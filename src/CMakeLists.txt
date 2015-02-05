@@ -10,6 +10,7 @@ set(PacBioBAM_DependencyIncludes
 )
 set(PacBioBAM_DependencyLibraries 
     ${Htslib_LibDir}/libhts.a
+    ${CMAKE_THREAD_LIBS_INIT}
     ${ZLIB_LIBRARIES}
 )
 
