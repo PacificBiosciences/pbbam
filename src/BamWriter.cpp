@@ -100,7 +100,7 @@ bool BamWriter::Open(const string& filename,
         return false;
     }
 
-    hts_set_threads(file_.get(), 4);
+//    hts_set_threads(file_.get(), 4);
 
     // write header
     const int ret = sam_hdr_write(file_.get(), header_.get());
