@@ -70,18 +70,22 @@ public:
     };
 
 public:
+    /// \name Constructors & Related Methods
+    /// \{
+
     BamRecord(void);
     BamRecord(const BamRecord& other);
     BamRecord(BamRecord&& other);
     BamRecord& operator=(const BamRecord& other);
     BamRecord& operator=(BamRecord&& other);
-    ~BamRecord(void);
+    virtual ~BamRecord(void);
+
+    /// \}
 
 public:
 
-    /** @name Core Data
-     */
-    ///@{
+    /// \name Core Data
+    /// \{
 
     /// \returns this record's assigned (BAI) index bin ID.
     inline uint32_t Bin(void) const;
@@ -155,12 +159,11 @@ public:
     /// \returns reference to this record
     inline BamRecord& ReferenceId(int32_t id);
 
-    ///@}
+    /// \}
 
 public:
-    /** @name Alignment Flags
-     */
-    ///@{
+    /// \name Alignment Flags
+    /// \{
 
     /// \returns true if this record is a PCR/optical duplicate
     inline bool IsDuplicate(void) const;
@@ -234,12 +237,11 @@ public:
     /// Sets whether this record is a supplementary alignment.
     inline BamRecord& SetSupplementaryAlignment(bool ok);
 
-    ///@}
+    /// \}
 
 public:
-    /** @name Variable-length Data (sequence, qualities, etc.)
-     */
-    ///@{
+    /// \name Variable-Length Data (sequence, qualities, etc.)
+    /// \{
 
     /// \returns the record's CIGAR data as a Cigar object
     Cigar CigarData(void) const;
@@ -342,10 +344,11 @@ public:
                                                  const size_t rawSequenceLength,
                                                  const char* qualities = 0);
 
+    /// \}
+
 public:
-    /** @name Tag Data
-     */
-    ///@{
+    /// \name Tag Data
+    ///\{
 
     /// \returns record's full tag data as a TagCollection object
     TagCollection Tags(void) const;
@@ -407,32 +410,29 @@ public:
     // tag iterator   ?
     // tag operator[] ?
 
-    ///@}
+    /// \}
 
-#ifdef PBBAM_TESTING
-public:
-#else
-private:
-#endif // PBBAM_TESTING
-
-    // returns a BamRecord object, with a deep copy of @rawData contents
-    static BamRecord FromRawData(const bam1_t* rawData);
-
+    /// \cond
     std::shared_ptr<bam1_t> RawData(void) const;
+    /// \endcond
 
 private:
+    // returns a BamRecord object, with a deep copy of @rawData contents
+    static BamRecord FromRawData(const std::shared_ptr<bam1_t>& rawData);
+
+
     // internal memory setup/expand methods
     void InitializeData(void);
     void MaybeReallocData(void);
 
     // core seq/qual logic shared by the public API
     BamRecord& SetSequenceAndQualitiesInternal(const char* sequence,
-                                               const size_t sequenceLength,
-                                               const char* qualities,
-                                               bool isPreencoded);
+                                                      const size_t sequenceLength,
+                                                      const char* qualities,
+                                                      bool isPreencoded);
 
 // data members
-private:
+protected:
     std::shared_ptr<bam1_t> d_;
 
     friend class BamReader;

@@ -38,7 +38,7 @@
 #ifndef BAMWRITER_H
 #define BAMWRITER_H
 
-#include "pbbam/BamRecord.h"
+
 #include "pbbam/Config.h"
 #include "pbbam/SamHeader.h"
 #include <memory>
@@ -46,6 +46,9 @@
 
 namespace PacBio {
 namespace BAM {
+
+class BamFile;
+class BamRecord;
 
 class PBBAM_EXPORT BamWriter
 {
@@ -73,27 +76,52 @@ public:
       , BestCompression    = CompressionLevel_9
     };
 
-public:
-    BamWriter(void);
-    ~BamWriter(void);
+    /// This enum describes the errors that may be returned by the Error() function.
+    enum WriteError
+    {
+        NoError = 0      ///< No error occurred.
+      , OpenFileError    ///< An error occurred while opening the file.
+      , NullHeaderError  ///< Header data was invalid.
+      , WriteHeaderError ///< An error occurred while writing header data.
+      , WriteRecordError ///< An error occurred while writing a record.
+    };
 
 public:
 
-    /// Closes the BAM file writer.
-    void Close(void);
+    /// \name Constructors & Related Methods
+    /// \{
 
     /// Opens a BAM file for writing & writes the header information.
     ///
-    /// Set \p filename to "-" for stdout.
+    /// The error status will be set if either operation fails.
+    ///
+    /// \note Set \p filename to "-" for stdout.
     ///
     /// \param[in] filename path to output BAM file
     /// \param[in] header SamHeader object
     /// \param[in] compressionLevel zlib compression level
-    ///
-    /// \returns success/failure
-    bool Open(const std::string& filename,
+    BamWriter(const std::string& filename,
               const SamHeader& header,
               const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression);
+
+    ~BamWriter(void);
+
+    /// \}
+
+public:
+
+    /// \name Data Writing & Resource Management
+
+    /// Closes BAM file - flushing any buffered data & releasing the file handle.
+    ///
+    /// The destructor handles cleanup and should suffice in most cases. However, this method
+    /// allows an earlier cleanup, if  necessary.
+    void Close(void);
+
+    /// Write any buffered data to file.
+    ///
+    /// \returns true if successful
+    bool Flush(void);
 
     /// Write a record to the output BAM file.
     ///
@@ -102,27 +130,39 @@ public:
     /// \returns succcess/failure
     bool Write(const BamRecord& record);
 
-    /// \returns human-readable error message
-    std::string ErrorString(void) const;
+    /// \}
 
-    /// \returns true if error encountered (error string is not empty)
-    bool HasError(void) const;
+    /// \name Error Handling
+    /// \{
 
-#ifdef PBBAM_TESTING
-public:
-#else
+    /// \returns error status code
+    BamWriter::WriteError Error(void) const;
+
+    /// \returns true if BamWriter::Error() == NoError
+    ///
+    /// \code
+    ///     BamWriter writer(...);
+    ///     if (!writer) {
+    ///         // handle error
+    ///         return;
+    ///     }
+    ///     // ok to work with writer
+    /// \endcode
+    operator bool(void) const;
+
+    /// \}
+
 private:
-#endif // PBBAM_TESTING
     bool Open(const std::string& filename,
-              bam_hdr_t *rawHeader,
+              const std::shared_ptr<bam_hdr_t> rawHeader,
               const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression);
-    bool Write(const bam1_t* rawRecord);
+    bool Write(const std::shared_ptr<bam1_t>& rawRecord);
 
 private:
-    std::shared_ptr<samFile> file_;
+    std::shared_ptr<samFile>   file_;
     std::shared_ptr<bam_hdr_t> header_;
     std::string filename_;
-    std::string errorString_;
+    BamWriter::WriteError error_;
 };
 
 } // namespace BAM

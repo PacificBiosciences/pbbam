@@ -35,25 +35,31 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
+#ifndef ENTIREFILEQUERY_H
+#define ENTIREFILEQUERY_H
 
-#include "TestData.h"
-#include <gtest/gtest.h>
+#include "pbbam/QueryBase.h"
 #include <htslib/sam.h>
-#include <pbbam/BamReader.h>
-#include <pbbam/BamWriter.h>
-#include <pbbam/SamHeader.h>
-#include <iostream>
-#include <string>
-#include <cstdio>
-#include <cstdlib>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
+#include <memory>
 
-// put any BamReader-only API tests here (error handling, random-access, etc.)
-//
-// plain ol' read & dump is in test_EndToEnd.cpp
+namespace PacBio {
+namespace BAM {
 
+class BamFile;
+
+class PBBAM_EXPORT EntireFileQuery : public QueryBase
+{
+public:
+    EntireFileQuery(const BamFile& file);
+protected:
+    bool GetNext(BamRecord& record);
+
+private:
+    std::shared_ptr<samFile>   file_;
+    std::shared_ptr<bam_hdr_t> header_;
+};
+
+} // namespace BAM
+} // namspace PacBio
+
+#endif // ENTIREFILEQUERY_H

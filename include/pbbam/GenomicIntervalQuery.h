@@ -35,25 +35,44 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
+#ifndef GENOMICINTERVALQUERY_H
+#define GENOMICINTERVALQUERY_H
 
-#include "TestData.h"
-#include <gtest/gtest.h>
-#include <htslib/sam.h>
-#include <pbbam/BamReader.h>
-#include <pbbam/BamWriter.h>
-#include <pbbam/SamHeader.h>
-#include <iostream>
+#include "pbbam/GenomicInterval.h"
+#include "pbbam/QueryBase.h"
 #include <string>
-#include <cstdio>
-#include <cstdlib>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
-// put any BamReader-only API tests here (error handling, random-access, etc.)
-//
-// plain ol' read & dump is in test_EndToEnd.cpp
+namespace PacBio {
+namespace BAM {
 
+class BamFile;
+
+class PBBAM_EXPORT GenomicIntervalQuery : public QueryBase
+{
+public:
+//    GenomicIntervalQuery(const std::string& zeroBasedRegion,
+//                         const BamFile& file);
+    GenomicIntervalQuery(const GenomicInterval& interval,
+                         const BamFile& file);
+
+    GenomicIntervalQuery& Interval(const GenomicInterval& interval);
+    GenomicInterval Interval(void) const;
+
+protected:
+    bool GetNext(BamRecord& record);
+
+private:
+    bool InitFile(const BamFile& file);
+
+private:
+    GenomicInterval interval_;
+    std::shared_ptr<samFile>   file_;
+    std::shared_ptr<bam_hdr_t> header_;
+    std::shared_ptr<hts_idx_t> index_;
+    std::shared_ptr<hts_itr_t> iterator_;
+};
+
+} // namespace BAM
+} // namspace PacBio
+
+#endif // GENOMICINTERVALQUERY_H

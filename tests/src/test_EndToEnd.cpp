@@ -35,20 +35,54 @@
 
 // Author: Derek Barnett
 
-#include "TestData.h"
+#ifdef PBBAM_TESTING
+#define private public
+#define protected public
+#endif
 
+#include "TestData.h"
 #include <gtest/gtest.h>
 #include <htslib/sam.h>
+#include <pbbam/BamFile.h>
 #include <pbbam/BamReader.h>
 #include <pbbam/BamWriter.h>
+#include <pbbam/EntireFileQuery.h>
 #include <pbbam/SamHeader.h>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <cstdio>
 #include <cstdlib>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
+
+struct Bam1Deleter
+{
+    void operator()(bam1_t* b) {
+        if (b)
+            bam_destroy1(b);
+        b = nullptr;
+    }
+};
+
+struct SamFileDeleter
+{
+    void operator()(samFile* file) {
+        if (file)
+            sam_close(file);
+        file = nullptr;
+    }
+};
+
+struct BamHdrDeleter
+{
+    void operator()(bam_hdr_t* hdr) {
+        if (hdr)
+            bam_hdr_destroy(hdr);
+        hdr = nullptr;
+    }
+};
 
 const string inputBamFn        = tests::Data_Dir + "/ex2.bam";
 const string goldStandardSamFn = tests::Data_Dir + "/ex2.sam";
@@ -84,22 +118,22 @@ void RemoveGeneratedFiles(const string& fn1,
 TEST(EndToEndTest, ReadPureHtslib_WritePureHtslib)
 {
     // open input BAM file
-    samFile* inputBam = sam_open(inputBamFn.c_str(), "r");
+    shared_ptr<samFile> inputBam(sam_open(inputBamFn.c_str(), "r"), SamFileDeleter());
     EXPECT_TRUE(inputBam != 0);
-    bam_hdr_t* header = sam_hdr_read(inputBam);
+    shared_ptr<bam_hdr_t> header(sam_hdr_read(inputBam.get()), BamHdrDeleter());
 
     // open output BAM file
-    samFile* outputBam = sam_open(generatedBamFn.c_str(), "wb");
-    sam_hdr_write(outputBam, header);
+    shared_ptr<samFile> outputBam(sam_open(generatedBamFn.c_str(), "wb"), SamFileDeleter());
+    sam_hdr_write(outputBam.get(), header.get());
 
     // copy BAM file
-    bam1_t* record = bam_init1();
-    while ( sam_read1(inputBam, header, record) >= 0 )
-        sam_write1(outputBam, header, record);
+    shared_ptr<bam1_t> record(bam_init1(), Bam1Deleter());
+    while (sam_read1(inputBam.get(), header.get(), record.get()) >= 0)
+        sam_write1(outputBam.get(), header.get(), record.get());
 
     // need to close files before comparing (to flush any buffers)
-    sam_close(inputBam);
-    sam_close(outputBam);
+    inputBam.reset();
+    outputBam.reset();
 
     // convert to sam & diff against gold standard
     const int convertRet = Samtools_Bam2Sam(generatedBamFn, generatedSamFn);
@@ -108,8 +142,6 @@ TEST(EndToEndTest, ReadPureHtslib_WritePureHtslib)
     EXPECT_EQ(0, diffRet);
 
     // clean up
-    bam_destroy1(record);
-    bam_hdr_destroy(header);
     RemoveGeneratedFiles(generatedBamFn, generatedSamFn);
 }
 
@@ -121,13 +153,12 @@ TEST(EndToEndTest, ReadRawData_WriteRawData)
     EXPECT_TRUE(inputOpenedOk);
 
     // open output BAM file
-    BamWriter writer;
-    const bool outputOpenedOk = writer.Open(generatedBamFn, reader.Header().CreateRawData());
-    EXPECT_TRUE(outputOpenedOk);
+    BamWriter writer(generatedBamFn, reader.Header());
+    EXPECT_TRUE(writer);
 
     // copy BAM file
-    bam1_t* record = bam_init1();
-    while ( reader.GetNext(record) )
+    shared_ptr<bam1_t> record(bam_init1(), Bam1Deleter());
+    while (reader.GetNext(record))
         writer.Write(record);
 
     // need to close files before comparing (to flush any buffers)
@@ -141,30 +172,25 @@ TEST(EndToEndTest, ReadRawData_WriteRawData)
     EXPECT_EQ(0, diffRet);
 
     // clean up
-    bam_destroy1(record);
     RemoveGeneratedFiles(generatedBamFn, generatedSamFn);
 }
 
 TEST(EndToEndTest, ReadBamRecord_WriteBamRecord)
 {
     // open input BAM file
-    BamReader reader;
-    const bool inputOpenedOk = reader.Open(inputBamFn);
-    EXPECT_TRUE(inputOpenedOk);
+    BamFile bamFile(inputBamFn);
+    EXPECT_TRUE(bamFile.Error() == BamFile::NoError);
 
     // open output BAM file
-    BamWriter writer;
-    const bool outputOpenedOk = writer.Open(generatedBamFn, reader.Header());
-    EXPECT_TRUE(outputOpenedOk);
+    BamWriter writer(generatedBamFn, bamFile.Header());
+    EXPECT_TRUE(writer);
 
     // copy BAM file
-    BamRecord record;
-    while ( reader.GetNext(&record) )
+    EntireFileQuery entireFile(bamFile);
+    EXPECT_TRUE(entireFile);
+    for (const BamRecord& record : entireFile)
         writer.Write(record);
-
-    // need to close files before comparing (to flush any buffers)
-    reader.Close();
-    writer.Close();
+    writer.Close();  // need to close output file before comparing (to flush any buffers)
 
     // convert to sam & diff against gold standard
     const int convertRet = Samtools_Bam2Sam(generatedBamFn, generatedSamFn);

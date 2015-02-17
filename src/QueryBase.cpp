@@ -35,25 +35,23 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include "TestData.h"
-#include <gtest/gtest.h>
-#include <htslib/sam.h>
-#include <pbbam/BamReader.h>
-#include <pbbam/BamWriter.h>
-#include <pbbam/SamHeader.h>
-#include <iostream>
-#include <string>
-#include <cstdio>
-#include <cstdlib>
+#include "pbbam/QueryBase.h"
+#include "pbbam/BamRecord.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-// put any BamReader-only API tests here (error handling, random-access, etc.)
-//
-// plain ol' read & dump is in test_EndToEnd.cpp
+QueryBase::QueryBase(void)
+    : error_(QueryError::NoError)
+{ }
 
+QueryBase::~QueryBase(void) { }
+
+QueryBase::operator bool(void) const {
+    return (error_ == QueryBase::NoError);
+}
+
+QueryBase::QueryError QueryBase::Error(void) const
+{
+    return error_;
+}

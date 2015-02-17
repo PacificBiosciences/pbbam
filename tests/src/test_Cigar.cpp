@@ -35,6 +35,10 @@
 
 // Author: Derek Barnett
 
+#ifdef PBBAM_TESTING
+#define private public
+#endif
+
 #include <gtest/gtest.h>
 #include <pbbam/Cigar.h>
 #include <string>

@@ -35,25 +35,36 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
+#ifndef UNMAPPEDREADSQUERY_H
+#define UNMAPPEDREADSQUERY_H
 
-#include "TestData.h"
-#include <gtest/gtest.h>
-#include <htslib/sam.h>
-#include <pbbam/BamReader.h>
-#include <pbbam/BamWriter.h>
-#include <pbbam/SamHeader.h>
-#include <iostream>
-#include <string>
-#include <cstdio>
-#include <cstdlib>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
+// TODO: Not yet implemented.
+//       Can't get bam_itr_queryi(idx, HTS_IDX_NOCOOR, -1, -1) to work reliably at the moment.
 
-// put any BamReader-only API tests here (error handling, random-access, etc.)
-//
-// plain ol' read & dump is in test_EndToEnd.cpp
+//#include "pbbam/QueryBase.h"
+//#include <string>
 
+//namespace PacBio {
+//namespace BAM {
+
+//class BamFile;
+
+//class PBBAM_EXPORT UnmappedReadsQuery : public QueryBase
+//{
+//public:
+//    UnmappedReadsQuery(const BamFile& file);
+
+//protected:
+//    bool GetNext(BamRecord& record);
+
+//private:
+//    std::shared_ptr<samFile>   file_;
+////    std::shared_ptr<bam_hdr_t> header_;
+//    std::shared_ptr<hts_idx_t> index_;
+//    std::shared_ptr<hts_itr_t> iterator_;
+//};
+
+//} // namespace BAM
+//} // namspace PacBio
+
+#endif // UNMAPPEDREADSQUERY_H

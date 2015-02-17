@@ -44,30 +44,51 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
-// intended for use with std::shared_ptr<samFile>
-struct RawFileDeleter
+// intended for use with std::shared_ptr<T>, std::unique_ptr<T>, etc
+struct HtslibFileDeleter
 {
-    void operator()(samFile* file) {
+    void operator()(samFile* file)
+    {
         if (file)
             sam_close(file);
         file = nullptr;
     }
 };
 
-// intended for use with std::shared_ptr<bam_hdr_t>
-struct RawHeaderDeleter
+struct HtslibHeaderDeleter
 {
-    void operator()(bam_hdr_t* hdr) {
+    void operator()(bam_hdr_t* hdr)
+    {
         if (hdr)
             bam_hdr_destroy(hdr);
         hdr = nullptr;
     }
 };
 
-// intended for use with std::shared_ptr<bam1_t>
-struct RawRecordDeleter
+struct HtslibIndexDeleter
 {
-    void operator()(bam1_t* b) {
+    void operator()(hts_idx_t* index)
+    {
+        if (index)
+            hts_idx_destroy(index);
+        index = nullptr;
+    }
+};
+
+struct HtslibIteratorDeleter
+{
+    void operator()(hts_itr_t* iter)
+    {
+        if (iter)
+            hts_itr_destroy(iter);
+        iter = nullptr;
+    }
+};
+
+struct HtslibRecordDeleter
+{
+    void operator()(bam1_t* b)
+    {
         if (b)
             bam_destroy1(b);
         b = nullptr;

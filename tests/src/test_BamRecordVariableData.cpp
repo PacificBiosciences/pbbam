@@ -35,6 +35,10 @@
 
 // Author: Derek Barnett
 
+#ifdef PBBAM_TESTING
+#define private public
+#endif
+
 #include <gtest/gtest.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamTagCodec.h>
@@ -588,6 +592,9 @@ TEST(BamRecordVariableDataTest, SeqQualOnly_Init_Preencoded) {
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities());
     tests::CheckRawData(bam);
+
+    if (encoded)
+        free(encoded);
 }
 
 TEST(BamRecordVariableDataTest, SeqQualOnly_Init_Preencoded_EmptyQual) {
@@ -629,6 +636,9 @@ TEST(BamRecordVariableDataTest, SeqQualOnly_Init_Preencoded_EmptyQual) {
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities());
     tests::CheckRawData(bam);
+
+    if (encoded)
+        free(encoded);
 }
 
 TEST(BamRecordVariableDataTest, SeqQualOnly_ThenOverwriteWithLongerSeq_NormalQual)

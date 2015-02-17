@@ -55,7 +55,7 @@ BamRecord::BamRecord(void)
 }
 
 BamRecord::BamRecord(const BamRecord& other)
-    : d_(bam_dup1(other.d_.get()), internal::RawRecordDeleter())
+    : d_(bam_dup1(other.d_.get()), internal::HtslibRecordDeleter())
 { }
 
 BamRecord::BamRecord(BamRecord&& other)
@@ -145,7 +145,7 @@ BamRecord& BamRecord::CigarData(const Cigar& cigar)
     return *this;
 }
 
-BamRecord& BamRecord::CigarData(const string& cigarString)
+BamRecord& BamRecord::CigarData(const std::string& cigarString)
 {
     return CigarData(Cigar::FromStdString(cigarString));
 }
@@ -155,10 +155,10 @@ bool BamRecord::EditTag(const string& tagName, const Tag& newValue)
     return RemoveTag(tagName) && AddTag(tagName, newValue);
 }
 
-BamRecord BamRecord::FromRawData(const bam1_t* rawData)
+BamRecord BamRecord::FromRawData(const shared_ptr<bam1_t>& rawData)
 {
     BamRecord result;
-    bam_copy1(result.d_.get(), rawData);
+    bam_copy1(result.d_.get(), rawData.get());
     return result;
 }
 
@@ -171,7 +171,7 @@ bool BamRecord::HasTag(const string& tagName) const
 
 void BamRecord::InitializeData(void)
 {
-    d_.reset(bam_init1(), internal::RawRecordDeleter());
+    d_.reset(bam_init1(), internal::HtslibRecordDeleter());
     d_->data = static_cast<uint8_t*>(calloc(0x800, sizeof(uint8_t)));   // maybe make this value tune-able later?
 
     // initialized with NULL term for qname
@@ -196,7 +196,7 @@ string BamRecord::Name(void) const
     return string(bam_get_qname(d_));
 }
 
-BamRecord& BamRecord::Name(const string& name)
+BamRecord& BamRecord::Name(const std::string& name)
 {
     // determine change in memory needed
     // diffNumBytes: pos -> growing, neg -> shrinking
@@ -234,10 +234,12 @@ string BamRecord::Qualities(void) const
     return result;
 }
 
+/// \cond
 std::shared_ptr<bam1_t> BamRecord::RawData(void) const
 {
     return d_;
 }
+/// \endcond
 
 bool BamRecord::RemoveTag(const string& tagName)
 {
@@ -260,8 +262,8 @@ string BamRecord::Sequence(void) const
     return result;
 }
 
-BamRecord& BamRecord::SetSequenceAndQualities(const string& sequence,
-                                              const string& qualities)
+BamRecord& BamRecord::SetSequenceAndQualities(const std::string& sequence,
+                                              const std::string& qualities)
 {
     // TODO: I'm ok with the assert for now, but how to handle at runtime?
     if (!qualities.empty()) {

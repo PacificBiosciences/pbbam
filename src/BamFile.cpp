@@ -35,90 +35,104 @@
 
 // Author: Derek Barnett
 
-#include "pbbam/Cigar.h"
+#include "pbbam/BamFile.h"
+#include "AssertUtils.h"
+#include "MemoryUtils.h"
 #include <htslib/sam.h>
-#include <sstream>
+#include <memory>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-// CigarOperation
-
-string CigarOperation::cigarCodes_ = string("MIDNSHP=X");
-
-CigarOperation::CigarOperation(void)
-    : type_()
-{ }
-
-CigarOperation::CigarOperation(char type, uint32_t length)
-    : type_(type)
-    , length_(length)
-{ }
-
-CigarOperation::CigarOperation(CigarOperationType op, uint32_t length)
-    : type_(CigarOperation::TypeToChar(op))
-    , length_(length)
-{ }
-
-CigarOperation::CigarOperation(const CigarOperation &other)
-    : type_(other.type_)
-    , length_(other.length_)
-{ }
-
-CigarOperation::~CigarOperation(void) { }
-
-char CigarOperation::TypeToChar(const CigarOperationType& type)
+BamFile::BamFile(const std::string& filename)
+    : filename_(filename)
+    , error_(BamFile::NoError)
 {
-    return bam_cigar_opchr(static_cast<int>(type));
-}
-
-CigarOperationType CigarOperation::CharToType(const char c)
-{
-    size_t index = cigarCodes_.find(c);
-    if (index == string::npos)
-        index = 0;
-    return static_cast<CigarOperationType>(index);
-}
-
-// Cigar
-
-Cigar::Cigar(void)
-    : vector<CigarOperation>()
-{ }
-
-Cigar::Cigar(const Cigar& other)
-    : vector<CigarOperation>(other)
-{ }
-
-Cigar::~Cigar(void) { }
-
-Cigar Cigar::FromStdString(const string& stdString)
-{
-    Cigar result;
-
-    size_t numberStart = 0;
-    const size_t numChars = stdString.size();
-    for (size_t i = 0; i < numChars; ++i) {
-        const char c = stdString.at(i);
-        if (!::isdigit(c)) {
-            const size_t distance = i - numberStart;
-            const uint32_t length = stoul(stdString.substr(numberStart, distance));
-            result.push_back(CigarOperation(c, length));
-            numberStart = i+1;
-        }
+    std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename.c_str(), "rb"));
+    if (!f) {
+        error_ = BamFile::OpenError;
+        return;
     }
 
-    return result;
+    std::shared_ptr<bam_hdr_t> hdr(sam_hdr_read(f.get()), internal::HtslibHeaderDeleter());
+    if (!hdr) {
+        error_ = BamFile::ReadHeaderError;
+        return;
+    }
+    header_ = std::move(SamHeader::FromRawData(hdr));
 }
 
-string Cigar::ToStdString(void) const
+BamFile::BamFile(const BamFile& other)
+    : filename_(other.filename_)
+    , header_(other.header_)
+    , error_(other.error_)
+{ }
+
+BamFile::~BamFile(void) { }
+
+BamFile::operator bool(void) const
 {
-    stringstream s;
-    const auto end  = this->cend();
-    for (auto iter = this->cbegin(); iter != end; ++iter) {
-        const CigarOperation& cigar = (*iter);
-        s << cigar.Length()
-          << cigar.Type();
+    return error_ == BamFile::NoError;
+}
+
+BamFile::FileError BamFile::Error(void) const
+{
+    return error_;
+}
+
+string BamFile::Filename(void) const
+{
+    return filename_;
+}
+
+SamHeader BamFile::Header(void) const
+{
+    return header_;
+}
+
+bool BamFile::IsPacBioBAM(void) const
+{
+    return !header_.pacbioBamVersion.empty();
+}
+
+string BamFile::StandardIndexFilename(void) const
+{
+    return filename_ + ".bai";
+}
+
+string BamFile::PacBioIndexFilename(void) const
+{
+    return filename_ + ".pbi";
+}
+
+int BamFile::ReferenceId(const string& name) const
+{
+    return header_.sequences.IndexOf(name);
+}
+
+uint32_t BamFile::ReferenceLength(const std::string& name) const
+{
+    return ReferenceLength(ReferenceId(name));
+}
+
+uint32_t BamFile::ReferenceLength(const int id) const
+{
+    if (id < 0)
+        return 0;
+    try {
+        return stoul(header_.sequences.At(id).length);
+    } catch (std::exception&) {
+        return 0;
     }
-    return s.str();
+}
+
+string BamFile::ReferenceName(const int id) const
+{
+    if (id < 0)
+        return string();
+    try {
+        return header_.sequences.At(id).name;
+    } catch (std::exception&) {
+        return string();
+    }
 }

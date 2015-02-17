@@ -49,21 +49,21 @@
 // -------------------------------------
 
 #if defined(WIN32)
-#  define PP_LIBRARY_EXPORT __declspec(dllexport)
+#  define PBBAM_LIBRARY_EXPORT __declspec(dllexport)
 #else
-#  define PP_LIBRARY_EXPORT __attribute__((visibility("default")))
+#  define PBBAM_LIBRARY_EXPORT __attribute__((visibility("default")))
 #endif
 
 #if defined(WIN32)
-#  define PP_LIBRARY_IMPORT __declspec(dllimport)
+#  define PBBAM_LIBRARY_IMPORT __declspec(dllimport)
 #else
-#  define PP_LIBRARY_IMPORT
+#  define PBBAM_LIBRARY_IMPORT
 #endif
 
 #if defined(PBBAM_LIBRARY)
-#  define PBBAM_EXPORT PP_LIBRARY_EXPORT
+#  define PBBAM_EXPORT PBBAM_LIBRARY_EXPORT
 #else
-#  define PBBAM_EXPORT PP_LIBRARY_IMPORT
+#  define PBBAM_EXPORT PBBAM_LIBRARY_IMPORT
 #endif
 
 #endif // PBBAM_CONFIG_H

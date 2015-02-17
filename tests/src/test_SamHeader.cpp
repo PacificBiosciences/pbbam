@@ -35,6 +35,10 @@
 
 // Author: Derek Barnett
 
+#ifdef PBBAM_TESTING
+#define private public
+#endif
+
 #include <gtest/gtest.h>
 #include <pbbam/SamHeader.h>
 #include <pbbam/SamHeaderCodec.h>
@@ -45,6 +49,19 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
+
+namespace tests {
+
+struct BamHdrDeleter
+{
+    void operator()(bam_hdr_t* hdr) {
+        if (hdr)
+            bam_hdr_destroy(hdr);
+        hdr = nullptr;
+    }
+};
+
+} // namespace tests
 
 TEST(DictionaryTest, DefaultConstruction)
 {
@@ -262,7 +279,6 @@ TEST(SamHeaderCodecTest, EncodeTest)
                                  "@CO\tcitation needed\n";
 
     const string& text = SamHeaderCodec::Encode(header);
-
     EXPECT_EQ(expectedText, text);
 }
 
@@ -293,11 +309,9 @@ TEST(SamHeaderTest, ConvertToRawDataOk)
                                  "@CO\tipsum and so on\n"
                                  "@CO\tcitation needed\n";
 
-    bam_hdr_t* rawData = header.CreateRawData();
+    shared_ptr<bam_hdr_t> rawData = header.CreateRawData();
     const string rawText = string(rawData->text, rawData->l_text);
     EXPECT_EQ(expectedText, rawText);
-
-    bam_hdr_destroy(rawData);
 }
 
 TEST(SamHeaderTest, ExtractFromRawDataOk)
@@ -327,11 +341,12 @@ TEST(SamHeaderTest, ExtractFromRawDataOk)
                                  "@CO\tipsum and so on\n"
                                  "@CO\tcitation needed\n";
 
-    bam_hdr_t* rawData = header.CreateRawData();
+    shared_ptr<bam_hdr_t> rawData = header.CreateRawData();
     SamHeader newHeader = SamHeader::FromRawData(rawData);
+    EXPECT_EQ(header.version, newHeader.version);
+    EXPECT_EQ(header.sortOrder, newHeader.sortOrder);
+    EXPECT_EQ(header.pacbioBamVersion, newHeader.pacbioBamVersion);
 
     const string& text = SamHeaderCodec::Encode(newHeader);
     EXPECT_EQ(expectedText, text);
-
-    bam_hdr_destroy(rawData);
 }

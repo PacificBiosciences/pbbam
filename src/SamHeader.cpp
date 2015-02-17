@@ -37,6 +37,8 @@
 
 #include "pbbam/SamHeader.h"
 #include "pbbam/SamHeaderCodec.h"
+#include "MemoryUtils.h"
+#include <iostream>
 #include <cstring>
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -44,18 +46,17 @@ using namespace std;
 
 SamHeader::SamHeader(void) { }
 
-SamHeader SamHeader::FromRawData(bam_hdr_t* rawData)
+SamHeader SamHeader::FromRawData(const std::shared_ptr<bam_hdr_t> rawData)
 {
-    if (rawData == 0 || rawData->l_text == 0 || rawData->text == 0)
+    if ( !rawData || rawData->l_text == 0 || rawData->text == 0)
         return SamHeader();
     return SamHeaderCodec::Decode(string(rawData->text, rawData->l_text));
 }
 
-bam_hdr_t* SamHeader::CreateRawData(void) const
+std::shared_ptr<bam_hdr_t> SamHeader::CreateRawData(void) const
 {
     const string& text = SamHeaderCodec::Encode(*this);
-
-    bam_hdr_t* rawData = sam_hdr_parse(text.size(), text.c_str());
+    std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), internal::HtslibHeaderDeleter());
     rawData->ignore_sam_err = 0;
     rawData->cigar_tab = NULL;
     rawData->l_text = text.size();

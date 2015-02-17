@@ -88,9 +88,9 @@ const vector<string> Split(const string& line, const char delim = '\t')
 void SamHeaderCodec::DecodeHeaderLine(const string& line,
                                       SamHeader* header)
 {
-    static const string Token_VN = string("VN");
-    static const string Token_SO = string("SO");
-    static const string Token_pb = string("pb");
+    static string Token_VN = string("VN");
+    static string Token_SO = string("SO");
+    static string Token_pb = string("pb");
 
     // split HD lines into tokens
     const vector<string>& tokens = Split(line);
@@ -112,18 +112,17 @@ void SamHeaderCodec::DecodeHeaderLine(const string& line,
     // check for required tags
     if (header->version.empty())
         header->version = string(hts_version());
-
 }
 
 void SamHeaderCodec::DecodeSequenceLine(const string& line,
                                         SamHeader* header)
 {
-    static const string Token_SN = string("SN");
-    static const string Token_LN = string("LN");
-    static const string Token_AS = string("AS");
-    static const string Token_M5 = string("M5");
-    static const string Token_SP = string("SP");
-    static const string Token_UR = string("UR");
+    static string Token_SN = string("SN");
+    static string Token_LN = string("LN");
+    static string Token_AS = string("AS");
+    static string Token_M5 = string("M5");
+    static string Token_SP = string("SP");
+    static string Token_UR = string("UR");
 
     // split SQ line into tokens
     const vector<string>& tokens = Split(line);
@@ -157,18 +156,18 @@ void SamHeaderCodec::DecodeSequenceLine(const string& line,
 void SamHeaderCodec::DecodeReadGroupLine(const string& line,
                                          SamHeader* header)
 {
-    static const string Token_ID = string("ID");
-    static const string Token_CN = string("CN");
-    static const string Token_DS = string("DS");
-    static const string Token_DT = string("DT");
-    static const string Token_FO = string("FO");
-    static const string Token_KS = string("KS");
-    static const string Token_LB = string("LB");
-    static const string Token_PG = string("PG");
-    static const string Token_PI = string("PI");
-    static const string Token_PL = string("PL");
-    static const string Token_PU = string("PU");
-    static const string Token_SM = string("SM");
+    static string Token_ID = string("ID");
+    static string Token_CN = string("CN");
+    static string Token_DS = string("DS");
+    static string Token_DT = string("DT");
+    static string Token_FO = string("FO");
+    static string Token_KS = string("KS");
+    static string Token_LB = string("LB");
+    static string Token_PG = string("PG");
+    static string Token_PI = string("PI");
+    static string Token_PL = string("PL");
+    static string Token_PU = string("PU");
+    static string Token_SM = string("SM");
 
     // split SQ line into tokens
     const vector<string>& tokens = Split(line);
@@ -208,12 +207,12 @@ void SamHeaderCodec::DecodeReadGroupLine(const string& line,
 void SamHeaderCodec::DecodeProgramLine(const string& line,
                                        SamHeader* header)
 {
-    static const string Token_ID = string("ID");
-    static const string Token_CL = string("CL");
-    static const string Token_DS = string("DS");
-    static const string Token_PN = string("PN");
-    static const string Token_PP = string("PP");
-    static const string Token_VN = string("VN");
+    const string Token_ID = string("ID");
+    const string Token_CL = string("CL");
+    const string Token_DS = string("DS");
+    const string Token_PN = string("PN");
+    const string Token_PP = string("PP");
+    const string Token_VN = string("VN");
 
     // split SQ line into tokens
     const vector<string>& tokens = Split(line);

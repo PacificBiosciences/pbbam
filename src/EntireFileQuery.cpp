@@ -35,25 +35,41 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include "TestData.h"
-#include <gtest/gtest.h>
-#include <htslib/sam.h>
-#include <pbbam/BamReader.h>
-#include <pbbam/BamWriter.h>
-#include <pbbam/SamHeader.h>
-#include <iostream>
-#include <string>
-#include <cstdio>
-#include <cstdlib>
+#include "pbbam/EntireFileQuery.h"
+#include "pbbam/BamFile.h"
+#include "MemoryUtils.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-// put any BamReader-only API tests here (error handling, random-access, etc.)
-//
-// plain ol' read & dump is in test_EndToEnd.cpp
+EntireFileQuery::EntireFileQuery(const BamFile& file)
+    : QueryBase()
+    , file_(nullptr)
+    , header_(nullptr)
+{
+    file_.reset(sam_open(file.Filename().c_str(), "rb"), internal::HtslibFileDeleter());
+    if (!file_) {
+        error_ = EntireFileQuery::FileOpenError;
+        return;
+    }
 
+    header_.reset(sam_hdr_read(file_.get()), internal::HtslibHeaderDeleter());
+    if (!header_) {
+        error_ = EntireFileQuery::FileMetadataError;
+        return;
+    }
+}
+
+bool EntireFileQuery::GetNext(BamRecord& record)
+{
+    if (error_ == EntireFileQuery::NoError) {
+        const int result = sam_read1(file_.get(), header_.get(), record.RawData().get());
+        if (result >= 0)
+            return true;
+        else if (result < -1) {
+            // TODO: determine & report error (probaby truncated BAM file)
+        }
+
+    }
+    return false;
+}

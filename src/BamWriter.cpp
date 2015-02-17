@@ -36,45 +36,58 @@
 // Author: Derek Barnett
 
 #include "pbbam/BamWriter.h"
+#include "pbbam/BamRecord.h"
+#include "pbbam/BamFile.h"
 #include "AssertUtils.h"
 #include "MemoryUtils.h"
+#include <htslib/bgzf.h>
 #include <htslib/hts.h>
 #include <iostream>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-BamWriter::BamWriter()
+BamWriter::BamWriter(const std::string& filename,
+                     const SamHeader& header,
+                     const BamWriter::CompressionLevel compressionLevel)
     : file_(nullptr)
     , header_(nullptr)
-{ }
+    , error_(BamWriter::NoError)
+{
+     Open(filename, header.CreateRawData(), compressionLevel);
+}
 
 BamWriter::~BamWriter(void)
 {
     Close();
 }
 
+BamWriter::operator bool(void) const
+{
+    return (error_ == BamWriter::NoError);
+}
+
 void BamWriter::Close(void)
 {
-    filename_.clear();
-    errorString_.clear();
-
-    file_.reset();
     header_.reset();
+    file_.reset();
+    error_ = BamWriter::NoError;
+    filename_.empty();
 }
 
-string BamWriter::ErrorString(void) const
+BamWriter::WriteError BamWriter::Error(void) const
 {
-    return errorString_;
+    return error_;
 }
 
-bool BamWriter::HasError(void) const
+bool BamWriter::Flush(void)
 {
-    return !errorString_.empty();
+    // TODO: sanity checks on file_ & fp
+    return (bgzf_flush(file_.get()->fp.bgzf) == 0);
 }
 
 bool BamWriter::Open(const string& filename,
-                     bam_hdr_t* rawHeader,
+                     const shared_ptr<bam_hdr_t> rawHeader,
                      const CompressionLevel compressionLevel)
 {
     // ensure clean slate
@@ -84,53 +97,47 @@ bool BamWriter::Open(const string& filename,
     filename_ = filename;
 
     // store header
-    header_.reset(rawHeader, internal::RawHeaderDeleter());
+    header_ = rawHeader;
     if (!header_) {
-        errorString_ = "invalid header data";
+        error_ = BamWriter::NullHeaderError;
         return false;
     }
-
-    PB_ASSERT_OR_RETURN_VALUE(header_, false);
+    PB_ASSERT_OR_RETURN_VALUE((bool)header_, false);
 
     // open file
     const string& mode = string("wb") + to_string(static_cast<int>(compressionLevel));
-    file_.reset(sam_open(filename_.c_str(), mode.c_str()), internal::RawFileDeleter());
+    file_.reset(sam_open(filename_.c_str(), mode.c_str()), internal::HtslibFileDeleter());
     if (!file_) {
-        errorString_ = "could not open " + filename_;
+        error_ = BamWriter::OpenFileError;
         return false;
     }
 
+    // TODO: setup multithreading ??
 //    hts_set_threads(file_.get(), 4);
 
     // write header
     const int ret = sam_hdr_write(file_.get(), header_.get());
     if (ret != 0) {
-        errorString_ = "could not write header";
+        error_ = BamWriter::WriteHeaderError;
         return false;
     }
 
+    // if we get here, return success
     return true;
-}
-
-bool BamWriter::Open(const string& filename,
-                     const SamHeader& header,
-                     const CompressionLevel compressionLevel)
-{
-    return Open(filename, header.CreateRawData(), compressionLevel);
 }
 
 bool BamWriter::Write(const BamRecord& record)
 {
-    return Write(record.RawData().get());
+    return Write(record.RawData());
 }
 
-bool BamWriter::Write(const bam1_t* rawRecord)
+bool BamWriter::Write(const std::shared_ptr<bam1_t>& rawRecord)
 {
-    const int ret = sam_write1(file_.get(), header_.get(), rawRecord);
+    const int ret = sam_write1(file_.get(), header_.get(), rawRecord.get());
     if (ret > 0)
         return true;
     else {
-        errorString_ = "could not write BAM record";
+        error_ = BamWriter::WriteRecordError;
         return false;
     }
 }

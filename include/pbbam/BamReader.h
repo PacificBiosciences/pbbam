@@ -49,9 +49,19 @@ namespace BAM {
 
 class PBBAM_EXPORT BamReader
 {
+
+public:
+    enum ReadError
+    {
+        NoError = 0
+      , OpenFileError
+      , ReadHeaderError
+      , ReadRecordError
+    };
+
 public:
     BamReader(void);
-    ~BamReader(void);
+    virtual ~BamReader(void);
 
 public:
 
@@ -71,10 +81,10 @@ public:
     /// \returns header as SamHeader object
     SamHeader Header(void) const;
 
-    /// \returns human-readable error message
-    std::string ErrorString(void) const;
+    /// \returns error status code
+    BamReader::ReadError Error(void) const;
 
-    /// \returns true if error encountered (error string is not empty)
+    /// \returns true if error encountered
     bool HasError(void) const;
 
     /// Fetches the next record in a BAM file.
@@ -82,26 +92,21 @@ public:
     /// \param[out] record pointer to BamRecord object
     ///
     /// \returns succcess/failure
-    bool GetNext(BamRecord* record);
+    bool GetNext(std::shared_ptr<BamRecord> record);
 
-#ifdef PBBAM_TESTING
 public:
-#else
-private:
-#endif // PBBAM_TESTING
+    std::string PacBioBamVersion(void) const;
 
-    bool GetNext(bam1_t* rawRecord);
-    bam_hdr_t* RawHeader(void) const;
-
-private:
+protected:
+    bool GetNext(std::shared_ptr<bam1_t> rawRecord);
     void InitialOpen(void);
+    std::shared_ptr<bam_hdr_t> RawHeader(void) const;
 
-private:
-    std::shared_ptr<samFile>    file_;
-    std::shared_ptr<bam_hdr_t>  header_;
-    std::shared_ptr<bam1_t>     rawRecord_;
+protected:
+    std::shared_ptr<samFile>   file_;
+    std::shared_ptr<bam_hdr_t> header_;
     std::string filename_;
-    std::string errorString_;
+    BamReader::ReadError error_;
 };
 
 } // namespace BAM

@@ -135,7 +135,7 @@ Tag::Tag(uint16_t value) : data_(value), modifier_(TagModifier::NONE) { }
 Tag::Tag(int32_t value)  : data_(value), modifier_(TagModifier::NONE) { }
 Tag::Tag(uint32_t value) : data_(value), modifier_(TagModifier::NONE) { }
 Tag::Tag(float value)    : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const string& value)           : data_(value), modifier_(TagModifier::NONE) { }
+Tag::Tag(const std::string& value)           : data_(value), modifier_(TagModifier::NONE) { }
 Tag::Tag(const vector<int8_t>& value)   : data_(value), modifier_(TagModifier::NONE) { }
 Tag::Tag(const vector<uint8_t>& value)  : data_(value), modifier_(TagModifier::NONE) { }
 Tag::Tag(const vector<int16_t>& value)  : data_(value), modifier_(TagModifier::NONE) { }
@@ -159,7 +159,7 @@ Tag& Tag::operator=(uint16_t value) { data_ = value; return *this; }
 Tag& Tag::operator=(int32_t value)  { data_ = value; return *this; }
 Tag& Tag::operator=(uint32_t value) { data_ = value; return *this; }
 Tag& Tag::operator=(float value)    { data_ = value; return *this; }
-Tag& Tag::operator=(const string& value)           { data_ = value; return *this; }
+Tag& Tag::operator=(const std::string& value)           { data_ = value; return *this; }
 Tag& Tag::operator=(const vector<int8_t>& value)   { data_ = value; return *this; }
 Tag& Tag::operator=(const vector<uint8_t>& value)  { data_ = value; return *this; }
 Tag& Tag::operator=(const vector<int16_t>& value)  { data_ = value; return *this; }

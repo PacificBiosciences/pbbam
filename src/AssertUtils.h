@@ -68,7 +68,7 @@ void printFailedAssert(const char* msg);
 // failure response.
 //
 // PB_VERIFY(cond)           if condition fails, print message
-// ASSERT(cond, action)   if condition fails, print message & perform action
+// PB_ASSERT(cond, action)   if condition fails, print message & perform action
 // PB_ASSERT_OR_BREAK        overload of ASSERT where action is 'break'
 // PB_ASSERT_OR_CONTINUE     overload of ASSERT where action is 'continue'
 // PB_ASSERT_OR_RETURN       overload of ASSERT where action is 'return'

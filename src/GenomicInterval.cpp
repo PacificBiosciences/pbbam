@@ -35,25 +35,46 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include "TestData.h"
-#include <gtest/gtest.h>
-#include <htslib/sam.h>
-#include <pbbam/BamReader.h>
-#include <pbbam/BamWriter.h>
-#include <pbbam/SamHeader.h>
-#include <iostream>
-#include <string>
-#include <cstdio>
-#include <cstdlib>
+#include "pbbam/GenomicInterval.h"
+#include "AssertUtils.h"
+#include <htslib/hts.h>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-// put any BamReader-only API tests here (error handling, random-access, etc.)
-//
-// plain ol' read & dump is in test_EndToEnd.cpp
+GenomicInterval::GenomicInterval(void)
+    : id_(-1)
+{ }
 
+GenomicInterval::GenomicInterval(const int id,
+                                 const int32_t& start,
+                                 const int32_t& stop)
+    : id_(id)
+    , interval_(start, stop)
+{ }
+
+bool GenomicInterval::CoveredBy(const GenomicInterval& other) const
+{
+    if (id_ != other.id_)
+        return false;
+    return interval_.CoveredBy(other.interval_);
+}
+
+bool GenomicInterval::Covers(const GenomicInterval& other) const
+{
+    if (id_ != other.id_)
+        return false;
+    return interval_.Covers(other.interval_);
+}
+
+bool GenomicInterval::Intersects(const GenomicInterval& other) const
+{
+    if (id_ != other.id_)
+        return false;
+    return interval_.Intersects(other.interval_);
+}
+
+GenomicInterval::difference_type GenomicInterval::Length(void) const
+{
+    return interval_.Length();
+}

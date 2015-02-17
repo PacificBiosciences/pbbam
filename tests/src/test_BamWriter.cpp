@@ -137,24 +137,24 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
     tags["SQ"] = subQv;
     result.bamRecord.Tags(tags);
 
-    BamWriter bamSubreads_;
     SamHeader headerSubreads;
     headerSubreads.version = "1.1";
     headerSubreads.sortOrder = "coordinate";
-    bamSubreads_.Open("42.subreads.bam", headerSubreads);
-    EXPECT_TRUE(bamSubreads_.Write(result.bamRecord));
-    bamSubreads_.Close();
+    BamWriter bamSubreads("42.subreads.bam", headerSubreads);
+    EXPECT_TRUE(bamSubreads);
+    EXPECT_TRUE(bamSubreads.Write(result.bamRecord));
+    bamSubreads.Close();
 
     BamReader reader;
     EXPECT_TRUE(reader.Open("42.subreads.bam"));
     EXPECT_EQ(std::string("1.1"), reader.Header().version);
     EXPECT_EQ(std::string("coordinate"), reader.Header().sortOrder);
 
-    BamRecord inputRecord;
-    EXPECT_TRUE(reader.GetNext(&inputRecord));
-    EXPECT_EQ(std::string("ACGTC"),   inputRecord.Sequence());
-    EXPECT_EQ(std::string("ZMW\\42"), inputRecord.Name());
-    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), inputRecord.Tags().at("SQ").ToUInt8Array());
+    auto inputRecord = std::shared_ptr<BamRecord>(new BamRecord);
+    EXPECT_TRUE(reader.GetNext(inputRecord));
+    EXPECT_EQ(std::string("ACGTC"),   inputRecord->Sequence());
+    EXPECT_EQ(std::string("ZMW\\42"), inputRecord->Name());
+    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), inputRecord->Tags().at("SQ").ToUInt8Array());
 //    EXPECT_EQ(std::vector<uint16_t>({34, 5, 125}), inputRecord.Tags().at("SQ").ToUInt16Array());
 
     reader.Close();

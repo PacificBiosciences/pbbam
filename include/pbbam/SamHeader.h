@@ -44,13 +44,12 @@
 #include "pbbam/SamProgram.h"
 #include "pbbam/SamReadGroup.h"
 #include "pbbam/SamSequence.h"
+#include <memory>
 #include <string>
 #include <vector>
 
 namespace PacBio {
 namespace BAM {
-
-class BamReader;
 
 class PBBAM_EXPORT SamHeader
 {
@@ -61,8 +60,6 @@ public:
 
 public:
     SamHeader(void);
-    SamHeader(const SamHeader& other) = default;
-    SamHeader(SamHeader&& other) = default;
     ~SamHeader(void) { }
 
 public:
@@ -74,20 +71,15 @@ public:
     ProgramDictionary   programs;
     std::vector<std::string> comments;
 
-#ifdef PBBAM_TESTING
-public:
-#else
 private:
-#endif // PBBAM_TESTING
-
     // converts SamHeader contents to htslib raw data
-    // NOTE: caller takes ownership of object (so it must be cleaned later up via sam.h:bam_hdr_destroy())
-    bam_hdr_t* CreateRawData(void) const;
+    std::shared_ptr<bam_hdr_t> CreateRawData(void) const;
 
     // returns a SamHeader object, with a deep copy of @rawData contents
-    static SamHeader FromRawData(bam_hdr_t* rawData);
+    static SamHeader FromRawData(const std::shared_ptr<bam_hdr_t> rawData);
 
 private:
+    friend class BamFile;
     friend class BamReader;
     friend class BamWriter;
 };

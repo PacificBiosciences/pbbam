@@ -44,7 +44,7 @@ using namespace std;
 BamReader::BamReader(void)
     : file_(nullptr)
     , header_(nullptr)
-    , rawRecord_(nullptr)
+    , error_(BamReader::NoError)
 { }
 
 BamReader::~BamReader(void)
@@ -55,43 +55,45 @@ BamReader::~BamReader(void)
 void BamReader::Close(void)
 {
     filename_.clear();
-    errorString_.clear();
 
     file_.reset();
     header_.reset();
-    rawRecord_.reset();
+
+    error_ = BamReader::NoError;
 }
 
-string BamReader::ErrorString(void) const
+BamReader::ReadError BamReader::Error(void) const
 {
-    return errorString_;
+    return error_;
 }
 
 bool BamReader::HasError(void) const
 {
-    return !errorString_.empty();
+    return error_ != BamReader::NoError;
 }
 
-bool BamReader::GetNext(BamRecord* record)
+bool BamReader::GetNext(std::shared_ptr<BamRecord> record)
 {
-    if (!GetNext(rawRecord_.get()))
-        return false;
-    *record = BamRecord::FromRawData(rawRecord_.get());
-    return true;
+    return GetNext(record->d_);
 }
 
-bool BamReader::GetNext(bam1_t* rawRecord)
+bool BamReader::GetNext(std::shared_ptr<bam1_t> rawRecord)
 {
-    const int ret = sam_read1(file_.get(), header_.get(), rawRecord);
-    if (ret < 0) {
-        // TODO: give more info
-        errorString_ = "could not read BAM record - ret: "+ to_string(ret);
-    }
-    return ret >= 0;
+    const int ret = sam_read1(file_.get(), header_.get(), rawRecord.get());
+    if (ret >= 0)
+        return true;
+
+    // else determine error type
+    // -1 : EOF - normal (so should we set error then? or just return false so we're done)
+    // -2 : EOF - truncated
+    // -3 : malformatted fixed-length data
+    // -4 : malformatted variable-length data
+    error_ = BamReader::ReadRecordError;
+    return false;
 }
 
 SamHeader BamReader::Header(void) const {
-    return SamHeader::FromRawData(header_.get());
+    return SamHeader::FromRawData(header_);
 }
 
 bool BamReader::Open(const string& filename)
@@ -101,26 +103,28 @@ bool BamReader::Open(const string& filename)
 
     // open file
     filename_ = filename;
-    file_.reset(sam_open(filename_.c_str(), "rb"), internal::RawFileDeleter());
+    file_.reset(sam_open(filename_.c_str(), "rb"), internal::HtslibFileDeleter());
     if (!file_) {
-        errorString_ = "could not open " + filename_;
+        error_ = BamReader::OpenFileError;
         return false;
     }
 
     // read header
-    header_.reset(sam_hdr_read(file_.get()), internal::RawHeaderDeleter());
+    header_.reset(sam_hdr_read(file_.get()), internal::HtslibHeaderDeleter());
     if (!header_) {
-        errorString_ = "could not read header";
+        error_ = BamReader::ReadHeaderError;
         return false;
     }
-
-    // create our temp record
-    rawRecord_.reset(bam_init1(), internal::RawRecordDeleter());
 
     // if we get here, return success
     return true;
 }
 
-bam_hdr_t* BamReader::RawHeader(void) const {
-    return header_.get();
+string BamReader::PacBioBamVersion(void) const {
+    const SamHeader& header = SamHeader::FromRawData(header_);
+    return header.pacbioBamVersion;
+}
+
+std::shared_ptr<bam_hdr_t> BamReader::RawHeader(void) const {
+    return header_;
 }

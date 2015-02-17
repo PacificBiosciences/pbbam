@@ -41,19 +41,30 @@
 
 #include "TestData.h"
 #include <gtest/gtest.h>
-#include <htslib/sam.h>
-#include <pbbam/BamReader.h>
-#include <pbbam/BamWriter.h>
-#include <pbbam/SamHeader.h>
-#include <iostream>
+#include <pbbam/EntireFileQuery.h>
 #include <string>
-#include <cstdio>
-#include <cstdlib>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-// put any BamReader-only API tests here (error handling, random-access, etc.)
-//
-// plain ol' read & dump is in test_EndToEnd.cpp
+const string inputBamFn = tests::Data_Dir + "/ex2.bam";
 
+TEST(EntireFileQueryTest, CountRecords)
+{
+    // open input BAM file
+    BamFile bamFile(inputBamFn);
+    EXPECT_TRUE(bamFile);
+
+    // count records
+    int count = 0;
+    EntireFileQuery entireFile(bamFile);
+    EXPECT_TRUE(entireFile);
+    for (const BamRecord& record : entireFile) {
+        (void)record;
+        ++count;
+    }
+
+    EXPECT_EQ(3307, count);
+}
+
+// add special cases as needed

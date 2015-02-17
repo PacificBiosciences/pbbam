@@ -35,6 +35,10 @@
 
 // Author: Derek Barnett
 
+#ifdef PBBAM_TESTING
+#define private public
+#endif
+
 #include <boost/type_traits/is_convertible.hpp>
 #include <gtest/gtest.h>
 #include <pbbam/BamTagCodec.h>

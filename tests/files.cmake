@@ -11,10 +11,14 @@ set( PacBioBAMTest_CPP
     ${PacBioBAM_TestsDir}/src/test_BamRecordTags.cpp
     ${PacBioBAM_TestsDir}/src/test_BamRecordVariableData.cpp
     ${PacBioBAM_TestsDir}/src/test_BamWriter.cpp
-    ${PacBioBAM_TestsDir}/src/test_EndToEnd.cpp
     ${PacBioBAM_TestsDir}/src/test_Cigar.cpp
+    ${PacBioBAM_TestsDir}/src/test_EndToEnd.cpp
+    ${PacBioBAM_TestsDir}/src/test_EntireFileQuery.cpp
+    ${PacBioBAM_TestsDir}/src/test_GenomicIntervalQuery.cpp
+    ${PacBioBAM_TestsDir}/src/test_Intervals.cpp
     ${PacBioBAM_TestsDir}/src/test_SamHeader.cpp
     ${PacBioBAM_TestsDir}/src/test_Tags.cpp
+    ${PacBioBAM_TestsDir}/src/test_UnmappedReadsQuery.cpp
 )
 
 # GoogleTest headers

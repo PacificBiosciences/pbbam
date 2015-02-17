@@ -95,6 +95,10 @@ public:
     inline bool Contains(const std::string& key) const;
     inline bool Contains(const T& value) const;
 
+    // returns index of key, -1 if not found
+    inline int IndexOf(const std::string& key) const;
+    inline int IndexOf(const T& value) const;
+
     // is dictionary empty
     inline bool IsEmpty(void) const;
 
@@ -113,6 +117,10 @@ public:
     // retrieves a const reference to the object associated with this ID
     // if none exists, throws std::out_of_range (a la std::map::at())
     inline const T& At(const std::string& key) const;
+
+    // retrieves a const reference to the object at index
+    // if none exists, throws std::out_of_range
+    inline const T& At(const size_t index) const;
 
 // iterators
 public:
@@ -214,6 +222,21 @@ inline typename DictionaryBase<T>::ConstIterator DictionaryBase<T>::End(void) co
 }
 
 template<typename T>
+inline int DictionaryBase<T>::IndexOf(const std::string& key) const
+{
+    const auto iter = lookupData_.find(key);
+    if (iter == lookupData_.cend())
+        return -1;
+    return iter->second;
+}
+
+template<typename T>
+inline int DictionaryBase<T>::IndexOf(const T& value) const
+{
+    return IndexOf(value.Key());
+}
+
+template<typename T>
 inline bool DictionaryBase<T>::IsEmpty(void) const
 {
     return data_.empty();
@@ -273,6 +296,14 @@ inline const T& DictionaryBase<T>::At(const std::string& key) const
     if (iter == lookupData_.cend())
         throw std::out_of_range("unknown key");
     return data_.at(iter->second);
+}
+
+template<typename T>
+inline const T& DictionaryBase<T>::At(const size_t index) const
+{
+    if ( index >= data_.size() )
+        throw std::out_of_range("invalid index");
+    return data_.at(index);
 }
 
 } // namespace BAM

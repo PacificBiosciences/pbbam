@@ -35,6 +35,10 @@
 
 // Author: Derek Barnett
 
+#ifdef PBBAM_TESTING
+#define private public
+#endif
+
 #include <gtest/gtest.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamTagCodec.h>
@@ -43,6 +47,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -50,6 +55,15 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 
 namespace tests {
+
+struct Bam1Deleter
+{
+    void operator()(bam1_t* b) {
+        if (b)
+            bam_destroy1(b);
+        b = nullptr;
+    }
+};
 
 static
 BamRecord CreateRecord(void)
@@ -93,6 +107,7 @@ void CheckRawData(const BamRecord& bam)
                                          expectedSeqLength +
                                          expectedTagsLength;
 
+    EXPECT_TRUE((bool)bam.RawData());
     EXPECT_EQ(expectedNameLength,      bam.RawData()->core.l_qname);
     EXPECT_EQ(expectedNumCigarOps,     bam.RawData()->core.n_cigar);
     EXPECT_EQ(expectedSeqLength,       bam.RawData()->core.l_qseq);
@@ -103,8 +118,8 @@ void CheckRawData(const BamRecord& bam)
 
 TEST(BamRecordCoreTest, RawDataDefaultValues)
 {
-    bam1_t* rawData = bam_init1();
-    ASSERT_TRUE(rawData != nullptr);
+    std::shared_ptr<bam1_t> rawData(bam_init1(), tests::Bam1Deleter());
+    ASSERT_TRUE((bool)rawData);
 
     // fixed-length (core) data
     EXPECT_EQ(0, rawData->core.tid);
@@ -123,8 +138,6 @@ TEST(BamRecordCoreTest, RawDataDefaultValues)
     EXPECT_EQ(0, rawData->data);
     EXPECT_EQ(0, rawData->l_data);
     EXPECT_EQ(0, rawData->m_data);
-
-    bam_destroy1(rawData);
 }
 
 TEST(BamRecordCoreTest, DefaultValues)
@@ -135,8 +148,8 @@ TEST(BamRecordCoreTest, DefaultValues)
     // check raw data
     // -------------------------------
 
-    const bam1_t* rawData = bam.RawData().get();
-    ASSERT_TRUE(rawData != nullptr);
+    const std::shared_ptr<bam1_t> rawData = bam.RawData();
+    ASSERT_TRUE((bool)rawData);
 
     // fixed-length (core) data
     EXPECT_EQ(0, rawData->core.tid);
@@ -183,7 +196,6 @@ TEST(BamRecordCoreTest, DefaultValues)
     EXPECT_FALSE(bam.IsSecondMate());
     EXPECT_FALSE(bam.IsSupplementaryAlignment());
 
-
     const std::string emptyString = "";
     EXPECT_EQ(emptyString, bam.Name());
     EXPECT_EQ(emptyString, bam.CigarData().ToStdString());
@@ -215,8 +227,8 @@ TEST(BamRecordCoreTest, CoreSetters)
     // check raw data
     // -------------------------------
 
-    const bam1_t* rawData = bam.RawData().get();
-    ASSERT_TRUE(rawData != nullptr);
+    const std::shared_ptr<bam1_t> rawData = bam.RawData();
+    ASSERT_TRUE((bool)rawData);
 
     // fixed-length (core) data
     EXPECT_EQ(42, rawData->core.tid);
@@ -260,7 +272,9 @@ TEST(BamRecordCoreTest, CoreSetters)
 TEST(BamRecordCoreTest, DeepCopyFromRawData)
 {
     // init raw data
-    bam1_t* rawData = bam_init1();
+    std::shared_ptr<bam1_t> rawData(bam_init1(), tests::Bam1Deleter());
+    ASSERT_TRUE((bool)rawData);
+
     rawData->core.tid = 42;
     rawData->core.pos = 42;
     rawData->core.bin = 42;
@@ -275,7 +289,7 @@ TEST(BamRecordCoreTest, DeepCopyFromRawData)
     std::copy(static_cast<const char*>(static_cast<const void*>(&x)),
               static_cast<const char*>(static_cast<const void*>(&x)) + sizeof x,
               valueBytes);
-    bam_aux_append(rawData, "XY", 'i', sizeof(x), (uint8_t*)&valueBytes[0]);
+    bam_aux_append(rawData.get(), "XY", 'i', sizeof(x), (uint8_t*)&valueBytes[0]);
 
     EXPECT_EQ(42, rawData->core.tid);
     EXPECT_EQ(42, rawData->core.pos);
@@ -288,7 +302,7 @@ TEST(BamRecordCoreTest, DeepCopyFromRawData)
     EXPECT_EQ(42, rawData->core.mtid);
     EXPECT_EQ(42, rawData->core.mpos);
     EXPECT_EQ(42, rawData->core.isize);
-    const int32_t fetchedX = bam_aux2i( bam_aux_get(rawData, "XY") );
+    const int32_t fetchedX = bam_aux2i( bam_aux_get(rawData.get(), "XY") );
     EXPECT_EQ(42, fetchedX);
 
     // static "ctor"
@@ -329,8 +343,6 @@ TEST(BamRecordCoreTest, DeepCopyFromRawData)
     EXPECT_EQ(37, rawData->core.pos);
     EXPECT_EQ(42, bam.Position());
     EXPECT_EQ(42, bam.RawData()->core.pos);
-
-    bam_destroy1(rawData);
 }
 
 TEST(BamRecordCoreTest, CopyAssignment)
