@@ -175,7 +175,34 @@ TEST(EndToEndTest, ReadRawData_WriteRawData)
     RemoveGeneratedFiles(generatedBamFn, generatedSamFn);
 }
 
-TEST(EndToEndTest, ReadBamRecord_WriteBamRecord)
+TEST(EndToEndTest, ReadBamRecord_WriteBamRecord_SingleThread)
+{
+    // open input BAM file
+    BamFile bamFile(inputBamFn);
+    EXPECT_TRUE(bamFile.Error() == BamFile::NoError);
+
+    // open output BAM file
+    BamWriter writer(generatedBamFn, bamFile.Header(), BamWriter::DefaultCompression, 1);
+    EXPECT_TRUE(writer);
+
+    // copy BAM file
+    EntireFileQuery entireFile(bamFile);
+    EXPECT_TRUE(entireFile);
+    for (const BamRecord& record : entireFile)
+        writer.Write(record);
+    writer.Close();  // need to close output file before comparing (to flush any buffers)
+
+    // convert to sam & diff against gold standard
+    const int convertRet = Samtools_Bam2Sam(generatedBamFn, generatedSamFn);
+    const int diffRet    = Diff_Sam2Sam(goldStandardSamFn, generatedSamFn);
+    EXPECT_EQ(0, convertRet);
+    EXPECT_EQ(0, diffRet);
+
+    // clean up
+    RemoveGeneratedFiles(generatedBamFn, generatedSamFn);
+}
+
+TEST(EndToEndTest, ReadBamRecord_WriteBamRecord_APIDefaultThreadCount)
 {
     // open input BAM file
     BamFile bamFile(inputBamFn);
@@ -183,6 +210,60 @@ TEST(EndToEndTest, ReadBamRecord_WriteBamRecord)
 
     // open output BAM file
     BamWriter writer(generatedBamFn, bamFile.Header());
+    EXPECT_TRUE(writer);
+
+    // copy BAM file
+    EntireFileQuery entireFile(bamFile);
+    EXPECT_TRUE(entireFile);
+    for (const BamRecord& record : entireFile)
+        writer.Write(record);
+    writer.Close();  // need to close output file before comparing (to flush any buffers)
+
+    // convert to sam & diff against gold standard
+    const int convertRet = Samtools_Bam2Sam(generatedBamFn, generatedSamFn);
+    const int diffRet    = Diff_Sam2Sam(goldStandardSamFn, generatedSamFn);
+    EXPECT_EQ(0, convertRet);
+    EXPECT_EQ(0, diffRet);
+
+    // clean up
+    RemoveGeneratedFiles(generatedBamFn, generatedSamFn);
+}
+
+TEST(EndToEndTest, ReadBamRecord_WriteBamRecord_SystemDefaultThreadCount)
+{
+    // open input BAM file
+    BamFile bamFile(inputBamFn);
+    EXPECT_TRUE(bamFile.Error() == BamFile::NoError);
+
+    // open output BAM file
+    BamWriter writer(generatedBamFn, bamFile.Header(), BamWriter::DefaultCompression, 0);
+    EXPECT_TRUE(writer);
+
+    // copy BAM file
+    EntireFileQuery entireFile(bamFile);
+    EXPECT_TRUE(entireFile);
+    for (const BamRecord& record : entireFile)
+        writer.Write(record);
+    writer.Close();  // need to close output file before comparing (to flush any buffers)
+
+    // convert to sam & diff against gold standard
+    const int convertRet = Samtools_Bam2Sam(generatedBamFn, generatedSamFn);
+    const int diffRet    = Diff_Sam2Sam(goldStandardSamFn, generatedSamFn);
+    EXPECT_EQ(0, convertRet);
+    EXPECT_EQ(0, diffRet);
+
+    // clean up
+    RemoveGeneratedFiles(generatedBamFn, generatedSamFn);
+}
+
+TEST(EndToEndTest, ReadBamRecord_WriteBamRecord_UserThreadCount)
+{
+    // open input BAM file
+    BamFile bamFile(inputBamFn);
+    EXPECT_TRUE(bamFile.Error() == BamFile::NoError);
+
+    // open output BAM file
+    BamWriter writer(generatedBamFn, bamFile.Header(), BamWriter::DefaultCompression, 6);
     EXPECT_TRUE(writer);
 
     // copy BAM file

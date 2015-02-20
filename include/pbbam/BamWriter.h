@@ -97,12 +97,17 @@ public:
     ///
     /// \note Set \p filename to "-" for stdout.
     ///
-    /// \param[in] filename path to output BAM file
-    /// \param[in] header SamHeader object
+    /// \param[in] filename         path to output BAM file
+    /// \param[in] header           SamHeader object
     /// \param[in] compressionLevel zlib compression level
+    /// \param[in] numThreads       number of threads for compression.
+    ///            If set to 0, BamWriter will attempt to determine a reasonable estimate.
+    ///            If set to 1, this will force single-threaded execution.
+    ///            No checks are made against an upper limit.
     BamWriter(const std::string& filename,
               const SamHeader& header,
-              const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression);
+              const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
+              const size_t numThreads = 4);
 
     ~BamWriter(void);
 
@@ -155,7 +160,8 @@ public:
 private:
     bool Open(const std::string& filename,
               const std::shared_ptr<bam_hdr_t> rawHeader,
-              const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression);
+              const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
+              size_t numThreads = 4);
     bool Write(const std::shared_ptr<bam1_t>& rawRecord);
 
 private:

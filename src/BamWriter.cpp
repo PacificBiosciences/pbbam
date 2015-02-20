@@ -42,6 +42,7 @@
 #include "MemoryUtils.h"
 #include <htslib/bgzf.h>
 #include <htslib/hts.h>
+#include <thread>
 #include <iostream>
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -49,12 +50,13 @@ using namespace std;
 
 BamWriter::BamWriter(const std::string& filename,
                      const SamHeader& header,
-                     const BamWriter::CompressionLevel compressionLevel)
+                     const BamWriter::CompressionLevel compressionLevel,
+                     const size_t numThreads)
     : file_(nullptr)
     , header_(nullptr)
     , error_(BamWriter::NoError)
 {
-     Open(filename, header.CreateRawData(), compressionLevel);
+     Open(filename, header.CreateRawData(), compressionLevel, numThreads);
 }
 
 BamWriter::~BamWriter(void)
@@ -88,7 +90,8 @@ bool BamWriter::Flush(void)
 
 bool BamWriter::Open(const string& filename,
                      const shared_ptr<bam_hdr_t> rawHeader,
-                     const CompressionLevel compressionLevel)
+                     const CompressionLevel compressionLevel,
+                     size_t numThreads)
 {
     // ensure clean slate
     Close();
@@ -112,8 +115,18 @@ bool BamWriter::Open(const string& filename,
         return false;
     }
 
-    // TODO: setup multithreading ??
-//    hts_set_threads(file_.get(), 4);
+    // if no explicit thread count given, attempt built-in check
+    if (numThreads == 0) {
+        numThreads = thread::hardware_concurrency();
+
+        // if still unknown, default to single-threaded
+        if (numThreads == 0)
+            numThreads = 1;
+    }
+
+    // if multithreading requested, enable it
+    if (numThreads > 1)
+        hts_set_threads(file_.get(), numThreads);
 
     // write header
     const int ret = sam_hdr_write(file_.get(), header_.get());

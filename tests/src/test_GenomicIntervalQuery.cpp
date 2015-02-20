@@ -51,12 +51,6 @@ using namespace std;
 
 const string inputBamFn = tests::Data_Dir + "/ex2.bam";
 
-static inline
-void printInterval(const GenomicInterval& i)
-{
-    cerr << i.Id() << ":" << i.Start() << "-" << i.Stop() << endl;
-}
-
 TEST(GenomicIntervalQueryTest, CountRecords)
 {
     // open input BAM file
@@ -69,7 +63,6 @@ TEST(GenomicIntervalQueryTest, CountRecords)
     // count records
     int count = 0;
     GenomicInterval interval(id, 0, 100);
-    printInterval(interval);
     GenomicIntervalQuery query(interval, bamFile);
     EXPECT_TRUE(query);
     for (const BamRecord& record : query) {
@@ -81,7 +74,6 @@ TEST(GenomicIntervalQueryTest, CountRecords)
     // adjust interval and pass back in
     interval.Start(500);
     interval.Stop(600);
-    printInterval(interval);
     query.Interval(interval);
     EXPECT_TRUE(query);
     count = 0;
@@ -95,7 +87,6 @@ TEST(GenomicIntervalQueryTest, CountRecords)
     interval.Id(1);
     interval.Start(0);
     interval.Stop(100);
-    printInterval(interval);
     query.Interval(interval);
     EXPECT_TRUE(query);
     count = 0;
@@ -109,7 +100,6 @@ TEST(GenomicIntervalQueryTest, CountRecords)
     interval.Id(-1);
     interval.Start(0);
     interval.Stop(100);
-    printInterval(interval);
     query.Interval(interval);
     EXPECT_FALSE(query);                       // operator bool() returns false
     count = 0;
@@ -123,7 +113,6 @@ TEST(GenomicIntervalQueryTest, CountRecords)
     interval.Id(1);
     interval.Start(0);
     interval.Stop(100);
-    printInterval(interval);
     query.Interval(interval);
     EXPECT_TRUE(query);
     count = 0;
@@ -137,7 +126,6 @@ TEST(GenomicIntervalQueryTest, CountRecords)
     interval.Id(2);
     interval.Start(0);
     interval.Stop(100);
-    printInterval(interval);
     query.Interval(interval);
     EXPECT_FALSE(query);                       // operator bool() returns false
     count = 0;
