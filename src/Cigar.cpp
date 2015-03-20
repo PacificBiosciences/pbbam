@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -37,78 +37,65 @@
 
 #include "pbbam/Cigar.h"
 #include <htslib/sam.h>
+#include <array>
 #include <sstream>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
+namespace internal {
+
+typedef array<CigarOperationType, 128> CigarLookup;
+
+static
+CigarLookup InitCigarLookup(void)
+{
+    CigarLookup cl;
+    cl.fill(CigarOperationType::UNKNOWN);
+    cl['M'] = CigarOperationType::ALIGNMENT_MATCH;
+    cl['I'] = CigarOperationType::INSERTION;
+    cl['D'] = CigarOperationType::DELETION;
+    cl['N'] = CigarOperationType::REFERENCE_SKIP;
+    cl['S'] = CigarOperationType::SOFT_CLIP;
+    cl['H'] = CigarOperationType::HARD_CLIP;
+    cl['P'] = CigarOperationType::PADDING;
+    cl['='] = CigarOperationType::SEQUENCE_MATCH;
+    cl['X'] = CigarOperationType::SEQUENCE_MISMATCH;
+    return cl;
+}
+
+const static CigarLookup cigarLookup_ = InitCigarLookup();
+
+} // namespace internal
+
+// ----------------
 // CigarOperation
 
-string CigarOperation::cigarCodes_ = string("MIDNSHP=X");
-
-CigarOperation::CigarOperation(void)
-    : type_()
-{ }
-
-CigarOperation::CigarOperation(char type, uint32_t length)
-    : type_(type)
-    , length_(length)
-{ }
-
-CigarOperation::CigarOperation(CigarOperationType op, uint32_t length)
-    : type_(CigarOperation::TypeToChar(op))
-    , length_(length)
-{ }
-
-CigarOperation::CigarOperation(const CigarOperation &other)
-    : type_(other.type_)
-    , length_(other.length_)
-{ }
-
-CigarOperation::~CigarOperation(void) { }
+CigarOperationType CigarOperation::CharToType(const char c)
+{   return (static_cast<uint8_t>(c) >= 128 ? CigarOperationType::UNKNOWN
+                                           : internal::cigarLookup_[c] );
+}
 
 char CigarOperation::TypeToChar(const CigarOperationType& type)
-{
-    return bam_cigar_opchr(static_cast<int>(type));
-}
+{ return bam_cigar_opchr(static_cast<int>(type)); }
 
-CigarOperationType CigarOperation::CharToType(const char c)
-{
-    size_t index = cigarCodes_.find(c);
-    if (index == string::npos)
-        index = 0;
-    return static_cast<CigarOperationType>(index);
-}
-
+// ----------------
 // Cigar
 
-Cigar::Cigar(void)
+Cigar::Cigar(const string& cigarString)
     : vector<CigarOperation>()
-{ }
-
-Cigar::Cigar(const Cigar& other)
-    : vector<CigarOperation>(other)
-{ }
-
-Cigar::~Cigar(void) { }
-
-Cigar Cigar::FromStdString(const string& stdString)
 {
-    Cigar result;
-
     size_t numberStart = 0;
-    const size_t numChars = stdString.size();
+    const size_t numChars = cigarString.size();
     for (size_t i = 0; i < numChars; ++i) {
-        const char c = stdString.at(i);
+        const char c = cigarString.at(i);
         if (!::isdigit(c)) {
             const size_t distance = i - numberStart;
-            const uint32_t length = stoul(stdString.substr(numberStart, distance));
-            result.push_back(CigarOperation(c, length));
+            const uint32_t length = stoul(cigarString.substr(numberStart, distance));
+            push_back(CigarOperation(c, length));
             numberStart = i+1;
         }
     }
-
-    return result;
 }
 
 string Cigar::ToStdString(void) const
@@ -118,7 +105,7 @@ string Cigar::ToStdString(void) const
     for (auto iter = this->cbegin(); iter != end; ++iter) {
         const CigarOperation& cigar = (*iter);
         s << cigar.Length()
-          << cigar.Type();
+          << cigar.Char();
     }
     return s.str();
 }

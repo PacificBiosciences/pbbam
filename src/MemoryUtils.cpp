@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -35,53 +35,41 @@
 
 // Author: Derek Barnett
 
-#ifndef SAMREADGROUP_H
-#define SAMREADGROUP_H
-
-#include "pbbam/Config.h"
+#include "MemoryUtils.h"
 #include <string>
+#include <cstdlib>
+#include <cstring>
+using namespace PacBio;
+using namespace PacBio::BAM;
+using namespace PacBio::BAM::internal;
+using namespace std;
 
-namespace PacBio {
-namespace BAM {
+// -----------------
+// BamHeaderMemory
+// -----------------
 
-struct PBBAM_EXPORT SamReadGroup
+std::shared_ptr<BamHeader> BamHeaderMemory::FromRawData(bam_hdr_t* hdr)
 {
-public:
-    SamReadGroup(void) { }
-    SamReadGroup(const std::string& ID)
-        : id(ID)
-    { }
-//    SamReadGroup(const SamReadGroup& other) = default;
-//    SamReadGroup(SamReadGroup&& other) = default;
-    ~SamReadGroup(void) { }
+    if (hdr == nullptr || hdr->text == nullptr || hdr->l_text == 0)
+        return std::shared_ptr<BamHeader>(nullptr);
+    return BamHeader::FromSam(string(hdr->text, hdr->l_text));
+}
 
-public:
-    // DictionaryBase compatibility
-    inline std::string Key(void) const;
-    inline SamReadGroup& Key(const std::string& key);
+std::shared_ptr<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& header)
+{
+    const string& text = header.ToSam();
+    std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), internal::HtslibHeaderDeleter());
+    rawData->ignore_sam_err = 0;
+    rawData->cigar_tab = NULL;
+    rawData->l_text = text.size();
+    rawData->text = (char*)calloc(rawData->l_text + 1, 1);
+    memcpy(rawData->text, text.c_str(), rawData->l_text);
+    return rawData;
+}
 
-public:
-    std::string id;                     // ID:<Id>               * Unique ID required for valid SAM header*
-    std::string sequencingCenter;       // CN:<SequencingCenter>
-    std::string description;            // DS:<Description>
-    std::string date;                   // DT:<Date>             * (ISO 8601)
-    std::string flowOrder;              // FO:<FlowOrder>
-    std::string keySequence;            // KS:<KeySequence>
-    std::string library;                // LB:<Library>
-    std::string programs;               // PG:<Programs>
-    std::string predictedInsertSize;    // PI:<PredictedInsertSize>
-    std::string platform;               // PL:<Platform>
-    std::string platformUnit;           // PU:<PlatformUnit>
-    std::string sample;                 // SM:<Sample>
-};
-
-inline std::string SamReadGroup::Key(void) const
-{ return id; }
-
-inline SamReadGroup& SamReadGroup::Key(const std::string& key)
-{ id = key; return *this; }
-
-} // namespace BAM
-} // namespace PacBio
-
-#endif // SAMREADGROUP_H
+std::shared_ptr<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const std::shared_ptr<BamHeader>& header)
+{
+    if (!header)
+        return std::shared_ptr<bam_hdr_t>(nullptr);
+    return MakeRawHeader(*header.get());
+}

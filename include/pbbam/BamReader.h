@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -38,9 +38,9 @@
 #ifndef BAMREADER_H
 #define BAMREADER_H
 
+#include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/Config.h"
-#include "pbbam/SamHeader.h"
 #include <memory>
 #include <string>
 
@@ -78,8 +78,8 @@ public:
     /// \returns success/failure
     bool Open(const std::string& filename);
 
-    /// \returns header as SamHeader object
-    SamHeader Header(void) const;
+    /// \returns header as BamHeader object
+    std::shared_ptr<BamHeader> Header(void) const;
 
     /// \returns error status code
     BamReader::ReadError Error(void) const;

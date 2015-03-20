@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -35,11 +35,16 @@
 
 // Author: Derek Barnett
 
+#ifdef PBBAM_TESTING
+#define private public
+#endif
+
 #include <gtest/gtest.h>
 #include <htslib/sam.h>
+#include <pbbam/BamHeader.h>
 #include <pbbam/BamReader.h>
 #include <pbbam/BamWriter.h>
-#include <pbbam/SamHeader.h>
+#include <chrono>
 #include <iostream>
 #include <string>
 #include <cstdio>
@@ -118,28 +123,31 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
     result.overallQv[4] = '<';
 
     // Encode data to BamAlignment
-    result.bamRecord.Name(result.name);
-    result.bamRecord.SetSequenceAndQualities(result.bases, length);
-    result.bamRecord.CigarData("");
-    result.bamRecord.Bin(0);
-    result.bamRecord.Flag(0);
-    result.bamRecord.InsertSize(0);
-    result.bamRecord.MapQuality(0);
-    result.bamRecord.MatePosition(-1);
-    result.bamRecord.MateReferenceId(-1);
-    result.bamRecord.Position(-1);
-    result.bamRecord.ReferenceId(-1);
+    result.bamRecord.impl_.Name(result.name);
+    result.bamRecord.impl_.SetSequenceAndQualities(result.bases, length);
+    result.bamRecord.impl_.CigarData("");
+    result.bamRecord.impl_.Bin(0);
+    result.bamRecord.impl_.Flag(0);
+    result.bamRecord.impl_.InsertSize(0);
+    result.bamRecord.impl_.MapQuality(0);
+    result.bamRecord.impl_.MatePosition(-1);
+    result.bamRecord.impl_.MateReferenceId(-1);
+    result.bamRecord.impl_.Position(-1);
+    result.bamRecord.impl_.ReferenceId(-1);
 
     std::vector<uint8_t> subQv = std::vector<uint8_t>({34, 5, 125});
 //    std::vector<uint16_t> subQv = std::vector<uint16_t>({34, 5, 125});
 
     TagCollection tags;
     tags["SQ"] = subQv;
-    result.bamRecord.Tags(tags);
+    result.bamRecord.impl_.Tags(tags);
 
-    SamHeader headerSubreads;
-    headerSubreads.version = "1.1";
-    headerSubreads.sortOrder = "coordinate";
+    BamHeader headerSubreads;
+    headerSubreads.Version("1.1")
+                  .SortOrder("coordinate");
+//    SamHeader headerSubreads;
+//    headerSubreads.version = "1.1";
+//    headerSubreads.sortOrder = "coordinate";
     BamWriter bamSubreads("42.subreads.bam", headerSubreads);
     EXPECT_TRUE(bamSubreads);
     EXPECT_TRUE(bamSubreads.Write(result.bamRecord));
@@ -147,17 +155,59 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
 
     BamReader reader;
     EXPECT_TRUE(reader.Open("42.subreads.bam"));
-    EXPECT_EQ(std::string("1.1"), reader.Header().version);
-    EXPECT_EQ(std::string("coordinate"), reader.Header().sortOrder);
+    EXPECT_EQ(std::string("1.1"), reader.Header()->Version());
+    EXPECT_EQ(std::string("coordinate"), reader.Header()->SortOrder());
 
     auto inputRecord = std::shared_ptr<BamRecord>(new BamRecord);
     EXPECT_TRUE(reader.GetNext(inputRecord));
-    EXPECT_EQ(std::string("ACGTC"),   inputRecord->Sequence());
-    EXPECT_EQ(std::string("ZMW\\42"), inputRecord->Name());
-    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), inputRecord->Tags().at("SQ").ToUInt8Array());
+    EXPECT_EQ(std::string("ACGTC"),   inputRecord->impl_.Sequence());
+    EXPECT_EQ(std::string("ZMW\\42"), inputRecord->impl_.Name());
+    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), inputRecord->impl_.Tags().at("SQ").ToUInt8Array());
 //    EXPECT_EQ(std::vector<uint16_t>({34, 5, 125}), inputRecord.Tags().at("SQ").ToUInt16Array());
 
     reader.Close();
     remove("42.subreads.bam");
 }
+
+//#define SEQ_LENGTH  7000
+//#define NUM_RECORDS 100000
+
+//static const std::string& TEST_SEQUENCE  = std::string(SEQ_LENGTH, 'G');
+//static const std::string& TEST_QUALITIES = std::string(SEQ_LENGTH, '=');
+//static const std::string& TEST_NAME      = std::string(SEQ_LENGTH, '/');
+//static const std::string& TEST_TAGDATA   = std::string(SEQ_LENGTH, '2');
+
+//TEST(BamWriterTest, CheckTiming)
+//{
+//    TagCollection tags;
+//    tags["aa"] = TEST_TAGDATA;
+//    tags["bb"] = TEST_TAGDATA;
+//    tags["cc"] = TEST_TAGDATA;
+//    tags["dd"] = TEST_TAGDATA;
+//    tags["ee"] = TEST_TAGDATA;
+//    tags["ff"] = TEST_TAGDATA;
+
+//    BamRecord record;
+//    record.SetSequenceAndQualities(TEST_SEQUENCE, TEST_QUALITIES);
+//    record.Name(TEST_NAME);
+//    record.Tags(tags);
+
+//    SamHeader header;
+//    header.pacbioBamVersion = "3.0b3";
+
+//    BamWriter writer("fake.bam", header);
+//    if(!writer) {
+//        std::cout << "BamWriter::WriteError: " << writer.Error() << endl;
+//    }
+
+
+//    auto start = std::chrono::steady_clock::now();
+//    for (size_t i = 0; i < NUM_RECORDS; ++i)
+//        writer.Write(record);
+//    writer.Close();
+//    auto end = std::chrono::steady_clock::now();
+
+//    auto diff = end - start;
+//    std::cout << std::chrono::duration <double, std::milli>(diff).count() << " ms" << std::endl;
+//}
 

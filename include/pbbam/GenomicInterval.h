@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -40,6 +40,7 @@
 
 #include "pbbam/Config.h"
 #include "pbbam/Interval.h"
+#include "pbbam/Position.h"
 #include <string>
 
 namespace PacBio {
@@ -49,43 +50,82 @@ namespace BAM {
 class PBBAM_EXPORT GenomicInterval
 {
 public:
-    typedef typename Interval<uint32_t>::difference_type difference_type;
+    typedef typename Interval<Position>::difference_type difference_type;
 
 public:
 
-    /// \name Constructors
+    /// \name Constructors & Related Methods
     ///  \{
 
-    /** Default constructor; yields an empty genomic interval [0,0) */
+    /** Default constructor; yields an empty genomic interval [0,0) with id of -1  */
     GenomicInterval(void);
 
     /** Constructor for interval from [start, stop) */
     GenomicInterval(const int id,
-                    const int32_t& start,
-                    const int32_t& stop);
+                    const Position& start,
+                    const Position& stop);
 
     /// \}
 
     /// \name Attributes
     /// \{
 
+    /// \returns interval reference id
+    /// \sa BamFile::ReferenceId
     inline int Id(void) const;
+
+    /// \returns underlying Interval object
+    inline PacBio::BAM::Interval<Position> Interval(void) const;
+
+    /// \returns interval start coordinate
+    inline Position Start(void) const;
+
+    /// \returns interval stop coordinate
+    inline Position Stop(void) const;
+
+    /// Sets this interval's reference id.
+    ///
+    /// \param[in] id
+    /// \returns reference to this interval
+    /// \sa BamFile::ReferenceId
     inline GenomicInterval& Id(const int id);
 
-    inline uint32_t Start(void) const;
-    inline GenomicInterval& Start(const uint32_t start);
+    /// Sets this underlying Interval
+    ///
+    /// \param[in] interval
+    /// \returns reference to this interval
+    inline GenomicInterval& Interval(const PacBio::BAM::Interval<Position>& interval);
 
-    inline uint32_t Stop(void) const;
-    inline GenomicInterval& Stop(const uint32_t stop);
+    /// Sets this interval's start coordinate.
+    ///
+    /// \param[in] start
+    /// \returns reference to this interval
+    inline GenomicInterval& Start(const Position start);
+
+    /// Sets this interval's stop coordinate.
+    ///
+    /// \param[in] stop
+    /// \returns reference to this interval
+    inline GenomicInterval& Stop(const Position stop);
 
     /// \}
 
     /// \name Interval Operations
     /// \{
 
+    /// \returns true if same id and underlying Interval::CoveredBy() other.
     bool CoveredBy(const GenomicInterval& other) const;
+
+    /// \returns true if same id and underlying Interval::Covers() other.
     bool Covers(const GenomicInterval& other) const;
+
+    /// \returns true if same id and underlying Interval::Intersects() other.
     bool Intersects(const GenomicInterval& other) const;
+
+    /// \returns true if underlying Interval::IsValid(), and id/endpoints are non-negative.
+    bool IsValid(void) const;
+
+    /// \returns length of underlying
     difference_type Length(void) const;
 
     /// \}
@@ -93,58 +133,56 @@ public:
     /// \name Comparison Operators
     /// \{
 
+    /// \returns true if same id & underlying interval
     inline bool operator==(const GenomicInterval& other) const;
+
+    /// \returns true if either ids or underlying intervals differ
     inline bool operator!=(const GenomicInterval& other) const;
 
     /// \}
 
 private:
     int id_;
-    Interval<uint32_t> interval_;
+    PacBio::BAM::Interval<Position> interval_;
 };
 
 inline int GenomicInterval::Id(void) const
-{
-    return id_;
-}
+{ return id_; }
 
 inline GenomicInterval& GenomicInterval::Id(const int id)
+{ id_ = id; return *this; }
+
+inline PacBio::BAM::Interval<Position> GenomicInterval::Interval(void) const
+{ return interval_; }
+
+inline GenomicInterval& GenomicInterval::Interval(const PacBio::BAM::Interval<Position>& interval)
+{ interval_ = interval; return *this; }
+
+inline bool GenomicInterval::IsValid(void) const
 {
-    id_ = id;
-    return *this;
+    return id_ >= 0 &&
+           interval_.Start() >= 0 &&
+           interval_.Stop()  >= 0 &&
+           interval_.IsValid();
 }
 
-inline uint32_t GenomicInterval::Start(void) const
-{
-    return interval_.Start();
-}
+inline Position GenomicInterval::Start(void) const
+{ return interval_.Start(); }
 
-inline GenomicInterval& GenomicInterval::Start(const uint32_t start)
-{
-    interval_.Start(start);
-    return *this;
-}
+inline GenomicInterval& GenomicInterval::Start(const Position start)
+{ interval_.Start(start); return *this; }
 
-inline uint32_t GenomicInterval::Stop(void) const
-{
-    return interval_.Stop();
-}
+inline Position GenomicInterval::Stop(void) const
+{ return interval_.Stop(); }
 
-inline GenomicInterval& GenomicInterval::Stop(const uint32_t stop)
-{
-    interval_.Stop(stop);
-    return *this;
-}
+inline GenomicInterval& GenomicInterval::Stop(const Position stop)
+{ interval_.Stop(stop); return *this; }
 
 inline bool GenomicInterval::operator==(const GenomicInterval& other) const
-{
-    return id_ == other.id_ && interval_ == other.interval_;
-}
+{ return id_ == other.id_ && interval_ == other.interval_; }
 
 inline bool GenomicInterval::operator!=(const GenomicInterval& other) const
-{
-   return !(*this == other);
-}
+{ return !(*this == other); }
 
 } // namespace BAM
 } // namspace PacBio

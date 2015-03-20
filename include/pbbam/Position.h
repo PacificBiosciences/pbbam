@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -32,48 +32,28 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
 // Author: Derek Barnett
 
-#ifndef SAMPROGRAM_H
-#define SAMPROGRAM_H
+#ifndef POSITION_H
+#define POSITION_H
 
 #include "pbbam/Config.h"
-#include <string>
 
 namespace PacBio {
 namespace BAM {
 
-struct PBBAM_EXPORT SamProgram
-{
-public:
-    SamProgram(void) { }
-    SamProgram(const std::string& ID)
-        : id(ID)
-    { }
-//    SamProgram(const SamProgram& other) = default;
-//    SamProgram(SamProgram&& other) = default;
-    ~SamProgram(void) { }
+/// \typedef typedef int32_t PacBio::BAM::Position
+///
+/// This type refers to all genomic positions. We use signed
+/// because SAM/BAM uses the -1 value to indicate unknown, unmapped, etc.
+/// positions.
+///
+typedef int32_t Position;
 
-    // DictionaryBase compatibility
-    inline std::string Key(void) const;
-    inline SamProgram& Key(const std::string& key);
-
-public:
-    std::string commandLine;            // CL:<CommandLine>
-    std::string description;            // DS:<Description>
-    std::string id;                     // ID:<ID>              * Unique ID required for valid SAM header*
-    std::string name;                   // PN:<Name>
-    std::string previousProgramId;      // PP:<PreviousProgramID>
-    std::string version;                // VN:<Version>
-};
-inline std::string SamProgram::Key(void) const
-{ return id; }
-
-inline SamProgram& SamProgram::Key(const std::string& key)
-{ id = key; return *this; }
+static const Position UnmappedPosition = Position(-1);
 
 } // namespace BAM
 } // namespace PacBio
 
-#endif // SAMPROGRAM_H
+#endif // POSITION_H

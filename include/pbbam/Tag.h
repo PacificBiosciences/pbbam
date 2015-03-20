@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -101,6 +101,9 @@ class PBBAM_EXPORT Tag
 {
 public:
 
+    /// \name Constructors & Related Methods
+    /// \{
+
     /// Constructs a null tag.
     /// \sa IsNull()
     Tag(void);
@@ -147,7 +150,12 @@ public:
     bool operator== (const Tag& other) const;
     bool operator!= (const Tag& other) const;
 
+    /// \}
+
 public:
+    /// \name Conversion & Validation
+    ///
+
     /// Converts the tag value to an ASCII character
     ///
     /// Tag must hold an integer type, within the valid ASCII range [33-127].
@@ -176,6 +184,10 @@ public:
     std::vector<uint32_t> ToUInt32Array(bool* ok = 0) const;
     std::vector<float>    ToFloatArray(bool* ok = 0) const;
 
+    /// \}
+
+    /// \name Attributes
+
     enum TagDataType Type(void) const;
     std::string Typename(void) const; // really just for testing
 
@@ -183,7 +195,12 @@ public:
     TagModifier Modifier(void) const;
     Tag& Modifier(const TagModifier m);
 
+    /// \}
+
 public:
+
+    /// \name Conversion & Validation
+    ///
 
     /// \returns true if tag is null (e.g. default-constructed)
     inline bool IsNull(void) const;
@@ -259,6 +276,8 @@ public:
 
     /// \returns true if tag contains a vector (integers or floats)
     inline bool IsArray(void) const;
+
+    /// \}
 
 private :
     // NOTE - keep this synced with TagDataType enum ordering

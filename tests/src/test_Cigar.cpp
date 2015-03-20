@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -74,48 +74,48 @@ TEST(CigarTest, TypeToOperation)
 
 TEST(CigarTest, SetOperationYieldsCorrectType)
 {
-    CigarOperation c1; c1.Operation(CigarOperationType::ALIGNMENT_MATCH);
-    CigarOperation c2; c2.Operation(CigarOperationType::INSERTION);
-    CigarOperation c3; c3.Operation(CigarOperationType::DELETION);
-    CigarOperation c4; c4.Operation(CigarOperationType::REFERENCE_SKIP);
-    CigarOperation c5; c5.Operation(CigarOperationType::SOFT_CLIP);
-    CigarOperation c6; c6.Operation(CigarOperationType::HARD_CLIP);
-    CigarOperation c7; c7.Operation(CigarOperationType::PADDING);
-    CigarOperation c8; c8.Operation(CigarOperationType::SEQUENCE_MATCH);
-    CigarOperation c9; c9.Operation(CigarOperationType::SEQUENCE_MISMATCH);
+    CigarOperation c1; c1.Type(CigarOperationType::ALIGNMENT_MATCH);
+    CigarOperation c2; c2.Type(CigarOperationType::INSERTION);
+    CigarOperation c3; c3.Type(CigarOperationType::DELETION);
+    CigarOperation c4; c4.Type(CigarOperationType::REFERENCE_SKIP);
+    CigarOperation c5; c5.Type(CigarOperationType::SOFT_CLIP);
+    CigarOperation c6; c6.Type(CigarOperationType::HARD_CLIP);
+    CigarOperation c7; c7.Type(CigarOperationType::PADDING);
+    CigarOperation c8; c8.Type(CigarOperationType::SEQUENCE_MATCH);
+    CigarOperation c9; c9.Type(CigarOperationType::SEQUENCE_MISMATCH);
 
-    EXPECT_EQ('M', c1.Type() );
-    EXPECT_EQ('I', c2.Type() );
-    EXPECT_EQ('D', c3.Type() );
-    EXPECT_EQ('N', c4.Type() );
-    EXPECT_EQ('S', c5.Type() );
-    EXPECT_EQ('H', c6.Type() );
-    EXPECT_EQ('P', c7.Type() );
-    EXPECT_EQ('=', c8.Type() );
-    EXPECT_EQ('X', c9.Type() );
+    EXPECT_EQ('M', c1.Char() );
+    EXPECT_EQ('I', c2.Char() );
+    EXPECT_EQ('D', c3.Char() );
+    EXPECT_EQ('N', c4.Char() );
+    EXPECT_EQ('S', c5.Char() );
+    EXPECT_EQ('H', c6.Char() );
+    EXPECT_EQ('P', c7.Char() );
+    EXPECT_EQ('=', c8.Char() );
+    EXPECT_EQ('X', c9.Char() );
 }
 
 TEST(CigarTest, SetTypeYieldsCorrectOperation)
 {
-    CigarOperation c1; c1.Type('M');
-    CigarOperation c2; c2.Type('I');
-    CigarOperation c3; c3.Type('D');
-    CigarOperation c4; c4.Type('N');
-    CigarOperation c5; c5.Type('S');
-    CigarOperation c6; c6.Type('H');
-    CigarOperation c7; c7.Type('P');
-    CigarOperation c8; c8.Type('=');
-    CigarOperation c9; c9.Type('X');
+    CigarOperation c1; c1.Char('M');
+    CigarOperation c2; c2.Char('I');
+    CigarOperation c3; c3.Char('D');
+    CigarOperation c4; c4.Char('N');
+    CigarOperation c5; c5.Char('S');
+    CigarOperation c6; c6.Char('H');
+    CigarOperation c7; c7.Char('P');
+    CigarOperation c8; c8.Char('=');
+    CigarOperation c9; c9.Char('X');
 
-    EXPECT_EQ(CigarOperationType::ALIGNMENT_MATCH,   c1.Operation());
-    EXPECT_EQ(CigarOperationType::INSERTION,         c2.Operation());
-    EXPECT_EQ(CigarOperationType::DELETION,          c3.Operation());
-    EXPECT_EQ(CigarOperationType::REFERENCE_SKIP,    c4.Operation());
-    EXPECT_EQ(CigarOperationType::SOFT_CLIP,         c5.Operation());
-    EXPECT_EQ(CigarOperationType::HARD_CLIP,         c6.Operation());
-    EXPECT_EQ(CigarOperationType::PADDING,           c7.Operation());
-    EXPECT_EQ(CigarOperationType::SEQUENCE_MATCH,    c8.Operation());
-    EXPECT_EQ(CigarOperationType::SEQUENCE_MISMATCH, c9.Operation());
+    EXPECT_EQ(CigarOperationType::ALIGNMENT_MATCH,   c1.Type());
+    EXPECT_EQ(CigarOperationType::INSERTION,         c2.Type());
+    EXPECT_EQ(CigarOperationType::DELETION,          c3.Type());
+    EXPECT_EQ(CigarOperationType::REFERENCE_SKIP,    c4.Type());
+    EXPECT_EQ(CigarOperationType::SOFT_CLIP,         c5.Type());
+    EXPECT_EQ(CigarOperationType::HARD_CLIP,         c6.Type());
+    EXPECT_EQ(CigarOperationType::PADDING,           c7.Type());
+    EXPECT_EQ(CigarOperationType::SEQUENCE_MATCH,    c8.Type());
+    EXPECT_EQ(CigarOperationType::SEQUENCE_MISMATCH, c9.Type());
 }
 
 TEST(CigarStringTest, FromStdString_Empty)
@@ -133,7 +133,7 @@ TEST(CigarStringTest, FromStdString_SingleOp)
     ASSERT_TRUE(cigar.size() == 1);
 
     const CigarOperation& op = cigar.front();
-    EXPECT_TRUE(op.Type()   == 'M');
+    EXPECT_TRUE(op.Char()   == 'M');
     EXPECT_TRUE(op.Length() == 100);
 }
 
@@ -149,13 +149,13 @@ TEST(CigarStringTest, FromStdString_MultipleOps)
     CigarOperation op2 = cigar.at(2);
     CigarOperation op3 = cigar.at(3);
 
-    EXPECT_TRUE(op0.Type()   == 'M');
+    EXPECT_TRUE(op0.Char()   == 'M');
     EXPECT_TRUE(op0.Length() == 100);
-    EXPECT_TRUE(op1.Type()   == 'D');
+    EXPECT_TRUE(op1.Char()   == 'D');
     EXPECT_TRUE(op1.Length() == 2);
-    EXPECT_TRUE(op2.Type()   == 'I');
+    EXPECT_TRUE(op2.Char()   == 'I');
     EXPECT_TRUE(op2.Length() == 34);
-    EXPECT_TRUE(op3.Type()   == 'M');
+    EXPECT_TRUE(op3.Char()   == 'M');
     EXPECT_TRUE(op3.Length() == 6);
 }
 

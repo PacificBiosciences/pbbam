@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -47,8 +47,7 @@
 #include <pbbam/BamReader.h>
 #include <pbbam/BamWriter.h>
 #include <pbbam/EntireFileQuery.h>
-#include <pbbam/SamHeader.h>
-#include <iostream>
+    #include <iostream>
 #include <memory>
 #include <string>
 #include <cstdio>
@@ -153,7 +152,7 @@ TEST(EndToEndTest, ReadRawData_WriteRawData)
     EXPECT_TRUE(inputOpenedOk);
 
     // open output BAM file
-    BamWriter writer(generatedBamFn, reader.Header());
+    BamWriter writer(generatedBamFn, *reader.Header().get());
     EXPECT_TRUE(writer);
 
     // copy BAM file

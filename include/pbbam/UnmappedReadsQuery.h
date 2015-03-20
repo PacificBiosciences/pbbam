@@ -59,7 +59,7 @@
 
 //private:
 //    std::shared_ptr<samFile>   file_;
-////    std::shared_ptr<bam_hdr_t> header_;
+//    std::shared_ptr<bam_hdr_t> header_;
 //    std::shared_ptr<hts_idx_t> index_;
 //    std::shared_ptr<hts_itr_t> iterator_;
 //};

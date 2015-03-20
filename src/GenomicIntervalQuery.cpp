@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -45,7 +45,7 @@ using namespace std;
 
 GenomicIntervalQuery::GenomicIntervalQuery(const GenomicInterval& interval,
                                            const BamFile& file)
-    : QueryBase()
+    : QueryBase(file)
 {
     if (InitFile(file))
         Interval(interval);
@@ -61,8 +61,10 @@ GenomicIntervalQuery::GenomicIntervalQuery(const GenomicInterval& interval,
 
 bool GenomicIntervalQuery::GetNext(BamRecord& record)
 {
-    if (error_ == GenomicIntervalQuery::NoError && iterator_) {
-        const int result = sam_itr_next(file_.get(), iterator_.get(), record.RawData().get());
+    if (error_ == GenomicIntervalQuery::NoError && htsIterator_) {
+        const int result = sam_itr_next(htsFile_.get(),
+                                        htsIterator_.get(),
+                                        internal::BamRecordMemory::GetRawData(record).get());
         if (result >= 0)
             return true;
         else if (result < -1) {
@@ -77,21 +79,21 @@ bool GenomicIntervalQuery::InitFile(const BamFile& file) {
     error_ = GenomicIntervalQuery::NoError;
 
     // open file
-    file_.reset(sam_open(file.Filename().c_str(), "rb"), internal::HtslibFileDeleter());
-    if (!file_) {
+    htsFile_.reset(sam_open(file.Filename().c_str(), "rb"), internal::HtslibFileDeleter());
+    if (!htsFile_) {
         error_ = GenomicIntervalQuery::FileOpenError;
         return false;
     }
 
-    header_.reset(sam_hdr_read(file_.get()), internal::HtslibHeaderDeleter());
-    if (!header_) {
+    htsHeader_.reset(sam_hdr_read(htsFile_.get()), internal::HtslibHeaderDeleter());
+    if (!htsHeader_) {
         error_ = GenomicIntervalQuery::FileMetadataError;
         return false;
     }
 
     // open index
-    index_.reset(bam_index_load(file.Filename().c_str()), internal::HtslibIndexDeleter());
-    if (!index_) {
+    htsIndex_.reset(bam_index_load(file.Filename().c_str()), internal::HtslibIndexDeleter());
+    if (!htsIndex_) {
         error_ = GenomicIntervalQuery::IndexFileOpenError;
         return false;
     }
@@ -109,26 +111,27 @@ GenomicIntervalQuery& GenomicIntervalQuery::Interval(const GenomicInterval& inte
 {
     // if file-related error, or missing data - then setting a new interval
     // can't help anything. just get out of here
-    if (!file_ || !header_ || !index_ ||
+    if (!htsFile_ || !htsHeader_ || !htsIndex_ ||
         error_ == GenomicIntervalQuery::FileOpenError ||
         error_ == GenomicIntervalQuery::FileMetadataError ||
         error_ == GenomicIntervalQuery::IndexFileOpenError ||
         error_ == GenomicIntervalQuery::IndexFileMetadataError)
     {
-        iterator_.reset();
+        htsIterator_.reset();
         return *this;
     }
 
     // otherwise, attempt to get an iterator for this interval
     error_ = GenomicIntervalQuery::InitializeQueryError;
-    if (interval.Id() >= 0 && interval.Id() < header_->n_targets) {
-        iterator_.reset(sam_itr_queryi(index_.get(),
-                                       interval.Id(),
-                                       interval.Start(),
-                                       interval.Stop()),
-                        internal::HtslibIteratorDeleter());
+    if (interval.Id() >= 0 && interval.Id() < htsHeader_->n_targets) {
+        htsIterator_.reset(sam_itr_queryi(htsIndex_.get(),
+                                          interval.Id(),
+                                          interval.Start(),
+                                          interval.Stop()),
+                           internal::HtslibIteratorDeleter());
+
         // if successful, clear error
-        if(iterator_)
+        if(htsIterator_)
             error_ = GenomicIntervalQuery::NoError;
     }
 

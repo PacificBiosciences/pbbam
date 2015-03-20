@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -38,42 +38,56 @@
 #ifndef BAMRECORD_H
 #define BAMRECORD_H
 
-#include "htslib/sam.h"
-#include "pbbam/Cigar.h"
-#include "pbbam/Config.h"
-#include "pbbam/TagCollection.h"
+#include "pbbam/Accuracy.h"
+#include "pbbam/Frames.h"
+#include "pbbam/BamRecordImpl.h"
+#include "pbbam/BamHeader.h"
+#include "pbbam/Orientation.h"
+#include "pbbam/ReadGroupInfo.h"
+#include "pbbam/Strand.h"
+#include "pbbam/QualityValues.h"
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace PacBio {
 namespace BAM {
 
+namespace internal { class BamRecordMemory; }
+
+enum class ClipType
+{
+    NONE
+  , CLIP_TO_QUERY
+  , CLIP_TO_REFERENCE
+};
+
+enum class RecordType
+{
+    POLYMERASE
+  , HQREGION
+  , SUBREAD
+  , CCS
+  , SCRAP
+  , UNKNOWN
+};
+
+enum class FrameEncodingType
+{
+    LOSSY
+  , LOSSLESS
+};
+
 class PBBAM_EXPORT BamRecord
 {
-public:
-
-    /// These flags describe the alignment status of the record.
-    enum AlignmentFlag
-    {
-        PAIRED              = 0x0001    ///< Record comes from paired-end sequencing
-      , PROPER_PAIR         = 0x0002    ///< Each mate of a pair was properly aligned ("proper" as determined by aligner)
-      , UNMAPPED            = 0x0004    ///< Record was not mapped by aligner
-      , MATE_UNMAPPED       = 0x0008    ///< Record's mate was not mapped by aligner
-      , REVERSE_STRAND      = 0x0010    ///< Record was aligned to reverse strand (Sequence() is reverse-complemented)
-      , MATE_REVERSE_STRAND = 0x0020    ///< Record's mate was aligned to reverse strand (mate's Sequence() is reverse-complemented)
-      , MATE_1              = 0x0040    ///< Record is first mate of pair
-      , MATE_2              = 0x0080    ///< Record is second mate of pair
-      , SECONDARY           = 0x0100    ///< Record is a secondary alignment
-      , FAILED_QC           = 0x0200    ///< Record failed quality controls
-      , DUPLICATE           = 0x0400    ///< Record is a PCR/optical duplicate
-      , SUPPLEMENTARY       = 0x0800    ///< Record is a supplementary alignment
-    };
-
 public:
     /// \name Constructors & Related Methods
     /// \{
 
     BamRecord(void);
+    BamRecord(const std::shared_ptr<BamHeader>& header);
+    BamRecord(const BamRecordImpl& impl);
+    BamRecord(BamRecordImpl&& impl);
     BamRecord(const BamRecord& other);
     BamRecord(BamRecord&& other);
     BamRecord& operator=(const BamRecord& other);
@@ -83,529 +97,542 @@ public:
     /// \}
 
 public:
-
-    /// \name Core Data
+    /// \name Per-Record Data
     /// \{
 
-    /// \returns this record's assigned (BAI) index bin ID.
-    inline uint32_t Bin(void) const;
-
-    /// \returns this record's alignment flag, in raw integer form.
-    inline uint32_t Flag(void) const;
-
-    /// \returns this record's insert size
-    inline int32_t InsertSize(void) const;
-
-    /// \returns this record's mapping quality. A value of 255 indicates "unknown"
-    inline uint8_t MapQuality(void) const;
-
-    /// \returns this record's mate's mapped position, or -1 if unmapped
-    inline int32_t MatePosition(void) const;
-
-    /// \returns this record's mate's mapped reference ID, or -1 if unmapped
-    inline int32_t MateReferenceId(void) const;
-
-    /// \returns this record's mapped position, or -1 if unmapped
-    inline int32_t Position(void) const;
-
-    /// \returns this record's mate's mapped reference ID, or -1 if unmapped
-    inline int32_t ReferenceId(void) const;
-
-    /// Sets the record's (BAI) index bin ID.
+    /// \note AlignedStart is in polymerase read coordinates, NOT genomic coordinates.
     ///
-    /// \param[in] bin BAI index bin ID.
-    /// \returns reference to this record
-    inline BamRecord& Bin(uint32_t bin);
+    /// \returns the record's aligned start position
+    Position AlignedStart(void) const;
 
-    /// Sets this record's alignment flag, using a raw integer.
+    /// \note AlignedEnd is in polymerase read coordinates, NOT genomic coordinates.
     ///
-    /// \param[in] flag raw alignment flag
-    /// \returns reference to this record
-    inline BamRecord& Flag(uint32_t flag);
+    /// \returns the record's aligned end position
+    Position AlignedEnd(void) const;
 
-    /// Sets this record's insert size.
-    ///
-    /// \param[in] iSize insert size
-    /// \returns reference to this record
-    inline BamRecord& InsertSize(int32_t iSize);
-
-    /// Sets this record's map quality.
-    ///
-    /// \param[in] mapQual mapping quality - value of 255 indicates "unknown"
-    /// \returns reference to this record
-    inline BamRecord& MapQuality(uint8_t mapQual);
-
-    /// Sets this record's mate's mapped position.
-    ///
-    /// \param[in] pos mapped position. A value of -1 indicates unmapped.
-    /// \returns reference to this record
-    inline BamRecord& MatePosition(int32_t pos);
-
-    /// Sets this record's mate's mapped reference ID
-    ///
-    /// \param[in] id reference ID. A value of -1 indicates unmapped.
-    /// \returns reference to this record
-    inline BamRecord& MateReferenceId(int32_t id);
-
-    /// Sets this record's mapped position.
-    ///
-    /// \param[in] pos mapped position. A value of -1 indicates unmapped.
-    /// \returns reference to this record
-    inline BamRecord& Position(int32_t pos);
-
-    /// Sets this record's mapped reference ID
-    ///
-    /// \param[in] id reference ID. A value of -1 indicates unmapped.
-    /// \returns reference to this record
-    inline BamRecord& ReferenceId(int32_t id);
-
-    /// \}
-
-public:
-    /// \name Alignment Flags
-    /// \{
-
-    /// \returns true if this record is a PCR/optical duplicate
-    inline bool IsDuplicate(void) const;
-
-    /// \returns true if this record failed quality controls
-    inline bool IsFailedQC(void) const;
-
-    /// \returns true if this record is the first mate of a pair
-    inline bool IsFirstMate(void) const;
-
-    /// \returns true if this record was mapped by aligner
-    inline bool IsMapped(void) const;
-
-    /// \returns true if this record's mate was mapped by aligner
-    inline bool IsMateMapped(void) const;
-
-    /// \returns true if this record's mate was mapped to the reverse strand
-    inline bool IsMateReverseStrand(void) const;
-
-    /// \returns true if this record comes from paired-end sequencing
-    inline bool IsPaired(void) const;
-
-    /// \returns true if this record is a read's primary alignment
-    inline bool IsPrimaryAlignment(void) const;
-
-    /// \returns true if this record & its mate were properly aligned
-    inline bool IsProperPair(void) const;
-
-    /// \returns true if this record was mapped to the reverse strand
-    inline bool IsReverseStrand(void) const;
-
-    /// \returns true if this record is the second mate of a pair
-    inline bool IsSecondMate(void) const;
-
-    /// \returns true if this record is a supplementary alignment
-    inline bool IsSupplementaryAlignment(void) const;
-
-    /// Sets whether this record is a PCR/optical duplicate
-    inline BamRecord& SetDuplicate(bool ok);
-
-    /// Sets whether this record failed quality controls
-    inline BamRecord& SetFailedQC(bool ok);
-
-    /// Sets whether this record is the first mate of a pair.
-    inline BamRecord& SetFirstMate(bool ok);
-
-    /// Sets whether this record was aligned.
-    inline BamRecord& SetMapped(bool ok);
-
-    /// Sets whether this record's mate was aligned.
-    inline BamRecord& SetMateMapped(bool ok);
-
-    /// Sets whether this record's mate mapped to reverse strand.
-    inline BamRecord& SetMateReverseStrand(bool ok);
-
-    /// Sets whether this record came from paired-end sequencing.
-    inline BamRecord& SetPaired(bool ok);
-
-    /// Sets whether this record is a read's primary alignment.
-    inline BamRecord& SetPrimaryAlignment(bool ok);
-
-    /// Sets whether this record & its mate were properly mapped, per the aligner.
-    inline BamRecord& SetProperPair(bool ok);
-
-    /// Sets whether this record mapped to reverse strand.
-    inline BamRecord& SetReverseStrand(bool ok);
-
-    /// Sets whether this record is the second mate of a pair.
-    inline BamRecord& SetSecondMate(bool ok);
-
-    /// Sets whether this record is a supplementary alignment.
-    inline BamRecord& SetSupplementaryAlignment(bool ok);
-
-    /// \}
-
-public:
-    /// \name Variable-Length Data (sequence, qualities, etc.)
-    /// \{
+    /// \returns the record's strand as a Strand enum value
+    Strand AlignedStrand(void) const;
 
     /// \returns the record's CIGAR data as a Cigar object
     Cigar CigarData(void) const;
 
-    /// Sets the record's CIGAR data using a Cigar object
-    ///
-    /// \param[in] cigar PacBio::BAM::Cigar object
-    ///
-    /// \returns reference to this record
-    BamRecord& CigarData(const Cigar& cigar);
+    /// \returns true if this record has DeletionQV data
+    bool HasDeletionQV(void) const;
 
-    /// Sets the record's CIGAR data using a CIGAR-formatted string.
-    ///
-    /// \param[in] cigarString CIGAR-formatted string
-    ///
-    /// \returns reference to this record
-    BamRecord& CigarData(const std::string& cigarString);
+    /// \returns true if this record has DeletionTag data
+    bool HasDeletionTag(void) const;
 
-    // TODO: CIGAR iterator - Cigar only or here as well ??
+    /// \returns true if this record has InsertionQV data
+    bool HasInsertionQV(void) const;
 
-    /// \returns the record's query name
-    std::string Name(void) const;
+    /// \returns true if this record has IPD data
+    bool HasIPD(void) const;
 
-    /// Sets the record's "query name".
-    ///
-    /// \param name new name
-    ///
-    /// \returns reference to this record
-    BamRecord& Name(const std::string& name);
+    /// \returns true if this record has MergeQV data
+    bool HasMergeQV(void) const;
 
-    /// \returns the record's quality values (phred-style ASCII)
-    ///
-    /// \note Usually Qualities().size() == Sequence.size(). However, in
-    ///       some data sets, the quality values are not provided. In that
-    ///       case, this method will return an empty string.
-    std::string Qualities(void) const;
+    /// \returns true if this record has PulseWidth data
+    bool HasPulseWidth(void) const;
 
-    /// \returns the record's DNA sequence.
-    std::string Sequence(void) const;
+    /// \returns true if this record has SubstitutionQV data
+    bool HasSubstitutionQV(void) const;
 
-    /// \brief Sets the record's DNA sequence and quality values
-    ///
-    /// This is an overloaded function. Sets the DNA sequence and quality values,
-    /// using the length of \p sequence.
-    ///
-    /// \note When using this overload (and \p qualities is non-empty), the lengths
-    ///       of \p sequence and \p qualities \b must be equal.
-    ///
-    /// \todo How to handle mismatched lenths?
-    ///
-    /// \param[in] sequence  std::string containing DNA sequence
-    /// \param[in] qualities std::string containing ASCII quality values
-    ///
-    /// \returns reference to this record.
-    ///
-    /// \sa SetSequenceAndQualities(const char* sequence, const size_t sequenceLength, const char* qualities)
-    ///
-    BamRecord& SetSequenceAndQualities(const std::string& sequence,
-                                       const std::string& qualities = std::string());
+    /// \returns true if this record has SubstitutionTag data
+    bool HasSubstitutionTag(void) const;
 
-    /// \brief Sets the record's DNA sequence and quality values.
-    ///
-    /// The \p sequence must consist of IUPAC nucleotide codes {=ACMGRSVTWYHKDBN}.
-    /// The \p qualities, if not empty, must consist of 'phred'-style ASCII quality
-    /// values. \p qualities may be an empty string or NULL pointer in cases where
-    /// there are no such data available.
-    ///
-    /// \param[in] sequence       C-string containing DNA sequence
-    /// \param[in] sequenceLength length of DNA sequence
-    /// \param[in] qualities      C-string containing 'phred-style' ASCII quality values
-    ///
-    /// \note \p sequence does \b NOT have to be NULL-terminated. Length is explicitly
-    ///        determined by the value of \p sequenceLength provided.
-    ///
-    /// \returns reference to this record.
-    ///
-    BamRecord& SetSequenceAndQualities(const char* sequence,
-                                       const size_t sequenceLength,
-                                       const char* qualities = 0);
+    /// \returns shared pointer to this record's associated BamHeader
+    std::shared_ptr<BamHeader> Header(void) const;
 
-    /// \brief Sets the record's DNA sequence and quality values.
+    /// \returns ZMW hole number
+    int32_t HoleNumber(void) const;
+
+    /// \returns true if this record was mapped by aligner
+    /// \sa BamRecordImpl::IsMapped
+    bool IsMapped(void) const;
+
+    /// \returns this record's mapping quality. A value of 255 indicates "unknown"
+    uint8_t MapQuality(void) const;
+
+    /// \returns this record's movie name
+    std::string MovieName(void) const;
+
+    /// \returns this record's name
+//    std::string Name(void) const;
+
+    /// \returns "number of complete passes of the insert"
+    int32_t NumPasses(void) const;
+
+    /// \note QueryStart is in polymerase read coordinates, NOT genomic coordinates.
     ///
-    /// The \p encodedSequence should be preencoded/packed into the BAM binary format.
-    /// The \p qualities, if not empty, must consist of 'phred'-style ASCII quality values.
-    /// \p qualities may be an empty string or NULL pointer in cases where there are no
-    /// such data available.
+    /// \returns the record's query start position
+    Position QueryStart(void) const;
+
+    /// \note QueryEnd is in polymerase read coordinates, NOT genomic coordinates.
     ///
-    /// \param[in] encodedSequence   C-string containing BAM-format-encoded DNA sequence
-    /// \param[in] rawSequenceLength length of DNA sequence (not the encoded length)
-    /// \param[in] qualities         C-string containing 'phred-style' ASCII quality values
+    /// \returns the record's query end position
+    Position QueryEnd(void) const;
+
+    /// \returns this record's expected read accuracy [0, 1000]
+    Accuracy ReadAccuracy(void) const;
+
+    /// \returns ReadGroupInfo object for this record
+    ReadGroupInfo ReadGroup(void) const;
+
+    /// \returns ID of this record's read group
+    /// \sa ReadGroupInfo::Id
+    std::string ReadGroupId(void) const;
+
+    /// \returns this record's reference ID, or -1 if unmapped
+    int32_t ReferenceId(void) const;
+
+    /// \note ReferenceStart is in reference coordinates, NOT polymerase read coordinates.
     ///
-    /// \note \p encodedSequence does \b NOT have to be NULL-terminated. Length is explicitly
-    ///        determined by the value of \p sequenceLength provided.
+    /// \returns the record's reference start position, or UnmappedPosition if unmapped
+    Position ReferenceStart(void) const;
+
+    /// \note ReferenceEnd is in reference coordinates, NOT polymerase read coordinates.
     ///
-    /// \returns reference to this record.
-    ///
-    /// \sa SetSequenceAndQualities(const char* sequence, const size_t sequenceLength, const char* qualities)
-    ///
-    BamRecord& SetPreencodedSequenceAndQualities(const char* encodedSequence,
-                                                 const size_t rawSequenceLength,
-                                                 const char* qualities = 0);
+    /// \returns the record's reference end position, or UnmappedPosition if unmapped
+    Position ReferenceEnd(void) const;
+
+    /// \returns this record's type
+    /// \sa RecordType
+    RecordType Type(void) const;
 
     /// \}
 
 public:
-    /// \name Tag Data
-    ///\{
+    /// \name Per-Base Data
+    /// \{
 
-    /// \returns record's full tag data as a TagCollection object
-    TagCollection Tags(void) const;
+    /// \brief Fetch this record's DeletionQV values ("dq" tag).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       QVs will have a value of 0.
+    ///
+    /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
+    ///
+    /// \returns DeletionQV as QualityValues object
+    ///
+    QualityValues DeletionQV(Orientation orientation = Orientation::NATIVE,
+                             bool aligned = false,
+                             bool exciseSoftClips = false) const;
 
-    /// Sets the record's full tag data via a TagCollection object
-    BamRecord& Tags(const TagCollection& tags);
+    /// \brief Fetch this record's DeletionTag values ("dt" tag).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       gap chars will be '-' and padding chars will be '*'.
+    ///
+    /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
+    ///
+    /// \returns DeletionTag string
+    ///
+    std::string DeletionTag(Orientation orientation = Orientation::NATIVE,
+                            bool aligned = false,
+                            bool exciseSoftClips = false) const;
 
-    /// Adds a new tag to this record.
+    /// \brief Fetch this record's InsertionQV values ("iq" tag).
     ///
-    /// \param[in] tagName 2-character tag name.
-    /// \param[in] value Tag object that describes the type & value of data to be added
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       QVs will have a value of 0.
     ///
-    /// \note Any value that can be used to implicitly construct a Tag is valid.
-    /// \code
-    ///     string s;
-    ///     vector<uint32_t> v;
-    ///     record.AddTag("XX", s); // will add a string-type tag
-    ///     record.AddTag("YY", v); // will add a uint32-array-type tag
-    /// \endcode
+    /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
     ///
-    /// \returns true if tag was successfully added.
-    bool AddTag(const std::string& tagName, const Tag& value);
+    /// \returns InsertionQVs as QualityValues object
+    ///
+    QualityValues InsertionQV(Orientation orientation = Orientation::NATIVE,
+                              bool aligned = false,
+                              bool exciseSoftClips = false) const;
 
-    /// Edits an existing tag on this record.
+    /// \brief Fetch this record's IPD values ("ip" tag).
     ///
-    /// \param[in] tagName 2-character tag name. Name must be present (see HasTag)
-    /// \param[in] newValue Tag object that describes the type & value of new data to be added
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       frames will have a value of 0;
     ///
-    /// \note Any value that can be used to implicitly construct a Tag is valid.
-    /// \code
-    ///     string s;
-    ///     vector<uint32_t> v;
-    ///     record.EditTag("XX", s); // will overwrite tag XX with a string-type Tag
-    ///     record.EditTag("YY", v); // will overwrite tag YY with a uint32-array-type Tag
-    /// \endcode
+    /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
     ///
-    /// \returns true if tag was successfully edited.
-    bool EditTag(const std::string& tagName, const Tag& newValue);
+    /// \returns IPD as Frames object
+    ///
+    Frames IPD(Orientation orientation = Orientation::NATIVE,
+               bool aligned = false,
+               bool exciseSoftClips = false) const;
 
-    /// \returns true if a tag with this name is present in this record.
-    bool HasTag(const std::string& tagName) const;
+    /// \brief Fetch this record's MergeQV values ("mq" tag).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       QVs will have a value of 0.
+    ///
+    /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
+    ///
+    /// \returns MergeQV as QualityValues object
+    ///
+    QualityValues MergeQV(Orientation orientation = Orientation::NATIVE,
+                          bool aligned = false,
+                          bool exciseSoftClips = false) const;
 
-    /// Removes an existing tag from this record.
+    /// \brief Fetch this record's PulseWidth values ("pw" tag).
     ///
-    /// \param[in] tagName 2-character tag name.
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       frames will have a value of 0.
     ///
-    /// \returns true if tag was actaully removed (i.e. false if tagName previously unknown)
-    /// \sa HasTag
-    bool RemoveTag(const std::string& tagName);
+    /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
+    ///
+    /// \returns PulseWidths as Frames object
+    ///
+    Frames PulseWidth(Orientation orientation = Orientation::NATIVE,
+                      bool aligned = false,
+                      bool exciseSoftClips = false) const;
 
-    /// Fetches a tag from this record.
+    /// \brief Fetch this record's BAM quality values (QUAL field).
     ///
-    /// \param[in] tagName 2-character tag name.
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       QVs will have a value of 0.
     ///
-    /// \returns Tag object for the requested name. If name is unknown, a default constructed
-    ///          Tag is returned (Tag::IsNull() is true).
-    Tag TagValue(const std::string& tagName) const;
+    /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
+    ///
+    /// \returns BAM qualities as QualityValues object
+    ///
+    QualityValues Qualities(Orientation orientation = Orientation::NATIVE,
+                            bool aligned = false,
+                            bool exciseSoftClips = false) const;
 
-    // tag iterator   ?
-    // tag operator[] ?
+    /// \brief Fetch this record's DNA sequence (SEQ field).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       gap chars will be '-' and padding chars will be '*'.
+    ///
+    /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
+    ///
+    /// \returns sequence string
+    ///
+    std::string Sequence(const Orientation orientation = Orientation::NATIVE,
+                         bool aligned = false,
+                         bool exciseSoftClips = false) const;
+
+    /// \brief Fetch this record's SubstitutionQV values ("sq" tag).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       QVs will have a value of 0.
+    ///
+    /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
+    ///
+    /// \returns SubstitutionQV as QualityValues object
+    ///
+    QualityValues SubstitutionQV(Orientation orientation = Orientation::NATIVE,
+                                 bool aligned = false,
+                                 bool exciseSoftClips = false) const;
+
+    /// \brief Fetch this record's SubstitutionTag values ("st" tag).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       gap chars will be '-' and padding chars will be '*'.
+    ///
+    /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
+    ///
+    /// \returns SubstitutionTags string
+    ///
+    std::string SubstitutionTag(Orientation orientation = Orientation::NATIVE,
+                                bool aligned = false,
+                                bool exciseSoftClips = false) const;
 
     /// \}
 
-    /// \cond
-    std::shared_ptr<bam1_t> RawData(void) const;
-    /// \endcond
+public:
+    /// \name Low-Level
+    /// \{
+
+    /// \warning This method should be considered temporary and avoided as much as possible.
+    ///          Direct access to the internal object is likely to disappear as BamRecord interface matures.
+    ///
+    /// \returns const reference to underlying BamRecordImpl object
+    const BamRecordImpl& Impl(void) const;
+
+    /// \warning This method should be considered temporary and avoided as much as possible.
+    ///          Direct access to the internal object is likely to disappear as BamRecord interface matures.
+    ///
+    /// \returns reference to underlying BamRecordImpl object
+    BamRecordImpl& Impl(void);
+
+    /// \}
+
+public:
+    /// \name Per-Record Data
+    /// \{
+
+    /// Sets this record's "number of complete passes of the insert".
+    ///
+    /// \param[in] numPasses
+    /// \returns reference to this record
+    BamRecord& NumPasses(const int32_t numPasses);
+
+    /// Sets this record's expected read accuracy [0, 1000]
+    ///
+    /// \param[in] accuracy
+    /// \returns reference to this record
+    BamRecord& ReadAccuracy(const Accuracy& accuracy);
+
+    /// \}
+
+public:
+    /// \name Per-Base Data
+    /// \{
+
+    /// Sets this record's DeletionQV values ("dq" tag).
+    ///
+    /// \param[in] deletionQVs
+    /// \returns reference to this record
+    BamRecord& DeletionQV(const QualityValues& deletionQVs);
+
+    /// Sets this record's DeletionTag values ("dt" tag).
+    ///
+    /// \param[in] tags
+    /// \returns reference to this record
+    BamRecord& DeletionTag(const std::string& tags);
+
+    /// Sets this record's InsertionQV values ("iq" tag).
+    ///
+    /// \param[in] insertionQVs
+    /// \returns reference to this record
+    BamRecord& InsertionQV(const QualityValues& insertionQVs);
+
+    /// Sets this record's IPD values ("ip" tag).
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or 16-bit lossless)
+    /// \returns reference to this record
+    BamRecord& IPD(const Frames& frames,
+                   const FrameEncodingType encoding);
+
+    /// Sets this record's MergeQV values ("mq" tag).
+    ///
+    /// \param[in] mergeQVs
+    /// \returns reference to this record
+    BamRecord& MergeQV(const QualityValues& mergeQVs);
+
+    /// Sets this record's PulseWidth values ("pw" tag).
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or 16-bit lossless)
+    /// \returns reference to this record
+    BamRecord& PulseWidth(const Frames& frames,
+                          const FrameEncodingType encoding);
+
+    /// Sets this record's SubstitutionQV values ("sq" tag).
+    ///
+    /// \param[in] substitutionQVs
+    /// \returns reference to this record
+    BamRecord& SubstitutionQV(const QualityValues& substitutionQVs);
+
+    /// Sets this record's SubstitutionTag values ("st" tag).
+    ///
+    /// \param[in] tags
+    /// \returns reference to this record
+    BamRecord& SubstitutionTag(const std::string& tags);
+
+    /// \}
+
+
+//public:
+//    BamRecord& QueryEnd(const PacBio::BAM::Position pos);
+//    BamRecord& QueryStart(const PacBio::BAM::Position pos);
+
+//    BamRecord& HoleNumber(const int32_t holeNumber);
+//    BamRecord& MovieName(const std::string& movie);
+
+//    BamRecord& ReadGroup(const ReadGroupInfo& rg);
+//    BamRecord& ReadGroupId(const std::string& id);
+//    BamRecord& ReferenceStart(const PacBio::BAM::Position pos);
+
+public:
+    /// \name Clipping & Mapping
+    /// \{
+
+    /// Creates a copied record from input, with clipping applied
+    static BamRecord Clipped(const BamRecord& input,
+                             const ClipType clipType,
+                             const PacBio::BAM::Position start,
+                             const PacBio::BAM::Position end);
+
+    /// Creates a copied record from input, with mapping applied
+    static BamRecord Mapped(const BamRecord& input,
+                            const int32_t referenceId,
+                            const Position refStart,
+                            const Strand strand,
+                            const Cigar& cigar,
+                            const uint8_t mappingQuality);
+
+    /// Applies clipping to this record
+    BamRecord& Clip(const ClipType clipType,
+                    const PacBio::BAM::Position start,
+                    const PacBio::BAM::Position end);
+
+    /// Creates a copied record from this one, with clipping applied
+    BamRecord Clipped(const ClipType clipType,
+                      const PacBio::BAM::Position start,
+                      const PacBio::BAM::Position end) const;
+
+    /// Applies mapping to this record
+    BamRecord& Map(const int32_t referenceId,
+                   const Position refStart,
+                   const Strand strand,
+                   const Cigar& cigar,
+                   const uint8_t mappingQuality);
+
+    /// Creates a copied record from this one, with mapping applied
+    BamRecord Mapped(const int32_t referenceId,
+                     const Position refStart,
+                     const Strand strand,
+                     const Cigar& cigar,
+                     const uint8_t mappingQuality) const;
+
+    /// \}
 
 private:
-    // returns a BamRecord object, with a deep copy of @rawData contents
-    static BamRecord FromRawData(const std::shared_ptr<bam1_t>& rawData);
+    BamRecordImpl impl_;
+    std::shared_ptr<BamHeader> header_;
 
+    // cached positions (mutable to allow lazy-calc in const methods)
+    mutable Position alignedStart_;
+    mutable Position alignedEnd_;
 
-    // internal memory setup/expand methods
-    void InitializeData(void);
-    void MaybeReallocData(void);
+private:
+    std::string FetchBases(const std::string& tagName,
+                           const Orientation orientation,
+                           const bool aligned,
+                           const bool exciseSoftClips) const;
 
-    // core seq/qual logic shared by the public API
-    BamRecord& SetSequenceAndQualitiesInternal(const char* sequence,
-                                                      const size_t sequenceLength,
-                                                      const char* qualities,
-                                                      bool isPreencoded);
+    Frames FetchFrames(const std::string& tagName,
+                       const Orientation orientation,
+                       const bool aligned,
+                       const bool exciseSoftClips) const;
 
-// data members
-protected:
-    std::shared_ptr<bam1_t> d_;
+    QualityValues FetchQualities(const std::string& tagName,
+                                 const Orientation orientation,
+                                 const bool aligned,
+                                 const bool exciseSoftClips) const;
 
-    friend class BamReader;
-    friend class BamWriter;
+private:
+    // marked const to allow calling from const methods
+    //   but lazy-calc mutable, cached values
+    void CalculateAlignedPositions(void) const;
+
+//    void UpdateName(void);
+
+    friend class internal::BamRecordMemory;
 };
 
-inline uint32_t BamRecord::Bin(void) const
-{ return d_->core.bin; }
-
-inline BamRecord& BamRecord::Bin(uint32_t bin)
-{ d_->core.bin = bin; return *this; }
-
-inline uint32_t BamRecord::Flag(void) const
-{ return d_->core.flag; }
-
-inline BamRecord& BamRecord::Flag(uint32_t flag)
-{ d_->core.flag = flag; return *this; }
-
-inline int32_t BamRecord::InsertSize(void) const
-{ return d_->core.isize; }
-
-inline BamRecord& BamRecord::InsertSize(int32_t iSize)
-{ d_->core.isize = iSize; return *this; }
-
-inline uint8_t BamRecord::MapQuality(void) const
-{ return d_->core.qual; }
-
-inline BamRecord& BamRecord::MapQuality(uint8_t mapQual)
-{ d_->core.qual = mapQual; return *this; }
-
-inline int32_t BamRecord::MatePosition(void) const
-{ return d_->core.mpos; }
-
-inline BamRecord& BamRecord::MatePosition(int32_t pos)
-{ d_->core.mpos = pos; return *this; }
-
-inline int32_t BamRecord::MateReferenceId(void) const
-{ return d_->core.mtid; }
-
-inline BamRecord& BamRecord::MateReferenceId(int32_t id)
-{ d_->core.mtid = id; return *this; }
-
-inline int32_t BamRecord::Position(void) const
-{ return d_->core.pos; }
-
-inline BamRecord& BamRecord::Position(int32_t pos)
-{ d_->core.pos = pos; return *this; }
-
-inline int32_t BamRecord::ReferenceId(void) const
-{ return d_->core.tid; }
-
-inline BamRecord& BamRecord::ReferenceId(int32_t id)
-{ d_->core.tid = id; return *this; }
-
-inline bool BamRecord::IsDuplicate(void) const
-{ return (d_->core.flag & BamRecord::DUPLICATE) != 0; }
-
-inline BamRecord& BamRecord::SetDuplicate(bool ok)
+inline
+BamRecord BamRecord::Clipped(const BamRecord& input,
+                             const ClipType clipType,
+                             const PacBio::BAM::Position start,
+                             const PacBio::BAM::Position end)
 {
-    if (ok) d_->core.flag |=  BamRecord::DUPLICATE;
-    else    d_->core.flag &= ~BamRecord::DUPLICATE;
-    return *this;
+    return input.Clipped(clipType, start, end);
 }
 
-inline bool BamRecord::IsFailedQC(void) const
-{ return (d_->core.flag & BamRecord::FAILED_QC) != 0; }
-
-inline BamRecord& BamRecord::SetFailedQC(bool ok)
+inline
+BamRecord BamRecord::Clipped(const ClipType clipType,
+                             const PacBio::BAM::Position start,
+                             const PacBio::BAM::Position end) const
 {
-    if (ok) d_->core.flag |=  BamRecord::FAILED_QC;
-    else    d_->core.flag &= ~BamRecord::FAILED_QC;
-    return *this;
+    BamRecord result(*this);
+    result.Clip(clipType, start, end);
+    return result;
 }
 
-inline bool BamRecord::IsFirstMate(void) const
-{ return (d_->core.flag & BamRecord::MATE_1) != 0; }
-
-inline BamRecord& BamRecord::SetFirstMate(bool ok)
+inline
+BamRecord BamRecord::Mapped(const BamRecord& input,
+                            const int32_t referenceId,
+                            const Position refStart,
+                            const Strand strand,
+                            const Cigar& cigar,
+                            const uint8_t mappingQuality)
 {
-    if (ok) d_->core.flag |=  BamRecord::MATE_1;
-    else    d_->core.flag &= ~BamRecord::MATE_1;
-    return *this;
+    return input.Mapped(referenceId, refStart, strand, cigar, mappingQuality);
 }
 
-inline bool BamRecord::IsMapped(void) const
-{ return (d_->core.flag & BamRecord::UNMAPPED) == 0; }
-
-inline BamRecord& BamRecord::SetMapped(bool ok)
+inline
+BamRecord BamRecord::Mapped(const int32_t referenceId,
+                            const Position refStart,
+                            const Strand strand,
+                            const Cigar& cigar,
+                            const uint8_t mappingQuality) const
 {
-    if (ok) d_->core.flag &= ~BamRecord::UNMAPPED;
-    else    d_->core.flag |=  BamRecord::UNMAPPED;
-    return *this;
+    BamRecord result(*this);
+    result.Map(referenceId, refStart, strand, cigar, mappingQuality);
+    return result;
 }
 
-inline bool BamRecord::IsMateMapped(void) const
-{ return (d_->core.flag & BamRecord::MATE_UNMAPPED) == 0; }
-
-inline BamRecord& BamRecord::SetMateMapped(bool ok)
+class PBBAM_EXPORT BamRecordView
 {
-    if (ok) d_->core.flag &= ~BamRecord::MATE_UNMAPPED;
-    else    d_->core.flag |=  BamRecord::MATE_UNMAPPED;
-    return *this;
-}
+public:
+    BamRecordView(const BamRecord& record,
+                  const Orientation orientation,
+                  const bool aligned,
+                  const bool exciseSoftClips)
+        : record_(record)
+        , orientation_(orientation)
+        , aligned_(aligned)
+        , exciseSoftClips_(exciseSoftClips)
+    { }
 
-inline bool BamRecord::IsMateReverseStrand(void) const
-{ return (d_->core.flag & BamRecord::MATE_REVERSE_STRAND) != 0; }
+public:
+    QualityValues DeletionQVs(void) const
+    { return record_.DeletionQV(orientation_, aligned_, exciseSoftClips_); }
 
-inline BamRecord& BamRecord::SetMateReverseStrand(bool ok)
-{
-    if (ok) d_->core.flag |=  BamRecord::MATE_REVERSE_STRAND;
-    else    d_->core.flag &= ~BamRecord::MATE_REVERSE_STRAND;
-    return *this;
-}
+    std::string DeletionTags(void) const
+    { return record_.DeletionTag(orientation_, aligned_, exciseSoftClips_); }
 
-inline bool BamRecord::IsPaired(void) const
-{ return (d_->core.flag & BamRecord::PAIRED) != 0; }
+    QualityValues InsertionQVs(void) const
+    { return record_.InsertionQV(orientation_, aligned_, exciseSoftClips_); }
 
-inline BamRecord& BamRecord::SetPaired(bool ok)
-{
-    if (ok) d_->core.flag |=  BamRecord::PAIRED;
-    else    d_->core.flag &= ~BamRecord::PAIRED;
-    return *this;
-}
+    Frames IPD(void) const
+    { return record_.IPD(orientation_, aligned_, exciseSoftClips_); }
 
-inline bool BamRecord::IsPrimaryAlignment(void) const
-{ return (d_->core.flag & BamRecord::SECONDARY) == 0; }
+    QualityValues MergeQVs(void) const
+    { return record_.MergeQV(orientation_, aligned_, exciseSoftClips_); }
 
-inline BamRecord& BamRecord::SetPrimaryAlignment(bool ok)
-{
-    if (ok) d_->core.flag &= ~BamRecord::SECONDARY;
-    else    d_->core.flag |=  BamRecord::SECONDARY;
-    return *this;
-}
+    Frames PulseWidths(void) const
+    { return record_.PulseWidth(orientation_, aligned_, exciseSoftClips_); }
 
-inline bool BamRecord::IsProperPair(void) const
-{ return (d_->core.flag & BamRecord::PROPER_PAIR) != 0; }
+    QualityValues Qualities(void) const
+    { return record_.Qualities(orientation_, aligned_, exciseSoftClips_); }
 
-inline BamRecord& BamRecord::SetProperPair(bool ok)
-{
-    if (ok) d_->core.flag |=  BamRecord::PROPER_PAIR;
-    else    d_->core.flag &= ~BamRecord::PROPER_PAIR;
-    return *this;
-}
+    std::string Sequence(void) const
+    { return record_.Sequence(orientation_, aligned_, exciseSoftClips_); }
 
-inline bool BamRecord::IsReverseStrand(void) const
-{ return (d_->core.flag & BamRecord::REVERSE_STRAND) != 0; }
+    QualityValues SubstitutionQVs(void) const
+    { return record_.SubstitutionQV(orientation_, aligned_, exciseSoftClips_); }
 
-inline BamRecord& BamRecord::SetReverseStrand(bool ok)
-{
-    if (ok) d_->core.flag |=  BamRecord::REVERSE_STRAND;
-    else    d_->core.flag &= ~BamRecord::REVERSE_STRAND;
-    return *this;
-}
+    std::string SubstitutionTags(void) const
+    { return record_.SubstitutionTag(orientation_, aligned_, exciseSoftClips_); }
 
-inline bool BamRecord::IsSecondMate(void) const
-{ return (d_->core.flag & BamRecord::MATE_2) != 0; }
-
-inline BamRecord& BamRecord::SetSecondMate(bool ok)
-{
-    if (ok) d_->core.flag |=  BamRecord::MATE_2;
-    else    d_->core.flag &= ~BamRecord::MATE_2;
-    return *this;
-}
-
-inline bool BamRecord::IsSupplementaryAlignment(void) const
-{ return (d_->core.flag & BamRecord::SUPPLEMENTARY) != 0; }
-
-inline BamRecord& BamRecord::SetSupplementaryAlignment(bool ok)
-{
-    if (ok) d_->core.flag |=  BamRecord::SUPPLEMENTARY;
-    else    d_->core.flag &= ~BamRecord::SUPPLEMENTARY;
-    return *this;
-}
+private:
+    const BamRecord& record_;
+    Orientation orientation_;
+    bool aligned_;
+    bool exciseSoftClips_;
+};
 
 } // namespace BAM
 } // namespace PacBio

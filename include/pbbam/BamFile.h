@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -39,7 +39,7 @@
 #define BAMFILE_H
 
 #include "pbbam/Config.h"
-#include "pbbam/SamHeader.h"
+#include "pbbam/BamHeader.h"
 #include <memory>
 #include <string>
 
@@ -99,8 +99,8 @@ public:
     /// \name Header Metadata Methods
     /// \{
 
-    /// \returns SamHeader object containing the file's metadata
-    SamHeader Header(void) const;
+    /// \returns BamHeader object containing the file's metadata
+    std::shared_ptr<BamHeader> Header(void) const;
 
     /// \returns true if BAM file is a PacBio BAM file (i.e. has non-empty version associated with header "pb" tag)
     bool IsPacBioBAM(void) const;
@@ -141,9 +141,42 @@ public:
 
 private:
     std::string filename_;
-    SamHeader header_;
     BamFile::FileError error_;
+    std::shared_ptr<BamHeader> header_;
 };
+
+inline BamFile::operator bool(void) const
+{ return error_ == BamFile::NoError; }
+
+inline BamFile::FileError BamFile::Error(void) const
+{ return error_; }
+
+inline std::string BamFile::Filename(void) const
+{ return filename_; }
+
+inline std::shared_ptr<BamHeader> BamFile::Header(void) const
+{ return header_; }
+
+inline bool BamFile::IsPacBioBAM(void) const
+{ return !header_->PacBioBamVersion().empty(); }
+
+inline std::string BamFile::StandardIndexFilename(void) const
+{ return filename_ + ".bai"; }
+
+inline std::string BamFile::PacBioIndexFilename(void) const
+{ return filename_ + ".pbi"; }
+
+inline int BamFile::ReferenceId(const std::string& name) const
+{ return header_->SequenceId(name); }
+
+inline uint32_t BamFile::ReferenceLength(const std::string& name) const
+{ return ReferenceLength(ReferenceId(name)); }
+
+inline uint32_t BamFile::ReferenceLength(const int id) const
+{ return std::stoul(header_->SequenceLength(id)); }
+
+inline std::string BamFile::ReferenceName(const int id) const
+{ return header_->SequenceName(id); }
 
 } // namespace BAM
 } // namespace PacBio

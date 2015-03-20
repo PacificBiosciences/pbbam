@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -66,5 +66,59 @@ TEST(EntireFileQueryTest, CountRecords)
 
     EXPECT_EQ(3307, count);
 }
+
+TEST(EntireFileQueryTest, NonConstBamRecord)
+{
+    // open input BAM file
+    BamFile bamFile(inputBamFn);
+    EXPECT_TRUE(bamFile);
+
+    // count records
+    int count = 0;
+    EntireFileQuery entireFile(bamFile);
+    EXPECT_TRUE(entireFile);
+    for (BamRecord& record : entireFile) {
+        (void)record;
+        ++count;
+    }
+
+    EXPECT_EQ(3307, count);
+}
+
+//TEST(EntireFileQueryTest, WorksWithBamRecordImpl)
+//{
+//    // open input BAM file
+//    BamFile bamFile(inputBamFn);
+//    EXPECT_TRUE(bamFile);
+
+//    // count records
+//    int count = 0;
+//    EntireFileQuery entireFile(bamFile);
+//    EXPECT_TRUE(entireFile);
+//    for (const BamRecordImpl& record : entireFile) {
+//        (void)record;
+//        ++count;
+//    }
+
+//    EXPECT_EQ(3307, count);
+//}
+
+//TEST(EntireFileQueryTest, WorksWithNonConstBamRecordImpl)
+//{
+//    // open input BAM file
+//    BamFile bamFile(inputBamFn);
+//    EXPECT_TRUE(bamFile);
+
+//    // count records
+//    int count = 0;
+//    EntireFileQuery entireFile(bamFile);
+//    EXPECT_TRUE(entireFile);
+//    for (BamRecordImpl& record : entireFile) {
+//        (void)record;
+//        ++count;
+//    }
+
+//    EXPECT_EQ(3307, count);
+//}
 
 // add special cases as needed

@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -59,7 +59,7 @@ public:
     };
 
 protected:
-    QueryBase(void);
+    QueryBase(const BamFile& file);
 public:
     virtual ~QueryBase(void);
 
@@ -68,8 +68,11 @@ public:
     /// \name Error Handling
     /// \{
 
-    QueryError Error(void) const;
-    operator bool(void) const;
+    QueryError Error(void) const
+    { return error_; }
+
+    operator bool(void) const
+    { return error_ == QueryBase::NoError; }
 
     /// \}
 
@@ -78,19 +81,15 @@ public:
     public:
 
         BamRecord& operator*(void)
-        {
-            return m_record;
-        }
+        { return record_; }
 
         BamRecord* operator->(void)
-        {
-            return &(operator*());
-        }
+        { return &(operator*()); }
 
         iterator& operator++(void)
         {
-            if (!(m_query->GetNext(m_record)))
-                m_query = 0;
+            if (!(query_->GetNext(record_)))
+                query_ = 0;
             return *this;
         }
 
@@ -101,30 +100,25 @@ public:
             return __t;
         }
 
-        inline
         bool operator==(const iterator& other) const
-        {
-            return m_query == other.m_query;
-        }
+        { return query_ == other.query_; }
 
-        inline
         bool operator!=(const iterator& other) const
-        {
-            return !(*this == other);
-        }
+        { return !(*this == other); }
 
     private:
-        iterator(void) : m_query(0) { }
+        iterator(void) : query_(0) { }
         iterator(QueryBase& parent)
-            : m_query(&parent)
+            : query_(&parent)
+            , record_(parent.file_.Header())
         {
-            if (!(m_query->GetNext(m_record)))
-                m_query = 0;
+            if (!(query_->GetNext(record_)))
+                query_ = 0;
         }
 
     private:
-        QueryBase* m_query;
-        BamRecord m_record;
+        QueryBase* query_;
+        BamRecord record_;
         friend class QueryBase;
     };
 
@@ -133,18 +127,15 @@ public:
     public:
 
         const BamRecord& operator*(void) const
-        {
-            return m_record;
-        }
+        { return record_; }
 
-        const BamRecord* operator->(void) const {
-            return &(operator*());
-        }
+        const BamRecord* operator->(void) const
+        { return &(operator*()); }
 
         const_iterator& operator++(void)
         {
-            if (!(m_query->GetNext(m_record)))
-                m_query = 0;
+            if (!(query_->GetNext(record_)))
+                query_ = 0;
             return *this;
         }
 
@@ -155,30 +146,25 @@ public:
             return __t;
         }
 
-        inline
         bool operator==(const const_iterator& other) const
-        {
-            return m_query == other.m_query;
-        }
+        { return query_ == other.query_; }
 
-        inline
         bool operator!=(const const_iterator& other) const
-        {
-            return !(*this == other);
-        }
+        { return !(*this == other); }
 
     private:
-        const_iterator(void) : m_query(0) { }
+        const_iterator(void) : query_(0) { }
         const_iterator(const QueryBase& parent)
+            : record_(parent.file_.Header())
         {
-            m_query = const_cast<QueryBase*>(&parent);
-            if (!(m_query->GetNext(m_record)))
-                m_query = 0;
+            query_ = const_cast<QueryBase*>(&parent);
+            if (!(query_->GetNext(record_)))
+                query_ = 0;
         }
 
     private:
-        QueryBase* m_query;
-        BamRecord m_record;
+        QueryBase* query_;
+        BamRecord record_;
         friend class QueryBase;
     };
 
@@ -187,12 +173,23 @@ public:
     /// \name Iterators
     /// \{
 
-    QueryBase::iterator begin(void) { return QueryBase::iterator(*this); }
-    QueryBase::const_iterator begin(void) const { return QueryBase::const_iterator(*this); }
-    QueryBase::const_iterator cbegin(void) const { return QueryBase::const_iterator(*this); }
-    QueryBase::iterator end(void) { return QueryBase::iterator(); }
-    QueryBase::const_iterator end(void) const { return QueryBase::const_iterator(); }
-    QueryBase::const_iterator cend(void) const { return QueryBase::const_iterator(); }
+    QueryBase::iterator begin(void)
+    { return QueryBase::iterator(*this); }
+
+    QueryBase::const_iterator begin(void) const
+    { return QueryBase::const_iterator(*this); }
+
+    QueryBase::const_iterator cbegin(void) const
+    { return QueryBase::const_iterator(*this); }
+
+    QueryBase::iterator end(void)
+    { return QueryBase::iterator(); }
+
+    QueryBase::const_iterator end(void) const
+    { return QueryBase::const_iterator(); }
+
+    QueryBase::const_iterator cend(void) const
+    { return QueryBase::const_iterator(); }
 
     /// \}
 
@@ -201,6 +198,7 @@ protected:
 
 protected:
     QueryError error_;
+    const BamFile& file_;
 };
 
 } // namespace BAM

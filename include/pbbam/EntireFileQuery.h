@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -55,8 +55,8 @@ protected:
     bool GetNext(BamRecord& record);
 
 private:
-    std::shared_ptr<samFile>   file_;
-    std::shared_ptr<bam_hdr_t> header_;
+    std::shared_ptr<samFile>   htsFile_;
+    std::shared_ptr<bam_hdr_t> htsHeader_;
 };
 
 } // namespace BAM

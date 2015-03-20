@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -36,7 +36,6 @@
 // Author: Derek Barnett
 
 #include "pbbam/BamWriter.h"
-#include "pbbam/BamRecord.h"
 #include "pbbam/BamFile.h"
 #include "AssertUtils.h"
 #include "MemoryUtils.h"
@@ -49,15 +48,34 @@ using namespace PacBio::BAM;
 using namespace std;
 
 BamWriter::BamWriter(const std::string& filename,
-                     const SamHeader& header,
+                     const BamHeader& header,
                      const BamWriter::CompressionLevel compressionLevel,
                      const size_t numThreads)
     : file_(nullptr)
     , header_(nullptr)
     , error_(BamWriter::NoError)
 {
-     Open(filename, header.CreateRawData(), compressionLevel, numThreads);
+     Open(filename,
+          internal::BamHeaderMemory::MakeRawHeader(header),
+          compressionLevel,
+          numThreads);
 }
+
+
+BamWriter::BamWriter(const std::string& filename,
+                     const std::shared_ptr<BamHeader>& header,
+                     const BamWriter::CompressionLevel compressionLevel,
+                     const size_t numThreads)
+    : file_(nullptr)
+    , header_(nullptr)
+    , error_(BamWriter::NoError)
+{
+     Open(filename,
+          internal::BamHeaderMemory::MakeRawHeader(header),
+          compressionLevel,
+          numThreads);
+}
+
 
 BamWriter::~BamWriter(void)
 {
@@ -141,7 +159,12 @@ bool BamWriter::Open(const string& filename,
 
 bool BamWriter::Write(const BamRecord& record)
 {
-    return Write(record.RawData());
+    return Write(internal::BamRecordMemory::GetRawData(record));
+}
+
+bool BamWriter::Write(const BamRecordImpl& recordImpl)
+{
+    return Write(internal::BamRecordMemory::GetRawData(recordImpl));
 }
 
 bool BamWriter::Write(const std::shared_ptr<bam1_t>& rawRecord)

@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -38,9 +38,10 @@
 #ifndef BAMWRITER_H
 #define BAMWRITER_H
 
-
+#include "pbbam/BamHeader.h"
+#include "pbbam/BamRecord.h"
 #include "pbbam/Config.h"
-#include "pbbam/SamHeader.h"
+#include <htslib/sam.h>
 #include <memory>
 #include <string>
 
@@ -48,7 +49,6 @@ namespace PacBio {
 namespace BAM {
 
 class BamFile;
-class BamRecord;
 
 class PBBAM_EXPORT BamWriter
 {
@@ -98,14 +98,34 @@ public:
     /// \note Set \p filename to "-" for stdout.
     ///
     /// \param[in] filename         path to output BAM file
-    /// \param[in] header           SamHeader object
+    /// \param[in] header           BamHeader object
     /// \param[in] compressionLevel zlib compression level
     /// \param[in] numThreads       number of threads for compression.
     ///            If set to 0, BamWriter will attempt to determine a reasonable estimate.
     ///            If set to 1, this will force single-threaded execution.
     ///            No checks are made against an upper limit.
     BamWriter(const std::string& filename,
-              const SamHeader& header,
+              const BamHeader& header,
+              const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
+              const size_t numThreads = 4);
+
+    /// Opens a BAM file for writing & writes the header information.
+    ///
+    /// The error status will be set if either operation fails.
+    ///
+    /// \note This overload is useful if you're carrying over a header from an existing BamFile.
+    ///
+    /// \note Set \p filename to "-" for stdout.
+    ///
+    /// \param[in] filename         path to output BAM file
+    /// \param[in] header           shared_ptr to BamHeader object
+    /// \param[in] compressionLevel zlib compression level
+    /// \param[in] numThreads       number of threads for compression.
+    ///            If set to 0, BamWriter will attempt to determine a reasonable estimate.
+    ///            If set to 1, this will force single-threaded execution.
+    ///            No checks are made against an upper limit.
+    BamWriter(const std::string& filename,
+              const std::shared_ptr<BamHeader>& header,
               const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
               const size_t numThreads = 4);
 
@@ -132,8 +152,15 @@ public:
     ///
     /// \param[in] record BamRecord object
     ///
-    /// \returns succcess/failure
+    /// \returns success/failure
     bool Write(const BamRecord& record);
+
+    /// Write a record to the output BAM file.
+    ///
+    /// \param[in] recordImpl BamRecordImpl object
+    ///
+    /// \returns success/failure
+    bool Write(const BamRecordImpl& recordImpl);
 
     /// \}
 

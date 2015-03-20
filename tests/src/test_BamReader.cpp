@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -44,7 +44,6 @@
 #include <htslib/sam.h>
 #include <pbbam/BamReader.h>
 #include <pbbam/BamWriter.h>
-#include <pbbam/SamHeader.h>
 #include <iostream>
 #include <string>
 #include <cstdio>

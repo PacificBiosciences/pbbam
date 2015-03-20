@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -48,9 +48,9 @@ using namespace std;
 
 TEST(IntervalTest, Constructors)
 {
-    Interval<uint32_t> empty;
-    Interval<uint32_t> singleton(4);
-    Interval<uint32_t> normal(5, 8);
+    Interval<Position> empty;
+    Interval<Position> singleton(4);
+    Interval<Position> normal(5, 8);
 
     EXPECT_EQ(0, empty.Start());
     EXPECT_EQ(0, empty.Stop());
@@ -66,16 +66,16 @@ TEST(IntervalTest, Constructors)
 
 TEST(IntervalTest, EqualityTest)
 {
-    Interval<uint32_t> empty;
-    Interval<uint32_t> empty2;
+    Interval<Position> empty;
+    Interval<Position> empty2;
 
-    Interval<uint32_t> singleton(4);
-    Interval<uint32_t> sameAsSingleton(4,5);
+    Interval<Position> singleton(4);
+    Interval<Position> sameAsSingleton(4,5);
 
-    Interval<uint32_t> normal(5, 8);
-    Interval<uint32_t> sameAsNormal(5, 8);
+    Interval<Position> normal(5, 8);
+    Interval<Position> sameAsNormal(5, 8);
 
-    Interval<uint32_t> different(20, 40);
+    Interval<Position> different(20, 40);
 
     // self-equality
     EXPECT_TRUE(empty == empty);
@@ -98,9 +98,9 @@ TEST(IntervalTest, EqualityTest)
 
 TEST(IntervalTest, Copy)
 {
-    Interval<uint32_t> interval1(5, 8);
-    Interval<uint32_t> interval2(interval1);
-    Interval<uint32_t> interval3 = interval1;
+    Interval<Position> interval1(5, 8);
+    Interval<Position> interval2(interval1);
+    Interval<Position> interval3 = interval1;
 
     EXPECT_TRUE(interval1 == interval1);
     EXPECT_TRUE(interval1 == interval2);
@@ -109,8 +109,8 @@ TEST(IntervalTest, Copy)
 
 TEST(IntervalTest, Modifier)
 {
-    Interval<uint32_t> interval1(5, 8);
-    Interval<uint32_t> interval2(interval1);
+    Interval<Position> interval1(5, 8);
+    Interval<Position> interval2(interval1);
     interval2.Start(2);
     interval2.Stop(10);
 
@@ -121,11 +121,11 @@ TEST(IntervalTest, Modifier)
 
 TEST(IntervalTest, CoverTest)
 {
-    Interval<uint32_t> interval1(2, 4);
-    Interval<uint32_t> interval2(3, 5);
-    Interval<uint32_t> interval3(6, 8);
-    Interval<uint32_t> interval4(1, 7);
-    Interval<uint32_t> interval5(5, 8);
+    Interval<Position> interval1(2, 4);
+    Interval<Position> interval2(3, 5);
+    Interval<Position> interval3(6, 8);
+    Interval<Position> interval4(1, 7);
+    Interval<Position> interval5(5, 8);
 
     EXPECT_TRUE(interval1.Covers(interval1));    // self-cover: a.covers(a)
     EXPECT_TRUE(interval1.CoveredBy(interval1)); // self-cover: a.coveredBy(a)
@@ -149,11 +149,11 @@ TEST(IntervalTest, CoverTest)
 
 TEST(IntervalTest, IntersectTest)
 {
-    Interval<uint32_t> interval1(2, 4);
-    Interval<uint32_t> interval2(3, 5);
-    Interval<uint32_t> interval3(6, 8);
-    Interval<uint32_t> interval4(1, 7);
-    Interval<uint32_t> interval5(5, 8);
+    Interval<Position> interval1(2, 4);
+    Interval<Position> interval2(3, 5);
+    Interval<Position> interval3(6, 8);
+    Interval<Position> interval4(1, 7);
+    Interval<Position> interval5(5, 8);
 
     EXPECT_TRUE(interval1.Intersects(interval1)); // self-intersection: a.intersects(a)
 
@@ -168,13 +168,30 @@ TEST(IntervalTest, IntersectTest)
     EXPECT_FALSE(interval2.Intersects(interval5)); // b.start == a.stop (intervals are right open, so disjoint)
 }
 
+TEST(IntervalTest, ValidityTest)
+{
+    Interval<Position> interval1;        // default ctor
+    Interval<Position> interval2(0,0);   // start == stop (zero)
+    Interval<Position> interval3(4,4);   // start == stop (nonzero)
+    Interval<Position> interval4(0,1);   // start < stop  (start is zero)
+    Interval<Position> interval5(4,5);   // start < stop  (start is nonzero)
+    Interval<Position> interval6(5,4);   // start > stop
+
+    EXPECT_FALSE(interval1.IsValid());
+    EXPECT_FALSE(interval2.IsValid());
+    EXPECT_FALSE(interval3.IsValid());
+    EXPECT_TRUE(interval4.IsValid());
+    EXPECT_TRUE(interval5.IsValid());
+    EXPECT_FALSE(interval6.IsValid());
+}
+
 TEST(IntervalTest, LengthTest)
 {
-    Interval<uint32_t> interval1(2, 4);
-    Interval<uint32_t> interval2(3, 5);
-    Interval<uint32_t> interval3(6, 8);
-    Interval<uint32_t> interval4(1, 7);
-    Interval<uint32_t> interval5(5, 8);
+    Interval<Position> interval1(2, 4);
+    Interval<Position> interval2(3, 5);
+    Interval<Position> interval3(6, 8);
+    Interval<Position> interval4(1, 7);
+    Interval<Position> interval5(5, 8);
 
     EXPECT_EQ(2, interval1.Length());
     EXPECT_EQ(2, interval2.Length());
@@ -213,15 +230,24 @@ TEST(GenomicIntervalTest, Copy)
 TEST(GenomicIntervalTest, Modifiers)
 {
     GenomicInterval interval1(1, 10, 20);
+
+    // modify individual properties
     GenomicInterval interval2(interval1);
     interval2.Id(5);
     interval2.Start(2);
     interval2.Stop(10);
 
+    // modify interval as a whole
+    GenomicInterval interval3(interval1);
+    interval3.Interval(interval2.Interval());
+
     EXPECT_FALSE(interval1 == interval2);
     EXPECT_EQ(5,  interval2.Id());
     EXPECT_EQ(2,  interval2.Start());
     EXPECT_EQ(10, interval2.Stop());
+
+    EXPECT_EQ(interval1.Id(),       interval3.Id());
+    EXPECT_EQ(interval2.Interval(), interval3.Interval());
 }
 
 TEST(GenomicIntervalTest, CoverTest)
@@ -261,3 +287,29 @@ TEST(GenomicIntervalTest, CoverTest)
     EXPECT_TRUE(interval3.CoveredBy(interval5)); // and b.coveredBy(a)
 }
 
+TEST(GenomicIntervalTest, ValidityTest)
+{
+    GenomicInterval interval1;            // default ctor
+    GenomicInterval interval2(0,0,0);     // valid id, start == stop (zero)
+    GenomicInterval interval3(0,4,4);     // valid id, start == stop (nonzero)
+    GenomicInterval interval4(0,0,1);     // valid id, start < stop  (start is zero)
+    GenomicInterval interval5(0,4,5);     // valid id, start < stop  (start is nonzero)
+    GenomicInterval interval6(0,5,4);     // valid id, start > stop
+    GenomicInterval interval7(-1,0,0);    // invalid id, start == stop (zero)
+    GenomicInterval interval8(-1,4,4);    // invalid id, start == stop (nonzero)
+    GenomicInterval interval9(-1,0,1);    // invalid id, start < stop  (start is zero)
+    GenomicInterval interval10(-1,4,5);   // invalid id, start < stop  (start is nonzero)
+    GenomicInterval interval11(-1,5,4);   // invalid id, start > stop
+
+    EXPECT_FALSE(interval1.IsValid());
+    EXPECT_FALSE(interval2.IsValid());
+    EXPECT_FALSE(interval3.IsValid());
+    EXPECT_TRUE(interval4.IsValid());
+    EXPECT_TRUE(interval5.IsValid());
+    EXPECT_FALSE(interval6.IsValid());
+    EXPECT_FALSE(interval7.IsValid());
+    EXPECT_FALSE(interval8.IsValid());
+    EXPECT_FALSE(interval9.IsValid());
+    EXPECT_FALSE(interval10.IsValid());
+    EXPECT_FALSE(interval11.IsValid());
+}

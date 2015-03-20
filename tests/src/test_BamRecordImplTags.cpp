@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -45,11 +45,11 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-// NOTE: these tests check "high-level" tag query/manipulation via BamRecord.
+// NOTE: these tests check "high-level" tag query/manipulation via BamRecordImpl.
 //       For raw Tag/TagCollection tests, see test_Tags.cpp
-//       For encoding tests, see test_BamRecordVariableData.cpp
+//       For encoding tests, see test_BamRecordImplVariableData.cpp
 
-TEST(BamRecordTagsTest, HasTagTest)
+TEST(BamRecordImplTagsTest, HasTagTest)
 {
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -57,7 +57,7 @@ TEST(BamRecordTagsTest, HasTagTest)
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
     tags["XY"] = (int32_t)-42;
 
-    BamRecord bam;
+    BamRecordImpl bam;
     bam.Tags(tags);
 
     EXPECT_TRUE(bam.HasTag("HX"));
@@ -77,14 +77,14 @@ TEST(BamRecordTagsTest, HasTagTest)
     EXPECT_FALSE(fetchedTags.Contains("some_too_long_name"));
 }
 
-TEST(BamRecordTagsTest, SimpleAddTag)
+TEST(BamRecordImplTagsTest, SimpleAddTag)
 {
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
 
-    BamRecord bam;
+    BamRecordImpl bam;
     bam.Tags(tags);
 
     EXPECT_TRUE(bam.HasTag("HX"));
@@ -113,7 +113,7 @@ TEST(BamRecordTagsTest, SimpleAddTag)
     EXPECT_FALSE(bam.AddTag("XY", (int32_t)-42));                   // reject duplicate
 }
 
-TEST(BamRecordTagsTest, SimpleRemoveTag)
+TEST(BamRecordImplTagsTest, SimpleRemoveTag)
 {
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -121,7 +121,7 @@ TEST(BamRecordTagsTest, SimpleRemoveTag)
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
     tags["XY"] = (int32_t)-42;
 
-    BamRecord bam;
+    BamRecordImpl bam;
     bam.Tags(tags);
 
     EXPECT_TRUE(bam.HasTag("HX"));
@@ -149,7 +149,7 @@ TEST(BamRecordTagsTest, SimpleRemoveTag)
     EXPECT_FALSE(bam.RemoveTag("zz"));                 // reject remove unknown
 }
 
-TEST(BamRecordTagsTest, SimpleEditTag)
+TEST(BamRecordImplTagsTest, SimpleEditTag)
 {
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -157,7 +157,7 @@ TEST(BamRecordTagsTest, SimpleEditTag)
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
     tags["XY"] = (int32_t)-42;
 
-    BamRecord bam;
+    BamRecordImpl bam;
     bam.Tags(tags);
 
     EXPECT_TRUE(bam.HasTag("XY"));
@@ -184,7 +184,7 @@ TEST(BamRecordTagsTest, SimpleEditTag)
     EXPECT_FALSE(bam.EditTag("zz", 500));                 // reject edit unknown
 }
 
-TEST(BamRecordTagsTest, SimpleQueryTag)
+TEST(BamRecordImplTagsTest, SimpleQueryTag)
 {
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -192,7 +192,7 @@ TEST(BamRecordTagsTest, SimpleQueryTag)
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
     tags["XY"] = (int32_t)-42;
 
-    BamRecord bam;
+    BamRecordImpl bam;
     bam.Tags(tags);
 
     EXPECT_TRUE(bam.HasTag("XY"));

@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -40,7 +40,7 @@
 #endif
 
 #include <gtest/gtest.h>
-#include <pbbam/BamRecord.h>
+#include <pbbam/BamRecordImpl.h>
 #include <pbbam/BamTagCodec.h>
 #include <pbbam/Tag.h>
 #include <pbbam/TagCollection.h>
@@ -66,9 +66,9 @@ struct Bam1Deleter
 };
 
 static
-BamRecord CreateRecord(void)
+BamRecordImpl CreateBamImpl(void)
 {
-    BamRecord bam;
+    BamRecordImpl bam;
     bam.Bin(42);
     bam.Flag(42);
     bam.InsertSize(42);
@@ -89,7 +89,7 @@ BamRecord CreateRecord(void)
 }
 
 static
-void CheckRawData(const BamRecord& bam)
+void CheckRawData(const BamRecordImpl& bam)
 {
     // ensure raw data (lengths at least) matches API-facing data
 
@@ -107,16 +107,16 @@ void CheckRawData(const BamRecord& bam)
                                          expectedSeqLength +
                                          expectedTagsLength;
 
-    EXPECT_TRUE((bool)bam.RawData());
-    EXPECT_EQ(expectedNameLength,      bam.RawData()->core.l_qname);
-    EXPECT_EQ(expectedNumCigarOps,     bam.RawData()->core.n_cigar);
-    EXPECT_EQ(expectedSeqLength,       bam.RawData()->core.l_qseq);
-    EXPECT_EQ(expectedTotalDataLength, bam.RawData()->l_data);
+    EXPECT_TRUE((bool)bam.d_);
+    EXPECT_EQ(expectedNameLength,      bam.d_->core.l_qname);
+    EXPECT_EQ(expectedNumCigarOps,     bam.d_->core.n_cigar);
+    EXPECT_EQ(expectedSeqLength,       bam.d_->core.l_qseq);
+    EXPECT_EQ(expectedTotalDataLength, bam.d_->l_data);
 }
 
 } // namespace tests
 
-TEST(BamRecordCoreTest, RawDataDefaultValues)
+TEST(BamRecordImplCoreTest, RawDataDefaultValues)
 {
     std::shared_ptr<bam1_t> rawData(bam_init1(), tests::Bam1Deleter());
     ASSERT_TRUE((bool)rawData);
@@ -140,28 +140,29 @@ TEST(BamRecordCoreTest, RawDataDefaultValues)
     EXPECT_EQ(0, rawData->m_data);
 }
 
-TEST(BamRecordCoreTest, DefaultValues)
+TEST(BamRecordImplCoreTest, DefaultValues)
 {
-    BamRecord bam;
+    BamRecordImpl bam;
 
     // -------------------------------
     // check raw data
     // -------------------------------
 
-    const std::shared_ptr<bam1_t> rawData = bam.RawData();
+    const std::shared_ptr<bam1_t> rawData = bam.d_;
     ASSERT_TRUE((bool)rawData);
 
     // fixed-length (core) data
-    EXPECT_EQ(0, rawData->core.tid);
-    EXPECT_EQ(0, rawData->core.pos);
+    // (forced init unmapped, with NULL-term as QNAME)
+    EXPECT_EQ(-1, rawData->core.tid);
+    EXPECT_EQ(-1, rawData->core.pos);
     EXPECT_EQ(0, rawData->core.bin);
     EXPECT_EQ(0, rawData->core.qual);
-    EXPECT_EQ(1, rawData->core.l_qname);    // initialized w/ NULL-term
-    EXPECT_EQ(0, rawData->core.flag);
+    EXPECT_EQ(1, rawData->core.l_qname);
+    EXPECT_EQ(BamRecordImpl::UNMAPPED, rawData->core.flag);
     EXPECT_EQ(0, rawData->core.n_cigar);
     EXPECT_EQ(0, rawData->core.l_qseq);
-    EXPECT_EQ(0, rawData->core.mtid);
-    EXPECT_EQ(0, rawData->core.mpos);
+    EXPECT_EQ(-1, rawData->core.mtid);
+    EXPECT_EQ(-1, rawData->core.mpos);
     EXPECT_EQ(0, rawData->core.isize);
 
     // variable length data
@@ -174,19 +175,19 @@ TEST(BamRecordCoreTest, DefaultValues)
     // -------------------------------
 
     EXPECT_EQ(0, bam.Bin());
-    EXPECT_EQ(0, bam.Flag());
+    EXPECT_EQ(BamRecordImpl::UNMAPPED, bam.Flag());
     EXPECT_EQ(0, bam.InsertSize());
     EXPECT_EQ(0, bam.MapQuality());
-    EXPECT_EQ(0, bam.MateReferenceId());
-    EXPECT_EQ(0, bam.MatePosition());
-    EXPECT_EQ(0, bam.Position());
-    EXPECT_EQ(0, bam.ReferenceId());
+    EXPECT_EQ(-1, bam.MateReferenceId());
+    EXPECT_EQ(-1, bam.MatePosition());
+    EXPECT_EQ(-1, bam.Position());
+    EXPECT_EQ(-1, bam.ReferenceId());
     EXPECT_EQ(0, bam.Tags().size());
 
     EXPECT_FALSE(bam.IsDuplicate());
     EXPECT_FALSE(bam.IsFailedQC());
     EXPECT_FALSE(bam.IsFirstMate());
-    EXPECT_TRUE(bam.IsMapped());
+    EXPECT_FALSE(bam.IsMapped());
     EXPECT_TRUE(bam.IsMateMapped());
     EXPECT_FALSE(bam.IsMateReverseStrand());
     EXPECT_FALSE(bam.IsPaired());
@@ -200,13 +201,13 @@ TEST(BamRecordCoreTest, DefaultValues)
     EXPECT_EQ(emptyString, bam.Name());
     EXPECT_EQ(emptyString, bam.CigarData().ToStdString());
     EXPECT_EQ(emptyString, bam.Sequence());
-    EXPECT_EQ(emptyString, bam.Qualities());
+    EXPECT_EQ(emptyString, bam.Qualities().Fastq());
     tests::CheckRawData(bam);
 }
 
-TEST(BamRecordCoreTest, CoreSetters)
+TEST(BamRecordImplCoreTest, CoreSetters)
 {
-    BamRecord bam;
+    BamRecordImpl bam;
     bam.Bin(42);
     bam.Flag(42);
     bam.InsertSize(42);
@@ -227,7 +228,7 @@ TEST(BamRecordCoreTest, CoreSetters)
     // check raw data
     // -------------------------------
 
-    const std::shared_ptr<bam1_t> rawData = bam.RawData();
+    const std::shared_ptr<bam1_t> rawData = bam.d_;
     ASSERT_TRUE((bool)rawData);
 
     // fixed-length (core) data
@@ -269,7 +270,7 @@ TEST(BamRecordCoreTest, CoreSetters)
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags.at("CA").ToUInt8Array());
 }
 
-TEST(BamRecordCoreTest, DeepCopyFromRawData)
+TEST(BamRecordImplCoreTest, DeepCopyFromRawData)
 {
     // init raw data
     std::shared_ptr<bam1_t> rawData(bam_init1(), tests::Bam1Deleter());
@@ -306,7 +307,7 @@ TEST(BamRecordCoreTest, DeepCopyFromRawData)
     EXPECT_EQ(42, fetchedX);
 
     // static "ctor"
-    BamRecord bam = BamRecord::FromRawData(rawData);
+    BamRecordImpl bam = BamRecordImpl::FromRawData(rawData);
 
     // make sure raw data is still valid
     EXPECT_EQ(42, rawData->core.tid);
@@ -335,19 +336,19 @@ TEST(BamRecordCoreTest, DeepCopyFromRawData)
     EXPECT_EQ(42, bam.ReferenceId());
     EXPECT_EQ(x,  bam.Tags()["XY"].ToInt32());
 
-    EXPECT_TRUE(bam.RawData()->data != nullptr);
-    EXPECT_TRUE(bam.RawData()->m_data >= (int)0x800); // check this if we change or tune later
+    EXPECT_TRUE(bam.d_->data != nullptr);
+    EXPECT_TRUE(bam.d_->m_data >= (int)0x800); // check this if we change or tune later
 
-    // tweak raw data, make sure we've done a deep copy (so BamRecord isn't changed)
+    // tweak raw data, make sure we've done a deep copy (so BamRecordImpl isn't changed)
     rawData->core.pos = 37;
     EXPECT_EQ(37, rawData->core.pos);
     EXPECT_EQ(42, bam.Position());
-    EXPECT_EQ(42, bam.RawData()->core.pos);
+    EXPECT_EQ(42, bam.d_->core.pos);
 }
 
-TEST(BamRecordCoreTest, CopyAssignment)
+TEST(BamRecordImplCoreTest, CopyAssignment)
 {
-    BamRecord bam1;
+    BamRecordImpl bam1;
     bam1.Bin(42);
     bam1.Flag(42);
     bam1.InsertSize(42);
@@ -364,7 +365,7 @@ TEST(BamRecordCoreTest, CopyAssignment)
     tags["XY"] = static_cast<int32_t>(-42);
     bam1.Tags(tags);
 
-    BamRecord bam2;
+    BamRecordImpl bam2;
     bam2 = bam1;
 
     EXPECT_EQ(42, bam1.Bin());
@@ -401,9 +402,9 @@ TEST(BamRecordCoreTest, CopyAssignment)
     tests::CheckRawData(bam2);
 }
 
-TEST(BamRecordCoreTest, SelfAssignmentTolerated)
+TEST(BamRecordImplCoreTest, SelfAssignmentTolerated)
 {
-    BamRecord bam1;
+    BamRecordImpl bam1;
     bam1.Bin(42);
     bam1.Flag(42);
     bam1.InsertSize(42);
@@ -440,9 +441,9 @@ TEST(BamRecordCoreTest, SelfAssignmentTolerated)
     tests::CheckRawData(bam1);
 }
 
-TEST(BamRecordCoreTest, CopyConstructor)
+TEST(BamRecordImplCoreTest, CopyConstructor)
 {
-    BamRecord bam1;
+    BamRecordImpl bam1;
     bam1.Bin(42);
     bam1.Flag(42);
     bam1.InsertSize(42);
@@ -459,7 +460,7 @@ TEST(BamRecordCoreTest, CopyConstructor)
     tags["XY"] = static_cast<int32_t>(-42);
     bam1.Tags(tags);
 
-    BamRecord bam2(bam1);
+    BamRecordImpl bam2(bam1);
 
     EXPECT_EQ(42, bam1.Bin());
     EXPECT_EQ(42, bam1.Flag());
@@ -495,9 +496,9 @@ TEST(BamRecordCoreTest, CopyConstructor)
     tests::CheckRawData(bam2);
 }
 
-TEST(BamRecordCoreTest, CreateRecord_InternalTest)
+TEST(BamRecordImplCoreTest, CreateRecord_InternalTest)
 {
-    BamRecord bam = tests::CreateRecord();
+    BamRecordImpl bam = tests::CreateBamImpl();
 
     EXPECT_EQ(42, bam.Bin());
     EXPECT_EQ(42, bam.Flag());
@@ -518,10 +519,10 @@ TEST(BamRecordCoreTest, CreateRecord_InternalTest)
     tests::CheckRawData(bam);
 }
 
-TEST(BamRecordCoreTest, MoveAssignment)
+TEST(BamRecordImplCoreTest, MoveAssignment)
 {
-    BamRecord bam;
-    bam = std::move(tests::CreateRecord());
+    BamRecordImpl bam;
+    bam = std::move(tests::CreateBamImpl());
 
     EXPECT_EQ(42, bam.Bin());
     EXPECT_EQ(42, bam.Flag());
@@ -541,9 +542,9 @@ TEST(BamRecordCoreTest, MoveAssignment)
     tests::CheckRawData(bam);
 }
 
-TEST(BamRecordCoreTest, MoveConstructor)
+TEST(BamRecordImplCoreTest, MoveConstructor)
 {
-    BamRecord bam(std::move(tests::CreateRecord()));
+    BamRecordImpl bam(std::move(tests::CreateBamImpl()));
 
     EXPECT_EQ(42, bam.Bin());
     EXPECT_EQ(42, bam.Flag());
@@ -563,25 +564,25 @@ TEST(BamRecordCoreTest, MoveConstructor)
     tests::CheckRawData(bam);
 }
 
-TEST(BamRecordCoreTest, AlignmentFlags)
+TEST(BamRecordImplCoreTest, AlignmentFlags)
 {
     // same set of flags, different ways of getting there
 
     // raw number
-    BamRecord bam1;
+    BamRecordImpl bam1;
     bam1.Flag(1107);
 
     // enum values
-    BamRecord bam2;
-    bam2.Flag(BamRecord::DUPLICATE |
-              BamRecord::MATE_1 |
-              BamRecord::REVERSE_STRAND |
-              BamRecord::PROPER_PAIR |
-              BamRecord::PAIRED
+    BamRecordImpl bam2;
+    bam2.Flag(BamRecordImpl::DUPLICATE |
+              BamRecordImpl::MATE_1 |
+              BamRecordImpl::REVERSE_STRAND |
+              BamRecordImpl::PROPER_PAIR |
+              BamRecordImpl::PAIRED
              );
 
     // convenience calls
-    BamRecord bam3;
+    BamRecordImpl bam3;
     bam3.SetDuplicate(true);
     bam3.SetFirstMate(true);
     bam3.SetReverseStrand(true);

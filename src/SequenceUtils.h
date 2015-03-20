@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -35,56 +35,73 @@
 
 // Author: Derek Barnett
 
-#ifndef SAMHEADER_H
-#define SAMHEADER_H
+#ifndef SEQUENCEUTILS_H
+#define SEQUENCEUTILS_H
 
-#include "htslib/sam.h"
-#include "pbbam/Config.h"
-#include "pbbam/DictionaryBase.h"
-#include "pbbam/SamProgram.h"
-#include "pbbam/SamReadGroup.h"
-#include "pbbam/SamSequence.h"
-#include <memory>
+#include "StringUtils.h"
+#include <algorithm>
 #include <string>
-#include <vector>
+#include <ctype.h>
 
 namespace PacBio {
 namespace BAM {
+namespace internal {
 
-class PBBAM_EXPORT SamHeader
+inline char Complement(const char character)
 {
-public:
-    typedef DictionaryBase<SamReadGroup> ReadGroupDictionary;
-    typedef DictionaryBase<SamSequence>  SequenceDictionary;
-    typedef DictionaryBase<SamProgram>   ProgramDictionary;
+    static char const complementLookup[] =
+    {
+        '\0', 'T', 'V', 'G', 'H',
+        '\0', '\0', 'C', 'D', '\0',
+        '\0', 'M', '\0', 'K', 'N',
+        '\0', '\0', '\0', 'Y', 'S',
+        'A', 'A', 'B', 'W', '\0', 'R'
+    };
+    if (character == '-' || character == '*')
+        return character;
+    return complementLookup[toupper(character) & 0x1f];
+}
 
-public:
-    SamHeader(void);
-    ~SamHeader(void) { }
+//inline void Reverse(std::string& s)
+//{ std::reverse(s.begin(), s.end()); }
 
-public:
-    std::string version;
-    std::string sortOrder;
-    std::string pacbioBamVersion;
-    ReadGroupDictionary readGroups;
-    SequenceDictionary  sequences;
-    ProgramDictionary   programs;
-    std::vector<std::string> comments;
+template<typename T>
+void Reverse(T& input)
+{ std::reverse(input.begin(), input.end()); }
 
-private:
-    // converts SamHeader contents to htslib raw data
-    std::shared_ptr<bam_hdr_t> CreateRawData(void) const;
+template<typename T>
+T Reversed(const T& input)
+{
+    T result = input;
+    Reverse(result);
+    return result;
+}
 
-    // returns a SamHeader object, with a deep copy of @rawData contents
-    static SamHeader FromRawData(const std::shared_ptr<bam_hdr_t> rawData);
+//inline std::string Reversed(const std::string& input)
+//{
+//    std::string result = input;
+//    Reverse(result);
+//    return result;
+//}
 
-private:
-    friend class BamFile;
-    friend class BamReader;
-    friend class BamWriter;
-};
+inline void ReverseComplement(std::string& seq) {
 
+    std::string::iterator sIter = seq.begin();
+    std::string::iterator sEnd  = seq.end();
+    for ( ; sIter != sEnd; ++sIter )
+        *sIter = Complement(*sIter);
+    Reverse(seq);
+}
+
+inline std::string ReverseComplemented(const std::string& input)
+{
+    std::string result = input;
+    ReverseComplement(result);
+    return result;
+}
+
+} // namespace internal
 } // namespace BAM
 } // namespace PacBio
 
-#endif // SAMHEADER_H
+#endif // SEQUENCEUTILS_H

@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -35,47 +35,29 @@
 
 // Author: Derek Barnett
 
-#ifndef SAMSEQUENCE_H
-#define SAMSEQUENCE_H
+#ifdef PBBAM_TESTING
+#define private public
+#endif
 
-#include "pbbam/Config.h"
-#include <string>
+#include <gtest/gtest.h>
+#include <pbbam/Accuracy.h>
+using namespace PacBio;
+using namespace PacBio::BAM;
+using namespace std;
 
-namespace PacBio {
-namespace BAM {
-
-class PBBAM_EXPORT SamSequence
+TEST(AccuracyTest, ClampValues)
 {
-public:
-    SamSequence(void) { }
-    SamSequence(const std::string& n, const std::string& l)
-        : name(n)
-        , length(l)
-    { }
-//    SamSequence(const SamSequence& other) = default;
-//    SamSequence(SamSequence&& other) = default;
-    ~SamSequence(void) { }
+    Accuracy a_zero(0);
+    Accuracy a_neg(-1);
+    Accuracy a_min(0);
+    Accuracy a_normal(300);
+    Accuracy a_max(1000);
+    Accuracy a_tooLarge(2000);
 
-    // DictionaryBase compatibility
-    inline std::string Key(void) const;
-    inline SamSequence& Key(const std::string& key);
-
-public:
-    std::string name;                   // SN:<Name>            * Unique Name required for valid SAM header*
-    std::string length;                 // LN:<Length>          * [0 - 2^31-1]
-    std::string assemblyId;             // AS:<AssemblyId>
-    std::string checksum;               // M5:<Checksum>
-    std::string species;                // SP:<Species>
-    std::string uri;                    // UR:<URI>
-};
-
-inline std::string SamSequence::Key(void) const
-{ return name; }
-
-inline SamSequence& SamSequence::Key(const std::string& key)
-{ name = key; return *this; }
-
-} // namespace BAM
-} // namespace PacBio
-
-#endif // SAMSEQUENCE_H
+    EXPECT_EQ(0,    a_zero);
+    EXPECT_EQ(0,    a_neg);
+    EXPECT_EQ(0,    a_min);
+    EXPECT_EQ(300,  a_normal);
+    EXPECT_EQ(1000, a_max);
+    EXPECT_EQ(1000, a_tooLarge);
+}

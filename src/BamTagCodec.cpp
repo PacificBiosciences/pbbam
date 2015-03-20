@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -379,38 +379,88 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
 
 vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag)
 {
-    vector<uint8_t> result;
-
     kstring_t str = { 0, 0, NULL };
 
-    switch ( tag.Type() ) {
-        case TagDataType::INT8   : appendBamValue(tag.ToInt8(),   &str); break;
-        case TagDataType::UINT8  : appendBamValue(tag.ToUInt8(),  &str); break;
-        case TagDataType::INT16  : appendBamValue(tag.ToInt16(),  &str); break;
-        case TagDataType::UINT16 : appendBamValue(tag.ToUInt16(), &str); break;
-        case TagDataType::INT32  : appendBamValue(tag.ToInt32(),  &str); break;
-        case TagDataType::UINT32 : appendBamValue(tag.ToUInt32(), &str); break;
-        case TagDataType::FLOAT  : appendBamValue(tag.ToFloat(),  &str); break;
-
-        case TagDataType::STRING :
-        {
-            const string s = tag.ToString();
-            kputsn_(s.c_str(), s.size()+1, &str);
-            break;
+    // "<TYPE>:<DATA>" for printable, ASCII char
+    if (tag.HasModifier(TagModifier::ASCII_CHAR)) {
+        char c = tag.ToAscii();
+        if (c != '\0') {
+            kputc_(c, &str);
         }
-
-        case TagDataType::INT8_ARRAY   : appendBamMultiValue(tag.ToInt8Array(),   &str); break;
-        case TagDataType::UINT8_ARRAY  : appendBamMultiValue(tag.ToUInt8Array(),  &str); break;
-        case TagDataType::INT16_ARRAY  : appendBamMultiValue(tag.ToInt16Array(),  &str); break;
-        case TagDataType::UINT16_ARRAY : appendBamMultiValue(tag.ToUInt16Array(), &str); break;
-        case TagDataType::INT32_ARRAY  : appendBamMultiValue(tag.ToInt32Array(),  &str); break;
-        case TagDataType::UINT32_ARRAY : appendBamMultiValue(tag.ToUInt32Array(), &str); break;
-        case TagDataType::FLOAT_ARRAY  : appendBamMultiValue(tag.ToFloatArray(),  &str); break;
-
-        default :
-            PB_ASSERT_OR_RETURN_VALUE(false, vector<uint8_t>());
     }
 
+    // for all others
+    else {
+        switch ( tag.Type() ) {
+
+            // single, numeric values
+            case TagDataType::INT8   : appendBamValue(tag.ToInt8(), &str);   break;
+            case TagDataType::UINT8  : appendBamValue(tag.ToUInt8(), &str);  break;
+            case TagDataType::INT16  : appendBamValue(tag.ToInt16(), &str);  break;
+            case TagDataType::UINT16 : appendBamValue(tag.ToUInt16(), &str); break;
+            case TagDataType::INT32  : appendBamValue(tag.ToInt32(), &str);  break;
+            case TagDataType::UINT32 : appendBamValue(tag.ToUInt32(), &str); break;
+            case TagDataType::FLOAT  : appendBamValue(tag.ToFloat(), &str);  break;
+
+            // string (& hex-string) values
+            case TagDataType::STRING :
+            {
+                const string& s = tag.ToString();
+                kputsn_(s.c_str(), s.size()+1, &str); // this adds the null-term
+                break;
+            }
+
+            // array-type values
+            case TagDataType::INT8_ARRAY   :
+            {
+                kputc_('c', &str);
+                appendBamMultiValue(tag.ToInt8Array(), &str);
+                break;
+            }
+            case TagDataType::UINT8_ARRAY  :
+            {
+                kputc_('C', &str);
+                appendBamMultiValue(tag.ToUInt8Array(), &str);
+                break;
+            }
+            case TagDataType::INT16_ARRAY  :
+            {
+                kputc_('s', &str);
+                appendBamMultiValue(tag.ToInt16Array(), &str);
+                break;
+            }
+            case TagDataType::UINT16_ARRAY :
+            {
+                kputc_('S', &str);
+                appendBamMultiValue(tag.ToUInt16Array(), &str);
+                break;
+            }
+            case TagDataType::INT32_ARRAY  :
+            {
+                kputc_('i', &str);
+                appendBamMultiValue(tag.ToInt32Array(), &str);
+                break;
+            }
+            case TagDataType::UINT32_ARRAY :
+            {
+                kputc_('I', &str);
+                appendBamMultiValue(tag.ToUInt32Array(), &str);
+                break;
+            }
+            case TagDataType::FLOAT_ARRAY :
+            {
+                kputc_('f', &str);
+                appendBamMultiValue(tag.ToFloatArray(), &str);
+                break;
+            }
+
+            default :
+                free(str.s);
+                PB_ASSERT_OR_RETURN_VALUE(false, vector<uint8_t>());
+        }
+    }
+
+    vector<uint8_t> result;
     result.resize(str.l);
     memcpy((char*)&result[0], str.s, str.l);
     free(str.s);

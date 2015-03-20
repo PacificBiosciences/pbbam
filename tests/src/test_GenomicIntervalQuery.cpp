@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -41,7 +41,6 @@
 
 #include "TestData.h"
 #include <gtest/gtest.h>
-#include <pbbam/EntireFileQuery.h>
 #include <pbbam/GenomicIntervalQuery.h>
 #include <iostream>
 #include <string>
@@ -135,5 +134,68 @@ TEST(GenomicIntervalQueryTest, CountRecords)
     }
     EXPECT_EQ(0, count);
 }
+
+TEST(GenomicIntervalQueryTest, NonConstBamRecord)
+{
+    // open input BAM file
+    BamFile bamFile(inputBamFn);
+    EXPECT_TRUE(bamFile);
+
+    const int id = bamFile.ReferenceId("seq1");
+    EXPECT_TRUE(id != -1);
+
+    // count records
+    int count = 0;
+    GenomicInterval interval(id, 0, 100);
+    GenomicIntervalQuery query(interval, bamFile);
+    EXPECT_TRUE(query);
+    for (BamRecord& record : query) {
+        (void)record;
+        ++count;
+    }
+    EXPECT_EQ(39, count);
+}
+
+//TEST(GenomicIntervalQueryTest, WorksWithBamRecordImpl)
+//{
+//    // open input BAM file
+//    BamFile bamFile(inputBamFn);
+//    EXPECT_TRUE(bamFile);
+
+//    const int id = bamFile.ReferenceId("seq1");
+//    EXPECT_TRUE(id != -1);
+
+//    // count records
+//    int count = 0;
+//    GenomicInterval interval(id, 0, 100);
+//    GenomicIntervalQuery query(interval, bamFile);
+//    EXPECT_TRUE(query);
+//    for (const BamRecordImpl& record : query) {
+//        (void)record;
+//        ++count;
+//    }
+//    EXPECT_EQ(39, count);
+//}
+
+//TEST(GenomicIntervalQueryTest, WorksWithNonConstBamRecordImpl)
+//{
+//    // open input BAM file
+//    BamFile bamFile(inputBamFn);
+//    EXPECT_TRUE(bamFile);
+
+//    const int id = bamFile.ReferenceId("seq1");
+//    EXPECT_TRUE(id != -1);
+
+//    // count records
+//    int count = 0;
+//    GenomicInterval interval(id, 0, 100);
+//    GenomicIntervalQuery query(interval, bamFile);
+//    EXPECT_TRUE(query);
+//    for (BamRecordImpl& record : query) {
+//        (void)record;
+//        ++count;
+//    }
+//    EXPECT_EQ(39, count);
+//}
 
 // add special cases as needed

@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -36,7 +36,6 @@
 // Author: Derek Barnett
 
 #include "pbbam/BamFile.h"
-#include "AssertUtils.h"
 #include "MemoryUtils.h"
 #include <htslib/sam.h>
 #include <memory>
@@ -47,92 +46,28 @@ using namespace std;
 BamFile::BamFile(const std::string& filename)
     : filename_(filename)
     , error_(BamFile::NoError)
+    , header_(nullptr)
 {
+    // attempt open
     std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename.c_str(), "rb"));
     if (!f) {
         error_ = BamFile::OpenError;
         return;
     }
 
-    std::shared_ptr<bam_hdr_t> hdr(sam_hdr_read(f.get()), internal::HtslibHeaderDeleter());
+    // attempt fetch header
+    std::unique_ptr<bam_hdr_t, internal::HtslibHeaderDeleter> hdr(sam_hdr_read(f.get()));
     if (!hdr) {
         error_ = BamFile::ReadHeaderError;
         return;
     }
-    header_ = std::move(SamHeader::FromRawData(hdr));
+    header_ = internal::BamHeaderMemory::FromRawData(hdr.get());
 }
 
 BamFile::BamFile(const BamFile& other)
     : filename_(other.filename_)
-    , header_(other.header_)
     , error_(other.error_)
+    , header_(other.header_)
 { }
 
 BamFile::~BamFile(void) { }
-
-BamFile::operator bool(void) const
-{
-    return error_ == BamFile::NoError;
-}
-
-BamFile::FileError BamFile::Error(void) const
-{
-    return error_;
-}
-
-string BamFile::Filename(void) const
-{
-    return filename_;
-}
-
-SamHeader BamFile::Header(void) const
-{
-    return header_;
-}
-
-bool BamFile::IsPacBioBAM(void) const
-{
-    return !header_.pacbioBamVersion.empty();
-}
-
-string BamFile::StandardIndexFilename(void) const
-{
-    return filename_ + ".bai";
-}
-
-string BamFile::PacBioIndexFilename(void) const
-{
-    return filename_ + ".pbi";
-}
-
-int BamFile::ReferenceId(const string& name) const
-{
-    return header_.sequences.IndexOf(name);
-}
-
-uint32_t BamFile::ReferenceLength(const std::string& name) const
-{
-    return ReferenceLength(ReferenceId(name));
-}
-
-uint32_t BamFile::ReferenceLength(const int id) const
-{
-    if (id < 0)
-        return 0;
-    try {
-        return stoul(header_.sequences.At(id).length);
-    } catch (std::exception&) {
-        return 0;
-    }
-}
-
-string BamFile::ReferenceName(const int id) const
-{
-    if (id < 0)
-        return string();
-    try {
-        return header_.sequences.At(id).name;
-    } catch (std::exception&) {
-        return string();
-    }
-}

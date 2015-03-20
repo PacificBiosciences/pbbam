@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -41,54 +41,9 @@
 #include "pbbam/Config.h"
 #include <string>
 
-//
-// ----------------------------------------------------------
-//
-// Boost ICL library relies on some extras that are not provided
-// by a simple include of right_open_interval.hpp. So keep
-// these guys *in this order* until a need to change arises.
-//
-/// \cond
-
-#include <boost/type_traits/is_same.hpp>
-
-template <class TT>
-void require_boolean_expr(const TT& t)
-{
-    bool x = t;
-    (void)x;
-}
-
-template <class TT>
-struct DefaultConstructibleConcept
-{
-    void constraints(void) {
-        TT a; // require default constructor
-        (void)a;
-    }
-};
-
-template <class TT>
-struct LessThanComparableConcept
-{
-    void constraints() {
-        require_boolean_expr(a < b);
-    }
-    TT a, b;
-};
-
 #define BOOST_ICL_USE_STATIC_BOUNDED_INTERVALS
-
-/// \endcond
-//
-// And finally include the type we're using.
-//
 #include <boost/icl/discrete_interval.hpp>
 #include <boost/icl/interval_traits.hpp>
-//#include <boost/icl/right_open_interval.hpp>
-//
-// ----------------------------------------------------------
-//
 
 namespace PacBio {
 namespace BAM {
@@ -157,6 +112,9 @@ public:
     /// \returns true if intervals interset
     inline bool Intersects(const Interval<T>& other) const;
 
+    /// \returns true if interval is valid (e.g. start < stop)
+    inline bool IsValid(void) const;
+
     /// \returns interval length
     inline difference_type Length(void) const;
 
@@ -165,10 +123,11 @@ public:
     /// \name Comparison Operators
     /// \{
 
+    /// \returns true if both intervals share the same endpoints
     inline bool operator==(const Interval<T>& other) const;
-    inline bool operator!=(const Interval<T>& other) const;
 
-    // TODO: less than and friends ???
+    /// \returns true if either interval's endpoints differ
+    inline bool operator!=(const Interval<T>& other) const;
 
     /// \}
 
@@ -193,65 +152,51 @@ Interval<T>::Interval(const T& start, const T& stop)
 
 template<typename T>
 inline bool Interval<T>::operator==(const Interval<T>& other) const
-{
-    return data_ == other.data_;
-}
+{ return data_ == other.data_; }
 
 template<typename T>
 inline bool Interval<T>::operator!=(const Interval<T>& other) const
-{
-    return !(data_ == other.data_);
-}
+{ return !(data_ == other.data_); }
 
 template<typename T>
 inline bool Interval<T>::CoveredBy(const Interval<T>& other) const
-{
-    return boost::icl::within(data_, other.data_);
-}
+{ return boost::icl::within(data_, other.data_); }
 
 template<typename T>
 inline bool Interval<T>::Covers(const Interval<T>& other) const
-{
-    return boost::icl::contains(data_, other.data_);
-}
+{ return boost::icl::contains(data_, other.data_); }
 
 template<typename T>
 inline bool Interval<T>::Intersects(const Interval<T>& other) const
-{
-    return boost::icl::intersects(data_, other.data_);
-}
+{ return boost::icl::intersects(data_, other.data_); }
+
+template<typename T>
+inline bool Interval<T>::IsValid(void) const
+{ return !boost::icl::is_empty(data_); }
 
 template<typename T>
 inline typename Interval<T>::difference_type Interval<T>::Length(void) const
-{
-    return boost::icl::length(data_);
-}
+{ return boost::icl::length(data_); }
 
 template<typename T>
 inline T Interval<T>::Start(void) const
-{
-    return data_.lower();
-}
+{ return data_.lower(); }
 
 template<typename T>
 inline Interval<T>& Interval<T>::Start(const T& start)
 {
     data_ = boost::icl::discrete_interval<T>::right_open(start, data_.upper());
-//    data_ = boost::icl::right_open_interval<T>();
     return *this;
 }
 
 template<typename T>
 inline T Interval<T>::Stop(void) const
-{
-    return data_.upper();
-}
+{ return data_.upper(); }
 
 template<typename T>
 inline Interval<T>& Interval<T>::Stop(const T& stop)
 {
     data_ = boost::icl::discrete_interval<T>::right_open(data_.lower(), stop);
-//    data_ = boost::icl::right_open_interval<T>(data_.lower(), stop);
     return *this;
 }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -74,7 +74,7 @@ bool BamReader::HasError(void) const
 
 bool BamReader::GetNext(std::shared_ptr<BamRecord> record)
 {
-    return GetNext(record->d_);
+    return GetNext(internal::BamRecordMemory::GetRawData(record.get()));
 }
 
 bool BamReader::GetNext(std::shared_ptr<bam1_t> rawRecord)
@@ -92,8 +92,17 @@ bool BamReader::GetNext(std::shared_ptr<bam1_t> rawRecord)
     return false;
 }
 
-SamHeader BamReader::Header(void) const {
-    return SamHeader::FromRawData(header_);
+shared_ptr<BamHeader> BamReader::Header(void) const {
+
+    if (header_ == nullptr)
+        return shared_ptr<BamHeader>(nullptr);
+
+    // parse header
+    const char* text = header_->text;
+    const uint32_t l_text = header_->l_text;
+    if (text == 0 || l_text == 0)
+        return shared_ptr<BamHeader>(nullptr);
+   return BamHeader::FromSam(string(text, l_text));
 }
 
 bool BamReader::Open(const string& filename)
@@ -120,9 +129,12 @@ bool BamReader::Open(const string& filename)
     return true;
 }
 
-string BamReader::PacBioBamVersion(void) const {
-    const SamHeader& header = SamHeader::FromRawData(header_);
-    return header.pacbioBamVersion;
+string BamReader::PacBioBamVersion(void) const
+{
+    const std::shared_ptr<BamHeader> header = internal::BamHeaderMemory::FromRawData(header_.get());
+    if (!header)
+        return string();
+    return header->PacBioBamVersion();
 }
 
 std::shared_ptr<bam_hdr_t> BamReader::RawHeader(void) const {

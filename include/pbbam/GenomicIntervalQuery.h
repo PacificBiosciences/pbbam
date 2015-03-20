@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -66,10 +66,10 @@ private:
 
 private:
     GenomicInterval interval_;
-    std::shared_ptr<samFile>   file_;
-    std::shared_ptr<bam_hdr_t> header_;
-    std::shared_ptr<hts_idx_t> index_;
-    std::shared_ptr<hts_itr_t> iterator_;
+    std::shared_ptr<samFile>   htsFile_;
+    std::shared_ptr<bam_hdr_t> htsHeader_;
+    std::shared_ptr<hts_idx_t> htsIndex_;
+    std::shared_ptr<hts_itr_t> htsIterator_;
 };
 
 } // namespace BAM

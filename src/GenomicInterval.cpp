@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -47,8 +47,8 @@ GenomicInterval::GenomicInterval(void)
 { }
 
 GenomicInterval::GenomicInterval(const int id,
-                                 const int32_t& start,
-                                 const int32_t& stop)
+                                 const Position& start,
+                                 const Position& stop)
     : id_(id)
     , interval_(start, stop)
 { }

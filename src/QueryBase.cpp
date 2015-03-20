@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -41,17 +41,9 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-QueryBase::QueryBase(void)
+QueryBase::QueryBase(const BamFile& file)
     : error_(QueryError::NoError)
+    , file_(file)
 { }
 
 QueryBase::~QueryBase(void) { }
-
-QueryBase::operator bool(void) const {
-    return (error_ == QueryBase::NoError);
-}
-
-QueryBase::QueryError QueryBase::Error(void) const
-{
-    return error_;
-}

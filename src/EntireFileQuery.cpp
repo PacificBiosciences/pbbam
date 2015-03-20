@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -43,18 +43,18 @@ using namespace PacBio::BAM;
 using namespace std;
 
 EntireFileQuery::EntireFileQuery(const BamFile& file)
-    : QueryBase()
-    , file_(nullptr)
-    , header_(nullptr)
+    : QueryBase(file)
+    , htsFile_(nullptr)
+    , htsHeader_(nullptr)
 {
-    file_.reset(sam_open(file.Filename().c_str(), "rb"), internal::HtslibFileDeleter());
-    if (!file_) {
+    htsFile_.reset(sam_open(file.Filename().c_str(), "rb"), internal::HtslibFileDeleter());
+    if (!htsFile_) {
         error_ = EntireFileQuery::FileOpenError;
         return;
     }
 
-    header_.reset(sam_hdr_read(file_.get()), internal::HtslibHeaderDeleter());
-    if (!header_) {
+    htsHeader_.reset(sam_hdr_read(htsFile_.get()), internal::HtslibHeaderDeleter());
+    if (!htsHeader_) {
         error_ = EntireFileQuery::FileMetadataError;
         return;
     }
@@ -63,7 +63,9 @@ EntireFileQuery::EntireFileQuery(const BamFile& file)
 bool EntireFileQuery::GetNext(BamRecord& record)
 {
     if (error_ == EntireFileQuery::NoError) {
-        const int result = sam_read1(file_.get(), header_.get(), record.RawData().get());
+        const int result = sam_read1(htsFile_.get(),
+                                     htsHeader_.get(),
+                                     internal::BamRecordMemory::GetRawData(record).get());
         if (result >= 0)
             return true;
         else if (result < -1) {

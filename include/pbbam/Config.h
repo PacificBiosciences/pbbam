@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -48,22 +48,28 @@
 // library symbol import/export macros
 // -------------------------------------
 
-#if defined(WIN32)
-#  define PBBAM_LIBRARY_EXPORT __declspec(dllexport)
-#else
-#  define PBBAM_LIBRARY_EXPORT __attribute__((visibility("default")))
+#ifndef PBBAM_LIBRARY_EXPORT
+#  if defined(WIN32)
+#    define PBBAM_LIBRARY_EXPORT __declspec(dllexport)
+#  else
+#    define PBBAM_LIBRARY_EXPORT __attribute__((visibility("default")))
+#  endif
 #endif
 
-#if defined(WIN32)
-#  define PBBAM_LIBRARY_IMPORT __declspec(dllimport)
-#else
-#  define PBBAM_LIBRARY_IMPORT
+#ifndef PBBAM_LIBRARY_IMPORT
+#  if defined(WIN32)
+#    define PBBAM_LIBRARY_IMPORT __declspec(dllimport)
+#  else
+#    define PBBAM_LIBRARY_IMPORT
+#  endif
 #endif
 
-#if defined(PBBAM_LIBRARY)
-#  define PBBAM_EXPORT PBBAM_LIBRARY_EXPORT
-#else
-#  define PBBAM_EXPORT PBBAM_LIBRARY_IMPORT
+#ifndef PBBAM_EXPORT
+#  if defined(PBBAM_LIBRARY)
+#    define PBBAM_EXPORT PBBAM_LIBRARY_EXPORT
+#  else
+#    define PBBAM_EXPORT PBBAM_LIBRARY_IMPORT
+#  endif
 #endif
 
 #endif // PBBAM_CONFIG_H

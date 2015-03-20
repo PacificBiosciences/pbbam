@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -35,32 +35,21 @@
 
 // Author: Derek Barnett
 
-#include "pbbam/SamHeader.h"
-#include "pbbam/SamHeaderCodec.h"
-#include "MemoryUtils.h"
-#include <iostream>
-#include <cstring>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
+#ifndef STRAND_H
+#define STRAND_H
 
-SamHeader::SamHeader(void) { }
+#include "pbbam/Config.h"
 
-SamHeader SamHeader::FromRawData(const std::shared_ptr<bam_hdr_t> rawData)
+namespace PacBio {
+namespace BAM {
+
+enum class Strand
 {
-    if ( !rawData || rawData->l_text == 0 || rawData->text == 0)
-        return SamHeader();
-    return SamHeaderCodec::Decode(string(rawData->text, rawData->l_text));
-}
+    FORWARD
+  , REVERSE
+};
 
-std::shared_ptr<bam_hdr_t> SamHeader::CreateRawData(void) const
-{
-    const string& text = SamHeaderCodec::Encode(*this);
-    std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), internal::HtslibHeaderDeleter());
-    rawData->ignore_sam_err = 0;
-    rawData->cigar_tab = NULL;
-    rawData->l_text = text.size();
-    rawData->text = (char*)calloc(rawData->l_text + 1, 1);
-    memcpy(rawData->text, text.c_str(), rawData->l_text);
-    return rawData;
-}
+} // namespace BAM
+} // namespace PacBio
+
+#endif // STRAND_H

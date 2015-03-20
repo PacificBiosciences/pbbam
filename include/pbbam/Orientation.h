@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -35,44 +35,21 @@
 
 // Author: Derek Barnett
 
-#ifndef SAMHEADERCODEC_H
-#define SAMHEADERCODEC_H
+#ifndef ORIENTATION_H
+#define ORIENTATION_H
 
 #include "pbbam/Config.h"
-#include "pbbam/SamHeader.h"
-#include <sstream>
-#include <string>
 
 namespace PacBio {
 namespace BAM {
 
-class PBBAM_EXPORT SamHeaderCodec
+enum class Orientation
 {
-public:
-    static SamHeader Decode(const std::string& text);
-    static std::string Encode(const SamHeader& header);
-
-private:
-
-    // decode helper functions
-    static void DecodeHeaderLine(const std::string& line, SamHeader* header);
-    static void DecodeSequenceLine(const std::string& line, SamHeader* header);
-    static void DecodeReadGroupLine(const std::string& line, SamHeader* header);
-    static void DecodeProgramLine(const std::string& line, SamHeader* header);
-    static void DecodeCommentLine(const std::string& line, SamHeader* header);
-
-    // encode helper functions
-    static void EncodeHeaderLine(const std::string& version,
-                                 const std::string& sortOrder,
-                                 const std::string& pbVersion,
-                                 std::stringstream* out);
-    static void EncodeSequence(const SamSequence& sequence, std::stringstream* out);
-    static void EncodeReadGroup(const SamReadGroup& readGroup, std::stringstream* out);
-    static void EncodeProgram(const SamProgram& program, std::stringstream* out);
-    static void EncodeComment(const std::string& comment, std::stringstream* out);
+    NATIVE
+  , GENOMIC
 };
 
 } // namespace BAM
 } // namespace PacBio
 
-#endif // SAMHEADERCODEC_H
+#endif // ORIENTATION_H

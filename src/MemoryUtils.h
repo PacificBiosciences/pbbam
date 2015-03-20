@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -38,10 +38,17 @@
 #ifndef MEMORYUTILS_H
 #define MEMORYUTILS_H
 
+#include "pbbam/BamHeader.h"
+#include "pbbam/BamRecord.h"
+#include "pbbam/BamRecordImpl.h"
 #include <htslib/sam.h>
+#include <memory>
 
 namespace PacBio {
 namespace BAM {
+
+class BamHeader;
+
 namespace internal {
 
 // intended for use with std::shared_ptr<T>, std::unique_ptr<T>, etc
@@ -94,6 +101,43 @@ struct HtslibRecordDeleter
         b = nullptr;
     }
 };
+
+class BamHeaderMemory
+{
+public:
+    static std::shared_ptr<BamHeader> FromRawData(bam_hdr_t* header);
+    static std::shared_ptr<bam_hdr_t> MakeRawHeader(const BamHeader& header);
+    static std::shared_ptr<bam_hdr_t> MakeRawHeader(const std::shared_ptr<BamHeader>& header);
+};
+
+class BamRecordMemory
+{
+public:
+    static const BamRecordImpl& GetImpl(const BamRecord& r);
+    static const BamRecordImpl& GetImpl(const BamRecord* r);
+    static std::shared_ptr<bam1_t> GetRawData(const BamRecord& r);
+    static std::shared_ptr<bam1_t> GetRawData(const BamRecord* r);
+    static std::shared_ptr<bam1_t> GetRawData(const BamRecordImpl& impl);
+    static std::shared_ptr<bam1_t> GetRawData(const BamRecordImpl* impl);
+};
+
+inline const BamRecordImpl& BamRecordMemory::GetImpl(const BamRecord& r)
+{ return r.impl_; }
+
+inline const BamRecordImpl& BamRecordMemory::GetImpl(const BamRecord* r)
+{ return r->impl_; }
+
+inline std::shared_ptr<bam1_t> BamRecordMemory::GetRawData(const BamRecord& r)
+{ return GetRawData(r.impl_); }
+
+inline std::shared_ptr<bam1_t> BamRecordMemory::GetRawData(const BamRecord* r)
+{ return GetRawData(r->impl_); }
+
+inline std::shared_ptr<bam1_t> BamRecordMemory::GetRawData(const BamRecordImpl& impl)
+{ return impl.d_; }
+
+inline std::shared_ptr<bam1_t> BamRecordMemory::GetRawData(const BamRecordImpl* impl)
+{ return impl->d_; }
 
 } // namespace internal
 } // namespace BAM
