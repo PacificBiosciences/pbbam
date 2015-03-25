@@ -63,10 +63,13 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
+    /// Creates a BamFile object with no associated file.
+    BamFile(void);
+
     /// \brief Creates a BamFile object on the provided \p filename.
     ///
-    /// Attempts to open the file and load the header information. The error status
-    /// will be set if either operation fails.
+    /// \sa Open
+    /// \param[in] filename BAM filename
     BamFile(const std::string& filename);
 
     /// Creates a copy of the BamFile object, with the same filename, header data, and error status
@@ -119,6 +122,16 @@ public:
 
     /// \}
 
+public:
+    /// \name Open/Close Methods
+    /// \{
+
+    /// \returns true if BamFile has been opened on a file
+    bool IsOpen(void) const;
+
+    /// \}
+
+public:
     /// \name Error Handling
     /// \{
 
@@ -136,6 +149,19 @@ public:
     ///     // ok to work with file and/or header info
     /// \endcode
     operator bool(void) const;
+
+    /// \}
+
+public:
+    /// \name Open/Close Methods
+    /// \{
+
+    /// Resets BAM file metadata associated with this object.
+    void Close(void);
+
+    /// Attempts to open the file and load the header metadata. The error status
+    /// will be set if either operation fails.
+    void Open(const std::string& filename);
 
     /// \}
 

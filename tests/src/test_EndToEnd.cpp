@@ -281,3 +281,26 @@ TEST(EndToEndTest, ReadBamRecord_WriteBamRecord_UserThreadCount)
     // clean up
     RemoveGeneratedFiles(generatedBamFn, generatedSamFn);
 }
+
+TEST(EndToEndTest, BamFileReuse)
+{
+    BamFile file;
+    ASSERT_FALSE(file.IsOpen());
+    ASSERT_TRUE(file.Filename().empty());
+    ASSERT_FALSE((bool)file.Header());
+
+    file.Open(inputBamFn);
+    ASSERT_TRUE(file.IsOpen());
+    ASSERT_FALSE(file.Filename().empty());
+    ASSERT_TRUE((bool)file.Header());
+
+    file.Close();
+    ASSERT_FALSE(file.IsOpen());
+    ASSERT_TRUE(file.Filename().empty());
+    ASSERT_FALSE((bool)file.Header());
+
+    file.Open(inputBamFn);
+    ASSERT_TRUE(file.IsOpen());
+    ASSERT_FALSE(file.Filename().empty());
+    ASSERT_TRUE((bool)file.Header());
+}

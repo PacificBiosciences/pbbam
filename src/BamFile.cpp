@@ -43,11 +43,40 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
+BamFile::BamFile(void)
+    : error_(BamFile::NoError)
+    , header_(nullptr)
+{ }
+
 BamFile::BamFile(const std::string& filename)
-    : filename_(filename)
-    , error_(BamFile::NoError)
+    : error_(BamFile::NoError)
     , header_(nullptr)
 {
+    Open(filename);
+}
+
+BamFile::BamFile(const BamFile& other)
+    : filename_(other.filename_)
+    , error_(other.error_)
+    , header_(other.header_)
+{ }
+
+BamFile::~BamFile(void) { }
+
+void BamFile::Close(void)
+{
+    error_ = BamFile::NoError;
+    filename_.clear();
+    header_.reset();
+}
+
+bool BamFile::IsOpen(void) const
+{ return !filename_.empty() && header_; }
+
+void BamFile::Open(const string& filename)
+{
+    filename_ = filename;
+
     // attempt open
     std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename.c_str(), "rb"));
     if (!f) {
@@ -63,11 +92,3 @@ BamFile::BamFile(const std::string& filename)
     }
     header_ = internal::BamHeaderMemory::FromRawData(hdr.get());
 }
-
-BamFile::BamFile(const BamFile& other)
-    : filename_(other.filename_)
-    , error_(other.error_)
-    , header_(other.header_)
-{ }
-
-BamFile::~BamFile(void) { }

@@ -44,7 +44,54 @@
 namespace PacBio {
 namespace BAM {
 
+class QueryBase;
+
+class QueryIterator
+{
+public:
+    BamRecord& operator*(void);
+    BamRecord* operator->(void);
+    QueryIterator& operator++(void);
+    QueryIterator operator++(int);
+    bool operator==(const QueryIterator& other) const;
+    bool operator!=(const QueryIterator& other) const;
+
+private:
+    QueryIterator(void);
+    QueryIterator(QueryBase& parent);
+
+private:
+    QueryBase* query_;
+    BamRecord record_;
+    friend class QueryBase;
+};
+
+class QueryConstIterator
+{
+public:
+    const BamRecord& operator*(void) const;
+    const BamRecord* operator->(void) const;
+    QueryConstIterator& operator++(void);
+    QueryConstIterator operator++(int);
+    bool operator==(const QueryConstIterator& other) const;
+    bool operator!=(const QueryConstIterator& other) const;
+
+private:
+    QueryConstIterator(void);
+    QueryConstIterator(const QueryBase& parent);
+
+private:
+    QueryBase* query_;
+    BamRecord record_;
+    friend class QueryBase;
+};
+
+/// This class provides the base functionality and iterators for querying BAM files.
 class PBBAM_EXPORT QueryBase {
+
+public:
+    typedef QueryIterator      iterator;
+    typedef QueryConstIterator const_iterator;
 
 public:
     /// This enum describes the errors that may be returned by the Error() function.
@@ -58,8 +105,7 @@ public:
       , InitializeQueryError      ///< An error occurred while initializing query (e.g. invalid parameters).
     };
 
-protected:
-    QueryBase(const BamFile& file);
+
 public:
     virtual ~QueryBase(void);
 
@@ -68,138 +114,161 @@ public:
     /// \name Error Handling
     /// \{
 
-    QueryError Error(void) const
-    { return error_; }
+    /// \returns the query's error status.
+    QueryError Error(void) const;
 
-    operator bool(void) const
-    { return error_ == QueryBase::NoError; }
+    /// \returns true if Error() is QueryBase::NoError, else false
+    operator bool(void) const;
 
     /// \}
-
-    class iterator
-    {
-    public:
-
-        BamRecord& operator*(void)
-        { return record_; }
-
-        BamRecord* operator->(void)
-        { return &(operator*()); }
-
-        iterator& operator++(void)
-        {
-            if (!(query_->GetNext(record_)))
-                query_ = 0;
-            return *this;
-        }
-
-        iterator operator++(int)
-        {
-            iterator __t(*this);
-            ++(*this);
-            return __t;
-        }
-
-        bool operator==(const iterator& other) const
-        { return query_ == other.query_; }
-
-        bool operator!=(const iterator& other) const
-        { return !(*this == other); }
-
-    private:
-        iterator(void) : query_(0) { }
-        iterator(QueryBase& parent)
-            : query_(&parent)
-            , record_(parent.file_.Header())
-        {
-            if (!(query_->GetNext(record_)))
-                query_ = 0;
-        }
-
-    private:
-        QueryBase* query_;
-        BamRecord record_;
-        friend class QueryBase;
-    };
-
-    class const_iterator
-    {
-    public:
-
-        const BamRecord& operator*(void) const
-        { return record_; }
-
-        const BamRecord* operator->(void) const
-        { return &(operator*()); }
-
-        const_iterator& operator++(void)
-        {
-            if (!(query_->GetNext(record_)))
-                query_ = 0;
-            return *this;
-        }
-
-        const_iterator operator++(int)
-        {
-            const_iterator __t(*this);
-            ++(*this);
-            return __t;
-        }
-
-        bool operator==(const const_iterator& other) const
-        { return query_ == other.query_; }
-
-        bool operator!=(const const_iterator& other) const
-        { return !(*this == other); }
-
-    private:
-        const_iterator(void) : query_(0) { }
-        const_iterator(const QueryBase& parent)
-            : record_(parent.file_.Header())
-        {
-            query_ = const_cast<QueryBase*>(&parent);
-            if (!(query_->GetNext(record_)))
-                query_ = 0;
-        }
-
-    private:
-        QueryBase* query_;
-        BamRecord record_;
-        friend class QueryBase;
-    };
 
 public:
 
     /// \name Iterators
     /// \{
 
-    QueryBase::iterator begin(void)
-    { return QueryBase::iterator(*this); }
+    /// \returns an iterator to the beginning of the query results.
+    QueryBase::iterator begin(void);
 
-    QueryBase::const_iterator begin(void) const
-    { return QueryBase::const_iterator(*this); }
+    /// \returns a const_iterator to the beginning of the query results.
+    QueryBase::const_iterator begin(void) const;
 
-    QueryBase::const_iterator cbegin(void) const
-    { return QueryBase::const_iterator(*this); }
+    /// \returns a const_iterator to the beginning of the query results.
+    QueryBase::const_iterator cbegin(void) const;
 
-    QueryBase::iterator end(void)
-    { return QueryBase::iterator(); }
+    /// \returns an iterator marking the end of query results.
+    QueryBase::iterator end(void);
 
-    QueryBase::const_iterator end(void) const
-    { return QueryBase::const_iterator(); }
+    /// \returns a const_iterator marking the end of query results.
+    QueryBase::const_iterator end(void) const;
 
-    QueryBase::const_iterator cend(void) const
-    { return QueryBase::const_iterator(); }
+    /// \returns a const_iterator marking the end of query results.
+    QueryBase::const_iterator cend(void) const;
 
     /// \}
 
 protected:
+    QueryBase(const BamFile& file);
+
+    /// Primary method for iterating through a query. Derived classes will implement this
+    /// method to return
     virtual bool GetNext(BamRecord& x) =0;
 
 protected:
     QueryError error_;
     const BamFile& file_;
+
+    friend class QueryIterator;
+    friend class QueryConstIterator;
 };
+
+inline QueryBase::iterator QueryBase::begin(void)
+{ return QueryBase::iterator(*this); }
+
+inline QueryBase::const_iterator QueryBase::begin(void) const
+{ return QueryBase::const_iterator(*this); }
+
+inline QueryBase::const_iterator QueryBase::cbegin(void) const
+{ return QueryBase::const_iterator(*this); }
+
+inline QueryBase::iterator QueryBase::end(void)
+{ return QueryBase::iterator(); }
+
+inline QueryBase::const_iterator QueryBase::end(void) const
+{ return QueryBase::const_iterator(); }
+
+inline QueryBase::const_iterator QueryBase::cend(void) const
+{ return QueryBase::const_iterator(); }
+
+inline QueryBase::QueryError QueryBase::Error(void) const
+{ return error_; }
+
+inline QueryBase::operator bool(void) const
+{ return error_ == QueryBase::NoError; }
+
+// ---------------
+// QueryIterator
+// ---------------
+
+inline QueryIterator::QueryIterator(void)
+    : query_(0)
+{ }
+
+inline QueryIterator::QueryIterator(QueryBase& parent)
+    : query_(&parent)
+    , record_(parent.file_.Header())
+{
+    if (!(query_->GetNext(record_)))
+        query_ = 0;
+}
+
+inline BamRecord& QueryIterator::operator*(void)
+{ return record_; }
+
+inline BamRecord* QueryIterator::operator->(void)
+{ return &(operator*()); }
+
+inline QueryIterator& QueryIterator::operator++(void)
+{
+    if (!(query_->GetNext(record_)))
+        query_ = 0;
+    return *this;
+}
+
+inline QueryIterator QueryIterator::operator++(int)
+{
+    QueryIterator result(*this);
+    ++(*this);
+    return result;
+}
+
+inline bool QueryIterator::operator==(const QueryIterator& other) const
+{ return query_ == other.query_; }
+
+inline bool QueryIterator::operator!=(const QueryIterator& other) const
+{ return !(*this == other); }
+
+// --------------------
+// QueryConstIterator
+// --------------------
+
+inline const BamRecord& QueryConstIterator::operator*(void) const
+{ return record_; }
+
+inline const BamRecord* QueryConstIterator::operator->(void) const
+{ return &(operator*()); }
+
+inline QueryConstIterator& QueryConstIterator::operator++(void)
+{
+    if (!(query_->GetNext(record_)))
+        query_ = 0;
+    return *this;
+}
+
+inline QueryConstIterator QueryConstIterator::operator++(int)
+{
+    QueryConstIterator result(*this);
+    ++(*this);
+    return result;
+}
+
+inline bool QueryConstIterator::operator==(const QueryConstIterator& other) const
+{ return query_ == other.query_; }
+
+inline bool QueryConstIterator::operator!=(const QueryConstIterator& other) const
+{ return !(*this == other); }
+
+inline QueryConstIterator::QueryConstIterator(void)
+    : query_(0)
+{ }
+
+inline QueryConstIterator::QueryConstIterator(const QueryBase& parent)
+    : record_(parent.file_.Header())
+{
+    query_ = const_cast<QueryBase*>(&parent);
+    if (!(query_->GetNext(record_)))
+        query_ = 0;
+}
 
 } // namespace BAM
 } // namspace PacBio
