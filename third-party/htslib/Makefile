@@ -26,16 +26,19 @@ CC     = gcc
 AR     = ar
 RANLIB = ranlib
 
-ZLIB_ROOT?=../../../../../../prebuilt.out/zlib/zlib-1.2.5/ubuntu-1004/
-ZLIB_INC?=$(ZLIB_ROOT)/include
-ZLIB_DIR?=$(ZLIB_ROOT)/lib
+G_BUILDOS_CMD := bash -c 'set -e; set -o pipefail; id=$$(lsb_release -si | tr "[:upper:]" "[:lower:]"); rel=$$(lsb_release -sr); case $$id in ubuntu) printf "$$id-%04d\n" $${rel/./};; centos) echo "$$id-$${rel%%.*}";; *) echo "$$id-$$rel";; esac' 2>/dev/null
+OS_STRING     ?= $(shell $(G_BUILDOS_CMD))
+PREBUILT      ?= ../../../../../../prebuilt.out
+ZLIB_ROOT     ?= $(PREBUILT)/zlib/zlib-1.2.5/$(OS_STRING)
+ZLIB_INC      ?= $(ZLIB_ROOT)/include
+ZLIB_DIR      ?= $(ZLIB_ROOT)/lib
 
 CPPFLAGS = -I. -I$(ZLIB_INC)
 # TODO: probably update cram code to make it compile cleanly with -Wc++-compat
 CFLAGS   = -g -Wall -O2 -Wno-unused-function
 EXTRA_CFLAGS_PIC = -fpic
 LDFLAGS  =
-LDLIBS   = $(ZLIB_DIR)  #-L$(ZLIB_DIR)
+LDLIBS   = -L$(ZLIB_DIR)  #-L$(ZLIB_DIR)
 
 # For now these don't work too well as samtools also needs to know to
 # add -lbz2 and -llzma if linking against the static libhts.a library.
