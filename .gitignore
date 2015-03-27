@@ -1,0 +1,20 @@
+*.o
+*.so
+*.a
+*.dylib
+build/
+third-party/htslib/bgzip
+third-party/htslib/htsfile
+third-party/htslib/tabix
+third-party/htslib/test/fieldarith
+third-party/htslib/test/hfile
+third-party/htslib/test/sam
+third-party/htslib/test/test-regidx
+third-party/htslib/test/test-vcf-api
+third-party/htslib/test/test-vcf-sweep
+third-party/htslib/test/test_view
+tests/bin/test_pbbam
+
+# Generated source files
+tests/src/TestData.h
+third-party/htslib/version.h
