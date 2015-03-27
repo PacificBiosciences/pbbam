@@ -18,6 +18,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/Frames.h
     ${PacBioBAM_IncludeDir}/pbbam/GenomicInterval.h
     ${PacBioBAM_IncludeDir}/pbbam/GenomicIntervalQuery.h
+    ${PacBioBAM_IncludeDir}/pbbam/IndexedFastaReader.h
     ${PacBioBAM_IncludeDir}/pbbam/Interval.h
     ${PacBioBAM_IncludeDir}/pbbam/Orientation.h
     ${PacBioBAM_IncludeDir}/pbbam/Position.h
@@ -57,6 +58,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/Frames.cpp
     ${PacBioBAM_SourceDir}/GenomicInterval.cpp
     ${PacBioBAM_SourceDir}/GenomicIntervalQuery.cpp
+    ${PacBioBAM_SourceDir}/IndexedFastaReader.cpp
     ${PacBioBAM_SourceDir}/MemoryUtils.cpp
     ${PacBioBAM_SourceDir}/ProgramInfo.cpp
     ${PacBioBAM_SourceDir}/QueryBase.cpp
