@@ -55,9 +55,9 @@ public:
     QueryIterator operator++(int);
     bool operator==(const QueryIterator& other) const;
     bool operator!=(const QueryIterator& other) const;
+    QueryIterator(void);
 
 private:
-    QueryIterator(void);
     QueryIterator(QueryBase& parent);
 
 private:
