@@ -16,22 +16,37 @@ set(PacBioBAM_VERSION
 # build-time options
 option(PacBioBAM_build_docs  "Build PacBioBAM's API documentation." ON)
 option(PacBioBAM_build_tests "Build PacBioBAM's unit tests." ON)
+option(PacBioBAM_build_chef  "Build PacBioBAM using chef build." OFF)
 
 # main project paths
 set(PacBioBAM_RootDir       ${PacBioBAM_SOURCE_DIR})
 set(PacBioBAM_BinDir        ${PacBioBAM_RootDir}/bin)
 set(PacBioBAM_DocsDir       ${PacBioBAM_RootDir}/docs)
-set(PacBioBAM_LibDir        ${PacBioBAM_RootDir}/lib)
+if(PacBioBAM_build_chef)
+    set(PacBioBAM_LibDir        ${PacBioBAM_RootDir}/_output/lib)
+else()
+    set(PacBioBAM_LibDir        ${PacBioBAM_RootDir}/lib)
+endif()
 set(PacBioBAM_IncludeDir    ${PacBioBAM_RootDir}/include)
 set(PacBioBAM_SourceDir     ${PacBioBAM_RootDir}/src)
 set(PacBioBAM_TestsDir      ${PacBioBAM_RootDir}/tests)
-set(PacBioBAM_ThirdPartyDir ${PacBioBAM_RootDir}/third-party)
+if(PacBioBAM_build_chef)
+else()
+    set(PacBioBAM_ThirdPartyDir ${PacBioBAM_RootDir}/third-party)
+endif()
 file(MAKE_DIRECTORY ${PacBioBAM_LibDir})
 
 # shared & third-party paths
-set(Htslib_RootDir    ${PacBioBAM_ThirdPartyDir}/htslib)
-set(Htslib_IncludeDir ${Htslib_RootDir})
-set(Htslib_LibDir     ${Htslib_RootDir})
+if(PacBioBAM_build_chef)
+    set(htslib_RootDir    "${PacBioBAM_RootDir}/_output/deplinks/htslib")
+    set(htslib_IncludeDir "${htslib_RootDir}/include")
+    set(htslib_LibDir     "${htslib_RootDir}/lib")
+else()
+    set(Htslib_RootDir    ${PacBioBAM_ThirdPartyDir}/htslib)
+    set(Htslib_IncludeDir ${Htslib_RootDir})
+    set(Htslib_LibDir     ${Htslib_RootDir})
+endif()
+
 
 # shared CXX flags for src & tests
 include(CheckCXXCompilerFlag)
@@ -44,7 +59,9 @@ endif()
 
 # keep this order (src first, at least)
 add_subdirectory(src)
-add_subdirectory(docs)
+if(PacBioBAM_build_docs)
+    add_subdirectory(docs)
+endif()
 if(PacBioBAM_build_tests)
     enable_testing()
     add_subdirectory(tests)
