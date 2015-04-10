@@ -56,7 +56,6 @@ public:
     bool operator==(const QueryIterator& other) const;
     bool operator!=(const QueryIterator& other) const;
 
-private:
     QueryIterator(void);
     QueryIterator(QueryBase& parent);
 
@@ -76,7 +75,6 @@ public:
     bool operator==(const QueryConstIterator& other) const;
     bool operator!=(const QueryConstIterator& other) const;
 
-private:
     QueryConstIterator(void);
     QueryConstIterator(const QueryBase& parent);
 
