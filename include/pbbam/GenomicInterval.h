@@ -50,9 +50,6 @@ namespace BAM {
 class PBBAM_EXPORT GenomicInterval
 {
 public:
-    typedef typename Interval<Position>::difference_type difference_type;
-
-public:
 
     /// \name Constructors & Related Methods
     ///  \{
@@ -64,6 +61,11 @@ public:
     GenomicInterval(const int id,
                     const Position& start,
                     const Position& stop);
+
+    /** Copy constructor */
+    GenomicInterval(const GenomicInterval& other);
+
+    ~GenomicInterval(void);
 
     /// \}
 
@@ -126,7 +128,7 @@ public:
     bool IsValid(void) const;
 
     /// \returns length of underlying
-    difference_type Length(void) const;
+    size_t Length(void) const;
 
     /// \}
 
@@ -145,6 +147,8 @@ private:
     int id_;
     PacBio::BAM::Interval<Position> interval_;
 };
+
+inline GenomicInterval::~GenomicInterval(void) { }
 
 inline int GenomicInterval::Id(void) const
 { return id_; }

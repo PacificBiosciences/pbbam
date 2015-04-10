@@ -353,7 +353,7 @@ BamRecord::BamRecord(void)
     , alignedEnd_(PacBio::BAM::UnmappedPosition)
 { }
 
-BamRecord::BamRecord(const std::shared_ptr<BamHeader>& header)
+BamRecord::BamRecord(const BamHeader::SharedPtr &header)
     : header_(header)
     , alignedStart_(PacBio::BAM::UnmappedPosition)
     , alignedEnd_(PacBio::BAM::UnmappedPosition)
@@ -465,7 +465,7 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
                            const Position end)
 {
     // skip if no clip requested
-    if (clipType == ClipType::NONE)
+    if (clipType == ClipType::CLIP_NONE)
         return *this;
     const bool clipToQuery = (clipType == ClipType::CLIP_TO_QUERY);
 
@@ -862,6 +862,9 @@ QualityValues BamRecord::FetchQualities(const string& tagName,
     }
 }
 
+string BamRecord::FullName(void) const
+{ return impl_.Name(); }
+
 bool BamRecord::HasDeletionQV(void) const
 { return impl_.HasTag(internal::tagName_deletionQV); }
 
@@ -886,7 +889,7 @@ bool BamRecord::HasSubstitutionQV(void) const
 bool BamRecord::HasSubstitutionTag(void) const
 { return impl_.HasTag(internal::tagName_substitutionTag); }
 
-shared_ptr<BamHeader> BamRecord::Header(void) const
+BamHeader::SharedPtr BamRecord::Header(void) const
 { return header_; }
 
 int32_t BamRecord::HoleNumber(void) const
@@ -897,6 +900,14 @@ int32_t BamRecord::HoleNumber(void) const
     if (!ok)
         return -1;
     return result;
+}
+
+BamRecord& BamRecord::HoleNumber(const int32_t holeNumber)
+{
+    internal::CreateOrEdit(internal::tagName_holeNumber,
+                           holeNumber,
+                           &impl_);
+    return *this;
 }
 
 BamRecordImpl& BamRecord::Impl(void)
@@ -1113,7 +1124,7 @@ Position BamRecord::ReferenceEnd(void) const
 {
     if (!impl_.IsMapped())
         return PacBio::BAM::UnmappedPosition;
-    std::shared_ptr<bam1_t> htsData = internal::BamRecordMemory::GetRawData(impl_);
+    PBBAM_SHARED_PTR<bam1_t> htsData = internal::BamRecordMemory::GetRawData(impl_);
     if (!htsData)
         return PacBio::BAM::UnmappedPosition;
     return bam_endpos(htsData.get());
@@ -1173,13 +1184,7 @@ RecordType BamRecord::Type(void) const
     return internal::NameToType(typeName);
 }
 
-//BamRecord& BamRecord::HoleNumber(const int32_t holeNumber)
-//{
-//    internal::CreateOrEdit(internal::tagName_holeNumber,
-//                           holeNumber,
-//                           &impl_);
-//    return *this;
-//}
+
 
 //BamRecord& BamRecord::MovieName(const string& movieName)
 //{

@@ -153,9 +153,7 @@ vector<uint8_t> Downsampled(const vector<uint16_t>& frames)
 } // namespace PacBio
 
 Frames::Frames(void)
-{
-
-}
+{ }
 
 Frames::Frames(const std::vector<uint16_t>& frames)
     : data_(frames)
@@ -173,26 +171,16 @@ Frames::Frames(Frames&& other)
     : data_(std::move(other.data_))
 { }
 
-Frames& Frames::operator=(const Frames& other)
-{
-    data_ = other.data_;
-    return *this;
-}
-
-Frames& Frames::operator=(Frames&& other)
-{
-    data_ = std::move(other.data_);
-    return *this;
-}
-
 Frames::~Frames(void) { }
 
+Frames& Frames::operator=(const Frames& other)
+{ data_ = other.data_; return *this; }
+
+Frames& Frames::operator=(Frames&& other)
+{ data_ = std::move(other.data_); return *this; }
+
 Frames Frames::CodeToFrames(const std::vector<uint8_t>& codedData)
-{
-    return Frames(std::move(internal::CodeToFrames(codedData)));
-}
+{  return Frames(std::move(internal::CodeToFrames(codedData))); }
 
 std::vector<uint8_t> Frames::Downsample(const std::vector<uint16_t>& frames)
-{
-    return internal::Downsampled(frames);
-}
+{ return internal::Downsampled(frames); }

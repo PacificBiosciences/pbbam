@@ -46,7 +46,7 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-TEST(CigarTest, OperationToType)
+TEST(CigarTest, TypeToCar)
 {
     EXPECT_EQ('M', CigarOperation::TypeToChar(CigarOperationType::ALIGNMENT_MATCH) );
     EXPECT_EQ('I', CigarOperation::TypeToChar(CigarOperationType::INSERTION) );
@@ -59,7 +59,7 @@ TEST(CigarTest, OperationToType)
     EXPECT_EQ('X', CigarOperation::TypeToChar(CigarOperationType::SEQUENCE_MISMATCH) );
 }
 
-TEST(CigarTest, TypeToOperation)
+TEST(CigarTest, CharToType)
 {
     EXPECT_EQ(CigarOperationType::ALIGNMENT_MATCH,   CigarOperation::CharToType('M'));
     EXPECT_EQ(CigarOperationType::INSERTION,         CigarOperation::CharToType('I'));

@@ -74,10 +74,6 @@ public:
 
     Frames(void);
     Frames(const std::vector<uint16_t>& frames);
-    Frames(const std::vector<uint8_t>::const_iterator first,
-            const std::vector<uint8_t>::const_iterator last);
-
-
     Frames(std::vector<uint16_t>&& frames);
     Frames(const Frames& other);
     Frames(Frames&& other);
@@ -100,8 +96,19 @@ public:
     /// \name Conversion Methods
     /// \{
 
+
+
     /// \returns Frame data in (lossy, 8-bit) encoded form.
     std::vector<uint8_t> Downsampled(void) const;
+
+    /// \}
+
+public:
+    /// \name Comparison Operators
+    /// \{
+
+    bool operator==(const Frames& other) const;
+    bool operator!=(const Frames& other) const;
 
     /// \}
 
@@ -184,23 +191,11 @@ inline std::vector<uint16_t>::iterator Frames::begin(void)
 inline std::vector<uint16_t>::iterator Frames::end(void)
 { return data_.end(); }
 
-inline bool operator==(const Frames& lhs, const Frames& rhs)
-{ return lhs.Data() == rhs.Data(); }
+inline bool Frames::operator==(const Frames& other) const
+{ return data_ == other.data_; }
 
-inline bool operator==(const Frames& lhs, const std::vector<uint16_t>& rhs)
-{ return lhs.Data() == rhs; }
-
-inline bool operator==(const std::vector<uint16_t>& lhs, const Frames& rhs)
-{ return lhs == rhs.Data(); }
-
-inline bool operator!=(const Frames& lhs, const Frames& rhs)
-{ return !(lhs == rhs); }
-
-inline bool operator!=(const Frames& lhs, const std::vector<uint16_t>& rhs)
-{ return !(lhs == rhs); }
-
-inline bool operator!=(const std::vector<uint16_t>& lhs, const Frames& rhs)
-{ return !(lhs == rhs); }
+inline bool Frames::operator!=(const Frames& other) const
+{ return !(*this == other); }
 
 } // namespace BAM
 } // namespace PacBio

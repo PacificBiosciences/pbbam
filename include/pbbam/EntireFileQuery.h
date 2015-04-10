@@ -40,7 +40,6 @@
 
 #include "pbbam/QueryBase.h"
 #include <htslib/sam.h>
-#include <memory>
 
 namespace PacBio {
 namespace BAM {
@@ -55,8 +54,8 @@ protected:
     bool GetNext(BamRecord& record);
 
 private:
-    std::shared_ptr<samFile>   htsFile_;
-    std::shared_ptr<bam_hdr_t> htsHeader_;
+    PBBAM_SHARED_PTR<samFile>   htsFile_;
+    PBBAM_SHARED_PTR<bam_hdr_t> htsHeader_;
 };
 
 } // namespace BAM

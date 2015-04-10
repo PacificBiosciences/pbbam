@@ -42,7 +42,6 @@
 #include "pbbam/ProgramInfo.h"
 #include "pbbam/ReadGroupInfo.h"
 #include "pbbam/SequenceInfo.h"
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -52,12 +51,13 @@ namespace BAM {
 class PBBAM_EXPORT BamHeader
 {
 public:
+    typedef PBBAM_SHARED_PTR<BamHeader> SharedPtr;
+
+public:
     /// \name Conversion Methods
     /// \{
 
-    static std::shared_ptr<BamHeader> FromSam(const std::string& sam);
-    static std::string ToSam(const BamHeader& header);
-    static std::string ToSam(const std::shared_ptr<BamHeader>& header);
+    static BamHeader::SharedPtr FromSam(const std::string& sam);
 
     /// \}
 
@@ -66,6 +66,7 @@ public:
     /// \{
 
     BamHeader(void);
+    BamHeader(const std::string& text);
     BamHeader(const BamHeader& other);
     BamHeader(BamHeader&& other);
     BamHeader& operator=(const BamHeader& other);
@@ -224,6 +225,9 @@ inline std::vector<std::string> BamHeader::Comments(void) const
 inline BamHeader& BamHeader::Comments(const std::vector<std::string>& comments)
 { comments_ = comments; return *this; }
 
+inline BamHeader::SharedPtr BamHeader::FromSam(const std::string& sam)
+{ return BamHeader::SharedPtr(new BamHeader(sam)); }
+
 inline bool BamHeader::HasProgram(const std::string& id) const
 { return programs_.find(id) != programs_.cend(); }
 
@@ -285,12 +289,6 @@ inline std::string BamHeader::SortOrder(void) const
 
 inline BamHeader& BamHeader::SortOrder(const std::string& order)
 { sortOrder_ = order; return *this; }
-
-inline std::string BamHeader::ToSam(const BamHeader& header)
-{ return header.ToSam(); }
-
-inline std::string BamHeader::ToSam(const std::shared_ptr<BamHeader>& header)
-{ return header ? header->ToSam() : std::string(); }
 
 inline std::string BamHeader::Version(void) const
 { return version_; }

@@ -41,7 +41,6 @@
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/Config.h"
-#include <memory>
 #include <string>
 
 namespace PacBio {
@@ -79,7 +78,7 @@ public:
     bool Open(const std::string& filename);
 
     /// \returns header as BamHeader object
-    std::shared_ptr<BamHeader> Header(void) const;
+    BamHeader::SharedPtr Header(void) const;
 
     /// \returns error status code
     BamReader::ReadError Error(void) const;
@@ -92,19 +91,19 @@ public:
     /// \param[out] record pointer to BamRecord object
     ///
     /// \returns succcess/failure
-    bool GetNext(std::shared_ptr<BamRecord> record);
+    bool GetNext(PBBAM_SHARED_PTR<BamRecord> record);
 
 public:
     std::string PacBioBamVersion(void) const;
 
 protected:
-    bool GetNext(std::shared_ptr<bam1_t> rawRecord);
+    bool GetNext(PBBAM_SHARED_PTR<bam1_t> rawRecord);
     void InitialOpen(void);
-    std::shared_ptr<bam_hdr_t> RawHeader(void) const;
+    PBBAM_SHARED_PTR<bam_hdr_t> RawHeader(void) const;
 
 protected:
-    std::shared_ptr<samFile>   file_;
-    std::shared_ptr<bam_hdr_t> header_;
+    PBBAM_SHARED_PTR<samFile>   file_;
+    PBBAM_SHARED_PTR<bam_hdr_t> header_;
     std::string filename_;
     BamReader::ReadError error_;
 };

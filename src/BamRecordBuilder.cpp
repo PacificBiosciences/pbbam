@@ -59,7 +59,7 @@ BamRecordBuilder::BamRecordBuilder(void)
     cigar_.reserve(256);
 }
 
-BamRecordBuilder::BamRecordBuilder(const std::shared_ptr<BamHeader>& header)
+BamRecordBuilder::BamRecordBuilder(const BamHeader::SharedPtr& header)
     : header_(header)
 {
     // ensure proper clean slate
@@ -130,7 +130,7 @@ BamRecord BamRecordBuilder::Build(void) const
 bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
 {
     // initialize with basic 'core data'
-    std::shared_ptr<bam1_t> recordRawData = internal::BamRecordMemory::GetRawData(record); /*   record.impl_.RawData().get();*/
+    PBBAM_SHARED_PTR<bam1_t> recordRawData = internal::BamRecordMemory::GetRawData(record); /*   record.impl_.RawData().get();*/
     PB_ASSERT_OR_RETURN_VALUE(recordRawData, false);
     PB_ASSERT_OR_RETURN_VALUE(recordRawData->data, false);
     recordRawData->core = core_;
@@ -262,7 +262,7 @@ void BamRecordBuilder::Reset(const BamRecord& prototype)
     header_ = prototype.Header();
 
     // reset core data
-    const std::shared_ptr<bam1_t> rawData = internal::BamRecordMemory::GetRawData(prototype); //  prototype.impl_.RawData().get();
+    const PBBAM_SHARED_PTR<bam1_t> rawData = internal::BamRecordMemory::GetRawData(prototype); //  prototype.impl_.RawData().get();
     PB_ASSERT_OR_RETURN(rawData);
     core_ = rawData->core;
 
@@ -282,7 +282,7 @@ void BamRecordBuilder::Reset(BamRecord&& prototype)
     header_ = std::move(prototype.Header());
 
     // reset core data
-    const std::shared_ptr<bam1_t> rawData = internal::BamRecordMemory::GetRawData(prototype); //  prototype.impl_.RawData().get();
+    const PBBAM_SHARED_PTR<bam1_t> rawData = internal::BamRecordMemory::GetRawData(prototype); //  prototype.impl_.RawData().get();
     PB_ASSERT_OR_RETURN(rawData);
     core_ = std::move(rawData->core);
 

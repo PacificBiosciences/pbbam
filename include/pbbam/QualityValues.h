@@ -60,8 +60,9 @@ public:
     ///  \{
 
     QualityValues(void);
-    QualityValues(const std::vector<QualityValue>& quals);
-    QualityValues(const std::vector<uint8_t>& quals);
+    explicit QualityValues(const std::string& fastqString);
+    explicit QualityValues(const std::vector<QualityValue>& quals);
+    explicit QualityValues(const std::vector<uint8_t>& quals);
 
     QualityValues(const std::vector<uint8_t>::const_iterator first,
                   const std::vector<uint8_t>::const_iterator last);
@@ -80,6 +81,15 @@ public:
     QualityValues& operator=(std::vector<QualityValue>&& quals);
 
     ~QualityValues(void);
+
+    /// \}
+
+public:
+    /// \name Comparison Operators
+    /// \{
+
+    bool operator==(const std::string& other) const;
+    bool operator!=(const std::string& other) const;
 
     /// \}
 
@@ -115,6 +125,14 @@ public:
 inline QualityValues::QualityValues(void)
     : std::vector<QualityValue>()
 { }
+
+inline QualityValues::QualityValues(const std::string& fastqString)
+    : std::vector<QualityValue>()
+{
+    resize(fastqString.size());
+    std::transform(fastqString.cbegin(), fastqString.cend(),
+                   begin(), QualityValue::FromFastq);
+}
 
 inline QualityValues::QualityValues(const std::vector<QualityValue>& quals)
     : std::vector<QualityValue>(quals)
@@ -185,10 +203,11 @@ inline std::vector<QualityValue>::iterator QualityValues::end(void)
 
 inline QualityValues QualityValues::FromFastq(const std::string& fastq)
 {
-    QualityValues result;
-    result.resize(fastq.size());
-    std::transform(fastq.cbegin(), fastq.cend(), result.begin(), QualityValue::FromFastq);
-    return result;
+    return QualityValues(fastq);
+//    QualityValues result;
+//    result.resize(fastq.size());
+//    std::transform(fastq.cbegin(), fastq.cend(), result.begin(), QualityValue::FromFastq);
+//    return result;
 }
 
 inline std::string QualityValues::Fastq(void) const
@@ -202,17 +221,11 @@ inline std::string QualityValues::Fastq(void) const
     return result;
 }
 
-inline bool operator==(const QualityValues& lhs, const std::string& rhs)
-{ return lhs == QualityValues::FromFastq(rhs); }
+inline bool QualityValues::operator==(const std::string& fastq) const
+{ return *this == QualityValues(fastq); }
 
-inline bool operator==(const std::string& lhs, const QualityValues& rhs)
-{ return rhs == lhs; }
-
-inline bool operator!=(const QualityValues& lhs, const std::string& rhs)
-{ return !(lhs == rhs); }
-
-inline bool operator!=(const std::string& lhs, const QualityValues& rhs)
-{ return !(lhs == rhs); }
+inline bool QualityValues::operator!=(const std::string& fastq) const
+{ return *this != QualityValues(fastq); }
 
 } // namespace BAM
 } // namespace PacBio

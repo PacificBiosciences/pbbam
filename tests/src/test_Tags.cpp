@@ -174,7 +174,7 @@ TEST(TagTest, Type_None)
 {
      Tag tag;
 
-     EXPECT_TRUE(tag.Type() == TagDataType::NONE);
+     EXPECT_TRUE(tag.Type() == TagDataType::INVALID);
      EXPECT_TRUE(tag.IsNull());
      EXPECT_TRUE(tag.Typename() == "none");
 

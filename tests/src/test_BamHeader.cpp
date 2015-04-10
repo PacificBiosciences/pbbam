@@ -86,7 +86,7 @@ TEST(BamHeaderTest, DecodeTest)
                          "@CO\tipsum and so on\n"
                          "@CO\tcitation needed\n";
 
-    std::shared_ptr<BamHeader> header = BamHeader::FromSam(text);
+    BamHeader::SharedPtr header = BamHeader::FromSam(text);
 
     EXPECT_EQ(string("1.1"),       header->Version());
     EXPECT_EQ(string("queryname"), header->SortOrder());
@@ -204,7 +204,7 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
 
 
     const string& text = header.ToSam();
-    std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), tests::BamHdrDeleter());
+    PBBAM_SHARED_PTR<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), tests::BamHdrDeleter());
     rawData->ignore_sam_err = 0;
     rawData->cigar_tab = NULL;
     rawData->l_text = text.size();
@@ -257,14 +257,14 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
 
 
     string text = header.ToSam();
-    std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), tests::BamHdrDeleter());
+    PBBAM_SHARED_PTR<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), tests::BamHdrDeleter());
     rawData->ignore_sam_err = 0;
     rawData->cigar_tab = NULL;
     rawData->l_text = text.size();
     rawData->text = (char*)calloc(rawData->l_text + 1, 1);
     memcpy(rawData->text, text.c_str(), rawData->l_text);
 
-    const std::shared_ptr<BamHeader>& newHeader = BamHeader::FromSam(string(rawData->text, rawData->l_text));
+    const BamHeader::SharedPtr& newHeader = BamHeader::FromSam(string(rawData->text, rawData->l_text));
 
     EXPECT_EQ(header.Version(),          newHeader->Version());
     EXPECT_EQ(header.SortOrder(),        newHeader->SortOrder());

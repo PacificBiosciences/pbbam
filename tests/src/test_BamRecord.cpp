@@ -42,7 +42,6 @@
 #include <gtest/gtest.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamTagCodec.h>
-#include <chrono>
 #include <string>
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -456,49 +455,6 @@ TEST(BamRecordTest, CoreSetters)
     EXPECT_EQ(vector<uint8_t>({34, 5, 125}), fetchedTags.at("CA").ToUInt8Array());
 
     tests::CheckRawData(bam);
-}
-
-TEST(BamRecordTest, ClampReadAccuracy)
-{
-//    // make sure BamRecord respects clamped Accuracy
-
-//    BamRecord bam;
-//    EXPECT_EQ(0, bam.ReadAccuracy());
-
-//    // minimum valid
-//    bam.ReadAccuracy(0);
-//    EXPECT_EQ(0, bam.ReadAccuracy());
-
-//    bam.ReadAccuracy(Accuracy(0));
-//    EXPECT_EQ(0, bam.ReadAccuracy());
-
-//    // random valid
-//    bam.ReadAccuracy(300);
-//    EXPECT_EQ(300, bam.ReadAccuracy());
-
-//    bam.ReadAccuracy(Accuracy(300));
-//    EXPECT_EQ(300, bam.ReadAccuracy());
-
-//    // maximum valid
-//    bam.ReadAccuracy(1000);
-//    EXPECT_EQ(1000, bam.ReadAccuracy());
-
-//    bam.ReadAccuracy(Accuracy(300));
-//    EXPECT_EQ(300, bam.ReadAccuracy());
-
-//    // negative
-//    bam.ReadAccuracy(-1);
-//    EXPECT_EQ(0, bam.ReadAccuracy());
-
-//    bam.ReadAccuracy(Accuracy(-1));
-//    EXPECT_EQ(0, bam.ReadAccuracy());
-
-//    // over maximum
-//    bam.ReadAccuracy(2000);
-//    EXPECT_EQ(1000, bam.ReadAccuracy());
-
-//    bam.ReadAccuracy(Accuracy(2000));
-//    EXPECT_EQ(1000, bam.ReadAccuracy());
 }
 
 TEST(BamRecordTest, SequenceOrientation)
@@ -1878,49 +1834,49 @@ TEST(BamRecordTest, FrameTagsClippedAndAligned)
     EXPECT_EQ(s6.PulseWidth(Orientation::NATIVE), s6.PulseWidth(Orientation::GENOMIC));
 
     //  - unaligned, unclipped genomic output == genomic input
-    EXPECT_EQ(s1_frames, s1.IPD(Orientation::GENOMIC));
-    EXPECT_EQ(s2_frames, s2.IPD(Orientation::GENOMIC));
-    EXPECT_EQ(s3_frames, s3.IPD(Orientation::GENOMIC));
-    EXPECT_EQ(s4_frames, s4.IPD(Orientation::GENOMIC));
-    EXPECT_EQ(s5_frames, s5.IPD(Orientation::GENOMIC));
-    EXPECT_EQ(s6_frames, s6.IPD(Orientation::GENOMIC));
+    EXPECT_EQ(s1_frames, s1.IPD(Orientation::GENOMIC).Data());
+    EXPECT_EQ(s2_frames, s2.IPD(Orientation::GENOMIC).Data());
+    EXPECT_EQ(s3_frames, s3.IPD(Orientation::GENOMIC).Data());
+    EXPECT_EQ(s4_frames, s4.IPD(Orientation::GENOMIC).Data());
+    EXPECT_EQ(s5_frames, s5.IPD(Orientation::GENOMIC).Data());
+    EXPECT_EQ(s6_frames, s6.IPD(Orientation::GENOMIC).Data());
 
-    EXPECT_EQ(s1_frames, s1.PulseWidth(Orientation::GENOMIC));
-    EXPECT_EQ(s2_frames, s2.PulseWidth(Orientation::GENOMIC));
-    EXPECT_EQ(s3_frames, s3.PulseWidth(Orientation::GENOMIC));
-    EXPECT_EQ(s4_frames, s4.PulseWidth(Orientation::GENOMIC));
-    EXPECT_EQ(s5_frames, s5.PulseWidth(Orientation::GENOMIC));
-    EXPECT_EQ(s6_frames, s6.PulseWidth(Orientation::GENOMIC));
+    EXPECT_EQ(s1_frames, s1.PulseWidth(Orientation::GENOMIC).Data());
+    EXPECT_EQ(s2_frames, s2.PulseWidth(Orientation::GENOMIC).Data());
+    EXPECT_EQ(s3_frames, s3.PulseWidth(Orientation::GENOMIC).Data());
+    EXPECT_EQ(s4_frames, s4.PulseWidth(Orientation::GENOMIC).Data());
+    EXPECT_EQ(s5_frames, s5.PulseWidth(Orientation::GENOMIC).Data());
+    EXPECT_EQ(s6_frames, s6.PulseWidth(Orientation::GENOMIC).Data());
 
     //  - aligned, unclipped genomic output == aligned, unclipped genomic input
-    EXPECT_EQ(s1_frames_aligned, s1.IPD(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s2_frames_aligned, s2.IPD(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s3_frames_aligned, s3.IPD(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s4_frames_aligned, s4.IPD(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s5_frames_aligned, s5.IPD(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s6_frames_aligned, s6.IPD(Orientation::GENOMIC, true, false));
+    EXPECT_EQ(s1_frames_aligned, s1.IPD(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s2_frames_aligned, s2.IPD(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s3_frames_aligned, s3.IPD(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s4_frames_aligned, s4.IPD(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s5_frames_aligned, s5.IPD(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s6_frames_aligned, s6.IPD(Orientation::GENOMIC, true, false).Data());
 
-    EXPECT_EQ(s1_frames_aligned, s1.PulseWidth(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s2_frames_aligned, s2.PulseWidth(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s3_frames_aligned, s3.PulseWidth(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s4_frames_aligned, s4.PulseWidth(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s5_frames_aligned, s5.PulseWidth(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s6_frames_aligned, s6.PulseWidth(Orientation::GENOMIC, true, false));
+    EXPECT_EQ(s1_frames_aligned, s1.PulseWidth(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s2_frames_aligned, s2.PulseWidth(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s3_frames_aligned, s3.PulseWidth(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s4_frames_aligned, s4.PulseWidth(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s5_frames_aligned, s5.PulseWidth(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s6_frames_aligned, s6.PulseWidth(Orientation::GENOMIC, true, false).Data());
 
     //  - aligned, clipped genomic output == aligned, clipped genomic output
-    EXPECT_EQ(s1_frames_aligned_clipped, s1.IPD(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s2_frames_aligned_clipped, s2.IPD(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s3_frames_aligned_clipped, s3.IPD(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s4_frames_aligned_clipped, s4.IPD(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s5_frames_aligned_clipped, s5.IPD(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s6_frames_aligned_clipped, s6.IPD(Orientation::GENOMIC, true, true));
+    EXPECT_EQ(s1_frames_aligned_clipped, s1.IPD(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s2_frames_aligned_clipped, s2.IPD(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s3_frames_aligned_clipped, s3.IPD(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s4_frames_aligned_clipped, s4.IPD(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s5_frames_aligned_clipped, s5.IPD(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s6_frames_aligned_clipped, s6.IPD(Orientation::GENOMIC, true, true).Data());
 
-    EXPECT_EQ(s1_frames_aligned_clipped, s1.PulseWidth(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s2_frames_aligned_clipped, s2.PulseWidth(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s3_frames_aligned_clipped, s3.PulseWidth(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s4_frames_aligned_clipped, s4.PulseWidth(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s5_frames_aligned_clipped, s5.PulseWidth(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s6_frames_aligned_clipped, s6.PulseWidth(Orientation::GENOMIC, true, true));
+    EXPECT_EQ(s1_frames_aligned_clipped, s1.PulseWidth(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s2_frames_aligned_clipped, s2.PulseWidth(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s3_frames_aligned_clipped, s3.PulseWidth(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s4_frames_aligned_clipped, s4.PulseWidth(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s5_frames_aligned_clipped, s5.PulseWidth(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s6_frames_aligned_clipped, s6.PulseWidth(Orientation::GENOMIC, true, true).Data());
 
     // ----------------
     // reverse strand
@@ -1942,93 +1898,92 @@ TEST(BamRecordTest, FrameTagsClippedAndAligned)
     EXPECT_NE(s6_reverse.PulseWidth(Orientation::NATIVE), s6_reverse.PulseWidth(Orientation::GENOMIC));
 
     //  - unaligned, unclipped genomic output (rev-comp of native input)
-    EXPECT_EQ(s1_revframes, s1_reverse.IPD(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s2_revframes, s2_reverse.IPD(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s3_revframes, s3_reverse.IPD(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s4_revframes, s4_reverse.IPD(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s5_revframes, s5_reverse.IPD(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s6_revframes, s6_reverse.IPD(Orientation::GENOMIC, false, false));
+    EXPECT_EQ(s1_revframes, s1_reverse.IPD(Orientation::GENOMIC, false, false).Data());
+    EXPECT_EQ(s2_revframes, s2_reverse.IPD(Orientation::GENOMIC, false, false).Data());
+    EXPECT_EQ(s3_revframes, s3_reverse.IPD(Orientation::GENOMIC, false, false).Data());
+    EXPECT_EQ(s4_revframes, s4_reverse.IPD(Orientation::GENOMIC, false, false).Data());
+    EXPECT_EQ(s5_revframes, s5_reverse.IPD(Orientation::GENOMIC, false, false).Data());
+    EXPECT_EQ(s6_revframes, s6_reverse.IPD(Orientation::GENOMIC, false, false).Data());
 
-    EXPECT_EQ(s1_revframes, s1_reverse.PulseWidth(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s2_revframes, s2_reverse.PulseWidth(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s3_revframes, s3_reverse.PulseWidth(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s4_revframes, s4_reverse.PulseWidth(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s5_revframes, s5_reverse.PulseWidth(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s6_revframes, s6_reverse.PulseWidth(Orientation::GENOMIC, false, false));
+    EXPECT_EQ(s1_revframes, s1_reverse.PulseWidth(Orientation::GENOMIC, false, false).Data());
+    EXPECT_EQ(s2_revframes, s2_reverse.PulseWidth(Orientation::GENOMIC, false, false).Data());
+    EXPECT_EQ(s3_revframes, s3_reverse.PulseWidth(Orientation::GENOMIC, false, false).Data());
+    EXPECT_EQ(s4_revframes, s4_reverse.PulseWidth(Orientation::GENOMIC, false, false).Data());
+    EXPECT_EQ(s5_revframes, s5_reverse.PulseWidth(Orientation::GENOMIC, false, false).Data());
+    EXPECT_EQ(s6_revframes, s6_reverse.PulseWidth(Orientation::GENOMIC, false, false).Data());
 
     //  - unaligned, unclipped native output (native input)
-    EXPECT_EQ(s1_frames, s1_reverse.IPD(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s2_frames, s2_reverse.IPD(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s3_frames, s3_reverse.IPD(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s4_frames, s4_reverse.IPD(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s5_frames, s5_reverse.IPD(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s6_frames, s6_reverse.IPD(Orientation::NATIVE, false, false));
+    EXPECT_EQ(s1_frames, s1_reverse.IPD(Orientation::NATIVE, false, false).Data());
+    EXPECT_EQ(s2_frames, s2_reverse.IPD(Orientation::NATIVE, false, false).Data());
+    EXPECT_EQ(s3_frames, s3_reverse.IPD(Orientation::NATIVE, false, false).Data());
+    EXPECT_EQ(s4_frames, s4_reverse.IPD(Orientation::NATIVE, false, false).Data());
+    EXPECT_EQ(s5_frames, s5_reverse.IPD(Orientation::NATIVE, false, false).Data());
+    EXPECT_EQ(s6_frames, s6_reverse.IPD(Orientation::NATIVE, false, false).Data());
 
-    EXPECT_EQ(s1_frames, s1_reverse.PulseWidth(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s2_frames, s2_reverse.PulseWidth(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s3_frames, s3_reverse.PulseWidth(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s4_frames, s4_reverse.PulseWidth(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s5_frames, s5_reverse.PulseWidth(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s6_frames, s6_reverse.PulseWidth(Orientation::NATIVE, false, false));
+    EXPECT_EQ(s1_frames, s1_reverse.PulseWidth(Orientation::NATIVE, false, false).Data());
+    EXPECT_EQ(s2_frames, s2_reverse.PulseWidth(Orientation::NATIVE, false, false).Data());
+    EXPECT_EQ(s3_frames, s3_reverse.PulseWidth(Orientation::NATIVE, false, false).Data());
+    EXPECT_EQ(s4_frames, s4_reverse.PulseWidth(Orientation::NATIVE, false, false).Data());
+    EXPECT_EQ(s5_frames, s5_reverse.PulseWidth(Orientation::NATIVE, false, false).Data());
+    EXPECT_EQ(s6_frames, s6_reverse.PulseWidth(Orientation::NATIVE, false, false).Data());
 
     //  - aligned, unclipped genomic output (rev-comp of native input)
-    EXPECT_EQ(s1_revframes_aligned, s1_reverse.IPD(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s2_revframes_aligned, s2_reverse.IPD(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s3_revframes_aligned, s3_reverse.IPD(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s4_revframes_aligned, s4_reverse.IPD(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s5_revframes_aligned, s5_reverse.IPD(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s6_revframes_aligned, s6_reverse.IPD(Orientation::GENOMIC, true, false));
+    EXPECT_EQ(s1_revframes_aligned, s1_reverse.IPD(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s2_revframes_aligned, s2_reverse.IPD(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s3_revframes_aligned, s3_reverse.IPD(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s4_revframes_aligned, s4_reverse.IPD(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s5_revframes_aligned, s5_reverse.IPD(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s6_revframes_aligned, s6_reverse.IPD(Orientation::GENOMIC, true, false).Data());
 
-    EXPECT_EQ(s1_revframes_aligned, s1_reverse.PulseWidth(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s2_revframes_aligned, s2_reverse.PulseWidth(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s3_revframes_aligned, s3_reverse.PulseWidth(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s4_revframes_aligned, s4_reverse.PulseWidth(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s5_revframes_aligned, s5_reverse.PulseWidth(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s6_revframes_aligned, s6_reverse.PulseWidth(Orientation::GENOMIC, true, false));
+    EXPECT_EQ(s1_revframes_aligned, s1_reverse.PulseWidth(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s2_revframes_aligned, s2_reverse.PulseWidth(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s3_revframes_aligned, s3_reverse.PulseWidth(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s4_revframes_aligned, s4_reverse.PulseWidth(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s5_revframes_aligned, s5_reverse.PulseWidth(Orientation::GENOMIC, true, false).Data());
+    EXPECT_EQ(s6_revframes_aligned, s6_reverse.PulseWidth(Orientation::GENOMIC, true, false).Data());
 
     //  - aligned, unclipped native output (native input)
-    EXPECT_EQ(s1_frames_aligned, s1_reverse.IPD(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s2_frames_aligned, s2_reverse.IPD(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s3_frames_aligned, s3_reverse.IPD(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s4_frames_aligned, s4_reverse.IPD(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s5_frames_aligned, s5_reverse.IPD(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s6_frames_aligned, s6_reverse.IPD(Orientation::NATIVE, true, false));
+    EXPECT_EQ(s1_frames_aligned, s1_reverse.IPD(Orientation::NATIVE, true, false).Data());
+    EXPECT_EQ(s2_frames_aligned, s2_reverse.IPD(Orientation::NATIVE, true, false).Data());
+    EXPECT_EQ(s3_frames_aligned, s3_reverse.IPD(Orientation::NATIVE, true, false).Data());
+    EXPECT_EQ(s4_frames_aligned, s4_reverse.IPD(Orientation::NATIVE, true, false).Data());
+    EXPECT_EQ(s5_frames_aligned, s5_reverse.IPD(Orientation::NATIVE, true, false).Data());
+    EXPECT_EQ(s6_frames_aligned, s6_reverse.IPD(Orientation::NATIVE, true, false).Data());
 
-    EXPECT_EQ(s1_frames_aligned, s1_reverse.PulseWidth(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s2_frames_aligned, s2_reverse.PulseWidth(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s3_frames_aligned, s3_reverse.PulseWidth(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s4_frames_aligned, s4_reverse.PulseWidth(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s5_frames_aligned, s5_reverse.PulseWidth(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s6_frames_aligned, s6_reverse.PulseWidth(Orientation::NATIVE, true, false));
+    EXPECT_EQ(s1_frames_aligned, s1_reverse.PulseWidth(Orientation::NATIVE, true, false).Data());
+    EXPECT_EQ(s2_frames_aligned, s2_reverse.PulseWidth(Orientation::NATIVE, true, false).Data());
+    EXPECT_EQ(s3_frames_aligned, s3_reverse.PulseWidth(Orientation::NATIVE, true, false).Data());
+    EXPECT_EQ(s4_frames_aligned, s4_reverse.PulseWidth(Orientation::NATIVE, true, false).Data());
+    EXPECT_EQ(s5_frames_aligned, s5_reverse.PulseWidth(Orientation::NATIVE, true, false).Data());
+    EXPECT_EQ(s6_frames_aligned, s6_reverse.PulseWidth(Orientation::NATIVE, true, false).Data());
 
     //  - aligned, clipped genomic output (rev-comp of native input)
-    EXPECT_EQ(s1_revframes_aligned_clipped, s1_reverse.IPD(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s2_revframes_aligned_clipped, s2_reverse.IPD(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s3_revframes_aligned_clipped, s3_reverse.IPD(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s4_revframes_aligned_clipped, s4_reverse.IPD(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s5_revframes_aligned_clipped, s5_reverse.IPD(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s6_revframes_aligned_clipped, s6_reverse.IPD(Orientation::GENOMIC, true, true));
+    EXPECT_EQ(s1_revframes_aligned_clipped, s1_reverse.IPD(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s2_revframes_aligned_clipped, s2_reverse.IPD(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s3_revframes_aligned_clipped, s3_reverse.IPD(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s4_revframes_aligned_clipped, s4_reverse.IPD(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s5_revframes_aligned_clipped, s5_reverse.IPD(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s6_revframes_aligned_clipped, s6_reverse.IPD(Orientation::GENOMIC, true, true).Data());
 
-    EXPECT_EQ(s1_revframes_aligned_clipped, s1_reverse.PulseWidth(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s2_revframes_aligned_clipped, s2_reverse.PulseWidth(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s3_revframes_aligned_clipped, s3_reverse.PulseWidth(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s4_revframes_aligned_clipped, s4_reverse.PulseWidth(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s5_revframes_aligned_clipped, s5_reverse.PulseWidth(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s6_revframes_aligned_clipped, s6_reverse.PulseWidth(Orientation::GENOMIC, true, true));
+    EXPECT_EQ(s1_revframes_aligned_clipped, s1_reverse.PulseWidth(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s2_revframes_aligned_clipped, s2_reverse.PulseWidth(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s3_revframes_aligned_clipped, s3_reverse.PulseWidth(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s4_revframes_aligned_clipped, s4_reverse.PulseWidth(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s5_revframes_aligned_clipped, s5_reverse.PulseWidth(Orientation::GENOMIC, true, true).Data());
+    EXPECT_EQ(s6_revframes_aligned_clipped, s6_reverse.PulseWidth(Orientation::GENOMIC, true, true).Data());
 
     //  - aligned, clipped native output (native input)
-    EXPECT_EQ(s1_frames_aligned_clipped, s1_reverse.IPD(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s2_frames_aligned_clipped, s2_reverse.IPD(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s3_frames_aligned_clipped, s3_reverse.IPD(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s4_frames_aligned_clipped, s4_reverse.IPD(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s5_frames_aligned_clipped, s5_reverse.IPD(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s6_frames_aligned_clipped, s6_reverse.IPD(Orientation::NATIVE, true, true));
+    EXPECT_EQ(s1_frames_aligned_clipped, s1_reverse.IPD(Orientation::NATIVE, true, true).Data());
+    EXPECT_EQ(s2_frames_aligned_clipped, s2_reverse.IPD(Orientation::NATIVE, true, true).Data());
+    EXPECT_EQ(s3_frames_aligned_clipped, s3_reverse.IPD(Orientation::NATIVE, true, true).Data());
+    EXPECT_EQ(s4_frames_aligned_clipped, s4_reverse.IPD(Orientation::NATIVE, true, true).Data());
+    EXPECT_EQ(s5_frames_aligned_clipped, s5_reverse.IPD(Orientation::NATIVE, true, true).Data());
+    EXPECT_EQ(s6_frames_aligned_clipped, s6_reverse.IPD(Orientation::NATIVE, true, true).Data());
 
-    EXPECT_EQ(s1_frames_aligned_clipped, s1_reverse.PulseWidth(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s2_frames_aligned_clipped, s2_reverse.PulseWidth(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s3_frames_aligned_clipped, s3_reverse.PulseWidth(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s4_frames_aligned_clipped, s4_reverse.PulseWidth(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s5_frames_aligned_clipped, s5_reverse.PulseWidth(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s6_frames_aligned_clipped, s6_reverse.PulseWidth(Orientation::NATIVE, true, true));
+    EXPECT_EQ(s1_frames_aligned_clipped, s1_reverse.PulseWidth(Orientation::NATIVE, true, true).Data());
+    EXPECT_EQ(s2_frames_aligned_clipped, s2_reverse.PulseWidth(Orientation::NATIVE, true, true).Data());
+    EXPECT_EQ(s3_frames_aligned_clipped, s3_reverse.PulseWidth(Orientation::NATIVE, true, true).Data());
+    EXPECT_EQ(s4_frames_aligned_clipped, s4_reverse.PulseWidth(Orientation::NATIVE, true, true).Data());
+    EXPECT_EQ(s5_frames_aligned_clipped, s5_reverse.PulseWidth(Orientation::NATIVE, true, true).Data());
+    EXPECT_EQ(s6_frames_aligned_clipped, s6_reverse.PulseWidth(Orientation::NATIVE, true, true).Data());
 }
-

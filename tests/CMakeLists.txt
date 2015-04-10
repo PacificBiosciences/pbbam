@@ -40,10 +40,17 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PacBioBAM_CXX_FLAGS}")
 
 # define test executable
 add_definitions(-DPBBAM_TESTING)
+if(PacBioBAM_wrap_r)
+    # SWIG R does not support PBBAM_SHARED_PTR, but it does support boost::shared_ptr
+    # So force boost if we're wrapping for R.
+    add_definitions(-DPBBAM_USE_BOOST_SHARED_PTR)
+endif()
 add_executable(test_pbbam ${SOURCES})
 set_target_properties(test_pbbam PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PacBioBAM_TestsDir}/bin
 )
+
+# set up unit test to run our executable
 add_test(
     NAME UnitTests
     WORKING_DIRECTORY ${PacBioBAM_TestsDir}/bin

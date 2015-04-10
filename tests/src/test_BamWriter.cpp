@@ -158,7 +158,7 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
     EXPECT_EQ(std::string("1.1"), reader.Header()->Version());
     EXPECT_EQ(std::string("coordinate"), reader.Header()->SortOrder());
 
-    auto inputRecord = std::shared_ptr<BamRecord>(new BamRecord);
+    auto inputRecord = PBBAM_SHARED_PTR<BamRecord>(new BamRecord);
     EXPECT_TRUE(reader.GetNext(inputRecord));
     EXPECT_EQ(std::string("ACGTC"),   inputRecord->impl_.Sequence());
     EXPECT_EQ(std::string("ZMW\\42"), inputRecord->impl_.Name());

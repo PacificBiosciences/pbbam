@@ -65,6 +65,53 @@ static const string token_pb = string("pb");
 
 BamHeader::BamHeader(void) { }
 
+BamHeader::BamHeader(const string& text)
+{
+    istringstream s(text);
+    string line("");
+    string firstToken;
+    while (getline(s, line)) {
+
+        // skip if line is not long enough to contain true values
+        if (line.length() < 5)
+            continue;
+
+        // determine token at beginning of line
+        firstToken = line.substr(0,3);
+
+        if (firstToken == internal::prefix_HD) {
+
+            // pop off '@HD\t', then split HD lines into tokens
+            const vector<string>& tokens = internal::Split(line.substr(4), '\t');
+            for (const string& token : tokens) {
+                const string& tokenTag   = token.substr(0,2);
+                const string& tokenValue = token.substr(3);
+
+                // set header contents
+                if      (tokenTag == internal::token_VN) Version(tokenValue);
+                else if (tokenTag == internal::token_SO) SortOrder(tokenValue);
+                else if (tokenTag == internal::token_pb) PacBioBamVersion(tokenValue);
+            }
+
+            // check for required tags
+            if (Version().empty())
+                Version(string(hts_version()));
+        }
+
+        else if (firstToken == internal::prefix_SQ)
+            AddSequence(SequenceInfo::FromSam(line));
+
+        else if (firstToken == internal::prefix_RG)
+            AddReadGroup(ReadGroupInfo::FromSam(line));
+
+        else if (firstToken == internal::prefix_PG)
+            AddProgram(ProgramInfo::FromSam(line));
+
+        else if (firstToken == internal::prefix_CO)
+            AddComment(line.substr(4));
+    }
+}
+
 BamHeader::BamHeader(const BamHeader& other)
     : version_(other.version_)
     , pacbioBamVersion_(other.pacbioBamVersion_)
@@ -120,57 +167,6 @@ BamHeader& BamHeader::AddSequence(const SequenceInfo& sequence)
     sequences_.push_back(sequence);
     sequenceIdLookup_[sequence.Name()] = sequences_.size() - 1;
     return *this;
-}
-
-std::shared_ptr<BamHeader> BamHeader::FromSam(const string& sam)
-{
-    std::shared_ptr<BamHeader> header(new BamHeader);
-
-    istringstream s(sam);
-    string line("");
-    string firstToken;
-    while (getline(s, line)) {
-
-        // skip if line is not long enough to contain true values
-        if (line.length() < 5)
-            continue;
-
-        // determine token at beginning of line
-        firstToken = line.substr(0,3);
-
-        if (firstToken == internal::prefix_HD) {
-
-            // pop off '@HD\t', then split HD lines into tokens
-            const vector<string>& tokens = internal::Split(line.substr(4), '\t');
-            for (const string& token : tokens) {
-                const string& tokenTag   = token.substr(0,2);
-                const string& tokenValue = token.substr(3);
-
-                // set header contents
-                if      (tokenTag == internal::token_VN) header->Version(tokenValue);
-                else if (tokenTag == internal::token_SO) header->SortOrder(tokenValue);
-                else if (tokenTag == internal::token_pb) header->PacBioBamVersion(tokenValue);
-            }
-
-            // check for required tags
-            if (header->Version().empty())
-                header->Version(string(hts_version()));
-        }
-
-        else if (firstToken == internal::prefix_SQ)
-            header->AddSequence(SequenceInfo::FromSam(line));
-
-        else if (firstToken == internal::prefix_RG)
-            header->AddReadGroup(ReadGroupInfo::FromSam(line));
-
-        else if (firstToken == internal::prefix_PG)
-            header->AddProgram(ProgramInfo::FromSam(line));
-
-        else if (firstToken == internal::prefix_CO)
-            header->AddComment(line.substr(4));
-    }
-
-    return header;
 }
 
 vector<string> BamHeader::ProgramIds(void) const

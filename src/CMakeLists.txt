@@ -21,17 +21,30 @@ if(PacBioBAM_build_chef)
         ${CMAKE_THREAD_LIBS_INIT}
    )
 else()
-    set(PacBioBAM_DependencyIncludes 
-        ${Htslib_IncludeDir}
-        ${ZLIB_INCLUDE_DIRS}
-        ${Boost_INCLUDE_DIRS}
-    )
-    set(PacBioBAM_DependencyLibraries 
-        ${Htslib_LibDir}/libhts.a
-        ${CMAKE_THREAD_LIBS_INIT}
-        ${ZLIB_LIBRARIES}
-    )
-endif()
+    if(${building_shared})
+        set(PacBioBAM_DependencyIncludes
+            ${Htslib_IncludeDir}
+            ${ZLIB_INCLUDE_DIRS}
+            ${Boost_INCLUDE_DIRS}
+        )
+        set(PacBioBAM_DependencyLibraries
+            ${Htslib_LibDir}/libhts.so
+            ${CMAKE_THREAD_LIBS_INIT}
+            ${ZLIB_LIBRARIES}
+        )
+    else()
+        set(PacBioBAM_DependencyIncludes
+            ${Htslib_IncludeDir}
+            ${ZLIB_INCLUDE_DIRS}
+            ${Boost_INCLUDE_DIRS}
+        )
+        set(PacBioBAM_DependencyLibraries
+            ${Htslib_LibDir}/libhts.a
+            ${CMAKE_THREAD_LIBS_INIT}
+            ${ZLIB_LIBRARIES}
+        )
+    endif() # shared
+endif() # chef
 
 # set up library include dirs
 include_directories(
@@ -47,14 +60,6 @@ set(SOURCES
 )
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PacBioBAM_CXX_FLAGS}")
 
-# define actual library
-add_definitions(-DPBBAM_LIBRARY)
-add_library(pbbam STATIC ${SOURCES})
-set_target_properties(pbbam PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}
-    LIBRARY_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}
-)    
-	
 if(PacBioBAM_build_chef)
 else()
     # ensure we build self-contained htslib
@@ -65,6 +70,33 @@ else()
         WORKING_DIRECTORY ${Htslib_RootDir}
         VERBATIM
     )
+
+endif()
+
+# define actual library
+add_definitions(-DPBBAM_LIBRARY)
+if(PacBioBAM_wrap_r)
+    # SWIG R does not support PBBAM_SHARED_PTR, but it does support boost::shared_ptr
+    # So force boost if we're wrapping for R.
+    add_definitions(-DPBBAM_USE_BOOST_SHARED_PTR)
+endif()
+
+if(${building_shared})
+    add_library(pbbam SHARED ${SOURCES})
+    set_target_properties(pbbam PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}
+        LIBRARY_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}
+    )
+else()
+    add_library(pbbam STATIC ${SOURCES})
+    set_target_properties(pbbam PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}
+        LIBRARY_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}
+    )
+endif()
+
+if(PacBioBAM_build_chef)
+else()
     add_dependencies(pbbam htslib)
 endif()
 		
@@ -78,9 +110,22 @@ set(PacBioBAM_INCLUDE_DIRS
     "${PROJECT_NAME}: Include Directories"
     FORCE
 )
-set(PacBioBAM_LIBRARIES
-    ${PacBioBAM_LibDir}/libpbbam.a ${PacBioBAM_DependencyLibraries}
-    CACHE INTERNAL
-    "${PROJECT_NAME}: Libraries"
-    FORCE
-)
+
+if(${building_shared})
+    set(PacBioBAM_LIBRARIES
+        ${PacBioBAM_LibDir}/libpbbam.so ${PacBioBAM_DependencyLibraries}
+        CACHE INTERNAL
+        "${PROJECT_NAME}: Libraries"
+        FORCE
+    )
+else()
+    set(PacBioBAM_LIBRARIES
+        ${PacBioBAM_LibDir}/libpbbam.a ${PacBioBAM_DependencyLibraries}
+        CACHE INTERNAL
+        "${PROJECT_NAME}: Libraries"
+        FORCE
+    )
+endif()
+
+# add SWIG directory
+add_subdirectory(swig)

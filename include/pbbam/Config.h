@@ -72,4 +72,20 @@
 #  endif
 #endif
 
+// ----------------------------------------------------
+// setup the shared_ptr implementation we'll be using
+// ----------------------------------------------------
+
+// uncomment this define, or pass via command-line (-DPBBAM_USE_BOOST_SHARED_PTR),
+// to use boost::shared_ptr<T> instead of std::shared_ptr<T>
+//#define PBBAM_USE_BOOST_SHARED_PTR
+
+#ifdef PBBAM_USE_BOOST_SHARED_PTR
+#  include <boost/smart_ptr/shared_ptr.hpp>
+#  define PBBAM_SHARED_PTR boost::shared_ptr
+#else
+#  include <memory>
+#  define PBBAM_SHARED_PTR std::shared_ptr
+#endif
+
 #endif // PBBAM_CONFIG_H

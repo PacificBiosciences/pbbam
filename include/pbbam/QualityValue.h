@@ -56,7 +56,7 @@ namespace BAM {
 class PBBAM_EXPORT QualityValue
 {
 public:
-    static const uint8_t MAX = 93;
+    static const uint8_t MAX;
 
 public:
     /// Creates a QualityValue from a FASTQ encoding character.
@@ -74,7 +74,7 @@ public:
 
 public:
     /// \returns the FASTQ encoding char for this QualityValue
-    unsigned char Fastq(void) const;
+    char Fastq(void) const;
 
     /// \returns the integer value of this QualityValue
     operator uint8_t(void) const;
@@ -97,8 +97,8 @@ inline QualityValue::QualityValue(const QualityValue& other)
 
 inline QualityValue::~QualityValue(void) { }
 
-inline unsigned char QualityValue::Fastq(void) const
-{ return static_cast<unsigned char>(value_ + 33); }
+inline char QualityValue::Fastq(void) const
+{ return static_cast<char>(value_ + 33); }
 
 inline QualityValue::operator uint8_t(void) const
 { return value_; }

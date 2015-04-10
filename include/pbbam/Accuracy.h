@@ -49,15 +49,15 @@ namespace BAM {
 class PBBAM_EXPORT Accuracy
 {
 public:
-    static const int MIN = 0;
-    static const int MAX = 1000;
+    static const int MIN;
+    static const int MAX;
 
 public:
     /// \name Constructors & Related Methods
     /// \{
 
     /// \note This is not an 'explicit' ctor, to make it as easy to use in
-    ///       numeric operations as possible. We realy just want to make
+    ///       numeric operations as possible. We really just want to make
     ///       sure that the acceptable range is respected.
     Accuracy(int accuracy);
     Accuracy(const Accuracy& other);

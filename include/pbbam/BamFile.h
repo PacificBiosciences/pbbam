@@ -40,7 +40,6 @@
 
 #include "pbbam/Config.h"
 #include "pbbam/BamHeader.h"
-#include <memory>
 #include <string>
 
 namespace PacBio {
@@ -102,8 +101,8 @@ public:
     /// \name Header Metadata Methods
     /// \{
 
-    /// \returns BamHeader object containing the file's metadata
-    std::shared_ptr<BamHeader> Header(void) const;
+    /// \returns BamHeader containing the file's metadata
+    BamHeader::SharedPtr Header(void) const;
 
     /// \returns true if BAM file is a PacBio BAM file (i.e. has non-empty version associated with header "pb" tag)
     bool IsPacBioBAM(void) const;
@@ -168,7 +167,7 @@ public:
 private:
     std::string filename_;
     BamFile::FileError error_;
-    std::shared_ptr<BamHeader> header_;
+    BamHeader::SharedPtr header_;
 };
 
 inline BamFile::operator bool(void) const
@@ -180,11 +179,11 @@ inline BamFile::FileError BamFile::Error(void) const
 inline std::string BamFile::Filename(void) const
 { return filename_; }
 
-inline std::shared_ptr<BamHeader> BamFile::Header(void) const
+inline BamHeader::SharedPtr BamFile::Header(void) const
 { return header_; }
 
 inline bool BamFile::IsPacBioBAM(void) const
-{ return !header_->PacBioBamVersion().empty(); }
+{ return (header_ ? !header_->PacBioBamVersion().empty() : false); }
 
 inline std::string BamFile::StandardIndexFilename(void) const
 { return filename_ + ".bai"; }
@@ -193,16 +192,16 @@ inline std::string BamFile::PacBioIndexFilename(void) const
 { return filename_ + ".pbi"; }
 
 inline int BamFile::ReferenceId(const std::string& name) const
-{ return header_->SequenceId(name); }
+{ return (header_ ? header_->SequenceId(name) : -1); }
 
 inline uint32_t BamFile::ReferenceLength(const std::string& name) const
 { return ReferenceLength(ReferenceId(name)); }
 
 inline uint32_t BamFile::ReferenceLength(const int id) const
-{ return std::stoul(header_->SequenceLength(id)); }
+{ return (header_ ? std::stoul(header_->SequenceLength(id)) : 0); }
 
 inline std::string BamFile::ReferenceName(const int id) const
-{ return header_->SequenceName(id); }
+{ return (header_ ? header_->SequenceName(id) : ""); }
 
 } // namespace BAM
 } // namespace PacBio

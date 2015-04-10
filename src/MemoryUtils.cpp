@@ -48,17 +48,17 @@ using namespace std;
 // BamHeaderMemory
 // -----------------
 
-std::shared_ptr<BamHeader> BamHeaderMemory::FromRawData(bam_hdr_t* hdr)
+BamHeader::SharedPtr BamHeaderMemory::FromRawData(bam_hdr_t* hdr)
 {
     if (hdr == nullptr || hdr->text == nullptr || hdr->l_text == 0)
-        return std::shared_ptr<BamHeader>(nullptr);
+        return BamHeader::SharedPtr(nullptr);
     return BamHeader::FromSam(string(hdr->text, hdr->l_text));
 }
 
-std::shared_ptr<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& header)
+PBBAM_SHARED_PTR<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& header)
 {
     const string& text = header.ToSam();
-    std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), internal::HtslibHeaderDeleter());
+    PBBAM_SHARED_PTR<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), internal::HtslibHeaderDeleter());
     rawData->ignore_sam_err = 0;
     rawData->cigar_tab = NULL;
     rawData->l_text = text.size();
@@ -67,9 +67,9 @@ std::shared_ptr<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& heade
     return rawData;
 }
 
-std::shared_ptr<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const std::shared_ptr<BamHeader>& header)
+PBBAM_SHARED_PTR<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader::SharedPtr& header)
 {
     if (!header)
-        return std::shared_ptr<bam_hdr_t>(nullptr);
+        return PBBAM_SHARED_PTR<bam_hdr_t>(nullptr);
     return MakeRawHeader(*header.get());
 }

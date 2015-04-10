@@ -53,6 +53,11 @@ GenomicInterval::GenomicInterval(const int id,
     , interval_(start, stop)
 { }
 
+GenomicInterval::GenomicInterval(const GenomicInterval& other)
+    : id_(other.id_)
+    , interval_(other.interval_)
+{ }
+
 bool GenomicInterval::CoveredBy(const GenomicInterval& other) const
 {
     if (id_ != other.id_)
@@ -74,7 +79,7 @@ bool GenomicInterval::Intersects(const GenomicInterval& other) const
     return interval_.Intersects(other.interval_);
 }
 
-GenomicInterval::difference_type GenomicInterval::Length(void) const
+size_t GenomicInterval::Length(void) const
 {
     return interval_.Length();
 }

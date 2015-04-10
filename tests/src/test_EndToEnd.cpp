@@ -47,7 +47,7 @@
 #include <pbbam/BamReader.h>
 #include <pbbam/BamWriter.h>
 #include <pbbam/EntireFileQuery.h>
-    #include <iostream>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <cstdio>
@@ -117,16 +117,16 @@ void RemoveGeneratedFiles(const string& fn1,
 TEST(EndToEndTest, ReadPureHtslib_WritePureHtslib)
 {
     // open input BAM file
-    shared_ptr<samFile> inputBam(sam_open(inputBamFn.c_str(), "r"), SamFileDeleter());
+    PBBAM_SHARED_PTR<samFile> inputBam(sam_open(inputBamFn.c_str(), "r"), SamFileDeleter());
     EXPECT_TRUE(inputBam != 0);
-    shared_ptr<bam_hdr_t> header(sam_hdr_read(inputBam.get()), BamHdrDeleter());
+    PBBAM_SHARED_PTR<bam_hdr_t> header(sam_hdr_read(inputBam.get()), BamHdrDeleter());
 
     // open output BAM file
-    shared_ptr<samFile> outputBam(sam_open(generatedBamFn.c_str(), "wb"), SamFileDeleter());
+    PBBAM_SHARED_PTR<samFile> outputBam(sam_open(generatedBamFn.c_str(), "wb"), SamFileDeleter());
     sam_hdr_write(outputBam.get(), header.get());
 
     // copy BAM file
-    shared_ptr<bam1_t> record(bam_init1(), Bam1Deleter());
+    PBBAM_SHARED_PTR<bam1_t> record(bam_init1(), Bam1Deleter());
     while (sam_read1(inputBam.get(), header.get(), record.get()) >= 0)
         sam_write1(outputBam.get(), header.get(), record.get());
 
@@ -156,7 +156,7 @@ TEST(EndToEndTest, ReadRawData_WriteRawData)
     EXPECT_TRUE(writer);
 
     // copy BAM file
-    shared_ptr<bam1_t> record(bam_init1(), Bam1Deleter());
+    PBBAM_SHARED_PTR<bam1_t> record(bam_init1(), Bam1Deleter());
     while (reader.GetNext(record))
         writer.Write(record);
 

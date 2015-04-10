@@ -156,7 +156,7 @@ bool BamRecordImpl::EditTag(const string& tagName, const Tag& newValue)
     return RemoveTag(tagName) && AddTag(tagName, newValue);
 }
 
-BamRecordImpl BamRecordImpl::FromRawData(const shared_ptr<bam1_t>& rawData)
+BamRecordImpl BamRecordImpl::FromRawData(const PBBAM_SHARED_PTR<bam1_t>& rawData)
 {
     BamRecordImpl result;
     bam_copy1(result.d_.get(), rawData.get());

@@ -58,8 +58,6 @@ class Interval
 {
 public:
     typedef boost::icl::discrete_interval<T> interval_type;
-    typedef typename boost::icl::interval_traits<interval_type> interval_traits;
-    typedef typename boost::icl::difference_type_of<interval_traits>::type difference_type;
 
 public:
 
@@ -70,10 +68,13 @@ public:
     inline Interval(void);
 
     /** Constructor for a singleton interval [val,val+1) */
-    inline Interval(const T& val);
+    inline Interval(const T val);
 
     /** Constructor for interval from [start, stop) */
-    inline Interval(const T& start, const T& stop);
+    inline Interval(const T start, const T stop);
+
+    /** Copy constructor */
+    inline Interval(const Interval<T>& other);
 
     /// \}
 
@@ -116,7 +117,7 @@ public:
     inline bool IsValid(void) const;
 
     /// \returns interval length
-    inline difference_type Length(void) const;
+    inline size_t Length(void) const;
 
     /// \}
 
@@ -141,13 +142,18 @@ Interval<T>::Interval(void)
 { }
 
 template<typename T>
-Interval<T>::Interval(const T& val)
+Interval<T>::Interval(const T val)
     : data_(boost::icl::discrete_interval<T>::right_open(val,val+1))
 { }
 
 template<typename T>
-Interval<T>::Interval(const T& start, const T& stop)
+Interval<T>::Interval(const T start, const T stop)
     : data_(boost::icl::discrete_interval<T>::right_open(start,stop))
+{ }
+
+template<typename T>
+Interval<T>::Interval(const Interval<T>& other)
+    : data_(boost::icl::discrete_interval<T>::right_open(other.Start(), other.Stop()))
 { }
 
 template<typename T>
@@ -175,7 +181,7 @@ inline bool Interval<T>::IsValid(void) const
 { return !boost::icl::is_empty(data_); }
 
 template<typename T>
-inline typename Interval<T>::difference_type Interval<T>::Length(void) const
+inline size_t Interval<T>::Length(void) const
 { return boost::icl::length(data_); }
 
 template<typename T>

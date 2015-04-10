@@ -44,6 +44,7 @@ set( PacBioBAM_H
 # sources
 set( PacBioBAM_CPP
 
+    ${PacBioBAM_SourceDir}/Accuracy.cpp
     ${PacBioBAM_SourceDir}/AssertUtils.cpp
     ${PacBioBAM_SourceDir}/BamFile.cpp
     ${PacBioBAM_SourceDir}/BamHeader.cpp
@@ -54,6 +55,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/BamTagCodec.cpp
     ${PacBioBAM_SourceDir}/BamWriter.cpp
     ${PacBioBAM_SourceDir}/Cigar.cpp
+    ${PacBioBAM_SourceDir}/CigarOperation.cpp
     ${PacBioBAM_SourceDir}/EntireFileQuery.cpp
     ${PacBioBAM_SourceDir}/Frames.cpp
     ${PacBioBAM_SourceDir}/GenomicInterval.cpp
@@ -61,14 +63,12 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/IndexedFastaReader.cpp
     ${PacBioBAM_SourceDir}/MemoryUtils.cpp
     ${PacBioBAM_SourceDir}/ProgramInfo.cpp
+    ${PacBioBAM_SourceDir}/QualityValue.cpp
     ${PacBioBAM_SourceDir}/QueryBase.cpp
     ${PacBioBAM_SourceDir}/ReadGroupInfo.cpp
-#    ${PacBioBAM_SourceDir}/SamHeader.cpp
-#    ${PacBioBAM_SourceDir}/SamHeaderCodec.cpp
     ${PacBioBAM_SourceDir}/SamTagCodec.cpp
     ${PacBioBAM_SourceDir}/SequenceInfo.cpp
     ${PacBioBAM_SourceDir}/Tag.cpp
     ${PacBioBAM_SourceDir}/TagCollection.cpp
 #    ${PacBioBAM_SourceDir}/UnmappedReadsQuery.cpp
-
 )

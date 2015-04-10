@@ -42,7 +42,6 @@
 #include "pbbam/BamRecord.h"
 #include "pbbam/Config.h"
 #include <htslib/sam.h>
-#include <memory>
 #include <string>
 
 namespace PacBio {
@@ -125,7 +124,7 @@ public:
     ///            If set to 1, this will force single-threaded execution.
     ///            No checks are made against an upper limit.
     BamWriter(const std::string& filename,
-              const std::shared_ptr<BamHeader>& header,
+              const BamHeader::SharedPtr& header,
               const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
               const size_t numThreads = 4);
 
@@ -186,14 +185,14 @@ public:
 
 private:
     bool Open(const std::string& filename,
-              const std::shared_ptr<bam_hdr_t> rawHeader,
+              const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader,
               const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
               size_t numThreads = 4);
-    bool Write(const std::shared_ptr<bam1_t>& rawRecord);
+    bool Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord);
 
 private:
-    std::shared_ptr<samFile>   file_;
-    std::shared_ptr<bam_hdr_t> header_;
+    PBBAM_SHARED_PTR<samFile>   file_;
+    PBBAM_SHARED_PTR<bam_hdr_t> header_;
     std::string filename_;
     BamWriter::WriteError error_;
 };

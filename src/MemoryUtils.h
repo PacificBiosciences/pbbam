@@ -38,6 +38,7 @@
 #ifndef MEMORYUTILS_H
 #define MEMORYUTILS_H
 
+#include "pbbam/Config.h"
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamRecordImpl.h"
@@ -51,7 +52,7 @@ class BamHeader;
 
 namespace internal {
 
-// intended for use with std::shared_ptr<T>, std::unique_ptr<T>, etc
+// intended for use with PBBAM_SHARED_PTR<T>, std::unique_ptr<T>, etc
 struct HtslibFileDeleter
 {
     void operator()(samFile* file)
@@ -105,9 +106,9 @@ struct HtslibRecordDeleter
 class BamHeaderMemory
 {
 public:
-    static std::shared_ptr<BamHeader> FromRawData(bam_hdr_t* header);
-    static std::shared_ptr<bam_hdr_t> MakeRawHeader(const BamHeader& header);
-    static std::shared_ptr<bam_hdr_t> MakeRawHeader(const std::shared_ptr<BamHeader>& header);
+    static BamHeader::SharedPtr FromRawData(bam_hdr_t* header);
+    static PBBAM_SHARED_PTR<bam_hdr_t> MakeRawHeader(const BamHeader& header);
+    static PBBAM_SHARED_PTR<bam_hdr_t> MakeRawHeader(const BamHeader::SharedPtr& header);
 };
 
 class BamRecordMemory
@@ -115,10 +116,10 @@ class BamRecordMemory
 public:
     static const BamRecordImpl& GetImpl(const BamRecord& r);
     static const BamRecordImpl& GetImpl(const BamRecord* r);
-    static std::shared_ptr<bam1_t> GetRawData(const BamRecord& r);
-    static std::shared_ptr<bam1_t> GetRawData(const BamRecord* r);
-    static std::shared_ptr<bam1_t> GetRawData(const BamRecordImpl& impl);
-    static std::shared_ptr<bam1_t> GetRawData(const BamRecordImpl* impl);
+    static PBBAM_SHARED_PTR<bam1_t> GetRawData(const BamRecord& r);
+    static PBBAM_SHARED_PTR<bam1_t> GetRawData(const BamRecord* r);
+    static PBBAM_SHARED_PTR<bam1_t> GetRawData(const BamRecordImpl& impl);
+    static PBBAM_SHARED_PTR<bam1_t> GetRawData(const BamRecordImpl* impl);
 };
 
 inline const BamRecordImpl& BamRecordMemory::GetImpl(const BamRecord& r)
@@ -127,16 +128,16 @@ inline const BamRecordImpl& BamRecordMemory::GetImpl(const BamRecord& r)
 inline const BamRecordImpl& BamRecordMemory::GetImpl(const BamRecord* r)
 { return r->impl_; }
 
-inline std::shared_ptr<bam1_t> BamRecordMemory::GetRawData(const BamRecord& r)
+inline PBBAM_SHARED_PTR<bam1_t> BamRecordMemory::GetRawData(const BamRecord& r)
 { return GetRawData(r.impl_); }
 
-inline std::shared_ptr<bam1_t> BamRecordMemory::GetRawData(const BamRecord* r)
+inline PBBAM_SHARED_PTR<bam1_t> BamRecordMemory::GetRawData(const BamRecord* r)
 { return GetRawData(r->impl_); }
 
-inline std::shared_ptr<bam1_t> BamRecordMemory::GetRawData(const BamRecordImpl& impl)
+inline PBBAM_SHARED_PTR<bam1_t> BamRecordMemory::GetRawData(const BamRecordImpl& impl)
 { return impl.d_; }
 
-inline std::shared_ptr<bam1_t> BamRecordMemory::GetRawData(const BamRecordImpl* impl)
+inline PBBAM_SHARED_PTR<bam1_t> BamRecordMemory::GetRawData(const BamRecordImpl* impl)
 { return impl->d_; }
 
 } // namespace internal

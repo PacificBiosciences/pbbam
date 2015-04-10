@@ -49,7 +49,7 @@ namespace BAM {
 /// \brief Provides information on the exact (C++) data type held by a Tag.
 enum class TagDataType
 {
-    NONE         = 0     ///< boost::blank
+    INVALID      = 0     ///< boost::blank
   , INT8                 ///< int8_t
   , UINT8                ///< uint8_t
   , INT16                ///< int16_t
@@ -303,7 +303,7 @@ private :
 };
 
 inline bool Tag::IsNull(void) const
-{ return Type() == TagDataType::NONE; }
+{ return Type() == TagDataType::INVALID; }
 
 inline bool Tag::IsInt8(void) const
 { return Type() == TagDataType::INT8; }

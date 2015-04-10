@@ -72,12 +72,12 @@ bool BamReader::HasError(void) const
     return error_ != BamReader::NoError;
 }
 
-bool BamReader::GetNext(std::shared_ptr<BamRecord> record)
+bool BamReader::GetNext(PBBAM_SHARED_PTR<BamRecord> record)
 {
     return GetNext(internal::BamRecordMemory::GetRawData(record.get()));
 }
 
-bool BamReader::GetNext(std::shared_ptr<bam1_t> rawRecord)
+bool BamReader::GetNext(PBBAM_SHARED_PTR<bam1_t> rawRecord)
 {
     const int ret = sam_read1(file_.get(), header_.get(), rawRecord.get());
     if (ret >= 0)
@@ -92,16 +92,16 @@ bool BamReader::GetNext(std::shared_ptr<bam1_t> rawRecord)
     return false;
 }
 
-shared_ptr<BamHeader> BamReader::Header(void) const {
+BamHeader::SharedPtr BamReader::Header(void) const {
 
     if (header_ == nullptr)
-        return shared_ptr<BamHeader>(nullptr);
+        return BamHeader::SharedPtr(nullptr);
 
     // parse header
     const char* text = header_->text;
     const uint32_t l_text = header_->l_text;
     if (text == 0 || l_text == 0)
-        return shared_ptr<BamHeader>(nullptr);
+        return BamHeader::SharedPtr(nullptr);
    return BamHeader::FromSam(string(text, l_text));
 }
 
@@ -131,12 +131,12 @@ bool BamReader::Open(const string& filename)
 
 string BamReader::PacBioBamVersion(void) const
 {
-    const std::shared_ptr<BamHeader> header = internal::BamHeaderMemory::FromRawData(header_.get());
+    const BamHeader::SharedPtr& header = internal::BamHeaderMemory::FromRawData(header_.get());
     if (!header)
         return string();
     return header->PacBioBamVersion();
 }
 
-std::shared_ptr<bam_hdr_t> BamReader::RawHeader(void) const {
+PBBAM_SHARED_PTR<bam_hdr_t> BamReader::RawHeader(void) const {
     return header_;
 }

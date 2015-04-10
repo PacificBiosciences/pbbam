@@ -57,7 +57,7 @@ namespace internal { class BamRecordMemory; }
 
 enum class ClipType
 {
-    NONE
+    CLIP_NONE
   , CLIP_TO_QUERY
   , CLIP_TO_REFERENCE
 };
@@ -85,7 +85,7 @@ public:
     /// \{
 
     BamRecord(void);
-    BamRecord(const std::shared_ptr<BamHeader>& header);
+    BamRecord(const BamHeader::SharedPtr& header);
     BamRecord(const BamRecordImpl& impl);
     BamRecord(BamRecordImpl&& impl);
     BamRecord(const BamRecord& other);
@@ -116,6 +116,10 @@ public:
     /// \returns the record's CIGAR data as a Cigar object
     Cigar CigarData(void) const;
 
+    /// \returns this record's full name
+    /// \sa BamRecordImpl::Name
+    std::string FullName(void) const;
+
     /// \returns true if this record has DeletionQV data
     bool HasDeletionQV(void) const;
 
@@ -141,7 +145,7 @@ public:
     bool HasSubstitutionTag(void) const;
 
     /// \returns shared pointer to this record's associated BamHeader
-    std::shared_ptr<BamHeader> Header(void) const;
+    BamHeader::SharedPtr Header(void) const;
 
     /// \returns ZMW hole number
     int32_t HoleNumber(void) const;
@@ -155,9 +159,6 @@ public:
 
     /// \returns this record's movie name
     std::string MovieName(void) const;
-
-    /// \returns this record's name
-//    std::string Name(void) const;
 
     /// \returns "number of complete passes of the insert"
     int32_t NumPasses(void) const;
@@ -378,6 +379,13 @@ public:
 public:
     /// \name Per-Record Data
     /// \{
+    ///
+
+    /// Sets this record's ZMW hole number.
+    ///
+    /// \param[in] numPasses
+    /// \returns reference to this record
+    BamRecord& HoleNumber(const int32_t holeNumber);
 
     /// Sets this record's "number of complete passes of the insert".
     ///
@@ -456,7 +464,7 @@ public:
 //    BamRecord& QueryEnd(const PacBio::BAM::Position pos);
 //    BamRecord& QueryStart(const PacBio::BAM::Position pos);
 
-//    BamRecord& HoleNumber(const int32_t holeNumber);
+
 //    BamRecord& MovieName(const std::string& movie);
 
 //    BamRecord& ReadGroup(const ReadGroupInfo& rg);
@@ -509,7 +517,7 @@ public:
 
 private:
     BamRecordImpl impl_;
-    std::shared_ptr<BamHeader> header_;
+    BamHeader::SharedPtr header_;
 
     // cached positions (mutable to allow lazy-calc in const methods)
     mutable Position alignedStart_;

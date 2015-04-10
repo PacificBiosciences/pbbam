@@ -131,10 +131,10 @@ TEST(BamRecordMappingTest, BasicMap)
     EXPECT_EQ(110, s1.ReferenceEnd());       // 100 + 10M
 
     EXPECT_EQ(seq,      s1.Sequence());
-    EXPECT_EQ(quals,    s1.Qualities());
+    EXPECT_EQ(quals,    s1.Qualities().Fastq());
     EXPECT_EQ(tagBases, s1.DeletionTag());
-    EXPECT_EQ(tagQuals, s1.DeletionQV());
-    EXPECT_EQ(frames,   s1.IPD());
+    EXPECT_EQ(tagQuals, s1.DeletionQV().Fastq());
+    EXPECT_EQ(frames,   s1.IPD().Data());
 
     // s1 - REVERSE
     EXPECT_TRUE(s1_rev.IsMapped());
@@ -151,17 +151,17 @@ TEST(BamRecordMappingTest, BasicMap)
 
     // - native
     EXPECT_EQ(seq,      s1_rev.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(quals,    s1_rev.Qualities(Orientation::NATIVE));
+    EXPECT_EQ(quals,    s1_rev.Qualities(Orientation::NATIVE).Fastq());
     EXPECT_EQ(tagBases, s1_rev.DeletionTag(Orientation::NATIVE));
-    EXPECT_EQ(tagQuals, s1_rev.DeletionQV(Orientation::NATIVE));
-    EXPECT_EQ(frames,   s1_rev.IPD(Orientation::NATIVE));
+    EXPECT_EQ(tagQuals, s1_rev.DeletionQV(Orientation::NATIVE).Fastq());
+    EXPECT_EQ(frames,   s1_rev.IPD(Orientation::NATIVE).Data());
 
     // - genomic
     EXPECT_EQ(seq_rev,      s1_rev.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(quals_rev,    s1_rev.Qualities(Orientation::GENOMIC));
+    EXPECT_EQ(quals_rev,    s1_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(tagBases_rev, s1_rev.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(tagQuals_rev, s1_rev.DeletionQV(Orientation::GENOMIC));
-    EXPECT_EQ(frames_rev,   s1_rev.IPD(Orientation::GENOMIC));
+    EXPECT_EQ(tagQuals_rev, s1_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(frames_rev,   s1_rev.IPD(Orientation::GENOMIC).Data());
 
     // s2 - FORWARD
     EXPECT_TRUE(s2.IsMapped());
@@ -177,10 +177,10 @@ TEST(BamRecordMappingTest, BasicMap)
     EXPECT_EQ(113, s2.ReferenceEnd());      // 100 + 10M + 3D
 
     EXPECT_EQ(seq,      s2.Sequence());
-    EXPECT_EQ(quals,    s2.Qualities());
+    EXPECT_EQ(quals,    s2.Qualities().Fastq());
     EXPECT_EQ(tagBases, s2.DeletionTag());
-    EXPECT_EQ(tagQuals, s2.DeletionQV());
-    EXPECT_EQ(frames,   s2.IPD());
+    EXPECT_EQ(tagQuals, s2.DeletionQV().Fastq());
+    EXPECT_EQ(frames,   s2.IPD().Data());
 
     // s2 - REVERSE
     EXPECT_TRUE(s2_rev.IsMapped());
@@ -197,17 +197,17 @@ TEST(BamRecordMappingTest, BasicMap)
 
     // - native
     EXPECT_EQ(seq,      s2_rev.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(quals,    s2_rev.Qualities(Orientation::NATIVE));
+    EXPECT_EQ(quals,    s2_rev.Qualities(Orientation::NATIVE).Fastq());
     EXPECT_EQ(tagBases, s2_rev.DeletionTag(Orientation::NATIVE));
-    EXPECT_EQ(tagQuals, s2_rev.DeletionQV(Orientation::NATIVE));
-    EXPECT_EQ(frames,   s2_rev.IPD(Orientation::NATIVE));
+    EXPECT_EQ(tagQuals, s2_rev.DeletionQV(Orientation::NATIVE).Fastq());
+    EXPECT_EQ(frames,   s2_rev.IPD(Orientation::NATIVE).Data());
 
     // - genomic
     EXPECT_EQ(seq_rev,      s2_rev.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(quals_rev,    s2_rev.Qualities(Orientation::GENOMIC));
+    EXPECT_EQ(quals_rev,    s2_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(tagBases_rev, s2_rev.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(tagQuals_rev, s2_rev.DeletionQV(Orientation::GENOMIC));
-    EXPECT_EQ(frames_rev,   s2_rev.IPD(Orientation::GENOMIC));
+    EXPECT_EQ(tagQuals_rev, s2_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(frames_rev,   s2_rev.IPD(Orientation::GENOMIC).Data());
 
     // s3 - FORWARD
     EXPECT_TRUE(s3.IsMapped());
@@ -223,10 +223,10 @@ TEST(BamRecordMappingTest, BasicMap)
     EXPECT_EQ(111, s3.ReferenceEnd());      // 100 + 8M + 3D
 
     EXPECT_EQ(seq,      s3.Sequence());
-    EXPECT_EQ(quals,    s3.Qualities());
+    EXPECT_EQ(quals,    s3.Qualities().Fastq());
     EXPECT_EQ(tagBases, s3.DeletionTag());
-    EXPECT_EQ(tagQuals, s3.DeletionQV());
-    EXPECT_EQ(frames,   s3.IPD());
+    EXPECT_EQ(tagQuals, s3.DeletionQV().Fastq());
+    EXPECT_EQ(frames,   s3.IPD().Data());
 
     // s3 - REVERSE
     EXPECT_TRUE(s3_rev.IsMapped());
@@ -243,17 +243,17 @@ TEST(BamRecordMappingTest, BasicMap)
 
     // - native
     EXPECT_EQ(seq,      s3_rev.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(quals,    s3_rev.Qualities(Orientation::NATIVE));
+    EXPECT_EQ(quals,    s3_rev.Qualities(Orientation::NATIVE).Fastq());
     EXPECT_EQ(tagBases, s3_rev.DeletionTag(Orientation::NATIVE));
-    EXPECT_EQ(tagQuals, s3_rev.DeletionQV(Orientation::NATIVE));
-    EXPECT_EQ(frames,   s3_rev.IPD(Orientation::NATIVE));
+    EXPECT_EQ(tagQuals, s3_rev.DeletionQV(Orientation::NATIVE).Fastq());
+    EXPECT_EQ(frames,   s3_rev.IPD(Orientation::NATIVE).Data());
 
     // - genomic
     EXPECT_EQ(seq_rev,      s3_rev.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(quals_rev,    s3_rev.Qualities(Orientation::GENOMIC));
+    EXPECT_EQ(quals_rev,    s3_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(tagBases_rev, s3_rev.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(tagQuals_rev, s3_rev.DeletionQV(Orientation::GENOMIC));
-    EXPECT_EQ(frames_rev,   s3_rev.IPD(Orientation::GENOMIC));
+    EXPECT_EQ(tagQuals_rev, s3_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(frames_rev,   s3_rev.IPD(Orientation::GENOMIC).Data());
 }
 
 TEST(BamRecordMappingTest, SoftClipMapping)
@@ -305,10 +305,10 @@ TEST(BamRecordMappingTest, SoftClipMapping)
     EXPECT_EQ(110, s1.ReferenceEnd());       // RefStart + 10M
 
     EXPECT_EQ(seq,      s1.Sequence());
-    EXPECT_EQ(quals,    s1.Qualities());
+    EXPECT_EQ(quals,    s1.Qualities().Fastq());
     EXPECT_EQ(tagBases, s1.DeletionTag());
-    EXPECT_EQ(tagQuals, s1.DeletionQV());
-    EXPECT_EQ(frames,   s1.IPD());
+    EXPECT_EQ(tagQuals, s1.DeletionQV().Fastq());
+    EXPECT_EQ(frames,   s1.IPD().Data());
 
     // s1 - REVERSE
     EXPECT_TRUE(s1_rev.IsMapped());
@@ -325,17 +325,17 @@ TEST(BamRecordMappingTest, SoftClipMapping)
 
     // - native
     EXPECT_EQ(seq,      s1_rev.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(quals,    s1_rev.Qualities(Orientation::NATIVE));
+    EXPECT_EQ(quals,    s1_rev.Qualities(Orientation::NATIVE).Fastq());
     EXPECT_EQ(tagBases, s1_rev.DeletionTag(Orientation::NATIVE));
-    EXPECT_EQ(tagQuals, s1_rev.DeletionQV(Orientation::NATIVE));
-    EXPECT_EQ(frames,   s1_rev.IPD(Orientation::NATIVE));
+    EXPECT_EQ(tagQuals, s1_rev.DeletionQV(Orientation::NATIVE).Fastq());
+    EXPECT_EQ(frames,   s1_rev.IPD(Orientation::NATIVE).Data());
 
     // - genomic
     EXPECT_EQ(seq_rev,      s1_rev.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(quals_rev,    s1_rev.Qualities(Orientation::GENOMIC));
+    EXPECT_EQ(quals_rev,    s1_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(tagBases_rev, s1_rev.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(tagQuals_rev, s1_rev.DeletionQV(Orientation::GENOMIC));
-    EXPECT_EQ(frames_rev,   s1_rev.IPD(Orientation::GENOMIC));
+    EXPECT_EQ(tagQuals_rev, s1_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(frames_rev,   s1_rev.IPD(Orientation::GENOMIC).Data());
 
     // s2 - FORWARD
     EXPECT_TRUE(s2.IsMapped());
@@ -351,10 +351,10 @@ TEST(BamRecordMappingTest, SoftClipMapping)
     EXPECT_EQ(113, s2.ReferenceEnd());       // RefStart + 10M + 3D
 
     EXPECT_EQ(seq,      s2.Sequence());
-    EXPECT_EQ(quals,    s2.Qualities());
+    EXPECT_EQ(quals,    s2.Qualities().Fastq());
     EXPECT_EQ(tagBases, s2.DeletionTag());
-    EXPECT_EQ(tagQuals, s2.DeletionQV());
-    EXPECT_EQ(frames,   s2.IPD());
+    EXPECT_EQ(tagQuals, s2.DeletionQV().Fastq());
+    EXPECT_EQ(frames,   s2.IPD().Data());
 
     // s2 - REVERSE
     EXPECT_TRUE(s2_rev.IsMapped());
@@ -371,17 +371,17 @@ TEST(BamRecordMappingTest, SoftClipMapping)
 
     // - native
     EXPECT_EQ(seq,      s2_rev.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(quals,    s2_rev.Qualities(Orientation::NATIVE));
+    EXPECT_EQ(quals,    s2_rev.Qualities(Orientation::NATIVE).Fastq());
     EXPECT_EQ(tagBases, s2_rev.DeletionTag(Orientation::NATIVE));
-    EXPECT_EQ(tagQuals, s2_rev.DeletionQV(Orientation::NATIVE));
-    EXPECT_EQ(frames,   s2_rev.IPD(Orientation::NATIVE));
+    EXPECT_EQ(tagQuals, s2_rev.DeletionQV(Orientation::NATIVE).Fastq());
+    EXPECT_EQ(frames,   s2_rev.IPD(Orientation::NATIVE).Data());
 
     // - genomic
     EXPECT_EQ(seq_rev,      s2_rev.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(quals_rev,    s2_rev.Qualities(Orientation::GENOMIC));
+    EXPECT_EQ(quals_rev,    s2_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(tagBases_rev, s2_rev.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(tagQuals_rev, s2_rev.DeletionQV(Orientation::GENOMIC));
-    EXPECT_EQ(frames_rev,   s2_rev.IPD(Orientation::GENOMIC));
+    EXPECT_EQ(tagQuals_rev, s2_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(frames_rev,   s2_rev.IPD(Orientation::GENOMIC).Data());
 
     // s3 - FORWARD
     EXPECT_TRUE(s3.IsMapped());
@@ -397,10 +397,10 @@ TEST(BamRecordMappingTest, SoftClipMapping)
     EXPECT_EQ(111, s3.ReferenceEnd());       // RefStart + 8M + 3D
 
     EXPECT_EQ(seq,      s3.Sequence());
-    EXPECT_EQ(quals,    s3.Qualities());
+    EXPECT_EQ(quals,    s3.Qualities().Fastq());
     EXPECT_EQ(tagBases, s3.DeletionTag());
-    EXPECT_EQ(tagQuals, s3.DeletionQV());
-    EXPECT_EQ(frames,   s3.IPD());
+    EXPECT_EQ(tagQuals, s3.DeletionQV().Fastq());
+    EXPECT_EQ(frames,   s3.IPD().Data());
 
     // s3 - REVERSE
     EXPECT_TRUE(s3_rev.IsMapped());
@@ -417,17 +417,17 @@ TEST(BamRecordMappingTest, SoftClipMapping)
 
     // - native
     EXPECT_EQ(seq,      s3_rev.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(quals,    s3_rev.Qualities(Orientation::NATIVE));
+    EXPECT_EQ(quals,    s3_rev.Qualities(Orientation::NATIVE).Fastq());
     EXPECT_EQ(tagBases, s3_rev.DeletionTag(Orientation::NATIVE));
-    EXPECT_EQ(tagQuals, s3_rev.DeletionQV(Orientation::NATIVE));
-    EXPECT_EQ(frames,   s3_rev.IPD(Orientation::NATIVE));
+    EXPECT_EQ(tagQuals, s3_rev.DeletionQV(Orientation::NATIVE).Fastq());
+    EXPECT_EQ(frames,   s3_rev.IPD(Orientation::NATIVE).Data());
 
     // - genomic
     EXPECT_EQ(seq_rev,      s3_rev.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(quals_rev,    s3_rev.Qualities(Orientation::GENOMIC));
+    EXPECT_EQ(quals_rev,    s3_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(tagBases_rev, s3_rev.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(tagQuals_rev, s3_rev.DeletionQV(Orientation::GENOMIC));
-    EXPECT_EQ(frames_rev,   s3_rev.IPD(Orientation::GENOMIC));
+    EXPECT_EQ(tagQuals_rev, s3_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(frames_rev,   s3_rev.IPD(Orientation::GENOMIC).Data());
 }
 
 TEST(BamRecordMappingTest, MappedCopy)
@@ -458,10 +458,10 @@ TEST(BamRecordMappingTest, MappedCopy)
     EXPECT_EQ(111, mapped.ReferenceEnd());    // RefStart + 8M + 3D
 
     EXPECT_EQ(seq,      mapped.Sequence());
-    EXPECT_EQ(quals,    mapped.Qualities());
+    EXPECT_EQ(quals,    mapped.Qualities().Fastq());
     EXPECT_EQ(tagBases, mapped.DeletionTag());
-    EXPECT_EQ(tagQuals, mapped.DeletionQV());
-    EXPECT_EQ(frames,   mapped.IPD());
+    EXPECT_EQ(tagQuals, mapped.DeletionQV().Fastq());
+    EXPECT_EQ(frames,   mapped.IPD().Data());
 }
 
 TEST(BamRecordMappingTest, StaticMapped)
@@ -492,8 +492,8 @@ TEST(BamRecordMappingTest, StaticMapped)
     EXPECT_EQ(111, mapped.ReferenceEnd());    // RefStart + 8M + 3D
 
     EXPECT_EQ(seq,      mapped.Sequence());
-    EXPECT_EQ(quals,    mapped.Qualities());
+    EXPECT_EQ(quals,    mapped.Qualities().Fastq());
     EXPECT_EQ(tagBases, mapped.DeletionTag());
-    EXPECT_EQ(tagQuals, mapped.DeletionQV());
-    EXPECT_EQ(frames,   mapped.IPD());
+    EXPECT_EQ(tagQuals, mapped.DeletionQV().Fastq());
+    EXPECT_EQ(frames,   mapped.IPD().Data());
 }

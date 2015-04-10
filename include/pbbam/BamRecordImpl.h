@@ -44,7 +44,6 @@
 #include "pbbam/Position.h"
 #include "pbbam/QualityValues.h"
 #include "pbbam/TagCollection.h"
-#include <memory>
 #include <string>
 
 namespace PacBio {
@@ -425,7 +424,7 @@ public:
 
 private:
     // returns a BamRecordImpl object, with a deep copy of @rawData contents
-    static BamRecordImpl FromRawData(const std::shared_ptr<bam1_t>& rawData);
+    static BamRecordImpl FromRawData(const PBBAM_SHARED_PTR<bam1_t>& rawData);
 
     // internal memory setup/expand methods
     void InitializeData(void);
@@ -440,7 +439,7 @@ private:
 private:
 
     // data members
-    std::shared_ptr<bam1_t> d_;
+    PBBAM_SHARED_PTR<bam1_t> d_;
 
     // friends
     friend class internal::BamRecordMemory;

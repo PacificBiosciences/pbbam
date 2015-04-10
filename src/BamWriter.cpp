@@ -63,7 +63,7 @@ BamWriter::BamWriter(const std::string& filename,
 
 
 BamWriter::BamWriter(const std::string& filename,
-                     const std::shared_ptr<BamHeader>& header,
+                     const BamHeader::SharedPtr& header,
                      const BamWriter::CompressionLevel compressionLevel,
                      const size_t numThreads)
     : file_(nullptr)
@@ -107,7 +107,7 @@ bool BamWriter::Flush(void)
 }
 
 bool BamWriter::Open(const string& filename,
-                     const shared_ptr<bam_hdr_t> rawHeader,
+                     const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader,
                      const CompressionLevel compressionLevel,
                      size_t numThreads)
 {
@@ -167,7 +167,7 @@ bool BamWriter::Write(const BamRecordImpl& recordImpl)
     return Write(internal::BamRecordMemory::GetRawData(recordImpl));
 }
 
-bool BamWriter::Write(const std::shared_ptr<bam1_t>& rawRecord)
+bool BamWriter::Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord)
 {
     const int ret = sam_write1(file_.get(), header_.get(), rawRecord.get());
     if (ret > 0)

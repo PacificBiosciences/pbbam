@@ -36,51 +36,10 @@
 // Author: Derek Barnett
 
 #include "pbbam/Cigar.h"
-#include <htslib/sam.h>
-#include <array>
 #include <sstream>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
-
-namespace internal {
-
-typedef array<CigarOperationType, 128> CigarLookup;
-
-static
-CigarLookup InitCigarLookup(void)
-{
-    CigarLookup cl;
-    cl.fill(CigarOperationType::UNKNOWN);
-    cl['M'] = CigarOperationType::ALIGNMENT_MATCH;
-    cl['I'] = CigarOperationType::INSERTION;
-    cl['D'] = CigarOperationType::DELETION;
-    cl['N'] = CigarOperationType::REFERENCE_SKIP;
-    cl['S'] = CigarOperationType::SOFT_CLIP;
-    cl['H'] = CigarOperationType::HARD_CLIP;
-    cl['P'] = CigarOperationType::PADDING;
-    cl['='] = CigarOperationType::SEQUENCE_MATCH;
-    cl['X'] = CigarOperationType::SEQUENCE_MISMATCH;
-    return cl;
-}
-
-const static CigarLookup cigarLookup_ = InitCigarLookup();
-
-} // namespace internal
-
-// ----------------
-// CigarOperation
-
-CigarOperationType CigarOperation::CharToType(const char c)
-{   return (static_cast<uint8_t>(c) >= 128 ? CigarOperationType::UNKNOWN
-                                           : internal::cigarLookup_[c] );
-}
-
-char CigarOperation::TypeToChar(const CigarOperationType& type)
-{ return bam_cigar_opchr(static_cast<int>(type)); }
-
-// ----------------
-// Cigar
 
 Cigar::Cigar(const string& cigarString)
     : vector<CigarOperation>()

@@ -38,121 +38,13 @@
 #ifndef CIGAR_H
 #define CIGAR_H
 
+#include "pbbam/CigarOperation.h"
 #include "pbbam/Config.h"
-#include <map>
 #include <string>
 #include <vector>
 
 namespace PacBio {
 namespace BAM {
-
-/// Describes a CIGAR operation. Bracketed character is the corresponding SAM/BAM character code.
-enum class CigarOperationType
-{
-    UNKNOWN           = -1 ///< unknown/invalid CIGAR operator
-  , ALIGNMENT_MATCH   = 0  ///< alignment match (can be a sequence match or mismatch) [M]
-  , INSERTION              ///< insertion to the reference [I]
-  , DELETION               ///< deletion from the reference [D]
-  , REFERENCE_SKIP         ///< skipped region from the reference [N]
-  , SOFT_CLIP              ///< soft clipping (clipped sequences present in SEQ) [S]
-  , HARD_CLIP         = 5  ///< hard clipping (clipped sequences NOT present in SEQ) [H]
-  , PADDING                ///< padding (silent deletion from padded reference) [P]
-  , SEQUENCE_MATCH         ///< sequence match [=]
-  , SEQUENCE_MISMATCH      ///< sequence mismatch [X]
-
-    // TODO: looks like there is a new 'B' type in htslib soure...
-    //       no reference in htslib docs though yet as to what it means
-};
-
-class PBBAM_EXPORT CigarOperation
-{
-public:
-
-    /// \name Operation Type Conversion Methods
-    /// \{
-
-    /// Convert between CigarOperationType enum & SAM/BAM character code.
-    ///
-    /// \param[in] type CigarOperationType value
-    /// \returns SAM/BAM character code
-    static char TypeToChar(const CigarOperationType& type);
-
-    /// Convert between CigarOperationType enum & SAM/BAM character code.
-    ///
-    /// \param[in] c SAM/BAM character code
-    /// \returns CigarOperationType value
-    static CigarOperationType CharToType(const char c);
-
-    /// \}
-
-public:
-    /// \name Constructors & Related Methods
-    /// \{
-
-    CigarOperation(void);
-    CigarOperation(char c, uint32_t length);
-    CigarOperation(CigarOperationType op, uint32_t length);
-    CigarOperation(const CigarOperation& other);
-    CigarOperation(CigarOperation&& other) = default;
-    CigarOperation& operator=(const CigarOperation& other) = default;
-    CigarOperation& operator=(CigarOperation&& other) = default;
-    ~CigarOperation(void);
-
-    /// \}
-
-public:
-
-    /// \returns operation type as SAM/BAM char code
-    inline char Char(void) const;
-
-    /// \returns operation length
-    inline uint32_t Length(void) const;
-
-    /// \returns operation type as CigarOperationType enum value
-    inline CigarOperationType Type(void) const;
-
-    /// \}
-
-public:
-    /// \name Attributes
-    /// \{
-
-    /// Sets this operation type.
-    ///
-    /// \param[in] opChar SAM/BAM character code
-    /// \returns reference to this operation
-    inline CigarOperation& Char(const char opChar);
-
-    /// Sets this operation length.
-    ///
-    /// \param[in] length
-    /// \returns reference to this operation
-    inline CigarOperation& Length(const uint32_t length);
-
-    /// Sets this operation type.
-    ///
-    /// \param[in] opType CigarOperationType value
-    /// \returns reference to this operation
-    inline CigarOperation& Type(const CigarOperationType& opType);
-
-    /// \}
-
-public:
-    /// \name Comparison Operators
-    /// \{
-
-    /// \returns true if both CIGAR operation type & length match
-    inline bool operator==(const CigarOperation& other) const;
-
-    /// \returns true if either CIGAR operation type or length differ
-    inline bool operator!=(const CigarOperation& other) const;
-
-    /// \} 
-
-private:
-    CigarOperationType type_;
-    uint32_t length_;
-};
 
 class PBBAM_EXPORT Cigar : public std::vector<CigarOperation>
 {
@@ -194,56 +86,6 @@ public:
 
     /// \}
 };
-
-// CigarOperation
-
-inline CigarOperation::CigarOperation(void)
-    : type_(CigarOperationType::UNKNOWN)
-    , length_(0)
-{ }
-
-inline CigarOperation::CigarOperation(char c, uint32_t length)
-    : type_(CigarOperation::CharToType(c))
-    , length_(length)
-{ }
-
-inline CigarOperation::CigarOperation(CigarOperationType op, uint32_t length)
-    : type_(op)
-    , length_(length)
-{ }
-
-inline CigarOperation::CigarOperation(const CigarOperation& other)
-    : type_(other.type_)
-    , length_(other.length_)
-{ }
-
-inline CigarOperation::~CigarOperation(void) { }
-
-inline uint32_t CigarOperation::Length(void) const
-{ return length_; }
-
-inline CigarOperation& CigarOperation::Length(const uint32_t length)
-{ length_ = length; return *this; }
-
-inline CigarOperationType CigarOperation::Type(void) const
-{ return type_; }
-
-inline CigarOperation &CigarOperation::Type(const CigarOperationType& opType)
-{ type_ = opType; return *this; }
-
-inline char CigarOperation::Char(void) const
-{ return CigarOperation::TypeToChar(type_); }
-
-inline CigarOperation &CigarOperation::Char(const char opChar)
-{ type_ = CigarOperation::CharToType(opChar);return *this; }
-
-inline bool CigarOperation::operator==(const CigarOperation& other) const
-{ return type_ == other.type_ && length_ == other.length_; }
-
-inline bool CigarOperation::operator!=(const CigarOperation& other) const
-{ return !(*this == other); }
-
-// Cigar
 
 inline Cigar::Cigar(void)
     : std::vector<CigarOperation>()

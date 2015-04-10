@@ -41,7 +41,6 @@
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamHeader.h"
 #include "pbbam/Config.h"
-#include <memory>
 #include <string>
 
 namespace PacBio {
@@ -60,7 +59,7 @@ public:
     /// \{
 
     BamRecordBuilder(void);
-    explicit BamRecordBuilder(const std::shared_ptr<BamHeader>& header);
+    explicit BamRecordBuilder(const BamHeader::SharedPtr& header);
     BamRecordBuilder(const BamRecord& prototype);
     BamRecordBuilder(const BamRecordBuilder& other);
     BamRecordBuilder(BamRecordBuilder&& other);
@@ -217,7 +216,7 @@ public:
     BamRecordBuilder& Tags(TagCollection&& tags);
 
 private:
-    std::shared_ptr<BamHeader> header_;
+    BamHeader::SharedPtr header_;
 
     bam1_core_t core_;
     std::string name_;

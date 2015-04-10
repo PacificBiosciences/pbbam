@@ -59,9 +59,9 @@ TEST(QualityValueTest, FromNumber)
     const QualityValue valid(42);
     const QualityValue max(93);
     const QualityValue tooHigh(94);
-    const QualityValue wayTooHigh(188);
+    const QualityValue wayTooHigh(INT8_MAX);
 
-    EXPECT_EQ(0, zero);
+    EXPECT_EQ(0,  zero);
     EXPECT_EQ(33, thirtyThree);
     EXPECT_EQ(42, valid);
     EXPECT_EQ(93, max);
