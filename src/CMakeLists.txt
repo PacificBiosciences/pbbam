@@ -28,7 +28,7 @@ else()
             ${Boost_INCLUDE_DIRS}
         )
         set(PacBioBAM_DependencyLibraries
-            ${Htslib_LibDir}/libhts.so
+            ${Htslib_LibDir}/libhts${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_THREAD_LIBS_INIT}
             ${ZLIB_LIBRARIES}
         )
@@ -113,7 +113,7 @@ set(PacBioBAM_INCLUDE_DIRS
 
 if(${building_shared})
     set(PacBioBAM_LIBRARIES
-        ${PacBioBAM_LibDir}/libpbbam.so ${PacBioBAM_DependencyLibraries}
+        ${PacBioBAM_LibDir}/libpbbam${CMAKE_SHARED_LIBRARY_SUFFIX} ${PacBioBAM_DependencyLibraries}
         CACHE INTERNAL
         "${PROJECT_NAME}: Libraries"
         FORCE
