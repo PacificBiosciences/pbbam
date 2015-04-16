@@ -55,6 +55,12 @@ enum class BaseFeature
   , SUBSTITUTION_TAG
   , IPD
   , PULSE_WIDTH
+  , PKMID
+  , PKMEAN
+  , LABEL
+  , LABEL_QV
+  , ALT_LABEL
+  , ALT_LABEL_QV
 };
 
 class PBBAM_EXPORT ReadGroupInfo
