@@ -140,7 +140,18 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
 
     TagCollection tags;
     tags["SQ"] = subQv;
+
+    Tag asciiTag('J');
+    asciiTag.Modifier(TagModifier::ASCII_CHAR);
+
+    // add ASCII tag via TagCollection
+    tags["a1"] = asciiTag;
     result.bamRecord.impl_.Tags(tags);
+
+    // add ASCII tag via BamRecordImpl
+    Tag asciiTag2('K');
+    asciiTag2.Modifier(TagModifier::ASCII_CHAR);
+    result.bamRecord.impl_.AddTag("a2", asciiTag2);
 
     BamHeader headerSubreads;
     headerSubreads.Version("1.1")
@@ -160,10 +171,22 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
 
     auto inputRecord = PBBAM_SHARED_PTR<BamRecord>(new BamRecord);
     EXPECT_TRUE(reader.GetNext(inputRecord));
-    EXPECT_EQ(std::string("ACGTC"),   inputRecord->impl_.Sequence());
-    EXPECT_EQ(std::string("ZMW\\42"), inputRecord->impl_.Name());
-    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), inputRecord->impl_.Tags().at("SQ").ToUInt8Array());
-//    EXPECT_EQ(std::vector<uint16_t>({34, 5, 125}), inputRecord.Tags().at("SQ").ToUInt16Array());
+
+    const BamRecordImpl& impl = inputRecord->Impl();
+    EXPECT_EQ(std::string("ACGTC"),   impl.Sequence());
+    EXPECT_EQ(std::string("ZMW\\42"), impl.Name());
+
+    const TagCollection& implTags = impl.Tags();
+    EXPECT_TRUE(implTags.Contains("SQ"));
+    EXPECT_TRUE(implTags.Contains("a1"));
+    EXPECT_TRUE(implTags.Contains("a2"));
+
+    const Tag sqTag = impl.TagValue("SQ");
+    const Tag a1Tag = impl.TagValue("a1");
+    const Tag a2Tag = impl.TagValue("a2");
+    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), sqTag.ToUInt8Array());
+    EXPECT_EQ('J', a1Tag.ToAscii());
+    EXPECT_EQ('K', a2Tag.ToAscii());
 
     reader.Close();
     remove("42.subreads.bam");

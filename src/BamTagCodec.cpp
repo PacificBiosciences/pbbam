@@ -469,18 +469,28 @@ vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag)
 
 uint8_t BamTagCodec::TagTypeCode(const Tag &tag)
 {
-    switch ( tag.Type() ) {
-        case TagDataType::INT8 :
-        {
-            return tag.HasModifier(TagModifier::ASCII_CHAR) ? static_cast<uint8_t>('A')
-                                                            : static_cast<uint8_t>('c');
+    if ( tag.HasModifier(TagModifier::ASCII_CHAR) ) {
+        int64_t value = 0;
+        switch ( tag.Type() ) {
+            case TagDataType::INT8   : value = static_cast<int64_t>(tag.ToInt8());   break;
+            case TagDataType::UINT8  : value = static_cast<int64_t>(tag.ToUInt8());  break;
+            case TagDataType::INT16  : value = static_cast<int64_t>(tag.ToInt16());  break;
+            case TagDataType::UINT16 : value = static_cast<int64_t>(tag.ToUInt16()); break;
+            case TagDataType::INT32  : value = static_cast<int64_t>(tag.ToInt32());  break;
+            case TagDataType::UINT32 : value = static_cast<int64_t>(tag.ToUInt32()); break;
+            default:
+                // non integers not
+                PB_ASSERT_OR_RETURN_VALUE(false, 0);
         }
-        case TagDataType::UINT8 :
-        {
-            return tag.HasModifier(TagModifier::ASCII_CHAR) ? static_cast<uint8_t>('A')
-                                                            : static_cast<uint8_t>('C');
-        }
+        // printable range
+        PB_ASSERT_OR_RETURN_VALUE(value >= 33,  0);
+        PB_ASSERT_OR_RETURN_VALUE(value <= 126, 0);
+        return static_cast<uint8_t>('A');
+    }
 
+    switch ( tag.Type() ) {
+        case TagDataType::INT8   : return static_cast<uint8_t>('c');
+        case TagDataType::UINT8  : return static_cast<uint8_t>('C');
         case TagDataType::INT16  : return static_cast<uint8_t>('s');
         case TagDataType::UINT16 : return static_cast<uint8_t>('S');
         case TagDataType::INT32  : return static_cast<uint8_t>('i');
