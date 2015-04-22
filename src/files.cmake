@@ -32,6 +32,8 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/Strand.h
     ${PacBioBAM_IncludeDir}/pbbam/Tag.h
     ${PacBioBAM_IncludeDir}/pbbam/TagCollection.h
+    ${PacBioBAM_IncludeDir}/pbbam/GroupQueryBase.h
+    ${PacBioBAM_IncludeDir}/pbbam/GroupQuery.h
 #    ${PacBioBAM_IncludeDir}/pbbam/UnmappedReadsQuery.h
 
     # internal headers
@@ -70,5 +72,6 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/SequenceInfo.cpp
     ${PacBioBAM_SourceDir}/Tag.cpp
     ${PacBioBAM_SourceDir}/TagCollection.cpp
+    ${PacBioBAM_SourceDir}/GroupQuery.cpp
 #    ${PacBioBAM_SourceDir}/UnmappedReadsQuery.cpp
 )

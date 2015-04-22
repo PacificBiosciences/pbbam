@@ -29,6 +29,7 @@ set( PacBioBAMTest_CPP
 #    ${PacBioBAM_TestsDir}/src/test_SamHeader.cpp
     ${PacBioBAM_TestsDir}/src/test_Tags.cpp
     ${PacBioBAM_TestsDir}/src/test_UnmappedReadsQuery.cpp
+    ${PacBioBAM_TestsDir}/src/test_GroupQuery.cpp
 )
 
 # GoogleTest headers
