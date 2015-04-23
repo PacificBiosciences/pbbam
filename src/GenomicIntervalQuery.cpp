@@ -106,9 +106,6 @@ GenomicIntervalQuery& GenomicIntervalQuery::Interval(const GenomicInterval& inte
     // if file-related error, or missing data - setting a new interval
     // can't help anything. just get out of here
     if (!htsFile_ || !htsHeader_ || !htsIndex_) {
-        if (!htsFile_)   cerr << "HTS file null" << endl;
-        if (!htsHeader_) cerr << "HTS header null" << endl;
-        if (!htsIndex_)  cerr << "HTS index null" << endl;
         throw std::exception();
     }
 
