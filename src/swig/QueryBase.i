@@ -12,12 +12,11 @@ using namespace PacBio::BAM;
 // Python
 #ifdef SWIGPYTHON
 %rename(__nonzero__) PacBio::BAM::QueryBase::operator bool; 
-#endif // Python
-
-// R
-#ifdef SWIGR
+#elif defined(SWIGR)
 %rename(isTRUE) PacBio::BAM::QueryBase::operator bool;
-#endif // R
+#else // C#
+%rename(IsTrue) PacBio::BAM::QueryBase::operator bool;
+#endif
 
 %include <pbbam/QueryBase.h>
 

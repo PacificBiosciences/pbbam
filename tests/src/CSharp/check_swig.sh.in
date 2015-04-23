@@ -1,0 +1,18 @@
+#!/bin/sh
+(cd ${PacBioBAM_CSharpLibDir}; xbuild PacBio.BAM.csproj)
+
+${CSHARP_COMPILER} -lib:${PacBioBAM_CSharpLibDir}/bin/Debug -r:PacBio.BAM.dll CheckSWIG.cs
+
+#
+# For deployment these all need to be installed somewhere more sensible.
+# This is just a hack for testing if the build works.
+#
+LIBRARY_PATHS=\
+${PacBioBAM_CSharpLibDir}:\
+${PacBioBAM_LibDir}:\
+${Htslib_LibDir}
+
+DYLD_LIBRARY_PATH=$LIBRARY_PATHS \
+LD_LIBRARY_PATH=$LIBRARY_PATHS \
+MONO_PATH=${PacBioBAM_CSharpLibDir}/bin/Debug \
+mono CheckSWIG.exe

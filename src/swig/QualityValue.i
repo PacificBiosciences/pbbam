@@ -10,9 +10,7 @@ using namespace PacBio::BAM;
 
 #ifdef SWIGPYTHON
 %rename(__int__) PacBio::BAM::QualityValue::operator uint8_t;
-#endif 
-
-#ifdef SWIGR
+#else // R, C#
 %rename(ToInt) PacBio::BAM::QualityValue::operator uint8_t;
 #endif
 

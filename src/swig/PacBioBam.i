@@ -15,18 +15,35 @@ endif*/
 #define SWIG_FILE_WITH_INIT
 #define PBBAM_EXPORT
 
+#ifdef SWIGCSHARP
+%rename(Equals)        *::operator==;
+%rename(ToBool)        *::operator bool;
+%rename(ToInt)         *::operator int;
+%rename(ToUint8)       *::operator uint8_t;
+
+%ignore *::operator !=;
+
+// Iterator interfaces are not useful outside of C++
+%ignore *::begin;
+%ignore *::end;
+
+%csmethodmodifiers *::ToString() const "public override";
+
+#endif // SWIGCSHARP
+
+
+
+
 /********* SWIG includes ************/
 
 %include "exception.i"
 %include "stdint.i"
 %include "std_common.i"
 
-#ifdef SWIGPYTHON
-%include "std_shared_ptr.i"
-#endif
-
 #ifdef SWIGR
 %include "boost_shared_ptr.i"
+#else
+%include "std_shared_ptr.i"
 #endif
 
 %include "std_map.i"

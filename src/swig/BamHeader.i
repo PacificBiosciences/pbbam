@@ -7,6 +7,10 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 %}
 
+
+// Hide warnings about "internal" being a C# reserved word
+%warnfilter(314) PacBio::BAM::internal;
+
 %ignore PacBio::BAM::BamHeader::BamHeader(BamHeader&&);      // move ctors not used
 %ignore PacBio::BAM::BamHeader::operator=;                   // assignment operators not used
 

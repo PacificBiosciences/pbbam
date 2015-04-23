@@ -61,6 +61,7 @@ set(PacBioBAM_BinDir        ${PacBioBAM_RootDir}/bin)
 set(PacBioBAM_DocsDir       ${PacBioBAM_RootDir}/docs)
 set(PacBioBAM_IncludeDir    ${PacBioBAM_RootDir}/include)
 set(PacBioBAM_SourceDir     ${PacBioBAM_RootDir}/src)
+set(PacBioBAM_SwigSourceDir ${PacBioBAM_RootDir}/src/swig)
 set(PacBioBAM_TestsDir      ${PacBioBAM_RootDir}/tests)
 
 if(PacBioBAM_build_chef)

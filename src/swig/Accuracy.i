@@ -8,9 +8,7 @@ using namespace PacBio::BAM;
 
 #ifdef SWIGPYTHON
 %rename(__int__) PacBio::BAM::Accuracy::operator int;
-#endif
-
-#ifdef SWIGR
+#else // C#, R
 %rename(ToInt) PacBio::BAM::Accuracy::operator int;
 #endif
 
