@@ -81,6 +81,7 @@ public:
 
     ReadGroupInfo(void);
     ReadGroupInfo(const std::string& id);
+    ReadGroupInfo(const std::string& movieName, const std::string& readType);
     ReadGroupInfo(const ReadGroupInfo& other);
     ReadGroupInfo(ReadGroupInfo&& other);
     ReadGroupInfo& operator=(const ReadGroupInfo& other);
@@ -159,6 +160,8 @@ public:
 
     ReadGroupInfo& Id(const std::string& id);
 
+    ReadGroupInfo& Id(const std::string& movieName, const std::string& readType);
+
     ReadGroupInfo& KeySequence(const std::string& sequence);
 
     ReadGroupInfo& Library(const std::string& library);
@@ -205,6 +208,10 @@ private:
     std::string EncodeSamDescription(void) const;
     void DecodeSamDescription(const std::string& description);
 };
+
+PBBAM_EXPORT
+std::string MakeReadGroupId(const std::string& movieName,
+                            const std::string& readType);
 
 inline const std::string& ReadGroupInfo::BasecallerVersion(void) const
 { return basecallerVersion_; }
@@ -256,6 +263,10 @@ inline std::string ReadGroupInfo::Id(void) const
 
 inline ReadGroupInfo& ReadGroupInfo::Id(const std::string& id)
 { id_ = id; return *this; }
+
+inline ReadGroupInfo& ReadGroupInfo::Id(const std::string& movieName,
+                                        const std::string& readType)
+{ id_ = MakeReadGroupId(movieName, readType); return *this; }
 
 inline bool ReadGroupInfo::IsValid(void) const
 { return !id_.empty(); }

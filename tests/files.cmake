@@ -25,6 +25,7 @@ set( PacBioBAMTest_CPP
     ${PacBioBAM_TestsDir}/src/test_IndexedFastaReader.cpp
     ${PacBioBAM_TestsDir}/src/test_Intervals.cpp
     ${PacBioBAM_TestsDir}/src/test_QualityValues.cpp
+    ${PacBioBAM_TestsDir}/src/test_ReadGroupInfo.cpp
     ${PacBioBAM_TestsDir}/src/test_SequenceUtils.cpp
     ${PacBioBAM_TestsDir}/src/test_Tags.cpp
     ${PacBioBAM_TestsDir}/src/test_UnmappedReadsQuery.cpp

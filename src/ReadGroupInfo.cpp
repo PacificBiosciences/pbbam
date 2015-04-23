@@ -37,6 +37,8 @@
 
 #include "pbbam/ReadGroupInfo.h"
 #include "SequenceUtils.h"
+#include <cram/md5.h>
+#include <cstdio>
 #include <set>
 #include <sstream>
 using namespace PacBio;
@@ -140,8 +142,6 @@ BaseFeature FromName(const std::string& name)
 }
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
 ReadGroupInfo::ReadGroupInfo(void)
     : readType_("UNKNOWN")
@@ -150,6 +150,13 @@ ReadGroupInfo::ReadGroupInfo(void)
 ReadGroupInfo::ReadGroupInfo(const std::string& id)
     : id_(id)
     , readType_("UNKNOWN")
+{ }
+
+ReadGroupInfo::ReadGroupInfo(const std::string& movieName,
+                             const std::string& readType)
+    : id_(MakeReadGroupId(movieName, readType))
+    , movieName_(movieName)
+    , readType_(readType)
 { }
 
 ReadGroupInfo::ReadGroupInfo(const ReadGroupInfo& other)
@@ -349,3 +356,27 @@ std::string ReadGroupInfo::ToSam(void) const
 
     return out.str();
 }
+
+std::string MakeReadGroupId(const std::string& movieName,
+                            const std::string& readType)
+{
+    MD5_CTX md5;
+    unsigned char digest[16];
+    char hexdigest[9];
+
+    MD5_Init(&md5);
+    MD5_Update(&md5, reinterpret_cast<void*>(const_cast<char*>(movieName.c_str())), movieName.size());
+    MD5_Update(&md5, reinterpret_cast<void*>(const_cast<char*>("//")), 2);
+    MD5_Update(&md5, reinterpret_cast<void*>(const_cast<char*>(readType.c_str())), readType.size());
+    MD5_Final(digest, &md5);
+
+    for (int i = 0; i < 4; i++)
+    {
+        snprintf(&hexdigest[2*i], 3, "%02x", digest[i]);
+    }
+
+    return std::string(hexdigest, 8);
+}
+
+} // namespace BAM
+} // namespace PacBio
