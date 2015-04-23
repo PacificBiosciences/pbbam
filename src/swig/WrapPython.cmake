@@ -1,6 +1,6 @@
 
 # setup
-find_package(PythonLibs)
+find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_PATH})
 set(PacBioBAM_PythonLibDir ${PacBioBAM_LibDir}/python)
 set(PythonTestRootDir ${PacBioBAM_TestsDir}/src/python)
