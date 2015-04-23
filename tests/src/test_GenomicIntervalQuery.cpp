@@ -50,20 +50,18 @@ using namespace std;
 
 const string inputBamFn = tests::Data_Dir + "/ex2.bam";
 
-TEST(GenomicIntervalQueryTest, CountRecords)
+TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
 {
+    const string seq1 = "seq1";
+    const string seq2 = "seq2";
+
     // open input BAM file
     BamFile bamFile(inputBamFn);
-    EXPECT_TRUE(bamFile);
-
-    const int id = bamFile.ReferenceId("seq1");
-    EXPECT_TRUE(id != -1);
 
     // count records
     int count = 0;
-    GenomicInterval interval(id, 0, 100);
+    GenomicInterval interval(seq1, 0, 100);
     GenomicIntervalQuery query(interval, bamFile);
-    EXPECT_TRUE(query);
     for (const BamRecord& record : query) {
         (void)record;
         ++count;
@@ -71,11 +69,10 @@ TEST(GenomicIntervalQueryTest, CountRecords)
     EXPECT_EQ(39, count);
 
     // adjust interval and pass back in
+    count = 0;
     interval.Start(500);
     interval.Stop(600);
     query.Interval(interval);
-    EXPECT_TRUE(query);
-    count = 0;
     for (const BamRecord& record : query) {
         (void)record;
         ++count;
@@ -83,77 +80,61 @@ TEST(GenomicIntervalQueryTest, CountRecords)
     EXPECT_EQ(166, count);
 
     // adjust again
-    interval.Id(1);
+    count = 0;
+    interval.Name(seq2);
     interval.Start(0);
     interval.Stop(100);
     query.Interval(interval);
-    EXPECT_TRUE(query);
-    count = 0;
     for (const BamRecord& record : query) {
         (void)record;
         ++count;
     }
     EXPECT_EQ(83, count);
 
-    // unknown ref (-1)
-    interval.Id(-1);
+    // unknown ref
+    count = 0;
+    interval.Name("does not exist");
     interval.Start(0);
     interval.Stop(100);
-    query.Interval(interval);
-    EXPECT_FALSE(query);                       // operator bool() returns false
-    count = 0;
-    for (const BamRecord& record : query) {    // iteration is still valid, just returns no data
+//    EXPECT_THROW(
+        query.Interval(interval);
+//    , std::exception);
+    for (const BamRecord& record : query) {    // iteration is still safe, just returns no data
         (void)record;
         ++count;
     }
     EXPECT_EQ(0, count);
 
     // adjust again - make sure we can read a real region after an invalid one
-    interval.Id(1);
+    interval.Name(seq2);
     interval.Start(0);
     interval.Stop(100);
     query.Interval(interval);
-    EXPECT_TRUE(query);
     count = 0;
     for (const BamRecord& record : query) {
         (void)record;
         ++count;
     }
     EXPECT_EQ(83, count);
-
-    // unknown ref (too high)
-    interval.Id(2);
-    interval.Start(0);
-    interval.Stop(100);
-    query.Interval(interval);
-    EXPECT_FALSE(query);                       // operator bool() returns false
-    count = 0;
-    for (const BamRecord& record : query) {    // iteration is still valid, just returns no data
-        (void)record;
-        ++count;
-    }
-    EXPECT_EQ(0, count);
 }
 
 TEST(GenomicIntervalQueryTest, NonConstBamRecord)
 {
-    // open input BAM file
-    BamFile bamFile(inputBamFn);
-    EXPECT_TRUE(bamFile);
+    EXPECT_NO_THROW(
+    {
+        // open input BAM file
+        BamFile bamFile(inputBamFn);
 
-    const int id = bamFile.ReferenceId("seq1");
-    EXPECT_TRUE(id != -1);
-
-    // count records
-    int count = 0;
-    GenomicInterval interval(id, 0, 100);
-    GenomicIntervalQuery query(interval, bamFile);
-    EXPECT_TRUE(query);
-    for (BamRecord& record : query) {
-        (void)record;
-        ++count;
-    }
-    EXPECT_EQ(39, count);
+        // count records
+        int count = 0;
+        GenomicInterval interval("seq1", 0, 100);
+        GenomicIntervalQuery query(interval, bamFile);
+        for (BamRecord& record : query) {
+            (void)record;
+            ++count;
+        }
+        EXPECT_EQ(39, count);
+    });
 }
 
 //TEST(GenomicIntervalQueryTest, WorksWithBamRecordImpl)

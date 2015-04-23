@@ -59,15 +59,35 @@ static const string token_VN = string("VN");
 static const string token_SO = string("SO");
 static const string token_pb = string("pb");
 
+class BamHeaderPrivate
+{
+public:
+    std::string version_;
+    std::string pacbioBamVersion_;
+    std::string sortOrder_;
+    std::map<std::string, std::string> headerLineCustom_;
+
+    std::map<std::string, ReadGroupInfo> readGroups_; // id => read group info
+    std::map<std::string, ProgramInfo> programs_;     // id => program info
+    std::vector<std::string> comments_;
+
+    // we need to preserve insertion order, use lookup for access by name
+    std::vector<SequenceInfo> sequences_;
+    std::map<std::string, int32_t> sequenceIdLookup_;
+};
+
 } // namespace internal
 } // namespace BAM
 } // namespace PacBio
 
-BamHeader::BamHeader(void) { }
+BamHeader::BamHeader(void)
+    : d_(new internal::BamHeaderPrivate)
+{ }
 
-BamHeader::BamHeader(const string& text)
+BamHeader::BamHeader(const string& samHeaderText)
+    : d_(new internal::BamHeaderPrivate)
 {
-    istringstream s(text);
+    istringstream s(samHeaderText);
     string line("");
     string firstToken;
     while (getline(s, line)) {
@@ -113,68 +133,88 @@ BamHeader::BamHeader(const string& text)
 }
 
 BamHeader::BamHeader(const BamHeader& other)
-    : version_(other.version_)
-    , pacbioBamVersion_(other.pacbioBamVersion_)
-    , sortOrder_(other.sortOrder_)
-    , readGroups_(other.readGroups_)
-    , programs_(other.programs_)
-    , comments_(other.comments_)
-    , sequences_(other.sequences_)
-    , sequenceIdLookup_(other.sequenceIdLookup_)
+    : d_(other.d_)
 { }
 
 BamHeader::BamHeader(BamHeader&& other)
-    : version_(std::move(other.version_))
-    , pacbioBamVersion_(std::move(other.pacbioBamVersion_))
-    , sortOrder_(std::move(other.sortOrder_))
-    , readGroups_(std::move(other.readGroups_))
-    , programs_(std::move(other.programs_))
-    , comments_(std::move(other.comments_))
-    , sequences_(std::move(other.sequences_))
-    , sequenceIdLookup_(std::move(other.sequenceIdLookup_))
+    : d_(std::move(other.d_))
 { }
+
+BamHeader& BamHeader::operator=(const BamHeader& other)
+{ d_ = other.d_; return *this; }
+
+BamHeader& BamHeader::operator=(BamHeader&& other)
+{  d_ = std::move(other.d_); return *this; }
 
 BamHeader::~BamHeader(void) { }
 
-BamHeader& BamHeader::operator=(const BamHeader& other)
-{
-    version_ = other.version_;
-    pacbioBamVersion_ = other.pacbioBamVersion_;
-    sortOrder_ = other.sortOrder_;
-    readGroups_ = other.readGroups_;
-    programs_ = other.programs_;
-    comments_ = other.comments_;
-    sequences_ = other.sequences_;
-    sequenceIdLookup_ = other.sequenceIdLookup_;
-    return *this;
-}
+BamHeader& BamHeader::AddComment(const std::string& comment)
+{ d_->comments_.push_back(comment); return *this; }
 
-BamHeader& BamHeader::operator=(BamHeader&& other)
-{
-    version_ = std::move(other.version_);
-    pacbioBamVersion_ = std::move(other.pacbioBamVersion_);
-    sortOrder_ = std::move(other.sortOrder_);
-    readGroups_ = std::move(other.readGroups_);
-    programs_ = std::move(other.programs_);
-    comments_ = std::move(other.comments_);
-    sequences_ = std::move(other.sequences_);
-    sequenceIdLookup_ = std::move(other.sequenceIdLookup_);
-    return *this;
-}
+BamHeader& BamHeader::AddProgram(const ProgramInfo& pg)
+{ d_->programs_[pg.Id()] = pg; return *this; }
+
+BamHeader& BamHeader::AddReadGroup(const ReadGroupInfo& readGroup)
+{ d_->readGroups_[readGroup.Id()] = readGroup; return *this; }
 
 BamHeader& BamHeader::AddSequence(const SequenceInfo& sequence)
 {
-    sequences_.push_back(sequence);
-    sequenceIdLookup_[sequence.Name()] = sequences_.size() - 1;
+    d_->sequences_.push_back(sequence);
+    d_->sequenceIdLookup_[sequence.Name()] = d_->sequences_.size() - 1;
     return *this;
+}
+
+BamHeader& BamHeader::ClearComments(void)
+{ d_->comments_.clear(); return* this; }
+
+BamHeader& BamHeader::ClearPrograms(void)
+{ d_->programs_.clear(); return *this; }
+
+BamHeader& BamHeader::ClearReadGroups(void)
+{ d_->readGroups_.clear(); return *this; }
+
+BamHeader& BamHeader::ClearSequences(void)
+{
+    d_->sequenceIdLookup_.clear();
+    d_->sequences_.clear();
+    return *this;
+}
+
+std::vector<std::string> BamHeader::Comments(void) const
+{ return d_->comments_; }
+
+BamHeader& BamHeader::Comments(const std::vector<std::string>& comments)
+{ d_->comments_ = comments; return *this; }
+
+bool BamHeader::HasProgram(const std::string& id) const
+{ return d_->programs_.find(id) != d_->programs_.cend(); }
+
+bool BamHeader::HasReadGroup(const std::string& id) const
+{ return d_->readGroups_.find(id) != d_->readGroups_.cend(); }
+
+bool BamHeader::HasSequence(const std::string& name) const
+{ return d_->sequenceIdLookup_.find(name) != d_->sequenceIdLookup_.cend(); }
+
+std::string BamHeader::PacBioBamVersion(void) const
+{ return d_->pacbioBamVersion_; }
+
+BamHeader& BamHeader::PacBioBamVersion(const std::string& version)
+{ d_->pacbioBamVersion_ = version; return *this; }
+
+ProgramInfo BamHeader::Program(const std::string& id) const
+{
+    const auto iter = d_->programs_.find(id);
+    if (iter == d_->programs_.cend())
+        throw std::exception();
+    return iter->second;
 }
 
 vector<string> BamHeader::ProgramIds(void) const
 {
     vector<string> result;
-    result.reserve(programs_.size());
-    const auto end = programs_.cend();
-    auto iter = programs_.cbegin();
+    result.reserve(d_->programs_.size());
+    const auto end = d_->programs_.cend();
+    auto iter = d_->programs_.cbegin();
     for ( ; iter != end; ++iter )
         result.push_back(iter->first);
     return result;
@@ -183,9 +223,9 @@ vector<string> BamHeader::ProgramIds(void) const
 vector<ProgramInfo> BamHeader::Programs(void) const
 {
     vector<ProgramInfo> result;
-    result.reserve(programs_.size());
-    const auto end = programs_.cend();
-    auto iter = programs_.cbegin();
+    result.reserve(d_->programs_.size());
+    const auto end = d_->programs_.cend();
+    auto iter = d_->programs_.cbegin();
     for ( ; iter != end; ++iter )
         result.push_back(iter->second);
     return result;
@@ -193,18 +233,26 @@ vector<ProgramInfo> BamHeader::Programs(void) const
 
 BamHeader& BamHeader::Programs(const vector<ProgramInfo>& programs)
 {
-    programs_.clear();
+    d_->programs_.clear();
     for (const ProgramInfo& pg : programs)
-        programs_[pg.Id()] = pg;
+        d_->programs_[pg.Id()] = pg;
     return *this;
+}
+
+ReadGroupInfo BamHeader::ReadGroup(const std::string& id) const
+{
+    const auto iter = d_->readGroups_.find(id);
+    if (iter == d_->readGroups_.cend())
+        throw std::exception();
+    return iter->second;
 }
 
 vector<string> BamHeader::ReadGroupIds(void) const
 {
     vector<string> result;
-    result.reserve(readGroups_.size());
-    const auto end = readGroups_.cend();
-    auto iter = readGroups_.cbegin();
+    result.reserve(d_->readGroups_.size());
+    const auto end = d_->readGroups_.cend();
+    auto iter = d_->readGroups_.cbegin();
     for ( ; iter != end; ++iter )
         result.push_back(iter->first);
     return result;
@@ -213,9 +261,9 @@ vector<string> BamHeader::ReadGroupIds(void) const
 vector<ReadGroupInfo> BamHeader::ReadGroups(void) const
 {
     vector<ReadGroupInfo> result;
-    result.reserve(readGroups_.size());
-    const auto end = readGroups_.cend();
-    auto iter = readGroups_.cbegin();
+    result.reserve(d_->readGroups_.size());
+    const auto end = d_->readGroups_.cend();
+    auto iter = d_->readGroups_.cbegin();
     for ( ; iter != end; ++iter )
         result.push_back(iter->second);
     return result;
@@ -223,40 +271,69 @@ vector<ReadGroupInfo> BamHeader::ReadGroups(void) const
 
 BamHeader& BamHeader::ReadGroups(const vector<ReadGroupInfo>& readGroups)
 {
-    readGroups_.clear();
+    d_->readGroups_.clear();
     for (const ReadGroupInfo& rg : readGroups)
-        readGroups_[rg.Id()] = rg;
+        d_->readGroups_[rg.Id()] = rg;
     return *this;
+}
+
+SequenceInfo BamHeader::Sequence(const int32_t id) const
+{
+    // throws out of range
+    return d_->sequences_.at(id);
 }
 
 SequenceInfo BamHeader::Sequence(const std::string& name) const
 {
-    const auto iter = sequenceIdLookup_.find(name);
-    if (iter == sequenceIdLookup_.cend())
+    const auto iter = d_->sequenceIdLookup_.find(name);
+    if (iter == d_->sequenceIdLookup_.cend())
         return SequenceInfo();
     const int index = iter->second;
-    assert(index >= 0 && (size_t)index < sequences_.size());
-    return sequences_.at(index);
+    assert(index >= 0 && (size_t)index < d_->sequences_.size());
+    return d_->sequences_.at(index);
 }
+
+int32_t BamHeader::SequenceId(const std::string& name) const
+{
+    const auto iter = d_->sequenceIdLookup_.find(name);
+    if (iter == d_->sequenceIdLookup_.cend())
+        throw std::exception();
+    return iter->second;
+}
+
+std::string BamHeader::SequenceLength(const int32_t id) const
+{ return Sequence(id).Length(); }
+
+std::string BamHeader::SequenceName(const int32_t id) const
+{ return Sequence(id).Name(); }
 
 vector<string> BamHeader::SequenceNames(void) const
 {
     vector<string> result;
-    result.reserve(sequences_.size());
-    const auto end = sequences_.cend();
-    auto iter = sequences_.cbegin();
+    result.reserve(d_->sequences_.size());
+    const auto end = d_->sequences_.cend();
+    auto iter = d_->sequences_.cbegin();
     for ( ; iter != end; ++iter )
         result.push_back(iter->Name());
     return result;
 }
 
+std::vector<SequenceInfo> BamHeader::Sequences(void) const
+{ return d_->sequences_; }
+
 BamHeader& BamHeader::Sequences(const vector<SequenceInfo>& sequences)
 {
-    sequences_.clear();
+    d_->sequences_.clear();
     for (const SequenceInfo& seq : sequences)
         AddSequence(seq);
     return *this;
 }
+
+std::string BamHeader::SortOrder(void) const
+{ return d_->sortOrder_; }
+
+BamHeader& BamHeader::SortOrder(const std::string& order)
+{ d_->sortOrder_ = order; return *this; }
 
 string BamHeader::ToSam(void) const
 {
@@ -264,33 +341,40 @@ string BamHeader::ToSam(void) const
     stringstream out("");
 
     // @HD
-    const string& outputVersion   = (version_.empty()   ? string(hts_version()) : version_);
-    const string& outputSortOrder = (sortOrder_.empty() ? string("unknown") : sortOrder_);
+    const string& outputVersion   = (d_->version_.empty()   ? string(hts_version()) : d_->version_);
+    const string& outputSortOrder = (d_->sortOrder_.empty() ? string("unknown") : d_->sortOrder_);
 //    const string& outputPbBamVersion = (pbVersion.empty() ? string("3.0b3") : pbVersion);
 
     out << internal::prefix_HD
         << internal::MakeSamTag(internal::token_VN, outputVersion)
         << internal::MakeSamTag(internal::token_SO, outputSortOrder);
-    if (!pacbioBamVersion_.empty())
-        out << internal::MakeSamTag(internal::token_pb, pacbioBamVersion_);
+    if (!d_->pacbioBamVersion_.empty())
+        out << internal::MakeSamTag(internal::token_pb, d_->pacbioBamVersion_);
      out << endl;
 
     // @SQ
-    for (const SequenceInfo& seq : sequences_)
+    for (const SequenceInfo& seq : d_->sequences_)
         out << seq.ToSam() << endl;
 
     // @RG
-    for (const auto& rgIter : readGroups_)
+    for (const auto& rgIter : d_->readGroups_)
         out << rgIter.second.ToSam() << endl;
 
     // @PG
-    for (const auto& progIter : programs_)
+    for (const auto& progIter : d_->programs_)
         out  << progIter.second.ToSam() << endl;
 
     // @CO
-    for (const string& comment : comments_)
+    for (const string& comment : d_->comments_)
         out << internal::prefix_CO << '\t' << comment << endl;
 
     // return result
     return out.str();
 }
+
+std::string BamHeader::Version(void) const
+{ return d_->version_; }
+
+BamHeader& BamHeader::Version(const std::string& version)
+{ d_->version_ = version; return *this; }
+

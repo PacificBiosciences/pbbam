@@ -86,7 +86,7 @@ BamRecordImpl& BamRecordImpl::operator=(BamRecordImpl&& other)
 
 BamRecordImpl::~BamRecordImpl(void) { }
 
-bool BamRecordImpl::AddTag(const string& tagName, const Tag& value)
+bool BamRecordImpl::AddTag(const string& tagName, const Tag &value)
 {
     if (tagName.size() != 2 || HasTag(tagName))
         return false;
@@ -151,7 +151,7 @@ BamRecordImpl& BamRecordImpl::CigarData(const std::string& cigarString)
     return CigarData(Cigar::FromStdString(cigarString));
 }
 
-bool BamRecordImpl::EditTag(const string& tagName, const Tag& newValue)
+bool BamRecordImpl::EditTag(const string& tagName, const Tag &newValue)
 {
     return RemoveTag(tagName) && AddTag(tagName, newValue);
 }

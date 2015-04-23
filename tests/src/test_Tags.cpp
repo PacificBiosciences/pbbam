@@ -188,8 +188,8 @@ TEST(TagTest, Type_Int8)
     const int8_t v = -42;
     const Tag tag(v);
 
-    bool ok;
-    const int8_t v2 = tag.ToInt8(&ok);
+    int8_t v2;
+    EXPECT_NO_THROW(v2 = tag.ToInt8());
 
     EXPECT_TRUE(tag.Type() == TagDataType::INT8);
     EXPECT_TRUE(tag.Typename() == "int8_t");
@@ -206,7 +206,6 @@ TEST(TagTest, Type_Int8)
     EXPECT_FALSE(tag.IsArray());
 
     EXPECT_EQ(v, v2);
-    EXPECT_TRUE(ok);
 }
 
 TEST(TagTest, Type_UInt8)
@@ -214,8 +213,8 @@ TEST(TagTest, Type_UInt8)
     const uint8_t v = 42;
     const Tag tag(v);
 
-    bool ok;
-    const uint8_t v2 = tag.ToUInt8(&ok);
+    uint8_t v2;
+    EXPECT_NO_THROW(v2 = tag.ToUInt8());
 
     EXPECT_TRUE(tag.Type() == TagDataType::UINT8);
     EXPECT_TRUE(tag.Typename() == "uint8_t");
@@ -232,7 +231,6 @@ TEST(TagTest, Type_UInt8)
     EXPECT_FALSE(tag.IsArray());
 
     EXPECT_EQ(v, v2);
-    EXPECT_TRUE(ok);
 }
 
 TEST(TagTest, Type_Ascii)
@@ -269,8 +267,8 @@ TEST(TagTest, Type_Int16)
     const int16_t v = -42;
     const Tag tag(v);
 
-    bool ok;
-    const int16_t v2 = tag.ToInt16(&ok);
+    int16_t v2;
+    EXPECT_NO_THROW(v2 = tag.ToInt16());
 
     EXPECT_TRUE(tag.Type() == TagDataType::INT16);
     EXPECT_TRUE(tag.Typename() == "int16_t");
@@ -286,7 +284,6 @@ TEST(TagTest, Type_Int16)
     EXPECT_FALSE(tag.IsArray());
 
     EXPECT_EQ(v, v2);
-    EXPECT_TRUE(ok);
 }
 
 TEST(TagTest, Type_UInt16)
@@ -294,8 +291,8 @@ TEST(TagTest, Type_UInt16)
     const uint16_t v = 42;
     const Tag tag(v);
 
-    bool ok;
-    const uint16_t v2 = tag.ToUInt16(&ok);
+    uint16_t v2;
+    EXPECT_NO_THROW(v2 = tag.ToUInt16());
 
     EXPECT_TRUE(tag.Type() == TagDataType::UINT16);
     EXPECT_TRUE(tag.Typename() == "uint16_t");
@@ -311,7 +308,6 @@ TEST(TagTest, Type_UInt16)
     EXPECT_FALSE(tag.IsArray());
 
     EXPECT_EQ(v, v2);
-    EXPECT_TRUE(ok);
 }
 
 TEST(TagTest, Type_Int32)
@@ -319,8 +315,8 @@ TEST(TagTest, Type_Int32)
     const int32_t v = -42;
     const Tag tag(v);
 
-    bool ok;
-    const int32_t v2 = tag.ToInt32(&ok);
+    int32_t v2;
+    EXPECT_NO_THROW(v2 = tag.ToInt32());
 
     EXPECT_TRUE(tag.Type() == TagDataType::INT32);
     EXPECT_TRUE(tag.Typename() == "int32_t");
@@ -336,7 +332,6 @@ TEST(TagTest, Type_Int32)
     EXPECT_FALSE(tag.IsArray());
 
     EXPECT_EQ(v, v2);
-    EXPECT_TRUE(ok);
 }
 
 TEST(TagTest, Type_UInt32)
@@ -344,8 +339,8 @@ TEST(TagTest, Type_UInt32)
     const uint32_t v = 42;
     const Tag tag(v);
 
-    bool ok;
-    const uint32_t v2 = tag.ToUInt32(&ok);
+    uint32_t v2;
+    EXPECT_NO_THROW(v2 = tag.ToUInt32());
 
     EXPECT_TRUE(tag.Type() == TagDataType::UINT32);
     EXPECT_TRUE(tag.Typename() == "uint32_t");
@@ -361,7 +356,6 @@ TEST(TagTest, Type_UInt32)
     EXPECT_FALSE(tag.IsArray());
 
     EXPECT_EQ(v, v2);
-    EXPECT_TRUE(ok);
 }
 
 TEST(TagTest, Type_Float)
@@ -369,8 +363,8 @@ TEST(TagTest, Type_Float)
     const float v = 3.141;
     const Tag tag(v);
 
-    bool ok;
-    const float v2 = tag.ToFloat(&ok);
+    float v2;
+    EXPECT_NO_THROW(v2 = tag.ToFloat());
 
     EXPECT_TRUE(tag.Type() == TagDataType::FLOAT);
     EXPECT_TRUE(tag.Typename() == "float");
@@ -383,7 +377,6 @@ TEST(TagTest, Type_Float)
     EXPECT_FALSE(tag.IsArray());
 
     EXPECT_EQ(v, v2);
-    EXPECT_TRUE(ok);
 }
 
 TEST(TagTest, Type_String)
@@ -391,8 +384,8 @@ TEST(TagTest, Type_String)
     const string v = "foo_who";
     const Tag tag(v);
 
-    bool ok;
-    const string v2 = tag.ToString(&ok);
+    string v2;
+    EXPECT_NO_THROW(v2 = tag.ToString());
 
     EXPECT_TRUE(tag.Type() == TagDataType::STRING);
     EXPECT_TRUE(tag.Typename() == "string");
@@ -403,7 +396,6 @@ TEST(TagTest, Type_String)
     EXPECT_FALSE(tag.IsArray());
 
     EXPECT_EQ(v, v2);
-    EXPECT_TRUE(ok);
 }
 
 TEST(TagTest, Type_Int8Array)
@@ -411,8 +403,8 @@ TEST(TagTest, Type_Int8Array)
     const vector<int8_t> v = { -42, 100, 0 };
     const Tag tag(v);
 
-    bool ok;
-    const vector<int8_t> v2 = tag.ToInt8Array(&ok);
+    vector<int8_t> v2;
+    EXPECT_NO_THROW(v2 = tag.ToInt8Array());
 
     EXPECT_TRUE(tag.Type() == TagDataType::INT8_ARRAY);
     EXPECT_TRUE(tag.Typename() == "vector<int8_t>");
@@ -427,7 +419,6 @@ TEST(TagTest, Type_Int8Array)
     EXPECT_FALSE(tag.IsNumeric());
 
     EXPECT_EQ(v, v2);
-    EXPECT_TRUE(ok);
 }
 
 TEST(TagTest, Type_UInt8Array)
@@ -435,8 +426,8 @@ TEST(TagTest, Type_UInt8Array)
     const vector<uint8_t> v = { 42, 200, 0 };
     const Tag tag(v);
 
-    bool ok;
-    const vector<uint8_t> v2 = tag.ToUInt8Array(&ok);
+    vector<uint8_t> v2;
+    EXPECT_NO_THROW(v2 = tag.ToUInt8Array());
 
     EXPECT_TRUE(tag.Type() == TagDataType::UINT8_ARRAY);
     EXPECT_TRUE(tag.Typename() == "vector<uint8_t>");
@@ -451,7 +442,6 @@ TEST(TagTest, Type_UInt8Array)
     EXPECT_FALSE(tag.IsNumeric());
 
     EXPECT_EQ(v, v2);
-    EXPECT_TRUE(ok);
 }
 
 TEST(TagTest, Type_Int16Array)
@@ -459,8 +449,8 @@ TEST(TagTest, Type_Int16Array)
     const vector<int16_t> v = { 42, -300, 0 };
     const Tag tag(v);
 
-    bool ok;
-    const vector<int16_t> v2 = tag.ToInt16Array(&ok);
+    vector<int16_t> v2;
+    EXPECT_NO_THROW(v2 = tag.ToInt16Array());
 
     EXPECT_TRUE(tag.Type() == TagDataType::INT16_ARRAY);
     EXPECT_TRUE(tag.Typename() == "vector<int16_t>");
@@ -475,7 +465,6 @@ TEST(TagTest, Type_Int16Array)
     EXPECT_FALSE(tag.IsNumeric());
 
     EXPECT_EQ(v, v2);
-    EXPECT_TRUE(ok);
 }
 
 TEST(TagTest, Type_UInt16Array)
@@ -483,8 +472,8 @@ TEST(TagTest, Type_UInt16Array)
     const vector<uint16_t> v = { 42, 300, 0 };
     const Tag tag(v);
 
-    bool ok;
-    const vector<uint16_t> v2 = tag.ToUInt16Array(&ok);
+    vector<uint16_t> v2;
+    EXPECT_NO_THROW(v2 = tag.ToUInt16Array());
 
     EXPECT_TRUE(tag.Type() == TagDataType::UINT16_ARRAY);
     EXPECT_TRUE(tag.Typename() == "vector<uint16_t>");
@@ -498,8 +487,7 @@ TEST(TagTest, Type_UInt16Array)
     EXPECT_FALSE(tag.IsNull());
     EXPECT_FALSE(tag.IsNumeric());
 
-    EXPECT_EQ(v, v2);
-    EXPECT_TRUE(ok);
+    EXPECT_EQ(v, v2);;
 }
 
 TEST(TagTest, Type_Int32Array)
@@ -507,8 +495,8 @@ TEST(TagTest, Type_Int32Array)
     const vector<int32_t> v = { 42, -300, 0 };
     const Tag tag(v);
 
-    bool ok;
-    const vector<int32_t> v2 = tag.ToInt32Array(&ok);
+    vector<int32_t> v2;
+    EXPECT_NO_THROW(v2 = tag.ToInt32Array());
 
     EXPECT_TRUE(tag.Type() == TagDataType::INT32_ARRAY);
     EXPECT_TRUE(tag.Typename() == "vector<int32_t>");
@@ -523,7 +511,6 @@ TEST(TagTest, Type_Int32Array)
     EXPECT_FALSE(tag.IsNumeric());
 
     EXPECT_EQ(v, v2);
-    EXPECT_TRUE(ok);
 }
 
 TEST(TagTest, Type_UInt32Array)
@@ -531,8 +518,8 @@ TEST(TagTest, Type_UInt32Array)
     const vector<uint32_t> v = { 42, 300, 0 };
     const Tag tag(v);
 
-    bool ok;
-    const vector<uint32_t> v2 = tag.ToUInt32Array(&ok);
+    vector<uint32_t> v2;
+    EXPECT_NO_THROW(v2 = tag.ToUInt32Array());
 
     EXPECT_TRUE(tag.Type() == TagDataType::UINT32_ARRAY);
     EXPECT_TRUE(tag.Typename() == "vector<uint32_t>");
@@ -547,7 +534,6 @@ TEST(TagTest, Type_UInt32Array)
     EXPECT_FALSE(tag.IsNumeric());
 
     EXPECT_EQ(v, v2);
-    EXPECT_TRUE(ok);
 }
 
 TEST(TagTest, Type_FloatArray)
@@ -555,8 +541,8 @@ TEST(TagTest, Type_FloatArray)
     const vector<float> v = { 1.1, 1.2, 1.3 };
     const Tag tag(v);
 
-    bool ok;
-    const auto v2 = tag.ToFloatArray(&ok);
+    vector<float> v2;
+    EXPECT_NO_THROW(v2 = tag.ToFloatArray());
 
     EXPECT_TRUE(tag.Type() == TagDataType::FLOAT_ARRAY);
     EXPECT_TRUE(tag.Typename() == "vector<float>");
@@ -570,7 +556,6 @@ TEST(TagTest, Type_FloatArray)
     EXPECT_FALSE(tag.IsNumeric());
 
     EXPECT_EQ(v, v2);
-    EXPECT_TRUE(ok);
 }
 
 TEST(TagTest, CastingOk)
@@ -607,38 +592,23 @@ TEST(TagTest, CastingOk)
     Tag u32_array_Tag(u32_array);
     Tag float_array_Tag(float_array);
 
-    bool ok;
-
-    i8 = i8Tag.ToInt8(&ok);
-    EXPECT_TRUE(ok);
-    u8 = u8Tag.ToUInt8(&ok);
-    EXPECT_TRUE(ok);
-    i16 = i16Tag.ToInt16(&ok);
-    EXPECT_TRUE(ok);
-    u16 = u16Tag.ToUInt16(&ok);
-    EXPECT_TRUE(ok);
-    i32 = i32Tag.ToInt32(&ok);
-    EXPECT_TRUE(ok);
-    u32 = u32Tag.ToUInt32(&ok);
-    EXPECT_TRUE(ok);
-    f = floatTag.ToFloat(&ok);
-    EXPECT_TRUE(ok);
-    str = stringTag.ToString(&ok);
-    EXPECT_TRUE(ok);
-    i8_array = i8_array_Tag.ToInt8Array(&ok);
-    EXPECT_TRUE(ok);
-    u8_array = u8_array_Tag.ToUInt8Array(&ok);
-    EXPECT_TRUE(ok);
-    i16_array = i16_array_Tag.ToInt16Array(&ok);
-    EXPECT_TRUE(ok);
-    u16_array = u16_array_Tag.ToUInt16Array(&ok);
-    EXPECT_TRUE(ok);
-    i32_array = i32_array_Tag.ToInt32Array(&ok);
-    EXPECT_TRUE(ok);
-    u32_array = u32_array_Tag.ToUInt32Array(&ok);
-    EXPECT_TRUE(ok);
-    float_array = float_array_Tag.ToFloatArray(&ok);
-    EXPECT_TRUE(ok);
+    EXPECT_NO_THROW({
+        i8 = i8Tag.ToInt8();
+        u8 = u8Tag.ToUInt8();
+        i16 = i16Tag.ToInt16();
+        u16 = u16Tag.ToUInt16();
+        i32 = i32Tag.ToInt32();
+        u32 = u32Tag.ToUInt32();
+        f = floatTag.ToFloat();
+        str = stringTag.ToString();
+        i8_array = i8_array_Tag.ToInt8Array();
+        u8_array = u8_array_Tag.ToUInt8Array();
+        i16_array = i16_array_Tag.ToInt16Array();
+        u16_array = u16_array_Tag.ToUInt16Array();
+        i32_array = i32_array_Tag.ToInt32Array();
+        u32_array = u32_array_Tag.ToUInt32Array();
+        float_array = float_array_Tag.ToFloatArray();
+    });
 
     bool boostConvert;
 

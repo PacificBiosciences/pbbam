@@ -85,7 +85,7 @@ public:
     /// \{
 
     BamRecord(void);
-    BamRecord(const BamHeader::SharedPtr& header);
+    BamRecord(const BamHeader& header);
     BamRecord(const BamRecordImpl& impl);
     BamRecord(BamRecordImpl&& impl);
     BamRecord(const BamRecord& other);
@@ -145,7 +145,7 @@ public:
     bool HasSubstitutionTag(void) const;
 
     /// \returns shared pointer to this record's associated BamHeader
-    BamHeader::SharedPtr Header(void) const;
+    BamHeader Header(void) const;
 
     /// \returns ZMW hole number
     int32_t HoleNumber(void) const;
@@ -517,7 +517,7 @@ public:
 
 private:
     BamRecordImpl impl_;
-    BamHeader::SharedPtr header_;
+    BamHeader header_;
 
     // cached positions (mutable to allow lazy-calc in const methods)
     mutable Position alignedStart_;
@@ -541,7 +541,7 @@ private:
 
 private:
     // marked const to allow calling from const methods
-    //   but lazy-calc mutable, cached values
+    // but updates our mutable cached values
     void CalculateAlignedPositions(void) const;
 
 //    void UpdateName(void);

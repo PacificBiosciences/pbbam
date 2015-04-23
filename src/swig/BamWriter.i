@@ -5,15 +5,12 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 %}
+ 
+%ignore PacBio::BAM::BamWriter(const BamWriter&);  // copy ctor not used
+%ignore PacBio::BAM::BamWriter(BamWriter&&);       // move ctor not used
+%ignore PacBio::BAM::BamWriter::operator=;         // assignment operators not used
 
-// Python
-#ifdef SWIGPYTHON
-%rename(__nonzero__) PacBio::BAM::BamWriter::operator bool; 
-#endif // Python
-
-// R
-#ifdef SWIGR
-%rename(IsOpen) PacBio::BAM::BamWriter::operator bool; 
-#endif // R
+HANDLE_STD_EXCEPTION(BamWriter);
+HANDLE_STD_EXCEPTION(Write);
 
 %include <pbbam/BamWriter.h>

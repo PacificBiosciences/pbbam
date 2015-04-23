@@ -43,42 +43,46 @@ import unittest
 
 class EndToEndTest(unittest.TestCase):
         
+    def originalNames(self):
+        # loop over original file, store names, write to generated file
+        try:
+            file = PacBioBam.BamFile(self.ex2BamFn)
+            writer = PacBioBam.BamWriter(self.generatedBamFn, file.Header())
+            entireFile = PacBioBam.EntireFileQuery(file)
+         
+            names_in = []
+            for record in PacBioBam.Iterate(entireFile):
+                names_in.append(record.FullName())
+                writer.Write(record)
+            return names_in
+            
+        except SystemError:
+            self.assertTrue(False) # should not throw
+        
+    def generatedNames(self):
+        try:   
+            # open generated file, read names
+            file = PacBioBam.BamFile(self.generatedBamFn)
+            entireFile = PacBioBam.EntireFileQuery(file)
+        
+            names_out = []
+            for record in PacBioBam.Iterate(entireFile):
+                names_out.append(record.FullName())
+            return names_out
+                
+        except SystemError:
+            self.assertTrue(False) # should not throw
+        
     def runTest(self):
         
-        testData = config.TestData()
-        ex2BamFn = testData.directory + "/ex2.bam"
-        generatedBamFn = testData.directory + "/generated.bam"
+        self.testData = config.TestData()
+        self.ex2BamFn = self.testData.directory + "/ex2.bam"
+        self.generatedBamFn = self.testData.directory + "/generated.bam"
         
-        # loop over original file, store names, write to generated file
-        file = PacBioBam.BamFile(ex2BamFn)
-        self.assertTrue(file)
-
-        writer = PacBioBam.BamWriter(generatedBamFn, file.Header())
-        self.assertTrue(writer)
-
-        entireFile = PacBioBam.EntireFileQuery(file)
-        self.assertTrue(entireFile)
-         
-        names_in = []
-        for record in PacBioBam.Iterate(entireFile):
-            names_in.append(record.FullName())
-            writer.Write(record)
-
-        writer.Close() # force flush & close
-        
-        # open generated file, read names
-        file = PacBioBam.BamFile(generatedBamFn)
-        self.assertTrue(file)
-        
-        entireFile = PacBioBam.EntireFileQuery(file)
-        self.assertTrue(entireFile)
-        
-        names_out = []
-        for record in PacBioBam.Iterate(entireFile):
-            names_out.append(record.FullName())
-        
-        # ensure equal
+        # compare input records to generated copy's records
+        names_in = self.originalNames()
+        names_out = self.generatedNames()
         self.assertEqual(names_in, names_out)
         
         # clean up
-        os.remove(generatedBamFn)
+        os.remove(self.generatedBamFn)

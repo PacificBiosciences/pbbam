@@ -237,20 +237,20 @@ class GenomicIntervalsTest(unittest.TestCase):
     def test_ctors(self):
         
         empty  = PacBioBam.GenomicInterval()
-        normal = PacBioBam.GenomicInterval(0, 100, 200)
+        normal = PacBioBam.GenomicInterval("foo", 100, 200)
         
-        self.assertEqual(-1, empty.Id())
+        self.assertEqual("", empty.Name())
         self.assertEqual(0,  empty.Start())
         self.assertEqual(0,  empty.Stop())
         
-        self.assertEqual(0,   normal.Id())
-        self.assertEqual(100, normal.Start())
-        self.assertEqual(200, normal.Stop())
+        self.assertEqual("foo", normal.Name())
+        self.assertEqual(100,   normal.Start())
+        self.assertEqual(200,   normal.Stop())
 
         
     def test_copy(self):
         
-        a = PacBioBam.GenomicInterval(1, 10, 20)
+        a = PacBioBam.GenomicInterval("foo", 10, 20)
         b = PacBioBam.GenomicInterval(a)
         c = a
         
@@ -260,29 +260,29 @@ class GenomicIntervalsTest(unittest.TestCase):
         
     def test_modifiers(self):
         
-        a = PacBioBam.GenomicInterval(1, 10, 20)
+        a = PacBioBam.GenomicInterval("foo", 10, 20)
         
         b = PacBioBam.GenomicInterval(a)
-        b.Id(5).Start(2).Stop(10)
+        b.Name("bar").Start(2).Stop(10)
         
         c = PacBioBam.GenomicInterval(a)
         c.Interval(b.Interval())
         
         self.assertNotEqual(a, b)
-        self.assertEqual(5,  b.Id())
+        self.assertEqual("bar",  b.Name())
         self.assertEqual(2,  b.Start())
         self.assertEqual(10, b.Stop())        
-        self.assertEqual(a.Id(), c.Id())
+        self.assertEqual(a.Name(), c.Name())
         self.assertEqual(b.Interval(), c.Interval())
         
     def test_cover(self):
         
-        a = PacBioBam.GenomicInterval(0,2,4)
-        b = PacBioBam.GenomicInterval(0,3,5)
-        c = PacBioBam.GenomicInterval(0,6,8)
-        d = PacBioBam.GenomicInterval(0,1,7)
-        e = PacBioBam.GenomicInterval(0,5,8)
-        f = PacBioBam.GenomicInterval(1,3,5)  # same as b, different ref
+        a = PacBioBam.GenomicInterval("foo",2,4)
+        b = PacBioBam.GenomicInterval("foo",3,5)
+        c = PacBioBam.GenomicInterval("foo",6,8)
+        d = PacBioBam.GenomicInterval("foo",1,7)
+        e = PacBioBam.GenomicInterval("foo",5,8)
+        f = PacBioBam.GenomicInterval("bar",3,5)  # same as b, different ref
         
         #   0123456789  
         # a   --
@@ -324,16 +324,16 @@ class GenomicIntervalsTest(unittest.TestCase):
     def test_validity(self):
         
         a = PacBioBam.GenomicInterval()       # default
-        b = PacBioBam.GenomicInterval(0,0,0)  # valid id, start == stop (zero)
-        c = PacBioBam.GenomicInterval(0,4,4)  # valid id, start == stop (non-zero)
-        d = PacBioBam.GenomicInterval(0,0,1)  # valid id, start <  stop (start == zero)     OK
-        e = PacBioBam.GenomicInterval(0,4,5)  # valid id, start <  stop (start >  zero)     OK
-        f = PacBioBam.GenomicInterval(0,5,4)  # valid id, start >  stop 
-        g = PacBioBam.GenomicInterval(-1,0,0) # invalid id, start == stop (zero)
-        h = PacBioBam.GenomicInterval(-1,4,4) # invalid id, start == stop (non-zero)
-        i = PacBioBam.GenomicInterval(-1,0,1) # invalid id, start <  stop (start == zero)
-        j = PacBioBam.GenomicInterval(-1,4,5) # invalid id, start <  stop (start >  zero)
-        k = PacBioBam.GenomicInterval(-1,5,4) # invalid id, start >  stop 
+        b = PacBioBam.GenomicInterval("foo",0,0)  # valid id, start == stop (zero)
+        c = PacBioBam.GenomicInterval("foo",4,4)  # valid id, start == stop (non-zero)
+        d = PacBioBam.GenomicInterval("foo",0,1)  # valid id, start <  stop (start == zero)     OK
+        e = PacBioBam.GenomicInterval("foo",4,5)  # valid id, start <  stop (start >  zero)     OK
+        f = PacBioBam.GenomicInterval("foo",5,4)  # valid id, start >  stop 
+        g = PacBioBam.GenomicInterval("",0,0) # invalid id, start == stop (zero)
+        h = PacBioBam.GenomicInterval("",4,4) # invalid id, start == stop (non-zero)
+        i = PacBioBam.GenomicInterval("",0,1) # invalid id, start <  stop (start == zero)
+        j = PacBioBam.GenomicInterval("",4,5) # invalid id, start <  stop (start >  zero)
+        k = PacBioBam.GenomicInterval("",5,4) # invalid id, start >  stop 
              
         self.assertTrue(d.IsValid())
         self.assertTrue(e.IsValid())

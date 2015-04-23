@@ -47,91 +47,49 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-BamWriter::BamWriter(const std::string& filename,
-                     const BamHeader& header,
-                     const BamWriter::CompressionLevel compressionLevel,
-                     const size_t numThreads)
-    : file_(nullptr)
-    , header_(nullptr)
-    , error_(BamWriter::NoError)
+namespace PacBio {
+namespace BAM {
+namespace internal {
+
+class BamWriterPrivate
 {
-     Open(filename,
-          internal::BamHeaderMemory::MakeRawHeader(header),
-          compressionLevel,
-          numThreads);
-}
+public:
+    BamWriterPrivate(void)
+        : file_(nullptr)
+        , header_(nullptr)
+    { }
 
+public:
+    void Open(const std::string& filename,
+              const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader,
+              const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
+              size_t numThreads = 4);
+    void Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord);
 
-BamWriter::BamWriter(const std::string& filename,
-                     const BamHeader::SharedPtr& header,
-                     const BamWriter::CompressionLevel compressionLevel,
-                     const size_t numThreads)
-    : file_(nullptr)
-    , header_(nullptr)
-    , error_(BamWriter::NoError)
+public:
+    std::unique_ptr<samFile, internal::HtslibFileDeleter> file_;
+    PBBAM_SHARED_PTR<bam_hdr_t> header_;
+    std::string filename_;
+};
+
+void BamWriterPrivate::Open(const string& filename,
+                            const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader,
+                            const BamWriter::CompressionLevel compressionLevel,
+                            size_t numThreads)
 {
-     Open(filename,
-          internal::BamHeaderMemory::MakeRawHeader(header),
-          compressionLevel,
-          numThreads);
-}
-
-
-BamWriter::~BamWriter(void)
-{
-    Close();
-}
-
-BamWriter::operator bool(void) const
-{
-    return (error_ == BamWriter::NoError);
-}
-
-void BamWriter::Close(void)
-{
-    header_.reset();
-    file_.reset();
-    error_ = BamWriter::NoError;
-    filename_.empty();
-}
-
-BamWriter::WriteError BamWriter::Error(void) const
-{
-    return error_;
-}
-
-bool BamWriter::Flush(void)
-{
-    // TODO: sanity checks on file_ & fp
-    return (bgzf_flush(file_.get()->fp.bgzf) == 0);
-}
-
-bool BamWriter::Open(const string& filename,
-                     const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader,
-                     const CompressionLevel compressionLevel,
-                     size_t numThreads)
-{
-    // ensure clean slate
-    Close();
-
     // store filename
     filename_ = filename;
 
     // store header
     header_ = rawHeader;
-    if (!header_) {
-        error_ = BamWriter::NullHeaderError;
-        return false;
-    }
-    PB_ASSERT_OR_RETURN_VALUE((bool)header_, false);
+    if (!header_)
+        throw std::exception();
 
     // open file
     const string& mode = string("wb") + to_string(static_cast<int>(compressionLevel));
-    file_.reset(sam_open(filename_.c_str(), mode.c_str()), internal::HtslibFileDeleter());
-    if (!file_) {
-        error_ = BamWriter::OpenFileError;
-        return false;
-    }
+    file_.reset(sam_open(filename_.c_str(), mode.c_str()));
+    if (!file_)
+        throw std::exception();
 
     // if no explicit thread count given, attempt built-in check
     if (numThreads == 0) {
@@ -148,32 +106,48 @@ bool BamWriter::Open(const string& filename,
 
     // write header
     const int ret = sam_hdr_write(file_.get(), header_.get());
-    if (ret != 0) {
-        error_ = BamWriter::WriteHeaderError;
-        return false;
-    }
-
-    // if we get here, return success
-    return true;
+    if (ret != 0)
+        throw std::exception();
 }
 
-bool BamWriter::Write(const BamRecord& record)
-{
-    return Write(internal::BamRecordMemory::GetRawData(record));
-}
-
-bool BamWriter::Write(const BamRecordImpl& recordImpl)
-{
-    return Write(internal::BamRecordMemory::GetRawData(recordImpl));
-}
-
-bool BamWriter::Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord)
+void BamWriterPrivate::Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord)
 {
     const int ret = sam_write1(file_.get(), header_.get(), rawRecord.get());
-    if (ret > 0)
-        return true;
-    else {
-        error_ = BamWriter::WriteRecordError;
-        return false;
-    }
+    if (ret <= 0)
+        throw std::exception();
 }
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio
+
+BamWriter::BamWriter(const std::string& filename,
+                     const BamHeader& header,
+                     const BamWriter::CompressionLevel compressionLevel,
+                     const size_t numThreads)
+    : d_(new internal::BamWriterPrivate)
+{
+     d_->Open(filename,
+              internal::BamHeaderMemory::MakeRawHeader(header),
+              compressionLevel,
+              numThreads);
+}
+
+BamWriter::~BamWriter(void)
+{
+    bgzf_flush(d_->file_.get()->fp.bgzf);
+}
+
+void BamWriter::TryFlush(void)
+{
+    // TODO: sanity checks on file_ & fp
+    const int ret = bgzf_flush(d_->file_.get()->fp.bgzf);
+    if (ret != 0)
+        throw std::exception();
+}
+
+void BamWriter::Write(const BamRecord& record)
+{ d_->Write(internal::BamRecordMemory::GetRawData(record)); }
+
+void BamWriter::Write(const BamRecordImpl& recordImpl)
+{ d_->Write(internal::BamRecordMemory::GetRawData(recordImpl)); }

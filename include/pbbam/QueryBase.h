@@ -92,33 +92,7 @@ public:
     typedef QueryConstIterator const_iterator;
 
 public:
-    /// This enum describes the errors that may be returned by the Error() function.
-    enum QueryError
-    {
-        NoError                   ///< No error occurred.
-      , FileOpenError             ///< An error occurred while opening the BAM file.
-      , FileMetadataError         ///< An error occurred while reading the BAM file metadata.
-      , IndexFileOpenError        ///< An error occurred while opening the index file.
-      , IndexFileMetadataError    ///< An error occurred while reading the index file metadata.
-      , InitializeQueryError      ///< An error occurred while initializing query (e.g. invalid parameters).
-    };
-
-
-public:
     virtual ~QueryBase(void);
-
-public:
-
-    /// \name Error Handling
-    /// \{
-
-    /// \returns the query's error status.
-    QueryError Error(void) const;
-
-    /// \returns true if Error() is QueryBase::NoError, else false
-    operator bool(void) const;
-
-    /// \}
 
 public:
 
@@ -153,7 +127,6 @@ protected:
     virtual bool GetNext(BamRecord& x) =0;
 
 protected:
-    QueryError error_;
     const BamFile& file_;
 
     friend class QueryIterator;
@@ -177,12 +150,6 @@ inline QueryBase::const_iterator QueryBase::end(void) const
 
 inline QueryBase::const_iterator QueryBase::cend(void) const
 { return QueryBase::const_iterator(); }
-
-inline QueryBase::QueryError QueryBase::Error(void) const
-{ return error_; }
-
-inline QueryBase::operator bool(void) const
-{ return error_ == QueryBase::NoError; }
 
 // ---------------
 // QueryIterator

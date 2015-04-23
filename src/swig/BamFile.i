@@ -6,14 +6,12 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 %}
 
-// Python
-#ifdef SWIGPYTHON
-%rename(__nonzero__) PacBio::BAM::BamFile::operator bool; 
-#endif // Python
+%ignore PacBio::BAM::BamFile::BamFile(BamFile&&);
+%ignore PacBio::BAM::BamFile::operator=;
 
-// R
-#ifdef SWIGR
-%ignore PacBio::BAM::BamFile::operator bool; // use BamFile$IsOpen() instead
-#endif // R
+HANDLE_STD_EXCEPTION(BamFile);
+HANDLE_STD_EXCEPTION(ReferenceId);
+HANDLE_STD_EXCEPTION(ReferenceLength);
+HANDLE_STD_EXCEPTION(ReferenceName);
 
 %include <pbbam/BamFile.h>

@@ -41,18 +41,29 @@
 
 #include "TestData.h"
 #include <gtest/gtest.h>
-#include <htslib/sam.h>
-#include <pbbam/BamReader.h>
-#include <pbbam/BamWriter.h>
-#include <iostream>
-#include <string>
-#include <cstdio>
-#include <cstdlib>
+#include <pbbam/BamFile.h>
+#include <stdexcept>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-// put any BamReader-only API tests here (error handling, random-access, etc.)
-//
-// plain ol' read & dump is in test_EndToEnd.cpp
+TEST(BamFileTest, NonExistentFileThrows)
+{
+    EXPECT_THROW(
+    {
+       BamFile file("does_not_exist.bam");
+       (void)file;
+    },
+    std::exception);
+}
 
+TEST(BamFileTest, NonBamFileThrows)
+{
+    EXPECT_THROW(
+    {
+        const std::string& fn = tests::Data_Dir + "/lambdaNEB.fa.fai";
+        BamFile file(fn);
+        (void)file;
+    },
+    std::exception);
+}

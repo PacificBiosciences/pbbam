@@ -38,57 +38,94 @@
 #include "pbbam/BamFile.h"
 #include "MemoryUtils.h"
 #include <htslib/sam.h>
+
+#include <iostream>
+
 #include <memory>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-BamFile::BamFile(void)
-    : error_(BamFile::NoError)
-    , header_(nullptr)
-{ }
+namespace PacBio {
+namespace BAM {
+namespace internal {
+
+class BamFilePrivate
+{
+public:
+    BamFilePrivate(const string& fn)
+        : filename_(fn)
+    {
+        // update verbosity
+        hts_verbose = PacBio::BAM::HtslibVerbosity;
+
+        // attempt open
+        std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
+        if (!f)
+            throw std::exception();
+        if (f->format.format != bam)
+            throw std::exception();
+
+        // attempt fetch header
+        std::unique_ptr<bam_hdr_t, internal::HtslibHeaderDeleter> hdr(sam_hdr_read(f.get()));
+        header_ = internal::BamHeaderMemory::FromRawData(hdr.get());
+    }
+
+public:
+    std::string filename_;
+    BamHeader header_;
+};
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio
 
 BamFile::BamFile(const std::string& filename)
-    : error_(BamFile::NoError)
-    , header_(nullptr)
-{
-    Open(filename);
-}
+    : d_(new internal::BamFilePrivate(filename))
+{ }
 
 BamFile::BamFile(const BamFile& other)
-    : filename_(other.filename_)
-    , error_(other.error_)
-    , header_(other.header_)
+    : d_(other.d_)
 { }
+
+BamFile::BamFile(BamFile&& other)
+    : d_(std::move(other.d_))
+{ }
+
+BamFile& BamFile::operator=(const BamFile& other)
+{ d_ = other.d_; return *this; }
+
+BamFile& BamFile::operator=(BamFile&& other)
+{ d_ = std::move(other.d_); return *this; }
 
 BamFile::~BamFile(void) { }
 
-void BamFile::Close(void)
-{
-    error_ = BamFile::NoError;
-    filename_.clear();
-    header_.reset();
-}
+std::string BamFile::Filename(void) const
+{ return d_->filename_; }
 
-bool BamFile::IsOpen(void) const
-{ return !filename_.empty() && header_; }
+bool BamFile::HasReference(const std::string& name) const
+{ return d_->header_.HasSequence(name); }
 
-void BamFile::Open(const string& filename)
-{
-    filename_ = filename;
+BamHeader BamFile::Header(void) const
+{ return d_->header_; }
 
-    // attempt open
-    std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename.c_str(), "rb"));
-    if (!f) {
-        error_ = BamFile::OpenError;
-        return;
-    }
+bool BamFile::IsPacBioBAM(void) const
+{ return !d_->header_.PacBioBamVersion().empty(); }
 
-    // attempt fetch header
-    std::unique_ptr<bam_hdr_t, internal::HtslibHeaderDeleter> hdr(sam_hdr_read(f.get()));
-    if (!hdr) {
-        error_ = BamFile::ReadHeaderError;
-        return;
-    }
-    header_ = internal::BamHeaderMemory::FromRawData(hdr.get());
-}
+std::string BamFile::StandardIndexFilename(void) const
+{ return d_->filename_ + ".bai"; }
+
+std::string BamFile::PacBioIndexFilename(void) const
+{ return d_->filename_ + ".pbi"; }
+
+int BamFile::ReferenceId(const std::string& name) const
+{ return d_->header_.SequenceId(name); }
+
+uint32_t BamFile::ReferenceLength(const std::string& name) const
+{ return ReferenceLength(ReferenceId(name)); }
+
+uint32_t BamFile::ReferenceLength(const int id) const
+{ return std::stoul(d_->header_.SequenceLength(id)); }
+
+std::string BamFile::ReferenceName(const int id) const
+{ return d_->header_.SequenceName(id); }

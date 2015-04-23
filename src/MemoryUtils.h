@@ -106,9 +106,9 @@ struct HtslibRecordDeleter
 class BamHeaderMemory
 {
 public:
-    static BamHeader::SharedPtr FromRawData(bam_hdr_t* header);
+    static BamHeader FromRawData(bam_hdr_t* header);
     static PBBAM_SHARED_PTR<bam_hdr_t> MakeRawHeader(const BamHeader& header);
-    static PBBAM_SHARED_PTR<bam_hdr_t> MakeRawHeader(const BamHeader::SharedPtr& header);
+//    static PBBAM_SHARED_PTR<bam_hdr_t> MakeRawHeader(const BamHeader& header);
 };
 
 class BamRecordMemory

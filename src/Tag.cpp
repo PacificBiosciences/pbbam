@@ -76,9 +76,7 @@ struct IsEqualVisitor : public boost::static_visitor<bool>
 
     template <typename T>
     bool operator() (const T& lhs, const T& rhs) const
-    {
-        return IsEqual(lhs, rhs);
-    }
+    { return IsEqual(lhs, rhs); }
 
 private:
     bool IsEqual(const boost::blank&, const boost::blank&) const { return true; }
@@ -182,9 +180,7 @@ bool Tag::operator== (const Tag& other) const
 }
 
 bool Tag::operator!= (const Tag& other) const
-{
-    return !(*this == other);
-}
+{ return !(*this == other); }
 
 bool Tag::HasModifier(const TagModifier m) const
 {
@@ -192,228 +188,17 @@ bool Tag::HasModifier(const TagModifier m) const
     return modifier_ == m;
 }
 
-TagModifier Tag::Modifier(void) const {
-    return modifier_;
-}
+TagModifier Tag::Modifier(void) const
+{ return modifier_; }
 
 Tag& Tag::Modifier(const TagModifier m)
-{
-    modifier_ = m;
-    return *this;
-}
+{ modifier_ = m; return *this; }
 
 char Tag::ToAscii(void) const
-{
-    return boost::apply_visitor(internal::AsciiConvertVisitor(), data_);
-}
-
-// We may enable some smart conversion between convertible types for these operator T() methods below
-// i.e. it's OK to convert an int16 to an int32
-//
-// check boost::numeric_cast
-//
-
-int8_t Tag::ToInt8(bool* ok) const
-{
-    if (ok)
-        *ok = true;
-    try {
-        return boost::get<int8_t>(data_);
-    } catch (const boost::bad_get&) {
-        if (ok)
-            *ok = false;
-        return 0;
-    }
-}
-
-uint8_t Tag::ToUInt8(bool* ok) const
-{
-    if (ok)
-        *ok = true;
-    try {
-        return boost::get<uint8_t>(data_);
-    } catch (const boost::bad_get&) {
-        if (ok)
-            *ok = false;
-        return 0;
-    }
-}
-
-int16_t Tag::ToInt16(bool* ok) const
-{
-    if (ok)
-        *ok = true;
-    try {
-        return boost::get<int16_t>(data_);
-    } catch (const boost::bad_get&) {
-        if (ok)
-            *ok = false;
-        return 0;
-    }
-}
-
-uint16_t Tag::ToUInt16(bool* ok) const
-{
-    if (ok)
-        *ok = true;
-    try {
-        return boost::get<uint16_t>(data_);
-    } catch (const boost::bad_get&) {
-        if (ok)
-            *ok = false;
-        return 0;
-    }
-}
-
-int32_t Tag::ToInt32(bool* ok) const
-{
-    if (ok)
-        *ok = true;
-    try {
-        return boost::get<int32_t>(data_);
-    } catch (const boost::bad_get&) {
-        if (ok)
-            *ok = false;
-        return 0;
-    }
-}
-
-uint32_t Tag::ToUInt32(bool* ok) const
-{
-    if (ok)
-        *ok = true;
-    try {
-        return boost::get<uint32_t>(data_);
-    } catch (const boost::bad_get&) {
-        if (ok)
-            *ok = false;
-        return 0;
-    }
-}
-
-float Tag::ToFloat(bool* ok) const
-{
-    if (ok)
-        *ok = true;
-    try {
-        return boost::get<float>(data_);
-    } catch (const boost::bad_get&) {
-        if (ok)
-            *ok = false;
-        return 0;
-    }
-}
-
-string Tag::ToString(bool* ok) const
-{
-    if (ok)
-        *ok = true;
-    try {
-        return boost::get<string>(data_);
-    } catch (const boost::bad_get&) {
-        if (ok)
-            *ok = false;
-        return string();
-    }
-}
-
-vector<int8_t> Tag::ToInt8Array(bool* ok) const
-{
-    if (ok)
-        *ok = true;
-    try {
-        return boost::get< vector<int8_t> >(data_);
-    } catch (const boost::bad_get&) {
-        if (ok)
-            *ok = false;
-        return vector<int8_t>();
-    }
-}
-
-vector<uint8_t> Tag::ToUInt8Array(bool* ok) const
-{
-    if (ok)
-        *ok = true;
-    try {
-        return boost::get< vector<uint8_t> >(data_);
-    } catch (const boost::bad_get&) {
-        if (ok)
-            *ok = false;
-        return vector<uint8_t>();
-    }
-}
-
-vector<int16_t> Tag::ToInt16Array(bool* ok) const
-{
-    if (ok)
-        *ok = true;
-    try {
-        return boost::get< vector<int16_t> >(data_);
-    } catch (const boost::bad_get&) {
-        if (ok)
-            *ok = false;
-        return vector<int16_t>();
-    }
-}
-
-vector<uint16_t> Tag::ToUInt16Array(bool* ok) const
-{
-    if (ok)
-        *ok = true;
-    try {
-        return boost::get< vector<uint16_t> >(data_);
-    } catch (const boost::bad_get&) {
-        if (ok)
-            *ok = false;
-        return vector<uint16_t>();
-    }
-}
-
-vector<int32_t> Tag::ToInt32Array(bool* ok) const
-{
-    if (ok)
-        *ok = true;
-    try {
-        return boost::get< vector<int32_t> >(data_);
-    } catch (const boost::bad_get&) {
-        if (ok)
-            *ok = false;
-        return vector<int32_t>();
-    }
-}
-
-vector<uint32_t> Tag::ToUInt32Array(bool* ok) const
-{
-    if (ok)
-        *ok = true;
-    try {
-        return boost::get< vector<uint32_t> >(data_);
-    } catch (const boost::bad_get&) {
-        if (ok)
-            *ok = false;
-        return vector<uint32_t>();
-    }
-}
-
-vector<float> Tag::ToFloatArray(bool* ok) const
-{
-    if (ok)
-        *ok = true;
-    try {
-        return boost::get< vector<float> >(data_);
-    } catch (const boost::bad_get&) {
-        if (ok)
-            *ok = false;
-        return vector<float>();
-    }
-}
+{ return boost::apply_visitor(internal::AsciiConvertVisitor(), data_); }
 
 TagDataType Tag::Type(void) const
-{
-    return TagDataType( data_.which() );
-}
+{ return TagDataType( data_.which() ); }
 
 string Tag::Typename(void) const
-{
-    return boost::apply_visitor(internal::TypenameVisitor(), data_);
-}
+{ return boost::apply_visitor(internal::TypenameVisitor(), data_); }

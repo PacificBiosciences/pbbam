@@ -37,7 +37,7 @@
 
 try:
     import PacBioBam as bam
-    bamFile = bam.BamFile()
+    header = bam.BamHeader()
     print "\nPython wrapper OK.\n"
 except ImportError:
     print "\nPython wrapper failed!\n"

@@ -61,6 +61,14 @@ class BamHeaderTest(unittest.TestCase):
         self.assertEqual(0, len(header.Programs()))
         self.assertEqual(0, len(header.Comments()))
         
+        with self.assertRaises(SystemError):
+            pg = header.Program("foo")
+            rg = header.ReadGroup("foo")
+            sq = header.SequenceId("foo")
+            sl = header.SequenceLength(42)
+            sn = header.SequenceName(42)
+        
+        
     def test_decode(self):
         
         text = ("@HD\tVN:1.1\tSO:queryname\tpb:3.0b3\n"

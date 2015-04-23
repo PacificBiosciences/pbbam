@@ -6,7 +6,6 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/Accuracy.h
     ${PacBioBAM_IncludeDir}/pbbam/BamFile.h
     ${PacBioBAM_IncludeDir}/pbbam/BamHeader.h
-    ${PacBioBAM_IncludeDir}/pbbam/BamReader.h
     ${PacBioBAM_IncludeDir}/pbbam/BamRecord.h
     ${PacBioBAM_IncludeDir}/pbbam/BamRecordBuilder.h
     ${PacBioBAM_IncludeDir}/pbbam/BamRecordImpl.h
@@ -50,7 +49,6 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/AssertUtils.cpp
     ${PacBioBAM_SourceDir}/BamFile.cpp
     ${PacBioBAM_SourceDir}/BamHeader.cpp
-    ${PacBioBAM_SourceDir}/BamReader.cpp
     ${PacBioBAM_SourceDir}/BamRecord.cpp
     ${PacBioBAM_SourceDir}/BamRecordBuilder.cpp
     ${PacBioBAM_SourceDir}/BamRecordImpl.cpp
@@ -58,6 +56,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/BamWriter.cpp
     ${PacBioBAM_SourceDir}/Cigar.cpp
     ${PacBioBAM_SourceDir}/CigarOperation.cpp
+    ${PacBioBAM_SourceDir}/Config.cpp
     ${PacBioBAM_SourceDir}/EntireFileQuery.cpp
     ${PacBioBAM_SourceDir}/Frames.cpp
     ${PacBioBAM_SourceDir}/GenomicInterval.cpp

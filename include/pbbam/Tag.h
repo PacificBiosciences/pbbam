@@ -163,26 +163,29 @@ public:
     /// \returns ASCII character, if valid. Otherwise NULL char ('\0').
     char ToAscii(void) const;
 
-    // casts data to requested type, if can convert
-    // otherwise, returns 0 or empty container (and ok == false, if passed in)
-    //
-    // For now, the conversion MUST be to the same EXACT TYPE as the input data.
-    //
-    int8_t   ToInt8(bool* ok = 0) const;
-    uint8_t  ToUInt8(bool* ok = 0) const;
-    int16_t  ToInt16(bool* ok = 0) const;
-    uint16_t ToUInt16(bool* ok = 0) const;
-    int32_t  ToInt32(bool* ok = 0) const;
-    uint32_t ToUInt32(bool* ok = 0) const;
-    float    ToFloat(bool* ok = 0) const;
-    std::string           ToString(bool* ok = 0) const;
-    std::vector<int8_t>   ToInt8Array(bool* ok = 0) const;
-    std::vector<uint8_t>  ToUInt8Array(bool* ok = 0) const;
-    std::vector<int16_t>  ToInt16Array(bool* ok = 0) const;
-    std::vector<uint16_t> ToUInt16Array(bool* ok = 0) const;
-    std::vector<int32_t>  ToInt32Array(bool* ok = 0) const;
-    std::vector<uint32_t> ToUInt32Array(bool* ok = 0) const;
-    std::vector<float>    ToFloatArray(bool* ok = 0) const;
+    /// Explicit convenience method
+    inline int8_t   ToInt8(void) const;
+    inline uint8_t  ToUInt8(void) const;
+    inline int16_t  ToInt16(void) const;
+    inline uint16_t ToUInt16(void) const;
+    inline int32_t  ToInt32(void) const;
+    inline uint32_t ToUInt32(void) const;
+    inline float    ToFloat(void) const;
+    inline std::string           ToString(void) const;
+    inline std::vector<int8_t>   ToInt8Array(void) const;
+    inline std::vector<uint8_t>  ToUInt8Array(void) const;
+    inline std::vector<int16_t>  ToInt16Array(void) const;
+    inline std::vector<uint16_t> ToUInt16Array(void) const;
+    inline std::vector<int32_t>  ToInt32Array(void) const;
+    inline std::vector<uint32_t> ToUInt32Array(void) const;
+    inline std::vector<float>    ToFloatArray(void) const;
+
+    /// Fetch stored value.
+    ///
+    /// \note The requested type MUST be to the same EXACT TYPE as the stored data.
+    /// \throws boost::bad_get on failed conversion
+    template<typename T>
+    T Value(void) const;
 
     /// \}
 
@@ -376,6 +379,55 @@ inline bool Tag::IsIntegralArray(void) const
 
 inline bool Tag::IsArray(void) const
 { return IsIntegralArray() || IsFloatArray(); }
+
+inline int8_t Tag::ToInt8(void) const
+{ return Value<int8_t>(); }
+
+inline uint8_t Tag::ToUInt8(void) const
+{ return Value<uint8_t>(); }
+
+inline int16_t Tag::ToInt16(void) const
+{ return Value<int16_t>(); }
+
+inline uint16_t Tag::ToUInt16(void) const
+{ return Value<uint16_t>(); }
+
+inline int32_t Tag::ToInt32(void) const
+{ return Value<int32_t>(); }
+
+inline uint32_t Tag::ToUInt32(void) const
+{ return Value<uint32_t>(); }
+
+inline float Tag::ToFloat(void) const
+{ return Value<float>(); }
+
+inline std::string Tag::ToString(void) const
+{ return Value<std::string>(); }
+
+inline std::vector<int8_t> Tag::ToInt8Array(void) const
+{ return Value< std::vector<int8_t> >(); }
+
+inline std::vector<uint8_t> Tag::ToUInt8Array(void) const
+{ return Value< std::vector<uint8_t> >(); }
+
+inline std::vector<int16_t> Tag::ToInt16Array(void) const
+{ return Value< std::vector<int16_t> >(); }
+
+inline std::vector<uint16_t> Tag::ToUInt16Array(void) const
+{ return Value< std::vector<uint16_t> >(); }
+
+inline std::vector<int32_t> Tag::ToInt32Array(void) const
+{ return Value< std::vector<int32_t> >(); }
+
+inline std::vector<uint32_t> Tag::ToUInt32Array(void) const
+{ return Value< std::vector<uint32_t> >(); }
+
+inline std::vector<float> Tag::ToFloatArray(void) const
+{ return Value< std::vector<float> >(); }
+
+template<typename T>
+T Tag::Value(void) const
+{ return boost::get<T>(data_); }
 
 } // namespace BAM
 } // namespace PacBio

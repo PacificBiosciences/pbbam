@@ -46,9 +46,24 @@ using namespace std;
 GenomicIntervalQuery::GenomicIntervalQuery(const GenomicInterval& interval,
                                            const BamFile& file)
     : QueryBase(file)
+    , htsIterator_(nullptr)
 {
-    if (InitFile(file))
-        Interval(interval);
+    // open file
+    htsFile_.reset(sam_open(file.Filename().c_str(), "rb"), internal::HtslibFileDeleter());
+    if (!htsFile_)
+        throw std::exception();
+
+    htsHeader_.reset(sam_hdr_read(htsFile_.get()), internal::HtslibHeaderDeleter());
+    if (!htsHeader_)
+        throw std::exception();
+
+    // open index
+    htsIndex_.reset(bam_index_load(file.Filename().c_str()), internal::HtslibIndexDeleter());
+    if (!htsIndex_)
+        throw std::exception();
+
+    // initialize interval
+    Interval(interval);
 }
 
 //GenomicIntervalQuery::GenomicIntervalQuery(const string& zeroBasedRegion,
@@ -61,78 +76,57 @@ GenomicIntervalQuery::GenomicIntervalQuery(const GenomicInterval& interval,
 
 bool GenomicIntervalQuery::GetNext(BamRecord& record)
 {
-    if (error_ == GenomicIntervalQuery::NoError && htsIterator_) {
+    if (htsIterator_) {
         const int result = sam_itr_next(htsFile_.get(),
                                         htsIterator_.get(),
                                         internal::BamRecordMemory::GetRawData(record).get());
+
+        // success
         if (result >= 0)
             return true;
-        else if (result < -1) {
-            // TODO: determine & report error (truncated BAM file or malformed index, etc.)
-        }
+
+        // normal EOF
+        else if (result == -1)
+            return false;
+
+        // error (truncated file, etc)
+        else
+            throw std::exception();
     }
+
+    // no iterator set
     return false;
 }
 
-bool GenomicIntervalQuery::InitFile(const BamFile& file) {
-
-    error_ = GenomicIntervalQuery::NoError;
-
-    // open file
-    htsFile_.reset(sam_open(file.Filename().c_str(), "rb"), internal::HtslibFileDeleter());
-    if (!htsFile_) {
-        error_ = GenomicIntervalQuery::FileOpenError;
-        return false;
-    }
-
-    htsHeader_.reset(sam_hdr_read(htsFile_.get()), internal::HtslibHeaderDeleter());
-    if (!htsHeader_) {
-        error_ = GenomicIntervalQuery::FileMetadataError;
-        return false;
-    }
-
-    // open index
-    htsIndex_.reset(bam_index_load(file.Filename().c_str()), internal::HtslibIndexDeleter());
-    if (!htsIndex_) {
-        error_ = GenomicIntervalQuery::IndexFileOpenError;
-        return false;
-    }
-
-    // if we get here, return success
-    return true;
-}
-
 GenomicInterval GenomicIntervalQuery::Interval(void) const
-{
-    return interval_;
-}
+{ return interval_; }
 
 GenomicIntervalQuery& GenomicIntervalQuery::Interval(const GenomicInterval& interval)
 {
-    // if file-related error, or missing data - then setting a new interval
+    // if file-related error, or missing data - setting a new interval
     // can't help anything. just get out of here
-    if (!htsFile_ || !htsHeader_ || !htsIndex_ ||
-        error_ == GenomicIntervalQuery::FileOpenError ||
-        error_ == GenomicIntervalQuery::FileMetadataError ||
-        error_ == GenomicIntervalQuery::IndexFileOpenError ||
-        error_ == GenomicIntervalQuery::IndexFileMetadataError)
-    {
-        htsIterator_.reset();
-        return *this;
+    if (!htsFile_ || !htsHeader_ || !htsIndex_) {
+        if (!htsFile_)   cerr << "HTS file null" << endl;
+        if (!htsHeader_) cerr << "HTS header null" << endl;
+        if (!htsIndex_)  cerr << "HTS index null" << endl;
+        throw std::exception();
     }
 
-    // otherwise, attempt to get an iterator for this interval
-    error_ = GenomicIntervalQuery::InitializeQueryError;
-    if (interval.Id() >= 0 && interval.Id() < htsHeader_->n_targets) {
-        htsIterator_.reset(sam_itr_queryi(htsIndex_.get(),
-                                          interval.Id(),
-                                          interval.Start(),
-                                          interval.Stop()),
-                           internal::HtslibIteratorDeleter());
+    // ensure clean slate
+    htsIterator_.reset();
 
-        // if successful, clear error
-        if(htsIterator_)
-            error_ = GenomicIntervalQuery::NoError;
+    // lookup ID for reference name
+    if (file_.Header().HasSequence(interval.Name())) {
+        const int id = file_.ReferenceId(interval.Name());
+        if (id >= 0 && id < htsHeader_->n_targets) {
+
+            // get iterator for interval
+            htsIterator_.reset(sam_itr_queryi(htsIndex_.get(),
+                                              id,
+                                              interval.Start(),
+                                              interval.Stop()),
+                               internal::HtslibIteratorDeleter());
+        }
     }
 
     return *this;

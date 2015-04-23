@@ -72,6 +72,12 @@ TEST(BamHeaderTest, DefaultConstruction)
     EXPECT_TRUE(header.Sequences().empty());
     EXPECT_TRUE(header.Programs().empty());
     EXPECT_TRUE(header.Comments().empty());
+
+    EXPECT_THROW(header.Program("foo"),     std::exception);
+    EXPECT_THROW(header.ReadGroup("foo"),   std::exception);
+    EXPECT_THROW(header.SequenceId("foo"),  std::exception);
+    EXPECT_THROW(header.SequenceLength(42), std::exception);
+    EXPECT_THROW(header.SequenceName(42),   std::exception);
 }
 
 TEST(BamHeaderTest, DecodeTest)
@@ -86,36 +92,36 @@ TEST(BamHeaderTest, DecodeTest)
                          "@CO\tipsum and so on\n"
                          "@CO\tcitation needed\n";
 
-    BamHeader::SharedPtr header = BamHeader::FromSam(text);
+    BamHeader header = BamHeader(text);
 
-    EXPECT_EQ(string("1.1"),       header->Version());
-    EXPECT_EQ(string("queryname"), header->SortOrder());
-    EXPECT_EQ(string("3.0b3"),     header->PacBioBamVersion());
+    EXPECT_EQ(string("1.1"),       header.Version());
+    EXPECT_EQ(string("queryname"), header.SortOrder());
+    EXPECT_EQ(string("3.0b3"),     header.PacBioBamVersion());
 
-    EXPECT_EQ(3, header->ReadGroups().size());
-    EXPECT_TRUE(header->HasReadGroup("rg1"));
-    EXPECT_TRUE(header->HasReadGroup("rg2"));
-    EXPECT_TRUE(header->HasReadGroup("rg3"));
+    EXPECT_EQ(3, header.ReadGroups().size());
+    EXPECT_TRUE(header.HasReadGroup("rg1"));
+    EXPECT_TRUE(header.HasReadGroup("rg2"));
+    EXPECT_TRUE(header.HasReadGroup("rg3"));
 
-    EXPECT_EQ(string("control"),    header->ReadGroup("rg1").Sample());
-    EXPECT_EQ(string("condition1"), header->ReadGroup("rg2").Sample());
-    EXPECT_EQ(string("condition1"), header->ReadGroup("rg3").Sample());
+    EXPECT_EQ(string("control"),    header.ReadGroup("rg1").Sample());
+    EXPECT_EQ(string("condition1"), header.ReadGroup("rg2").Sample());
+    EXPECT_EQ(string("condition1"), header.ReadGroup("rg3").Sample());
 
-    EXPECT_EQ(2, header->Sequences().size());
-    EXPECT_TRUE(header->HasSequence("chr1"));
-    EXPECT_TRUE(header->HasSequence("chr2"));
-    EXPECT_EQ(string("chocobo"), header->Sequence("chr1").Species());
-    EXPECT_EQ(string("chocobo"), header->Sequence("chr2").Species());
-    EXPECT_EQ(string("2038"), header->Sequence("chr1").Length());
-    EXPECT_EQ(string("3042"), header->Sequence("chr2").Length());
+    EXPECT_EQ(2, header.Sequences().size());
+    EXPECT_TRUE(header.HasSequence("chr1"));
+    EXPECT_TRUE(header.HasSequence("chr2"));
+    EXPECT_EQ(string("chocobo"), header.Sequence("chr1").Species());
+    EXPECT_EQ(string("chocobo"), header.Sequence("chr2").Species());
+    EXPECT_EQ(string("2038"), header.Sequence("chr1").Length());
+    EXPECT_EQ(string("3042"), header.Sequence("chr2").Length());
 
-    EXPECT_EQ(1, header->Programs().size());
-    EXPECT_TRUE(header->HasProgram("_foo_"));
-    EXPECT_EQ(string("ide"), header->Program("_foo_").Name());
+    EXPECT_EQ(1, header.Programs().size());
+    EXPECT_TRUE(header.HasProgram("_foo_"));
+    EXPECT_EQ(string("ide"), header.Program("_foo_").Name());
 
-    EXPECT_EQ(2, header->Comments().size());
-    EXPECT_EQ(string("ipsum and so on"), header->Comments().at(0));
-    EXPECT_EQ(string("citation needed"), header->Comments().at(1));
+    EXPECT_EQ(2, header.Comments().size());
+    EXPECT_EQ(string("ipsum and so on"), header.Comments().at(0));
+    EXPECT_EQ(string("citation needed"), header.Comments().at(1));
 }
 
 TEST(BamHeaderCodecTest, EncodeTest)
@@ -264,12 +270,12 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
     rawData->text = (char*)calloc(rawData->l_text + 1, 1);
     memcpy(rawData->text, text.c_str(), rawData->l_text);
 
-    const BamHeader::SharedPtr& newHeader = BamHeader::FromSam(string(rawData->text, rawData->l_text));
+    const BamHeader newHeader = BamHeader(string(rawData->text, rawData->l_text));
 
-    EXPECT_EQ(header.Version(),          newHeader->Version());
-    EXPECT_EQ(header.SortOrder(),        newHeader->SortOrder());
-    EXPECT_EQ(header.PacBioBamVersion(), newHeader->PacBioBamVersion());
+    EXPECT_EQ(header.Version(),          newHeader.Version());
+    EXPECT_EQ(header.SortOrder(),        newHeader.SortOrder());
+    EXPECT_EQ(header.PacBioBamVersion(), newHeader.PacBioBamVersion());
 
-    text = newHeader->ToSam();
+    text = newHeader.ToSam();
     EXPECT_EQ(expectedText, text);
 }

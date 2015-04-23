@@ -39,11 +39,13 @@
 #define private public
 #endif
 
+#include "TestData.h"
 #include <gtest/gtest.h>
 #include <htslib/sam.h>
 #include <pbbam/BamHeader.h>
-#include <pbbam/BamReader.h>
+#include <pbbam/BamRecord.h>
 #include <pbbam/BamWriter.h>
+#include <pbbam/EntireFileQuery.h>
 #include <chrono>
 #include <iostream>
 #include <string>
@@ -56,6 +58,8 @@ using namespace std;
 // put any BamWriter-only API tests here (error handling, etc.)
 //
 // plain ol' read & dump is in test_EndToEnd.cpp
+
+const string generatedBamFn = tests::Data_Dir + "/generated.bam";
 
 struct ResultPacket
 {
@@ -136,7 +140,6 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
     result.bamRecord.impl_.ReferenceId(-1);
 
     std::vector<uint8_t> subQv = std::vector<uint8_t>({34, 5, 125});
-//    std::vector<uint16_t> subQv = std::vector<uint16_t>({34, 5, 125});
 
     TagCollection tags;
     tags["SQ"] = subQv;
@@ -156,40 +159,42 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
     BamHeader headerSubreads;
     headerSubreads.Version("1.1")
                   .SortOrder("coordinate");
-//    SamHeader headerSubreads;
-//    headerSubreads.version = "1.1";
-//    headerSubreads.sortOrder = "coordinate";
-    BamWriter bamSubreads("42.subreads.bam", headerSubreads);
-    EXPECT_TRUE(bamSubreads);
-    EXPECT_TRUE(bamSubreads.Write(result.bamRecord));
-    bamSubreads.Close();
 
-    BamReader reader;
-    EXPECT_TRUE(reader.Open("42.subreads.bam"));
-    EXPECT_EQ(std::string("1.1"), reader.Header()->Version());
-    EXPECT_EQ(std::string("coordinate"), reader.Header()->SortOrder());
+    EXPECT_NO_THROW ({
+        BamWriter writer(generatedBamFn, headerSubreads);
+        writer.Write(result.bamRecord);
+    });
 
-    auto inputRecord = PBBAM_SHARED_PTR<BamRecord>(new BamRecord);
-    EXPECT_TRUE(reader.GetNext(inputRecord));
+    EXPECT_NO_THROW ({
+        BamFile file(generatedBamFn);
+        EXPECT_EQ(std::string("1.1"),        file.Header().Version());
+        EXPECT_EQ(std::string("coordinate"), file.Header().SortOrder());
 
-    const BamRecordImpl& impl = inputRecord->Impl();
-    EXPECT_EQ(std::string("ACGTC"),   impl.Sequence());
-    EXPECT_EQ(std::string("ZMW\\42"), impl.Name());
+        EntireFileQuery entireFile(file);
+        for (const BamRecord& record : entireFile) {
+            const BamRecordImpl& impl = record.Impl();
 
-    const TagCollection& implTags = impl.Tags();
-    EXPECT_TRUE(implTags.Contains("SQ"));
-    EXPECT_TRUE(implTags.Contains("a1"));
-    EXPECT_TRUE(implTags.Contains("a2"));
+            EXPECT_EQ(std::string("ACGTC"),   impl.Sequence());
+            EXPECT_EQ(std::string("ZMW\\42"), impl.Name());
 
-    const Tag sqTag = impl.TagValue("SQ");
-    const Tag a1Tag = impl.TagValue("a1");
-    const Tag a2Tag = impl.TagValue("a2");
-    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), sqTag.ToUInt8Array());
-    EXPECT_EQ('J', a1Tag.ToAscii());
-    EXPECT_EQ('K', a2Tag.ToAscii());
+            const TagCollection& implTags = impl.Tags();
+            EXPECT_TRUE(implTags.Contains("SQ"));
+            EXPECT_TRUE(implTags.Contains("a1"));
+            EXPECT_TRUE(implTags.Contains("a2"));
 
-    reader.Close();
-    remove("42.subreads.bam");
+            const Tag sqTag = impl.TagValue("SQ");
+            const Tag a1Tag = impl.TagValue("a1");
+            const Tag a2Tag = impl.TagValue("a2");
+            EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), sqTag.ToUInt8Array());
+            EXPECT_EQ('J', a1Tag.ToAscii());
+            EXPECT_EQ('K', a2Tag.ToAscii());
+
+            // just check first record
+            break;
+        }
+    });
+
+    remove(generatedBamFn.c_str());
 }
 
 //#define SEQ_LENGTH  7000

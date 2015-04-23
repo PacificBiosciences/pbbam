@@ -35,6 +35,51 @@
 #
 # Author: Derek Barnett
 
+empty_program <- function(header) {
+	result <- tryCatch(
+		{
+			pg <- header$Program("foo")
+			assertTrue(FALSE) # should have thrown 
+			invisible()
+		},
+		warning = function(w) {
+			assertTrue(TRUE)
+			invisible()
+		}
+	)
+	return(result)
+}
+
+empty_readgroup <- function(header) {
+	result <- tryCatch(
+		{
+			pg <- header$ReadGroup("foo")
+			assertTrue(FALSE) # should have thrown 
+			invisible()
+		},
+		warning = function(w) {
+			assertTrue(TRUE)
+			invisible()
+		}
+	)
+	return(result)
+}
+
+empty_sequenceid <- function(header) {
+	result <- tryCatch(
+		{
+			pg <- header$SequenceId("foo")
+			assertTrue(FALSE) # should have thrown 
+			invisible()
+		},
+		warning = function(w) {
+			assertTrue(TRUE)
+			invisible()
+		}
+	)
+	return(result)
+}
+
 test_case("BamHeader_Defaults", {
 	
     header <- BamHeader()
@@ -44,6 +89,10 @@ test_case("BamHeader_Defaults", {
 	assertTrue(header$ReadGroups()$empty())
 	assertTrue(header$Sequences()$empty())
 	assertTrue(header$Programs()$empty())
+	
+	pg <- empty_program(header)
+	rg <- empty_readgroup(header)
+	id <- empty_sequenceid(header)
 	
 	# TODO: get comment fetching working
 	#assertEqual(1, length(header$Comments()))

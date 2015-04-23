@@ -51,38 +51,40 @@ const string inputBamFn = tests::Data_Dir + "/ex2.bam";
 
 TEST(EntireFileQueryTest, CountRecords)
 {
-    // open input BAM file
-    BamFile bamFile(inputBamFn);
-    EXPECT_TRUE(bamFile);
+    EXPECT_NO_THROW(
+    {
+        // open input BAM file
+        BamFile bamFile(inputBamFn);
 
-    // count records
-    int count = 0;
-    EntireFileQuery entireFile(bamFile);
-    EXPECT_TRUE(entireFile);
-    for (const BamRecord& record : entireFile) {
-        (void)record;
-        ++count;
-    }
+        // count records
+        int count = 0;
+        EntireFileQuery entireFile(bamFile);
+        for (const BamRecord& record : entireFile) {
+            (void)record;
+            ++count;
+        }
 
-    EXPECT_EQ(3307, count);
+        EXPECT_EQ(3307, count);
+    });
 }
 
 TEST(EntireFileQueryTest, NonConstBamRecord)
 {
-    // open input BAM file
-    BamFile bamFile(inputBamFn);
-    EXPECT_TRUE(bamFile);
+    EXPECT_NO_THROW(
+    {
+        // open input BAM file
+        BamFile bamFile(inputBamFn);
 
-    // count records
-    int count = 0;
-    EntireFileQuery entireFile(bamFile);
-    EXPECT_TRUE(entireFile);
-    for (BamRecord& record : entireFile) {
-        (void)record;
-        ++count;
-    }
+        // count records
+        int count = 0;
+        EntireFileQuery entireFile(bamFile);
+        for (BamRecord& record : entireFile) {
+            (void)record;
+            ++count;
+        }
 
-    EXPECT_EQ(3307, count);
+        EXPECT_EQ(3307, count);
+    });
 }
 
 //TEST(EntireFileQueryTest, WorksWithBamRecordImpl)

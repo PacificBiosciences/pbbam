@@ -205,20 +205,20 @@ TEST(IntervalTest, LengthTest)
 TEST(GenomicIntervalTest, Constructors)
 {
     GenomicInterval empty;
-    GenomicInterval refAndCoords(0, 100, 200);
+    GenomicInterval refAndCoords("foo", 100, 200);
 
-    EXPECT_EQ(-1, empty.Id());
+    EXPECT_EQ("", empty.Name());
     EXPECT_EQ(0,  empty.Start());
     EXPECT_EQ(0,  empty.Stop());
 
-    EXPECT_EQ(0,   refAndCoords.Id());
-    EXPECT_EQ(100, refAndCoords.Start());
-    EXPECT_EQ(200, refAndCoords.Stop());
+    EXPECT_EQ("foo", refAndCoords.Name());
+    EXPECT_EQ(100,   refAndCoords.Start());
+    EXPECT_EQ(200,   refAndCoords.Stop());
 }
 
 TEST(GenomicIntervalTest, Copy)
 {
-    GenomicInterval interval1(1, 10, 20);
+    GenomicInterval interval1("foo", 10, 20);
     GenomicInterval interval2(interval1);
     GenomicInterval interval3 = interval1;
 
@@ -229,11 +229,11 @@ TEST(GenomicIntervalTest, Copy)
 
 TEST(GenomicIntervalTest, Modifiers)
 {
-    GenomicInterval interval1(1, 10, 20);
+    GenomicInterval interval1("foo", 10, 20);
 
     // modify individual properties
     GenomicInterval interval2(interval1);
-    interval2.Id(5);
+    interval2.Name("bar");
     interval2.Start(2);
     interval2.Stop(10);
 
@@ -242,25 +242,25 @@ TEST(GenomicIntervalTest, Modifiers)
     interval3.Interval(interval2.Interval());
 
     EXPECT_FALSE(interval1 == interval2);
-    EXPECT_EQ(5,  interval2.Id());
-    EXPECT_EQ(2,  interval2.Start());
-    EXPECT_EQ(10, interval2.Stop());
+    EXPECT_EQ("bar", interval2.Name());
+    EXPECT_EQ(2,     interval2.Start());
+    EXPECT_EQ(10,    interval2.Stop());
 
-    EXPECT_EQ(interval1.Id(),       interval3.Id());
+    EXPECT_EQ(interval1.Name(),     interval3.Name());
     EXPECT_EQ(interval2.Interval(), interval3.Interval());
 }
 
 TEST(GenomicIntervalTest, CoverTest)
 {
-    GenomicInterval interval1(0, 2, 4);
-    GenomicInterval interval2(0, 3, 5);
-    GenomicInterval interval3(0, 6, 8);
-    GenomicInterval interval4(0, 1, 7);
-    GenomicInterval interval5(0, 5, 8);
+    GenomicInterval interval1("foo", 2, 4);
+    GenomicInterval interval2("foo", 3, 5);
+    GenomicInterval interval3("foo", 6, 8);
+    GenomicInterval interval4("foo", 1, 7);
+    GenomicInterval interval5("foo", 5, 8);
 
     // same as interval2, but different ref
     GenomicInterval interval6(interval2);
-    interval6.Id(1);
+    interval6.Name("bar");
 
     EXPECT_TRUE(interval1.Covers(interval1));    // self-cover: a.covers(a)
     EXPECT_TRUE(interval1.CoveredBy(interval1)); // self-cover: a.coveredBy(a)
@@ -290,16 +290,16 @@ TEST(GenomicIntervalTest, CoverTest)
 TEST(GenomicIntervalTest, ValidityTest)
 {
     GenomicInterval interval1;            // default ctor
-    GenomicInterval interval2(0,0,0);     // valid id, start == stop (zero)
-    GenomicInterval interval3(0,4,4);     // valid id, start == stop (nonzero)
-    GenomicInterval interval4(0,0,1);     // valid id, start < stop  (start is zero)
-    GenomicInterval interval5(0,4,5);     // valid id, start < stop  (start is nonzero)
-    GenomicInterval interval6(0,5,4);     // valid id, start > stop
-    GenomicInterval interval7(-1,0,0);    // invalid id, start == stop (zero)
-    GenomicInterval interval8(-1,4,4);    // invalid id, start == stop (nonzero)
-    GenomicInterval interval9(-1,0,1);    // invalid id, start < stop  (start is zero)
-    GenomicInterval interval10(-1,4,5);   // invalid id, start < stop  (start is nonzero)
-    GenomicInterval interval11(-1,5,4);   // invalid id, start > stop
+    GenomicInterval interval2("foo",0,0);     // valid id, start == stop (zero)
+    GenomicInterval interval3("foo",4,4);     // valid id, start == stop (nonzero)
+    GenomicInterval interval4("foo",0,1);     // valid id, start < stop  (start is zero)
+    GenomicInterval interval5("foo",4,5);     // valid id, start < stop  (start is nonzero)
+    GenomicInterval interval6("foo",5,4);     // valid id, start > stop
+    GenomicInterval interval7("",0,0);    // invalid id, start == stop (zero)
+    GenomicInterval interval8("",4,4);    // invalid id, start == stop (nonzero)
+    GenomicInterval interval9("",0,1);    // invalid id, start < stop  (start is zero)
+    GenomicInterval interval10("",4,5);   // invalid id, start < stop  (start is nonzero)
+    GenomicInterval interval11("",5,4);   // invalid id, start > stop
 
     EXPECT_FALSE(interval1.IsValid());
     EXPECT_FALSE(interval2.IsValid());

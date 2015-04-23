@@ -35,46 +35,68 @@
 #
 # Author: Derek Barnett
 
+originalNames <-function(inputFn, generatedFn) {
+	
+	result <- tryCatch(
+		{
+			file <- BamFile(inputFn)
+			writer <- BamWriter(generatedFn, file$Header())
+			entireFile <- EntireFileQuery(file)
+		
+			names_in <- list()
+			iter <- entireFile$begin()
+			end <- entireFile$end()
+			while ( iter$'__ne__'(end) ) {
+				record <- iter$value()
+				names_in <- c(names_in, record$FullName())
+				writer$Write(record)
+				iter$incr()
+			}
+			return(names_in)
+		},
+		error = function(e) {
+			assertTrue(FALSE)     # should not throw
+			return(list())
+		}
+	)
+	return(result)
+}
+
+generatedNames <- function(generatedFn) {
+	
+	result <- tryCatch(
+		{
+			file <- BamFile(generatedFn)
+			entireFile <- EntireFileQuery(file)
+	
+			names_out <- list()
+			iter <- entireFile$begin()
+			end <- entireFile$end()
+			while ( iter$'__ne__'(end) ) {
+				names_out <- c(names_out, iter$FullName())
+				iter$incr()
+			}
+			return(names_out)
+		},
+		error = function(e) {
+			assertTrue(FALSE)     # should not throw
+			return(list())
+		}
+	)
+	return(result)
+}
+
 test_case("EndToEnd_Placeholder", {
 	
 	inputFn     <- paste(test_data_path, "ex2.bam", sep="/")
 	generatedFn <- paste(test_data_path, "generated.bam", sep="/")
 
 	# loop over original file, store names, write to generated file
-	file <- BamFile(inputFn)
-	assertTrue(file$IsOpen())
-
-	writer <- BamWriter(generatedFn, file$Header())
-	assertTrue(writer$IsOpen())
-
-	entireFile <- EntireFileQuery(file)
-
-	# iterate
-	names_in <- list()
-	iter <- entireFile$begin()
-	end <- entireFile$end()
-	while ( iter$'__ne__'(end) ) {
-		record <- iter$value()
-		names_in <- c(names_in, record$FullName())
-		writer$Write(record)
-		iter$incr()
-	}
-	writer$Close() # ensure we flush buffers
-
-	# open generated file, read names back
-	file$Open(generatedFn)
-	assertTrue(file$IsOpen())
-
-	entireFile <- EntireFileQuery(file)
+	names_in  <- originalNames(inputFn, generatedFn)
 	
-	names_out <- list()
-	iter <- entireFile$begin()
-	end <- entireFile$end()
-	while ( iter$'__ne__'(end) ) {
-		names_out <- c(names_out, iter$FullName())
-		iter$incr()
-	}
-
+	# read names from new file
+	names_out <- generatedNames(generatedFn)
+	
 	# ensure equal
 	assertEqual(names_in, names_out)
 })

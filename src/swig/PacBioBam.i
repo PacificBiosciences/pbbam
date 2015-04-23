@@ -17,6 +17,7 @@ endif*/
 
 /********* SWIG includes ************/
 
+%include "exception.i"
 %include "stdint.i"
 %include "std_common.i"
 
@@ -28,13 +29,42 @@ endif*/
 %include "boost_shared_ptr.i"
 #endif
 
-%include "std_container.i"
 %include "std_map.i"
 %include "std_pair.i"
 %include "std_string.i"
 %include "std_vector.i"
 
 %template(StringList) std::vector<std::string>;
+
+// basic exception-handler helper 
+//
+// -- STL builtins --
+// std::invalid_argument -> ValueError
+// std::domain_error     -> ValueError
+// std::overflow_error   -> OverflowError
+// std::out_of_range     -> IndexError
+// std::length_error     -> IndexError
+// std::runtime_error    -> RuntimeError
+// std::exception        -> SystemError       
+// 
+// (anything else)       -> UnknownError
+//
+// * All pbbam exceptions are simply std::exception (SystemErro) for now, 
+//   until (if?) we flesh out a more detailed exception hierarchy.
+//   Either way, new ones will inherit from std::exception, so SystemError 
+//   should still remain a valid handler.
+//
+%define HANDLE_STD_EXCEPTION(MethodName)
+%exception MethodName {
+    try { 
+		$action 
+	}
+    SWIG_CATCH_STDEXCEPT // catch std::exception
+    catch (...) { 
+		SWIG_exception_fail(SWIG_UnknownError, "Unknown exception"); 
+	}
+}
+%enddef
 
 /********* PacBioBAM includes ************/
 

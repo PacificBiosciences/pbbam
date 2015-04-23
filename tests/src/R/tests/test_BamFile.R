@@ -35,30 +35,43 @@
 #
 # Author: Derek Barnett
 
-test_case("BamFile_Defaults", {
-	
-	f <- BamFile()
-	assertFalse(f$IsOpen())
-	assertEqual(0L, nchar(f$Filename())) 
+test_case("BamFile_NonExistentFile", {
+	result <- tryCatch(
+		{
+			f <- BamFile("does_not_exist.bam")
+			assertTrue(FALSE) # should have thrown
+			invisible()
+		},
+		warning = function(w) {
+			assertTrue(TRUE)
+			invisible()
+		},
+		error = function(e) {
+			assertTrue(TRUE) 
+			invisible()
+		}
+	)
+	return(result)
 })
 
-test_case("BamFile_FilenameCtor", {
+test_case("BamFile_Ctor", {
 	
 	fn <- paste(test_data_path, "ex2.bam", sep="/")
-	f <- BamFile(fn)
-	assertTrue(f$IsOpen())
-	assertFalse(f$IsPacBioBAM())
-})
-
-test_case("BamFile_OpenClose", {
 	
-	f <- BamFile()
-	assertFalse(f$IsOpen())
-	
-	fn <- paste(test_data_path, "ex2.bam", sep="/")
-	f$Open(fn)
-	assertTrue(f$IsOpen())
-	
-	f$Close()
-	assertFalse(f$IsOpen())
+	result <- tryCatch(
+		{
+			f <- BamFile(fn)
+			assertFalse(f$IsPacBioBAM())
+			invisible()
+		},
+		warning = function(w) {
+			assertTrue(TRUE)
+			invisible()
+		},
+		error = function(e) {
+			assertTrue(FALSE)    # should not throw
+			invisible()
+		}
+	)
+	return(result)
 })

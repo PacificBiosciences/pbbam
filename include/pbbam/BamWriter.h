@@ -49,6 +49,8 @@ namespace BAM {
 
 class BamFile;
 
+namespace internal { class BamWriterPrivate; }
+
 class PBBAM_EXPORT BamWriter
 {
 public:
@@ -75,16 +77,6 @@ public:
       , BestCompression    = CompressionLevel_9
     };
 
-    /// This enum describes the errors that may be returned by the Error() function.
-    enum WriteError
-    {
-        NoError = 0      ///< No error occurred.
-      , OpenFileError    ///< An error occurred while opening the file.
-      , NullHeaderError  ///< Header data was invalid.
-      , WriteHeaderError ///< An error occurred while writing header data.
-      , WriteRecordError ///< An error occurred while writing a record.
-    };
-
 public:
 
     /// \name Constructors & Related Methods
@@ -108,26 +100,7 @@ public:
               const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
               const size_t numThreads = 4);
 
-    /// Opens a BAM file for writing & writes the header information.
-    ///
-    /// The error status will be set if either operation fails.
-    ///
-    /// \note This overload is useful if you're carrying over a header from an existing BamFile.
-    ///
-    /// \note Set \p filename to "-" for stdout.
-    ///
-    /// \param[in] filename         path to output BAM file
-    /// \param[in] header           shared_ptr to BamHeader object
-    /// \param[in] compressionLevel zlib compression level
-    /// \param[in] numThreads       number of threads for compression.
-    ///            If set to 0, BamWriter will attempt to determine a reasonable estimate.
-    ///            If set to 1, this will force single-threaded execution.
-    ///            No checks are made against an upper limit.
-    BamWriter(const std::string& filename,
-              const BamHeader::SharedPtr& header,
-              const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
-              const size_t numThreads = 4);
-
+    /// Fully flushes all buffered data & closes file.
     ~BamWriter(void);
 
     /// \}
@@ -136,65 +109,34 @@ public:
 
     /// \name Data Writing & Resource Management
 
-    /// Closes BAM file - flushing any buffered data & releasing the file handle.
+    /// Try to flush any buffered data to file.
     ///
-    /// The destructor handles cleanup and should suffice in most cases. However, this method
-    /// allows an earlier cleanup, if  necessary.
-    void Close(void);
-
-    /// Write any buffered data to file.
+    /// \note The underlying implementation doesn't necessarily flush buffered data
+    ///       immediately, especially in a multithreaded writer situation.
+    ///       Let the BamWriter go out of scope to fully ensure flushing.
     ///
-    /// \returns true if successful
-    bool Flush(void);
+    /// \throws
+    void TryFlush(void);
 
     /// Write a record to the output BAM file.
     ///
     /// \param[in] record BamRecord object
     ///
-    /// \returns success/failure
-    bool Write(const BamRecord& record);
+    /// \throws
+    void Write(const BamRecord& record);
 
     /// Write a record to the output BAM file.
     ///
     /// \param[in] recordImpl BamRecordImpl object
     ///
-    /// \returns success/failure
-    bool Write(const BamRecordImpl& recordImpl);
-
-    /// \}
-
-    /// \name Error Handling
-    /// \{
-
-    /// \returns error status code
-    BamWriter::WriteError Error(void) const;
-
-    /// \returns true if BamWriter::Error() == NoError
-    ///
-    /// \code
-    ///     BamWriter writer(...);
-    ///     if (!writer) {
-    ///         // handle error
-    ///         return;
-    ///     }
-    ///     // ok to work with writer
-    /// \endcode
-    operator bool(void) const;
+    /// \throws
+    void Write(const BamRecordImpl& recordImpl);
 
     /// \}
 
 private:
-    bool Open(const std::string& filename,
-              const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader,
-              const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
-              size_t numThreads = 4);
-    bool Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord);
-
-private:
-    PBBAM_SHARED_PTR<samFile>   file_;
-    PBBAM_SHARED_PTR<bam_hdr_t> header_;
-    std::string filename_;
-    BamWriter::WriteError error_;
+    std::unique_ptr<internal::BamWriterPrivate> d_;
+    DISABLE_MOVE_AND_COPY(BamWriter);
 };
 
 } // namespace BAM

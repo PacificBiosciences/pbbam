@@ -40,7 +40,7 @@
 #endif
 
 #include <gtest/gtest.h>
-#include <pbbam/BamReader.h>
+#include <pbbam/BamRecordImpl.h>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;

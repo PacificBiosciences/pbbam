@@ -70,14 +70,14 @@ public:
                   const QualityValues::const_iterator last);
 
     QualityValues(const QualityValues& other);
-
-    QualityValues(std::vector<QualityValue>&& quals);
     QualityValues(QualityValues&& other);
 
-    QualityValues& operator=(const QualityValues& other);
-    QualityValues& operator=(const std::vector<QualityValue>& quals);
+    QualityValues(std::vector<QualityValue>&& quals);
 
+    QualityValues& operator=(const QualityValues& other);
     QualityValues& operator=(QualityValues&& other);
+
+    QualityValues& operator=(const std::vector<QualityValue>& quals);
     QualityValues& operator=(std::vector<QualityValue>&& quals);
 
     ~QualityValues(void);

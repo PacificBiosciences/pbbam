@@ -47,7 +47,6 @@ using namespace PacBio::BAM;
 using namespace std;
 
 BamRecordBuilder::BamRecordBuilder(void)
-    : header_(nullptr)
 {
     // ensure proper clean slate
     Reset();
@@ -59,7 +58,7 @@ BamRecordBuilder::BamRecordBuilder(void)
     cigar_.reserve(256);
 }
 
-BamRecordBuilder::BamRecordBuilder(const BamHeader::SharedPtr& header)
+BamRecordBuilder::BamRecordBuilder(const BamHeader& header)
     : header_(header)
 {
     // ensure proper clean slate

@@ -48,30 +48,28 @@ EntireFileQuery::EntireFileQuery(const BamFile& file)
     , htsHeader_(nullptr)
 {
     htsFile_.reset(sam_open(file.Filename().c_str(), "rb"), internal::HtslibFileDeleter());
-    if (!htsFile_) {
-        error_ = EntireFileQuery::FileOpenError;
-        return;
-    }
+    if (!htsFile_)
+        throw std::exception();
 
     htsHeader_.reset(sam_hdr_read(htsFile_.get()), internal::HtslibHeaderDeleter());
-    if (!htsHeader_) {
-        error_ = EntireFileQuery::FileMetadataError;
-        return;
-    }
+    if (!htsHeader_)
+        throw std::exception();
 }
 
 bool EntireFileQuery::GetNext(BamRecord& record)
 {
-    if (error_ == EntireFileQuery::NoError) {
-        const int result = sam_read1(htsFile_.get(),
-                                     htsHeader_.get(),
-                                     internal::BamRecordMemory::GetRawData(record).get());
-        if (result >= 0)
-            return true;
-        else if (result < -1) {
-            // TODO: determine & report error (probaby truncated BAM file)
-        }
+    const int result = sam_read1(htsFile_.get(),
+                                 htsHeader_.get(),
+                                 internal::BamRecordMemory::GetRawData(record).get());
+    // success
+    if (result >= 0)
+        return true;
 
-    }
-    return false;
+    // normal EOF
+    else if (result == -1)
+        return false;
+
+    // error (truncated file, etc)
+    else
+        throw std::exception();
 }

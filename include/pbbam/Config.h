@@ -88,4 +88,38 @@
 #  define PBBAM_SHARED_PTR std::shared_ptr
 #endif
 
+// ----------------------------------------------------
+// htslib verbosity level
+// ----------------------------------------------------
+
+namespace PacBio {
+namespace BAM {
+
+/// \brief Sets the desired verbosity level of htslib warnings.
+///
+/// Change this value to allow debug/warning statements from htslib.
+/// The valid range seems to be [0-3], where 0->OFF, and 3->most verbose.
+///
+extern int HtslibVerbosity;
+
+} // namespace BAM
+} // namespace PacBio
+
+// ----------------------------------------------------
+// additional helper macros
+// ----------------------------------------------------
+
+#ifndef DISABLE_COPY
+#define DISABLE_COPY(Class) \
+    Class(const Class&); \
+    Class& operator=(const Class&)
+#endif
+
+#ifndef DISABLE_MOVE_AND_COPY
+#define DISABLE_MOVE_AND_COPY(Class) \
+    Class(Class&&); \
+    Class& operator=(Class&&); \
+    DISABLE_COPY(Class)
+#endif
+
 #endif // PBBAM_CONFIG_H

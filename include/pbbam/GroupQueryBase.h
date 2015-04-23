@@ -96,12 +96,9 @@ public:
     typedef GroupQueryIterator iterator;
 
 protected:
-    QueryBase::QueryError error_;
     BamFile file_;
 
 public:
-    QueryBase::QueryError Error(void) const;
-    operator bool(void) const;
     virtual ~GroupQueryBase(void);
 
 public:
@@ -122,15 +119,9 @@ inline GroupQueryBase::iterator GroupQueryBase::begin(void)
 inline GroupQueryBase::iterator GroupQueryBase::end(void)
 { return GroupQueryBase::iterator(); }
 
-inline QueryBase::QueryError GroupQueryBase::Error(void) const
-{ return error_;}
-
-inline GroupQueryBase::operator bool(void) const
-{ return error_ == QueryBase::NoError; }
 
 inline GroupQueryBase::GroupQueryBase(const BamFile & file)
-    : error_(QueryBase::NoError)
-    , file_(file)
+    : file_(file)
 { }
 
 inline GroupQueryBase::~GroupQueryBase(void) { }

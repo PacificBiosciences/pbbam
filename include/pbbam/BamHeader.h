@@ -42,31 +42,23 @@
 #include "pbbam/ProgramInfo.h"
 #include "pbbam/ReadGroupInfo.h"
 #include "pbbam/SequenceInfo.h"
+#include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace PacBio {
 namespace BAM {
 
+namespace internal { class BamHeaderPrivate; }
+
 class PBBAM_EXPORT BamHeader
 {
-public:
-    typedef PBBAM_SHARED_PTR<BamHeader> SharedPtr;
-
-public:
-    /// \name Conversion Methods
-    /// \{
-
-    static BamHeader::SharedPtr FromSam(const std::string& sam);
-
-    /// \}
-
 public:
     /// \name Constructors & Related Methods
     /// \{
 
     BamHeader(void);
-    BamHeader(const std::string& text);
+    BamHeader(const std::string& samHeaderText);
     BamHeader(const BamHeader& other);
     BamHeader(BamHeader&& other);
     BamHeader& operator=(const BamHeader& other);
@@ -103,6 +95,7 @@ public:
     std::string SequenceLength(const int32_t id) const;
     std::string SequenceName(const int32_t id) const;
     std::vector<std::string> SequenceNames(void) const;
+    SequenceInfo Sequence(const int32_t id) const;
     SequenceInfo Sequence(const std::string& name) const;
     std::vector<SequenceInfo> Sequences(void) const;
 
@@ -180,121 +173,8 @@ public:
     /// \}
 
 private:
-    std::string version_;
-    std::string pacbioBamVersion_;
-    std::string sortOrder_;
-    std::map<std::string, std::string> headerLineCustom_;
-
-    std::map<std::string, ReadGroupInfo> readGroups_; // id => read group info
-    std::map<std::string, ProgramInfo> programs_;     // id => program info
-    std::vector<std::string> comments_;
-
-    // we need to preserve insertion order, use lookup for access by name
-    std::vector<SequenceInfo> sequences_;
-    std::map<std::string, int32_t> sequenceIdLookup_;
+    PBBAM_SHARED_PTR<internal::BamHeaderPrivate> d_;
 };
-
-inline BamHeader& BamHeader::AddComment(const std::string& comment)
-{ comments_.push_back(comment); return *this; }
-
-inline BamHeader& BamHeader::AddProgram(const ProgramInfo& pg)
-{ programs_[pg.Id()] = pg; return *this; }
-
-inline BamHeader& BamHeader::AddReadGroup(const ReadGroupInfo& readGroup)
-{ readGroups_[readGroup.Id()] = readGroup; return *this; }
-
-inline BamHeader& BamHeader::ClearComments(void)
-{ comments_.clear(); return* this; }
-
-inline BamHeader& BamHeader::ClearPrograms(void)
-{ programs_.clear(); return *this; }
-
-inline BamHeader& BamHeader::ClearReadGroups(void)
-{ readGroups_.clear(); return *this; }
-
-inline BamHeader& BamHeader::ClearSequences(void)
-{
-    sequenceIdLookup_.clear();
-    sequences_.clear();
-    return *this;
-}
-
-inline std::vector<std::string> BamHeader::Comments(void) const
-{ return comments_; }
-
-inline BamHeader& BamHeader::Comments(const std::vector<std::string>& comments)
-{ comments_ = comments; return *this; }
-
-inline BamHeader::SharedPtr BamHeader::FromSam(const std::string& sam)
-{ return BamHeader::SharedPtr(new BamHeader(sam)); }
-
-inline bool BamHeader::HasProgram(const std::string& id) const
-{ return programs_.find(id) != programs_.cend(); }
-
-inline bool BamHeader::HasReadGroup(const std::string& id) const
-{ return readGroups_.find(id) != readGroups_.cend(); }
-
-inline bool BamHeader::HasSequence(const std::string& name) const
-{ return sequenceIdLookup_.find(name) != sequenceIdLookup_.cend(); }
-
-inline std::string BamHeader::PacBioBamVersion(void) const
-{ return pacbioBamVersion_; }
-
-inline BamHeader& BamHeader::PacBioBamVersion(const std::string& version)
-{ pacbioBamVersion_ = version; return *this; }
-
-inline ProgramInfo BamHeader::Program(const std::string& id) const
-{
-    const auto iter = programs_.find(id);
-    if (iter == programs_.cend())
-        return ProgramInfo();
-    return iter->second;
-}
-
-inline ReadGroupInfo BamHeader::ReadGroup(const std::string& id) const
-{
-    const auto iter = readGroups_.find(id);
-    if (iter == readGroups_.cend())
-        return ReadGroupInfo();
-    return iter->second;
-}
-
-inline int32_t BamHeader::SequenceId(const std::string& name) const
-{
-    const auto iter = sequenceIdLookup_.find(name);
-    if (iter == sequenceIdLookup_.cend())
-        return -1;
-    return iter->second;
-}
-
-inline std::string BamHeader::SequenceLength(const int32_t id) const
-{
-    if (id < 0 || (size_t)id >= sequences_.size())
-        return 0;
-    return sequences_.at(id).Length();
-}
-
-inline std::string BamHeader::SequenceName(const int32_t id) const
-{
-    if (id < 0 || (size_t)id >= sequences_.size())
-        return std::string();
-    return sequences_.at(id).Name();
-}
-
-inline std::vector<SequenceInfo> BamHeader::Sequences(void) const
-{ return sequences_; }
-
-inline std::string BamHeader::SortOrder(void) const
-{ return sortOrder_; }
-
-inline BamHeader& BamHeader::SortOrder(const std::string& order)
-{ sortOrder_ = order; return *this; }
-
-inline std::string BamHeader::Version(void) const
-{ return version_; }
-
-inline BamHeader& BamHeader::Version(const std::string& version)
-{ version_ = version; return *this; }
 
 } // namespace BAM
 } // namespace PacBio

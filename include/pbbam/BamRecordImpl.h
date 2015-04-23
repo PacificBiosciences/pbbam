@@ -417,8 +417,11 @@ public:
     ///          Tag is returned (Tag::IsNull() is true).
     Tag TagValue(const std::string& tagName) const;
 
-    // tag iterator   ?
-    // tag operator[] ?
+    // change above to Tag();
+
+//    template<typename T>
+//    T TagValue(const std::string& tagName) const;
+
 
     ///@}
 

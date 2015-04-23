@@ -348,12 +348,11 @@ RecordType NameToType(const string& name)
 } // namespace PacBio
 
 BamRecord::BamRecord(void)
-    : header_(nullptr)
-    , alignedStart_(PacBio::BAM::UnmappedPosition)
+    : alignedStart_(PacBio::BAM::UnmappedPosition)
     , alignedEnd_(PacBio::BAM::UnmappedPosition)
 { }
 
-BamRecord::BamRecord(const BamHeader::SharedPtr &header)
+BamRecord::BamRecord(const BamHeader& header)
     : header_(header)
     , alignedStart_(PacBio::BAM::UnmappedPosition)
     , alignedEnd_(PacBio::BAM::UnmappedPosition)
@@ -361,14 +360,12 @@ BamRecord::BamRecord(const BamHeader::SharedPtr &header)
 
 BamRecord::BamRecord(const BamRecordImpl& impl)
     : impl_(impl)
-    , header_(nullptr)
     , alignedStart_(PacBio::BAM::UnmappedPosition)
     , alignedEnd_(PacBio::BAM::UnmappedPosition)
 { }
 
 BamRecord::BamRecord(BamRecordImpl&& impl)
     : impl_(std::move(impl))
-    , header_(nullptr)
     , alignedStart_(PacBio::BAM::UnmappedPosition)
     , alignedEnd_(PacBio::BAM::UnmappedPosition)
 { }
@@ -746,13 +743,7 @@ string BamRecord::FetchBases(const string& tagName,
     else {
 
         const Tag& seqTag = impl_.TagValue(tagName);
-        if (seqTag.IsNull())
-            return string();
-
-        bool ok;
-        string seq = std::move(seqTag.ToString(&ok));
-        if (!ok)
-            return string();
+        string seq = seqTag.ToString();
 
         // rev-comp
         internal::MaybeReverseComplementSeq(isBamSeq,
@@ -780,21 +771,14 @@ Frames BamRecord::FetchFrames(const string& tagName,
 
     // lossy frame codes
     if (frameTag.IsUInt8Array()) {
-
-        bool ok;
-        const vector<uint8_t> codes = std::move(frameTag.ToUInt8Array(&ok));
-        if (!ok)
-            return Frames();
+        const vector<uint8_t> codes = std::move(frameTag.ToUInt8Array());
         frames = std::move(Frames::CodeToFrames(codes));
     }
 
     // lossless frame data
     else {
         assert(frameTag.IsUInt16Array());
-        bool ok;
-        const vector<uint16_t> losslessFrames = std::move(frameTag.ToUInt16Array(&ok));
-        if (!ok)
-            return Frames();
+        const vector<uint16_t> losslessFrames = std::move(frameTag.ToUInt16Array());
         frames.Data(std::move(losslessFrames));
     }
 
@@ -841,12 +825,7 @@ QualityValues BamRecord::FetchQualities(const string& tagName,
 
         // fetch data
         const Tag& qvsTag = impl_.TagValue(tagName);
-        if (qvsTag.IsNull())
-            return QualityValues();
-        bool ok;
-        QualityValues quals = std::move(QualityValues::FromFastq(qvsTag.ToString(&ok)));
-        if (!ok)
-            return QualityValues();
+        QualityValues quals = std::move(QualityValues::FromFastq(qvsTag.ToString()));
 
         // rev-comp
         internal::MaybeReverseQuals(isBamQual,
@@ -889,17 +868,13 @@ bool BamRecord::HasSubstitutionQV(void) const
 bool BamRecord::HasSubstitutionTag(void) const
 { return impl_.HasTag(internal::tagName_substitutionTag); }
 
-BamHeader::SharedPtr BamRecord::Header(void) const
+BamHeader BamRecord::Header(void) const
 { return header_; }
 
 int32_t BamRecord::HoleNumber(void) const
 {
     const Tag& holeNumber = impl_.TagValue(internal::tagName_holeNumber);
-    bool ok;
-    int32_t result = holeNumber.ToInt32(&ok);
-    if (!ok)
-        return -1;
-    return result;
+    return holeNumber.ToInt32();
 }
 
 BamRecord& BamRecord::HoleNumber(const int32_t holeNumber)
@@ -1016,11 +991,7 @@ string BamRecord::MovieName(void) const
 int32_t BamRecord::NumPasses(void) const
 {
     const Tag& numPasses = impl_.TagValue(internal::tagName_numPasses);
-    bool ok;
-    const int32_t result = numPasses.ToInt32(&ok);
-    if (!ok)
-        return -1;
-    return result;
+    return numPasses.ToInt32();
 }
 
 BamRecord& BamRecord::NumPasses(const int32_t numPasses)
@@ -1062,13 +1033,8 @@ BamRecord& BamRecord::PulseWidth(const Frames& frames,
 Position BamRecord::QueryEnd(void) const
 {
     const Tag& qe = impl_.TagValue(internal::tagName_queryEnd);
-    if (!qe.IsNull()) {
-        bool ok;
-        Position result = qe.ToInt32(&ok);
-        if (!ok)
-            return PacBio::BAM::UnmappedPosition;
-        return result;
-    }
+    if (!qe.IsNull())
+        return qe.ToInt32();
 
     // missing qe tag - check movie name
 
@@ -1079,13 +1045,8 @@ Position BamRecord::QueryEnd(void) const
 Position BamRecord::QueryStart(void) const
 {
     const Tag& qs = impl_.TagValue(internal::tagName_queryStart);
-    if (!qs.IsNull()) {
-        bool ok;
-        Position result = qs.ToInt32(&ok);
-        if (!ok)
-            return PacBio::BAM::UnmappedPosition;
-        return result;
-    }
+    if (!qs.IsNull())
+        return qs.ToInt32();
 
     // missing qs tag - chcek movie name
 
@@ -1108,11 +1069,7 @@ BamRecord& BamRecord::ReadAccuracy(const Accuracy& accuracy)
 }
 
 ReadGroupInfo BamRecord::ReadGroup(void) const
-{
-    if (!header_)
-        return ReadGroupInfo();
-    return header_->ReadGroup(ReadGroupId());
-}
+{ return header_.ReadGroup(ReadGroupId()); }
 
 string BamRecord::ReadGroupId(void) const
 {

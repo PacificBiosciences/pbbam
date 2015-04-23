@@ -46,19 +46,18 @@
 namespace PacBio {
 namespace BAM {
 
-/// This class represents a genomic interval (reference ID, and 0-based coordinates)
+/// This class represents a genomic interval (reference name, and 0-based coordinates)
 class PBBAM_EXPORT GenomicInterval
 {
 public:
-
     /// \name Constructors & Related Methods
     ///  \{
 
-    /** Default constructor; yields an empty genomic interval [0,0) with id of -1  */
+    /** Default constructor; yields an empty genomic interval */
     GenomicInterval(void);
 
-    /** Constructor for interval from [start, stop) */
-    GenomicInterval(const int id,
+    /** Constructor for interval on named sequence with range: [start, stop) */
+    GenomicInterval(const std::string& name,
                     const Position& start,
                     const Position& stop);
 
@@ -69,49 +68,55 @@ public:
 
     /// \}
 
+public:
     /// \name Attributes
     /// \{
 
-    /// \returns interval reference id
-    /// \sa BamFile::ReferenceId
-    inline int Id(void) const;
+    /// \returns interval reference name
+    std::string Name(void) const;
 
     /// \returns underlying Interval object
-    inline PacBio::BAM::Interval<Position> Interval(void) const;
+    PacBio::BAM::Interval<Position> Interval(void) const;
 
     /// \returns interval start coordinate
-    inline Position Start(void) const;
+    Position Start(void) const;
 
     /// \returns interval stop coordinate
-    inline Position Stop(void) const;
+    Position Stop(void) const;
 
-    /// Sets this interval's reference id.
+    /// \}
+
+public:
+    /// \name Attributes
+    /// \{
+
+    /// Sets this interval's reference name.
     ///
-    /// \param[in] id
+    /// \param[in] name
     /// \returns reference to this interval
-    /// \sa BamFile::ReferenceId
-    inline GenomicInterval& Id(const int id);
+    GenomicInterval& Name(const std::string& name);
 
     /// Sets this underlying Interval
     ///
     /// \param[in] interval
     /// \returns reference to this interval
-    inline GenomicInterval& Interval(const PacBio::BAM::Interval<Position>& interval);
+    GenomicInterval& Interval(const PacBio::BAM::Interval<Position>& interval);
 
     /// Sets this interval's start coordinate.
     ///
     /// \param[in] start
     /// \returns reference to this interval
-    inline GenomicInterval& Start(const Position start);
+    GenomicInterval& Start(const Position start);
 
     /// Sets this interval's stop coordinate.
     ///
     /// \param[in] stop
     /// \returns reference to this interval
-    inline GenomicInterval& Stop(const Position stop);
+    GenomicInterval& Stop(const Position stop);
 
     /// \}
 
+public:
     /// \name Interval Operations
     /// \{
 
@@ -132,29 +137,30 @@ public:
 
     /// \}
 
+public:
     /// \name Comparison Operators
     /// \{
 
     /// \returns true if same id & underlying interval
-    inline bool operator==(const GenomicInterval& other) const;
+    bool operator==(const GenomicInterval& other) const;
 
     /// \returns true if either ids or underlying intervals differ
-    inline bool operator!=(const GenomicInterval& other) const;
+    bool operator!=(const GenomicInterval& other) const;
 
     /// \}
 
 private:
-    int id_;
+    std::string name_;
     PacBio::BAM::Interval<Position> interval_;
 };
 
 inline GenomicInterval::~GenomicInterval(void) { }
 
-inline int GenomicInterval::Id(void) const
-{ return id_; }
+inline std::string GenomicInterval::Name(void) const
+{ return name_; }
 
-inline GenomicInterval& GenomicInterval::Id(const int id)
-{ id_ = id; return *this; }
+inline GenomicInterval& GenomicInterval::Name(const std::string& name)
+{ name_ = name; return *this; }
 
 inline PacBio::BAM::Interval<Position> GenomicInterval::Interval(void) const
 { return interval_; }
@@ -164,11 +170,14 @@ inline GenomicInterval& GenomicInterval::Interval(const PacBio::BAM::Interval<Po
 
 inline bool GenomicInterval::IsValid(void) const
 {
-    return id_ >= 0 &&
+    return !name_.empty() &&
            interval_.Start() >= 0 &&
            interval_.Stop()  >= 0 &&
            interval_.IsValid();
 }
+
+inline size_t GenomicInterval::Length(void) const
+{ return interval_.Length(); }
 
 inline Position GenomicInterval::Start(void) const
 { return interval_.Start(); }
@@ -183,7 +192,7 @@ inline GenomicInterval& GenomicInterval::Stop(const Position stop)
 { interval_.Stop(stop); return *this; }
 
 inline bool GenomicInterval::operator==(const GenomicInterval& other) const
-{ return id_ == other.id_ && interval_ == other.interval_; }
+{ return name_ == other.name_ && interval_ == other.interval_; }
 
 inline bool GenomicInterval::operator!=(const GenomicInterval& other) const
 { return !(*this == other); }

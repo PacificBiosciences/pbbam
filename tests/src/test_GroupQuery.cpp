@@ -53,74 +53,57 @@ const string test1fn = string(dataDir) + "test1.bam";
 const string test2fn = string(dataDir) + "test2.bam";
 const string test3fn = string(dataDir) + "test3.bam";
 
-void TestZmwQuery(const string & fn, const vector<int> & expected) {
-    // open input BAM file
-    BamFile bamFile(fn);
-    EXPECT_TRUE(bamFile);
-
-    // count records
-    vector<int> counts;
-    ZmwQuery zmwQuery(bamFile);
-    EXPECT_TRUE(zmwQuery);
-    for (const vector<BamRecord>& records : zmwQuery) {
-        (void)records;
-        counts.push_back(records.size());
-    }
-
-    EXPECT_EQ(expected, counts);
+void TestZmwQuery(const string & fn, const vector<int> & expected) 
+{
+    EXPECT_NO_THROW(
+    {
+        BamFile bamFile(fn);
+        vector<int> counts;
+        ZmwQuery zmwQuery(bamFile);
+        for (const vector<BamRecord>& records : zmwQuery) 
+            counts.push_back(records.size());
+        EXPECT_EQ(expected, counts);
+    });
 }
 
-void TestNoneConstZmwQuery(const string & fn, const vector<int> & expected) {
-    // open input BAM file
-    BamFile bamFile(fn);
-    EXPECT_TRUE(bamFile);
-
-    // count records
-    vector<int> counts;
-    ZmwQuery zmwQuery(bamFile);
-    EXPECT_TRUE(zmwQuery);
-    for (vector<BamRecord>& records : zmwQuery) {
-        (void)records;
-        counts.push_back(records.size());
-    }
-
-    EXPECT_EQ(expected, counts);
+void TestNoneConstZmwQuery(const string & fn, const vector<int> & expected) 
+{    
+    EXPECT_NO_THROW(
+    {
+        BamFile bamFile(fn);
+        vector<int> counts;
+        ZmwQuery zmwQuery(bamFile);
+        for (vector<BamRecord>& records : zmwQuery) 
+            counts.push_back(records.size());
+        EXPECT_EQ(expected, counts);
+    });
 }
 
-void TestQNameQuery(const string & fn, const vector<int> & expected) {
-    // open input BAM file
-    BamFile bamFile(fn);
-    EXPECT_TRUE(bamFile);
-
-    // count records
-    vector<int> counts;
-    QNameQuery qQuery(bamFile);
-    EXPECT_TRUE(qQuery);
-    for (const vector<BamRecord>& records : qQuery) {
-        (void)records;
-        counts.push_back(records.size());
-    }
-
-    EXPECT_EQ(expected, counts);
+void TestQNameQuery(const string & fn, const vector<int> & expected) 
+{
+    EXPECT_NO_THROW(
+    {
+        BamFile bamFile(fn);
+        vector<int> counts;
+        QNameQuery qQuery(bamFile);
+        for (const vector<BamRecord>& records : qQuery) 
+            counts.push_back(records.size());
+        EXPECT_EQ(expected, counts);
+    });
 }
 
-void TestNoneConstQNameQuery(const string & fn, const vector<int> & expected) {
-    // open input BAM file
-    BamFile bamFile(fn);
-    EXPECT_TRUE(bamFile);
-
-    // count records
-    vector<int> counts;
-    QNameQuery qQuery(bamFile);
-    EXPECT_TRUE(qQuery);
-    for (vector<BamRecord>& records : qQuery) {
-        (void)records;
-        counts.push_back(records.size());
-    }
-
-    EXPECT_EQ(expected, counts);
+void TestNoneConstQNameQuery(const string & fn, const vector<int> & expected) 
+{    
+    EXPECT_NO_THROW(
+    {
+        BamFile bamFile(fn);
+        vector<int> counts;
+        QNameQuery qQuery(bamFile);
+        for (vector<BamRecord>& records : qQuery) 
+            counts.push_back(records.size());
+        EXPECT_EQ(expected, counts);
+    });
 }
-
 
 TEST(ZmwQueryTest, CountZmwSizes)
 {
@@ -162,3 +145,4 @@ TEST(QNameQueryTest, CountQSizes)
     TestQNameQuery(fn, expected);
     TestNoneConstQNameQuery(fn, expected);
 }
+

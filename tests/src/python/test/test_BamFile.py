@@ -48,29 +48,16 @@ class BamFileTest(unittest.TestCase):
         self.ex2BamFn = self.data.directory + "/ex2.bam"
     
     def runTest(self):
-        self.test_defaultFile()
-        self.test_filenameCtor()
-        self.test_openclose()
+        self.test_ctor()
+        self.test_nonExistentFile()
     
     # ------------ TESTS --------------
         
-    def test_defaultFile(self):
-        f = PacBioBam.BamFile()
-        self.assertFalse(f.IsOpen())
-        self.assertFalse(f.Filename())
-        
-    def test_filenameCtor(self):
+    def test_ctor(self):
         f = PacBioBam.BamFile(self.ex2BamFn)
-        self.assertTrue(f.IsOpen())
         self.assertFalse(f.IsPacBioBAM())
-
-    def test_openclose(self):
-        f = PacBioBam.BamFile()
-        self.assertFalse(f.IsOpen())
-
-        f.Open(self.ex2BamFn)
-        self.assertTrue(f.IsOpen())
         
-        f.Close()
-        self.assertFalse(f.IsOpen())
-        
+    def test_nonExistentFile(self):
+        with self.assertRaises(SystemError):
+            f = PacBioBam.BamFile("non_existent_file.bam")
+            

@@ -42,8 +42,7 @@ using namespace PacBio::BAM;
 using namespace std;
 
 QueryBase::QueryBase(const BamFile& file)
-    : error_(QueryError::NoError)
-    , file_(file)
+    : file_(file)
 { }
 
 QueryBase::~QueryBase(void) { }

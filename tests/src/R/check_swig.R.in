@@ -44,7 +44,7 @@ dyn.load(paste(pbbam_libname, .Platform$dynlib.ext, sep=""))
 source(pbbam_wrapper)
 cacheMetaData(1)
 
-f <- BamFile() 
+h <- BamHeader() 
 
 message = "\nR Wrapper OK.\n"
 cat(message)

@@ -45,35 +45,25 @@
 namespace PacBio {
 namespace BAM {
 
+namespace internal { class BamFilePrivate; }
+
 class PBBAM_EXPORT BamFile
 {
-public:
-
-    /// This enum describes the errors that may be returned by the Error() function.
-    enum FileError
-    {
-         NoError         ///< No error occurred.
-       , OpenError       ///< An error occurred when opening the file.
-       , ReadHeaderError ///< An error occurred when reading the header data.
-    };
-
 public:
 
     /// \name Constructors & Related Methods
     /// \{
 
-    /// Creates a BamFile object with no associated file.
-    BamFile(void);
-
-    /// \brief Creates a BamFile object on the provided \p filename.
+    /// \brief Creates a BamFile object on the provided \p filename & loads header information.
     ///
-    /// \sa Open
     /// \param[in] filename BAM filename
+    /// \throws std::exception on failure
     BamFile(const std::string& filename);
 
-    /// Creates a copy of the BamFile object, with the same filename, header data, and error status
     BamFile(const BamFile& other);
-
+    BamFile(BamFile&& other);
+    BamFile& operator=(const BamFile& other);
+    BamFile& operator=(BamFile&& other);
     ~BamFile(void);
 
     /// \}
@@ -87,13 +77,13 @@ public:
     std::string Filename(void) const;
 
     /// \returns filename of PacBio index file (".pbi")
-    /// \note No guarantee is made on the existence of this file - this method simply returns the
-    ///       expected filename.
+    /// \note No guarantee is made on the existence of this file.
+    ///       This method simply returns the expected filename.
     std::string PacBioIndexFilename(void) const;
 
     /// \returns filename of standard index file (".bai")
-    /// \note No guarantee is made on the existence of this file - this method simply returns the
-    ///       expected filename.
+    /// \note No guarantee is made on the existence of this file.
+    ///       This method simply returns the expected filename.
     std::string StandardIndexFilename(void) const;
 
     /// \}
@@ -101,8 +91,11 @@ public:
     /// \name Header Metadata Methods
     /// \{
 
+    /// \returns true if header metadata has this reference name
+    bool HasReference(const std::string& name) const;
+
     /// \returns BamHeader containing the file's metadata
-    BamHeader::SharedPtr Header(void) const;
+    BamHeader Header(void) const;
 
     /// \returns true if BAM file is a PacBio BAM file (i.e. has non-empty version associated with header "pb" tag)
     bool IsPacBioBAM(void) const;
@@ -121,87 +114,9 @@ public:
 
     /// \}
 
-public:
-    /// \name Open/Close Methods
-    /// \{
-
-    /// \returns true if BamFile has been opened on a file
-    bool IsOpen(void) const;
-
-    /// \}
-
-public:
-    /// \name Error Handling
-    /// \{
-
-    /// \returns file error status
-    BamFile::FileError Error(void) const;
-
-    /// \returns true if BamFile::Error() == NoError
-    ///
-    /// \code
-    ///     BamFile file("foo.bam");
-    ///     if (!file) {
-    ///         // handle error
-    ///         return;
-    ///     }
-    ///     // ok to work with file and/or header info
-    /// \endcode
-    operator bool(void) const;
-
-    /// \}
-
-public:
-    /// \name Open/Close Methods
-    /// \{
-
-    /// Resets BAM file metadata associated with this object.
-    void Close(void);
-
-    /// Attempts to open the file and load the header metadata. The error status
-    /// will be set if either operation fails.
-    void Open(const std::string& filename);
-
-    /// \}
-
 private:
-    std::string filename_;
-    BamFile::FileError error_;
-    BamHeader::SharedPtr header_;
+    PBBAM_SHARED_PTR<internal::BamFilePrivate> d_;
 };
-
-inline BamFile::operator bool(void) const
-{ return error_ == BamFile::NoError; }
-
-inline BamFile::FileError BamFile::Error(void) const
-{ return error_; }
-
-inline std::string BamFile::Filename(void) const
-{ return filename_; }
-
-inline BamHeader::SharedPtr BamFile::Header(void) const
-{ return header_; }
-
-inline bool BamFile::IsPacBioBAM(void) const
-{ return (header_ ? !header_->PacBioBamVersion().empty() : false); }
-
-inline std::string BamFile::StandardIndexFilename(void) const
-{ return filename_ + ".bai"; }
-
-inline std::string BamFile::PacBioIndexFilename(void) const
-{ return filename_ + ".pbi"; }
-
-inline int BamFile::ReferenceId(const std::string& name) const
-{ return (header_ ? header_->SequenceId(name) : -1); }
-
-inline uint32_t BamFile::ReferenceLength(const std::string& name) const
-{ return ReferenceLength(ReferenceId(name)); }
-
-inline uint32_t BamFile::ReferenceLength(const int id) const
-{ return (header_ ? std::stoul(header_->SequenceLength(id)) : 0); }
-
-inline std::string BamFile::ReferenceName(const int id) const
-{ return (header_ ? header_->SequenceName(id) : ""); }
 
 } // namespace BAM
 } // namespace PacBio

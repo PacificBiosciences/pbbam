@@ -48,11 +48,18 @@ using namespace std;
 // BamHeaderMemory
 // -----------------
 
-BamHeader::SharedPtr BamHeaderMemory::FromRawData(bam_hdr_t* hdr)
+BamHeader BamHeaderMemory::FromRawData(bam_hdr_t* hdr)
 {
-    if (hdr == nullptr || hdr->text == nullptr || hdr->l_text == 0)
-        return BamHeader::SharedPtr(nullptr);
-    return BamHeader::FromSam(string(hdr->text, hdr->l_text));
+    // null input - error
+    if (hdr == nullptr)
+        throw std::exception();
+
+    // empty text input - ok
+    if (hdr->text == nullptr || hdr->l_text == 0)
+        return BamHeader();
+
+    // parse normal SAM text input
+    return BamHeader(string(hdr->text, hdr->l_text));
 }
 
 PBBAM_SHARED_PTR<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& header)
@@ -67,9 +74,9 @@ PBBAM_SHARED_PTR<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& head
     return rawData;
 }
 
-PBBAM_SHARED_PTR<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader::SharedPtr& header)
-{
-    if (!header)
-        return PBBAM_SHARED_PTR<bam_hdr_t>(nullptr);
-    return MakeRawHeader(*header.get());
-}
+//PBBAM_SHARED_PTR<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& header)
+//{
+//    if (!header)
+//        return PBBAM_SHARED_PTR<bam_hdr_t>(nullptr);
+//    return MakeRawHeader(*header.get());
+//}

@@ -9,6 +9,23 @@ using namespace PacBio::BAM;
 %ignore PacBio::BAM::Tag::Tag(Tag&&);
 %ignore PacBio::BAM::Tag::operator=;
 
+HANDLE_STD_EXCEPTION(ToInt8);
+HANDLE_STD_EXCEPTION(ToUInt8);
+HANDLE_STD_EXCEPTION(ToInt16);
+HANDLE_STD_EXCEPTION(ToUInt16);
+HANDLE_STD_EXCEPTION(ToInt32);
+HANDLE_STD_EXCEPTION(ToUInt32);
+HANDLE_STD_EXCEPTION(ToFloat);
+HANDLE_STD_EXCEPTION(ToString);
+HANDLE_STD_EXCEPTION(ToInt8Array);
+HANDLE_STD_EXCEPTION(ToUInt8Array);
+HANDLE_STD_EXCEPTION(ToInt16Array);
+HANDLE_STD_EXCEPTION(ToUInt16Array);
+HANDLE_STD_EXCEPTION(ToInt32Array);
+HANDLE_STD_EXCEPTION(ToUInt32Array);
+HANDLE_STD_EXCEPTION(ToFloatArray);
+HANDLE_STD_EXCEPTION(Value);
+
 #ifdef SWIGR
 
 %ignore PacBio::BAM::Tag::Tag(int8_t value);
@@ -29,26 +46,13 @@ using namespace PacBio::BAM;
 
 %extend PacBio::BAM::Tag {
 	
-	PacBio::BAM::Tag FromInt8(int x)
-	{ return PacBio::BAM::Tag(static_cast<int8_t>(x)); }
-	
-	PacBio::BAM::Tag FromUInt8(int x)
-	{ return PacBio::BAM::Tag(static_cast<uint8_t>(x)); }
-	
-	PacBio::BAM::Tag FromInt16(int x)
-	{ return PacBio::BAM::Tag(static_cast<int16_t>(x)); }
-	
-	PacBio::BAM::Tag FromUInt16(int x)
-	{ return PacBio::BAM::Tag(static_cast<uint16_t>(x)); }
-	
-	PacBio::BAM::Tag FromInt32(int x)
-	{ return PacBio::BAM::Tag(static_cast<int32_t>(x)); }
-	
-	PacBio::BAM::Tag FromUInt32(int x)
-	{ return PacBio::BAM::Tag(static_cast<uint32_t>(x)); }
-	
-	PacBio::BAM::Tag FromFloat(int x)
-	{ return PacBio::BAM::Tag(static_cast<float>(x)); }
+	PacBio::BAM::Tag FromInt8(int x)   { return PacBio::BAM::Tag(static_cast<int8_t>(x));   }
+	PacBio::BAM::Tag FromUInt8(int x)  { return PacBio::BAM::Tag(static_cast<uint8_t>(x));  }
+	PacBio::BAM::Tag FromInt16(int x)  { return PacBio::BAM::Tag(static_cast<int16_t>(x));  }
+	PacBio::BAM::Tag FromUInt16(int x) { return PacBio::BAM::Tag(static_cast<uint16_t>(x)); }
+	PacBio::BAM::Tag FromInt32(int x)  { return PacBio::BAM::Tag(static_cast<int32_t>(x));  }
+	PacBio::BAM::Tag FromUInt32(int x) { return PacBio::BAM::Tag(static_cast<uint32_t>(x)); }
+	PacBio::BAM::Tag FromFloat(int x)  { return PacBio::BAM::Tag(static_cast<float>(x));    }
 	
 	PacBio::BAM::Tag FromInt8Array(const std::vector<int>& v)
 	{

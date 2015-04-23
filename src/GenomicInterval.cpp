@@ -42,44 +42,39 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-GenomicInterval::GenomicInterval(void)
-    : id_(-1)
-{ }
+GenomicInterval::GenomicInterval(void) { }
 
-GenomicInterval::GenomicInterval(const int id,
+GenomicInterval::GenomicInterval(const std::string& name,
                                  const Position& start,
                                  const Position& stop)
-    : id_(id)
+    : name_(name)
     , interval_(start, stop)
 { }
 
 GenomicInterval::GenomicInterval(const GenomicInterval& other)
-    : id_(other.id_)
+    : name_(other.name_)
     , interval_(other.interval_)
 { }
 
 bool GenomicInterval::CoveredBy(const GenomicInterval& other) const
 {
-    if (id_ != other.id_)
+    if (name_ != other.name_)
         return false;
     return interval_.CoveredBy(other.interval_);
 }
 
 bool GenomicInterval::Covers(const GenomicInterval& other) const
 {
-    if (id_ != other.id_)
+    if (name_ != other.name_)
         return false;
     return interval_.Covers(other.interval_);
 }
 
 bool GenomicInterval::Intersects(const GenomicInterval& other) const
 {
-    if (id_ != other.id_)
+    if (name_ != other.name_)
         return false;
     return interval_.Intersects(other.interval_);
 }
 
-size_t GenomicInterval::Length(void) const
-{
-    return interval_.Length();
-}
+
