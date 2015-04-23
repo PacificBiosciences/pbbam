@@ -1,15 +1,15 @@
 /* pbbam.i */
 %module PacBioBam
 %{
-	
+
 /*ifdef SWIGR
  define SWIG_SHARED_PTR_NAMESPACE boost
  define SWIG_SHARED_PTR_SUBNAMESPACE
 endif*/
-		
+
 #include <pbbam/Config.h>
 #include <string>
-#include <vector>	
+#include <vector>
 %}
 
 #define SWIG_FILE_WITH_INIT
@@ -53,7 +53,7 @@ endif*/
 
 %template(StringList) std::vector<std::string>;
 
-// basic exception-handler helper 
+// basic exception-handler helper
 //
 // -- STL builtins --
 // std::invalid_argument -> ValueError
@@ -62,24 +62,24 @@ endif*/
 // std::out_of_range     -> IndexError
 // std::length_error     -> IndexError
 // std::runtime_error    -> RuntimeError
-// std::exception        -> SystemError       
-// 
+// std::exception        -> SystemError
+//
 // (anything else)       -> UnknownError
 //
-// * All pbbam exceptions are simply std::exception (SystemErro) for now, 
+// * All pbbam exceptions are simply std::exception (SystemErro) for now,
 //   until (if?) we flesh out a more detailed exception hierarchy.
-//   Either way, new ones will inherit from std::exception, so SystemError 
+//   Either way, new ones will inherit from std::exception, so SystemError
 //   should still remain a valid handler.
 //
 %define HANDLE_STD_EXCEPTION(MethodName)
 %exception MethodName {
-    try { 
-		$action 
-	}
+    try {
+                $action
+        }
     SWIG_CATCH_STDEXCEPT // catch std::exception
-    catch (...) { 
-		SWIG_exception_fail(SWIG_UnknownError, "Unknown exception"); 
-	}
+    catch (...) {
+                SWIG_exception(SWIG_UnknownError, "Unknown exception");
+        }
 }
 %enddef
 
@@ -102,7 +102,7 @@ endif*/
 %include "TagCollection.i"
 
 // keep this guy after the other basic types, hacky but works
-%include "Frames.i" 
+%include "Frames.i"
 
 // Header API components
 %include "ProgramInfo.i"
