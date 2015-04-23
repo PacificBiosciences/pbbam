@@ -40,6 +40,9 @@
 #include "MemoryUtils.h"
 #include "SequenceUtils.h"
 #include <htslib/sam.h>
+
+#include <iostream>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -178,10 +181,14 @@ void MaybeClipAndGapifyBases(const BamRecordImpl& impl,
 
                     // maybe add gaps/padding
                     if (aligned) {
-                        if (type == CigarOperationType::DELETION)
+                        if (type == CigarOperationType::DELETION) {
+                            seq.reserve(seq.size() + opLength);
                             seq.insert(seqIndex, opLength, '-');
-                        else if (type == CigarOperationType::PADDING)
+                        }
+                        else if (type == CigarOperationType::PADDING) {
+                            seq.reserve(seq.size() + opLength);
                             seq.insert(seqIndex, opLength, '*');
+                        }
                     }
 
                     // update index
@@ -222,8 +229,10 @@ void MaybeClipAndGapifyFrames(const BamRecordImpl& impl,
 
                     // maybe add gaps/padding
                     if (aligned) {
-                        if (type == CigarOperationType::DELETION || type == CigarOperationType::PADDING)
+                        if (type == CigarOperationType::DELETION || type == CigarOperationType::PADDING) {
+                            data.reserve(data.size() + opLength);
                             data.insert(data.begin() + frameIndex, opLength, 0);
+                        }
                     }
 
                     // update index
@@ -239,7 +248,7 @@ static
 void MaybeClipAndGapifyQualities(const BamRecordImpl& impl,
                                  const bool aligned,
                                  const bool exciseSoftClips,
-                                 QualityValues& quals)
+                                 QualityValues& qualities)
 {
     if (impl.IsMapped() && (aligned || exciseSoftClips)) {
 
@@ -248,6 +257,7 @@ void MaybeClipAndGapifyQualities(const BamRecordImpl& impl,
         Cigar::const_iterator cigarIter = cigar.cbegin();
         Cigar::const_iterator cigarEnd  = cigar.cend();
         for (; cigarIter != cigarEnd; ++cigarIter) {
+
             const CigarOperation& op = (*cigarIter);
             const CigarOperationType& type = op.Type();
 
@@ -257,15 +267,17 @@ void MaybeClipAndGapifyQualities(const BamRecordImpl& impl,
 
                 // maybe remove soft clips
                 if (type == CigarOperationType::SOFT_CLIP && exciseSoftClips)
-                    quals.erase(quals.begin() + qualIndex, quals.begin() + qualIndex + opLength);
+                    qualities.erase(qualities.begin() + qualIndex, qualities.begin() + qualIndex + opLength);
 
                 // for non-clipping operations
                 else {
 
                     // maybe add gaps/padding
                     if (aligned) {
-                        if (type == CigarOperationType::DELETION || type == CigarOperationType::PADDING)
-                            quals.insert(quals.begin() + qualIndex, opLength, QualityValue(0));
+                        if (type == CigarOperationType::DELETION || type == CigarOperationType::PADDING) {
+                            qualities.reserve(qualities.size() + opLength);
+                            qualities.insert(qualities.begin() + qualIndex, opLength, QualityValue(0));
+                        }
                     }
 
                     // update index
@@ -805,6 +817,8 @@ QualityValues BamRecord::FetchQualities(const string& tagName,
 
     // fetch SAM/BAM QUAL field
     if (isBamQual) {
+
+        // fetch data
         QualityValues quals = std::move(impl_.Qualities());
 
         // clip / gapify
@@ -812,6 +826,7 @@ QualityValues BamRecord::FetchQualities(const string& tagName,
                                               aligned,
                                               exciseSoftClips,
                                               quals);
+
         // rev-comp
         internal::MaybeReverseQuals(isBamQual,
                                     impl_.IsReverseStrand(),

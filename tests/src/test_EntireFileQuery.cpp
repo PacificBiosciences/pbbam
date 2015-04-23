@@ -87,40 +87,40 @@ TEST(EntireFileQueryTest, NonConstBamRecord)
     });
 }
 
-//TEST(EntireFileQueryTest, WorksWithBamRecordImpl)
-//{
-//    // open input BAM file
-//    BamFile bamFile(inputBamFn);
-//    EXPECT_TRUE(bamFile);
+TEST(BamRecordTest, HandlesDeletionOK)
+{
+    // this file raised no error in Debug mode, but segfaulted when
+    // trying to access the aligned qualities in Release mode
 
-//    // count records
-//    int count = 0;
-//    EntireFileQuery entireFile(bamFile);
-//    EXPECT_TRUE(entireFile);
-//    for (const BamRecordImpl& record : entireFile) {
-//        (void)record;
-//        ++count;
-//    }
+    EXPECT_NO_THROW(
+    {
+        // open input BAM file
+        const string problemBamFn = tests::Data_Dir + "/segfault.bam";
+        BamFile bamFile(problemBamFn);
 
-//    EXPECT_EQ(3307, count);
-//}
+        // count records
+        int count = 0;
+        EntireFileQuery entireFile(bamFile);
+        for (const BamRecord& record : entireFile) {
 
-//TEST(EntireFileQueryTest, WorksWithNonConstBamRecordImpl)
-//{
-//    // open input BAM file
-//    BamFile bamFile(inputBamFn);
-//    EXPECT_TRUE(bamFile);
+            const auto rawQualities     = record.Qualities(Orientation::GENOMIC, false);
+            const auto alignedQualities = record.Qualities(Orientation::GENOMIC, true);
 
-//    // count records
-//    int count = 0;
-//    EntireFileQuery entireFile(bamFile);
-//    EXPECT_TRUE(entireFile);
-//    for (BamRecordImpl& record : entireFile) {
-//        (void)record;
-//        ++count;
-//    }
+            const string rawExpected =
+                "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII";
 
-//    EXPECT_EQ(3307, count);
-//}
+            // 1M1D98M
+            const string alignedExpected =
+                "I!IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII";
 
-// add special cases as needed
+            EXPECT_EQ(rawExpected,     rawQualities.Fastq());
+            EXPECT_EQ(alignedExpected, alignedQualities.Fastq());
+
+            ++count;
+        }
+
+        EXPECT_EQ(1, count);
+    });
+}
+
+// add add'l special cases as needed
