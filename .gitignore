@@ -1,8 +1,10 @@
 *.o
+*.pico
 *.so
 *.a
 *.dylib
 build/
+lib/
 third-party/htslib/bgzip
 third-party/htslib/htsfile
 third-party/htslib/tabix
