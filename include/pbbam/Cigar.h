@@ -100,10 +100,10 @@ inline Cigar::Cigar(Cigar&& other)
 { }
 
 inline Cigar& Cigar::operator=(const Cigar& other)
-{ *this = other; return *this; }
+{ std::vector<CigarOperation>::operator= (other); return *this; }
 
 inline Cigar& Cigar::operator=(Cigar&& other)
-{ *this = std::move(other); return *this; }
+{ std::vector<CigarOperation>::operator= (std::move(other)); return *this; }
 
 inline Cigar::~Cigar(void) { }
 
