@@ -1,0 +1,107 @@
+﻿#pragma warning disable 168, 219
+
+using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+
+using PacBio.BAM;
+
+namespace TestStuff
+{
+    //
+    // This approach is the best we can do for now, without requiring nunit.
+    //
+    public class TestPbbam
+    {
+        public static readonly string DATA_DIR = "@PacBioBAM_TestsDir@/data";
+
+        public static readonly string BAM_FILENAME_1 = DATA_DIR + "test_group_query/test1.bam";
+        public static readonly string BAM_FILENAME_2 = DATA_DIR + "/test_group_query/test2.bam";
+        public static readonly string FASTA_FILENAME = DATA_DIR + "/lambdaNEB.fa";
+
+        public TestPbbam ()
+        {
+        }
+
+        public static void TestExceptions()
+        {
+            try
+            {
+                var badFile = new BamFile("nonexistent.bam");
+            }
+            catch (Exception e)
+            {
+                //Console.Write(e.ToString());
+                Console.WriteLine("Exceptions - OK!");
+                return;
+            }
+            throw new Exception("doh!");
+        }
+
+
+        public static void TestCigar()
+        {
+            string s = "3M3I3D";
+            var c = new Cigar(s);
+            string cs = c.ToStdString();
+            if (s != cs)
+            {
+                throw new Exception("Cigar not working!");
+            }
+
+            // This used to crash
+            var c2 = Cigar.FromStdString("3M3I3D");
+
+            // This crashes now--- bad cigar string format.
+            //var c3 = Cigar.FromStdString("III");
+
+            Console.WriteLine("TestCigar - OK!");
+        }
+
+        public static void TestBamFileEnumeration()
+        {
+            var bf = new BamFile(BAM_FILENAME_2);
+            var q = new EntireFileQuery(bf);
+
+            if (q.Count() !=  4)
+            {
+                throw new Exception("Enumeration not working!");
+            }
+
+            Console.WriteLine("TesBamFileEnumeration - OK!");
+        }
+
+        public static void TestIndexedFasta()
+        {
+            var f = new IndexedFastaReader(FASTA_FILENAME);
+            bool check = (f.NumSequences() == 1  &&
+                          f.HasSequence("lambda_NEB3011") &&
+                          f.Subsequence("lambda_NEB3011:0-10") == "GGGCGGCGAC");
+            if (!check)
+            {
+                throw new Exception("Indexed FASTA files not working");
+            }
+
+            var b = new BamRecord();
+            var x = b.Impl();
+
+            Console.WriteLine("TestIndexedFasta - OK!");
+        }
+
+        public void RunAllTests()
+        {
+            TestExceptions();
+            TestCigar();
+            TestBamFileEnumeration();
+            TestIndexedFasta();
+        }
+
+        public static void Main()
+        {
+            var t = new TestPbbam();
+            t.RunAllTests();
+        }
+
+    }
+}
