@@ -18,6 +18,28 @@ using namespace PacBio::BAM;
 %rename(IsTrue) PacBio::BAM::QueryBase::operator bool;
 #endif
 
+
+// IEnumerable<BamRecord> interfaces for Queries
+%typemap(csinterfaces) PacBio::BAM::QueryBase "global::System.Collections.IEnumerable\n, global::System.Collections.Generic.IEnumerable<PacBio.BAM.BamRecord>\n";
+%typemap(cscode) PacBio::BAM::QueryBase %{
+    public global::System.Collections.Generic.IEnumerator<PacBio.BAM.BamRecord> GetEnumerator()
+    {
+        var i = this.cbegin();
+        var e = this.cend();
+        while (!i.Equals(e))
+        {
+            yield return i.value();
+            i.incr();
+        }
+    }
+
+    global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+%}
+
+
 %include <pbbam/QueryBase.h>
 
 // Iterator API
