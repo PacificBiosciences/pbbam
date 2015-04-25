@@ -8,6 +8,8 @@ public class CheckSWIG
    {
        var header = new BamHeader();
        header.ToSam();
+       System.Console.WriteLine("");
        System.Console.WriteLine("pbbam SWIG binding to C# worked!");
+       System.Console.WriteLine("");
    }
 }
