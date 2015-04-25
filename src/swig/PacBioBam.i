@@ -122,3 +122,6 @@ endif*/
 %include "QueryBase.i"
 %include "EntireFileQuery.i"
 %include "GenomicIntervalQuery.i"
+
+// FASTA
+%include "IndexedFastaReader.i"
