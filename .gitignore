@@ -3,6 +3,8 @@
 *.so
 *.a
 *.dylib
+*.pyc
+*~
 build/
 lib/
 third-party/htslib/bgzip
