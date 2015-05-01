@@ -123,9 +123,10 @@ public:
     Tag(const std::vector<int32_t>& value);
     Tag(const std::vector<uint32_t>& value);
     Tag(const std::vector<float>& value);
-
+    
     Tag(const Tag& other);
-    Tag(Tag&& other) = default;
+    Tag(Tag&& other);
+
     ~Tag(void);
 
     Tag& operator=(boost::blank value);
@@ -145,7 +146,7 @@ public:
     Tag& operator=(const std::vector<uint32_t>& value);
     Tag& operator=(const std::vector<float>& value);
     Tag& operator=(const Tag& other);
-    Tag& operator=(Tag&& other) = default;
+    Tag& operator=(Tag&& other);
 
     bool operator== (const Tag& other) const;
     bool operator!= (const Tag& other) const;
@@ -191,7 +192,7 @@ public:
 
     /// \name Attributes
 
-    enum TagDataType Type(void) const;
+    TagDataType Type(void) const;
     std::string Typename(void) const; // really just for testing
 
     bool HasModifier(const TagModifier m) const;

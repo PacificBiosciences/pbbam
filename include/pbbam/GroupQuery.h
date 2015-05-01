@@ -65,7 +65,7 @@ public:
 
 private:
     bool InSameGroup(const BamRecord & record, const BamRecord & another) {
-        return (record.MovieName() == another.MovieName() and 
+        return (record.MovieName() == another.MovieName() && 
                 record.HoleNumber() == another.HoleNumber());
     }
 };

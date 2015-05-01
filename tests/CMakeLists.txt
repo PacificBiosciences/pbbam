@@ -40,6 +40,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PacBioBAM_CXX_FLAGS}")
 
 # define test executable
 add_definitions(-DPBBAM_TESTING)
+if(MSVC)
+    # VS2012+ pooh-pooh's Derek's "#define private public" trick
+    add_definitions(-D_ALLOW_KEYWORD_MACROS)
+endif()
+
 if(PacBioBAM_wrap_r)
     # SWIG R does not support PBBAM_SHARED_PTR, but it does support boost::shared_ptr
     # So force boost if we're wrapping for R.

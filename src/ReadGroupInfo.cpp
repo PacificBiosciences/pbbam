@@ -372,7 +372,7 @@ std::string MakeReadGroupId(const std::string& movieName,
 
     for (int i = 0; i < 4; i++)
     {
-        snprintf(&hexdigest[2*i], 3, "%02x", digest[i]);
+        sprintf(&hexdigest[2*i], "%02x", digest[i]);
     }
 
     return std::string(hexdigest, 8);

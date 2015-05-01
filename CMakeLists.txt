@@ -88,9 +88,14 @@ else()
 endif()
 
 # shared CXX flags for src & tests
-include(CheckCXXCompilerFlag)
-set(PacBioBAM_CXX_FLAGS "-std=c++11 -Wall")
+if (MSVC)
+    set(PacBioBAM_CXX_FLAGS "/Wall")
+else()
+    set(PacBioBAM_CXX_FLAGS "-std=c++11 -Wall")
+endif()
+
 # NOTE: -Wno-unused-local-typedefs used to quash clang warnings w/ Boost
+include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag("-Wno-unused-local-typedefs" HAS_NO_UNUSED_LOCAL_TYPEDEFS)
 if(HAS_NO_UNUSED_LOCAL_TYPEDEFS)
     set(PacBioBAM_CXX_FLAGS "${PacBioBAM_CXX_FLAGS} -Wno-unused-local-typedefs")

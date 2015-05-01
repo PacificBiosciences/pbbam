@@ -147,6 +147,11 @@ Tag::Tag(const Tag& other)
     , modifier_(other.modifier_)
 { }
 
+Tag::Tag(Tag&& other)
+    : data_(std::move(other.data_))
+    , modifier_(std::move(other.modifier_))
+{}
+
 Tag::~Tag(void) { }
 
 Tag& Tag::operator=(boost::blank value) { data_ = value; return *this; }
@@ -170,6 +175,13 @@ Tag& Tag::operator=(const Tag& other)
 {
     data_ = other.data_;
     modifier_ = other.modifier_;
+    return *this;
+}
+
+Tag& Tag::operator=(Tag&& other)
+{
+    data_ = std::move(other.data_);
+    modifier_ = std::move(other.modifier_);
     return *this;
 }
 

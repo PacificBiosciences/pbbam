@@ -90,9 +90,9 @@ public:
     CigarOperation(char c, uint32_t length);
     CigarOperation(CigarOperationType op, uint32_t length);
     CigarOperation(const CigarOperation& other);
-    CigarOperation(CigarOperation&& other) = default;
-    CigarOperation& operator=(const CigarOperation& other) = default;
-    CigarOperation& operator=(CigarOperation&& other) = default;
+    CigarOperation(CigarOperation&& other);
+    CigarOperation& operator=(const CigarOperation& other);
+    CigarOperation& operator=(CigarOperation&& other);
     ~CigarOperation(void);
 
     /// \}
@@ -171,6 +171,11 @@ inline CigarOperation::CigarOperation(const CigarOperation& other)
     , length_(other.length_)
 { }
 
+inline CigarOperation::CigarOperation(CigarOperation&& other)
+    : type_(std::move(other.type_))
+    , length_(std::move(other.length_))
+{ }
+
 inline CigarOperation::~CigarOperation(void) { }
 
 inline uint32_t CigarOperation::Length(void) const
@@ -190,6 +195,12 @@ inline char CigarOperation::Char(void) const
 
 inline CigarOperation &CigarOperation::Char(const char opChar)
 { type_ = CigarOperation::CharToType(opChar);return *this; }
+
+inline CigarOperation& CigarOperation::operator=(const CigarOperation& other)
+{ type_ = other.type_; length_ = other.length_; return *this; }
+
+inline CigarOperation& CigarOperation::operator=(CigarOperation&& other)
+{ type_ = std::move(other.type_); length_ = std::move(other.length_); return *this; }
 
 inline bool CigarOperation::operator==(const CigarOperation& other) const
 { return type_ == other.type_ && length_ == other.length_; }

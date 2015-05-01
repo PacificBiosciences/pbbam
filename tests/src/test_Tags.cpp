@@ -538,7 +538,7 @@ TEST(TagTest, Type_UInt32Array)
 
 TEST(TagTest, Type_FloatArray)
 {
-    const vector<float> v = { 1.1, 1.2, 1.3 };
+    const vector<float> v = { 1.1f, 1.2f, 1.3f };
     const Tag tag(v);
 
     vector<float> v2;
