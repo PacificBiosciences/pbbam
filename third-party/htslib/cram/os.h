@@ -285,7 +285,7 @@ extern "C" {
 #endif
 
 /* Generic WIN32 API issues */
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
 #  ifndef HAVE_FSEEKO
 #    if __MSVCRT_VERSION__ >= 0x800
        /* if you have MSVCR80 installed then you can use these definitions: */

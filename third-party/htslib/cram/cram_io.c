@@ -86,6 +86,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "htslib/bgzf.h"
 #include "htslib/faidx.h"
 
+#include "compat.h"
+
 #define TRIAL_SPAN 50
 #define NTRIALS 3
 

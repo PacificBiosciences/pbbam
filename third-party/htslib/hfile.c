@@ -22,6 +22,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.  */
 
+#include "compat.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -294,14 +296,17 @@ void hclose_abruptly(hFILE *fp)
  * File descriptor backend *
  ***************************/
 
-#include <sys/socket.h>
+#ifdef _WIN32
+    #include <winsock2.h>
+    #define HAVE_CLOSESOCKET
+#else
+    #include <sys/socket.h>
+#endif
+
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 
-#ifdef _WIN32
-#define HAVE_CLOSESOCKET
-#endif
 
 /* For Unix, it doesn't matter whether a file descriptor is a socket.
    However Windows insists on send()/recv() and its own closesocket()
@@ -377,11 +382,17 @@ static const struct hFILE_backend fd_backend =
     fd_read, fd_write, fd_seek, fd_flush, fd_close
 };
 
+
 static size_t blksize(int fd)
 {
+
+#ifdef _WIN32
+    return 0;
+#else
     struct stat sbuf;
     if (fstat(fd, &sbuf) != 0) return 0;
     return sbuf.st_blksize;
+#endif
 }
 
 static hFILE *hopen_fd(const char *filename, const char *mode)

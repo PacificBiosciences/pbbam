@@ -29,8 +29,11 @@ DEALINGS IN THE SOFTWARE.  */
 #include <string.h>
 
 #include "cram/cram.h"
-
 #include "htslib/sam.h"
+
+#ifdef _WIN32
+#include <fcntl.h>
+#endif
 
 typedef struct hts_opt {
     enum cram_option opt;
@@ -120,6 +123,11 @@ int main(int argc, char *argv[])
     char modew[8];
     int r = 0, exit_code = 0;
     hts_opt *in_opts = NULL, *out_opts = NULL, *last = NULL;
+
+#ifdef _WIN32
+    // Set stdout to binary to avoid rewriting of newline characters
+    _setmode(_fileno(stdout),_O_BINARY);
+#endif
 
     while ((c = getopt(argc, argv, "IbDCSl:t:i:o:")) >= 0) {
         switch (c) {

@@ -64,6 +64,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "compat.h"
+
 typedef struct {
 	void *left, *right;
 	int depth;

@@ -30,7 +30,6 @@
 #include <errno.h>
 #include <stdarg.h>
 #include <getopt.h>
-#include <sys/select.h>
 #include <sys/stat.h>
 #include "htslib/bgzf.h"
 #include "htslib/hts.h"

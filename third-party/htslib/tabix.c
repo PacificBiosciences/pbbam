@@ -38,6 +38,8 @@ DEALINGS IN THE SOFTWARE.  */
 #include "htslib/bgzf.h"
 #include "htslib/hts.h"
 
+#include "compat.h"
+
 typedef struct
 {
     int min_shift;

@@ -30,6 +30,8 @@
 #include <stdint.h>
 #include "htslib/kstring.h"
 
+#include "compat.h" // Override vsnprintf on windows
+
 int kvsprintf(kstring_t *s, const char *fmt, va_list ap)
 {
 	va_list args;
