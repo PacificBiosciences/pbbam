@@ -194,7 +194,7 @@ TEST(BamRecordTest, DefaultValues)
     EXPECT_EQ(0, bam.impl_.Bin());
     EXPECT_EQ(BamRecordImpl::UNMAPPED, bam.impl_.Flag());  // forced init unmapped
     EXPECT_EQ(0, bam.impl_.InsertSize());
-    EXPECT_EQ(0, bam.impl_.MapQuality());
+    EXPECT_EQ(255, bam.impl_.MapQuality());
     EXPECT_EQ(-1, bam.impl_.MateReferenceId());
     EXPECT_EQ(-1, bam.impl_.MatePosition());
     EXPECT_EQ(-1, bam.impl_.Position());

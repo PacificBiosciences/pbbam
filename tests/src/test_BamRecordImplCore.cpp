@@ -156,7 +156,7 @@ TEST(BamRecordImplCoreTest, DefaultValues)
     EXPECT_EQ(-1, rawData->core.tid);
     EXPECT_EQ(-1, rawData->core.pos);
     EXPECT_EQ(0, rawData->core.bin);
-    EXPECT_EQ(0, rawData->core.qual);
+    EXPECT_EQ(255, rawData->core.qual);
     EXPECT_EQ(1, rawData->core.l_qname);
     EXPECT_EQ(BamRecordImpl::UNMAPPED, rawData->core.flag);
     EXPECT_EQ(0, rawData->core.n_cigar);
@@ -177,7 +177,7 @@ TEST(BamRecordImplCoreTest, DefaultValues)
     EXPECT_EQ(0, bam.Bin());
     EXPECT_EQ(BamRecordImpl::UNMAPPED, bam.Flag());
     EXPECT_EQ(0, bam.InsertSize());
-    EXPECT_EQ(0, bam.MapQuality());
+    EXPECT_EQ(255, bam.MapQuality());
     EXPECT_EQ(-1, bam.MateReferenceId());
     EXPECT_EQ(-1, bam.MatePosition());
     EXPECT_EQ(-1, bam.Position());

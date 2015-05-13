@@ -181,6 +181,7 @@ void BamRecordImpl::InitializeData(void)
     ReferenceId(-1);
     MateReferenceId(-1);
     SetMapped(false);
+    MapQuality(255);
 
     // initialized with NULL term for qname
     d_->core.l_qname = 1;
