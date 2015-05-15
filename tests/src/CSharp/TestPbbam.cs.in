@@ -1,9 +1,11 @@
 ﻿#pragma warning disable 168, 219
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 
 using PacBio.BAM;
 
@@ -14,11 +16,10 @@ namespace TestStuff
     //
     public class TestPbbam
     {
-        public static readonly string DATA_DIR = "@PacBioBAM_TestsDir@/data";
-
-        public static readonly string BAM_FILENAME_1 = DATA_DIR + "test_group_query/test1.bam";
-        public static readonly string BAM_FILENAME_2 = DATA_DIR + "/test_group_query/test2.bam";
-        public static readonly string FASTA_FILENAME = DATA_DIR + "/lambdaNEB.fa";
+        public static readonly string DATA_DIR = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/TestData";
+        public static readonly string BAM_FILENAME_1 = DATA_DIR + @"\test_group_query\test1.bam";
+        public static readonly string BAM_FILENAME_2 = DATA_DIR + @"\test_group_query\test2.bam";
+        public static readonly string FASTA_FILENAME = DATA_DIR + @"\lambdaNEB.fa";
 
         public TestPbbam ()
         {
