@@ -8,6 +8,16 @@ else()
     find_package(Boost REQUIRED)
 endif()
 find_package(Threads)
+
+if(WIN32)
+  # Need winsock on windows
+  set(SOCKET_LIBRARIES "ws2_32")
+
+  # Limit the number of DLLs we will have to bundle
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc -static-libstdc++")
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc -static-libstdc++")
+endif()
+
 	
 # define PacBioBAM library dependencies
 if(PacBioBAM_build_chef)
@@ -31,6 +41,7 @@ else()
             ${Htslib_LibDir}/libhts${CMAKE_SHARED_LIBRARY_SUFFIX}
             ${CMAKE_THREAD_LIBS_INIT}
             ${ZLIB_LIBRARIES}
+            ${SOCKET_LIBRARIES}
         )
     else()
         set(PacBioBAM_DependencyIncludes
@@ -42,9 +53,11 @@ else()
             ${Htslib_LibDir}/libhts.a
             ${CMAKE_THREAD_LIBS_INIT}
             ${ZLIB_LIBRARIES}
+            ${SOCKET_LIBRARIES}
         )
     endif() # shared
 endif() # chef
+
 
 # set up library include dirs
 include_directories(
