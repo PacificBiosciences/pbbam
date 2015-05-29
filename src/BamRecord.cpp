@@ -55,6 +55,8 @@ namespace internal {
 static const string tagName_readAccuracy    = "rq";
 static const string tagName_holeNumber      = "zm";
 static const string tagName_numPasses       = "np";
+static const string tagName_contextFlags    = "cx";
+static const string tagName_snr             = "sn";
 static const string tagName_deletionQV      = "dq";
 static const string tagName_deletionTag     = "dt";
 static const string tagName_insertionQV     = "iq";
@@ -871,11 +873,17 @@ bool BamRecord::HasInsertionQV(void) const
 bool BamRecord::HasIPD(void) const
 { return impl_.HasTag(internal::tagName_ipd); }
 
+bool BamRecord::HasLocalContextFlags(void) const
+{ return impl_.HasTag(internal::tagName_contextFlags); }
+
 bool BamRecord::HasMergeQV(void) const
 { return impl_.HasTag(internal::tagName_mergeQV); }
 
 bool BamRecord::HasPulseWidth(void) const
 { return impl_.HasTag(internal::tagName_pulseWidth); }
+
+bool BamRecord::HasSignalToNoise(void) const
+{ return impl_.HasTag(internal::tagName_snr); }
 
 bool BamRecord::HasSubstitutionQV(void) const
 { return impl_.HasTag(internal::tagName_substitutionQV); }
@@ -944,6 +952,20 @@ BamRecord& BamRecord::IPD(const Frames& frames,
 
 bool BamRecord::IsMapped(void) const
 { return impl_.IsMapped(); }
+
+LocalContextFlags BamRecord::LocalContextFlags(void) const
+{
+    const Tag& cxTag = impl_.TagValue(internal::tagName_contextFlags);
+    return static_cast<enum LocalContextFlags>(cxTag.ToUInt8());
+}
+
+BamRecord& BamRecord::LocalContextFlags(const enum LocalContextFlags flags)
+{
+    internal::CreateOrEdit(internal::tagName_contextFlags,
+                           static_cast<uint8_t>(flags),
+                           &impl_);
+    return *this;
+}
 
 BamRecord& BamRecord::Map(const int32_t referenceId,
                           const Position refStart,
@@ -1015,16 +1037,6 @@ BamRecord& BamRecord::NumPasses(const int32_t numPasses)
     return *this;
 }
 
-QualityValues BamRecord::Qualities(Orientation orientation,
-                                   bool aligned,
-                                   bool exciseSoftClips) const
-{
-    return FetchQualities("QUAL",
-                          orientation,
-                          aligned,
-                          exciseSoftClips);
-}
-
 Frames BamRecord::PulseWidth(Orientation orientation,
                              bool aligned,
                              bool exciseSoftClips) const
@@ -1043,6 +1055,16 @@ BamRecord& BamRecord::PulseWidth(const Frames& frames,
     else
         internal::CreateOrEdit(internal::tagName_pulseWidth, frames.Data(), &impl_);
     return *this;
+}
+
+QualityValues BamRecord::Qualities(Orientation orientation,
+                                   bool aligned,
+                                   bool exciseSoftClips) const
+{
+    return FetchQualities("QUAL",
+                          orientation,
+                          aligned,
+                          exciseSoftClips);
 }
 
 Position BamRecord::QueryEnd(void) const
@@ -1116,6 +1138,18 @@ std::string BamRecord::Sequence(const Orientation orientation,
                       orientation,
                       aligned,
                       exciseSoftClips);
+}
+
+vector<float> BamRecord::SignalToNoise(void) const
+{
+    const Tag& snTag = impl_.TagValue(internal::tagName_snr);
+    return snTag.ToFloatArray();
+}
+
+BamRecord& BamRecord::SignalToNoise(const vector<float>& snr)
+{
+    internal::CreateOrEdit(internal::tagName_snr, snr, &impl_);
+    return *this;
 }
 
 QualityValues BamRecord::SubstitutionQV(Orientation orientation,

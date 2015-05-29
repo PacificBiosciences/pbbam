@@ -42,6 +42,7 @@
 #include "pbbam/Frames.h"
 #include "pbbam/BamRecordImpl.h"
 #include "pbbam/BamHeader.h"
+#include "pbbam/LocalContextFlags.h"
 #include "pbbam/Orientation.h"
 #include "pbbam/ReadGroupInfo.h"
 #include "pbbam/Strand.h"
@@ -126,6 +127,9 @@ public:
     /// \returns true if this record has DeletionTag data
     bool HasDeletionTag(void) const;
 
+    /// \returns true if this record has LocalContextFlags (absent in CCS)
+    bool HasLocalContextFlags(void) const;
+
     /// \returns true if this record has InsertionQV data
     bool HasInsertionQV(void) const;
 
@@ -137,6 +141,9 @@ public:
 
     /// \returns true if this record has PulseWidth data
     bool HasPulseWidth(void) const;
+
+    /// \returns true if this record has signal-to-noise data (absent in POLYMERASE)
+    bool HasSignalToNoise(void) const;
 
     /// \returns true if this record has SubstitutionQV data
     bool HasSubstitutionQV(void) const;
@@ -153,6 +160,9 @@ public:
     /// \returns true if this record was mapped by aligner
     /// \sa BamRecordImpl::IsMapped
     bool IsMapped(void) const;
+
+    /// \returns this record's LocalContextFlags
+    LocalContextFlags LocalContextFlags(void) const;
 
     /// \returns this record's mapping quality. A value of 255 indicates "unknown"
     uint8_t MapQuality(void) const;
@@ -195,6 +205,9 @@ public:
     ///
     /// \returns the record's reference end position, or UnmappedPosition if unmapped
     Position ReferenceEnd(void) const;
+
+    /// \returns this record's average signal-to-noise for each of A, C, G, and T
+    std::vector<float> SignalToNoise(void) const;
 
     /// \returns this record's type
     /// \sa RecordType
@@ -387,6 +400,12 @@ public:
     /// \returns reference to this record
     BamRecord& HoleNumber(const int32_t holeNumber);
 
+    /// Sets this record's local context flags
+    ///
+    /// \param[in] flags
+    /// \returns reference to this record
+    BamRecord& LocalContextFlags(const enum LocalContextFlags flags);
+
     /// Sets this record's "number of complete passes of the insert".
     ///
     /// \param[in] numPasses
@@ -398,6 +417,12 @@ public:
     /// \param[in] accuracy
     /// \returns reference to this record
     BamRecord& ReadAccuracy(const Accuracy& accuracy);
+
+    /// Sets this record's average signal-to-noise in each of A, C, G, and T
+    ///
+    /// \param[in] average signal-to-noise of A, C, G, and T (in this order)
+    /// \returns reference to this record
+    BamRecord& SignalToNoise(const std::vector<float>& snr);
 
     /// \}
 
