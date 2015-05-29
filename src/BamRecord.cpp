@@ -956,10 +956,10 @@ bool BamRecord::IsMapped(void) const
 LocalContextFlags BamRecord::LocalContextFlags(void) const
 {
     const Tag& cxTag = impl_.TagValue(internal::tagName_contextFlags);
-    return static_cast<enum LocalContextFlags>(cxTag.ToUInt8());
+    return static_cast<PacBio::BAM::LocalContextFlags>(cxTag.ToUInt8());
 }
 
-BamRecord& BamRecord::LocalContextFlags(const enum LocalContextFlags flags)
+BamRecord& BamRecord::LocalContextFlags(const PacBio::BAM::LocalContextFlags flags)
 {
     internal::CreateOrEdit(internal::tagName_contextFlags,
                            static_cast<uint8_t>(flags),
