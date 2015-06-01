@@ -42,6 +42,7 @@
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamRecordImpl.h"
+#include <htslib/bgzf.h>
 #include <htslib/sam.h>
 #include <memory>
 
@@ -53,6 +54,17 @@ class BamHeader;
 namespace internal {
 
 // intended for use with PBBAM_SHARED_PTR<T>, std::unique_ptr<T>, etc
+
+struct HtslibBgzfDeleter
+{
+    void operator()(BGZF* bgzf)
+    {
+        if (bgzf) 
+            bgzf_close(bgzf);
+        bgzf = nullptr;
+    }
+};
+
 struct HtslibFileDeleter
 {
     void operator()(samFile* file)

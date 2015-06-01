@@ -37,6 +37,9 @@
 
 #include "pbbam/EntireFileQuery.h"
 #include "pbbam/BamFile.h"
+
+#include "pbbam/internal/SequentialMergeStrategy.h"
+
 #include "MemoryUtils.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -73,3 +76,63 @@ bool EntireFileQuery::GetNext(BamRecord& record)
     else
         throw std::exception();
 }
+
+namespace PacBio {
+namespace BAM {
+namespace staging {
+
+class EntireFileIterator : public internal::IBamFileIterator
+{
+public:
+    EntireFileIterator(const BamFile& bamFile)
+        : internal::IBamFileIterator(bamFile)
+    {
+        htsFile_.reset(sam_open(bamFile.Filename().c_str(), "rb"));
+        if (!htsFile_)
+            throw std::exception();
+
+        htsHeader_.reset(sam_hdr_read(htsFile_.get()));
+        if (!htsHeader_)
+            throw std::exception();
+    }
+
+public:
+    bool GetNext(BamRecord& record) {
+
+        const int result = sam_read1(htsFile_.get(),
+                                     htsHeader_.get(),
+                                     internal::BamRecordMemory::GetRawData(record).get());
+        // success
+        if (result >= 0)
+            return true;
+
+        // normal EOF
+        else if (result == -1)
+            return false;
+
+        // error (truncated file, etc)
+        else
+            throw std::exception();
+    }
+
+private:
+    unique_ptr<samFile,   internal::HtslibFileDeleter>   htsFile_;
+    unique_ptr<bam_hdr_t, internal::HtslibHeaderDeleter> htsHeader_;
+};
+
+EntireFileQuery::EntireFileQuery(const DataSet& dataset)
+    : internal::IQuery(dataset)
+{
+    // check files
+    // if SO all coordinate
+    // else if SO all queryname
+    // else SO unsorted/unknown
+    mergeStrategy_.reset(new internal::SequentialMergeStrategy(CreateIterators()));
+}
+
+EntireFileQuery::FileIterPtr EntireFileQuery::CreateIterator(const BamFile& bamFile)
+{ return FileIterPtr(new EntireFileIterator(bamFile)); }
+
+} // namespace staging
+} // namespace BAM
+} // namspace PacBio

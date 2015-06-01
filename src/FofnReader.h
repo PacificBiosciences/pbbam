@@ -35,16 +35,11 @@
 
 // Author: Derek Barnett
 
-#ifndef STRINGUTILS_H
-#define STRINGUTILS_H
+#ifndef FOFNREADER_H
+#define FOFNREADER_H
 
-#include <boost/spirit/include/karma.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_parse.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <algorithm>
-#include <exception>
-#include <sstream>
+#include "pbbam/dataset/DataSet.h"
+#include <iosfwd>
 #include <string>
 #include <vector>
 
@@ -52,47 +47,14 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
-inline std::string Int2String(const int x)
+class FofnReader
 {
-    char buffer[64];
-    char* p = buffer;
-    if (boost::spirit::karma::generate(p, boost::spirit::karma::int_, x)) {
-        *p = 0;
-        return std::string(buffer);
-    }
-    throw std::exception();
-}
-
-inline std::string MakeSamTag(const std::string& tag,
-                              const std::string& value)
-{
-    return std::string('\t' + tag + ':' + value);
-}
-
-inline std::vector<std::string> Split(const std::string& line,
-                                      const char delim = '\t')
-{
-    std::vector<std::string> tokens;
-    std::stringstream lineStream(line);
-    std::string token;
-    while (std::getline(lineStream, token, delim))
-        tokens.push_back(token);
-    return tokens;
-}
-
-inline int String2Int(const std::string& str)
-{
-    int result;
-    std::string::const_iterator i = str.begin();
-    if (boost::spirit::qi::parse(i, str.end(), boost::spirit::qi::int_, result)) {
-        if (i == str.end())
-            return result;
-    }
-    throw std::exception();
-}
+public:
+    static std::vector<std::string> Files(std::istream& in);
+};
 
 } // namespace internal
 } // namespace BAM
 } // namespace PacBio
 
-#endif // STRINGUTILS_H
+#endif // FOFNREADER_H

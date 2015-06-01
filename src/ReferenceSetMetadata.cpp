@@ -35,64 +35,57 @@
 
 // Author: Derek Barnett
 
-#ifndef STRINGUTILS_H
-#define STRINGUTILS_H
-
-#include <boost/spirit/include/karma.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_parse.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <algorithm>
+#include "pbbam/dataset/ReferenceSetMetadata.h"
 #include <exception>
-#include <sstream>
-#include <string>
-#include <vector>
+using namespace PacBio;
+using namespace PacBio::BAM;
+using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-inline std::string Int2String(const int x)
-{
-    char buffer[64];
-    char* p = buffer;
-    if (boost::spirit::karma::generate(p, boost::spirit::karma::int_, x)) {
-        *p = 0;
-        return std::string(buffer);
-    }
-    throw std::exception();
-}
+// empty, "null" components
 
-inline std::string MakeSamTag(const std::string& tag,
-                              const std::string& value)
+static
+const ContigsMetadata& NullContigs(void)
 {
-    return std::string('\t' + tag + ':' + value);
-}
-
-inline std::vector<std::string> Split(const std::string& line,
-                                      const char delim = '\t')
-{
-    std::vector<std::string> tokens;
-    std::stringstream lineStream(line);
-    std::string token;
-    while (std::getline(lineStream, token, delim))
-        tokens.push_back(token);
-    return tokens;
-}
-
-inline int String2Int(const std::string& str)
-{
-    int result;
-    std::string::const_iterator i = str.begin();
-    if (boost::spirit::qi::parse(i, str.end(), boost::spirit::qi::int_, result)) {
-        if (i == str.end())
-            return result;
-    }
-    throw std::exception();
+    static const ContigsMetadata empty;
+    return empty;
 }
 
 } // namespace internal
 } // namespace BAM
 } // namespace PacBio
 
-#endif // STRINGUTILS_H
+ReferenceSetMetadata::ReferenceSetMetadata(void)
+    : DataSetMetadataBase()
+{ }
+
+const ContigsMetadata& ReferenceSetMetadata::Contigs(void) const
+{
+    try {
+        return Child<ContigsMetadata>("Contigs");
+    } catch (std::exception&) {
+        return internal::NullContigs();
+    }
+}
+
+ContigsMetadata& ReferenceSetMetadata::Contigs(void)
+{
+    if (!HasChild("Contigs"))
+        AddChild(internal::NullContigs());
+    return Child<ContigsMetadata>("Contigs");
+}
+
+const std::string& ReferenceSetMetadata::Organism(void) const
+{ return FetchChildText("Organism"); }
+
+ReferenceSetMetadata& ReferenceSetMetadata::Organism(const std::string& organism)
+{ SetChildText("Organism", organism); return *this; }
+
+const std::string& ReferenceSetMetadata::Ploidy(void) const
+{ return FetchChildText("Ploidy"); }
+
+ReferenceSetMetadata& ReferenceSetMetadata::Ploidy(const std::string& ploidy)
+{ SetChildText("Ploidy", ploidy); return *this; }

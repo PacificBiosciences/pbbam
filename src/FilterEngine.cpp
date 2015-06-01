@@ -35,64 +35,34 @@
 
 // Author: Derek Barnett
 
-#ifndef STRINGUTILS_H
-#define STRINGUTILS_H
+#include "pbbam/internal/FilterEngine.h"
+#include "pbbam/BamRecord.h"
+using namespace PacBio;
+using namespace PacBio::BAM;
+using namespace PacBio::BAM::internal;
+using namespace std;
 
-#include <boost/spirit/include/karma.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_parse.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <algorithm>
-#include <exception>
-#include <sstream>
-#include <string>
-#include <vector>
+FilterEngine::FilterEngine(void) { }
 
-namespace PacBio {
-namespace BAM {
-namespace internal {
-
-inline std::string Int2String(const int x)
+bool FilterEngine::Accepts(const BamRecord& r) const
 {
-    char buffer[64];
-    char* p = buffer;
-    if (boost::spirit::karma::generate(p, boost::spirit::karma::int_, x)) {
-        *p = 0;
-        return std::string(buffer);
+//        foreach ( const FilterParameter& param, parameters_ ) {
+//            if (!param.Accepts(r))
+//                return false;
+//        }
+//        return true;
+    (void)r;
+    return true;
+}
+
+bool FilterEngine::Accepts(vector<BamRecord>& r) const
+{
+    size_t i = 0;
+    while (i < r.size()) {
+        if (!Accepts(r.at(i)))
+            r.erase(r.begin() + i);
+        else
+            ++i;
     }
-    throw std::exception();
+    return !r.empty();
 }
-
-inline std::string MakeSamTag(const std::string& tag,
-                              const std::string& value)
-{
-    return std::string('\t' + tag + ':' + value);
-}
-
-inline std::vector<std::string> Split(const std::string& line,
-                                      const char delim = '\t')
-{
-    std::vector<std::string> tokens;
-    std::stringstream lineStream(line);
-    std::string token;
-    while (std::getline(lineStream, token, delim))
-        tokens.push_back(token);
-    return tokens;
-}
-
-inline int String2Int(const std::string& str)
-{
-    int result;
-    std::string::const_iterator i = str.begin();
-    if (boost::spirit::qi::parse(i, str.end(), boost::spirit::qi::int_, result)) {
-        if (i == str.end())
-            return result;
-    }
-    throw std::exception();
-}
-
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
-
-#endif // STRINGUTILS_H

@@ -35,64 +35,49 @@
 
 // Author: Derek Barnett
 
-#ifndef STRINGUTILS_H
-#define STRINGUTILS_H
-
-#include <boost/spirit/include/karma.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_parse.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <algorithm>
+#include "pbbam/dataset/SubreadSet.h"
 #include <exception>
-#include <sstream>
-#include <string>
-#include <vector>
+using namespace PacBio;
+using namespace PacBio::BAM;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-inline std::string Int2String(const int x)
+static
+const SubreadSetMetadata& NullMetadata(void)
 {
-    char buffer[64];
-    char* p = buffer;
-    if (boost::spirit::karma::generate(p, boost::spirit::karma::int_, x)) {
-        *p = 0;
-        return std::string(buffer);
-    }
-    throw std::exception();
-}
-
-inline std::string MakeSamTag(const std::string& tag,
-                              const std::string& value)
-{
-    return std::string('\t' + tag + ':' + value);
-}
-
-inline std::vector<std::string> Split(const std::string& line,
-                                      const char delim = '\t')
-{
-    std::vector<std::string> tokens;
-    std::stringstream lineStream(line);
-    std::string token;
-    while (std::getline(lineStream, token, delim))
-        tokens.push_back(token);
-    return tokens;
-}
-
-inline int String2Int(const std::string& str)
-{
-    int result;
-    std::string::const_iterator i = str.begin();
-    if (boost::spirit::qi::parse(i, str.end(), boost::spirit::qi::int_, result)) {
-        if (i == str.end())
-            return result;
-    }
-    throw std::exception();
+    static const SubreadSetMetadata m;
+    return m;
 }
 
 } // namespace internal
 } // namespace BAM
 } // namespace PacBio
 
-#endif // STRINGUTILS_H
+SubreadSet::SubreadSet(void)
+    : DataSetBase(DataSetType::SUBREADSET)
+{ }
+
+SubreadSet::SubreadSet(const DataSetBase &other)
+    : DataSetBase(other)
+{
+    if (other.Type() != DataSetType::SUBREADSET)
+        throw std::exception();
+}
+
+const SubreadSetMetadata& SubreadSet::Metadata(void) const
+{
+    try {
+        return Child<SubreadSetMetadata>("DataSetMetadata");
+    } catch (std::exception&) {
+        return internal::NullMetadata();
+    }
+}
+
+SubreadSetMetadata& SubreadSet::Metadata(void)
+{
+    if (!HasChild("DataSetMetadata"))
+        AddChild(internal::NullMetadata());
+    return Child<SubreadSetMetadata>("DataSetMetadata");
+}

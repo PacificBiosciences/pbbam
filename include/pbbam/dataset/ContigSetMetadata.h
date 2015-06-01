@@ -35,64 +35,55 @@
 
 // Author: Derek Barnett
 
-#ifndef STRINGUTILS_H
-#define STRINGUTILS_H
+#ifndef CONTIGSETMETADATA_H
+#define CONTIGSETMETADATA_H
 
-#include <boost/spirit/include/karma.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_parse.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <algorithm>
-#include <exception>
-#include <sstream>
-#include <string>
-#include <vector>
+#include "pbbam/dataset/ContigSetMetadata.h"
+#include "pbbam/dataset/DataSetMetadataBase.h"
+#include "pbbam/internal/DataSetListElement.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-inline std::string Int2String(const int x)
+// <Contig />
+class PBBAM_EXPORT ContigMetadata : public internal::DataSetElement
 {
-    char buffer[64];
-    char* p = buffer;
-    if (boost::spirit::karma::generate(p, boost::spirit::karma::int_, x)) {
-        *p = 0;
-        return std::string(buffer);
-    }
-    throw std::exception();
-}
+public:
+    ContigMetadata(void);
+    using DataSetElement::DataSetElement;
 
-inline std::string MakeSamTag(const std::string& tag,
-                              const std::string& value)
+public:
+    const std::string& Digest(void) const;
+    const std::string& Length(void) const;
+public:
+    ContigMetadata& Digest(const std::string& digest);
+    ContigMetadata& Length(const std::string& length);
+};
+
+// <Contigs />
+class PBBAM_EXPORT ContigsMetadata : public internal::DataSetListElement<ContigMetadata>
 {
-    return std::string('\t' + tag + ':' + value);
-}
+public:
+    ContigsMetadata(void);
+    using DataSetListElement::DataSetListElement;
 
-inline std::vector<std::string> Split(const std::string& line,
-                                      const char delim = '\t')
+public:
+    ContigsMetadata& AddContig(const ContigMetadata& contig);
+    ContigsMetadata& RemoveContig(const ContigMetadata& contig);
+};
+
+class PBBAM_EXPORT ContigSetMetadata : public DataSetMetadataBase
 {
-    std::vector<std::string> tokens;
-    std::stringstream lineStream(line);
-    std::string token;
-    while (std::getline(lineStream, token, delim))
-        tokens.push_back(token);
-    return tokens;
-}
+public:
+    ContigSetMetadata(void);
+    using DataSetMetadataBase::DataSetMetadataBase;
 
-inline int String2Int(const std::string& str)
-{
-    int result;
-    std::string::const_iterator i = str.begin();
-    if (boost::spirit::qi::parse(i, str.end(), boost::spirit::qi::int_, result)) {
-        if (i == str.end())
-            return result;
-    }
-    throw std::exception();
-}
+public:
+    const ContigsMetadata& Contigs(void) const;
+    ContigsMetadata& Contigs(void);
+};
 
-} // namespace internal
 } // namespace BAM
 } // namespace PacBio
 
-#endif // STRINGUTILS_H
+#endif // CONTIGSETMETADATA_H

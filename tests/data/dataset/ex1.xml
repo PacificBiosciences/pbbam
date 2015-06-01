@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<SubreadSet xmlns="http://pacificbiosciences.com/PacBioDataModel.xsd">
+    <ExternalDataReferences>
+        <ExternalReference MetaType="SubreadFile.SubreadBamFile"
+                           ResourceId="file:///Users/derek/development/data/ex1.bam"/>
+        <ExternalReference MetaType="SubreadFile.SubreadBamFile"
+                           ResourceId="file:///Users/derek/development/data/ex2.bam"/>
+    </ExternalDataReferences>
+    <Filters>
+        <Filter>
+            <Parameters>
+                <Parameter Name="rq" Value=">0.75"/>
+            </Parameters>
+        </Filter>
+    </Filters>
+    <DataSetMetadata>
+        <TotalLength>5000</TotalLength>
+        <NumRecords>500</NumRecords>
+    </DataSetMetadata>
+    <DataSets>
+        <DataSet Name="High quality">
+            <Filters>
+                <Filter>
+                    <Parameters>
+                        <Parameter Name="rq" Value=">0.85"/>
+                    </Parameters>
+                </Filter>
+            </Filters>
+        </DataSet>
+    </DataSets>
+</SubreadSet>

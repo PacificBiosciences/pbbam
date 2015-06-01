@@ -35,64 +35,64 @@
 
 // Author: Derek Barnett
 
-#ifndef STRINGUTILS_H
-#define STRINGUTILS_H
+#ifndef DATASETMETADATABASE_H
+#define DATASETMETADATABASE_H
 
-#include <boost/spirit/include/karma.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_parse.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <algorithm>
-#include <exception>
-#include <sstream>
+#include "pbbam/Config.h"
+#include "pbbam/internal/DataSetElement.h"
 #include <string>
-#include <vector>
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-inline std::string Int2String(const int x)
+class PBBAM_EXPORT DataSetMetadataBase : public internal::DataSetElement
 {
-    char buffer[64];
-    char* p = buffer;
-    if (boost::spirit::karma::generate(p, boost::spirit::karma::int_, x)) {
-        *p = 0;
-        return std::string(buffer);
-    }
-    throw std::exception();
-}
+public:
+    /// \name Constructors & Related Methods
+    /// \{
 
-inline std::string MakeSamTag(const std::string& tag,
-                              const std::string& value)
-{
-    return std::string('\t' + tag + ':' + value);
-}
+    DataSetMetadataBase(void);
 
-inline std::vector<std::string> Split(const std::string& line,
-                                      const char delim = '\t')
-{
-    std::vector<std::string> tokens;
-    std::stringstream lineStream(line);
-    std::string token;
-    while (std::getline(lineStream, token, delim))
-        tokens.push_back(token);
-    return tokens;
-}
+    using DataSetElement::DataSetElement;
 
-inline int String2Int(const std::string& str)
-{
-    int result;
-    std::string::const_iterator i = str.begin();
-    if (boost::spirit::qi::parse(i, str.end(), boost::spirit::qi::int_, result)) {
-        if (i == str.end())
-            return result;
-    }
-    throw std::exception();
-}
+    /// \}
 
-} // namespace internal
+public:
+    /// \name Attributes
+    /// \{
+
+    /// \returns value of "NumRecords" entry (or empty string if not found)
+    ///
+    const std::string& NumRecords(void) const;
+
+    /// \returns value of "TotalLength" entry (or empty string if not found)
+    ///
+    const std::string& TotalLength(void) const;
+
+    /// \}
+
+public:
+    /// \name Attributes
+    /// \{
+
+    /// Sets the "NumRecords" value.
+    ///
+    /// \param[in] numRecords
+    /// \returns reference to metadata
+    ///
+    DataSetMetadataBase& NumRecords(const std::string& numRecords);
+
+    /// Sets the "TotalLength" value.
+    ///
+    /// \param[in] numRecords
+    /// \returns reference to metadata
+    ///
+    DataSetMetadataBase& TotalLength(const std::string& totalLength);
+
+    /// \}
+};
+
 } // namespace BAM
 } // namespace PacBio
 
-#endif // STRINGUTILS_H
+#endif // DATASETMETADATABASE_H

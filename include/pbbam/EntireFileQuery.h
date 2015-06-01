@@ -39,6 +39,7 @@
 #define ENTIREFILEQUERY_H
 
 #include "pbbam/QueryBase.h"
+#include "pbbam/internal/QueryBase.h"
 #include <htslib/sam.h>
 
 namespace PacBio {
@@ -58,6 +59,17 @@ private:
     PBBAM_SHARED_PTR<bam_hdr_t> htsHeader_;
 };
 
+namespace staging {
+
+class PBBAM_EXPORT EntireFileQuery : public internal::IQuery
+{
+public:
+    EntireFileQuery(const DataSet& dataset);
+protected:
+    FileIterPtr CreateIterator(const BamFile& bamFile);
+};
+
+} // namespace staging
 } // namespace BAM
 } // namspace PacBio
 

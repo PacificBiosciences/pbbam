@@ -40,6 +40,7 @@
 
 #include "pbbam/GenomicInterval.h"
 #include "pbbam/QueryBase.h"
+#include "pbbam/internal/QueryBase.h"
 #include <string>
 
 namespace PacBio {
@@ -72,6 +73,26 @@ private:
     std::shared_ptr<hts_itr_t> htsIterator_;
 };
 
+namespace staging {
+
+class PBBAM_EXPORT GenomicIntervalQuery : public internal::IQuery
+{
+public:
+    GenomicIntervalQuery(const GenomicInterval& interval,
+                         const DataSet& dataset);
+
+public:
+    GenomicIntervalQuery& Interval(const GenomicInterval& interval);
+    GenomicInterval Interval(void) const;
+
+protected:
+    FileIterPtr CreateIterator(const BamFile& bamFile);
+
+private:
+    GenomicInterval interval_;
+};
+
+} // namespace staging
 } // namespace BAM
 } // namspace PacBio
 

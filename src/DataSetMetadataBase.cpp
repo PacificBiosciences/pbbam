@@ -35,64 +35,24 @@
 
 // Author: Derek Barnett
 
-#ifndef STRINGUTILS_H
-#define STRINGUTILS_H
-
-#include <boost/spirit/include/karma.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_parse.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <algorithm>
+#include "pbbam/dataset/DataSetMetadataBase.h"
 #include <exception>
-#include <sstream>
-#include <string>
-#include <vector>
+using namespace PacBio;
+using namespace PacBio::BAM;
+using namespace std;
 
-namespace PacBio {
-namespace BAM {
-namespace internal {
+DataSetMetadataBase::DataSetMetadataBase(void)
+    : internal::DataSetElement("DataSetMetadata")
+{ }
 
-inline std::string Int2String(const int x)
-{
-    char buffer[64];
-    char* p = buffer;
-    if (boost::spirit::karma::generate(p, boost::spirit::karma::int_, x)) {
-        *p = 0;
-        return std::string(buffer);
-    }
-    throw std::exception();
-}
+const string& DataSetMetadataBase::NumRecords(void) const
+{ return FetchChildText("NumRecords"); }
 
-inline std::string MakeSamTag(const std::string& tag,
-                              const std::string& value)
-{
-    return std::string('\t' + tag + ':' + value);
-}
+DataSetMetadataBase& DataSetMetadataBase::NumRecords(const std::string& numRecords)
+{ SetChildText("NumRecords", numRecords); return *this; }
 
-inline std::vector<std::string> Split(const std::string& line,
-                                      const char delim = '\t')
-{
-    std::vector<std::string> tokens;
-    std::stringstream lineStream(line);
-    std::string token;
-    while (std::getline(lineStream, token, delim))
-        tokens.push_back(token);
-    return tokens;
-}
+const std::string& DataSetMetadataBase::TotalLength(void) const
+{ return FetchChildText("TotalLength"); }
 
-inline int String2Int(const std::string& str)
-{
-    int result;
-    std::string::const_iterator i = str.begin();
-    if (boost::spirit::qi::parse(i, str.end(), boost::spirit::qi::int_, result)) {
-        if (i == str.end())
-            return result;
-    }
-    throw std::exception();
-}
-
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
-
-#endif // STRINGUTILS_H
+DataSetMetadataBase& DataSetMetadataBase::TotalLength(const std::string& totalLength)
+{ SetChildText("TotalLength", totalLength); return *this; }

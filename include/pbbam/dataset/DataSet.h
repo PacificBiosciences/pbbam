@@ -35,64 +35,81 @@
 
 // Author: Derek Barnett
 
-#ifndef STRINGUTILS_H
-#define STRINGUTILS_H
+#ifndef DATASET_H
+#define DATASET_H
 
-#include <boost/spirit/include/karma.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_parse.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <algorithm>
-#include <exception>
-#include <sstream>
-#include <string>
-#include <vector>
+#include "pbbam/BamFile.h"
+#include "pbbam/dataset/AlignmentSet.h"
+#include "pbbam/dataset/BarcodeSet.h"
+#include "pbbam/dataset/CcsReadSet.h"
+#include "pbbam/dataset/ContigSet.h"
+#include "pbbam/dataset/ReferenceSet.h"
+#include "pbbam/dataset/SubreadSet.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-inline std::string Int2String(const int x)
+class PBBAM_EXPORT DataSet : public DataSetBase
 {
-    char buffer[64];
-    char* p = buffer;
-    if (boost::spirit::karma::generate(p, boost::spirit::karma::int_, x)) {
-        *p = 0;
-        return std::string(buffer);
-    }
-    throw std::exception();
-}
 
-inline std::string MakeSamTag(const std::string& tag,
-                              const std::string& value)
-{
-    return std::string('\t' + tag + ':' + value);
-}
+public:
+    DataSet(void);
+    DataSet(const BamFile& bamFile);
+    using DataSetBase::DataSetBase;
 
-inline std::vector<std::string> Split(const std::string& line,
-                                      const char delim = '\t')
-{
-    std::vector<std::string> tokens;
-    std::stringstream lineStream(line);
-    std::string token;
-    while (std::getline(lineStream, token, delim))
-        tokens.push_back(token);
-    return tokens;
-}
+public:
+    /// \name Generic Dataset Metadata
+    /// \{
 
-inline int String2Int(const std::string& str)
-{
-    int result;
-    std::string::const_iterator i = str.begin();
-    if (boost::spirit::qi::parse(i, str.end(), boost::spirit::qi::int_, result)) {
-        if (i == str.end())
-            return result;
-    }
-    throw std::exception();
-}
+    /// \returns dataset's metadata
+    ///
+    const DataSetMetadata& Metadata(void) const;
 
-} // namespace internal
+public:
+    /// \returns editable metadata object
+    DataSetMetadata& Metadata(void);
+
+    /// \}
+
+public:
+    /// \name DataSet Conversion
+    /// \{
+
+    AlignmentSet ToAlignmentSet(void) const;
+    BarcodeSet   ToBarcodeSet(void) const;
+    CcsReadSet   ToCcsReadSet(void) const;
+    ContigSet    ToContigSet(void) const;
+    ReferenceSet ToReferenceSet(void) const;
+    SubreadSet   ToSubreadSet(void) const;
+
+    /// \}
+
+public:
+    /// \n BAM-Specific Methods
+    /// \{
+
+    /// \returns list of BamFile objects for BAM files in external data references
+    ///
+    std::vector<BamFile> BamFiles(void) const;
+
+    /// \}
+
+public:
+    /// \name Merging Datasets
+    /// \{
+
+    /// Merges \p other dataset with this dataset.
+    ///
+    /// Checks for same metadata (for now).
+    ///
+    /// \returns reference to this dataset
+    ///
+    DataSet& operator+=(const DataSet& other);
+
+    /// \}
+};
+
 } // namespace BAM
 } // namespace PacBio
 
-#endif // STRINGUTILS_H
+#endif // DATASET_H

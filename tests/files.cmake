@@ -18,12 +18,17 @@ set( PacBioBAMTest_CPP
     ${PacBioBAM_TestsDir}/src/test_BamRecordMapping.cpp
     ${PacBioBAM_TestsDir}/src/test_BamWriter.cpp
     ${PacBioBAM_TestsDir}/src/test_Cigar.cpp
+    ${PacBioBAM_TestsDir}/src/test_DataSetCore.cpp
+    ${PacBioBAM_TestsDir}/src/test_DataSetIO.cpp
+    ${PacBioBAM_TestsDir}/src/test_DataSetMetadata.cpp
+    ${PacBioBAM_TestsDir}/src/test_DataSetQuery.cpp
     ${PacBioBAM_TestsDir}/src/test_EndToEnd.cpp
     ${PacBioBAM_TestsDir}/src/test_EntireFileQuery.cpp
     ${PacBioBAM_TestsDir}/src/test_Frames.cpp
     ${PacBioBAM_TestsDir}/src/test_GenomicIntervalQuery.cpp
     ${PacBioBAM_TestsDir}/src/test_IndexedFastaReader.cpp
     ${PacBioBAM_TestsDir}/src/test_Intervals.cpp
+    ${PacBioBAM_TestsDir}/src/test_PacBioIndex.cpp
     ${PacBioBAM_TestsDir}/src/test_QualityValues.cpp
     ${PacBioBAM_TestsDir}/src/test_ReadGroupInfo.cpp
     ${PacBioBAM_TestsDir}/src/test_SequenceUtils.cpp

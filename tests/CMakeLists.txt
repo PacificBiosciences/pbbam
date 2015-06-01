@@ -18,6 +18,10 @@ configure_file(
     ${PacBioBAM_TestsDir}/src/TestData.h.in
     ${PacBioBAM_TestsDir}/src/TestData.h
 )
+configure_file(
+    ${PacBioBAM_TestsDir}/data/test_group_query/group.fofn.in
+    ${PacBioBAM_TestsDir}/data/test_group_query/group.fofn
+)
 
 # add PacBioBAM & GoogleTest includes
 include_directories(

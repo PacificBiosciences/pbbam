@@ -35,64 +35,43 @@
 
 // Author: Derek Barnett
 
-#ifndef STRINGUTILS_H
-#define STRINGUTILS_H
+#ifndef MERGEITEM_H
+#define MERGEITEM_H
 
-#include <boost/spirit/include/karma.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_parse.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <algorithm>
-#include <exception>
-#include <sstream>
-#include <string>
+#include "pbbam/BamRecord.h"
+#include "pbbam/internal/IBamFileIterator.h"
 #include <vector>
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-inline std::string Int2String(const int x)
+template<typename T>
+struct MergeItemBase
 {
-    char buffer[64];
-    char* p = buffer;
-    if (boost::spirit::karma::generate(p, boost::spirit::karma::int_, x)) {
-        *p = 0;
-        return std::string(buffer);
-    }
-    throw std::exception();
-}
+public:
+    using FileIterPtr = typename IBamFileIteratorBase<T>::Ptr;
 
-inline std::string MakeSamTag(const std::string& tag,
-                              const std::string& value)
-{
-    return std::string('\t' + tag + ':' + value);
-}
+public:
+    MergeItemBase(void) { }
+    MergeItemBase(const T& r, const FileIterPtr& iter)
+        : record_(r), iter_(iter)
+    { }
 
-inline std::vector<std::string> Split(const std::string& line,
-                                      const char delim = '\t')
-{
-    std::vector<std::string> tokens;
-    std::stringstream lineStream(line);
-    std::string token;
-    while (std::getline(lineStream, token, delim))
-        tokens.push_back(token);
-    return tokens;
-}
+public:
+    bool IsNull(void) const
+    { return !iter_; }
 
-inline int String2Int(const std::string& str)
-{
-    int result;
-    std::string::const_iterator i = str.begin();
-    if (boost::spirit::qi::parse(i, str.end(), boost::spirit::qi::int_, result)) {
-        if (i == str.end())
-            return result;
-    }
-    throw std::exception();
-}
+public:
+    T record_;
+    FileIterPtr iter_;
+};
+
+typedef MergeItemBase<BamRecord>               MergeItem;
+typedef MergeItemBase<std::vector<BamRecord> > GroupMergeItem;
 
 } // namespace internal
 } // namespace BAM
 } // namespace PacBio
 
-#endif // STRINGUTILS_H
+#endif // MERGEITEM_H

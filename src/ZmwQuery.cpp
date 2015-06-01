@@ -35,64 +35,70 @@
 
 // Author: Derek Barnett
 
-#ifndef STRINGUTILS_H
-#define STRINGUTILS_H
-
-#include <boost/spirit/include/karma.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_parse.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
+#include "pbbam/ZmwQuery.h"
+#include "pbbam/internal/BamRecordSort.h"
+#include "pbbam/internal/MergeStrategy.h"
 #include <algorithm>
-#include <exception>
-#include <sstream>
-#include <string>
-#include <vector>
+using namespace PacBio;
+using namespace PacBio::BAM;
+using namespace PacBio::BAM::internal;
+using namespace PacBio::BAM::staging;
+using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-inline std::string Int2String(const int x)
+class ZmwQueryIterator : public IBamFileIterator
 {
-    char buffer[64];
-    char* p = buffer;
-    if (boost::spirit::karma::generate(p, boost::spirit::karma::int_, x)) {
-        *p = 0;
-        return std::string(buffer);
+public:
+    ZmwQueryIterator(const std::vector<int>& zmwWhitelist,
+                     const BamFile& bamFile)
+        : internal::IBamFileIterator(bamFile)
+        , currentWhitelistIndex_(0)
+    {
+        std::vector<int> sortedZmws = zmwWhitelist;
+        std::sort(sortedZmws.begin(), sortedZmws.end());
+        for (int zmw : sortedZmws) {
+            (void)zmw;
+            std::vector<int> zmwIndices = { }; // PBI magic goes here for pbi.OffsetsForZmw(zmw);
+            std::sort(zmwIndices.begin(), zmwIndices.end());
+            for (int index : zmwIndices)
+                whitelistRecordIndices_.push_back(index);
+        }
     }
-    throw std::exception();
-}
 
-inline std::string MakeSamTag(const std::string& tag,
-                              const std::string& value)
-{
-    return std::string('\t' + tag + ':' + value);
-}
+public:
+    bool GetNext(BamRecord& r){
+        if (currentWhitelistIndex_ >= whitelistRecordIndices_.size())
+            return false;
 
-inline std::vector<std::string> Split(const std::string& line,
-                                      const char delim = '\t')
-{
-    std::vector<std::string> tokens;
-    std::stringstream lineStream(line);
-    std::string token;
-    while (std::getline(lineStream, token, delim))
-        tokens.push_back(token);
-    return tokens;
-}
+        // this is where we seek & read
+        // r = fileData_.records.at(whitelistRecordIndices_.at(currentWhitelistIndex_));
 
-inline int String2Int(const std::string& str)
-{
-    int result;
-    std::string::const_iterator i = str.begin();
-    if (boost::spirit::qi::parse(i, str.end(), boost::spirit::qi::int_, result)) {
-        if (i == str.end())
-            return result;
+        ++currentWhitelistIndex_;
+        return true;
     }
-    throw std::exception();
-}
+
+private:
+    std::vector<int> whitelistRecordIndices_;
+    size_t currentWhitelistIndex_;
+};
 
 } // namespace internal
 } // namespace BAM
 } // namespace PacBio
 
-#endif // STRINGUTILS_H
+ZmwQuery::ZmwQuery(const std::vector<int>& zmwWhitelist,
+                   const DataSet& dataset)
+    : internal::IQuery(dataset)
+    , whitelist_(zmwWhitelist)
+{
+    // not yet fully implemented
+    throw std::exception();
+
+//    mergeStrategy_.reset(new MergeStrategy<ByZmw>(CreateIterators()));
+}
+
+ZmwQuery::FileIterPtr ZmwQuery::CreateIterator(const BamFile& bamFile)
+{ return FileIterPtr(new ZmwQueryIterator(whitelist_, bamFile)); }
