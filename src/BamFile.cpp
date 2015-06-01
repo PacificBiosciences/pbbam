@@ -36,12 +36,12 @@
 // Author: Derek Barnett
 
 #include "pbbam/BamFile.h"
+#include "pbbam/PbiFile.h"
+#include "FileUtils.h"
 #include "MemoryUtils.h"
 #include <htslib/sam.h>
-
-#include <iostream>
-
 #include <memory>
+#include <sys/stat.h>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -80,6 +80,10 @@ public:
 } // namespace BAM
 } // namespace PacBio
 
+// ------------------------
+// BamFile implementation
+// ------------------------
+
 BamFile::BamFile(const std::string& filename)
     : d_(new internal::BamFilePrivate(filename))
 { }
@@ -99,6 +103,40 @@ BamFile& BamFile::operator=(BamFile&& other)
 { d_ = std::move(other.d_); return *this; }
 
 BamFile::~BamFile(void) { }
+
+void BamFile::EnsurePacBioIndexExists(void) const
+{
+    // if PBI exists and is not older than BAM, we're good to go
+    // TODO: check readable? or just wait til index load time?
+    const string pbiFn = PacBioIndexFilename();
+    if (internal::FileUtils::Exists(pbiFn)) {
+        const time_t bamTimestamp = internal::FileUtils::LastModified(Filename());
+        const time_t pbiTimestamp = internal::FileUtils::LastModified(pbiFn);
+        if (bamTimestamp <= pbiTimestamp)
+            return;
+    }
+
+    // otherwise, create PBI index file
+    PbiFile::CreateFrom(*this);
+}
+
+void BamFile::EnsureStandardIndexExists(void) const
+{
+    // if BAI exists and is not older than BAM, we're good to go
+    // TODO: check readable? or just wait til index load time?
+    const string bamFn = Filename();
+    const string baiFn = StandardIndexFilename();
+    if (internal::FileUtils::Exists(baiFn)) {
+        const time_t bamTimestamp = internal::FileUtils::LastModified(bamFn);
+        const time_t baiTimestamp = internal::FileUtils::LastModified(baiFn);
+        if (bamTimestamp <= baiTimestamp)
+            return;
+    }
+
+    // otherwise, create BAI index file
+    if (bam_index_build(bamFn.c_str(), 0) != 0)
+        throw std::exception();
+}
 
 std::string BamFile::Filename(void) const
 { return d_->filename_; }

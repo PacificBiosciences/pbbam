@@ -70,7 +70,7 @@ public:
 
 public:
 
-    /// \name Filename Methods
+    /// \name Index & Filename Methods
     /// \{
 
     /// \returns BAM filename
@@ -85,6 +85,26 @@ public:
     /// \note No guarantee is made on the existence of this file.
     ///       This method simply returns the expected filename.
     std::string StandardIndexFilename(void) const;
+
+    /// Check that ".pbi" exists, is readable, and is newer than
+    /// this BAM file. If not, one will be created.
+    ///
+    /// \note The PBI sections will be auto-detected from the
+    /// BAM file's contents. If you need fine-grained control over
+    /// the PBI layout, see PbiIndex::Build for more info.
+    ///
+    /// \throws if PBI file could not be properly created and/or
+    /// written to disk
+    ///
+    void EnsurePacBioIndexExists(void) const;
+
+    /// Check that ".bai" exists, is readable, and is newer than
+    /// this BAM file. If not, one will be created.
+    ///
+    /// \throws if BAI file could not be properly created (e.g. this
+    /// BAM is not coordinate-sorted) or could not be written to disk
+    ///
+    void EnsureStandardIndexExists(void) const;
 
     /// \}
 
