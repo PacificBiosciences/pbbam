@@ -108,6 +108,8 @@ public:
 
     std::string FlowOrder(void) const;
 
+    std::string FrameRateHz(void) const;
+
     std::string Id(void) const;
 
     std::string KeySequence(void) const;
@@ -158,6 +160,8 @@ public:
 
     ReadGroupInfo& FlowOrder(const std::string& order);
 
+    ReadGroupInfo& FrameRateHz(const std::string& frameRateHz);
+
     ReadGroupInfo& Id(const std::string& id);
 
     ReadGroupInfo& Id(const std::string& movieName, const std::string& readType);
@@ -180,6 +184,7 @@ public:
 
     ReadGroupInfo& SequencingKit(const std::string& kitNumber);
 
+
     /// \}
 
 private:
@@ -199,6 +204,7 @@ private:
     std::string bindingKit_;
     std::string sequencingKit_;
     std::string basecallerVersion_;
+    std::string frameRateHz_;
     std::map<BaseFeature, std::string> features_;
 
     // custom attributes
@@ -254,6 +260,12 @@ inline std::string ReadGroupInfo::FlowOrder(void) const
 
 inline ReadGroupInfo& ReadGroupInfo::FlowOrder(const std::string& order)
 { flowOrder_ = order; return *this; }
+
+inline std::string ReadGroupInfo::FrameRateHz(void) const
+{ return frameRateHz_; }
+
+inline ReadGroupInfo& ReadGroupInfo::FrameRateHz(const std::string& frameRateHz)
+{ frameRateHz_ = frameRateHz; return *this; }
 
 inline bool ReadGroupInfo::HasBaseFeature(const BaseFeature& feature) const
 { return features_.find(feature) != features_.end(); }

@@ -81,6 +81,7 @@ static const string token_RT = string("READTYPE");
 static const string token_BK = string("BINDINGKIT");
 static const string token_SK = string("SEQUENCINGKIT");
 static const string token_BV = string("BASECALLERVERSION");
+static const string token_FR = string("FRAMERATEHZ");
 
 static
 string BaseFeatureName(const BaseFeature& feature)
@@ -174,6 +175,7 @@ ReadGroupInfo::ReadGroupInfo(const ReadGroupInfo& other)
     , bindingKit_(other.bindingKit_)
     , sequencingKit_(other.sequencingKit_)
     , basecallerVersion_(other.basecallerVersion_)
+    , frameRateHz_(other.frameRateHz_)
     , features_(other.features_)
 {  }
 
@@ -192,6 +194,7 @@ ReadGroupInfo::ReadGroupInfo(ReadGroupInfo&& other)
     , bindingKit_(std::move(other.bindingKit_))
     , sequencingKit_(std::move(other.sequencingKit_))
     , basecallerVersion_(std::move(other.basecallerVersion_))
+    , frameRateHz_(std::move(other.frameRateHz_))
     , features_(std::move(other.features_))
 { }
 
@@ -213,6 +216,7 @@ ReadGroupInfo& ReadGroupInfo::operator=(const ReadGroupInfo& other)
     bindingKit_ = other.bindingKit_;
     sequencingKit_ = other.sequencingKit_;
     basecallerVersion_ = other.basecallerVersion_;
+    frameRateHz_ = other.frameRateHz_;
     features_ = other.features_;
     return *this;
 }
@@ -233,6 +237,7 @@ ReadGroupInfo& ReadGroupInfo::operator=(ReadGroupInfo&& other)
     bindingKit_ = std::move(other.bindingKit_);
     sequencingKit_ = std::move(other.sequencingKit_);
     basecallerVersion_ = std::move(other.basecallerVersion_);
+    frameRateHz_ = std::move(other.frameRateHz_);
     features_ = std::move(other.features_);
     return *this;
 }
@@ -264,6 +269,7 @@ void ReadGroupInfo::DecodeSamDescription(const std::string& description)
         else if (key == internal::token_BK) bindingKit_ = value;
         else if (key == internal::token_BV) basecallerVersion_ = value;
         else if (key == internal::token_SK) sequencingKit_ = value;
+        else if (key == internal::token_FR) frameRateHz_ = value;
         else if (internal::IsBaseFeature(key))
             features_[internal::FromName(key)] = value;
     }
@@ -273,7 +279,7 @@ std::string ReadGroupInfo::EncodeSamDescription(void) const
 {
     string result;
     result.reserve(256);
-    result.append(std::string("READTYPE=" + readType_));
+    result.append(std::string(internal::token_RT+"=" + readType_));
 
     const auto featureEnd = features_.cend();
     auto featureIter = features_.cbegin();
@@ -284,9 +290,10 @@ std::string ReadGroupInfo::EncodeSamDescription(void) const
         result.append(string(';' + featureName + '=' + featureIter->second));
     }
 
-    if (!bindingKit_.empty())        result.append(";BINDINGKIT="+bindingKit_);
-    if (!sequencingKit_.empty())     result.append(";SEQUENCINGKIT="+sequencingKit_);
-    if (!basecallerVersion_.empty()) result.append(";BASECALLERVERSION="+basecallerVersion_);
+    if (!bindingKit_.empty())        result.append(";"+internal::token_BK+"="+bindingKit_);
+    if (!sequencingKit_.empty())     result.append(";"+internal::token_SK+"="+sequencingKit_);
+    if (!basecallerVersion_.empty()) result.append(";"+internal::token_BV+"="+basecallerVersion_);
+    if (!frameRateHz_.empty()) result.append(";"+internal::token_FR+"="+frameRateHz_);
 
     return result;
 }
