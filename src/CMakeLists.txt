@@ -78,8 +78,8 @@ else()
     # ensure we build self-contained htslib
     add_custom_target(
         htslib
-        "make" ZLIB_INC=${ZLIB_INCLUDE_DIRS} ZLIB_DIR=${ZLIB_LIBRARIES}
-        COMMENT "building htslib"
+        "make" ZLIB_INC=${ZLIB_INCLUDE_DIR} ZLIB_DIR=${ZLIB_LIBRARIES}
+        COMMENT "building htslib ZLIB_INC=${ZLIB_INCLUDE_DIR} ZLIB_DIR=${ZLIB_LIBRARIES}"
         WORKING_DIRECTORY ${Htslib_RootDir}
         VERBATIM
     )
