@@ -76,10 +76,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PacBioBAM_CXX_FLAGS}")
 if(PacBioBAM_build_chef)
 else()
     # ensure we build self-contained htslib
+    string(REPLACE "/libz.a" "" ZLIB_LIBRARY_REPLACED ${ZLIB_LIBRARY})
     add_custom_target(
         htslib
-        "make" ZLIB_INC=${ZLIB_INCLUDE_DIR} ZLIB_DIR=${ZLIB_LIBRARIES}
-        COMMENT "building htslib ZLIB_INC=${ZLIB_INCLUDE_DIR} ZLIB_DIR=${ZLIB_LIBRARIES}"
+        "make" ZLIB_INC=${ZLIB_INCLUDE_DIR} ZLIB_DIR=${ZLIB_LIBRARY_REPLACED}
+        COMMENT "building htslib ZLIB_INC=${ZLIB_INCLUDE_DIR} ZLIB_DIR=${ZLIB_LIBRARY_REPLACED}"
         WORKING_DIRECTORY ${Htslib_RootDir}
         VERBATIM
     )
