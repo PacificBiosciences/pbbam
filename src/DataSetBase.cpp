@@ -40,6 +40,7 @@
 #include "DataSetIO.h"
 #include "StringUtils.h"
 #include <boost/algorithm/string.hpp>
+#include <iostream>
 #include <set>
 #include <vector>
 using namespace PacBio;
