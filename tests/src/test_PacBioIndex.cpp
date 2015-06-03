@@ -45,11 +45,14 @@
 #include <pbbam/PbiIndex.h>
 #include <pbbam/PbiRawData.h>
 #include <string>
+#include <cstdlib>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
 const string test2BamFn = tests::Data_Dir + "/test_group_query/test2.bam";
+const string tempBamFn  = tests::Data_Dir + "/test_group_query/tmp.bam";
 
 namespace PacBio {
 namespace BAM {
@@ -162,22 +165,32 @@ TEST(PacBioIndexTest, RawLoadFromFileOk)
 
 TEST(PacBioIndexTest, BuildFromBamOk)
 {
-    BamFile bamFile(test2BamFn);
-    PbiFile::CreateFrom(bamFile);
+ 
+    // can't clobber checked-in pbi file, so we'll copy BAM to a temp file & build from that 
+    const string bamFnArgs = test2BamFn + " " + tempBamFn;
+    const string copyCmd = string("cp ") + test2BamFn + " " + tempBamFn;
+    const string chmodCmd = string("chmod 666 ") + tempBamFn; 
+    system(copyCmd.c_str());
+    system(chmodCmd.c_str());
 
+    BamFile bamFile(tempBamFn);
+    PbiFile::CreateFrom(bamFile);
     PbiRawData index(bamFile.PacBioIndexFilename());
+    
     EXPECT_EQ(PbiFile::Version_3_0_0,  index.Version());
     EXPECT_EQ(4, index.NumReads());
     EXPECT_TRUE(index.HasMappedData());
-
     const PbiRawData& expectedIndex = tests::Test2Bam_RawIndex();
     EXPECT_TRUE(expectedIndex == index);
+
+    // clean up temp files
+    const string rmCmd = string("rm ") + tempBamFn + " " + tempBamFn + ".pbi";
+    system(rmCmd.c_str());
 }
 
 TEST(PacBioIndexTest, ReferenceDataNotLoadedOnUnsortedBam)
 {
     BamFile bamFile(test2BamFn);
-    PbiFile::CreateFrom(bamFile);
     PbiRawData raw(bamFile.PacBioIndexFilename());
     EXPECT_FALSE(raw.HasReferenceData());
 }
@@ -187,8 +200,6 @@ TEST(PacBioIndexTest, LookupLoadFromFileOk)
     // active development - just throws for now
     BamFile bamFile(test2BamFn);
     EXPECT_THROW(PbiIndex index(bamFile.PacBioIndexFilename()), std::exception);
-
-
 }
 
 TEST(PacBioIndexTest, ThrowOnNonExistentPbiFile)
