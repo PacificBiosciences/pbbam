@@ -47,13 +47,13 @@ namespace PacBio {
 namespace BAM {
 
 class GenomicInterval;
-class BamRecordImpl;
+class BamRecord;
 
 class IndexedFastaReader {
 
 public:
     IndexedFastaReader();
-    IndexedFastaReader(const std::string& filename);  // Derek: would be nice to have this capability for other readers
+    IndexedFastaReader(const std::string& filename);
     ~IndexedFastaReader();
 
 public:
@@ -62,7 +62,7 @@ public:
 
 public:
     std::string Subsequence(const std::string& id, Position begin, Position end) const;
-    //    std::string Subsequence(const GenomicInterval& interval);
+    std::string Subsequence(const GenomicInterval& interval) const;
     std::string Subsequence(const char* htslibRegion) const;
 
 public:
@@ -70,7 +70,7 @@ public:
     // oriented and gapped as requested.  For example, "native" orientation
     // and "gapped" will return the reference sequence with gaps inserted, as
     // would align against the read in "native" orientation
-    std::string ReferenceSubsequence(const BamRecordImpl& bamRecord,
+    std::string ReferenceSubsequence(const BamRecord& bamRecord,
                                      Orientation orientation=Orientation::NATIVE,
                                      bool gapped=false) const;
 

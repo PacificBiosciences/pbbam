@@ -35,7 +35,8 @@
 
 // Author: David Alexander
 
-#include "pbbam/BamRecordImpl.h"
+#include "pbbam/BamRecord.h"
+#include "pbbam/GenomicInterval.h"
 #include "pbbam/IndexedFastaReader.h"
 #include "pbbam/Orientation.h"
 #include "htslib/faidx.h"
@@ -106,6 +107,12 @@ std::string IndexedFastaReader::Subsequence(const std::string& id,
     }
 }
 
+std::string IndexedFastaReader::Subsequence(const GenomicInterval& interval) const
+{
+    REQUIRE_FAIDX_LOADED;
+    return Subsequence(interval.Name(), interval.Start(), interval.Stop());
+}
+
 std::string IndexedFastaReader::Subsequence(const char *htslibRegion) const
 {
     REQUIRE_FAIDX_LOADED;
@@ -121,21 +128,19 @@ std::string IndexedFastaReader::Subsequence(const char *htslibRegion) const
     }
 }
 
+
 std::string
-IndexedFastaReader::ReferenceSubsequence(const BamRecordImpl& bamRecord,
+IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
                                          Orientation orientation,
                                          bool gapped) const
 {
-    // TODO: implement me!   This can be done once BamRecord exposes
-    // "reference name"
+    REQUIRE_FAIDX_LOADED;
 
-    // (the ref name is the primary identifier... the integer key is a
-    // local key that makes sense only within the BAM file.)
+    std::string subseq = Subsequence(bamRecord.ReferenceName(),
+                                     bamRecord.ReferenceStart(),
+                                     bamRecord.ReferenceEnd());
 
-    // (we could also have conveniences like this:
-    //   GenomicInterval BamRecord::ReferenceInterval();
-    //   PacBioReadInterval PacBioBamRecord::QueryInterval();
-    //   PacBioReadInterval PacBioBamRecord::AlignedInterval(); )
+    // TODO: orient, emgapify
     return std::string();
 }
 
