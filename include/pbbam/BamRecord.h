@@ -193,8 +193,13 @@ public:
     /// \sa ReadGroupInfo::Id
     std::string ReadGroupId(void) const;
 
-    /// \returns this record's reference ID, or -1 if unmapped
+    /// \returns this record's reference ID, or -1 if unmapped.
+    /// \note This is only a valid identifier within this BAM file
     int32_t ReferenceId(void) const;
+
+    /// \returns this record's reference name.
+    /// \throws an exception if unmapped record.
+    std::string ReferenceName(void) const;
 
     /// \note ReferenceStart is in reference coordinates, NOT polymerase read coordinates.
     ///

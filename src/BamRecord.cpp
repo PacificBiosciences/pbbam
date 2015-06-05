@@ -1127,6 +1127,14 @@ Position BamRecord::ReferenceEnd(void) const
 int32_t BamRecord::ReferenceId(void) const
 { return impl_.ReferenceId(); }
 
+std::string BamRecord::ReferenceName(void) const
+{
+    if (IsMapped())
+        return Header().SequenceName(ReferenceId());
+    else
+        throw std::exception();
+}
+
 Position BamRecord::ReferenceStart(void) const
 { return impl_.Position(); }
 
