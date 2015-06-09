@@ -38,6 +38,7 @@
 #include <stdexcept>
 
 #include "pbbam/virtual/VirtualPolymeraseReader.h"
+#include "pbbam/ReadGroupInfo.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -65,7 +66,8 @@ VirtualPolymeraseReader::VirtualPolymeraseReader(
     readGroups[0].Id(readGroups[0].MovieName(), "POLYMERASE");
     if (readGroups.size() > 1)
     {
-        const auto singleGroup{std::move(readGroups[0])};
+        std::vector<ReadGroupInfo> singleGroup;
+        singleGroup.emplace_back(std::move(readGroups[0]));
         readGroups = std::move(singleGroup);
         polyHeader_->ClearReadGroups();
     }
