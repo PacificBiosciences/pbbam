@@ -385,5 +385,27 @@ std::string MakeReadGroupId(const std::string& movieName,
     return std::string(hexdigest, 8);
 }
 
+bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
+{
+    return id_ == other.id_ 
+            && sequencingCenter_ == other.sequencingCenter_        
+            && date_ == other.date_                    
+            && flowOrder_ == other.flowOrder_               
+            && keySequence_ == other.keySequence_             
+            && library_ == other.library_                 
+            && programs_ == other.programs_                
+            && predictedInsertSize_ == other.predictedInsertSize_     
+            && movieName_ == other.movieName_               
+            && sample_ == other.sample_                  
+            && readType_ == other.readType_ 
+            && bindingKit_ == other.bindingKit_ 
+            && sequencingKit_ == other.sequencingKit_ 
+            && basecallerVersion_ == other.basecallerVersion_ 
+            && frameRateHz_ == other.frameRateHz_ 
+            && features_.size() == other.features_.size()
+            && std::equal(features_.begin(), features_.end(),
+                          other.features_.begin());
+}
+
 } // namespace BAM
 } // namespace PacBio

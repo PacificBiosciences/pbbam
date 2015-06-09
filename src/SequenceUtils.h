@@ -93,6 +93,24 @@ inline void ReverseComplement(std::string& seq) {
     Reverse(seq);
 }
 
+/// Reverse complement a DNA sequence case-sensitive
+inline void ReverseComplementCaseSens(std::string& seq)
+{
+    const std::string original = seq;
+    int8_t rc_table[128] = {
+        4, 4, 4,   4,  4,   4, 4, 4, 4,  4,  4,  4, 4, 4, 4,  4, 4, 4, 4,
+        4, 4, 4,   4,  4,   4, 4, 4, 4,  4,  4,  4, 4, 4, 4,  4, 4, 4, 4,
+        4, 4, 4,   4,  4,   4, 4, 4, 4,  4,  4,  4, 4, 4, 4,  4, 4, 4, 4,
+        4, 4, 4,   4,  4,   4, 4, 4, 84, 4,  71, 4, 4, 4, 67, 4, 4, 4, 4,
+        4, 4, 4,   4,  4,   4, 4, 4, 65, 65, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+        4, 4, 116, 4,  103, 4, 4, 4, 99, 4,  4,  4, 4, 4, 4,  4, 4, 4, 4,
+        4, 4, 97,  97, 4,   4, 4, 4, 4,  4,  4,  4, 4, 4};
+    std::string reverseCompl(original.length(), 'N');
+    for (uint32_t i = 0; i < original.length(); ++i)
+        reverseCompl[original.length()-i-1] = (char)rc_table[(int8_t)original[i]];
+    seq = reverseCompl;
+}
+
 inline std::string ReverseComplemented(const std::string& input)
 {
     std::string result = input;

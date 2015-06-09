@@ -143,6 +143,13 @@ public:
 
     /// \}
 
+    /// \name Comparison
+    /// \{
+
+    bool operator==(const ReadGroupInfo& other) const;
+
+    /// \}
+
 public:
     /// \name Attributes
     /// \{

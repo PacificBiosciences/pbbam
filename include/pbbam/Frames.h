@@ -88,6 +88,7 @@ public:
     /// \{
 
     /// \returns Frame data in expanded (not encoded) form
+    std::vector<uint16_t>& DataRaw(void);
     const std::vector<uint16_t>& Data(void) const;
 
     /// \}
@@ -162,6 +163,9 @@ private:
 };
 
 inline const std::vector<uint16_t>& Frames::Data(void) const
+{ return data_; }
+
+inline std::vector<uint16_t>& Frames::DataRaw(void)
 { return data_; }
 
 inline std::vector<uint8_t> Frames::Downsampled(void) const

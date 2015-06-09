@@ -35,6 +35,7 @@ set( PacBioBAMTest_CPP
     ${PacBioBAM_TestsDir}/src/test_Tags.cpp
     ${PacBioBAM_TestsDir}/src/test_UnmappedReadsQuery.cpp
     ${PacBioBAM_TestsDir}/src/test_GroupQuery.cpp
+    ${PacBioBAM_TestsDir}/src/test_PolymeraseStitching.cpp
 )
 
 # GoogleTest headers

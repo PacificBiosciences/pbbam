@@ -8,6 +8,34 @@ The public API should not be considered stable yet. Once we lock down a version 
 define a reference point & compatibility guarantees will be maintained within each major version 
 series.
 
+## [0.0.6] - 2015-06-07
+
+### Added
+
+- Accessor methods for pulse bam support:
+ - LabelQV()
+ - AltLabelQV()
+ - LabelTag()
+ - AltLabelTag()
+ - Pkmean()
+ - Pkmid()
+ - PrePulseFrames() only RC, no clipping
+ - PulseCallWidth() only RC, no clipping
+ - PulseCall() case-sensitive RC, no clipping
+ - IPDRaw() to avoid up and downscaling for stitching
+- BamRecord::ParseTagName and BamRecord::ParseTagString to convert a two 
+  character tag string to a TagName enum and back. Allows a switch over tags.
+- VirtualPolymeraseReader to create VirtualPolymeraseBamRecord from a 
+  subreads|hqregion+scraps.bam
+- VirtualRegion represents annotations of the polymerase reads, for adapters, 
+  barcodes, lqregions, and hqregions.
+- ReadGroupInfo operator== 
+
+### Fixed
+
+- Reimplemented QueryStart(int), QueryEnd(int), UpdateName(void), 
+  ReadGroup(ReadGroupInfo&), ReadGroupId(std::string&);
+
 ## [0.0.5] - 2015-05-29
 
 ### Added

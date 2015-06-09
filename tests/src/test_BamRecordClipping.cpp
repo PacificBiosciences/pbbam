@@ -59,7 +59,8 @@ BamRecord MakeRecord(const Position qStart,
                      const string& quals,
                      const string& tagBases,
                      const string& tagQuals,
-                     const f_data& frames)
+                     const f_data& frames,
+                     const string& pulseCall = "")
 {
     BamRecordImpl impl;
     impl.SetSequenceAndQualities(seq, quals);
@@ -67,14 +68,21 @@ BamRecord MakeRecord(const Position qStart,
     TagCollection tags;
     tags["qs"] = qStart;
     tags["qe"] = qEnd;
+    tags["pa"] = frames;
+    tags["pm"] = frames;
     tags["ip"] = frames;
     tags["pw"] = frames;
     tags["dt"] = tagBases;
     tags["st"] = tagBases;
+    tags["lt"] = tagBases;
+    tags["at"] = tagBases;
     tags["dq"] = tagQuals;
     tags["iq"] = tagQuals;
     tags["mq"] = tagQuals;
     tags["sq"] = tagQuals;
+    tags["lq"] = tagQuals;
+    tags["aq"] = tagQuals;
+    tags["pc"] = pulseCall;
     impl.Tags(tags);
 
     return BamRecord(std::move(impl));
@@ -84,13 +92,14 @@ BamRecord MakeRecord(const Position qStart,
 
 TEST(BamRecordClippingTest, ClipToQuery_Basic)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 510;
-    const string seq      = "AACCGTTAGC";
-    const string quals    = "?]?]?]?]?*";
-    const string tagBases = "AACCGTTAGC";
-    const string tagQuals = "?]?]?]?]?*";
-    const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
+    const Position qStart  = 500;
+    const Position qEnd    = 510;
+    const string seq       = "AACCGTTAGC";
+    const string pulseCall = "ttAaAtaCCGggatTTAcatGCt";
+    const string quals     = "?]?]?]?]?*";
+    const string tagBases  = "AACCGTTAGC";
+    const string tagQuals  = "?]?]?]?]?*";
+    const f_data frames    = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
 
     const int32_t  tId     = 0;
     const Position tPos    = 100;
@@ -105,9 +114,10 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     const string tagQuals_clipped = "?]?]?]?";
     const f_data frames_clipped   = { 20, 20, 30, 40, 40, 10, 30 };
 
-    const string seq_rev   = "GCTAACGGTT";
-    const string quals_rev = "*?]?]?]?]?";
-    const f_data frames_rev = { 20, 30, 10, 40, 40, 30, 20, 20, 10, 10 };
+    const string seq_rev       = "GCTAACGGTT";
+    const string pulseCall_rev = "aGCatgTAAatccCGGtaTtTaa";
+    const string quals_rev     = "*?]?]?]?]?";
+    const f_data frames_rev    = { 20, 30, 10, 40, 40, 30, 20, 20, 10, 10 };
 
     const string seq_rev_clipped   = "TAACGGT";
     const string quals_rev_clipped = "]?]?]?]";
@@ -123,7 +133,7 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     const string s2_cigar_clipped = "3M3D4M";
     const string s3_cigar_clipped = "2M1D2I2D3M";
 
-    const BamRecord prototype = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    const BamRecord prototype = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames, pulseCall);
     BamRecord s0 = prototype; // unmapped record
     BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
     BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
@@ -152,7 +162,10 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     EXPECT_EQ(quals_clipped,    s0.Qualities().Fastq());
     EXPECT_EQ(tagBases_clipped, s0.DeletionTag());
     EXPECT_EQ(tagQuals_clipped, s0.DeletionQV().Fastq());
+    EXPECT_EQ(tagQuals_clipped, s0.LabelQV().Fastq());
+    EXPECT_EQ(tagQuals_clipped, s0.AltLabelQV().Fastq());
     EXPECT_EQ(frames_clipped,   s0.IPD().Data());
+    EXPECT_EQ(pulseCall,        s0.PulseCall());
 
     // s1 - FORWARD
     EXPECT_TRUE(s1.IsMapped());
@@ -170,7 +183,10 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     EXPECT_EQ(quals_clipped,    s1.Qualities().Fastq());
     EXPECT_EQ(tagBases_clipped, s1.DeletionTag());
     EXPECT_EQ(tagQuals_clipped, s1.DeletionQV().Fastq());
+    EXPECT_EQ(tagQuals_clipped, s1.LabelQV().Fastq());
+    EXPECT_EQ(tagQuals_clipped, s1.AltLabelQV().Fastq());
     EXPECT_EQ(frames_clipped,   s1.IPD().Data());
+    EXPECT_EQ(pulseCall,        s1.PulseCall());
 
     // s1 - REVERSE
     EXPECT_TRUE(s1_rev.IsMapped());
@@ -188,7 +204,10 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     EXPECT_EQ(quals_rev_clipped,    s1_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(tagBases_rev_clipped, s1_rev.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(tagQuals_rev_clipped, s1_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(tagQuals_rev_clipped, s1_rev.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(tagQuals_rev_clipped, s1_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(frames_rev_clipped,   s1_rev.IPD(Orientation::GENOMIC).Data());
+    EXPECT_EQ(pulseCall_rev,        s1_rev.PulseCall(Orientation::GENOMIC));
 
     // s2 - FORWARD
     EXPECT_TRUE(s2.IsMapped());
@@ -206,6 +225,8 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     EXPECT_EQ(quals_clipped,    s2.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(tagBases_clipped, s2.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(tagQuals_clipped, s2.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(tagQuals_clipped, s2.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(tagQuals_clipped, s2.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(frames_clipped,   s2.IPD(Orientation::GENOMIC).Data());
 
     // s2 - REVERSE
@@ -224,7 +245,10 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     EXPECT_EQ(quals_rev_clipped,    s2_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(tagBases_rev_clipped, s2_rev.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(tagQuals_rev_clipped, s2_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(tagQuals_rev_clipped, s2_rev.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(tagQuals_rev_clipped, s2_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(frames_rev_clipped,   s2_rev.IPD(Orientation::GENOMIC).Data());
+    EXPECT_EQ(pulseCall_rev,        s2_rev.PulseCall(Orientation::GENOMIC));
 
     // s3 - FORWARD
     EXPECT_TRUE(s3.IsMapped());
@@ -242,6 +266,8 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     EXPECT_EQ(quals_clipped,    s3.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(tagBases_clipped, s3.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(tagQuals_clipped, s3.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(tagQuals_clipped, s3.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(tagQuals_clipped, s3.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(frames_clipped,   s3.IPD(Orientation::GENOMIC).Data());
 
     // s3 - REVERSE
@@ -260,7 +286,10 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     EXPECT_EQ(quals_rev_clipped,    s3_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(tagBases_rev_clipped, s3_rev.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(tagQuals_rev_clipped, s3_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(tagQuals_rev_clipped, s3_rev.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(tagQuals_rev_clipped, s3_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(frames_rev_clipped,   s3_rev.IPD(Orientation::GENOMIC).Data());
+    EXPECT_EQ(pulseCall_rev,        s3_rev.PulseCall(Orientation::GENOMIC));
 }
 
 TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
@@ -375,6 +404,8 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     EXPECT_EQ(s1_quals_clipped,    s1.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s1_tagBases_clipped, s1.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s1_tagQuals_clipped, s1.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s1_tagQuals_clipped, s1.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s1_tagQuals_clipped, s1.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s1_frames_clipped,   s1.IPD(Orientation::GENOMIC).Data());
 
     // s1 - REVERSE
@@ -393,6 +424,8 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     EXPECT_EQ(s1_quals_rev_clipped,    s1_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s1_tagBases_rev_clipped, s1_rev.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s1_tagQuals_rev_clipped, s1_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s1_tagQuals_rev_clipped, s1_rev.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s1_tagQuals_rev_clipped, s1_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s1_frames_rev_clipped,   s1_rev.IPD(Orientation::GENOMIC).Data());
 
     // s2 - FORWARD
@@ -411,6 +444,8 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     EXPECT_EQ(s2_quals_clipped,    s2.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s2_tagBases_clipped, s2.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s2_tagQuals_clipped, s2.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s2_tagQuals_clipped, s2.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s2_tagQuals_clipped, s2.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s2_frames_clipped,   s2.IPD(Orientation::GENOMIC).Data());
 
     // s2 - REVERSE
@@ -429,6 +464,8 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     EXPECT_EQ(s2_quals_rev_clipped,    s2_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s2_tagBases_rev_clipped, s2_rev.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s2_tagQuals_rev_clipped, s2_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s2_tagQuals_rev_clipped, s2_rev.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s2_tagQuals_rev_clipped, s2_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s2_frames_rev_clipped,   s2_rev.IPD(Orientation::GENOMIC).Data());
 
     // s3 - FORWARD
@@ -447,6 +484,8 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     EXPECT_EQ(s3_quals_clipped,    s3.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_tagBases_clipped, s3.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s3_tagQuals_clipped, s3.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_clipped, s3.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_clipped, s3.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_frames_clipped,   s3.IPD(Orientation::GENOMIC).Data());
 
     // s3 - REVERSE
@@ -465,6 +504,8 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     EXPECT_EQ(s3_quals_rev_clipped,    s3_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_tagBases_rev_clipped, s3_rev.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s3_tagQuals_rev_clipped, s3_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_rev_clipped, s3_rev.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_rev_clipped, s3_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_frames_rev_clipped,   s3_rev.IPD(Orientation::GENOMIC).Data());
 }
 
@@ -553,6 +594,8 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     EXPECT_EQ(prototype.Qualities(),      s0.Qualities());
     EXPECT_EQ(prototype.DeletionTag(),    s0.DeletionTag());
     EXPECT_EQ(prototype.DeletionQV(),     s0.DeletionQV());
+    EXPECT_EQ(prototype.LabelQV(),        s0.LabelQV());
+    EXPECT_EQ(prototype.AltLabelQV(),     s0.AltLabelQV());
     EXPECT_EQ(prototype.IPD(),            s0.IPD());
 
     // s1 - FORWARD
@@ -571,6 +614,8 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     EXPECT_EQ(s1_quals_clipped,    s1.Qualities().Fastq());
     EXPECT_EQ(s1_tagBases_clipped, s1.DeletionTag());
     EXPECT_EQ(s1_tagQuals_clipped, s1.DeletionQV().Fastq());
+    EXPECT_EQ(s1_tagQuals_clipped, s1.LabelQV().Fastq());
+    EXPECT_EQ(s1_tagQuals_clipped, s1.AltLabelQV().Fastq());
     EXPECT_EQ(s1_frames_clipped,   s1.IPD().Data());
 
     // s1 - REVERSE
@@ -589,6 +634,8 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     EXPECT_EQ(s1_quals_rev_clipped,    s1_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s1_tagBases_rev_clipped, s1_rev.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s1_tagQuals_rev_clipped, s1_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s1_tagQuals_rev_clipped, s1_rev.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s1_tagQuals_rev_clipped, s1_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s1_frames_rev_clipped,   s1_rev.IPD(Orientation::GENOMIC).Data());
 
     // s2 - FORWARD
@@ -607,6 +654,8 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     EXPECT_EQ(s2_quals_clipped,    s2.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s2_tagBases_clipped, s2.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s2_tagQuals_clipped, s2.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s2_tagQuals_clipped, s2.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s2_tagQuals_clipped, s2.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s2_frames_clipped,   s2.IPD(Orientation::GENOMIC).Data());
 
     // s2 - REVERSE
@@ -625,6 +674,8 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     EXPECT_EQ(s2_quals_rev_clipped,    s2_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s2_tagBases_rev_clipped, s2_rev.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s2_tagQuals_rev_clipped, s2_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s2_tagQuals_rev_clipped, s2_rev.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s2_tagQuals_rev_clipped, s2_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s2_frames_rev_clipped,   s2_rev.IPD(Orientation::GENOMIC).Data());
 
     // s3 - FORWARD
@@ -643,6 +694,8 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     EXPECT_EQ(s3_quals_clipped,    s3.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_tagBases_clipped, s3.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s3_tagQuals_clipped, s3.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_clipped, s3.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_clipped, s3.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_frames_clipped,   s3.IPD(Orientation::GENOMIC).Data());
 
     // s3 - REVERSE
@@ -661,6 +714,8 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     EXPECT_EQ(s3_quals_rev_clipped,    s3_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_tagBases_rev_clipped, s3_rev.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s3_tagQuals_rev_clipped, s3_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_rev_clipped, s3_rev.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_rev_clipped, s3_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_frames_rev_clipped,   s3_rev.IPD(Orientation::GENOMIC).Data());
 }
 
@@ -804,6 +859,8 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     EXPECT_EQ(prototype.Qualities(),      s0.Qualities());
     EXPECT_EQ(prototype.DeletionTag(),    s0.DeletionTag());
     EXPECT_EQ(prototype.DeletionQV(),     s0.DeletionQV());
+    EXPECT_EQ(prototype.LabelQV(),        s0.LabelQV());
+    EXPECT_EQ(prototype.AltLabelQV(),     s0.AltLabelQV());
     EXPECT_EQ(prototype.IPD(),            s0.IPD());
 
     // s1 - FORWARD
@@ -822,6 +879,8 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     EXPECT_EQ(s1_quals_clipped,    s1.Qualities().Fastq());
     EXPECT_EQ(s1_tagBases_clipped, s1.DeletionTag());
     EXPECT_EQ(s1_tagQuals_clipped, s1.DeletionQV().Fastq());
+    EXPECT_EQ(s1_tagQuals_clipped, s1.LabelQV().Fastq());
+    EXPECT_EQ(s1_tagQuals_clipped, s1.AltLabelQV().Fastq());
     EXPECT_EQ(s1_frames_clipped,   s1.IPD().Data());
 
     // s1 - REVERSE
@@ -840,6 +899,8 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     EXPECT_EQ(s1_quals_rev_clipped,    s1_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s1_tagBases_rev_clipped, s1_rev.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s1_tagQuals_rev_clipped, s1_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s1_tagQuals_rev_clipped, s1_rev.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s1_tagQuals_rev_clipped, s1_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s1_frames_rev_clipped,   s1_rev.IPD(Orientation::GENOMIC).Data());
 
     // s2 - FORWARD
@@ -858,6 +919,8 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     EXPECT_EQ(s2_quals_clipped,    s2.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s2_tagBases_clipped, s2.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s2_tagQuals_clipped, s2.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s2_tagQuals_clipped, s2.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s2_tagQuals_clipped, s2.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s2_frames_clipped,   s2.IPD(Orientation::GENOMIC).Data());
 
     // s2 - REVERSE
@@ -876,6 +939,8 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     EXPECT_EQ(s2_quals_rev_clipped,    s2_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s2_tagBases_rev_clipped, s2_rev.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s2_tagQuals_rev_clipped, s2_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s2_tagQuals_rev_clipped, s2_rev.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s2_tagQuals_rev_clipped, s2_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s2_frames_rev_clipped,   s2_rev.IPD(Orientation::GENOMIC).Data());
 
     // s3 - FORWARD
@@ -894,6 +959,8 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     EXPECT_EQ(s3_quals_clipped,    s3.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_tagBases_clipped, s3.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s3_tagQuals_clipped, s3.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_clipped, s3.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_clipped, s3.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_frames_clipped,   s3.IPD(Orientation::GENOMIC).Data());
 
     // s3 - REVERSE
@@ -912,6 +979,8 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     EXPECT_EQ(s3_quals_rev_clipped,    s3_rev.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_tagBases_rev_clipped, s3_rev.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s3_tagQuals_rev_clipped, s3_rev.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_rev_clipped, s3_rev.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_rev_clipped, s3_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_frames_rev_clipped,   s3_rev.IPD(Orientation::GENOMIC).Data());
 }
 
@@ -960,6 +1029,8 @@ TEST(BamRecordClippingTest, ClippedToQueryCopy)
     EXPECT_EQ(quals_clipped,    s3.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(tagBases_clipped, s3.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(tagQuals_clipped, s3.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(tagQuals_clipped, s3.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(tagQuals_clipped, s3.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(frames_clipped,   s3.IPD(Orientation::GENOMIC).Data());
 }
 
@@ -1007,6 +1078,8 @@ TEST(BamRecordClippingTest, ClippedToReferenceCopy)
     EXPECT_EQ(s3_quals_clipped,    s3.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_tagBases_clipped, s3.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s3_tagQuals_clipped, s3.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_clipped, s3.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_clipped, s3.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_frames_clipped,   s3.IPD(Orientation::GENOMIC).Data());
 }
 
@@ -1055,6 +1128,8 @@ TEST(BamRecordClippingTest, StaticClippedToQuery)
     EXPECT_EQ(quals_clipped,    s3.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(tagBases_clipped, s3.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(tagQuals_clipped, s3.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(tagQuals_clipped, s3.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(tagQuals_clipped, s3.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(frames_clipped,   s3.IPD(Orientation::GENOMIC).Data());
 }
 
@@ -1102,5 +1177,7 @@ TEST(BamRecordClippingTest, StaticClippedToReference)
     EXPECT_EQ(s3_quals_clipped,    s3.Qualities(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_tagBases_clipped, s3.DeletionTag(Orientation::GENOMIC));
     EXPECT_EQ(s3_tagQuals_clipped, s3.DeletionQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_clipped, s3.LabelQV(Orientation::GENOMIC).Fastq());
+    EXPECT_EQ(s3_tagQuals_clipped, s3.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_frames_clipped,   s3.IPD(Orientation::GENOMIC).Data());
 }

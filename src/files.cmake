@@ -75,6 +75,13 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/internal/MergeItem.h
     ${PacBioBAM_IncludeDir}/pbbam/internal/SequentialMergeStrategy.h
 
+    # virtual headers
+    ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualPolymeraseBamRecord.h
+    ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualPolymeraseReader.h
+    ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualRegion.h
+    ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualRegionType.h
+    ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualRegionTypeMap.h
+
     ${PacBioBAM_SourceDir}/AssertUtils.h
     ${PacBioBAM_SourceDir}/DataSetIO.h
     ${PacBioBAM_SourceDir}/FileUtils.h
@@ -153,6 +160,11 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/XmlWriter.cpp
     ${PacBioBAM_SourceDir}/ZmwGroupQuery.cpp
     ${PacBioBAM_SourceDir}/ZmwQuery.cpp
+
+    # virtual
+    ${PacBioBAM_SourceDir}/VirtualPolymeraseBamRecord.cpp
+    ${PacBioBAM_SourceDir}/VirtualPolymeraseReader.cpp
+    ${PacBioBAM_SourceDir}/VirtualRegionTypeMap.cpp
 
     # XML I/O
     ${PacBioBAM_SourceDir}/pugixml/pugixml.cpp
