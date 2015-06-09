@@ -211,7 +211,7 @@ public:
     bool IsMapped(void) const;
 
     /// \returns this record's LocalContextFlags
-    LocalContextFlags LocalContextFlags(void) const;
+    PacBio::BAM::LocalContextFlags LocalContextFlags(void) const;
 
     /// \returns this record's mapping quality. A value of 255 indicates "unknown"
     uint8_t MapQuality(void) const;
