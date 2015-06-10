@@ -41,7 +41,10 @@
 #include "pbbam/Orientation.h"
 #include "pbbam/Position.h"
 #include "htslib/faidx.h"
+
 #include <string>
+#include <iostream>
+#include <stdexcept>
 
 namespace PacBio {
 namespace BAM {
@@ -52,13 +55,26 @@ class BamRecord;
 class IndexedFastaReader {
 
 public:
-    IndexedFastaReader();
+    IndexedFastaReader() = delete;
     IndexedFastaReader(const std::string& filename);
     ~IndexedFastaReader();
 
 public:
-    void Close(void);
-    bool Open(const std::string& filename);
+    // Copy constructor
+    IndexedFastaReader(const IndexedFastaReader& src)
+    {
+        if (!Open(src.filename_)) 
+            throw std::runtime_error("Cannot open file " + src.filename_);
+    }
+
+    // Copy assignment operator
+    IndexedFastaReader& operator=(const IndexedFastaReader& rhs)
+    {
+        if(&rhs == this) return *this;
+
+        Open(rhs.filename_);
+        return *this;
+    }
 
 public:
     std::string Subsequence(const std::string& id, Position begin, Position end) const;
@@ -83,6 +99,10 @@ public:
 private:
     std::string filename_;
     faidx_t* handle_;
+
+private:
+    void Close(void);
+    bool Open(const std::string& filename);
 };
 
 

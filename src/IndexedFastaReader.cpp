@@ -49,13 +49,7 @@ namespace PacBio {
 namespace BAM {
 
 
-IndexedFastaReader::IndexedFastaReader()
-    : filename_(""),
-      handle_(nullptr)
-{}
-
 IndexedFastaReader::IndexedFastaReader(const std::string& filename)
-    : IndexedFastaReader()
 {
     Open(filename);
 }
@@ -67,7 +61,6 @@ IndexedFastaReader::~IndexedFastaReader()
 
 bool IndexedFastaReader::Open(const std::string &filename)
 {
-    Close();
     faidx_t* handle = fai_load(filename.c_str());
     if (handle == nullptr)
         return false;
@@ -167,7 +160,7 @@ IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
                     if (!exciseSoftClips)
                     {
                         subseq.reserve(subseq.size() + opLength);
-                        subseq.insert(seqIndex, opLength, ' ');
+                        subseq.insert(seqIndex, opLength, '-');
                         seqIndex += opLength;
                     }
                 }

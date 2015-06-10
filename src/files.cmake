@@ -4,6 +4,7 @@ set( PacBioBAM_H
 
     # API headers
     ${PacBioBAM_IncludeDir}/pbbam/Accuracy.h
+    ${PacBioBAM_IncludeDir}/pbbam/AlignmentPrinter.h
     ${PacBioBAM_IncludeDir}/pbbam/BamFile.h
     ${PacBioBAM_IncludeDir}/pbbam/BamHeader.h
     ${PacBioBAM_IncludeDir}/pbbam/BamRecord.h
@@ -102,6 +103,7 @@ set( PacBioBAM_CPP
 
     # main API headers
     ${PacBioBAM_SourceDir}/Accuracy.cpp
+    ${PacBioBAM_SourceDir}/AlignmentPrinter.cpp
     ${PacBioBAM_SourceDir}/AlignmentSet.cpp
     ${PacBioBAM_SourceDir}/AlignmentSetMetadata.cpp
     ${PacBioBAM_SourceDir}/AssertUtils.cpp

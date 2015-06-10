@@ -7,6 +7,7 @@ set( PacBioBAMTest_H
 set( PacBioBAMTest_CPP
 
     ${PacBioBAM_TestsDir}/src/test_Accuracy.cpp
+    ${PacBioBAM_TestsDir}/src/test_AlignmentPrinter.cpp
     ${PacBioBAM_TestsDir}/src/test_BamFile.cpp
     ${PacBioBAM_TestsDir}/src/test_BamHeader.cpp
     ${PacBioBAM_TestsDir}/src/test_BamRecord.cpp

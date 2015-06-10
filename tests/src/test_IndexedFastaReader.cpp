@@ -60,8 +60,7 @@ const string singleInsertionBam = tests::Data_Dir + "/aligned.bam";
 
 TEST(IndexedFastaReaderTests, PrintSingleInsertion)
 {
-    IndexedFastaReader r;
-    r.Open(lambdaFasta);
+    IndexedFastaReader r(lambdaFasta);
 
     // Open BAM file
     BamFile bamFile(singleInsertionBam);
@@ -87,18 +86,18 @@ TEST(IndexedFastaReaderTests, PrintSingleInsertion)
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
         r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
     record = *it++;
-    EXPECT_EQ("                                                    AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
+    EXPECT_EQ("----------------------------------------------------AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
         r.ReferenceSubsequence(record, Orientation::NATIVE, true));
     EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
         r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
-    EXPECT_EQ("                                                    AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
+    EXPECT_EQ("----------------------------------------------------AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
         r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
     EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
         r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
     record = *it++;
-    EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA                                                    ",
+    EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA----------------------------------------------------",
         r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
-    EXPECT_EQ("                                                    TTGCCGCTGTT-ACCGTGCTGCGATCTTCTGCCATCGACGGACGTCCCACATTGGTGACTT",
+    EXPECT_EQ("----------------------------------------------------TTGCCGCTGTT-ACCGTGCTGCGATCTTCTGCCATCGACGGACGTCCCACATTGGTGACTT",
         r.ReferenceSubsequence(record, Orientation::NATIVE, true));
     EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
         r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
@@ -178,8 +177,7 @@ TEST(IndexedFastaReaderTests, PrintSingleInsertion)
 
 TEST(IndexedFastaReaderTests, ReadLambda)
 {
-    IndexedFastaReader r;
-    r.Open(lambdaFasta);
+    IndexedFastaReader r(lambdaFasta);
 
     EXPECT_TRUE(r.HasSequence("lambda_NEB3011"));
     EXPECT_FALSE(r.HasSequence("dog"));
@@ -203,20 +201,19 @@ TEST(IndexedFastaReaderTests, ReadLambda)
 
 TEST(IndexedFastaReaderTests, Errors)
 {
-    IndexedFastaReader r;
+    IndexedFastaReader r(lambdaFasta);
 
     //
     // attempt access without "opening"
     //
-    EXPECT_THROW(r.NumSequences(), std::exception);
-    EXPECT_THROW(r.HasSequence("lambda_NEB3011"), std::exception);
-    EXPECT_THROW(r.SequenceLength("lambda_NEB3011"), std::exception);
-    EXPECT_THROW(r.Subsequence("lambda_NEB3011:0-10"), std::exception);
+    // EXPECT_THROW(r.NumSequences(), std::exception);
+    // EXPECT_THROW(r.HasSequence("lambda_NEB3011"), std::exception);
+    // EXPECT_THROW(r.SequenceLength("lambda_NEB3011"), std::exception);
+    // EXPECT_THROW(r.Subsequence("lambda_NEB3011:0-10"), std::exception);
 
     //
     // invalid accesses after opening
     //
-    r.Open(lambdaFasta);
     EXPECT_THROW(r.SequenceLength("dog"), std::exception);
     EXPECT_THROW(r.Subsequence("dog:0-10"), std::exception);
 }
