@@ -71,8 +71,9 @@ public:
     // and "gapped" will return the reference sequence with gaps inserted, as
     // would align against the read in "native" orientation
     std::string ReferenceSubsequence(const BamRecord& bamRecord,
-                                     Orientation orientation=Orientation::NATIVE,
-                                     bool gapped=false) const;
+                                     const Orientation orientation=Orientation::GENOMIC,
+                                     const bool gapped=false,
+                                     const bool exciseSoftClips=false) const;
 
 public:
     int NumSequences() const;

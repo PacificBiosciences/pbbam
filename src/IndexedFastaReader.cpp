@@ -35,13 +35,15 @@
 
 // Author: David Alexander
 
+#include "htslib/faidx.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/GenomicInterval.h"
 #include "pbbam/IndexedFastaReader.h"
 #include "pbbam/Orientation.h"
-#include "htslib/faidx.h"
+#include "SequenceUtils.h"
 
 #include <cstdlib>
+#include <iostream>
 
 namespace PacBio {
 namespace BAM {
@@ -131,17 +133,71 @@ std::string IndexedFastaReader::Subsequence(const char *htslibRegion) const
 
 std::string
 IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
-                                         Orientation orientation,
-                                         bool gapped) const
+                                         const Orientation orientation,
+                                         const bool gapped,
+                                         const bool exciseSoftClips) const
 {
     REQUIRE_FAIDX_LOADED;
 
     std::string subseq = Subsequence(bamRecord.ReferenceName(),
                                      bamRecord.ReferenceStart(),
                                      bamRecord.ReferenceEnd());
+    const auto reverse = orientation != Orientation::GENOMIC &&
+                         bamRecord.Impl().IsReverseStrand();
 
-    // TODO: orient, emgapify
-    return std::string();
+    if (bamRecord.Impl().IsMapped() && gapped)
+    {
+        size_t seqIndex = 0;
+        const Cigar& cigar = bamRecord.Impl().CigarData();
+        Cigar::const_iterator cigarIter = cigar.cbegin();
+        Cigar::const_iterator cigarEnd = cigar.cend();
+        for (; cigarIter != cigarEnd; ++cigarIter)
+        {
+            const CigarOperation& op = (*cigarIter);
+            const CigarOperationType& type = op.Type();
+
+            // do nothing for hard clips
+            if (type != CigarOperationType::HARD_CLIP)
+            {
+                const size_t opLength = op.Length();
+
+                // maybe remove soft clips
+                if (type == CigarOperationType::SOFT_CLIP)
+                {
+                    if (!exciseSoftClips)
+                    {
+                        subseq.reserve(subseq.size() + opLength);
+                        subseq.insert(seqIndex, opLength, ' ');
+                        seqIndex += opLength;
+                    }
+                }
+
+                // for non-clipping operations
+                else {
+
+                    // maybe add gaps/padding
+                    if (type == CigarOperationType::INSERTION)
+                    {
+                        subseq.reserve(subseq.size() + opLength);
+                        subseq.insert(seqIndex, opLength, '-');
+                    }
+                    else if (type == CigarOperationType::PADDING)
+                    {
+                        subseq.reserve(subseq.size() + opLength);
+                        subseq.insert(seqIndex, opLength, '*');
+                    }
+
+                    // update index
+                    seqIndex += opLength;
+                }
+            }
+        }
+    }
+
+    if (reverse)
+        internal::ReverseComplementCaseSens(subseq);
+
+    return subseq;
 }
 
 

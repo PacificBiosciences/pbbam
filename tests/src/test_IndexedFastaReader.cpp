@@ -41,14 +41,140 @@
 
 #include "TestData.h"
 #include <gtest/gtest.h>
-#include <pbbam/IndexedFastaReader.h>
+
+#include "pbbam/IndexedFastaReader.h"
+#include "pbbam/BamRecord.h"
+#include "pbbam/BamFile.h"
+#include "pbbam/EntireFileQuery.h"
+
 #include <iostream>
+#include <sstream>
 #include <string>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
 const string lambdaFasta = tests::Data_Dir + "/lambdaNEB.fa";
+const string singleInsertionBam = tests::Data_Dir + "/aligned.bam";
+
+TEST(IndexedFastaReaderTests, PrintSingleInsertion)
+{
+    IndexedFastaReader r;
+    r.Open(lambdaFasta);
+
+    // Open BAM file
+    BamFile bamFile(singleInsertionBam);
+    EntireFileQuery bamQuery(bamFile);
+
+    auto it = bamQuery.begin();
+    auto record = *it++;
+    EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
+        r.ReferenceSubsequence(record, Orientation::NATIVE, true));
+    EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
+        r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
+    EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
+        r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
+    EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
+        r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
+    record = *it++;
+    EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
+        r.ReferenceSubsequence(record, Orientation::NATIVE, true));
+    EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
+        r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
+    EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
+        r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
+    EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
+        r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
+    record = *it++;
+    EXPECT_EQ("                                                    AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
+        r.ReferenceSubsequence(record, Orientation::NATIVE, true));
+    EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
+        r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
+    EXPECT_EQ("                                                    AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
+        r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
+    EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
+        r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
+    record = *it++;
+    EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA                                                    ",
+        r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
+    EXPECT_EQ("                                                    TTGCCGCTGTT-ACCGTGCTGCGATCTTCTGCCATCGACGGACGTCCCACATTGGTGACTT",
+        r.ReferenceSubsequence(record, Orientation::NATIVE, true));
+    EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
+        r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
+    EXPECT_EQ("TTGCCGCTGTT-ACCGTGCTGCGATCTTCTGCCATCGACGGACGTCCCACATTGGTGACTT",
+        r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
+
+    // {
+    //     std::stringstream output;
+    //     auto itSS = bamQuery.begin();
+    //     {
+    //         const auto recordSS = *itSS;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::NATIVE, true) << std::endl;
+    //         output << std::endl;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::NATIVE, true, true) << std::endl;
+    //         output << std::endl;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::GENOMIC, true) << std::endl;
+    //         output << std::endl;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::GENOMIC, true, true) << std::endl;
+    //         output << std::endl;
+    //     }
+    //     ++itSS;
+    //     {
+    //         const auto recordSS = *itSS;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::NATIVE, true) << std::endl;
+    //         output << std::endl;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::NATIVE, true, true) << std::endl;
+    //         output << std::endl;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::GENOMIC, true) << std::endl;
+    //         output << std::endl;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::GENOMIC, true, true) << std::endl;
+    //         output << std::endl;
+    //     }
+    //     ++itSS;
+    //     {
+    //         const auto recordSS = *itSS;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::NATIVE, true) << std::endl;
+    //         output << std::endl;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::NATIVE, true, true) << std::endl;
+    //         output << std::endl;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::GENOMIC, true) << std::endl;
+    //         output << std::endl;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::GENOMIC, true, true) << std::endl;
+    //         output << std::endl;
+    //     }
+    //     ++itSS;
+    //     {
+    //         const auto recordSS = *itSS;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::GENOMIC, true) << std::endl;
+    //         output << std::endl;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::NATIVE, true) << std::endl;
+    //         output << std::endl;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::GENOMIC, true, true) << std::endl;
+    //         output << std::endl;
+    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true, true) << std::endl;
+    //         output << recordSS.Sequence(Orientation::NATIVE, true, true) << std::endl;
+    //     }
+    //     std::cerr << output.str();
+    // }
+
+}
+
 
 TEST(IndexedFastaReaderTests, ReadLambda)
 {
@@ -94,10 +220,3 @@ TEST(IndexedFastaReaderTests, Errors)
     EXPECT_THROW(r.SequenceLength("dog"), std::exception);
     EXPECT_THROW(r.Subsequence("dog:0-10"), std::exception);
 }
-
-
-
-
-
-
-
