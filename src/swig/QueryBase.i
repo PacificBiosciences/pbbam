@@ -2,9 +2,12 @@
 %module PacBioBam
 %{
 #include <pbbam/QueryBase.h>
+#include <pbbam/internal/QueryBase.h>
 using namespace PacBio;
 using namespace PacBio::BAM;
 %}
+
+
 
 %ignore PacBio::BAM::QueryIterator::operator++;
 %ignore PacBio::BAM::QueryConstIterator::operator++;
@@ -41,6 +44,10 @@ using namespace PacBio::BAM;
 
 
 %include <pbbam/QueryBase.h>
+%include <pbbam/internal/QueryBase.h>
+
+%template(IQuery) PacBio::BAM::internal::QueryBase<BamRecord>;
+//%template (FileIterPtr) PacBio::BAM::internal::IBamFileIteratorBase<PacBio::BAM::BamRecord>;
 
 // Iterator API
 #ifdef SWIGPYTHON
