@@ -54,29 +54,84 @@ std::string AlignmentPrinter::Print(const BamRecord& record,
 	std::string ref = ifr_->ReferenceSubsequence(record, orientation, true, true);
 
 	if (seq.size() != ref.size())
+	{
+		std::cerr << "NOOOO" << std::endl;
 		throw std::runtime_error("Sequence and reference parts are of different size");
+	}
 
 	int seqLength = 0;
 	float matches = 0;
 	std::string pretty;
-	pretty.reserve(seq.size());
-	for (int i = 0; i < seq.size(); ++i)
+	int refCoord = record.ReferenceStart();
+	int seqCoord = record.QueryStart();
+	for (int i = 0; i < seq.size();)
 	{
-		if (seq[i] == ref[i])
+		std::string refCoordStr = std::to_string(refCoord);
+		std::string seqCoordStr = std::to_string(seqCoord);
+
+		int maxCoordLength = std::max(refCoordStr.size(), seqCoordStr.size());
+		while (refCoordStr.size() < maxCoordLength)
+			refCoordStr = " "+refCoordStr;
+		while (seqCoordStr.size() < maxCoordLength)
+			seqCoordStr = " "+seqCoordStr;
+
+		std::string seqWrap = seqCoordStr + " : ";
+		std::string refWrap = refCoordStr + " : ";
+		std::string prettyWrap(maxCoordLength+3, ' ');
+		prettyWrap.reserve(seq.size());
+		for (int j = 0; i < seq.size() && j < 40; ++i, ++j)
 		{
-			++matches;
-			pretty +=  '|';
+			refWrap +=  ref[i];
+
+			if (seq[i] == ref[i])
+			{
+				++matches;
+				if (refCoord == 0 || refCoord % 10)
+					prettyWrap += '|'; 
+				else
+				{
+					prettyWrap += "\033[1m\x1b[31m";
+					prettyWrap += '|'; 
+					prettyWrap += "\033[0m\x1b[39;49m";
+				}
+				seqWrap += seq[i];
+			}
+			else if (seq[i] == '-' || ref[i] == '-')
+			{
+				prettyWrap +=  ' ';
+				seqWrap += seq[i];
+			}
+			else
+			{
+				prettyWrap +=  '.';
+				seqWrap += "\033[1m\x1b[31m";
+				seqWrap += seq[i];
+				seqWrap += "\033[0m\x1b[39;49m";
+			}
+			if (seq[i] != '-')
+			{
+				++seqLength;
+				++seqCoord;
+			}
+			if (ref[i] != '-')
+			{
+				++refCoord;
+			}
 		}
-		else if (seq[i] == '-' || ref[i] == '-')
-		{
-			pretty +=  ' ';
-		}
-		else
-		{
-			pretty +=  '.';
-		}
-		if (seq[i] != '-')
-			++seqLength;
+
+		refCoordStr = std::to_string(refCoord);
+		seqCoordStr = std::to_string(seqCoord);
+
+		maxCoordLength = std::max(refCoordStr.size(), seqCoordStr.size());
+		while (refCoordStr.size() < maxCoordLength)
+			refCoordStr = " "+refCoordStr;
+		while (seqCoordStr.size() < maxCoordLength)
+			seqCoordStr = " "+seqCoordStr;
+
+		seqWrap += " : " + seqCoordStr;
+		refWrap += " : " + refCoordStr;
+
+		pretty += refWrap + '\n' + prettyWrap + '\n' + seqWrap + "\n\n";
 	}
 	float similarity = matches/seq.size();
 
@@ -89,9 +144,7 @@ std::string AlignmentPrinter::Print(const BamRecord& record,
 	output << "Concordance : " << std::setprecision(3) << (similarity);
 	output << std::endl;
 	output << std::endl;
-	output << "   " << std::move(ref) << std::endl;
-	output << "   " << std::move(pretty) << std::endl;
-	output << "   " << std::move(seq) << std::endl;
+	output << pretty;
 
     return output.str();
 }
