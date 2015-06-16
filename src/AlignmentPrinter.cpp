@@ -62,14 +62,14 @@ std::string AlignmentPrinter::Print(const BamRecord& record,
 	int seqLength = 0;
 	float matches = 0;
 	std::string pretty;
-	int refCoord = record.ReferenceStart();
-	int seqCoord = record.QueryStart();
-	for (int i = 0; i < seq.size();)
+	size_t refCoord = record.ReferenceStart();
+	size_t seqCoord = record.QueryStart();
+	for (size_t i = 0; i < seq.size();)
 	{
 		std::string refCoordStr = std::to_string(refCoord);
 		std::string seqCoordStr = std::to_string(seqCoord);
 
-		int maxCoordLength = std::max(refCoordStr.size(), seqCoordStr.size());
+		size_t maxCoordLength = std::max(refCoordStr.size(), seqCoordStr.size());
 		while (refCoordStr.size() < maxCoordLength)
 			refCoordStr = " "+refCoordStr;
 		while (seqCoordStr.size() < maxCoordLength)
