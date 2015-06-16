@@ -102,6 +102,8 @@ public:
 
     std::string BindingKit(void) const;
 
+    bool Control(void) const;
+
     std::map<std::string, std::string> CustomTags(void) const;
 
     std::string Date(void) const;
@@ -161,6 +163,8 @@ public:
 
     ReadGroupInfo& BindingKit(const std::string& kitNumber);
 
+    ReadGroupInfo& Control(const bool ctrl);
+
     ReadGroupInfo& CustomTags(const std::map<std::string, std::string>& custom);
 
     ReadGroupInfo& Date(const std::string& date);
@@ -212,6 +216,7 @@ private:
     std::string sequencingKit_;
     std::string basecallerVersion_;
     std::string frameRateHz_;
+    bool        control_ = false;
     std::map<BaseFeature, std::string> features_;
 
     // custom attributes
@@ -249,6 +254,12 @@ inline std::string ReadGroupInfo::BindingKit(void) const
 
 inline ReadGroupInfo& ReadGroupInfo::BindingKit(const std::string& kitNumber)
 { bindingKit_ = kitNumber; return *this; }
+
+inline bool ReadGroupInfo::Control(void) const
+{ return control_; }
+
+inline ReadGroupInfo& ReadGroupInfo::Control(const bool ctrl)
+{ control_ = ctrl; return *this; }
 
 inline std::map<std::string, std::string> ReadGroupInfo::CustomTags(void) const
 { return custom_; }
