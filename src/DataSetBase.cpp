@@ -276,7 +276,7 @@ const string& DataSetBase::Tags(void) const
 DataSetBase& DataSetBase::Tags(const string& tags)
 { Attribute("Tags", tags); return *this; }
 
-const DataSetType DataSetBase::Type(void) const
+DataSetType DataSetBase::Type(void) const
 { return TypeForName(Label()); }
 
 DataSetBase& DataSetBase::Type(DataSetType type)

@@ -131,7 +131,7 @@ public:
 
     /// \returns enum describing dataset type
     ///
-    const DataSetType Type(void) const;
+    DataSetType Type(void) const;
 
     /// \returns "UniqueId" attribute value (or empty string if none present)
     ///
