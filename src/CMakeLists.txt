@@ -1,13 +1,39 @@
-if(PacBioBAM_build_chef)
-    set(boost_RootDir "${PacBioBAM_RootDir}/_output/deplinks/boost")
-    set(boost_IncludeDir "${boost_RootDir}")
-    set(zlib_RootDir "${PacBioBAM_RootDir}/_output/deplinks/zlib")
-    set(zlib_IncludeDir "${zlib_RootDir}/include")
+if(PacBioBAM_use_modbuild)
+    # boost
+    set(boost_RootDir     "${PacBioBAM_OutputDir}/deplinks/boost")
+    set(boost_IncludeDir  "${boost_RootDir}")
+    # htslib
+    set(Htslib_RootDir    "${PacBioBAM_OutputDir}/deplinks/htslib")
+    set(Htslib_IncludeDir "${Htslib_RootDir}/include")
+    set(Htslib_LibDir     "${Htslib_RootDir}/lib")
+    # zlib
+    set(zlib_RootDir      "${PacBioBAM_OutputDir}/deplinks/zlib")
+    set(zlib_IncludeDir   "${zlib_RootDir}/include")
+    set(zlib_LibDir       "${zlib_RootDir}/lib")
+
+    set(Boost_INCLUDE_DIRS "${boost_IncludeDir}")
+    set(ZLIB_INCLUDE_DIRS  "${zlib_IncludeDir}")
+
+    if(${building_shared})
+        set(Htslib_Libraries "${Htslib_LibDir}/libhts${CMAKE_SHARED_LIBRARY_SUFFIX}")
+        set(ZLIB_LIBRARIES   "${zlib_LibDir}/libz${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    else()
+        set(Htslib_Libraries "${Htslib_LibDir}/libhts.a")
+        set(ZLIB_LIBRARIES   "${zlib_LibDir}/libhts.a")
+    endif() # shared
 else()
     find_package(ZLIB REQUIRED)
     find_package(Boost REQUIRED)
-endif()
+
+    if(${building_shared})
+        set(Htslib_Libraries "${Htslib_LibDir}/libhts${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    else()
+        set(Htslib_Libraries "${Htslib_LibDir}/libhts.a")
+    endif() # shared
+endif()  # use_modbuild
 find_package(Threads)
+
+
 
 if(WIN32)
   # Need winsock on windows
@@ -18,46 +44,26 @@ if(WIN32)
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc -static-libstdc++")
 endif()
 
-	
-# define PacBioBAM library dependencies
-if(PacBioBAM_build_chef)
-    set(PacBioBAM_DependencyIncludes 
-        ${htslib_IncludeDir}
-        ${boost_IncludeDir}
-        ${zlib_IncludeDir}
-    )
-    set(PacBioBAM_DependencyLibraries 
-        ${htslib_LibDir}/libhts.a
-        ${CMAKE_THREAD_LIBS_INIT}
-   )
-else()
-    if(${building_shared})
-        set(PacBioBAM_DependencyIncludes
-            ${Htslib_IncludeDir}
-            ${ZLIB_INCLUDE_DIRS}
-            ${Boost_INCLUDE_DIRS}
-        )
-        set(PacBioBAM_DependencyLibraries
-            ${Htslib_LibDir}/libhts${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${CMAKE_THREAD_LIBS_INIT}
-            ${ZLIB_LIBRARIES}
-            ${SOCKET_LIBRARIES}
-        )
-    else()
-        set(PacBioBAM_DependencyIncludes
-            ${Htslib_IncludeDir}
-            ${ZLIB_INCLUDE_DIRS}
-            ${Boost_INCLUDE_DIRS}
-        )
-        set(PacBioBAM_DependencyLibraries
-            ${Htslib_LibDir}/libhts.a
-            ${CMAKE_THREAD_LIBS_INIT}
-            ${ZLIB_LIBRARIES}
-            ${SOCKET_LIBRARIES}
-        )
-    endif() # shared
-endif() # chef
+if(PacBioBAM_use_modbuild)
+  # Turn off setting of rpath in libs and exes, so we can use LD_LIBRARY_PATH
+  # without getting overriden by the rpath setting if the rpath library 
+  # happens to exist.
+  SET(CMAKE_SKIP_BUILD_RPATH  TRUE)
+endif()
 
+
+# define PacBioBAM library dependencies
+set(PacBioBAM_DependencyIncludes
+    ${Boost_INCLUDE_DIRS}
+    ${Htslib_IncludeDir}
+    ${ZLIB_INCLUDE_DIRS}
+)
+set(PacBioBAM_DependencyLibraries
+    ${Htslib_Libraries}
+    ${ZLIB_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${SOCKET_LIBRARIES}
+)
 
 # set up library include dirs
 include_directories(
@@ -73,7 +79,7 @@ set(SOURCES
 )
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PacBioBAM_CXX_FLAGS}")
 
-if(PacBioBAM_build_chef)
+if(PacBioBAM_use_modbuild)
 else()
     # ensure we build self-contained htslib
     string(REPLACE "/libz.a" "" ZLIB_LIBRARY_REPLACED ${ZLIB_LIBRARY})
@@ -109,7 +115,7 @@ else()
     )
 endif()
 
-if(PacBioBAM_build_chef)
+if(PacBioBAM_use_modbuild)
 else()
     add_dependencies(pbbam htslib)
 endif()
@@ -141,5 +147,7 @@ else()
     )
 endif()
 
-# add SWIG directory
-add_subdirectory(swig)
+if(${wrapping_swig})
+    # add SWIG directory
+    add_subdirectory(swig)
+endif()  # swig
