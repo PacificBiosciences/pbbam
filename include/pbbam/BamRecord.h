@@ -387,18 +387,11 @@ public:
 
     /// \brief Fetch this record's IPD values ("ip" tag), but does not upscale.
     ///
-    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
-    ///       frames will have a value of 0;
-    ///
     /// \param[in] orientation     Orientation of output.
-    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
-    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
     ///
     /// \returns IPD as Frames object
     ///
-    Frames IPDRaw(Orientation orientation = Orientation::NATIVE,
-                  bool aligned = false, 
-                  bool exciseSoftClips = false) const;
+    Frames IPDRaw(Orientation orientation = Orientation::NATIVE) const;
 
     /// \brief Fetch this record's PrePulseFrames values ("pd" tag).
     ///

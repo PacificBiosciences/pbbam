@@ -84,9 +84,7 @@ public:
     { return virtualRegionsMap_; }
 
 public: // New BamRecord functionality.
-    Frames IPDV1Frames(Orientation orientation = Orientation::NATIVE,
-                       bool aligned = false,
-                       bool exciseSoftClips = false) const;
+    Frames IPDV1Frames(Orientation orientation = Orientation::NATIVE) const;
 
 private:
     std::vector<BamRecord> sources_;

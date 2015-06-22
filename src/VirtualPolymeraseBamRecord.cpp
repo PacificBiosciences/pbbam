@@ -260,11 +260,9 @@ void VirtualPolymeraseBamRecord::StitchSources()
     }
 }
 
-Frames VirtualPolymeraseBamRecord::IPDV1Frames(Orientation orientation,
-                                               bool aligned,
-                                               bool exciseSoftClips) const
+Frames VirtualPolymeraseBamRecord::IPDV1Frames(Orientation orientation) const
 {
-    const auto rawFrames = this->IPDRaw(orientation, aligned, exciseSoftClips);
+    const auto rawFrames = this->IPDRaw(orientation);
     const std::vector<uint8_t> rawData(rawFrames.Data().begin(), rawFrames.Data().end());
     return Frames::CodeToFrames(rawData);
 }

@@ -1224,9 +1224,7 @@ Frames BamRecord::IPD(Orientation orientation,
                        exciseSoftClips);
 }
 
-Frames BamRecord::IPDRaw(Orientation orientation, 
-                         bool aligned,
-                         bool exciseSoftClips) const
+Frames BamRecord::IPDRaw(Orientation orientation) const
 {
     const auto tagName = internal::tagName_ipd;
 
