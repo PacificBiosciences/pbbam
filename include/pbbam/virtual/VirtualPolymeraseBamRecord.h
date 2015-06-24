@@ -60,13 +60,13 @@ public:
 
     VirtualPolymeraseBamRecord() = delete;
     // Move constructor
-    VirtualPolymeraseBamRecord(VirtualPolymeraseBamRecord&& src) = default;
+    VirtualPolymeraseBamRecord(VirtualPolymeraseBamRecord&&) = default;
     // Copy constructor
-    VirtualPolymeraseBamRecord(const VirtualPolymeraseBamRecord& src) = delete;
+    VirtualPolymeraseBamRecord(const VirtualPolymeraseBamRecord&) = delete;
     // Move assignment operator
-    VirtualPolymeraseBamRecord& operator=(VirtualPolymeraseBamRecord&& rhs) = default;
+    VirtualPolymeraseBamRecord& operator=(VirtualPolymeraseBamRecord&&) = default;
     // Copy assignment operator
-    VirtualPolymeraseBamRecord& operator=(const VirtualPolymeraseBamRecord& rhs) = delete;
+    VirtualPolymeraseBamRecord& operator=(const VirtualPolymeraseBamRecord&) = delete;
     // Destructor
     virtual ~VirtualPolymeraseBamRecord() = default;
 

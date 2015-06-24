@@ -60,13 +60,13 @@ public:
 
     VirtualPolymeraseReader() = delete;
     // Move constructor
-    VirtualPolymeraseReader(VirtualPolymeraseReader&& src) = delete;
+    VirtualPolymeraseReader(VirtualPolymeraseReader&&) = delete;
     // Copy constructor
-    VirtualPolymeraseReader(const VirtualPolymeraseReader& src) = delete;
+    VirtualPolymeraseReader(const VirtualPolymeraseReader&) = delete;
     // Move assignment operator
-    VirtualPolymeraseReader& operator=(VirtualPolymeraseReader&& rhs) = delete;
+    VirtualPolymeraseReader& operator=(VirtualPolymeraseReader&&) = delete;
     // Copy assignment operator
-    VirtualPolymeraseReader& operator=(const VirtualPolymeraseReader& rhs) = delete;
+    VirtualPolymeraseReader& operator=(const VirtualPolymeraseReader&) = delete;
     // Destructor
     ~VirtualPolymeraseReader() = default;
 

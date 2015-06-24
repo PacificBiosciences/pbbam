@@ -59,13 +59,13 @@ public:
 
     AlignmentPrinter() = delete;
     // Move constructor
-    AlignmentPrinter(AlignmentPrinter&& src) = default;
+    AlignmentPrinter(AlignmentPrinter&&) = default;
     // Copy constructor
-    AlignmentPrinter(const AlignmentPrinter& src) = delete;
+    AlignmentPrinter(const AlignmentPrinter&) = delete;
     // Move assignment operator
-    AlignmentPrinter& operator=(AlignmentPrinter&& rhs) = default;
+    AlignmentPrinter& operator=(AlignmentPrinter&&) = default;
     // Copy assignment operator
-    AlignmentPrinter& operator=(const AlignmentPrinter& rhs) = delete;
+    AlignmentPrinter& operator=(const AlignmentPrinter&) = delete;
     // Destructor
     ~AlignmentPrinter() = default;
 

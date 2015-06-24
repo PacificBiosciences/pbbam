@@ -78,13 +78,13 @@ public:
     {}
     VirtualRegion() = default;
     // Move constructor
-    VirtualRegion(VirtualRegion&& src) = default;
+    VirtualRegion(VirtualRegion&&) = default;
     // Copy constructor
-    VirtualRegion(const VirtualRegion& src) = default;
+    VirtualRegion(const VirtualRegion&) = default;
     // Move assignment operator
-    VirtualRegion& operator=(VirtualRegion&& rhs) = default;
+    VirtualRegion& operator=(VirtualRegion&&) = default;
     // Copy assignment operator
-    VirtualRegion& operator=(const VirtualRegion& rhs) = delete;
+    VirtualRegion& operator=(const VirtualRegion&) = delete;
     // Destructor
     ~VirtualRegion() = default;
 

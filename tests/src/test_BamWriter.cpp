@@ -90,11 +90,11 @@ struct ResultPacket
         bamRecord = std::move(src.bamRecord);
     }
     // Copy constructor
-    ResultPacket(const ResultPacket& src) = delete;
+    ResultPacket(const ResultPacket&) = delete;
     // Move assignment constructor
-    ResultPacket& operator=(ResultPacket&& rhs) = delete;
+    ResultPacket& operator=(ResultPacket&&) = delete;
     // Copy assignment constructor
-    ResultPacket& operator=(const ResultPacket& rhs) = delete;
+    ResultPacket& operator=(const ResultPacket&) = delete;
     // Destructor
     ~ResultPacket()
     {
