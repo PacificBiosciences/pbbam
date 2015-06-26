@@ -60,21 +60,21 @@ static const vector<uint16_t> testFrames =
     0,  7,  1,   14,  3,  26,  12, 0,  20, 17,
     2,  13, 2,   9,   13, 7,   15, 29, 3,   6,
     2,  1,  28,  10,  3,  14,  7,  1,  22, 1,
-    6,  6,  0,   19,  31, 6,   2,  14, 0,  0
+    6,  6,  0,   19,  31, 6,   2,  14, 0,  0,
+    1000, 947, 948
 };
 
-static const vector<uint8_t> downsampledFrames =
+static const vector<uint8_t> encodedFrames =
 {
-    0,  8,  140, 0,   0,  7,   4,  0,  86, 2,
-    1,  3,  2,   10,  1,  20,  47, 10, 9,  60,
-    20, 3,  12,  5,   13, 166, 6,  14, 22, 12,
-    2,  4,  9,   220, 27, 3,   15, 2,  17, 2,
-    45, 24, 90,  10,  7,  1,   11, 15, 0,  7,
-    0,  28, 17,  12,  6,  10,  37, 0,  12, 52,
-    0,  7,  1,   14,  3,  26,  12, 0,  20, 17,
-    2,  13, 2,   9,   13, 7,   15, 29, 3,  6,
-    2,  1,  28,  10,  3,  14,  7,  1,  22, 1,
-    6,  6,  0,   19,  31, 6,   2,  14, 0,  0
+    0,     8,  102,   0,   0,   7,   4,   0,  75,   2,   1,   3,   2,
+    10,    1,   20,  47,  10,   9,  60,  20,   3,  12,   5,  13, 115,
+    6,    14,   22,  12,   2,   4,   9, 135,  27,   3,  15,   2,  17,
+    2,    45,   24,  77,  10,   7,   1,  11,  15,   0,   7,   0,  28,
+    17,   12,    6,  10,  37,   0,  12,  52,   0,   7,   1,  14,   3,
+    26,   12,    0,  20,  17,   2,  13,   2,   9,  13,   7,  15,  29,
+    3,     6,    2,   1,  28,  10,   3,  14,   7,   1,  22,   1,   6,
+    6,     0,   19,  31,   6,   2,  14,   0,   0,
+    255, 254,  255
 };
 
 } // namespace tests
@@ -89,9 +89,9 @@ TEST(FramesTest, Constructors)
     ASSERT_EQ(tests::testFrames, d);
 }
 
-TEST(FramesTest, Downsampled)
+TEST(FramesTest, Encoded)
 {
     const Frames f(tests::testFrames);
-    const auto d = f.Downsampled();
-    ASSERT_EQ(tests::downsampledFrames, d);
+    const auto e = f.Encoded();
+    ASSERT_EQ(tests::encodedFrames, e);
 }

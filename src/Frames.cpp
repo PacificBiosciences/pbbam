@@ -106,7 +106,7 @@ void InitIpdDownsampling(void)
 }
 
 static inline
-uint16_t CodeToFrame(const uint8_t code)
+uint16_t CodeToFrames(const uint8_t code)
 {
     return framepoints[code];
 }
@@ -119,32 +119,25 @@ vector<uint16_t> CodeToFrames(const vector<uint8_t>& codedData)
     const size_t length = codedData.size();
     vector<uint16_t> frames(length, 0);
     for (size_t i = 0; i < length; ++i)
-        frames[i] = CodeToFrame(codedData[i]);
+        frames[i] = CodeToFrames(codedData[i]);
     return frames;
 }
 
 static inline
-uint8_t FrameToCode(const uint16_t frame)
+uint8_t FramesToCode(const uint16_t frame)
 {
     return frameToCode[std::min(maxFramepoint, frame)];
 }
 
-static inline
-uint8_t DownsampleFrame(const uint16_t frame)
-{
-    static const uint16_t encodedMax = 255;
-    return std::min(framepoints[FrameToCode(frame)], encodedMax);
-}
-
 static
-vector<uint8_t> Downsampled(const vector<uint16_t>& frames)
+vector<uint8_t> FramesToCode(const vector<uint16_t>& frames)
 {
     InitIpdDownsampling();
 
     const size_t length = frames.size();
     vector<uint8_t> result(length, 0);
     for (size_t i = 0; i < length; ++i)
-        result[i] = DownsampleFrame(frames[i]);
+        result[i] = FramesToCode(frames[i]);
     return result;
 }
 
@@ -182,5 +175,5 @@ Frames& Frames::operator=(Frames&& other)
 Frames Frames::CodeToFrames(const std::vector<uint8_t>& codedData)
 {  return Frames(std::move(internal::CodeToFrames(codedData))); }
 
-std::vector<uint8_t> Frames::Downsample(const std::vector<uint16_t>& frames)
-{ return internal::Downsampled(frames); }
+std::vector<uint8_t> Frames::FramesToCode(const std::vector<uint16_t>& frames)
+{ return internal::FramesToCode(frames); }

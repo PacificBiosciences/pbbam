@@ -353,27 +353,3 @@ TEST(VirtualPolymeraseReader, ProductionHQToOriginal)
     EXPECT_FALSE(virtualRecord.HasPrePulseFrames());
     EXPECT_FALSE(virtualRecord.HasPulseCallWidth());
 }
-
-// TEST(VirtualPolymeraseReader, Frames)
-// {
-//     std::vector<uint16_t> original;
-//     original.reserve(65355);
-//     for (int i = 0; i < 65355; ++i)
-//         original.push_back(i);
-
-//     Frames f(original);
-//     const auto downsampled = f.Downsampled();
-//     const auto upsampled = Frames::CodeToFrames(downsampled);
-//     const auto downsampled2 = upsampled.Downsampled();
-
-//     for (int i = 0; i < 65355; ++i)
-//     {
-//         std::cerr << std::to_string(f.Data()[i]) << "\t" 
-//                   << std::to_string(downsampled[i]) << "\t" 
-//                   << std::to_string(upsampled.Data()[i]) << "\t" 
-//                   << std::to_string(downsampled2[i]) << std::endl;
-//         // EXPECT_EQ(downsampled[i], downsampled2[i]);
-//     }
-
-//     EXPECT_EQ(downsampled, downsampled2);
-// }
