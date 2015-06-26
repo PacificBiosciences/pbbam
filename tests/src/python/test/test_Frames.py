@@ -88,7 +88,7 @@ class FramesTest(unittest.TestCase):
     
     def test_encode(self):
         f = PacBioBam.Frames(self.testframes)
-        e = f.Encoded()
+        e = f.Encode()
         self.assertEqual(len(self.encoded), len(e))
         for i, v in enumerate(e):
             self.assertEqual(int(self.encoded[i]), int(v))

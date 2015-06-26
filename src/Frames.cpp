@@ -172,8 +172,8 @@ Frames& Frames::operator=(const Frames& other)
 Frames& Frames::operator=(Frames&& other)
 { data_ = std::move(other.data_); return *this; }
 
-Frames Frames::CodeToFrames(const std::vector<uint8_t>& codedData)
+Frames Frames::Decode(const std::vector<uint8_t>& codedData)
 {  return Frames(std::move(internal::CodeToFrames(codedData))); }
 
-std::vector<uint8_t> Frames::FramesToCode(const std::vector<uint16_t>& frames)
+std::vector<uint8_t> Frames::Encode(const std::vector<uint16_t>& frames)
 { return internal::FramesToCode(frames); }

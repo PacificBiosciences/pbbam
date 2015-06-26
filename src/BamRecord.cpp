@@ -924,7 +924,7 @@ Frames BamRecord::FetchFramesRaw(const string& tagName) const
     // lossy frame codes
     if (frameTag.IsUInt8Array()) {
         const vector<uint8_t> codes = std::move(frameTag.ToUInt8Array());
-        frames = std::move(Frames::CodeToFrames(codes));
+        frames = std::move(Frames::Decode(codes));
     }
 
     // lossless frame data
@@ -1193,7 +1193,7 @@ BamRecord& BamRecord::PrePulseFrames(const Frames& frames,
                                      const FrameEncodingType encoding)
 {
     if (encoding == FrameEncodingType::LOSSY)
-        internal::CreateOrEdit(internal::tagName_pre_pulse_frames, frames.Encoded(), &impl_);
+        internal::CreateOrEdit(internal::tagName_pre_pulse_frames, frames.Encode(), &impl_);
     else
         internal::CreateOrEdit(internal::tagName_pre_pulse_frames, frames.Data(), &impl_);
     return *this;
@@ -1208,7 +1208,7 @@ BamRecord& BamRecord::PulseCallWidth(const Frames& frames,
                                      const FrameEncodingType encoding)
 {
     if (encoding == FrameEncodingType::LOSSY)
-        internal::CreateOrEdit(internal::tagName_pulse_call_width, frames.Encoded(), &impl_);
+        internal::CreateOrEdit(internal::tagName_pulse_call_width, frames.Encode(), &impl_);
     else
         internal::CreateOrEdit(internal::tagName_pulse_call_width, frames.Data(), &impl_);
     return *this;
@@ -1259,7 +1259,7 @@ BamRecord& BamRecord::IPD(const Frames& frames,
                           const FrameEncodingType encoding)
 {
     if (encoding == FrameEncodingType::LOSSY)
-        internal::CreateOrEdit(internal::tagName_ipd, frames.Encoded(), &impl_);
+        internal::CreateOrEdit(internal::tagName_ipd, frames.Encode(), &impl_);
     else
         internal::CreateOrEdit(internal::tagName_ipd, frames.Data(), &impl_);
     return *this;
@@ -1366,7 +1366,7 @@ BamRecord& BamRecord::PulseWidth(const Frames& frames,
                                  const FrameEncodingType encoding)
 {
     if (encoding == FrameEncodingType::LOSSY)
-        internal::CreateOrEdit(internal::tagName_pulseWidth, frames.Encoded(), &impl_);
+        internal::CreateOrEdit(internal::tagName_pulseWidth, frames.Encode(), &impl_);
     else
         internal::CreateOrEdit(internal::tagName_pulseWidth, frames.Data(), &impl_);
     return *this;

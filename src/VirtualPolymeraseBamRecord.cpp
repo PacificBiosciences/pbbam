@@ -264,5 +264,5 @@ Frames VirtualPolymeraseBamRecord::IPDV1Frames(Orientation orientation) const
 {
     const auto rawFrames = this->IPDRaw(orientation);
     const std::vector<uint8_t> rawData(rawFrames.Data().begin(), rawFrames.Data().end());
-    return Frames::CodeToFrames(rawData);
+    return Frames::Decode(rawData);
 }

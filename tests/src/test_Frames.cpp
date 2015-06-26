@@ -92,6 +92,6 @@ TEST(FramesTest, Constructors)
 TEST(FramesTest, Encoded)
 {
     const Frames f(tests::testFrames);
-    const auto e = f.Encoded();
+    const auto e = f.Encode();
     ASSERT_EQ(tests::encodedFrames, e);
 }

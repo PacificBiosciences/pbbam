@@ -58,13 +58,13 @@ public:
     ///
     /// \param[in] codedData encoded data
     /// \returns Frames object
-    static Frames CodeToFrames(const std::vector<uint8_t>& codedData);
+    static Frames Decode(const std::vector<uint8_t>& codedData);
 
     /// Encodes a container of (raw) frames values in our 8-bit encoding.
     ///
     /// \param[in] frames expanded frame data
     /// \returns lossy, 8-bit encoded frame codes
-    static std::vector<uint8_t> FramesToCode(const std::vector<uint16_t>& frames);
+    static std::vector<uint8_t> Encode(const std::vector<uint16_t>& frames);
 
     /// \}
 
@@ -97,10 +97,8 @@ public:
     /// \name Conversion Methods
     /// \{
 
-
-
     /// \returns Frame data in (lossy, 8-bit) encoded form.
-    std::vector<uint8_t> Encoded(void) const;
+    std::vector<uint8_t> Encode(void) const;
 
     /// \}
 
@@ -168,8 +166,8 @@ inline const std::vector<uint16_t>& Frames::Data(void) const
 inline std::vector<uint16_t>& Frames::DataRaw(void)
 { return data_; }
 
-inline std::vector<uint8_t> Frames::Encoded(void) const
-{ return Frames::FramesToCode(data_); }
+inline std::vector<uint8_t> Frames::Encode(void) const
+{ return Frames::Encode(data_); }
 
 inline Frames& Frames::Data(const std::vector<uint16_t>& frames)
 { data_ = frames; return *this; }
