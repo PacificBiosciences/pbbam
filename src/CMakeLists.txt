@@ -1,7 +1,7 @@
 if(PacBioBAM_use_modbuild)
     # boost
     set(boost_RootDir     "${PacBioBAM_OutputDir}/deplinks/boost")
-    set(boost_IncludeDir  "${boost_RootDir}")
+    set(boost_IncludeDir  "${boost_RootDir}/include")
     # htslib
     set(Htslib_RootDir    "${PacBioBAM_OutputDir}/deplinks/htslib")
     set(Htslib_IncludeDir "${Htslib_RootDir}/include")
