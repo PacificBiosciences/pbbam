@@ -7,11 +7,12 @@ set(GTest_SourceDir  ${GTest_RootDir}/src)
 
 # find samtools binary for comparing against 'gold standard' files
 #set(Samtools_Dir "/Users/derek/development/samtools")
-set(Samtools_Dir "${PacBioBAM_RootDir}/../../../../../prebuilt.out/samtools/samtools-0.1.19/ubuntu-1404/bin")
+set(Samtools_Dir "${PacBioBAM_RootDir}/../../../../prebuilt.out/samtools/samtools-0.1.19/ubuntu-1404/bin")
 set(Samtools_Bin "${Samtools_Dir}/samtools")
 
 # ensure tests directory exists
 file(MAKE_DIRECTORY ${PacBioBAM_TestsDir}/bin)
+file(MAKE_DIRECTORY ${PacBioBAM_TestsDir}/data/temp)
 
 # generate paths/values used by for test
 configure_file(

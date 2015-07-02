@@ -46,11 +46,14 @@
 #include <pbbam/PbiRawData.h>
 #include <pbbam/internal/PbiIndex_p.h>
 #include <string>
+#include <cstdlib>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
 const string test2BamFn = tests::Data_Dir + "/test_group_query/test2.bam";
+const string tempDir    = tests::Data_Dir + "/temp/";
+const string tempBamFn  = tempDir + "test2.bam";
 
 namespace PacBio {
 namespace BAM {
@@ -115,6 +118,16 @@ bool operator==(const PbiRawData& lhs, const PbiRawData& rhs)
 }
 
 namespace tests {
+
+static
+void CopyBamToTemp(void) 
+{
+    string cmd("cp ");
+    cmd += test2BamFn;
+    cmd += " ";
+    cmd += tempDir;
+    system(cmd.c_str());
+}
 
 static
 PbiRawData Test2Bam_RawIndex(void)
@@ -235,7 +248,10 @@ TEST(PacBioIndexTest, RawLoadFromFileOk)
 
 TEST(PacBioIndexTest, BuildFromBamOk)
 {
-    BamFile bamFile(test2BamFn);
+    // do this in temp directory, so we can ensure write access
+    tests::CopyBamToTemp();
+
+    BamFile bamFile(tempBamFn);
     PbiFile::CreateFrom(bamFile);
 
     PbiRawData index(bamFile.PacBioIndexFilename());
@@ -249,7 +265,10 @@ TEST(PacBioIndexTest, BuildFromBamOk)
 
 TEST(PacBioIndexTest, ReferenceDataNotLoadedOnUnsortedBam)
 {
-    BamFile bamFile(test2BamFn);
+    // do this in temp directory, so we can ensure write access
+    tests::CopyBamToTemp();
+
+    BamFile bamFile(tempBamFn);
     PbiFile::CreateFrom(bamFile);
     PbiRawData raw(bamFile.PacBioIndexFilename());
     EXPECT_FALSE(raw.HasReferenceData());
