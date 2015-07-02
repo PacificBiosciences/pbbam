@@ -1,10 +1,5 @@
 find_package(Threads REQUIRED)
 
-# use self-contained GoogleTest (going to compile into text exe)
-set(GTest_RootDir    ${PacBioBAM_ThirdPartyDir}/gtest-1.7.0)
-set(GTest_IncludeDir ${GTest_RootDir}/include)
-set(GTest_SourceDir  ${GTest_RootDir}/src)
-
 # find samtools binary for comparing against 'gold standard' files
 #set(Samtools_Dir "/Users/derek/development/samtools")
 set(Samtools_Dir "${PacBioBAM_RootDir}/../../../../prebuilt.out/samtools/samtools-0.1.19/ubuntu-1404/bin")
@@ -27,8 +22,8 @@ configure_file(
 # add PacBioBAM & GoogleTest includes
 include_directories(
     ${PacBioBAM_INCLUDE_DIRS}
-    ${GTest_RootDir}
-    ${GTest_IncludeDir}
+    ${gtest_SOURCE_DIR}/include 
+    ${gtest_SOURCE_DIR}
 )
 
 # grab PacBioBAM test source files
@@ -36,10 +31,6 @@ include(files.cmake)
 set(SOURCES
     ${PacBioBAMTest_H}
     ${PacBioBAMTest_CPP}
-
-    # GoogleTest compiled in to test exe - mostly to ensure same compile flags
-    ${GTest_H}
-    ${GTest_CPP}
 )
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PacBioBAM_CXX_FLAGS}")
 
@@ -70,4 +61,6 @@ add_dependencies(test_pbbam pbbam)
 target_link_libraries(test_pbbam
     ${PacBioBAM_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT} # quirky pthreads 
+    gtest
+    gtest_main
 )

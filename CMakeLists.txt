@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 2.8)
 # project version
 set(PacBioBAM_MAJOR_VERSION 0)
 set(PacBioBAM_MINOR_VERSION 0)
-set(PacBioBAM_PATCH_VERSION 7)
+set(PacBioBAM_PATCH_VERSION 8)
 set(PacBioBAM_VERSION
   "${PacBioBAM_MAJOR_VERSION}.${PacBioBAM_MINOR_VERSION}.${PacBioBAM_PATCH_VERSION}"
 )
@@ -39,20 +39,14 @@ endif()
 # determine if we need a shared lib
 if(PacBioBAM_build_shared OR wrapping_swig)
     set(building_shared TRUE)
+    set(PB_LIB_MODE SHARED)
+    set(PB_LIB_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
 else()
     set(building_shared FALSE)
+    set(PB_LIB_MODE STATIC)
+    set(PB_LIB_SUFFIX ${CMAKE_STATIC_LIBRARY_SUFFIX})
 endif()
-
-if(PacBioBAM_use_modbuild)
-    # if SWIG bindings requested
-    if(${wrapping_swig})
-        message(FATAL_ERROR "SWIG bindings not currently supported in modular build.")
-    endif()
-    if(NOT PacBioBAM_OutputDir)
-        message(FATAL_ERROR "PacBioBAM_OutputDir is not set on command line in modular build.")
-    endif()
-endif()
-
+    
 # main project paths
 set(PacBioBAM_RootDir       ${PacBioBAM_SOURCE_DIR})
 set(PacBioBAM_BinDir        ${PacBioBAM_RootDir}/bin)
@@ -62,12 +56,17 @@ set(PacBioBAM_SourceDir     ${PacBioBAM_RootDir}/src)
 set(PacBioBAM_SwigSourceDir ${PacBioBAM_RootDir}/src/swig)
 set(PacBioBAM_TestsDir      ${PacBioBAM_RootDir}/tests)
 
-if(PacBioBAM_use_modbuild)
-    set(PacBioBAM_LibDir        ${PacBioBAM_OutputDir}/lib)
+if(NOT PacBioBAM_OutputDir)
+    set(PacBioBAM_OutputDir ${PacBioBAM_RootDir})
 else()
-    set(PacBioBAM_LibDir        ${PacBioBAM_RootDir}/lib)
-    set(PacBioBAM_ThirdPartyDir ${PacBioBAM_RootDir}/third-party)
+    # if SWIG bindings requested
+    if(${wrapping_swig})
+        message(FATAL_ERROR "SWIG bindings not currently supported in modular build.")
+    endif()
 endif()
+
+set(PacBioBAM_LibDir        ${PacBioBAM_OutputDir}/lib)
+set(PacBioBAM_ThirdPartyDir ${PacBioBAM_RootDir}/third-party)
 
 file(MAKE_DIRECTORY ${PacBioBAM_LibDir})
 
@@ -75,11 +74,22 @@ file(MAKE_DIRECTORY ${PacBioBAM_LibDir})
 list(APPEND CMAKE_MODULE_PATH "${PacBioBAM_RootDir}/cmake")
 
 # shared & third-party paths
-if(PacBioBAM_use_modbuild)
-else()
-    set(Htslib_RootDir    ${PacBioBAM_ThirdPartyDir}/htslib)
-    set(Htslib_IncludeDir ${Htslib_RootDir})
-    set(Htslib_LibDir     ${Htslib_RootDir})
+if(NOT HTSLIB_INCLUDE_DIRS OR
+   NOT HTSLIB_LIBRARIES)
+    if(HTSLIB_ROOTDIR)
+        find_package(${HTSLIB_ROOTDIR}/htslib REQUIRED)
+    else()
+        find_package(${PacBioBAM_SOURCE_DIR}/../htslib/htslib REQUIRED)
+    endif()
+endif()
+
+if(NOT Boost_INCLUDE_DIRS)
+    find_package(Boost REQUIRED)
+endif()
+
+if (NOT ZLIB_INCLUDE_DIRS OR
+    NOT ZLIB_LIBRARIES)
+    find_package(ZLIB REQUIRED)
 endif()
 
 # shared CXX flags for src & tests
@@ -102,5 +112,6 @@ if(PacBioBAM_build_docs)
     add_subdirectory(docs)
 endif()
 if(PacBioBAM_build_tests)
+    add_subdirectory(../gtest external/gtest/build)
     add_subdirectory(tests)
 endif()
