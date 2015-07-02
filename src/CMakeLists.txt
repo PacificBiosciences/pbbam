@@ -50,8 +50,6 @@ set_target_properties(pbbam PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}
     LIBRARY_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}
 )
-
-add_dependencies(pbbam htslib)
         
 # link dependency libs to pbbam 
 target_link_libraries(pbbam ${PacBioBAM_DependencyLibraries})
