@@ -1,5 +1,7 @@
 /* TagCollection.i */
+
 %module PacBioBam
+
 %{
 #include <pbbam/TagCollection.h>
 using namespace PacBio;

@@ -36,13 +36,17 @@
 // Author: Derek Barnett
 
 #include "pbbam/ZmwQuery.h"
+#include "pbbam/PbiIndex.h"
 #include "pbbam/internal/BamRecordSort.h"
 #include "pbbam/internal/MergeStrategy.h"
+#include "MemoryUtils.h"
+#include <htslib/bgzf.h>
+#include <htslib/sam.h>
 #include <algorithm>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
-using namespace PacBio::BAM::staging;
+//using namespace PacBio::BAM::staging;
 using namespace std;
 
 namespace PacBio {
@@ -52,52 +56,82 @@ namespace internal {
 class ZmwQueryIterator : public IBamFileIterator
 {
 public:
-    ZmwQueryIterator(const std::vector<int>& zmwWhitelist,
+    ZmwQueryIterator(const std::vector<int32_t>& zmwWhitelist,
                      const BamFile& bamFile)
         : internal::IBamFileIterator(bamFile)
-        , currentWhitelistIndex_(0)
+        , currentBlockReadCount_(0)
+        , htsFile_(nullptr)
+        , htsHeader_(nullptr)
     {
-        std::vector<int> sortedZmws = zmwWhitelist;
-        std::sort(sortedZmws.begin(), sortedZmws.end());
-        for (int zmw : sortedZmws) {
-            (void)zmw;
-            std::vector<int> zmwIndices = { }; // PBI magic goes here for pbi.OffsetsForZmw(zmw);
-            std::sort(zmwIndices.begin(), zmwIndices.end());
-            for (int index : zmwIndices)
-                whitelistRecordIndices_.push_back(index);
-        }
+        // init BAM file for reading
+        htsFile_.reset(sam_open(bamFile.Filename().c_str(), "rb"));
+        if (!htsFile_)
+            throw std::runtime_error("could not open BAM file for reading");
+
+        htsHeader_.reset(sam_hdr_read(htsFile_.get()));
+        if (!htsHeader_)
+            throw std::runtime_error("could not read BAM header data");
+
+        // open index & query for ZMWs
+        PbiIndex index(bamFile.PacBioIndexFilename());
+        blocks_ = index.Lookup(ZmwIndexMultiRequest(zmwWhitelist));
     }
 
 public:
     bool GetNext(BamRecord& r){
-        if (currentWhitelistIndex_ >= whitelistRecordIndices_.size())
+
+        // no data to fetch, return false
+        if (blocks_.empty())
             return false;
 
-        // this is where we seek & read
-        // r = fileData_.records.at(whitelistRecordIndices_.at(currentWhitelistIndex_));
+        // maybe seek to block
+        if (currentBlockReadCount_ == 0) {
+            const int seekResult = bgzf_seek(htsFile_.get()->fp.bgzf, blocks_.at(0).virtualOffset_, SEEK_SET);
+            if (seekResult == -1)
+                throw std::runtime_error("could not seek in BAM file");
+        }
 
-        ++currentWhitelistIndex_;
-        return true;
+        // read next record
+//        r = BamRecord(fileData_.Header());
+        const int readResult = sam_read1(htsFile_.get(),
+                                         htsHeader_.get(),
+                                         internal::BamRecordMemory::GetRawData(r).get());
+//        r.header_ = fileData_.Header();
+        r.header_ = header_;
+
+        // update counters
+        ++currentBlockReadCount_;
+        if (currentBlockReadCount_ == blocks_.at(0).numReads_) {
+            blocks_.pop_front();
+            currentBlockReadCount_ = 0;
+        }
+
+        // return result of reading
+        if (readResult >= 0)           // success
+            return true;
+        else if (readResult == -1)     // normal EOF
+            return false;
+        else                           // error (truncated file, etc)
+            throw std::runtime_error("corrupted file, may be truncated");
     }
 
 private:
-    std::vector<int> whitelistRecordIndices_;
-    size_t currentWhitelistIndex_;
+    IndexResultBlocks blocks_;
+    size_t currentBlockReadCount_;
+    unique_ptr<samFile,   internal::HtslibFileDeleter>   htsFile_;
+    unique_ptr<bam_hdr_t, internal::HtslibHeaderDeleter> htsHeader_;
 };
 
 } // namespace internal
 } // namespace BAM
 } // namespace PacBio
 
-ZmwQuery::ZmwQuery(const std::vector<int>& zmwWhitelist,
+ZmwQuery::ZmwQuery(const std::vector<int32_t> &zmwWhitelist,
                    const DataSet& dataset)
     : internal::IQuery(dataset)
     , whitelist_(zmwWhitelist)
 {
-    // not yet fully implemented
-    throw std::exception();
-
-//    mergeStrategy_.reset(new MergeStrategy<ByZmw>(CreateIterators()));
+    mergeStrategy_.reset(new MergeStrategy<ByZmw>(CreateIterators()));
 }
 
 ZmwQuery::FileIterPtr ZmwQuery::CreateIterator(const BamFile& bamFile)

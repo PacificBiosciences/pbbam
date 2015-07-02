@@ -36,7 +36,7 @@
 // Author: Derek Barnett
 
 #include "XmlWriter.h"
-#include "pbbam/dataset/DataSetBase.h"
+#include "pbbam/DataSet.h"
 #include "pugixml/pugixml.hpp"
 #include <fstream>
 #include <iostream>
@@ -87,14 +87,15 @@ void ToXml(const DataSetElement& node,
 } // namespace BAM
 } // namespace PacBio
 
-void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
+void XmlWriter::ToStream(const DataSetBase& dataset,
+                         ostream& out)
 {
     pugi::xml_document doc;
 
     // create top-level dataset XML node
     const string& label = dataset.Label();
     if (label.empty())
-        throw std::exception();
+        throw std::runtime_error("could not convert dataset node to XML");
     pugi::xml_node root = doc.append_child(label.c_str());
 
     const string& text = dataset.Text();
@@ -130,3 +131,7 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
     // we may remove this if/when comparison is separated from the value
     doc.save(out, "\t", pugi::format_default | pugi::format_no_escapes, pugi::encoding_utf8);
 }
+
+void XmlWriter::ToStream(const unique_ptr<DataSetBase>& dataset,
+                         ostream& out)
+{ ToStream(*dataset.get(), out); }

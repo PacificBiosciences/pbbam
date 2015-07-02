@@ -36,156 +36,157 @@
 // Author: Derek Barnett
 
 #include "pbbam/PbiIndex.h"
-#include "PbiIndex_p.h"
 #include "PbiIndexIO.h"
-
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
 using namespace std;
 
-namespace PacBio {
-namespace BAM {
-namespace internal {
-
-
-
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
-
-// ---------------------------
-// LookupBase implementation
-// ---------------------------
-
-const size_t LookupBase::NullIndex = static_cast<size_t>(-1);
-
 // ----------------------------------
-// PerReadLookupBase implementation
+// IndexResultBlock implementation
 // ----------------------------------
+
+IndexResultBlock::IndexResultBlock(void)
+    : firstIndex_(0)
+    , numReads_(0)
+    , virtualOffset_(-1)
+{ }
+
+IndexResultBlock::IndexResultBlock(size_t idx, size_t numReads)
+    : firstIndex_(idx)
+    , numReads_(numReads)
+    , virtualOffset_(-1)
+{ }
+
+bool IndexResultBlock::operator==(const IndexResultBlock& other) const
+{
+    return firstIndex_ == other.firstIndex_ &&
+           numReads_ == other.numReads_ &&
+           virtualOffset_ == other.virtualOffset_;
+}
+
+bool IndexResultBlock::operator!=(const IndexResultBlock& other) const
+{ return !(*this == other); }
 
 // ----------------------------------
 // SubreadLookupData implementation
 // ----------------------------------
 
-SubreadLookupData::SubreadLookupData(void)
-    : PerReadLookupBase()
-{ }
+SubreadLookupData::SubreadLookupData(void) { }
 
 SubreadLookupData::SubreadLookupData(const PbiRawSubreadData& rawData)
-    : PerReadLookupBase()
-    , rgId_(16) // just reserve some space
-    , qStart_(MakeLookupMap(rawData.qStart_))
-    , qEnd_(MakeLookupMap(rawData.qEnd_))
-    , holeNumber_(MakeLookupMap(rawData.holeNumber_))
-    , readQual_(MakeLookupMap(rawData.readQual_))
+    : rgId_(rawData.rgId_)
+    , qStart_(rawData.qStart_)
+    , qEnd_(rawData.qEnd_)
+    , holeNumber_(rawData.holeNumber_)
+    , readQual_(rawData.readQual_)
     , fileOffset_(rawData.fileOffset_)
-{
-    const size_t numElements = rawData.rgId_.size();
-    for (size_t i = 0; i < numElements; ++i)
-        rgId_[ rawData.rgId_.at(i) ].push_back(i);
-}
+{ }
 
-SubreadLookupData::SubreadLookupData(PbiRawSubreadData&& rawData)
-    : PerReadLookupBase()
-    , rgId_(16) // just reserve some space
-    , qStart_(MakeLookupMap(std::move(rawData.qStart_)))
-    , qEnd_(MakeLookupMap(std::move(rawData.qEnd_)))
-    , holeNumber_(MakeLookupMap(std::move(rawData.holeNumber_)))
-    , readQual_(MakeLookupMap(std::move(rawData.readQual_)))
-    , fileOffset_(std::move(rawData.fileOffset_))
-{
-    const size_t numElements = rawData.rgId_.size();
-    for (size_t i = 0; i < numElements; ++i)
-        rgId_[ rawData.rgId_.at(i) ].push_back(i);
-}
+//SubreadLookupData::SubreadLookupData(PbiRawSubreadData&& rawData)
+//    : rgId_(std::move(rawData.rgId_))
+//    , qStart_(std::move(rawData.qStart_))
+//    , qEnd_(std::move(rawData.qEnd_))
+//    , holeNumber_(std::move(rawData.holeNumber_))
+//    , readQual_(std::move(rawData.readQual_))
+//    , fileOffset_(std::move(rawData.fileOffset_))
+//{ }
 
 // ----------------------------------
 // MappedLookupData implementation
 // ----------------------------------
 
-MappedLookupData::MappedLookupData(void)
-    : PerReadLookupBase()
-{ }
+MappedLookupData::MappedLookupData(void) { }
 
 MappedLookupData::MappedLookupData(const PbiRawMappedData& rawData)
-    : PerReadLookupBase()
-    , tId_(MakeLookupMap(rawData.tId_))
-    , tStart_(MakeLookupMap(rawData.tStart_))
-    , tEnd_(MakeLookupMap(rawData.tEnd_))
-    , aStart_(MakeLookupMap(rawData.aStart_))
-    , aEnd_(MakeLookupMap(rawData.aEnd_))
-    , nM_(MakeLookupMap(rawData.nM_))
-    , nMM_(MakeLookupMap(rawData.nMM_))
-    , mapQV_(MakeLookupMap(rawData.mapQV_))
+    : tId_(rawData.tId_)
+    , tStart_(rawData.tStart_)
+    , tEnd_(rawData.tEnd_)
+    , aStart_(rawData.aStart_)
+    , aEnd_(rawData.aEnd_)
+    , nM_(rawData.nM_)
+    , nMM_(rawData.nMM_)
+    , mapQV_(rawData.mapQV_)
 {
     const size_t numElements = rawData.revStrand_.size();
     reverseStrand_.reserve(numElements/2);
     forwardStrand_.reserve(numElements/2);
+
+    std::map<uint32_t, IndexList> insRawData;
+    std::map<uint32_t, IndexList> delRawData;
     for (size_t i = 0; i < numElements; ++i) {
+
+        // nIns, nDel
+        const uint32_t aStart = rawData.aStart_.at(i);
+        const uint32_t aEnd   = rawData.aEnd_.at(i);
+        const uint32_t tStart = rawData.tStart_.at(i);
+        const uint32_t tEnd   = rawData.tEnd_.at(i);
+        const uint32_t nM     = rawData.nM_.at(i);
+        const uint32_t nMM    = rawData.nMM_.at(i);
+        const uint32_t numIns = (aEnd - aStart - nM - nMM);
+        const uint32_t numDel = (tEnd - tStart - nM - nMM);
+        insRawData[numIns].push_back(i);
+        delRawData[numDel].push_back(i);
+
+        // strand
         if (rawData.revStrand_.at(i) == 0)
             forwardStrand_.push_back(i);
         else
             reverseStrand_.push_back(i);
     }
+
+    nIns_ = OrderedLookup<uint32_t>(std::move(insRawData));
+    nDel_ = OrderedLookup<uint32_t>(std::move(delRawData));
 }
 
-MappedLookupData::MappedLookupData(PbiRawMappedData&& rawData)
-    : PerReadLookupBase()
-    , tId_(MakeLookupMap(std::move(rawData.tId_)))
-    , tStart_(MakeLookupMap(std::move(rawData.tStart_)))
-    , tEnd_(MakeLookupMap(std::move(rawData.tEnd_)))
-    , aStart_(MakeLookupMap(std::move(rawData.aStart_)))
-    , aEnd_(MakeLookupMap(std::move(rawData.aEnd_)))
-    , nM_(MakeLookupMap(std::move(rawData.nM_)))
-    , nMM_(MakeLookupMap(std::move(rawData.nMM_)))
-    , mapQV_(MakeLookupMap(std::move(rawData.mapQV_)))
-{
-    const size_t numElements = rawData.revStrand_.size();
-    reverseStrand_.reserve(numElements/2);
-    forwardStrand_.reserve(numElements/2);
-    for (size_t i = 0; i < numElements; ++i) {
-        if (rawData.revStrand_.at(i) == 0)
-            forwardStrand_.push_back(i);
-        else
-            reverseStrand_.push_back(i);
-    }
-}
+//MappedLookupData::MappedLookupData(PbiRawMappedData&& rawData)
+//    : tId_(std::move(rawData.tId_))
+//    , tStart_(std::move(rawData.tStart_))
+//    , tEnd_(std::move(rawData.tEnd_))
+//    , aStart_(std::move(rawData.aStart_))
+//    , aEnd_(std::move(rawData.aEnd_))
+//    , nM_(std::move(rawData.nM_))
+//    , nMM_(std::move(rawData.nMM_))
+//    , mapQV_(std::move(rawData.mapQV_))
+//{
+//    const size_t numElements = rawData.revStrand_.size();
+//    reverseStrand_.reserve(numElements/2);
+//    forwardStrand_.reserve(numElements/2);
+//    for (size_t i = 0; i < numElements; ++i) {
+//        if (rawData.revStrand_.at(i) == 0)
+//            forwardStrand_.push_back(i);
+//        else
+//            reverseStrand_.push_back(i);
+//    }
+//}
 
 // ----------------------------------
 // BarcodeLookupData implementation
 // ----------------------------------
 
-BarcodeLookupData::BarcodeLookupData(void)
-    : PerReadLookupBase()
-{ }
+BarcodeLookupData::BarcodeLookupData(void) { }
 
 BarcodeLookupData::BarcodeLookupData(const PbiRawBarcodeData& rawData)
-    : PerReadLookupBase()
-    , bcLeft_(MakeLookupMap(rawData.bcLeft_))
-    , bcRight_(MakeLookupMap(rawData.bcRight_))
-    , bcQual_(MakeLookupMap(rawData.bcQual_))
-    , ctxtFlag_(MakeLookupMap(rawData.ctxtFlag_))
+    : bcLeft_(rawData.bcLeft_)
+    , bcRight_(rawData.bcRight_)
+    , bcQual_(rawData.bcQual_)
+    , ctxtFlag_(rawData.ctxtFlag_)
 {  }
 
-BarcodeLookupData::BarcodeLookupData(PbiRawBarcodeData&& rawData)
-    : PerReadLookupBase()
-    , bcLeft_(MakeLookupMap(std::move(rawData.bcLeft_)))
-    , bcRight_(MakeLookupMap(std::move(rawData.bcRight_)))
-    , bcQual_(MakeLookupMap(std::move(rawData.bcQual_)))
-    , ctxtFlag_(MakeLookupMap(std::move(rawData.ctxtFlag_)))
-{ }
+//BarcodeLookupData::BarcodeLookupData(PbiRawBarcodeData&& rawData)
+//    : bcLeft_(std::move(rawData.bcLeft_))
+//    , bcRight_(std::move(rawData.bcRight_))
+//    , bcQual_(std::move(rawData.bcQual_))
+//    , ctxtFlag_(std::move(rawData.ctxtFlag_))
+//{ }
 
 // ----------------------------------
 // ReferenceLookupData implementation
 // ----------------------------------
 
-ReferenceLookupData::ReferenceLookupData(void)
-    : LookupBase()
-{ }
+ReferenceLookupData::ReferenceLookupData(void) { }
 
 ReferenceLookupData::ReferenceLookupData(const PbiRawReferenceData& rawData)
-    : LookupBase()
 {
     const size_t numEntries = rawData.entries_.size();
     references_.reserve(numEntries);
@@ -195,36 +196,45 @@ ReferenceLookupData::ReferenceLookupData(const PbiRawReferenceData& rawData)
     }
 }
 
-ReferenceLookupData::ReferenceLookupData(PbiRawReferenceData&& rawData)
-    : LookupBase()
-{
-    const size_t numEntries = rawData.entries_.size();
-    references_.reserve(numEntries);
-    for (size_t i = 0; i < numEntries; ++i) {
-        const PbiReferenceEntry& entry = rawData.entries_.at(i);
-        references_[entry.tId_] = IndexRange(entry.beginRow_, entry.endRow_);
-    }
-}
+//ReferenceLookupData::ReferenceLookupData(PbiRawReferenceData&& rawData)
+//{
+//    const size_t numEntries = rawData.entries_.size();
+//    references_.reserve(numEntries);
+//    for (size_t i = 0; i < numEntries; ++i) {
+//        const PbiReferenceEntry& entry = rawData.entries_.at(i);
+//        references_[entry.tId_] = IndexRange(entry.beginRow_, entry.endRow_);
+//    }
+//}
 
 // --------------------------------
 // PbiIndexPrivate implementation
 // --------------------------------
 
 PbiIndexPrivate::PbiIndexPrivate(void)
-{
-
-}
+    : version_(PbiFile::CurrentVersion)
+    , sections_(PbiFile::SUBREAD)
+    , numReads_(0)
+{ }
 
 PbiIndexPrivate::PbiIndexPrivate(const PbiRawData& rawIndex)
-{
-
-}
+    : version_(rawIndex.Version())
+    , sections_(rawIndex.FileSections())
+    , numReads_(rawIndex.NumReads())
+    , subreadData_(rawIndex.SubreadData())
+    , mappedData_(rawIndex.MappedData())
+    , referenceData_(rawIndex.ReferenceData())
+    , barcodeData_(rawIndex.BarcodeData())
+{ }
 
 PbiIndexPrivate::PbiIndexPrivate(PbiRawData&& rawIndex)
-{
-
-}
-
+    : version_(std::move(rawIndex.Version()))
+    , sections_(std::move(rawIndex.FileSections()))
+    , numReads_(std::move(rawIndex.NumReads()))
+    , subreadData_(std::move(rawIndex.SubreadData()))
+    , mappedData_(std::move(rawIndex.MappedData()))
+    , referenceData_(std::move(rawIndex.ReferenceData()))
+    , barcodeData_(std::move(rawIndex.BarcodeData()))
+{ }
 
 unique_ptr<PbiIndexPrivate> PbiIndexPrivate::DeepCopy(void) const
 {
@@ -243,15 +253,13 @@ unique_ptr<PbiIndexPrivate> PbiIndexPrivate::DeepCopy(void) const
 // PbiIndex implementation
 // -------------------------
 
-PbiIndex::PbiIndex(const string& pbiFilename)
-    : d_(nullptr)
-{
-    // load raw data from PbiIndexIO
-    // update cache
+PbiIndex::PbiIndex(void)
+    : d_(new PbiIndexPrivate)
+{ }
 
-    // not yet implemented
-    throw std::exception();
-}
+PbiIndex::PbiIndex(const string& pbiFilename)
+    : d_(new PbiIndexPrivate(PbiRawData(pbiFilename)))
+{ }
 
 PbiIndex::PbiIndex(const PbiIndex& other)
     : d_(std::move(other.d_->DeepCopy()))
@@ -298,3 +306,6 @@ uint32_t PbiIndex::NumReads(void) const
 
 PbiFile::VersionEnum PbiIndex::Version(void) const
 { return d_->version_; }
+
+const vector<int64_t>& PbiIndex::VirtualFileOffsets(void) const
+{ return d_->subreadData_.fileOffset_; }

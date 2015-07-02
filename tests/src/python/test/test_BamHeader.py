@@ -61,7 +61,7 @@ class BamHeaderTest(unittest.TestCase):
         self.assertEqual(0, len(header.Programs()))
         self.assertEqual(0, len(header.Comments()))
         
-        with self.assertRaises(SystemError):
+        with self.assertRaises(RuntimeError):
             pg = header.Program("foo")
             rg = header.ReadGroup("foo")
             sq = header.SequenceId("foo")

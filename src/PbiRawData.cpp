@@ -39,6 +39,7 @@
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
 #include "PbiIndexIO.h"
+#include <cassert>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -104,11 +105,9 @@ bool PbiRawBarcodeData::AddRecord(const BamRecord& b)
     bcLeft_.push_back(bcValue[0]);
     bcRight_.push_back(bcValue[1]);
 
-    const uint8_t bqValue  = impl.TagValue("bq").ToUInt8();
-    bcQual_.push_back(bqValue);
+    bcQual_.push_back(impl.TagValue("bq").ToUInt8());
+    ctxtFlag_.push_back(impl.TagValue("cx").ToUInt8());
 
-    const uint8_t cxValue  = impl.TagValue("cx").ToUInt8();
-    ctxtFlag_.push_back(cxValue);
     return true;
 }
 
@@ -219,6 +218,7 @@ bool PbiRawMappedData::AddRecord(const BamRecord& b)
     }
     nM_.push_back(nM);
     nMM_.push_back(nMM);
+
     return true;
 }
 // ------------------------------------
@@ -355,6 +355,7 @@ PbiRawSubreadData& PbiRawSubreadData::operator=(PbiRawSubreadData&& other)
 
 void PbiRawSubreadData::AddRecord(const BamRecord& b, int64_t offset)
 {
+
     string rgId = b.ReadGroupId();
     if (rgId.empty()) {
         // calculate
@@ -363,10 +364,22 @@ void PbiRawSubreadData::AddRecord(const BamRecord& b, int64_t offset)
     const int32_t id = static_cast<int32_t>(rawid);
 
     rgId_.push_back(id);
-    qStart_.push_back(b.QueryStart());
-    qEnd_.push_back(b.QueryEnd());
-    holeNumber_.push_back(b.HoleNumber());
-    readQual_.push_back(static_cast<uint16_t>(b.ReadAccuracy()));
+
+    const BamRecordImpl& impl = b.Impl();
+
+    qStart_.push_back(impl.TagValue("qs").ToInt32());
+    qEnd_.push_back(impl.TagValue("qe").ToInt32());
+
+    if (b.HasHoleNumber())
+        holeNumber_.push_back(impl.TagValue("zm").ToInt32());
+    else
+        holeNumber_.push_back(0); // TODO: what to do?
+
+    if (b.HasReadAccuracy())
+        readQual_.push_back(impl.TagValue("rq").ToUInt16());
+    else
+        readQual_.push_back(0); // TODO: what to do?
+
     fileOffset_.push_back(offset);
 }
 

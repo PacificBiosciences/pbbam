@@ -8,6 +8,7 @@ set(PythonTestRootDir ${PacBioBAM_TestsDir}/src/python)
 # create wrapper
 file(MAKE_DIRECTORY ${PacBioBAM_PythonLibDir})
 set(CMAKE_SWIG_OUTDIR ${PacBioBAM_PythonLibDir})  # put PacBioBam.py in lib/python
+
 swig_add_module(PacBioBam python PacBioBam.i)
 swig_link_libraries(PacBioBam ${PacBioBAM_LIBRARIES} ${PYTHON_LIBRARIES})
 set_target_properties(

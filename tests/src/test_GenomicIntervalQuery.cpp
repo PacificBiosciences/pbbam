@@ -96,9 +96,9 @@ TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
     interval.Name("does not exist");
     interval.Start(0);
     interval.Stop(100);
-//    EXPECT_THROW(
+    EXPECT_THROW(
         query.Interval(interval);
-//    , std::exception);
+    , std::exception);
     for (const BamRecord& record : query) {    // iteration is still safe, just returns no data
         (void)record;
         ++count;

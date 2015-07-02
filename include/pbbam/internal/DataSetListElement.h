@@ -46,7 +46,7 @@ namespace BAM {
 namespace internal {
 
 //
-// adds operator[](int) & iterators for convenience
+// adds iterators for convenience
 //
 template<class T> class DataSetListElement;
 
@@ -93,7 +93,6 @@ class DataSetListElement : public DataSetElement
 {
 public:
     DataSetListElement(const std::string& label);
-    using DataSetElement::DataSetElement;
 
 // child access through index
 public:

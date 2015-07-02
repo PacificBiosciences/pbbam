@@ -1,5 +1,7 @@
 /* Cigar.i */
+
 %module PacBioBam
+
 %{
 #include <pbbam/Cigar.h>
 using namespace PacBio;

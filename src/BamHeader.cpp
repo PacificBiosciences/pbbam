@@ -144,7 +144,7 @@ BamHeader& BamHeader::operator=(const BamHeader& other)
 { d_ = other.d_; return *this; }
 
 BamHeader& BamHeader::operator=(BamHeader&& other)
-{  d_ = std::move(other.d_); return *this; }
+{ d_ = std::move(other.d_); return *this; }
 
 BamHeader::~BamHeader(void) { }
 
@@ -186,6 +186,21 @@ std::vector<std::string> BamHeader::Comments(void) const
 BamHeader& BamHeader::Comments(const std::vector<std::string>& comments)
 { d_->comments_ = comments; return *this; }
 
+BamHeader BamHeader::DeepCopy(void) const
+{
+    BamHeader result;
+    result.d_->version_ = d_->version_;
+    result.d_->pacbioBamVersion_ = d_->pacbioBamVersion_;
+    result.d_->sortOrder_ = d_->sortOrder_;
+    result.d_->headerLineCustom_ = d_->headerLineCustom_;
+    result.d_->readGroups_ = d_->readGroups_;
+    result.d_->programs_ = d_->programs_;
+    result.d_->comments_ = d_->comments_;
+    result.d_->sequences_ = d_->sequences_;
+    result.d_->sequenceIdLookup_ = d_->sequenceIdLookup_;
+    return result;
+}
+
 bool BamHeader::HasProgram(const std::string& id) const
 { return d_->programs_.find(id) != d_->programs_.cend(); }
 
@@ -205,7 +220,7 @@ ProgramInfo BamHeader::Program(const std::string& id) const
 {
     const auto iter = d_->programs_.find(id);
     if (iter == d_->programs_.cend())
-        throw std::exception();
+        throw std::runtime_error("program ID not found");
     return iter->second;
 }
 
@@ -243,7 +258,7 @@ ReadGroupInfo BamHeader::ReadGroup(const std::string& id) const
 {
     const auto iter = d_->readGroups_.find(id);
     if (iter == d_->readGroups_.cend())
-        throw std::exception();
+        throw std::runtime_error("read group ID not found");
     return iter->second;
 }
 
@@ -297,7 +312,7 @@ int32_t BamHeader::SequenceId(const std::string& name) const
 {
     const auto iter = d_->sequenceIdLookup_.find(name);
     if (iter == d_->sequenceIdLookup_.cend())
-        throw std::exception();
+        throw std::runtime_error("sequence not found");
     return iter->second;
 }
 

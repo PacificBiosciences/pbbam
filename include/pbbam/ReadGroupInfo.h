@@ -195,7 +195,6 @@ public:
 
     ReadGroupInfo& SequencingKit(const std::string& kitNumber);
 
-
     /// \}
 
 private:

@@ -46,11 +46,11 @@ namespace BAM {
 
 class BamFile;
 
-struct PBBAM_EXPORT PbiFile
+// class-like namespace
+namespace PbiFile
 {
-public:
 
-    /// \name PBI File Sections
+    /// PBI File Sections
     ///
     /// See (spec/doc links) for more details.
     ///
@@ -65,8 +65,7 @@ public:
     };
     typedef uint16_t Sections;
 
-    /// \name PBI File Version
-    ///
+    /// PBI File Version
     enum VersionEnum
     {
         Version_3_0_0 = 0x030000
@@ -74,17 +73,15 @@ public:
       , CurrentVersion = Version_3_0_0
     };
 
-public:
-
     /// Builds PBI index data from the supplied ".bam" file and writes a ".pbi" file.
     ///
     /// \param[in] bamFile The source BamFile.
     ///
     /// \throws std::exception if index file could not be created
     ///
-    static void CreateFrom(const BamFile& bamFile);
-};
+    PBBAM_EXPORT void CreateFrom(const BamFile& bamFile);
 
+} // namespace PbiFile
 } // namespace BAM
 } // namespace PacBio
 

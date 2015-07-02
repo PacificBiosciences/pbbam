@@ -1,5 +1,7 @@
 /* Strand.i */
+
 %module PacBioBam
+
 %{
 #include <pbbam/Strand.h>	
 using namespace PacBio;

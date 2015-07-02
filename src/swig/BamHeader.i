@@ -1,4 +1,5 @@
 /* BamHeader.i */
+
 %module PacBioBam
 
 %{
@@ -6,7 +7,6 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 %}
-
 
 // Hide warnings about "internal" being a C# reserved word
 %warnfilter(314) PacBio::BAM::internal;

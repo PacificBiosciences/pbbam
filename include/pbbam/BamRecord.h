@@ -204,6 +204,7 @@ public:
     BamHeader Header(void) const;
 
     /// \returns ZMW hole number
+    /// \throws if missing zm tag & record name does not contain hole number
     int32_t HoleNumber(void) const;
 
     /// \returns true if this record was mapped by aligner
@@ -224,12 +225,12 @@ public:
 
     /// \note QueryStart is in polymerase read coordinates, NOT genomic coordinates.
     ///
-    /// \returns the record's query start position
+    /// \returns the record's query start position, or 0 if not stored
     Position QueryStart(void) const;
 
     /// \note QueryEnd is in polymerase read coordinates, NOT genomic coordinates.
     ///
-    /// \returns the record's query end position
+    /// \returns the record's query end position, or Sequence().length() if not stored
     Position QueryEnd(void) const;
 
     /// \returns the left and right barcode ids
@@ -263,11 +264,11 @@ public:
     /// \returns the record's reference end position, or UnmappedPosition if unmapped
     Position ReferenceEnd(void) const;
 
-    /// \returns this record's average signal-to-noise for each of A, C, G, and T
-    std::vector<float> SignalToNoise(void) const;
-
     /// \returns this scrap record's ScrapType
     VirtualRegionType ScrapType(void) const;
+
+    /// \returns this record's average signal-to-noise for each of A, C, G, and T
+    std::vector<float> SignalToNoise(void) const;
 
     /// \returns this record's type
     /// \sa RecordType
@@ -294,20 +295,20 @@ public:
                                      bool aligned = false,
                                      bool exciseSoftClips = false) const;
 
-    /// \brief Fetch this record's LabelQV values ("lq" tag).
+    /// \brief Fetch this record's AltLabelTag values ("at" tag).
     ///
     /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
-    ///       QVs will have a value of 0.
+    ///       gap chars will be '-' and padding chars will be '*'.
     ///
     /// \param[in] orientation     Orientation of output.
     /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
     /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
     ///
-    /// \returns LabelQV as QualityValues object
+    /// \returns AltLabelTags string
     ///
-    QualityValues LabelQV(Orientation orientation = Orientation::NATIVE,
-                          bool aligned = false,
-                          bool exciseSoftClips = false) const;
+    std::string AltLabelTag(Orientation orientation = Orientation::NATIVE,
+                            bool aligned = false,
+                            bool exciseSoftClips = false) const;
 
     /// \brief Fetch this record's DeletionQV values ("dq" tag).
     ///
@@ -354,22 +355,6 @@ public:
                               bool aligned = false,
                               bool exciseSoftClips = false) const;
 
-    /// \brief Fetch this record's Pkmean values ("pa" tag).
-    ///
-    /// \param[in] orientation     Orientation of output.
-    /// 
-    /// \returns Pkmean as vector<float> object
-    ///
-    std::vector<float> Pkmean(Orientation orientation = Orientation::NATIVE) const;
-
-    /// \brief Fetch this record's Pkmid values ("pm" tag).
-    ///
-    /// \param[in] orientation     Orientation of output.
-    ///
-    /// \returns Pkmid as vector<float> object
-    ///
-    std::vector<float> Pkmid(Orientation orientation = Orientation::NATIVE) const;
-
     /// \brief Fetch this record's IPD values ("ip" tag).
     ///
     /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
@@ -393,27 +378,35 @@ public:
     ///
     Frames IPDRaw(Orientation orientation = Orientation::NATIVE) const;
 
-    /// \brief Fetch this record's PrePulseFrames values ("pd" tag).
+    /// \brief Fetch this record's LabelQV values ("lq" tag).
     ///
     /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
-    ///       frames will have a value of 0;
+    ///       QVs will have a value of 0.
     ///
     /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
     ///
-    /// \returns PrePulseFrames as Frames object
+    /// \returns LabelQV as QualityValues object
     ///
-    Frames PrePulseFrames(Orientation orientation = Orientation::NATIVE) const;
+    QualityValues LabelQV(Orientation orientation = Orientation::NATIVE,
+                          bool aligned = false,
+                          bool exciseSoftClips = false) const;
 
-    /// \brief Fetch this record's PulseCallWidth values ("px" tag).
+    /// \brief Fetch this record's LabelTag values ("lt" tag).
     ///
     /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
-    ///       frames will have a value of 0;
+    ///       gap chars will be '-' and padding chars will be '*'.
     ///
     /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
     ///
-    /// \returns PulseCallWidth as Frames object
+    /// \returns LabelTags string
     ///
-    Frames PulseCallWidth(Orientation orientation = Orientation::NATIVE) const;
+    std::string LabelTag(Orientation orientation = Orientation::NATIVE,
+                         bool aligned = false,
+                         bool exciseSoftClips = false) const;
 
     /// \brief Fetch this record's MergeQV values ("mq" tag).
     ///
@@ -429,6 +422,52 @@ public:
     QualityValues MergeQV(Orientation orientation = Orientation::NATIVE,
                           bool aligned = false,
                           bool exciseSoftClips = false) const;
+
+    /// \brief Fetch this record's Pkmean values ("pa" tag).
+    ///
+    /// \param[in] orientation     Orientation of output.
+    ///
+    /// \returns Pkmean as vector<float> object
+    ///
+    std::vector<float> Pkmean(Orientation orientation = Orientation::NATIVE) const;
+
+    /// \brief Fetch this record's Pkmid values ("pm" tag).
+    ///
+    /// \param[in] orientation     Orientation of output.
+    ///
+    /// \returns Pkmid as vector<float> object
+    ///
+    std::vector<float> Pkmid(Orientation orientation = Orientation::NATIVE) const;
+
+    /// \brief Fetch this record's PrePulseFrames values ("pd" tag).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       frames will have a value of 0;
+    ///
+    /// \param[in] orientation     Orientation of output.
+    ///
+    /// \returns PrePulseFrames as Frames object
+    ///
+    Frames PrePulseFrames(Orientation orientation = Orientation::NATIVE) const;
+
+    /// \brief Fetch this record's PulseCall values ("pc" tag).
+    ///
+    /// \param[in] orientation     Orientation of output.
+    ///
+    /// \returns PulseCalls string
+    ///
+    std::string PulseCall(Orientation orientation = Orientation::NATIVE) const;
+
+    /// \brief Fetch this record's PulseCallWidth values ("px" tag).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       frames will have a value of 0;
+    ///
+    /// \param[in] orientation     Orientation of output.
+    ///
+    /// \returns PulseCallWidth as Frames object
+    ///
+    Frames PulseCallWidth(Orientation orientation = Orientation::NATIVE) const;
 
     /// \brief Fetch this record's PulseWidth values ("pw" tag).
     ///
@@ -489,44 +528,6 @@ public:
     QualityValues SubstitutionQV(Orientation orientation = Orientation::NATIVE,
                                  bool aligned = false,
                                  bool exciseSoftClips = false) const;
-
-    /// \brief Fetch this record's LabelTag values ("lt" tag).
-    ///
-    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
-    ///       gap chars will be '-' and padding chars will be '*'.
-    ///
-    /// \param[in] orientation     Orientation of output.
-    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
-    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
-    ///
-    /// \returns LabelTags string
-    ///
-    std::string LabelTag(Orientation orientation = Orientation::NATIVE,
-                         bool aligned = false,
-                         bool exciseSoftClips = false) const;
-
-    /// \brief Fetch this record's AltLabelTag values ("at" tag).
-    ///
-    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
-    ///       gap chars will be '-' and padding chars will be '*'.
-    ///
-    /// \param[in] orientation     Orientation of output.
-    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
-    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
-    ///
-    /// \returns AltLabelTags string
-    ///
-    std::string AltLabelTag(Orientation orientation = Orientation::NATIVE,
-                            bool aligned = false,
-                            bool exciseSoftClips = false) const;
-
-    /// \brief Fetch this record's PulseCall values ("pc" tag).
-    ///
-    /// \param[in] orientation     Orientation of output.
-    ///
-    /// \returns PulseCalls string
-    ///
-    std::string PulseCall(Orientation orientation = Orientation::NATIVE) const;
 
     /// \brief Fetch this record's SubstitutionTag values ("st" tag).
     ///
@@ -656,7 +657,7 @@ public:
     ///
     /// \param[in] encoded photons
     /// \returns reference to this record
-    BamRecord& Pkmid(const std::vector<uint16_t> encodedPhotons);
+    BamRecord& Pkmid(const std::vector<uint16_t>& encodedPhotons);
 
     /// Sets this record's Pkmean values ("pm" tag).
     ///
@@ -668,7 +669,7 @@ public:
     ///
     /// \param[in] encoded photons
     /// \returns reference to this record
-    BamRecord& Pkmean(const std::vector<uint16_t> encodedPhotons);
+    BamRecord& Pkmean(const std::vector<uint16_t>& encodedPhotons);
 
     /// Sets this record's IPD values ("ip" tag).
     ///
@@ -740,7 +741,6 @@ public:
 
     /// \}
 
-
 public:
    BamRecord& QueryEnd(const PacBio::BAM::Position pos);
    BamRecord& QueryStart(const PacBio::BAM::Position pos);
@@ -749,10 +749,9 @@ public:
 
    static std::vector<uint16_t> EncodePhotons(const std::vector<float>& data);
 
-   // BamRecord& MovieName(const std::string& movie);
-
    BamRecord& ReadGroup(const ReadGroupInfo& rg);
    BamRecord& ReadGroupId(const std::string& id);
+
 //    BamRecord& ReferenceStart(const PacBio::BAM::Position pos);
 
 public:
@@ -801,8 +800,10 @@ public:
 private:
     BamRecordImpl impl_;
 
-protected:
-    BamHeader header_;
+public:
+    // public & mutable so that queries can directly set the header info,
+    // even on a record that is const from client code's perspective
+    mutable BamHeader header_;
     
 private:
     // cached positions (mutable to allow lazy-calc in const methods)
@@ -842,10 +843,9 @@ private:
     // but updates our mutable cached values
     void CalculateAlignedPositions(void) const;
 
-
-
     friend class internal::BamRecordMemory;
 };
+
 inline
 BamRecord BamRecord::Clipped(const BamRecord& input,
                              const ClipType clipType,
@@ -905,8 +905,8 @@ public:
     QualityValues AltLabelQVs(void) const
     { return record_.AltLabelQV(orientation_, aligned_, exciseSoftClips_); }
 
-    QualityValues LabelQVs(void) const
-    { return record_.LabelQV(orientation_, aligned_, exciseSoftClips_); }
+    std::string AltLabelTags(void) const
+    { return record_.AltLabelTag(orientation_, aligned_, exciseSoftClips_); }
 
     QualityValues DeletionQVs(void) const
     { return record_.DeletionQV(orientation_, aligned_, exciseSoftClips_); }
@@ -917,6 +917,18 @@ public:
     QualityValues InsertionQVs(void) const
     { return record_.InsertionQV(orientation_, aligned_, exciseSoftClips_); }
 
+    Frames IPD(void) const
+    { return record_.IPD(orientation_, aligned_, exciseSoftClips_); }
+
+    QualityValues LabelQVs(void) const
+    { return record_.LabelQV(orientation_, aligned_, exciseSoftClips_); }
+
+    std::string LabelTags(void) const
+    { return record_.LabelTag(orientation_, aligned_, exciseSoftClips_); }
+
+    QualityValues MergeQVs(void) const
+    { return record_.MergeQV(orientation_, aligned_, exciseSoftClips_); }
+
     std::vector<float> Pkmean(void) const
     { return record_.Pkmean(orientation_); }
 
@@ -926,14 +938,11 @@ public:
     Frames PrePulseFrames(void) const
     { return record_.PrePulseFrames(orientation_); }
 
+    std::string PulseCalls(void) const
+    { return record_.PulseCall(orientation_); }
+
     Frames PulseCallWidth(void) const
     { return record_.PulseCallWidth(orientation_); }
-
-    Frames IPD(void) const
-    { return record_.IPD(orientation_, aligned_, exciseSoftClips_); }
-
-    QualityValues MergeQVs(void) const
-    { return record_.MergeQV(orientation_, aligned_, exciseSoftClips_); }
 
     Frames PulseWidths(void) const
     { return record_.PulseWidth(orientation_, aligned_, exciseSoftClips_); }
@@ -946,15 +955,6 @@ public:
 
     QualityValues SubstitutionQVs(void) const
     { return record_.SubstitutionQV(orientation_, aligned_, exciseSoftClips_); }
-
-    std::string LabelTags(void) const
-    { return record_.LabelTag(orientation_, aligned_, exciseSoftClips_); }
-
-    std::string AltLabelTags(void) const
-    { return record_.AltLabelTag(orientation_, aligned_, exciseSoftClips_); }
-
-    std::string PulseCalls(void) const
-    { return record_.PulseCall(orientation_); }
 
     std::string SubstitutionTags(void) const
     { return record_.SubstitutionTag(orientation_, aligned_, exciseSoftClips_); }

@@ -58,6 +58,6 @@ class BamFileTest(unittest.TestCase):
         self.assertFalse(f.IsPacBioBAM())
         
     def test_nonExistentFile(self):
-        with self.assertRaises(SystemError):
+        with self.assertRaises(RuntimeError):
             f = PacBioBam.BamFile("non_existent_file.bam")
             

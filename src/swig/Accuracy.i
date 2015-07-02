@@ -1,5 +1,7 @@
 /* Accuracy.i */
+
 %module PacBioBam
+
 %{
 #include <pbbam/Accuracy.h>
 using namespace PacBio;

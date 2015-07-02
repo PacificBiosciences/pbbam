@@ -36,11 +36,19 @@
 // Author: Derek Barnett
 
 #include "pbbam/internal/FilterEngine.h"
-#include "pbbam/BamRecord.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
 using namespace std;
+
+namespace PacBio {
+namespace BAM {
+namespace internal {
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio
+
 
 FilterEngine::FilterEngine(void) { }
 

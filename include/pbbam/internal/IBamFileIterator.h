@@ -55,7 +55,7 @@ public:
 
 protected:
     IBamFileIteratorBase(const BamFile& file)
-        : fileData_(file)
+        : header_(file.Header().DeepCopy())
     { }
 public:
     virtual ~IBamFileIteratorBase(void) { }
@@ -66,7 +66,7 @@ public:
     { (void)lhs; (void)rhs; return true; }
 
 protected:
-    const BamFile& fileData_;
+    const BamHeader header_;
 };
 
 typedef IBamFileIteratorBase<BamRecord>               IBamFileIterator;

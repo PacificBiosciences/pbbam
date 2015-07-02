@@ -90,11 +90,11 @@ private:
 
 	std::unique_ptr<BamFile>         primaryBamFile_;
 	std::unique_ptr<BamFile>         scrapsBamFile_;
-	std::unique_ptr<EntireFileQuery> primaryQuery_;
-	std::unique_ptr<EntireFileQuery> scrapsQuery_;
+    std::unique_ptr<EntireFileQuery> primaryQuery_;
+    std::unique_ptr<EntireFileQuery> scrapsQuery_;
 
-	QueryBase::iterator              primaryIt_;
-	QueryBase::iterator              scrapsIt_;
+    EntireFileQuery::iterator              primaryIt_;
+    EntireFileQuery::iterator              scrapsIt_;
 
 	std::unique_ptr<BamHeader>       polyHeader_;
 };

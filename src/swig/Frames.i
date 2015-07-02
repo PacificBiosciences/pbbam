@@ -1,5 +1,7 @@
 /* Frames.i */
+
 %module PacBioBam
+
 %{
 #include <pbbam/Frames.h>
 using namespace PacBio;

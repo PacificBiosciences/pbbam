@@ -77,7 +77,7 @@ inline time_t FileUtils::LastModified(const char* fn)
 {
     struct stat s;
     if (stat(fn, &s) != 0)
-        throw std::exception();
+        throw std::runtime_error("could not get file timestamp");
 
 #ifdef __DARWIN_64_BIT_INO_T
     return s.st_mtimespec.tv_sec; // 64-bit OSX has a modified stat struct
@@ -93,7 +93,7 @@ inline off_t FileUtils::Size(const char* fn)
 {
     struct stat s;
     if (stat(fn, &s) != 0)
-        throw std::exception();
+        throw std::runtime_error("could not determine file size");
     return s.st_size;
 }
 

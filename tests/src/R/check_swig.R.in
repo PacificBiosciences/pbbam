@@ -37,11 +37,18 @@
 
 # load PacBioBAM lib & wrapper script
 
-lib_path <- "@PacBioBAM_RLibDir@"
-pbbam_libname <- paste(lib_path, "PacBioBam",   sep="/")
-pbbam_wrapper <- paste(lib_path, "PacBioBam.R", sep="/")
-dyn.load(paste(pbbam_libname, .Platform$dynlib.ext, sep=""))
+# htslib_libname <- "@Htslib_Libraries@"
+# dyn.load(htslib_libname)
+# # htslib_libname <- paste(htslib_libpath, "libhts", sep="/")
+# # dyn.load(paste(htslib_libname, ".dylib", sep=""))
+
+pbbam_libpath <- "@PacBioBAM_RLibDir@"
+pbbam_libname <- paste(pbbam_libpath, "PacBioBam",   sep="/")
+dyn.load(paste(pbbam_libname,  .Platform$dynlib.ext, sep=""))
+
+pbbam_wrapper <- paste(pbbam_libpath, "PacBioBam.R", sep="/")
 source(pbbam_wrapper)
+
 cacheMetaData(1)
 
 h <- BamHeader() 

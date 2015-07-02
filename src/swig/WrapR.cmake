@@ -1,4 +1,3 @@
-
 # setup
 set(R_INCLUDE_DIR_HINT /mnt/software/r/R/3.1.1/usr/share/R/include) # TODO: hard-coded hint for now, clean up later
 find_package(R REQUIRED)
@@ -19,6 +18,14 @@ if(R_LIBRARIES)
     swig_link_libraries(PacBioBam ${R_LIBRARIES})
 endif()
 
+# symlink htslib
+add_custom_target(
+    htslib_symlink
+    ALL
+    "${CMAKE_COMMAND}" -E create_symlink ${Htslib_Libraries} ${PacBioBAM_RLibDir}/libhts.1${CMAKE_SHARED_LIBRARY_SUFFIX}
+    COMMENT "Symlinking htslib for R"
+)
+
 # make sure the library is named "PacBioBam.so" explicitly
 # no "lib" prefix... that gets in the way of the name lookups between SWIG/R
 # and make sure library ends up in lib/R
@@ -26,10 +33,12 @@ set_target_properties(
     ${SWIG_MODULE_PacBioBam_REAL_NAME}
     PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${PacBioBAM_RLibDir}
+    RUNTIME_OUTPUT_DIRECTORY ${PacBioBAM_RLibDir}
     SONAME PacBioBam.so
     PREFIX ""
 )
 add_dependencies(${SWIG_MODULE_PacBioBam_REAL_NAME} pbbam-shared)
+add_dependencies(${SWIG_MODULE_PacBioBam_REAL_NAME} htslib_symlink)
 
 # simple "wrapper worked" check
 configure_file(
@@ -62,4 +71,3 @@ if(PacBioBAM_build_tests)
         WORKING_DIRECTORY ${PacBioBAM_RLibDir}
     )
 endif()
-

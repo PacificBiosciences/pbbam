@@ -46,96 +46,6 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-GenomicIntervalQuery::GenomicIntervalQuery(const GenomicInterval& interval,
-                                           const BamFile& file)
-    : QueryBase(file)
-    , htsIterator_(nullptr)
-{
-    // open file
-    htsFile_.reset(sam_open(file.Filename().c_str(), "rb"), internal::HtslibFileDeleter());
-    if (!htsFile_)
-        throw std::exception();
-
-    htsHeader_.reset(sam_hdr_read(htsFile_.get()), internal::HtslibHeaderDeleter());
-    if (!htsHeader_)
-        throw std::exception();
-
-    // open index
-    htsIndex_.reset(bam_index_load(file.Filename().c_str()), internal::HtslibIndexDeleter());
-    if (!htsIndex_)
-        throw std::exception();
-
-    // initialize interval
-    Interval(interval);
-}
-
-//GenomicIntervalQuery::GenomicIntervalQuery(const string& zeroBasedRegion,
-//                                           const BamFile& file)
-//    : QueryBase()
-//{
-//    if (InitFile(file))
-//        Interval(zeroBasedRegion);
-//}
-
-bool GenomicIntervalQuery::GetNext(BamRecord& record)
-{
-    if (htsIterator_) {
-        const int result = sam_itr_next(htsFile_.get(),
-                                        htsIterator_.get(),
-                                        internal::BamRecordMemory::GetRawData(record).get());
-
-        // success
-        if (result >= 0)
-            return true;
-
-        // normal EOF
-        else if (result == -1)
-            return false;
-
-        // error (truncated file, etc)
-        else
-            throw std::exception();
-    }
-
-    // no iterator set
-    return false;
-}
-
-GenomicInterval GenomicIntervalQuery::Interval(void) const
-{ return interval_; }
-
-GenomicIntervalQuery& GenomicIntervalQuery::Interval(const GenomicInterval& interval)
-{
-    // if file-related error, or missing data - setting a new interval
-    // can't help anything. just get out of here
-    if (!htsFile_ || !htsHeader_ || !htsIndex_) {
-        throw std::exception();
-    }
-
-    // ensure clean slate
-    htsIterator_.reset();
-
-    // lookup ID for reference name
-    if (file_.Header().HasSequence(interval.Name())) {
-        const int id = file_.ReferenceId(interval.Name());
-        if (id >= 0 && id < htsHeader_->n_targets) {
-
-            // get iterator for interval
-            htsIterator_.reset(sam_itr_queryi(htsIndex_.get(),
-                                              id,
-                                              interval.Start(),
-                                              interval.Stop()),
-                               internal::HtslibIteratorDeleter());
-        }
-    }
-
-    return *this;
-}
-
-namespace PacBio {
-namespace BAM {
-namespace staging {
-
 class GenomicIntervalIterator : public internal::IBamFileIterator
 {
 public:
@@ -147,17 +57,17 @@ public:
         // open file
         htsFile_.reset(sam_open(bamFile.Filename().c_str(), "rb"));
         if (!htsFile_)
-            throw std::exception();
+            throw std::runtime_error("could not open BAM file for reading");
 
         // load header info
         htsHeader_.reset(sam_hdr_read(htsFile_.get()));
         if (!htsHeader_)
-            throw std::exception();
+            throw std::runtime_error("could not read BAM header data");
 
         // open index
         htsIndex_.reset(bam_index_load(bamFile.Filename().c_str()));
         if (!htsIndex_)
-            throw std::exception();
+            throw std::runtime_error("could not load BAI index data");
 
         // initialize iterator
         if (bamFile.Header().HasSequence(interval_.Name())) {
@@ -170,7 +80,7 @@ public:
             }
         }
         if (!htsIterator_)
-            throw std::exception();
+            throw std::runtime_error("could not create iterator for requested region");
     }
 
 public:
@@ -181,6 +91,8 @@ public:
         const int result = sam_itr_next(htsFile_.get(),
                                         htsIterator_.get(),
                                         internal::BamRecordMemory::GetRawData(record).get());
+        record.header_ = header_;
+
         // success
         if (result >= 0)
             return true;
@@ -191,7 +103,7 @@ public:
 
         // error (truncated file, etc)
         else
-            throw std::exception();
+            throw std::runtime_error("corrupted file, may be truncated");
     }
 
 private:
@@ -226,7 +138,3 @@ GenomicIntervalQuery& GenomicIntervalQuery::Interval(const GenomicInterval& inte
 
 GenomicInterval GenomicIntervalQuery::Interval(void) const
 { return interval_; }
-
-} // namespace staging
-} // namespace BAM
-} // namespace PacBio

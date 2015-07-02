@@ -142,11 +142,11 @@ PbiRawData PbiIndexIO::Build(const BamFile& bam)
 {
     unique_ptr<samFile,internal::HtslibFileDeleter> htsFile(sam_open(bam.Filename().c_str(), "rb"));
     if (!htsFile)
-        throw std::exception();
+        throw std::runtime_error("could not open BAM file for reading");
 
     unique_ptr<bam_hdr_t, internal::HtslibHeaderDeleter> htsHeader(sam_hdr_read(htsFile.get()));
     if (!htsHeader)
-        throw std::exception();
+        throw std::runtime_error("could not read BAM header data");
 
     samFile*   fp  = htsFile.get();
     bam_hdr_t* hdr = htsHeader.get();
@@ -154,7 +154,7 @@ PbiRawData PbiIndexIO::Build(const BamFile& bam)
     BamRecord record;
     bam1_t* b = internal::BamRecordMemory::GetRawData(record).get();
     if (b == 0)
-        throw std::exception();
+        throw std::runtime_error("could not allocate BAM record");
 
     // For these optional sections: assume true, we'll mark false if that
     // data type is not present. This allows us to stop checking in during
@@ -215,11 +215,11 @@ void PbiIndexIO::Load(PbiRawData& rawData,
 {
     // open file for reading
     if (!boost::algorithm::iends_with(filename, ".pbi"))
-        throw std::exception();
+        throw std::runtime_error("unsupported file extension");
     std::unique_ptr<BGZF, HtslibBgzfDeleter> bgzf(bgzf_open(filename.c_str(), "rb"));
     BGZF* fp = bgzf.get();
     if (fp == 0)
-        throw std::exception();
+        throw std::runtime_error("could not open PBI file for reading");
 
     // load data
     LoadHeader(rawData, fp);
@@ -258,7 +258,7 @@ void PbiIndexIO::LoadHeader(PbiRawData& index,
     char magic[4];
     bytesRead = bgzf_read(fp, magic, 4);
     if (bytesRead != 4 || strncmp(magic, "PBI\1", 4))
-        throw std::exception();
+        throw std::runtime_error("expected PBI file, found unknown format instead");
 
     // version, pbi_flags, & n_reads
     uint32_t version;
@@ -366,7 +366,7 @@ void PbiIndexIO::Save(const PbiRawData& index,
     std::unique_ptr<BGZF, HtslibBgzfDeleter> bgzf(bgzf_open(filename.c_str(), "wb"));
     BGZF* fp = bgzf.get();
     if (fp == 0)
-        throw std::exception();
+        throw std::runtime_error("could not open PBI file for writing");
 
     WriteHeader(index, fp);
     const uint32_t numReads = index.NumReads();

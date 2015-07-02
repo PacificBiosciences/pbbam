@@ -45,6 +45,8 @@
 #include <string>
 #include <vector>
 
+#include <climits>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
@@ -70,64 +72,6 @@ TEST(StringUtilsTest, SplitKeepsEmptyTokens)
     EXPECT_TRUE(tokens.at(2) == "");
     EXPECT_TRUE(tokens.at(3) == "baz");
 }
-
-/*
-TEST(StringUtilsTest, Int2String)
-{
-    const int zero     = 0;
-    const int one      = 1;
-    const int negative = -42;
-    const int large    = INT32_MAX;
-
-    const string zeroString     = "0";
-    const string oneString      = "1";
-    const string negativeString = "-42";
-    const string largeString    = "2147483647";
-
-    EXPECT_NO_THROW(
-    {
-        EXPECT_EQ(zeroString,     internal::Int2String(zero));
-        EXPECT_EQ(oneString,      internal::Int2String(one));
-        EXPECT_EQ(negativeString, internal::Int2String(negative));
-        EXPECT_EQ(largeString,    internal::Int2String(large));
-    });
-}
-
-
-TEST(StringUtilsTest, String2Int)
-{
-    const string zeroString     = "0";
-    const string oneString      = "1";
-    const string negativeString = "-42";
-    const string maxString      = "2147483647";
-    const string minString      = "-2147483648";
-
-    const string overflowString   = "2147483648";
-    const string underflowString  = "-2147483649";
-    const string floatNumString   = "3.14";
-    const string notANumberString = "foo";
-
-    const int zero     = 0;
-    const int one      = 1;
-    const int negative = -42;
-    const int min      = INT32_MIN;
-    const int max      = INT32_MAX;
-
-    EXPECT_NO_THROW(
-    {
-        EXPECT_EQ(zero,     internal::String2Int(zeroString));
-        EXPECT_EQ(one,      internal::String2Int(oneString));
-        EXPECT_EQ(negative, internal::String2Int(negativeString));
-        EXPECT_EQ(min,      internal::String2Int(minString));
-        EXPECT_EQ(max,      internal::String2Int(maxString));
-    });
-
-    EXPECT_THROW(internal::String2Int(overflowString),   std::exception);
-    EXPECT_THROW(internal::String2Int(underflowString),  std::exception);
-    EXPECT_THROW(internal::String2Int(floatNumString),   std::exception);
-    EXPECT_THROW(internal::String2Int(notANumberString), std::exception);
-}
-*/
 
 TEST(SequenceUtilsTest, ComplementChar)
 {

@@ -40,7 +40,7 @@
 
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
-#include "pbbam/dataset/DataSet.h"
+#include "pbbam/DataSet.h"
 #include "pbbam/internal/FilterEngine.h"
 #include "pbbam/internal/IBamFileIterator.h"
 #include "pbbam/internal/IMergeStrategy.h"
@@ -130,7 +130,10 @@ template<typename T>
 class QueryBase {
 
 public:
-    using FileIterPtr = typename IBamFileIteratorBase<T>::Ptr;
+    typedef QueryIterator<T>      iterator;
+    typedef QueryConstIterator<T> const_iterator;
+
+    typedef typename IBamFileIteratorBase<T>::Ptr FileIterPtr;
 
 protected:
     QueryBase(const DataSet& dataset);
@@ -149,15 +152,15 @@ public:
     bool GetNext(T& r);
 
     std::vector<BamFile> GetBamFiles(void) const
-    { return dataset_.BamFiles(); }
+    { return dataset_.ExternalResources().BamFiles(); }
 
 public:
     std::vector<FileIterPtr> CreateIterators(void)
     {
-        const std::vector<BamFile>& bamFiles = dataset_.BamFiles();
+        const std::vector<BamFile>& bamFiles = dataset_.ExternalResources().BamFiles();
         std::vector<FileIterPtr> result;
         result.reserve(bamFiles.size());
-        for ( const BamFile& bamFile : bamFiles)
+        for (const BamFile& bamFile : bamFiles)
             result.push_back(CreateIterator(bamFile));
         return result;
     }
@@ -166,7 +169,7 @@ protected:
     virtual FileIterPtr CreateIterator(const BamFile& bamFile) = 0;
 
 protected:
-    DataSet dataset_;
+    const DataSet dataset_;
     std::unique_ptr<IMergeStrategyBase<T> > mergeStrategy_;
     FilterEngine filterEngine_;
 };

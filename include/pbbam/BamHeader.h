@@ -65,6 +65,8 @@ public:
     BamHeader& operator=(BamHeader&& other);
     ~BamHeader(void);
 
+    BamHeader DeepCopy(void) const;
+
     /// \}
 
 public:

@@ -40,6 +40,7 @@
 
 #ifndef _GROUP_QUERY_BASE_H_
 #define _GROUP_QUERY_BASE_H_
+
 #include "pbbam/QueryBase.h"
 #include "pbbam/BamRecord.h"
 #include <memory>

@@ -36,20 +36,26 @@
 // Author: Derek Barnett
 
 #include "TestData.h"
+#include <boost/any.hpp>
 #include <gtest/gtest.h>
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/GenomicIntervalQuery.h>
-#include <pbbam/dataset/DataSet.h>
+#include <pbbam/ZmwQuery.h>
+#include <pbbam/ZmwGroupQuery.h>
+#include <pbbam/DataSet.h>
 #include <string>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-const string ex2BamFn    = tests::Data_Dir + "/ex2.bam";
-const string group_fofn  = tests::Data_Dir + "/test_group_query/group.fofn";
-const string group_file1 = tests::Data_Dir + "/test_group_query/test1.bam";
-const string group_file2 = tests::Data_Dir + "/test_group_query/test2.bam";
-const string group_file3 = tests::Data_Dir + "/test_group_query/test3.bam";
+const string ex2BamFn     = tests::Data_Dir + "/ex2.bam";
+const string bamMappingFn = tests::Data_Dir + "/dataset/bam_mapping.bam";
+const string bamMappingFn_1 = tests::Data_Dir + "/dataset/bam_mapping_1.bam";
+const string bamMappingFn_2 = tests::Data_Dir + "/dataset/bam_mapping_2.bam";
+const string group_fofn   = tests::Data_Dir + "/test_group_query/group.fofn";
+const string group_file1  = tests::Data_Dir + "/test_group_query/test1.bam";
+const string group_file2  = tests::Data_Dir + "/test_group_query/test2.bam";
+const string group_file3  = tests::Data_Dir + "/test_group_query/test3.bam";
 
 const vector<string> group_file1_names =
 {
@@ -99,10 +105,10 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
         BamFile bamFile(ex2BamFn);
 
         DataSet dataset;
-        dataset.AddExternalDataReference(bamFile);
+        dataset.ExternalResources().Add(bamFile);
 
         int count =0;
-        staging::EntireFileQuery query(dataset);
+        EntireFileQuery query(dataset); // from DataSet object
         for (const BamRecord& record : query) {
             (void)record;
             ++count;
@@ -110,7 +116,7 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
         EXPECT_EQ(3307, count);
 
         count = 0;
-        staging::EntireFileQuery query2(ex2BamFn);
+        EntireFileQuery query2(ex2BamFn); // from BAM filename
         for (const BamRecord& record : query2) {
             (void)record;
             ++count;
@@ -118,7 +124,7 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
         EXPECT_EQ(3307, count);
 
         count = 0;
-        staging::EntireFileQuery query3(bamFile);
+        EntireFileQuery query3(bamFile); // from BamFile object
         for (const BamRecord& record : query3) {
             (void)record;
             ++count;
@@ -132,11 +138,11 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
         BamFile bamFile(ex2BamFn);
 
         DataSet dataset;
-        dataset.AddExternalDataReference(bamFile);
-        dataset.AddExternalDataReference(bamFile);
+        dataset.ExternalResources().Add(bamFile);
+        dataset.ExternalResources().Add(bamFile);
 
         int count =0;
-        staging::EntireFileQuery query(dataset);
+        EntireFileQuery query(dataset);
         for (const BamRecord& record : query) {
             (void)record;
             ++count;
@@ -152,12 +158,12 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
         BamFile file3(group_file3); // 13 reads
 
         DataSet dataset;
-        dataset.AddExternalDataReference(file1);
-        dataset.AddExternalDataReference(file2);
-        dataset.AddExternalDataReference(file3);
+        dataset.ExternalResources().Add(file1);
+        dataset.ExternalResources().Add(file2);
+        dataset.ExternalResources().Add(file3);
 
         int count = 0;
-        staging::EntireFileQuery query(dataset);
+        EntireFileQuery query(dataset);
         for (const BamRecord& record : query) {
 
             // ensure sequential merge of files
@@ -176,7 +182,7 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
         int count = 0;
 
         DataSet dataset(group_fofn);
-        staging::EntireFileQuery query(dataset);
+        EntireFileQuery query(dataset);
         for (const BamRecord& record : query) {
 
             // ensure sequential merge of files
@@ -195,15 +201,12 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
     // single file
     EXPECT_NO_THROW(
     {
-        BamFile bamFile(ex2BamFn);
-
-        DataSet dataset;
-        dataset.AddExternalDataReference(bamFile);
+        DataSet dataset(ex2BamFn); // from BAM filename
 
         // count records
         int count = 0;
         GenomicInterval interval("seq1", 0, 100);
-        staging::GenomicIntervalQuery query(interval, dataset);
+        GenomicIntervalQuery query(interval, dataset);
         for (const BamRecord& record : query) {
             (void)record;
             ++count;
@@ -266,8 +269,8 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         BamFile bamFile(ex2BamFn);
 
         DataSet dataset;
-        dataset.AddExternalDataReference(bamFile);
-        dataset.AddExternalDataReference(bamFile);
+        dataset.ExternalResources().Add(bamFile);
+        dataset.ExternalResources().Add(bamFile);
 
         // count records & also ensure sorted merge
         int count = 0;
@@ -275,7 +278,7 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         int prevPos = 0;
 
         GenomicInterval interval("seq1", 0, 100);
-        staging::GenomicIntervalQuery query(interval, dataset);
+        GenomicIntervalQuery query(interval, dataset);
         for (const BamRecord& record : query) {
 
             EXPECT_TRUE(record.ReferenceId()   >= prevId);
@@ -347,14 +350,85 @@ TEST(DataSetQueryTest, QNameQueryTest)
     EXPECT_TRUE(true);
 }
 
-// TODO: implement once PBI in place
 TEST(DataSetQueryTest, ZmwQueryTest)
 {
-    EXPECT_TRUE(true);
+    const std::vector<int32_t> whitelist = { 13473, 38025 };
+
+    // single file
+    EXPECT_NO_THROW(
+    {
+        BamFile bamFile(bamMappingFn);
+        bamFile.EnsurePacBioIndexExists();
+        DataSet dataset(bamFile);
+
+        int count = 0;
+        ZmwQuery query(whitelist, dataset);
+        for (const BamRecord& record: query) {
+            const int32_t holeNumber = record.HoleNumber();
+            EXPECT_TRUE(holeNumber == 13473 || holeNumber == 38025);
+            ++count;
+        }
+        EXPECT_EQ(5, count);
+    });
+
+    // multi-file
 }
 
-// TODO: implement once PBI in place
 TEST(DataSetQueryTest, ZmwGroupQueryTest)
 {
-    EXPECT_TRUE(true);
+    const std::vector<int32_t> whitelist = { 13473, 38025 };
+
+    // single-file
+    EXPECT_NO_THROW(
+    {
+        BamFile bamFile(bamMappingFn);
+        bamFile.EnsurePacBioIndexExists();
+        DataSet dataset(bamFile);
+
+        int count = 0;
+        int32_t groupZmw = -1;
+        ZmwGroupQuery query(whitelist, dataset);
+        for (const vector<BamRecord>& group : query)  {
+            for (const BamRecord& record: group) {
+                if (groupZmw == -1)
+                    groupZmw = record.HoleNumber();
+                EXPECT_EQ(groupZmw, record.HoleNumber());
+                ++count;
+            }
+            groupZmw = -1;
+        }
+        EXPECT_EQ(5, count);
+    });
+
+    // multi-file
+    EXPECT_NO_THROW(
+    {
+        BamFile bamFile(bamMappingFn);
+        bamFile.EnsurePacBioIndexExists();
+
+        BamFile bamFile_1(bamMappingFn_1);
+        bamFile_1.EnsurePacBioIndexExists();
+
+        BamFile bamFile_2(bamMappingFn_2);
+        bamFile_2.EnsurePacBioIndexExists();
+
+        DataSet dataset;
+        dataset.ExternalResources().Add(ExternalResource(bamFile));
+        dataset.ExternalResources().Add(ExternalResource(bamFile_1));
+        dataset.ExternalResources().Add(ExternalResource(bamFile_2));
+
+        int count = 0;
+        int32_t groupZmw = -1;
+        ZmwGroupQuery query(whitelist, dataset);
+        for (const vector<BamRecord>& group : query)  {
+            for (const BamRecord& record: group) {
+                if (groupZmw == -1)
+                    groupZmw = record.HoleNumber();
+                EXPECT_EQ(groupZmw, record.HoleNumber());
+                ++count;
+            }
+            groupZmw = -1;
+        }
+        EXPECT_EQ(15, count);
+    });
 }

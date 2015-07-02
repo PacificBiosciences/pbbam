@@ -1,5 +1,7 @@
 /* GenomicInterval.i */
+
 %module PacBioBam
+
 %{
 #include <pbbam/GenomicInterval.h>
 using namespace PacBio;

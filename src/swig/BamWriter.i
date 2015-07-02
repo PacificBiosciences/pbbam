@@ -1,5 +1,7 @@
 /* BamWriter.i */
+
 %module PacBioBam
+
 %{
 #include <pbbam/BamWriter.h>
 using namespace PacBio;

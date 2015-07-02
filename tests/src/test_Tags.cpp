@@ -558,7 +558,7 @@ TEST(TagTest, Type_FloatArray)
     EXPECT_EQ(v, v2);
 }
 
-TEST(TagTest, CastingOk)
+TEST(TagTest, CastBackToOriginalOk)
 {
     int8_t   i8   = 0;
     uint8_t  u8   = 0;
@@ -609,52 +609,178 @@ TEST(TagTest, CastingOk)
         u32_array = u32_array_Tag.ToUInt32Array();
         float_array = float_array_Tag.ToFloatArray();
     });
-
-    bool boostConvert;
-
-    boostConvert = boost::is_convertible<int8_t, int8_t>::value;   EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<int8_t, uint8_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<int8_t, int16_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<int8_t, uint16_t>::value; EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<int8_t, int32_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<int8_t, uint32_t>::value; EXPECT_TRUE(boostConvert);
-
-    boostConvert = boost::is_convertible<uint8_t, int8_t>::value;   EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<uint8_t, uint8_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<uint8_t, int16_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<uint8_t, uint16_t>::value; EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<uint8_t, int32_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<uint8_t, uint32_t>::value; EXPECT_TRUE(boostConvert);
-
-    boostConvert = boost::is_convertible<int16_t, int8_t>::value;   EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<int16_t, uint8_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<int16_t, int16_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<int16_t, uint16_t>::value; EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<int16_t, int32_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<int16_t, uint32_t>::value; EXPECT_TRUE(boostConvert);
-
-    boostConvert = boost::is_convertible<uint16_t, int8_t>::value;   EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<uint16_t, uint8_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<uint16_t, int16_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<uint16_t, uint16_t>::value; EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<uint16_t, int32_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<uint16_t, uint32_t>::value; EXPECT_TRUE(boostConvert);
-
-    boostConvert = boost::is_convertible<int32_t, int8_t>::value;   EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<int32_t, uint8_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<int32_t, int16_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<int32_t, uint16_t>::value; EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<int32_t, int32_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<int32_t, uint32_t>::value; EXPECT_TRUE(boostConvert);
-
-    boostConvert = boost::is_convertible<uint32_t, int8_t>::value;   EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<uint32_t, uint8_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<uint32_t, int16_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<uint32_t, uint16_t>::value; EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<uint32_t, int32_t>::value;  EXPECT_TRUE(boostConvert);
-    boostConvert = boost::is_convertible<uint32_t, uint32_t>::value; EXPECT_TRUE(boostConvert);
 }
 
+TEST(TagTest, ConvertToInt8)
+{
+    Tag zero(int32_t(0));
+    Tag min(int32_t(INT8_MIN));
+    Tag normal(int32_t(42));
+    Tag max(int32_t(INT8_MAX));
+    Tag underflow(int32_t(INT8_MIN-1));
+    Tag overflow(int32_t(INT8_MAX+1));
+    Tag floatTag(float(3.14));
+    Tag stringTag(string("foo"));
+    Tag arrayTag(vector<int8_t>({1, 2, 3}));
+
+    // allowed
+    EXPECT_NO_THROW(
+    {
+        zero.ToInt8();
+        min.ToInt8();
+        normal.ToInt8();
+        max.ToInt8();
+    });
+
+    // not allowed
+    EXPECT_THROW(underflow.ToInt8(), std::exception);
+    EXPECT_THROW(overflow.ToInt8(), std::exception);
+    EXPECT_THROW(floatTag.ToInt8(), std::exception);
+    EXPECT_THROW(stringTag.ToInt8(), std::exception);
+    EXPECT_THROW(arrayTag.ToInt8(), std::exception);
+}
+
+TEST(TagTest, ConvertToUInt8)
+{
+    Tag zero(int32_t(0));
+    Tag neg(int32_t(-1));
+    Tag normal(int32_t(42));
+    Tag max(int32_t(UINT8_MAX));
+    Tag overflow(int32_t(UINT8_MAX+1));
+    Tag floatTag(float(3.14));
+    Tag stringTag(string("foo"));
+    Tag arrayTag(vector<uint8_t>({1, 2, 3}));
+
+    // allowed
+    EXPECT_NO_THROW(
+    {
+        zero.ToUInt8();
+        normal.ToUInt8();
+        max.ToUInt8();
+    });
+
+    // not allowed
+    EXPECT_THROW(neg.ToUInt8(), std::exception);
+    EXPECT_THROW(overflow.ToUInt8(), std::exception);
+    EXPECT_THROW(floatTag.ToUInt8(), std::exception);
+    EXPECT_THROW(stringTag.ToUInt8(), std::exception);
+    EXPECT_THROW(arrayTag.ToUInt8(), std::exception);
+}
+
+TEST(TagTest, ConvertToInt16)
+{
+    Tag zero(int32_t(0));
+    Tag min(int32_t(INT16_MIN));
+    Tag normal(int32_t(42));
+    Tag max(int32_t(INT16_MAX));
+    Tag underflow(int32_t(INT16_MIN-1));
+    Tag overflow(int32_t(INT16_MAX+1));
+    Tag floatTag(float(3.14));
+    Tag stringTag(string("foo"));
+    Tag arrayTag(vector<int16_t>({1, 2, 3}));
+
+    // allowed
+    EXPECT_NO_THROW(
+    {
+        zero.ToInt16();
+        min.ToInt16();
+        normal.ToInt16();
+        max.ToInt16();
+    });
+
+    // not allowed
+    EXPECT_THROW(underflow.ToInt16(), std::exception);
+    EXPECT_THROW(overflow.ToInt16(), std::exception);
+    EXPECT_THROW(floatTag.ToInt16(), std::exception);
+    EXPECT_THROW(stringTag.ToInt16(), std::exception);
+    EXPECT_THROW(arrayTag.ToInt16(), std::exception);
+}
+
+TEST(TagTest, ConvertToUInt16)
+{
+    Tag zero(int32_t(0));
+    Tag neg(int32_t(-1));
+    Tag normal(int32_t(42));
+    Tag max(int32_t(UINT16_MAX));
+    Tag overflow(int32_t(UINT16_MAX+1));
+    Tag floatTag(float(3.14));
+    Tag stringTag(string("foo"));
+    Tag arrayTag(vector<uint16_t>({1, 2, 3}));
+
+    // allowed
+    EXPECT_NO_THROW(
+    {
+        zero.ToUInt16();
+        normal.ToUInt16();
+        max.ToUInt16();
+    });
+
+    // not allowed
+    EXPECT_THROW(neg.ToUInt16(), std::exception);
+    EXPECT_THROW(overflow.ToUInt16(), std::exception);
+    EXPECT_THROW(floatTag.ToUInt16(), std::exception);
+    EXPECT_THROW(stringTag.ToUInt16(), std::exception);
+    EXPECT_THROW(arrayTag.ToUInt16(), std::exception);
+}
+
+TEST(TagTest, ConvertToInt32)
+{
+    Tag zero(int32_t(0));
+    Tag min(int32_t(INT32_MIN));
+    Tag normal(int32_t(42));
+    Tag max(int32_t(INT32_MAX));
+    Tag floatTag(float(3.14));
+    Tag stringTag(string("foo"));
+    Tag arrayTag(vector<int32_t>({1, 2, 3}));
+
+    // no 64-bit ctors - will not compile
+    //
+    // Tag underflow(int64_t(INT32_MIN-1));
+    // Tag overflow(int64_t(INT32_MAX+1));
+
+    // allowed
+    EXPECT_NO_THROW(
+    {
+        zero.ToInt32();
+        min.ToInt32();
+        normal.ToInt32();
+        max.ToInt32();
+    });
+
+    // not allowed
+    EXPECT_THROW(floatTag.ToInt32(), std::exception);
+    EXPECT_THROW(stringTag.ToInt32(), std::exception);
+    EXPECT_THROW(arrayTag.ToInt32(), std::exception);
+}
+
+TEST(TagTest, ConvertToUInt32)
+{
+    Tag zero(int32_t(0));
+    Tag neg(int32_t(-1));
+    Tag normal(int32_t(42));
+    Tag max(uint32_t(UINT32_MAX));
+    Tag floatTag(float(3.14));
+    Tag stringTag(string("foo"));
+    Tag arrayTag(vector<uint32_t>({1, 2, 3}));
+
+    // no 64-bit ctors - will not compile
+    //
+    // Tag overflow(int64_t(UINT32_MAX+1));
+
+    // allowed
+    EXPECT_NO_THROW(
+    {
+        zero.ToUInt32();
+        normal.ToUInt32();
+        max.ToUInt32();
+    });
+
+    // not allowed
+    EXPECT_THROW(neg.ToUInt32(), std::exception);
+    EXPECT_THROW(floatTag.ToUInt32(), std::exception);
+    EXPECT_THROW(stringTag.ToUInt32(), std::exception);
+    EXPECT_THROW(arrayTag.ToUInt32(), std::exception);
+}
 
 TEST(TagCollectionTest, DefaultConstruction)
 {

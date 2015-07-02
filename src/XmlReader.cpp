@@ -37,8 +37,9 @@
 
 #include "XmlReader.h"
 #include "pugixml/pugixml.hpp"
-#include <fstream>
 #include <iostream>
+#include <fstream>
+#include <memory>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
@@ -85,35 +86,34 @@ void FromXml(const pugi::xml_node& xmlNode, DataSetElement& parent)
 } // namespace BAM
 } // namespace PacBio
 
-DataSetBase XmlReader::FromStream(istream& in)
+std::unique_ptr<DataSetBase> XmlReader::FromStream(istream& in)
 {
     pugi::xml_document doc;
     const pugi::xml_parse_result& loadResult = doc.load(in);
     if (loadResult.status != pugi::status_ok)
-        throw std::exception();
+        throw std::runtime_error("could not read XML file");
 
     // parse top-level attributes
     pugi::xml_node rootNode = doc.document_element();
-    if ( rootNode == pugi::xml_node() )
-        throw std::exception();
+    if (rootNode == pugi::xml_node())
+        throw std::runtime_error("could not fetch XML root node");
 
-    const char* datasetTypeName = rootNode.name();
-
-    DataSetBase dataset;
-    dataset.Label(datasetTypeName);
+    // create dataset matching type strings
+    std::unique_ptr<DataSetBase> dataset(new DataSetBase);
+    dataset->Label(rootNode.name());
 
     // iterate attributes
     auto attrIter = rootNode.attributes_begin();
     auto attrEnd  = rootNode.attributes_end();
     for ( ; attrIter != attrEnd; ++attrIter )
-        dataset.Attribute(attrIter->name(), attrIter->value());
+        dataset->Attribute(attrIter->name(), attrIter->value());
 
     // iterate children, recursively building up subtree
     auto childIter = rootNode.begin();
     auto childEnd = rootNode.end();
     for ( ; childIter != childEnd; ++childIter ) {
         pugi::xml_node childNode = *childIter;
-        internal::FromXml(childNode, dataset);
+        internal::FromXml(childNode, *dataset.get());
     }
 
     return dataset;

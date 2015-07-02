@@ -1,5 +1,7 @@
 /* BamTagCodec.i */
+
 %module PacBioBam
+
 %{
 #include <pbbam/BamTagCodec.h>
 using namespace PacBio;

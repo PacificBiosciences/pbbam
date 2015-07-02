@@ -1,5 +1,7 @@
 /* QueryBase.i */
+
 %module PacBioBam
+
 %{
 #include <pbbam/QueryBase.h>
 #include <pbbam/internal/QueryBase.h>
@@ -7,10 +9,11 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 %}
 
-
-
 %ignore PacBio::BAM::QueryIterator::operator++;
 %ignore PacBio::BAM::QueryConstIterator::operator++;
+
+%ignore PacBio::BAM::internal::QueryIterator::operator++;
+%ignore PacBio::BAM::internal::QueryConstIterator::operator++;
 
 // Python
 #ifdef SWIGPYTHON
@@ -20,7 +23,6 @@ using namespace PacBio::BAM;
 #else // C#
 %rename(IsTrue) PacBio::BAM::QueryBase::operator bool;
 #endif
-
 
 // IEnumerable<BamRecord> interfaces for Queries
 %typemap(csinterfaces) PacBio::BAM::QueryBase "global::System.Collections.IEnumerable\n, global::System.Collections.Generic.IEnumerable<PacBio.BAM.BamRecord>\n";
@@ -42,12 +44,20 @@ using namespace PacBio::BAM;
     }
 %}
 
-
 %include <pbbam/QueryBase.h>
 %include <pbbam/internal/QueryBase.h>
 
-%template(IQuery) PacBio::BAM::internal::QueryBase<BamRecord>;
-//%template (FileIterPtr) PacBio::BAM::internal::IBamFileIteratorBase<PacBio::BAM::BamRecord>;
+%template(BamRecordList) std::vector<PacBio::BAM::BamRecord>;
+
+%template(IQuery)      PacBio::BAM::internal::QueryBase<BamRecord>;
+%template(IGroupQuery) PacBio::BAM::internal::QueryBase<std::vector<BamRecord> >;
+
+%template(BamQueryIteratorBase)       PacBio::BAM::internal::QueryIteratorBase<BamRecord>;
+%template(BamGroupQueryIteratorBase)  PacBio::BAM::internal::QueryIteratorBase<std::vector<BamRecord> >;
+%template(BamQueryIterator)           PacBio::BAM::internal::QueryIterator<BamRecord>;
+%template(BamGroupQueryIterator)      PacBio::BAM::internal::QueryIterator<std::vector<BamRecord> >;
+%template(BamQueryConstIterator)      PacBio::BAM::internal::QueryConstIterator<BamRecord>;
+%template(BamGroupQueryConstIterator) PacBio::BAM::internal::QueryConstIterator<std::vector<BamRecord> >;
 
 // Iterator API
 #ifdef SWIGPYTHON
@@ -62,19 +72,55 @@ def Iterate(c):
 #endif
 
 %extend PacBio::BAM::QueryIterator
+{
+    PacBio::BAM::QueryIterator& incr(void)
+    { return $self->operator++(); }
+
+    PacBio::BAM::BamRecord* value(void)
+    { return $self->operator->(); }
+}
+
+%extend PacBio::BAM::QueryConstIterator
+{
+    PacBio::BAM::QueryConstIterator& incr(void)
+    { return $self->operator++(); }
+
+    const PacBio::BAM::BamRecord* value(void) const
+    { return $self->operator->(); }
+}
+
+%extend PacBio::BAM::internal::QueryIterator<BamRecord>
 {		
-	PacBio::BAM::QueryIterator& incr(void) 
+        PacBio::BAM::internal::QueryIterator<BamRecord>& incr(void)
 	{ return $self->operator++(); }
 	
 	PacBio::BAM::BamRecord* value(void) 
 	{ return $self->operator->(); }
 }
 
-%extend PacBio::BAM::QueryConstIterator
+%extend PacBio::BAM::internal::QueryConstIterator<BamRecord>
 {	
-	PacBio::BAM::QueryConstIterator& incr(void) 
+        PacBio::BAM::internal::QueryConstIterator<BamRecord>& incr(void)
 	{ return $self->operator++(); }
 	
 	const PacBio::BAM::BamRecord* value(void) const 
+	{ return $self->operator->(); }
+}
+
+%extend PacBio::BAM::internal::QueryIterator<std::vector<BamRecord> >
+{		
+        PacBio::BAM::internal::QueryIterator<std::vector<BamRecord> >& incr(void)
+	{ return $self->operator++(); }
+	
+	std::vector<PacBio::BAM::BamRecord>* value(void) 
+	{ return $self->operator->(); }
+}
+
+%extend PacBio::BAM::internal::QueryConstIterator<std::vector<BamRecord> >
+{	
+        PacBio::BAM::internal::QueryConstIterator<std::vector<BamRecord> >& incr(void)
+	{ return $self->operator++(); }
+	
+	const std::vector<PacBio::BAM::BamRecord>* value(void) const 
 	{ return $self->operator->(); }
 }

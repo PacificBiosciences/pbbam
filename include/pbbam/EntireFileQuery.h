@@ -38,7 +38,6 @@
 #ifndef ENTIREFILEQUERY_H
 #define ENTIREFILEQUERY_H
 
-#include "pbbam/QueryBase.h"
 #include "pbbam/internal/QueryBase.h"
 #include <htslib/sam.h>
 
@@ -47,29 +46,14 @@ namespace BAM {
 
 class BamFile;
 
-class PBBAM_EXPORT EntireFileQuery : public QueryBase
-{
-public:
-    EntireFileQuery(const BamFile& file);
-protected:
-    bool GetNext(BamRecord& record);
-
-private:
-    PBBAM_SHARED_PTR<samFile>   htsFile_;
-    PBBAM_SHARED_PTR<bam_hdr_t> htsHeader_;
-};
-
-namespace staging {
-
 class PBBAM_EXPORT EntireFileQuery : public internal::IQuery
 {
 public:
-    EntireFileQuery(const DataSet& dataset);
+    EntireFileQuery(const PacBio::BAM::DataSet& dataset);
 protected:
     FileIterPtr CreateIterator(const BamFile& bamFile);
 };
 
-} // namespace staging
 } // namespace BAM
 } // namspace PacBio
 

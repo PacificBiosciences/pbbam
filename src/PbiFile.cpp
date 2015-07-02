@@ -39,14 +39,23 @@
 #include "pbbam/BamFile.h"
 #include "PbiIndexIO.h"
 
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
-
 #include <iostream>
 
-void PbiFile::CreateFrom(const BamFile& bamFile)
+using namespace PacBio;
+using namespace PacBio::BAM;
+using namespace PacBio::BAM::PbiFile;
+using namespace std;
+
+namespace PacBio {
+namespace BAM {
+namespace PbiFile {
+
+void CreateFrom(const BamFile& bamFile)
 {
     const PbiRawData raw = std::move(internal::PbiIndexIO::Build(bamFile));
     internal::PbiIndexIO::Save(raw, bamFile.PacBioIndexFilename());
 }
+
+} // namespace PbiFile
+} // namespace BAM
+} // namespace PacBio

@@ -47,6 +47,7 @@
 
 namespace PacBio {
 namespace BAM {
+
 class BamRecord;
 
 class AlignmentPrinter
@@ -54,8 +55,7 @@ class AlignmentPrinter
 public:
     AlignmentPrinter(const IndexedFastaReader& ifr)
         : ifr_(std::unique_ptr<IndexedFastaReader>(new IndexedFastaReader(ifr)))
-    {
-    }
+    { }
 
     AlignmentPrinter() = delete;
     // Move constructor

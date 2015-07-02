@@ -35,87 +35,134 @@
 
 // Author: Derek Barnett
 
-#include "pbbam/dataset/DataSet.h"
-#include "pbbam/dataset/DataSetMetadata.h"
+#include "pbbam/DataSet.h"
+#include "pbbam/DataSetTypes.h"
+#include "pbbam/internal/DataSetBaseTypes.h"
 #include "DataSetIO.h"
-#include "StringUtils.h"
-#include <boost/algorithm/string.hpp>
-#include <set>
-#include <vector>
+#include <unordered_map>
+#include <iostream>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
 using namespace std;
 
-namespace PacBio {
-namespace BAM {
-namespace internal {
-
-// empty, "null" components
-
-static
-const DataSetMetadata& NullMetadata(void)
-{
-    static const DataSetMetadata empty;
-    return empty;
-}
-
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
-
 DataSet::DataSet(void)
-    : DataSetBase(DataSetType::GENERIC)
+    : d_(new DataSetBase)
 { }
 
-DataSet::DataSet(const BamFile& bamFile)
-    : DataSetBase(DataSetType::GENERIC)
-{ DataSetBase::operator=(std::move(DataSetIO::FromUri(bamFile.Filename()))); }
-
-DataSet& DataSet::operator+=(const DataSet& other)
+DataSet::DataSet(const DataSet::TypeEnum type)
+    : d_(nullptr)
 {
-    // fail on conflicting metadata, just for now to simplify
-    const DataSetMetadata& metadata = Metadata();
-    const DataSetMetadata& otherMetadata = other.Metadata();
-    if (metadata != otherMetadata)
-        throw std::exception();
-    DataSetBase::operator+=(other);
-    return *this;
-}
-
-vector<BamFile> DataSet::BamFiles(void) const
-{ return ExternalDataReferenceList().BamFiles(); }
-
-const DataSetMetadata& DataSet::Metadata(void) const
-{
-    try {
-        return Child<DataSetMetadata>("DataSetMetadata");
-    } catch (std::exception&) {
-        return internal::NullMetadata();
+    switch(type) {
+        case DataSet::GENERIC             : d_.reset(new DataSetBase); break;
+        case DataSet::ALIGNMENT           : d_.reset(new AlignmentSet); break;
+        case DataSet::BARCODE             : d_.reset(new BarcodeSet); break;
+        case DataSet::CONSENSUS_ALIGNMENT : d_.reset(new ConsensusAlignmentSet); break;
+        case DataSet::CONSENSUS_READ      : d_.reset(new ConsensusReadSet); break;
+        case DataSet::CONTIG              : d_.reset(new ContigSet); break;
+        case DataSet::HDF_SUBREAD         : d_.reset(new HdfSubreadSet); break;
+        case DataSet::REFERENCE           : d_.reset(new ReferenceSet); break;
+        case DataSet::SUBREAD             : d_.reset(new SubreadSet); break;
+        default:
+            throw std::runtime_error("unsupported dataset type"); // unknown type
     }
 }
 
-DataSetMetadata& DataSet::Metadata(void)
+DataSet::DataSet(const BamFile& bamFile)
+    : d_(internal::DataSetIO::FromUri(bamFile.Filename()))
+{ }
+
+DataSet::DataSet(const string& filename)
+    : d_(internal::DataSetIO::FromUri(filename))
+{ }
+
+DataSet::DataSet(const DataSet& other)
 {
-    if (!HasChild("DataSetMetadata"))
-        AddChild(internal::NullMetadata());
-    return Child<DataSetMetadata>("DataSetMetadata");
+    DataSetBase* otherDataset = other.d_.get();
+    DataSetElement* copyDataset = new DataSetElement(*otherDataset);
+    d_.reset(static_cast<DataSetBase*>(copyDataset));
 }
 
-AlignmentSet DataSet::ToAlignmentSet(void) const
-{ return AlignmentSet(*this); }
+DataSet::DataSet(DataSet&& other)
+    : d_(std::move(other.d_))
+{
+    assert(other.d_.get() == nullptr);
+}
 
-BarcodeSet DataSet::ToBarcodeSet(void) const
-{ return BarcodeSet(*this); }
+DataSet& DataSet::operator=(const DataSet& other)
+{
+    DataSetBase* otherDataset = other.d_.get();
+    DataSetElement* copyDataset = new DataSetElement(*otherDataset);
+    d_.reset(static_cast<DataSetBase*>(copyDataset));
+    return *this;
+}
 
-CcsReadSet DataSet::ToCcsReadSet(void) const
-{ return CcsReadSet(*this); }
+DataSet& DataSet::operator=(DataSet&& other)
+{
+    d_ = std::move(other.d_);
+    return *this;
+}
 
-ContigSet DataSet::ToContigSet(void) const
-{ return ContigSet(*this); }
+DataSet::~DataSet(void) { }
 
-ReferenceSet DataSet::ToReferenceSet(void) const
-{  return ReferenceSet(*this); }
+DataSet& DataSet::operator+=(const DataSet& other)
+{
+    return *this;
+}
 
-SubreadSet DataSet::ToSubreadSet(void) const
-{ return SubreadSet(*this); }
+bool DataSet::operator==(const DataSet& other) const
+{
+    return true;
+}
+
+DataSet::TypeEnum DataSet::NameToType(const string& typeName)
+{
+    static std::unordered_map<std::string, DataSet::TypeEnum> lookup;
+    if (lookup.empty()) {
+        lookup["DataSet"] = DataSet::GENERIC;
+        lookup["AlignmentSet"] = DataSet::ALIGNMENT;
+        lookup["BarcodeSet"] = DataSet::BARCODE;
+        lookup["ConsensusAlignmentSet"] = DataSet::CONSENSUS_ALIGNMENT;
+        lookup["ConsensusReadSet"] = DataSet::CONSENSUS_READ;
+        lookup["ContigSet"] = DataSet::CONTIG;
+        lookup["HdfSubreadSet"] = DataSet::HDF_SUBREAD;
+        lookup["ReferenceSet"] = DataSet::REFERENCE;
+        lookup["SubreadSet"] = DataSet::SUBREAD;
+    }
+    return lookup.at(typeName); // throws if unknown typename
+}
+
+void DataSet::Save(const std::string& outputFilename)
+{ internal::DataSetIO::ToFile(d_, outputFilename); }
+
+void DataSet::SaveToStream(ostream& out)
+{ internal::DataSetIO::ToStream(d_, out); }
+
+string DataSet::TypeToName(const DataSet::TypeEnum& type)
+{
+    switch(type) {
+        case DataSet::GENERIC             : return "DataSet";
+        case DataSet::ALIGNMENT           : return "AlignmentSet";
+        case DataSet::BARCODE             : return "BarcodeSet";
+        case DataSet::CONSENSUS_ALIGNMENT : return "ConsensusAlignmentSet";
+        case DataSet::CONSENSUS_READ      : return "ConsensusReadSet";
+        case DataSet::CONTIG              : return "ContigSet";
+        case DataSet::HDF_SUBREAD         : return "HdfSubreadSet";
+        case DataSet::REFERENCE           : return "ReferenceSet";
+        case DataSet::SUBREAD             : return "SubreadSet";
+        default:
+            throw std::runtime_error("unsupported dataset type"); // unknown type
+    }
+}
+
+//DataSet& DataSet::operator+=(const DataSet& other)
+//{
+//    // fail on conflicting metadata, just for now to simplify
+//    const DataSetMetadata& metadata = Metadata();
+//    const DataSetMetadata& otherMetadata = other.Metadata();
+//    if (metadata != otherMetadata)
+//        throw std::exception();
+//    DataSetBase::operator+=(other);
+//    return *this;
+//}
+

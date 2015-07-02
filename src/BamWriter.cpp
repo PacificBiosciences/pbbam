@@ -83,13 +83,13 @@ void BamWriterPrivate::Open(const string& filename,
     // store header
     header_ = rawHeader;
     if (!header_)
-        throw std::exception();
+        throw std::runtime_error("null header");
 
     // open file
     const string& mode = string("wb") + to_string(static_cast<int>(compressionLevel));
     file_.reset(sam_open(filename_.c_str(), mode.c_str()));
     if (!file_)
-        throw std::exception();
+        throw std::runtime_error("could not open file for writing");
 
     // if no explicit thread count given, attempt built-in check
     if (numThreads == 0) {
@@ -107,14 +107,14 @@ void BamWriterPrivate::Open(const string& filename,
     // write header
     const int ret = sam_hdr_write(file_.get(), header_.get());
     if (ret != 0)
-        throw std::exception();
+        throw std::runtime_error("could not write header");
 }
 
 void BamWriterPrivate::Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord)
 {
     const int ret = sam_write1(file_.get(), header_.get(), rawRecord.get());
     if (ret <= 0)
-        throw std::exception();
+        throw std::runtime_error("could not write record");
 }
 
 } // namespace internal
@@ -143,7 +143,7 @@ void BamWriter::TryFlush(void)
     // TODO: sanity checks on file_ & fp
     const int ret = bgzf_flush(d_->file_.get()->fp.bgzf);
     if (ret != 0)
-        throw std::exception();
+        throw std::runtime_error("could not flush output buffer contents");
 }
 
 void BamWriter::Write(const BamRecord& record)

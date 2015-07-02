@@ -48,33 +48,6 @@ namespace BAM {
 
 class BamFile;
 
-class PBBAM_EXPORT GenomicIntervalQuery : public QueryBase
-{
-public:
-//    GenomicIntervalQuery(const std::string& zeroBasedRegion,
-//                         const BamFile& file);
-    GenomicIntervalQuery(const GenomicInterval& interval,
-                         const BamFile& file);
-
-    GenomicIntervalQuery& Interval(const GenomicInterval& interval);
-    GenomicInterval Interval(void) const;
-
-protected:
-    bool GetNext(BamRecord& record);
-
-private:
-    bool InitFile(const BamFile& file);
-
-private:
-    GenomicInterval interval_;
-    std::shared_ptr<samFile>   htsFile_;
-    std::shared_ptr<bam_hdr_t> htsHeader_;
-    std::shared_ptr<hts_idx_t> htsIndex_;
-    std::shared_ptr<hts_itr_t> htsIterator_;
-};
-
-namespace staging {
-
 class PBBAM_EXPORT GenomicIntervalQuery : public internal::IQuery
 {
 public:
@@ -92,7 +65,7 @@ private:
     GenomicInterval interval_;
 };
 
-} // namespace staging
+//} // namespace staging
 } // namespace BAM
 } // namspace PacBio
 

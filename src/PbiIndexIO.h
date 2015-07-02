@@ -130,7 +130,7 @@ inline void PbiIndexIO::SwapEndianness(std::vector<T>& data)
     const size_t elementSize = sizeof(T);
     const size_t numReads = data.size();
     switch (elementSize) {
-        case 1 : break;
+        case 1 : break; // no swapping necessary
         case 2 :
             for (size_t i = 0; i < numReads; ++i)
                 ed_swap_2p(&data[i]);
@@ -144,8 +144,7 @@ inline void PbiIndexIO::SwapEndianness(std::vector<T>& data)
                 ed_swap_8p(&data[i]);
             break;
         default:
-            // unsupported element size
-            throw std::exception();
+            throw std::runtime_error("unsupported element size");
     }
 }
 

@@ -54,7 +54,8 @@ class DataSetElement
 public:
     // allowed to be instantiated directly
     // (for compound objects that don't need a dedicated subtype for children)
-    DataSetElement(const std::string& label);
+    DataSetElement(const std::string& label = std::string());
+    DataSetElement(const std::string& label, const std::vector<std::string>& initialChildLabels);
     DataSetElement(const DataSetElement& other);
     DataSetElement(DataSetElement&& other);
     DataSetElement& operator=(const DataSetElement& other);
@@ -67,19 +68,26 @@ public:
 
 public:
     const std::string& Attribute(const std::string& name) const;
+    std::string& Attribute(const std::string& name);
     const std::map<std::string, std::string>& Attributes(void) const;
+    std::map<std::string, std::string>& Attributes(void);
     bool HasAttribute(const std::string& name) const;
 
     const std::vector<DataSetElement>& Children(void) const;
+    std::vector<DataSetElement>& Children(void);
     bool HasChild(const std::string& label) const;
 
     const std::string& Label(void) const;
+    std::string& Label(void);
+
     const std::string& Text(void) const;
+    std::string& Text(void);
 
 public:
     void Attribute(const std::string& name, const std::string& value);
     void Label(const std::string& label);
     void Text(const std::string& text);
+
 
 public:
     size_t NumAttributes(void) const;
@@ -116,9 +124,10 @@ public:
 protected:
     static const std::string& SharedNullString(void);
 
-protected:
-    const std::string& FetchChildText(const std::string& label) const;
-    void SetChildText(const std::string& label, const std::string& text);
+public:
+    const std::string& ChildText(const std::string& label) const;
+    std::string& ChildText(const std::string& label);
+    void ChildText(const std::string& label, const std::string& text);
 
 protected:
     std::string label_;
@@ -133,6 +142,14 @@ private:
 inline DataSetElement::DataSetElement(const std::string& label)
     : label_(label)
 { }
+
+inline DataSetElement::DataSetElement(const std::string& label,
+                                      const std::vector<std::string>& initialChildLabels)
+    : label_(label)
+{
+    for (auto childLabel : initialChildLabels)
+        AddChild(DataSetElement(childLabel));
+}
 
 inline DataSetElement::DataSetElement(const DataSetElement& other)
     : label_(other.label_)
@@ -198,6 +215,9 @@ T& DataSetElement::operator[](const std::string& label)
 inline void DataSetElement::AddChild(const DataSetElement& e)
 { children_.push_back(e); }
 
+inline std::string& DataSetElement::Attribute(const std::string& name)
+{ return attributes_[name]; }
+
 inline const std::string& DataSetElement::Attribute(const std::string& name) const
 {
     auto iter = attributes_.find(name);
@@ -210,6 +230,9 @@ inline void DataSetElement::Attribute(const std::string& name, const std::string
 { attributes_[name] = value; }
 
 inline const std::map<std::string, std::string>& DataSetElement::Attributes(void) const
+{ return attributes_; }
+
+inline std::map<std::string, std::string>& DataSetElement::Attributes(void)
 { return attributes_; }
 
 template<typename T>
@@ -226,15 +249,34 @@ inline const T& DataSetElement::Child(const std::string& label) const
 
 template<typename T>
 inline T& DataSetElement::Child(const std::string& label)
-{ return Child<T>(IndexOf(label)); }
+{
+    const int i = IndexOf(label);
+    if (i >= 0) {
+        assert(i < NumChildren());
+        return Child<T>(i);
+    } else {
+        AddChild(DataSetElement(label));
+        return Child<T>(NumChildren()-1);
+    }
+}
 
 inline const std::vector<DataSetElement>& DataSetElement::Children(void) const
 { return children_; }
 
-inline const std::string& DataSetElement::FetchChildText(const std::string& label) const
+inline std::vector<DataSetElement>& DataSetElement::Children(void)
+{ return children_; }
+
+inline const std::string& DataSetElement::ChildText(const std::string& label) const
 {
     if (!HasChild(label))
         return SharedNullString();
+    return Child<DataSetElement>(label).Text();
+}
+
+inline std::string& DataSetElement::ChildText(const std::string& label)
+{
+    if (!HasChild(label))
+        AddChild(DataSetElement(label));
     return Child<DataSetElement>(label).Text();
 }
 
@@ -258,6 +300,9 @@ inline int DataSetElement::IndexOf(const std::string& label) const
 inline const std::string& DataSetElement::Label(void) const
 { return label_; }
 
+inline std::string& DataSetElement::Label(void)
+{ return label_; }
+
 inline void DataSetElement::Label(const std::string& label)
 { label_ = label; }
 
@@ -277,7 +322,7 @@ inline void DataSetElement::RemoveChild(const DataSetElement& e)
     );
 }
 
-inline void DataSetElement::SetChildText(const std::string& label,
+inline void DataSetElement::ChildText(const std::string& label,
                                          const std::string& text)
 {
     if (!HasChild(label)) {
@@ -290,6 +335,9 @@ inline void DataSetElement::SetChildText(const std::string& label,
 }
 
 inline const std::string& DataSetElement::Text(void) const
+{ return text_; }
+
+inline std::string& DataSetElement::Text(void)
 { return text_; }
 
 inline void DataSetElement::Text(const std::string& text)

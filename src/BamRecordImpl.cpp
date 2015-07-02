@@ -332,43 +332,49 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
     if (isPreencoded) {
         memcpy(pEncodedSequence, sequence, encodedSequenceLength);
     } else {
-        const char* pRawSequence = sequence;
-        uint8_t nucleotideCode;
-        bool useHighWord = true;
-        for (size_t i = 0; i < sequenceLength; ++i) {
-            switch (*pRawSequence) {
-                case '=' : nucleotideCode = 0;  break;
-                case 'A' : nucleotideCode = 1;  break;
-                case 'C' : nucleotideCode = 2;  break;
-                case 'M' : nucleotideCode = 3;  break;
-                case 'G' : nucleotideCode = 4;  break;
-                case 'R' : nucleotideCode = 5;  break;
-                case 'S' : nucleotideCode = 6;  break;
-                case 'V' : nucleotideCode = 7;  break;
-                case 'T' : nucleotideCode = 8;  break;
-                case 'W' : nucleotideCode = 9;  break;
-                case 'Y' : nucleotideCode = 10; break;
-                case 'H' : nucleotideCode = 11; break;
-                case 'K' : nucleotideCode = 12; break;
-                case 'D' : nucleotideCode = 13; break;
-                case 'B' : nucleotideCode = 14; break;
-                case 'N' : nucleotideCode = 15; break;
-                default :
-                    PB_ASSERT_UNREACHABLE; // graceful way to handle?
-                    break;
-            }
+        memset(pEncodedSequence, 0, encodedSequenceLength);
+        for (size_t i = 0; i < sequenceLength; ++i)
+            pEncodedSequence[i>>1] |= seq_nt16_table[(int)sequence[i]] << ((~i&1)<<2);
 
-            // pack the nucleotide code
-            if (useHighWord) {
-                *pEncodedSequence = nucleotideCode << 4;
-                useHighWord = false;
-            } else {
-                *pEncodedSequence |= nucleotideCode;
-                ++pEncodedSequence;
-                useHighWord = true;
-            }
-            ++pRawSequence;
-        }
+
+
+//        const char* pRawSequence = sequence;
+//        uint8_t nucleotideCode;
+//        bool useHighWord = true;
+//        for (size_t i = 0; i < sequenceLength; ++i) {
+//            switch (*pRawSequence) {
+//                case '=' : nucleotideCode = 0;  break;
+//                case 'A' : nucleotideCode = 1;  break;
+//                case 'C' : nucleotideCode = 2;  break;
+//                case 'M' : nucleotideCode = 3;  break;
+//                case 'G' : nucleotideCode = 4;  break;
+//                case 'R' : nucleotideCode = 5;  break;
+//                case 'S' : nucleotideCode = 6;  break;
+//                case 'V' : nucleotideCode = 7;  break;
+//                case 'T' : nucleotideCode = 8;  break;
+//                case 'W' : nucleotideCode = 9;  break;
+//                case 'Y' : nucleotideCode = 10; break;
+//                case 'H' : nucleotideCode = 11; break;
+//                case 'K' : nucleotideCode = 12; break;
+//                case 'D' : nucleotideCode = 13; break;
+//                case 'B' : nucleotideCode = 14; break;
+//                case 'N' : nucleotideCode = 15; break;
+//                default :
+//                    PB_ASSERT_UNREACHABLE; // graceful way to handle?
+//                    break;
+//            }
+
+//            // pack the nucleotide code
+//            if (useHighWord) {
+//                *pEncodedSequence = nucleotideCode << 4;
+//                useHighWord = false;
+//            } else {
+//                *pEncodedSequence |= nucleotideCode;
+//                ++pEncodedSequence;
+//                useHighWord = true;
+//            }
+//            ++pRawSequence;
+//        }
     }
 
     // fill in quality values

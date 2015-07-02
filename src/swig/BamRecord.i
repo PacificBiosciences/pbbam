@@ -11,7 +11,6 @@ using namespace PacBio::BAM;
 // Hide warnings about "internal" being a C# reserved word
 %warnfilter(314) PacBio::BAM::internal;
 
-
 // hide warnings about unused methods
 %ignore PacBio::BAM::BamRecord::BamRecord(BamRecordImpl&&);
 %ignore PacBio::BAM::BamRecord::BamRecord(BamRecord&&);
@@ -23,5 +22,10 @@ using namespace PacBio::BAM;
 
 // C# gets confused by the const and nonconst overloads
 %ignore PacBio::BAM::BamRecord::Impl() const;
+
+#ifdef SWIGR
+%rename("EncodedPkmean") PacBio::BAM::BamRecord::Pkmean(const std::vector<uint16_t>&);
+%rename("EncodedPkmid")  PacBio::BAM::BamRecord::Pkmid(const std::vector<uint16_t>&);
+#endif // SWIGR
 
 %include <pbbam/BamRecord.h>

@@ -1,5 +1,7 @@
 /* QualityValues.i */
+
 %module PacBioBam
+
 %{
 #include <pbbam/QualityValues.h>
 using namespace PacBio;

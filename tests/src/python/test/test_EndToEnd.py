@@ -48,7 +48,9 @@ class EndToEndTest(unittest.TestCase):
         try:
             file = PacBioBam.BamFile(self.ex2BamFn)
             writer = PacBioBam.BamWriter(self.generatedBamFn, file.Header())
-            entireFile = PacBioBam.EntireFileQuery(file)
+            
+            dataset = PacBioBam.DataSet(self.ex2BamFn)
+            entireFile = PacBioBam.EntireFileQuery(dataset)
          
             names_in = []
             for record in PacBioBam.Iterate(entireFile):
@@ -56,21 +58,20 @@ class EndToEndTest(unittest.TestCase):
                 writer.Write(record)
             return names_in
             
-        except SystemError:
+        except RuntimeError:
             self.assertTrue(False) # should not throw
         
     def generatedNames(self):
         try:   
-            # open generated file, read names
-            file = PacBioBam.BamFile(self.generatedBamFn)
-            entireFile = PacBioBam.EntireFileQuery(file)
-        
+            # open dataset on generated BAM file, read in names
+            dataset = PacBioBam.DataSet(self.generatedBamFn)
+            entireFile = PacBioBam.EntireFileQuery(dataset)
             names_out = []
             for record in PacBioBam.Iterate(entireFile):
                 names_out.append(record.FullName())
             return names_out
                 
-        except SystemError:
+        except RuntimeError:
             self.assertTrue(False) # should not throw
         
     def runTest(self):

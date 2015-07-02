@@ -31,9 +31,6 @@ endif*/
 
 #endif // SWIGCSHARP
 
-
-
-
 /********* SWIG includes ************/
 
 %include "exception.i"
@@ -89,6 +86,7 @@ endif*/
 %include "Accuracy.i"
 %include "CigarOperation.i"
 %include "Interval.i"
+%include "LocalContextFlags.i"
 %include "Orientation.i"
 %include "Position.i"
 %include "QualityValue.i"
@@ -104,7 +102,7 @@ endif*/
 // keep this guy after the other basic types, hacky but works
 %include "Frames.i"
 
-// Header API components
+// Header API 
 %include "ProgramInfo.i"
 %include "ReadGroupInfo.i"
 %include "SequenceInfo.i"
@@ -118,10 +116,23 @@ endif*/
 %include "BamWriter.i"
 %include "SamTagCodec.i"
 
+// DataSet
+%include "DataSetTypes.i"
+%include "DataSet.i"
+
 // Query/iterator API
 %include "QueryBase.i"
+%include "GroupQueryBase.i"
+%include "GroupQuery.i"
 %include "EntireFileQuery.i"
 %include "GenomicIntervalQuery.i"
+%include "ZmwQuery.i"
+%include "ZmwGroupQuery.i"
+
+// PBI
+%include "PbiFile.i"
+%include "PbiRawData.i"
+%include "PbiIndex.i"
 
 // FASTA
 %include "IndexedFastaReader.i"

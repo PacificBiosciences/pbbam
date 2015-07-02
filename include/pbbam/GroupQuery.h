@@ -57,18 +57,18 @@ protected:
     BamRecord nextRecord_;
 };
 
-class PBBAM_EXPORT ZmwQuery: public SequentialGroupQueryBase
-{
-public: 
-    ZmwQuery(const BamFile & bamFile)
-    : SequentialGroupQueryBase(bamFile) { }
+//class PBBAM_EXPORT ZmwQuery: public SequentialGroupQueryBase
+//{
+//public:
+//    ZmwQuery(const BamFile & bamFile)
+//    : SequentialGroupQueryBase(bamFile) { }
 
-private:
-    bool InSameGroup(const BamRecord & record, const BamRecord & another) {
-        return (record.MovieName() == another.MovieName() && 
-                record.HoleNumber() == another.HoleNumber());
-    }
-};
+//private:
+//    bool InSameGroup(const BamRecord & record, const BamRecord & another) {
+//        return (record.MovieName() == another.MovieName() &&
+//                record.HoleNumber() == another.HoleNumber());
+//    }
+//};
 
 class PBBAM_EXPORT QNameQuery: public SequentialGroupQueryBase
 {

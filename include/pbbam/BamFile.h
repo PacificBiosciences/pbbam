@@ -114,8 +114,8 @@ public:
     /// \returns true if header metadata has this reference name
     bool HasReference(const std::string& name) const;
 
-    /// \returns BamHeader containing the file's metadata
-    BamHeader Header(void) const;
+    /// \returns const reference to BamHeader containing the file's metadata
+    const BamHeader& Header(void) const;
 
     /// \returns true if BAM file is a PacBio BAM file (i.e. has non-empty version associated with header "pb" tag)
     bool IsPacBioBAM(void) const;

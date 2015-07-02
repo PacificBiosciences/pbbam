@@ -94,7 +94,7 @@ std::string IndexedFastaReader::Subsequence(const std::string& id,
     // fai_fetch.  Can you please verify?
     char* rawSeq = faidx_fetch_seq(handle_, id.c_str(), begin, end - 1, &len);
     if (rawSeq == nullptr)
-        throw std::exception();
+        throw std::runtime_error("could not fetch FASTA sequence");
     else {
         std::string seq(rawSeq);
         free(rawSeq);
@@ -115,7 +115,7 @@ std::string IndexedFastaReader::Subsequence(const char *htslibRegion) const
     int len;
     char* rawSeq = fai_fetch(handle_, htslibRegion, &len);
     if (rawSeq == nullptr)
-        throw std::exception();
+        throw std::runtime_error("could not fetch FASTA sequence");
     else {
         std::string seq(rawSeq);
         free(rawSeq);
@@ -211,7 +211,7 @@ int IndexedFastaReader::SequenceLength(const std::string& name) const
     REQUIRE_FAIDX_LOADED;
     int len = faidx_seq_len(handle_, name.c_str());
     if (len < 0)
-        throw std::exception();
+        throw std::runtime_error("could not determine FASTA sequence length");
     else return len;
 }
 

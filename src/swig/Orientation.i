@@ -1,5 +1,7 @@
 /* Orientation.i */
+
 %module PacBioBam
+
 %{
 #include <pbbam/Orientation.h>
 using namespace PacBio;

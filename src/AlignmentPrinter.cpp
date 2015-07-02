@@ -54,16 +54,14 @@ std::string AlignmentPrinter::Print(const BamRecord& record,
 	std::string ref = ifr_->ReferenceSubsequence(record, orientation, true, true);
 
 	if (seq.size() != ref.size())
-	{
-		std::cerr << "NOOOO" << std::endl;
-		throw std::runtime_error("Sequence and reference parts are of different size");
-	}
+        throw std::runtime_error("Sequence and reference parts are of different size");
 
 	int seqLength = 0;
 	float matches = 0;
 	std::string pretty;
-	size_t refCoord = record.ReferenceStart();
-	size_t seqCoord = record.QueryStart();
+    Position refCoord = record.ReferenceStart();
+    Position seqCoord = record.QueryStart();
+
 	for (size_t i = 0; i < seq.size();)
 	{
 		std::string refCoordStr = std::to_string(refCoord);

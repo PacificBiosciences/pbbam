@@ -1,4 +1,5 @@
 /* ProgramInfo.i */
+
 %module PacBioBam
 
 %{

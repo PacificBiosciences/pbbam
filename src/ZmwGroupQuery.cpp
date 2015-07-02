@@ -36,14 +36,16 @@
 // Author: Derek Barnett
 
 #include "pbbam/ZmwGroupQuery.h"
+#include "pbbam/PbiIndex.h"
 #include "pbbam/internal/BamRecordSort.h"
 #include "pbbam/internal/MergeStrategy.h"
+#include "MemoryUtils.h"
 #include <algorithm>
 #include <map>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
-using namespace PacBio::BAM::staging;
+//using namespace PacBio::BAM::staging;
 using namespace std;
 
 namespace PacBio {
@@ -53,44 +55,69 @@ namespace internal {
 class ZmwQueryGroupIterator : public IBamFileGroupIterator
 {
 public:
-    ZmwQueryGroupIterator(const std::vector<int>& zmwWhitelist,
+    ZmwQueryGroupIterator(const std::vector<int32_t>& zmwWhitelist,
                           const BamFile& file)
         : IBamFileGroupIterator(file)
     {
-        std::vector<int> sortedZmws = zmwWhitelist;
-        std::sort(sortedZmws.begin(), sortedZmws.end());
-        for (int zmw : sortedZmws) {
-            std::vector<int> zmwIndexList = { }; // PBI magic goes here for pbi.OffsetsForZmw(zmw);
-            if (zmwIndexList.empty())
-                continue;
-            std::sort(zmwIndexList.begin(), zmwIndexList.end());
-            zmwIndices_[zmw] = zmwIndexList;
-        }
+        // init BAM file for reading
+        htsFile_.reset(sam_open(file.Filename().c_str(), "rb"));
+        if (!htsFile_)
+            throw std::runtime_error("could not open BAM file for reading");
+
+        htsHeader_.reset(sam_hdr_read(htsFile_.get()));
+        if (!htsHeader_)
+            throw std::runtime_error("could not read BAM header data");
+
+        // open index & query for ZMWs
+        PbiIndex index(file.PacBioIndexFilename());
+        for (int32_t zmw : zmwWhitelist)
+            zmwGroups_[zmw] = index.Lookup(ZmwIndexRequest(zmw));
     }
 
 public:
-    bool GetNext(std::vector<BamRecord>& r) {
-
-        if (zmwIndices_.empty())
+    bool GetNext(std::vector<BamRecord>& r)
+    {
+        r.clear();
+        if (zmwGroups_.empty())
             return false;
 
-        const auto firstIter = zmwIndices_.cbegin();
-        const std::vector<int>& indices = (*firstIter).second;
-        for (int i : indices) {
+        BamRecord record(header_);
+        const IndexResultBlocks& blocks = zmwGroups_.cbegin()->second;
+        for (const IndexResultBlock& block : blocks) {
 
-            // seek & read
-//            r.push_back( fileData_.records.at(i) );
+            // seek to first record in block
+            const int seekResult = bgzf_seek(htsFile_.get()->fp.bgzf, block.virtualOffset_, SEEK_SET);
+            if (seekResult == -1)
+                throw std::runtime_error("could not seek in BAM file");
+
+            // read block records
+            for (size_t i = 0; i < block.numReads_; ++i) {
+                const int readResult = sam_read1(htsFile_.get(),
+                                                 htsHeader_.get(),
+                                                 internal::BamRecordMemory::GetRawData(record).get());
+//                record.header_ = fileData_.Header();
+
+                if (readResult >= 0)           // success
+                    r.push_back(record);
+                else if (readResult == -1)     // normal EOF
+                    break;
+                else                           // error (truncated file, etc)
+                    throw std::runtime_error("corrupted file, may be truncated");
+            }
         }
-        zmwIndices_.erase(firstIter);
-        return true;
+
+        // pop zmw info & return success
+        zmwGroups_.erase(zmwGroups_.begin());
+        return !r.empty();
     }
 
-    bool InSameGroup(const BamRecord& lhs, const BamRecord& rhs) const {
-        return lhs.HoleNumber() == rhs.HoleNumber();
-    }
+    bool InSameGroup(const BamRecord& lhs, const BamRecord& rhs) const
+    { return lhs.HoleNumber() == rhs.HoleNumber(); }
 
 private:
-    map<int, vector<int> > zmwIndices_;
+    unique_ptr<samFile,   internal::HtslibFileDeleter>   htsFile_;
+    unique_ptr<bam_hdr_t, internal::HtslibHeaderDeleter> htsHeader_;
+    map<int32_t, IndexResultBlocks> zmwGroups_;
 };
 
 } // namespace internal
@@ -104,7 +131,7 @@ ZmwGroupQuery::ZmwGroupQuery(const DataSet& dataset)
     mergeStrategy_.reset(new GroupMergeStrategy<ByZmw>(CreateIterators()));
 }
 
-ZmwGroupQuery::ZmwGroupQuery(const std::vector<int>& zmwWhitelist,
+ZmwGroupQuery::ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist,
                              const DataSet& dataset)
     : IGroupQuery(dataset)
     , whitelist_(zmwWhitelist)

@@ -45,42 +45,6 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-EntireFileQuery::EntireFileQuery(const BamFile& file)
-    : QueryBase(file)
-    , htsFile_(nullptr)
-    , htsHeader_(nullptr)
-{
-    htsFile_.reset(sam_open(file.Filename().c_str(), "rb"), internal::HtslibFileDeleter());
-    if (!htsFile_)
-        throw std::exception();
-
-    htsHeader_.reset(sam_hdr_read(htsFile_.get()), internal::HtslibHeaderDeleter());
-    if (!htsHeader_)
-        throw std::exception();
-}
-
-bool EntireFileQuery::GetNext(BamRecord& record)
-{
-    const int result = sam_read1(htsFile_.get(),
-                                 htsHeader_.get(),
-                                 internal::BamRecordMemory::GetRawData(record).get());
-    // success
-    if (result >= 0)
-        return true;
-
-    // normal EOF
-    else if (result == -1)
-        return false;
-
-    // error (truncated file, etc)
-    else
-        throw std::exception();
-}
-
-namespace PacBio {
-namespace BAM {
-namespace staging {
-
 class EntireFileIterator : public internal::IBamFileIterator
 {
 public:
@@ -89,19 +53,22 @@ public:
     {
         htsFile_.reset(sam_open(bamFile.Filename().c_str(), "rb"));
         if (!htsFile_)
-            throw std::exception();
+            throw std::runtime_error("could not open BAM file for reading");
 
         htsHeader_.reset(sam_hdr_read(htsFile_.get()));
         if (!htsHeader_)
-            throw std::exception();
+            throw std::runtime_error("could not read BAM header");
     }
 
 public:
     bool GetNext(BamRecord& record) {
 
+//        record = BamRecord(/*fileData_.Header()*/);
         const int result = sam_read1(htsFile_.get(),
                                      htsHeader_.get(),
                                      internal::BamRecordMemory::GetRawData(record).get());
+        record.header_ = header_;
+
         // success
         if (result >= 0)
             return true;
@@ -112,7 +79,7 @@ public:
 
         // error (truncated file, etc)
         else
-            throw std::exception();
+            throw std::runtime_error("corrupted file, may be truncated");
     }
 
 private:
@@ -133,6 +100,3 @@ EntireFileQuery::EntireFileQuery(const DataSet& dataset)
 EntireFileQuery::FileIterPtr EntireFileQuery::CreateIterator(const BamFile& bamFile)
 { return FileIterPtr(new EntireFileIterator(bamFile)); }
 
-} // namespace staging
-} // namespace BAM
-} // namspace PacBio

@@ -1,5 +1,7 @@
 /* Tag.i */
+
 %module PacBioBam
+
 %{
 #include <pbbam/Tag.h>
 using namespace PacBio;
@@ -24,7 +26,6 @@ HANDLE_STD_EXCEPTION(ToUInt16Array);
 HANDLE_STD_EXCEPTION(ToInt32Array);
 HANDLE_STD_EXCEPTION(ToUInt32Array);
 HANDLE_STD_EXCEPTION(ToFloatArray);
-HANDLE_STD_EXCEPTION(Value);
 
 #ifdef SWIGR
 

@@ -38,14 +38,15 @@
 #ifndef FILTERENGINE_H
 #define FILTERENGINE_H
 
+#include "pbbam/BamRecord.h"
+#include <memory>
 #include <vector>
 
 namespace PacBio {
 namespace BAM {
-
-class BamRecord;
-
 namespace internal {
+
+
 
 class FilterEngine {
 
@@ -60,7 +61,7 @@ public:
     bool Accepts(std::vector<BamRecord>& r) const;
 
 private:
-//    std::vector<FilterParameter> parameters_;
+
 };
 
 } // namespace internal

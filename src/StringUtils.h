@@ -40,6 +40,8 @@
 
 #include <algorithm>
 #include <exception>
+#include <ios>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>

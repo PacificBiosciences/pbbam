@@ -8,6 +8,30 @@ The public API should not be considered stable yet. Once we lock down a version 
 define a reference point & compatibility guarantees will be maintained within each major version 
 series.
 
+## [0.0.7] - 2015-06-07
+
+### Added
+- PBI index lookup API. Not so much intended for client use directly, but will enable construction of
+  higher-level semantic queries: grouping by, filtering, etc.
+- DataSet & PBI-aware queries (e.g. ZmwGroupQuery). More PBI-enabled queries to follow.
+- More flexibility in tag access. Samtools has a habit of performing a "shrink-to-fit" when it handles
+  integer-valued tag data. Thus we cannot **guarantee** the binary type that our API will have to process.
+  Safe conversions are allowed on integer-like data only. Under- or overflows in casting will trigger an 
+  exception. All other tag data types must be asked for explicitly, or else an exception will be raised, 
+  as before.
+- BamHeader::DeepCopy - allows creation of editable header data, without overwriting all shared instances
+
+### Fixed
+- XSD compliance for DataSet APIs.
+
+### Changed
+- The functionality provided by ZmwQuery (group by hole number), is now available using the ZmwGroupQuery
+  object. The new ZmwQuery returns a single-record iterator (a la EntireFileQuery), but limited to a whitelist 
+  of requested hole numbers.
+
+### Removed
+- XSD non-compliant classes (e.g. ExternalDataReference)
+
 ## [0.0.6] - 2015-06-07
 
 ### Added

@@ -38,8 +38,9 @@
 #ifndef XMLREADER_H
 #define XMLREADER_H
 
-#include "pbbam/dataset/DataSetBase.h"
+#include "pbbam/DataSet.h"
 #include <iosfwd>
+#include <memory>
 
 namespace PacBio {
 namespace BAM {
@@ -48,7 +49,7 @@ namespace internal {
 class XmlReader
 {
 public:
-    static DataSetBase FromStream(std::istream& in);
+    static std::unique_ptr<DataSetBase> FromStream(std::istream& in);
 };
 
 } // namespace internal

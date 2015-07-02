@@ -48,7 +48,7 @@ template<typename T>
 class IMergeStrategyBase
 {
 public:
-    using FileIterPtr = typename IBamFileIteratorBase<T>::Ptr;
+    typedef typename IBamFileIteratorBase<T>::Ptr FileIterPtr;
 protected:
     IMergeStrategyBase(void) { }
 public:

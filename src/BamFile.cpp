@@ -62,9 +62,9 @@ public:
         // attempt open
         std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
         if (!f)
-            throw std::exception();
+            throw std::runtime_error("could not open file");
         if (f->format.format != bam)
-            throw std::exception();
+            throw std::runtime_error("expected BAM, unknown format");
 
         // attempt fetch header
         std::unique_ptr<bam_hdr_t, internal::HtslibHeaderDeleter> hdr(sam_hdr_read(f.get()));
@@ -135,7 +135,7 @@ void BamFile::EnsureStandardIndexExists(void) const
 
     // otherwise, create BAI index file
     if (bam_index_build(bamFn.c_str(), 0) != 0)
-        throw std::exception();
+        throw std::runtime_error("could not build BAI index");
 }
 
 std::string BamFile::Filename(void) const
@@ -144,7 +144,7 @@ std::string BamFile::Filename(void) const
 bool BamFile::HasReference(const std::string& name) const
 { return d_->header_.HasSequence(name); }
 
-BamHeader BamFile::Header(void) const
+const BamHeader& BamFile::Header(void) const
 { return d_->header_; }
 
 bool BamFile::IsPacBioBAM(void) const

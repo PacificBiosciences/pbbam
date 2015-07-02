@@ -50,7 +50,7 @@ template<typename T>
 struct MergeItemBase
 {
 public:
-    using FileIterPtr = typename IBamFileIteratorBase<T>::Ptr;
+    typedef typename IBamFileIteratorBase<T>::Ptr FileIterPtr;
 
 public:
     MergeItemBase(void) { }

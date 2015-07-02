@@ -44,13 +44,13 @@
 
 namespace PacBio {
 namespace BAM {
-namespace staging {
+//namespace staging {
 
 class PBBAM_EXPORT ZmwGroupQuery : public internal::IGroupQuery
 {
 public:
     ZmwGroupQuery(const DataSet& dataset);
-    ZmwGroupQuery(const std::vector<int>& zmwWhitelist,
+    ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist,
                   const DataSet& dataset);
 
 protected:
@@ -60,7 +60,7 @@ private:
     std::vector<int> whitelist_;
 };
 
-} // namespace staging
+//} // namespace staging
 } // namespace BAM
 } // namespace PacBio
 

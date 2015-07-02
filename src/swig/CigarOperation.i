@@ -1,5 +1,7 @@
 /* CigarOperation.i */
+
 %module PacBioBam
+
 %{
 #include <pbbam/CigarOperation.h>
 using namespace PacBio;
@@ -16,7 +18,7 @@ using namespace PacBio::BAM;
 %include <pbbam/CigarOperation.h>
 
 // enums aren't always named consistently (at least between Mac/clang/swig & Linux/gcc/swig)
-// so, keep this after the main %include so client sourcecan be consistent 
+// so, keep this after the main %include so client source can be consistent 
 #ifdef SWIGPYTHON
 %pythoncode %{
 try:
@@ -43,4 +45,3 @@ except NameError:
 	SEQUENCE_MISMATCH = CigarOperationType_SEQUENCE_MISMATCH
 %}
 #endif
-

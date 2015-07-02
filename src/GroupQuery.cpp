@@ -49,11 +49,11 @@ SequentialGroupQueryBase::SequentialGroupQueryBase(const BamFile & file)
 {
     htsFile_.reset(sam_open(file.Filename().c_str(), "rb"), internal::HtslibFileDeleter());
     if (!htsFile_) 
-        throw std::exception();
+        throw std::runtime_error("could not open BAM file for reading");
 
     htsHeader_.reset(sam_hdr_read(htsFile_.get()), internal::HtslibHeaderDeleter());
     if (!htsHeader_) 
-        throw std::exception();
+        throw std::runtime_error("could not read BAM header data");
 }
 
 bool SequentialGroupQueryBase::GetNext(vector<BamRecord> & records) 

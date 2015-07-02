@@ -99,4 +99,4 @@ TEST(AlignmentPrinterTest, Print)
     record = *it++;
     std::cerr << pretty.Print(record, Orientation::GENOMIC);
     std::cerr << std::endl << std::endl;
-};
+}

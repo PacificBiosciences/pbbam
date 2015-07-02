@@ -38,7 +38,7 @@
 #ifndef FOFNREADER_H
 #define FOFNREADER_H
 
-#include "pbbam/dataset/DataSet.h"
+#include "pbbam/DataSet.h"
 #include <iosfwd>
 #include <string>
 #include <vector>
