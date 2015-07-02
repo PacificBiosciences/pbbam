@@ -169,6 +169,8 @@ public:
     DataSet& UniqueId(const std::string& uuid);
     DataSet& Version(const std::string& version);
 
+    DataSet& Type(const PacBio::BAM::DataSet::TypeEnum type);
+
     /// \}
 
 public:

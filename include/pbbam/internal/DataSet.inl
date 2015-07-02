@@ -169,6 +169,9 @@ inline DataSet& DataSet::TimeStampedName(const std::string& timeStampedName)
 inline const PacBio::BAM::DataSet::TypeEnum DataSet::Type(void) const
 { return DataSet::NameToType(TypeName()); }
 
+inline DataSet& DataSet::Type(const DataSet::TypeEnum type)
+{ d_->Label(DataSet::TypeToName(type)); return *this; }
+
 inline const std::string& DataSet::TypeName(void) const
 { return d_->Label(); }
 
