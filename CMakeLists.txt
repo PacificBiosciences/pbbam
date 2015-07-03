@@ -96,7 +96,7 @@ endif()
 if (MSVC)
     set(PacBioBAM_CXX_FLAGS "/Wall")
 else()
-    set(PacBioBAM_CXX_FLAGS "-std=c++11 -Wall")
+    set(PacBioBAM_CXX_FLAGS "-std=c++11 -Wall -Wno-sign-compare")
 endif()
 
 # NOTE: -Wno-unused-local-typedefs used to quash clang warnings w/ Boost
