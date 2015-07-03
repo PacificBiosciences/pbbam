@@ -252,7 +252,7 @@ inline T& DataSetElement::Child(const std::string& label)
 {
     const int i = IndexOf(label);
     if (i >= 0) {
-        assert(i < NumChildren());
+        assert(static_cast<size_t>(i) < NumChildren());
         return Child<T>(i);
     } else {
         AddChild(DataSetElement(label));

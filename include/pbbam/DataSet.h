@@ -93,7 +93,7 @@ public:
     /// \name Operators
     /// \{
 
-    DataSet& operator+=(const DataSet& other);
+    DataSet& operator+=(const DataSet&);
 
     bool operator==(const DataSet&) const;
 

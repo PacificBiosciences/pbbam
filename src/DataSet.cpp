@@ -105,7 +105,7 @@ DataSet& DataSet::operator=(DataSet&& other)
 
 DataSet::~DataSet(void) { }
 
-DataSet& DataSet::operator+=(const DataSet& other)
+DataSet& DataSet::operator+=(const DataSet&)
 {
     return *this;
 }
