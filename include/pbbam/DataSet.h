@@ -95,7 +95,7 @@ public:
 
     DataSet& operator+=(const DataSet& other);
 
-    bool operator==(const DataSet& other) const;
+    bool operator==(const DataSet&) const;
 
     /// \}
 
@@ -125,7 +125,7 @@ public:
     const std::string& UniqueId(void) const;
     const std::string& Version(void) const;
 
-    const PacBio::BAM::DataSet::TypeEnum Type(void) const;
+    PacBio::BAM::DataSet::TypeEnum Type(void) const;
     const std::string& TypeName(void) const;
 
     /// \}

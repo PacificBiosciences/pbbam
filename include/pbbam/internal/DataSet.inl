@@ -166,7 +166,7 @@ inline std::string& DataSet::TimeStampedName(void)
 inline DataSet& DataSet::TimeStampedName(const std::string& timeStampedName)
 { d_->TimeStampedName(timeStampedName); return *this; }
 
-inline const PacBio::BAM::DataSet::TypeEnum DataSet::Type(void) const
+inline PacBio::BAM::DataSet::TypeEnum DataSet::Type(void) const
 { return DataSet::NameToType(TypeName()); }
 
 inline DataSet& DataSet::Type(const DataSet::TypeEnum type)

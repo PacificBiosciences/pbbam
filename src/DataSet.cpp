@@ -110,7 +110,7 @@ DataSet& DataSet::operator+=(const DataSet& other)
     return *this;
 }
 
-bool DataSet::operator==(const DataSet& other) const
+bool DataSet::operator==(const DataSet&) const
 {
     return true;
 }

@@ -114,7 +114,7 @@ struct IsEqualVisitor : public boost::static_visitor<bool>
         return false;
     }
 
-    bool operator()(const boost::blank& lhs, const boost::blank& rhs) const
+    bool operator()(const boost::blank&, const boost::blank&) const
     { return true; }
 
     template <typename T>
