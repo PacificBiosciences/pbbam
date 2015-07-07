@@ -5,6 +5,13 @@ include_directories(${R_INCLUDE_DIR})
 set(PacBioBAM_RLibDir ${PacBioBAM_LibDir}/R)
 set(RTestRootDir ${PacBioBAM_TestsDir}/src/R)
 
+# Suppress warnings from generated code
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag("-Wno-unused-parameter" HAS_NO_UNUSED_PARAMETER)
+if(HAS_NO_UNUSED_PARAMETER)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
+endif()
+
 # SWIG R does not support PBBAM_SHARED_PTR, but it does support boost::shared_ptr
 # So force boost if we're wrapping for R.
 add_definitions(-DPBBAM_USE_BOOST_SHARED_PTR)
@@ -18,14 +25,6 @@ if(R_LIBRARIES)
     swig_link_libraries(PacBioBam ${R_LIBRARIES})
 endif()
 
-# symlink htslib
-add_custom_target(
-    htslib_symlink
-    ALL
-    "${CMAKE_COMMAND}" -E create_symlink ${Htslib_Libraries} ${PacBioBAM_RLibDir}/libhts.1${CMAKE_SHARED_LIBRARY_SUFFIX}
-    COMMENT "Symlinking htslib for R"
-)
-
 # make sure the library is named "PacBioBam.so" explicitly
 # no "lib" prefix... that gets in the way of the name lookups between SWIG/R
 # and make sure library ends up in lib/R
@@ -37,8 +36,7 @@ set_target_properties(
     SONAME PacBioBam.so
     PREFIX ""
 )
-add_dependencies(${SWIG_MODULE_PacBioBam_REAL_NAME} pbbam-shared)
-add_dependencies(${SWIG_MODULE_PacBioBam_REAL_NAME} htslib_symlink)
+add_dependencies(${SWIG_MODULE_PacBioBam_REAL_NAME} pbbam)
 
 # simple "wrapper worked" check
 configure_file(

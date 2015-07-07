@@ -44,7 +44,7 @@ if(PacBioBAM_wrap_r)
     add_definitions(-DPBBAM_USE_BOOST_SHARED_PTR)
 endif()
 
-add_library(pbbam ${PB_LIB_MODE} ${SOURCES})
+add_library(pbbam ${SOURCES})
 set_target_properties(pbbam PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}
     RUNTIME_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}
