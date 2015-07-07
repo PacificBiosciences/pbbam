@@ -23,5 +23,5 @@ add_executable(pbindex ${PBINDEX_SOURCES})
 set_target_properties(pbindex PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PacBioBAM_BinDir}
 )
-target_link_libraries(pbindex ${PacBioBAM_LIBRARIES})
+target_link_libraries(pbindex pbbam)
 
