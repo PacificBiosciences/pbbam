@@ -50,7 +50,6 @@ endif()
     
 # main project paths
 set(PacBioBAM_RootDir       ${PacBioBAM_SOURCE_DIR})
-set(PacBioBAM_BinDir        ${PacBioBAM_RootDir}/bin)
 set(PacBioBAM_DocsDir       ${PacBioBAM_RootDir}/docs)
 set(PacBioBAM_IncludeDir    ${PacBioBAM_RootDir}/include)
 set(PacBioBAM_SourceDir     ${PacBioBAM_RootDir}/src)
@@ -66,9 +65,11 @@ else()
     endif()
 endif()
 
+set(PacBioBAM_BinDir        ${PacBioBAM_OutputDir}/bin)
 set(PacBioBAM_LibDir        ${PacBioBAM_OutputDir}/lib)
 set(PacBioBAM_ThirdPartyDir ${PacBioBAM_RootDir}/third-party)
 
+file(MAKE_DIRECTORY ${PacBioBAM_BinDir})
 file(MAKE_DIRECTORY ${PacBioBAM_LibDir})
 
 # use some custom Find*, Use* cmake modules
@@ -109,6 +110,7 @@ endif()
 
 # keep this order (src first, at least)
 add_subdirectory(src)
+add_subdirectory(tools)
 if(PacBioBAM_build_docs)
     add_subdirectory(docs)
 endif()
