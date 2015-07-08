@@ -1599,6 +1599,18 @@ std::string BamRecord::ReferenceName(void) const
 Position BamRecord::ReferenceStart(void) const
 { return impl_.Position(); }
 
+void BamRecord::ResetCachedPositions(void) const 
+{
+    alignedEnd_   = PacBio::BAM::UnmappedPosition;
+    alignedStart_ = PacBio::BAM::UnmappedPosition;
+}
+
+void BamRecord::ResetCachedPositions(void) 
+{
+    alignedEnd_   = PacBio::BAM::UnmappedPosition;
+    alignedStart_ = PacBio::BAM::UnmappedPosition;
+}
+
 VirtualRegionType BamRecord::ScrapType(void) const
 {
     const Tag& scTag = impl_.TagValue(internal::tagName_scrap_type);

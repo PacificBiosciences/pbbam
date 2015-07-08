@@ -101,9 +101,9 @@ TEST(BamRecordMappingTest, BasicMap)
     const string tagQuals_rev = quals_rev;
     const f_data frames_rev = { 20, 30, 10, 40, 40, 30, 20, 20, 10, 10 };
 
-    const string s1_cigar = "10M";
-    const string s2_cigar = "5M3D5M";
-    const string s3_cigar = "4M1D2I2D4M";
+    const string s1_cigar = "10=";
+    const string s2_cigar = "5=3D5=";
+    const string s3_cigar = "4=1D2I2D4=";
 
     BamRecord s1 = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     BamRecord s2 = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
@@ -128,9 +128,9 @@ TEST(BamRecordMappingTest, BasicMap)
     EXPECT_EQ(qStart, s1.QueryStart());
     EXPECT_EQ(qEnd,   s1.QueryEnd());
     EXPECT_EQ(500, s1.AlignedStart());
-    EXPECT_EQ(510, s1.AlignedEnd());         // 500 + 10M
+    EXPECT_EQ(510, s1.AlignedEnd());         // 500 + 10=
     EXPECT_EQ(100, s1.ReferenceStart());
-    EXPECT_EQ(110, s1.ReferenceEnd());       // 100 + 10M
+    EXPECT_EQ(110, s1.ReferenceEnd());       // 100 + 10=
 
     EXPECT_EQ(seq,      s1.Sequence());
     EXPECT_EQ(quals,    s1.Qualities().Fastq());
@@ -149,9 +149,9 @@ TEST(BamRecordMappingTest, BasicMap)
     EXPECT_EQ(qStart, s1_rev.QueryStart());
     EXPECT_EQ(qEnd,   s1_rev.QueryEnd());
     EXPECT_EQ(500, s1_rev.AlignedStart());
-    EXPECT_EQ(510, s1_rev.AlignedEnd());         // 500 + 10M
+    EXPECT_EQ(510, s1_rev.AlignedEnd());         // 500 + 10=
     EXPECT_EQ(100, s1_rev.ReferenceStart());
-    EXPECT_EQ(110, s1_rev.ReferenceEnd());       // 100 + 10M
+    EXPECT_EQ(110, s1_rev.ReferenceEnd());       // 100 + 10=
 
     // - native
     EXPECT_EQ(seq,      s1_rev.Sequence(Orientation::NATIVE));
@@ -180,9 +180,9 @@ TEST(BamRecordMappingTest, BasicMap)
     EXPECT_EQ(qStart, s2.QueryStart());
     EXPECT_EQ(qEnd,   s2.QueryEnd());
     EXPECT_EQ(500, s2.AlignedStart());
-    EXPECT_EQ(510, s2.AlignedEnd());         // 500 + 10M
+    EXPECT_EQ(510, s2.AlignedEnd());         // 500 + 10=
     EXPECT_EQ(100, s2.ReferenceStart());
-    EXPECT_EQ(113, s2.ReferenceEnd());      // 100 + 10M + 3D
+    EXPECT_EQ(113, s2.ReferenceEnd());      // 100 + 10= + 3D
 
     EXPECT_EQ(seq,      s2.Sequence());
     EXPECT_EQ(quals,    s2.Qualities().Fastq());
@@ -201,9 +201,9 @@ TEST(BamRecordMappingTest, BasicMap)
     EXPECT_EQ(qStart, s2_rev.QueryStart());
     EXPECT_EQ(qEnd,   s2_rev.QueryEnd());
     EXPECT_EQ(500, s2_rev.AlignedStart());
-    EXPECT_EQ(510, s2_rev.AlignedEnd());         // 500 + 10M
+    EXPECT_EQ(510, s2_rev.AlignedEnd());         // 500 + 10=
     EXPECT_EQ(100, s2_rev.ReferenceStart());
-    EXPECT_EQ(113, s2_rev.ReferenceEnd());      // 100 + 10M + 3D
+    EXPECT_EQ(113, s2_rev.ReferenceEnd());      // 100 + 10= + 3D
 
     // - native
     EXPECT_EQ(seq,      s2_rev.Sequence(Orientation::NATIVE));
@@ -232,9 +232,9 @@ TEST(BamRecordMappingTest, BasicMap)
     EXPECT_EQ(qStart, s3.QueryStart());
     EXPECT_EQ(qEnd,   s3.QueryEnd());
     EXPECT_EQ(500, s3.AlignedStart());
-    EXPECT_EQ(510, s3.AlignedEnd());         // 500 + 8M + 2I
+    EXPECT_EQ(510, s3.AlignedEnd());         // 500 + 8= + 2I
     EXPECT_EQ(100, s3.ReferenceStart());
-    EXPECT_EQ(111, s3.ReferenceEnd());      // 100 + 8M + 3D
+    EXPECT_EQ(111, s3.ReferenceEnd());      // 100 + 8= + 3D
 
     EXPECT_EQ(seq,      s3.Sequence());
     EXPECT_EQ(quals,    s3.Qualities().Fastq());
@@ -253,9 +253,9 @@ TEST(BamRecordMappingTest, BasicMap)
     EXPECT_EQ(qStart, s3_rev.QueryStart());
     EXPECT_EQ(qEnd,   s3_rev.QueryEnd());
     EXPECT_EQ(500, s3_rev.AlignedStart());
-    EXPECT_EQ(510, s3_rev.AlignedEnd());         // 500 + 8M + 2I
+    EXPECT_EQ(510, s3_rev.AlignedEnd());         // 500 + 8= + 2I
     EXPECT_EQ(100, s3_rev.ReferenceStart());
-    EXPECT_EQ(111, s3_rev.ReferenceEnd());      // 100 + 8M + 3D
+    EXPECT_EQ(111, s3_rev.ReferenceEnd());      // 100 + 8= + 3D
 
     // - native
     EXPECT_EQ(seq,      s3_rev.Sequence(Orientation::NATIVE));
@@ -293,9 +293,9 @@ TEST(BamRecordMappingTest, SoftClipMapping)
     const string tagQuals_rev = quals_rev;
     const f_data frames_rev = { 10, 10, 10, 20, 30, 10, 40, 40, 30, 20, 20, 10, 10, 40, 40 };
 
-    const string s1_cigar = "2S10M3S";
-    const string s2_cigar = "2S5M3D5M3S";
-    const string s3_cigar = "2S4M1D2I2D4M3S";
+    const string s1_cigar = "2S10=3S";
+    const string s2_cigar = "2S5=3D5=3S";
+    const string s3_cigar = "2S4=1D2I2D4=3S";
 
     BamRecord s1 = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     BamRecord s2 = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
@@ -320,9 +320,9 @@ TEST(BamRecordMappingTest, SoftClipMapping)
     EXPECT_EQ(qStart, s1.QueryStart());      // 500
     EXPECT_EQ(qEnd,   s1.QueryEnd());        // QStart + seqLength
     EXPECT_EQ(502, s1.AlignedStart());       // QStart + 2S
-    EXPECT_EQ(512, s1.AlignedEnd());         // AStart + 10M
+    EXPECT_EQ(512, s1.AlignedEnd());         // AStart + 10=
     EXPECT_EQ(100, s1.ReferenceStart());     // 100
-    EXPECT_EQ(110, s1.ReferenceEnd());       // RefStart + 10M
+    EXPECT_EQ(110, s1.ReferenceEnd());       // RefStart + 10=
 
     EXPECT_EQ(seq,      s1.Sequence());
     EXPECT_EQ(quals,    s1.Qualities().Fastq());
@@ -341,9 +341,9 @@ TEST(BamRecordMappingTest, SoftClipMapping)
     EXPECT_EQ(qStart, s1_rev.QueryStart());      // 500
     EXPECT_EQ(qEnd,   s1_rev.QueryEnd());        // QStart + seqLength
     EXPECT_EQ(503, s1_rev.AlignedStart());       // QStart + 3S
-    EXPECT_EQ(513, s1_rev.AlignedEnd());         // AStart + 10M
+    EXPECT_EQ(513, s1_rev.AlignedEnd());         // AStart + 10=
     EXPECT_EQ(100, s1_rev.ReferenceStart());     // 100
-    EXPECT_EQ(110, s1_rev.ReferenceEnd());       // RefStart + 10M
+    EXPECT_EQ(110, s1_rev.ReferenceEnd());       // RefStart + 10=
 
     // - native
     EXPECT_EQ(seq,      s1_rev.Sequence(Orientation::NATIVE));
@@ -372,9 +372,9 @@ TEST(BamRecordMappingTest, SoftClipMapping)
     EXPECT_EQ(qStart, s2.QueryStart());      // 500
     EXPECT_EQ(qEnd,   s2.QueryEnd());        // QStart + seqLength
     EXPECT_EQ(502, s2.AlignedStart());       // QStart + 2S
-    EXPECT_EQ(512, s2.AlignedEnd());         // AStart + 10M
+    EXPECT_EQ(512, s2.AlignedEnd());         // AStart + 10=
     EXPECT_EQ(100, s2.ReferenceStart());     // 100
-    EXPECT_EQ(113, s2.ReferenceEnd());       // RefStart + 10M + 3D
+    EXPECT_EQ(113, s2.ReferenceEnd());       // RefStart + 10= + 3D
 
     EXPECT_EQ(seq,      s2.Sequence());
     EXPECT_EQ(quals,    s2.Qualities().Fastq());
@@ -393,9 +393,9 @@ TEST(BamRecordMappingTest, SoftClipMapping)
     EXPECT_EQ(qStart, s2_rev.QueryStart());      // 500
     EXPECT_EQ(qEnd,   s2_rev.QueryEnd());        // QStart + seqLength
     EXPECT_EQ(503, s2_rev.AlignedStart());       // QStart + 3S
-    EXPECT_EQ(513, s2_rev.AlignedEnd());         // AStart + 10M
+    EXPECT_EQ(513, s2_rev.AlignedEnd());         // AStart + 10=
     EXPECT_EQ(100, s2_rev.ReferenceStart());     // 100
-    EXPECT_EQ(113, s2_rev.ReferenceEnd());       // RefStart + 10M + 3D
+    EXPECT_EQ(113, s2_rev.ReferenceEnd());       // RefStart + 10= + 3D
 
     // - native
     EXPECT_EQ(seq,      s2_rev.Sequence(Orientation::NATIVE));
@@ -424,9 +424,9 @@ TEST(BamRecordMappingTest, SoftClipMapping)
     EXPECT_EQ(qStart, s3.QueryStart());      // 500
     EXPECT_EQ(qEnd,   s3.QueryEnd());        // QStart + seqLength
     EXPECT_EQ(502, s3.AlignedStart());       // QStart + 2S
-    EXPECT_EQ(512, s3.AlignedEnd());         // AStart + 8M + 2I
+    EXPECT_EQ(512, s3.AlignedEnd());         // AStart + 8= + 2I
     EXPECT_EQ(100, s3.ReferenceStart());     // 100
-    EXPECT_EQ(111, s3.ReferenceEnd());       // RefStart + 8M + 3D
+    EXPECT_EQ(111, s3.ReferenceEnd());       // RefStart + 8= + 3D
 
     EXPECT_EQ(seq,      s3.Sequence());
     EXPECT_EQ(quals,    s3.Qualities().Fastq());
@@ -445,9 +445,9 @@ TEST(BamRecordMappingTest, SoftClipMapping)
     EXPECT_EQ(qStart, s3_rev.QueryStart());      // 500
     EXPECT_EQ(qEnd,   s3_rev.QueryEnd());        // QStart + seqLength
     EXPECT_EQ(503, s3_rev.AlignedStart());       // QStart + 3S
-    EXPECT_EQ(513, s3_rev.AlignedEnd());         // AStart + 8M + 2I
+    EXPECT_EQ(513, s3_rev.AlignedEnd());         // AStart + 8= + 2I
     EXPECT_EQ(100, s3_rev.ReferenceStart());     // 100
-    EXPECT_EQ(111, s3_rev.ReferenceEnd());       // RefStart + 8M + 3D
+    EXPECT_EQ(111, s3_rev.ReferenceEnd());       // RefStart + 8= + 3D
 
     // - native
     EXPECT_EQ(seq,      s3_rev.Sequence(Orientation::NATIVE));
@@ -478,7 +478,7 @@ TEST(BamRecordMappingTest, MappedCopy)
     const string tagQuals = "?]?]?]?]?*";
     const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
     const uint8_t mapQual = 80;
-    const string cigar    = "4M1D2I2D4M";
+    const string cigar    = "4=1D2I2D4=";
 
     const BamRecord orig = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     const BamRecord mapped = orig.Mapped(0, 100, Strand::FORWARD, cigar, mapQual);
@@ -491,9 +491,9 @@ TEST(BamRecordMappingTest, MappedCopy)
     EXPECT_EQ(500, mapped.QueryStart());      // 500
     EXPECT_EQ(510, mapped.QueryEnd());        // QStart + seqLength
     EXPECT_EQ(500, mapped.AlignedStart());    // QStart
-    EXPECT_EQ(510, mapped.AlignedEnd());      // QStart + 8M + 2I
+    EXPECT_EQ(510, mapped.AlignedEnd());      // QStart + 8= + 2I
     EXPECT_EQ(100, mapped.ReferenceStart());  // 100
-    EXPECT_EQ(111, mapped.ReferenceEnd());    // RefStart + 8M + 3D
+    EXPECT_EQ(111, mapped.ReferenceEnd());    // RefStart + 8= + 3D
 
     EXPECT_EQ(seq,      mapped.Sequence());
     EXPECT_EQ(quals,    mapped.Qualities().Fastq());
@@ -514,7 +514,7 @@ TEST(BamRecordMappingTest, StaticMapped)
     const string tagQuals = "?]?]?]?]?*";
     const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
     const uint8_t mapQual = 80;
-    const string cigar    = "4M1D2I2D4M";
+    const string cigar    = "4=1D2I2D4=";
 
     const BamRecord orig = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     const BamRecord mapped = BamRecord::Mapped(orig, 0, 100, Strand::FORWARD, cigar, mapQual);
@@ -527,9 +527,9 @@ TEST(BamRecordMappingTest, StaticMapped)
     EXPECT_EQ(500, mapped.QueryStart());      // 500
     EXPECT_EQ(510, mapped.QueryEnd());        // QStart + seqLength
     EXPECT_EQ(500, mapped.AlignedStart());    // QStart
-    EXPECT_EQ(510, mapped.AlignedEnd());      // QStart + 8M + 2I
+    EXPECT_EQ(510, mapped.AlignedEnd());      // QStart + 8= + 2I
     EXPECT_EQ(100, mapped.ReferenceStart());  // 100
-    EXPECT_EQ(111, mapped.ReferenceEnd());    // RefStart + 8M + 3D
+    EXPECT_EQ(111, mapped.ReferenceEnd());    // RefStart + 8= + 3D
 
     EXPECT_EQ(seq,      mapped.Sequence());
     EXPECT_EQ(quals,    mapped.Qualities().Fastq());

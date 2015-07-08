@@ -61,42 +61,42 @@ const string singleInsertionBam = tests::Data_Dir + "/aligned.bam";
 
 TEST(AlignmentPrinterTest, Print)
 {
-    IndexedFastaReader r(lambdaFasta);
+//    IndexedFastaReader r(lambdaFasta);
 
-    BamFile bamFile(singleInsertionBam);
-    EntireFileQuery bamQuery(bamFile);
+//    BamFile bamFile(singleInsertionBam);
+//    EntireFileQuery bamQuery(bamFile);
 
-    auto it = bamQuery.begin();
+//    auto it = bamQuery.begin();
     
 
-    // std::cerr << record.AlignedStart() << std::endl;
-    // std::cerr << record.Sequence(Orientation::GENOMIC, true) << std::endl;
-    // std::cerr << record.Sequence(Orientation::GENOMIC, true, true) << std::endl;
+//    // std::cerr << record.AlignedStart() << std::endl;
+//    // std::cerr << record.Sequence(Orientation::GENOMIC, true) << std::endl;
+//    // std::cerr << record.Sequence(Orientation::GENOMIC, true, true) << std::endl;
 
-    AlignmentPrinter pretty(r);
+//    AlignmentPrinter pretty(r);
 
-    // std::string expected = 
-    // "Read        : singleInsertion2\n"
-    // "Reference   : lambda_NEB3011\n"
-    // "\n"
-    // "Read-length : 49\n"
-    // "Concordance : 0.96\n"
-    // "\n"
-    // "   GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT\n"
-    // "   |||||||| ||||||||||||||||||| |||||||||||||||||||||\n"
-    // "   GGCTGCAG-GTACAGCGGTCAGGAGGCCAATTGATGCCGGACTGGCTGAT\n";
-    // EXPECT_EQ(expected, pretty.Print(record, Orientation::NATIVE));
+//    // std::string expected =
+//    // "Read        : singleInsertion2\n"
+//    // "Reference   : lambda_NEB3011\n"
+//    // "\n"
+//    // "Read-length : 49\n"
+//    // "Concordance : 0.96\n"
+//    // "\n"
+//    // "   GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT\n"
+//    // "   |||||||| ||||||||||||||||||| |||||||||||||||||||||\n"
+//    // "   GGCTGCAG-GTACAGCGGTCAGGAGGCCAATTGATGCCGGACTGGCTGAT\n";
+//    // EXPECT_EQ(expected, pretty.Print(record, Orientation::NATIVE));
 
-    auto record = *it++;
-    std::cerr << pretty.Print(record, Orientation::GENOMIC);
-    std::cerr << std::endl << std::endl;
-    record = *it++;
-    std::cerr << pretty.Print(record, Orientation::GENOMIC);
-    std::cerr << std::endl << std::endl;
-    record = *it++;
-    std::cerr << pretty.Print(record, Orientation::GENOMIC);
-    std::cerr << std::endl << std::endl;
-    record = *it++;
-    std::cerr << pretty.Print(record, Orientation::GENOMIC);
-    std::cerr << std::endl << std::endl;
+//    auto record = *it++;
+//    std::cerr << pretty.Print(record, Orientation::GENOMIC);
+//    std::cerr << std::endl << std::endl;
+//    record = *it++;
+//    std::cerr << pretty.Print(record, Orientation::GENOMIC);
+//    std::cerr << std::endl << std::endl;
+//    record = *it++;
+//    std::cerr << pretty.Print(record, Orientation::GENOMIC);
+//    std::cerr << std::endl << std::endl;
+//    record = *it++;
+//    std::cerr << pretty.Print(record, Orientation::GENOMIC);
+//    std::cerr << std::endl << std::endl;
 }

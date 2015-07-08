@@ -8,7 +8,17 @@ The public API should not be considered stable yet. Once we lock down a version 
 define a reference point & compatibility guarantees will be maintained within each major version 
 series.
 
-## [0.0.7] - 2015-06-07
+## [Active]
+- Bringing API up to BAM spec v3.0b7 compliance
+- PBI creation bugfixes
+- Removal of 'M' as allowed CIGAR operation
+
+## [0.0.8] - 2015-07-02
+
+### Changed
+- Build system refactoring.
+
+## [0.0.7] - 2015-07-02
 
 ### Added
 - PBI index lookup API. Not so much intended for client use directly, but will enable construction of

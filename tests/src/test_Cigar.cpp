@@ -84,15 +84,15 @@ TEST(CigarTest, SetOperationYieldsCorrectType)
     CigarOperation c8; c8.Type(CigarOperationType::SEQUENCE_MATCH);
     CigarOperation c9; c9.Type(CigarOperationType::SEQUENCE_MISMATCH);
 
-    EXPECT_EQ('M', c1.Char() );
-    EXPECT_EQ('I', c2.Char() );
-    EXPECT_EQ('D', c3.Char() );
-    EXPECT_EQ('N', c4.Char() );
-    EXPECT_EQ('S', c5.Char() );
-    EXPECT_EQ('H', c6.Char() );
-    EXPECT_EQ('P', c7.Char() );
-    EXPECT_EQ('=', c8.Char() );
-    EXPECT_EQ('X', c9.Char() );
+    EXPECT_EQ('M', c1.Char());
+    EXPECT_EQ('I', c2.Char());
+    EXPECT_EQ('D', c3.Char());
+    EXPECT_EQ('N', c4.Char());
+    EXPECT_EQ('S', c5.Char());
+    EXPECT_EQ('H', c6.Char());
+    EXPECT_EQ('P', c7.Char());
+    EXPECT_EQ('=', c8.Char());
+    EXPECT_EQ('X', c9.Char());
 }
 
 TEST(CigarTest, SetTypeYieldsCorrectOperation)
@@ -127,36 +127,42 @@ TEST(CigarStringTest, FromStdString_Empty)
 
 TEST(CigarStringTest, FromStdString_SingleOp)
 {
-    const string singleCigar = "100M";
+    const string singleCigar = "100=";
 
     Cigar cigar = Cigar::FromStdString(singleCigar);
     ASSERT_TRUE(cigar.size() == 1);
 
     const CigarOperation& op = cigar.front();
-    EXPECT_TRUE(op.Char()   == 'M');
+    EXPECT_TRUE(op.Char()   == '=');
     EXPECT_TRUE(op.Length() == 100);
 }
 
 TEST(CigarStringTest, FromStdString_MultipleOps)
 {
-    const string multiCigar = "100M2D34I6M";
+    const string multiCigar = "100=2D34I6=6X6=";
 
     Cigar cigar = Cigar::FromStdString(multiCigar);
-    ASSERT_TRUE(cigar.size() == 4);
+    ASSERT_TRUE(cigar.size() == 6);
 
     CigarOperation op0 = cigar.at(0);
     CigarOperation op1 = cigar.at(1);
     CigarOperation op2 = cigar.at(2);
     CigarOperation op3 = cigar.at(3);
+    CigarOperation op4 = cigar.at(4);
+    CigarOperation op5 = cigar.at(5);
 
-    EXPECT_TRUE(op0.Char()   == 'M');
+    EXPECT_TRUE(op0.Char()   == '=');
     EXPECT_TRUE(op0.Length() == 100);
     EXPECT_TRUE(op1.Char()   == 'D');
     EXPECT_TRUE(op1.Length() == 2);
     EXPECT_TRUE(op2.Char()   == 'I');
     EXPECT_TRUE(op2.Length() == 34);
-    EXPECT_TRUE(op3.Char()   == 'M');
+    EXPECT_TRUE(op3.Char()   == '=');
     EXPECT_TRUE(op3.Length() == 6);
+    EXPECT_TRUE(op4.Char()   == 'X');
+    EXPECT_TRUE(op4.Length() == 6);
+    EXPECT_TRUE(op5.Char()   == '=');
+    EXPECT_TRUE(op5.Length() == 6);
 }
 
 TEST(CigarStringTest, ToStdString_Empty)
@@ -168,23 +174,25 @@ TEST(CigarStringTest, ToStdString_Empty)
 
 TEST(CigarStringTest, ToStdString_SingleOp)
 {
-    const string singleCigar = "100M";
+    const string singleCigar = "100=";
 
     Cigar cigar;
-    cigar.push_back( CigarOperation(CigarOperationType::ALIGNMENT_MATCH, 100) );
+    cigar.push_back( CigarOperation(CigarOperationType::SEQUENCE_MATCH, 100) );
 
     EXPECT_EQ(singleCigar, cigar.ToStdString());
 }
 
 TEST(CigarStringTest, ToStdString_MultipleOps)
 {
-    const string multiCigar = "100M2D34I6M";
+    const string multiCigar = "100=2D34I6=6X6=";
 
     Cigar cigar;
-    cigar.push_back( CigarOperation(CigarOperationType::ALIGNMENT_MATCH, 100) );
-    cigar.push_back( CigarOperation(CigarOperationType::DELETION, 2) );
-    cigar.push_back( CigarOperation(CigarOperationType::INSERTION, 34) );
-    cigar.push_back( CigarOperation(CigarOperationType::ALIGNMENT_MATCH, 6) );
+    cigar.push_back(CigarOperation(CigarOperationType::SEQUENCE_MATCH,  100));
+    cigar.push_back(CigarOperation(CigarOperationType::DELETION,          2));
+    cigar.push_back(CigarOperation(CigarOperationType::INSERTION,        34));
+    cigar.push_back(CigarOperation(CigarOperationType::SEQUENCE_MATCH,    6));
+    cigar.push_back(CigarOperation(CigarOperationType::SEQUENCE_MISMATCH, 6));
+    cigar.push_back(CigarOperation(CigarOperationType::SEQUENCE_MATCH,    6));
 
     EXPECT_EQ(multiCigar, cigar.ToStdString());
 }

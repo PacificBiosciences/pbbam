@@ -745,6 +745,24 @@ public:
    BamRecord& QueryEnd(const PacBio::BAM::Position pos);
    BamRecord& QueryStart(const PacBio::BAM::Position pos);
 
+   /// Resets cached aligned start/end positions.
+   /// 
+   /// \note This method not be needed in most client code. It exists
+   /// primarily as a hook for internal reading loops (queries, index build,
+   /// etc.) It's essentially a workaround and will likely be removed from 
+   /// API  as soon as possible.
+   ///
+   void ResetCachedPositions(void);
+
+   /// Resets cached aligned start/end positions.
+   /// 
+   /// \note This method not be needed in most client code. It exists
+   /// primarily as a hook for internal reading loops (queries, index build,
+   /// etc.) It's essentially a workaround and will likely be removed from 
+   /// API  as soon as possible.
+   ///
+   void ResetCachedPositions(void) const;
+
    void UpdateName(void);
 
    static std::vector<uint16_t> EncodePhotons(const std::vector<float>& data);

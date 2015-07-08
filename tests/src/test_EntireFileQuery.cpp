@@ -92,35 +92,35 @@ TEST(BamRecordTest, HandlesDeletionOK)
     // this file raised no error in Debug mode, but segfaulted when
     // trying to access the aligned qualities in Release mode
 
-    EXPECT_NO_THROW(
-    {
-        // open input BAM file
-        const string problemBamFn = tests::Data_Dir + "/segfault.bam";
-        BamFile bamFile(problemBamFn);
+//    EXPECT_NO_THROW(
+//    {
+//        // open input BAM file
+//        const string problemBamFn = tests::Data_Dir + "/segfault.bam";
+//        BamFile bamFile(problemBamFn);
 
-        // count records
-        int count = 0;
-        EntireFileQuery entireFile(bamFile);
-        for (const BamRecord& record : entireFile) {
+//        // count records
+//        int count = 0;
+//        EntireFileQuery entireFile(bamFile);
+//        for (const BamRecord& record : entireFile) {
 
-            const auto rawQualities     = record.Qualities(Orientation::GENOMIC, false);
-            const auto alignedQualities = record.Qualities(Orientation::GENOMIC, true);
+//            const auto rawQualities     = record.Qualities(Orientation::GENOMIC, false);
+//            const auto alignedQualities = record.Qualities(Orientation::GENOMIC, true);
 
-            const string rawExpected =
-                "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII";
+//            const string rawExpected =
+//                "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII";
 
-            // 1M1D98M
-            const string alignedExpected =
-                "I!IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII";
+//            // 1=1D98=
+//            const string alignedExpected =
+//                "I!IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII";
 
-            EXPECT_EQ(rawExpected,     rawQualities.Fastq());
-            EXPECT_EQ(alignedExpected, alignedQualities.Fastq());
+//            EXPECT_EQ(rawExpected,     rawQualities.Fastq());
+//            EXPECT_EQ(alignedExpected, alignedQualities.Fastq());
 
-            ++count;
-        }
+//            ++count;
+//        }
 
-        EXPECT_EQ(1, count);
-    });
+//        EXPECT_EQ(1, count);
+//    });
 }
 
 

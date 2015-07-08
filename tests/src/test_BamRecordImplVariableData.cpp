@@ -205,19 +205,19 @@ TEST(BamRecordImplVariableDataTest, CigarOnly_InitEmpty)
 TEST(BamRecordImplVariableDataTest, CigarOnly_InitNormal_CigarObject)
 {
     Cigar cigar;
-    cigar.push_back(CigarOperation('M', 100));
+    cigar.push_back(CigarOperation('=', 100));
 
     BamRecordImpl bam;
     bam.CigarData(cigar);
 
     EXPECT_EQ(cigar, bam.CigarData());
-    EXPECT_TRUE("100M" == bam.CigarData().ToStdString());
+    EXPECT_TRUE("100=" == bam.CigarData().ToStdString());
     tests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarOnly_InitNormal_StdString)
 {
-    const std::string cigar = "100M";
+    const std::string cigar = "100=";
 
     BamRecordImpl bam;
     bam.CigarData(cigar);
@@ -228,8 +228,8 @@ TEST(BamRecordImplVariableDataTest, CigarOnly_InitNormal_StdString)
 
 TEST(BamRecordImplVariableDataTest, CigarOnly_ThenOverwriteWithLongerCigar)
 {
-    const std::string cigar       = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar       = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     BamRecordImpl bam;
     bam.CigarData(cigar);
@@ -241,8 +241,8 @@ TEST(BamRecordImplVariableDataTest, CigarOnly_ThenOverwriteWithLongerCigar)
 
 TEST(BamRecordImplVariableDataTest, CigarOnly_ThenOverwriteWithShorterCigar)
 {
-    const std::string cigar       = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar       = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     BamRecordImpl bam;
     bam.CigarData(longerCigar);
@@ -254,7 +254,7 @@ TEST(BamRecordImplVariableDataTest, CigarOnly_ThenOverwriteWithShorterCigar)
 
 TEST(BamRecordImplVariableDataTest, CigarOnly_ThenOverwriteWithEmptyCigar)
 {
-    const std::string cigar = "100M";
+    const std::string cigar = "100=";
     const std::string empty = "";
 
     BamRecordImpl bam;
@@ -267,7 +267,7 @@ TEST(BamRecordImplVariableDataTest, CigarOnly_ThenOverwriteWithEmptyCigar)
 
 TEST(BamRecordImplVariableDataTest, CigarTag_Init_Normal)
 {
-    const std::string cigar = "100M";
+    const std::string cigar = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -296,7 +296,7 @@ TEST(BamRecordImplVariableDataTest, CigarTag_Init_Normal)
 
 TEST(BamRecordImplVariableDataTest, CigarTag_Init_EmptyCigar)
 {
-    const std::string cigar = "100M";
+    const std::string cigar = "100=";
     const std::string empty = "";
 
     TagCollection tags;
@@ -327,7 +327,7 @@ TEST(BamRecordImplVariableDataTest, CigarTag_Init_EmptyCigar)
 
 TEST(BamRecordImplVariableDataTest, CigarTag_Init_EmptyTag)
 {
-    const std::string cigar = "100M";
+    const std::string cigar = "100=";
 
     BamRecordImpl bam;
     bam.CigarData(cigar);
@@ -340,8 +340,8 @@ TEST(BamRecordImplVariableDataTest, CigarTag_Init_EmptyTag)
 
 TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithLongerCigar)
 {
-    const std::string cigar = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -371,8 +371,8 @@ TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithLongerCigar)
 
 TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithShorterCigar)
 {
-    const std::string cigar = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -402,7 +402,7 @@ TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithShorterCigar)
 
 TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithEmptyCigar)
 {
-    const std::string cigar = "100M";
+    const std::string cigar = "100=";
     const std::string empty = "";
 
     TagCollection tags;
@@ -433,7 +433,7 @@ TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithEmptyCigar)
 
 TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithLongerTags)
 {
-    const std::string cigar = "100M";
+    const std::string cigar = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -468,7 +468,7 @@ TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithLongerTags)
 
 TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithShorterTags)
 {
-    const std::string cigar = "100M";
+    const std::string cigar = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -501,7 +501,7 @@ TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithShorterTags)
 
 TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithEmptyTags)
 {
-    const std::string cigar = "100M";
+    const std::string cigar = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -1094,7 +1094,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_Init_Normal)
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1110,7 +1110,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_Init_EmptySeqQual)
 {
     const std::string sequence  = "";
     const std::string qualities = "";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1126,7 +1126,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_Init_EmptyQual)
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1158,7 +1158,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithLongerSeq_Norm
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "?]?]";
 
@@ -1177,7 +1177,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithLongerSeq_Empt
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "?]?]";
 
@@ -1196,7 +1196,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithShorterSeq_Nor
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "?]?]";
 
@@ -1215,7 +1215,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithShorterSeq_Emp
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "";
 
@@ -1234,7 +1234,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithEmptySeq)
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string empty     = "";
 
     BamRecordImpl bam;
@@ -1252,8 +1252,8 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithLongerCigar)
 {
     const std::string sequence    = "ACGTACGTACGT";
     const std::string qualities   = "?]?]?]?]?]?]";
-    const std::string cigar       = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar       = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1270,8 +1270,8 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithShorterCigar)
 {
     const std::string sequence    = "ACGTACGTACGT";
     const std::string qualities   = "?]?]?]?]?]?]";
-    const std::string cigar       = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar       = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1288,7 +1288,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithEmptyCigar)
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string empty     = "";
 
     BamRecordImpl bam;
@@ -1306,7 +1306,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_Init_Normal)
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -1340,7 +1340,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_Init_EmptySeqQual)
 {
     const std::string sequence  = "";
     const std::string qualities = "";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -1374,7 +1374,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_Init_EmptyQual)
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -1442,7 +1442,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_Init_EmptyTag)
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1460,7 +1460,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithLongerSeq_N
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "?]?]";
 
@@ -1497,7 +1497,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithLongerSeq_E
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "?]?]";
 
@@ -1534,7 +1534,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithShorterSeq_
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "?]?]";
 
@@ -1571,7 +1571,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithShorterSeq_
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "";
 
@@ -1608,7 +1608,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithEmptySeq)
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string empty     = "";
 
     TagCollection tags;
@@ -1644,8 +1644,8 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithLongerCigar
 {
     const std::string sequence    = "ACGTACGTACGT";
     const std::string qualities   = "?]?]?]?]?]?]";
-    const std::string cigar       = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar       = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -1680,8 +1680,8 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithShorterCiga
 {
     const std::string sequence    = "ACGTACGTACGT";
     const std::string qualities   = "?]?]?]?]?]?]";
-    const std::string cigar       = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar       = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -1716,7 +1716,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithEmptyCigar)
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string empty     = "";
 
     TagCollection tags;
@@ -1752,7 +1752,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithLongerTags)
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -1792,7 +1792,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithShorterTags
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -1830,7 +1830,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithEmptyTags)
 {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -2164,7 +2164,7 @@ TEST(BamRecordImplVariableDataTest, NameTag_ThenOverwriteWithEmptyTags)
 TEST(BamRecordImplVariableDataTest, NameCigar_Init_Normal)
 {
     const std::string readName = "foo";
-    const std::string cigar   = "100M";
+    const std::string cigar   = "100=";
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2178,7 +2178,7 @@ TEST(BamRecordImplVariableDataTest, NameCigar_Init_Normal)
 TEST(BamRecordImplVariableDataTest, NameCigar_Init_EmptyName)
 {
     const std::string readName = "";
-    const std::string cigar    = "100M";
+    const std::string cigar    = "100=";
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2206,7 +2206,7 @@ TEST(BamRecordImplVariableDataTest, NameCigar_Init_EmptyCigar)
 TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithLongerName)
 {
     const std::string readName   = "foo";
-    const std::string cigar      = "100M";
+    const std::string cigar      = "100=";
     const std::string longerName = "this is a long read name";
 
     BamRecordImpl bam;
@@ -2222,7 +2222,7 @@ TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithLongerName)
 TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithShorterName)
 {
     const std::string readName   = "foo";
-    const std::string cigar      = "100M";
+    const std::string cigar      = "100=";
     const std::string longerName = "this is a long read name";
 
     BamRecordImpl bam;
@@ -2238,7 +2238,7 @@ TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithShorterName)
 TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithEmptyName)
 {
     const std::string readName = "foo";
-    const std::string cigar    = "100M";
+    const std::string cigar    = "100=";
     const std::string empty    = "";
 
     BamRecordImpl bam;
@@ -2254,8 +2254,8 @@ TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithEmptyName)
 TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithLongerCigar)
 {
     const std::string readName    = "foo";
-    const std::string cigar       = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar       = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2270,8 +2270,8 @@ TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithLongerCigar)
 TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithShorterCigar)
 {
     const std::string readName    = "foo";
-    const std::string cigar       = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar       = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2286,7 +2286,7 @@ TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithShorterCigar)
 TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithEmptyCigar)
 {
     const std::string readName = "foo";
-    const std::string cigar    = "100M";
+    const std::string cigar    = "100=";
     const std::string empty    = "";
 
     BamRecordImpl bam;
@@ -2302,7 +2302,7 @@ TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithEmptyCigar)
 TEST(BamRecordImplVariableDataTest, NameCigarTag_Init_Normal)
 {
     const std::string readName = "foo";
-    const std::string cigar    = "100M";
+    const std::string cigar    = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -2334,7 +2334,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_Init_Normal)
 TEST(BamRecordImplVariableDataTest, NameCigarTag_Init_EmptyName)
 {
     const std::string readName = "";
-    const std::string cigar    = "100M";
+    const std::string cigar    = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -2398,7 +2398,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_Init_EmptyCigar)
 TEST(BamRecordImplVariableDataTest, NameCigarTag_Init_EmptyTag)
 {
     const std::string readName = "foo";
-    const std::string cigar    = "100M";
+    const std::string cigar    = "100=";
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2414,7 +2414,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_Init_EmptyTag)
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithLongerName)
 {
     const std::string readName   = "foo";
-    const std::string cigar      = "100M";
+    const std::string cigar      = "100=";
     const std::string longerName = "this is a long read name";
 
     TagCollection tags;
@@ -2448,7 +2448,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithLongerName)
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithShorterName)
 {
     const std::string readName   = "foo";
-    const std::string cigar      = "100M";
+    const std::string cigar      = "100=";
     const std::string longerName = "this is a long read name";
 
     TagCollection tags;
@@ -2482,7 +2482,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithShorterName)
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithEmptyName)
 {
     const std::string readName = "foo";
-    const std::string cigar    = "100M";
+    const std::string cigar    = "100=";
     const std::string empty    = "";
 
     TagCollection tags;
@@ -2516,8 +2516,8 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithEmptyName)
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithLongerCigar)
 {
     const std::string readName    = "foo";
-    const std::string cigar       = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar       = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -2550,8 +2550,8 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithLongerCigar)
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithShorterCigar)
 {
     const std::string readName    = "foo";
-    const std::string cigar       = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar       = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -2584,7 +2584,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithShorterCigar)
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithEmptyCigar)
 {
     const std::string readName = "foo";
-    const std::string cigar    = "100M";
+    const std::string cigar    = "100=";
     const std::string empty    = "";
 
     TagCollection tags;
@@ -2618,7 +2618,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithEmptyCigar)
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithLongerTags)
 {
     const std::string readName = "foo";
-    const std::string cigar    = "100M";
+    const std::string cigar    = "100=";
 
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
@@ -2656,7 +2656,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithLongerTags)
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithShorterTags)
 {
     const std::string readName = "foo";
-    const std::string cigar    = "100M";
+    const std::string cigar    = "100=";
 
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
@@ -2692,7 +2692,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithShorterTags)
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithEmptyTags)
 {
     const std::string readName = "foo";
-    const std::string cigar    = "100M";
+    const std::string cigar    = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -3463,7 +3463,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_Init_Normal)
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3482,7 +3482,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_Init_EmptyName)
     const std::string readName  = "";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3501,7 +3501,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_Init_EmptySeqQual)
     const std::string readName  = "foo";
     const std::string sequence  = "";
     const std::string qualities = "";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3520,7 +3520,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_Init_EmptyQual)
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3558,7 +3558,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithLongerName
     const std::string readName   = "foo";
     const std::string sequence   = "ACGTACGTACGT";
     const std::string qualities  = "?]?]?]?]?]?]";
-    const std::string cigar      = "100M";
+    const std::string cigar      = "100=";
     const std::string longerName = "this is a long read name";
 
     BamRecordImpl bam;
@@ -3579,7 +3579,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithShorterNam
     const std::string readName   = "foo";
     const std::string sequence   = "ACGTACGTACGT";
     const std::string qualities  = "?]?]?]?]?]?]";
-    const std::string cigar      = "100M";
+    const std::string cigar      = "100=";
     const std::string longerName = "this is a long read name";
 
     BamRecordImpl bam;
@@ -3600,7 +3600,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithEmptyName)
     const std::string readName   = "foo";
     const std::string sequence   = "ACGTACGTACGT";
     const std::string qualities  = "?]?]?]?]?]?]";
-    const std::string cigar      = "100M";
+    const std::string cigar      = "100=";
     const std::string empty      = "";
 
     BamRecordImpl bam;
@@ -3621,7 +3621,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithLongerSeq_
     const std::string readName   = "foo";
     const std::string sequence   = "ACGTACGTACGT";
     const std::string qualities  = "?]?]?]?]?]?]";
-    const std::string cigar      = "100M";
+    const std::string cigar      = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "?]?]";
 
@@ -3643,7 +3643,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithLongerSeq_
     const std::string readName   = "foo";
     const std::string sequence   = "ACGTACGTACGT";
     const std::string qualities  = "";
-    const std::string cigar      = "100M";
+    const std::string cigar      = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "?]?]";
 
@@ -3665,7 +3665,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithShorterSeq
     const std::string readName   = "foo";
     const std::string sequence   = "ACGTACGTACGT";
     const std::string qualities  = "?]?]?]?]?]?]";
-    const std::string cigar      = "100M";
+    const std::string cigar      = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "?]?]";
 
@@ -3687,7 +3687,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithShorterSeq
     const std::string readName   = "foo";
     const std::string sequence   = "ACGTACGTACGT";
     const std::string qualities  = "?]?]?]?]?]?]";
-    const std::string cigar      = "100M";
+    const std::string cigar      = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "";
 
@@ -3709,7 +3709,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithEmptySeq)
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string empty     = "";
 
     BamRecordImpl bam;
@@ -3730,8 +3730,8 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithLongerCiga
     const std::string readName    = "foo";
     const std::string sequence    = "ACGTACGTACGT";
     const std::string qualities   = "?]?]?]?]?]?]";
-    const std::string cigar       = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar       = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3751,8 +3751,8 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithShorterCig
     const std::string readName    = "foo";
     const std::string sequence    = "ACGTACGTACGT";
     const std::string qualities   = "?]?]?]?]?]?]";
-    const std::string cigar       = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar       = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3772,7 +3772,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithEmptyCigar
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string empty     = "";
 
     BamRecordImpl bam;
@@ -3795,7 +3795,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_Normal)
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -3832,7 +3832,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_EmptyName)
     const std::string readName  = "";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -3869,7 +3869,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_EmptySeqQual)
     const std::string readName  = "foo";
     const std::string sequence  = "";
     const std::string qualities = "";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -3906,7 +3906,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_EmptyQual)
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -3980,7 +3980,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_EmptyTag)
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -4001,7 +4001,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithLongerN
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string longerName = "this is a long read name";
 
     TagCollection tags;
@@ -4040,7 +4040,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithShorter
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string longerName = "this is a long read name";
 
     TagCollection tags;
@@ -4079,7 +4079,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithEmptyNa
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string empty     = "";
 
     TagCollection tags;
@@ -4118,7 +4118,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithLongerS
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "?]?]";
 
@@ -4158,7 +4158,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithLongerS
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "?]?]";
 
@@ -4198,7 +4198,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithShorter
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "?]?]";
 
@@ -4238,7 +4238,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithShorter
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string shortSeq  = "ACGT";
     const std::string shortQual = "";
 
@@ -4278,7 +4278,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithEmptySe
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string empty     = "";
 
     TagCollection tags;
@@ -4317,8 +4317,8 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithLongerC
     const std::string readName    = "foo";
     const std::string sequence    = "ACGTACGTACGT";
     const std::string qualities   = "?]?]?]?]?]?]";
-    const std::string cigar       = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar       = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -4356,8 +4356,8 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithShorter
     const std::string readName    = "foo";
     const std::string sequence    = "ACGTACGTACGT";
     const std::string qualities   = "?]?]?]?]?]?]";
-    const std::string cigar       = "100M";
-    const std::string longerCigar = "100=10D100M10I100X";
+    const std::string cigar       = "100=";
+    const std::string longerCigar = "100=10D100=10I100X";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -4395,7 +4395,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithEmptyCi
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
     const std::string empty     = "";
 
     TagCollection tags;
@@ -4434,7 +4434,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithLongerT
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
@@ -4477,7 +4477,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithShorter
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
@@ -4518,7 +4518,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithEmptyTa
     const std::string readName  = "foo";
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
-    const std::string cigar     = "100M";
+    const std::string cigar     = "100=";
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");

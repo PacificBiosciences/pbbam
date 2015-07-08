@@ -117,7 +117,7 @@ BamRecordImpl MakeCigaredImpl(const string& seq,
 {
     BamRecordImpl impl;
     impl.SetMapped(true).ReferenceId(0).Position(0).MapQuality(0);
-    impl.CigarData( Cigar::FromStdString(cigar) );
+    impl.CigarData(Cigar::FromStdString(cigar));
     impl.MateReferenceId(-1).MatePosition(-1).InsertSize(0);
     impl.SetSequenceAndQualities(seq, string(seq.size(), '*'));
     impl.SetReverseStrand(isReverseStrand);
@@ -808,13 +808,13 @@ TEST(BamRecordTest, ClippingAndOrientation)
     // reverse strand records have same cigar and **input** seq as forward strand
     // (native output will be rev-comp'd)
 
-    const string s1_cigar = "10M";
-    const string s2_cigar = "3M4N3M";
-    const string s3_cigar = "1S8M1S";
-    const string s4_cigar = "1H8M1H";
-    const string s5_cigar = "2S6M2S";
-    const string s6_cigar = "2S3M2I3M2S";
-    const string s7_cigar = "2H6M2H";
+    const string s1_cigar = "10=";
+    const string s2_cigar = "3=4N3=";
+    const string s3_cigar = "1S8=1S";
+    const string s4_cigar = "1H8=1H";
+    const string s5_cigar = "2S6=2S";
+    const string s6_cigar = "2S3=2I3=2S";
+    const string s7_cigar = "2H6=2H";
 
     const string s1_seq  = "ATCCGCGGTT";
     const string s2_seq  = "ACGTT";
@@ -959,12 +959,12 @@ TEST(BamRecordTest, ClippingOrientationAndAlignment)
     // reverse strand records have same cigar and **input** seq as forward strand
     // (native output will be rev-comp'd)
 
-    const string s1_cigar = "4M3D4M";
-    const string s2_cigar = "4M1D2I2D4M";
-    const string s3_cigar = "4M1D2P2I2P2D4M";
-    const string s4_cigar = "2S4M3D4M3S";
-    const string s5_cigar = "2H4M3D4M3H";
-    const string s6_cigar = "2H2S4M3D4M3S3H";
+    const string s1_cigar = "4=3D4=";
+    const string s2_cigar = "4=1D2I2D4=";
+    const string s3_cigar = "4=1D2P2I2P2D4=";
+    const string s4_cigar = "2S4=3D4=3S";
+    const string s5_cigar = "2H4=3D4=3H";
+    const string s6_cigar = "2H2S4=3D4=3S3H";
 
     const string s1_seq = "AACCGTTA";
     const string s2_seq = "ATCCTAGGTT";
@@ -1123,12 +1123,12 @@ TEST(BamRecordTest, QualityTagsClippedAndAligned)
 {
     // NOTE - FASTQ for QV=0 is '!'. Thus deletions/padding will be rendered as '!'s.
 
-    const string s1_cigar = "4M3D4M";
-    const string s2_cigar = "4M1D2I2D4M";
-    const string s3_cigar = "4M1D2P2I2P2D4M";
-    const string s4_cigar = "3S4M3D4M3S";
-    const string s5_cigar = "2H4M3D4M3H";
-    const string s6_cigar = "2H3S4M3D4M3S3H";
+    const string s1_cigar = "4=3D4=";
+    const string s2_cigar = "4=1D2I2D4=";
+    const string s3_cigar = "4=1D2P2I2P2D4=";
+    const string s4_cigar = "3S4=3D4=3S";
+    const string s5_cigar = "2H4=3D4=3H";
+    const string s6_cigar = "2H3S4=3D4=3S3H";
 
     const string s1_quals = "?]?]?]?@";
     const string s2_quals = "?]?]87?]?@";
@@ -1515,12 +1515,12 @@ TEST(BamRecordTest, QualityTagsClippedAndAligned)
 
 TEST(BamRecordTest, BaseTagsClippedAndAligned)
 {
-    const string s1_cigar = "4M3D4M";
-    const string s2_cigar = "4M1D2I2D4M";
-    const string s3_cigar = "4M1D2P2I2P2D4M";
-    const string s4_cigar = "3S4M3D4M3S";
-    const string s5_cigar = "2H4M3D4M3H";
-    const string s6_cigar = "2H3S4M3D4M3S3H";
+    const string s1_cigar = "4=3D4=";
+    const string s2_cigar = "4=1D2I2D4=";
+    const string s3_cigar = "4=1D2P2I2P2D4=";
+    const string s4_cigar = "3S4=3D4=3S";
+    const string s5_cigar = "2H4=3D4=3H";
+    const string s6_cigar = "2H3S4=3D4=3S3H";
 
     const string s1_seq = "AACCGTTA";
     const string s2_seq = "ATCCTAGGTT";
@@ -1754,12 +1754,12 @@ TEST(BamRecordTest, BaseTagsClippedAndAligned)
 
 TEST(BamRecordTest, FrameTagsClippedAndAligned)
 {
-    const string s1_cigar = "4M3D4M";
-    const string s2_cigar = "4M1D2I2D4M";
-    const string s3_cigar = "4M1D2P2I2P2D4M";
-    const string s4_cigar = "3S4M3D4M3S";
-    const string s5_cigar = "2H4M3D4M3H";
-    const string s6_cigar = "2H3S4M3D4M3S3H";
+    const string s1_cigar = "4=3D4=";
+    const string s2_cigar = "4=1D2I2D4=";
+    const string s3_cigar = "4=1D2P2I2P2D4=";
+    const string s4_cigar = "3S4=3D4=3S";
+    const string s5_cigar = "2H4=3D4=3H";
+    const string s6_cigar = "2H3S4=3D4=3S3H";
 
     typedef vector<uint16_t> f_data;
 

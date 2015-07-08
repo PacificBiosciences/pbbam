@@ -59,6 +59,8 @@ static const string token_VN = string("VN");
 static const string token_SO = string("SO");
 static const string token_pb = string("pb");
 
+static const string current_version = string("3.0b7");
+
 class BamHeaderPrivate
 {
 public:
@@ -358,14 +360,17 @@ string BamHeader::ToSam(void) const
     // @HD
     const string& outputVersion   = (d_->version_.empty()   ? string(hts_version()) : d_->version_);
     const string& outputSortOrder = (d_->sortOrder_.empty() ? string("unknown") : d_->sortOrder_);
-//    const string& outputPbBamVersion = (pbVersion.empty() ? string("3.0b3") : pbVersion);
+    const string& outputPbBamVersion = (d_->pacbioBamVersion_.empty() ? internal::current_version : d_->pacbioBamVersion_);
 
     out << internal::prefix_HD
         << internal::MakeSamTag(internal::token_VN, outputVersion)
-        << internal::MakeSamTag(internal::token_SO, outputSortOrder);
-    if (!d_->pacbioBamVersion_.empty())
-        out << internal::MakeSamTag(internal::token_pb, d_->pacbioBamVersion_);
-     out << endl;
+        << internal::MakeSamTag(internal::token_SO, outputSortOrder)
+        << internal::MakeSamTag(internal::token_pb, outputPbBamVersion)
+        << endl;
+
+//    if (!d_->pacbioBamVersion_.empty())
+//        out << internal::MakeSamTag(internal::token_pb, d_->pacbioBamVersion_);
+//     out << endl;
 
     // @SQ
     for (const SequenceInfo& seq : d_->sequences_)

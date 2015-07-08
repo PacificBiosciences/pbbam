@@ -148,8 +148,8 @@ test_case("Cigar_FromEmptyString", {
 
 test_case("Cigar_FromString", {
 	
-    singleCigarString <- "100M"
-    multiCigarString  <- "100M2D34I6M"
+    singleCigarString <- "100="
+    multiCigarString  <- "100=2D34I6=6X6="
     
     singleCigar <- Cigar(singleCigarString)
     multiCigar  <- Cigar(multiCigarString)
@@ -157,11 +157,11 @@ test_case("Cigar_FromString", {
     assertEqual(1L, singleCigar$size())
 	
 	c <- singleCigar$front()
-	assertEqual('M',               c$Char())
-	assertEqual('ALIGNMENT_MATCH', c$Type())
-	assertEqual(100L,              c$Length())
+	assertEqual('=',              c$Char())
+	assertEqual('SEQUENCE_MATCH', c$Type())
+	assertEqual(100L,             c$Length())
 
-    assertEqual(4L, multiCigar$size())
+    assertEqual(6L, multiCigar$size())
 	
 	# haven't quite figured out [ ] accessors via SWIG, 
 	# but this method does work w/ !ZERO!-based indices
@@ -169,19 +169,27 @@ test_case("Cigar_FromString", {
     op1 <- multiCigar$'__getitem__'(1)
     op2 <- multiCigar$'__getitem__'(2)
     op3 <- multiCigar$'__getitem__'(3)
+    op4 <- multiCigar$'__getitem__'(4)
+    op5 <- multiCigar$'__getitem__'(5)
     
-    assertEqual('M', op0$Char())
+    assertEqual('=', op0$Char())
     assertEqual('D', op1$Char())
     assertEqual('I', op2$Char())
-    assertEqual('M', op3$Char())
-	assertEqual('ALIGNMENT_MATCH', op0$Type())
-	assertEqual('DELETION',        op1$Type())
-	assertEqual('INSERTION',       op2$Type())
-	assertEqual('ALIGNMENT_MATCH', op3$Type())
+    assertEqual('=', op3$Char())
+    assertEqual('X', op4$Char())
+    assertEqual('=', op5$Char())
+	assertEqual('SEQUENCE_MATCH',    op0$Type())
+	assertEqual('DELETION',          op1$Type())
+	assertEqual('INSERTION',         op2$Type())
+	assertEqual('SEQUENCE_MATCH',    op3$Type())
+    assertEqual('SEQUENCE_MISMATCH', op4$Type())
+    assertEqual('SEQUENCE_MATCH',    op5$Type())
     assertEqual(100L, op0$Length())
     assertEqual(2L,   op1$Length())
     assertEqual(34L,  op2$Length())
     assertEqual(6L,   op3$Length())
+    assertEqual(6L,   op4$Length())
+    assertEqual(6L,   op5$Length())
 })
 
 test_case("Cigar_ToEmptyString", {
@@ -192,17 +200,19 @@ test_case("Cigar_ToEmptyString", {
 
 test_case("Cigar_ToString", {
 	
-    singleCigarString <- "100M"
-    multiCigarString  <- "100M2D34I6M"
+    singleCigarString <- "100="
+    multiCigarString  <- "100=2D34I6=6X6="
     
 	singleCigar <- Cigar()
-	singleCigar$push_back( CigarOperation(CigarOperation_TypeToChar('ALIGNMENT_MATCH'), 100) )
+	singleCigar$push_back( CigarOperation(CigarOperation_TypeToChar('SEQUENCE_MATCH'), 100) )
 
 	multiCigar <- Cigar()
-	multiCigar$push_back(CigarOperation('M', 100))
+	multiCigar$push_back(CigarOperation('=', 100))
 	multiCigar$push_back(CigarOperation('D', 2))
 	multiCigar$push_back(CigarOperation('I', 34))
-	multiCigar$push_back(CigarOperation('M', 6))
+	multiCigar$push_back(CigarOperation('=', 6))
+    multiCigar$push_back(CigarOperation('X', 6))
+    multiCigar$push_back(CigarOperation('=', 6))
 
 	assertEqual(singleCigarString, singleCigar$ToStdString())
 	assertEqual(multiCigarString,  multiCigar$ToStdString())

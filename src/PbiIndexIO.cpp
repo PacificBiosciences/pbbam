@@ -172,6 +172,7 @@ PbiRawData PbiIndexIO::Build(const BamFile& bam)
     PbiReferenceEntry::Row rowNumber = 0;
     int64_t offset = bgzf_tell(fp->fp.bgzf);
     while (sam_read1(fp, hdr, b) >= 0) {
+        record.ResetCachedPositions();
 
         subreadData.AddRecord(record, offset);
 

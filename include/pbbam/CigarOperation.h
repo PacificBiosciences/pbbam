@@ -39,11 +39,17 @@
 #define CIGAROPERATION_H
 
 #include "pbbam/Config.h"
+#include <stdexcept>
 
 namespace PacBio {
 namespace BAM {
 
 /// Describes a CIGAR operation. Bracketed character is the corresponding SAM/BAM character code.
+///
+/// \warning ALIGNMENT_MATCH ('M') is included in this enum to maintain consistency with htslib.
+/// However, as of PacBio BAM spec version 3.0b7, this CIGAR operation \b forbidden. Attempt to
+/// read or write a record containing this operation will trigger a std::runtime_error.
+///
 enum class CigarOperationType
 {
     UNKNOWN_OP        = -1 ///< unknown/invalid CIGAR operator
@@ -57,8 +63,8 @@ enum class CigarOperationType
   , SEQUENCE_MATCH         ///< sequence match [=]
   , SEQUENCE_MISMATCH      ///< sequence mismatch [X]
 
-    // TODO: looks like there is a new 'B' type in htslib soure...
-    //       no reference in htslib docs though yet as to what it means
+    // TODO: looks like there is a new 'B' type in htslib source, referring to some 'back' operation...
+    //       no reference in htslib docs though yet as to what that applies to
 };
 
 class PBBAM_EXPORT CigarOperation
@@ -159,12 +165,18 @@ inline CigarOperation::CigarOperation(void)
 inline CigarOperation::CigarOperation(char c, uint32_t length)
     : type_(CigarOperation::CharToType(c))
     , length_(length)
-{ }
+{
+    if (type_ == CigarOperationType::ALIGNMENT_MATCH)
+        throw std::runtime_error("CIGAR operation 'M' is not allowed in PacBio BAM files. Use 'X/=' instead.");
+}
 
 inline CigarOperation::CigarOperation(CigarOperationType op, uint32_t length)
     : type_(op)
     , length_(length)
-{ }
+{
+    if (type_ == CigarOperationType::ALIGNMENT_MATCH)
+        throw std::runtime_error("CIGAR operation 'M' is not allowed in PacBio BAM files. Use 'X/=' instead.");
+}
 
 inline CigarOperation::CigarOperation(const CigarOperation& other)
     : type_(other.type_)

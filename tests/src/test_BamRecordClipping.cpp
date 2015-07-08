@@ -125,13 +125,13 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     const string tagQuals_rev_clipped = quals_rev_clipped;
     const f_data frames_rev_clipped = { 10, 40, 40, 30, 20, 20, 10 };
 
-    const string s1_cigar = "10M";
-    const string s2_cigar = "5M3D5M";
-    const string s3_cigar = "4M1D2I2D4M";
+    const string s1_cigar = "10=";
+    const string s2_cigar = "5=3D5=";
+    const string s3_cigar = "4=1D2I2D4=";
 
-    const string s1_cigar_clipped = "7M";
-    const string s2_cigar_clipped = "3M3D4M";
-    const string s3_cigar_clipped = "2M1D2I2D3M";
+    const string s1_cigar_clipped = "7=";
+    const string s2_cigar_clipped = "3=3D4=";
+    const string s3_cigar_clipped = "2=1D2I2D3=";
 
     const BamRecord prototype = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames, pulseCall);
     BamRecord s0 = prototype; // unmapped record
@@ -175,7 +175,7 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     EXPECT_EQ(clipStart, s1.AlignedStart());   // queryStart (no soft clips)
     EXPECT_EQ(clipEnd,   s1.AlignedEnd());     // alignStart + seqLength
     EXPECT_EQ(102, s1.ReferenceStart());       // 100 + startOffset
-    EXPECT_EQ(109, s1.ReferenceEnd());         // RefStart + 7M
+    EXPECT_EQ(109, s1.ReferenceEnd());         // RefStart + 7=
 
     EXPECT_EQ(s1_cigar_clipped, s1.CigarData().ToStdString());
 
@@ -196,7 +196,7 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     EXPECT_EQ(clipStart, s1_rev.AlignedStart());    // queryStart (no soft clips)
     EXPECT_EQ(clipEnd,   s1_rev.AlignedEnd());      // alignStart + seqLength
     EXPECT_EQ(102, s1_rev.ReferenceStart());        // 100 + startOffset
-    EXPECT_EQ(109, s1_rev.ReferenceEnd());          // RefStart + 7M
+    EXPECT_EQ(109, s1_rev.ReferenceEnd());          // RefStart + 7=
 
     EXPECT_EQ(s1_cigar_clipped, s1_rev.CigarData().ToStdString());
 
@@ -217,7 +217,7 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     EXPECT_EQ(clipStart, s2.AlignedStart());   // queryStart (no soft clips)
     EXPECT_EQ(clipEnd,   s2.AlignedEnd());     // alignStart + seqLength
     EXPECT_EQ(102, s2.ReferenceStart());       // 100 + startOffset
-    EXPECT_EQ(112, s2.ReferenceEnd());         // RefStart + 7M + 3D
+    EXPECT_EQ(112, s2.ReferenceEnd());         // RefStart + 7= + 3D
 
     EXPECT_EQ(s2_cigar_clipped, s2.CigarData().ToStdString());
 
@@ -237,7 +237,7 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     EXPECT_EQ(clipStart, s2_rev.AlignedStart());    // queryStart (no soft clips)
     EXPECT_EQ(clipEnd,   s2_rev.AlignedEnd());      // alignStart + seqLength
     EXPECT_EQ(102, s2_rev.ReferenceStart());        // 100 + startOffset
-    EXPECT_EQ(112, s2_rev.ReferenceEnd());          // RefStart + 7M + 3D
+    EXPECT_EQ(112, s2_rev.ReferenceEnd());          // RefStart + 7= + 3D
 
     EXPECT_EQ(s2_cigar_clipped, s2_rev.CigarData().ToStdString());
 
@@ -258,7 +258,7 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     EXPECT_EQ(clipStart, s3.AlignedStart());     // queryStart (no soft clips)
     EXPECT_EQ(clipEnd,   s3.AlignedEnd());       // alignStart + seqLength
     EXPECT_EQ(102, s3.ReferenceStart());         // 100 + startOffset
-    EXPECT_EQ(110, s3.ReferenceEnd());           // RefStart + 5M + 3D
+    EXPECT_EQ(110, s3.ReferenceEnd());           // RefStart + 5= + 3D
 
     EXPECT_EQ(s3_cigar_clipped, s3.CigarData().ToStdString());
 
@@ -278,7 +278,7 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     EXPECT_EQ(clipStart, s3_rev.AlignedStart());     // queryStart (no soft clips)
     EXPECT_EQ(clipEnd,   s3_rev.AlignedEnd());       // alignStart + seqLength
     EXPECT_EQ(102, s3_rev.ReferenceStart());         // 100 + startOffset
-    EXPECT_EQ(110, s3_rev.ReferenceEnd());           // RefStart + 5M + 3D
+    EXPECT_EQ(110, s3_rev.ReferenceEnd());           // RefStart + 5= + 3D
 
     EXPECT_EQ(s3_cigar_clipped, s3_rev.CigarData().ToStdString());
 
@@ -309,8 +309,8 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     const Position clipStart = 502;
     const Position clipEnd   = 509;
 
-    const string s1_cigar = "2S10M3S";
-    const string s1_cigar_clipped = "7M";
+    const string s1_cigar = "2S10=3S";
+    const string s1_cigar_clipped = "7=";
     const string s1_seq_clipped      = "AACCGTT";
     const string s1_quals_clipped    = "?]?]?]?";
     const string s1_tagBases_clipped = s1_seq_clipped;
@@ -322,8 +322,8 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     const string s1_tagQuals_rev_clipped = s1_quals_rev_clipped;
     const f_data s1_frames_rev_clipped = { 10, 20, 30, 10, 40, 40, 30 };
 
-    const string s2_cigar = "2S5M3D5M3S";
-    const string s2_cigar_clipped = "5M3D2M";
+    const string s2_cigar = "2S5=3D5=3S";
+    const string s2_cigar_clipped = "5=3D2=";
     const string s2_seq_clipped      = "AACCGTT";
     const string s2_quals_clipped    = "?]?]?]?";
     const string s2_tagBases_clipped = s2_seq_clipped;
@@ -335,8 +335,8 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     const string s2_tagQuals_rev_clipped = s2_quals_rev_clipped;
     const f_data s2_frames_rev_clipped = { 10, 20, 30, 10, 40, 40, 30 };
 
-    const string s3_cigar = "2S4M1D2I2D4M3S";
-    const string s3_cigar_clipped = "4M1D2I2D1M";
+    const string s3_cigar = "2S4=1D2I2D4=3S";
+    const string s3_cigar_clipped = "4=1D2I2D1=";
     const string s3_seq_clipped      = "AACCGTT";
     const string s3_quals_clipped    = "?]?]?]?";
     const string s3_tagBases_clipped = s3_seq_clipped;
@@ -359,27 +359,27 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     // sanity checks before clipping
     EXPECT_TRUE(s1.IsMapped());
     EXPECT_EQ(tPos, s1.ReferenceStart());
-    EXPECT_EQ(tPos + 10, s1.ReferenceEnd()); // 10M
+    EXPECT_EQ(tPos + 10, s1.ReferenceEnd()); // 10=
 
     EXPECT_TRUE(s1_rev.IsMapped());
     EXPECT_EQ(tPos, s1_rev.ReferenceStart());
-    EXPECT_EQ(tPos + 10, s1_rev.ReferenceEnd()); // 10M
+    EXPECT_EQ(tPos + 10, s1_rev.ReferenceEnd()); // 10=
 
     EXPECT_TRUE(s2.IsMapped());
     EXPECT_EQ(tPos, s2.ReferenceStart());
-    EXPECT_EQ(tPos + 13, s2.ReferenceEnd());   // 5M + 3D + 5M
+    EXPECT_EQ(tPos + 13, s2.ReferenceEnd());   // 5= + 3D + 5=
 
     EXPECT_TRUE(s2_rev.IsMapped());
     EXPECT_EQ(tPos, s2_rev.ReferenceStart());
-    EXPECT_EQ(tPos + 13, s2_rev.ReferenceEnd());   // 5M + 3D + 5M
+    EXPECT_EQ(tPos + 13, s2_rev.ReferenceEnd());   // 5= + 3D + 5=
 
     EXPECT_TRUE(s3.IsMapped());
     EXPECT_EQ(tPos, s3.ReferenceStart());
-    EXPECT_EQ(tPos + 11, s3.ReferenceEnd());   // 4M + 1D + 2D + 4M
+    EXPECT_EQ(tPos + 11, s3.ReferenceEnd());   // 4= + 1D + 2D + 4=
 
     EXPECT_TRUE(s3_rev.IsMapped());
     EXPECT_EQ(tPos, s3_rev.ReferenceStart());
-    EXPECT_EQ(tPos + 11, s3_rev.ReferenceEnd());   // 4M + 1D + 2D + 4M
+    EXPECT_EQ(tPos + 11, s3_rev.ReferenceEnd());   // 4= + 1D + 2D + 4=
 
     s1.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
     s2.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
@@ -396,7 +396,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     EXPECT_EQ(clipStart, s1.AlignedStart());    // queryStart (no soft clips left)
     EXPECT_EQ(clipEnd,   s1.AlignedEnd());      // alignStart + seqLength
     EXPECT_EQ(tPos,      s1.ReferenceStart());  // tPos
-    EXPECT_EQ(tPos + 7,  s1.ReferenceEnd());    // RefStart + 7M
+    EXPECT_EQ(tPos + 7,  s1.ReferenceEnd());    // RefStart + 7=
 
     EXPECT_EQ(s1_cigar_clipped, s1.CigarData().ToStdString());
 
@@ -416,7 +416,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     EXPECT_EQ(clipStart, s1_rev.AlignedStart());    // queryStart (no soft clips)
     EXPECT_EQ(clipEnd,   s1_rev.AlignedEnd());      // alignStart + seqLength
     EXPECT_EQ(tPos,      s1_rev.ReferenceStart());  // 100 + startOffset
-    EXPECT_EQ(tPos + 7,  s1_rev.ReferenceEnd());    // RefStart + 7M
+    EXPECT_EQ(tPos + 7,  s1_rev.ReferenceEnd());    // RefStart + 7=
 
     EXPECT_EQ(s1_cigar_clipped, s1_rev.CigarData().ToStdString());
 
@@ -436,7 +436,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     EXPECT_EQ(clipStart, s2.AlignedStart());    // queryStart (no soft clips left)
     EXPECT_EQ(clipEnd,   s2.AlignedEnd());      // alignStart + seqLength
     EXPECT_EQ(tPos,      s2.ReferenceStart());  // 100 + startOffset
-    EXPECT_EQ(tPos + 10, s2.ReferenceEnd());    // RefStart + 5M3D2M
+    EXPECT_EQ(tPos + 10, s2.ReferenceEnd());    // RefStart + 5=3D2=
 
     EXPECT_EQ(s2_cigar_clipped, s2.CigarData().ToStdString());
 
@@ -456,7 +456,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     EXPECT_EQ(clipStart, s2_rev.AlignedStart());    // queryStart (no soft clips left)
     EXPECT_EQ(clipEnd,   s2_rev.AlignedEnd());      // alignStart + seqLength
     EXPECT_EQ(tPos,      s2_rev.ReferenceStart());  // 100 + startOffset
-    EXPECT_EQ(tPos + 10, s2_rev.ReferenceEnd());    // RefStart + 5M3D2M
+    EXPECT_EQ(tPos + 10, s2_rev.ReferenceEnd());    // RefStart + 5=3D2=
 
     EXPECT_EQ(s2_cigar_clipped, s2_rev.CigarData().ToStdString());
 
@@ -476,7 +476,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     EXPECT_EQ(clipStart, s3.AlignedStart());    // queryStart (no soft clips left)
     EXPECT_EQ(clipEnd,   s3.AlignedEnd());      // alignStart + seqLength
     EXPECT_EQ(tPos,      s3.ReferenceStart());  // 100 + startOffset
-    EXPECT_EQ(tPos + 8,  s3.ReferenceEnd());    // RefStart + 4M1D2D1M
+    EXPECT_EQ(tPos + 8,  s3.ReferenceEnd());    // RefStart + 4=1D2D1=
 
     EXPECT_EQ(s3_cigar_clipped, s3.CigarData().ToStdString());
 
@@ -496,7 +496,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     EXPECT_EQ(clipStart, s3_rev.AlignedStart());    // queryStart (no soft clips left)
     EXPECT_EQ(clipEnd,   s3_rev.AlignedEnd());      // alignStart + seqLength
     EXPECT_EQ(tPos,      s3_rev.ReferenceStart());  // 100 + startOffset
-    EXPECT_EQ(tPos + 8,  s3_rev.ReferenceEnd());    // RefStart + 4M1D2D1M
+    EXPECT_EQ(tPos + 8,  s3_rev.ReferenceEnd());    // RefStart + 4=1D2D1=
 
     EXPECT_EQ(s3_cigar_clipped, s3_rev.CigarData().ToStdString());
 
@@ -526,8 +526,8 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     const Position clipStart = 102;
     const Position clipEnd   = 107;
 
-    const string s1_cigar = "10M";
-    const string s1_cigar_clipped = "5M";
+    const string s1_cigar = "10=";
+    const string s1_cigar_clipped = "5=";
     const string s1_seq_clipped      = "CCGTT";
     const string s1_quals_clipped    = "?]?]?";
     const string s1_tagBases_clipped = s1_seq_clipped;
@@ -539,8 +539,8 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     const string s1_tagQuals_rev_clipped = s1_quals_rev_clipped;
     const f_data s1_frames_rev_clipped = { 10, 40, 40, 30, 20 };
 
-    const string s2_cigar = "5M3D5M";
-    const string s2_cigar_clipped = "3M2D";
+    const string s2_cigar = "5=3D5=";
+    const string s2_cigar_clipped = "3=2D";
     const string s2_seq_clipped      = "CCG";
     const string s2_quals_clipped    = "?]?";
     const string s2_tagBases_clipped = s2_seq_clipped;
@@ -552,8 +552,8 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     const string s2_tagQuals_rev_clipped = s2_quals_rev_clipped;
     const f_data s2_frames_rev_clipped = { 10, 40, 40 };
 
-    const string s3_cigar = "4M1D2I2D4M";
-    const string s3_cigar_clipped = "2M1D2I2D";
+    const string s3_cigar = "4=1D2I2D4=";
+    const string s3_cigar_clipped = "2=1D2I2D";
     const string s3_seq_clipped      = "CCGT";
     const string s3_quals_clipped    = "?]?]";
     const string s3_tagBases_clipped = s3_seq_clipped;
@@ -740,8 +740,8 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     const string quals_rev    = "+++*?]?]?]?]?--";
     const f_data frames_rev   = { 10, 10, 10, 20, 30, 10, 40, 40, 30, 20, 20, 10, 10, 40, 40 };
 
-    const string s1_cigar = "2S10M3S";
-    const string s1_cigar_clipped = "5M";
+    const string s1_cigar = "2S10=3S";
+    const string s1_cigar_clipped = "5=";
     const string s1_seq_clipped      = "CCGTT";
     const string s1_quals_clipped    = "?]?]?";
     const string s1_tagBases_clipped = s1_seq_clipped;
@@ -753,8 +753,8 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     const string s1_tagQuals_rev_clipped = s1_quals_rev_clipped;
     const f_data s1_frames_rev_clipped = { 30, 10, 40, 40, 30 };
 
-    const string s2_cigar = "2S5M3D5M3S";
-    const string s2_cigar_clipped = "3M2D";
+    const string s2_cigar = "2S5=3D5=3S";
+    const string s2_cigar_clipped = "3=2D";
     const string s2_seq_clipped      = "CCG";
     const string s2_quals_clipped    = "?]?";
     const string s2_tagBases_clipped = s2_seq_clipped;
@@ -766,8 +766,8 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     const string s2_tagQuals_rev_clipped = s2_quals_rev_clipped;
     const f_data s2_frames_rev_clipped = { 30, 10, 40 };
 
-    const string s3_cigar = "2S4M1D2I2D4M3S";
-    const string s3_cigar_clipped = "2M1D2I2D";
+    const string s3_cigar = "2S4=1D2I2D4=3S";
+    const string s3_cigar_clipped = "2=1D2I2D";
     const string s3_seq_clipped      = "CCGT";
     const string s3_quals_clipped    = "?]?]";
     const string s3_tagBases_clipped = s3_seq_clipped;
@@ -795,49 +795,49 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     EXPECT_EQ(500,       s1.QueryStart());      // queryStart
     EXPECT_EQ(515,       s1.QueryEnd());        // queryStart + seqLength
     EXPECT_EQ(502,       s1.AlignedStart());    // queryStart + 2S
-    EXPECT_EQ(512,       s1.AlignedEnd());      // alignedStart + 10M
+    EXPECT_EQ(512,       s1.AlignedEnd());      // alignedStart + 10=
     EXPECT_EQ(tPos,      s1.ReferenceStart());  // tPos
-    EXPECT_EQ(tPos + 10, s1.ReferenceEnd());    // tPos + 10M
+    EXPECT_EQ(tPos + 10, s1.ReferenceEnd());    // tPos + 10=
 
     EXPECT_TRUE(s1_rev.IsMapped());
     EXPECT_EQ(500,       s1_rev.QueryStart());      // queryStart
     EXPECT_EQ(515,       s1_rev.QueryEnd());        // queryStart + seqLength
     EXPECT_EQ(503,       s1_rev.AlignedStart());    // queryStart + 3S
-    EXPECT_EQ(513,       s1_rev.AlignedEnd());      // alignedStart + 10M
+    EXPECT_EQ(513,       s1_rev.AlignedEnd());      // alignedStart + 10=
     EXPECT_EQ(tPos,      s1_rev.ReferenceStart());  // tPos
-    EXPECT_EQ(tPos + 10, s1_rev.ReferenceEnd());    // tPos + 10M
+    EXPECT_EQ(tPos + 10, s1_rev.ReferenceEnd());    // tPos + 10=
 
     EXPECT_TRUE(s2.IsMapped());
     EXPECT_EQ(500,       s2.QueryStart());      // queryStart
     EXPECT_EQ(515,       s2.QueryEnd());        // queryStart + seqLength
     EXPECT_EQ(502,       s2.AlignedStart());    // queryStart + 2S
-    EXPECT_EQ(512,       s2.AlignedEnd());      // alignedStart + 5M5M
+    EXPECT_EQ(512,       s2.AlignedEnd());      // alignedStart + 5=5=
     EXPECT_EQ(tPos,      s2.ReferenceStart());  // tPos
-    EXPECT_EQ(tPos + 13, s2.ReferenceEnd());    // tPos + 5M3D5M
+    EXPECT_EQ(tPos + 13, s2.ReferenceEnd());    // tPos + 5=3D5=
 
     EXPECT_TRUE(s2_rev.IsMapped());
     EXPECT_EQ(500,       s2_rev.QueryStart());      // queryStart
     EXPECT_EQ(515,       s2_rev.QueryEnd());        // queryStart + seqLength
     EXPECT_EQ(503,       s2_rev.AlignedStart());    // queryStart + S
-    EXPECT_EQ(513,       s2_rev.AlignedEnd());      // alignedStart + 5M5M
+    EXPECT_EQ(513,       s2_rev.AlignedEnd());      // alignedStart + 5=5=
     EXPECT_EQ(tPos,      s2_rev.ReferenceStart());  // tPos
-    EXPECT_EQ(tPos + 13, s2_rev.ReferenceEnd());    // tPos + 5M3D5M
+    EXPECT_EQ(tPos + 13, s2_rev.ReferenceEnd());    // tPos + 5=3D5=
 
     EXPECT_TRUE(s3.IsMapped());
     EXPECT_EQ(500,       s3.QueryStart());      // queryStart
     EXPECT_EQ(515,       s3.QueryEnd());        // queryStart + seqLength
     EXPECT_EQ(502,       s3.AlignedStart());    // queryStart + 2S
-    EXPECT_EQ(512,       s3.AlignedEnd());      // alignedStart + 4M2I4M
+    EXPECT_EQ(512,       s3.AlignedEnd());      // alignedStart + 4=2I4=
     EXPECT_EQ(tPos,      s3.ReferenceStart());  // tPos
-    EXPECT_EQ(tPos + 11, s3.ReferenceEnd());    // tPos + 4M1D2D4M
+    EXPECT_EQ(tPos + 11, s3.ReferenceEnd());    // tPos + 4=1D2D4=
 
     EXPECT_TRUE(s3_rev.IsMapped());
     EXPECT_EQ(500,       s3_rev.QueryStart());      // queryStart
     EXPECT_EQ(515,       s3_rev.QueryEnd());        // queryStart + seqLength
     EXPECT_EQ(503,       s3_rev.AlignedStart());    // queryStart + 2S
-    EXPECT_EQ(513,       s3_rev.AlignedEnd());      // alignedStart + 4M2I4M
+    EXPECT_EQ(513,       s3_rev.AlignedEnd());      // alignedStart + 4=2I4=
     EXPECT_EQ(tPos,      s3_rev.ReferenceStart());  // tPos
-    EXPECT_EQ(tPos + 11, s3_rev.ReferenceEnd());    // tPos + 4M1D2D4M
+    EXPECT_EQ(tPos + 11, s3_rev.ReferenceEnd());    // tPos + 4=1D2D4=
 
     s0.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd);
     s1.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd);
@@ -1006,8 +1006,8 @@ TEST(BamRecordClippingTest, ClippedToQueryCopy)
     const string tagQuals_clipped = "?]?]?]?";
     const f_data frames_clipped   = { 20, 20, 30, 40, 40, 10, 30 };
 
-    const string s3_cigar = "4M1D2I2D4M";
-    const string s3_cigar_clipped = "2M1D2I2D3M";
+    const string s3_cigar = "4=1D2I2D4=";
+    const string s3_cigar_clipped = "2=1D2I2D3=";
 
     BamRecord prototype = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
@@ -1021,7 +1021,7 @@ TEST(BamRecordClippingTest, ClippedToQueryCopy)
     EXPECT_EQ(clipStart, s3.AlignedStart());     // queryStart (no soft clips)
     EXPECT_EQ(clipEnd,   s3.AlignedEnd());       // alignStart + seqLength
     EXPECT_EQ(102, s3.ReferenceStart());         // 100 + startOffset
-    EXPECT_EQ(110, s3.ReferenceEnd());           // RefStart + 5M + 3D
+    EXPECT_EQ(110, s3.ReferenceEnd());           // RefStart + 5= + 3D
 
     EXPECT_EQ(s3_cigar_clipped, s3.CigarData().ToStdString());
 
@@ -1049,8 +1049,8 @@ TEST(BamRecordClippingTest, ClippedToReferenceCopy)
     const Position clipStart = 102;
     const Position clipEnd   = 107;
 
-    const string s3_cigar = "4M1D2I2D4M";
-    const string s3_cigar_clipped = "2M1D2I2D";
+    const string s3_cigar = "4=1D2I2D4=";
+    const string s3_cigar_clipped = "2=1D2I2D";
     const string s3_seq_clipped      = "CCGT";
     const string s3_quals_clipped    = "?]?]";
     const string s3_tagBases_clipped = s3_seq_clipped;
@@ -1105,8 +1105,8 @@ TEST(BamRecordClippingTest, StaticClippedToQuery)
     const string tagQuals_clipped = "?]?]?]?";
     const f_data frames_clipped   = { 20, 20, 30, 40, 40, 10, 30 };
 
-    const string s3_cigar = "4M1D2I2D4M";
-    const string s3_cigar_clipped = "2M1D2I2D3M";
+    const string s3_cigar = "4=1D2I2D4=";
+    const string s3_cigar_clipped = "2=1D2I2D3=";
 
     BamRecord prototype = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
@@ -1120,7 +1120,7 @@ TEST(BamRecordClippingTest, StaticClippedToQuery)
     EXPECT_EQ(clipStart, s3.AlignedStart());     // queryStart (no soft clips)
     EXPECT_EQ(clipEnd,   s3.AlignedEnd());       // alignStart + seqLength
     EXPECT_EQ(102, s3.ReferenceStart());         // 100 + startOffset
-    EXPECT_EQ(110, s3.ReferenceEnd());           // RefStart + 5M + 3D
+    EXPECT_EQ(110, s3.ReferenceEnd());           // RefStart + 5= + 3D
 
     EXPECT_EQ(s3_cigar_clipped, s3.CigarData().ToStdString());
 
@@ -1148,8 +1148,8 @@ TEST(BamRecordClippingTest, StaticClippedToReference)
     const Position clipStart = 102;
     const Position clipEnd   = 107;
 
-    const string s3_cigar = "4M1D2I2D4M";
-    const string s3_cigar_clipped = "2M1D2I2D";
+    const string s3_cigar = "4=1D2I2D4=";
+    const string s3_cigar_clipped = "2=1D2I2D";
     const string s3_seq_clipped      = "CCGT";
     const string s3_quals_clipped    = "?]?]";
     const string s3_tagBases_clipped = s3_seq_clipped;

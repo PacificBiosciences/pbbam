@@ -157,31 +157,37 @@ class CigarTest(unittest.TestCase):
         self.assertEqual(0, len(cigar))
         
     def test_fromString(self):
-        singleCigarString = "100M"
-        multiCigarString  = "100M2D34I6M"
+        singleCigarString = "100="
+        multiCigarString  = "100=2D34I6=6X6="
         
         singleCigar = PacBioBam.Cigar(singleCigarString)
         multiCigar  = PacBioBam.Cigar(multiCigarString)
         
         self.assertEqual(1, len(singleCigar))
         c = singleCigar[0]
-        self.assertEqual('M', c.Char())
+        self.assertEqual('=', c.Char())
         self.assertEqual(100, c.Length())
 
-        self.assertEqual(4, len(multiCigar))
+        self.assertEqual(6, len(multiCigar))
         op0 = multiCigar[0]
         op1 = multiCigar[1]
         op2 = multiCigar[2]
         op3 = multiCigar[3]
+        op4 = multiCigar[2]
+        op5 = multiCigar[3]
 
-        self.assertEqual('M', op0.Char())
+        self.assertEqual('=', op0.Char())
         self.assertEqual('D', op1.Char())
         self.assertEqual('I', op2.Char())
-        self.assertEqual('M', op3.Char())
+        self.assertEqual('=', op3.Char())
+        self.assertEqual('X', op4.Char())
+        self.assertEqual('=', op5.Char())
         self.assertEqual(100, op0.Length())
         self.assertEqual(2,   op1.Length())
         self.assertEqual(34,  op2.Length())
         self.assertEqual(6,   op3.Length())
+        self.assertEqual(6,   op4.Length())
+        self.assertEqual(6,   op5.Length())
         
     def test_toEmptyString(self):
         cigar = PacBioBam.Cigar()
@@ -189,17 +195,19 @@ class CigarTest(unittest.TestCase):
 
     def test_toString(self):
         
-        singleCigarString = "100M"
-        multiCigarString  = "100M2D34I6M"
+        singleCigarString = "100="
+        multiCigarString  = "100=2D34I6=6X6="
         
         singleCigar = PacBioBam.Cigar()
-        singleCigar.append(PacBioBam.CigarOperation(PacBioBam.ALIGNMENT_MATCH, 100))
+        singleCigar.append(PacBioBam.CigarOperation(PacBioBam.SEQUENCE_MATCH, 100))
         
         multiCigar = PacBioBam.Cigar()
-        multiCigar.append(PacBioBam.CigarOperation(PacBioBam.ALIGNMENT_MATCH, 100))
-        multiCigar.append(PacBioBam.CigarOperation(PacBioBam.DELETION, 2))
-        multiCigar.append(PacBioBam.CigarOperation(PacBioBam.INSERTION, 34))
-        multiCigar.append(PacBioBam.CigarOperation(PacBioBam.ALIGNMENT_MATCH, 6))
+        multiCigar.append(PacBioBam.CigarOperation(PacBioBam.SEQUENCE_MATCH, 100))
+        multiCigar.append(PacBioBam.CigarOperation(PacBioBam.DELETION,         2))
+        multiCigar.append(PacBioBam.CigarOperation(PacBioBam.INSERTION,       34))
+        multiCigar.append(PacBioBam.CigarOperation(PacBioBam.SEQUENCE_MATCH,   6))
+        multiCigar.append(PacBioBam.CigarOperation(PacBioBam.SEQUENCE_MISMATCH,6))
+        multiCigar.append(PacBioBam.CigarOperation(PacBioBam.SEQUENCE_MATCH,   6))
         
         self.assertEqual(singleCigarString, singleCigar.ToStdString())
         self.assertEqual(multiCigarString,  multiCigar.ToStdString())
