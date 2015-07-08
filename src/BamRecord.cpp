@@ -533,8 +533,7 @@ std::pair<int,int> BamRecord::Barcodes(void) const
 void BamRecord::CalculateAlignedPositions(void) const
 {
     // reset
-    alignedEnd_   = PacBio::BAM::UnmappedPosition;
-    alignedStart_ = PacBio::BAM::UnmappedPosition;
+    ResetCachedPositions();
 
     // skip if unmapped, or has no queryStart/End
     if (!impl_.IsMapped())
@@ -812,9 +811,7 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
     }
 
     // reset any cached aligned start/end
-    alignedStart_ = PacBio::BAM::UnmappedPosition;
-    alignedEnd_   = PacBio::BAM::UnmappedPosition;
-
+    ResetCachedPositions();
     return *this;
 }
 
@@ -1599,13 +1596,13 @@ std::string BamRecord::ReferenceName(void) const
 Position BamRecord::ReferenceStart(void) const
 { return impl_.Position(); }
 
-void BamRecord::ResetCachedPositions(void) const 
+void BamRecord::ResetCachedPositions(void) const
 {
     alignedEnd_   = PacBio::BAM::UnmappedPosition;
     alignedStart_ = PacBio::BAM::UnmappedPosition;
 }
 
-void BamRecord::ResetCachedPositions(void) 
+void BamRecord::ResetCachedPositions(void)
 {
     alignedEnd_   = PacBio::BAM::UnmappedPosition;
     alignedStart_ = PacBio::BAM::UnmappedPosition;
@@ -1688,8 +1685,20 @@ BamRecord& BamRecord::SubstitutionTag(const std::string& tags)
 
 RecordType BamRecord::Type(void) const
 {
-    const string& typeName = ReadGroup().ReadType();
-    return internal::NameToType(typeName);
+    try {
+        const string& typeName = ReadGroup().ReadType();
+        return internal::NameToType(typeName);
+    } catch (std::exception&) {
+
+        // read group not found
+        // peek at name to see if we're CCS
+        if (FullName().find("ccs") != string::npos)
+            return RecordType::CCS;
+
+        // otherwise unknown
+        else
+            return RecordType::UNKNOWN;
+    }
 }
 
 void BamRecord::UpdateName()
@@ -1697,27 +1706,31 @@ void BamRecord::UpdateName()
     std::string newName;
     newName.reserve(100);
 
-    newName += this->MovieName();
+    newName += MovieName();
     newName += "/";
 
-    if (this->HasHoleNumber())
-        newName += std::to_string(this->HoleNumber());
+    if (HasHoleNumber())
+        newName += std::to_string(HoleNumber());
     else
         newName += "?";
 
     newName += "/";
 
-    if (this->HasQueryStart())
-        newName += std::to_string(this->QueryStart());
-    else
-        newName += "?";
+    if (Type() == RecordType::CCS)
+        newName += "ccs";
+    else {
+        if (HasQueryStart())
+            newName += std::to_string(QueryStart());
+        else
+            newName += "?";
 
-    newName += '_';
+        newName += '_';
 
-    if (this->HasQueryEnd())
-        newName += std::to_string(this->QueryEnd());
-    else
-        newName += "?";
+        if (HasQueryEnd())
+            newName += std::to_string(QueryEnd());
+        else
+            newName += "?";
+    }
 
-    this->Impl().Name(newName);
+    impl_.Name(newName);
 }

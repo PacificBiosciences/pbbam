@@ -211,10 +211,9 @@ bool PbiRawMappedData::AddRecord(const BamRecord& b)
 //    }
 //    nM_.push_back(nM);
 //    nMM_.push_back(nMM);
- 
+
     nM_.push_back(0);
     nMM_.push_back(0);
-
 
     return true;
 }
@@ -362,18 +361,21 @@ void PbiRawSubreadData::AddRecord(const BamRecord& b, int64_t offset)
 
     rgId_.push_back(id);
 
-    const BamRecordImpl& impl = b.Impl();
-
-    qStart_.push_back(impl.TagValue("qs").ToInt32());
-    qEnd_.push_back(impl.TagValue("qe").ToInt32());
+    if (b.Type() == RecordType::CCS) {
+        qStart_.push_back(-1);
+        qEnd_.push_back(-1);
+    } else {
+        qStart_.push_back(b.QueryStart());
+        qEnd_.push_back(b.QueryEnd());
+    }
 
     if (b.HasHoleNumber())
-        holeNumber_.push_back(impl.TagValue("zm").ToInt32());
+        holeNumber_.push_back(b.HoleNumber());
     else
         holeNumber_.push_back(0); // TODO: what to do?
 
     if (b.HasReadAccuracy())
-        readQual_.push_back(impl.TagValue("rq").ToUInt16());
+        readQual_.push_back(b.ReadAccuracy());
     else
         readQual_.push_back(0); // TODO: what to do?
 
