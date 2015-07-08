@@ -84,6 +84,9 @@ static const string token_BV = string("BASECALLERVERSION");
 static const string token_FR = string("FRAMERATEHZ");
 static const string token_CT = string("CONTROL");
 
+static const string codec_RAW = string("Frames");
+static const string codec_V1  = string("CodecV1");
+
 static
 string BaseFeatureName(const BaseFeature& feature)
 {
@@ -102,11 +105,26 @@ string BaseFeatureName(const BaseFeature& feature)
         case BaseFeature::LABEL_QV         : return feature_LQ;
         case BaseFeature::ALT_LABEL        : return feature_AT;
         case BaseFeature::ALT_LABEL_QV     : return feature_AQ;
+        default:
+            throw std::runtime_error("unrecognized base feature");
+    }
+    return string();
+}
+
+static
+string FrameCodecName(const FrameCodec& codec)
+{
+    switch (codec) {
+        case FrameCodec::RAW : return codec_RAW;
+        case FrameCodec::V1  : return codec_V1;
+        default:
+            throw std::runtime_error("unrecognized frame codec");
     }
     return string();
 }
 
 static map<string, BaseFeature> nameToFeature;
+static map<string, FrameCodec>  nameToCodec;
 
 static inline
 void InitNameToFeature(void)
@@ -130,6 +148,15 @@ void InitNameToFeature(void)
 }
 
 static inline
+void InitNameToCodec(void)
+{
+    if (nameToCodec.empty()) {
+        nameToCodec[codec_RAW] = FrameCodec::RAW;
+        nameToCodec[codec_V1]  = FrameCodec::V1;
+    }
+}
+
+static inline
 bool IsBaseFeature(const std::string& name)
 {
     InitNameToFeature();
@@ -137,21 +164,32 @@ bool IsBaseFeature(const std::string& name)
 }
 
 static inline
-BaseFeature FromName(const std::string& name)
+BaseFeature BaseFeatureFromName(const std::string& name)
 {
     InitNameToFeature();
     return nameToFeature.at(name);
+}
+
+static inline
+FrameCodec FrameCodecFromName(const string& name)
+{
+    InitNameToCodec();
+    return nameToCodec.at(name);
 }
 
 } // namespace internal
 
 ReadGroupInfo::ReadGroupInfo(void)
     : readType_("UNKNOWN")
+    , ipdCodec_(FrameCodec::V1)
+    , pulseWidthCodec_(FrameCodec::V1)
 { }
 
 ReadGroupInfo::ReadGroupInfo(const std::string& id)
     : id_(id)
     , readType_("UNKNOWN")
+    , ipdCodec_(FrameCodec::V1)
+    , pulseWidthCodec_(FrameCodec::V1)
 { }
 
 ReadGroupInfo::ReadGroupInfo(const std::string& movieName,
@@ -178,6 +216,8 @@ ReadGroupInfo::ReadGroupInfo(const ReadGroupInfo& other)
     , basecallerVersion_(other.basecallerVersion_)
     , frameRateHz_(other.frameRateHz_)
     , control_(other.control_)
+    , ipdCodec_(other.ipdCodec_)
+    , pulseWidthCodec_(other.pulseWidthCodec_)
     , features_(other.features_)
 {  }
 
@@ -198,6 +238,8 @@ ReadGroupInfo::ReadGroupInfo(ReadGroupInfo&& other)
     , basecallerVersion_(std::move(other.basecallerVersion_))
     , frameRateHz_(std::move(other.frameRateHz_))
     , control_(std::move(other.control_))
+    , ipdCodec_(std::move(other.ipdCodec_))
+    , pulseWidthCodec_(std::move(other.pulseWidthCodec_))
     , features_(std::move(other.features_))
 { }
 
@@ -221,6 +263,8 @@ ReadGroupInfo& ReadGroupInfo::operator=(const ReadGroupInfo& other)
     basecallerVersion_ = other.basecallerVersion_;
     frameRateHz_ = other.frameRateHz_;
     control_ = other.control_;
+    ipdCodec_ = other.ipdCodec_;
+    pulseWidthCodec_ = other.pulseWidthCodec_;
     features_ = other.features_;
     return *this;
 }
@@ -243,6 +287,8 @@ ReadGroupInfo& ReadGroupInfo::operator=(ReadGroupInfo&& other)
     basecallerVersion_ = std::move(other.basecallerVersion_);
     frameRateHz_ = std::move(other.frameRateHz_);
     control_ = std::move(other.control_);
+    ipdCodec_ = std::move(other.ipdCodec_);
+    pulseWidthCodec_ = std::move(other.pulseWidthCodec_);
     features_ = std::move(other.features_);
     return *this;
 }
@@ -276,8 +322,25 @@ void ReadGroupInfo::DecodeSamDescription(const std::string& description)
         else if (key == internal::token_SK) sequencingKit_ = value;
         else if (key == internal::token_FR) frameRateHz_ = value;
         else if (key == internal::token_CT) control_ = value == "TRUE";
-        else if (internal::IsBaseFeature(key))
-            features_[internal::FromName(key)] = value;
+        else if (internal::IsBaseFeature(key)) {
+
+            // determine codec type for frame features
+            if (key == internal::feature_IP) {
+                const vector<string> keyParts = internal::Split(key, ':');
+                if (keyParts.size() != 2)
+                    throw std::runtime_error("misformatted Ipd manifest feature. Expected Ipd:<codec>=<tag>");
+                ipdCodec_ = internal::FrameCodecFromName(keyParts.at(1));
+            }
+            else if (key == internal::feature_PW) {
+                const vector<string> keyParts = internal::Split(key, ':');
+                if (keyParts.size() != 2)
+                    throw std::runtime_error("misformatted PulseWidth manifest feature. Expected PulseWidth:<codec>=<tag>");
+                pulseWidthCodec_ = internal::FrameCodecFromName(keyParts.at(1));
+            }
+
+            // store base feature entry (key -> tag name)
+            features_[internal::BaseFeatureFromName(key)] = value;
+        }
     }
 }
 
@@ -287,13 +350,23 @@ std::string ReadGroupInfo::EncodeSamDescription(void) const
     result.reserve(256);
     result.append(std::string(internal::token_RT+"=" + readType_));
 
+    string featureName;
     const auto featureEnd = features_.cend();
     auto featureIter = features_.cbegin();
     for ( ; featureIter != featureEnd; ++featureIter ) {
-        const string& featureName = internal::BaseFeatureName(featureIter->first);
+        featureName = internal::BaseFeatureName(featureIter->first);
         if (featureName.empty() || featureIter->second.empty())
             continue;
-        result.append(string(';' + featureName + '=' + featureIter->second));
+        else if (featureName == internal::feature_IP) {
+            featureName.append(":");
+            featureName.append(internal::FrameCodecName(ipdCodec_));
+        }
+        else if (featureName == internal::feature_PW) {
+            featureName.append(":");
+            featureName.append(internal::FrameCodecName(pulseWidthCodec_));
+        }
+        else
+            result.append(string(';' + featureName + '=' + featureIter->second));
     }
 
     if (!bindingKit_.empty())        result.append(";"+internal::token_BK+"="+bindingKit_);
@@ -341,6 +414,32 @@ ReadGroupInfo ReadGroupInfo::FromSam(const string& sam)
     return rg;
 }
 
+ReadGroupInfo& ReadGroupInfo::IpdCodec(const FrameCodec& codec, const string& tag)
+{
+    // store desired codec type
+    ipdCodec_ = codec;
+
+    // update base features map
+    string actualTag = tag;
+    if (actualTag.empty())
+        actualTag = internal::feature_IP;
+    BaseFeatureTag(BaseFeature::IPD, actualTag);
+    return *this;
+}
+
+ReadGroupInfo& ReadGroupInfo::PulseWidthCodec(const FrameCodec& codec, const string& tag)
+{
+    // store desired codec type
+    pulseWidthCodec_ = codec;
+
+    // update base features map
+    string actualTag = tag;
+    if (actualTag.empty())
+        actualTag = internal::feature_PW;
+    BaseFeatureTag(BaseFeature::PULSE_WIDTH, actualTag);
+    return *this;
+}
+
 std::string ReadGroupInfo::ToSam(void) const
 {
     stringstream out;
@@ -384,10 +483,8 @@ std::string MakeReadGroupId(const std::string& movieName,
     MD5_Update(&md5, reinterpret_cast<void*>(const_cast<char*>(readType.c_str())), readType.size());
     MD5_Final(digest, &md5);
 
-    for (int i = 0; i < 4; i++)
-    {
+    for (int i = 0; i < 4; ++i)
         sprintf(&hexdigest[2*i], "%02x", digest[i]);
-    }
 
     return std::string(hexdigest, 8);
 }
@@ -410,6 +507,8 @@ bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
             && basecallerVersion_ == other.basecallerVersion_ 
             && frameRateHz_ == other.frameRateHz_ 
             && control_ == other.control_ 
+            && ipdCodec_ == other.ipdCodec_
+            && pulseWidthCodec_ == other.pulseWidthCodec_
             && features_.size() == other.features_.size()
             && std::equal(features_.begin(), features_.end(),
                           other.features_.begin());

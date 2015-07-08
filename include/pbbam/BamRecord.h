@@ -745,23 +745,23 @@ public:
    BamRecord& QueryEnd(const PacBio::BAM::Position pos);
    BamRecord& QueryStart(const PacBio::BAM::Position pos);
 
-   /// Resets cached aligned start/end positions.
-   /// 
-   /// \note This method not be needed in most client code. It exists
-   /// primarily as a hook for internal reading loops (queries, index build,
-   /// etc.) It's essentially a workaround and will likely be removed from 
-   /// API  as soon as possible.
+   /// Resets cached aligned start/end.
    ///
-   void ResetCachedPositions(void);
-
-   /// Resets cached aligned start/end positions.
-   /// 
-   /// \note This method not be needed in most client code. It exists
-   /// primarily as a hook for internal reading loops (queries, index build,
-   /// etc.) It's essentially a workaround and will likely be removed from 
-   /// API  as soon as possible.
+   /// \note This method should not be needed in most client code. It exists
+   /// primarily as a hook for internal reading loops (queries, index build, etc.)
+   /// It's essentially a workaround and will likely be removed from the API as
+   /// soon as possible.
    ///
    void ResetCachedPositions(void) const;
+
+   /// Resets cached aligned start/end.
+   ///
+   /// \note This method should not be needed in most client code. It exists
+   /// primarily as a hook for internal reading loops (queries, index build, etc.)
+   /// It's essentially a workaround and will likely be removed from the API as
+   /// soon as possible.
+   ///
+   void ResetCachedPositions(void);
 
    void UpdateName(void);
 

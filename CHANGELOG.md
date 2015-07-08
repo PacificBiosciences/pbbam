@@ -10,8 +10,12 @@ series.
 
 ## [Active]
 - Bringing API up to BAM spec v3.0b7 compliance
-- PBI creation bugfixes
-- Removal of 'M' as allowed CIGAR operation
+  - Removal of 'M' as allowed CIGAR operation
+  - Addition of IPD/PulseWidth codec tags in header
+- PBI bugfixes
+  - Failing on CCS reads
+  - Stopgap for nM/nMM fields until we fully port tools to 'X/=' instead of 'M' CIGAR
+ 
 
 ## [0.0.8] - 2015-07-02
 

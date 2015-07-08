@@ -63,6 +63,12 @@ enum class BaseFeature
   , ALT_LABEL_QV
 };
 
+enum class FrameCodec
+{
+    RAW
+  , V1
+};
+
 class PBBAM_EXPORT ReadGroupInfo
 {
 public:
@@ -114,6 +120,8 @@ public:
 
     std::string Id(void) const;
 
+    FrameCodec IpdCodec(void) const;
+
     std::string KeySequence(void) const;
 
     std::string Library(void) const;
@@ -125,6 +133,8 @@ public:
     std::string PredictedInsertSize(void) const;
 
     std::string Programs(void) const;
+
+    FrameCodec PulseWidthCodec(void) const;
 
     std::string ReadType(void) const;
 
@@ -177,6 +187,8 @@ public:
 
     ReadGroupInfo& Id(const std::string& movieName, const std::string& readType);
 
+    ReadGroupInfo& IpdCodec(const FrameCodec& codec, const std::string& tag = std::string());
+
     ReadGroupInfo& KeySequence(const std::string& sequence);
 
     ReadGroupInfo& Library(const std::string& library);
@@ -186,6 +198,8 @@ public:
     ReadGroupInfo& PredictedInsertSize(const std::string& size);
 
     ReadGroupInfo& Programs(const std::string& programs);
+
+    ReadGroupInfo& PulseWidthCodec(const FrameCodec& codec, const std::string& tag = std::string());
 
     ReadGroupInfo& ReadType(const std::string& type);
 
@@ -216,6 +230,8 @@ private:
     std::string basecallerVersion_;
     std::string frameRateHz_;
     bool        control_ = false;
+    FrameCodec  ipdCodec_;
+    FrameCodec  pulseWidthCodec_;
     std::map<BaseFeature, std::string> features_;
 
     // custom attributes
@@ -297,6 +313,9 @@ inline ReadGroupInfo& ReadGroupInfo::Id(const std::string& movieName,
                                         const std::string& readType)
 { id_ = MakeReadGroupId(movieName, readType); return *this; }
 
+inline FrameCodec ReadGroupInfo::IpdCodec(void) const
+{ return ipdCodec_; }
+
 inline bool ReadGroupInfo::IsValid(void) const
 { return !id_.empty(); }
 
@@ -332,6 +351,9 @@ inline std::string ReadGroupInfo::Programs(void) const
 
 inline ReadGroupInfo& ReadGroupInfo::Programs(const std::string& programs)
 { programs_ = programs; return *this; }
+
+inline FrameCodec ReadGroupInfo::PulseWidthCodec(void) const
+{ return pulseWidthCodec_; }
 
 inline std::string ReadGroupInfo::ReadType(void) const
 { return readType_; }
