@@ -365,8 +365,7 @@ std::string ReadGroupInfo::EncodeSamDescription(void) const
             featureName.append(":");
             featureName.append(internal::FrameCodecName(pulseWidthCodec_));
         }
-        else
-            result.append(string(';' + featureName + '=' + featureIter->second));
+        result.append(string(';' + featureName + '=' + featureIter->second));
     }
 
     if (!bindingKit_.empty())        result.append(";"+internal::token_BK+"="+bindingKit_);
@@ -422,7 +421,7 @@ ReadGroupInfo& ReadGroupInfo::IpdCodec(const FrameCodec& codec, const string& ta
     // update base features map
     string actualTag = tag;
     if (actualTag.empty())
-        actualTag = internal::feature_IP;
+        actualTag = "ip";
     BaseFeatureTag(BaseFeature::IPD, actualTag);
     return *this;
 }
@@ -435,7 +434,7 @@ ReadGroupInfo& ReadGroupInfo::PulseWidthCodec(const FrameCodec& codec, const str
     // update base features map
     string actualTag = tag;
     if (actualTag.empty())
-        actualTag = internal::feature_PW;
+        actualTag = "pw";
     BaseFeatureTag(BaseFeature::PULSE_WIDTH, actualTag);
     return *this;
 }

@@ -50,3 +50,12 @@ TEST(ReadGroupInfoTest, IdFromMovieNameAndReadType)
     EXPECT_EQ("00082ba1", rg.Id());
 }
 
+TEST(ReadGroupInfoTest, FrameCodecSetOk)
+{
+    ReadGroupInfo rg("test");
+    rg.IpdCodec(FrameCodec::V1);
+    EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::IPD));
+    EXPECT_EQ("ip", rg.BaseFeatureTag(BaseFeature::IPD));
+    EXPECT_EQ(FrameCodec::V1, rg.IpdCodec());
+}
+
