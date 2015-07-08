@@ -323,23 +323,21 @@ void ReadGroupInfo::DecodeSamDescription(const std::string& description)
         else if (key == internal::token_FR) frameRateHz_ = value;
         else if (key == internal::token_CT) control_ = value == "TRUE";
         else if (internal::IsBaseFeature(key)) {
-
-            // determine codec type for frame features
-            if (key == internal::feature_IP) {
-                const vector<string> keyParts = internal::Split(key, ':');
-                if (keyParts.size() != 2)
-                    throw std::runtime_error("misformatted Ipd manifest feature. Expected Ipd:<codec>=<tag>");
-                ipdCodec_ = internal::FrameCodecFromName(keyParts.at(1));
-            }
-            else if (key == internal::feature_PW) {
-                const vector<string> keyParts = internal::Split(key, ':');
-                if (keyParts.size() != 2)
-                    throw std::runtime_error("misformatted PulseWidth manifest feature. Expected PulseWidth:<codec>=<tag>");
-                pulseWidthCodec_ = internal::FrameCodecFromName(keyParts.at(1));
-            }
-
-            // store base feature entry (key -> tag name)
             features_[internal::BaseFeatureFromName(key)] = value;
+        } 
+        else {
+            const vector<string> keyParts = internal::Split(key, ':');
+            if (keyParts.size() == 2) {
+                const string& subkey = keyParts.at(0);
+                if (subkey == internal::feature_IP) {
+                    ipdCodec_ = internal::FrameCodecFromName(keyParts.at(1));
+                    features_[BaseFeature::IPD] = value;
+                } 
+                else if (subkey == internal::feature_PW) {
+                    pulseWidthCodec_ = internal::FrameCodecFromName(keyParts.at(1));
+                    features_[BaseFeature::PULSE_WIDTH] = value;
+                }
+            }
         }
     }
 }
