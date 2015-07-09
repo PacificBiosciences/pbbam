@@ -3,7 +3,7 @@ find_package(Threads REQUIRED)
 # find samtools binary for comparing against 'gold standard' files
 #set(Samtools_Dir "/Users/derek/development/samtools")
 set(Samtools_Dir "${PacBioBAM_RootDir}/../../../../prebuilt.out/samtools/samtools-0.1.19/ubuntu-1404/bin")
-set(Samtools_Bin "${Samtools_Dir}/samtools")
+find_program(Samtools_Bin samtools HINTS ${Samtools_Dir})
 
 # ensure tests directory exists
 file(MAKE_DIRECTORY ${PacBioBAM_TestsDir}/bin)
