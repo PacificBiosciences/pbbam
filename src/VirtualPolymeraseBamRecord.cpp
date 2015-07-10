@@ -140,7 +140,7 @@ void VirtualPolymeraseBamRecord::StitchSources()
             MoveAppend(b.IPDRaw().DataRaw(), ipd.DataRaw());
 
         if (b.HasPulseWidth())
-            MoveAppend(b.PulseWidth().DataRaw(), pw.DataRaw());
+            MoveAppend(b.PulseWidthRaw().DataRaw(), pw.DataRaw());
 
         if (b.HasPulseCallWidth())
             MoveAppend(b.PulseCallWidth().DataRaw(), px.DataRaw());
@@ -232,7 +232,7 @@ void VirtualPolymeraseBamRecord::StitchSources()
     if (!alternativeLabelQv.empty())
         this->AltLabelQV(alternativeLabelQv);
 
-    // // 16 bit arrays
+    // 16 bit arrays
     if (!ipd.Data().empty())
         this->IPD(ipd, FrameEncodingType::LOSSLESS);
     if (!pw.Data().empty())
