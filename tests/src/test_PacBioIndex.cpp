@@ -46,28 +46,17 @@
 #include <pbbam/PbiRawData.h>
 #include <pbbam/internal/PbiIndex_p.h>
 #include <string>
+#include <cstdio>
 #include <cstdlib>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
 const string test2BamFn = tests::Data_Dir + "/test_group_query/test2.bam";
-const string tempDir    = tests::Data_Dir + "/temp/";
-const string tempBamFn  = tempDir + "test2.bam";
 
 namespace PacBio {
 namespace BAM {
 namespace tests {
-
-static
-void CopyBamToTemp(void) 
-{
-    string cmd("cp ");
-    cmd += test2BamFn;
-    cmd += " ";
-    cmd += tempDir;
-    system(cmd.c_str());
-}
 
 static
 PbiRawData Test2Bam_RawIndex(void)
@@ -85,24 +74,16 @@ PbiRawData Test2Bam_RawIndex(void)
     subreadData.readQual_   = { 901, 901, 901, 901 };
     subreadData.fileOffset_ =  { 35651584, 35655123, 35667124, 35679164 };
 
-//    { 35323904,  35327454, 35339466, 35351517 };
-
-
     PbiRawMappedData& mappedData = index.mappedData_;
     mappedData.tId_       = { 0, 0, 0, 0 };
     mappedData.tStart_    = { 9507, 8453, 8455, 9291 };
     mappedData.tEnd_      = { 9903, 9902, 9893, 9900 };
-    mappedData.aStart_    = { 2130, 2130, 2130, 2130 };
-    mappedData.aEnd_      = { 2531, 2531, 2531, 2531 };
+    mappedData.aStart_    = { 2130, 2581, 4102, 5619 };
+    mappedData.aEnd_      = { 2531, 4055, 5560, 6237 };
     mappedData.revStrand_ = { 0, 1, 0, 1 };
     mappedData.mapQV_     = { 254, 254, 254, 254 };
-
-    // NOTE: nM_/nMM_ won't be zeroed out forever, just while we migrate to req'd CIGAR ops
-    //       nM/nMM disabled (though present) in PBI until then
-
-//    mappedData.nM_        = { 384, 1411, 1393, 598 };
-    mappedData.nM_        = { 0, 0, 0, 0 };
-    mappedData.nMM_       = { 0, 0, 0, 0 };
+    mappedData.nM_        = { 384, 1411, 1393, 598 };
+    mappedData.nMM_       = { 0, 0, 0, 0 };             // old 'M' ops were just replaced w/ '=', no 'X'
 
     // reference & barcode data are empty for this file
     return index;
@@ -128,7 +109,7 @@ void ExpectRawIndicesEqual(const PbiRawData& expected, const PbiRawData& actual)
 
     // mapped data
     EXPECT_EQ(expected.HasMappedData(), actual.HasMappedData());
-    if (expected.HasReferenceData() && actual.HasReferenceData()) {
+    if (expected.HasMappedData() && actual.HasMappedData()) {
         const PbiRawMappedData& e = expected.MappedData();
         const PbiRawMappedData& a = actual.MappedData();
         EXPECT_EQ(e.tId_,       a.tId_);
@@ -239,41 +220,51 @@ bool PbiIndicesEqual(const PbiIndex& lhs, const PbiIndex& rhs)
 } // namespace BAM
 } // namespace PacBio
 
+TEST(PacBioIndexTest, BuildFromBamOk)
+{
+    // do this in temp directory, so we can ensure write access
+    const string tempDir    = "/tmp/";
+    const string tempBamFn  = tempDir + "test2.bam";
+    const string tempPbiFn  = tempBamFn + ".pbi";
+    string cmd("cp ");
+    cmd += test2BamFn;
+    cmd += " ";
+    cmd += tempDir;
+    system(cmd.c_str());
+
+    BamFile bamFile(tempBamFn);
+    PbiFile::CreateFrom(bamFile);
+    EXPECT_EQ(tempPbiFn, bamFile.PacBioIndexFilename());
+
+    PbiRawData index(bamFile.PacBioIndexFilename());
+    EXPECT_EQ(PbiFile::Version_3_0_0,  index.Version());
+    EXPECT_EQ(4, index.NumReads());
+    EXPECT_TRUE(index.HasMappedData());
+
+    const PbiRawData& expectedIndex = tests::Test2Bam_RawIndex();
+    tests::ExpectRawIndicesEqual(expectedIndex, index);
+
+    // clean up temp file(s)
+    remove(tempBamFn.c_str());
+    remove(tempPbiFn.c_str());
+
+}
+
 TEST(PacBioIndexTest, RawLoadFromFileOk)
 {
     const BamFile bamFile(test2BamFn);
     const string& pbiFilename = bamFile.PacBioIndexFilename();
     const PbiRawData loadedIndex(pbiFilename);
+
     const PbiRawData& expectedIndex = tests::Test2Bam_RawIndex();
     tests::ExpectRawIndicesEqual(expectedIndex, loadedIndex);
 }
 
-TEST(PacBioIndexTest, BuildFromBamOk)
-{
-//    // do this in temp directory, so we can ensure write access
-//    tests::CopyBamToTemp();
-
-//    BamFile bamFile(tempBamFn);
-//    PbiFile::CreateFrom(bamFile);
-
-//    PbiRawData index(bamFile.PacBioIndexFilename());
-//    EXPECT_EQ(PbiFile::Version_3_0_0,  index.Version());
-//    EXPECT_EQ(4, index.NumReads());
-//    EXPECT_TRUE(index.HasMappedData());
-
-//    const PbiRawData& expectedIndex = tests::Test2Bam_RawIndex();
-//    tests::ExpectRawIndicesEqual(expectedIndex, index);
-}
-
 TEST(PacBioIndexTest, ReferenceDataNotLoadedOnUnsortedBam)
 {
-//    // do this in temp directory, so we can ensure write access
-//    tests::CopyBamToTemp();
-
-//    BamFile bamFile(tempBamFn);
-//    PbiFile::CreateFrom(bamFile);
-//    PbiRawData raw(bamFile.PacBioIndexFilename());
-//    EXPECT_FALSE(raw.HasReferenceData());
+    BamFile bamFile(test2BamFn);
+    PbiRawData raw(bamFile.PacBioIndexFilename());
+    EXPECT_FALSE(raw.HasReferenceData());
 }
 
 TEST(PacBioIndexTest, LookupLoadFromFileOk)
@@ -683,27 +674,27 @@ TEST(PacBioIndexTest, LookupByZmw)
     const IndexResultBlock& block0 = blocks.at(0);
     EXPECT_EQ(3, block0.firstIndex_);
     EXPECT_EQ(2, block0.numReads_);
-    EXPECT_EQ(32654594, block0.virtualOffset_);
+    EXPECT_EQ(32654529, block0.virtualOffset_);
 
     const IndexResultBlock& block1 = blocks.at(1);
     EXPECT_EQ(6, block1.firstIndex_);
     EXPECT_EQ(3, block1.numReads_);
-    EXPECT_EQ(32670126, block1.virtualOffset_);
+    EXPECT_EQ(32669996, block1.virtualOffset_);
 
     const IndexResultBlock& block2 = blocks.at(2);
     EXPECT_EQ(10, block2.firstIndex_);
     EXPECT_EQ(3,  block2.numReads_);
-    EXPECT_EQ(1389300730, block2.virtualOffset_);
+    EXPECT_EQ(1388841957, block2.virtualOffset_);
 
     const IndexResultBlock& block3 = blocks.at(3);
     EXPECT_EQ(14, block3.firstIndex_);
     EXPECT_EQ(1,  block3.numReads_);
-    EXPECT_EQ(1389323725, block3.virtualOffset_);
+    EXPECT_EQ(1388864866, block3.virtualOffset_);
 
     const IndexResultBlock& block4 = blocks.at(4);
     EXPECT_EQ(22, block4.firstIndex_);
     EXPECT_EQ(2,  block4.numReads_);
-    EXPECT_EQ(2542600192, block4.virtualOffset_);
+    EXPECT_EQ(1388892121, block4.virtualOffset_);
 }
 
 TEST(PacBioIndexTest, LookupMultiZmw)
@@ -722,15 +713,15 @@ TEST(PacBioIndexTest, LookupMultiZmw)
     const IndexResultBlock& block0 = blocks.at(0);
     EXPECT_EQ(6, block0.firstIndex_);
     EXPECT_EQ(2, block0.numReads_);
-    EXPECT_EQ(32670126, block0.virtualOffset_);
+    EXPECT_EQ(32669996, block0.virtualOffset_);
 
     const IndexResultBlock& block1 = blocks.at(1);
     EXPECT_EQ(13, block1.firstIndex_);
     EXPECT_EQ(2, block1.numReads_);
-    EXPECT_EQ(1389310464, block1.virtualOffset_);
+    EXPECT_EQ(1388851626, block1.virtualOffset_);
 
     const IndexResultBlock& block2 = blocks.at(2);
     EXPECT_EQ(19, block2.firstIndex_);
     EXPECT_EQ(1,  block2.numReads_);
-    EXPECT_EQ(1389340436, block2.virtualOffset_);
+    EXPECT_EQ(1388881468, block2.virtualOffset_);
 }
