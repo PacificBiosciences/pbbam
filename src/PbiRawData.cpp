@@ -195,25 +195,22 @@ bool PbiRawMappedData::AddRecord(const BamRecord& b)
     revStrand_.push_back( (b.AlignedStrand() == Strand::REVERSE ? 1 : 0) );
     mapQV_.push_back(b.MapQuality());
 
-//    uint32_t nM = 0;
-//    uint32_t nMM = 0;
-//    const Cigar& cigar = b.CigarData();
-//    auto cigarIter = cigar.cbegin();
-//    auto cigarEnd  = cigar.cend();
-//    for (; cigarIter != cigarEnd; ++cigarIter) {
-//        const CigarOperation& op = (*cigarIter);
-//        if (op.Type() == CigarOperationType::SEQUENCE_MATCH)
-//            nM += op.Length();
-//        else if (op.Type() == CigarOperationType::SEQUENCE_MISMATCH)
-//            nMM += op.Length();
-//        else if (op.Type() == CigarOperationType::ALIGNMENT_MATCH)
-//            throw std::runtime_error("CIGAR operation 'M' is not allowed in PacBio BAM files. Use 'X/=' instead.");
-//    }
-//    nM_.push_back(nM);
-//    nMM_.push_back(nMM);
-
-    nM_.push_back(0);
-    nMM_.push_back(0);
+    uint32_t nM = 0;
+    uint32_t nMM = 0;
+    const Cigar& cigar = b.CigarData();
+    auto cigarIter = cigar.cbegin();
+    auto cigarEnd  = cigar.cend();
+    for (; cigarIter != cigarEnd; ++cigarIter) {
+        const CigarOperation& op = (*cigarIter);
+        if (op.Type() == CigarOperationType::SEQUENCE_MATCH)
+            nM += op.Length();
+        else if (op.Type() == CigarOperationType::SEQUENCE_MISMATCH)
+            nMM += op.Length();
+        else if (op.Type() == CigarOperationType::ALIGNMENT_MATCH)
+            throw std::runtime_error("CIGAR operation 'M' is not allowed in PacBio BAM files. Use 'X/=' instead.");
+    }
+    nM_.push_back(nM);
+    nMM_.push_back(nMM);
 
     return true;
 }
