@@ -484,6 +484,14 @@ public:
                       bool aligned = false,
                       bool exciseSoftClips = false) const;
 
+    /// \brief Fetch this record's PulseWidth values ("pw" tag), but does not upscale.
+    ///
+    /// \param[in] orientation     Orientation of output.
+    ///
+    /// \returns PulseWidth as Frames object
+    ///
+    Frames PulseWidthRaw(Orientation orientation = Orientation::NATIVE) const;
+
     /// \brief Fetch this record's BAM quality values (QUAL field).
     ///
     /// \note If \p aligned is true, and gaps/padding need to be inserted, the new

@@ -1237,6 +1237,37 @@ Frames BamRecord::IPDRaw(Orientation orientation) const
     return frames;
 }
 
+Frames BamRecord::PulseWidthRaw(Orientation orientation) const
+{
+    const auto tagName = internal::tagName_pulseWidth;
+
+    Frames frames;
+    const Tag& frameTag = impl_.TagValue(tagName);
+    if (frameTag.IsNull())
+        return frames;
+
+    // lossy frame codes
+    if (frameTag.IsUInt8Array()) {
+        const vector<uint8_t> codes = std::move(frameTag.ToUInt8Array());
+        const vector<uint16_t> codes16(codes.begin(), codes.end());
+        frames.Data(std::move(codes16));
+    }
+
+    // lossless frame data
+    else {
+        assert(frameTag.IsUInt16Array());
+        const vector<uint16_t> losslessFrames = std::move(frameTag.ToUInt16Array());
+        frames.Data(std::move(losslessFrames));
+    }
+
+    // reverse, if needed
+    internal::MaybeReverseFrames(impl_.IsReverseStrand(),
+                                 orientation,
+                                 frames);
+
+    return frames;
+}
+
 bool BamRecord::IsMapped(void) const
 { return impl_.IsMapped(); }
 
