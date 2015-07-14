@@ -118,6 +118,15 @@ DataSet& DataSet::operator+=(const DataSet& other)
     return *this;
 }
 
+DataSet DataSet::FromXml(const string& xml)
+{
+    DataSet result;
+    result.d_ = internal::DataSetIO::FromXmlString(xml);
+    if (result.CreatedAt().empty())
+        result.CreatedAt(internal::ToIso8601(internal::CurrentTime()));
+    return result;
+}
+
 DataSet::TypeEnum DataSet::NameToType(const string& typeName)
 {
     static std::unordered_map<std::string, DataSet::TypeEnum> lookup;

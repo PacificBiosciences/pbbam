@@ -70,6 +70,7 @@ const string subread2XmlFn    = tests::Data_Dir + "/dataset/subread_dataset2.xml
 const string subread3XmlFn    = tests::Data_Dir + "/dataset/subread_dataset3.xml";
 const string transformedXmlFn = tests::Data_Dir + "/dataset/transformed_rs_subread_dataset.xml";
 
+static void TestFromXmlString(void);
 static void TestAli1Xml(void);
 static void TestAli2Xml(void);
 static void TestAli3Xml(void);
@@ -114,6 +115,11 @@ TEST(DataSetIOTest, FromFofn)
 }
 
 TEST(DataSetIOTest, FromXml)
+{
+    EXPECT_NO_THROW(TestFromXmlString());
+}
+
+TEST(DataSetIOTest, FromXmlFile)
 {
     EXPECT_NO_THROW(TestAli1Xml());
     EXPECT_NO_THROW(TestAli2Xml());
@@ -261,6 +267,124 @@ TEST(DataSetIOTest, ToXml)
     stringstream s;
     dataset.SaveToStream(s);
     EXPECT_EQ(expectedXml, s.str());
+}
+
+static void TestFromXmlString(void)
+{
+    const string inputXml =
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+        "<AlignmentSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.AlignmentSet\" "
+                "Name=\"DataSet_AlignmentSet\" Tags=\"barcode moreTags mapping mytags\" "
+                "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\" "
+                "xmlns=\"http://pacificbiosciences.com/PacBioDataModel.xsd\" "
+                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDataModel.xsd "
+                "../../../../../../../../common/datamodel/SequEl/EndToEnd/xsd/PacBioSecondaryDataModel.xsd\">\n"
+        "\t<ExternalResources>\n"
+        "\t\t<ExternalResource Description=\"Points to an example Alignments BAM file.\" "
+                "MetaType=\"AlignmentFile.AlignmentBamFile\" Name=\"Third Alignments BAM\" "
+                "ResourceId=\"file:/mnt/path/to/alignments2.bam\" Tags=\"Example\">\n"
+        "\t\t\t<FileIndices>\n"
+        "\t\t\t\t<FileIndex MetaType=\"PacBio.Index.PacBioIndex\" ResourceId=\"file:/mnt/path/to/alignments2.pbi\" />\n"
+        "\t\t\t</FileIndices>\n"
+        "\t\t</ExternalResource>\n"
+        "\t\t<ExternalResource Description=\"Points to another example Alignments BAM file, by relative path.\" "
+                "MetaType=\"AlignmentFile.AlignmentBamFile\" Name=\"Fourth Alignments BAM\" "
+                "ResourceId=\"file:./alignments3.bam\" Tags=\"Example\">\n"
+        "\t\t\t<FileIndices>\n"
+        "\t\t\t\t<FileIndex MetaType=\"PacBio.Index.PacBioIndex\" ResourceId=\"file:/mnt/path/to/alignments3.pbi\" />\n"
+        "\t\t\t</FileIndices>\n"
+        "\t\t</ExternalResource>\n"
+        "\t</ExternalResources>\n"
+        "\t<DataSets>\n"
+        "\t\t<DataSet Name=\"HighQuality Read Alignments\" UniqueId=\"ab95d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\">\n"
+        "\t\t\t<Filters>\n"
+        "\t\t\t\t<Filter>\n"
+        "\t\t\t\t\t<Properties>\n"
+        "\t\t\t\t\t\t<Property Name=\"rq\" Operator=\">\" Value=\"0.85\" />\n"
+        "\t\t\t\t\t</Properties>\n"
+        "\t\t\t\t</Filter>\n"
+        "\t\t\t</Filters>\n"
+        "\t\t</DataSet>\n"
+        "\t\t<DataSet Name=\"Alignments to chromosome 1\" UniqueId=\"ac95d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\">\n"
+        "\t\t\t<Filters>\n"
+        "\t\t\t\t<Filter>\n"
+        "\t\t\t\t\t<Properties>\n"
+        "\t\t\t\t\t\t<Property Name=\"RNAME\" Operator=\"==\" Value=\"chr1\" />\n"
+        "\t\t\t\t\t</Properties>\n"
+        "\t\t\t\t</Filter>\n"
+        "\t\t\t</Filters>\n"
+        "\t\t</DataSet>\n"
+        "\t</DataSets>\n"
+        "</AlignmentSet>\n";
+
+    const DataSet dataset = DataSet::FromXml(inputXml);
+
+    EXPECT_EQ(DataSet::ALIGNMENT,                     dataset.Type());
+    EXPECT_EQ("2015-01-27T09:00:01",                  dataset.CreatedAt());
+    EXPECT_EQ("PacBio.DataSet.AlignmentSet",          dataset.MetaType());
+    EXPECT_EQ("DataSet_AlignmentSet",                 dataset.Name());
+    EXPECT_EQ("barcode moreTags mapping mytags",      dataset.Tags());
+    EXPECT_EQ("b095d0a3-94b8-4918-b3af-a3f81bbe519c", dataset.UniqueId());
+    EXPECT_EQ("2.3.0",                                dataset.Version());
+    EXPECT_EQ("http://pacificbiosciences.com/PacBioDataModel.xsd", dataset.Attribute("xmlns"));
+    EXPECT_EQ("http://www.w3.org/2001/XMLSchema-instance",         dataset.Attribute("xmlns:xsi"));
+
+    const ExternalResources& resources = dataset.ExternalResources();
+    EXPECT_EQ(2, resources.Size());
+
+    const ExternalResource& resource1 = resources[0];
+    EXPECT_EQ("Third Alignments BAM",                      resource1.Name());
+    EXPECT_EQ("Points to an example Alignments BAM file.", resource1.Description());
+    EXPECT_EQ("AlignmentFile.AlignmentBamFile",            resource1.MetaType());
+    EXPECT_EQ("file:/mnt/path/to/alignments2.bam",         resource1.ResourceId());
+    EXPECT_EQ("Example",                                   resource1.Tags());
+    const FileIndices& fileIndices1 = resource1.FileIndices();
+    EXPECT_EQ(1, fileIndices1.Size());
+    const FileIndex& pbi1 = fileIndices1[0];
+    EXPECT_EQ("PacBio.Index.PacBioIndex",          pbi1.MetaType());
+    EXPECT_EQ("file:/mnt/path/to/alignments2.pbi", pbi1.ResourceId());
+
+    const ExternalResource& resource2 = resources[1];
+    EXPECT_EQ("Fourth Alignments BAM",                     resource2.Name());
+    EXPECT_EQ("Points to another example Alignments BAM file, by relative path.", resource2.Description());
+    EXPECT_EQ("AlignmentFile.AlignmentBamFile",            resource2.MetaType());
+    EXPECT_EQ("file:./alignments3.bam",                    resource2.ResourceId());
+    EXPECT_EQ("Example",                                   resource2.Tags());
+    const FileIndices& fileIndices2 = resource2.FileIndices();
+    EXPECT_EQ(1, fileIndices2.Size());
+    const FileIndex& pbi2 = fileIndices2[0];
+    EXPECT_EQ("PacBio.Index.PacBioIndex",          pbi2.MetaType());
+    EXPECT_EQ("file:/mnt/path/to/alignments3.pbi", pbi2.ResourceId());
+
+    const SubDataSets& subDatasets = dataset.SubDataSets();
+    EXPECT_EQ(2, subDatasets.Size());
+
+    const DataSetBase& sub1 = subDatasets[0];
+    EXPECT_EQ("HighQuality Read Alignments",          sub1.Name());
+    EXPECT_EQ("ab95d0a3-94b8-4918-b3af-a3f81bbe519c", sub1.UniqueId());
+    EXPECT_EQ("2.3.0",                                sub1.Version());
+    const Filters& sub1Filters = sub1.Filters();
+    EXPECT_EQ(1, sub1Filters.Size());
+    const Filter& sub1Filter = sub1Filters[0];
+    EXPECT_EQ(1, sub1Filter.Properties().Size());
+    const Property& property1 = sub1Filter.Properties()[0];
+    EXPECT_EQ("rq",   property1.Name());
+    EXPECT_EQ(">",    property1.Operator());
+    EXPECT_EQ("0.85", property1.Value());
+
+    const DataSetBase& sub2 = subDatasets[1];
+    EXPECT_EQ("Alignments to chromosome 1",          sub2.Name());
+    EXPECT_EQ("ac95d0a3-94b8-4918-b3af-a3f81bbe519c", sub2.UniqueId());
+    EXPECT_EQ("2.3.0",                                sub2.Version());
+    const Filters& sub2Filters = sub2.Filters();
+    EXPECT_EQ(1, sub2Filters.Size());
+    const Filter& sub2Filter = sub2Filters[0];
+    EXPECT_EQ(1, sub2Filter.Properties().Size());
+    const Property& property2 = sub2Filter.Properties()[0];
+    EXPECT_EQ("RNAME",   property2.Name());
+    EXPECT_EQ("==",    property2.Operator());
+    EXPECT_EQ("chr1", property2.Value());
 }
 
 static void TestAli1Xml(void)

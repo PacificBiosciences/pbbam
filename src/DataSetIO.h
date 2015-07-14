@@ -56,6 +56,8 @@ public:
     static std::unique_ptr<DataSetBase> FromUri(const std::string& uri);
     static std::unique_ptr<DataSetBase> FromUris(const std::vector<std::string>& uris);
 
+    static std::unique_ptr<DataSetBase> FromXmlString(const std::string& xml);
+
 //    static DataSetBase FromUri(const std::string& uri);
 //    static DataSetBase FromUris(const std::vector<std::string>& uris);
 

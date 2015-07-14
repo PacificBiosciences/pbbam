@@ -70,12 +70,12 @@ public:
     static DataSet::TypeEnum NameToType(const std::string& typeName);
 
     static std::string TypeToName(const DataSet::TypeEnum& type);
-
     /// \}
 
 public:
 
     /// \name Constructors & Related Methods
+    /// \{
 
     DataSet(void);
     DataSet(const DataSet::TypeEnum type);
@@ -87,15 +87,16 @@ public:
     DataSet& operator=(DataSet&& other);
     ~DataSet(void);
 
+    /// Creates a DataSet from "raw" XML data.
+    static DataSet FromXml(const std::string& xml);
+
     /// \}
 
 public:
     /// \name Operators
     /// \{
 
-    DataSet& operator+=(const DataSet&);
-
-    bool operator==(const DataSet&) const;
+    DataSet& operator+=(const DataSet& other);
 
     /// \}
 

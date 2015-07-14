@@ -136,6 +136,14 @@ std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>&
     }
 }
 
+std::unique_ptr<DataSetBase> DataSetIO::FromXmlString(const string& xml)
+{
+    if (xml.empty())
+        throw std::runtime_error("empty XML string");
+    stringstream s(xml);
+    return XmlReader::FromStream(s);
+}
+
 void DataSetIO::ToFile(const std::unique_ptr<DataSetBase>& dataset,
                        const string& fn)
 {
