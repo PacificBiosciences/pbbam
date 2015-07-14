@@ -81,7 +81,7 @@ set( PacBioBAM_H
     ${PacBioBAM_SourceDir}/PbiIndexIO.h
     ${PacBioBAM_SourceDir}/SequenceUtils.h
     ${PacBioBAM_SourceDir}/StringUtils.h
-#    ${PacBioBAM_SourceDir}/TimeUtils.h
+    ${PacBioBAM_SourceDir}/TimeUtils.h
     ${PacBioBAM_SourceDir}/XmlReader.h
     ${PacBioBAM_SourceDir}/XmlWriter.h
     ${PacBioBAM_SourceDir}/pugixml/pugiconfig.hpp

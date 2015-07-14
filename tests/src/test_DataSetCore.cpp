@@ -62,7 +62,7 @@ TEST(DataSetCoreTest, DefaultsOk)
 {
     DataSet dataset;
     EXPECT_EQ(DataSet::GENERIC, dataset.Type());
-    EXPECT_TRUE(dataset.CreatedAt().empty());
+    EXPECT_FALSE(dataset.CreatedAt().empty());    // default init
     EXPECT_TRUE(dataset.Format().empty());
     EXPECT_TRUE(dataset.MetaType().empty());
     EXPECT_TRUE(dataset.ModifiedAt().empty());

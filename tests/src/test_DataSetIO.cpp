@@ -665,7 +665,6 @@ static void TestMappingStaggeredXml(void)
         }
     }
 
-    // ?
     const SubDataSets& subdatasets = dataset.SubDataSets();
     ASSERT_EQ(2, subdatasets.Size());
     for (size_t i = 0; i < subdatasets.Size(); ++i) {
@@ -1158,4 +1157,3 @@ static void TestTransformedXml(void)
     EXPECT_EQ(string("150000"),   metadata.NumRecords());
     EXPECT_EQ(string("50000000"), metadata.TotalLength());
 }
-

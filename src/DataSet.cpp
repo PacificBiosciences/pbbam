@@ -39,6 +39,7 @@
 #include "pbbam/DataSetTypes.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 #include "DataSetIO.h"
+#include "TimeUtils.h"
 #include <unordered_map>
 #include <iostream>
 using namespace PacBio;
@@ -48,7 +49,9 @@ using namespace std;
 
 DataSet::DataSet(void)
     : d_(new DataSetBase)
-{ }
+{
+    CreatedAt(internal::ToIso8601(internal::CurrentTime()));
+}
 
 DataSet::DataSet(const DataSet::TypeEnum type)
     : d_(nullptr)
@@ -66,11 +69,15 @@ DataSet::DataSet(const DataSet::TypeEnum type)
         default:
             throw std::runtime_error("unsupported dataset type"); // unknown type
     }
+
+    CreatedAt(internal::ToIso8601(internal::CurrentTime()));
 }
 
 DataSet::DataSet(const BamFile& bamFile)
     : d_(internal::DataSetIO::FromUri(bamFile.Filename()))
-{ }
+{
+    CreatedAt(internal::ToIso8601(internal::CurrentTime()));
+}
 
 DataSet::DataSet(const string& filename)
     : d_(internal::DataSetIO::FromUri(filename))
@@ -105,14 +112,10 @@ DataSet& DataSet::operator=(DataSet&& other)
 
 DataSet::~DataSet(void) { }
 
-DataSet& DataSet::operator+=(const DataSet&)
+DataSet& DataSet::operator+=(const DataSet& other)
 {
+    *d_.get() += *other.d_.get();
     return *this;
-}
-
-bool DataSet::operator==(const DataSet&) const
-{
-    return true;
 }
 
 DataSet::TypeEnum DataSet::NameToType(const string& typeName)
@@ -154,15 +157,3 @@ string DataSet::TypeToName(const DataSet::TypeEnum& type)
             throw std::runtime_error("unsupported dataset type"); // unknown type
     }
 }
-
-//DataSet& DataSet::operator+=(const DataSet& other)
-//{
-//    // fail on conflicting metadata, just for now to simplify
-//    const DataSetMetadata& metadata = Metadata();
-//    const DataSetMetadata& otherMetadata = other.Metadata();
-//    if (metadata != otherMetadata)
-//        throw std::exception();
-//    DataSetBase::operator+=(other);
-//    return *this;
-//}
-
