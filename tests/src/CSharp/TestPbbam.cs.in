@@ -17,9 +17,9 @@ namespace TestStuff
     public class TestPbbam
     {
         public static readonly string DATA_DIR = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/TestData";
-        public static readonly string BAM_FILENAME_1 = DATA_DIR + @"\test_group_query\test1.bam";
-        public static readonly string BAM_FILENAME_2 = DATA_DIR + @"\test_group_query\test2.bam";
-        public static readonly string FASTA_FILENAME = DATA_DIR + @"\lambdaNEB.fa";
+        public static readonly string BAM_FILENAME_1 = Path.Combine(DATA_DIR, "test_group_query", "test1.bam");
+        public static readonly string BAM_FILENAME_2 = Path.Combine(DATA_DIR, "test_group_query", "test2.bam");
+        public static readonly string FASTA_FILENAME = Path.Combine(DATA_DIR, "lambdaNEB.fa");
 
         public TestPbbam ()
         {
@@ -43,7 +43,7 @@ namespace TestStuff
 
         public static void TestCigar()
         {
-            string s = "3M3I3D";
+            string s = "3=3I3D";
             var c = new Cigar(s);
             string cs = c.ToStdString();
             if (s != cs)
@@ -52,7 +52,7 @@ namespace TestStuff
             }
 
             // This used to crash
-            var c2 = Cigar.FromStdString("3M3I3D");
+            var c2 = Cigar.FromStdString("3=3I3D");
 
             // This crashes now--- bad cigar string format.
             //var c3 = Cigar.FromStdString("III");
@@ -63,7 +63,7 @@ namespace TestStuff
         public static void TestBamFileEnumeration()
         {
             var bf = new BamFile(BAM_FILENAME_2);
-            var q = new EntireFileQuery(bf);
+            var q = new EntireFileQuery(new DataSet(bf));
 
             if (q.Count() !=  4)
             {

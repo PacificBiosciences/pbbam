@@ -72,7 +72,7 @@ if [ "$PLATFORM" == "Windows" ]
 then
     ( $CSC  /lib:$ASSEMBLY_ROOT //r:PacBio.BAM.dll /out:$CHECK_BIN $(cygpath -w $CHECK_SRC) && $CHECK_BIN)
 else
-    ( $CSC  /lib:$ASSEMBLY_ROOT /r:PacBio.BAM.dll /out:$CHECK_BIN $CHECK_SRC           && mono $CHECK_BIN)
+    ( $CSC  /lib:$ASSEMBLY_ROOT /r:PacBio.BAM.dll /out:$CHECK_BIN $CHECK_SRC && cd $ASSEMBLY_ROOT && mono CheckSWIG.exe )
 fi
 
 
@@ -87,5 +87,5 @@ if [ "$PLATFORM" == "Windows" ]
 then
     ( $CSC /lib:$ASSEMBLY_ROOT //r:PacBio.BAM.dll /out:$TEST_BIN $(cygpath -w $TEST_SRC) && $TEST_BIN )
 else
-    ( $CSC /lib:$ASSEMBLY_ROOT //r:PacBio.BAM.dll /out:$TEST_BIN $TEST_SRC          && mono $TEST_BIN )
+    ( $CSC /lib:$ASSEMBLY_ROOT /r:PacBio.BAM.dll /out:$TEST_BIN $TEST_SRC && cd $ASSEMBLY_ROOT && mono TestPbbam.exe )
 fi
