@@ -121,15 +121,20 @@ public:
     /// Write a record to the output BAM file.
     ///
     /// \param[in] record BamRecord object
-    ///
-    /// \throws
+    /// \throws std::runtime_error on failure to write
     void Write(const BamRecord& record);
 
     /// Write a record to the output BAM file.
     ///
-    /// \param[in] recordImpl BamRecordImpl object
+    /// \param[in] record BamRecord object
+    /// \param[out] vOffset BGZF virtual offset to start of \p record
+    /// \throws std::runtime_error on failure to write
+    void Write(const BamRecord& record, int64_t* vOffset);
+
+    /// Write a record to the output BAM file.
     ///
-    /// \throws
+    /// \param[in] recordImpl BamRecordImpl object
+    /// \throws std::runtime_error on failure to write
     void Write(const BamRecordImpl& recordImpl);
 
     /// \}

@@ -27,6 +27,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/Interval.h
     ${PacBioBAM_IncludeDir}/pbbam/LocalContextFlags.h
     ${PacBioBAM_IncludeDir}/pbbam/Orientation.h
+    ${PacBioBAM_IncludeDir}/pbbam/PbiBuilder.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiFile.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiIndex.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiRawData.h
@@ -80,6 +81,7 @@ set( PacBioBAM_H
     ${PacBioBAM_SourceDir}/PbiIndexIO.h
     ${PacBioBAM_SourceDir}/SequenceUtils.h
     ${PacBioBAM_SourceDir}/StringUtils.h
+#    ${PacBioBAM_SourceDir}/TimeUtils.h
     ${PacBioBAM_SourceDir}/XmlReader.h
     ${PacBioBAM_SourceDir}/XmlWriter.h
     ${PacBioBAM_SourceDir}/pugixml/pugiconfig.hpp
@@ -117,6 +119,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/GroupQuery.cpp
     ${PacBioBAM_SourceDir}/IndexedFastaReader.cpp
     ${PacBioBAM_SourceDir}/MemoryUtils.cpp
+    ${PacBioBAM_SourceDir}/PbiBuilder.cpp
     ${PacBioBAM_SourceDir}/PbiFile.cpp
     ${PacBioBAM_SourceDir}/PbiIndex.cpp
     ${PacBioBAM_SourceDir}/PbiIndexIO.cpp

@@ -56,7 +56,6 @@ class PbiIndexIO
 {
 public:
     // top-level entry points
-    static PbiRawData Build(const BamFile& bam);
     static PbiRawData Load(const std::string& filename);
     static void Load(PbiRawData& rawData,
                      const std::string& filename);

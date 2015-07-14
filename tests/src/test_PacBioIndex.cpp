@@ -42,12 +42,16 @@
 #include "TestData.h"
 #include <gtest/gtest.h>
 #include <pbbam/BamFile.h>
+#include <pbbam/BamWriter.h>
+#include <pbbam/EntireFileQuery.h>
+#include <pbbam/PbiBuilder.h>
 #include <pbbam/PbiIndex.h>
 #include <pbbam/PbiRawData.h>
 #include <pbbam/internal/PbiIndex_p.h>
 #include <string>
 #include <cstdio>
 #include <cstdlib>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -220,7 +224,7 @@ bool PbiIndicesEqual(const PbiIndex& lhs, const PbiIndex& rhs)
 } // namespace BAM
 } // namespace PacBio
 
-TEST(PacBioIndexTest, BuildFromBamOk)
+TEST(PacBioIndexTest, CreateFromExistingBam)
 {
     // do this in temp directory, so we can ensure write access
     const string tempDir    = "/tmp/";
@@ -230,7 +234,8 @@ TEST(PacBioIndexTest, BuildFromBamOk)
     cmd += test2BamFn;
     cmd += " ";
     cmd += tempDir;
-    system(cmd.c_str());
+    int cmdResult = system(cmd.c_str());
+    ASSERT_EQ(0, cmdResult);
 
     BamFile bamFile(tempBamFn);
     PbiFile::CreateFrom(bamFile);
@@ -247,10 +252,46 @@ TEST(PacBioIndexTest, BuildFromBamOk)
     // clean up temp file(s)
     remove(tempBamFn.c_str());
     remove(tempPbiFn.c_str());
-
 }
 
-TEST(PacBioIndexTest, RawLoadFromFileOk)
+TEST(PacBioIndexTest, CreateOnTheFly)
+{
+    // do this in temp directory, so we can ensure write access
+    const string tempDir    = "/tmp/";
+    const string tempBamFn  = tempDir + "temp.bam";
+    const string tempPbiFn  = tempBamFn + ".pbi";
+
+    // create PBI on the fly from input BAM while we write to new file
+    {
+        BamFile bamFile(test2BamFn);
+        BamHeader header = bamFile.Header();
+
+        BamWriter writer(tempBamFn, header);
+        PbiBuilder builder(tempPbiFn, header.Sequences().size());
+
+        int64_t vOffset = 0;
+        EntireFileQuery entireFile(bamFile);
+        for (const BamRecord& record : entireFile) {
+            writer.Write(record, &vOffset);
+            builder.AddRecord(record, vOffset);
+        }
+    }
+
+    // compare data in new PBI file, to expected data
+    const PbiRawData& expectedIndex = tests::Test2Bam_RawIndex();
+    const PbiRawData& fromBuilt = PbiRawData(tempPbiFn);
+    tests::ExpectRawIndicesEqual(expectedIndex, fromBuilt);
+
+    // straight diff of newly-generated PBI file to existing PBI
+    const string pbiDiffCmd = string("diff -q ") + test2BamFn + ".pbi " + tempPbiFn;
+    EXPECT_EQ(0, system(pbiDiffCmd.c_str()));
+
+    // clean up temp file(s)
+    remove(tempBamFn.c_str());
+    remove(tempPbiFn.c_str());
+}
+
+TEST(PacBioIndexTest, RawLoadFromPbiFile)
 {
     const BamFile bamFile(test2BamFn);
     const string& pbiFilename = bamFile.PacBioIndexFilename();

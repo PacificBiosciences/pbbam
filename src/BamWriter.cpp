@@ -40,6 +40,7 @@
 #include "AssertUtils.h"
 #include "MemoryUtils.h"
 #include <htslib/bgzf.h>
+#include <htslib/hfile.h>
 #include <htslib/hts.h>
 #include <thread>
 #include <iostream>
@@ -65,6 +66,7 @@ public:
               const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
               size_t numThreads = 4);
     void Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord);
+    void Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord, int64_t* vOffset);
 
 public:
     std::unique_ptr<samFile, internal::HtslibFileDeleter> file_;
@@ -117,6 +119,19 @@ void BamWriterPrivate::Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord)
         throw std::runtime_error("could not write record");
 }
 
+void BamWriterPrivate::Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord, int64_t* vOffset)
+{
+    BGZF* bgzf = file_.get()->fp.bgzf;
+    assert(bgzf);
+    assert(vOffset);
+
+    const off_t rawTell = htell(bgzf->fp);
+    const int length = bgzf->block_offset;
+
+    *vOffset = (rawTell << 16) | length ;
+    Write(rawRecord);
+}
+
 } // namespace internal
 } // namespace BAM
 } // namespace PacBio
@@ -148,6 +163,9 @@ void BamWriter::TryFlush(void)
 
 void BamWriter::Write(const BamRecord& record)
 { d_->Write(internal::BamRecordMemory::GetRawData(record)); }
+
+void BamWriter::Write(const BamRecord& record, int64_t* vOffset)
+{  d_->Write(internal::BamRecordMemory::GetRawData(record), vOffset); }
 
 void BamWriter::Write(const BamRecordImpl& recordImpl)
 { d_->Write(internal::BamRecordMemory::GetRawData(recordImpl)); }

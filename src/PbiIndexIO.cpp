@@ -39,6 +39,7 @@
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/EntireFileQuery.h"
+#include "pbbam/PbiBuilder.h"
 #include "MemoryUtils.h"
 #include <boost/algorithm/string.hpp>
 using namespace PacBio;
@@ -46,163 +47,9 @@ using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
 using namespace std;
 
-namespace PacBio {
-namespace BAM {
-namespace internal {
-
-// helper for reference data
-class PbiRawReferenceDataBuilder
-{
-public:
-    PbiRawReferenceDataBuilder(const BamFile& bam)
-        : lastRefId_(-1)
-        , lastPos_(-1)
-    {
-        const BamHeader& header = bam.Header();
-        const size_t numReferences = header.Sequences().size();
-        for (size_t i = 0; i < numReferences; ++i)
-            rawReferenceEntries_[i] = PbiReferenceEntry(i);
-        rawReferenceEntries_[PbiReferenceEntry::UNMAPPED_ID] = PbiReferenceEntry();
-    }
-
-public:
-    bool AddRecord(const BamRecord& record,
-                   const PbiReferenceEntry::Row rowNumber)
-    {
-        // fetch ref ID & pos for record
-        const int32_t tId = record.ReferenceId();
-        const int32_t pos = record.ReferenceStart();
-
-        // sanity checks to protect against non-coordinate-sorted BAMs
-        if (lastRefId_ != tId || (lastRefId_ >= 0 && tId < 0)) {
-            if (tId >= 0) {
-
-                // if we've already seen unmapped reads, but our current tId is valid
-                //
-                // error: unmapped reads should all be at the end (can stop checking refs)
-                //
-                PbiReferenceEntry& unmappedEntry =
-                        rawReferenceEntries_[PbiReferenceEntry::UNMAPPED_ID];
-                if (unmappedEntry.beginRow_ != PbiReferenceEntry::UNSET_ROW)
-                    return false;
-
-                // if we've already seen data for this new tId
-                // (remember we're coming from another tId)
-                //
-                // error: refs are out of order (can stop checking refs)
-                //
-                PbiReferenceEntry& currentEntry =
-                        rawReferenceEntries_[(uint32_t)tId];
-                if (currentEntry.beginRow_ != PbiReferenceEntry::UNSET_ROW)
-                    return false;
-            }
-            lastRefId_ = tId;
-        }
-        else if (tId >= 0 && lastPos_ > pos)
-            return false; //error: positions out of order
-
-        // update row numbers
-        PbiReferenceEntry& entry = rawReferenceEntries_[(uint32_t)tId];
-        if (entry.beginRow_ == PbiReferenceEntry::UNSET_ROW)
-            entry.beginRow_ = rowNumber;
-        entry.endRow_ = rowNumber+1;
-
-        // update pos (for sorting check next go-round)
-        lastPos_ = pos;
-        return true;
-    }
-
-    PbiRawReferenceData Result(void) const {
-        // PbiReferenceEntries will be sorted thanks to std::map
-        // tId will be at end since we're sorting on the uint cast of -1
-        PbiRawReferenceData result;
-        result.entries_.reserve(rawReferenceEntries_.size());
-        auto refIter = rawReferenceEntries_.cbegin();
-        const auto refEnd  = rawReferenceEntries_.cend();
-        for ( ; refIter != refEnd; ++refIter )
-            result.entries_.push_back(refIter->second);
-        return result;
-    }
-
-private:
-    int32_t lastRefId_;
-    Position lastPos_;
-    map<uint32_t, PbiReferenceEntry> rawReferenceEntries_;
-};
-
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
-
 // ---------------------------
 // PbiIndexIO implementation
 // ---------------------------
-
-PbiRawData PbiIndexIO::Build(const BamFile& bam)
-{
-    unique_ptr<samFile,internal::HtslibFileDeleter> htsFile(sam_open(bam.Filename().c_str(), "rb"));
-    if (!htsFile)
-        throw std::runtime_error("could not open BAM file for reading");
-
-    unique_ptr<bam_hdr_t, internal::HtslibHeaderDeleter> htsHeader(sam_hdr_read(htsFile.get()));
-    if (!htsHeader)
-        throw std::runtime_error("could not read BAM header data");
-
-    samFile*   fp  = htsFile.get();
-    bam_hdr_t* hdr = htsHeader.get();
-
-    BamRecord record;
-    bam1_t* b = internal::BamRecordMemory::GetRawData(record).get();
-    if (b == 0)
-        throw std::runtime_error("could not allocate BAM record");
-
-    // For these optional sections: assume true, we'll mark false if that
-    // data type is not present. This allows us to stop checking in during
-    // the main loop, and also correctly mark the file at the end.
-    bool hasMappedData    = true;
-    bool hasBarcodeData   = true;
-    bool hasReferenceData = true;
-
-    PbiRawData rawIndex;
-    PbiRawBarcodeData& barcodeData = rawIndex.BarcodeData();
-    PbiRawMappedData&  mappedData  = rawIndex.MappedData();
-    PbiRawSubreadData& subreadData = rawIndex.SubreadData();
-    PbiRawReferenceDataBuilder refDataBuilder(bam);
-
-    PbiReferenceEntry::Row rowNumber = 0;
-    int64_t offset = bgzf_tell(fp->fp.bgzf);
-    while (sam_read1(fp, hdr, b) >= 0) {
-        record.ResetCachedPositions();
-
-        subreadData.AddRecord(record, offset);
-
-        if (hasMappedData)
-            hasMappedData &= mappedData.AddRecord(record);
-
-        if (hasReferenceData)
-            hasBarcodeData &= barcodeData.AddRecord(record);
-
-        if (hasReferenceData)
-            hasReferenceData &= refDataBuilder.AddRecord(record, rowNumber);
-
-        offset = bgzf_tell(fp->fp.bgzf);
-        ++rowNumber;
-    }
-    rawIndex.NumReads(rowNumber);
-
-    // fetch reference data, if available
-    if (hasReferenceData)
-        rawIndex.ReferenceData() = std::move(refDataBuilder.Result());
-
-    // determine flags
-    PbiFile::Sections sections = PbiFile::SUBREAD;
-    if (hasMappedData)    sections |= PbiFile::MAPPED;
-    if (hasBarcodeData)   sections |= PbiFile::BARCODE;
-    if (hasReferenceData) sections |= PbiFile::REFERENCE;
-    rawIndex.FileSections(sections);
-
-    return rawIndex;
-}
 
 PbiRawData PbiIndexIO::Load(const std::string& pbiFilename)
 {
