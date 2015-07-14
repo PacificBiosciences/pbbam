@@ -79,9 +79,13 @@ list(APPEND CMAKE_MODULE_PATH "${PacBioBAM_RootDir}/cmake")
 if(NOT HTSLIB_INCLUDE_DIRS OR
    NOT HTSLIB_LIBRARIES)
     if(HTSLIB_ROOTDIR)
-        find_package(${HTSLIB_ROOTDIR}/htslib REQUIRED)
+        find_package(htslib
+                     PATHS ${HTSLIB_ROOTDIR}/
+                     REQUIRED)
     else()
-        find_package(${PacBioBAM_SOURCE_DIR}/../htslib/htslib REQUIRED)
+        find_package(htslib
+                     PATHS ${PacBioBAM_SOURCE_DIR}/../htslib/
+                     REQUIRED)
     endif()
 endif()
 
