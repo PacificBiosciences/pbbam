@@ -145,6 +145,11 @@ else( UNIX )
     set( CSHARP_MONO_VERSIONS ${CSHARP_MONO_VERSION} CACHE STRING "Available C# Mono compiler versions" FORCE )
     mark_as_advanced( CSHARP_MONO_VERSIONS )
     set( CSHARP_MONO_FOUND 1 CACHE INTERNAL "Boolean indicating if C# Mono was found" )
+
+    # Assume xbuild is just xbuild.
+    set(CSHARP_PROJECT_BUILDER "xbuild")
+
+
   endif( EXISTS ${csharp_mono_compiler} )
 
   # Remove temp variable from cache

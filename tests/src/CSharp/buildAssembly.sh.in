@@ -1,9 +1,15 @@
-#!/bin/sh
+#!/bin/bash
+set -euo pipefail
+set -x
+
 
 # This is a temporary hack to build windows C# bindings, while I work on getting it
 # to work nicely through CMake --DHA
 
-# Setup (before doing this!):
+# UNIX setup (before doing this!)
+#  - install swig, cmake, and mono
+#
+# Windows setup (before doing this!):
 #  - install msys2 (64-bit) from https://msys2.github.io/
 #  - install: (pacman -S [package-name]); in all cases use the mingw-w64 64bit version when
 #    available:
@@ -12,6 +18,12 @@
 #   + swig
 #   + cmake
 #  - for cmake, generate MSYS makefiles
+
+if [ ${WIN32} ]; then
+    PLATFORM="Windows"
+else
+    PLATFORM="Unix"
+fi
 
 MSBUILD=${CSHARP_PROJECT_BUILDER}
 CSC=${CSHARP_COMPILER}
@@ -28,14 +40,20 @@ ASSEMBLY_ROOT=${PacBioBAM_CSharpLibDir}/bin/Debug
 #
 # Copy the dependency libs
 #
-cp ${PacBioBAM_LibDir}/libpbbam.dll                       $ASSEMBLY_ROOT
-cp ${PacBioBAM_CSharpLibDir}/libPacBioBam.dll             $ASSEMBLY_ROOT/PacBioBam.dll
-cp ${Htslib_LibDir}/libhts${CMAKE_SHARED_LIBRARY_SUFFIX}  $ASSEMBLY_ROOT
+cp ${PacBioBAM_LibDir}/libpbbam${CMAKE_SHARED_LIBRARY_SUFFIX}  $ASSEMBLY_ROOT
+cp ${HTSLIB_LIBRARIES}                                         $ASSEMBLY_ROOT  # Need "libhts*.dylib"
 
-# stuff we need to bundle on windows
-cp /mingw64/bin/zlib1.dll                                 $ASSEMBLY_ROOT
-cp /mingw64/bin/libwinpthread-1.dll                       $ASSEMBLY_ROOT
-
+if [ "$PLATFORM" == "Windows" ]
+then
+    # stuff we need to bundle on windows
+    cp /mingw64/bin/zlib1.dll                                 $ASSEMBLY_ROOT
+    cp /mingw64/bin/libwinpthread-1.dll                       $ASSEMBLY_ROOT
+    cp ${PacBioBAM_CSharpLibDir}/libPacBioBam.dll             $ASSEMBLY_ROOT/PacBioBam.dll
+else
+    # For UNIX this is .so, even Mac.  Not sure why.
+    cp ${PacBioBAM_CSharpLibDir}/libPacBioBam.so              $ASSEMBLY_ROOT
+    cp ${HTSLIB_LIBRARIES_VERSIONED_LINK}                     $ASSEMBLY_ROOT  # Need "libhts*.dylib"
+fi
 
 # Bundle test data
 mkdir -p $ASSEMBLY_ROOT/TestData
@@ -49,7 +67,13 @@ cp -rf ${PacBioBAM_TestsDir}/data/* $ASSEMBLY_ROOT/TestData
 CHECK_SRC=${CSharpTestRootDir}/CheckSWIG.cs
 CHECK_BIN=$ASSEMBLY_ROOT/CheckSWIG.exe
 
-( $CSC  /lib:$ASSEMBLY_ROOT //r:PacBio.BAM.dll /out:$CHECK_BIN $(cygpath -w $CHECK_SRC) && $CHECK_BIN)
+
+if [ "$PLATFORM" == "Windows" ]
+then
+    ( $CSC  /lib:$ASSEMBLY_ROOT //r:PacBio.BAM.dll /out:$CHECK_BIN $(cygpath -w $CHECK_SRC) && $CHECK_BIN)
+else
+    ( $CSC  /lib:$ASSEMBLY_ROOT /r:PacBio.BAM.dll /out:$CHECK_BIN $CHECK_SRC           && mono $CHECK_BIN)
+fi
 
 
 #
@@ -58,4 +82,10 @@ CHECK_BIN=$ASSEMBLY_ROOT/CheckSWIG.exe
 TEST_SRC=${CSharpTestRootDir}/TestPbbam.cs
 TEST_BIN=$ASSEMBLY_ROOT/TestPbbam.exe
 
-( $CSC /lib:$ASSEMBLY_ROOT //r:PacBio.BAM.dll /out:$TEST_BIN $(cygpath -w $TEST_SRC) && $TEST_BIN )
+
+if [ "$PLATFORM" == "Windows" ]
+then
+    ( $CSC /lib:$ASSEMBLY_ROOT //r:PacBio.BAM.dll /out:$TEST_BIN $(cygpath -w $TEST_SRC) && $TEST_BIN )
+else
+    ( $CSC /lib:$ASSEMBLY_ROOT //r:PacBio.BAM.dll /out:$TEST_BIN $TEST_SRC          && mono $TEST_BIN )
+fi

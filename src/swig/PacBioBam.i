@@ -82,6 +82,26 @@ endif*/
 
 /********* PacBioBAM includes ************/
 
+#ifdef SWIGCSHARP
+ // Renames to play nice with C#
+ // (These are used in the dataset support code, where things like
+ //  this happen in C++:
+ //
+ //    void Extensions(Extensions x) { ... }
+ //
+ //  and this poses problems for C#.  Renaming should be fine
+ //  as it is doubtful we will refer to these classes by name anyway.)
+ //
+%rename(ExtensionsType)        PacBio::BAM::Extensions;
+%rename(ExternalResourcesType) PacBio::BAM::ExternalResources;
+%rename(FiltersType)           PacBio::BAM::Filters;
+%rename(SubDataSetsType)       PacBio::BAM::SubDataSets;
+%rename(ProvenanceType)        PacBio::BAM::Provenance;
+%rename(PropertiesType)        PacBio::BAM::Properties;
+%rename(FileIndicesType)       PacBio::BAM::FileIndices;
+%rename(ParentToolType)        PacBio::BAM::ParentTool;
+#endif
+
 // Basic types
 %include "Accuracy.i"
 %include "CigarOperation.i"
