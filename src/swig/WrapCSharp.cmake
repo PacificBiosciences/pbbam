@@ -4,7 +4,7 @@ include (${CSHARP_USE_FILE})
 
 set(PacBioBAM_CSharpLibDir  ${PacBioBAM_LibDir}/csharp/PacBio.BAM)
 set(PacBioBAM_CSharpDLL     ${PacBioBAM_CSharpLibDir}/bin/Debug/PacBio.BAM.dll)
-set(CSharpTestRootDir       ${PacBioBAM_TestsDir}/src/csharp)
+set(CSharpTestRootDir       ${PacBioBAM_TestsDir}/src/CSharp)
 set(NativeLibraryPaths      ${PacBioBAM_CSharpLibDir}:${PacBioBAM_LibDir}:${Htslib_LibDir})
 
 #
