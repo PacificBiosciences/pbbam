@@ -9,6 +9,13 @@ define a reference point & compatibility guarantees will be maintained within ea
 series.
 
 
+## Active
+
+### Added 
+- BamFile::PacBioIndexExists() & BamFile::StandardIndexExists() - query existence of index files without
+auto-generating them if they are missing (e.g. BamFile::Ensure*IndexExists())
+- 
+
 ## [0.1.0] - 2015-07-17
 
 ### Changed

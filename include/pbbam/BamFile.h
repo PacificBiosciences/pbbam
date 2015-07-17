@@ -73,38 +73,41 @@ public:
     /// \name Index & Filename Methods
     /// \{
 
-    /// \returns BAM filename
-    std::string Filename(void) const;
-
-    /// \returns filename of PacBio index file (".pbi")
-    /// \note No guarantee is made on the existence of this file.
-    ///       This method simply returns the expected filename.
-    std::string PacBioIndexFilename(void) const;
-
-    /// \returns filename of standard index file (".bai")
-    /// \note No guarantee is made on the existence of this file.
-    ///       This method simply returns the expected filename.
-    std::string StandardIndexFilename(void) const;
-
-    /// Check that ".pbi" exists, is readable, and is newer than
-    /// this BAM file. If not, one will be created.
-    ///
-    /// \note The PBI sections will be auto-detected from the
-    /// BAM file's contents. If you need fine-grained control over
-    /// the PBI layout, see PbiIndex::Build for more info.
+    /// Check that ".pbi" exists and is newer than this BAM file.
+    /// If not, one will be created.
     ///
     /// \throws if PBI file could not be properly created and/or
     /// written to disk
     ///
     void EnsurePacBioIndexExists(void) const;
 
-    /// Check that ".bai" exists, is readable, and is newer than
-    /// this BAM file. If not, one will be created.
+    /// Check that ".bai" exists and is newer than this BAM file.
+    /// If not, one will be created.
     ///
     /// \throws if BAI file could not be properly created (e.g. this
     /// BAM is not coordinate-sorted) or could not be written to disk
     ///
     void EnsureStandardIndexExists(void) const;
+
+    /// \returns BAM filename
+    std::string Filename(void) const;
+
+    /// \returns true if ".pbi" exists and is newer than this BAM file.
+    bool PacBioIndexExists(void) const;
+
+    /// \returns filename of PacBio index file (".pbi")
+    /// \note No guarantee is made on the existence of this file.
+    ///       This method simply returns the expected filename.
+    std::string PacBioIndexFilename(void) const;
+
+    /// \returns true if ".bai" exists and is newer than this BAM file.
+    bool StandardIndexExists(void) const;
+
+    /// \returns filename of standard index file (".bai")
+    /// \note No guarantee is made on the existence of this file.
+    ///       This method simply returns the expected filename.
+    std::string StandardIndexFilename(void) const;
+
 
     /// \}
 
