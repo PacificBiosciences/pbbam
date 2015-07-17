@@ -14,13 +14,14 @@ set(PacBioBAM_VERSION
 )
 
 # list build-time options
-option(PacBioBAM_build_docs   "Build PacBioBAM's API documentation."           ON)
-option(PacBioBAM_build_tests  "Build PacBioBAM's unit tests."                  ON)
-option(PacBioBAM_build_shared "Build PacBioBAM as shared library as well."     OFF)
-option(PacBioBAM_wrap_csharp  "Build PacBioBAM with SWIG bindings for C#."     OFF)
-option(PacBioBAM_wrap_python  "Build PacBioBAM with SWIG bindings for Python." OFF)
-option(PacBioBAM_wrap_r       "Build PacBioBAM with SWIG bindings for R."      OFF)
-option(PacBioBAM_use_modbuild "Build PacBioBAM using Modular Build System."    OFF)
+option(PacBioBAM_build_docs    "Build PacBioBAM's API documentation."           ON)
+option(PacBioBAM_build_tests   "Build PacBioBAM's unit tests."                  ON)
+option(PacBioBAM_build_shared  "Build PacBioBAM as shared library as well."     OFF)
+option(PacBioBAM_build_pbindex "Build pbindex tool."                            ON)
+option(PacBioBAM_wrap_csharp   "Build PacBioBAM with SWIG bindings for C#."     OFF)
+option(PacBioBAM_wrap_python   "Build PacBioBAM with SWIG bindings for Python." OFF)
+option(PacBioBAM_wrap_r        "Build PacBioBAM with SWIG bindings for R."      OFF)
+option(PacBioBAM_use_modbuild  "Build PacBioBAM using Modular Build System."    OFF)
 
 # --check build-time options --
 
