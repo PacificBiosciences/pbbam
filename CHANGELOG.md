@@ -8,14 +8,25 @@ The public API should not be considered stable yet. Once we lock down a version 
 define a reference point & compatibility guarantees will be maintained within each major version 
 series.
 
-## [Active]
-- Bringing API up to BAM spec v3.0b7 compliance
-  - Removal of 'M' as allowed CIGAR operation
-  - Addition of IPD/PulseWidth codec tags in header
-- PBI bugfixes
-  - Failing on CCS reads
-  - Stopgap for nM/nMM fields until we fully port tools to 'X/=' instead of 'M' CIGAR
- 
+
+## [0.1.0] - 2015-07-17
+
+### Changed
+- BAM spec v3.0b7 compliance
+ - Removal of 'M' as allowed CIGAR operation. Attempt to use such a CIGAR op will throw an exception.
+ - Addition of IPD/PulseWidth codec version info in header
+  
+### Added
+- Auto-generation of UTC timestamp for DataSet objects
+- PbiBuilder - allows generation of PBI index data alongside generation/modification of BAM record
+data. This obviates the need to wait for a completed BAM, then go through the zlib decompression, etc.
+- Added DataSet::FromXml(string xml) to create DataSets from "raw" XML string, rather than building up 
+using DataSet API or loading from existing file.
+- "pbindex" command line tool to generate ".pbi" files from BAM data. The executable is built by default, 
+but can be disabled using the cmake option "-DPacBioBAM_build_pbindex=OFF".
+  
+### Fixed
+- PBI construction failing on CCS reads
 
 ## [0.0.8] - 2015-07-02
 

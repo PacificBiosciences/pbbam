@@ -7,8 +7,8 @@ cmake_minimum_required(VERSION 2.8)
 
 # project version
 set(PacBioBAM_MAJOR_VERSION 0)
-set(PacBioBAM_MINOR_VERSION 0)
-set(PacBioBAM_PATCH_VERSION 8)
+set(PacBioBAM_MINOR_VERSION 1)
+set(PacBioBAM_PATCH_VERSION 0)
 set(PacBioBAM_VERSION
   "${PacBioBAM_MAJOR_VERSION}.${PacBioBAM_MINOR_VERSION}.${PacBioBAM_PATCH_VERSION}"
 )
