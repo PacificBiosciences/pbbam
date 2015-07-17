@@ -53,6 +53,11 @@ set_target_properties(pbbam PROPERTIES
         
 # link dependency libs to pbbam 
 target_link_libraries(pbbam ${PacBioBAM_DependencyLibraries})
+target_include_directories(pbbam 
+    PUBLIC
+    ${PacBioBAM_IncludeDir} 
+    ${PacBioBAM_DependencyIncludes}
+)
 
 # define symbols for projects that use PacBioBAM
 set(PacBioBAM_INCLUDE_DIRS
