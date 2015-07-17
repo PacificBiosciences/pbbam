@@ -53,16 +53,27 @@ public:
     /// \name Constructors & Related Methods
     ///  \{
 
-    /** Default constructor; yields an empty genomic interval */
+    /// Default constructor; yields an empty genomic interval
     GenomicInterval(void);
 
-    /** Constructor for interval on named sequence with range: [start, stop) */
+    /// Constructor for interval on sequence with \p name, using range: [\p start, \p stop)
     GenomicInterval(const std::string& name,
                     const Position& start,
                     const Position& stop);
 
-    /** Copy constructor */
+    /// Constructor for interval, using REGION string
+    ///
+    /// "<ref>:<start>-<stop>" ("chr8:200-600")
+    ///
+    /// \note The htslib/samtools REGION string expects start positions to be 1-based.
+    ///       However, throughout pbbam (including the rest of this class), we stick
+    ///       to 0-based start coordinates. Thus, while the syntax matches that of samtools,
+    ///       we are using a 0-based start coordinate here.
+    ///
+    GenomicInterval(const std::string& zeroBasedRegionString);
+
     GenomicInterval(const GenomicInterval& other);
+    GenomicInterval& operator=(const GenomicInterval& other);
 
     ~GenomicInterval(void);
 

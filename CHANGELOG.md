@@ -12,9 +12,11 @@ series.
 ## Active
 
 ### Added 
-- BamFile::PacBioIndexExists() & BamFile::StandardIndexExists() - query existence of index files without
-auto-generating them if they are missing (e.g. BamFile::Ensure*IndexExists())
-- 
+- BamFile::PacBioIndexExists() & BamFile::StandardIndexExists() - query the existence of index files 
+without auto-building them if they are missing, as in BamFile::Ensure*IndexExists().
+- GenomicInterval now accepts an htslib/samtools-style REGION string in the constructor: 
+GenomicInterval("chr1:1000-2000"). Please note though, that pbbam uses 0-based coordinates throughout, 
+whereas samtools expects 1-based. The above string is equivalent to "chr1:1001-2000" in samtools.
 
 ## [0.1.0] - 2015-07-17
 

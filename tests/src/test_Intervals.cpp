@@ -202,18 +202,33 @@ TEST(IntervalTest, LengthTest)
     // TODO: check out-of-order intervals, etc
 }
 
-TEST(GenomicIntervalTest, Constructors)
+TEST(GenomicIntervalTest, DefaultConstructor)
 {
-    GenomicInterval empty;
-    GenomicInterval refAndCoords("foo", 100, 200);
+    GenomicInterval gi;
+    EXPECT_EQ("", gi.Name());
+    EXPECT_EQ(0,  gi.Start());
+    EXPECT_EQ(0,  gi.Stop());
+}
 
-    EXPECT_EQ("", empty.Name());
-    EXPECT_EQ(0,  empty.Start());
-    EXPECT_EQ(0,  empty.Stop());
+TEST(GenomicIntervalTest, ExplicitConstructor)
+{
+    GenomicInterval gi("foo", 100, 200);
+    EXPECT_EQ("foo", gi.Name());
+    EXPECT_EQ(100,   gi.Start());
+    EXPECT_EQ(200,   gi.Stop());
+}
 
-    EXPECT_EQ("foo", refAndCoords.Name());
-    EXPECT_EQ(100,   refAndCoords.Start());
-    EXPECT_EQ(200,   refAndCoords.Stop());
+TEST(GenomicIntervalTest, RegionStringConstructor)
+{
+    GenomicInterval gi("foo:100-200");
+    EXPECT_EQ("foo", gi.Name());
+    EXPECT_EQ(100,   gi.Start());
+    EXPECT_EQ(200,   gi.Stop());
+
+    GenomicInterval refOnly("foo");
+    EXPECT_EQ("foo", refOnly.Name());
+    EXPECT_EQ(0,     refOnly.Start());
+    EXPECT_EQ(1<<29, refOnly.Stop()); // htslib's default, "read-to-end" interval stop
 }
 
 TEST(GenomicIntervalTest, Copy)

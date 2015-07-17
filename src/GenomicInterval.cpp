@@ -37,10 +37,48 @@
 
 #include "pbbam/GenomicInterval.h"
 #include "AssertUtils.h"
-#include <htslib/hts.h>
+#include "StringUtils.h"
+#include <cstdlib>
+#include <cstring>
+#include <ctype.h>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
+
+namespace PacBio {
+namespace BAM {
+namespace internal {
+
+// returns sequence name & sets begin/end, from input regionString
+string parseRegionString(const string& reg,
+                         PacBio::BAM::Position* begin,
+                         PacBio::BAM::Position* end)
+{
+    const vector<string> parts = internal::Split(reg, ':');
+    if (parts.empty() || parts.size() > 2)
+        throw std::runtime_error("malformed region string");
+
+    // given name only, default min,max intervals
+    if (parts.size() == 1) {
+        *begin = 0;
+        *end = 1<<29;
+    }
+
+    // parse interval from input
+    else if (parts.size() == 2) {
+        const vector<string> intervalParts = internal::Split(parts.at(1), '-');
+        if (intervalParts.empty() || intervalParts.size() >2 )
+            throw std::runtime_error("malformed region string");
+        *begin = std::stoi(intervalParts.at(0));
+        *end   = std::stoi(intervalParts.at(1));
+    }
+
+    return parts.at(0);
+}
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio
 
 GenomicInterval::GenomicInterval(void) { }
 
@@ -51,10 +89,25 @@ GenomicInterval::GenomicInterval(const std::string& name,
     , interval_(start, stop)
 { }
 
+GenomicInterval::GenomicInterval(const string& samtoolsRegionString)
+{
+    Position begin;
+    Position end;
+    name_ = internal::parseRegionString(samtoolsRegionString, &begin, &end);
+    interval_ = PacBio::BAM::Interval<Position>(begin, end);
+}
+
 GenomicInterval::GenomicInterval(const GenomicInterval& other)
     : name_(other.name_)
     , interval_(other.interval_)
 { }
+
+GenomicInterval& GenomicInterval::operator=(const GenomicInterval& other)
+{
+    name_ = other.name_;
+    interval_ = other.interval_;
+    return *this;
+}
 
 bool GenomicInterval::CoveredBy(const GenomicInterval& other) const
 {
@@ -76,5 +129,3 @@ bool GenomicInterval::Intersects(const GenomicInterval& other) const
         return false;
     return interval_.Intersects(other.interval_);
 }
-
-
