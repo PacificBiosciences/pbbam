@@ -13,7 +13,6 @@ using namespace PacBio::BAM;
 
 %ignore PacBio::BAM::PbiIndex::PbiIndex(PbiIndex&&);      // move ctors not used
 %ignore PacBio::BAM::PbiIndex::operator=;                 // assignment operators not used
-
-%template(VirtualOffsetList) std::vector<int64_t>;
+%ignore PacBio::BAM::PbiIndeX::VirtualFileOffsets; 
 
 %include <pbbam/PbiIndex.h>

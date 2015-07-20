@@ -173,8 +173,8 @@ class CigarTest(unittest.TestCase):
         op1 = multiCigar[1]
         op2 = multiCigar[2]
         op3 = multiCigar[3]
-        op4 = multiCigar[2]
-        op5 = multiCigar[3]
+        op4 = multiCigar[4]
+        op5 = multiCigar[5]
 
         self.assertEqual('=', op0.Char())
         self.assertEqual('D', op1.Char())
