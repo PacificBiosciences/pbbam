@@ -2,15 +2,13 @@
 # CMake build script for PacBioBAM library.
 ########################################################################
 
-project(PacBioBAM CXX C)
-cmake_minimum_required(VERSION 2.8)
+cmake_policy(SET CMP0048 NEW)  # lets us set version in project()
+project(PacBioBAM VERSION 0.1.0 LANGUAGES CXX C)
+cmake_minimum_required(VERSION 3.0)
 
 # project version
-set(PacBioBAM_MAJOR_VERSION 0)
-set(PacBioBAM_MINOR_VERSION 1)
-set(PacBioBAM_PATCH_VERSION 0)
 set(PacBioBAM_VERSION
-  "${PacBioBAM_MAJOR_VERSION}.${PacBioBAM_MINOR_VERSION}.${PacBioBAM_PATCH_VERSION}"
+  "${PacBioBAM_VERSION_MAJOR}.${PacBioBAM_VERSION_MINOR}.${PacBioBAM_VERSION_PATCH}"
 )
 
 # list build-time options
