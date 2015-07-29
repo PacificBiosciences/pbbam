@@ -48,7 +48,13 @@ endif*/
 %include "std_string.i"
 %include "std_vector.i"
 
+ // TODO: can we call these vectors!?
 %template(StringList) std::vector<std::string>;
+%template(IntList)    std::vector<int>;
+%template(UIntList)   std::vector<unsigned int>;
+%template(FloatList)  std::vector<float>;
+%template(ShortList)  std::vector<short>;
+%template(CharList)   std::vector<char>;
 
 // basic exception-handler helper
 //

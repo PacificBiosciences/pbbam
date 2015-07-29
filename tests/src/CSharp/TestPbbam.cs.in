@@ -90,12 +90,26 @@ namespace TestStuff
             Console.WriteLine("TestIndexedFasta - OK!");
         }
 
+        public static void TestZmwQuery()
+        {
+            var d = new DataSet(BAM_FILENAME_2);
+            var q = new ZmwQuery(new IntList {1, 2, 3}, d);
+            var q2 = new ZmwQuery(new IntList { 14743 }, d);
+
+            if (0 != q.Count() || 4 != q2.Count())
+            {
+                throw new Exception("ZmwQuery not working");
+            }
+            Console.WriteLine("TestZmwQuery - OK!");
+        }
+
         public void RunAllTests()
         {
             TestExceptions();
             TestCigar();
             TestBamFileEnumeration();
             TestIndexedFasta();
+            TestZmwQuery();
         }
 
         public static void Main()
