@@ -106,6 +106,7 @@ endif*/
 %rename(PropertiesType)        PacBio::BAM::Properties;
 %rename(FileIndicesType)       PacBio::BAM::FileIndices;
 %rename(ParentToolType)        PacBio::BAM::ParentTool;
+%rename(CigarType)             PacBio::BAM::Cigar;
 #endif
 
 // Basic types
@@ -137,6 +138,7 @@ endif*/
 // SAM/BAM format
 %include "BamFile.i"
 %include "BamRecord.i"
+%include "BamRecordBuilder.i"
 %include "BamRecordImpl.i"
 %include "BamTagCodec.i"
 %include "BamWriter.i"

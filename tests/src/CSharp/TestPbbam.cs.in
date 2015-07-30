@@ -44,7 +44,7 @@ namespace TestStuff
         public static void TestCigar()
         {
             string s = "3=3I3D";
-            var c = new Cigar(s);
+            var c = new CigarType(s);
             string cs = c.ToStdString();
             if (s != cs)
             {
@@ -52,10 +52,7 @@ namespace TestStuff
             }
 
             // This used to crash
-            var c2 = Cigar.FromStdString("3=3I3D");
-
-            // This crashes now--- bad cigar string format.
-            //var c3 = Cigar.FromStdString("III");
+            var c2 = CigarType.FromStdString("3=3I3D");
 
             Console.WriteLine("TestCigar - OK!");
         }
