@@ -137,9 +137,9 @@ endif*/
 
 // SAM/BAM format
 %include "BamFile.i"
+%include "BamRecordImpl.i"
 %include "BamRecord.i"
 %include "BamRecordBuilder.i"
-%include "BamRecordImpl.i"
 %include "BamTagCodec.i"
 %include "BamWriter.i"
 %include "SamTagCodec.i"
