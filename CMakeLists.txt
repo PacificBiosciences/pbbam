@@ -111,6 +111,12 @@ if(HAS_NO_UNUSED_LOCAL_TYPEDEFS)
     set(PacBioBAM_CXX_FLAGS "${PacBioBAM_CXX_FLAGS} -Wno-unused-local-typedefs")
 endif()
 
+# For now, keep @rpath out of install names on OS X, as it causes SWIG
+# tests to fail.
+if(APPLE)
+    set(CMAKE_MACOSX_RPATH OFF)
+endif()
+
 # keep this order (src first, at least)
 add_subdirectory(src)
 add_subdirectory(tools)
