@@ -160,25 +160,24 @@ TEST(DataSetIOTest, ToXml)
 {
     // top-level data
     DataSet dataset(DataSet::ALIGNMENT);
-    dataset.CreatedAt("2015-01-27T09:00:01")
-           .MetaType("PacBio.DataSet.AlignmentSet")
-           .Name("DataSet_AlignmentSet")
-           .Tags("barcode moreTags mapping mytags")
-           .UniqueId("b095d0a3-94b8-4918-b3af-a3f81bbe519c")
-           .Version("2.3.0");
-    dataset.Attribute("xmlns","http://pacificbiosciences.com/PacBioDataModel.xsd")
+    dataset.CreatedAt("2015-01-27T09:00:01");
+    dataset.MetaType("PacBio.DataSet.AlignmentSet");
+    dataset.Name("DataSet_AlignmentSet");
+    dataset.Tags("barcode moreTags mapping mytags");
+    dataset.UniqueId("b095d0a3-94b8-4918-b3af-a3f81bbe519c");
+    dataset.Version("2.3.0");
+    dataset.Attribute("xmlns","http://pacificbiosciences.com/PacBioSecondaryDataModel.xsd")
            .Attribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
            .Attribute("xsi:schemaLocation",
-        "http://pacificbiosciences.com/PacBioDataModel.xsd "
-        "../../../../../../../../common/datamodel/SequEl/EndToEnd/xsd/PacBioSecondaryDataModel.xsd");
+                      "http://pacificbiosciences.com/PacBioSecondaryDataModel.xsd PacBioSecondaryDataModel.xsd");
 
     // external resources
     ExternalResource resource1;
-    resource1.Name("Third Alignments BAM")
-        .Description("Points to an example Alignments BAM file.")
-        .MetaType("AlignmentFile.AlignmentBamFile")
-        .ResourceId("file:/mnt/path/to/alignments2.bam")
-        .Tags("Example");
+    resource1.Name("Third Alignments BAM");
+    resource1.Description("Points to an example Alignments BAM file.");
+    resource1.MetaType("AlignmentFile.AlignmentBamFile");
+    resource1.ResourceId("file:/mnt/path/to/alignments2.bam");
+    resource1.Tags("Example");
     FileIndex pbi1;
     pbi1.MetaType("PacBio.Index.PacBioIndex");
     pbi1.ResourceId("file:/mnt/path/to/alignments2.pbi");
@@ -186,11 +185,11 @@ TEST(DataSetIOTest, ToXml)
     dataset.ExternalResources().Add(resource1);
 
     ExternalResource resource2;
-    resource2.Name("Fourth Alignments BAM")
-        .Description("Points to another example Alignments BAM file, by relative path.")
-        .MetaType("AlignmentFile.AlignmentBamFile")
-        .ResourceId("file:./alignments3.bam")
-        .Tags("Example");
+    resource2.Name("Fourth Alignments BAM");
+    resource2.Description("Points to another example Alignments BAM file, by relative path.");
+    resource2.MetaType("AlignmentFile.AlignmentBamFile");
+    resource2.ResourceId("file:./alignments3.bam");
+    resource2.Tags("Example");
     FileIndex pbi2;
     pbi2.MetaType("PacBio.Index.PacBioIndex");
     pbi2.ResourceId("file:/mnt/path/to/alignments3.pbi");
@@ -199,18 +198,18 @@ TEST(DataSetIOTest, ToXml)
 
     // sub-datasets with filters
     DataSetBase subDataSet1;
-    subDataSet1.Name("HighQuality Read Alignments")
-               .UniqueId("ab95d0a3-94b8-4918-b3af-a3f81bbe519c")
-               .Version("2.3.0");
+    subDataSet1.Name("HighQuality Read Alignments");
+    subDataSet1.UniqueId("ab95d0a3-94b8-4918-b3af-a3f81bbe519c");
+    subDataSet1.Version("2.3.0");
     Filter filter1;
     filter1.Properties().Add(Property("rq", "0.85", ">"));
     subDataSet1.Filters().Add(filter1);
     dataset.SubDataSets().Add(subDataSet1);
 
     DataSetBase subDataSet2;
-    subDataSet2.Name("Alignments to chromosome 1")
-               .UniqueId("ac95d0a3-94b8-4918-b3af-a3f81bbe519c")
-               .Version("2.3.0");
+    subDataSet2.Name("Alignments to chromosome 1");
+    subDataSet2.UniqueId("ac95d0a3-94b8-4918-b3af-a3f81bbe519c");
+    subDataSet2.Version("2.3.0");
     Filter filter2;
     filter2.Properties().Add(Property("RNAME", "chr1", "=="));
     subDataSet2.Filters().Add(filter2);
@@ -219,50 +218,50 @@ TEST(DataSetIOTest, ToXml)
     // write dataset
     const string expectedXml =
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-        "<AlignmentSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.AlignmentSet\" "
+        "<pbds:AlignmentSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.AlignmentSet\" "
                 "Name=\"DataSet_AlignmentSet\" Tags=\"barcode moreTags mapping mytags\" "
                 "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\" "
-                "xmlns=\"http://pacificbiosciences.com/PacBioDataModel.xsd\" "
+                "xmlns=\"http://pacificbiosciences.com/PacBioSecondaryDataModel.xsd\" "
                 "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-                "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDataModel.xsd "
-                "../../../../../../../../common/datamodel/SequEl/EndToEnd/xsd/PacBioSecondaryDataModel.xsd\">\n"
-        "\t<ExternalResources>\n"
-        "\t\t<ExternalResource Description=\"Points to an example Alignments BAM file.\" "
+                "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioSecondaryDataModel.xsd "
+                "PacBioSecondaryDataModel.xsd\">\n"
+        "\t<pbbase:ExternalResources>\n"
+        "\t\t<pbbase:ExternalResource Description=\"Points to an example Alignments BAM file.\" "
                 "MetaType=\"AlignmentFile.AlignmentBamFile\" Name=\"Third Alignments BAM\" "
                 "ResourceId=\"file:/mnt/path/to/alignments2.bam\" Tags=\"Example\">\n"
-        "\t\t\t<FileIndices>\n"
-        "\t\t\t\t<FileIndex MetaType=\"PacBio.Index.PacBioIndex\" ResourceId=\"file:/mnt/path/to/alignments2.pbi\" />\n"
-        "\t\t\t</FileIndices>\n"
-        "\t\t</ExternalResource>\n"
-        "\t\t<ExternalResource Description=\"Points to another example Alignments BAM file, by relative path.\" "
+        "\t\t\t<pbbase:FileIndices>\n"
+        "\t\t\t\t<pbbase:FileIndex MetaType=\"PacBio.Index.PacBioIndex\" ResourceId=\"file:/mnt/path/to/alignments2.pbi\" />\n"
+        "\t\t\t</pbbase:FileIndices>\n"
+        "\t\t</pbbase:ExternalResource>\n"
+        "\t\t<pbbase:ExternalResource Description=\"Points to another example Alignments BAM file, by relative path.\" "
                 "MetaType=\"AlignmentFile.AlignmentBamFile\" Name=\"Fourth Alignments BAM\" "
                 "ResourceId=\"file:./alignments3.bam\" Tags=\"Example\">\n"
-        "\t\t\t<FileIndices>\n"
-        "\t\t\t\t<FileIndex MetaType=\"PacBio.Index.PacBioIndex\" ResourceId=\"file:/mnt/path/to/alignments3.pbi\" />\n"
-        "\t\t\t</FileIndices>\n"
-        "\t\t</ExternalResource>\n"
-        "\t</ExternalResources>\n"
-        "\t<DataSets>\n"
-        "\t\t<DataSet Name=\"HighQuality Read Alignments\" UniqueId=\"ab95d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\">\n"
-        "\t\t\t<Filters>\n"
-        "\t\t\t\t<Filter>\n"
-        "\t\t\t\t\t<Properties>\n"
-        "\t\t\t\t\t\t<Property Name=\"rq\" Operator=\">\" Value=\"0.85\" />\n"
-        "\t\t\t\t\t</Properties>\n"
-        "\t\t\t\t</Filter>\n"
-        "\t\t\t</Filters>\n"
-        "\t\t</DataSet>\n"
-        "\t\t<DataSet Name=\"Alignments to chromosome 1\" UniqueId=\"ac95d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\">\n"
-        "\t\t\t<Filters>\n"
-        "\t\t\t\t<Filter>\n"
-        "\t\t\t\t\t<Properties>\n"
-        "\t\t\t\t\t\t<Property Name=\"RNAME\" Operator=\"==\" Value=\"chr1\" />\n"
-        "\t\t\t\t\t</Properties>\n"
-        "\t\t\t\t</Filter>\n"
-        "\t\t\t</Filters>\n"
-        "\t\t</DataSet>\n"
-        "\t</DataSets>\n"
-        "</AlignmentSet>\n";
+        "\t\t\t<pbbase:FileIndices>\n"
+        "\t\t\t\t<pbbase:FileIndex MetaType=\"PacBio.Index.PacBioIndex\" ResourceId=\"file:/mnt/path/to/alignments3.pbi\" />\n"
+        "\t\t\t</pbbase:FileIndices>\n"
+        "\t\t</pbbase:ExternalResource>\n"
+        "\t</pbbase:ExternalResources>\n"
+        "\t<pbds:DataSets>\n"
+        "\t\t<pbds:DataSet Name=\"HighQuality Read Alignments\" UniqueId=\"ab95d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\">\n"
+        "\t\t\t<pbds:Filters>\n"
+        "\t\t\t\t<pbds:Filter>\n"
+        "\t\t\t\t\t<pbbase:Properties>\n"
+        "\t\t\t\t\t\t<pbbase:Property Name=\"rq\" Operator=\">\" Value=\"0.85\" />\n"
+        "\t\t\t\t\t</pbbase:Properties>\n"
+        "\t\t\t\t</pbds:Filter>\n"
+        "\t\t\t</pbds:Filters>\n"
+        "\t\t</pbds:DataSet>\n"
+        "\t\t<pbds:DataSet Name=\"Alignments to chromosome 1\" UniqueId=\"ac95d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\">\n"
+        "\t\t\t<pbds:Filters>\n"
+        "\t\t\t\t<pbds:Filter>\n"
+        "\t\t\t\t\t<pbbase:Properties>\n"
+        "\t\t\t\t\t\t<pbbase:Property Name=\"RNAME\" Operator=\"==\" Value=\"chr1\" />\n"
+        "\t\t\t\t\t</pbbase:Properties>\n"
+        "\t\t\t\t</pbds:Filter>\n"
+        "\t\t\t</pbds:Filters>\n"
+        "\t\t</pbds:DataSet>\n"
+        "\t</pbds:DataSets>\n"
+        "</pbds:AlignmentSet>\n";
 
     stringstream s;
     dataset.SaveToStream(s);
@@ -273,50 +272,50 @@ static void TestFromXmlString(void)
 {
     const string inputXml =
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-        "<AlignmentSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.AlignmentSet\" "
+        "<pbds:AlignmentSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.AlignmentSet\" "
                 "Name=\"DataSet_AlignmentSet\" Tags=\"barcode moreTags mapping mytags\" "
                 "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\" "
                 "xmlns=\"http://pacificbiosciences.com/PacBioDataModel.xsd\" "
                 "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
                 "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDataModel.xsd "
                 "../../../../../../../../common/datamodel/SequEl/EndToEnd/xsd/PacBioSecondaryDataModel.xsd\">\n"
-        "\t<ExternalResources>\n"
-        "\t\t<ExternalResource Description=\"Points to an example Alignments BAM file.\" "
+        "\t<pbbase:ExternalResources>\n"
+        "\t\t<pbbase:ExternalResource Description=\"Points to an example Alignments BAM file.\" "
                 "MetaType=\"AlignmentFile.AlignmentBamFile\" Name=\"Third Alignments BAM\" "
                 "ResourceId=\"file:/mnt/path/to/alignments2.bam\" Tags=\"Example\">\n"
-        "\t\t\t<FileIndices>\n"
-        "\t\t\t\t<FileIndex MetaType=\"PacBio.Index.PacBioIndex\" ResourceId=\"file:/mnt/path/to/alignments2.pbi\" />\n"
-        "\t\t\t</FileIndices>\n"
-        "\t\t</ExternalResource>\n"
-        "\t\t<ExternalResource Description=\"Points to another example Alignments BAM file, by relative path.\" "
+        "\t\t\t<pbbase:FileIndices>\n"
+        "\t\t\t\t<pbbase:FileIndex MetaType=\"PacBio.Index.PacBioIndex\" ResourceId=\"file:/mnt/path/to/alignments2.pbi\" />\n"
+        "\t\t\t</pbbase:FileIndices>\n"
+        "\t\t</pbbase:ExternalResource>\n"
+        "\t\t<pbbase:ExternalResource Description=\"Points to another example Alignments BAM file, by relative path.\" "
                 "MetaType=\"AlignmentFile.AlignmentBamFile\" Name=\"Fourth Alignments BAM\" "
                 "ResourceId=\"file:./alignments3.bam\" Tags=\"Example\">\n"
-        "\t\t\t<FileIndices>\n"
-        "\t\t\t\t<FileIndex MetaType=\"PacBio.Index.PacBioIndex\" ResourceId=\"file:/mnt/path/to/alignments3.pbi\" />\n"
-        "\t\t\t</FileIndices>\n"
-        "\t\t</ExternalResource>\n"
-        "\t</ExternalResources>\n"
-        "\t<DataSets>\n"
-        "\t\t<DataSet Name=\"HighQuality Read Alignments\" UniqueId=\"ab95d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\">\n"
-        "\t\t\t<Filters>\n"
-        "\t\t\t\t<Filter>\n"
-        "\t\t\t\t\t<Properties>\n"
-        "\t\t\t\t\t\t<Property Name=\"rq\" Operator=\">\" Value=\"0.85\" />\n"
-        "\t\t\t\t\t</Properties>\n"
-        "\t\t\t\t</Filter>\n"
-        "\t\t\t</Filters>\n"
-        "\t\t</DataSet>\n"
-        "\t\t<DataSet Name=\"Alignments to chromosome 1\" UniqueId=\"ac95d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\">\n"
-        "\t\t\t<Filters>\n"
-        "\t\t\t\t<Filter>\n"
-        "\t\t\t\t\t<Properties>\n"
-        "\t\t\t\t\t\t<Property Name=\"RNAME\" Operator=\"==\" Value=\"chr1\" />\n"
-        "\t\t\t\t\t</Properties>\n"
-        "\t\t\t\t</Filter>\n"
-        "\t\t\t</Filters>\n"
-        "\t\t</DataSet>\n"
-        "\t</DataSets>\n"
-        "</AlignmentSet>\n";
+        "\t\t\t<pbbase:FileIndices>\n"
+        "\t\t\t\t<pbbase:FileIndex MetaType=\"PacBio.Index.PacBioIndex\" ResourceId=\"file:/mnt/path/to/alignments3.pbi\" />\n"
+        "\t\t\t</pbbase:FileIndices>\n"
+        "\t\t</pbbase:ExternalResource>\n"
+        "\t</pbbase:ExternalResources>\n"
+        "\t<pbds:DataSets>\n"
+        "\t\t<pbds:DataSet Name=\"HighQuality Read Alignments\" UniqueId=\"ab95d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\">\n"
+        "\t\t\t<pbds:Filters>\n"
+        "\t\t\t\t<pbds:Filter>\n"
+        "\t\t\t\t\t<pbbase:Properties>\n"
+        "\t\t\t\t\t\t<pbbase:Property Name=\"rq\" Operator=\">\" Value=\"0.85\" />\n"
+        "\t\t\t\t\t</pbbase:Properties>\n"
+        "\t\t\t\t</pbds:Filter>\n"
+        "\t\t\t</pbds:Filters>\n"
+        "\t\t</pbds:DataSet>\n"
+        "\t\t<pbds:DataSet Name=\"Alignments to chromosome 1\" UniqueId=\"ac95d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\">\n"
+        "\t\t\t<pbds:Filters>\n"
+        "\t\t\t\t<pbds:Filter>\n"
+        "\t\t\t\t\t<pbbase:Properties>\n"
+        "\t\t\t\t\t\t<pbbase:Property Name=\"RNAME\" Operator=\"==\" Value=\"chr1\" />\n"
+        "\t\t\t\t\t</pbbase:Properties>\n"
+        "\t\t\t\t</pbds:Filter>\n"
+        "\t\t\t</pbds:Filters>\n"
+        "\t\t</pbds:DataSet>\n"
+        "\t</pbds:DataSets>\n"
+        "</pbds:AlignmentSet>\n";
 
     const DataSet dataset = DataSet::FromXml(inputXml);
 

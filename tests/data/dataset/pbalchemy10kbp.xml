@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DataSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://pacificbiosciences.com/PacBioDataModel.xsd" CreatedAt="2015-05-22T16:56:16" MetaType="PacBio.DataSet.DataSet" Name="" Tags="" UniqueId="58e3f7c5-24c1-b58b-fbd5-37de268cc2f0" Version="2.3.0" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
-  <ExternalResources>
-    <ExternalResource ResourceId="file:tests/data/pbalchemy10kbp.pbalign.sorted.pbver1.bam">
-      <FileIndices>
-        <FileIndex ResourceId="file:tests/data/pbalchemy10kbp.pbalign.sorted.pbver1.bam.bai"/>
-      </FileIndices>
-    </ExternalResource>
-  </ExternalResources>
-  <Filters>
-      <Filter>
-          <Parameters>
-              <Parameter Name="rname" Value="E.faecalis.1" Operator="=" />
-          </Parameters>
-      </Filter>
-  </Filters>
-</DataSet>
+<pbds:DataSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://pacificbiosciences.com/PacBioDataModel.xsd" CreatedAt="2015-05-22T16:56:16" MetaType="PacBio.DataSet.DataSet" Name="" Tags="" UniqueId="58e3f7c5-24c1-b58b-fbd5-37de268cc2f0" Version="2.3.0" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+  <pbbase:ExternalResources>
+    <pbbase:ExternalResource ResourceId="file:tests/data/pbalchemy10kbp.pbalign.sorted.pbver1.bam">
+      <pbbase:FileIndices>
+        <pbbase:FileIndex ResourceId="file:tests/data/pbalchemy10kbp.pbalign.sorted.pbver1.bam.bai"/>
+      </pbbase:FileIndices>
+    </pbbase:ExternalResource>
+  </pbbase:ExternalResources>
+  <pbds:Filters>
+      <pbds:Filter>
+          <pbbase:Properties>
+              <pbbase:Property Name="rname" Value="E.faecalis.1" Operator="=" />
+          </pbbase:Properties>
+      </pbds:Filter>
+  </pbds:Filters>
+</pbds:DataSet>

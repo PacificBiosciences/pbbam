@@ -127,7 +127,7 @@ public:
     const std::string& Version(void) const;
 
     PacBio::BAM::DataSet::TypeEnum Type(void) const;
-    const std::string& TypeName(void) const;
+    std::string TypeName(void) const;
 
     /// \}
 
@@ -139,6 +139,14 @@ public:
     const PacBio::BAM::Filters& Filters(void) const;
     const PacBio::BAM::DataSetMetadata& Metadata(void) const;
     const PacBio::BAM::SubDataSets& SubDataSets(void) const;
+
+    /// \}
+
+public:
+    /// \name XML Namespace Handling
+    /// \{
+
+    const NamespaceRegistry& Namespaces(void) const;
 
     /// \}
 
@@ -188,6 +196,14 @@ public:
     DataSet& Metadata(const PacBio::BAM::DataSetMetadata& metadata);
     DataSet& SubDataSets(const PacBio::BAM::SubDataSets& subdatasets);
     
+    /// \}
+
+public:
+    /// \name XML Namespace Handling
+    /// \{
+
+    NamespaceRegistry& Namespaces(void);
+
     /// \}
 
 private:

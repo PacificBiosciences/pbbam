@@ -38,6 +38,9 @@
 #ifndef DATASETELEMENT_H
 #define DATASETELEMENT_H
 
+#include "pbbam/DataSetXsd.h"
+
+#include <boost/utility/string_ref.hpp>
 #include <algorithm>
 #include <map>
 #include <stdexcept>
@@ -49,13 +52,45 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
+class XmlName
+{
+    //    qualified name
+    //       |
+    //  --------------
+    // <pbns:node_name >
+    //  ---- ---------
+    //   |        |
+    //  prefix    local name
+
+public:
+    XmlName(const std::string& fullName);
+    XmlName(const std::string& localName, const std::string& prefix);
+    XmlName(const XmlName& other);
+    XmlName(XmlName&& other);
+    XmlName& operator=(const XmlName& other);
+    XmlName& operator=(XmlName&& other);
+    ~XmlName(void);
+
+public:
+    bool operator==(const XmlName& other) const;
+    bool operator!=(const XmlName& other) const;
+
+public:
+    const boost::string_ref LocalName(void) const;
+    const boost::string_ref Prefix(void) const;
+    const std::string& QualifiedName(void) const;
+
+private:
+    std::string qualifiedName_;
+    size_t prefixSize_;
+    size_t localNameOffset_;
+    size_t localNameSize_;
+};
+
 class DataSetElement
 {
 public:
-    // allowed to be instantiated directly
-    // (for compound objects that don't need a dedicated subtype for children)
-    DataSetElement(const std::string& label = std::string());
-    DataSetElement(const std::string& label, const std::vector<std::string>& initialChildLabels);
+    DataSetElement(const std::string& label, const XsdType& xsd = XsdType::NONE);
     DataSetElement(const DataSetElement& other);
     DataSetElement(DataSetElement&& other);
     DataSetElement& operator=(const DataSetElement& other);
@@ -77,17 +112,19 @@ public:
     std::vector<DataSetElement>& Children(void);
     bool HasChild(const std::string& label) const;
 
-    const std::string& Label(void) const;
-    std::string& Label(void);
+    const boost::string_ref LocalNameLabel(void) const;
+    const boost::string_ref PrefixLabel(void) const;
+    const std::string& QualifiedNameLabel(void) const;
 
     const std::string& Text(void) const;
     std::string& Text(void);
+
+    const XsdType& Xsd(void) const;
 
 public:
     void Attribute(const std::string& name, const std::string& value);
     void Label(const std::string& label);
     void Text(const std::string& text);
-
 
 public:
     size_t NumAttributes(void) const;
@@ -130,7 +167,8 @@ public:
     void ChildText(const std::string& label, const std::string& text);
 
 protected:
-    std::string label_;
+    XsdType xsd_;
+    XmlName label_;
     std::string text_;
     std::map<std::string, std::string> attributes_;
     std::vector<DataSetElement> children_;
@@ -139,212 +177,10 @@ private:
     int IndexOf(const std::string& label) const;
 };
 
-inline DataSetElement::DataSetElement(const std::string& label)
-    : label_(label)
-{ }
-
-inline DataSetElement::DataSetElement(const std::string& label,
-                                      const std::vector<std::string>& initialChildLabels)
-    : label_(label)
-{
-    for (auto childLabel : initialChildLabels)
-        AddChild(DataSetElement(childLabel));
-}
-
-inline DataSetElement::DataSetElement(const DataSetElement& other)
-    : label_(other.label_)
-    , text_(other.text_)
-    , attributes_(other.attributes_)
-    , children_(other.children_)
-{ }
-
-inline DataSetElement::DataSetElement(DataSetElement&& other)
-    : label_(std::move(other.label_))
-    , text_(std::move(other.text_))
-    , attributes_(std::move(other.attributes_))
-    , children_(std::move(other.children_))
-{ }
-
-inline DataSetElement& DataSetElement::operator=(const DataSetElement& other)
-{
-    label_ = other.label_;
-    text_ = other.text_;
-    attributes_ = other.attributes_;
-    children_ = other.children_;
-    return *this;
-}
-
-inline DataSetElement& DataSetElement::operator=(DataSetElement&& other)
-{
-    label_ = std::move(other.label_);
-    text_ = std::move(other.text_);
-    attributes_ = std::move(other.attributes_);
-    children_ = std::move(other.children_);
-    return *this;
-}
-
-inline DataSetElement::~DataSetElement(void) { }
-
-inline bool DataSetElement::operator==(const DataSetElement& other) const
-{
-    return label_ == other.label_ &&
-           text_  == other.text_ &&
-           attributes_ == other.attributes_ &&
-           children_ == other.children_;
-}
-
-inline bool DataSetElement::operator!=(const DataSetElement& other) const
-{ return !(*this == other); }
-
-template<typename T>
-const T& DataSetElement::operator[](size_t index) const
-{ return Child<T>(index); }
-
-template<typename T>
-T& DataSetElement::operator[](size_t index)
-{ return Child<T>(index); }
-
-template<typename T>
-const T& DataSetElement::operator[](const std::string& label) const
-{ return Child<T>(label); }
-
-template<typename T>
-T& DataSetElement::operator[](const std::string& label)
-{ return Child<T>(label); }
-
-inline void DataSetElement::AddChild(const DataSetElement& e)
-{ children_.push_back(e); }
-
-inline std::string& DataSetElement::Attribute(const std::string& name)
-{ return attributes_[name]; }
-
-inline const std::string& DataSetElement::Attribute(const std::string& name) const
-{
-    auto iter = attributes_.find(name);
-    if (iter == attributes_.cend())
-        return SharedNullString();
-    return iter->second;
-}
-
-inline void DataSetElement::Attribute(const std::string& name, const std::string& value)
-{ attributes_[name] = value; }
-
-inline const std::map<std::string, std::string>& DataSetElement::Attributes(void) const
-{ return attributes_; }
-
-inline std::map<std::string, std::string>& DataSetElement::Attributes(void)
-{ return attributes_; }
-
-template<typename T>
-inline const T& DataSetElement::Child(size_t index) const
-{ return static_cast<const T&>(children_.at(index)); }
-
-template<typename T>
-inline T& DataSetElement::Child(size_t index)
-{ return static_cast<T&>(children_.at(index)); }
-
-template<typename T>
-inline const T& DataSetElement::Child(const std::string& label) const
-{ return Child<T>(IndexOf(label)); }
-
-template<typename T>
-inline T& DataSetElement::Child(const std::string& label)
-{
-    const int i = IndexOf(label);
-    if (i >= 0) {
-        assert(static_cast<size_t>(i) < NumChildren());
-        return Child<T>(i);
-    } else {
-        AddChild(DataSetElement(label));
-        return Child<T>(NumChildren()-1);
-    }
-}
-
-inline const std::vector<DataSetElement>& DataSetElement::Children(void) const
-{ return children_; }
-
-inline std::vector<DataSetElement>& DataSetElement::Children(void)
-{ return children_; }
-
-inline const std::string& DataSetElement::ChildText(const std::string& label) const
-{
-    if (!HasChild(label))
-        return SharedNullString();
-    return Child<DataSetElement>(label).Text();
-}
-
-inline std::string& DataSetElement::ChildText(const std::string& label)
-{
-    if (!HasChild(label))
-        AddChild(DataSetElement(label));
-    return Child<DataSetElement>(label).Text();
-}
-
-inline bool DataSetElement::HasAttribute(const std::string& name) const
-{ return attributes_.find(name) != attributes_.cend(); }
-
-inline bool DataSetElement::HasChild(const std::string& label) const
-{ return IndexOf(label) != -1; }
-
-inline int DataSetElement::IndexOf(const std::string& label) const
-{
-    const size_t count = NumChildren();
-    for (size_t i = 0; i < count; ++i) {
-        const DataSetElement& child = children_.at(i);
-        if (child.label_ == label)
-            return i;
-    }
-    return -1;
-}
-
-inline const std::string& DataSetElement::Label(void) const
-{ return label_; }
-
-inline std::string& DataSetElement::Label(void)
-{ return label_; }
-
-inline void DataSetElement::Label(const std::string& label)
-{ label_ = label; }
-
-inline size_t DataSetElement::NumAttributes(void) const
-{ return attributes_.size(); }
-
-inline size_t DataSetElement::NumChildren(void) const
-{ return children_.size(); }
-
-inline void DataSetElement::RemoveChild(const DataSetElement& e)
-{
-    children_.erase(
-        std::remove(children_.begin(),
-                    children_.end(),
-                    e),
-        children_.end()
-    );
-}
-
-inline void DataSetElement::ChildText(const std::string& label,
-                                         const std::string& text)
-{
-    if (!HasChild(label)) {
-        DataSetElement e(label);
-        e.Text(text);
-        AddChild(e);
-    } else {
-        Child<DataSetElement>(label).Text(text);
-    }
-}
-
-inline const std::string& DataSetElement::Text(void) const
-{ return text_; }
-
-inline std::string& DataSetElement::Text(void)
-{ return text_; }
-
-inline void DataSetElement::Text(const std::string& text)
-{ text_ = text; }
-
 } // namespace internal
 } // namespace BAM
 } // namespace PacBio
+
+#include "pbbam/internal/DataSetElement.inl"
 
 #endif // DATASETELEMENT_H

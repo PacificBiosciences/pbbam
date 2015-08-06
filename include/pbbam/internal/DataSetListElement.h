@@ -39,7 +39,6 @@
 #define DATASETLISTELEMENT_H
 
 #include "pbbam/internal/DataSetElement.h"
-#include <cassert>
 
 namespace PacBio {
 namespace BAM {
@@ -92,7 +91,7 @@ template<class T>
 class DataSetListElement : public DataSetElement
 {
 public:
-    DataSetListElement(const std::string& label);
+    DataSetListElement(const std::string& label, const XsdType& xsd = XsdType::NONE);
 
 // child access through index
 public:
@@ -110,141 +109,10 @@ public:
     DataSetListConstIterator<T> cend(void) const;
 };
 
-// --------------------
-// DataSetListElement
-// --------------------
-
-template<class T>
-inline DataSetListElement<T>::DataSetListElement(const std::string& label)
-    : DataSetElement(label)
-{ }
-
-template<class T>
-inline const T& DataSetListElement<T>::operator[](size_t index) const
-{ return static_cast<const T&>(children_.at(index)); }
-
-template<class T>
-inline T& DataSetListElement<T>::operator[](size_t index)
-{ return static_cast<T&>(children_.at(index)); }
-
-template<class T>
-inline size_t DataSetListElement<T>::Size(void) const
-{ return NumChildren(); }
-
-template<class T>
-inline DataSetListIterator<T> DataSetListElement<T>::begin(void)
-{ return DataSetListIterator<T>(this, 0); }
-
-template<class T>
-inline DataSetListConstIterator<T> DataSetListElement<T>::begin(void) const
-{ return DataSetListConstIterator<T>(this, 0); }
-
-template<class T>
-inline DataSetListConstIterator<T> DataSetListElement<T>::cbegin(void) const
-{ return DataSetListConstIterator<T>(this, 0); }
-
-template<class T>
-inline DataSetListIterator<T> DataSetListElement<T>::end(void)
-{ return DataSetListIterator<T>(this, NumChildren()); }
-
-template<class T>
-inline DataSetListConstIterator<T> DataSetListElement<T>::end(void) const
-{ return DataSetListConstIterator<T>(this, NumChildren()); }
-
-template<class T>
-inline DataSetListConstIterator<T>DataSetListElement<T>::cend(void) const
-{ return DataSetListConstIterator<T>(this, NumChildren()); }
-
-// -------------------------
-// DataSetListIteratorBase
-// -------------------------
-
-template<class T>
-inline bool DataSetListIteratorBase<T>::operator==(const DataSetListIteratorBase<T>& other) const
-{ return parent_ == other.parent_ &&
-         index_ == other.index_;
-}
-
-template<class T>
-inline bool DataSetListIteratorBase<T>::operator!=(const DataSetListIteratorBase<T>& other) const
-{ return !(*this == other); }
-
-template<class T>
-inline DataSetListIteratorBase<T>::DataSetListIteratorBase(const DataSetListElement<T>* parent, size_t i)
-    : parent_(parent)
-    , index_(i)
-{ }
-
-template<class T>
-inline void DataSetListIteratorBase<T>::ReadNext(void)
-{
-    if (index_ >= parent_->NumChildren()) {
-        parent_ = nullptr;
-        return;
-    }
-    ++index_;
-}
-
-// ---------------------
-// DataSetListIterator
-// ---------------------
-
-template<class T>
-inline DataSetListIterator<T>::DataSetListIterator(const DataSetListElement<T>* parent, size_t i)
-    : DataSetListIteratorBase<T>(parent, i)
-{ }
-
-template<class T>
-inline T& DataSetListIterator<T>::operator*(void)
-{ return DataSetListIteratorBase<T>::parent_->template Child<T>(DataSetListIteratorBase<T>::index_); }
-
-template<class T>
-inline T* DataSetListIterator<T>::operator->(void)
-{ return &(operator*()); }
-
-template<class T>
-inline DataSetListIterator<T>& DataSetListIterator<T>::operator++(void)
-{ DataSetListIteratorBase<T>::ReadNext(); return *this; }
-
-template<class T>
-inline DataSetListIterator<T> DataSetListIterator<T>::operator++(int)
-{
-    DataSetListIterator<T> result(*this);
-    ++(*this);
-    return result;
-}
-
-// --------------------------
-// DataSetListConstIterator
-// --------------------------
-
-template<class T>
-inline DataSetListConstIterator<T>::DataSetListConstIterator(const DataSetListElement<T>* parent, size_t i)
-    : DataSetListIteratorBase<T>(parent, i)
-{ }
-
-template<class T>
-inline const T& DataSetListConstIterator<T>::operator*(void) const
-{ return DataSetListIteratorBase<T>::parent_->template Child<T>(DataSetListIteratorBase<T>::index_); }
-
-template<class T>
-inline const T* DataSetListConstIterator<T>::operator->(void) const
-{ return &(operator*()); }
-
-template<class T>
-inline DataSetListConstIterator<T>& DataSetListConstIterator<T>::operator++(void)
-{ DataSetListIteratorBase<T>::ReadNext(); return *this; }
-
-template<class T>
-inline DataSetListConstIterator<T> DataSetListConstIterator<T>::operator++(int)
-{
-    DataSetListConstIterator<T> result(*this);
-    ++(*this);
-    return result;
-}
-
 } // namespace internal
 } // namespace BAM
 } // namespace PacBio
+
+#include "pbbam/internal/DataSetListElement.inl"
 
 #endif // DATASETLISTELEMENT_H

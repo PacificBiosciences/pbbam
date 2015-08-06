@@ -22,6 +22,7 @@ set( PacBioBAMTest_CPP
     ${PacBioBAM_TestsDir}/src/test_DataSetCore.cpp
     ${PacBioBAM_TestsDir}/src/test_DataSetIO.cpp
     ${PacBioBAM_TestsDir}/src/test_DataSetQuery.cpp
+    ${PacBioBAM_TestsDir}/src/test_DataSetXsd.cpp
     ${PacBioBAM_TestsDir}/src/test_EndToEnd.cpp
     ${PacBioBAM_TestsDir}/src/test_EntireFileQuery.cpp
     ${PacBioBAM_TestsDir}/src/test_Frames.cpp

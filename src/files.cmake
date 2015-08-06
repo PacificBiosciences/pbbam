@@ -17,6 +17,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/Config.h
     ${PacBioBAM_IncludeDir}/pbbam/DataSet.h
     ${PacBioBAM_IncludeDir}/pbbam/DataSetTypes.h
+    ${PacBioBAM_IncludeDir}/pbbam/DataSetXsd.h
     ${PacBioBAM_IncludeDir}/pbbam/EntireFileQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/Frames.h
     ${PacBioBAM_IncludeDir}/pbbam/GenomicInterval.h
@@ -52,7 +53,9 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetBaseTypes.h
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetBaseTypes.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetElement.h
+    ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetElement.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetListElement.h
+    ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetListElement.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetTypes.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/FilterEngine.h
     ${PacBioBAM_IncludeDir}/pbbam/internal/IBamFileIterator.h
@@ -110,6 +113,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/DataSetElement.cpp
     ${PacBioBAM_SourceDir}/DataSetIO.cpp
     ${PacBioBAM_SourceDir}/DataSetTypes.cpp
+    ${PacBioBAM_SourceDir}/DataSetXsd.cpp
     ${PacBioBAM_SourceDir}/EntireFileQuery.cpp
     ${PacBioBAM_SourceDir}/FilterEngine.cpp
     ${PacBioBAM_SourceDir}/FofnReader.cpp

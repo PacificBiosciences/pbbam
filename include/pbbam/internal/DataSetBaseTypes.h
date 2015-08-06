@@ -59,126 +59,111 @@ namespace internal {
 class BaseEntityType : public DataSetElement
 {
 protected:
-    BaseEntityType(const std::string& label);
+    BaseEntityType(const std::string& label,
+                   const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 
 public:
     const std::string& CreatedAt(void) const;
     const std::string& Description(void) const;
     const PacBio::BAM::Extensions& Extensions(void) const;
     const std::string& Format(void) const;
-    const std::string& MetaType(void) const;
     const std::string& ModifiedAt(void) const;
     const std::string& Name(void) const;
     const std::string& ResourceId(void) const;
     const std::string& Tags(void) const;
-    const std::string& TimeStampedName(void) const;
-    const std::string& UniqueId(void) const;
     const std::string& Version(void) const;
 
     std::string& CreatedAt(void);
     std::string& Description(void);
     PacBio::BAM::Extensions& Extensions(void);
     std::string& Format(void);
-    std::string& MetaType(void);
     std::string& ModifiedAt(void);
     std::string& Name(void);
     std::string& ResourceId(void);
     std::string& Tags(void);
-    std::string& TimeStampedName(void);
-    std::string& UniqueId(void);
     std::string& Version(void);
 
     BaseEntityType& CreatedAt(const std::string& createdAt);
     BaseEntityType& Description(const std::string& description);
     BaseEntityType& Extensions(const PacBio::BAM::Extensions& extensions);
-    BaseEntityType& Format(const std::string& format);
-    BaseEntityType& MetaType(const std::string& metatype);
+    BaseEntityType& Format(const std::string& format);    
     BaseEntityType& ModifiedAt(const std::string& modifiedAt);
     BaseEntityType& Name(const std::string& name);
     BaseEntityType& ResourceId(const std::string& resourceId);
     BaseEntityType& Tags(const std::string& tags);
-    BaseEntityType& TimeStampedName(const std::string& timeStampedName);
-    BaseEntityType& UniqueId(const std::string& uuid);
     BaseEntityType& Version(const std::string& version);
 };
 
 class DataEntityType : public BaseEntityType
 {
 protected:
-    DataEntityType(const std::string& label);
+    DataEntityType(const std::string& label,
+                   const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 
 public:
     const std::string& Checksum(void) const;
     const std::string& EncodedValue(void) const;
+    const std::string& MetaType(void) const;
     const std::string& SimpleValue(void) const;
+    const std::string& TimeStampedName(void) const;
+    const std::string& UniqueId(void) const;
     const std::string& ValueDataType(void) const;
 
     std::string& Checksum(void);
     std::string& EncodedValue(void);
+    std::string& MetaType(void);
     std::string& SimpleValue(void);
+    std::string& TimeStampedName(void);
+    std::string& UniqueId(void);
     std::string& ValueDataType(void);
 
     DataEntityType& Checksum(const std::string& checksum);
     DataEntityType& EncodedValue(const std::string& encodedValue);
+    DataEntityType& MetaType(const std::string& metatype);
     DataEntityType& SimpleValue(const std::string& simpleValue);
+    DataEntityType& TimeStampedName(const std::string& timeStampedName);
+    DataEntityType& UniqueId(const std::string& uuid);
     DataEntityType& ValueDataType(const std::string& valueDataType);
 };
 
-class InputOutputDataType : public DataEntityType
+class StrictEntityType : public BaseEntityType
 {
 protected:
-    InputOutputDataType(const std::string& label);
+    StrictEntityType(const std::string& label,
+                     const XsdType& xsd = XsdType::BASE_DATA_MODEL);
+
+public:
+    const std::string& MetaType(void) const;
+    const std::string& TimeStampedName(void) const;
+    const std::string& UniqueId(void) const;
+
+    std::string& MetaType(void);
+    std::string& TimeStampedName(void);
+    std::string& UniqueId(void);
+
+    StrictEntityType& MetaType(const std::string& metatype);
+    StrictEntityType& TimeStampedName(const std::string& timeStampedName);
+    StrictEntityType& UniqueId(const std::string& uuid);
+};
+
+class InputOutputDataType : public StrictEntityType
+{
+protected:
+    InputOutputDataType(const std::string& label,
+                        const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 };
 
 class IndexedDataType : public InputOutputDataType
 {
 protected:
-    IndexedDataType(const std::string& label);
+    IndexedDataType(const std::string& label,
+                    const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 
 public:
     const PacBio::BAM::FileIndices& FileIndices(void) const;
     PacBio::BAM::FileIndices& FileIndices(void);
     IndexedDataType& FileIndices(const PacBio::BAM::FileIndices& indices);
 };
-
-
-//class DataSetType : public BaseEntityType
-//{
-//protected:
-//    DataSetType(const std::string& label);
-
-
-//};
-
-//class AlignmentSetType : public DataSetType
-//{
-//protected:
-//    AlignmentSetType(const std::string& label);
-//};
-
-//class BarcodeSetType : public DataSetType
-//{
-//protected:
-//    BarcodeSetType(const std::string& label);
-//};
-
-//class ContigSetType : public DataSetType
-//{
-//protected:
-//    ContigSetType(const std::string& label);
-//};
-
-//class ReadSetType : public DataSetType
-//{
-//protected:
-//    ReadSetType(const std::string& label);
-//};
-
-//class SubreadSetType : public ReadSetType
-//{
-//protected:
-//    SubreadSetType(const std::string& label);
-//};
 
 } // namespace internal
 } // namespace BAM

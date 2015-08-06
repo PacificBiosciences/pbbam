@@ -44,32 +44,56 @@ using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
 using namespace std;
 
+// -------------------
+// AlignmentSet
+// -------------------
+
 AlignmentSet::AlignmentSet(void)
-    : DataSetBase("AlignmentSet")
+    : DataSetBase("AlignmentSet", XsdType::DATASETS)
 { }
+
+// -------------------
+// BarcodeSet
+// -------------------
 
 BarcodeSet::BarcodeSet(void)
-    : DataSetBase("BarcodeSet")
+    : DataSetBase("BarcodeSet", XsdType::DATASETS)
 { }
+
+// -----------------------
+// ConsensusAlignmentSet
+// -----------------------
 
 ConsensusAlignmentSet::ConsensusAlignmentSet(void)
-    : DataSetBase("ConsensusAlignmentSet")
+    : DataSetBase("ConsensusAlignmentSet", XsdType::DATASETS)
 { }
+
+// -------------------
+// ConsensusReadSet
+// -------------------
 
 ConsensusReadSet::ConsensusReadSet(void)
-    : DataSetBase("ConsensusReadSet")
+    : DataSetBase("ConsensusReadSet", XsdType::DATASETS)
 { }
+
+// -------------------
+// ContigSet
+// -------------------
 
 ContigSet::ContigSet(void)
-    : DataSetBase("ContigSet")
+    : DataSetBase("ContigSet", XsdType::DATASETS)
 { }
+
+// -------------------
+// DataSetBase
+// -------------------
 
 DataSetBase::DataSetBase(void)
-    : BaseEntityType("DataSet")
+    : StrictEntityType("DataSet", XsdType::DATASETS)
 { }
 
-DataSetBase::DataSetBase(const string &label)
-    : BaseEntityType(label)
+DataSetBase::DataSetBase(const string& label, const XsdType& xsd)
+    : StrictEntityType(label, xsd)
 { }
 
 DEFINE_ACCESSORS(DataSetBase, ExternalResources, ExternalResources)
@@ -109,13 +133,15 @@ DataSetBase& DataSetBase::SubDataSets(const PacBio::BAM::SubDataSets &subdataset
 DataSetBase* DataSetBase::DeepCopy(void) const
 {
     DataSetElement* copyDataset = new DataSetElement(*this);
-    return static_cast<DataSetBase*>(copyDataset);
+    DataSetBase* result = static_cast<DataSetBase*>(copyDataset);
+    result->registry_ = registry_;
+    return result;
 }
 
 DataSetBase& DataSetBase::operator+=(const DataSetBase& other)
 {
     // must be same dataset types (or 'other' must be generic)
-    if (other.Label() != Label() && other.Label() != "DataSet")
+    if (other.QualifiedNameLabel() != QualifiedNameLabel() && other.LocalNameLabel() != "DataSet")
         throw std::runtime_error("cannot merge incompatible dataset types");
 
     // check filter match
@@ -124,8 +150,6 @@ DataSetBase& DataSetBase::operator+=(const DataSetBase& other)
     ExternalResources() += other.ExternalResources();
     Filters() += other.Filters();
     SubDataSets() += other;
-
-    // add self to
 
     return *this;
 }
@@ -146,9 +170,13 @@ std::shared_ptr<DataSetBase> DataSetBase::Create(const string& typeName)
     throw std::runtime_error("unsupported dataset type");
 }
 
+// -------------------
+// DataSetMetadata
+// -------------------
+
 DataSetMetadata::DataSetMetadata(const std::string& numRecords,
                                  const std::string& totalLength)
-    : DataSetElement("DataSetMetadata")
+    : DataSetElement("DataSetMetadata", XsdType::DATASETS)
 {
     NumRecords(numRecords);
     TotalLength(totalLength);
@@ -167,27 +195,39 @@ DataSetMetadata& DataSetMetadata::operator+=(const DataSetMetadata& other)
     return *this;
 }
 
+// -------------------
+// ExtensionElement
+// -------------------
+
 ExtensionElement::ExtensionElement(void)
-    : DataSetElement("ExtensionElement")
+    : DataSetElement("ExtensionElement", XsdType::BASE_DATA_MODEL)
 { }
 
+// -------------------
+// Extensions
+// -------------------
+
 Extensions::Extensions(void)
-    : DataSetListElement<ExtensionElement>("Extensions")
+    : DataSetListElement<ExtensionElement>("Extensions", XsdType::BASE_DATA_MODEL)
 { }
 
 ExternalResource::ExternalResource(void)
-    : IndexedDataType("ExternalResource")
+    : IndexedDataType("ExternalResource", XsdType::BASE_DATA_MODEL)
 { }
 
+// -------------------
+// ExternalResource
+// -------------------
+
 ExternalResource::ExternalResource(const BamFile &bamFile)
-    : IndexedDataType("ExternalResource")
+    : IndexedDataType("ExternalResource", XsdType::BASE_DATA_MODEL)
 {
     MetaType("SubreadFile.SubreadBamFile");
     ResourceId(bamFile.Filename());
 }
 
 ExternalResource::ExternalResource(const string& metatype, const string& filename)
-    : IndexedDataType("ExternalResource")
+    : IndexedDataType("ExternalResource", XsdType::BASE_DATA_MODEL)
 {
     MetaType(metatype);
     ResourceId(filename);
@@ -196,8 +236,12 @@ ExternalResource::ExternalResource(const string& metatype, const string& filenam
 BamFile ExternalResource::ToBamFile(void) const
 { return BamFile(ResourceId()); }
 
+// -------------------
+// ExternalResources
+// -------------------
+
 ExternalResources::ExternalResources(void)
-    : DataSetListElement<ExternalResource>("ExternalResources")
+    : DataSetListElement<ExternalResource>("ExternalResources", XsdType::BASE_DATA_MODEL)
 { }
 
 ExternalResources& ExternalResources::operator+=(const ExternalResources& other)
@@ -242,12 +286,20 @@ vector<BamFile> ExternalResources::BamFiles(void) const
 void ExternalResources::Remove(const ExternalResource& ext)
 { RemoveChild(ext); }
 
+// -------------------
+// FileIndex
+// -------------------
+
 FileIndex::FileIndex(void)
-    : InputOutputDataType("FileIndex")
+    : InputOutputDataType("FileIndex", XsdType::BASE_DATA_MODEL)
 { }
 
+// -------------------
+// FileIndices
+// -------------------
+
 FileIndices::FileIndices(void)
-    : DataSetListElement<FileIndex>("FileIndices")
+    : DataSetListElement<FileIndex>("FileIndices", XsdType::BASE_DATA_MODEL)
 { }
 
 void FileIndices::Add(const FileIndex& index)
@@ -256,8 +308,12 @@ void FileIndices::Add(const FileIndex& index)
 void FileIndices::Remove(const FileIndex& index)
 { RemoveChild(index); }
 
+// -------------------
+// Filter
+// -------------------
+
 Filter::Filter(void)
-    : DataSetElement("Filter")
+    : DataSetElement("Filter", XsdType::DATASETS)
 { }
 
 DEFINE_ACCESSORS(Filter, Properties, Properties)
@@ -265,8 +321,12 @@ DEFINE_ACCESSORS(Filter, Properties, Properties)
 Filter& Filter::Properties(const PacBio::BAM::Properties& properties)
 { Properties() = properties; return *this; }
 
+// -------------------
+// Filters
+// -------------------
+
 Filters::Filters(void)
-    : DataSetListElement<Filter>("Filters")
+    : DataSetListElement<Filter>("Filters", XsdType::DATASETS)
 { }
 
 Filters& Filters::operator+=(const Filters& other)
@@ -282,16 +342,28 @@ void Filters::Add(const Filter& filter)
 void Filters::Remove(const Filter& filter)
 { RemoveChild(filter); }
 
+// -------------------
+// HdfSubreadSet
+// -------------------
+
 HdfSubreadSet::HdfSubreadSet(void)
-    : DataSetBase("HdfSubreadSet")
+    : DataSetBase("HdfSubreadSet", XsdType::DATASETS)
 { }
+
+// -------------------
+// ParentTool
+// -------------------
 
 ParentTool::ParentTool(void)
-    : BaseEntityType("ParentTool")
+    : BaseEntityType("ParentTool", XsdType::DATASETS)
 { }
 
+// -------------------
+// Properties
+// -------------------
+
 Properties::Properties(void)
-    : DataSetListElement<Property>("Properties")
+    : DataSetListElement<Property>("Properties", XsdType::BASE_DATA_MODEL)
 { }
 
 void Properties::Add(const Property &property)
@@ -300,28 +372,44 @@ void Properties::Add(const Property &property)
 void Properties::Remove(const Property& property)
 { RemoveChild(property); }
 
+// -------------------
+// Property
+// -------------------
+
 Property::Property(const std::string& name,
                    const std::string& value,
                    const std::string& op)
-    : DataSetElement("Property")
+    : DataSetElement("Property", XsdType::BASE_DATA_MODEL)
 {
     Name(name);
     Value(value);
     Operator(op);
 }
 
+// -------------------
+// Provenance
+// -------------------
+
 Provenance::Provenance(void)
-    : DataSetElement("Provenance")
+    : DataSetElement("Provenance", XsdType::DATASETS)
 { }
 
 DEFINE_ACCESSORS(Provenance, ParentTool, ParentTool)
 
+// -------------------
+// ReferenceSet
+// -------------------
+
 ReferenceSet::ReferenceSet(void)
-    : DataSetBase("ReferenceSet")
+    : DataSetBase("ReferenceSet", XsdType::DATASETS)
 { }
 
+// -------------------
+// SubDataSets
+// -------------------
+
 SubDataSets::SubDataSets(void)
-    : internal::DataSetListElement<DataSetBase>("DataSets")
+    : internal::DataSetListElement<DataSetBase>("DataSets", XsdType::DATASETS)
 { }
 
 SubDataSets& SubDataSets::operator+=(const DataSetBase& other)
@@ -343,6 +431,10 @@ void SubDataSets::Add(const DataSetBase& subdataset)
 void SubDataSets::Remove(const DataSetBase& subdataset)
 { RemoveChild(subdataset); }
 
+// -------------------
+// SubreadSet
+// -------------------
+
 SubreadSet::SubreadSet(void)
-    : DataSetBase("SubreadSet")
+    : DataSetBase("SubreadSet", XsdType::DATASETS)
 { }

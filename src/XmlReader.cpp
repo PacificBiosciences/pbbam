@@ -36,10 +36,13 @@
 // Author: Derek Barnett
 
 #include "XmlReader.h"
+#include "StringUtils.h"
 #include "pugixml/pugixml.hpp"
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <vector>
+#include <cassert>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
@@ -48,6 +51,30 @@ using namespace std;
 namespace PacBio {
 namespace BAM {
 namespace internal {
+
+static
+void UpdateRegistry(const string& attributeName,
+                    const string& attributeValue,
+                    NamespaceRegistry& registry)
+{
+    vector<string> nameParts = Split(attributeName, ':');
+    assert(!nameParts.empty());
+    if (nameParts.size() > 2)
+        throw std::runtime_error("malformed xmlns attribute: " + attributeName);
+
+    const bool isDefault = (nameParts.size() == 1);
+    const XsdType& xsd = registry.XsdForUri(attributeValue);
+
+    if (isDefault)
+        registry.SetDefaultXsd(xsd);
+    else {
+        assert(nameParts.size() == 2);
+        const string& name = nameParts.at(1);
+        const string& uri  = attributeValue;
+        NamespaceInfo namespaceInfo(name, uri);
+        registry.Register(xsd, namespaceInfo);
+    }
+}
 
 static
 void FromXml(const pugi::xml_node& xmlNode, DataSetElement& parent)
@@ -91,7 +118,7 @@ std::unique_ptr<DataSetBase> XmlReader::FromStream(istream& in)
     pugi::xml_document doc;
     const pugi::xml_parse_result& loadResult = doc.load(in);
     if (loadResult.status != pugi::status_ok)
-        throw std::runtime_error("could not read XML file");
+        throw std::runtime_error(string("could not read XML file, error code:") + to_string(loadResult.status) );
 
     // parse top-level attributes
     pugi::xml_node rootNode = doc.document_element();
@@ -102,11 +129,18 @@ std::unique_ptr<DataSetBase> XmlReader::FromStream(istream& in)
     std::unique_ptr<DataSetBase> dataset(new DataSetBase);
     dataset->Label(rootNode.name());
 
-    // iterate attributes
+    // iterate attributes, capture namespace info
+    const string xmlnsPrefix("xmlns");
     auto attrIter = rootNode.attributes_begin();
     auto attrEnd  = rootNode.attributes_end();
-    for ( ; attrIter != attrEnd; ++attrIter )
-        dataset->Attribute(attrIter->name(), attrIter->value());
+    for ( ; attrIter != attrEnd; ++attrIter ) {
+        const string& name = attrIter->name();
+        const string& value = attrIter->value();
+        dataset->Attribute(name, value);
+
+        if (name.find(xmlnsPrefix) == 0)
+            UpdateRegistry(name, value, dataset->Namespaces());
+    }
 
     // iterate children, recursively building up subtree
     auto childIter = rootNode.begin();

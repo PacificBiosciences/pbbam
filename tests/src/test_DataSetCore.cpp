@@ -58,6 +58,29 @@ DataSet CreateDataSet(void)
 
 } // namespace tests
 
+TEST(DataSetCoreTest, XmlNameParts)
+{
+    internal::XmlName name("ns:node_name");
+    EXPECT_EQ(boost::string_ref("ns"),           name.Prefix());
+    EXPECT_EQ(boost::string_ref("node_name"),    name.LocalName());
+    EXPECT_EQ(boost::string_ref("ns:node_name"), name.QualifiedName());
+
+    internal::XmlName bareName("node_name");
+    EXPECT_EQ(boost::string_ref(""),          bareName.Prefix());
+    EXPECT_EQ(boost::string_ref("node_name"), bareName.LocalName());
+    EXPECT_EQ(boost::string_ref("node_name"), bareName.QualifiedName());
+
+    internal::XmlName leadingColon(":node_name");
+    EXPECT_EQ(boost::string_ref(""),           leadingColon.Prefix());
+    EXPECT_EQ(boost::string_ref(":node_name"), leadingColon.LocalName());
+    EXPECT_EQ(boost::string_ref(":node_name"), leadingColon.QualifiedName());
+}
+
+TEST(DataSetCoreTest, NamespacesOk)
+{
+
+}
+
 TEST(DataSetCoreTest, DefaultsOk)
 {
     DataSet dataset;
@@ -90,32 +113,6 @@ TEST(DataSetCoreTest, BasicGettersSettersOk)
     dataset.TimeStampedName("now:30");
     dataset.UniqueId("uuid");
     dataset.Version("0.0.0");
-
-    EXPECT_EQ(string("now"),          dataset.CreatedAt());
-    EXPECT_EQ(string("format"),       dataset.Format());
-    EXPECT_EQ(string("meta"),         dataset.MetaType());
-    EXPECT_EQ(string("later"),        dataset.ModifiedAt());
-    EXPECT_EQ(string("foo"),          dataset.Name());
-    EXPECT_EQ(string("path/to/file"), dataset.ResourceId());
-    EXPECT_EQ(string("tag tag"),      dataset.Tags());
-    EXPECT_EQ(string("now:30"),       dataset.TimeStampedName());
-    EXPECT_EQ(string("uuid"),         dataset.UniqueId());
-    EXPECT_EQ(string("0.0.0"),        dataset.Version());
-}
-
-TEST(DataSetCoreTest, ChainedSettersOk)
-{
-    DataSet dataset;
-    dataset.CreatedAt("now")
-           .Format("format")
-           .MetaType("meta")
-           .ModifiedAt("later")
-           .Name("foo")
-           .ResourceId("path/to/file")
-           .Tags("tag tag")
-           .TimeStampedName("now:30")
-           .UniqueId("uuid")
-           .Version("0.0.0");
 
     EXPECT_EQ(string("now"),          dataset.CreatedAt());
     EXPECT_EQ(string("format"),       dataset.Format());
@@ -169,6 +166,7 @@ TEST(DataSetCoreTest, AddExternalResources)
 
     ExternalResource resource2;
     resource2.Name("file2");
+    resource2.MetaType("blah");
 
     dataset.ExternalResources().Add(resource1);
     dataset.ExternalResources().Add(resource2);

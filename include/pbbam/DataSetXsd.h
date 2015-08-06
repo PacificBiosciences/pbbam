@@ -35,60 +35,77 @@
 
 // Author: Derek Barnett
 
-#include "pbbam/DataSetTypes.h"
-#include "pbbam/internal/DataSetBaseTypes.h"
-#include "DataSetUtils.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
+#ifndef DATASETXSD_H
+#define DATASETXSD_H
 
-// ----------------
-// BaseEntityType
-// ----------------
+#include "pbbam/Config.h"
+#include <map>
+#include <string>
 
-BaseEntityType::BaseEntityType(const std::string& label, const XsdType& xsd)
-    : DataSetElement(label, xsd)
-{ }
+namespace PacBio {
+namespace BAM {
 
-DEFINE_ACCESSORS(BaseEntityType, Extensions, Extensions)
+enum class XsdType
+{
+    NONE
 
-BaseEntityType& BaseEntityType::Extensions(const PacBio::BAM::Extensions& extensions)
-{ Extensions() = extensions; return *this; }
+  , AUTOMATION_CONSTRAINTS
+  , BASE_DATA_MODEL
+  , COLLECTION_METADATA
+  , COMMON_MESSAGES
+  , DATA_MODEL
+  , DATA_STORE
+  , DATASETS
+  , DECL_DATA
+  , PART_NUMBERS
+  , PRIMARY_METRICS
+  , REAGENT_KIT
+  , RIGHTS_AND_ROLES
+  , SAMPLE_INFO
+  , SEEDING_DATA
+};
 
-// ----------------
-// DataEntityType
-// ----------------
+class PBBAM_EXPORT NamespaceInfo
+{
+public:
+    NamespaceInfo(void);
+    NamespaceInfo(const std::string& name,
+                  const std::string& uri);
 
-DataEntityType::DataEntityType(const std::string& label, const XsdType& xsd)
-    : BaseEntityType(label, xsd)
-{ }
+public:
+    const std::string& Name(void) const { return name_; }
+    const std::string& Uri(void) const { return uri_; }
 
-// -----------------
-// IndexedDataType
-// -----------------
+private:
+    std::string name_;
+    std::string uri_;
+};
 
-IndexedDataType::IndexedDataType(const std::string& label, const XsdType &xsd)
-    : InputOutputDataType(label, xsd)
-{ }
+class PBBAM_EXPORT NamespaceRegistry
+{
+public:
+    NamespaceRegistry(void);
+    NamespaceRegistry(const NamespaceRegistry& other);
+    NamespaceRegistry& operator=(const NamespaceRegistry& other);
+    ~NamespaceRegistry(void);
 
-DEFINE_ACCESSORS(IndexedDataType, FileIndices, FileIndices)
+public:
+    const NamespaceInfo& DefaultNamespace(void) const;
+    XsdType DefaultXsd(void) const;
+    const NamespaceInfo& Namespace(const XsdType& xsd) const;
 
-IndexedDataType& IndexedDataType::FileIndices(const PacBio::BAM::FileIndices& indices)
-{ FileIndices() = indices; return *this; }
+    XsdType XsdForUri(const std::string& uri) const;
 
-// ---------------------
-// InputOutputDataType
-// ---------------------
+public:
+    void Register(const XsdType& xsd, const NamespaceInfo& namespaceInfo);
+    void SetDefaultXsd(const XsdType& xsd);
 
-InputOutputDataType::InputOutputDataType(const std::string& label, const XsdType &xsd)
-    : StrictEntityType(label, xsd)
-{ }
+private:
+    std::map<XsdType, NamespaceInfo> data_;
+    XsdType defaultXsdType_;
+};
 
-// ----------------
-// StrictEntityType
-// ----------------
+} // namespace PacBio
+} // namespace BAM
 
-StrictEntityType::StrictEntityType(const std::string& label, const XsdType& xsd)
-    : BaseEntityType(label, xsd)
-{ }
+#endif // DATASETXSD_H

@@ -72,15 +72,6 @@ inline std::string& BaseEntityType::Format(void)
 inline BaseEntityType& BaseEntityType::Format(const std::string& format)
 { Attribute("Format", format); return *this; }
 
-inline const std::string& BaseEntityType::MetaType(void) const
-{ return Attribute("MetaType"); }
-
-inline std::string& BaseEntityType::MetaType(void)
-{ return Attribute("MetaType"); }
-
-inline BaseEntityType& BaseEntityType::MetaType(const std::string& metatype)
-{ Attribute("MetaType", metatype); return *this; }
-
 inline const std::string& BaseEntityType::ModifiedAt(void) const
 { return Attribute("ModifiedAt"); }
 
@@ -117,24 +108,6 @@ inline std::string& BaseEntityType::Tags(void)
 inline BaseEntityType& BaseEntityType::Tags(const std::string& tags)
 { Attribute("Tags", tags); return *this; }
 
-inline const std::string& BaseEntityType::TimeStampedName(void) const
-{ return Attribute("TimeStampedName"); }
-
-inline std::string& BaseEntityType::TimeStampedName(void)
-{ return Attribute("TimeStampedName"); }
-
-inline BaseEntityType& BaseEntityType::TimeStampedName(const std::string& timeStampedName)
-{ Attribute("TimeStampedName", timeStampedName); return *this; }
-
-inline const std::string& BaseEntityType::UniqueId(void) const
-{ return Attribute("UniqueId"); }
-
-inline std::string& BaseEntityType::UniqueId(void)
-{ return Attribute("UniqueId"); }
-
-inline BaseEntityType& BaseEntityType::UniqueId(const std::string& uuid)
-{ Attribute("UniqueId", uuid); return *this; }
-
 inline const std::string& BaseEntityType::Version(void) const
 { return Attribute("Version"); }
 
@@ -148,7 +121,6 @@ inline BaseEntityType& BaseEntityType::Version(const std::string& version)
 // DataEntityType
 // ----------------
 
-// elements
 inline const std::string& DataEntityType::Checksum(void) const
 { return ChildText("Checksum"); }
 
@@ -167,6 +139,15 @@ inline std::string& DataEntityType::EncodedValue(void)
 inline DataEntityType& DataEntityType::EncodedValue(const std::string& encodedValue)
 { ChildText("EncodedValue", encodedValue); return *this; }
 
+inline const std::string& DataEntityType::MetaType(void) const
+{ return Attribute("MetaType"); }
+
+inline std::string& DataEntityType::MetaType(void)
+{ return Attribute("MetaType"); }
+
+inline DataEntityType& DataEntityType::MetaType(const std::string& metatype)
+{ Attribute("MetaType", metatype); return *this; }
+
 inline const std::string& DataEntityType::SimpleValue(void) const
 { return Attribute("SimpleValue"); }
 
@@ -176,6 +157,24 @@ inline std::string& DataEntityType::SimpleValue(void)
 inline DataEntityType& DataEntityType::SimpleValue(const std::string& simpleValue)
 { Attribute("SimpleValue", simpleValue); return *this; }
 
+inline const std::string& DataEntityType::TimeStampedName(void) const
+{ return Attribute("TimeStampedName"); }
+
+inline std::string& DataEntityType::TimeStampedName(void)
+{ return Attribute("TimeStampedName"); }
+
+inline DataEntityType& DataEntityType::TimeStampedName(const std::string& timeStampedName)
+{ Attribute("TimeStampedName", timeStampedName); return *this; }
+
+inline const std::string& DataEntityType::UniqueId(void) const
+{ return Attribute("UniqueId"); }
+
+inline std::string& DataEntityType::UniqueId(void)
+{ return Attribute("UniqueId"); }
+
+inline DataEntityType& DataEntityType::UniqueId(const std::string& uuid)
+{ Attribute("UniqueId", uuid); return *this; }
+
 inline const std::string& DataEntityType::ValueDataType(void) const
 { return Attribute("ValueDataType"); }
 
@@ -184,6 +183,37 @@ inline std::string& DataEntityType::ValueDataType(void)
 
 inline DataEntityType& DataEntityType::ValueDataType(const std::string& valueDataType)
 { Attribute("ValueDataType", valueDataType); return *this; }
+
+// ----------------
+// StrictEntityType
+// ----------------
+
+inline const std::string& StrictEntityType::MetaType(void) const
+{ return Attribute("MetaType"); }
+
+inline std::string& StrictEntityType::MetaType(void)
+{ return Attribute("MetaType"); }
+
+inline StrictEntityType& StrictEntityType::MetaType(const std::string& metatype)
+{ Attribute("MetaType", metatype); return *this; }
+
+inline const std::string& StrictEntityType::TimeStampedName(void) const
+{ return Attribute("TimeStampedName"); }
+
+inline std::string& StrictEntityType::TimeStampedName(void)
+{ return Attribute("TimeStampedName"); }
+
+inline StrictEntityType& StrictEntityType::TimeStampedName(const std::string& timeStampedName)
+{ Attribute("TimeStampedName", timeStampedName); return *this; }
+
+inline const std::string& StrictEntityType::UniqueId(void) const
+{ return Attribute("UniqueId"); }
+
+inline std::string& StrictEntityType::UniqueId(void)
+{ return Attribute("UniqueId"); }
+
+inline StrictEntityType& StrictEntityType::UniqueId(const std::string& uuid)
+{ Attribute("UniqueId", uuid); return *this; }
 
 } // namespace internal
 } // namespace BAM

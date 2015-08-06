@@ -50,13 +50,26 @@ namespace BAM {
 namespace internal {
 
 static
+string OutputName(const DataSetElement& node,
+                  const NamespaceRegistry& registry)
+{
+    if (node.PrefixLabel().empty())
+        return registry.Namespace(node.Xsd()).Name() + ":" + node.LocalNameLabel().to_string();
+    else
+        return node.QualifiedNameLabel(); // is this correct? what if node's contents don't match registry
+                                          // who gets priority?
+}
+
+static
 void ToXml(const DataSetElement& node,
+           const NamespaceRegistry& registry,
            pugi::xml_node& parentXml)
 {
     // create child of parent, w/ label & text
-    if ( node.Label().empty() )
+    const string& label = OutputName(node, registry);
+    if (label.empty())
         return; // error?
-    pugi::xml_node xmlNode = parentXml.append_child(node.Label().c_str());
+    pugi::xml_node xmlNode = parentXml.append_child(label.c_str());
 
     if (!node.Text().empty())
         xmlNode.text().set(node.Text().c_str());
@@ -79,7 +92,7 @@ void ToXml(const DataSetElement& node,
     auto childEnd  = node.Children().cend();
     for ( ; childIter != childEnd; ++childIter) {
         const DataSetElement& child = (*childIter);
-        ToXml(child, xmlNode);
+        ToXml(child, registry, xmlNode);
     }
 }
 
@@ -92,8 +105,10 @@ void XmlWriter::ToStream(const DataSetBase& dataset,
 {
     pugi::xml_document doc;
 
+    const NamespaceRegistry& registry = dataset.Namespaces();
+
     // create top-level dataset XML node
-    const string& label = dataset.Label();
+    const string& label = OutputName(dataset, registry);
     if (label.empty())
         throw std::runtime_error("could not convert dataset node to XML");
     pugi::xml_node root = doc.append_child(label.c_str());
@@ -119,7 +134,7 @@ void XmlWriter::ToStream(const DataSetBase& dataset,
     auto childEnd  = dataset.Children().cend();
     for ( ; childIter != childEnd; ++childIter) {
         const DataSetElement& child = (*childIter);
-        ToXml(child, root);
+        ToXml(child, registry, root);
     }
 
     // write XML to stream

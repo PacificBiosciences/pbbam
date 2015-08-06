@@ -40,7 +40,15 @@
 namespace PacBio {
 namespace BAM {
 
+// -------------
+// DataSetBase
+// --------------
 
+inline const NamespaceRegistry& DataSetBase::Namespaces(void) const
+{ return registry_; }
+
+inline NamespaceRegistry& DataSetBase::Namespaces(void)
+{ return registry_; }
 
 // ---------------------
 // DataSetMetadata
@@ -63,7 +71,6 @@ inline std::string& DataSetMetadata::TotalLength(void)
 
 inline DataSetMetadata& DataSetMetadata::TotalLength(const std::string& totalLength)
 { ChildText("TotalLength", totalLength); return *this; }
-
 
 // ----------
 // Property

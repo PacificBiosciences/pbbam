@@ -172,8 +172,8 @@ inline PacBio::BAM::DataSet::TypeEnum DataSet::Type(void) const
 inline DataSet& DataSet::Type(const DataSet::TypeEnum type)
 { d_->Label(DataSet::TypeToName(type)); return *this; }
 
-inline const std::string& DataSet::TypeName(void) const
-{ return d_->Label(); }
+inline std::string DataSet::TypeName(void) const
+{ return d_->LocalNameLabel().to_string(); }
 
 inline const std::string& DataSet::UniqueId(void) const
 { return d_->UniqueId(); }

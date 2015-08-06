@@ -41,7 +41,6 @@
 #include "DataSetIO.h"
 #include "TimeUtils.h"
 #include <unordered_map>
-#include <iostream>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
@@ -126,6 +125,12 @@ DataSet DataSet::FromXml(const string& xml)
         result.CreatedAt(internal::ToIso8601(internal::CurrentTime()));
     return result;
 }
+
+const NamespaceRegistry& DataSet::Namespaces(void) const
+{ return d_->Namespaces(); }
+
+NamespaceRegistry& DataSet::Namespaces(void)
+{ return d_->Namespaces(); }
 
 DataSet::TypeEnum DataSet::NameToType(const string& typeName)
 {

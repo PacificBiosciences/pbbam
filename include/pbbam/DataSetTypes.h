@@ -40,6 +40,7 @@
 
 #include "pbbam/BamFile.h"
 #include "pbbam/Config.h"
+#include "pbbam/DataSetXsd.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 #include <string>
 
@@ -206,7 +207,7 @@ public:
 
 class SubDataSets;
 
-class PBBAM_EXPORT DataSetBase : public internal::BaseEntityType
+class PBBAM_EXPORT DataSetBase : public internal::StrictEntityType
 {
 public:
     static std::shared_ptr<DataSetBase> Create(const std::string& typeName);
@@ -215,7 +216,7 @@ public:
     DataSetBase(void);
 
 protected:
-    DataSetBase(const std::string& label);
+    DataSetBase(const std::string& label, const XsdType& xsd);
     DataSetBase* DeepCopy(void) const;
 
 public:
@@ -236,6 +237,14 @@ public:
     DataSetBase& Filters(const PacBio::BAM::Filters& filters);
     DataSetBase& Metadata(const PacBio::BAM::DataSetMetadata& metadata);
     DataSetBase& SubDataSets(const PacBio::BAM::SubDataSets& subdatasets);
+
+
+public:
+    const NamespaceRegistry& Namespaces(void) const;
+    NamespaceRegistry& Namespaces(void);
+
+private:
+    NamespaceRegistry registry_;
 };
 
 class PBBAM_EXPORT AlignmentSet : public DataSetBase
