@@ -86,9 +86,9 @@ std::vector<BamRecord> VirtualPolymeraseReader::NextRaw()
 {
     std::vector<BamRecord> bamRecordVec;
 
-    // current hole number
-    int currentHoleNumber = (*primaryIt_).HoleNumber();
-
+    // Current hole number, the smallest of scraps and primary.
+    // It can be that the next ZMW is scrap only.
+    int currentHoleNumber = std::min((*primaryIt_).HoleNumber(), (*scrapsIt_).HoleNumber());
     // collect subreads or hqregions
     while (primaryIt_ != primaryQuery_->end() && currentHoleNumber == (*primaryIt_).HoleNumber())
         bamRecordVec.push_back(*primaryIt_++);
