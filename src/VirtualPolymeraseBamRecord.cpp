@@ -177,7 +177,7 @@ void VirtualPolymeraseBamRecord::StitchSources()
 
             virtualRegionsMap_[regionType].emplace_back(
                 regionType, b.QueryStart(), b.QueryEnd(), b.LocalContextFlags(),
-                barcodes.first, barcodes.second);   
+                barcodes.first, barcodes.second);
         }
     }
 
@@ -249,14 +249,34 @@ void VirtualPolymeraseBamRecord::StitchSources()
     // Determine HQREGION bases on LQREGIONS
     if (HasVirtualRegionType(VirtualRegionType::LQREGION))
     {
-        int beginPos = 0;
-        for (const auto& lqregion : virtualRegionsMap_[VirtualRegionType::LQREGION])
+        if (virtualRegionsMap_[VirtualRegionType::LQREGION].size() == 1)
         {
-            if (lqregion.beginPos - beginPos > 0)
+            const auto lq = virtualRegionsMap_[VirtualRegionType::LQREGION][0];
+            if (lq.beginPos == 0)
                 virtualRegionsMap_[VirtualRegionType::HQREGION].emplace_back(
-                    VirtualRegionType::HQREGION, beginPos, lqregion.beginPos);
-            beginPos = lqregion.endPos;
+                    VirtualRegionType::HQREGION, lq.endPos, sequence.size());
+            else if (lq.endPos == static_cast<int>(sequence.size()))
+                virtualRegionsMap_[VirtualRegionType::HQREGION].emplace_back(
+                    VirtualRegionType::HQREGION, 0, lq.beginPos);
+            else
+                throw std::runtime_error("Unknown HQREGION");
         }
+        else
+        {
+            int beginPos = 0;
+            for (const auto& lqregion : virtualRegionsMap_[VirtualRegionType::LQREGION])
+            {
+                if (lqregion.beginPos - beginPos > 0)
+                    virtualRegionsMap_[VirtualRegionType::HQREGION].emplace_back(
+                        VirtualRegionType::HQREGION, beginPos, lqregion.beginPos);
+                beginPos = lqregion.endPos;
+            }
+        }
+    }
+    else
+    {
+        virtualRegionsMap_[VirtualRegionType::HQREGION].emplace_back(
+            VirtualRegionType::HQREGION, 0, sequence.size());
     }
 }
 
