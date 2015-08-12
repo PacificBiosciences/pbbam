@@ -75,7 +75,6 @@ static const string tagName_pkmid                   = "pm";
 static const string tagName_pre_pulse_frames        = "pd";
 static const string tagName_pulse_call_width        = "px";
 static const string tagName_labelQV                 = "pq";
-static const string tagName_labelTag                = "lt";
 static const string tagName_alternative_labelQV     = "pv";
 static const string tagName_alternative_labelTag    = "pt";
 static const string tagName_pulse_call              = "pc";
@@ -735,7 +734,6 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
     Frames pulseWidth = std::move(internal::Clip(PulseWidth(Orientation::GENOMIC).Data(), clipIndex, clipLength));
     string deletionTag = std::move(internal::Clip(DeletionTag(Orientation::GENOMIC), clipIndex, clipLength));
     string substitutionTag = std::move(internal::Clip(SubstitutionTag(Orientation::GENOMIC), clipIndex, clipLength));
-    string labelTag = LabelTag(Orientation::GENOMIC);
     string altLabelTag = AltLabelTag(Orientation::GENOMIC);
     string pulseCall = std::move(PulseCall(Orientation::GENOMIC));
     std::vector<float> pkmean = std::move(Pkmean(Orientation::GENOMIC));
@@ -755,7 +753,6 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
         internal::Reverse(pulseWidth);
         internal::ReverseComplement(deletionTag);
         internal::ReverseComplement(substitutionTag);
-        internal::ReverseComplement(labelTag);
         internal::ReverseComplement(altLabelTag);
         internal::ReverseComplementCaseSens(pulseCall);
         internal::Reverse(pkmean);
@@ -776,7 +773,6 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
     tags[internal::tagName_pulseWidth]          = pulseWidth.Data();
     tags[internal::tagName_deletionTag]         = deletionTag;
     tags[internal::tagName_substitutionTag]     = substitutionTag;
-    tags[internal::tagName_labelTag]            = labelTag;
     tags[internal::tagName_alternative_labelTag]= altLabelTag;
     tags[internal::tagName_pulse_call]          = pulseCall;
     tags[internal::tagName_pkmean]              = EncodePhotons(pkmean);
@@ -1106,9 +1102,6 @@ bool BamRecord::HasPreBaseFrames(void) const
 bool BamRecord::HasIPD(void) const
 { return impl_.HasTag(internal::tagName_ipd); }
 
-bool BamRecord::HasLabelTag(void) const
-{ return impl_.HasTag(internal::tagName_labelTag); }
-
 bool BamRecord::HasLocalContextFlags(void) const
 { return impl_.HasTag(internal::tagName_contextFlags); }
 
@@ -1306,17 +1299,6 @@ QualityValues BamRecord::LabelQV(Orientation orientation) const
 BamRecord& BamRecord::LabelQV(const QualityValues& labelQVs)
 {
     internal::CreateOrEdit(internal::tagName_labelQV, labelQVs.Fastq(), &impl_);
-    return *this;
-}
-
-std::string BamRecord::LabelTag(Orientation orientation) const
-{
-    return FetchBases(internal::tagName_labelTag, orientation);
-}
-
-BamRecord& BamRecord::LabelTag(const std::string& tags)
-{
-    internal::CreateOrEdit(internal::tagName_labelTag, tags, &impl_);
     return *this;
 }
 

@@ -71,7 +71,6 @@ void VirtualPolymeraseBamRecord::StitchSources()
     std::string   sequence;
     std::string   deletionTag;
     std::string   substitutionTag;
-    std::string   labelTag;
     std::string   alternativeLabelTag;
     std::string   pulseCall;
 
@@ -126,9 +125,6 @@ void VirtualPolymeraseBamRecord::StitchSources()
 
         if (b.HasSubstitutionTag())
             substitutionTag.append(std::move(b.SubstitutionTag()));
-
-        if (b.HasLabelTag())
-            labelTag.append(std::move(b.LabelTag()));
 
         if (b.HasAltLabelTag())
             alternativeLabelTag.append(std::move(b.AltLabelTag()));
@@ -211,8 +207,6 @@ void VirtualPolymeraseBamRecord::StitchSources()
         this->DeletionTag(deletionTag);
     if (!substitutionTag.empty())
         this->SubstitutionTag(substitutionTag);
-    if (!labelTag.empty())
-        this->LabelTag(labelTag);
     if (!alternativeLabelTag.empty())
         this->AltLabelTag(alternativeLabelTag);
     if (!pulseCall.empty())

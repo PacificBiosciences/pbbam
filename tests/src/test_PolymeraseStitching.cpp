@@ -70,7 +70,6 @@ void Compare(const BamRecord& b1, const BamRecord& b2)
     EXPECT_EQ(b1.SubstitutionTag(), b2.SubstitutionTag());
     EXPECT_EQ(b1.LabelQV(),         b2.LabelQV());
     EXPECT_EQ(b1.AltLabelQV(),      b2.AltLabelQV());
-    EXPECT_EQ(b1.LabelTag(),        b2.LabelTag());
     EXPECT_EQ(b1.AltLabelTag(),     b2.AltLabelTag());
     EXPECT_EQ(b1.Pkmean(),          b2.Pkmean());
     EXPECT_EQ(b1.Pkmid(),           b2.Pkmid());
@@ -89,7 +88,6 @@ void Compare(const BamRecord& b1, const BamRecord& b2)
     EXPECT_TRUE(b1.HasSubstitutionTag());
     EXPECT_TRUE(b1.HasLabelQV());
     EXPECT_TRUE(b1.HasAltLabelQV());
-    EXPECT_TRUE(b1.HasLabelTag());
     EXPECT_TRUE(b1.HasAltLabelTag());
     EXPECT_TRUE(b1.HasPkmean());
     EXPECT_TRUE(b1.HasPkmid());
@@ -107,7 +105,6 @@ void Compare(const BamRecord& b1, const BamRecord& b2)
     EXPECT_TRUE(b2.HasSubstitutionTag());
     EXPECT_TRUE(b2.HasLabelQV());
     EXPECT_TRUE(b2.HasAltLabelQV());
-    EXPECT_TRUE(b2.HasLabelTag());
     EXPECT_TRUE(b2.HasAltLabelTag());
     EXPECT_TRUE(b2.HasPkmean());
     EXPECT_TRUE(b2.HasPkmid());
@@ -325,7 +322,6 @@ TEST(VirtualPolymeraseReader, ProductionHQToOriginal)
     EXPECT_TRUE(polyRecord.HasIPD());
     EXPECT_FALSE(polyRecord.HasLabelQV());
     EXPECT_FALSE(polyRecord.HasAltLabelQV());
-    EXPECT_FALSE(polyRecord.HasLabelTag());
     EXPECT_FALSE(polyRecord.HasAltLabelTag());
     EXPECT_FALSE(polyRecord.HasPkmean());
     EXPECT_FALSE(polyRecord.HasPkmid());
@@ -343,7 +339,6 @@ TEST(VirtualPolymeraseReader, ProductionHQToOriginal)
     EXPECT_TRUE(virtualRecord.HasIPD());
     EXPECT_FALSE(virtualRecord.HasLabelQV());
     EXPECT_FALSE(virtualRecord.HasAltLabelQV());
-    EXPECT_FALSE(virtualRecord.HasLabelTag());
     EXPECT_FALSE(virtualRecord.HasAltLabelTag());
     EXPECT_FALSE(virtualRecord.HasPkmean());
     EXPECT_FALSE(virtualRecord.HasPkmid());

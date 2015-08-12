@@ -179,9 +179,6 @@ public:
     /// \returns true if this record has SubstitutionTag data
     bool HasSubstitutionTag(void) const;
 
-    /// \returns true if this record has LabelTag data
-    bool HasLabelTag(void) const;
-
     /// \returns true if this record has AltLabelTag data
     bool HasAltLabelTag(void) const;
 
@@ -398,19 +395,6 @@ public:
     /// \returns LabelQV as QualityValues object
     ///
     QualityValues LabelQV(Orientation orientation = Orientation::NATIVE) const;
-
-    /// \brief Fetch this record's LabelTag values ("lt" tag).
-    ///
-    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
-    ///       gap chars will be '-' and padding chars will be '*'.
-    ///
-    /// \param[in] orientation     Orientation of output.
-    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
-    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
-    ///
-    /// \returns LabelTags string
-    ///
-    std::string LabelTag(Orientation orientation = Orientation::NATIVE) const;
 
     /// \brief Fetch this record's MergeQV values ("mq" tag).
     ///
@@ -741,12 +725,6 @@ public:
     /// \returns reference to this record
     BamRecord& SubstitutionTag(const std::string& tags);
 
-    /// Sets this record's LabelTag values ("lt" tag).
-    ///
-    /// \param[in] tags
-    /// \returns reference to this record
-    BamRecord& LabelTag(const std::string& tags);
-
     /// Sets this record's AltLabelTag values ("at" tag).
     ///
     /// \param[in] tags
@@ -968,9 +946,6 @@ public:
 
     QualityValues LabelQVs(void) const
     { return record_.LabelQV(orientation_); }
-
-    std::string LabelTags(void) const
-    { return record_.LabelTag(orientation_); }
 
     QualityValues MergeQVs(void) const
     { return record_.MergeQV(orientation_, aligned_, exciseSoftClips_); }
