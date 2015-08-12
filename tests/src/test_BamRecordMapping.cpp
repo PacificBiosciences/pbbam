@@ -75,8 +75,8 @@ BamRecord MakeRecord(const Position qStart,
     tags["iq"] = tagQuals;
     tags["mq"] = tagQuals;
     tags["sq"] = tagQuals;
-    tags["lq"] = tagQuals;
-    tags["aq"] = tagQuals;
+    tags["pq"] = tagQuals;
+    tags["pv"] = tagQuals;
     impl.Tags(tags);
 
     return BamRecord(std::move(impl));

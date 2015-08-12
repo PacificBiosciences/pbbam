@@ -59,7 +59,6 @@ void Compare(const BamRecord& b1, const BamRecord& b2)
 {
     EXPECT_EQ(b1.FullName(),        b2.FullName());
 	EXPECT_EQ(b1.HoleNumber(), 		b2.HoleNumber());
-	EXPECT_EQ(b1.ReadAccuracy(), 	b2.ReadAccuracy());
 	EXPECT_EQ(b1.NumPasses(), 		b2.NumPasses());
 	EXPECT_EQ(b1.Sequence(), 		b2.Sequence());
 	EXPECT_EQ(b1.Qualities(), 		b2.Qualities());
@@ -145,8 +144,8 @@ TEST(VirtualPolymeraseReader, InternalSubreadsToOriginal)
 TEST(VirtualPolymeraseReader, InternalHQToOriginal)
 {
 	// Create virtual polymerase read
-    VirtualPolymeraseReader vpr(tests::Data_Dir + "/polymerase/internal_hq.hqregion.bam",
-                                tests::Data_Dir + "/polymerase/internal_hq.scraps.bam");
+    VirtualPolymeraseReader vpr(tests::Data_Dir + "/polymerase/internal.hqregions.bam",
+                                tests::Data_Dir + "/polymerase/internal.lqregions.bam");
     EXPECT_TRUE(vpr.HasNext());
     auto virtualRecord = vpr.Next();
     EXPECT_FALSE(vpr.HasNext());

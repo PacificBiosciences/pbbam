@@ -74,10 +74,10 @@ static const string tagName_pkmean                  = "pa";
 static const string tagName_pkmid                   = "pm";
 static const string tagName_pre_pulse_frames        = "pd";
 static const string tagName_pulse_call_width        = "px";
-static const string tagName_labelQV                 = "lq";
+static const string tagName_labelQV                 = "pq";
 static const string tagName_labelTag                = "lt";
-static const string tagName_alternative_labelQV     = "aq";
-static const string tagName_alternative_labelTag    = "at";
+static const string tagName_alternative_labelQV     = "pv";
+static const string tagName_alternative_labelTag    = "pt";
 static const string tagName_pulse_call              = "pc";
 static const string tagName_scrap_type              = "sc";
 static const string tagName_barcodes                = "bc";
@@ -482,13 +482,10 @@ Position BamRecord::AlignedStart(void) const
 Strand BamRecord::AlignedStrand(void) const
 { return impl_.IsReverseStrand() ? Strand::REVERSE : Strand::FORWARD; }
 
-QualityValues BamRecord::AltLabelQV(Orientation orientation, bool aligned,
-                                    bool exciseSoftClips) const
+QualityValues BamRecord::AltLabelQV(Orientation orientation) const
 {
     return FetchQualities(internal::tagName_alternative_labelQV,
-                          orientation,
-                          aligned,
-                          exciseSoftClips);
+                          orientation);
 }
 
 BamRecord& BamRecord::AltLabelQV(const QualityValues& altLabelQVs)
@@ -498,14 +495,10 @@ BamRecord& BamRecord::AltLabelQV(const QualityValues& altLabelQVs)
     return *this;
 }
 
-std::string BamRecord::AltLabelTag(Orientation orientation,
-                                   bool aligned,
-                                   bool exciseSoftClips) const
+std::string BamRecord::AltLabelTag(Orientation orientation) const
 {
     return FetchBases(internal::tagName_alternative_labelTag,
-                      orientation,
-                      aligned,
-                      exciseSoftClips);
+                      orientation);
 }
 
 BamRecord& BamRecord::AltLabelTag(const std::string& tags)
@@ -732,8 +725,8 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
     impl_.SetSequenceAndQualities(sequence, qualities.Fastq());
 
     // clip PacBio tags
-    QualityValues altLabelQV = std::move(internal::Clip(AltLabelQV(Orientation::GENOMIC), clipIndex, clipLength));
-    QualityValues labelQV = std::move(internal::Clip(LabelQV(Orientation::GENOMIC), clipIndex, clipLength));
+    QualityValues altLabelQV = AltLabelQV(Orientation::GENOMIC);
+    QualityValues labelQV = LabelQV(Orientation::GENOMIC);
     QualityValues deletionQV = std::move(internal::Clip(DeletionQV(Orientation::GENOMIC), clipIndex, clipLength));
     QualityValues insertionQV = std::move(internal::Clip(InsertionQV(Orientation::GENOMIC), clipIndex, clipLength));
     QualityValues mergeQV = std::move(internal::Clip(MergeQV(Orientation::GENOMIC), clipIndex, clipLength));
@@ -742,8 +735,8 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
     Frames pulseWidth = std::move(internal::Clip(PulseWidth(Orientation::GENOMIC).Data(), clipIndex, clipLength));
     string deletionTag = std::move(internal::Clip(DeletionTag(Orientation::GENOMIC), clipIndex, clipLength));
     string substitutionTag = std::move(internal::Clip(SubstitutionTag(Orientation::GENOMIC), clipIndex, clipLength));
-    string labelTag = std::move(internal::Clip(LabelTag(Orientation::GENOMIC), clipIndex, clipLength));
-    string altLabelTag = std::move(internal::Clip(AltLabelTag(Orientation::GENOMIC), clipIndex, clipLength));
+    string labelTag = LabelTag(Orientation::GENOMIC);
+    string altLabelTag = AltLabelTag(Orientation::GENOMIC);
     string pulseCall = std::move(PulseCall(Orientation::GENOMIC));
     std::vector<float> pkmean = std::move(Pkmean(Orientation::GENOMIC));
     std::vector<float> pkmid = std::move(Pkmid(Orientation::GENOMIC));
@@ -1009,6 +1002,28 @@ vector<float> BamRecord::FetchPhotons(const string& tagName,
     return photons;
 }
 
+QualityValues BamRecord::FetchQualitiesRaw(const string& tagName) const
+{
+    const Tag& qvsTag = impl_.TagValue(tagName);
+    return QualityValues::FromFastq(qvsTag.ToString());
+}
+
+QualityValues BamRecord::FetchQualities(const string& tagName,
+                                        const Orientation orientation) const
+{
+    const bool isBamQual = (tagName == internal::tagName_QUAL);
+    // fetch data
+    QualityValues quals = FetchQualitiesRaw(tagName);
+
+    // rev-comp
+    internal::MaybeReverseQuals(isBamQual,
+                                impl_.IsReverseStrand(),
+                                orientation,
+                                quals);
+
+    return quals;
+}
+
 QualityValues BamRecord::FetchQualities(const string& tagName,
                                         const Orientation orientation,
                                         const bool aligned,
@@ -1040,8 +1055,7 @@ QualityValues BamRecord::FetchQualities(const string& tagName,
     else {
 
         // fetch data
-        const Tag& qvsTag = impl_.TagValue(tagName);
-        QualityValues quals = std::move(QualityValues::FromFastq(qvsTag.ToString()));
+        QualityValues quals = FetchQualitiesRaw(tagName);
 
         // rev-comp
         internal::MaybeReverseQuals(isBamQual,
@@ -1283,13 +1297,10 @@ Frames BamRecord::PulseWidthRaw(Orientation orientation) const
 bool BamRecord::IsMapped(void) const
 { return impl_.IsMapped(); }
 
-QualityValues BamRecord::LabelQV(Orientation orientation, bool aligned,
-                                 bool exciseSoftClips) const
+QualityValues BamRecord::LabelQV(Orientation orientation) const
 {
     return FetchQualities(internal::tagName_labelQV,
-                          orientation,
-                          aligned,
-                          exciseSoftClips);
+                          orientation);
 }
 
 BamRecord& BamRecord::LabelQV(const QualityValues& labelQVs)
@@ -1298,14 +1309,9 @@ BamRecord& BamRecord::LabelQV(const QualityValues& labelQVs)
     return *this;
 }
 
-std::string BamRecord::LabelTag(Orientation orientation,
-                                bool aligned,
-                                bool exciseSoftClips) const
+std::string BamRecord::LabelTag(Orientation orientation) const
 {
-    return FetchBases(internal::tagName_labelTag,
-                      orientation,
-                      aligned,
-                      exciseSoftClips);
+    return FetchBases(internal::tagName_labelTag, orientation);
 }
 
 BamRecord& BamRecord::LabelTag(const std::string& tags)

@@ -283,35 +283,27 @@ public:
     /// \name Per-Base Data
     /// \{
 
-    /// \brief Fetch this record's AltLabelQV values ("lq" tag).
+    /// \brief Fetch this record's AltLabelQV values ("pv" tag).
     ///
     /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
     ///       QVs will have a value of 0.
     ///
     /// \param[in] orientation     Orientation of output.
-    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
-    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
     ///
     /// \returns AltLabelQV as QualityValues object
     ///
-    QualityValues AltLabelQV(Orientation orientation = Orientation::NATIVE,
-                                     bool aligned = false,
-                                     bool exciseSoftClips = false) const;
+    QualityValues AltLabelQV(Orientation orientation = Orientation::NATIVE) const;
 
-    /// \brief Fetch this record's AltLabelTag values ("at" tag).
+    /// \brief Fetch this record's AltLabelTag values ("pt" tag).
     ///
     /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
     ///       gap chars will be '-' and padding chars will be '*'.
     ///
     /// \param[in] orientation     Orientation of output.
-    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
-    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
     ///
     /// \returns AltLabelTags string
     ///
-    std::string AltLabelTag(Orientation orientation = Orientation::NATIVE,
-                            bool aligned = false,
-                            bool exciseSoftClips = false) const;
+    std::string AltLabelTag(Orientation orientation = Orientation::NATIVE) const;
 
     /// \brief Fetch this record's DeletionQV values ("dq" tag).
     ///
@@ -396,20 +388,16 @@ public:
     ///
     Frames IPDRaw(Orientation orientation = Orientation::NATIVE) const;
 
-    /// \brief Fetch this record's LabelQV values ("lq" tag).
+    /// \brief Fetch this record's LabelQV values ("pq" tag).
     ///
     /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
     ///       QVs will have a value of 0.
     ///
     /// \param[in] orientation     Orientation of output.
-    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
-    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
     ///
     /// \returns LabelQV as QualityValues object
     ///
-    QualityValues LabelQV(Orientation orientation = Orientation::NATIVE,
-                          bool aligned = false,
-                          bool exciseSoftClips = false) const;
+    QualityValues LabelQV(Orientation orientation = Orientation::NATIVE) const;
 
     /// \brief Fetch this record's LabelTag values ("lt" tag).
     ///
@@ -422,9 +410,7 @@ public:
     ///
     /// \returns LabelTags string
     ///
-    std::string LabelTag(Orientation orientation = Orientation::NATIVE,
-                         bool aligned = false,
-                         bool exciseSoftClips = false) const;
+    std::string LabelTag(Orientation orientation = Orientation::NATIVE) const;
 
     /// \brief Fetch this record's MergeQV values ("mq" tag).
     ///
@@ -643,13 +629,13 @@ public:
     /// \name Per-Base Data
     /// \{
 
-    /// Sets this record's AltLabelQV values ("lq" tag).
+    /// Sets this record's AltLabelQV values ("pv" tag).
     ///
     /// \param[in] altLabelQVs
     /// \returns reference to this record
     BamRecord& AltLabelQV(const QualityValues& altLabelQVs);
 
-    /// Sets this record's LabelQV values ("lq" tag).
+    /// Sets this record's LabelQV values ("pq" tag).
     ///
     /// \param[in] labelQVs
     /// \returns reference to this record
@@ -885,6 +871,11 @@ private:
                        const bool aligned,
                        const bool exciseSoftClips) const;
 
+    QualityValues FetchQualitiesRaw(const std::string& tagName) const;
+
+    QualityValues FetchQualities(const std::string& tagName,
+                                 const Orientation orientation) const;
+
     QualityValues FetchQualities(const std::string& tagName,
                                  const Orientation orientation,
                                  const bool aligned,
@@ -955,10 +946,10 @@ public:
 
 public:
     QualityValues AltLabelQVs(void) const
-    { return record_.AltLabelQV(orientation_, aligned_, exciseSoftClips_); }
+    { return record_.AltLabelQV(orientation_); }
 
     std::string AltLabelTags(void) const
-    { return record_.AltLabelTag(orientation_, aligned_, exciseSoftClips_); }
+    { return record_.AltLabelTag(orientation_); }
 
     QualityValues DeletionQVs(void) const
     { return record_.DeletionQV(orientation_, aligned_, exciseSoftClips_); }
@@ -976,10 +967,10 @@ public:
     { return record_.IPD(orientation_, aligned_, exciseSoftClips_); }
 
     QualityValues LabelQVs(void) const
-    { return record_.LabelQV(orientation_, aligned_, exciseSoftClips_); }
+    { return record_.LabelQV(orientation_); }
 
     std::string LabelTags(void) const
-    { return record_.LabelTag(orientation_, aligned_, exciseSoftClips_); }
+    { return record_.LabelTag(orientation_); }
 
     QualityValues MergeQVs(void) const
     { return record_.MergeQV(orientation_, aligned_, exciseSoftClips_); }
