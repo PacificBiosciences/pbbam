@@ -152,6 +152,9 @@ public:
     /// \returns true if this record has IPD data
     bool HasIPD(void) const;
 
+    /// \returns true if this record has PreBaseFrames aka IPD data
+    bool HasPreBaseFrames(void) const;
+
     /// \returns true if this record has PrePulseFrames data
     bool HasPrePulseFrames(void) const;
 
@@ -367,6 +370,21 @@ public:
     /// \returns IPD as Frames object
     ///
     Frames IPD(Orientation orientation = Orientation::NATIVE,
+               bool aligned = false,
+               bool exciseSoftClips = false) const;
+
+    /// \brief Fetch this record's PreBaseFrames aka IPD values ("ip" tag).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       frames will have a value of 0;
+    ///
+    /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
+    ///
+    /// \returns IPD as Frames object
+    ///
+    Frames PreBaseFrames(Orientation orientation = Orientation::NATIVE,
                bool aligned = false,
                bool exciseSoftClips = false) const;
 
@@ -687,6 +705,14 @@ public:
     BamRecord& IPD(const Frames& frames,
                    const FrameEncodingType encoding);
 
+    /// Sets this record's PreBaseFrames aka IPD values ("ip" tag).
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or 16-bit lossless)
+    /// \returns reference to this record
+    BamRecord& PreBaseFrames(const Frames& frames,
+                             const FrameEncodingType encoding);
+
     /// Sets this record's PrePulseFrames values ("pd" tag).
     ///
     /// \param[in] frames
@@ -944,6 +970,9 @@ public:
     { return record_.InsertionQV(orientation_, aligned_, exciseSoftClips_); }
 
     Frames IPD(void) const
+    { return record_.IPD(orientation_, aligned_, exciseSoftClips_); }
+
+    Frames PrebaseFrames(void) const
     { return record_.IPD(orientation_, aligned_, exciseSoftClips_); }
 
     QualityValues LabelQVs(void) const

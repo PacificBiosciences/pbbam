@@ -1086,6 +1086,9 @@ bool BamRecord::HasHoleNumber(void) const
 bool BamRecord::HasInsertionQV(void) const
 { return impl_.HasTag(internal::tagName_insertionQV); }
 
+bool BamRecord::HasPreBaseFrames(void) const
+{ return HasIPD(); }
+
 bool BamRecord::HasIPD(void) const
 { return impl_.HasTag(internal::tagName_ipd); }
 
@@ -1205,6 +1208,15 @@ BamRecord& BamRecord::IPD(const Frames& frames,
         internal::CreateOrEdit(internal::tagName_ipd, frames.Data(), &impl_);
     return *this;
 }
+
+Frames BamRecord::PreBaseFrames(Orientation orientation, 
+                                bool aligned,
+                                bool exciseSoftClips) const
+{ return IPD(orientation,aligned,exciseSoftClips); }
+
+BamRecord& BamRecord::PreBaseFrames(const Frames& frames,
+                                    const FrameEncodingType encoding)
+{ return IPD(frames, encoding); }
 
 Frames BamRecord::IPDRaw(Orientation orientation) const
 {
