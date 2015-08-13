@@ -23,8 +23,11 @@ set(PacBioBAM_DependencyLibraries
 )
 
 # set up library include dirs
-include_directories(
+include_directories(SYSTEM
     ${PacBioBAM_DependencyIncludes}
+)
+
+include_directories(
     ${PacBioBAM_IncludeDir}
 )
 
