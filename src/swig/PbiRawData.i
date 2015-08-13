@@ -24,4 +24,6 @@ using namespace PacBio::BAM;
 %ignore PacBio::BAM::PbiRawSubreadData::operator=;
 %ignore PacBio::BAM::PbiRawData::operator=;
 
+HANDLE_STD_EXCEPTION(PacBio::BAM::PbiRawMappedData::AddRecord);
+
 %include <pbbam/PbiRawData.h>

@@ -15,6 +15,8 @@ using namespace PacBio::BAM;
 %ignore PacBio::BAM::CigarOperation::CigarOperation(CigarOperationType, uint32_t);
 #endif
 
+HANDLE_STD_EXCEPTION(CigarOperation);
+
 %include <pbbam/CigarOperation.h>
 
 // enums aren't always named consistently (at least between Mac/clang/swig & Linux/gcc/swig)

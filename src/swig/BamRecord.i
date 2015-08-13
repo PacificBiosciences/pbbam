@@ -28,4 +28,6 @@ using namespace PacBio::BAM;
 %rename("EncodedPkmid")  PacBio::BAM::BamRecord::Pkmid(const std::vector<uint16_t>&);
 #endif // SWIGR
 
+HANDLE_STD_EXCEPTION(CigarData);
+
 %include <pbbam/BamRecord.h>
