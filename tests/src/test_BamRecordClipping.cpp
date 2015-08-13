@@ -74,7 +74,6 @@ BamRecord MakeRecord(const Position qStart,
     tags["pw"] = frames;
     tags["dt"] = tagBases;
     tags["st"] = tagBases;
-    tags["lt"] = tagBases;
     tags["pt"] = tagBases;
     tags["dq"] = tagQuals;
     tags["iq"] = tagQuals;
@@ -82,6 +81,7 @@ BamRecord MakeRecord(const Position qStart,
     tags["sq"] = tagQuals;
     tags["pq"] = tagQuals;
     tags["pv"] = tagQuals;
+    tags["pg"] = tagQuals;
     tags["pc"] = pulseCall;
     impl.Tags(tags);
 

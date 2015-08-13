@@ -164,6 +164,9 @@ public:
     /// \returns true if this record has MergeQV data
     bool HasMergeQV(void) const;
 
+    /// \returns true if this record has PulseMergeQV data
+    bool HasPulseMergeQV(void) const;
+
     /// \returns true if this record has PulseWidth data
     bool HasPulseWidth(void) const;
 
@@ -410,6 +413,19 @@ public:
     QualityValues MergeQV(Orientation orientation = Orientation::NATIVE,
                           bool aligned = false,
                           bool exciseSoftClips = false) const;
+
+    /// \brief Fetch this record's PulseMergeQV values ("pg" tag).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       QVs will have a value of 0.
+    ///
+    /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
+    ///
+    /// \returns PulseMergeQV as QualityValues object
+    ///
+    QualityValues PulseMergeQV(Orientation orientation = Orientation::NATIVE) const;
 
     /// \brief Fetch this record's Pkmean values ("pa" tag).
     ///
@@ -705,6 +721,12 @@ public:
     /// \returns reference to this record
     BamRecord& MergeQV(const QualityValues& mergeQVs);
 
+    /// Sets this record's PulseMergeQV values ("pg" tag).
+    ///
+    /// \param[in] pulseMergeQVs
+    /// \returns reference to this record
+    BamRecord& PulseMergeQV(const QualityValues& pulseMergeQVs);
+
     /// Sets this record's PulseWidth values ("pw" tag).
     ///
     /// \param[in] frames
@@ -949,6 +971,9 @@ public:
 
     QualityValues MergeQVs(void) const
     { return record_.MergeQV(orientation_, aligned_, exciseSoftClips_); }
+
+    QualityValues PulseMergeQVs(void) const
+    { return record_.PulseMergeQV(orientation_); }
 
     std::vector<float> Pkmean(void) const
     { return record_.Pkmean(orientation_); }

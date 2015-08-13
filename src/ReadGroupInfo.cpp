@@ -73,9 +73,13 @@ static const string feature_PW = string("PulseWidth");
 static const string feature_PM = string("PkMid");
 static const string feature_PA = string("PkMean");
 static const string feature_LT = string("Label");
-static const string feature_LQ = string("LabelQV");
-static const string feature_AT = string("AltLabel");
-static const string feature_AQ = string("AltLabelQV");
+static const string feature_PQ = string("LabelQV");
+static const string feature_PT = string("AltLabel");
+static const string feature_PV = string("AltLabelQV");
+static const string feature_PG = string("PulseMergeQV");
+static const string feature_PC = string("PulseCall");
+static const string feature_PD = string("PrePulseFrames");
+static const string feature_PX = string("PulseCallWidth");
 
 static const string token_RT = string("READTYPE");
 static const string token_BK = string("BINDINGKIT");
@@ -101,10 +105,13 @@ string BaseFeatureName(const BaseFeature& feature)
         case BaseFeature::PULSE_WIDTH      : return feature_PW;
         case BaseFeature::PKMID            : return feature_PM;
         case BaseFeature::PKMEAN           : return feature_PA;
-        case BaseFeature::LABEL            : return feature_LT;
-        case BaseFeature::LABEL_QV         : return feature_LQ;
-        case BaseFeature::ALT_LABEL        : return feature_AT;
-        case BaseFeature::ALT_LABEL_QV     : return feature_AQ;
+        case BaseFeature::LABEL_QV         : return feature_PQ;
+        case BaseFeature::ALT_LABEL        : return feature_PT;
+        case BaseFeature::ALT_LABEL_QV     : return feature_PV;
+        case BaseFeature::PULSE_MERGE_QV   : return feature_PG;
+        case BaseFeature::PULSE_CALL       : return feature_PC;
+        case BaseFeature::PRE_PULSE_FRAMES : return feature_PD;
+        case BaseFeature::PULSE_CALL_WIDTH : return feature_PX;
         default:
             throw std::runtime_error("unrecognized base feature");
     }
@@ -140,10 +147,13 @@ void InitNameToFeature(void)
         nameToFeature[feature_PW] = BaseFeature::PULSE_WIDTH;
         nameToFeature[feature_PM] = BaseFeature::PKMID;
         nameToFeature[feature_PA] = BaseFeature::PKMEAN;
-        nameToFeature[feature_LT] = BaseFeature::LABEL;
-        nameToFeature[feature_LQ] = BaseFeature::LABEL_QV;
-        nameToFeature[feature_AT] = BaseFeature::ALT_LABEL;
-        nameToFeature[feature_AQ] = BaseFeature::ALT_LABEL_QV;
+        nameToFeature[feature_PQ] = BaseFeature::LABEL_QV;
+        nameToFeature[feature_PT] = BaseFeature::ALT_LABEL;
+        nameToFeature[feature_PV] = BaseFeature::ALT_LABEL_QV;
+        nameToFeature[feature_PC] = BaseFeature::PULSE_CALL;
+        nameToFeature[feature_PG] = BaseFeature::PULSE_MERGE_QV;
+        nameToFeature[feature_PD] = BaseFeature::PRE_PULSE_FRAMES;
+        nameToFeature[feature_PX] = BaseFeature::PULSE_CALL_WIDTH;
     }
 }
 

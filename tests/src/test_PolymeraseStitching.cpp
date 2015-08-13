@@ -57,29 +57,6 @@ using namespace PacBio::BAM;
 
 void Compare(const BamRecord& b1, const BamRecord& b2)
 {
-    EXPECT_EQ(b1.FullName(),        b2.FullName());
-	EXPECT_EQ(b1.HoleNumber(), 		b2.HoleNumber());
-	EXPECT_EQ(b1.NumPasses(), 		b2.NumPasses());
-	EXPECT_EQ(b1.Sequence(), 		b2.Sequence());
-	EXPECT_EQ(b1.Qualities(), 		b2.Qualities());
-	EXPECT_EQ(b1.DeletionQV(), 		b2.DeletionQV());
-	EXPECT_EQ(b1.DeletionTag(), 	b2.DeletionTag());
-	EXPECT_EQ(b1.InsertionQV(), 	b2.InsertionQV());
-	EXPECT_EQ(b1.MergeQV(), 		b2.MergeQV());
-	EXPECT_EQ(b1.SubstitutionQV(),  b2.SubstitutionQV());
-    EXPECT_EQ(b1.SubstitutionTag(), b2.SubstitutionTag());
-    EXPECT_EQ(b1.LabelQV(),         b2.LabelQV());
-    EXPECT_EQ(b1.AltLabelQV(),      b2.AltLabelQV());
-    EXPECT_EQ(b1.AltLabelTag(),     b2.AltLabelTag());
-    EXPECT_EQ(b1.Pkmean(),          b2.Pkmean());
-    EXPECT_EQ(b1.Pkmid(),           b2.Pkmid());
-	EXPECT_EQ(b1.PulseCall(),       b2.PulseCall());
-	EXPECT_EQ(b1.IPD(),             b2.IPD());
-	EXPECT_EQ(b1.PulseWidth(),      b2.PulseWidth());
-    EXPECT_EQ(b1.PrePulseFrames(),  b2.PrePulseFrames());
-    EXPECT_EQ(b1.PulseCallWidth(),  b2.PulseCallWidth());
-    EXPECT_EQ(b1.ReadGroup(),       b2.ReadGroup());
-
     EXPECT_TRUE(b1.HasDeletionQV());
     EXPECT_TRUE(b1.HasDeletionTag());
     EXPECT_TRUE(b1.HasInsertionQV());
@@ -96,6 +73,7 @@ void Compare(const BamRecord& b1, const BamRecord& b2)
     EXPECT_TRUE(b1.HasPulseWidth());
     EXPECT_TRUE(b1.HasPrePulseFrames());
     EXPECT_TRUE(b1.HasPulseCallWidth());
+    EXPECT_TRUE(b1.HasPulseMergeQV());
 
     EXPECT_TRUE(b2.HasDeletionQV());
     EXPECT_TRUE(b2.HasDeletionTag());
@@ -113,6 +91,31 @@ void Compare(const BamRecord& b1, const BamRecord& b2)
     EXPECT_TRUE(b2.HasPulseWidth());
     EXPECT_TRUE(b2.HasPrePulseFrames());
     EXPECT_TRUE(b2.HasPulseCallWidth());
+    EXPECT_TRUE(b2.HasPulseMergeQV());
+
+    EXPECT_EQ(b1.FullName(),        b2.FullName());
+    EXPECT_EQ(b1.HoleNumber(),      b2.HoleNumber());
+    EXPECT_EQ(b1.NumPasses(),       b2.NumPasses());
+    EXPECT_EQ(b1.Sequence(),        b2.Sequence());
+    EXPECT_EQ(b1.Qualities(),       b2.Qualities());
+    EXPECT_EQ(b1.DeletionQV(),      b2.DeletionQV());
+    EXPECT_EQ(b1.DeletionTag(),     b2.DeletionTag());
+    EXPECT_EQ(b1.InsertionQV(),     b2.InsertionQV());
+    EXPECT_EQ(b1.MergeQV(),         b2.MergeQV());
+    EXPECT_EQ(b1.SubstitutionQV(),  b2.SubstitutionQV());
+    EXPECT_EQ(b1.SubstitutionTag(), b2.SubstitutionTag());
+    EXPECT_EQ(b1.LabelQV(),         b2.LabelQV());
+    EXPECT_EQ(b1.AltLabelQV(),      b2.AltLabelQV());
+    EXPECT_EQ(b1.AltLabelTag(),     b2.AltLabelTag());
+    EXPECT_EQ(b1.Pkmean(),          b2.Pkmean());
+    EXPECT_EQ(b1.Pkmid(),           b2.Pkmid());
+    EXPECT_EQ(b1.PulseCall(),       b2.PulseCall());
+    EXPECT_EQ(b1.IPD(),             b2.IPD());
+    EXPECT_EQ(b1.PulseWidth(),      b2.PulseWidth());
+    EXPECT_EQ(b1.PrePulseFrames(),  b2.PrePulseFrames());
+    EXPECT_EQ(b1.PulseCallWidth(),  b2.PulseCallWidth());
+    EXPECT_EQ(b1.ReadGroup(),       b2.ReadGroup());
+    EXPECT_EQ(b1.PulseMergeQV(),    b2.PulseMergeQV());
 }
 
 TEST(VirtualPolymeraseReader, InternalSubreadsToOriginal)

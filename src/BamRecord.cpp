@@ -80,6 +80,7 @@ static const string tagName_alternative_labelTag    = "pt";
 static const string tagName_pulse_call              = "pc";
 static const string tagName_scrap_type              = "sc";
 static const string tagName_barcodes                = "bc";
+static const string tagName_pulseMergeQV            = "pg";
 
 // faux (helper) tag names
 static const string tagName_QUAL = "QUAL";
@@ -729,6 +730,7 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
     QualityValues deletionQV = std::move(internal::Clip(DeletionQV(Orientation::GENOMIC), clipIndex, clipLength));
     QualityValues insertionQV = std::move(internal::Clip(InsertionQV(Orientation::GENOMIC), clipIndex, clipLength));
     QualityValues mergeQV = std::move(internal::Clip(MergeQV(Orientation::GENOMIC), clipIndex, clipLength));
+    QualityValues pulseMergeQV = std::move(PulseMergeQV(Orientation::GENOMIC));
     QualityValues substitutionQV = std::move(internal::Clip(SubstitutionQV(Orientation::GENOMIC), clipIndex, clipLength));
     Frames ipd = std::move(internal::Clip(IPD(Orientation::GENOMIC).Data(), clipIndex, clipLength));
     Frames pulseWidth = std::move(internal::Clip(PulseWidth(Orientation::GENOMIC).Data(), clipIndex, clipLength));
@@ -748,6 +750,7 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
         internal::Reverse(deletionQV);
         internal::Reverse(insertionQV);
         internal::Reverse(mergeQV);
+        internal::Reverse(pulseMergeQV);
         internal::Reverse(substitutionQV);
         internal::Reverse(ipd);
         internal::Reverse(pulseWidth);
@@ -768,6 +771,7 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
     tags[internal::tagName_deletionQV]          = deletionQV.Fastq();
     tags[internal::tagName_insertionQV]         = insertionQV.Fastq();
     tags[internal::tagName_mergeQV]             = mergeQV.Fastq();
+    tags[internal::tagName_pulseMergeQV]        = pulseMergeQV.Fastq();
     tags[internal::tagName_substitutionQV]      = substitutionQV.Fastq();
     tags[internal::tagName_ipd]                 = ipd.Data();
     tags[internal::tagName_pulseWidth]          = pulseWidth.Data();
@@ -1108,6 +1112,9 @@ bool BamRecord::HasLocalContextFlags(void) const
 bool BamRecord::HasMergeQV(void) const
 { return impl_.HasTag(internal::tagName_mergeQV); }
 
+bool BamRecord::HasPulseMergeQV(void) const
+{ return impl_.HasTag(internal::tagName_pulseMergeQV); }
+
 bool BamRecord::HasPkmean(void) const
 { return impl_.HasTag(internal::tagName_pkmean); }
 
@@ -1368,6 +1375,17 @@ QualityValues BamRecord::MergeQV(Orientation orientation,
 BamRecord& BamRecord::MergeQV(const QualityValues& mergeQVs)
 {
     internal::CreateOrEdit(internal::tagName_mergeQV, mergeQVs.Fastq(), &impl_);
+    return *this;
+}
+
+QualityValues BamRecord::PulseMergeQV(Orientation orientation) const
+{
+    return FetchQualities(internal::tagName_pulseMergeQV, orientation);
+}
+
+BamRecord& BamRecord::PulseMergeQV(const QualityValues& mergeQVs)
+{
+    internal::CreateOrEdit(internal::tagName_pulseMergeQV, mergeQVs.Fastq(), &impl_);
     return *this;
 }
 

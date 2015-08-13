@@ -78,6 +78,7 @@ void VirtualPolymeraseBamRecord::StitchSources()
     QualityValues deletionQv;
     QualityValues insertionQv;
     QualityValues mergeQv;
+    QualityValues pulseMergeQv;
     QualityValues substitutionQv;
     QualityValues labelQv;
     QualityValues alternativeLabelQv;
@@ -110,6 +111,9 @@ void VirtualPolymeraseBamRecord::StitchSources()
 
         if (b.HasMergeQV())
             MoveAppend(std::move(b.MergeQV()), mergeQv);
+
+        if (b.HasPulseMergeQV())
+            MoveAppend(std::move(b.PulseMergeQV()), pulseMergeQv);
 
         if (b.HasSubstitutionQV())
             MoveAppend(std::move(b.SubstitutionQV()), substitutionQv);
@@ -219,6 +223,8 @@ void VirtualPolymeraseBamRecord::StitchSources()
         this->InsertionQV(insertionQv);
     if (!mergeQv.empty())
         this->MergeQV(mergeQv);
+    if (!pulseMergeQv.empty())
+        this->PulseMergeQV(pulseMergeQv);
     if (!substitutionQv.empty())
         this->SubstitutionQV(substitutionQv);
     if (!labelQv.empty())

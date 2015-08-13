@@ -61,6 +61,10 @@ enum class BaseFeature
   , LABEL_QV
   , ALT_LABEL
   , ALT_LABEL_QV
+  , PULSE_MERGE_QV
+  , PULSE_CALL
+  , PRE_PULSE_FRAMES
+  , PULSE_CALL_WIDTH
 };
 
 enum class FrameCodec
