@@ -41,6 +41,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctype.h>
+#include <stdexcept>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;

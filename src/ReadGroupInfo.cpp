@@ -41,6 +41,7 @@
 #include <cstdio>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
