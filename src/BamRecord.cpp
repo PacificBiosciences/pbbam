@@ -54,33 +54,34 @@ namespace BAM {
 namespace internal {
 
 // BAM record tag names
-static const string tagName_readAccuracy            = "rq";
-static const string tagName_holeNumber              = "zm";
-static const string tagName_numPasses               = "np";
+static const string tagName_alternative_labelQV     = "pv";
+static const string tagName_alternative_labelTag    = "pt";
+static const string tagName_barcodes                = "bc";
+static const string tagName_barcode_quality        = "bq";
 static const string tagName_contextFlags            = "cx";
-static const string tagName_snr                     = "sn";
+static const string tagName_holeNumber              = "zm";
 static const string tagName_deletionQV              = "dq";
 static const string tagName_deletionTag             = "dt";
 static const string tagName_insertionQV             = "iq";
 static const string tagName_ipd                     = "ip";
+static const string tagName_labelQV                 = "pq";
 static const string tagName_mergeQV                 = "mq";
-static const string tagName_pulseWidth              = "pw";
-static const string tagName_readGroup               = "RG";
-static const string tagName_queryStart              = "qs";
-static const string tagName_queryEnd                = "qe";
-static const string tagName_substitutionQV          = "sq";
-static const string tagName_substitutionTag         = "st";
+static const string tagName_numPasses               = "np";
 static const string tagName_pkmean                  = "pa";
 static const string tagName_pkmid                   = "pm";
 static const string tagName_pre_pulse_frames        = "pd";
-static const string tagName_pulse_call_width        = "px";
-static const string tagName_labelQV                 = "pq";
-static const string tagName_alternative_labelQV     = "pv";
-static const string tagName_alternative_labelTag    = "pt";
 static const string tagName_pulse_call              = "pc";
-static const string tagName_scrap_type              = "sc";
-static const string tagName_barcodes                = "bc";
+static const string tagName_pulse_call_width        = "px";
 static const string tagName_pulseMergeQV            = "pg";
+static const string tagName_pulseWidth              = "pw";
+static const string tagName_queryStart              = "qs";
+static const string tagName_queryEnd                = "qe";
+static const string tagName_readAccuracy            = "rq";
+static const string tagName_readGroup               = "RG";
+static const string tagName_scrap_type              = "sc";
+static const string tagName_snr                     = "sn";
+static const string tagName_substitutionQV          = "sq";
+static const string tagName_substitutionTag         = "st";
 
 // faux (helper) tag names
 static const string tagName_QUAL = "QUAL";
@@ -507,6 +508,20 @@ BamRecord& BamRecord::AltLabelTag(const std::string& tags)
     return *this;
 }
 
+uint8_t BamRecord::BarcodeQuality(void) const
+{
+    const Tag& bq = impl_.TagValue(internal::tagName_barcode_quality);
+    if (bq.IsNull())
+        return 0; // ?? "missing" value for tags ?? should we consider boost::optional<T> for these kind of guys ??
+    return bq.ToUInt8();
+}
+
+BamRecord& BamRecord::BarcodeQuality(const uint8_t quality)
+{
+    internal::CreateOrEdit(internal::tagName_barcode_quality, quality, &impl_);
+    return *this;
+}
+
 std::pair<int,int> BamRecord::Barcodes(void) const
 {
     const Tag& bc = impl_.TagValue(internal::tagName_barcodes);
@@ -521,6 +536,13 @@ std::pair<int,int> BamRecord::Barcodes(void) const
         throw std::runtime_error("Barcode array is not of size 2");
 
     return std::make_pair(bcArray[0], bcArray[1]);
+}
+
+BamRecord& BamRecord::Barcodes(const std::pair<int, int>& barcodeIds)
+{
+    const vector<uint16_t> data({static_cast<uint16_t>(barcodeIds.first), static_cast<uint16_t>(barcodeIds.second)});
+    internal::CreateOrEdit(internal::tagName_barcodes, data, &impl_);
+    return *this;
 }
 
 void BamRecord::CalculateAlignedPositions(void) const
@@ -1082,6 +1104,9 @@ bool BamRecord::HasAltLabelTag(void) const
 
 bool BamRecord::HasBarcodes(void) const
 { return impl_.HasTag(internal::tagName_barcodes); }
+
+bool BamRecord::HasBarcodeQuality(void) const
+{ return impl_.HasTag(internal::tagName_barcode_quality); }
 
 bool BamRecord::HasLabelQV(void) const
 { return impl_.HasTag(internal::tagName_labelQV); }

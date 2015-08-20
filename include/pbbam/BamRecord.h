@@ -105,18 +105,24 @@ public:
     /// \name Per-Record Data
     /// \{
 
-    /// \note AlignedStart is in polymerase read coordinates, NOT genomic coordinates.
-    ///
-    /// \returns the record's aligned start position
-    Position AlignedStart(void) const;
-
     /// \note AlignedEnd is in polymerase read coordinates, NOT genomic coordinates.
     ///
     /// \returns the record's aligned end position
     Position AlignedEnd(void) const;
 
+    /// \note AlignedStart is in polymerase read coordinates, NOT genomic coordinates.
+    ///
+    /// \returns the record's aligned start position
+    Position AlignedStart(void) const;
+
     /// \returns the record's strand as a Strand enum value
     Strand AlignedStrand(void) const;
+
+    /// \returns barcode call confidence (Phred-scaled posterior probability that barcode call)
+    uint8_t BarcodeQuality(void) const;
+
+    /// \returns the left and right barcode ids
+    std::pair<int,int> Barcodes(void) const;
 
     /// \returns the record's CIGAR data as a Cigar object
     Cigar CigarData(void) const;
@@ -128,8 +134,14 @@ public:
     /// \returns true if this record has AltLabelQV data
     bool HasAltLabelQV(void) const;
 
-    /// \returns true if this record has LabelQV data
-    bool HasLabelQV(void) const;
+    /// \returns true if this record has AltLabelTag data
+    bool HasAltLabelTag(void) const;
+
+    /// \returns true if this record has Barcode data
+    bool HasBarcodes(void) const;
+
+    /// \returns true is this record has BarcodeQuality data
+    bool HasBarcodeQuality(void) const;
 
     /// \returns true if this record has DeletionQV data
     bool HasDeletionQV(void) const;
@@ -137,11 +149,23 @@ public:
     /// \returns true if this record has DeletionTag data
     bool HasDeletionTag(void) const;
 
-    /// \returns true if this record has LocalContextFlags (absent in CCS)
-    bool HasLocalContextFlags(void) const;
+    /// \returns true if this record has a HoleNumber
+    bool HasHoleNumber(void) const;
 
     /// \returns true if this record has InsertionQV data
     bool HasInsertionQV(void) const;
+
+    /// \returns true if this record has IPD data
+    bool HasIPD(void) const;
+
+    /// \returns true if this record has LabelQV data
+    bool HasLabelQV(void) const;
+
+    /// \returns true if this record has LocalContextFlags (absent in CCS)
+    bool HasLocalContextFlags(void) const;
+
+    /// \returns true if this record has MergeQV data
+    bool HasMergeQV(void) const;
 
     /// \returns true if this record has Pkmean data
     bool HasPkmean(void) const;
@@ -149,20 +173,17 @@ public:
     /// \returns true if this record has Pkmid data
     bool HasPkmid(void) const;
 
-    /// \returns true if this record has IPD data
-    bool HasIPD(void) const;
-
     /// \returns true if this record has PreBaseFrames aka IPD data
     bool HasPreBaseFrames(void) const;
 
     /// \returns true if this record has PrePulseFrames data
     bool HasPrePulseFrames(void) const;
 
+    /// \returns true if this record has PulseCall data
+    bool HasPulseCall(void) const;
+
     /// \returns true if this record has PulseCallWidth data
     bool HasPulseCallWidth(void) const;
-
-    /// \returns true if this record has MergeQV data
-    bool HasMergeQV(void) const;
 
     /// \returns true if this record has PulseMergeQV data
     bool HasPulseMergeQV(void) const;
@@ -170,38 +191,26 @@ public:
     /// \returns true if this record has PulseWidth data
     bool HasPulseWidth(void) const;
 
-    /// \returns true if this record has signal-to-noise data (absent in POLYMERASE)
-    bool HasSignalToNoise(void) const;
+    /// \returns true if this record has ReadAccuracyTag data
+    bool HasReadAccuracy(void) const;
+
+    /// \returns true if this record has QueryEnd data
+    bool HasQueryEnd(void) const;
+
+    /// \returns true if this record has QueryStart data
+    bool HasQueryStart(void) const;
 
     /// \returns true if this record has ScrapType data (only in SCRAP)
     bool HasScrapType(void) const;
+
+    /// \returns true if this record has signal-to-noise data (absent in POLYMERASE)
+    bool HasSignalToNoise(void) const;
 
     /// \returns true if this record has SubstitutionQV data
     bool HasSubstitutionQV(void) const;
 
     /// \returns true if this record has SubstitutionTag data
     bool HasSubstitutionTag(void) const;
-
-    /// \returns true if this record has AltLabelTag data
-    bool HasAltLabelTag(void) const;
-
-    /// \returns true if this record has PulseCall data
-    bool HasPulseCall(void) const;
-
-    /// \returns true if this record has ReadAccuracyTag data
-    bool HasReadAccuracy(void) const;
-
-    /// \returns true if this record has a HoleNumber
-    bool HasHoleNumber(void) const;
-
-    /// \returns true if this record has QueryStart data
-    bool HasQueryStart(void) const;
-
-    /// \returns true if this record has QueryEnd data
-    bool HasQueryEnd(void) const;
-
-    /// \returns true if this record has Barcode data
-    bool HasBarcodes(void) const;
 
     /// \returns shared pointer to this record's associated BamHeader
     BamHeader Header(void) const;
@@ -226,18 +235,15 @@ public:
     /// \returns "number of complete passes of the insert"
     int32_t NumPasses(void) const;
 
-    /// \note QueryStart is in polymerase read coordinates, NOT genomic coordinates.
-    ///
-    /// \returns the record's query start position, or 0 if not stored
-    Position QueryStart(void) const;
-
     /// \note QueryEnd is in polymerase read coordinates, NOT genomic coordinates.
     ///
     /// \returns the record's query end position, or Sequence().length() if not stored
     Position QueryEnd(void) const;
 
-    /// \returns the left and right barcode ids
-    std::pair<int,int> Barcodes(void) const;
+    /// \note QueryStart is in polymerase read coordinates, NOT genomic coordinates.
+    ///
+    /// \returns the record's query start position, or 0 if not stored
+    Position QueryStart(void) const;
 
     /// \returns this record's expected read accuracy [0, 1000]
     Accuracy ReadAccuracy(void) const;
@@ -257,15 +263,15 @@ public:
     /// \throws an exception if unmapped record.
     std::string ReferenceName(void) const;
 
-    /// \note ReferenceStart is in reference coordinates, NOT polymerase read coordinates.
-    ///
-    /// \returns the record's reference start position, or UnmappedPosition if unmapped
-    Position ReferenceStart(void) const;
-
     /// \note ReferenceEnd is in reference coordinates, NOT polymerase read coordinates.
     ///
     /// \returns the record's reference end position, or UnmappedPosition if unmapped
     Position ReferenceEnd(void) const;
+
+    /// \note ReferenceStart is in reference coordinates, NOT polymerase read coordinates.
+    ///
+    /// \returns the record's reference start position, or UnmappedPosition if unmapped
+    Position ReferenceStart(void) const;
 
     /// \returns this scrap record's ScrapType
     VirtualRegionType ScrapType(void) const;
@@ -365,21 +371,6 @@ public:
                bool aligned = false,
                bool exciseSoftClips = false) const;
 
-    /// \brief Fetch this record's PreBaseFrames aka IPD values ("ip" tag).
-    ///
-    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
-    ///       frames will have a value of 0;
-    ///
-    /// \param[in] orientation     Orientation of output.
-    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
-    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
-    ///
-    /// \returns IPD as Frames object
-    ///
-    Frames PreBaseFrames(Orientation orientation = Orientation::NATIVE,
-               bool aligned = false,
-               bool exciseSoftClips = false) const;
-
     /// \brief Fetch this record's IPD values ("ip" tag), but does not upscale.
     ///
     /// \param[in] orientation     Orientation of output.
@@ -414,19 +405,6 @@ public:
                           bool aligned = false,
                           bool exciseSoftClips = false) const;
 
-    /// \brief Fetch this record's PulseMergeQV values ("pg" tag).
-    ///
-    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
-    ///       QVs will have a value of 0.
-    ///
-    /// \param[in] orientation     Orientation of output.
-    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
-    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
-    ///
-    /// \returns PulseMergeQV as QualityValues object
-    ///
-    QualityValues PulseMergeQV(Orientation orientation = Orientation::NATIVE) const;
-
     /// \brief Fetch this record's Pkmean values ("pa" tag).
     ///
     /// \param[in] orientation     Orientation of output.
@@ -442,6 +420,21 @@ public:
     /// \returns Pkmid as vector<float> object
     ///
     std::vector<float> Pkmid(Orientation orientation = Orientation::NATIVE) const;
+
+    /// \brief Fetch this record's PreBaseFrames aka IPD values ("ip" tag).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       frames will have a value of 0;
+    ///
+    /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
+    ///
+    /// \returns IPD as Frames object
+    ///
+    Frames PreBaseFrames(Orientation orientation = Orientation::NATIVE,
+                         bool aligned = false,
+                         bool exciseSoftClips = false) const;
 
     /// \brief Fetch this record's PrePulseFrames values ("pd" tag).
     ///
@@ -472,6 +465,19 @@ public:
     /// \returns PulseCallWidth as Frames object
     ///
     Frames PulseCallWidth(Orientation orientation = Orientation::NATIVE) const;
+
+    /// \brief Fetch this record's PulseMergeQV values ("pg" tag).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
+    ///       QVs will have a value of 0.
+    ///
+    /// \param[in] orientation     Orientation of output.
+    /// \param[in] aligned         if true, gaps/padding will be inserted, per Cigar info.
+    /// \param[in] exciseSoftClips if true, any soft-clipped positions will be removed from query ends
+    ///
+    /// \returns PulseMergeQV as QualityValues object
+    ///
+    QualityValues PulseMergeQV(Orientation orientation = Orientation::NATIVE) const;
 
     /// \brief Fetch this record's PulseWidth values ("pw" tag).
     ///
@@ -566,12 +572,14 @@ public:
     ///          Direct access to the internal object is likely to disappear as BamRecord interface matures.
     ///
     /// \returns const reference to underlying BamRecordImpl object
+    ///
     const BamRecordImpl& Impl(void) const;
 
     /// \warning This method should be considered temporary and avoided as much as possible.
     ///          Direct access to the internal object is likely to disappear as BamRecord interface matures.
     ///
     /// \returns reference to underlying BamRecordImpl object
+    ///
     BamRecordImpl& Impl(void);
 
     /// \}
@@ -580,6 +588,18 @@ public:
     /// \name Per-Record Data
     /// \{
     ///
+
+    /// Sets this record's barcode IDs ('bc' tag)
+    ///
+    /// \param[in] barcodeIds
+    /// \returns reference to this record
+    BamRecord& Barcodes(const std::pair<int,int>& barcodeIds);
+
+    /// Sets this record's barcode quality ('bq' tag)
+    ///
+    /// \param[in] quality Phred-scaled confidence call
+    /// \returns reference to this record
+    BamRecord& BarcodeQuality(const uint8_t quality);
 
     /// Sets this record's ZMW hole number.
     ///
@@ -599,17 +619,39 @@ public:
     /// \returns reference to this record
     BamRecord& NumPasses(const int32_t numPasses);
 
+    /// Sets this record's query end position.
+    ///
+    /// \note Changing this will modify the name of non-CCS records.
+    ///
+    /// \param[in] pos
+    /// \returns reference to this record
+    BamRecord& QueryEnd(const PacBio::BAM::Position pos);
+
+    /// Sets this record's query start position.
+    ///
+    /// \note Changing this will modify the name of non-CCS records.
+    ///
+    /// \param[in] pos
+    /// \returns reference to this record
+    BamRecord& QueryStart(const PacBio::BAM::Position pos);
+
     /// Sets this record's expected read accuracy [0, 1000]
     ///
     /// \param[in] accuracy
     /// \returns reference to this record
     BamRecord& ReadAccuracy(const Accuracy& accuracy);
 
-    /// Sets this record's average signal-to-noise in each of A, C, G, and T
+    /// Attaches this record to the provided read group, changing the record name & 'RG' tag.
     ///
-    /// \param[in] average signal-to-noise of A, C, G, and T (in this order)
+    /// \param[in] rg
     /// \returns reference to this record
-    BamRecord& SignalToNoise(const std::vector<float>& snr);
+    BamRecord& ReadGroup(const ReadGroupInfo& rg);
+
+    /// Attaches this record to the provided read group, changing the record name & 'RG' tag.
+    ///
+    /// \param[in] rg
+    /// \returns reference to this record
+    BamRecord& ReadGroupId(const std::string& id);
 
     /// Sets this scrap record's ScrapType
     ///
@@ -623,6 +665,12 @@ public:
     /// \returns reference to this record
     BamRecord& ScrapType(const char type);
 
+    /// Sets this record's average signal-to-noise in each of A, C, G, and T
+    ///
+    /// \param[in] average signal-to-noise of A, C, G, and T (in this order)
+    /// \returns reference to this record
+    BamRecord& SignalToNoise(const std::vector<float>& snr);
+
     /// \}
 
 public:
@@ -634,6 +682,12 @@ public:
     /// \param[in] altLabelQVs
     /// \returns reference to this record
     BamRecord& AltLabelQV(const QualityValues& altLabelQVs);
+
+    /// Sets this record's AltLabelTag values ("at" tag).
+    ///
+    /// \param[in] tags
+    /// \returns reference to this record
+    BamRecord& AltLabelTag(const std::string& tags);
 
     /// Sets this record's LabelQV values ("pq" tag).
     ///
@@ -659,17 +713,19 @@ public:
     /// \returns reference to this record
     BamRecord& InsertionQV(const QualityValues& insertionQVs);
 
-    /// Sets this record's Pkmid values ("pa" tag).
+    /// Sets this record's IPD values ("ip" tag).
     ///
-    /// \param[in] photons
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or 16-bit lossless)
     /// \returns reference to this record
-    BamRecord& Pkmid(const std::vector<float>& photons);
+    BamRecord& IPD(const Frames& frames,
+                   const FrameEncodingType encoding);
 
-    /// Sets this record's Pkmid values ("pa" tag).
+    /// Sets this record's MergeQV values ("mq" tag).
     ///
-    /// \param[in] encoded photons
+    /// \param[in] mergeQVs
     /// \returns reference to this record
-    BamRecord& Pkmid(const std::vector<uint16_t>& encodedPhotons);
+    BamRecord& MergeQV(const QualityValues& mergeQVs);
 
     /// Sets this record's Pkmean values ("pm" tag).
     ///
@@ -683,13 +739,17 @@ public:
     /// \returns reference to this record
     BamRecord& Pkmean(const std::vector<uint16_t>& encodedPhotons);
 
-    /// Sets this record's IPD values ("ip" tag).
+    /// Sets this record's Pkmid values ("pa" tag).
     ///
-    /// \param[in] frames
-    /// \param[in] encoding specify how to encode the data (8-bit lossy, or 16-bit lossless)
+    /// \param[in] photons
     /// \returns reference to this record
-    BamRecord& IPD(const Frames& frames,
-                   const FrameEncodingType encoding);
+    BamRecord& Pkmid(const std::vector<float>& photons);
+
+    /// Sets this record's Pkmid values ("pa" tag).
+    ///
+    /// \param[in] encoded photons
+    /// \returns reference to this record
+    BamRecord& Pkmid(const std::vector<uint16_t>& encodedPhotons);
 
     /// Sets this record's PreBaseFrames aka IPD values ("ip" tag).
     ///
@@ -707,6 +767,12 @@ public:
     BamRecord& PrePulseFrames(const Frames& frames,
                               const FrameEncodingType encoding);
 
+    /// Sets this record's PulseCall values ("pc" tag).
+    ///
+    /// \param[in] tags
+    /// \returns reference to this record
+    BamRecord& PulseCall(const std::string& tags);
+
     /// Sets this record's PulseCallWidth values ("px" tag).
     ///
     /// \param[in] frames
@@ -714,12 +780,6 @@ public:
     /// \returns reference to this record
     BamRecord& PulseCallWidth(const Frames& frames,
                               const FrameEncodingType encoding);
-
-    /// Sets this record's MergeQV values ("mq" tag).
-    ///
-    /// \param[in] mergeQVs
-    /// \returns reference to this record
-    BamRecord& MergeQV(const QualityValues& mergeQVs);
 
     /// Sets this record's PulseMergeQV values ("pg" tag).
     ///
@@ -747,23 +807,9 @@ public:
     /// \returns reference to this record
     BamRecord& SubstitutionTag(const std::string& tags);
 
-    /// Sets this record's AltLabelTag values ("at" tag).
-    ///
-    /// \param[in] tags
-    /// \returns reference to this record
-    BamRecord& AltLabelTag(const std::string& tags);
-
-    /// Sets this record's PulseCall values ("pc" tag).
-    ///
-    /// \param[in] tags
-    /// \returns reference to this record
-    BamRecord& PulseCall(const std::string& tags);
-
     /// \}
 
 public:
-   BamRecord& QueryEnd(const PacBio::BAM::Position pos);
-   BamRecord& QueryStart(const PacBio::BAM::Position pos);
 
    /// Resets cached aligned start/end.
    ///
@@ -786,11 +832,6 @@ public:
    void UpdateName(void);
 
    static std::vector<uint16_t> EncodePhotons(const std::vector<float>& data);
-
-   BamRecord& ReadGroup(const ReadGroupInfo& rg);
-   BamRecord& ReadGroupId(const std::string& id);
-
-//    BamRecord& ReferenceStart(const PacBio::BAM::Position pos);
 
 public:
     /// \name Clipping & Mapping

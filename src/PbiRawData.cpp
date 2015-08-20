@@ -92,21 +92,33 @@ PbiRawBarcodeData& PbiRawBarcodeData::operator=(PbiRawBarcodeData&& other)
 
 bool PbiRawBarcodeData::AddRecord(const BamRecord& b)
 {
-    const BamRecordImpl& impl = b.Impl();
-    const bool hasBcTag = impl.HasTag("bc");
-    const bool hasBqTag = impl.HasTag("bq");
-    const bool hasCxTag = impl.HasTag("cx");
-    const bool hasBarcodeInfo = hasBcTag && hasBqTag && hasCxTag;
-    if (!hasBarcodeInfo)
+    // see which, if any, barcoding tags are present
+    // skip if none at all
+    const bool hasBcTag = b.HasBarcodes();
+    const bool hasBqTag = b.HasBarcodeQuality();
+    const bool hasCxTag = b.HasLocalContextFlags();
+    const bool hasAnyBarcodeInfo = hasBcTag || hasBqTag || hasCxTag;
+    if (!hasAnyBarcodeInfo)
         return false;
 
-    const vector<uint16_t> bcValue = impl.TagValue("bc").ToUInt16Array();
-    assert(bcValue.size() == 2);
-    bcLeft_.push_back(bcValue[0]);
-    bcRight_.push_back(bcValue[1]);
+    if (hasBcTag) {
+        const std::pair<int, int> barcodes = b.Barcodes();
+        bcLeft_.push_back(barcodes.first);
+        bcRight_.push_back(barcodes.second);
+    } else {
+        bcLeft_.push_back(0);
+        bcRight_.push_back(0); // missing value marker... ??
+    }
 
-    bcQual_.push_back(impl.TagValue("bq").ToUInt8());
-    ctxtFlag_.push_back(impl.TagValue("cx").ToUInt8());
+    if (hasBqTag)
+        bcQual_.push_back(b.BarcodeQuality());
+    else
+        bcQual_.push_back(0); // missing value marker... ??
+
+    if (hasCxTag)
+        ctxtFlag_.push_back(b.LocalContextFlags());
+    else
+        ctxtFlag_.push_back(0); // missing value marker... ??
 
     return true;
 }

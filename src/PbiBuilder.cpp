@@ -221,7 +221,7 @@ void PbiBuilderPrivate::AddRecord(const BamRecord& record, const int64_t vOffset
     if (hasMappedData_)
         hasMappedData_ &= rawData_.MappedData().AddRecord(record);
 
-    if (hasReferenceData_)
+    if (hasBarcodeData_)
         hasBarcodeData_ &= rawData_.BarcodeData().AddRecord(record);
 
     if (hasReferenceData_)
