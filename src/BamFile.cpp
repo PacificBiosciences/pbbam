@@ -104,18 +104,27 @@ BamFile& BamFile::operator=(BamFile&& other)
 
 BamFile::~BamFile(void) { }
 
+void BamFile::CreatePacBioIndex(void) const
+{
+    PbiFile::CreateFrom(*this);
+}
+
+void BamFile::CreateStandardIndex(void) const
+{
+    if (bam_index_build(d_->filename_.c_str(), 0) != 0)
+        throw std::runtime_error("could not build BAI index");
+}
+
 void BamFile::EnsurePacBioIndexExists(void) const
 {
     if (!PacBioIndexExists())
-        PbiFile::CreateFrom(*this);
+        CreatePacBioIndex();
 }
 
 void BamFile::EnsureStandardIndexExists(void) const
 {
-    if (!StandardIndexExists()) {
-        if (bam_index_build(d_->filename_.c_str(), 0) != 0)
-            throw std::runtime_error("could not build BAI index");
-    }
+    if (!StandardIndexExists())
+        CreateStandardIndex();
 }
 
 std::string BamFile::Filename(void) const

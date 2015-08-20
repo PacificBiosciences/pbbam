@@ -53,7 +53,7 @@ int PbIndex::Create(const Settings& settings)
     try
     {
         PacBio::BAM::BamFile bamFile(settings.inputBamFilename_);
-        bamFile.EnsurePacBioIndexExists();
+        bamFile.CreatePacBioIndex();
         return EXIT_SUCCESS;
     }
     catch (std::runtime_error& e)

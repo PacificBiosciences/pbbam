@@ -73,16 +73,42 @@ public:
     /// \name Index & Filename Methods
     /// \{
 
-    /// Check that ".pbi" exists and is newer than this BAM file.
+    /// Creates a ".pbi" file for this BAM file.
+    ///
+    /// \note Existing index file will be overwritten. Use EnsurePacBioIndexExists() if this is not desired.
+    ///
+    /// \throws if PBI file could not be properly created and/or
+    /// written to disk
+    ///
+    void CreatePacBioIndex(void) const;
+
+    /// Creates a ".bai" file for this BAM file.
+    ///
+    /// \note Existing index file will be overwritten. Use EnsureStandardIndexExists() if this is not desired.
+    ///
+    /// \throws if BAI file could not be properly created (e.g. this
+    /// BAM is not coordinate-sorted) or could not be written to disk
+    ///
+    void CreateStandardIndex(void) const;
+
+    /// Convenience method to check that ".pbi" exists and is newer than this BAM file.
     /// If not, one will be created.
+    ///
+    /// Equivalent to:
+    ///    if (!file.PacBioIndexExists())
+    ///        file.CreatePacBioIndex();
     ///
     /// \throws if PBI file could not be properly created and/or
     /// written to disk
     ///
     void EnsurePacBioIndexExists(void) const;
 
-    /// Check that ".bai" exists and is newer than this BAM file.
+    /// Convenience method to check that ".bai" exists and is newer than this BAM file.
     /// If not, one will be created.
+    ///
+    /// Equivalent to:
+    ///    if (!file.StandardIndexExists())
+    ///        file.CreateStandardIndex();
     ///
     /// \throws if BAI file could not be properly created (e.g. this
     /// BAM is not coordinate-sorted) or could not be written to disk
