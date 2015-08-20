@@ -553,14 +553,18 @@ void BamRecord::CalculateAlignedPositions(void) const
     // skip if unmapped, or has no queryStart/End
     if (!impl_.IsMapped())
         return;
-    const Position qStart = QueryStart();
-    const Position qEnd   = QueryEnd();
+
+    // get the query start/end
+    const size_t seqLength = impl_.Sequence().size();
+    const RecordType type  = Type();
+    const Position qStart  = (type == RecordType::CCS) ? Position(0) : QueryStart();
+    const Position qEnd    = (type == RecordType::CCS) ? Position(seqLength) : QueryEnd();
+    
     if (qStart == PacBio::BAM::UnmappedPosition || qEnd == PacBio::BAM::UnmappedPosition)
         return;
 
     // determine clipped end ranges
     const Cigar& cigar     = impl_.CigarData();
-    const size_t seqLength = impl_.Sequence().size();
     const int32_t startOffset = internal::AlignedStartOffset(cigar, seqLength);
     const int32_t endOffset   = internal::AlignedEndOffset(cigar, seqLength);
     if (endOffset == -1 || startOffset == -1)
