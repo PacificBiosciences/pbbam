@@ -152,12 +152,12 @@ public:
     bool GetNext(T& r);
 
     std::vector<BamFile> GetBamFiles(void) const
-    { return dataset_.ExternalResources().BamFiles(); }
+    { return dataset_.BamFiles(); }
 
 public:
     std::vector<FileIterPtr> CreateIterators(void)
     {
-        const std::vector<BamFile>& bamFiles = dataset_.ExternalResources().BamFiles();
+        const std::vector<BamFile>& bamFiles = dataset_.BamFiles();
         std::vector<FileIterPtr> result;
         result.reserve(bamFiles.size());
         for (const BamFile& bamFile : bamFiles)

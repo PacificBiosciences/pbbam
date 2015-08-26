@@ -42,7 +42,11 @@
 #include "TestData.h"
 #include <gtest/gtest.h>
 #include <pbbam/BamFile.h>
+#include <pbbam/EntireFileQuery.h>
+#include <pbbam/../../src/FileUtils.h>
 #include <stdexcept>
+#include <cstdlib>
+#include <unistd.h>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -66,4 +70,101 @@ TEST(BamFileTest, NonBamFileThrows)
         (void)file;
     },
     std::exception);
+}
+
+TEST(BamFileTest, RelativePathBamOk)
+{
+    const string cwd = internal::FileUtils::CurrentWorkingDirectory();
+    ASSERT_EQ(0, chdir(tests::Data_Dir.c_str()));
+    ASSERT_EQ(0, chdir("relative/a"));
+
+    { // direct BAM
+        BamFile file("../b/test1.bam");
+        EntireFileQuery entireFile(file);
+        int count = 0;
+        for (const BamRecord& r : entireFile) {
+            (void)r;
+            ++count;
+        }
+        EXPECT_EQ(10, count);
+    }
+
+    { // dataset from BAM filename
+        DataSet ds("../b/test1.bam");
+        EntireFileQuery entireFile(ds);
+        int count = 0;
+        for (const BamRecord& r : entireFile) {
+            (void)r;
+            ++count;
+        }
+        EXPECT_EQ(10, count);
+    }
+
+    { // dataset from BamFile object
+        BamFile file("../b/test1.bam");
+        DataSet ds(file);
+        EntireFileQuery entireFile(ds);
+        int count = 0;
+        for (const BamRecord& r : entireFile) {
+            (void)r;
+            ++count;
+        }
+        EXPECT_EQ(10, count);
+    }
+
+    ASSERT_EQ(0, chdir(cwd.c_str()));
+}
+
+TEST(BamFileTest, RelativePathXmlOk)
+{
+    const string cwd = internal::FileUtils::CurrentWorkingDirectory();
+
+    ASSERT_EQ(0, chdir(tests::Data_Dir.c_str()));
+
+    {
+        DataSet ds("relative/relative.xml");
+        EntireFileQuery entireFile(ds);
+        int count = 0;
+        for (const BamRecord& r : entireFile) {
+            (void)r;
+            ++count;
+        }
+        EXPECT_EQ(30, count);
+    }
+
+    ASSERT_EQ(0, chdir(cwd.c_str()));
+}
+
+TEST(BamFileTest, RelativePathFofnOk)
+{
+    const string cwd = internal::FileUtils::CurrentWorkingDirectory();
+    ASSERT_EQ(0, chdir(tests::Data_Dir.c_str()));
+
+    { // FOFN containing BAMs in different subdirs
+
+        DataSet ds("relative/relative.fofn");
+        EntireFileQuery entireFile(ds);
+        int count = 0;
+        for (const BamRecord& r : entireFile) {
+            (void)r;
+            ++count;
+        }
+        EXPECT_EQ(30, count);
+    }
+
+    // NOTE: doesn't yet support a FOFN containing an XML with relative paths
+
+//    { // FOFN containing subdir BAMs + relative.xml
+
+//        DataSet ds("relative/relative2.fofn");
+//        EntireFileQuery entireFile(ds);
+//        int count = 0;
+//        for (const BamRecord& r : entireFile) {
+//            (void)r;
+//            ++count;
+//        }
+//        EXPECT_EQ(60, count);
+//    }
+
+    ASSERT_EQ(0, chdir(cwd.c_str()));
 }

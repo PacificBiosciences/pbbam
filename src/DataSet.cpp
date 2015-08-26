@@ -39,7 +39,9 @@
 #include "pbbam/DataSetTypes.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 #include "DataSetIO.h"
+#include "FileUtils.h"
 #include "TimeUtils.h"
+#include <boost/algorithm/string.hpp>
 #include <unordered_map>
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -48,12 +50,14 @@ using namespace std;
 
 DataSet::DataSet(void)
     : d_(new DataSetBase)
+    , path_(FileUtils::CurrentWorkingDirectory())
 {
-    CreatedAt(internal::ToIso8601(internal::CurrentTime()));
+    CreatedAt(ToIso8601(CurrentTime()));
 }
 
 DataSet::DataSet(const DataSet::TypeEnum type)
     : d_(nullptr)
+    , path_(FileUtils::CurrentWorkingDirectory())
 {
     switch(type) {
         case DataSet::GENERIC             : d_.reset(new DataSetBase); break;
@@ -69,20 +73,31 @@ DataSet::DataSet(const DataSet::TypeEnum type)
             throw std::runtime_error("unsupported dataset type"); // unknown type
     }
 
-    CreatedAt(internal::ToIso8601(internal::CurrentTime()));
+    CreatedAt(internal::ToIso8601(CurrentTime()));
 }
 
 DataSet::DataSet(const BamFile& bamFile)
-    : d_(internal::DataSetIO::FromUri(bamFile.Filename()))
+    : d_(DataSetIO::FromUri(bamFile.Filename()))
+    , path_(FileUtils::CurrentWorkingDirectory())
 {
-    CreatedAt(internal::ToIso8601(internal::CurrentTime()));
+    CreatedAt(internal::ToIso8601(CurrentTime()));
 }
 
 DataSet::DataSet(const string& filename)
-    : d_(internal::DataSetIO::FromUri(filename))
-{ }
+    : d_(DataSetIO::FromUri(filename))
+    , path_(FileUtils::DirectoryName(filename))
+{
+    // for FOFNs, child files are already resolved from CWD.
+    // FOFNs may be relative within so we have a bit of extra layered resolution as we
+    //
+    // NOTE: this workaround feels like a code smell, but is working for test cases
+    //
+    if (boost::algorithm::iends_with(filename, ".fofn"))
+        path_ = FileUtils::CurrentWorkingDirectory();
+}
 
 DataSet::DataSet(const DataSet& other)
+    : path_(other.path_)
 {
     DataSetBase* otherDataset = other.d_.get();
     DataSetElement* copyDataset = new DataSetElement(*otherDataset);
@@ -91,6 +106,7 @@ DataSet::DataSet(const DataSet& other)
 
 DataSet::DataSet(DataSet&& other)
     : d_(std::move(other.d_))
+    , path_(std::move(other.path_))
 {
     assert(other.d_.get() == nullptr);
 }
@@ -100,12 +116,14 @@ DataSet& DataSet::operator=(const DataSet& other)
     DataSetBase* otherDataset = other.d_.get();
     DataSetElement* copyDataset = new DataSetElement(*otherDataset);
     d_.reset(static_cast<DataSetBase*>(copyDataset));
+    path_ = other.path_;
     return *this;
 }
 
 DataSet& DataSet::operator=(DataSet&& other)
 {
     d_ = std::move(other.d_);
+    path_ = std::move(other.path_);
     return *this;
 }
 
@@ -115,6 +133,19 @@ DataSet& DataSet::operator+=(const DataSet& other)
 {
     *d_.get() += *other.d_.get();
     return *this;
+}
+
+vector<BamFile> DataSet::BamFiles(void) const
+{
+    vector<BamFile> result;
+    const PacBio::BAM::ExternalResources& resources = ExternalResources();
+    const int numResources = resources.Size();
+    result.reserve(numResources);
+    for( const ExternalResource& ext : resources ) {
+        const string fn = internal::FileUtils::ResolvedFilePath(ext.ResourceId(), path_);
+        result.push_back(BamFile(fn));
+    }
+    return result;
 }
 
 DataSet DataSet::FromXml(const string& xml)
@@ -136,24 +167,24 @@ DataSet::TypeEnum DataSet::NameToType(const string& typeName)
 {
     static std::unordered_map<std::string, DataSet::TypeEnum> lookup;
     if (lookup.empty()) {
-        lookup["DataSet"] = DataSet::GENERIC;
-        lookup["AlignmentSet"] = DataSet::ALIGNMENT;
-        lookup["BarcodeSet"] = DataSet::BARCODE;
+        lookup["DataSet"]               = DataSet::GENERIC;
+        lookup["AlignmentSet"]          = DataSet::ALIGNMENT;
+        lookup["BarcodeSet"]            = DataSet::BARCODE;
         lookup["ConsensusAlignmentSet"] = DataSet::CONSENSUS_ALIGNMENT;
-        lookup["ConsensusReadSet"] = DataSet::CONSENSUS_READ;
-        lookup["ContigSet"] = DataSet::CONTIG;
-        lookup["HdfSubreadSet"] = DataSet::HDF_SUBREAD;
-        lookup["ReferenceSet"] = DataSet::REFERENCE;
-        lookup["SubreadSet"] = DataSet::SUBREAD;
+        lookup["ConsensusReadSet"]      = DataSet::CONSENSUS_READ;
+        lookup["ContigSet"]             = DataSet::CONTIG;
+        lookup["HdfSubreadSet"]         = DataSet::HDF_SUBREAD;
+        lookup["ReferenceSet"]          = DataSet::REFERENCE;
+        lookup["SubreadSet"]            = DataSet::SUBREAD;
     }
     return lookup.at(typeName); // throws if unknown typename
 }
 
 void DataSet::Save(const std::string& outputFilename)
-{ internal::DataSetIO::ToFile(d_, outputFilename); }
+{ DataSetIO::ToFile(d_, outputFilename); }
 
 void DataSet::SaveToStream(ostream& out)
-{ internal::DataSetIO::ToStream(d_, out); }
+{ DataSetIO::ToStream(d_, out); }
 
 string DataSet::TypeToName(const DataSet::TypeEnum& type)
 {

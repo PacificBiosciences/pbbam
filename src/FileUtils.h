@@ -38,12 +38,8 @@
 #ifndef FILEUTILS_H
 #define FILEUTILS_H
 
-#include <exception>
-#include <fstream>
-#include <iostream>
+#include <chrono>
 #include <string>
-#include <ctime>
-#include <sys/stat.h>
 
 namespace PacBio {
 namespace BAM {
@@ -52,78 +48,88 @@ namespace internal {
 struct FileUtils
 {
 public:
+
+    /// \returns application's current working directory
+    static std::string CurrentWorkingDirectory(void);
+
+    /// Parses a filepath for the the directory name for a file.
+    ///
+    /// Essentially this method strips the filename from the string provided (/path/to/file => /path/to).
+    /// If only a filename is provided, then "." is returned to indicate the current directory.
+    ///
+    /// \param[in] file name of file (can be just a filename or path/to/filename)
+    /// \returns file's directory name
+    ///
+    static std::string DirectoryName(const std::string& file);
+
+    /// Check for existence of a file.
+    ///
+    /// \param[in] fn full path to file
+    /// \returns true if file exists & can be opened
+    ///
     static bool Exists(const char* fn);
+
+    /// Check for existence of a file.
+    ///
+    /// \param[in] fn full path to file
+    /// \returns true if file exists & can be opened
+    ///
     static bool Exists(const std::string& fn);
 
-    // throws if can't read
-    static time_t LastModified(const char* fn);
-    static time_t LastModified(const std::string& fn);
+    /// Check "last modified" timestamp for a file.
+    ///
+    /// \param[in] fn full path to file
+    /// \returns time of last modification
+    /// \throws runtime_error if file info can't be accessed
+    ///
+    static std::chrono::system_clock::time_point LastModified(const char* fn);
 
-    // throws if can't read
+    /// Check "last modified" timestamp for a file.
+    ///
+    /// \param[in] fn full path to file
+    /// \returns time of last modification
+    /// \throws runtime_error if file info can't be accessed
+    ///
+    static std::chrono::system_clock::time_point LastModified(const std::string& fn);
+
+    /// Resolves input file path using optional starting directory.
+    ///
+    /// /absolute/path/to/file.txt   => /absolute/path/to/file.txt
+    /// ../relative/path/to/file.txt => <from>/../relative/path/to/file.txt
+    /// file.txt                     => <from>/file.txt
+    ///
+    /// \param[in] filePath file path to be resolved
+    /// \param[in] from     optional starting directory (useful if not same as application's working directory)
+    /// \returns resolved file path
+    ///
+    static std::string ResolvedFilePath(const std::string& filePath,
+                                        const std::string& from = ".");
+
+    /// Check size of file.
+    ///
+    /// \param[in] fn full path to file
+    /// \returns file size in bytes
+    /// \throws runtime_error if file info can't be accessed
+    ///
     static off_t Size(const char* fn);
+
+    /// Check size of file.
+    ///
+    /// \param[in] fn full path to file
+    /// \returns file size in bytes
+    /// \throws runtime_error if file info can't be accessed
+    ///
     static off_t Size(const std::string& fn);
 };
 
-inline bool FileUtils::Exists(const char* fn)
-{ return Exists(std::string(fn)); }
-
 inline bool FileUtils::Exists(const std::string& fn)
-{
-    std::ifstream stream(fn);
-    return !stream.fail();
-}
+{ return FileUtils::Exists(fn.c_str()); }
 
-inline time_t FileUtils::LastModified(const char* fn)
-{
-    struct stat s;
-    if (stat(fn, &s) != 0)
-        throw std::runtime_error("could not get file timestamp");
-
-#ifdef __DARWIN_64_BIT_INO_T
-    return s.st_mtimespec.tv_sec; // 64-bit OSX has a modified stat struct
-#else
-    return s.st_mtime;            // all others?
-#endif
-}
-
-inline time_t FileUtils::LastModified(const std::string& fn)
-{ return LastModified(fn.c_str()); }
-
-inline off_t FileUtils::Size(const char* fn)
-{
-    struct stat s;
-    if (stat(fn, &s) != 0)
-        throw std::runtime_error("could not determine file size");
-    return s.st_size;
-}
+inline std::chrono::system_clock::time_point FileUtils::LastModified(const std::string& fn)
+{ return FileUtils::LastModified(fn.c_str()); }
 
 inline off_t FileUtils::Size(const std::string& fn)
-{ return Size(fn.c_str()); }
-
-//inline std::string FilenameExtension(const std::string& fn)
-//{
-//    const size_t lastDot = fn.find_last_of(".");
-//    return (lastDot != std::string::npos ? fn.substr(lastDot+1) : std::string());
-//}
-
-////
-//// -- examples --
-////
-//// input: /path/to/file.ext      result: file.ext
-//// input: /path/to/file.ext.zip  result: file.ext.zip
-//// input: file.ext               result: file.ext
-////
-//inline std::string FilenameFromPath(const std::string& fullPath)
-//{
-//    struct MatchesPathSeparator {
-//        bool operator()(char c) const { return c == '/'; }
-//    };
-
-//    const auto lastSeparator = std::find_if(fullPath.rbegin(),
-//                                            fullPath.rend(),
-//                                            MatchesPathSeparator()).base();
-//    return std::string(lastSeparator,fullPath.end());
-//}
+{ return FileUtils::Size(fn.c_str()); }
 
 } // namespace internal
 } // namespace BAM

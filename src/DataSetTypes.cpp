@@ -38,6 +38,7 @@
 #include "pbbam/DataSetTypes.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 #include "DataSetUtils.h"
+#include "FileUtils.h"
 #include <set>
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -141,7 +142,7 @@ DataSetBase* DataSetBase::DeepCopy(void) const
 DataSetBase& DataSetBase::operator+=(const DataSetBase& other)
 {
     // must be same dataset types (or 'other' must be generic)
-    if (other.QualifiedNameLabel() != QualifiedNameLabel() && other.LocalNameLabel() != "DataSet")
+    if (other.LocalNameLabel() != LocalNameLabel() && other.LocalNameLabel() != "DataSet")
         throw std::runtime_error("cannot merge incompatible dataset types");
 
     // check filter match

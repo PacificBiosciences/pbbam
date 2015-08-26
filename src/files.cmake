@@ -115,6 +115,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/DataSetTypes.cpp
     ${PacBioBAM_SourceDir}/DataSetXsd.cpp
     ${PacBioBAM_SourceDir}/EntireFileQuery.cpp
+    ${PacBioBAM_SourceDir}/FileUtils.cpp
     ${PacBioBAM_SourceDir}/FilterEngine.cpp
     ${PacBioBAM_SourceDir}/FofnReader.cpp
     ${PacBioBAM_SourceDir}/Frames.cpp

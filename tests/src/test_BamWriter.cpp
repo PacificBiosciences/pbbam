@@ -46,6 +46,9 @@
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamWriter.h>
 #include <pbbam/EntireFileQuery.h>
+
+#include <pbbam/../../src/FileUtils.h>
+
 #include <chrono>
 #include <iostream>
 #include <string>
@@ -196,3 +199,27 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
 
     remove(generatedBamFn.c_str());
 }
+
+//static
+//void CreateBamFile(const string& filename)
+//{
+//    if (internal::FileUtils::Exists(filename))
+//        return;
+
+//    BamHeader header;
+//    BamWriter writer(filename, header);
+
+//    BamRecord r;
+//    for (int i = 0; i < 10; ++i) {
+//        writer.Write(r);
+//    }
+//}
+
+
+//TEST(BamWriterTest, CreateBAMs)
+//{
+//    const string relativeDir = tests::Data_Dir + "/relative";
+//    CreateBamFile(relativeDir + "/a/test.bam");
+//    CreateBamFile(relativeDir + "/b/test1.bam");
+//    CreateBamFile(relativeDir + "/b/test2.bam");
+//}

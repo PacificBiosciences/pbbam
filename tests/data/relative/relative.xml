@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pbds:SubreadSet xmlns="http://pacificbiosciences.com/PacBioDataModel.xsd" MetaType="PacBio.DataSet.AlignmentSet" Name="DataSet_AlignmentSet" Tags="barcode moreTags mapping mytags" UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe519c" Version="2.3.0" CreatedAt="2015-01-27T09:00:01" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+        <pbbase:ExternalResources>
+                <pbbase:ExternalResource MetaType="SubreadFile.SubreadBamFile" ResourceId="./a/test.bam" />
+                <pbbase:ExternalResource MetaType="SubreadFile.SubreadBamFile" ResourceId="./b/test1.bam" />
+                <pbbase:ExternalResource MetaType="SubreadFile.SubreadBamFile" ResourceId="./b/test2.bam"/>
+        </pbbase:ExternalResources>
+</pbds:SubreadSet>

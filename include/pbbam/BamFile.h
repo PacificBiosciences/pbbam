@@ -58,7 +58,7 @@ public:
     ///
     /// \param[in] filename BAM filename
     /// \throws std::exception on failure
-    BamFile(const std::string& filename);
+    explicit BamFile(const std::string& filename);
 
     BamFile(const BamFile& other);
     BamFile(BamFile&& other);

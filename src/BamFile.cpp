@@ -62,7 +62,7 @@ public:
         // attempt open
         std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
         if (!f)
-            throw std::runtime_error("could not open file");
+            throw std::runtime_error(string("could not open file: ") + filename_);
         if (f->format.format != bam)
             throw std::runtime_error("expected BAM, unknown format");
 
@@ -143,8 +143,8 @@ bool BamFile::PacBioIndexExists(void) const
 {
     const string pbiFn = PacBioIndexFilename();
     if (internal::FileUtils::Exists(pbiFn)) {
-        const time_t bamTimestamp = internal::FileUtils::LastModified(Filename());
-        const time_t pbiTimestamp = internal::FileUtils::LastModified(pbiFn);
+        const auto bamTimestamp = internal::FileUtils::LastModified(Filename());
+        const auto pbiTimestamp = internal::FileUtils::LastModified(pbiFn);
         if (bamTimestamp <= pbiTimestamp)
             return true;
     }
@@ -171,8 +171,8 @@ bool BamFile::StandardIndexExists(void) const
     const string bamFn = Filename();
     const string baiFn = StandardIndexFilename();
     if (internal::FileUtils::Exists(baiFn)) {
-        const time_t bamTimestamp = internal::FileUtils::LastModified(bamFn);
-        const time_t baiTimestamp = internal::FileUtils::LastModified(baiFn);
+        const auto bamTimestamp = internal::FileUtils::LastModified(bamFn);
+        const auto baiTimestamp = internal::FileUtils::LastModified(baiFn);
         if (bamTimestamp <= baiTimestamp)
             return true;
     }

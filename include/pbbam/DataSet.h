@@ -101,8 +101,16 @@ public:
     /// \}
 
 public:
+    /// \name Serialization
+    /// \{
+
+    /// Save dataset XML to file.
     void Save(const std::string& outputFilename);
+
+    /// Save dataset XML to stream (cout, stringstream, etc.).
     void SaveToStream(std::ostream& out);
+
+    /// \}
 
 public:
 
@@ -139,6 +147,14 @@ public:
     const PacBio::BAM::Filters& Filters(void) const;
     const PacBio::BAM::DataSetMetadata& Metadata(void) const;
     const PacBio::BAM::SubDataSets& SubDataSets(void) const;
+
+    /// \}
+
+public:
+    /// \name Resources
+    /// \{
+
+    std::vector<BamFile> BamFiles(void) const;
 
     /// \}
 
@@ -208,6 +224,7 @@ public:
 
 private:
     std::unique_ptr<DataSetBase> d_;
+    std::string path_;
 };
 
 } // namespace BAM
