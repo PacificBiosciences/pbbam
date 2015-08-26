@@ -36,6 +36,7 @@
 // Author: Derek Barnett
 
 #include "pbbam/Tag.h"
+#include <stdexcept>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -56,6 +57,24 @@ Tag::Tag(const vector<uint16_t>& value) : data_(value), modifier_(TagModifier::N
 Tag::Tag(const vector<int32_t>& value)  : data_(value), modifier_(TagModifier::NONE) { }
 Tag::Tag(const vector<uint32_t>& value) : data_(value), modifier_(TagModifier::NONE) { }
 Tag::Tag(const vector<float>& value)    : data_(value), modifier_(TagModifier::NONE) { }
+
+Tag::Tag(int8_t value, const TagModifier mod)
+    : data_(value)
+    , modifier_(mod)
+{
+    if (mod == TagModifier::HEX_STRING)
+        throw runtime_error("HEX_STRING is not a valid tag modifier for int8_t data. "
+                            "It is intended for string-type data only.");
+}
+
+Tag::Tag(const std::string& value, const TagModifier mod)
+    : data_(value)
+    , modifier_(mod)
+{
+    if (mod == TagModifier::ASCII_CHAR)
+        throw runtime_error("ASCII_CHAR is not a valid tag modifier for string-type data. "
+                            "To construct an ASCII char tag, use a single-quoted value (e.g. 'X' instead of \"X\")");
+}
 
 Tag::Tag(const Tag& other)
     : data_(other.data_)

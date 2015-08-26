@@ -86,18 +86,26 @@ BamRecordImpl& BamRecordImpl::operator=(BamRecordImpl&& other)
 
 BamRecordImpl::~BamRecordImpl(void) { }
 
-bool BamRecordImpl::AddTag(const string& tagName, const Tag &value)
+bool BamRecordImpl::AddTag(const string& tagName,
+                           const Tag &value)
+{
+    return AddTag(tagName, value, TagModifier::NONE);
+}
+
+bool BamRecordImpl::AddTag(const string& tagName,
+                           const Tag& value,
+                           const TagModifier additionalModifier)
 {
     if (tagName.size() != 2 || HasTag(tagName))
         return false;
 
-    const vector<uint8_t> rawData = std::move(BamTagCodec::ToRawData(value));
+    const vector<uint8_t> rawData = std::move(BamTagCodec::ToRawData(value, additionalModifier));
     if (rawData.empty())
         return false;
 
     bam_aux_append(d_.get(),
                    tagName.c_str(),
-                   BamTagCodec::TagTypeCode(value),
+                   BamTagCodec::TagTypeCode(value, additionalModifier),
                    rawData.size(),
                    const_cast<uint8_t*>(rawData.data()));
 
@@ -151,9 +159,17 @@ BamRecordImpl& BamRecordImpl::CigarData(const std::string& cigarString)
     return CigarData(Cigar::FromStdString(cigarString));
 }
 
-bool BamRecordImpl::EditTag(const string& tagName, const Tag &newValue)
+bool BamRecordImpl::EditTag(const string& tagName,
+                            const Tag& newValue)
 {
     return RemoveTag(tagName) && AddTag(tagName, newValue);
+}
+
+bool BamRecordImpl::EditTag(const string& tagName,
+                            const Tag& newValue,
+                            const TagModifier additionalModifier)
+{
+    return RemoveTag(tagName) && AddTag(tagName, newValue, additionalModifier);
 }
 
 BamRecordImpl BamRecordImpl::FromRawData(const PBBAM_SHARED_PTR<bam1_t>& rawData)
@@ -242,12 +258,6 @@ QualityValues BamRecordImpl::Qualities(void) const
     for (size_t i = 0; i < numQuals; ++i)
         result.push_back(QualityValue(qualData[i]));
     return result;
-
-//    string result;
-//    result.reserve(d_->core.l_qseq);
-//    for (int i = 0; i < d_->core.l_qseq; ++i)
-//        result.push_back(qualData[i] + 33);
-//    return result;
 }
 
 bool BamRecordImpl::RemoveTag(const string& tagName)
@@ -335,51 +345,11 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
         memset(pEncodedSequence, 0, encodedSequenceLength);
         for (size_t i = 0; i < sequenceLength; ++i)
             pEncodedSequence[i>>1] |= seq_nt16_table[(int)sequence[i]] << ((~i&1)<<2);
-
-
-
-//        const char* pRawSequence = sequence;
-//        uint8_t nucleotideCode;
-//        bool useHighWord = true;
-//        for (size_t i = 0; i < sequenceLength; ++i) {
-//            switch (*pRawSequence) {
-//                case '=' : nucleotideCode = 0;  break;
-//                case 'A' : nucleotideCode = 1;  break;
-//                case 'C' : nucleotideCode = 2;  break;
-//                case 'M' : nucleotideCode = 3;  break;
-//                case 'G' : nucleotideCode = 4;  break;
-//                case 'R' : nucleotideCode = 5;  break;
-//                case 'S' : nucleotideCode = 6;  break;
-//                case 'V' : nucleotideCode = 7;  break;
-//                case 'T' : nucleotideCode = 8;  break;
-//                case 'W' : nucleotideCode = 9;  break;
-//                case 'Y' : nucleotideCode = 10; break;
-//                case 'H' : nucleotideCode = 11; break;
-//                case 'K' : nucleotideCode = 12; break;
-//                case 'D' : nucleotideCode = 13; break;
-//                case 'B' : nucleotideCode = 14; break;
-//                case 'N' : nucleotideCode = 15; break;
-//                default :
-//                    PB_ASSERT_UNREACHABLE; // graceful way to handle?
-//                    break;
-//            }
-
-//            // pack the nucleotide code
-//            if (useHighWord) {
-//                *pEncodedSequence = nucleotideCode << 4;
-//                useHighWord = false;
-//            } else {
-//                *pEncodedSequence |= nucleotideCode;
-//                ++pEncodedSequence;
-//                useHighWord = true;
-//            }
-//            ++pRawSequence;
-//        }
     }
 
     // fill in quality values
     uint8_t* encodedQualities = bam_get_qual(d_);
-    if ( (qualities == 0 ) || (::strlen(qualities) == 0) )
+    if ( (qualities == 0 ) || (strlen(qualities) == 0) )
         memset(encodedQualities, 0xff, sequenceLength);
     else {
         for (size_t i = 0; i < sequenceLength; ++i)

@@ -146,8 +146,7 @@ TagCollection SamTagCodec::Decode(const string& tagString)
             case 'A' :
             case 'a' :
             {
-                tags[name] = static_cast<char>(remainder.at(0));
-                tags[name].Modifier(TagModifier::ASCII_CHAR);
+                tags[name] = Tag(static_cast<char>(remainder.at(0), TagModifier::ASCII_CHAR));
                 break;
             }
 
@@ -198,8 +197,7 @@ TagCollection SamTagCodec::Decode(const string& tagString)
 
             case 'H' :
             {
-                tags[name] = remainder;
-                tags[name].Modifier(TagModifier::HEX_STRING);
+                tags[name] = Tag(remainder, TagModifier::HEX_STRING);
                 break;
             }
 
@@ -229,7 +227,6 @@ TagCollection SamTagCodec::Decode(const string& tagString)
 
     return tags;
 }
-
 
 string SamTagCodec::Encode(const TagCollection& tags)
 {

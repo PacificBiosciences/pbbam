@@ -48,25 +48,59 @@ namespace BAM {
 class PBBAM_EXPORT BamTagCodec
 {
 
-// high-level, operate on a full collection
 public:
+    /// \name Tag Collection Methods
+    /// \{
+
+    /// Creates a TagCollection from raw BAM data
+    ///
+    /// \param[in] data raw BAM binary
+    /// \returns TagCollection containing tag data
+    ///
     static TagCollection Decode(const std::vector<uint8_t>& data);
+
+    /// Creates raw BAM data from a TagCollection
+    ///
+    /// \param[in] tags TagCollection containing tag data
+    /// \returns vector of bytes (encoded BAM data)
+    ///
     static std::vector<uint8_t> Encode(const PacBio::BAM::TagCollection& tags);
 
-// per-tag methods
+    /// \}
+
 public:
+    /// \name Per-Tag Methods
+    /// \{
 
-    // returns the SAM/BAM single char code for tag type
-    static uint8_t TagTypeCode(const PacBio::BAM::Tag& tag);
+    /// Get SAM/BAM tag code for a Tag
+    ///
+    /// \param[in] tag Tag object to check
+    /// \param[in] additionalModifier optional extra modifier (for explicit modification of an otherwise const Tag)
+    /// \returns the SAM/BAM single char code for tag type
+    ///
+    static uint8_t TagTypeCode(const PacBio::BAM::Tag& tag,
+                               const TagModifier& additionalModifier = TagModifier::NONE);
 
-    // returns the tag value's raw data in bytes
-    // NOTE: does *NOT* encode name & tag type. It does however,
-    // include the element type of an array tag
-    static std::vector<uint8_t> ToRawData(const PacBio::BAM::Tag& tag);
+    /// Encode a single Tag's contents in raw BAM binary
+    ///
+    /// \note This method does \b NOT encode the tag name & tag type. It does include the element type
+    ///       for array-type tags.
+    ///
+    /// \param[in] tag Tag object containing data to encode
+    /// \param[in] additionalModifier optional extra modifier (for explicit modification of an otherwise const Tag)
+    /// \returns vector of bytes (encoded BAM data)
+    ///
+    static std::vector<uint8_t> ToRawData(const PacBio::BAM::Tag& tag,
+                                          const TagModifier& additionalModifier = TagModifier::NONE);
 
-    // TODO: make this hidden a bit more, maybe this whole class in fact
-    // rawData should be the result of sam.h:bam_aux_get(...)
+    /// Creates a Tag object from raw BAM data
+    ///
+    /// \param[in] rawData raw BAM data (assumed to be the result of htslib's bam_aux_get())
+    /// \returns resulting Tag object
+    ///
     static PacBio::BAM::Tag FromRawData(uint8_t* rawData);
+
+    /// \}
 };
 
 } // namespace BAM

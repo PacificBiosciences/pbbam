@@ -44,30 +44,17 @@ using namespace PacBio::BAM;
 using namespace std;
 
 template<typename T>
-inline void appendBamValue(const T& value, kstring_t* str /*vector<uint8_t>& result*/)
+inline void appendBamValue(const T& value, kstring_t* str)
 {
     kputsn_((char*)&value, sizeof(value), str);
-//    const size_t initialResultSize = result.size();
-//    result.resize(initialResultSize + sizeof(T));
-//    memcpy((uint8_t*)&result[initialResultSize],
-//           (uint8_t*)&value,
-//           sizeof(T));
 }
 
 template<typename T>
-inline void appendBamMultiValue(const vector<T>& container, kstring_t* str /*vector<uint8_t>& result*/)
+inline void appendBamMultiValue(const vector<T>& container, kstring_t* str)
 {
     const uint32_t n = container.size();
     kputsn_(&n, sizeof(n), str);
     kputsn_((char*)&container[0], n*sizeof(T), str);
-
-//    const size_t initialResultSize = result.size();
-//    const uint32_t numValues = container.size();
-//    result.resize(initialResultSize + 4 + numValues*sizeof(T));
-//    memcpy((uint8_t*)&result[initialResultSize], (uint32_t*)&numValues, sizeof(numValues));
-//    memcpy((uint8_t*)&result[initialResultSize + 4],
-//           (uint8_t*)&container[0],
-//            numValues*sizeof(T));
 }
 
 template<typename T>
@@ -147,7 +134,6 @@ TagCollection BamTagCodec::Decode(const vector<uint8_t>& data)
             {
                 const char subTagType = pData[i++];
                 switch (subTagType) {
-
                     case 'c' : tags[tagName] = readBamMultiValue<int8_t>(pData, i);   break;
                     case 'C' : tags[tagName] = readBamMultiValue<uint8_t>(pData, i);  break;
                     case 's' : tags[tagName] = readBamMultiValue<int16_t>(pData, i);  break;
@@ -175,8 +161,6 @@ TagCollection BamTagCodec::Decode(const vector<uint8_t>& data)
 vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
 {
     kstring_t str = { 0, 0, NULL };
-
-    vector<uint8_t> result;
 
     const auto tagEnd  = tags.cend();
     for (auto tagIter = tags.cbegin(); tagIter != tagEnd; ++tagIter) {
@@ -305,12 +289,14 @@ vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
                 break;
             }
 
+            // unsupported tag type
             default :
                 free(str.s);
                 PB_ASSERT_OR_RETURN_VALUE(false, vector<uint8_t>());
         }
     }
 
+    vector<uint8_t> result;
     result.resize(str.l);
     memcpy((char*)&result[0], str.s, str.l);
     free(str.s);
@@ -344,7 +330,7 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
             const size_t dataLength = strlen((const char*)&rawData[0]);
             string value;
             value.resize(dataLength);
-            memcpy( (char*)value.data(), &rawData[0], dataLength );
+            memcpy((char*)value.data(), &rawData[0], dataLength);
             Tag t(value);
             if (tagType == 'H')
                 t.Modifier(TagModifier::HEX_STRING);
@@ -377,32 +363,33 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
     }
 }
 
-vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag)
+vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag,
+                                       const TagModifier& additionalModifier)
 {
+    // temp raw data destination (for use with htslib methods)
     kstring_t str = { 0, 0, NULL };
 
     // "<TYPE>:<DATA>" for printable, ASCII char
-    if (tag.HasModifier(TagModifier::ASCII_CHAR)) {
-        char c = tag.ToAscii();
-        if (c != '\0') {
+    if (tag.HasModifier(TagModifier::ASCII_CHAR) || additionalModifier == TagModifier::ASCII_CHAR) {
+        const char c = tag.ToAscii();
+        if (c != '\0')
             kputc_(c, &str);
-        }
     }
 
     // for all others
     else {
-        switch ( tag.Type() ) {
+        switch (tag.Type()) {
 
             // single, numeric values
-            case TagDataType::INT8   : appendBamValue(tag.ToInt8(), &str);   break;
-            case TagDataType::UINT8  : appendBamValue(tag.ToUInt8(), &str);  break;
-            case TagDataType::INT16  : appendBamValue(tag.ToInt16(), &str);  break;
+            case TagDataType::INT8   : appendBamValue(tag.ToInt8(),   &str); break;
+            case TagDataType::UINT8  : appendBamValue(tag.ToUInt8(),  &str); break;
+            case TagDataType::INT16  : appendBamValue(tag.ToInt16(),  &str); break;
             case TagDataType::UINT16 : appendBamValue(tag.ToUInt16(), &str); break;
-            case TagDataType::INT32  : appendBamValue(tag.ToInt32(), &str);  break;
+            case TagDataType::INT32  : appendBamValue(tag.ToInt32(),  &str); break;
             case TagDataType::UINT32 : appendBamValue(tag.ToUInt32(), &str); break;
-            case TagDataType::FLOAT  : appendBamValue(tag.ToFloat(), &str);  break;
+            case TagDataType::FLOAT  : appendBamValue(tag.ToFloat(),  &str); break;
 
-            // string (& hex-string) values
+            // string & hex-string values
             case TagDataType::STRING :
             {
                 const string& s = tag.ToString();
@@ -454,12 +441,14 @@ vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag)
                 break;
             }
 
+            // unsupported tag type
             default :
                 free(str.s);
                 PB_ASSERT_OR_RETURN_VALUE(false, vector<uint8_t>());
         }
     }
 
+    // store temp contents in actual destination
     vector<uint8_t> result;
     result.resize(str.l);
     memcpy((char*)&result[0], str.s, str.l);
@@ -467,11 +456,12 @@ vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag)
     return result;
 }
 
-uint8_t BamTagCodec::TagTypeCode(const Tag &tag)
+uint8_t BamTagCodec::TagTypeCode(const Tag& tag,
+                                 const TagModifier& additionalModifier)
 {
-    if ( tag.HasModifier(TagModifier::ASCII_CHAR) ) {
+    if (tag.HasModifier(TagModifier::ASCII_CHAR) || additionalModifier == TagModifier::ASCII_CHAR) {
         int64_t value = 0;
-        switch ( tag.Type() ) {
+        switch (tag.Type()) {
             case TagDataType::INT8   : value = static_cast<int64_t>(tag.ToInt8());   break;
             case TagDataType::UINT8  : value = static_cast<int64_t>(tag.ToUInt8());  break;
             case TagDataType::INT16  : value = static_cast<int64_t>(tag.ToInt16());  break;
@@ -479,7 +469,7 @@ uint8_t BamTagCodec::TagTypeCode(const Tag &tag)
             case TagDataType::INT32  : value = static_cast<int64_t>(tag.ToInt32());  break;
             case TagDataType::UINT32 : value = static_cast<int64_t>(tag.ToUInt32()); break;
             default:
-                // non integers not
+                // non integers not allowed
                 PB_ASSERT_OR_RETURN_VALUE(false, 0);
         }
         // printable range
@@ -488,7 +478,7 @@ uint8_t BamTagCodec::TagTypeCode(const Tag &tag)
         return static_cast<uint8_t>('A');
     }
 
-    switch ( tag.Type() ) {
+    switch (tag.Type()) {
         case TagDataType::INT8   : return static_cast<uint8_t>('c');
         case TagDataType::UINT8  : return static_cast<uint8_t>('C');
         case TagDataType::INT16  : return static_cast<uint8_t>('s');
@@ -499,8 +489,10 @@ uint8_t BamTagCodec::TagTypeCode(const Tag &tag)
 
         case TagDataType::STRING :
         {
-            return tag.HasModifier(TagModifier::HEX_STRING) ? static_cast<uint8_t>('H')
-                                                            : static_cast<uint8_t>('Z');
+            if (tag.HasModifier(TagModifier::HEX_STRING) || additionalModifier == TagModifier::HEX_STRING)
+                return static_cast<uint8_t>('H');
+            else
+                return static_cast<uint8_t>('Z');
         }
 
         case TagDataType::INT8_ARRAY   : // fall through

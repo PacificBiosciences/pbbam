@@ -124,48 +124,56 @@ public:
     ///
     /// \param[in] bin BAI index bin ID.
     /// \returns reference to this record
+    ///
     inline BamRecordImpl& Bin(uint32_t bin);
 
     /// Sets this record's alignment flag, using a raw integer.
     ///
     /// \param[in] flag raw alignment flag
     /// \returns reference to this record
+    ///
     inline BamRecordImpl& Flag(uint32_t flag);
 
     /// Sets this record's insert size.
     ///
     /// \param[in] iSize insert size
     /// \returns reference to this record
+    ///
     inline BamRecordImpl& InsertSize(int32_t iSize);
 
     /// Sets this record's map quality.
     ///
     /// \param[in] mapQual mapping quality - value of 255 indicates "unknown"
     /// \returns reference to this record
+    ///
     inline BamRecordImpl& MapQuality(uint8_t mapQual);
 
     /// Sets this record's mate's mapped position.
     ///
     /// \param[in] pos mapped position. A value of -1 indicates unmapped.
     /// \returns reference to this record
+    ///
     inline BamRecordImpl& MatePosition(PacBio::BAM::Position pos);
 
     /// Sets this record's mate's mapped reference ID
     ///
     /// \param[in] id reference ID. A value of -1 indicates unmapped.
     /// \returns reference to this record
+    ///
     inline BamRecordImpl& MateReferenceId(int32_t id);
 
     /// Sets this record's mapped position.
     ///
     /// \param[in] pos mapped position. A value of -1 indicates unmapped.
     /// \returns reference to this record
+    ///
     inline BamRecordImpl& Position(PacBio::BAM::Position pos);
 
     /// Sets this record's mapped reference ID
     ///
     /// \param[in] id reference ID. A value of -1 indicates unmapped.
     /// \returns reference to this record
+    ///
     inline BamRecordImpl& ReferenceId(int32_t id);
 
     ///@}
@@ -260,15 +268,15 @@ public:
     /// Sets the record's CIGAR data using a Cigar object
     ///
     /// \param[in] cigar PacBio::BAM::Cigar object
-    ///
     /// \returns reference to this record
+    ///
     BamRecordImpl& CigarData(const Cigar& cigar);
 
     /// Sets the record's CIGAR data using a CIGAR-formatted string.
     ///
     /// \param[in] cigarString CIGAR-formatted string
-    ///
     /// \returns reference to this record
+    ///
     BamRecordImpl& CigarData(const std::string& cigarString);
 
     // TODO: CIGAR iterator - Cigar only or here as well ??
@@ -279,8 +287,8 @@ public:
     /// Sets the record's "query name".
     ///
     /// \param name new name
-    ///
     /// \returns reference to this record
+    ///
     BamRecordImpl& Name(const std::string& name);
 
     /// \returns the record's quality values (phred-style ASCII)
@@ -288,6 +296,7 @@ public:
     /// \note Usually Qualities().size() == Sequence.size(). However, in
     ///       some data sets, the quality values are not provided. In that
     ///       case, this method will return an empty container.
+    ///
     QualityValues Qualities(void) const;
 
     /// \returns the record's DNA sequence.
@@ -380,7 +389,29 @@ public:
     /// \endcode
     ///
     /// \returns true if tag was successfully added.
-    bool AddTag(const std::string& tagName, const Tag& value);
+    ///
+    bool AddTag(const std::string& tagName,
+                const Tag& value);
+
+    /// Adds a new tag to this record, with an optional modifier.
+    ///
+    /// \param[in] tagName 2-character tag name.
+    /// \param[in] value Tag object that describes the type & value of data to be added
+    /// \param[in] additionalModifier optional extra modifier (for explicit modification of an otherwise const Tag)
+    ///
+    /// \note Any value that can be used to implicitly construct a Tag is valid.
+    /// \code
+    ///     char c;
+    ///     string h;
+    ///     record.AddTag("XX", c, TagModifier::ASCII_CHAR); // will add a char-type tag
+    ///     record.AddTag("YY", h, TagModifier::HEX_STRING); // will add a hex string-type tag
+    /// \endcode
+    ///
+    /// \returns true if tag was successfully added.
+    ///
+    bool AddTag(const std::string& tagName,
+                const Tag& value,
+                const TagModifier additionalModifier);
 
     /// Edits an existing tag on this record.
     ///
@@ -391,12 +422,34 @@ public:
     /// \code
     ///     string s;
     ///     vector<uint32_t> v;
-    ///     record.EditTag("XX", s); // will overwrite tag XX with a string-type Tag
-    ///     record.EditTag("YY", v); // will overwrite tag YY with a uint32-array-type Tag
+    ///     record.EditTag("XX", s); // will overwrite tag XX with a string-type tag
+    ///     record.EditTag("YY", v); // will overwrite tag YY with a uint32-array-type tag
     /// \endcode
     ///
     /// \returns true if tag was successfully edited.
-    bool EditTag(const std::string& tagName, const Tag& newValue);
+    ///
+    bool EditTag(const std::string& tagName,
+                 const Tag& newValue);
+
+    /// Edits an existing tag on this record.
+    ///
+    /// \param[in] tagName 2-character tag name. Name must be present (see HasTag)
+    /// \param[in] newValue Tag object that describes the type & value of new data to be added
+    /// \param[in] additionalModifier optional extra modifier (for explicit modification of an otherwise const Tag)
+    ///
+    /// \note Any value that can be used to implicitly construct a Tag is valid.
+    /// \code
+    ///     char c;
+    ///     string h;
+    ///     record.EditTag("XX", c, TagModifier::ASCII_CHAR); // will overwrite tag XX with a char-type tag
+    ///     record.EditTag("YY", h, TagModifier::HEX_STRING); // will overwrite tag YY with a hex string-type tag
+    /// \endcode
+    ///
+    /// \returns true if tag was successfully edited.
+    ///
+    bool EditTag(const std::string& tagName,
+                 const Tag& value,
+                 const TagModifier additionalModifier);
 
     /// \returns true if a tag with this name is present in this record.
     bool HasTag(const std::string& tagName) const;
@@ -407,6 +460,7 @@ public:
     ///
     /// \returns true if tag was actaully removed (i.e. false if tagName previously unknown)
     /// \sa HasTag
+    ///
     bool RemoveTag(const std::string& tagName);
 
     /// Fetches a tag from this record.
@@ -415,6 +469,7 @@ public:
     ///
     /// \returns Tag object for the requested name. If name is unknown, a default constructed
     ///          Tag is returned (Tag::IsNull() is true).
+    ///
     Tag TagValue(const std::string& tagName) const;
 
     // change above to Tag();

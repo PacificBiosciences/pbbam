@@ -47,6 +47,7 @@ namespace PacBio {
 namespace BAM {
 
 /// \brief Provides information on the exact (C++) data type held by a Tag.
+///
 enum class TagDataType
 {
     INVALID      = 0     ///< boost::blank
@@ -72,9 +73,11 @@ enum class TagDataType
 /// Some C++ data types (e.g. std::string) may represent more than one BAM tag type
 /// ('H' vs 'Z'). These modifiers indicate how to properly interpret those shared
 /// data types.
-enum class TagModifier
+///
+enum class   TagModifier
 {
     /// \brief This indicates the tag has no modifiers set.
+    ///
     NONE = 0,
 
     /// \brief This modifier marks an integer as ASCII.
@@ -84,6 +87,7 @@ enum class TagModifier
     /// (int8_t/uint8_t are likely implemented as typedefs around char/unsigned char).
     /// Thus this modifier can be used to indicate a tag's integer data should be
     /// interpreted as a printable, ASCII character.
+    ///
     ASCII_CHAR,
 
     /// \brief This modifier marks std::string data as "hex string", rather than a regular string.
@@ -92,6 +96,7 @@ enum class TagModifier
     /// However, they are both manipulated in C++ via std::string. Thus this modifier
     /// can be used to indicate that a tag's string data should be interpreted as
     /// "Hex format" rather than a regular, literal string.
+    ///
     HEX_STRING
 };
 
@@ -106,27 +111,79 @@ public:
 
     /// Constructs a null tag.
     /// \sa IsNull()
+    ///
     Tag(void);
 
+    /// Constructs a Tag from 8-bit integer or character.
+    ///
+    /// \note Passing a char ('A') to Tag constructor will likely result in calling
+    ///       this version. If you desire an ASCII char tag and not a numeric value,
+    ///       use the version that allows passing a modifier:
+    ///       Tag('A', TagModifier::ASCII_CHAR), or set that modifier flag using
+    ///       Tag::Modifier(const TagModifier m) .
+    ///
     Tag(int8_t value);
+
+    /// Constructs a Tag from 8-bit integer or character, adding modifier.
+    ///
+    /// This method allows direct construction of an ASCII character, rather
+    /// than an 8-bit integer (e.g. Tag('A', TagModifier::ASCII_CHAR) ).
+    ///
+    /// \throws runtime_error if \p modifier is not valid for int8_t data
+    ///
+    Tag(int8_t value, const TagModifier mod);
+
+    /// Constructs a Tag from 8-bit unsigned integer or unsigned character.
+    ///
     Tag(uint8_t value);
+
+    /// Constructs a Tag from 16-bit integer.
     Tag(int16_t value);
+
+    /// Constructs a Tag from 16-bit unsigned integer.
     Tag(uint16_t value);
+
+    /// Constructs a Tag from 32-bit signed integer.
     Tag(int32_t value);
+
+    /// Constructs a Tag from 32-bit unsigned integer.
     Tag(uint32_t value);
+
+    /// Constrcuts a Tag from floating-point value.
     Tag(float value);
+
+    /// Constructs a Tag from string data.
     Tag(const std::string& value);
+
+    /// Constructs a Tag from string data, adding modifier.
+    ///
+    /// \throws runtime_error if \p modifier is not valid for string data
+    ///
+    Tag(const std::string& value, const TagModifier mod);
+
+    /// Constructs a Tag from a vector of 8-bit integers.
     Tag(const std::vector<int8_t>& value);
+
+    /// Constructs a Tag from a vector of 8-bit unsigned integers.
     Tag(const std::vector<uint8_t>& value);
+
+    /// Constructs a Tag from a vector of 16-bit integers.
     Tag(const std::vector<int16_t>& value);
+
+    /// Constructs a Tag from a vector of 16-bit unsigned integers.
     Tag(const std::vector<uint16_t>& value);
+
+    /// Constructs a Tag from a vector of 32-bit integers.
     Tag(const std::vector<int32_t>& value);
+
+    /// Constructs a Tag from a vector of 32-bit unsigned integers.
     Tag(const std::vector<uint32_t>& value);
+
+    /// Constructs a Tag from a vector of floating-point values.
     Tag(const std::vector<float>& value);
     
     Tag(const Tag& other);
     Tag(Tag&& other);
-
     ~Tag(void);
 
     Tag& operator=(boost::blank value);
