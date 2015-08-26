@@ -57,6 +57,7 @@ public:
     ///
     /// \param [in] stdString SAM/BAM formatted CIGAR data
     /// \returns Cigar object representing the input data
+    ///
     static Cigar FromStdString(const std::string& stdString);
 
     /// \}
@@ -82,6 +83,7 @@ public:
     /// Converts Cigar object data to SAM/BAM formatted string
     ///
     /// \returns SAM/BAM formatted std::string
+    ///
     std::string ToStdString(void) const;
 
     /// \}

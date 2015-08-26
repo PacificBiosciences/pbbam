@@ -581,8 +581,21 @@ void BamRecord::CalculateAlignedPositions(void) const
     }
 }
 
-Cigar BamRecord::CigarData(void) const
-{ return impl_.CigarData(); }
+static
+bool is_clipping_op(const CigarOperation& op)
+{
+    const CigarOperationType opType = op.Type();
+    return opType == CigarOperationType::SOFT_CLIP ||
+           opType == CigarOperationType::HARD_CLIP;
+}
+
+Cigar BamRecord::CigarData(bool exciseAllClips) const
+{
+    Cigar cigar = std::move(impl_.CigarData());
+    if (exciseAllClips)
+        cigar.erase(std::remove_if(cigar.begin(), cigar.end(), is_clipping_op), cigar.end());
+    return cigar;
+}
 
 BamRecord& BamRecord::Clip(const ClipType clipType,
                            const Position start,

@@ -48,7 +48,7 @@ Cigar::Cigar(const string& cigarString)
     const size_t numChars = cigarString.size();
     for (size_t i = 0; i < numChars; ++i) {
         const char c = cigarString.at(i);
-        if (!::isdigit(c)) {
+        if (!isdigit(c)) {
             const size_t distance = i - numberStart;
             const uint32_t length = stoul(cigarString.substr(numberStart, distance));
             push_back(CigarOperation(c, length));

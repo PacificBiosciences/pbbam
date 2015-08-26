@@ -1185,3 +1185,27 @@ TEST(BamRecordClippingTest, StaticClippedToReference)
 //    EXPECT_EQ(s3_tagQuals_clipped, s3.AltLabelQV(Orientation::GENOMIC).Fastq());
     EXPECT_EQ(s3_frames_clipped,   s3.IPD(Orientation::GENOMIC).Data());
 }
+
+TEST(BamRecordTest, ClipCigarData)
+{
+    const Position qStart = 500;
+    const Position qEnd   = 515;
+    const string seq      = "TTAACCGTTAGCAAA";
+    const string quals    = "--?]?]?]?]?*+++";
+    const string tagBases = "TTAACCGTTAGCAAA";
+    const string tagQuals = "--?]?]?]?]?*+++";
+    const f_data frames   = { 40, 40, 10, 10, 20, 20, 30, 40, 40, 10, 30, 20, 10, 10, 10 };
+    const uint8_t mapQual = 80;
+    BamRecord s3 = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s3_rev = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+
+    const string s3_cigar = "5H2S4=1D2I2D4=3S7H";
+    s3.Map(0, 100, Strand::FORWARD, s3_cigar, mapQual);
+    s3_rev.Map(0, 100, Strand::REVERSE, s3_cigar, mapQual);
+
+    const Cigar s3_cigar_raw     = s3.CigarData();
+    const Cigar s3_cigar_clipped = s3.CigarData(true);
+
+    EXPECT_EQ(s3_cigar, s3_cigar_raw.ToStdString());
+    EXPECT_EQ(string("4=1D2I2D4="), s3_cigar_clipped.ToStdString());
+}

@@ -124,8 +124,13 @@ public:
     /// \returns the left and right barcode ids
     std::pair<int,int> Barcodes(void) const;
 
+    /// Fetch the record's alignment CIGAR.
+    ///
+    /// \param[in] exciseAllClips if true, remove all clipping operations (hard & soft) [default:false]
+    //
     /// \returns the record's CIGAR data as a Cigar object
-    Cigar CigarData(void) const;
+    ///
+    Cigar CigarData(bool exciseAllClips = false) const;
 
     /// \returns this record's full name
     /// \sa BamRecordImpl::Name
