@@ -1285,9 +1285,6 @@ TEST(DataSetIOTest, InspectMalformedXml)
     const string xmlFn = tests::Data_Dir + "/dataset/malformed.xml";
 
     DataSet ds(xmlFn);
-    const std::unique_ptr<DataSetBase>& d = ds.d_;
-    const NamespaceRegistry& registry = d->Namespaces();
-
     stringstream s;
     ds.SaveToStream(s);
 

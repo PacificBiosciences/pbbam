@@ -64,11 +64,8 @@ string OutputName(const DataSetElement& node,
                   const NamespaceRegistry& registry)
 {
     // if from input XML, respect the namespaces given
-    if (node.IsVerbatimLabel()) {
-        if (node.QualifiedNameLabel() == "SubreadSet")
-            cerr << "verbatime node";
+    if (node.IsVerbatimLabel()) 
         return node.QualifiedNameLabel();
-    }
 
     // otherwise, probably user-generated
     else {

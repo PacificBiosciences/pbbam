@@ -155,6 +155,7 @@ public:
     /// \{
 
     std::vector<BamFile> BamFiles(void) const;
+    std::vector<std::string> ResolvedResourceIds(void) const;
 
     /// \}
 

@@ -91,12 +91,14 @@ TEST(FileUtilsTest, LastModifiedOk)
 
 TEST(FileUtilsTest, ResolvedFilePathOk)
 {
+    const string testFrom = "/path/to/myDir";
+
+    // "raw" filenames - no URI scheme
+
     const string absolutePath = "/absolute/path/to/file.txt";
     const string relativePath = "../relative/path/to/file.txt";
     const string noPathFn     = "file.txt";
-
-    const string testFrom = "/path/to/myDir";
-
+    
     const string resolvedAbsolutePath = FileUtils::ResolvedFilePath(absolutePath, testFrom);
     const string resolvedRelativePath = FileUtils::ResolvedFilePath(relativePath, testFrom);
     const string resolvedNoPath       = FileUtils::ResolvedFilePath(noPathFn, testFrom);
@@ -111,6 +113,27 @@ TEST(FileUtilsTest, ResolvedFilePathOk)
     EXPECT_EQ("/absolute/path/to/file.txt",     resolvedAbsolutePath_defaultFrom);
     EXPECT_EQ("./../relative/path/to/file.txt", resolvedRelativePath_defaultFrom);
     EXPECT_EQ("./file.txt",                     resolvedNoPath_defaultFrom);
+
+    // filenames with URI scheme ("file://")
+
+    const string absoluteSchemeFn = "file:///absolute/path/to/file.txt";
+    const string relativeSchemeFn = "file://../relative/path/to/file.txt";
+    const string noPathSchemeFn   = "file://file.txt";
+
+    const string resolvedAbsoluteSchemePath = FileUtils::ResolvedFilePath(absoluteSchemeFn, testFrom);
+    const string resolvedRelativeSchemePath = FileUtils::ResolvedFilePath(relativeSchemeFn, testFrom);
+    const string resolvedNoPathSchemeFn     = FileUtils::ResolvedFilePath(noPathSchemeFn, testFrom);
+    const string resolvedAbsoluteSchemePath_defaultFrom = FileUtils::ResolvedFilePath(absoluteSchemeFn);
+    const string resolvedRelativeSchemePath_defaultFrom = FileUtils::ResolvedFilePath(relativeSchemeFn);
+    const string resolvedNoPathSchemeFn_defaultFrom     = FileUtils::ResolvedFilePath(noPathSchemeFn);
+
+    EXPECT_EQ("/absolute/path/to/file.txt",                  resolvedAbsoluteSchemePath);
+    EXPECT_EQ("/path/to/myDir/../relative/path/to/file.txt", resolvedRelativeSchemePath);
+    EXPECT_EQ("/path/to/myDir/file.txt",                     resolvedNoPathSchemeFn);
+
+    EXPECT_EQ("/absolute/path/to/file.txt",                  resolvedAbsoluteSchemePath_defaultFrom);
+    EXPECT_EQ("./../relative/path/to/file.txt", resolvedRelativeSchemePath_defaultFrom);
+    EXPECT_EQ("./file.txt",                     resolvedNoPathSchemeFn_defaultFrom);
 }
 
 TEST(FileUtilsTest, SizeOk)

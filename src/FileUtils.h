@@ -98,6 +98,8 @@ public:
     /// ../relative/path/to/file.txt => <from>/../relative/path/to/file.txt
     /// file.txt                     => <from>/file.txt
     ///
+    /// \note This method will strip any URI scheme as well ("file://") so that the result is immediately ready from I/O operations.
+    ///
     /// \param[in] filePath file path to be resolved
     /// \param[in] from     optional starting directory (useful if not same as application's working directory)
     /// \returns resolved file path

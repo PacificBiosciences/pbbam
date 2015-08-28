@@ -137,13 +137,29 @@ DataSet& DataSet::operator+=(const DataSet& other)
 
 vector<BamFile> DataSet::BamFiles(void) const
 {
-    vector<BamFile> result;
     const PacBio::BAM::ExternalResources& resources = ExternalResources();
-    const int numResources = resources.Size();
-    result.reserve(numResources);
-    for( const ExternalResource& ext : resources ) {
+    
+    vector<BamFile> result;
+    result.reserve(resources.Size());
+    for(const ExternalResource& ext : resources) {
+        boost::iterator_range<string::const_iterator> bamFound = boost::algorithm::ifind_first(ext.MetaType(), "bam");
+        if (!bamFound.empty()) {
+            const string fn = internal::FileUtils::ResolvedFilePath(ext.ResourceId(), path_);
+            result.push_back(BamFile(fn));
+        }
+    }
+    return result;
+}
+
+vector<string> DataSet::ResolvedResourceIds(void) const
+{
+    const PacBio::BAM::ExternalResources& resources = ExternalResources();
+    
+    vector<string> result;
+    result.reserve(resources.Size());
+    for(const ExternalResource& ext : resources) {
         const string fn = internal::FileUtils::ResolvedFilePath(ext.ResourceId(), path_);
-        result.push_back(BamFile(fn));
+        result.push_back(fn);
     }
     return result;
 }

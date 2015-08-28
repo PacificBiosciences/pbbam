@@ -107,11 +107,24 @@ chrono::system_clock::time_point FileUtils::LastModified(const char* fn)
 string FileUtils::ResolvedFilePath(const string& filePath,
                                    const string& from)
 {
+    // strip scheme from beginning, if it exists
+    string schemeLess = filePath;
+    const size_t schemeFound = schemeLess.find("file://");
+    if (schemeFound != string::npos) {
+        if (schemeFound != 0)
+            throw runtime_error("Malformed URI: scheme not at beginning");
+        schemeLess = schemeLess.substr(7);
+    }
+
     // if absolute path, just return it
-    // else make relative from  the provided'from' directory
-    if (filePath.at(0) == '/')
-        return filePath;
-    return from + "/" + filePath;
+    if (schemeLess.at(0) == '/')
+        return schemeLess;
+        
+     // else make relative from the provided'from' directory (avoiding redundant "./"(s) at start)
+    const bool thisDirAtStart = (schemeLess.find("./") == 0);
+    if (thisDirAtStart)
+        schemeLess = schemeLess.substr(2);
+    return from + "/" + schemeLess;
 }
 
 off_t FileUtils::Size(const char* fn)
