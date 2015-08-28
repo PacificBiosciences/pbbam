@@ -88,7 +88,7 @@ void FromXml(const pugi::xml_node& xmlNode, DataSetElement& parent)
         return;
 
     // label & text
-    DataSetElement e(xmlNode.name());
+    DataSetElement e(xmlNode.name(), FromInputXml());
     e.Text(xmlNode.text().get());
 
     // iterate attributes

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<pbds:DataSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CreatedAt="2015-05-13T10:58:26" MetaType="PacBio.DataSet.DataSet" Name="" Tags="" UniqueId="30f72098-bc5b-e06b-566c-8b28dda909a8" Version="2.3.0" xmlns="http://pacificbiosciences.com/PacBioDataModel.xsd" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+<pbds:DataSet CreatedAt="2015-05-13T10:58:26" MetaType="PacBio.DataSet.DataSet" Name="" Tags="" UniqueId="30f72098-bc5b-e06b-566c-8b28dda909a8" Version="2.3.0" xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:schemaLocation="http://pacificbiosciences.com/PacBioDatasets.xsd">
     <pbbase:ExternalResources>
         <pbbase:ExternalResource ResourceId="file:tests/data/bam_mapping_1.bam">
 			<pbbase:FileIndices>

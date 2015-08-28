@@ -96,10 +96,9 @@ TEST(DataSetXsdTest, EditDatasetRegistry)
     dataset.Tags("barcode moreTags mapping mytags");
     dataset.UniqueId("b095d0a3-94b8-4918-b3af-a3f81bbe519c");
     dataset.Version("2.3.0");
-    dataset.Attribute("xmlns","http://pacificbiosciences.com/PacBioSecondaryDataModel.xsd")
-           .Attribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-           .Attribute("xsi:schemaLocation",
-                      "http://pacificbiosciences.com/PacBioSecondaryDataModel.xsd PacBioSecondaryDataModel.xsd");
+    dataset.Attribute("xmlns",              "http://pacificbiosciences.com/PacBioDatasets.xsd")
+           .Attribute("xmlns:xsi",          "http://www.w3.org/2001/XMLSchema-instance")
+           .Attribute("xsi:schemaLocation", "http://pacificbiosciences.com/PacBioDatasets.xsd");
     dataset.ExternalResources().Add(ExternalResource("Fake.MetaType", "filename"));
 
     dataset.Namespaces().Register(XsdType::BASE_DATA_MODEL, NamespaceInfo("custom", "http://custom/uri.xsd"));
@@ -109,10 +108,11 @@ TEST(DataSetXsdTest, EditDatasetRegistry)
         "<pbds:AlignmentSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.AlignmentSet\" "
                 "Name=\"DataSet_AlignmentSet\" Tags=\"barcode moreTags mapping mytags\" "
                 "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\" "
-                "xmlns=\"http://pacificbiosciences.com/PacBioSecondaryDataModel.xsd\" "
+                "xmlns=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
                 "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-                "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioSecondaryDataModel.xsd "
-                "PacBioSecondaryDataModel.xsd\">\n"
+                "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
+                "xmlns:custom=\"http://custom/uri.xsd\" "
+                "xmlns:pbds=\"http://pacificbiosciences.com/PacBioDatasets.xsd\">\n"
         "\t<custom:ExternalResources>\n"
         "\t\t<custom:ExternalResource MetaType=\"Fake.MetaType\" ResourceId=\"filename\" />\n"
         "\t</custom:ExternalResources>\n"

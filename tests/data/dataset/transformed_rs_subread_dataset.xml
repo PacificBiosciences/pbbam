@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<pbds:HdfSubreadSet xmlns:uuid="java:java.util.UUID" xmlns:bax="http://whatever"
-               xmlns="http://pacificbiosciences.com/PacBioDataModel.xsd"
-               xmlns:xs="http://www.w3.org/2001/XMLSchema"
-               xmlns:fn="http://www.w3.org/2005/xpath-functions"
-               Name="Subreads from run r001173_42129_130607"
-               MetaType="PacBio.DataSet.SubreadSet"
-               Tags="pacbio.secondary.instrument=RS"
-               Version="0.5"
-               UniqueId="abbc9183-b01e-4671-8c12-19efee534647">
+<pbds:HdfSubreadSet 
+    xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd"
+    xmlns:bax="http://whatever"
+    xmlns:fn="http://www.w3.org/2005/xpath-functions"
+    xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd"
+    xmlns:pbmeta="http://pacificbiosciences.com/PacBioCollectionMetadata.xsd"
+    xmlns:pbsample="http://pacificbiosciences.com/PacBioSampleInfo.xsd" 
+    xmlns:uuid="java:java.util.UUID" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://pacificbiosciences.com/PacBioDatasets.xsd"
+    Name="Subreads from run r001173_42129_130607"
+    MetaType="PacBio.DataSet.SubreadSet"
+    Tags="pacbio.secondary.instrument=RS"
+    Version="0.5"
+    UniqueId="abbc9183-b01e-4671-8c12-19efee534647">
    <pbbase:ExternalResources>
       <pbbase:ExternalResource MetaType="PacBio.SubreadFile.BaxFile"
           ResourceId="file:///mnt/secondary-siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.0.bax.h5"/>

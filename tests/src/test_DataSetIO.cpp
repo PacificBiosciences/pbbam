@@ -166,10 +166,9 @@ TEST(DataSetIOTest, ToXml)
     dataset.Tags("barcode moreTags mapping mytags");
     dataset.UniqueId("b095d0a3-94b8-4918-b3af-a3f81bbe519c");
     dataset.Version("2.3.0");
-    dataset.Attribute("xmlns","http://pacificbiosciences.com/PacBioSecondaryDataModel.xsd")
-           .Attribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-           .Attribute("xsi:schemaLocation",
-                      "http://pacificbiosciences.com/PacBioSecondaryDataModel.xsd PacBioSecondaryDataModel.xsd");
+    dataset.Attribute("xmlns",              "http://pacificbiosciences.com/PacBioDatasets.xsd")
+           .Attribute("xmlns:xsi",          "http://www.w3.org/2001/XMLSchema-instance")
+           .Attribute("xsi:schemaLocation", "http://pacificbiosciences.com/PacBioDatasets.xsd");
 
     // external resources
     ExternalResource resource1;
@@ -221,10 +220,11 @@ TEST(DataSetIOTest, ToXml)
         "<pbds:AlignmentSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.AlignmentSet\" "
                 "Name=\"DataSet_AlignmentSet\" Tags=\"barcode moreTags mapping mytags\" "
                 "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\" "
-                "xmlns=\"http://pacificbiosciences.com/PacBioSecondaryDataModel.xsd\" "
+                "xmlns=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
                 "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-                "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioSecondaryDataModel.xsd "
-                "PacBioSecondaryDataModel.xsd\">\n"
+                "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
+                "xmlns:pbbase=\"http://pacificbiosciences.com/PacBioBaseDataModel.xsd\" "
+                "xmlns:pbds=\"http://pacificbiosciences.com/PacBioDatasets.xsd\">\n"
         "\t<pbbase:ExternalResources>\n"
         "\t\t<pbbase:ExternalResource Description=\"Points to an example Alignments BAM file.\" "
                 "MetaType=\"AlignmentFile.AlignmentBamFile\" Name=\"Third Alignments BAM\" "
@@ -395,9 +395,9 @@ static void TestAli1Xml(void)
     EXPECT_EQ(string("barcode moreTags mapping mytags"),      dataset.Tags());
     EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
     EXPECT_EQ(string("2.3.0"),                                dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),         dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
 
@@ -484,9 +484,9 @@ static void TestAli2Xml(void)
     EXPECT_EQ(string("barcode moreTags mapping mytags"),      dataset.Tags());
     EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
     EXPECT_EQ(string("2.3.0"),                                dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),         dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
 
@@ -573,9 +573,9 @@ static void TestAli3Xml(void)
     EXPECT_EQ(string("barcode moreTags mapping mytags"),      dataset.Tags());
     EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
     EXPECT_EQ(string("2.3.0"),                                dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),         dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
 
@@ -662,9 +662,9 @@ static void TestAli4Xml(void)
     EXPECT_EQ(string("barcode moreTags mapping mytags"),      dataset.Tags());
     EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
     EXPECT_EQ(string("2.3.0"),                                dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),         dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
 
@@ -751,9 +751,9 @@ static void TestMappingStaggeredXml(void)
     EXPECT_EQ(string(""), dataset.Tags());
     EXPECT_EQ(string("30f72098-bc5b-e06b-566c-8b28dda909a8"), dataset.UniqueId());
     EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),         dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
 
@@ -838,9 +838,9 @@ static void TestBarcodeXml(void)
     EXPECT_EQ(string("barcode moreTags mapping mytags"), dataset.Tags());
     EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
     EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),         dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
     EXPECT_EQ(0, dataset.SubDataSets().Size());
@@ -872,9 +872,9 @@ static void TestCcsReadXml(void)
     EXPECT_EQ(string("barcode moreTags mapping mytags"), dataset.Tags());
     EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
     EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),         dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
     EXPECT_EQ(0, dataset.SubDataSets().Size());
@@ -927,9 +927,9 @@ static void TestLambdaContigsXml(void)
     EXPECT_EQ(string(""), dataset.Tags());
     EXPECT_EQ(string("596e87db-34f9-d2fd-c905-b017543170e1"), dataset.UniqueId());
     EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),         dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
     EXPECT_EQ(0, dataset.SubDataSets().Size());
@@ -950,9 +950,9 @@ static void TestPbalchemyXml(void)
     EXPECT_EQ(string(""), dataset.Tags());
     EXPECT_EQ(string("58e3f7c5-24c1-b58b-fbd5-37de268cc2f0"), dataset.UniqueId());
     EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),         dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.SubDataSets().Size());
 
@@ -979,9 +979,9 @@ static void TestReferenceXml(void)
     EXPECT_EQ(string("barcode moreTags mapping mytags"), dataset.Tags());
     EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
     EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),         dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
     EXPECT_EQ(0, dataset.SubDataSets().Size());
@@ -1036,9 +1036,9 @@ static void TestSubread1Xml(void)
     EXPECT_EQ(string("barcode moreTags mapping mytags"), dataset.Tags());
     EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
     EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),         dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(2, resources.Size());
@@ -1106,9 +1106,9 @@ static void TestSubread2Xml(void)
     EXPECT_EQ(string("barcode moreTags mapping mytags"), dataset.Tags());
     EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
     EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),         dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(2, resources.Size());
@@ -1176,9 +1176,9 @@ static void TestSubread3Xml(void)
     EXPECT_EQ(string("barcode moreTags mapping mytags"), dataset.Tags());
     EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
     EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),         dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(2, resources.Size());
@@ -1245,7 +1245,7 @@ static void TestTransformedXml(void)
     EXPECT_EQ(string("pacbio.secondary.instrument=RS"), dataset.Tags());
     EXPECT_EQ(string("abbc9183-b01e-4671-8c12-19efee534647"), dataset.UniqueId());
     EXPECT_EQ(string("0.5"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDataModel.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
     EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema"),         dataset.Attribute("xmlns:xs"));
     EXPECT_EQ(string("http://www.w3.org/2005/xpath-functions"), dataset.Attribute("xmlns:fn"));
     EXPECT_EQ(string("java:java.util.UUID"), dataset.Attribute("xmlns:uuid"));
@@ -1279,3 +1279,95 @@ static void TestTransformedXml(void)
     EXPECT_EQ(string("150000"),   metadata.NumRecords());
     EXPECT_EQ(string("50000000"), metadata.TotalLength());
 }
+
+TEST(DataSetIOTest, InspectMalformedXml)
+{
+    const string xmlFn = tests::Data_Dir + "/dataset/malformed.xml";
+
+    DataSet ds(xmlFn);
+    const std::unique_ptr<DataSetBase>& d = ds.d_;
+    const NamespaceRegistry& registry = d->Namespaces();
+
+    stringstream s;
+    ds.SaveToStream(s);
+
+    const string expected =
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+        "<SubreadSet Description=\"Merged dataset from 1 files using DatasetMerger 0.1.2\" "
+                    "MetaType=\"PacBio.DataSet.HdfSubreadSet\" Name=\"Subreads from runr000013_42267_150403\" "
+                    "Tags=\"pacbio.secondary.instrument=RS\" TimeStampedName=\"hdfsubreadset_2015-08-19T15:39:36.331-07:00\" "
+                    "UniqueId=\"b4741521-2a4c-42df-8a13-0a755ca9ed1e\" Version=\"0.5\" "
+                    "xmlns=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
+                    "xmlns:ns0=\"http://pacificbiosciences.com/PacBioBaseDataModel.xsd\" "
+                    "xmlns:ns1=\"http://pacificbiosciences.com/PacBioSampleInfo.xsd\" "
+                    "xmlns:ns2=\"http://pacificbiosciences.com/PacBioCollectionMetadata.xsd\" "
+                    "xmlns:ns3=\"http://pacificbiosciences.com/PacBioReagentKit.xsd\" "
+                    "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                    "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDatasets.xsd\">\n"
+        "\t<ns0:ExternalResources>\n"
+        "\t\t<ns0:ExternalResource MetaType=\"SubreadFile.SubreadBamFile\" "
+                                  "ResourceId=\"file:///mnt/secondary-siv/jenkins/jenkins-bot01/workspace/Ubuntu1404_Mainline_SA3_Tiny_tests/software/smrtanalysis/siv/testkit-jobs/sa3_pipelines/mapping/tiny/job_output-ubuntu1404/tasks/pbsmrtpipe.tasks.h5_subreads_to_subread-0//mnt/secondary-siv/jenkins/jenkins-bot01/workspace/Ubuntu1404_Mainline_SA3_Tiny_tests/software/smrtanalysis/siv/testkit-jobs/sa3_pipelines/mapping/tiny/job_output-ubuntu1404/tasks/pbsmrtpipe.tasks.h5_subreads_to_subread-0/file.subreads.subreads.bam\" "
+                                  "TimeStampedName=\"SubreadFile.SubreadBamFile_00000000000000\" "
+                                  "UniqueId=\"251acf71-9eb0-489e-9dd1-cdbd11432753\" />\n"
+        "\t</ns0:ExternalResources>\n"
+        "\t<DataSetMetadata>\n"
+        "\t\t<TotalLength>50000000</TotalLength>\n"
+        "\t\t<NumRecords>150000</NumRecords>\n"
+        "\t\t<ns2:Collections>\n"
+        "\t\t\t<ns2:CollectionMetadata Context=\"m150404_101626_42267_c100807920800000001823174110291514_s1_p0\" "
+                                      "InstrumentId=\"1\" InstrumentName=\"42267\" MetaType=\"PacBio.Collection\" "
+                                      "TimeStampedName=\"m150404_101626_42267_c100807920800000001823174110291514_s1_p0\" "
+                                      "UniqueId=\"d66c8372-2b70-4dcf-b64f-9f8b5cc351fd\">\n"
+        "\t\t\t\t<ns2:InstCtrlVer>2.3.0.1.142990</ns2:InstCtrlVer>\n"
+        "\t\t\t\t<ns2:SigProcVer>NRT@172.31.128.10:8082, SwVer=2301.142990, HwVer=1.0</ns2:SigProcVer>\n"
+        "\t\t\t\t<ns2:RunDetails>\n"
+        "\t\t\t\t\t<ns2:RunId>r000013_42267_150403</ns2:RunId>\n"
+        "\t\t\t\t\t<ns2:Name>Inst42267-040315-SAT-100pM-2kb-P6C4</ns2:Name>\n"
+        "\t\t\t\t</ns2:RunDetails>\n"
+        "\t\t\t\t<ns2:WellSample Name=\"Inst42267-040315-SAT-100pM-2kb-P6C4\">\n"
+        "\t\t\t\t\t<ns2:PlateId>Inst42267-040315-SAT-100pM-2kb-P6C4</ns2:PlateId>\n"
+        "\t\t\t\t\t<ns2:WellName>Inst42267-040315-SAT-100pM-2kb-P6C4</ns2:WellName>\n"
+        "\t\t\t\t\t<ns2:Concentration>0.0</ns2:Concentration>\n"
+        "\t\t\t\t\t<ns2:SampleReuseEnabled>false</ns2:SampleReuseEnabled>\n"
+        "\t\t\t\t\t<ns2:StageHotstartEnabled>false</ns2:StageHotstartEnabled>\n"
+        "\t\t\t\t\t<ns2:SizeSelectionEnabled>false</ns2:SizeSelectionEnabled>\n"
+        "\t\t\t\t\t<ns2:UseCount>1</ns2:UseCount>\n"
+        "\t\t\t\t\t<ns1:BioSamplePointers>\n"
+        "\t\t\t\t\t\t<ns1:BioSamplePointer>251acf71-9eb0-489e-9dd1-cdbd11432752</ns1:BioSamplePointer>\n"
+        "\t\t\t\t\t</ns1:BioSamplePointers>\n"
+        "\t\t\t\t</ns2:WellSample>\n"
+        "\t\t\t\t<ns2:Automation>\n"
+        "\t\t\t\t\t<ns0:AutomationParameters>\n"
+        "\t\t\t\t\t\t<ns0:AutomationParameter />\n"
+        "\t\t\t\t\t</ns0:AutomationParameters>\n"
+        "\t\t\t\t</ns2:Automation>\n"
+        "\t\t\t\t<ns2:CollectionNumber>7</ns2:CollectionNumber>\n"
+        "\t\t\t\t<ns2:CellIndex>4</ns2:CellIndex>\n"
+        "\t\t\t\t<ns2:CellPac Barcode=\"10080792080000000182317411029151\" />\n"
+        "\t\t\t\t<ns2:Primary>\n"
+        "\t\t\t\t\t<ns2:AutomationName>BasecallerV1</ns2:AutomationName>\n"
+        "\t\t\t\t\t<ns2:ConfigFileName>2-3-0_P6-C4.xml</ns2:ConfigFileName>\n"
+        "\t\t\t\t\t<ns2:SequencingCondition />\n"
+        "\t\t\t\t\t<ns2:OutputOptions>\n"
+        "\t\t\t\t\t\t<ns2:ResultsFolder>Analysis_Results</ns2:ResultsFolder>\n"
+        "\t\t\t\t\t\t<ns2:CollectionPathUri>rsy://mp-rsync/vol55//RS_DATA_STAGING/42267/Inst42267-040315-SAT-100pM-2kb-P6C4_13/A04_7/</ns2:CollectionPathUri>\n"
+        "\t\t\t\t\t\t<ns2:CopyFiles>\n"
+        "\t\t\t\t\t\t\t<ns2:CollectionFileCopy>Fasta</ns2:CollectionFileCopy>\n"
+        "\t\t\t\t\t\t</ns2:CopyFiles>\n"
+        "\t\t\t\t\t\t<ns2:Readout>Bases</ns2:Readout>\n"
+        "\t\t\t\t\t\t<ns2:MetricsVerbosity>Minimal</ns2:MetricsVerbosity>\n"
+        "\t\t\t\t\t</ns2:OutputOptions>\n"
+        "\t\t\t\t</ns2:Primary>\n"
+        "\t\t\t</ns2:CollectionMetadata>\n"
+        "\t\t</ns2:Collections>\n"
+        "\t\t<ns1:BioSamples>\n"
+        "\t\t\t<ns1:BioSample Description=\"Inst42267-SAT-100pM-2kbLambda-P6C4-Std120_CPS_040315\" "
+                            "MetaType=\"PacBio.Sample\" Name=\"Inst42267-040315-SAT-100pM-2kb-P6C4\" "
+                            "TimeStampedName=\"biosample_2015-08-19T15:39:36.331-07:00\" UniqueId=\"251acf71-9eb0-489e-9dd1-cdbd11432752\" />\n"
+        "\t\t</ns1:BioSamples>\n"
+        "\t</DataSetMetadata>\n"
+        "</SubreadSet>\n";
+
+    EXPECT_EQ(expected, s.str());
+}
+

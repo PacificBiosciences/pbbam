@@ -40,6 +40,7 @@
 #include "pugixml/pugixml.hpp"
 #include <fstream>
 #include <iostream>
+#include <map>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
@@ -50,19 +51,42 @@ namespace BAM {
 namespace internal {
 
 static
+string Prefix(const string& input)
+{
+    const size_t colonFound = input.find(':');
+    if (colonFound == std::string::npos || colonFound == 0)
+        return string();
+    return input.substr(0, colonFound);
+}
+
+static
 string OutputName(const DataSetElement& node,
                   const NamespaceRegistry& registry)
 {
-    if (node.PrefixLabel().empty())
-        return registry.Namespace(node.Xsd()).Name() + ":" + node.LocalNameLabel().to_string();
-    else
-        return node.QualifiedNameLabel(); // is this correct? what if node's contents don't match registry
-                                          // who gets priority?
+    // if from input XML, respect the namespaces given
+    if (node.IsVerbatimLabel()) {
+        if (node.QualifiedNameLabel() == "SubreadSet")
+            cerr << "verbatime node";
+        return node.QualifiedNameLabel();
+    }
+
+    // otherwise, probably user-generated
+    else {
+        // if no namespace prefix, prepend the appropriate one & return
+        if (node.PrefixLabel().empty()) {
+            static const string colon = ":";
+            return registry.Namespace(node.Xsd()).Name() + colon + node.LocalNameLabel().to_string();
+        }
+        // otherwise, has prefix - return full name
+        else
+            return node.QualifiedNameLabel();
+    }
 }
 
 static
 void ToXml(const DataSetElement& node,
            const NamespaceRegistry& registry,
+           map<XsdType, string>& xsdPrefixesUsed,
            pugi::xml_node& parentXml)
 {
     // create child of parent, w/ label & text
@@ -73,6 +97,11 @@ void ToXml(const DataSetElement& node,
 
     if (!node.Text().empty())
         xmlNode.text().set(node.Text().c_str());
+
+    // store XSD type for later
+    const string prefix = Prefix(label);
+    if (!prefix.empty())
+        xsdPrefixesUsed[node.Xsd()] = prefix;
 
     // add attributes
     auto attrIter = node.Attributes().cbegin();
@@ -92,7 +121,7 @@ void ToXml(const DataSetElement& node,
     auto childEnd  = node.Children().cend();
     for ( ; childIter != childEnd; ++childIter) {
         const DataSetElement& child = (*childIter);
-        ToXml(child, registry, xmlNode);
+        ToXml(child, registry, xsdPrefixesUsed, xmlNode);
     }
 }
 
@@ -129,18 +158,74 @@ void XmlWriter::ToStream(const DataSetBase& dataset,
         attr.set_value(value.c_str());
     }
 
+    map<XsdType, string> xsdPrefixesUsed;
+    xsdPrefixesUsed[dataset.Xsd()] = Prefix(label);
+
     // iterate children, recursively building up subtree
     auto childIter = dataset.Children().cbegin();
     auto childEnd  = dataset.Children().cend();
     for ( ; childIter != childEnd; ++childIter) {
         const DataSetElement& child = (*childIter);
-        ToXml(child, registry, root);
+        ToXml(child, registry, xsdPrefixesUsed, root);
     }
 
     // write XML to stream
     pugi::xml_node decl = doc.prepend_child(pugi::node_declaration);
     decl.append_attribute("version")  = "1.0";
     decl.append_attribute("encoding") = "utf-8";
+
+    // add XSD namespace attributes
+    pugi::xml_attribute xmlnsDefaultAttribute = root.attribute("xmlns");
+    if (xmlnsDefaultAttribute.empty()) {
+        xmlnsDefaultAttribute = root.append_attribute("xmlns");
+        xmlnsDefaultAttribute.set_value(registry.DefaultNamespace().Uri().c_str());
+    }
+    pugi::xml_attribute xsiAttribute = root.attribute("xmlns:xsi");
+    if (xsiAttribute.empty()) {
+        xsiAttribute = root.append_attribute("xmlns:xsi");
+        xsiAttribute.set_value("http://www.w3.org/2001/XMLSchema-instance");
+    }
+    pugi::xml_attribute xsiSchemaLocationAttribute = root.attribute("xsi:schemaLocation");
+    if (xsiSchemaLocationAttribute.empty()) {
+        xsiSchemaLocationAttribute = root.append_attribute("xsi:schemaLocation");
+        xsiSchemaLocationAttribute.set_value(registry.DefaultNamespace().Uri().c_str());
+    }
+
+    static const string xmlnsPrefix = "xmlns:";
+    map<XsdType, string>::const_iterator prefixIter = xsdPrefixesUsed.cbegin();
+    map<XsdType, string>::const_iterator prefixEnd  = xsdPrefixesUsed.cend();
+    for ( ; prefixIter != prefixEnd; ++prefixIter ) {
+        const XsdType& xsd = prefixIter->first;
+        const string& prefix = prefixIter->second;
+        if (xsd == XsdType::NONE || prefix.empty())
+            continue;
+        const NamespaceInfo& nsInfo = registry.Namespace(xsd);
+        assert(nsInfo.Name() == prefix);
+        const string xmlnsName = xmlnsPrefix + prefix;
+        pugi::xml_attribute xmlnsAttribute = root.attribute(xmlnsName.c_str());
+        if (xmlnsAttribute.empty()) {
+            xmlnsAttribute = root.append_attribute(xmlnsName.c_str());
+            xmlnsAttribute.set_value(nsInfo.Uri().c_str());
+        }
+    }
+
+
+
+//    static const string xmlnsPrefix = "xmlns:";
+//    for (const XsdType& xsd : xsdTypesFound) {
+//        if (xsd == XsdType::NONE)
+//            continue;
+//        const NamespaceInfo& nsInfo = registry.Namespace(xsd);
+
+
+
+//        const string xmlnsName = xmlnsPrefix + nsInfo.Name();
+//        pugi::xml_attribute xmlnsAttribute = root.attribute(xmlnsName.c_str());
+//        if (xmlnsAttribute.empty()) {
+//            xmlnsAttribute = root.append_attribute(xmlnsName.c_str());
+//            xmlnsAttribute.set_value(nsInfo.Uri().c_str());
+//        }
+//    }
 
     // "no escapes" to allow explicit ">" "<" comparison operators in filter parameters
     // we may remove this if/when comparison is separated from the value

@@ -63,7 +63,7 @@ class XmlName
     //  prefix    local name
 
 public:
-    XmlName(const std::string& fullName);
+    XmlName(const std::string& fullName, bool verbatim = false);
     XmlName(const std::string& localName, const std::string& prefix);
     XmlName(const XmlName& other);
     XmlName(XmlName&& other);
@@ -79,18 +79,23 @@ public:
     const boost::string_ref LocalName(void) const;
     const boost::string_ref Prefix(void) const;
     const std::string& QualifiedName(void) const;
+    bool Verbatim(void) const;
 
 private:
     std::string qualifiedName_;
     size_t prefixSize_;
     size_t localNameOffset_;
     size_t localNameSize_;
+    bool verbatim_;
 };
+
+struct FromInputXml { };
 
 class DataSetElement
 {
 public:
     DataSetElement(const std::string& label, const XsdType& xsd = XsdType::NONE);
+    DataSetElement(const std::string& label, const FromInputXml& fromInputXml, const XsdType& xsd = XsdType::NONE);
     DataSetElement(const DataSetElement& other);
     DataSetElement(DataSetElement&& other);
     DataSetElement& operator=(const DataSetElement& other);
@@ -115,6 +120,7 @@ public:
     const boost::string_ref LocalNameLabel(void) const;
     const boost::string_ref PrefixLabel(void) const;
     const std::string& QualifiedNameLabel(void) const;
+    bool IsVerbatimLabel(void) const;
 
     const std::string& Text(void) const;
     std::string& Text(void);

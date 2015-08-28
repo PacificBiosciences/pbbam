@@ -52,6 +52,13 @@ inline DataSetElement::DataSetElement(const std::string& label, const XsdType& x
     , label_(label)
 { }
 
+inline DataSetElement::DataSetElement(const std::string& label,
+                                      const FromInputXml&,
+                                      const XsdType& xsd)
+    : xsd_(xsd)
+    , label_(label, true)
+{ }
+
 inline DataSetElement::DataSetElement(const DataSetElement& other)
     : xsd_(other.xsd_)
     , label_(other.label_)
@@ -216,7 +223,7 @@ inline const std::string& DataSetElement::QualifiedNameLabel(void) const
 //{ return label_.QualifiedName(); }
 
 inline void DataSetElement::Label(const std::string& label)
-{ label_ = XmlName(label); }
+{ label_ = XmlName(label, true); }
 
 inline size_t DataSetElement::NumAttributes(void) const
 { return attributes_.size(); }
@@ -246,6 +253,9 @@ inline void DataSetElement::ChildText(const std::string& label,
     }
 }
 
+inline bool DataSetElement::IsVerbatimLabel(void) const
+{ return label_.Verbatim(); }
+
 inline const std::string& DataSetElement::Text(void) const
 { return text_; }
 
@@ -262,14 +272,13 @@ inline const XsdType& DataSetElement::Xsd(void) const
 // XmlName
 // ----------------
 
-inline XmlName::XmlName(const std::string& fullName)
+inline XmlName::XmlName(const std::string& fullName, bool verbatim)
     : qualifiedName_(fullName)
     , prefixSize_(0)
     , localNameOffset_(0)
     , localNameSize_(0)
+    , verbatim_(verbatim)
 {
-//    std::cerr << "Creating XmlName from fullName: " << fullName << std::endl;
-
     const size_t colonFound = qualifiedName_.find(':');
     if (colonFound == std::string::npos || colonFound == 0)
         localNameSize_ = qualifiedName_.size();
@@ -282,10 +291,6 @@ inline XmlName::XmlName(const std::string& fullName)
     localNameOffset_ = prefixSize_;
     if (prefixSize_ != 0)
         ++localNameOffset_;
-
-//    std::cerr << "  qualName:  " << qualifiedName_ << std::endl;
-//    std::cerr << "  prefix:    " << Prefix() << std::endl;
-//    std::cerr << "  localName: " << LocalName() << std::endl;
 }
 
 inline XmlName::XmlName(const std::string& localName,
@@ -293,6 +298,7 @@ inline XmlName::XmlName(const std::string& localName,
     : prefixSize_(prefix.size())
     , localNameOffset_(prefixSize_)
     , localNameSize_(localName.size())
+    , verbatim_(true)
 {
     qualifiedName_.clear();
     qualifiedName_.reserve(localNameSize_+ prefixSize_ + 1);
@@ -311,6 +317,7 @@ inline XmlName::XmlName(const XmlName& other)
     , prefixSize_(other.prefixSize_)
     , localNameOffset_(other.localNameOffset_)
     , localNameSize_(other.localNameSize_)
+    , verbatim_(other.verbatim_)
 { }
 
 inline XmlName::XmlName(XmlName&& other)
@@ -318,6 +325,7 @@ inline XmlName::XmlName(XmlName&& other)
     , prefixSize_(std::move(other.prefixSize_))
     , localNameOffset_(std::move(other.localNameOffset_))
     , localNameSize_(std::move(other.localNameSize_))
+    , verbatim_(std::move(other.verbatim_))
 { }
 
 inline XmlName& XmlName::operator=(const XmlName& other)
@@ -326,6 +334,7 @@ inline XmlName& XmlName::operator=(const XmlName& other)
     prefixSize_      = other.prefixSize_;
     localNameOffset_ = other.localNameOffset_;
     localNameSize_   = other.localNameSize_;
+    verbatim_        = other.verbatim_;
     return *this;
 }
 
@@ -335,6 +344,7 @@ inline XmlName& XmlName::operator=(XmlName&& other)
     prefixSize_      = std::move(other.prefixSize_);
     localNameOffset_ = std::move(other.localNameOffset_);
     localNameSize_   = std::move(other.localNameSize_);
+    verbatim_        = std::move(other.verbatim_);
     return *this;
 }
 
@@ -346,17 +356,6 @@ inline bool XmlName::operator==(const XmlName& other) const
 inline bool XmlName::operator!=(const XmlName& other) const
 { return !(*this == other); }
 
-//inline void XmlName::CalculateSizes(const size_t localNameSize,
-//                                    const size_t prefixSize)
-//{
-//    size_t offset = prefixSize;
-//    if (offset != 0)
-//        ++offset;
-
-//    localName_ = boost::string_ref(qualifiedName_.data() + offset, localNameSize);
-//    prefix_    = boost::string_ref(qualifiedName_.data(), prefixSize);
-//}
-
 inline const boost::string_ref XmlName::LocalName(void) const
 { return boost::string_ref(qualifiedName_.data() + localNameOffset_, localNameSize_); }
 
@@ -365,6 +364,9 @@ inline const boost::string_ref XmlName::Prefix(void) const
 
 inline const std::string& XmlName::QualifiedName(void) const
 { return qualifiedName_; }
+
+inline bool XmlName::Verbatim(void) const
+{ return verbatim_; }
 
 } // namespace internal
 } // namespace BAM

@@ -86,7 +86,9 @@ class PBBAM_EXPORT NamespaceRegistry
 public:
     NamespaceRegistry(void);
     NamespaceRegistry(const NamespaceRegistry& other);
+    NamespaceRegistry(NamespaceRegistry&& other);
     NamespaceRegistry& operator=(const NamespaceRegistry& other);
+    NamespaceRegistry& operator=(NamespaceRegistry&& other);
     ~NamespaceRegistry(void);
 
 public:
