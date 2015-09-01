@@ -38,6 +38,7 @@
 #include "pbbam/DataSetTypes.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 #include "DataSetUtils.h"
+#include "TimeUtils.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
@@ -68,8 +69,11 @@ DataEntityType::DataEntityType(const std::string& label, const XsdType& xsd)
 // IndexedDataType
 // -----------------
 
-IndexedDataType::IndexedDataType(const std::string& label, const XsdType &xsd)
-    : InputOutputDataType(label, xsd)
+IndexedDataType::IndexedDataType(const string& metatype,
+                                 const string& filename,
+                                 const string& label, 
+                                 const XsdType &xsd)
+    : InputOutputDataType(metatype, filename, label, xsd)
 { }
 
 DEFINE_ACCESSORS(IndexedDataType, FileIndices, FileIndices)
@@ -81,14 +85,33 @@ IndexedDataType& IndexedDataType::FileIndices(const PacBio::BAM::FileIndices& in
 // InputOutputDataType
 // ---------------------
 
-InputOutputDataType::InputOutputDataType(const std::string& label, const XsdType &xsd)
-    : StrictEntityType(label, xsd)
-{ }
+InputOutputDataType::InputOutputDataType(const string& metatype,
+                                         const string& filename,
+                                         const string& label,
+                                         const XsdType &xsd)
+    : StrictEntityType(metatype, label, xsd)
+{  
+    ResourceId(filename);
+}
 
 // ----------------
 // StrictEntityType
 // ----------------
 
-StrictEntityType::StrictEntityType(const std::string& label, const XsdType& xsd)
+StrictEntityType::StrictEntityType(const string& metatype, 
+                                   const string& label, 
+                                   const XsdType& xsd)
     : BaseEntityType(label, xsd)
-{ }
+{ 
+    // MetaType
+    MetaType(metatype);
+
+    // TimeStampedName
+    static const string underscore = "_";
+    const string& tsn = LocalNameLabel().to_string() + underscore + ToIso8601(CurrentTime());
+    TimeStampedName(tsn);
+
+    // UniqueId
+    const string& uuid = GenerateUuid();
+    UniqueId(uuid);
+}

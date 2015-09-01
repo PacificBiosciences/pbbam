@@ -94,12 +94,17 @@ TEST(DataSetXsdTest, EditDatasetRegistry)
     dataset.MetaType("PacBio.DataSet.AlignmentSet");
     dataset.Name("DataSet_AlignmentSet");
     dataset.Tags("barcode moreTags mapping mytags");
+    dataset.TimeStampedName("my_time_stamped_name");
     dataset.UniqueId("b095d0a3-94b8-4918-b3af-a3f81bbe519c");
     dataset.Version("2.3.0");
     dataset.Attribute("xmlns",              "http://pacificbiosciences.com/PacBioDatasets.xsd")
            .Attribute("xmlns:xsi",          "http://www.w3.org/2001/XMLSchema-instance")
            .Attribute("xsi:schemaLocation", "http://pacificbiosciences.com/PacBioDatasets.xsd");
-    dataset.ExternalResources().Add(ExternalResource("Fake.MetaType", "filename"));
+
+    ExternalResource ext("Fake.MetaType", "filename");
+    ext.TimeStampedName("custom_tsn")
+       .UniqueId("my_uuid");
+    dataset.ExternalResources().Add(ext);
 
     dataset.Namespaces().Register(XsdType::BASE_DATA_MODEL, NamespaceInfo("custom", "http://custom/uri.xsd"));
 
@@ -107,6 +112,7 @@ TEST(DataSetXsdTest, EditDatasetRegistry)
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
         "<pbds:AlignmentSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.AlignmentSet\" "
                 "Name=\"DataSet_AlignmentSet\" Tags=\"barcode moreTags mapping mytags\" "
+                "TimeStampedName=\"my_time_stamped_name\" "
                 "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\" "
                 "xmlns=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
                 "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
@@ -114,7 +120,7 @@ TEST(DataSetXsdTest, EditDatasetRegistry)
                 "xmlns:custom=\"http://custom/uri.xsd\" "
                 "xmlns:pbds=\"http://pacificbiosciences.com/PacBioDatasets.xsd\">\n"
         "\t<custom:ExternalResources>\n"
-        "\t\t<custom:ExternalResource MetaType=\"Fake.MetaType\" ResourceId=\"filename\" />\n"
+        "\t\t<custom:ExternalResource MetaType=\"Fake.MetaType\" ResourceId=\"filename\" TimeStampedName=\"custom_tsn\" UniqueId=\"my_uuid\" />\n"
         "\t</custom:ExternalResources>\n"
         "</pbds:AlignmentSet>\n";
 

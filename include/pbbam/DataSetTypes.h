@@ -84,7 +84,6 @@ public:
 class PBBAM_EXPORT ExternalResource : public internal::IndexedDataType
 {
 public:
-    ExternalResource(void);
     ExternalResource(const BamFile& bamFile);
     ExternalResource(const std::string& metatype,
                      const std::string& filename);
@@ -111,7 +110,8 @@ public:
 class PBBAM_EXPORT FileIndex : public internal::InputOutputDataType
 {
 public:
-    FileIndex(void);
+    FileIndex(const std::string& metatype, 
+              const std::string& filename);
 };
 
 class PBBAM_EXPORT FileIndices : public internal::DataSetListElement<FileIndex>
@@ -216,7 +216,9 @@ public:
     DataSetBase(void);
 
 protected:
-    DataSetBase(const std::string& label, const XsdType& xsd);
+    DataSetBase(const std::string& metatype, 
+                const std::string& label, 
+                const XsdType& xsd);
     DataSetBase* DeepCopy(void) const;
 
 public:

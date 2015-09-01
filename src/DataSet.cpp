@@ -218,3 +218,21 @@ string DataSet::TypeToName(const DataSet::TypeEnum& type)
             throw std::runtime_error("unsupported dataset type"); // unknown type
     }
 }
+
+// Exposed timestamp utils
+
+namespace PacBio {
+namespace BAM {
+
+string CurrentTimestamp(void)
+{ return internal::ToIso8601(internal::CurrentTime()); }
+
+string ToIso8601(const chrono::system_clock::time_point &tp)
+{ return internal::ToIso8601(tp); }
+
+string ToIso8601(const time_t &t)
+{ return ToIso8601(chrono::system_clock::from_time_t(t)); }
+
+} // namespace BAM
+} // namespace PacBio
+

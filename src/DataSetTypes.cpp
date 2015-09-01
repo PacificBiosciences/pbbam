@@ -39,6 +39,7 @@
 #include "pbbam/internal/DataSetBaseTypes.h"
 #include "DataSetUtils.h"
 #include "FileUtils.h"
+#include "TimeUtils.h"
 #include <set>
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -50,7 +51,9 @@ using namespace std;
 // -------------------
 
 AlignmentSet::AlignmentSet(void)
-    : DataSetBase("AlignmentSet", XsdType::DATASETS)
+    : DataSetBase("PacBio.DataSet.AlignmentSet",
+                  "AlignmentSet",
+                  XsdType::DATASETS)
 { }
 
 // -------------------
@@ -58,7 +61,9 @@ AlignmentSet::AlignmentSet(void)
 // -------------------
 
 BarcodeSet::BarcodeSet(void)
-    : DataSetBase("BarcodeSet", XsdType::DATASETS)
+    : DataSetBase("PacBio.DataSet.BarcodeSet",
+                  "BarcodeSet",
+                  XsdType::DATASETS)
 { }
 
 // -----------------------
@@ -66,7 +71,9 @@ BarcodeSet::BarcodeSet(void)
 // -----------------------
 
 ConsensusAlignmentSet::ConsensusAlignmentSet(void)
-    : DataSetBase("ConsensusAlignmentSet", XsdType::DATASETS)
+    : DataSetBase("PacBio.DataSet.ConsensusAlignmentSet",
+                  "ConsensusAlignmentSet",
+                  XsdType::DATASETS)
 { }
 
 // -------------------
@@ -74,7 +81,9 @@ ConsensusAlignmentSet::ConsensusAlignmentSet(void)
 // -------------------
 
 ConsensusReadSet::ConsensusReadSet(void)
-    : DataSetBase("ConsensusReadSet", XsdType::DATASETS)
+    : DataSetBase("PacBio.DataSet.ConsensusReadSet",
+                  "ConsensusReadSet",
+                  XsdType::DATASETS)
 { }
 
 // -------------------
@@ -82,7 +91,9 @@ ConsensusReadSet::ConsensusReadSet(void)
 // -------------------
 
 ContigSet::ContigSet(void)
-    : DataSetBase("ContigSet", XsdType::DATASETS)
+    : DataSetBase("PacBio.DataSet.ContigSet",
+                  "ContigSet",
+                  XsdType::DATASETS)
 { }
 
 // -------------------
@@ -90,11 +101,15 @@ ContigSet::ContigSet(void)
 // -------------------
 
 DataSetBase::DataSetBase(void)
-    : StrictEntityType("DataSet", XsdType::DATASETS)
+    : StrictEntityType("PacBio.DataSet.DataSet",
+                       "DataSet",
+                       XsdType::DATASETS)
 { }
 
-DataSetBase::DataSetBase(const string& label, const XsdType& xsd)
-    : StrictEntityType(label, xsd)
+DataSetBase::DataSetBase(const string& metatype,
+                         const string& label,
+                         const XsdType& xsd)
+    : StrictEntityType(metatype, label, xsd)
 { }
 
 DEFINE_ACCESSORS(DataSetBase, ExternalResources, ExternalResources)
@@ -212,27 +227,24 @@ Extensions::Extensions(void)
     : DataSetListElement<ExtensionElement>("Extensions", XsdType::BASE_DATA_MODEL)
 { }
 
-ExternalResource::ExternalResource(void)
-    : IndexedDataType("ExternalResource", XsdType::BASE_DATA_MODEL)
-{ }
-
 // -------------------
 // ExternalResource
 // -------------------
 
-ExternalResource::ExternalResource(const BamFile &bamFile)
-    : IndexedDataType("ExternalResource", XsdType::BASE_DATA_MODEL)
-{
-    MetaType("SubreadFile.SubreadBamFile");
-    ResourceId(bamFile.Filename());
-}
+ExternalResource::ExternalResource(const BamFile& bamFile)
+    : IndexedDataType("PacBio.SubreadFile.SubreadBamFile",
+                      bamFile.Filename(),
+                      "ExternalResource",
+                      XsdType::BASE_DATA_MODEL)
+{ }
 
-ExternalResource::ExternalResource(const string& metatype, const string& filename)
-    : IndexedDataType("ExternalResource", XsdType::BASE_DATA_MODEL)
-{
-    MetaType(metatype);
-    ResourceId(filename);
-}
+ExternalResource::ExternalResource(const string& metatype,
+                                   const string& filename)
+    : IndexedDataType(metatype,
+                      filename,
+                      "ExternalResource",
+                      XsdType::BASE_DATA_MODEL)
+{ }
 
 BamFile ExternalResource::ToBamFile(void) const
 { return BamFile(ResourceId()); }
@@ -242,7 +254,8 @@ BamFile ExternalResource::ToBamFile(void) const
 // -------------------
 
 ExternalResources::ExternalResources(void)
-    : DataSetListElement<ExternalResource>("ExternalResources", XsdType::BASE_DATA_MODEL)
+    : DataSetListElement<ExternalResource>("ExternalResources",
+                                           XsdType::BASE_DATA_MODEL)
 { }
 
 ExternalResources& ExternalResources::operator+=(const ExternalResources& other)
@@ -278,9 +291,8 @@ vector<BamFile> ExternalResources::BamFiles(void) const
     vector<BamFile> result;
     const int numResources = Size();
     result.reserve(numResources);
-    for( const ExternalResource& ext : *this ) {
+    for( const ExternalResource& ext : *this )
         result.push_back(ext.ToBamFile());
-    }
     return result;
 }
 
@@ -291,8 +303,11 @@ void ExternalResources::Remove(const ExternalResource& ext)
 // FileIndex
 // -------------------
 
-FileIndex::FileIndex(void)
-    : InputOutputDataType("FileIndex", XsdType::BASE_DATA_MODEL)
+FileIndex::FileIndex(const string& metatype, const string& filename)
+    : InputOutputDataType(metatype,
+                          filename,
+                          "FileIndex",
+                          XsdType::BASE_DATA_MODEL)
 { }
 
 // -------------------
@@ -348,7 +363,9 @@ void Filters::Remove(const Filter& filter)
 // -------------------
 
 HdfSubreadSet::HdfSubreadSet(void)
-    : DataSetBase("HdfSubreadSet", XsdType::DATASETS)
+    : DataSetBase("PacBio.DataSet.HdfSubreadSet",
+                  "HdfSubreadSet",
+                  XsdType::DATASETS)
 { }
 
 // -------------------
@@ -402,7 +419,9 @@ DEFINE_ACCESSORS(Provenance, ParentTool, ParentTool)
 // -------------------
 
 ReferenceSet::ReferenceSet(void)
-    : DataSetBase("ReferenceSet", XsdType::DATASETS)
+    : DataSetBase("PacBio.DataSet.ReferenceSet",
+                  "ReferenceSet",
+                  XsdType::DATASETS)
 { }
 
 // -------------------
@@ -437,5 +456,8 @@ void SubDataSets::Remove(const DataSetBase& subdataset)
 // -------------------
 
 SubreadSet::SubreadSet(void)
-    : DataSetBase("SubreadSet", XsdType::DATASETS)
+    : DataSetBase("PacBio.DataSet.SubreadSet",
+                  "SubreadSet",
+                  XsdType::DATASETS)
 { }
+

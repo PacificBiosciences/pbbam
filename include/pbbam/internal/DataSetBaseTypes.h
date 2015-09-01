@@ -129,7 +129,8 @@ public:
 class StrictEntityType : public BaseEntityType
 {
 protected:
-    StrictEntityType(const std::string& label,
+    StrictEntityType(const std::string& metatype,
+                     const std::string& label,
                      const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 
 public:
@@ -149,14 +150,18 @@ public:
 class InputOutputDataType : public StrictEntityType
 {
 protected:
-    InputOutputDataType(const std::string& label,
+    InputOutputDataType(const std::string& metatype, 
+                        const std::string& filename,
+                        const std::string& label,
                         const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 };
 
 class IndexedDataType : public InputOutputDataType
 {
 protected:
-    IndexedDataType(const std::string& label,
+    IndexedDataType(const std::string& metatype, 
+                    const std::string& filename,
+                    const std::string& label,
                     const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 
 public:

@@ -76,24 +76,22 @@ TEST(DataSetCoreTest, XmlNameParts)
     EXPECT_EQ(boost::string_ref(":node_name"), leadingColon.QualifiedName());
 }
 
-TEST(DataSetCoreTest, NamespacesOk)
-{
-
-}
-
 TEST(DataSetCoreTest, DefaultsOk)
 {
     DataSet dataset;
     EXPECT_EQ(DataSet::GENERIC, dataset.Type());
-    EXPECT_FALSE(dataset.CreatedAt().empty());    // default init
+    EXPECT_FALSE(dataset.CreatedAt().empty());
+    EXPECT_FALSE(dataset.MetaType().empty());
+    EXPECT_FALSE(dataset.TimeStampedName().empty());
+    EXPECT_FALSE(dataset.UniqueId().empty());
+
+    EXPECT_EQ(0, dataset.TimeStampedName().find("DataSet_"));
+
     EXPECT_TRUE(dataset.Format().empty());
-    EXPECT_TRUE(dataset.MetaType().empty());
     EXPECT_TRUE(dataset.ModifiedAt().empty());
     EXPECT_TRUE(dataset.Name().empty());
     EXPECT_TRUE(dataset.ResourceId().empty());
     EXPECT_TRUE(dataset.Tags().empty());
-    EXPECT_TRUE(dataset.TimeStampedName().empty());
-    EXPECT_TRUE(dataset.UniqueId().empty());
     EXPECT_TRUE(dataset.Version().empty());
     EXPECT_EQ(0, dataset.ExternalResources().Size());
     EXPECT_EQ(0, dataset.Filters().Size());
@@ -161,12 +159,11 @@ TEST(DataSetCoreTest, AddExternalResources)
     DataSet dataset;
     EXPECT_EQ(0, dataset.ExternalResources().Size());
 
-    ExternalResource resource1;
+    ExternalResource resource1("metatype", "id");
     resource1.Name("file1");
 
-    ExternalResource resource2;
+    ExternalResource resource2("metatype", "id");
     resource2.Name("file2");
-    resource2.MetaType("blah");
 
     dataset.ExternalResources().Add(resource1);
     dataset.ExternalResources().Add(resource2);
@@ -192,7 +189,7 @@ TEST(DataSetCoreTest, EditExternalResources)
 {
     DataSet dataset;
 
-    ExternalResource resource;
+    ExternalResource resource("metatype", "id");
     resource.Name("file1");
     dataset.ExternalResources().Add(resource);
 
@@ -407,10 +404,10 @@ TEST(DataSetCoreTest, RemoveExternalResources)
     DataSet dataset;
     EXPECT_EQ(0, dataset.ExternalResources().Size());
 
-    ExternalResource resource1;
+    ExternalResource resource1("metatype", "id");
     resource1.Name("file1");
 
-    ExternalResource resource2;
+    ExternalResource resource2("metatype", "id");
     resource2.Name("file2");
 
     dataset.ExternalResources().Add(resource1);

@@ -41,6 +41,7 @@
 #include "pbbam/BamFile.h"
 #include "pbbam/Config.h"
 #include "pbbam/DataSetTypes.h"
+#include <chrono>
 #include <memory>
 #include <string>
 #include <vector>
@@ -227,6 +228,30 @@ private:
     std::unique_ptr<DataSetBase> d_;
     std::string path_;
 };
+
+/// \name DataSet Timestamp Utilities
+/// \{
+
+/// Get current time.
+///
+/// \returns ISO-8601 formatted timestamp
+///
+PBBAM_EXPORT std::string CurrentTimestamp(void);
+
+/// Convert provided timepoint to timestamp.
+///
+/// \returns ISO-8601 formatted timestamp
+///
+PBBAM_EXPORT std::string ToIso8601(const std::chrono::system_clock::time_point& tp);
+
+/// Convert provided time_t to timestamp.
+///
+/// \returns ISO-8601 formatted timestamp
+///
+PBBAM_EXPORT std::string ToIso8601(const time_t& t);
+
+/// \}
+
 
 } // namespace BAM
 } // namespace PacBio
