@@ -203,6 +203,20 @@ TEST(DataSetCoreTest, EditExternalResources)
     EXPECT_EQ(string("file2"),         dataset.ExternalResources()[1].Name());
 }
 
+TEST(DataSetCoreTest, NestedExternalResources)
+{
+    ExternalResource resource("metatype", "filename");
+    resource.ExternalResources().Add(ExternalResource("metatype.child",  "filename.child"));
+    resource.ExternalResources().Add(ExternalResource("metatype.child2", "filename.child2"));
+
+    const ExternalResources& childResources = resource.ExternalResources();
+    EXPECT_EQ(2, childResources.Size());
+    EXPECT_EQ(string("metatype.child"),  childResources[0].MetaType());
+    EXPECT_EQ(string("metatype.child2"), childResources[1].MetaType());
+    EXPECT_EQ(string("filename.child"),  childResources[0].ResourceId());
+    EXPECT_EQ(string("filename.child2"), childResources[1].ResourceId());
+}
+
 TEST(DataSetCoreTest, AddFilters)
 {
     DataSet dataset;

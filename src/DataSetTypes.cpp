@@ -246,6 +246,11 @@ ExternalResource::ExternalResource(const string& metatype,
                       XsdType::BASE_DATA_MODEL)
 { }
 
+DEFINE_ACCESSORS(ExternalResource, ExternalResources, ExternalResources)
+
+ExternalResource& ExternalResource::ExternalResources(const PacBio::BAM::ExternalResources& resources)
+{ ExternalResources() = resources; return *this; }
+
 BamFile ExternalResource::ToBamFile(void) const
 { return BamFile(ResourceId()); }
 

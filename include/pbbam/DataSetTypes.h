@@ -81,6 +81,8 @@ public:
     Extensions(void);
 };
 
+class ExternalResources;
+
 class PBBAM_EXPORT ExternalResource : public internal::IndexedDataType
 {
 public:
@@ -90,6 +92,11 @@ public:
 
 public:
     BamFile ToBamFile(void) const;
+
+public:
+    const PacBio::BAM::ExternalResources& ExternalResources(void) const;
+    PacBio::BAM::ExternalResources& ExternalResources(void);
+    ExternalResource& ExternalResources(const PacBio::BAM::ExternalResources& resources);
 };
 
 class PBBAM_EXPORT ExternalResources : public internal::DataSetListElement<ExternalResource>
