@@ -24,6 +24,12 @@ using namespace PacBio::BAM;
 %ignore PacBio::BAM::PbiRawSubreadData::operator=;
 %ignore PacBio::BAM::PbiRawData::operator=;
 
-HANDLE_STD_EXCEPTION(PacBio::BAM::PbiRawMappedData::AddRecord);
+#ifdef SWIGCSHARP
+// ignore non-const accessors
+%ignore PacBio::BAM::PbiRawData::BarcodeData();
+%ignore PacBio::BAM::PbiRawData::MappedData();
+%ignore PacBio::BAM::PbiRawData::ReferenceData();
+%ignore PacBio::BAM::PbiRawData::SubreadData();
+#endif // C#
 
 %include <pbbam/PbiRawData.h>

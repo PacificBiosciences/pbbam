@@ -23,11 +23,9 @@ using namespace PacBio::BAM;
 // C# gets confused by the const and nonconst overloads
 %ignore PacBio::BAM::BamRecord::Impl() const;
 
-#ifdef SWIGR
+#if defined(SWIGR) || defined(SWIGPYTHON)
 %rename("EncodedPkmean") PacBio::BAM::BamRecord::Pkmean(const std::vector<uint16_t>&);
 %rename("EncodedPkmid")  PacBio::BAM::BamRecord::Pkmid(const std::vector<uint16_t>&);
-#endif // SWIGR
-
-HANDLE_STD_EXCEPTION(CigarData);
+#endif
 
 %include <pbbam/BamRecord.h>

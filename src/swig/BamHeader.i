@@ -18,11 +18,4 @@ using namespace PacBio::BAM;
 %template(ReadGroupInfoList) std::vector<PacBio::BAM::ReadGroupInfo>;
 %template(SequenceInfoList)  std::vector<PacBio::BAM::SequenceInfo>;
 
-HANDLE_STD_EXCEPTION(Program);
-HANDLE_STD_EXCEPTION(ReadGroup);
-HANDLE_STD_EXCEPTION(Sequence);
-HANDLE_STD_EXCEPTION(SequenceId);
-HANDLE_STD_EXCEPTION(SequenceLength);
-HANDLE_STD_EXCEPTION(SequenceName);
-
 %include <pbbam/BamHeader.h>
