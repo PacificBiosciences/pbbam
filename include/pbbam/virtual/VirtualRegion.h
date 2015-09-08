@@ -54,27 +54,32 @@ public:
     LocalContextFlags cxTag = LocalContextFlags::NO_LOCAL_CONTEXT;
     int barcodeLeft = -1;
     int barcodeRight = -1;
+    int score = 0;
 
 public:
     VirtualRegion(const VirtualRegionType type, 
                   const int beginPos,
-                  const int endPos)
+                  const int endPos,
+                  const int score = 0)
         : type(type)
         , beginPos(beginPos)
         , endPos(endPos), cxTag()
+        , score(score)
     {}
     VirtualRegion(const VirtualRegionType type, 
                   const int beginPos,
                   const int endPos, 
                   const LocalContextFlags cxTag, 
                   const int barcodeLeft,
-                  const int barcodeRight)
+                  const int barcodeRight,
+                  const int score = 0)
         : type(type)
         , beginPos(beginPos)
         , endPos(endPos)
         , cxTag(cxTag)
         , barcodeLeft(barcodeLeft)
         , barcodeRight(barcodeRight)
+        , score(score)
     {}
     VirtualRegion() = default;
     // Move constructor
