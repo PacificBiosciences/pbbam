@@ -40,4 +40,10 @@ using namespace PacBio::BAM;
 
 #endif // C#
 
+#ifdef SWIGR
+%ignore PacBio::BAM::DataSet::DataSet(const DataSet::TypeEnum type);
+/*%ignore PacBio::BAM::DataSet::DataSet(const BamFile& bamFile);*/
+#endif // R
+
+
 %include <pbbam/DataSet.h>

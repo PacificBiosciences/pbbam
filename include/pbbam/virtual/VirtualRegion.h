@@ -89,7 +89,7 @@ public:
     // Move assignment operator
     VirtualRegion& operator=(VirtualRegion&&) = default;
     // Copy assignment operator
-    VirtualRegion& operator=(const VirtualRegion&) = delete;
+    VirtualRegion& operator=(const VirtualRegion&) = default; // un-"delete"-ed for SWIG
     // Destructor
     ~VirtualRegion() = default;
 

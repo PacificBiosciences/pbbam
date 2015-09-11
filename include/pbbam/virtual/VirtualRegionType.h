@@ -43,13 +43,13 @@
 namespace PacBio {
 namespace BAM {
 /// Type of annotated region.
-enum class VirtualRegionType : char
+enum class VirtualRegionType // : char
 {
-	ADAPTER        = 'A',
-	BARCODE        = 'B',
-	SUBREAD        = 'S',
-	HQREGION       = 'H',
-	LQREGION       = 'L'  // Outside the HQ region
+    ADAPTER        = 0x41, // 'A',
+    BARCODE        = 0x42, // 'B',
+    SUBREAD        = 0x53, // 'S',
+    HQREGION       = 0x48, // 'H',
+    LQREGION       = 0x4C  // 'L'  // Outside the HQ region
 };
 
 } // namespace BAM

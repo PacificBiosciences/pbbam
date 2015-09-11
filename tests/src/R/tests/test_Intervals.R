@@ -216,20 +216,20 @@ test_case("Intervals_Length",{
 test_case("GenomicIntervals_Ctors", { 
 	
     empty  <- GenomicInterval()
-    normal <- GenomicInterval(0, 100, 200)
+    normal <- GenomicInterval("seq1", 100, 200)
     
-    assertEqual(-1L, empty$Id())
+    assertEqual("",  empty$Name())
     assertEqual(0L,  empty$Start())
     assertEqual(0L,  empty$Stop())
     
-    assertEqual(0L,   normal$Id())
-    assertEqual(100L, normal$Start())
-    assertEqual(200L, normal$Stop())
+    assertEqual("seq1", normal$Name())
+    assertEqual(100L,   normal$Start())
+    assertEqual(200L,   normal$Stop())
 })
 
 test_case("GenomicIntervals_Copy", { 
 	
-    a <- GenomicInterval(1, 10, 20)
+    a <- GenomicInterval("seq1", 10, 20)
     b <- GenomicInterval(a)
     c <- a
     
@@ -241,10 +241,10 @@ test_case("GenomicIntervals_Copy", {
 
 test_case("GenomicIntervals_Modifiers", { 
 	
-    a <- GenomicInterval(1, 10, 20)
+    a <- GenomicInterval("seq1", 10, 20)
     
     b <- GenomicInterval(a)
-    b$Id(5)
+    b$Name("seq5")
 	b$Start(2)
 	b$Stop(10)
     
@@ -253,11 +253,11 @@ test_case("GenomicIntervals_Modifiers", {
     
     assertNotEqual(a, b)
 	
-    assertEqual(5L,  b$Id())
+    assertEqual("seq5",  b$Name())
     assertEqual(2L,  b$Start())
     assertEqual(10L, b$Stop())        
 	
-    assertEqual(a$Id(), c$Id())
+    assertEqual(a$Name(), c$Name())
 	
 	# TODO: fix this to work with == or *anything* cleaner
 	assertTrue(b$Interval()$'__eq__'(c$Interval()))
@@ -265,12 +265,12 @@ test_case("GenomicIntervals_Modifiers", {
 
 test_case("GenomicIntervals_Cover", { 
 	
-    a <- GenomicInterval(0,2,4)
-    b <- GenomicInterval(0,3,5)
-    c <- GenomicInterval(0,6,8)
-    d <- GenomicInterval(0,1,7)
-    e <- GenomicInterval(0,5,8)
-    f <- GenomicInterval(1,3,5)  # same as b, different ref
+    a <- GenomicInterval("seq1",2,4)
+    b <- GenomicInterval("seq1",3,5)
+    c <- GenomicInterval("seq1",6,8)
+    d <- GenomicInterval("seq1",1,7)
+    e <- GenomicInterval("seq1",5,8)
+    f <- GenomicInterval("seq2",3,5)  # same as b, different ref
     
     #   0123456789  
     # a   --
@@ -315,16 +315,16 @@ test_case("GenomicIntervals_Cover", {
 test_case("GenomicIntervals_Validity", { 
 	
     a <- GenomicInterval()       # default
-    b <- GenomicInterval(0,0,0)  # valid id, start == stop (zero)
-    c <- GenomicInterval(0,4,4)  # valid id, start == stop (non-zero)
-    d <- GenomicInterval(0,0,1)  # valid id, start <  stop (start == zero)     OK
-    e <- GenomicInterval(0,4,5)  # valid id, start <  stop (start >  zero)     OK
-    f <- GenomicInterval(0,5,4)  # valid id, start >  stop 
-    g <- GenomicInterval(-1,0,0) # invalid id, start == stop (zero)
-    h <- GenomicInterval(-1,4,4) # invalid id, start == stop (non-zero)
-    i <- GenomicInterval(-1,0,1) # invalid id, start <  stop (start == zero)
-    j <- GenomicInterval(-1,4,5) # invalid id, start <  stop (start >  zero)
-    k <- GenomicInterval(-1,5,4) # invalid id, start >  stop 
+    b <- GenomicInterval("seq1",0,0)  # valid id, start == stop (zero)
+    c <- GenomicInterval("seq1",4,4)  # valid id, start == stop (non-zero)
+    d <- GenomicInterval("seq",0,1)  # valid id, start <  stop (start == zero)     OK
+    e <- GenomicInterval("seq1",4,5)  # valid id, start <  stop (start >  zero)     OK
+    f <- GenomicInterval("seq1",5,4)  # valid id, start >  stop 
+    g <- GenomicInterval("",0,0) # invalid id, start == stop (zero)
+    h <- GenomicInterval("",4,4) # invalid id, start == stop (non-zero)
+    i <- GenomicInterval("",0,1) # invalid id, start <  stop (start == zero)
+    j <- GenomicInterval("",4,5) # invalid id, start <  stop (start >  zero)
+    k <- GenomicInterval("",5,4) # invalid id, start >  stop 
          
     assertTrue(d$IsValid())
     assertTrue(e$IsValid())

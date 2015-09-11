@@ -143,3 +143,8 @@ endif*/
 
 // FASTA
 %include "IndexedFastaReader.i"
+
+// VirtualPolymeraseBamRecord 
+%include "VirtualRegion.i"
+%include "VirtualPolymeraseBamRecord.i"
+%include "VirtualPolymeraseReader.i"

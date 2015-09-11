@@ -62,7 +62,7 @@ public:
     // Move constructor
     VirtualPolymeraseBamRecord(VirtualPolymeraseBamRecord&&) = default;
     // Copy constructor
-    VirtualPolymeraseBamRecord(const VirtualPolymeraseBamRecord&) = delete;
+    VirtualPolymeraseBamRecord(const VirtualPolymeraseBamRecord&) = default; // un-"delete"-ed for SWIG
     // Move assignment operator
     VirtualPolymeraseBamRecord& operator=(VirtualPolymeraseBamRecord&&) = default;
     // Copy assignment operator
@@ -72,12 +72,12 @@ public:
 
 public:
     /// Provides bool if a given VirtualRegionType has been annotated
-    bool HasVirtualRegionType(const VirtualRegionType type) const
-    { return virtualRegionsMap_.find(type) != virtualRegionsMap_.end(); }
+    bool HasVirtualRegionType(const VirtualRegionType regionType) const
+    { return virtualRegionsMap_.find(regionType) != virtualRegionsMap_.end(); }
 
     /// Provides annotations of the polymerase read for a given VirtualRegionType
-    std::vector<VirtualRegion> VirtualRegionsTable(const VirtualRegionType type) const
-    { return virtualRegionsMap_.at(type); }
+    std::vector<VirtualRegion> VirtualRegionsTable(const VirtualRegionType regionType) const
+    { return virtualRegionsMap_.at(regionType); }
 
     /// Provides all annotations of the polymerase read as a map
     std::map<VirtualRegionType, std::vector<VirtualRegion>> VirtualRegionsMap() const

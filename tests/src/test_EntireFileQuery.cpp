@@ -42,6 +42,7 @@
 #include "TestData.h"
 #include <gtest/gtest.h>
 #include <pbbam/EntireFileQuery.h>
+#include <pbbam/BamWriter.h>
 #include <string>
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -146,6 +147,20 @@ TEST(BamRecordTest, ReferenceName)
 
 //        EXPECT_THROW(records.begin()->ReferenceName(), std::exception);
 //    }
+}
+
+TEST(ZZZ_LastTest_Perhaps, CreateSmallerTestBam) 
+{
+    BamFile file("/mnt/secondary-siv/mdsmith/simulationStudies/lambdaToMerge/10Gb/pbalchemysim.all.pbalign.bam");
+    BamWriter writer("smaller.bam", file.Header());
+    EntireFileQuery query(file);
+    int count = 0;
+    for (const BamRecord& b : query) {
+        writer.Write(b);
+        ++count;
+        if (count == 25000)
+            break;
+    } 
 }
 
 // add add'l special cases as needed

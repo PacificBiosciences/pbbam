@@ -65,7 +65,7 @@ test_case("BamFile_Ctor", {
 			invisible()
 		},
 		warning = function(w) {
-			assertTrue(TRUE)
+			assertTrue(FALSE)
 			invisible()
 		},
 		error = function(e) {

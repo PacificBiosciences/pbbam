@@ -41,17 +41,20 @@ originalNames <-function(inputFn, generatedFn) {
 		{
 			file <- BamFile(inputFn)
 			writer <- BamWriter(generatedFn, file$Header())
-			entireFile <- EntireFileQuery(file)
+            
+            ds <- DataSet(file)
+			entireFile <- EntireFileQuery(ds)
 		
 			names_in <- list()
 			iter <- entireFile$begin()
 			end <- entireFile$end()
 			while ( iter$'__ne__'(end) ) {
-				record <- iter$value()
+                record <- iter$value()
 				names_in <- c(names_in, record$FullName())
-				writer$Write(record)
+                writer$Write(record)
 				iter$incr()
 			}
+            writer$TryFlush()
 			return(names_in)
 		},
 		error = function(e) {
@@ -64,18 +67,18 @@ originalNames <-function(inputFn, generatedFn) {
 
 generatedNames <- function(generatedFn) {
 	
-	result <- tryCatch(
-		{
-			file <- BamFile(generatedFn)
-			entireFile <- EntireFileQuery(file)
+    result <- tryCatch(
+        {
+            ds <- DataSet(generatedFn)
+            entireFile <- EntireFileQuery(ds)
 	
 			names_out <- list()
-			iter <- entireFile$begin()
-			end <- entireFile$end()
-			while ( iter$'__ne__'(end) ) {
-				names_out <- c(names_out, iter$FullName())
-				iter$incr()
-			}
+            iter <- entireFile$begin()
+            end <- entireFile$end()
+            while ( iter$'__ne__'(end) ) {
+                names_out <- c(names_out, iter$FullName())
+                iter$incr()
+            }
 			return(names_out)
 		},
 		error = function(e) {
@@ -86,7 +89,7 @@ generatedNames <- function(generatedFn) {
 	return(result)
 }
 
-test_case("EndToEnd_Placeholder", {
+test_case("EndToEnd_CopyFileAndReadBack", {
 	
 	inputFn     <- paste(test_data_path, "ex2.bam", sep="/")
 	generatedFn <- paste(test_data_path, "generated.bam", sep="/")
@@ -94,9 +97,9 @@ test_case("EndToEnd_Placeholder", {
 	# loop over original file, store names, write to generated file
 	names_in  <- originalNames(inputFn, generatedFn)
 	
-	# read names from new file
-	names_out <- generatedNames(generatedFn)
-	
-	# ensure equal
-	assertEqual(names_in, names_out)
+    # read names from new file
+    names_out <- generatedNames(generatedFn)
+
+    # ensure equal
+    assertEqual(names_in, names_out)
 })

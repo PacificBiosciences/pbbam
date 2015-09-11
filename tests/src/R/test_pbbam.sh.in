@@ -37,9 +37,18 @@
 
 #! /usr/bin/sh
 
+GENERATED_BAM=@PacBioBAM_TestsDir@/data/generated.bam
+
+touch $GENERATED_BAM
+chmod 644 $GENERATED_BAM
+
 R --slave --no-save < @RTestRootDir@/test_pbbam.R --args \
 	@RTestRootDir@/tests \
 	@PacBioBAM_RLibDir@ \
 	@PacBioBAM_TestsDir@/data
+    
+STATUS=$?
 	
-rm @PacBioBAM_TestsDir@/data/generated.bam
+rm $GENERATED_BAM
+
+exit $STATUS
