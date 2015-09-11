@@ -56,10 +56,12 @@ BamRecordImpl::BamRecordImpl(void)
 
 BamRecordImpl::BamRecordImpl(const BamRecordImpl& other)
     : d_(bam_dup1(other.d_.get()), internal::HtslibRecordDeleter())
+    , tagOffsets_(other.tagOffsets_)
 { }
 
 BamRecordImpl::BamRecordImpl(BamRecordImpl&& other)
     : d_(nullptr)
+    , tagOffsets_(std::move(other.tagOffsets_))
 {
     d_.swap(other.d_);
     other.d_.reset();
@@ -71,6 +73,7 @@ BamRecordImpl& BamRecordImpl::operator=(const BamRecordImpl& other)
         if (d_ == nullptr)
             InitializeData();
         bam_copy1(d_.get(), other.d_.get());
+        tagOffsets_ = other.tagOffsets_;
     }
     return *this;
 }
@@ -80,6 +83,8 @@ BamRecordImpl& BamRecordImpl::operator=(BamRecordImpl&& other)
     if (this != & other) {
         d_.swap(other.d_);
         other.d_.reset();
+
+        tagOffsets_ = std::move(other.tagOffsets_);
     }
     return *this;
 }
@@ -98,7 +103,16 @@ bool BamRecordImpl::AddTag(const string& tagName,
 {
     if (tagName.size() != 2 || HasTag(tagName))
         return false;
+    const bool added = AddTagImpl(tagName, value, additionalModifier);
+    if (added)
+        UpdateTagMap();
+    return added;
+}
 
+bool BamRecordImpl::AddTagImpl(const string& tagName,
+                               const Tag& value,
+                               const TagModifier additionalModifier)
+{
     const vector<uint8_t> rawData = std::move(BamTagCodec::ToRawData(value, additionalModifier));
     if (rawData.empty())
         return false;
@@ -108,7 +122,6 @@ bool BamRecordImpl::AddTag(const string& tagName,
                    BamTagCodec::TagTypeCode(value, additionalModifier),
                    rawData.size(),
                    const_cast<uint8_t*>(rawData.data()));
-
     return true;
 }
 
@@ -119,7 +132,7 @@ Cigar BamRecordImpl::CigarData(void) const
     uint32_t* cigarData = bam_get_cigar(d_);
     for (uint32_t i = 0; i < d_->core.n_cigar; ++i) {
         const uint32_t length = bam_cigar_oplen(cigarData[i]);
-        const char type = bam_cigar_opchr(cigarData[i]);
+        const CigarOperationType type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
         result.push_back(CigarOperation(type, length));
     }
 
@@ -162,14 +175,23 @@ BamRecordImpl& BamRecordImpl::CigarData(const std::string& cigarString)
 bool BamRecordImpl::EditTag(const string& tagName,
                             const Tag& newValue)
 {
-    return RemoveTag(tagName) && AddTag(tagName, newValue);
+    return EditTag(tagName, newValue, TagModifier::NONE);
 }
 
 bool BamRecordImpl::EditTag(const string& tagName,
                             const Tag& newValue,
                             const TagModifier additionalModifier)
 {
-    return RemoveTag(tagName) && AddTag(tagName, newValue, additionalModifier);
+    // try remove old value (with delayed tag map update)
+    const bool removed = RemoveTagImpl(tagName);
+    if (!removed)
+        return false;
+
+    // if old value removed, add new value
+    const bool added = AddTagImpl(tagName, newValue, additionalModifier);
+    if (added)
+        UpdateTagMap();
+    return added;
 }
 
 BamRecordImpl BamRecordImpl::FromRawData(const PBBAM_SHARED_PTR<bam1_t>& rawData)
@@ -183,7 +205,10 @@ bool BamRecordImpl::HasTag(const string& tagName) const
 {
     if (tagName.size() != 2)
         return false;
-    return bam_aux_get(d_.get(), tagName.c_str()) != 0;
+    return TagOffset(tagName) != -1;
+
+    // 27635
+//    return bam_aux_get(d_.get(), tagName.c_str()) != 0;
 }
 
 void BamRecordImpl::InitializeData(void)
@@ -262,12 +287,21 @@ QualityValues BamRecordImpl::Qualities(void) const
 
 bool BamRecordImpl::RemoveTag(const string& tagName)
 {
+    const bool removed = RemoveTagImpl(tagName);
+    if (removed)
+        UpdateTagMap();
+    return removed;
+}
+
+bool BamRecordImpl::RemoveTagImpl(const string &tagName)
+{
     if (tagName.size() != 2)
         return false;
     uint8_t* data = bam_aux_get(d_.get(), tagName.c_str());
     if (data == 0)
         return false;
-    return bam_aux_del(d_.get(), data) == 0;
+    const bool ok = bam_aux_del(d_.get(), data) == 0;
+    return ok;
 }
 
 string BamRecordImpl::Sequence(void) const
@@ -280,6 +314,9 @@ string BamRecordImpl::Sequence(void) const
         result.append(1, DnaLookup[bam_seqi(seqData, i)]);
     return result;
 }
+
+size_t BamRecordImpl::SequenceLength(void) const
+{ return d_->core.l_qseq; }
 
 BamRecordImpl& BamRecordImpl::SetSequenceAndQualities(const std::string& sequence,
                                                       const std::string& qualities)
@@ -358,6 +395,19 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
     return *this;
 }
 
+int BamRecordImpl::TagOffset(const string& tagName) const
+{
+    if (tagName.size() != 2)
+        throw std::runtime_error("invalid tag name size");
+
+    if (tagOffsets_.empty())
+        UpdateTagMap();
+
+    const uint16_t tagCode = (static_cast<uint8_t>(tagName.at(0)) << 8) | static_cast<uint8_t>(tagName.at(1));
+    const auto found = tagOffsets_.find(tagCode);
+    return (found != tagOffsets_.cend() ? found->second : -1);
+}
+
 BamRecordImpl& BamRecordImpl::Tags(const TagCollection& tags)
 {
     // convert tags to binary
@@ -375,6 +425,9 @@ BamRecordImpl& BamRecordImpl::Tags(const TagCollection& tags)
 
     // fill in new tag data
     memcpy((void*)tagStart, data, numBytes);
+
+    // update tag info
+    UpdateTagMap();
     return *this;
 }
 
@@ -389,8 +442,123 @@ Tag BamRecordImpl::TagValue(const string& tagName) const
 {
     if (tagName.size() != 2)
         return Tag();
-    uint8_t* data = bam_aux_get(d_.get(), tagName.c_str());
-    if (data == 0)
+
+    const int offset = TagOffset(tagName);
+    if (offset == -1)
         return Tag();
-    return BamTagCodec::FromRawData(data);
+
+    bam1_t* b = d_.get();
+    assert(bam_get_aux(b));
+    uint8_t* tagData = bam_get_aux(b) + offset;
+    if (offset >= b->l_data)
+        return Tag();
+
+    // skip tag name
+    return BamTagCodec::FromRawData(tagData);
+}
+
+void BamRecordImpl::UpdateTagMap(void) const
+{
+
+//   MaybeUpdateTagOffsets() {
+//      if tagOffsetsReset
+//         UpdateTagMap()
+//   }
+
+//   GetTagFoo() {
+//      MaybeUpdateTagOffsets()
+//      return result;
+//   }
+
+//   SetTagFoo() {
+//     set value;
+//     ResetTagOffsets();
+//   }
+
+    // clear out offsets, leave map structure basically intact
+    auto tagIter = tagOffsets_.begin();
+    auto tagEnd  = tagOffsets_.end();
+    for ( ; tagIter != tagEnd; ++tagIter )
+        tagIter->second = -1;
+
+    const uint8_t* tagStart = bam_get_aux(d_);
+    if (tagStart == 0)
+        return;
+    const ptrdiff_t numBytes = d_->l_data - (tagStart - d_->data);
+
+    // NOTE: using a 16-bit 'code' for tag name here instead of string, to avoid
+    // a lot of string constructions & comparisons. All valid tags will be 2 chars
+    // anyway, so this should be a nice lookup mechanism.
+    //
+    uint16_t tagNameCode;
+    size_t i = 0;
+    while(i < numBytes) {
+
+        // store (tag name code -> start offset into tag data)
+        tagNameCode = static_cast<char>(tagStart[i]) << 8 | static_cast<char>(tagStart[i+1]);
+        i += 2;
+        tagOffsets_[tagNameCode] = i;
+
+        // skip tag contents
+        const char tagType = static_cast<char>(tagStart[i++]);
+        switch (tagType) {
+            case 'A' :
+            case 'a' :
+            case 'c' :
+            case 'C' :
+            {
+                i += 1;
+                break;
+            }
+            case 's' :
+            case 'S' :
+            {
+                i += 2;
+                break;
+            }
+            case 'i' :
+            case 'I' :
+            case 'f' :
+            {
+                i += 4;
+                break;
+            }
+
+            case 'Z' :
+            case 'H' :
+            {
+                // null-terminated string
+                i += strlen((const char*)&tagStart[i]) + 1;
+                break;
+            }
+
+            case 'B' :
+            {
+                const char subTagType = tagStart[i++];
+                size_t elementSize = 0;
+                switch (subTagType) {
+                    case 'c' :
+                    case 'C' : elementSize = 1; break;
+                    case 's' :
+                    case 'S' : elementSize = 2; break;
+                    case 'i' :
+                    case 'I' :
+                    case 'f' : elementSize = 4; break;
+
+                    // unknown subTagType
+                    default:
+                        PB_ASSERT_OR_RETURN(false);
+                }
+
+                uint32_t numElements = 0;
+                memcpy(&numElements, &tagStart[i], sizeof(uint32_t));
+                i += (4 + (elementSize * numElements));
+                break;
+            }
+
+            // unknown tagType
+            default:
+                PB_ASSERT_OR_RETURN(false);
+        }
+    }
 }

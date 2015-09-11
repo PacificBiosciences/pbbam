@@ -132,6 +132,9 @@ public:
     static PBBAM_SHARED_PTR<bam1_t> GetRawData(const BamRecord* r);
     static PBBAM_SHARED_PTR<bam1_t> GetRawData(const BamRecordImpl& impl);
     static PBBAM_SHARED_PTR<bam1_t> GetRawData(const BamRecordImpl* impl);
+
+    static void UpdateRecordTags(const BamRecord& r);
+    static void UpdateRecordTags(const BamRecordImpl& r);
 };
 
 inline const BamRecordImpl& BamRecordMemory::GetImpl(const BamRecord& r)
@@ -151,6 +154,12 @@ inline PBBAM_SHARED_PTR<bam1_t> BamRecordMemory::GetRawData(const BamRecordImpl&
 
 inline PBBAM_SHARED_PTR<bam1_t> BamRecordMemory::GetRawData(const BamRecordImpl* impl)
 { return impl->d_; }
+
+inline void BamRecordMemory::UpdateRecordTags(const BamRecord& r)
+{ UpdateRecordTags(r.impl_); }
+
+inline void BamRecordMemory::UpdateRecordTags(const BamRecordImpl& r)
+{ r.UpdateTagMap(); }
 
 } // namespace internal
 } // namespace BAM

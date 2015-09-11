@@ -96,6 +96,7 @@ public:
         const int readResult = sam_read1(htsFile_.get(),
                                          htsHeader_.get(),
                                          internal::BamRecordMemory::GetRawData(r).get());
+        internal::BamRecordMemory::UpdateRecordTags(r);
 //        r.header_ = fileData_.Header();
         r.header_ = header_;
 

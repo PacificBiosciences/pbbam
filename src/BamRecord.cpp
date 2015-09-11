@@ -141,54 +141,52 @@ BamRecordImpl* CreateOrEdit(const string& tagName,
 }
 
 static
-int32_t AlignedEndOffset(const Cigar& cigar,
-                         const int seqLength)
-{
-    int32_t endOffset = seqLength;
-
-    if (!cigar.empty()) {
-        Cigar::const_reverse_iterator cigarIter = cigar.crbegin();
-        Cigar::const_reverse_iterator cigarEnd  = cigar.crend();
-        for (; cigarIter != cigarEnd; ++cigarIter) {
-            const CigarOperation& op = (*cigarIter);
-            if (op.Type() == CigarOperationType::HARD_CLIP) {
-                if (endOffset != 0 && endOffset != seqLength)
-                    return -1;
-            }
-            else if (op.Type() == CigarOperationType::SOFT_CLIP)
-                endOffset -= op.Length();
-            else
-                break;
-        }
-    }
-
-    if (endOffset == 0)
-        endOffset = seqLength;
-    return endOffset;
-}
-
-static
-int32_t AlignedStartOffset(const Cigar& cigar,
-                           const int seqLength)
+pair<int32_t, int32_t> AlignedOffsets(const BamRecord& record,
+                                      const int seqLength)
 {
     int32_t startOffset = 0;
+    int32_t endOffset = seqLength;
 
-    if (!cigar.empty()) {
-        Cigar::const_iterator cigarIter = cigar.cbegin();
-        Cigar::const_iterator cigarEnd  = cigar.cend();
-        for (; cigarIter != cigarEnd; ++cigarIter) {
-            const CigarOperation& op = (*cigarIter);
-            if (op.Type() == CigarOperationType::HARD_CLIP) {
-                if (startOffset != 0 && startOffset != seqLength)
-                    return -1;
+    PBBAM_SHARED_PTR<bam1_t> b = internal::BamRecordMemory::GetRawData(record);
+    uint32_t* cigarData = bam_get_cigar(b.get());
+    const size_t numCigarOps = b->core.n_cigar;
+    if (numCigarOps > 0) {
+
+        // start offset
+        for (int i = 0; i < numCigarOps; ++i) {
+            const CigarOperationType type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
+            if (type == CigarOperationType::HARD_CLIP) {
+                if (startOffset != 0 && startOffset != seqLength) {
+                    startOffset = -1;
+                    break;
+                }
             }
-            else if (op.Type() == CigarOperationType::SOFT_CLIP)
-                startOffset += op.Length();
+            else if (type == CigarOperationType::SOFT_CLIP)
+                startOffset += bam_cigar_oplen(cigarData[i]);
             else
                 break;
         }
+
+        // end offset
+        for (int i = numCigarOps-1; i >= 0; --i) {
+            const CigarOperationType type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
+            if (type == CigarOperationType::HARD_CLIP) {
+                if (endOffset != 0 && endOffset != seqLength) {
+                    endOffset = -1;
+                    break;
+                }
+            }
+            else if (type == CigarOperationType::SOFT_CLIP)
+                endOffset -= bam_cigar_oplen(cigarData[i]);
+            else
+                break;
+
+        }
+
+        if (endOffset == 0)
+            endOffset = seqLength;
     }
-    return startOffset;
+    return std::make_pair(startOffset, endOffset);
 }
 
 template<typename T>
@@ -555,7 +553,8 @@ void BamRecord::CalculateAlignedPositions(void) const
         return;
 
     // get the query start/end
-    const size_t seqLength = impl_.Sequence().size();
+    const size_t seqLength = impl_.SequenceLength();
+//    const size_t seqLength = impl_.Sequence().size();
     const RecordType type  = Type();
     const Position qStart  = (type == RecordType::CCS) ? Position(0) : QueryStart();
     const Position qEnd    = (type == RecordType::CCS) ? Position(seqLength) : QueryEnd();
@@ -564,9 +563,13 @@ void BamRecord::CalculateAlignedPositions(void) const
         return;
 
     // determine clipped end ranges
-    const Cigar& cigar     = impl_.CigarData();
-    const int32_t startOffset = internal::AlignedStartOffset(cigar, seqLength);
-    const int32_t endOffset   = internal::AlignedEndOffset(cigar, seqLength);
+    const std::pair<int32_t, int32_t> alignedOffsets = internal::AlignedOffsets(*this, seqLength);
+    const int32_t startOffset = alignedOffsets.first;
+    const int32_t endOffset = alignedOffsets.second;
+
+//    const Cigar& cigar     = impl_.CigarData();
+//    const int32_t startOffset = internal::AlignedStartOffset(cigar, seqLength);
+//    const int32_t endOffset   = internal::AlignedEndOffset(cigar, seqLength);
     if (endOffset == -1 || startOffset == -1)
         return; // TODO: handle error more??
 
@@ -1263,6 +1266,31 @@ BamRecord& BamRecord::IPD(const Frames& frames,
     else
         internal::CreateOrEdit(internal::tagName_ipd, frames.Data(), &impl_);
     return *this;
+}
+
+size_t BamRecord::NumMatches(void) const
+{
+    return NumMatchesAndMismatches().first;
+}
+
+pair<size_t, size_t> BamRecord::NumMatchesAndMismatches(void) const
+{
+    pair<size_t, size_t> result = make_pair(0,0);
+    PBBAM_SHARED_PTR<bam1_t> b = internal::BamRecordMemory::GetRawData(this);
+    uint32_t* cigarData = bam_get_cigar(b.get());
+    for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
+        const CigarOperationType type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
+        if (type == CigarOperationType::SEQUENCE_MATCH)
+            result.first += bam_cigar_oplen(cigarData[i]);
+        else if (type == CigarOperationType::SEQUENCE_MISMATCH)
+            result.second += bam_cigar_oplen(cigarData[i]);
+    }
+    return result;
+}
+
+size_t BamRecord::NumMismatches(void) const
+{
+    return NumMatchesAndMismatches().second;
 }
 
 Frames BamRecord::PreBaseFrames(Orientation orientation, 

@@ -70,6 +70,7 @@ bool SequentialGroupQueryBase::GetNext(vector<BamRecord> & records)
         const int result = sam_read1(htsFile_.get(),
                                      htsHeader_.get(),
                                      internal::BamRecordMemory::GetRawData(record).get());
+        internal::BamRecordMemory::UpdateRecordTags(record);
         if (result >= 0) { // get next record
             if (records.size() == 0) {
                 records.push_back(record); // add the first record

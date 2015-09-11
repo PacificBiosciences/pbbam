@@ -91,6 +91,7 @@ public:
         const int result = sam_itr_next(htsFile_.get(),
                                         htsIterator_.get(),
                                         internal::BamRecordMemory::GetRawData(record).get());
+        internal::BamRecordMemory::UpdateRecordTags(record);
         record.header_ = header_;
 
         // success

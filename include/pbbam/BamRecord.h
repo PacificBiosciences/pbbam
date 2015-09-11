@@ -50,6 +50,7 @@
 #include "pbbam/virtual/VirtualRegionType.h"
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace PacBio {
@@ -236,6 +237,15 @@ public:
 
     /// \returns this record's movie name
     std::string MovieName(void) const;
+
+    /// \returns the number of matching bases (sum of '=' CIGAR op lengths)
+    size_t NumMatches(void) const;
+
+    /// \returns a tuple containing NumMatches (first) and NumMismatches (second)
+    std::pair<size_t, size_t> NumMatchesAndMismatches(void) const;
+
+    /// \returns the number of mismatching bases (sum of 'X' CIGAR op lengths)
+    size_t NumMismatches(void) const;
 
     /// \returns "number of complete passes of the insert"
     int32_t NumPasses(void) const;

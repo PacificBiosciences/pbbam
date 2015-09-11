@@ -44,6 +44,7 @@
 #include "pbbam/Position.h"
 #include "pbbam/QualityValues.h"
 #include "pbbam/TagCollection.h"
+#include <map>
 #include <string>
 
 namespace PacBio {
@@ -302,6 +303,8 @@ public:
     /// \returns the record's DNA sequence.
     std::string Sequence(void) const;
 
+    size_t SequenceLength(void) const;
+
     /// \brief Sets the record's DNA sequence and quality values
     ///
     /// This is an overloaded function. Sets the DNA sequence and quality values,
@@ -487,6 +490,14 @@ private:
     // internal memory setup/expand methods
     void InitializeData(void);
     void MaybeReallocData(void);
+    void UpdateTagMap(void) const; // allowed to be called from const methods (lazy update on request)
+
+    // internal tag helper methods
+    bool AddTagImpl(const std::string& tagName,
+                    const Tag& value,
+                    const TagModifier additionalModifier);
+    bool RemoveTagImpl(const std::string& tagName);
+    int TagOffset(const std::string& tagName) const;
 
     // core seq/qual logic shared by the public API
     BamRecordImpl& SetSequenceAndQualitiesInternal(const char* sequence,
@@ -498,6 +509,7 @@ private:
 
     // data members
     PBBAM_SHARED_PTR<bam1_t> d_;
+    mutable std::map<uint16_t, int> tagOffsets_;
 
     // friends
     friend class internal::BamRecordMemory;
