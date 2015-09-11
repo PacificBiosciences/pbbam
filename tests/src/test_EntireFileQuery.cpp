@@ -149,18 +149,4 @@ TEST(BamRecordTest, ReferenceName)
 //    }
 }
 
-TEST(ZZZ_LastTest_Perhaps, CreateSmallerTestBam) 
-{
-    BamFile file("/mnt/secondary-siv/mdsmith/simulationStudies/lambdaToMerge/10Gb/pbalchemysim.all.pbalign.bam");
-    BamWriter writer("smaller.bam", file.Header());
-    EntireFileQuery query(file);
-    int count = 0;
-    for (const BamRecord& b : query) {
-        writer.Write(b);
-        ++count;
-        if (count == 25000)
-            break;
-    } 
-}
-
 // add add'l special cases as needed
