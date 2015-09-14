@@ -47,6 +47,7 @@ enum class VirtualRegionType // : char
 {
     ADAPTER        = 0x41, // 'A',
     BARCODE        = 0x42, // 'B',
+    FILTERED       = 0x46, // 'F', // subreads that are filtered
     SUBREAD        = 0x53, // 'S',
     HQREGION       = 0x48, // 'H',
     LQREGION       = 0x4C  // 'L'  // Outside the HQ region

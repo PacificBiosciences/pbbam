@@ -42,8 +42,9 @@ using namespace PacBio::BAM;
 
 std::map<char, VirtualRegionType> VirtualRegionTypeMap::ParseChar
 {
-	{ 'A' , VirtualRegionType::ADAPTER },
-	{ 'B' , VirtualRegionType::BARCODE },
-	{ 'H' , VirtualRegionType::HQREGION },
-	{ 'L' , VirtualRegionType::LQREGION }
+    { 'A' , VirtualRegionType::ADAPTER },
+    { 'B' , VirtualRegionType::BARCODE },
+    { 'H' , VirtualRegionType::HQREGION },
+    { 'F' , VirtualRegionType::FILTERED },
+    { 'L' , VirtualRegionType::LQREGION }
 };
