@@ -37,16 +37,141 @@
 
 #include "FileUtils.h"
 #include "StringUtils.h"
+#include <boost/algorithm/string.hpp>
 #include <exception>
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <cassert>
 #include <sys/stat.h>
 #include <unistd.h>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
 using namespace std;
+
+namespace PacBio {
+namespace BAM {
+namespace internal {
+
+// pops "file://" scheme off the front of a URI/filepath, if found
+static string removeFileUriScheme(const string& uri)
+{
+    assert(!uri.empty());
+
+    auto schemeLess = uri;
+    const auto fileScheme = string{"file://"};
+    const auto schemeFound = schemeLess.find(fileScheme);
+    if (schemeFound != string::npos) {
+        if (schemeFound != 0)
+            throw runtime_error("Malformed URI: scheme not at beginning");
+        schemeLess = schemeLess.substr(fileScheme.size());
+    }
+    return schemeLess;
+}
+
+#ifdef WIN32
+
+static
+string removeDiskName(const string& filePath)
+{
+    if (filePath.size() >= 2) {
+        const char firstChar = filePath.at(0);
+        if ((isalpha(firstChar) != 0) && (filePath.at(1) == ':'))
+            return filePath.substr(2);
+    }
+    return filePath;
+}
+
+static const char native_pathSeparator = '\\';
+
+static bool native_pathIsAbsolute(const string& filePath)
+{
+    assert(!filePath.empty());
+
+    // if starts with single slash or double slash [cases 1,3]
+    if (boost::algorithm::starts_with(filePath, "\\"))
+        return true;
+
+    // if starts with single or double-dots -> not absolute [case 4 + ".\file.txt"]
+    if (boost::algorithm::starts_with(filePath, "."))
+        return false;
+
+    // if starts with drive name and colon ("C:\foo\bar.txt")
+    if (filePath.size() >= 2) {
+        const char firstChar = filePath.at(0);
+        if ((isalpha(firstChar) != 0) && (filePath.at(1) == ':'))
+            return native_pathIsAbsolute(removeDiskName(filePath));
+    }
+
+    // otherwise, likely relative
+    return false;
+}
+
+static string native_resolvedFilePath(const string& filePath,
+                                      const string& from)
+{
+    // strip file:// scheme if present
+    auto schemeLess = removeFileUriScheme(filePath);
+
+    // if empty or already absolute path, just return it
+    // upfront empty check simplifies further parsing logic
+    if (schemeLess.empty() || native_pathIsAbsolute(schemeLess))
+        return schemeLess;
+
+    // else make relative from the provided 'from' directory
+    //
+    // first pop disk name, then any leading single-dot '.'
+    //
+    // since we're prepending the 'from' directory, we can remove
+    // any leading './' form our file path. this may just mean that
+    // we pop it off to add it right back (when from == '.'), but this
+    // keeps it consistent with other 'from' parent directories
+    //
+    schemeLess = removeDiskName(schemeLess);
+
+    const bool thisDirAtStart = (schemeLess.find(".") == 0);
+    if (thisDirAtStart) {
+        if (schemeLess.find(native_pathSeparator) == 1)
+            schemeLess = schemeLess.substr(2);
+    }
+    return from + native_pathSeparator + schemeLess;
+}
+
+#else // else for non-Windows systems
+
+static const char native_pathSeparator = '/';
+
+static bool native_pathIsAbsolute(const string& filePath)
+{ return filePath.at(0) == '/'; }
+
+static string native_resolvedFilePath(const string& filePath,
+                                      const string& from)
+{
+    // strip file:// scheme if present
+    auto schemeLess = removeFileUriScheme(filePath);
+
+    // if empty or already absolute path, just return it
+    // upfront empty check simplifies further parsing logic
+    if (schemeLess.empty() || native_pathIsAbsolute(schemeLess))
+        return schemeLess;
+
+    // else make relative from the provided 'from' directory
+    //
+    // since we're prepending the 'from' directory, we can remove
+    // any leading './' form our file path. this may just mean that
+    // we pop it off to add it right back (when from == '.'), but this
+    // keeps it consistent with other 'from' parent directories
+    //
+    const bool thisDirAtStart = (schemeLess.find(".") == 0);
+    if (thisDirAtStart) {
+        if (schemeLess.find(native_pathSeparator) == 1)
+            schemeLess = schemeLess.substr(2);
+    }
+    return from + native_pathSeparator + schemeLess;
+}
+
+#endif // WIN32
 
 // see http://stackoverflow.com/questions/2869594/how-return-a-stdstring-from-cs-getcwd-function
 string FileUtils::CurrentWorkingDirectory(void)
@@ -80,11 +205,7 @@ string FileUtils::CurrentWorkingDirectory(void)
 
 string FileUtils::DirectoryName(const string& file)
 {
-    char separator = '/';
-#ifdef WIN32
-    separator = '\\';
-#endif
-    const size_t found = file.rfind(separator, file.length());
+    const size_t found = file.rfind(Separator(), file.length());
     if (found != string::npos)
         return file.substr(0, found);
     return string(".");
@@ -106,26 +227,10 @@ chrono::system_clock::time_point FileUtils::LastModified(const char* fn)
 
 string FileUtils::ResolvedFilePath(const string& filePath,
                                    const string& from)
-{
-    // strip scheme from beginning, if it exists
-    string schemeLess = filePath;
-    const size_t schemeFound = schemeLess.find("file://");
-    if (schemeFound != string::npos) {
-        if (schemeFound != 0)
-            throw runtime_error("Malformed URI: scheme not at beginning");
-        schemeLess = schemeLess.substr(7);
-    }
+{ return native_resolvedFilePath(filePath, from); }
 
-    // if absolute path, just return it
-    if (schemeLess.at(0) == '/')
-        return schemeLess;
-        
-     // else make relative from the provided'from' directory (avoiding redundant "./"(s) at start)
-    const bool thisDirAtStart = (schemeLess.find("./") == 0);
-    if (thisDirAtStart)
-        schemeLess = schemeLess.substr(2);
-    return from + "/" + schemeLess;
-}
+constexpr char FileUtils::Separator(void)
+{ return native_pathSeparator; }
 
 off_t FileUtils::Size(const char* fn)
 {
@@ -134,3 +239,7 @@ off_t FileUtils::Size(const char* fn)
         throw runtime_error("could not determine file size");
     return s.st_size;
 }
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio

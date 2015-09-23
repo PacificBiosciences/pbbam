@@ -107,6 +107,9 @@ public:
     static std::string ResolvedFilePath(const std::string& filePath,
                                         const std::string& from = ".");
 
+    /// \returns native path separator
+    constexpr static char Separator(void);
+
     /// Check size of file.
     ///
     /// \param[in] fn full path to file
