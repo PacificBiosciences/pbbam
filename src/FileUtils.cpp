@@ -70,7 +70,7 @@ static string removeFileUriScheme(const string& uri)
     return schemeLess;
 }
 
-#ifdef WIN32
+#ifdef PBBAM_WIN_FILEPATHS
 
 static
 string removeDiskName(const string& filePath)
@@ -171,7 +171,7 @@ static string native_resolvedFilePath(const string& filePath,
     return from + native_pathSeparator + schemeLess;
 }
 
-#endif // WIN32
+#endif // PBBAM_WIN_FILEPATHS
 
 // see http://stackoverflow.com/questions/2869594/how-return-a-stdstring-from-cs-getcwd-function
 string FileUtils::CurrentWorkingDirectory(void)
