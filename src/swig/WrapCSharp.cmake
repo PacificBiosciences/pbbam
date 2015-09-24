@@ -7,9 +7,6 @@ set(PacBioBAM_CSharpDLL     ${PacBioBAM_CSharpLibDir}/bin/Debug/PacBio.BAM.dll)
 set(CSharpTestRootDir       ${PacBioBAM_TestsDir}/src/CSharp)
 set(NativeLibraryPaths      ${PacBioBAM_CSharpLibDir}:${PacBioBAM_LibDir}:${Htslib_LibDir})
 
-# turn on windows-style filepath resolution
-add_definitions(-DPBBAM_WIN_FILEPATHS)
-
 #
 # Create SWIG wrapper
 #

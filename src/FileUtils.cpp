@@ -89,15 +89,16 @@ static bool native_pathIsAbsolute(const string& filePath)
 {
     assert(!filePath.empty());
 
-    // if starts with single slash or double slash [cases 1,3]
+    // if starts with single slash or double slash
     if (boost::algorithm::starts_with(filePath, "\\"))
         return true;
 
-    // if starts with single or double-dots -> not absolute [case 4 + ".\file.txt"]
+    // if starts with single or double-dots -> not absolute
     if (boost::algorithm::starts_with(filePath, "."))
         return false;
 
-    // if starts with drive name and colon ("C:\foo\bar.txt")
+    // if starts with disk drive name and colon ("C:\foo\bar.txt")
+    // strip the drive name and check to see if the remaining path is absolute
     if (filePath.size() >= 2) {
         const char firstChar = filePath.at(0);
         if ((isalpha(firstChar) != 0) && (filePath.at(1) == ':'))
