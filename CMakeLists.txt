@@ -119,7 +119,7 @@ endif()
 
 # Turn on windows-style filepath resolution.
 # We need to add this #define early (not just in the C# SWIG wrapper)
-if(PacBioBAM_wrap_csharp)
+if(WIN32 AND PacBioBAM_wrap_csharp)
     add_definitions(-DPBBAM_WIN_FILEPATHS)
 endif()
 
