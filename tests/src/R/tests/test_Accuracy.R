@@ -37,17 +37,26 @@
 
 test_case("Accuracy_Clamp", {
 	
-    a_zero     <- Accuracy(0)
-    a_neg      <- Accuracy(-1)
-    a_min      <- Accuracy(0)
-    a_normal   <- Accuracy(300)
-    a_max      <- Accuracy(1000)
-    a_tooLarge <- Accuracy(2000)
+    a_zero     <- Accuracy(0.0)
+    a_neg      <- Accuracy(-0.5)
+    a_min      <- Accuracy(0.0)
+    a_normal   <- Accuracy(0.9)
+    a_max      <- Accuracy(1.0)
+    a_tooLarge <- Accuracy(1.1)
 	
-    assertEqual(0L,    a_zero$ToInt())
-    assertEqual(0L,    a_neg$ToInt())
-    assertEqual(0L,    a_min$ToInt())
-    assertEqual(300L,  a_normal$ToInt())
-    assertEqual(1000L, a_max$ToInt())
-    assertEqual(1000L, a_tooLarge$ToInt())
+    tolerance = 1e-5
+
+    assertTrue( abs(0.0 - a_zero$ToFloat())     <= tolerance )
+    assertTrue( abs(0.0 - a_neg$ToFloat())      <= tolerance )
+    assertTrue( abs(0.0 - a_min$ToFloat())      <= tolerance )
+    assertTrue( abs(0.9 - a_normal$ToFloat())   <= tolerance )
+    assertTrue( abs(1.0 - a_max$ToFloat())      <= tolerance )
+    assertTrue( abs(1.0 - a_tooLarge$ToFloat()) <= tolerance )
+    
+    # assertEqual(0.0, a_zero$ToFloat())
+    # assertEqual(0.0, a_neg$ToFloat())
+    # assertEqual(0.0, a_min$ToFloat())
+    # assertEqual(0.9, a_normal$ToFloat())
+    # assertEqual(1.0, a_max$ToFloat())
+    # assertEqual(1.0, a_tooLarge$ToFloat())
 })

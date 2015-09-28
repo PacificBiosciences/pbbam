@@ -71,7 +71,7 @@ class BamHeaderTest(unittest.TestCase):
         
     def test_decode(self):
         
-        text = ("@HD\tVN:1.1\tSO:queryname\tpb:3.0b3\n"
+        text = ("@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
                "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
                "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
                "@RG\tID:rg1\tSM:control\n"
@@ -85,7 +85,7 @@ class BamHeaderTest(unittest.TestCase):
 
         self.assertEqual("1.1",       header.Version())
         self.assertEqual("queryname", header.SortOrder())
-        self.assertEqual("3.0b3",     header.PacBioBamVersion())
+        self.assertEqual("3.0.1",     header.PacBioBamVersion())
 
         self.assertEqual(3, len(header.ReadGroups()))
         self.assertTrue(header.HasReadGroup("rg1"))
@@ -113,7 +113,7 @@ class BamHeaderTest(unittest.TestCase):
         
     def test_encode(self):
         
-        expectedText = ("@HD\tVN:1.1\tSO:queryname\tpb:3.0b3\n"
+        expectedText = ("@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
                         "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
                         "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
                         "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\n"
@@ -143,7 +143,7 @@ class BamHeaderTest(unittest.TestCase):
         header = PacBioBam.BamHeader()
         header.Version("1.1")
         header.SortOrder("queryname")
-        header.PacBioBamVersion("3.0b3")
+        header.PacBioBamVersion("3.0.1")
         header.AddReadGroup(rg1)
         header.AddReadGroup(rg2)
         header.AddReadGroup(rg3)

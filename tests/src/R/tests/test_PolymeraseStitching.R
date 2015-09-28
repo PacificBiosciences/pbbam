@@ -345,7 +345,10 @@ test_case("PolymeraseStitching_ProductionSubreadsToOriginal", {
     
     compareFrames(polyRecord$IPD(),                virtualRecord$IPDV1Frames())
     assertEqual(polyRecord$ReadGroup()$Id(),       virtualRecord$ReadGroup()$Id())
-    assertEqual(polyRecord$ReadAccuracy()$ToInt(), virtualRecord$ReadAccuracy()$ToInt())
+    
+    tolerance = 1e-5
+    assertTrue( abs(polyRecord$ReadAccuracy()$ToFloat() - virtualRecord$ReadAccuracy()$ToFloat()) <= tolerance )
+    # assertEqual(polyRecord$ReadAccuracy()$ToFloat(), virtualRecord$ReadAccuracy()$ToFloat())
 
     assertEqual(polyRecord$Qualities()$Fastq(),       virtualRecord$Qualities()$Fastq())
     assertEqual(polyRecord$DeletionQV()$Fastq(),      virtualRecord$DeletionQV()$Fastq())
@@ -375,7 +378,10 @@ test_case("PolymeraseStitching_ProductionHQToOriginal", {
 
     compareFrames(polyRecord$IPD(),                virtualRecord$IPDV1Frames())
     assertEqual(polyRecord$ReadGroup()$Id(),       virtualRecord$ReadGroup()$Id())
-    assertEqual(polyRecord$ReadAccuracy()$ToInt(), virtualRecord$ReadAccuracy()$ToInt())
+    
+    tolerance = 1e-5
+    assertTrue( abs(polyRecord$ReadAccuracy()$ToFloat() - virtualRecord$ReadAccuracy()$ToFloat()) <= tolerance )
+    # assertEqual(polyRecord$ReadAccuracy()$ToInt(), virtualRecord$ReadAccuracy()$ToInt())
     
     assertEqual(polyRecord$Qualities()$Fastq(),       virtualRecord$Qualities()$Fastq())
     assertEqual(polyRecord$DeletionQV()$Fastq(),      virtualRecord$DeletionQV()$Fastq())

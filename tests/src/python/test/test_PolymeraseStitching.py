@@ -229,7 +229,7 @@ class PolymeraseStitchingTest(unittest.TestCase):
         self.assertEqual(polyRecord.IPD(),             virtualRecord.IPDV1Frames());
         self.assertEqual(polyRecord.ReadGroup(),       virtualRecord.ReadGroup());
         
-        self.assertEqual(int(polyRecord.ReadAccuracy()), int(virtualRecord.ReadAccuracy()));
+        self.assertAlmostEqual(float(polyRecord.ReadAccuracy()), float(virtualRecord.ReadAccuracy()));
         
         self.assertEqual(polyRecord.Qualities().Fastq(),       virtualRecord.Qualities().Fastq());
         self.assertEqual(polyRecord.DeletionQV().Fastq(),      virtualRecord.DeletionQV().Fastq());
@@ -273,7 +273,7 @@ class PolymeraseStitchingTest(unittest.TestCase):
         self.assertEqual(polyRecord.IPD(),             virtualRecord.IPDV1Frames());
         self.assertEqual(polyRecord.ReadGroup(),       virtualRecord.ReadGroup());
         
-        self.assertEqual(int(polyRecord.ReadAccuracy()), int(virtualRecord.ReadAccuracy()));
+        self.assertAlmostEqual(float(polyRecord.ReadAccuracy()), float(virtualRecord.ReadAccuracy()));
         
         self.assertEqual(polyRecord.Qualities().Fastq(),       virtualRecord.Qualities().Fastq());
         self.assertEqual(polyRecord.DeletionQV().Fastq(),      virtualRecord.DeletionQV().Fastq());

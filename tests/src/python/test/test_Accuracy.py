@@ -49,17 +49,17 @@ class AccuracyTest(unittest.TestCase):
     # ------------ TESTS --------------
         
     def test_clamp(self):
-        a_zero     = PacBioBam.Accuracy(0)
-        a_neg      = PacBioBam.Accuracy(-1)
-        a_min      = PacBioBam.Accuracy(0)
-        a_normal   = PacBioBam.Accuracy(300)
-        a_max      = PacBioBam.Accuracy(1000)
-        a_tooLarge = PacBioBam.Accuracy(2000)
+        a_zero     = PacBioBam.Accuracy(0.0)
+        a_neg      = PacBioBam.Accuracy(-0.5)
+        a_min      = PacBioBam.Accuracy(0.0)
+        a_normal   = PacBioBam.Accuracy(0.9)
+        a_max      = PacBioBam.Accuracy(1.0)
+        a_tooLarge = PacBioBam.Accuracy(1.1)
         
-        self.assertEqual(0,    int(a_zero))
-        self.assertEqual(0,    int(a_neg))
-        self.assertEqual(0,    int(a_min))
-        self.assertEqual(300,  int(a_normal))
-        self.assertEqual(1000, int(a_max))
-        self.assertEqual(1000, int(a_tooLarge))
+        self.assertAlmostEqual(float(0.0), float(a_zero))
+        self.assertAlmostEqual(float(0.0), float(a_neg))
+        self.assertAlmostEqual(float(0.0), float(a_min))
+        self.assertAlmostEqual(float(0.9), float(a_normal))
+        self.assertAlmostEqual(float(1.0), float(a_max))
+        self.assertAlmostEqual(float(1.0), float(a_tooLarge))
         

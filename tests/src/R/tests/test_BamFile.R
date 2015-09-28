@@ -61,7 +61,6 @@ test_case("BamFile_Ctor", {
 	result <- tryCatch(
 		{
 			f <- BamFile(fn)
-			assertFalse(f$IsPacBioBAM())
 			invisible()
 		},
 		warning = function(w) {

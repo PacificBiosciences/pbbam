@@ -55,7 +55,6 @@ class BamFileTest(unittest.TestCase):
         
     def test_ctor(self):
         f = PacBioBam.BamFile(self.ex2BamFn)
-        self.assertFalse(f.IsPacBioBAM())
         
     def test_nonExistentFile(self):
         with self.assertRaises(RuntimeError):

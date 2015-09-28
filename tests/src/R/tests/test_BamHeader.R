@@ -100,7 +100,7 @@ test_case("BamHeader_Defaults", {
 
 test_case("BamHeader_Decode", { 
 	
-    text <- paste("@HD\tVN:1.1\tSO:queryname\tpb:3.0b3",
+    text <- paste("@HD\tVN:1.1\tSO:queryname\tpb:3.0.1",
 			      "@SQ\tSN:chr1\tLN:2038\tSP:chocobo",
 				  "@SQ\tSN:chr2\tLN:3042\tSP:chocobo",
 				  "@RG\tID:rg1\tSM:control",
@@ -116,7 +116,7 @@ test_case("BamHeader_Decode", {
 	
 	assertEqual("1.1",       header$Version())
 	assertEqual("queryname", header$SortOrder())
-	assertEqual("3.0b3",     header$PacBioBamVersion())
+	assertEqual("3.0.1",     header$PacBioBamVersion())
 
 	assertEqual(3L, header$ReadGroups()$size())
 	assertTrue(header$HasReadGroup("rg1"))
@@ -146,7 +146,7 @@ test_case("BamHeader_Decode", {
 	
 test_case("BamHeader_Encode", { 
 	
-    expectedText <- paste("@HD\tVN:1.1\tSO:queryname\tpb:3.0b3",
+    expectedText <- paste("@HD\tVN:1.1\tSO:queryname\tpb:3.0.1",
 			              "@SQ\tSN:chr1\tLN:2038\tSP:chocobo",
 				          "@SQ\tSN:chr2\tLN:3042\tSP:chocobo",
 				          "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control",
@@ -179,7 +179,7 @@ test_case("BamHeader_Encode", {
 	header <- BamHeader()
 	header$Version("1.1")
 	header$SortOrder("queryname")
-	header$PacBioBamVersion("3.0b3")
+	header$PacBioBamVersion("3.0.1")
 	header$AddReadGroup(rg1)
 	header$AddReadGroup(rg2)
 	header$AddReadGroup(rg3)
