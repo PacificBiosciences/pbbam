@@ -9,9 +9,9 @@ using namespace PacBio::BAM;
 %}
 
 #ifdef SWIGPYTHON
-%rename(__int__) PacBio::BAM::Accuracy::operator int;
+%rename(__float__) PacBio::BAM::Accuracy::operator float;
 #else // C#, R
-%rename(ToInt) PacBio::BAM::Accuracy::operator int;
+%rename(ToFloat) PacBio::BAM::Accuracy::operator float;
 #endif
 
 %include <pbbam/Accuracy.h>

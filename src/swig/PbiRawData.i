@@ -13,7 +13,7 @@ using namespace PacBio::BAM;
 %ignore PacBio::BAM::PbiRawMappedData::PbiRawMappedData(PbiRawMappedData&&);
 %ignore PacBio::BAM::PbiReferenceEntry::PbiReferenceEntry(PbiReferenceEntry&&);
 %ignore PacBio::BAM::PbiRawReferenceData::PbiRawReferenceData(PbiRawReferenceData&&);
-%ignore PacBio::BAM::PbiRawSubreadData::PbiRawSubreadData(PbiRawSubreadData&&);
+%ignore PacBio::BAM::PbiRawBasicData::PbiRawBasicData(PbiRawBasicData&&);
 %ignore PacBio::BAM::PbiRawData::PbiRawData(PbiRawData&&); 
 
 // assignment operators not used
@@ -21,7 +21,7 @@ using namespace PacBio::BAM;
 %ignore PacBio::BAM::PbiRawMappedData::operator=;
 %ignore PacBio::BAM::PbiReferenceEntry::operator=;
 %ignore PacBio::BAM::PbiRawReferenceData::operator=;
-%ignore PacBio::BAM::PbiRawSubreadData::operator=;
+%ignore PacBio::BAM::PbiRawBasicData::operator=;
 %ignore PacBio::BAM::PbiRawData::operator=;
 
 #ifdef SWIGCSHARP
@@ -29,7 +29,7 @@ using namespace PacBio::BAM;
 %ignore PacBio::BAM::PbiRawData::BarcodeData();
 %ignore PacBio::BAM::PbiRawData::MappedData();
 %ignore PacBio::BAM::PbiRawData::ReferenceData();
-%ignore PacBio::BAM::PbiRawData::SubreadData();
+%ignore PacBio::BAM::PbiRawData::BasicData();
 #endif // C#
 
 %include <pbbam/PbiRawData.h>
