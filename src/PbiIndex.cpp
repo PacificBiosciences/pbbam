@@ -72,14 +72,15 @@ bool IndexResultBlock::operator!=(const IndexResultBlock& other) const
 // SubreadLookupData implementation
 // ----------------------------------
 
-SubreadLookupData::SubreadLookupData(void) { }
+BasicLookupData::BasicLookupData(void) { }
 
-SubreadLookupData::SubreadLookupData(const PbiRawSubreadData& rawData)
+BasicLookupData::BasicLookupData(const PbiRawBasicData& rawData)
     : rgId_(rawData.rgId_)
     , qStart_(rawData.qStart_)
     , qEnd_(rawData.qEnd_)
     , holeNumber_(rawData.holeNumber_)
     , readQual_(rawData.readQual_)
+    , ctxtFlag_(rawData.ctxtFlag_)
     , fileOffset_(rawData.fileOffset_)
 { }
 
@@ -170,7 +171,7 @@ BarcodeLookupData::BarcodeLookupData(const PbiRawBarcodeData& rawData)
     : bcLeft_(rawData.bcLeft_)
     , bcRight_(rawData.bcRight_)
     , bcQual_(rawData.bcQual_)
-    , ctxtFlag_(rawData.ctxtFlag_)
+
 {  }
 
 //BarcodeLookupData::BarcodeLookupData(PbiRawBarcodeData&& rawData)
@@ -212,7 +213,7 @@ ReferenceLookupData::ReferenceLookupData(const PbiRawReferenceData& rawData)
 
 PbiIndexPrivate::PbiIndexPrivate(void)
     : version_(PbiFile::CurrentVersion)
-    , sections_(PbiFile::SUBREAD)
+    , sections_(PbiFile::BASIC)
     , numReads_(0)
 { }
 
@@ -220,7 +221,7 @@ PbiIndexPrivate::PbiIndexPrivate(const PbiRawData& rawIndex)
     : version_(rawIndex.Version())
     , sections_(rawIndex.FileSections())
     , numReads_(rawIndex.NumReads())
-    , subreadData_(rawIndex.SubreadData())
+    , basicData_(rawIndex.BasicData())
     , mappedData_(rawIndex.MappedData())
     , referenceData_(rawIndex.ReferenceData())
     , barcodeData_(rawIndex.BarcodeData())
@@ -230,7 +231,7 @@ PbiIndexPrivate::PbiIndexPrivate(PbiRawData&& rawIndex)
     : version_(std::move(rawIndex.Version()))
     , sections_(std::move(rawIndex.FileSections()))
     , numReads_(std::move(rawIndex.NumReads()))
-    , subreadData_(std::move(rawIndex.SubreadData()))
+    , basicData_(std::move(rawIndex.BasicData()))
     , mappedData_(std::move(rawIndex.MappedData()))
     , referenceData_(std::move(rawIndex.ReferenceData()))
     , barcodeData_(std::move(rawIndex.BarcodeData()))
@@ -242,7 +243,7 @@ unique_ptr<PbiIndexPrivate> PbiIndexPrivate::DeepCopy(void) const
     copy->version_  = version_;
     copy->sections_ = sections_;
     copy->numReads_ = numReads_;
-    copy->subreadData_   = subreadData_;
+    copy->basicData_   = basicData_;
     copy->mappedData_    = mappedData_;
     copy->referenceData_ = referenceData_;
     copy->barcodeData_   = barcodeData_;
@@ -308,4 +309,4 @@ PbiFile::VersionEnum PbiIndex::Version(void) const
 { return d_->version_; }
 
 const vector<int64_t>& PbiIndex::VirtualFileOffsets(void) const
-{ return d_->subreadData_.fileOffset_; }
+{ return d_->basicData_.fileOffset_; }

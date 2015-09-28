@@ -133,11 +133,11 @@ private:
 // Subread Data
 // ----------------
 
-struct SubreadLookupData
+struct BasicLookupData
 {
     // ctors
-    SubreadLookupData(void);
-    SubreadLookupData(const PbiRawSubreadData& rawData);
+    BasicLookupData(void);
+    BasicLookupData(const PbiRawBasicData& rawData);
 //    SubreadLookupData(PbiRawSubreadData&& rawData);
 
     // add offset data to index result blocks
@@ -156,10 +156,13 @@ struct SubreadLookupData
     UnorderedLookup<int32_t> rgId_;
 
     // numeric comparisons make sense, keep key ordering preserved
-    OrderedLookup<int32_t>  qStart_;
-    OrderedLookup<int32_t>  qEnd_;
-    OrderedLookup<int32_t>  holeNumber_;
-    OrderedLookup<uint16_t> readQual_;
+    OrderedLookup<int32_t> qStart_;
+    OrderedLookup<int32_t> qEnd_;
+    OrderedLookup<int32_t> holeNumber_;
+    OrderedLookup<float>   readQual_;
+
+    // see if this works, or if can use unordered, 'direct' query
+    OrderedLookup<uint8_t> ctxtFlag_;
 
     // offsets
     std::vector<int64_t> fileOffset_;
@@ -246,9 +249,6 @@ struct BarcodeLookupData
     OrderedLookup<uint16_t> bcLeft_;
     OrderedLookup<uint16_t> bcRight_;
     OrderedLookup<uint8_t>  bcQual_;
-
-    // see if this works, or if can use unordered, 'direct' query
-    OrderedLookup<uint8_t> ctxtFlag_;
 };
 
 // --------------------------
@@ -335,7 +335,7 @@ public:
     uint32_t numReads_;
 
     // lookup structures
-    SubreadLookupData   subreadData_;
+    BasicLookupData     basicData_;
     MappedLookupData    mappedData_;
     ReferenceLookupData referenceData_;
     BarcodeLookupData   barcodeData_;
@@ -578,14 +578,14 @@ UnorderedLookup<T>::LookupIndices(const UnorderedLookup::KeyType& key,
 // -------------------
 
 inline
-void SubreadLookupData::ApplyOffsets(IndexResultBlocks& blocks) const
+void BasicLookupData::ApplyOffsets(IndexResultBlocks& blocks) const
 {
     for (IndexResultBlock& block : blocks)
         block.virtualOffset_ = fileOffset_.at(block.firstIndex_);
 }
 
 template<typename T>
-inline IndexList SubreadLookupData::Indices(const SubreadField& field,
+inline IndexList BasicLookupData::Indices(const SubreadField& field,
                                             const T& value,
                                             const CompareType& compareType) const
 {
@@ -595,6 +595,7 @@ inline IndexList SubreadLookupData::Indices(const SubreadField& field,
         case SubreadField::Q_END:        return qEnd_.LookupIndices(value, compareType);
         case SubreadField::ZMW:          return holeNumber_.LookupIndices(value, compareType);
         case SubreadField::READ_QUALITY: return readQual_.LookupIndices(value, compareType);
+        case SubreadField::CONTEXT_FLAG: return ctxtFlag_.LookupIndices(value, compareType);
 
         case SubreadField::VIRTUAL_OFFSET : // fall-through, not supported this way
         default:
@@ -604,7 +605,7 @@ inline IndexList SubreadLookupData::Indices(const SubreadField& field,
 }
 
 template<typename T>
-inline IndexList SubreadLookupData::IndicesMulti(const SubreadField& field,
+inline IndexList BasicLookupData::IndicesMulti(const SubreadField& field,
                                                  const std::vector<T>& values) const
 {
     IndexList result;
@@ -708,7 +709,6 @@ inline IndexList BarcodeLookupData::Indices(const BarcodeField& field,
         case BarcodeField::BC_LEFT:      return bcLeft_.LookupIndices(value, compareType);
         case BarcodeField::BC_RIGHT:     return bcRight_.LookupIndices(value, compareType);
         case BarcodeField::BC_QUALITY:   return bcQual_.LookupIndices(value, compareType);
-        case BarcodeField::CONTEXT_FLAG: return ctxtFlag_.LookupIndices(value, compareType);
         default:
             assert(false);
     }
@@ -745,7 +745,7 @@ inline IndexList
 PbiIndexPrivate::Indices(const SubreadField& field,
                          const T& value,
                          const CompareType& compareType) const
-{ return subreadData_.Indices(field, value, compareType); }
+{ return basicData_.Indices(field, value, compareType); }
 
 template<typename T>
 inline IndexList
@@ -765,7 +765,7 @@ template<typename T>
 inline IndexList
 PbiIndexPrivate::IndicesMulti(const SubreadField& field,
                               const T& value) const
-{ return subreadData_.IndicesMulti(field, value); }
+{ return basicData_.IndicesMulti(field, value); }
 
 template<typename T>
 inline IndexList
@@ -784,7 +784,7 @@ inline IndexResultBlocks
 PbiIndexPrivate::Lookup(const SubreadField& field,
                         const T& value,
                         const CompareType& compareType) const
-{ return MergeBlocksWithOffsets(subreadData_.Indices(field, value, compareType)); }
+{ return MergeBlocksWithOffsets(basicData_.Indices(field, value, compareType)); }
 
 template<typename T>
 inline IndexResultBlocks
@@ -812,7 +812,7 @@ template<typename T>
 inline IndexResultBlocks
 PbiIndexPrivate::LookupMulti(const SubreadField& field,
                              const std::vector<T>& values) const
-{ return MergeBlocksWithOffsets(subreadData_.IndicesMulti(field, values)); }
+{ return MergeBlocksWithOffsets(basicData_.IndicesMulti(field, values)); }
 
 template<typename T>
 inline IndexResultBlocks
@@ -836,7 +836,7 @@ PbiIndexPrivate::LookupReference(const int32_t tId) const
         return IndexResultBlocks();
     const size_t numReads = indexRange.second - indexRange.first;
     IndexResultBlocks blocks(1, IndexResultBlock(indexRange.first, numReads));
-    subreadData_.ApplyOffsets(blocks);
+    basicData_.ApplyOffsets(blocks);
     return blocks;
 }
 
@@ -844,7 +844,7 @@ inline IndexResultBlocks
 PbiIndexPrivate::MergeBlocksWithOffsets(const IndexList& indices) const
 {
     IndexResultBlocks blocks = mergedIndexBlocks(indices);
-    subreadData_.ApplyOffsets(blocks);
+    basicData_.ApplyOffsets(blocks);
     return blocks;
 }
 

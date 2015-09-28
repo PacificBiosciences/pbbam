@@ -44,13 +44,13 @@ namespace PacBio {
 namespace BAM {
 
 /// \brief The Accuracy class represents the expected accuracy of a BamRecord.
-/// Values are clamped to [0,1000].
+/// Values are clamped to fall within [0,1].
 ///
 class PBBAM_EXPORT Accuracy
 {
 public:
-    static const int MIN;
-    static const int MAX;
+    static const float MIN;
+    static const float MAX;
 
 public:
     /// \name Constructors & Related Methods
@@ -59,7 +59,7 @@ public:
     /// \note This is not an 'explicit' ctor, to make it as easy to use in
     ///       numeric operations as possible. We really just want to make
     ///       sure that the acceptable range is respected.
-    Accuracy(int accuracy);
+    Accuracy(float accuracy);
     Accuracy(const Accuracy& other);
     ~Accuracy(void);
 
@@ -67,14 +67,14 @@ public:
 
 public:
 
-    /// \returns Accuracy as integer
-    operator int(void) const;
+    /// \returns Accuracy as float primitive
+    operator float(void) const;
 
 private:
-    int accuracy_;
+    float accuracy_;
 };
 
-inline Accuracy::Accuracy(int accuracy)
+inline Accuracy::Accuracy(float accuracy)
 {
     if (accuracy < Accuracy::MIN)
         accuracy = Accuracy::MIN;
@@ -89,7 +89,7 @@ inline Accuracy::Accuracy(const Accuracy &other)
 
 inline Accuracy::~Accuracy(void) { }
 
-inline Accuracy::operator int(void) const
+inline Accuracy::operator float(void) const
 { return accuracy_; }
 
 } // namespace BAM

@@ -74,9 +74,9 @@ public:
                                BGZF* fp);
     static void LoadReferenceData(PbiRawReferenceData& referenceData,
                                   BGZF* fp);
-    static void LoadSubreadData(PbiRawSubreadData& subreadData,
-                                const uint32_t numReads,
-                                BGZF* fp);
+    static void LoadBasicData(PbiRawBasicData& basicData,
+                              const uint32_t numReads,
+                              BGZF* fp);
 
     // per-data-field load
     template<typename T>
@@ -96,7 +96,7 @@ public:
                                 BGZF* fp);
     static void WriteReferenceData(const PbiRawReferenceData& referenceData,
                                    BGZF* fp);
-    static void WriteSubreadData(const PbiRawSubreadData& subreadData,
+    static void WriteBasicData(const PbiRawBasicData& subreadData,
                                  const uint32_t numReads,
                                  BGZF* fp);
 

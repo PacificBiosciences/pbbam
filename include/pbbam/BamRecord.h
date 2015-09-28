@@ -122,8 +122,11 @@ public:
     /// \returns barcode call confidence (Phred-scaled posterior probability that barcode call)
     uint8_t BarcodeQuality(void) const;
 
-    /// \returns the left and right barcode ids
-    std::pair<int,int> Barcodes(void) const;
+    /// \returns the forward and reverse barcode ids
+    ///
+    /// \throws std::runtime_error if barcode data is absent or malformed. \sa HasBarcodes
+    ///
+    std::pair<uint16_t,uint16_t> Barcodes(void) const;
 
     /// Fetch the record's alignment CIGAR.
     ///
@@ -608,7 +611,8 @@ public:
     ///
     /// \param[in] barcodeIds
     /// \returns reference to this record
-    BamRecord& Barcodes(const std::pair<int,int>& barcodeIds);
+    ///
+    BamRecord& Barcodes(const std::pair<uint16_t,uint16_t>& barcodeIds);
 
     /// Sets this record's barcode quality ('bq' tag)
     ///

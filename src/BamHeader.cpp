@@ -59,7 +59,7 @@ static const string token_VN = string("VN");
 static const string token_SO = string("SO");
 static const string token_pb = string("pb");
 
-static const string current_version = string("3.0b7");
+static const string current_version = string("3.0.1");
 
 class BamHeaderPrivate
 {

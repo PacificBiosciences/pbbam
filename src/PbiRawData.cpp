@@ -55,21 +55,18 @@ PbiRawBarcodeData::PbiRawBarcodeData(uint32_t numReads)
     bcLeft_.reserve(numReads);
     bcRight_.reserve(numReads);
     bcQual_.reserve(numReads);
-    ctxtFlag_.reserve(numReads);
 }
 
 PbiRawBarcodeData::PbiRawBarcodeData(const PbiRawBarcodeData& other)
     : bcLeft_(other.bcLeft_)
     , bcRight_(other.bcRight_)
     , bcQual_(other.bcQual_)
-    , ctxtFlag_(other.ctxtFlag_)
 { }
 
 PbiRawBarcodeData::PbiRawBarcodeData(PbiRawBarcodeData&& other)
     : bcLeft_(std::move(other.bcLeft_))
     , bcRight_(std::move(other.bcRight_))
     , bcQual_(std::move(other.bcQual_))
-    , ctxtFlag_(std::move(other.ctxtFlag_))
 { }
 
 PbiRawBarcodeData& PbiRawBarcodeData::operator=(const PbiRawBarcodeData& other)
@@ -77,7 +74,6 @@ PbiRawBarcodeData& PbiRawBarcodeData::operator=(const PbiRawBarcodeData& other)
     bcLeft_ = other.bcLeft_;
     bcRight_ = other.bcRight_;
     bcQual_ = other.bcQual_;
-    ctxtFlag_ =other.ctxtFlag_;
     return *this;
 }
 
@@ -86,7 +82,6 @@ PbiRawBarcodeData& PbiRawBarcodeData::operator=(PbiRawBarcodeData&& other)
     bcLeft_ = std::move(other.bcLeft_);
     bcRight_ = std::move(other.bcRight_);
     bcQual_ = std::move(other.bcQual_);
-    ctxtFlag_ = std::move(other.ctxtFlag_);
     return *this;
 }
 
@@ -96,13 +91,12 @@ bool PbiRawBarcodeData::AddRecord(const BamRecord& b)
     // skip if none at all
     const bool hasBcTag = b.HasBarcodes();
     const bool hasBqTag = b.HasBarcodeQuality();
-    const bool hasCxTag = b.HasLocalContextFlags();
-    const bool hasAnyBarcodeInfo = hasBcTag || hasBqTag || hasCxTag;
+    const bool hasAnyBarcodeInfo = hasBcTag || hasBqTag;
     if (!hasAnyBarcodeInfo)
         return false;
 
     if (hasBcTag) {
-        const std::pair<int, int> barcodes = b.Barcodes();
+        const std::pair<uint16_t, uint16_t> barcodes = b.Barcodes();
         bcLeft_.push_back(barcodes.first);
         bcRight_.push_back(barcodes.second);
     } else {
@@ -114,11 +108,6 @@ bool PbiRawBarcodeData::AddRecord(const BamRecord& b)
         bcQual_.push_back(b.BarcodeQuality());
     else
         bcQual_.push_back(0); // missing value marker... ??
-
-    if (hasCxTag)
-        ctxtFlag_.push_back(b.LocalContextFlags());
-    else
-        ctxtFlag_.push_back(0); // missing value marker... ??
 
     return true;
 }
@@ -293,59 +282,64 @@ PbiRawReferenceData& PbiRawReferenceData::operator=(PbiRawReferenceData&& other)
 // PbiRawSubreadData implementation
 // ----------------------------------
 
-PbiRawSubreadData::PbiRawSubreadData(void) { }
+PbiRawBasicData::PbiRawBasicData(void) { }
 
-PbiRawSubreadData::PbiRawSubreadData(uint32_t numReads)
+PbiRawBasicData::PbiRawBasicData(uint32_t numReads)
 {
     rgId_.reserve(numReads);
     qStart_.reserve(numReads);
     qEnd_.reserve(numReads);
     holeNumber_.reserve(numReads);
     readQual_.reserve(numReads);
+    ctxtFlag_.reserve(numReads);
     fileOffset_.reserve(numReads);
 }
 
-PbiRawSubreadData::PbiRawSubreadData(const PbiRawSubreadData& other)
+PbiRawBasicData::PbiRawBasicData(const PbiRawBasicData& other)
     : rgId_(other.rgId_)
     , qStart_(other.qStart_)
     , qEnd_(other.qEnd_)
     , holeNumber_(other.holeNumber_)
     , readQual_(other.readQual_)
+    , ctxtFlag_(other.ctxtFlag_)
     , fileOffset_(other.fileOffset_)
 { }
 
-PbiRawSubreadData::PbiRawSubreadData(PbiRawSubreadData&& other)
+PbiRawBasicData::PbiRawBasicData(PbiRawBasicData&& other)
     : rgId_(std::move(other.rgId_))
     , qStart_(std::move(other.qStart_))
     , qEnd_(std::move(other.qEnd_))
     , holeNumber_(std::move(other.holeNumber_))
     , readQual_(std::move(other.readQual_))
+    , ctxtFlag_(std::move(other.ctxtFlag_))
     , fileOffset_(std::move(other.fileOffset_))
 { }
 
-PbiRawSubreadData& PbiRawSubreadData::operator=(const PbiRawSubreadData& other)
+PbiRawBasicData& PbiRawBasicData::operator=(const PbiRawBasicData& other)
 {
     rgId_ = other.rgId_;
     qStart_ = other.qStart_;
     qEnd_ = other.qEnd_;
     holeNumber_ = other.holeNumber_;
     readQual_ = other.readQual_;
+    ctxtFlag_ = other.ctxtFlag_;
     fileOffset_ = other.fileOffset_;
     return *this;
 }
 
-PbiRawSubreadData& PbiRawSubreadData::operator=(PbiRawSubreadData&& other)
+PbiRawBasicData& PbiRawBasicData::operator=(PbiRawBasicData&& other)
 {
     rgId_ = std::move(other.rgId_);
     qStart_ = std::move(other.qStart_);
     qEnd_ = std::move(other.qEnd_);
     holeNumber_ = std::move(other.holeNumber_);
     readQual_ = std::move(other.readQual_);
+    ctxtFlag_ = std::move(other.ctxtFlag_);
     fileOffset_ = std::move(other.fileOffset_);
     return *this;
 }
 
-void PbiRawSubreadData::AddRecord(const BamRecord& b, int64_t offset)
+void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
 {
 
     string rgId = b.ReadGroupId();
@@ -373,7 +367,12 @@ void PbiRawSubreadData::AddRecord(const BamRecord& b, int64_t offset)
     if (b.HasReadAccuracy())
         readQual_.push_back(b.ReadAccuracy());
     else
-        readQual_.push_back(0); // TODO: what to do?
+        readQual_.push_back(0.0f); // TODO: what to do?
+
+    if (b.HasLocalContextFlags())
+        ctxtFlag_.push_back(b.LocalContextFlags());
+    else
+        ctxtFlag_.push_back(LocalContextFlags::NO_LOCAL_CONTEXT);
 
     fileOffset_.push_back(offset);
 }
@@ -403,7 +402,7 @@ PbiRawData::PbiRawData(const PbiRawData& other)
     , barcodeData_(other.barcodeData_)
     , mappedData_(other.mappedData_)
     , referenceData_(other.referenceData_)
-    , subreadData_(other.subreadData_)
+    , basicData_(other.basicData_)
 { }
 
 PbiRawData::PbiRawData(PbiRawData&& other)
@@ -413,7 +412,7 @@ PbiRawData::PbiRawData(PbiRawData&& other)
     , barcodeData_(std::move(other.barcodeData_))
     , mappedData_(std::move(other.mappedData_))
     , referenceData_(std::move(other.referenceData_))
-    , subreadData_(std::move(other.subreadData_))
+    , basicData_(std::move(other.basicData_))
 { }
 
 PbiRawData& PbiRawData::operator=(const PbiRawData& other)
@@ -424,7 +423,7 @@ PbiRawData& PbiRawData::operator=(const PbiRawData& other)
     barcodeData_ = other.barcodeData_;
     mappedData_ = other.mappedData_;
     referenceData_ = other.referenceData_;
-    subreadData_ = other.subreadData_;
+    basicData_ = other.basicData_;
     return *this;
 }
 
@@ -436,7 +435,7 @@ PbiRawData& PbiRawData::operator=(PbiRawData&& other)
     barcodeData_ = std::move(other.barcodeData_);
     mappedData_ = std::move(other.mappedData_);
     referenceData_ = std::move(other.referenceData_);
-    subreadData_ = std::move(other.subreadData_);
+    basicData_ = std::move(other.basicData_);
     return *this;
 }
 

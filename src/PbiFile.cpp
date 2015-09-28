@@ -76,7 +76,8 @@ void CreateFrom(const BamFile& bamFile)
     // iterate through file, building index data
     PbiBuilder builder(bamFile.PacBioIndexFilename(), bamFile.Header().Sequences().size());
     int64_t offset = bgzf_tell(fp->fp.bgzf);
-    while (sam_read1(fp, hdr, b) >= 0) {
+    int result = 0;
+    while ((result = sam_read1(fp, hdr, b)) >= 0) {
         internal::BamRecordMemory::UpdateRecordTags(record);
         builder.AddRecord(record, offset);
         offset = bgzf_tell(fp->fp.bgzf);

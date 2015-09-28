@@ -98,7 +98,7 @@ static const string recordTypeName_Unknown    = "UNKNOWN";
 static
 int32_t HoleNumberFromName(const string& fullName)
 {
-    const vector<string> mainTokens = std::move(Split(fullName, '/'));
+    const auto mainTokens = Split(fullName, '/');
     if (mainTokens.size() != 3)
         throw std::runtime_error("malformed record name");
     return stoi(mainTokens.at(1));
@@ -107,10 +107,10 @@ int32_t HoleNumberFromName(const string& fullName)
 static
 Position QueryEndFromName(const string& fullName)
 {
-    const vector<string> mainTokens = std::move(Split(fullName, '/'));
+    const auto mainTokens = Split(fullName, '/');
     if (mainTokens.size() != 3)
         throw std::runtime_error("malformed record name");
-    const vector<string> queryTokens = std::move(Split(mainTokens.at(2), '_'));
+    const auto queryTokens = Split(mainTokens.at(2), '_');
     if (queryTokens.size() != 2)
         throw std::runtime_error("malformed record name");
     return stoi(queryTokens.at(1));
@@ -119,10 +119,10 @@ Position QueryEndFromName(const string& fullName)
 static
 Position QueryStartFromName(const string& fullName)
 {
-    const vector<string> mainTokens = std::move(Split(fullName, '/'));
+    const auto mainTokens = Split(fullName, '/');
     if (mainTokens.size() != 3)
         throw std::runtime_error("malformed record name");
-    const vector<string> queryTokens = std::move(Split(mainTokens.at(2), '_'));
+    const auto queryTokens = Split(mainTokens.at(2), '_');
     if (queryTokens.size() != 2)
         throw std::runtime_error("malformed record name");
     return stoi(queryTokens.at(0));
@@ -207,16 +207,16 @@ void MaybeClipAndGapifyBases(const BamRecordImpl& impl,
     if (impl.IsMapped() && (aligned || exciseSoftClips)) {
 
         size_t seqIndex = 0;
-        const Cigar& cigar = impl.CigarData();
-        Cigar::const_iterator cigarIter = cigar.cbegin();
-        Cigar::const_iterator cigarEnd  = cigar.cend();
+        const auto cigar = impl.CigarData();
+        auto cigarIter = cigar.cbegin();
+        auto cigarEnd  = cigar.cend();
         for (; cigarIter != cigarEnd; ++cigarIter) {
-            const CigarOperation& op = (*cigarIter);
-            const CigarOperationType& type = op.Type();
+            const auto op = (*cigarIter);
+            const auto type = op.Type();
 
             // do nothing for hard clips
             if (type != CigarOperationType::HARD_CLIP) {
-                const size_t opLength = op.Length();
+                const auto opLength = op.Length();
 
                 // maybe remove soft clips
                 if (type == CigarOperationType::SOFT_CLIP && exciseSoftClips)
@@ -253,18 +253,18 @@ void MaybeClipAndGapifyFrames(const BamRecordImpl& impl,
 {
     if (impl.IsMapped() && (aligned || exciseSoftClips)) {
 
-        vector<uint16_t> data = std::move(frames.Data()); // we're going to put it back
+        auto data = std::move(frames.Data()); // we're going to put it back
         size_t frameIndex = 0;
-        const Cigar& cigar = impl.CigarData();
-        Cigar::const_iterator cigarIter = cigar.cbegin();
-        Cigar::const_iterator cigarEnd  = cigar.cend();
+        const auto cigar = impl.CigarData();
+        auto cigarIter = cigar.cbegin();
+        auto cigarEnd  = cigar.cend();
         for (; cigarIter != cigarEnd; ++cigarIter) {
-            const CigarOperation& op = (*cigarIter);
-            const CigarOperationType& type = op.Type();
+            const auto op = (*cigarIter);
+            const auto type = op.Type();
 
             // do nothing for hard clips
             if (type != CigarOperationType::HARD_CLIP) {
-                const size_t opLength = op.Length();
+                const auto opLength = op.Length();
 
                 // maybe remove soft clips
                 if (type == CigarOperationType::SOFT_CLIP && exciseSoftClips)
@@ -299,17 +299,16 @@ void MaybeClipAndGapifyQualities(const BamRecordImpl& impl,
     if (impl.IsMapped() && (aligned || exciseSoftClips)) {
 
         size_t qualIndex = 0;
-        const Cigar& cigar = impl.CigarData();
-        Cigar::const_iterator cigarIter = cigar.cbegin();
-        Cigar::const_iterator cigarEnd  = cigar.cend();
+        const auto cigar = impl.CigarData();
+        auto cigarIter = cigar.cbegin();
+        auto cigarEnd  = cigar.cend();
         for (; cigarIter != cigarEnd; ++cigarIter) {
-
-            const CigarOperation& op = (*cigarIter);
-            const CigarOperationType& type = op.Type();
+            const auto op = (*cigarIter);
+            const auto type = op.Type();
 
             // do nothing for hard clips
             if (type != CigarOperationType::HARD_CLIP) {
-                const size_t opLength = op.Length();
+                const auto opLength = op.Length();
 
                 // maybe remove soft clips
                 if (type == CigarOperationType::SOFT_CLIP && exciseSoftClips)
@@ -400,6 +399,13 @@ RecordType NameToType(const string& name)
     return RecordType::UNKNOWN;
 }
 
+static inline
+bool IsClippingOp(const CigarOperation& op)
+{
+    const auto opType = op.Type();
+    return opType == CigarOperationType::SOFT_CLIP ||
+           opType == CigarOperationType::HARD_CLIP;
+}
 
 } // namespace internal
 } // namespace BAM
@@ -508,7 +514,7 @@ BamRecord& BamRecord::AltLabelTag(const std::string& tags)
 
 uint8_t BamRecord::BarcodeQuality(void) const
 {
-    const Tag& bq = impl_.TagValue(internal::tagName_barcode_quality);
+    const auto bq = impl_.TagValue(internal::tagName_barcode_quality);
     if (bq.IsNull())
         return 0; // ?? "missing" value for tags ?? should we consider boost::optional<T> for these kind of guys ??
     return bq.ToUInt8();
@@ -520,25 +526,25 @@ BamRecord& BamRecord::BarcodeQuality(const uint8_t quality)
     return *this;
 }
 
-std::pair<int,int> BamRecord::Barcodes(void) const
+std::pair<uint16_t,uint16_t> BamRecord::Barcodes(void) const
 {
     const Tag& bc = impl_.TagValue(internal::tagName_barcodes);
     if (bc.IsNull())
-        return std::make_pair(-1, -1);
+        throw std::runtime_error("barcode tag (bc) was requested but is missing");
 
     if (!bc.IsUInt16Array())
-        throw std::runtime_error("Barcode tag bc is not of type uint16_t array.");
+        throw std::runtime_error("barcode tag (bc) is malformed: should be a uint16_t array of size==2.");
 
     const auto bcArray = bc.ToUInt16Array();
     if (bcArray.size() != 2)
-        throw std::runtime_error("Barcode array is not of size 2");
+        throw std::runtime_error("barcode tag (bc) is malformed: should be a uint16_t array of size==2.");
 
     return std::make_pair(bcArray[0], bcArray[1]);
 }
 
-BamRecord& BamRecord::Barcodes(const std::pair<int, int>& barcodeIds)
+BamRecord& BamRecord::Barcodes(const std::pair<uint16_t,uint16_t>& barcodeIds)
 {
-    const vector<uint16_t> data({static_cast<uint16_t>(barcodeIds.first), static_cast<uint16_t>(barcodeIds.second)});
+    const auto data = std::vector<uint16_t>{ barcodeIds.first, barcodeIds.second };
     internal::CreateOrEdit(internal::tagName_barcodes, data, &impl_);
     return *this;
 }
@@ -554,7 +560,6 @@ void BamRecord::CalculateAlignedPositions(void) const
 
     // get the query start/end
     const size_t seqLength = impl_.SequenceLength();
-//    const size_t seqLength = impl_.Sequence().size();
     const RecordType type  = Type();
     const Position qStart  = (type == RecordType::CCS) ? Position(0) : QueryStart();
     const Position qEnd    = (type == RecordType::CCS) ? Position(seqLength) : QueryEnd();
@@ -566,10 +571,6 @@ void BamRecord::CalculateAlignedPositions(void) const
     const std::pair<int32_t, int32_t> alignedOffsets = internal::AlignedOffsets(*this, seqLength);
     const int32_t startOffset = alignedOffsets.first;
     const int32_t endOffset = alignedOffsets.second;
-
-//    const Cigar& cigar     = impl_.CigarData();
-//    const int32_t startOffset = internal::AlignedStartOffset(cigar, seqLength);
-//    const int32_t endOffset   = internal::AlignedEndOffset(cigar, seqLength);
     if (endOffset == -1 || startOffset == -1)
         return; // TODO: handle error more??
 
@@ -584,19 +585,15 @@ void BamRecord::CalculateAlignedPositions(void) const
     }
 }
 
-static
-bool is_clipping_op(const CigarOperation& op)
-{
-    const CigarOperationType opType = op.Type();
-    return opType == CigarOperationType::SOFT_CLIP ||
-           opType == CigarOperationType::HARD_CLIP;
-}
-
 Cigar BamRecord::CigarData(bool exciseAllClips) const
 {
-    Cigar cigar = std::move(impl_.CigarData());
-    if (exciseAllClips)
-        cigar.erase(std::remove_if(cigar.begin(), cigar.end(), is_clipping_op), cigar.end());
+    auto cigar = impl_.CigarData();
+    if (exciseAllClips) {
+        cigar.erase(std::remove_if(cigar.begin(),
+                                   cigar.end(),
+                                   internal::IsClippingOp),
+                    cigar.end());
+    }
     return cigar;
 }
 
@@ -1653,13 +1650,13 @@ BamRecord& BamRecord::QueryStart(const Position pos)
 Accuracy BamRecord::ReadAccuracy(void) const
 {
     const Tag& readAccuracy = impl_.TagValue(internal::tagName_readAccuracy);
-    return Accuracy(readAccuracy.ToInt32());
+    return Accuracy(readAccuracy.ToFloat());
 }
 
 BamRecord& BamRecord::ReadAccuracy(const Accuracy& accuracy)
 {
     internal::CreateOrEdit(internal::tagName_readAccuracy,
-                           static_cast<int32_t>(accuracy),
+                           static_cast<float>(accuracy),
                            &impl_);
     return *this;
 }

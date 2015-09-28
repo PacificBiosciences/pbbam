@@ -191,7 +191,7 @@ PbiBuilderPrivate::~PbiBuilderPrivate(void)
     }
 
     // determine flags
-    PbiFile::Sections sections = PbiFile::SUBREAD;
+    PbiFile::Sections sections = PbiFile::BASIC;
     if (hasMappedData_)    sections |= PbiFile::MAPPED;
     if (hasBarcodeData_)   sections |= PbiFile::BARCODE;
     if (hasReferenceData_) sections |= PbiFile::REFERENCE;
@@ -202,7 +202,7 @@ PbiBuilderPrivate::~PbiBuilderPrivate(void)
     PbiIndexIO::WriteHeader(rawData_, fp);
     const uint32_t numReads = rawData_.NumReads();
     if (numReads > 0) {
-        PbiIndexIO::WriteSubreadData(rawData_.SubreadData(), numReads, fp);
+        PbiIndexIO::WriteBasicData(rawData_.BasicData(), numReads, fp);
         if (rawData_.HasMappedData())
             PbiIndexIO::WriteMappedData(rawData_.MappedData(), numReads, fp);
         if (rawData_.HasReferenceData())
@@ -216,7 +216,7 @@ void PbiBuilderPrivate::AddRecord(const BamRecord& record, const int64_t vOffset
 {
     record.ResetCachedPositions();
 
-    rawData_.SubreadData().AddRecord(record, vOffset);
+    rawData_.BasicData().AddRecord(record, vOffset);
 
     if (hasMappedData_)
         hasMappedData_ &= rawData_.MappedData().AddRecord(record);

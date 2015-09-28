@@ -65,8 +65,8 @@ void VirtualPolymeraseBamRecord::StitchSources()
     const auto& lastRecord = sources_[sources_.size() - 1];
 
     // Temporary variables used for stitching
-    int accuracy = 0;
-    int accuracyCounter = 0;
+    float accuracy = 0.0;
+    float accuracyCounter = 0.0;
 
     std::string   sequence;
     std::string   deletionTag;
@@ -185,7 +185,7 @@ void VirtualPolymeraseBamRecord::StitchSources()
     this->ReadGroup(this->header_.ReadGroups()[0]);
 
     // Avoid division by 0
-    if (accuracyCounter > 0)
+    if (accuracyCounter > 0.0)
         this->ReadAccuracy(accuracy / accuracyCounter);
 
     this->NumPasses(1);

@@ -68,7 +68,7 @@ public:
     std::vector<uint16_t> bcLeft_;
     std::vector<uint16_t> bcRight_;
     std::vector<uint8_t>  bcQual_;
-    std::vector<uint8_t>  ctxtFlag_;
+
 };
 
 class PBBAM_EXPORT PbiRawMappedData
@@ -144,15 +144,15 @@ public:
     std::vector<PbiReferenceEntry> entries_;
 };
 
-class PBBAM_EXPORT PbiRawSubreadData
+class PBBAM_EXPORT PbiRawBasicData
 {
 public:
-    PbiRawSubreadData(void);
-    PbiRawSubreadData(uint32_t numReads);
-    PbiRawSubreadData(const PbiRawSubreadData& other);
-    PbiRawSubreadData(PbiRawSubreadData&& other);
-    PbiRawSubreadData& operator=(const PbiRawSubreadData& other);
-    PbiRawSubreadData& operator=(PbiRawSubreadData&& other);
+    PbiRawBasicData(void);
+    PbiRawBasicData(uint32_t numReads);
+    PbiRawBasicData(const PbiRawBasicData& other);
+    PbiRawBasicData(PbiRawBasicData&& other);
+    PbiRawBasicData& operator=(const PbiRawBasicData& other);
+    PbiRawBasicData& operator=(PbiRawBasicData&& other);
 
 public:
     void AddRecord(const BamRecord& b, int64_t offset);
@@ -162,9 +162,12 @@ public:
     std::vector<int32_t>  qStart_;
     std::vector<int32_t>  qEnd_;
     std::vector<int32_t>  holeNumber_;
-    std::vector<uint16_t> readQual_;
+    std::vector<float>    readQual_;
+    std::vector<uint8_t>  ctxtFlag_;
     std::vector<int64_t>  fileOffset_;
 };
+
+typedef PbiRawBasicData PbiRawSubreadData; // for existing code, possible in use externally
 
 class PBBAM_EXPORT PbiRawData
 {
@@ -213,7 +216,7 @@ public:
     const PbiRawBarcodeData&   BarcodeData(void) const;
     const PbiRawMappedData&    MappedData(void) const;
     const PbiRawReferenceData& ReferenceData(void) const;
-    const PbiRawSubreadData&   SubreadData(void) const;
+    const PbiRawBasicData&   BasicData(void) const;
 
     /// \}
 
@@ -231,9 +234,9 @@ public:
     /// \name Indexed Sections
 
     PbiRawBarcodeData&   BarcodeData(void);
+    PbiRawBasicData&     BasicData(void);
     PbiRawMappedData&    MappedData(void);
     PbiRawReferenceData& ReferenceData(void);
-    PbiRawSubreadData&   SubreadData(void);
 
     /// \}
 
@@ -244,7 +247,7 @@ private:
     PbiRawBarcodeData    barcodeData_;
     PbiRawMappedData     mappedData_;
     PbiRawReferenceData  referenceData_;
-    PbiRawSubreadData    subreadData_;
+    PbiRawBasicData      basicData_;
 };
 
 inline const PbiRawBarcodeData& PbiRawData::BarcodeData(void) const
@@ -289,11 +292,11 @@ inline const PbiRawReferenceData& PbiRawData::ReferenceData(void) const
 inline PbiRawReferenceData& PbiRawData::ReferenceData(void)
 { return referenceData_; }
 
-inline const PbiRawSubreadData& PbiRawData::SubreadData(void) const
-{ return subreadData_; }
+inline const PbiRawBasicData& PbiRawData::BasicData(void) const
+{ return basicData_; }
 
-inline PbiRawSubreadData& PbiRawData::SubreadData(void)
-{ return subreadData_; }
+inline PbiRawBasicData& PbiRawData::BasicData(void)
+{ return basicData_; }
 
 inline PbiFile::VersionEnum PbiRawData::Version(void) const
 { return version_; }

@@ -73,6 +73,20 @@ enum class FrameCodec
   , V1
 };
 
+enum class BarcodeModeType
+{
+   NONE
+ , SYMMETRIC
+ , ASYMMETRIC
+};
+
+enum class BarcodeQualityType
+{
+    NONE
+  , SCORE
+  , PROBABILITY
+};
+
 class PBBAM_EXPORT ReadGroupInfo
 {
 public:
@@ -104,26 +118,67 @@ public:
     /// \name Attributes
     /// \{
 
-    const std::string& BasecallerVersion(void) const;
+    /// \returns the number of barcode sequences in BarcodeFile
+    ///
+    /// \throws std::runtime_error if barcode data not set. Check HasBarcodeData if this data may be absent.
+    ///
+    size_t BarcodeCount(void) const;
 
-    bool HasBaseFeature(const BaseFeature& feature) const;
+    /// \returns name of FASTA file containing barcode sequences
+    ///
+    /// \throws std::runtime_error if barcode data not set. Check HasBarcodeData if this data may be absent.
+    ///
+    std::string  BarcodeFile(void) const;
 
+    /// \returns MD5 hash of the contents of BarcodeFile
+    ///
+    /// \throws std::runtime_error if barcode data not set. Check HasBarcodeData if this data may be absent.
+    ///
+    std::string BarcodeHash(void) const;
+
+    /// \returns experimental design type of barcodes
+    ///
+    /// \throws std::runtime_error if barcode data not set. Check HasBarcodeData if this data may be absent.
+    ///
+    BarcodeModeType BarcodeMode(void) const;
+
+    /// \returns type of value encoded in the 'bq' tag
+    ///
+    /// \throws std::runtime_error if barcode data is not set. Check HasBarcodeData if this data may be absent.
+    ///
+    BarcodeQualityType BarcodeQuality(void) const;
+
+    /// \returns basecaller version number (e.g. "2.1")
+    std::string BasecallerVersion(void) const;
+
+    /// \returns tag name in use for the specified for base feature
     std::string BaseFeatureTag(const BaseFeature& feature) const;
 
+    /// \returns binding kit part number (e.g. "100236500")
     std::string BindingKit(void) const;
 
+    /// \returns true if reads are classified as spike-in controls
     bool Control(void) const;
 
+    /// \returns additional tags not specified by either SAM/BAM or PacBio specs.
     std::map<std::string, std::string> CustomTags(void) const;
 
     std::string Date(void) const;
 
     std::string FlowOrder(void) const;
 
+    /// \returns frame rate in Hz
     std::string FrameRateHz(void) const;
+
+    /// \returns true if read group has barcode data
+    bool HasBarcodeData(void) const;
+
+    /// \returns true if read group has an entry for the specified base feature
+    bool HasBaseFeature(const BaseFeature& feature) const;
 
     std::string Id(void) const;
 
+    /// \returns codec type in use for IPD
     FrameCodec IpdCodec(void) const;
 
     std::string KeySequence(void) const;
@@ -138,6 +193,7 @@ public:
 
     std::string Programs(void) const;
 
+    /// \returns codec type in use for PulseWidth
     FrameCodec PulseWidthCodec(void) const;
 
     std::string ReadType(void) const;
@@ -146,6 +202,7 @@ public:
 
     std::string SequencingCenter(void) const;
 
+    /// \returns sequencing kit part number
     std::string SequencingKit(void) const;
 
     /// \}
@@ -155,6 +212,7 @@ public:
 
     bool IsValid(void) const;
 
+    /// \returns SAM-formatted text representation of ReadGroupInfo
     std::string ToSam(void) const;
 
     /// \}
@@ -170,12 +228,38 @@ public:
     /// \name Attributes
     /// \{
 
+    /// Sets read group's barcode data.
+    ///
+    /// Barcode fields are either absent or all must be present.
+    ///
+    /// \param[in] barcodeFile    \sa BarcodeFile
+    /// \param[in] barcodeHash    \sa BarcodeHash
+    /// \param[in] barcodeCount   \sa BarcodeCount
+    /// \param[in] barcodeMode    \sa BarcodeMode
+    /// \param[in] barcodeQuality \sa BarcodeQuality
+    ///
+    /// \sa ClearBarcodeData
+    ///
+    /// \returns reference to this read group
+    ///
+    ReadGroupInfo& BarcodeData(const std::string& barcodeFile,
+                               const std::string& barcodeHash,
+                               size_t barcodeCount,
+                               BarcodeModeType barcodeMode,
+                               BarcodeQualityType barcodeQuality);
+
     ReadGroupInfo& BasecallerVersion(const std::string& versionNumber);
 
     ReadGroupInfo& BaseFeatureTag(const BaseFeature& feature,
                                   const std::string& tag);
 
     ReadGroupInfo& BindingKit(const std::string& kitNumber);
+
+    /// Removes all barcode data from this read group.
+    ///
+    /// \returns reference to this read group
+    ///
+    ReadGroupInfo& ClearBarcodeData(void);
 
     ReadGroupInfo& Control(const bool ctrl);
 
@@ -236,6 +320,12 @@ private:
     bool        control_ = false;
     FrameCodec  ipdCodec_;
     FrameCodec  pulseWidthCodec_;
+    bool        hasBarcodeData_ = false;
+    std::string barcodeFile_;
+    std::string barcodeHash_;
+    size_t      barcodeCount_ = 0;
+    BarcodeModeType barcodeMode_ = BarcodeModeType::NONE;
+    BarcodeQualityType barcodeQuality_ = BarcodeQualityType::NONE;
     std::map<BaseFeature, std::string> features_;
 
     // custom attributes
@@ -250,143 +340,9 @@ PBBAM_EXPORT
 std::string MakeReadGroupId(const std::string& movieName,
                             const std::string& readType);
 
-inline const std::string& ReadGroupInfo::BasecallerVersion(void) const
-{ return basecallerVersion_; }
-
-inline ReadGroupInfo& ReadGroupInfo::BasecallerVersion(const std::string& versionNumber)
-{ basecallerVersion_ = versionNumber; return *this; }
-
-inline std::string ReadGroupInfo::BaseFeatureTag(const BaseFeature& feature) const
-{
-    const auto iter = features_.find(feature);
-    if (iter == features_.end())
-        return std::string();
-    return iter->second;
-}
-
-inline ReadGroupInfo& ReadGroupInfo::BaseFeatureTag(const BaseFeature& feature,
-                                                    const std::string& tag)
-{ features_[feature] = tag; return *this; }
-
-inline std::string ReadGroupInfo::BindingKit(void) const
-{ return bindingKit_; }
-
-inline ReadGroupInfo& ReadGroupInfo::BindingKit(const std::string& kitNumber)
-{ bindingKit_ = kitNumber; return *this; }
-
-inline bool ReadGroupInfo::Control(void) const
-{ return control_; }
-
-inline ReadGroupInfo& ReadGroupInfo::Control(const bool ctrl)
-{ control_ = ctrl; return *this; }
-
-inline std::map<std::string, std::string> ReadGroupInfo::CustomTags(void) const
-{ return custom_; }
-
-inline ReadGroupInfo& ReadGroupInfo::CustomTags(const std::map<std::string, std::string>& custom)
-{ custom_ = custom; return *this; }
-
-inline std::string ReadGroupInfo::Date(void) const
-{ return date_; }
-
-inline ReadGroupInfo& ReadGroupInfo::Date(const std::string& date)
-{ date_ = date; return *this; }
-
-inline std::string ReadGroupInfo::FlowOrder(void) const
-{ return flowOrder_; }
-
-inline ReadGroupInfo& ReadGroupInfo::FlowOrder(const std::string& order)
-{ flowOrder_ = order; return *this; }
-
-inline std::string ReadGroupInfo::FrameRateHz(void) const
-{ return frameRateHz_; }
-
-inline ReadGroupInfo& ReadGroupInfo::FrameRateHz(const std::string& frameRateHz)
-{ frameRateHz_ = frameRateHz; return *this; }
-
-inline bool ReadGroupInfo::HasBaseFeature(const BaseFeature& feature) const
-{ return features_.find(feature) != features_.end(); }
-
-inline std::string ReadGroupInfo::Id(void) const
-{ return id_; }
-
-inline ReadGroupInfo& ReadGroupInfo::Id(const std::string& id)
-{ id_ = id; return *this; }
-
-inline ReadGroupInfo& ReadGroupInfo::Id(const std::string& movieName,
-                                        const std::string& readType)
-{ id_ = MakeReadGroupId(movieName, readType); return *this; }
-
-inline FrameCodec ReadGroupInfo::IpdCodec(void) const
-{ return ipdCodec_; }
-
-inline bool ReadGroupInfo::IsValid(void) const
-{ return !id_.empty(); }
-
-inline std::string ReadGroupInfo::KeySequence(void) const
-{ return keySequence_; }
-
-inline ReadGroupInfo& ReadGroupInfo::KeySequence(const std::string& sequence)
-{ keySequence_ = sequence; return *this; }
-
-inline std::string ReadGroupInfo::Library(void) const
-{ return library_; }
-
-inline ReadGroupInfo& ReadGroupInfo::Library(const std::string& library)
-{ library_ = library; return *this; }
-
-inline std::string ReadGroupInfo::MovieName(void) const
-{ return movieName_; }
-
-inline ReadGroupInfo& ReadGroupInfo::MovieName(const std::string& movieName)
-{ movieName_ = movieName; return *this; }
-
-inline std::string ReadGroupInfo::Platform(void) const
-{ return std::string("PACBIO"); }
-
-inline std::string ReadGroupInfo::PredictedInsertSize(void) const
-{ return predictedInsertSize_; }
-
-inline ReadGroupInfo& ReadGroupInfo::PredictedInsertSize(const std::string& size)
-{ predictedInsertSize_ = size; return *this; }
-
-inline std::string ReadGroupInfo::Programs(void) const
-{ return programs_; }
-
-inline ReadGroupInfo& ReadGroupInfo::Programs(const std::string& programs)
-{ programs_ = programs; return *this; }
-
-inline FrameCodec ReadGroupInfo::PulseWidthCodec(void) const
-{ return pulseWidthCodec_; }
-
-inline std::string ReadGroupInfo::ReadType(void) const
-{ return readType_; }
-
-inline ReadGroupInfo& ReadGroupInfo::ReadType(const std::string& type)
-{ readType_ = type; return *this; }
-
-inline std::string ReadGroupInfo::Sample(void) const
-{ return sample_; }
-
-inline ReadGroupInfo& ReadGroupInfo::Sample(const std::string& sample)
-{ sample_ = sample; return *this; }
-
-inline std::string ReadGroupInfo::SequencingCenter(void) const
-{ return sequencingCenter_; }
-
-inline ReadGroupInfo& ReadGroupInfo::SequencingCenter(const std::string& center)
-{ sequencingCenter_ = center; return *this; }
-
-inline std::string ReadGroupInfo::SequencingKit(void) const
-{ return sequencingKit_; }
-
-inline ReadGroupInfo& ReadGroupInfo::SequencingKit(const std::string& kitNumber)
-{ sequencingKit_ = kitNumber; return *this; }
-
-inline std::string ReadGroupInfo::ToSam(const ReadGroupInfo& rg)
-{ return rg.ToSam(); }
-
 } // namespace BAM
 } // namespace PacBio
+
+#include "pbbam/internal/ReadGroupInfo.inl"
 
 #endif // READGROUPINFO_H

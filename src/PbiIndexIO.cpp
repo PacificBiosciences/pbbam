@@ -73,7 +73,7 @@ void PbiIndexIO::Load(PbiRawData& rawData,
     LoadHeader(rawData, fp);
     const uint32_t numReads = rawData.NumReads();
     if (numReads > 0) {
-        LoadSubreadData(rawData.SubreadData(), numReads, fp);
+        LoadBasicData(rawData.BasicData(), numReads, fp);
         LoadMappedData(rawData.MappedData(), numReads, fp);
         LoadReferenceData(rawData.ReferenceData(), fp);
         LoadBarcodeData(rawData.BarcodeData(), numReads, fp);
@@ -89,12 +89,11 @@ void PbiIndexIO::LoadBarcodeData(PbiRawBarcodeData& barcodeData,
     LoadBgzfVector(fp, barcodeData.bcLeft_,   numReads);
     LoadBgzfVector(fp, barcodeData.bcRight_,  numReads);
     LoadBgzfVector(fp, barcodeData.bcQual_,   numReads);
-    LoadBgzfVector(fp, barcodeData.ctxtFlag_, numReads);
+
 
     assert(barcodeData.bcLeft_.size()   == numReads);
     assert(barcodeData.bcRight_.size()  == numReads);
     assert(barcodeData.bcQual_.size()   == numReads);
-    assert(barcodeData.ctxtFlag_.size() == numReads);
 }
 
 void PbiIndexIO::LoadHeader(PbiRawData& index,
@@ -187,25 +186,27 @@ void PbiIndexIO::LoadReferenceData(PbiRawReferenceData& referenceData,
     }
 }
 
-void PbiIndexIO::LoadSubreadData(PbiRawSubreadData& subreadData,
+void PbiIndexIO::LoadBasicData(PbiRawBasicData& basicData,
                                  const uint32_t numReads,
                                  BGZF* fp)
 {
     assert(numReads > 0);
 
-    LoadBgzfVector(fp, subreadData.rgId_,       numReads);
-    LoadBgzfVector(fp, subreadData.qStart_,     numReads);
-    LoadBgzfVector(fp, subreadData.qEnd_,       numReads);
-    LoadBgzfVector(fp, subreadData.holeNumber_, numReads);
-    LoadBgzfVector(fp, subreadData.readQual_,   numReads);
-    LoadBgzfVector(fp, subreadData.fileOffset_, numReads);
+    LoadBgzfVector(fp, basicData.rgId_,       numReads);
+    LoadBgzfVector(fp, basicData.qStart_,     numReads);
+    LoadBgzfVector(fp, basicData.qEnd_,       numReads);
+    LoadBgzfVector(fp, basicData.holeNumber_, numReads);
+    LoadBgzfVector(fp, basicData.readQual_,   numReads);
+    LoadBgzfVector(fp, basicData.ctxtFlag_,   numReads);
+    LoadBgzfVector(fp, basicData.fileOffset_, numReads);
 
-    assert(subreadData.rgId_.size()       == numReads);
-    assert(subreadData.qStart_.size()     == numReads);
-    assert(subreadData.qEnd_.size()       == numReads);
-    assert(subreadData.holeNumber_.size() == numReads);
-    assert(subreadData.readQual_.size()   == numReads);
-    assert(subreadData.fileOffset_.size() == numReads);
+    assert(basicData.rgId_.size()       == numReads);
+    assert(basicData.qStart_.size()     == numReads);
+    assert(basicData.qEnd_.size()       == numReads);
+    assert(basicData.holeNumber_.size() == numReads);
+    assert(basicData.readQual_.size()   == numReads);
+    assert(basicData.ctxtFlag_.size()   == numReads);
+    assert(basicData.fileOffset_.size() == numReads);
 }
 
 void PbiIndexIO::Save(const PbiRawData& index,
@@ -219,7 +220,7 @@ void PbiIndexIO::Save(const PbiRawData& index,
     WriteHeader(index, fp);
     const uint32_t numReads = index.NumReads();
     if (numReads > 0) {
-        WriteSubreadData(index.SubreadData(), numReads, fp);
+        WriteBasicData(index.BasicData(), numReads, fp);
 
         if (index.HasMappedData())
             WriteMappedData(index.MappedData(), numReads, fp);
@@ -238,12 +239,10 @@ void PbiIndexIO::WriteBarcodeData(const PbiRawBarcodeData& barcodeData,
     assert(barcodeData.bcLeft_.size()   == numReads);
     assert(barcodeData.bcRight_.size()  == numReads);
     assert(barcodeData.bcQual_.size()   == numReads);
-    assert(barcodeData.ctxtFlag_.size() == numReads);
 
     WriteBgzfVector(fp, barcodeData.bcLeft_);
     WriteBgzfVector(fp, barcodeData.bcRight_);
     WriteBgzfVector(fp, barcodeData.bcQual_);
-    WriteBgzfVector(fp, barcodeData.ctxtFlag_);
 }
 
 void PbiIndexIO::WriteHeader(const PbiRawData& index,
@@ -325,21 +324,23 @@ void PbiIndexIO::WriteReferenceData(const PbiRawReferenceData& referenceData,
     }
 }
 
-void PbiIndexIO::WriteSubreadData(const PbiRawSubreadData& subreadData,
-                                  const uint32_t numReads,
-                                  BGZF* fp)
+void PbiIndexIO::WriteBasicData(const PbiRawBasicData& basicData,
+                                const uint32_t numReads,
+                                BGZF* fp)
 {
-    assert(subreadData.rgId_.size()       == numReads);
-    assert(subreadData.qStart_.size()     == numReads);
-    assert(subreadData.qEnd_.size()       == numReads);
-    assert(subreadData.holeNumber_.size() == numReads);
-    assert(subreadData.readQual_.size()   == numReads);
-    assert(subreadData.fileOffset_.size() == numReads);
+    assert(basicData.rgId_.size()       == numReads);
+    assert(basicData.qStart_.size()     == numReads);
+    assert(basicData.qEnd_.size()       == numReads);
+    assert(basicData.holeNumber_.size() == numReads);
+    assert(basicData.readQual_.size()   == numReads);
+    assert(basicData.ctxtFlag_.size()   == numReads);
+    assert(basicData.fileOffset_.size() == numReads);
 
-    WriteBgzfVector(fp, subreadData.rgId_);
-    WriteBgzfVector(fp, subreadData.qStart_);
-    WriteBgzfVector(fp, subreadData.qEnd_);
-    WriteBgzfVector(fp, subreadData.holeNumber_);
-    WriteBgzfVector(fp, subreadData.readQual_);
-    WriteBgzfVector(fp, subreadData.fileOffset_);
+    WriteBgzfVector(fp, basicData.rgId_);
+    WriteBgzfVector(fp, basicData.qStart_);
+    WriteBgzfVector(fp, basicData.qEnd_);
+    WriteBgzfVector(fp, basicData.holeNumber_);
+    WriteBgzfVector(fp, basicData.readQual_);
+    WriteBgzfVector(fp, basicData.ctxtFlag_);
+    WriteBgzfVector(fp, basicData.fileOffset_);
 }

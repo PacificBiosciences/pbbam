@@ -56,12 +56,12 @@ namespace PbiFile
     ///
     enum Section
     {
-         SUBREAD   = 0x0000  ///< SubreadData   (required)
+         BASIC     = 0x0000  ///< BasicData     (required)
        , MAPPED    = 0x0001  ///< MappedData    (always optional)
        , REFERENCE = 0x0002  ///< ReferenceData (always optional)
        , BARCODE   = 0x0004  ///< BarcodeData   (always optional)
 
-       , ALL  = SUBREAD | MAPPED | REFERENCE | BARCODE  ///< synonym for building
+       , ALL  = BASIC | MAPPED | REFERENCE | BARCODE
     };
     typedef uint16_t Sections;
 
@@ -69,8 +69,9 @@ namespace PbiFile
     enum VersionEnum
     {
         Version_3_0_0 = 0x030000
+      , Version_3_0_1 = 0x030001
 
-      , CurrentVersion = Version_3_0_0
+      , CurrentVersion = Version_3_0_1
     };
 
     /// Builds PBI index data from the supplied ".bam" file and writes a ".pbi" file.

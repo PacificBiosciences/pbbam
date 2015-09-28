@@ -59,6 +59,7 @@ enum class SubreadField
   , Q_END
   , ZMW
   , READ_QUALITY
+  , CONTEXT_FLAG
   , VIRTUAL_OFFSET
 };
 
@@ -82,7 +83,6 @@ enum class BarcodeField
     BC_LEFT
   , BC_RIGHT
   , BC_QUALITY
-  , CONTEXT_FLAG
 };
 
 enum class CompareType
@@ -220,12 +220,14 @@ typedef SubreadIndexRequest<SubreadField::Q_START,      int32_t>  QueryStartInde
 typedef SubreadIndexRequest<SubreadField::Q_END,        int32_t>  QueryEndIndexRequest;
 typedef SubreadIndexRequest<SubreadField::ZMW,          int32_t>  ZmwIndexRequest;
 typedef SubreadIndexRequest<SubreadField::READ_QUALITY, uint16_t> ReadQualityIndexRequest;
+typedef SubreadIndexRequest<SubreadField::CONTEXT_FLAG, LocalContextFlags> ContextFlagIndexRequest;
 
 typedef SubreadIndexMultiRequest<SubreadField::RG_ID,        int32_t>  ReadGroupIndexMultiRequest;
 typedef SubreadIndexMultiRequest<SubreadField::Q_START,      int32_t>  QueryStartIndexMultiRequest;
 typedef SubreadIndexMultiRequest<SubreadField::Q_END,        int32_t>  QueryEndIndexMultiRequest;
 typedef SubreadIndexMultiRequest<SubreadField::ZMW,          int32_t>  ZmwIndexMultiRequest;
 typedef SubreadIndexMultiRequest<SubreadField::READ_QUALITY, uint16_t> ReadQualityIndexMultiRequest;
+typedef SubreadIndexMultiRequest<SubreadField::CONTEXT_FLAG, LocalContextFlags> ContextFlagIndexMultiRequest;
 
 template<MappedField field, typename ValueType>
 class MappedIndexRequest : public IndexRequestBase<MappedField, ValueType>
@@ -284,12 +286,12 @@ public:
 typedef BarcodeIndexRequest<BarcodeField::BC_LEFT,      uint16_t> BarcodeLeftIndexRequest;
 typedef BarcodeIndexRequest<BarcodeField::BC_RIGHT,     uint16_t> BarcodeRightIndexRequest;
 typedef BarcodeIndexRequest<BarcodeField::BC_QUALITY,   uint8_t>  BarcodeQualityIndexRequest;
-typedef BarcodeIndexRequest<BarcodeField::CONTEXT_FLAG, LocalContextFlags> ContextFlagIndexRequest;
+
 
 typedef BarcodeIndexMultiRequest<BarcodeField::BC_LEFT,      uint16_t> BarcodeLeftIndexMultiRequest;
 typedef BarcodeIndexMultiRequest<BarcodeField::BC_RIGHT,     uint16_t> BarcodeRightIndexMultiRequest;
 typedef BarcodeIndexMultiRequest<BarcodeField::BC_QUALITY,   uint8_t>  BarcodeQualityIndexMultiRequest;
-typedef BarcodeIndexMultiRequest<BarcodeField::CONTEXT_FLAG, LocalContextFlags> ContextFlagIndexMultiRequest;
+
 
 } // namespace BAM
 } // namespace PacBio

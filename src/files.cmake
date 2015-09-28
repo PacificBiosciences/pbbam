@@ -64,6 +64,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/internal/MergeStrategy.h
     ${PacBioBAM_IncludeDir}/pbbam/internal/PbiIndex_p.h
     ${PacBioBAM_IncludeDir}/pbbam/internal/PbiIndex_p.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/ReadGroupInfo.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/QueryBase.h
     ${PacBioBAM_IncludeDir}/pbbam/internal/SequentialMergeStrategy.h
     ${PacBioBAM_IncludeDir}/pbbam/internal/Tag.inl

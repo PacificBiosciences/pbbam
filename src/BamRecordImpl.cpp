@@ -459,22 +459,6 @@ Tag BamRecordImpl::TagValue(const string& tagName) const
 
 void BamRecordImpl::UpdateTagMap(void) const
 {
-
-//   MaybeUpdateTagOffsets() {
-//      if tagOffsetsReset
-//         UpdateTagMap()
-//   }
-
-//   GetTagFoo() {
-//      MaybeUpdateTagOffsets()
-//      return result;
-//   }
-
-//   SetTagFoo() {
-//     set value;
-//     ResetTagOffsets();
-//   }
-
     // clear out offsets, leave map structure basically intact
     auto tagIter = tagOffsets_.begin();
     auto tagEnd  = tagOffsets_.end();

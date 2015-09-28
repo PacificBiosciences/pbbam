@@ -273,8 +273,8 @@ inline uint16_t Tag::ToUInt16(void) const
 
 inline int32_t Tag::ToInt32(void) const
 {
-//    if (IsInt32())
-//        return boost::get<int32_t>(data_);
+    if (IsInt32())
+        return boost::get<int32_t>(data_);
     return boost::apply_visitor(internal::ToInt32ConvertVisitor(), data_);
 }
 

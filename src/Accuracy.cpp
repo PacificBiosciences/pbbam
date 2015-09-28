@@ -39,5 +39,5 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-const int Accuracy::MIN = 0;
-const int Accuracy::MAX = 1000;
+const float Accuracy::MIN = 0.0f;
+const float Accuracy::MAX = 1.0f;
