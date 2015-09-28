@@ -66,17 +66,18 @@ static
 PbiRawData Test2Bam_RawIndex(void)
 {
     PbiRawData index;
-    index.Version(PbiFile::Version_3_0_0);
-    index.FileSections(PbiFile::SUBREAD | PbiFile::MAPPED);
+    index.Version(PbiFile::Version_3_0_1);
+    index.FileSections(PbiFile::BASIC | PbiFile::MAPPED);
     index.NumReads(4);
 
-    PbiRawSubreadData& subreadData = index.SubreadData();
+    PbiRawBasicData& subreadData = index.BasicData();
     subreadData.rgId_       = { -1197849594, -1197849594, -1197849594, -1197849594 };
     subreadData.qStart_     = { 2114, 2579, 4101, 5615 };
     subreadData.qEnd_       = { 2531, 4055, 5571, 6237 };
     subreadData.holeNumber_ = { 14743, 14743, 14743, 14743 };
-    subreadData.readQual_   = { 901, 901, 901, 901 };
-    subreadData.fileOffset_ =  { 35651584, 35655123, 35667124, 35679164 };
+    subreadData.readQual_   = { 0.901, 0.901, 0.901, 0.901 };
+    subreadData.ctxtFlag_   = { 0, 0, 0, 0 };
+    subreadData.fileOffset_ =  { 35651584, 35655125, 35667128, 35679170 };
 
     PbiRawMappedData& mappedData = index.mappedData_;
     mappedData.tId_       = { 0, 0, 0, 0 };
@@ -102,13 +103,14 @@ void ExpectRawIndicesEqual(const PbiRawData& expected, const PbiRawData& actual)
     EXPECT_EQ(expected.NumReads(),     actual.NumReads());
 
     // subread data
-    const PbiRawSubreadData& e = expected.SubreadData();
-    const PbiRawSubreadData& a = actual.SubreadData();
+    const PbiRawBasicData& e = expected.BasicData();
+    const PbiRawBasicData& a = actual.BasicData();
     EXPECT_EQ(e.rgId_,       a.rgId_);
     EXPECT_EQ(e.qStart_,     a.qStart_);
     EXPECT_EQ(e.qEnd_,       a.qEnd_);
     EXPECT_EQ(e.holeNumber_, a.holeNumber_);
     EXPECT_EQ(e.readQual_,   a.readQual_);
+    EXPECT_EQ(e.ctxtFlag_,   a.ctxtFlag_);
     EXPECT_EQ(e.fileOffset_, a.fileOffset_);
 
     // mapped data
@@ -143,19 +145,19 @@ void ExpectRawIndicesEqual(const PbiRawData& expected, const PbiRawData& actual)
         EXPECT_EQ(e.bcLeft_,   a.bcLeft_);
         EXPECT_EQ(e.bcRight_,  a.bcRight_);
         EXPECT_EQ(e.bcQual_,   a.bcQual_);
-        EXPECT_EQ(e.ctxtFlag_, a.ctxtFlag_);
     }
 }
 
 static
-bool SubreadLookupsEqual(const internal::SubreadLookupData& lhs,
-                         const internal::SubreadLookupData& rhs)
+bool BasicLookupsEqual(const internal::BasicLookupData& lhs,
+                         const internal::BasicLookupData& rhs)
 {
     return (lhs.rgId_ == rhs.rgId_ &&
             lhs.qStart_ == rhs.qStart_ &&
             lhs.qEnd_ == rhs.qEnd_ &&
             lhs.holeNumber_ == rhs.holeNumber_ &&
             lhs.readQual_ == rhs.readQual_ &&
+            lhs.ctxtFlag_ == rhs.ctxtFlag_ &&
             lhs.fileOffset_ == rhs.fileOffset_);
 }
 
@@ -188,8 +190,7 @@ bool BarcodeLookupsEqual(const internal::BarcodeLookupData& lhs,
 {
     return (lhs.bcLeft_ == rhs.bcLeft_ &&
             lhs.bcRight_ == rhs.bcRight_ &&
-            lhs.bcQual_ == rhs.bcQual_ &&
-            lhs.ctxtFlag_ == rhs.ctxtFlag_);
+            lhs.bcQual_ == rhs.bcQual_);
 }
 
 static
@@ -210,7 +211,7 @@ bool PbiIndicesEqual(const PbiIndex& lhs, const PbiIndex& rhs)
     { return false; }
 
     // component compare
-    if ( !SubreadLookupsEqual(lhsImpl->subreadData_,     rhsImpl->subreadData_)   ||
+    if ( !BasicLookupsEqual(lhsImpl->basicData_,         rhsImpl->basicData_)   ||
          !MappedLookupsEqual(lhsImpl->mappedData_,       rhsImpl->mappedData_)    ||
          !ReferenceLookupsEqual(lhsImpl->referenceData_, rhsImpl->referenceData_) ||
          !BarcodeLookupsEqual(lhsImpl->barcodeData_,     rhsImpl->barcodeData_))
@@ -242,7 +243,7 @@ TEST(PacBioIndexTest, CreateFromExistingBam)
     EXPECT_EQ(tempPbiFn, bamFile.PacBioIndexFilename());
 
     PbiRawData index(bamFile.PacBioIndexFilename());
-    EXPECT_EQ(PbiFile::Version_3_0_0,  index.Version());
+    EXPECT_EQ(PbiFile::Version_3_0_1,  index.Version());
     EXPECT_EQ(4, index.NumReads());
     EXPECT_TRUE(index.HasMappedData());
 
@@ -315,7 +316,7 @@ TEST(PacBioIndexTest, LookupLoadFromFileOk)
     {
         PbiIndex index(bamFile.PacBioIndexFilename());
         EXPECT_EQ(4, index.NumReads());
-        EXPECT_EQ(vector<int64_t>({ 35651584, 35655123, 35667124, 35679164 }), index.VirtualFileOffsets());
+        EXPECT_EQ(vector<int64_t>({ 35651584, 35655125, 35667128, 35679170 }), index.VirtualFileOffsets());
     });
 }
 
@@ -560,7 +561,7 @@ TEST(PacBioIndexTest, ApplyOffsetsToBlocks)
     using PacBio::BAM::IndexResultBlocks;
     using PacBio::BAM::internal::mergedIndexBlocks;
     using PacBio::BAM::internal::OrderedLookup;
-    using PacBio::BAM::internal::SubreadLookupData;
+    using PacBio::BAM::internal::BasicLookupData;
 
     OrderedLookup<int>::ContainerType oRawData;
     oRawData[11] = { 0, 3, 4 };
@@ -577,7 +578,7 @@ TEST(PacBioIndexTest, ApplyOffsetsToBlocks)
     EXPECT_EQ(IndexResultBlock(0, 5), mergedBlocks.at(0));
     EXPECT_EQ(IndexResultBlock(6, 4), mergedBlocks.at(1));
 
-    SubreadLookupData subreadIndex;
+    BasicLookupData subreadIndex;
     subreadIndex.fileOffset_ = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 };
     subreadIndex.ApplyOffsets(mergedBlocks);
 
@@ -596,7 +597,7 @@ TEST(PacBioIndexTest, LookupMulti)
     using PacBio::BAM::IndexResultBlocks;
     using PacBio::BAM::SubreadField;
     using PacBio::BAM::internal::mergedIndexBlocks;
-    using PacBio::BAM::internal::SubreadLookupData;
+    using PacBio::BAM::internal::BasicLookupData;
     using PacBio::BAM::internal::UnorderedLookup;
 
     UnorderedLookup<int32_t>::ContainerType uRawData;
@@ -607,7 +608,7 @@ TEST(PacBioIndexTest, LookupMulti)
     uRawData[12] = { 6 };
     uRawData[99] = { 9 };
 
-    SubreadLookupData subreadIndex;
+    BasicLookupData subreadIndex;
     subreadIndex.rgId_ = UnorderedLookup<int32_t>(uRawData);
     subreadIndex.fileOffset_ = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 };
 
@@ -651,7 +652,7 @@ TEST(PacBioIndexTest, LookupAPI)
     EXPECT_EQ(1, tEndLteResult.size());
     EXPECT_EQ(2, tEndLteResult.at(0).firstIndex_);
     EXPECT_EQ(2, tEndLteResult.at(0).numReads_);
-    EXPECT_EQ(35667124, tEndLteResult.at(0).virtualOffset_);
+    EXPECT_EQ(35667128, tEndLteResult.at(0).virtualOffset_);
 
     // tEnd >= x
     const IndexResultBlocks tEndGteResult = index.Lookup(ReferenceEndIndexRequest(9900, CompareType::GREATER_THAN_EQUAL));
@@ -661,7 +662,7 @@ TEST(PacBioIndexTest, LookupAPI)
     EXPECT_EQ(35651584, tEndGteResult.at(0).virtualOffset_);
     EXPECT_EQ(3, tEndGteResult.at(1).firstIndex_);
     EXPECT_EQ(1, tEndGteResult.at(1).numReads_);
-    EXPECT_EQ(35679164, tEndGteResult.at(1).virtualOffset_);
+    EXPECT_EQ(35679170, tEndGteResult.at(1).virtualOffset_);
 
     // strand query
     const IndexResultBlocks forward = index.Lookup(StrandIndexRequest(Strand::FORWARD));
@@ -671,16 +672,16 @@ TEST(PacBioIndexTest, LookupAPI)
     EXPECT_EQ(35651584, forward.at(0).virtualOffset_);
     EXPECT_EQ(2, forward.at(1).firstIndex_);
     EXPECT_EQ(1, forward.at(1).numReads_);
-    EXPECT_EQ(35667124, forward.at(1).virtualOffset_);
+    EXPECT_EQ(35667128, forward.at(1).virtualOffset_);
 
     const IndexResultBlocks reverse = index.Lookup(StrandIndexRequest(Strand::REVERSE));
     EXPECT_EQ(2, reverse.size());
     EXPECT_EQ(1, reverse.at(0).firstIndex_);
     EXPECT_EQ(1, reverse.at(0).numReads_);
-    EXPECT_EQ(35655123, reverse.at(0).virtualOffset_);
+    EXPECT_EQ(35655125, reverse.at(0).virtualOffset_);
     EXPECT_EQ(3, reverse.at(1).firstIndex_);
     EXPECT_EQ(1, reverse.at(1).numReads_);
-    EXPECT_EQ(35679164, reverse.at(1).virtualOffset_);
+    EXPECT_EQ(35679170, reverse.at(1).virtualOffset_);
 
     // query data field that is not in the PBI
     const IndexResultBlocks missing = index.Lookup(BarcodeQualityIndexRequest(77, CompareType::GREATER_THAN));

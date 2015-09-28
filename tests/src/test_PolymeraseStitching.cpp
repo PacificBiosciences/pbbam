@@ -248,6 +248,7 @@ TEST(VirtualPolymeraseReader, ProductionSubreadsToOriginal)
     // Create virtual polymerase read
     VirtualPolymeraseReader vpr(tests::Data_Dir + "/polymerase/production.subreads.bam",
                                 tests::Data_Dir + "/polymerase/production.scraps.bam");
+
     EXPECT_TRUE(vpr.HasNext());
     auto virtualRecord = vpr.Next();
     EXPECT_FALSE(vpr.HasNext());
@@ -261,11 +262,11 @@ TEST(VirtualPolymeraseReader, ProductionSubreadsToOriginal)
 
     EXPECT_TRUE(begin != end);
     auto polyRecord = *begin++;
-    EXPECT_TRUE(begin == end); 
+    EXPECT_TRUE(begin == end);
 
     EXPECT_EQ(polyRecord.FullName(),        virtualRecord.FullName());
     EXPECT_EQ(polyRecord.HoleNumber(),      virtualRecord.HoleNumber());
-    EXPECT_EQ(polyRecord.ReadAccuracy(),    virtualRecord.ReadAccuracy());
+    EXPECT_FLOAT_EQ(polyRecord.ReadAccuracy(),    virtualRecord.ReadAccuracy());
     EXPECT_EQ(polyRecord.NumPasses(),       virtualRecord.NumPasses());
     EXPECT_EQ(polyRecord.Sequence(),        virtualRecord.Sequence());
     EXPECT_EQ(polyRecord.Qualities(),       virtualRecord.Qualities());

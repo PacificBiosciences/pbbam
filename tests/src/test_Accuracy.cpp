@@ -47,17 +47,17 @@ using namespace std;
 
 TEST(AccuracyTest, ClampValues)
 {
-    Accuracy a_zero(0);
-    Accuracy a_neg(-1);
-    Accuracy a_min(0);
-    Accuracy a_normal(300);
-    Accuracy a_max(1000);
-    Accuracy a_tooLarge(2000);
+    Accuracy a_zero(0.0);
+    Accuracy a_neg(-0.5);
+    Accuracy a_min(0.0);
+    Accuracy a_normal(0.9);
+    Accuracy a_max(1.0);
+    Accuracy a_tooLarge(1.1);
 
-    EXPECT_EQ(0,    a_zero);
-    EXPECT_EQ(0,    a_neg);
-    EXPECT_EQ(0,    a_min);
-    EXPECT_EQ(300,  a_normal);
-    EXPECT_EQ(1000, a_max);
-    EXPECT_EQ(1000, a_tooLarge);
+    EXPECT_FLOAT_EQ(0.0, a_zero);
+    EXPECT_FLOAT_EQ(0.0, a_neg);
+    EXPECT_FLOAT_EQ(0.0, a_min);
+    EXPECT_FLOAT_EQ(0.9, a_normal);
+    EXPECT_FLOAT_EQ(1.0, a_max);
+    EXPECT_FLOAT_EQ(1.0, a_tooLarge);
 }

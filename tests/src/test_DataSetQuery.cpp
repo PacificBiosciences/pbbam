@@ -355,8 +355,8 @@ TEST(DataSetQueryTest, ZmwQueryTest)
     const std::vector<int32_t> whitelist = { 13473, 38025 };
 
     // single file
-    EXPECT_NO_THROW(
-    {
+//    EXPECT_NO_THROW(
+//    {
         BamFile bamFile(bamMappingFn);
         bamFile.EnsurePacBioIndexExists();
         DataSet dataset(bamFile);
@@ -369,7 +369,7 @@ TEST(DataSetQueryTest, ZmwQueryTest)
             ++count;
         }
         EXPECT_EQ(5, count);
-    });
+//    });
 
     // multi-file
 }
