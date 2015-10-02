@@ -36,7 +36,7 @@
 // Author: Derek Barnett
 
 #include "pbbam/BamHeader.h"
-#include "SequenceUtils.h"
+#include "StringUtils.h"
 #include <htslib/hts.h>
 #include <sstream>
 #include <set>
@@ -59,8 +59,6 @@ static const string token_VN = string("VN");
 static const string token_SO = string("SO");
 static const string token_pb = string("pb");
 
-static const string current_version = string("3.0.1");
-
 class BamHeaderPrivate
 {
 public:
@@ -77,6 +75,107 @@ public:
     std::vector<SequenceInfo> sequences_;
     std::map<std::string, int32_t> sequenceIdLookup_;
 };
+
+struct PacBioVersion
+{
+public:
+    PacBioVersion(int major, int minor, int revision)
+        : major_(major)
+        , minor_(minor)
+        , revision_(revision)
+    { }
+
+    PacBioVersion(const string& v)
+        : major_(0)
+        , minor_(0)
+        , revision_(0)
+    {
+        if (v.empty()) {
+            auto msg = string{ "PacBio BAM version number is missing (@HD pb:<version> tag). See spec for details." };
+            throw std::runtime_error(msg);
+        }
+
+        if (v.find('b') != string::npos) {
+            auto msg = string{ "invalid version number (" + v + "): beta version BAMs are no longer supported" };
+            throw std::runtime_error(msg);
+        }
+
+        try {
+            const auto fields = Split(v, '.');
+            const auto numFields = fields.size();
+            if (numFields > 0) {
+                major_ = stoi(fields.at(0));
+                if (numFields > 1) {
+                    minor_ = stoi(fields.at(1));
+                    if (numFields > 2 )
+                        revision_ = stoi(fields.at(2));
+                }
+            }
+        } catch (std::exception&) {
+            auto msg = string{ "invalid version number (" + v + "): failed to parse" };
+            throw std::runtime_error(msg);
+        }
+    }
+
+public:
+    bool operator==(const PacBioVersion& other) const
+    {
+        return major_ == other.major_ &&
+               minor_ == other.minor_ &&
+               revision_ == other.revision_;
+    }
+
+    bool operator<(const PacBioVersion& other) const
+    {
+        // 2.* < 3.*
+        if (major_ < other.major_)
+            return true;
+
+        // 3. ==  3.
+        else if (major_ == other.major_) {
+
+            // 3.1.* < 3.2.*
+            if (minor_ < other.minor_)
+                return true;
+
+            // 3.2. == 3.2.
+            else if (minor_ == other.minor_) {
+
+                // 3.2.1 < 3.2.2
+                if (revision_ < other.revision_)
+                    return true;
+            }
+        }
+
+        // otherwise not less-than
+        return false;
+    }
+    bool operator>=(const PacBioVersion& other) const
+    { return !operator<(other); }
+
+public:
+    string ToString(void) const
+    {
+        stringstream s;
+        s << major_ << '.' << minor_ << '.' << revision_;
+        return s.str();
+    }
+
+    string ToMsgString(void) const
+    {
+        stringstream s;
+        s << '(' << ToString() << ')';
+        return s.str();
+    }
+
+private:
+    int major_;
+    int minor_;
+    int revision_;
+};
+
+static const PacBioVersion minimum_version = PacBioVersion(3,0,1);
+static const PacBioVersion current_version = PacBioVersion(3,0,1);
 
 } // namespace internal
 } // namespace BAM
@@ -216,7 +315,20 @@ std::string BamHeader::PacBioBamVersion(void) const
 { return d_->pacbioBamVersion_; }
 
 BamHeader& BamHeader::PacBioBamVersion(const std::string& version)
-{ d_->pacbioBamVersion_ = version; return *this; }
+{
+    const auto fileVersion = internal::PacBioVersion{ version };
+    if (fileVersion >= internal::minimum_version)
+        d_->pacbioBamVersion_ = version;
+    else {
+        d_->pacbioBamVersion_.clear();
+        auto msg  = string{ "invalid PacBio BAM version number" };
+             msg += fileVersion.ToMsgString();
+             msg += string{ "is older than the minimum supported version" };
+             msg += internal::minimum_version.ToMsgString();
+        throw std::runtime_error(msg);
+    }
+    return *this;
+}
 
 ProgramInfo BamHeader::Program(const std::string& id) const
 {
@@ -360,7 +472,8 @@ string BamHeader::ToSam(void) const
     // @HD
     const string& outputVersion   = (d_->version_.empty()   ? string(hts_version()) : d_->version_);
     const string& outputSortOrder = (d_->sortOrder_.empty() ? string("unknown") : d_->sortOrder_);
-    const string& outputPbBamVersion = (d_->pacbioBamVersion_.empty() ? internal::current_version : d_->pacbioBamVersion_);
+    const string& outputPbBamVersion = (d_->pacbioBamVersion_.empty() ? internal::current_version.ToString()
+                                                                      : d_->pacbioBamVersion_);
 
     out << internal::prefix_HD
         << internal::MakeSamTag(internal::token_VN, outputVersion)
@@ -397,4 +510,3 @@ std::string BamHeader::Version(void) const
 
 BamHeader& BamHeader::Version(const std::string& version)
 { d_->version_ = version; return *this; }
-

@@ -82,7 +82,7 @@ TEST(BamHeaderTest, DefaultConstruction)
 
 TEST(BamHeaderTest, DecodeTest)
 {
-    const string& text = "@HD\tVN:1.1\tSO:queryname\tpb:3.0b3\n"
+    const string& text = "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
                          "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
                          "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
                          "@RG\tID:rg1\tSM:control\n"
@@ -96,7 +96,7 @@ TEST(BamHeaderTest, DecodeTest)
 
     EXPECT_EQ(string("1.1"),       header.Version());
     EXPECT_EQ(string("queryname"), header.SortOrder());
-    EXPECT_EQ(string("3.0b3"),     header.PacBioBamVersion());
+    EXPECT_EQ(string("3.0.1"),     header.PacBioBamVersion());
 
     EXPECT_EQ(3, header.ReadGroups().size());
     EXPECT_TRUE(header.HasReadGroup("rg1"));
@@ -124,7 +124,51 @@ TEST(BamHeaderTest, DecodeTest)
     EXPECT_EQ(string("citation needed"), header.Comments().at(1));
 }
 
-TEST(BamHeaderCodecTest, EncodeTest)
+TEST(BamHeaderTest, VersionCheckOk)
+{
+
+    // empty
+    EXPECT_THROW({
+        const string text = "@HD\tVN:1.1\tSO:queryname\tpb:\n";
+        BamHeader h(text);
+        (void)h;
+    }, std::runtime_error);
+
+    // old beta version(s)
+    EXPECT_THROW({
+        const string text = "@HD\tVN:1.1\tSO:queryname\tpb:3.0b3\n";
+        BamHeader h(text);
+        (void)h;
+    }, std::runtime_error);
+    EXPECT_THROW({
+        const string text = "@HD\tVN:1.1\tSO:queryname\tpb:3.0b7\n";
+        BamHeader h(text);
+        (void)h;
+    }, std::runtime_error);
+
+    // contains other, invalid info
+    EXPECT_THROW({
+        const string text = "@HD\tVN:1.1\tSO:queryname\tpb:3.0.should_not_work\n";
+        BamHeader h(text);
+        (void)h;
+    }, std::runtime_error);
+
+    // valid syntax, but earlier than minimum allowed version
+    EXPECT_THROW({
+        const string text = "@HD\tVN:1.1\tSO:queryname\tpb:3.0.0\n";
+        BamHeader h(text);
+        (void)h;
+    }, std::runtime_error);
+
+    // correct version syntax, number
+    EXPECT_NO_THROW({
+        const string text = "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n";
+        BamHeader h(text);
+        (void)h;
+    });
+}
+
+TEST(BamHeaderTest, EncodeTest)
 {
     ReadGroupInfo rg1("rg1");
     rg1.Sample("control");
@@ -144,7 +188,7 @@ TEST(BamHeaderCodecTest, EncodeTest)
     BamHeader header;
     header.Version("1.1")
           .SortOrder("queryname")
-          .PacBioBamVersion("3.0b3")
+          .PacBioBamVersion("3.0.1")
           .AddReadGroup(rg1)
           .AddReadGroup(rg2)
           .AddReadGroup(rg3)
@@ -154,7 +198,7 @@ TEST(BamHeaderCodecTest, EncodeTest)
           .AddComment("ipsum and so on")
           .AddComment("citation needed");
 
-    const string& expectedText = "@HD\tVN:1.1\tSO:queryname\tpb:3.0b3\n"
+    const string& expectedText = "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
                                  "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
                                  "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
                                  "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\n"
@@ -188,7 +232,7 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
     BamHeader header;
     header.Version("1.1")
           .SortOrder("queryname")
-          .PacBioBamVersion("3.0b3")
+          .PacBioBamVersion("3.0.1")
           .AddReadGroup(rg1)
           .AddReadGroup(rg2)
           .AddReadGroup(rg3)
@@ -198,7 +242,7 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
           .AddComment("ipsum and so on")
           .AddComment("citation needed");
 
-    const string& expectedText = "@HD\tVN:1.1\tSO:queryname\tpb:3.0b3\n"
+    const string& expectedText = "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
                                  "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
                                  "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
                                  "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\n"
@@ -241,7 +285,7 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
     BamHeader header;
     header.Version("1.1")
           .SortOrder("queryname")
-          .PacBioBamVersion("3.0b3")
+          .PacBioBamVersion("3.0.1")
           .AddReadGroup(rg1)
           .AddReadGroup(rg2)
           .AddReadGroup(rg3)
@@ -251,7 +295,7 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
           .AddComment("ipsum and so on")
           .AddComment("citation needed");
 
-    const string& expectedText = "@HD\tVN:1.1\tSO:queryname\tpb:3.0b3\n"
+    const string& expectedText = "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
                                  "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
                                  "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
                                  "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\n"
