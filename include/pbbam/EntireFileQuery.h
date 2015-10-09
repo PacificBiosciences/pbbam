@@ -39,19 +39,23 @@
 #define ENTIREFILEQUERY_H
 
 #include "pbbam/internal/QueryBase.h"
-#include <htslib/sam.h>
+#include <memory>
 
 namespace PacBio {
 namespace BAM {
-
-class BamFile;
 
 class PBBAM_EXPORT EntireFileQuery : public internal::IQuery
 {
 public:
     EntireFileQuery(const PacBio::BAM::DataSet& dataset);
-protected:
-    FileIterPtr CreateIterator(const BamFile& bamFile);
+    ~EntireFileQuery(void);
+
+public:
+    bool GetNext(BamRecord& r);
+
+private:
+    struct EntireFileQueryPrivate;
+    std::unique_ptr<EntireFileQueryPrivate> d_;
 };
 
 } // namespace BAM

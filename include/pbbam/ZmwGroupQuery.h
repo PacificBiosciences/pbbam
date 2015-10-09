@@ -38,29 +38,27 @@
 #ifndef ZMWGROUPQUERY_H
 #define ZMWGROUPQUERY_H
 
-#include "pbbam/Config.h"
 #include "pbbam/internal/QueryBase.h"
 #include <vector>
 
 namespace PacBio {
 namespace BAM {
-//namespace staging {
 
 class PBBAM_EXPORT ZmwGroupQuery : public internal::IGroupQuery
 {
 public:
-    ZmwGroupQuery(const DataSet& dataset);
     ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist,
                   const DataSet& dataset);
+    ~ZmwGroupQuery(void);
 
-protected:
-    FileIterPtr CreateIterator(const BamFile& file);
+public:
+    bool GetNext(std::vector<BamRecord>& records);
 
 private:
-    std::vector<int> whitelist_;
+    struct ZmwGroupQueryPrivate;
+    std::unique_ptr<ZmwGroupQueryPrivate> d_;
 };
 
-//} // namespace staging
 } // namespace BAM
 } // namespace PacBio
 

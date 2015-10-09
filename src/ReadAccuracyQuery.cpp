@@ -35,43 +35,33 @@
 
 // Author: Derek Barnett
 
-#ifndef MERGEITEM_H
-#define MERGEITEM_H
+#include "pbbam/ReadAccuracyQuery.h"
+#include "pbbam/PbiFilterTypes.h"
+#include "CompositeBamReader.h"
+using namespace PacBio;
+using namespace PacBio::BAM;
+using namespace PacBio::BAM::internal;
+using namespace std;
 
-#include "pbbam/BamRecord.h"
-#include "pbbam/internal/IBamFileIterator.h"
-#include <vector>
-
-namespace PacBio {
-namespace BAM {
-namespace internal {
-
-template<typename T>
-struct MergeItemBase
+struct ReadAccuracyQuery::ReadAccuracyQueryPrivate
 {
-public:
-    typedef typename IBamFileIteratorBase<T>::Ptr FileIterPtr;
-
-public:
-    MergeItemBase(void) { }
-    MergeItemBase(const T& r, const FileIterPtr& iter)
-        : record_(r), iter_(iter)
+    ReadAccuracyQueryPrivate(const Accuracy accuracy,
+                             const Compare::Type compareType,
+                             const DataSet& dataset)
+        : reader_(PbiReadAccuracyFilter(accuracy, compareType), dataset)
     { }
 
-public:
-    bool IsNull(void) const
-    { return !iter_; }
-
-public:
-    T record_;
-    FileIterPtr iter_;
+    internal::PbiFilterCompositeBamReader<Compare::None> reader_; // unsorted
 };
 
-typedef MergeItemBase<BamRecord>               MergeItem;
-typedef MergeItemBase<std::vector<BamRecord> > GroupMergeItem;
+ReadAccuracyQuery::ReadAccuracyQuery(const Accuracy accuracy,
+                                     const Compare::Type compareType,
+                                     const DataSet& dataset)
+    : internal::IQuery()
+    , d_(new ReadAccuracyQueryPrivate(accuracy, compareType, dataset))
+{ }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+ReadAccuracyQuery::~ReadAccuracyQuery(void) { }
 
-#endif // MERGEITEM_H
+bool ReadAccuracyQuery::GetNext(BamRecord &r)
+{ return d_->reader_.GetNext(r); }

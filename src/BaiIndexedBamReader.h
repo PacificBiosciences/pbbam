@@ -33,56 +33,47 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 
-// Author: Yuan Li
+// Author: Derek Barnett
 
-#ifndef _GROUP_QUERY_H_
-#define _GROUP_QUERY_H_
-#include "GroupQueryBase.h"
-#include <htslib/sam.h>
-#include <vector>
+#ifndef BAIINDEXEDBAMREADER_H
+#define BAIINDEXEDBAMREADER_H
+
+#include "BamReader.h"
+#include "pbbam/BamFile.h"
+#include "pbbam/GenomicInterval.h"
 
 namespace PacBio {
 namespace BAM {
+namespace internal {
 
-class PBBAM_EXPORT SequentialGroupQueryBase: public GroupQueryBase
+class BaiIndexedBamReader : public BamReader
 {
 public:
-    SequentialGroupQueryBase(const BamFile & bamFile);
+    BaiIndexedBamReader(const GenomicInterval& interval, const std::string& filename);
+    BaiIndexedBamReader(const GenomicInterval& interval, const BamFile& bamFile);
+    BaiIndexedBamReader(const GenomicInterval& interval, BamFile&& bamFile);
+
+public:
+    GenomicInterval Interval(void) const;
+    BaiIndexedBamReader& Interval(const GenomicInterval& interval);
 
 protected:
-    virtual bool InSameGroup(const BamRecord & record, const BamRecord & another) = 0;
-    bool GetNext(std::vector<BamRecord> & records);
-    PBBAM_SHARED_PTR<samFile>   htsFile_;
-    PBBAM_SHARED_PTR<bam_hdr_t> htsHeader_;
-    BamRecord nextRecord_;
-};
-
-//class PBBAM_EXPORT ZmwQuery: public SequentialGroupQueryBase
-//{
-//public:
-//    ZmwQuery(const BamFile & bamFile)
-//    : SequentialGroupQueryBase(bamFile) { }
-
-//private:
-//    bool InSameGroup(const BamRecord & record, const BamRecord & another) {
-//        return (record.MovieName() == another.MovieName() &&
-//                record.HoleNumber() == another.HoleNumber());
-//    }
-//};
-
-class PBBAM_EXPORT QNameQuery: public SequentialGroupQueryBase
-{
-public:
-    QNameQuery(const BamFile & bamFile) 
-    : SequentialGroupQueryBase(bamFile) { }
+    int ReadRawData(BGZF* bgzf, bam1_t* b);
 
 private:
-    bool InSameGroup(const BamRecord & record, const BamRecord & another) {
-        return (record.Impl().Name() == another.Impl().Name());
-    }
+    void LoadIndex(void);
+
+private:
+    GenomicInterval interval_;
+    std::unique_ptr<hts_idx_t, internal::HtslibIndexDeleter>    htsIndex_;
+    std::unique_ptr<hts_itr_t, internal::HtslibIteratorDeleter> htsIterator_;
 };
 
+inline GenomicInterval BaiIndexedBamReader::Interval(void) const
+{ return interval_; }
+
+} // namespace internal
 } // namespace BAM
 } // namespace PacBio
 
-#endif // _SEQUENTIAL_GROUP_QUERY_BASE_H_
+#endif // BAIINDEXEDBAMREADER_H

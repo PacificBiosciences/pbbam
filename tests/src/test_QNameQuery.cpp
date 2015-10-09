@@ -33,44 +33,64 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 
-// Author: Derek Barnett
+// Author: Yuan Li
 
-#include "pbbam/internal/FilterEngine.h"
+#include "TestData.h"
+#include <gtest/gtest.h>
+#include <pbbam/QNameQuery.h>
+#include <string>
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
 using namespace std;
 
-namespace PacBio {
-namespace BAM {
-namespace internal {
+static const string dataDir = tests::Data_Dir + "/test_group_query/";
+static const string test1fn = string(dataDir) + "test1.bam";
+static const string test2fn = string(dataDir) + "test2.bam";
+static const string test3fn = string(dataDir) + "test3.bam";
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
-
-
-FilterEngine::FilterEngine(void) { }
-
-bool FilterEngine::Accepts(const BamRecord& r) const
+static
+void TestQNameQuery(const string& fn, const vector<int>& expected)
 {
-//        foreach ( const FilterParameter& param, parameters_ ) {
-//            if (!param.Accepts(r))
-//                return false;
-//        }
-//        return true;
-    (void)r;
-    return true;
+    EXPECT_NO_THROW(
+    {
+        vector<int> counts;
+        QNameQuery qQuery(fn);
+        for (const vector<BamRecord>& records : qQuery)
+            counts.push_back(records.size());
+        EXPECT_EQ(expected, counts);
+    });
 }
 
-bool FilterEngine::Accepts(vector<BamRecord>& r) const
+static
+void TestNoneConstQNameQuery(const string& fn, const vector<int>& expected)
 {
-    size_t i = 0;
-    while (i < r.size()) {
-        if (!Accepts(r.at(i)))
-            r.erase(r.begin() + i);
-        else
-            ++i;
-    }
-    return !r.empty();
+    EXPECT_NO_THROW(
+    {
+        vector<int> counts;
+        QNameQuery qQuery(fn);
+        for (vector<BamRecord>& records : qQuery)
+            counts.push_back(records.size());
+        EXPECT_EQ(expected, counts);
+    });
 }
+
+TEST(QNameQueryTest, CountQSizes)
+{
+    // test case 1 has exactly one bamRecord.
+    string fn = test1fn;
+    vector<int> expected({1});
+    TestQNameQuery(fn, expected);
+    TestNoneConstQNameQuery(fn, expected);
+
+    // test case 2 has bamRecords of four subreads.
+    fn = test2fn;
+    expected = {1, 1, 1, 1};
+    TestQNameQuery(fn, expected);
+    TestNoneConstQNameQuery(fn, expected);
+
+    fn = test3fn;
+    expected = {2,1,1,1,1,1,1,2,1,1,1};
+    TestQNameQuery(fn, expected);
+    TestNoneConstQNameQuery(fn, expected);
+}
+

@@ -129,8 +129,6 @@ endif*/
 
 // Query/iterator API
 %include "QueryBase.i"
-%include "GroupQueryBase.i"
-%include "GroupQuery.i"
 %include "EntireFileQuery.i"
 %include "GenomicIntervalQuery.i"
 %include "ZmwQuery.i"

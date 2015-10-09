@@ -39,33 +39,30 @@
 #define GENOMICINTERVALQUERY_H
 
 #include "pbbam/GenomicInterval.h"
-#include "pbbam/QueryBase.h"
 #include "pbbam/internal/QueryBase.h"
-#include <string>
+#include <memory>
 
 namespace PacBio {
 namespace BAM {
-
-class BamFile;
 
 class PBBAM_EXPORT GenomicIntervalQuery : public internal::IQuery
 {
 public:
     GenomicIntervalQuery(const GenomicInterval& interval,
-                         const DataSet& dataset);
+                         const PacBio::BAM::DataSet& dataset);
+    ~GenomicIntervalQuery(void);
 
 public:
+    bool GetNext(BamRecord& r);
+public:
     GenomicIntervalQuery& Interval(const GenomicInterval& interval);
-    GenomicInterval Interval(void) const;
-
-protected:
-    FileIterPtr CreateIterator(const BamFile& bamFile);
+    const GenomicInterval& Interval(void) const;
 
 private:
-    GenomicInterval interval_;
+    struct GenomicIntervalQueryPrivate;
+    std::unique_ptr<GenomicIntervalQueryPrivate> d_;
 };
 
-//} // namespace staging
 } // namespace BAM
 } // namspace PacBio
 

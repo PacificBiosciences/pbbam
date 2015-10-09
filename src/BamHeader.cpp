@@ -412,6 +412,9 @@ SequenceInfo BamHeader::Sequence(const int32_t id) const
     return d_->sequences_.at(id);
 }
 
+size_t BamHeader::NumSequences(void) const
+{ return d_->sequences_.size(); }
+
 SequenceInfo BamHeader::Sequence(const std::string& name) const
 {
     const auto iter = d_->sequenceIdLookup_.find(name);

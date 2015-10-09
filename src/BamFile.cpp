@@ -40,7 +40,11 @@
 #include "FileUtils.h"
 #include "MemoryUtils.h"
 #include <htslib/sam.h>
+
+#include <iostream>
+
 #include <memory>
+#include <cassert>
 #include <sys/stat.h>
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -55,25 +59,35 @@ class BamFilePrivate
 public:
     BamFilePrivate(const string& fn)
         : filename_(fn)
+        , firstAlignmentOffset_(-1)
     {
         // update verbosity
         hts_verbose = PacBio::BAM::HtslibVerbosity;
 
         // attempt open
         std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
-        if (!f)
-            throw std::runtime_error(string("could not open file: ") + filename_);
+        if (!f || !f->fp.bgzf)
+            throw std::runtime_error(string("could not open BAM file: ") + filename_);
         if (f->format.format != bam)
             throw std::runtime_error("expected BAM, unknown format");
 
         // attempt fetch header
         std::unique_ptr<bam_hdr_t, internal::HtslibHeaderDeleter> hdr(sam_hdr_read(f.get()));
         header_ = internal::BamHeaderMemory::FromRawData(hdr.get());
+
+        // cache first alignment offset
+        firstAlignmentOffset_ = bgzf_tell(f->fp.bgzf);
+    }
+
+    unique_ptr<BamFilePrivate> DeepCopy(void)
+    {
+        return unique_ptr<BamFilePrivate>(new BamFilePrivate(filename_));
     }
 
 public:
     std::string filename_;
     BamHeader header_;
+    int64_t firstAlignmentOffset_;
 };
 
 } // namespace internal
@@ -89,7 +103,7 @@ BamFile::BamFile(const std::string& filename)
 { }
 
 BamFile::BamFile(const BamFile& other)
-    : d_(other.d_)
+    : d_(other.d_->DeepCopy())
 { }
 
 BamFile::BamFile(BamFile&& other)
@@ -97,7 +111,10 @@ BamFile::BamFile(BamFile&& other)
 { }
 
 BamFile& BamFile::operator=(const BamFile& other)
-{ d_ = other.d_; return *this; }
+{
+    d_ = other.d_->DeepCopy();
+    return *this;
+}
 
 BamFile& BamFile::operator=(BamFile&& other)
 { d_ = std::move(other.d_); return *this; }
@@ -129,6 +146,9 @@ void BamFile::EnsureStandardIndexExists(void) const
 
 std::string BamFile::Filename(void) const
 { return d_->filename_; }
+
+int64_t BamFile::FirstAlignmentOffset(void) const
+{ return d_->firstAlignmentOffset_; }
 
 bool BamFile::HasReference(const std::string& name) const
 { return d_->header_.HasSequence(name); }

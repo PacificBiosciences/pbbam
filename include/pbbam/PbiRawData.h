@@ -65,8 +65,8 @@ public:
     bool AddRecord(const BamRecord& b);
 
 public:
-    std::vector<uint16_t> bcLeft_;
-    std::vector<uint16_t> bcRight_;
+    std::vector<uint16_t> bcForward_;
+    std::vector<uint16_t> bcReverse_;
     std::vector<uint8_t>  bcQual_;
 
 };
@@ -86,6 +86,10 @@ public:
     /// \returns true if record had mapping data
     ///
     bool AddRecord(const BamRecord& b);
+
+    uint32_t NumDeletedBasesAt(size_t recordIndex) const;
+    uint32_t NumInsertedBasesAt(size_t recordIndex) const;
+    std::pair<uint32_t, uint32_t> NumDeletedAndInsertedBasesAt(size_t recordIndex) const;
 
 public:
     std::vector<int32_t>  tId_;
@@ -108,6 +112,7 @@ public:
 public:
     PbiReferenceEntry(void);
     PbiReferenceEntry(ID id);
+    PbiReferenceEntry(ID id, Row beginRow, Row endRow);
     PbiReferenceEntry(const PbiReferenceEntry& other);
     PbiReferenceEntry(PbiReferenceEntry&& other);
     PbiReferenceEntry& operator=(const PbiReferenceEntry& other);
@@ -203,6 +208,8 @@ public:
     bool HasReferenceData(void) const;
     bool HasSection(const PbiFile::Section section) const;
 
+    /// \returns PBI filename (".pbi"), will be empty string if user-generated
+    std::string Filename(void) const;
     PbiFile::Sections FileSections(void) const;
     uint32_t NumReads(void) const;
     PbiFile::VersionEnum Version(void) const;
@@ -214,9 +221,9 @@ public:
     /// \{
 
     const PbiRawBarcodeData&   BarcodeData(void) const;
+    const PbiRawBasicData&     BasicData(void) const;
     const PbiRawMappedData&    MappedData(void) const;
     const PbiRawReferenceData& ReferenceData(void) const;
-    const PbiRawBasicData&   BasicData(void) const;
 
     /// \}
 
@@ -241,6 +248,7 @@ public:
     /// \}
 
 private:
+    std::string          filename_;
     PbiFile::VersionEnum version_;
     PbiFile::Sections    sections_;
     uint32_t             numReads_;
@@ -255,6 +263,9 @@ inline const PbiRawBarcodeData& PbiRawData::BarcodeData(void) const
 
 inline PbiRawBarcodeData& PbiRawData::BarcodeData(void)
 { return barcodeData_; }
+
+inline std::string PbiRawData::Filename(void) const
+{ return filename_; }
 
 inline PbiFile::Sections PbiRawData::FileSections(void) const
 { return sections_; }

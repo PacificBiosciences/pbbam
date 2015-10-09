@@ -35,80 +35,28 @@
 
 // Author: Derek Barnett
 
-#ifndef BAMREADER_H
-#define BAMREADER_H
+#include "pbbam/PbiFilterQuery.h"
+#include "CompositeBamReader.h"
+using namespace PacBio;
+using namespace PacBio::BAM;
+using namespace PacBio::BAM::internal;
+using namespace std;
 
-#include "pbbam/BamHeader.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
-#include <string>
-
-namespace PacBio {
-namespace BAM {
-
-class PBBAM_EXPORT BamReader
+struct PbiFilterQuery::PbiFilterQueryPrivate
 {
+    PbiFilterQueryPrivate(const PbiFilter& filter, const DataSet& dataset)
+        : reader_(filter, dataset)
+    { }
 
-public:
-    enum ReadError
-    {
-        NoError = 0
-      , OpenFileError
-      , ReadHeaderError
-      , ReadRecordError
-    };
-
-public:
-    BamReader(void);
-    virtual ~BamReader(void);
-
-public:
-
-    /// Closes the BAM file reader.
-    void Close(void);
-
-    /// Opens a BAM file for reading.
-    ///
-    /// Prefix \p filename with "http://" or "ftp://" for remote files,
-    /// or set to "-" for stdin.
-    ///
-    /// \param[in] filename path to input BAM file
-    ///
-    /// \returns success/failure
-    bool Open(const std::string& filename);
-
-    /// \returns header as BamHeader object
-    BamHeader::SharedPtr Header(void) const;
-
-    /// \returns error status code
-    BamReader::ReadError Error(void) const;
-
-    /// \returns true if error encountered
-    bool HasError(void) const;
-
-    /// Fetches the next record in a BAM file.
-    ///
-    /// \param[out] record pointer to BamRecord object
-    ///
-    /// \returns succcess/failure
-    bool GetNext(PBBAM_SHARED_PTR<BamRecord> record);
-
-public:
-    std::string PacBioBamVersion(void) const;
-
-protected:
-    bool GetNext(PBBAM_SHARED_PTR<bam1_t> rawRecord);
-    void InitialOpen(void);
-    PBBAM_SHARED_PTR<bam_hdr_t> RawHeader(void) const;
-
-protected:
-    PBBAM_SHARED_PTR<samFile>   file_;
-    PBBAM_SHARED_PTR<bam_hdr_t> header_;
-    std::string filename_;
-    BamReader::ReadError error_;
+    internal::PbiFilterCompositeBamReader<Compare::None> reader_; // unsorted
 };
 
-} // namespace BAM
-} // namespace PacBio
+PbiFilterQuery::PbiFilterQuery(const PbiFilter& filter, const DataSet& dataset)
+    : internal::IQuery()
+    , d_(new PbiFilterQueryPrivate(filter, dataset))
+{ }
 
-#endif // BAMREADER_H
+PbiFilterQuery::~PbiFilterQuery(void) { }
+
+bool PbiFilterQuery::GetNext(BamRecord &r)
+{ return d_->reader_.GetNext(r); }

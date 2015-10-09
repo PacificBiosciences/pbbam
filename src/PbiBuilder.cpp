@@ -249,7 +249,10 @@ PbiBuilder::PbiBuilder(const string& pbiFilename, const size_t numReferenceSeque
 PbiBuilder::~PbiBuilder(void) { }
 
 void PbiBuilder::AddRecord(const BamRecord& record, const int64_t vOffset)
-{ d_->AddRecord(record, vOffset);  }
+{
+    internal::BamRecordMemory::UpdateRecordTags(record);
+    d_->AddRecord(record, vOffset);
+}
 
 const PbiRawData& PbiBuilder::Index(void) const
 { return d_->rawData_; }

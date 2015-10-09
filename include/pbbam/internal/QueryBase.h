@@ -35,15 +35,12 @@
 
 // Author: Derek Barnett
 
-#ifndef QUERYBASE2_H
-#define QUERYBASE2_H
+#ifndef QUERYBASE_H
+#define QUERYBASE_H
 
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/DataSet.h"
-#include "pbbam/internal/FilterEngine.h"
-#include "pbbam/internal/IBamFileIterator.h"
-#include "pbbam/internal/IMergeStrategy.h"
 #include <memory>
 #include <vector>
 #include <cassert>
@@ -58,22 +55,17 @@ class QueryBase;
 template<typename T>
 class QueryIteratorBase
 {
+public:
+    virtual ~QueryIteratorBase(void);
+
+    bool operator==(const QueryIteratorBase<T>& other) const;
+    bool operator!=(const QueryIteratorBase<T>& other) const;
+
 protected:
     QueryIteratorBase(void);
     QueryIteratorBase(QueryBase<T>& query);
 
-public:
-    virtual ~QueryIteratorBase(void) { }
-
-protected:
     void ReadNext(void);
-
-public:
-    bool operator==(const QueryIteratorBase<T>& other) const
-    { return query_ == other.query_; }
-
-    bool operator!=(const QueryIteratorBase<T>& other) const
-    { return !(*this == other); }
 
 protected:
     QueryBase<T>* query_;
@@ -84,46 +76,28 @@ template<typename T>
 class QueryIterator : public QueryIteratorBase<T>
 {
 public:
-    QueryIterator(void) : QueryIteratorBase<T>() { }
-    QueryIterator(QueryBase<T>& query)
-        : QueryIteratorBase<T>(query)
-    { }
+    QueryIterator(void);
+    QueryIterator(QueryBase<T>& query);
 
-    T& operator*(void) { return QueryIteratorBase<T>::record_; }
-    T* operator->(void) { return &(operator*()); }
+    T& operator*(void);
+    T* operator->(void);
 
-    QueryIterator<T>& operator++(void)
-    { QueryIteratorBase<T>::ReadNext(); return *this; }
-
-    QueryIterator<T> operator++(int)
-    {
-        QueryIterator<T> result(*this);
-        ++(*this);
-        return result;
-    }
+    QueryIterator<T>& operator++(void);
+    QueryIterator<T> operator++(int);
 };
 
 template<typename T>
 class QueryConstIterator : public QueryIteratorBase<T>
 {
 public:
-    QueryConstIterator(void) : QueryIteratorBase<T>() { }
-    QueryConstIterator(const QueryBase<T>& query)
-        : QueryIteratorBase<T>(const_cast<QueryBase<T>&>(query))
-    { }
+    QueryConstIterator(void);
+    QueryConstIterator(const QueryBase<T>& query);
 
-    const T& operator*(void) const { return QueryIteratorBase<T>::record_; }
-    const T* operator->(void) const { return &(operator*()); }
+    const T& operator*(void) const;
+    const T* operator->(void) const;
 
-    QueryConstIterator<T>& operator++(void)
-    { QueryIteratorBase<T>::ReadNext(); return *this; }
-
-    QueryConstIterator<T> operator++(int)
-    {
-        QueryConstIterator<T> result(*this);
-        ++(*this);
-        return result;
-    }
+    QueryConstIterator<T>& operator++(void);
+    QueryConstIterator<T> operator++(int);
 };
 
 template<typename T>
@@ -133,86 +107,32 @@ public:
     typedef QueryIterator<T>      iterator;
     typedef QueryConstIterator<T> const_iterator;
 
-    typedef typename IBamFileIteratorBase<T>::Ptr FileIterPtr;
-
-protected:
-    QueryBase(const DataSet& dataset);
 public:
-    virtual ~QueryBase(void) { }
-
-    QueryConstIterator<T> begin(void) const  { return QueryConstIterator<T>(*this); }
-    QueryConstIterator<T> cbegin(void) const { return QueryConstIterator<T>(*this); }
-    QueryIterator<T> begin(void) { return QueryIterator<T>(*this); }
-
-    QueryConstIterator<T> end(void) const { return QueryConstIterator<T>(); }
-    QueryConstIterator<T> cend(void) const { return QueryConstIterator<T>(); }
-    QueryIterator<T> end(void) { return QueryIterator<T>(); }
+    virtual ~QueryBase(void);
 
 public:
-    bool GetNext(T& r);
+    QueryConstIterator<T> begin(void) const;
+    QueryConstIterator<T> cbegin(void) const;
+    QueryIterator<T> begin(void);
 
-    std::vector<BamFile> GetBamFiles(void) const
-    { return dataset_.BamFiles(); }
+    QueryConstIterator<T> end(void) const;
+    QueryConstIterator<T> cend(void) const;
+    QueryIterator<T> end(void);
 
 public:
-    std::vector<FileIterPtr> CreateIterators(void)
-    {
-        const std::vector<BamFile>& bamFiles = dataset_.BamFiles();
-        std::vector<FileIterPtr> result;
-        result.reserve(bamFiles.size());
-        for (const BamFile& bamFile : bamFiles)
-            result.push_back(CreateIterator(bamFile));
-        return result;
-    }
+    virtual bool GetNext(T& r) =0;
 
 protected:
-    virtual FileIterPtr CreateIterator(const BamFile& bamFile) = 0;
-
-protected:
-    const DataSet dataset_;
-    std::unique_ptr<IMergeStrategyBase<T> > mergeStrategy_;
-    FilterEngine filterEngine_;
+    QueryBase(void);
 };
 
 typedef QueryBase<BamRecord>               IQuery;
 typedef QueryBase<std::vector<BamRecord> > IGroupQuery;
 
-template<typename T>
-inline QueryIteratorBase<T>::QueryIteratorBase(void)
-    : query_(nullptr)
-{ }
-
-template<typename T>
-inline QueryIteratorBase<T>::QueryIteratorBase(QueryBase<T> &query)
-    : query_(&query)
-{ ReadNext(); }
-
-template<typename T>
-inline QueryBase<T>::QueryBase(const DataSet& dataset)
-    : dataset_(dataset)
-    , mergeStrategy_(nullptr)
-{ }
-
-template<typename T>
-inline bool QueryBase<T>::GetNext(T& r)
-{
-    while (mergeStrategy_->GetNext(r)) {
-        if (filterEngine_.Accepts(r))
-            return true;
-    }
-    return false;
-}
-
-template<typename T>
-inline void QueryIteratorBase<T>::ReadNext(void)
-{
-    assert(query_);
-    if (!query_->GetNext(record_))
-        query_ = nullptr;
-}
-
 } // namespace internal
 } // namespace BAM
 } // namespace PacBio
 
-#endif // QUERYBASE2_H
+#include "pbbam/internal/QueryBase.inl"
+
+#endif // QUERYBASE_H

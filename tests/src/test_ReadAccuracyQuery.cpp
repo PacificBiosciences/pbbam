@@ -33,60 +33,40 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 
-// Author: Yuan Li
+// Author: Derek Barnett
 
-#include "pbbam/GroupQuery.h"
-#include "MemoryUtils.h"
+#ifdef PBBAM_TESTING
+#define private public
+#endif
+
+#include "TestData.h"
+#include <gtest/gtest.h>
+#include <pbbam/ReadAccuracyQuery.h>
+#include <string>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-SequentialGroupQueryBase::SequentialGroupQueryBase(const BamFile & file) 
-    : GroupQueryBase(file)
-    , htsFile_(nullptr)
-    , htsHeader_(nullptr)
-    , nextRecord_()
+TEST(ReadAccuracyQueryTest, QueryOk)
 {
-    htsFile_.reset(sam_open(file.Filename().c_str(), "rb"), internal::HtslibFileDeleter());
-    if (!htsFile_) 
-        throw std::runtime_error("could not open BAM file for reading");
+    const auto bamFile = BamFile{ tests::Data_Dir + string{ "/test_group_query/test2.bam" } };
 
-    htsHeader_.reset(sam_hdr_read(htsFile_.get()), internal::HtslibHeaderDeleter());
-    if (!htsHeader_) 
-        throw std::runtime_error("could not read BAM header data");
-}
-
-bool SequentialGroupQueryBase::GetNext(vector<BamRecord> & records) 
-{
-    records.clear();
-
-    if (nextRecord_.Impl().Name() != "") {
-        records.push_back(nextRecord_);
-        nextRecord_ = BamRecord();
-    }
-
-    while(true) {
-        BamRecord record(file_.Header());
-        const int result = sam_read1(htsFile_.get(),
-                                     htsHeader_.get(),
-                                     internal::BamRecordMemory::GetRawData(record).get());
-        internal::BamRecordMemory::UpdateRecordTags(record);
-        if (result >= 0) { // get next record
-            if (records.size() == 0) {
-                records.push_back(record); // add the first record
-            } else {
-                if (InSameGroup(record, records[0])) {
-                    records.push_back(record); // add remaining record
-                } else {
-                    nextRecord_ = record; // store record from another zmw
-                    return true;
-                }
-            }
-        } else { // unable to get next record
-            if (records.size() > 0) return true; // Has records to return
-            else return false; // Has no records to return
+    {
+        int count = 0;
+        ReadAccuracyQuery query(0.901, Compare::GREATER_THAN_EQUAL, bamFile);
+        for (const auto& r: query) {
+            ++count;
+            EXPECT_GE(r.ReadAccuracy(), 0.901);
         }
+        EXPECT_EQ(4, count);
     }
-    assert(false); // Should not reach here.
-    return false;
+    {
+        int count = 0;
+        ReadAccuracyQuery query(0.95, Compare::GREATER_THAN_EQUAL, bamFile);
+        for (const auto& r: query) {
+            ++count;
+            EXPECT_GE(r.ReadAccuracy(), 0.901);
+        }
+        EXPECT_EQ(0, count);
+    }
 }

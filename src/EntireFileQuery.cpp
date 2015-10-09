@@ -36,68 +36,26 @@
 // Author: Derek Barnett
 
 #include "pbbam/EntireFileQuery.h"
-#include "pbbam/BamFile.h"
-
-#include "pbbam/internal/SequentialMergeStrategy.h"
-
-#include "MemoryUtils.h"
+#include "CompositeBamReader.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-class EntireFileIterator : public internal::IBamFileIterator
+struct EntireFileQuery::EntireFileQueryPrivate
 {
-public:
-    EntireFileIterator(const BamFile& bamFile)
-        : internal::IBamFileIterator(bamFile)
-    {
-        htsFile_.reset(sam_open(bamFile.Filename().c_str(), "rb"));
-        if (!htsFile_)
-            throw std::runtime_error("could not open BAM file for reading");
+    EntireFileQueryPrivate(const DataSet& dataset)
+        : reader_(dataset)
+    { }
 
-        htsHeader_.reset(sam_hdr_read(htsFile_.get()));
-        if (!htsHeader_)
-            throw std::runtime_error("could not read BAM header");
-    }
-
-public:
-    bool GetNext(BamRecord& record) {
-
-//        record = BamRecord(/*fileData_.Header()*/);
-        const int result = sam_read1(htsFile_.get(),
-                                     htsHeader_.get(),
-                                     internal::BamRecordMemory::GetRawData(record).get());
-        internal::BamRecordMemory::UpdateRecordTags(record);
-        record.header_ = header_;
-
-        // success
-        if (result >= 0)
-            return true;
-
-        // normal EOF
-        else if (result == -1)
-            return false;
-
-        // error (truncated file, etc)
-        else
-            throw std::runtime_error("corrupted file, may be truncated");
-    }
-
-private:
-    unique_ptr<samFile,   internal::HtslibFileDeleter>   htsFile_;
-    unique_ptr<bam_hdr_t, internal::HtslibHeaderDeleter> htsHeader_;
+    PacBio::BAM::internal::SequentialCompositeBamReader reader_;
 };
 
-EntireFileQuery::EntireFileQuery(const DataSet& dataset)
-    : internal::IQuery(dataset)
-{
-    // check files
-    // if SO all coordinate
-    // else if SO all queryname
-    // else SO unsorted/unknown
-    mergeStrategy_.reset(new internal::SequentialMergeStrategy(CreateIterators()));
-}
+EntireFileQuery::EntireFileQuery(const DataSet &dataset)
+    : internal::IQuery()
+    , d_(new EntireFileQueryPrivate(dataset))
+{ }
 
-EntireFileQuery::FileIterPtr EntireFileQuery::CreateIterator(const BamFile& bamFile)
-{ return FileIterPtr(new EntireFileIterator(bamFile)); }
+EntireFileQuery::~EntireFileQuery(void) { }
 
+bool EntireFileQuery::GetNext(BamRecord &r)
+{ return d_->reader_.GetNext(r); }

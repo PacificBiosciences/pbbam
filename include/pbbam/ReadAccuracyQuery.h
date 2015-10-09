@@ -35,14 +35,35 @@
 
 // Author: Derek Barnett
 
-#include "pbbam/QueryBase.h"
-#include "pbbam/BamRecord.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
+#ifndef READACCURACYQUERY_H
+#define READACCURACYQUERY_H
 
-QueryBase::QueryBase(const BamFile& file)
-    : file_(file)
-{ }
+#include "pbbam/Accuracy.h"
+#include "pbbam/Compare.h"
+#include "pbbam/Config.h"
+#include "pbbam/internal/QueryBase.h"
+#include <vector>
 
-QueryBase::~QueryBase(void) { }
+namespace PacBio {
+namespace BAM {
+
+class PBBAM_EXPORT ReadAccuracyQuery : public internal::IQuery
+{
+public:
+    ReadAccuracyQuery(const Accuracy accuracy,
+                      const Compare::Type compareType,
+                      const DataSet& dataset);
+    ~ReadAccuracyQuery(void);
+
+public:
+    bool GetNext(BamRecord& r);
+
+private:
+    struct ReadAccuracyQueryPrivate;
+    std::unique_ptr<ReadAccuracyQueryPrivate> d_;
+};
+
+} // namespace BAM
+} // namespace PacBio
+
+#endif // READACCURACYQUERY_H

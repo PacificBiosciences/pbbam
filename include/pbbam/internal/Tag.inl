@@ -91,7 +91,7 @@ struct NumericConvertVisitor : public boost::static_visitor<DesiredType>
     {
         const std::string from = typeid(t).name();
         const std::string to   = typeid(DesiredType).name();
-        const std::string msg = std::string("conversion not supported: ") + from + " -> " + to;
+        const std::string msg  = std::string("conversion not supported: ") + from + " -> " + to;
         throw std::runtime_error(msg);
         return 0;
     }
@@ -114,7 +114,7 @@ struct IsEqualVisitor : public boost::static_visitor<bool>
         return false;
     }
 
-    bool operator()(const boost::blank&, const boost::blank&) const
+    bool operator() (const boost::blank&, const boost::blank&) const
     { return true; }
 
     template <typename T>

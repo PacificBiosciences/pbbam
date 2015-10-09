@@ -49,6 +49,7 @@ using namespace PacBio::BAM;
 using namespace std;
 
 const string ex2BamFn     = tests::Data_Dir + "/ex2.bam";
+const string ex2CopyBamFn = tests::Data_Dir + "/ex2_copy.bam";
 const string bamMappingFn = tests::Data_Dir + "/dataset/bam_mapping.bam";
 const string bamMappingFn_1 = tests::Data_Dir + "/dataset/bam_mapping_1.bam";
 const string bamMappingFn_2 = tests::Data_Dir + "/dataset/bam_mapping_2.bam";
@@ -132,7 +133,7 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
         EXPECT_EQ(3307, count);
     });
 
-    // simple multi-file (actually just same file twice)
+    // duplicate file attempt
     EXPECT_NO_THROW(
     {
         BamFile bamFile(ex2BamFn);
@@ -147,7 +148,7 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
             (void)record;
             ++count;
         }
-        EXPECT_EQ(3307*2, count);
+        EXPECT_EQ(3307, count); // same as single
     });
 
     // true multi-file dataset
@@ -263,7 +264,7 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         EXPECT_EQ(83, count);
     });
 
-    // multi-file (same twice)
+    // duplicate file
     EXPECT_NO_THROW(
     {
         BamFile bamFile(ex2BamFn);
@@ -271,6 +272,81 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         DataSet dataset;
         dataset.ExternalResources().Add(bamFile);
         dataset.ExternalResources().Add(bamFile);
+
+        // count records & also ensure sorted merge
+        int count = 0;
+        int prevId = 0;
+        int prevPos = 0;
+
+        GenomicInterval interval("seq1", 0, 100);
+        GenomicIntervalQuery query(interval, dataset);
+        for (const BamRecord& record : query) {
+
+            EXPECT_TRUE(record.ReferenceId()   >= prevId);
+            EXPECT_TRUE(record.ReferenceStart() >= prevPos);
+
+            prevId = record.ReferenceId();
+            prevPos = record.ReferenceStart();
+            ++count;
+        }
+        EXPECT_EQ(39, count); // same as single file
+
+        // adjust interval and pass back in
+        count = 0;
+        interval.Start(500);
+        interval.Stop(600);
+        query.Interval(interval);
+        for (const BamRecord& record : query) {
+            (void)record;
+            ++count;
+        }
+        EXPECT_EQ(166, count); // same as single file
+
+        // adjust again
+        count = 0;
+        interval.Name("seq2");
+        interval.Start(0);
+        interval.Stop(100);
+        query.Interval(interval);
+        for (const BamRecord& record : query) {
+            (void)record;
+            ++count;
+        }
+        EXPECT_EQ(83, count); // same as single file
+
+        // unknown ref
+        count = 0;
+        interval.Name("does not exist");
+        interval.Start(0);
+        interval.Stop(100);
+        EXPECT_THROW(
+            query.Interval(interval);
+        , std::exception);
+        for (const BamRecord& record : query) {    // iteration is still safe, just returns no data
+            (void)record;
+            ++count;
+        }
+        EXPECT_EQ(0, count); // same as single file
+
+        // adjust again - make sure we can read a real region after an invalid one
+        interval.Name("seq2");
+        interval.Start(0);
+        interval.Stop(100);
+        query.Interval(interval);
+        count = 0;
+        for (const BamRecord& record : query) {
+            (void)record;
+            ++count;
+        }
+        EXPECT_EQ(83, count); // same as single file
+    });
+
+    // multi file BAM (same record content for easy testing, but different filename(ResourceId)
+    EXPECT_NO_THROW(
+    {
+        DataSet dataset;
+        dataset.ExternalResources().Add(BamFile(ex2BamFn));
+        dataset.ExternalResources().Add(BamFile(ex2CopyBamFn));
 
         // count records & also ensure sorted merge
         int count = 0;
@@ -339,9 +415,6 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         }
         EXPECT_EQ(83*2, count);
     });
-
-    // multi file BAM
-
 }
 
 // TODO: implement me
@@ -355,8 +428,8 @@ TEST(DataSetQueryTest, ZmwQueryTest)
     const std::vector<int32_t> whitelist = { 13473, 38025 };
 
     // single file
-//    EXPECT_NO_THROW(
-//    {
+    EXPECT_NO_THROW(
+    {
         BamFile bamFile(bamMappingFn);
         bamFile.EnsurePacBioIndexExists();
         DataSet dataset(bamFile);
@@ -369,7 +442,7 @@ TEST(DataSetQueryTest, ZmwQueryTest)
             ++count;
         }
         EXPECT_EQ(5, count);
-//    });
+    });
 
     // multi-file
 }
@@ -417,18 +490,29 @@ TEST(DataSetQueryTest, ZmwGroupQueryTest)
         dataset.ExternalResources().Add(ExternalResource(bamFile_1));
         dataset.ExternalResources().Add(ExternalResource(bamFile_2));
 
-        int count = 0;
+        int totalCount = 0;
+        int numRecordsInGroup = 0;
+        int groupCount = 0;
         int32_t groupZmw = -1;
         ZmwGroupQuery query(whitelist, dataset);
         for (const vector<BamRecord>& group : query)  {
             for (const BamRecord& record: group) {
+                ++numRecordsInGroup;
                 if (groupZmw == -1)
                     groupZmw = record.HoleNumber();
                 EXPECT_EQ(groupZmw, record.HoleNumber());
-                ++count;
+                ++totalCount;
             }
+            if (groupCount == 0)
+                EXPECT_EQ(9, numRecordsInGroup);
+            else if (groupCount == 1)
+                EXPECT_EQ(6, numRecordsInGroup);
+            else
+                EXPECT_TRUE(false); // should not get here
+            numRecordsInGroup = 0;
+            ++groupCount;
             groupZmw = -1;
         }
-        EXPECT_EQ(15, count);
+        EXPECT_EQ(15, totalCount);
     });
 }

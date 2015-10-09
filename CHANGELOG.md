@@ -8,8 +8,14 @@ The public API should not be considered stable yet. Once we lock down a version 
 define a reference point & compatibility guarantees will be maintained within each major version 
 series.
 
-
 ## Active
+
+## [0.2.0] - 2015-10-09
+
+### Changed
+- BAM spec v3.0.1 compliance. Previous (betas) versions of the BAM spec are not supported and will cause
+  an exception to be throw if encountered.
+- PBI lookup interface & backend, see PbiIndex.h & PbiLookupData.h for details.
 
 ### Added 
 - BamFile::PacBioIndexExists() & BamFile::StandardIndexExists() - query the existence of index files 
@@ -17,6 +23,17 @@ without auto-building them if they are missing, as in BamFile::Ensure*IndexExist
 - GenomicInterval now accepts an htslib/samtools-style REGION string in the constructor: 
 GenomicInterval("chr1:1000-2000"). Please note though, that pbbam uses 0-based coordinates throughout, 
 whereas samtools expects 1-based. The above string is equivalent to "chr1:1001-2000" in samtools.
+- Built-in PBI filters. See PbiFlter.h & PbiFilterTypes.h for built-in filters and constructing composite
+  filters. These can be used in conjunction with the new PbiFilterQuery, which takes a generic PbiFilter
+  and applies that to a DataSet for iteration.
+- New built-in queries: BarcodeQuery, ReadAccuracyQuery, SubreadLengthQuery. These leverage the new filter
+  API to construct a PbiFilter and apply to a DataSet.
+- Built-in BamRecord comparators that are STL-compatible. See Compare.h for full list. 
+  This allows statements like:
+      vector<BamRecord> data;
+      std::sort(data.begin(), data.end(), Compare::Zmw());
+  to get a container of records, sorted by ZMW. 
+- "exciseSoftClips" option to BamRecord::CigarData() 
 
 ## [0.1.0] - 2015-07-17
 

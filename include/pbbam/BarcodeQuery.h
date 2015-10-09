@@ -35,37 +35,31 @@
 
 // Author: Derek Barnett
 
-#ifndef FILTERENGINE_H
-#define FILTERENGINE_H
+#ifndef BARCODEQUERY_H
+#define BARCODEQUERY_H
 
-#include "pbbam/BamRecord.h"
-#include <memory>
+#include "pbbam/Config.h"
+#include "pbbam/internal/QueryBase.h"
 #include <vector>
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-
-
-class FilterEngine {
+class PBBAM_EXPORT BarcodeQuery : public internal::IQuery
+{
+public:
+    BarcodeQuery(const uint16_t barcode, const DataSet& dataset);
+    ~BarcodeQuery(void);
 
 public:
-    FilterEngine(void);
-
-public:
-    // returns true if record passes filter
-    bool Accepts(const BamRecord& r) const;
-
-    // removes records that do not pass filter, returns true if !empty()
-    bool Accepts(std::vector<BamRecord>& r) const;
+    bool GetNext(BamRecord& r);
 
 private:
-
+    struct BarcodeQueryPrivate;
+    std::unique_ptr<BarcodeQueryPrivate> d_;
 };
 
-} // namespace internal
 } // namespace BAM
 } // namespace PacBio
 
-#endif // FILTERENGINE_H
+#endif // BARCODEQUERY_H

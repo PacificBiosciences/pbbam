@@ -46,8 +46,8 @@
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/PbiBuilder.h>
 #include <pbbam/PbiIndex.h>
+#include <pbbam/PbiLookupData.h>
 #include <pbbam/PbiRawData.h>
-#include <pbbam/internal/PbiIndex_p.h>
 #include <string>
 #include <cstdio>
 #include <cstdlib>
@@ -142,15 +142,15 @@ void ExpectRawIndicesEqual(const PbiRawData& expected, const PbiRawData& actual)
     if (expected.HasBarcodeData() && actual.HasBarcodeData()) {
         const PbiRawBarcodeData& e = expected.BarcodeData();
         const PbiRawBarcodeData& a = actual.BarcodeData();
-        EXPECT_EQ(e.bcLeft_,   a.bcLeft_);
-        EXPECT_EQ(e.bcRight_,  a.bcRight_);
+        EXPECT_EQ(e.bcForward_,   a.bcForward_);
+        EXPECT_EQ(e.bcReverse_,  a.bcReverse_);
         EXPECT_EQ(e.bcQual_,   a.bcQual_);
     }
 }
 
 static
-bool BasicLookupsEqual(const internal::BasicLookupData& lhs,
-                         const internal::BasicLookupData& rhs)
+bool BasicLookupsEqual(const BasicLookupData& lhs,
+                         const BasicLookupData& rhs)
 {
     return (lhs.rgId_ == rhs.rgId_ &&
             lhs.qStart_ == rhs.qStart_ &&
@@ -162,8 +162,8 @@ bool BasicLookupsEqual(const internal::BasicLookupData& lhs,
 }
 
 static
-bool MappedLookupsEqual(const internal::MappedLookupData& lhs,
-                        const internal::MappedLookupData& rhs)
+bool MappedLookupsEqual(const MappedLookupData& lhs,
+                        const MappedLookupData& rhs)
 {
     return (lhs.tId_ == rhs.tId_ &&
             lhs.tStart_ == rhs.tStart_ &&
@@ -178,18 +178,18 @@ bool MappedLookupsEqual(const internal::MappedLookupData& lhs,
 }
 
 static
-bool ReferenceLookupsEqual(const internal::ReferenceLookupData& lhs,
-                           const internal::ReferenceLookupData& rhs)
+bool ReferenceLookupsEqual(const ReferenceLookupData& lhs,
+                           const ReferenceLookupData& rhs)
 {
     return lhs.references_ == rhs.references_;
 }
 
 static
-bool BarcodeLookupsEqual(const internal::BarcodeLookupData& lhs,
-                         const internal::BarcodeLookupData& rhs)
+bool BarcodeLookupsEqual(const BarcodeLookupData& lhs,
+                         const BarcodeLookupData& rhs)
 {
-    return (lhs.bcLeft_ == rhs.bcLeft_ &&
-            lhs.bcRight_ == rhs.bcRight_ &&
+    return (lhs.bcForward_ == rhs.bcForward_ &&
+            lhs.bcReverse_ == rhs.bcReverse_ &&
             lhs.bcQual_ == rhs.bcQual_);
 }
 
@@ -316,7 +316,7 @@ TEST(PacBioIndexTest, LookupLoadFromFileOk)
     {
         PbiIndex index(bamFile.PacBioIndexFilename());
         EXPECT_EQ(4, index.NumReads());
-        EXPECT_EQ(vector<int64_t>({ 35651584, 35655125, 35667128, 35679170 }), index.VirtualFileOffsets());
+        EXPECT_EQ(vector<int64_t>({ 35651584, 35655125, 35667128, 35679170 }), index.BasicData().VirtualFileOffsets());
     });
 }
 
@@ -360,11 +360,10 @@ TEST(PacBioIndexTest, Copy_and_Move)
 
 TEST(PacBioIndexTest, OrderedLookup)
 {
-    using PacBio::BAM::CompareType;
     using PacBio::BAM::IndexList;
-    using PacBio::BAM::internal::OrderedLookup;
+    using PacBio::BAM::OrderedLookup;
 
-    OrderedLookup<int>::ContainerType oRawData;
+    OrderedLookup<int>::container_type oRawData;
     oRawData[11] = { 0, 3, 4 };
     oRawData[20] = { 1 };
     oRawData[42] = { 2, 7, 8 };
@@ -375,51 +374,50 @@ TEST(PacBioIndexTest, OrderedLookup)
     OrderedLookup<int> oLookup(oRawData);
 
     // EQUAL
-    EXPECT_EQ(IndexList({5}),       oLookup.LookupIndices(10, CompareType::EQUAL));
-    EXPECT_EQ(IndexList({0, 3, 4}), oLookup.LookupIndices(11, CompareType::EQUAL));
-    EXPECT_EQ(IndexList({6}),       oLookup.LookupIndices(12, CompareType::EQUAL));
-    EXPECT_EQ(IndexList({1}),       oLookup.LookupIndices(20, CompareType::EQUAL));
-    EXPECT_EQ(IndexList({2, 7, 8}), oLookup.LookupIndices(42, CompareType::EQUAL));
-    EXPECT_EQ(IndexList({9}),       oLookup.LookupIndices(99, CompareType::EQUAL));
-    EXPECT_EQ(IndexList(),          oLookup.LookupIndices(66, CompareType::EQUAL)); // does not exist
+    EXPECT_EQ(IndexList({5}),       oLookup.LookupIndices(10, Compare::EQUAL));
+    EXPECT_EQ(IndexList({0, 3, 4}), oLookup.LookupIndices(11, Compare::EQUAL));
+    EXPECT_EQ(IndexList({6}),       oLookup.LookupIndices(12, Compare::EQUAL));
+    EXPECT_EQ(IndexList({1}),       oLookup.LookupIndices(20, Compare::EQUAL));
+    EXPECT_EQ(IndexList({2, 7, 8}), oLookup.LookupIndices(42, Compare::EQUAL));
+    EXPECT_EQ(IndexList({9}),       oLookup.LookupIndices(99, Compare::EQUAL));
+    EXPECT_EQ(IndexList(),          oLookup.LookupIndices(66, Compare::EQUAL)); // does not exist
 
     // NOT_EQUAL
-    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 6, 7, 8, 9}),    oLookup.LookupIndices(10, CompareType::NOT_EQUAL));
-    EXPECT_EQ(IndexList({1, 2, 5, 6, 7, 8, 9}),          oLookup.LookupIndices(11, CompareType::NOT_EQUAL));
-    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 5, 7, 8, 9}),    oLookup.LookupIndices(12, CompareType::NOT_EQUAL));
-    EXPECT_EQ(IndexList({0, 2, 3, 4, 5, 6, 7, 8, 9}),    oLookup.LookupIndices(20, CompareType::NOT_EQUAL));
-    EXPECT_EQ(IndexList({0, 1, 3, 4, 5, 6, 9}),          oLookup.LookupIndices(42, CompareType::NOT_EQUAL));
-    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 5, 6, 7, 8}),    oLookup.LookupIndices(99, CompareType::NOT_EQUAL));
-    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}), oLookup.LookupIndices(66, CompareType::NOT_EQUAL)); // does not exist
+    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 6, 7, 8, 9}),    oLookup.LookupIndices(10, Compare::NOT_EQUAL));
+    EXPECT_EQ(IndexList({1, 2, 5, 6, 7, 8, 9}),          oLookup.LookupIndices(11, Compare::NOT_EQUAL));
+    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 5, 7, 8, 9}),    oLookup.LookupIndices(12, Compare::NOT_EQUAL));
+    EXPECT_EQ(IndexList({0, 2, 3, 4, 5, 6, 7, 8, 9}),    oLookup.LookupIndices(20, Compare::NOT_EQUAL));
+    EXPECT_EQ(IndexList({0, 1, 3, 4, 5, 6, 9}),          oLookup.LookupIndices(42, Compare::NOT_EQUAL));
+    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 5, 6, 7, 8}),    oLookup.LookupIndices(99, Compare::NOT_EQUAL));
+    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}), oLookup.LookupIndices(66, Compare::NOT_EQUAL)); // does not exist
 
     // LESS_THAN
-    EXPECT_EQ(IndexList({0, 3, 4, 5, 6}), oLookup.LookupIndices(13, CompareType::LESS_THAN));
-    EXPECT_EQ(IndexList({0, 3, 4, 5}),    oLookup.LookupIndices(12, CompareType::LESS_THAN));
+    EXPECT_EQ(IndexList({0, 3, 4, 5, 6}), oLookup.LookupIndices(13, Compare::LESS_THAN));
+    EXPECT_EQ(IndexList({0, 3, 4, 5}),    oLookup.LookupIndices(12, Compare::LESS_THAN));
     // do more checks
 
     // LESS_THAN_EQUAL
-    EXPECT_EQ(IndexList({0, 3, 4, 5, 6}), oLookup.LookupIndices(13, CompareType::LESS_THAN_EQUAL));
-    EXPECT_EQ(IndexList({0, 3, 4, 5, 6}), oLookup.LookupIndices(12, CompareType::LESS_THAN_EQUAL));
+    EXPECT_EQ(IndexList({0, 3, 4, 5, 6}), oLookup.LookupIndices(13, Compare::LESS_THAN_EQUAL));
+    EXPECT_EQ(IndexList({0, 3, 4, 5, 6}), oLookup.LookupIndices(12, Compare::LESS_THAN_EQUAL));
     // more checks?
 
     // GREATER_THAN
-    EXPECT_EQ(IndexList({2,7,8,9}), oLookup.LookupIndices(41, CompareType::GREATER_THAN));
-    EXPECT_EQ(IndexList({9}),       oLookup.LookupIndices(42, CompareType::GREATER_THAN));
+    EXPECT_EQ(IndexList({2,7,8,9}), oLookup.LookupIndices(41, Compare::GREATER_THAN));
+    EXPECT_EQ(IndexList({9}),       oLookup.LookupIndices(42, Compare::GREATER_THAN));
     // more checks?
 
     // GREATER_THAN_EQUAL
-    EXPECT_EQ(IndexList({2,7,8,9}), oLookup.LookupIndices(41, CompareType::GREATER_THAN_EQUAL));
-    EXPECT_EQ(IndexList({2,7,8,9}), oLookup.LookupIndices(42, CompareType::GREATER_THAN_EQUAL));
+    EXPECT_EQ(IndexList({2,7,8,9}), oLookup.LookupIndices(41, Compare::GREATER_THAN_EQUAL));
+    EXPECT_EQ(IndexList({2,7,8,9}), oLookup.LookupIndices(42, Compare::GREATER_THAN_EQUAL));
     // more checks?
 }
 
 TEST(PacBioIndexTest, UnorderedLookup)
 {
-    using PacBio::BAM::CompareType;
     using PacBio::BAM::IndexList;
-    using PacBio::BAM::internal::UnorderedLookup;
+    using PacBio::BAM::UnorderedLookup;
 
-    UnorderedLookup<int>::ContainerType uRawData;
+    UnorderedLookup<int>::container_type uRawData;
     uRawData[11] = { 0, 3, 4 };
     uRawData[20] = { 1 };
     uRawData[42] = { 2, 7, 8 };
@@ -430,54 +428,53 @@ TEST(PacBioIndexTest, UnorderedLookup)
     UnorderedLookup<int> uLookup(uRawData);
 
     // EQUAL
-    EXPECT_EQ(IndexList({5}),       uLookup.LookupIndices(10, CompareType::EQUAL));
-    EXPECT_EQ(IndexList({0, 3, 4}), uLookup.LookupIndices(11, CompareType::EQUAL));
-    EXPECT_EQ(IndexList({6}),       uLookup.LookupIndices(12, CompareType::EQUAL));
-    EXPECT_EQ(IndexList({1}),       uLookup.LookupIndices(20, CompareType::EQUAL));
-    EXPECT_EQ(IndexList({2, 7, 8}), uLookup.LookupIndices(42, CompareType::EQUAL));
-    EXPECT_EQ(IndexList({9}),       uLookup.LookupIndices(99, CompareType::EQUAL));
-    EXPECT_EQ(IndexList(),          uLookup.LookupIndices(66, CompareType::EQUAL)); // does not exist
+    EXPECT_EQ(IndexList({5}),       uLookup.LookupIndices(10, Compare::EQUAL));
+    EXPECT_EQ(IndexList({0, 3, 4}), uLookup.LookupIndices(11, Compare::EQUAL));
+    EXPECT_EQ(IndexList({6}),       uLookup.LookupIndices(12, Compare::EQUAL));
+    EXPECT_EQ(IndexList({1}),       uLookup.LookupIndices(20, Compare::EQUAL));
+    EXPECT_EQ(IndexList({2, 7, 8}), uLookup.LookupIndices(42, Compare::EQUAL));
+    EXPECT_EQ(IndexList({9}),       uLookup.LookupIndices(99, Compare::EQUAL));
+    EXPECT_EQ(IndexList(),          uLookup.LookupIndices(66, Compare::EQUAL)); // does not exist
 
     // NOT_EQUAL
-    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 6, 7, 8, 9}),    uLookup.LookupIndices(10, CompareType::NOT_EQUAL));
-    EXPECT_EQ(IndexList({1, 2, 5, 6, 7, 8, 9}),          uLookup.LookupIndices(11, CompareType::NOT_EQUAL));
-    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 5, 7, 8, 9}),    uLookup.LookupIndices(12, CompareType::NOT_EQUAL));
-    EXPECT_EQ(IndexList({0, 2, 3, 4, 5, 6, 7, 8, 9}),    uLookup.LookupIndices(20, CompareType::NOT_EQUAL));
-    EXPECT_EQ(IndexList({0, 1, 3, 4, 5, 6, 9}),          uLookup.LookupIndices(42, CompareType::NOT_EQUAL));
-    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 5, 6, 7, 8}),    uLookup.LookupIndices(99, CompareType::NOT_EQUAL));
-    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}), uLookup.LookupIndices(66, CompareType::NOT_EQUAL)); // does not exist
+    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 6, 7, 8, 9}),    uLookup.LookupIndices(10, Compare::NOT_EQUAL));
+    EXPECT_EQ(IndexList({1, 2, 5, 6, 7, 8, 9}),          uLookup.LookupIndices(11, Compare::NOT_EQUAL));
+    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 5, 7, 8, 9}),    uLookup.LookupIndices(12, Compare::NOT_EQUAL));
+    EXPECT_EQ(IndexList({0, 2, 3, 4, 5, 6, 7, 8, 9}),    uLookup.LookupIndices(20, Compare::NOT_EQUAL));
+    EXPECT_EQ(IndexList({0, 1, 3, 4, 5, 6, 9}),          uLookup.LookupIndices(42, Compare::NOT_EQUAL));
+    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 5, 6, 7, 8}),    uLookup.LookupIndices(99, Compare::NOT_EQUAL));
+    EXPECT_EQ(IndexList({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}), uLookup.LookupIndices(66, Compare::NOT_EQUAL)); // does not exist
 
     // LESS_THAN
-    EXPECT_EQ(IndexList({0, 3, 4, 5, 6}), uLookup.LookupIndices(13, CompareType::LESS_THAN));
-    EXPECT_EQ(IndexList({0, 3, 4, 5}),    uLookup.LookupIndices(12, CompareType::LESS_THAN));
+    EXPECT_EQ(IndexList({0, 3, 4, 5, 6}), uLookup.LookupIndices(13, Compare::LESS_THAN));
+    EXPECT_EQ(IndexList({0, 3, 4, 5}),    uLookup.LookupIndices(12, Compare::LESS_THAN));
     // more checks?
 
     // LESS_THAN_EQUAL
-    EXPECT_EQ(IndexList({0, 3, 4, 5, 6}), uLookup.LookupIndices(13, CompareType::LESS_THAN_EQUAL));
-    EXPECT_EQ(IndexList({0, 3, 4, 5, 6}), uLookup.LookupIndices(12, CompareType::LESS_THAN_EQUAL));
+    EXPECT_EQ(IndexList({0, 3, 4, 5, 6}), uLookup.LookupIndices(13, Compare::LESS_THAN_EQUAL));
+    EXPECT_EQ(IndexList({0, 3, 4, 5, 6}), uLookup.LookupIndices(12, Compare::LESS_THAN_EQUAL));
     // more checks?
 
     // GREATER_THAN
-    EXPECT_EQ(IndexList({2,7,8,9}), uLookup.LookupIndices(41, CompareType::GREATER_THAN));
-    EXPECT_EQ(IndexList({9}),       uLookup.LookupIndices(42, CompareType::GREATER_THAN));
+    EXPECT_EQ(IndexList({2,7,8,9}), uLookup.LookupIndices(41, Compare::GREATER_THAN));
+    EXPECT_EQ(IndexList({9}),       uLookup.LookupIndices(42, Compare::GREATER_THAN));
     // more checks?
 
     // GREATER_THAN_EQUAL
-    EXPECT_EQ(uLookup.LookupIndices(41, CompareType::GREATER_THAN_EQUAL), IndexList({2,7,8,9}));
-    EXPECT_EQ(uLookup.LookupIndices(42, CompareType::GREATER_THAN_EQUAL), IndexList({2,7,8,9}));
+    EXPECT_EQ(uLookup.LookupIndices(41, Compare::GREATER_THAN_EQUAL), IndexList({2,7,8,9}));
+    EXPECT_EQ(uLookup.LookupIndices(42, Compare::GREATER_THAN_EQUAL), IndexList({2,7,8,9}));
     // more checks?
 }
 
 TEST(PacBioIndexTest, MergeBlocks)
 {
-    using PacBio::BAM::CompareType;
     using PacBio::BAM::IndexList;
     using PacBio::BAM::IndexResultBlock;
     using PacBio::BAM::IndexResultBlocks;
-    using PacBio::BAM::internal::mergedIndexBlocks;
-    using PacBio::BAM::internal::OrderedLookup;
+    using PacBio::BAM::mergedIndexBlocks;
+    using PacBio::BAM::OrderedLookup;
 
-    OrderedLookup<int>::ContainerType oRawData;
+    OrderedLookup<int>::container_type oRawData;
     oRawData[11] = { 0, 3, 4 };
     oRawData[20] = { 1 };
     oRawData[42] = { 2, 7, 8 };
@@ -488,82 +485,81 @@ TEST(PacBioIndexTest, MergeBlocks)
     OrderedLookup<int> oLookup(oRawData);
 
     // EQUAL
-    auto mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(10, CompareType::EQUAL));
+    auto mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(10, Compare::EQUAL));
     EXPECT_EQ(1, mergedBlocks.size());
     EXPECT_EQ(IndexResultBlock(5, 1), mergedBlocks.at(0));
 
-    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(11, CompareType::EQUAL));
+    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(11, Compare::EQUAL));
     EXPECT_EQ(2, mergedBlocks.size());
     EXPECT_EQ(IndexResultBlock(0, 1), mergedBlocks.at(0));
     EXPECT_EQ(IndexResultBlock(3, 2), mergedBlocks.at(1));
 
-    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(12, CompareType::EQUAL));
+    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(12, Compare::EQUAL));
     EXPECT_EQ(1, mergedBlocks.size());
     EXPECT_EQ(IndexResultBlock(6, 1), mergedBlocks.at(0));
 
-    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(20, CompareType::EQUAL));
+    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(20, Compare::EQUAL));
     EXPECT_EQ(1, mergedBlocks.size());
     EXPECT_EQ(IndexResultBlock(1, 1), mergedBlocks.at(0));
 
-    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(42, CompareType::EQUAL));
+    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(42, Compare::EQUAL));
     EXPECT_EQ(2, mergedBlocks.size());
     EXPECT_EQ(IndexResultBlock(2, 1), mergedBlocks.at(0));
     EXPECT_EQ(IndexResultBlock(7, 2), mergedBlocks.at(1));
 
-    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(99, CompareType::EQUAL));
+    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(99, Compare::EQUAL));
     EXPECT_EQ(1, mergedBlocks.size());
     EXPECT_EQ(IndexResultBlock(9, 1), mergedBlocks.at(0));
 
-    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(66, CompareType::EQUAL));
+    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(66, Compare::EQUAL));
     EXPECT_TRUE(mergedBlocks.empty());
 
     // NOT_EQUAL
-    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(10, CompareType::NOT_EQUAL));
+    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(10, Compare::NOT_EQUAL));
     EXPECT_EQ(2, mergedBlocks.size());
     EXPECT_EQ(IndexResultBlock(0, 5), mergedBlocks.at(0));
     EXPECT_EQ(IndexResultBlock(6, 4), mergedBlocks.at(1));
 
-    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(11, CompareType::NOT_EQUAL));
+    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(11, Compare::NOT_EQUAL));
     EXPECT_EQ(2, mergedBlocks.size());
     EXPECT_EQ(IndexResultBlock(1, 2), mergedBlocks.at(0));
     EXPECT_EQ(IndexResultBlock(5, 5), mergedBlocks.at(1));
 
-    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(12, CompareType::NOT_EQUAL));
+    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(12, Compare::NOT_EQUAL));
     EXPECT_EQ(2, mergedBlocks.size());
     EXPECT_EQ(IndexResultBlock(0, 6), mergedBlocks.at(0));
     EXPECT_EQ(IndexResultBlock(7, 3), mergedBlocks.at(1));
 
-    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(20, CompareType::NOT_EQUAL));
+    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(20, Compare::NOT_EQUAL));
     EXPECT_EQ(2, mergedBlocks.size());
     EXPECT_EQ(IndexResultBlock(0, 1), mergedBlocks.at(0));
     EXPECT_EQ(IndexResultBlock(2, 8), mergedBlocks.at(1));
 
-    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(42, CompareType::NOT_EQUAL));
+    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(42, Compare::NOT_EQUAL));
     EXPECT_EQ(3, mergedBlocks.size());
     EXPECT_EQ(IndexResultBlock(0, 2), mergedBlocks.at(0));
     EXPECT_EQ(IndexResultBlock(3, 4), mergedBlocks.at(1));
     EXPECT_EQ(IndexResultBlock(9, 1), mergedBlocks.at(2));
 
-    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(99, CompareType::NOT_EQUAL));
+    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(99, Compare::NOT_EQUAL));
     EXPECT_EQ(1, mergedBlocks.size());
     EXPECT_EQ(IndexResultBlock(0, 9), mergedBlocks.at(0));
 
-    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(66, CompareType::NOT_EQUAL));
+    mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(66, Compare::NOT_EQUAL));
     EXPECT_EQ(1, mergedBlocks.size());
     EXPECT_EQ(IndexResultBlock(0, 10), mergedBlocks.at(0));
 }
 
 TEST(PacBioIndexTest, ApplyOffsetsToBlocks)
 {
-    using PacBio::BAM::CompareType;
+    using PacBio::BAM::BasicLookupData;
     using PacBio::BAM::IndexList;
     using PacBio::BAM::IndexResultBlock;
     using PacBio::BAM::IndexResultBlocks;
-    using PacBio::BAM::internal::mergedIndexBlocks;
-    using PacBio::BAM::internal::OrderedLookup;
-    using PacBio::BAM::internal::BasicLookupData;
+    using PacBio::BAM::mergedIndexBlocks;
+    using PacBio::BAM::OrderedLookup;
 
-    OrderedLookup<int>::ContainerType oRawData;
+    OrderedLookup<int>::container_type oRawData;
     oRawData[11] = { 0, 3, 4 };
     oRawData[20] = { 1 };
     oRawData[42] = { 2, 7, 8 };
@@ -572,15 +568,15 @@ TEST(PacBioIndexTest, ApplyOffsetsToBlocks)
     oRawData[99] = { 9 };
 
     OrderedLookup<int> oLookup(oRawData);
-    auto mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(10, CompareType::NOT_EQUAL));
+    auto mergedBlocks = mergedIndexBlocks(oLookup.LookupIndices(10, Compare::NOT_EQUAL));
 
     EXPECT_EQ(2, mergedBlocks.size());
     EXPECT_EQ(IndexResultBlock(0, 5), mergedBlocks.at(0));
     EXPECT_EQ(IndexResultBlock(6, 4), mergedBlocks.at(1));
 
-    BasicLookupData subreadIndex;
-    subreadIndex.fileOffset_ = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 };
-    subreadIndex.ApplyOffsets(mergedBlocks);
+    BasicLookupData basicLookupData;
+    basicLookupData.fileOffset_ = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 };
+    basicLookupData.ApplyOffsets(mergedBlocks);
 
     EXPECT_EQ(2,  mergedBlocks.size());
     EXPECT_EQ(0,  mergedBlocks.at(0).virtualOffset_);
@@ -591,16 +587,14 @@ TEST(PacBioIndexTest, ApplyOffsetsToBlocks)
 
 TEST(PacBioIndexTest, LookupMulti)
 {
-    using PacBio::BAM::CompareType;
+    using PacBio::BAM::BasicLookupData;
     using PacBio::BAM::IndexList;
     using PacBio::BAM::IndexResultBlock;
     using PacBio::BAM::IndexResultBlocks;
-    using PacBio::BAM::SubreadField;
-    using PacBio::BAM::internal::mergedIndexBlocks;
-    using PacBio::BAM::internal::BasicLookupData;
-    using PacBio::BAM::internal::UnorderedLookup;
+    using PacBio::BAM::mergedIndexBlocks;
+    using PacBio::BAM::UnorderedLookup;
 
-    UnorderedLookup<int32_t>::ContainerType uRawData;
+    UnorderedLookup<int32_t>::container_type uRawData;
     uRawData[11] = { 0, 3, 4 };
     uRawData[20] = { 1 };
     uRawData[42] = { 2, 7, 8 };
@@ -608,15 +602,15 @@ TEST(PacBioIndexTest, LookupMulti)
     uRawData[12] = { 6 };
     uRawData[99] = { 9 };
 
-    BasicLookupData subreadIndex;
-    subreadIndex.rgId_ = UnorderedLookup<int32_t>(uRawData);
-    subreadIndex.fileOffset_ = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 };
+    BasicLookupData basicLookup;
+    basicLookup.rgId_ = UnorderedLookup<int32_t>(uRawData);
+    basicLookup.fileOffset_ = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 };
 
     const std::vector<int32_t> whitelist = { 11, 42, 20 };
-    const auto indices = subreadIndex.IndicesMulti(SubreadField::RG_ID, whitelist);
+    const auto indices = basicLookup.IndicesMulti(BasicLookupData::RG_ID, whitelist);
 
     IndexResultBlocks mergedBlocks = mergedIndexBlocks(indices);
-    subreadIndex.ApplyOffsets(mergedBlocks);
+    basicLookup.ApplyOffsets(mergedBlocks);
 
     EXPECT_EQ(IndexList({0, 3, 4, 2, 7, 8, 1}), indices);
     EXPECT_EQ(2, mergedBlocks.size());
@@ -635,27 +629,40 @@ TEST(PacBioIndexTest, LookupMulti)
 TEST(PacBioIndexTest, LookupAPI)
 {
     const PbiIndex index(test2BamFn + ".pbi");
+    const BasicLookupData& basicData = index.BasicData();
+    const MappedLookupData& mappedData = index.MappedData();
+    const BarcodeLookupData& barcodeData = index.BarcodeData();
 
     // rgId == x
-    const IndexResultBlocks rgResult = index.Lookup(ReadGroupIndexRequest(-1197849594));
+    IndexResultBlocks rgResult = mergedIndexBlocks(basicData.Indices(BasicLookupData::RG_ID, -1197849594));
+    basicData.ApplyOffsets(rgResult);
     EXPECT_EQ(1, rgResult.size());
     EXPECT_EQ(0, rgResult.at(0).firstIndex_);
     EXPECT_EQ(4, rgResult.at(0).numReads_);
     EXPECT_EQ(35651584, rgResult.at(0).virtualOffset_);
 
     // rg != x
-    const IndexResultBlocks notRgResult = index.Lookup(ReadGroupIndexRequest(-1197849594, CompareType::NOT_EQUAL));
+    IndexResultBlocks notRgResult = mergedIndexBlocks(basicData.Indices(BasicLookupData::RG_ID,
+                                                                          -1197849594,
+                                                                          Compare::NOT_EQUAL));
+    basicData.ApplyOffsets(notRgResult);
     EXPECT_TRUE(notRgResult.empty());
 
     // tEnd <= x
-    const IndexResultBlocks tEndLteResult = index.Lookup(ReferenceEndIndexRequest(9900, CompareType::LESS_THAN_EQUAL));
+    IndexResultBlocks tEndLteResult = mergedIndexBlocks(mappedData.Indices(MappedLookupData::T_END,
+                                                                            9900,
+                                                                            Compare::LESS_THAN_EQUAL));
+    basicData.ApplyOffsets(tEndLteResult);
     EXPECT_EQ(1, tEndLteResult.size());
     EXPECT_EQ(2, tEndLteResult.at(0).firstIndex_);
     EXPECT_EQ(2, tEndLteResult.at(0).numReads_);
     EXPECT_EQ(35667128, tEndLteResult.at(0).virtualOffset_);
 
     // tEnd >= x
-    const IndexResultBlocks tEndGteResult = index.Lookup(ReferenceEndIndexRequest(9900, CompareType::GREATER_THAN_EQUAL));
+    IndexResultBlocks tEndGteResult = mergedIndexBlocks(mappedData.Indices(MappedLookupData::T_END,
+                                                                           9900,
+                                                                           Compare::GREATER_THAN_EQUAL));
+    basicData.ApplyOffsets(tEndGteResult);
     EXPECT_EQ(2, tEndGteResult.size());
     EXPECT_EQ(0, tEndGteResult.at(0).firstIndex_);
     EXPECT_EQ(2, tEndGteResult.at(0).numReads_);
@@ -665,7 +672,9 @@ TEST(PacBioIndexTest, LookupAPI)
     EXPECT_EQ(35679170, tEndGteResult.at(1).virtualOffset_);
 
     // strand query
-    const IndexResultBlocks forward = index.Lookup(StrandIndexRequest(Strand::FORWARD));
+    IndexResultBlocks forward = mergedIndexBlocks(mappedData.Indices(MappedLookupData::STRAND,
+                                                                     Strand::FORWARD));
+    basicData.ApplyOffsets(forward);
     EXPECT_EQ(2, forward.size());
     EXPECT_EQ(0, forward.at(0).firstIndex_);
     EXPECT_EQ(1, forward.at(0).numReads_);
@@ -674,7 +683,9 @@ TEST(PacBioIndexTest, LookupAPI)
     EXPECT_EQ(1, forward.at(1).numReads_);
     EXPECT_EQ(35667128, forward.at(1).virtualOffset_);
 
-    const IndexResultBlocks reverse = index.Lookup(StrandIndexRequest(Strand::REVERSE));
+    IndexResultBlocks reverse = mergedIndexBlocks(mappedData.Indices(MappedLookupData::STRAND,
+                                                                     Strand::REVERSE));
+    basicData.ApplyOffsets(reverse);
     EXPECT_EQ(2, reverse.size());
     EXPECT_EQ(1, reverse.at(0).firstIndex_);
     EXPECT_EQ(1, reverse.at(0).numReads_);
@@ -684,7 +695,10 @@ TEST(PacBioIndexTest, LookupAPI)
     EXPECT_EQ(35679170, reverse.at(1).virtualOffset_);
 
     // query data field that is not in the PBI
-    const IndexResultBlocks missing = index.Lookup(BarcodeQualityIndexRequest(77, CompareType::GREATER_THAN));
+    IndexResultBlocks missing = mergedIndexBlocks(barcodeData.Indices(BarcodeLookupData::BC_QUALITY,
+                                                                      77,
+                                                                      Compare::GREATER_THAN));
+    basicData.ApplyOffsets(missing);
     EXPECT_TRUE(missing.empty());
 }
 
@@ -693,9 +707,13 @@ TEST(PacBioIndexTest, LookupByZmw)
     BamFile f(tests::Data_Dir + "/dataset/bam_mapping.bam");
     f.EnsurePacBioIndexExists();
 
-    PbiIndex index(f.PacBioIndexFilename());
+    const PbiIndex index(f.PacBioIndexFilename());
+    const BasicLookupData& basicData = index.BasicData();
 
-    const IndexResultBlocks blocks = index.Lookup(ZmwIndexRequest(20000, CompareType::LESS_THAN));
+    IndexResultBlocks blocks =  mergedIndexBlocks(basicData.Indices(BasicLookupData::ZMW,
+                                                                      20000,
+                                                                      Compare::LESS_THAN));
+    basicData.ApplyOffsets(blocks);
     EXPECT_EQ(14, blocks.size());
 
     //
@@ -744,11 +762,12 @@ TEST(PacBioIndexTest, LookupMultiZmw)
     BamFile f(tests::Data_Dir + "/dataset/bam_mapping.bam");
     f.EnsurePacBioIndexExists();
 
-    PbiIndex index(f.PacBioIndexFilename());
+    const PbiIndex index(f.PacBioIndexFilename());
+    const BasicLookupData& basicData = index.BasicData();
 
     const std::vector<int32_t> whitelist = { 13473, 38025 };
-    const ZmwIndexMultiRequest request(whitelist);
-    const IndexResultBlocks& blocks = index.Lookup(request);
+    IndexResultBlocks blocks = mergedIndexBlocks(basicData.IndicesMulti(BasicLookupData::ZMW, whitelist));
+    basicData.ApplyOffsets(blocks);
 
     EXPECT_EQ(3, blocks.size());
 

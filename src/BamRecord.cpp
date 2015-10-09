@@ -57,7 +57,7 @@ namespace internal {
 static const string tagName_alternative_labelQV     = "pv";
 static const string tagName_alternative_labelTag    = "pt";
 static const string tagName_barcodes                = "bc";
-static const string tagName_barcode_quality        = "bq";
+static const string tagName_barcode_quality         = "bq";
 static const string tagName_contextFlags            = "cx";
 static const string tagName_holeNumber              = "zm";
 static const string tagName_deletionQV              = "dq";
@@ -511,6 +511,12 @@ BamRecord& BamRecord::AltLabelTag(const std::string& tags)
     internal::CreateOrEdit(internal::tagName_alternative_labelTag, tags, &impl_);
     return *this;
 }
+
+uint16_t BamRecord::BarcodeForward(void) const
+{ return Barcodes().first; }
+
+uint16_t BamRecord::BarcodeReverse(void) const
+{ return Barcodes().second; }
 
 uint8_t BamRecord::BarcodeQuality(void) const
 {
@@ -1265,6 +1271,26 @@ BamRecord& BamRecord::IPD(const Frames& frames,
     return *this;
 }
 
+size_t BamRecord::NumDeletedBases(void) const
+{
+    auto tEnd = ReferenceEnd();
+    auto tStart = ReferenceStart();
+    auto numMatchesAndMismatches = NumMatchesAndMismatches();
+    auto nM = numMatchesAndMismatches.first;
+    auto nMM = numMatchesAndMismatches.second;
+    return (tEnd - tStart - nM - nMM);
+}
+
+size_t BamRecord::NumInsertedBases(void) const
+{
+    auto aEnd = AlignedEnd();
+    auto aStart = AlignedStart();
+    auto numMatchesAndMismatches = NumMatchesAndMismatches();
+    auto nM = numMatchesAndMismatches.first;
+    auto nMM = numMatchesAndMismatches.second;
+    return (aEnd - aStart - nM - nMM);
+}
+
 size_t BamRecord::NumMatches(void) const
 {
     return NumMatchesAndMismatches().first;
@@ -1687,6 +1713,10 @@ BamRecord& BamRecord::ReadGroupId(const std::string& id)
    UpdateName();
    return *this;
 }
+
+int32_t BamRecord::ReadGroupNumericId(void) const
+{ return ReadGroupInfo::IdToInt(ReadGroupId()); }
+
 
 Position BamRecord::ReferenceEnd(void) const
 {

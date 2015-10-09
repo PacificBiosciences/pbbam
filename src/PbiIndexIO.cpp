@@ -85,15 +85,15 @@ void PbiIndexIO::LoadBarcodeData(PbiRawBarcodeData& barcodeData,
                                  BGZF* fp)
 {
     assert(numReads > 0);
+    (void)numReads; // quash warnings building in release mode
 
-    LoadBgzfVector(fp, barcodeData.bcLeft_,   numReads);
-    LoadBgzfVector(fp, barcodeData.bcRight_,  numReads);
-    LoadBgzfVector(fp, barcodeData.bcQual_,   numReads);
+    LoadBgzfVector(fp, barcodeData.bcForward_, numReads);
+    LoadBgzfVector(fp, barcodeData.bcReverse_, numReads);
+    LoadBgzfVector(fp, barcodeData.bcQual_,    numReads);
 
-
-    assert(barcodeData.bcLeft_.size()   == numReads);
-    assert(barcodeData.bcRight_.size()  == numReads);
-    assert(barcodeData.bcQual_.size()   == numReads);
+    assert(barcodeData.bcForward_.size() == numReads);
+    assert(barcodeData.bcReverse_.size() == numReads);
+    assert(barcodeData.bcQual_.size()    == numReads);
 }
 
 void PbiIndexIO::LoadHeader(PbiRawData& index,
@@ -136,6 +136,7 @@ void PbiIndexIO::LoadMappedData(PbiRawMappedData& mappedData,
                                 BGZF* fp)
 {
     assert(numReads > 0);
+    (void)numReads; // quash warnings building in release mode
 
     LoadBgzfVector(fp, mappedData.tId_,       numReads);
     LoadBgzfVector(fp, mappedData.tStart_,    numReads);
@@ -191,6 +192,7 @@ void PbiIndexIO::LoadBasicData(PbiRawBasicData& basicData,
                                  BGZF* fp)
 {
     assert(numReads > 0);
+    (void)numReads; // quash warnings building in release mode
 
     LoadBgzfVector(fp, basicData.rgId_,       numReads);
     LoadBgzfVector(fp, basicData.qStart_,     numReads);
@@ -236,12 +238,13 @@ void PbiIndexIO::WriteBarcodeData(const PbiRawBarcodeData& barcodeData,
                                   BGZF* fp)
 {
     assert(numReads > 0);
-    assert(barcodeData.bcLeft_.size()   == numReads);
-    assert(barcodeData.bcRight_.size()  == numReads);
-    assert(barcodeData.bcQual_.size()   == numReads);
+    assert(barcodeData.bcForward_.size()   == numReads);
+    assert(barcodeData.bcReverse_.size()   == numReads);
+    assert(barcodeData.bcQual_.size()      == numReads);
+    (void)numReads; // quash warnings building in release mode
 
-    WriteBgzfVector(fp, barcodeData.bcLeft_);
-    WriteBgzfVector(fp, barcodeData.bcRight_);
+    WriteBgzfVector(fp, barcodeData.bcForward_);
+    WriteBgzfVector(fp, barcodeData.bcReverse_);
     WriteBgzfVector(fp, barcodeData.bcQual_);
 }
 
@@ -285,6 +288,7 @@ void PbiIndexIO::WriteMappedData(const PbiRawMappedData& mappedData,
     assert(mappedData.nM_.size()        == numReads);
     assert(mappedData.nMM_.size()       == numReads);
     assert(mappedData.mapQV_.size()     == numReads);
+    (void)numReads; // quash warnings building in release mode
 
     WriteBgzfVector(fp, mappedData.tId_);
     WriteBgzfVector(fp, mappedData.tStart_);
@@ -335,6 +339,7 @@ void PbiIndexIO::WriteBasicData(const PbiRawBasicData& basicData,
     assert(basicData.readQual_.size()   == numReads);
     assert(basicData.ctxtFlag_.size()   == numReads);
     assert(basicData.fileOffset_.size() == numReads);
+    (void)numReads; // quash warnings building in release mode
 
     WriteBgzfVector(fp, basicData.rgId_);
     WriteBgzfVector(fp, basicData.qStart_);

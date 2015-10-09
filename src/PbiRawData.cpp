@@ -52,35 +52,35 @@ PbiRawBarcodeData::PbiRawBarcodeData(void) { }
 
 PbiRawBarcodeData::PbiRawBarcodeData(uint32_t numReads)
 {
-    bcLeft_.reserve(numReads);
-    bcRight_.reserve(numReads);
+    bcForward_.reserve(numReads);
+    bcReverse_.reserve(numReads);
     bcQual_.reserve(numReads);
 }
 
 PbiRawBarcodeData::PbiRawBarcodeData(const PbiRawBarcodeData& other)
-    : bcLeft_(other.bcLeft_)
-    , bcRight_(other.bcRight_)
+    : bcForward_(other.bcForward_)
+    , bcReverse_(other.bcReverse_)
     , bcQual_(other.bcQual_)
 { }
 
 PbiRawBarcodeData::PbiRawBarcodeData(PbiRawBarcodeData&& other)
-    : bcLeft_(std::move(other.bcLeft_))
-    , bcRight_(std::move(other.bcRight_))
+    : bcForward_(std::move(other.bcForward_))
+    , bcReverse_(std::move(other.bcReverse_))
     , bcQual_(std::move(other.bcQual_))
 { }
 
 PbiRawBarcodeData& PbiRawBarcodeData::operator=(const PbiRawBarcodeData& other)
 {
-    bcLeft_ = other.bcLeft_;
-    bcRight_ = other.bcRight_;
+    bcForward_ = other.bcForward_;
+    bcReverse_ = other.bcReverse_;
     bcQual_ = other.bcQual_;
     return *this;
 }
 
 PbiRawBarcodeData& PbiRawBarcodeData::operator=(PbiRawBarcodeData&& other)
 {
-    bcLeft_ = std::move(other.bcLeft_);
-    bcRight_ = std::move(other.bcRight_);
+    bcForward_ = std::move(other.bcForward_);
+    bcReverse_ = std::move(other.bcReverse_);
     bcQual_ = std::move(other.bcQual_);
     return *this;
 }
@@ -97,11 +97,11 @@ bool PbiRawBarcodeData::AddRecord(const BamRecord& b)
 
     if (hasBcTag) {
         const std::pair<uint16_t, uint16_t> barcodes = b.Barcodes();
-        bcLeft_.push_back(barcodes.first);
-        bcRight_.push_back(barcodes.second);
+        bcForward_.push_back(barcodes.first);
+        bcReverse_.push_back(barcodes.second);
     } else {
-        bcLeft_.push_back(0);
-        bcRight_.push_back(0); // missing value marker... ??
+        bcForward_.push_back(0);
+        bcReverse_.push_back(0); // missing value marker... ??
     }
 
     if (hasBqTag)
@@ -196,12 +196,32 @@ bool PbiRawMappedData::AddRecord(const BamRecord& b)
     revStrand_.push_back( (b.AlignedStrand() == Strand::REVERSE ? 1 : 0) );
     mapQV_.push_back(b.MapQuality());
 
-    auto matchesAndMismatches = b.NumMatchesAndMismatches();
+    const auto matchesAndMismatches = b.NumMatchesAndMismatches();
     nM_.push_back(matchesAndMismatches.first);
     nMM_.push_back(matchesAndMismatches.second);
 
     return true;
 }
+
+uint32_t PbiRawMappedData::NumDeletedBasesAt(size_t recordIndex) const
+{ return NumDeletedAndInsertedBasesAt(recordIndex).first; }
+
+std::pair<uint32_t, uint32_t> PbiRawMappedData::NumDeletedAndInsertedBasesAt(size_t recordIndex) const
+{
+    const auto aStart = aStart_.at(recordIndex);
+    const auto aEnd   = aEnd_.at(recordIndex);
+    const auto tStart = tStart_.at(recordIndex);
+    const auto tEnd   = tEnd_.at(recordIndex);
+    const auto nM     = nM_.at(recordIndex);
+    const auto nMM    = nMM_.at(recordIndex);
+    const auto numIns = (aEnd - aStart - nM - nMM);
+    const auto numDel = (tEnd - tStart - nM - nMM);
+    return std::make_pair(numDel, numIns);
+}
+
+uint32_t PbiRawMappedData::NumInsertedBasesAt(size_t recordIndex) const
+{ return NumDeletedAndInsertedBasesAt(recordIndex).second; }
+
 // ------------------------------------
 // PbiReferenceEntry implementation
 // ------------------------------------
@@ -219,6 +239,12 @@ PbiReferenceEntry::PbiReferenceEntry(ID id)
     : tId_(id)
     , beginRow_(UNSET_ROW)
     , endRow_(UNSET_ROW)
+{ }
+
+PbiReferenceEntry::PbiReferenceEntry(ID id, Row beginRow, Row endRow)
+    : tId_(id)
+    , beginRow_(beginRow)
+    , endRow_(endRow)
 { }
 
 PbiReferenceEntry::PbiReferenceEntry(const PbiReferenceEntry& other)
@@ -388,7 +414,8 @@ PbiRawData::PbiRawData(void)
 { }
 
 PbiRawData::PbiRawData(const string& pbiFilename)
-    : version_(PbiFile::CurrentVersion)
+    : filename_(pbiFilename)
+    , version_(PbiFile::CurrentVersion)
     , sections_(PbiFile::ALL)
     , numReads_(0)
 {
@@ -396,7 +423,8 @@ PbiRawData::PbiRawData(const string& pbiFilename)
 }
 
 PbiRawData::PbiRawData(const PbiRawData& other)
-    : version_(other.version_)
+    : filename_(other.filename_)
+    , version_(other.version_)
     , sections_(other.sections_)
     , numReads_(other.numReads_)
     , barcodeData_(other.barcodeData_)
@@ -406,7 +434,8 @@ PbiRawData::PbiRawData(const PbiRawData& other)
 { }
 
 PbiRawData::PbiRawData(PbiRawData&& other)
-    : version_(std::move(other.version_))
+    : filename_(std::move(other.filename_))
+    , version_(std::move(other.version_))
     , sections_(std::move(other.sections_))
     , numReads_(std::move(other.numReads_))
     , barcodeData_(std::move(other.barcodeData_))
@@ -417,6 +446,7 @@ PbiRawData::PbiRawData(PbiRawData&& other)
 
 PbiRawData& PbiRawData::operator=(const PbiRawData& other)
 {
+    filename_ = other.filename_;
     version_ = other.version_;
     sections_ = other.sections_;
     numReads_ = other.numReads_;
@@ -429,6 +459,7 @@ PbiRawData& PbiRawData::operator=(const PbiRawData& other)
 
 PbiRawData& PbiRawData::operator=(PbiRawData&& other)
 {
+    filename_ = std::move(other.filename_);
     version_ = std::move(other.version_);
     sections_ = std::move(other.sections_);
     numReads_ = std::move(other.numReads_);

@@ -143,7 +143,7 @@ TEST(BamRecordTest, ReferenceName)
 //    {
 //        const string exampleBam  = tests::Data_Dir + "/unmap1.bam";
 //        BamFile bamFile(exampleBam);
-//        staging::EntireFileQuery records(bamFile);
+//        EntireFileQuery records(bamFile);
 
 //        EXPECT_THROW(records.begin()->ReferenceName(), std::exception);
 //    }

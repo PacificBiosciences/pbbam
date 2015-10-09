@@ -35,45 +35,30 @@
 
 // Author: Derek Barnett
 
-#ifndef IBAMFILEITERATOR_H
-#define IBAMFILEITERATOR_H
+#include "pbbam/BarcodeQuery.h"
+#include "pbbam/PbiFilterTypes.h"
+#include "CompositeBamReader.h"
+using namespace PacBio;
+using namespace PacBio::BAM;
+using namespace PacBio::BAM::internal;
+using namespace std;
 
-#include "pbbam/BamFile.h"
-#include "pbbam/BamRecord.h"
-#include <memory>
-#include <vector>
-
-namespace PacBio {
-namespace BAM {
-namespace internal {
-
-template<typename T>
-class IBamFileIteratorBase
+struct BarcodeQuery::BarcodeQueryPrivate
 {
-public:
-    typedef std::shared_ptr< IBamFileIteratorBase<T> > Ptr;
-
-protected:
-    IBamFileIteratorBase(const BamFile& file)
-        : header_(file.Header().DeepCopy())
+    BarcodeQueryPrivate(const uint16_t barcode, const DataSet& dataset)
+        : reader_(PbiBarcodeFilter(barcode), dataset)
     { }
-public:
-    virtual ~IBamFileIteratorBase(void) { }
 
-public:
-    virtual bool GetNext(T& result) =0;
-    virtual bool InSameGroup(const BamRecord& lhs, const BamRecord& rhs) const
-    { (void)lhs; (void)rhs; return true; }
-
-protected:
-    const BamHeader header_;
+    internal::PbiFilterCompositeBamReader<Compare::None> reader_; // unsorted
 };
 
-typedef IBamFileIteratorBase<BamRecord>               IBamFileIterator;
-typedef IBamFileIteratorBase<std::vector<BamRecord> > IBamFileGroupIterator;
+BarcodeQuery::BarcodeQuery(const uint16_t barcode,
+                           const DataSet& dataset)
+    : internal::IQuery()
+    , d_(new BarcodeQueryPrivate(barcode, dataset))
+{ }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+BarcodeQuery::~BarcodeQuery(void) { }
 
-#endif // IBAMFILEITERATOR_H
+bool BarcodeQuery::GetNext(BamRecord &r)
+{ return d_->reader_.GetNext(r); }

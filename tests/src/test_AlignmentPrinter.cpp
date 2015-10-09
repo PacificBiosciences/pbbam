@@ -62,41 +62,91 @@ const string singleInsertionBam = tests::Data_Dir + "/aligned.bam";
 TEST(AlignmentPrinterTest, Print)
 {
     IndexedFastaReader r(lambdaFasta);
+    AlignmentPrinter pretty(r);
 
     BamFile bamFile(singleInsertionBam);
     EntireFileQuery bamQuery(bamFile);
-
     auto it = bamQuery.begin();
-    
 
-    // std::cerr << record.AlignedStart() << std::endl;
-    // std::cerr << record.Sequence(Orientation::GENOMIC, true) << std::endl;
-    // std::cerr << record.Sequence(Orientation::GENOMIC, true, true) << std::endl;
-
-    AlignmentPrinter pretty(r);
-
-    // std::string expected =
-    // "Read        : singleInsertion2\n"
-    // "Reference   : lambda_NEB3011\n"
-    // "\n"
-    // "Read-length : 49\n"
-    // "Concordance : 0.96\n"
-    // "\n"
-    // "   GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT\n"
-    // "   |||||||| ||||||||||||||||||| |||||||||||||||||||||\n"
-    // "   GGCTGCAG-GTACAGCGGTCAGGAGGCCAATTGATGCCGGACTGGCTGAT\n";
-    // EXPECT_EQ(expected, pretty.Print(record, Orientation::NATIVE));
+    // funky formatting used to format alignments
+    auto expected = string
+    {
+        "Read        : singleInsertion2\n"
+        "Reference   : lambda_NEB3011\n"
+        "\n"
+        "Read-length : 49\n"
+        "Concordance : 0.96\n"
+        "\n"
+        "5210 : GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGG : 5249\n"
+        "       \x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||||| |\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m|||||||||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||||| ||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||||||\n"
+        "   0 : GGCTGCAG-GTACAGCGGTCAGGAGGCCAATTGATGCCGG :   39\n"
+        "\n"
+        "5249 : ACTGGCTGAT : 5259\n"
+        "       |\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||||||\n"
+        "  39 : ACTGGCTGAT :   49\n"
+        "\n"
+    };
 
     auto record = *it++;
-    std::cerr << pretty.Print(record, Orientation::GENOMIC);
-    std::cerr << std::endl << std::endl;
+    EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
+
+    expected = {
+        "Read        : singleInsertion\n"
+        "Reference   : lambda_NEB3011\n"
+        "\n"
+        "Read-length : 49\n"
+        "Concordance : 0.96\n"
+        "\n"
+        "5210 : GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGG : 5249\n"
+        "       \x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||||| |\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m|||||||||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||||| ||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||||||\n"
+        "   0 : GGCTGCAG-GTACAGCGGTCAGGAGGCCAATTGATGCCGG :   39\n"
+        "\n"
+        "5249 : ACTGGCTGAT : 5259\n"
+        "       |\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||||||\n"
+        "  39 : ACTGGCTGAT :   49\n"
+        "\n"
+    };
+
     record = *it++;
-    std::cerr << pretty.Print(record, Orientation::GENOMIC);
-    std::cerr << std::endl << std::endl;
+    EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
+
+    expected = {
+        "Read        : singleInsertion2\n"
+        "Reference   : lambda_NEB3011\n"
+        "\n"
+        "Read-length : 59\n"
+        "Concordance : 0.951\n"
+        "\n"
+        "9377 : AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCG : 9417\n"
+        "       |||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m|||||||||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m|||||||||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m|||||||||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m|||  |\n"
+        "   0 : AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGA--G :   38\n"
+        "\n"
+        "9417 : CAGCACGGT-AACAGCGGCAA : 9437\n"
+        "       |||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||| ||||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||||\n"
+        "  38 : CAGCACGGTAAACAGCGGCAA :   59\n"
+        "\n"
+    };
+
     record = *it++;
-    std::cerr << pretty.Print(record, Orientation::GENOMIC);
-    std::cerr << std::endl << std::endl;
+    EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
+
+    expected = {
+        "Read        : singleInsertion\n"
+        "Reference   : lambda_NEB3011\n"
+        "\n"
+        "Read-length : 59\n"
+        "Concordance : 0.951\n"
+        "\n"
+        "9377 : AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCG : 9417\n"
+        "       |||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m|||||||||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m|||||||||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m|||||||||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m|||  |\n"
+        "   0 : AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGA--G :   38\n"
+        "\n"
+        "9417 : CAGCACGGT-AACAGCGGCAA : 9437\n"
+        "       |||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||| ||||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||||\n"
+        "  38 : CAGCACGGTAAACAGCGGCAA :   59\n"
+        "\n"
+    };
+
     record = *it++;
-    std::cerr << pretty.Print(record, Orientation::GENOMIC);
-    std::cerr << std::endl << std::endl;
+    EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
 }

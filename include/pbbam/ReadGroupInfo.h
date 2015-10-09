@@ -93,9 +93,17 @@ public:
     /// \name Conversion & Validation
     ///
 
+    /// \returns ReadGroupInfo object from SAM-formatted string \verbatim ("@RG...\n") \endverbatim
     static ReadGroupInfo FromSam(const std::string& sam);
 
+    /// \returns SAM-formatted string representing read group info
     static std::string ToSam(const ReadGroupInfo& rg);
+
+    /// \returns integer value of ID string
+    static int32_t IdToInt(const std::string& rgId);
+
+    /// \returns ID string from integer
+    static std::string IntToId(const int32_t id);
 
     /// \}
 

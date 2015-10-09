@@ -169,6 +169,12 @@ inline ReadGroupInfo& ReadGroupInfo::Id(const std::string& movieName,
                                         const std::string& readType)
 { id_ = MakeReadGroupId(movieName, readType); return *this; }
 
+inline int32_t ReadGroupInfo::IdToInt(const std::string& rgId)
+{
+    const uint32_t rawid = std::stoul(rgId, nullptr, 16);
+    return static_cast<int32_t>(rawid);
+}
+
 inline FrameCodec ReadGroupInfo::IpdCodec(void) const
 { return ipdCodec_; }
 

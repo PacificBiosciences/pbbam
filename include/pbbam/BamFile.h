@@ -163,8 +163,14 @@ public:
 
     /// \}
 
+public:
+    /// \returns virtual offset of first alignment. Mostly used internally.
+    ///          Note that this is a SAM/BAM \b virtual offset, not a 'normal' file position.
+    ///
+    int64_t FirstAlignmentOffset(void) const;
+
 private:
-    PBBAM_SHARED_PTR<internal::BamFilePrivate> d_;
+    std::unique_ptr<internal::BamFilePrivate> d_;
 };
 
 } // namespace BAM

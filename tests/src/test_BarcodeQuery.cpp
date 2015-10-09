@@ -35,45 +35,19 @@
 
 // Author: Derek Barnett
 
-#ifndef SEQUENTIALMERGESTRATEGY_H
-#define SEQUENTIALMERGESTRATEGY_H
+#ifdef PBBAM_TESTING
+#define private public
+#endif
 
-#include "pbbam/internal/IMergeStrategy.h"
+#include "TestData.h"
+#include <gtest/gtest.h>
+#include <pbbam/BarcodeQuery.h>
+#include <string>
+using namespace PacBio;
+using namespace PacBio::BAM;
+using namespace std;
 
-namespace PacBio {
-namespace BAM {
-namespace internal {
-
-class SequentialMergeStrategy : public IMergeStrategy
+TEST(BarcodeQueryTest, QueryOk)
 {
-public:
-    SequentialMergeStrategy(const std::vector<FileIterPtr>& iters);
-    bool GetNext(BamRecord& r);
-private:
-    std::vector<FileIterPtr> iters_;
-};
-
-inline SequentialMergeStrategy::SequentialMergeStrategy(const std::vector<FileIterPtr>& iters)
-    : IMergeStrategy()
-    , iters_(iters)
-{ }
-
-inline bool SequentialMergeStrategy::GetNext(BamRecord& r)
-{
-    if (iters_.empty())
-        return false;
-
-    FileIterPtr iter = iters_.front();
-    if (iter->GetNext(r))
-        return true;
-    else {
-        iters_.erase(iters_.begin());
-        return GetNext(r);
-    }
+    // come back with barcoded data
 }
-
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
-
-#endif // SEQUENCTIALMERGESTRATEGY_H

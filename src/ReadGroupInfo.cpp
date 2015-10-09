@@ -38,10 +38,11 @@
 #include "pbbam/ReadGroupInfo.h"
 #include "SequenceUtils.h"
 #include <cram/md5.h>
-#include <cstdio>
+#include <iomanip>
 #include <set>
 #include <sstream>
 #include <stdexcept>
+#include <cstdio>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -576,6 +577,13 @@ ReadGroupInfo ReadGroupInfo::FromSam(const string& sam)
     rg.CustomTags(custom);
 
     return rg;
+}
+
+string ReadGroupInfo::IntToId(const int32_t id)
+{
+    stringstream s;
+    s << std::setfill('0') << std::setw(8) << std::hex << id;
+    return s.str();
 }
 
 ReadGroupInfo& ReadGroupInfo::IpdCodec(const FrameCodec& codec, const string& tag)

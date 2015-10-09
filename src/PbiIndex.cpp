@@ -43,32 +43,6 @@ using namespace PacBio::BAM::internal;
 using namespace std;
 
 // ----------------------------------
-// IndexResultBlock implementation
-// ----------------------------------
-
-IndexResultBlock::IndexResultBlock(void)
-    : firstIndex_(0)
-    , numReads_(0)
-    , virtualOffset_(-1)
-{ }
-
-IndexResultBlock::IndexResultBlock(size_t idx, size_t numReads)
-    : firstIndex_(idx)
-    , numReads_(numReads)
-    , virtualOffset_(-1)
-{ }
-
-bool IndexResultBlock::operator==(const IndexResultBlock& other) const
-{
-    return firstIndex_ == other.firstIndex_ &&
-           numReads_ == other.numReads_ &&
-           virtualOffset_ == other.virtualOffset_;
-}
-
-bool IndexResultBlock::operator!=(const IndexResultBlock& other) const
-{ return !(*this == other); }
-
-// ----------------------------------
 // SubreadLookupData implementation
 // ----------------------------------
 
@@ -83,15 +57,6 @@ BasicLookupData::BasicLookupData(const PbiRawBasicData& rawData)
     , ctxtFlag_(rawData.ctxtFlag_)
     , fileOffset_(rawData.fileOffset_)
 { }
-
-//SubreadLookupData::SubreadLookupData(PbiRawSubreadData&& rawData)
-//    : rgId_(std::move(rawData.rgId_))
-//    , qStart_(std::move(rawData.qStart_))
-//    , qEnd_(std::move(rawData.qEnd_))
-//    , holeNumber_(std::move(rawData.holeNumber_))
-//    , readQual_(std::move(rawData.readQual_))
-//    , fileOffset_(std::move(rawData.fileOffset_))
-//{ }
 
 // ----------------------------------
 // MappedLookupData implementation
@@ -117,17 +82,10 @@ MappedLookupData::MappedLookupData(const PbiRawMappedData& rawData)
     std::map<uint32_t, IndexList> delRawData;
     for (size_t i = 0; i < numElements; ++i) {
 
-        // nIns, nDel
-        const uint32_t aStart = rawData.aStart_.at(i);
-        const uint32_t aEnd   = rawData.aEnd_.at(i);
-        const uint32_t tStart = rawData.tStart_.at(i);
-        const uint32_t tEnd   = rawData.tEnd_.at(i);
-        const uint32_t nM     = rawData.nM_.at(i);
-        const uint32_t nMM    = rawData.nMM_.at(i);
-        const uint32_t numIns = (aEnd - aStart - nM - nMM);
-        const uint32_t numDel = (tEnd - tStart - nM - nMM);
-        insRawData[numIns].push_back(i);
-        delRawData[numDel].push_back(i);
+        // nDel, nIns
+        const auto indels = rawData.NumDeletedAndInsertedBasesAt(i);
+        delRawData[indels.first].push_back(i);
+        insRawData[indels.second].push_back(i);
 
         // strand
         if (rawData.revStrand_.at(i) == 0)
@@ -140,27 +98,6 @@ MappedLookupData::MappedLookupData(const PbiRawMappedData& rawData)
     nDel_ = OrderedLookup<uint32_t>(std::move(delRawData));
 }
 
-//MappedLookupData::MappedLookupData(PbiRawMappedData&& rawData)
-//    : tId_(std::move(rawData.tId_))
-//    , tStart_(std::move(rawData.tStart_))
-//    , tEnd_(std::move(rawData.tEnd_))
-//    , aStart_(std::move(rawData.aStart_))
-//    , aEnd_(std::move(rawData.aEnd_))
-//    , nM_(std::move(rawData.nM_))
-//    , nMM_(std::move(rawData.nMM_))
-//    , mapQV_(std::move(rawData.mapQV_))
-//{
-//    const size_t numElements = rawData.revStrand_.size();
-//    reverseStrand_.reserve(numElements/2);
-//    forwardStrand_.reserve(numElements/2);
-//    for (size_t i = 0; i < numElements; ++i) {
-//        if (rawData.revStrand_.at(i) == 0)
-//            forwardStrand_.push_back(i);
-//        else
-//            reverseStrand_.push_back(i);
-//    }
-//}
-
 // ----------------------------------
 // BarcodeLookupData implementation
 // ----------------------------------
@@ -168,18 +105,11 @@ MappedLookupData::MappedLookupData(const PbiRawMappedData& rawData)
 BarcodeLookupData::BarcodeLookupData(void) { }
 
 BarcodeLookupData::BarcodeLookupData(const PbiRawBarcodeData& rawData)
-    : bcLeft_(rawData.bcLeft_)
-    , bcRight_(rawData.bcRight_)
+    : bcForward_(rawData.bcForward_)
+    , bcReverse_(rawData.bcReverse_)
     , bcQual_(rawData.bcQual_)
 
 {  }
-
-//BarcodeLookupData::BarcodeLookupData(PbiRawBarcodeData&& rawData)
-//    : bcLeft_(std::move(rawData.bcLeft_))
-//    , bcRight_(std::move(rawData.bcRight_))
-//    , bcQual_(std::move(rawData.bcQual_))
-//    , ctxtFlag_(std::move(rawData.ctxtFlag_))
-//{ }
 
 // ----------------------------------
 // ReferenceLookupData implementation
@@ -197,16 +127,6 @@ ReferenceLookupData::ReferenceLookupData(const PbiRawReferenceData& rawData)
     }
 }
 
-//ReferenceLookupData::ReferenceLookupData(PbiRawReferenceData&& rawData)
-//{
-//    const size_t numEntries = rawData.entries_.size();
-//    references_.reserve(numEntries);
-//    for (size_t i = 0; i < numEntries; ++i) {
-//        const PbiReferenceEntry& entry = rawData.entries_.at(i);
-//        references_[entry.tId_] = IndexRange(entry.beginRow_, entry.endRow_);
-//    }
-//}
-
 // --------------------------------
 // PbiIndexPrivate implementation
 // --------------------------------
@@ -218,7 +138,8 @@ PbiIndexPrivate::PbiIndexPrivate(void)
 { }
 
 PbiIndexPrivate::PbiIndexPrivate(const PbiRawData& rawIndex)
-    : version_(rawIndex.Version())
+    : filename_(rawIndex.Filename())
+    , version_(rawIndex.Version())
     , sections_(rawIndex.FileSections())
     , numReads_(rawIndex.NumReads())
     , basicData_(rawIndex.BasicData())
@@ -228,7 +149,8 @@ PbiIndexPrivate::PbiIndexPrivate(const PbiRawData& rawIndex)
 { }
 
 PbiIndexPrivate::PbiIndexPrivate(PbiRawData&& rawIndex)
-    : version_(std::move(rawIndex.Version()))
+    : filename_(std::move(rawIndex.Filename()))
+    , version_(std::move(rawIndex.Version()))
     , sections_(std::move(rawIndex.FileSections()))
     , numReads_(std::move(rawIndex.NumReads()))
     , basicData_(std::move(rawIndex.BasicData()))
@@ -240,10 +162,11 @@ PbiIndexPrivate::PbiIndexPrivate(PbiRawData&& rawIndex)
 unique_ptr<PbiIndexPrivate> PbiIndexPrivate::DeepCopy(void) const
 {
     std::unique_ptr<PbiIndexPrivate> copy(new PbiIndexPrivate);
+    copy->filename_ = filename_;
     copy->version_  = version_;
     copy->sections_ = sections_;
     copy->numReads_ = numReads_;
-    copy->basicData_   = basicData_;
+    copy->basicData_     = basicData_;
     copy->mappedData_    = mappedData_;
     copy->referenceData_ = referenceData_;
     copy->barcodeData_   = barcodeData_;
@@ -287,26 +210,5 @@ PbiIndex& PbiIndex::operator=(PbiIndex&& other)
 
 PbiIndex::~PbiIndex(void) { }
 
-PbiFile::Sections PbiIndex::FileSections(void) const
-{ return d_->sections_; }
-
-bool PbiIndex::HasBarcodeData(void) const
-{ return d_->HasSection(PbiFile::BARCODE); }
-
-bool PbiIndex::HasMappedData(void) const
-{ return d_->HasSection(PbiFile::MAPPED); }
-
-bool PbiIndex::HasReferenceData(void) const
-{ return d_->HasSection(PbiFile::REFERENCE); }
-
-bool PbiIndex::HasSection(const PbiFile::Section section) const
-{ return d_->HasSection(section); }
-
-uint32_t PbiIndex::NumReads(void) const
-{ return d_->numReads_; }
-
-PbiFile::VersionEnum PbiIndex::Version(void) const
-{ return d_->version_; }
-
-const vector<int64_t>& PbiIndex::VirtualFileOffsets(void) const
-{ return d_->basicData_.fileOffset_; }
+string PbiIndex::Filename(void) const
+{ return d_->filename_; }

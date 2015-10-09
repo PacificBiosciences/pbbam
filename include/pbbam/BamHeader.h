@@ -93,6 +93,7 @@ public:
     /// \{
 
     bool HasSequence(const std::string& name) const;
+    size_t NumSequences(void) const;
     int32_t SequenceId(const std::string& name) const;
     std::string SequenceLength(const int32_t id) const;
     std::string SequenceName(const int32_t id) const;

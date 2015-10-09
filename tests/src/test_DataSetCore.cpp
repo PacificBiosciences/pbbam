@@ -162,11 +162,16 @@ TEST(DataSetCoreTest, AddExternalResources)
     ExternalResource resource1("metatype", "id");
     resource1.Name("file1");
 
-    ExternalResource resource2("metatype", "id");
+    ExternalResource resource2("metatype", "id2");
     resource2.Name("file2");
 
     dataset.ExternalResources().Add(resource1);
     dataset.ExternalResources().Add(resource2);
+    EXPECT_EQ(2, dataset.ExternalResources().Size());
+
+     // disallow duplicates (checking on ResourceId)
+    ExternalResource duplicateResource("metatype", "id");
+    dataset.ExternalResources().Add(duplicateResource);
     EXPECT_EQ(2, dataset.ExternalResources().Size());
 
     // direct access
@@ -193,7 +198,7 @@ TEST(DataSetCoreTest, EditExternalResources)
     resource.Name("file1");
     dataset.ExternalResources().Add(resource);
 
-    resource.Name("file2");
+    resource.Name("file2").ResourceId("id2");
     dataset.ExternalResources().Add(resource);
     EXPECT_EQ(2, dataset.ExternalResources().Size());
 
@@ -421,7 +426,7 @@ TEST(DataSetCoreTest, RemoveExternalResources)
     ExternalResource resource1("metatype", "id");
     resource1.Name("file1");
 
-    ExternalResource resource2("metatype", "id");
+    ExternalResource resource2("metatype", "id2");
     resource2.Name("file2");
 
     dataset.ExternalResources().Add(resource1);

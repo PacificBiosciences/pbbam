@@ -289,7 +289,16 @@ ExternalResources& ExternalResources::operator+=(const ExternalResources& other)
 }
 
 void ExternalResources::Add(const ExternalResource& ext)
-{ AddChild(ext); }
+{
+    // disallow external resources w/ duplicate ResourceIds
+    set<std::string> myResourceIds;
+    for (size_t i = 0; i < Size(); ++i) {
+        const ExternalResource& resource = this->operator[](i);
+        myResourceIds.insert(resource.ResourceId());
+    }
+    if (myResourceIds.find(ext.ResourceId()) == myResourceIds.cend())
+        AddChild(ext);
+}
 
 vector<BamFile> ExternalResources::BamFiles(void) const
 {

@@ -35,33 +35,33 @@
 
 // Author: Derek Barnett
 
-#ifndef IMERGESTRATEGY_H
-#define IMERGESTRATEGY_H
+#include "pbbam/SubreadLengthQuery.h"
+#include "pbbam/PbiFilterTypes.h"
+#include "CompositeBamReader.h"
+using namespace PacBio;
+using namespace PacBio::BAM;
+using namespace PacBio::BAM::internal;
+using namespace std;
 
-#include "pbbam/internal/IBamFileIterator.h"
-
-namespace PacBio {
-namespace BAM {
-namespace internal {
-
-template<typename T>
-class IMergeStrategyBase
+struct SubreadLengthQuery::SubreadLengthQueryPrivate
 {
-public:
-    typedef typename IBamFileIteratorBase<T>::Ptr FileIterPtr;
-protected:
-    IMergeStrategyBase(void) { }
-public:
-    virtual ~IMergeStrategyBase(void) { }
-public:
-    virtual bool GetNext(T& result) =0;
+    SubreadLengthQueryPrivate(const int32_t length,
+                              const Compare::Type compareType,
+                              const DataSet& dataset)
+        : reader_(PbiQueryLengthFilter(length, compareType), dataset)
+    { }
+
+    internal::PbiFilterCompositeBamReader<Compare::None> reader_; // unsorted
 };
 
-typedef IMergeStrategyBase<BamRecord>               IMergeStrategy;
-typedef IMergeStrategyBase<std::vector<BamRecord> > IGroupMergeStrategy;
+SubreadLengthQuery::SubreadLengthQuery(const int32_t length,
+                                       const Compare::Type compareType,
+                                       const DataSet& dataset)
+    : internal::IQuery()
+    , d_(new SubreadLengthQueryPrivate(length, compareType, dataset))
+{ }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+SubreadLengthQuery::~SubreadLengthQuery(void) { }
 
-#endif // IMERGESTRATEGY_H
+bool SubreadLengthQuery::GetNext(BamRecord &r)
+{ return d_->reader_.GetNext(r); }

@@ -119,8 +119,20 @@ public:
     /// \returns the record's strand as a Strand enum value
     Strand AlignedStrand(void) const;
 
+    /// \returns forward barcode id
+    ///
+    /// \throws std::runtime_error if barcode data is absent or malformed. \sa HasBarcodes
+    ///
+    uint16_t BarcodeForward(void) const;
+
     /// \returns barcode call confidence (Phred-scaled posterior probability that barcode call)
     uint8_t BarcodeQuality(void) const;
+
+    /// \returns reverse barcode id
+    ///
+    /// \throws std::runtime_error if barcode data is absent or malformed. \sa HasBarcodes
+    ///
+    uint16_t BarcodeReverse(void) const;
 
     /// \returns the forward and reverse barcode ids
     ///
@@ -241,6 +253,12 @@ public:
     /// \returns this record's movie name
     std::string MovieName(void) const;
 
+    /// \returns the number of deleted bases (relative to reference)
+    size_t NumDeletedBases(void) const;
+
+    /// \returns the number of inserted bases (relative to reference)
+    size_t NumInsertedBases(void) const;
+
     /// \returns the number of matching bases (sum of '=' CIGAR op lengths)
     size_t NumMatches(void) const;
 
@@ -269,9 +287,12 @@ public:
     /// \returns ReadGroupInfo object for this record
     ReadGroupInfo ReadGroup(void) const;
 
-    /// \returns ID of this record's read group
+    /// \returns string ID of this record's read group
     /// \sa ReadGroupInfo::Id
     std::string ReadGroupId(void) const;
+
+    /// \returns integer value for this record's read group ID
+    int32_t ReadGroupNumericId(void) const;
 
     /// \returns this record's reference ID, or -1 if unmapped.
     /// \note This is only a valid identifier within this BAM file
