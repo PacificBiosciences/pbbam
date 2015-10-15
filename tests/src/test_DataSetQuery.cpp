@@ -445,6 +445,30 @@ TEST(DataSetQueryTest, ZmwQueryTest)
     });
 
     // multi-file
+    {
+        BamFile bamFile(bamMappingFn);
+        bamFile.EnsurePacBioIndexExists();
+
+        BamFile bamFile_1(bamMappingFn_1);
+        bamFile_1.EnsurePacBioIndexExists();
+
+        BamFile bamFile_2(bamMappingFn_2);
+        bamFile_2.EnsurePacBioIndexExists();
+
+        DataSet dataset;
+        dataset.ExternalResources().Add(ExternalResource(bamFile));
+        dataset.ExternalResources().Add(ExternalResource(bamFile_1));
+        dataset.ExternalResources().Add(ExternalResource(bamFile_2));
+
+        int count = 0;
+        ZmwQuery query(whitelist, dataset);
+        for (const BamRecord& r : query) {
+            const auto holeNumber = r.HoleNumber();
+            EXPECT_TRUE(holeNumber == 13473 || holeNumber == 38025);
+            ++count;
+        }
+        EXPECT_EQ(15, count);
+    }
 }
 
 TEST(DataSetQueryTest, ZmwGroupQueryTest)

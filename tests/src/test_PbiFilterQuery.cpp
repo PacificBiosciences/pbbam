@@ -118,3 +118,60 @@ TEST(PbiFilterQueryTest, QueryOk)
         EXPECT_EQ(2, count);
     }
 }
+
+TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
+{
+    const auto expectedMovieName = string{ "m150404_101626_42267_c100807920800000001823174110291514_s1_p0" };
+
+    DataSet ds(tests::Data_Dir + "/chunking/chunking.subreadset.xml");
+    EXPECT_EQ(3, ds.BamFiles().size());
+
+    { // movie name
+
+        int count = 0;
+        PbiFilterQuery query{ PbiMovieNameFilter{expectedMovieName}, ds };
+        for (const BamRecord& r : query) {
+            EXPECT_EQ(expectedMovieName, r.MovieName());
+            ++count;
+        }
+        EXPECT_EQ(1220, count);
+    }
+
+    { // min ZMW
+
+        int count = 0;
+        PbiFilterQuery query{ PbiZmwFilter{54, Compare::GREATER_THAN}, ds };
+        for (const BamRecord& r : query) {
+            EXPECT_GT(r.HoleNumber(), 54);
+            ++count;
+        }
+        EXPECT_EQ(1220, count);
+    }
+
+    { // max ZMW
+
+        int count = 0;
+        PbiFilterQuery query{ PbiZmwFilter{1816, Compare::LESS_THAN}, ds };
+        for (const BamRecord& r : query) {
+            EXPECT_LT(r.HoleNumber(),1816);
+            ++count;
+        }
+        EXPECT_EQ(150, count);
+    }
+
+    { // put all together, from DataSet XML
+
+        const PbiFilter filter = PbiFilter::FromDataSet(ds);
+        PbiFilterQuery query(filter, ds);
+        int count = 0;
+        for (const BamRecord& r : query) {
+            EXPECT_EQ(expectedMovieName, r.MovieName());
+            const auto zmw = r.HoleNumber();
+            EXPECT_GT(zmw, 54);
+            EXPECT_LT(zmw, 1816);
+            ++count;
+        }
+        EXPECT_EQ(150, count);
+    }
+}
+
