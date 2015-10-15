@@ -106,7 +106,7 @@ template<typename T>
 inline OrderedLookup<T>::OrderedLookup(const std::vector<T>& rawData)
 {
     const auto numElements = rawData.size();
-    for (auto i = 0; i < numElements; ++i)
+    for (auto i = decltype(numElements){0}; i < numElements; ++i)
         data_[rawData.at(i)].push_back(i);
 }
 
@@ -114,7 +114,7 @@ template<typename T>
 inline OrderedLookup<T>::OrderedLookup(std::vector<T>&& rawData)
 {
     const auto numElements = rawData.size();
-    for (auto i = 0; i < numElements; ++i)
+    for (auto i = decltype(numElements){0}; i < numElements; ++i)
         data_[rawData.at(i)].push_back(i);
 }
 
@@ -250,7 +250,7 @@ template<typename T>
 inline UnorderedLookup<T>::UnorderedLookup(const std::vector<T>& rawData)
 {
     const auto numElements = rawData.size();
-    for (auto i = 0; i < numElements; ++i)
+    for (auto i = decltype(numElements){0}; i < numElements; ++i)
         data_[rawData.at(i)].push_back(i);
 }
 
@@ -258,7 +258,7 @@ template<typename T>
 inline UnorderedLookup<T>::UnorderedLookup(std::vector<T>&& rawData)
 {
     const auto numElements = rawData.size();
-    for (auto i = 0; i < numElements; ++i)
+    for (auto i = decltype(numElements){0}; i < numElements; ++i)
         data_[rawData.at(i)].push_back(i);
 }
 

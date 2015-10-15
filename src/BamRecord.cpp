@@ -153,7 +153,7 @@ pair<int32_t, int32_t> AlignedOffsets(const BamRecord& record,
     if (numCigarOps > 0) {
 
         // start offset
-        for (int i = 0; i < numCigarOps; ++i) {
+        for (size_t i = 0; i < numCigarOps; ++i) {
             const CigarOperationType type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
             if (type == CigarOperationType::HARD_CLIP) {
                 if (startOffset != 0 && startOffset != seqLength) {

@@ -475,7 +475,7 @@ void BamRecordImpl::UpdateTagMap(void) const
     // anyway, so this should be a nice lookup mechanism.
     //
     uint16_t tagNameCode;
-    size_t i = 0;
+    int64_t i = 0;
     while(i < numBytes) {
 
         // store (tag name code -> start offset into tag data)

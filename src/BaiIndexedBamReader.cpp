@@ -86,7 +86,7 @@ BaiIndexedBamReader& BaiIndexedBamReader::Interval(const GenomicInterval& interv
     auto header = bamFile_.Header();
     if (header.HasSequence(interval.Name())) {
         auto id = header.SequenceId(interval.Name());
-        if (id >= 0 && id < header.NumSequences()) {
+        if (id >= 0 && static_cast<size_t>(id) < header.NumSequences()) {
             htsIterator_.reset(bam_itr_queryi(htsIndex_.get(),
                                               id,
                                               interval.Start(),
