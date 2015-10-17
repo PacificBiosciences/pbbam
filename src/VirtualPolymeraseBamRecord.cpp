@@ -179,6 +179,11 @@ void VirtualPolymeraseBamRecord::StitchSources()
                 regionType, b.QueryStart(), b.QueryEnd(), b.LocalContextFlags(),
                 barcodes.first, barcodes.second);
         }
+
+        if (b.HasBarcodes() && !this->HasBarcodes())
+            this->Barcodes(b.Barcodes());
+        if (b.HasBarcodeQuality() && !this->HasBarcodeQuality())
+            this->BarcodeQuality(b.BarcodeQuality());
     }
 
     // ReadGroup
