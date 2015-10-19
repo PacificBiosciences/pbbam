@@ -64,10 +64,6 @@ void VirtualPolymeraseBamRecord::StitchSources()
     const auto& firstRecord = sources_[0];
     const auto& lastRecord = sources_[sources_.size() - 1];
 
-    // Temporary variables used for stitching
-    float accuracy = 0.0;
-    float accuracyCounter = 0.0;
-
     std::string   sequence;
     std::string   deletionTag;
     std::string   substitutionTag;
@@ -96,12 +92,6 @@ void VirtualPolymeraseBamRecord::StitchSources()
         sequence.append(b.Sequence());
         
         MoveAppend(b.Qualities(), qualities);
-
-        if (b.HasReadAccuracy())
-        {
-            accuracy += b.ReadAccuracy();
-            ++accuracyCounter;
-        }
 
         if (b.HasDeletionQV())
             MoveAppend(std::move(b.DeletionQV()), deletionQv);
@@ -184,14 +174,12 @@ void VirtualPolymeraseBamRecord::StitchSources()
             this->Barcodes(b.Barcodes());
         if (b.HasBarcodeQuality() && !this->HasBarcodeQuality())
             this->BarcodeQuality(b.BarcodeQuality());
+        if (b.HasReadAccuracy() && !this->HasReadAccuracy())
+            this->ReadAccuracy(b.ReadAccuracy());
     }
 
     // ReadGroup
     this->ReadGroup(this->header_.ReadGroups()[0]);
-
-    // Avoid division by 0
-    if (accuracyCounter > 0.0)
-        this->ReadAccuracy(accuracy / accuracyCounter);
 
     this->NumPasses(1);
 
