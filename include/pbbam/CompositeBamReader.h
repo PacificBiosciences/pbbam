@@ -38,17 +38,15 @@
 #ifndef COMPOSITEBAMREADER_H
 #define COMPOSITEBAMREADER_H
 
+#include "pbbam/BaiIndexedBamReader.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/BamHeader.h"
+#include "pbbam/BamReader.h"
 #include "pbbam/BamRecord.h"
+#include "pbbam/Config.h"
 #include "pbbam/DataSet.h"
 #include "pbbam/GenomicInterval.h"
-#include "BaiIndexedBamReader.h"
-#include "BamReader.h"
-#include "PbiIndexedBamReader.h"
-
-#include <boost/optional.hpp>
-
+#include "pbbam/PbiIndexedBamReader.h"
 #include <deque>
 #include <functional>
 #include <memory>
@@ -57,8 +55,11 @@
 
 namespace PacBio {
 namespace BAM {
+
 namespace internal {
 
+/// Helper struct for composite readers, contains a single-file reader and its "next" record.
+///
 struct CompositeMergeItem
 {
 public:
@@ -73,6 +74,9 @@ public:
     ~CompositeMergeItem(void);
 };
 
+/// Comparator that helps in ordering results returned by composite readers, essentially extracts a BamRecord from
+/// its parent CompositeMergeItem for further checks.
+///
 template<typename CompareType>
 struct CompositeMergeItemSorter : public std::function<bool(const CompositeMergeItem&,
                                                             const CompositeMergeItem&)>
@@ -81,49 +85,84 @@ struct CompositeMergeItemSorter : public std::function<bool(const CompositeMerge
                     const CompositeMergeItem& rhs);
 };
 
-class GenomicIntervalCompositeBamReader
+} // namespace internal
+
+class PBBAM_EXPORT GenomicIntervalCompositeBamReader
 {
 public:
+    /// \name Contstructors & Related Methods
+
     GenomicIntervalCompositeBamReader(const GenomicInterval& interval, const std::vector<BamFile>& bamFiles);
     GenomicIntervalCompositeBamReader(const GenomicInterval& interval, std::vector<BamFile>&& bamFiles);
     GenomicIntervalCompositeBamReader(const GenomicInterval& interval, const DataSet& dataset);
 
-public:
-    bool GetNext(BamRecord& record);
+    /// \}
 
 public:
+    /// \name Data Access
+
+    /// Fetches next BAM record in the interval specified, storing in
+    ///
+    /// \returns true on success, false if no more data available.
+    ///
+    bool GetNext(BamRecord& record);
+
+    /// Sets a new genomic interval of interest.
+    ///
+    /// \returns reference to this reader
+    ///
     GenomicIntervalCompositeBamReader& Interval(const GenomicInterval& interval);
+
+    /// \returns the current specified interval
+    ///
     const GenomicInterval& Interval(void) const;
+
+    /// \}
 
 private:
     void UpdateSort(void);
 
 private:
     GenomicInterval interval_;
-    std::deque<CompositeMergeItem> mergeItems_;
+    std::deque<internal::CompositeMergeItem> mergeItems_;
     std::vector<std::string> filenames_;
 };
 
 template<typename OrderByType>
-class PbiFilterCompositeBamReader
+class PBBAM_EXPORT PbiFilterCompositeBamReader
 {
 public:
-    typedef CompositeMergeItem                              value_type;
-    typedef CompositeMergeItemSorter<OrderByType>           merge_sorter_type;
-    typedef std::deque<value_type>                  container_type;
-    typedef typename container_type::iterator       iterator;
-    typedef typename container_type::const_iterator const_iterator;
+    typedef internal::CompositeMergeItem                      value_type;
+    typedef internal::CompositeMergeItemSorter<OrderByType>   merge_sorter_type;
+    typedef std::deque<value_type>                            container_type;
+    typedef typename container_type::iterator                 iterator;
+    typedef typename container_type::const_iterator           const_iterator;
 
 public:
+    /// \name Contstructors & Related Methods
+
     PbiFilterCompositeBamReader(const PbiFilter& filter, const std::vector<BamFile>& bamFiles);
     PbiFilterCompositeBamReader(const PbiFilter& filter, std::vector<BamFile>&& bamFiles);
     PbiFilterCompositeBamReader(const PbiFilter& filter, const DataSet& dataset);
 
-public:
-    bool GetNext(BamRecord& record);
+    /// \}
 
 public:
+    /// \name Data Access
+
+    /// Fetches next BAM record in the interval specified.
+    ///
+    /// \returns true on success, false if no more data available.
+    ///
+    bool GetNext(BamRecord& record);
+
+    /// Sets a new PBI filter
+    ///
+    /// \returns reference to this reader
+    ///
     PbiFilterCompositeBamReader& Filter(const PbiFilter& filter);
+
+    /// \}
 
 private:
     void UpdateSort(void);
@@ -133,24 +172,30 @@ private:
     std::vector<std::string> filenames_;
 };
 
-class SequentialCompositeBamReader
+class PBBAM_EXPORT SequentialCompositeBamReader
 {
 public:
+    /// \name Contstructors & Related Methods
+
     SequentialCompositeBamReader(const std::vector<BamFile>& bamFiles);
     SequentialCompositeBamReader(std::vector<BamFile>&& bamFiles);
     SequentialCompositeBamReader(const DataSet& dataset);
 
+    /// \}
+
 public:
+    /// \name Data Access
+
+    ///
     bool GetNext(BamRecord& record);
 
 private:
     std::deque<std::unique_ptr<BamReader> > readers_;
 };
 
-} // namespace internal
 } // namespace BAM
 } // namespace PacBio
 
-#include "CompositeBamReader.inl"
+#include "pbbam/internal/CompositeBamReader.inl"
 
 #endif // COMPOSITEBAMREADER_H

@@ -35,13 +35,11 @@
 
 // Author: Derek Barnett
 
-#include "BamReader.h"
+#include "pbbam/BamReader.h"
+#include "MemoryUtils.h"
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
-
-#include <iostream>
-
 #include <cassert>
 #include <cstdio>
 using namespace PacBio;
@@ -49,43 +47,88 @@ using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
 using namespace std;
 
+namespace PacBio {
+namespace BAM {
+namespace internal {
+
+struct BamReaderPrivate
+{
+public:
+    BamReaderPrivate(const BamFile& bamFile)
+        : htsFile_(nullptr)
+        , bamFile_(bamFile)
+    {
+        DoOpen();
+    }
+
+    BamReaderPrivate(BamFile&& bamFile)
+        : htsFile_(nullptr)
+        , bamFile_(std::move(bamFile))
+    {
+        DoOpen();
+    }
+
+    void DoOpen(void) {
+
+        // fetch file pointer
+        htsFile_.reset(sam_open(bamFile_.Filename().c_str(), "rb"));
+        if (!htsFile_)
+            throw std::runtime_error("could not open BAM file for reading");
+    }
+
+public:
+    std::unique_ptr<samFile, internal::HtslibFileDeleter> htsFile_;
+    BamFile bamFile_;
+};
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio
+
 BamReader::BamReader(const string& fn)
     : BamReader(BamFile(fn))
 { }
 
-BamReader::BamReader(const BamFile &bamFile)
-    : htsFile_(nullptr)
-    , bamFile_(bamFile)
+BamReader::BamReader(const BamFile& bamFile)
+    : d_(new internal::BamReaderPrivate(bamFile))
 {
-    // fetch file pointer
-    htsFile_.reset(sam_open(bamFile_.Filename().c_str(), "rb"));
-    if (!htsFile_)
-        throw std::runtime_error("could not open BAM file for reading");
-
     // skip header
-    VirtualSeek(bamFile.FirstAlignmentOffset());
+    VirtualSeek(d_->bamFile_.FirstAlignmentOffset());
 }
 
 BamReader::BamReader(BamFile&& bamFile)
-    : htsFile_(nullptr)
-    , bamFile_(std::move(bamFile))
+    : d_(new internal::BamReaderPrivate(std::move(bamFile)))
 {
-    // fetch file pointer
-    htsFile_.reset(sam_open(bamFile_.Filename().c_str(), "rb"));
-    if (!htsFile_)
-        throw std::runtime_error("could not open BAM file for reading");
-
     // skip header
-    VirtualSeek(bamFile_.FirstAlignmentOffset());
+    VirtualSeek(d_->bamFile_.FirstAlignmentOffset());
 }
 
 BamReader::~BamReader(void) { }
 
 BGZF* BamReader::Bgzf(void) const
 {
-    assert(htsFile_);
-    assert(htsFile_->fp.bgzf);
-    return htsFile_->fp.bgzf;
+    assert(d_);
+    assert(d_->htsFile_);
+    assert(d_->htsFile_->fp.bgzf);
+    return d_->htsFile_->fp.bgzf;
+}
+
+const BamFile& BamReader::File(void) const
+{
+    assert(d_);
+    return d_->bamFile_;
+}
+
+std::string BamReader::Filename(void) const
+{
+    assert(d_);
+    return d_->bamFile_.Filename();
+}
+
+const BamHeader& BamReader::Header(void) const
+{
+    assert(d_);
+    return d_->bamFile_.Header();
 }
 
 bool BamReader::GetNext(BamRecord& record)
@@ -98,7 +141,7 @@ bool BamReader::GetNext(BamRecord& record)
     // success
     if (result >= 0) {
         internal::BamRecordMemory::UpdateRecordTags(record);
-        record.header_ = bamFile_.Header();
+        record.header_ = Header();
         return true;
     }
 
@@ -118,7 +161,7 @@ bool BamReader::GetNext(BamRecord& record)
         else
             errorMsg += "unknown reason " + to_string(result);
         errorMsg += string{" ("};
-        errorMsg += bamFile_.Filename();
+        errorMsg += Filename();
         errorMsg += string{")"};
         throw std::runtime_error{errorMsg};
     }

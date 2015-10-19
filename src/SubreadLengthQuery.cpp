@@ -37,7 +37,7 @@
 
 #include "pbbam/SubreadLengthQuery.h"
 #include "pbbam/PbiFilterTypes.h"
-#include "CompositeBamReader.h"
+#include "pbbam/CompositeBamReader.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
@@ -51,7 +51,7 @@ struct SubreadLengthQuery::SubreadLengthQueryPrivate
         : reader_(PbiQueryLengthFilter(length, compareType), dataset)
     { }
 
-    internal::PbiFilterCompositeBamReader<Compare::None> reader_; // unsorted
+    PbiFilterCompositeBamReader<Compare::None> reader_; // unsorted
 };
 
 SubreadLengthQuery::SubreadLengthQuery(const int32_t length,

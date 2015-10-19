@@ -37,8 +37,8 @@
 
 #include "pbbam/ZmwGroupQuery.h"
 #include "pbbam/BamRecord.h"
+#include "pbbam/CompositeBamReader.h"
 #include "pbbam/PbiFilterTypes.h"
-#include "CompositeBamReader.h"
 #include "MemoryUtils.h"
 #include <algorithm>
 #include <deque>
@@ -49,7 +49,7 @@ using namespace std;
 
 struct ZmwGroupQuery::ZmwGroupQueryPrivate
 {
-    typedef internal::PbiFilterCompositeBamReader<Compare::Zmw> ReaderType;
+    typedef PbiFilterCompositeBamReader<Compare::Zmw> ReaderType;
     typedef std::unique_ptr<ReaderType> ReaderPtr;
 
     ZmwGroupQueryPrivate(const std::vector<int32_t>& zmwWhitelist,

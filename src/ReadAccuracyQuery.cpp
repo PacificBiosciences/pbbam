@@ -37,7 +37,7 @@
 
 #include "pbbam/ReadAccuracyQuery.h"
 #include "pbbam/PbiFilterTypes.h"
-#include "CompositeBamReader.h"
+#include "pbbam/CompositeBamReader.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
@@ -51,7 +51,7 @@ struct ReadAccuracyQuery::ReadAccuracyQueryPrivate
         : reader_(PbiReadAccuracyFilter(accuracy, compareType), dataset)
     { }
 
-    internal::PbiFilterCompositeBamReader<Compare::None> reader_; // unsorted
+    PbiFilterCompositeBamReader<Compare::None> reader_; // unsorted
 };
 
 ReadAccuracyQuery::ReadAccuracyQuery(const Accuracy accuracy,

@@ -10,6 +10,16 @@ series.
 
 ## Active
 
+## [0.2.1] - 2015-10-19
+
+### Added
+- Exposed the following classes to public API:
+    BamReader
+    BaiIndexedBamReader
+    PbiIndexedBamReader
+    GenomicIntervalCompositeBamReader
+    PbiFilterCompositeBamReader
+
 ## [0.2.0] - 2015-10-09
 
 ### Changed

@@ -38,15 +38,16 @@
 #ifndef BAIINDEXEDBAMREADER_H
 #define BAIINDEXEDBAMREADER_H
 
-#include "BamReader.h"
+#include "pbbam/BamReader.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/GenomicInterval.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-class BaiIndexedBamReader : public BamReader
+namespace internal { struct BaiIndexedBamReaderPrivate; }
+
+class PBBAM_EXPORT BaiIndexedBamReader : public BamReader
 {
 public:
     BaiIndexedBamReader(const GenomicInterval& interval, const std::string& filename);
@@ -54,25 +55,16 @@ public:
     BaiIndexedBamReader(const GenomicInterval& interval, BamFile&& bamFile);
 
 public:
-    GenomicInterval Interval(void) const;
+    const GenomicInterval& Interval(void) const;
     BaiIndexedBamReader& Interval(const GenomicInterval& interval);
 
 protected:
     int ReadRawData(BGZF* bgzf, bam1_t* b);
 
 private:
-    void LoadIndex(void);
-
-private:
-    GenomicInterval interval_;
-    std::unique_ptr<hts_idx_t, internal::HtslibIndexDeleter>    htsIndex_;
-    std::unique_ptr<hts_itr_t, internal::HtslibIteratorDeleter> htsIterator_;
+    std::unique_ptr<internal::BaiIndexedBamReaderPrivate> d_;
 };
 
-inline GenomicInterval BaiIndexedBamReader::Interval(void) const
-{ return interval_; }
-
-} // namespace internal
 } // namespace BAM
 } // namespace PacBio
 

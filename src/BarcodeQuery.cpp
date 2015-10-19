@@ -37,7 +37,7 @@
 
 #include "pbbam/BarcodeQuery.h"
 #include "pbbam/PbiFilterTypes.h"
-#include "CompositeBamReader.h"
+#include "pbbam/CompositeBamReader.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
@@ -49,7 +49,7 @@ struct BarcodeQuery::BarcodeQueryPrivate
         : reader_(PbiBarcodeFilter(barcode), dataset)
     { }
 
-    internal::PbiFilterCompositeBamReader<Compare::None> reader_; // unsorted
+    PbiFilterCompositeBamReader<Compare::None> reader_; // unsorted
 };
 
 BarcodeQuery::BarcodeQuery(const uint16_t barcode,

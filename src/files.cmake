@@ -11,6 +11,9 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/BamRecordBuilder.h
     ${PacBioBAM_IncludeDir}/pbbam/BamRecordImpl.h
     ${PacBioBAM_IncludeDir}/pbbam/BamTagCodec.h
+    ${PacBioBAM_IncludeDir}/pbbam/BaiIndexedBamReader.h
+    ${PacBioBAM_IncludeDir}/pbbam/BamReader.h
+    ${PacBioBAM_IncludeDir}/pbbam/CompositeBamReader.h
     ${PacBioBAM_IncludeDir}/pbbam/BamWriter.h
     ${PacBioBAM_IncludeDir}/pbbam/BarcodeQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/Cigar.h
@@ -35,6 +38,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/PbiFilterQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiFilterTypes.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiIndex.h
+    ${PacBioBAM_IncludeDir}/pbbam/PbiIndexedBamReader.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiLookupData.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiRawData.h
     ${PacBioBAM_IncludeDir}/pbbam/Position.h
@@ -56,6 +60,7 @@ set( PacBioBAM_H
 
     # internal headers
     ${PacBioBAM_IncludeDir}/pbbam/internal/Compare.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/CompositeBamReader.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSet.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetBaseTypes.h
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetBaseTypes.inl
@@ -81,16 +86,12 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualRegionTypeMap.h
 
     ${PacBioBAM_SourceDir}/AssertUtils.h
-    ${PacBioBAM_SourceDir}/BaiIndexedBamReader.h
-    ${PacBioBAM_SourceDir}/BamReader.h
-    ${PacBioBAM_SourceDir}/CompositeBamReader.h
-    ${PacBioBAM_SourceDir}/CompositeBamReader.inl
+
     ${PacBioBAM_SourceDir}/DataSetIO.h
     ${PacBioBAM_SourceDir}/DataSetUtils.h
     ${PacBioBAM_SourceDir}/FileUtils.h
     ${PacBioBAM_SourceDir}/FofnReader.h
     ${PacBioBAM_SourceDir}/MemoryUtils.h
-    ${PacBioBAM_SourceDir}/PbiIndexedBamReader.h
     ${PacBioBAM_SourceDir}/PbiIndexIO.h
     ${PacBioBAM_SourceDir}/SequenceUtils.h
     ${PacBioBAM_SourceDir}/StringUtils.h

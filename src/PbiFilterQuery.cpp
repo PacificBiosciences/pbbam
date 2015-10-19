@@ -36,7 +36,7 @@
 // Author: Derek Barnett
 
 #include "pbbam/PbiFilterQuery.h"
-#include "CompositeBamReader.h"
+#include "pbbam/CompositeBamReader.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
@@ -48,7 +48,7 @@ struct PbiFilterQuery::PbiFilterQueryPrivate
         : reader_(filter, dataset)
     { }
 
-    internal::PbiFilterCompositeBamReader<Compare::None> reader_; // unsorted
+    PbiFilterCompositeBamReader<Compare::None> reader_; // unsorted
 };
 
 PbiFilterQuery::PbiFilterQuery(const PbiFilter& filter, const DataSet& dataset)

@@ -41,19 +41,24 @@
 #include "pbbam/BamFile.h"
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
+#include "pbbam/Config.h"
 #include "pbbam/GenomicInterval.h"
-#include "MemoryUtils.h"
+
 #include <htslib/sam.h>
 #include <memory>
 #include <string>
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-class BamReader
+namespace internal { struct BamReaderPrivate; }
+
+class PBBAM_EXPORT BamReader
 {
 public:
+    /// \name Constructors & Related Methods
+    /// \{
+
     /// Opens BAM file for reading.
     ///
     /// \param[in] fn BAM filename
@@ -80,13 +85,25 @@ public:
     ///
     virtual ~BamReader(void);
 
-public:
+    /// \}
 
-    /// \returns BAM flename
+public:
+    /// \name BAM File Attributes
+    /// \{
+
+    const BamFile& File(void) const;
+
+    /// \returns BAM filename
     std::string Filename(void) const;
 
     /// \returns BamHeader object from BAM header contents
     const BamHeader& Header(void) const;
+
+    /// \}
+
+public:
+    /// \name BAM File I/O
+    /// \{
 
     /// Get "next" BAM record.
     ///
@@ -99,8 +116,6 @@ public:
     /// \throws std::runtime_error if failed to read file (e.g. truncated or corrupted file).
     ///
     bool GetNext(BamRecord& record);
-
-public:
 
     /// Seeks to virtual offset in BAM.
     ///
@@ -115,7 +130,10 @@ public:
     ///
     int64_t VirtualTell(void) const;
 
+    /// \}
+
 protected:
+
     /// Internal helper method for access to underlying BGZF stream pointer.
     ///
     /// Useful for readers' interfacing with htslib methods.
@@ -134,18 +152,10 @@ protected:
     ///
     virtual int ReadRawData(BGZF* bgzf, bam1_t* b);
 
-protected:
-    std::unique_ptr<samFile, internal::HtslibFileDeleter> htsFile_;
-    BamFile bamFile_;
+private:
+    std::unique_ptr<internal::BamReaderPrivate> d_;
 };
 
-inline std::string BamReader::Filename(void) const
-{ return bamFile_.Filename(); }
-
-inline const BamHeader& BamReader::Header(void) const
-{ return bamFile_.Header(); }
-
-} // namespace internal
 } // namespace BAM
 } // namespace PacBio
 

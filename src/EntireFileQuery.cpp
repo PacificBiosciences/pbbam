@@ -36,7 +36,7 @@
 // Author: Derek Barnett
 
 #include "pbbam/EntireFileQuery.h"
-#include "CompositeBamReader.h"
+#include "pbbam/CompositeBamReader.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -47,7 +47,7 @@ struct EntireFileQuery::EntireFileQueryPrivate
         : reader_(dataset)
     { }
 
-    PacBio::BAM::internal::SequentialCompositeBamReader reader_;
+    SequentialCompositeBamReader reader_;
 };
 
 EntireFileQuery::EntireFileQuery(const DataSet &dataset)

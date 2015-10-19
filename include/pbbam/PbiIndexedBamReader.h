@@ -39,18 +39,18 @@
 #define PBIINDEXEDBAMREADER_H
 
 #include "pbbam/BamFile.h"
-#include "pbbam/GenomicInterval.h"
+#include "pbbam/BamReader.h"
 #include "pbbam/PbiBasicTypes.h"
 #include "pbbam/PbiFilter.h"
 #include "pbbam/PbiIndex.h"
-#include "BamReader.h"
 #include <string>
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-class PbiIndexedBamReader : public BamReader
+namespace internal { struct PbiIndexedBamReaderPrivate; }
+
+class PBBAM_EXPORT PbiIndexedBamReader : public BamReader
 {
 public:
     PbiIndexedBamReader(const PbiFilter& filter, const std::string& bamFilename);
@@ -65,14 +65,10 @@ protected:
     int ReadRawData(BGZF* bgzf, bam1_t* b);
 
 private:
-    PbiFilter filter_;
-    PbiIndex index_;
-    IndexResultBlocks blocks_;
-    size_t currentBlockReadCount_;
+    std::unique_ptr<internal::PbiIndexedBamReaderPrivate> d_;
 };
 
 } // namespace internal
 } // namespace BAM
-} // namespace PacBio
 
 #endif // PBIINDEXEDBAMREADER_H

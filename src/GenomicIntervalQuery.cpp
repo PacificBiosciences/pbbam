@@ -36,7 +36,7 @@
 // Author: Derek Barnett
 
 #include "pbbam/GenomicIntervalQuery.h"
-#include "CompositeBamReader.h"
+#include "pbbam/CompositeBamReader.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -48,7 +48,7 @@ struct GenomicIntervalQuery::GenomicIntervalQueryPrivate
         : reader_(interval, dataset)
     { }
 
-    internal::GenomicIntervalCompositeBamReader reader_;
+    GenomicIntervalCompositeBamReader reader_;
 };
 
 GenomicIntervalQuery::GenomicIntervalQuery(const GenomicInterval& interval,

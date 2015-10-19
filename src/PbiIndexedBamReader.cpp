@@ -35,11 +35,75 @@
 
 // Author: Derek Barnett
 
-#include "PbiIndexedBamReader.h"
+#include "pbbam/PbiIndexedBamReader.h"
+#include <htslib/bgzf.h>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
 using namespace std;
+
+namespace PacBio {
+namespace BAM {
+namespace internal {
+
+struct PbiIndexedBamReaderPrivate
+{
+public:
+    PbiIndexedBamReaderPrivate(const string& pbiFilename)
+        : index_(pbiFilename)
+        , currentBlockReadCount_(0)
+    { }
+
+    void Filter(const PbiFilter& filter)
+    {
+        // store request & reset counters
+        filter_ = filter;
+        currentBlockReadCount_ = 0;
+        blocks_.clear();
+
+        // query for index blocks
+        auto indexList = filter.Lookup(index_);
+        blocks_ = mergedIndexBlocks(indexList);
+        index_.BasicData().ApplyOffsets(blocks_);
+    }
+
+    int ReadRawData(BGZF* bgzf, bam1_t* b)
+    {
+        // no data to fetch, return false
+        if (blocks_.empty())
+            return -1; // "EOF"
+
+        // if on new block, seek to its first record
+        if (currentBlockReadCount_ == 0) {
+            auto seekResult = bgzf_seek(bgzf, blocks_.at(0).virtualOffset_, SEEK_SET);
+            if (seekResult == -1)
+                throw std::runtime_error("could not seek in BAM file");
+        }
+
+        // read next record
+        auto result = bam_read1(bgzf, b);
+
+        // update counters. if block finished, pop & reset
+        ++currentBlockReadCount_;
+        if (currentBlockReadCount_ == blocks_.at(0).numReads_) {
+            blocks_.pop_front();
+            currentBlockReadCount_ = 0;
+        }
+
+        return result;
+    }
+
+public:
+    PbiFilter filter_;
+    PbiIndex index_;
+    IndexResultBlocks blocks_;
+    size_t currentBlockReadCount_;
+};
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio
+
 
 PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter,
                                          const std::string& filename)
@@ -49,8 +113,7 @@ PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter,
 PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter,
                                          const BamFile& bamFile)
     : BamReader(bamFile)
-    , index_(bamFile_.PacBioIndexFilename())
-    , currentBlockReadCount_(0)
+    , d_(new internal::PbiIndexedBamReaderPrivate(File().PacBioIndexFilename()))
 {
     Filter(filter);
 }
@@ -58,51 +121,26 @@ PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter,
 PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter,
                                          BamFile&& bamFile)
     : BamReader(std::move(bamFile))
-    , index_(bamFile_.PacBioIndexFilename())
-    , currentBlockReadCount_(0)
+    , d_(new internal::PbiIndexedBamReaderPrivate(File().PacBioIndexFilename()))
 {
     Filter(filter);
 }
 
 int PbiIndexedBamReader::ReadRawData(BGZF* bgzf, bam1_t* b)
 {
-    // no data to fetch, return false
-    if (blocks_.empty())
-        return -1; // "EOF"
-
-    // if on new block, seek to its first record
-    if (currentBlockReadCount_ == 0) {
-        auto seekResult = bgzf_seek(bgzf, blocks_.at(0).virtualOffset_, SEEK_SET);
-        if (seekResult == -1)
-            throw std::runtime_error("could not seek in BAM file");
-    }
-
-    // read next record
-    auto result = bam_read1(bgzf, b);
-
-    // update counters. if block finished, pop & reset
-    ++currentBlockReadCount_;
-    if (currentBlockReadCount_ == blocks_.at(0).numReads_) {
-        blocks_.pop_front();
-        currentBlockReadCount_ = 0;
-    }
-
-    return result;
+    assert(d_);
+    return d_->ReadRawData(bgzf, b);
 }
 
 const PbiFilter& PbiIndexedBamReader::Filter(void) const
-{ return filter_; }
+{
+    assert(d_);
+    return d_->filter_;
+}
 
 PbiIndexedBamReader& PbiIndexedBamReader::Filter(const PbiFilter& filter)
 {
-    // store request & reset counters
-    filter_ = filter;
-    currentBlockReadCount_ = 0;
-    blocks_.clear();
-
-    // query for index blocks
-    auto indexList = filter.Lookup(index_);
-    blocks_ = mergedIndexBlocks(indexList);
-    index_.BasicData().ApplyOffsets(blocks_);
+    assert(d_);
+    d_->Filter(filter);
     return *this;
 }

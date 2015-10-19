@@ -36,7 +36,7 @@
 // Author: Derek Barnett
 
 #include "pbbam/QNameQuery.h"
-#include "CompositeBamReader.h"
+#include "pbbam/CompositeBamReader.h"
 #include <boost/optional.hpp>
 #include <cassert>
 using namespace PacBio;

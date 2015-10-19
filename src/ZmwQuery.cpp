@@ -37,7 +37,7 @@
 
 #include "pbbam/ZmwQuery.h"
 #include "pbbam/PbiFilterTypes.h"
-#include "CompositeBamReader.h"
+#include "pbbam/CompositeBamReader.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
@@ -50,7 +50,7 @@ struct ZmwQuery::ZmwQueryPrivate
         : reader_(PbiZmwFilter(zmwWhitelist), dataset)
     { }
 
-    internal::PbiFilterCompositeBamReader<Compare::Zmw> reader_;
+    PbiFilterCompositeBamReader<Compare::Zmw> reader_;
 };
 
 ZmwQuery::ZmwQuery(const std::vector<int32_t>& zmwWhitelist,
