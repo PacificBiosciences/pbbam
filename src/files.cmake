@@ -40,6 +40,8 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/Position.h
     ${PacBioBAM_IncludeDir}/pbbam/ProgramInfo.h
     ${PacBioBAM_IncludeDir}/pbbam/QNameQuery.h
+    ${PacBioBAM_IncludeDir}/pbbam/SequentialZmwGroupQuery.h
+    ${PacBioBAM_IncludeDir}/pbbam/PbiFilterZmwGroupQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/QualityValue.h
     ${PacBioBAM_IncludeDir}/pbbam/QualityValues.h
     ${PacBioBAM_IncludeDir}/pbbam/ReadAccuracyQuery.h
@@ -146,6 +148,8 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/PbiRawData.cpp
     ${PacBioBAM_SourceDir}/ProgramInfo.cpp
     ${PacBioBAM_SourceDir}/QNameQuery.cpp
+    ${PacBioBAM_SourceDir}/SequentialZmwGroupQuery.cpp
+    ${PacBioBAM_SourceDir}/PbiFilterZmwGroupQuery.cpp
     ${PacBioBAM_SourceDir}/QualityValue.cpp
     ${PacBioBAM_SourceDir}/ReadAccuracyQuery.cpp
     ${PacBioBAM_SourceDir}/ReadGroupInfo.cpp
