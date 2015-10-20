@@ -111,6 +111,8 @@ public:
     void Remove(const ExternalResource& ext);
 
 public:
+    /// \deprecated Use DataSet::BamFiles instead. This method cannot resolve relative filepaths 
+    ///             and will be removed in the near future.
     std::vector<BamFile> BamFiles(void) const;
 };
 
