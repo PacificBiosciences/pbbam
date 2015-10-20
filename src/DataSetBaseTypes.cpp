@@ -39,6 +39,7 @@
 #include "pbbam/internal/DataSetBaseTypes.h"
 #include "DataSetUtils.h"
 #include "TimeUtils.h"
+#include <boost/algorithm/string.hpp>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
@@ -107,8 +108,14 @@ StrictEntityType::StrictEntityType(const string& metatype,
     MetaType(metatype);
 
     // TimeStampedName
-    static const string underscore = "_";
-    const string& tsn = LocalNameLabel().to_string() + underscore + ToIso8601(CurrentTime());
+    const size_t numChars = metatype.size();
+    string transformedMetatype;
+    transformedMetatype.resize(numChars);
+    for (auto i = 0; i < numChars; ++i) {
+        const char c = metatype.at(i);
+        transformedMetatype[i] = ((c == '.') ? '_' : tolower(c));
+    }
+    const string& tsn = transformedMetatype + "-" + internal::ToDataSetFormat(internal::CurrentTime());
     TimeStampedName(tsn);
 
     // UniqueId

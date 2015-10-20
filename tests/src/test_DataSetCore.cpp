@@ -85,7 +85,7 @@ TEST(DataSetCoreTest, DefaultsOk)
     EXPECT_FALSE(dataset.TimeStampedName().empty());
     EXPECT_FALSE(dataset.UniqueId().empty());
 
-    EXPECT_EQ(0, dataset.TimeStampedName().find("DataSet_"));
+    EXPECT_EQ(0, dataset.TimeStampedName().find("pacbio_dataset_"));
 
     EXPECT_TRUE(dataset.Format().empty());
     EXPECT_TRUE(dataset.ModifiedAt().empty());
@@ -96,6 +96,29 @@ TEST(DataSetCoreTest, DefaultsOk)
     EXPECT_EQ(0, dataset.ExternalResources().Size());
     EXPECT_EQ(0, dataset.Filters().Size());
     EXPECT_EQ(0, dataset.SubDataSets().Size());
+}
+
+TEST(DataSetCoreTest, TimeStampedNamesOk)
+{
+    DataSet dataset;
+    AlignmentSet alignmentSet;
+    BarcodeSet barcodeSet;
+    ContigSet contigSet;
+    ConsensusAlignmentSet consensusAlignmentSet;
+    ConsensusReadSet consensusReadSet;
+    HdfSubreadSet hdfSubreadSet;
+    ReferenceSet referenceSet;
+    SubreadSet subreadSet;
+
+    EXPECT_EQ(0, dataset.TimeStampedName().find("pacbio_dataset_dataset-"));
+    EXPECT_EQ(0, alignmentSet.TimeStampedName().find("pacbio_dataset_alignmentset-"));
+    EXPECT_EQ(0, barcodeSet.TimeStampedName().find("pacbio_dataset_barcodeset-"));
+    EXPECT_EQ(0, contigSet.TimeStampedName().find("pacbio_dataset_contigset-"));
+    EXPECT_EQ(0, consensusAlignmentSet.TimeStampedName().find("pacbio_dataset_consensusalignmentset-"));
+    EXPECT_EQ(0, consensusReadSet.TimeStampedName().find("pacbio_dataset_consensusreadset-"));
+    EXPECT_EQ(0, hdfSubreadSet.TimeStampedName().find("pacbio_dataset_hdfsubreadset-"));
+    EXPECT_EQ(0, referenceSet.TimeStampedName().find("pacbio_dataset_referenceset-"));
+    EXPECT_EQ(0, subreadSet.TimeStampedName().find("pacbio_dataset_subreadset-"));
 }
 
 TEST(DataSetCoreTest, BasicGettersSettersOk)

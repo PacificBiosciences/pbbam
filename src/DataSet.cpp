@@ -49,11 +49,8 @@ using namespace PacBio::BAM::internal;
 using namespace std;
 
 DataSet::DataSet(void)
-    : d_(new DataSetBase)
-    , path_(FileUtils::CurrentWorkingDirectory())
-{
-    CreatedAt(ToIso8601(CurrentTime()));
-}
+    : DataSet(DataSet::GENERIC)
+{ }
 
 DataSet::DataSet(const DataSet::TypeEnum type)
     : d_(nullptr)
@@ -73,14 +70,14 @@ DataSet::DataSet(const DataSet::TypeEnum type)
             throw std::runtime_error("unsupported dataset type"); // unknown type
     }
 
-    CreatedAt(internal::ToIso8601(CurrentTime()));
+    CreatedAt(internal::ToDataSetFormat(CurrentTime()));
 }
 
 DataSet::DataSet(const BamFile& bamFile)
     : d_(DataSetIO::FromUri(bamFile.Filename()))
     , path_(FileUtils::CurrentWorkingDirectory())
 {
-    CreatedAt(internal::ToIso8601(CurrentTime()));
+    CreatedAt(internal::ToDataSetFormat(CurrentTime()));
 }
 
 DataSet::DataSet(const string& filename)
@@ -169,7 +166,7 @@ DataSet DataSet::FromXml(const string& xml)
     DataSet result;
     result.d_ = internal::DataSetIO::FromXmlString(xml);
     if (result.CreatedAt().empty())
-        result.CreatedAt(internal::ToIso8601(internal::CurrentTime()));
+        result.CreatedAt(internal::ToDataSetFormat(internal::CurrentTime()));
     return result;
 }
 
@@ -225,7 +222,13 @@ namespace PacBio {
 namespace BAM {
 
 string CurrentTimestamp(void)
-{ return internal::ToIso8601(internal::CurrentTime()); }
+{ return internal::ToDataSetFormat(internal::CurrentTime()); }
+
+string ToDataSetFormat(const chrono::system_clock::time_point &tp)
+{ return internal::ToDataSetFormat(tp); }
+
+string ToDataSetFormat(const time_t &t)
+{ return ToDataSetFormat(chrono::system_clock::from_time_t(t)); }
 
 string ToIso8601(const chrono::system_clock::time_point &tp)
 { return internal::ToIso8601(tp); }

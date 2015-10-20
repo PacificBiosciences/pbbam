@@ -234,11 +234,26 @@ private:
 
 /// Get current time.
 ///
-/// \returns ISO-8601 formatted timestamp
+/// \returns DataSetXML formatted timestamp
 ///
 PBBAM_EXPORT std::string CurrentTimestamp(void);
 
+/// Convert provided timepoint to timestamp
+///
+/// \returns DataSetXML formatted timestamp
+///
+PBBAM_EXPORT std::string ToDataSetFormat(const std::chrono::system_clock::time_point& tp);
+
+/// Convert provided time_t to timestamp
+///
+/// \returns DataSetXML formatted timestamp
+///
+PBBAM_EXPORT std::string ToDataSetFormat(const time_t& tp);
+
 /// Convert provided timepoint to timestamp.
+///
+/// \deprecated DataSet XML does not use ISO8601 for timestamps. Use ToDataSetFormat instead.
+///             This method will be removed in a future API update.
 ///
 /// \returns ISO-8601 formatted timestamp
 ///
@@ -246,12 +261,14 @@ PBBAM_EXPORT std::string ToIso8601(const std::chrono::system_clock::time_point& 
 
 /// Convert provided time_t to timestamp.
 ///
+/// \deprecated DataSet XML does not use ISO8601 for timestamps. Use ToDataSetFormat instead.
+///             This method will be removed in a future API update.
+///
 /// \returns ISO-8601 formatted timestamp
 ///
 PBBAM_EXPORT std::string ToIso8601(const time_t& t);
 
 /// \}
-
 
 } // namespace BAM
 } // namespace PacBio
