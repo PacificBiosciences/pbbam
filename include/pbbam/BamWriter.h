@@ -58,6 +58,7 @@ public:
     ///
     /// Values are equivalent to zlib compression levels. See its documentation for more details:
     /// http://www.zlib.net/manual.html
+    ///
     enum CompressionLevel
     {
         CompressionLevel_0 = 0
@@ -75,6 +76,19 @@ public:
       , NoCompression      = CompressionLevel_0
       , FastCompression    = CompressionLevel_1
       , BestCompression    = CompressionLevel_9
+    };
+
+    /// This enum allows you to control whether BAI bin numbers are calculated for output records.
+    /// 
+    /// For most cases, the default behavior (ON) should be retained for maximum compatibility with
+    /// downstream tools (e.g. samtools index). Disabling bin calculation should only be used if all
+    /// records are known to never be mapped, and even then only if profiling revelas the calculation 
+    /// to affect extremely performance-sensitive, "critical paths".
+    ///
+    enum BinCalculationMode
+    {
+        BinCalculation_ON = 0
+      , BinCalculation_OFF
     };
 
 public:
@@ -95,10 +109,18 @@ public:
     ///            If set to 0, BamWriter will attempt to determine a reasonable estimate.
     ///            If set to 1, this will force single-threaded execution.
     ///            No checks are made against an upper limit.
+    /// \param[in] binCalculationMode BAI bin calculation mode. The default behavior will
+    ///            ensure proper bin numbers are provided for all records written. This extra stop
+    ///            may turned off when bin numbers are not needed. Though if in doubt, keep the default.
+    ///
+    /// \throws std::runtmie_error if there was a problem opening the file for writing or if an error 
+    ///         occurred while writing the header
+    ///
     BamWriter(const std::string& filename,
               const BamHeader& header,
               const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
-              const size_t numThreads = 4);
+              const size_t numThreads = 4,
+              const BinCalculationMode binCalculationMode = BamWriter::BinCalculation_ON);
 
     /// Fully flushes all buffered data & closes file.
     ~BamWriter(void);
@@ -115,26 +137,33 @@ public:
     ///       immediately, especially in a multithreaded writer situation.
     ///       Let the BamWriter go out of scope to fully ensure flushing.
     ///
-    /// \throws
+    /// \throws std::runtime_error if flush fails
+    ///
     void TryFlush(void);
 
     /// Write a record to the output BAM file.
     ///
     /// \param[in] record BamRecord object
+    ///
     /// \throws std::runtime_error on failure to write
+    ///
     void Write(const BamRecord& record);
 
     /// Write a record to the output BAM file.
     ///
     /// \param[in] record BamRecord object
     /// \param[out] vOffset BGZF virtual offset to start of \p record
+    ///
     /// \throws std::runtime_error on failure to write
+    ///
     void Write(const BamRecord& record, int64_t* vOffset);
 
     /// Write a record to the output BAM file.
     ///
     /// \param[in] recordImpl BamRecordImpl object
+    ///
     /// \throws std::runtime_error on failure to write
+    ///
     void Write(const BamRecordImpl& recordImpl);
 
     /// \}

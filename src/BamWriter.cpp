@@ -55,35 +55,34 @@ namespace internal {
 class BamWriterPrivate
 {
 public:
-    BamWriterPrivate(void)
-        : file_(nullptr)
-        , header_(nullptr)
-    { }
+    BamWriterPrivate(const std::string& filename,
+                     const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader,
+                     const BamWriter::CompressionLevel compressionLevel,
+                     const size_t numThreads,
+                     const BamWriter::BinCalculationMode binCalculationMode);
 
 public:
-    void Open(const std::string& filename,
-              const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader,
-              const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
-              size_t numThreads = 4);
     void Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord);
+//    void WriteWithBin(const PBBAM_SHARED_PTR<bam1_t>& rawRecord);
     void Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord, int64_t* vOffset);
 
 public:
+    bool calculateBins_;
     std::unique_ptr<samFile, internal::HtslibFileDeleter> file_;
     PBBAM_SHARED_PTR<bam_hdr_t> header_;
     std::string filename_;
 };
 
-void BamWriterPrivate::Open(const string& filename,
-                            const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader,
-                            const BamWriter::CompressionLevel compressionLevel,
-                            size_t numThreads)
+BamWriterPrivate::BamWriterPrivate(const string& filename,
+                                   const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader,
+                                   const BamWriter::CompressionLevel compressionLevel,
+                                   const size_t numThreads,
+                                   const BamWriter::BinCalculationMode binCalculationMode)
+    : calculateBins_(binCalculationMode == BamWriter::BinCalculation_ON)
+    , file_(nullptr)
+    , header_(rawHeader)
+    , filename_(filename)
 {
-    // store filename
-    filename_ = filename;
-
-    // store header
-    header_ = rawHeader;
     if (!header_)
         throw std::runtime_error("null header");
 
@@ -94,17 +93,18 @@ void BamWriterPrivate::Open(const string& filename,
         throw std::runtime_error("could not open file for writing");
 
     // if no explicit thread count given, attempt built-in check
-    if (numThreads == 0) {
-        numThreads = thread::hardware_concurrency();
+    size_t actualNumThreads = numThreads;
+    if (actualNumThreads == 0) {
+        actualNumThreads = thread::hardware_concurrency();
 
         // if still unknown, default to single-threaded
-        if (numThreads == 0)
-            numThreads = 1;
+        if (actualNumThreads == 0)
+            actualNumThreads = 1;
     }
 
     // if multithreading requested, enable it
-    if (numThreads > 1)
-        hts_set_threads(file_.get(), numThreads);
+    if (actualNumThreads > 1)
+        hts_set_threads(file_.get(), actualNumThreads);
 
     // write header
     const int ret = sam_hdr_write(file_.get(), header_.get());
@@ -114,6 +114,11 @@ void BamWriterPrivate::Open(const string& filename,
 
 void BamWriterPrivate::Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord)
 {
+    // (probably) store bins
+    if (calculateBins_)
+        rawRecord->core.bin = hts_reg2bin(rawRecord->core.pos, bam_endpos(rawRecord.get()), 14, 5); // min_shift=14 & n_lvls=5 are BAM "magic numbers"
+
+    // write record to file
     const int ret = sam_write1(file_.get(), header_.get(), rawRecord.get());
     if (ret <= 0)
         throw std::runtime_error("could not write record");
@@ -129,8 +134,17 @@ void BamWriterPrivate::Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord, int64_t*
     const int length = bgzf->block_offset;
 
     *vOffset = (rawTell << 16) | length ;
+
+//    cerr << "BamWriter about to return: " << *vOffset
+//         << ", htell gives: " << htell(bgzf->fp)
+//         << ", bgzf_tell gives: " << bgzf_tell(bgzf) << endl
+//         << "    bgzf->block_address: " << bgzf->block_address << endl
+//         << "    bgzf->block_length:  " << bgzf->block_length << endl
+//         << "    bgzf->block_offset:  " << bgzf->block_offset << endl;
+
     Write(rawRecord);
 }
+
 
 } // namespace internal
 } // namespace BAM
@@ -139,14 +153,16 @@ void BamWriterPrivate::Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord, int64_t*
 BamWriter::BamWriter(const std::string& filename,
                      const BamHeader& header,
                      const BamWriter::CompressionLevel compressionLevel,
-                     const size_t numThreads)
-    : d_(new internal::BamWriterPrivate)
-{
-     d_->Open(filename,
-              internal::BamHeaderMemory::MakeRawHeader(header),
-              compressionLevel,
-              numThreads);
-}
+                     const size_t numThreads,
+                     const BinCalculationMode binCalculationMode)
+    : d_{ new internal::BamWriterPrivate{ filename,
+                                          internal::BamHeaderMemory::MakeRawHeader(header),
+                                          compressionLevel,
+                                          numThreads,
+                                          binCalculationMode
+                                        }
+        }
+{ }
 
 BamWriter::~BamWriter(void)
 {

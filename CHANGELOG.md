@@ -10,6 +10,13 @@ series.
 
 ## Active
 
+## [0.2.2] - 2015-10-22
+
+### Added
+- Added BAI bin calculation to BamWriter::Write, to ensure maximal compatibility with downstream 
+  tools (e.g. 'samtools index'). A new BinCalculationMode enum flag in BamWriter constructor 
+  cotnrols whether this behavior is enabled[default] or not. 
+
 ## [0.2.1] - 2015-10-19
 
 ### Added
