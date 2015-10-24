@@ -70,14 +70,14 @@ DataSet::DataSet(const DataSet::TypeEnum type)
             throw std::runtime_error("unsupported dataset type"); // unknown type
     }
 
-    CreatedAt(internal::ToDataSetFormat(CurrentTime()));
+    CreatedAt(internal::ToIso8601(CurrentTime()));
 }
 
 DataSet::DataSet(const BamFile& bamFile)
     : d_(DataSetIO::FromUri(bamFile.Filename()))
     , path_(FileUtils::CurrentWorkingDirectory())
 {
-    CreatedAt(internal::ToDataSetFormat(CurrentTime()));
+    CreatedAt(internal::ToIso8601(CurrentTime()));
 }
 
 DataSet::DataSet(const string& filename)
@@ -166,7 +166,7 @@ DataSet DataSet::FromXml(const string& xml)
     DataSet result;
     result.d_ = internal::DataSetIO::FromXmlString(xml);
     if (result.CreatedAt().empty())
-        result.CreatedAt(internal::ToDataSetFormat(internal::CurrentTime()));
+        result.CreatedAt(internal::ToIso8601(internal::CurrentTime()));
     return result;
 }
 
