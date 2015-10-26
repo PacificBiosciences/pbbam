@@ -84,6 +84,9 @@ private:
 class PBBAM_EXPORT NamespaceRegistry
 {
 public:
+    /// \name Constructors & Related Methods
+    /// \{
+
     NamespaceRegistry(void);
     NamespaceRegistry(const NamespaceRegistry& other);
     NamespaceRegistry(NamespaceRegistry&& other);
@@ -91,11 +94,13 @@ public:
     NamespaceRegistry& operator=(NamespaceRegistry&& other);
     ~NamespaceRegistry(void);
 
+    /// \}
+
 public:
     const NamespaceInfo& DefaultNamespace(void) const;
     XsdType DefaultXsd(void) const;
     const NamespaceInfo& Namespace(const XsdType& xsd) const;
-
+    XsdType XsdForElement(const std::string& elementLabel) const;
     XsdType XsdForUri(const std::string& uri) const;
 
 public:

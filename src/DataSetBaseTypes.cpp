@@ -51,7 +51,10 @@ using namespace std;
 
 BaseEntityType::BaseEntityType(const std::string& label, const XsdType& xsd)
     : DataSetElement(label, xsd)
-{ }
+{
+    if (Version().empty())
+        Version(internal::XML_VERSION);
+}
 
 DEFINE_ACCESSORS(BaseEntityType, Extensions, Extensions)
 
@@ -119,6 +122,5 @@ StrictEntityType::StrictEntityType(const string& metatype,
     TimeStampedName(tsn);
 
     // UniqueId
-    const string& uuid = GenerateUuid();
-    UniqueId(uuid);
+    UniqueId(internal::GenerateUuid());
 }

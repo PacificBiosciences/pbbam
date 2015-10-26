@@ -92,10 +92,11 @@ TEST(DataSetCoreTest, DefaultsOk)
     EXPECT_TRUE(dataset.Name().empty());
     EXPECT_TRUE(dataset.ResourceId().empty());
     EXPECT_TRUE(dataset.Tags().empty());
-    EXPECT_TRUE(dataset.Version().empty());
     EXPECT_EQ(0, dataset.ExternalResources().Size());
     EXPECT_EQ(0, dataset.Filters().Size());
     EXPECT_EQ(0, dataset.SubDataSets().Size());
+
+    EXPECT_EQ(string{"3.0.1"}, dataset.Version());
 }
 
 TEST(DataSetCoreTest, TimeStampedNamesOk)

@@ -238,4 +238,3 @@ string ToIso8601(const time_t &t)
 
 } // namespace BAM
 } // namespace PacBio
-

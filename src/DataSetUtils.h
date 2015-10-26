@@ -46,6 +46,8 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
+static const std::string XML_VERSION = std::string { "3.0.1" };
+
 template<typename T>
 inline const T& NullObject(void)
 {

@@ -166,7 +166,6 @@ TEST(DataSetIOTest, ToXml)
     dataset.Tags("barcode moreTags mapping mytags");
     dataset.TimeStampedName("my_tsn");
     dataset.UniqueId("b095d0a3-94b8-4918-b3af-a3f81bbe519c");
-    dataset.Version("2.3.0");
     dataset.Attribute("xmlns",              "http://pacificbiosciences.com/PacBioDatasets.xsd")
            .Attribute("xmlns:xsi",          "http://www.w3.org/2001/XMLSchema-instance")
            .Attribute("xsi:schemaLocation", "http://pacificbiosciences.com/PacBioDatasets.xsd");
@@ -202,7 +201,6 @@ TEST(DataSetIOTest, ToXml)
     subDataSet1.Name("HighQuality Read Alignments");
     subDataSet1.TimeStampedName("my_tsn");
     subDataSet1.UniqueId("ab95d0a3-94b8-4918-b3af-a3f81bbe519c");
-    subDataSet1.Version("2.3.0");
     Filter filter1;
     filter1.Properties().Add(Property("rq", "0.85", ">"));
     subDataSet1.Filters().Add(filter1);
@@ -212,7 +210,6 @@ TEST(DataSetIOTest, ToXml)
     subDataSet2.Name("Alignments to chromosome 1");
     subDataSet2.TimeStampedName("my_tsn");
     subDataSet2.UniqueId("ac95d0a3-94b8-4918-b3af-a3f81bbe519c");
-    subDataSet2.Version("2.3.0");
     Filter filter2;
     filter2.Properties().Add(Property("RNAME", "chr1", "=="));
     subDataSet2.Filters().Add(filter2);
@@ -227,7 +224,7 @@ TEST(DataSetIOTest, ToXml)
                 "Name=\"DataSet_AlignmentSet\" "
                 "Tags=\"barcode moreTags mapping mytags\" "
                 "TimeStampedName=\"my_tsn\" "
-                "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"2.3.0\" "
+                "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"3.0.1\" "
                 "xmlns=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
                 "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
                 "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
@@ -241,13 +238,13 @@ TEST(DataSetIOTest, ToXml)
                 "ResourceId=\"file:/mnt/path/to/alignments2.bam\" "
                 "Tags=\"Example\" "
                 "TimeStampedName=\"my_tsn\" "
-                "UniqueId=\"my_uuid\">\n"
+                "UniqueId=\"my_uuid\" Version=\"3.0.1\">\n"
         "\t\t\t<pbbase:FileIndices>\n"
         "\t\t\t\t<pbbase:FileIndex "
                 "MetaType=\"PacBio.Index.PacBioIndex\" "
                 "ResourceId=\"file:/mnt/path/to/alignments2.pbi\" "
                 "TimeStampedName=\"my_tsn\" "
-                "UniqueId=\"my_uuid\" />\n"
+                "UniqueId=\"my_uuid\" Version=\"3.0.1\" />\n"
         "\t\t\t</pbbase:FileIndices>\n"
         "\t\t</pbbase:ExternalResource>\n"
         "\t\t<pbbase:ExternalResource "
@@ -257,13 +254,13 @@ TEST(DataSetIOTest, ToXml)
                 "ResourceId=\"file:./alignments3.bam\" "
                 "Tags=\"Example\" "
                 "TimeStampedName=\"my_tsn\" "
-                "UniqueId=\"my_uuid\">\n"
+                "UniqueId=\"my_uuid\" Version=\"3.0.1\">\n"
         "\t\t\t<pbbase:FileIndices>\n"
         "\t\t\t\t<pbbase:FileIndex "
                 "MetaType=\"PacBio.Index.PacBioIndex\" "
                 "ResourceId=\"file:/mnt/path/to/alignments3.pbi\" "
                 "TimeStampedName=\"my_tsn\" "
-                "UniqueId=\"my_uuid\" />\n"
+                "UniqueId=\"my_uuid\" Version=\"3.0.1\" />\n"
         "\t\t\t</pbbase:FileIndices>\n"
         "\t\t</pbbase:ExternalResource>\n"
         "\t</pbbase:ExternalResources>\n"
@@ -273,7 +270,7 @@ TEST(DataSetIOTest, ToXml)
                 "Name=\"HighQuality Read Alignments\" "
                 "TimeStampedName=\"my_tsn\" "
                 "UniqueId=\"ab95d0a3-94b8-4918-b3af-a3f81bbe519c\" "
-                "Version=\"2.3.0\">\n"
+                "Version=\"3.0.1\">\n"
         "\t\t\t<pbds:Filters>\n"
         "\t\t\t\t<pbds:Filter>\n"
         "\t\t\t\t\t<pbbase:Properties>\n"
@@ -287,7 +284,7 @@ TEST(DataSetIOTest, ToXml)
                 "Name=\"Alignments to chromosome 1\" "
                 "TimeStampedName=\"my_tsn\" "
                 "UniqueId=\"ac95d0a3-94b8-4918-b3af-a3f81bbe519c\" "
-                "Version=\"2.3.0\">\n"
+                "Version=\"3.0.1\">\n"
         "\t\t\t<pbds:Filters>\n"
         "\t\t\t\t<pbds:Filter>\n"
         "\t\t\t\t\t<pbbase:Properties>\n"

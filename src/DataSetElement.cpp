@@ -36,12 +36,12 @@
 // Author: Derek Barnett
 
 #include "pbbam/internal/DataSetElement.h"
+#include "DataSetUtils.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
 
 const std::string& DataSetElement::SharedNullString(void)
 {
-    static const std::string empty = std::string("");
-    return empty;
+    return internal::NullObject<std::string>();
 }

@@ -474,4 +474,3 @@ SubreadSet::SubreadSet(void)
                   "SubreadSet",
                   XsdType::DATASETS)
 { }
-

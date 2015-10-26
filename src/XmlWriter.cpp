@@ -72,7 +72,10 @@ string OutputName(const DataSetElement& node,
         // if no namespace prefix, prepend the appropriate one & return
         if (node.PrefixLabel().empty()) {
             static const string colon = ":";
-            return registry.Namespace(node.Xsd()).Name() + colon + node.LocalNameLabel().to_string();
+            XsdType xsdType = node.Xsd();
+            if (xsdType == XsdType::NONE)
+                xsdType = registry.XsdForElement(node.LocalNameLabel().to_string());
+            return registry.Namespace(xsdType).Name() + colon + node.LocalNameLabel().to_string();
         }
         // otherwise, has prefix - return full name
         else
@@ -134,7 +137,7 @@ void XmlWriter::ToStream(const DataSetBase& dataset,
     const NamespaceRegistry& registry = dataset.Namespaces();
 
     // create top-level dataset XML node
-    const string& label = OutputName(dataset, registry);
+    const string& label = internal::OutputName(dataset, registry);
     if (label.empty())
         throw std::runtime_error("could not convert dataset node to XML");
     pugi::xml_node root = doc.append_child(label.c_str());
@@ -205,24 +208,6 @@ void XmlWriter::ToStream(const DataSetBase& dataset,
             xmlnsAttribute.set_value(nsInfo.Uri().c_str());
         }
     }
-
-
-
-//    static const string xmlnsPrefix = "xmlns:";
-//    for (const XsdType& xsd : xsdTypesFound) {
-//        if (xsd == XsdType::NONE)
-//            continue;
-//        const NamespaceInfo& nsInfo = registry.Namespace(xsd);
-
-
-
-//        const string xmlnsName = xmlnsPrefix + nsInfo.Name();
-//        pugi::xml_attribute xmlnsAttribute = root.attribute(xmlnsName.c_str());
-//        if (xmlnsAttribute.empty()) {
-//            xmlnsAttribute = root.append_attribute(xmlnsName.c_str());
-//            xmlnsAttribute.set_value(nsInfo.Uri().c_str());
-//        }
-//    }
 
     // "no escapes" to allow explicit ">" "<" comparison operators in filter parameters
     // we may remove this if/when comparison is separated from the value
