@@ -173,5 +173,16 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
         }
         EXPECT_EQ(150, count);
     }
+    { // empty filter - should return all records from the same dataset
+
+        PbiFilterQuery query(PbiFilter{ }, ds);
+        int count = 0;
+        for (const BamRecord& r : query) {
+            (void)r;
+            ++count;
+        }
+        EXPECT_EQ(1220, count);
+
+    }
 }
 

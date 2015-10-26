@@ -10,7 +10,14 @@ series.
 
 ## Active
 
+## [0.2.4] - 2015-10-26
+
+### Fixed
+- Empty PbiFilter now returns all records, instead of filtering away all records.
+
 ## [0.2.3] - 2015-10-26
+
+### Added/Fixed
 - Syncing DataSetXML across APIs. Primary changes include output of Version attribute ("3.0.1") on 
 appropriate elements, as well as resolution of namespace issues.
    

@@ -150,14 +150,14 @@ PbiFilter simpleFilter(void)
 TEST(PbiFilterTest, DefaultCtorOk)
 {
     auto filter = PbiFilter{ };
-    tests::checkFilterInternals(filter, PbiFilter::INTERSECT, 0, 0);
+    tests::checkFilterInternals(filter, PbiFilter::INTERSECT, 0, 4);
 }
 
 TEST(PbiFilterTest, CompositionOk)
 {
     auto filter = PbiFilter{ };
     filter.Add(PbiFilter{ });
-    tests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, 0);
+    tests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, 4);
 }
 
 TEST(PbiFilterTest, CustomFilterOk)
@@ -185,13 +185,13 @@ TEST(PbiFilterTest, CopyOk)
         PbiFilter copyAssign;
         copyAssign = original;
 
-        tests::checkFilterInternals(original,   PbiFilter::INTERSECT, 0, 0);
-        tests::checkFilterInternals(copyCtor,   PbiFilter::INTERSECT, 0, 0);
-        tests::checkFilterInternals(copyAssign, PbiFilter::INTERSECT, 0, 0);
+        tests::checkFilterInternals(original,   PbiFilter::INTERSECT, 0, 4);
+        tests::checkFilterInternals(copyCtor,   PbiFilter::INTERSECT, 0, 4);
+        tests::checkFilterInternals(copyAssign, PbiFilter::INTERSECT, 0, 4);
 
-        EXPECT_EQ(0, original.Lookup(tests::shared_index).size());
-        EXPECT_EQ(0, copyCtor.Lookup(tests::shared_index).size());
-        EXPECT_EQ(0, copyAssign.Lookup(tests::shared_index).size());
+        EXPECT_EQ(4, original.Lookup(tests::shared_index).size());
+        EXPECT_EQ(4, copyCtor.Lookup(tests::shared_index).size());
+        EXPECT_EQ(4, copyAssign.Lookup(tests::shared_index).size());
     }
     { // with children
         const auto original = PbiFilter{ tests::SimpleFilter{ } };
@@ -219,13 +219,13 @@ TEST(PbiFilterTest, MoveOk)
         PbiFilter moveAssign;
         moveAssign = tests::emptyFilter();
 
-        tests::checkFilterInternals(original,   PbiFilter::INTERSECT, 0, 0);
-        tests::checkFilterInternals(moveCtor,   PbiFilter::INTERSECT, 0, 0);
-        tests::checkFilterInternals(moveAssign, PbiFilter::INTERSECT, 0, 0);
+        tests::checkFilterInternals(original,   PbiFilter::INTERSECT, 0, 4);
+        tests::checkFilterInternals(moveCtor,   PbiFilter::INTERSECT, 0, 4);
+        tests::checkFilterInternals(moveAssign, PbiFilter::INTERSECT, 0, 4);
 
-        EXPECT_EQ(0, original.Lookup(tests::shared_index).size());
-        EXPECT_EQ(0, moveCtor.Lookup(tests::shared_index).size());
-        EXPECT_EQ(0, moveAssign.Lookup(tests::shared_index).size());
+        EXPECT_EQ(4, original.Lookup(tests::shared_index).size());
+        EXPECT_EQ(4, moveCtor.Lookup(tests::shared_index).size());
+        EXPECT_EQ(4, moveAssign.Lookup(tests::shared_index).size());
     }
     { // with children
         const auto original = tests::simpleFilter();
@@ -259,11 +259,11 @@ TEST(PbiFilterTest, UnionOk)
             const auto emptyFilter = tests::emptyFilter();
             const auto emptyFilter2 = tests::emptyFilter();
             const auto u = PbiFilter::Union({ emptyFilter, emptyFilter2 });
-            tests::checkFilterInternals(u, PbiFilter::UNION, 2, 0);
+            tests::checkFilterInternals(u, PbiFilter::UNION, 2, 4);
         }
         { // move
             const auto u = PbiFilter::Union({ PbiFilter{ }, PbiFilter{ } });
-            tests::checkFilterInternals(u, PbiFilter::UNION, 2, 0);
+            tests::checkFilterInternals(u, PbiFilter::UNION, 2, 4);
         }
     }
 
@@ -298,11 +298,11 @@ TEST(PbiFilterTest, IntersectOk)
             const auto emptyFilter = tests::emptyFilter();
             const auto emptyFilter2 = tests::emptyFilter();
             const auto i = PbiFilter::Intersection({ emptyFilter, emptyFilter2 });
-            tests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, 0);
+            tests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, 4);
         }
         { // move
             const auto i = PbiFilter::Intersection({ PbiFilter{ }, PbiFilter{ } });
-            tests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, 0);
+            tests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, 4);
         }
     }
 

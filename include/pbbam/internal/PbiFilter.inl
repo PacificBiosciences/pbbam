@@ -171,6 +171,16 @@ struct PbiFilterPrivate
 
     IndexList Lookup(const PbiIndex& idx) const
     {
+        // if no child filters (i.e. this is an empty PbiFilter{ }), return all indices
+        if (filters_.empty()) {
+            const auto numRecords = idx.NumReads();
+            auto result = IndexList{ };
+            result.reserve(numRecords);
+            for (auto i = 0; i < numRecords; ++i)
+                result.push_back(i);
+            return result;
+        }
+
         // do child filter lookups
         auto resultMap = std::map<size_t, size_t>{ }; // index -> numOccurrences
         for (auto&& filter : filters_) {
