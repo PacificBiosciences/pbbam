@@ -197,7 +197,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
     }
     { // <Filters> element contains no child <Filter> elements
 
-        const DataSet ds(tests::Data_Dir + "/chunking/chunking_emptyfilters.xml");
+        const DataSet ds(tests::Data_Dir + "/chunking/chunking_emptyfilters.subreadset.xml");
         const PbiFilter filter = PbiFilter::FromDataSet(ds);
         PbiFilterQuery query(filter, ds);
         int count = 0;
