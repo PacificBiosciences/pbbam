@@ -173,7 +173,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
         }
         EXPECT_EQ(150, count);
     }
-    { // empty filter - should return all records from the same dataset
+    { // empty filter object - should return all records from the same dataset
 
         PbiFilterQuery query(PbiFilter{ }, ds);
         int count = 0;
@@ -182,7 +182,29 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
             ++count;
         }
         EXPECT_EQ(1220, count);
+    }
+    { // no <Filters> element present at all
 
+        const DataSet ds(tests::Data_Dir + "/chunking/chunking_missingfilters.subreadset.xml");
+        const PbiFilter filter = PbiFilter::FromDataSet(ds);
+        PbiFilterQuery query(filter, ds);
+        int count = 0;
+        for (const BamRecord& r : query) {
+            (void)r;
+            ++count;
+        }
+        EXPECT_EQ(1220, count);
+    }
+    { // <Filters> element contains no child <Filter> elements
+
+        const DataSet ds(tests::Data_Dir + "/chunking/chunking_emptyfilters.xml");
+        const PbiFilter filter = PbiFilter::FromDataSet(ds);
+        PbiFilterQuery query(filter, ds);
+        int count = 0;
+        for (const BamRecord& r : query) {
+            (void)r;
+            ++count;
+        }
+        EXPECT_EQ(1220, count);
     }
 }
-
