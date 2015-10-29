@@ -38,10 +38,7 @@
 #include "pbbam/PbiFile.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/PbiBuilder.h"
-#include "MemoryUtils.h"
-#include <htslib/sam.h>
-#include <cassert>
-
+#include "pbbam/BamReader.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::PbiFile;
@@ -53,34 +50,13 @@ namespace PbiFile {
 
 void CreateFrom(const BamFile& bamFile)
 {
-    // open input file for file handle & header
-    unique_ptr<samFile,internal::HtslibFileDeleter> htsFile(sam_open(bamFile.Filename().c_str(), "rb"));
-    if (!htsFile)
-        throw std::runtime_error("could not open BAM file for reading");
-
-    unique_ptr<bam_hdr_t, internal::HtslibHeaderDeleter> htsHeader(sam_hdr_read(htsFile.get()));
-    if (!htsHeader)
-        throw std::runtime_error("could not read BAM header data");
-
-    samFile*   fp  = htsFile.get();
-    bam_hdr_t* hdr = htsHeader.get();
-    assert(fp);
-    assert(hdr);
-
-    // setup our record object
-    BamRecord record;
-    bam1_t* b = internal::BamRecordMemory::GetRawData(record).get();
-    if (b == 0)
-        throw std::runtime_error("could not allocate BAM record");
-
-    // iterate through file, building index data
     PbiBuilder builder(bamFile.PacBioIndexFilename(), bamFile.Header().Sequences().size());
-    int64_t offset = bgzf_tell(fp->fp.bgzf);
-    int result = 0;
-    while ((result = sam_read1(fp, hdr, b)) >= 0) {
-        internal::BamRecordMemory::UpdateRecordTags(record);
-        builder.AddRecord(record, offset);
-        offset = bgzf_tell(fp->fp.bgzf);
+    BamReader reader(bamFile);
+    BamRecord b;
+    int64_t offset = reader.VirtualTell();
+    while (reader.GetNext(b)) {
+        builder.AddRecord(b, offset);
+        offset = reader.VirtualTell();
     }
 }
 

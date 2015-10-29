@@ -42,6 +42,7 @@
 #include "TestData.h"
 #include <gtest/gtest.h>
 #include <pbbam/BamFile.h>
+#include <pbbam/BamReader.h>
 #include <pbbam/BamWriter.h>
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/PbiBuilder.h>
@@ -63,7 +64,8 @@ namespace BAM {
 namespace tests {
 
 static
-PbiRawData Test2Bam_RawIndex(void)
+PbiRawData Test2Bam_CoreIndexData(void)
+
 {
     PbiRawData index;
     index.Version(PbiFile::Version_3_0_1);
@@ -77,7 +79,7 @@ PbiRawData Test2Bam_RawIndex(void)
     subreadData.holeNumber_ = { 14743, 14743, 14743, 14743 };
     subreadData.readQual_   = { 0.901, 0.901, 0.901, 0.901 };
     subreadData.ctxtFlag_   = { 0, 0, 0, 0 };
-    subreadData.fileOffset_ =  { 35651584, 35655125, 35667128, 35679170 };
+    subreadData.fileOffset_ = { 0, 0, 0 ,0 }; // filled in per existing vs new BAM/PBI
 
     PbiRawMappedData& mappedData = index.mappedData_;
     mappedData.tId_       = { 0, 0, 0, 0 };
@@ -91,6 +93,26 @@ PbiRawData Test2Bam_RawIndex(void)
     mappedData.nMM_       = { 0, 0, 0, 0 };             // old 'M' ops were just replaced w/ '=', no 'X'
 
     // reference & barcode data are empty for this file
+    return index;
+}
+
+// NOTE: We have 2 different sets of offsets because the copied, new file differs in size than the existing one
+//       Different write parameters (thread count, compression level, etc) may yield different file sizes, even
+//       though content is same).
+
+static
+PbiRawData Test2Bam_ExistingIndex(void)
+{
+    PbiRawData index = Test2Bam_CoreIndexData();
+    index.BasicData().fileOffset_ = { 35651584, 35655125, 35667128, 35679170 };
+    return index;
+}
+
+static
+PbiRawData Test2Bam_NewIndex(void)
+{
+    PbiRawData index = Test2Bam_CoreIndexData();
+    index.BasicData().fileOffset_ = { 35651584, 145358848, 469893120, 796459008 };
     return index;
 }
 
@@ -247,12 +269,20 @@ TEST(PacBioIndexTest, CreateFromExistingBam)
     EXPECT_EQ(4, index.NumReads());
     EXPECT_TRUE(index.HasMappedData());
 
-    const PbiRawData& expectedIndex = tests::Test2Bam_RawIndex();
+    const PbiRawData& expectedIndex = tests::Test2Bam_ExistingIndex();
     tests::ExpectRawIndicesEqual(expectedIndex, index);
 
     // clean up temp file(s)
     remove(tempBamFn.c_str());
     remove(tempPbiFn.c_str());
+}
+
+::testing::AssertionResult CanRead(BamReader& reader, BamRecord& record, int i)
+{
+    if (reader.GetNext(record))
+        return ::testing::AssertionSuccess() << "i: " << i;
+    else
+        return ::testing::AssertionFailure() << "i: " << i;
 }
 
 TEST(PacBioIndexTest, CreateOnTheFly)
@@ -262,12 +292,16 @@ TEST(PacBioIndexTest, CreateOnTheFly)
     const string tempBamFn  = tempDir + "temp.bam";
     const string tempPbiFn  = tempBamFn + ".pbi";
 
+    // NOTE: new file differs in size than existing (different write parameters may yield different file sizes, even though content is same)
+    const vector<int64_t> expectedNewOffsets = { 35651584, 145358848, 469893120, 796459008 };
+    vector<int64_t> observedOffsets;
+
     // create PBI on the fly from input BAM while we write to new file
     {
         BamFile bamFile(test2BamFn);
         BamHeader header = bamFile.Header();
 
-        BamWriter writer(tempBamFn, header);
+        BamWriter writer(tempBamFn, header); // default compression, default thread count
         PbiBuilder builder(tempPbiFn, header.Sequences().size());
 
         int64_t vOffset = 0;
@@ -275,17 +309,48 @@ TEST(PacBioIndexTest, CreateOnTheFly)
         for (const BamRecord& record : entireFile) {
             writer.Write(record, &vOffset);
             builder.AddRecord(record, vOffset);
+            observedOffsets.push_back(vOffset);
+        }
+    }
+
+    EXPECT_EQ(expectedNewOffsets, observedOffsets);
+
+    // sanity check on original file
+    {
+        const vector<int64_t> originalFileOffsets = { 35651584, 35655125, 35667128, 35679170 };
+        BamRecord r;
+        BamReader reader(test2BamFn);
+        for (int i = 0; i < originalFileOffsets.size(); ++i) {
+            reader.VirtualSeek(originalFileOffsets.at(i));
+            EXPECT_TRUE(CanRead(reader, r, i));
+        }
+    }
+
+    // attempt to seek in our new file using both expected & observed offsets
+    {
+        BamRecord r;
+        BamReader reader(tempBamFn);
+        for (int i = 0; i < expectedNewOffsets.size(); ++i) {
+            reader.VirtualSeek(expectedNewOffsets.at(i));
+            EXPECT_TRUE(CanRead(reader, r, i));
+        }
+        for (int i = 0; i < observedOffsets.size(); ++i) {
+            reader.VirtualSeek(observedOffsets.at(i));
+            EXPECT_TRUE(CanRead(reader, r, i));
         }
     }
 
     // compare data in new PBI file, to expected data
-    const PbiRawData& expectedIndex = tests::Test2Bam_RawIndex();
+    const PbiRawData& expectedIndex = tests::Test2Bam_NewIndex();
     const PbiRawData& fromBuilt = PbiRawData(tempPbiFn);
     tests::ExpectRawIndicesEqual(expectedIndex, fromBuilt);
 
     // straight diff of newly-generated PBI file to existing PBI
-    const string pbiDiffCmd = string("diff -q ") + test2BamFn + ".pbi " + tempPbiFn;
-    EXPECT_EQ(0, system(pbiDiffCmd.c_str()));
+    // TODO: Come back to this once pbindexump is in place.
+    //       We can't exactly do this since file offsets may differ between 2 BAMs of differing compression levels.
+    //       Should add some sort of BAM checksum based on contents, not just size, for this reason.
+//    const string pbiDiffCmd = string("diff -q ") + test2BamFn + ".pbi " + tempPbiFn;
+//    EXPECT_EQ(0, system(pbiDiffCmd.c_str()));
 
     // clean up temp file(s)
     remove(tempBamFn.c_str());
@@ -298,7 +363,7 @@ TEST(PacBioIndexTest, RawLoadFromPbiFile)
     const string& pbiFilename = bamFile.PacBioIndexFilename();
     const PbiRawData loadedIndex(pbiFilename);
 
-    const PbiRawData& expectedIndex = tests::Test2Bam_RawIndex();
+    const PbiRawData& expectedIndex = tests::Test2Bam_ExistingIndex();
     tests::ExpectRawIndicesEqual(expectedIndex, loadedIndex);
 }
 

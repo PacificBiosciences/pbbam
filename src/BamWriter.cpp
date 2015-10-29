@@ -42,8 +42,8 @@
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
-#include <thread>
 #include <iostream>
+#include <thread>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -63,7 +63,6 @@ public:
 
 public:
     void Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord);
-//    void WriteWithBin(const PBBAM_SHARED_PTR<bam1_t>& rawRecord);
     void Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord, int64_t* vOffset);
 
 public:
@@ -130,21 +129,17 @@ void BamWriterPrivate::Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord, int64_t*
     assert(bgzf);
     assert(vOffset);
 
+    // ensure offsets up-to-date
+    bgzf_flush(bgzf);
+
+    // capture virtual offset where we’re about to write 
     const off_t rawTell = htell(bgzf->fp);
     const int length = bgzf->block_offset;
-
-    *vOffset = (rawTell << 16) | length ;
-
-//    cerr << "BamWriter about to return: " << *vOffset
-//         << ", htell gives: " << htell(bgzf->fp)
-//         << ", bgzf_tell gives: " << bgzf_tell(bgzf) << endl
-//         << "    bgzf->block_address: " << bgzf->block_address << endl
-//         << "    bgzf->block_length:  " << bgzf->block_length << endl
-//         << "    bgzf->block_offset:  " << bgzf->block_offset << endl;
-
+    *vOffset = (rawTell << 16) + length ;
+    
+    // now write data
     Write(rawRecord);
 }
-
 
 } // namespace internal
 } // namespace BAM
@@ -185,3 +180,4 @@ void BamWriter::Write(const BamRecord& record, int64_t* vOffset)
 
 void BamWriter::Write(const BamRecordImpl& recordImpl)
 { d_->Write(internal::BamRecordMemory::GetRawData(recordImpl)); }
+

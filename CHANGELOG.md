@@ -10,6 +10,13 @@ series.
 
 ## Active
 
+## [0.3.0] - 2015-10-29
+
+### Fixed
+- Improper reporting of current offset from multi-threaded BamWriter. This had the effect of creating 
+broken PBIs that were written alongside the BAM. Added a flush step, which incurs a performance hit, 
+but restores correctness.
+
 ## [0.2.4] - 2015-10-26
 
 ### Fixed
