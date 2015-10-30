@@ -10,9 +10,16 @@ series.
 
 ## Active
 
+## [0.3.1] - 2015-10-30
+
 ### Added
 - ZmwWhitelistVirtualReader: similar to VirtualPolymeraseReader but restricts iteration to a whitelist of
 ZMW hole numbers, leveraging PBI index data for random-access.
+
+### Fixed
+- Fixed error in PBI construction, in which entire file sections (e.g. BarcodeData or MappedData) where being 
+dropped when any one record lacked data. Correct behavior is to allow file section ommission if all records
+lack that data type. 
 
 ## [0.3.0] - 2015-10-29
 

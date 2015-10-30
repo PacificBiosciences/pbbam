@@ -73,6 +73,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/internal/PbiFilterTypes.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/PbiIndex.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/PbiLookupData.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/PbiRawData.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/QueryBase.h
     ${PacBioBAM_IncludeDir}/pbbam/internal/QueryBase.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/ReadGroupInfo.inl

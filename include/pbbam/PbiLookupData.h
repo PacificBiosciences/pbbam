@@ -373,9 +373,9 @@ public:
 
 public:
     // numeric comparisons make sense, keep key ordering preserved
-    OrderedLookup<uint16_t> bcForward_;
-    OrderedLookup<uint16_t> bcReverse_;
-    OrderedLookup<uint8_t>  bcQual_;
+    OrderedLookup<int16_t> bcForward_;
+    OrderedLookup<int16_t> bcReverse_;
+    OrderedLookup<int8_t>  bcQual_;
 };
 
 } // namespace BAM

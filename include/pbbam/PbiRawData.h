@@ -51,6 +51,9 @@ class BamRecord;
 class PBBAM_EXPORT PbiRawBarcodeData
 {
 public:
+    /// \name Constructors & Related Methods
+    /// \{
+
     PbiRawBarcodeData(void);
     PbiRawBarcodeData(uint32_t numReads);
     PbiRawBarcodeData(const PbiRawBarcodeData& other);
@@ -58,22 +61,29 @@ public:
     PbiRawBarcodeData& operator=(const PbiRawBarcodeData& other);
     PbiRawBarcodeData& operator=(PbiRawBarcodeData&& other);
 
-public:
-    /// Maybe add barcode data for \p b, if available.
-    /// \returns true if record had barcode data
-    ///
-    bool AddRecord(const BamRecord& b);
+    /// \}
 
 public:
-    std::vector<uint16_t> bcForward_;
-    std::vector<uint16_t> bcReverse_;
-    std::vector<uint8_t>  bcQual_;
+    /// \name Index Construction
+    /// \{
 
+    /// Add barcode data for \p b, if available.
+    void AddRecord(const BamRecord& b);
+
+    /// \}
+
+public:
+    std::vector<int16_t> bcForward_;
+    std::vector<int16_t> bcReverse_;
+    std::vector<int8_t>  bcQual_;
 };
 
 class PBBAM_EXPORT PbiRawMappedData
 {
 public:
+    /// \name Constructors & Related Methods
+    /// \{
+
     PbiRawMappedData(void);
     PbiRawMappedData(uint32_t numReads);
     PbiRawMappedData(const PbiRawMappedData& other);
@@ -81,15 +91,26 @@ public:
     PbiRawMappedData& operator=(const PbiRawMappedData& other);
     PbiRawMappedData& operator=(PbiRawMappedData&& other);
 
+    /// \}
+
 public:
-    /// Maybe add mapping data for \p b, if available.
-    /// \returns true if record had mapping data
-    ///
-    bool AddRecord(const BamRecord& b);
+    /// \name Index Construction
+    /// \{
+
+    /// Add mapping data for \p b, if available.
+    void AddRecord(const BamRecord& b);
+
+    /// \}
+
+public:
+    /// \name Index Data
+    /// \{
 
     uint32_t NumDeletedBasesAt(size_t recordIndex) const;
     uint32_t NumInsertedBasesAt(size_t recordIndex) const;
     std::pair<uint32_t, uint32_t> NumDeletedAndInsertedBasesAt(size_t recordIndex) const;
+
+    /// }
 
 public:
     std::vector<int32_t>  tId_;
@@ -110,6 +131,9 @@ public:
     typedef uint32_t Row;
 
 public:
+    /// \name Constructors & Related Methods
+    /// \{
+
     PbiReferenceEntry(void);
     PbiReferenceEntry(ID id);
     PbiReferenceEntry(ID id, Row beginRow, Row endRow);
@@ -118,12 +142,9 @@ public:
     PbiReferenceEntry& operator=(const PbiReferenceEntry& other);
     PbiReferenceEntry& operator=(PbiReferenceEntry&& other);
 
-    bool operator==(const PbiReferenceEntry& other) const
-    {
-        return tId_      == other.tId_ &&
-               beginRow_ == other.beginRow_ &&
-               endRow_   == other.endRow_;
-    }
+    bool operator==(const PbiReferenceEntry& other) const;
+
+    /// \}
 
 public:
     static const ID  UNMAPPED_ID;
@@ -138,12 +159,17 @@ public:
 class PBBAM_EXPORT PbiRawReferenceData
 {
 public:
+    /// \name Constructors & Related Methods
+    /// \{
+
     PbiRawReferenceData(void);
     PbiRawReferenceData(uint32_t numRefs);
     PbiRawReferenceData(const PbiRawReferenceData& other);
     PbiRawReferenceData(PbiRawReferenceData&& other);
     PbiRawReferenceData& operator=(const PbiRawReferenceData& other);
     PbiRawReferenceData& operator=(PbiRawReferenceData&& other);
+
+    /// \}
 
 public:
     std::vector<PbiReferenceEntry> entries_;
@@ -152,6 +178,9 @@ public:
 class PBBAM_EXPORT PbiRawBasicData
 {
 public:
+    /// \name Constructors & Related Methods
+    /// \{
+
     PbiRawBasicData(void);
     PbiRawBasicData(uint32_t numReads);
     PbiRawBasicData(const PbiRawBasicData& other);
@@ -159,8 +188,16 @@ public:
     PbiRawBasicData& operator=(const PbiRawBasicData& other);
     PbiRawBasicData& operator=(PbiRawBasicData&& other);
 
+    /// \}
+
 public:
+    /// \name Index Construction
+    /// \{
+
+    /// Add mapping data for \p b, if available.
     void AddRecord(const BamRecord& b, int64_t offset);
+
+    /// \}
 
 public:
     std::vector<int32_t>  rgId_;
@@ -203,15 +240,28 @@ public:
     /// \name Attributes
     /// \{
 
+    /// \returns true if index contains barcode data (BarcodeData flag is set)
     bool HasBarcodeData(void) const;
+
+    /// \returns true if index contains mapped data (MappedData flag is set)
     bool HasMappedData(void) const;
+
+    /// \returns true if index contains reference data (CoordinateSorted flag is set)
     bool HasReferenceData(void) const;
+
+    /// \returns true if \p section flag is set
     bool HasSection(const PbiFile::Section section) const;
 
     /// \returns PBI filename (".pbi"), will be empty string if user-generated
     std::string Filename(void) const;
+
+    /// \returns sections flags for PBI file
     PbiFile::Sections FileSections(void) const;
+
+    /// \returns number of records indexed
     uint32_t NumReads(void) const;
+
+    /// \returns PBI file version
     PbiFile::VersionEnum Version(void) const;
 
     /// \}
@@ -220,9 +270,16 @@ public:
     /// \name Indexed Sections
     /// \{
 
-    const PbiRawBarcodeData&   BarcodeData(void) const;
-    const PbiRawBasicData&     BasicData(void) const;
-    const PbiRawMappedData&    MappedData(void) const;
+    /// \returns read-only reference to barcode data component
+    const PbiRawBarcodeData& BarcodeData(void) const;
+
+    /// \returns read-only reference to basic data component
+    const PbiRawBasicData& BasicData(void) const;
+
+    /// \returns read-only reference to mapped data component
+    const PbiRawMappedData& MappedData(void) const;
+
+    /// \returns read-only reference to reference data component
     const PbiRawReferenceData& ReferenceData(void) const;
 
     /// \}
@@ -231,8 +288,22 @@ public:
     /// \name Attributes
     /// \{
 
+    /// Set file section flags.
+    ///
+    /// \returns reference to this index
+    ///
     PbiRawData& FileSections(PbiFile::Sections sections);
+
+    /// Set number of indexed records
+    ///
+    /// \returns reference to this index
+    ///
     PbiRawData& NumReads(uint32_t num);
+
+    /// Set PBI file version
+    ///
+    /// \returns reference to this index
+    ///
     PbiRawData& Version(PbiFile::VersionEnum version);
 
     /// \}
@@ -240,12 +311,20 @@ public:
 public:
     /// \name Indexed Sections
 
-    PbiRawBarcodeData&   BarcodeData(void);
-    PbiRawBasicData&     BasicData(void);
-    PbiRawMappedData&    MappedData(void);
+    /// \returns modifiable reference to barcode data component
+    PbiRawBarcodeData& BarcodeData(void);
+
+    /// \returns modifiable reference to basic data component
+    PbiRawBasicData& BasicData(void);
+
+    /// \returns modifiable reference to mapped data component
+    PbiRawMappedData& MappedData(void);
+
+    /// \returns modifiable reference to reference data component
     PbiRawReferenceData& ReferenceData(void);
 
     /// \}
+
 
 private:
     std::string          filename_;
@@ -258,64 +337,9 @@ private:
     PbiRawBasicData      basicData_;
 };
 
-inline const PbiRawBarcodeData& PbiRawData::BarcodeData(void) const
-{ return barcodeData_; }
-
-inline PbiRawBarcodeData& PbiRawData::BarcodeData(void)
-{ return barcodeData_; }
-
-inline std::string PbiRawData::Filename(void) const
-{ return filename_; }
-
-inline PbiFile::Sections PbiRawData::FileSections(void) const
-{ return sections_; }
-
-inline PbiRawData& PbiRawData::FileSections(PbiFile::Sections sections)
-{ sections_ = sections; return *this; }
-
-inline bool PbiRawData::HasBarcodeData(void) const
-{ return HasSection(PbiFile::BARCODE); }
-
-inline bool PbiRawData::HasMappedData(void) const
-{ return HasSection(PbiFile::MAPPED); }
-
-inline bool PbiRawData::HasReferenceData(void) const
-{ return HasSection(PbiFile::REFERENCE); }
-
-inline bool PbiRawData::HasSection(const PbiFile::Section section) const
-{ return (sections_ & section) != 0; }
-
-inline uint32_t PbiRawData::NumReads(void) const
-{ return numReads_; }
-
-inline PbiRawData& PbiRawData::NumReads(uint32_t num)
-{ numReads_ = num; return *this; }
-
-inline const PbiRawMappedData& PbiRawData::MappedData(void) const
-{ return mappedData_; }
-
-inline PbiRawMappedData& PbiRawData::MappedData(void)
-{ return mappedData_; }
-
-inline const PbiRawReferenceData& PbiRawData::ReferenceData(void) const
-{ return referenceData_; }
-
-inline PbiRawReferenceData& PbiRawData::ReferenceData(void)
-{ return referenceData_; }
-
-inline const PbiRawBasicData& PbiRawData::BasicData(void) const
-{ return basicData_; }
-
-inline PbiRawBasicData& PbiRawData::BasicData(void)
-{ return basicData_; }
-
-inline PbiFile::VersionEnum PbiRawData::Version(void) const
-{ return version_; }
-
-inline PbiRawData& PbiRawData::Version(PbiFile::VersionEnum version)
-{ version_ = version; return *this; }
-
 } // namespace BAM
 } // namespace PacBio
+
+#include "pbbam/internal/PbiRawData.inl"
 
 #endif // PBIRAWDATA_H

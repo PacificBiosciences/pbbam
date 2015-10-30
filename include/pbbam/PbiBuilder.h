@@ -71,7 +71,18 @@ public:
     ///
     /// \throws std::runtime_error if PBI file cannot be opened for writing
     ///
-    PbiBuilder(const std::string& pbiFilename, const size_t numReferenceSequences);
+    PbiBuilder(const std::string& pbiFilename,
+               const size_t numReferenceSequences);
+
+    /// Initialize builder to write data to \p pbiFilename. Reference data-tracking
+    /// structures will be initialized to expect \p numReferenceSequences, but only if
+    /// \p isCoordinateSorted is true.
+    ///
+    /// \throws std::runtime_error if PBI file cannot be opened for writing
+    ///
+    PbiBuilder(const std::string& pbiFilename,
+               const size_t numReferenceSequences,
+               const bool isCoordinateSorted);
 
     /// On destruction, data summaries are calculated, raw data is written to file, and
     /// file handle closed.

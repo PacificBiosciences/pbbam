@@ -75,10 +75,15 @@ PbiRawReferenceDataBuilder::PbiRawReferenceDataBuilder(const size_t numReference
     : lastRefId_(-1)
     , lastPos_(-1)
 {
-//    const BamHeader& header = bam.Header();
-//    const size_t numReferences = header.Sequences().size();
+    // initialize with number of references we expect to see
+    //
+    // we can add more later, but want to ensure known references have an entry
+    // even if no records are observed mapping to it
+    //
     for (size_t i = 0; i < numReferenceSequences; ++i)
         rawReferenceEntries_[i] = PbiReferenceEntry(i);
+
+    // also create an "unmapped" entry
     rawReferenceEntries_[PbiReferenceEntry::UNMAPPED_ID] = PbiReferenceEntry();
 }
 
@@ -147,54 +152,74 @@ PbiRawReferenceData PbiRawReferenceDataBuilder::Result(void) const {
 class PbiBuilderPrivate
 {
 public:
-    PbiBuilderPrivate(const string& filename, const size_t numReferenceSequences);
+    PbiBuilderPrivate(const string& filename,
+                      const size_t numReferenceSequences);
+    PbiBuilderPrivate(const string& filename,
+                      const size_t numReferenceSequences,
+                      const bool isCoordinateSorted);
     ~PbiBuilderPrivate(void);
 
 public:
     void AddRecord(const BamRecord& record, const int64_t vOffset);
 
 public:
+    bool HasBarcodeData(void) const;
+    bool HasMappedData(void) const;
+    bool HasReferenceData(void) const;
+
+public:
     unique_ptr<BGZF, HtslibBgzfDeleter> bgzf_;
     PbiRawData rawData_;
     PbiReferenceEntry::Row currentRow_;
-    bool hasMappedData_;
-    bool hasBarcodeData_;
-    bool hasReferenceData_;
     unique_ptr<PbiRawReferenceDataBuilder> refDataBuilder_;
 };
 
-PbiBuilderPrivate::PbiBuilderPrivate(const string& filename, const size_t numReferenceSequences)
+PbiBuilderPrivate::PbiBuilderPrivate(const string& filename,
+                                     const size_t numReferenceSequences)
     : bgzf_(bgzf_open(filename.c_str(), "wb"))
     , currentRow_(0)
-    , hasMappedData_(true)
-    , hasBarcodeData_(true)
-    , hasReferenceData_(true)
+    , refDataBuilder_(nullptr)
+{
+    if (bgzf_.get() == 0)
+        throw std::runtime_error("could not open PBI file for writing");
+
+    if (numReferenceSequences > 0)
+        refDataBuilder_.reset(new PbiRawReferenceDataBuilder(numReferenceSequences));
+}
+
+PbiBuilderPrivate::PbiBuilderPrivate(const string& filename,
+                                     const size_t numReferenceSequences,
+                                     const bool isCoordinateSorted)
+    : bgzf_(bgzf_open(filename.c_str(), "wb"))
+    , currentRow_(0)
     , refDataBuilder_(nullptr)
 {
     if (bgzf_.get()== 0)
         throw std::runtime_error("could not open PBI file for writing");
 
-    if (numReferenceSequences > 0)
+    if (isCoordinateSorted && numReferenceSequences > 0)
         refDataBuilder_.reset(new PbiRawReferenceDataBuilder(numReferenceSequences));
-    else
-        hasReferenceData_ = false;
 }
 
 PbiBuilderPrivate::~PbiBuilderPrivate(void)
 {
     rawData_.NumReads(currentRow_);
 
+    const auto hasBarcodeData   = HasBarcodeData();
+    const auto hasMappedData    = HasMappedData();
+    const auto hasReferenceData = HasReferenceData();
+
     // fetch reference data, if available
-    if (hasReferenceData_) {
+    if (hasReferenceData) {
         assert(refDataBuilder_);
         rawData_.ReferenceData() = std::move(refDataBuilder_->Result());
     }
 
     // determine flags
     PbiFile::Sections sections = PbiFile::BASIC;
-    if (hasMappedData_)    sections |= PbiFile::MAPPED;
-    if (hasBarcodeData_)   sections |= PbiFile::BARCODE;
-    if (hasReferenceData_) sections |= PbiFile::REFERENCE;
+    if (hasMappedData)    sections |= PbiFile::MAPPED;
+    if (hasBarcodeData)   sections |= PbiFile::BARCODE;
+    if (hasReferenceData) sections |= PbiFile::REFERENCE;
     rawData_.FileSections(sections);
 
     // write index contents to file
@@ -203,32 +228,83 @@ PbiBuilderPrivate::~PbiBuilderPrivate(void)
     const uint32_t numReads = rawData_.NumReads();
     if (numReads > 0) {
         PbiIndexIO::WriteBasicData(rawData_.BasicData(), numReads, fp);
-        if (rawData_.HasMappedData())
-            PbiIndexIO::WriteMappedData(rawData_.MappedData(), numReads, fp);
-        if (rawData_.HasReferenceData())
-            PbiIndexIO::WriteReferenceData(rawData_.ReferenceData(), fp);
-        if (rawData_.HasBarcodeData())
-            PbiIndexIO::WriteBarcodeData(rawData_.BarcodeData(), numReads, fp);
+        if (hasMappedData)    PbiIndexIO::WriteMappedData(rawData_.MappedData(), numReads, fp);
+        if (hasReferenceData) PbiIndexIO::WriteReferenceData(rawData_.ReferenceData(), fp);
+        if (hasBarcodeData)   PbiIndexIO::WriteBarcodeData(rawData_.BarcodeData(), numReads, fp);
     }
 }
 
 void PbiBuilderPrivate::AddRecord(const BamRecord& record, const int64_t vOffset)
 {
+    // ensure updated data
     record.ResetCachedPositions();
 
+    // store data
+    rawData_.BarcodeData().AddRecord(record);
     rawData_.BasicData().AddRecord(record, vOffset);
+    rawData_.MappedData().AddRecord(record);
 
-    if (hasMappedData_)
-        hasMappedData_ &= rawData_.MappedData().AddRecord(record);
+    if (refDataBuilder_) {
 
-    if (hasBarcodeData_)
-        hasBarcodeData_ &= rawData_.BarcodeData().AddRecord(record);
+        // stop storing coordinate-sorted reference data if we encounter out-of-order record
+        const bool sorted = refDataBuilder_->AddRecord(record, currentRow_);
+        if (!sorted)
+            refDataBuilder_.reset();
+    }
 
-    if (hasReferenceData_)
-        hasReferenceData_ &= refDataBuilder_->AddRecord(record, currentRow_);
-
+    // increment row counter
     ++currentRow_;
 }
+
+bool PbiBuilderPrivate::HasBarcodeData(void) const
+{
+    // fetch data components
+    const auto& barcodeData = rawData_.BarcodeData();
+    const auto& bcForward   = barcodeData.bcForward_;
+    const auto& bcReverse   = barcodeData.bcReverse_;
+    const auto& bcQuality   = barcodeData.bcQual_;
+
+    // ensure valid sizes
+    if (bcForward.size() != bcReverse.size() &&
+        bcForward.size() != bcQuality.size())
+    {
+        auto msg = string{ "error: inconsistency in PBI barcode data:\n" };
+        msg +=     string{ "  bcForward has " } + to_string(bcForward.size()) + string{ " elements\n" };
+        msg +=     string{ "  bcReverse has " } + to_string(bcReverse.size()) + string{ " elements\n" };
+        msg +=     string{ "  bcQuality has " } + to_string(bcQuality.size()) + string{ " elements\n" };
+        msg +=     string{ "\n" };
+        msg +=     string{ "  these containers should contain equal number of elements.\n" };
+        throw std::runtime_error(msg);
+    }
+    assert(bcForward.size() == rawData_.NumReads());
+
+    // check for data
+    for (auto i = 0; i < rawData_.NumReads(); ++i) {
+        if (bcForward.at(i) != -1 ||
+            bcReverse.at(i)  != -1 ||
+            bcQuality.at(i)  != -1 )
+        {
+            return true;
+        }
+    }
+    // no actual data found
+    return false;
+}
+
+bool PbiBuilderPrivate::HasMappedData(void) const
+{
+    const auto& mappedData = rawData_.MappedData();
+    const auto& tIds = mappedData.tId_;
+    assert(tIds.size() == rawData_.NumReads());
+    for (const auto tId : tIds) {
+        if (tId >= 0)
+            return true;
+    }
+    return false; // all reads unmapped
+}
+
+bool PbiBuilderPrivate::HasReferenceData(void) const
+{ return bool(refDataBuilder_); }
 
 } // namespace internal
 } // namespace BAM
@@ -242,8 +318,17 @@ PbiBuilder::PbiBuilder(const string& pbiFilename)
     : d_(new internal::PbiBuilderPrivate(pbiFilename, 0))
 { }
 
-PbiBuilder::PbiBuilder(const string& pbiFilename, const size_t numReferenceSequences)
+PbiBuilder::PbiBuilder(const string& pbiFilename,
+                       const size_t numReferenceSequences)
     : d_(new internal::PbiBuilderPrivate(pbiFilename, numReferenceSequences))
+{ }
+
+PbiBuilder::PbiBuilder(const string& pbiFilename,
+                       const size_t numReferenceSequences,
+                       const bool isCoordinateSorted)
+    : d_(new internal::PbiBuilderPrivate(pbiFilename,
+                                         numReferenceSequences,
+                                         isCoordinateSorted))
 { }
 
 PbiBuilder::~PbiBuilder(void) { }

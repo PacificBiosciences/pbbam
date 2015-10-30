@@ -39,10 +39,39 @@
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
 #include "PbiIndexIO.h"
+#include <map>
 #include <cassert>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
+
+namespace PacBio {
+namespace BAM {
+namespace internal {
+
+static
+string ToString(const RecordType type)
+{
+    static const auto lookup = map<RecordType, string>
+    {
+        { RecordType::POLYMERASE, "POLYMERASE" },
+        { RecordType::HQREGION,   "HQREGION" },
+        { RecordType::SUBREAD,    "SUBREAD" },
+        { RecordType::CCS,        "CCS" },
+        { RecordType::SCRAP,      "SCRAP" },
+        { RecordType::UNKNOWN,    "UNKNOWN" }
+    };
+
+    try {
+        return lookup.at(type);
+    } catch (std::exception&) {
+        throw std::runtime_error("error: unknown RecordType encountered");
+    }
+}
+
+} // namespace internal
+} // namespace BAM
+} // namesapce PacBio
 
 // ----------------------------------
 // PbiRawBarcodeData implementation
@@ -85,31 +114,33 @@ PbiRawBarcodeData& PbiRawBarcodeData::operator=(PbiRawBarcodeData&& other)
     return *this;
 }
 
-bool PbiRawBarcodeData::AddRecord(const BamRecord& b)
+void PbiRawBarcodeData::AddRecord(const BamRecord& b)
 {
-    // see which, if any, barcoding tags are present
-    // skip if none at all
-    const bool hasBcTag = b.HasBarcodes();
-    const bool hasBqTag = b.HasBarcodeQuality();
-    const bool hasAnyBarcodeInfo = hasBcTag || hasBqTag;
-    if (!hasAnyBarcodeInfo)
-        return false;
+    // check for any barcode data (both required)
+    if (b.HasBarcodes() && b.HasBarcodeQuality()) {
 
-    if (hasBcTag) {
-        const std::pair<uint16_t, uint16_t> barcodes = b.Barcodes();
-        bcForward_.push_back(barcodes.first);
-        bcReverse_.push_back(barcodes.second);
-    } else {
-        bcForward_.push_back(0);
-        bcReverse_.push_back(0); // missing value marker... ??
+        // fetch data from record
+        const auto barcodes = b.Barcodes();
+        const auto barcodeQuality = b.BarcodeQuality();
+
+        // convert to signed integers (stored unsigned in BAM)
+        const auto bcForward = static_cast<int16_t>(barcodes.first);
+        const auto bcReverse = static_cast<int16_t>(barcodes.second);
+        const auto bcQuality = static_cast<int8_t>(barcodeQuality);
+
+        // only store actual data if all values >= 0
+        if (bcForward >= 0 && bcReverse >=0 && bcQuality >= 0) {
+            bcForward_.push_back(bcForward);
+            bcReverse_.push_back(bcReverse);
+            bcQual_.push_back(bcQuality);
+            return;
+        }
     }
 
-    if (hasBqTag)
-        bcQual_.push_back(b.BarcodeQuality());
-    else
-        bcQual_.push_back(0); // missing value marker... ??
-
-    return true;
+    // if we get here, at least one value is either missing or is -1
+    bcForward_.push_back(-1);
+    bcReverse_.push_back(-1);
+    bcQual_.push_back(-1);
 }
 
 // ----------------------------------
@@ -183,11 +214,8 @@ PbiRawMappedData& PbiRawMappedData::operator=(PbiRawMappedData&& other)
     return *this;
 }
 
-bool PbiRawMappedData::AddRecord(const BamRecord& b)
+void PbiRawMappedData::AddRecord(const BamRecord& b)
 {
-    if (!b.IsMapped())
-        return false;
-
     tId_.push_back(b.ReferenceId());
     tStart_.push_back(b.ReferenceStart());
     tEnd_.push_back(b.ReferenceEnd());
@@ -199,8 +227,6 @@ bool PbiRawMappedData::AddRecord(const BamRecord& b)
     const auto matchesAndMismatches = b.NumMatchesAndMismatches();
     nM_.push_back(matchesAndMismatches.first);
     nMM_.push_back(matchesAndMismatches.second);
-
-    return true;
 }
 
 uint32_t PbiRawMappedData::NumDeletedBasesAt(size_t recordIndex) const
@@ -367,16 +393,15 @@ PbiRawBasicData& PbiRawBasicData::operator=(PbiRawBasicData&& other)
 
 void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
 {
-
-    string rgId = b.ReadGroupId();
-    if (rgId.empty()) {
-        // calculate
-    }
+    // read group ID
+    auto rgId = b.ReadGroupId();
+    if (rgId.empty())
+        rgId = MakeReadGroupId(b.MovieName(), internal::ToString(b.Type()));
     const uint32_t rawid = std::stoul(rgId, nullptr, 16);
     const int32_t id = static_cast<int32_t>(rawid);
-
     rgId_.push_back(id);
 
+    // query start/end
     if (b.Type() == RecordType::CCS) {
         qStart_.push_back(-1);
         qEnd_.push_back(-1);
@@ -385,21 +410,12 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
         qEnd_.push_back(b.QueryEnd());
     }
 
-    if (b.HasHoleNumber())
-        holeNumber_.push_back(b.HoleNumber());
-    else
-        holeNumber_.push_back(0); // TODO: what to do?
+    // add'l basic data
+    holeNumber_.push_back(b.HasHoleNumber() ? b.HoleNumber() : 0);
+    readQual_.push_back(b.HasReadAccuracy() ? static_cast<float>(b.ReadAccuracy()) : 0.0f);
+    ctxtFlag_.push_back(b.HasLocalContextFlags() ? b.LocalContextFlags() : LocalContextFlags::NO_LOCAL_CONTEXT);
 
-    if (b.HasReadAccuracy())
-        readQual_.push_back(b.ReadAccuracy());
-    else
-        readQual_.push_back(0.0f); // TODO: what to do?
-
-    if (b.HasLocalContextFlags())
-        ctxtFlag_.push_back(b.LocalContextFlags());
-    else
-        ctxtFlag_.push_back(LocalContextFlags::NO_LOCAL_CONTEXT);
-
+    // virtual offset of record start
     fileOffset_.push_back(offset);
 }
 
