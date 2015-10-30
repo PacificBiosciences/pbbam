@@ -146,3 +146,4 @@ endif*/
 %include "VirtualRegion.i"
 %include "VirtualPolymeraseBamRecord.i"
 %include "VirtualPolymeraseReader.i"
+%include "ZmwWhitelistVirtualReader.i"

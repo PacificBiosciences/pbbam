@@ -10,6 +10,10 @@ series.
 
 ## Active
 
+### Added
+- ZmwWhitelistVirtualReader: similar to VirtualPolymeraseReader but restricts iteration to a whitelist of
+ZMW hole numbers, leveraging PBI index data for random-access.
+
 ## [0.3.0] - 2015-10-29
 
 ### Fixed

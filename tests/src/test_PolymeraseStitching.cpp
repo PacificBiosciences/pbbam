@@ -44,16 +44,21 @@
 #include <string>
 
 #include <gtest/gtest.h>
+#include <pbbam/BamFile.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/EntireFileQuery.h>
+#include <pbbam/Frames.h>
+#include <pbbam/virtual/VirtualPolymeraseReader.h>
+#include <pbbam/virtual/ZmwWhitelistVirtualReader.h>
 
-#include "pbbam/virtual/VirtualPolymeraseReader.h"
-#include "pbbam/BamFile.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/EntireFileQuery.h"
-#include "pbbam/Frames.h"
 #include "TestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
+
+namespace PacBio {
+namespace BAM {
+namespace tests {
 
 void Compare(const BamRecord& b1, const BamRecord& b2)
 {
@@ -118,6 +123,10 @@ void Compare(const BamRecord& b1, const BamRecord& b2)
     EXPECT_EQ(b1.PulseMergeQV(),    b2.PulseMergeQV());
 }
 
+} // namespace tests
+} // namespace BAM
+} // namespace PacBio
+
 TEST(VirtualPolymeraseReader, InternalSubreadsToOriginal)
 {
 	// Create virtual polymerase read
@@ -138,7 +147,7 @@ TEST(VirtualPolymeraseReader, InternalSubreadsToOriginal)
     auto polyRecord = *begin++;
 	EXPECT_TRUE(begin == end); 
 
-	Compare(polyRecord, virtualRecord);
+    tests::Compare(polyRecord, virtualRecord);
 }
 
 TEST(VirtualPolymeraseReader, InternalHQToOriginal)
@@ -161,7 +170,7 @@ TEST(VirtualPolymeraseReader, InternalHQToOriginal)
     auto polyRecord = *begin++;
 	EXPECT_TRUE(begin == end);    
 
-	Compare(polyRecord, virtualRecord);
+    tests::Compare(polyRecord, virtualRecord);
 }
 
 TEST(VirtualPolymeraseReader, VirtualRegions)
@@ -350,4 +359,122 @@ TEST(VirtualPolymeraseReader, ProductionHQToOriginal)
     EXPECT_FALSE(virtualRecord.HasPulseWidth());
     EXPECT_FALSE(virtualRecord.HasPrePulseFrames());
     EXPECT_FALSE(virtualRecord.HasPulseCallWidth());
+}
+
+TEST(ZmwWhitelistVirtualReader, SingleZmwOk)
+{
+    const std::vector<int32_t> whitelist = { 200000 };
+
+    ZmwWhitelistVirtualReader reader(whitelist,
+                                     tests::Data_Dir + "/polymerase/whitelist/internal.subreads.bam",
+                                     tests::Data_Dir + "/polymerase/whitelist/internal.scraps.bam");
+
+    // create virtual record
+    EXPECT_TRUE(reader.HasNext());
+    auto virtualRecord = reader.Next();
+    EXPECT_FALSE(reader.HasNext());
+
+    // fetch original polymerase read (2nd record)
+    BamFile polyBam(tests::Data_Dir + "/polymerase/whitelist/internal.polymerase.bam");
+    EntireFileQuery polyQuery(polyBam);
+    auto begin = polyQuery.begin();
+    auto end = polyQuery.end();
+    EXPECT_TRUE(begin != end);
+    ++begin;
+    EXPECT_TRUE(begin != end);
+    auto polyRecord = *begin++;
+
+    EXPECT_EQ(200000, virtualRecord.HoleNumber());
+
+    tests::Compare(polyRecord, virtualRecord);
+}
+
+TEST(ZmwWhitelistVirtualReader, MultiZmwsOk)
+{
+    const std::vector<int32_t> whitelist = { 100000, 300000 };
+
+    ZmwWhitelistVirtualReader reader(whitelist,
+                                     tests::Data_Dir + "/polymerase/whitelist/internal.subreads.bam",
+                                     tests::Data_Dir + "/polymerase/whitelist/internal.scraps.bam");
+
+
+    // create virtual records
+    EXPECT_TRUE(reader.HasNext());
+    auto virtualRecord1 = reader.Next();
+    EXPECT_TRUE(reader.HasNext());
+    auto virtualRecord2 = reader.Next();
+    EXPECT_FALSE(reader.HasNext());
+
+    // fetch original polymerase reads (2nd record)
+    BamFile polyBam(tests::Data_Dir + "/polymerase/whitelist/internal.polymerase.bam");
+    EntireFileQuery polyQuery(polyBam);
+    auto begin = polyQuery.begin();
+    auto end = polyQuery.end();
+
+    EXPECT_TRUE(begin != end);
+    auto polyRecord1 = *begin++;
+    EXPECT_TRUE(begin != end);
+    ++begin;
+    EXPECT_TRUE(begin != end);
+    auto polyRecord2 = *begin++;
+    EXPECT_TRUE(begin == end);
+
+    EXPECT_EQ(100000, virtualRecord1.HoleNumber());
+    EXPECT_EQ(300000, virtualRecord2.HoleNumber());
+
+    tests::Compare(polyRecord1, virtualRecord1);
+    tests::Compare(polyRecord2, virtualRecord2);
+}
+
+TEST(ZmwWhitelistVirtualReader, EmptyListOk)
+{
+    const std::vector<int32_t> whitelist = { };
+
+    ZmwWhitelistVirtualReader reader(whitelist,
+                                     tests::Data_Dir + "/polymerase/whitelist/internal.subreads.bam",
+                                     tests::Data_Dir + "/polymerase/whitelist/internal.scraps.bam");
+    EXPECT_FALSE(reader.HasNext());
+    EXPECT_TRUE(reader.NextRaw().empty());
+}
+
+TEST(ZmwWhitelistVirtualReader, UnknownZmwOk)
+{
+    const std::vector<int32_t> whitelist = { 42 }; // ZMW not in our files
+
+    ZmwWhitelistVirtualReader reader(whitelist,
+                                     tests::Data_Dir + "/polymerase/whitelist/internal.subreads.bam",
+                                     tests::Data_Dir + "/polymerase/whitelist/internal.scraps.bam");
+    EXPECT_FALSE(reader.HasNext());
+    EXPECT_TRUE(reader.NextRaw().empty());
+}
+
+TEST(ZmwWhitelistVirtualReader, MixedKnownAndUnknownZmwsOk)
+{
+    const std::vector<int32_t> whitelist = { 42, 200000, 24 };
+
+    ZmwWhitelistVirtualReader reader(whitelist,
+                                     tests::Data_Dir + "/polymerase/whitelist/internal.subreads.bam",
+                                     tests::Data_Dir + "/polymerase/whitelist/internal.scraps.bam");
+
+    // everything below should behave exactly as 'SingleValueOk' test,
+    // as the unknown ZMWs will have been removed during construction
+
+    // create virtual record
+    EXPECT_TRUE(reader.HasNext());
+    auto virtualRecord = reader.Next();
+    EXPECT_FALSE(reader.HasNext());
+
+    // fetch original polymerase read (2nd record)
+    BamFile polyBam(tests::Data_Dir + "/polymerase/whitelist/internal.polymerase.bam");
+    EntireFileQuery polyQuery(polyBam);
+    auto begin = polyQuery.begin();
+    auto end = polyQuery.end();
+    EXPECT_TRUE(begin != end);
+    ++begin;
+    EXPECT_TRUE(begin != end);
+    auto polyRecord = *begin++;
+
+    EXPECT_EQ(200000, virtualRecord.HoleNumber());
+
+    tests::Compare(polyRecord, virtualRecord);
 }

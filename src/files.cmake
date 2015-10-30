@@ -84,9 +84,9 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualRegion.h
     ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualRegionType.h
     ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualRegionTypeMap.h
+    ${PacBioBAM_IncludeDir}/pbbam/virtual/ZmwWhitelistVirtualReader.h
 
     ${PacBioBAM_SourceDir}/AssertUtils.h
-
     ${PacBioBAM_SourceDir}/DataSetIO.h
     ${PacBioBAM_SourceDir}/DataSetUtils.h
     ${PacBioBAM_SourceDir}/FileUtils.h
@@ -163,6 +163,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/XmlWriter.cpp
     ${PacBioBAM_SourceDir}/ZmwGroupQuery.cpp
     ${PacBioBAM_SourceDir}/ZmwQuery.cpp
+    ${PacBioBAM_SourceDir}/ZmwWhitelistVirtualReader.cpp
 
     # XML I/O
     ${PacBioBAM_SourceDir}/pugixml/pugixml.cpp

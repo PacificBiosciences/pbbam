@@ -53,13 +53,45 @@ namespace internal { struct PbiIndexedBamReaderPrivate; }
 class PBBAM_EXPORT PbiIndexedBamReader : public BamReader
 {
 public:
+    /// \name Constructors & Related Methods
+    /// \{
+
+    /// Constructs reader on \p bamFilename with an initial PBI filter.
     PbiIndexedBamReader(const PbiFilter& filter, const std::string& bamFilename);
+
+    /// Constructs reader on \p bamFile with an initial PBI filter.
     PbiIndexedBamReader(const PbiFilter& filter, const BamFile& bamFile);
+
+    /// Constructs reader on \p bamFile with an initial PBI filter.
     PbiIndexedBamReader(const PbiFilter& filter, BamFile&& bamFile);
+
+    /// Constructs reader on \p bamFilename with no initial PBI filter.
+    ///
+    /// Useful for delayed PBI lookups.
+    ///
+    PbiIndexedBamReader(const std::string& bamFilename);
+
+    /// Constructs reader on \p bamFile with no initial PBI filter.
+    ///
+    /// Useful for delayed PBI lookups.
+    ///
+    PbiIndexedBamReader(const BamFile& bamFile);
+
+    /// Constructs reader on \p bamFile with no initial PBI filter.
+    ///
+    /// Useful for delayed PBI lookups.
+    ///
+    PbiIndexedBamReader(BamFile&& bamFile);
+
+    ~PbiIndexedBamReader(void);
+
+    /// \}
 
 public:
     const PbiFilter& Filter(void) const;
     PbiIndexedBamReader& Filter(const PbiFilter& filter);
+
+    const PbiIndex& Index(void) const;
 
 protected:
     int ReadRawData(BGZF* bgzf, bam1_t* b);

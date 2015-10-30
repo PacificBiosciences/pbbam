@@ -112,19 +112,33 @@ PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter,
 
 PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter,
                                          const BamFile& bamFile)
-    : BamReader(bamFile)
-    , d_(new internal::PbiIndexedBamReaderPrivate(File().PacBioIndexFilename()))
+    : PbiIndexedBamReader(bamFile)
 {
     Filter(filter);
 }
 
 PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter,
                                          BamFile&& bamFile)
-    : BamReader(std::move(bamFile))
-    , d_(new internal::PbiIndexedBamReaderPrivate(File().PacBioIndexFilename()))
+    : PbiIndexedBamReader(std::move(bamFile))
 {
     Filter(filter);
 }
+
+PbiIndexedBamReader::PbiIndexedBamReader(const std::string& bamFilename)
+    : PbiIndexedBamReader(BamFile(bamFilename))
+{ }
+
+PbiIndexedBamReader::PbiIndexedBamReader(const BamFile& bamFile)
+    : BamReader(bamFile)
+    , d_(new internal::PbiIndexedBamReaderPrivate(File().PacBioIndexFilename()))
+{ }
+
+PbiIndexedBamReader::PbiIndexedBamReader(BamFile&& bamFile)
+    : BamReader(std::move(bamFile))
+    , d_(new internal::PbiIndexedBamReaderPrivate(File().PacBioIndexFilename()))
+{ }
+
+PbiIndexedBamReader::~PbiIndexedBamReader(void) { }
 
 int PbiIndexedBamReader::ReadRawData(BGZF* bgzf, bam1_t* b)
 {
@@ -143,4 +157,10 @@ PbiIndexedBamReader& PbiIndexedBamReader::Filter(const PbiFilter& filter)
     assert(d_);
     d_->Filter(filter);
     return *this;
+}
+
+const PbiIndex& PbiIndexedBamReader::Index(void) const
+{
+    assert(d_);
+    return d_->index_;
 }
