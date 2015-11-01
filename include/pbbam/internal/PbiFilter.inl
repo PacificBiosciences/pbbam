@@ -176,7 +176,7 @@ struct PbiFilterPrivate
             const auto numRecords = idx.NumReads();
             auto result = IndexList{ };
             result.reserve(numRecords);
-            for (auto i = 0; i < numRecords; ++i)
+            for (auto i = decltype(numRecords){0}; i < numRecords; ++i)
                 result.push_back(i);
             return result;
         }
