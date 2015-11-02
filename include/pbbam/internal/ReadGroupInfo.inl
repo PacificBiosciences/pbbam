@@ -241,6 +241,9 @@ inline std::string ReadGroupInfo::SequencingKit(void) const
 inline ReadGroupInfo& ReadGroupInfo::SequencingKit(const std::string& kitNumber)
 { sequencingKit_ = kitNumber; return *this; }
 
+inline std::string ReadGroupInfo::SequencingChemistry(void) const
+{ return SequencingChemistryFromTriple(BindingKit(), SequencingKit(), BasecallerVersion()); }
+
 inline std::string ReadGroupInfo::ToSam(const ReadGroupInfo& rg)
 { return rg.ToSam(); }
 

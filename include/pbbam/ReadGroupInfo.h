@@ -105,6 +105,11 @@ public:
     /// \returns ID string from integer
     static std::string IntToId(const int32_t id);
 
+    /// \returns sequencingChemistry from (bindingKit, sequencingKit, basecallerVersion)
+    static std::string SequencingChemistryFromTriple(const std::string& bindingKit,
+                                                     const std::string& sequencingKit,
+                                                     const std::string& basecallerVersion);
+
     /// \}
 
 public:
@@ -212,6 +217,9 @@ public:
 
     /// \returns sequencing kit part number
     std::string SequencingKit(void) const;
+
+    /// \returns sequencing chemistry name
+    std::string SequencingChemistry(void) const;
 
     /// \}
 

@@ -41,6 +41,7 @@
 
 #include <gtest/gtest.h>
 #include <pbbam/ReadGroupInfo.h>
+#include <vector>
 using namespace PacBio::BAM;
 
 
@@ -59,3 +60,42 @@ TEST(ReadGroupInfoTest, FrameCodecSetOk)
     EXPECT_EQ(FrameCodec::V1, rg.IpdCodec());
 }
 
+TEST(ReadGroupInfoTest, SequencingChemistryOk)
+{
+    using std::string;
+    using std::vector;
+
+    { // P6-C4
+        const vector<string> bindingKits { "100356300", "100372700" };
+        const vector<string> versions { "2.1", "2.3" };
+        ReadGroupInfo rg("P6C4");
+        rg.SequencingKit("100356200");
+        for (const string& bk : bindingKits) {
+            rg.BindingKit(bk);
+            for (const string& ver : versions) {
+                rg.BasecallerVersion(ver);
+                EXPECT_EQ("P6-C4", rg.SequencingChemistry());
+            }
+        }
+    }
+
+    { // S/P1-C1
+        const vector<string> sequencingKits { "100-619-400", "100-711-600" };
+        ReadGroupInfo rg("SP1C1");
+        rg.BindingKit("100-619-300");
+        rg.BasecallerVersion("3.0");
+        for (const string& sk : sequencingKits) {
+            rg.SequencingKit(sk);
+            EXPECT_EQ("S/P1-C1", rg.SequencingChemistry());
+        }
+    }
+}
+
+TEST(ReadGroupInfoTest, SequencingChemistryThrowsOnBadTriple)
+{
+    ReadGroupInfo rg("BAD");
+    rg.BindingKit("100372700");
+    rg.SequencingKit("100-619-400");
+    rg.BasecallerVersion("2.0");
+    EXPECT_THROW(rg.SequencingChemistry(), std::exception);
+}
