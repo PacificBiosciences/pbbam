@@ -74,9 +74,12 @@ void PbiIndexIO::Load(PbiRawData& rawData,
     const uint32_t numReads = rawData.NumReads();
     if (numReads > 0) {
         LoadBasicData(rawData.BasicData(), numReads, fp);
-        LoadMappedData(rawData.MappedData(), numReads, fp);
-        LoadReferenceData(rawData.ReferenceData(), fp);
-        LoadBarcodeData(rawData.BarcodeData(), numReads, fp);
+        if (rawData.HasMappedData())
+            LoadMappedData(rawData.MappedData(), numReads, fp);
+        if (rawData.HasReferenceData())
+            LoadReferenceData(rawData.ReferenceData(), fp);
+        if (rawData.HasBarcodeData())
+            LoadBarcodeData(rawData.BarcodeData(), numReads, fp);
     }
 }
 

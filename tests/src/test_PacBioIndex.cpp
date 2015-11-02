@@ -58,6 +58,7 @@ using namespace PacBio::BAM;
 using namespace std;
 
 const string test2BamFn = tests::Data_Dir + "/dataset/bam_mapping_new.bam";
+const string phi29BamFn = tests::Data_Dir + "/phi29.bam";
 
 namespace PacBio {
 namespace BAM {
@@ -373,6 +374,55 @@ TEST(PacBioIndexTest, RawLoadFromPbiFile)
     const PbiRawData& expectedIndex = tests::Test2Bam_ExistingIndex();
     tests::ExpectRawIndicesEqual(expectedIndex, loadedIndex);
 }
+
+TEST(PacBioIndexTest, BasicAndBarodeSectionsOnly)
+{
+    // do this in temp directory, so we can ensure write access
+    const string tempDir    = "/tmp/";
+    const string tempBamFn  = tempDir + "phi29.bam";
+    const string tempPbiFn  = tempBamFn + ".pbi";
+    string cmd("cp ");
+    cmd += phi29BamFn;
+    cmd += " ";
+    cmd += tempDir;
+    int cmdResult = system(cmd.c_str());
+    (void)cmdResult;
+
+    BamFile bamFile(tempBamFn);
+    PbiFile::CreateFrom(bamFile);
+    EXPECT_EQ(tempPbiFn, bamFile.PacBioIndexFilename());
+
+    PbiRawData index(bamFile.PacBioIndexFilename());
+    EXPECT_EQ(PbiFile::Version_3_0_1,  index.Version());
+    EXPECT_EQ(120, index.NumReads());
+    EXPECT_FALSE(index.HasMappedData());
+    EXPECT_TRUE(index.HasBarcodeData());
+
+    const vector<int16_t> expectedBcForward = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+        2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2};
+    const vector<int16_t> expectedBcReverse = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+        2,2,2,2,2,2,2,2,2,2,2,2,2,2};
+    const vector<int8_t>  expectedBcQuality = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+        1,1,1,1,1,1,1,1,1,1,1};
+
+    const PbiRawBarcodeData& barcodeData = index.BarcodeData();
+    EXPECT_EQ(expectedBcForward, barcodeData.bcForward_);
+    EXPECT_EQ(expectedBcReverse, barcodeData.bcReverse_);
+    EXPECT_EQ(expectedBcQuality, barcodeData.bcQual_);
+
+
+    // clean up temp file(s)
+    remove(tempBamFn.c_str());
+    remove(tempPbiFn.c_str());
+
+}
+
 
 TEST(PacBioIndexTest, ReferenceDataNotLoadedOnUnsortedBam)
 {
