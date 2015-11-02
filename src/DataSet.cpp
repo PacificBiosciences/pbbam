@@ -161,6 +161,21 @@ vector<string> DataSet::ResolvedResourceIds(void) const
     return result;
 }
 
+set<string> DataSet::SequencingChemistries(void) const
+{
+    const vector<BamFile> bamFiles{ BamFiles() };
+
+    set<string> result;
+    for(const BamFile& bf : bamFiles) {
+        if (!bf.IsPacBioBAM())
+            throw std::runtime_error{ "only PacBio BAMs are supported" };
+        const vector<ReadGroupInfo> readGroups{ bf.Header().ReadGroups() };
+        for (const ReadGroupInfo& rg : readGroups)
+            result.insert(rg.SequencingChemistry());
+    }
+    return result;
+}
+
 DataSet DataSet::FromXml(const string& xml)
 {
     DataSet result;

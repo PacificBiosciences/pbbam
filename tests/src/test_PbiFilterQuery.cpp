@@ -42,6 +42,7 @@
 #include "TestData.h"
 #include <gtest/gtest.h>
 #include <pbbam/PbiFilterQuery.h>
+#include <algorithm>
 #include <string>
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -135,6 +136,12 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
             ++count;
         }
         EXPECT_EQ(1220, count);
+    }
+    
+    { // sequencing chemistries
+        set<string> chems{ ds.SequencingChemistries() };
+        set<string> expected{ "P6-C4" };
+        EXPECT_TRUE(equal(chems.begin(), chems.end(), expected.begin()));
     }
 
     { // min ZMW

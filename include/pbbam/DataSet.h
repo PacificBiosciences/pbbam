@@ -43,6 +43,7 @@
 #include "pbbam/DataSetTypes.h"
 #include <chrono>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -157,6 +158,7 @@ public:
 
     std::vector<BamFile> BamFiles(void) const;
     std::vector<std::string> ResolvedResourceIds(void) const;
+    std::set<std::string> SequencingChemistries(void) const;
 
     /// \}
 
