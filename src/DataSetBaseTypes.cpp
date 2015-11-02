@@ -114,7 +114,7 @@ StrictEntityType::StrictEntityType(const string& metatype,
     const size_t numChars = metatype.size();
     string transformedMetatype;
     transformedMetatype.resize(numChars);
-    for (auto i = 0; i < numChars; ++i) {
+    for (size_t i = 0; i < numChars; ++i) {
         const char c = metatype.at(i);
         transformedMetatype[i] = ((c == '.') ? '_' : tolower(c));
     }

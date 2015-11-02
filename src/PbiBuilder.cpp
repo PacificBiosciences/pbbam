@@ -279,7 +279,7 @@ bool PbiBuilderPrivate::HasBarcodeData(void) const
     assert(bcForward.size() == rawData_.NumReads());
 
     // check for data
-    for (auto i = 0; i < rawData_.NumReads(); ++i) {
+    for (auto i = decltype(rawData_.NumReads()){0}; i < rawData_.NumReads(); ++i) {
         if (bcForward.at(i) != -1 ||
             bcReverse.at(i)  != -1 ||
             bcQuality.at(i)  != -1 )
