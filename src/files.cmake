@@ -88,6 +88,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/virtual/ZmwWhitelistVirtualReader.h
 
     ${PacBioBAM_SourceDir}/AssertUtils.h
+    ${PacBioBAM_SourceDir}/ChemistryTable.h
     ${PacBioBAM_SourceDir}/DataSetIO.h
     ${PacBioBAM_SourceDir}/DataSetUtils.h
     ${PacBioBAM_SourceDir}/FileUtils.h
@@ -119,6 +120,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/BamTagCodec.cpp
     ${PacBioBAM_SourceDir}/BamWriter.cpp
     ${PacBioBAM_SourceDir}/BarcodeQuery.cpp
+    ${PacBioBAM_SourceDir}/ChemistryTable.cpp
     ${PacBioBAM_SourceDir}/Cigar.cpp
     ${PacBioBAM_SourceDir}/CigarOperation.cpp
     ${PacBioBAM_SourceDir}/Compare.cpp
