@@ -598,7 +598,9 @@ string ReadGroupInfo::SequencingChemistryFromTriple(const string& bindingKit,
         return "P6-C4";
 
     if ((bindingKit == "100-619-300") &&
-        (sequencingKit == "100-619-400" || sequencingKit == "100-711-600") &&
+        (sequencingKit == "100-619-400" ||
+         sequencingKit == "100-620-000" ||
+         sequencingKit == "100-711-600") &&
         (ver == "3.0"))
         return "S/P1-C1";
 
