@@ -43,9 +43,11 @@
 #include <gtest/gtest.h>
 #include <pbbam/DataSet.h>
 #include <pbbam/internal/DataSetElement.h>
-#include <stdexcept>
+#include <fstream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
+#include <vector>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -95,6 +97,16 @@ TEST(DataSetIOTest, FromBamFilename)
     const ExternalResource& bamRef = dataset.ExternalResources()[0];
 
     EXPECT_EQ(ex2BamFn, bamRef.ResourceId());
+}
+
+TEST(DataSetIOTest, FromBamFilenames)
+{
+    std::ifstream fofn(bamGroupFofn);
+    std::vector<std::string> files;
+    std::string file;
+    while (std::getline(fofn, file)) if (!file.empty()) files.emplace_back(file);
+    DataSet dataset(files);
+    EXPECT_EQ(3, dataset.ExternalResources().Size());
 }
 
 TEST(DataSetIOTest, FromBamFileObject)

@@ -83,6 +83,7 @@ public:
     DataSet(const DataSet::TypeEnum type);
     DataSet(const BamFile& bamFile);
     DataSet(const std::string& filename);
+    DataSet(const std::vector<std::string>& filenames);
     DataSet(const DataSet& other);
     DataSet(DataSet&& other);
     DataSet& operator=(const DataSet& other);

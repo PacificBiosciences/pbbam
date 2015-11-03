@@ -93,6 +93,11 @@ DataSet::DataSet(const string& filename)
         path_ = FileUtils::CurrentWorkingDirectory();
 }
 
+DataSet::DataSet(const std::vector<std::string>& filenames)
+    : d_(DataSetIO::FromUris(filenames))
+    , path_(FileUtils::CurrentWorkingDirectory())
+{ }
+
 DataSet::DataSet(const DataSet& other)
     : path_(other.path_)
 {
