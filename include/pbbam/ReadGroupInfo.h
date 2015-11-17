@@ -39,6 +39,7 @@
 #define READGROUPINFO_H
 
 #include "pbbam/Config.h"
+#include "pbbam/exception/InvalidSequencingChemistryException.h"
 #include <map>
 #include <string>
 

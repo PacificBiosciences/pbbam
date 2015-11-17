@@ -43,7 +43,7 @@
 #include <pbbam/ReadGroupInfo.h>
 #include <vector>
 using namespace PacBio::BAM;
-
+using namespace std;
 
 TEST(ReadGroupInfoTest, IdFromMovieNameAndReadType)
 {
@@ -93,9 +93,19 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
 
 TEST(ReadGroupInfoTest, SequencingChemistryThrowsOnBadTriple)
 {
-    ReadGroupInfo rg("BAD");
-    rg.BindingKit("100372700");
-    rg.SequencingKit("100-619-400");
-    rg.BasecallerVersion("2.0");
-    EXPECT_THROW(rg.SequencingChemistry(), std::exception);
+    try {
+        ReadGroupInfo rg("BAD");
+        rg.BindingKit("100372700");
+        rg.SequencingKit("100-619-400");
+        rg.BasecallerVersion("2.0");
+        //EXPECT_THROW(rg.SequencingChemistry(), InvalidSequencingChemistryException);
+    } catch (InvalidSequencingChemistryException& e) {
+        EXPECT_EQ(string("100372700"),   e.BindingKit());
+        EXPECT_EQ(string("100-619-400"), e.SequencingKit());
+        EXPECT_EQ(string("2.0"),         e.BasecallerVersion());
+    }
 }
+
+
+
+

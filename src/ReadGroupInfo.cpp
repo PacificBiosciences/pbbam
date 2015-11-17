@@ -596,8 +596,8 @@ string ReadGroupInfo::SequencingChemistryFromTriple(const string& bindingKit,
     for (const auto& row : internal::ChemistryTable)
         if (bindingKit == row[0] && sequencingKit == row[1] && ver == row[2])
             return row[3];
-
-    throw std::runtime_error{ "unsupported sequencing chemistry combination" };
+    throw InvalidSequencingChemistryException(bindingKit, sequencingKit, basecallerVersion);
+    //throw std::runtime_error{ "unsupported sequencing chemistry combination" };
 }
 
 ReadGroupInfo& ReadGroupInfo::IpdCodec(const FrameCodec& codec, const string& tag)

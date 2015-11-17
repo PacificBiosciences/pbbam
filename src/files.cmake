@@ -58,6 +58,9 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/ZmwGroupQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/ZmwQuery.h
 
+    # exceptions
+    ${PacBioBAM_IncludeDir}/pbbam/exception/InvalidSequencingChemistryException.h
+
     # internal headers
     ${PacBioBAM_IncludeDir}/pbbam/internal/Compare.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/CompositeBamReader.inl

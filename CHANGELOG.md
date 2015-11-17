@@ -10,6 +10,8 @@ series.
 
 ## Active
 
+### Support for ReadGroupInfo sequencing chemistry data.
+
 ## [0.3.1] - 2015-10-30
 
 ### Added
