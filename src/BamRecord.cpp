@@ -81,6 +81,7 @@ static const string tagName_readGroup               = "RG";
 static const string tagName_scrap_type              = "sc";
 static const string tagName_snr                     = "sn";
 static const string tagName_substitutionQV          = "sq";
+static const string tagName_startFrame              = "sf";
 static const string tagName_substitutionTag         = "st";
 
 // faux (helper) tag names
@@ -787,6 +788,7 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
     std::vector<float> pkmid = std::move(Pkmid(Orientation::GENOMIC));
     Frames prePulseFrames = std::move(PrePulseFrames(Orientation::GENOMIC).Data());
     Frames pulseCallWidth = std::move(PulseCallWidth(Orientation::GENOMIC).Data());
+    std::vector<uint32_t> startFrame = std::move(StartFrame(Orientation::GENOMIC));
 
     // restore native orientation
     if (!isForwardStrand) {
@@ -807,6 +809,7 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
         internal::Reverse(pkmid);
         internal::Reverse(prePulseFrames);
         internal::Reverse(pulseCallWidth);
+        internal::Reverse(startFrame);
     }
 
     // update BAM tags
@@ -828,6 +831,7 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
     tags[internal::tagName_pkmid]               = EncodePhotons(pkmid);
     tags[internal::tagName_pre_pulse_frames]    = prePulseFrames.Data();
     tags[internal::tagName_pulse_call_width]    = pulseCallWidth.Data();
+    tags[internal::tagName_startFrame]          = startFrame;
     impl_.Tags(tags);
 
     // update query start/end
@@ -1201,6 +1205,9 @@ bool BamRecord::HasScrapType(void) const
 
 bool BamRecord::HasSignalToNoise(void) const
 { return impl_.HasTag(internal::tagName_snr); }
+
+bool BamRecord::HasStartFrame(void) const
+{ return impl_.HasTag(internal::tagName_startFrame); }
 
 bool BamRecord::HasSubstitutionQV(void) const
 { return impl_.HasTag(internal::tagName_substitutionQV); }
@@ -1792,6 +1799,18 @@ vector<float> BamRecord::SignalToNoise(void) const
 BamRecord& BamRecord::SignalToNoise(const vector<float>& snr)
 {
     internal::CreateOrEdit(internal::tagName_snr, snr, &impl_);
+    return *this;
+}
+
+std::vector<uint32_t> BamRecord::StartFrame(Orientation orientation) const
+{
+    const Tag& sfTag = impl_.TagValue(internal::tagName_startFrame);
+    return sfTag.ToUInt32Array();
+}
+
+BamRecord& BamRecord::StartFrame(const std::vector<uint32_t>& startFrame)
+{
+    internal::CreateOrEdit(internal::tagName_startFrame, startFrame, &impl_);
     return *this;
 }
 

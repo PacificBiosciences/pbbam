@@ -227,6 +227,9 @@ public:
     /// \returns true if this record has signal-to-noise data (absent in POLYMERASE)
     bool HasSignalToNoise(void) const;
 
+    /// \returns true if this record has StartFrame data
+    bool HasStartFrame(void) const;
+
     /// \returns true if this record has SubstitutionQV data
     bool HasSubstitutionQV(void) const;
 
@@ -571,6 +574,14 @@ public:
                          bool aligned = false,
                          bool exciseSoftClips = false) const;
 
+    /// \brief Fetch this record's StartFrame values ("sf" tag).
+    ///
+    /// \param[in] orientation     Orientation of output.
+    ///
+    /// \returns StartFrame as uint32_t vector
+    ///
+    std::vector<uint32_t> StartFrame(Orientation orientation = Orientation::NATIVE) const;
+
     /// \brief Fetch this record's SubstitutionQV values ("sq" tag).
     ///
     /// \note If \p aligned is true, and gaps/padding need to be inserted, the new
@@ -835,6 +846,12 @@ public:
     BamRecord& PulseWidth(const Frames& frames,
                           const FrameEncodingType encoding);
 
+    /// Sets this record's StartFrame values ("sf" tag).
+    ///
+    /// \param[in] startFrame
+    /// \returns reference to this record
+    BamRecord& StartFrame(const std::vector<uint32_t>& startFrame);
+
     /// Sets this record's SubstitutionQV values ("sq" tag).
     ///
     /// \param[in] substitutionQVs
@@ -1079,6 +1096,9 @@ public:
 
     std::string Sequence(void) const
     { return record_.Sequence(orientation_, aligned_, exciseSoftClips_); }
+
+    std::vector<uint32_t> StartFrames(void) const
+    { return record_.StartFrame(orientation_); }
 
     QualityValues SubstitutionQVs(void) const
     { return record_.SubstitutionQV(orientation_, aligned_, exciseSoftClips_); }

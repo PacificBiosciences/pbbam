@@ -66,6 +66,7 @@ enum class BaseFeature
   , PULSE_CALL
   , PRE_PULSE_FRAMES
   , PULSE_CALL_WIDTH
+  , START_FRAME
 };
 
 enum class FrameCodec

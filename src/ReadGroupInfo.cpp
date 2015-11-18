@@ -83,6 +83,7 @@ static const string feature_PG = string{ "PulseMergeQV" };
 static const string feature_PC = string{ "PulseCall" };
 static const string feature_PD = string{ "PrePulseFrames" };
 static const string feature_PX = string{ "PulseCallWidth" };
+static const string feature_SF = string{ "StartFrame" };
 
 static const string token_RT = string{ "READTYPE" };
 static const string token_BK = string{ "BINDINGKIT" };
@@ -129,6 +130,7 @@ string BaseFeatureName(const BaseFeature& feature)
         case BaseFeature::PULSE_CALL       : return feature_PC;
         case BaseFeature::PRE_PULSE_FRAMES : return feature_PD;
         case BaseFeature::PULSE_CALL_WIDTH : return feature_PX;
+        case BaseFeature::START_FRAME      : return feature_SF;
         default:
             throw std::runtime_error{ "unrecognized base feature" };
     }
@@ -199,6 +201,7 @@ void InitNameToFeature(void)
         nameToFeature[feature_PG] = BaseFeature::PULSE_MERGE_QV;
         nameToFeature[feature_PD] = BaseFeature::PRE_PULSE_FRAMES;
         nameToFeature[feature_PX] = BaseFeature::PULSE_CALL_WIDTH;
+        nameToFeature[feature_SF] = BaseFeature::START_FRAME;
     }
 }
 
