@@ -788,7 +788,11 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
     std::vector<float> pkmid = std::move(Pkmid(Orientation::GENOMIC));
     Frames prePulseFrames = std::move(PrePulseFrames(Orientation::GENOMIC).Data());
     Frames pulseCallWidth = std::move(PulseCallWidth(Orientation::GENOMIC).Data());
-    std::vector<uint32_t> startFrame = std::move(StartFrame(Orientation::GENOMIC));
+    
+    // TODO: clean this up
+    std::vector<uint32_t> startFrame;
+    if (HasStartFrame())
+        startFrame = std::move(StartFrame(Orientation::GENOMIC));
 
     // restore native orientation
     if (!isForwardStrand) {
@@ -809,7 +813,8 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
         internal::Reverse(pkmid);
         internal::Reverse(prePulseFrames);
         internal::Reverse(pulseCallWidth);
-        internal::Reverse(startFrame);
+        if (HasStartFrame())
+            internal::Reverse(startFrame);
     }
 
     // update BAM tags
@@ -831,7 +836,8 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
     tags[internal::tagName_pkmid]               = EncodePhotons(pkmid);
     tags[internal::tagName_pre_pulse_frames]    = prePulseFrames.Data();
     tags[internal::tagName_pulse_call_width]    = pulseCallWidth.Data();
-    tags[internal::tagName_startFrame]          = startFrame;
+    if (HasStartFrame())
+        tags[internal::tagName_startFrame] = startFrame;
     impl_.Tags(tags);
 
     // update query start/end
