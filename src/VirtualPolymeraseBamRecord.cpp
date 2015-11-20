@@ -143,12 +143,13 @@ void VirtualPolymeraseBamRecord::StitchSources(void)
     QualityValues labelQv;
     QualityValues alternativeLabelQv;
 
-    Frames             ipd;
-    Frames             pw;
-    Frames             pd;
-    Frames             px;
-    std::vector<float> pa;
-    std::vector<float> pm;
+    Frames                ipd;
+    Frames                pw;
+    Frames                pd;
+    Frames                px;
+    std::vector<float>    pa;
+    std::vector<float>    pm;
+    std::vector<uint32_t> sf;
 
     // Stitch using tmp vars
     for(auto& b : sources_)
@@ -207,6 +208,9 @@ void VirtualPolymeraseBamRecord::StitchSources(void)
 
         if (b.HasPkmean())
             MoveAppend(b.Pkmean(), pa);
+
+        if (b.HasStartFrame())
+            MoveAppend(b.StartFrame(), sf);
 
         if (b.HasScrapType())
         {
@@ -302,6 +306,10 @@ void VirtualPolymeraseBamRecord::StitchSources(void)
         this->PrePulseFrames(pd, FrameEncodingType::LOSSLESS);
     if (!px.Data().empty())
         this->PulseCallWidth(px, FrameEncodingType::LOSSLESS);
+
+    // 32 bit arrays
+    if (!sf.empty())
+        this->StartFrame(sf);
 
     // Determine HQREGION bases on LQREGIONS
     if (HasVirtualRegionType(VirtualRegionType::LQREGION))
