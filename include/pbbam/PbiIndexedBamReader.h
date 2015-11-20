@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file PbiIndexedBamReader.h
+/// \brief Defines the PbiIndexedBamReader class.
+//
 // Author: Derek Barnett
 
 #ifndef PBIINDEXEDBAMREADER_H
@@ -50,36 +54,86 @@ namespace BAM {
 
 namespace internal { struct PbiIndexedBamReaderPrivate; }
 
+/// \brief The PbiIndexedBamReader class provides read-only iteration over %BAM
+///        records, limited to some filtering criteria.
+///
+/// The PacBio BAM index (*.pbi) is used to allow random-access operations.
+///
 class PBBAM_EXPORT PbiIndexedBamReader : public BamReader
 {
 public:
     /// \name Constructors & Related Methods
     /// \{
 
-    /// Constructs reader on \p bamFilename with an initial PBI filter.
+    /// \brief Constructs %BAM reader, with an initial filter.
+    ///
+    /// All reads that satisfy the filter will be available.
+    ///
+    /// \param[in] filter       PbiFilter or compatible object
+    /// \param[in] bamFilename  input %BAM filename
+    ///
+    /// \throws std::runtime_error if either file (*.bam or *.pbi) cannot be
+    ///         read
+    ///
     PbiIndexedBamReader(const PbiFilter& filter, const std::string& bamFilename);
 
-    /// Constructs reader on \p bamFile with an initial PBI filter.
+    /// \brief Constructs %BAM reader, with an initial filter.
+    ///
+    /// All reads that satisfy the filter will be available.
+    ///
+    /// \param[in] filter       PbiFilter or compatible object
+    /// \param[in] bamFile      input BamFile object
+    ///
+    /// \throws std::runtime_error if either file (*.bam or *.pbi) cannot be
+    ///         read
+    ///
     PbiIndexedBamReader(const PbiFilter& filter, const BamFile& bamFile);
 
-    /// Constructs reader on \p bamFile with an initial PBI filter.
+    /// \brief Constructs %BAM reader, with an initial filter.
+    ///
+    /// All reads that satisfy the filter will be available.
+    ///
+    /// \param[in] filter       PbiFilter or compatible object
+    /// \param[in] bamFile      input BamFile object
+    ///
+    /// \throws std::runtime_error if either file (*.bam or *.pbi) cannot be
+    ///         read
+    ///
     PbiIndexedBamReader(const PbiFilter& filter, BamFile&& bamFile);
 
-    /// Constructs reader on \p bamFilename with no initial PBI filter.
+    /// \brief Constructs %BAM reader, with no initial filter.
     ///
-    /// Useful for delayed PBI lookups.
+    /// Useful for delaying either specifying the filtering criteria or
+    /// performing the PBI lookups.
+    ///
+    /// \param[in] bamFilename  input %BAM filename
+    ///
+    /// \throws std::runtime_error if either file (*.bam or *.pbi) cannot be
+    ///         read
     ///
     PbiIndexedBamReader(const std::string& bamFilename);
 
-    /// Constructs reader on \p bamFile with no initial PBI filter.
+    /// \brief Constructs %BAM reader, with no initial filter.
     ///
-    /// Useful for delayed PBI lookups.
+    /// Useful for delaying either specifying the filtering criteria or
+    /// performing the PBI lookups.
+    ///
+    /// \param[in] bamFile      input BamFile object
+    ///
+    /// \throws std::runtime_error if either file (*.bam or *.pbi) cannot be
+    ///         read
     ///
     PbiIndexedBamReader(const BamFile& bamFile);
 
-    /// Constructs reader on \p bamFile with no initial PBI filter.
+    /// \brief Constructs %BAM reader, with no initial filter.
     ///
-    /// Useful for delayed PBI lookups.
+    /// Useful for delaying either specifying the filtering criteria or
+    /// performing the PBI lookups.
+    ///
+    /// \param[in] bamFile      input BamFile object
+    ///
+    /// \throws std::runtime_error if either file (*.bam or *.pbi) cannot be
+    ///         read
     ///
     PbiIndexedBamReader(BamFile&& bamFile);
 
@@ -88,10 +142,24 @@ public:
     /// \}
 
 public:
+    /// \name Filtering & Index Data
+    /// \{
+
+    /// \returns the current filter active on this reader
     const PbiFilter& Filter(void) const;
+
+    /// \returns the reader's underlying index data
+    const PbiIndex& Index(void) const;
+
+public:
+    /// \brief Sets a new filter on the reader.
+    ///
+    /// \param[in] filter
+    /// \returns reference to this reader
+    ///
     PbiIndexedBamReader& Filter(const PbiFilter& filter);
 
-    const PbiIndex& Index(void) const;
+    /// \}
 
 protected:
     int ReadRawData(BGZF* bgzf, bam1_t* b);

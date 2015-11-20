@@ -32,29 +32,47 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file IndexedFastaReader.cpp
+/// \brief Implements the IndexedFastaReader class.
+//
 // Author: David Alexander
 
-#include "htslib/faidx.h"
+#include "pbbam/IndexedFastaReader.h"
+
 #include "pbbam/BamRecord.h"
 #include "pbbam/GenomicInterval.h"
-#include "pbbam/IndexedFastaReader.h"
 #include "pbbam/Orientation.h"
 #include "SequenceUtils.h"
-
-#include <cstdlib>
+#include <htslib/faidx.h>
 #include <iostream>
+#include <cstdlib>
 
 namespace PacBio {
 namespace BAM {
-
 
 IndexedFastaReader::IndexedFastaReader(const std::string& filename)
 {
     Open(filename);
 }
 
-IndexedFastaReader::~IndexedFastaReader()
+IndexedFastaReader::IndexedFastaReader(const IndexedFastaReader& src)
+{
+    if (!Open(src.filename_))
+        throw std::runtime_error("Cannot open file " + src.filename_);
+}
+
+IndexedFastaReader& IndexedFastaReader::operator=(const IndexedFastaReader& rhs)
+{
+    if (&rhs == this)
+        return *this;
+
+    Open(rhs.filename_);
+    return *this;
+}
+
+IndexedFastaReader::~IndexedFastaReader(void)
 {
     Close();
 }
@@ -72,7 +90,7 @@ bool IndexedFastaReader::Open(const std::string &filename)
     }
 }
 
-void IndexedFastaReader::Close()
+void IndexedFastaReader::Close(void)
 {
     filename_ = "";
     if (handle_ != nullptr)
@@ -194,7 +212,7 @@ IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
 }
 
 
-int IndexedFastaReader::NumSequences() const
+int IndexedFastaReader::NumSequences(void) const
 {
     REQUIRE_FAIDX_LOADED;
     return faidx_nseq(handle_);
@@ -214,6 +232,5 @@ int IndexedFastaReader::SequenceLength(const std::string& name) const
         throw std::runtime_error("could not determine FASTA sequence length");
     else return len;
 }
-
 
 }}  // PacBio::BAM

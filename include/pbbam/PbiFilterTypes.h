@@ -33,6 +33,10 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 //
+// File Description
+/// \file PbiFilterTypes.h
+/// \brief Defines the built-in PBI filters.
+//
 // Author: Derek Barnett
 
 #ifndef PBIFILTERTYPES_H
@@ -118,545 +122,867 @@ public:
 
 } // namespace internal
 
-/// Provides a filter that operates on PBI field MappedData::aEnd
+/// \brief The PbiAlignedEndFilter class provides a PbiFilter-compatible filter
+///        on aligned end.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiAlignedEndFilter{3000, Compare::GREATER_THAN} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiAlignedEndFilter.txt
 ///
-struct PbiAlignedEndFilter : public internal::MappedDataFilterBase<uint32_t, MappedLookupData::A_END>
+/// \sa BamRecord::AlignedEnd
+///
+struct PbiAlignedEndFilter
+    : public internal::MappedDataFilterBase<uint32_t, MappedLookupData::A_END>
 {
-    PbiAlignedEndFilter(const uint32_t position, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a filter on aligned end.
+    ///
+    /// \param[in] position value to compare on
+    /// \param[in] cmp      compare type
+    ///
+    PbiAlignedEndFilter(const uint32_t position,
+                        const Compare::Type cmp = Compare::EQUAL);
 };
 
-/// Provides a filter that operates on aligned length (aEnd - aStart)
+/// \brief The PbiAlignedLengthFilter class provides a PbiFilter-compatible
+///        filter on aligned length.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiQueryLengthFilter{ 2000 , Compare::GREATER_THAN } };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiAlignedLengthFilter.txt
+///
+/// \sa BamRecord::AlignedEnd, BamRecord::AlignedStart
 ///
 struct PbiAlignedLengthFilter : public internal::FilterBase<uint32_t>
 {
-    PbiAlignedLengthFilter(const uint32_t length, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a filter on aligned length.
+    ///
+    /// \param[in] length value to compare on
+    /// \param[in] cmp      compare type
+    ///
+    PbiAlignedLengthFilter(const uint32_t length,
+                           const Compare::Type cmp = Compare::EQUAL);
 
+public:
+    /// \brief Performs the actual index lookup.
+    ///
+    /// Most client code should not need to use this method directly.
+    ///
     IndexList Lookup(const PbiIndex& idx) const;
 };
 
-/// Provides a filter that operates on PBI field MappedData::aStart
+/// \brief The PbiAlignedStartFilter class provides a PbiFilter-compatible
+///        filter on aligned start.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiAlignedStartFilter{3000, Compare::GREATER_THAN} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiAlignedStartFilter.txt
 ///
-struct PbiAlignedStartFilter : public internal::MappedDataFilterBase<uint32_t, MappedLookupData::A_START>
+/// \sa BamRecord::AlignedStart
+///
+struct PbiAlignedStartFilter
+    : public internal::MappedDataFilterBase<uint32_t, MappedLookupData::A_START>
 {
-    PbiAlignedStartFilter(const uint32_t position, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a filter on aligned start.
+    ///
+    /// \param[in] position value to compare on
+    /// \param[in] cmp      compare type
+    ///
+    PbiAlignedStartFilter(const uint32_t position,
+                          const Compare::Type cmp = Compare::EQUAL);
 };
 
-/// Provides a filter that operates on PBI field MappedData::revStrand
+/// \brief The PbiAlignedStrandFilter class provides a PbiFilter-compatible
+///        filter on aligned strand.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiAlignedStrandFilter{Strand::FORWARD} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiAlignedStrandFilter.txt
 ///
-struct PbiAlignedStrandFilter : public internal::MappedDataFilterBase<Strand, MappedLookupData::STRAND>
+/// \sa BamRecord::AlignedStrand
+///
+struct PbiAlignedStrandFilter
+    : public internal::MappedDataFilterBase<Strand, MappedLookupData::STRAND>
 {
-    PbiAlignedStrandFilter(const Strand strand, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a strand filter.
+    ///
+    /// \param[in] strand  strand value to compare on
+    /// \param[in] cmp     compare type
+    ///
+    PbiAlignedStrandFilter(const Strand strand,
+                           const Compare::Type cmp = Compare::EQUAL);
 };
 
-/// Provides a filter that operates on an barcode ID. Any record with this barcode ID (forward or reverse) will pass this filter.
+/// \brief The PbiBarcodeFilter class provides a PbiFilter-compatible filter on
+///        barcode ID.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiBarcodeFilter{17} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Any record with this barcode ID (forward or reverse) will pass this filter.
 ///
-/// \note The whitelist versions only use Compare::EQUAL. Records will match at least one value
-///       provided in the whitelist, exactly, in either bc_forward or bc_reverse.
+/// Example: \include code/PbiBarcodeFilter.txt
+///
+/// \sa BamRecord::BarcodeForward, BamRecord::BarcodeReverse
 ///
 struct PbiBarcodeFilter
 {
 public:
-    PbiBarcodeFilter(const uint16_t barcode, const Compare::Type cmp = Compare::EQUAL);
+    /// \brief Creates a single-value barcode filter.
+    ///
+    /// \param[in] barcode  barcode ID to compare on
+    /// \param[in] cmp      compare type
+    ///
+    PbiBarcodeFilter(const uint16_t barcode,
+                     const Compare::Type cmp = Compare::EQUAL);
+
+    /// \brief Creates a 'whitelisted' barcode filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly, in either bc_forward or bc_reverse.
+    ///
+    /// \param[in] whitelist  barcode IDs to compare on
+    ///
     PbiBarcodeFilter(const std::vector<uint16_t>& whitelist);
+
+    /// \brief Creates a 'whitelisted' barcode filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly, in either bc_forward or bc_reverse.
+    ///
+    /// \param[in] whitelist  barcode IDs to compare on
+    ///
     PbiBarcodeFilter(std::vector<uint16_t>&& whitelist);
 
+public:
+    /// \brief Performs the actual index lookup.
+    ///
+    /// Most client code should not need to use this method directly.
+    ///
     IndexList Lookup(const PbiIndex& idx) const;
 
 private:
     PbiFilter compositeFilter_;
 };
 
-/// Provides a filter that operates on PBI field BarcodeData::bc_forward.
+/// \brief The PbiBarcodeForwardFilter class provides a PbiFilter-compatible
+///        filter on forward barcode ID.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiBarcodeForwardFilter{50} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiBarcodeForwardFilter.txt
 ///
-/// \note The whitelist versions only use Compare::EQUAL. Records will match at least one value
-///       provided in the whitelist, exactly, in bc_forward.
+/// \sa BamRecord::BarcodeForward
 ///
-struct PbiBarcodeForwardFilter : public internal::BarcodeDataFilterBase<uint16_t, BarcodeLookupData::BC_FORWARD>
+struct PbiBarcodeForwardFilter
+    : public internal::BarcodeDataFilterBase<uint16_t, BarcodeLookupData::BC_FORWARD>
 {
-    PbiBarcodeForwardFilter(const uint16_t bcFwdId, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a single-value forward barcode filter.
+    ///
+    /// \param[in] bcFwdId  (forward) barcode ID to compare on
+    /// \param[in] cmp      compare type
+    ///
+    PbiBarcodeForwardFilter(const uint16_t bcFwdId,
+                            const Compare::Type cmp = Compare::EQUAL);
+
+    /// \brief Creates a 'whitelisted' forward barcode filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly, in bc_forward.
+    ///
+    /// \param[in] whitelist  barcode IDs to compare on
+    ///
     PbiBarcodeForwardFilter(const std::vector<uint16_t>& whitelist);
+
+    /// \brief Creates a 'whitelisted' forward barcode filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly, in bc_forward.
+    ///
+    /// \param[in] whitelist  barcode IDs to compare on
+    ///
     PbiBarcodeForwardFilter(std::vector<uint16_t>&& whitelist);
 };
 
-/// Provides a filter that operates on PBI field BarcodeData::bc_qual
+/// \brief The PbiBarcodeQualityFilter class provides a PbiFilter-compatible
+///        filter on  barcode quality.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiBarcodeForwardFilter{42, Compare::GREATER_THAN_EQUAL} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiBarcodeQualityFilter.txt
 ///
-struct PbiBarcodeQualityFilter : public internal::BarcodeDataFilterBase<uint8_t, BarcodeLookupData::BC_QUALITY>
+/// \sa BamRecord::BarcodeQuality
+///
+struct PbiBarcodeQualityFilter
+    : public internal::BarcodeDataFilterBase<uint8_t, BarcodeLookupData::BC_QUALITY>
 {
-    PbiBarcodeQualityFilter(const uint8_t bcQuality, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a single-value barcode quality filter.
+    ///
+    /// \param[in] bcQuality    barcode quality to compare on
+    /// \param[in] cmp          compare type
+    ///
+    PbiBarcodeQualityFilter(const uint8_t bcQuality,
+                            const Compare::Type cmp = Compare::EQUAL);
 };
 
-/// Provides a filter that operates on PBI field BarcodeData::bc_reverse
+/// \brief The PbiBarcodeReverseFilter class provides a PbiFilter-compatible
+///        filter on forward barcode ID.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiBarcodeReverseFilter{50} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiBarcodeReverseFilter.txt
 ///
-/// \note The whitelist versions only use Compare::EQUAL. Records will match at least one value
-///       provided in the whitelist, exactly, in bc_reverse.
+/// \sa BamRecord::BarcodeReverse
 ///
-struct PbiBarcodeReverseFilter : public internal::BarcodeDataFilterBase<uint16_t, BarcodeLookupData::BC_REVERSE>
+struct PbiBarcodeReverseFilter
+    : public internal::BarcodeDataFilterBase<uint16_t, BarcodeLookupData::BC_REVERSE>
 {
-    PbiBarcodeReverseFilter(const uint16_t bcRevId, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a single-value reverse barcode filter.
+    ///
+    /// \param[in] bcRevId  (reverse) barcode ID to compare on
+    /// \param[in] cmp      compare type
+    ///
+    PbiBarcodeReverseFilter(const uint16_t bcRevId,
+                            const Compare::Type cmp = Compare::EQUAL);
+
+    /// \brief Creates a 'whitelisted' reverse barcode filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly, in bc_reverse.
+    ///
+    /// \param[in] whitelist  barcode IDs to compare on
+    ///
     PbiBarcodeReverseFilter(const std::vector<uint16_t>& whitelist);
+
+    /// \brief Creates a 'whitelisted' reverse barcode filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly, in bc_reverse.
+    ///
+    /// \param[in] whitelist  barcode IDs to compare on
+    ///
     PbiBarcodeReverseFilter(std::vector<uint16_t>&& whitelist);
 };
 
-/// Provides a filter that operates on barcode ID pairs. A record must match both IDs to pass the filter.
+/// \brief The PbiBarcodesFilter class provides a PbiFilter-compatible filter on
+///        both forward & reverse barcode IDs.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiBarcodesFilter{17, 18} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// A record must match both IDs to pass the filter.
+///
+/// Example: \include code/PbiBarcodesFilter.txt
+///
+/// \sa BamRecord::Barcodes
 ///
 struct PbiBarcodesFilter
 {
 public:
-    /// Constructs filter from a std::pair of barcode IDs (forward, reverse).
+    /// \brief Creates a barcodes filter from a std::pair of IDs.
     ///
-    /// \sa BamRecord::Barcodes
+    /// pair.first -> BarcodeForward\n
+    /// pair.second -> BarcodeReverse
+    ///
+    /// \param[in] barcodes barcode IDs to compare on
+    /// \param[in] cmp      compare type
     ///
     PbiBarcodesFilter(const std::pair<uint16_t, uint16_t> barcodes,
                       const Compare::Type cmp = Compare::EQUAL);
 
-    /// Constructs filter from a pair of barcode IDs (forward, reverse).
+    /// \brief Creates a barcodes filter from forward & reverse IDs.
     ///
-    /// \sa BamRecord::Barcodes
+    /// \param[in] bcForward    forward barcode ID to compare on
+    /// \param[in] bcReverse    reverse barcode ID to compare on
+    /// \param[in] cmp          compare type
     ///
     PbiBarcodesFilter(const uint16_t bcForward,
                       const uint16_t bcReverse,
                       const Compare::Type cmp = Compare::EQUAL);
-
+public:
+    /// \brief Performs the actual index lookup.
+    ///
+    /// Most client code should not need to use this method directly.
+    ///
     IndexList Lookup(const PbiIndex& idx) const;
 
 private:
     PbiFilter compositeFilter_;
 };
 
-/// Provides a filter that operates on read identity (% aligned match).
+/// \brief The PbiIdentityFilter class provides a PbiFilter-compatible filter on
+///        read identity (% aligned match).
 ///
-/// Equivalent to 1.0 - (nMM + nDel + nIns)/readLength.
+/// Read identity is equivalent to: 1.0 - (nMM + nDel + nIns)/readLength.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiIdentityFilter{0.9, Compare::GREATER_THAN_EQUAL} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiIdentityFilter.txt
 ///
 struct PbiIdentityFilter : public internal::FilterBase<float>
 {
-    PbiIdentityFilter(const float identity, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a read identity filter.
+    ///
+    /// \param[in] identity value to compare on
+    /// \param[in] cmp      compare type
+    ///
+    PbiIdentityFilter(const float identity,
+                      const Compare::Type cmp = Compare::EQUAL);
+
+public:
+    /// \brief Performs the actual index lookup.
+    ///
+    /// Most client code should not need to use this method directly.
+    ///
     IndexList Lookup(const PbiIndex& idx) const;
 };
 
 // TODO: determine use case(s) for query - entire flag or parts?
-//struct PbiLocalContextFlagFilter : public internal::BasicDataFilterBase<LocalContextFlags, BasicLookupData::CONTEXT_FLAG > { };
+//struct PbiLocalContextFlagFilter
+//    : public internal::BasicDataFilterBase<LocalContextFlags,
+//                                           BasicLookupData::CONTEXT_FLAG >
+//{ };
 
-/// Provides a filter that operates on PBI field MappedData::mapQV
+/// \brief The PbiMapQualityFilter class provides a PbiFilter-compatible filter on
+///        mapping quality.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiMapQualityFilter{75, Compare::GREATER_THAN_EQUAL} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiMapQualityFilter.txt
 ///
-struct PbiMapQualityFilter : public internal::MappedDataFilterBase<uint8_t, MappedLookupData::MAP_QUALITY>
+/// \sa BamRecord::MapQuality
+///
+struct PbiMapQualityFilter
+    : public internal::MappedDataFilterBase<uint8_t, MappedLookupData::MAP_QUALITY>
 {
-    PbiMapQualityFilter(const uint8_t mapQual, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a map quality filter.
+    ///
+    /// \param[in] mapQual  value to compare on
+    /// \param[in] cmp      compare type
+    ///
+    PbiMapQualityFilter(const uint8_t mapQual,
+                        const Compare::Type cmp = Compare::EQUAL);
 };
 
-/// Provides a filter that operates on movie name.
+/// \brief The PbiMovieNameFilter class provides a PbiFilter-compatible filter
+///        on movie name.
 ///
-/// \note Unlike most other filters, Compare::EQUAL is the only supported compare type,
-/// hence no optional argument for it in the constructor.
+/// Example: \include code/PbiMovieNameFilter.txt
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiMovieNameFilter{ "movie_name" } };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// \sa BamRecord::MovieName
 ///
 struct PbiMovieNameFilter : public internal::FilterBase<std::string>
 {
+public:
+    /// \brief Creates a single-value movie name filter.
+    ///
+    /// \param[in] movieName    movie name to compare on
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match movie name, exactly.
+    ///
     PbiMovieNameFilter(const std::string& movieName);
+
+    /// \brief Creates a 'whitelisted' movie name filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    movie names to compare on
+    ///
     PbiMovieNameFilter(const std::vector<std::string>& whitelist);
+
+    /// \brief Creates a 'whitelisted' movie name filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    movie names to compare on
+    ///
     PbiMovieNameFilter(std::vector<std::string>&& whitelist);
 
+public:
+    /// \brief Performs the actual index lookup.
+    ///
+    /// Most client code should not need to use this method directly.
+    ///
     IndexList Lookup(const PbiIndex& idx) const;
 };
 
-/// Provides a filter that operates on MappedData::nDel (not stored in PBI, but calculated from other data)
+/// \brief The PbiNumDeletedBasesFilter class provides a PbiFilter-compatible
+///        filter on the number of deleted bases.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiNumDeletedBasesFilter{50, Compare::LESS_THAN} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiNumDeletedBasesFilter.txt
 ///
-struct PbiNumDeletedBasesFilter : public internal::MappedDataFilterBase<size_t, MappedLookupData::N_DEL>
+/// \sa BamRecord::NumDeletedBases
+///
+struct PbiNumDeletedBasesFilter
+    : public internal::MappedDataFilterBase<size_t, MappedLookupData::N_DEL>
 {
-    PbiNumDeletedBasesFilter(const size_t numDeletions, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a filter on the number of deleted bases.
+    ///
+    /// \param[in] numDeletions value to compare on
+    /// \param[in] cmp          compare type
+    ///
+    PbiNumDeletedBasesFilter(const size_t numDeletions,
+                             const Compare::Type cmp = Compare::EQUAL);
 };
 
-/// Provides a filter that operates on MappedData::nIns (not stored in PBI, but calculated from other data)
+/// \brief The PbiNumInsertededBasesFilter class provides a PbiFilter-compatible
+///        filter on the number of inserted bases.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiNumDInsertedBasesFilter{50, Compare::LESS_THAN} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiNumInsertedBasesFilter.txt
 ///
-struct PbiNumInsertedBasesFilter : public internal::MappedDataFilterBase<size_t, MappedLookupData::N_INS>
+/// \sa BamRecord::NumInsertedBases
+///
+struct PbiNumInsertedBasesFilter
+    : public internal::MappedDataFilterBase<size_t, MappedLookupData::N_INS>
 {
-    PbiNumInsertedBasesFilter(const size_t numInsertions, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a filter on the number of inserted bases.
+    ///
+    /// \param[in] numInsertions    value to compare on
+    /// \param[in] cmp              compare type
+    ///
+    PbiNumInsertedBasesFilter(const size_t numInsertions,
+                              const Compare::Type cmp = Compare::EQUAL);
 };
 
-/// Provides a filter that operates on PBI field MappedData::nM
+/// \brief The PbiNumMatchesFilter class provides a PbiFilter-compatible filter
+///        on the number of matched bases.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiNumMatchesFilter{4000, Compare::GREATER_THAN_EQUAL} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiNumMatchesFilter.txt
 ///
-struct PbiNumMatchesFilter : public internal::MappedDataFilterBase<size_t, MappedLookupData::N_M>
+/// \sa BamRecord::NumMatches
+///
+struct PbiNumMatchesFilter
+    : public internal::MappedDataFilterBase<size_t, MappedLookupData::N_M>
 {
-    PbiNumMatchesFilter(const size_t numMatchedBases, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a filter on the number of matched bases.
+    ///
+    /// \param[in] numMatchedBases  value to compare on
+    /// \param[in] cmp              compare type
+    ///
+    PbiNumMatchesFilter(const size_t numMatchedBases,
+                        const Compare::Type cmp = Compare::EQUAL);
 };
 
-/// Provides a filter that operates on PBI field MappedData::nMM
+/// \brief The PbiNumMismatchesFilter class provides a PbiFilter-compatible
+///        filter on the number of mismatched bases.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiNumMismatchesFilter{400, Compare::LESS_THAN_EQUAL} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiNumMismatchesFilter.txt
 ///
-struct PbiNumMismatchesFilter : public internal::MappedDataFilterBase<size_t, MappedLookupData::N_MM>
+/// \sa BamRecord::NumMismatches
+///
+struct PbiNumMismatchesFilter
+    : public internal::MappedDataFilterBase<size_t, MappedLookupData::N_MM>
 {
-    PbiNumMismatchesFilter(const size_t numMismatchedBases, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a filter on the number of mismatched bases.
+    ///
+    /// \param[in] numMismatchedBases   value to compare on
+    /// \param[in] cmp                  compare type
+    ///
+    PbiNumMismatchesFilter(const size_t numMismatchedBases,
+                           const Compare::Type cmp = Compare::EQUAL);
 };
 
-/// Provides a filter that operates on PBI field BasicData::qEnd
+/// \brief The PbiQueryEndFilter class provides a PbiFilter-compatible filter
+///        on query end.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiQueryEndFilter{3000} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiQueryEndFilter.txt
 ///
-struct PbiQueryEndFilter : public internal::BasicDataFilterBase<int32_t, BasicLookupData::Q_END>
+/// \sa BamRecord::QueryEnd
+///
+struct PbiQueryEndFilter
+    : public internal::BasicDataFilterBase<int32_t, BasicLookupData::Q_END>
 {
-    PbiQueryEndFilter(const int32_t position, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a filter on query end position.
+    ///
+    /// \param[in] position value to compare on
+    /// \param[in] cmp      compare type
+    ///
+    PbiQueryEndFilter(const int32_t position,
+                      const Compare::Type cmp = Compare::EQUAL);
 };
 
-/// Provides a filter that operates on query length (qEnd - qStart)
+/// \brief The PbiQueryLengthFilter class provides a PbiFilter-compatible filter
+///        on query length.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiQueryLengthFilter{ 2000 , Compare::GREATER_THAN } };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// queryLength = (queryEnd - queryStart)
+///
+/// Example: \include code/PbiQueryLengthFilter.txt
+///
+/// \sa BamRecord::QueryEnd, BamRecord::QueryStart
 ///
 struct PbiQueryLengthFilter : public internal::FilterBase<int32_t>
 {
-    PbiQueryLengthFilter(const int32_t length, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a filter on query length
+    ///
+    /// \param[in] length   value to compare on
+    /// \param[in] cmp      compare type
+    ///
+    PbiQueryLengthFilter(const int32_t length,
+                         const Compare::Type cmp = Compare::EQUAL);
+
+public:
+    /// \brief Performs the actual index lookup.
+    ///
+    /// Most client code should not need to use this method directly.
+    ///
     IndexList Lookup(const PbiIndex& idx) const;
 };
 
-/// Provides a filter that operates on query name.
+/// \brief The PbiQueryNameFilter class provides a PbiFilter-compatible filter
+///        on name length.
 ///
-/// \note Unlike most other filters, Compare::EQUAL is the only supported compare type,
-/// hence no optional argument for it in the constructor.
+/// Example: \include code/PbiQueryNameFilter.txt
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiQueryNameFilter{ "movie_name/42/100_200" } };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// \sa BamRecord::FullName
 ///
 struct PbiQueryNameFilter : public internal::FilterBase<std::string>
 {
+public:
+    /// \brief Creates a single-value query name filter.
+    ///
+    /// \param[in] qname    query name to compare on
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match query name, exactly.
+    ///
     PbiQueryNameFilter(const std::string& qname);
+
+    /// \brief Creates a 'whitelisted' query name filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    query names to compare on
+    ///
     PbiQueryNameFilter(const std::vector<std::string>& whitelist);
+
+    /// \brief Creates a 'whitelisted' query name filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    query names to compare on
+    ///
     PbiQueryNameFilter(std::vector<std::string>&& whitelist);
 
+public:
+    /// \brief Performs the actual index lookup.
+    ///
+    /// Most client code should not need to use this method directly.
+    ///
     IndexList Lookup(const PbiIndex& idx) const;
 };
 
-/// Provides a filter that operates on PBI field BasicData::qStart
+/// \brief The PbiQueryStartFilter class provides a PbiFilter-compatible filter
+///        on query start.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiQueryEndFilter{3000} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiQueryStartFilter.txt
 ///
-struct PbiQueryStartFilter : public internal::BasicDataFilterBase<int32_t, BasicLookupData::Q_START>
+/// \sa BamRecord::QueryStart
+///
+struct PbiQueryStartFilter
+    : public internal::BasicDataFilterBase<int32_t, BasicLookupData::Q_START>
 {
-    PbiQueryStartFilter(const int32_t position, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a filter on query start position.
+    ///
+    /// \param[in] position value to compare on
+    /// \param[in] cmp      compare type
+    ///
+    PbiQueryStartFilter(const int32_t position,
+                        const Compare::Type cmp = Compare::EQUAL);
 };
 
-/// Provides a filter that operates on PBI field BasicData::readQual
+/// \brief The PbiReadAccuracyFilter class provides a PbiFilter-compatible filter
+///        on read accuracy.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiReadAccuracyFilter{0.8, Compare::GREATER_THAN_EQUAL} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiReadAccuracyFilter.txt
 ///
-struct PbiReadAccuracyFilter : public internal::BasicDataFilterBase<Accuracy, BasicLookupData::READ_QUALITY>
+/// \sa BamRecord::ReadAccuracy
+///
+struct PbiReadAccuracyFilter
+    : public internal::BasicDataFilterBase<Accuracy, BasicLookupData::READ_QUALITY>
 {
-    PbiReadAccuracyFilter(const Accuracy accuracy, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a filter on read accuracy.
+    ///
+    /// \param[in] accuracy value to compare on
+    /// \param[in] cmp      compare type
+    ///
+    PbiReadAccuracyFilter(const Accuracy accuracy,
+                          const Compare::Type cmp = Compare::EQUAL);
 };
 
-/// Provides a filter that operates on PBI field BasicData::rgId
+/// \brief The PbiReadGroupFilter class provides a PbiFilter-compatible filter
+///        on read group.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiReadGroupFilter{ 2458765 } };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiReadGroupFilter.txt
 ///
-/// \note The whitelist versions only use Compare::EQUAL. Records will match at least one value
-///       provided in the whitelist.
+/// \sa BamRecord::ReadGroup,
+///     BamRecord::ReadGroupId,
+///     BamRecord::ReadGroupNumericId
 ///
-struct PbiReadGroupFilter : public internal::BasicDataFilterBase<int32_t, BasicLookupData::RG_ID>
+struct PbiReadGroupFilter
+    : public internal::BasicDataFilterBase<int32_t, BasicLookupData::RG_ID>
 {
-    /// Constructs a read group filter using the raw, numeric ID value.
-    PbiReadGroupFilter(const int32_t rgId, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a filter on read group (numeric) ID value
+    ///
+    /// \param[in] rgId     numeric read group ID
+    /// \param[in] cmp      compare type
+    ///
+    /// \sa BamRecord::ReadGroupNumericId
+    ///
+    PbiReadGroupFilter(const int32_t rgId,
+                       const Compare::Type cmp = Compare::EQUAL);
 
-    /// Constructs a read group filter using the printable string used in the BAM file.
-    PbiReadGroupFilter(const std::string rgId, const Compare::Type cmp = Compare::EQUAL);
+    /// \brief Creates a filter on printable read group ID value
+    ///
+    /// \param[in] rgId     read group ID string
+    /// \param[in] cmp      compare type
+    ///
+    /// \sa BamRecord::ReadGroupId
+    ///
+    PbiReadGroupFilter(const std::string rgId,
+                       const Compare::Type cmp = Compare::EQUAL);
 
-    /// Constructs a read group filter using a ReadGroupInfo object from a BamHeader.
-    PbiReadGroupFilter(const ReadGroupInfo& rg, const Compare::Type cmo = Compare::EQUAL);
+    /// \brief Creates a filter on read group (object).
+    ///
+    /// \param[in] rg   read group object
+    /// \param[in] cmp  compare type
+    ///
+    /// \sa BamRecord::ReadGroup
+    ///
+    PbiReadGroupFilter(const ReadGroupInfo& rg,
+                       const Compare::Type cmp = Compare::EQUAL);
 
-    /// Constructs a read group filter using raw, numeric ID values.
+    /// \brief Creates a 'whitelisted' filter on read group numeric IDs.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    read group IDs to compare on
+    ///
     PbiReadGroupFilter(const std::vector<int32_t>& whitelist);
 
-    /// Constructs a read group filter using raw, numeric ID values.
+    /// \brief Creates a 'whitelisted' filter on read group numeric IDs.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    read group IDs to compare on
+    ///
     PbiReadGroupFilter(std::vector<int32_t>&& whitelist);
 
-    /// Constructs a read group filter using the printable strings used in the BAM file.
+    /// \brief Creates a 'whitelisted' filter on read group printable IDs.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    read group ID strings to compare on
+    ///
     PbiReadGroupFilter(const std::vector<std::string>& whitelist);
 
-    /// Constructs a read group filter using the printable strings used in the BAM file.
+    /// \brief Creates a 'whitelisted' filter on read group printable IDs.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    read group ID strings to compare on
+    ///
     PbiReadGroupFilter(std::vector<std::string>&& whitelist);
 
-    /// Constructs a read group filter using ReadGroupInfo objects from a BamHeader.
+    /// \brief Creates a 'whitelisted' filter using read group objects.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    read group objects to compare on
+    ///
     PbiReadGroupFilter(const std::vector<ReadGroupInfo>& whitelist);
 
-    /// Constructs a read group filter using ReadGroupInfo objects from a BamHeader.
+    /// \brief Creates a 'whitelisted' filter using read group objects.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    read group objects to compare on
+    ///
     PbiReadGroupFilter(std::vector<ReadGroupInfo>&& whitelist);
 };
 
-/// Provides a filter that operates on PBI field MappedData::tEnd
+/// \brief The PbiReferenceEndFilter class provides a PbiFilter-compatible
+///        filter on reference end.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiReferenceEndFilter{2000} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiReferenceEndFilter.txt
 ///
-struct PbiReferenceEndFilter : public internal::MappedDataFilterBase<uint32_t, MappedLookupData::T_END>
+/// \sa BamRecord::ReferenceEnd
+///
+struct PbiReferenceEndFilter
+    : public internal::MappedDataFilterBase<uint32_t, MappedLookupData::T_END>
 {
-    PbiReferenceEndFilter(const uint32_t tEnd, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a filter on reference end.
+    ///
+    /// \param[in] tEnd     value to compare on
+    /// \param[in] cmp      compare type
+    ///
+    PbiReferenceEndFilter(const uint32_t tEnd,
+                          const Compare::Type cmp = Compare::EQUAL);
 };
 
-/// Provides a filter that operates on PBI field MappedData::tId
+/// \brief The PbiReferenceIdFilter class provides a PbiFilter-compatible
+///        filter on reference ID.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiReferenceIdFilter{6} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiReferenceIdFilter.txt
 ///
-/// \note The whitelist versions only use Compare::EQUAL. Records will match at least one value
-///       provided in the whitelist.
+/// \sa BamRecord::ReferenceId
 ///
-struct PbiReferenceIdFilter : public internal::MappedDataFilterBase<int32_t, MappedLookupData::T_ID>
+struct PbiReferenceIdFilter
+    : public internal::MappedDataFilterBase<int32_t, MappedLookupData::T_ID>
 {
-    PbiReferenceIdFilter(const int32_t tId, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a single-value reference ID filter.
+    ///
+    /// \param[in] tId  reference ID to compare on
+    /// \param[in] cmp  compare type
+    ///
+    PbiReferenceIdFilter(const int32_t tId,
+                         const Compare::Type cmp = Compare::EQUAL);
+
+    /// \brief Creates a 'whitelisted' reference ID filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    reference IDs to compare on
+    ///
     PbiReferenceIdFilter(const std::vector<int32_t>& whitelist);
+
+    /// \brief Creates a 'whitelisted' reference ID filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    reference IDs to compare on
+    ///
     PbiReferenceIdFilter(std::vector<int32_t>&& whitelist);
 };
 
-/// Provides a filter that operates on reference name
+/// \brief The PbiReferenceNameFilter class provides a PbiFilter-compatible
+///        filter on reference name.
 ///
-/// \note Compare::EQUAL and Compare::NOT_EQUAL are the only supported compare types.
+/// Example: \include code/PbiReferenceNameFilter.txt
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiReferenceNameFilter{"chr1"} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
-///
-///\note The whitelist versions only use Compare::EQUAL. Records will match at least one value
-///       provided in the whitelist.
+/// \sa BamRecord::ReferenceName
 ///
 struct PbiReferenceNameFilter : public internal::FilterBase<std::string>
 {
-    PbiReferenceNameFilter(const std::string& rname, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a single-value reference name filter.
+    ///
+    /// \param[in] rname    reference ID to compare on
+    /// \param[in] cmp      compare type
+    ///
+    PbiReferenceNameFilter(const std::string& rname,
+                           const Compare::Type cmp = Compare::EQUAL);
+
+    /// \brief Creates a 'whitelisted' reference name filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    reference names to compare on
+    ///
     PbiReferenceNameFilter(const std::vector<std::string>& whitelist);
+
+    /// \brief Creates a 'whitelisted' reference name filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    reference names to compare on
+    ///
     PbiReferenceNameFilter(std::vector<std::string>&& whitelist);
 
+public:
+    /// \brief Performs the actual index lookup.
+    ///
+    /// Most client code should not need to use this method directly.
+    ///
     IndexList Lookup(const PbiIndex& idx) const;
 };
 
-/// Provides a filter that operates on PBI field MappedData::tStart
+/// \brief The PbiReferenceStartFilter class provides a PbiFilter-compatible
+///        filter on reference start.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiReferenceStartFilter{2000} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiReferenceStartFilter.txt
 ///
-struct PbiReferenceStartFilter : public internal::MappedDataFilterBase<uint32_t, MappedLookupData::T_START>
+/// \sa BamRecord::ReferenceStart
+///
+struct PbiReferenceStartFilter
+    : public internal::MappedDataFilterBase<uint32_t, MappedLookupData::T_START>
 {
-    PbiReferenceStartFilter(const uint32_t tStart, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a filter on reference start.
+    ///
+    /// \param[in] tStart   value to compare on
+    /// \param[in] cmp      compare type
+    ///
+    PbiReferenceStartFilter(const uint32_t tStart,
+                            const Compare::Type cmp = Compare::EQUAL);
 };
 
-/// Provides a filter that operates on PBI field BasicData::holeNumber
+/// \brief The PbiZmwFilter class provides a PbiFilter-compatible filter on
+///        ZMW hole number.
 ///
-/// Example:
-/// \code{.cpp}
-///     PbiFilter filter{ PbiZmwFilter{42} };
-///     PbiFilterQuery query(filter);
-///     for (const BamRecord& record : query) {
-///         // use record
-///     }
-/// \endcode
+/// Example: \include code/PbiZmwFilter.txt
 ///
-/// \note The whitelist versions only use Compare::EQUAL. Records will match at least one value
-///       provided in the whitelist.
+/// \sa BamRecord::HoleNumber
 ///
-struct PbiZmwFilter : public internal::BasicDataFilterBase<int32_t, BasicLookupData::ZMW>
+struct PbiZmwFilter : public internal::BasicDataFilterBase<int32_t,
+                                                           BasicLookupData::ZMW>
 {
-    PbiZmwFilter(const int32_t zmw, const Compare::Type cmp = Compare::EQUAL);
+public:
+    /// \brief Creates a single-value ZMW hole number filter.
+    ///
+    /// \param[in] zmw  value to compare on
+    /// \param[in] cmp  compare type
+    ///
+    PbiZmwFilter(const int32_t zmw,
+                 const Compare::Type cmp = Compare::EQUAL);
+
+    /// \brief Creates a 'whitelisted' ZMW hole number filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    ZMW hole numbers to compare on
+    ///
     PbiZmwFilter(const std::vector<int32_t>& whitelist);
+
+    /// \brief Creates a 'whitelisted' ZMW hole number filter.
+    ///
+    /// \note There is no compare type parameter here, it is always
+    ///       Compare::EQUAL. Records will match at least one value from the
+    ///       whitelist, exactly.
+    ///
+    /// \param[in] whitelist    ZMW hole numbers to compare on
+    ///
     PbiZmwFilter(std::vector<int32_t>&& whitelist);
 };
 

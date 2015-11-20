@@ -32,15 +32,16 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file Tag.inl
+/// \brief Inline implementations for the Tag class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/Tag.h"
 #include <boost/numeric/conversion/cast.hpp>
 #include <iostream>
-
-#ifndef TAG_INL
-#define TAG_INL
 
 namespace PacBio {
 namespace BAM {
@@ -320,5 +321,3 @@ inline std::string Tag::Typename(void) const
 
 } // namespace BAM
 } // namespace PacBio
-
-#endif // TAG_INL

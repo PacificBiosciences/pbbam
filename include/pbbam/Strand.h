@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file Strand.h
+/// \brief Defines the Strand enum.
+//
 // Author: Derek Barnett
 
 #ifndef STRAND_H
@@ -43,10 +47,13 @@
 namespace PacBio {
 namespace BAM {
 
+/// \brief This enum defines the strand orientations used for reporting
+///        alignment-related information.
+///
 enum class Strand
 {
-    FORWARD
-  , REVERSE
+    FORWARD     ///< Forward strand
+  , REVERSE     ///< Reverse strand
 };
 
 } // namespace BAM

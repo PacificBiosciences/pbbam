@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file VirtualRegionType.h
+/// \brief Defines the VirtualRegionType enum.
+//
 // Author: Derek Barnett
 
 #ifndef REGIONTYPE_H
@@ -42,15 +46,17 @@
 
 namespace PacBio {
 namespace BAM {
-/// Type of annotated region.
+
+/// \brief This enum defines the types of annotated region.
+///
 enum class VirtualRegionType // : char
 {
-    ADAPTER        = 0x41, // 'A',
-    BARCODE        = 0x42, // 'B',
-    FILTERED       = 0x46, // 'F', // subreads that are filtered
-    SUBREAD        = 0x53, // 'S',
-    HQREGION       = 0x48, // 'H',
-    LQREGION       = 0x4C  // 'L'  // Outside the HQ region
+    ADAPTER        = 0x41,  ///< Adapter region ('A')
+    BARCODE        = 0x42,  ///< Barcode region ('B')
+    FILTERED       = 0x46,  ///< Filtered subread ('F')
+    SUBREAD        = 0x53,  ///< Subread ('S')
+    HQREGION       = 0x48,  ///< High-quality region ('H')
+    LQREGION       = 0x4C   ///< Low-quality region ('L'), i.e. outside the HQ region
 };
 
 } // namespace BAM

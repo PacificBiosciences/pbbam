@@ -33,6 +33,11 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 //
+// File Description
+/// \file PbiRawData.inl
+/// \brief Inline implementations for the classes used for working with raw PBI
+///        data.
+//
 // Author: Derek Barnett
 
 #include "pbbam/PbiRawData.h"

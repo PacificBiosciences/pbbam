@@ -33,6 +33,10 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 //
+// File Description
+/// \file PbiFilter.inl
+/// \brief Inline implementations for the PbiFilter class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/PbiFilter.h"
@@ -173,10 +177,10 @@ struct PbiFilterPrivate
     {
         // if no child filters (i.e. this is an empty PbiFilter{ }), return all indices
         if (filters_.empty()) {
-            const auto numRecords = idx.NumReads();
+            const size_t numRecords = idx.NumReads();
             auto result = IndexList{ };
             result.reserve(numRecords);
-            for (auto i = decltype(numRecords){0}; i < numRecords; ++i)
+            for (size_t i = 0; i < numRecords; ++i)
                 result.push_back(i);
             return result;
         }

@@ -32,7 +32,12 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file Compare.h
+/// \brief Defines the Compare class & a number of function objects for
+///       comparing BamRecords.
+//
 // Author: Derek Barnett
 
 #ifndef COMPARE_H
@@ -46,29 +51,23 @@
 namespace PacBio {
 namespace BAM {
 
-/// The (namespace-like) struct defines a variety of functor objects that can be
-/// used to filter, sort, etc. BamRecord
+/// \brief The Compare class provides utilities for sorting collections of
+///        BamRecords.
 ///
-/// \code{.cpp}
-///     std::vector<BamRecord> records;
+/// \note The functors provided here currently only support std::less<T>
+///       comparisons (i.e. sorting by ascending value).
 ///
-///     // sort on increasing ZMW hole number
-///     std::sort(records.begin(), records.end(), Compare::Zmw());
-///
-///     // sort by mapping quality, highest to lowest
-///     std::sort(records.begin(), records.end(), Compare::MapQuality(Compare::GREATER_THAN));
-///
-/// \endcode
+/// \include code/Compare.txt
 ///
 struct PBBAM_EXPORT Compare
 {
-
 public:
 
     /// \name Comparison Type
     /// \{
 
-    /// Supported comparison types (==, !=, <, <=, >, >=).
+    /// \brief This enum defines the supported comparison types
+    ///        (==, !=, <, <=, >, >=).
     ///
     enum Type {
         EQUAL = 0
@@ -79,29 +78,23 @@ public:
       , GREATER_THAN_EQUAL
     };
 
-    /// Convert operator string to Compare::Type.
+    /// \brief Convert operator string to Compare::Type.
     ///
-    /// \example
-    /// \code {.cpp}
-    ///     Compare::Type type = Compare::TypeFromOperator("!=");
-    ///     assert(type == Compare::NOT_EQUAL);
-    /// \endcode
+    /// \include code/Compare_TypeFromOperator.txt
     ///
-    /// \param[in] opString operator string. Can be C++-style operators ("==", "!=", "<=", etc)
-    ///            or alpha equivalents ("eq", "ne", "lte", etc).
+    /// \param[in] opString operator string. Can be C++-style operators
+    ///                     ("==", "!=", "<=", etc) or alpha equivalents
+    ///                     ("eq", "ne", "lte", etc).
+    ///
     /// \returns comparison type from an operator string
     /// \throws std::runtime_error if cannot convert opString to Compare::Type
     /// \sa Compare::TypeToOperator
     ///
     static Compare::Type TypeFromOperator(const std::string& opString);
 
-    /// Convert Compare::Type to printable enum name.
+    /// \brief Convert a Compare::Type to printable enum name.
     ///
-    /// \example
-    /// \code{.cpp}
-    ///     string name = Compare::TypeToName(Compare::LESS_THAN);
-    ///     assert(name = "Compare::LESS_THAN");
-    /// \endcode
+    /// \include code/Compare_TypeToName.txt
     ///
     /// \param[in] type Compare::Type to convert
     /// \returns the printable name for a Compare::Type enum value.are::Type
@@ -109,14 +102,16 @@ public:
     ///
     static std::string TypeToName(const Compare::Type& type);
 
-    /// Convert Compare::Type to printable operator.
+    /// \brief Convert a Compare::Type to printable operator.
     ///
-    /// \param[in] type Compare::Type to convert
-    /// \param[in] asAlpha (optional) flag to print using alpha equivalents e.g. "lte" rather than "<="
+    /// \param[in] type     Compare::Type to convert
+    /// \param[in] asAlpha  (optional) flag to print using alpha equivalents
+    ///                     e.g. "lte" rather than "<="
     /// \returns the printable operator string
     /// \throws std::runtime_error on unknown Compare::Type
     ///
-    static std::string TypeToOperator(const Compare::Type& type, bool asAlpha = false);
+    static std::string TypeToOperator(const Compare::Type& type,
+                                      bool asAlpha = false);
 
     /// \}
 
@@ -125,7 +120,7 @@ public:
     /// \name Comparison Function Objects
     /// \{
 
-    /// Base class for all BamRecord compare functors.
+    /// %Base class for all BamRecord compare functors.
     ///
     /// Mostly used for method signatures that can accept any comparator.
     ///
@@ -136,8 +131,9 @@ public:
 private:
     /// \internal
     ///
-    /// Exists to provide the typedef we'll use in the actual MemberFunctionBase, since we
-    /// need to use it in the template signature. This keeps that a lot easier to read.
+    /// Exists to provide the typedef we'll use in the actual
+    /// MemberFunctionBase, since we need to use it in the template signature.
+    /// This keeps that a lot easier to read.
     ///
     template<typename ValueType>
     struct MemberFunctionBaseHelper : public Compare::Base
@@ -146,14 +142,15 @@ private:
     };
 
 public:
-    /// Base class for all BamRecord compare functors that take a BamRecord function pointer
-    /// and compare on its return type.
+    /// \brief %Base class for all BamRecord compare functors that take a
+    ///        BamRecord function pointer and compare on its return type.
     ///
-    /// Derived comparators usually need only declare the return value & function pointer in
-    /// the template signature. This class implements the basic method-calling machinery.
+    /// Derived comparators usually need only declare the return value &
+    /// function pointer in the template signature. This class implements the
+    /// basic method-calling machinery.
     ///
-    /// Custom comparators will work for any BamRecord member function that does not take any input
-    /// parameters.
+    /// Custom comparators will work for any BamRecord member function that does
+    /// not take any input parameters.
     ///
     template<typename ValueType,
              typename MemberFunctionBaseHelper<ValueType>::MemberFnType fn,
@@ -165,107 +162,108 @@ public:
 
 public:
 
-    /// Provides an operator() that compares on BamRecord::AlignedEnd
+    /// \brief Compares on BamRecord::AlignedEnd.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::AlignedEnd());
-    /// \endcode
+    /// \include code/Compare_AlignedEnd.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct AlignedEnd : public MemberFunctionBase<Position, &BamRecord::AlignedEnd> { };
 
-    /// Provides an operator() that compares on BamRecord::AlignedStart
+    /// \brief Compares on BamRecord::AlignedStart.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::AlignedStart());
-    /// \endcode
+    /// \include code/Compare_AlignedStart.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct AlignedStart : public MemberFunctionBase<Position, &BamRecord::AlignedStart> { };
 
-    /// Provides an operator() that compares on BamRecord::AlignedStrand
+    /// \brief Compares on BamRecord::AlignedStrand
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::AlignedStrand());
-    /// \endcode
+    /// \include code/Compare_AlignedStrand.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct AlignedStrand : public MemberFunctionBase<Strand, &BamRecord::AlignedStrand> { };
 
-    /// Provides an operator() that compares on BamRecord::BarcodeForward
+    /// \brief Compares on BamRecord::BarcodeForward.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::BarcodeForward());
-    /// \endcode
+    /// \include code/Compare_BarcodeForward.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct BarcodeForward : public MemberFunctionBase<uint16_t, &BamRecord::BarcodeForward> { };
 
-    /// Provides an operator() that compares on BamRecord::BarcodeQuality
+    /// \brief Compares on BamRecord::BarcodeQuality.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::BarcodeQuality());
-    /// \endcode
+    /// \include code/Compare_BarcodeQuality.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct BarcodeQuality : public MemberFunctionBase<uint8_t, &BamRecord::BarcodeQuality> { };
 
-    /// Provides an operator() that compares on BamRecord::BarcodeReverse
+    /// \brief Compares on BamRecord::BarcodeReverse.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::BarcodeReverse());
-    /// \endcode
+    /// \include code/Compare_BarcodeReverse.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct BarcodeReverse: public MemberFunctionBase<uint16_t, &BamRecord::BarcodeReverse> { };
 
-    /// Provides an operator() that compares on BamRecord::FullName
+    /// \brief Compares on BamRecord::FullName.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::FullName());
-    /// \endcode
+    /// \include code/Compare_FullName.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct FullName : public MemberFunctionBase<std::string, &BamRecord::FullName> { };
 
-    /// Provides an operator() that compares on BamRecord::LocalContextFlags
+    /// \brief Compares on BamRecord::LocalContextFlags.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::LocalContextFlag());
-    /// \endcode
+    /// \include code/Compare_LocalContextFlag.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct LocalContextFlag : public MemberFunctionBase<LocalContextFlags, &BamRecord::LocalContextFlags> { };
 
-    /// Provides an operator() that compares on BamRecord::MapQuality
+    /// \brief Compares on BamRecord::MapQuality.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::MapQuality());
-    /// \endcode
+    /// \include code/Compare_MapQuality.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct MapQuality : public MemberFunctionBase<uint8_t, &BamRecord::MapQuality> { };
 
-    /// Provides an operator() that compares on BamRecord::MovieName
+    /// \brief Compares on BamRecord::MovieName.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::MovieName());
-    /// \endcode
+    /// \include code/Compare_MovieName.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct MovieName : public MemberFunctionBase<std::string, &BamRecord::MovieName> { };
 
-    /// Provides an operator() is essentially a no-op for comparing/sorting.
+    /// \brief Provides an operator() is essentially a no-op for
+    ///        comparing/sorting.
     ///
     /// If used in a sorting operation, then no change will occur.
     ///
@@ -274,147 +272,148 @@ public:
         bool operator()(const BamRecord&, const BamRecord&) const;
     };
 
-    /// Provides an operator() that compares on BamRecord::NumDeletedBases
+    ///\brief Compares on BamRecord::NumDeletedBases.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::NumDeletedBases());
-    /// \endcode
+    /// \include code/Compare_NumDeletedBases.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct NumDeletedBases : public MemberFunctionBase<size_t, &BamRecord::NumDeletedBases> { };
 
-    /// Provides an operator() that compares on BamRecord::NumInsertedBases
+    /// \brief Compares on BamRecord::NumInsertedBases.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::NumInsertedBases());
-    /// \endcode
+    /// \include code/Compare_NumInsertedBases.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct NumInsertedBases : public MemberFunctionBase<size_t, &BamRecord::NumInsertedBases> { };
 
-    /// Provides an operator() that compares on BamRecord::NumMatches
+    /// \brief Compares on BamRecord::NumMatches.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::NumMatches());
-    /// \endcode
+    /// \include code/Compare_NumMatches.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct NumMatches : public MemberFunctionBase<size_t, &BamRecord::NumMatches> { };
 
-    /// Provides an operator() that compares on BamRecord::NumMismatches
+    /// \brief Compares on BamRecord::NumMismatches.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::NumMismatches());
-    /// \endcode
+    /// \include code/Compare_NumMismatches.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct NumMismatches : public MemberFunctionBase<size_t, &BamRecord::NumMismatches> { };
 
-    /// Provides an operator() that compares on BamRecord::QueryEnd
+    /// \brief Compares on BamRecord::QueryEnd.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::QueryEnd());
-    /// \endcode
+    /// \include code/Compare_QueryEnd.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct QueryEnd : public MemberFunctionBase<Position, &BamRecord::QueryEnd> { };
 
-    /// Provides an operator() that compares on BamRecord::QueryStart
+    /// \brief Compares on BamRecord::QueryStart.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::QueryStart());
-    /// \endcode
+    /// \include code/Compare_QueryStart.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct QueryStart : public MemberFunctionBase<Position, &BamRecord::QueryStart> { };
 
-    /// Provides an operator() that compares on BamRecord::ReadAccuracy
+    /// \brief Compares on BamRecord::ReadAccuracy.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::ReadAccuracy());
-    /// \endcode
+    /// \include code/Compare_ReadAccuracy.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct ReadAccuracy : public MemberFunctionBase<Accuracy, &BamRecord::ReadAccuracy> { };
 
-    /// Provides an operator() that compares on BamRecord::ReadGroupId.
+    /// \brief Compares on BamRecord::ReadGroupId.
     ///
-    /// \note Even though ReadGroupId contains hex values, it is still a std::string.
-    ///       Comparisons will use lexical, not numeric ordering. If numeric ordering
-    ///       is desired, use Compare::ReadGroupNumericId instead.
+    /// \note Even though the ReadGroupId string contains hex values, it is
+    ///       still just a std::string. Comparisons will use lexical, not
+    ///       numeric ordering. If numeric ordering is desired, use
+    ///       Compare::ReadGroupNumericId instead.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::ReadGroupId());
-    /// \endcode
+    /// \include code/Compare_ReadGroupId.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct ReadGroupId : public MemberFunctionBase<std::string, &BamRecord::ReadGroupId> { };
 
-    /// Provides an operator() that compares on BamRecord::ReadGroupNumericId
+    /// \brief Compares on BamRecord::ReadGroupNumericId.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::ReadGroupNumericId());
-    /// \endcode
+    /// \include code/Compare_ReadGroupNumericId.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct ReadGroupNumericId : public MemberFunctionBase<int32_t, &BamRecord::ReadGroupNumericId> { };
 
-    /// Provides an operator() that compares on BamRecord::ReferenceEnd
+    /// \brief Compares on BamRecord::ReferenceEnd.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::ReferenceEnd());
-    /// \endcode
+    /// \include code/Compare_ReferenceEnd.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct ReferenceEnd : public MemberFunctionBase<Position, &BamRecord::ReferenceEnd> { };
 
-    /// Provides an operator() that compares on BamRecord::ReferenceId
+    /// \brief Compares on BamRecord::ReferenceId.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::ReferenceId());
-    /// \endcode
+    /// \include code/Compare_ReferenceId.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct ReferenceId : public MemberFunctionBase<int32_t, &BamRecord::ReferenceId> { };
 
-    /// Provides an operator() that compares on BamRecord::ReferenceName
+    /// \brief Compares on BamRecord::ReferenceName.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::ReferenceName());
-    /// \endcode
+    /// \include code/Compare_ReferenceName.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct ReferenceName : public MemberFunctionBase<std::string, &BamRecord::ReferenceName> { };
 
-    /// Provides an operator() that compares on BamRecord::ReferenceStart
+    /// \brief Compares on BamRecord::ReferenceStart.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::ReferenceStart());
-    /// \endcode
+    /// \include code/Compare_ReferenceStart.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct ReferenceStart : public MemberFunctionBase<Position, &BamRecord::ReferenceStart> { };
 
-    /// Provides an operator() that compares on BamRecord::HoleNumber
+    /// \brief Compares on BamRecord::HoleNumber.
     ///
     /// Example:
-    /// \code{.cpp}
-    ///     std::vector<BamRecord> records;
-    ///     std::sort(records.begin(), records.end(), Compare::Zmw());
-    /// \endcode
+    /// \include code/Compare_Zmw.txt
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
     ///
     struct Zmw : public MemberFunctionBase<int32_t, &BamRecord::HoleNumber> { };
 

@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file BamFile.cpp
+/// \brief Implements the BamFile class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/BamFile.h"
@@ -62,7 +66,10 @@ public:
         , firstAlignmentOffset_(-1)
     {
         // update verbosity
-        hts_verbose = PacBio::BAM::HtslibVerbosity;
+        //
+        //
+
+        hts_verbose = ( PacBio::BAM::HtslibVerbosity == -1 ? 0 : PacBio::BAM::HtslibVerbosity);
 
         // attempt open
         std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));

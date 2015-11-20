@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file ReadGroupInfo.inl
+/// \brief Inline implementations for the ReadGroupInfo class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/ReadGroupInfo.h"
@@ -60,7 +64,6 @@ inline ReadGroupInfo& ReadGroupInfo::BarcodeData(const std::string& barcodeFile,
     barcodeQuality_ = barcodeQuality;
     hasBarcodeData_ = true;
     return *this;
-
 }
 
 inline std::string ReadGroupInfo::BarcodeFile(void) const
@@ -235,14 +238,18 @@ inline std::string ReadGroupInfo::SequencingCenter(void) const
 inline ReadGroupInfo& ReadGroupInfo::SequencingCenter(const std::string& center)
 { sequencingCenter_ = center; return *this; }
 
+inline std::string ReadGroupInfo::SequencingChemistry(void) const
+{
+    return SequencingChemistryFromTriple(BindingKit(),
+                                         SequencingKit(),
+                                         BasecallerVersion());
+}
+
 inline std::string ReadGroupInfo::SequencingKit(void) const
 { return sequencingKit_; }
 
 inline ReadGroupInfo& ReadGroupInfo::SequencingKit(const std::string& kitNumber)
 { sequencingKit_ = kitNumber; return *this; }
-
-inline std::string ReadGroupInfo::SequencingChemistry(void) const
-{ return SequencingChemistryFromTriple(BindingKit(), SequencingKit(), BasecallerVersion()); }
 
 inline std::string ReadGroupInfo::ToSam(const ReadGroupInfo& rg)
 { return rg.ToSam(); }

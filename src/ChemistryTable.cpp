@@ -35,15 +35,14 @@
 
 // Author: Lance Hepler
 
-#include <array>
-#include <string>
-#include <vector>
+#include "ChemistryTable.h"
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
 extern const std::vector<std::array<std::string, 4>> ChemistryTable = {
+
     // binding, sequencing, version, chemistry
     {{"100356300",   "100356200",   "2.1", "P6-C4"}},
     {{"100356300",   "100356200",   "2.3", "P6-C4"}},
@@ -55,9 +54,9 @@ extern const std::vector<std::array<std::string, 4>> ChemistryTable = {
     {{"100372700",   "100612400",   "2.3", "P6-C4"}},
     {{"100-619-300", "100-619-400", "3.0", "S/P1-C1"}},
     {{"100-619-300", "100-711-600", "3.0", "S/P1-C1"}},
-    {{"100-619-300", "100-620-000", "3.0", "S/P1-C1"}},
+    {{"100-619-300", "100-620-000", "3.0", "S/P1-C1"}}
 };
 
-}  // internal
-}  // BAM
-}  // PacBio
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio

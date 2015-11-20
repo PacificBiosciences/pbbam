@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file VirtualPolymeraseReader.cpp
+/// \brief Implements the VirtualPolymeraseReader class.
+//
 // Author: Armin Töpfer
 
 #include <stdexcept>
@@ -74,15 +78,21 @@ VirtualPolymeraseReader::VirtualPolymeraseReader(
     polyHeader_->ReadGroups(readGroups);
 }
 
+bool VirtualPolymeraseReader::HasNext(void)
+{
+    // Return true until both iterators are at the end of the query
+    return primaryIt_ != primaryQuery_->end() || scrapsIt_ != scrapsQuery_->end();
+}
+
 // This method is not thread safe
-VirtualPolymeraseBamRecord VirtualPolymeraseReader::Next()
+VirtualPolymeraseBamRecord VirtualPolymeraseReader::Next(void)
 {
     auto bamRecordVec = NextRaw();
     VirtualPolymeraseBamRecord stitched(std::move(bamRecordVec), *polyHeader_);
     return std::move(stitched);
 }
 
-std::vector<BamRecord> VirtualPolymeraseReader::NextRaw()
+std::vector<BamRecord> VirtualPolymeraseReader::NextRaw(void)
 {
     std::vector<BamRecord> bamRecordVec;
 
@@ -107,14 +117,8 @@ std::vector<BamRecord> VirtualPolymeraseReader::NextRaw()
     return bamRecordVec;
 }
 
-bool VirtualPolymeraseReader::HasNext()
-{
-	// Return true until both iterators are at the end of the query
-	return primaryIt_ != primaryQuery_->end() || scrapsIt_ != scrapsQuery_->end();
-}
-
-BamHeader VirtualPolymeraseReader::PrimaryHeader()
+BamHeader VirtualPolymeraseReader::PrimaryHeader(void) const
 { return primaryBamFile_->Header(); }
 
-BamHeader VirtualPolymeraseReader::ScrapsHeader()
+BamHeader VirtualPolymeraseReader::ScrapsHeader(void) const
 { return scrapsBamFile_->Header(); }

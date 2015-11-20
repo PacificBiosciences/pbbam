@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file ReadGroupInfo.cpp
+/// \brief Implements the ReadGroupInfo class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/ReadGroupInfo.h"
@@ -130,7 +134,7 @@ string BaseFeatureName(const BaseFeature& feature)
         case BaseFeature::PULSE_CALL       : return feature_PC;
         case BaseFeature::PRE_PULSE_FRAMES : return feature_PD;
         case BaseFeature::PULSE_CALL_WIDTH : return feature_PX;
-        case BaseFeature::START_FRAME      : return feature_SF;
+    case BaseFeature::START_FRAME          : return feature_SF;
         default:
             throw std::runtime_error{ "unrecognized base feature" };
     }
@@ -531,15 +535,18 @@ std::string ReadGroupInfo::EncodeSamDescription(void) const
     if (!sequencingKit_.empty())     result.append(SEP + internal::token_SK +EQ + sequencingKit_);
     if (!basecallerVersion_.empty()) result.append(SEP + internal::token_BV +EQ + basecallerVersion_);
     if (!frameRateHz_.empty())       result.append(SEP + internal::token_FR +EQ + frameRateHz_);
-    if (control_)                    result.append(SEP + internal::token_CT +EQ + (control_ ? "TRUE" : "FALSE"));
+    if (control_)                    result.append(SEP + internal::token_CT +EQ + (control_ ? "TRUE"
+                                                                                            : "FALSE"));
+
     if (hasBarcodeData_) {
-        const auto barcodeData = string{
-                                         SEP + internal::token_BF + EQ + barcodeFile_ +
-                                         SEP + internal::token_BH + EQ + barcodeHash_ +
-                                         SEP + internal::token_BC + EQ + std::to_string(barcodeCount_) +
-                                         SEP + internal::token_BM + EQ + internal::BarcodeModeName(barcodeMode_) +
-                                         SEP + internal::token_BQ + EQ + internal::BarcodeQualityName(barcodeQuality_)
-                                       };
+        const auto barcodeData =
+            string {
+                SEP + internal::token_BF + EQ + barcodeFile_ +
+                SEP + internal::token_BH + EQ + barcodeHash_ +
+                SEP + internal::token_BC + EQ + std::to_string(barcodeCount_) +
+                SEP + internal::token_BM + EQ + internal::BarcodeModeName(barcodeMode_) +
+                SEP + internal::token_BQ + EQ + internal::BarcodeQualityName(barcodeQuality_)
+            };
         result.reserve(result.size() + barcodeData.size());
         result.append(barcodeData);
     }
@@ -590,20 +597,8 @@ string ReadGroupInfo::IntToId(const int32_t id)
     return s.str();
 }
 
-string ReadGroupInfo::SequencingChemistryFromTriple(const string& bindingKit,
-                                                    const string& sequencingKit,
-                                                    const string& basecallerVersion)
-{
-    const string ver{ basecallerVersion.substr(0, 3) };
-
-    for (const auto& row : internal::ChemistryTable)
-        if (bindingKit == row[0] && sequencingKit == row[1] && ver == row[2])
-            return row[3];
-    throw InvalidSequencingChemistryException(bindingKit, sequencingKit, basecallerVersion);
-    //throw std::runtime_error{ "unsupported sequencing chemistry combination" };
-}
-
-ReadGroupInfo& ReadGroupInfo::IpdCodec(const FrameCodec& codec, const string& tag)
+ReadGroupInfo& ReadGroupInfo::IpdCodec(const FrameCodec& codec,
+                                       const string& tag)
 {
     // store desired codec type
     ipdCodec_ = codec;
@@ -616,7 +611,8 @@ ReadGroupInfo& ReadGroupInfo::IpdCodec(const FrameCodec& codec, const string& ta
     return *this;
 }
 
-ReadGroupInfo& ReadGroupInfo::PulseWidthCodec(const FrameCodec& codec, const string& tag)
+ReadGroupInfo& ReadGroupInfo::PulseWidthCodec(const FrameCodec& codec,
+                                              const string& tag)
 {
     // store desired codec type
     pulseWidthCodec_ = codec;
@@ -627,6 +623,22 @@ ReadGroupInfo& ReadGroupInfo::PulseWidthCodec(const FrameCodec& codec, const str
         actualTag = "pw";
     BaseFeatureTag(BaseFeature::PULSE_WIDTH, actualTag);
     return *this;
+}
+
+string ReadGroupInfo::SequencingChemistryFromTriple(const string& bindingKit,
+                                                    const string& sequencingKit,
+                                                    const string& basecallerVersion)
+{
+    const string ver{ basecallerVersion.substr(0, 3) };
+    for (const auto& row : internal::ChemistryTable) {
+        if (bindingKit == row[0] && sequencingKit == row[1] && ver == row[2])
+            return row[3];
+    }
+
+    // not found
+    throw InvalidSequencingChemistryException(bindingKit,
+                                              sequencingKit,
+                                              basecallerVersion);
 }
 
 std::string ReadGroupInfo::ToSam(void) const
@@ -705,9 +717,13 @@ bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
             && barcodeMode_ == other.barcodeMode_
             && barcodeQuality_ == other.barcodeQuality_
             && features_.size() == other.features_.size()
-            && std::equal(features_.cbegin(), features_.cend(), other.features_.cbegin())
+            && std::equal(features_.cbegin(),
+                          features_.cend(),
+                          other.features_.cbegin())
             && custom_.size() == other.custom_.size()
-            && std::equal(custom_.begin(), custom_.end(), other.custom_.cbegin());
+            && std::equal(custom_.begin(),
+                          custom_.end(),
+                          other.custom_.cbegin());
 }
 
 } // namespace BAM

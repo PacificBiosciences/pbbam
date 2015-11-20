@@ -33,7 +33,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file ProgramInfo.cpp
+/// \brief Implements the ProgramInfo class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/ProgramInfo.h"

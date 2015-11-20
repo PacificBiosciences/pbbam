@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file SamTagCodec.h
+/// \brief Defines the SamTagCodec class.
+//
 // Author: Derek Barnett
 
 #ifndef SAMTAGCODEC_H
@@ -45,10 +49,30 @@
 namespace PacBio {
 namespace BAM {
 
+/// \brief The SamTagCodec class provides text-based encoding/decoding of %BAM
+///        tag data.
+///
+/// \note SamTagCodec is mostly an implementation and/or testing detail, and may
+///       be removed from the public API.
+///
 class PBBAM_EXPORT SamTagCodec
 {
 public:
+    /// \name Tag Collection Methods
+    /// \{
+
+    /// \brief Creates a TagCollection from SAM-formatted tag data.
+    ///
+    /// \param[in] tagString    SAM-formmated string
+    /// \returns resulting tag collection
+    ///
     static TagCollection Decode(const std::string& tagString);
+
+    /// \brief Creates SAM-formatted string from a TagCollection.
+    ///
+    /// \param[in] tags     TagCollection containing tag data
+    /// \returns SAM-formatted string
+    ///
     static std::string Encode(const PacBio::BAM::TagCollection& tags);
 };
 

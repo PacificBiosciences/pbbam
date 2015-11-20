@@ -33,6 +33,10 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 //
+// File Description
+/// \file Compare.cpp
+/// \brief Implements the Compare class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/Compare.h"

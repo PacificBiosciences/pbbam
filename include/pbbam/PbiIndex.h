@@ -33,6 +33,10 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 //
+// File Description
+/// \file PbiIndex.h
+/// \brief Defines the PbiIndex class.
+//
 // Author: Derek Barnett
 
 #ifndef PBIINDEX_H
@@ -49,13 +53,29 @@ namespace BAM {
 
 namespace internal { class PbiIndexPrivate; }
 
+/// \brief The PbiIndex class provides an representation of PBI index data that
+///        is rearranged for quick lookups.
+///
+/// The PbiIndex class itself provides access to a few high-level attributes
+/// (e.g. version, number of records, etc.). The actual lookup data is stored
+/// in its member components:
+///     BasicLookupData,
+///     MappedLookupData,
+///     ReferenceLookupData, &
+///     BarcodeLookupData .
+///
 class PBBAM_EXPORT PbiIndex
 {
 public:
     /// \name Constructors & Related Methods
     /// \{
 
-    /// Constructs a PbiIndex lookup structure from a PBI file.
+    /// \brief Creates a PbiIndex lookup structure from a PBI file.
+    ///
+    /// \param[in] pbiFilename  filename
+    ///
+    /// \throws std::runtime_error if failed to load data from file
+    ///
     PbiIndex(const std::string& pbiFilename);
 
     PbiIndex(const PbiIndex& other);
@@ -86,17 +106,18 @@ public:
 
     /// \returns index filename ("*.pbi")
     ///
-    /// \note Returns an empty string if the underlying data was generated, not loaded from file.
+    /// \note Returns an empty string if the underlying data was generated, not
+    ///       loaded from file.
     ///
     std::string Filename(void) const;
 
     /// \returns enum flags representing the file sections present
     PbiFile::Sections FileSections(void) const;
 
-    /// \returns the number of records in the PBI (& associated BAM)
+    /// \returns the number of records in the PBI (& associated %BAM)
     uint32_t NumReads(void) const;
 
-    /// \returns the PBI file's version number
+    /// \returns the PBI file's version
     PbiFile::VersionEnum Version(void) const;
 
     /// \}
@@ -105,16 +126,25 @@ public:
     /// \name Lookup Data Components
     /// \{
 
-    /// \returns barcode data lookup structure (may be empty, check result of HasBarcodeData)
+    /// \returns const reference to BarcodeData lookup structure
+    ///
+    /// May be empty, check result of HasBarcodeData.
+    ///
     const BarcodeLookupData& BarcodeData(void) const;
 
-    /// \returns basic data lookup structure
+    /// \returns const reference to BasicData lookup structure
     const BasicLookupData& BasicData(void) const;
 
-    /// \returns mapped data lookup structure (may be empty, check result of HasMappedData)
+    /// \returns const reference to MappedData lookup structure
+    ///
+    /// May be empty, check result of HasMappedData.
+    ///
     const MappedLookupData& MappedData(void) const;
 
-    /// \returns reference data lookup structure (may be empty, check result of HasReferenceData)
+    /// \returns const reference to reference data lookup structure
+    ///
+    /// May be empty, check result of HasReferenceData.
+    ///
     const ReferenceLookupData& ReferenceData(void) const;
 
     /// }

@@ -35,6 +35,9 @@
 
 // Author: Lance Hepler
 
+#ifndef CHEMISTRYTABLE_H
+#define CHEMISTRYTABLE_H
+
 #include <array>
 #include <string>
 #include <vector>
@@ -45,6 +48,8 @@ namespace internal {
 
 extern const std::vector<std::array<std::string, 4>> ChemistryTable;
 
-}  // internal
-}  // BAM
-}  // PacBio
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio
+
+#endif // CHEMISTRYTABLE_H

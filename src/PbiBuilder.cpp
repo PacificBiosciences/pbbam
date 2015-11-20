@@ -33,6 +33,10 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 //
+// File Description
+/// \file PbiBuilder.cpp
+/// \brief Implements the PbiBuilder class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/PbiBuilder.h"
@@ -194,7 +198,7 @@ PbiBuilderPrivate::PbiBuilderPrivate(const string& filename,
     , currentRow_(0)
     , refDataBuilder_(nullptr)
 {
-    if (bgzf_.get()== 0)
+    if (bgzf_.get() == 0)
         throw std::runtime_error("could not open PBI file for writing");
 
     if (isCoordinateSorted && numReferenceSequences > 0)
@@ -279,7 +283,7 @@ bool PbiBuilderPrivate::HasBarcodeData(void) const
     assert(bcForward.size() == rawData_.NumReads());
 
     // check for data
-    for (auto i = decltype(rawData_.NumReads()){0}; i < rawData_.NumReads(); ++i) {
+    for (uint32_t i = 0; i < rawData_.NumReads(); ++i) {
         if (bcForward.at(i) != -1 ||
             bcReverse.at(i)  != -1 ||
             bcQuality.at(i)  != -1 )

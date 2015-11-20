@@ -94,9 +94,11 @@ public:
 
     /// Resolves input file path using optional starting directory.
     ///
-    /// /absolute/path/to/file.txt   => /absolute/path/to/file.txt
-    /// ../relative/path/to/file.txt => <from>/../relative/path/to/file.txt
-    /// file.txt                     => <from>/file.txt
+    /// \verbatim
+    ///   /absolute/path/to/file.txt   => /absolute/path/to/file.txt
+    ///   ../relative/path/to/file.txt => <from>/../relative/path/to/file.txt
+    ///   file.txt                     => <from>/file.txt
+    /// \endverbatim
     ///
     /// \note This method will strip any URI scheme as well ("file://") so that the result is immediately ready from I/O operations.
     ///

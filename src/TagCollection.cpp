@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file TagCollection.cpp
+/// \brief Implements the TagCollection class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/TagCollection.h"

@@ -32,21 +32,20 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file Config.h
+/// \brief Defines library-wide macros & global variables.
+//
 // Author: Derek Barnett
 
 #ifndef PBBAM_CONFIG_H
 #define PBBAM_CONFIG_H
 
-// --------------------------------
-// standard types
-// --------------------------------
-
 #include <cstdint>
 
-// -------------------------------------
-// library symbol import/export macros
-// -------------------------------------
+/// \name Library Import/Export
+/// \{
 
 #ifndef PBBAM_LIBRARY_EXPORT
 #  if defined(WIN32)
@@ -72,12 +71,14 @@
 #  endif
 #endif
 
-// ----------------------------------------------------
-// setup the shared_ptr implementation we'll be using
-// ----------------------------------------------------
+/// \}
+
+/// \name Shared Pointer Settings
+/// \{
 
 // uncomment this define, or pass via command-line (-DPBBAM_USE_BOOST_SHARED_PTR),
 // to use boost::shared_ptr<T> instead of std::shared_ptr<T>
+//
 //#define PBBAM_USE_BOOST_SHARED_PTR
 
 #ifdef PBBAM_USE_BOOST_SHARED_PTR
@@ -88,38 +89,88 @@
 #  define PBBAM_SHARED_PTR std::shared_ptr
 #endif
 
-// ----------------------------------------------------
-// htslib verbosity level
-// ----------------------------------------------------
+/// \}
 
-namespace PacBio {
-namespace BAM {
+/// \name Class Definition Helpers
+/// \{
 
-/// \brief Sets the desired verbosity level of htslib warnings.
+/// \brief Disables the use of copy constructors and assignment operators for a
+///        class.
 ///
-/// Change this value to allow debug/warning statements from htslib.
-/// The valid range seems to be [0-3], where 0->OFF, and 3->most verbose.
+/// To use, place the macro in a class's private section:
+/// \code{.cpp}
+/// struct Foo {
+/// private:
+///     DISABLE_COPY(Foo);
+/// };
+/// \endcode
 ///
-extern int HtslibVerbosity;
-
-} // namespace BAM
-} // namespace PacBio
-
-// ----------------------------------------------------
-// additional helper macros
-// ----------------------------------------------------
-
 #ifndef DISABLE_COPY
 #define DISABLE_COPY(Class) \
     Class(const Class&); \
     Class& operator=(const Class&)
 #endif
 
+/// \brief Disables the use of move constructors and assignment operators for a
+///        class.
+///
+/// To use, place the macro in a class's private section:
+/// \code{.cpp}
+/// struct Foo {
+/// private:
+///     DISABLE_MOVE(Foo);
+/// };
+/// \endcode
+///
+#ifndef DISABLE_MOVE
+#define DISABLE_MOVE(Class) \
+    Class(Class&&); \
+    Class& operator=(Class&&);
+#endif
+
+/// \brief Disables the use of copy & move constructors and assignment operators f
+///        or a class.
+///
+/// To use, place the macro in a class's private section:
+/// \code{.cpp}
+/// struct Foo {
+/// private:
+///     DISABLE_MOVE_AND_COPY(Foo);
+/// };
+/// \endcode
+///
 #ifndef DISABLE_MOVE_AND_COPY
 #define DISABLE_MOVE_AND_COPY(Class) \
-    Class(Class&&); \
-    Class& operator=(Class&&); \
+    DISABLE_MOVE(Class) \
     DISABLE_COPY(Class)
 #endif
+
+/// \}
+
+namespace PacBio {
+namespace BAM {
+
+/// \name Verbosity Settings
+/// \{
+
+/// \brief Sets the desired verbosity level of htslib warnings.
+///
+/// Change this value to allow debug/warning statements from htslib itself.
+/// The valid range seems to be [0-3], where 0 indicates OFF, and 3 is the
+/// most verbose.
+///
+/// By default, pbbam disables htslib statements to keep output channels clean.
+/// We rely on exceptions & their associated messages instead.
+///
+/// This global variable is obviously not thread-safe by any means. But as a
+/// debug flag, it is unlikely to cause any real issues. The worst case would be
+/// unexpected presence/absence of output statements.
+///
+extern int HtslibVerbosity;
+
+/// \}
+
+} // namespace BAM
+} // namespace PacBio
 
 #endif // PBBAM_CONFIG_H

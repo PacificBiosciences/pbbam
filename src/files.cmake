@@ -58,10 +58,16 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/ZmwGroupQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/ZmwQuery.h
 
-    # exceptions
+    # exception headers
     ${PacBioBAM_IncludeDir}/pbbam/exception/InvalidSequencingChemistryException.h
 
     # internal headers
+    ${PacBioBAM_IncludeDir}/pbbam/internal/Accuracy.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/BamRecord.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/BamRecordBuilder.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/BamRecordImpl.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/Cigar.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/CigarOperation.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/Compare.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/CompositeBamReader.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSet.inl
@@ -72,14 +78,22 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetListElement.h
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetListElement.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetTypes.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/Frames.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/GenomicInterval.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/Interval.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/PbiBasicTypes.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/PbiFilter.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/PbiFilterTypes.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/PbiIndex.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/PbiLookupData.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/PbiRawData.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/ProgramInfo.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/QualityValue.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/QualityValues.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/QueryBase.h
     ${PacBioBAM_IncludeDir}/pbbam/internal/QueryBase.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/ReadGroupInfo.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/SequenceInfo.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/Tag.inl
 
     # virtual headers

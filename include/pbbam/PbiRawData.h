@@ -33,6 +33,10 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 //
+// File Description
+/// \file PbiRawData.h
+/// \brief Defines the classes used for working with raw PBI data.
+//
 // Author: Derek Barnett
 
 #ifndef PBIRAWDATA_H
@@ -48,14 +52,22 @@ namespace BAM {
 
 class BamRecord;
 
+/// \brief The PbiRawBarcodeData class represents the raw data stored in the
+///        "BarcodeData" section of the PBI index.
+///
 class PBBAM_EXPORT PbiRawBarcodeData
 {
 public:
     /// \name Constructors & Related Methods
     /// \{
 
+    /// \brief Creates an empty data structure.
     PbiRawBarcodeData(void);
+
+    /// \brief Creates an empty data structure, preallocating space for a known
+    ///        number of records.
     PbiRawBarcodeData(uint32_t numReads);
+
     PbiRawBarcodeData(const PbiRawBarcodeData& other);
     PbiRawBarcodeData(PbiRawBarcodeData&& other);
     PbiRawBarcodeData& operator=(const PbiRawBarcodeData& other);
@@ -67,25 +79,41 @@ public:
     /// \name Index Construction
     /// \{
 
-    /// Add barcode data for \p b, if available.
+    /// \brief Adds a record's barcode data.
+    ///
+    /// \param[in] b    %BAM record
+    ///
     void AddRecord(const BamRecord& b);
 
     /// \}
 
 public:
+    /// \name Raw Data Containers
+    /// \{
+
     std::vector<int16_t> bcForward_;
     std::vector<int16_t> bcReverse_;
     std::vector<int8_t>  bcQual_;
+
+    /// \}
 };
 
+/// \brief The PbiRawMappedData class represents the raw data stored in the
+///        "MappedData" section of the PBI index.
+///
 class PBBAM_EXPORT PbiRawMappedData
 {
 public:
     /// \name Constructors & Related Methods
     /// \{
 
+    /// \brief Creates an empty data structure.
     PbiRawMappedData(void);
+
+    /// \brief Creates an empty data structure, preallocating space for a known
+    ///        number of records.
     PbiRawMappedData(uint32_t numReads);
+
     PbiRawMappedData(const PbiRawMappedData& other);
     PbiRawMappedData(PbiRawMappedData&& other);
     PbiRawMappedData& operator=(const PbiRawMappedData& other);
@@ -97,22 +125,57 @@ public:
     /// \name Index Construction
     /// \{
 
-    /// Add mapping data for \p b, if available.
+    /// \brief Adds a record's mapping data.
+    ///
+    /// \param[in] b    %BAM record
+    ///
     void AddRecord(const BamRecord& b);
 
     /// \}
 
 public:
-    /// \name Index Data
+    /// \name Index Data Query
     /// \{
 
+    /// \brief Calculates the number of deleted bases for a particular record.
+    ///
+    /// Convenvience method. Equivalent to:
+    /// \code{.cpp}
+    /// NumDeletedAndInsertedBasesAt(i).first;
+    /// \endcode
+    ///
+    /// \param[in] recordIndex  i-th record
+    /// \returns number of deleted bases
+    ///
     uint32_t NumDeletedBasesAt(size_t recordIndex) const;
-    uint32_t NumInsertedBasesAt(size_t recordIndex) const;
-    std::pair<uint32_t, uint32_t> NumDeletedAndInsertedBasesAt(size_t recordIndex) const;
 
-    /// }
+    /// \brief Calculates the number of inserted bases for a particular record.
+    ///
+    /// Convenvience method. Equivalent to:
+    /// \code{.cpp}
+    /// NumDeletedAndInsertedBasesAt(i).second;
+    /// \endcode
+    ///
+    /// \param[in] recordIndex  i-th record
+    /// \returns number of inserted bases
+    ///
+    uint32_t NumInsertedBasesAt(size_t recordIndex) const;
+
+    /// \brief Calculates the number of deleted & inserted bases for a
+    ///        particular record.
+    ///
+    /// \param[in] recordIndex  i-th record in the data set
+    /// \returns a pair consisting of (numDeletions,numInsertions)
+    ///
+    std::pair<uint32_t, uint32_t>
+    NumDeletedAndInsertedBasesAt(size_t recordIndex) const;
+
+    /// \}
 
 public:
+    /// \name Raw Data Containers
+    /// \{
+
     std::vector<int32_t>  tId_;
     std::vector<uint32_t> tStart_;
     std::vector<uint32_t> tEnd_;
@@ -122,8 +185,18 @@ public:
     std::vector<uint32_t> nM_;
     std::vector<uint32_t> nMM_;
     std::vector<uint8_t>  mapQV_;
+
+    /// \}
 };
 
+/// \brief The PbiReferenceEntryClass represents a single reference in the PBI
+///        CoordinateSorted section.
+///
+/// A reference entry consists of an associated reference ID (tId), as well as
+/// start and end indices into the %BAM or PBI.
+///
+/// \note Rows are given in the interval [start, end).
+///
 class PBBAM_EXPORT PbiReferenceEntry
 {
 public:
@@ -131,12 +204,30 @@ public:
     typedef uint32_t Row;
 
 public:
+    static const ID  UNMAPPED_ID;
+    static const Row UNSET_ROW;
+
+public:
     /// \name Constructors & Related Methods
     /// \{
 
+    /// \brief Creates a default entry.
+    ///
+    /// - default ID:   PbiReferenceEntry::UNMAPPED_ID \n
+    /// - default rows: PbiReferenceEntry::UNSET_ROW
+    ///
     PbiReferenceEntry(void);
+
+    /// \brief Creates a reference entry, with no rows set.
+    ///
+    /// - default rows: PbiReferenceEntry::UNSET_ROW
+    ///
     PbiReferenceEntry(ID id);
+
+    /// \brief Creates a reference entry, with rows set.
+    ///
     PbiReferenceEntry(ID id, Row beginRow, Row endRow);
+
     PbiReferenceEntry(const PbiReferenceEntry& other);
     PbiReferenceEntry(PbiReferenceEntry&& other);
     PbiReferenceEntry& operator=(const PbiReferenceEntry& other);
@@ -147,23 +238,36 @@ public:
     /// \}
 
 public:
-    static const ID  UNMAPPED_ID;
-    static const Row UNSET_ROW;
+    /// \name Reference Data Members
+    /// \{
 
-public:
     ID  tId_;
     Row beginRow_;
     Row endRow_;
+
+    /// \}
 };
 
+/// \brief The PbiRawReferenceData class represents the raw data stored in the
+///        "CoordinateSortedData" section of the PBI index.
+///
 class PBBAM_EXPORT PbiRawReferenceData
 {
 public:
     /// \name Constructors & Related Methods
     /// \{
 
+    /// \brief Creates an empty data structure.
     PbiRawReferenceData(void);
+
+    /// \brief Creates an empty data structure, preallocating space for a
+    ///        number of references.
+    ///
+    /// This constructor is recommended as this is the safest way to ensure that
+    /// references without observed mappings are included in the final output.
+    ///
     PbiRawReferenceData(uint32_t numRefs);
+
     PbiRawReferenceData(const PbiRawReferenceData& other);
     PbiRawReferenceData(PbiRawReferenceData&& other);
     PbiRawReferenceData& operator=(const PbiRawReferenceData& other);
@@ -172,17 +276,30 @@ public:
     /// \}
 
 public:
+    /// \name Raw Data Containers
+    /// \{
+
     std::vector<PbiReferenceEntry> entries_;
+
+    /// \}
 };
 
+/// \brief The PbiRawBasicData class represents the raw data stored in the
+///        "BasicData" section of the PBI index.
+///
 class PBBAM_EXPORT PbiRawBasicData
 {
 public:
     /// \name Constructors & Related Methods
     /// \{
 
+    /// \brief Creates an empty data structure.
     PbiRawBasicData(void);
+
+    /// \brief Creates an empty data structure, preallocating space for a known
+    ///        number of records.
     PbiRawBasicData(uint32_t numReads);
+
     PbiRawBasicData(const PbiRawBasicData& other);
     PbiRawBasicData(PbiRawBasicData&& other);
     PbiRawBasicData& operator=(const PbiRawBasicData& other);
@@ -194,12 +311,19 @@ public:
     /// \name Index Construction
     /// \{
 
-    /// Add mapping data for \p b, if available.
+    /// \brief Adds a record's mapping data.
+    ///
+    /// \param[in] b        %BAM record
+    /// \param[in] offset   \b virtual file offset where record begins
+    ///
     void AddRecord(const BamRecord& b, int64_t offset);
 
     /// \}
 
 public:
+    /// \name Raw Data Containers
+    /// \{
+
     std::vector<int32_t>  rgId_;
     std::vector<int32_t>  qStart_;
     std::vector<int32_t>  qEnd_;
@@ -207,24 +331,41 @@ public:
     std::vector<float>    readQual_;
     std::vector<uint8_t>  ctxtFlag_;
     std::vector<int64_t>  fileOffset_;
+
+    /// \}
 };
 
-typedef PbiRawBasicData PbiRawSubreadData; // for existing code, possible in use externally
+/// \deprecated For legacy-code support only, and will be removed soon.
+///             Use PbiRawBasicData instead.
+///
+typedef PbiRawBasicData PbiRawSubreadData;
 
+/// \brief The PbiRawData class provides an representation of raw PBI index
+///        data, used mostly for construction or I/O.
+///
+/// The PbiRawData class itself provides access to a few high-level attributes
+/// (e.g. version, number of records, etc.). The actual index data is stored
+/// in its member components:
+///     PbiRawBasicData,
+///     PbiRawMappedData,
+///     PbiRawReferenceData, &
+///     PbiRawBarcodeData .
+///
 class PBBAM_EXPORT PbiRawData
 {
 public:
     /// \name Constructors & Related Methods
     /// \{
 
-    /// Default ctor. Used in index building
+    /// \brief Creates an empty raw data structure, ready for building.
+    ///
     PbiRawData(void);
 
-    /// Load raw data from \p pbiFilename.
+    /// \brief Loads raw PBI data from a file.
     ///
-    /// \param[in] pbiFilename PBI filename
+    /// \param[in] pbiFilename      ".pbi" filename
     ///
-    /// \throws if file contents cannot be loaded properly
+    /// \throws std::runtime_error if file contents cannot be loaded properly
     ///
     PbiRawData(const std::string& pbiFilename);
 
@@ -237,71 +378,89 @@ public:
     /// \}
 
 public:
-    /// \name Attributes
+    /// \name PBI General Attributes
     /// \{
 
-    /// \returns true if index contains barcode data (BarcodeData flag is set)
+    /// \returns true if index has BarcodeData section
     bool HasBarcodeData(void) const;
 
-    /// \returns true if index contains mapped data (MappedData flag is set)
+    /// \returns true if index has MappedData section
     bool HasMappedData(void) const;
 
-    /// \returns true if index contains reference data (CoordinateSorted flag is set)
+    /// \returns true if index has ReferenceData section
     bool HasReferenceData(void) const;
 
-    /// \returns true if \p section flag is set
+    /// \returns true if index has \b section
+    /// \param[in] section PbiFile::Section identifier
+    ///
     bool HasSection(const PbiFile::Section section) const;
 
-    /// \returns PBI filename (".pbi"), will be empty string if user-generated
+    /// \returns index filename ("*.pbi")
+    ///
+    /// \note Returns an empty string if the underlying data was generated, not
+    ///       loaded from file.
+    ///
     std::string Filename(void) const;
 
-    /// \returns sections flags for PBI file
+    /// \returns enum flags representing the file sections present
     PbiFile::Sections FileSections(void) const;
 
-    /// \returns number of records indexed
+    /// \returns the number of records in the PBI (& associated %BAM)
     uint32_t NumReads(void) const;
 
-    /// \returns PBI file version
+    /// \returns the PBI file's version
     PbiFile::VersionEnum Version(void) const;
 
     /// \}
 
 public:
-    /// \name Indexed Sections
+    /// \name Raw Data Components
     /// \{
 
-    /// \returns read-only reference to barcode data component
+    /// \returns const reference to BarcodeData lookup structure
+    ///
+    /// May be empty, check result of HasBarcodeData.
+    ///
     const PbiRawBarcodeData& BarcodeData(void) const;
 
-    /// \returns read-only reference to basic data component
+    /// \returns const reference to BasicData lookup structure
     const PbiRawBasicData& BasicData(void) const;
 
-    /// \returns read-only reference to mapped data component
+    /// \returns const reference to MappedData lookup structure
+    ///
+    /// May be empty, check result of HasMappedData.
+    ///
     const PbiRawMappedData& MappedData(void) const;
 
-    /// \returns read-only reference to reference data component
+    /// \returns const reference to reference data lookup structure
+    ///
+    /// May be empty, check result of HasReferenceData.
+    ///
     const PbiRawReferenceData& ReferenceData(void) const;
 
     /// \}
 
 public:
-    /// \name Attributes
+    /// \name PBI General Attributes
     /// \{
 
-    /// Set file section flags.
+    /// \brief Sets the file section flags.
     ///
+    /// \param[in] sections     section flags
     /// \returns reference to this index
     ///
     PbiRawData& FileSections(PbiFile::Sections sections);
 
-    /// Set number of indexed records
+    /// \brief Sets the number of indexed records.
     ///
+    /// \param[in] num  number of records
     /// \returns reference to this index
     ///
     PbiRawData& NumReads(uint32_t num);
 
-    /// Set PBI file version
+    /// \brief Sets PBI file version.
     ///
+    /// \param[in] version  file version
     /// \returns reference to this index
     ///
     PbiRawData& Version(PbiFile::VersionEnum version);
@@ -309,22 +468,31 @@ public:
     /// \}
 
 public:
-    /// \name Indexed Sections
+    /// \name Raw Data Components
+    /// \{
 
-    /// \returns modifiable reference to barcode data component
+    /// \returns reference to BarcodeData lookup structure
+    ///
+    /// May be empty, check result of HasBarcodeData.
+    ///
     PbiRawBarcodeData& BarcodeData(void);
 
-    /// \returns modifiable reference to basic data component
+    /// \returns reference to BasicData lookup structure
     PbiRawBasicData& BasicData(void);
 
-    /// \returns modifiable reference to mapped data component
+    /// \returns reference to MappedData lookup structure
+    ///
+    /// May be empty, check result of HasMappedData.
+    ///
     PbiRawMappedData& MappedData(void);
 
-    /// \returns modifiable reference to reference data component
+    /// \returns reference to reference data lookup structure
+    ///
+    /// May be empty, check result of HasReferenceData.
+    ///
     PbiRawReferenceData& ReferenceData(void);
 
     /// \}
-
 
 private:
     std::string          filename_;

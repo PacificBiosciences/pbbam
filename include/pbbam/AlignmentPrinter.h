@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file AlignmentPrinter.h
+/// \brief Defines the AlignmentPrinter class.
+//
 // Author: Armin Töpfer
 
 #ifndef ALIGNMENTPRINTER_H
@@ -40,7 +44,6 @@
 
 #include <memory>
 #include <string>
-
 #include "pbbam/BamRecord.h"
 #include "pbbam/IndexedFastaReader.h"
 #include "pbbam/Orientation.h"
@@ -50,28 +53,52 @@ namespace BAM {
 
 class BamRecord;
 
+/// \brief The AlignmentPrinter class "pretty-prints" an alignment with respect
+///        to its associated reference sequence.
+///
+/// Example output:
+/// \verbinclude plaintext/AlignmentPrinterOutput.txt
+///
 class AlignmentPrinter
 {
 public:
-    AlignmentPrinter(const IndexedFastaReader& ifr)
-        : ifr_(std::unique_ptr<IndexedFastaReader>(new IndexedFastaReader(ifr)))
-    { }
+    /// \name Constructors & Related Methods
+    /// \{
 
-    AlignmentPrinter() = delete;
-    // Move constructor
-    AlignmentPrinter(AlignmentPrinter&&) = default;
-    // Copy constructor
+    /// Constructs the alignment printer with an associated FASTA file reader.
+    ///
+    /// \param[in] ifr FASTA reader
+    ///
+    /// \throws std::runtime_error if FASTA file cannot be opened for reading.
+    ///
+    AlignmentPrinter(const IndexedFastaReader& ifr);
+
+    AlignmentPrinter(void) = delete;
     AlignmentPrinter(const AlignmentPrinter&) = delete;
-    // Move assignment operator
-    AlignmentPrinter& operator=(AlignmentPrinter&&) = default;
-    // Copy assignment operator
+    AlignmentPrinter(AlignmentPrinter&&) = default;
     AlignmentPrinter& operator=(const AlignmentPrinter&) = delete;
-    // Destructor
-    ~AlignmentPrinter() = default;
+    AlignmentPrinter& operator=(AlignmentPrinter&&) = default;
+    ~AlignmentPrinter(void) = default;
+
+    /// \}
 
 public:
+    /// \name Printing
+    /// \{
+
+    /// Pretty-prints an aligned BamRecord to std::string.
+    ///
+    /// \note The current implementation includes ANSI escape sequences for
+    ///       coloring terminal output. Future versions of this method will
+    ///       likely make this optional.
+    ///
+    /// \returns formatted string containing the alignment and summary
+    ///          information
+    ///
     std::string Print(const BamRecord& record,
                       const Orientation orientation = Orientation::GENOMIC);
+
+    /// \}
 
 private:
 	const std::unique_ptr<IndexedFastaReader> ifr_;

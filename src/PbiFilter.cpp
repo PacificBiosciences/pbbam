@@ -33,6 +33,10 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 //
+// File Description
+/// \file PbiFilter.cpp
+/// \brief Implements the PbiFilter class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/PbiFilter.h"

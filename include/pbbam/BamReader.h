@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file BamReader.h
+/// \brief Defines the BamReader class.
+//
 // Author: Derek Barnett
 
 #ifndef BAMREADER_H
@@ -53,36 +57,39 @@ namespace BAM {
 
 namespace internal { struct BamReaderPrivate; }
 
+/// \brief The BamReader class provides basic read-access to a %BAM file.
+///
+/// The base-class implementation provides a sequential read-through of BAM
+/// records. Derived classes may implement other access schemes (e.g. genomic
+/// region, PBI-enabled record filtering).
+///
 class PBBAM_EXPORT BamReader
 {
 public:
     /// \name Constructors & Related Methods
     /// \{
 
-    /// Opens BAM file for reading.
+    /// \brief Opens BAM file for reading.
     ///
-    /// \param[in] fn BAM filename
+    /// \param[in] fn %BAM filename
     /// \throws std::runtime_error if failed to open
     ///
     explicit BamReader(const std::string& fn);
 
-    /// Opens BAM file for reading.
+    /// \brief Opens BAM file for reading.
     ///
     /// \param[in] bamFile BamFile object
     /// \throws std::runtime_error if failed to open
     ///
     explicit BamReader(const BamFile& bamFile);
 
-    /// Opens BAM file for reading.
+    /// \brief Opens BAM file for reading.
     ///
     /// \param[in] bamFile BamFile object
     /// \throws std::runtime_error if failed to open
     ///
     explicit BamReader(BamFile&& bamFile);
 
-public:
-    /// Closes BAM file & frees up memory.
-    ///
     virtual ~BamReader(void);
 
     /// \}
@@ -91,12 +98,13 @@ public:
     /// \name BAM File Attributes
     /// \{
 
+    /// \returns the underlying BamFile
     const BamFile& File(void) const;
 
-    /// \returns BAM filename
+    /// \returns %BAM filename
     std::string Filename(void) const;
 
-    /// \returns BamHeader object from BAM header contents
+    /// \returns BamHeader object from %BAM header contents
     const BamHeader& Header(void) const;
 
     /// \}
@@ -105,52 +113,73 @@ public:
     /// \name BAM File I/O
     /// \{
 
-    /// Get "next" BAM record.
+    /// \brief Fetches the "next" %BAM record.
     ///
-    /// Default implementation will read records until EOF. Derived readers may use additional
-    /// criteria to decide which record is "next" and when reading is done.
+    /// Default implementation will read records until EOF. Derived readers may
+    /// use additional criteria to decide which record is "next" and when
+    /// reading is done.
     ///
-    /// \param[out] record next BamRecord object. Should not be used if method returns false.
-    /// \returns true if record was read successfully. Returns false if EOF (or end of iterator
-    ///          in derived readers). False is not an error, just "end of data".
-    /// \throws std::runtime_error if failed to read file (e.g. truncated or corrupted file).
+    /// \param[out] record  next BamRecord object. Should not be used if method
+    ///                     returns false.
+    ///
+    /// \returns true if record was read successfully. Returns false if EOF (or
+    ///          end of iterator in derived readers). False is not an error,
+    ///          it indicates "end of data".
+    ///
+    /// \throws std::runtime_error if failed to read from file (e.g. possible
+    ///         truncated or corrupted file).
     ///
     bool GetNext(BamRecord& record);
 
-    /// Seeks to virtual offset in BAM.
+    /// \brief Seeks to virtual offset in %BAM.
     ///
-    /// \note This is \b NOT a normal file offset, but the virtual offset used in BAM indexing.
+    /// \note This is \b NOT a normal file offset, but the virtual offset used
+    ///       in %BAM indexing.
+    ///
     /// \throws std::runtime_error if failed to seek
     ///
     void VirtualSeek(int64_t virtualOffset);
 
     /// \returns current (virtual) file position.
     ///
-    /// \note This is \b NOT a normal file offset, but the virtual offset used in BAM indexing.
+    /// \note This is \b NOT a normal file offset, but the virtual offset used
+    ///       in %BAM indexing.
     ///
     int64_t VirtualTell(void) const;
 
     /// \}
 
 protected:
+    /// \name BAM File I/O
+    /// \{
 
-    /// Internal helper method for access to underlying BGZF stream pointer.
+    /// \brief Helper method for access to underlying BGZF stream pointer.
     ///
-    /// Useful for readers' interfacing with htslib methods.
+    /// Useful for derived readers' contact points with htslib methods.
+    ///
+    /// \returns BGZF stream pointer
     ///
     BGZF* Bgzf(void) const;
 
-    /// Do the actual raw read of a record from the BAM file.
+    /// \brief Performs the actual raw read of the next record from the BAM
+    ///        file.
     ///
-    /// Default implementation will read records until EOF. Derived readers may use additional
-    /// criteria to decide which record is "next" and when reading is done.
+    /// Default implementation will read records, sequentially, until EOF.
+    /// Derived readers may use additional criteria to decide which record is
+    ///  "next" and when reading is done.
     ///
     /// Return value should be equivalent to htslib's bam_read1():
     ///     >= 0 : normal
     ///       -1 : EOF (not an error)
     ///     < -1 : error
     ///
+    /// \param[in]  bgzf BGZF stream pointer
+    /// \param[out] b    %BAM record pointer
+    /// \returns integer status code, see description
+    ///
     virtual int ReadRawData(BGZF* bgzf, bam1_t* b);
+
+    /// \}
 
 private:
     std::unique_ptr<internal::BamReaderPrivate> d_;

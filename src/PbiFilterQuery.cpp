@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file PbiFilterQuery.cpp
+/// \brief Implements the PbiFilterQuery class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/PbiFilterQuery.h"

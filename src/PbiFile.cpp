@@ -33,6 +33,10 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 //
+// File Description
+/// \file PbiFile.cpp
+/// \brief Implements the PbiFile methods.
+//
 // Author: Derek Barnett
 
 #include "pbbam/PbiFile.h"
@@ -50,7 +54,8 @@ namespace PbiFile {
 
 void CreateFrom(const BamFile& bamFile)
 {
-    PbiBuilder builder(bamFile.PacBioIndexFilename(), bamFile.Header().Sequences().size());
+    PbiBuilder builder(bamFile.PacBioIndexFilename(),
+                       bamFile.Header().Sequences().size());
     BamReader reader(bamFile);
     BamRecord b;
     int64_t offset = reader.VirtualTell();

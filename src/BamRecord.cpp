@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file BamRecord.cpp
+/// \brief Implements the BamRecord & BamRecordView classes.
+//
 // Author: Derek Barnett
 
 #include "pbbam/BamRecord.h"
@@ -80,8 +84,8 @@ static const string tagName_readAccuracy            = "rq";
 static const string tagName_readGroup               = "RG";
 static const string tagName_scrap_type              = "sc";
 static const string tagName_snr                     = "sn";
-static const string tagName_substitutionQV          = "sq";
 static const string tagName_startFrame              = "sf";
+static const string tagName_substitutionQV          = "sq";
 static const string tagName_substitutionTag         = "st";
 
 // faux (helper) tag names
@@ -788,7 +792,7 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
     std::vector<float> pkmid = std::move(Pkmid(Orientation::GENOMIC));
     Frames prePulseFrames = std::move(PrePulseFrames(Orientation::GENOMIC).Data());
     Frames pulseCallWidth = std::move(PulseCallWidth(Orientation::GENOMIC).Data());
-    
+
     // TODO: clean this up
     std::vector<uint32_t> startFrame;
     if (HasStartFrame())
@@ -813,8 +817,10 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
         internal::Reverse(pkmid);
         internal::Reverse(prePulseFrames);
         internal::Reverse(pulseCallWidth);
+
         if (HasStartFrame())
             internal::Reverse(startFrame);
+
     }
 
     // update BAM tags
@@ -838,6 +844,7 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
     tags[internal::tagName_pulse_call_width]    = pulseCallWidth.Data();
     if (HasStartFrame())
         tags[internal::tagName_startFrame] = startFrame;
+
     impl_.Tags(tags);
 
     // update query start/end
@@ -1209,11 +1216,11 @@ bool BamRecord::HasScrapType(void) const
           && !impl_.TagValue(internal::tagName_scrap_type).IsNull();
 }
 
-bool BamRecord::HasSignalToNoise(void) const
-{ return impl_.HasTag(internal::tagName_snr); }
-
 bool BamRecord::HasStartFrame(void) const
 { return impl_.HasTag(internal::tagName_startFrame); }
+
+bool BamRecord::HasSignalToNoise(void) const
+{ return impl_.HasTag(internal::tagName_snr); }
 
 bool BamRecord::HasSubstitutionQV(void) const
 { return impl_.HasTag(internal::tagName_substitutionQV); }

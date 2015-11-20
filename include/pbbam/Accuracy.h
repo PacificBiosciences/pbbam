@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file Accuracy.h
+/// \brief Defines the Accuracy class.
+//
 // Author: Derek Barnett
 
 #ifndef ACCURACY_H
@@ -44,21 +48,25 @@ namespace PacBio {
 namespace BAM {
 
 /// \brief The Accuracy class represents the expected accuracy of a BamRecord.
+///
 /// Values are clamped to fall within [0,1].
 ///
 class PBBAM_EXPORT Accuracy
 {
 public:
-    static const float MIN;
-    static const float MAX;
+    static const float MIN; ///< Minimum valid accuracy value [0.0]
+    static const float MAX; ///< Maximum valid accuracy value [1.0]
 
 public:
     /// \name Constructors & Related Methods
     /// \{
 
-    /// \note This is not an 'explicit' ctor, to make it as easy to use in
-    ///       numeric operations as possible. We really just want to make
-    ///       sure that the acceptable range is respected.
+    /// Constructs an Accuracy object from a floating-point number.
+    ///
+    /// \note This is not an \b explicit ctor, to make it as easy as
+    ///       possible to use in numeric operations. We really just want
+    ///       to make sure that the acceptable range is respected.
+    ///
     Accuracy(float accuracy);
     Accuracy(const Accuracy& other);
     ~Accuracy(void);
@@ -66,7 +74,6 @@ public:
     /// \}
 
 public:
-
     /// \returns Accuracy as float primitive
     operator float(void) const;
 
@@ -74,25 +81,9 @@ private:
     float accuracy_;
 };
 
-inline Accuracy::Accuracy(float accuracy)
-{
-    if (accuracy < Accuracy::MIN)
-        accuracy = Accuracy::MIN;
-    else if (accuracy > Accuracy::MAX)
-        accuracy = Accuracy::MAX;
-    accuracy_ = accuracy;
-}
-
-inline Accuracy::Accuracy(const Accuracy &other)
-    : accuracy_(other.accuracy_)
-{ }
-
-inline Accuracy::~Accuracy(void) { }
-
-inline Accuracy::operator float(void) const
-{ return accuracy_; }
-
 } // namespace BAM
 } // namespace PacBio
+
+#include "pbbam/internal/Accuracy.inl"
 
 #endif // ACCURACY_H

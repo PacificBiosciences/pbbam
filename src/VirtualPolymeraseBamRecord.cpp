@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file VirtualPolymeraseBamRecord.cpp
+/// \brief Implements the VirtualPolymeraseBamRecord class.
+//
 // Author: Armin Töpfer
 
 #include <iostream>
@@ -46,6 +50,55 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
+using namespace PacBio::BAM::internal;
+
+namespace PacBio {
+namespace BAM {
+namespace internal {
+
+/// \brief Appends content of src vector to dst vector using move semantics.
+///
+/// \param[in]     src  Input vector that will be empty after execution
+/// \param[in,out] dst  Output vector that will be appended to
+///
+template <typename T>
+inline void MoveAppend(std::vector<T>& src, std::vector<T>& dst) noexcept
+{
+    if (dst.empty())
+    {
+        dst = std::move(src);
+    }
+    else
+    {
+        dst.reserve(dst.size() + src.size());
+        std::move(src.begin(), src.end(), std::back_inserter(dst));
+        src.clear();
+    }
+}
+
+/// \brief Appends content of src vector to dst vector using move semantics.
+///
+/// \param[in]     src  Input vector via perfect forwarding
+/// \param[in,out] dst  Output vector that will be appended to
+///
+template <typename T>
+inline void MoveAppend(std::vector<T>&& src, std::vector<T>& dst) noexcept
+{
+    if (dst.empty())
+    {
+        dst = std::move(src);
+    }
+    else
+    {
+        dst.reserve(dst.size() + src.size());
+        std::move(src.begin(), src.end(), std::back_inserter(dst));
+        src.clear();
+    }
+}
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio
 
 VirtualPolymeraseBamRecord::VirtualPolymeraseBamRecord(
     std::vector<BamRecord>&& unorderedSources, const BamHeader& header)
@@ -59,7 +112,18 @@ VirtualPolymeraseBamRecord::VirtualPolymeraseBamRecord(
     StitchSources();
 }
 
-void VirtualPolymeraseBamRecord::StitchSources()
+bool VirtualPolymeraseBamRecord::HasVirtualRegionType(const VirtualRegionType regionType) const
+{ return virtualRegionsMap_.find(regionType) != virtualRegionsMap_.end(); }
+
+Frames VirtualPolymeraseBamRecord::IPDV1Frames(Orientation orientation) const
+{
+    const auto rawFrames = this->IPDRaw(orientation);
+    const std::vector<uint8_t> rawData(rawFrames.Data().begin(), rawFrames.Data().end());
+    return Frames::Decode(rawData);
+}
+
+
+void VirtualPolymeraseBamRecord::StitchSources(void)
 {
     const auto& firstRecord = sources_[0];
     const auto& lastRecord = sources_[sources_.size() - 1];
@@ -79,13 +143,12 @@ void VirtualPolymeraseBamRecord::StitchSources()
     QualityValues labelQv;
     QualityValues alternativeLabelQv;
 
-    Frames                ipd;
-    Frames                pw;
-    Frames                pd;
-    Frames                px;
-    std::vector<float>    pa;
-    std::vector<float>    pm;
-    std::vector<uint32_t> sf;
+    Frames             ipd;
+    Frames             pw;
+    Frames             pd;
+    Frames             px;
+    std::vector<float> pa;
+    std::vector<float> pm;
 
     // Stitch using tmp vars
     for(auto& b : sources_)
@@ -144,9 +207,6 @@ void VirtualPolymeraseBamRecord::StitchSources()
 
         if (b.HasPkmean())
             MoveAppend(b.Pkmean(), pa);
-
-        if (b.HasStartFrame())
-            MoveAppend(b.StartFrame(), sf);
 
         if (b.HasScrapType())
         {
@@ -243,10 +303,6 @@ void VirtualPolymeraseBamRecord::StitchSources()
     if (!px.Data().empty())
         this->PulseCallWidth(px, FrameEncodingType::LOSSLESS);
 
-    // 32 bit arrays
-    if (!sf.empty())
-        this->StartFrame(sf);
-
     // Determine HQREGION bases on LQREGIONS
     if (HasVirtualRegionType(VirtualRegionType::LQREGION))
     {
@@ -281,9 +337,12 @@ void VirtualPolymeraseBamRecord::StitchSources()
     }
 }
 
-Frames VirtualPolymeraseBamRecord::IPDV1Frames(Orientation orientation) const
-{
-    const auto rawFrames = this->IPDRaw(orientation);
-    const std::vector<uint8_t> rawData(rawFrames.Data().begin(), rawFrames.Data().end());
-    return Frames::Decode(rawData);
-}
+
+std::map<VirtualRegionType, std::vector<VirtualRegion>>
+VirtualPolymeraseBamRecord::VirtualRegionsMap(void) const
+{ return virtualRegionsMap_; }
+
+std::vector<VirtualRegion>
+VirtualPolymeraseBamRecord::VirtualRegionsTable(const VirtualRegionType regionType) const
+{ return virtualRegionsMap_.at(regionType); }
+

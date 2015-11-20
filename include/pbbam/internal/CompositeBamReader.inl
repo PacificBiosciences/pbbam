@@ -32,14 +32,16 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file CompositeBamReader.inl
+/// \brief Inline implementations for the composite BAM readers, for
+///        working with multiple input files.
+//
 // Author: Derek Barnett
 
 #include "pbbam/CompositeBamReader.h"
 #include <algorithm>
-
-#include <iostream>
-
 #include <set>
 
 namespace PacBio {

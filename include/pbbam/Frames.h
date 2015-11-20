@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file Frames.h
+/// \brief Defines the Frames class.
+//
 // Author: Derek Barnett
 
 #ifndef FRAMES_H
@@ -44,26 +48,36 @@
 namespace PacBio {
 namespace BAM {
 
+/// \brief The Frames class represents pulse frame data.
+///
+/// Frame data may be stored in either their raw, 16-bit values or
+/// using a lossy, 8-bit compression scheme.
+///
+/// This class is used to store the data and convert between the 2 storage types.
+///
 class PBBAM_EXPORT Frames
 {
 public:
     /// \name Conversion Methods
     /// \{
 
-    /// Constructs a Frames object from encoded (lossy, 8-bit data).
+    /// \brief Constructs a Frames object from encoded (lossy, 8-bit) data.
     ///
-    /// \note This method should probably not be needed often by client code working with frame data.
-    /// It exists primarily for (internal) parsing & interpretation of the BAM file contents. The
-    /// method is available, though, should the conversion operation be needed.
+    /// \note This method should probably not be needed often by client code
+    ///       working with frame data. It exists primarily for (internal)
+    ///       parsing & interpretation of the %BAM file contents. The method is
+    ///       available, though, should the conversion operation be needed.
     ///
-    /// \param[in] codedData encoded data
+    /// \param[in] codedData    encoded data
     /// \returns Frames object
+    ///
     static Frames Decode(const std::vector<uint8_t>& codedData);
 
-    /// Encodes a container of (raw) frames values in our 8-bit encoding.
+    /// \brief Creates encoded, compressed frame data from raw input data.
     ///
-    /// \param[in] frames expanded frame data
-    /// \returns lossy, 8-bit encoded frame codes
+    /// \param[in] frames   raw frame data
+    /// \returns lossy, 8-bit encoded frame data
+    ///
     static std::vector<uint8_t> Encode(const std::vector<uint16_t>& frames);
 
     /// \}
@@ -112,7 +126,7 @@ public:
     /// \}
 
 public:
-    /// \name Iterators
+    /// \name STL Compatbility
     /// \{
 
     /// \returns A const_iterator to the beginning of the sequence.
@@ -133,6 +147,12 @@ public:
     /// \returns An iterator to the element past the end of the sequence.
     std::vector<uint16_t>::iterator end(void);
 
+    /// \returns The number of frame data points.
+    size_t size(void) const;
+
+    /// \returns True if the container is empty, false otherwise.
+    bool empty(void) const;
+
     /// \} 
 
 public:
@@ -143,15 +163,14 @@ public:
     ///
     /// \param[in] frames data in expanded (not encoded) form
     /// \returns reference to this object
+    ///
     Frames& Data(const std::vector<uint16_t>& frames);
 
     /// Sets this record's data.
     ///
-    /// This is an overloaded function, allowing move semantics
-    /// (instead of copying the data).
-    ///
     /// \param[in] frames data in expanded (not encoded) form
     /// \returns reference to this object
+    ///
     Frames& Data(std::vector<uint16_t>&& frames);
 
     /// \}
@@ -160,46 +179,9 @@ private:
     std::vector<uint16_t> data_;
 };
 
-inline const std::vector<uint16_t>& Frames::Data(void) const
-{ return data_; }
-
-inline std::vector<uint16_t>& Frames::DataRaw(void)
-{ return data_; }
-
-inline std::vector<uint8_t> Frames::Encode(void) const
-{ return Frames::Encode(data_); }
-
-inline Frames& Frames::Data(const std::vector<uint16_t>& frames)
-{ data_ = frames; return *this; }
-
-inline Frames& Frames::Data(std::vector<uint16_t>&& frames)
-{ data_ = std::move(frames); return *this; }
-
-inline std::vector<uint16_t>::const_iterator Frames::cbegin(void) const
-{ return data_.cbegin(); }
-
-inline std::vector<uint16_t>::const_iterator Frames::cend(void) const
-{ return data_.cend(); }
-
-inline std::vector<uint16_t>::const_iterator Frames::begin(void) const
-{ return data_.begin(); }
-
-inline std::vector<uint16_t>::const_iterator Frames::end(void) const
-{ return data_.end(); }
-
-inline std::vector<uint16_t>::iterator Frames::begin(void)
-{ return data_.begin(); }
-
-inline std::vector<uint16_t>::iterator Frames::end(void)
-{ return data_.end(); }
-
-inline bool Frames::operator==(const Frames& other) const
-{ return data_ == other.data_; }
-
-inline bool Frames::operator!=(const Frames& other) const
-{ return !(*this == other); }
-
 } // namespace BAM
 } // namespace PacBio
+
+#include "pbbam/internal/Frames.inl"
 
 #endif // FRAMES_H

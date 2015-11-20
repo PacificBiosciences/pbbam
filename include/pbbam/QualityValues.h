@@ -32,14 +32,17 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file QualityValues.h
+/// \brief Defines the QualityValues class.
+//
 // Author: Derek Barnett
 
 #ifndef QUALITYVALUES_H
 #define QUALITYVALUES_H
 
 #include "pbbam/QualityValue.h"
-#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -47,39 +50,101 @@ namespace PacBio {
 namespace BAM {
 
 /// \brief The QualityValues class represents a sequence of FASTQ-compatible
-/// quality values. See QualityValue documentation for details.
+///        quality values. See QualityValue documentation for more details.
 ///
 class PBBAM_EXPORT QualityValues : public std::vector<QualityValue>
 {
 public:
-    /// Creates a QualityValues collection from a FASTQ-encoded string.
+    /// \brief Creates a QualityValues object from a FASTQ-encoded string.
+    ///
+    /// \param[in] fastq    FASTQ-encoded string
+    /// \returns corresponding QualityValues object
+    ///
     static QualityValues FromFastq(const std::string& fastq);
 
 public:
     /// \name Constructors & Related Methods
     ///  \{
 
+    /// \brief Default constructor - creates an empty QualityValues object.
     QualityValues(void);
+
+    /// \brief Creates a QualityValues object from a FASTQ-encoded string.
+    ///
+    /// \param[in] fastqString  FASTQ-encoded string
+    ///
     explicit QualityValues(const std::string& fastqString);
+
+    /// \brief Creates a QualityValues object from a vector of QualityValue
+    ///        elements.
+    ///
+    /// \param[in] quals    vector of QualityValue elements
+    ///
     explicit QualityValues(const std::vector<QualityValue>& quals);
+
+    /// \brief Creates a QualityValues object from a vector of QualityValue
+    ///        elements.
+    ///
+    /// \param[in] quals    vector of QualityValue elements
+    ///
+    QualityValues(std::vector<QualityValue>&& quals);
+
+    /// \brief Creates a QualityValues object from a vector of (numeric) quality
+    ///        values.
+    ///
+    /// \param[in] quals    vector of quality value numbers
+    ///
     explicit QualityValues(const std::vector<uint8_t>& quals);
 
+    /// \brief Creates a QualityValues object from the contents of the range:
+    ///        [first, last)
+    ///
+    /// \param[in] first    input iterator, whose element is a numeric quality
+    /// \param[in] last     input iterator, whose element is a numeric quality
+    ///
     QualityValues(const std::vector<uint8_t>::const_iterator first,
                   const std::vector<uint8_t>::const_iterator last);
+
+    /// \brief Creates a QualityValues object from the contents of the range:
+    ///        [first, last)
+    ///
+    /// \param[in] first    input iterator, whose element is a QualityValue
+    /// \param[in] last     input iterator, whose element is a QualityValue
+    ///
     QualityValues(const QualityValues::const_iterator first,
                   const QualityValues::const_iterator last);
 
+    /// \brief Copy constructor
     QualityValues(const QualityValues& other);
+
+    /// \brief Move constructor
     QualityValues(QualityValues&& other);
 
-    QualityValues(std::vector<QualityValue>&& quals);
-
+    /// \brief Copy assignment operator
+    ///
+    /// \param[in] other    QualityValues object
+    ///
     QualityValues& operator=(const QualityValues& other);
+
+    /// \brief Move assignment operator
+    ///
+    /// \param[in] other    QualityValues object
+    ///
     QualityValues& operator=(QualityValues&& other);
 
+    /// \brief Copy assignment operator
+    ///
+    /// \param[in] quals    vector of QualityValue elements
+    ///
     QualityValues& operator=(const std::vector<QualityValue>& quals);
+
+    /// \brief Move assignment operator
+    ///
+    /// \param[in] quals    vector of QualityValue elements
+    ///
     QualityValues& operator=(std::vector<QualityValue>&& quals);
 
+    /// \brief Destructor
     ~QualityValues(void);
 
     /// \}
@@ -97,137 +162,39 @@ public:
     /// \name Iterators
     /// \{
 
-    /// \returns A const_iterator to the beginning of the sequence.
+    /// \returns a const_iterator to the beginning of the sequence
     std::vector<QualityValue>::const_iterator cbegin(void) const;
 
-    /// \returns A const_iterator to the element past the end of the sequence.
+    /// \returns a const_iterator to the element following the last element
     std::vector<QualityValue>::const_iterator cend(void) const;
 
-    /// \returns A const_iterator to the beginning of the sequence.
+    /// \returns a const_iterator to the beginning of the sequence
     std::vector<QualityValue>::const_iterator begin(void) const;
 
-    /// \returns A const_iterator to the element past the end of the sequence.
+    /// \returns a const_iterator to the element following the last element
     std::vector<QualityValue>::const_iterator end(void) const;
 
-    /// \returns An iterator to the beginning of the sequence.
+    /// \returns an iterator to the beginning of the sequence
     std::vector<QualityValue>::iterator begin(void);
 
-    /// \returns An iterator to the element past the end of the sequence.
+    /// \returns an iterator to the element following the last element
     std::vector<QualityValue>::iterator end(void);
 
     /// \}
 
 public:
-    /// \returns the FASTQ-encoded string for this collection
+    /// \name Conversion Methods
+    /// \{
+
+    /// \returns the FASTQ-encoded string for this sequence of quality values
     std::string Fastq(void) const;
+
+    /// \}
 };
-
-inline QualityValues::QualityValues(void)
-    : std::vector<QualityValue>()
-{ }
-
-inline QualityValues::QualityValues(const std::string& fastqString)
-    : std::vector<QualityValue>()
-{
-    resize(fastqString.size());
-    std::transform(fastqString.cbegin(), fastqString.cend(),
-                   begin(), QualityValue::FromFastq);
-}
-
-inline QualityValues::QualityValues(const std::vector<QualityValue>& quals)
-    : std::vector<QualityValue>(quals)
-{ }
-
-inline QualityValues::QualityValues(const std::vector<uint8_t>& quals)
-    : std::vector<QualityValue>()
-{
-    resize(quals.size());
-    std::copy(quals.cbegin(), quals.cend(), begin());
-}
-
-inline QualityValues::QualityValues(const std::vector<uint8_t>::const_iterator first,
-                                    const std::vector<uint8_t>::const_iterator last)
-    : std::vector<QualityValue>(first, last)
-{ }
-
-inline QualityValues::QualityValues(const QualityValues::const_iterator first,
-                                    const QualityValues::const_iterator last)
-    : std::vector<QualityValue>()
-{
-    assign(first, last);
-}
-
-inline QualityValues::QualityValues(const QualityValues& other)
-    : std::vector<QualityValue>(other)
-{ }
-
-inline QualityValues::QualityValues(std::vector<QualityValue>&& quals)
-    : std::vector<QualityValue>(std::move(quals))
-{ }
-
-inline QualityValues::QualityValues(QualityValues&& other)
-    : std::vector<QualityValue>(std::move(other))
-{ }
-
-inline QualityValues& QualityValues::operator=(const QualityValues& other)
-{ std::vector<QualityValue>::operator=(other); return *this; }
-
-inline QualityValues& QualityValues::operator=(const std::vector<QualityValue>& quals)
-{ std::vector<QualityValue>::operator=(quals); return *this; }
-
-inline QualityValues& QualityValues::operator=(QualityValues&& other)
-{ std::vector<QualityValue>::operator=(std::move(other)); return *this; }
-
-inline QualityValues& QualityValues::operator=(std::vector<QualityValue>&& quals)
-{ std::vector<QualityValue>::operator=(std::move(quals)); return *this; }
-
-inline QualityValues::~QualityValues(void) { }
-
-inline std::vector<QualityValue>::const_iterator QualityValues::cbegin(void) const
-{ return std::vector<QualityValue>::cbegin(); }
-
-inline std::vector<QualityValue>::const_iterator QualityValues::cend(void) const
-{ return std::vector<QualityValue>::cend(); }
-
-inline std::vector<QualityValue>::const_iterator QualityValues::begin(void) const
-{ return std::vector<QualityValue>::begin(); }
-
-inline std::vector<QualityValue>::const_iterator QualityValues::end(void) const
-{ return std::vector<QualityValue>::end(); }
-
-inline std::vector<QualityValue>::iterator QualityValues::begin(void)
-{ return std::vector<QualityValue>::begin(); }
-
-inline std::vector<QualityValue>::iterator QualityValues::end(void)
-{ return std::vector<QualityValue>::end(); }
-
-inline QualityValues QualityValues::FromFastq(const std::string& fastq)
-{
-    return QualityValues(fastq);
-//    QualityValues result;
-//    result.resize(fastq.size());
-//    std::transform(fastq.cbegin(), fastq.cend(), result.begin(), QualityValue::FromFastq);
-//    return result;
-}
-
-inline std::string QualityValues::Fastq(void) const
-{
-    std::string result;
-    result.reserve(size());
-    auto iter = cbegin();
-    const auto end = cend();
-    for (; iter != end; ++iter)
-        result.push_back((*iter).Fastq());
-    return result;
-}
-
-inline bool QualityValues::operator==(const std::string& fastq) const
-{ return *this == QualityValues(fastq); }
-
-inline bool QualityValues::operator!=(const std::string& fastq) const
-{ return *this != QualityValues(fastq); }
 
 } // namespace BAM
 } // namespace PacBio
+
+#include "pbbam/internal/QualityValues.inl"
 
 #endif // QUALITYVALUES_H

@@ -33,6 +33,10 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 //
+// File Description
+/// \file PbiLookupData.inl
+/// \brief Inline implementations for the classes used for PBI data lookup.
+//
 // Author: Derek Barnett
 
 #include "pbbam/PbiLookupData.h"

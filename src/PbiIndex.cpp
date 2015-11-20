@@ -33,6 +33,10 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 //
+// File Description
+/// \file PbiIndex.cpp
+/// \brief Implements the PbiIndex class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/PbiIndex.h"

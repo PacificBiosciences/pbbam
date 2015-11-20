@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file Compare.inl
+/// \brief Inline implementations for the Compare class & inner classes.
+//
 // Author: Derek Barnett
 
 #include "pbbam/Compare.h"
@@ -56,18 +60,18 @@ struct MemberFnProxy<R (T::*)(Args...)const, fn>
 
 template<typename ValueType,
          typename Compare::MemberFunctionBaseHelper<ValueType>::MemberFnType fn,
-         typename CompareType> inline
-bool Compare::MemberFunctionBase<ValueType, fn, CompareType>::operator()(const BamRecord& lhs,
-                                                                         const BamRecord& rhs) const
+         typename CompareType>
+inline bool Compare::MemberFunctionBase<ValueType, fn, CompareType>::operator()(const BamRecord& lhs,
+                                                                                const BamRecord& rhs) const
 {
     using MemberFnType = typename Compare::MemberFunctionBaseHelper<ValueType>::MemberFnType;
     using Proxy = internal::MemberFnProxy<MemberFnType, fn>;
-    CompareType cmp;
+
+    const CompareType cmp;
     return cmp(Proxy::call(lhs), Proxy::call(rhs));
 }
 
-inline
-bool Compare::None::operator()(const BamRecord&, const BamRecord&) const
+inline bool Compare::None::operator()(const BamRecord&, const BamRecord&) const
 { return false; }
 
 } // namespace BAM

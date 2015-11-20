@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file SamTagCodec.h
+/// \brief Implements the SamTagCodec class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/SamTagCodec.h"
@@ -142,7 +146,8 @@ TagCollection SamTagCodec::Decode(const string& tagString)
 
         switch (type) {
 
-            // technically only 'A' is allowed in SAM chars, but we'll be a little permissive
+            // technically only 'A' is allowed in SAM chars,
+            // but we'll be a little permissive
             case 'A' :
             case 'a' :
             {
@@ -150,8 +155,8 @@ TagCollection SamTagCodec::Decode(const string& tagString)
                 break;
             }
 
-            // technically only 'i' is allowed in SAM ints, but we'll be a little permissive
-            // since SAM might be a bit more "user-edited" than BAM
+            // technically only 'i' is allowed in SAM ints, but we'll be a little
+            // permissive since SAM might be a bit more "user-edited" than BAM
             case 'c' :
             case 'C' :
             case 's' :
@@ -159,11 +164,13 @@ TagCollection SamTagCodec::Decode(const string& tagString)
             case 'i' :
             case 'I' :
             {
+                // check out boost::numeric cast for these conversions
+
                 // negative value (force signed int)
                 if (remainder.at(0) == '-') {
                     const int32_t x = boost::lexical_cast<int32_t>(remainder);
                     if ( x >= INT8_MIN )
-                        tags[name] = static_cast<int8_t>(x);  // check out boost::numeric cast
+                        tags[name] = static_cast<int8_t>(x);
                     else if ( x >= INT16_MIN )
                         tags[name] = static_cast<int16_t>(x);
                     else
@@ -260,7 +267,7 @@ string SamTagCodec::Encode(const TagCollection& tags)
         }
 
         // "<TYPE>:<DATA>" for all other data
-        switch ( tag.Type() ) {
+        switch (tag.Type()) {
             case TagDataType::INT8   : result.append("i:"); appendSamValue(tag.ToInt8(),   result, true); break;
             case TagDataType::UINT8  : result.append("i:"); appendSamValue(tag.ToUInt8(),  result, true); break;
             case TagDataType::INT16  : result.append("i:"); appendSamValue(tag.ToInt16(),  result); break;

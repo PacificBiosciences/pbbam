@@ -33,6 +33,10 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 //
+// File Description
+/// \file Position.h
+/// \brief Defines the Position typedef.
+//
 // Author: Derek Barnett
 
 #ifndef POSITION_H
@@ -43,14 +47,17 @@
 namespace PacBio {
 namespace BAM {
 
+/// \brief This type is used to refer to genomic positions.
 /// \typedef typedef int32_t PacBio::BAM::Position
 ///
-/// This type refers to all genomic positions. We use signed
-/// because SAM/BAM uses the -1 value to indicate unknown, unmapped, etc.
-/// positions.
+/// We use a signed integer because SAM/BAM uses the -1 value to indicate
+/// unknown or unmapped positions.
 ///
 typedef int32_t Position;
 
+/// \brief This constant is widely used as a "missing" or "invalid" position
+///        marker.
+///
 static const Position UnmappedPosition = Position(-1);
 
 } // namespace BAM

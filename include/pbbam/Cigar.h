@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file Cigar.h
+/// \brief Defines the Cigar class.
+//
 // Author: Derek Barnett
 
 #ifndef CIGAR_H
@@ -46,28 +50,39 @@
 namespace PacBio {
 namespace BAM {
 
+/// \brief The Cigar class represents the CIGAR string used to report alignment
+///        charateristics in SAM/BAM.
+///
+/// \note Use of the 'M' operator is forbidden in PacBio BAMs. See
+///       CigarOperationType description for more information.
+///
+/// \sa https://samtools.github.io/hts-specs/SAMv1.pdf for more information on CIGAR in general.
+///
 class PBBAM_EXPORT Cigar : public std::vector<CigarOperation>
 {
-
-public:
-    /// \name Static Constructor
-    /// \{
-
-    /// Creates a Cigar object from SAM/BAM string input
-    ///
-    /// \param [in] stdString SAM/BAM formatted CIGAR data
-    /// \returns Cigar object representing the input data
-    ///
-    static Cigar FromStdString(const std::string& stdString);
-
-    /// \}
-
 public:
     /// \name Constructors & Related Methods
     /// \{
 
+    /// \brief Creates a Cigar object from SAM/BAM string input
+    ///
+    /// \param [in] stdString   SAM/BAM formatted CIGAR data
+    /// \returns a Cigar object representing the input data
+    ///
+    /// \note This class may be removed from the public API in the future,
+    ///       as the constructor taking a std::string accomplishes the same end.
+    ///
+    static Cigar FromStdString(const std::string& stdString);
+
+    /// \brief Creates an empty Cigar.
     Cigar(void);
+
+    /// \brief Creates a Cigar object from SAM/BAM string input
+    ///
+    /// \param [in] cigarString   SAM/BAM formatted CIGAR data
+    ///
     Cigar(const std::string& cigarString);
+
     Cigar(const Cigar& other);
     Cigar(Cigar&& other);
     Cigar& operator=(const Cigar& other);
@@ -89,30 +104,9 @@ public:
     /// \}
 };
 
-inline Cigar::Cigar(void)
-    : std::vector<CigarOperation>()
-{ }
-
-inline Cigar::Cigar(const Cigar& other)
-    : std::vector<CigarOperation>(other)
-{ }
-
-inline Cigar::Cigar(Cigar&& other)
-    : std::vector<CigarOperation>(std::move(other))
-{ }
-
-inline Cigar& Cigar::operator=(const Cigar& other)
-{ std::vector<CigarOperation>::operator= (other); return *this; }
-
-inline Cigar& Cigar::operator=(Cigar&& other)
-{ std::vector<CigarOperation>::operator= (std::move(other)); return *this; }
-
-inline Cigar::~Cigar(void) { }
-
-inline Cigar Cigar::FromStdString(const std::string& stdString)
-{ return Cigar(stdString); }
-
 } // namespace BAM
 } // namespace PacBio
+
+#include "pbbam/internal/Cigar.inl"
 
 #endif // CIGAR_H

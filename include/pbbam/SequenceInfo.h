@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file SequenceInfo.h
+/// \brief Defines the SequenceInfo class.
+//
 // Author: Derek Barnett
 
 #ifndef SEQUENCEINFO_H
@@ -45,14 +49,27 @@
 namespace PacBio {
 namespace BAM {
 
+/// \brief The SequenceInfo class represents a program entry (\@SQ) in the SAM
+///        header.
+///
 class PBBAM_EXPORT SequenceInfo
 {
 public:
     /// \name Conversion & Validation
     ///
 
+    /// \brief Creates a SequenceInfo object from SAM-formatted text.
+    ///
+    /// \param[in] sam  SAM-formatted text
+    /// \returns program info object
+    ///
     static SequenceInfo FromSam(const std::string& sam);
 
+    /// \brief Converts a SequenceInfo object to its SAM-formatted text.
+    ///
+    /// \param[in] seq     input SequenceInfo object
+    /// \returns SAM-formatted text (no trailing newline)
+    ///
     static std::string ToSam(const SequenceInfo& seq);
 
     /// \}
@@ -61,8 +78,17 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
+    /// \brief Creates an empty sequence info object.
     SequenceInfo(void);
-    SequenceInfo(const std::string& name, const std::string& length = "0");
+
+    /// \brief Creates a sequence info object with name & (optional) length.
+    ///
+    /// \param[in] name       sequence name (\@SQ:SN)
+    /// \param[in] length     sequence length (\@SQ:LN)
+    ///
+    SequenceInfo(const std::string& name,
+                 const std::string& length = "0");
+
     SequenceInfo(const SequenceInfo& other);
     SequenceInfo(SequenceInfo&& other);
     SequenceInfo& operator=(const SequenceInfo& other);
@@ -72,111 +98,126 @@ public:
     /// \}
 
 public:
-    /// \name Attributes
-    /// \{
-
-    std::string AssemblyId(void) const;
-
-    std::string Checksum(void) const;
-
-    std::map<std::string, std::string> CustomTags(void) const;
-
-    std::string Length(void) const;
-
-    std::string Name(void) const;
-
-    std::string Species(void) const;
-
-    std::string Uri(void) const;
-
-    /// \}
-
     /// \name Conversion & Validation
     ///
 
+    /// \returns true if sequence info is valid
+    ///
+    /// Currently this checks to see that Name is non-empty and Length is within
+    /// the accepted range.
+    ///
     bool IsValid(void) const;
 
+    /// \brief Converts this object to its SAM-formatted text.
+    ///
+    /// \returns SAM-formatted text (no trailing newline)
+    ///
     std::string ToSam(void) const;
 
     /// \}
 
 public:
     /// \name Attributes
+    /// \{
 
+    /// \returns string value of \@SQ:AS
+    std::string AssemblyId(void) const;
+
+    /// \returns string value of \@SQ:M5
+    std::string Checksum(void) const;
+
+    /// \returns any non-standard tags added to the \@PG entry
+    ///
+    /// Result map consists of {tagName => value}.
+    ///
+    std::map<std::string, std::string> CustomTags(void) const;
+
+    /// \returns string value of \@SQ:LN
+    std::string Length(void) const;
+
+    /// \returns string value of \@SQ:SN
+    std::string Name(void) const;
+
+    /// \returns string value of \@SQ:SP
+    std::string Species(void) const;
+
+    /// \returns string value of \@SQ:UR
+    std::string Uri(void) const;
+
+    /// \}
+
+public:
+    /// \name Attributes
+    /// \{
+
+    /// \brief Sets the value for \@SQ:AS
+    ///
+    /// \param[in] id      new value
+    /// \returns reference to this object
+    ///
     SequenceInfo& AssemblyId(const std::string& id);
 
+    /// \brief Sets the value for \@SQ:M5
+    ///
+    /// \param[in] checksum      new value
+    /// \returns reference to this object
+    ///
     SequenceInfo& Checksum(const std::string& checksum);
 
+    /// \brief Sets a new collection of non-standard tags.
+    ///
+    /// Custom tag map entries should consist of {tagName => value}.
+    ///
+    /// \param[in] custom      new tags
+    /// \returns reference to this object
+    ///
     SequenceInfo& CustomTags(const std::map<std::string, std::string>& custom);
 
+    /// \brief Sets the value for \@SQ:LN
+    ///
+    /// \param[in] length      new value
+    /// \returns reference to this object
+    ///
     SequenceInfo& Length(const std::string& length);
 
+    /// \brief Sets the value for \@SQ:SN
+    ///
+    /// \param[in] name      new value
+    /// \returns reference to this object
+    ///
     SequenceInfo& Name(const std::string& name);
 
+    /// \brief Sets the value for \@SQ:SP
+    ///
+    /// \param[in] species     new value
+    /// \returns reference to this object
+    ///
     SequenceInfo& Species(const std::string& species);
 
+    /// \brief Sets the value for \@SQ:UR
+    ///
+    /// \param[in] uri      new value
+    /// \returns reference to this object
+    ///
     SequenceInfo& Uri(const std::string& uri);
 
     /// \}
 
 private:
-    std::string name_;                   // SN:<Name>            * Unique Name required for valid SAM header*
-    std::string length_;                 // LN:<Length>          * [0 - 2^31-1]
-    std::string assemblyId_;             // AS:<AssemblyId>
-    std::string checksum_;               // M5:<Checksum>
-    std::string species_;                // SP:<Species>
-    std::string uri_;                    // UR:<URI>
+    std::string name_;          // SN:<Name>    * must be unique for valid SAM *
+    std::string length_;        // LN:<Length>  * must be within [0 - 2^31-1] *
+    std::string assemblyId_;    // AS:<AssemblyId>
+    std::string checksum_;      // M5:<Checksum>
+    std::string species_;       // SP:<Species>
+    std::string uri_;           // UR:<URI>
 
     // custom attributes
     std::map<std::string, std::string> custom_; // tag => value
 };
 
-inline std::string SequenceInfo::AssemblyId(void) const
-{ return assemblyId_; }
-
-inline SequenceInfo& SequenceInfo::AssemblyId(const std::string& id)
-{ assemblyId_ = id; return *this; }
-
-inline std::string SequenceInfo::Checksum(void) const
-{ return checksum_; }
-
-inline SequenceInfo& SequenceInfo::Checksum(const std::string& checksum)
-{ checksum_ = checksum; return *this; }
-
-inline std::map<std::string, std::string> SequenceInfo::CustomTags(void) const
-{ return custom_; }
-
-inline SequenceInfo& SequenceInfo::CustomTags(const std::map<std::string, std::string>& custom)
-{ custom_ = custom; return *this; }
-
-inline std::string SequenceInfo::Length(void) const
-{ return length_; }
-
-inline SequenceInfo& SequenceInfo::Length(const std::string& length)
-{ length_ = length; return *this; }
-
-inline std::string SequenceInfo::Name(void) const
-{ return name_; }
-
-inline SequenceInfo& SequenceInfo::Name(const std::string& name)
-{ name_ = name; return *this; }
-
-inline std::string SequenceInfo::Species(void) const
-{ return species_; }
-
-inline SequenceInfo& SequenceInfo::Species(const std::string& species)
-{ species_ = species; return *this; }
-
-inline std::string SequenceInfo::ToSam(const SequenceInfo& seq)
-{ return seq.ToSam(); }
-
-inline std::string SequenceInfo::Uri(void) const
-{ return uri_; }
-
-inline SequenceInfo& SequenceInfo::Uri(const std::string& uri)
-{ uri_ = uri; return *this; }
-
 } // namespace BAM
 } // namespace PacBio
+
+#include "pbbam/internal/SequenceInfo.inl"
 
 #endif // SEQUENCEINFO_H

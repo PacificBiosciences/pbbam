@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file VirtualPolymeraseReader.h
+/// \brief Defines the VirtualPolymeraseReader class.
+//
 // Author: Armin Töpfer
 
 #ifndef VIRTUALPOLYMERASEREADER_H
@@ -49,54 +53,75 @@
 namespace PacBio {
 namespace BAM {
 
+/// \brief The VirtualPolymeraseReader class provides an interface for re-stitching
+///        "virtual" polymerase reads from their constituent parts.
+///
 class VirtualPolymeraseReader
 {
 public:
-	/// Constructor takes two input bam file paths.
+    /// \name Constructors & Related Methods
+    /// \{
+
+    /// \brief Creates a reader that will operate on a primary %BAM file (e.g. subread data)
+    ///        and a scraps file.
+    ///
 	/// \param[in] primaryBamFilePath hqregion.bam or subreads.bam file path
-	/// \param[in] scrapsBamFilePath scraps.bam file path
+    /// \param[in] scrapsBamFilePath  scraps.bam file path
+    ///
     VirtualPolymeraseReader(const std::string& primaryBamFilePath,
                             const std::string& scrapsBamFilePath);
 
-    VirtualPolymeraseReader() = delete;
-    // Move constructor
-    VirtualPolymeraseReader(VirtualPolymeraseReader&&) = delete;
-    // Copy constructor
+    VirtualPolymeraseReader(void) = delete;
     VirtualPolymeraseReader(const VirtualPolymeraseReader&) = delete;
-    // Move assignment operator
-    VirtualPolymeraseReader& operator=(VirtualPolymeraseReader&&) = delete;
-    // Copy assignment operator
+    VirtualPolymeraseReader(VirtualPolymeraseReader&&) = delete;
     VirtualPolymeraseReader& operator=(const VirtualPolymeraseReader&) = delete;
-    // Destructor
-    ~VirtualPolymeraseReader() = default;
+    VirtualPolymeraseReader& operator=(VirtualPolymeraseReader&&) = delete;
+    ~VirtualPolymeraseReader(void) = default;
+
+    /// \}
 
 public:
-	/// Provides the next stitched polymerase read
-	VirtualPolymeraseBamRecord Next();
+    /// \name File Headers
+    /// \{
 
-	/// Provides the next set of reads that belong to one ZMW.
-	/// Enables stitching records in a distinct thread.
-	std::vector<BamRecord> NextRaw();
+    /// \returns the BamHeader associated with this reader's "primary" %BAM file
+    BamHeader PrimaryHeader(void) const;
 
-	/// Returns true if more ZMWs are available for reading.
-	bool HasNext();
+    /// \returns the BamHeader associated with this reader's "scraps" %BAM file
+    BamHeader ScrapsHeader(void) const;
 
-	BamHeader PrimaryHeader();
-	BamHeader ScrapsHeader();
+    /// \}
+
+public:
+    /// \name Stitched Record Reading
+    ///
+
+    /// \returns true if more ZMWs are available for reading.
+    bool HasNext(void);
+
+    /// \returns the next stitched polymerase read
+    VirtualPolymeraseBamRecord Next(void);
+
+    /// \returns the next set of reads that belong to one ZMW.
+    ///          This enables stitching records in a distinct thread.
+    ///
+    std::vector<BamRecord> NextRaw(void);
+
+    /// \}
 
 private:
-	const std::string                primaryBamFilePath_;
-	const std::string                scrapsBamFilePath_;
+    const std::string                primaryBamFilePath_;
+    const std::string                scrapsBamFilePath_;
 
-	std::unique_ptr<BamFile>         primaryBamFile_;
-	std::unique_ptr<BamFile>         scrapsBamFile_;
+    std::unique_ptr<BamFile>         primaryBamFile_;
+    std::unique_ptr<BamFile>         scrapsBamFile_;
     std::unique_ptr<EntireFileQuery> primaryQuery_;
     std::unique_ptr<EntireFileQuery> scrapsQuery_;
 
-    EntireFileQuery::iterator              primaryIt_;
-    EntireFileQuery::iterator              scrapsIt_;
+    EntireFileQuery::iterator        primaryIt_;
+    EntireFileQuery::iterator        scrapsIt_;
 
-	std::unique_ptr<BamHeader>       polyHeader_;
+    std::unique_ptr<BamHeader>       polyHeader_;
 };
 
 } // namespace BAM

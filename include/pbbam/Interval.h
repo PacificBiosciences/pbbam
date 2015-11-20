@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file Interval.h
+/// \brief Defines the Interval class.
+//
 // Author: Derek Barnett
 
 #ifndef INTERVAL_H
@@ -48,10 +52,11 @@
 namespace PacBio {
 namespace BAM {
 
-/// \brief Utility class for working with half-open (right-open) intervals. [start, stop)
+/// \brief Represents a half-open (right-open) interval [start, stop)
 ///
 /// \note This class is agnostic whether the values are 0-based or 1-based.
-/// \todo Should it be? Should that go here or "higher up"?
+///       Client code should primarily work with GenomicInterval, which does
+///       enforce this distinction.
 ///
 template<typename T>
 class Interval
@@ -60,21 +65,31 @@ public:
     typedef boost::icl::discrete_interval<T> interval_type;
 
 public:
-
-    /// \name Constructors
+    /// \name Constructors & Related Methods
     /// \{
 
-    /** Default constructor; yields an empty interval [0,0) */
-    inline Interval(void);
+    /// \brief Creates an empty interval [0,0)
+    Interval(void);
 
-    /** Constructor for a singleton interval [val,val+1) */
-    inline Interval(const T val);
+    /// \brief Creates a 'singleton' interval [val,val+1)
+    Interval(const T val);
 
-    /** Constructor for interval from [start, stop) */
-    inline Interval(const T start, const T stop);
+    /// brief Creates an interval from [start, stop) */
+    Interval(const T start, const T stop);
 
-    /** Copy constructor */
-    inline Interval(const Interval<T>& other);
+    Interval(const Interval<T>& other);
+
+    /// \}
+
+public:
+    /// \name Comparison Operators
+    /// \{
+
+    /// \returns true if both intervals share the same endpoints
+    bool operator==(const Interval<T>& other) const;
+
+    /// \returns true if either interval's endpoints differ
+    bool operator!=(const Interval<T>& other) const;
 
     /// \}
 
@@ -82,53 +97,45 @@ public:
     /// \name Attributes
     /// \{
 
-    /// \returns interval start coordinate
-    inline T Start(void) const;
+    /// \returns interval's start coordinate
+    T Start(void) const;
 
     /// Sets this interval's start coordinate.
     ///
     /// \param[in] start
     /// \returns reference to this interval
-    inline Interval<T>& Start(const T& start);
+    ///
+    Interval<T>& Start(const T& start);
 
-    /// \returns interval stop coordinate
-    inline T Stop(void) const;
+    /// \returns interval's stop coordinate
+    T Stop(void) const;
 
     /// Sets this interval's stop coordinate.
     ///
     /// \param[in] stop
     /// \returns reference to this interval
-    inline Interval<T>& Stop(const T& stop);
+    ///
+    Interval<T>& Stop(const T& stop);
 
     /// \}
 
+public:
     /// \name Interval Operations
 
     /// \returns true if this interval is fully covered by (or contained in) \p other
-    inline bool CoveredBy(const Interval<T>& other) const;
+    bool CoveredBy(const Interval<T>& other) const;
 
     //// \returns true if this interval covers (or contains) \p other
-    inline bool Covers(const Interval<T>& other) const;
+    bool Covers(const Interval<T>& other) const;
 
     /// \returns true if intervals interset
-    inline bool Intersects(const Interval<T>& other) const;
+    bool Intersects(const Interval<T>& other) const;
 
     /// \returns true if interval is valid (e.g. start < stop)
-    inline bool IsValid(void) const;
+    bool IsValid(void) const;
 
     /// \returns interval length
-    inline size_t Length(void) const;
-
-    /// \}
-
-    /// \name Comparison Operators
-    /// \{
-
-    /// \returns true if both intervals share the same endpoints
-    inline bool operator==(const Interval<T>& other) const;
-
-    /// \returns true if either interval's endpoints differ
-    inline bool operator!=(const Interval<T>& other) const;
+    size_t Length(void) const;
 
     /// \}
 
@@ -136,77 +143,9 @@ private:
     interval_type data_;
 };
 
-template<typename T>
-Interval<T>::Interval(void)
-    : data_(boost::icl::discrete_interval<T>::right_open(0,0))
-{ }
-
-template<typename T>
-Interval<T>::Interval(const T val)
-    : data_(boost::icl::discrete_interval<T>::right_open(val,val+1))
-{ }
-
-template<typename T>
-Interval<T>::Interval(const T start, const T stop)
-    : data_(boost::icl::discrete_interval<T>::right_open(start,stop))
-{ }
-
-template<typename T>
-Interval<T>::Interval(const Interval<T>& other)
-    : data_(boost::icl::discrete_interval<T>::right_open(other.Start(), other.Stop()))
-{ }
-
-template<typename T>
-inline bool Interval<T>::operator==(const Interval<T>& other) const
-{ return data_ == other.data_; }
-
-template<typename T>
-inline bool Interval<T>::operator!=(const Interval<T>& other) const
-{ return !(data_ == other.data_); }
-
-template<typename T>
-inline bool Interval<T>::CoveredBy(const Interval<T>& other) const
-{ return boost::icl::within(data_, other.data_); }
-
-template<typename T>
-inline bool Interval<T>::Covers(const Interval<T>& other) const
-{ return boost::icl::contains(data_, other.data_); }
-
-template<typename T>
-inline bool Interval<T>::Intersects(const Interval<T>& other) const
-{ return boost::icl::intersects(data_, other.data_); }
-
-template<typename T>
-inline bool Interval<T>::IsValid(void) const
-{ return !boost::icl::is_empty(data_); }
-
-template<typename T>
-inline size_t Interval<T>::Length(void) const
-{ return boost::icl::length(data_); }
-
-template<typename T>
-inline T Interval<T>::Start(void) const
-{ return data_.lower(); }
-
-template<typename T>
-inline Interval<T>& Interval<T>::Start(const T& start)
-{
-    data_ = boost::icl::discrete_interval<T>::right_open(start, data_.upper());
-    return *this;
-}
-
-template<typename T>
-inline T Interval<T>::Stop(void) const
-{ return data_.upper(); }
-
-template<typename T>
-inline Interval<T>& Interval<T>::Stop(const T& stop)
-{
-    data_ = boost::icl::discrete_interval<T>::right_open(data_.lower(), stop);
-    return *this;
-}
-
 } // namespace BAM
 } // namspace PacBio
+
+#include "pbbam/internal/Interval.inl"
 
 #endif // GENOMICINTERVAL_H

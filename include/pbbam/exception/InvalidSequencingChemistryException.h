@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file InvalidSequencingChemistryException.h
+/// \brief Defines the InvalidSequencingChemistryException class.
+//
 // Author: Derek Barnett
 
 #ifndef INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H
@@ -45,16 +49,20 @@
 namespace PacBio {
 namespace BAM {
 
+/// \brief The InvalidSequencingChemistryException class represents an exception
+///        that will be thrown when an invalid sequencing chemistry combination
+///        is encountered.
+///
 class InvalidSequencingChemistryException : public std::exception
 {
 public:
     InvalidSequencingChemistryException(const std::string& bindingKit,
                                         const std::string& sequencingKit,
                                         const std::string& basecallerVersion)
-	: bindingKit_(bindingKit)
+        : bindingKit_(bindingKit)
         , sequencingKit_(sequencingKit)
         , basecallerVersion_(basecallerVersion)
-    { 
+    {
         std::stringstream s;
         s << "unsupported sequencing chemistry combination: " << std::endl
           << "    binding kit:        " << bindingKit_ << std::endl
@@ -71,10 +79,10 @@ public:
     { return sequencingKit_; }
 
     const std::string& BasecallerVersion(void) const
-    { return basecallerVersion_; } 
+    { return basecallerVersion_; }
 
 public:
-    virtual const char* what(void) const noexcept 
+    virtual const char* what(void) const noexcept
     { return what_.c_str(); }
 
 protected:
@@ -88,4 +96,3 @@ protected:
 } // namespace PacBio
 
 #endif // INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H
-

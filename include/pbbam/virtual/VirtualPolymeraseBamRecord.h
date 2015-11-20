@@ -32,11 +32,15 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file VirtualPolymeraseBamRecord.h
+/// \brief Defines the VirtualPolymeraseBamRecord class.
+//
 // Author: Armin Töpfer
 
-#ifndef POLYMERASEBAMRECORD_H
-#define POLYMERASEBAMRECORD_H
+#ifndef VIRTUALPOLYMERASEBAMRECORD_H
+#define VIRTUALPOLYMERASEBAMRECORD_H
 
 #include <vector>
 #include <sstream>
@@ -50,87 +54,65 @@
 namespace PacBio {
 namespace BAM {
 
-/// This class represents a polymerase read stitched on the fly
-/// from subreads|hqregion+scraps.
+/// \brief The VirtualPolymeraseBamRecord class represents a polymerase read stitched on the fly
+///        from subreads|hqregion+scraps.
+///
 class VirtualPolymeraseBamRecord : public BamRecord
 {
 public:
+    /// \name Constructors & Related Methods
+    /// \{
+
+    /// \brief Creates a "virtual" polymerase %BAM record, by re-stitching its constituent segments.
+    ///
+    /// \param[in] unorderedSources source data (subreads, scraps, etc.)
+    /// \param[in] header           %BAM header to associate with the new record
+    ///
+    /// \throws std::runtime_error on failure to stitch virtual record
+    ///
     VirtualPolymeraseBamRecord(std::vector<BamRecord>&& unorderedSources,
                                const BamHeader& header);
 
-    VirtualPolymeraseBamRecord() = delete;
-    // Move constructor
-    VirtualPolymeraseBamRecord(VirtualPolymeraseBamRecord&&) = default;
-    // Copy constructor
+    VirtualPolymeraseBamRecord(void) = delete;
     VirtualPolymeraseBamRecord(const VirtualPolymeraseBamRecord&) = default; // un-"delete"-ed for SWIG
-    // Move assignment operator
-    VirtualPolymeraseBamRecord& operator=(VirtualPolymeraseBamRecord&&) = default;
-    // Copy assignment operator
+    VirtualPolymeraseBamRecord(VirtualPolymeraseBamRecord&&) = default;
     VirtualPolymeraseBamRecord& operator=(const VirtualPolymeraseBamRecord&) = delete;
-    // Destructor
+    VirtualPolymeraseBamRecord& operator=(VirtualPolymeraseBamRecord&&) = default;
     virtual ~VirtualPolymeraseBamRecord() = default;
 
+    /// \}
+
 public:
-    /// Provides bool if a given VirtualRegionType has been annotated
-    bool HasVirtualRegionType(const VirtualRegionType regionType) const
-    { return virtualRegionsMap_.find(regionType) != virtualRegionsMap_.end(); }
+    /// \name Virtual Record Attributes
+    ///
 
-    /// Provides annotations of the polymerase read for a given VirtualRegionType
-    std::vector<VirtualRegion> VirtualRegionsTable(const VirtualRegionType regionType) const
-    { return virtualRegionsMap_.at(regionType); }
+    /// \returns true if requested VirtualRegionType has been annotated.
+    ///
+    bool HasVirtualRegionType(const VirtualRegionType regionType) const;
 
-    /// Provides all annotations of the polymerase read as a map
-    std::map<VirtualRegionType, std::vector<VirtualRegion>> VirtualRegionsMap() const
-    { return virtualRegionsMap_; }
-
-public: // New BamRecord functionality.
+    /// \returns IPD frame data
+    ///
     Frames IPDV1Frames(Orientation orientation = Orientation::NATIVE) const;
+
+    /// \brief Provides all annotations of the polymerase read as a map (type => regions)
+    ///
+    std::map<VirtualRegionType, std::vector<VirtualRegion>> VirtualRegionsMap(void) const;
+
+    /// \brief Provides annotations of the polymerase read for a given VirtualRegionType.
+    ///
+    std::vector<VirtualRegion> VirtualRegionsTable(const VirtualRegionType regionType) const;
+
+    /// \}
 
 private:
     std::vector<BamRecord> sources_;
     std::map<VirtualRegionType, std::vector<VirtualRegion>> virtualRegionsMap_;
 
 private:
-    void StitchSources();
-
-    /// \brief Appends content of src vector to dst vector using move semantics.
-    /// \param[in] src Input vector that will be empty after execution
-    /// \param[in,out] dest Output vector that will be appended to
-    template <typename T>
-    inline void MoveAppend(std::vector<T>& src, std::vector<T>& dst) noexcept
-    {
-        if (dst.empty())
-        {
-            dst = std::move(src);
-        }
-        else
-        {
-            dst.reserve(dst.size() + src.size());
-            std::move(src.begin(), src.end(), std::back_inserter(dst));
-            src.clear();
-        }
-    }
-
-    /// \brief Appends content of src vector to dst vector using move semantics.
-    /// \param[in] src Input vector via perfect forwarding
-    /// \param[in,out] dest Output vector that will be appended to
-    template <typename T>
-    inline void MoveAppend(std::vector<T>&& src, std::vector<T>& dst) noexcept
-    {
-        if (dst.empty())
-        {
-            dst = std::move(src);
-        }
-        else
-        {
-            dst.reserve(dst.size() + src.size());
-            std::move(src.begin(), src.end(), std::back_inserter(dst));
-            src.clear();
-        }
-    }
+    void StitchSources(void);
 };
 
 } // namespace BAM
 } // namespace PacBio
 
-#endif // POLYMERASEBAMRECORD_H
+#endif // VIRTUALPOLYMERASEBAMRECORD_H

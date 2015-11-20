@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file BamHeader.cpp
+/// \brief Implements the BamHeader class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/BamHeader.h"
@@ -417,6 +421,8 @@ size_t BamHeader::NumSequences(void) const
 
 SequenceInfo BamHeader::Sequence(const std::string& name) const
 {
+    // TODO: SequenceId(name) throws if not found, should we do so here as well?
+
     const auto iter = d_->sequenceIdLookup_.find(name);
     if (iter == d_->sequenceIdLookup_.cend())
         return SequenceInfo();

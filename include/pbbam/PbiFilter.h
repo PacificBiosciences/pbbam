@@ -33,6 +33,10 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 //
+// File Description
+/// \file PbiFilter.h
+/// \brief Defines the PbiFilter class & helper 'concept'.
+//
 // Author: Derek Barnett
 
 #ifndef PBIFILTER_H
@@ -50,13 +54,16 @@ namespace BAM {
 
 namespace internal { struct PbiFilterPrivate; }
 
+/// \brief The PbiFilterConcept class provides compile-time enforcement of the
+///        required interface for PbiFilter's child filters.
+///
 template<typename T>
 struct PbiFilterConcept
 {
     BOOST_CONCEPT_USAGE(PbiFilterConcept)
     {
-        // PBI filters (to be accepted by PbiIndex & CompositePbiFilter)
-        // need only provide this interface:
+        // All PBI filters (built-in or client-define) need only provide this
+        // interface:
         //
         //    IndexList Lookup(const PbiIndex& index) const;
         //
@@ -69,59 +76,39 @@ private:
     IndexList result;
 };
 
-// TODO: clean up this documentation ... move some to a "recipe" section ?
-
-/// PbiIndex filters are designed to be flexible, both built-in and for client-side
-/// customization.
+/// \brief The PbiFilter class provides a mechanism for performing PBI-enabled
+///        lookups.
 ///
-/// Set Composition - Intersect & Union
+/// The PbiFilter API is designed to be flexible, both built-in and for
+/// client-side customization. Built-in filters are provided for common queries,
+/// and client code can define and use custom filters as well. More complex
+/// filtering rules can be constructed via composition of simpler child filters.
 ///
-/// \code
+/// Filter objects used as children of PbiFilter need only provide a method that
+/// matches this signature:
 ///
-/// // (f1 && f2) || f3
-/// PbiFilter f1;
-/// PbiFilter f2;
-/// PbiFilter intersect_f1_f2 = PbiFilter::Intersect(f1, f2);
-/// PbiFilter f3;
-/// PbiFilter final = PbiFilter::Union(intersect_f1_f2, f3);
+/// \include code/PbiFilter_Interface.txt
 ///
-/// \endcode
+/// This requirement is enforced internally, using the PbiFilterConcept to
+/// require a compatible interface without requiring inheritance. This approach
+/// allows composition of heterogeneous filter types without worrying about a
+/// class hierarchy, pointer ownership across library/client boundaries, etc.
 ///
-/// Filter objects used as children of PbiFilter need only provide a method that matches this signature:
+/// Thus a client application can define a custom filter if the built-in filters
+/// do not quite meet requirements. This filter may then be used in further
+/// PbiFilter composition, or directly to PbiFilterQuery
 ///
-/// \code {.cpp}
-/// IndexList Lookup(const PbiIndex& index) const;
-/// \endcode
+/// \include code/PbiFilter_CustomFilter.txt
 ///
-/// This requirement is 'enforced' by using the PbiFilterConcept to require interface without requiring inheritance.
-/// This approach allows composition of heterogeneous types without worrying about a class hierarchy, pointer ownership, etc.
+/// As mentioned above, complex filters can be built up using multiple "child"
+/// filters. These complex filters are constructed by using either
+/// PbiFilter::Union (logical-OR over all direct children) or
+/// PbiFilter::Intersection (logical-AND over direct children).
 ///
-/// Thus a client application can define a custom filter if the built-in filters do not quite meet their needs:
-///
-/// \code
-/// struct MyCustomFilter
-/// {
-///     IndexList Lookup(const PbiIndex& index) const
-///     {
-///         // do index queries on index data
-///         // filter, calculate, transform, etc. as needed
-///         return IndexList();
-///     }
-/// };
-/// \endcode
-///
-/// And this filter may be used in PbiFilter composition, or directly to PbiFilterQuery.
-///
-///
-/// \code
-/// PbiFilter filter;
-/// filter.Add(MyCustomFilter(42));
-/// \endcode
-///
+/// \include code/PbiFilter_Composition.txt
 ///
 class PBBAM_EXPORT PbiFilter
 {
-
 public:
     enum CompositionType
     {
@@ -133,55 +120,53 @@ public:
     /// \name Set Operations
     /// \{
 
-    /// Constructs a PbiFilter that acts as an intersection of the input filters.
+    /// \brief Creates a PbiFilter that acts as intersection of the input
+    ///        filters.
     ///
-    /// i.e. records must satisfy all filters
+    /// A record must satisfy \b all of this filter's direct "child" filters.
     ///
-    /// Exactly equivalent to:
-    /// \code{.cpp}
-    ///     PbiFilter result{ PbiFilter::INTERSECT };
-    ///     result.Add(filters);
-    ///     return result;
-    /// \endcode
+    /// Equivalent to:
+    /// \include code/PbiFilter_Intersection_Copy.txt
+    ///
+    /// \param[in] filters  vector of child filters
+    /// \returns composite filter
     ///
     static PbiFilter Intersection(const std::vector<PbiFilter>& filters);
 
-    /// Constructs a PbiFilter that acts as an intersection of the input filters.
+    /// \brief Creates a PbiFilter that acts as an intersection of the input
+    ///        filters.
     ///
-    /// i.e. records must satisfy all filters
+    /// A record must satisfy \b all of this filter's direct "child" filters.
     ///
-    /// Exactly equivalent to:
-    /// \code{.cpp}
-    ///     PbiFilter result{ PbiFilter::INTERSECT };
-    ///     result.Add(std::move(filters));
-    ///     return result;
-    /// \endcode
+    /// Equivalent to:
+    /// \include code/PbiFilter_Intersection_Move.txt
+    ///
+    /// \param[in] filters  vector of child filters
+    /// \returns composite filter
     ///
     static PbiFilter Intersection(std::vector<PbiFilter>&& filters);
 
-    /// Constructs a PbiFilter that acts as a union of the input filters.
+    /// \brief Creates a PbiFilter that acts as a union of the input filters.
     ///
-    /// i.e. records must satisfy any child filters
+    /// A record must satisfy \b any of this filter's direct "child" filters.
     ///
-    /// Exactly equivalent to:
-    /// \code{.cpp}
-    ///     PbiFilter result{ PbiFilter::UNION };
-    ///     result.Add(filters);
-    ///     return result;
-    /// \endcode
+    /// Equivalent to:
+    /// \include code/PbiFilter_Union_Copy.txt
+    ///
+    /// \param[in] filters  vector of child filters
+    /// \returns composite filter
     ///
     static PbiFilter Union(const std::vector<PbiFilter>& filters);
 
-    /// Constructs a PbiFilter that acts as a union of the input filters.
+    /// \brief Creates a PbiFilter that acts as a union of the input filters.
     ///
-    /// i.e. records must satisfy any child filters
+    /// A record must satisfy \b any of this filter's direct "child" filters.
     ///
-    /// Exactly equivalent to:
-    /// \code{.cpp}
-    ///     PbiFilter result{ PbiFilter::UNION };
-    ///     result.Add(std::move(filters));
-    ///     return result;
-    /// \endcode
+    /// Equivalent to:
+    /// \include code/PbiFilter_Union_Move.txt
+    ///
+    /// \param[in] filters  vector of child filters
+    /// \returns composite filter
     ///
     static PbiFilter Union(std::vector<PbiFilter>&& filters);
 
@@ -191,27 +176,47 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    /// Construct a PbiFilter DataSet XML data
+    /// \brief Creates a PbiFilter from a %DataSet's described filters.
     ///
-    /// The DataSet XML element contains a Filters element. The resulting PbiFilter from this method
-    /// will perform a union of these filters. i.e. records must pass any one of the filters described.
+    /// A DataSet may contain a Filters element, itself a list of Filter
+    /// elements. Each Filter element will contain a Properties element, itself
+    /// a list of Property elements.
     ///
+    /// The Filters hierarchy looks like this (in its XML output):
+    /// \verbinclude examples/plaintext/PbiFilter_DataSetXmlFilters.txt
     ///
+    /// The resulting PbiFilter represents a union over all Filter elements,
+    /// with each Filter element requiring an intersection of all of its
+    /// Property criteria. These Property elements are mapped to built-in PBI
+    /// filter types. To use the labels in the example XML above, the filter
+    /// created here is equivalent to:
     ///
+    /// (A && B) || (C && D)
+    ///
+    /// If a DataSet lacks any Filters, then an empty PbiFilter will be created
+    /// - corresponding to the dataset's entire contents.
+    ///
+    /// \param[in] dataset  maybe containing filters
+    /// \returns composite filter
     ///
     static PbiFilter FromDataSet(const DataSet& dataset);
 
 public:
 
-    /// Constructs an empty filter.
+    /// \brief Creates an empty filter.
     ///
-    /// \param[in] type composition type. Any additional child filters added to this composite will be
-    ///                 treated according to this type If INTERSECT, a record must match all child filters.
-    ///                 If UNION, a record must match any child filter.
+    /// \note An empty filter will result in all records being returned, e.g.
+    ///       for query iteration.
+    ///
+    /// \param[in] type composition type. Any additional child filters added to
+    ///                 this composite will be treated according to this type.
+    ///                 If INTERSECT, a record must match all child filters. If
+    ///                 UNION, a record must match any child filter.
     ///
     PbiFilter(const CompositionType type = INTERSECT);
 
-    /// Constructs a composite (of INTERSECT type) with an initial filter.
+    /// \brief Creates a composite filter (of INTERSECT type) with an initial
+    ///        child filter.
     ///
     /// \note T must satisfy PbiFilterConcept
     ///
@@ -220,7 +225,8 @@ public:
     template<typename T>
     PbiFilter(const T& filter);
 
-    /// Constructs a composite (of INTERSECT type) with an initial filter.
+    /// \brief Creates a composite filter (of INTERSECT type) with an initial
+    ///        child filter.
     ///
     /// \note T must satisfy PbiFilterConcept
     ///
@@ -229,13 +235,15 @@ public:
     template<typename T>
     PbiFilter(T&& filter);
 
-    /// Constructs a composite (of INTERSECT type) with a list of initial filters.
+    /// \brief Creates a composite filter (of INTERSECT type) with a list of
+    ///        initial child filters.
     ///
     /// \param[in] filters initial child filters
     ///
     PbiFilter(const std::vector<PbiFilter>& filters);
 
-    /// Constructs a composite (of INTERSECT type) with a list of initial filters.
+    /// \brief Creates composite filter (of INTERSECT type) with a list of
+    ///        initial child filters.
     ///
     /// \param[in] filters initial child filters
     ///
@@ -243,7 +251,6 @@ public:
 
     PbiFilter(const PbiFilter& other);
     PbiFilter(PbiFilter&& other) noexcept;
-
     PbiFilter& operator=(const PbiFilter& other);
     PbiFilter& operator=(PbiFilter&& other) noexcept;
     ~PbiFilter(void);
@@ -254,33 +261,49 @@ public:
     /// \name Composition
     /// \{
 
-    /// Adds a new child filter of type T.
+    /// \brief Adds a new child filter of type T.
     ///
-    /// \note T must satisfy PbiFilterConcept
+    /// \param[in] filter   additional child filter. Type T must satisfy
+    ///                     PbiFilterConcept.
+    /// \returns reference to this filter
     ///
     template<typename T>
     PbiFilter& Add(const T& filter);
 
-    /// Adds a new child filter of type T.
+    /// \brief Adds a new child filter of type T.
     ///
-    /// \note T must satisfy PbiFilterConcept
+    /// \param[in] filter   additional child filter. Type T must satisfy
+    ///                     PbiFilterConcept.
+    /// \returns reference to this filter
     ///
     template<typename T>
     PbiFilter& Add(T&& filter);
 
-    /// Adds a new child filter.
+    /// \brief Adds a new child filter.
+    ///
+    /// \param[in] filter   additional child filter
+    /// \returns reference to this filter
     ///
     PbiFilter& Add(const PbiFilter& filter);
 
-    /// Adds a new child filter.
+    /// \brief Adds a new child filter.
+    ///
+    /// \param[in] filter   additional child filter
+    /// \returns reference to this filter
     ///
     PbiFilter& Add(PbiFilter&& filter);
 
-    /// Add child filters.
+    /// \brief Add child filters.
+    ///
+    /// \param[in] filters  additional child filters
+    /// \returns reference to this filter
     ///
     PbiFilter& Add(const std::vector<PbiFilter>& filters);
 
-    /// Add child filters.
+    /// \brief Add child filters.
+    ///
+    /// \param[in] filters  additional child filters
+    /// \returns reference to this filter
     ///
     PbiFilter& Add(std::vector<PbiFilter>&& filters);
 
@@ -290,10 +313,12 @@ public:
     /// \name Lookup
     /// \{
 
-    /// Performs the PBI index lookup, combining child results if PbiFilter is a composite.
+    /// \brief Performs the PBI index lookup, combining child results a
+    ///        composite filter.
     ///
-    /// \param[in] idx PBI index object
-    /// \returns list of \b sorted index positions (record #) that match all filter criteria.
+    /// \param[in] idx  PBI index object
+    /// \returns list of \b sorted index positions (record #) that match filter
+    ///          criteria.
     ///
     IndexList Lookup(const PacBio::BAM::PbiIndex& idx) const;
 

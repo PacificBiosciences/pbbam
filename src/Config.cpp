@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file Config.cpp
+/// \brief Initializes global variable defaults.
+//
 // Author: Derek Barnett
 
 #include "pbbam/Config.h"
@@ -42,7 +46,15 @@ using namespace PacBio::BAM;
 namespace PacBio {
 namespace BAM {
 
-int HtslibVerbosity = 0;
+// Initialized to -1 to indicate default. Client code may set this or not.
+//
+// To respect client code or else fallback to default[OFF], this value should be used like this:
+//
+//    hts_verbose = ( PacBio::BAM::HtslibVerbosity == -1 ? 0 : PacBio::BAM::HtslibVerbosity);
+//
+//
+//
+int HtslibVerbosity = -1;
 
 } // namespace BAM
 } // namespace PacBio

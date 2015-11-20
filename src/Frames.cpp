@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file Frames.cpp
+/// \brief Implements the Frames class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/Frames.h"
@@ -59,8 +63,6 @@ void InitIpdDownsampling(void)
 
     // liftover from Dave's python code:
     // .../bioinformatics/tools/kineticsTools/kineticsTools/_downsampling.py
-    //
-    // TODO: move this conversion functionality to pbbam
 
     const int B = 2;
     const int t = 6;
@@ -173,7 +175,7 @@ Frames& Frames::operator=(Frames&& other)
 { data_ = std::move(other.data_); return *this; }
 
 Frames Frames::Decode(const std::vector<uint8_t>& codedData)
-{  return Frames(std::move(internal::CodeToFrames(codedData))); }
+{ return Frames(std::move(internal::CodeToFrames(codedData))); }
 
 std::vector<uint8_t> Frames::Encode(const std::vector<uint16_t>& frames)
 { return internal::FramesToCode(frames); }

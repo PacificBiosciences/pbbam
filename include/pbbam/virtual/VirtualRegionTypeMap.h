@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file VirtualRegionTypeMap.h
+/// \brief Defines the VirtualRegionTypeMap class.
+//
 // Author: Derek Barnett
 
 #ifndef VIRTUALREGIONTYPEMAP_H
@@ -45,7 +49,10 @@
 
 namespace PacBio {
 namespace BAM {
-/// Allows mapping of char 'A', 'B', 'H', and 'L' to the respective enum keys.
+
+/// \brief The VirtualRegionTypeMap class provides mapping between char codes and
+///        VirtualRegionType enum keys.
+///
 class VirtualRegionTypeMap
 {
 public:

@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file DataSetXsd.h
+/// \brief Defines the XSD- and namespace-related classes for DataSetXML.
+//
 // Author: Derek Barnett
 
 #ifndef DATASETXSD_H
@@ -45,6 +49,8 @@
 namespace PacBio {
 namespace BAM {
 
+/// \brief The XsdType enum defines the supported XSD namespaces.
+///
 enum class XsdType
 {
     NONE
@@ -65,15 +71,26 @@ enum class XsdType
   , SEEDING_DATA
 };
 
+/// \brief The NamespaceInfo class provides XML namespace info (prefix & URI).
+///
 class PBBAM_EXPORT NamespaceInfo
 {
 public:
+    /// \brief Creates an empty entry.
+    ///
+    /// This constructor only exists for STL container compatibility.
+    ///
     NamespaceInfo(void);
+
+    /// \brief Creates a valid info entry.
     NamespaceInfo(const std::string& name,
                   const std::string& uri);
 
 public:
+    /// \brief Fetches namespace name (i.e. prefix)
     const std::string& Name(void) const { return name_; }
+
+    /// \brief Fetches namespace URI.
     const std::string& Uri(void) const { return uri_; }
 
 private:
@@ -81,6 +98,12 @@ private:
     std::string uri_;
 };
 
+/// \brief The NamespaceRegistry class provides a per-dataset registry of XML
+///        namespace information.
+///
+/// This is used to format XML output - properly prefixing element labels with
+/// namespace as appropriate.
+///
 class PBBAM_EXPORT NamespaceRegistry
 {
 public:
@@ -97,15 +120,31 @@ public:
     /// \}
 
 public:
+    /// \name Registry Access
+    /// \{
+
+    /// \brief Fetches namespace info for the dataset's default XSD type.
     const NamespaceInfo& DefaultNamespace(void) const;
+
+    /// \brief Fetches dataset's default XSD type.
     XsdType DefaultXsd(void) const;
+
+    /// \brief Fetches namespace info for the requested XSD type.
     const NamespaceInfo& Namespace(const XsdType& xsd) const;
+
+    /// \brief Registers namespace info for a particular XSD type.
+    void Register(const XsdType& xsd, const NamespaceInfo& namespaceInfo);
+
+    /// \brief Updates dataset's default XSD type.
+    void SetDefaultXsd(const XsdType& xsd);
+
+    /// \brief Fetches the XSD type for \p elementLabel.
     XsdType XsdForElement(const std::string& elementLabel) const;
+
+    /// \brief Fetches the XSD type for a particular URI.
     XsdType XsdForUri(const std::string& uri) const;
 
-public:
-    void Register(const XsdType& xsd, const NamespaceInfo& namespaceInfo);
-    void SetDefaultXsd(const XsdType& xsd);
+    /// \}
 
 private:
     std::map<XsdType, NamespaceInfo> data_;

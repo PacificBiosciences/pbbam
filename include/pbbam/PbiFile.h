@@ -33,6 +33,10 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 //
+// File Description
+/// \file PbiFile.h
+/// \brief Defines the PbiFile enums, typedefs, and methods.
+//
 // Author: Derek Barnett
 
 #ifndef PBIFILE_H
@@ -46,13 +50,9 @@ namespace BAM {
 
 class BamFile;
 
-// class-like namespace
 namespace PbiFile
 {
-
-    /// PBI File Sections
-    ///
-    /// See (spec/doc links) for more details.
+    /// \brief This enum describes the PBI file sections
     ///
     enum Section
     {
@@ -61,24 +61,28 @@ namespace PbiFile
        , REFERENCE = 0x0002  ///< ReferenceData (always optional)
        , BARCODE   = 0x0004  ///< BarcodeData   (always optional)
 
-       , ALL  = BASIC | MAPPED | REFERENCE | BARCODE
+       , ALL  = BASIC | MAPPED | REFERENCE | BARCODE    ///< Synonym for 'all sections'
     };
+
+    /// \brief Helper typedef for storing multiple Section flags.
+    ///
     typedef uint16_t Sections;
 
-    /// PBI File Version
+    /// \brief This enum describes the PBI file version.
     enum VersionEnum
     {
-        Version_3_0_0 = 0x030000
-      , Version_3_0_1 = 0x030001
+        Version_3_0_0 = 0x030000        ///< v3.0.0
+      , Version_3_0_1 = 0x030001        ///< v3.0.1
 
-      , CurrentVersion = Version_3_0_1
+      , CurrentVersion = Version_3_0_1  ///< Synonym for the current PBI version.
     };
 
-    /// Builds PBI index data from the supplied ".bam" file and writes a ".pbi" file.
+    /// \brief Builds PBI index data from the supplied %BAM file and writes a
+    ///        ".pbi" file.
     ///
-    /// \param[in] bamFile The source BamFile.
+    /// \param[in] bamFile source %BAM file
     ///
-    /// \throws std::exception if index file could not be created
+    /// \throws std::runtime_error if index file could not be created
     ///
     PBBAM_EXPORT void CreateFrom(const BamFile& bamFile);
 

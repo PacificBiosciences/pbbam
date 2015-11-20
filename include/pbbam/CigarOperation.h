@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file CigarOperation.h
+/// \brief Defines the CigarOperationType enum & CigarOperation class.
+//
 // Author: Derek Barnett
 
 #ifndef CIGAROPERATION_H
@@ -44,11 +48,16 @@
 namespace PacBio {
 namespace BAM {
 
-/// Describes a CIGAR operation. Bracketed character is the corresponding SAM/BAM character code.
+/// \brief Describes a CIGAR operation.
 ///
-/// \warning ALIGNMENT_MATCH ('M') is included in this enum to maintain consistency with htslib.
-/// However, as of PacBio BAM spec version 3.0b7, this CIGAR operation \b forbidden. Attempt to
-/// read or write a record containing this operation will trigger a std::runtime_error.
+/// Bracketed character is the corresponding SAM/BAM character code.
+///
+/// \warning ALIGNMENT_MATCH ('M') is included in this enum to maintain
+///          consistency with htslib. However, as of PacBio BAM spec version
+///          3.0b7, this CIGAR operation \b forbidden. Any attempt to read or
+///          write a record containing this operation will trigger a
+///          std::runtime_error. SEQUENCE_MATCH('=) or SEQUENCE_MISMATCH('X')
+///          should be used instead.
 ///
 enum class CigarOperationType
 {
@@ -62,11 +71,11 @@ enum class CigarOperationType
   , PADDING                ///< padding (silent deletion from padded reference) [P]
   , SEQUENCE_MATCH         ///< sequence match [=]
   , SEQUENCE_MISMATCH      ///< sequence mismatch [X]
-
-    // TODO: looks like there is a new 'B' type in htslib source, referring to some 'back' operation...
-    //       no reference in htslib docs though yet as to what that applies to
 };
 
+/// \brief The CigarOperation class represents a single CIGAR operation
+///        (consisting of a type & length).
+///
 class PBBAM_EXPORT CigarOperation
 {
 public:
@@ -157,70 +166,9 @@ private:
     uint32_t length_;
 };
 
-inline CigarOperation::CigarOperation(void)
-    : type_(CigarOperationType::UNKNOWN_OP)
-    , length_(0)
-{ }
-
-inline CigarOperation::CigarOperation(char c, uint32_t length)
-    : type_(CigarOperation::CharToType(c))
-    , length_(length)
-{
-    if (type_ == CigarOperationType::ALIGNMENT_MATCH)
-        throw std::runtime_error("CIGAR operation 'M' is not allowed in PacBio BAM files. Use 'X/=' instead.");
-}
-
-inline CigarOperation::CigarOperation(CigarOperationType op, uint32_t length)
-    : type_(op)
-    , length_(length)
-{
-    if (type_ == CigarOperationType::ALIGNMENT_MATCH)
-        throw std::runtime_error("CIGAR operation 'M' is not allowed in PacBio BAM files. Use 'X/=' instead.");
-}
-
-inline CigarOperation::CigarOperation(const CigarOperation& other)
-    : type_(other.type_)
-    , length_(other.length_)
-{ }
-
-inline CigarOperation::CigarOperation(CigarOperation&& other)
-    : type_(std::move(other.type_))
-    , length_(std::move(other.length_))
-{ }
-
-inline CigarOperation::~CigarOperation(void) { }
-
-inline uint32_t CigarOperation::Length(void) const
-{ return length_; }
-
-inline CigarOperation& CigarOperation::Length(const uint32_t length)
-{ length_ = length; return *this; }
-
-inline CigarOperationType CigarOperation::Type(void) const
-{ return type_; }
-
-inline CigarOperation &CigarOperation::Type(const CigarOperationType opType)
-{ type_ = opType; return *this; }
-
-inline char CigarOperation::Char(void) const
-{ return CigarOperation::TypeToChar(type_); }
-
-inline CigarOperation &CigarOperation::Char(const char opChar)
-{ type_ = CigarOperation::CharToType(opChar);return *this; }
-
-inline CigarOperation& CigarOperation::operator=(const CigarOperation& other)
-{ type_ = other.type_; length_ = other.length_; return *this; }
-
-inline CigarOperation& CigarOperation::operator=(CigarOperation&& other)
-{ type_ = std::move(other.type_); length_ = std::move(other.length_); return *this; }
-
-inline bool CigarOperation::operator==(const CigarOperation& other) const
-{ return type_ == other.type_ && length_ == other.length_; }
-
-inline bool CigarOperation::operator!=(const CigarOperation& other) const
-{ return !(*this == other); }
-
 } // namespace BAM
 } // namespace PacBio
+
+#include "pbbam/internal/CigarOperation.inl"
 
 #endif // CIGAROPERATION_H

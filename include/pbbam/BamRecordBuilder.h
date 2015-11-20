@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file BamRecordBuilder.h
+/// \brief Defines the BamRecordBuilder class.
+//
 // Author: Derek Barnett
 
 #ifndef BAMRECORDBUILDER_H
@@ -46,21 +50,37 @@
 namespace PacBio {
 namespace BAM {
 
-class PBBAM_EXPORT BamImplBuilder
-{
-
-};
-
-
+/// \brief The BamRecordBuilder class provides a helper utility for building
+///        BamRecords.
+///
+/// This class provides a mechanism for building up %BAM data and
+/// lazy-encoding/constructing the actual BamRecord. Currently, the methods here
+/// really only support  filling in the low-level SAM/BAM-style fields, not so
+/// much the PacBio-specific fields.
+///
 class PBBAM_EXPORT BamRecordBuilder
 {
 public:
     /// \name Constructors & Related Methods
     /// \{
 
+    /// \brief Creates an empty %BAM record builder.
     BamRecordBuilder(void);
+
+    /// \brief Creates an empty %BAM record builder, with header info to apply
+    ///        to built records.
+    ///
+    /// \param[in] header   BamHeader object
+    ///
     explicit BamRecordBuilder(const BamHeader& header);
+
+    /// \brief Creates record builder with inital record data.
+    ///
+    /// \param[in] prototype    data from this record will be used to seed the
+    ///                         builder
+    ///
     BamRecordBuilder(const BamRecord& prototype);
+
     BamRecordBuilder(const BamRecordBuilder& other);
     BamRecordBuilder(BamRecordBuilder&& other);
     BamRecordBuilder& operator=(const BamRecordBuilder& other);
@@ -73,28 +93,34 @@ public:
     /// \name Record-Building
     /// \{
 
-    /// Builds a BamRecord from current builder attributes
+    /// \brief Builds a BamRecord from current builder attributes.
     ///
-    /// \returns BamRecord object
+    /// \returns newly-built BamRecord object
+    ///
     BamRecord Build(void) const;
 
-    /// Replaces an existing BamRecord's data with current builder attributes
+    /// \brief Replaces an existing BamRecord's data with current builder
+    ///        attributes.
     ///
     /// \param[out] record resulting record
     /// \returns true if successful
+    ///
     bool BuildInPlace(BamRecord& record) const;
 
-    /// Resets builder attributes to default values
+    /// \brief Resets builder attributes to default values.
+    ///
     void Reset(void);
 
-    /// Resets builder attributes with existing BamRecord data
+    /// \brief Resets builder attributes with \p prototype's data.
     ///
     /// \param[in] prototype
+    ///
     void Reset(const BamRecord& prototype);
 
-    /// Resets builder attributes with existing BamRecord data
+    /// \brief Resets builder attributes with \p prototype's data.
     ///
     /// \param[in] prototype
+    ///
     void Reset(BamRecord&& prototype);
 
     /// \}
@@ -104,52 +130,60 @@ public:
     /// \name Core Attribute Setup
     /// \{
 
-    /// Sets the record's (BAI) index bin ID.
+    /// \brief Sets the record's (BAI) index bin ID.
     ///
     /// \param[in] bin BAI index bin ID.
     /// \returns reference to this builder
+    ///
     BamRecordBuilder& Bin(const uint32_t bin);
 
-    /// Sets this record's alignment flag, using a raw integer.
+    /// \brief Sets this record's alignment flag, using a raw integer.
     ///
     /// \param[in] flag raw alignment flag
     /// \returns reference to this record
+    ///
     BamRecordBuilder& Flag(const uint32_t flag);
 
-    /// Sets this record's insert size.
+    /// \brief Sets this record's insert size.
     ///
     /// \param[in] iSize insert size
     /// \returns reference to this record
+    ///
     BamRecordBuilder& InsertSize(const int32_t iSize);
 
-    /// Sets this record's map quality.
+    /// \brief Sets this record's map quality.
     ///
     /// \param[in] mapQual mapping quality - value of 255 indicates "unknown"
     /// \returns reference to this record
+    ///
     BamRecordBuilder& MapQuality(const uint8_t mapQual);
 
-    /// Sets this record's mate's mapped position.
+    /// \brief Sets this record's mate's mapped position.
     ///
     /// \param[in] pos mapped position. A value of -1 indicates unmapped.
     /// \returns reference to this record
+    ///
     BamRecordBuilder& MatePosition(const int32_t pos);
 
-    /// Sets this record's mate's mapped reference ID
+    /// \brief Sets this record's mate's mapped reference ID
     ///
     /// \param[in] id reference ID. A value of -1 indicates unmapped.
     /// \returns reference to this record
+    ///
     BamRecordBuilder& MateReferenceId(const int32_t id);
 
-    /// Sets this record's mapped position.
+    /// \brief Sets this record's mapped position.
     ///
     /// \param[in] pos mapped position. A value of -1 indicates unmapped.
     /// \returns reference to this record
+    ///
     BamRecordBuilder& Position(const int32_t pos);
 
-    /// Sets this record's mapped reference ID
+    /// \brief Sets this record's mapped reference ID
     ///
     /// \param[in] id reference ID. A value of -1 indicates unmapped.
     /// \returns reference to this record
+    ///
     BamRecordBuilder& ReferenceId(const int32_t id);
 
     /// \}
@@ -158,40 +192,42 @@ public:
     /// \name Alignment Flag Setup
     /// \{
 
-    /// Sets whether this record is a PCR/optical duplicate
+    /// \brief Sets whether this record is a PCR/optical duplicate
     BamRecordBuilder& SetDuplicate(bool ok);
 
-    /// Sets whether this record failed quality controls
+    /// \brief Sets whether this record failed quality controls
     BamRecordBuilder& SetFailedQC(bool ok);
 
-    /// Sets whether this record is the first mate of a pair.
+    /// \brief Sets whether this record is the first mate of a pair.
     BamRecordBuilder& SetFirstMate(bool ok);
 
-    /// Sets whether this record was aligned.
+    /// \brief Sets whether this record was aligned.
     BamRecordBuilder& SetMapped(bool ok);
 
-    /// Sets whether this record's mate was aligned.
+    /// \brief Sets whether this record's mate was aligned.
     BamRecordBuilder& SetMateMapped(bool ok);
 
-    /// Sets whether this record's mate mapped to reverse strand.
+    /// \brief Sets whether this record's mate mapped to reverse strand.
     BamRecordBuilder& SetMateReverseStrand(bool ok);
 
-    /// Sets whether this record came from paired-end sequencing.
+    /// \brief Sets whether this record came from paired-end sequencing.
     BamRecordBuilder& SetPaired(bool ok);
 
-    /// Sets whether this record is a read's primary alignment.
+    /// \brief Sets whether this record is a read's primary alignment.
     BamRecordBuilder& SetPrimaryAlignment(bool ok);
 
-    /// Sets whether this record & its mate were properly mapped, per the aligner.
+    /// \brief Sets whether this record & its mate were properly mapped, per the
+    ///        aligner.
+    ///
     BamRecordBuilder& SetProperPair(bool ok);
 
-    /// Sets whether this record mapped to reverse strand.
+    /// \brief Sets whether this record mapped to reverse strand.
     BamRecordBuilder& SetReverseStrand(bool ok);
 
-    /// Sets whether this record is the second mate of a pair.
+    /// \brief Sets whether this record is the second mate of a pair.
     BamRecordBuilder& SetSecondMate(bool ok);
 
-    /// Sets whether this record is a supplementary alignment.
+    /// \brief Sets whether this record is a supplementary alignment.
     BamRecordBuilder& SetSupplementaryAlignment(bool ok);
 
     /// \}
@@ -200,24 +236,70 @@ public:
     /// \name Variable-Length Data Setup
     /// \{
 
-    BamRecordBuilder& Name(const std::string& name);
-    BamRecordBuilder& Name(std::string&& name);
-
-    BamRecordBuilder& Sequence(const std::string& sequence);
-    BamRecordBuilder& Sequence(std::string&& sequence);
-
-    BamRecordBuilder& Qualities(const std::string& qualities);
-    BamRecordBuilder& Qualities(std::string&& qualities);
-
+    /// \brief Sets the record's CIGAR data.
+    ///
+    /// \returns reference to this builder
+    ///
     BamRecordBuilder& Cigar(const PacBio::BAM::Cigar& cigar);
+
+    /// \brief Sets the record's CIGAR data.
+    ///
+    /// \returns reference to this builder
+    ///
     BamRecordBuilder& Cigar(PacBio::BAM::Cigar&& cigar);
 
+    /// \brief Sets the record's name.
+    ///
+    /// \returns reference to this builder
+    ///
+    BamRecordBuilder& Name(const std::string& name);
+
+    /// \brief Sets the record's name.
+    ///
+    /// \returns reference to this builder
+    ///
+    BamRecordBuilder& Name(std::string&& name);
+
+    /// \brief Sets the record's qualities.
+    ///
+    /// \returns reference to this builder
+    ///
+    BamRecordBuilder& Qualities(const std::string& qualities);
+
+    /// \brief Sets the record's qualities.
+    ///
+    /// \returns reference to this builder
+    ///
+    BamRecordBuilder& Qualities(std::string&& qualities);
+
+    /// \brief Sets the record's sequence.
+    ///
+    /// \returns reference to this builder
+    ///
+    BamRecordBuilder& Sequence(const std::string& sequence);
+
+    /// \brief Sets the record's sequence.
+    ///
+    /// \returns reference to this builder
+    ///
+    BamRecordBuilder& Sequence(std::string&& sequence);
+
+    /// \brief Sets the record's tags.
+    ///
+    /// \returns reference to this builder
+    ///
     BamRecordBuilder& Tags(const TagCollection& tags);
+
+    /// \brief Sets the record's tags.
+    ///
+    /// \returns reference to this builder
+    ///
     BamRecordBuilder& Tags(TagCollection&& tags);
+
+    /// \}
 
 private:
     BamHeader header_;
-
     bam1_core_t core_;
     std::string name_;
     std::string sequence_;
@@ -226,43 +308,9 @@ private:
     TagCollection tags_;
 };
 
-inline BamRecordBuilder& BamRecordBuilder::Bin(const uint32_t bin)
-{ core_.bin = bin; return *this; }
-
-inline BamRecordBuilder& BamRecordBuilder::Flag(const uint32_t flag)
-{ core_.flag = flag; return *this; }
-
-inline BamRecordBuilder& BamRecordBuilder::InsertSize(const int32_t iSize)
-{ core_.isize = iSize; return *this; }
-
-inline BamRecordBuilder& BamRecordBuilder::MapQuality(const uint8_t mapQual)
-{ core_.qual = mapQual; return *this; }
-
-inline BamRecordBuilder& BamRecordBuilder::MatePosition(const int32_t pos)
-{ core_.mpos = pos; return *this; }
-
-inline BamRecordBuilder& BamRecordBuilder::MateReferenceId(const int32_t id)
-{ core_.mtid = id; return *this; }
-
-inline BamRecordBuilder& BamRecordBuilder::Position(const int32_t pos)
-{ core_.pos = pos; return *this; }
-
-inline BamRecordBuilder& BamRecordBuilder::Qualities(const std::string& qualities)
-{ qualities_ = qualities; return *this; }
-
-inline BamRecordBuilder& BamRecordBuilder::Qualities(std::string&& qualities)
-{ qualities_ = std::move(qualities); return *this; }
-
-inline BamRecordBuilder& BamRecordBuilder::ReferenceId(const int32_t id)
-{ core_.tid = id; return *this; }
-
-inline BamRecordBuilder& BamRecordBuilder::Tags(const TagCollection& tags)
-{ tags_ = tags; return *this; }
-
-inline BamRecordBuilder& BamRecordBuilder::Tags(TagCollection&& tags)
-{ tags_ = std::move(tags); return *this; }
-
 } // namespace BAM
 } // namespace PacBio
+
+#include "pbbam/internal/BamRecordBuilder.inl"
 
 #endif // BAMRECORDBUILDER_H

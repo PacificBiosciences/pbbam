@@ -32,8 +32,14 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file AlignmentPrinter.cpp
+/// \brief Implements the AlignmentPrinter class.
+//
 // Author: Armin Töpfer
+
+#include "pbbam/AlignmentPrinter.h"
 
 #include <cmath>
 #include <iostream>
@@ -41,15 +47,16 @@
 #include <stdexcept>
 #include <sstream>
 
-#include "pbbam/AlignmentPrinter.h"
-
 using namespace PacBio;
 using namespace PacBio::BAM;
+
+AlignmentPrinter::AlignmentPrinter(const IndexedFastaReader& ifr)
+    : ifr_(std::unique_ptr<IndexedFastaReader>(new IndexedFastaReader(ifr)))
+{ }
 
 std::string AlignmentPrinter::Print(const BamRecord& record,
                                     const Orientation orientation)
 {
-
 	std::string seq = record.Sequence(orientation, true, true);
 	std::string ref = ifr_->ReferenceSubsequence(record, orientation, true, true);
 

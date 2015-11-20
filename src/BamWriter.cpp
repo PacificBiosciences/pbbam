@@ -91,6 +91,9 @@ BamWriterPrivate::BamWriterPrivate(const string& filename,
     if (!file_)
         throw std::runtime_error("could not open file for writing");
 
+//    BGZF* bgzf = file_.get()->fp.bgzf;
+//    bgzf_index_build_init(bgzf);
+
     // if no explicit thread count given, attempt built-in check
     size_t actualNumThreads = numThreads;
     if (actualNumThreads == 0) {
@@ -132,11 +135,11 @@ void BamWriterPrivate::Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord, int64_t*
     // ensure offsets up-to-date
     bgzf_flush(bgzf);
 
-    // capture virtual offset where we’re about to write 
+    // capture virtual offset where we’re about to write
     const off_t rawTell = htell(bgzf->fp);
     const int length = bgzf->block_offset;
-    *vOffset = (rawTell << 16) + length ;
-    
+    *vOffset = (rawTell << 16) | length ;
+
     // now write data
     Write(rawRecord);
 }
@@ -180,4 +183,3 @@ void BamWriter::Write(const BamRecord& record, int64_t* vOffset)
 
 void BamWriter::Write(const BamRecordImpl& recordImpl)
 { d_->Write(internal::BamRecordMemory::GetRawData(recordImpl)); }
-

@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file QualityValue.h
+/// \brief Defines the QualityValue class.
+//
 // Author: Derek Barnett
 
 #ifndef QUALITYVALUE_H
@@ -47,11 +51,12 @@ namespace BAM {
 
 /// \brief The QualityValue class represents a FASTQ-compatible quality value.
 ///
-/// Integers are clamped to [0, 93] (corresponding to ASCII printable chars [!-~]).
+/// Integers are clamped to [0, 93] (corresponding to ASCII printable chars
+/// [!-~]).
 ///
-/// Use the explicitly-named static method for constructing QualityValue entries from
-/// FASTQ encoding characters. Otherwise, the value will be interpreted as the actual
-/// integer value.
+/// Use QualityValue::FromFastq for constructing entries from FASTQ encoding
+/// characters. Otherwise, the resulting QualityValue will be interpreted using
+/// the character's numeric value (ignoring the FASTQ offset of 33).
 ///
 class PBBAM_EXPORT QualityValue
 {
@@ -59,54 +64,52 @@ public:
     static const uint8_t MAX;
 
 public:
-    /// Creates a QualityValue from a FASTQ encoding character.
+    /// \name Conversion Methods
+    /// \{
+
+    /// \brief Creates a QualityValue from a FASTQ-encoding character.
+    ///
+    /// \param[in] c    FASTQ character
+    /// \returns quality value representing (c - 33)
+    ///
     static QualityValue FromFastq(const char c);
+
+    /// \}
 
 public:
     /// \name Constructors & Related Methods
     ///  \{
 
+    /// \brief Creates a QualityValue with specified value.
+    ///
+    /// \param[in] value    quality value
+    ///
     QualityValue(const uint8_t value = 0);
+
     QualityValue(const QualityValue& other);
     ~QualityValue(void);
 
     /// \}
 
 public:
-    /// \returns the FASTQ encoding char for this QualityValue
+    /// \name Conversion Methods
+    /// \{
+
+    /// \returns the FASTQ-encoding char for this QualityValue
     char Fastq(void) const;
 
     /// \returns the integer value of this QualityValue
     operator uint8_t(void) const;
 
+    /// \}
+
 private:
     uint8_t value_;
 };
 
-inline QualityValue::QualityValue(const uint8_t value)
-    : value_(value)
-{
-    // clamp QV
-    if (value_ > QualityValue::MAX)
-        value_ = QualityValue::MAX;
-}
-
-inline QualityValue::QualityValue(const QualityValue& other)
-    : value_(other.value_)
-{ }
-
-inline QualityValue::~QualityValue(void) { }
-
-inline char QualityValue::Fastq(void) const
-{ return static_cast<char>(value_ + 33); }
-
-inline QualityValue::operator uint8_t(void) const
-{ return value_; }
-
-inline QualityValue QualityValue::FromFastq(const char c)
-{ return QualityValue(static_cast<uint8_t>(c-33)); }
-
 } // namespace BAM
 } // namespace PacBio
+
+#include "pbbam/internal/QualityValue.inl"
 
 #endif // QUALITYVALUE_H

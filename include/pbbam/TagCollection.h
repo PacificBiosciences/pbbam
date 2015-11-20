@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file TagCollection.h
+/// \brief Defines the TagCollection class.
+//
 // Author: Derek Barnett
 
 #ifndef TAGCOLLECTION_H
@@ -46,9 +50,15 @@
 namespace PacBio {
 namespace BAM {
 
+/// \brief The TagCollection class represents a collection (or "dictionary") of
+///        tags.
+///
+/// Tags are mapped to their tag name, a 2-character string.
+///
 class PBBAM_EXPORT TagCollection : public std::map<std::string, Tag>
 {
 public:
+    /// \returns true if the collection contains a tag with \p name
     bool Contains(const std::string& name) const;
 };
 

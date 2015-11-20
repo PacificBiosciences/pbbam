@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file PbiFilterQuery.h
+/// \brief Defines the PbiFilterQuery class.
+//
 // Author: Derek Barnett
 
 #ifndef PBIFILTERQUERY_H
@@ -46,13 +50,39 @@
 namespace PacBio {
 namespace BAM {
 
+/// \brief The PbiFilter class provides iterable access to a DataSet's %BAM
+///        records, limiting results to those matching filter criteria.
+///
+/// Example:
+/// \include code/PbiFilterQuery.txt
+///
+/// \note Currently, all %BAM files must have a corresponding ".pbi" index file.
+///       Use BamFile::EnsurePacBioIndexExists before creating the query if one
+///       may not be present.
+///
 class PBBAM_EXPORT PbiFilterQuery : public internal::IQuery
 {
 public:
+    /// \brief Creates a new PbiFilterQuery, limiting record results to only
+    ///        those matching filter criteria
+    ///
+    /// \param[in] filter   filtering criteria
+    /// \param[in] dataset  input data source(s)
+    ///
+    /// \throws std::runtime_error on failure to open/read underlying %BAM or
+    ///         PBI files.
+    ///
     PbiFilterQuery(const PbiFilter& filter, const DataSet& dataset);
+
     ~PbiFilterQuery(void);
 
 public:
+
+    /// \brief Main iteration point for record access.
+    ///
+    /// Most client code should not need to use this method directly. Use
+    /// iterators instead.
+    ///
     bool GetNext(BamRecord& r);
 
 private:

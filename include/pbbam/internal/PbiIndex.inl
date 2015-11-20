@@ -33,6 +33,10 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 //
+// File Description
+/// \file PbiIndex.inl
+/// \brief Inline implementations for the PbiIndex class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/BamRecord.h"

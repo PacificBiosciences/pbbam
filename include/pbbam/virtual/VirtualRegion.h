@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file VirtualRegion.h
+/// \brief Defines the VirtualRegion class.
+//
 // Author: Armin Töpfer
 
 #ifndef VIRTUALREGION_H
@@ -44,7 +48,9 @@
 
 namespace PacBio {
 namespace BAM {
-/// Represents annotation of a polymerase region.
+
+/// \brief The VirtualRegion represents an annotation of a polymerase region.
+///
 struct VirtualRegion
 {
 public:
@@ -57,50 +63,66 @@ public:
     int score = 0;
 
 public:
+    /// \brief Creates a virtual region with basic type & position info.
+    ///
     VirtualRegion(const VirtualRegionType type, 
                   const int beginPos,
                   const int endPos,
-                  const int score = 0)
-        : type(type)
-        , beginPos(beginPos)
-        , endPos(endPos), cxTag()
-        , score(score)
-    {}
+                  const int score = 0);
+
+    /// \brief Creates a virtual region with type/position info, as well as context & barcode.
+    ///
     VirtualRegion(const VirtualRegionType type, 
                   const int beginPos,
                   const int endPos, 
                   const LocalContextFlags cxTag, 
                   const int barcodeLeft,
                   const int barcodeRight,
-                  const int score = 0)
-        : type(type)
-        , beginPos(beginPos)
-        , endPos(endPos)
-        , cxTag(cxTag)
-        , barcodeLeft(barcodeLeft)
-        , barcodeRight(barcodeRight)
-        , score(score)
-    {}
-    VirtualRegion() = default;
-    // Move constructor
-    VirtualRegion(VirtualRegion&&) = default;
-    // Copy constructor
-    VirtualRegion(const VirtualRegion&) = default;
-    // Move assignment operator
-    VirtualRegion& operator=(VirtualRegion&&) = default;
-    // Copy assignment operator
-    VirtualRegion& operator=(const VirtualRegion&) = default; // un-"delete"-ed for SWIG
-    // Destructor
-    ~VirtualRegion() = default;
+                  const int score = 0);
 
-public:
-    bool operator==(const VirtualRegion &v1) const
-    {
-        return (v1.type == this->type &&
-                v1.beginPos == this->beginPos &&
-                v1.endPos == this->endPos);
-    }
+    VirtualRegion(void) = default;
+    VirtualRegion(const VirtualRegion&) = default;
+    VirtualRegion(VirtualRegion&&) = default;
+    VirtualRegion& operator=(const VirtualRegion&) = default; // un-"delete"-ed for SWIG
+    VirtualRegion& operator=(VirtualRegion&&) = default;
+    ~VirtualRegion(void) = default;
+
+    bool operator==(const VirtualRegion &v1) const;
+
 };
+
+inline VirtualRegion::VirtualRegion(const VirtualRegionType type,
+                                    const int beginPos,
+                                    const int endPos,
+                                    const int score)
+    : type(type)
+    , beginPos(beginPos)
+    , endPos(endPos), cxTag()
+    , score(score)
+{}
+
+inline VirtualRegion::VirtualRegion(const VirtualRegionType type,
+                                    const int beginPos,
+                                    const int endPos,
+                                    const LocalContextFlags cxTag,
+                                    const int barcodeLeft,
+                                    const int barcodeRight,
+                                    const int score)
+    : type(type)
+    , beginPos(beginPos)
+    , endPos(endPos)
+    , cxTag(cxTag)
+    , barcodeLeft(barcodeLeft)
+    , barcodeRight(barcodeRight)
+    , score(score)
+{}
+
+inline bool VirtualRegion::operator==(const VirtualRegion& v1) const
+{
+    return (v1.type == this->type &&
+            v1.beginPos == this->beginPos &&
+            v1.endPos == this->endPos);
+}
 
 } // namespace BAM
 } // namespace PacBio

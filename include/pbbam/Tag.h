@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file Tag.h
+/// \brief Defines the Tag class.
+//
 // Author: Derek Barnett
 
 #ifndef TAG_H
@@ -46,7 +50,8 @@
 namespace PacBio {
 namespace BAM {
 
-/// \brief Provides information on the exact (C++) data type held by a Tag.
+/// \brief This enum is used to describe the exact (C++) data type held by a
+///        Tag.
 ///
 enum class TagDataType
 {
@@ -68,63 +73,73 @@ enum class TagDataType
   , FLOAT_ARRAY  = 15    ///< std::vector<float>
 };
 
-/// \brief Provides additional instructions on interpreting the tag's value.
+/// \brief This enum provides additional instructions on interpreting the tag's
+///        value.
 ///
-/// Some C++ data types (e.g. std::string) may represent more than one BAM tag type
-/// ('H' vs 'Z'). These modifiers indicate how to properly interpret those shared
-/// data types.
+/// Some C++ data types (e.g. std::string) may represent more than one BAM tag
+/// type ('H' vs 'Z'). Thus a TagModifier may be used to indicate how to
+/// properly distinguish between these shared data types.
 ///
-enum class   TagModifier
+enum class TagModifier
 {
-    /// \brief This indicates the tag has no modifiers set.
+    /// \brief This value indicates that the tag has no modifiers set.
     ///
     NONE = 0,
 
     /// \brief This modifier marks an integer as ASCII.
     ///
-    /// SAM/BAM has the concept of an ASCII character that is distinct from an 8-bit
-    /// integer. However, there is no such pure separation in C++
-    /// (int8_t/uint8_t are likely implemented as typedefs around char/unsigned char).
-    /// Thus this modifier can be used to indicate a tag's integer data should be
+    /// SAM/BAM has the concept of an ASCII character that is distinct from an
+    /// 8-bit integer. However, there is no such pure separation in C++ - as
+    /// int8_t/uint8_t are likely implemented as typedefs around char/unsigned
+    /// char. Thus this modifier can be used to indicate a tag's value should be
     /// interpreted as a printable, ASCII character.
     ///
     ASCII_CHAR,
 
-    /// \brief This modifier marks std::string data as "hex string", rather than a regular string.
+    /// \brief This modifier marks std::string data as "hex string", rather than
+    ///        a regular string.
     ///
-    /// SAM/BAM has a distinction between regular strings and "Hex format" strings.
-    /// However, they are both manipulated in C++ via std::string. Thus this modifier
-    /// can be used to indicate that a tag's string data should be interpreted as
-    /// "Hex format" rather than a regular, literal string.
+    /// SAM/BAM has a distinction between regular strings and "Hex format"
+    /// strings. However, they are both manipulated in C++ via std::string. Thus
+    /// this modifier can be used to indicate that a tag's string data should be
+    /// interpreted as "Hex format" rather than a regular, literal string.
     ///
     HEX_STRING
 };
 
+/// \brief The Tag class represents a SAM/BAM record tag value.
+///
+/// SAM/BAM tags may store values from a variety of types: varying fixed-width
+/// integers, strings, arrays of data, etc.
+///
+/// The Tag class allow tags to be handled in a generic fashion, while
+/// maintaining a high level of type-safety. Only those types recognized by the
+/// SAM/BAM format are allowed, and extracting the value from a tag is subject
+/// to allowed conversion rules, as well.
+///
 // Inspired by (but greatly simplified & modified from) the boost::variant
 // wrapper approach taken by DynamicCpp (https://code.google.com/p/dynamic-cpp)
+//
 class PBBAM_EXPORT Tag
 {
 public:
-
     /// \name Constructors & Related Methods
     /// \{
 
-    /// Constructs a null tag.
-    /// \sa IsNull()
-    ///
+    /// \brief Creates an empty, null tag
     Tag(void);
 
-    /// Constructs a Tag from 8-bit integer or character.
+    /// \brief Creates a Tag from a signed 8-bit integer or character.
     ///
-    /// \note Passing a char ('A') to Tag constructor will likely result in calling
-    ///       this version. If you desire an ASCII char tag and not a numeric value,
-    ///       use the version that allows passing a modifier:
-    ///       Tag('A', TagModifier::ASCII_CHAR), or set that modifier flag using
-    ///       Tag::Modifier(const TagModifier m) .
+    /// Without a TagModifier, the resulting Tag will be annotated as containing
+    /// an 8-bit integer, whether the input \p value was an integer or a char.
+    /// For ASCII tags, use one of these methods:
+    /// \include code/Tag_AsciiCtor.txt
     ///
     Tag(int8_t value);
 
-    /// Constructs a Tag from 8-bit integer or character, adding modifier.
+   /// \brief Creates a Tag from a signed 8-bit integer or character,
+   ///        applying the provided modifier.
     ///
     /// This method allows direct construction of an ASCII character, rather
     /// than an 8-bit integer (e.g. Tag('A', TagModifier::ASCII_CHAR) ).
@@ -133,53 +148,58 @@ public:
     ///
     Tag(int8_t value, const TagModifier mod);
 
-    /// Constructs a Tag from 8-bit unsigned integer or unsigned character.
+    /// \brief Creates a Tag from an unsigned 8-bit integer or character.
+    ///
+    /// Without a TagModifier, the resulting Tag will be annotated as containing
+    /// an 8-bit unsigned integer, whether the input \p value was an integer or
+    /// a char. For ASCII tags, use one of these methods:
+    /// \include code/Tag_AsciiCtor.txt
     ///
     Tag(uint8_t value);
 
-    /// Constructs a Tag from 16-bit integer.
+    /// \brief Creates a Tag from 16-bit integer.
     Tag(int16_t value);
 
-    /// Constructs a Tag from 16-bit unsigned integer.
+    /// \brief Creates a Tag from 16-bit unsigned integer.
     Tag(uint16_t value);
 
-    /// Constructs a Tag from 32-bit signed integer.
+    /// \brief Creates a Tag from 32-bit signed integer.
     Tag(int32_t value);
 
-    /// Constructs a Tag from 32-bit unsigned integer.
+    /// \brief Creates a Tag from 32-bit unsigned integer.
     Tag(uint32_t value);
 
-    /// Constrcuts a Tag from floating-point value.
+    /// \brief Creates a Tag from floating-point value.
     Tag(float value);
 
-    /// Constructs a Tag from string data.
+    /// \brief Creates a Tag from string data.
     Tag(const std::string& value);
 
-    /// Constructs a Tag from string data, adding modifier.
+    /// \brief Creates a Tag from string data, adding modifier.
     ///
     /// \throws runtime_error if \p modifier is not valid for string data
     ///
     Tag(const std::string& value, const TagModifier mod);
 
-    /// Constructs a Tag from a vector of 8-bit integers.
+    /// \brief Creates a Tag from a vector of 8-bit integers.
     Tag(const std::vector<int8_t>& value);
 
-    /// Constructs a Tag from a vector of 8-bit unsigned integers.
+    /// \brief Creates a Tag from a vector of 8-bit unsigned integers.
     Tag(const std::vector<uint8_t>& value);
 
-    /// Constructs a Tag from a vector of 16-bit integers.
+    /// \brief Creates a Tag from a vector of 16-bit integers.
     Tag(const std::vector<int16_t>& value);
 
-    /// Constructs a Tag from a vector of 16-bit unsigned integers.
+    /// \brief Creates a Tag from a vector of 16-bit unsigned integers.
     Tag(const std::vector<uint16_t>& value);
 
     /// Constructs a Tag from a vector of 32-bit integers.
     Tag(const std::vector<int32_t>& value);
 
-    /// Constructs a Tag from a vector of 32-bit unsigned integers.
+    /// \brief Creates a Tag from a vector of 32-bit unsigned integers.
     Tag(const std::vector<uint32_t>& value);
 
-    /// Constructs a Tag from a vector of floating-point values.
+    /// \brief Creates a Tag from a vector of floating-point values.
     Tag(const std::vector<float>& value);
     
     Tag(const Tag& other);
@@ -214,72 +234,82 @@ public:
     /// \name Data Conversion & Validation
     /// \{
 
-    /// Converts the tag value to an ASCII character
+    /// \brief Converts the tag value to an ASCII character.
     ///
-    /// Tag must hold an integer type, within the valid ASCII range [33-127].
+    /// Tag must hold an integral type, within the valid ASCII range [33-127].
     ///
-    /// \returns ASCII character if valid
-    /// \throws if not ASCII-compatible
+    /// \returns ASCII character value
+    /// \throws std::runtime_error if not ASCII-compatible
+    ///
     char ToAscii(void) const;
 
     /// \returns tag data as signed 8-bit (casting if needed)
-    /// \throws if not integral data, or out of valid range
+    /// \throws std::runtime_error if not integral data, or out of valid range
     int8_t ToInt8(void) const;
 
     /// \returns tag data as unsigned 8-bit (casting if needed)
-    /// \throws if not integral data, or out of valid range
+    /// \throws std::runtime_error if not integral data, or out of valid range
     uint8_t ToUInt8(void) const;
 
     /// \returns tag data as signed 16-bit (casting if needed)
-    /// \throws if not integral data, or out of valid range
+    /// \throws std::runtime_error if not integral data, or out of valid range
     int16_t ToInt16(void) const;
 
     /// \returns tag data as unsigned 16-bit (casting if needed)
-    /// \throws if not integral data, or out of valid range
+    /// \throws std::runtime_error if not integral data, or out of valid range
     uint16_t ToUInt16(void) const;
 
     /// \returns tag data as signed 32-bit (casting if needed)
-    /// \throws if not integral data, or out of valid range
+    /// \throws std::runtime_error if not integral data, or out of valid range
     int32_t ToInt32(void) const;
 
     /// \returns tag data as unsigned 32-bit (casting if needed)
-    /// \throws if not integral data, or out of valid range
+    /// \throws std::runtime_error if not integral data, or out of valid range
     uint32_t ToUInt32(void) const;
 
     /// \returns tag data as float
-    /// \throws if tag does not contain a value of explicit type: float
+    /// \throws std::runtime_error if tag does not contain a value of
+    ///         explicit type: float
     float ToFloat(void) const;
 
     /// \returns tag data as std::string
-    /// \throws if tag does not contain a value of explicit type: std::string
+    /// \throws std::runtime_error if tag does not contain a value of explicit
+    ///         type: std::string
     std::string ToString(void) const;
 
     /// \returns tag data as std::vector<int8_t>
-    /// \throws if tag does not contain a value of explicit type: std::vector<int8_t>
+    /// \throws std::runtime_error if tag does not contain a value of explicit
+    ///         type: std::vector<int8_t>
     std::vector<int8_t> ToInt8Array(void) const;
 
     /// \returns tag data as std::vector<uint8_t>
-    /// \throws if tag does not contain a value of explicit type: std::vector<uint8_t>
+    /// \throws std::runtime_error if tag does not contain a value of explicit
+    ///         type: std::vector<uint8_t>
     std::vector<uint8_t> ToUInt8Array(void) const;
 
     /// \returns tag data as std::vector<int16_t>
-    /// \throws if tag does not contain a value of explicit type: std::vector<int16_t>
+    /// \throws std::runtime_error if tag does not contain a value of explicit
+    ///         type: std::vector<int16_t>
     std::vector<int16_t> ToInt16Array(void) const;
 
     /// \returns tag data as std::vector<uint16_t>
-    /// \throws if tag does not contain a value of explicit type: std::vector<uint16_t>
+    /// \throws std::runtime_error if tag does not contain a value of explicit
+    ///         type: std::vector<uint16_t>
     std::vector<uint16_t> ToUInt16Array(void) const;
 
     /// \returns tag data as std::vector<int32_t>
-    /// \throws if tag does not contain a value of explicit type: std::vector<int32_t>
+    /// \throws std::runtime_error if tag does not contain a value of explicit
+    ///         type: std::vector<int32_t>
     std::vector<int32_t> ToInt32Array(void) const;
 
     /// \returns tag data as std::vector<uint32_t>
-    /// \throws if tag does not contain a value of explicit type: std::vector<uint32_t>
+    /// \throws std::runtime_error if tag does not contain a value of explicit
+    ///         type: std::vector<uint32_t>
     std::vector<uint32_t> ToUInt32Array(void) const;
 
     /// \returns tag data as std::vector<float>
-    /// \throws if tag does not contain a value of explicit type: std::vector<float>
+    /// \throws std::runtime_error if tag does not contain a value of explicit
+    ///         type: std::vector<float>
     std::vector<float> ToFloatArray(void) const;
 
     /// \}
@@ -316,7 +346,8 @@ public:
     /// \returns true if tag contains a value of type: std::string
     bool IsString(void) const;
 
-    /// \returns true if tag contains a value of type: std::string \b AND has a TagModifier of HEX_STRING
+    /// \returns true if tag contains a value of type: std::string \b AND has a
+    ///          TagModifier of TagModifier::HEX_STRING
     bool IsHexString(void) const;
 
     /// \returns true if tag contains a value of type: std::vector<int8_t>
@@ -382,7 +413,10 @@ public:
     /// \returns current tag data modifier
     TagModifier Modifier(void) const;
 
-    /// Sets tag data modifier
+    /// \brief Sets tag data modifier.
+    ///
+    /// \param[in] m    new modifier value
+    ///
     /// \returns reference to this tag
     Tag& Modifier(const TagModifier m);
 
@@ -414,6 +448,6 @@ private :
 } // namespace BAM
 } // namespace PacBio
 
-#include "internal/Tag.inl"
+#include "pbbam/internal/Tag.inl"
 
 #endif // TAG_H

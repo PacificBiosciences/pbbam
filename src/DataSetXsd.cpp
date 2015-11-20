@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file DataSetXsd.cpp
+/// \brief Implements the XSD- and namespace-related classes for DataSetXML.
+//
 // Author: Derek Barnett
 
 #include "pbbam/DataSetXsd.h"
@@ -49,7 +53,7 @@ static map<XsdType, NamespaceInfo> DefaultRegistry(void)
 {
     const auto result = map<XsdType, NamespaceInfo>
     {
-        { XsdType::NONE,                   NamespaceInfo{ } },
+        { XsdType::NONE,                   NamespaceInfo{ "", "" } },
         { XsdType::AUTOMATION_CONSTRAINTS, NamespaceInfo{ "",       "http://pacificbiosciences.com/PacBioAutomationConstraints.xsd" } },
         { XsdType::BASE_DATA_MODEL,        NamespaceInfo{ "pbbase", "http://pacificbiosciences.com/PacBioBaseDataModel.xsd" } },
         { XsdType::COLLECTION_METADATA,    NamespaceInfo{ "pbmeta", "http://pacificbiosciences.com/PacBioCollectionMetadata.xsd" } },

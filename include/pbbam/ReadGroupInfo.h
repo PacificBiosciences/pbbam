@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file ReadGroupInfo.h
+/// \brief Defines the ReadGroupInfo class.
+//
 // Author: Derek Barnett
 
 #ifndef READGROUPINFO_H
@@ -46,6 +50,11 @@
 namespace PacBio {
 namespace BAM {
 
+/// \brief This enum describes the base features that may be present in a read
+///        group's records.
+///
+/// This information is stored in its description (\@RG:DS).
+///
 enum class BaseFeature
 {
     DELETION_QV
@@ -69,12 +78,22 @@ enum class BaseFeature
   , START_FRAME
 };
 
+/// \brief This enum describes the encoding types used for frame data within a
+///        read group's records.
+///
+/// This information is stored in its description (\@RG:DS).
+///
 enum class FrameCodec
 {
     RAW
   , V1
 };
 
+/// \brief This enum describes the experimental design of the barcodes within a
+///        read group's records.
+///
+/// This information is stored in its description (\@RG:DS).
+///
 enum class BarcodeModeType
 {
    NONE
@@ -82,6 +101,11 @@ enum class BarcodeModeType
  , ASYMMETRIC
 };
 
+/// \brief This enum describes the type of value encoded by barcode quality,
+///        within a read group's records.
+///
+/// This information is stored in its description (\@RG:DS).
+///
 enum class BarcodeQualityType
 {
     NONE
@@ -89,25 +113,46 @@ enum class BarcodeQualityType
   , PROBABILITY
 };
 
+/// \brief The ReadGroupInfo class represents a read group entry (\@RG) in the
+///        SAM header.
+///
 class PBBAM_EXPORT ReadGroupInfo
 {
 public:
     /// \name Conversion & Validation
     ///
 
-    /// \returns ReadGroupInfo object from SAM-formatted string \verbatim ("@RG...\n") \endverbatim
+    /// \brief Creates a ReadGroupInfo object from SAM-formatted text.
+    ///
+    /// \param[in] sam  SAM-formatted text
+    /// \returns read group info object
+    ///
     static ReadGroupInfo FromSam(const std::string& sam);
 
-    /// \returns SAM-formatted string representing read group info
+    /// \brief Converts a ReadGroupInfo object to its SAM-formatted text.
+    ///
+    /// \param[in] rg     input ReadGroupInfo object
+    /// \returns SAM-formatted text (no trailing newline)
+    ///
     static std::string ToSam(const ReadGroupInfo& rg);
 
-    /// \returns integer value of ID string
+    /// \brief Converts a read group ID (string) to its numeric value.
+    ///
+    /// \param[in] rgId     read group ID string
+    /// \returns numeric value of ID
+    ///
     static int32_t IdToInt(const std::string& rgId);
 
-    /// \returns ID string from integer
+    /// \brief Converts a read group ID number to its string representation.
+    ///
+    /// \param[in] id     read group ID number
+    /// \returns hexadecimal string representation of ID
+    ///
     static std::string IntToId(const int32_t id);
 
-    /// \returns sequencingChemistry from (bindingKit, sequencingKit, basecallerVersion)
+    /// \returns sequencing chemistry from (bindingKig, sequencingKit,
+    ///          basecallerVersion)
+    ///
     static std::string SequencingChemistryFromTriple(const std::string& bindingKit,
                                                      const std::string& sequencingKit,
                                                      const std::string& basecallerVersion);
@@ -118,9 +163,25 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
+    /// \brief Creates an empty read group info object.
     ReadGroupInfo(void);
+
+    /// \brief Creates a read group info object with an ID.
+    ///
+    /// \param[in] id   string representation of read group ID
+    ///
     ReadGroupInfo(const std::string& id);
-    ReadGroupInfo(const std::string& movieName, const std::string& readType);
+
+    /// \brief Creates a read group info object from a movie name & read type.
+    ///
+    /// \param[in] movieName    sequencing movie name
+    /// \param[in] readType     string version of record type
+    ///
+    /// \sa RecordType
+    ///
+    ReadGroupInfo(const std::string& movieName,
+                  const std::string& readType);
+
     ReadGroupInfo(const ReadGroupInfo& other);
     ReadGroupInfo(ReadGroupInfo&& other);
     ReadGroupInfo& operator=(const ReadGroupInfo& other);
@@ -130,36 +191,68 @@ public:
     /// \}
 
 public:
+    /// \name Comparison Operators
+    /// \{
+
+    bool operator==(const ReadGroupInfo& other) const;
+
+    /// \}
+
+public:
+    /// \name Conversion & Validation
+    /// \{
+
+    /// \returns true if read group info is valid
+    ///
+    /// Currently this checks to see that ReadGroupInfo::Id does not contain an
+    /// empty string.
+    ///
+    bool IsValid(void) const;
+
+    /// \brief Converts this object to its SAM-formatted text.
+    ///
+    /// \returns SAM-formatted text (no trailing newline)
+    ///
+    std::string ToSam(void) const;
+
+    /// \}
+
+public:
     /// \name Attributes
     /// \{
 
     /// \returns the number of barcode sequences in BarcodeFile
     ///
-    /// \throws std::runtime_error if barcode data not set. Check HasBarcodeData if this data may be absent.
+    /// \throws std::runtime_error if barcode data not set.
+    ///         Check HasBarcodeData if this data may be absent.
     ///
     size_t BarcodeCount(void) const;
 
     /// \returns name of FASTA file containing barcode sequences
     ///
-    /// \throws std::runtime_error if barcode data not set. Check HasBarcodeData if this data may be absent.
+    /// \throws std::runtime_error if barcode data not set.
+    ///         Check HasBarcodeData if this data may be absent.
     ///
     std::string  BarcodeFile(void) const;
 
     /// \returns MD5 hash of the contents of BarcodeFile
     ///
-    /// \throws std::runtime_error if barcode data not set. Check HasBarcodeData if this data may be absent.
+    /// \throws std::runtime_error if barcode data not set.
+    ///         Check HasBarcodeData if this data may be absent.
     ///
     std::string BarcodeHash(void) const;
 
     /// \returns experimental design type of barcodes
     ///
-    /// \throws std::runtime_error if barcode data not set. Check HasBarcodeData if this data may be absent.
+    /// \throws std::runtime_error if barcode data not set.
+    ///         Check HasBarcodeData if this data may be absent.
     ///
     BarcodeModeType BarcodeMode(void) const;
 
     /// \returns type of value encoded in the 'bq' tag
     ///
-    /// \throws std::runtime_error if barcode data is not set. Check HasBarcodeData if this data may be absent.
+    /// \throws std::runtime_error if barcode data is not set.
+    ///         Check HasBarcodeData if this data may be absent.
     ///
     BarcodeQualityType BarcodeQuality(void) const;
 
@@ -175,11 +268,16 @@ public:
     /// \returns true if reads are classified as spike-in controls
     bool Control(void) const;
 
-    /// \returns additional tags not specified by either SAM/BAM or PacBio specs.
+    /// \returns any non-standard tags added to the \@PG entry
+    ///
+    /// Result map consists of {tagName => value}.
+    ///
     std::map<std::string, std::string> CustomTags(void) const;
 
+    /// \returns string value of \@RG:DT
     std::string Date(void) const;
 
+    /// \returns string value of \@RG:FO
     std::string FlowOrder(void) const;
 
     /// \returns frame rate in Hz
@@ -191,54 +289,47 @@ public:
     /// \returns true if read group has an entry for the specified base feature
     bool HasBaseFeature(const BaseFeature& feature) const;
 
+    /// \returns string value of \@RG:ID
     std::string Id(void) const;
 
     /// \returns codec type in use for IPD
     FrameCodec IpdCodec(void) const;
 
+    /// \returns string value of \@RG:KS
     std::string KeySequence(void) const;
 
+    /// \returns string value of \@RG:LB
     std::string Library(void) const;
 
+    /// \returns movie name (stored in \@RG:PU)
     std::string MovieName(void) const;
 
+    /// \returns string value of \@RG:PL
     std::string Platform(void) const;
 
+    /// \returns string value of \@RG:PI
     std::string PredictedInsertSize(void) const;
 
+    /// \returns string value of \@RG:PG
     std::string Programs(void) const;
 
     /// \returns codec type in use for PulseWidth
     FrameCodec PulseWidthCodec(void) const;
 
+    /// \returns string value of read type
     std::string ReadType(void) const;
 
+    /// \returns string value of \@RG:SM
     std::string Sample(void) const;
 
+    /// \returns string value of \@RG:CN
     std::string SequencingCenter(void) const;
-
-    /// \returns sequencing kit part number
-    std::string SequencingKit(void) const;
 
     /// \returns sequencing chemistry name
     std::string SequencingChemistry(void) const;
 
-    /// \}
-
-    /// \name Conversion & Validation
-    /// \{
-
-    bool IsValid(void) const;
-
-    /// \returns SAM-formatted text representation of ReadGroupInfo
-    std::string ToSam(void) const;
-
-    /// \}
-
-    /// \name Comparison
-    /// \{
-
-    bool operator==(const ReadGroupInfo& other) const;
+    /// \returns sequencing kit part number
+    std::string SequencingKit(void) const;
 
     /// \}
 
@@ -246,19 +337,24 @@ public:
     /// \name Attributes
     /// \{
 
-    /// Sets read group's barcode data.
+    /// \brief Sets read group's barcode data.
     ///
     /// Barcode fields are either absent or all must be present.
     ///
-    /// \param[in] barcodeFile    \sa BarcodeFile
-    /// \param[in] barcodeHash    \sa BarcodeHash
-    /// \param[in] barcodeCount   \sa BarcodeCount
-    /// \param[in] barcodeMode    \sa BarcodeMode
-    /// \param[in] barcodeQuality \sa BarcodeQuality
+    /// \param[in] barcodeFile      barcode filename
+    /// \param[in] barcodeHash      MD5 hash of barcode file
+    /// \param[in] barcodeCount     number of records in barcode file
+    /// \param[in] barcodeMode      experimental design of barcodes
+    /// \param[in] barcodeQuality   type of barcode quality value
     ///
-    /// \sa ClearBarcodeData
+    /// \sa BarcodeFile \n
+    ///     BarcodeHash \n
+    ///     BarcodeCount \n
+    ///     BarcodeMode \n
+    ///     BarcodeQuality \n
+    ///     ReadGroupInfo::ClearBarcodeData
     ///
-    /// \returns reference to this read group
+    /// \returns reference to this object
     ///
     ReadGroupInfo& BarcodeData(const std::string& barcodeFile,
                                const std::string& barcodeHash,
@@ -266,68 +362,183 @@ public:
                                BarcodeModeType barcodeMode,
                                BarcodeQualityType barcodeQuality);
 
+    /// \brief Sets the basecaller version number.
+    ///
+    /// \param[in] versionNumber   new value
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& BasecallerVersion(const std::string& versionNumber);
 
+    /// \brief Sets the tag to be used for a particular base feature.
+    ///
+    /// \param[in] feature      feature type begin updated
+    /// \param[in] tag          new value
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& BaseFeatureTag(const BaseFeature& feature,
                                   const std::string& tag);
 
+    /// \brief Sets the binding kit part number.
+    ///
+    /// \param[in] kitNumber    new value
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& BindingKit(const std::string& kitNumber);
 
-    /// Removes all barcode data from this read group.
+    /// \brief Removes all barcode data from this read group.
     ///
     /// \returns reference to this read group
     ///
     ReadGroupInfo& ClearBarcodeData(void);
 
+    /// \brief Sets whether read group's records are classifed as spike-in
+    ///        controls.
+    ///
+    /// \param[in] ctrl     true if records are spike-in controls
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& Control(const bool ctrl);
 
+    /// \brief Sets a new collection of non-standard tags.
+    ///
+    /// Custom tag map entries should consist of {tagName => value}.
+    ///
+    /// \param[in] custom      new tags
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& CustomTags(const std::map<std::string, std::string>& custom);
 
+    /// \brief Sets the value for \@RG:DT
+    ///
+    /// \param[in] date      new value
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& Date(const std::string& date);
 
+    /// \brief Sets the value for \@RG:FO
+    ///
+    /// \param[in] order     new value
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& FlowOrder(const std::string& order);
 
+    /// \brief Sets the frame rate.
+    ///
+    /// \param[in] frameRateHz     string value of frame rate in Hz
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& FrameRateHz(const std::string& frameRateHz);
 
+    /// \brief Sets the read group's ID.
+    ///
+    /// \param[in] id     string value of ID
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& Id(const std::string& id);
 
-    ReadGroupInfo& Id(const std::string& movieName, const std::string& readType);
+    /// \brief Sets the read group's ID, from movie name & read type
+    ///
+    /// \param[in] movieName    sequencing movie name
+    /// \param[in] readType     string version of read type
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& Id(const std::string& movieName,
+                      const std::string& readType);
 
-    ReadGroupInfo& IpdCodec(const FrameCodec& codec, const std::string& tag = std::string());
+    /// \brief Sets the codec type used for IPD
+    ///
+    /// \param[in] codec    codec type
+    /// \param[in] tag      IPD tag
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& IpdCodec(const FrameCodec& codec,
+                            const std::string& tag = std::string());
 
+    /// \brief Sets the value for \@RG:KS
+    ///
+    /// \param[in] sequence      new value
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& KeySequence(const std::string& sequence);
 
+    /// \brief Sets the value for \@RG:LB
+    ///
+    /// \param[in] library      new value
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& Library(const std::string& library);
 
-    ReadGroupInfo& MovieName(const std::string& id);
+    /// \brief Sets the value for movie name (stored in \@RG:PU).
+    ///
+    /// \param[in] movieName    new value
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& MovieName(const std::string& movieName);
 
+    /// \brief Sets the value for \@RG:PI
+    ///
+    /// \param[in] size         new value
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& PredictedInsertSize(const std::string& size);
 
+    /// \brief Sets the value for \@RG:PG
+    ///
+    /// \param[in] programs     new value
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& Programs(const std::string& programs);
 
-    ReadGroupInfo& PulseWidthCodec(const FrameCodec& codec, const std::string& tag = std::string());
+    /// \brief Sets the codec type used for PulseWidth
+    ///
+    /// \param[in] codec    codec type
+    /// \param[in] tag      pulse width tag
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& PulseWidthCodec(const FrameCodec& codec,
+                                   const std::string& tag = std::string());
 
+    /// \brief Sets the read type.
+    ///
+    /// \param[in] type    new value
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& ReadType(const std::string& type);
 
+    /// \brief Sets the value for \@RG:SM
+    ///
+    /// \param[in] sample       new value
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& Sample(const std::string& sample);
 
+    /// \brief Sets the value for \@RG:CN
+    ///
+    /// \param[in] center       new value
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& SequencingCenter(const std::string& center);
 
+    /// \brief Sets the sequencing kit part number.
+    ///
+    /// \param[in] kitNumber    new value
+    /// \returns reference to this object
+    ///
     ReadGroupInfo& SequencingKit(const std::string& kitNumber);
 
     /// \}
 
 private:
-    std::string id_;                     // ID * Unique ID required for valid SAM/BAM header *
-    std::string sequencingCenter_;       // CN
-    std::string date_;                   // DT * (ISO 8601) *
-    std::string flowOrder_;              // FO
-    std::string keySequence_;            // KS
-    std::string library_;                // LB
-    std::string programs_;               // PG
-    std::string predictedInsertSize_;    // PI
-    std::string movieName_;              // PU * more explicit, in place of "platform unit" *
-    std::string sample_;                 // SM
+    std::string id_;                    // ID * must be unique for valid SAM *
+    std::string sequencingCenter_;      // CN
+    std::string date_;                  // DT * (ISO-8601) *
+    std::string flowOrder_;             // FO
+    std::string keySequence_;           // KS
+    std::string library_;               // LB
+    std::string programs_;              // PG
+    std::string predictedInsertSize_;   // PI
+    std::string movieName_;             // PU
+    std::string sample_;                // SM
 
     // DS:<Description> components
     std::string readType_;
@@ -354,6 +565,13 @@ private:
     void DecodeSamDescription(const std::string& description);
 };
 
+/// \brief Creates a read group ID from a movie name & read type.
+///
+/// \param[in] movieName    sequencing movie name
+/// \param[in] readType     string version of read type
+///
+/// \returns hexadecimal string read group ID
+///
 PBBAM_EXPORT
 std::string MakeReadGroupId(const std::string& movieName,
                             const std::string& readType);

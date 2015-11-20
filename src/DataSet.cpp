@@ -32,7 +32,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file DataSet.cpp
+/// \brief Implements the DataSet class.
+//
 // Author: Derek Barnett
 
 #include "pbbam/DataSet.h"
@@ -93,7 +97,7 @@ DataSet::DataSet(const string& filename)
         path_ = FileUtils::CurrentWorkingDirectory();
 }
 
-DataSet::DataSet(const std::vector<std::string>& filenames)
+DataSet::DataSet(const vector<string>& filenames)
     : d_(DataSetIO::FromUris(filenames))
     , path_(FileUtils::CurrentWorkingDirectory())
 { }
@@ -144,6 +148,7 @@ vector<BamFile> DataSet::BamFiles(void) const
     vector<BamFile> result;
     result.reserve(resources.Size());
     for(const ExternalResource& ext : resources) {
+        // only bother resolving file path if this is a BAM file
         boost::iterator_range<string::const_iterator> bamFound = boost::algorithm::ifind_first(ext.MetaType(), "bam");
         if (!bamFound.empty()) {
             const string fn = internal::FileUtils::ResolvedFilePath(ext.ResourceId(), path_);
@@ -162,21 +167,6 @@ vector<string> DataSet::ResolvedResourceIds(void) const
     for(const ExternalResource& ext : resources) {
         const string fn = internal::FileUtils::ResolvedFilePath(ext.ResourceId(), path_);
         result.push_back(fn);
-    }
-    return result;
-}
-
-set<string> DataSet::SequencingChemistries(void) const
-{
-    const vector<BamFile> bamFiles{ BamFiles() };
-
-    set<string> result;
-    for(const BamFile& bf : bamFiles) {
-        if (!bf.IsPacBioBAM())
-            throw std::runtime_error{ "only PacBio BAMs are supported" };
-        const vector<ReadGroupInfo> readGroups{ bf.Header().ReadGroups() };
-        for (const ReadGroupInfo& rg : readGroups)
-            result.insert(rg.SequencingChemistry());
     }
     return result;
 }
@@ -218,6 +208,21 @@ void DataSet::Save(const std::string& outputFilename)
 
 void DataSet::SaveToStream(ostream& out)
 { DataSetIO::ToStream(d_, out); }
+
+set<string> DataSet::SequencingChemistries(void) const
+{
+    const vector<BamFile> bamFiles{ BamFiles() };
+
+    set<string> result;
+    for(const BamFile& bf : bamFiles) {
+        if (!bf.IsPacBioBAM())
+            throw std::runtime_error{ "only PacBio BAMs are supported" };
+        const vector<ReadGroupInfo> readGroups{ bf.Header().ReadGroups() };
+        for (const ReadGroupInfo& rg : readGroups)
+            result.insert(rg.SequencingChemistry());
+    }
+    return result;
+}
 
 string DataSet::TypeToName(const DataSet::TypeEnum& type)
 {
