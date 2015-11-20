@@ -82,7 +82,7 @@ ZmwWhitelistVirtualReader::ZmwWhitelistVirtualReader(const vector<int32_t>& zmwW
     for (const int32_t zmw : zmwWhitelist) {
         const bool primaryFound = !primaryFileZmws.LookupIndices(zmw, Compare::EQUAL).empty();
         const bool scrapsFound = !scrapsFileZmws.LookupIndices(zmw, Compare::EQUAL).empty();
-        if (primaryFound && scrapsFound)
+        if (primaryFound || scrapsFound)
             zmwWhitelist_.push_back(zmw);
     }
 }

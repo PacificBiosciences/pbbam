@@ -437,6 +437,29 @@ TEST(ZmwWhitelistVirtualReader, EmptyListOk)
     EXPECT_TRUE(reader.NextRaw().empty());
 }
 
+TEST(ZmwWhitelistVirtualReader, EmptyScrapsFileOk)
+{
+    const std::vector<int32_t> whitelist = { 10944689, 10944690 };
+    const std::string primaryBamFn = tests::Data_Dir + "/polymerase/whitelist/scrapless.subreads.bam" ;
+    const std::string scrapsBamFn  = tests::Data_Dir + "/polymerase/whitelist/scrapless.scraps.bam" ;
+
+    int count = 0;
+    ZmwWhitelistVirtualReader reader(whitelist, primaryBamFn, scrapsBamFn);
+    while (reader.HasNext()) {
+        auto record = reader.Next();
+        (void)record;
+        ++count;
+    }
+    EXPECT_EQ(2, count);
+
+    const BamFile primaryBam(primaryBamFn);
+    const BamFile scrapsBam(scrapsBamFn);
+    const PbiRawData primaryIdx(primaryBam.PacBioIndexFilename());
+    const PbiRawData scrapsIdx(scrapsBam.PacBioIndexFilename());
+    EXPECT_EQ(3, primaryIdx.NumReads());
+    EXPECT_EQ(0, scrapsIdx.NumReads());
+}
+
 TEST(ZmwWhitelistVirtualReader, UnknownZmwOk)
 {
     const std::vector<int32_t> whitelist = { 42 }; // ZMW not in our files
