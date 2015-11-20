@@ -67,7 +67,7 @@ inline bool Compare::MemberFunctionBase<ValueType, fn, CompareType>::operator()(
     using MemberFnType = typename Compare::MemberFunctionBaseHelper<ValueType>::MemberFnType;
     using Proxy = internal::MemberFnProxy<MemberFnType, fn>;
 
-    const CompareType cmp;
+    CompareType cmp;
     return cmp(Proxy::call(lhs), Proxy::call(rhs));
 }
 
