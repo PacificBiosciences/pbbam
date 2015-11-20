@@ -1,0 +1,5 @@
+PbiFilter filter{ PbiQueryLengthFilter{2000, Compare::GREATER_THAN} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert( (record.QueryEnd() - record.QueryStart()) > 2000 );
+}

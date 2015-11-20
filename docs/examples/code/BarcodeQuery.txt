@@ -1,0 +1,17 @@
+// using C++11 range-based for loop
+BarcodeQuery query(42, dataset);
+for (const BamRecord& r : query) {
+    assert(r.HasBarcodes());
+    assert(r.BarcodeForward() == 42 || r.barcodeReverse() == 42);
+}
+
+// OR
+
+// using iterators directly
+BarcodeQuery query(42, dataset);
+auto iter = query.cbegin();
+auto end  = query.cend();
+for (; iter != end; ++iter) {
+    assert(iter->HasBarcodes());
+    assert(iter->BarcodeForward() == 42 || iter->barcodeReverse() == 42);
+} 

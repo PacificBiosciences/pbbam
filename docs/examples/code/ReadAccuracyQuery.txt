@@ -1,0 +1,15 @@
+// using C++11 range-based for loop
+ReadAccuracyQuery query(0.9, Compare::GREATER_THAN_EQUAL, dataset);
+for (const BamRecord& r : query) {
+    assert(r.ReadAccuracy() >= 0.9);
+}
+
+// OR
+
+// using iterators directly
+ReadAccuracyQuery query(0.9, Compare::GREATER_THAN_EQUAL, dataset);
+auto iter = query.cbegin();
+auto end  = query.cend();
+for (; iter != end; ++iter) {
+    assert(iter->ReadAccuracy() >= 0.9);
+} 

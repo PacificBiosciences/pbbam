@@ -1,0 +1,4 @@
+PbiFilterQuery query(PbiAlignedLengthFilter{1000, Compare::GREATER_THAN});
+for (const BamRecord& record : query) {
+    assert((record.AlignedEnd() - record.AlignedStart()) > 1000);
+}

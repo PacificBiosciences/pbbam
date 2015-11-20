@@ -1,0 +1,30 @@
+// To simply create a PBI file from BAM, the following is the easiest method:
+//
+#include <pbbam/BamFile.h>
+#include <pbbam/PbiFile.h>
+
+BamFile bamFile("data.bam");
+PbiFile::CreateFrom(bamFile);
+
+
+// However if you need to perform additional operations while reading the BAM file, 
+// you can do something like the following:
+//
+{
+    BamFile bamFile("data.bam");
+    PbiBuilder builder(bamFile.PacBioIndexFilename(), 
+                       bamFile.Header().Sequences().size());
+    BamReader reader(bamFile);
+    BamRecord b;
+    int64_t offset = reader.VirtualTell(); // first record's vOffset
+    while (reader.GetNext(b)) {
+
+        // store PBI recrod entry & get next record's vOffset
+        builder.AddRecord(b, offset);
+        offset = reader.VirtualTell();
+   
+        // ... additional stuff as needed ...
+    }
+
+} // <-- PBI data will only be written here, as PbiBuilder goes out of scope
+

@@ -1,0 +1,4 @@
+EntireFileQuery query("foo.bam");
+for (BamRecord& record : query) {
+    // ok to modify 'record' here
+} 

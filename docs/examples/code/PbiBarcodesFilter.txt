@@ -1,0 +1,6 @@
+PbiFilter filter{ PbiBarcodesFilter{17, 18} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.BarcodeForward() == 17 && 
+           record.BarcodeReverse() == 18);
+}

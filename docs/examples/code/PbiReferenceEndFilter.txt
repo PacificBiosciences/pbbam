@@ -1,0 +1,5 @@
+PbiFilter filter{ PbiReferenceEndFilter{ 2000 } };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.ReferenceEnd() == 2000);
+}

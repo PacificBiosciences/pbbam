@@ -1,0 +1,15 @@
+// single value
+PbiFilter filter{ PbiQueryNameFilter{ "movie_1/42/100_200" } };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.FullName() == "movie_1/42/100_200");
+}
+
+// whitelist
+vector<string> whitelist = { "movie_1/42/100_200", "movie_3/24/300_500" };
+PbiFilter filter{ PbiQueryNameFilter{whitelist} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.FullName() == "movie_1/42/100_200" || 
+           record.FullName() == "movie_3/24/300_500");
+}

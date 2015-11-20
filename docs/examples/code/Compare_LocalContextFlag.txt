@@ -1,0 +1,2 @@
+std::vector<BamRecord> records;
+std::sort(records.begin(), records.end(), Compare::LocalContextFlag());

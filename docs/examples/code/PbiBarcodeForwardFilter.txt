@@ -1,0 +1,15 @@
+// single value
+PbiFilter filter{ PbiBarcodeForwardFilter{50} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.BarcodeForward() == 50);
+}
+
+// whitelist
+vector<uint16_t> whitelist = { 50, 100 };
+PbiFilter filter{ PbiBarcodeForwardFilter{whitelist} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.BarcodeForward() == 50 || record.BarcodeForward() == 100);
+}
+

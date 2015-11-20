@@ -1,0 +1,15 @@
+// using C++11 range-based for loop
+SubreadLengthQuery query(500, Compare::GREATER_THAN_EQUAL, dataset);
+for (const BamRecord& r : query) {
+    assert((r.QueryEnd() - r.QueryStart()) >= 500);  
+}
+
+// OR
+
+// using iterators directly
+SubreadLengthQuery query(500, Compare::GREATER_THAN_EQUAL, dataset);
+auto iter = query.cbegin();
+auto end  = query.cend();
+for (; iter != end; ++iter) {
+    assert((iter->QueryEnd() - iter->QueryStart()) >= 500);
+} 

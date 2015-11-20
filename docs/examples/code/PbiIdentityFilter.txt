@@ -1,0 +1,6 @@
+// single value
+PbiFilter filter{ PbiIdentityFilter{ 0.5, Compare::GREATER_THAN_EQUAL } };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    // ... at least 50% of record was aligned ...
+}

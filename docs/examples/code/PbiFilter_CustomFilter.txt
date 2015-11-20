@@ -1,0 +1,20 @@
+struct MyCustomFilter
+{
+    IndexList Lookup(const PbiIndex& index) const
+    {
+        // ... do queries on index data ...
+        // ... filter, calculate, transform, etc. as needed ...
+
+        return IndexList();
+    }
+};
+
+// use in composite filters
+PbiFilter f;
+f.Add(PbiMovieNameFilter("foo"));
+f.Add(MyCustomFilter());
+
+// pass directly to PbiFilterQuery
+PbiFilterQuery query(MyCustomFilter(), "foo.bam");
+for (const BamRecord& record : query)
+    // ... do stuff ...

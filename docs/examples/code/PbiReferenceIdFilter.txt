@@ -1,0 +1,16 @@
+// single value
+PbiFilter filter{ PbiReferenceIdFilter{ 4 } };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.ReferenceId() == 4);
+}
+
+// whitelist
+vector<int32_t> whitelist = { 0, 1 };
+PbiFilter filter{ PbiReferenceIdFilter{whitelist} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.ReferenceId() == 0 || 
+           record.ReferenceId() == 1);
+}
+

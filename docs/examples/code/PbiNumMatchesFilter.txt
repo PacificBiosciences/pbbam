@@ -1,0 +1,6 @@
+PbiFilter filter{ PbiNumMatchesFilter{2000, Compare::GREATER_THAN_EQUAL} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.NumMatches() >= 2000);
+}
+

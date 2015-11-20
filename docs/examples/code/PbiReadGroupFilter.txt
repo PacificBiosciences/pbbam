@@ -1,0 +1,64 @@
+// -------------------------
+// numeric ID
+// -------------------------
+
+// single value
+PbiFilter filter{ PbiReadGroupFilter{ 2458765 } };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.ReadGroupNumericId() == 2458765);
+}
+
+// whitelist
+vector<int32_t> whitelist = { 2458765, -32143 };
+PbiFilter filter{ PbiReadGroupFilter{whitelist} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.ReadGroupNumericId() == 2458765 ||
+           record.ReadGroupNumericId() == -32143);
+}
+
+// -------------------------
+// printable ID
+// -------------------------
+
+// single value 
+PbiFilter filter{ PbiReadGroupFilter{ "12B33F00" } };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.ReadGroupId() == "12B33F00");
+}
+
+// whitelist
+vector<string> whitelist = { "12B33F00", "123ABC77" };
+PbiFilter filter{ PbiReadGroupFilter{whitelist} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.ReadGroupId() == "12B33F00" ||
+           record.ReadGroupId() == "123ABC77");
+}
+
+
+// -------------------------
+// read group 
+// -------------------------
+
+BamFile file("foo.bam");
+BamHeader header = file.Header();
+assert(header.ReadGroups().size() > 1);
+
+// single value 
+PbiFilter filter{ PbiReadGroupFilter{ header.ReadGroups()[0] } };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.ReadGroup() == header.ReadGroups()[0]);
+}
+
+// whitelist
+vector<ReadGroupInfo> whitelist = { header.ReadGroups()[0], header.ReadGroups()[1] };
+PbiFilter filter{ PbiReadGroupFilter{whitelist} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.ReadGroup() == header.ReadGroups()[0] ||
+           record.ReadGroup() == header.ReadGroups()[1]);
+}

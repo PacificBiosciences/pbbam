@@ -1,0 +1,14 @@
+// single value
+PbiFilter filter{ PbiMovieFilter{ "foo" } };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.MovieName() == "foo");
+}
+
+// whitelist
+vector<string> whitelist = { "foo", "bar" };
+PbiFilter filter{ PbiMovieNameFilter{whitelist} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.MovieName() == "foo" || record.MovieName() == "bar");
+}

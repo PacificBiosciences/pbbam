@@ -1,0 +1,5 @@
+PbiFilterQuery query(PbiAlignedStrandFilter{Strand::FORWARD});
+for (const BamRecord& record : query) {
+    assert(record.AlignedStrand() == Strand::FORWARD);
+}
+

@@ -1,0 +1,15 @@
+// single value
+PbiFilter filter{ PbiReferenceNameFilter{ "chr1" } };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.ReferenceName() == "chr1");
+}
+
+// whitelist
+vector<string> whitelist = { "chr1", "chr5" };
+PbiFilter filter{ PbiReferenceNameFilter{whitelist} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.ReferenceName() == "chr1" ||
+           record.ReferenceName() == "chr5");
+}
