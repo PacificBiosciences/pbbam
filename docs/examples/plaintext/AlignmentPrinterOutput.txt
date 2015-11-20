@@ -1,0 +1,13 @@
+Read        : singleInsertion2
+Reference   : lambda_NEB3011
+
+Read-length : 49
+Concordance : 0.96
+
+5210 : GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGG : 5249
+       |||||||| ||||||||||||||||||| |||||||||||
+   0 : GGCTGCAG-GTACAGCGGTCAGGAGGCCAATTGATGCCGG :   39
+
+5249 : ACTGGCTGAT : 5259
+       ||||||||||
+  39 : ACTGGCTGAT :   49
