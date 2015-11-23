@@ -46,6 +46,6 @@ set( PacBioBAMTest_CPP
     ${PacBioBAM_TestsDir}/src/test_Tags.cpp
     ${PacBioBAM_TestsDir}/src/test_TimeUtils.cpp
     # ${PacBioBAM_TestsDir}/src/test_UnmappedReadsQuery.cpp
+    ${PacBioBAM_TestsDir}/src/test_VirtualPolymeraseCompositeReader.cpp
     ${PacBioBAM_TestsDir}/src/test_ZmwQuery.cpp
-
 )

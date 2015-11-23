@@ -61,7 +61,7 @@ set( PacBioBAM_H
     # exception headers
     ${PacBioBAM_IncludeDir}/pbbam/exception/InvalidSequencingChemistryException.h
 
-    # internal headers
+    # API-internal headers & inline files
     ${PacBioBAM_IncludeDir}/pbbam/internal/Accuracy.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/BamRecord.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/BamRecordBuilder.inl
@@ -98,12 +98,14 @@ set( PacBioBAM_H
 
     # virtual headers
     ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualPolymeraseBamRecord.h
+    ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualPolymeraseCompositeReader.h
     ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualPolymeraseReader.h
     ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualRegion.h
     ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualRegionType.h
     ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualRegionTypeMap.h
     ${PacBioBAM_IncludeDir}/pbbam/virtual/ZmwWhitelistVirtualReader.h
 
+    # library-internal headers
     ${PacBioBAM_SourceDir}/AssertUtils.h
     ${PacBioBAM_SourceDir}/ChemistryTable.h
     ${PacBioBAM_SourceDir}/DataSetIO.h
@@ -177,6 +179,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/TagCollection.cpp
 #    ${PacBioBAM_SourceDir}/UnmappedReadsQuery.cpp
     ${PacBioBAM_SourceDir}/VirtualPolymeraseBamRecord.cpp
+    ${PacBioBAM_SourceDir}/VirtualPolymeraseCompositeReader.cpp
     ${PacBioBAM_SourceDir}/VirtualPolymeraseReader.cpp
     ${PacBioBAM_SourceDir}/VirtualRegionTypeMap.cpp
     ${PacBioBAM_SourceDir}/XmlReader.cpp

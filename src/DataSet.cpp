@@ -151,22 +151,10 @@ vector<BamFile> DataSet::BamFiles(void) const
         // only bother resolving file path if this is a BAM file
         boost::iterator_range<string::const_iterator> bamFound = boost::algorithm::ifind_first(ext.MetaType(), "bam");
         if (!bamFound.empty()) {
-            const string fn = internal::FileUtils::ResolvedFilePath(ext.ResourceId(), path_);
+            const string fn = ResolvePath(ext.ResourceId());
+//            const string fn = internal::FileUtils::ResolvedFilePath(ext.ResourceId(), path_);
             result.push_back(BamFile(fn));
         }
-    }
-    return result;
-}
-
-vector<string> DataSet::ResolvedResourceIds(void) const
-{
-    const PacBio::BAM::ExternalResources& resources = ExternalResources();
-    
-    vector<string> result;
-    result.reserve(resources.Size());
-    for(const ExternalResource& ext : resources) {
-        const string fn = internal::FileUtils::ResolvedFilePath(ext.ResourceId(), path_);
-        result.push_back(fn);
     }
     return result;
 }
@@ -202,6 +190,23 @@ DataSet::TypeEnum DataSet::NameToType(const string& typeName)
     }
     return lookup.at(typeName); // throws if unknown typename
 }
+
+vector<string> DataSet::ResolvedResourceIds(void) const
+{
+    const PacBio::BAM::ExternalResources& resources = ExternalResources();
+
+    vector<string> result;
+    result.reserve(resources.Size());
+    for(const ExternalResource& ext : resources) {
+//        const string fn = ;
+//        const string fn = internal::FileUtils::ResolvedFilePath(ext.ResourceId(), path_);
+        result.push_back(ResolvePath(ext.ResourceId()));
+    }
+    return result;
+}
+
+string DataSet::ResolvePath(const string& originalPath) const
+{ return internal::FileUtils::ResolvedFilePath(originalPath, path_); }
 
 void DataSet::Save(const std::string& outputFilename)
 { DataSetIO::ToFile(d_, outputFilename); }

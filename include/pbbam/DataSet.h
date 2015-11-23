@@ -350,11 +350,14 @@ public:
     /// \}
 
 public:
-    /// \name Resources
+    /// \name Resource Handling
     /// \{
 
-    /// \brief Returns this dataset's %BAM resources, with relative paths
-    ///        already resolved.
+    /// \brief Returns this dataset's primary %BAM resources, with relative
+    ///        filepaths already resolved.
+    ///
+    /// Primary resources are those listed as top-level %ExternalResources, not
+    /// associated files (indices, references, scraps %BAMs, etc.).
     ///
     /// \returns vector of BamFiles
     ///
@@ -362,12 +365,23 @@ public:
     ///
     std::vector<BamFile> BamFiles(void) const;
 
-    /// \brief Returns this dataset's external resource filepaths, with relative
+    /// \brief Returns all primary external resource filepaths, with relative
     ///        paths resolved.
     ///
+    /// Primary resources are those listed as top-level %ExternalResources, not
+    /// associated files (indices, references, scraps %BAMs, etc.).
+    ///
+    /// \sa ResolvePath
+    ///
+    /// \returns resourceIds
+    ///
+    std::vector<std::string> ResolvedResourceIds(void) const;
+
+    /// \brief Resolves a filepath (that may be relative to the dataset).
+    ///
     /// A DataSet's resources may be described using absolute filepaths or with
-    /// relative paths. For absolute paths, nothing is changed from the input
-    /// XML. For relative paths, these are resolved using the DataSet's own path
+    /// relative paths. For absolute paths, nothing is changed from the input.
+    /// For relative paths, these are resolved using the DataSet's own path
     /// as a starting point. A DataSet's own path will be one of:\n
     ///  1 - the location of its XML or %BAM input file, e.g. created using
     ///      DataSet("foo.xml") or DataSet("foo.bam")\n
@@ -375,9 +389,10 @@ public:
     ///      construction methods { DataSet(), DataSet(type),
     ///      DataSet("foo.fofn") }\n
     ///
-    /// \returns resourceIds
+    /// \param[in] originalPath     input file path (absolute or relative)
+    /// \returns resolved path
     ///
-    std::vector<std::string> ResolvedResourceIds(void) const;
+    std::string ResolvePath(const std::string& originalPath) const;
 
     /// \returns sequence chemistry info for all read groups in this dataset
     ///
