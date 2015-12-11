@@ -48,6 +48,8 @@
 #include "pbbam/BamRecord.h"
 #include "pbbam/Config.h"
 #include "pbbam/EntireFileQuery.h"
+#include "pbbam/PbiFilter.h"
+#include "pbbam/PbiFilterQuery.h"
 #include "pbbam/virtual/VirtualPolymeraseBamRecord.h"
 
 namespace PacBio {
@@ -63,20 +65,35 @@ public:
     /// \{
 
     /// \brief Creates a reader that will operate on a primary %BAM file (e.g. subread data)
-    ///        and a scraps file.
+    ///        and a scraps file, consuming all reads.
     ///
-	/// \param[in] primaryBamFilePath hqregion.bam or subreads.bam file path
+    /// \param[in] primaryBamFilePath hqregion.bam or subreads.bam file path
     /// \param[in] scrapsBamFilePath  scraps.bam file path
     ///
     VirtualPolymeraseReader(const std::string& primaryBamFilePath,
                             const std::string& scrapsBamFilePath);
+
+    /// \brief Creates a reader that will operate on a primary %BAM file (e.g. subread data)
+    ///        and a scraps file, respecting the provided PBI filter.
+    ///
+    /// \note All %BAM files must have a corresponding ".pbi" index file to use
+    ///       the filter. You may need to call BamFile::EnsurePacBioIndexExists
+    ///       before constructing the reader.
+    ///
+    /// \param[in] primaryBamFilePath hqregion.bam or subreads.bam file path
+    /// \param[in] scrapsBamFilePath  scraps.bam file path
+    /// \param[in] filter PBI filter criteria
+    ///
+    VirtualPolymeraseReader(const std::string& primaryBamFilePath,
+                            const std::string& scrapsBamFilePath,
+                            const PbiFilter& filter);
 
     VirtualPolymeraseReader(void) = delete;
     VirtualPolymeraseReader(const VirtualPolymeraseReader&) = delete;
     VirtualPolymeraseReader(VirtualPolymeraseReader&&) = delete;
     VirtualPolymeraseReader& operator=(const VirtualPolymeraseReader&) = delete;
     VirtualPolymeraseReader& operator=(VirtualPolymeraseReader&&) = delete;
-    ~VirtualPolymeraseReader(void) = default;
+    ~VirtualPolymeraseReader(void);
 
     /// \}
 
@@ -110,18 +127,8 @@ public:
     /// \}
 
 private:
-    const std::string                primaryBamFilePath_;
-    const std::string                scrapsBamFilePath_;
-
-    std::unique_ptr<BamFile>         primaryBamFile_;
-    std::unique_ptr<BamFile>         scrapsBamFile_;
-    std::unique_ptr<EntireFileQuery> primaryQuery_;
-    std::unique_ptr<EntireFileQuery> scrapsQuery_;
-
-    EntireFileQuery::iterator        primaryIt_;
-    EntireFileQuery::iterator        scrapsIt_;
-
-    std::unique_ptr<BamHeader>       polyHeader_;
+    struct VirtualPolymeraseReaderPrivate;
+    std::unique_ptr<VirtualPolymeraseReaderPrivate> d_;
 };
 
 } // namespace BAM

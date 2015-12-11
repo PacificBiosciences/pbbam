@@ -10,9 +10,13 @@ series.
 
 ## Active
 
+## [0.3.2] - 2015-12-10
+
 ### Added 
-- Support for ReadGroupInfo sequencing chemistry data.
-- VirtualPolymeraseCompositeReader - for re-stitching records, across multiple resources (e.g. from DataSetXML)
+- Support for ReadGroupInfo sequencing chemistry data. InvalidSequencingChemistryException thrown if an 
+  unsupported combination is encountered.
+- VirtualPolymeraseCompositeReader - for re-stitching records, across multiple resources (e.g. from DataSetXML).
+  Reader respects DataSet filter criteria.
 
 ## [0.3.1] - 2015-10-30
 

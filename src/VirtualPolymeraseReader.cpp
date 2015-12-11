@@ -46,79 +46,240 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
+using namespace std;
 
-VirtualPolymeraseReader::VirtualPolymeraseReader(
-    const std::string& primaryBamFilePath, const std::string& scrapsBamFilePath)
-    : primaryBamFilePath_(primaryBamFilePath)
-    , scrapsBamFilePath_(scrapsBamFilePath)
+namespace PacBio {
+namespace BAM {
+namespace internal {
+
+class IBackend
 {
-    primaryBamFile_ = std::unique_ptr<BamFile>(new BamFile(primaryBamFilePath_));
-    primaryQuery_   = std::unique_ptr<EntireFileQuery>(new EntireFileQuery(*primaryBamFile_));
-    primaryIt_      = primaryQuery_->begin();
-
-    scrapsBamFile_  = std::unique_ptr<BamFile>(new BamFile(scrapsBamFilePath_));
-    scrapsQuery_    = std::unique_ptr<EntireFileQuery>(new EntireFileQuery(*scrapsBamFile_));
-    scrapsIt_       = scrapsQuery_->begin();
-
-    polyHeader_     = std::unique_ptr<BamHeader>(
-                        new BamHeader(primaryBamFile_->Header().ToSam()));
-
-    auto readGroups = polyHeader_->ReadGroups();
-    if (readGroups.empty())
-        throw std::runtime_error("Bam header of the primary bam has no read groups.");
-    readGroups[0].ReadType("POLYMERASE");
-    readGroups[0].Id(readGroups[0].MovieName(), "POLYMERASE");
-    if (readGroups.size() > 1)
+protected:
+    IBackend(const string& primaryBamFilePath,
+             const string& scrapsBamFilePath)
     {
-        std::vector<ReadGroupInfo> singleGroup;
-        singleGroup.emplace_back(std::move(readGroups[0]));
-        readGroups = std::move(singleGroup);
-        polyHeader_->ClearReadGroups();
+        primaryBamFile_ = std::unique_ptr<BamFile>(new BamFile(primaryBamFilePath));
+        scrapsBamFile_  = std::unique_ptr<BamFile>(new BamFile(scrapsBamFilePath));
+
+        polyHeader_     = std::unique_ptr<BamHeader>(
+                            new BamHeader(primaryBamFile_->Header().ToSam()));
+
+        auto readGroups = polyHeader_->ReadGroups();
+        if (readGroups.empty())
+            throw std::runtime_error("Bam header of the primary bam has no read groups.");
+        readGroups[0].ReadType("POLYMERASE");
+        readGroups[0].Id(readGroups[0].MovieName(), "POLYMERASE");
+        if (readGroups.size() > 1)
+        {
+            std::vector<ReadGroupInfo> singleGroup;
+            singleGroup.emplace_back(std::move(readGroups[0]));
+            readGroups = std::move(singleGroup);
+            polyHeader_->ClearReadGroups();
+        }
+        polyHeader_->ReadGroups(readGroups);
     }
-    polyHeader_->ReadGroups(readGroups);
-}
+
+public:
+    ~IBackend(void) { }
+
+public:
+    virtual bool HasNext(void) =0;
+    virtual std::vector<BamRecord> NextRaw(void) =0;
+
+    const BamHeader& PolyHeader(void) const
+    { return *polyHeader_; }
+
+    BamHeader PrimaryHeader(void) const
+    { return primaryBamFile_->Header(); }
+
+    BamHeader ScrapsHeader(void) const
+    { return scrapsBamFile_->Header(); }
+
+protected:
+    std::unique_ptr<BamFile>   primaryBamFile_;
+    std::unique_ptr<BamFile>   scrapsBamFile_;
+    std::unique_ptr<BamHeader> polyHeader_;
+};
+
+class EntireFileBackend : public IBackend
+{
+public:
+    EntireFileBackend(const string& primaryBamFilepath,
+                      const string& scrapsBamFilepath)
+        : IBackend(primaryBamFilepath, scrapsBamFilepath)
+    {
+        primaryQuery_   = std::unique_ptr<EntireFileQuery>(new EntireFileQuery(*primaryBamFile_));
+        primaryIt_      = primaryQuery_->begin();
+
+        scrapsQuery_    = std::unique_ptr<EntireFileQuery>(new EntireFileQuery(*scrapsBamFile_));
+        scrapsIt_       = scrapsQuery_->begin();
+    }
+
+    ~EntireFileBackend(void) { }
+
+public:
+    bool HasNext(void)
+    {
+        // Return true until both iterators are at the end of the query
+        return primaryIt_ != primaryQuery_->end() || scrapsIt_ != scrapsQuery_->end();
+    }
+
+    std::vector<BamRecord> NextRaw(void)
+    {
+        std::vector<BamRecord> bamRecordVec;
+
+        // Current hole number, the smallest of scraps and primary.
+        // It can be that the next ZMW is scrap only.
+        int currentHoleNumber;
+        if (primaryIt_ == primaryQuery_->end())
+            currentHoleNumber = (*scrapsIt_).HoleNumber();
+        else if (scrapsIt_ == scrapsQuery_->end())
+            currentHoleNumber = (*primaryIt_).HoleNumber();
+        else
+            currentHoleNumber = std::min((*primaryIt_).HoleNumber(), (*scrapsIt_).HoleNumber());
+
+        // collect subreads or hqregions
+        while (primaryIt_ != primaryQuery_->end() && currentHoleNumber == (*primaryIt_).HoleNumber())
+            bamRecordVec.push_back(*primaryIt_++);
+
+        // collect scraps
+        while (scrapsIt_ != scrapsQuery_->end() && currentHoleNumber == (*scrapsIt_).HoleNumber())
+            bamRecordVec.push_back(*scrapsIt_++);
+
+        return bamRecordVec;
+    }
+
+    std::unique_ptr<EntireFileQuery> primaryQuery_;
+    std::unique_ptr<EntireFileQuery> scrapsQuery_;
+    EntireFileQuery::iterator        primaryIt_;
+    EntireFileQuery::iterator        scrapsIt_;
+};
+
+class PbiFilterBackend : public IBackend
+{
+public:
+    PbiFilterBackend(const string& primaryBamFilePath,
+                     const string& scrapsBamFilePath,
+                     const PbiFilter& filter)
+        : IBackend(primaryBamFilePath, scrapsBamFilePath)
+    {
+        primaryQuery_   = std::unique_ptr<PbiFilterQuery>(new PbiFilterQuery(filter, *primaryBamFile_));
+        primaryIt_      = primaryQuery_->begin();
+
+        scrapsQuery_    = std::unique_ptr<PbiFilterQuery>(new PbiFilterQuery(filter, *scrapsBamFile_));
+        scrapsIt_       = scrapsQuery_->begin();
+    }
+
+    ~PbiFilterBackend(void) { }
+
+public:
+    bool HasNext(void)
+    {
+        // Return true until both iterators are at the end of the query
+        return primaryIt_ != primaryQuery_->end() || scrapsIt_ != scrapsQuery_->end();
+    }
+
+    std::vector<BamRecord> NextRaw(void)
+    {
+        std::vector<BamRecord> bamRecordVec;
+
+        // Current hole number, the smallest of scraps and primary.
+        // It can be that the next ZMW is scrap only.
+        int currentHoleNumber;
+        if (primaryIt_ == primaryQuery_->end())
+            currentHoleNumber = (*scrapsIt_).HoleNumber();
+        else if (scrapsIt_ == scrapsQuery_->end())
+            currentHoleNumber = (*primaryIt_).HoleNumber();
+        else
+            currentHoleNumber = std::min((*primaryIt_).HoleNumber(), (*scrapsIt_).HoleNumber());
+
+        // collect subreads or hqregions
+        while (primaryIt_ != primaryQuery_->end() && currentHoleNumber == (*primaryIt_).HoleNumber())
+            bamRecordVec.push_back(*primaryIt_++);
+
+        // collect scraps
+        while (scrapsIt_ != scrapsQuery_->end() && currentHoleNumber == (*scrapsIt_).HoleNumber())
+            bamRecordVec.push_back(*scrapsIt_++);
+
+        return bamRecordVec;
+    }
+
+private:
+    std::unique_ptr<PbiFilterQuery> primaryQuery_;
+    std::unique_ptr<PbiFilterQuery> scrapsQuery_;
+    PbiFilterQuery::iterator        primaryIt_;
+    PbiFilterQuery::iterator        scrapsIt_;
+};
+
+} // namespace internal
+
+struct VirtualPolymeraseReader::VirtualPolymeraseReaderPrivate
+{
+    VirtualPolymeraseReaderPrivate(const string& primaryBamFilepath,
+                                   const string& scrapsBamFilePath,
+                                   const PbiFilter& filter)
+        : backend_(nullptr)
+    {
+        if (filter.IsEmpty()) {
+            backend_.reset(new internal::EntireFileBackend(primaryBamFilepath,
+                                                           scrapsBamFilePath));
+        } else {
+            backend_.reset(new internal::PbiFilterBackend(primaryBamFilepath,
+                                                          scrapsBamFilePath,
+                                                          filter));
+        }
+    }
+
+    bool HasNext(void)
+    { return backend_->HasNext(); }
+
+    std::vector<BamRecord> NextRaw(void)
+    { return backend_->NextRaw(); }
+
+    const BamHeader& PolyHeader(void) const
+    { return backend_->PolyHeader(); }
+
+    BamHeader PrimaryHeader(void) const
+    { return backend_->PrimaryHeader(); }
+
+    BamHeader ScrapsHeader(void) const
+    { return backend_->ScrapsHeader(); }
+
+    std::unique_ptr<internal::IBackend> backend_;
+};
+
+} // namespace BAM
+} // namespace PacBio
+
+VirtualPolymeraseReader::VirtualPolymeraseReader(const std::string& primaryBamFilePath,
+                                                 const std::string& scrapsBamFilePath)
+    : d_(new VirtualPolymeraseReaderPrivate(primaryBamFilePath, scrapsBamFilePath, PbiFilter()))
+{ }
+
+VirtualPolymeraseReader::VirtualPolymeraseReader(const std::string& primaryBamFilePath,
+                                                 const std::string& scrapsBamFilePath,
+                                                 const PbiFilter& filter)
+    : d_(new VirtualPolymeraseReaderPrivate(primaryBamFilePath, scrapsBamFilePath, filter))
+{ }
+
+VirtualPolymeraseReader::~VirtualPolymeraseReader(void) { }
 
 bool VirtualPolymeraseReader::HasNext(void)
-{
-    // Return true until both iterators are at the end of the query
-    return primaryIt_ != primaryQuery_->end() || scrapsIt_ != scrapsQuery_->end();
-}
+{ return d_->HasNext(); }
 
 // This method is not thread safe
 VirtualPolymeraseBamRecord VirtualPolymeraseReader::Next(void)
 {
     auto bamRecordVec = NextRaw();
-    VirtualPolymeraseBamRecord stitched(std::move(bamRecordVec), *polyHeader_);
+    VirtualPolymeraseBamRecord stitched(std::move(bamRecordVec), d_->PolyHeader());
     return std::move(stitched);
 }
 
 std::vector<BamRecord> VirtualPolymeraseReader::NextRaw(void)
-{
-    std::vector<BamRecord> bamRecordVec;
-
-    // Current hole number, the smallest of scraps and primary.
-    // It can be that the next ZMW is scrap only.
-    int currentHoleNumber;
-    if (primaryIt_ == primaryQuery_->end())
-        currentHoleNumber = (*scrapsIt_).HoleNumber();
-    else if (scrapsIt_ == scrapsQuery_->end())
-        currentHoleNumber = (*primaryIt_).HoleNumber();
-    else
-        currentHoleNumber = std::min((*primaryIt_).HoleNumber(), (*scrapsIt_).HoleNumber());
-
-    // collect subreads or hqregions
-    while (primaryIt_ != primaryQuery_->end() && currentHoleNumber == (*primaryIt_).HoleNumber())
-        bamRecordVec.push_back(*primaryIt_++);
-
-    // collect scraps
-    while (scrapsIt_ != scrapsQuery_->end() && currentHoleNumber == (*scrapsIt_).HoleNumber())
-        bamRecordVec.push_back(*scrapsIt_++);
-
-    return bamRecordVec;
-}
+{ return d_->NextRaw(); }
 
 BamHeader VirtualPolymeraseReader::PrimaryHeader(void) const
-{ return primaryBamFile_->Header(); }
+{ return d_->PrimaryHeader(); }
 
 BamHeader VirtualPolymeraseReader::ScrapsHeader(void) const
-{ return scrapsBamFile_->Header(); }
+{ return d_->ScrapsHeader(); }

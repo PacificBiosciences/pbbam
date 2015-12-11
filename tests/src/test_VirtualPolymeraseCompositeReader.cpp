@@ -99,3 +99,34 @@ TEST(VirtualPolymeraseCompositeReaderTest, EmptyDataSetOk)
     VirtualPolymeraseCompositeReader reader(DataSet{});
     EXPECT_FALSE(reader.HasNext());
 }
+
+TEST(VirtualPolymeraseCompositeReaderTest, FilteredDataSetOk)
+{
+    // dataset contains these resources (subreads/scraps + hqregion/scraps BAMs)
+    const string primaryFn1 = tests::Data_Dir + "/polymerase/production.subreads.bam";
+    const string scrapsFn1  = tests::Data_Dir + "/polymerase/production.scraps.bam";
+    const string primaryFn2 = tests::Data_Dir + "/polymerase/internal.subreads.bam";
+    const string scrapsFn2  = tests::Data_Dir + "/polymerase/internal.scraps.bam";
+    const string primaryFn3 = tests::Data_Dir + "/polymerase/production_hq.hqregion.bam";
+    const string scrapsFn3  = tests::Data_Dir + "/polymerase/production_hq.scraps.bam";
+    const size_t totalRecords =
+            tests::NumVirtualRecords(primaryFn1, scrapsFn1) +
+            tests::NumVirtualRecords(primaryFn2, scrapsFn2) +
+            tests::NumVirtualRecords(primaryFn3, scrapsFn3);
+    EXPECT_EQ(3, totalRecords); // 1 per pair
+
+    // our filter will remove the 2 "production" BAM pairs
+    // using a ZMW filter that only the "internal" pair should pass
+    const string datasetFn = tests::Data_Dir +
+            "/polymerase/filtered_resources.subread.dataset.xml";
+
+    DataSet ds(datasetFn);
+    VirtualPolymeraseCompositeReader reader(ds);
+    size_t numObservedRecords = 0;
+    while (reader.HasNext()) {
+        const auto record = reader.Next();
+        (void)record;
+        ++numObservedRecords;
+    }
+    EXPECT_EQ(1, numObservedRecords);
+}

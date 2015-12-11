@@ -43,6 +43,7 @@
 #define VIRTUALPOLYMERASECOMPOSITEREADER_H
 
 #include "pbbam/DataSet.h"
+#include "pbbam/PbiFilter.h"
 #include "pbbam/virtual/VirtualPolymeraseReader.h"
 #include <deque>
 #include <memory>
@@ -98,6 +99,7 @@ public:
 private:
     std::deque< std::pair<std::string, std::string> > sources_;
     std::unique_ptr<VirtualPolymeraseReader> currentReader_;
+    PbiFilter filter_;
 
 private:
     void OpenNextReader(void);

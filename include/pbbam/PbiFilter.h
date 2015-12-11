@@ -307,6 +307,9 @@ public:
     ///
     PbiFilter& Add(std::vector<PbiFilter>&& filters);
 
+    /// \returns true if this filter has no child filters.
+    bool IsEmpty(void) const;
+
     /// \}
 
 public:

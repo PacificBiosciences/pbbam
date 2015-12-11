@@ -316,6 +316,9 @@ inline PbiFilter& PbiFilter::Add(std::vector<PbiFilter>&& filters)
     return *this;
 }
 
+inline bool PbiFilter::IsEmpty(void) const
+{ return d_->filters_.empty(); }
+
 inline IndexList PbiFilter::Lookup(const PacBio::BAM::PbiIndex& idx) const
 { return d_->Lookup(idx); }
 

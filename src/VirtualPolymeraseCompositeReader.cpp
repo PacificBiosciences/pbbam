@@ -47,6 +47,7 @@ using namespace std;
 
 VirtualPolymeraseCompositeReader::VirtualPolymeraseCompositeReader(const DataSet& dataset)
     : currentReader_(nullptr)
+    , filter_(PbiFilter::FromDataSet(dataset))
 {
     // set up source queue
     string primaryFn;
@@ -137,7 +138,8 @@ void VirtualPolymeraseCompositeReader::OpenNextReader(void)
         sources_.pop_front();
 
         currentReader_.reset(new VirtualPolymeraseReader(nextSource.first,
-                                                         nextSource.second));
+                                                         nextSource.second,
+                                                         filter_));
         if (currentReader_->HasNext())
             return;
     }
