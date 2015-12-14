@@ -6,7 +6,8 @@ cmake_policy(SET CMP0048 NEW)  # lets us set version in project()
 project(PacBioBAM VERSION 0.3.2 LANGUAGES CXX C)
 cmake_minimum_required(VERSION 3.0)
 
-# project version
+# project name & version
+set(PacBioBAM_NAME pbbam)
 set(PacBioBAM_VERSION
   "${PacBioBAM_VERSION_MAJOR}.${PacBioBAM_VERSION_MINOR}.${PacBioBAM_VERSION_PATCH}"
 )
