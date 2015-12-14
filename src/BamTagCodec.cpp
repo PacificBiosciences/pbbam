@@ -365,6 +365,7 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
         default:
             PB_ASSERT_OR_RETURN_VALUE(false, Tag());
     }
+    return Tag(); // to avoid compiler warning
 }
 
 vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag,
@@ -510,4 +511,5 @@ uint8_t BamTagCodec::TagTypeCode(const Tag& tag,
         default:
             PB_ASSERT_OR_RETURN_VALUE(false, 0);
     }
+    return 0; // to avoid compiler warning
 }
