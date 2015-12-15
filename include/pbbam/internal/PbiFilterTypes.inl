@@ -40,6 +40,8 @@
 // Author: Derek Barnett
 
 #include "pbbam/PbiFilterTypes.h"
+#include <cassert>
+#include <stdexcept>
 
 namespace PacBio {
 namespace BAM {
@@ -68,6 +70,45 @@ inline FilterBase<T>::FilterBase(std::vector<T>&& values)
     : multiValue_(std::move(values))
 { }
 
+template<typename T>
+inline bool FilterBase<T>::CompareHelper(const T& lhs) const
+{
+    if (multiValue_ == boost::none)
+        return CompareSingleHelper(lhs);
+    else
+        return CompareMultiHelper(lhs);
+}
+
+template<typename T>
+inline bool FilterBase<T>::CompareMultiHelper(const T& lhs) const
+{
+    // check provided value against all filter criteria,
+    // return true on any exact match
+    auto iter = multiValue_.get().cbegin();
+    const auto end  = multiValue_.get().cend();
+    for (; iter != end; ++iter) {
+        if (*iter == lhs)
+            return true;
+    }
+    return false; // no matches
+}
+
+template<typename T>
+inline bool FilterBase<T>::CompareSingleHelper(const T& lhs) const
+{
+    switch(cmp_) {
+        case Compare::EQUAL:              return lhs == value_;
+        case Compare::LESS_THAN:          return lhs < value_;
+        case Compare::LESS_THAN_EQUAL:    return lhs <= value_;
+        case Compare::GREATER_THAN:       return lhs > value_;
+        case Compare::GREATER_THAN_EQUAL: return lhs >= value_;
+        case Compare::NOT_EQUAL:          return lhs != value_;
+        default:
+            assert(false);
+            throw std::runtime_error("unsupported compare type requested");
+    }
+}
+
 // BarcodeDataFilterBase
 
 template<typename T, BarcodeLookupData::Field field>
@@ -91,12 +132,18 @@ inline BarcodeDataFilterBase<T, field>::BarcodeDataFilterBase(std::vector<T>&& v
 { }
 
 template<typename T, BarcodeLookupData::Field field>
-inline IndexList BarcodeDataFilterBase<T, field>::Lookup(const PbiIndex& index) const
+inline bool BarcodeDataFilterBase<T, field>::BarcodeDataFilterBase::Accepts(const PbiRawData& idx,
+                                           const size_t row) const
 {
-    if (FilterBase<T>::multiValue_ == boost::none)
-        return index.BarcodeData().Indices(field, FilterBase<T>::value_, FilterBase<T>::cmp_);
-    else
-        return index.BarcodeData().IndicesMulti(field, FilterBase<T>::multiValue_.get());
+    const PbiRawBarcodeData& barcodeData = idx.BarcodeData();
+    switch (field) {
+        case BarcodeLookupData::BC_FORWARD: return FilterBase<T>::CompareHelper(barcodeData.bcForward_.at(row));
+        case BarcodeLookupData::BC_REVERSE: return FilterBase<T>::CompareHelper(barcodeData.bcReverse_.at(row));
+        case BarcodeLookupData::BC_QUALITY: return FilterBase<T>::CompareHelper(barcodeData.bcQual_.at(row));
+        default:
+            assert(false);
+            throw std::runtime_error("unsupported BarcodeData field requested");
+    }
 }
 
 // BasicDataFilterBase
@@ -122,15 +169,22 @@ inline BasicDataFilterBase<T, field>::BasicDataFilterBase(std::vector<T>&& value
 { }
 
 template<typename T, BasicLookupData::Field field>
-inline IndexList BasicDataFilterBase<T, field>::Lookup(const PbiIndex& index) const
+inline bool BasicDataFilterBase<T, field>::BasicDataFilterBase::Accepts(const PbiRawData& idx,
+                                                                        const size_t row) const
 {
-    if (FilterBase<T>::multiValue_ == boost::none)
-        return index.BasicData().Indices(field, FilterBase<T>::value_, FilterBase<T>::cmp_);
-    else
-        return index.BasicData().IndicesMulti(field, FilterBase<T>::multiValue_.get());
+    const PbiRawBasicData& basicData = idx.BasicData();
+    switch (field) {
+        case BasicLookupData::RG_ID:        return FilterBase<T>::CompareHelper(basicData.rgId_.at(row));
+        case BasicLookupData::Q_START:      return FilterBase<T>::CompareHelper(basicData.qStart_.at(row));
+        case BasicLookupData::Q_END:        return FilterBase<T>::CompareHelper(basicData.qEnd_.at(row));
+        case BasicLookupData::ZMW:          return FilterBase<T>::CompareHelper(basicData.holeNumber_.at(row));
+        case BasicLookupData::READ_QUALITY: return FilterBase<T>::CompareHelper(basicData.readQual_.at(row));
+        case BasicLookupData::CONTEXT_FLAG: return FilterBase<T>::CompareHelper(basicData.ctxtFlag_.at(row));
+        default:
+            assert(false);
+            throw std::runtime_error("unsupported BasicData field requested");
+    }
 }
-
-// MappedDataFilterBase
 
 template<typename T, MappedLookupData::Field field>
 inline MappedDataFilterBase<T, field>::MappedDataFilterBase(const T& value, const Compare::Type cmp)
@@ -152,13 +206,35 @@ inline MappedDataFilterBase<T, field>::MappedDataFilterBase(std::vector<T>&& val
     : FilterBase<T>(std::move(values))
 { }
 
-template<typename T, MappedLookupData::Field field>
-inline IndexList MappedDataFilterBase<T, field>::Lookup(const PbiIndex& index) const
+template<>
+inline bool MappedDataFilterBase<Strand, MappedLookupData::STRAND>::MappedDataFilterBase::Accepts(const PbiRawData& idx,
+                                                                                                  const size_t row) const
 {
-    if (FilterBase<T>::multiValue_ == boost::none)
-        return index.MappedData().Indices(field, FilterBase<T>::value_, FilterBase<T>::cmp_);
-    else
-        return index.MappedData().IndicesMulti(field, FilterBase<T>::multiValue_.get());
+    const PbiRawMappedData& mappedData = idx.MappedData();
+    const Strand strand = (mappedData.revStrand_.at(row) == 1 ? Strand::REVERSE : Strand::FORWARD);
+    return FilterBase<Strand>::CompareHelper(strand);
+}
+
+template<typename T, MappedLookupData::Field field>
+inline bool MappedDataFilterBase<T, field>::MappedDataFilterBase::Accepts(const PbiRawData& idx,
+                                                                          const size_t row) const
+{
+    const PbiRawMappedData& mappedData = idx.MappedData();
+    switch (field) {
+        case MappedLookupData::T_ID:        return FilterBase<T>::CompareHelper(mappedData.tId_.at(row));
+        case MappedLookupData::T_START:     return FilterBase<T>::CompareHelper(mappedData.tStart_.at(row));
+        case MappedLookupData::T_END:       return FilterBase<T>::CompareHelper(mappedData.tEnd_.at(row));
+        case MappedLookupData::A_START:     return FilterBase<T>::CompareHelper(mappedData.aStart_.at(row));
+        case MappedLookupData::A_END:       return FilterBase<T>::CompareHelper(mappedData.aEnd_.at(row));
+        case MappedLookupData::N_M:         return FilterBase<T>::CompareHelper(mappedData.nM_.at(row));
+        case MappedLookupData::N_MM:        return FilterBase<T>::CompareHelper(mappedData.nMM_.at(row));
+        case MappedLookupData::N_DEL:       return FilterBase<T>::CompareHelper(mappedData.NumDeletedBasesAt(row));
+        case MappedLookupData::N_INS:       return FilterBase<T>::CompareHelper(mappedData.NumInsertedBasesAt(row));
+        case MappedLookupData::MAP_QUALITY: return FilterBase<T>::CompareHelper(mappedData.mapQV_.at(row));
+        default:
+            assert(false);
+            throw std::runtime_error("unsupported MappedData field requested");
+    }
 }
 
 } // namespace internal
@@ -217,8 +293,8 @@ inline PbiBarcodeFilter::PbiBarcodeFilter(std::vector<uint16_t> &&whitelist)
                       }
 { }
 
-inline IndexList PbiBarcodeFilter::Lookup(const PbiIndex& idx) const
-{ return compositeFilter_.Lookup(idx); }
+inline bool PbiBarcodeFilter::Accepts(const PbiRawData& idx, const size_t row) const
+{ return compositeFilter_.Accepts(idx, row); }
 
 // PbiBarcodeForwardFilter
 
@@ -267,8 +343,8 @@ inline PbiBarcodesFilter::PbiBarcodesFilter(const uint16_t bcForward, const uint
                       }
 { }
 
-inline IndexList PbiBarcodesFilter::Lookup(const PbiIndex& idx) const
-{ return compositeFilter_.Lookup(idx); }
+inline bool PbiBarcodesFilter::Accepts(const PbiRawData& idx, const size_t row) const
+{ return compositeFilter_.Accepts(idx, row); }
 
 // PbiIdentityFilter
 
@@ -285,17 +361,8 @@ inline PbiMapQualityFilter::PbiMapQualityFilter(const uint8_t mapQual, const Com
 
 // PbiMovieNameFilter
 
-inline PbiMovieNameFilter::PbiMovieNameFilter(const std::string& movieName)
-    : internal::FilterBase<std::string>(movieName, Compare::EQUAL)
-{ }
-
-inline PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& whitelist)
-    : internal::FilterBase<std::string>(whitelist)
-{ }
-
-inline PbiMovieNameFilter::PbiMovieNameFilter(std::vector<std::string>&& whitelist)
-    : internal::FilterBase<std::string>(std::move(whitelist))
-{ }
+inline bool PbiMovieNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
+{ return compositeFilter_.Accepts(idx, row); }
 
 // PbiNumDeletedBasesFilter
 
@@ -335,17 +402,8 @@ inline PbiQueryLengthFilter::PbiQueryLengthFilter(const int32_t length, const Co
 
 // PbiQueryNameFilter
 
-inline PbiQueryNameFilter::PbiQueryNameFilter(const std::string& qname)
-    : internal::FilterBase<std::string>(qname, Compare::EQUAL)
-{ }
-
-inline PbiQueryNameFilter::PbiQueryNameFilter(const std::vector<std::string>& whitelist)
-    : internal::FilterBase<std::string>(whitelist)
-{ }
-
-inline PbiQueryNameFilter::PbiQueryNameFilter(std::vector<std::string>&& whitelist)
-    : internal::FilterBase<std::string>(std::move(whitelist))
-{ }
+inline bool PbiQueryNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
+{ return compositeFilter_.Accepts(idx, row); }
 
 // PbiQueryStartFilter
 
@@ -431,28 +489,6 @@ inline PbiReferenceIdFilter::PbiReferenceIdFilter(const std::vector<int32_t>& wh
 
 inline PbiReferenceIdFilter::PbiReferenceIdFilter(std::vector<int32_t>&& whitelist)
     : internal::MappedDataFilterBase<int32_t, MappedLookupData::T_ID>(std::move(whitelist))
-{ }
-
-// PbiReferenceNameFilter
-
-inline PbiReferenceNameFilter::PbiReferenceNameFilter(const std::string& rname,
-                                                      const Compare::Type cmp)
-    : internal::FilterBase<std::string>(rname, cmp)
-{
-    if (cmp != Compare::EQUAL && cmp != Compare::NOT_EQUAL) {
-        auto msg = std::string{ "Compare type: " };
-        msg += Compare::TypeToName(cmp);
-        msg += " not supported for PbiReferenceNameFilter (use one of Compare::EQUAL or Compare::NOT_EQUAL).";
-        throw std::runtime_error(msg);
-    }
-}
-
-inline PbiReferenceNameFilter::PbiReferenceNameFilter(const std::vector<std::string>& whitelist)
-    : internal::FilterBase<std::string>(whitelist)
-{ }
-
-inline PbiReferenceNameFilter::PbiReferenceNameFilter(std::vector<std::string>&& whitelist)
-    : internal::FilterBase<std::string>(std::move(whitelist))
 { }
 
 // PbiReferenceStartFilter

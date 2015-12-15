@@ -148,8 +148,8 @@ public:
     /// \returns the current filter active on this reader
     const PbiFilter& Filter(void) const;
 
-    /// \returns the reader's underlying index data
-    const PbiIndex& Index(void) const;
+//    /// \returns the reader's underlying index data
+//    const PbiIndex& Index(void) const;
 
 public:
     /// \brief Sets a new filter on the reader.

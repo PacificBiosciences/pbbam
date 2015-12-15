@@ -60,16 +60,20 @@ namespace internal {
 template<typename T>
 struct FilterBase
 {
+public:
+    T value_;
+    boost::optional<std::vector<T> > multiValue_;
+    Compare::Type cmp_;
 protected:
     FilterBase(const T& value, const Compare::Type cmp);
     FilterBase(T&& value, const Compare::Type cmp);
     FilterBase(const std::vector<T>& values);
     FilterBase(std::vector<T>&& values);
-
-public:
-    T value_;
-    boost::optional<std::vector<T> > multiValue_;
-    Compare::Type cmp_;
+protected:
+    bool CompareHelper(const T& lhs) const;
+private:
+    bool CompareSingleHelper(const T& lhs) const;
+    bool CompareMultiHelper(const T& lhs) const;
 };
 
 /// \internal
@@ -85,7 +89,7 @@ protected:
     BarcodeDataFilterBase(const std::vector<T>& values);
     BarcodeDataFilterBase(std::vector<T>&& values);
 public:
-    IndexList Lookup(const PbiIndex& index) const;
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
 };
 
 /// \internal
@@ -101,7 +105,7 @@ protected:
     BasicDataFilterBase(const std::vector<T>& values);
     BasicDataFilterBase(std::vector<T>&& values);
 public:
-    IndexList Lookup(const PbiIndex& index) const;
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
 };
 
 /// \internal
@@ -117,7 +121,7 @@ protected:
     MappedDataFilterBase(const std::vector<T>& values);
     MappedDataFilterBase(std::vector<T>&& values);
 public:
-    IndexList Lookup(const PbiIndex& index) const;
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
 };
 
 } // namespace internal
@@ -165,7 +169,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    IndexList Lookup(const PbiIndex& idx) const;
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
 };
 
 /// \brief The PbiAlignedStartFilter class provides a PbiFilter-compatible
@@ -253,7 +257,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    IndexList Lookup(const PbiIndex& idx) const;
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
 
 private:
     PbiFilter compositeFilter_;
@@ -396,7 +400,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    IndexList Lookup(const PbiIndex& idx) const;
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
 
 private:
     PbiFilter compositeFilter_;
@@ -425,7 +429,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    IndexList Lookup(const PbiIndex& idx) const;
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
 };
 
 // TODO: determine use case(s) for query - entire flag or parts?
@@ -461,7 +465,7 @@ public:
 ///
 /// \sa BamRecord::MovieName
 ///
-struct PbiMovieNameFilter : public internal::FilterBase<std::string>
+struct PbiMovieNameFilter
 {
 public:
     /// \brief Creates a single-value movie name filter.
@@ -498,7 +502,10 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    IndexList Lookup(const PbiIndex& idx) const;
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
+
+private:
+   PbiFilter compositeFilter_;
 };
 
 /// \brief The PbiNumDeletedBasesFilter class provides a PbiFilter-compatible
@@ -626,7 +633,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    IndexList Lookup(const PbiIndex& idx) const;
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
 };
 
 /// \brief The PbiQueryNameFilter class provides a PbiFilter-compatible filter
@@ -636,7 +643,7 @@ public:
 ///
 /// \sa BamRecord::FullName
 ///
-struct PbiQueryNameFilter : public internal::FilterBase<std::string>
+struct PbiQueryNameFilter
 {
 public:
     /// \brief Creates a single-value query name filter.
@@ -673,7 +680,10 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    IndexList Lookup(const PbiIndex& idx) const;
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
+
+private:
+    PbiFilter compositeFilter_;
 };
 
 /// \brief The PbiQueryStartFilter class provides a PbiFilter-compatible filter
@@ -887,7 +897,7 @@ public:
 ///
 /// \sa BamRecord::ReferenceName
 ///
-struct PbiReferenceNameFilter : public internal::FilterBase<std::string>
+struct PbiReferenceNameFilter
 {
 public:
     /// \brief Creates a single-value reference name filter.
@@ -923,7 +933,19 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    IndexList Lookup(const PbiIndex& idx) const;
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
+
+private:
+    mutable bool initialized_;
+    mutable PbiFilter subFilter_;
+    std::string rname_;
+    boost::optional<std::vector<std::string> > rnameWhitelist_;
+    Compare::Type cmp_;
+
+private:
+    // marked const so we can delay setup of filter in Accepts(), once we have
+    // access to PBI/BAM input. modified values marked mutable accordingly
+    void Initialize(const PbiRawData& idx) const;
 };
 
 /// \brief The PbiReferenceStartFilter class provides a PbiFilter-compatible

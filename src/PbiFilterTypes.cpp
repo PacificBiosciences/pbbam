@@ -86,6 +86,7 @@ IndexList readLengthHelper(const std::vector<T>& start,
     return result;
 }
 
+static
 PbiFilter filterFromMovieName(const string& movieName, bool includeCcs)
 {
     // we'll match on any rgIds from our candidate list
@@ -104,6 +105,7 @@ PbiFilter filterFromMovieName(const string& movieName, bool includeCcs)
     return filter;
 }
 
+static
 PbiFilter filterFromQueryName(const string& queryName)
 {
     // split full name into moviename, holenumber
@@ -148,115 +150,81 @@ PbiFilter filterFromQueryName(const string& queryName)
 } // namespace BAM
 } // namespace PacBio
 
-IndexList PbiAlignedLengthFilter::Lookup(const PbiIndex& idx) const
+// PbiAlignedLengthFilter
+
+bool PbiAlignedLengthFilter::Accepts(const PbiRawData& idx, const size_t row) const
 {
     const auto& mappedData = idx.MappedData();
-    const auto& aStart = mappedData.aStart_.Unpack();
-    const auto& aEnd   = mappedData.aEnd_.Unpack();
-    if (aStart.size() != aEnd.size()) {
-        stringstream s;
-        s << "invalid PBI data encountered: aStart.size != aEnd.size (" << aStart.size()
-          << "!=" << aEnd.size() << ")";
-        throw std::runtime_error(s.str());
-    }
-    return internal::readLengthHelper(aStart, aEnd, value_, cmp_);
+    const auto& aEnd    = mappedData.aEnd_.at(row) ;
+    const auto& aStart  = mappedData.aStart_.at(row);
+    const auto aLength = aEnd - aStart;
+    return CompareHelper(aLength);
 }
 
-IndexList PbiIdentityFilter::Lookup(const PbiIndex& idx) const
+// PbiIdentityFilter
+
+bool PbiIdentityFilter::Accepts(const PbiRawData& idx, const size_t row) const
 {
-    // fetch unpacked data
     const auto& mappedData = idx.MappedData();
-    const auto& nMM  = mappedData.nMM_.Unpack();
-    const auto& nIns = mappedData.nIns_.Unpack();
-    const auto& nDel = mappedData.nDel_.Unpack();
+    const auto& nMM  = mappedData.nMM_.at(row);
+    const auto& nIndels = mappedData.NumDeletedAndInsertedBasesAt(row);
+    const auto& nDel = nIndels.first;
+    const auto& nIns = nIndels.second;
 
     const auto& basicData = idx.BasicData();
-    const auto& qStart = basicData.qStart_.Unpack();
-    const auto& qEnd   = basicData.qEnd_.Unpack();
+    const auto& qStart = basicData.qStart_.at(row);
+    const auto& qEnd   = basicData.qEnd_.at(row);
 
-    // check sizes all equal, throw if not
-    const auto sizes = { nMM.size(), nIns.size(), nDel.size(), qStart.size(), qEnd.size() };
-    const auto firstSize = nMM.size();
-    if (!std::all_of(sizes.begin(), sizes.end(), [firstSize](size_t i){ return i == firstSize; })) {
-        stringstream s;
-        s << "invalid PBI data encountered: nMM, nIns, nDel, qStart, & qEnd do not all have the same number of elements";
-        throw std::runtime_error(s.str());
-    }
+    const auto readLength = qEnd - qStart;
+    const auto nonMatches = nMM + nDel + nIns;
+    const float identity  = 1.0 - (static_cast<float>(nonMatches)/static_cast<float>(readLength));
 
-    // calculate results
-    auto result = IndexList{ };
-    const auto numElements = qStart.size();
-    for (size_t i = 0; i < numElements; ++i) {
-
-        const auto readLength = qEnd[i] - qStart[i];
-        const auto nonMatches = nMM[i] + nDel[i] + nIns[i];
-        const float identity  = 1.0 - (static_cast<float>(nonMatches)/static_cast<float>(readLength));
-
-        bool keep = false;
-        switch(cmp_) {
-            case Compare::EQUAL              : keep = (identity == value_); break;
-            case Compare::NOT_EQUAL          : keep = (identity != value_); break;
-            case Compare::LESS_THAN          : keep = (identity < value_); break;
-            case Compare::LESS_THAN_EQUAL    : keep = (identity <= value_); break;
-            case Compare::GREATER_THAN       : keep = (identity > value_); break;
-            case Compare::GREATER_THAN_EQUAL : keep = (identity >= value_); break;
-            default:
-                assert(false);
-                throw std::runtime_error(string{"read identity filter encountered unknown Compare::Type: "} +
-                                         Compare::TypeToName(cmp_));
-        }
-
-        if (keep)
-            result.push_back(i);
-    }
-    return result;
+    return CompareHelper(identity);
 }
 
-IndexList PbiMovieNameFilter::Lookup(const PbiIndex& idx) const
+// PbiMovieNameFilter
+
+PbiMovieNameFilter::PbiMovieNameFilter(const std::string& movieName)
+    : compositeFilter_(internal::filterFromMovieName(movieName, true)) // include CCS
+{ }
+
+PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& whitelist)
+    : compositeFilter_(PbiFilter::UNION)
 {
-    // single-value
-    if (multiValue_ == boost::none) {
-        const auto filter = internal::filterFromMovieName(value_, true); // include CCS
-        return filter.Lookup(idx);
-    }
-    // whitelist
-    else {
-        auto filter = PbiFilter{ PbiFilter::UNION };
-        for (const auto& movieName : multiValue_.get())
-            filter.Add(internal::filterFromMovieName(movieName, true)); // include CCS
-        return filter.Lookup(idx);
-    }
+    for (const auto& movieName : whitelist)
+        compositeFilter_.Add(internal::filterFromMovieName(movieName, true)); // include CCS
 }
 
-IndexList PbiQueryLengthFilter::Lookup(const PbiIndex& idx) const
+PbiMovieNameFilter::PbiMovieNameFilter(std::vector<std::string>&& whitelist)
+    : compositeFilter_(PbiFilter::UNION)
+{
+    for (auto&& movieName : whitelist)
+        compositeFilter_.Add(internal::filterFromMovieName(movieName, true)); // include CCS
+}
+
+// PbiQueryLengthFilter
+
+bool PbiQueryLengthFilter::Accepts(const PbiRawData& idx, const size_t row) const
 {
     const auto& basicData = idx.BasicData();
-    const auto& qStart = basicData.qStart_.Unpack();
-    const auto& qEnd   = basicData.qEnd_.Unpack();
-    if (qStart.size() != qEnd.size()) {
-        stringstream s;
-        s << "invalid PBI data encountered: aStart.size != aEnd.size (" << qStart.size()
-          << "!=" << qEnd.size() << ")";
-        throw std::runtime_error(s.str());
-    }
-    return internal::readLengthHelper(qStart, qEnd, value_, cmp_);
+    const auto& qStart = basicData.qStart_.at(row);
+    const auto& qEnd   = basicData.qEnd_.at(row);
+    const auto readLength = qEnd - qStart;
+    return CompareHelper(readLength);
 }
 
-IndexList PbiQueryNameFilter::Lookup(const PbiIndex& idx) const
+// PbiQueryNameFilter
+
+PbiQueryNameFilter::PbiQueryNameFilter(const std::string& qname)
+    : compositeFilter_(internal::filterFromQueryName(qname))
+{ }
+
+PbiQueryNameFilter::PbiQueryNameFilter(const std::vector<std::string>& whitelist)
+    : compositeFilter_(PbiFilter::UNION)
 {
     try {
-        // single value
-        if (multiValue_ == boost::none) {
-            const auto filter = internal::filterFromQueryName(value_);
-            return filter.Lookup(idx);
-        }
-        // multi-value whitelist
-        else {
-            auto filter = PbiFilter{ PbiFilter::UNION };
-            for ( const auto& name : multiValue_.get())
-                filter.Add(internal::filterFromQueryName(name));
-            return filter.Lookup(idx);
-        }
+        for (const auto& qname : whitelist)
+            compositeFilter_.Add(internal::filterFromQueryName(qname));
     }
     // simply re-throw our own exception
     catch (std::runtime_error&) {
@@ -264,29 +232,82 @@ IndexList PbiQueryNameFilter::Lookup(const PbiIndex& idx) const
     }
     // we may hit other exceptions (e.g. in stoi()) - but we'll pin on a bit of extra data
     catch (std::exception& e) {
-        auto msg = string{ "PbiQueryNameFilter, with requested QNAME (" } + value_;
-        msg += string{ "), encountered error: " } + e.what();
+        auto msg = string{ "PbiQueryNameFilter encountered error: " } + e.what();
         throw std::runtime_error(msg);
     }
 }
 
-IndexList PbiReferenceNameFilter::Lookup(const PbiIndex &idx) const
+PbiQueryNameFilter::PbiQueryNameFilter(std::vector<std::string>&& whitelist)
+    : compositeFilter_(PbiFilter::UNION)
+{
+    try {
+        for (const auto& qname : whitelist)
+            compositeFilter_.Add(internal::filterFromQueryName(qname));
+    }
+    // simply re-throw our own exception
+    catch (std::runtime_error&) {
+        throw;
+    }
+    // we may hit other exceptions (e.g. in stoi()) - but we'll pin on a bit of extra data
+    catch (std::exception& e) {
+        auto msg = string{ "PbiQueryNameFilter encountered error: " } + e.what();
+        throw std::runtime_error(msg);
+    }
+}
+
+// PbiReferenceNameFilter
+
+PbiReferenceNameFilter::PbiReferenceNameFilter(const std::string& rname,
+                                               const Compare::Type cmp)
+    : initialized_(false)
+    , rname_(rname)
+    , cmp_(cmp)
+{
+    if (cmp != Compare::EQUAL && cmp != Compare::NOT_EQUAL) {
+        auto msg = std::string{ "Compare type: " };
+        msg += Compare::TypeToName(cmp);
+        msg += " not supported for PbiReferenceNameFilter (use one of Compare::EQUAL or Compare::NOT_EQUAL).";
+        throw std::runtime_error(msg);
+    }
+}
+
+PbiReferenceNameFilter::PbiReferenceNameFilter(const std::vector<std::string>& whitelist)
+    : initialized_(false)
+    , rnameWhitelist_(whitelist)
+    , cmp_(Compare::EQUAL)
+{ }
+
+PbiReferenceNameFilter::PbiReferenceNameFilter(std::vector<std::string>&& whitelist)
+    : initialized_(false)
+    , rnameWhitelist_(std::move(whitelist))
+    , cmp_(Compare::EQUAL)
+{ }
+
+bool PbiReferenceNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
+{
+    if (!initialized_)
+        Initialize(idx);
+    return subFilter_.Accepts(idx, row);
+}
+
+void PbiReferenceNameFilter::Initialize(const PbiRawData& idx) const
 {
     const auto pbiFilename = idx.Filename();
     const auto bamFilename = pbiFilename.substr(0, pbiFilename.length() - 4);
     const auto bamFile = BamFile{ bamFilename };
 
     // single-value
-    if (multiValue_ == boost::none) {
-        const auto tId = bamFile.ReferenceId(value_);
-        return idx.MappedData().Indices(MappedLookupData::T_ID, tId, cmp_);
+    if (rnameWhitelist_ == boost::none) {
+        const auto tId = bamFile.ReferenceId(rname_);
+        subFilter_ = PbiReferenceIdFilter{ tId, cmp_ };
     }
 
     // multi-value whitelist
     else {
-        auto tIds = vector<int32_t>{ };
-        for (const auto& name : multiValue_.get())
-            tIds.push_back(bamFile.ReferenceId(name));
-        return idx.MappedData().IndicesMulti(MappedLookupData::T_ID, tIds);
+        subFilter_ = PbiFilter(PbiFilter::UNION);
+        for (const auto& rname : rnameWhitelist_.get())
+            subFilter_.Add(PbiReferenceIdFilter{ bamFile.ReferenceId(rname) });
     }
+    initialized_ = true;
 }
+

@@ -41,6 +41,10 @@
 
 #include "pbbam/PbiFilterQuery.h"
 #include "pbbam/CompositeBamReader.h"
+
+
+#include <iostream>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;

@@ -10,6 +10,12 @@ series.
 
 ## Active
 
+## [0.4.0] - 2015-12-15
+
+### Changed
+- Redesigned PbiFilter interface and backend. Previous implementation did not scale well as intermediate results 
+were far too unwieldy. This redesign provides speedups of orders of magnitude in many cases. 
+
 ## [0.3.2] - 2015-12-10
 
 ### Added 

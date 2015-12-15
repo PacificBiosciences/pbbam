@@ -124,7 +124,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 {
     const auto expectedMovieName = string{ "m150404_101626_42267_c100807920800000001823174110291514_s1_p0" };
 
-    DataSet ds(tests::Data_Dir + "/chunking/chunking.subreadset.xml");
+    const DataSet ds(tests::Data_Dir + "/chunking/chunking.subreadset.xml");
     EXPECT_EQ(3, ds.BamFiles().size());
 
     { // movie name

@@ -41,6 +41,10 @@
 
 #include "pbbam/PbiIndexedBamReader.h"
 #include <htslib/bgzf.h>
+
+#include <iostream>
+
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
@@ -58,6 +62,13 @@ public:
         , currentBlockReadCount_(0)
     { }
 
+    void ApplyOffsets(void)
+    {
+        const std::vector<int64_t>& fileOffsets = index_.BasicData().fileOffset_;
+        for (IndexResultBlock& block : blocks_)
+            block.virtualOffset_ = fileOffsets.at(block.firstIndex_);
+    }
+
     void Filter(const PbiFilter& filter)
     {
         // store request & reset counters
@@ -65,10 +76,22 @@ public:
         currentBlockReadCount_ = 0;
         blocks_.clear();
 
-        // query for index blocks
-        auto indexList = filter.Lookup(index_);
-        blocks_ = mergedIndexBlocks(indexList);
-        index_.BasicData().ApplyOffsets(blocks_);
+        // find blocks of reads passing filter criteria
+        const uint32_t numReads = index_.NumReads();
+        if (filter_.IsEmpty()) {
+            blocks_.push_back(IndexResultBlock{0, numReads});
+        } else {
+            IndexList indices;
+            indices.reserve(numReads);
+            for (size_t i = 0; i < numReads; ++i) {
+                if (filter_.Accepts(index_, i))
+                    indices.push_back(i);
+            }
+            blocks_ = mergedIndexBlocks(std::move(indices));
+        }
+
+        // apply offsets
+        ApplyOffsets();
     }
 
     int ReadRawData(BGZF* bgzf, bam1_t* b)
@@ -99,7 +122,7 @@ public:
 
 public:
     PbiFilter filter_;
-    PbiIndex index_;
+    PbiRawData index_;
     IndexResultBlocks blocks_;
     size_t currentBlockReadCount_;
 };
@@ -107,7 +130,6 @@ public:
 } // namespace internal
 } // namespace BAM
 } // namespace PacBio
-
 
 PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter,
                                          const std::string& filename)
@@ -163,8 +185,3 @@ PbiIndexedBamReader& PbiIndexedBamReader::Filter(const PbiFilter& filter)
     return *this;
 }
 
-const PbiIndex& PbiIndexedBamReader::Index(void) const
-{
-    assert(d_);
-    return d_->index_;
-}

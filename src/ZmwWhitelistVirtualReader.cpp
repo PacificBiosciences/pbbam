@@ -42,6 +42,7 @@
 #include "pbbam/virtual/ZmwWhitelistVirtualReader.h"
 #include "pbbam/PbiFilterTypes.h"
 #include "pbbam/ReadGroupInfo.h"
+#include <set>
 #include <stdexcept>
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -75,17 +76,12 @@ ZmwWhitelistVirtualReader::ZmwWhitelistVirtualReader(const vector<int32_t>& zmwW
     }
     polyHeader_->ReadGroups(readGroups);
 
-    // pre-remove ZMWs not found
-    // not ideal to lookup twice, but at least we're not reading the files multiple times
-    const OrderedLookup<int32_t>& primaryFileZmws = primaryReader_->Index().BasicData().holeNumber_;
-    const OrderedLookup<int32_t>& scrapsFileZmws = scrapsReader_->Index().BasicData().holeNumber_;
-    for (const int32_t zmw : zmwWhitelist) {
-        const bool primaryFound = !primaryFileZmws.LookupIndices(zmw, Compare::EQUAL).empty();
-        const bool scrapsFound = !scrapsFileZmws.LookupIndices(zmw, Compare::EQUAL).empty();
-        if (primaryFound || scrapsFound)
-            zmwWhitelist_.push_back(zmw);
-    }
+    // remove ZMWs up front, that are not found in either file
+    PreFilterZmws(zmwWhitelist);
 }
+
+bool ZmwWhitelistVirtualReader::HasNext(void) const
+{ return !zmwWhitelist_.empty(); }
 
 // This method is not thread safe
 VirtualPolymeraseBamRecord ZmwWhitelistVirtualReader::Next(void)
@@ -115,8 +111,28 @@ vector<BamRecord> ZmwWhitelistVirtualReader::NextRaw(void)
     return result;
 }
 
-bool ZmwWhitelistVirtualReader::HasNext(void) const
-{ return !zmwWhitelist_.empty(); }
+void ZmwWhitelistVirtualReader::PreFilterZmws(const std::vector<int32_t>& zmwWhitelist)
+{
+    // fetch input ZMWs
+    const PbiRawData primaryIndex(primaryBamFile_->PacBioIndexFilename());
+    const PbiRawData scrapsIndex(scrapsBamFile_->PacBioIndexFilename());
+    const auto& primaryZmws = primaryIndex.BasicData().holeNumber_;
+    const auto& scrapsZmws = scrapsIndex.BasicData().holeNumber_;
+
+    // toss them all into a set (for uniqueness & lookup here soon)
+    set<int32_t> inputZmws;
+    for (const auto& zmw : primaryZmws)
+        inputZmws.insert(zmw);
+    for (const auto& zmw : scrapsZmws)
+        inputZmws.insert(zmw);
+
+    // check our requested whitelist against files' ZMWs, keep if found
+    const auto inputEnd = inputZmws.cend();
+    for (const int32_t zmw : zmwWhitelist) {
+        if (inputZmws.find(zmw) != inputEnd)
+            zmwWhitelist_.push_back(zmw);
+    }
+}
 
 BamHeader ZmwWhitelistVirtualReader::PrimaryHeader(void) const
 { return primaryBamFile_->Header(); }

@@ -60,9 +60,9 @@ namespace internal {
 /// Filters can be given by value from client code and we will wrap them for composition.
 ///
 /// \code{.cpp}
-///    PbiFilter f1(ZmwFilter(42));
+///    PbiFilter f1(PbiZmwFilter(42));
 ///    PbiFilter f2;
-///    f2.Add(QueryLengthFilter(3000, GREATER_THAN_EQUAL));
+///    f2.Add(PbiQueryLengthFilter(3000, GREATER_THAN_EQUAL));
 ///    f2.Add(MyApplicationCustomFilter("foo"));
 ///    PbiFilter intersect = PbiFilter::Intersect(f1, f2);
 ///    ...
@@ -80,14 +80,15 @@ public:
     ~FilterWrapper(void);
 
 public:
-    PacBio::BAM::IndexList Lookup(const PacBio::BAM::PbiIndex& idx) const;
+    bool Accepts(const PacBio::BAM::PbiRawData& idx, const size_t row) const;
 
 private:
     struct WrapperInterface
     {
         virtual ~WrapperInterface(void) = default;
         virtual WrapperInterface* Clone(void) const =0;
-        virtual IndexList Lookup(const PacBio::BAM::PbiIndex& idx) const =0;
+        virtual bool Accepts(const PacBio::BAM::PbiRawData& idx,
+                             const size_t row) const =0;
     };
 
     template<typename T>
@@ -96,7 +97,7 @@ private:
         WrapperImpl(T x);
         WrapperImpl(const WrapperImpl& other);
         WrapperInterface* Clone(void) const;
-        IndexList Lookup(const PacBio::BAM::PbiIndex& idx) const;
+        bool Accepts(const PacBio::BAM::PbiRawData& idx, const size_t row) const;
         T data_;
     };
 
@@ -125,8 +126,8 @@ inline FilterWrapper& FilterWrapper::operator=(const FilterWrapper& other)
 
 inline FilterWrapper::~FilterWrapper(void) { }
 
-inline IndexList FilterWrapper::Lookup(const PbiIndex& idx) const
-{ return self_->Lookup(idx); }
+inline bool FilterWrapper::Accepts(const PbiRawData& idx, const size_t row) const
+{ return self_->Accepts(idx, row); }
 
 // ----------------
 // WrapperImpl<T>
@@ -151,8 +152,9 @@ inline FilterWrapper::WrapperInterface* FilterWrapper::WrapperImpl<T>::Clone(voi
 { return new WrapperImpl(*this); }
 
 template<typename T>
-inline IndexList FilterWrapper::WrapperImpl<T>::Lookup(const PbiIndex& idx) const
-{ return data_.Lookup(idx); }
+inline bool FilterWrapper::WrapperImpl<T>::Accepts(const PbiRawData& idx,
+                                                   const size_t row) const
+{ return data_.Accepts(idx, row); }
 
 struct PbiFilterPrivate
 {
@@ -173,50 +175,32 @@ struct PbiFilterPrivate
         return copy;
     }
 
-    IndexList Lookup(const PbiIndex& idx) const
+    bool Accepts(const PbiRawData& idx, const size_t row) const
     {
-        // if no child filters (i.e. this is an empty PbiFilter{ }), return all indices
-        if (filters_.empty()) {
-            const size_t numRecords = idx.NumReads();
-            auto result = IndexList{ };
-            result.reserve(numRecords);
-            for (size_t i = 0; i < numRecords; ++i)
-                result.push_back(i);
-            return result;
-        }
+        // no filter -> accepts every record
+        if (filters_.empty())
+            return true;
 
-        // do child filter lookups
-        auto resultMap = std::map<size_t, size_t>{ }; // index -> numOccurrences
-        for (auto&& filter : filters_) {
-            auto filterResult = filter.Lookup(idx);
-            for (auto&& i : filterResult)
-                ++resultMap[i];
-        }
-
-        // extract results, depending on composite type
-        // note: if we only have one filter, this will work here too
-        //
-        const size_t numChildFilters = filters_.size();
-        auto result = IndexList{ };
-        result.reserve(resultMap.size());
-        auto iter = resultMap.cbegin();
-        auto end  = resultMap.cend();
-        for ( ; iter != end; ++iter ) {
-            const size_t i = iter->first;
-            const size_t numOccurrences = iter->second;
-            if (type_ == PbiFilter::INTERSECT) {
-                if (numOccurrences == numChildFilters)
-                    result.push_back(i);
-            } else if (type_ == PbiFilter::UNION) {
-                assert(numOccurrences != 0);
-                result.push_back(i);
+        // intersection of child filters
+        if (type_ == PbiFilter::INTERSECT) {
+            for (const auto& filter : filters_) {
+                if (!filter.Accepts(idx, row))
+                    return false; // break early on failure
             }
-            else
-                assert(false); // invalid composite type
+            return true; // all passed
         }
 
-        // result is already sorted and uniq-ed
-        return result;
+        // union of child filters
+        else if (type_ == PbiFilter::UNION) {
+            for (const auto& filter : filters_) {
+                if (filter.Accepts(idx, row))
+                    return true; // break early on pass
+            }
+            return false; // none passed
+        }
+
+        else
+            assert(false); // invalid composite filter type
     }
 
     PbiFilter::CompositionType type_;
@@ -277,6 +261,10 @@ inline PbiFilter& PbiFilter::operator=(PbiFilter&& other) noexcept
 
 inline PbiFilter::~PbiFilter(void) { }
 
+inline bool PbiFilter::Accepts(const PacBio::BAM::PbiRawData& idx,
+                               const size_t row) const
+{ return d_->Accepts(idx, row); }
+
 template<typename T>
 inline PbiFilter& PbiFilter::Add(const T& filter)
 {
@@ -318,9 +306,6 @@ inline PbiFilter& PbiFilter::Add(std::vector<PbiFilter>&& filters)
 
 inline bool PbiFilter::IsEmpty(void) const
 { return d_->filters_.empty(); }
-
-inline IndexList PbiFilter::Lookup(const PacBio::BAM::PbiIndex& idx) const
-{ return d_->Lookup(idx); }
 
 } // namespace BAM
 } // namespace PacBio

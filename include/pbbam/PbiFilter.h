@@ -65,15 +65,16 @@ struct PbiFilterConcept
         // All PBI filters (built-in or client-define) need only provide this
         // interface:
         //
-        //    IndexList Lookup(const PbiIndex& index) const;
+        //    bool Accepts(const PbiRawData& index, const size_t row) const;
         //
-        result = filter.Lookup(index);
+        const PbiRawData index;
+        bool result = filter.Accepts(index, 0);
+        (void)result;
     }
 
 private:
     T filter;
-    PbiIndex index;
-    IndexList result;
+//    PbiRawData index;
 };
 
 /// \brief The PbiFilter class provides a mechanism for performing PBI-enabled
@@ -319,11 +320,13 @@ public:
     /// \brief Performs the PBI index lookup, combining child results a
     ///        composite filter.
     ///
-    /// \param[in] idx  PBI index object
-    /// \returns list of \b sorted index positions (record #) that match filter
-    ///          criteria.
+    /// \param[in] idx  PBI (raw) index object
+    /// \param[in] row  record number in %BAM/PBI files
     ///
-    IndexList Lookup(const PacBio::BAM::PbiIndex& idx) const;
+    /// \returns true if record at \p row passes this filter criteria, 
+    ///          including children (if any)
+    ///
+    bool Accepts(const BAM::PbiRawData& idx, const size_t row) const;
 
     /// \}
 

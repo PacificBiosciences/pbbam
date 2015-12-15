@@ -1,11 +1,12 @@
 struct MyCustomFilter
 {
-    IndexList Lookup(const PbiIndex& index) const
+    bool Accepts(const PbiRawData& index, const size_t row) const
     {
-        // ... do queries on index data ...
-        // ... filter, calculate, transform, etc. as needed ...
-
-        return IndexList();
+        // Look up data for record at the provided row. Do any calculations
+        // necessary, then return whether that record passes your 
+        // filter criteria. 
+        
+        return true;
     }
 };
 

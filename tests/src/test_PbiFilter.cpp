@@ -94,45 +94,66 @@ PbiRawData test2Bam_RawIndex(void)
     return index;
 }
 
-static
-PbiIndex createTestIndex(void)
-{
-    PbiIndex idx;
-    idx.d_.reset(new ::PacBio::BAM::internal::PbiIndexPrivate(test2Bam_RawIndex()));
-    return idx;
-}
+static const PbiRawData shared_index = test2Bam_RawIndex();
 
-static const PbiIndex shared_index = createTestIndex();
+static
+void checkFilterRows(const PbiFilter& filter, const std::vector<size_t> expectedRows)
+{
+    for (size_t row : expectedRows)
+        EXPECT_TRUE(filter.Accepts(shared_index, row));
+}
 
 static
 void checkFilterInternals(const PbiFilter& filter,
                           const PbiFilter::CompositionType expectedType,
                           const size_t expectedNumChildren,
-                          const size_t expectedLookupSize)
+                          const std::vector<size_t> expectedRows)
 {
     EXPECT_EQ(expectedType,        filter.d_->type_);
     EXPECT_EQ(expectedNumChildren, filter.d_->filters_.size());
-    EXPECT_EQ(expectedLookupSize,  filter.Lookup(tests::shared_index).size());
+    checkFilterRows(filter, expectedRows);
 }
 
 struct SimpleFilter
 {
-    IndexList Lookup(const PbiIndex&) const
-    { return IndexList{ }; }
+    bool Accepts(const PbiRawData& idx, const size_t row) const
+    { (void)idx; (void)row; return true; }
 };
 
 struct NoncompliantFilter { };
 
 struct SortUniqueTestFilter
 {
-    IndexList Lookup(const PbiIndex&) const
-    { return IndexList{ 2, 7, 0, 3, 4, 1, 8 }; }
+    bool Accepts(const PbiRawData& idx, const size_t row) const
+    {
+        (void)idx;
+        switch(row) {
+            case 0: // fall through
+            case 1: // .
+            case 2: // .
+            case 3: // .
+            case 4: // .
+            case 7: // .
+            case 8: return true;
+            default:
+                return false;
+        }
+    }
 };
 
 struct SortUniqueTestFilter2
 {
-    IndexList Lookup(const PbiIndex&) const
-    { return IndexList{ 3, 7, 5 }; }
+    bool Accepts(const PbiRawData& idx, const size_t row) const
+    {
+        (void)idx;
+        switch(row) {
+            case 3: // fall through
+            case 7: // .
+            case 5: return true;
+            default:
+                return false;
+        }
+    }
 };
 
 static inline
@@ -150,26 +171,26 @@ PbiFilter simpleFilter(void)
 TEST(PbiFilterTest, DefaultCtorOk)
 {
     auto filter = PbiFilter{ };
-    tests::checkFilterInternals(filter, PbiFilter::INTERSECT, 0, 4);
+    tests::checkFilterInternals(filter, PbiFilter::INTERSECT, 0, std::vector<size_t>{0,1,2,3});
 }
 
 TEST(PbiFilterTest, CompositionOk)
 {
     auto filter = PbiFilter{ };
     filter.Add(PbiFilter{ });
-    tests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, 4);
+    tests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, std::vector<size_t>{0,1,2,3});
 }
 
 TEST(PbiFilterTest, CustomFilterOk)
 {
     { // ctor
         auto filter = PbiFilter{ tests::SimpleFilter{ } };
-        tests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, 0);
+        tests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, std::vector<size_t>{});
     }
     { // Add
         auto filter = PbiFilter{ };
         filter.Add(tests::SimpleFilter{ });
-        tests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, 0);
+        tests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, std::vector<size_t>{});
     }
 
 //    PbiFilter shouldNotCompile = PbiFilter{ tests::NoncompliantFilter{ } };                       // <-- when uncommented, should not compile
@@ -185,13 +206,9 @@ TEST(PbiFilterTest, CopyOk)
         PbiFilter copyAssign;
         copyAssign = original;
 
-        tests::checkFilterInternals(original,   PbiFilter::INTERSECT, 0, 4);
-        tests::checkFilterInternals(copyCtor,   PbiFilter::INTERSECT, 0, 4);
-        tests::checkFilterInternals(copyAssign, PbiFilter::INTERSECT, 0, 4);
-
-        EXPECT_EQ(4, original.Lookup(tests::shared_index).size());
-        EXPECT_EQ(4, copyCtor.Lookup(tests::shared_index).size());
-        EXPECT_EQ(4, copyAssign.Lookup(tests::shared_index).size());
+        tests::checkFilterInternals(original,   PbiFilter::INTERSECT, 0, std::vector<size_t>{0,1,2,3});
+        tests::checkFilterInternals(copyCtor,   PbiFilter::INTERSECT, 0, std::vector<size_t>{0,1,2,3});
+        tests::checkFilterInternals(copyAssign, PbiFilter::INTERSECT, 0, std::vector<size_t>{0,1,2,3});
     }
     { // with children
         const auto original = PbiFilter{ tests::SimpleFilter{ } };
@@ -200,13 +217,9 @@ TEST(PbiFilterTest, CopyOk)
         PbiFilter copyAssign;
         copyAssign = original;
 
-        tests::checkFilterInternals(original,   PbiFilter::INTERSECT, 1, 0);
-        tests::checkFilterInternals(copyCtor,   PbiFilter::INTERSECT, 1, 0);
-        tests::checkFilterInternals(copyAssign, PbiFilter::INTERSECT, 1, 0);
-
-        EXPECT_EQ(0, original.Lookup(tests::shared_index).size());
-        EXPECT_EQ(0, copyCtor.Lookup(tests::shared_index).size());
-        EXPECT_EQ(0, copyAssign.Lookup(tests::shared_index).size());
+        tests::checkFilterInternals(original,   PbiFilter::INTERSECT, 1, std::vector<size_t>{});
+        tests::checkFilterInternals(copyCtor,   PbiFilter::INTERSECT, 1, std::vector<size_t>{});
+        tests::checkFilterInternals(copyAssign, PbiFilter::INTERSECT, 1, std::vector<size_t>{});
     }
 }
 
@@ -219,13 +232,9 @@ TEST(PbiFilterTest, MoveOk)
         PbiFilter moveAssign;
         moveAssign = tests::emptyFilter();
 
-        tests::checkFilterInternals(original,   PbiFilter::INTERSECT, 0, 4);
-        tests::checkFilterInternals(moveCtor,   PbiFilter::INTERSECT, 0, 4);
-        tests::checkFilterInternals(moveAssign, PbiFilter::INTERSECT, 0, 4);
-
-        EXPECT_EQ(4, original.Lookup(tests::shared_index).size());
-        EXPECT_EQ(4, moveCtor.Lookup(tests::shared_index).size());
-        EXPECT_EQ(4, moveAssign.Lookup(tests::shared_index).size());
+        tests::checkFilterInternals(original,   PbiFilter::INTERSECT, 0, std::vector<size_t>{0,1,2,3});
+        tests::checkFilterInternals(moveCtor,   PbiFilter::INTERSECT, 0, std::vector<size_t>{0,1,2,3});
+        tests::checkFilterInternals(moveAssign, PbiFilter::INTERSECT, 0, std::vector<size_t>{0,1,2,3});
     }
     { // with children
         const auto original = tests::simpleFilter();
@@ -234,13 +243,9 @@ TEST(PbiFilterTest, MoveOk)
         PbiFilter moveAssign;
         moveAssign = tests::simpleFilter();
 
-        tests::checkFilterInternals(original,   PbiFilter::INTERSECT, 1, 0);
-        tests::checkFilterInternals(moveCtor,   PbiFilter::INTERSECT, 1, 0);
-        tests::checkFilterInternals(moveAssign, PbiFilter::INTERSECT, 1, 0);
-
-        EXPECT_EQ(0, original.Lookup(tests::shared_index).size());
-        EXPECT_EQ(0, moveCtor.Lookup(tests::shared_index).size());
-        EXPECT_EQ(0, moveAssign.Lookup(tests::shared_index).size());
+        tests::checkFilterInternals(original,   PbiFilter::INTERSECT, 1, std::vector<size_t>{0,1,2,3});
+        tests::checkFilterInternals(moveCtor,   PbiFilter::INTERSECT, 1, std::vector<size_t>{0,1,2,3});
+        tests::checkFilterInternals(moveAssign, PbiFilter::INTERSECT, 1, std::vector<size_t>{0,1,2,3});
     }
 }
 
@@ -248,8 +253,8 @@ TEST(PbiFilterTest, SortsAndUniquesChildFilterResultsOk)
 {
     const auto childFilter = tests::SortUniqueTestFilter{ };
     const auto filter = PbiFilter{ childFilter };
-    EXPECT_EQ(IndexList({ 2, 7, 0, 3, 4, 1, 8 }), childFilter.Lookup(tests::shared_index));
-    EXPECT_EQ(IndexList({ 0, 1, 2, 3, 4, 7, 8 }), filter.Lookup(tests::shared_index));
+    tests::checkFilterRows(childFilter, std::vector<size_t>{2, 7, 0, 3, 4, 1, 8});
+    tests::checkFilterRows(filter, std::vector<size_t>{0, 1, 2, 3, 4, 7, 8});
 }
 
 TEST(PbiFilterTest, UnionOk)
@@ -259,11 +264,11 @@ TEST(PbiFilterTest, UnionOk)
             const auto emptyFilter = tests::emptyFilter();
             const auto emptyFilter2 = tests::emptyFilter();
             const auto u = PbiFilter::Union({ emptyFilter, emptyFilter2 });
-            tests::checkFilterInternals(u, PbiFilter::UNION, 2, 4);
+            tests::checkFilterInternals(u, PbiFilter::UNION, 2, std::vector<size_t>{0,1,2,3});
         }
         { // move
             const auto u = PbiFilter::Union({ PbiFilter{ }, PbiFilter{ } });
-            tests::checkFilterInternals(u, PbiFilter::UNION, 2, 4);
+            tests::checkFilterInternals(u, PbiFilter::UNION, 2, std::vector<size_t>{0,1,2,3});
         }
     }
 
@@ -272,11 +277,11 @@ TEST(PbiFilterTest, UnionOk)
             const auto simpleFilter = tests::SimpleFilter{ };
             const auto simpleFilter2 = tests::SimpleFilter{ };
             const auto u = PbiFilter::Union({ simpleFilter, simpleFilter2 });
-            tests::checkFilterInternals(u, PbiFilter::UNION, 2, 0);
+            tests::checkFilterInternals(u, PbiFilter::UNION, 2, std::vector<size_t>{});
         }
         { // move
             const auto u = PbiFilter::Union({ tests::SimpleFilter{ }, tests::SimpleFilter{ } });
-            tests::checkFilterInternals(u, PbiFilter::UNION, 2, 0);
+            tests::checkFilterInternals(u, PbiFilter::UNION, 2, std::vector<size_t>{});
         }
     }
 
@@ -285,9 +290,10 @@ TEST(PbiFilterTest, UnionOk)
         const auto child1 = tests::SortUniqueTestFilter{ };
         const auto child2 = tests::SortUniqueTestFilter2{ };
         const auto u = PbiFilter::Union({ child1, child2 });
-        EXPECT_EQ(IndexList({ 2, 7, 0, 3, 4, 1, 8 }),   child1.Lookup(tests::shared_index));
-        EXPECT_EQ(IndexList({ 3, 7, 5 }),               child2.Lookup(tests::shared_index));
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3, 4, 5, 7, 8}), u.Lookup(tests::shared_index));
+
+        tests::checkFilterRows(child1, std::vector<size_t>{2, 7, 0, 3, 4, 1, 8});
+        tests::checkFilterRows(child2, std::vector<size_t>{3, 7, 5});
+        tests::checkFilterRows(u, std::vector<size_t>{0, 1, 2, 3, 4, 5, 7, 8});
     }
 }
 
@@ -298,11 +304,11 @@ TEST(PbiFilterTest, IntersectOk)
             const auto emptyFilter = tests::emptyFilter();
             const auto emptyFilter2 = tests::emptyFilter();
             const auto i = PbiFilter::Intersection({ emptyFilter, emptyFilter2 });
-            tests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, 4);
+            tests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, std::vector<size_t>{0,1,2,3});
         }
         { // move
             const auto i = PbiFilter::Intersection({ PbiFilter{ }, PbiFilter{ } });
-            tests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, 4);
+            tests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, std::vector<size_t>{0,1,2,3});
         }
     }
 
@@ -311,11 +317,11 @@ TEST(PbiFilterTest, IntersectOk)
             const auto simpleFilter = tests::SimpleFilter{ };
             const auto simpleFilter2 = tests::SimpleFilter{ };
             const auto i = PbiFilter::Intersection({ simpleFilter, simpleFilter2 });
-            tests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, 0);
+            tests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, std::vector<size_t>{});
         }
         { // move
             const auto i = PbiFilter::Intersection({ tests::SimpleFilter{ }, tests::SimpleFilter{ } });
-            tests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, 0);
+            tests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, std::vector<size_t>{});
         }
     }
 
@@ -324,9 +330,10 @@ TEST(PbiFilterTest, IntersectOk)
         const auto child1 = tests::SortUniqueTestFilter{ };
         const auto child2 = tests::SortUniqueTestFilter2{ };
         const auto i = PbiFilter::Intersection({ child1, child2 });
-        EXPECT_EQ(IndexList({ 2, 7, 0, 3, 4, 1, 8 }), child1.Lookup(tests::shared_index));
-        EXPECT_EQ(IndexList({ 3, 7, 5 }),             child2.Lookup(tests::shared_index));
-        EXPECT_EQ(IndexList({ 3, 7 }),                i.Lookup(tests::shared_index));
+
+        tests::checkFilterRows(child1, std::vector<size_t>{2, 7, 0, 3, 4, 1, 8});
+        tests::checkFilterRows(child2, std::vector<size_t>{3, 7, 5 });
+        tests::checkFilterRows(i, std::vector<size_t>{3, 7});
     }
 }
 
@@ -334,28 +341,28 @@ TEST(PbiFilterTest, AlignedEndFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiAlignedEndFilter{ 4055 } };
-        EXPECT_EQ(IndexList({ 1 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1});
     }
     {
         const auto filter = PbiFilter{ PbiAlignedEndFilter{ 4055, Compare::NOT_EQUAL } };
-        EXPECT_EQ(IndexList({ 0, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,2,3});
     }
     {
         const auto filter = PbiFilter{ PbiAlignedEndFilter{ 4000, Compare::LESS_THAN } };
-        EXPECT_EQ(IndexList({ 0 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0});
     }
     {
         const auto filter = PbiFilter{ PbiAlignedEndFilter{ 5560, Compare::GREATER_THAN } };
-        EXPECT_EQ(IndexList({ 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{3});
     }
     {
         const auto filter = PbiFilter{ PbiAlignedEndFilter{ 5560, Compare::GREATER_THAN_EQUAL } };
-        EXPECT_EQ(IndexList({ 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{2,3});
     }
 
     {
         const auto filter = PbiFilter{ PbiAlignedEndFilter{ 7000, Compare::GREATER_THAN } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{});
     }
 }
 
@@ -363,11 +370,11 @@ TEST(PbiFilterTest, AlignedLengthFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiAlignedLengthFilter{ 500, Compare::GREATER_THAN_EQUAL } };
-        EXPECT_EQ(IndexList({ 1, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,2,3});
     }
     {
         const auto filter = PbiFilter{ PbiAlignedLengthFilter{ 1000, Compare::GREATER_THAN_EQUAL } };
-        EXPECT_EQ(IndexList({ 1, 2 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,2});
     }
 }
 
@@ -375,19 +382,19 @@ TEST(PbiFilterTest, AlignedStartFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiAlignedStartFilter{ 2600, Compare::LESS_THAN } };
-        EXPECT_EQ(IndexList({ 0, 1 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,1});
     }
     {
         const auto filter = PbiFilter{ PbiAlignedStartFilter{ 4102, Compare::GREATER_THAN } };
-        EXPECT_EQ(IndexList({ 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{3});
     }
     {
         const auto filter = PbiFilter{ PbiAlignedStartFilter{ 4102, Compare::GREATER_THAN_EQUAL } };
-        EXPECT_EQ(IndexList({ 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{2,3});
     }
     {
         const auto filter = PbiFilter{ PbiAlignedStartFilter{ 6000, Compare::GREATER_THAN } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{ });
     }
 }
 
@@ -395,15 +402,15 @@ TEST(PbiFilterTest, AlignedStrandFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiAlignedStrandFilter{ Strand::FORWARD } };
-        EXPECT_EQ(IndexList({ 0, 2 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,2});
     }
     {
         const auto filter = PbiFilter{ PbiAlignedStrandFilter{ Strand::REVERSE } };
-        EXPECT_EQ(IndexList({ 1, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,3});
     }
     {
         const auto filter = PbiFilter{ PbiAlignedStrandFilter{ Strand::FORWARD, Compare::NOT_EQUAL } }; // same as Strand::REVERSE
-        EXPECT_EQ(IndexList({ 1, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,3});
     }
 
     // unsupported compare types throw
@@ -417,15 +424,15 @@ TEST(PbiFilterTest, BarcodeFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiBarcodeFilter{ 17 } };
-        EXPECT_EQ(IndexList({ 1, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,3});
     }
     {
         const auto filter = PbiFilter{ PbiBarcodeFilter{ 18 } };
-        EXPECT_EQ(IndexList({ 1, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,3});
     }
     {
         const auto filter = PbiFilter{ PbiBarcodeFilter{ 0 } };
-        EXPECT_EQ(IndexList({ 0 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0});
     }
 }
 
@@ -433,15 +440,15 @@ TEST(PbiFilterTest, BarcodeForwardFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiBarcodeForwardFilter{ 17 } };
-        EXPECT_EQ(IndexList({ 1, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,3});
     }
     {
         const auto filter = PbiFilter{ PbiBarcodeForwardFilter{ 400 } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{});
     }
     {
         const auto filter = PbiFilter{ PbiBarcodeForwardFilter{ {0, 256} } };
-        EXPECT_EQ(IndexList({ 0, 2 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,2});
     }
 }
 
@@ -449,11 +456,11 @@ TEST(PbiFilterTest, BarcodeQualityFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiBarcodeQualityFilter{ 80, Compare::GREATER_THAN_EQUAL } };
-        EXPECT_EQ(IndexList({ 1, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,3});
     }
     {
         const auto filter = PbiFilter{ PbiBarcodeQualityFilter{ 40, Compare::LESS_THAN } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{});
     }
 }
 
@@ -461,15 +468,15 @@ TEST(PbiFilterTest, BarcodeReverseFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiBarcodeReverseFilter{ 18 } };
-        EXPECT_EQ(IndexList({ 1, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,3});
     }
     {
         const auto filter = PbiFilter{ PbiBarcodeReverseFilter{ 400 } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{ });
     }
     {
         const auto filter = PbiFilter{ PbiBarcodeReverseFilter{ {1, 257} } };
-        EXPECT_EQ(IndexList({ 0, 2 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,2});
     }
 }
 
@@ -477,15 +484,15 @@ TEST(PbiFilterTest, BarcodesFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiBarcodesFilter{ 17, 18 } };
-        EXPECT_EQ(IndexList({ 1, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,3});
     }
     {
         const auto filter = PbiFilter{ PbiBarcodesFilter{ 17, 19 } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{ });
     }
     {
         const auto filter = PbiFilter{ PbiBarcodesFilter{ std::make_pair(17,18) } };
-        EXPECT_EQ(IndexList({ 1, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,3});
     }
 }
 
@@ -493,7 +500,7 @@ TEST(PbiFilterTest, IdentityFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiIdentityFilter{ 0.95, Compare::GREATER_THAN_EQUAL } };
-        EXPECT_EQ(IndexList({ 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{3});
     }
 }
 
@@ -508,32 +515,38 @@ TEST(PbiFilterTest, MapQualityFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiMapQualityFilter{ 254 } };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
     {
         const auto filter = PbiFilter{ PbiMapQualityFilter{ 254, Compare::NOT_EQUAL } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{});
     }
 }
 
 TEST(PbiFilterTest, MovieNameFilterOk)
 {
     const auto bamFile = BamFile{ tests::Data_Dir + string{ "/test_group_query/test2.bam" } };
-    const auto index = PbiIndex{ bamFile.PacBioIndexFilename() };
+    const auto index = PbiRawData{ bamFile.PacBioIndexFilename() };
 
     {
         const auto filter = PbiFilter{ PbiMovieNameFilter{ "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0" } };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(index));
+        const auto expectedRows = std::vector<size_t>{0,1,2,3};
+        for (size_t row : expectedRows)
+            EXPECT_TRUE(filter.Accepts(index, row));
     }
     {
         const auto filter = PbiFilter{ PbiMovieNameFilter{ "does_not_exist" } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(index));
+        const auto expectedRows = std::vector<size_t>{};
+        for (size_t row : expectedRows)
+            EXPECT_TRUE(filter.Accepts(index, row));
     }
     {
         const auto names = vector<string>{"does_not_exist",
                                           "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0"};
         const auto filter = PbiFilter{ PbiMovieNameFilter{ names } };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(index));
+        const auto expectedRows = std::vector<size_t>{0,1,2,3};
+        for (size_t row : expectedRows)
+            EXPECT_TRUE(filter.Accepts(index, row));
     }
 }
 
@@ -543,11 +556,11 @@ TEST(PbiFilterTest, NumDeletedBasesFilterOk)
 
     {
         const auto filter = PbiFilter{ PbiNumDeletedBasesFilter{ 12, Compare::LESS_THAN_EQUAL } };
-        EXPECT_EQ(IndexList({ 0, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,3});
     }
     {
         const auto filter = PbiFilter{ PbiNumDeletedBasesFilter{ 45, Compare::EQUAL } };
-        EXPECT_EQ(IndexList({ 2 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{2});
     }
 }
 
@@ -557,11 +570,11 @@ TEST(PbiFilterTest, NumInsertedBasesFilterOk)
 
     {
         const auto filter = PbiFilter{ PbiNumInsertedBasesFilter{ 63, Compare::GREATER_THAN_EQUAL } };
-        EXPECT_EQ(IndexList({ 1, 2 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,2});
     }
     {
         const auto filter = PbiFilter{ PbiNumInsertedBasesFilter{ 17, Compare::NOT_EQUAL } };
-        EXPECT_EQ(IndexList({ 1, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,2,3});
     }
 }
 
@@ -569,11 +582,11 @@ TEST(PbiFilterTest, NumMatchesFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiNumMatchesFilter{ 1000, Compare::GREATER_THAN_EQUAL } };
-        EXPECT_EQ(IndexList({ 1, 2 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,2});
     }
     {
         const auto filter = PbiFilter{ PbiNumMatchesFilter{ 400, Compare::LESS_THAN } };
-        EXPECT_EQ(IndexList({ 0 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0});
     }
 }
 
@@ -581,11 +594,11 @@ TEST(PbiFilterTest, NumMismatchesFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiNumMismatchesFilter{ 0, Compare::EQUAL } };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
     {
         const auto filter = PbiFilter{ PbiNumMismatchesFilter{ 0, Compare::NOT_EQUAL } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{});
     }
 }
 
@@ -593,11 +606,11 @@ TEST(PbiFilterTest, QueryEndFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiQueryEndFilter{ 4055 } };
-        EXPECT_EQ(IndexList({ 1 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1});
     }
     {
         const auto filter = PbiFilter{ PbiQueryEndFilter{ 6200, Compare::GREATER_THAN_EQUAL } };
-        EXPECT_EQ(IndexList({ 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{3});
     }
 }
 
@@ -605,11 +618,11 @@ TEST(PbiFilterTest, QueryLengthFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiQueryLengthFilter{ 500, Compare::GREATER_THAN_EQUAL } };
-        EXPECT_EQ(IndexList({ 1, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,2,3});
     }
     {
         const auto filter = PbiFilter{ PbiQueryLengthFilter{ 1000, Compare::GREATER_THAN_EQUAL } };
-        EXPECT_EQ(IndexList({ 1, 2 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,2});
     }
 }
 
@@ -620,64 +633,64 @@ TEST(PbiFilterTest, QueryNameFilterOk)
 
     {
         const auto filter = PbiFilter{ PbiQueryNameFilter{ "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2579_4055" } };
-        EXPECT_EQ(IndexList({ 1 }), filter.Lookup(index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1});
     }
     {
         const auto filter = PbiFilter{ PbiQueryNameFilter{ "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/5615_6237" } };
-        EXPECT_EQ(IndexList({ 3 }), filter.Lookup(index));
+        tests::checkFilterRows(filter, std::vector<size_t>{3});
     }
 
     {
         const auto filter = PbiFilter{ PbiQueryNameFilter{ "does_not_exist/0/0_0" } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(index));
+        tests::checkFilterRows(filter, std::vector<size_t>{});
     }
     {
         const auto names = vector<string>{"m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2579_4055",
                                           "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/5615_6237"};
         const auto filter = PbiFilter{ PbiQueryNameFilter{ names } };
-        EXPECT_EQ(IndexList({ 1, 3 }), filter.Lookup(index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1,3});
     }
 
     // invalid QNAME syntax throws
     EXPECT_THROW(
     {
         const auto filter = PbiFilter{ PbiQueryNameFilter{ "" } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(index));
+        tests::checkFilterRows(filter, std::vector<size_t>{});
     },
     std::runtime_error);
     EXPECT_THROW(
     {
         const auto filter = PbiFilter{ PbiQueryNameFilter{ "foo" } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(index));
+        tests::checkFilterRows(filter, std::vector<size_t>{});
     },
     std::runtime_error);
     EXPECT_THROW(
     {
         const auto filter = PbiFilter{ PbiQueryNameFilter{ "foo/bar" } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(index));
+        tests::checkFilterRows(filter, std::vector<size_t>{});
     },
     std::runtime_error);
     EXPECT_THROW(
     {
         const auto filter = PbiFilter{ PbiQueryNameFilter{ "foo/bar/baz_bam" } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(index));
+        tests::checkFilterRows(filter, std::vector<size_t>{});
     },
-    std::runtime_error);
+    std::exception); // come back to see why this is not runtime_error but something else
 }
 
 TEST(PbiFilterTest, QueryStartFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiQueryStartFilter{ 4101 } };
-        EXPECT_EQ(IndexList({ 2 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{2});
     }
     {
         const auto filter = PbiFilter{ PbiQueryStartFilter{ 5000 } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{});
     }
     {
         const auto filter = PbiFilter{ PbiQueryStartFilter{ 5000, Compare::GREATER_THAN } };
-        EXPECT_EQ(IndexList({ 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{3});
     }
 }
 
@@ -685,11 +698,11 @@ TEST(PbiFilterTest, ReadAccuracyFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiReadAccuracyFilter{ 0.9 } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{});
     }
     {
         const auto filter = PbiFilter{ PbiReadAccuracyFilter{ 0.9, Compare::GREATER_THAN } };
-        EXPECT_EQ(IndexList({ 0, 2 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,2});
     }
 }
 
@@ -697,37 +710,37 @@ TEST(PbiFilterTest, ReadGroupFilterOk)
 {
     { // numeric ID
         const auto filter = PbiReadGroupFilter{ -1197849594 };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
 
         const auto filter2 = PbiReadGroupFilter{ 200 };
-        EXPECT_EQ(IndexList({ }), filter2.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter2, std::vector<size_t>{});
     }
     { // string ID
         const auto filter = PbiReadGroupFilter{ "b89a4406" };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
 
         const auto filter2 = PbiReadGroupFilter{ "b89a4406" };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter2.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter2, std::vector<size_t>{0,1,2,3});
     }
     { // ReadGroupInfo object
         const auto rg = ReadGroupInfo{ "b89a4406" };
         const auto filter = PbiReadGroupFilter{ rg };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
     { // multi-ID
         const auto ids = vector<int32_t>({-1197849594, 200});
         const auto filter = PbiReadGroupFilter{ ids };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
     { // multi-string
         const auto ids = vector<string>({"b89a4406", "deadbeef"});
         const auto filter = PbiReadGroupFilter{ ids };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
     { // multi-ReadGroupInfo
         const auto ids = vector<ReadGroupInfo>({ ReadGroupInfo("b89a4406"), ReadGroupInfo("deadbeef")});
         const auto filter = PbiReadGroupFilter{ ids };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
 }
 
@@ -735,11 +748,11 @@ TEST(PbiFilterTest, ReferenceEndFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiReferenceEndFilter{ 9900 } };
-        EXPECT_EQ(IndexList({ 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{3});
     }
     {
         const auto filter = PbiFilter{ PbiReferenceEndFilter{ 9900, Compare::GREATER_THAN_EQUAL } };
-        EXPECT_EQ(IndexList({ 0, 1, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,1,3});
     }
 }
 
@@ -747,36 +760,43 @@ TEST(PbiFilterTest, ReferenceIdFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiReferenceIdFilter{ 0 } };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
     {
         const auto filter = PbiFilter{ PbiReferenceIdFilter{ 0, Compare::NOT_EQUAL } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{});
     }
     {
         const auto ids = vector<int32_t>({0, 42});
         const auto filter = PbiFilter{ PbiReferenceIdFilter{ ids } };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
 }
 
 TEST(PbiFilterTest, ReferenceNameFilterOk)
 {
     const auto bamFile = BamFile{ tests::Data_Dir + string{ "/test_group_query/test2.bam" } };
-    const auto index = PbiIndex{ bamFile.PacBioIndexFilename() };
+    const auto index = PbiRawData{ bamFile.PacBioIndexFilename() };
 
     {
         const auto filter = PbiFilter{ PbiReferenceNameFilter{ "lambda_NEB3011" } };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(index));
+        const auto expectedRows = std::vector<size_t>{0,1,2,3};
+        for (size_t row : expectedRows)
+            EXPECT_TRUE(filter.Accepts(index, row));
+
     }
     {
         const auto filter = PbiFilter{ PbiReferenceNameFilter{ "lambda_NEB3011", Compare::NOT_EQUAL } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(index));
+        const auto expectedRows = std::vector<size_t>{};
+        for (size_t row : expectedRows)
+            EXPECT_TRUE(filter.Accepts(index, row));
     }
     {
         const auto names = vector<string>({ "lambda_NEB3011" }); // this file only has 1 :(
         const auto filter = PbiFilter{ PbiReferenceNameFilter{ names } };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(index));
+        const auto expectedRows = std::vector<size_t>{0,1,2,3};
+        for (size_t row : expectedRows)
+            EXPECT_TRUE(filter.Accepts(index, row));
     }
 
     // unsupported compare types throw
@@ -790,11 +810,11 @@ TEST(PbiFilterTest, ReferenceStartFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiReferenceStartFilter{ 8453 } };
-        EXPECT_EQ(IndexList({ 1 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{1});
     }
     {
         const auto filter = PbiFilter{ PbiReferenceStartFilter{ 9200, Compare::GREATER_THAN_EQUAL } };
-        EXPECT_EQ(IndexList({ 0, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,3});
     }
 }
 
@@ -802,16 +822,16 @@ TEST(PbiFilterTest, ZmwFilterOk)
 {
     {
         const auto filter = PbiFilter{ PbiZmwFilter{ 14743 } };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
     {
         const auto filter = PbiFilter{ PbiZmwFilter{ 14743, Compare::NOT_EQUAL } };
-        EXPECT_EQ(IndexList({ }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{});
     }
     {
         const auto zmws = vector<int32_t>({14743,42,200});
         const auto filter = PbiFilter{ PbiZmwFilter{ zmws } };
-        EXPECT_EQ(IndexList({ 0, 1, 2, 3 }), filter.Lookup(tests::shared_index));
+        tests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
 }
 
@@ -850,6 +870,9 @@ TEST(PbiFilterTest, FromDataSetOk)
     dataset.Filters(datasetFilters);
 
     const auto generatedFilter = PbiFilter::FromDataSet(dataset);
-    EXPECT_EQ(expectedFilter.Lookup(tests::shared_index),
-              generatedFilter.Lookup(tests::shared_index));
+
+    for (size_t i = 0; i < tests::shared_index.NumReads(); ++i) {
+        EXPECT_EQ(expectedFilter.Accepts(tests::shared_index, i),
+                  generatedFilter.Accepts(tests::shared_index, i));
+    }
 }

@@ -120,7 +120,6 @@ public:
     /// \}
 
 public:
-public:
     /// \name File Headers
     /// \{
 
@@ -141,6 +140,9 @@ private:
     std::unique_ptr<PbiIndexedBamReader> scrapsReader_;
     std::unique_ptr<BamHeader> polyHeader_;
     std::deque<int32_t>        zmwWhitelist_;
+
+private:
+    void PreFilterZmws(const std::vector<int32_t>& zmwWhitelist);
 };
 
 } // namespace BAM
