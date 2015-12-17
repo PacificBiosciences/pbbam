@@ -25,5 +25,5 @@ This library is **not** intended to be used as a general-purpose BAM utility - a
 
 ## License
 
- - [PacBio open source license](https://github.com/PacificBiosciences/pbbam/blob/master/LICENSE)
+ - [PacBio open source license](https://github.com/PacificBiosciences/pbbam/blob/master/LICENSE.txt)
 
