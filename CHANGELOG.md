@@ -10,6 +10,10 @@ series.
 
 ## Active
 
+### Changed
+- VirtualPolymeraseBamRecord::VirtualRegionsTable(type) returns an empty vector of regions if none are
+associated with the requested type, instead of throwing.
+
 ## [0.4.0] - 2015-12-15
 
 ### Changed

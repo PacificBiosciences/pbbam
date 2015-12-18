@@ -100,6 +100,9 @@ public:
 
     /// \brief Provides annotations of the polymerase read for a given VirtualRegionType.
     ///
+    /// \param[in] regionType  requested region type
+    /// \returns regions that match the requested type (empty vector if none found).
+    ///
     std::vector<VirtualRegion> VirtualRegionsTable(const VirtualRegionType regionType) const;
 
     /// \}

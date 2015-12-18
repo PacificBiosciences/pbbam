@@ -501,3 +501,25 @@ TEST(ZmwWhitelistVirtualReader, MixedKnownAndUnknownZmwsOk)
 
     tests::Compare(polyRecord, virtualRecord);
 }
+
+TEST(VirtualPolymeraseBamRecord, VirtualRegionsTableOk) 
+{
+    VirtualPolymeraseReader vpr(tests::Data_Dir + "/polymerase/production.subreads.bam",
+                                tests::Data_Dir + "/polymerase/production.scraps.bam");
+    EXPECT_TRUE(vpr.HasNext());
+    const auto virtualRecord = vpr.Next();
+
+    const auto subreads  = virtualRecord.VirtualRegionsTable(VirtualRegionType::SUBREAD);
+    const auto adapters  = virtualRecord.VirtualRegionsTable(VirtualRegionType::ADAPTER);
+    const auto hqRegions = virtualRecord.VirtualRegionsTable(VirtualRegionType::HQREGION);
+    const auto lqRegions = virtualRecord.VirtualRegionsTable(VirtualRegionType::LQREGION);
+    const auto barcodes  = virtualRecord.VirtualRegionsTable(VirtualRegionType::BARCODE);
+    const auto filtered  = virtualRecord.VirtualRegionsTable(VirtualRegionType::FILTERED);
+
+    EXPECT_FALSE(subreads.empty());
+    EXPECT_FALSE(adapters.empty());
+    EXPECT_FALSE(hqRegions.empty());
+    EXPECT_FALSE(lqRegions.empty());
+    EXPECT_FALSE(barcodes.empty());
+    EXPECT_TRUE(filtered.empty());    // this annnotation type is not in data set
+}

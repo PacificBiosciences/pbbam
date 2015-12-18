@@ -352,5 +352,10 @@ VirtualPolymeraseBamRecord::VirtualRegionsMap(void) const
 
 std::vector<VirtualRegion>
 VirtualPolymeraseBamRecord::VirtualRegionsTable(const VirtualRegionType regionType) const
-{ return virtualRegionsMap_.at(regionType); }
+{
+   const auto iter = virtualRegionsMap_.find(regionType);
+   if (iter != virtualRegionsMap_.cend())
+       return iter->second;
+   return std::vector<VirtualRegion>(); 
+}
 
