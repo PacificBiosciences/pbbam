@@ -1165,6 +1165,9 @@ bool BamRecord::HasHoleNumber(void) const
 bool BamRecord::HasInsertionQV(void) const
 { return impl_.HasTag(internal::tagName_insertionQV); }
 
+bool BamRecord::HasNumPasses(void) const
+{ return impl_.HasTag(internal::tagName_numPasses); }
+
 bool BamRecord::HasPreBaseFrames(void) const
 { return HasIPD(); }
 

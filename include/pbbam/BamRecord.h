@@ -363,6 +363,9 @@ public:
     /// \returns true if this record has MergeQV data
     bool HasMergeQV(void) const;
 
+    /// \returns true if this record has NumPasses data
+    bool HasNumPasses(void) const;
+
     /// \returns true if this record has Pkmean data
     bool HasPkmean(void) const;
 

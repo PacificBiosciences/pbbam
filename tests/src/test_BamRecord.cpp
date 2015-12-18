@@ -223,6 +223,9 @@ TEST(BamRecordTest, DefaultValues)
     EXPECT_EQ(-1, bam.AlignedStart());
     EXPECT_EQ(-1, bam.AlignedEnd());
     EXPECT_THROW(bam.HoleNumber(), std::exception);
+    EXPECT_FALSE(bam.HasNumPasses());
+    EXPECT_THROW(bam.NumPasses(), std::exception);
+
     // 8888888888888888888888888888888888888
 //    EXPECT_EQ(-1, bam.NumPasses());
 //    EXPECT_EQ(-1, bam.QueryStart());
@@ -442,6 +445,7 @@ TEST(BamRecordTest, CoreSetters)
 //    EXPECT_EQ(42, bam.HoleNumber());
 //    EXPECT_EQ(testQVs, bam.InsertionQVs());
 //    EXPECT_EQ(testQVs, bam.MergeQVs());
+
 //    EXPECT_EQ(42, bam.NumPasses());
 //    EXPECT_EQ(42, bam.QueryEnd());
 //    EXPECT_EQ(42, bam.QueryStart());
