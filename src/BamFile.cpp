@@ -167,19 +167,17 @@ bool BamFile::IsPacBioBAM(void) const
 { return !d_->header_.PacBioBamVersion().empty(); }
 
 bool BamFile::PacBioIndexExists(void) const
-{
-    const string pbiFn = PacBioIndexFilename();
-    if (internal::FileUtils::Exists(pbiFn)) {
-        const auto bamTimestamp = internal::FileUtils::LastModified(Filename());
-        const auto pbiTimestamp = internal::FileUtils::LastModified(pbiFn);
-        if (bamTimestamp <= pbiTimestamp)
-            return true;
-    }
-    return false;
-}
+{ return internal::FileUtils::Exists(PacBioIndexFilename()); }
 
 std::string BamFile::PacBioIndexFilename(void) const
 { return d_->filename_ + ".pbi"; }
+
+bool BamFile::PacBioIndexIsNewer(void) const
+{
+    const auto bamTimestamp = internal::FileUtils::LastModified(Filename());
+    const auto pbiTimestamp = internal::FileUtils::LastModified(PacBioIndexFilename());
+    return bamTimestamp <= pbiTimestamp;
+}
 
 int BamFile::ReferenceId(const std::string& name) const
 { return d_->header_.SequenceId(name); }
@@ -194,17 +192,15 @@ std::string BamFile::ReferenceName(const int id) const
 { return d_->header_.SequenceName(id); }
 
 bool BamFile::StandardIndexExists(void) const
-{
-    const string bamFn = Filename();
-    const string baiFn = StandardIndexFilename();
-    if (internal::FileUtils::Exists(baiFn)) {
-        const auto bamTimestamp = internal::FileUtils::LastModified(bamFn);
-        const auto baiTimestamp = internal::FileUtils::LastModified(baiFn);
-        if (bamTimestamp <= baiTimestamp)
-            return true;
-    }
-    return false;
-}
+{ return internal::FileUtils::Exists(StandardIndexFilename()); }
 
 std::string BamFile::StandardIndexFilename(void) const
 { return d_->filename_ + ".bai"; }
+
+bool BamFile::StandardIndexIsNewer(void) const 
+{ 
+    const auto bamTimestamp  = internal::FileUtils::LastModified(Filename());
+    const auto baiTimestamp = internal::FileUtils::LastModified(StandardIndexFilename());
+    return bamTimestamp <= baiTimestamp;
+}
+

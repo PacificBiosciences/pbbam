@@ -112,6 +112,8 @@ public:
     ///    if (!file.PacBioIndexExists())
     ///        file.CreatePacBioIndex();
     /// \endcode
+    ///
+    /// \note As of v0.4.02+, no timestamp check is performed. Previously we requr
     /// with an additional timestamp check.
     ///
     /// \throws if PBI file could not be properly created and/or
@@ -127,7 +129,8 @@ public:
     ///    if (!file.StandardIndexExists())
     ///        file.CreateStandardIndex();
     /// \endcode
-    /// with an additional timestamp check.
+    ///
+    /// \note As of v0.4.2, no timestamp check is performed.
     ///
     /// \throws if BAI file could not be properly created (e.g. this
     ///         %BAM is not coordinate-sorted) or could not be written to disk
@@ -145,14 +148,18 @@ public:
     ///       This method simply returns the expected filename.
     std::string PacBioIndexFilename(void) const;
 
-    /// \returns true if ".bai" exists and is newer than this BAM file.
+    /// \returns true if ".pbi" has a more recent timestamp than this file
+    bool PacBioIndexIsNewer(void) const;
+
+    /// \returns true if ".bai" exists
     bool StandardIndexExists(void) const;
 
-    /// \returns filename of standard index file (".bai")
     /// \note No guarantee is made on the existence of this file.
     ///       This method simply returns the expected filename.
     std::string StandardIndexFilename(void) const;
 
+    /// \returns true if ".bai" has a more recent timestamp than this file
+    bool StandardIndexIsNewer(void) const;
 
     /// \}
 

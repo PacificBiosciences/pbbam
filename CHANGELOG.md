@@ -10,6 +10,16 @@ series.
 
 ## Active
 
+## [0.4.2] - 2015-12-22
+
+### Changed
+- BamFile::PacBioIndexExists & StandardIndexExists no longer check timestamps. Copying/moving files 
+around can yield timestamps that are not helpful (no longer guaranteed that the .pbi will be "newer" 
+than the .bam, even though no content changed). Added methods (e.g. bool BamFile::PacBioIndexIsNewer()) 
+to do that lookup if needed, but it is no longer done automatically.
+
+## [0.4.1] - 2015-12-18
+
 ### Added
 - BamRecord::HasNumPasses
 
