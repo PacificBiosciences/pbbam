@@ -21,8 +21,18 @@ option(PacBioBAM_wrap_csharp   "Build PacBioBAM with SWIG bindings for C#."     
 option(PacBioBAM_wrap_python   "Build PacBioBAM with SWIG bindings for Python." OFF)
 option(PacBioBAM_wrap_r        "Build PacBioBAM with SWIG bindings for R."      OFF)
 option(PacBioBAM_use_modbuild  "Build PacBioBAM using Modular Build System."    OFF)
+option(PacBioBAM_use_ccache    "Build PacBioBAM using ccache, if available."    ON)
 
 # --check build-time options --
+
+# enable ccache, if available 
+if(PacBioBAM_use_ccache)
+    find_program(CCACHE_FOUND ccache)
+    if(CCACHE_FOUND)
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK    ccache)
+    endif()
+endif()
 
 # enable testing if requested
 if(PacBioBAM_build_tests)

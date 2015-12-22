@@ -10,6 +10,10 @@ series.
 
 ## Active
 
+### Added
+- Compile using ccache by default, if available. Can be manually disabled using -DPacBioBAM_use_ccache=OFF
+with cmake.
+
 ## [0.4.2] - 2015-12-22
 
 ### Changed
