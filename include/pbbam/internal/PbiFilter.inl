@@ -201,6 +201,7 @@ struct PbiFilterPrivate
 
         else
             assert(false); // invalid composite filter type
+        return false;
     }
 
     PbiFilter::CompositionType type_;
