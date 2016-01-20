@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pbds:AlignmentSet CreatedAt="2015-01-27T09:00:01" MetaType="PacBio.DataSet.AlignmentSet" Name="DataSet_AlignmentSet" Tags="barcode moreTags mapping mytags" UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe519c" Version="2.3.0" xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDatasets.xsd">
+	<pbbase:ExternalResources>
+		<pbbase:ExternalResource Name="First Alignments BAM" Description="Points to an example Alignments BAM file." MetaType="AlignmentFile.AlignmentBamFile" ResourceId="file:///mnt/path/to/alignments2.bam" Tags="Example">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex ResourceId="file:///mnt/path/to/alignments2.pbi"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+		<pbbase:ExternalResource Name="Second Alignments BAM" Description="Points to another example Alignments BAM file, by relative path." MetaType="AlignmentFile.AlignmentBamFile" ResourceId="file:./alignments3.bam" Tags="Example">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex ResourceId="file:///mnt/path/to/alignments3.pbi"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+	</pbbase:ExternalResources>
+	<pbds:DataSets>
+		<pbds:DataSet UniqueId="ab95d0a3-94b8-4918-b3af-a3f81bbe519c" Version="2.3.0" Name="HighQuality Read Alignments">
+			<pbds:Filters> <!-- These Filters are in addition to those above. This provides a means to subset and label the parent DataSet further. -->
+				<pbds:Filter>
+                    <pbbase:Properties>
+                        <pbbase:Property Name="rq" Value="0.85" Operator=">"/>
+                    </pbbase:Properties>
+                </pbds:Filter>
+			</pbds:Filters>
+		</pbds:DataSet>
+		<pbds:DataSet UniqueId="ac95d0a3-94b8-4918-b3af-a3f81bbe519c" Version="2.3.0" Name="Alignments to chromosome 1">
+			<pbds:Filters>
+				<pbds:Filter>
+                    <pbbase:Properties>
+                        <pbbase:Property Name="RNAME" Value="chr1" Operator="=="/>
+                    </pbbase:Properties>
+                </pbds:Filter>
+			</pbds:Filters>
+		</pbds:DataSet>
+	</pbds:DataSets>
+</pbds:AlignmentSet>

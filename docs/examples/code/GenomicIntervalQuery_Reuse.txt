@@ -1,0 +1,8 @@
+DataSet ds("data.xml");
+GenomicIntervalQuery query(GenomicInterval(), ds);
+for (const GenomicInterval& interval : intervals) {
+    query.Interval(interval);
+    for (const BamRecord& record : query) {}
+        // do stuff
+    }
+}

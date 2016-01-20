@@ -1,0 +1,3 @@
+PbiFilter result{ PbiFilter::UNION };
+result.Add(std::move(filters));
+return result;

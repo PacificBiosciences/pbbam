@@ -1,0 +1,2 @@
+string name = Compare::TypeToName(Compare::LESS_THAN);
+assert(name = "Compare::LESS_THAN");

@@ -1,0 +1,10 @@
+// One-step construction
+// 
+// This is useful in situations that require a const Tag.
+//
+const auto t = Tag('A', TagModifier::ASCII_CHAR);
+
+// or two-step construction
+auto t = Tag('A');
+t.Modifier(TagModifier::ASCII_CHAR);
+

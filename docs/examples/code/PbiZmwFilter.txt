@@ -1,0 +1,16 @@
+// single value
+PbiFilter filter{ PbiZmwFilter{ 4000 } };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.HoleNumber() == 4000);
+}
+
+// whitelist
+vector<int32_t> whitelist = { 4000, 8000 };
+PbiFilter filter{ PbiZmwFilter{whitelist} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.HoleNumber() == 4000 || 
+           record.HoleNumber() == 8000);
+}
+

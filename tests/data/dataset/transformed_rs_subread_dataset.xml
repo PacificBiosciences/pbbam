@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pbds:HdfSubreadSet 
+    xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd"
+    xmlns:bax="http://whatever"
+    xmlns:fn="http://www.w3.org/2005/xpath-functions"
+    xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd"
+    xmlns:pbmeta="http://pacificbiosciences.com/PacBioCollectionMetadata.xsd"
+    xmlns:pbsample="http://pacificbiosciences.com/PacBioSampleInfo.xsd" 
+    xmlns:uuid="java:java.util.UUID" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://pacificbiosciences.com/PacBioDatasets.xsd"
+    Name="Subreads from run r001173_42129_130607"
+    MetaType="PacBio.DataSet.SubreadSet"
+    Tags="pacbio.secondary.instrument=RS"
+    Version="0.5"
+    UniqueId="abbc9183-b01e-4671-8c12-19efee534647">
+   <pbbase:ExternalResources>
+      <pbbase:ExternalResource MetaType="PacBio.SubreadFile.BaxFile"
+          ResourceId="file:///mnt/secondary-siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.0.bax.h5"/>
+      <pbbase:ExternalResource MetaType="PacBio.SubreadFile.BaxFile"
+          ResourceId="file:///mnt/secondary-siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.1.bax.h5"/>
+      <pbbase:ExternalResource MetaType="PacBio.SubreadFile.BaxFile"
+          ResourceId="file:///mnt/secondary-siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.2.bax.h5"/>
+   </pbbase:ExternalResources>
+   <pbds:DataSetMetadata>
+      <pbds:TotalLength>50000000</pbds:TotalLength>
+      <pbds:NumRecords>150000</pbds:NumRecords>
+      <pbmeta:Collections>
+         <pbmeta:CollectionMetadata Context="m130608_033634_42129_c100515232550000001823076608221351_s1_p0"
+                             InstrumentName="42129"
+                             InstrumentId="1">
+            <pbmeta:InstCtrlVer>2.0.1.0.124174</pbmeta:InstCtrlVer>
+            <pbmeta:SigProcVer>NRT@172.31.128.10:8082, SwVer=2010.124174, HwVer=1.0</pbmeta:SigProcVer>
+            <pbmeta:RunDetails>
+               <pbmeta:RunId>r001173_42129_130607</pbmeta:RunId>
+               <pbmeta:Name>2013-06-07_42129_10kb_Ecoli_201-validation_2</pbmeta:Name>
+            </pbmeta:RunDetails>
+            <pbmeta:WellSample Name="P4-C2_Ecoli_10kb_MBS_stageHS">
+               <pbmeta:PlateId>2013-06-07_42129_10kb_Ecoli_201-validation_2</pbmeta:PlateId>
+               <pbmeta:WellName>P4-C2_Ecoli_10kb_MBS_stageHS</pbmeta:WellName>
+               <pbmeta:Concentration>0</pbmeta:Concentration>
+               <pbmeta:SampleReuseEnabled>false</pbmeta:SampleReuseEnabled>
+               <pbmeta:StageHotstartEnabled>true</pbmeta:StageHotstartEnabled>
+               <pbmeta:SizeSelectionEnabled>
+                                    false
+								</pbmeta:SizeSelectionEnabled>
+               <pbmeta:UseCount>1</pbmeta:UseCount>
+               <pbmeta:Comments>P4-C2_Ecoli_10kb_MBS_stageHS</pbmeta:Comments>
+               <pbsample:BioSamplePointers>
+                  <pbsample:BioSamplePointer>abafd4ed-5cf7-4b83-a869-1a5d239d30e2</pbsample:BioSamplePointer>
+               </pbsample:BioSamplePointers>
+            </pbmeta:WellSample>
+            <pbmeta:AutomationName>MagBead Standard Seq v2</pbmeta:AutomationName>
+            <pbmeta:CollectionNumber>2</pbmeta:CollectionNumber>
+            <pbmeta:CellIndex>1</pbmeta:CellIndex>
+            <pbmeta:CellPac Barcode="10051523255000000182307660822135"/>
+            <pbmeta:Primary>
+               <pbmeta:AutomationName>BasecallerV1</pbmeta:AutomationName>
+               <pbmeta:ConfigFileName>2-0-0_P4-C2.xml</pbmeta:ConfigFileName>
+               <pbmeta:SequencingCondition/>
+               <pbmeta:ResultsFolder>Analysis_Results</pbmeta:ResultsFolder>
+               <pbmeta:CollectionPathUri>rsy://mp-f030-io/vol54//RS_DATA_STAGING/42129/2013-06-07_42129_10kb_Ecoli_201-validation_2_1173/A01_2/</pbmeta:CollectionPathUri>
+               <pbmeta:CopyFiles>
+                  <pbmeta:CollectionFileCopy>Fasta</pbmeta:CollectionFileCopy>
+               </pbmeta:CopyFiles>
+            </pbmeta:Primary>
+         </pbmeta:CollectionMetadata>
+      </pbmeta:Collections>
+      <pbsample:BioSamples>
+         <pbsample:BioSample Name="P4-C2_Ecoli_10kb_MBS_stageHS" Description="P4-C2_Ecoli_10kb_MBS_stageHS"
+                    UniqueId="abafd4ed-5cf7-4b83-a869-1a5d239d30e2"/>
+      </pbsample:BioSamples>
+   </pbds:DataSetMetadata>
+</pbds:HdfSubreadSet>

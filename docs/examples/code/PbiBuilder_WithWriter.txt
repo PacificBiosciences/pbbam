@@ -1,0 +1,12 @@
+BamWriter writer(...);
+PbiBuilder pbiBuilder(...);
+int64_t vOffset;
+BamRecord record;
+while (...) {
+
+    // ... populate record data ...
+
+    // write record to BAM and add PBI entry
+    writer.Write(record, &vOffset);
+    pbiBuilder.AddRecord(record, vOffset);
+}

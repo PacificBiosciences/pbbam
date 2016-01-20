@@ -1,0 +1,2 @@
+Compare::Type type = Compare::TypeFromOperator("!=");
+assert(type == Compare::NOT_EQUAL);

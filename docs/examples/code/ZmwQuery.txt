@@ -1,0 +1,6 @@
+vector<int32_t> whitelist = { 50, 100 };
+ZmwQuery query(whitelist, dataset);
+for (const BamRecord& record : query) {
+    assert(record.HoleNumber() == 50 ||
+           record.HoleNumber() == 100);
+}

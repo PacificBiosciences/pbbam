@@ -1,0 +1,5 @@
+PbiFilter filter{ PbiReadAccuracyFilter{0.8, Compare::GREATER_THAN_EQUAL} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.ReadAccuracy() >= 0.8);
+}

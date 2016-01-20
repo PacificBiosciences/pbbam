@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pbds:DataSet CreatedAt="2015-05-13T10:58:26" MetaType="PacBio.DataSet.DataSet" Name="" Tags="" UniqueId="30f72098-bc5b-e06b-566c-8b28dda909a8" Version="2.3.0" xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:schemaLocation="http://pacificbiosciences.com/PacBioDatasets.xsd">
+    <pbbase:ExternalResources>
+        <pbbase:ExternalResource ResourceId="file:tests/data/bam_mapping_1.bam">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex ResourceId="file:tests/data/bam_mapping_1.bam.bai"/>
+			</pbbase:FileIndices>
+        </pbbase:ExternalResource>
+        <pbbase:ExternalResource ResourceId="file:tests/data/bam_mapping_2.bam">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex ResourceId="file:tests/data/bam_mapping_2.bam.bai"/>
+			</pbbase:FileIndices>
+        </pbbase:ExternalResource>
+    </pbbase:ExternalResources>
+    <pbds:DataSets>
+        <pbds:DataSet CreatedAt="2015-05-13T10:58:26" UniqueId="c5402d06-4643-057c-e300-fe229b4e8909" Version="2.3.0" xmlns="http://pacificbiosciences.com/PacBioDataModel.xsd" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+            <pbbase:ExternalResources>
+                <pbbase:ExternalResource ResourceId="file:tests/data/bam_mapping_2.bam">
+			        <pbbase:FileIndices>
+				        <pbbase:FileIndex ResourceId="file:tests/data/bam_mapping_2.bam.bai"/>
+			        </pbbase:FileIndices>
+                </pbbase:ExternalResource>
+            </pbbase:ExternalResources>
+        </pbds:DataSet>
+        <pbds:DataSet CreatedAt="2015-05-13T10:58:26" UniqueId="f8b54a55-5fb7-706f-ab35-39afc9c86924" Version="2.3.0" xmlns="http://pacificbiosciences.com/PacBioDataModel.xsd" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+            <pbbase:ExternalResources>
+                <pbbase:ExternalResource ResourceId="file:tests/data/bam_mapping_1.bam">
+			        <pbbase:FileIndices>
+				        <pbbase:FileIndex ResourceId="file:tests/data/bam_mapping_1.bam.bai"/>
+			        </pbbase:FileIndices>
+                </pbbase:ExternalResource>
+            </pbbase:ExternalResources>
+        </pbds:DataSet>
+    </pbds:DataSets>
+</pbds:DataSet>

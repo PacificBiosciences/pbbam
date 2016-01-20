@@ -1,0 +1,4 @@
+EntireFileQuery query("foo.bam");
+for (const BamRecord& record : query) {
+    // do stuff
+}

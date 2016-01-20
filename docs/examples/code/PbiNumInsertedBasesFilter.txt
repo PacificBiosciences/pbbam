@@ -1,0 +1,6 @@
+PbiFilter filter{ PbiNumInsertedBasesFilter{50, Compare::LESS_THAN} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.NumInsertedBases() < 50);
+}
+

@@ -1,0 +1,17 @@
+// single value
+PbiFilter filter{ PbiBarcodeFilter{17} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    const auto barcodes = record.Barcodes();
+    assert(barcodes.first == 17 || barcodes.second == 17);
+}
+
+// whitelist
+vector<uint16_t> whitelist = { 50, 100 };
+PbiFilter filter{ PbiBarcodeFilter{whitelist} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    const auto barcodes = record.Barcodes();
+    assert(barcodes.first == 50  || barcodes.second == 50 ||
+           barcodes.first == 100 || barcodes.second == 100);
+}

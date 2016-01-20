@@ -1,0 +1,3 @@
+// sort on increasing ZMW hole number
+std::vector<BamRecord> records;
+std::sort(records.begin(), records.end(), Compare::Zmw());

@@ -1,0 +1,23 @@
+bool allHoleNumbersEqual(const vector<BamRecord>& group) 
+{
+    if (group.empty()) 
+        return true;
+    const auto firstHoleNumber = group[0].HoleNumber();
+    for (size_t i = 1; i < group.size(); ++i) {
+       if (group[i].HoleNumber() != firstHoleNumber)
+           return false;
+    }
+    return true;
+}
+
+vector<int32_t> whitelist = { 50, 100 };
+ZmwGroupQuery query(whitelist, dataset);
+for(const vector<BamRecord>& group : query) {
+
+    assert(allHoleNumbersEqual(group));
+
+    for (const BamRecord& record : group) {
+        assert(record.HoleNumber() == 50 ||
+               record.HoleNumber() == 100);
+    }
+}

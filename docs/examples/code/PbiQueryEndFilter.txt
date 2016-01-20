@@ -1,0 +1,5 @@
+PbiFilter filter{ PbiQueryEndFilter{3000, Compare::GREATER_THAN} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.QueryEnd() > 3000);
+} 

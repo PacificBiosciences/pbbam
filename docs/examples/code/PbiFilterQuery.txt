@@ -1,0 +1,22 @@
+// setup filter
+PbiFilter filter;
+filter.Add(PbiZmwFilter(42));
+filter.Add(PbiReadAccuracyFilter(0.9, Compare::GREATER_THAN_EQUAL));
+
+// using C++11 range-based for loop
+PbiFilterQuery query(filter, dataset);
+for (const BamRecord& r : query) {
+    assert(r.HoleNumber() == 42);
+    assert(r.ReadAccuracy() >= 0.9);
+}
+
+// OR
+
+// using iterators directly
+PbiFilterQuery query(filter, dataset);
+auto iter = query.cbegin();
+auto end  = query.cend();
+for (; iter != end; ++iter) {
+    assert(iter->HoleNumber() == 42);
+    assert(iter->ReadAccuracy() >= 0.9);
+} 

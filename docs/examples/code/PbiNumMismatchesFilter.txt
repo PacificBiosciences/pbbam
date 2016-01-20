@@ -1,0 +1,6 @@
+PbiFilter filter{ PbiNumMismatchesFilter{500, Compare::LESS_THAN} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    assert(record.NumMismatches() < 500);
+}
+

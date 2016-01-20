@@ -1,0 +1,15 @@
+// using C++11 range-based for loop
+EntireFileQuery query(dataset);
+for (const BamRecord& record : query) {
+    // ... do stuff ...
+}
+
+// OR
+
+// using iterators
+EntireFileQuery query(dataset);
+auto iter = query.cbegin();
+auto end  = query.cend();
+for (; iter != end; ++iter) {
+    // ... do stuff ...
+}  

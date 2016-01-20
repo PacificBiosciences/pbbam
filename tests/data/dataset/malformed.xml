@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SubreadSet 
+	Description="Merged dataset from 1 files using DatasetMerger 0.1.2" 
+    MetaType="PacBio.DataSet.HdfSubreadSet" 
+    Name="Subreads from runr000013_42267_150403" 
+    Tags="pacbio.secondary.instrument=RS" 
+    TimeStampedName="hdfsubreadset_2015-08-19T15:39:36.331-07:00" 
+    UniqueId="b4741521-2a4c-42df-8a13-0a755ca9ed1e"
+    Version="0.5" 
+    xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd" 
+    xmlns:ns0="http://pacificbiosciences.com/PacBioBaseDataModel.xsd"
+    xmlns:ns1="http://pacificbiosciences.com/PacBioSampleInfo.xsd"
+    xmlns:ns2="http://pacificbiosciences.com/PacBioCollectionMetadata.xsd"
+    xmlns:ns3="http://pacificbiosciences.com/PacBioReagentKit.xsd">
+	<ns0:ExternalResources>
+        <ns0:ExternalResource 
+            MetaType="SubreadFile.SubreadBamFile"
+            TimeStampedName="SubreadFile.SubreadBamFile_00000000000000"
+            UniqueId="251acf71-9eb0-489e-9dd1-cdbd11432753" 
+            ResourceId="file:///mnt/secondary-siv/jenkins/jenkins-bot01/workspace/Ubuntu1404_Mainline_SA3_Tiny_tests/software/smrtanalysis/siv/testkit-jobs/sa3_pipelines/mapping/tiny/job_output-ubuntu1404/tasks/pbsmrtpipe.tasks.h5_subreads_to_subread-0//mnt/secondary-siv/jenkins/jenkins-bot01/workspace/Ubuntu1404_Mainline_SA3_Tiny_tests/software/smrtanalysis/siv/testkit-jobs/sa3_pipelines/mapping/tiny/job_output-ubuntu1404/tasks/pbsmrtpipe.tasks.h5_subreads_to_subread-0/file.subreads.subreads.bam"  />
+    </ns0:ExternalResources>
+    <DataSetMetadata>
+        <TotalLength>50000000</TotalLength>
+        <NumRecords>150000</NumRecords>
+        <ns2:Collections>
+            <ns2:CollectionMetadata 
+                Context="m150404_101626_42267_c100807920800000001823174110291514_s1_p0" 
+                InstrumentId="1" 
+                InstrumentName="42267" 
+                MetaType="PacBio.Collection" 
+                TimeStampedName="m150404_101626_42267_c100807920800000001823174110291514_s1_p0" 
+                UniqueId="d66c8372-2b70-4dcf-b64f-9f8b5cc351fd">
+                <ns2:InstCtrlVer>2.3.0.1.142990</ns2:InstCtrlVer>
+                <ns2:SigProcVer>NRT@172.31.128.10:8082, SwVer=2301.142990, HwVer=1.0</ns2:SigProcVer>
+                <ns2:RunDetails>
+                    <ns2:RunId>r000013_42267_150403</ns2:RunId>
+                    <ns2:Name>Inst42267-040315-SAT-100pM-2kb-P6C4</ns2:Name>
+                </ns2:RunDetails>
+                <ns2:WellSample Name="Inst42267-040315-SAT-100pM-2kb-P6C4">
+                    <ns2:PlateId>Inst42267-040315-SAT-100pM-2kb-P6C4</ns2:PlateId>
+                    <ns2:WellName>Inst42267-040315-SAT-100pM-2kb-P6C4</ns2:WellName>
+                    <ns2:Concentration>0.0</ns2:Concentration>                         
+                    <ns2:SampleReuseEnabled>false</ns2:SampleReuseEnabled>
+                    <ns2:StageHotstartEnabled>false</ns2:StageHotstartEnabled>
+                    <ns2:SizeSelectionEnabled>false</ns2:SizeSelectionEnabled>
+                    <ns2:UseCount>1</ns2:UseCount>
+                    <ns1:BioSamplePointers>
+                        <ns1:BioSamplePointer>251acf71-9eb0-489e-9dd1-cdbd11432752</ns1:BioSamplePointer>
+                    </ns1:BioSamplePointers>
+                </ns2:WellSample>
+                <ns2:Automation>
+                    <ns0:AutomationParameters>
+                        <ns0:AutomationParameter />
+                    </ns0:AutomationParameters>
+                </ns2:Automation>
+                <ns2:CollectionNumber>7</ns2:CollectionNumber>
+                <ns2:CellIndex>4</ns2:CellIndex>
+                <ns2:CellPac Barcode="10080792080000000182317411029151" />
+                <ns2:Primary>
+                    <ns2:AutomationName>BasecallerV1</ns2:AutomationName>
+                    <ns2:ConfigFileName>2-3-0_P6-C4.xml</ns2:ConfigFileName>
+                    <ns2:SequencingCondition />
+                    <ns2:OutputOptions>
+                        <ns2:ResultsFolder>Analysis_Results</ns2:ResultsFolder>
+                        <ns2:CollectionPathUri>rsy://mp-rsync/vol55//RS_DATA_STAGING/42267/Inst42267-040315-SAT-100pM-2kb-P6C4_13/A04_7/</ns2:CollectionPathUri>
+                        <ns2:CopyFiles>
+                            <ns2:CollectionFileCopy>Fasta</ns2:CollectionFileCopy>
+                        </ns2:CopyFiles>
+                        <ns2:Readout>Bases</ns2:Readout>
+                        <ns2:MetricsVerbosity>Minimal</ns2:MetricsVerbosity>
+                     </ns2:OutputOptions>
+                 </ns2:Primary>
+             </ns2:CollectionMetadata>
+         </ns2:Collections>
+         <ns1:BioSamples>
+             <ns1:BioSample
+                 Description="Inst42267-SAT-100pM-2kbLambda-P6C4-Std120_CPS_040315"
+                 MetaType="PacBio.Sample" 
+                 Name="Inst42267-040315-SAT-100pM-2kb-P6C4" 
+                 TimeStampedName="biosample_2015-08-19T15:39:36.331-07:00" 
+                 UniqueId="251acf71-9eb0-489e-9dd1-cdbd11432752" />
+         </ns1:BioSamples>
+      </DataSetMetadata>
+</SubreadSet>

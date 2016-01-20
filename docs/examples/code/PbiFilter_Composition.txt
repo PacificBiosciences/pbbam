@@ -1,0 +1,8 @@
+// (f1 && f2) || f3
+
+PbiFilter f1;
+PbiFilter f2;
+PbiFilter intersect_f1_f2 = PbiFilter::Intersection(f1, f2);
+
+PbiFilter f3;
+PbiFilter final = PbiFilter::Union(intersect_f1_f2, f3);

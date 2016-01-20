@@ -1,0 +1,21 @@
+struct MyCustomFilter
+{
+    bool Accepts(const PbiRawData& index, const size_t row) const
+    {
+        // Look up data for record at the provided row. Do any calculations
+        // necessary, then return whether that record passes your 
+        // filter criteria. 
+        
+        return true;
+    }
+};
+
+// use in composite filters
+PbiFilter f;
+f.Add(PbiMovieNameFilter("foo"));
+f.Add(MyCustomFilter());
+
+// pass directly to PbiFilterQuery
+PbiFilterQuery query(MyCustomFilter(), "foo.bam");
+for (const BamRecord& record : query)
+    // ... do stuff ...

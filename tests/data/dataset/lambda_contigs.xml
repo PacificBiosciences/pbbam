@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pbds:ReferenceSet CreatedAt="2015-05-28T10:56:36" MetaType="PacBio.DataSet.ReferenceSet" Name="" Tags="" UniqueId="596e87db-34f9-d2fd-c905-b017543170e1" Version="2.3.0" xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDatasets.xsd">
+    <pbbase:ExternalResources>
+        <pbbase:ExternalResource ResourceId="file:tests/data/lambda_contigs.fasta"/>
+    </pbbase:ExternalResources>
+</pbds:ReferenceSet>

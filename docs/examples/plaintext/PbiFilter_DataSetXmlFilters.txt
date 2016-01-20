@@ -1,0 +1,14 @@
+<Filters>
+  <Filter>
+    <Properties>
+      <Property />  # A
+      <Property />  # B
+    </Properties>
+  </Filter>
+  <Filter>
+    <Properties>
+      <Property />  # C
+      <Property />  # D
+    </Properties> 
+  </Filter>
+</Filters>

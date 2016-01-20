@@ -1,0 +1,1 @@
+bool Accepts(const PbiRawData& index, const size_t row) const;
