@@ -169,33 +169,38 @@ public:
 // BamFileMerger
 
 inline
-BamFileMerger::BamFileMerger(const std::vector<std::string>& inputFilenames,
-                             const std::string& outputFilename,
-                             const ProgramInfo& mergeProgram,
-                             bool createPbi)
-    : inputFilenames_(inputFilenames)
-    , outputFilename_(outputFilename)
-    , mergeProgram_(mergeProgram)
-    , createPbi_(createPbi)
+void BamFileMerger::Merge(const DataSet& dataset,
+                          const std::string& outputFilename,
+                          const ProgramInfo& mergeProgram,
+                          bool createPbi)
 {
-    if (inputFilenames.empty())
+    const PbiFilter filter = PbiFilter::FromDataSet(dataset);
+
+    std::vector<std::string> inputFilenames_;
+    const auto& bamFiles = dataset.BamFiles();
+    inputFilenames_.reserve(bamFiles.size());
+    for (const auto& file : bamFiles)
+        inputFilenames_.push_back(file.Filename());
+
+    if (inputFilenames_.empty())
         throw std::runtime_error("no input filenames provided to BamFileMerger");
 
     if (outputFilename.empty())
         throw std::runtime_error("no output filename provide to BamFileMerger");
-}
 
-inline
-void BamFileMerger::Merge(void)
-{
+
     // attempt open input files
-    std::vector<std::unique_ptr<PacBio::BAM::BamReader> > readers;
+    std::vector<std::unique_ptr<BamReader> > readers;
     readers.reserve(inputFilenames_.size());
-    for (const auto& fn : inputFilenames_)
-        readers.emplace_back(new PacBio::BAM::BamReader(fn));
+    for (const auto& fn : inputFilenames_) {
+        if (filter.IsEmpty())
+            readers.emplace_back(new BamReader(fn));
+        else
+            readers.emplace_back(new PbiIndexedBamReader(filter, fn));
+    }
 
     // read headers
-    std::vector<PacBio::BAM::BamHeader> headers;
+    std::vector<BamHeader> headers;
     headers.reserve(readers.size());
     for (auto&& reader : readers)
         headers.push_back(reader->Header());
@@ -204,17 +209,17 @@ void BamFileMerger::Merge(void)
     assert(!headers.empty());
 
     // merge headers
-    PacBio::BAM::BamHeader mergedHeader = headers.front();
+    BamHeader mergedHeader = headers.front();
     const std::string& usingSortOrder = mergedHeader.SortOrder();
     const bool isCoordinateSorted = (usingSortOrder == "coordinate");
     for (size_t i = 1; i < headers.size(); ++i) {
-        const PacBio::BAM::BamHeader& header = headers.at(i);
+        const BamHeader& header = headers.at(i);
         if (header.SortOrder() != usingSortOrder)
             throw std::runtime_error("BAM file sort orders do not match, aborting merge");
         mergedHeader += headers.at(i);
     }
-    if (mergeProgram_.IsValid())
-        mergedHeader.AddProgram(mergeProgram_);
+    if (mergeProgram.IsValid())
+        mergedHeader.AddProgram(mergeProgram);
 
     // setup collator, based on sort order
     std::unique_ptr<ICollator> collator;
@@ -222,18 +227,19 @@ void BamFileMerger::Merge(void)
         collator.reset(new AlignedCollator(std::move(readers)));
     else
         collator.reset(new QNameCollator(std::move(readers)));
+    // NOTE: readers *moved*, so no longer accessible here
 
     // do merge, creating PBI on-the-fly
-    if (createPbi_ && (outputFilename_ != "-")) {
+    if (createPbi && (outputFilename != "-")) {
 
-        // TODO: use existing PBI data, if available
+        // TODO: this implementation recalculates all PBI values, when we really
+        //       only need to collate entries and update offsets
 
-        PacBio::BAM::BamWriter writer(outputFilename_, mergedHeader);
-        PacBio::BAM::PbiBuilder builder{ (outputFilename_ + ".pbi"),
-                                         mergedHeader.NumSequences(),
-                                         isCoordinateSorted
-                                       };
-
+        BamWriter writer(outputFilename, mergedHeader);
+        PbiBuilder builder{ (outputFilename + ".pbi"),
+                            mergedHeader.NumSequences(),
+                            isCoordinateSorted
+                          };
         BamRecord record;
         int64_t vOffset = 0;
         while (collator->GetNext(record)) {
@@ -244,7 +250,7 @@ void BamFileMerger::Merge(void)
 
     // otherwise just merge BAM
     else {
-        PacBio::BAM::BamWriter writer(outputFilename_, mergedHeader);
+        BamWriter writer(outputFilename, mergedHeader);
         BamRecord record;
         while (collator->GetNext(record))
             writer.Write(record);

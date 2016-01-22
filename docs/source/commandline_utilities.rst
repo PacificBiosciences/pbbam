@@ -12,4 +12,4 @@ utilities for working with PacBio indices (".pbi" files).
    tools/bam2sam
    tools/pbindex
    tools/pbindexdump
-
+   tools/pbmerge

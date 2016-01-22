@@ -95,12 +95,12 @@ int main(int argc, char* argv[])
 {
     // setup help & options
     optparse::OptionParser parser;
-    parser.description("pbmerge merges PacBio BAM files. At least one filename must "
-                       "be provided for input (in which case, the merge is simply a copy). "
-                       "If no output filename is specified, output will be written to stdout."
+    parser.description("pbmerge merges PacBio BAM files. If the input is DataSetXML, "
+                       "any filters will be applied. If no output filename is specified, "
+                       "new BAM will be written to stdout."
                        );
     parser.prog("pbmerge");
-    parser.usage("pbmerge [-o <out.bam>] <in1.bam> [<in2.bam> ... <inN.bam>]");
+    parser.usage("pbmerge [options] [-o <out.bam>] <INPUT>");
     parser.version(pbmerge::Version);
     parser.add_version_option(true);
     parser.add_help_option(true);
@@ -109,13 +109,22 @@ int main(int argc, char* argv[])
     ioGroup.add_option("-o")
            .dest("output")
            .metavar("output")
-           .help("Output BAM filename");
+           .help("Output BAM filename. ");
     ioGroup.add_option("--no-pbi")
             .dest("no_pbi")
             .action("store_true")
-            .help("Set this option to skip PBI file creation. PBI creation is "
+            .help("Set this option to skip PBI index file creation. PBI creation is "
                   "automatically skipped if no output filename is provided."
                   );
+    ioGroup.add_option("")
+           .dest("input")
+           .metavar("INPUT")
+           .help("Input may be one of:\n"
+                 "    DataSetXML, list of BAM files, or FOFN\n\n"
+                 "    fofn: pbmerge -o merged.bam bams.fofn\n\n"
+                 "    bams: pbmerge -o merged.bam 1.bam 2.bam 3.bam\n\n"
+                 "    xml:  pbmerge -o merged.bam foo.subreadset.xml\n\n"
+                 );
     parser.add_option_group(ioGroup);
 
     // parse command line for settings
@@ -137,12 +146,25 @@ int main(int argc, char* argv[])
                     .Name("pbmerge")
                     .Version(pbmerge::Version);
 
-        // run merger
-        PacBio::BAM::common::BamFileMerger merger(settings.inputFilenames_,
+        PacBio::BAM::DataSet dataset;
+        if (settings.inputFilenames_.size() == 1)
+            dataset = PacBio::BAM::DataSet(settings.inputFilenames_.front());
+        else
+            dataset = PacBio::BAM::DataSet(settings.inputFilenames_);
+
+
+        PacBio::BAM::common::BamFileMerger::Merge(dataset,
                                                   settings.outputFilename_,
                                                   mergeProgram,
                                                   settings.createPbi_);
-        merger.Merge();
+
+
+//        PacBio::BAM::common::BamFileMerger merger(dataset,
+//                                                  settings.outputFilename_,
+//                                                  mergeProgram,
+//                                                  settings.createPbi_);
+//        merger.Merge();
+
         return EXIT_SUCCESS;
     }
     catch (std::exception& e) {

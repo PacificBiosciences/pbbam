@@ -9,6 +9,7 @@ configure_file(
 
 # list source files
 set(PBMERGE_SOURCES
+    ${ToolsCommonDir}/BamFileMerger.h
     ${ToolsCommonDir}/OptionParser.cpp
     ${PbmergeSrcDir}/main.cpp
 )
@@ -29,5 +30,7 @@ if (PacBioBAM_build_tests)
             ${PacBioBAM_CramTestsDir}/pbmerge_pacbio_ordering.t
             ${PacBioBAM_CramTestsDir}/pbmerge_aligned_ordering.t
             ${PacBioBAM_CramTestsDir}/pbmerge_mixed_ordering.t
+            ${PacBioBAM_CramTestsDir}/pbmerge_dataset.t
+            ${PacBioBAM_CramTestsDir}/pbmerge_fofn.t
     )
 endif()

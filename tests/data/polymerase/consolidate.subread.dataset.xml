@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pbds:SubreadSet 
+    xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd"
+    xmlns:pbsample="http://pacificbiosciences.com/PacBioSampleInfo.xsd"
+    xmlns:pbmeta="http://pacificbiosciences.com/PacBioCollectionMetadata.xsd"
+    xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd"
+    xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd" 
+    UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe519c" 
+    TimeStampedName="subreadset_150304_231155" 
+    MetaType="PacBio.DataSet.SubreadSet" 
+    Name="DataSet_SubreadSet" 
+    Version="3.0.0" 
+    CreatedAt="2015-01-27T09:00:01"> 
+<pbbase:ExternalResources>
+    <pbbase:ExternalResource 
+        UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5193" 
+        TimeStampedName="subread_bam_150304_231155" 
+        MetaType="PacBio.SubreadFile.SubreadBamFile" 
+        ResourceId="production.subreads.bam">
+    </pbbase:ExternalResource>
+    <pbbase:ExternalResource
+        UniqueId="b096d0a3-94b8-4918-b3af-a3f81bbe5195"
+        TimeStampedName="scraps_bam_150304_231155"
+        MetaType="PacBio.SubreadFile.ScrapsBamFile"
+        ResourceId="production.scraps.bam">
+    </pbbase:ExternalResource>
+</pbbase:ExternalResources>
+<pbds:Filters>
+    <pbds:Filter>
+        <pbbase:Properties>
+            <pbbase:Property Name="qStart" Value="4000" Operator=">"/>
+            <pbbase:Property Name="qStart" Value="5000" Operator="<"/>
+        </pbbase:Properties>
+    </pbds:Filter>
+</pbds:Filters>
+</pbds:SubreadSet>

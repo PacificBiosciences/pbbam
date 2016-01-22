@@ -38,6 +38,8 @@
 #ifndef BAMFILEMERGER_H
 #define BAMFILEMERGER_H
 
+#include <pbbam/DataSet.h>
+#include <pbbam/PbiFilter.h>
 #include <pbbam/ProgramInfo.h>
 #include <string>
 #include <vector>
@@ -49,18 +51,22 @@ namespace common {
 class BamFileMerger
 {
 public:
-    BamFileMerger(const std::vector<std::string>& inputFilenames,
-                  const std::string& outputFilename,
-                  const PacBio::BAM::ProgramInfo& mergeProgram = PacBio::BAM::ProgramInfo(),
-                  bool createPbi = true);
-public:
-    void Merge(void);
-
-private:
-    std::vector<std::string> inputFilenames_;
-    std::string outputFilename_;
-    PacBio::BAM::ProgramInfo mergeProgram_;
-    bool createPbi_;
+    /// \brief Runs merger on a dataset, applying any supplied filters.
+    ///
+    /// When this function exits, a merged BAM (and optional PBI) will have been
+    /// written and closed.
+    ///
+    /// \param[in] dataset          provides input filenames & filters
+    /// \param[in] outputFilename   resulting BAM output
+    /// \param[in] mergeProgram     info about the calling program. Adds a @PG entry to merged header.
+    /// \param[in] createPbi        if true, creates a PBI alongside output BAM
+    ///
+    /// \throws std::runtime_error if any any errors encountered while reading or writing
+    ///
+    static void Merge(const PacBio::BAM::DataSet& dataset,
+                      const std::string& outputFilename,
+                      const PacBio::BAM::ProgramInfo& mergeProgram = PacBio::BAM::ProgramInfo(),
+                      bool createPbi = true);
 };
 
 } // namespace common
