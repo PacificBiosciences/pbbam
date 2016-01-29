@@ -89,6 +89,18 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
             EXPECT_EQ("S/P1-C1", rg.SequencingChemistry());
         }
     }
+
+    // basecaller 3.1.x
+    { 
+        const vector<string> sequencingKits { "100-619-400", "100-711-600", "100-620-000" };
+        ReadGroupInfo rg("3.1");
+        rg.BindingKit("100-619-300");
+        rg.BasecallerVersion("3.1.0.171835");
+        for (const string& sk : sequencingKits) {
+            rg.SequencingKit(sk);
+            EXPECT_EQ("S/P1-C1", rg.SequencingChemistry());
+        }
+    }
 }
 
 TEST(ReadGroupInfoTest, SequencingChemistryThrowsOnBadTriple)
