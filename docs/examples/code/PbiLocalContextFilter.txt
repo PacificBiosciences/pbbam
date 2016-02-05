@@ -1,0 +1,22 @@
+
+// --------------------
+// has adapter_before
+// --------------------
+
+PbiFilter filter{ PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    const bool hasAdapterBefore = (record.LocalContextFlags() & LocalContextFlags::ADAPTER_BEFORE) != 0;
+    assert(hasAdapterBefore);
+}
+
+// ----------------------------------
+// has any adapters, barcodes, etc.
+// ----------------------------------
+
+PbiFilter filter{ PbiLocalContextFilter{LocalContextFlags::NO_LOCAL_CONTEXT, Compare::NOT_EQUAL} };
+PbiFilterQuery query(filter);
+for (const BamRecord& record : query) {
+    const bool hasContext = (record.LocalContextFlags() != LocalContextFlags::NO_LOCAL_CONTEXT);
+    assert(hasContext);
+}

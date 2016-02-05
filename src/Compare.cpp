@@ -91,7 +91,9 @@ static const unordered_map<string, Compare::Type> opToTypeMap =
     { "&gt;",  Compare::GREATER_THAN },
     { ">=",    Compare::GREATER_THAN_EQUAL },
     { "gte",   Compare::GREATER_THAN_EQUAL },
-    { "&gt;=", Compare::GREATER_THAN_EQUAL }
+    { "&gt;=", Compare::GREATER_THAN_EQUAL },
+    { "&",     Compare::CONTAINS },
+    { "~",     Compare::NOT_CONTAINS }
 };
 
 static const unordered_map<Compare::Type, TypeAlias, CompareTypeHash> typeAliases =
@@ -101,7 +103,9 @@ static const unordered_map<Compare::Type, TypeAlias, CompareTypeHash> typeAliase
     { Compare::LESS_THAN,          TypeAlias{ "Compare::LESS_THAN",          "<",  "lt"  } },
     { Compare::LESS_THAN_EQUAL,    TypeAlias{ "Compare::LESS_THAN_EQUAL",    "<=", "lte" } },
     { Compare::GREATER_THAN,       TypeAlias{ "Compare::GREATER_THAN",       ">",  "gt"  } },
-    { Compare::GREATER_THAN_EQUAL, TypeAlias{ "Compare::GREATER_THAN_EQUAL", ">=", "gte" } }
+    { Compare::GREATER_THAN_EQUAL, TypeAlias{ "Compare::GREATER_THAN_EQUAL", ">=", "gte" } },
+    { Compare::CONTAINS,           TypeAlias{ "Compare::CONTAINS",           "&",  "and" } },
+    { Compare::NOT_CONTAINS,       TypeAlias{ "Compare::NOT_CONTAINS",       "~",  "not" } }
 };
 
 } // namespace internal

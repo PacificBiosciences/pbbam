@@ -67,7 +67,7 @@ PbiRawData test2Bam_RawIndex(void)
     subreadData.qEnd_       = { 2531, 4055, 5571, 6237 };
     subreadData.holeNumber_ = { 14743, 14743, 14743, 14743 };
     subreadData.readQual_   = { 0.901, 0.601, 0.901, 0.601 };
-    subreadData.ctxtFlag_   = { 0, 0, 0, 0 };
+    subreadData.ctxtFlag_   = { 0, 1, 2, 3 };
     subreadData.fileOffset_ = { 35651584, 35655125, 35667128, 35679170 };
 
     PbiRawMappedData& mappedData = index.mappedData_;
@@ -504,12 +504,61 @@ TEST(PbiFilterTest, IdentityFilterOk)
     }
 }
 
-//TEST(PbiFilterTest, LocalContextFlagFilterOk)
-//{
-//    auto f = PbiLocalContextFlagFilter{ LocalContextFlags::ADAPTER_AFTER };
-//    (void)f;
-//    EXPECT_TRUE(false);
-//}
+TEST(PbiFilterTest, LocalContextFilterOk)
+{
+    { // == NO_LOCAL_CONTEXT
+        const auto filter = PbiFilter { PbiLocalContextFilter{ LocalContextFlags::NO_LOCAL_CONTEXT } };
+        tests::checkFilterRows(filter, std::vector<size_t>{0});
+    }
+    { // != ADAPTER_BEFORE (exact match)
+        const auto filter = PbiFilter { PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_EQUAL } };
+        tests::checkFilterRows(filter, std::vector<size_t>{0,2,3});
+    }
+    { // contains ADAPTER_BEFORE
+        const auto filter = PbiFilter { PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS } };
+        tests::checkFilterRows(filter, std::vector<size_t>{1,3});
+    }
+    { // does not contain ADAPTER_BEFORE
+        const auto filter = PbiFilter { PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS } };
+        tests::checkFilterRows(filter, std::vector<size_t>{0,2});
+    }
+    { // include both ADAPTER_BEFORE and ADAPTER_AFTER
+        const auto filter = PbiFilter::Intersection(
+        {
+            PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS },
+            PbiLocalContextFilter{ LocalContextFlags::ADAPTER_AFTER,  Compare::CONTAINS }
+        });
+        tests::checkFilterRows(filter, std::vector<size_t>{3});
+    }
+    { // exclude both ADAPTER_BEFORE and ADAPTER_AFTER
+        const auto filter = PbiFilter::Intersection(
+        {
+            PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS },
+            PbiLocalContextFilter{ LocalContextFlags::ADAPTER_AFTER,  Compare::NOT_CONTAINS }
+        });
+        tests::checkFilterRows(filter, std::vector<size_t>{0});
+    }
+    { // include everything with either ADAPTER_BEFORE or ADAPTER_AFTER
+        const auto filter = PbiFilter::Union(
+        {
+            PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS },
+            PbiLocalContextFilter{ LocalContextFlags::ADAPTER_AFTER,  Compare::CONTAINS }
+        });
+        tests::checkFilterRows(filter, std::vector<size_t>{1,2,3});
+    }
+    { // include everything with either ADAPTER_BEFORE or ADAPTER_AFTER, but not both
+        const auto filter = PbiFilter::Intersection(
+        {
+                PbiLocalContextFilter{ LocalContextFlags::NO_LOCAL_CONTEXT, Compare::NOT_EQUAL },
+                PbiFilter::Union(
+                {
+                    PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS },
+                    PbiLocalContextFilter{ LocalContextFlags::ADAPTER_AFTER,  Compare::NOT_CONTAINS }
+                })
+        });
+        tests::checkFilterRows(filter, std::vector<size_t>{1,2});
+    }
+}
 
 TEST(PbiFilterTest, MapQualityFilterOk)
 {
@@ -874,5 +923,378 @@ TEST(PbiFilterTest, FromDataSetOk)
     for (size_t i = 0; i < tests::shared_index.NumReads(); ++i) {
         EXPECT_EQ(expectedFilter.Accepts(tests::shared_index, i),
                   generatedFilter.Accepts(tests::shared_index, i));
+    }
+}
+
+TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
+{
+    {   // no adapters or barcodes
+
+        const auto expectedFilter =
+                PbiLocalContextFilter{ LocalContextFlags::NO_LOCAL_CONTEXT, Compare::EQUAL };
+
+        // <Property Name="cx" Value="0" Operator="==" />
+
+        Property property("cx", "0", "==");
+
+        auto filter = Filter{ };
+        filter.Properties().Add(property);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{0});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{0});
+    }
+    {   // any adapters or barcodes
+
+        const auto expectedFilter =
+                PbiLocalContextFilter{ LocalContextFlags::NO_LOCAL_CONTEXT, Compare::NOT_EQUAL };
+
+        // <Property Name="cx" Value="0" Operator="!=" />
+
+        Property property("cx", "0", "!=");
+
+        auto filter = Filter{ };
+        filter.Properties().Add(property);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{1,2,3});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{1,2,3});
+    }
+    {   // contains adapter_before
+
+        const auto expectedFilter =
+                PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS };
+
+        // <Property Name="cx" Value="1" Operator="&" />
+
+        Property property("cx", "1", "&");
+
+        auto filter = Filter{ };
+        filter.Properties().Add(property);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{1,3});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{1,3});
+    }
+    {   // contains adapter_before
+
+        const auto expectedFilter =
+                PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS };
+
+        // <Property Name="cx" Value="ADAPTER_BEFORE" Operator="&" />
+
+        Property property("cx", "ADAPTER_BEFORE", "&");
+
+        auto filter = Filter{ };
+        filter.Properties().Add(property);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{1,3});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{1,3});
+    }
+    {   // contains adapter_after
+
+        const auto expectedFilter =
+                PbiLocalContextFilter{ LocalContextFlags::ADAPTER_AFTER, Compare::CONTAINS };
+
+        // <Property Name="cx" Value="2" Operator="&" />
+
+        Property property("cx", "2", "&");
+
+        auto filter = Filter{ };
+        filter.Properties().Add(property);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{2,3});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{2,3});
+    }
+    {   // contains adapter_before or adapter_after
+
+        const auto expectedFilter =
+                PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE | LocalContextFlags::ADAPTER_AFTER,
+                                       Compare::CONTAINS };
+
+        // <Property Name="cx" Value="3" Operator="&" />
+
+        Property property("cx", "3", "&");
+
+        auto filter = Filter{ };
+        filter.Properties().Add(property);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{1,2,3});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{1,2,3});
+    }
+    {   // contains adapter_before or adapter_after
+
+        const auto expectedFilter =
+                PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE | LocalContextFlags::ADAPTER_AFTER,
+                                       Compare::CONTAINS };
+
+        // <Property Name="cx" Value="ADAPTER_BEFORE | ADAPTER_AFTER" Operator="&" />
+
+        Property property("cx", "ADAPTER_BEFORE | ADAPTER_AFTER", "&");
+
+        auto filter = Filter{ };
+        filter.Properties().Add(property);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{1,2,3});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{1,2,3});
+    }
+    {   // contains adapter_before or adapter_after - no whitespace separation
+
+        const auto expectedFilter =
+                PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE | LocalContextFlags::ADAPTER_AFTER,
+                                       Compare::CONTAINS };
+
+        // <Property Name="cx" Value="ADAPTER_BEFORE|ADAPTER_AFTER" Operator="&" />
+
+        Property property("cx", "ADAPTER_BEFORE|ADAPTER_AFTER", "&");
+
+        auto filter = Filter{ };
+        filter.Properties().Add(property);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{1,2,3});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{1,2,3});
+    }
+    {   // contains adapter_before or adapter_after - a lot of whitespace separation
+
+        const auto expectedFilter =
+                PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE | LocalContextFlags::ADAPTER_AFTER,
+                                       Compare::CONTAINS };
+
+        // <Property Name="cx" Value="ADAPTER_BEFORE        |           ADAPTER_AFTER" Operator="&" />
+
+        Property property("cx", "ADAPTER_BEFORE        |           ADAPTER_AFTER", "&");
+
+        auto filter = Filter{ };
+        filter.Properties().Add(property);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{1,2,3});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{1,2,3});
+    }
+    {   // contains adapter_before or adapter_after, but not both
+
+        const auto expectedFilter = PbiFilter::Union(
+        {
+            PbiFilter::Intersection(
+            {
+                PbiLocalContextFilter{ LocalContextFlags::NO_LOCAL_CONTEXT, Compare::NOT_EQUAL },
+                PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS }
+            }),
+            PbiFilter::Intersection(
+            {
+                PbiLocalContextFilter{ LocalContextFlags::NO_LOCAL_CONTEXT, Compare::NOT_EQUAL },
+                PbiLocalContextFilter{ LocalContextFlags::ADAPTER_AFTER, Compare::NOT_CONTAINS }
+            })
+        });
+
+        // <Filters>
+        //   <Filter>
+        //     <Properties>
+        //       <Property Name="cx" Value="0" Operator="!=" />
+        //       <Property Name="cx" Value="1" Operator="~" />
+        //     </Properties>
+        //   </Filter>
+        //   <Filter>
+        //     <Properties>
+        //       <Property Name="cx" Value="0" Operator="!=" />
+        //       <Property Name="cx" Value="2" Operator="~" />
+        //     </Properties>
+        //   </Filter>
+        // </Filters>
+
+        auto filter1 = Filter{ };
+        filter1.Properties().Add(Property("cx", "0", "!="));
+        filter1.Properties().Add(Property("cx", "1", "~"));
+
+        auto filter2 = Filter{ };
+        filter2.Properties().Add(Property("cx", "0", "!="));
+        filter2.Properties().Add(Property("cx", "2", "~"));
+
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter1);
+        dataset.Filters().Add(filter2);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{1,2});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{1,2});
+
+    }
+    {   // contains adapter_before or adapter_after
+
+        const auto expectedFilter = PbiFilter::Union(
+        {
+            PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS },
+            PbiLocalContextFilter{ LocalContextFlags::ADAPTER_AFTER,  Compare::CONTAINS }
+        });
+
+        // <Filters>
+        //   <Filter>
+        //     <Properties>
+        //       <Property Name="cx" Value="1" Operator="&" />
+        //     </Properties>
+        //   </Filter>
+        //   <Filter>
+        //     <Properties>
+        //       <Property Name="cx" Value="2" Operator="&" />
+        //     </Properties>
+        //   </Filter>
+        // </Filters>
+
+        auto filter1 = Filter{ };
+        filter1.Properties().Add(Property("cx", "1", "&"));
+
+        auto filter2 = Filter{ };
+        filter2.Properties().Add(Property("cx", "2", "&"));
+
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter1);
+        dataset.Filters().Add(filter2);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{1,2,3});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{1,2,3});
+    }
+    { // adapter_before and adapter_after
+
+        const auto expectedFilter = PbiFilter::Intersection(
+        {
+            PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS },
+            PbiLocalContextFilter{ LocalContextFlags::ADAPTER_AFTER,  Compare::CONTAINS }
+        });
+
+        // <Property Name="cx" Value="1" Operator="&" />
+        // <Property Name="cx" Value="2" Operator="&" />
+
+        Property property1("cx", "1", "&");
+        Property property2("cx", "2", "&");
+
+        auto filter = Filter{ };
+        filter.Properties().Add(property1);
+        filter.Properties().Add(property2);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{3});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{3});
+    }
+    {   // adapter_before, but no adapter_after
+
+        const auto expectedFilter = PbiFilter::Intersection(
+        {
+            PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS },
+            PbiLocalContextFilter{ LocalContextFlags::ADAPTER_AFTER,  Compare::NOT_CONTAINS }
+        });
+
+        // <Property Name="cx" Value="1" Operator="&" />
+        // <Property Name="cx" Value="2" Operator="~" />
+
+        Property property1("cx", "1", "&");
+        Property property2("cx", "2", "~");
+
+        auto filter = Filter{ };
+        filter.Properties().Add(property1);
+        filter.Properties().Add(property2);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{1});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{1});
+    }
+    {   // contains no adapter_before
+
+        const auto expectedFilter =
+                PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS };
+
+        // <Property Name="cx" Value="1" Operator="~" />
+
+        Property property("cx", "1", "~");
+
+        auto filter = Filter{ };
+        filter.Properties().Add(property);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{0,2});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{0,2});
+    }
+    {   // contains no adapter_before or adapter_after
+
+        const auto expectedFilter = PbiFilter::Intersection(
+        {
+            PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS },
+            PbiLocalContextFilter{ LocalContextFlags::ADAPTER_AFTER,  Compare::NOT_CONTAINS }
+        });
+
+        // <Property Name="cx" Value="1" Operator="~" />
+        // <Property Name="cx" Value="2" Operator="~" />
+
+        Property property1("cx", "1", "~");
+        Property property2("cx", "2", "~");
+
+        auto filter = Filter{ };
+        filter.Properties().Add(property1);
+        filter.Properties().Add(property2);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{0});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{0});
+    }
+    {   // contains no adapter_before or adapter_after
+
+        const auto expectedFilter =
+                PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE | LocalContextFlags::ADAPTER_AFTER,
+                                       Compare::NOT_CONTAINS };
+
+        // <Property Name="cx" Value="3" Operator="~" />
+
+        Property property("cx", "3", "~");
+
+        auto filter = Filter{ };
+        filter.Properties().Add(property);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  std::vector<size_t>{0});
+        tests::checkFilterRows(generatedFilter, std::vector<size_t>{0});
+    }
+    {   // throws on invalid enum name
+
+        Property property("cx", "DOES_NOT_EXIST", "~");
+
+        auto filter = Filter{ };
+        filter.Properties().Add(property);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        EXPECT_THROW(PbiFilter::FromDataSet(dataset), std::runtime_error);
     }
 }

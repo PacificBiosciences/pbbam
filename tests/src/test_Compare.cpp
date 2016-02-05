@@ -133,6 +133,8 @@ TEST(CompareTest, TypeToNameOk)
     EXPECT_EQ(string{"Compare::LESS_THAN_EQUAL"},    Compare::TypeToName(Compare::LESS_THAN_EQUAL));
     EXPECT_EQ(string{"Compare::GREATER_THAN"},       Compare::TypeToName(Compare::GREATER_THAN));
     EXPECT_EQ(string{"Compare::GREATER_THAN_EQUAL"}, Compare::TypeToName(Compare::GREATER_THAN_EQUAL));
+    EXPECT_EQ(string{"Compare::CONTAINS"},           Compare::TypeToName(Compare::CONTAINS));
+    EXPECT_EQ(string{"Compare::NOT_CONTAINS"},       Compare::TypeToName(Compare::NOT_CONTAINS));
 
     // invalid type throws
     EXPECT_THROW(Compare::TypeToName(static_cast<Compare::Type>(42)), std::runtime_error);
@@ -147,6 +149,8 @@ TEST(CompareTest, TypeToOperatorOk)
         EXPECT_EQ(Compare::TypeToOperator(Compare::LESS_THAN_EQUAL),    string{"<="});
         EXPECT_EQ(Compare::TypeToOperator(Compare::GREATER_THAN),       string{">"});
         EXPECT_EQ(Compare::TypeToOperator(Compare::GREATER_THAN_EQUAL), string{">="});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::CONTAINS),           string{"&"});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::NOT_CONTAINS),       string{"~"});
     }
 
     { // alpha
@@ -156,6 +160,8 @@ TEST(CompareTest, TypeToOperatorOk)
         EXPECT_EQ(Compare::TypeToOperator(Compare::LESS_THAN_EQUAL, true),    string{"lte"});
         EXPECT_EQ(Compare::TypeToOperator(Compare::GREATER_THAN, true),       string{"gt"});
         EXPECT_EQ(Compare::TypeToOperator(Compare::GREATER_THAN_EQUAL, true), string{"gte"});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::CONTAINS, true),           string{"and"});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::NOT_CONTAINS, true),       string{"not"});
     }
 
     // invalid type throws
@@ -181,6 +187,8 @@ TEST(CompareTest, FromOperatorOk)
     EXPECT_EQ(Compare::GREATER_THAN_EQUAL, Compare::TypeFromOperator(">="));
     EXPECT_EQ(Compare::GREATER_THAN_EQUAL, Compare::TypeFromOperator("gte"));
     EXPECT_EQ(Compare::GREATER_THAN_EQUAL, Compare::TypeFromOperator("&gt;="));
+    EXPECT_EQ(Compare::CONTAINS,           Compare::TypeFromOperator("&"));
+    EXPECT_EQ(Compare::NOT_CONTAINS,       Compare::TypeFromOperator("~"));
 
     // invalid operator strings throw
     EXPECT_THROW(Compare::TypeFromOperator(""),        std::runtime_error);

@@ -109,6 +109,25 @@ inline bool FilterBase<T>::CompareSingleHelper(const T& lhs) const
     }
 }
 
+template<>
+inline bool FilterBase<LocalContextFlags>::CompareSingleHelper(const LocalContextFlags& lhs) const
+{
+    switch(cmp_) {
+        case Compare::EQUAL:              return lhs == value_;
+        case Compare::LESS_THAN:          return lhs < value_;
+        case Compare::LESS_THAN_EQUAL:    return lhs <= value_;
+        case Compare::GREATER_THAN:       return lhs > value_;
+        case Compare::GREATER_THAN_EQUAL: return lhs >= value_;
+        case Compare::NOT_EQUAL:          return lhs != value_;
+        case Compare::CONTAINS:           return ((lhs & value_) != 0);
+        case Compare::NOT_CONTAINS:       return ((lhs & value_) == 0);
+
+        default:
+            assert(false);
+            throw std::runtime_error("unsupported compare type requested");
+    }
+}
+
 // BarcodeDataFilterBase
 
 template<typename T, BarcodeLookupData::Field field>
@@ -179,11 +198,23 @@ inline bool BasicDataFilterBase<T, field>::BasicDataFilterBase::Accepts(const Pb
         case BasicLookupData::Q_END:        return FilterBase<T>::CompareHelper(basicData.qEnd_.at(row));
         case BasicLookupData::ZMW:          return FilterBase<T>::CompareHelper(basicData.holeNumber_.at(row));
         case BasicLookupData::READ_QUALITY: return FilterBase<T>::CompareHelper(basicData.readQual_.at(row));
-        case BasicLookupData::CONTEXT_FLAG: return FilterBase<T>::CompareHelper(basicData.ctxtFlag_.at(row));
+        //   BasicLookupData::CONTEXT_FLAG has its own specialization
         default:
             assert(false);
             throw std::runtime_error("unsupported BasicData field requested");
     }
+}
+
+// this typedef exists purely so that the next method signature isn't 2 screen widths long
+typedef BasicDataFilterBase<LocalContextFlags, BasicLookupData::CONTEXT_FLAG> LocalContextFilter__;
+
+template<>
+inline bool LocalContextFilter__::BasicDataFilterBase::Accepts(const PbiRawData& idx,
+                                                               const size_t row) const
+{
+    const PbiRawBasicData& basicData = idx.BasicData();
+    const LocalContextFlags rowFlags = static_cast<LocalContextFlags>(basicData.ctxtFlag_.at(row));
+    return FilterBase<LocalContextFlags>::CompareHelper(rowFlags);
 }
 
 template<typename T, MappedLookupData::Field field>
@@ -351,6 +382,13 @@ inline bool PbiBarcodesFilter::Accepts(const PbiRawData& idx, const size_t row) 
 inline PbiIdentityFilter::PbiIdentityFilter(const float identity,
                                             const Compare::Type cmp)
     : internal::FilterBase<float>(identity, cmp)
+{ }
+
+// PbiLocalContextFilter
+
+inline PbiLocalContextFilter::PbiLocalContextFilter(const LocalContextFlags& flags,
+                                                    const Compare::Type cmp)
+    : internal::BasicDataFilterBase<LocalContextFlags, BasicLookupData::CONTEXT_FLAG>(flags, cmp)
 { }
 
 // PbiMapQualityFilter

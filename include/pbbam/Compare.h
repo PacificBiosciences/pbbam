@@ -67,7 +67,7 @@ public:
     /// \{
 
     /// \brief This enum defines the supported comparison types
-    ///        (==, !=, <, <=, >, >=).
+    ///        { ==, !=, <, <=, >, >=, & (contains), ~ (not contains) }.
     ///
     enum Type {
         EQUAL = 0
@@ -76,6 +76,8 @@ public:
       , LESS_THAN_EQUAL
       , GREATER_THAN
       , GREATER_THAN_EQUAL
+      , CONTAINS
+      , NOT_CONTAINS
     };
 
     /// \brief Convert operator string to Compare::Type.

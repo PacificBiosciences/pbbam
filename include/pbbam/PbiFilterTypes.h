@@ -432,11 +432,23 @@ public:
     bool Accepts(const PbiRawData& idx, const size_t row) const;
 };
 
-// TODO: determine use case(s) for query - entire flag or parts?
-//struct PbiLocalContextFlagFilter
-//    : public internal::BasicDataFilterBase<LocalContextFlags,
-//                                           BasicLookupData::CONTEXT_FLAG >
-//{ };
+/// \brief The PbiLocalContextFilter class provides a PbiFilter-compatible
+///        filter on local context (adapter, barcode, etc.).
+///
+/// The primary Compare::Type operators intended for this filter are:
+/// Compare::EQUAL, Compare::NOT_EQUAL, Compare::CONTAINS, and
+/// Compare::NOT_CONTAINS.
+///
+/// Example: \include code/PbiLocalContextFilter.txt
+///
+struct PbiLocalContextFilter
+    : public internal::BasicDataFilterBase<LocalContextFlags,
+                                           BasicLookupData::CONTEXT_FLAG >
+{
+public:
+    PbiLocalContextFilter(const LocalContextFlags& flags,
+                          const Compare::Type cmp = Compare::EQUAL);
+};
 
 /// \brief The PbiMapQualityFilter class provides a PbiFilter-compatible filter on
 ///        mapping quality.

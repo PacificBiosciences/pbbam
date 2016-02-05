@@ -14,6 +14,7 @@ guarantees will be maintained within each major version series.
 - pbmerge accepts DataSetXML as input - using top-level resource BAMs as input,
 applying filters, and generating a merged BAM. Also added FOFN support, instead
 of listing out BAMs as command line args.
+- PbiLocalContextFilter to allow filtering on subread local context.
 
 ### Fixed
 - Fixed mishandling of relative BAM filenames in the filename constructor for
@@ -41,7 +42,7 @@ creating the PBI file alongside.
 BAMs.
 
 ### Removed 
-- samtools dependency`
+- samtools dependency
 
 ## [0.4.3] - 2015-12-22
 
