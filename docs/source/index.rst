@@ -26,8 +26,7 @@ additional languages, and command-line utilities.
    commandline_utilities
 
 
-Search
-======
+Search:
 
 * :ref:`genindex`
 * :ref:`search`
