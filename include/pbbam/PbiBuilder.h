@@ -67,16 +67,50 @@ namespace internal { class PbiBuilderPrivate; }
 class PBBAM_EXPORT PbiBuilder
 {
 public:
+    /// \brief This enum allows you to control the compression level of the
+    ///        output PBI file.
+    ///
+    /// Values are equivalent to zlib compression levels. See its documentation
+    /// for more details: http://www.zlib.net/manual.html
+    ///
+    enum CompressionLevel
+    {
+        CompressionLevel_0 = 0
+      , CompressionLevel_1 = 1
+      , CompressionLevel_2 = 2
+      , CompressionLevel_3 = 3
+      , CompressionLevel_4 = 4
+      , CompressionLevel_5 = 5
+      , CompressionLevel_6 = 6
+      , CompressionLevel_7 = 7
+      , CompressionLevel_8 = 8
+      , CompressionLevel_9 = 9
+
+      , DefaultCompression = -1
+      , NoCompression      = CompressionLevel_0
+      , FastCompression    = CompressionLevel_1
+      , BestCompression    = CompressionLevel_9
+    };
+
+public:
     /// \name Constructors & Related Methods
     /// \{
 
     /// \brief Initializes builder to write data to \p pbiFilename.
     ///
-    /// \param[in] pbiFilename output filename
+    /// \param[in] pbiFilename      output filename
+    /// \param[in] compressionLevel zlib compression level
+    /// \param[in] numThreads       number of threads for compression. If set to
+    ///                             0, PbiBuilder will attempt to determine a
+    ///                             reasonable estimate. If set to 1, this will
+    ///                             force single-threaded execution. No checks
+    ///                             are made against an upper limit.
     ///
     /// \throws std::runtime_error if PBI file cannot be opened for writing
     ///
-    PbiBuilder(const std::string& pbiFilename);
+    PbiBuilder(const std::string& pbiFilename,
+               const PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
+               const size_t numThreads = 4);
 
     /// \brief Initializes builder to write data to \p pbiFilename.
     ///
@@ -87,11 +121,19 @@ public:
     /// \param[in] pbiFilename              output filename
     /// \param[in] numReferenceSequences    number of possible reference
     ///                                     sequences, e.g. BamHeader::NumSequences
+    /// \param[in] compressionLevel zlib compression level
+    /// \param[in] numThreads       number of threads for compression. If set to
+    ///                             0, PbiBuilder will attempt to determine a
+    ///                             reasonable estimate. If set to 1, this will
+    ///                             force single-threaded execution. No checks
+    ///                             are made against an upper limit.
     ///
     /// \throws std::runtime_error if PBI file cannot be opened for writing
     ///
     PbiBuilder(const std::string& pbiFilename,
-               const size_t numReferenceSequences);
+               const size_t numReferenceSequences,
+               const PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
+               const size_t numThreads = 4);
 
     /// \brief Initializes builder to write data to \p pbiFilename.
     ///
@@ -104,12 +146,20 @@ public:
     /// \param[in] isCoordinateSorted       if false, disables reference
     ///                                     sequence tracking
     ///                                     (BamHeader::SortOrder != "coordinate")
+    /// \param[in] compressionLevel zlib compression level
+    /// \param[in] numThreads       number of threads for compression. If set to
+    ///                             0, PbiBuilder will attempt to determine a
+    ///                             reasonable estimate. If set to 1, this will
+    ///                             force single-threaded execution. No checks
+    ///                             are made against an upper limit.
     ///
     /// \throws std::runtime_error if PBI file cannot be opened for writing
     ///
     PbiBuilder(const std::string& pbiFilename,
                const size_t numReferenceSequences,
-               const bool isCoordinateSorted);
+               const bool isCoordinateSorted,
+               const PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
+               const size_t numThreads = 4);
 
     /// \brief Destroys builder, writing its data out to PBI file.
     ///

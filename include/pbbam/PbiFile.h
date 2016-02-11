@@ -43,6 +43,7 @@
 #define PBIFILE_H
 
 #include "pbbam/Config.h"
+#include "pbbam/PbiBuilder.h"
 #include <string>
 
 namespace PacBio {
@@ -84,7 +85,9 @@ namespace PbiFile
     ///
     /// \throws std::runtime_error if index file could not be created
     ///
-    PBBAM_EXPORT void CreateFrom(const BamFile& bamFile);
+    PBBAM_EXPORT void CreateFrom(const BamFile& bamFile,
+                                 const PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
+                                 const size_t numThreads = 4);
 
 } // namespace PbiFile
 } // namespace BAM

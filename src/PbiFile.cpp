@@ -52,10 +52,14 @@ namespace PacBio {
 namespace BAM {
 namespace PbiFile {
 
-void CreateFrom(const BamFile& bamFile)
+void CreateFrom(const BamFile& bamFile,
+                const PbiBuilder::CompressionLevel compressionLevel,
+                const size_t numThreads)
 {
     PbiBuilder builder(bamFile.PacBioIndexFilename(),
-                       bamFile.Header().Sequences().size());
+                       bamFile.Header().Sequences().size(),
+                       compressionLevel,
+                       numThreads);
     BamReader reader(bamFile);
     BamRecord b;
     int64_t offset = reader.VirtualTell();

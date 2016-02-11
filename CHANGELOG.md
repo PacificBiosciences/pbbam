@@ -15,6 +15,7 @@ guarantees will be maintained within each major version series.
 applying filters, and generating a merged BAM. Also added FOFN support, instead
 of listing out BAMs as command line args.
 - PbiLocalContextFilter to allow filtering on subread local context.
+- PbiBuilder: multithreading & zlib compression-level tuning for PBI output
 
 ### Fixed
 - Fixed mishandling of relative BAM filenames in the filename constructor for
