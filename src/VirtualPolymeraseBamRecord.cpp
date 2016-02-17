@@ -218,9 +218,9 @@ void VirtualPolymeraseBamRecord::StitchSources(void)
         if (b.HasStartFrame())
             MoveAppend(b.StartFrame(), sf);
 
-        if (b.HasScrapType())
+        if (b.HasScrapRegionType())
         {
-            const auto regionType = b.ScrapType();
+            const auto regionType = b.ScrapRegionType();
 
             if (!HasVirtualRegionType(regionType))
                 virtualRegionsMap_[regionType] = std::vector<VirtualRegion>();
@@ -250,6 +250,13 @@ void VirtualPolymeraseBamRecord::StitchSources(void)
             this->BarcodeQuality(b.BarcodeQuality());
         if (b.HasReadAccuracy() && !this->HasReadAccuracy())
             this->ReadAccuracy(b.ReadAccuracy());
+        if (b.HasScrapZmwType())
+        {
+            if (!this->HasScrapZmwType())
+                this->ScrapZmwType(b.ScrapZmwType());
+            else if (this->ScrapZmwType() != b.ScrapZmwType())
+                throw std::runtime_error("ScrapZmwTypes do not match");
+        }
     }
 
     // ReadGroup

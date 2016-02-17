@@ -57,6 +57,8 @@ set( PacBioBAM_H
 #    ${PacBioBAM_IncludeDir}/pbbam/UnmappedReadsQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/ZmwGroupQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/ZmwQuery.h
+    ${PacBioBAM_IncludeDir}/pbbam/ZmwType.h
+    ${PacBioBAM_IncludeDir}/pbbam/ZmwTypeMap.h
 
     # exception headers
     ${PacBioBAM_IncludeDir}/pbbam/exception/InvalidSequencingChemistryException.h
@@ -187,6 +189,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/XmlWriter.cpp
     ${PacBioBAM_SourceDir}/ZmwGroupQuery.cpp
     ${PacBioBAM_SourceDir}/ZmwQuery.cpp
+    ${PacBioBAM_SourceDir}/ZmwTypeMap.cpp
     ${PacBioBAM_SourceDir}/ZmwWhitelistVirtualReader.cpp
 
     # XML I/O

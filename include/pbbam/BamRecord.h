@@ -52,6 +52,7 @@
 #include "pbbam/Strand.h"
 #include "pbbam/QualityValues.h"
 #include "pbbam/virtual/VirtualRegionType.h"
+#include "pbbam/ZmwType.h"
 #include <memory>
 #include <string>
 #include <utility>
@@ -194,6 +195,12 @@ public:
 
     /// \returns this scrap record's ScrapType
     VirtualRegionType ScrapType(void) const;
+
+    /// \returns this scrap record's scrap region type
+    VirtualRegionType ScrapRegionType(void) const;
+
+    /// \returns this scrap record's scrap ZMW type
+    ZmwType ScrapZmwType(void) const;
 
     /// \returns this record's average signal-to-noise for each of A, C, G,
     ///          and T
@@ -407,6 +414,12 @@ public:
 
     /// \returns true if this record has ScrapType data (only in SCRAP)
     bool HasScrapType(void) const;
+
+    /// \returns true if this record has ScrapRegionType data (only in SCRAP)
+    bool HasScrapRegionType(void) const;
+
+    /// \returns true if this record has scrap ZMW type data (only in SCRAP)
+    bool HasScrapZmwType(void) const;
 
     /// \returns true if this record has signal-to-noise data (absent in
     ///          POLYMERASE)
@@ -842,6 +855,34 @@ public:
     /// \returns reference to this record
     ///
     BamRecord& ScrapType(const char type);
+
+    /// \brief Sets this scrap record's ScrapRegionType
+    ///
+    /// \param[in] type
+    /// \returns reference to this record
+    ///
+    BamRecord& ScrapRegionType(const VirtualRegionType type);
+
+    /// \brief Sets this scrap record's ScrapRegionType
+    ///
+    /// \param[in] type character equivalent of VirtualRegionType
+    /// \returns reference to this record
+    ///
+    BamRecord& ScrapRegionType(const char type);
+
+    /// \brief Sets this scrap record's ScrapZmwType
+    ///
+    /// \param[in] type
+    /// \returns reference to this record
+    ///
+    BamRecord& ScrapZmwType(const ZmwType type);
+
+    /// \brief Sets this scrap record's ScrapZmwType
+    ///
+    /// \param[in] type character equivalent of ZmwType
+    /// \returns reference to this record
+    ///
+    BamRecord& ScrapZmwType(const char type);
 
     /// \brief Sets this record's average signal-to-noise in each of A, C, G,
     ///        and T

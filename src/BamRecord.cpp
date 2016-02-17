@@ -41,6 +41,7 @@
 
 #include "pbbam/BamRecord.h"
 #include "pbbam/virtual/VirtualRegionTypeMap.h"
+#include "pbbam/ZmwTypeMap.h"
 #include "AssertUtils.h"
 #include "MemoryUtils.h"
 #include "SequenceUtils.h"
@@ -84,7 +85,9 @@ static const string tagName_queryStart              = "qs";
 static const string tagName_queryEnd                = "qe";
 static const string tagName_readAccuracy            = "rq";
 static const string tagName_readGroup               = "RG";
+static const string tagName_scrap_region_type       = "sr";
 static const string tagName_scrap_type              = "sc";
+static const string tagName_scrap_zmw_type          = "sz";
 static const string tagName_snr                     = "sn";
 static const string tagName_startFrame              = "sf";
 static const string tagName_substitutionQV          = "sq";
@@ -1228,9 +1231,19 @@ bool BamRecord::HasReadAccuracy(void) const
           && !impl_.TagValue(internal::tagName_readAccuracy).IsNull();
 }
 
+bool BamRecord::HasScrapRegionType(void) const
+{ return impl_.HasTag(internal::tagName_scrap_region_type)
+          && !impl_.TagValue(internal::tagName_scrap_region_type).IsNull();
+}
+
 bool BamRecord::HasScrapType(void) const
 { return impl_.HasTag(internal::tagName_scrap_type)
           && !impl_.TagValue(internal::tagName_scrap_type).IsNull();
+}
+
+bool BamRecord::HasScrapZmwType(void) const
+{ return impl_.HasTag(internal::tagName_scrap_zmw_type)
+          && !impl_.TagValue(internal::tagName_scrap_zmw_type).IsNull();
 }
 
 bool BamRecord::HasStartFrame(void) const
@@ -1825,6 +1838,25 @@ void BamRecord::ResetCachedPositions(void)
     alignedStart_ = PacBio::BAM::UnmappedPosition;
 }
 
+VirtualRegionType BamRecord::ScrapRegionType(void) const
+{
+    const Tag& srTag = impl_.TagValue(internal::tagName_scrap_region_type);
+    return VirtualRegionTypeMap::ParseChar[srTag.ToUInt8()];
+}
+
+BamRecord& BamRecord::ScrapRegionType(const VirtualRegionType type)
+{
+    internal::CreateOrEdit(internal::tagName_scrap_region_type,
+                           static_cast<uint8_t>(type), &impl_);
+    return *this;
+}
+
+BamRecord& BamRecord::ScrapRegionType(const char type)
+{
+    internal::CreateOrEdit(internal::tagName_scrap_region_type, type, &impl_);
+    return *this;
+}
+
 VirtualRegionType BamRecord::ScrapType(void) const
 {
     const Tag& scTag = impl_.TagValue(internal::tagName_scrap_type);
@@ -1841,6 +1873,25 @@ BamRecord& BamRecord::ScrapType(const VirtualRegionType type)
 BamRecord& BamRecord::ScrapType(const char type)
 {
     internal::CreateOrEdit(internal::tagName_scrap_type, type, &impl_);
+    return *this;
+}
+
+ZmwType BamRecord::ScrapZmwType(void) const
+{
+    const Tag& szTag = impl_.TagValue(internal::tagName_scrap_zmw_type);
+    return ZmwTypeMap::ParseChar[szTag.ToUInt8()];
+}
+
+BamRecord& BamRecord::ScrapZmwType(const ZmwType type)
+{
+    internal::CreateOrEdit(internal::tagName_scrap_zmw_type,
+                           static_cast<uint8_t>(type), &impl_);
+    return *this;
+}
+
+BamRecord& BamRecord::ScrapZmwType(const char type)
+{
+    internal::CreateOrEdit(internal::tagName_scrap_zmw_type, type, &impl_);
     return *this;
 }
 
