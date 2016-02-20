@@ -218,9 +218,16 @@ void VirtualPolymeraseBamRecord::StitchSources(void)
         if (b.HasStartFrame())
             MoveAppend(b.StartFrame(), sf);
 
-        if (b.HasScrapRegionType())
+        if (b.HasScrapRegionType() && b.HasScrapType())
+            throw std::runtime_error("Tags sc and sr are mutually exclusive");
+
+        if (b.HasScrapRegionType() || b.HasScrapType())
         {
-            const auto regionType = b.ScrapRegionType();
+            VirtualRegionType regionType;
+            if (b.HasScrapRegionType())
+                regionType = b.ScrapRegionType();
+            else
+                regionType = b.ScrapType();
 
             if (!HasVirtualRegionType(regionType))
                 virtualRegionsMap_[regionType] = std::vector<VirtualRegion>();
@@ -246,10 +253,13 @@ void VirtualPolymeraseBamRecord::StitchSources(void)
 
         if (b.HasBarcodes() && !this->HasBarcodes())
             this->Barcodes(b.Barcodes());
+
         if (b.HasBarcodeQuality() && !this->HasBarcodeQuality())
             this->BarcodeQuality(b.BarcodeQuality());
+
         if (b.HasReadAccuracy() && !this->HasReadAccuracy())
             this->ReadAccuracy(b.ReadAccuracy());
+
         if (b.HasScrapZmwType())
         {
             if (!this->HasScrapZmwType())
