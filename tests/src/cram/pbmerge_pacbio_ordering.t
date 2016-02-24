@@ -61,12 +61,12 @@ Normal Merge:
 
   $ $BAM2SAM --header-only $MERGED_BAM
   @HD\tVN:1.1\tSO:unknown\tpb:3.0.1 (esc)
-  @RG\tID:ca75d884\tPL:PACBIO\tDS:READTYPE=HQREGION;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie (esc)
-  @RG\tID:e83fc9c6\tPL:PACBIO\tDS:READTYPE=SCRAP;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie (esc)
+  @RG\tID:ca75d884\tPL:PACBIO\tDS:READTYPE=HQREGION;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie\tPM:SEQUEL (esc)
+  @RG\tID:e83fc9c6\tPL:PACBIO\tDS:READTYPE=SCRAP;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie\tPM:SEQUEL (esc)
   @PG\tID:baz2bam-0.15.0\tPN:baz2bam\tVN:0.15.0 (esc)
   @PG\tID:bazFormat-0.3.0\tPN:bazFormat\tVN:0.3.0 (esc)
   @PG\tID:bazwriter-0.15.0\tPN:bazwriter\tVN:0.15.0 (esc)
-  @PG\tID:pbmerge-0.4.5\tPN:pbmerge\tVN:0.4.5 (esc)
+  @PG\tID:pbmerge-0.5.0\tPN:pbmerge\tVN:0.5.0 (esc)
 
   $ $BAM2SAM --no-header $MERGED_BAM | cut -f 1
   ArminsFakeMovie/100000/0_2659
@@ -102,12 +102,12 @@ Shuffle Input:
 
   $ $BAM2SAM --header-only $MERGED_BAM
   @HD\tVN:1.1\tSO:unknown\tpb:3.0.1 (esc)
-  @RG\tID:ca75d884\tPL:PACBIO\tDS:READTYPE=HQREGION;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie (esc)
-  @RG\tID:e83fc9c6\tPL:PACBIO\tDS:READTYPE=SCRAP;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie (esc)
+  @RG\tID:ca75d884\tPL:PACBIO\tDS:READTYPE=HQREGION;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie\tPM:SEQUEL (esc)
+  @RG\tID:e83fc9c6\tPL:PACBIO\tDS:READTYPE=SCRAP;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie\tPM:SEQUEL (esc)
   @PG\tID:baz2bam-0.15.0\tPN:baz2bam\tVN:0.15.0 (esc)
   @PG\tID:bazFormat-0.3.0\tPN:bazFormat\tVN:0.3.0 (esc)
   @PG\tID:bazwriter-0.15.0\tPN:bazwriter\tVN:0.15.0 (esc)
-  @PG\tID:pbmerge-0.4.5\tPN:pbmerge\tVN:0.4.5 (esc)
+  @PG\tID:pbmerge-0.5.0\tPN:pbmerge\tVN:0.5.0 (esc)
 
   $ $BAM2SAM --no-header $MERGED_BAM | cut -f 1
   ArminsFakeMovie/100000/0_2659
@@ -143,12 +143,12 @@ Explicit Output Filename (also enables PBI):
 
   $ $BAM2SAM --header-only $MERGED_BAM
   @HD\tVN:1.1\tSO:unknown\tpb:3.0.1 (esc)
-  @RG\tID:ca75d884\tPL:PACBIO\tDS:READTYPE=HQREGION;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie (esc)
-  @RG\tID:e83fc9c6\tPL:PACBIO\tDS:READTYPE=SCRAP;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie (esc)
+  @RG\tID:ca75d884\tPL:PACBIO\tDS:READTYPE=HQREGION;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie\tPM:SEQUEL (esc)
+  @RG\tID:e83fc9c6\tPL:PACBIO\tDS:READTYPE=SCRAP;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie\tPM:SEQUEL (esc)
   @PG\tID:baz2bam-0.15.0\tPN:baz2bam\tVN:0.15.0 (esc)
   @PG\tID:bazFormat-0.3.0\tPN:bazFormat\tVN:0.3.0 (esc)
   @PG\tID:bazwriter-0.15.0\tPN:bazwriter\tVN:0.15.0 (esc)
-  @PG\tID:pbmerge-0.4.5\tPN:pbmerge\tVN:0.4.5 (esc)
+  @PG\tID:pbmerge-0.5.0\tPN:pbmerge\tVN:0.5.0 (esc)
 
   $ $BAM2SAM --no-header $MERGED_BAM | cut -f 1
   ArminsFakeMovie/100000/0_2659
@@ -188,12 +188,12 @@ Explicit Output Filename (with disabled PBI):
 
   $ $BAM2SAM --header-only $MERGED_BAM
   @HD\tVN:1.1\tSO:unknown\tpb:3.0.1 (esc)
-  @RG\tID:ca75d884\tPL:PACBIO\tDS:READTYPE=HQREGION;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie (esc)
-  @RG\tID:e83fc9c6\tPL:PACBIO\tDS:READTYPE=SCRAP;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie (esc)
+  @RG\tID:ca75d884\tPL:PACBIO\tDS:READTYPE=HQREGION;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie\tPM:SEQUEL (esc)
+  @RG\tID:e83fc9c6\tPL:PACBIO\tDS:READTYPE=SCRAP;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;PulseWidth:Frames=pw;PkMid=pm;PkMean=pa;LabelQV=pq;AltLabel=pt;AltLabelQV=pv;PulseMergeQV=pg;PulseCall=pc;PrePulseFrames=pd;PulseCallWidth=px;BINDINGKIT=100372700;SEQUENCINGKIT=100356200;BASECALLERVERSION=0.1;FRAMERATEHZ=100.000000\tPU:ArminsFakeMovie\tPM:SEQUEL (esc)
   @PG\tID:baz2bam-0.15.0\tPN:baz2bam\tVN:0.15.0 (esc)
   @PG\tID:bazFormat-0.3.0\tPN:bazFormat\tVN:0.3.0 (esc)
   @PG\tID:bazwriter-0.15.0\tPN:bazwriter\tVN:0.15.0 (esc)
-  @PG\tID:pbmerge-0.4.5\tPN:pbmerge\tVN:0.4.5 (esc)
+  @PG\tID:pbmerge-0.5.0\tPN:pbmerge\tVN:0.5.0 (esc)
 
   $ $BAM2SAM --no-header $MERGED_BAM | cut -f 1
   ArminsFakeMovie/100000/0_2659

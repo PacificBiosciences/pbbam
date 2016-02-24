@@ -120,7 +120,7 @@ static
 PbiRawData Test2Bam_NewIndex(void)
 {
     PbiRawData index = Test2Bam_CoreIndexData();
-    index.BasicData().fileOffset_ = { 32636928, 233308160, 386990080, 463208448, 529858560, 579272704, 856883200, 1170604032, 1435893760, 1567162368 };
+    index.BasicData().fileOffset_ = { 33095680, 233766912, 387448832, 463667200, 530317312, 579731456, 857341952, 1171062784, 1436352512, 1567621120 };
     return index;
 }
 
@@ -301,7 +301,7 @@ TEST(PacBioIndexTest, CreateOnTheFly)
     const string tempPbiFn  = tempBamFn + ".pbi";
 
     // NOTE: new file differs in size than existing (different write parameters may yield different file sizes, even though content is same)
-    const vector<int64_t> expectedNewOffsets = { 32636928, 233308160, 386990080, 463208448, 529858560, 579272704, 856883200, 1170604032, 1435893760, 1567162368 };
+    const vector<int64_t> expectedNewOffsets = { 33095680, 233766912, 387448832, 463667200, 530317312, 579731456, 857341952, 1171062784, 1436352512, 1567621120 };
     vector<int64_t> observedOffsets;
 
     // create PBI on the fly from input BAM while we write to new file

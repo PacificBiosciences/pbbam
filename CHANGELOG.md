@@ -10,6 +10,12 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.5.0] - 2016-02-22
+
+### Added
+- Platform model tag added to read group as RG::PM
+- New scrap zmw type sz
+
 ### Added
 - pbmerge accepts DataSetXML as input - using top-level resource BAMs as input,
 applying filters, and generating a merged BAM. Also added FOFN support, instead

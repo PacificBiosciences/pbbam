@@ -205,6 +205,12 @@ inline ReadGroupInfo& ReadGroupInfo::MovieName(const std::string& movieName)
 inline std::string ReadGroupInfo::Platform(void) const
 { return std::string("PACBIO"); }
 
+inline PlatformModelType ReadGroupInfo::PlatformModel(void) const
+{ return platformModel_; }
+
+inline ReadGroupInfo& ReadGroupInfo::PlatformModel(const PlatformModelType& platform)
+{ platformModel_ = platform; return *this; }
+
 inline std::string ReadGroupInfo::PredictedInsertSize(void) const
 { return predictedInsertSize_; }
 

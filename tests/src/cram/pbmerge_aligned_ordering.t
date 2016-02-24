@@ -56,9 +56,9 @@ Normal Merge:
   $ $BAM2SAM --header-only $MERGED_BAM
   @HD\tVN:1.3.1\tSO:coordinate\tpb:3.0.1 (esc)
   @SQ\tSN:lambda_NEB3011\tLN:48502\tM5:a1319ff90e994c8190a4fe6569d0822a (esc)
-  @RG\tID:a9a22406c5\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;BINDINGKIT=100356300;SEQUENCINGKIT=100356200;BASECALLERVERSION=2.3\tPU:m140905_042212_sidney_c100564852550000001823085912221377_s1_X0\tSM:c100564852550000001823085912221377 (esc)
+  @RG\tID:a9a22406c5\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;BINDINGKIT=100356300;SEQUENCINGKIT=100356200;BASECALLERVERSION=2.3\tPU:m140905_042212_sidney_c100564852550000001823085912221377_s1_X0\tSM:c100564852550000001823085912221377\tPM:SEQUEL (esc)
   @PG\tID:BLASR\tVN:1.3.1.141565\tCL:/home/UNIXHOME/yli/for_the_people/blasr_bam_out/blasr m140905_042212_sidney_c100564852550000001823085912221377_s1_X0.1.bax.h5 lambdaNEB.fa -out tmp.bam -bam -bestn 10 -minMatch 12 -nproc 8 -minSubreadLength 50 -minReadLength 50 -randomSeed 1 -clipping subread  (esc)
-  @PG\tID:pbmerge-0.4.5\tPN:pbmerge\tVN:0.4.5 (esc)
+  @PG\tID:pbmerge-0.5.0\tPN:pbmerge\tVN:0.5.0 (esc)
 
   $ $BAM2SAM --no-header $MERGED_BAM | cut -f 1,3,4 | head -n 20
   m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/49050/48_1132\tlambda_NEB3011\t1 (esc)
@@ -91,9 +91,9 @@ Shuffle Input:
   $ $BAM2SAM --header-only $MERGED_BAM
   @HD\tVN:1.3.1\tSO:coordinate\tpb:3.0.1 (esc)
   @SQ\tSN:lambda_NEB3011\tLN:48502\tM5:a1319ff90e994c8190a4fe6569d0822a (esc)
-  @RG\tID:a9a22406c5\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;BINDINGKIT=100356300;SEQUENCINGKIT=100356200;BASECALLERVERSION=2.3\tPU:m140905_042212_sidney_c100564852550000001823085912221377_s1_X0\tSM:c100564852550000001823085912221377 (esc)
+  @RG\tID:a9a22406c5\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;BINDINGKIT=100356300;SEQUENCINGKIT=100356200;BASECALLERVERSION=2.3\tPU:m140905_042212_sidney_c100564852550000001823085912221377_s1_X0\tSM:c100564852550000001823085912221377\tPM:SEQUEL (esc)
   @PG\tID:BLASR\tVN:1.3.1.141565\tCL:/home/UNIXHOME/yli/for_the_people/blasr_bam_out/blasr m140905_042212_sidney_c100564852550000001823085912221377_s1_X0.1.bax.h5 lambdaNEB.fa -out tmp.bam -bam -bestn 10 -minMatch 12 -nproc 8 -minSubreadLength 50 -minReadLength 50 -randomSeed 1 -clipping subread  (esc)
-  @PG\tID:pbmerge-0.4.5\tPN:pbmerge\tVN:0.4.5 (esc)
+  @PG\tID:pbmerge-0.5.0\tPN:pbmerge\tVN:0.5.0 (esc)
 
   $ $BAM2SAM --no-header $MERGED_BAM | cut -f 1,3,4 | head -n 20
   m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/32328/387_1134\tlambda_NEB3011\t303 (esc)
@@ -126,9 +126,9 @@ Explicit Output Filename (also enables PBI):
   $ $BAM2SAM --header-only $MERGED_BAM
   @HD\tVN:1.3.1\tSO:coordinate\tpb:3.0.1 (esc)
   @SQ\tSN:lambda_NEB3011\tLN:48502\tM5:a1319ff90e994c8190a4fe6569d0822a (esc)
-  @RG\tID:a9a22406c5\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;BINDINGKIT=100356300;SEQUENCINGKIT=100356200;BASECALLERVERSION=2.3\tPU:m140905_042212_sidney_c100564852550000001823085912221377_s1_X0\tSM:c100564852550000001823085912221377 (esc)
+  @RG\tID:a9a22406c5\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;BINDINGKIT=100356300;SEQUENCINGKIT=100356200;BASECALLERVERSION=2.3\tPU:m140905_042212_sidney_c100564852550000001823085912221377_s1_X0\tSM:c100564852550000001823085912221377\tPM:SEQUEL (esc)
   @PG\tID:BLASR\tVN:1.3.1.141565\tCL:/home/UNIXHOME/yli/for_the_people/blasr_bam_out/blasr m140905_042212_sidney_c100564852550000001823085912221377_s1_X0.1.bax.h5 lambdaNEB.fa -out tmp.bam -bam -bestn 10 -minMatch 12 -nproc 8 -minSubreadLength 50 -minReadLength 50 -randomSeed 1 -clipping subread  (esc)
-  @PG\tID:pbmerge-0.4.5\tPN:pbmerge\tVN:0.4.5 (esc)
+  @PG\tID:pbmerge-0.5.0\tPN:pbmerge\tVN:0.5.0 (esc)
 
   $ $BAM2SAM --no-header $MERGED_BAM | cut -f 1,3,4 | head -n 20
   m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/49050/48_1132\tlambda_NEB3011\t1 (esc)
@@ -165,9 +165,9 @@ Explicit Output Filename (with disabled PBI):
   $ $BAM2SAM --header-only $MERGED_BAM
   @HD\tVN:1.3.1\tSO:coordinate\tpb:3.0.1 (esc)
   @SQ\tSN:lambda_NEB3011\tLN:48502\tM5:a1319ff90e994c8190a4fe6569d0822a (esc)
-  @RG\tID:a9a22406c5\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;BINDINGKIT=100356300;SEQUENCINGKIT=100356200;BASECALLERVERSION=2.3\tPU:m140905_042212_sidney_c100564852550000001823085912221377_s1_X0\tSM:c100564852550000001823085912221377 (esc)
+  @RG\tID:a9a22406c5\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;BINDINGKIT=100356300;SEQUENCINGKIT=100356200;BASECALLERVERSION=2.3\tPU:m140905_042212_sidney_c100564852550000001823085912221377_s1_X0\tSM:c100564852550000001823085912221377\tPM:SEQUEL (esc)
   @PG\tID:BLASR\tVN:1.3.1.141565\tCL:/home/UNIXHOME/yli/for_the_people/blasr_bam_out/blasr m140905_042212_sidney_c100564852550000001823085912221377_s1_X0.1.bax.h5 lambdaNEB.fa -out tmp.bam -bam -bestn 10 -minMatch 12 -nproc 8 -minSubreadLength 50 -minReadLength 50 -randomSeed 1 -clipping subread  (esc)
-  @PG\tID:pbmerge-0.4.5\tPN:pbmerge\tVN:0.4.5 (esc)
+  @PG\tID:pbmerge-0.5.0\tPN:pbmerge\tVN:0.5.0 (esc)
 
   $ $BAM2SAM --no-header $MERGED_BAM | cut -f 1,3,4 | head -n 20
   m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/49050/48_1132\tlambda_NEB3011\t1 (esc)

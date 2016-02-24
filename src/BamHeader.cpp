@@ -162,7 +162,7 @@ private:
 };
 
 static const PacBioVersion minimum_version = PacBioVersion(3,0,1);
-static const PacBioVersion current_version = PacBioVersion(3,0,1);
+static const PacBioVersion current_version = PacBioVersion(3,0,3);
 
 static
 void EnsureCanMerge(const BamHeader& lhs, const BamHeader& rhs)

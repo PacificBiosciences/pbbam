@@ -66,6 +66,7 @@ static const string sam_LB = string{ "LB" };
 static const string sam_PG = string{ "PG" };
 static const string sam_PI = string{ "PI" };
 static const string sam_PL = string{ "PL" };
+static const string sam_PM = string{ "PM" };
 static const string sam_PU = string{ "PU" };
 static const string sam_SM = string{ "SM" };
 
@@ -114,6 +115,10 @@ static const string barcodemode_ASYM = string{ "Asymmetric" };
 static const string barcodequal_NONE  = string{ "None" };
 static const string barcodequal_SCORE = string{ "Score" };
 static const string barcodequal_PROB  = string{ "Probability" };
+
+static const string platformModelType_ASTRO  = string{ "ASTRO" };
+static const string platformModelType_RS     = string{ "RS" };
+static const string platformModelType_SEQUEL = string{ "SEQUEL" };
 
 static
 string BaseFeatureName(const BaseFeature& feature)
@@ -183,10 +188,24 @@ string BarcodeQualityName(const BarcodeQualityType& type)
     return string{ }; // unreachable
 }
 
+static
+string PlatformModelName(const PlatformModelType& type)
+{
+    switch (type) {
+        case PlatformModelType::ASTRO  : return platformModelType_ASTRO;
+        case PlatformModelType::RS     : return platformModelType_RS;
+        case PlatformModelType::SEQUEL : return platformModelType_SEQUEL;
+        default:
+            throw std::runtime_error{ "unrecognized platform model" };
+    }
+    return string{ }; // unreachable
+}
+
 static map<string, BaseFeature>        nameToFeature;
 static map<string, FrameCodec>         nameToCodec;
 static map<string, BarcodeModeType>    nameToBarcodeMode;
 static map<string, BarcodeQualityType> nameToBarcodeQuality;
+static map<string, PlatformModelType>  nameToPlatformModel;
 
 static inline
 void InitNameToFeature(void)
@@ -245,6 +264,16 @@ void InitNameToBarcodeQuality(void)
 }
 
 static inline
+void InitNameToPlatformModel(void)
+{
+    if (nameToPlatformModel.empty()) {
+        nameToPlatformModel[platformModelType_ASTRO]  = PlatformModelType::ASTRO;
+        nameToPlatformModel[platformModelType_RS]     = PlatformModelType::RS;
+        nameToPlatformModel[platformModelType_SEQUEL] = PlatformModelType::SEQUEL;
+    }
+}
+
+static inline
 bool IsLikelyBarcodeKey(const string& name)
 { return name.find("Barcode") == 0; }
 
@@ -283,16 +312,25 @@ BarcodeQualityType BarcodeQualityFromName(const string& name)
     return nameToBarcodeQuality.at(name);
 }
 
+static inline
+PlatformModelType PlatformModelFromName(const string& name)
+{
+    InitNameToPlatformModel();
+    return nameToPlatformModel.at(name);
+}
+
 } // namespace internal
 
 ReadGroupInfo::ReadGroupInfo(void)
-    : readType_("UNKNOWN")
+    : platformModel_(PlatformModelType::SEQUEL)
+    , readType_("UNKNOWN")
     , ipdCodec_(FrameCodec::V1)
     , pulseWidthCodec_(FrameCodec::V1)
 { }
 
 ReadGroupInfo::ReadGroupInfo(const std::string& id)
     : id_(id)
+    , platformModel_(PlatformModelType::SEQUEL)
     , readType_("UNKNOWN")
     , ipdCodec_(FrameCodec::V1)
     , pulseWidthCodec_(FrameCodec::V1)
@@ -302,7 +340,21 @@ ReadGroupInfo::ReadGroupInfo(const std::string& movieName,
                              const std::string& readType)
     : id_(MakeReadGroupId(movieName, readType))
     , movieName_(movieName)
+    , platformModel_(PlatformModelType::SEQUEL)
     , readType_(readType)
+    , ipdCodec_(FrameCodec::V1)
+    , pulseWidthCodec_(FrameCodec::V1)
+{ }
+
+ReadGroupInfo::ReadGroupInfo(const std::string& movieName,
+                             const std::string& readType,
+                             const PlatformModelType platform)
+    : id_(MakeReadGroupId(movieName, readType))
+    , movieName_(movieName)
+    , platformModel_(platform)
+    , readType_(readType)
+    , ipdCodec_(FrameCodec::V1)
+    , pulseWidthCodec_(FrameCodec::V1)
 { }
 
 ReadGroupInfo::ReadGroupInfo(const ReadGroupInfo& other)
@@ -316,6 +368,7 @@ ReadGroupInfo::ReadGroupInfo(const ReadGroupInfo& other)
     , predictedInsertSize_(other.predictedInsertSize_)
     , movieName_(other.movieName_)
     , sample_(other.sample_)
+    , platformModel_(other.platformModel_)
     , readType_(other.readType_)
     , bindingKit_(other.bindingKit_)
     , sequencingKit_(other.sequencingKit_)
@@ -344,6 +397,7 @@ ReadGroupInfo::ReadGroupInfo(ReadGroupInfo&& other)
     , predictedInsertSize_(std::move(other.predictedInsertSize_))
     , movieName_(std::move(other.movieName_))
     , sample_(std::move(other.sample_))
+    , platformModel_(std::move(other.platformModel_))
     , readType_(std::move(other.readType_))
     , bindingKit_(std::move(other.bindingKit_))
     , sequencingKit_(std::move(other.sequencingKit_))
@@ -372,6 +426,7 @@ ReadGroupInfo& ReadGroupInfo::operator=(const ReadGroupInfo& other)
     keySequence_ = other.keySequence_;
     library_ = other.library_;
     programs_ = other.programs_;
+    platformModel_ = other.platformModel_;
     predictedInsertSize_ = other.predictedInsertSize_;
     movieName_ = other.movieName_;
     sample_ = other.sample_;
@@ -402,6 +457,7 @@ ReadGroupInfo& ReadGroupInfo::operator=(ReadGroupInfo&& other)
     keySequence_ = std::move(other.keySequence_);
     library_ = std::move(other.library_);
     programs_ = std::move(other.programs_);
+    platformModel_ = std::move(other.platformModel_);
     predictedInsertSize_ = std::move(other.predictedInsertSize_);
     movieName_ = std::move(other.movieName_);
     sample_ = std::move(other.sample_);
@@ -586,6 +642,7 @@ ReadGroupInfo ReadGroupInfo::FromSam(const string& sam)
         else if (tokenTag == internal::sam_PU) rg.MovieName(tokenValue);
         else if (tokenTag == internal::sam_SM) rg.Sample(tokenValue);
         else if (tokenTag == internal::sam_DS) rg.DecodeSamDescription(tokenValue);
+        else if (tokenTag == internal::sam_PM) rg.PlatformModel(internal::PlatformModelFromName(tokenValue));
 
         // otherwise, "custom" tag
         else
@@ -668,6 +725,8 @@ std::string ReadGroupInfo::ToSam(void) const
     if (!movieName_.empty())           out << internal::MakeSamTag(internal::sam_PU, movieName_);
     if (!sample_.empty())              out << internal::MakeSamTag(internal::sam_SM, sample_);
 
+    out << internal::MakeSamTag(internal::sam_PM, internal::PlatformModelName(platformModel_));
+
     // append any custom tags
     auto customIter = custom_.cbegin();
     auto customEnd  = custom_.cend();
@@ -705,6 +764,7 @@ bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
             && keySequence_ == other.keySequence_             
             && library_ == other.library_                 
             && programs_ == other.programs_                
+            && platformModel_ == other.platformModel_                
             && predictedInsertSize_ == other.predictedInsertSize_     
             && movieName_ == other.movieName_               
             && sample_ == other.sample_                  

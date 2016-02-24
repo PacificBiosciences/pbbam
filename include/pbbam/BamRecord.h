@@ -193,9 +193,6 @@ public:
     /// \returns integer value for this record's read group ID
     int32_t ReadGroupNumericId(void) const;
 
-    /// \returns this scrap record's ScrapType
-    VirtualRegionType ScrapType(void) const;
-
     /// \returns this scrap record's scrap region type
     VirtualRegionType ScrapRegionType(void) const;
 
@@ -411,9 +408,6 @@ public:
 
     /// \returns true if this record has QueryStart data
     bool HasQueryStart(void) const;
-
-    /// \returns true if this record has ScrapType data (only in SCRAP)
-    bool HasScrapType(void) const;
 
     /// \returns true if this record has ScrapRegionType data (only in SCRAP)
     bool HasScrapRegionType(void) const;
@@ -841,20 +835,6 @@ public:
     /// \returns reference to this record
     ///
     BamRecord& ReadGroupId(const std::string& id);
-
-    /// \brief Sets this scrap record's ScrapType
-    ///
-    /// \param[in] type
-    /// \returns reference to this record
-    ///
-    BamRecord& ScrapType(const VirtualRegionType type);
-
-    /// \brief Sets this scrap record's ScrapType
-    ///
-    /// \param[in] type character equivalent of VirtualRegionType
-    /// \returns reference to this record
-    ///
-    BamRecord& ScrapType(const char type);
 
     /// \brief Sets this scrap record's ScrapRegionType
     ///
