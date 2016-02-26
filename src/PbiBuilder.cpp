@@ -42,6 +42,7 @@
 #include "pbbam/PbiBuilder.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/PbiRawData.h"
+#include "FileProducer.h"
 #include "MemoryUtils.h"
 #include "PbiIndexIO.h"
 #include <htslib/bgzf.h>
@@ -154,7 +155,7 @@ PbiRawReferenceData PbiRawReferenceDataBuilder::Result(void) const {
 // PbiBuilderPrivate implementation
 // ----------------------------------
 
-class PbiBuilderPrivate
+class PbiBuilderPrivate : public internal::FileProducer
 {
 public:
     PbiBuilderPrivate(const string& filename,
@@ -187,12 +188,14 @@ PbiBuilderPrivate::PbiBuilderPrivate(const string& filename,
                                      const size_t numReferenceSequences,
                                      const PbiBuilder::CompressionLevel compressionLevel,
                                      const size_t numThreads)
-    : bgzf_(nullptr)
+    : internal::FileProducer(filename)
+    , bgzf_(nullptr)
     , currentRow_(0)
     , refDataBuilder_(nullptr)
 {
+    const string& usingFilename = TempFilename();
     const string& mode = string("wb") + to_string(static_cast<int>(compressionLevel));
-    bgzf_.reset(bgzf_open(filename.c_str(), mode.c_str()));
+    bgzf_.reset(bgzf_open(usingFilename.c_str(), mode.c_str()));
     if (bgzf_.get() == 0)
         throw std::runtime_error("could not open PBI file for writing");
 
@@ -218,12 +221,14 @@ PbiBuilderPrivate::PbiBuilderPrivate(const string& filename,
                                      const bool isCoordinateSorted,
                                      const PbiBuilder::CompressionLevel compressionLevel,
                                      const size_t numThreads)
-    : bgzf_(nullptr)
+    : internal::FileProducer(filename)
+    , bgzf_(nullptr)
     , currentRow_(0)
     , refDataBuilder_(nullptr)
 {
+    const string& usingFilename = TempFilename();
     const string& mode = string("wb") + to_string(static_cast<int>(compressionLevel));
-    bgzf_.reset(bgzf_open(filename.c_str(), mode.c_str()));
+    bgzf_.reset(bgzf_open(usingFilename.c_str(), mode.c_str()));
     if (bgzf_.get() == 0)
         throw std::runtime_error("could not open PBI file for writing");
 

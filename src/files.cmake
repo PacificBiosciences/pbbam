@@ -113,6 +113,7 @@ set( PacBioBAM_H
     ${PacBioBAM_SourceDir}/ChemistryTable.h
     ${PacBioBAM_SourceDir}/DataSetIO.h
     ${PacBioBAM_SourceDir}/DataSetUtils.h
+    ${PacBioBAM_SourceDir}/FileProducer.h
     ${PacBioBAM_SourceDir}/FileUtils.h
     ${PacBioBAM_SourceDir}/FofnReader.h
     ${PacBioBAM_SourceDir}/MemoryUtils.h
@@ -154,6 +155,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/DataSetTypes.cpp
     ${PacBioBAM_SourceDir}/DataSetXsd.cpp
     ${PacBioBAM_SourceDir}/EntireFileQuery.cpp
+    ${PacBioBAM_SourceDir}/FileProducer.cpp
     ${PacBioBAM_SourceDir}/FileUtils.cpp
     ${PacBioBAM_SourceDir}/FofnReader.cpp
     ${PacBioBAM_SourceDir}/Frames.cpp
