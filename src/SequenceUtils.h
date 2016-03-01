@@ -70,6 +70,13 @@ void Reverse(T& input)
 { std::reverse(input.begin(), input.end()); }
 
 template<typename T>
+T MaybeReverse(T&& input, bool reverse)
+{ 
+    if (reverse) std::reverse(input.begin(), input.end()); 
+    return input;
+}
+
+template<typename T>
 T Reversed(const T& input)
 {
     T result = input;
@@ -93,6 +100,12 @@ inline void ReverseComplement(std::string& seq) {
     Reverse(seq);
 }
 
+inline std::string MaybeReverseComplement(std::string&& seq, bool reverse)
+{
+    if (reverse) ReverseComplement(seq);
+    return seq;
+}
+
 /// Reverse complement a DNA sequence case-sensitive
 inline void ReverseComplementCaseSens(std::string& seq)
 {
@@ -110,6 +123,13 @@ inline void ReverseComplementCaseSens(std::string& seq)
         reverseCompl[original.length()-i-1] = (char)rc_table[(int8_t)original[i]];
     seq = reverseCompl;
 }
+
+inline std::string MaybeReverseComplementCaseSens(std::string&& seq, bool reverse)
+{
+    if (reverse) ReverseComplementCaseSens(seq);
+    return seq;
+}
+
 
 inline std::string ReverseComplemented(const std::string& input)
 {

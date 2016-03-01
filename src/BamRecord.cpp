@@ -778,27 +778,6 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
     const QualityValues qualities = std::move(internal::Clip(origQualities, clipIndex, clipLength));
     impl_.SetSequenceAndQualities(sequence, qualities.Fastq());
 
-    // clip PacBio tags
-    QualityValues altLabelQV = AltLabelQV(Orientation::GENOMIC);
-    QualityValues labelQV = LabelQV(Orientation::GENOMIC);
-    QualityValues deletionQV = std::move(internal::Clip(DeletionQV(Orientation::GENOMIC), clipIndex, clipLength));
-    QualityValues insertionQV = std::move(internal::Clip(InsertionQV(Orientation::GENOMIC), clipIndex, clipLength));
-    QualityValues mergeQV = std::move(internal::Clip(MergeQV(Orientation::GENOMIC), clipIndex, clipLength));
-    QualityValues pulseMergeQV = std::move(PulseMergeQV(Orientation::GENOMIC));
-    QualityValues substitutionQV = std::move(internal::Clip(SubstitutionQV(Orientation::GENOMIC), clipIndex, clipLength));
-    Frames ipd = std::move(internal::Clip(IPD(Orientation::GENOMIC).Data(), clipIndex, clipLength));
-    Frames pulseWidth = std::move(internal::Clip(PulseWidth(Orientation::GENOMIC).Data(), clipIndex, clipLength));
-    string deletionTag = std::move(internal::Clip(DeletionTag(Orientation::GENOMIC), clipIndex, clipLength));
-    string substitutionTag = std::move(internal::Clip(SubstitutionTag(Orientation::GENOMIC), clipIndex, clipLength));
-    string altLabelTag = AltLabelTag(Orientation::GENOMIC);
-    string pulseCall = std::move(PulseCall(Orientation::GENOMIC));
-    std::vector<float> pkmean = std::move(Pkmean(Orientation::GENOMIC));
-    std::vector<float> pkmid = std::move(Pkmid(Orientation::GENOMIC));
-    std::vector<float> pkmean2 = std::move(Pkmean2(Orientation::GENOMIC));
-    std::vector<float> pkmid2 = std::move(Pkmid2(Orientation::GENOMIC));
-    Frames prePulseFrames = std::move(PrePulseFrames(Orientation::GENOMIC).Data());
-    Frames pulseCallWidth = std::move(PulseCallWidth(Orientation::GENOMIC).Data());
-
     // TODO: clean this up
     std::vector<uint32_t> startFrame;
     if (HasStartFrame())
@@ -806,52 +785,56 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
 
     // restore native orientation
     if (!isForwardStrand) {
-        internal::Reverse(altLabelQV);
-        internal::Reverse(labelQV);
-        internal::Reverse(deletionQV);
-        internal::Reverse(insertionQV);
-        internal::Reverse(mergeQV);
-        internal::Reverse(pulseMergeQV);
-        internal::Reverse(substitutionQV);
-        internal::Reverse(ipd);
-        internal::Reverse(pulseWidth);
-        internal::ReverseComplement(deletionTag);
-        internal::ReverseComplement(substitutionTag);
-        internal::ReverseComplement(altLabelTag);
-        internal::ReverseComplementCaseSens(pulseCall);
-        internal::Reverse(pkmean);
-        internal::Reverse(pkmid);
-        internal::Reverse(pkmean2);
-        internal::Reverse(pkmid2);
-        internal::Reverse(prePulseFrames);
-        internal::Reverse(pulseCallWidth);
-
         if (HasStartFrame())
             internal::Reverse(startFrame);
-
     }
 
     // update BAM tags
     TagCollection tags = impl_.Tags();
-    tags[internal::tagName_alternative_labelQV] = altLabelQV.Fastq();
-    tags[internal::tagName_labelQV]             = labelQV.Fastq();
-    tags[internal::tagName_deletionQV]          = deletionQV.Fastq();
-    tags[internal::tagName_insertionQV]         = insertionQV.Fastq();
-    tags[internal::tagName_mergeQV]             = mergeQV.Fastq();
-    tags[internal::tagName_pulseMergeQV]        = pulseMergeQV.Fastq();
-    tags[internal::tagName_substitutionQV]      = substitutionQV.Fastq();
-    tags[internal::tagName_ipd]                 = ipd.Data();
-    tags[internal::tagName_pulseWidth]          = pulseWidth.Data();
-    tags[internal::tagName_deletionTag]         = deletionTag;
-    tags[internal::tagName_substitutionTag]     = substitutionTag;
-    tags[internal::tagName_alternative_labelTag]= altLabelTag;
-    tags[internal::tagName_pulse_call]          = pulseCall;
-    tags[internal::tagName_pkmean]              = EncodePhotons(pkmean);
-    tags[internal::tagName_pkmid]               = EncodePhotons(pkmid);
-    tags[internal::tagName_pkmean2]             = EncodePhotons(pkmean2);
-    tags[internal::tagName_pkmid2]              = EncodePhotons(pkmid2);
-    tags[internal::tagName_pre_pulse_frames]    = prePulseFrames.Data();
-    tags[internal::tagName_pulse_call_width]    = pulseCallWidth.Data();
+    if (HasAltLabelQV())
+        tags[internal::tagName_alternative_labelQV] = internal::MaybeReverse(std::move(AltLabelQV(Orientation::GENOMIC)), !isForwardStrand).Fastq();
+    if (HasLabelQV())
+        tags[internal::tagName_labelQV]             = internal::MaybeReverse(std::move(LabelQV(Orientation::GENOMIC)), !isForwardStrand).Fastq();
+    if (HasPulseMergeQV())
+        tags[internal::tagName_pulseMergeQV]        = internal::MaybeReverse(std::move(PulseMergeQV(Orientation::GENOMIC)), !isForwardStrand).Fastq();
+    if (HasAltLabelTag())
+        tags[internal::tagName_alternative_labelTag]= internal::MaybeReverseComplement(std::move(AltLabelTag(Orientation::GENOMIC)), !isForwardStrand);
+    if (HasPulseCall())
+        tags[internal::tagName_pulse_call]          = internal::MaybeReverseComplementCaseSens(std::move(PulseCall(Orientation::GENOMIC)), !isForwardStrand);
+    if (HasPkmean())
+        tags[internal::tagName_pkmean]              = EncodePhotons(internal::MaybeReverse(std::move(Pkmean(Orientation::GENOMIC)), !isForwardStrand));
+    if (HasPkmid())
+        tags[internal::tagName_pkmid]               = EncodePhotons(internal::MaybeReverse(std::move(Pkmid(Orientation::GENOMIC)), !isForwardStrand));
+    if (HasPkmean2())
+        tags[internal::tagName_pkmean2]             = EncodePhotons(internal::MaybeReverse(std::move(Pkmean2(Orientation::GENOMIC)), !isForwardStrand));
+    if (HasPkmid2())
+        tags[internal::tagName_pkmid2]              = EncodePhotons(internal::MaybeReverse(std::move(Pkmid2(Orientation::GENOMIC)), !isForwardStrand));
+    if (HasDeletionQV())
+        tags[internal::tagName_deletionQV]          = internal::MaybeReverse(std::move(internal::Clip(DeletionQV(Orientation::GENOMIC), clipIndex, clipLength)), !isForwardStrand).Fastq();
+    if (HasInsertionQV())
+        tags[internal::tagName_insertionQV]         = internal::MaybeReverse(std::move(internal::Clip(InsertionQV(Orientation::GENOMIC), clipIndex, clipLength)), !isForwardStrand).Fastq();
+    if (HasMergeQV())
+        tags[internal::tagName_mergeQV]             = internal::MaybeReverse(std::move(internal::Clip(MergeQV(Orientation::GENOMIC), clipIndex, clipLength)), !isForwardStrand).Fastq();
+    if (HasSubstitutionQV())
+        tags[internal::tagName_substitutionQV]      = internal::MaybeReverse(std::move(internal::Clip(SubstitutionQV(Orientation::GENOMIC), clipIndex, clipLength)), !isForwardStrand).Fastq();
+    if (HasIPD())
+        tags[internal::tagName_ipd]                 = internal::MaybeReverse(std::move(internal::Clip(IPD(Orientation::GENOMIC).Data(), clipIndex, clipLength)), !isForwardStrand);
+    if (HasPulseWidth())
+        tags[internal::tagName_pulseWidth]          = internal::MaybeReverse(std::move(internal::Clip(PulseWidth(Orientation::GENOMIC).Data(), clipIndex, clipLength)), !isForwardStrand);
+    if (HasDeletionTag())
+        tags[internal::tagName_deletionTag]         = internal::MaybeReverseComplement(std::move(internal::Clip(DeletionTag(Orientation::GENOMIC), clipIndex, clipLength)), !isForwardStrand);
+    if (HasSubstitutionTag())
+        tags[internal::tagName_substitutionTag]     = internal::MaybeReverseComplement(std::move(internal::Clip(SubstitutionTag(Orientation::GENOMIC), clipIndex, clipLength)), !isForwardStrand);
+    if (HasPrePulseFrames())
+    {
+        auto frames = PrePulseFrames(Orientation::GENOMIC).Data();
+        tags[internal::tagName_pre_pulse_frames]    = internal::MaybeReverse(std::move(frames), !isForwardStrand);
+    }
+    if (HasPulseCallWidth())
+    {
+        auto frames = PulseCallWidth(Orientation::GENOMIC).Data();
+        tags[internal::tagName_pulse_call_width]    = internal::MaybeReverse(std::move(frames), !isForwardStrand);
+    }
     if (HasStartFrame())
         tags[internal::tagName_startFrame] = startFrame;
 
