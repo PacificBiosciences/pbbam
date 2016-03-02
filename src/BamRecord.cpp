@@ -775,8 +775,15 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
 
     // clip seq, quals
     const string sequence = std::move(internal::Clip(origSequence, clipIndex, clipLength));
-    const QualityValues qualities = std::move(internal::Clip(origQualities, clipIndex, clipLength));
-    impl_.SetSequenceAndQualities(sequence, qualities.Fastq());
+    if (origQualities.begin() != origQualities.end())
+    {
+        const QualityValues qualities = std::move(internal::Clip(origQualities, clipIndex, clipLength));
+        impl_.SetSequenceAndQualities(sequence, qualities.Fastq());
+    }
+    else
+    {
+        impl_.SetSequenceAndQualities(sequence);
+    }
 
     // TODO: clean this up
     std::vector<uint32_t> startFrame;
