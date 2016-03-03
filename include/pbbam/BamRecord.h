@@ -1233,6 +1233,16 @@ private:
                                  const bool aligned,
                                  const bool exciseSoftClips) const;
 
+    void ClipFields(const size_t clipPos, const size_t clipLength);
+    BamRecord& ClipToQuery(const PacBio::BAM::Position start,
+                           const PacBio::BAM::Position end);
+    BamRecord& ClipToReference(const PacBio::BAM::Position start,
+                               const PacBio::BAM::Position end);
+    BamRecord& ClipToReferenceForward(const PacBio::BAM::Position start,
+                                      const PacBio::BAM::Position end);
+    BamRecord& ClipToReferenceReverse(const PacBio::BAM::Position start,
+                                      const PacBio::BAM::Position end);
+
 private:
     // marked const to allow calling from const methods
     // but updates our mutable cached values

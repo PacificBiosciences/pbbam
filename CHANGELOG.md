@@ -16,6 +16,9 @@ successful completion (i.e. normal BamWriter destruction, not triggered by a
 thrown exception) the file is renamed to the actual requested filename.
 - PBI file creation follows the same temporary naming convention.
 
+### Fixed
+- Improper 'clip to reference' product for BamRecord in some cases.
+
 ## [0.5.0] - 2016-02-22
 
 ### Added
