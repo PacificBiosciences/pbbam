@@ -813,12 +813,10 @@ BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
     // cache original coords
     const Position origQStart = QueryStart();
     const Position origQEnd   = QueryEnd();
-    const Position origAStart = AlignedStart();
-    const Position origAEnd   = AlignedEnd();
     const Position origTStart = ReferenceStart();
     const Position origTEnd   = ReferenceEnd();
-    assert(origAStart >= origQStart);
-    assert(origAEnd   <= origQEnd);
+    assert(AlignedStart() >= origQStart);
+    assert(AlignedEnd()   <= origQEnd);
 
     // skip if already within requested clip range
     if (start <= origTStart && end >= origTEnd)
@@ -946,16 +944,14 @@ BamRecord& BamRecord::ClipToReferenceReverse(const PacBio::BAM::Position start,
     // cache original coords
     const Position origQStart = QueryStart();
     const Position origQEnd   = QueryEnd();
-    const Position origAStart = AlignedStart();
-    const Position origAEnd   = AlignedEnd();
-    const Position origTStart  = ReferenceStart();
-    const Position origTEnd    = ReferenceEnd();
+    const Position origTStart = ReferenceStart();
+    const Position origTEnd   = ReferenceEnd();
 
     // skip if already within requested clip range
     if (start <= origTStart && end >= origTEnd)
         return *this;
-    assert(origAStart >= origQStart);
-    assert(origAEnd   <= origQEnd);
+    assert(AlignedStart() >= origQStart);
+    assert(AlignedEnd()   <= origQEnd);
 
     const Position newTStart = std::max(origTStart, start);
     const Position newTEnd   = std::min(origTEnd, end);
