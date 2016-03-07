@@ -202,7 +202,7 @@ template<typename T>
 T Clip(const T& input, const size_t pos, const size_t len)
 {
     if (input.empty())
-        return input;
+        return T();
     return T{ input.cbegin() + pos,
               input.cbegin() + pos + len };
 }
@@ -640,63 +640,58 @@ void BamRecord::ClipFields(const size_t clipFrom,
     const bool isForwardStrand = (AlignedStrand() == Strand::FORWARD);
 
     // clip seq, quals
-    const string sequence = std::move(internal::Clip(Sequence(Orientation::GENOMIC), clipFrom, clipLength));
-    const QualityValues qualities = std::move(internal::Clip(Qualities(Orientation::GENOMIC), clipFrom, clipLength));
+    string sequence = std::move(internal::Clip(Sequence(Orientation::NATIVE), clipFrom, clipLength));
+    QualityValues qualities = std::move(internal::Clip(Qualities(Orientation::NATIVE), clipFrom, clipLength));
+    if (!isForwardStrand) {
+        internal::ReverseComplement(sequence);
+        internal::Reverse(qualities);
+    }
     impl_.SetSequenceAndQualities(sequence, qualities.Fastq());
 
     // update BAM tags
     TagCollection tags = impl_.Tags();
-    if (HasAltLabelQV())
-        tags[internal::tagName_alternative_labelQV] = internal::MaybeReverse(std::move(AltLabelQV(Orientation::GENOMIC)), !isForwardStrand).Fastq();
-    if (HasLabelQV())
-        tags[internal::tagName_labelQV]             = internal::MaybeReverse(std::move(LabelQV(Orientation::GENOMIC)), !isForwardStrand).Fastq();
-    if (HasPulseMergeQV())
-        tags[internal::tagName_pulseMergeQV]        = internal::MaybeReverse(std::move(PulseMergeQV(Orientation::GENOMIC)), !isForwardStrand).Fastq();
-    if (HasAltLabelTag())
-        tags[internal::tagName_alternative_labelTag]= internal::MaybeReverseComplement(std::move(AltLabelTag(Orientation::GENOMIC)), !isForwardStrand);
-    if (HasPulseCall())
-        tags[internal::tagName_pulse_call]          = internal::MaybeReverseComplementCaseSens(std::move(PulseCall(Orientation::GENOMIC)), !isForwardStrand);
-    if (HasPkmean())
-        tags[internal::tagName_pkmean]              = EncodePhotons(internal::MaybeReverse(std::move(Pkmean(Orientation::GENOMIC)), !isForwardStrand));
-    if (HasPkmid())
-        tags[internal::tagName_pkmid]               = EncodePhotons(internal::MaybeReverse(std::move(Pkmid(Orientation::GENOMIC)), !isForwardStrand));
-    if (HasPkmean2())
-        tags[internal::tagName_pkmean2]             = EncodePhotons(internal::MaybeReverse(std::move(Pkmean2(Orientation::GENOMIC)), !isForwardStrand));
-    if (HasPkmid2())
-        tags[internal::tagName_pkmid2]              = EncodePhotons(internal::MaybeReverse(std::move(Pkmid2(Orientation::GENOMIC)), !isForwardStrand));
     if (HasDeletionQV())
-        tags[internal::tagName_deletionQV]          = internal::MaybeReverse(std::move(internal::Clip(DeletionQV(Orientation::GENOMIC), clipFrom, clipLength)), !isForwardStrand).Fastq();
+        tags[internal::tagName_deletionQV]          = internal::Clip(DeletionQV(Orientation::NATIVE), clipFrom, clipLength).Fastq();
     if (HasInsertionQV())
-        tags[internal::tagName_insertionQV]         = internal::MaybeReverse(std::move(internal::Clip(InsertionQV(Orientation::GENOMIC), clipFrom, clipLength)), !isForwardStrand).Fastq();
+        tags[internal::tagName_insertionQV]         = internal::Clip(InsertionQV(Orientation::NATIVE), clipFrom, clipLength).Fastq();
     if (HasMergeQV())
-        tags[internal::tagName_mergeQV]             = internal::MaybeReverse(std::move(internal::Clip(MergeQV(Orientation::GENOMIC), clipFrom, clipLength)), !isForwardStrand).Fastq();
+        tags[internal::tagName_mergeQV]             = internal::Clip(MergeQV(Orientation::NATIVE), clipFrom, clipLength).Fastq();
     if (HasSubstitutionQV())
-        tags[internal::tagName_substitutionQV]      = internal::MaybeReverse(std::move(internal::Clip(SubstitutionQV(Orientation::GENOMIC), clipFrom, clipLength)), !isForwardStrand).Fastq();
+        tags[internal::tagName_substitutionQV]      = internal::Clip(SubstitutionQV(Orientation::NATIVE), clipFrom, clipLength).Fastq();
     if (HasIPD())
-        tags[internal::tagName_ipd]                 = internal::MaybeReverse(std::move(internal::Clip(IPD(Orientation::GENOMIC).Data(), clipFrom, clipLength)), !isForwardStrand);
+        tags[internal::tagName_ipd]                 = internal::Clip(IPD(Orientation::NATIVE).Data(), clipFrom, clipLength);
     if (HasPulseWidth())
-        tags[internal::tagName_pulseWidth]          = internal::MaybeReverse(std::move(internal::Clip(PulseWidth(Orientation::GENOMIC).Data(), clipFrom, clipLength)), !isForwardStrand);
+        tags[internal::tagName_pulseWidth]          = internal::Clip(PulseWidth(Orientation::NATIVE).Data(), clipFrom, clipLength);
     if (HasDeletionTag())
-        tags[internal::tagName_deletionTag]         = internal::MaybeReverseComplement(std::move(internal::Clip(DeletionTag(Orientation::GENOMIC), clipFrom, clipLength)), !isForwardStrand);
+        tags[internal::tagName_deletionTag]         = internal::Clip(DeletionTag(Orientation::NATIVE), clipFrom, clipLength);
     if (HasSubstitutionTag())
-        tags[internal::tagName_substitutionTag]     = internal::MaybeReverseComplement(std::move(internal::Clip(SubstitutionTag(Orientation::GENOMIC), clipFrom, clipLength)), !isForwardStrand);
+        tags[internal::tagName_substitutionTag]     = internal::Clip(SubstitutionTag(Orientation::NATIVE), clipFrom, clipLength);
+
+    // need to implement clipping on pulse tags etc (bug 31633)
+    if (HasAltLabelQV())
+        tags[internal::tagName_alternative_labelQV] = AltLabelQV(Orientation::NATIVE).Fastq();
+    if (HasLabelQV())
+        tags[internal::tagName_labelQV]             = LabelQV(Orientation::NATIVE).Fastq();
+    if (HasPulseMergeQV())
+        tags[internal::tagName_pulseMergeQV]        = PulseMergeQV(Orientation::NATIVE).Fastq();
+    if (HasAltLabelTag())
+        tags[internal::tagName_alternative_labelTag]= AltLabelTag(Orientation::NATIVE);
+    if (HasPulseCall())
+        tags[internal::tagName_pulse_call]          = PulseCall(Orientation::NATIVE);
+    if (HasPkmean())
+        tags[internal::tagName_pkmean]              = EncodePhotons(Pkmean(Orientation::NATIVE));
+    if (HasPkmid())
+        tags[internal::tagName_pkmid]               = EncodePhotons(Pkmid(Orientation::NATIVE));
+    if (HasPkmean2())
+        tags[internal::tagName_pkmean2]             = EncodePhotons(Pkmean2(Orientation::NATIVE));
+    if (HasPkmid2())
+        tags[internal::tagName_pkmid2]              = EncodePhotons(Pkmid2(Orientation::NATIVE));
     if (HasPrePulseFrames())
-    {
-        auto frames = PrePulseFrames(Orientation::GENOMIC).Data();
-        tags[internal::tagName_pre_pulse_frames]    = internal::MaybeReverse(std::move(frames), !isForwardStrand);
-    }
+        tags[internal::tagName_pre_pulse_frames]    = PrePulseFrames(Orientation::NATIVE).Data();
     if (HasPulseCallWidth())
-    {
-        auto frames = PulseCallWidth(Orientation::GENOMIC).Data();
-        tags[internal::tagName_pulse_call_width]    = internal::MaybeReverse(std::move(frames), !isForwardStrand);
-    }
+        tags[internal::tagName_pulse_call_width]    = PulseCallWidth(Orientation::NATIVE).Data();
     if (HasStartFrame())
-    {
-        std::vector<uint32_t> startFrame = std::move(StartFrame(Orientation::GENOMIC));
-        if (!isForwardStrand)
-            internal::Reverse(startFrame);
-        tags[internal::tagName_startFrame] = startFrame;
-    }
+        tags[internal::tagName_startFrame]          = StartFrame(Orientation::NATIVE);
 
     impl_.Tags(tags);
 }
@@ -728,6 +723,12 @@ BamRecord& BamRecord::ClipToQuery(const Position start,
             const size_t firstOpLength = firstOp.Length();
             const bool consumesQuery = internal::ConsumesQuery(firstOp.Type());
             const bool consumesRef = internal::ConsumesReference(firstOp.Type());
+
+            // if (!consumesQuery)
+            //    just pop (e.g. deletion) ?
+            // else {
+            //    check bounds, like clip to reference ?
+            // }
 
             // CIGAR op ends at or before clip
             if (firstOpLength <= remaining) {
@@ -823,6 +824,9 @@ BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
     if (start <= origTStart && end >= origTEnd)
         return *this;
 
+    const Position newTStart = std::max(origTStart, start);
+    const Position newTEnd   = std::min(origTEnd, end);
+
     // fetch a 'working copy' of CIGAR data
     Cigar cigar = std::move(impl_.CigarData());
 
@@ -834,28 +838,40 @@ BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
     // clip leading CIGAR ops
     // ------------------------
 
-    size_t remaining = start - origTStart;
+    size_t remaining = newTStart - origTStart;
     while (remaining > 0 && !cigar.empty()) {
         CigarOperation& firstOp = cigar.front();
         const size_t firstOpLength = firstOp.Length();
         const bool consumesQuery = internal::ConsumesQuery(firstOp.Type());
         const bool consumesRef = internal::ConsumesReference(firstOp.Type());
 
-        // CIGAR op ends at or before clip
-        if (firstOpLength <= remaining) {
+        if (!consumesRef) {
+
+            // e.g. softclip - just pop it completely
             cigar.erase(cigar.begin());
             if (consumesQuery)
                 queryPosRemovedFront += firstOpLength;
-            if (consumesRef)
-                remaining -= firstOpLength;
-        }
 
-        // CIGAR op straddles clip
-        else {
-            firstOp.Length(firstOpLength - remaining);
-            if (consumesQuery)
-                queryPosRemovedFront += remaining;
-            remaining = 0;
+        } else {
+            assert(consumesRef);
+
+            // CIGAR ends at or before clip
+            if (firstOpLength <= remaining) {
+                cigar.erase(cigar.begin());
+                if (consumesQuery)
+                    queryPosRemovedFront += firstOpLength;
+                if (consumesRef)
+                    remaining -= firstOpLength;
+            }
+
+            // CIGAR straddles clip
+            else {
+                assert(firstOpLength > remaining);
+                firstOp.Length(firstOpLength - remaining);
+                if (consumesQuery)
+                    queryPosRemovedFront += remaining;
+                remaining = 0;
+            }
         }
     }
 
@@ -863,34 +879,46 @@ BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
     // clip trailing CIGAR ops
     // -------------------------
 
-    remaining = origTEnd - end;
+    remaining = origTEnd - newTEnd;
     while (remaining > 0 && !cigar.empty()) {
         CigarOperation& lastOp = cigar.back();
         const size_t lastOpLength = lastOp.Length();
         const bool consumesQuery = internal::ConsumesQuery(lastOp.Type());
         const bool consumesRef = internal::ConsumesReference(lastOp.Type());
 
-        // CIGAR op ends at or after clip
-        if (lastOpLength <= remaining) {
+        if (!consumesRef) {
+
+            // e.g. softclip - just pop it completely
             cigar.pop_back();
             if (consumesQuery)
                 queryPosRemovedBack += lastOpLength;
-            if (consumesRef)
-                remaining -= lastOpLength;
-        }
 
-        // CIGAR op straddles clip
-        else {
-            lastOp.Length(lastOpLength - remaining);
-            if (consumesQuery)
-                queryPosRemovedBack += remaining;
-            remaining = 0;
+        } else {
+            assert(consumesRef);
+
+            // CIGAR ends at or after clip
+            if (lastOpLength <= remaining) {
+                cigar.pop_back();
+                if (consumesQuery)
+                    queryPosRemovedBack += lastOpLength;
+                if (consumesRef)
+                    remaining -= lastOpLength;
+            }
+
+            // CIGAR straddles clip
+            else {
+                assert(lastOpLength > remaining);
+                lastOp.Length(lastOpLength - remaining);
+                if (consumesQuery)
+                    queryPosRemovedBack += remaining;
+                remaining = 0;
+            }
         }
     }
 
     // update CIGAR and position
     impl_.CigarData(cigar);
-    impl_.Position(start);
+    impl_.Position(newTStart);
 
     // clip SEQ, QUAL, tags
     const Position qStart = origQStart + queryPosRemovedFront;
@@ -902,6 +930,7 @@ BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
     // update query start/end
     internal::CreateOrEdit(internal::tagName_queryStart, qStart, &impl_);
     internal::CreateOrEdit(internal::tagName_queryEnd,   qEnd,   &impl_);
+//    UpdateName();
 
     // reset any cached aligned start/end
     ResetCachedPositions();
@@ -919,7 +948,6 @@ BamRecord& BamRecord::ClipToReferenceReverse(const PacBio::BAM::Position start,
     const Position origQEnd   = QueryEnd();
     const Position origAStart = AlignedStart();
     const Position origAEnd   = AlignedEnd();
-
     const Position origTStart  = ReferenceStart();
     const Position origTEnd    = ReferenceEnd();
 
@@ -929,102 +957,106 @@ BamRecord& BamRecord::ClipToReferenceReverse(const PacBio::BAM::Position start,
     assert(origAStart >= origQStart);
     assert(origAEnd   <= origQEnd);
 
-    // determine new offsets into data
-    const size_t alignedStartOffset = (origAStart - origQStart);
-    const size_t alignedEndOffset = (origQEnd - origAEnd);
-    const size_t tStartDiff = start - origTStart;
-    const size_t tEndDiff   = origTEnd - end;
+    const Position newTStart = std::max(origTStart, start);
+    const Position newTEnd   = std::min(origTEnd, end);
 
-    size_t startOffset = alignedEndOffset + tStartDiff;
-    size_t endOffset = alignedStartOffset + tEndDiff;
+    Cigar cigar = std::move(impl_.CigarData());
 
     size_t queryPosRemovedFront = 0;
     size_t queryPosRemovedBack  = 0;
-    size_t refPosRemovedFront   = 0;
-    size_t refPosRemovedBack    = 0;
 
     // update CIGAR - clip front ops, then clip back ops
-    Cigar cigar = std::move(impl_.CigarData());
-    size_t offsetRemaining = startOffset;
-    while (offsetRemaining > 0 && !cigar.empty()) {
+    size_t remaining = newTStart - origTStart;
+    while (remaining > 0 && !cigar.empty()) {
         CigarOperation& firstOp = cigar.front();
         const CigarOperationType firstOpType = firstOp.Type();
         const size_t firstOpLength = firstOp.Length();
+        const bool consumesQuery = internal::ConsumesQuery(firstOpType);
+        const bool consumesRef = internal::ConsumesReference(firstOpType);
 
-        const bool shouldUpdateQueryPos = internal::ConsumesQuery(firstOpType);
-        const bool shouldUpdateRefPos = internal::ConsumesReference(firstOpType);
+        if (!consumesRef) {
 
-        if (firstOpLength <= offsetRemaining) {
-
+            // e.g. softclip - just pop it completely
             cigar.erase(cigar.begin());
-
-            if (shouldUpdateQueryPos)
-                queryPosRemovedFront += firstOpLength;
-            if (shouldUpdateRefPos)
-                refPosRemovedFront += firstOpLength;
-
-            offsetRemaining -= firstOpLength;
+            if (consumesQuery)
+                queryPosRemovedBack += firstOpLength;
 
         } else {
+            assert(consumesRef);
 
-            firstOp.Length(firstOpLength - offsetRemaining);
+            // CIGAR ends at or before clip
+            if (firstOpLength <= remaining) {
+                cigar.erase(cigar.begin());
+                if (consumesQuery)
+                    queryPosRemovedBack += firstOpLength;
+                if (consumesRef)
+                    remaining -= firstOpLength;
+            }
 
-            if (shouldUpdateQueryPos)
-                queryPosRemovedFront += offsetRemaining;
-            if (shouldUpdateRefPos)
-                refPosRemovedFront += offsetRemaining;
-
-            offsetRemaining = 0;
+            // CIGAR straddles clip
+            else {
+                assert(firstOpLength > remaining);
+                firstOp.Length(firstOpLength - remaining);
+                if (consumesQuery)
+                    queryPosRemovedBack += remaining;
+                remaining = 0;
+            }
         }
     }
 
-    offsetRemaining = endOffset;
-    while (offsetRemaining > 0 && !cigar.empty()) {
+    remaining = origTEnd - newTEnd;
+    while (remaining > 0 && !cigar.empty()) {
         CigarOperation& lastOp = cigar.back();
         const CigarOperationType lastOpType = lastOp.Type();
         const size_t lastOpLength = lastOp.Length();
+        const bool consumesQuery = internal::ConsumesQuery(lastOpType);
+        const bool consumesRef = internal::ConsumesReference(lastOpType);
 
-        const bool shouldUpdateQueryPos = internal::ConsumesQuery(lastOpType);
-        const bool shouldUpdateRefPos = internal::ConsumesReference(lastOpType);
+        if (!consumesRef) {
 
-        if (lastOpLength <= offsetRemaining) {
+            // e.g. softclip - just pop it completely
             cigar.pop_back();
-
-            if (shouldUpdateQueryPos)
-                queryPosRemovedBack += lastOpLength;
-            if (shouldUpdateRefPos)
-                refPosRemovedBack += lastOpLength;
-
-            offsetRemaining -= lastOpLength;
+            if (consumesQuery)
+                queryPosRemovedFront += lastOpLength;
 
         } else {
-            lastOp.Length(lastOpLength - offsetRemaining);
+            assert(consumesRef);
 
-            if (shouldUpdateQueryPos)
-                queryPosRemovedBack += offsetRemaining;
-            if (shouldUpdateRefPos)
-                refPosRemovedBack += offsetRemaining;
+            // CIGAR ends at or before clip
+            if (lastOpLength <= remaining) {
+                cigar.pop_back();
+                if (consumesQuery)
+                    queryPosRemovedFront += lastOpLength;
+                if (consumesRef)
+                    remaining -= lastOpLength;
+            }
 
-            offsetRemaining = 0;
+            // CIGAR straddles clip
+            else {
+                assert(lastOpLength > remaining);
+                lastOp.Length(lastOpLength - remaining);
+                if (consumesQuery)
+                    queryPosRemovedFront += remaining;
+                remaining = 0;
+            }
         }
     }
     impl_.CigarData(cigar);
 
     // update aligned reference position
-    impl_.Position(start);
+    impl_.Position(newTStart);
 
     // clip SEQ, QUAL, tags
-    const size_t origSeqLength = Sequence(Orientation::GENOMIC).length();
-    const size_t newSeqLength = (origSeqLength - queryPosRemovedBack) - queryPosRemovedFront;
+    const Position qStart = origQStart + queryPosRemovedFront;
+    const Position qEnd   = origQEnd   - queryPosRemovedBack;
     const size_t clipFrom = queryPosRemovedFront;
-    const size_t clipLength = newSeqLength;
+    const size_t clipLength = qEnd - qStart;
     ClipFields(clipFrom, clipLength);
 
     // update query start/end
-    const Position qStart = origQStart + queryPosRemovedBack;
-    const Position qEnd   = origQEnd   - queryPosRemovedFront;
     internal::CreateOrEdit(internal::tagName_queryStart, qStart, &impl_);
     internal::CreateOrEdit(internal::tagName_queryEnd,   qEnd,   &impl_);
+//    UpdateName();
 
     // reset any cached aligned start/end
     ResetCachedPositions();
