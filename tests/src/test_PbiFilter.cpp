@@ -926,6 +926,74 @@ TEST(PbiFilterTest, FromDataSetOk)
     }
 }
 
+TEST(PbiFilterTest, BarcodeListFromDataSetXmlOk)
+{
+    auto runner = [](const Property& property,
+                     const PbiFilter& expectedFilter,
+                     const std::vector<size_t>& expectedResults)
+    {
+        auto filter = Filter{ };
+        filter.Properties().Add(property);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        const auto generatedFilter = PbiFilter::FromDataSet(dataset);
+        tests::checkFilterRows(expectedFilter,  expectedResults);
+        tests::checkFilterRows(generatedFilter, expectedResults);
+    };
+
+    // single barcode
+    runner(Property{ "bc", "18", "==" },
+           PbiBarcodeFilter{ 18, Compare::EQUAL },
+           std::vector<size_t>{1,3});
+
+    // single barcode (bracketed)
+    runner(Property{ "bc", "[18]", "==" },
+           PbiBarcodeFilter{ 18, Compare::EQUAL },
+           std::vector<size_t>{1,3});
+
+    // barcode pair (square brackets)
+    runner(Property{ "bc", "[17,18]", "==" },
+           PbiBarcodesFilter{ {17, 18}, Compare::EQUAL },
+           std::vector<size_t>{1,3});
+
+    // barcode pair (parens)
+    runner(Property{ "bc", "(17,18)", "==" },
+           PbiBarcodesFilter{ {17, 18}, Compare::EQUAL },
+           std::vector<size_t>{1,3});
+
+    // barcode pair (curly brackets)
+    runner(Property{ "bc", "{17,18}", "==" },
+           PbiBarcodesFilter{ {17, 18}, Compare::EQUAL },
+           std::vector<size_t>{1,3});
+
+    // barcode pair (list, but no brackets)
+    runner(Property{ "bc", "17,18", "==" },
+           PbiBarcodesFilter{ {17, 18}, Compare::EQUAL },
+           std::vector<size_t>{1,3});
+
+    // barcode pair - same value
+    runner(Property{ "bc", "[18,18]", "==" },
+           PbiBarcodesFilter{ {18, 18}, Compare::EQUAL },
+           std::vector<size_t>{}); // none share forward & reverse
+
+    auto expectFail = [](const Property& property)
+    {
+        auto filter = Filter{ };
+        filter.Properties().Add(property);
+        DataSet dataset = DataSet{ };
+        dataset.Filters().Add(filter);
+
+        EXPECT_THROW(PbiFilter::FromDataSet(dataset), std::runtime_error);
+    };
+
+    // list-ish, but only one value
+    expectFail(Property{ "bc", "[18,]", "==" });
+
+    // too many barcodes
+    expectFail(Property{ "bc", "[18,18,18]", "==" });
+}
+
 TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
 {
     {   // no adapters or barcodes
@@ -933,8 +1001,7 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
         const auto expectedFilter =
                 PbiLocalContextFilter{ LocalContextFlags::NO_LOCAL_CONTEXT, Compare::EQUAL };
 
-        // <Property Name="cx" Value="0" Operator="==" />
-
+        // XML: <Property Name="cx" Value="0" Operator="==" />
         Property property("cx", "0", "==");
 
         auto filter = Filter{ };
@@ -951,8 +1018,7 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
         const auto expectedFilter =
                 PbiLocalContextFilter{ LocalContextFlags::NO_LOCAL_CONTEXT, Compare::NOT_EQUAL };
 
-        // <Property Name="cx" Value="0" Operator="!=" />
-
+        // XML: <Property Name="cx" Value="0" Operator="!=" />
         Property property("cx", "0", "!=");
 
         auto filter = Filter{ };
@@ -969,8 +1035,7 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
         const auto expectedFilter =
                 PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS };
 
-        // <Property Name="cx" Value="1" Operator="&" />
-
+        // XML: <Property Name="cx" Value="1" Operator="&" />
         Property property("cx", "1", "&");
 
         auto filter = Filter{ };
@@ -987,8 +1052,7 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
         const auto expectedFilter =
                 PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS };
 
-        // <Property Name="cx" Value="ADAPTER_BEFORE" Operator="&" />
-
+        // XML: <Property Name="cx" Value="ADAPTER_BEFORE" Operator="&" />
         Property property("cx", "ADAPTER_BEFORE", "&");
 
         auto filter = Filter{ };
@@ -1005,8 +1069,7 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
         const auto expectedFilter =
                 PbiLocalContextFilter{ LocalContextFlags::ADAPTER_AFTER, Compare::CONTAINS };
 
-        // <Property Name="cx" Value="2" Operator="&" />
-
+        // XML: <Property Name="cx" Value="2" Operator="&" />
         Property property("cx", "2", "&");
 
         auto filter = Filter{ };
@@ -1024,8 +1087,7 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
                 PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE | LocalContextFlags::ADAPTER_AFTER,
                                        Compare::CONTAINS };
 
-        // <Property Name="cx" Value="3" Operator="&" />
-
+        // XML: <Property Name="cx" Value="3" Operator="&" />
         Property property("cx", "3", "&");
 
         auto filter = Filter{ };
@@ -1043,8 +1105,7 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
                 PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE | LocalContextFlags::ADAPTER_AFTER,
                                        Compare::CONTAINS };
 
-        // <Property Name="cx" Value="ADAPTER_BEFORE | ADAPTER_AFTER" Operator="&" />
-
+        // XML: <Property Name="cx" Value="ADAPTER_BEFORE | ADAPTER_AFTER" Operator="&" />
         Property property("cx", "ADAPTER_BEFORE | ADAPTER_AFTER", "&");
 
         auto filter = Filter{ };
@@ -1062,8 +1123,7 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
                 PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE | LocalContextFlags::ADAPTER_AFTER,
                                        Compare::CONTAINS };
 
-        // <Property Name="cx" Value="ADAPTER_BEFORE|ADAPTER_AFTER" Operator="&" />
-
+        // XML: <Property Name="cx" Value="ADAPTER_BEFORE|ADAPTER_AFTER" Operator="&" />
         Property property("cx", "ADAPTER_BEFORE|ADAPTER_AFTER", "&");
 
         auto filter = Filter{ };
@@ -1081,8 +1141,7 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
                 PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE | LocalContextFlags::ADAPTER_AFTER,
                                        Compare::CONTAINS };
 
-        // <Property Name="cx" Value="ADAPTER_BEFORE        |           ADAPTER_AFTER" Operator="&" />
-
+        // XML: <Property Name="cx" Value="ADAPTER_BEFORE        |           ADAPTER_AFTER" Operator="&" />
         Property property("cx", "ADAPTER_BEFORE        |           ADAPTER_AFTER", "&");
 
         auto filter = Filter{ };
@@ -1110,6 +1169,7 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
             })
         });
 
+        // XML:
         // <Filters>
         //   <Filter>
         //     <Properties>
@@ -1150,6 +1210,7 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
             PbiLocalContextFilter{ LocalContextFlags::ADAPTER_AFTER,  Compare::CONTAINS }
         });
 
+        // XML:
         // <Filters>
         //   <Filter>
         //     <Properties>
@@ -1185,9 +1246,9 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
             PbiLocalContextFilter{ LocalContextFlags::ADAPTER_AFTER,  Compare::CONTAINS }
         });
 
+        // XML:
         // <Property Name="cx" Value="1" Operator="&" />
         // <Property Name="cx" Value="2" Operator="&" />
-
         Property property1("cx", "1", "&");
         Property property2("cx", "2", "&");
 
@@ -1209,9 +1270,9 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
             PbiLocalContextFilter{ LocalContextFlags::ADAPTER_AFTER,  Compare::NOT_CONTAINS }
         });
 
+        // XML:
         // <Property Name="cx" Value="1" Operator="&" />
         // <Property Name="cx" Value="2" Operator="~" />
-
         Property property1("cx", "1", "&");
         Property property2("cx", "2", "~");
 
@@ -1230,8 +1291,7 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
         const auto expectedFilter =
                 PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS };
 
-        // <Property Name="cx" Value="1" Operator="~" />
-
+        // XML: <Property Name="cx" Value="1" Operator="~" />
         Property property("cx", "1", "~");
 
         auto filter = Filter{ };
@@ -1251,9 +1311,9 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
             PbiLocalContextFilter{ LocalContextFlags::ADAPTER_AFTER,  Compare::NOT_CONTAINS }
         });
 
+        // XML:
         // <Property Name="cx" Value="1" Operator="~" />
         // <Property Name="cx" Value="2" Operator="~" />
-
         Property property1("cx", "1", "~");
         Property property2("cx", "2", "~");
 
@@ -1273,8 +1333,7 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
                 PbiLocalContextFilter{ LocalContextFlags::ADAPTER_BEFORE | LocalContextFlags::ADAPTER_AFTER,
                                        Compare::NOT_CONTAINS };
 
-        // <Property Name="cx" Value="3" Operator="~" />
-
+        // XML: <Property Name="cx" Value="3" Operator="~" />
         Property property("cx", "3", "~");
 
         auto filter = Filter{ };

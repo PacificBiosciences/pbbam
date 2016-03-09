@@ -45,6 +45,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <algorithm>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -134,8 +135,46 @@ static const unordered_map<string, LocalContextFlags> contextFlagNames =
 };
 
 static
-PbiFilter CreateLocalContextFilter(const std::string& value,
-                                        const Compare::Type compareType)
+PbiFilter CreateBarcodeFilter(string value,
+                              const Compare::Type compareType)
+{
+    // little helper lambdas (for readability below)
+    auto isBracketed = [](const string& value)
+    {
+        static const string openBrackets = "[({";
+        static const string closeBrackets = "])}";
+        return openBrackets.find(value.at(0)) != string::npos &&
+               closeBrackets.find(value.at(value.length()-1)) != string::npos;
+    };
+    auto isList = [](const string& value)
+    {
+        return value.find(',') != string::npos;
+    };
+
+
+    if (value.empty())
+        throw std::runtime_error("empty value for barcode filter property");
+
+    if (isBracketed(value)) {
+        value.erase(0,1);
+        value.pop_back();
+    }
+
+    if (isList(value)) {
+        vector<string> barcodes = internal::Split(value, ',');
+        if (barcodes.size() != 2)
+            throw std::runtime_error("only 2 barcode values expected");
+        return PbiBarcodesFilter{ static_cast<uint16_t>(stoul(barcodes.at(0))),
+                                  static_cast<uint16_t>(stoul(barcodes.at(1))),
+                                  compareType
+                                };
+    } else
+        return PbiBarcodeFilter{ static_cast<uint16_t>(stoul(value)), compareType };
+}
+
+static
+PbiFilter CreateLocalContextFilter(const string& value,
+                                   const Compare::Type compareType)
 {
     if (value.empty())
         throw std::runtime_error("empty value for local context filter property");
@@ -166,10 +205,11 @@ PbiFilter FromDataSetProperty(const Property& property)
         const Compare::Type compareType = Compare::TypeFromOperator(property.Operator());
         const BuiltIn builtInCode = builtInLookup.at(boost::algorithm::to_lower_copy(property.Name()));
         switch (builtInCode) {
+
+            // single-value filters
             case BuiltIn::AlignedEndFilter     : return PbiAlignedEndFilter{ static_cast<uint32_t>(stoul(value)), compareType };
             case BuiltIn::AlignedLengthFilter  : return PbiAlignedLengthFilter{ static_cast<uint32_t>(stoul(value)), compareType };
             case BuiltIn::AlignedStartFilter   : return PbiAlignedStartFilter{ static_cast<uint32_t>(stoul(value)), compareType };
-            case BuiltIn::BarcodeFilter        : return PbiBarcodeFilter{ static_cast<uint16_t>(stoul(value)), compareType };
             case BuiltIn::IdentityFilter       : return PbiIdentityFilter{ stof(value), compareType };
             case BuiltIn::MovieNameFilter      : return PbiMovieNameFilter{ value };
             case BuiltIn::QueryEndFilter       : return PbiQueryEndFilter{ stoi(value), compareType };
@@ -183,10 +223,11 @@ PbiFilter FromDataSetProperty(const Property& property)
             case BuiltIn::ReferenceNameFilter  : return PbiReferenceNameFilter{ value };
             case BuiltIn::ReferenceStartFilter : return PbiReferenceStartFilter{ static_cast<uint32_t>(stoul(value)), compareType };
             case BuiltIn::ZmwFilter            : return PbiZmwFilter{ stoi(value), compareType };
-            case BuiltIn::LocalContextFilter   :
-            {
-                return CreateLocalContextFilter(value, compareType);
-            }
+
+            // (maybe) list-value filters
+            case BuiltIn::BarcodeFilter      : return CreateBarcodeFilter(value, compareType);
+            case BuiltIn::LocalContextFilter : return CreateLocalContextFilter(value, compareType);
+
             default :
                 throw std::exception();
         }
