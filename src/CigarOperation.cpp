@@ -41,39 +41,26 @@
 
 #include "pbbam/CigarOperation.h"
 #include <htslib/sam.h>
-#include <array>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-namespace internal {
-
-typedef array<CigarOperationType, 128> CigarLookup;
-
-static
-CigarLookup InitCigarLookup(void)
-{
-    CigarLookup cl;
-    cl.fill(CigarOperationType::UNKNOWN_OP);
-    cl['M'] = CigarOperationType::ALIGNMENT_MATCH;
-    cl['I'] = CigarOperationType::INSERTION;
-    cl['D'] = CigarOperationType::DELETION;
-    cl['N'] = CigarOperationType::REFERENCE_SKIP;
-    cl['S'] = CigarOperationType::SOFT_CLIP;
-    cl['H'] = CigarOperationType::HARD_CLIP;
-    cl['P'] = CigarOperationType::PADDING;
-    cl['='] = CigarOperationType::SEQUENCE_MATCH;
-    cl['X'] = CigarOperationType::SEQUENCE_MISMATCH;
-    return cl;
-}
-
-const static CigarLookup cigarLookup_ = InitCigarLookup();
-
-} // namespace internal
-
 CigarOperationType CigarOperation::CharToType(const char c)
-{   return (static_cast<uint8_t>(c) >= 128 ? CigarOperationType::UNKNOWN_OP
-                                           : internal::cigarLookup_[c] );
+{
+    switch(c)
+    {
+        case 'S' : return CigarOperationType::SOFT_CLIP;
+        case '=' : return CigarOperationType::SEQUENCE_MATCH;
+        case 'X' : return CigarOperationType::SEQUENCE_MISMATCH;
+        case 'I' : return CigarOperationType::INSERTION;
+        case 'D' : return CigarOperationType::DELETION;
+        case 'N' : return CigarOperationType::REFERENCE_SKIP;
+        case 'H' : return CigarOperationType::HARD_CLIP;
+        case 'P' : return CigarOperationType::PADDING;
+        case 'M' : return CigarOperationType::ALIGNMENT_MATCH;
+        default:
+            return CigarOperationType::UNKNOWN_OP;
+    }
 }
 
 char CigarOperation::TypeToChar(const CigarOperationType type)

@@ -48,116 +48,107 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-const string inputBamFn = tests::Data_Dir + "/ex2.bam";
+const string inputBamFn = tests::Data_Dir + "/aligned.bam";
 
 TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
 {
-    const string seq1 = "seq1";
-    const string seq2 = "seq2";
+    const string rname = "lambda_NEB3011";
 
-    // open input BAM file
     BamFile bamFile(inputBamFn);
 
-    // count records
+    // setup with normal interval
     int count = 0;
-    GenomicInterval interval(seq1, 0, 100);
+    GenomicInterval interval(rname, 5000, 6000);
     GenomicIntervalQuery query(interval, bamFile);
     for (const BamRecord& record : query) {
         (void)record;
         ++count;
     }
-    EXPECT_EQ(39, count);
+    EXPECT_EQ(2, count);
 
     // adjust interval and pass back in
     count = 0;
-    interval.Start(500);
-    interval.Stop(600);
+    interval.Start(9300);
+    interval.Stop(9400);
     query.Interval(interval);
     for (const BamRecord& record : query) {
         (void)record;
         ++count;
     }
-    EXPECT_EQ(166, count);
+    EXPECT_EQ(2, count);
 
-    // adjust again
+    // adjust again (empty region)
     count = 0;
-    interval.Name(seq2);
-    interval.Start(0);
-    interval.Stop(100);
+    interval.Name(rname);
+    interval.Start(1000);
+    interval.Stop(2000);
     query.Interval(interval);
     for (const BamRecord& record : query) {
         (void)record;
         ++count;
     }
-    EXPECT_EQ(83, count);
+    EXPECT_EQ(0, count);
 
     // unknown ref
     count = 0;
     interval.Name("does not exist");
     interval.Start(0);
     interval.Stop(100);
-    EXPECT_THROW(
-        query.Interval(interval);
-    , std::exception);
-    for (const BamRecord& record : query) {    // iteration is still safe, just returns no data
+    EXPECT_THROW(query.Interval(interval), std::runtime_error);
+    for (const BamRecord& record : query) { // iteration is still safe, just returns no data
         (void)record;
         ++count;
     }
     EXPECT_EQ(0, count);
 
     // adjust again - make sure we can read a real region after an invalid one
-    interval.Name(seq2);
-    interval.Start(0);
-    interval.Stop(100);
+    interval.Name(rname);
+    interval.Start(5000);
+    interval.Stop(6000);
     query.Interval(interval);
     count = 0;
     for (const BamRecord& record : query) {
         (void)record;
         ++count;
     }
-    EXPECT_EQ(83, count);
+    EXPECT_EQ(2, count);
 }
 
 TEST(GenomicIntervalQueryTest, NonConstBamRecord)
 {
     EXPECT_NO_THROW(
     {
-        // open input BAM file
         BamFile bamFile(inputBamFn);
-
-        // count records
         int count = 0;
-        GenomicInterval interval("seq1", 0, 100);
+
+        GenomicInterval interval("lambda_NEB3011", 8000, 10000);
         GenomicIntervalQuery query(interval, bamFile);
         for (BamRecord& record : query) {
             (void)record;
             ++count;
         }
-        EXPECT_EQ(39, count);
+        EXPECT_EQ(2, count);
     });
 }
 
 TEST(GenomicIntervalQueryTest,  MissingBaiShouldThrow)
 {
-    GenomicInterval interval("seq1", 0, 100);
+    GenomicInterval interval("lambda_NEB3011", 0, 100);
     const string phi29Bam = tests::Data_Dir + "/phi29.bam";
-    const string hasBaiBam = tests::Data_Dir + "/dataset/bam_mapping1.bam";
+    const string hasBaiBam = tests::Data_Dir + "/aligned.bam";
 
-    { // single file, missing BAI
-
+    {   // single file, missing BAI
         EXPECT_THROW(GenomicIntervalQuery query(interval, phi29Bam), std::runtime_error);
     }
 
-    { // from dataset, all missing BAI
-
+    {   // from dataset, all missing BAI
         DataSet ds;
         ds.ExternalResources().Add(ExternalResource("PacBio.SubreadFile.SubreadBamFile", phi29Bam));
         ds.ExternalResources().Add(ExternalResource("PacBio.SubreadFile.SubreadBamFile", phi29Bam));
         EXPECT_THROW(GenomicIntervalQuery query(interval, ds), std::runtime_error);
     }
 
-    { // from dataset, mixed BAI presence
-
+    {   // from dataset, mixed BAI presence
         DataSet ds;
         ds.ExternalResources().Add(ExternalResource("PacBio.SubreadFile.SubreadBamFile", phi29Bam));
         ds.ExternalResources().Add(ExternalResource("PacBio.AlignmentFile.AlignmentBamFile", hasBaiBam));

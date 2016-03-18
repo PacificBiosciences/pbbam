@@ -140,6 +140,10 @@ public:
     /// \returns %BAM filename
     std::string Filename(void) const;
 
+    /// \returns true if %BAM file has EOF marker (empty BGZF block). Streamed
+    ///          input (filename: "-")
+    bool HasEOF(void) const;
+
     /// \returns true if ".pbi" exists and is newer than this %BAM file.
     bool PacBioIndexExists(void) const;
 

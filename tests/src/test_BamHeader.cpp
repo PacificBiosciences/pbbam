@@ -50,6 +50,8 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
+namespace PacBio {
+namespace BAM {
 namespace tests {
 
 struct BamHdrDeleter
@@ -62,6 +64,8 @@ struct BamHdrDeleter
 };
 
 } // namespace tests
+} // namespace BAM
+} // namespace PacBio
 
 TEST(BamHeaderTest, DefaultConstruction)
 {
@@ -126,46 +130,19 @@ TEST(BamHeaderTest, DecodeTest)
 
 TEST(BamHeaderTest, VersionCheckOk)
 {
-
-    // empty
-    EXPECT_THROW({
-        const string text = "@HD\tVN:1.1\tSO:queryname\tpb:\n";
-        BamHeader h(text);
-        (void)h;
-    }, std::runtime_error);
-
-    // old beta version(s)
-    EXPECT_THROW({
-        const string text = "@HD\tVN:1.1\tSO:queryname\tpb:3.0b3\n";
-        BamHeader h(text);
-        (void)h;
-    }, std::runtime_error);
-    EXPECT_THROW({
-        const string text = "@HD\tVN:1.1\tSO:queryname\tpb:3.0b7\n";
-        BamHeader h(text);
-        (void)h;
-    }, std::runtime_error);
-
-    // contains other, invalid info
-    EXPECT_THROW({
-        const string text = "@HD\tVN:1.1\tSO:queryname\tpb:3.0.should_not_work\n";
-        BamHeader h(text);
-        (void)h;
-    }, std::runtime_error);
-
-    // valid syntax, but earlier than minimum allowed version
-    EXPECT_THROW({
-        const string text = "@HD\tVN:1.1\tSO:queryname\tpb:3.0.0\n";
-        BamHeader h(text);
-        (void)h;
-    }, std::runtime_error);
+    auto expectFail = [](string&& label, string&& text)
+    {
+        SCOPED_TRACE(label);
+        EXPECT_THROW(BamHeader{ text }, std::runtime_error);
+    };
+    expectFail("empty version",        "@HD\tVN:1.1\tSO:queryname\tpb:\n");
+    expectFail("old beta version",     "@HD\tVN:1.1\tSO:queryname\tpb:3.0b3\n");
+    expectFail("old beta version",     "@HD\tVN:1.1\tSO:queryname\tpb:3.0b7\n");
+    expectFail("invalid value",        "@HD\tVN:1.1\tSO:queryname\tpb:3.0.should_not_work\n");
+    expectFail("earlier than minimum", "@HD\tVN:1.1\tSO:queryname\tpb:3.0.0\n");
 
     // correct version syntax, number
-    EXPECT_NO_THROW({
-        const string text = "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n";
-        BamHeader h(text);
-        (void)h;
-    });
+    EXPECT_NO_THROW(BamHeader{ "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n" });
 }
 
 TEST(BamHeaderTest, EncodeTest)
@@ -409,7 +386,6 @@ TEST(BamHeaderTest, MergeHandlesDuplicateReadGroups)
     };
 
     // duplicate @RG:IDs handled ok (i.e. not duplicated in output)
-
     const BamHeader header1(hdrText);
     const BamHeader header2(hdrText);
     const BamHeader merged = header1 + header2;
@@ -418,7 +394,7 @@ TEST(BamHeaderTest, MergeHandlesDuplicateReadGroups)
 
 TEST(BamHeaderTest, IncompatibleMergeFails)
 {
-    { // @HD:VN
+    {   // @HD:VN
         const string hdrText1 = { "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n" };
         const string hdrText2 = { "@HD\tVN:1.0\tSO:unknown\tpb:3.0.1\n" };
         const BamHeader header1(hdrText1);
@@ -426,7 +402,7 @@ TEST(BamHeaderTest, IncompatibleMergeFails)
         EXPECT_THROW(header1 + header2, std::runtime_error);
     }
 
-    { // @HD:SO
+    {   // @HD:SO
         const string hdrText1 = { "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n" };
         const string hdrText2 = { "@HD\tVN:1.1\tSO:coordinate\tpb:3.0.1\n" };
         const BamHeader header1(hdrText1);
@@ -434,7 +410,7 @@ TEST(BamHeaderTest, IncompatibleMergeFails)
         EXPECT_THROW(header1 + header2, std::runtime_error);
     }
 
-    { // @HD:pb
+    {   // @HD:pb
         const string hdrText1 = { "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n" };
         const string hdrText2 = { "@HD\tVN:1.1\tSO:unknown\tpb:3.0.3\n" };
         const BamHeader header1(hdrText1);
@@ -442,8 +418,7 @@ TEST(BamHeaderTest, IncompatibleMergeFails)
         EXPECT_THROW(header1 + header2, std::runtime_error);
     }
 
-    { // @SQ list clash
-
+    {   // @SQ list clash
         const string hdrText1 = {
             "@HD\tVN:1.1\tSO:coordinate\tpb:3.0.1\n"
             "@SQ\tSN:foo\tLN:42\n"

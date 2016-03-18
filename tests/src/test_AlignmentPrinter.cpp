@@ -42,14 +42,11 @@
 #include "TestData.h"
 #include <gtest/gtest.h>
 
-#include "pbbam/AlignmentPrinter.h"
-#include "pbbam/BamFile.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/EntireFileQuery.h"
-#include "pbbam/IndexedFastaReader.h"
-
-#include <iostream>
-#include <sstream>
+#include <pbbam/AlignmentPrinter.h>
+#include <pbbam/BamFile.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/EntireFileQuery.h>
+#include <pbbam/IndexedFastaReader.h>
 #include <string>
 
 using namespace PacBio;
@@ -71,7 +68,7 @@ TEST(AlignmentPrinterTest, Print)
     // funky formatting used to format alignments
     auto expected = string
     {
-        "Read        : singleInsertion2\n"
+        "Read        : singleInsertion/100/0_49\n"
         "Reference   : lambda_NEB3011\n"
         "\n"
         "Read-length : 49\n"
@@ -91,7 +88,7 @@ TEST(AlignmentPrinterTest, Print)
     EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
 
     expected = {
-        "Read        : singleInsertion\n"
+        "Read        : singleInsertion/200/0_49\n"
         "Reference   : lambda_NEB3011\n"
         "\n"
         "Read-length : 49\n"
@@ -111,7 +108,7 @@ TEST(AlignmentPrinterTest, Print)
     EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
 
     expected = {
-        "Read        : singleInsertion2\n"
+        "Read        : singleInsertion/100/0_111\n"
         "Reference   : lambda_NEB3011\n"
         "\n"
         "Read-length : 59\n"
@@ -131,7 +128,7 @@ TEST(AlignmentPrinterTest, Print)
     EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
 
     expected = {
-        "Read        : singleInsertion\n"
+        "Read        : singleInsertion/100/0_111\n"
         "Reference   : lambda_NEB3011\n"
         "\n"
         "Read-length : 59\n"

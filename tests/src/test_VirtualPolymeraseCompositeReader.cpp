@@ -113,7 +113,7 @@ TEST(VirtualPolymeraseCompositeReaderTest, FilteredDataSetOk)
             tests::NumVirtualRecords(primaryFn1, scrapsFn1) +
             tests::NumVirtualRecords(primaryFn2, scrapsFn2) +
             tests::NumVirtualRecords(primaryFn3, scrapsFn3);
-    EXPECT_EQ(3, totalRecords); // 1 per pair
+    EXPECT_EQ(5, totalRecords);
 
     // our filter will remove the 2 "production" BAM pairs
     // using a ZMW filter that only the "internal" pair should pass

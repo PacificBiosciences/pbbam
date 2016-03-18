@@ -574,7 +574,7 @@ TEST(PbiFilterTest, MapQualityFilterOk)
 
 TEST(PbiFilterTest, MovieNameFilterOk)
 {
-    const auto bamFile = BamFile{ tests::Data_Dir + string{ "/test_group_query/test2.bam" } };
+    const auto bamFile = BamFile{ tests::Data_Dir + string{ "/group/test2.bam" } };
     const auto index = PbiRawData{ bamFile.PacBioIndexFilename() };
 
     {
@@ -677,7 +677,7 @@ TEST(PbiFilterTest, QueryLengthFilterOk)
 
 TEST(PbiFilterTest, QueryNameFilterOk)
 {
-    const auto bamFile = BamFile{ tests::Data_Dir + string{ "/test_group_query/test2.bam" } };
+    const auto bamFile = BamFile{ tests::Data_Dir + string{ "/group/test2.bam" } };
     const auto index = PbiIndex{ bamFile.PacBioIndexFilename() };
 
     {
@@ -824,7 +824,7 @@ TEST(PbiFilterTest, ReferenceIdFilterOk)
 
 TEST(PbiFilterTest, ReferenceNameFilterOk)
 {
-    const auto bamFile = BamFile{ tests::Data_Dir + string{ "/test_group_query/test2.bam" } };
+    const auto bamFile = BamFile{ tests::Data_Dir + string{ "/group/test2.bam" } };
     const auto index = PbiRawData{ bamFile.PacBioIndexFilename() };
 
     {

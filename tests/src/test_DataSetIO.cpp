@@ -54,8 +54,8 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-const string ex2BamFn      = tests::Data_Dir + "/ex2.bam";
-const string bamGroupFofn  = tests::Data_Dir + "/test_group_query/group.fofn";
+const string alignedBamFn  = tests::Data_Dir + "/aligned.bam";
+const string bamGroupFofn  = tests::Data_Dir + "/group/group.fofn";
 
 const string ali1XmlFn = tests::Data_Dir + "/dataset/ali1.xml";
 const string ali2XmlFn = tests::Data_Dir + "/dataset/ali2.xml";
@@ -64,8 +64,6 @@ const string ali4XmlFn = tests::Data_Dir + "/dataset/ali4.xml";
 const string mappingStaggeredXmlFn = tests::Data_Dir + "/dataset/bam_mapping_staggered.xml";
 const string barcodeXmlFn = tests::Data_Dir + "/dataset/barcode.dataset.xml";
 const string ccsReadXmlFn = tests::Data_Dir + "/dataset/ccsread.dataset.xml";
-const string datasetFofn  = tests::Data_Dir + "/dataset/fofn.fofn";
-const string hdfSubreadXmlFn    = tests::Data_Dir + "/dataset/hdfsubread_dataset.xml";
 const string lambdaContigsXmlFn = tests::Data_Dir + "/dataset/lambda_contigs.xml";
 const string pbalchemyXmlFn   = tests::Data_Dir + "/dataset/pbalchemy10kbp.xml";
 const string referenceXmlFn   = tests::Data_Dir + "/dataset/reference.dataset.xml";
@@ -82,7 +80,6 @@ static void TestAli4Xml(void);
 static void TestMappingStaggeredXml(void);
 static void TestBarcodeXml(void);
 static void TestCcsReadXml(void);
-static void TestHdfSubreadXml(void);
 static void TestLambdaContigsXml(void);
 static void TestPbalchemyXml(void);
 static void TestReferenceXml(void);
@@ -97,12 +94,12 @@ void changeCurrentDirectory(const std::string& dir)
 
 TEST(DataSetIOTest, FromBamFilename)
 {
-    DataSet dataset(ex2BamFn);
+    DataSet dataset(alignedBamFn);
 
     EXPECT_EQ(1, dataset.ExternalResources().Size());
     const ExternalResource& bamRef = dataset.ExternalResources()[0];
 
-    EXPECT_EQ(ex2BamFn, bamRef.ResourceId());
+    EXPECT_EQ(alignedBamFn, bamRef.ResourceId());
 }
 
 TEST(DataSetIOTest, FromBamFilenames)
@@ -117,13 +114,13 @@ TEST(DataSetIOTest, FromBamFilenames)
 
 TEST(DataSetIOTest, FromBamFileObject)
 {
-    BamFile bamFile(ex2BamFn);
+    BamFile bamFile(alignedBamFn);
     DataSet dataset(bamFile.Filename());
 
     EXPECT_EQ(1, dataset.ExternalResources().Size());
     const ExternalResource& bamRef = dataset.ExternalResources()[0];
 
-    EXPECT_EQ(ex2BamFn, bamRef.ResourceId());
+    EXPECT_EQ(alignedBamFn, bamRef.ResourceId());
 }
 
 TEST(DataSetIOTest, FromFofn)
@@ -146,7 +143,6 @@ TEST(DataSetIOTest, FromXmlFile)
     EXPECT_NO_THROW(TestMappingStaggeredXml());
     EXPECT_NO_THROW(TestBarcodeXml());
     EXPECT_NO_THROW(TestCcsReadXml());
-    EXPECT_NO_THROW(TestHdfSubreadXml());
     EXPECT_NO_THROW(TestLambdaContigsXml());
     EXPECT_NO_THROW(TestPbalchemyXml());
     EXPECT_NO_THROW(TestReferenceXml());
@@ -158,20 +154,12 @@ TEST(DataSetIOTest, FromXmlFile)
 
 TEST(DataSetIOTest, ThrowsOnNonexistentFofnFile)
 {
-    EXPECT_THROW(
-    {
-        DataSet dataset("does/not/exist.fofn");
-
-    }, std::exception);
+    EXPECT_THROW(DataSet{"does/not/exist.fofn"}, std::runtime_error);
 }
 
 TEST(DataSetIOTest, ThrowsOnNonexistentXmlFile)
 {
-    EXPECT_THROW(
-    {
-        DataSet dataset("does/not/exist.xml");
-
-    }, std::exception);
+    EXPECT_THROW(DataSet{"does/not/exist.xml"}, std::runtime_error);
 }
 
 TEST(DataSetIOTest, ToXml)
@@ -981,11 +969,6 @@ static void TestCcsReadXml(void)
             EXPECT_EQ(string("file:///mnt/path/to/ccsreads0.pbi"), index.ResourceId());
         }
     }
-}
-
-static void TestHdfSubreadXml(void)
-{
-    // Looks like a bunch of TYPOS in XML file !!
 }
 
 static void TestLambdaContigsXml(void)

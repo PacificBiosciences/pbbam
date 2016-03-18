@@ -88,8 +88,8 @@ struct BamHdrDeleter
     }
 };
 
-const string inputBamFn        = tests::Data_Dir + "/ex2.bam";
-const string goldStandardSamFn = tests::Data_Dir + "/ex2.sam";
+const string inputBamFn        = tests::Data_Dir + "/aligned.bam";
+const string goldStandardSamFn = tests::Data_Dir + "/aligned.sam";
 const string generatedBamFn    = "/tmp/generated.bam";
 const string generatedSamFn    = "/tmp/generated.sam";
 const vector<string> generatedFiles = { generatedBamFn, generatedSamFn };

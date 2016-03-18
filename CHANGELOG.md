@@ -16,6 +16,7 @@ successful completion (i.e. normal BamWriter destruction, not triggered by a
 thrown exception) the file is renamed to the actual requested filename.
 - PBI file creation follows the same temporary naming convention.
 - Support for barcode pair (forward, reverse) in DataSetXML filter.
+- Validation API & 'auto-validate' compile-time switch. 
 
 ### Fixed
 - Improper 'clip to reference' product for BamRecord in some cases.

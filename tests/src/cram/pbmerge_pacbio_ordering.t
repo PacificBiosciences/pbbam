@@ -54,6 +54,52 @@ Sanity Check:
   ArminsFakeMovie/100000/6740_6790
   ArminsFakeMovie/100000/6790_6812
   ArminsFakeMovie/100000/7034_7035
+  ArminsFakeMovie/200000/0_2659
+  ArminsFakeMovie/200000/3025_3047
+  ArminsFakeMovie/200000/3047_3095
+  ArminsFakeMovie/200000/3095_3116
+  ArminsFakeMovie/200000/3628_3650
+  ArminsFakeMovie/200000/3650_3700
+  ArminsFakeMovie/200000/3700_3722
+  ArminsFakeMovie/200000/4267_4289
+  ArminsFakeMovie/200000/4289_4335
+  ArminsFakeMovie/200000/4335_4356
+  ArminsFakeMovie/200000/4864_4888
+  ArminsFakeMovie/200000/4888_4939
+  ArminsFakeMovie/200000/4939_4960
+  ArminsFakeMovie/200000/5477_5498
+  ArminsFakeMovie/200000/5498_5546
+  ArminsFakeMovie/200000/5546_5571
+  ArminsFakeMovie/200000/6087_6116
+  ArminsFakeMovie/200000/6116_6173
+  ArminsFakeMovie/200000/6173_6199
+  ArminsFakeMovie/200000/6719_6740
+  ArminsFakeMovie/200000/6740_6790
+  ArminsFakeMovie/200000/6790_6812
+  ArminsFakeMovie/200000/7034_7035
+  ArminsFakeMovie/300000/0_2659
+  ArminsFakeMovie/300000/3025_3047
+  ArminsFakeMovie/300000/3047_3095
+  ArminsFakeMovie/300000/3095_3116
+  ArminsFakeMovie/300000/3628_3650
+  ArminsFakeMovie/300000/3650_3700
+  ArminsFakeMovie/300000/3700_3722
+  ArminsFakeMovie/300000/4267_4289
+  ArminsFakeMovie/300000/4289_4335
+  ArminsFakeMovie/300000/4335_4356
+  ArminsFakeMovie/300000/4864_4888
+  ArminsFakeMovie/300000/4888_4939
+  ArminsFakeMovie/300000/4939_4960
+  ArminsFakeMovie/300000/5477_5498
+  ArminsFakeMovie/300000/5498_5546
+  ArminsFakeMovie/300000/5546_5571
+  ArminsFakeMovie/300000/6087_6116
+  ArminsFakeMovie/300000/6116_6173
+  ArminsFakeMovie/300000/6173_6199
+  ArminsFakeMovie/300000/6719_6740
+  ArminsFakeMovie/300000/6740_6790
+  ArminsFakeMovie/300000/6790_6812
+  ArminsFakeMovie/300000/7034_7035
 
 Normal Merge:
 
@@ -93,6 +139,52 @@ Normal Merge:
   ArminsFakeMovie/100000/6740_6790
   ArminsFakeMovie/100000/6790_6812
   ArminsFakeMovie/100000/7034_7035
+  ArminsFakeMovie/200000/0_2659
+  ArminsFakeMovie/200000/3025_3047
+  ArminsFakeMovie/200000/3047_3095
+  ArminsFakeMovie/200000/3095_3116
+  ArminsFakeMovie/200000/3628_3650
+  ArminsFakeMovie/200000/3650_3700
+  ArminsFakeMovie/200000/3700_3722
+  ArminsFakeMovie/200000/4267_4289
+  ArminsFakeMovie/200000/4289_4335
+  ArminsFakeMovie/200000/4335_4356
+  ArminsFakeMovie/200000/4864_4888
+  ArminsFakeMovie/200000/4888_4939
+  ArminsFakeMovie/200000/4939_4960
+  ArminsFakeMovie/200000/5477_5498
+  ArminsFakeMovie/200000/5498_5546
+  ArminsFakeMovie/200000/5546_5571
+  ArminsFakeMovie/200000/6087_6116
+  ArminsFakeMovie/200000/6116_6173
+  ArminsFakeMovie/200000/6173_6199
+  ArminsFakeMovie/200000/6719_6740
+  ArminsFakeMovie/200000/6740_6790
+  ArminsFakeMovie/200000/6790_6812
+  ArminsFakeMovie/200000/7034_7035
+  ArminsFakeMovie/300000/0_2659
+  ArminsFakeMovie/300000/3025_3047
+  ArminsFakeMovie/300000/3047_3095
+  ArminsFakeMovie/300000/3095_3116
+  ArminsFakeMovie/300000/3628_3650
+  ArminsFakeMovie/300000/3650_3700
+  ArminsFakeMovie/300000/3700_3722
+  ArminsFakeMovie/300000/4267_4289
+  ArminsFakeMovie/300000/4289_4335
+  ArminsFakeMovie/300000/4335_4356
+  ArminsFakeMovie/300000/4864_4888
+  ArminsFakeMovie/300000/4888_4939
+  ArminsFakeMovie/300000/4939_4960
+  ArminsFakeMovie/300000/5477_5498
+  ArminsFakeMovie/300000/5498_5546
+  ArminsFakeMovie/300000/5546_5571
+  ArminsFakeMovie/300000/6087_6116
+  ArminsFakeMovie/300000/6116_6173
+  ArminsFakeMovie/300000/6173_6199
+  ArminsFakeMovie/300000/6719_6740
+  ArminsFakeMovie/300000/6740_6790
+  ArminsFakeMovie/300000/6790_6812
+  ArminsFakeMovie/300000/7034_7035
 
   $ rm $MERGED_BAM
 
@@ -134,6 +226,52 @@ Shuffle Input:
   ArminsFakeMovie/100000/6740_6790
   ArminsFakeMovie/100000/6790_6812
   ArminsFakeMovie/100000/7034_7035
+  ArminsFakeMovie/200000/0_2659
+  ArminsFakeMovie/200000/3025_3047
+  ArminsFakeMovie/200000/3047_3095
+  ArminsFakeMovie/200000/3095_3116
+  ArminsFakeMovie/200000/3628_3650
+  ArminsFakeMovie/200000/3650_3700
+  ArminsFakeMovie/200000/3700_3722
+  ArminsFakeMovie/200000/4267_4289
+  ArminsFakeMovie/200000/4289_4335
+  ArminsFakeMovie/200000/4335_4356
+  ArminsFakeMovie/200000/4864_4888
+  ArminsFakeMovie/200000/4888_4939
+  ArminsFakeMovie/200000/4939_4960
+  ArminsFakeMovie/200000/5477_5498
+  ArminsFakeMovie/200000/5498_5546
+  ArminsFakeMovie/200000/5546_5571
+  ArminsFakeMovie/200000/6087_6116
+  ArminsFakeMovie/200000/6116_6173
+  ArminsFakeMovie/200000/6173_6199
+  ArminsFakeMovie/200000/6719_6740
+  ArminsFakeMovie/200000/6740_6790
+  ArminsFakeMovie/200000/6790_6812
+  ArminsFakeMovie/200000/7034_7035
+  ArminsFakeMovie/300000/0_2659
+  ArminsFakeMovie/300000/3025_3047
+  ArminsFakeMovie/300000/3047_3095
+  ArminsFakeMovie/300000/3095_3116
+  ArminsFakeMovie/300000/3628_3650
+  ArminsFakeMovie/300000/3650_3700
+  ArminsFakeMovie/300000/3700_3722
+  ArminsFakeMovie/300000/4267_4289
+  ArminsFakeMovie/300000/4289_4335
+  ArminsFakeMovie/300000/4335_4356
+  ArminsFakeMovie/300000/4864_4888
+  ArminsFakeMovie/300000/4888_4939
+  ArminsFakeMovie/300000/4939_4960
+  ArminsFakeMovie/300000/5477_5498
+  ArminsFakeMovie/300000/5498_5546
+  ArminsFakeMovie/300000/5546_5571
+  ArminsFakeMovie/300000/6087_6116
+  ArminsFakeMovie/300000/6116_6173
+  ArminsFakeMovie/300000/6173_6199
+  ArminsFakeMovie/300000/6719_6740
+  ArminsFakeMovie/300000/6740_6790
+  ArminsFakeMovie/300000/6790_6812
+  ArminsFakeMovie/300000/7034_7035
 
   $ rm $MERGED_BAM
 
@@ -175,6 +313,52 @@ Explicit Output Filename (also enables PBI):
   ArminsFakeMovie/100000/6740_6790
   ArminsFakeMovie/100000/6790_6812
   ArminsFakeMovie/100000/7034_7035
+  ArminsFakeMovie/200000/0_2659
+  ArminsFakeMovie/200000/3025_3047
+  ArminsFakeMovie/200000/3047_3095
+  ArminsFakeMovie/200000/3095_3116
+  ArminsFakeMovie/200000/3628_3650
+  ArminsFakeMovie/200000/3650_3700
+  ArminsFakeMovie/200000/3700_3722
+  ArminsFakeMovie/200000/4267_4289
+  ArminsFakeMovie/200000/4289_4335
+  ArminsFakeMovie/200000/4335_4356
+  ArminsFakeMovie/200000/4864_4888
+  ArminsFakeMovie/200000/4888_4939
+  ArminsFakeMovie/200000/4939_4960
+  ArminsFakeMovie/200000/5477_5498
+  ArminsFakeMovie/200000/5498_5546
+  ArminsFakeMovie/200000/5546_5571
+  ArminsFakeMovie/200000/6087_6116
+  ArminsFakeMovie/200000/6116_6173
+  ArminsFakeMovie/200000/6173_6199
+  ArminsFakeMovie/200000/6719_6740
+  ArminsFakeMovie/200000/6740_6790
+  ArminsFakeMovie/200000/6790_6812
+  ArminsFakeMovie/200000/7034_7035
+  ArminsFakeMovie/300000/0_2659
+  ArminsFakeMovie/300000/3025_3047
+  ArminsFakeMovie/300000/3047_3095
+  ArminsFakeMovie/300000/3095_3116
+  ArminsFakeMovie/300000/3628_3650
+  ArminsFakeMovie/300000/3650_3700
+  ArminsFakeMovie/300000/3700_3722
+  ArminsFakeMovie/300000/4267_4289
+  ArminsFakeMovie/300000/4289_4335
+  ArminsFakeMovie/300000/4335_4356
+  ArminsFakeMovie/300000/4864_4888
+  ArminsFakeMovie/300000/4888_4939
+  ArminsFakeMovie/300000/4939_4960
+  ArminsFakeMovie/300000/5477_5498
+  ArminsFakeMovie/300000/5498_5546
+  ArminsFakeMovie/300000/5546_5571
+  ArminsFakeMovie/300000/6087_6116
+  ArminsFakeMovie/300000/6116_6173
+  ArminsFakeMovie/300000/6173_6199
+  ArminsFakeMovie/300000/6719_6740
+  ArminsFakeMovie/300000/6740_6790
+  ArminsFakeMovie/300000/6790_6812
+  ArminsFakeMovie/300000/7034_7035
 
   $ [ -f $MERGED_BAM_PBI ] && echo "Found" || echo "Not found"
   Found
@@ -220,6 +404,52 @@ Explicit Output Filename (with disabled PBI):
   ArminsFakeMovie/100000/6740_6790
   ArminsFakeMovie/100000/6790_6812
   ArminsFakeMovie/100000/7034_7035
+  ArminsFakeMovie/200000/0_2659
+  ArminsFakeMovie/200000/3025_3047
+  ArminsFakeMovie/200000/3047_3095
+  ArminsFakeMovie/200000/3095_3116
+  ArminsFakeMovie/200000/3628_3650
+  ArminsFakeMovie/200000/3650_3700
+  ArminsFakeMovie/200000/3700_3722
+  ArminsFakeMovie/200000/4267_4289
+  ArminsFakeMovie/200000/4289_4335
+  ArminsFakeMovie/200000/4335_4356
+  ArminsFakeMovie/200000/4864_4888
+  ArminsFakeMovie/200000/4888_4939
+  ArminsFakeMovie/200000/4939_4960
+  ArminsFakeMovie/200000/5477_5498
+  ArminsFakeMovie/200000/5498_5546
+  ArminsFakeMovie/200000/5546_5571
+  ArminsFakeMovie/200000/6087_6116
+  ArminsFakeMovie/200000/6116_6173
+  ArminsFakeMovie/200000/6173_6199
+  ArminsFakeMovie/200000/6719_6740
+  ArminsFakeMovie/200000/6740_6790
+  ArminsFakeMovie/200000/6790_6812
+  ArminsFakeMovie/200000/7034_7035
+  ArminsFakeMovie/300000/0_2659
+  ArminsFakeMovie/300000/3025_3047
+  ArminsFakeMovie/300000/3047_3095
+  ArminsFakeMovie/300000/3095_3116
+  ArminsFakeMovie/300000/3628_3650
+  ArminsFakeMovie/300000/3650_3700
+  ArminsFakeMovie/300000/3700_3722
+  ArminsFakeMovie/300000/4267_4289
+  ArminsFakeMovie/300000/4289_4335
+  ArminsFakeMovie/300000/4335_4356
+  ArminsFakeMovie/300000/4864_4888
+  ArminsFakeMovie/300000/4888_4939
+  ArminsFakeMovie/300000/4939_4960
+  ArminsFakeMovie/300000/5477_5498
+  ArminsFakeMovie/300000/5498_5546
+  ArminsFakeMovie/300000/5546_5571
+  ArminsFakeMovie/300000/6087_6116
+  ArminsFakeMovie/300000/6116_6173
+  ArminsFakeMovie/300000/6173_6199
+  ArminsFakeMovie/300000/6719_6740
+  ArminsFakeMovie/300000/6740_6790
+  ArminsFakeMovie/300000/6790_6812
+  ArminsFakeMovie/300000/7034_7035
 
   $ [ -f $MERGED_BAM_PBI ] && echo "Found" || echo "Not found"
   Not found

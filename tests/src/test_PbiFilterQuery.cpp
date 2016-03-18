@@ -50,7 +50,7 @@ using namespace std;
 
 TEST(PbiFilterQueryTest, QueryOk)
 {
-    const auto bamFile = BamFile{ tests::Data_Dir + string{ "/test_group_query/test2.bam" } };
+    const auto bamFile = BamFile{ tests::Data_Dir + string{ "/group/test2.bam" } };
 
     {
         int count = 0;
@@ -192,7 +192,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
     }
     { // no <Filters> element present at all
 
-        const DataSet ds(tests::Data_Dir + "/chunking/chunking_missingfilters.subreadset.xml");
+        const DataSet ds(tests::GeneratedData_Dir + "/chunking_missingfilters.subreadset.xml");
         const PbiFilter filter = PbiFilter::FromDataSet(ds);
         PbiFilterQuery query(filter, ds);
         int count = 0;
@@ -204,7 +204,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
     }
     { // <Filters> element contains no child <Filter> elements
 
-        const DataSet ds(tests::Data_Dir + "/chunking/chunking_emptyfilters.subreadset.xml");
+        const DataSet ds(tests::GeneratedData_Dir + "/chunking_emptyfilters.subreadset.xml");
         const PbiFilter filter = PbiFilter::FromDataSet(ds);
         PbiFilterQuery query(filter, ds);
         int count = 0;

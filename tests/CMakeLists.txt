@@ -1,8 +1,9 @@
 find_package(Threads REQUIRED)
 
-# ensure tests directory exists
+# ensure output directories exists
 file(MAKE_DIRECTORY ${PacBioBAM_TestsDir}/bin)
-file(MAKE_DIRECTORY ${PacBioBAM_TestsDir}/data/temp)
+set(GeneratedTestDataDir ${CMAKE_BINARY_DIR}/generated/data)
+file(MAKE_DIRECTORY ${GeneratedTestDataDir})
 
 # generate paths/values used by for unit tests
 configure_file(
@@ -10,8 +11,8 @@ configure_file(
     ${PacBioBAM_TestsDir}/src/TestData.h
 )
 configure_file(
-    ${PacBioBAM_TestsDir}/data/test_group_query/group.fofn.in
-    ${PacBioBAM_TestsDir}/data/test_group_query/group.fofn
+    ${PacBioBAM_TestsDir}/data/group/group.fofn.in
+    ${PacBioBAM_TestsDir}/data/group/group.fofn
 )
 
 # add PacBioBAM & GoogleTest includes
@@ -46,13 +47,23 @@ set_target_properties(test_pbbam PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PacBioBAM_TestsDir}/bin
 )
 
+# generate test data
+add_custom_target(
+    generate_test_data
+    WORKING_DIRECTORY ${PacBioBAM_TestsDir}/scripts
+    COMMAND "python" generate_data.py
+        ${PacBioBAM_TestsDir}/data/
+        ${GeneratedTestDataDir}
+        baz
+)
+
 # add unit tests to test framework
 add_test(
     NAME UnitTests
     WORKING_DIRECTORY ${PacBioBAM_TestsDir}/bin
     COMMAND test_pbbam
 )
-add_dependencies(test_pbbam pbbam)
+add_dependencies(test_pbbam pbbam generate_test_data)
 target_link_libraries(test_pbbam
     ${PacBioBAM_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT} # quirky pthreads 

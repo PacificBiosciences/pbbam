@@ -23,7 +23,10 @@ create_pbbam_tool(
 
 # cram tests
 if (PacBioBAM_build_tests)
-    add_test(
+    if(PacBioBAM_auto_validate)
+        # skip for now til we clean up merge tests under autovalidate, too
+    else()
+        add_test(
         NAME pbmerge_CramTests
         WORKING_DIRECTORY ${PacBioBAM_TestsDir}/scripts
         COMMAND "python" cram.py
@@ -33,4 +36,5 @@ if (PacBioBAM_build_tests)
             ${PacBioBAM_CramTestsDir}/pbmerge_dataset.t
             ${PacBioBAM_CramTestsDir}/pbmerge_fofn.t
     )
+    endif()
 endif()

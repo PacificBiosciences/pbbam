@@ -49,7 +49,7 @@ using namespace std;
 
 TEST(SubreadLengthQueryTest, QueryOk)
 {
-    const auto bamFile = BamFile{ tests::Data_Dir + string{ "/test_group_query/test2.bam" } };
+    const auto bamFile = BamFile{ tests::Data_Dir + string{ "/group/test2.bam" } };
 
     {
         int count = 0;

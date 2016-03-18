@@ -48,16 +48,13 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-const string inputBamFn = tests::Data_Dir + "/ex2.bam";
+const string inputBamFn = tests::Data_Dir + "/aligned.bam";
 
 TEST(EntireFileQueryTest, CountRecords)
 {
     EXPECT_NO_THROW(
     {
-        // open input BAM file
         BamFile bamFile(inputBamFn);
-
-        // count records
         int count = 0;
         EntireFileQuery entireFile(bamFile);
         for (const BamRecord& record : entireFile) {
@@ -65,7 +62,7 @@ TEST(EntireFileQueryTest, CountRecords)
             ++count;
         }
 
-        EXPECT_EQ(3307, count);
+        EXPECT_EQ(4, count);
     });
 }
 
@@ -73,10 +70,7 @@ TEST(EntireFileQueryTest, NonConstBamRecord)
 {
     EXPECT_NO_THROW(
     {
-        // open input BAM file
         BamFile bamFile(inputBamFn);
-
-        // count records
         int count = 0;
         EntireFileQuery entireFile(bamFile);
         for (BamRecord& record : entireFile) {
@@ -84,7 +78,7 @@ TEST(EntireFileQueryTest, NonConstBamRecord)
             ++count;
         }
 
-        EXPECT_EQ(3307, count);
+        EXPECT_EQ(4, count);
     });
 }
 
@@ -93,60 +87,51 @@ TEST(BamRecordTest, HandlesDeletionOK)
     // this file raised no error in Debug mode, but segfaulted when
     // trying to access the aligned qualities in Release mode
 
-    EXPECT_NO_THROW(
-    {
-        // open input BAM file
-        const string problemBamFn = tests::Data_Dir + "/segfault.bam";
-        BamFile bamFile(problemBamFn);
+    const string problemBamFn = tests::Data_Dir + "/segfault.bam";
+    BamFile bamFile(problemBamFn);
+    int count = 0;
+    EntireFileQuery entireFile(bamFile);
+    for (const BamRecord& record : entireFile) {
 
-        // count records
-        int count = 0;
-        EntireFileQuery entireFile(bamFile);
-        for (const BamRecord& record : entireFile) {
+        const auto rawQualities     = record.Qualities(Orientation::GENOMIC, false);
+        const auto alignedQualities = record.Qualities(Orientation::GENOMIC, true);
 
-            const auto rawQualities     = record.Qualities(Orientation::GENOMIC, false);
-            const auto alignedQualities = record.Qualities(Orientation::GENOMIC, true);
+        const string rawExpected =
+            "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII";
 
-            const string rawExpected =
-                "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII";
+        // 1=1D98=
+        const string alignedExpected =
+            "I!IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII";
 
-            // 1=1D98=
-            const string alignedExpected =
-                "I!IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII";
+        EXPECT_EQ(rawExpected,     rawQualities.Fastq());
+        EXPECT_EQ(alignedExpected, alignedQualities.Fastq());
 
-            EXPECT_EQ(rawExpected,     rawQualities.Fastq());
-            EXPECT_EQ(alignedExpected, alignedQualities.Fastq());
+        ++count;
+    }
 
-            ++count;
-        }
-
-        EXPECT_EQ(1, count);
-    });
+    EXPECT_EQ(1, count);
 }
 
 
 TEST(BamRecordTest, ReferenceName)
 {
-    // check reference name of first record
-//    {
-        const string exampleBam  = tests::Data_Dir + "/ex2.bam";
+    {   // check reference name of first record
+        const string exampleBam  = tests::Data_Dir + "/aligned.bam";
         BamFile bamFile(exampleBam);
         EntireFileQuery records(bamFile);
+        auto firstIter = records.begin();
+        auto& firstRecord = *firstIter;
+        ASSERT_TRUE(firstRecord.IsMapped());
+        EXPECT_EQ("lambda_NEB3011", firstRecord.ReferenceName());
+    }
 
-        auto it = records.begin();
-        auto record = *it;
-
-//        EXPECT_EQ("seq1", records.begin()->ReferenceName());
-//    }
-
-//    // unmapped records have no reference name, should throw
-//    {
-//        const string exampleBam  = tests::Data_Dir + "/unmap1.bam";
-//        BamFile bamFile(exampleBam);
-//        EntireFileQuery records(bamFile);
-
-//        EXPECT_THROW(records.begin()->ReferenceName(), std::exception);
-//    }
+    {   // unmapped records have no reference name, should throw
+        const string exampleBam  = tests::Data_Dir + "/unmap1.bam";
+        BamFile bamFile(exampleBam);
+        EntireFileQuery records(bamFile);
+        auto firstIter = records.begin();
+        auto& firstRecord = *firstIter;
+        ASSERT_FALSE(firstRecord.IsMapped());
+        EXPECT_THROW(firstRecord.ReferenceName(), std::runtime_error);
+    }
 }
-
-// add add'l special cases as needed

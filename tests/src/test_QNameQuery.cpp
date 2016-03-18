@@ -43,7 +43,7 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-static const string dataDir = tests::Data_Dir + "/test_group_query/";
+static const string dataDir = tests::Data_Dir + "/group/";
 static const string test1fn = string(dataDir) + "test1.bam";
 static const string test2fn = string(dataDir) + "test2.bam";
 static const string test3fn = string(dataDir) + "test3.bam";

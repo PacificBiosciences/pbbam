@@ -22,6 +22,7 @@ option(PacBioBAM_wrap_python   "Build PacBioBAM with SWIG bindings for Python." 
 option(PacBioBAM_wrap_r        "Build PacBioBAM with SWIG bindings for R."              OFF)
 option(PacBioBAM_use_modbuild  "Build PacBioBAM using Modular Build System."            OFF)
 option(PacBioBAM_use_ccache    "Build PacBioBAM using ccache, if available."            ON)
+option(PacBioBAM_auto_validate "Build PacBioBAM with auto-validation enabled."          OFF)
 
 # enable ccache, if available 
 if(PacBioBAM_use_ccache)
@@ -54,7 +55,6 @@ if(DEFINED PacBioBAM_build_pbindex)
     set(PacBioBAM_build_tools ${PacBioBAM_build_pbindex} CACHE BOOL
         "Build PacBioBAM with add'l utilities (e.g. pbindex, pbindexdump)." FORCE)
 endif()
-
 
 # enable testing if requested
 if(PacBioBAM_build_tests)
@@ -143,6 +143,10 @@ include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag("-Wno-unused-local-typedefs" HAS_NO_UNUSED_LOCAL_TYPEDEFS)
 if(HAS_NO_UNUSED_LOCAL_TYPEDEFS)
     set(PacBioBAM_CXX_FLAGS "${PacBioBAM_CXX_FLAGS} -Wno-unused-local-typedefs")
+endif()
+
+if(PacBioBAM_auto_validate)
+    add_definitions("-DPBBAM_AUTOVALIDATE=1")
 endif()
 
 # For now, keep @rpath out of install names on OS X, as it causes SWIG

@@ -51,127 +51,92 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
+namespace PacBio {
+namespace BAM {
+namespace tests {
+
+template<typename T>
+void CheckFile(const T& input, const size_t expectedCount)
+{
+    size_t observedCount = 0;
+    EntireFileQuery entireFile(input);
+    for (const BamRecord& r : entireFile) {
+        (void)r;
+        ++observedCount;
+    }
+    EXPECT_EQ(expectedCount, observedCount);
+}
+
+} // namespace tests
+} // namespace BAM
+} // namespace PacBio
+
 TEST(BamFileTest, NonExistentFileThrows)
 {
-    EXPECT_THROW(
-    {
-       BamFile file("does_not_exist.bam");
-       (void)file;
-    },
-    std::exception);
+    EXPECT_THROW(BamFile{ "does_not_exist.bam" }, std::runtime_error);
 }
 
 TEST(BamFileTest, NonBamFileThrows)
 {
-    EXPECT_THROW(
-    {
-        const std::string& fn = tests::Data_Dir + "/lambdaNEB.fa.fai";
-        BamFile file(fn);
-        (void)file;
-    },
-    std::exception);
+    EXPECT_THROW(BamFile { tests::Data_Dir + "/lambdaNEB.fa.fai" }, std::runtime_error);
 }
 
 TEST(BamFileTest, RelativePathBamOk)
 {
+    // cache current working directory, then drill down so we can point to
+    // BAMs using relative path
     const string cwd = internal::FileUtils::CurrentWorkingDirectory();
     ASSERT_EQ(0, chdir(tests::Data_Dir.c_str()));
     ASSERT_EQ(0, chdir("relative/a"));
 
-    { // direct BAM
-        BamFile file("../b/test1.bam");
-        EntireFileQuery entireFile(file);
-        int count = 0;
-        for (const BamRecord& r : entireFile) {
-            (void)r;
-            ++count;
-        }
-        EXPECT_EQ(10, count);
+    // BamFile from relative BAM fn
+    tests::CheckFile(BamFile{ "../b/test1.bam" }, 3);
+
+    // dataset from relative BAM fn
+    tests::CheckFile(DataSet{ "../b/test1.bam" }, 3);
+
+    // dataset from BamFile object (itself from relative BAM fn)
+    {
+        auto file = BamFile{"../b/test1.bam"};
+        tests::CheckFile(DataSet{ file }, 3);
     }
 
-    { // dataset from BAM filename
-        DataSet ds("../b/test1.bam");
-        EntireFileQuery entireFile(ds);
-        int count = 0;
-        for (const BamRecord& r : entireFile) {
-            (void)r;
-            ++count;
-        }
-        EXPECT_EQ(10, count);
-    }
-
-    { // dataset from BamFile object
-        BamFile file("../b/test1.bam");
-        DataSet ds(file);
-        EntireFileQuery entireFile(ds);
-        int count = 0;
-        for (const BamRecord& r : entireFile) {
-            (void)r;
-            ++count;
-        }
-        EXPECT_EQ(10, count);
-    }
-
+    // restore working directory
     ASSERT_EQ(0, chdir(cwd.c_str()));
 }
 
 TEST(BamFileTest, RelativePathXmlOk)
 {
+    // cache current working directory, then drill down so we can point to
+    // BAMs using relative path
     const string cwd = internal::FileUtils::CurrentWorkingDirectory();
-
     ASSERT_EQ(0, chdir(tests::Data_Dir.c_str()));
 
-    {
-        DataSet ds("relative/relative.xml");
-        EntireFileQuery entireFile(ds);
-        int count = 0;
-        for (const BamRecord& r : entireFile) {
-            (void)r;
-            ++count;
-        }
-        EXPECT_EQ(30, count);
-    }
+    // dataset from XML containing relative paths
+    tests::CheckFile(DataSet{ "relative/relative.xml" }, 9);
 
+    // restore working directory
     ASSERT_EQ(0, chdir(cwd.c_str()));
 }
 
 TEST(BamFileTest, RelativePathFofnOk)
 {
+    // cache current working directory, then drill down so we can point to
+    // BAMs using relative path
     const string cwd = internal::FileUtils::CurrentWorkingDirectory();
     ASSERT_EQ(0, chdir(tests::Data_Dir.c_str()));
 
-    { // FOFN containing BAMs in different subdirs
-
-        DataSet ds("relative/relative.fofn");
-        EntireFileQuery entireFile(ds);
-        int count = 0;
-        for (const BamRecord& r : entireFile) {
-            (void)r;
-            ++count;
-        }
-        EXPECT_EQ(30, count);
-    }
+    // dataset from FOFN containing relative paths
+    tests::CheckFile(DataSet{ "relative/relative.fofn" }, 9);
 
     // NOTE: doesn't yet support a FOFN containing an XML with relative paths
+//       tests::CheckFile(DataSet{ "relative/relative2.fofn" }, 60);
 
-//    { // FOFN containing subdir BAMs + relative.xml
-
-//        DataSet ds("relative/relative2.fofn");
-//        EntireFileQuery entireFile(ds);
-//        int count = 0;
-//        for (const BamRecord& r : entireFile) {
-//            (void)r;
-//            ++count;
-//        }
-//        EXPECT_EQ(60, count);
-//    }
-
+    // restore working directory
     ASSERT_EQ(0, chdir(cwd.c_str()));
 }
 
 TEST(BamFileTest, TruncatedFileThrowsOk)
 {
-    const string fn = tests::Data_Dir + "/truncated.bam";
-    EXPECT_THROW(BamFile file(fn), std::runtime_error);
+    EXPECT_THROW(BamFile{ tests::GeneratedData_Dir + "/truncated.bam" }, std::runtime_error);
 }
-

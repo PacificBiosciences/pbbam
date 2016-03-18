@@ -37,6 +37,7 @@
 
 #include "pbbam/BamWriter.h"
 #include "pbbam/BamFile.h"
+#include "pbbam/Validator.h"
 #include "AssertUtils.h"
 #include "FileProducer.h"
 #include "MemoryUtils.h"
@@ -63,8 +64,9 @@ public:
                      const BamWriter::BinCalculationMode binCalculationMode);
 
 public:
-    void Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord);
-    void Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord, int64_t* vOffset);
+    void Write(const BamRecord& record);
+    void Write(const BamRecord& record, int64_t* vOffset);
+    void Write(const BamRecordImpl& recordImpl);
 
 public:
     bool calculateBins_;
@@ -112,8 +114,14 @@ BamWriterPrivate::BamWriterPrivate(const string& filename,
         throw std::runtime_error("could not write header");
 }
 
-void BamWriterPrivate::Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord)
+void BamWriterPrivate::Write(const BamRecord& record)
 {
+#if PBBAM_AUTOVALIDATE
+    Validator::Validate(record);
+#endif
+
+    const auto rawRecord = internal::BamRecordMemory::GetRawData(record);
+
     // (probably) store bins
     // min_shift=14 & n_lvls=5 are BAM "magic numbers"
     if (calculateBins_)
@@ -125,7 +133,7 @@ void BamWriterPrivate::Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord)
         throw std::runtime_error("could not write record");
 }
 
-void BamWriterPrivate::Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord, int64_t* vOffset)
+void BamWriterPrivate::Write(const BamRecord& record, int64_t* vOffset)
 {
     BGZF* bgzf = file_.get()->fp.bgzf;
     assert(bgzf);
@@ -140,8 +148,11 @@ void BamWriterPrivate::Write(const PBBAM_SHARED_PTR<bam1_t>& rawRecord, int64_t*
     *vOffset = (rawTell << 16) | length ;
 
     // now write data
-    Write(rawRecord);
+    Write(record);
 }
+
+inline void BamWriterPrivate::Write(const BamRecordImpl& recordImpl)
+{ Write(BamRecord(recordImpl)); }
 
 } // namespace internal
 } // namespace BAM
@@ -152,14 +163,18 @@ BamWriter::BamWriter(const std::string& filename,
                      const BamWriter::CompressionLevel compressionLevel,
                      const size_t numThreads,
                      const BinCalculationMode binCalculationMode)
-    : d_{ new internal::BamWriterPrivate{ filename,
-                                          internal::BamHeaderMemory::MakeRawHeader(header),
-                                          compressionLevel,
-                                          numThreads,
-                                          binCalculationMode
-                                        }
-        }
-{ }
+    : d_(nullptr)
+{
+#if PBBAM_AUTOVALIDATE
+    Validator::Validate(header);
+#endif
+    d_.reset(new internal::BamWriterPrivate{ filename,
+                                             internal::BamHeaderMemory::MakeRawHeader(header),
+                                             compressionLevel,
+                                             numThreads,
+                                             binCalculationMode
+                                           });
+}
 
 BamWriter::~BamWriter(void)
 {
@@ -175,10 +190,10 @@ void BamWriter::TryFlush(void)
 }
 
 void BamWriter::Write(const BamRecord& record)
-{ d_->Write(internal::BamRecordMemory::GetRawData(record)); }
+{ d_->Write(record); }
 
 void BamWriter::Write(const BamRecord& record, int64_t* vOffset)
-{  d_->Write(internal::BamRecordMemory::GetRawData(record), vOffset); }
+{ d_->Write(record, vOffset); }
 
 void BamWriter::Write(const BamRecordImpl& recordImpl)
-{ d_->Write(internal::BamRecordMemory::GetRawData(recordImpl)); }
+{ d_->Write(recordImpl); }

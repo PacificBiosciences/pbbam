@@ -67,13 +67,9 @@ public:
         hts_verbose = ( PacBio::BAM::HtslibVerbosity == -1 ? 0 : PacBio::BAM::HtslibVerbosity);
 
         // attempt open
-        std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
-        if (!f || !f->fp.bgzf)
-            throw std::runtime_error(string("could not open BAM file: ") + filename_);
-        if (f->format.format != bam)
-            throw std::runtime_error("expected BAM, unknown format");
+        auto f = RawOpen();
 
-#ifndef PBBAM_NO_CHECK_EOF
+#if !defined (PBBAM_NO_CHECK_EOF) || PBBAM_AUTOVALIDATE
         // sanity check on file
         const int eofCheck = bgzf_check_EOF(f->fp.bgzf);
         if (eofCheck <= 0 ) {
@@ -101,6 +97,34 @@ public:
     unique_ptr<BamFilePrivate> DeepCopy(void)
     {
         return unique_ptr<BamFilePrivate>(new BamFilePrivate(filename_));
+    }
+
+    bool HasEOF(void) const
+    {
+        // streamed input is unknown, since it's not random-accessible
+        if (filename_ == "-")
+            return false;
+
+        // attempt open
+        auto f = RawOpen();
+        return RawEOFCheck(f) == 1;
+    }
+
+    int RawEOFCheck(const std::unique_ptr<samFile, internal::HtslibFileDeleter>& f) const
+    {
+        assert(f);
+        assert(f->fp.bgzf);
+        return bgzf_check_EOF(f->fp.bgzf);
+    }
+
+    std::unique_ptr<samFile, internal::HtslibFileDeleter> RawOpen(void) const
+    {
+        std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
+        if (!f || !f->fp.bgzf)
+            throw std::runtime_error(string("could not open BAM file: ") + filename_);
+        if (f->format.format != bam)
+            throw std::runtime_error("expected BAM, unknown format");
+        return f;
     }
 
 public:
@@ -168,6 +192,9 @@ std::string BamFile::Filename(void) const
 
 int64_t BamFile::FirstAlignmentOffset(void) const
 { return d_->firstAlignmentOffset_; }
+
+bool BamFile::HasEOF(void) const
+{ return d_->HasEOF(); }
 
 bool BamFile::HasReference(const std::string& name) const
 { return d_->header_.HasSequence(name); }

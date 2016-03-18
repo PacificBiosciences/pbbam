@@ -41,185 +41,87 @@
 
 #include "TestData.h"
 #include <gtest/gtest.h>
-#include <htslib/sam.h>
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamWriter.h>
 #include <pbbam/EntireFileQuery.h>
-
-#include <pbbam/../../src/FileUtils.h>
-
-#include <chrono>
-#include <iostream>
-#include <string>
-#include <cstdio>
-#include <cstdlib>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-// put any BamWriter-only API tests here (error handling, etc.)
-//
-// plain ol' read & dump is in test_EndToEnd.cpp
-
-const string generatedBamFn = tests::Data_Dir + "/generated.bam";
-
-struct ResultPacket
-{
-    std::string name;
-    char*       bases;
-    char*       overallQv;
-    size_t      length;
-    int         zmwNum;
-    int         startPos;
-    BamRecord   bamRecord;
-
-    ResultPacket() = default;
-
-    ResultPacket(ResultPacket&& src)
-    {
-        name            = std::move(src.name);
-
-        bases           = src.bases;
-        overallQv       = src.overallQv;
-        length          = src.length;
-
-        zmwNum          = src.zmwNum;
-        startPos        = src.startPos;
-
-        src.bases     = 0;
-        src.overallQv = 0;
-
-        bamRecord = std::move(src.bamRecord);
-    }
-    // Copy constructor
-    ResultPacket(const ResultPacket&) = delete;
-    // Move assignment constructor
-    ResultPacket& operator=(ResultPacket&&) = delete;
-    // Copy assignment constructor
-    ResultPacket& operator=(const ResultPacket&) = delete;
-    // Destructor
-    ~ResultPacket()
-    {
-        // delete [] basesBam;
-        if (bases != 0) delete [] bases;
-        if (overallQv != 0) delete [] overallQv;
-    }
-};
-
 TEST(BamWriterTest, SingleWrite_UserRecord)
 {
-    //Writing a ResultPacket in Workflow.h:
-    ResultPacket result;
-    result.zmwNum = 42;
-    result.name = "ZMW\\"+std::to_string(42);
-    auto length = 5;
+    const string fullName = "test/100/0_5";
+    const string rgId     = "6002b307";
+    const vector<float> expectedSnr = {0.2,0.2,0.2,0.2};
 
-    result.bases     = (char*) calloc(length,1);
-    result.overallQv = (char*) calloc(length,1);
-    // FILL WITH CONTENT
-    result.bases[0] = 'A';
-    result.bases[1] = 'C';
-    result.bases[2] = 'G';
-    result.bases[3] = 'T';
-    result.bases[4] = 'C';
-    result.overallQv[0] = ']';
-    result.overallQv[1] = '6';
-    result.overallQv[2] = '4';
-    result.overallQv[3] = '@';
-    result.overallQv[4] = '<';
+    // setup header
+    const string hdrText = {
+        "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
+        "@RG\tID:6002b307\tPL:PACBIO\tDS:READTYPE=SUBREAD;BINDINGKIT=100-619-300;"
+             "SEQUENCINGKIT=100-619-400;BASECALLERVERSION=3.0;FRAMERATEHZ=100\t"
+             "PU:test\tPM:SEQUEL\n"
+    };
+    BamHeader inputHeader(hdrText);
 
-    // Encode data to BamAlignment
-    result.bamRecord.impl_.Name(result.name);
-    result.bamRecord.impl_.SetSequenceAndQualities(result.bases, length);
-    result.bamRecord.impl_.CigarData("");
-    result.bamRecord.impl_.Bin(0);
-    result.bamRecord.impl_.Flag(0);
-    result.bamRecord.impl_.InsertSize(0);
-    result.bamRecord.impl_.MapQuality(0);
-    result.bamRecord.impl_.MatePosition(-1);
-    result.bamRecord.impl_.MateReferenceId(-1);
-    result.bamRecord.impl_.Position(-1);
-    result.bamRecord.impl_.ReferenceId(-1);
-
-    std::vector<uint8_t> subQv = std::vector<uint8_t>({34, 5, 125});
+    // setup record
+    BamRecord bamRecord(inputHeader);
+    bamRecord.impl_.Name(fullName);
+    bamRecord.impl_.SetSequenceAndQualities("ACGTC", 5);
+    bamRecord.impl_.CigarData("");
+    bamRecord.impl_.Bin(0);
+    bamRecord.impl_.Flag(0);
+    bamRecord.impl_.InsertSize(0);
+    bamRecord.impl_.MapQuality(0);
+    bamRecord.impl_.MatePosition(-1);
+    bamRecord.impl_.MateReferenceId(-1);
+    bamRecord.impl_.Position(-1);
+    bamRecord.impl_.ReferenceId(-1);
+    bamRecord.impl_.SetMapped(false);
 
     TagCollection tags;
-    tags["SQ"] = subQv;
+    tags["zm"] = static_cast<int32_t>(100);
+    tags["qs"] = static_cast<Position>(0);
+    tags["qe"] = static_cast<Position>(5);
+    tags["np"] = static_cast<int32_t>(1);
+    tags["rq"] = static_cast<float>(0.6);
+    tags["RG"] = rgId;
+    tags["sn"] = expectedSnr;
+    bamRecord.impl_.Tags(tags);
 
-    Tag asciiTag('J');
-    asciiTag.Modifier(TagModifier::ASCII_CHAR);
+    // write record to file
+    const string generatedBamFn = "/tmp/bamwriter_generated.bam";
+    {
+        BamWriter writer(generatedBamFn, inputHeader);
+        writer.Write(bamRecord);
+    }
 
-    // add ASCII tag via TagCollection
-    tags["a1"] = asciiTag;
-    result.bamRecord.impl_.Tags(tags);
+    // check written header
+    BamFile file(generatedBamFn);
+    const auto header = file.Header();
+    EXPECT_EQ(std::string("1.1"),     header.Version());
+    EXPECT_EQ(std::string("unknown"), header.SortOrder());
+    EXPECT_EQ(std::string("3.0.1"),   header.PacBioBamVersion());
 
-    // add ASCII tag via BamRecordImpl
-    Tag asciiTag2('K');
-    asciiTag2.Modifier(TagModifier::ASCII_CHAR);
-    result.bamRecord.impl_.AddTag("a2", asciiTag2);
+    // check written record
+    EntireFileQuery entireFile(file);
+    auto firstIter = entireFile.begin();
+    auto record = *firstIter;
+    EXPECT_EQ(std::string("ACGTC"),        record.Sequence());
+    EXPECT_EQ(std::string("test/100/0_5"), record.FullName());
+    EXPECT_TRUE(record.HasHoleNumber());
+    EXPECT_TRUE(record.HasNumPasses());
+    EXPECT_TRUE(record.HasQueryEnd());
+    EXPECT_TRUE(record.HasQueryStart());
+    EXPECT_TRUE(record.HasReadAccuracy());
+    EXPECT_TRUE(record.HasSignalToNoise());
+    EXPECT_EQ(100, record.HoleNumber());
+    EXPECT_EQ(1,   record.NumPasses());
+    EXPECT_EQ(0,   record.QueryStart());
+    EXPECT_EQ(5,   record.QueryEnd());
+    EXPECT_EQ(expectedSnr, record.SignalToNoise());
+    EXPECT_EQ(rgId, record.ReadGroupId());
 
-    BamHeader headerSubreads;
-    headerSubreads.Version("1.1")
-                  .SortOrder("coordinate");
-
-    EXPECT_NO_THROW ({
-        BamWriter writer(generatedBamFn, headerSubreads);
-        writer.Write(result.bamRecord);
-    });
-
-    EXPECT_NO_THROW ({
-        BamFile file(generatedBamFn);
-        EXPECT_EQ(std::string("1.1"),        file.Header().Version());
-        EXPECT_EQ(std::string("coordinate"), file.Header().SortOrder());
-
-        EntireFileQuery entireFile(file);
-        for (const BamRecord& record : entireFile) {
-            const BamRecordImpl& impl = record.Impl();
-
-            EXPECT_EQ(std::string("ACGTC"),   impl.Sequence());
-            EXPECT_EQ(std::string("ZMW\\42"), impl.Name());
-
-            const TagCollection& implTags = impl.Tags();
-            EXPECT_TRUE(implTags.Contains("SQ"));
-            EXPECT_TRUE(implTags.Contains("a1"));
-            EXPECT_TRUE(implTags.Contains("a2"));
-
-            const Tag sqTag = impl.TagValue("SQ");
-            const Tag a1Tag = impl.TagValue("a1");
-            const Tag a2Tag = impl.TagValue("a2");
-            EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), sqTag.ToUInt8Array());
-            EXPECT_EQ('J', a1Tag.ToAscii());
-            EXPECT_EQ('K', a2Tag.ToAscii());
-
-            // just check first record
-            break;
-        }
-    });
-
+    // clean up
     remove(generatedBamFn.c_str());
 }
-
-//static
-//void CreateBamFile(const string& filename)
-//{
-//    if (internal::FileUtils::Exists(filename))
-//        return;
-
-//    BamHeader header;
-//    BamWriter writer(filename, header);
-
-//    BamRecord r;
-//    for (int i = 0; i < 10; ++i) {
-//        writer.Write(r);
-//    }
-//}
-
-
-//TEST(BamWriterTest, CreateBAMs)
-//{
-//    const string relativeDir = tests::Data_Dir + "/relative";
-//    CreateBamFile(relativeDir + "/a/test.bam");
-//    CreateBamFile(relativeDir + "/b/test1.bam");
-//    CreateBamFile(relativeDir + "/b/test2.bam");
-//}

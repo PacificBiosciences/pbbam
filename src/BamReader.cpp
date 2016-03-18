@@ -40,6 +40,7 @@
 // Author: Derek Barnett
 
 #include "pbbam/BamReader.h"
+#include "pbbam/Validator.h"
 #include "MemoryUtils.h"
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
@@ -146,6 +147,10 @@ bool BamReader::GetNext(BamRecord& record)
     if (result >= 0) {
         internal::BamRecordMemory::UpdateRecordTags(record);
         record.header_ = Header();
+
+#if PBBAM_AUTOVALIDATE
+        Validator::Validate(record);
+#endif
         return true;
     }
 
