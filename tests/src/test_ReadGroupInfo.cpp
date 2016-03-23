@@ -79,14 +79,14 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
         }
     }
 
-    { // S/P1-C1
+    { // S/P1-C1/beta
         const vector<string> sequencingKits { "100-619-400", "100-711-600" };
         ReadGroupInfo rg("SP1C1");
         rg.BindingKit("100-619-300");
         rg.BasecallerVersion("3.0");
         for (const string& sk : sequencingKits) {
             rg.SequencingKit(sk);
-            EXPECT_EQ("S/P1-C1", rg.SequencingChemistry());
+            EXPECT_EQ("S/P1-C1/beta", rg.SequencingChemistry());
         }
     }
 
