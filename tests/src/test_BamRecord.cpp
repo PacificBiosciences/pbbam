@@ -42,7 +42,10 @@
 #include <gtest/gtest.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamTagCodec.h>
+#include <array>
+#include <initializer_list>
 #include <string>
+#include <vector>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -52,6 +55,12 @@ namespace tests {
 static
 BamRecordImpl CreateBamImpl(void)
 {
+    TagCollection tags;
+    tags["HX"] = string("1abc75");
+    tags["HX"].Modifier(TagModifier::HEX_STRING);
+    tags["CA"] = vector<uint8_t>({34, 5, 125});
+    tags["XY"] = static_cast<int32_t>(-42);
+
     BamRecordImpl bam;
     bam.Bin(42);
     bam.Flag(42);
@@ -61,30 +70,18 @@ BamRecordImpl CreateBamImpl(void)
     bam.MateReferenceId(42);
     bam.Position(42);
     bam.ReferenceId(42);
-
-    TagCollection tags;
-    tags["HX"] = string("1abc75");
-    tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = vector<uint8_t>({34, 5, 125});
-    tags["XY"] = static_cast<int32_t>(-42);
     bam.Tags(tags);
-
     return bam;
 }
 
-static
+static inline
 BamRecord CreateBam(void)
-{
-    BamRecord bam;
-    bam.impl_ = CreateBamImpl();
-    return bam;
-}
+{ return BamRecord{ CreateBamImpl() }; }
 
 static
 void CheckRawData(const BamRecordImpl& bam)
 {
     // ensure raw data (lengths at least) matches API-facing data
-
     const uint32_t expectedNameLength  = bam.Name().size() + 1;
     const uint32_t expectedNumCigarOps = bam.CigarData().size();
     const int32_t  expectedSeqLength   = bam.Sequence().length();
@@ -92,13 +89,11 @@ void CheckRawData(const BamRecordImpl& bam)
 
     //  Name        CIGAR         Sequence       Quals      Tags
     // l_qname + (n_cigar * 4) + (l_qseq+1)/2 + l_qseq + << TAGS >>
-
     const int expectedTotalDataLength = expectedNameLength +
                                         (expectedNumCigarOps * 4) +
                                         (expectedSeqLength+1)/2 +
                                          expectedSeqLength +
                                          expectedTagsLength;
-
     EXPECT_TRUE((bool)bam.d_);
     EXPECT_EQ(expectedNameLength,      bam.d_->core.l_qname);
     EXPECT_EQ(expectedNumCigarOps,     bam.d_->core.n_cigar);
@@ -106,81 +101,292 @@ void CheckRawData(const BamRecordImpl& bam)
     EXPECT_EQ(expectedTotalDataLength, bam.d_->l_data);
 }
 
-static
+static inline
 void CheckRawData(const BamRecord& bam)
 { CheckRawData(bam.impl_); }
 
 static
 BamRecordImpl MakeCigaredImpl(const string& seq,
                               const string& cigar,
-                              const bool isReverseStrand)
+                              const Strand strand)
 {
     BamRecordImpl impl;
     impl.SetMapped(true).ReferenceId(0).Position(0).MapQuality(0);
     impl.CigarData(Cigar::FromStdString(cigar));
     impl.MateReferenceId(-1).MatePosition(-1).InsertSize(0);
     impl.SetSequenceAndQualities(seq, string(seq.size(), '*'));
-    impl.SetReverseStrand(isReverseStrand);
+    impl.SetReverseStrand(strand == Strand::REVERSE);
     return impl;
 }
 
-static
+static inline
 BamRecord MakeCigaredRecord(const string& seq,
                             const string& cigar,
-                            const bool isReverseStrand)
-{
-    const BamRecordImpl impl = MakeCigaredImpl(seq, cigar, isReverseStrand);
-    return BamRecord(std::move(impl));
-}
+                            const Strand strand)
+{ return BamRecord{ MakeCigaredImpl(seq, cigar, strand) }; }
 
 static
 BamRecord MakeCigaredBaseRecord(const string& bases,
                                 const string& cigar,
-                                const bool isReverseStrand)
+                                const Strand strand)
 {
-    const string seq = string(bases.size(), 'N');
-    BamRecordImpl impl = MakeCigaredImpl(seq, cigar, isReverseStrand);
-
     TagCollection tags;
     tags["dt"] = bases;
     tags["st"] = bases;
-    impl.Tags(tags);
 
+    const string seq = string(bases.size(), 'N');
+    BamRecordImpl impl = MakeCigaredImpl(seq, cigar, strand);
+    impl.Tags(tags);
     return BamRecord(std::move(impl));
 }
 
 static
 BamRecord MakeCigaredFrameRecord(const vector<uint16_t>& frames,
                                  const string& cigar,
-                                 const bool isReverseStrand)
+                                 const Strand strand)
 {
-    const string seq = string(frames.size(), 'N');
-    BamRecordImpl impl = MakeCigaredImpl(seq, cigar, isReverseStrand);
-
     TagCollection tags;
     tags["ip"] = frames;
     tags["pw"] = frames;
-    impl.Tags(tags);
 
+    const string seq = string(frames.size(), 'N');
+    BamRecordImpl impl = MakeCigaredImpl(seq, cigar, strand);
+    impl.Tags(tags);
     return BamRecord(std::move(impl));
 }
 
 static
 BamRecord MakeCigaredQualRecord(const string& quals,
                                 const string& cigar,
-                                const bool isReverseStrand)
+                                const Strand strand)
 {
-    const string seq = string(quals.size(), 'N');
-    BamRecordImpl impl = MakeCigaredImpl(seq, cigar, isReverseStrand);
-
     TagCollection tags;
     tags["dq"] = quals;
     tags["iq"] = quals;
     tags["mq"] = quals;
     tags["sq"] = quals;
-    impl.Tags(tags);
 
+    const string seq = string(quals.size(), 'N');
+    BamRecordImpl impl = MakeCigaredImpl(seq, cigar, strand);
+    impl.Tags(tags);
     return BamRecord(std::move(impl));
+}
+
+// ----------------------------------------------------------
+// helper structs and methods for checking combinations of:
+//   aligned strand, orientation requested, alignment, clipping
+// ----------------------------------------------------------
+
+// generic result holder for various requested states
+template<typename T>
+struct ExpectedResult
+{
+public:
+    ExpectedResult(std::initializer_list<T> init)
+        : d_(init)
+    {
+        assert(12 == init.size());
+    }
+
+    T ForwardGenomic(void) const               { return d_.at(0); }
+    T ForwardNative(void) const                { return d_.at(1); }
+    T ForwardGenomicAligned(void) const        { return d_.at(2); }
+    T ForwardNativeAligned(void) const         { return d_.at(3); }
+    T ForwardGenomicAlignedClipped(void) const { return d_.at(4); }
+    T ForwardNativeAlignedClipped(void) const  { return d_.at(5); }
+    T ReverseGenomic(void) const               { return d_.at(6); }
+    T ReverseNative(void) const                { return d_.at(7); }
+    T ReverseGenomicAligned(void) const        { return d_.at(8); }
+    T ReverseNativeAligned(void) const         { return d_.at(9); }
+    T ReverseGenomicAlignedClipped(void) const { return d_.at(10); }
+    T ReverseNativeAlignedClipped(void) const  { return d_.at(11); }
+
+private:
+    vector<T> d_;
+};
+
+// generic data type checker on the various requested states
+template<typename DataType, typename MakeRecordType, typename FetchDataType>
+void CheckAlignAndClip(const string& cigar,
+                       const DataType& input,
+                       const tests::ExpectedResult<DataType>& e,
+                       const MakeRecordType& makeRecord,
+                       const FetchDataType& fetchData)
+{
+    {   // map to forward strand
+        const BamRecord b = makeRecord(input, cigar, Strand::FORWARD);
+        EXPECT_EQ(e.ForwardGenomic(),               fetchData(b, Orientation::GENOMIC, false, false));
+        EXPECT_EQ(e.ForwardNative(),                fetchData(b, Orientation::NATIVE,  false, false));
+        EXPECT_EQ(e.ForwardGenomicAligned(),        fetchData(b, Orientation::GENOMIC, true,  false));
+        EXPECT_EQ(e.ForwardNativeAligned(),         fetchData(b, Orientation::NATIVE,  true,  false));
+        EXPECT_EQ(e.ForwardGenomicAlignedClipped(), fetchData(b, Orientation::GENOMIC, true,  true));
+        EXPECT_EQ(e.ForwardNativeAlignedClipped(),  fetchData(b, Orientation::NATIVE,  true,  true));
+    }
+    {   // map to reverse strand
+        const BamRecord b = makeRecord(input, cigar, Strand::REVERSE);
+        EXPECT_EQ(e.ReverseGenomic(),               fetchData(b, Orientation::GENOMIC, false, false));
+        EXPECT_EQ(e.ReverseNative(),                fetchData(b, Orientation::NATIVE,  false, false));
+        EXPECT_EQ(e.ReverseGenomicAligned(),        fetchData(b, Orientation::GENOMIC, true,  false));
+        EXPECT_EQ(e.ReverseNativeAligned(),         fetchData(b, Orientation::NATIVE,  true,  false));
+        EXPECT_EQ(e.ReverseGenomicAlignedClipped(), fetchData(b, Orientation::GENOMIC, true,  true));
+        EXPECT_EQ(e.ReverseNativeAlignedClipped(),  fetchData(b, Orientation::NATIVE,  true,  true));
+    }
+}
+
+static
+void CheckBaseTagsClippedAndAligned(const string& cigar,
+                                    const string& input,
+                                    const ExpectedResult<string>& e)
+{
+    // aligned record + DeletionTag, SubstitutionTag
+    auto makeRecord = [](const string& bases,
+                         const string& cigar,
+                         const Strand strand)
+    { return MakeCigaredBaseRecord(bases, cigar, strand); };
+
+    // DeletionTag
+    CheckAlignAndClip(cigar, input, e, makeRecord,
+                      [](const BamRecord& b,
+                         Orientation orientation,
+                         bool aligned,
+                         bool exciseSoftClips)
+                      { return b.DeletionTag(orientation, aligned, exciseSoftClips); }
+    );
+
+    // SubstitutionTag
+    CheckAlignAndClip(cigar, input, e, makeRecord,
+                      [](const BamRecord& b,
+                         Orientation orientation,
+                         bool aligned,
+                         bool exciseSoftClips)
+                      { return b.SubstitutionTag(orientation, aligned, exciseSoftClips); }
+    );
+}
+
+static
+void CheckFrameTagsClippedAndAligned(const string& cigar,
+                                     const vector<uint16_t>& input,
+                                     const ExpectedResult<vector<uint16_t> >& e)
+{
+
+    // aligned record + IPD, PulseWidth
+    auto makeRecord = [](const vector<uint16_t>& frames,
+                         const string& cigar,
+                         const Strand strand)
+    { return tests::MakeCigaredFrameRecord(frames, cigar, strand); };
+
+    // IPD
+    CheckAlignAndClip(cigar, input, e, makeRecord,
+                      [](const BamRecord& b,
+                         Orientation orientation,
+                         bool aligned,
+                         bool exciseSoftClips)
+                      { return b.IPD(orientation, aligned, exciseSoftClips).Data(); }
+    );
+
+    // PulseWidth
+    CheckAlignAndClip(cigar, input, e, makeRecord,
+                      [](const BamRecord& b,
+                         Orientation orientation,
+                         bool aligned,
+                         bool exciseSoftClips)
+                      { return b.PulseWidth(orientation, aligned, exciseSoftClips).Data(); }
+    );
+}
+
+static
+void CheckQualityTagsClippedAndAligned(const string& cigar,
+                                       const string& input,
+                                       const ExpectedResult<string>& e)
+{
+    // aligned record + DeletionQV, InsertionQV, MergeQV, SubstitutionQV
+    auto makeRecord = [](const string& quals,
+                         const string& cigar,
+                         const Strand strand)
+    { return tests::MakeCigaredQualRecord(quals, cigar, strand); };
+
+    // DeletionQV
+    CheckAlignAndClip(cigar, input, e, makeRecord,
+                      [](const BamRecord& b,
+                         Orientation orientation,
+                         bool aligned,
+                         bool exciseSoftClips)
+                      { return b.DeletionQV(orientation, aligned, exciseSoftClips).Fastq(); }
+    );
+
+    // InsertionQV
+    CheckAlignAndClip(cigar, input, e, makeRecord,
+                      [](const BamRecord& b,
+                         Orientation orientation,
+                         bool aligned,
+                         bool exciseSoftClips)
+                      { return b.InsertionQV(orientation, aligned, exciseSoftClips).Fastq(); }
+    );
+
+    // MergeQV
+    CheckAlignAndClip(cigar, input, e, makeRecord,
+                      [](const BamRecord& b,
+                         Orientation orientation,
+                         bool aligned,
+                         bool exciseSoftClips)
+                      { return b.MergeQV(orientation, aligned, exciseSoftClips).Fastq(); }
+    );
+
+    // SubstitutionQV
+    CheckAlignAndClip(cigar, input, e, makeRecord,
+                      [](const BamRecord& b,
+                         Orientation orientation,
+                         bool aligned,
+                         bool exciseSoftClips)
+                      { return b.SubstitutionQV(orientation, aligned, exciseSoftClips).Fastq(); }
+    );
+}
+
+static
+void CheckQualitiesClippedAndAligned(const string& cigar,
+                                     const string& input,
+                                     const ExpectedResult<string>& e)
+{
+    // aligned record w/ dummy SEQ & QUALs under test
+    auto makeRecord = [](const string& quals,
+                         const string& cigar,
+                         const Strand strand)
+    {
+        const string seq = string(quals.size(), 'N');
+        auto record = tests::MakeCigaredRecord(seq, cigar, strand);
+        record.Impl().SetSequenceAndQualities(seq, quals);
+        return record;
+    };
+
+    // QUAL
+    CheckAlignAndClip(cigar, input, e, makeRecord,
+                      [](const BamRecord& b,
+                         Orientation orientation,
+                         bool aligned,
+                         bool exciseSoftClips)
+                      { return b.Qualities(orientation, aligned, exciseSoftClips).Fastq(); }
+    );
+}
+
+static
+void CheckSequenceClippedAndAligned(const string& cigar,
+                                    const string& input,
+                                    const ExpectedResult<string>& e)
+{
+    // aligned record w/ SEQ
+    auto makeRecord = [](const string& seq,
+                         const string& cigar,
+                         const Strand strand)
+    { return tests::MakeCigaredRecord(seq, cigar, strand); };
+
+    // SEQ
+    CheckAlignAndClip(cigar, input, e, makeRecord,
+                      [](const BamRecord& b,
+                         Orientation orientation,
+                         bool aligned,
+                         bool exciseSoftClips)
+                      { return b.Sequence(orientation, aligned, exciseSoftClips); }
+    );
 }
 
 } // namespace tests
@@ -467,1531 +673,796 @@ TEST(BamRecordTest, CoreSetters)
 
 TEST(BamRecordTest, SequenceOrientation)
 {
-    const string sequence = "ATATATCCCGGCG";
-    const string revSeq   = "CGCCGGGATATAT";
-
-    // ----------------
-    // forward strand
-    // ----------------
-
-    BamRecordImpl forwardImpl;
-    forwardImpl.SetSequenceAndQualities(sequence);
-    forwardImpl.SetReverseStrand(false);
-
-    BamRecord forwardRead(forwardImpl);
-
-    //  - "native" == "genomic"
-    EXPECT_EQ(forwardRead.Sequence(Orientation::NATIVE),
-              forwardRead.Sequence(Orientation::GENOMIC));
-    //  - genomic output == genomic input
-    EXPECT_EQ(sequence, forwardRead.Sequence(Orientation::GENOMIC));
-    //  - native output == genomic input
-    EXPECT_EQ(sequence, forwardRead.Sequence(Orientation::NATIVE));
-
-    // ----------------
-    // reverse strand
-    // ----------------
-
-    BamRecordImpl reverseImpl;
-    reverseImpl.SetSequenceAndQualities(sequence);
-    reverseImpl.SetReverseStrand(true);
-
-    BamRecord reverseRead(reverseImpl);
-
-    //  - "native" != "genomic"
-    EXPECT_NE(reverseRead.Sequence(Orientation::NATIVE),
-              reverseRead.Sequence(Orientation::GENOMIC));
-    //  - genomic output == genomic input
-    EXPECT_EQ(sequence, reverseRead.Sequence(Orientation::GENOMIC));
-    //  - genomic (raw) input != native output
-    EXPECT_NE(sequence, reverseRead.Sequence(Orientation::NATIVE));
-    //  - native output should be reverse complement
-    EXPECT_EQ(revSeq, reverseRead.Sequence(Orientation::NATIVE));
+    {
+        SCOPED_TRACE("Simple CIGAR Sequence");
+        tests::CheckSequenceClippedAndAligned(
+            "13=",                  // CIGAR
+            "ATATATCCCGGCG",        // input
+            {
+                "ATATATCCCGGCG",    // forward strand, genomic
+                "ATATATCCCGGCG",    // forward strand, native
+                "ATATATCCCGGCG",    // forward strand, genomic, aligned
+                "ATATATCCCGGCG",    // forward strand, native,  aligned
+                "ATATATCCCGGCG",    // forward strand, genomic, aligned + clipped
+                "ATATATCCCGGCG",    // forward strand, native,  aligned + clipped
+                "ATATATCCCGGCG",    // reverse strand, genomic
+                "CGCCGGGATATAT",    // reverse strand, native
+                "ATATATCCCGGCG",    // reverse strand, genomic, aligned
+                "CGCCGGGATATAT",    // reverse strand, native,  aligned
+                "ATATATCCCGGCG",    // reverse strand, genomic, aligned + clipped
+                "CGCCGGGATATAT"     // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
 }
 
 TEST(BamRecordTest, QualitiesOrientation)
 {
-    const string sequence = "ATATATCCCGGCG";
-    const string qualities = "?]?]?]?]?]?]*";
-    const string revQuals  = "*]?]?]?]?]?]?";
-
-    // ----------------
-    // forward strand
-    // ----------------
-
-    BamRecordImpl forwardImpl;
-    forwardImpl.SetSequenceAndQualities(sequence, qualities);
-    forwardImpl.SetReverseStrand(false);
-
-    BamRecord forwardRead(forwardImpl);
-
-    //  - "native" == "genomic"
-    EXPECT_EQ(forwardRead.Qualities(Orientation::NATIVE),
-              forwardRead.Qualities(Orientation::GENOMIC));
-    //  - genomic (raw) input == genomic input
-    EXPECT_EQ(qualities, forwardRead.Qualities(Orientation::GENOMIC).Fastq());
-    //  - native output == genomic input
-    EXPECT_EQ(qualities, forwardRead.Qualities(Orientation::NATIVE).Fastq());
-
-    // ----------------
-    // reverse strand
-    // ----------------
-
-    BamRecordImpl reverseImpl;
-    reverseImpl.SetSequenceAndQualities(sequence, qualities);
-    reverseImpl.SetReverseStrand(true);
-
-    BamRecord reverseRead(reverseImpl);
-
-    //  - "native" != "genomic"
-    EXPECT_NE(reverseRead.Qualities(Orientation::NATIVE),
-              reverseRead.Qualities(Orientation::GENOMIC));
-    //  - genomic output == genomic input
-    EXPECT_EQ(qualities, reverseRead.Qualities(Orientation::GENOMIC).Fastq());
-    //  - genomic (raw) input != native output
-    EXPECT_NE(qualities, reverseRead.Qualities(Orientation::NATIVE).Fastq());
-    //  - native output should be reverse
-    EXPECT_EQ(revQuals, reverseRead.Qualities(Orientation::NATIVE).Fastq());
+    {
+        SCOPED_TRACE("Simple CIGAR Qualities");
+        tests::CheckQualitiesClippedAndAligned(
+            "13=",                  // CIGAR
+            "?]?]?]?]?]?]*",        // input
+            {
+                "?]?]?]?]?]?]*",    // forward strand, genomic
+                "?]?]?]?]?]?]*",    // forward strand, native
+                "?]?]?]?]?]?]*",    // forward strand, genomic, aligned
+                "?]?]?]?]?]?]*",    // forward strand, native,  aligned
+                "?]?]?]?]?]?]*",    // forward strand, genomic, aligned + clipped
+                "?]?]?]?]?]?]*",    // forward strand, native,  aligned + clipped
+                "?]?]?]?]?]?]*",    // reverse strand, genomic
+                "*]?]?]?]?]?]?",    // reverse strand, native
+                "?]?]?]?]?]?]*",    // reverse strand, genomic, aligned
+                "*]?]?]?]?]?]?",    // reverse strand, native,  aligned
+                "?]?]?]?]?]?]*",    // reverse strand, genomic, aligned + clipped
+                "*]?]?]?]?]?]?"     // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
 }
 
 TEST(BamRecordTest, SequenceTagsOrientation)
 {
-    const string tag    = "ATATATCCCGGCG";
-    const string revTag = "CGCCGGGATATAT";
-
-    // ----------------
-    // forward strand
-    // ----------------
-
-    BamRecordImpl forwardImpl;
-    forwardImpl.SetReverseStrand(false);
-    forwardImpl.AddTag("dt", tag);
-    forwardImpl.AddTag("st", tag);
-
-    BamRecord forwardRead(forwardImpl);
-
-    // sanity check
-    EXPECT_TRUE(forwardImpl.HasTag("dt"));
-    EXPECT_TRUE(forwardImpl.HasTag("st"));
-    EXPECT_TRUE(forwardRead.HasDeletionTag());
-    EXPECT_TRUE(forwardRead.HasSubstitutionTag());
-
-    //  - "native" == "genomic"
-    EXPECT_EQ(forwardRead.DeletionTag(Orientation::NATIVE),
-              forwardRead.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(forwardRead.SubstitutionTag(Orientation::NATIVE),
-              forwardRead.SubstitutionTag(Orientation::GENOMIC));
-
-    //  - genomic output == genomic input
-    EXPECT_EQ(tag, forwardRead.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(tag, forwardRead.SubstitutionTag(Orientation::GENOMIC));
-
-    //  - native output == genomic input
-    EXPECT_EQ(tag, forwardRead.DeletionTag(Orientation::NATIVE));
-    EXPECT_EQ(tag, forwardRead.SubstitutionTag(Orientation::NATIVE));
-
-    // ----------------
-    // reverse strand
-    // ----------------
-
-    BamRecordImpl reverseImpl;
-    reverseImpl.SetReverseStrand(true);
-    reverseImpl.AddTag("dt", revTag);
-    reverseImpl.AddTag("st", revTag);
-
-    BamRecord reverseRead(reverseImpl);
-
-    // sanity check
-    EXPECT_TRUE(reverseImpl.HasTag("dt"));
-    EXPECT_TRUE(reverseImpl.HasTag("st"));
-    EXPECT_TRUE(reverseRead.HasDeletionTag());
-    EXPECT_TRUE(reverseRead.HasSubstitutionTag());
-
-    //  - "native" != "genomic"
-    EXPECT_NE(reverseRead.DeletionTag(Orientation::NATIVE),
-              reverseRead.DeletionTag(Orientation::GENOMIC));
-    EXPECT_NE(reverseRead.SubstitutionTag(Orientation::NATIVE),
-              reverseRead.SubstitutionTag(Orientation::GENOMIC));
-
-    //  - genomic output == genomic input
-    EXPECT_EQ(tag, reverseRead.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(tag, reverseRead.SubstitutionTag(Orientation::GENOMIC));
-
-    //  - genomic (raw) input != native output
-    EXPECT_NE(tag, reverseRead.DeletionTag(Orientation::NATIVE));
-    EXPECT_NE(tag, reverseRead.SubstitutionTag(Orientation::NATIVE));
-
-    //  - native output should be reverse
-    EXPECT_EQ(revTag, reverseRead.DeletionTag(Orientation::NATIVE));
-    EXPECT_EQ(revTag, reverseRead.SubstitutionTag(Orientation::NATIVE));
+    {
+        SCOPED_TRACE("Simple CIGAR Base Tags");
+        tests::CheckBaseTagsClippedAndAligned(
+            "13=",                  // CIGAR
+            "ATATATCCCGGCG",        // input
+            {
+                "ATATATCCCGGCG",    // forward strand, genomic
+                "ATATATCCCGGCG",    // forward strand, native
+                "ATATATCCCGGCG",    // forward strand, genomic, aligned
+                "ATATATCCCGGCG",    // forward strand, native, aligned
+                "ATATATCCCGGCG",    // forward strand, genomic, aligned, clipped
+                "ATATATCCCGGCG",    // forward strand, native, aligned, clipped
+                "CGCCGGGATATAT",    // reverse strand, genomic
+                "ATATATCCCGGCG",    // reverse strand, native
+                "CGCCGGGATATAT",    // reverse strand, genomic, aligned
+                "ATATATCCCGGCG",    // reverse strand, native, aligned
+                "CGCCGGGATATAT",    // reverse strand, genomic, aligned, clipped
+                "ATATATCCCGGCG"     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
 }
 
 TEST(BamRecordTest, FrameTagsOrientation)
 {
-    vector<uint16_t> frameData;
-    vector<uint16_t> revFrameData;
-    for (int i = 0, j = 4; i < 5; ++i, --j) {
-        frameData.push_back(i*10);
-        revFrameData.push_back(j*10);
+    {
+        SCOPED_TRACE("Simple CIGAR Frames");
+        tests::CheckFrameTagsClippedAndAligned(
+            "5=",                   // CIGAR
+            { 0, 1, 2, 3, 4 },      // input
+            {
+                { 0, 1, 2, 3, 4 },  // forward strand, genomic
+                { 0, 1, 2, 3, 4 },  // forward strand, native
+                { 0, 1, 2, 3, 4 },  // forward strand, genomic, aligned
+                { 0, 1, 2, 3, 4 },  // forward strand, native, aligned
+                { 0, 1, 2, 3, 4 },  // forward strand, genomic, aligned, clipped
+                { 0, 1, 2, 3, 4 },  // forward strand, native, aligned, clipped
+                { 4, 3, 2, 1, 0 },  // reverse strand, genomic
+                { 0, 1, 2, 3, 4 },  // reverse strand, native
+                { 4, 3, 2, 1, 0 },  // reverse strand, genomic, aligned
+                { 0, 1, 2, 3, 4 },  // reverse strand, native, aligned
+                { 4, 3, 2, 1, 0 },  // reverse strand, genomic, aligned, clipped
+                { 0, 1, 2, 3, 4 }   // reverse strand, native, aligned, clipped
+            }
+        );
     }
-    const Frames frames(frameData);
-    const Frames revFrames(revFrameData);
-
-    // ----------------
-    // forward strand
-    // ----------------
-
-    BamRecordImpl forwardImpl;
-    forwardImpl.SetReverseStrand(false);
-    forwardImpl.AddTag("ip", frames.Data());
-    forwardImpl.AddTag("pw", frames.Data());
-
-    BamRecord forwardRead(forwardImpl);
-
-    // sanity check
-    EXPECT_TRUE(forwardImpl.HasTag("ip"));
-    EXPECT_TRUE(forwardImpl.HasTag("pw"));
-    EXPECT_TRUE(forwardRead.HasIPD());
-    EXPECT_TRUE(forwardRead.HasPulseWidth());
-
-    //  - "native" == "genomic"
-    EXPECT_EQ(forwardRead.IPD(Orientation::NATIVE),
-              forwardRead.IPD(Orientation::GENOMIC));
-    EXPECT_EQ(forwardRead.PulseWidth(Orientation::NATIVE),
-              forwardRead.PulseWidth(Orientation::GENOMIC));
-
-    //  - genomic output == genomic input
-    EXPECT_EQ(frames, forwardRead.IPD(Orientation::GENOMIC));
-    EXPECT_EQ(frames, forwardRead.PulseWidth(Orientation::GENOMIC));
-
-    //  - native output == genomic input
-    EXPECT_EQ(frames, forwardRead.IPD(Orientation::NATIVE));
-    EXPECT_EQ(frames, forwardRead.PulseWidth(Orientation::NATIVE));
-
-    // ----------------
-    // reverse strand
-    // ----------------
-
-    BamRecordImpl reverseImpl;
-    reverseImpl.SetReverseStrand(true);
-    reverseImpl.AddTag("ip", revFrames.Data());
-    reverseImpl.AddTag("pw", revFrames.Data());
-
-    BamRecord reverseRead(reverseImpl);
-
-    // sanity check
-    EXPECT_TRUE(reverseImpl.HasTag("ip"));
-    EXPECT_TRUE(reverseImpl.HasTag("pw"));
-    EXPECT_TRUE(reverseRead.HasIPD());
-    EXPECT_TRUE(reverseRead.HasPulseWidth());
-
-    //  - "native" != "genomic"
-    EXPECT_NE(reverseRead.IPD(Orientation::NATIVE),
-              reverseRead.IPD(Orientation::GENOMIC));
-    EXPECT_NE(reverseRead.PulseWidth(Orientation::NATIVE),
-              reverseRead.PulseWidth(Orientation::GENOMIC));
-
-    //  - genomic output == genomic input
-    EXPECT_EQ(frames, reverseRead.IPD(Orientation::GENOMIC));
-    EXPECT_EQ(frames, reverseRead.PulseWidth(Orientation::GENOMIC));
-
-    //  - genomic (raw) input != native output
-    EXPECT_NE(frames, reverseRead.IPD(Orientation::NATIVE));
-    EXPECT_NE(frames, reverseRead.PulseWidth(Orientation::NATIVE));
-
-    //  - native output should be reverse
-    EXPECT_EQ(revFrames, reverseRead.IPD(Orientation::NATIVE));
-    EXPECT_EQ(revFrames, reverseRead.PulseWidth(Orientation::NATIVE));
 }
 
 TEST(BamRecordTest, QualityTagsOrientation)
 {
-    const string qualities = "?]?]?]?]?]?]*";
-    const string revQuals  = "*]?]?]?]?]?]?";
-
-    // ----------------
-    // forward strand
-    // ----------------
-
-    BamRecordImpl forwardImpl;
-    forwardImpl.SetReverseStrand(false);
-    forwardImpl.AddTag("dq", qualities);
-    forwardImpl.AddTag("iq", qualities);
-    forwardImpl.AddTag("mq", qualities);
-    forwardImpl.AddTag("sq", qualities);
-
-    BamRecord forwardRead(forwardImpl);
-
-    // sanity check
-    EXPECT_TRUE(forwardImpl.HasTag("dq"));
-    EXPECT_TRUE(forwardImpl.HasTag("iq"));
-    EXPECT_TRUE(forwardImpl.HasTag("mq"));
-    EXPECT_TRUE(forwardImpl.HasTag("sq"));
-    EXPECT_TRUE(forwardRead.HasDeletionQV());
-    EXPECT_TRUE(forwardRead.HasInsertionQV());
-    EXPECT_TRUE(forwardRead.HasMergeQV());
-    EXPECT_TRUE(forwardRead.HasSubstitutionQV());
-
-    //  - "native" == "genomic"
-    EXPECT_EQ(forwardRead.DeletionQV(Orientation::NATIVE),
-              forwardRead.DeletionQV(Orientation::GENOMIC));
-    EXPECT_EQ(forwardRead.InsertionQV(Orientation::NATIVE),
-              forwardRead.InsertionQV(Orientation::GENOMIC));
-    EXPECT_EQ(forwardRead.MergeQV(Orientation::NATIVE),
-              forwardRead.MergeQV(Orientation::GENOMIC));
-    EXPECT_EQ(forwardRead.SubstitutionQV(Orientation::NATIVE),
-              forwardRead.SubstitutionQV(Orientation::GENOMIC));
-
-    //  - genomic output == genomic input
-    EXPECT_EQ(qualities, forwardRead.DeletionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(qualities, forwardRead.InsertionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(qualities, forwardRead.MergeQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(qualities, forwardRead.SubstitutionQV(Orientation::GENOMIC).Fastq());
-
-    //  - native output == genomic input
-    EXPECT_EQ(qualities, forwardRead.DeletionQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(qualities, forwardRead.InsertionQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(qualities, forwardRead.MergeQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(qualities, forwardRead.SubstitutionQV(Orientation::NATIVE).Fastq());
-
-    // ----------------
-    // reverse strand
-    // ----------------
-
-    BamRecordImpl reverseImpl;
-    reverseImpl.SetReverseStrand(true);
-    reverseImpl.AddTag("dq", revQuals);
-    reverseImpl.AddTag("iq", revQuals);
-    reverseImpl.AddTag("mq", revQuals);
-    reverseImpl.AddTag("sq", revQuals);
-
-    BamRecord reverseRead(reverseImpl);
-
-    // sanity check
-    EXPECT_TRUE(reverseImpl.HasTag("dq"));
-    EXPECT_TRUE(reverseImpl.HasTag("iq"));
-    EXPECT_TRUE(reverseImpl.HasTag("mq"));
-    EXPECT_TRUE(reverseImpl.HasTag("sq"));
-    EXPECT_TRUE(reverseRead.HasDeletionQV());
-    EXPECT_TRUE(reverseRead.HasInsertionQV());
-    EXPECT_TRUE(reverseRead.HasMergeQV());
-    EXPECT_TRUE(reverseRead.HasSubstitutionQV());
-
-    //  - "native" != "genomic"
-    EXPECT_NE(reverseRead.DeletionQV(Orientation::NATIVE),
-              reverseRead.DeletionQV(Orientation::GENOMIC));
-    EXPECT_NE(reverseRead.InsertionQV(Orientation::NATIVE),
-              reverseRead.InsertionQV(Orientation::GENOMIC));
-    EXPECT_NE(reverseRead.MergeQV(Orientation::NATIVE),
-              reverseRead.MergeQV(Orientation::GENOMIC));
-    EXPECT_NE(reverseRead.SubstitutionQV(Orientation::NATIVE),
-              reverseRead.SubstitutionQV(Orientation::GENOMIC));
-
-    //  - genomic output == genomic input
-    EXPECT_EQ(qualities, reverseRead.DeletionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(qualities, reverseRead.InsertionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(qualities, reverseRead.MergeQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(qualities, reverseRead.SubstitutionQV(Orientation::GENOMIC).Fastq());
-
-    //  - genomic (raw) input != native output
-    EXPECT_NE(qualities, reverseRead.DeletionQV(Orientation::NATIVE).Fastq());
-    EXPECT_NE(qualities, reverseRead.InsertionQV(Orientation::NATIVE).Fastq());
-    EXPECT_NE(qualities, reverseRead.MergeQV(Orientation::NATIVE).Fastq());
-    EXPECT_NE(qualities, reverseRead.SubstitutionQV(Orientation::NATIVE).Fastq());
-
-    //  - native output should be reverse
-    EXPECT_EQ(revQuals, reverseRead.DeletionQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(revQuals, reverseRead.InsertionQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(revQuals, reverseRead.MergeQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(revQuals, reverseRead.SubstitutionQV(Orientation::NATIVE).Fastq());
+    {
+        SCOPED_TRACE("Simple CIGAR Quality Tags");
+        tests::CheckQualityTagsClippedAndAligned(
+            "13=",                  // CIGAR
+            "?]?]?]?]?]?]*",        // input
+            {
+                "?]?]?]?]?]?]*",    // forward strand, genomic
+                "?]?]?]?]?]?]*",    // forward strand, native
+                "?]?]?]?]?]?]*",    // forward strand, genomic, aligned
+                "?]?]?]?]?]?]*",    // forward strand, native,  aligned
+                "?]?]?]?]?]?]*",    // forward strand, genomic, aligned + clipped
+                "?]?]?]?]?]?]*",    // forward strand, native,  aligned + clipped
+                "*]?]?]?]?]?]?",    // reverse strand, genomic
+                "?]?]?]?]?]?]*",    // reverse strand, native
+                "*]?]?]?]?]?]?",    // reverse strand, genomic, aligned
+                "?]?]?]?]?]?]*",    // reverse strand, native,  aligned
+                "*]?]?]?]?]?]?",    // reverse strand, genomic, aligned + clipped
+                "?]?]?]?]?]?]*"     // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
 }
 
-TEST(BamRecordTest, ClippingAndOrientation)
+TEST(BamRecordTest, SequenceClippedAndAligned)
 {
-    // forward string names, cigar, seq
-    // reverse strand records have same cigar and **input** seq as forward strand
-    // (native output will be rev-comp'd)
-
-    const string s1_cigar = "10=";
-    const string s2_cigar = "3=4N3=";
-    const string s3_cigar = "1S8=1S";
-    const string s4_cigar = "1H8=1H";
-    const string s5_cigar = "2S6=2S";
-    const string s6_cigar = "2S3=2I3=2S";
-    const string s7_cigar = "2H6=2H";
-
-    const string s1_seq  = "ATCCGCGGTT";
-    const string s2_seq  = "ACGTT";
-    const string s3_seq  = "ACCCGCGGTT";
-    const string s4_seq  = "ATCGCGGT";
-    const string s5_seq  = "AGCCGCGGTT";
-    const string s6_seq  = "ATCCGNNCGGTT";
-    const string s7_seq  = "CAGCGG";
-
-    const string s1_seq_clipped  = "ATCCGCGGTT";
-    const string s2_seq_clipped  = "ACGTT";
-    const string s3_seq_clipped  = "CCCGCGGT";
-    const string s4_seq_clipped  = "ATCGCGGT";
-    const string s5_seq_clipped  = "CCGCGG";
-    const string s6_seq_clipped  = "CCGNNCGG";
-    const string s7_seq_clipped  = "CAGCGG";
-
-    const string s1_revseq = "AACCGCGGAT";
-    const string s2_revseq = "AACGT";
-    const string s3_revseq = "AACCGCGGGT";
-    const string s4_revseq = "ACCGCGAT";
-    const string s5_revseq = "AACCGCGGCT";
-    const string s6_revseq = "AACCGNNCGGAT";
-    const string s7_revseq = "CCGCTG";
-
-    const string s1_revseq_clipped = "AACCGCGGAT";
-    const string s2_revseq_clipped = "AACGT";
-    const string s3_revseq_clipped = "ACCGCGGG";
-    const string s4_revseq_clipped = "ACCGCGAT";
-    const string s5_revseq_clipped = "CCGCGG";
-    const string s6_revseq_clipped = "CCGNNCGG";
-    const string s7_revseq_clipped = "CCGCTG";
-
-    const BamRecord s1 = tests::MakeCigaredRecord(s1_seq, s1_cigar, false);
-    const BamRecord s2 = tests::MakeCigaredRecord(s2_seq, s2_cigar, false);
-    const BamRecord s3 = tests::MakeCigaredRecord(s3_seq, s3_cigar, false);
-    const BamRecord s4 = tests::MakeCigaredRecord(s4_seq, s4_cigar, false);
-    const BamRecord s5 = tests::MakeCigaredRecord(s5_seq, s5_cigar, false);
-    const BamRecord s6 = tests::MakeCigaredRecord(s6_seq, s6_cigar, false);
-    const BamRecord s7 = tests::MakeCigaredRecord(s7_seq, s7_cigar, false);
-    const BamRecord s1_reverse = tests::MakeCigaredRecord(s1_seq, s1_cigar, true);
-    const BamRecord s2_reverse = tests::MakeCigaredRecord(s2_seq, s2_cigar, true);
-    const BamRecord s3_reverse = tests::MakeCigaredRecord(s3_seq, s3_cigar, true);
-    const BamRecord s4_reverse = tests::MakeCigaredRecord(s4_seq, s4_cigar, true);
-    const BamRecord s5_reverse = tests::MakeCigaredRecord(s5_seq, s5_cigar, true);
-    const BamRecord s6_reverse = tests::MakeCigaredRecord(s6_seq, s6_cigar, true);
-    const BamRecord s7_reverse = tests::MakeCigaredRecord(s7_seq, s7_cigar, true);
-
-    // ----------------
-    // forward strand
-    // ----------------
-
-    //  - "native" == "genomic"
-    EXPECT_EQ(s1.Sequence(Orientation::NATIVE), s1.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s2.Sequence(Orientation::NATIVE), s2.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s3.Sequence(Orientation::NATIVE), s3.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s4.Sequence(Orientation::NATIVE), s4.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s5.Sequence(Orientation::NATIVE), s5.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s6.Sequence(Orientation::NATIVE), s6.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s7.Sequence(Orientation::NATIVE), s7.Sequence(Orientation::GENOMIC));
-
-    //  - unclipped, unaligned genomic output == genomic input
-    EXPECT_EQ(s1_seq, s1.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s2_seq, s2.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s3_seq, s3.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s4_seq, s4.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s5_seq, s5.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s6_seq, s6.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s7_seq, s7.Sequence(Orientation::GENOMIC));
-
-    //  - unclipped, unaligned native output == genomic input
-    EXPECT_EQ(s1_seq, s1.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(s2_seq, s2.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(s3_seq, s3.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(s4_seq, s4.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(s5_seq, s5.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(s6_seq, s6.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(s7_seq, s7.Sequence(Orientation::NATIVE));
-
-    //  - clipped, unaligned native output == clipped genomic input
-    EXPECT_EQ(s1_seq_clipped, s1.Sequence(Orientation::NATIVE, false, true));
-    EXPECT_EQ(s2_seq_clipped, s2.Sequence(Orientation::NATIVE, false, true));
-    EXPECT_EQ(s3_seq_clipped, s3.Sequence(Orientation::NATIVE, false, true));
-    EXPECT_EQ(s4_seq_clipped, s4.Sequence(Orientation::NATIVE, false, true));
-    EXPECT_EQ(s5_seq_clipped, s5.Sequence(Orientation::NATIVE, false, true));
-    EXPECT_EQ(s6_seq_clipped, s6.Sequence(Orientation::NATIVE, false, true));
-    EXPECT_EQ(s7_seq_clipped, s7.Sequence(Orientation::NATIVE, false, true));
-
-    // ----------------
-    // reverse strand
-    // ----------------
-
-    //  - "native" != "genomic"
-    EXPECT_NE(s1_reverse.Sequence(Orientation::NATIVE), s1_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_NE(s2_reverse.Sequence(Orientation::NATIVE), s2_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_NE(s3_reverse.Sequence(Orientation::NATIVE), s3_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_NE(s4_reverse.Sequence(Orientation::NATIVE), s4_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_NE(s5_reverse.Sequence(Orientation::NATIVE), s5_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_NE(s6_reverse.Sequence(Orientation::NATIVE), s6_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_NE(s7_reverse.Sequence(Orientation::NATIVE), s7_reverse.Sequence(Orientation::GENOMIC));
-
-    //  - unclipped, unaligned genomic output == genomic input
-    EXPECT_EQ(s1_seq, s1_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s2_seq, s2_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s3_seq, s3_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s4_seq, s4_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s5_seq, s5_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s6_seq, s6_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s7_seq, s7_reverse.Sequence(Orientation::GENOMIC));
-
-    //  - unclipped, unaligned native output != genomic (raw) input
-    EXPECT_NE(s1_seq, s1_reverse.Sequence(Orientation::NATIVE));
-    EXPECT_NE(s2_seq, s2_reverse.Sequence(Orientation::NATIVE));
-    EXPECT_NE(s3_seq, s3_reverse.Sequence(Orientation::NATIVE));
-    EXPECT_NE(s4_seq, s4_reverse.Sequence(Orientation::NATIVE));
-    EXPECT_NE(s5_seq, s5_reverse.Sequence(Orientation::NATIVE));
-    EXPECT_NE(s6_seq, s6_reverse.Sequence(Orientation::NATIVE));
-    EXPECT_NE(s7_seq, s7_reverse.Sequence(Orientation::NATIVE));
-
-    //  - unclipped, unaligned native output should be reverse
-    EXPECT_EQ(s1_revseq, s1_reverse.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(s2_revseq, s2_reverse.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(s3_revseq, s3_reverse.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(s4_revseq, s4_reverse.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(s5_revseq, s5_reverse.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(s6_revseq, s6_reverse.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(s7_revseq, s7_reverse.Sequence(Orientation::NATIVE));
-
-    //  - clipped, unaligned native output == clipped genomic input
-    EXPECT_EQ(s1_revseq_clipped, s1_reverse.Sequence(Orientation::NATIVE, false, true));
-    EXPECT_EQ(s2_revseq_clipped, s2_reverse.Sequence(Orientation::NATIVE, false, true));
-    EXPECT_EQ(s3_revseq_clipped, s3_reverse.Sequence(Orientation::NATIVE, false, true));
-    EXPECT_EQ(s4_revseq_clipped, s4_reverse.Sequence(Orientation::NATIVE, false, true));
-    EXPECT_EQ(s5_revseq_clipped, s5_reverse.Sequence(Orientation::NATIVE, false, true));
-    EXPECT_EQ(s6_revseq_clipped, s6_reverse.Sequence(Orientation::NATIVE, false, true));
-    EXPECT_EQ(s7_revseq_clipped, s7_reverse.Sequence(Orientation::NATIVE, false, true));
+    {
+        SCOPED_TRACE("CIGAR: 10=");
+        tests::CheckSequenceClippedAndAligned(
+            "10=",              // CIGAR
+            "ATCCGCGGTT",       // input
+            {
+                "ATCCGCGGTT",   // forward strand, genomic
+                "ATCCGCGGTT",   // forward strand, native
+                "ATCCGCGGTT",   // forward strand, genomic, aligned
+                "ATCCGCGGTT",   // forward strand, native,  aligned
+                "ATCCGCGGTT",   // forward strand, genomic, aligned + clipped
+                "ATCCGCGGTT",   // forward strand, native,  aligned + clipped
+                "ATCCGCGGTT",   // reverse strand, genomic
+                "AACCGCGGAT",   // reverse strand, native
+                "ATCCGCGGTT",   // reverse strand, genomic, aligned
+                "AACCGCGGAT",   // reverse strand, native,  aligned
+                "ATCCGCGGTT",   // reverse strand, genomic, aligned + clipped
+                "AACCGCGGAT"    // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 3=4N3=");
+        tests::CheckSequenceClippedAndAligned(
+            "3=4N3=",       // CIGAR
+            "ACGTT",        // input
+            {
+                "ACGTT",    // forward strand, genomic
+                "ACGTT",    // forward strand, native
+                "ACGTT",    // forward strand, genomic, aligned
+                "ACGTT",    // forward strand, native,  aligned
+                "ACGTT",    // forward strand, genomic, aligned + clipped
+                "ACGTT",    // forward strand, native,  aligned + clipped
+                "ACGTT",    // reverse strand, genomic
+                "AACGT",    // reverse strand, native
+                "ACGTT",    // reverse strand, genomic, aligned
+                "AACGT",    // reverse strand, native,  aligned
+                "ACGTT",    // reverse strand, genomic, aligned + clipped
+                "AACGT"     // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 1S8=1S");
+        tests::CheckSequenceClippedAndAligned(
+            "1S8=1S",           // CIGAR
+            "ACCCGCGGTT",       // input
+            {
+                "ACCCGCGGTT",   // forward strand, genomic
+                "ACCCGCGGTT",   // forward strand, native
+                "ACCCGCGGTT",   // forward strand, genomic, aligned
+                "ACCCGCGGTT",   // forward strand, native,  aligned
+                "CCCGCGGT",     // forward strand, genomic, aligned + clipped
+                "CCCGCGGT",     // forward strand, native,  aligned + clipped
+                "ACCCGCGGTT",   // reverse strand, genomic
+                "AACCGCGGGT",   // reverse strand, native
+                "ACCCGCGGTT",   // reverse strand, genomic, aligned
+                "AACCGCGGGT",   // reverse strand, native,  aligned
+                "CCCGCGGT",     // reverse strand, genomic, aligned + clipped
+                "ACCGCGGG"      // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 1H8=1H");
+        tests::CheckSequenceClippedAndAligned(
+            "1H8=1H",           // CIGAR
+            "ATCGCGGT",         // input
+            {
+                "ATCGCGGT",     // forward strand, genomic
+                "ATCGCGGT",     // forward strand, native
+                "ATCGCGGT",     // forward strand, genomic, aligned
+                "ATCGCGGT",     // forward strand, native,  aligned
+                "ATCGCGGT",     // forward strand, genomic, aligned + clipped
+                "ATCGCGGT",     // forward strand, native,  aligned + clipped
+                "ATCGCGGT",     // reverse strand, genomic
+                "ACCGCGAT",     // reverse strand, native
+                "ATCGCGGT",     // reverse strand, genomic, aligned
+                "ACCGCGAT",     // reverse strand, native,  aligned
+                "ATCGCGGT",     // reverse strand, genomic, aligned + clipped
+                "ACCGCGAT"      // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2S6=2S");
+        tests::CheckSequenceClippedAndAligned(
+            "2S6=2S",           // CIGAR
+            "AGCCGCGGTT",       // input
+            {
+                "AGCCGCGGTT",   // forward strand, genomic
+                "AGCCGCGGTT",   // forward strand, native
+                "AGCCGCGGTT",   // forward strand, genomic, aligned
+                "AGCCGCGGTT",   // forward strand, native,  aligned
+                "CCGCGG",       // forward strand, genomic, aligned + clipped
+                "CCGCGG",       // forward strand, native,  aligned + clipped
+                "AGCCGCGGTT",   // reverse strand, genomic
+                "AACCGCGGCT",   // reverse strand, native
+                "AGCCGCGGTT",   // reverse strand, genomic, aligned
+                "AACCGCGGCT",   // reverse strand, native,  aligned
+                "CCGCGG",       // reverse strand, genomic, aligned + clipped
+                "CCGCGG"        // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2S3=2I3=2S");
+        tests::CheckSequenceClippedAndAligned(
+            "2S3=2I3=2S",           // CIGAR
+            "ATCCGNNCGGTT",         // input
+            {
+                "ATCCGNNCGGTT",     // forward strand, genomic
+                "ATCCGNNCGGTT",     // forward strand, native
+                "ATCCGNNCGGTT",     // forward strand, genomic, aligned
+                "ATCCGNNCGGTT",     // forward strand, native,  aligned
+                "CCGNNCGG",         // forward strand, genomic, aligned + clipped
+                "CCGNNCGG",         // forward strand, native,  aligned + clipped
+                "ATCCGNNCGGTT",     // reverse strand, genomic
+                "AACCGNNCGGAT",     // reverse strand, native
+                "ATCCGNNCGGTT",     // reverse strand, genomic, aligned
+                "AACCGNNCGGAT",     // reverse strand, native,  aligned
+                "CCGNNCGG",         // reverse strand, genomic, aligned + clipped
+                "CCGNNCGG"          // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H6=2H");
+        tests::CheckSequenceClippedAndAligned(
+            "2H6=2H",       // CIGAR
+            "CAGCGG",       // input
+            {
+                "CAGCGG",   // forward strand, genomic
+                "CAGCGG",   // forward strand, native
+                "CAGCGG",   // forward strand, genomic, aligned
+                "CAGCGG",   // forward strand, native,  aligned
+                "CAGCGG",   // forward strand, genomic, aligned + clipped
+                "CAGCGG",   // forward strand, native,  aligned + clipped
+                "CAGCGG",   // reverse strand, genomic
+                "CCGCTG",   // reverse strand, native
+                "CAGCGG",   // reverse strand, genomic, aligned
+                "CCGCTG",   // reverse strand, native,  aligned
+                "CAGCGG",   // reverse strand, genomic, aligned + clipped
+                "CCGCTG"    // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
 }
 
 TEST(BamRecordTest, ClippingOrientationAndAlignment)
 {
-    // forward string names, cigar, seq
-    // reverse strand records have same cigar and **input** seq as forward strand
-    // (native output will be rev-comp'd)
-
-    const string s1_cigar = "4=3D4=";
-    const string s2_cigar = "4=1D2I2D4=";
-    const string s3_cigar = "4=1D2P2I2P2D4=";
-    const string s4_cigar = "2S4=3D4=3S";
-    const string s5_cigar = "2H4=3D4=3H";
-    const string s6_cigar = "2H2S4=3D4=3S3H";
-
-    const string s1_seq = "AACCGTTA";
-    const string s2_seq = "ATCCTAGGTT";
-    const string s3_seq = "ATCCTAGGTT";
-    const string s4_seq = "TTAACCGTTACCG";
-    const string s5_seq = "AACCGTTA";
-    const string s6_seq = "TTAACCGTTACCG";
-
-    const string s1_seq_aligned = "AACC---GTTA";
-    const string s2_seq_aligned = "ATCC-TA--GGTT";
-    const string s3_seq_aligned = "ATCC-**TA**--GGTT";
-    const string s4_seq_aligned = "TTAACC---GTTACCG";
-    const string s5_seq_aligned = "AACC---GTTA";
-    const string s6_seq_aligned = "TTAACC---GTTACCG";
-
-    const string s1_seq_aligned_clipped = "AACC---GTTA";
-    const string s2_seq_aligned_clipped = "ATCC-TA--GGTT";
-    const string s3_seq_aligned_clipped = "ATCC-**TA**--GGTT";
-    const string s4_seq_aligned_clipped = "AACC---GTTA";
-    const string s5_seq_aligned_clipped = "AACC---GTTA";
-    const string s6_seq_aligned_clipped = "AACC---GTTA";
-
-    const string s1_revseq = "TAACGGTT";
-    const string s2_revseq = "AACCTAGGAT";
-    const string s3_revseq = "AACCTAGGAT";
-    const string s4_revseq = "CGGTAACGGTTAA";
-    const string s5_revseq = "TAACGGTT";
-    const string s6_revseq = "CGGTAACGGTTAA";
-
-    const string s1_revseq_aligned = "TAAC---GGTT";
-    const string s2_revseq_aligned = "AACC--TA-GGAT";
-    const string s3_revseq_aligned = "AACC--**TA**-GGAT";
-    const string s4_revseq_aligned = "CGGTAAC---GGTTAA";
-    const string s5_revseq_aligned = "TAAC---GGTT";
-    const string s6_revseq_aligned = "CGGTAAC---GGTTAA";
-
-    const string s1_revseq_aligned_clipped = "TAAC---GGTT";
-    const string s2_revseq_aligned_clipped = "AACC--TA-GGAT";
-    const string s3_revseq_aligned_clipped = "AACC--**TA**-GGAT";
-    const string s4_revseq_aligned_clipped = "TAAC---GGTT";
-    const string s5_revseq_aligned_clipped = "TAAC---GGTT";
-    const string s6_revseq_aligned_clipped = "TAAC---GGTT";
-
-    const BamRecord s1 = tests::MakeCigaredRecord(s1_seq, s1_cigar, false);
-    const BamRecord s2 = tests::MakeCigaredRecord(s2_seq, s2_cigar, false);
-    const BamRecord s3 = tests::MakeCigaredRecord(s3_seq, s3_cigar, false);
-    const BamRecord s4 = tests::MakeCigaredRecord(s4_seq, s4_cigar, false);
-    const BamRecord s5 = tests::MakeCigaredRecord(s5_seq, s5_cigar, false);
-    const BamRecord s6 = tests::MakeCigaredRecord(s6_seq, s6_cigar, false);
-    const BamRecord s1_reverse = tests::MakeCigaredRecord(s1_seq, s1_cigar, true);
-    const BamRecord s2_reverse = tests::MakeCigaredRecord(s2_seq, s2_cigar, true);
-    const BamRecord s3_reverse = tests::MakeCigaredRecord(s3_seq, s3_cigar, true);
-    const BamRecord s4_reverse = tests::MakeCigaredRecord(s4_seq, s4_cigar, true);
-    const BamRecord s5_reverse = tests::MakeCigaredRecord(s5_seq, s5_cigar, true);
-    const BamRecord s6_reverse = tests::MakeCigaredRecord(s6_seq, s6_cigar, true);
-
-    // ----------------
-    // forward strand
-    // ----------------
-
-    //  - "native" == "genomic"
-    EXPECT_EQ(s1.Sequence(Orientation::NATIVE), s1.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s2.Sequence(Orientation::NATIVE), s2.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s3.Sequence(Orientation::NATIVE), s3.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s4.Sequence(Orientation::NATIVE), s4.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s5.Sequence(Orientation::NATIVE), s5.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(s6.Sequence(Orientation::NATIVE), s6.Sequence(Orientation::GENOMIC));
-
-    //  - unaligned, unclipped genomic output == genomic input
-    EXPECT_EQ(s1_seq, s1.Sequence(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s2_seq, s2.Sequence(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s3_seq, s3.Sequence(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s4_seq, s4.Sequence(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s5_seq, s5.Sequence(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s6_seq, s6.Sequence(Orientation::GENOMIC, false, false));
-
-    //  - aligned, unclipped genomic output == aligned, unclipped genomic input
-    EXPECT_EQ(s1_seq_aligned, s1.Sequence(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s2_seq_aligned, s2.Sequence(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s3_seq_aligned, s3.Sequence(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s4_seq_aligned, s4.Sequence(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s5_seq_aligned, s5.Sequence(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s6_seq_aligned, s6.Sequence(Orientation::GENOMIC, true, false));
-
-    //  - aligned, clipped genomic output == aligned, clipped genomic output
-    EXPECT_EQ(s1_seq_aligned_clipped, s1.Sequence(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s2_seq_aligned_clipped, s2.Sequence(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s3_seq_aligned_clipped, s3.Sequence(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s4_seq_aligned_clipped, s4.Sequence(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s5_seq_aligned_clipped, s5.Sequence(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s6_seq_aligned_clipped, s6.Sequence(Orientation::GENOMIC, true, true));
-
-    // ----------------
-    // reverse strand
-    // ----------------
-
-    //  - "native" != "genomic"
-    EXPECT_NE(s1_reverse.Sequence(Orientation::NATIVE), s1_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_NE(s2_reverse.Sequence(Orientation::NATIVE), s2_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_NE(s3_reverse.Sequence(Orientation::NATIVE), s3_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_NE(s4_reverse.Sequence(Orientation::NATIVE), s4_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_NE(s5_reverse.Sequence(Orientation::NATIVE), s5_reverse.Sequence(Orientation::GENOMIC));
-    EXPECT_NE(s6_reverse.Sequence(Orientation::NATIVE), s6_reverse.Sequence(Orientation::GENOMIC));
-
-    //  - unaligned, unclipped genomic output
-    EXPECT_EQ(s1_seq, s1_reverse.Sequence(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s2_seq, s2_reverse.Sequence(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s3_seq, s3_reverse.Sequence(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s4_seq, s4_reverse.Sequence(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s5_seq, s5_reverse.Sequence(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s6_seq, s6_reverse.Sequence(Orientation::GENOMIC, false, false));
-
-    //  - unaligned, unclipped native output
-    EXPECT_EQ(s1_revseq, s1_reverse.Sequence(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s2_revseq, s2_reverse.Sequence(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s3_revseq, s3_reverse.Sequence(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s4_revseq, s4_reverse.Sequence(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s5_revseq, s5_reverse.Sequence(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s6_revseq, s6_reverse.Sequence(Orientation::NATIVE, false, false));
-
-    //  - aligned, unclipped genomic output
-    EXPECT_EQ(s1_seq_aligned, s1_reverse.Sequence(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s2_seq_aligned, s2_reverse.Sequence(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s3_seq_aligned, s3_reverse.Sequence(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s4_seq_aligned, s4_reverse.Sequence(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s5_seq_aligned, s5_reverse.Sequence(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s6_seq_aligned, s6_reverse.Sequence(Orientation::GENOMIC, true, false));
-
-    //  - aligned, unclipped native output
-    EXPECT_EQ(s1_revseq_aligned, s1_reverse.Sequence(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s2_revseq_aligned, s2_reverse.Sequence(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s3_revseq_aligned, s3_reverse.Sequence(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s4_revseq_aligned, s4_reverse.Sequence(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s5_revseq_aligned, s5_reverse.Sequence(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s6_revseq_aligned, s6_reverse.Sequence(Orientation::NATIVE, true, false));
-
-    //  - aligned, clipped genomic output
-    EXPECT_EQ(s1_seq_aligned_clipped, s1_reverse.Sequence(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s2_seq_aligned_clipped, s2_reverse.Sequence(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s3_seq_aligned_clipped, s3_reverse.Sequence(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s4_seq_aligned_clipped, s4_reverse.Sequence(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s5_seq_aligned_clipped, s5_reverse.Sequence(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s6_seq_aligned_clipped, s6_reverse.Sequence(Orientation::GENOMIC, true, true));
-
-    //  - aligned, clipped native output
-    EXPECT_EQ(s1_revseq_aligned_clipped, s1_reverse.Sequence(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s2_revseq_aligned_clipped, s2_reverse.Sequence(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s3_revseq_aligned_clipped, s3_reverse.Sequence(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s4_revseq_aligned_clipped, s4_reverse.Sequence(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s5_revseq_aligned_clipped, s5_reverse.Sequence(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s6_revseq_aligned_clipped, s6_reverse.Sequence(Orientation::NATIVE, true, true));
+    {
+        SCOPED_TRACE("CIGAR: 4=3D4=");
+        tests::CheckSequenceClippedAndAligned(
+            "4=3D4=",           // CIGAR
+            "AACCGTTA",         // input
+            {
+                "AACCGTTA",     // forward strand, genomic
+                "AACCGTTA",     // forward strand, native
+                "AACC---GTTA",  // forward strand, genomic, aligned
+                "AACC---GTTA",  // forward strand, native,  aligned
+                "AACC---GTTA",  // forward strand, genomic, aligned + clipped
+                "AACC---GTTA",  // forward strand, native,  aligned + clipped
+                "AACCGTTA",     // reverse strand, genomic
+                "TAACGGTT",     // reverse strand, native
+                "AACC---GTTA",  // reverse strand, genomic, aligned
+                "TAAC---GGTT",  // reverse strand, native,  aligned
+                "AACC---GTTA",  // reverse strand, genomic, aligned + clipped
+                "TAAC---GGTT"   // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
+        tests::CheckSequenceClippedAndAligned(
+            "4=1D2I2D4=",           // CIGAR
+            "ATCCTAGGTT",           // input
+            {
+                "ATCCTAGGTT",       // forward strand, genomic
+                "ATCCTAGGTT",       // forward strand, native
+                "ATCC-TA--GGTT",    // forward strand, genomic, aligned
+                "ATCC-TA--GGTT",    // forward strand, native,  aligned
+                "ATCC-TA--GGTT",    // forward strand, genomic, aligned + clipped
+                "ATCC-TA--GGTT",    // forward strand, native,  aligned + clipped
+                "ATCCTAGGTT",       // reverse strand, genomic
+                "AACCTAGGAT",       // reverse strand, native
+                "ATCC-TA--GGTT",    // reverse strand, genomic, aligned
+                "AACC--TA-GGAT",    // reverse strand, native,  aligned
+                "ATCC-TA--GGTT",    // reverse strand, genomic, aligned + clipped
+                "AACC--TA-GGAT"     // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
+        tests::CheckSequenceClippedAndAligned(
+            "4=1D2P2I2P2D4=",           // CIGAR
+            "ATCCTAGGTT",               // input
+            {
+                "ATCCTAGGTT",           // forward strand, genomic
+                "ATCCTAGGTT",           // forward strand, native
+                "ATCC-**TA**--GGTT",    // forward strand, genomic, aligned
+                "ATCC-**TA**--GGTT",    // forward strand, native,  aligned
+                "ATCC-**TA**--GGTT",    // forward strand, genomic, aligned + clipped
+                "ATCC-**TA**--GGTT",    // forward strand, native,  aligned + clipped
+                "ATCCTAGGTT",           // reverse strand, genomic
+                "AACCTAGGAT",           // reverse strand, native
+                "ATCC-**TA**--GGTT",    // reverse strand, genomic, aligned
+                "AACC--**TA**-GGAT",    // reverse strand, native,  aligned
+                "ATCC-**TA**--GGTT",    // reverse strand, genomic, aligned + clipped
+                "AACC--**TA**-GGAT"     // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2S4=3D4=3S");
+        tests::CheckSequenceClippedAndAligned(
+            "2S4=3D4=3S",               // CIGAR
+            "TTAACCGTTACCG",            // input
+            {
+                "TTAACCGTTACCG",        // forward strand, genomic
+                "TTAACCGTTACCG",        // forward strand, native
+                "TTAACC---GTTACCG",     // forward strand, genomic, aligned
+                "TTAACC---GTTACCG",     // forward strand, native,  aligned
+                "AACC---GTTA",          // forward strand, genomic, aligned + clipped
+                "AACC---GTTA",          // forward strand, native,  aligned + clipped
+                "TTAACCGTTACCG",        // reverse strand, genomic
+                "CGGTAACGGTTAA",        // reverse strand, native
+                "TTAACC---GTTACCG",     // reverse strand, genomic, aligned
+                "CGGTAAC---GGTTAA",     // reverse strand, native,  aligned
+                "AACC---GTTA",          // reverse strand, genomic, aligned + clipped
+                "TAAC---GGTT"           // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
+        tests::CheckSequenceClippedAndAligned(
+            "2H4=3D4=3H",       // CIGAR
+            "AACCGTTA",         // input
+            {
+                "AACCGTTA",     // forward strand, genomic
+                "AACCGTTA",     // forward strand, native
+                "AACC---GTTA",  // forward strand, genomic, aligned
+                "AACC---GTTA",  // forward strand, native,  aligned
+                "AACC---GTTA",  // forward strand, genomic, aligned + clipped
+                "AACC---GTTA",  // forward strand, native,  aligned + clipped
+                "AACCGTTA",     // reverse strand, genomic
+                "TAACGGTT",     // reverse strand, native
+                "AACC---GTTA",  // reverse strand, genomic, aligned
+                "TAAC---GGTT",  // reverse strand, native,  aligned
+                "AACC---GTTA",  // reverse strand, genomic, aligned + clipped
+                "TAAC---GGTT"   // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H2S4=3D4=3S3H");
+        tests::CheckSequenceClippedAndAligned(
+            "2H2S4=3D4=3S3H",           // CIGAR
+            "TTAACCGTTACCG",            // input
+            {
+                "TTAACCGTTACCG",        // forward strand, genomic
+                "TTAACCGTTACCG",        // forward strand, native
+                "TTAACC---GTTACCG",     // forward strand, genomic, aligned
+                "TTAACC---GTTACCG",     // forward strand, native,  aligned
+                "AACC---GTTA",          // forward strand, genomic, aligned + clipped
+                "AACC---GTTA",          // forward strand, native,  aligned + clipped
+                "TTAACCGTTACCG",        // reverse strand, genomic
+                "CGGTAACGGTTAA",        // reverse strand, native
+                "TTAACC---GTTACCG",     // reverse strand, genomic, aligned
+                "CGGTAAC---GGTTAA",     // reverse strand, native,  aligned
+                "AACC---GTTA",          // reverse strand, genomic, aligned + clipped
+                "TAAC---GGTT"           // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
 }
-
 
 TEST(BamRecordTest, QualityTagsClippedAndAligned)
 {
-    // NOTE - FASTQ for QV=0 is '!'. Thus deletions/padding will be rendered as '!'s.
-
-    const string s1_cigar = "4=3D4=";
-    const string s2_cigar = "4=1D2I2D4=";
-    const string s3_cigar = "4=1D2P2I2P2D4=";
-    const string s4_cigar = "3S4=3D4=3S";
-    const string s5_cigar = "2H4=3D4=3H";
-    const string s6_cigar = "2H3S4=3D4=3S3H";
-
-    const string s1_quals = "?]?]?]?@";
-    const string s2_quals = "?]?]87?]?@";
-    const string s3_quals = "?]?]87?]?@";
-    const string s4_quals = "vvv?]?]?]?@xxx";
-    const string s5_quals = "?]?]?]?@";
-    const string s6_quals = "vvv?]?]?]?@xxx";
-
-    const string s1_quals_aligned = "?]?]!!!?]?@";
-    const string s2_quals_aligned = "?]?]!87!!?]?@";
-    const string s3_quals_aligned = "?]?]!!!87!!!!?]?@";
-    const string s4_quals_aligned = "vvv?]?]!!!?]?@xxx";
-    const string s5_quals_aligned = "?]?]!!!?]?@";
-    const string s6_quals_aligned = "vvv?]?]!!!?]?@xxx";
-
-    const string s1_quals_aligned_clipped = "?]?]!!!?]?@";
-    const string s2_quals_aligned_clipped = "?]?]!87!!?]?@";
-    const string s3_quals_aligned_clipped = "?]?]!!!87!!!!?]?@";
-    const string s4_quals_aligned_clipped = "?]?]!!!?]?@";
-    const string s5_quals_aligned_clipped = "?]?]!!!?]?@";
-    const string s6_quals_aligned_clipped = "?]?]!!!?]?@";
-
-    const string s1_revquals = "@?]?]?]?";
-    const string s2_revquals = "@?]?78]?]?";
-    const string s3_revquals = "@?]?78]?]?";
-    const string s4_revquals = "xxx@?]?]?]?vvv";
-    const string s5_revquals = "@?]?]?]?";
-    const string s6_revquals = "xxx@?]?]?]?vvv";
-
-    const string s1_revquals_aligned = "@?]?!!!]?]?";
-    const string s2_revquals_aligned = "@?]?!78!!]?]?";
-    const string s3_revquals_aligned = "@?]?!!!78!!!!]?]?";
-    const string s4_revquals_aligned = "xxx@?]?!!!]?]?vvv";
-    const string s5_revquals_aligned = "@?]?!!!]?]?";
-    const string s6_revquals_aligned = "xxx@?]?!!!]?]?vvv";
-
-    const string s1_revquals_aligned_clipped = "@?]?!!!]?]?";
-    const string s2_revquals_aligned_clipped = "@?]?!78!!]?]?";
-    const string s3_revquals_aligned_clipped = "@?]?!!!78!!!!]?]?";
-    const string s4_revquals_aligned_clipped = "@?]?!!!]?]?";
-    const string s5_revquals_aligned_clipped = "@?]?!!!]?]?";
-    const string s6_revquals_aligned_clipped = "@?]?!!!]?]?";
-
-    const BamRecord s1 = tests::MakeCigaredQualRecord(s1_quals, s1_cigar, false);
-    const BamRecord s2 = tests::MakeCigaredQualRecord(s2_quals, s2_cigar, false);
-    const BamRecord s3 = tests::MakeCigaredQualRecord(s3_quals, s3_cigar, false);
-    const BamRecord s4 = tests::MakeCigaredQualRecord(s4_quals, s4_cigar, false);
-    const BamRecord s5 = tests::MakeCigaredQualRecord(s5_quals, s5_cigar, false);
-    const BamRecord s6 = tests::MakeCigaredQualRecord(s6_quals, s6_cigar, false);
-    const BamRecord s1_reverse = tests::MakeCigaredQualRecord(s1_quals, s1_cigar, true);
-    const BamRecord s2_reverse = tests::MakeCigaredQualRecord(s2_quals, s2_cigar, true);
-    const BamRecord s3_reverse = tests::MakeCigaredQualRecord(s3_quals, s3_cigar, true);
-    const BamRecord s4_reverse = tests::MakeCigaredQualRecord(s4_quals, s4_cigar, true);
-    const BamRecord s5_reverse = tests::MakeCigaredQualRecord(s5_quals, s5_cigar, true);
-    const BamRecord s6_reverse = tests::MakeCigaredQualRecord(s6_quals, s6_cigar, true);
-
-    // ----------------
-    // forward strand
-    // ----------------
-
-    //  - "native" == "genomic"
-    EXPECT_EQ(s1.DeletionQV(Orientation::NATIVE), s1.DeletionQV(Orientation::GENOMIC));
-    EXPECT_EQ(s2.DeletionQV(Orientation::NATIVE), s2.DeletionQV(Orientation::GENOMIC));
-    EXPECT_EQ(s3.DeletionQV(Orientation::NATIVE), s3.DeletionQV(Orientation::GENOMIC));
-    EXPECT_EQ(s4.DeletionQV(Orientation::NATIVE), s4.DeletionQV(Orientation::GENOMIC));
-    EXPECT_EQ(s5.DeletionQV(Orientation::NATIVE), s5.DeletionQV(Orientation::GENOMIC));
-    EXPECT_EQ(s6.DeletionQV(Orientation::NATIVE), s6.DeletionQV(Orientation::GENOMIC));
-
-    EXPECT_EQ(s1.InsertionQV(Orientation::NATIVE), s1.InsertionQV(Orientation::GENOMIC));
-    EXPECT_EQ(s2.InsertionQV(Orientation::NATIVE), s2.InsertionQV(Orientation::GENOMIC));
-    EXPECT_EQ(s3.InsertionQV(Orientation::NATIVE), s3.InsertionQV(Orientation::GENOMIC));
-    EXPECT_EQ(s4.InsertionQV(Orientation::NATIVE), s4.InsertionQV(Orientation::GENOMIC));
-    EXPECT_EQ(s5.InsertionQV(Orientation::NATIVE), s5.InsertionQV(Orientation::GENOMIC));
-    EXPECT_EQ(s6.InsertionQV(Orientation::NATIVE), s6.InsertionQV(Orientation::GENOMIC));
-
-    EXPECT_EQ(s1.MergeQV(Orientation::NATIVE), s1.MergeQV(Orientation::GENOMIC));
-    EXPECT_EQ(s2.MergeQV(Orientation::NATIVE), s2.MergeQV(Orientation::GENOMIC));
-    EXPECT_EQ(s3.MergeQV(Orientation::NATIVE), s3.MergeQV(Orientation::GENOMIC));
-    EXPECT_EQ(s4.MergeQV(Orientation::NATIVE), s4.MergeQV(Orientation::GENOMIC));
-    EXPECT_EQ(s5.MergeQV(Orientation::NATIVE), s5.MergeQV(Orientation::GENOMIC));
-    EXPECT_EQ(s6.MergeQV(Orientation::NATIVE), s6.MergeQV(Orientation::GENOMIC));
-
-    EXPECT_EQ(s1.SubstitutionQV(Orientation::NATIVE), s1.SubstitutionQV(Orientation::GENOMIC));
-    EXPECT_EQ(s2.SubstitutionQV(Orientation::NATIVE), s2.SubstitutionQV(Orientation::GENOMIC));
-    EXPECT_EQ(s3.SubstitutionQV(Orientation::NATIVE), s3.SubstitutionQV(Orientation::GENOMIC));
-    EXPECT_EQ(s4.SubstitutionQV(Orientation::NATIVE), s4.SubstitutionQV(Orientation::GENOMIC));
-    EXPECT_EQ(s5.SubstitutionQV(Orientation::NATIVE), s5.SubstitutionQV(Orientation::GENOMIC));
-    EXPECT_EQ(s6.SubstitutionQV(Orientation::NATIVE), s6.SubstitutionQV(Orientation::GENOMIC));
-
-    //  - unaligned, unclipped genomic output == genomic input
-    EXPECT_EQ(s1_quals, s1.DeletionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s2_quals, s2.DeletionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s3_quals, s3.DeletionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s4_quals, s4.DeletionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s5_quals, s5.DeletionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s6_quals, s6.DeletionQV(Orientation::GENOMIC).Fastq());
-
-    EXPECT_EQ(s1_quals, s1.InsertionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s2_quals, s2.InsertionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s3_quals, s3.InsertionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s4_quals, s4.InsertionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s5_quals, s5.InsertionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s6_quals, s6.InsertionQV(Orientation::GENOMIC).Fastq());
-
-    EXPECT_EQ(s1_quals, s1.MergeQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s2_quals, s2.MergeQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s3_quals, s3.MergeQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s4_quals, s4.MergeQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s5_quals, s5.MergeQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s6_quals, s6.MergeQV(Orientation::GENOMIC).Fastq());
-
-    EXPECT_EQ(s1_quals, s1.SubstitutionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s2_quals, s2.SubstitutionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s3_quals, s3.SubstitutionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s4_quals, s4.SubstitutionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s5_quals, s5.SubstitutionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(s6_quals, s6.SubstitutionQV(Orientation::GENOMIC).Fastq());
-
-    //  - aligned, unclipped genomic output == aligned, unclipped genomic input
-    EXPECT_EQ(s1_quals_aligned, s1.DeletionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s2_quals_aligned, s2.DeletionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s3_quals_aligned, s3.DeletionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s4_quals_aligned, s4.DeletionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s5_quals_aligned, s5.DeletionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s6_quals_aligned, s6.DeletionQV(Orientation::GENOMIC, true, false).Fastq());
-
-    EXPECT_EQ(s1_quals_aligned, s1.MergeQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s2_quals_aligned, s2.MergeQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s3_quals_aligned, s3.MergeQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s4_quals_aligned, s4.MergeQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s5_quals_aligned, s5.MergeQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s6_quals_aligned, s6.MergeQV(Orientation::GENOMIC, true, false).Fastq());
-
-    EXPECT_EQ(s1_quals_aligned, s1.InsertionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s2_quals_aligned, s2.InsertionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s3_quals_aligned, s3.InsertionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s4_quals_aligned, s4.InsertionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s5_quals_aligned, s5.InsertionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s6_quals_aligned, s6.InsertionQV(Orientation::GENOMIC, true, false).Fastq());
-
-    EXPECT_EQ(s1_quals_aligned, s1.SubstitutionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s2_quals_aligned, s2.SubstitutionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s3_quals_aligned, s3.SubstitutionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s4_quals_aligned, s4.SubstitutionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s5_quals_aligned, s5.SubstitutionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s6_quals_aligned, s6.SubstitutionQV(Orientation::GENOMIC, true, false).Fastq());
-
-    //  - aligned, clipped genomic output == aligned, clipped genomic output
-    EXPECT_EQ(s1_quals_aligned_clipped, s1.DeletionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s2_quals_aligned_clipped, s2.DeletionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s3_quals_aligned_clipped, s3.DeletionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s4_quals_aligned_clipped, s4.DeletionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s5_quals_aligned_clipped, s5.DeletionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s6_quals_aligned_clipped, s6.DeletionQV(Orientation::GENOMIC, true, true).Fastq());
-
-    EXPECT_EQ(s1_quals_aligned_clipped, s1.MergeQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s2_quals_aligned_clipped, s2.MergeQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s3_quals_aligned_clipped, s3.MergeQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s4_quals_aligned_clipped, s4.MergeQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s5_quals_aligned_clipped, s5.MergeQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s6_quals_aligned_clipped, s6.MergeQV(Orientation::GENOMIC, true, true).Fastq());
-
-    EXPECT_EQ(s1_quals_aligned_clipped, s1.InsertionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s2_quals_aligned_clipped, s2.InsertionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s3_quals_aligned_clipped, s3.InsertionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s4_quals_aligned_clipped, s4.InsertionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s5_quals_aligned_clipped, s5.InsertionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s6_quals_aligned_clipped, s6.InsertionQV(Orientation::GENOMIC, true, true).Fastq());
-
-    EXPECT_EQ(s1_quals_aligned_clipped, s1.SubstitutionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s2_quals_aligned_clipped, s2.SubstitutionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s3_quals_aligned_clipped, s3.SubstitutionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s4_quals_aligned_clipped, s4.SubstitutionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s5_quals_aligned_clipped, s5.SubstitutionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s6_quals_aligned_clipped, s6.SubstitutionQV(Orientation::GENOMIC, true, true).Fastq());
-
-    // ----------------
-    // reverse strand
-    // ----------------
-
-    //  - "native" != "genomic"
-    EXPECT_NE(s1_reverse.DeletionQV(Orientation::NATIVE), s1_reverse.DeletionQV(Orientation::GENOMIC));
-    EXPECT_NE(s2_reverse.DeletionQV(Orientation::NATIVE), s2_reverse.DeletionQV(Orientation::GENOMIC));
-    EXPECT_NE(s3_reverse.DeletionQV(Orientation::NATIVE), s3_reverse.DeletionQV(Orientation::GENOMIC));
-    EXPECT_NE(s4_reverse.DeletionQV(Orientation::NATIVE), s4_reverse.DeletionQV(Orientation::GENOMIC));
-    EXPECT_NE(s5_reverse.DeletionQV(Orientation::NATIVE), s5_reverse.DeletionQV(Orientation::GENOMIC));
-    EXPECT_NE(s6_reverse.DeletionQV(Orientation::NATIVE), s6_reverse.DeletionQV(Orientation::GENOMIC));
-
-    EXPECT_NE(s1_reverse.InsertionQV(Orientation::NATIVE), s1_reverse.InsertionQV(Orientation::GENOMIC));
-    EXPECT_NE(s2_reverse.InsertionQV(Orientation::NATIVE), s2_reverse.InsertionQV(Orientation::GENOMIC));
-    EXPECT_NE(s3_reverse.InsertionQV(Orientation::NATIVE), s3_reverse.InsertionQV(Orientation::GENOMIC));
-    EXPECT_NE(s4_reverse.InsertionQV(Orientation::NATIVE), s4_reverse.InsertionQV(Orientation::GENOMIC));
-    EXPECT_NE(s5_reverse.InsertionQV(Orientation::NATIVE), s5_reverse.InsertionQV(Orientation::GENOMIC));
-    EXPECT_NE(s6_reverse.InsertionQV(Orientation::NATIVE), s6_reverse.InsertionQV(Orientation::GENOMIC));
-
-    EXPECT_NE(s1_reverse.MergeQV(Orientation::NATIVE), s1_reverse.MergeQV(Orientation::GENOMIC));
-    EXPECT_NE(s2_reverse.MergeQV(Orientation::NATIVE), s2_reverse.MergeQV(Orientation::GENOMIC));
-    EXPECT_NE(s3_reverse.MergeQV(Orientation::NATIVE), s3_reverse.MergeQV(Orientation::GENOMIC));
-    EXPECT_NE(s4_reverse.MergeQV(Orientation::NATIVE), s4_reverse.MergeQV(Orientation::GENOMIC));
-    EXPECT_NE(s5_reverse.MergeQV(Orientation::NATIVE), s5_reverse.MergeQV(Orientation::GENOMIC));
-    EXPECT_NE(s6_reverse.MergeQV(Orientation::NATIVE), s6_reverse.MergeQV(Orientation::GENOMIC));
-
-    EXPECT_NE(s1_reverse.SubstitutionQV(Orientation::NATIVE), s1_reverse.SubstitutionQV(Orientation::GENOMIC));
-    EXPECT_NE(s2_reverse.SubstitutionQV(Orientation::NATIVE), s2_reverse.SubstitutionQV(Orientation::GENOMIC));
-    EXPECT_NE(s3_reverse.SubstitutionQV(Orientation::NATIVE), s3_reverse.SubstitutionQV(Orientation::GENOMIC));
-    EXPECT_NE(s4_reverse.SubstitutionQV(Orientation::NATIVE), s4_reverse.SubstitutionQV(Orientation::GENOMIC));
-    EXPECT_NE(s5_reverse.SubstitutionQV(Orientation::NATIVE), s5_reverse.SubstitutionQV(Orientation::GENOMIC));
-    EXPECT_NE(s6_reverse.SubstitutionQV(Orientation::NATIVE), s6_reverse.SubstitutionQV(Orientation::GENOMIC));
-
-    //  - unaligned, unclipped genomic output (rev-comp of native input)
-    EXPECT_EQ(s1_revquals, s1_reverse.DeletionQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s2_revquals, s2_reverse.DeletionQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s3_revquals, s3_reverse.DeletionQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s4_revquals, s4_reverse.DeletionQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s5_revquals, s5_reverse.DeletionQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s6_revquals, s6_reverse.DeletionQV(Orientation::GENOMIC, false, false).Fastq());
-
-    EXPECT_EQ(s1_revquals, s1_reverse.InsertionQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s2_revquals, s2_reverse.InsertionQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s3_revquals, s3_reverse.InsertionQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s4_revquals, s4_reverse.InsertionQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s5_revquals, s5_reverse.InsertionQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s6_revquals, s6_reverse.InsertionQV(Orientation::GENOMIC, false, false).Fastq());
-
-    EXPECT_EQ(s1_revquals, s1_reverse.MergeQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s2_revquals, s2_reverse.MergeQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s3_revquals, s3_reverse.MergeQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s4_revquals, s4_reverse.MergeQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s5_revquals, s5_reverse.MergeQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s6_revquals, s6_reverse.MergeQV(Orientation::GENOMIC, false, false).Fastq());
-
-    EXPECT_EQ(s1_revquals, s1_reverse.SubstitutionQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s2_revquals, s2_reverse.SubstitutionQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s3_revquals, s3_reverse.SubstitutionQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s4_revquals, s4_reverse.SubstitutionQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s5_revquals, s5_reverse.SubstitutionQV(Orientation::GENOMIC, false, false).Fastq());
-    EXPECT_EQ(s6_revquals, s6_reverse.SubstitutionQV(Orientation::GENOMIC, false, false).Fastq());
-
-    //  - unaligned, unclipped native output (native input)
-    EXPECT_EQ(s1_quals, s1_reverse.DeletionQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s2_quals, s2_reverse.DeletionQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s3_quals, s3_reverse.DeletionQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s4_quals, s4_reverse.DeletionQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s5_quals, s5_reverse.DeletionQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s6_quals, s6_reverse.DeletionQV(Orientation::NATIVE, false, false).Fastq());
-
-    EXPECT_EQ(s1_quals, s1_reverse.InsertionQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s2_quals, s2_reverse.InsertionQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s3_quals, s3_reverse.InsertionQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s4_quals, s4_reverse.InsertionQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s5_quals, s5_reverse.InsertionQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s6_quals, s6_reverse.InsertionQV(Orientation::NATIVE, false, false).Fastq());
-
-    EXPECT_EQ(s1_quals, s1_reverse.MergeQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s2_quals, s2_reverse.MergeQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s3_quals, s3_reverse.MergeQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s4_quals, s4_reverse.MergeQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s5_quals, s5_reverse.MergeQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s6_quals, s6_reverse.MergeQV(Orientation::NATIVE, false, false).Fastq());
-
-    EXPECT_EQ(s1_quals, s1_reverse.SubstitutionQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s2_quals, s2_reverse.SubstitutionQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s3_quals, s3_reverse.SubstitutionQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s4_quals, s4_reverse.SubstitutionQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s5_quals, s5_reverse.SubstitutionQV(Orientation::NATIVE, false, false).Fastq());
-    EXPECT_EQ(s6_quals, s6_reverse.SubstitutionQV(Orientation::NATIVE, false, false).Fastq());
-
-    //  - aligned, unclipped genomic output (rev-comp of native input)
-    EXPECT_EQ(s1_revquals_aligned, s1_reverse.DeletionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s2_revquals_aligned, s2_reverse.DeletionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s3_revquals_aligned, s3_reverse.DeletionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s4_revquals_aligned, s4_reverse.DeletionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s5_revquals_aligned, s5_reverse.DeletionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s6_revquals_aligned, s6_reverse.DeletionQV(Orientation::GENOMIC, true, false).Fastq());
-
-    EXPECT_EQ(s1_revquals_aligned, s1_reverse.InsertionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s2_revquals_aligned, s2_reverse.InsertionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s3_revquals_aligned, s3_reverse.InsertionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s4_revquals_aligned, s4_reverse.InsertionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s5_revquals_aligned, s5_reverse.InsertionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s6_revquals_aligned, s6_reverse.InsertionQV(Orientation::GENOMIC, true, false).Fastq());
-
-    EXPECT_EQ(s1_revquals_aligned, s1_reverse.MergeQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s2_revquals_aligned, s2_reverse.MergeQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s3_revquals_aligned, s3_reverse.MergeQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s4_revquals_aligned, s4_reverse.MergeQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s5_revquals_aligned, s5_reverse.MergeQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s6_revquals_aligned, s6_reverse.MergeQV(Orientation::GENOMIC, true, false).Fastq());
-
-    EXPECT_EQ(s1_revquals_aligned, s1_reverse.SubstitutionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s2_revquals_aligned, s2_reverse.SubstitutionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s3_revquals_aligned, s3_reverse.SubstitutionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s4_revquals_aligned, s4_reverse.SubstitutionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s5_revquals_aligned, s5_reverse.SubstitutionQV(Orientation::GENOMIC, true, false).Fastq());
-    EXPECT_EQ(s6_revquals_aligned, s6_reverse.SubstitutionQV(Orientation::GENOMIC, true, false).Fastq());
-
-    //  - aligned, unclipped native output (native input)
-    EXPECT_EQ(s1_quals_aligned, s1_reverse.DeletionQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s2_quals_aligned, s2_reverse.DeletionQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s3_quals_aligned, s3_reverse.DeletionQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s4_quals_aligned, s4_reverse.DeletionQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s5_quals_aligned, s5_reverse.DeletionQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s6_quals_aligned, s6_reverse.DeletionQV(Orientation::NATIVE, true, false).Fastq());
-
-    EXPECT_EQ(s1_quals_aligned, s1_reverse.InsertionQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s2_quals_aligned, s2_reverse.InsertionQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s3_quals_aligned, s3_reverse.InsertionQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s4_quals_aligned, s4_reverse.InsertionQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s5_quals_aligned, s5_reverse.InsertionQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s6_quals_aligned, s6_reverse.InsertionQV(Orientation::NATIVE, true, false).Fastq());
-
-    EXPECT_EQ(s1_quals_aligned, s1_reverse.MergeQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s2_quals_aligned, s2_reverse.MergeQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s3_quals_aligned, s3_reverse.MergeQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s4_quals_aligned, s4_reverse.MergeQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s5_quals_aligned, s5_reverse.MergeQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s6_quals_aligned, s6_reverse.MergeQV(Orientation::NATIVE, true, false).Fastq());
-
-    EXPECT_EQ(s1_quals_aligned, s1_reverse.SubstitutionQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s2_quals_aligned, s2_reverse.SubstitutionQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s3_quals_aligned, s3_reverse.SubstitutionQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s4_quals_aligned, s4_reverse.SubstitutionQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s5_quals_aligned, s5_reverse.SubstitutionQV(Orientation::NATIVE, true, false).Fastq());
-    EXPECT_EQ(s6_quals_aligned, s6_reverse.SubstitutionQV(Orientation::NATIVE, true, false).Fastq());
-
-    //  - aligned, clipped genomic output (rev-comp of native input)
-    EXPECT_EQ(s1_revquals_aligned_clipped, s1_reverse.DeletionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s2_revquals_aligned_clipped, s2_reverse.DeletionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s3_revquals_aligned_clipped, s3_reverse.DeletionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s4_revquals_aligned_clipped, s4_reverse.DeletionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s5_revquals_aligned_clipped, s5_reverse.DeletionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s6_revquals_aligned_clipped, s6_reverse.DeletionQV(Orientation::GENOMIC, true, true).Fastq());
-
-    EXPECT_EQ(s1_revquals_aligned_clipped, s1_reverse.InsertionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s2_revquals_aligned_clipped, s2_reverse.InsertionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s3_revquals_aligned_clipped, s3_reverse.InsertionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s4_revquals_aligned_clipped, s4_reverse.InsertionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s5_revquals_aligned_clipped, s5_reverse.InsertionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s6_revquals_aligned_clipped, s6_reverse.InsertionQV(Orientation::GENOMIC, true, true).Fastq());
-
-    EXPECT_EQ(s1_revquals_aligned_clipped, s1_reverse.MergeQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s2_revquals_aligned_clipped, s2_reverse.MergeQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s3_revquals_aligned_clipped, s3_reverse.MergeQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s4_revquals_aligned_clipped, s4_reverse.MergeQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s5_revquals_aligned_clipped, s5_reverse.MergeQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s6_revquals_aligned_clipped, s6_reverse.MergeQV(Orientation::GENOMIC, true, true).Fastq());
-
-    EXPECT_EQ(s1_revquals_aligned_clipped, s1_reverse.SubstitutionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s2_revquals_aligned_clipped, s2_reverse.SubstitutionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s3_revquals_aligned_clipped, s3_reverse.SubstitutionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s4_revquals_aligned_clipped, s4_reverse.SubstitutionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s5_revquals_aligned_clipped, s5_reverse.SubstitutionQV(Orientation::GENOMIC, true, true).Fastq());
-    EXPECT_EQ(s6_revquals_aligned_clipped, s6_reverse.SubstitutionQV(Orientation::GENOMIC, true, true).Fastq());
-
-    //  - aligned, clipped native output (native input)
-    EXPECT_EQ(s1_quals_aligned_clipped, s1_reverse.DeletionQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s2_quals_aligned_clipped, s2_reverse.DeletionQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s3_quals_aligned_clipped, s3_reverse.DeletionQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s4_quals_aligned_clipped, s4_reverse.DeletionQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s5_quals_aligned_clipped, s5_reverse.DeletionQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s6_quals_aligned_clipped, s6_reverse.DeletionQV(Orientation::NATIVE, true, true).Fastq());
-
-    EXPECT_EQ(s1_quals_aligned_clipped, s1_reverse.InsertionQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s2_quals_aligned_clipped, s2_reverse.InsertionQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s3_quals_aligned_clipped, s3_reverse.InsertionQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s4_quals_aligned_clipped, s4_reverse.InsertionQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s5_quals_aligned_clipped, s5_reverse.InsertionQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s6_quals_aligned_clipped, s6_reverse.InsertionQV(Orientation::NATIVE, true, true).Fastq());
-
-    EXPECT_EQ(s1_quals_aligned_clipped, s1_reverse.MergeQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s2_quals_aligned_clipped, s2_reverse.MergeQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s3_quals_aligned_clipped, s3_reverse.MergeQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s4_quals_aligned_clipped, s4_reverse.MergeQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s5_quals_aligned_clipped, s5_reverse.MergeQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s6_quals_aligned_clipped, s6_reverse.MergeQV(Orientation::NATIVE, true, true).Fastq());
-
-    EXPECT_EQ(s1_quals_aligned_clipped, s1_reverse.SubstitutionQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s2_quals_aligned_clipped, s2_reverse.SubstitutionQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s3_quals_aligned_clipped, s3_reverse.SubstitutionQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s4_quals_aligned_clipped, s4_reverse.SubstitutionQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s5_quals_aligned_clipped, s5_reverse.SubstitutionQV(Orientation::NATIVE, true, true).Fastq());
-    EXPECT_EQ(s6_quals_aligned_clipped, s6_reverse.SubstitutionQV(Orientation::NATIVE, true, true).Fastq());
+    {
+        SCOPED_TRACE("CIGAR: 4=3D4=");
+        tests::CheckQualityTagsClippedAndAligned(
+            "4=3D4=",           // CIGAR
+            "?]?]?]?@",         // input
+            {
+                "?]?]?]?@",     // forward strand, genomic
+                "?]?]?]?@",     // forward strand, native
+                "?]?]!!!?]?@",  // forward strand, genomic, aligned
+                "?]?]!!!?]?@",  // forward strand, native,  aligned
+                "?]?]!!!?]?@",  // forward strand, genomic, aligned + clipped
+                "?]?]!!!?]?@",  // forward strand, native,  aligned + clipped
+                "@?]?]?]?",     // reverse strand, genomic
+                "?]?]?]?@",     // reverse strand, native
+                "@?]?!!!]?]?",  // reverse strand, genomic, aligned
+                "?]?]!!!?]?@",  // reverse strand, native,  aligned
+                "@?]?!!!]?]?",  // reverse strand, genomic, aligned + clipped
+                "?]?]!!!?]?@"   // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
+        tests::CheckQualityTagsClippedAndAligned(
+            "4=1D2I2D4=",           // CIGAR
+            "?]?]87?]?@",           // input
+            {
+                "?]?]87?]?@",       // forward strand, genomic
+                "?]?]87?]?@",       // forward strand, native
+                "?]?]!87!!?]?@",    // forward strand, genomic, aligned
+                "?]?]!87!!?]?@",    // forward strand, native,  aligned
+                "?]?]!87!!?]?@",    // forward strand, genomic, aligned + clipped
+                "?]?]!87!!?]?@",    // forward strand, native,  aligned + clipped
+                "@?]?78]?]?",       // reverse strand, genomic
+                "?]?]87?]?@",       // reverse strand, native
+                "@?]?!78!!]?]?",    // reverse strand, genomic, aligned
+                "?]?]!!87!?]?@",    // reverse strand, native,  aligned
+                "@?]?!78!!]?]?",    // reverse strand, genomic, aligned + clipped
+                "?]?]!!87!?]?@"     // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
+        tests::CheckQualityTagsClippedAndAligned(
+            "4=1D2P2I2P2D4=",       // CIGAR
+            "?]?]87?]?@",           // input
+        {
+            "?]?]87?]?@",           // forward strand, genomic
+            "?]?]87?]?@",           // forward strand, native
+            "?]?]!!!87!!!!?]?@",    // forward strand, genomic, aligned
+            "?]?]!!!87!!!!?]?@",    // forward strand, native,  aligned
+            "?]?]!!!87!!!!?]?@",    // forward strand, genomic, aligned + clipped
+            "?]?]!!!87!!!!?]?@",    // forward strand, native,  aligned + clipped
+            "@?]?78]?]?",           // reverse strand, genomic
+            "?]?]87?]?@",           // reverse strand, native
+            "@?]?!!!78!!!!]?]?",    // reverse strand, genomic, aligned
+            "?]?]!!!!87!!!?]?@",    // reverse strand, native,  aligned
+            "@?]?!!!78!!!!]?]?",    // reverse strand, genomic, aligned + clipped
+            "?]?]!!!!87!!!?]?@"     // reverse strand, native,  aligned + clipped
+        }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 3S4=3D4=3S");
+        tests::CheckQualityTagsClippedAndAligned(
+            "3S4=3D4=3S",               // CIGAR
+            "vvv?]?]?]?@xxx",           // input
+            {
+                "vvv?]?]?]?@xxx",       // forward strand, genomic
+                "vvv?]?]?]?@xxx",       // forward strand, native
+                "vvv?]?]!!!?]?@xxx",    // forward strand, genomic, aligned
+                "vvv?]?]!!!?]?@xxx",    // forward strand, native, aligned
+                "?]?]!!!?]?@",          // forward strand, genomic, aligned, clipped
+                "?]?]!!!?]?@",          // forward strand, native, aligned, clipped
+                "xxx@?]?]?]?vvv",       // reverse strand, genomic
+                "vvv?]?]?]?@xxx",       // reverse strand, native
+                "xxx@?]?!!!]?]?vvv",    // reverse strand, genomic, aligned
+                "vvv?]?]!!!?]?@xxx",    // reverse strand, native, aligned
+                "@?]?!!!]?]?",          // reverse strand, genomic, aligned, clipped
+                "?]?]!!!?]?@"           // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
+        tests::CheckQualityTagsClippedAndAligned(
+            "2H4=3D4=3H",       // CIGAR
+            "?]?]?]?@",         // input
+            {
+                "?]?]?]?@",     // forward strand, genomic
+                "?]?]?]?@",     // forward strand, native
+                "?]?]!!!?]?@",  // forward strand, genomic, aligned
+                "?]?]!!!?]?@",  // forward strand, native, aligned
+                "?]?]!!!?]?@",  // forward strand, genomic, aligned, clipped
+                "?]?]!!!?]?@",  // forward strand, native, aligned, clipped
+                "@?]?]?]?",     // reverse strand, genomic
+                "?]?]?]?@",     // reverse strand, native
+                "@?]?!!!]?]?",  // reverse strand, genomic, aligned
+                "?]?]!!!?]?@",  // reverse strand, native, aligned
+                "@?]?!!!]?]?",  // reverse strand, genomic, aligned, clipped
+                "?]?]!!!?]?@"   // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H3S4=3D4=3S3H");
+        tests::CheckQualityTagsClippedAndAligned(
+            "2H3S4=3D4=3S3H",           // CIGAR
+            "vvv?]?]?]?@xxx",           // input
+            {
+                "vvv?]?]?]?@xxx",       // forward strand, genomic
+                "vvv?]?]?]?@xxx",       // forward strand, native
+                "vvv?]?]!!!?]?@xxx",    // forward strand, genomic, aligned
+                "vvv?]?]!!!?]?@xxx",    // forward strand, native, aligned
+                "?]?]!!!?]?@",          // forward strand, genomic, aligned, clipped
+                "?]?]!!!?]?@",          // forward strand, native, aligned, clipped
+                "xxx@?]?]?]?vvv",       // reverse strand, genomic
+                "vvv?]?]?]?@xxx",       // reverse strand, native
+                "xxx@?]?!!!]?]?vvv",    // reverse strand, genomic, aligned
+                "vvv?]?]!!!?]?@xxx",    // reverse strand, native, aligned
+                "@?]?!!!]?]?",          // reverse strand, genomic, aligned, clipped
+                "?]?]!!!?]?@"           // reverse strand, native, aligned, clipped
+            }
+        );
+    }
 }
 
 TEST(BamRecordTest, BaseTagsClippedAndAligned)
 {
-    const string s1_cigar = "4=3D4=";
-    const string s2_cigar = "4=1D2I2D4=";
-    const string s3_cigar = "4=1D2P2I2P2D4=";
-    const string s4_cigar = "3S4=3D4=3S";
-    const string s5_cigar = "2H4=3D4=3H";
-    const string s6_cigar = "2H3S4=3D4=3S3H";
-
-    const string s1_seq = "AACCGTTA";
-    const string s2_seq = "ATCCTAGGTT";
-    const string s3_seq = "ATCCTAGGTT";
-    const string s4_seq = "TTTAACCGTTACCG";
-    const string s5_seq = "AACCGTTA";
-    const string s6_seq = "TTTAACCGTTACCG";
-
-    const string s1_seq_aligned = "AACC---GTTA";
-    const string s2_seq_aligned = "ATCC-TA--GGTT";
-    const string s3_seq_aligned = "ATCC-**TA**--GGTT";
-    const string s4_seq_aligned = "TTTAACC---GTTACCG";
-    const string s5_seq_aligned = "AACC---GTTA";
-    const string s6_seq_aligned = "TTTAACC---GTTACCG";
-
-    const string s1_seq_aligned_clipped = "AACC---GTTA";
-    const string s2_seq_aligned_clipped = "ATCC-TA--GGTT";
-    const string s3_seq_aligned_clipped = "ATCC-**TA**--GGTT";
-    const string s4_seq_aligned_clipped = "AACC---GTTA";
-    const string s5_seq_aligned_clipped = "AACC---GTTA";
-    const string s6_seq_aligned_clipped = "AACC---GTTA";
-
-    const string s1_revseq = "TAACGGTT";
-    const string s2_revseq = "AACCTAGGAT";
-    const string s3_revseq = "AACCTAGGAT";
-    const string s4_revseq = "CGGTAACGGTTAAA";
-    const string s5_revseq = "TAACGGTT";
-    const string s6_revseq = "CGGTAACGGTTAAA";
-
-    const string s1_revseq_aligned = "TAAC---GGTT";
-    const string s2_revseq_aligned = "AACC-TA--GGAT";
-    const string s3_revseq_aligned = "AACC-**TA**--GGAT";
-    const string s4_revseq_aligned = "CGGTAAC---GGTTAAA";
-    const string s5_revseq_aligned = "TAAC---GGTT";
-    const string s6_revseq_aligned = "CGGTAAC---GGTTAAA";
-
-    const string s1_revseq_aligned_clipped = "TAAC---GGTT";
-    const string s2_revseq_aligned_clipped = "AACC-TA--GGAT";
-    const string s3_revseq_aligned_clipped = "AACC-**TA**--GGAT";
-    const string s4_revseq_aligned_clipped = "TAAC---GGTT";
-    const string s5_revseq_aligned_clipped = "TAAC---GGTT";
-    const string s6_revseq_aligned_clipped = "TAAC---GGTT";
-
-    const BamRecord s1 = tests::MakeCigaredBaseRecord(s1_seq, s1_cigar, false);
-    const BamRecord s2 = tests::MakeCigaredBaseRecord(s2_seq, s2_cigar, false);
-    const BamRecord s3 = tests::MakeCigaredBaseRecord(s3_seq, s3_cigar, false);
-    const BamRecord s4 = tests::MakeCigaredBaseRecord(s4_seq, s4_cigar, false);
-    const BamRecord s5 = tests::MakeCigaredBaseRecord(s5_seq, s5_cigar, false);
-    const BamRecord s6 = tests::MakeCigaredBaseRecord(s6_seq, s6_cigar, false);
-    const BamRecord s1_reverse = tests::MakeCigaredBaseRecord(s1_seq, s1_cigar, true);
-    const BamRecord s2_reverse = tests::MakeCigaredBaseRecord(s2_seq, s2_cigar, true);
-    const BamRecord s3_reverse = tests::MakeCigaredBaseRecord(s3_seq, s3_cigar, true);
-    const BamRecord s4_reverse = tests::MakeCigaredBaseRecord(s4_seq, s4_cigar, true);
-    const BamRecord s5_reverse = tests::MakeCigaredBaseRecord(s5_seq, s5_cigar, true);
-    const BamRecord s6_reverse = tests::MakeCigaredBaseRecord(s6_seq, s6_cigar, true);
-
-    // ----------------
-    // forward strand
-    // ----------------
-
-    //  - "native" == "genomic"
-    EXPECT_EQ(s1.DeletionTag(Orientation::NATIVE), s1.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s2.DeletionTag(Orientation::NATIVE), s2.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s3.DeletionTag(Orientation::NATIVE), s3.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s4.DeletionTag(Orientation::NATIVE), s4.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s5.DeletionTag(Orientation::NATIVE), s5.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s6.DeletionTag(Orientation::NATIVE), s6.DeletionTag(Orientation::GENOMIC));
-
-    EXPECT_EQ(s1.SubstitutionTag(Orientation::NATIVE), s1.SubstitutionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s2.SubstitutionTag(Orientation::NATIVE), s2.SubstitutionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s3.SubstitutionTag(Orientation::NATIVE), s3.SubstitutionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s4.SubstitutionTag(Orientation::NATIVE), s4.SubstitutionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s5.SubstitutionTag(Orientation::NATIVE), s5.SubstitutionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s6.SubstitutionTag(Orientation::NATIVE), s6.SubstitutionTag(Orientation::GENOMIC));
-
-    //  - unaligned, unclipped genomic output == genomic input
-    EXPECT_EQ(s1_seq, s1.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s2_seq, s2.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s3_seq, s3.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s4_seq, s4.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s5_seq, s5.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s6_seq, s6.DeletionTag(Orientation::GENOMIC));
-
-    EXPECT_EQ(s1_seq, s1.SubstitutionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s2_seq, s2.SubstitutionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s3_seq, s3.SubstitutionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s4_seq, s4.SubstitutionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s5_seq, s5.SubstitutionTag(Orientation::GENOMIC));
-    EXPECT_EQ(s6_seq, s6.SubstitutionTag(Orientation::GENOMIC));
-
-    //  - aligned, unclipped genomic output == aligned, unclipped genomic input
-    EXPECT_EQ(s1_seq_aligned, s1.DeletionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s2_seq_aligned, s2.DeletionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s3_seq_aligned, s3.DeletionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s4_seq_aligned, s4.DeletionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s5_seq_aligned, s5.DeletionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s6_seq_aligned, s6.DeletionTag(Orientation::GENOMIC, true, false));
-
-    EXPECT_EQ(s1_seq_aligned, s1.SubstitutionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s2_seq_aligned, s2.SubstitutionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s3_seq_aligned, s3.SubstitutionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s4_seq_aligned, s4.SubstitutionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s5_seq_aligned, s5.SubstitutionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s6_seq_aligned, s6.SubstitutionTag(Orientation::GENOMIC, true, false));
-
-    //  - aligned, clipped genomic output == aligned, clipped genomic output
-    EXPECT_EQ(s1_seq_aligned_clipped, s1.DeletionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s2_seq_aligned_clipped, s2.DeletionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s3_seq_aligned_clipped, s3.DeletionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s4_seq_aligned_clipped, s4.DeletionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s5_seq_aligned_clipped, s5.DeletionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s6_seq_aligned_clipped, s6.DeletionTag(Orientation::GENOMIC, true, true));
-
-    EXPECT_EQ(s1_seq_aligned_clipped, s1.SubstitutionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s2_seq_aligned_clipped, s2.SubstitutionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s3_seq_aligned_clipped, s3.SubstitutionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s4_seq_aligned_clipped, s4.SubstitutionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s5_seq_aligned_clipped, s5.SubstitutionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s6_seq_aligned_clipped, s6.SubstitutionTag(Orientation::GENOMIC, true, true));
-
-    // ----------------
-    // reverse strand
-    // ----------------
-
-    //  - "native" != "genomic"
-    EXPECT_NE(s1_reverse.DeletionTag(Orientation::NATIVE), s1_reverse.DeletionTag(Orientation::GENOMIC));
-    EXPECT_NE(s2_reverse.DeletionTag(Orientation::NATIVE), s2_reverse.DeletionTag(Orientation::GENOMIC));
-    EXPECT_NE(s3_reverse.DeletionTag(Orientation::NATIVE), s3_reverse.DeletionTag(Orientation::GENOMIC));
-    EXPECT_NE(s4_reverse.DeletionTag(Orientation::NATIVE), s4_reverse.DeletionTag(Orientation::GENOMIC));
-    EXPECT_NE(s5_reverse.DeletionTag(Orientation::NATIVE), s5_reverse.DeletionTag(Orientation::GENOMIC));
-    EXPECT_NE(s6_reverse.DeletionTag(Orientation::NATIVE), s6_reverse.DeletionTag(Orientation::GENOMIC));
-
-    EXPECT_NE(s1_reverse.SubstitutionTag(Orientation::NATIVE), s1_reverse.SubstitutionTag(Orientation::GENOMIC));
-    EXPECT_NE(s2_reverse.SubstitutionTag(Orientation::NATIVE), s2_reverse.SubstitutionTag(Orientation::GENOMIC));
-    EXPECT_NE(s3_reverse.SubstitutionTag(Orientation::NATIVE), s3_reverse.SubstitutionTag(Orientation::GENOMIC));
-    EXPECT_NE(s4_reverse.SubstitutionTag(Orientation::NATIVE), s4_reverse.SubstitutionTag(Orientation::GENOMIC));
-    EXPECT_NE(s5_reverse.SubstitutionTag(Orientation::NATIVE), s5_reverse.SubstitutionTag(Orientation::GENOMIC));
-    EXPECT_NE(s6_reverse.SubstitutionTag(Orientation::NATIVE), s6_reverse.SubstitutionTag(Orientation::GENOMIC));
-
-    //  - unaligned, unclipped genomic output (rev-comp of native input)
-    EXPECT_EQ(s1_revseq, s1_reverse.DeletionTag(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s2_revseq, s2_reverse.DeletionTag(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s3_revseq, s3_reverse.DeletionTag(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s4_revseq, s4_reverse.DeletionTag(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s5_revseq, s5_reverse.DeletionTag(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s6_revseq, s6_reverse.DeletionTag(Orientation::GENOMIC, false, false));
-
-    EXPECT_EQ(s1_revseq, s1_reverse.SubstitutionTag(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s2_revseq, s2_reverse.SubstitutionTag(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s3_revseq, s3_reverse.SubstitutionTag(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s4_revseq, s4_reverse.SubstitutionTag(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s5_revseq, s5_reverse.SubstitutionTag(Orientation::GENOMIC, false, false));
-    EXPECT_EQ(s6_revseq, s6_reverse.SubstitutionTag(Orientation::GENOMIC, false, false));
-
-    //  - unaligned, unclipped native output (native input)
-    EXPECT_EQ(s1_seq, s1_reverse.DeletionTag(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s2_seq, s2_reverse.DeletionTag(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s3_seq, s3_reverse.DeletionTag(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s4_seq, s4_reverse.DeletionTag(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s5_seq, s5_reverse.DeletionTag(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s6_seq, s6_reverse.DeletionTag(Orientation::NATIVE, false, false));
-
-    EXPECT_EQ(s1_seq, s1_reverse.SubstitutionTag(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s2_seq, s2_reverse.SubstitutionTag(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s3_seq, s3_reverse.SubstitutionTag(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s4_seq, s4_reverse.SubstitutionTag(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s5_seq, s5_reverse.SubstitutionTag(Orientation::NATIVE, false, false));
-    EXPECT_EQ(s6_seq, s6_reverse.SubstitutionTag(Orientation::NATIVE, false, false));
-
-    //  - aligned, unclipped genomic output (rev-comp of native input)
-    EXPECT_EQ(s1_revseq_aligned, s1_reverse.DeletionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s2_revseq_aligned, s2_reverse.DeletionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s3_revseq_aligned, s3_reverse.DeletionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s4_revseq_aligned, s4_reverse.DeletionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s5_revseq_aligned, s5_reverse.DeletionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s6_revseq_aligned, s6_reverse.DeletionTag(Orientation::GENOMIC, true, false));
-
-    EXPECT_EQ(s1_revseq_aligned, s1_reverse.SubstitutionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s2_revseq_aligned, s2_reverse.SubstitutionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s3_revseq_aligned, s3_reverse.SubstitutionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s4_revseq_aligned, s4_reverse.SubstitutionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s5_revseq_aligned, s5_reverse.SubstitutionTag(Orientation::GENOMIC, true, false));
-    EXPECT_EQ(s6_revseq_aligned, s6_reverse.SubstitutionTag(Orientation::GENOMIC, true, false));
-
-    //  - aligned, unclipped native output (native input)
-    EXPECT_EQ(s1_seq_aligned, s1_reverse.DeletionTag(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s2_seq_aligned, s2_reverse.DeletionTag(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s3_seq_aligned, s3_reverse.DeletionTag(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s4_seq_aligned, s4_reverse.DeletionTag(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s5_seq_aligned, s5_reverse.DeletionTag(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s6_seq_aligned, s6_reverse.DeletionTag(Orientation::NATIVE, true, false));
-
-    EXPECT_EQ(s1_seq_aligned, s1_reverse.SubstitutionTag(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s2_seq_aligned, s2_reverse.SubstitutionTag(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s3_seq_aligned, s3_reverse.SubstitutionTag(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s4_seq_aligned, s4_reverse.SubstitutionTag(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s5_seq_aligned, s5_reverse.SubstitutionTag(Orientation::NATIVE, true, false));
-    EXPECT_EQ(s6_seq_aligned, s6_reverse.SubstitutionTag(Orientation::NATIVE, true, false));
-
-    //  - aligned, clipped genomic output (rev-comp of native input)
-    EXPECT_EQ(s1_revseq_aligned_clipped, s1_reverse.DeletionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s2_revseq_aligned_clipped, s2_reverse.DeletionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s3_revseq_aligned_clipped, s3_reverse.DeletionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s4_revseq_aligned_clipped, s4_reverse.DeletionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s5_revseq_aligned_clipped, s5_reverse.DeletionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s6_revseq_aligned_clipped, s6_reverse.DeletionTag(Orientation::GENOMIC, true, true));
-
-    EXPECT_EQ(s1_revseq_aligned_clipped, s1_reverse.SubstitutionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s2_revseq_aligned_clipped, s2_reverse.SubstitutionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s3_revseq_aligned_clipped, s3_reverse.SubstitutionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s4_revseq_aligned_clipped, s4_reverse.SubstitutionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s5_revseq_aligned_clipped, s5_reverse.SubstitutionTag(Orientation::GENOMIC, true, true));
-    EXPECT_EQ(s6_revseq_aligned_clipped, s6_reverse.SubstitutionTag(Orientation::GENOMIC, true, true));
-
-    //  - aligned, clipped native output (native input)
-    EXPECT_EQ(s1_seq_aligned_clipped, s1_reverse.DeletionTag(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s2_seq_aligned_clipped, s2_reverse.DeletionTag(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s3_seq_aligned_clipped, s3_reverse.DeletionTag(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s4_seq_aligned_clipped, s4_reverse.DeletionTag(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s5_seq_aligned_clipped, s5_reverse.DeletionTag(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s6_seq_aligned_clipped, s6_reverse.DeletionTag(Orientation::NATIVE, true, true));
-
-    EXPECT_EQ(s1_seq_aligned_clipped, s1_reverse.SubstitutionTag(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s2_seq_aligned_clipped, s2_reverse.SubstitutionTag(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s3_seq_aligned_clipped, s3_reverse.SubstitutionTag(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s4_seq_aligned_clipped, s4_reverse.SubstitutionTag(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s5_seq_aligned_clipped, s5_reverse.SubstitutionTag(Orientation::NATIVE, true, true));
-    EXPECT_EQ(s6_seq_aligned_clipped, s6_reverse.SubstitutionTag(Orientation::NATIVE, true, true));
-
+    {
+        SCOPED_TRACE("CIGAR: 4=3D4=");
+        tests::CheckBaseTagsClippedAndAligned(
+            "4=3D4=",           // CIGAR
+            "AACCGTTA",         // input
+            {
+                "AACCGTTA",     // forward strand, genomic
+                "AACCGTTA",     // forward strand, native
+                "AACC---GTTA",  // forward strand, genomic, aligned
+                "AACC---GTTA",  // forward strand, native, aligned
+                "AACC---GTTA",  // forward strand, genomic, aligned, clipped
+                "AACC---GTTA",  // forward strand, native, aligned, clipped
+                "TAACGGTT",     // reverse strand, genomic
+                "AACCGTTA",     // reverse strand, native
+                "TAAC---GGTT",  // reverse strand, genomic, aligned
+                "AACC---GTTA",  // reverse strand, native, aligned
+                "TAAC---GGTT",  // reverse strand, genomic, aligned, clipped
+                "AACC---GTTA"   // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
+        tests::CheckBaseTagsClippedAndAligned(
+            "4=1D2I2D4=",           // CIGAR
+            "ATCCTAGGTT",           // input
+            {
+                "ATCCTAGGTT",       // forward strand, genomic
+                "ATCCTAGGTT",       // forward strand, native
+                "ATCC-TA--GGTT",    // forward strand, genomic, aligned
+                "ATCC-TA--GGTT",    // forward strand, native, aligned
+                "ATCC-TA--GGTT",    // forward strand, genomic, aligned, clipped
+                "ATCC-TA--GGTT",    // forward strand, native, aligned, clipped
+                "AACCTAGGAT",       // reverse strand, genomic
+                "ATCCTAGGTT",       // reverse strand, native
+                "AACC-TA--GGAT",    // reverse strand, genomic, aligned
+                "ATCC--TA-GGTT",    // reverse strand, native, aligned
+                "AACC-TA--GGAT",    // reverse strand, genomic, aligned, clipped
+                "ATCC--TA-GGTT"     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
+        tests::CheckBaseTagsClippedAndAligned(
+            "4=1D2P2I2P2D4=",           // CIGAR
+            "ATCCTAGGTT",               // input
+            {
+                "ATCCTAGGTT",           // forward strand, genomic
+                "ATCCTAGGTT",           // forward strand, native
+                "ATCC-**TA**--GGTT",    // forward strand, genomic, aligned
+                "ATCC-**TA**--GGTT",    // forward strand, native, aligned
+                "ATCC-**TA**--GGTT",    // forward strand, genomic, aligned, clipped
+                "ATCC-**TA**--GGTT",    // forward strand, native, aligned, clipped
+                "AACCTAGGAT",           // reverse strand, genomic
+                "ATCCTAGGTT",           // reverse strand, native
+                "AACC-**TA**--GGAT",    // reverse strand, genomic, aligned
+                "ATCC--**TA**-GGTT",    // reverse strand, native, aligned
+                "AACC-**TA**--GGAT",    // reverse strand, genomic, aligned, clipped
+                "ATCC--**TA**-GGTT"     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 3S4=3D4=3S");
+        tests::CheckBaseTagsClippedAndAligned(
+            "3S4=3D4=3S",               // CIGAR
+            "TTTAACCGTTACCG",           // input
+            {
+                "TTTAACCGTTACCG",       // forward strand, genomic
+                "TTTAACCGTTACCG",       // forward strand, native
+                "TTTAACC---GTTACCG",    // forward strand, genomic, aligned
+                "TTTAACC---GTTACCG",    // forward strand, native, aligned
+                "AACC---GTTA",          // forward strand, genomic, aligned, clipped
+                "AACC---GTTA",          // forward strand, native, aligned, clipped
+                "CGGTAACGGTTAAA",       // reverse strand, genomic
+                "TTTAACCGTTACCG",       // reverse strand, native
+                "CGGTAAC---GGTTAAA",    // reverse strand, genomic, aligned
+                "TTTAACC---GTTACCG",    // reverse strand, native, aligned
+                "TAAC---GGTT",          // reverse strand, genomic, aligned, clipped
+                "AACC---GTTA"           // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
+        tests::CheckBaseTagsClippedAndAligned(
+            "2H4=3D4=3H",       // CIGAR
+            "AACCGTTA",         // input
+            {
+                "AACCGTTA",     // forward strand, genomic
+                "AACCGTTA",     // forward strand, native
+                "AACC---GTTA",  // forward strand, genomic, aligned
+                "AACC---GTTA",  // forward strand, native, aligned
+                "AACC---GTTA",  // forward strand, genomic, aligned, clipped
+                "AACC---GTTA",  // forward strand, native, aligned, clipped
+                "TAACGGTT",     // reverse strand, genomic
+                "AACCGTTA",     // reverse strand, native
+                "TAAC---GGTT",  // reverse strand, genomic, aligned
+                "AACC---GTTA",  // reverse strand, native, aligned
+                "TAAC---GGTT",  // reverse strand, genomic, aligned, clipped
+                "AACC---GTTA"   // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H3S4=3D4=3S3H");
+        tests::CheckBaseTagsClippedAndAligned(
+            "2H3S4=3D4=3S3H",           // CIGAR
+            "TTTAACCGTTACCG",           // input
+            {
+                "TTTAACCGTTACCG",       // forward strand, genomic
+                "TTTAACCGTTACCG",       // forward strand, native
+                "TTTAACC---GTTACCG",    // forward strand, genomic, aligned
+                "TTTAACC---GTTACCG",    // forward strand, native, aligned
+                "AACC---GTTA",          // forward strand, genomic, aligned, clipped
+                "AACC---GTTA",          // forward strand, native, aligned, clipped
+                "CGGTAACGGTTAAA",       // reverse strand, genomic
+                "TTTAACCGTTACCG",       // reverse strand, native
+                "CGGTAAC---GGTTAAA",    // reverse strand, genomic, aligned
+                "TTTAACC---GTTACCG",    // reverse strand, native, aligned
+                "TAAC---GGTT",          // reverse strand, genomic, aligned, clipped
+                "AACC---GTTA"           // reverse strand, native, aligned, clipped
+            }
+        );
+    }
 }
 
 TEST(BamRecordTest, FrameTagsClippedAndAligned)
 {
-    const string s1_cigar = "4=3D4=";
-    const string s2_cigar = "4=1D2I2D4=";
-    const string s3_cigar = "4=1D2P2I2P2D4=";
-    const string s4_cigar = "3S4=3D4=3S";
-    const string s5_cigar = "2H4=3D4=3H";
-    const string s6_cigar = "2H3S4=3D4=3S3H";
-
-    typedef vector<uint16_t> f_data;
-
-    const f_data s1_frames = { 10, 20, 10, 20, 10, 20, 10, 30 };
-    const f_data s2_frames = { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 };
-    const f_data s3_frames = { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 };
-    const f_data s4_frames = { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 };
-    const f_data s5_frames = { 10, 20, 10, 20, 10, 20, 10, 30 };
-    const f_data s6_frames = { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 };
-
-    const f_data s1_frames_aligned = { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 };
-    const f_data s2_frames_aligned = { 10, 20, 10, 20, 0, 80, 70, 0, 0, 10, 20, 10, 30 };
-    const f_data s3_frames_aligned = { 10, 20, 10, 20, 0, 0, 0, 80, 70, 0, 0, 0, 0, 10, 20, 10, 30 };
-    const f_data s4_frames_aligned = { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 };
-    const f_data s5_frames_aligned = { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 };
-    const f_data s6_frames_aligned = { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 };
-
-    const f_data s1_frames_aligned_clipped = { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 };
-    const f_data s2_frames_aligned_clipped = { 10, 20, 10, 20, 0, 80, 70, 0, 0, 10, 20, 10, 30 };
-    const f_data s3_frames_aligned_clipped = { 10, 20, 10, 20, 0, 0, 0, 80, 70, 0, 0, 0, 0, 10, 20, 10, 30 };
-    const f_data s4_frames_aligned_clipped = { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 };
-    const f_data s5_frames_aligned_clipped = { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 };
-    const f_data s6_frames_aligned_clipped = { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 };
-
-    const f_data s1_revframes = { 30, 10, 20, 10, 20, 10, 20, 10 };
-    const f_data s2_revframes = { 30, 10, 20, 10, 70, 80, 20, 10, 20, 10 };
-    const f_data s3_revframes = { 30, 10, 20, 10, 70, 80, 20, 10, 20, 10 };
-    const f_data s4_revframes = { 50, 50, 50, 30, 10, 20, 10, 20, 10, 20, 10, 40, 40, 40 };
-    const f_data s5_revframes = { 30, 10, 20, 10, 20, 10, 20, 10 };
-    const f_data s6_revframes = { 50, 50, 50, 30, 10, 20, 10, 20, 10, 20, 10, 40, 40, 40 };
-
-    const f_data s1_revframes_aligned = { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 };
-    const f_data s2_revframes_aligned = { 30, 10, 20, 10, 0, 70, 80, 0, 0, 20, 10, 20, 10 };
-    const f_data s3_revframes_aligned = { 30, 10, 20, 10, 0, 0, 0, 70, 80, 0, 0, 0, 0, 20, 10, 20, 10 };
-    const f_data s4_revframes_aligned = { 50, 50, 50, 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10, 40, 40, 40 };
-    const f_data s5_revframes_aligned = { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 };
-    const f_data s6_revframes_aligned = { 50, 50, 50, 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10, 40, 40, 40 };
-
-    const f_data s1_revframes_aligned_clipped = { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 };
-    const f_data s2_revframes_aligned_clipped = { 30, 10, 20, 10, 0, 70, 80, 0, 0, 20, 10, 20, 10 };
-    const f_data s3_revframes_aligned_clipped = { 30, 10, 20, 10, 0, 0, 0, 70, 80, 0, 0, 0, 0, 20, 10, 20, 10 };
-    const f_data s4_revframes_aligned_clipped = { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 };
-    const f_data s5_revframes_aligned_clipped = { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 };
-    const f_data s6_revframes_aligned_clipped = { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 };
-
-    const BamRecord s1 = tests::MakeCigaredFrameRecord(s1_frames, s1_cigar, false);
-    const BamRecord s2 = tests::MakeCigaredFrameRecord(s2_frames, s2_cigar, false);
-    const BamRecord s3 = tests::MakeCigaredFrameRecord(s3_frames, s3_cigar, false);
-    const BamRecord s4 = tests::MakeCigaredFrameRecord(s4_frames, s4_cigar, false);
-    const BamRecord s5 = tests::MakeCigaredFrameRecord(s5_frames, s5_cigar, false);
-    const BamRecord s6 = tests::MakeCigaredFrameRecord(s6_frames, s6_cigar, false);
-    const BamRecord s1_reverse = tests::MakeCigaredFrameRecord(s1_frames, s1_cigar, true);
-    const BamRecord s2_reverse = tests::MakeCigaredFrameRecord(s2_frames, s2_cigar, true);
-    const BamRecord s3_reverse = tests::MakeCigaredFrameRecord(s3_frames, s3_cigar, true);
-    const BamRecord s4_reverse = tests::MakeCigaredFrameRecord(s4_frames, s4_cigar, true);
-    const BamRecord s5_reverse = tests::MakeCigaredFrameRecord(s5_frames, s5_cigar, true);
-    const BamRecord s6_reverse = tests::MakeCigaredFrameRecord(s6_frames, s6_cigar, true);
-
-    // ----------------
-    // forward strand
-    // ----------------
-
-    //  - "native" == "genomic"
-    EXPECT_EQ(s1.IPD(Orientation::NATIVE), s1.IPD(Orientation::GENOMIC));
-    EXPECT_EQ(s2.IPD(Orientation::NATIVE), s2.IPD(Orientation::GENOMIC));
-    EXPECT_EQ(s3.IPD(Orientation::NATIVE), s3.IPD(Orientation::GENOMIC));
-    EXPECT_EQ(s4.IPD(Orientation::NATIVE), s4.IPD(Orientation::GENOMIC));
-    EXPECT_EQ(s5.IPD(Orientation::NATIVE), s5.IPD(Orientation::GENOMIC));
-    EXPECT_EQ(s6.IPD(Orientation::NATIVE), s6.IPD(Orientation::GENOMIC));
-
-    EXPECT_EQ(s1.PulseWidth(Orientation::NATIVE), s1.PulseWidth(Orientation::GENOMIC));
-    EXPECT_EQ(s2.PulseWidth(Orientation::NATIVE), s2.PulseWidth(Orientation::GENOMIC));
-    EXPECT_EQ(s3.PulseWidth(Orientation::NATIVE), s3.PulseWidth(Orientation::GENOMIC));
-    EXPECT_EQ(s4.PulseWidth(Orientation::NATIVE), s4.PulseWidth(Orientation::GENOMIC));
-    EXPECT_EQ(s5.PulseWidth(Orientation::NATIVE), s5.PulseWidth(Orientation::GENOMIC));
-    EXPECT_EQ(s6.PulseWidth(Orientation::NATIVE), s6.PulseWidth(Orientation::GENOMIC));
-
-    //  - unaligned, unclipped genomic output == genomic input
-    EXPECT_EQ(s1_frames, s1.IPD(Orientation::GENOMIC).Data());
-    EXPECT_EQ(s2_frames, s2.IPD(Orientation::GENOMIC).Data());
-    EXPECT_EQ(s3_frames, s3.IPD(Orientation::GENOMIC).Data());
-    EXPECT_EQ(s4_frames, s4.IPD(Orientation::GENOMIC).Data());
-    EXPECT_EQ(s5_frames, s5.IPD(Orientation::GENOMIC).Data());
-    EXPECT_EQ(s6_frames, s6.IPD(Orientation::GENOMIC).Data());
-
-    EXPECT_EQ(s1_frames, s1.PulseWidth(Orientation::GENOMIC).Data());
-    EXPECT_EQ(s2_frames, s2.PulseWidth(Orientation::GENOMIC).Data());
-    EXPECT_EQ(s3_frames, s3.PulseWidth(Orientation::GENOMIC).Data());
-    EXPECT_EQ(s4_frames, s4.PulseWidth(Orientation::GENOMIC).Data());
-    EXPECT_EQ(s5_frames, s5.PulseWidth(Orientation::GENOMIC).Data());
-    EXPECT_EQ(s6_frames, s6.PulseWidth(Orientation::GENOMIC).Data());
-
-    //  - aligned, unclipped genomic output == aligned, unclipped genomic input
-    EXPECT_EQ(s1_frames_aligned, s1.IPD(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s2_frames_aligned, s2.IPD(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s3_frames_aligned, s3.IPD(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s4_frames_aligned, s4.IPD(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s5_frames_aligned, s5.IPD(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s6_frames_aligned, s6.IPD(Orientation::GENOMIC, true, false).Data());
-
-    EXPECT_EQ(s1_frames_aligned, s1.PulseWidth(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s2_frames_aligned, s2.PulseWidth(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s3_frames_aligned, s3.PulseWidth(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s4_frames_aligned, s4.PulseWidth(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s5_frames_aligned, s5.PulseWidth(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s6_frames_aligned, s6.PulseWidth(Orientation::GENOMIC, true, false).Data());
-
-    //  - aligned, clipped genomic output == aligned, clipped genomic output
-    EXPECT_EQ(s1_frames_aligned_clipped, s1.IPD(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s2_frames_aligned_clipped, s2.IPD(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s3_frames_aligned_clipped, s3.IPD(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s4_frames_aligned_clipped, s4.IPD(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s5_frames_aligned_clipped, s5.IPD(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s6_frames_aligned_clipped, s6.IPD(Orientation::GENOMIC, true, true).Data());
-
-    EXPECT_EQ(s1_frames_aligned_clipped, s1.PulseWidth(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s2_frames_aligned_clipped, s2.PulseWidth(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s3_frames_aligned_clipped, s3.PulseWidth(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s4_frames_aligned_clipped, s4.PulseWidth(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s5_frames_aligned_clipped, s5.PulseWidth(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s6_frames_aligned_clipped, s6.PulseWidth(Orientation::GENOMIC, true, true).Data());
-
-    // ----------------
-    // reverse strand
-    // ----------------
-
-    //  - "native" != "genomic"
-    EXPECT_NE(s1_reverse.IPD(Orientation::NATIVE), s1_reverse.IPD(Orientation::GENOMIC));
-    EXPECT_NE(s2_reverse.IPD(Orientation::NATIVE), s2_reverse.IPD(Orientation::GENOMIC));
-    EXPECT_NE(s3_reverse.IPD(Orientation::NATIVE), s3_reverse.IPD(Orientation::GENOMIC));
-    EXPECT_NE(s4_reverse.IPD(Orientation::NATIVE), s4_reverse.IPD(Orientation::GENOMIC));
-    EXPECT_NE(s5_reverse.IPD(Orientation::NATIVE), s5_reverse.IPD(Orientation::GENOMIC));
-    EXPECT_NE(s6_reverse.IPD(Orientation::NATIVE), s6_reverse.IPD(Orientation::GENOMIC));
-
-    EXPECT_NE(s1_reverse.PulseWidth(Orientation::NATIVE), s1_reverse.PulseWidth(Orientation::GENOMIC));
-    EXPECT_NE(s2_reverse.PulseWidth(Orientation::NATIVE), s2_reverse.PulseWidth(Orientation::GENOMIC));
-    EXPECT_NE(s3_reverse.PulseWidth(Orientation::NATIVE), s3_reverse.PulseWidth(Orientation::GENOMIC));
-    EXPECT_NE(s4_reverse.PulseWidth(Orientation::NATIVE), s4_reverse.PulseWidth(Orientation::GENOMIC));
-    EXPECT_NE(s5_reverse.PulseWidth(Orientation::NATIVE), s5_reverse.PulseWidth(Orientation::GENOMIC));
-    EXPECT_NE(s6_reverse.PulseWidth(Orientation::NATIVE), s6_reverse.PulseWidth(Orientation::GENOMIC));
-
-    //  - unaligned, unclipped genomic output (rev-comp of native input)
-    EXPECT_EQ(s1_revframes, s1_reverse.IPD(Orientation::GENOMIC, false, false).Data());
-    EXPECT_EQ(s2_revframes, s2_reverse.IPD(Orientation::GENOMIC, false, false).Data());
-    EXPECT_EQ(s3_revframes, s3_reverse.IPD(Orientation::GENOMIC, false, false).Data());
-    EXPECT_EQ(s4_revframes, s4_reverse.IPD(Orientation::GENOMIC, false, false).Data());
-    EXPECT_EQ(s5_revframes, s5_reverse.IPD(Orientation::GENOMIC, false, false).Data());
-    EXPECT_EQ(s6_revframes, s6_reverse.IPD(Orientation::GENOMIC, false, false).Data());
-
-    EXPECT_EQ(s1_revframes, s1_reverse.PulseWidth(Orientation::GENOMIC, false, false).Data());
-    EXPECT_EQ(s2_revframes, s2_reverse.PulseWidth(Orientation::GENOMIC, false, false).Data());
-    EXPECT_EQ(s3_revframes, s3_reverse.PulseWidth(Orientation::GENOMIC, false, false).Data());
-    EXPECT_EQ(s4_revframes, s4_reverse.PulseWidth(Orientation::GENOMIC, false, false).Data());
-    EXPECT_EQ(s5_revframes, s5_reverse.PulseWidth(Orientation::GENOMIC, false, false).Data());
-    EXPECT_EQ(s6_revframes, s6_reverse.PulseWidth(Orientation::GENOMIC, false, false).Data());
-
-    //  - unaligned, unclipped native output (native input)
-    EXPECT_EQ(s1_frames, s1_reverse.IPD(Orientation::NATIVE, false, false).Data());
-    EXPECT_EQ(s2_frames, s2_reverse.IPD(Orientation::NATIVE, false, false).Data());
-    EXPECT_EQ(s3_frames, s3_reverse.IPD(Orientation::NATIVE, false, false).Data());
-    EXPECT_EQ(s4_frames, s4_reverse.IPD(Orientation::NATIVE, false, false).Data());
-    EXPECT_EQ(s5_frames, s5_reverse.IPD(Orientation::NATIVE, false, false).Data());
-    EXPECT_EQ(s6_frames, s6_reverse.IPD(Orientation::NATIVE, false, false).Data());
-
-    EXPECT_EQ(s1_frames, s1_reverse.PulseWidth(Orientation::NATIVE, false, false).Data());
-    EXPECT_EQ(s2_frames, s2_reverse.PulseWidth(Orientation::NATIVE, false, false).Data());
-    EXPECT_EQ(s3_frames, s3_reverse.PulseWidth(Orientation::NATIVE, false, false).Data());
-    EXPECT_EQ(s4_frames, s4_reverse.PulseWidth(Orientation::NATIVE, false, false).Data());
-    EXPECT_EQ(s5_frames, s5_reverse.PulseWidth(Orientation::NATIVE, false, false).Data());
-    EXPECT_EQ(s6_frames, s6_reverse.PulseWidth(Orientation::NATIVE, false, false).Data());
-
-    //  - aligned, unclipped genomic output (rev-comp of native input)
-    EXPECT_EQ(s1_revframes_aligned, s1_reverse.IPD(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s2_revframes_aligned, s2_reverse.IPD(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s3_revframes_aligned, s3_reverse.IPD(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s4_revframes_aligned, s4_reverse.IPD(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s5_revframes_aligned, s5_reverse.IPD(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s6_revframes_aligned, s6_reverse.IPD(Orientation::GENOMIC, true, false).Data());
-
-    EXPECT_EQ(s1_revframes_aligned, s1_reverse.PulseWidth(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s2_revframes_aligned, s2_reverse.PulseWidth(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s3_revframes_aligned, s3_reverse.PulseWidth(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s4_revframes_aligned, s4_reverse.PulseWidth(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s5_revframes_aligned, s5_reverse.PulseWidth(Orientation::GENOMIC, true, false).Data());
-    EXPECT_EQ(s6_revframes_aligned, s6_reverse.PulseWidth(Orientation::GENOMIC, true, false).Data());
-
-    //  - aligned, unclipped native output (native input)
-    EXPECT_EQ(s1_frames_aligned, s1_reverse.IPD(Orientation::NATIVE, true, false).Data());
-    EXPECT_EQ(s2_frames_aligned, s2_reverse.IPD(Orientation::NATIVE, true, false).Data());
-    EXPECT_EQ(s3_frames_aligned, s3_reverse.IPD(Orientation::NATIVE, true, false).Data());
-    EXPECT_EQ(s4_frames_aligned, s4_reverse.IPD(Orientation::NATIVE, true, false).Data());
-    EXPECT_EQ(s5_frames_aligned, s5_reverse.IPD(Orientation::NATIVE, true, false).Data());
-    EXPECT_EQ(s6_frames_aligned, s6_reverse.IPD(Orientation::NATIVE, true, false).Data());
-
-    EXPECT_EQ(s1_frames_aligned, s1_reverse.PulseWidth(Orientation::NATIVE, true, false).Data());
-    EXPECT_EQ(s2_frames_aligned, s2_reverse.PulseWidth(Orientation::NATIVE, true, false).Data());
-    EXPECT_EQ(s3_frames_aligned, s3_reverse.PulseWidth(Orientation::NATIVE, true, false).Data());
-    EXPECT_EQ(s4_frames_aligned, s4_reverse.PulseWidth(Orientation::NATIVE, true, false).Data());
-    EXPECT_EQ(s5_frames_aligned, s5_reverse.PulseWidth(Orientation::NATIVE, true, false).Data());
-    EXPECT_EQ(s6_frames_aligned, s6_reverse.PulseWidth(Orientation::NATIVE, true, false).Data());
-
-    //  - aligned, clipped genomic output (rev-comp of native input)
-    EXPECT_EQ(s1_revframes_aligned_clipped, s1_reverse.IPD(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s2_revframes_aligned_clipped, s2_reverse.IPD(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s3_revframes_aligned_clipped, s3_reverse.IPD(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s4_revframes_aligned_clipped, s4_reverse.IPD(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s5_revframes_aligned_clipped, s5_reverse.IPD(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s6_revframes_aligned_clipped, s6_reverse.IPD(Orientation::GENOMIC, true, true).Data());
-
-    EXPECT_EQ(s1_revframes_aligned_clipped, s1_reverse.PulseWidth(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s2_revframes_aligned_clipped, s2_reverse.PulseWidth(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s3_revframes_aligned_clipped, s3_reverse.PulseWidth(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s4_revframes_aligned_clipped, s4_reverse.PulseWidth(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s5_revframes_aligned_clipped, s5_reverse.PulseWidth(Orientation::GENOMIC, true, true).Data());
-    EXPECT_EQ(s6_revframes_aligned_clipped, s6_reverse.PulseWidth(Orientation::GENOMIC, true, true).Data());
-
-    //  - aligned, clipped native output (native input)
-    EXPECT_EQ(s1_frames_aligned_clipped, s1_reverse.IPD(Orientation::NATIVE, true, true).Data());
-    EXPECT_EQ(s2_frames_aligned_clipped, s2_reverse.IPD(Orientation::NATIVE, true, true).Data());
-    EXPECT_EQ(s3_frames_aligned_clipped, s3_reverse.IPD(Orientation::NATIVE, true, true).Data());
-    EXPECT_EQ(s4_frames_aligned_clipped, s4_reverse.IPD(Orientation::NATIVE, true, true).Data());
-    EXPECT_EQ(s5_frames_aligned_clipped, s5_reverse.IPD(Orientation::NATIVE, true, true).Data());
-    EXPECT_EQ(s6_frames_aligned_clipped, s6_reverse.IPD(Orientation::NATIVE, true, true).Data());
-
-    EXPECT_EQ(s1_frames_aligned_clipped, s1_reverse.PulseWidth(Orientation::NATIVE, true, true).Data());
-    EXPECT_EQ(s2_frames_aligned_clipped, s2_reverse.PulseWidth(Orientation::NATIVE, true, true).Data());
-    EXPECT_EQ(s3_frames_aligned_clipped, s3_reverse.PulseWidth(Orientation::NATIVE, true, true).Data());
-    EXPECT_EQ(s4_frames_aligned_clipped, s4_reverse.PulseWidth(Orientation::NATIVE, true, true).Data());
-    EXPECT_EQ(s5_frames_aligned_clipped, s5_reverse.PulseWidth(Orientation::NATIVE, true, true).Data());
-    EXPECT_EQ(s6_frames_aligned_clipped, s6_reverse.PulseWidth(Orientation::NATIVE, true, true).Data());
+    {
+        SCOPED_TRACE("CIGAR: 4=3D4=");
+        tests::CheckFrameTagsClippedAndAligned(
+            "4=3D4=",                                           // CIGAR
+            { 10, 20, 10, 20, 10, 20, 10, 30 },                 // input
+            {
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // forward strand, genomic
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // forward strand, native
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned, clipped
+                { 30, 10, 20, 10, 20, 10, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // reverse strand, native
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 }     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
+        tests::CheckFrameTagsClippedAndAligned(
+            "4=1D2I2D4=",                                               // CIGAR
+            { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },                 // input
+            {
+                { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },             // forward strand, genomic
+                { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },             // forward strand, native
+                { 10, 20, 10, 20, 0, 80, 70, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 80, 70, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 80, 70, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 80, 70, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned, clipped
+                { 30, 10, 20, 10, 70, 80, 20, 10, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },             // reverse strand, native
+                { 30, 10, 20, 10, 0, 70, 80, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 80, 70, 0, 10, 20, 10, 30 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 70, 80, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 80, 70, 0, 10, 20, 10, 30 }     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
+        tests::CheckFrameTagsClippedAndAligned(
+            "4=1D2P2I2P2D4=",                                                   // CIGAR
+            { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },                         // input
+        {
+            { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },                         // forward strand, genomic
+            { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },                         // forward strand, native
+            { 10, 20, 10, 20, 0, 0, 0, 80, 70, 0, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned
+            { 10, 20, 10, 20, 0, 0, 0, 80, 70, 0, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned
+            { 10, 20, 10, 20, 0, 0, 0, 80, 70, 0, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned, clipped
+            { 10, 20, 10, 20, 0, 0, 0, 80, 70, 0, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned, clipped
+            { 30, 10, 20, 10, 70, 80, 20, 10, 20, 10 },                         // reverse strand, genomic
+            { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },                         // reverse strand, native
+            { 30, 10, 20, 10, 0, 0, 0, 70, 80, 0, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned
+            { 10, 20, 10, 20, 0, 0, 0, 0, 80, 70, 0, 0, 0, 10, 20, 10, 30 },    // reverse strand, native, aligned
+            { 30, 10, 20, 10, 0, 0, 0, 70, 80, 0, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned, clipped
+            { 10, 20, 10, 20, 0, 0, 0, 0, 80, 70, 0, 0, 0, 10, 20, 10, 30 }     // reverse strand, native, aligned, clipped
+        }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 3S4=3D4=3S");
+        tests::CheckFrameTagsClippedAndAligned(
+            "3S4=3D4=3S",                                                               // CIGAR
+            { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },                 // input
+            {
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // forward strand, genomic
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // forward strand, native
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // forward strand, genomic, aligned
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },                            // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },                            // forward strand, native, aligned, clipped
+                { 50, 50, 50, 30, 10, 20, 10, 20, 10, 20, 10, 40, 40, 40 },             // reverse strand, genomic
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // reverse strand, native
+                { 50, 50, 50, 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10, 40, 40, 40 },    // reverse strand, genomic, aligned
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },                            // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 }                             // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
+        tests::CheckFrameTagsClippedAndAligned(
+            "2H4=3D4=3H",                                       // CIGAR
+            { 10, 20, 10, 20, 10, 20, 10, 30 },                 // input
+            {
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // forward strand, genomic
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // forward strand, native
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned, clipped
+                { 30, 10, 20, 10, 20, 10, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // reverse strand, native
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 }     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H3S4=3D4=3S3H");
+        tests::CheckFrameTagsClippedAndAligned(
+            "2H3S4=3D4=3S3H",                                                           // CIGAR
+            { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },                 // input
+            {
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // forward strand, genomic
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // forward strand, native
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // forward strand, genomic, aligned
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },                            // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },                            // forward strand, native, aligned, clipped
+                { 50, 50, 50, 30, 10, 20, 10, 20, 10, 20, 10, 40, 40, 40 },             // reverse strand, genomic
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // reverse strand, native
+                { 50, 50, 50, 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10, 40, 40, 40 },    // reverse strand, genomic, aligned
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },                            // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 }                             // reverse strand, native, aligned, clipped
+            }
+        );
+    }
 }

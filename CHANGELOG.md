@@ -20,6 +20,8 @@ thrown exception) the file is renamed to the actual requested filename.
 
 ### Fixed
 - Improper 'clip to reference' product for BamRecord in some cases.
+- Improper behavior in tag accessors (e.g. BamRecord::IPD()) on reverse strand-
+aligned reads (bug 31339).
 
 ## [0.5.0] - 2016-02-22
 
