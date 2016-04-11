@@ -44,6 +44,7 @@
 #include "StringUtils.h"
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -164,12 +165,12 @@ PbiFilter CreateBarcodeFilter(string value,
         vector<string> barcodes = internal::Split(value, ',');
         if (barcodes.size() != 2)
             throw std::runtime_error("only 2 barcode values expected");
-        return PbiBarcodesFilter{ static_cast<uint16_t>(stoul(barcodes.at(0))),
-                                  static_cast<uint16_t>(stoul(barcodes.at(1))),
+        return PbiBarcodesFilter{ boost::numeric_cast<int16_t>(stoi(barcodes.at(0))),
+                                  boost::numeric_cast<int16_t>(stoi(barcodes.at(1))),
                                   compareType
                                 };
     } else
-        return PbiBarcodeFilter{ static_cast<uint16_t>(stoul(value)), compareType };
+        return PbiBarcodeFilter{ boost::numeric_cast<int16_t>(stoi(value)), compareType };
 }
 
 static

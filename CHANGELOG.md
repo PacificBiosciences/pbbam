@@ -23,6 +23,16 @@ thrown exception) the file is renamed to the actual requested filename.
 - Improper behavior in tag accessors (e.g. BamRecord::IPD()) on reverse strand-
 aligned reads (bug 31339).
 
+### Changed
+- RecordType::POLYMERASE renamed to RecordType::ZMW to reflect changes in
+PacBio BAM spec v3.0.4
+- Barcodes now represented as int16_t throughout the API, to better handle the
+'missing' value of -1. Please note that the PacBio BAM spec still requires that
+barcodes be stored as uint16_t, but pbbam will handle that conversion for client
+code. Conversions are done using boost::numeric_cast to check for over/underflow,
+so any erroroneous values should be catch-able via boost::bad_numeric_cast 
+exception.
+
 ## [0.5.0] - 2016-02-22
 
 ### Added

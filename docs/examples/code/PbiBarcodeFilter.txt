@@ -7,7 +7,7 @@ for (const BamRecord& record : query) {
 }
 
 // whitelist
-vector<uint16_t> whitelist = { 50, 100 };
+vector<int16_t> whitelist = { 50, 100 };
 PbiFilter filter{ PbiBarcodeFilter{whitelist} };
 PbiFilterQuery query(filter);
 for (const BamRecord& record : query) {

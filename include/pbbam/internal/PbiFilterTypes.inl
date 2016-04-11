@@ -303,21 +303,21 @@ inline PbiAlignedStrandFilter::PbiAlignedStrandFilter(const Strand strand, const
 
 // PbiBarcodeFilter
 
-inline PbiBarcodeFilter::PbiBarcodeFilter(const uint16_t barcode, const Compare::Type cmp)
+inline PbiBarcodeFilter::PbiBarcodeFilter(const int16_t barcode, const Compare::Type cmp)
     : compositeFilter_{ PbiFilter::Union({ PbiBarcodeForwardFilter{barcode,cmp},
                                            PbiBarcodeReverseFilter{barcode,cmp}
                                          })
                       }
 { }
 
-inline PbiBarcodeFilter::PbiBarcodeFilter(const std::vector<uint16_t> &whitelist)
+inline PbiBarcodeFilter::PbiBarcodeFilter(const std::vector<int16_t>& whitelist)
     : compositeFilter_{ PbiFilter::Union({ PbiBarcodeForwardFilter{whitelist},
                                            PbiBarcodeReverseFilter{whitelist}
                                          })
                       }
 { }
 
-inline PbiBarcodeFilter::PbiBarcodeFilter(std::vector<uint16_t> &&whitelist)
+inline PbiBarcodeFilter::PbiBarcodeFilter(std::vector<int16_t>&& whitelist)
     : compositeFilter_{ PbiFilter::Union({ PbiBarcodeForwardFilter{std::move(whitelist)},
                                            PbiBarcodeReverseFilter{std::move(whitelist)}
                                          })
@@ -329,16 +329,16 @@ inline bool PbiBarcodeFilter::Accepts(const PbiRawData& idx, const size_t row) c
 
 // PbiBarcodeForwardFilter
 
-inline PbiBarcodeForwardFilter::PbiBarcodeForwardFilter(const uint16_t bcFwdId, const Compare::Type cmp)
-    : internal::BarcodeDataFilterBase<uint16_t, BarcodeLookupData::BC_FORWARD>(bcFwdId, cmp)
+inline PbiBarcodeForwardFilter::PbiBarcodeForwardFilter(const int16_t bcFwdId, const Compare::Type cmp)
+    : internal::BarcodeDataFilterBase<int16_t, BarcodeLookupData::BC_FORWARD>(bcFwdId, cmp)
 { }
 
-inline PbiBarcodeForwardFilter::PbiBarcodeForwardFilter(const std::vector<uint16_t>& whitelist)
-    : internal::BarcodeDataFilterBase<uint16_t, BarcodeLookupData::BC_FORWARD>(whitelist)
+inline PbiBarcodeForwardFilter::PbiBarcodeForwardFilter(const std::vector<int16_t>& whitelist)
+    : internal::BarcodeDataFilterBase<int16_t, BarcodeLookupData::BC_FORWARD>(whitelist)
 { }
 
-inline PbiBarcodeForwardFilter::PbiBarcodeForwardFilter(std::vector<uint16_t>&& whitelist)
-    : internal::BarcodeDataFilterBase<uint16_t, BarcodeLookupData::BC_FORWARD>(std::move(whitelist))
+inline PbiBarcodeForwardFilter::PbiBarcodeForwardFilter(std::vector<int16_t>&& whitelist)
+    : internal::BarcodeDataFilterBase<int16_t, BarcodeLookupData::BC_FORWARD>(std::move(whitelist))
 { }
 
 // PbiBarcodeQualityFilter
@@ -349,25 +349,25 @@ inline PbiBarcodeQualityFilter::PbiBarcodeQualityFilter(const uint8_t bcQuality,
 
 // PbiBarcodeReverseFilter
 
-inline PbiBarcodeReverseFilter::PbiBarcodeReverseFilter(const uint16_t bcRevId, const Compare::Type cmp)
-    : internal::BarcodeDataFilterBase<uint16_t, BarcodeLookupData::BC_REVERSE>(bcRevId, cmp)
+inline PbiBarcodeReverseFilter::PbiBarcodeReverseFilter(const int16_t bcRevId, const Compare::Type cmp)
+    : internal::BarcodeDataFilterBase<int16_t, BarcodeLookupData::BC_REVERSE>(bcRevId, cmp)
 { }
 
-inline PbiBarcodeReverseFilter::PbiBarcodeReverseFilter(const std::vector<uint16_t>& whitelist)
-    : internal::BarcodeDataFilterBase<uint16_t, BarcodeLookupData::BC_REVERSE>(whitelist)
+inline PbiBarcodeReverseFilter::PbiBarcodeReverseFilter(const std::vector<int16_t>& whitelist)
+    : internal::BarcodeDataFilterBase<int16_t, BarcodeLookupData::BC_REVERSE>(whitelist)
 { }
 
-inline PbiBarcodeReverseFilter::PbiBarcodeReverseFilter(std::vector<uint16_t>&& whitelist)
-    : internal::BarcodeDataFilterBase<uint16_t, BarcodeLookupData::BC_REVERSE>(std::move(whitelist))
+inline PbiBarcodeReverseFilter::PbiBarcodeReverseFilter(std::vector<int16_t>&& whitelist)
+    : internal::BarcodeDataFilterBase<int16_t, BarcodeLookupData::BC_REVERSE>(std::move(whitelist))
 { }
 
 // PbiBarcodesFilter
 
-inline PbiBarcodesFilter::PbiBarcodesFilter(const std::pair<uint16_t, uint16_t> barcodes, const Compare::Type cmp)
+inline PbiBarcodesFilter::PbiBarcodesFilter(const std::pair<int16_t, int16_t> barcodes, const Compare::Type cmp)
     : PbiBarcodesFilter(barcodes.first, barcodes.second, cmp)
 { }
 
-inline PbiBarcodesFilter::PbiBarcodesFilter(const uint16_t bcForward, const uint16_t bcReverse, const Compare::Type cmp)
+inline PbiBarcodesFilter::PbiBarcodesFilter(const int16_t bcForward, const int16_t bcReverse, const Compare::Type cmp)
     : compositeFilter_{ PbiFilter::Intersection({ PbiBarcodeForwardFilter{bcForward,cmp},
                                                   PbiBarcodeReverseFilter{bcReverse,cmp}
                                                 })

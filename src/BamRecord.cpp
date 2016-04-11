@@ -45,8 +45,8 @@
 #include "AssertUtils.h"
 #include "MemoryUtils.h"
 #include "SequenceUtils.h"
+#include <boost/numeric/conversion/cast.hpp>
 #include <htslib/sam.h>
-
 #include <iostream>
 #include <stdexcept>
 
@@ -97,6 +97,7 @@ static const string tagName_QUAL = "QUAL";
 static const string tagName_SEQ  = "SEQ";
 
 // record type names
+static const string recordTypeName_ZMW        = "ZMW";
 static const string recordTypeName_Polymerase = "POLYMERASE";
 static const string recordTypeName_HqRegion   = "HQREGION";
 static const string recordTypeName_Subread    = "SUBREAD";
@@ -357,8 +358,8 @@ RecordType NameToType(const string& name)
 {
     if (name == recordTypeName_Subread)
         return RecordType::SUBREAD;
-    if (name == recordTypeName_Polymerase)
-        return RecordType::POLYMERASE;
+    if (name == recordTypeName_ZMW || name == recordTypeName_Polymerase)
+        return RecordType::ZMW;
     if (name == recordTypeName_HqRegion)
         return RecordType::HQREGION;
     if (name == recordTypeName_CCS)
@@ -508,10 +509,10 @@ BamRecord& BamRecord::AltLabelTag(const std::string& tags)
     return *this;
 }
 
-uint16_t BamRecord::BarcodeForward(void) const
+int16_t BamRecord::BarcodeForward(void) const
 { return Barcodes().first; }
 
-uint16_t BamRecord::BarcodeReverse(void) const
+int16_t BamRecord::BarcodeReverse(void) const
 { return Barcodes().second; }
 
 uint8_t BamRecord::BarcodeQuality(void) const
@@ -528,25 +529,32 @@ BamRecord& BamRecord::BarcodeQuality(const uint8_t quality)
     return *this;
 }
 
-std::pair<uint16_t,uint16_t> BamRecord::Barcodes(void) const
+std::pair<int16_t,int16_t> BamRecord::Barcodes(void) const
 {
     const Tag& bc = impl_.TagValue(internal::tagName_barcodes);
     if (bc.IsNull())
         throw std::runtime_error("barcode tag (bc) was requested but is missing");
 
+    // NOTE: barcodes are still stored, per the spec, as uint16, even though
+    // we're now using them as int16_t in the API (bug 31511)
+    //
     if (!bc.IsUInt16Array())
         throw std::runtime_error("barcode tag (bc) is malformed: should be a uint16_t array of size==2.");
-
     const auto bcArray = bc.ToUInt16Array();
     if (bcArray.size() != 2)
         throw std::runtime_error("barcode tag (bc) is malformed: should be a uint16_t array of size==2.");
 
-    return std::make_pair(bcArray[0], bcArray[1]);
+    return std::make_pair(boost::numeric_cast<int16_t>(bcArray[0]),
+                          boost::numeric_cast<int16_t>(bcArray[1]));
 }
 
-BamRecord& BamRecord::Barcodes(const std::pair<uint16_t,uint16_t>& barcodeIds)
+BamRecord& BamRecord::Barcodes(const std::pair<int16_t,int16_t>& barcodeIds)
 {
-    const auto data = std::vector<uint16_t>{ barcodeIds.first, barcodeIds.second };
+    const std::vector<uint16_t> data =
+    {
+        boost::numeric_cast<uint16_t>(barcodeIds.first),
+        boost::numeric_cast<uint16_t>(barcodeIds.second)
+    };
     internal::CreateOrEdit(internal::tagName_barcodes, data, &impl_);
     return *this;
 }

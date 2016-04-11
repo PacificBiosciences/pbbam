@@ -43,6 +43,7 @@
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
 #include "PbiIndexIO.h"
+#include <boost/numeric/conversion/cast.hpp>
 #include <map>
 #include <cassert>
 using namespace PacBio;
@@ -58,7 +59,7 @@ string ToString(const RecordType type)
 {
     static const auto lookup = map<RecordType, string>
     {
-        { RecordType::POLYMERASE, "POLYMERASE" },
+        { RecordType::ZMW,        "ZMW" },
         { RecordType::HQREGION,   "HQREGION" },
         { RecordType::SUBREAD,    "SUBREAD" },
         { RecordType::CCS,        "CCS" },
@@ -126,11 +127,9 @@ void PbiRawBarcodeData::AddRecord(const BamRecord& b)
         // fetch data from record
         const auto barcodes = b.Barcodes();
         const auto barcodeQuality = b.BarcodeQuality();
-
-        // convert to signed integers (stored unsigned in BAM)
-        const auto bcForward = static_cast<int16_t>(barcodes.first);
-        const auto bcReverse = static_cast<int16_t>(barcodes.second);
-        const auto bcQuality = static_cast<int8_t>(barcodeQuality);
+        const auto bcForward = barcodes.first;
+        const auto bcReverse = barcodes.second;
+        const auto bcQuality = boost::numeric_cast<int8_t>(barcodeQuality);
 
         // only store actual data if all values >= 0
         if (bcForward >= 0 && bcReverse >=0 && bcQuality >= 0) {

@@ -49,14 +49,14 @@ using namespace std;
 
 struct BarcodeQuery::BarcodeQueryPrivate
 {
-    BarcodeQueryPrivate(const uint16_t barcode, const DataSet& dataset)
+    BarcodeQueryPrivate(const int16_t barcode, const DataSet& dataset)
         : reader_(PbiBarcodeFilter(barcode), dataset)
     { }
 
     PbiFilterCompositeBamReader<Compare::None> reader_; // unsorted
 };
 
-BarcodeQuery::BarcodeQuery(const uint16_t barcode,
+BarcodeQuery::BarcodeQuery(const int16_t barcode,
                            const DataSet& dataset)
     : internal::IQuery()
     , d_(new BarcodeQueryPrivate(barcode, dataset))

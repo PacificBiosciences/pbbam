@@ -73,7 +73,7 @@ public:
     /// \throws std::runtime_error on failure to open/read underlying %BAM or PBI
     ///         files.
     ///
-    BarcodeQuery(const uint16_t barcode, const DataSet& dataset);
+    BarcodeQuery(const int16_t barcode, const DataSet& dataset);
 
     ~BarcodeQuery(void);
 

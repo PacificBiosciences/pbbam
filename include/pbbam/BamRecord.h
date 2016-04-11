@@ -83,12 +83,14 @@ enum class ClipType
 ///
 enum class RecordType
 {
-    POLYMERASE  ///< Polymerase read
+    ZMW         ///< Polymerase read
   , HQREGION    ///< High-quality region
   , SUBREAD     ///< Subread (
   , CCS         ///< Circular consensus sequence
   , SCRAP       ///< Additional sequence (barcodes, adapters, etc.)
   , UNKNOWN     ///< Unknown read type
+
+  , POLYMERASE = ZMW ///< \deprecated as of PacBio BAM spec v 3.0.4 (use RecordType::ZMW instead)
 };
 
 /// \brief This enum defines the possible encoding modes used in Frames data
@@ -302,7 +304,7 @@ public:
     /// \throws std::runtime_error if barcode data is absent or malformed.
     /// \sa HasBarcodes
     ///
-    uint16_t BarcodeForward(void) const;
+    int16_t BarcodeForward(void) const;
 
     /// \returns barcode call confidence (Phred-scaled posterior probability
     ///          of correct barcode call)
@@ -316,14 +318,14 @@ public:
     /// \throws std::runtime_error if barcode data is absent or malformed.
     /// \sa HasBarcodes
     ///
-    uint16_t BarcodeReverse(void) const;
+    int16_t BarcodeReverse(void) const;
 
     /// \returns the forward and reverse barcode ids
     ///
     /// \throws std::runtime_error if barcode data is absent or malformed.
     /// \sa HasBarcodes
     ///
-    std::pair<uint16_t,uint16_t> Barcodes(void) const;
+    std::pair<int16_t,int16_t> Barcodes(void) const;
 
     /// \}
 
@@ -883,7 +885,7 @@ public:
     /// \param[in] barcodeIds
     /// \returns reference to this record
     ///
-    BamRecord& Barcodes(const std::pair<uint16_t,uint16_t>& barcodeIds);
+    BamRecord& Barcodes(const std::pair<int16_t, int16_t>& barcodeIds);
 
     /// \brief Sets this record's barcode quality ('bq' tag)
     ///

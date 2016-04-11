@@ -229,7 +229,7 @@ public:
     /// \param[in] barcode  barcode ID to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiBarcodeFilter(const uint16_t barcode,
+    PbiBarcodeFilter(const int16_t barcode,
                      const Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a 'whitelisted' barcode filter.
@@ -240,7 +240,7 @@ public:
     ///
     /// \param[in] whitelist  barcode IDs to compare on
     ///
-    PbiBarcodeFilter(const std::vector<uint16_t>& whitelist);
+    PbiBarcodeFilter(const std::vector<int16_t>& whitelist);
 
     /// \brief Creates a 'whitelisted' barcode filter.
     ///
@@ -250,7 +250,7 @@ public:
     ///
     /// \param[in] whitelist  barcode IDs to compare on
     ///
-    PbiBarcodeFilter(std::vector<uint16_t>&& whitelist);
+    PbiBarcodeFilter(std::vector<int16_t>&& whitelist);
 
 public:
     /// \brief Performs the actual index lookup.
@@ -271,7 +271,7 @@ private:
 /// \sa BamRecord::BarcodeForward
 ///
 struct PbiBarcodeForwardFilter
-    : public internal::BarcodeDataFilterBase<uint16_t, BarcodeLookupData::BC_FORWARD>
+    : public internal::BarcodeDataFilterBase<int16_t, BarcodeLookupData::BC_FORWARD>
 {
 public:
     /// \brief Creates a single-value forward barcode filter.
@@ -279,7 +279,7 @@ public:
     /// \param[in] bcFwdId  (forward) barcode ID to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiBarcodeForwardFilter(const uint16_t bcFwdId,
+    PbiBarcodeForwardFilter(const int16_t bcFwdId,
                             const Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a 'whitelisted' forward barcode filter.
@@ -290,7 +290,7 @@ public:
     ///
     /// \param[in] whitelist  barcode IDs to compare on
     ///
-    PbiBarcodeForwardFilter(const std::vector<uint16_t>& whitelist);
+    PbiBarcodeForwardFilter(const std::vector<int16_t>& whitelist);
 
     /// \brief Creates a 'whitelisted' forward barcode filter.
     ///
@@ -300,7 +300,7 @@ public:
     ///
     /// \param[in] whitelist  barcode IDs to compare on
     ///
-    PbiBarcodeForwardFilter(std::vector<uint16_t>&& whitelist);
+    PbiBarcodeForwardFilter(std::vector<int16_t>&& whitelist);
 };
 
 /// \brief The PbiBarcodeQualityFilter class provides a PbiFilter-compatible
@@ -331,7 +331,7 @@ public:
 /// \sa BamRecord::BarcodeReverse
 ///
 struct PbiBarcodeReverseFilter
-    : public internal::BarcodeDataFilterBase<uint16_t, BarcodeLookupData::BC_REVERSE>
+    : public internal::BarcodeDataFilterBase<int16_t, BarcodeLookupData::BC_REVERSE>
 {
 public:
     /// \brief Creates a single-value reverse barcode filter.
@@ -339,7 +339,7 @@ public:
     /// \param[in] bcRevId  (reverse) barcode ID to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiBarcodeReverseFilter(const uint16_t bcRevId,
+    PbiBarcodeReverseFilter(const int16_t bcRevId,
                             const Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a 'whitelisted' reverse barcode filter.
@@ -350,7 +350,7 @@ public:
     ///
     /// \param[in] whitelist  barcode IDs to compare on
     ///
-    PbiBarcodeReverseFilter(const std::vector<uint16_t>& whitelist);
+    PbiBarcodeReverseFilter(const std::vector<int16_t>& whitelist);
 
     /// \brief Creates a 'whitelisted' reverse barcode filter.
     ///
@@ -360,7 +360,7 @@ public:
     ///
     /// \param[in] whitelist  barcode IDs to compare on
     ///
-    PbiBarcodeReverseFilter(std::vector<uint16_t>&& whitelist);
+    PbiBarcodeReverseFilter(std::vector<int16_t>&& whitelist);
 };
 
 /// \brief The PbiBarcodesFilter class provides a PbiFilter-compatible filter on
@@ -383,7 +383,7 @@ public:
     /// \param[in] barcodes barcode IDs to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiBarcodesFilter(const std::pair<uint16_t, uint16_t> barcodes,
+    PbiBarcodesFilter(const std::pair<int16_t, int16_t> barcodes,
                       const Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a barcodes filter from forward & reverse IDs.
@@ -392,8 +392,8 @@ public:
     /// \param[in] bcReverse    reverse barcode ID to compare on
     /// \param[in] cmp          compare type
     ///
-    PbiBarcodesFilter(const uint16_t bcForward,
-                      const uint16_t bcReverse,
+    PbiBarcodesFilter(const int16_t bcForward,
+                      const int16_t bcReverse,
                       const Compare::Type cmp = Compare::EQUAL);
 public:
     /// \brief Performs the actual index lookup.
