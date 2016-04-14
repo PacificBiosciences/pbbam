@@ -89,6 +89,17 @@ public:
     /// \}
 
 public:
+    /// \name File Headers
+    /// \{
+
+    /// \returns the BamHeader associated with this reader's "primary" %BAM file
+    BamHeader PrimaryHeader(void) const;
+
+    /// \returns the BamHeader associated with this reader's "scraps" %BAM file
+    BamHeader ScrapsHeader(void) const;
+
+    /// \}
+
 public:
     /// \name Stitched Record Reading
     ///

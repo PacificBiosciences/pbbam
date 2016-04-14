@@ -148,6 +148,12 @@ public:
         throw std::runtime_error(msg);
     }
 
+    BamHeader PrimaryHeader(void) const
+    { return currentReader_->PrimaryHeader(); }
+
+    BamHeader ScrapsHeader(void) const
+    { return currentReader_->ScrapsHeader(); }
+
 private:
     std::deque< std::pair<std::string, std::string> > sources_;
     std::unique_ptr<VirtualZmwReader> currentReader_;
@@ -208,3 +214,10 @@ VirtualZmwBamRecord ZmwReadStitcher::Next(void)
 
 vector<BamRecord> ZmwReadStitcher::NextRaw(void)
 { return d_->NextRaw(); }
+
+BamHeader ZmwReadStitcher::PrimaryHeader(void) const
+{ return d_->PrimaryHeader(); }
+
+BamHeader ZmwReadStitcher::ScrapsHeader(void) const 
+{ return d_->ScrapsHeader(); }
+
