@@ -116,9 +116,9 @@ class BamHeaderTest(unittest.TestCase):
         expectedText = ("@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
                         "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
                         "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
-                        "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\n"
-                        "@RG\tID:rg2\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:condition1\n"
-                        "@RG\tID:rg3\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:condition1\n"
+                        "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\tPM:SEQUEL\n"
+                        "@RG\tID:rg2\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:condition1\tPM:SEQUEL\n"
+                        "@RG\tID:rg3\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:condition1\tPM:SEQUEL\n"
                         "@PG\tID:_foo_\tPN:ide\n"
                         "@CO\tipsum and so on\n"
                         "@CO\tcitation needed\n")

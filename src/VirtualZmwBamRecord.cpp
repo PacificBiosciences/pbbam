@@ -34,8 +34,8 @@
 // SUCH DAMAGE.
 //
 // File Description
-/// \file VirtualPolymeraseBamRecord.cpp
-/// \brief Implements the VirtualPolymeraseBamRecord class.
+/// \file VirtualZmwBamRecord.cpp
+/// \brief Implements the VirtualZmwBamRecord class.
 //
 // Author: Armin Töpfer
 
@@ -44,7 +44,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "pbbam/virtual/VirtualPolymeraseBamRecord.h"
+#include "pbbam/virtual/VirtualZmwBamRecord.h"
 #include "pbbam/virtual/VirtualRegionType.h"
 #include "pbbam/virtual/VirtualRegionTypeMap.h"
 
@@ -100,10 +100,10 @@ inline void MoveAppend(std::vector<T>&& src, std::vector<T>& dst) noexcept
 } // namespace BAM
 } // namespace PacBio
 
-VirtualPolymeraseBamRecord::VirtualPolymeraseBamRecord(
+VirtualZmwBamRecord::VirtualZmwBamRecord(
     std::vector<BamRecord>&& unorderedSources, const BamHeader& header)
     : BamRecord(header)
-    , sources_(std::forward<std::vector<BamRecord>>(unorderedSources))
+    , sources_(std::move(unorderedSources))
 {
     // Sort sources by queryStart
     std::sort(sources_.begin(), sources_.end(),
@@ -112,10 +112,10 @@ VirtualPolymeraseBamRecord::VirtualPolymeraseBamRecord(
     StitchSources();
 }
 
-bool VirtualPolymeraseBamRecord::HasVirtualRegionType(const VirtualRegionType regionType) const
+bool VirtualZmwBamRecord::HasVirtualRegionType(const VirtualRegionType regionType) const
 { return virtualRegionsMap_.find(regionType) != virtualRegionsMap_.end(); }
 
-Frames VirtualPolymeraseBamRecord::IPDV1Frames(Orientation orientation) const
+Frames VirtualZmwBamRecord::IPDV1Frames(Orientation orientation) const
 {
     const auto rawFrames = this->IPDRaw(orientation);
     const std::vector<uint8_t> rawData(rawFrames.Data().begin(), rawFrames.Data().end());
@@ -123,7 +123,7 @@ Frames VirtualPolymeraseBamRecord::IPDV1Frames(Orientation orientation) const
 }
 
 
-void VirtualPolymeraseBamRecord::StitchSources(void)
+void VirtualZmwBamRecord::StitchSources(void)
 {
     const auto& firstRecord = sources_[0];
     const auto& lastRecord = sources_[sources_.size() - 1];
@@ -151,11 +151,34 @@ void VirtualPolymeraseBamRecord::StitchSources(void)
     std::vector<float>    pm;
     std::vector<uint32_t> sf;
 
+    // initialize capacity
+    const auto stitchedSize = lastRecord.QueryEnd() - firstRecord.QueryStart();
+    sequence.reserve(stitchedSize);
+    deletionTag.reserve(stitchedSize);
+    substitutionTag.reserve(stitchedSize);
+    alternativeLabelTag.reserve(stitchedSize);
+    pulseCall.reserve(stitchedSize);
+    qualities.reserve(stitchedSize);
+    deletionQv.reserve(stitchedSize);
+    insertionQv.reserve(stitchedSize);
+    mergeQv.reserve(stitchedSize);
+    pulseMergeQv.reserve(stitchedSize);
+    substitutionQv.reserve(stitchedSize);
+    labelQv.reserve(stitchedSize);
+    alternativeLabelQv.reserve(stitchedSize);
+    ipd.DataRaw().reserve(stitchedSize);
+    pw.DataRaw().reserve(stitchedSize);
+    pd.DataRaw().reserve(stitchedSize);
+    px.DataRaw().reserve(stitchedSize);
+    pa.reserve(stitchedSize);
+    pm.reserve(stitchedSize);
+    sf.reserve(stitchedSize);
+
     // Stitch using tmp vars
     for(auto& b : sources_)
     {
         sequence.append(b.Sequence());
-        
+
         MoveAppend(b.Qualities(), qualities);
 
         if (b.HasDeletionQV())
@@ -221,12 +244,12 @@ void VirtualPolymeraseBamRecord::StitchSources(void)
         if (b.HasScrapRegionType())
         {
             const VirtualRegionType regionType = b.ScrapRegionType();
-            
+
             if (!HasVirtualRegionType(regionType))
                 virtualRegionsMap_[regionType] = std::vector<VirtualRegion>();
 
             virtualRegionsMap_[regionType].emplace_back(
-                regionType, b.QueryStart(), b.QueryEnd());   
+                regionType, b.QueryStart(), b.QueryEnd());
         }
 
         if (b.HasLocalContextFlags())
@@ -363,15 +386,14 @@ void VirtualPolymeraseBamRecord::StitchSources(void)
 
 
 std::map<VirtualRegionType, std::vector<VirtualRegion>>
-VirtualPolymeraseBamRecord::VirtualRegionsMap(void) const
+VirtualZmwBamRecord::VirtualRegionsMap(void) const
 { return virtualRegionsMap_; }
 
 std::vector<VirtualRegion>
-VirtualPolymeraseBamRecord::VirtualRegionsTable(const VirtualRegionType regionType) const
+VirtualZmwBamRecord::VirtualRegionsTable(const VirtualRegionType regionType) const
 {
    const auto iter = virtualRegionsMap_.find(regionType);
    if (iter != virtualRegionsMap_.cend())
        return iter->second;
-   return std::vector<VirtualRegion>(); 
+   return std::vector<VirtualRegion>();
 }
-

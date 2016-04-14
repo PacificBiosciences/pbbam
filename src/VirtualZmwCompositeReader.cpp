@@ -34,18 +34,19 @@
 // SUCH DAMAGE.
 //
 // File Description
-/// \file VirtualPolymeraseCompositeReader.cpp
-/// \brief Implements the VirtualPolymeraseCompositeReader class.
+/// \file VirtualZmwCompositeReader.cpp
+/// \brief Implements the VirtualZmwCompositeReader class.
 //
 // Author: Derek Barnett
 
-#include "pbbam/virtual/VirtualPolymeraseCompositeReader.h"
+#include "VirtualZmwCompositeReader.h"
 #include <boost/algorithm/string.hpp>
 using namespace PacBio;
 using namespace PacBio::BAM;
+using namespace PacBio::BAM::internal;
 using namespace std;
 
-VirtualPolymeraseCompositeReader::VirtualPolymeraseCompositeReader(const DataSet& dataset)
+VirtualZmwCompositeReader::VirtualZmwCompositeReader(const DataSet& dataset)
     : currentReader_(nullptr)
     , filter_(PbiFilter::FromDataSet(dataset))
 {
@@ -89,12 +90,12 @@ VirtualPolymeraseCompositeReader::VirtualPolymeraseCompositeReader(const DataSet
     OpenNextReader();
 }
 
-bool VirtualPolymeraseCompositeReader::HasNext(void)
+bool VirtualZmwCompositeReader::HasNext(void)
 {
     return (currentReader_ && currentReader_->HasNext());
 }
 
-VirtualPolymeraseBamRecord VirtualPolymeraseCompositeReader::Next(void)
+VirtualZmwBamRecord VirtualZmwCompositeReader::Next(void)
 {
     if (currentReader_) {
         const auto result = currentReader_->Next();
@@ -105,13 +106,13 @@ VirtualPolymeraseBamRecord VirtualPolymeraseCompositeReader::Next(void)
 
     // no reader active
     const string msg = { "no readers active, make sure you use "
-                         "VirtualPolymeraseCompositeReader::HasNext before "
+                         "VirtualZmwCompositeReader::HasNext before "
                          "requesting next record"
                       };
     throw std::runtime_error(msg);
 }
 
-vector<BamRecord> VirtualPolymeraseCompositeReader::NextRaw(void)
+vector<BamRecord> VirtualZmwCompositeReader::NextRaw(void)
 {
     if (currentReader_) {
         const auto result = currentReader_->NextRaw();
@@ -122,13 +123,13 @@ vector<BamRecord> VirtualPolymeraseCompositeReader::NextRaw(void)
 
     // no reader active
     const string msg = { "no readers active, make sure you use "
-                         "VirtualPolymeraseCompositeReader::HasNext before "
+                         "VirtualZmwCompositeReader::HasNext before "
                          "requesting next group of records"
                       };
     throw std::runtime_error(msg);
 }
 
-void VirtualPolymeraseCompositeReader::OpenNextReader(void)
+void VirtualZmwCompositeReader::OpenNextReader(void)
 {
     currentReader_.reset(nullptr);
 
@@ -137,9 +138,9 @@ void VirtualPolymeraseCompositeReader::OpenNextReader(void)
         const auto nextSource = sources_.front();
         sources_.pop_front();
 
-        currentReader_.reset(new VirtualPolymeraseReader(nextSource.first,
-                                                         nextSource.second,
-                                                         filter_));
+        currentReader_.reset(new VirtualZmwReader(nextSource.first,
+                                                  nextSource.second,
+                                                  filter_));
         if (currentReader_->HasNext())
             return;
     }

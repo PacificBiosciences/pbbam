@@ -42,94 +42,13 @@
 #ifndef VIRTUALPOLYMERASEREADER_H
 #define VIRTUALPOLYMERASEREADER_H
 
-#include <memory>
-
-#include "pbbam/BamFile.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
-#include "pbbam/EntireFileQuery.h"
-#include "pbbam/PbiFilter.h"
-#include "pbbam/PbiFilterQuery.h"
-#include "pbbam/virtual/VirtualPolymeraseBamRecord.h"
+#include "pbbam/virtual/ZmwReadStitcher.h"
 
 namespace PacBio {
 namespace BAM {
 
-/// \brief The VirtualPolymeraseReader class provides an interface for re-stitching
-///        "virtual" polymerase reads from their constituent parts.
-///
-class VirtualPolymeraseReader
-{
-public:
-    /// \name Constructors & Related Methods
-    /// \{
-
-    /// \brief Creates a reader that will operate on a primary %BAM file (e.g. subread data)
-    ///        and a scraps file, consuming all reads.
-    ///
-    /// \param[in] primaryBamFilePath hqregion.bam or subreads.bam file path
-    /// \param[in] scrapsBamFilePath  scraps.bam file path
-    ///
-    VirtualPolymeraseReader(const std::string& primaryBamFilePath,
-                            const std::string& scrapsBamFilePath);
-
-    /// \brief Creates a reader that will operate on a primary %BAM file (e.g. subread data)
-    ///        and a scraps file, respecting the provided PBI filter.
-    ///
-    /// \note All %BAM files must have a corresponding ".pbi" index file to use
-    ///       the filter. You may need to call BamFile::EnsurePacBioIndexExists
-    ///       before constructing the reader.
-    ///
-    /// \param[in] primaryBamFilePath hqregion.bam or subreads.bam file path
-    /// \param[in] scrapsBamFilePath  scraps.bam file path
-    /// \param[in] filter PBI filter criteria
-    ///
-    VirtualPolymeraseReader(const std::string& primaryBamFilePath,
-                            const std::string& scrapsBamFilePath,
-                            const PbiFilter& filter);
-
-    VirtualPolymeraseReader(void) = delete;
-    VirtualPolymeraseReader(const VirtualPolymeraseReader&) = delete;
-    VirtualPolymeraseReader(VirtualPolymeraseReader&&) = delete;
-    VirtualPolymeraseReader& operator=(const VirtualPolymeraseReader&) = delete;
-    VirtualPolymeraseReader& operator=(VirtualPolymeraseReader&&) = delete;
-    ~VirtualPolymeraseReader(void);
-
-    /// \}
-
-public:
-    /// \name File Headers
-    /// \{
-
-    /// \returns the BamHeader associated with this reader's "primary" %BAM file
-    BamHeader PrimaryHeader(void) const;
-
-    /// \returns the BamHeader associated with this reader's "scraps" %BAM file
-    BamHeader ScrapsHeader(void) const;
-
-    /// \}
-
-public:
-    /// \name Stitched Record Reading
-    ///
-
-    /// \returns true if more ZMWs are available for reading.
-    bool HasNext(void);
-
-    /// \returns the next stitched polymerase read
-    VirtualPolymeraseBamRecord Next(void);
-
-    /// \returns the next set of reads that belong to one ZMW.
-    ///          This enables stitching records in a distinct thread.
-    ///
-    std::vector<BamRecord> NextRaw(void);
-
-    /// \}
-
-private:
-    struct VirtualPolymeraseReaderPrivate;
-    std::unique_ptr<VirtualPolymeraseReaderPrivate> d_;
-};
+/// \deprecated Use ZmwReadStitcher instead.
+typedef ZmwReadStitcher VirtualPolymeraseReader;
 
 } // namespace BAM
 } // namespace PacBio

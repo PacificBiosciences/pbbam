@@ -19,6 +19,8 @@ namespace TestStuff
         public static readonly string DATA_DIR = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/TestData";
         public static readonly string BAM_FILENAME_1 = Path.Combine(DATA_DIR, "test_group_query", "test1.bam");
         public static readonly string BAM_FILENAME_2 = Path.Combine(DATA_DIR, "test_group_query", "test2.bam");
+        public static readonly string STITCHING_FN_1 = Path.Combine(DATA_DIR, "polymerase", "production.subreads.bam");
+        public static readonly string STITCHING_FN_2 = Path.Combine(DATA_DIR, "polymerase", "production.scraps.bam");
         public static readonly string FASTA_FILENAME = Path.Combine(DATA_DIR, "lambdaNEB.fa");
 
         public TestPbbam ()
@@ -99,6 +101,18 @@ namespace TestStuff
             }
             Console.WriteLine("TestZmwQuery - OK!");
         }
+        
+        public static void TestStitching()
+        {
+            var stitcher = new ZmwReadStitcher(STITCHING_FN_1, STITCHING_FN_2);
+            if (!stitcher.HasNext())
+            {
+                throw new Exception("Error stitching via ZmwReadStitcher");
+            }
+            var zmwRecord = stitcher.Next();
+            
+            Console.WriteLine("TestStitching - OK!");
+        }
 
         public void RunAllTests()
         {
@@ -107,6 +121,7 @@ namespace TestStuff
             TestBamFileEnumeration();
             TestIndexedFasta();
             TestZmwQuery();
+            TestStitching();
         }
 
         public static void Main()

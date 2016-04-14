@@ -26,12 +26,18 @@ aligned reads (bug 31339).
 ### Changed
 - RecordType::POLYMERASE renamed to RecordType::ZMW to reflect changes in
 PacBio BAM spec v3.0.4
-- Barcodes now represented as int16_t throughout the API, to better handle the
-'missing' value of -1. Please note that the PacBio BAM spec still requires that
-barcodes be stored as uint16_t, but pbbam will handle that conversion for client
-code. Conversions are done using boost::numeric_cast to check for over/underflow,
-so any erroroneous values should be catch-able via boost::bad_numeric_cast 
-exception.
+- Refactored the 'virtual' reader classes - to match the new nomenclature,
+and to combine the virtual reader & composite readers behind a shared 
+interface. The old class names still exist, as typedefs to the new ones, 
+and the interfaces are completely source-compatible - so as not to break 
+existing code. However, the old classes should be considered deprecated and 
+the new ones preferred. Below is the mapping of old -> new:
+
+   VirtualPolymeraseBamRecord        ->  VirtualZmwBamRecord
+   VirtualPolymeraseReader           ->  ZmwReadStitcher
+   VirtualPolymeraseCompositeReader  ->  ZmwReadStitcher
+   ZmwWhitelistVirtualReader         ->  WhitelistedZmwReadStitcher
+
 
 ## [0.5.0] - 2016-02-22
 

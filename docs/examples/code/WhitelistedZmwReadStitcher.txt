@@ -1,5 +1,5 @@
 vector<int32_t> zmws = { ... };
-ZmwWhitelistVirtualReader reader(zmws, "primary.bam", "scraps.bam");
+WhitelistedZmwReadStitcher reader(zmws, "primary.bam", "scraps.bam");
 while(reader.HasNext()) {
     auto virtualRecord = reader.Next();
     // ... do stuff ...

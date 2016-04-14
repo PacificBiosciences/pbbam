@@ -45,7 +45,7 @@ class BamFileTest(unittest.TestCase):
     
     def setUp(self):
         self.data = config.TestData()
-        self.ex2BamFn = self.data.directory + "/ex2.bam"
+        self.bamFn = self.data.directory + "/aligned.bam"
     
     def runTest(self):
         self.test_ctor()
@@ -54,7 +54,7 @@ class BamFileTest(unittest.TestCase):
     # ------------ TESTS --------------
         
     def test_ctor(self):
-        f = PacBioBam.BamFile(self.ex2BamFn)
+        f = PacBioBam.BamFile(self.bamFn)
         
     def test_nonExistentFile(self):
         with self.assertRaises(RuntimeError):

@@ -35,7 +35,6 @@ set( PacBioBAMTest_CPP
     ${PacBioBAM_TestsDir}/src/test_PacBioIndex.cpp
     ${PacBioBAM_TestsDir}/src/test_PbiFilter.cpp
     ${PacBioBAM_TestsDir}/src/test_PbiFilterQuery.cpp
-    ${PacBioBAM_TestsDir}/src/test_PolymeraseStitching.cpp
     ${PacBioBAM_TestsDir}/src/test_QNameQuery.cpp
     ${PacBioBAM_TestsDir}/src/test_QualityValues.cpp
     ${PacBioBAM_TestsDir}/src/test_ReadAccuracyQuery.cpp
@@ -48,6 +47,7 @@ set( PacBioBAMTest_CPP
     # ${PacBioBAM_TestsDir}/src/test_UnmappedReadsQuery.cpp
     ${PacBioBAM_TestsDir}/src/test_Validator.cpp
     ${PacBioBAM_TestsDir}/src/test_Version.cpp
-    ${PacBioBAM_TestsDir}/src/test_VirtualPolymeraseCompositeReader.cpp
+    ${PacBioBAM_TestsDir}/src/test_WhitelistedZmwReadStitcher.cpp
+    ${PacBioBAM_TestsDir}/src/test_ZmwReadStitcher.cpp
     ${PacBioBAM_TestsDir}/src/test_ZmwQuery.cpp
 )

@@ -77,7 +77,7 @@ class EndToEndTest(unittest.TestCase):
     def runTest(self):
         
         self.testData = config.TestData()
-        self.ex2BamFn = self.testData.directory + "/ex2.bam"
+        self.ex2BamFn = self.testData.directory + "/aligned.bam"
         self.generatedBamFn = self.testData.directory + "/generated.bam"
         
         # compare input records to generated copy's records

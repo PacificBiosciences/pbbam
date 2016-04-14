@@ -42,78 +42,13 @@
 #ifndef VIRTUALPOLYMERASEBAMRECORD_H
 #define VIRTUALPOLYMERASEBAMRECORD_H
 
-#include <vector>
-#include <sstream>
-
-#include "pbbam/BamHeader.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
-#include "pbbam/virtual/VirtualRegion.h"
-#include "pbbam/virtual/VirtualRegionType.h"
+#include "pbbam/virtual/VirtualZmwBamRecord.h"
 
 namespace PacBio {
 namespace BAM {
 
-/// \brief The VirtualPolymeraseBamRecord class represents a polymerase read stitched on the fly
-///        from subreads|hqregion+scraps.
-///
-class VirtualPolymeraseBamRecord : public BamRecord
-{
-public:
-    /// \name Constructors & Related Methods
-    /// \{
-
-    /// \brief Creates a "virtual" polymerase %BAM record, by re-stitching its constituent segments.
-    ///
-    /// \param[in] unorderedSources source data (subreads, scraps, etc.)
-    /// \param[in] header           %BAM header to associate with the new record
-    ///
-    /// \throws std::runtime_error on failure to stitch virtual record
-    ///
-    VirtualPolymeraseBamRecord(std::vector<BamRecord>&& unorderedSources,
-                               const BamHeader& header);
-
-    VirtualPolymeraseBamRecord(void) = delete;
-    VirtualPolymeraseBamRecord(const VirtualPolymeraseBamRecord&) = default; // un-"delete"-ed for SWIG
-    VirtualPolymeraseBamRecord(VirtualPolymeraseBamRecord&&) = default;
-    VirtualPolymeraseBamRecord& operator=(const VirtualPolymeraseBamRecord&) = delete;
-    VirtualPolymeraseBamRecord& operator=(VirtualPolymeraseBamRecord&&) = default;
-    virtual ~VirtualPolymeraseBamRecord() = default;
-
-    /// \}
-
-public:
-    /// \name Virtual Record Attributes
-    ///
-
-    /// \returns true if requested VirtualRegionType has been annotated.
-    ///
-    bool HasVirtualRegionType(const VirtualRegionType regionType) const;
-
-    /// \returns IPD frame data
-    ///
-    Frames IPDV1Frames(Orientation orientation = Orientation::NATIVE) const;
-
-    /// \brief Provides all annotations of the polymerase read as a map (type => regions)
-    ///
-    std::map<VirtualRegionType, std::vector<VirtualRegion>> VirtualRegionsMap(void) const;
-
-    /// \brief Provides annotations of the polymerase read for a given VirtualRegionType.
-    ///
-    /// \param[in] regionType  requested region type
-    /// \returns regions that match the requested type (empty vector if none found).
-    ///
-    std::vector<VirtualRegion> VirtualRegionsTable(const VirtualRegionType regionType) const;
-
-    /// \}
-
-private:
-    std::vector<BamRecord> sources_;
-    std::map<VirtualRegionType, std::vector<VirtualRegion>> virtualRegionsMap_;
-
-private:
-    void StitchSources(void);
-};
+/// \deprecated Use VirtualZmwBamRecord instead.
+typedef VirtualZmwBamRecord VirtualPolymeraseBamRecord;
 
 } // namespace BAM
 } // namespace PacBio

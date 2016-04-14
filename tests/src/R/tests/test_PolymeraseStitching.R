@@ -124,14 +124,9 @@ getVirtualRecord <- function(fn1, fn2) {
     
     result <- tryCatch(
         {
-            vpr <- VirtualPolymeraseReader(fn1, fn2)
-            
+            vpr <- ZmwReadStitcher(fn1, fn2)
             assertTrue(vpr$HasNext())
-            
             virtualRecord <- vpr$Next()
-            
-            assertFalse(vpr$HasNext())
-            
             return(virtualRecord)
         },
         error = function(e) {
@@ -149,17 +144,10 @@ getPolymeraseRecord <- function(fn) {
         {
             ds <- DataSet(fn)
             entireFile <- EntireFileQuery(ds)
-            
             polyIter <- entireFile$begin()
             polyEnd <- entireFile$end()
-            
             assertTrue(polyIter$'__ne__'(polyEnd))
-            
             polyRecord <- polyIter$value()
-            polyIter$incr()
-            
-            assertTrue(polyIter$'__eq__'(polyEnd))
-            
             return(polyRecord)
         },
         error = function(e) {

@@ -142,8 +142,13 @@ endif*/
 // FASTA
 %include "IndexedFastaReader.i"
 
-// VirtualPolymeraseBamRecord 
+// Virtual record API
 %include "VirtualRegion.i"
+%include "VirtualZmwBamRecord.i"
+%include "ZmwReadStitcher.i"
+%include "WhitelistedZmwReadStitcher.i"
+
+// Virtual record API - deprecated
 %include "VirtualPolymeraseBamRecord.i"
 %include "VirtualPolymeraseReader.i"
 %include "ZmwWhitelistVirtualReader.i"

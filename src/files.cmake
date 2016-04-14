@@ -109,6 +109,9 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualRegion.h
     ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualRegionType.h
     ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualRegionTypeMap.h
+    ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualZmwBamRecord.h
+    ${PacBioBAM_IncludeDir}/pbbam/virtual/WhitelistedZmwReadStitcher.h
+    ${PacBioBAM_IncludeDir}/pbbam/virtual/ZmwReadStitcher.h
     ${PacBioBAM_IncludeDir}/pbbam/virtual/ZmwWhitelistVirtualReader.h
 
     # library-internal headers
@@ -126,6 +129,8 @@ set( PacBioBAM_H
     ${PacBioBAM_SourceDir}/TimeUtils.h
     ${PacBioBAM_SourceDir}/ValidationErrors.h
     ${PacBioBAM_SourceDir}/Version.h
+    ${PacBioBAM_SourceDir}/VirtualZmwCompositeReader.h
+    ${PacBioBAM_SourceDir}/VirtualZmwReader.h
     ${PacBioBAM_SourceDir}/XmlReader.h
     ${PacBioBAM_SourceDir}/XmlWriter.h
     ${PacBioBAM_SourceDir}/pugixml/pugiconfig.hpp
@@ -192,16 +197,17 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/ValidationErrors.cpp
     ${PacBioBAM_SourceDir}/ValidationException.cpp
     ${PacBioBAM_SourceDir}/Version.cpp
-    ${PacBioBAM_SourceDir}/VirtualPolymeraseBamRecord.cpp
-    ${PacBioBAM_SourceDir}/VirtualPolymeraseCompositeReader.cpp
-    ${PacBioBAM_SourceDir}/VirtualPolymeraseReader.cpp
+    ${PacBioBAM_SourceDir}/VirtualZmwBamRecord.cpp
+    ${PacBioBAM_SourceDir}/VirtualZmwCompositeReader.cpp
+    ${PacBioBAM_SourceDir}/VirtualZmwReader.cpp
     ${PacBioBAM_SourceDir}/VirtualRegionTypeMap.cpp
     ${PacBioBAM_SourceDir}/XmlReader.cpp
     ${PacBioBAM_SourceDir}/XmlWriter.cpp
+    ${PacBioBAM_SourceDir}/WhitelistedZmwReadStitcher.cpp
     ${PacBioBAM_SourceDir}/ZmwGroupQuery.cpp
+    ${PacBioBAM_SourceDir}/ZmwReadStitcher.cpp
     ${PacBioBAM_SourceDir}/ZmwQuery.cpp
     ${PacBioBAM_SourceDir}/ZmwTypeMap.cpp
-    ${PacBioBAM_SourceDir}/ZmwWhitelistVirtualReader.cpp
 
     # XML I/O
     ${PacBioBAM_SourceDir}/pugixml/pugixml.cpp

@@ -56,7 +56,7 @@ test_case("BamFile_NonExistentFile", {
 
 test_case("BamFile_Ctor", {
 	
-	fn <- paste(test_data_path, "ex2.bam", sep="/")
+        fn <- paste(test_data_path, "aligned.bam", sep="/")
 	
 	result <- tryCatch(
 		{

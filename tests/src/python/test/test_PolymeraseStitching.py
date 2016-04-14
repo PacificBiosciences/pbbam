@@ -150,22 +150,16 @@ class PolymeraseStitchingTest(unittest.TestCase):
         subreadsBam = self.data.directory + "/polymerase/internal.subreads.bam"
         scrapsBam   = self.data.directory + "/polymerase/internal.scraps.bam"
         vpr = PacBioBam.VirtualPolymeraseReader(subreadsBam, scrapsBam)
-
         self.assertTrue(vpr.HasNext())
         virtualRecord = vpr.Next()
-        self.assertFalse(vpr.HasNext())
 
         # fetch original polymerase record
         polyBam   = PacBioBam.DataSet(self.data.directory + "/polymerase/internal.polymerase.bam")
         polyQuery = PacBioBam.EntireFileQuery(polyBam)
-
         polyIter = polyQuery.begin()
         polyEnd  = polyQuery.end()
-
         self.assertTrue(polyIter != polyEnd)
         polyRecord = polyIter.value()
-        polyIter.incr()
-        self.assertTrue(polyIter == polyEnd)
 
         # compare
         self.compare(polyRecord, virtualRecord)
@@ -176,22 +170,16 @@ class PolymeraseStitchingTest(unittest.TestCase):
         hqRegionsBam = self.data.directory + "/polymerase/internal.hqregions.bam"
         lqRegionsBam = self.data.directory + "/polymerase/internal.lqregions.bam"
         vpr = PacBioBam.VirtualPolymeraseReader(hqRegionsBam, lqRegionsBam)
-
         self.assertTrue(vpr.HasNext())
         virtualRecord = vpr.Next()
-        self.assertFalse(vpr.HasNext())
 
         # fetch original polymerase record
         polyBam   = PacBioBam.DataSet(self.data.directory + "/polymerase/internal.polymerase.bam")
         polyQuery = PacBioBam.EntireFileQuery(polyBam)
-
         polyIter = polyQuery.begin()
         polyEnd  = polyQuery.end()
-
         self.assertTrue(polyIter != polyEnd)
         polyRecord = polyIter.value()
-        polyIter.incr()
-        self.assertTrue(polyIter == polyEnd)
        
         # # compare
         self.compare(polyRecord, virtualRecord)
@@ -202,22 +190,16 @@ class PolymeraseStitchingTest(unittest.TestCase):
         subreadsBam = self.data.directory + "/polymerase/production.subreads.bam"
         scrapsBam   = self.data.directory + "/polymerase/production.scraps.bam"
         vpr = PacBioBam.VirtualPolymeraseReader(subreadsBam, scrapsBam)
-
         self.assertTrue(vpr.HasNext())
         virtualRecord = vpr.Next()
-        self.assertFalse(vpr.HasNext())
 
         # fetch original polymerase record
         polyBam   = PacBioBam.DataSet(self.data.directory + "/polymerase/production.polymerase.bam")
         polyQuery = PacBioBam.EntireFileQuery(polyBam)
-
         polyIter = polyQuery.begin()
         polyEnd  = polyQuery.end()
-
         self.assertTrue(polyIter != polyEnd)
         polyRecord = polyIter.value()
-        polyIter.incr()
-        self.assertTrue(polyIter == polyEnd)
         
         # compare
         self.assertEqual(polyRecord.FullName(),        virtualRecord.FullName());
@@ -243,22 +225,16 @@ class PolymeraseStitchingTest(unittest.TestCase):
         hqRegionsBam = self.data.directory + "/polymerase/production_hq.hqregion.bam"
         lqRegionsBam = self.data.directory + "/polymerase/production_hq.scraps.bam"
         vpr = PacBioBam.VirtualPolymeraseReader(hqRegionsBam, lqRegionsBam)
-
         self.assertTrue(vpr.HasNext())
         virtualRecord = vpr.Next()
-        self.assertFalse(vpr.HasNext())
 
         # fetch original polymerase record
         polyBam   = PacBioBam.DataSet(self.data.directory + "/polymerase/production.polymerase.bam")
         polyQuery = PacBioBam.EntireFileQuery(polyBam)
-
         polyIter = polyQuery.begin()
         polyEnd  = polyQuery.end()
-
         self.assertTrue(polyIter != polyEnd)
         polyRecord = polyIter.value()
-        polyIter.incr()
-        self.assertTrue(polyIter == polyEnd)
         
         # compare        
         self.assertFalse(polyRecord.HasPulseCall());
@@ -379,5 +355,4 @@ class PolymeraseStitchingTest(unittest.TestCase):
         self.assertEqual(b1.PulseMergeQV().Fastq(),    b2.PulseMergeQV().Fastq());
         self.assertEqual(b1.LabelQV().Fastq(),         b2.LabelQV().Fastq());
         self.assertEqual(b1.AltLabelQV().Fastq(),      b2.AltLabelQV().Fastq());
-        
         

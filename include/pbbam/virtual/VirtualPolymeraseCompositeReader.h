@@ -42,68 +42,13 @@
 #ifndef VIRTUALPOLYMERASECOMPOSITEREADER_H
 #define VIRTUALPOLYMERASECOMPOSITEREADER_H
 
-#include "pbbam/DataSet.h"
-#include "pbbam/PbiFilter.h"
-#include "pbbam/virtual/VirtualPolymeraseReader.h"
-#include <deque>
-#include <memory>
-#include <string>
-#include <utility>
+#include "pbbam/virtual/ZmwReadStitcher.h"
 
 namespace PacBio {
 namespace BAM {
 
-/// \brief The VirtualPolymeraseCompositeReader provides an interface for
-///        re-stitching "virtual" polymerase reads from their constituent parts,
-///        across multiple %BAM resources from a DataSet.
-///
-/// This class is essentially a DataSet-aware wrapper around
-/// VirtualPolymeraseReader, enabling multiple resources as input. See that
-/// class's documentation for more info.
-///
-class PBBAM_EXPORT VirtualPolymeraseCompositeReader
-{
-public:
-    /// \name Constructors & Related Methods
-    /// \{
-
-    VirtualPolymeraseCompositeReader(const DataSet& dataset);
-
-    VirtualPolymeraseCompositeReader(void) = delete;
-    VirtualPolymeraseCompositeReader(const VirtualPolymeraseCompositeReader&) = delete;
-    VirtualPolymeraseCompositeReader(VirtualPolymeraseCompositeReader&&) = delete;
-    VirtualPolymeraseCompositeReader& operator=(const VirtualPolymeraseCompositeReader&) = delete;
-    VirtualPolymeraseCompositeReader& operator=(VirtualPolymeraseCompositeReader&&) = delete;
-    ~VirtualPolymeraseCompositeReader(void) = default;
-
-    /// \}
-
-public:
-    /// \name Stitched Record Reading
-    ///
-
-    /// \returns true if more ZMWs/files are available for reading.
-    bool HasNext(void);
-
-    /// \returns the next stitched polymerase read
-    VirtualPolymeraseBamRecord Next(void);
-
-    /// \returns the next set of reads that belong to one ZMW from one %BAM
-    ///          resource (a primary %BAM and/or its scraps file). This enables
-    ///          stitching records in a distinct thread.
-    ///
-    std::vector<BamRecord> NextRaw(void);
-
-    /// \}
-
-private:
-    std::deque< std::pair<std::string, std::string> > sources_;
-    std::unique_ptr<VirtualPolymeraseReader> currentReader_;
-    PbiFilter filter_;
-
-private:
-    void OpenNextReader(void);
-};
+/// \deprecated Use ZmwReadStitcher instead.
+typedef ZmwReadStitcher VirtualPolymeraseCompositeReader;
 
 } // namespace BAM
 } // namespace PacBio
