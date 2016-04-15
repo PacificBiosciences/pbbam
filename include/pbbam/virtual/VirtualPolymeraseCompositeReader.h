@@ -42,6 +42,7 @@
 #ifndef VIRTUALPOLYMERASECOMPOSITEREADER_H
 #define VIRTUALPOLYMERASECOMPOSITEREADER_H
 
+#include "pbbam/virtual/VirtualPolymeraseBamRecord.h"
 #include "pbbam/virtual/ZmwReadStitcher.h"
 
 namespace PacBio {

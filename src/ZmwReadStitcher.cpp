@@ -216,8 +216,8 @@ vector<BamRecord> ZmwReadStitcher::NextRaw(void)
 { return d_->NextRaw(); }
 
 BamHeader ZmwReadStitcher::PrimaryHeader(void) const
-{ return d_->PrimaryHeader(); }
+{ return d_->PrimaryHeader().DeepCopy(); }
 
 BamHeader ZmwReadStitcher::ScrapsHeader(void) const 
-{ return d_->ScrapsHeader(); }
+{ return d_->ScrapsHeader().DeepCopy(); }
 
