@@ -40,9 +40,9 @@
 // Author: Derek Barnett
 
 #include "pbbam/ReadGroupInfo.h"
+#include "pbbam/MD5.h"
 #include "ChemistryTable.h"
 #include "SequenceUtils.h"
-#include <cram/md5.h>
 #include <iomanip>
 #include <set>
 #include <sstream>
@@ -739,20 +739,7 @@ std::string ReadGroupInfo::ToSam(void) const
 std::string MakeReadGroupId(const std::string& movieName,
                             const std::string& readType)
 {
-    MD5_CTX md5;
-    unsigned char digest[16];
-    char hexdigest[9];
-
-    MD5_Init(&md5);
-    MD5_Update(&md5, reinterpret_cast<void*>(const_cast<char*>(movieName.c_str())), movieName.size());
-    MD5_Update(&md5, reinterpret_cast<void*>(const_cast<char*>("//")), 2);
-    MD5_Update(&md5, reinterpret_cast<void*>(const_cast<char*>(readType.c_str())), readType.size());
-    MD5_Final(digest, &md5);
-
-    for (int i = 0; i < 4; ++i)
-        sprintf(&hexdigest[2*i], "%02x", digest[i]);
-
-    return std::string{hexdigest, 8};
+    return MD5Hash(movieName + "//" + readType).substr(0, 8);
 }
 
 bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
