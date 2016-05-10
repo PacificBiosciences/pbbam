@@ -49,7 +49,7 @@ namespace BAM {
 
 /// \brief MD5 hash of a string as a 32-digit hexadecimal string
 ///
-std::string MD5Hash(const std::string& str)
+inline std::string MD5Hash(const std::string& str)
 {
     MD5_CTX md5;
     unsigned char digest[16];
