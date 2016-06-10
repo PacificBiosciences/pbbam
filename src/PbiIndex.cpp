@@ -153,7 +153,7 @@ PbiIndexPrivate::PbiIndexPrivate(const PbiRawData& rawIndex)
 { }
 
 PbiIndexPrivate::PbiIndexPrivate(PbiRawData&& rawIndex)
-    : filename_(std::move(rawIndex.Filename()))
+    : filename_(rawIndex.Filename())
     , version_(std::move(rawIndex.Version()))
     , sections_(std::move(rawIndex.FileSections()))
     , numReads_(std::move(rawIndex.NumReads()))
@@ -190,7 +190,7 @@ PbiIndex::PbiIndex(const string& pbiFilename)
 { }
 
 PbiIndex::PbiIndex(const PbiIndex& other)
-    : d_(std::move(other.d_->DeepCopy()))
+    : d_(std::forward<unique_ptr<PbiIndexPrivate>>(other.d_->DeepCopy()))
 {
     // move is ok, since it's a deep-copied, new object
 }
@@ -202,7 +202,7 @@ PbiIndex::PbiIndex(PbiIndex&& other)
 PbiIndex& PbiIndex::operator=(const PbiIndex& other)
 {
     // move is ok, since it's a deep-copied, new object
-    d_ = std::move(other.d_->DeepCopy());
+    d_ = other.d_->DeepCopy();
     return *this;
 }
 

@@ -113,7 +113,7 @@ bool BamRecordImpl::AddTagImpl(const string& tagName,
                                const Tag& value,
                                const TagModifier additionalModifier)
 {
-    const vector<uint8_t> rawData = std::move(BamTagCodec::ToRawData(value, additionalModifier));
+    const vector<uint8_t> rawData = BamTagCodec::ToRawData(value, additionalModifier);
     if (rawData.empty())
         return false;
 

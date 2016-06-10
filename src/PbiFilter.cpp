@@ -46,6 +46,7 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -81,6 +82,7 @@ enum class BuiltIn
   , QueryEndFilter
   , QueryLengthFilter
   , QueryNameFilter
+  , QueryNamesFromFileFilter
   , QueryStartFilter
   , ReadAccuracyFilter
   , ReadGroupFilter
@@ -111,6 +113,7 @@ static const unordered_map<string, BuiltIn> builtInLookup =
     { "length",        BuiltIn::QueryLengthFilter },
     { "querylength",   BuiltIn::QueryLengthFilter },
     { "qname",         BuiltIn::QueryNameFilter },
+    { "qname_file",    BuiltIn::QueryNamesFromFileFilter },
     { "qs",            BuiltIn::QueryStartFilter },
     { "qstart",        BuiltIn::QueryStartFilter },
     { "rq",            BuiltIn::ReadAccuracyFilter },
@@ -188,7 +191,7 @@ PbiFilter CreateLocalContextFilter(const string& value,
 
     // else interpret as flag names
     else {
-        vector<string> tokens = std::move(internal::Split(value, '|'));
+        vector<string> tokens = internal::Split(value, '|');
         for (string& token : tokens) {
             boost::algorithm::trim(token); // trim whitespace
             filterValue = (filterValue | contextFlagNames.at(token));
@@ -199,7 +202,22 @@ PbiFilter CreateLocalContextFilter(const string& value,
 }
 
 static
-PbiFilter FromDataSetProperty(const Property& property)
+PbiFilter CreateQueryNamesFilterFromFile(const string& value,
+                                         const DataSet& dataset)
+{
+    // resolve file from dataset, value
+    const string resolvedFilename = dataset.ResolvePath(value);
+    vector<string> whitelist;
+    string fn;
+    ifstream in(resolvedFilename);
+    while (getline(in, fn))
+        whitelist.push_back(fn);
+    return PbiQueryNameFilter{ whitelist };
+}
+
+static
+PbiFilter FromDataSetProperty(const Property& property,
+                              const DataSet& dataset)
 {
     try {
         const string& value = property.Value();
@@ -229,6 +247,9 @@ PbiFilter FromDataSetProperty(const Property& property)
             case BuiltIn::BarcodeFilter      : return CreateBarcodeFilter(value, compareType);
             case BuiltIn::LocalContextFilter : return CreateLocalContextFilter(value, compareType);
 
+            // other built-ins
+            case BuiltIn::QueryNamesFromFileFilter : return CreateQueryNamesFilterFromFile(value, dataset); // compareType ignored
+
             default :
                 throw std::exception();
         }
@@ -256,7 +277,7 @@ PbiFilter PbiFilter::FromDataSet(const DataSet& dataset)
     for (auto&& xmlFilter : dataset.Filters()) {
         auto propertiesFilter = PbiFilter{ };
         for (auto&& xmlProperty : xmlFilter.Properties())
-            propertiesFilter.Add(internal::FromDataSetProperty(xmlProperty));
+            propertiesFilter.Add(internal::FromDataSetProperty(xmlProperty, dataset));
         datasetFilter.Add(propertiesFilter);
     }
     return datasetFilter;

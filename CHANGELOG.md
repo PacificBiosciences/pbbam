@@ -17,11 +17,16 @@ thrown exception) the file is renamed to the actual requested filename.
 - PBI file creation follows the same temporary naming convention.
 - Support for barcode pair (forward, reverse) in DataSetXML filter.
 - Validation API & 'auto-validate' compile-time switch. 
+- Added support for a batched QNAME whitelist filter in DataSet XML. Uses (new) 
+Property name 'qname_file', with the value being the filepath containing the 
+whitelist.
+- Exposed MD5 hashing to API.
 
 ### Fixed
 - Improper 'clip to reference' product for BamRecord in some cases.
 - Improper behavior in tag accessors (e.g. BamRecord::IPD()) on reverse strand-
 aligned reads (bug 31339).
+- Improper basecaller version parsing in ReadGroupInfo.
 
 ### Changed
 - RecordType::POLYMERASE renamed to RecordType::ZMW to reflect changes in

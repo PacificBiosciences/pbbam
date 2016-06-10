@@ -438,11 +438,6 @@ inline PbiQueryLengthFilter::PbiQueryLengthFilter(const int32_t length, const Co
     : internal::FilterBase<int32_t>(length, cmp)
 { }
 
-// PbiQueryNameFilter
-
-inline bool PbiQueryNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
-{ return compositeFilter_.Accepts(idx, row); }
-
 // PbiQueryStartFilter
 
 inline PbiQueryStartFilter::PbiQueryStartFilter(const int32_t position, const Compare::Type cmp)

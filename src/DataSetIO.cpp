@@ -83,7 +83,7 @@ unique_ptr<DataSetBase> FromFofn(const string& fofn)
     if (!in)
         throw std::runtime_error("could not open FOFN for reading");
 
-    vector<string> filenames = std::move(FofnReader::Files(in));
+    vector<string> filenames = FofnReader::Files(in);
     for (size_t i = 0; i < filenames.size(); ++i)
         filenames[i] = internal::FileUtils::ResolvedFilePath(filenames[i], fofnDir);
     return DataSetIO::FromUris(filenames);

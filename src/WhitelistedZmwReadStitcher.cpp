@@ -91,7 +91,7 @@ public:
     {
         auto bamRecordVec = NextRaw();
         VirtualZmwBamRecord stitched(move(bamRecordVec), *polyHeader_);
-        return move(stitched);
+        return stitched;
     }
 
     vector<BamRecord> NextRaw(void)

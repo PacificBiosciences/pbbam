@@ -243,3 +243,17 @@ TEST(PbiFilterQueryTest, MissingPbiShouldThrow)
         EXPECT_THROW(PbiFilterQuery(filter, ds), std::runtime_error);
     }
 }
+
+TEST(PbiFilterQueryTest, QNameWhitelistFile)
+{
+    const DataSet ds(tests::Data_Dir + "/polymerase/qnameFiltered.subreads.dataset.xml");
+    const PbiFilter filter = PbiFilter::FromDataSet(ds);
+    PbiFilterQuery query(filter, ds);
+    int count = 0;
+    for (const BamRecord& r : query) {
+        (void)r;
+        ++count;
+    }
+    EXPECT_EQ(3, count);
+}
+

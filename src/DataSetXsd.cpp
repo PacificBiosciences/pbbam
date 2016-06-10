@@ -199,7 +199,7 @@ NamespaceInfo::NamespaceInfo(const string& name,
 // -------------------
 
 NamespaceRegistry::NamespaceRegistry(void)
-    : data_(std::move(internal::DefaultRegistry()))
+    : data_(internal::DefaultRegistry())
     , defaultXsdType_(XsdType::DATASETS)
 { }
 

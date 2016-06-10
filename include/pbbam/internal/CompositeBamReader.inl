@@ -113,7 +113,7 @@ inline GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(cons
 
 inline GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(const GenomicInterval& interval,
                                                                             const DataSet& dataset)
-    : GenomicIntervalCompositeBamReader(interval, std::move(dataset.BamFiles()))
+    : GenomicIntervalCompositeBamReader(interval, dataset.BamFiles())
 { }
 
 inline bool GenomicIntervalCompositeBamReader::GetNext(BamRecord& record)
@@ -374,7 +374,7 @@ inline SequentialCompositeBamReader::SequentialCompositeBamReader(std::vector<Ba
 }
 
 inline SequentialCompositeBamReader::SequentialCompositeBamReader(const DataSet& dataset)
-    : SequentialCompositeBamReader(std::move(dataset.BamFiles()))
+    : SequentialCompositeBamReader(dataset.BamFiles())
 { }
 
 inline bool SequentialCompositeBamReader::GetNext(BamRecord& record)

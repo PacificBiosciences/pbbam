@@ -46,6 +46,7 @@
 #include "pbbam/PbiFilter.h"
 #include "pbbam/PbiIndex.h"
 #include <boost/optional.hpp>
+#include <memory>
 #include <string>
 
 namespace PacBio {
@@ -677,15 +678,8 @@ public:
     ///
     PbiQueryNameFilter(const std::vector<std::string>& whitelist);
 
-    /// \brief Creates a 'whitelisted' query name filter.
-    ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
-    ///
-    /// \param[in] whitelist    query names to compare on
-    ///
-    PbiQueryNameFilter(std::vector<std::string>&& whitelist);
+    PbiQueryNameFilter(const PbiQueryNameFilter& other);
+    ~PbiQueryNameFilter(void);
 
 public:
     /// \brief Performs the actual index lookup.
@@ -695,7 +689,8 @@ public:
     bool Accepts(const PbiRawData& idx, const size_t row) const;
 
 private:
-    PbiFilter compositeFilter_;
+    struct PbiQueryNameFilterPrivate;
+    std::unique_ptr<PbiQueryNameFilterPrivate> d_;
 };
 
 /// \brief The PbiQueryStartFilter class provides a PbiFilter-compatible filter

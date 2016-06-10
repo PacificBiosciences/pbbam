@@ -40,9 +40,9 @@
 // Author: Derek Barnett
 
 #include "pbbam/ReadGroupInfo.h"
+#include "pbbam/MD5.h"
 #include "ChemistryTable.h"
 #include "SequenceUtils.h"
-#include <cram/md5.h>
 #include <iomanip>
 #include <set>
 #include <sstream>
@@ -692,7 +692,11 @@ string ReadGroupInfo::SequencingChemistryFromTriple(const string& bindingKit,
                                                     const string& sequencingKit,
                                                     const string& basecallerVersion)
 {
-    const string ver{ basecallerVersion.substr(0, 3) };
+    const auto verFields = internal::Split(basecallerVersion, '.');
+    if (verFields.size() < 2)
+        throw std::runtime_error("basecaller version too short: " + basecallerVersion);
+    const string ver = verFields.at(0) + "." + verFields.at(1);
+//    const string ver{ basecallerVersion.substr(0, 3) };
     for (const auto& row : internal::ChemistryTable) {
         if (bindingKit == row[0] && sequencingKit == row[1] && ver == row[2])
             return row[3];
@@ -739,6 +743,7 @@ std::string ReadGroupInfo::ToSam(void) const
 std::string MakeReadGroupId(const std::string& movieName,
                             const std::string& readType)
 {
+/*{
     MD5_CTX md5;
     unsigned char digest[16];
     char hexdigest[9];
@@ -753,6 +758,8 @@ std::string MakeReadGroupId(const std::string& movieName,
         sprintf(&hexdigest[2*i], "%02x", digest[i]);
 
     return std::string{hexdigest, 8};
+*/
+    return MD5Hash(movieName + "//" + readType).substr(0,8);
 }
 
 bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const

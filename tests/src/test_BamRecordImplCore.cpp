@@ -522,7 +522,14 @@ TEST(BamRecordImplCoreTest, CreateRecord_InternalTest)
 TEST(BamRecordImplCoreTest, MoveAssignment)
 {
     BamRecordImpl bam;
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpessimizing-move"
+#endif
     bam = std::move(tests::CreateBamImpl());
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
     EXPECT_EQ(42, bam.Bin());
     EXPECT_EQ(42, bam.Flag());
@@ -544,7 +551,14 @@ TEST(BamRecordImplCoreTest, MoveAssignment)
 
 TEST(BamRecordImplCoreTest, MoveConstructor)
 {
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpessimizing-move"
+#endif 
     BamRecordImpl bam(std::move(tests::CreateBamImpl()));
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
     EXPECT_EQ(42, bam.Bin());
     EXPECT_EQ(42, bam.Flag());

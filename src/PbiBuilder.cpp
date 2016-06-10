@@ -260,7 +260,7 @@ PbiBuilderPrivate::~PbiBuilderPrivate(void)
     // fetch reference data, if available
     if (hasReferenceData) {
         assert(refDataBuilder_);
-        rawData_.ReferenceData() = std::move(refDataBuilder_->Result());
+        rawData_.ReferenceData() = refDataBuilder_->Result();
     }
 
     // determine flags

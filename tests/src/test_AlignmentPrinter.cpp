@@ -87,7 +87,8 @@ TEST(AlignmentPrinterTest, Print)
     auto record = *it++;
     EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
 
-    expected = {
+    expected = string 
+    {
         "Read        : singleInsertion/200/0_49\n"
         "Reference   : lambda_NEB3011\n"
         "\n"
@@ -107,7 +108,8 @@ TEST(AlignmentPrinterTest, Print)
     record = *it++;
     EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
 
-    expected = {
+    expected = string 
+    {
         "Read        : singleInsertion/100/0_111\n"
         "Reference   : lambda_NEB3011\n"
         "\n"
@@ -127,7 +129,8 @@ TEST(AlignmentPrinterTest, Print)
     record = *it++;
     EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
 
-    expected = {
+    expected = string 
+    {
         "Read        : singleInsertion/100/0_111\n"
         "Reference   : lambda_NEB3011\n"
         "\n"

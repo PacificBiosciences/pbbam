@@ -169,12 +169,26 @@ TEST(DataSetCoreTest, MoveOk)
     d1.Name("foo");
 
     // move ctor
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpessimizing-move"
+#endif
     DataSet d2(std::move(tests::CreateDataSet()));
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
     EXPECT_EQ(string("foo"), d2.Name());
 
     // move assignment
     DataSet d3;
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpessimizing-move"
+#endif
     d3 = std::move(tests::CreateDataSet());
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif 
     EXPECT_EQ(string("foo"), d3.Name());
 }
 

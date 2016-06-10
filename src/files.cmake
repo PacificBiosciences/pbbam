@@ -30,6 +30,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/IndexedFastaReader.h
     ${PacBioBAM_IncludeDir}/pbbam/Interval.h
     ${PacBioBAM_IncludeDir}/pbbam/LocalContextFlags.h
+    ${PacBioBAM_IncludeDir}/pbbam/MD5.h
     ${PacBioBAM_IncludeDir}/pbbam/Orientation.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiBasicTypes.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiBuilder.h
@@ -172,6 +173,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/GenomicInterval.cpp
     ${PacBioBAM_SourceDir}/GenomicIntervalQuery.cpp
     ${PacBioBAM_SourceDir}/IndexedFastaReader.cpp
+    ${PacBioBAM_SourceDir}/MD5.cpp
     ${PacBioBAM_SourceDir}/MemoryUtils.cpp
     ${PacBioBAM_SourceDir}/PbiBuilder.cpp
     ${PacBioBAM_SourceDir}/PbiFile.cpp

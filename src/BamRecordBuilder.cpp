@@ -135,7 +135,7 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
     recordRawData->core = core_;
 
     // setup variable length data
-    const vector<uint8_t> encodedTags = std::move(BamTagCodec::Encode(tags_));
+    const vector<uint8_t> encodedTags = BamTagCodec::Encode(tags_);
 
     const size_t nameLength  = name_.size() + 1;
     const size_t numCigarOps = cigar_.size();
@@ -278,7 +278,7 @@ void BamRecordBuilder::Reset(BamRecord&& prototype)
 {
     // ensure clean slate
     Reset();
-    header_ = std::move(prototype.Header());
+    header_ = prototype.Header();
 
     // reset core data
     const PBBAM_SHARED_PTR<bam1_t> rawData = internal::BamRecordMemory::GetRawData(prototype); //  prototype.impl_.RawData().get();
@@ -287,11 +287,11 @@ void BamRecordBuilder::Reset(BamRecord&& prototype)
 
     // reset variable-length data
     const BamRecordImpl& impl = internal::BamRecordMemory::GetImpl(prototype);
-    name_ = std::move(impl.Name());
-    sequence_ = std::move(impl.Sequence());
-    qualities_ = std::move(impl.Qualities().Fastq());
-    cigar_ = std::move(impl.CigarData());
-    tags_ = std::move(impl.Tags());
+    name_ = impl.Name();
+    sequence_ = impl.Sequence();
+    qualities_ = impl.Qualities().Fastq();
+    cigar_ = impl.CigarData();
+    tags_ = impl.Tags();
 }
 
 BamRecordBuilder& BamRecordBuilder::Sequence(const std::string& sequence)

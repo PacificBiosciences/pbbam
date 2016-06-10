@@ -466,13 +466,29 @@ TEST(PacBioIndexTest, Copy_and_Move)
     const PbiIndex lookup(test2BamFn + ".pbi");
 
     const PbiIndex copyConstructed(lookup);
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpessimizing-move"
+#endif
     const PbiIndex moveConstructed(std::move(PbiIndex(test2BamFn + ".pbi")));
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
     PbiIndex copyAssigned;
     copyAssigned = lookup;
 
     PbiIndex moveAssigned;
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpessimizing-move"
+#endif
     moveAssigned = std::move(PbiIndex(test2BamFn + ".pbi"));
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
     EXPECT_TRUE(tests::PbiIndicesEqual(lookup, copyConstructed));
     EXPECT_TRUE(tests::PbiIndicesEqual(lookup, moveConstructed));

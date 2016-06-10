@@ -174,3 +174,39 @@ TEST(ReadGroupInfoTest, SequencingChemistryThrowsOnBadTriple)
         EXPECT_EQ(string("2.0"),         e.BasecallerVersion());
     }
 }
+
+TEST(ReadGroupInfoTest, BasecallerVersion)
+{
+    // too short
+    try {
+        ReadGroupInfo rg("dummy");
+        rg.BindingKit("100-619-300")
+          .SequencingKit("100-867-300")
+          .BasecallerVersion("3");
+        const string chem = rg.SequencingChemistry();
+        (void)chem;
+
+    } catch (std::runtime_error& e) {
+        EXPECT_EQ(string("basecaller version too short: 3"), string(e.what()));
+    }
+
+    // initial implementation assumed single digit version numbers:
+    //    const string ver{ basecallerVersion.substr(0, 3) };
+    // So '3.299.dummy' would incorrectly be interpreted as (OK) '3.2'.
+    // 3.
+
+    try {
+        ReadGroupInfo rg("dummy");
+        rg.BindingKit("100-619-300")
+          .SequencingKit("100-867-300")
+          .BasecallerVersion("3.299.dummy");   
+        const string chem = rg.SequencingChemistry();
+        (void)chem;
+
+    } catch (InvalidSequencingChemistryException& e) {
+        EXPECT_EQ("100-619-300", e.BindingKit());
+        EXPECT_EQ("100-867-300", e.SequencingKit());
+        EXPECT_EQ("3.299.dummy", e.BasecallerVersion());
+    }
+    //EXPECT_THROW(rg.SequencingChemistry(), InvalidSequencingChemistryException);
+}
