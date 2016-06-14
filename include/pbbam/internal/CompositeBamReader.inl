@@ -355,7 +355,7 @@ PbiFilterCompositeBamReader<OrderByType>::Filter(const PbiFilter& filter)
 
 template<typename OrderByType>
 inline void PbiFilterCompositeBamReader<OrderByType>::UpdateSort(void)
-{ std::sort(mergeQueue_.begin(), mergeQueue_.end(), merge_sorter_type{}); }
+{ std::stable_sort(mergeQueue_.begin(), mergeQueue_.end(), merge_sorter_type{}); }
 
 // ------------------------------
 // SequentialCompositeBamReader
