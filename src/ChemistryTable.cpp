@@ -45,8 +45,7 @@ extern const std::vector<std::array<std::string, 4>> ChemistryTable = {
 
     // BindingKit, SequencingKit, BasecallerVersion, Chemistry
 
-    // P6-C4
-    //
+    // RS
     {{"100356300",   "100356200",   "2.1", "P6-C4"}},
     {{"100356300",   "100356200",   "2.3", "P6-C4"}},
     {{"100356300",   "100612400",   "2.1", "P6-C4"}},
@@ -56,38 +55,15 @@ extern const std::vector<std::array<std::string, 4>> ChemistryTable = {
     {{"100372700",   "100612400",   "2.1", "P6-C4"}},
     {{"100372700",   "100612400",   "2.3", "P6-C4"}},
 
-    // S/P1-C1/beta
-    //
+    // 3.0 ("Dromedary"): S/P1-C1/beta
     {{"100-619-300", "100-620-000", "3.0", "S/P1-C1/beta"}},
     {{"100-619-300", "100-620-000", "3.1", "S/P1-C1/beta"}},
-    {{"100-619-300", "100-620-000", "3.2", "S/P1-C1/beta"}},
 
-    // S/P1-C1
-    //
-    {{"100-619-300", "100-867-300", "3.1", "S/P1-C1"}},
-    {{"100-619-300", "100-867-300", "3.2", "S/P1-C1"}},
-    {{"100-867-500", "100-867-300", "3.1", "S/P1-C1"}},
-    {{"100-867-500", "100-867-300", "3.2", "S/P1-C1"}},
+    // 3.1 ("Echidna"): S/P1-C1.1
+    {{"100-619-300", "100-867-300", "3.1", "S/P1-C1.1"}},
 
-    // S/P2-C2/prospective-compatible
-    //
-    {{"100-864-400", "100-864-100", "3.1", "S/P2-C2/prospective-compatible"}},
-    {{"100-864-400", "100-864-100", "3.2", "S/P2-C2/prospective-compatible"}},
-    {{"100-864-600", "100-864-200", "3.1", "S/P2-C2/prospective-compatible"}},
-    {{"100-864-600", "100-864-200", "3.2", "S/P2-C2/prospective-compatible"}}
-
-#ifdef PRIMARY
-
-    // these tuples are disallowed in SA, but allowed in ICS/PPA
-    ,
-    {{"100-867-400", "100-861-700","3.1", "S/P1-C1"}},
-    {{"100-867-400", "100-861-700","3.2", "S/P1-C1"}},
-    {{"100-862-200", "100-861-800","3.1", "S/P1-C1/prospective-compatible"}},
-    {{"100-862-200", "100-861-800","3.2", "S/P1-C1/prospective-compatible"}},
-    {{"100-864-500", "100-861-900","3.1", "S/P1-C1/prospective-compatible"}},
-    {{"100-864-500", "100-861-900","3.2", "S/P1-C1/prospective-compatible"}}
-
-#endif // PRIMARY
+    // 3.1.1 ("Flea"): S/P1-C1.2
+    {{"100-619-300", "100-902-100", "3.1", "S/P1-C1.2"}}
 };
 
 } // namespace internal
