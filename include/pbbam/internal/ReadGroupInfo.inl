@@ -126,6 +126,12 @@ inline ReadGroupInfo& ReadGroupInfo::ClearBarcodeData(void)
     return *this;
 }
 
+inline ReadGroupInfo& ReadGroupInfo::ClearBaseFeatures(void)
+{
+    features_.clear();
+    return *this;
+}
+
 inline bool ReadGroupInfo::Control(void) const
 { return control_; }
 
@@ -231,6 +237,14 @@ inline std::string ReadGroupInfo::ReadType(void) const
 
 inline ReadGroupInfo& ReadGroupInfo::ReadType(const std::string& type)
 { readType_ = type; return *this; }
+
+inline ReadGroupInfo& ReadGroupInfo::RemoveBaseFeature(const BaseFeature& feature)
+{
+    auto iter = features_.find(feature);
+    if (iter != features_.end())
+        features_.erase(iter);
+    return *this;
+}
 
 inline std::string ReadGroupInfo::Sample(void) const
 { return sample_; }

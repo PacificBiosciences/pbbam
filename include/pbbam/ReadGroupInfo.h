@@ -421,6 +421,12 @@ public:
     ///
     ReadGroupInfo& ClearBarcodeData(void);
 
+    /// \brief Removes all base features from this read group.
+    ///
+    /// \returns reference to this read group
+    ///
+    ReadGroupInfo& ClearBaseFeatures(void);
+
     /// \brief Sets whether read group's records are classifed as spike-in
     ///        controls.
     ///
@@ -541,6 +547,13 @@ public:
     /// \returns reference to this object
     ///
     ReadGroupInfo& ReadType(const std::string& type);
+
+    /// \brief Removes a particular base feature from this read group.
+    ///
+    /// \param[in] feature      feature to remove
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& RemoveBaseFeature(const BaseFeature& feature);
 
     /// \brief Sets the value for \@RG:SM
     ///

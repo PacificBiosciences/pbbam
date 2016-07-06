@@ -21,6 +21,7 @@ thrown exception) the file is renamed to the actual requested filename.
 Property name 'qname_file', with the value being the filepath containing the 
 whitelist.
 - Exposed MD5 hashing to API.
+- Ability to remove base features from a ReadGroupInfo object.
 
 ### Fixed
 - Improper 'clip to reference' product for BamRecord in some cases.

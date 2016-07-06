@@ -163,3 +163,43 @@ TEST(ReadGroupInfoTest, BasecallerVersion)
     }
     //EXPECT_THROW(rg.SequencingChemistry(), InvalidSequencingChemistryException);
 }
+
+TEST(ReadGroupInfoTest, ClearBaseFeatures)
+{
+    ReadGroupInfo rg("test");
+    rg.BaseFeatureTag(BaseFeature::DELETION_QV,     "dq");
+    rg.BaseFeatureTag(BaseFeature::DELETION_TAG,    "dt");
+    rg.BaseFeatureTag(BaseFeature::INSERTION_QV,    "iq");
+    rg.BaseFeatureTag(BaseFeature::MERGE_QV,        "mq");
+    rg.BaseFeatureTag(BaseFeature::SUBSTITUTION_QV, "sq");
+    EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::DELETION_QV));
+    EXPECT_EQ("dq", rg.BaseFeatureTag(BaseFeature::DELETION_QV));
+
+    rg.ClearBaseFeatures();
+    EXPECT_FALSE(rg.HasBaseFeature(BaseFeature::DELETION_QV));
+    EXPECT_FALSE(rg.HasBaseFeature(BaseFeature::DELETION_TAG));
+    EXPECT_FALSE(rg.HasBaseFeature(BaseFeature::INSERTION_QV));
+    EXPECT_FALSE(rg.HasBaseFeature(BaseFeature::MERGE_QV));
+    EXPECT_FALSE(rg.HasBaseFeature(BaseFeature::SUBSTITUTION_QV));
+}
+
+TEST(ReadGroupInfoTest, RemoveBaseFeature)
+{
+    ReadGroupInfo rg("test");
+    rg.BaseFeatureTag(BaseFeature::DELETION_QV,     "dq");
+    rg.BaseFeatureTag(BaseFeature::DELETION_TAG,    "dt");
+    rg.BaseFeatureTag(BaseFeature::INSERTION_QV,    "iq");
+    rg.BaseFeatureTag(BaseFeature::MERGE_QV,        "mq");
+    rg.BaseFeatureTag(BaseFeature::SUBSTITUTION_QV, "sq");
+    EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::DELETION_QV));
+    EXPECT_EQ("dq", rg.BaseFeatureTag(BaseFeature::DELETION_QV));
+
+    rg.RemoveBaseFeature(BaseFeature::DELETION_QV);
+    EXPECT_FALSE(rg.HasBaseFeature(BaseFeature::DELETION_QV));
+    
+    EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::DELETION_TAG));
+    EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::INSERTION_QV));
+    EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::MERGE_QV));
+    EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::SUBSTITUTION_QV));
+}
+
