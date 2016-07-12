@@ -51,6 +51,7 @@ namespace PacBio {
 namespace BAM {
 
 class BamRecord;
+class DataSet;
 
 /// \brief The PbiRawBarcodeData class represents the raw data stored in the
 ///        "BarcodeData" section of the PBI index.
@@ -331,6 +332,7 @@ public:
     std::vector<float>    readQual_;
     std::vector<uint8_t>  ctxtFlag_;
     std::vector<int64_t>  fileOffset_;
+    std::vector<uint16_t> fileNumber_;
 
     /// \}
 };
@@ -369,6 +371,21 @@ public:
     ///
     PbiRawData(const std::string& pbiFilename);
 
+    /// \brief Loads a raw, aggregate PBI data from a dataset
+    ///
+    /// This constructor creates a raw index object that contains an aggregation
+    /// of index data across the dataset.
+    ///
+    /// \note ReferenceData (the per-reference table for coordinate-sorted data)
+    ///       is not currently available for the index aggregate. All other
+    ///       per-record data sections will be present.
+    ///
+    /// \param[in] dataset  DataSet object
+    ///
+    /// \throws std::runtime_error if file(s) contents cannot be loaded properly
+    ///
+    explicit PbiRawData(const DataSet& dataset);
+
     PbiRawData(const PbiRawData& other);
     PbiRawData(PbiRawData&& other);
     PbiRawData& operator=(const PbiRawData& other);
@@ -397,15 +414,16 @@ public:
 
     /// \returns index filename ("*.pbi")
     ///
-    /// \note Returns an empty string if the underlying data was generated, not
-    ///       loaded from file.
+    /// \note Returns an empty string if the underlying data was calculated in
+    ///       code or aggregated from a DataSet, rather than loaded from a
+    ///       single PBI file.
     ///
     std::string Filename(void) const;
 
     /// \returns enum flags representing the file sections present
     PbiFile::Sections FileSections(void) const;
 
-    /// \returns the number of records in the PBI (& associated %BAM)
+    /// \returns the number of records in the PBI(s)
     uint32_t NumReads(void) const;
 
     /// \returns the PBI file's version

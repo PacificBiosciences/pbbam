@@ -22,6 +22,8 @@ Property name 'qname_file', with the value being the filepath containing the
 whitelist.
 - Exposed MD5 hashing to API.
 - Ability to remove base features from a ReadGroupInfo object.
+- Can construct an aggregate PbiRawData index object from a DataSet: essentially
+concatenates all PBI data within the dataset.
 
 ### Fixed
 - Improper 'clip to reference' product for BamRecord in some cases.

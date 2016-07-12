@@ -36,16 +36,66 @@
 // Author: Derek Barnett
 
 #include "PbiIndexIO.h"
+
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/EntireFileQuery.h"
 #include "pbbam/PbiBuilder.h"
 #include "MemoryUtils.h"
 #include <boost/algorithm/string.hpp>
+#include <vector>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
 using namespace std;
+
+namespace PacBio {
+namespace BAM {
+namespace internal {
+
+// \brief Appends content of src vector to dst vector using move semantics.
+///
+/// \param[in]     src  Input vector that will be empty after execution
+/// \param[in,out] dst  Output vector that will be appended to
+///
+template <typename T>
+inline void MoveAppend(std::vector<T>& src, std::vector<T>& dst) noexcept
+{
+    if (dst.empty())
+    {
+        dst = std::move(src);
+    }
+    else
+    {
+        dst.reserve(dst.size() + src.size());
+        std::move(src.begin(), src.end(), std::back_inserter(dst));
+        src.clear();
+    }
+}
+
+/// \brief Appends content of src vector to dst vector using move semantics.
+///
+/// \param[in]     src  Input vector via perfect forwarding
+/// \param[in,out] dst  Output vector that will be appended to
+///
+template <typename T>
+inline void MoveAppend(std::vector<T>&& src, std::vector<T>& dst) noexcept
+{
+    if (dst.empty())
+    {
+        dst = std::move(src);
+    }
+    else
+    {
+        dst.reserve(dst.size() + src.size());
+        std::move(src.begin(), src.end(), std::back_inserter(dst));
+        src.clear();
+    }
+}
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio
 
 // ---------------------------
 // PbiIndexIO implementation
@@ -59,7 +109,7 @@ PbiRawData PbiIndexIO::Load(const std::string& pbiFilename)
 }
 
 void PbiIndexIO::Load(PbiRawData& rawData,
-                      const string &filename)
+                      const string& filename)
 {
     // open file for reading
     if (!boost::algorithm::iends_with(filename, ".pbi"))
@@ -80,6 +130,76 @@ void PbiIndexIO::Load(PbiRawData& rawData,
             LoadReferenceData(rawData.ReferenceData(), fp);
         if (rawData.HasBarcodeData())
             LoadBarcodeData(rawData.BarcodeData(), numReads, fp);
+    }
+}
+
+void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData,
+                                 const DataSet& dataset)
+{
+    aggregateData.NumReads(0);
+    aggregateData.FileSections(PbiFile::BASIC | PbiFile::MAPPED | PbiFile::BARCODE);
+    aggregateData.Version(PbiFile::CurrentVersion);
+
+    const auto bamFiles = dataset.BamFiles();
+    uint16_t fileNumber = 0;
+    for (const auto& bamFile : bamFiles) {
+        PbiRawData currentPbi{bamFile.PacBioIndexFilename()};
+        const size_t currentPbiCount = currentPbi.NumReads();
+
+        // read count
+        aggregateData.NumReads(aggregateData.NumReads()+currentPbiCount);
+
+        // BasicData
+        PbiRawBasicData& aggregateBasicData = aggregateData.BasicData();
+        PbiRawBasicData& currentBasicData   = currentPbi.BasicData();
+        MoveAppend(std::move(currentBasicData.rgId_),       aggregateBasicData.rgId_);
+        MoveAppend(std::move(currentBasicData.qStart_),     aggregateBasicData.qStart_);
+        MoveAppend(std::move(currentBasicData.qEnd_),       aggregateBasicData.qEnd_);
+        MoveAppend(std::move(currentBasicData.holeNumber_), aggregateBasicData.holeNumber_);
+        MoveAppend(std::move(currentBasicData.readQual_),   aggregateBasicData.readQual_);
+        MoveAppend(std::move(currentBasicData.ctxtFlag_),   aggregateBasicData.ctxtFlag_);
+        MoveAppend(std::move(currentBasicData.fileOffset_), aggregateBasicData.fileOffset_);
+        MoveAppend(std::vector<uint16_t>(currentPbiCount, fileNumber), aggregateBasicData.fileNumber_);
+
+        // BarcodeData
+        PbiRawBarcodeData& aggregateBarcodeData = aggregateData.BarcodeData();
+        if (currentPbi.HasBarcodeData()) {
+            PbiRawBarcodeData& currentBarcodeData  = currentPbi.BarcodeData();
+            MoveAppend(std::move(currentBarcodeData.bcForward_), aggregateBarcodeData.bcForward_);
+            MoveAppend(std::move(currentBarcodeData.bcReverse_), aggregateBarcodeData.bcReverse_);
+            MoveAppend(std::move(currentBarcodeData.bcQual_),    aggregateBarcodeData.bcQual_);
+        } else {
+            MoveAppend(std::vector<int16_t>(currentPbiCount, -1), aggregateBarcodeData.bcForward_);
+            MoveAppend(std::vector<int16_t>(currentPbiCount, -1), aggregateBarcodeData.bcReverse_);
+            MoveAppend(std::vector<int8_t>(currentPbiCount, -1),  aggregateBarcodeData.bcQual_);
+        }
+
+        // MappedData
+        PbiRawMappedData& aggregateMappedData = aggregateData.MappedData();
+        if (currentPbi.HasMappedData()) {
+            PbiRawMappedData& currentMappedData  = currentPbi.MappedData();
+            MoveAppend(std::move(currentMappedData.tId_),       aggregateMappedData.tId_);
+            MoveAppend(std::move(currentMappedData.tStart_),    aggregateMappedData.tStart_);
+            MoveAppend(std::move(currentMappedData.tEnd_),      aggregateMappedData.tEnd_);
+            MoveAppend(std::move(currentMappedData.aStart_),    aggregateMappedData.aStart_);
+            MoveAppend(std::move(currentMappedData.aEnd_),      aggregateMappedData.aEnd_);
+            MoveAppend(std::move(currentMappedData.revStrand_), aggregateMappedData.revStrand_);
+            MoveAppend(std::move(currentMappedData.nM_),        aggregateMappedData.nM_);
+            MoveAppend(std::move(currentMappedData.nMM_),       aggregateMappedData.nMM_);
+            MoveAppend(std::move(currentMappedData.mapQV_),     aggregateMappedData.mapQV_);
+        } else {
+            MoveAppend(std::vector<int32_t>(currentPbiCount, -1), aggregateMappedData.tId_);
+            MoveAppend(std::vector<uint32_t>(currentPbiCount, UnmappedPosition), aggregateMappedData.tStart_);
+            MoveAppend(std::vector<uint32_t>(currentPbiCount, UnmappedPosition), aggregateMappedData.tEnd_);
+            MoveAppend(std::vector<uint32_t>(currentPbiCount, UnmappedPosition), aggregateMappedData.aStart_);
+            MoveAppend(std::vector<uint32_t>(currentPbiCount, UnmappedPosition), aggregateMappedData.aEnd_);
+            MoveAppend(std::vector<uint8_t>(currentPbiCount, 0),   aggregateMappedData.revStrand_);
+            MoveAppend(std::vector<uint32_t>(currentPbiCount, 0),  aggregateMappedData.nM_);
+            MoveAppend(std::vector<uint32_t>(currentPbiCount, 0),  aggregateMappedData.nMM_);
+            MoveAppend(std::vector<uint8_t>(currentPbiCount, 255), aggregateMappedData.mapQV_);
+        }
+
+        ++fileNumber;
     }
 }
 

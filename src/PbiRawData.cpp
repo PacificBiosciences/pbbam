@@ -348,6 +348,7 @@ PbiRawBasicData::PbiRawBasicData(uint32_t numReads)
     readQual_.reserve(numReads);
     ctxtFlag_.reserve(numReads);
     fileOffset_.reserve(numReads);
+    fileNumber_.reserve(numReads);
 }
 
 PbiRawBasicData::PbiRawBasicData(const PbiRawBasicData& other)
@@ -358,6 +359,7 @@ PbiRawBasicData::PbiRawBasicData(const PbiRawBasicData& other)
     , readQual_(other.readQual_)
     , ctxtFlag_(other.ctxtFlag_)
     , fileOffset_(other.fileOffset_)
+    , fileNumber_(other.fileNumber_)
 { }
 
 PbiRawBasicData::PbiRawBasicData(PbiRawBasicData&& other)
@@ -368,6 +370,7 @@ PbiRawBasicData::PbiRawBasicData(PbiRawBasicData&& other)
     , readQual_(std::move(other.readQual_))
     , ctxtFlag_(std::move(other.ctxtFlag_))
     , fileOffset_(std::move(other.fileOffset_))
+    , fileNumber_(std::move(other.fileNumber_))
 { }
 
 PbiRawBasicData& PbiRawBasicData::operator=(const PbiRawBasicData& other)
@@ -379,6 +382,7 @@ PbiRawBasicData& PbiRawBasicData::operator=(const PbiRawBasicData& other)
     readQual_ = other.readQual_;
     ctxtFlag_ = other.ctxtFlag_;
     fileOffset_ = other.fileOffset_;
+    fileNumber_ = other.fileNumber_;
     return *this;
 }
 
@@ -391,6 +395,7 @@ PbiRawBasicData& PbiRawBasicData::operator=(PbiRawBasicData&& other)
     readQual_ = std::move(other.readQual_);
     ctxtFlag_ = std::move(other.ctxtFlag_);
     fileOffset_ = std::move(other.fileOffset_);
+    fileNumber_ = std::move(other.fileNumber_);
     return *this;
 }
 
@@ -420,6 +425,9 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
 
     // virtual offset of record start
     fileOffset_.push_back(offset);
+
+    // default file number
+    fileNumber_.push_back(0);
 }
 
 // ----------------------------------
@@ -439,6 +447,14 @@ PbiRawData::PbiRawData(const string& pbiFilename)
     , numReads_(0)
 {
     internal::PbiIndexIO::Load(*this, pbiFilename);
+}
+
+PbiRawData::PbiRawData(const DataSet& dataset)
+    : version_(PbiFile::CurrentVersion)
+    , sections_(PbiFile::BASIC | PbiFile::MAPPED | PbiFile::BARCODE)
+    , numReads_(0)
+{
+    internal::PbiIndexIO::LoadFromDataSet(*this, dataset);
 }
 
 PbiRawData::PbiRawData(const PbiRawData& other)
