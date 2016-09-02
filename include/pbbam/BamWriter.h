@@ -45,6 +45,7 @@
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/Config.h"
+#include "pbbam/IRecordWriter.h"
 #include <htslib/sam.h>
 #include <string>
 
@@ -74,7 +75,7 @@ namespace internal { class BamWriterPrivate; }
 /// \endcode
 ///
 ///
-class PBBAM_EXPORT BamWriter
+class PBBAM_EXPORT BamWriter : public IRecordWriter
 {
 public:
     /// \brief This enum allows you to control the compression level of the

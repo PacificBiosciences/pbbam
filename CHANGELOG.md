@@ -24,6 +24,7 @@ whitelist.
 - Ability to remove base features from a ReadGroupInfo object.
 - Can construct an aggregate PbiRawData index object from a DataSet: essentially
 concatenates all PBI data within the dataset.
+- New SamWriter class to create SAM-formatted output of PacBio BAM data.
 
 ### Fixed
 - Improper 'clip to reference' product for BamRecord in some cases.

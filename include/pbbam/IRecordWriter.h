@@ -32,45 +32,49 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
+//
+// File Description
+/// \file IRecordWriter.h
+/// \brief Defines the IRecordWriter interface.
+//
+// Author: Derek Barnett
 
-// Author: Lance Hepler
-
-#include "ChemistryTable.h"
+#ifndef IRECORDWRITER_H
+#define IRECORDWRITER_H
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-extern const std::vector<std::array<std::string, 4>> ChemistryTable = {
+class BamRecord;
+class BamRecordImpl;
 
-    // BindingKit, SequencingKit, BasecallerVersion, Chemistry
+class IRecordWriter
+{
+public:
+    virtual ~IRecordWriter(void);
 
-    // RS
-    {{"100356300",   "100356200",   "2.1", "P6-C4"}},
-    {{"100356300",   "100356200",   "2.3", "P6-C4"}},
-    {{"100356300",   "100612400",   "2.1", "P6-C4"}},
-    {{"100356300",   "100612400",   "2.3", "P6-C4"}},
-    {{"100372700",   "100356200",   "2.1", "P6-C4"}},
-    {{"100372700",   "100356200",   "2.3", "P6-C4"}},
-    {{"100372700",   "100612400",   "2.1", "P6-C4"}},
-    {{"100372700",   "100612400",   "2.3", "P6-C4"}},
+public:
+    /// \brief Write a record to the output %BAM file.
+    ///
+    /// \param[in] record BamRecord object
+    ///
+    /// \throws std::runtime_error on failure to write
+    ///
+    virtual void Write(const BamRecord& record) =0;
 
-    // 3.0 ("Dromedary"): S/P1-C1/beta
-    {{"100-619-300", "100-620-000", "3.0", "S/P1-C1/beta"}},
-    {{"100-619-300", "100-620-000", "3.1", "S/P1-C1/beta"}},
+    /// \brief Write a record to the output %BAM file.
+    ///
+    /// \param[in] recordImpl BamRecordImpl object
+    ///
+    /// \throws std::runtime_error on failure to write
+    ///
+    virtual void Write(const BamRecordImpl& recordImpl) =0;
 
-    // 3.1 ("Echidna"): S/P1-C1.1
-    {{"100-619-300", "100-867-300", "3.1", "S/P1-C1.1"}},
-    {{"100-619-300", "100-867-300", "3.2", "S/P1-C1.1"}},
-
-
-    // 3.1.1 ("Flea"): S/P1-C1.2
-    {{"100-619-300", "100-902-100", "3.1", "S/P1-C1.2"}},
-    {{"100-619-300", "100-902-100", "3.2", "S/P1-C1.2"}}
-
-
+protected:
+    IRecordWriter(void);
 };
 
-} // namespace internal
 } // namespace BAM
 } // namespace PacBio
+
+#endif // IRECORDWRITER_H

@@ -163,7 +163,8 @@ BamWriter::BamWriter(const std::string& filename,
                      const BamWriter::CompressionLevel compressionLevel,
                      const size_t numThreads,
                      const BinCalculationMode binCalculationMode)
-    : d_(nullptr)
+    : IRecordWriter()
+    , d_(nullptr)
 {
 #if PBBAM_AUTOVALIDATE
     Validator::Validate(header);

@@ -115,6 +115,7 @@ endif*/
 %include "BamHeader.i"
 
 // SAM/BAM format
+%include "IRecordWriter.i"
 %include "BamFile.i"
 %include "BamRecordImpl.i"
 %include "BamRecord.i"
@@ -122,6 +123,7 @@ endif*/
 %include "BamTagCodec.i"
 %include "BamWriter.i"
 %include "SamTagCodec.i"
+%include "SamWriter.i"
 
 // DataSet
 %include "DataSetTypes.i"

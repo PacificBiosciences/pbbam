@@ -29,6 +29,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/GenomicIntervalQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/IndexedFastaReader.h
     ${PacBioBAM_IncludeDir}/pbbam/Interval.h
+    ${PacBioBAM_IncludeDir}/pbbam/IRecordWriter.h
     ${PacBioBAM_IncludeDir}/pbbam/LocalContextFlags.h
     ${PacBioBAM_IncludeDir}/pbbam/MD5.h
     ${PacBioBAM_IncludeDir}/pbbam/Orientation.h
@@ -50,6 +51,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/ReadAccuracyQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/ReadGroupInfo.h
     ${PacBioBAM_IncludeDir}/pbbam/SamTagCodec.h
+    ${PacBioBAM_IncludeDir}/pbbam/SamWriter.h
     ${PacBioBAM_IncludeDir}/pbbam/SequenceInfo.h
     ${PacBioBAM_IncludeDir}/pbbam/Strand.h  
     ${PacBioBAM_IncludeDir}/pbbam/SubreadLengthQuery.h
@@ -173,6 +175,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/GenomicInterval.cpp
     ${PacBioBAM_SourceDir}/GenomicIntervalQuery.cpp
     ${PacBioBAM_SourceDir}/IndexedFastaReader.cpp
+    ${PacBioBAM_SourceDir}/IRecordWriter.cpp
     ${PacBioBAM_SourceDir}/MD5.cpp
     ${PacBioBAM_SourceDir}/MemoryUtils.cpp
     ${PacBioBAM_SourceDir}/PbiBuilder.cpp
@@ -190,6 +193,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/ReadAccuracyQuery.cpp
     ${PacBioBAM_SourceDir}/ReadGroupInfo.cpp
     ${PacBioBAM_SourceDir}/SamTagCodec.cpp
+    ${PacBioBAM_SourceDir}/SamWriter.cpp
     ${PacBioBAM_SourceDir}/SequenceInfo.cpp
     ${PacBioBAM_SourceDir}/SubreadLengthQuery.cpp
     ${PacBioBAM_SourceDir}/Tag.cpp
