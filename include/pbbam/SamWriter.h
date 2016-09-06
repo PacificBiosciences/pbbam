@@ -92,6 +92,16 @@ public:
     ~SamWriter(void);
 
 public:
+    
+    /// \brief Try to flush any buffered data to file.
+    ///
+    /// \note The underlying implementation may not necessarily flush buffered
+    ///       data immediately, especially in a multithreaded writer situation.
+    ///       Let the SamWriter go out of scope to fully ensure flushing.
+    ///
+    /// \throws std::runtime_error if flush fails
+    ///
+    void TryFlush(void) override;
 
     /// \brief Write a record to the output SAM file.
     ///

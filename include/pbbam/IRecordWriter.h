@@ -54,6 +54,18 @@ public:
     virtual ~IRecordWriter(void);
 
 public:
+
+    /// \brief Try to flush any buffered data to file.
+    ///
+    /// \note The underlying implementation may not necessarily flush buffered
+    ///       data immediately, especially in a multithreaded writer situation.
+    ///       Let the writer go out of scope to fully ensure flushing.
+    ///
+    /// \throws std::runtime_error if flush fails
+    ///
+    virtual void TryFlush(void) =0;
+
+
     /// \brief Write a record to the output %BAM file.
     ///
     /// \param[in] record BamRecord object

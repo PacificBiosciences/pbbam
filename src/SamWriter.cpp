@@ -39,6 +39,7 @@
 #include "pbbam/Validator.h"
 #include "FileProducer.h"
 #include "MemoryUtils.h"
+#include <htslib/hfile.h>
 #include <htslib/sam.h>
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -73,12 +74,20 @@ public:
             throw std::runtime_error("could not write header");
     }
 
+    void TryFlush(void);
     void Write(const BamRecord& record);
 
 private:
     std::unique_ptr<samFile, internal::HtslibFileDeleter> file_;
     PBBAM_SHARED_PTR<bam_hdr_t> header_;
 };
+
+void SamWriterPrivate::TryFlush(void)
+{
+    const auto ret = file_.get()->fp.hfile;
+    if (ret != 0)
+        throw std::runtime_error("could not flush output buffer contents");
+}
 
 void SamWriterPrivate::Write(const BamRecord& record)
 {
@@ -116,6 +125,11 @@ SamWriter::SamWriter(const string& filename, const BamHeader& header)
 }
 
 SamWriter::~SamWriter(void) { }
+
+void SamWriter::TryFlush(void)
+{
+    d_->TryFlush();
+}
 
 void SamWriter::Write(const BamRecord& record)
 {
