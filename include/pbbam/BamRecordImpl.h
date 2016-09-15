@@ -42,6 +42,7 @@
 #ifndef BAMRECORDIMPL_H
 #define BAMRECORDIMPL_H
 
+#include "pbbam/BamRecordTag.h"
 #include "pbbam/Cigar.h"
 #include "pbbam/Config.h"
 #include "pbbam/Position.h"
@@ -410,6 +411,18 @@ public:
     bool AddTag(const std::string& tagName,
                 const Tag& value);
 
+    /// \brief Adds a new tag to this record.
+    ///
+    /// This is an overloaded method.
+    ///
+    /// \param[in] tag      BamRecordTag enum
+    /// \param[in] value    Tag object that describes the type & value of data
+    ///                     to be added
+    /// \returns true if tag was successfully added.
+    ///
+    bool AddTag(const BamRecordTag tag,
+                const Tag& value);
+
     /// \brief Adds a new tag to this record, with an optional modifier.
     ///
     /// \param[in] tagName              2-character tag name.
@@ -429,6 +442,22 @@ public:
     /// \returns true if tag was successfully added.
     ///
     bool AddTag(const std::string& tagName,
+                const Tag& value,
+                const TagModifier additionalModifier);
+
+    /// \brief Adds a new tag to this record, with an optional modifier.
+    ///
+    /// This is an overloaded method.
+    ///
+    /// \param[in] tag                  BamRecordTag enum.
+    /// \param[in] value                Tag object that describes the type &
+    ///                                 value of data to be added
+    /// \param[in] additionalModifier   optional extra modifier (for explicit
+    ///                                 modification of an otherwise const Tag)
+    ///
+    /// \returns true if tag was successfully added.
+    ///
+    bool AddTag(const BamRecordTag tag,
                 const Tag& value,
                 const TagModifier additionalModifier);
 
@@ -454,6 +483,19 @@ public:
 
     /// \brief Edits an existing tag on this record.
     ///
+    /// This is an overloaded method.
+    ///
+    /// \param[in] tag          BamRecordTag enum
+    /// \param[in] newValue     Tag object that describes the type & value of
+    ///                         new data to be added
+    ///
+    /// \returns true if tag was successfully edited.
+    ///
+    bool EditTag(const BamRecordTag tag,
+                 const Tag& newValue);
+
+    /// \brief Edits an existing tag on this record.
+    ///
     /// \param[in] tagName              2-character tag name. Name must be
     ///                                 present (see HasTag)
     /// \param[in] value                Tag object that describes the type &
@@ -475,8 +517,31 @@ public:
                  const Tag& value,
                  const TagModifier additionalModifier);
 
+    /// \brief Edits an existing tag on this record.
+    ///
+    /// This is an overloaded method.
+    ///
+    /// \param[in] tag                  BamRecordTag enum
+    /// \param[in] value                Tag object that describes the type &
+    ///                                 value of new data to be added
+    /// \param[in] additionalModifier   optional extra modifier (for explicit
+    ///                                 modification of an otherwise const Tag)
+    ///
+    /// \returns true if tag was successfully edited.
+    ///
+    bool EditTag(const BamRecordTag tag,
+                 const Tag& value,
+                 const TagModifier additionalModifier);
+
+
     /// \returns true if a tag with this name is present in this record.
     bool HasTag(const std::string& tagName) const;
+
+    /// \returns true if this tag is present in this record.
+    ///
+    /// This is an overloaded method.
+    ///
+    bool HasTag(const BamRecordTag tag) const;
 
     /// \brief Removes an existing tag from this record.
     ///
@@ -488,6 +553,18 @@ public:
     ///
     bool RemoveTag(const std::string& tagName);
 
+    /// \brief Removes an existing tag from this record.
+    ///
+    /// This is an overloaded method.
+    ///
+    /// \param[in] tag  BamRecordTag enum
+    ///
+    /// \returns true if tag was actaully removed (i.e. false if tagName
+    ///          previously unknown)
+    /// \sa HasTag
+    ///
+    bool RemoveTag(const BamRecordTag tag);
+
     /// \brief Fetches a tag from this record.
     ///
     /// \param[in] tagName  2-character tag name.
@@ -496,6 +573,17 @@ public:
     ///          default constructed Tag is returned (Tag::IsNull() is true).
     ///
     Tag TagValue(const std::string& tagName) const;
+
+    /// \brief Fetches a tag from this record.
+    ///
+    /// This is an overloaded method
+    ///
+    /// \param[in] tag  BamRecordTag enum
+    ///
+    /// \returns Tag object for the requested name. If name is unknown, a
+    ///          default constructed Tag is returned (Tag::IsNull() is true).
+    ///
+    Tag TagValue(const BamRecordTag tag) const;
 
     // change above to Tag();
 

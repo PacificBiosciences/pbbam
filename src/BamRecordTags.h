@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2016, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -34,53 +34,60 @@
 // SUCH DAMAGE.
 //
 // File Description
-/// \file BamRecord.inl
-/// \brief Inline implementations for the BamRecord class.
+/// \file BamRecordTags.h
+/// \brief Defines the BamRecordTags utility class.
 //
 // Author: Derek Barnett
 
+#ifndef BAMRECORDTAGS_H
+#define BAMRECORDTAGS_H
+
 #include "pbbam/BamRecord.h"
+#include "pbbam/BamRecordImpl.h"
+#include "pbbam/BamRecordTag.h"
+#include "EnumClassHash.h"
+#include <string>
+#include <unordered_map>
+#include <cassert>
 
 namespace PacBio {
 namespace BAM {
+namespace internal {
 
-inline BamRecord BamRecord::Clipped(const BamRecord& input,
-                                    const ClipType clipType,
-                                    const PacBio::BAM::Position start,
-                                    const PacBio::BAM::Position end)
+class BamRecordTags
 {
-    return input.Clipped(clipType, start, end);
+public:
+    // tag info
+    static inline bool IsPulse(const BamRecordTag tag);
+    static inline std::string LabelFor(const BamRecordTag tag);
+
+private:
+    struct BamRecordTagData
+    {
+        const std::string label_; //[3]; // 2-char tag plus NULL
+        const bool isPulse_;
+    };
+    typedef std::unordered_map<BamRecordTag,
+                               BamRecordTagData,
+                               EnumClassHash> TagLookupType;
+
+    static const TagLookupType tagLookup;
+};
+
+inline bool BamRecordTags::IsPulse(const BamRecordTag tag)
+{
+    assert(tagLookup.find(tag) != tagLookup.cend());
+    return tagLookup.at(tag).isPulse_;
 }
 
-inline BamRecord BamRecord::Clipped(const ClipType clipType,
-                                    const PacBio::BAM::Position start,
-                                    const PacBio::BAM::Position end) const
+inline std::string BamRecordTags::LabelFor(const BamRecordTag tag)
 {
-    BamRecord result(*this);
-    result.Clip(clipType, start, end);
-    return result;
+    assert(tagLookup.find(tag) != tagLookup.cend());
+    return tagLookup.at(tag).label_;
 }
 
-inline BamRecord BamRecord::Mapped(const BamRecord& input,
-                                   const int32_t referenceId,
-                                   const Position refStart,
-                                   const Strand strand,
-                                   const Cigar& cigar,
-                                   const uint8_t mappingQuality)
-{
-    return input.Mapped(referenceId, refStart, strand, cigar, mappingQuality);
-}
-
-inline BamRecord BamRecord::Mapped(const int32_t referenceId,
-                                   const Position refStart,
-                                   const Strand strand,
-                                   const Cigar& cigar,
-                                   const uint8_t mappingQuality) const
-{
-    BamRecord result(*this);
-    result.Map(referenceId, refStart, strand, cigar, mappingQuality);
-    return result;
-}
-
+} // namespace internal
 } // namespace BAM
 } // namespace PacBio
+
+#endif // BAMRECORDTAGS_H

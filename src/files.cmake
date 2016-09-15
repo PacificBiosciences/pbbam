@@ -10,6 +10,8 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/BamRecord.h
     ${PacBioBAM_IncludeDir}/pbbam/BamRecordBuilder.h
     ${PacBioBAM_IncludeDir}/pbbam/BamRecordImpl.h
+    ${PacBioBAM_IncludeDir}/pbbam/BamRecordTag.h
+    ${PacBioBAM_IncludeDir}/pbbam/BamRecordView.h
     ${PacBioBAM_IncludeDir}/pbbam/BamTagCodec.h
     ${PacBioBAM_IncludeDir}/pbbam/BaiIndexedBamReader.h
     ${PacBioBAM_IncludeDir}/pbbam/BamReader.h
@@ -18,12 +20,14 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/BarcodeQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/Cigar.h
     ${PacBioBAM_IncludeDir}/pbbam/CigarOperation.h
+    ${PacBioBAM_IncludeDir}/pbbam/ClipType.h
     ${PacBioBAM_IncludeDir}/pbbam/Compare.h
     ${PacBioBAM_IncludeDir}/pbbam/Config.h
     ${PacBioBAM_IncludeDir}/pbbam/DataSet.h
     ${PacBioBAM_IncludeDir}/pbbam/DataSetTypes.h
     ${PacBioBAM_IncludeDir}/pbbam/DataSetXsd.h
     ${PacBioBAM_IncludeDir}/pbbam/EntireFileQuery.h
+    ${PacBioBAM_IncludeDir}/pbbam/FrameEncodingType.h
     ${PacBioBAM_IncludeDir}/pbbam/Frames.h
     ${PacBioBAM_IncludeDir}/pbbam/GenomicInterval.h
     ${PacBioBAM_IncludeDir}/pbbam/GenomicIntervalQuery.h
@@ -45,11 +49,13 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/PbiRawData.h
     ${PacBioBAM_IncludeDir}/pbbam/Position.h
     ${PacBioBAM_IncludeDir}/pbbam/ProgramInfo.h
+    ${PacBioBAM_IncludeDir}/pbbam/PulseBehavior.h
     ${PacBioBAM_IncludeDir}/pbbam/QNameQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/QualityValue.h
     ${PacBioBAM_IncludeDir}/pbbam/QualityValues.h
     ${PacBioBAM_IncludeDir}/pbbam/ReadAccuracyQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/ReadGroupInfo.h
+    ${PacBioBAM_IncludeDir}/pbbam/RecordType.h
     ${PacBioBAM_IncludeDir}/pbbam/SamTagCodec.h
     ${PacBioBAM_IncludeDir}/pbbam/SamWriter.h
     ${PacBioBAM_IncludeDir}/pbbam/SequenceInfo.h
@@ -74,6 +80,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/internal/BamRecord.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/BamRecordBuilder.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/BamRecordImpl.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/BamRecordView.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/Cigar.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/CigarOperation.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/Compare.inl
@@ -119,14 +126,17 @@ set( PacBioBAM_H
 
     # library-internal headers
     ${PacBioBAM_SourceDir}/AssertUtils.h
+    ${PacBioBAM_SourceDir}/BamRecordTags.h
     ${PacBioBAM_SourceDir}/ChemistryTable.h
     ${PacBioBAM_SourceDir}/DataSetIO.h
     ${PacBioBAM_SourceDir}/DataSetUtils.h
+    ${PacBioBAM_SourceDir}/EnumClassHash.h
     ${PacBioBAM_SourceDir}/FileProducer.h
     ${PacBioBAM_SourceDir}/FileUtils.h
     ${PacBioBAM_SourceDir}/FofnReader.h
     ${PacBioBAM_SourceDir}/MemoryUtils.h
     ${PacBioBAM_SourceDir}/PbiIndexIO.h
+    ${PacBioBAM_SourceDir}/Pulse2BaseCache.h
     ${PacBioBAM_SourceDir}/SequenceUtils.h
     ${PacBioBAM_SourceDir}/StringUtils.h
     ${PacBioBAM_SourceDir}/TimeUtils.h
@@ -153,6 +163,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/BamRecord.cpp
     ${PacBioBAM_SourceDir}/BamRecordBuilder.cpp
     ${PacBioBAM_SourceDir}/BamRecordImpl.cpp
+    ${PacBioBAM_SourceDir}/BamRecordTags.cpp
     ${PacBioBAM_SourceDir}/BamTagCodec.cpp
     ${PacBioBAM_SourceDir}/BamWriter.cpp
     ${PacBioBAM_SourceDir}/BarcodeQuery.cpp

@@ -41,6 +41,7 @@
 
 #include <gtest/gtest.h>
 #include <pbbam/BamRecord.h>
+#include <pbbam/BamRecordView.h>
 #include <pbbam/BamTagCodec.h>
 #include <chrono>
 #include <string>
@@ -119,161 +120,247 @@ TEST(BamRecordMappingTest, BasicMap)
     s2_rev.Map(0, 100, Strand::REVERSE, s2_cigar, mapQual);
     s3_rev.Map(0, 100, Strand::REVERSE, s3_cigar, mapQual);
 
-    // s1 - FORWARD
-    EXPECT_TRUE(s1.IsMapped());
-    EXPECT_EQ(0, s1.ReferenceId());
-    EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
-    EXPECT_EQ(mapQual, s1.MapQuality());
+    {   // s1 - FORWARD
+        EXPECT_TRUE(s1.IsMapped());
+        EXPECT_EQ(0, s1.ReferenceId());
+        EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
+        EXPECT_EQ(mapQual, s1.MapQuality());
 
-    EXPECT_EQ(qStart, s1.QueryStart());
-    EXPECT_EQ(qEnd,   s1.QueryEnd());
-    EXPECT_EQ(500, s1.AlignedStart());
-    EXPECT_EQ(510, s1.AlignedEnd());         // 500 + 10=
-    EXPECT_EQ(100, s1.ReferenceStart());
-    EXPECT_EQ(110, s1.ReferenceEnd());       // 100 + 10=
+        EXPECT_EQ(qStart, s1.QueryStart());
+        EXPECT_EQ(qEnd,   s1.QueryEnd());
+        EXPECT_EQ(500, s1.AlignedStart());
+        EXPECT_EQ(510, s1.AlignedEnd());         // 500 + 10=
+        EXPECT_EQ(100, s1.ReferenceStart());
+        EXPECT_EQ(110, s1.ReferenceEnd());       // 100 + 10=
 
-    EXPECT_EQ(seq,      s1.Sequence());
-    EXPECT_EQ(quals,    s1.Qualities().Fastq());
-    EXPECT_EQ(tagBases, s1.DeletionTag());
-    EXPECT_EQ(tagQuals, s1.DeletionQV().Fastq());
-    EXPECT_EQ(tagQuals, s1.LabelQV().Fastq());
-    EXPECT_EQ(tagQuals, s1.AltLabelQV().Fastq());
-    EXPECT_EQ(frames,   s1.IPD().Data());
+        const BamRecordView view
+        {
+            s1,
+            Orientation::NATIVE,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
 
-    // s1 - REVERSE
-    EXPECT_TRUE(s1_rev.IsMapped());
-    EXPECT_EQ(0, s1_rev.ReferenceId());
-    EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
-    EXPECT_EQ(mapQual, s1_rev.MapQuality());
+        EXPECT_EQ(seq,      view.Sequence());
+        EXPECT_EQ(quals,    view.Qualities().Fastq());
+        EXPECT_EQ(tagBases, view.DeletionTags());
+        EXPECT_EQ(tagQuals, view.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals, view.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals, view.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames,   view.IPD().Data());
+    }
 
-    EXPECT_EQ(qStart, s1_rev.QueryStart());
-    EXPECT_EQ(qEnd,   s1_rev.QueryEnd());
-    EXPECT_EQ(500, s1_rev.AlignedStart());
-    EXPECT_EQ(510, s1_rev.AlignedEnd());         // 500 + 10=
-    EXPECT_EQ(100, s1_rev.ReferenceStart());
-    EXPECT_EQ(110, s1_rev.ReferenceEnd());       // 100 + 10=
+    {   // s1 - REVERSE
 
-    // - native
-    EXPECT_EQ(seq,      s1_rev.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(quals,    s1_rev.Qualities(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagBases, s1_rev.DeletionTag(Orientation::NATIVE));
-    EXPECT_EQ(tagQuals, s1_rev.DeletionQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagQuals, s1_rev.LabelQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagQuals, s1_rev.AltLabelQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(frames,   s1_rev.IPD(Orientation::NATIVE).Data());
+        EXPECT_TRUE(s1_rev.IsMapped());
+        EXPECT_EQ(0, s1_rev.ReferenceId());
+        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(mapQual, s1_rev.MapQuality());
 
-    // - genomic
-    EXPECT_EQ(seq_rev,      s1_rev.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(quals_rev,    s1_rev.Qualities(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagBases_rev, s1_rev.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(tagQuals_rev, s1_rev.DeletionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagQuals_rev, s1_rev.LabelQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagQuals_rev, s1_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(frames_rev,   s1_rev.IPD(Orientation::GENOMIC).Data());
+        EXPECT_EQ(qStart, s1_rev.QueryStart());
+        EXPECT_EQ(qEnd,   s1_rev.QueryEnd());
+        EXPECT_EQ(500, s1_rev.AlignedStart());
+        EXPECT_EQ(510, s1_rev.AlignedEnd());         // 500 + 10=
+        EXPECT_EQ(100, s1_rev.ReferenceStart());
+        EXPECT_EQ(110, s1_rev.ReferenceEnd());       // 100 + 10=
 
-    // s2 - FORWARD
-    EXPECT_TRUE(s2.IsMapped());
-    EXPECT_EQ(0, s2.ReferenceId());
-    EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
-    EXPECT_EQ(mapQual, s2.MapQuality());
+        // native
+        const BamRecordView nativeView
+        {
+            s1_rev,
+            Orientation::NATIVE,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+        EXPECT_EQ(seq,      nativeView.Sequence());
+        EXPECT_EQ(quals,    nativeView.Qualities().Fastq());
+        EXPECT_EQ(tagBases, nativeView.DeletionTags());
+        EXPECT_EQ(tagQuals, nativeView.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals, nativeView.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals, nativeView.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames,   nativeView.IPD().Data());
 
-    EXPECT_EQ(qStart, s2.QueryStart());
-    EXPECT_EQ(qEnd,   s2.QueryEnd());
-    EXPECT_EQ(500, s2.AlignedStart());
-    EXPECT_EQ(510, s2.AlignedEnd());         // 500 + 10=
-    EXPECT_EQ(100, s2.ReferenceStart());
-    EXPECT_EQ(113, s2.ReferenceEnd());      // 100 + 10= + 3D
+        // - genomic
+        const BamRecordView genomicView
+        {
+            s1_rev,
+            Orientation::GENOMIC,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+        EXPECT_EQ(seq_rev,      genomicView.Sequence());
+        EXPECT_EQ(quals_rev,    genomicView.Qualities().Fastq());
+        EXPECT_EQ(tagBases_rev, genomicView.DeletionTags());
+        EXPECT_EQ(tagQuals_rev, genomicView.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals_rev, genomicView.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals_rev, genomicView.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames_rev,   genomicView.IPD().Data());
+    }
 
-    EXPECT_EQ(seq,      s2.Sequence());
-    EXPECT_EQ(quals,    s2.Qualities().Fastq());
-    EXPECT_EQ(tagBases, s2.DeletionTag());
-    EXPECT_EQ(tagQuals, s2.DeletionQV().Fastq());
-    EXPECT_EQ(tagQuals, s2.LabelQV().Fastq());
-    EXPECT_EQ(tagQuals, s2.AltLabelQV().Fastq());
-    EXPECT_EQ(frames,   s2.IPD().Data());
+    {   // s2 - FORWARD
 
-    // s2 - REVERSE
-    EXPECT_TRUE(s2_rev.IsMapped());
-    EXPECT_EQ(0, s2_rev.ReferenceId());
-    EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
-    EXPECT_EQ(mapQual, s2_rev.MapQuality());
+        EXPECT_TRUE(s2.IsMapped());
+        EXPECT_EQ(0, s2.ReferenceId());
+        EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
+        EXPECT_EQ(mapQual, s2.MapQuality());
 
-    EXPECT_EQ(qStart, s2_rev.QueryStart());
-    EXPECT_EQ(qEnd,   s2_rev.QueryEnd());
-    EXPECT_EQ(500, s2_rev.AlignedStart());
-    EXPECT_EQ(510, s2_rev.AlignedEnd());         // 500 + 10=
-    EXPECT_EQ(100, s2_rev.ReferenceStart());
-    EXPECT_EQ(113, s2_rev.ReferenceEnd());      // 100 + 10= + 3D
+        EXPECT_EQ(qStart, s2.QueryStart());
+        EXPECT_EQ(qEnd,   s2.QueryEnd());
+        EXPECT_EQ(500, s2.AlignedStart());
+        EXPECT_EQ(510, s2.AlignedEnd());         // 500 + 10=
+        EXPECT_EQ(100, s2.ReferenceStart());
+        EXPECT_EQ(113, s2.ReferenceEnd());      // 100 + 10= + 3D
 
-    // - native
-    EXPECT_EQ(seq,      s2_rev.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(quals,    s2_rev.Qualities(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagBases, s2_rev.DeletionTag(Orientation::NATIVE));
-    EXPECT_EQ(tagQuals, s2_rev.DeletionQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagQuals, s2_rev.LabelQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagQuals, s2_rev.AltLabelQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(frames,   s2_rev.IPD(Orientation::NATIVE).Data());
+        const BamRecordView view
+        {
+            s2,
+            Orientation::NATIVE,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
 
-    // - genomic
-    EXPECT_EQ(seq_rev,      s2_rev.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(quals_rev,    s2_rev.Qualities(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagBases_rev, s2_rev.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(tagQuals_rev, s2_rev.DeletionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagQuals_rev, s2_rev.LabelQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagQuals_rev, s2_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(frames_rev,   s2_rev.IPD(Orientation::GENOMIC).Data());
+        EXPECT_EQ(seq,      view.Sequence());
+        EXPECT_EQ(quals,    view.Qualities().Fastq());
+        EXPECT_EQ(tagBases, view.DeletionTags());
+        EXPECT_EQ(tagQuals, view.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals, view.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals, view.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames,   view.IPD().Data());
+    }
 
-    // s3 - FORWARD
-    EXPECT_TRUE(s3.IsMapped());
-    EXPECT_EQ(0, s3.ReferenceId());
-    EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
-    EXPECT_EQ(mapQual, s3.MapQuality());
+    {   // s2 - REVERSE
 
-    EXPECT_EQ(qStart, s3.QueryStart());
-    EXPECT_EQ(qEnd,   s3.QueryEnd());
-    EXPECT_EQ(500, s3.AlignedStart());
-    EXPECT_EQ(510, s3.AlignedEnd());         // 500 + 8= + 2I
-    EXPECT_EQ(100, s3.ReferenceStart());
-    EXPECT_EQ(111, s3.ReferenceEnd());      // 100 + 8= + 3D
+        EXPECT_TRUE(s2_rev.IsMapped());
+        EXPECT_EQ(0, s2_rev.ReferenceId());
+        EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
+        EXPECT_EQ(mapQual, s2_rev.MapQuality());
 
-    EXPECT_EQ(seq,      s3.Sequence());
-    EXPECT_EQ(quals,    s3.Qualities().Fastq());
-    EXPECT_EQ(tagBases, s3.DeletionTag());
-    EXPECT_EQ(tagQuals, s3.DeletionQV().Fastq());
-    EXPECT_EQ(tagQuals, s3.LabelQV().Fastq());
-    EXPECT_EQ(tagQuals, s3.AltLabelQV().Fastq());
-    EXPECT_EQ(frames,   s3.IPD().Data());
+        EXPECT_EQ(qStart, s2_rev.QueryStart());
+        EXPECT_EQ(qEnd,   s2_rev.QueryEnd());
+        EXPECT_EQ(500, s2_rev.AlignedStart());
+        EXPECT_EQ(510, s2_rev.AlignedEnd());         // 500 + 10=
+        EXPECT_EQ(100, s2_rev.ReferenceStart());
+        EXPECT_EQ(113, s2_rev.ReferenceEnd());      // 100 + 10= + 3D
 
-    // s3 - REVERSE
-    EXPECT_TRUE(s3_rev.IsMapped());
-    EXPECT_EQ(0, s3_rev.ReferenceId());
-    EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
-    EXPECT_EQ(mapQual, s3_rev.MapQuality());
+        // - native
+        const BamRecordView nativeView
+        {
+            s2_rev,
+            Orientation::NATIVE,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+        EXPECT_EQ(seq,      nativeView.Sequence());
+        EXPECT_EQ(quals,    nativeView.Qualities().Fastq());
+        EXPECT_EQ(tagBases, nativeView.DeletionTags());
+        EXPECT_EQ(tagQuals, nativeView.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals, nativeView.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals, nativeView.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames,   nativeView.IPD().Data());
 
-    EXPECT_EQ(qStart, s3_rev.QueryStart());
-    EXPECT_EQ(qEnd,   s3_rev.QueryEnd());
-    EXPECT_EQ(500, s3_rev.AlignedStart());
-    EXPECT_EQ(510, s3_rev.AlignedEnd());         // 500 + 8= + 2I
-    EXPECT_EQ(100, s3_rev.ReferenceStart());
-    EXPECT_EQ(111, s3_rev.ReferenceEnd());      // 100 + 8= + 3D
+        // - genomic
+        const BamRecordView genomicView
+        {
+            s2_rev,
+            Orientation::GENOMIC,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+        EXPECT_EQ(seq_rev,      genomicView.Sequence());
+        EXPECT_EQ(quals_rev,    genomicView.Qualities().Fastq());
+        EXPECT_EQ(tagBases_rev, genomicView.DeletionTags());
+        EXPECT_EQ(tagQuals_rev, genomicView.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals_rev, genomicView.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals_rev, genomicView.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames_rev,   genomicView.IPD().Data());
+    }
 
-    // - native
-    EXPECT_EQ(seq,      s3_rev.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(quals,    s3_rev.Qualities(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagBases, s3_rev.DeletionTag(Orientation::NATIVE));
-    EXPECT_EQ(tagQuals, s3_rev.DeletionQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagQuals, s3_rev.LabelQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagQuals, s3_rev.AltLabelQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(frames,   s3_rev.IPD(Orientation::NATIVE).Data());
+    {   // s3 - FORWARD
 
-    // - genomic
-    EXPECT_EQ(seq_rev,      s3_rev.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(quals_rev,    s3_rev.Qualities(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagBases_rev, s3_rev.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(tagQuals_rev, s3_rev.DeletionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagQuals_rev, s3_rev.LabelQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagQuals_rev, s3_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(frames_rev,   s3_rev.IPD(Orientation::GENOMIC).Data());
+        EXPECT_TRUE(s3.IsMapped());
+        EXPECT_EQ(0, s3.ReferenceId());
+        EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+        EXPECT_EQ(mapQual, s3.MapQuality());
+
+        EXPECT_EQ(qStart, s3.QueryStart());
+        EXPECT_EQ(qEnd,   s3.QueryEnd());
+        EXPECT_EQ(500, s3.AlignedStart());
+        EXPECT_EQ(510, s3.AlignedEnd());         // 500 + 8= + 2I
+        EXPECT_EQ(100, s3.ReferenceStart());
+        EXPECT_EQ(111, s3.ReferenceEnd());      // 100 + 8= + 3D
+
+        const BamRecordView view
+        {
+            s3,
+            Orientation::NATIVE,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+
+        EXPECT_EQ(seq,      view.Sequence());
+        EXPECT_EQ(quals,    view.Qualities().Fastq());
+        EXPECT_EQ(tagBases, view.DeletionTags());
+        EXPECT_EQ(tagQuals, view.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals, view.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals, view.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames,   view.IPD().Data());
+    }
+
+    {   // s3 - REVERSE
+
+        EXPECT_TRUE(s3_rev.IsMapped());
+        EXPECT_EQ(0, s3_rev.ReferenceId());
+        EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
+        EXPECT_EQ(mapQual, s3_rev.MapQuality());
+
+        EXPECT_EQ(qStart, s3_rev.QueryStart());
+        EXPECT_EQ(qEnd,   s3_rev.QueryEnd());
+        EXPECT_EQ(500, s3_rev.AlignedStart());
+        EXPECT_EQ(510, s3_rev.AlignedEnd());         // 500 + 8= + 2I
+        EXPECT_EQ(100, s3_rev.ReferenceStart());
+        EXPECT_EQ(111, s3_rev.ReferenceEnd());      // 100 + 8= + 3D
+
+        // - native
+        const BamRecordView nativeView
+        {
+            s3_rev,
+            Orientation::NATIVE,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+        EXPECT_EQ(seq,      nativeView.Sequence());
+        EXPECT_EQ(quals,    nativeView.Qualities().Fastq());
+        EXPECT_EQ(tagBases, nativeView.DeletionTags());
+        EXPECT_EQ(tagQuals, nativeView.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals, nativeView.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals, nativeView.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames,   nativeView.IPD().Data());
+
+        // - genomic
+        const BamRecordView genomicView
+        {
+            s3_rev,
+            Orientation::GENOMIC,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+        EXPECT_EQ(seq_rev,      genomicView.Sequence());
+        EXPECT_EQ(quals_rev,    genomicView.Qualities().Fastq());
+        EXPECT_EQ(tagBases_rev, genomicView.DeletionTags());
+        EXPECT_EQ(tagQuals_rev, genomicView.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals_rev, genomicView.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals_rev, genomicView.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames_rev,   genomicView.IPD().Data());
+    }
 }
 
 TEST(BamRecordMappingTest, SoftClipMapping)
@@ -287,11 +374,23 @@ TEST(BamRecordMappingTest, SoftClipMapping)
     const f_data frames   = { 40, 40, 10, 10, 20, 20, 30, 40, 40, 10, 30, 20, 10, 10, 10 };
     const uint8_t mapQual = 80;
 
+    const string clipped_seq   = "AACCGTTAGC";
+    const string clipped_quals = "?]?]?]?]?*";
+    const string clipped_tagBases   = "AACCGTTAGC";
+    const string clipped_tagQuals = "?]?]?]?]?*";
+    const f_data clipped_frames = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
+
     const string seq_rev   = "TTTGCTAACGGTTAA";
     const string quals_rev = "+++*?]?]?]?]?--";
     const string tagBases_rev = seq_rev;
     const string tagQuals_rev = quals_rev;
     const f_data frames_rev = { 10, 10, 10, 20, 30, 10, 40, 40, 30, 20, 20, 10, 10, 40, 40 };
+
+    const string clipped_seq_rev   = "GCTAACGGTT";
+    const string clipped_quals_rev = "*?]?]?]?]?";
+    const string clipped_tagBases_rev = clipped_seq_rev;
+    const string clipped_tagQuals_rev = clipped_quals_rev;
+    const f_data clipped_frames_rev = { 20, 30, 10, 40, 40, 30, 20, 20, 10, 10 };
 
     const string s1_cigar = "2S10=3S";
     const string s2_cigar = "2S5=3D5=3S";
@@ -311,161 +410,248 @@ TEST(BamRecordMappingTest, SoftClipMapping)
     s2_rev.Map(0, 100, Strand::REVERSE, s2_cigar, mapQual);
     s3_rev.Map(0, 100, Strand::REVERSE, s3_cigar, mapQual);
 
-    // s1 - FORWARD
-    EXPECT_TRUE(s1.IsMapped());
-    EXPECT_EQ(0, s1.ReferenceId());
-    EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
-    EXPECT_EQ(mapQual, s1.MapQuality());
+    {   // s1 - FORWARD
 
-    EXPECT_EQ(qStart, s1.QueryStart());      // 500
-    EXPECT_EQ(qEnd,   s1.QueryEnd());        // QStart + seqLength
-    EXPECT_EQ(502, s1.AlignedStart());       // QStart + 2S
-    EXPECT_EQ(512, s1.AlignedEnd());         // AStart + 10=
-    EXPECT_EQ(100, s1.ReferenceStart());     // 100
-    EXPECT_EQ(110, s1.ReferenceEnd());       // RefStart + 10=
+        EXPECT_TRUE(s1.IsMapped());
+        EXPECT_EQ(0, s1.ReferenceId());
+        EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
+        EXPECT_EQ(mapQual, s1.MapQuality());
 
-    EXPECT_EQ(seq,      s1.Sequence());
-    EXPECT_EQ(quals,    s1.Qualities().Fastq());
-    EXPECT_EQ(tagBases, s1.DeletionTag());
-    EXPECT_EQ(tagQuals, s1.DeletionQV().Fastq());
-    EXPECT_EQ(tagQuals, s1.LabelQV().Fastq());
-    EXPECT_EQ(tagQuals, s1.AltLabelQV().Fastq());
-    EXPECT_EQ(frames,   s1.IPD().Data());
+        EXPECT_EQ(qStart, s1.QueryStart());      // 500
+        EXPECT_EQ(qEnd,   s1.QueryEnd());        // QStart + seqLength
+        EXPECT_EQ(502, s1.AlignedStart());       // QStart + 2S
+        EXPECT_EQ(512, s1.AlignedEnd());         // AStart + 10=
+        EXPECT_EQ(100, s1.ReferenceStart());     // 100
+        EXPECT_EQ(110, s1.ReferenceEnd());       // RefStart + 10=
 
-    // s1 - REVERSE
-    EXPECT_TRUE(s1_rev.IsMapped());
-    EXPECT_EQ(0, s1_rev.ReferenceId());
-    EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
-    EXPECT_EQ(mapQual, s1_rev.MapQuality());
+        const BamRecordView view
+        {
+            s1,
+            Orientation::NATIVE,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
 
-    EXPECT_EQ(qStart, s1_rev.QueryStart());      // 500
-    EXPECT_EQ(qEnd,   s1_rev.QueryEnd());        // QStart + seqLength
-    EXPECT_EQ(503, s1_rev.AlignedStart());       // QStart + 3S
-    EXPECT_EQ(513, s1_rev.AlignedEnd());         // AStart + 10=
-    EXPECT_EQ(100, s1_rev.ReferenceStart());     // 100
-    EXPECT_EQ(110, s1_rev.ReferenceEnd());       // RefStart + 10=
+        EXPECT_EQ(seq,      view.Sequence());
+        EXPECT_EQ(quals,    view.Qualities().Fastq());
+        EXPECT_EQ(tagBases, view.DeletionTags());
+        EXPECT_EQ(tagQuals, view.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals, view.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals, view.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames,   view.IPD().Data());
+    }
 
-    // - native
-    EXPECT_EQ(seq,      s1_rev.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(quals,    s1_rev.Qualities(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagBases, s1_rev.DeletionTag(Orientation::NATIVE));
-    EXPECT_EQ(tagQuals, s1_rev.DeletionQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagQuals, s1_rev.LabelQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagQuals, s1_rev.AltLabelQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(frames,   s1_rev.IPD(Orientation::NATIVE).Data());
+    {   // s1 - REVERSE
 
-    // - genomic
-    EXPECT_EQ(seq_rev,      s1_rev.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(quals_rev,    s1_rev.Qualities(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagBases_rev, s1_rev.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(tagQuals_rev, s1_rev.DeletionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagQuals_rev, s1_rev.LabelQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagQuals_rev, s1_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(frames_rev,   s1_rev.IPD(Orientation::GENOMIC).Data());
+        EXPECT_TRUE(s1_rev.IsMapped());
+        EXPECT_EQ(0, s1_rev.ReferenceId());
+        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(mapQual, s1_rev.MapQuality());
 
-    // s2 - FORWARD
-    EXPECT_TRUE(s2.IsMapped());
-    EXPECT_EQ(0, s2.ReferenceId());
-    EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
-    EXPECT_EQ(mapQual, s2.MapQuality());
+        EXPECT_EQ(qStart, s1_rev.QueryStart());      // 500
+        EXPECT_EQ(qEnd,   s1_rev.QueryEnd());        // QStart + seqLength
+        EXPECT_EQ(503, s1_rev.AlignedStart());       // QStart + 3S
+        EXPECT_EQ(513, s1_rev.AlignedEnd());         // AStart + 10=
+        EXPECT_EQ(100, s1_rev.ReferenceStart());     // 100
+        EXPECT_EQ(110, s1_rev.ReferenceEnd());       // RefStart + 10=
 
-    EXPECT_EQ(qStart, s2.QueryStart());      // 500
-    EXPECT_EQ(qEnd,   s2.QueryEnd());        // QStart + seqLength
-    EXPECT_EQ(502, s2.AlignedStart());       // QStart + 2S
-    EXPECT_EQ(512, s2.AlignedEnd());         // AStart + 10=
-    EXPECT_EQ(100, s2.ReferenceStart());     // 100
-    EXPECT_EQ(113, s2.ReferenceEnd());       // RefStart + 10= + 3D
+        // - native
+        const BamRecordView nativeView
+        {
+            s1_rev,
+            Orientation::NATIVE,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+        EXPECT_EQ(seq,      nativeView.Sequence());
+        EXPECT_EQ(quals,    nativeView.Qualities().Fastq());
+        EXPECT_EQ(tagBases, nativeView.DeletionTags());
+        EXPECT_EQ(tagQuals, nativeView.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals, nativeView.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals, nativeView.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames,   nativeView.IPD().Data());
 
-    EXPECT_EQ(seq,      s2.Sequence());
-    EXPECT_EQ(quals,    s2.Qualities().Fastq());
-    EXPECT_EQ(tagBases, s2.DeletionTag());
-    EXPECT_EQ(tagQuals, s2.DeletionQV().Fastq());
-    EXPECT_EQ(tagQuals, s2.LabelQV().Fastq());
-    EXPECT_EQ(tagQuals, s2.AltLabelQV().Fastq());
-    EXPECT_EQ(frames,   s2.IPD().Data());
+        // - genomic
+        const BamRecordView genomicView
+        {
+            s1_rev,
+            Orientation::GENOMIC,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+        EXPECT_EQ(seq_rev,      genomicView.Sequence());
+        EXPECT_EQ(quals_rev,    genomicView.Qualities().Fastq());
+        EXPECT_EQ(tagBases_rev, genomicView.DeletionTags());
+        EXPECT_EQ(tagQuals_rev, genomicView.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals_rev, genomicView.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals_rev, genomicView.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames_rev,   genomicView.IPD().Data());
+    }
 
-    // s2 - REVERSE
-    EXPECT_TRUE(s2_rev.IsMapped());
-    EXPECT_EQ(0, s2_rev.ReferenceId());
-    EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
-    EXPECT_EQ(mapQual, s2_rev.MapQuality());
+    {   // s2 - FORWARD
 
-    EXPECT_EQ(qStart, s2_rev.QueryStart());      // 500
-    EXPECT_EQ(qEnd,   s2_rev.QueryEnd());        // QStart + seqLength
-    EXPECT_EQ(503, s2_rev.AlignedStart());       // QStart + 3S
-    EXPECT_EQ(513, s2_rev.AlignedEnd());         // AStart + 10=
-    EXPECT_EQ(100, s2_rev.ReferenceStart());     // 100
-    EXPECT_EQ(113, s2_rev.ReferenceEnd());       // RefStart + 10= + 3D
+        EXPECT_TRUE(s2.IsMapped());
+        EXPECT_EQ(0, s2.ReferenceId());
+        EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
+        EXPECT_EQ(mapQual, s2.MapQuality());
 
-    // - native
-    EXPECT_EQ(seq,      s2_rev.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(quals,    s2_rev.Qualities(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagBases, s2_rev.DeletionTag(Orientation::NATIVE));
-    EXPECT_EQ(tagQuals, s2_rev.DeletionQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagQuals, s2_rev.LabelQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagQuals, s2_rev.AltLabelQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(frames,   s2_rev.IPD(Orientation::NATIVE).Data());
+        EXPECT_EQ(qStart, s2.QueryStart());      // 500
+        EXPECT_EQ(qEnd,   s2.QueryEnd());        // QStart + seqLength
+        EXPECT_EQ(502, s2.AlignedStart());       // QStart + 2S
+        EXPECT_EQ(512, s2.AlignedEnd());         // AStart + 10=
+        EXPECT_EQ(100, s2.ReferenceStart());     // 100
+        EXPECT_EQ(113, s2.ReferenceEnd());       // RefStart + 10= + 3D
 
-    // - genomic
-    EXPECT_EQ(seq_rev,      s2_rev.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(quals_rev,    s2_rev.Qualities(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagBases_rev, s2_rev.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(tagQuals_rev, s2_rev.DeletionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagQuals_rev, s2_rev.LabelQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagQuals_rev, s2_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(frames_rev,   s2_rev.IPD(Orientation::GENOMIC).Data());
+        const BamRecordView view
+        {
+            s2,
+            Orientation::NATIVE,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
 
-    // s3 - FORWARD
-    EXPECT_TRUE(s3.IsMapped());
-    EXPECT_EQ(0, s3.ReferenceId());
-    EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
-    EXPECT_EQ(mapQual, s3.MapQuality());
+        EXPECT_EQ(seq,      view.Sequence());
+        EXPECT_EQ(quals,    view.Qualities().Fastq());
+        EXPECT_EQ(tagBases, view.DeletionTags());
+        EXPECT_EQ(tagQuals, view.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals, view.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals, view.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames,   view.IPD().Data());
+    }
 
-    EXPECT_EQ(qStart, s3.QueryStart());      // 500
-    EXPECT_EQ(qEnd,   s3.QueryEnd());        // QStart + seqLength
-    EXPECT_EQ(502, s3.AlignedStart());       // QStart + 2S
-    EXPECT_EQ(512, s3.AlignedEnd());         // AStart + 8= + 2I
-    EXPECT_EQ(100, s3.ReferenceStart());     // 100
-    EXPECT_EQ(111, s3.ReferenceEnd());       // RefStart + 8= + 3D
+    {   // s2 - REVERSE
 
-    EXPECT_EQ(seq,      s3.Sequence());
-    EXPECT_EQ(quals,    s3.Qualities().Fastq());
-    EXPECT_EQ(tagBases, s3.DeletionTag());
-    EXPECT_EQ(tagQuals, s3.DeletionQV().Fastq());
-    EXPECT_EQ(tagQuals, s3.LabelQV().Fastq());
-    EXPECT_EQ(tagQuals, s3.AltLabelQV().Fastq());
-    EXPECT_EQ(frames,   s3.IPD().Data());
+        EXPECT_TRUE(s2_rev.IsMapped());
+        EXPECT_EQ(0, s2_rev.ReferenceId());
+        EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
+        EXPECT_EQ(mapQual, s2_rev.MapQuality());
 
-    // s3 - REVERSE
-    EXPECT_TRUE(s3_rev.IsMapped());
-    EXPECT_EQ(0, s3_rev.ReferenceId());
-    EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
-    EXPECT_EQ(mapQual, s3_rev.MapQuality());
+        EXPECT_EQ(qStart, s2_rev.QueryStart());      // 500
+        EXPECT_EQ(qEnd,   s2_rev.QueryEnd());        // QStart + seqLength
+        EXPECT_EQ(503, s2_rev.AlignedStart());       // QStart + 3S
+        EXPECT_EQ(513, s2_rev.AlignedEnd());         // AStart + 10=
+        EXPECT_EQ(100, s2_rev.ReferenceStart());     // 100
+        EXPECT_EQ(113, s2_rev.ReferenceEnd());       // RefStart + 10= + 3D
 
-    EXPECT_EQ(qStart, s3_rev.QueryStart());      // 500
-    EXPECT_EQ(qEnd,   s3_rev.QueryEnd());        // QStart + seqLength
-    EXPECT_EQ(503, s3_rev.AlignedStart());       // QStart + 3S
-    EXPECT_EQ(513, s3_rev.AlignedEnd());         // AStart + 8= + 2I
-    EXPECT_EQ(100, s3_rev.ReferenceStart());     // 100
-    EXPECT_EQ(111, s3_rev.ReferenceEnd());       // RefStart + 8= + 3D
+        // - native
+        const BamRecordView nativeView
+        {
+            s2_rev,
+            Orientation::NATIVE,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+        EXPECT_EQ(seq,      nativeView.Sequence());
+        EXPECT_EQ(quals,    nativeView.Qualities().Fastq());
+        EXPECT_EQ(tagBases, nativeView.DeletionTags());
+        EXPECT_EQ(tagQuals, nativeView.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals, nativeView.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals, nativeView.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames,   nativeView.IPD().Data());
 
-    // - native
-    EXPECT_EQ(seq,      s3_rev.Sequence(Orientation::NATIVE));
-    EXPECT_EQ(quals,    s3_rev.Qualities(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagBases, s3_rev.DeletionTag(Orientation::NATIVE));
-    EXPECT_EQ(tagQuals, s3_rev.DeletionQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagQuals, s3_rev.LabelQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(tagQuals, s3_rev.AltLabelQV(Orientation::NATIVE).Fastq());
-    EXPECT_EQ(frames,   s3_rev.IPD(Orientation::NATIVE).Data());
+        // - genomic
+        const BamRecordView genomicView
+        {
+            s2_rev,
+            Orientation::GENOMIC,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+        EXPECT_EQ(seq_rev,      genomicView.Sequence());
+        EXPECT_EQ(quals_rev,    genomicView.Qualities().Fastq());
+        EXPECT_EQ(tagBases_rev, genomicView.DeletionTags());
+        EXPECT_EQ(tagQuals_rev, genomicView.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals_rev, genomicView.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals_rev, genomicView.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames_rev,   genomicView.IPD().Data());
+    }
 
-    // - genomic
-    EXPECT_EQ(seq_rev,      s3_rev.Sequence(Orientation::GENOMIC));
-    EXPECT_EQ(quals_rev,    s3_rev.Qualities(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagBases_rev, s3_rev.DeletionTag(Orientation::GENOMIC));
-    EXPECT_EQ(tagQuals_rev, s3_rev.DeletionQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagQuals_rev, s3_rev.LabelQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(tagQuals_rev, s3_rev.AltLabelQV(Orientation::GENOMIC).Fastq());
-    EXPECT_EQ(frames_rev,   s3_rev.IPD(Orientation::GENOMIC).Data());
+    {   // s3 - FORWARD
+
+        EXPECT_TRUE(s3.IsMapped());
+        EXPECT_EQ(0, s3.ReferenceId());
+        EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+        EXPECT_EQ(mapQual, s3.MapQuality());
+
+        EXPECT_EQ(qStart, s3.QueryStart());      // 500
+        EXPECT_EQ(qEnd,   s3.QueryEnd());        // QStart + seqLength
+        EXPECT_EQ(502, s3.AlignedStart());       // QStart + 2S
+        EXPECT_EQ(512, s3.AlignedEnd());         // AStart + 8= + 2I
+        EXPECT_EQ(100, s3.ReferenceStart());     // 100
+        EXPECT_EQ(111, s3.ReferenceEnd());       // RefStart + 8= + 3D
+
+        const BamRecordView view
+        {
+            s2,
+            Orientation::NATIVE,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+
+        EXPECT_EQ(seq,      view.Sequence());
+        EXPECT_EQ(quals,    view.Qualities().Fastq());
+        EXPECT_EQ(tagBases, view.DeletionTags());
+        EXPECT_EQ(tagQuals, view.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals, view.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals, view.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames,   view.IPD().Data());
+    }
+
+    {   // s3 - REVERSE
+
+        EXPECT_TRUE(s3_rev.IsMapped());
+        EXPECT_EQ(0, s3_rev.ReferenceId());
+        EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
+        EXPECT_EQ(mapQual, s3_rev.MapQuality());
+
+        EXPECT_EQ(qStart, s3_rev.QueryStart());      // 500
+        EXPECT_EQ(qEnd,   s3_rev.QueryEnd());        // QStart + seqLength
+        EXPECT_EQ(503, s3_rev.AlignedStart());       // QStart + 3S
+        EXPECT_EQ(513, s3_rev.AlignedEnd());         // AStart + 8= + 2I
+        EXPECT_EQ(100, s3_rev.ReferenceStart());     // 100
+        EXPECT_EQ(111, s3_rev.ReferenceEnd());       // RefStart + 8= + 3D
+
+        // - native
+        const BamRecordView nativeView
+        {
+            s3_rev,
+            Orientation::NATIVE,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+        EXPECT_EQ(seq,      nativeView.Sequence());
+        EXPECT_EQ(quals,    nativeView.Qualities().Fastq());
+        EXPECT_EQ(tagBases, nativeView.DeletionTags());
+        EXPECT_EQ(tagQuals, nativeView.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals, nativeView.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals, nativeView.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames,   nativeView.IPD().Data());
+
+        // - genomic
+        const BamRecordView genomicView
+        {
+            s3_rev,
+            Orientation::GENOMIC,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+        EXPECT_EQ(seq_rev,      genomicView.Sequence());
+        EXPECT_EQ(quals_rev,    genomicView.Qualities().Fastq());
+        EXPECT_EQ(tagBases_rev, genomicView.DeletionTags());
+        EXPECT_EQ(tagQuals_rev, genomicView.DeletionQVs().Fastq());
+        EXPECT_EQ(tagQuals_rev, genomicView.LabelQVs().Fastq());
+        EXPECT_EQ(tagQuals_rev, genomicView.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames_rev,   genomicView.IPD().Data());
+    }
 }
 
 TEST(BamRecordMappingTest, MappedCopy)
@@ -495,13 +681,22 @@ TEST(BamRecordMappingTest, MappedCopy)
     EXPECT_EQ(100, mapped.ReferenceStart());  // 100
     EXPECT_EQ(111, mapped.ReferenceEnd());    // RefStart + 8= + 3D
 
-    EXPECT_EQ(seq,      mapped.Sequence());
-    EXPECT_EQ(quals,    mapped.Qualities().Fastq());
-    EXPECT_EQ(tagBases, mapped.DeletionTag());
-    EXPECT_EQ(tagQuals, mapped.DeletionQV().Fastq());
-    EXPECT_EQ(tagQuals, mapped.LabelQV().Fastq());
-    EXPECT_EQ(tagQuals, mapped.AltLabelQV().Fastq());
-    EXPECT_EQ(frames,   mapped.IPD().Data());
+    const BamRecordView view
+    {
+        mapped,
+        Orientation::NATIVE,
+        false,
+        false,
+        PulseBehavior::ALL
+    };
+
+    EXPECT_EQ(seq,      view.Sequence());
+    EXPECT_EQ(quals,    view.Qualities().Fastq());
+    EXPECT_EQ(tagBases, view.DeletionTags());
+    EXPECT_EQ(tagQuals, view.DeletionQVs().Fastq());
+    EXPECT_EQ(tagQuals, view.LabelQVs().Fastq());
+    EXPECT_EQ(tagQuals, view.AltLabelQVs().Fastq());
+    EXPECT_EQ(frames,   view.IPD().Data());
 }
 
 TEST(BamRecordMappingTest, StaticMapped)
@@ -531,11 +726,20 @@ TEST(BamRecordMappingTest, StaticMapped)
     EXPECT_EQ(100, mapped.ReferenceStart());  // 100
     EXPECT_EQ(111, mapped.ReferenceEnd());    // RefStart + 8= + 3D
 
-    EXPECT_EQ(seq,      mapped.Sequence());
-    EXPECT_EQ(quals,    mapped.Qualities().Fastq());
-    EXPECT_EQ(tagBases, mapped.DeletionTag());
-    EXPECT_EQ(tagQuals, mapped.DeletionQV().Fastq());
-    EXPECT_EQ(tagQuals, mapped.LabelQV().Fastq());
-    EXPECT_EQ(tagQuals, mapped.AltLabelQV().Fastq());
-    EXPECT_EQ(frames,   mapped.IPD().Data());
+    const BamRecordView view
+    {
+        mapped,
+        Orientation::NATIVE,
+        false,
+        false,
+        PulseBehavior::ALL
+    };
+
+    EXPECT_EQ(seq,      view.Sequence());
+    EXPECT_EQ(quals,    view.Qualities().Fastq());
+    EXPECT_EQ(tagBases, view.DeletionTags());
+    EXPECT_EQ(tagQuals, view.DeletionQVs().Fastq());
+    EXPECT_EQ(tagQuals, view.LabelQVs().Fastq());
+    EXPECT_EQ(tagQuals, view.AltLabelQVs().Fastq());
+    EXPECT_EQ(frames,   view.IPD().Data());
 }

@@ -428,37 +428,32 @@ TEST(BamRecordTest, DefaultValues)
     // PacBio data
     EXPECT_EQ(-1, bam.AlignedStart());
     EXPECT_EQ(-1, bam.AlignedEnd());
-    EXPECT_THROW(bam.HoleNumber(), std::exception);
+
+    EXPECT_FALSE(bam.HasHoleNumber());
     EXPECT_FALSE(bam.HasNumPasses());
+    EXPECT_FALSE(bam.HasQueryEnd());
+    EXPECT_FALSE(bam.HasQueryStart());
+    EXPECT_FALSE(bam.HasReadAccuracy());
+
+    EXPECT_THROW(bam.HoleNumber(), std::exception);
     EXPECT_THROW(bam.NumPasses(), std::exception);
+    EXPECT_EQ(Position(0), bam.QueryEnd());
+    EXPECT_EQ(Position(0), bam.QueryStart());
+    EXPECT_THROW(bam.ReadAccuracy(), std::exception);
 
-    // 8888888888888888888888888888888888888
-//    EXPECT_EQ(-1, bam.NumPasses());
-//    EXPECT_EQ(-1, bam.QueryStart());
-//    EXPECT_EQ(-1, bam.QueryEnd());
-//    EXPECT_EQ(0, bam.ReadAccuracy());
-//    EXPECT_EQ(-1, bam.ReferenceStart());
-//    EXPECT_EQ(-1, bam.ReferenceEnd());
-    // 8888888888888888888888888888888888888
+    EXPECT_FALSE(bam.HasDeletionQV());
+    EXPECT_FALSE(bam.HasDeletionTag());
+    EXPECT_FALSE(bam.HasInsertionQV());
+    EXPECT_FALSE(bam.HasMergeQV());
+    EXPECT_FALSE(bam.HasSubstitutionQV());
+    EXPECT_FALSE(bam.HasSubstitutionTag());
 
-    EXPECT_THROW(bam.DeletionQV(), std::exception);
-    EXPECT_THROW(bam.DeletionTag(), std::exception);
-    EXPECT_THROW(bam.InsertionQV(), std::exception);
-    EXPECT_THROW(bam.MergeQV(), std::exception);
-    EXPECT_THROW(bam.SubstitutionQV(), std::exception);
+    EXPECT_THROW(bam.DeletionQV(),      std::exception);
+    EXPECT_THROW(bam.DeletionTag(),     std::exception);
+    EXPECT_THROW(bam.InsertionQV(),     std::exception);
+    EXPECT_THROW(bam.MergeQV(),         std::exception);
+    EXPECT_THROW(bam.SubstitutionQV(),  std::exception);
     EXPECT_THROW(bam.SubstitutionTag(), std::exception);
-
-    // 8888888888888888888888888888888888888
-//    EXPECT_FALSE(bam.HasDeletionQV());
-//    EXPECT_FALSE(bam.HasDeletionTag());
-//    EXPECT_FALSE(bam.HasInsertionQV());
-//    EXPECT_FALSE(bam.HasMergeQV());
-//    EXPECT_FALSE(bam.HasSubstitutionQV());
-//    EXPECT_FALSE(bam.HasSubstitutionTag());
-
-//    EXPECT_EQ(emptyString, bam.MovieName());
-//    EXPECT_EQ(emptyString, bam.ReadGroupId());
-    // 8888888888888888888888888888888888888
 
     // raw data
     tests::CheckRawData(bam);
@@ -837,20 +832,20 @@ TEST(BamRecordTest, SequenceClippedAndAligned)
         SCOPED_TRACE("CIGAR: 3=4N3=");
         tests::CheckSequenceClippedAndAligned(
             "3=4N3=",       // CIGAR
-            "ACGTT",        // input
+            "ACGTTT",        // input
             {
-                "ACGTT",    // forward strand, genomic
-                "ACGTT",    // forward strand, native
-                "ACGTT",    // forward strand, genomic, aligned
-                "ACGTT",    // forward strand, native,  aligned
-                "ACGTT",    // forward strand, genomic, aligned + clipped
-                "ACGTT",    // forward strand, native,  aligned + clipped
-                "ACGTT",    // reverse strand, genomic
-                "AACGT",    // reverse strand, native
-                "ACGTT",    // reverse strand, genomic, aligned
-                "AACGT",    // reverse strand, native,  aligned
-                "ACGTT",    // reverse strand, genomic, aligned + clipped
-                "AACGT"     // reverse strand, native,  aligned + clipped
+                "ACGTTT",    // forward strand, genomic
+                "ACGTTT",    // forward strand, native
+                "ACGTTT",    // forward strand, genomic, aligned
+                "ACGTTT",    // forward strand, native,  aligned
+                "ACGTTT",    // forward strand, genomic, aligned + clipped
+                "ACGTTT",    // forward strand, native,  aligned + clipped
+                "ACGTTT",    // reverse strand, genomic
+                "AAACGT",    // reverse strand, native
+                "ACGTTT",    // reverse strand, genomic, aligned
+                "AAACGT",    // reverse strand, native,  aligned
+                "ACGTTT",    // reverse strand, genomic, aligned + clipped
+                "AAACGT"     // reverse strand, native,  aligned + clipped
             }
         );
     }

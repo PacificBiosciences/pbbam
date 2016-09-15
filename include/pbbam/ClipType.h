@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2016, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -34,53 +34,32 @@
 // SUCH DAMAGE.
 //
 // File Description
-/// \file BamRecord.inl
-/// \brief Inline implementations for the BamRecord class.
+/// \file ClipType.h
+/// \brief Defines the ClipType enum.
 //
 // Author: Derek Barnett
 
-#include "pbbam/BamRecord.h"
+#ifndef CLIPTYPE_H
+#define CLIPTYPE_H
 
 namespace PacBio {
 namespace BAM {
 
-inline BamRecord BamRecord::Clipped(const BamRecord& input,
-                                    const ClipType clipType,
-                                    const PacBio::BAM::Position start,
-                                    const PacBio::BAM::Position end)
+/// \brief This enum defines the modes supported by BamRecord clipping
+///        operations.
+///
+/// Methods like BamRecord::Clip accept Position parameters - which may be in
+/// either polymerase or reference coorindates. Using this enum as a flag
+/// indicates how the positions should be interpreted.
+///
+enum class ClipType
 {
-    return input.Clipped(clipType, start, end);
-}
-
-inline BamRecord BamRecord::Clipped(const ClipType clipType,
-                                    const PacBio::BAM::Position start,
-                                    const PacBio::BAM::Position end) const
-{
-    BamRecord result(*this);
-    result.Clip(clipType, start, end);
-    return result;
-}
-
-inline BamRecord BamRecord::Mapped(const BamRecord& input,
-                                   const int32_t referenceId,
-                                   const Position refStart,
-                                   const Strand strand,
-                                   const Cigar& cigar,
-                                   const uint8_t mappingQuality)
-{
-    return input.Mapped(referenceId, refStart, strand, cigar, mappingQuality);
-}
-
-inline BamRecord BamRecord::Mapped(const int32_t referenceId,
-                                   const Position refStart,
-                                   const Strand strand,
-                                   const Cigar& cigar,
-                                   const uint8_t mappingQuality) const
-{
-    BamRecord result(*this);
-    result.Map(referenceId, refStart, strand, cigar, mappingQuality);
-    return result;
-}
+    CLIP_NONE           ///< No clipping will be performed.
+  , CLIP_TO_QUERY       ///< Clipping positions are in polymerase coordinates.
+  , CLIP_TO_REFERENCE   ///< Clipping positions are in genomic coordinates.
+};
 
 } // namespace BAM
 } // namespace PacBio
+
+#endif // CLIPTYPE_H

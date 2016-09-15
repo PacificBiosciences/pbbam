@@ -35,7 +35,7 @@
 //
 // File Description
 /// \file BamRecord.h
-/// \brief Defines the BamRecord & BamRecordView classes.
+/// \brief Defines the BamRecord class.
 //
 // Author: Derek Barnett
 
@@ -46,9 +46,13 @@
 #include "pbbam/Frames.h"
 #include "pbbam/BamRecordImpl.h"
 #include "pbbam/BamHeader.h"
+#include "pbbam/ClipType.h"
+#include "pbbam/FrameEncodingType.h"
 #include "pbbam/LocalContextFlags.h"
 #include "pbbam/Orientation.h"
+#include "pbbam/PulseBehavior.h"
 #include "pbbam/ReadGroupInfo.h"
+#include "pbbam/RecordType.h"
 #include "pbbam/Strand.h"
 #include "pbbam/QualityValues.h"
 #include "pbbam/virtual/VirtualRegionType.h"
@@ -61,52 +65,12 @@
 namespace PacBio {
 namespace BAM {
 
-namespace internal { class BamRecordMemory; }
+namespace internal {
 
-/// \brief This enum defines the modes supported by BamRecord clipping
-///        operations.
-///
-/// Methods like BamRecord::Clip accept Position parameters - which may be in
-/// either polymerase or reference coorindates. Using this enum as a flag
-/// indicates how the positions should be interpreted.
-///
-enum class ClipType
-{
-    CLIP_NONE           ///< No clipping will be performed.
-  , CLIP_TO_QUERY       ///< Clipping positions are in polymerase coordinates.
-  , CLIP_TO_REFERENCE   ///< Clipping positions are in genomic coordinates.
-};
+class BamRecordMemory;
+class Pulse2BaseCache;
 
-/// \brief This enum defines the possible PacBio BAM record types.
-///
-/// \sa ReadGroupInfo::ReadType
-///
-enum class RecordType
-{
-    ZMW         ///< Polymerase read
-  , HQREGION    ///< High-quality region
-  , SUBREAD     ///< Subread (
-  , CCS         ///< Circular consensus sequence
-  , SCRAP       ///< Additional sequence (barcodes, adapters, etc.)
-  , UNKNOWN     ///< Unknown read type
-
-  , POLYMERASE = ZMW ///< \deprecated as of PacBio BAM spec v 3.0.4 (use RecordType::ZMW instead)
-};
-
-/// \brief This enum defines the possible encoding modes used in Frames data
-/// (e.g. BamRecord::IPD or BamRecord::PulseWidth).
-///
-/// The LOSSY mode is the default in production output; LOSSLESS mode
-/// being used primarily for internal applications.
-///
-/// \sa https://github.com/PacificBiosciences/PacBioFileFormats/blob/3.0/BAM.rst
-///     for more information on pulse frame encoding schemes.
-///
-enum class FrameEncodingType
-{
-    LOSSY       ///< 8-bit compression (using CodecV1) of frame data
-  , LOSSLESS    ///< 16-bit native frame data
-};
+} // namespace internal
 
 /// \brief The BamRecord class represents a %PacBio %BAM record.
 ///
@@ -446,7 +410,10 @@ public:
     ///
     /// \returns AltLabelTags string
     ///
-    std::string AltLabelTag(Orientation orientation = Orientation::NATIVE) const;
+    std::string AltLabelTag(Orientation orientation = Orientation::NATIVE,
+                            bool aligned = false,
+                            bool exciseSoftClips = false,
+                            PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
     /// \brief Fetches this record's DeletionTag values ("dt" tag).
     ///
@@ -514,7 +481,10 @@ public:
     ///
     /// \returns AltLabelQV as QualityValues object
     ///
-    QualityValues AltLabelQV(Orientation orientation = Orientation::NATIVE) const;
+    QualityValues AltLabelQV(Orientation orientation = Orientation::NATIVE,
+                             bool aligned = false,
+                             bool exciseSoftClips = false,
+                             PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
     /// \brief Fetches this record's DeletionQV values ("dq" tag).
     ///
@@ -559,7 +529,10 @@ public:
     ///
     /// \returns LabelQV as QualityValues object
     ///
-    QualityValues LabelQV(Orientation orientation = Orientation::NATIVE) const;
+    QualityValues LabelQV(Orientation orientation = Orientation::NATIVE,
+                          bool aligned = false,
+                          bool exciseSoftClips = false,
+                          PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
     /// \brief Fetches this record's MergeQV values ("mq" tag).
     ///
@@ -647,28 +620,40 @@ public:
     /// \param[in] orientation     Orientation of output.
     /// \returns Pkmean as vector<float> object
     ///
-    std::vector<float> Pkmean(Orientation orientation = Orientation::NATIVE) const;
+    std::vector<float> Pkmean(Orientation orientation = Orientation::NATIVE,
+                              bool aligned = false,
+                              bool exciseSoftClips = false,
+                              PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
     /// \brief Fetches this record's Pkmid values ("pm" tag).
     ///
     /// \param[in] orientation     Orientation of output.
     /// \returns Pkmid as vector<float> object
     ///
-    std::vector<float> Pkmid(Orientation orientation = Orientation::NATIVE) const;
+    std::vector<float> Pkmid(Orientation orientation = Orientation::NATIVE,
+                             bool aligned = false,
+                             bool exciseSoftClips = false,
+                             PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
     /// \brief Fetches this record's Pkmean2 values ("pi" tag).
     ///
     /// \param[in] orientation     Orientation of output.
     /// \returns Pkmean as vector<float> object
     ///
-    std::vector<float> Pkmean2(Orientation orientation = Orientation::NATIVE) const;
+    std::vector<float> Pkmean2(Orientation orientation = Orientation::NATIVE,
+                               bool aligned = false,
+                               bool exciseSoftClips = false,
+                               PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
     /// \brief Fetches this record's Pkmid2 values ("ps" tag).
     ///
     /// \param[in] orientation     Orientation of output.
     /// \returns Pkmid as vector<float> object
     ///
-    std::vector<float> Pkmid2(Orientation orientation = Orientation::NATIVE) const;
+    std::vector<float> Pkmid2(Orientation orientation = Orientation::NATIVE,
+                              bool aligned = false,
+                              bool exciseSoftClips = false,
+                              PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
     /// \brief Fetches this record's PreBaseFrames aka IPD values ("ip" tag).
     ///
@@ -692,28 +677,40 @@ public:
     /// \param[in] orientation     Orientation of output.
     /// \returns PrePulseFrames as Frames object
     ///
-    Frames PrePulseFrames(Orientation orientation = Orientation::NATIVE) const;
+    Frames PrePulseFrames(Orientation orientation = Orientation::NATIVE,
+                          bool aligned = false,
+                          bool exciseSoftClips = false,
+                          PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
     /// \brief Fetches this record's PulseCall values ("pc" tag).
     ///
     /// \param[in] orientation     Orientation of output.
     /// \returns PulseCalls string
     ///
-    std::string PulseCall(Orientation orientation = Orientation::NATIVE) const;
+    std::string PulseCall(Orientation orientation = Orientation::NATIVE,
+                          bool aligned = false,
+                          bool exciseSoftClips = false,
+                          PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
     /// \brief Fetches this record's PulseCallWidth values ("px" tag).
     ///
     /// \param[in] orientation     Orientation of output.
     /// \returns PulseCallWidth as Frames object
     ///
-    Frames PulseCallWidth(Orientation orientation = Orientation::NATIVE) const;
+    Frames PulseCallWidth(Orientation orientation = Orientation::NATIVE,
+                          bool aligned = false,
+                          bool exciseSoftClips = false,
+                          PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
     /// \brief Fetch this record's PulseMergeQV values ("pg" tag).
     ///
     /// \param[in] orientation     Orientation of output.
     /// \returns PulseMergeQV as QualityValues object
     ///
-    QualityValues PulseMergeQV(Orientation orientation = Orientation::NATIVE) const;
+    QualityValues PulseMergeQV(Orientation orientation = Orientation::NATIVE,
+                               bool aligned = false,
+                               bool exciseSoftClips = false,
+                               PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
     /// \brief Fetches this record's PulseWidth values ("pw" tag).
     ///
@@ -738,7 +735,9 @@ public:
     /// \param[in] orientation     Orientation of output.
     /// \returns PulseWidth as Frames object
     ///
-    Frames PulseWidthRaw(Orientation orientation = Orientation::NATIVE) const;
+    Frames PulseWidthRaw(Orientation orientation = Orientation::NATIVE,
+                         bool aligned = false,
+                         bool exciseSoftClips = false) const;
 
     /// \brief Fetches this record's StartFrame values ("sf" tag).
     ///
@@ -746,7 +745,10 @@ public:
     ///
     /// \returns StartFrame as uint32_t vector
     ///
-    std::vector<uint32_t> StartFrame(Orientation orientation = Orientation::NATIVE) const;
+    std::vector<uint32_t> StartFrame(Orientation orientation = Orientation::NATIVE,
+                                     bool aligned = false,
+                                     bool exciseSoftClips = false,
+                                     PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
     /// \}
 
@@ -1203,37 +1205,12 @@ private:
 
 private:
     /// \internal
-    std::vector<float> FetchPhotons(const std::string& tagName,
-                                    const Orientation orientation) const;
-    std::string FetchBasesRaw(const std::string& tagName) const;
+    /// pulse to bam mapping cache
+    mutable std::unique_ptr<internal::Pulse2BaseCache> p2bCache_;
 
-    std::string FetchBases(const std::string& tagName,
-                           const Orientation orientation) const;
-
-    std::string FetchBases(const std::string& tagName,
-                           const Orientation orientation,
-                           const bool aligned,
-                           const bool exciseSoftClips) const;
-
-    Frames FetchFramesRaw(const std::string& tagName) const;
-
-    Frames FetchFrames(const std::string& tagName,
-                       const Orientation orientation) const;
-
-    Frames FetchFrames(const std::string& tagName,
-                       const Orientation orientation,
-                       const bool aligned,
-                       const bool exciseSoftClips) const;
-
-    QualityValues FetchQualitiesRaw(const std::string& tagName) const;
-
-    QualityValues FetchQualities(const std::string& tagName,
-                                 const Orientation orientation) const;
-
-    QualityValues FetchQualities(const std::string& tagName,
-                                 const Orientation orientation,
-                                 const bool aligned,
-                                 const bool exciseSoftClips) const;
+private:
+    ///\internal
+    /// clipping methods
 
     void ClipFields(const size_t clipPos, const size_t clipLength);
     BamRecord& ClipToQuery(const PacBio::BAM::Position start,
@@ -1246,122 +1223,57 @@ private:
                                       const PacBio::BAM::Position end);
 
 private:
-    // marked const to allow calling from const methods
-    // but updates our mutable cached values
-    void CalculateAlignedPositions(void) const;
+    ///\internal
+    /// raw tag data fetching
 
-    friend class internal::BamRecordMemory;
-};
+    // sequence tags
+    std::string FetchBasesRaw(const BamRecordTag tag) const;
+    std::string FetchBases(const BamRecordTag tag,
+                           const Orientation orientation = Orientation::NATIVE,
+                           const bool aligned = false,
+                           const bool exciseSoftClips = false,
+                           const PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
-/// \brief Provides a re-usable "view" onto a BamRecord
-///
-/// This class acts a convenience wrapper for working with per-base BamRecord
-/// data. Most of these BamRecord methods take a list of parameters, to adjust
-/// how the underlying data are presented to client code. Often these parameters
-/// will be re-used for each BamRecord method call. Thus, to simplify such
-/// client code, a BamRecordView can be used to state those parameters once, and
-/// then simply request the desired fields.
-///
-/// \internal
-/// \todo Sync up method names with BamRecord
-/// \endinternal
-///
-class PBBAM_EXPORT BamRecordView
-{
-public:
-    /// \brief Constructs a view onto \p record using the supplied parameters.
-    ///
-    /// For frame or QV data, if \p aligned is true, a value of 0 (Accuracy or
-    /// QualityValue) will be used at each inserted or padded base location.
-    ///
-    /// \param[in] record           BamRecord data source.
-    /// \param[in] orientation      Orientation of output.
-    /// \param[in] aligned          if true, gaps/padding will be inserted, per
-    ///                             Cigar info.
-    /// \param[in] exciseSoftClips  if true, any soft-clipped positions will be
-    ///                             removed from query ends
-    ///
-    BamRecordView(const BamRecord& record,
-                  const Orientation orientation,
-                  const bool aligned,
-                  const bool exciseSoftClips);
+    // frame tags
+    Frames FetchFramesRaw(const BamRecordTag tag) const;
+    Frames FetchFrames(const BamRecordTag tag,
+                       const Orientation orientation = Orientation::NATIVE,
+                       const bool aligned = false,
+                       const bool exciseSoftClips = false,
+                       const PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
-public:
+    // pulse tags
+    std::vector<float> FetchPhotonsRaw(const BamRecordTag tag) const;
+    std::vector<float> FetchPhotons(const BamRecordTag tag,
+                                    const Orientation orientation = Orientation::NATIVE,
+                                    const bool aligned = false,
+                                    const bool exciseSoftClips = false,
+                                    const PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
-    /// \returns BamRecord::AltLabelQV with this view's parameters applied
-    QualityValues AltLabelQVs(void) const;
+    // QV tags
+    QualityValues FetchQualitiesRaw(const BamRecordTag tag) const;
+    QualityValues FetchQualities(const BamRecordTag tag,
+                                 const Orientation orientation = Orientation::NATIVE,
+                                 const bool aligned = false,
+                                 const bool exciseSoftClips = false,
+                                 const PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
-    /// \returns BamRecord::AltLabelTag with this view's parameters applied
-    std::string AltLabelTags(void) const;
-
-    /// \returns BamRecord::DeletionQV with this view's parameters applied
-    QualityValues DeletionQVs(void) const;
-
-    /// \returns BamRecord::DeletionTag with this view's parameters applied
-    std::string DeletionTags(void) const;
-
-    /// \returns BamRecord::InsertionQV with this view's parameters applied
-    QualityValues InsertionQVs(void) const;
-
-    /// \returns BamRecord::IPD with this view's parameters applied
-    Frames IPD(void) const;
-
-    /// \returns BamRecord::LabelQV with this view's parameters applied
-    QualityValues LabelQVs(void) const;
-
-    /// \returns BamRecord::MergeQV with this view's parameters applied
-    QualityValues MergeQVs(void) const;
-
-    /// \returns BamRecord::PulseMergeQV with this view's parameters applied
-    QualityValues PulseMergeQVs(void) const;
-
-    /// \returns BamRecord::Pkmean with this view's parameters applied
-    std::vector<float> Pkmean(void) const;
-
-    /// \returns BamRecord::Pkmid with this view's parameters applied
-    std::vector<float> Pkmid(void) const;
-
-    /// \returns BamRecord::Pkmean2 with this view's parameters applied
-    std::vector<float> Pkmean2(void) const;
-
-    /// \returns BamRecord::Pkmid2 with this view's parameters applied
-    std::vector<float> Pkmid2(void) const;
-
-    /// \returns BamRecord::PreBaseFrames with this view's parameters applied
-    Frames PrebaseFrames(void) const;
-
-    /// \returns BamRecord::PrePulseFrames with this view's parameters applied
-    Frames PrePulseFrames(void) const;
-
-    /// \returns BamRecord::PulseCalls with this view's parameters applied
-    std::string PulseCalls(void) const;
-
-    /// \returns BamRecord::PulseCallWidth with this view's parameters applied
-    Frames PulseCallWidth(void) const;
-
-    /// \returns BamRecord::PulseWidths with this view's parameters applied
-    Frames PulseWidths(void) const;
-
-    /// \returns BamRecord::Qualities with this view's parameters applied
-    QualityValues Qualities(void) const;
-
-    /// \returns BamRecord::Sequence with this view's parameters applied
-    std::string Sequence(void) const;
-
-    /// \returns BamRecord::StartFrame with this view's parameters applied
-    std::vector<uint32_t> StartFrames(void) const;
-
-    /// \returns BamRecord::SubstitutionQV with this view's parameters applied
-    QualityValues SubstitutionQVs(void) const;
-
-    /// \returns BamRecord::SubstitutionTag with this view's parameters applied
-    std::string SubstitutionTags(void) const;
+    // UInt tags (e.g. start frame)
+    std::vector<uint32_t> FetchUIntsRaw(const BamRecordTag tag) const;
+    std::vector<uint32_t> FetchUInts(const BamRecordTag tag,
+                                     const Orientation orientation = Orientation::NATIVE,
+                                     const bool aligned = false,
+                                     const bool exciseSoftClips = false,
+                                     const PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
 
 private:
-    const BamRecord& record_;
-    Orientation orientation_;
-    bool aligned_;
-    bool exciseSoftClips_;
+    ///\internal
+    /// marked const to allow calling from const methods
+    /// but updates our mutable cached values
+    void CalculateAlignedPositions(void) const;
+    void CalculatePulse2BaseCache(void) const;
+
+    friend class internal::BamRecordMemory;
 };
 
 } // namespace BAM

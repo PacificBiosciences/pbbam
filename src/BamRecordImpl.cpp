@@ -38,6 +38,7 @@
 #include "pbbam/BamRecordImpl.h"
 #include "pbbam/BamTagCodec.h"
 #include "AssertUtils.h"
+#include "BamRecordTags.h"
 #include "MemoryUtils.h"
 #include <algorithm>
 #include <iostream>
@@ -97,6 +98,14 @@ bool BamRecordImpl::AddTag(const string& tagName,
     return AddTag(tagName, value, TagModifier::NONE);
 }
 
+bool BamRecordImpl::AddTag(const BamRecordTag tag,
+                           const Tag& value)
+{
+   return AddTag(internal::BamRecordTags::LabelFor(tag),
+                 value,
+                 TagModifier::NONE);
+}
+
 bool BamRecordImpl::AddTag(const string& tagName,
                            const Tag& value,
                            const TagModifier additionalModifier)
@@ -107,6 +116,15 @@ bool BamRecordImpl::AddTag(const string& tagName,
     if (added)
         UpdateTagMap();
     return added;
+}
+
+bool BamRecordImpl::AddTag(const BamRecordTag tag,
+                           const Tag& value,
+                           const TagModifier additionalModifier)
+{
+    return AddTag(internal::BamRecordTags::LabelFor(tag),
+                  value,
+                  additionalModifier);
 }
 
 bool BamRecordImpl::AddTagImpl(const string& tagName,
@@ -178,6 +196,14 @@ bool BamRecordImpl::EditTag(const string& tagName,
     return EditTag(tagName, newValue, TagModifier::NONE);
 }
 
+bool BamRecordImpl::EditTag(const BamRecordTag tag,
+                            const Tag& newValue)
+{
+    return EditTag(internal::BamRecordTags::LabelFor(tag),
+                   newValue,
+                   TagModifier::NONE);
+}
+
 bool BamRecordImpl::EditTag(const string& tagName,
                             const Tag& newValue,
                             const TagModifier additionalModifier)
@@ -192,6 +218,15 @@ bool BamRecordImpl::EditTag(const string& tagName,
     if (added)
         UpdateTagMap();
     return added;
+}
+
+bool BamRecordImpl::EditTag(const BamRecordTag tag,
+                            const Tag& newValue,
+                            const TagModifier additionalModifier)
+{
+    return EditTag(internal::BamRecordTags::LabelFor(tag),
+                   newValue,
+                   additionalModifier);
 }
 
 BamRecordImpl BamRecordImpl::FromRawData(const PBBAM_SHARED_PTR<bam1_t>& rawData)
@@ -209,6 +244,11 @@ bool BamRecordImpl::HasTag(const string& tagName) const
 
     // 27635
 //    return bam_aux_get(d_.get(), tagName.c_str()) != 0;
+}
+
+bool BamRecordImpl::HasTag(const BamRecordTag tag) const
+{
+    return HasTag(internal::BamRecordTags::LabelFor(tag));
 }
 
 void BamRecordImpl::InitializeData(void)
@@ -291,6 +331,11 @@ bool BamRecordImpl::RemoveTag(const string& tagName)
     if (removed)
         UpdateTagMap();
     return removed;
+}
+
+bool BamRecordImpl::RemoveTag(const BamRecordTag tag)
+{
+    return RemoveTag(internal::BamRecordTags::LabelFor(tag));
 }
 
 bool BamRecordImpl::RemoveTagImpl(const string &tagName)
@@ -455,6 +500,11 @@ Tag BamRecordImpl::TagValue(const string& tagName) const
 
     // skip tag name
     return BamTagCodec::FromRawData(tagData);
+}
+
+Tag BamRecordImpl::TagValue(const BamRecordTag tag) const
+{
+    return TagValue(internal::BamRecordTags::LabelFor(tag));
 }
 
 void BamRecordImpl::UpdateTagMap(void) const

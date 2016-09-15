@@ -11,6 +11,11 @@ guarantees will be maintained within each major version series.
 ## Active
 
 ### Added
+- Clipping for CCS records
+
+## [0.6.0] - 2016-09-13
+
+### Added
 - BamWriter writes to a BAM file with the target name plus a ".tmp" suffix. On
 successful completion (i.e. normal BamWriter destruction, not triggered by a
 thrown exception) the file is renamed to the actual requested filename.
@@ -25,6 +30,8 @@ whitelist.
 - Can construct an aggregate PbiRawData index object from a DataSet: essentially
 concatenates all PBI data within the dataset.
 - New SamWriter class to create SAM-formatted output of PacBio BAM data.
+- Extended APIs for accessing "internal BAM" data, including PulseBehavior
+switch for selecting between all pulses & basecalls only. 
 
 ### Fixed
 - Improper 'clip to reference' product for BamRecord in some cases.

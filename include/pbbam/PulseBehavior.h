@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2016, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -34,53 +34,27 @@
 // SUCH DAMAGE.
 //
 // File Description
-/// \file BamRecord.inl
-/// \brief Inline implementations for the BamRecord class.
+/// \file PulseBehavior.h
+/// \brief Defines the PulseBehavior enum.
 //
 // Author: Derek Barnett
 
-#include "pbbam/BamRecord.h"
+#ifndef PULSEBEHAVIOR_H
+#define PULSEBEHAVIOR_H
 
 namespace PacBio {
 namespace BAM {
 
-inline BamRecord BamRecord::Clipped(const BamRecord& input,
-                                    const ClipType clipType,
-                                    const PacBio::BAM::Position start,
-                                    const PacBio::BAM::Position end)
+/// \brief This enum defines the pulsecall modes supported by BamRecord tag
+///        accessors.
+///
+enum class PulseBehavior
 {
-    return input.Clipped(clipType, start, end);
-}
-
-inline BamRecord BamRecord::Clipped(const ClipType clipType,
-                                    const PacBio::BAM::Position start,
-                                    const PacBio::BAM::Position end) const
-{
-    BamRecord result(*this);
-    result.Clip(clipType, start, end);
-    return result;
-}
-
-inline BamRecord BamRecord::Mapped(const BamRecord& input,
-                                   const int32_t referenceId,
-                                   const Position refStart,
-                                   const Strand strand,
-                                   const Cigar& cigar,
-                                   const uint8_t mappingQuality)
-{
-    return input.Mapped(referenceId, refStart, strand, cigar, mappingQuality);
-}
-
-inline BamRecord BamRecord::Mapped(const int32_t referenceId,
-                                   const Position refStart,
-                                   const Strand strand,
-                                   const Cigar& cigar,
-                                   const uint8_t mappingQuality) const
-{
-    BamRecord result(*this);
-    result.Map(referenceId, refStart, strand, cigar, mappingQuality);
-    return result;
-}
+    BASECALLS_ONLY  ///< "Squashed" pulses not included, only basecalls.
+  , ALL             ///< All pulses included.
+};
 
 } // namespace BAM
 } // namespace PacBio
+
+#endif // PULSEBEHAVIOR_H

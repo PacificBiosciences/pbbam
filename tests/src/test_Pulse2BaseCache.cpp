@@ -32,55 +32,53 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-//
-// File Description
-/// \file BamRecord.inl
-/// \brief Inline implementations for the BamRecord class.
-//
+
 // Author: Derek Barnett
 
-#include "pbbam/BamRecord.h"
+#ifdef PBBAM_TESTING
+#define private public
+#endif
 
-namespace PacBio {
-namespace BAM {
+#include "TestData.h"
+#include <gtest/gtest.h>
+#include <pbbam/../../src/Pulse2BaseCache.h>
+#include <string>
+using namespace PacBio;
+using namespace PacBio::BAM;
+using namespace PacBio::BAM::internal;
+using namespace std;
 
-inline BamRecord BamRecord::Clipped(const BamRecord& input,
-                                    const ClipType clipType,
-                                    const PacBio::BAM::Position start,
-                                    const PacBio::BAM::Position end)
+TEST(Pulse2BaseCacheTest, CountsDetectedInConstructor)
 {
-    return input.Clipped(clipType, start, end);
+    const string pulseCalls = "ACccTTAGtTCAtG";
+    const string trimmedPC  = "ACTTAGTCAG";
+
+    const Pulse2BaseCache cache{ pulseCalls };
+
+    EXPECT_EQ(pulseCalls.size(), cache.NumPulses());
+    EXPECT_EQ(trimmedPC.size(),  cache.NumBases());
 }
 
-inline BamRecord BamRecord::Clipped(const ClipType clipType,
-                                    const PacBio::BAM::Position start,
-                                    const PacBio::BAM::Position end) const
+TEST(Pulse2BaseCacheTest, RemovesSquashedPulsesFromString)
 {
-    BamRecord result(*this);
-    result.Clip(clipType, start, end);
-    return result;
+    const string pulseCalls = "ACccTTAGtTCAtG";
+    const string trimmedPC  = "ACTTAGTCAG";
+    const string altLabel   = "-G--A--T--AC--";
+    const string trimmedAlt = "-GA--T-AC-";
+
+    const Pulse2BaseCache cache{ pulseCalls };
+
+    EXPECT_EQ(trimmedPC,  cache.RemoveSquashedPulses(pulseCalls));
+    EXPECT_EQ(trimmedAlt, cache.RemoveSquashedPulses(altLabel));
 }
 
-inline BamRecord BamRecord::Mapped(const BamRecord& input,
-                                   const int32_t referenceId,
-                                   const Position refStart,
-                                   const Strand strand,
-                                   const Cigar& cigar,
-                                   const uint8_t mappingQuality)
+TEST(Pulse2BaseCacheTest, RemovesSquashedPulsesFromVector)
 {
-    return input.Mapped(referenceId, refStart, strand, cigar, mappingQuality);
-}
+    const string pulseCalls = "ACccTTAGtTCAtG";
+    const vector<uint16_t> pkMean        = {5,4,2,2,3,8,8,8,4,7,7,7,3,4};
+    const vector<uint16_t> trimmedPkmean = {5,4,3,8,8,8,7,7,7,4};
 
-inline BamRecord BamRecord::Mapped(const int32_t referenceId,
-                                   const Position refStart,
-                                   const Strand strand,
-                                   const Cigar& cigar,
-                                   const uint8_t mappingQuality) const
-{
-    BamRecord result(*this);
-    result.Map(referenceId, refStart, strand, cigar, mappingQuality);
-    return result;
-}
+    const Pulse2BaseCache cache{ pulseCalls };
 
-} // namespace BAM
-} // namespace PacBio
+    EXPECT_EQ(trimmedPkmean, cache.RemoveSquashedPulses(pkMean));
+}

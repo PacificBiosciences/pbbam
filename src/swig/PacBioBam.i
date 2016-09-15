@@ -90,12 +90,17 @@ endif*/
 
 // Basic types
 %include "Accuracy.i"
+%include "BamRecordTag.i"
 %include "CigarOperation.i"
+%include "ClipType.i"
+%include "FrameEncodingType.i"
 %include "Interval.i"
 %include "LocalContextFlags.i"
 %include "Orientation.i"
 %include "Position.i"
+%include "PulseBehavior.i"
 %include "QualityValue.i"
+%include "RecordType.i"
 %include "Strand.i"
 %include "Tag.i"
 

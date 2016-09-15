@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2016, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -34,53 +34,60 @@
 // SUCH DAMAGE.
 //
 // File Description
-/// \file BamRecord.inl
-/// \brief Inline implementations for the BamRecord class.
+/// \file BamRecordTag.h
+/// \brief Defines the BamRecordTag enum.
 //
 // Author: Derek Barnett
 
-#include "pbbam/BamRecord.h"
+#ifndef BAMRECORDTAG_H
+#define BAMRECORDTAG_H
 
 namespace PacBio {
 namespace BAM {
 
-inline BamRecord BamRecord::Clipped(const BamRecord& input,
-                                    const ClipType clipType,
-                                    const PacBio::BAM::Position start,
-                                    const PacBio::BAM::Position end)
+enum class BamRecordTag
 {
-    return input.Clipped(clipType, start, end);
-}
+    ALT_LABEL_QV
+  , ALT_LABEL_TAG
+  , BARCODE_QUALITY
+  , BARCODES
+  , CONTEXT_FLAGS
+  , DELETION_QV
+  , DELETION_TAG
+  , HOLE_NUMBER
+  , INSERTION_QV
+  , IPD
+  , LABEL_QV
+  , MERGE_QV
+  , NUM_PASSES
+  , PKMEAN
+  , PKMEAN_2
+  , PKMID
+  , PKMID_2
+  , PRE_PULSE_FRAMES
+  , PULSE_CALL
+  , PULSE_CALL_WIDTH
+  , PULSE_MERGE_QV
+  , PULSE_WIDTH
+  , QUERY_END
+  , QUERY_START
+  , READ_ACCURACY
+  , READ_GROUP
+  , SCRAP_REGION_TYPE
+  , SCRAP_ZMW_TYPE
+  , SNR
+  , START_FRAME
+  , SUBSTITUTION_QV
+  , SUBSTITUTION_TAG
 
-inline BamRecord BamRecord::Clipped(const ClipType clipType,
-                                    const PacBio::BAM::Position start,
-                                    const PacBio::BAM::Position end) const
-{
-    BamRecord result(*this);
-    result.Clip(clipType, start, end);
-    return result;
-}
-
-inline BamRecord BamRecord::Mapped(const BamRecord& input,
-                                   const int32_t referenceId,
-                                   const Position refStart,
-                                   const Strand strand,
-                                   const Cigar& cigar,
-                                   const uint8_t mappingQuality)
-{
-    return input.Mapped(referenceId, refStart, strand, cigar, mappingQuality);
-}
-
-inline BamRecord BamRecord::Mapped(const int32_t referenceId,
-                                   const Position refStart,
-                                   const Strand strand,
-                                   const Cigar& cigar,
-                                   const uint8_t mappingQuality) const
-{
-    BamRecord result(*this);
-    result.Map(referenceId, refStart, strand, cigar, mappingQuality);
-    return result;
-}
+  //
+  // not tags per se, but faking these here to simplify data fetching
+  //
+  , QUAL
+  , SEQ
+};
 
 } // namespace BAM
 } // namespace PacBio
+
+#endif // BAMRECORDTAG_H

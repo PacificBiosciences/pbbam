@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2016, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -34,53 +34,52 @@
 // SUCH DAMAGE.
 //
 // File Description
-/// \file BamRecord.inl
-/// \brief Inline implementations for the BamRecord class.
+/// \file EnumClassHash.h
+/// \brief Defines the EnumClassHash class.
 //
 // Author: Derek Barnett
 
-#include "pbbam/BamRecord.h"
+#ifndef ENUMCLASSHASH_H
+#define ENUMCLASSHASH_H
+
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {
+namespace internal {
 
-inline BamRecord BamRecord::Clipped(const BamRecord& input,
-                                    const ClipType clipType,
-                                    const PacBio::BAM::Position start,
-                                    const PacBio::BAM::Position end)
+///
+/// \brief The EnumClassHash struct enables the use of enum class types as keys
+///        for std::unordered_map.
+///
+/// Allows something like:
+///
+/// \code{.cpp}
+///    std::unordered_map<Key_t, Value_t, EnumClassHash> myLookup;
+/// \endcode
+///
+/// where Key_t is an enum class. Without this sort of extra hand-holding to
+/// provide a 'manual' hash value, enum classes as keys will fail to compile.
+///
+/// \note This approach might be unnecessary in C++14, if I understand some of
+/// the changes correctly. But this works for C++11 and should continue beyond.
+///
+/// \sa http://stackoverflow.com/questions/18837857/cant-use-enum-class-as-unordered-map-key
+///
+struct EnumClassHash
 {
-    return input.Clipped(clipType, start, end);
-}
+    // *** NOTE ***
+    //
+    // Remove this when we integrate pbcopper.
+    // This is a duplicate of pbcopper/utility/EnumClassHash.h
+    //
 
-inline BamRecord BamRecord::Clipped(const ClipType clipType,
-                                    const PacBio::BAM::Position start,
-                                    const PacBio::BAM::Position end) const
-{
-    BamRecord result(*this);
-    result.Clip(clipType, start, end);
-    return result;
-}
+    template<typename T> size_t operator()(const T t) const
+    { return static_cast<size_t>(t); }
+};
 
-inline BamRecord BamRecord::Mapped(const BamRecord& input,
-                                   const int32_t referenceId,
-                                   const Position refStart,
-                                   const Strand strand,
-                                   const Cigar& cigar,
-                                   const uint8_t mappingQuality)
-{
-    return input.Mapped(referenceId, refStart, strand, cigar, mappingQuality);
-}
-
-inline BamRecord BamRecord::Mapped(const int32_t referenceId,
-                                   const Position refStart,
-                                   const Strand strand,
-                                   const Cigar& cigar,
-                                   const uint8_t mappingQuality) const
-{
-    BamRecord result(*this);
-    result.Map(referenceId, refStart, strand, cigar, mappingQuality);
-    return result;
-}
-
+} // namespace internal
 } // namespace BAM
 } // namespace PacBio
+
+#endif // ENUMCLASSHASH_H
