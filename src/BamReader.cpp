@@ -147,6 +147,7 @@ bool BamReader::GetNext(BamRecord& record)
     if (result >= 0) {
         internal::BamRecordMemory::UpdateRecordTags(record);
         record.header_ = Header();
+        record.ResetCachedPositions();
 
 #if PBBAM_AUTOVALIDATE
         Validator::Validate(record);

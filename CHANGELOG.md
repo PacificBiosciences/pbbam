@@ -13,6 +13,9 @@ guarantees will be maintained within each major version series.
 ### Added
 - Clipping for CCS records
 
+### Fixed
+- Cached position data leaking across records while iterating.
+
 ## [0.6.0] - 2016-09-13
 
 ### Added
