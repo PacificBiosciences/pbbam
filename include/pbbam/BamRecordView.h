@@ -79,7 +79,7 @@ public:
                   const Orientation orientation,
                   const bool aligned,
                   const bool exciseSoftClips,
-                  const PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY);
+                  const PulseBehavior pulseBehavior = PulseBehavior::ALL);
 
 public:
 

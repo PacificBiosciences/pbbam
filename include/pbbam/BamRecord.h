@@ -413,7 +413,7 @@ public:
     std::string AltLabelTag(Orientation orientation = Orientation::NATIVE,
                             bool aligned = false,
                             bool exciseSoftClips = false,
-                            PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                            PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's DeletionTag values ("dt" tag).
     ///
@@ -484,7 +484,7 @@ public:
     QualityValues AltLabelQV(Orientation orientation = Orientation::NATIVE,
                              bool aligned = false,
                              bool exciseSoftClips = false,
-                             PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                             PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's DeletionQV values ("dq" tag).
     ///
@@ -532,7 +532,7 @@ public:
     QualityValues LabelQV(Orientation orientation = Orientation::NATIVE,
                           bool aligned = false,
                           bool exciseSoftClips = false,
-                          PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                          PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's MergeQV values ("mq" tag).
     ///
@@ -623,7 +623,7 @@ public:
     std::vector<float> Pkmean(Orientation orientation = Orientation::NATIVE,
                               bool aligned = false,
                               bool exciseSoftClips = false,
-                              PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                              PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's Pkmid values ("pm" tag).
     ///
@@ -633,7 +633,7 @@ public:
     std::vector<float> Pkmid(Orientation orientation = Orientation::NATIVE,
                              bool aligned = false,
                              bool exciseSoftClips = false,
-                             PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                             PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's Pkmean2 values ("pi" tag).
     ///
@@ -643,7 +643,7 @@ public:
     std::vector<float> Pkmean2(Orientation orientation = Orientation::NATIVE,
                                bool aligned = false,
                                bool exciseSoftClips = false,
-                               PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                               PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's Pkmid2 values ("ps" tag).
     ///
@@ -653,7 +653,7 @@ public:
     std::vector<float> Pkmid2(Orientation orientation = Orientation::NATIVE,
                               bool aligned = false,
                               bool exciseSoftClips = false,
-                              PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                              PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's PreBaseFrames aka IPD values ("ip" tag).
     ///
@@ -680,7 +680,7 @@ public:
     Frames PrePulseFrames(Orientation orientation = Orientation::NATIVE,
                           bool aligned = false,
                           bool exciseSoftClips = false,
-                          PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                          PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's PulseCall values ("pc" tag).
     ///
@@ -690,7 +690,7 @@ public:
     std::string PulseCall(Orientation orientation = Orientation::NATIVE,
                           bool aligned = false,
                           bool exciseSoftClips = false,
-                          PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                          PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's PulseCallWidth values ("px" tag).
     ///
@@ -700,7 +700,7 @@ public:
     Frames PulseCallWidth(Orientation orientation = Orientation::NATIVE,
                           bool aligned = false,
                           bool exciseSoftClips = false,
-                          PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                          PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetch this record's PulseMergeQV values ("pg" tag).
     ///
@@ -710,7 +710,7 @@ public:
     QualityValues PulseMergeQV(Orientation orientation = Orientation::NATIVE,
                                bool aligned = false,
                                bool exciseSoftClips = false,
-                               PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                               PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's PulseWidth values ("pw" tag).
     ///
@@ -748,7 +748,7 @@ public:
     std::vector<uint32_t> StartFrame(Orientation orientation = Orientation::NATIVE,
                                      bool aligned = false,
                                      bool exciseSoftClips = false,
-                                     PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                                     PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \}
 
@@ -1232,7 +1232,7 @@ private:
                            const Orientation orientation = Orientation::NATIVE,
                            const bool aligned = false,
                            const bool exciseSoftClips = false,
-                           const PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                           const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     // frame tags
     Frames FetchFramesRaw(const BamRecordTag tag) const;
@@ -1240,7 +1240,7 @@ private:
                        const Orientation orientation = Orientation::NATIVE,
                        const bool aligned = false,
                        const bool exciseSoftClips = false,
-                       const PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                       const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     // pulse tags
     std::vector<float> FetchPhotonsRaw(const BamRecordTag tag) const;
@@ -1248,7 +1248,7 @@ private:
                                     const Orientation orientation = Orientation::NATIVE,
                                     const bool aligned = false,
                                     const bool exciseSoftClips = false,
-                                    const PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                                    const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     // QV tags
     QualityValues FetchQualitiesRaw(const BamRecordTag tag) const;
@@ -1256,7 +1256,7 @@ private:
                                  const Orientation orientation = Orientation::NATIVE,
                                  const bool aligned = false,
                                  const bool exciseSoftClips = false,
-                                 const PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                                 const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     // UInt tags (e.g. start frame)
     std::vector<uint32_t> FetchUIntsRaw(const BamRecordTag tag) const;
@@ -1264,7 +1264,7 @@ private:
                                      const Orientation orientation = Orientation::NATIVE,
                                      const bool aligned = false,
                                      const bool exciseSoftClips = false,
-                                     const PulseBehavior pulseBehavior = PulseBehavior::BASECALLS_ONLY) const;
+                                     const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
 private:
     ///\internal

@@ -10,11 +10,17 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.7.0] - 2016-09-26 
+
 ### Added
 - Clipping for CCS records
 
 ### Fixed
 - Cached position data leaking across records while iterating.
+- Rolled back default pulse behavior in internal BAM API, to be backward-
+compatible with existing client code (for now at least). v0.6.0 introduced
+returning basecalled positions ONLY by default, rather than return ALL 
+pulses.  
 
 ## [0.6.0] - 2016-09-13
 

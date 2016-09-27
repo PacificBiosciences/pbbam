@@ -158,7 +158,9 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     const string tagQuals_clipped = "?]?]?]?";
     const f_data frames_clipped   = { 20, 20, 30, 40, 40, 10, 30 };
 
-    const string pulseCall_clipped = "CCGTTAG";
+    const string pulseCall_clipped = "CCGggatTTAcatG";
+    const string pulseQuals_clipped = "?]?====]?]===?";
+    const f_data pulseFrames_clipped = { 20,20,30,0,0,0,0,40,40,10,0,0,0,30 };
 
     const string seq_rev       = "GCTAACGGTT";
     const string pulseCall_rev = "aGCatgTAAatccCGGtaTtTaa";
@@ -172,7 +174,9 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     const string tagQuals_rev_clipped = quals_rev_clipped;
     const f_data frames_rev_clipped = { 30, 10, 40, 40, 30, 20, 20 };
 
-    const string pulseCall_rev_clipped = "CTAACGG";
+    const string pulseCall_rev_clipped = "CatgTAAatccCGG";
+    const string pulseQuals_rev_clipped    = "?===]?]====?]?";
+    const f_data pulseFrames_rev_clipped = { 30,0,0,0,10,40,40,0,0,0,0,30,20,20 };
 
     const string s1_cigar = "10=";
     const string s2_cigar = "5=3D5=";
@@ -224,8 +228,8 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_EQ(quals_clipped,     view.Qualities().Fastq());
         EXPECT_EQ(tagBases_clipped,  view.DeletionTags());
         EXPECT_EQ(tagQuals_clipped,  view.DeletionQVs().Fastq());
-        EXPECT_EQ(tagQuals_clipped,  view.LabelQVs().Fastq());
-        EXPECT_EQ(tagQuals_clipped,  view.AltLabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped, view.LabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped, view.AltLabelQVs().Fastq());
         EXPECT_EQ(frames_clipped,    view.IPD().Data());
         EXPECT_EQ(pulseCall_clipped, view.PulseCalls());
     }
@@ -256,8 +260,8 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_EQ(quals_clipped,     view.Qualities().Fastq());
         EXPECT_EQ(tagBases_clipped,  view.DeletionTags());
         EXPECT_EQ(tagQuals_clipped,  view.DeletionQVs().Fastq());
-        EXPECT_EQ(tagQuals_clipped,  view.LabelQVs().Fastq());
-        EXPECT_EQ(tagQuals_clipped,  view.AltLabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped, view.LabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped, view.AltLabelQVs().Fastq());
         EXPECT_EQ(frames_clipped,    view.IPD().Data());
         EXPECT_EQ(pulseCall_clipped, view.PulseCalls());
     }
@@ -288,8 +292,8 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_EQ(quals_rev_clipped,     view.Qualities().Fastq());
         EXPECT_EQ(tagBases_rev_clipped,  view.DeletionTags());
         EXPECT_EQ(tagQuals_rev_clipped,  view.DeletionQVs().Fastq());
-        EXPECT_EQ(tagQuals_rev_clipped,  view.LabelQVs().Fastq());
-        EXPECT_EQ(tagQuals_rev_clipped,  view.AltLabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_rev_clipped,  view.LabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_rev_clipped,  view.AltLabelQVs().Fastq());
         EXPECT_EQ(frames_rev_clipped,    view.IPD().Data());
         EXPECT_EQ(pulseCall_rev_clipped, view.PulseCalls());
     }
@@ -320,8 +324,8 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_EQ(quals_clipped,    view.Qualities().Fastq());
         EXPECT_EQ(tagBases_clipped, view.DeletionTags());
         EXPECT_EQ(tagQuals_clipped, view.DeletionQVs().Fastq());
-        EXPECT_EQ(tagQuals_clipped, view.LabelQVs().Fastq());
-        EXPECT_EQ(tagQuals_clipped, view.AltLabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped, view.LabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped, view.AltLabelQVs().Fastq());
         EXPECT_EQ(frames_clipped,   view.IPD().Data());
     }
 
@@ -351,8 +355,8 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_EQ(quals_rev_clipped,     view.Qualities().Fastq());
         EXPECT_EQ(tagBases_rev_clipped,  view.DeletionTags());
         EXPECT_EQ(tagQuals_rev_clipped,  view.DeletionQVs().Fastq());
-        EXPECT_EQ(tagQuals_rev_clipped,  view.LabelQVs().Fastq());
-        EXPECT_EQ(tagQuals_rev_clipped,  view.AltLabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_rev_clipped,  view.LabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_rev_clipped,  view.AltLabelQVs().Fastq());
         EXPECT_EQ(frames_rev_clipped,    view.IPD().Data());
         EXPECT_EQ(pulseCall_rev_clipped, view.PulseCalls());
     }
@@ -383,8 +387,8 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_EQ(quals_clipped,     view.Qualities().Fastq());
         EXPECT_EQ(tagBases_clipped,  view.DeletionTags());
         EXPECT_EQ(tagQuals_clipped,  view.DeletionQVs().Fastq());
-        EXPECT_EQ(tagQuals_clipped,  view.LabelQVs().Fastq());
-        EXPECT_EQ(tagQuals_clipped,  view.AltLabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped,  view.LabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped,  view.AltLabelQVs().Fastq());
         EXPECT_EQ(frames_clipped,    view.IPD().Data());
         EXPECT_EQ(pulseCall_clipped, view.PulseCalls());
     }
@@ -415,8 +419,8 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_EQ(quals_rev_clipped,     view.Qualities().Fastq());
         EXPECT_EQ(tagBases_rev_clipped,  view.DeletionTags());
         EXPECT_EQ(tagQuals_rev_clipped,  view.DeletionQVs().Fastq());
-        EXPECT_EQ(tagQuals_rev_clipped,  view.LabelQVs().Fastq());
-        EXPECT_EQ(tagQuals_rev_clipped,  view.AltLabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_rev_clipped,  view.LabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_rev_clipped,  view.AltLabelQVs().Fastq());
         EXPECT_EQ(frames_rev_clipped,    view.IPD().Data());
         EXPECT_EQ(pulseCall_rev_clipped, view.PulseCalls());
     }

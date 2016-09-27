@@ -77,6 +77,29 @@ public:
 
 public:
 
+    ///
+    /// \brief FindFirst
+    /// \return
+    ///
+    size_t FindFirst(void) const
+    { return data_.find_first(); }
+
+    ///
+    /// \brief FindNext
+    /// \param from
+    /// \return
+    ///
+    size_t FindNext(size_t from) const
+    { return data_.find_next(from); }
+
+    ///
+    /// \brief IsBasecallAt
+    /// \param pos
+    /// \return
+    ///
+    bool IsBasecallAt(const size_t pos) const
+    { return data_[pos]; }
+
     /// \returns the total number of pulses (basecalled & squashed)
     ///
     size_t NumPulses(void) const

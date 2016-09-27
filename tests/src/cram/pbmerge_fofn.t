@@ -61,7 +61,7 @@ Normal Merge from FOFN:
   @RG\tID:b89a4406\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;BINDINGKIT=100356300;SEQUENCINGKIT=100356200;BASECALLERVERSION=2.3;FRAMERATEHZ=100\tPU:m140905_042212_sidney_c100564852550000001823085912221377_s1_X0\tSM:c100564852550000001823085912221377\tPM:SEQUEL (esc)
   @PG\tID:BLASR\tVN:1.3.1.141565\tCL:/home/UNIXHOME/yli/for_the_people/blasr_bam_out/blasr m140905_042212_sidney_c100564852550000001823085912221377_s1_X0.1.bax.h5 lambdaNEB.fa -out tmp.bam -bam -bestn 10 -minMatch 12 -nproc 8 -minSubreadLength 50 -minReadLength 50 -randomSeed 1 -clipping subread  (esc)
   @PG\tID:bwa\tPN:bwa\tVN:0.7.10-r1017-dirty\tCL:bwa mem lambdaNEB.fa singleInsertion.fasta (esc)
-  @PG\tID:pbmerge-0.6.0\tPN:pbmerge\tVN:0.6.0 (esc)
+  @PG\tID:pbmerge-0.7.0\tPN:pbmerge\tVN:0.7.0 (esc)
 
   $ $BAM2SAM --no-header $MERGED_BAM | cut -f 1,3,4 | head -n 20
   m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/49050/48_1132\tlambda_NEB3011\t1 (esc)
@@ -99,7 +99,7 @@ Normal Merge from FOFN (disabled PBI):
   @RG\tID:b89a4406\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;BINDINGKIT=100356300;SEQUENCINGKIT=100356200;BASECALLERVERSION=2.3;FRAMERATEHZ=100\tPU:m140905_042212_sidney_c100564852550000001823085912221377_s1_X0\tSM:c100564852550000001823085912221377\tPM:SEQUEL (esc)
   @PG\tID:BLASR\tVN:1.3.1.141565\tCL:/home/UNIXHOME/yli/for_the_people/blasr_bam_out/blasr m140905_042212_sidney_c100564852550000001823085912221377_s1_X0.1.bax.h5 lambdaNEB.fa -out tmp.bam -bam -bestn 10 -minMatch 12 -nproc 8 -minSubreadLength 50 -minReadLength 50 -randomSeed 1 -clipping subread  (esc)
   @PG\tID:bwa\tPN:bwa\tVN:0.7.10-r1017-dirty\tCL:bwa mem lambdaNEB.fa singleInsertion.fasta (esc)
-  @PG\tID:pbmerge-0.6.0\tPN:pbmerge\tVN:0.6.0 (esc)
+  @PG\tID:pbmerge-0.7.0\tPN:pbmerge\tVN:0.7.0 (esc)
 
   $ $BAM2SAM --no-header $MERGED_BAM | cut -f 1,3,4 | head -n 20
   m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/49050/48_1132\tlambda_NEB3011\t1 (esc)

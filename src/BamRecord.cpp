@@ -178,6 +178,37 @@ T Clip(const T& input, const size_t pos, const size_t len)
               input.cbegin() + pos + len };
 }
 
+template<typename T>
+T ClipPulse(const T& input,
+            internal::Pulse2BaseCache* p2bCache,
+            const size_t pos,
+            const size_t len)
+{
+    assert(p2bCache);
+    if (input.empty())
+        return T();
+
+    // find start
+    size_t start = p2bCache->FindFirst();
+    size_t basesSeen = 0;
+    while (basesSeen < pos) {
+        start = p2bCache->FindNext(start);
+        ++basesSeen;
+    }
+
+    // find end
+    size_t end = start;
+    size_t seen = 1;
+    while (seen < len) {
+        end = p2bCache->FindNext(end);
+        ++seen;
+    }
+
+    // return clipped
+    return T{ input.cbegin() + start,
+              input.cbegin() + end + 1 };
+}
+
 template< class InputIt, class Size, class OutputIt>
 OutputIt Move_N(InputIt first, Size count, OutputIt result)
 {
@@ -687,31 +718,39 @@ void BamRecord::ClipFields(const size_t clipFrom,
     if (HasSubstitutionTag())
         tags[internal::Label(BamRecordTag::SUBSTITUTION_TAG)] = internal::Clip(SubstitutionTag(Orientation::NATIVE), clipFrom, clipLength);
 
-    // need to implement clipping on pulse tags etc (bug 31633)
-    if (HasAltLabelQV())
-        tags[internal::Label(BamRecordTag::ALT_LABEL_QV)]     = internal::Clip(AltLabelQV(Orientation::NATIVE), clipFrom, clipLength).Fastq();
-    if (HasLabelQV())
-        tags[internal::Label(BamRecordTag::LABEL_QV)]         = internal::Clip(LabelQV(Orientation::NATIVE), clipFrom, clipLength).Fastq();
-    if (HasPulseMergeQV())
-        tags[internal::Label(BamRecordTag::PULSE_MERGE_QV)]   = internal::Clip(PulseMergeQV(Orientation::NATIVE), clipFrom, clipLength).Fastq();
-    if (HasAltLabelTag())
-        tags[internal::Label(BamRecordTag::ALT_LABEL_TAG)]    = internal::Clip(AltLabelTag(Orientation::NATIVE), clipFrom, clipLength);
-    if (HasPulseCall())
-        tags[internal::Label(BamRecordTag::PULSE_CALL)]       = internal::Clip(PulseCall(Orientation::NATIVE), clipFrom, clipLength);
-    if (HasPkmean())
-        tags[internal::Label(BamRecordTag::PKMEAN)]           = EncodePhotons(internal::Clip(Pkmean(Orientation::NATIVE), clipFrom, clipLength));
-    if (HasPkmid())
-        tags[internal::Label(BamRecordTag::PKMID)]            = EncodePhotons(internal::Clip(Pkmid(Orientation::NATIVE), clipFrom, clipLength));
-    if (HasPkmean2())
-        tags[internal::Label(BamRecordTag::PKMEAN_2)]         = EncodePhotons(internal::Clip(Pkmean2(Orientation::NATIVE), clipFrom, clipLength));
-    if (HasPkmid2())
-        tags[internal::Label(BamRecordTag::PKMID_2)]          = EncodePhotons(internal::Clip(Pkmid2(Orientation::NATIVE), clipFrom, clipLength));
-    if (HasPrePulseFrames())
-        tags[internal::Label(BamRecordTag::PRE_PULSE_FRAMES)] = internal::Clip(PrePulseFrames(Orientation::NATIVE).Data(), clipFrom, clipLength);
-    if (HasPulseCallWidth())
-        tags[internal::Label(BamRecordTag::PULSE_CALL_WIDTH)] = internal::Clip(PulseCallWidth(Orientation::NATIVE).Data(), clipFrom, clipLength);
-    if (HasStartFrame())
-        tags[internal::Label(BamRecordTag::START_FRAME)]      = internal::Clip(StartFrame(Orientation::NATIVE), clipFrom, clipLength);
+    // internal BAM tags
+    if (HasPulseCall()) {
+
+        // ensure p2bCache initialized
+        CalculatePulse2BaseCache();
+        internal::Pulse2BaseCache* p2bCache = p2bCache_.get();
+
+        if (HasAltLabelQV())
+            tags[internal::Label(BamRecordTag::ALT_LABEL_QV)]     = internal::ClipPulse(AltLabelQV(Orientation::NATIVE), p2bCache, clipFrom, clipLength).Fastq();
+        if (HasLabelQV())
+            tags[internal::Label(BamRecordTag::LABEL_QV)]         = internal::ClipPulse(LabelQV(Orientation::NATIVE), p2bCache, clipFrom, clipLength).Fastq();
+        if (HasPulseMergeQV())
+            tags[internal::Label(BamRecordTag::PULSE_MERGE_QV)]   = internal::ClipPulse(PulseMergeQV(Orientation::NATIVE), p2bCache, clipFrom, clipLength).Fastq();
+        if (HasAltLabelTag())
+            tags[internal::Label(BamRecordTag::ALT_LABEL_TAG)]    = internal::ClipPulse(AltLabelTag(Orientation::NATIVE), p2bCache, clipFrom, clipLength);
+        if (HasPulseCall())
+            tags[internal::Label(BamRecordTag::PULSE_CALL)]       = internal::ClipPulse(PulseCall(Orientation::NATIVE), p2bCache, clipFrom, clipLength);
+        if (HasPkmean())
+            tags[internal::Label(BamRecordTag::PKMEAN)]           = EncodePhotons(internal::ClipPulse(Pkmean(Orientation::NATIVE), p2bCache, clipFrom, clipLength));
+        if (HasPkmid())
+            tags[internal::Label(BamRecordTag::PKMID)]            = EncodePhotons(internal::ClipPulse(Pkmid(Orientation::NATIVE), p2bCache, clipFrom, clipLength));
+        if (HasPkmean2())
+            tags[internal::Label(BamRecordTag::PKMEAN_2)]         = EncodePhotons(internal::ClipPulse(Pkmean2(Orientation::NATIVE), p2bCache, clipFrom, clipLength));
+        if (HasPkmid2())
+            tags[internal::Label(BamRecordTag::PKMID_2)]          = EncodePhotons(internal::ClipPulse(Pkmid2(Orientation::NATIVE), p2bCache, clipFrom, clipLength));
+        if (HasPrePulseFrames())
+            tags[internal::Label(BamRecordTag::PRE_PULSE_FRAMES)] = internal::ClipPulse(PrePulseFrames(Orientation::NATIVE).Data(), p2bCache, clipFrom, clipLength);
+        if (HasPulseCallWidth())
+            tags[internal::Label(BamRecordTag::PULSE_CALL_WIDTH)] = internal::ClipPulse(PulseCallWidth(Orientation::NATIVE).Data(), p2bCache, clipFrom, clipLength);
+        if (HasStartFrame())
+            tags[internal::Label(BamRecordTag::START_FRAME)]      = internal::ClipPulse(StartFrame(Orientation::NATIVE), p2bCache, clipFrom, clipLength);
+
+    }
 
     impl_.Tags(tags);
 }
@@ -2054,7 +2093,7 @@ Frames BamRecord::PulseWidth(Orientation orientation,
                        orientation,
                        aligned,
                        exciseSoftClips,
-                       PulseBehavior::BASECALLS_ONLY);
+                       PulseBehavior::ALL);
 }
 
 BamRecord& BamRecord::PulseWidth(const Frames& frames,
