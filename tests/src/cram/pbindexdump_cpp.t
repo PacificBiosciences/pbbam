@@ -1,6 +1,8 @@
 Setup:
 
-  $ PBINDEXDUMP="$TESTDIR/../../../bin/pbindexdump" && export PBINDEXDUMP
+  $ PATH="$TESTDIR/../../../bin:$PATH" && export PATH
+
+  $ PBINDEXDUMP="pbindexdump" && export PBINDEXDUMP
 
   $ DATADIR="$TESTDIR/../../data" && export DATADIR
 

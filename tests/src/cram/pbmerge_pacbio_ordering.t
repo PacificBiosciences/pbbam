@@ -1,8 +1,8 @@
 Setup:
 
-  $ TOOLS_BIN="$TESTDIR/../../../bin" && export TOOLS_BIN
-  $ PBMERGE="$TOOLS_BIN/pbmerge" && export PBMERGE
-  $ BAM2SAM="$TOOLS_BIN/bam2sam" && export BAM2SAM
+  $ PATH="$TESTDIR/../../../bin:$PATH" && export PATH
+  $ PBMERGE="pbmerge" && export PBMERGE
+  $ BAM2SAM="bam2sam" && export BAM2SAM
 
   $ DATADIR="$TESTDIR/../../data" && export DATADIR
   $ HQREGION_BAM="$DATADIR/polymerase/internal.hqregions.bam" && export HQREGION_BAM
