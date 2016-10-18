@@ -1,16 +1,16 @@
 Setup:
 
-  $ TOOLS_BIN="$TESTDIR/../../../bin" && export TOOLS_BIN
+  $ TOOLS_BIN="@PacBioBAM_BinDir@" && export TOOLS_BIN
   $ PBMERGE="$TOOLS_BIN/pbmerge" && export PBMERGE
   $ BAM2SAM="$TOOLS_BIN/bam2sam" && export BAM2SAM
 
-  $ DATADIR="$TESTDIR/../../data" && export DATADIR
+  $ DATADIR="@PacBioBAM_TestsDir@/data" && export DATADIR
   $ INPUT_FOFN="$DATADIR/merge.fofn" && export INPUT_FOFN
   $ INPUT_1="$DATADIR/aligned.bam" && export INPUT_1
   $ INPUT_2="$DATADIR/aligned2.bam" && export INPUT_2
 
-  $ MERGED_BAM="/tmp/aligned_ordering_merged.bam" && export MERGED_BAM
-  $ MERGED_BAM_PBI="/tmp/aligned_ordering_merged.bam.pbi" && export MERGED_BAM_PBI
+  $ MERGED_BAM="@GeneratedTestDataDir@/aligned_ordering_merged.bam" && export MERGED_BAM
+  $ MERGED_BAM_PBI="@GeneratedTestDataDir@/aligned_ordering_merged.bam.pbi" && export MERGED_BAM_PBI
 
 Sanity Check:
 

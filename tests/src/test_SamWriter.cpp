@@ -58,7 +58,7 @@ TEST(SamWriterTest, HeaderOk)
     EXPECT_NO_THROW(
     {
         // write header to file
-        const string generatedFn = "/tmp/samwriter_hdr_only.sam";
+        const string generatedFn = tests::GeneratedData_Dir + "/samwriter_hdr_only.sam";
         {
             const BamHeader inputHeader(hdrText);
             SamWriter writer(generatedFn, inputHeader);
@@ -124,7 +124,7 @@ TEST(SamWriterTest, SingleRecordOk)
     EXPECT_NO_THROW(
     {
         // write data to file
-        const string generatedFn = "/tmp/samwriter_hdr_and_record.sam";
+        const string generatedFn = tests::GeneratedData_Dir + "/samwriter_hdr_and_record.sam";
         {
             SamWriter writer(generatedFn, inputHeader);
             writer.Write(record);

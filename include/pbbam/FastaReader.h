@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2016, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -32,27 +32,82 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file FastaReader.h
+/// \brief Defines the FastaReader class.
+//
 // Author: Derek Barnett
 
-#ifndef TESTDATA_H
-#define TESTDATA_H
+#ifndef FASTAREADER_H
+#define FASTAREADER_H
 
-#include <string>
+#include "pbbam/FastaSequence.h"
+#include <memory>
+#include <vector>
 
 namespace PacBio {
 namespace BAM {
-namespace tests {
 
-const std::string Source_Dir = std::string("@PacBioBAM_TestsDir@");
-const std::string Bin_Dir    = std::string("@CMAKE_CURRENT_BINARY_DIR@");
-const std::string Data_Dir   = std::string("@PacBioBAM_TestsDir@/data");
-const std::string Generated_Dir     = std::string("@GeneratedDir@");
-const std::string GeneratedData_Dir = std::string("@GeneratedTestDataDir@");
-const std::string Bam2Sam    = std::string("@PacBioBAM_BinDir@/bam2sam");
+namespace internal { struct FastaReaderPrivate; }
 
-} // namespace tests
+///
+/// \brief The FastaReader provides sequential access to FASTA records.
+///
+class FastaReader
+{
+public:
+    ///
+    /// \brief Reads all FASTA sequences from a file
+    ///
+    /// \param fn   FASTA filename
+    /// \return vector of FastaSequence results
+    ///
+    static std::vector<FastaSequence> ReadAll(const std::string& fn);
+
+public:
+    /// \name Constructors & Related Methods
+    /// \{
+
+    explicit FastaReader(const std::string& fn);
+    FastaReader(FastaReader&& other);
+    FastaReader& operator=(FastaReader&& other);
+    ~FastaReader(void);
+
+    // copy is disabled
+    FastaReader(const FastaReader&) = delete;
+    FastaReader& operator=(const FastaReader&) = delete;
+
+    /// \}
+
+public:
+    /// \name Sequence Access
+    /// \{
+
+    ///
+    /// \brief GetNext
+    ///
+    /// \code{cpp}
+    ///
+    /// FastaReader reader{ fn };
+    /// FastaSequence f;
+    /// while (reader.GetNext(f)) {
+    ///     // do stuff with f
+    /// }
+    /// \endcode
+    ///
+    /// \param[out] record
+    /// \return success/failure
+    ///
+    bool GetNext(FastaSequence& record);
+
+    /// \}
+
+private:
+    std::unique_ptr<internal::FastaReaderPrivate> d_;
+};
+
 } // namespace BAM
 } // namespace PacBio
 
-#endif // TESTDATA_H
+#endif // FASTAREADER_H

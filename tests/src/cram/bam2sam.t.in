@@ -1,8 +1,8 @@
 Setup:
 
-  $ BAM2SAM="$TESTDIR/../../../bin/bam2sam" && export BAM2SAM
+  $ BAM2SAM="@PacBioBAM_BinDir@/bam2sam" && export BAM2SAM
 
-  $ DATADIR="$TESTDIR/../../data" && export DATADIR
+  $ DATADIR="@PacBioBAM_TestsDir@/data" && export DATADIR
 
 Normal:
 

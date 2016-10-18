@@ -102,8 +102,12 @@ set(PacBioBAM_BinDir        ${PacBioBAM_OutputDir}/bin)
 set(PacBioBAM_LibDir        ${PacBioBAM_OutputDir}/lib)
 set(PacBioBAM_ThirdPartyDir ${PacBioBAM_RootDir}/third-party)
 
+set(GeneratedDir ${CMAKE_BINARY_DIR}/generated)
+set(GeneratedTestDataDir ${GeneratedDir}/data)
 file(MAKE_DIRECTORY ${PacBioBAM_BinDir})
 file(MAKE_DIRECTORY ${PacBioBAM_LibDir})
+file(MAKE_DIRECTORY ${GeneratedDir})
+file(MAKE_DIRECTORY ${GeneratedTestDataDir})
 
 # use some custom Find*, Use* cmake modules
 list(APPEND CMAKE_MODULE_PATH "${PacBioBAM_RootDir}/cmake")

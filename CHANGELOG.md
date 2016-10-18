@@ -10,6 +10,9 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+### Added
+- (Unindexed) FASTA reader & FastaSequence data structure.
+
 ## [0.7.0] - 2016-09-26 
 
 ### Added
@@ -20,7 +23,9 @@ guarantees will be maintained within each major version series.
 - Rolled back default pulse behavior in internal BAM API, to be backward-
 compatible with existing client code (for now at least). v0.6.0 introduced
 returning basecalled positions ONLY by default, rather than return ALL 
-pulses.  
+pulses. 
+- Fixed crash when attempting to read from empty BAM/PBI files using the 
+PbiFilter-enabled APIs.
 
 ## [0.6.0] - 2016-09-13
 

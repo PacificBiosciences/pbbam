@@ -53,7 +53,7 @@ const string aligned2BamFn     = tests::Data_Dir + "/aligned2.bam";
 const string alignedCopyBamFn  = tests::GeneratedData_Dir + "/aligned.bam";
 const string aligned2CopyBamFn = tests::GeneratedData_Dir + "/aligned2.bam";
 
-const string group_fofn   = tests::Data_Dir + "/group/group.fofn";
+const string group_fofn   = tests::Generated_Dir + "/group.fofn";
 const string group_file1  = tests::Data_Dir + "/group/test1.bam";
 const string group_file2  = tests::Data_Dir + "/group/test2.bam";
 const string group_file3  = tests::Data_Dir + "/group/test3.bam";

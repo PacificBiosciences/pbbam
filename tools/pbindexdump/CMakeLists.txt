@@ -25,11 +25,23 @@ create_pbbam_tool(
 
 # cram tests
 if (PacBioBAM_build_tests)
+
+    configure_file(
+        ${PacBioBAM_CramTestsDir}/pbindexdump_json.t.in
+        ${GeneratedDir}/pbindexdump_json.t
+    )
+
+    configure_file(
+        ${PacBioBAM_CramTestsDir}/pbindexdump_cpp.t.in
+        ${GeneratedDir}/pbindexdump_cpp.t
+    )
+
     add_test(
         NAME pbindexdump_CramTests
         WORKING_DIRECTORY ${PacBioBAM_TestsDir}/scripts
         COMMAND "python" cram.py
-            ${PacBioBAM_CramTestsDir}/pbindexdump_json.t
-            ${PacBioBAM_CramTestsDir}/pbindexdump_cpp.t
+            ${GeneratedDir}/pbindexdump_json.t
+            ${GeneratedDir}/pbindexdump_cpp.t
     )
+
 endif()

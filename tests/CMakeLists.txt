@@ -2,21 +2,20 @@ find_package(Threads REQUIRED)
 
 # ensure output directories exists
 file(MAKE_DIRECTORY ${PacBioBAM_TestsDir}/bin)
-set(GeneratedTestDataDir ${CMAKE_BINARY_DIR}/generated/data)
-file(MAKE_DIRECTORY ${GeneratedTestDataDir})
 
 # generate paths/values used by for unit tests
 configure_file(
     ${PacBioBAM_TestsDir}/src/TestData.h.in
-    ${PacBioBAM_TestsDir}/src/TestData.h
+    ${GeneratedDir}/TestData.h
 )
 configure_file(
     ${PacBioBAM_TestsDir}/data/group/group.fofn.in
-    ${PacBioBAM_TestsDir}/data/group/group.fofn
+    ${GeneratedDir}/group.fofn
 )
 
 # add PacBioBAM & GoogleTest includes
 include_directories(
+    ${GeneratedDir}
     ${PacBioBAM_INCLUDE_DIRS}
     ${gtest_SOURCE_DIR}/include 
     ${gtest_SOURCE_DIR}

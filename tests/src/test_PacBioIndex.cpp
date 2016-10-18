@@ -258,7 +258,7 @@ bool PbiIndicesEqual(const PbiIndex& lhs, const PbiIndex& rhs)
 TEST(PacBioIndexTest, CreateFromExistingBam)
 {
     // do this in temp directory, so we can ensure write access
-    const string tempDir    = "/tmp/";
+    const string tempDir    = tests::GeneratedData_Dir + "/";
     const string tempBamFn  = tempDir + "aligned2.bam";
     const string tempPbiFn  = tempBamFn + ".pbi";
     string cmd("cp ");
@@ -296,7 +296,7 @@ TEST(PacBioIndexTest, CreateFromExistingBam)
 TEST(PacBioIndexTest, CreateOnTheFly)
 {
     // do this in temp directory, so we can ensure write access
-    const string tempDir    = "/tmp/";
+    const string tempDir    = tests::GeneratedData_Dir + "/";
     const string tempBamFn  = tempDir + "temp.bam";
     const string tempPbiFn  = tempBamFn + ".pbi";
 
@@ -378,7 +378,7 @@ TEST(PacBioIndexTest, RawLoadFromPbiFile)
 TEST(PacBioIndexTest, BasicAndBarodeSectionsOnly)
 {
     // do this in temp directory, so we can ensure write access
-    const string tempDir    = "/tmp/";
+    const string tempDir    = tests::GeneratedData_Dir + "/";
     const string tempBamFn  = tempDir + "phi29.bam";
     const string tempPbiFn  = tempBamFn + ".pbi";
     string cmd("cp ");

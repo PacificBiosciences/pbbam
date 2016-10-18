@@ -55,7 +55,7 @@ using namespace PacBio::BAM;
 using namespace std;
 
 const string alignedBamFn  = tests::Data_Dir + "/aligned.bam";
-const string bamGroupFofn  = tests::Data_Dir + "/group/group.fofn";
+const string bamGroupFofn  = tests::Generated_Dir + "/group.fofn";
 
 const string ali1XmlFn = tests::Data_Dir + "/dataset/ali1.xml";
 const string ali2XmlFn = tests::Data_Dir + "/dataset/ali2.xml";

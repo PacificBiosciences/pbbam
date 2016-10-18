@@ -27,6 +27,7 @@ set( PacBioBAMTest_CPP
     ${PacBioBAM_TestsDir}/src/test_DataSetXsd.cpp
     ${PacBioBAM_TestsDir}/src/test_EndToEnd.cpp
     ${PacBioBAM_TestsDir}/src/test_EntireFileQuery.cpp
+    ${PacBioBAM_TestsDir}/src/test_Fasta.cpp
     ${PacBioBAM_TestsDir}/src/test_FileUtils.cpp
     ${PacBioBAM_TestsDir}/src/test_Frames.cpp
     ${PacBioBAM_TestsDir}/src/test_GenomicIntervalQuery.cpp

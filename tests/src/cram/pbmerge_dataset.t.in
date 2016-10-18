@@ -1,16 +1,16 @@
 Setup:
 
-  $ TOOLS_BIN="$TESTDIR/../../../bin" && export TOOLS_BIN
+  $ TOOLS_BIN="@PacBioBAM_BinDir@" && export TOOLS_BIN
   $ PBMERGE="$TOOLS_BIN/pbmerge" && export PBMERGE
   $ BAM2SAM="$TOOLS_BIN/bam2sam" && export BAM2SAM
 
-  $ DATADIR="$TESTDIR/../../data" && export DATADIR
+  $ DATADIR="@PacBioBAM_TestsDir@/data" && export DATADIR
   $ INPUT_XML="$DATADIR/polymerase/consolidate.subread.dataset.xml" && export INPUT_XML
   $ BAM_1="$DATADIR/polymerase/production.subreads.bam" && export BAM_1
   $ BAM_2="$DATADIR/polymerase/production.scraps.bam" && export BAM_2
 
-  $ MERGED_BAM="/tmp/merged.bam" && export MERGED_BAM
-  $ MERGED_BAM_PBI="/tmp/merged.bam.pbi" && export MERGED_BAM_PBI
+  $ MERGED_BAM="@GeneratedTestDataDir@/merged.bam" && export MERGED_BAM
+  $ MERGED_BAM_PBI="@GeneratedTestDataDir@/merged.bam.pbi" && export MERGED_BAM_PBI
 
 Sanity Check:
 

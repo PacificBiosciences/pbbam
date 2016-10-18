@@ -90,7 +90,7 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
     bamRecord.impl_.Tags(tags);
 
     // write record to file
-    const string generatedBamFn = "/tmp/bamwriter_generated.bam";
+    const string generatedBamFn = tests::GeneratedData_Dir + "/bamwriter_generated.bam";
     {
         BamWriter writer(generatedBamFn, inputHeader);
         writer.Write(bamRecord);

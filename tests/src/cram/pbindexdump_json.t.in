@@ -1,8 +1,8 @@
 Setup:
 
-  $ PBINDEXDUMP="$TESTDIR/../../../bin/pbindexdump" && export PBINDEXDUMP
+  $ PBINDEXDUMP="@PacBioBAM_BinDir@/pbindexdump" && export PBINDEXDUMP
 
-  $ DATADIR="$TESTDIR/../../data" && export DATADIR
+  $ DATADIR="@PacBioBAM_TestsDir@/data" && export DATADIR
 
 Default settings (JSON):
 

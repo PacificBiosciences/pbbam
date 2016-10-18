@@ -5,6 +5,15 @@ from __future__ import print_function
 import os, shutil, sys
 import StringIO
 
+fastaSeq_1 = """TAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAAC
+AACGCAGCTCCGCCCTCGCGGTGCTCTCCGGGTCTGTGCTGAGGAGAACGCAACTCCGCCGGCGCAGGCG"""
+
+fastaSeq_2 = """TAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAAC
+AACGCAGCTCCGCCCTCGCGGTGCTCTCCGGGTCTGTGCTGAGGAGAACGCAAC"""
+
+fastaSeq_3 = """TAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAAC
+ACCCTAACCCCAACCCCAACCCCAACCCCAACCCCAACCCCAACCCTAACCCCTAACCCTAACCCT"""
+
 # file creation decorator
 def fileMaker(func):
     def inner(*args, **kwargs):
@@ -50,6 +59,7 @@ class TestDataGenerator:
             'truncated.bam' : self.makeTruncatedBam,
             'chunking_emptyfilters.subreadset.xml'   : self.makeChunkingXml,
             'chunking_missingfilters.subreadset.xml' : self.makeChunkingXml,
+            'normal.fa' : self.makeNormalFasta
         }
         self.outputSymlinks = {
             'aligned.bam'      : self.makeAlignedBamCopy,
@@ -100,6 +110,13 @@ class TestDataGenerator:
         else:
             removeFiltersNode = True
         self.editChunkingXml(outputFn, removeFiltersNode)
+
+    @fileMaker
+    def makeNormalFasta(self, outputFn):
+        content = ">1\n" + fastaSeq_1 + "\n>2\n" + fastaSeq_2 + "\n>3\n" + fastaSeq_3
+        dest = os.path.join(self.generatedDataDir, outputFn)
+        with open(outputFn, 'w') as fasta_out:
+            fasta_out.write(content)
 
     @fileMaker
     def makeTruncatedBam(self, outputFn):

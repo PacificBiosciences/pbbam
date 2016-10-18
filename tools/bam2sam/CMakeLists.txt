@@ -23,10 +23,17 @@ create_pbbam_tool(
 
 # cram tests
 if (PacBioBAM_build_tests)
+
+    configure_file(
+        ${PacBioBAM_CramTestsDir}/bam2sam.t.in
+        ${GeneratedDir}/bam2sam.t
+    )
+
     add_test(
         NAME bam2sam_CramTests
         WORKING_DIRECTORY ${PacBioBAM_TestsDir}/scripts
         COMMAND "python" cram.py
-            ${PacBioBAM_CramTestsDir}/bam2sam.t
+            ${GeneratedDir}/bam2sam.t
     )
+
 endif()

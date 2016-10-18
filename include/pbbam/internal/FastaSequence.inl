@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2016, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -32,27 +32,29 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file FastaSequence.inl
+/// \brief Inline implementations for the FastaSequence class.
+//
 // Author: Derek Barnett
 
-#ifndef TESTDATA_H
-#define TESTDATA_H
-
-#include <string>
+#include "pbbam/FastaSequence.h"
 
 namespace PacBio {
 namespace BAM {
-namespace tests {
 
-const std::string Source_Dir = std::string("@PacBioBAM_TestsDir@");
-const std::string Bin_Dir    = std::string("@CMAKE_CURRENT_BINARY_DIR@");
-const std::string Data_Dir   = std::string("@PacBioBAM_TestsDir@/data");
-const std::string Generated_Dir     = std::string("@GeneratedDir@");
-const std::string GeneratedData_Dir = std::string("@GeneratedTestDataDir@");
-const std::string Bam2Sam    = std::string("@PacBioBAM_BinDir@/bam2sam");
+inline FastaSequence::FastaSequence(std::string name,
+                                    std::string bases)
+    : name_{std::move(name)}
+    , bases_{std::move(bases)}
+{ }
 
-} // namespace tests
+inline std::string FastaSequence::Bases(void) const
+{ return bases_; }
+
+inline std::string FastaSequence::Name(void) const
+{ return name_; }
+
 } // namespace BAM
 } // namespace PacBio
-
-#endif // TESTDATA_H

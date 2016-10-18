@@ -26,15 +26,42 @@ if (PacBioBAM_build_tests)
     if(PacBioBAM_auto_validate)
         # skip for now til we clean up merge tests under autovalidate, too
     else()
+
+        configure_file(
+            ${PacBioBAM_CramTestsDir}/pbmerge_pacbio_ordering.t.in
+            ${GeneratedDir}/pbmerge_pacbio_ordering.t
+        )
+ 
+        configure_file(
+            ${PacBioBAM_CramTestsDir}/pbmerge_aligned_ordering.t.in
+            ${GeneratedDir}/pbmerge_aligned_ordering.t
+        )
+
+        configure_file(
+            ${PacBioBAM_CramTestsDir}/pbmerge_mixed_ordering.t.in
+            ${GeneratedDir}/pbmerge_mixed_ordering.t
+        )
+
+        configure_file(
+            ${PacBioBAM_CramTestsDir}/pbmerge_dataset.t.in
+            ${GeneratedDir}/pbmerge_dataset.t
+        )
+
+        configure_file(
+            ${PacBioBAM_CramTestsDir}/pbmerge_fofn.t.in
+            ${GeneratedDir}/pbmerge_fofn.t
+        )
+
         add_test(
-        NAME pbmerge_CramTests
-        WORKING_DIRECTORY ${PacBioBAM_TestsDir}/scripts
-        COMMAND "python" cram.py
-            ${PacBioBAM_CramTestsDir}/pbmerge_pacbio_ordering.t
-            ${PacBioBAM_CramTestsDir}/pbmerge_aligned_ordering.t
-            ${PacBioBAM_CramTestsDir}/pbmerge_mixed_ordering.t
-            ${PacBioBAM_CramTestsDir}/pbmerge_dataset.t
-            ${PacBioBAM_CramTestsDir}/pbmerge_fofn.t
-    )
+            NAME pbmerge_CramTests
+            WORKING_DIRECTORY ${PacBioBAM_TestsDir}/scripts
+            COMMAND "python" cram.py
+                ${GeneratedDir}/pbmerge_pacbio_ordering.t
+                ${GeneratedDir}/pbmerge_aligned_ordering.t
+                ${GeneratedDir}/pbmerge_mixed_ordering.t
+                ${GeneratedDir}/pbmerge_dataset.t
+                ${GeneratedDir}/pbmerge_fofn.t
+        )
+
     endif()
 endif()

@@ -78,7 +78,9 @@ public:
 
         // find blocks of reads passing filter criteria
         const uint32_t numReads = index_.NumReads();
-        if (filter_.IsEmpty()) {
+        if (numReads == 0) {               // empty PBI - no reads to use
+            return;
+        } else if (filter_.IsEmpty()) {    // empty filter - use all reads
             blocks_.push_back(IndexResultBlock{0, numReads});
         } else {
             IndexList indices;

@@ -257,3 +257,15 @@ TEST(PbiFilterQueryTest, QNameWhitelistFile)
     EXPECT_EQ(3, count);
 }
 
+TEST(PbiFilterQueryTest, EmptyFiles)
+{
+    const BamFile file{ tests::Data_Dir + "/empty.bam" };
+    PbiFilterQuery query{ PbiFilter{}, file };
+    size_t count = 0;
+    for (const auto& r : query) {
+        (void)r;
+        ++count;
+    }
+    EXPECT_EQ(0, count);
+}
+
