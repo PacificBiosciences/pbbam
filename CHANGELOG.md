@@ -12,6 +12,10 @@ guarantees will be maintained within each major version series.
 
 ### Added
 - (Unindexed) FASTA reader & FastaSequence data structure.
+- Missing unit tests for internal BAM tag access.
+
+### Fixed
+- Reverse complement on padding base.
 
 ## [0.7.0] - 2016-09-26 
 

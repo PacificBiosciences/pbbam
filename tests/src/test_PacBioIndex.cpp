@@ -259,12 +259,12 @@ TEST(PacBioIndexTest, CreateFromExistingBam)
 {
     // do this in temp directory, so we can ensure write access
     const string tempDir    = tests::GeneratedData_Dir + "/";
-    const string tempBamFn  = tempDir + "aligned2.bam";
+    const string tempBamFn  = tempDir + "aligned_copy.bam";
     const string tempPbiFn  = tempBamFn + ".pbi";
     string cmd("cp ");
     cmd += test2BamFn;
     cmd += " ";
-    cmd += tempDir;
+    cmd += tempBamFn;
     int cmdResult = system(cmd.c_str());
     (void)cmdResult;
 

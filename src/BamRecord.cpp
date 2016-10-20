@@ -318,7 +318,7 @@ void ClipAndGapifyBases(const BamRecordImpl& impl,
                         string* seq)
 {
     ClipAndGapify<string, char>(impl, aligned, exciseSoftClips,
-                                seq, '*', '-');
+                                seq, char('*'), char('-'));
 }
 
 static inline

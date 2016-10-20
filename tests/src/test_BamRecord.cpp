@@ -172,6 +172,73 @@ BamRecord MakeCigaredQualRecord(const string& quals,
     return BamRecord(std::move(impl));
 }
 
+static
+BamRecord MakeCigaredPulseBaseRecord(const string& seqBases,
+                                     const string& pulseCalls,
+                                     const string& pulseBases,
+                                     const string& cigar,
+                                     const Strand strand)
+{
+    TagCollection tags;
+    tags["pc"] = pulseCalls; // PulseCall
+    tags["pt"] = pulseBases; // AltLabelTag
+
+    BamRecordImpl impl = MakeCigaredImpl(seqBases, cigar, strand);
+    impl.Tags(tags);
+    return BamRecord(std::move(impl));
+}
+
+static
+BamRecord MakeCigaredPulseQualRecord(const string& seqBases,
+                                     const string& pulseCalls,
+                                     const string& pulseQuals,
+                                     const string& cigar,
+                                     const Strand strand)
+{
+    TagCollection tags;
+    tags["pc"] = pulseCalls;
+    tags["pv"] = pulseQuals; // AltLabelQV
+    tags["pq"] = pulseQuals; // LabelQV
+    tags["pg"] = pulseQuals; // PulseMergeQV
+
+    BamRecordImpl impl = MakeCigaredImpl(seqBases, cigar, strand);
+    impl.Tags(tags);
+    return BamRecord(std::move(impl));
+}
+
+static
+BamRecord MakeCigaredPulseFrameRecord(const string& seqBases,
+                                     const string& pulseCalls,
+                                     const vector<uint16_t>& pulseFrames,
+                                     const string& cigar,
+                                     const Strand strand)
+{
+    TagCollection tags;
+    tags["pc"] = pulseCalls;
+    tags["pd"] = pulseFrames; // PrePulseFrames
+    tags["px"] = pulseFrames; // PulseCallWidth
+
+    BamRecordImpl impl = MakeCigaredImpl(seqBases, cigar, strand);
+    impl.Tags(tags);
+    return BamRecord(std::move(impl));
+}
+
+static
+BamRecord MakeCigaredPulseUIntRecord(const string& seqBases,
+                                     const string& pulseCalls,
+                                     const vector<uint32_t>& pulseUInts,
+                                     const string& cigar,
+                                     const Strand strand)
+{
+    TagCollection tags;
+    tags["pc"] = pulseCalls;
+    tags["sf"] = pulseUInts; // StartFrame
+
+    BamRecordImpl impl = MakeCigaredImpl(seqBases, cigar, strand);
+    impl.Tags(tags);
+    return BamRecord(std::move(impl));
+}
+
 // ----------------------------------------------------------
 // helper structs and methods for checking combinations of:
 //   aligned strand, orientation requested, alignment, clipping
@@ -230,6 +297,46 @@ void CheckAlignAndClip(const string& cigar,
         EXPECT_EQ(e.ReverseNativeAligned(),         fetchData(b, Orientation::NATIVE,  true,  false));
         EXPECT_EQ(e.ReverseGenomicAlignedClipped(), fetchData(b, Orientation::GENOMIC, true,  true));
         EXPECT_EQ(e.ReverseNativeAlignedClipped(),  fetchData(b, Orientation::NATIVE,  true,  true));
+    }
+}
+
+template<typename DataType, typename MakeRecordType, typename FetchDataType>
+void CheckPulseDataAlignAndClip(const string& cigar,
+                                const string& seqBases,
+                                const string& pulseCalls,
+                                const DataType& input,
+                                const tests::ExpectedResult<DataType>& allPulses,
+                                const tests::ExpectedResult<DataType>& basecallsOnly,
+                                const MakeRecordType& makeRecord,
+                                const FetchDataType& fetchData)
+{
+    {   // map to forward strand
+        const BamRecord b = makeRecord(seqBases, pulseCalls, input, cigar, Strand::FORWARD);
+
+        EXPECT_EQ(allPulses.ForwardGenomic(),               fetchData(b, Orientation::GENOMIC, false, false, PulseBehavior::ALL));
+        EXPECT_EQ(allPulses.ForwardNative(),                fetchData(b, Orientation::NATIVE,  false, false, PulseBehavior::ALL));
+        // no align/clipping operations available on ALL pulses
+
+        EXPECT_EQ(basecallsOnly.ForwardGenomic(),               fetchData(b, Orientation::GENOMIC, false, false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ForwardNative(),                fetchData(b, Orientation::NATIVE,  false, false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ForwardGenomicAligned(),        fetchData(b, Orientation::GENOMIC, true,  false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ForwardNativeAligned(),         fetchData(b, Orientation::NATIVE,  true,  false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ForwardGenomicAlignedClipped(), fetchData(b, Orientation::GENOMIC, true,  true,  PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ForwardNativeAlignedClipped(),  fetchData(b, Orientation::NATIVE,  true,  true,  PulseBehavior::BASECALLS_ONLY));
+    }
+    {   // map to reverse strand
+        const BamRecord b = makeRecord(seqBases, pulseCalls, input, cigar, Strand::REVERSE);
+
+        EXPECT_EQ(allPulses.ReverseGenomic(),               fetchData(b, Orientation::GENOMIC, false, false, PulseBehavior::ALL));
+        EXPECT_EQ(allPulses.ReverseNative(),                fetchData(b, Orientation::NATIVE,  false, false, PulseBehavior::ALL));
+        // no align/clipping operations available on ALL pulses
+
+        EXPECT_EQ(basecallsOnly.ReverseGenomic(),               fetchData(b, Orientation::GENOMIC, false, false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ReverseNative(),                fetchData(b, Orientation::NATIVE,  false, false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ReverseGenomicAligned(),        fetchData(b, Orientation::GENOMIC, true,  false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ReverseNativeAligned(),         fetchData(b, Orientation::NATIVE,  true,  false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ReverseGenomicAlignedClipped(), fetchData(b, Orientation::GENOMIC, true,  true,  PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ReverseNativeAlignedClipped(),  fetchData(b, Orientation::NATIVE,  true,  true,  PulseBehavior::BASECALLS_ONLY));
     }
 }
 
@@ -388,6 +495,160 @@ void CheckSequenceClippedAndAligned(const string& cigar,
                       { return b.Sequence(orientation, aligned, exciseSoftClips); }
     );
 }
+
+static
+void CheckPulseBaseTags(const string& cigar,
+                        const string& seqBases,
+                        const string& pulseCalls,
+                        const string& pulseBases,
+                        const ExpectedResult<string>& allPulses,
+                        const ExpectedResult<string>& basecallsOnly)
+{
+    // aligned record + AltLabelTag
+    auto makeRecord = [](const string& seqBases,
+                         const string& pulseCalls,
+                         const string& pulseBases,
+                         const string& cigar,
+                         const Strand strand)
+    { return MakeCigaredPulseBaseRecord(seqBases, pulseCalls, pulseBases, cigar, strand); };
+
+    // AltLabelTag
+    CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseBases, allPulses, basecallsOnly, makeRecord,
+                              [](const BamRecord& b,
+                                 Orientation orientation,
+                                 bool aligned,
+                                 bool exciseSoftClips,
+                                 PulseBehavior pulseBehavior)
+                              { return b.AltLabelTag(orientation, aligned, exciseSoftClips, pulseBehavior); }
+    );
+    // PulseCall
+    CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseBases, allPulses, basecallsOnly, makeRecord,
+                              [](const BamRecord& b,
+                                 Orientation orientation,
+                                 bool aligned,
+                                 bool exciseSoftClips,
+                                 PulseBehavior pulseBehavior)
+                              { return b.PulseCall(orientation, aligned, exciseSoftClips, pulseBehavior); }
+    );
+}
+
+static
+void CheckPulseFrameTags(const string& cigar,
+                         const string& seqBases,
+                         const string& pulseCalls,
+                         const vector<uint16_t>& pulseFrames,
+                         const ExpectedResult<vector<uint16_t>>& allPulses,
+                         const ExpectedResult<vector<uint16_t>>& basecallsOnly)
+{
+    // aligned record + PrePulseFrames
+    auto makeRecord = [](const string& seqBases,
+                         const string& pulseCalls,
+                         const vector<uint16_t>& pulseFrames,
+                         const string& cigar,
+                         const Strand strand)
+    { return MakeCigaredPulseFrameRecord(seqBases, pulseCalls, pulseFrames, cigar, strand); };
+
+    // PrePulseFrame
+    CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseFrames, allPulses, basecallsOnly, makeRecord,
+                              [](const BamRecord& b,
+                                 Orientation orientation,
+                                 bool aligned,
+                                 bool exciseSoftClips,
+                                 PulseBehavior pulseBehavior)
+                              { return b.PrePulseFrames(orientation, aligned, exciseSoftClips, pulseBehavior).Data(); }
+    );
+    // PulseCallWidth
+    CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseFrames, allPulses, basecallsOnly, makeRecord,
+                              [](const BamRecord& b,
+                                 Orientation orientation,
+                                 bool aligned,
+                                 bool exciseSoftClips,
+                                 PulseBehavior pulseBehavior)
+                              { return b.PulseCallWidth(orientation, aligned, exciseSoftClips, pulseBehavior).Data(); }
+    );
+}
+
+/*
+
+    { BamRecordTag::PKMEAN,            {"pa", true}  },   photons (vector<float>
+    { BamRecordTag::PKMEAN_2,          {"ps", true}  },   photons
+    { BamRecordTag::PKMID,             {"pm", true}  },   photons
+    { BamRecordTag::PKMID_2,           {"pi", true}  },   photons
+*/
+
+static
+void CheckPulseQualityTags(const string& cigar,
+                           const string& seqBases,
+                           const string& pulseCalls,
+                           const string& pulseQuals,
+                           const ExpectedResult<string>& allPulses,
+                           const ExpectedResult<string>& basecallsOnly)
+{
+    // aligned record + AltLabelQV
+    auto makeRecord = [](const string& seqBases,
+                         const string& pulseCalls,
+                         const string& pulseQuals,
+                         const string& cigar,
+                         const Strand strand)
+    { return MakeCigaredPulseQualRecord(seqBases, pulseCalls, pulseQuals, cigar, strand); };
+
+    // AltLabelQV
+    CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseQuals, allPulses, basecallsOnly, makeRecord,
+                              [](const BamRecord& b,
+                                 Orientation orientation,
+                                 bool aligned,
+                                 bool exciseSoftClips,
+                                 PulseBehavior pulseBehavior)
+                              { return b.AltLabelQV(orientation, aligned, exciseSoftClips, pulseBehavior).Fastq(); }
+    );
+    // LabelQV
+    CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseQuals, allPulses, basecallsOnly, makeRecord,
+                              [](const BamRecord& b,
+                                 Orientation orientation,
+                                 bool aligned,
+                                 bool exciseSoftClips,
+                                 PulseBehavior pulseBehavior)
+                              { return b.LabelQV(orientation, aligned, exciseSoftClips, pulseBehavior).Fastq(); }
+    );
+    // PulseMergeQV
+    CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseQuals, allPulses, basecallsOnly, makeRecord,
+                              [](const BamRecord& b,
+                                 Orientation orientation,
+                                 bool aligned,
+                                 bool exciseSoftClips,
+                                 PulseBehavior pulseBehavior)
+                              { return b.PulseMergeQV(orientation, aligned, exciseSoftClips, pulseBehavior).Fastq(); }
+    );
+}
+
+static
+void CheckPulseUIntTags(const string& cigar,
+                        const string& seqBases,
+                        const string& pulseCalls,
+                        const vector<uint32_t>& startFrames,
+                        const ExpectedResult<vector<uint32_t>>& allPulses,
+                        const ExpectedResult<vector<uint32_t>>& basecallsOnly)
+{
+   // aligned record + StartFrame
+   auto makeRecord = [](const string& seqBases,
+                        const string& pulseCalls,
+                        const vector<uint32_t>& startFrames,
+                        const string& cigar,
+                        const Strand strand)
+   { return MakeCigaredPulseUIntRecord(seqBases, pulseCalls, startFrames, cigar, strand); };
+
+   // StartFrame
+   CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, startFrames, allPulses, basecallsOnly, makeRecord,
+                             [](const BamRecord& b,
+                                Orientation orientation,
+                                bool aligned,
+                                bool exciseSoftClips,
+                                PulseBehavior pulseBehavior)
+                             { return b.StartFrame(orientation, aligned, exciseSoftClips, pulseBehavior); }
+   );
+}
+
+
 
 } // namespace tests
 
@@ -1459,6 +1720,976 @@ TEST(BamRecordTest, FrameTagsClippedAndAligned)
             "2H3S4=3D4=3S3H",                                                           // CIGAR
             { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },                 // input
             {
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // forward strand, genomic
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // forward strand, native
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // forward strand, genomic, aligned
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },                            // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },                            // forward strand, native, aligned, clipped
+                { 50, 50, 50, 30, 10, 20, 10, 20, 10, 20, 10, 40, 40, 40 },             // reverse strand, genomic
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // reverse strand, native
+                { 50, 50, 50, 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10, 40, 40, 40 },    // reverse strand, genomic, aligned
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },                            // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 }                             // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+}
+
+TEST(BamRecordTest, PulseBaseTags)
+{
+    {
+        SCOPED_TRACE("CIGAR: 4=3D4=");
+        tests::CheckPulseBaseTags(
+            "4=3D4=",           // CIGAR
+            "AACCGTTA",         // seqBases
+            "AAaaCCGggTTA",     // pulseCalls
+            "AAaaCCGggTTA",     // tag data
+
+            {   // all pulses
+
+                "AAaaCCGggTTA",     // forward strand, genomic
+                "AAaaCCGggTTA",     // forward strand, native
+                "",  // forward strand, genomic, aligned
+                "",  // forward strand, native, aligned
+                "",  // forward strand, genomic, aligned, clipped
+                "",  // forward strand, native, aligned, clipped
+                "TAAccCGGttTT",     // reverse strand, genomic
+                "AAaaCCGggTTA",     // reverse strand, native
+                "",  // reverse strand, genomic, aligned
+                "",  // reverse strand, native, aligned
+                "",  // reverse strand, genomic, aligned, clipped
+                ""   // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                "AACCGTTA",     // forward strand, genomic
+                "AACCGTTA",     // forward strand, native
+                "AACC---GTTA",  // forward strand, genomic, aligned
+                "AACC---GTTA",  // forward strand, native, aligned
+                "AACC---GTTA",  // forward strand, genomic, aligned, clipped
+                "AACC---GTTA",  // forward strand, native, aligned, clipped
+                "TAACGGTT",     // reverse strand, genomic
+                "AACCGTTA",     // reverse strand, native
+                "TAAC---GGTT",  // reverse strand, genomic, aligned
+                "AACC---GTTA",  // reverse strand, native, aligned
+                "TAAC---GGTT",  // reverse strand, genomic, aligned, clipped
+                "AACC---GTTA"   // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
+        tests::CheckPulseBaseTags(
+            "4=1D2I2D4=",       // CIGAR
+            "ATCCTAGGTT",       // seqBases
+            "ATttCCTtAGGggTT",  // pulseCalls
+            "ATttCCTtAGGggTT",  // tag data
+
+            {   // all pulses
+
+                "ATttCCTtAGGggTT",       // forward strand, genomic
+                "ATttCCTtAGGggTT",       // forward strand, native
+                "",    // forward strand, genomic, aligned
+                "",    // forward strand, native, aligned
+                "",    // forward strand, genomic, aligned, clipped
+                "",    // forward strand, native, aligned, clipped
+                "AAccCCTaAGGaaAT",       // reverse strand, genomic
+                "ATttCCTtAGGggTT",       // reverse strand, native
+                "",    // reverse strand, genomic, aligned
+                "",    // reverse strand, native, aligned
+                "",    // reverse strand, genomic, aligned, clipped
+                ""     // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                "ATCCTAGGTT",       // forward strand, genomic
+                "ATCCTAGGTT",       // forward strand, native
+                "ATCC-TA--GGTT",    // forward strand, genomic, aligned
+                "ATCC-TA--GGTT",    // forward strand, native, aligned
+                "ATCC-TA--GGTT",    // forward strand, genomic, aligned, clipped
+                "ATCC-TA--GGTT",    // forward strand, native, aligned, clipped
+                "AACCTAGGAT",       // reverse strand, genomic
+                "ATCCTAGGTT",       // reverse strand, native
+                "AACC-TA--GGAT",    // reverse strand, genomic, aligned
+                "ATCC--TA-GGTT",    // reverse strand, native, aligned
+                "AACC-TA--GGAT",    // reverse strand, genomic, aligned, clipped
+                "ATCC--TA-GGTT"     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
+        tests::CheckPulseBaseTags(
+            "4=1D2P2I2P2D4=",   // CIGAR
+            "ATCCTAGGTT",       // seqBases
+            "ATttCCTtAGGggTT",  // pulseCalls
+            "ATttCCTtAGGggTT",  // tag data
+            {
+                "ATttCCTtAGGggTT",           // forward strand, genomic
+                "ATttCCTtAGGggTT",           // forward strand, native
+                "",    // forward strand, genomic, aligned
+                "",    // forward strand, native, aligned
+                "",    // forward strand, genomic, aligned, clipped
+                "",    // forward strand, native, aligned, clipped
+                "AAccCCTaAGGaaAT",           // reverse strand, genomic
+                "ATttCCTtAGGggTT",           // reverse strand, native
+                "",    // reverse strand, genomic, aligned
+                "",    // reverse strand, native, aligned
+                "",    // reverse strand, genomic, aligned, clipped
+                ""     // reverse strand, native, aligned, clipped
+            },
+            {
+                "ATCCTAGGTT",           // forward strand, genomic
+                "ATCCTAGGTT",           // forward strand, native
+                "ATCC-**TA**--GGTT",    // forward strand, genomic, aligned
+                "ATCC-**TA**--GGTT",    // forward strand, native, aligned
+                "ATCC-**TA**--GGTT",    // forward strand, genomic, aligned, clipped
+                "ATCC-**TA**--GGTT",    // forward strand, native, aligned, clipped
+                "AACCTAGGAT",           // reverse strand, genomic
+                "ATCCTAGGTT",           // reverse strand, native
+                "AACC-**TA**--GGAT",    // reverse strand, genomic, aligned
+                "ATCC--**TA**-GGTT",    // reverse strand, native, aligned
+                "AACC-**TA**--GGAT",    // reverse strand, genomic, aligned, clipped
+                "ATCC--**TA**-GGTT"     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 3S4=3D4=3S");
+        tests::CheckPulseBaseTags(
+            "3S4=3D4=3S",               // CIGAR
+            "TTTAACCGTTACCG",           // seqBases
+            "TTTttAACCccGTTAaaCCG",     // pulseCalls
+            "TTTttAACCccGTTAaaCCG",     // tag data
+
+            {   // all pulses
+
+                "TTTttAACCccGTTAaaCCG",       // forward strand, genomic
+                "TTTttAACCccGTTAaaCCG",       // forward strand, native
+                "",         // forward strand, genomic, aligned
+                "",         // forward strand, native, aligned
+                "",          // forward strand, genomic, aligned, clipped
+                "",          // forward strand, native, aligned, clipped
+                "CGGttTAACggGGTTaaAAA",       // reverse strand, genomic
+                "TTTttAACCccGTTAaaCCG",       // reverse strand, native
+                "",    // reverse strand, genomic, aligned
+                "",    // reverse strand, native, aligned
+                "",     // reverse strand, genomic, aligned, clipped
+                ""           // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                "TTTAACCGTTACCG",       // forward strand, genomic
+                "TTTAACCGTTACCG",       // forward strand, native
+                "TTTAACC---GTTACCG",    // forward strand, genomic, aligned
+                "TTTAACC---GTTACCG",    // forward strand, native, aligned
+                "AACC---GTTA",          // forward strand, genomic, aligned, clipped
+                "AACC---GTTA",          // forward strand, native, aligned, clipped
+                "CGGTAACGGTTAAA",       // reverse strand, genomic
+                "TTTAACCGTTACCG",       // reverse strand, native
+                "CGGTAAC---GGTTAAA",    // reverse strand, genomic, aligned
+                "TTTAACC---GTTACCG",    // reverse strand, native, aligned
+                "TAAC---GGTT",          // reverse strand, genomic, aligned, clipped
+                "AACC---GTTA"           // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
+        tests::CheckPulseBaseTags(
+            "2H4=3D4=3H",       // CIGAR
+            "AACCGTTA",         // seqBases
+            "AAaaCCGggTTA",     // pulseCalls
+            "AAaaCCGggTTA",     // tag data
+
+            {   // all pulses
+
+                "AAaaCCGggTTA",     // forward strand, genomic
+                "AAaaCCGggTTA",     // forward strand, native
+                "",  // forward strand, genomic, aligned
+                "",  // forward strand, native, aligned
+                "",  // forward strand, genomic, aligned, clipped
+                "",  // forward strand, native, aligned, clipped
+                "TAAccCGGttTT",     // reverse strand, genomic
+                "AAaaCCGggTTA",     // reverse strand, native
+                "",  // reverse strand, genomic, aligned
+                "",  // reverse strand, native, aligned
+                "",  // reverse strand, genomic, aligned, clipped
+                ""   // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                "AACCGTTA",     // forward strand, genomic
+                "AACCGTTA",     // forward strand, native
+                "AACC---GTTA",  // forward strand, genomic, aligned
+                "AACC---GTTA",  // forward strand, native, aligned
+                "AACC---GTTA",  // forward strand, genomic, aligned, clipped
+                "AACC---GTTA",  // forward strand, native, aligned, clipped
+                "TAACGGTT",     // reverse strand, genomic
+                "AACCGTTA",     // reverse strand, native
+                "TAAC---GGTT",  // reverse strand, genomic, aligned
+                "AACC---GTTA",  // reverse strand, native, aligned
+                "TAAC---GGTT",  // reverse strand, genomic, aligned, clipped
+                "AACC---GTTA"   // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H3S4=3D4=3S3H");
+        tests::CheckPulseBaseTags(
+            "2H3S4=3D4=3S3H",           // CIGAR
+            "TTTAACCGTTACCG",           // seqBases
+            "TTTttAACCccGTTAaaCCG",     // pulseCalls
+            "TTTttAACCccGTTAaaCCG",     // tag data
+
+            {   // all pulses
+
+                "TTTttAACCccGTTAaaCCG",       // forward strand, genomic
+                "TTTttAACCccGTTAaaCCG",       // forward strand, native
+                "",         // forward strand, genomic, aligned
+                "",         // forward strand, native, aligned
+                "",          // forward strand, genomic, aligned, clipped
+                "",          // forward strand, native, aligned, clipped
+                "CGGttTAACggGGTTaaAAA",       // reverse strand, genomic
+                "TTTttAACCccGTTAaaCCG",       // reverse strand, native
+                "",         // reverse strand, genomic, aligned
+                "",         // reverse strand, native, aligned
+                "",          // reverse strand, genomic, aligned, clipped
+                ""           // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                "TTTAACCGTTACCG",       // forward strand, genomic
+                "TTTAACCGTTACCG",       // forward strand, native
+                "TTTAACC---GTTACCG",    // forward strand, genomic, aligned
+                "TTTAACC---GTTACCG",    // forward strand, native, aligned
+                "AACC---GTTA",          // forward strand, genomic, aligned, clipped
+                "AACC---GTTA",          // forward strand, native, aligned, clipped
+                "CGGTAACGGTTAAA",       // reverse strand, genomic
+                "TTTAACCGTTACCG",       // reverse strand, native
+                "CGGTAAC---GGTTAAA",    // reverse strand, genomic, aligned
+                "TTTAACC---GTTACCG",    // reverse strand, native, aligned
+                "TAAC---GGTT",          // reverse strand, genomic, aligned, clipped
+                "AACC---GTTA"           // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+}
+
+TEST(BamRecordTest, PulseQualityTags)
+{
+    {
+        SCOPED_TRACE("CIGAR: 4=3D4=");
+        tests::CheckPulseQualityTags(
+            "4=3D4=",           // CIGAR
+            "AACCGTTA",         // seqBases
+            "AAaaCCGggTTA",     // pulseCalls
+            "?]!!?]?!!]?@",     // tag data
+
+            {   // all pulses
+
+                "?]!!?]?!!]?@",     // forward strand, genomic
+                "?]!!?]?!!]?@",     // forward strand, native
+                "",  // forward strand, genomic, aligned
+                "",  // forward strand, native,  aligned
+                "",  // forward strand, genomic, aligned + clipped
+                "",  // forward strand, native,  aligned + clipped
+                "@?]!!?]?!!]?",     // reverse strand, genomic
+                "?]!!?]?!!]?@",     // reverse strand, native
+                "",  // reverse strand, genomic, aligned
+                "",  // reverse strand, native,  aligned
+                "",  // reverse strand, genomic, aligned + clipped
+                ""   // reverse strand, native,  aligned + clipped
+            },
+            {   // basecalls only
+
+                "?]?]?]?@",     // forward strand, genomic
+                "?]?]?]?@",     // forward strand, native
+                "?]?]!!!?]?@",  // forward strand, genomic, aligned
+                "?]?]!!!?]?@",  // forward strand, native,  aligned
+                "?]?]!!!?]?@",  // forward strand, genomic, aligned + clipped
+                "?]?]!!!?]?@",  // forward strand, native,  aligned + clipped
+                "@?]?]?]?",     // reverse strand, genomic
+                "?]?]?]?@",     // reverse strand, native
+                "@?]?!!!]?]?",  // reverse strand, genomic, aligned
+                "?]?]!!!?]?@",  // reverse strand, native,  aligned
+                "@?]?!!!]?]?",  // reverse strand, genomic, aligned + clipped
+                "?]?]!!!?]?@"   // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
+        tests::CheckPulseQualityTags(
+            "4=1D2I2D4=",       // CIGAR
+            "ATCCTAGGTT",       // seqBases
+            "ATttCCTtAGGggTT",  // pulseCalls
+            "?]!!?]8!7?]!!?@",  // tag data
+
+            {   // all pulses
+
+                "?]!!?]8!7?]!!?@",       // forward strand, genomic
+                "?]!!?]8!7?]!!?@",       // forward strand, native
+                "",    // forward strand, genomic, aligned
+                "",    // forward strand, native,  aligned
+                "",    // forward strand, genomic, aligned + clipped
+                "",    // forward strand, native,  aligned + clipped
+                "@?!!]?7!8]?!!]?",       // reverse strand, genomic
+                "?]!!?]8!7?]!!?@",       // reverse strand, native
+                "",    // reverse strand, genomic, aligned
+                "",    // reverse strand, native,  aligned
+                "",    // reverse strand, genomic, aligned + clipped
+                ""     // reverse strand, native,  aligned + clipped
+            },
+            {   // basecalls only
+
+                "?]?]87?]?@",       // forward strand, genomic
+                "?]?]87?]?@",       // forward strand, native
+                "?]?]!87!!?]?@",    // forward strand, genomic, aligned
+                "?]?]!87!!?]?@",    // forward strand, native,  aligned
+                "?]?]!87!!?]?@",    // forward strand, genomic, aligned + clipped
+                "?]?]!87!!?]?@",    // forward strand, native,  aligned + clipped
+                "@?]?78]?]?",       // reverse strand, genomic
+                "?]?]87?]?@",       // reverse strand, native
+                "@?]?!78!!]?]?",    // reverse strand, genomic, aligned
+                "?]?]!!87!?]?@",    // reverse strand, native,  aligned
+                "@?]?!78!!]?]?",    // reverse strand, genomic, aligned + clipped
+                "?]?]!!87!?]?@"     // reverse strand, native,  aligned + clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
+        tests::CheckPulseQualityTags(
+            "4=1D2P2I2P2D4=",   // CIGAR
+            "ATCCTAGGTT",       // seqBases
+            "ATttCCTtAGGggTT",  // pulseCalls
+            "?]!!?]8!7?]!!?@",  // tag data
+        {
+            "?]!!?]8!7?]!!?@",           // forward strand, genomic
+            "?]!!?]8!7?]!!?@",           // forward strand, native
+            "",    // forward strand, genomic, aligned
+            "",    // forward strand, native,  aligned
+            "",    // forward strand, genomic, aligned + clipped
+            "",    // forward strand, native,  aligned + clipped
+            "@?!!]?7!8]?!!]?",           // reverse strand, genomic
+            "?]!!?]8!7?]!!?@",           // reverse strand, native
+            "",    // reverse strand, genomic, aligned
+            "",    // reverse strand, native,  aligned
+            "",    // reverse strand, genomic, aligned + clipped
+            ""     // reverse strand, native,  aligned + clipped
+        },
+        {
+            "?]?]87?]?@",           // forward strand, genomic
+            "?]?]87?]?@",           // forward strand, native
+            "?]?]!!!87!!!!?]?@",    // forward strand, genomic, aligned
+            "?]?]!!!87!!!!?]?@",    // forward strand, native,  aligned
+            "?]?]!!!87!!!!?]?@",    // forward strand, genomic, aligned + clipped
+            "?]?]!!!87!!!!?]?@",    // forward strand, native,  aligned + clipped
+            "@?]?78]?]?",           // reverse strand, genomic
+            "?]?]87?]?@",           // reverse strand, native
+            "@?]?!!!78!!!!]?]?",    // reverse strand, genomic, aligned
+            "?]?]!!!!87!!!?]?@",    // reverse strand, native,  aligned
+            "@?]?!!!78!!!!]?]?",    // reverse strand, genomic, aligned + clipped
+            "?]?]!!!!87!!!?]?@"     // reverse strand, native,  aligned + clipped
+        }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 3S4=3D4=3S");
+        tests::CheckPulseQualityTags(
+            "3S4=3D4=3S",               // CIGAR
+            "TTTAACCGTTACCG",           // seqBases
+            "TTTttAACCccGTTAaaCCG",     // pulseCalls
+            "vvv!!?]?]!!?]?@!!xxx",     // tag data
+
+            {   // all pulses
+
+                "vvv!!?]?]!!?]?@!!xxx",       // forward strand, genomic
+                "vvv!!?]?]!!?]?@!!xxx",       // forward strand, native
+                "",    // forward strand, genomic, aligned
+                "",    // forward strand, native, aligned
+                "",          // forward strand, genomic, aligned, clipped
+                "",          // forward strand, native, aligned, clipped
+                "xxx!!@?]?!!]?]?!!vvv",       // reverse strand, genomic
+                "vvv!!?]?]!!?]?@!!xxx",       // reverse strand, native
+                "",    // reverse strand, genomic, aligned
+                "",    // reverse strand, native, aligned
+                "",          // reverse strand, genomic, aligned, clipped
+                ""           // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                "vvv?]?]?]?@xxx",       // forward strand, genomic
+                "vvv?]?]?]?@xxx",       // forward strand, native
+                "vvv?]?]!!!?]?@xxx",    // forward strand, genomic, aligned
+                "vvv?]?]!!!?]?@xxx",    // forward strand, native, aligned
+                "?]?]!!!?]?@",          // forward strand, genomic, aligned, clipped
+                "?]?]!!!?]?@",          // forward strand, native, aligned, clipped
+                "xxx@?]?]?]?vvv",       // reverse strand, genomic
+                "vvv?]?]?]?@xxx",       // reverse strand, native
+                "xxx@?]?!!!]?]?vvv",    // reverse strand, genomic, aligned
+                "vvv?]?]!!!?]?@xxx",    // reverse strand, native, aligned
+                "@?]?!!!]?]?",          // reverse strand, genomic, aligned, clipped
+                "?]?]!!!?]?@"           // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
+        tests::CheckPulseQualityTags(
+            "2H4=3D4=3H",       // CIGAR
+            "AACCGTTA",         // seqBases
+            "AAaaCCGggTTA",     // pulseCalls
+            "?]!!?]?!!]?@",     // tag data
+
+            {   // all pulses
+
+                "?]!!?]?!!]?@",     // forward strand, genomic
+                "?]!!?]?!!]?@",     // forward strand, native
+                "",  // forward strand, genomic, aligned
+                "",  // forward strand, native, aligned
+                "",  // forward strand, genomic, aligned, clipped
+                "",  // forward strand, native, aligned, clipped
+                "@?]!!?]?!!]?",     // reverse strand, genomic
+                "?]!!?]?!!]?@",     // reverse strand, native
+                "",  // reverse strand, genomic, aligned
+                "",  // reverse strand, native, aligned
+                "",  // reverse strand, genomic, aligned, clipped
+                ""   // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                "?]?]?]?@",     // forward strand, genomic
+                "?]?]?]?@",     // forward strand, native
+                "?]?]!!!?]?@",  // forward strand, genomic, aligned
+                "?]?]!!!?]?@",  // forward strand, native, aligned
+                "?]?]!!!?]?@",  // forward strand, genomic, aligned, clipped
+                "?]?]!!!?]?@",  // forward strand, native, aligned, clipped
+                "@?]?]?]?",     // reverse strand, genomic
+                "?]?]?]?@",     // reverse strand, native
+                "@?]?!!!]?]?",  // reverse strand, genomic, aligned
+                "?]?]!!!?]?@",  // reverse strand, native, aligned
+                "@?]?!!!]?]?",  // reverse strand, genomic, aligned, clipped
+                "?]?]!!!?]?@"   // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H3S4=3D4=3S3H");
+        tests::CheckPulseQualityTags(
+            "2H3S4=3D4=3S3H",           // CIGAR
+            "TTTAACCGTTACCG",           // seqBases
+            "TTTttAACCccGTTAaaCCG",     // pulseCalls
+            "vvv!!?]?]!!?]?@!!xxx",     // tag data
+
+            {   // all pulses
+
+                "vvv!!?]?]!!?]?@!!xxx",       // forward strand, genomic
+                "vvv!!?]?]!!?]?@!!xxx",       // forward strand, native
+                "",    // forward strand, genomic, aligned
+                "",    // forward strand, native, aligned
+                "",          // forward strand, genomic, aligned, clipped
+                "",          // forward strand, native, aligned, clipped
+                "xxx!!@?]?!!]?]?!!vvv",       // reverse strand, genomic
+                "vvv!!?]?]!!?]?@!!xxx",       // reverse strand, native
+                "",    // reverse strand, genomic, aligned
+                "",    // reverse strand, native, aligned
+                "",          // reverse strand, genomic, aligned, clipped
+                ""           // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                "vvv?]?]?]?@xxx",       // forward strand, genomic
+                "vvv?]?]?]?@xxx",       // forward strand, native
+                "vvv?]?]!!!?]?@xxx",    // forward strand, genomic, aligned
+                "vvv?]?]!!!?]?@xxx",    // forward strand, native, aligned
+                "?]?]!!!?]?@",          // forward strand, genomic, aligned, clipped
+                "?]?]!!!?]?@",          // forward strand, native, aligned, clipped
+                "xxx@?]?]?]?vvv",       // reverse strand, genomic
+                "vvv?]?]?]?@xxx",       // reverse strand, native
+                "xxx@?]?!!!]?]?vvv",    // reverse strand, genomic, aligned
+                "vvv?]?]!!!?]?@xxx",    // reverse strand, native, aligned
+                "@?]?!!!]?]?",          // reverse strand, genomic, aligned, clipped
+                "?]?]!!!?]?@"           // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+}
+
+TEST(BamRecordTest, PulseFrameTags)
+{
+    {
+        SCOPED_TRACE("CIGAR: 4=3D4=");
+        tests::CheckPulseFrameTags(
+            "4=3D4=",       // CIGAR
+            "AACCGTTA",     // seqBases
+            "AAaaCCGggTTA", // pulseCalls
+            { 10, 20, 0,0, 10, 20, 10, 0,0, 20, 10, 30 },   // tag data
+
+            {   // all pulses
+
+                { 10, 20, 0,0, 10, 20, 10, 0,0, 20, 10, 30 },             // forward strand, genomic
+                { 10, 20, 0,0, 10, 20, 10, 0,0, 20, 10, 30 },             // forward strand, native
+                { },    // forward strand, genomic, aligned
+                { },    // forward strand, native, aligned
+                { },    // forward strand, genomic, aligned, clipped
+                { },    // forward strand, native, aligned, clipped
+                { 30, 10, 20, 0,0, 10, 20, 10, 0,0, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 0,0, 10, 20, 10, 0,0, 20, 10, 30 },             // reverse strand, native
+                { },    // reverse strand, genomic, aligned
+                { },    // reverse strand, native, aligned
+                { },    // reverse strand, genomic, aligned, clipped
+                { }     // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // forward strand, genomic
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // forward strand, native
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned, clipped
+                { 30, 10, 20, 10, 20, 10, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // reverse strand, native
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 }     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
+        tests::CheckPulseFrameTags(
+            "4=1D2I2D4=",       // CIGAR
+            "ATCCTAGGTT",       // seqBases
+            "ATttCCTtAGGggTT",  // pulseCalls
+            { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 }, // tag data
+
+            {   // all pulses
+
+                { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 },             // forward strand, genomic
+                { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 },             // forward strand, native
+                { },    // forward strand, genomic, aligned
+                { },    // forward strand, native, aligned
+                { },    // forward strand, genomic, aligned, clipped
+                { },    // forward strand, native, aligned, clipped
+                { 30, 10, 0, 0, 20, 10, 70, 0, 80, 20, 10, 0, 0, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 },             // reverse strand, native
+                { },    // reverse strand, genomic, aligned
+                { },    // reverse strand, native, aligned
+                { },    // reverse strand, genomic, aligned, clipped
+                { }     // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },             // forward strand, genomic
+                { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },             // forward strand, native
+                { 10, 20, 10, 20, 0, 80, 70, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 80, 70, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 80, 70, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 80, 70, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned, clipped
+                { 30, 10, 20, 10, 70, 80, 20, 10, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },             // reverse strand, native
+                { 30, 10, 20, 10, 0, 70, 80, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 80, 70, 0, 10, 20, 10, 30 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 70, 80, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 80, 70, 0, 10, 20, 10, 30 }     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
+        tests::CheckPulseFrameTags(
+            "4=1D2P2I2P2D4=",   // CIGAR
+            "ATCCTAGGTT",       // seqBases
+            "ATttCCTtAGGggTT",  // pulseCalls
+            { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 }, // tag data
+
+            {   // all pulses
+
+                { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 },             // forward strand, genomic
+                { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 },             // forward strand, native
+                { },    // forward strand, genomic, aligned
+                { },    // forward strand, native, aligned
+                { },    // forward strand, genomic, aligned, clipped
+                { },    // forward strand, native, aligned, clipped
+                { 30, 10, 0, 0, 20, 10, 70, 0, 80, 20, 10, 0, 0, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 },             // reverse strand, native
+                { },    // reverse strand, genomic, aligned
+                { },    // reverse strand, native, aligned
+                { },    // reverse strand, genomic, aligned, clipped
+                { }     // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },                         // forward strand, genomic
+                { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },                         // forward strand, native
+                { 10, 20, 10, 20, 0, 0, 0, 80, 70, 0, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 80, 70, 0, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 80, 70, 0, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 80, 70, 0, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned, clipped
+                { 30, 10, 20, 10, 70, 80, 20, 10, 20, 10 },                         // reverse strand, genomic
+                { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },                         // reverse strand, native
+                { 30, 10, 20, 10, 0, 0, 0, 70, 80, 0, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 0, 80, 70, 0, 0, 0, 10, 20, 10, 30 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 0, 0, 70, 80, 0, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 0, 80, 70, 0, 0, 0, 10, 20, 10, 30 }     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 3S4=3D4=3S");
+        tests::CheckPulseFrameTags(
+            "3S4=3D4=3S",               // CIGAR
+            "TTTAACCGTTACCG",           // seqBases
+            "TTTttAACCccGTTAaaCCG",     // pulseCalls
+            { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },   // tag data
+
+            {   // all pulses
+
+                { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },             // forward strand, genomic
+                { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },             // forward strand, native
+                { },    // forward strand, genomic, aligned
+                { },    // forward strand, native, aligned
+                { },    // forward strand, genomic, aligned, clipped
+                { },    // forward strand, native, aligned, clipped
+                { 50, 50, 50, 0, 0, 30, 10, 20, 10, 0, 0, 20, 10, 20, 10, 0, 0, 40, 40, 40 },             // reverse strand, genomic
+                { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },             // reverse strand, native
+                { },    // reverse strand, genomic, aligned
+                { },    // reverse strand, native, aligned
+                { },    // reverse strand, genomic, aligned, clipped
+                { }     // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // forward strand, genomic
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // forward strand, native
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // forward strand, genomic, aligned
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },                            // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },                            // forward strand, native, aligned, clipped
+                { 50, 50, 50, 30, 10, 20, 10, 20, 10, 20, 10, 40, 40, 40 },             // reverse strand, genomic
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // reverse strand, native
+                { 50, 50, 50, 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10, 40, 40, 40 },    // reverse strand, genomic, aligned
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },                            // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 }                             // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
+        tests::CheckPulseFrameTags(
+            "2H4=3D4=3H",       // CIGAR
+            "AACCGTTA",         // seqBases
+            "AAaaCCGggTTA",     // pulseCalls
+            { 10, 20, 0, 0, 10, 20, 10, 0, 0, 20, 10, 30 }, // tag data
+
+            {   // all pulses
+
+                { 10, 20, 0, 0, 10, 20, 10, 0, 0, 20, 10, 30 },             // forward strand, genomic
+                { 10, 20, 0, 0, 10, 20, 10, 0, 0, 20, 10, 30 },             // forward strand, native
+                { },    // forward strand, genomic, aligned
+                { },    // forward strand, native, aligned
+                { },    // forward strand, genomic, aligned, clipped
+                { },    // forward strand, native, aligned, clipped
+                { 30, 10, 20, 0, 0, 10, 20, 10, 0, 0, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 0, 0, 10, 20, 10, 0, 0, 20, 10, 30 },             // reverse strand, native
+                { },    // reverse strand, genomic, aligned
+                { },    // reverse strand, native, aligned
+                { },    // reverse strand, genomic, aligned, clipped
+                { }     // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // forward strand, genomic
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // forward strand, native
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned, clipped
+                { 30, 10, 20, 10, 20, 10, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // reverse strand, native
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 }     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H3S4=3D4=3S3H");
+        tests::CheckPulseFrameTags(
+            "2H3S4=3D4=3S3H",           // CIGAR
+            "TTTAACCGTTACCG",           // seqBases
+            "TTTttAACCccGTTAaaCCG",     // pulseCalls
+            { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },                 // tag data
+
+            {   // all pulses
+
+                { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },             // forward strand, genomic
+                { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },             // forward strand, native
+                { },    // forward strand, genomic, aligned
+                { },    // forward strand, native, aligned
+                { },    // forward strand, genomic, aligned, clipped
+                { },    // forward strand, native, aligned, clipped
+                { 50, 50, 50, 0, 0, 30, 10, 20, 10, 0, 0, 20, 10, 20, 10, 0, 0, 40, 40, 40 },             // reverse strand, genomic
+                { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },             // reverse strand, native
+                { },    // reverse strand, genomic, aligned
+                { },    // reverse strand, native, aligned
+                { },    // reverse strand, genomic, aligned, clipped
+                { }     // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // forward strand, genomic
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // forward strand, native
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // forward strand, genomic, aligned
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },                            // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },                            // forward strand, native, aligned, clipped
+                { 50, 50, 50, 30, 10, 20, 10, 20, 10, 20, 10, 40, 40, 40 },             // reverse strand, genomic
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // reverse strand, native
+                { 50, 50, 50, 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10, 40, 40, 40 },    // reverse strand, genomic, aligned
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },                            // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 }                             // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+}
+
+TEST(BamRecordTest, PulseUIntTags)
+{
+    {
+        SCOPED_TRACE("CIGAR: 4=3D4=");
+        tests::CheckPulseUIntTags(
+            "4=3D4=",       // CIGAR
+            "AACCGTTA",     // seqBases
+            "AAaaCCGggTTA", // pulseCalls
+            { 10, 20, 0,0, 10, 20, 10, 0,0, 20, 10, 30 },   // tag data
+
+            {   // all pulses
+
+                { 10, 20, 0,0, 10, 20, 10, 0,0, 20, 10, 30 },             // forward strand, genomic
+                { 10, 20, 0,0, 10, 20, 10, 0,0, 20, 10, 30 },             // forward strand, native
+                { },    // forward strand, genomic, aligned
+                { },    // forward strand, native, aligned
+                { },    // forward strand, genomic, aligned, clipped
+                { },    // forward strand, native, aligned, clipped
+                { 30, 10, 20, 0,0, 10, 20, 10, 0,0, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 0,0, 10, 20, 10, 0,0, 20, 10, 30 },             // reverse strand, native
+                { },    // reverse strand, genomic, aligned
+                { },    // reverse strand, native, aligned
+                { },    // reverse strand, genomic, aligned, clipped
+                { }     // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // forward strand, genomic
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // forward strand, native
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned, clipped
+                { 30, 10, 20, 10, 20, 10, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // reverse strand, native
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 }     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
+        tests::CheckPulseUIntTags(
+            "4=1D2I2D4=",       // CIGAR
+            "ATCCTAGGTT",       // seqBases
+            "ATttCCTtAGGggTT",  // pulseCalls
+            { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 }, // tag data
+
+            {   // all pulses
+
+                { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 },             // forward strand, genomic
+                { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 },             // forward strand, native
+                { },    // forward strand, genomic, aligned
+                { },    // forward strand, native, aligned
+                { },    // forward strand, genomic, aligned, clipped
+                { },    // forward strand, native, aligned, clipped
+                { 30, 10, 0, 0, 20, 10, 70, 0, 80, 20, 10, 0, 0, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 },             // reverse strand, native
+                { },    // reverse strand, genomic, aligned
+                { },    // reverse strand, native, aligned
+                { },    // reverse strand, genomic, aligned, clipped
+                { }     // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },             // forward strand, genomic
+                { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },             // forward strand, native
+                { 10, 20, 10, 20, 0, 80, 70, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 80, 70, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 80, 70, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 80, 70, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned, clipped
+                { 30, 10, 20, 10, 70, 80, 20, 10, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },             // reverse strand, native
+                { 30, 10, 20, 10, 0, 70, 80, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 80, 70, 0, 10, 20, 10, 30 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 70, 80, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 80, 70, 0, 10, 20, 10, 30 }     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
+        tests::CheckPulseUIntTags(
+            "4=1D2P2I2P2D4=",   // CIGAR
+            "ATCCTAGGTT",       // seqBases
+            "ATttCCTtAGGggTT",  // pulseCalls
+            { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 }, // tag data
+
+            {   // all pulses
+
+                { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 },             // forward strand, genomic
+                { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 },             // forward strand, native
+                { },    // forward strand, genomic, aligned
+                { },    // forward strand, native, aligned
+                { },    // forward strand, genomic, aligned, clipped
+                { },    // forward strand, native, aligned, clipped
+                { 30, 10, 0, 0, 20, 10, 70, 0, 80, 20, 10, 0, 0, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 0, 0, 10, 20, 80, 0, 70, 10, 20, 0, 0, 10, 30 },             // reverse strand, native
+                { },    // reverse strand, genomic, aligned
+                { },    // reverse strand, native, aligned
+                { },    // reverse strand, genomic, aligned, clipped
+                { }     // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },                         // forward strand, genomic
+                { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },                         // forward strand, native
+                { 10, 20, 10, 20, 0, 0, 0, 80, 70, 0, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 80, 70, 0, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 80, 70, 0, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 80, 70, 0, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned, clipped
+                { 30, 10, 20, 10, 70, 80, 20, 10, 20, 10 },                         // reverse strand, genomic
+                { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },                         // reverse strand, native
+                { 30, 10, 20, 10, 0, 0, 0, 70, 80, 0, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 0, 80, 70, 0, 0, 0, 10, 20, 10, 30 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 0, 0, 70, 80, 0, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 0, 80, 70, 0, 0, 0, 10, 20, 10, 30 }     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 3S4=3D4=3S");
+        tests::CheckPulseUIntTags(
+            "3S4=3D4=3S",               // CIGAR
+            "TTTAACCGTTACCG",           // seqBases
+            "TTTttAACCccGTTAaaCCG",     // pulseCalls
+            { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },   // tag data
+
+            {   // all pulses
+
+                { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },             // forward strand, genomic
+                { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },             // forward strand, native
+                { },    // forward strand, genomic, aligned
+                { },    // forward strand, native, aligned
+                { },    // forward strand, genomic, aligned, clipped
+                { },    // forward strand, native, aligned, clipped
+                { 50, 50, 50, 0, 0, 30, 10, 20, 10, 0, 0, 20, 10, 20, 10, 0, 0, 40, 40, 40 },             // reverse strand, genomic
+                { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },             // reverse strand, native
+                { },    // reverse strand, genomic, aligned
+                { },    // reverse strand, native, aligned
+                { },    // reverse strand, genomic, aligned, clipped
+                { }     // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // forward strand, genomic
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // forward strand, native
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // forward strand, genomic, aligned
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },                            // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },                            // forward strand, native, aligned, clipped
+                { 50, 50, 50, 30, 10, 20, 10, 20, 10, 20, 10, 40, 40, 40 },             // reverse strand, genomic
+                { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // reverse strand, native
+                { 50, 50, 50, 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10, 40, 40, 40 },    // reverse strand, genomic, aligned
+                { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },                            // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 }                             // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
+        tests::CheckPulseUIntTags(
+            "2H4=3D4=3H",       // CIGAR
+            "AACCGTTA",         // seqBases
+            "AAaaCCGggTTA",     // pulseCalls
+            { 10, 20, 0, 0, 10, 20, 10, 0, 0, 20, 10, 30 }, // tag data
+
+            {   // all pulses
+
+                { 10, 20, 0, 0, 10, 20, 10, 0, 0, 20, 10, 30 },             // forward strand, genomic
+                { 10, 20, 0, 0, 10, 20, 10, 0, 0, 20, 10, 30 },             // forward strand, native
+                { },    // forward strand, genomic, aligned
+                { },    // forward strand, native, aligned
+                { },    // forward strand, genomic, aligned, clipped
+                { },    // forward strand, native, aligned, clipped
+                { 30, 10, 20, 0, 0, 10, 20, 10, 0, 0, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 0, 0, 10, 20, 10, 0, 0, 20, 10, 30 },             // reverse strand, native
+                { },    // reverse strand, genomic, aligned
+                { },    // reverse strand, native, aligned
+                { },    // reverse strand, genomic, aligned, clipped
+                { }     // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // forward strand, genomic
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // forward strand, native
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // forward strand, native, aligned, clipped
+                { 30, 10, 20, 10, 20, 10, 20, 10 },             // reverse strand, genomic
+                { 10, 20, 10, 20, 10, 20, 10, 30 },             // reverse strand, native
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 },    // reverse strand, native, aligned
+                { 30, 10, 20, 10, 0, 0, 0, 20, 10, 20, 10 },    // reverse strand, genomic, aligned, clipped
+                { 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30 }     // reverse strand, native, aligned, clipped
+            }
+        );
+    }
+    {
+        SCOPED_TRACE("CIGAR: 2H3S4=3D4=3S3H");
+        tests::CheckPulseUIntTags(
+            "2H3S4=3D4=3S3H",           // CIGAR
+            "TTTAACCGTTACCG",           // seqBases
+            "TTTttAACCccGTTAaaCCG",     // pulseCalls
+            { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },                 // tag data
+
+            {   // all pulses
+
+                { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },             // forward strand, genomic
+                { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },             // forward strand, native
+                { },    // forward strand, genomic, aligned
+                { },    // forward strand, native, aligned
+                { },    // forward strand, genomic, aligned, clipped
+                { },    // forward strand, native, aligned, clipped
+                { 50, 50, 50, 0, 0, 30, 10, 20, 10, 0, 0, 20, 10, 20, 10, 0, 0, 40, 40, 40 },             // reverse strand, genomic
+                { 40, 40, 40, 0, 0, 10, 20, 10, 20, 0, 0, 10, 20, 10, 30, 0, 0, 50, 50, 50 },             // reverse strand, native
+                { },    // reverse strand, genomic, aligned
+                { },    // reverse strand, native, aligned
+                { },    // reverse strand, genomic, aligned, clipped
+                { }     // reverse strand, native, aligned, clipped
+            },
+            {   // basecalls only
+
                 { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // forward strand, genomic
                 { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },             // forward strand, native
                 { 40, 40, 40, 10, 20, 10, 20, 0, 0, 0, 10, 20, 10, 30, 50, 50, 50 },    // forward strand, genomic, aligned
