@@ -41,6 +41,7 @@
 
 #include "pbbam/FastaReader.h"
 #include <htslib/faidx.h>
+#include <stdexcept>
 #include <fstream>
 #include <iostream>
 #include <limits>

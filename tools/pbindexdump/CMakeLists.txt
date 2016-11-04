@@ -4,7 +4,7 @@ set(PbindexdumpSrcDir ${PacBioBAM_ToolsDir}/pbindexdump/src)
 # create version header
 set(PbIndexDump_VERSION ${PacBioBAM_VERSION})
 configure_file(
-    ${PbindexdumpSrcDir}/PbIndexDumpVersion.h.in PbIndexDumpVersion.h @ONLY
+    ${PbindexdumpSrcDir}/PbIndexDumpVersion.h.in ${GeneratedDir}/PbIndexDumpVersion.h @ONLY
 )
 
 # list source files

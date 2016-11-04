@@ -104,6 +104,10 @@ static const unordered_map<string, BuiltIn> builtInLookup =
     { "readstart",     BuiltIn::AlignedStartFilter },
     { "bc",            BuiltIn::BarcodeFilter },
     { "barcode",       BuiltIn::BarcodeFilter },
+    { "bcf",           BuiltIn::BarcodeForwardFilter },
+    { "bq",            BuiltIn::BarcodeQualityFilter },
+    { "bcq",           BuiltIn::BarcodeQualityFilter },
+    { "bcr",           BuiltIn::BarcodeReverseFilter },
     { "accuracy",      BuiltIn::IdentityFilter },
     { "identity",      BuiltIn::IdentityFilter },
     { "cx",            BuiltIn::LocalContextFilter },
@@ -138,24 +142,24 @@ static const unordered_map<string, LocalContextFlags> contextFlagNames =
     { "REVERSE_PASS",     LocalContextFlags::REVERSE_PASS }
 };
 
+// helper methods (for handling maybe-list strings))
+static inline bool isBracketed(const string& value)
+{
+    static const string openBrackets = "[({";
+    static const string closeBrackets = "])}";
+    return openBrackets.find(value.at(0)) != string::npos &&
+           closeBrackets.find(value.at(value.length()-1)) != string::npos;
+};
+
+static inline bool isList(const string& value)
+{
+    return value.find(',') != string::npos;
+}
+
 static
 PbiFilter CreateBarcodeFilter(string value,
                               const Compare::Type compareType)
 {
-    // little helper lambdas (for readability below)
-    auto isBracketed = [](const string& value)
-    {
-        static const string openBrackets = "[({";
-        static const string closeBrackets = "])}";
-        return openBrackets.find(value.at(0)) != string::npos &&
-               closeBrackets.find(value.at(value.length()-1)) != string::npos;
-    };
-    auto isList = [](const string& value)
-    {
-        return value.find(',') != string::npos;
-    };
-
-
     if (value.empty())
         throw std::runtime_error("empty value for barcode filter property");
 
@@ -174,6 +178,52 @@ PbiFilter CreateBarcodeFilter(string value,
                                 };
     } else
         return PbiBarcodeFilter{ boost::numeric_cast<int16_t>(stoi(value)), compareType };
+}
+
+static
+PbiFilter CreateBarcodeForwardFilter(string value,
+                                     const Compare::Type compareType)
+{
+    if (value.empty())
+        throw std::runtime_error("empty value for barcode_forward filter property");
+
+    if (isBracketed(value)) {
+        value.erase(0,1);
+        value.pop_back();
+    }
+
+    if (isList(value)) {
+        vector<string> tokens = internal::Split(value, ',');
+        vector<int16_t> barcodes;
+        barcodes.reserve(tokens.size());
+        for (const auto& t : tokens) 
+            barcodes.push_back(boost::numeric_cast<int16_t>(stoi(t)));
+        return PbiBarcodeForwardFilter{ std::move(barcodes) };
+    } else
+        return PbiBarcodeForwardFilter{ boost::numeric_cast<int16_t>(stoi(value)), compareType };
+}
+
+static
+PbiFilter CreateBarcodeReverseFilter(string value,
+                                     const Compare::Type compareType)
+{
+    if (value.empty())
+        throw std::runtime_error("empty value for barcode_reverse filter property");
+
+    if (isBracketed(value)) {
+        value.erase(0,1);
+        value.pop_back();
+    }
+
+    if (isList(value)) {
+        vector<string> tokens = internal::Split(value, ',');
+        vector<int16_t> barcodes;
+        barcodes.reserve(tokens.size());
+        for (const auto& t : tokens)
+            barcodes.push_back(boost::numeric_cast<int16_t>(stoi(t)));
+        return PbiBarcodeReverseFilter{ std::move(barcodes) };
+    } else
+        return PbiBarcodeReverseFilter{ boost::numeric_cast<int16_t>(stoi(value)), compareType };
 }
 
 static
@@ -229,6 +279,7 @@ PbiFilter FromDataSetProperty(const Property& property,
             case BuiltIn::AlignedEndFilter     : return PbiAlignedEndFilter{ static_cast<uint32_t>(stoul(value)), compareType };
             case BuiltIn::AlignedLengthFilter  : return PbiAlignedLengthFilter{ static_cast<uint32_t>(stoul(value)), compareType };
             case BuiltIn::AlignedStartFilter   : return PbiAlignedStartFilter{ static_cast<uint32_t>(stoul(value)), compareType };
+            case BuiltIn::BarcodeQualityFilter : return PbiBarcodeQualityFilter{ static_cast<uint8_t>(stoul(value)), compareType };
             case BuiltIn::IdentityFilter       : return PbiIdentityFilter{ stof(value), compareType };
             case BuiltIn::MovieNameFilter      : return PbiMovieNameFilter{ value };
             case BuiltIn::QueryEndFilter       : return PbiQueryEndFilter{ stoi(value), compareType };
@@ -244,8 +295,10 @@ PbiFilter FromDataSetProperty(const Property& property,
             case BuiltIn::ZmwFilter            : return PbiZmwFilter{ stoi(value), compareType };
 
             // (maybe) list-value filters
-            case BuiltIn::BarcodeFilter      : return CreateBarcodeFilter(value, compareType);
-            case BuiltIn::LocalContextFilter : return CreateLocalContextFilter(value, compareType);
+            case BuiltIn::BarcodeFilter        : return CreateBarcodeFilter(value, compareType);
+            case BuiltIn::BarcodeForwardFilter : return CreateBarcodeForwardFilter(value, compareType);
+            case BuiltIn::BarcodeReverseFilter : return CreateBarcodeReverseFilter(value, compareType); 
+            case BuiltIn::LocalContextFilter   : return CreateLocalContextFilter(value, compareType);
 
             // other built-ins
             case BuiltIn::QueryNamesFromFileFilter : return CreateQueryNamesFilterFromFile(value, dataset); // compareType ignored

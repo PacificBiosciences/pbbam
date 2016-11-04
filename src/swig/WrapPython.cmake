@@ -16,7 +16,8 @@ set_target_properties(
     PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${PacBioBAM_PythonLibDir}
 )
-add_dependencies(${SWIG_MODULE_PacBioBam_REAL_NAME} pbbam)
+#add_dependencies(${SWIG_MODULE_PacBioBam_REAL_NAME} pbbam ${PacBioBAM_LIBRARIES})
+target_link_libraries(${SWIG_MODULE_PacBioBam_REAL_NAME} pbbam)
 
 # simple "wrapper worked" check
 # this is run every build, to check importing from Python, but does NOT run full Python-side unit tests

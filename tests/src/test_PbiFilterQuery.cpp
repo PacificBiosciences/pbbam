@@ -219,7 +219,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 TEST(PbiFilterQueryTest, MissingPbiShouldThrow)
 {
     const PbiFilter filter{ PbiZmwFilter{31883} };
-    const string phi29Bam = tests::Data_Dir + "/phi29.bam";
+    const string phi29Bam = tests::GeneratedData_Dir + "/missing_pbi.bam";
     const string hasPbiBam = tests::Data_Dir + "/polymerase/production.scraps.bam";
 
     { // single file, missing PBI
@@ -268,4 +268,177 @@ TEST(PbiFilterQueryTest, EmptyFiles)
     }
     EXPECT_EQ(0, count);
 }
+
+TEST(PbiFilterQueryTest, BarcodeData)
+{
+   const BamFile file{ tests::Data_Dir + "/phi29.bam" };
+
+   // bc_quality == 1
+   {
+       size_t count = 0;
+       PbiFilterQuery query{ PbiBarcodeQualityFilter{1}, file };
+       for (const auto& r : query) {
+           (void)r;
+           ++count;
+       }
+       EXPECT_EQ(120, count);
+   }
+
+   // bc_quality != 1
+   {
+       size_t count = 0;
+       PbiFilterQuery query{ PbiBarcodeQualityFilter{1, Compare::NOT_EQUAL}, file };
+       for (const auto& r : query) {
+           (void)r;
+           ++count;
+       }
+       EXPECT_EQ(0, count);
+   }
+
+   // bc_forward == 0
+   {
+       size_t count = 0;
+       PbiFilterQuery query{ PbiBarcodeForwardFilter{0}, file };
+       for (const auto& r : query) {
+           (void)r;
+           ++count;
+       }
+       EXPECT_EQ(40, count);
+   }
+
+   // bc_forward == [0,2]
+   {
+       size_t count = 0;
+       const auto ids = vector<int16_t>{ 0, 2 };
+       PbiFilterQuery query{ PbiBarcodeForwardFilter{ ids }, file };
+       for (const auto& r : query) {
+           (void)r;
+           ++count;
+       }
+       EXPECT_EQ(80, count);
+   }
+
+   // bc_reverse != 0
+   {
+       size_t count = 0;
+       PbiFilterQuery query{ PbiBarcodeReverseFilter{0, Compare::NOT_EQUAL}, file };
+       for (const auto& r : query) {
+           (void)r;
+           ++count;
+       }
+       EXPECT_EQ(80, count);
+   }
+}
+
+TEST(PbiFilterQueryTest, BarcodeQualityFromXml)
+{
+
+const string xml_all = R"_XML_(
+<?xml version="1.0" encoding="utf-8"?>
+<pbds:SubreadSet 
+   xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd" 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+   xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd"
+   xmlns:pbsample="http://pacificbiosciences.com/PacBioSampleInfo.xsd"
+   xmlns:pbmeta="http://pacificbiosciences.com/PacBioCollectionMetadata.xsd"
+   xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd"
+   xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd" 
+   UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe519c" 
+   TimeStampedName="subreadset_150304_231155" 
+   MetaType="PacBio.DataSet.SubreadSet" 
+   Name="DataSet_SubreadSet" 
+   Tags="" 
+   Version="3.0.0" 
+   CreatedAt="2015-01-27T09:00:01"> 
+<pbbase:ExternalResources>
+   <pbbase:ExternalResource 
+       UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5193" 
+       TimeStampedName="subread_bam_150304_231155" 
+       MetaType="PacBio.SubreadFile.SubreadBamFile" 
+       ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.1.subreads.bam">
+       <pbbase:FileIndices>
+           <pbbase:FileIndex 
+               UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5194" 
+               TimeStampedName="bam_index_150304_231155" 
+               MetaType="PacBio.Index.PacBioIndex" 
+               ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.1.subreads.bam.pbi"/>
+       </pbbase:FileIndices>
+   </pbbase:ExternalResource>
+</pbbase:ExternalResources>
+<pbds:Filters>
+    <pbds:Filter>
+        <pbbase:Properties>
+            <pbbase:Property Name="bq" Operator="=" Value="1"/>
+        </pbbase:Properties>
+    </pbds:Filter>
+</pbds:Filters>
+</pbds:SubreadSet>
+)_XML_";
+
+const string xml_none = R"_XML_(
+<?xml version="1.0" encoding="utf-8"?>
+<pbds:SubreadSet
+   xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd"
+   xmlns:pbsample="http://pacificbiosciences.com/PacBioSampleInfo.xsd"
+   xmlns:pbmeta="http://pacificbiosciences.com/PacBioCollectionMetadata.xsd"
+   xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd"
+   xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd"
+   UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe519c"
+   TimeStampedName="subreadset_150304_231155"
+   MetaType="PacBio.DataSet.SubreadSet"
+   Name="DataSet_SubreadSet"
+   Tags=""
+   Version="3.0.0"
+   CreatedAt="2015-01-27T09:00:01">
+<pbbase:ExternalResources>
+   <pbbase:ExternalResource
+       UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5193"
+       TimeStampedName="subread_bam_150304_231155"
+       MetaType="PacBio.SubreadFile.SubreadBamFile"
+       ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.1.subreads.bam">
+       <pbbase:FileIndices>
+           <pbbase:FileIndex
+               UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5194"
+               TimeStampedName="bam_index_150304_231155"
+               MetaType="PacBio.Index.PacBioIndex"
+               ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.1.subreads.bam.pbi"/>
+       </pbbase:FileIndices>
+   </pbbase:ExternalResource>
+</pbbase:ExternalResources>
+<pbds:Filters>
+    <pbds:Filter>
+        <pbbase:Properties>
+            <pbbase:Property Name="bq" Operator="!=" Value="1"/>
+        </pbbase:Properties>
+    </pbds:Filter>
+</pbds:Filters>
+</pbds:SubreadSet>
+)_XML_";
+
+     const BamFile file{ tests::Data_Dir + "/phi29.bam" }; 
+
+     {   // filter allows all records
+         const DataSet ds = DataSet::FromXml(xml_all);
+         const PbiFilterQuery query { PbiFilter::FromDataSet(ds), file };
+         size_t count = 0;
+         for (const auto& r : query) {
+             (void)r;
+             ++count;
+         }
+         EXPECT_EQ(120, count);
+     }
+     {    // filter allows no records
+         const DataSet ds = DataSet::FromXml(xml_none);
+         const PbiFilterQuery query { PbiFilter::FromDataSet(ds), file };
+         size_t count = 0;
+         for (const auto& r : query) {
+             (void)r;
+             ++count;
+         }
+         EXPECT_EQ(0, count);
+    }
+}
+
 

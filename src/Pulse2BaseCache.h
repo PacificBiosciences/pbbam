@@ -73,7 +73,7 @@ public:
     Pulse2BaseCache(Pulse2BaseCache&& other) = default;
     Pulse2BaseCache& operator=(const Pulse2BaseCache&) = default;
     Pulse2BaseCache& operator=(Pulse2BaseCache&&) = default;
-    ~Pulse2BaseCache(void) noexcept = default;
+    ~Pulse2BaseCache(void) noexcept {}
 
 public:
 

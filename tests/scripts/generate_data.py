@@ -74,6 +74,7 @@ class TestDataGenerator:
             'm150404_101626_42267_c100807920800000001823174110291514_s1_p0.2.subreads.bam.pbi' : self.makeChunkingSymlink,
             'm150404_101626_42267_c100807920800000001823174110291514_s1_p0.3.subreads.bam'     : self.makeChunkingSymlink,
             'm150404_101626_42267_c100807920800000001823174110291514_s1_p0.3.subreads.bam.pbi' : self.makeChunkingSymlink,
+            'missing_pbi.bam' : self.makeMissingPbiBam,
         }
 
     def editChunkingXml(self, outputFn, removeFiltersNode):
@@ -100,6 +101,12 @@ class TestDataGenerator:
     @fileLinker
     def makeChunkingSymlink(self, outputFn):
         source = os.path.join(self.testDataDir,'chunking', outputFn)
+        dest   = os.path.join(self.generatedDataDir, outputFn)
+        os.symlink(source, dest)
+  
+    @fileLinker
+    def makeMissingPbiBam(self, outputFn):
+        source = os.path.join(self.testDataDir, 'phi29.bam')
         dest   = os.path.join(self.generatedDataDir, outputFn)
         os.symlink(source, dest)
 

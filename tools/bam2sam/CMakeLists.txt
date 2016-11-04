@@ -4,7 +4,7 @@ set(Bam2SamSrcDir ${PacBioBAM_ToolsDir}/bam2sam/src)
 # create version header
 set(Bam2Sam_VERSION ${PacBioBAM_VERSION})
 configure_file(
-    ${Bam2SamSrcDir}/Bam2SamVersion.h.in Bam2SamVersion.h @ONLY
+    ${Bam2SamSrcDir}/Bam2SamVersion.h.in ${GeneratedDir}/Bam2SamVersion.h @ONLY
 )
 
 # list source files

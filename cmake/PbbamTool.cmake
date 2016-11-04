@@ -9,9 +9,9 @@ function(create_pbbam_tool)
 
     # create executable
     include_directories(
-        ${ToolsCommonDir}              # shared tool code
-        ${CMAKE_CURRENT_BINARY_DIR}    # generated version headers
-        ${PacBioBAM_INCLUDE_DIRS}      # pbbam/htslib includes
+        ${ToolsCommonDir}           # shared tool code
+        ${GeneratedDir}             # generated version headers
+        ${PacBioBAM_INCLUDE_DIRS}   # pbbam/htslib includes
     )
     add_executable(${create_pbbam_tool_TARGET} ${create_pbbam_tool_SOURCES})
     set_target_properties(

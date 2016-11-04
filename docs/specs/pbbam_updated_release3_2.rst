@@ -577,7 +577,7 @@ functional requirements to corresponding Test Cases/Procedures.
 |             |                           |                                                   |             |            |           | party software to extract all run information    |
 |             |                           |                                                   |             |            |           | including summary reports and locations          |
 +-------------+---------------------------+---------------------------------------------------+-------------+------------+-----------+--------------------------------------------------+
-| 5.2         | Query BAM data by         | pbbam shall allow client applications to query    |             | Yes         | dbarnett  | \\DIR\\Functionality\\Software\Common\APIs\\     |
+| 5.2         | Query BAM data by         | pbbam shall allow client applications to query    |             | Yes        | dbarnett  | \\DIR\\Functionality\\Software\Common\APIs\\     |
 |             | filter criteria           | data, limited to some filter criteria (e.g. only  |             |            |           | Software shall provide an API to allow 3rd       |
 |             |                           | reads from ZMW hole number 200 with a read        |             |            |           | party software to extract all run information    |
 |             |                           | quality of >0.5).                                 |             |            |           | including summary reports and locations          |
@@ -590,7 +590,7 @@ functional requirements to corresponding Test Cases/Procedures.
 | 5.4         | Create PacBio BAM index   | Much of PacBio BAM data processing relies on the  |             | Yes        | dbarnett  | \\DIR\\Functionality\\Software\\PostProcessing\\ |
 |             | file                      | presence of a `PacBio BAM index`_ file. pbbam     |             |            |           | Software shall provide base files including      |
 |             |                           | shall be able to generate this file type for a    |             |            |           | kinetic information in industry standard format  |
-|             |                           | `PacBio BAM`_ file.                               |             |            |           | such as SAM/BAM using current specifications     |                                          |
+|             |                           | `PacBio BAM`_ file.                               |             |            |           | such as SAM/BAM using current specifications     |
 +-------------+---------------------------+---------------------------------------------------+-------------+------------+-----------+--------------------------------------------------+
 
 10.2. Automated Tests Coverage

@@ -71,6 +71,11 @@ public:
         what_ = s.str();
     }
 
+    // This is a work around for the Intel PHI compiler (icpc)
+    ~InvalidSequencingChemistryException() throw()
+    {
+
+    }
 public:
     const std::string& BindingKit(void) const
     { return bindingKit_; }
@@ -82,7 +87,7 @@ public:
     { return basecallerVersion_; }
 
 public:
-    virtual const char* what(void) const noexcept
+    const char* what(void) const noexcept override
     { return what_.c_str(); }
 
 protected:

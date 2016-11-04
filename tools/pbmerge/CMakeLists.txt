@@ -4,7 +4,7 @@ set(PbmergeSrcDir ${PacBioBAM_ToolsDir}/pbmerge/src)
 # create version header
 set(PbMerge_VERSION ${PacBioBAM_VERSION})
 configure_file(
-    ${PbmergeSrcDir}/PbMergeVersion.h.in PbMergeVersion.h @ONLY
+    ${PbmergeSrcDir}/PbMergeVersion.h.in ${GeneratedDir}/PbMergeVersion.h @ONLY
 )
 
 # list source files

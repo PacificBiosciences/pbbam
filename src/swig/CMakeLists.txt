@@ -8,7 +8,7 @@ if(${wrapping_swig})
     find_package(SWIG 3.0.5 REQUIRED)
 
     include(${SWIG_USE_FILE})
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+    include_directories(${PacBioBAM_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
 
     #
     # quash compiler warnings from SWIG-generated code

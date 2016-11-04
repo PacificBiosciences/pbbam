@@ -71,13 +71,17 @@ public:
     ValidationException(ErrorMap&& fileErrors,
                         ErrorMap&& readGroupErrors,
                         ErrorMap&& recordErrors);
+    // This is a work around for the Intel PHI compiler (icpc)
+    ~ValidationException() throw()
+    {
 
+    }
 public:
     const ErrorMap& FileErrors(void) const;
     const ErrorMap& ReadGroupErrors(void) const;
     const ErrorMap& RecordErrors(void) const;
 
-    virtual const char* what(void) const noexcept;
+    const char* what(void) const noexcept override;
 
 private:
     ErrorMap fileErrors_;

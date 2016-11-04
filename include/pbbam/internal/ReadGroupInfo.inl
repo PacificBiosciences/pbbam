@@ -39,6 +39,7 @@
 //
 // Author: Derek Barnett
 
+#include <stdexcept>
 #include "pbbam/ReadGroupInfo.h"
 
 namespace PacBio {

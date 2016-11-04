@@ -32,6 +32,10 @@ CSPROJ_ROOT=${PacBioBAM_CSharpLibDir}
 CSPROJ=${PacBioBAM_CSharpLibDir}/PacBio.BAM.csproj
 ASSEMBLY_ROOT=${PacBioBAM_CSharpLibDir}/bin/Debug
 
+# get expanded cmake generator expression ( $<TARGET:hts> or externally defined -DHTSLIB_LIBRARIES="") 
+# from cmd line
+EXPANDED_HTSLIB_LIBRARIES=("$@")
+
 #
 # Make the managed DLL
 #
@@ -41,7 +45,7 @@ ASSEMBLY_ROOT=${PacBioBAM_CSharpLibDir}/bin/Debug
 # Copy the dependency libs
 #
 cp ${PacBioBAM_LibDir}/libpbbam${CMAKE_SHARED_LIBRARY_SUFFIX}  $ASSEMBLY_ROOT
-cp ${HTSLIB_LIBRARIES}                                         $ASSEMBLY_ROOT  # Need "libhts*.dylib"
+cp "$EXPANDED_HTSLIB_LIBRARIES"                                $ASSEMBLY_ROOT  # Need "libhts*.dylib"
 
 if [ "$PLATFORM" == "Windows" ]
 then
@@ -52,7 +56,7 @@ then
 else
     # For UNIX this is .so, even Mac.  Not sure why.
     cp ${PacBioBAM_CSharpLibDir}/libPacBioBam.so              $ASSEMBLY_ROOT
-    cp ${HTSLIB_LIBRARIES_VERSIONED_LINK}                     $ASSEMBLY_ROOT  # Need "libhts*.dylib"
+#    cp ${HTSLIB_LIBRARIES_VERSIONED_LINK}                     $ASSEMBLY_ROOT  # Need "libhts*.dylib"
 fi
 
 # Bundle test data
