@@ -10,12 +10,15 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.7.1] - 2016-11-09
+
 ### Added
 - (Unindexed) FASTA reader & FastaSequence data structure.
 - Missing unit tests for internal BAM tag access.
 - Chemistry data for basecaller v3.3.
 - Missing parsers for filtering barcode quality ("bq"), barcode forward ("bcf"), 
 and barcode reverse ("bcr") from DataSetXML.
+- Integrated htslib into project.
 
 ### Fixed
 - Reverse complement on padding base.

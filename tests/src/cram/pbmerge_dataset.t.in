@@ -66,7 +66,7 @@ Normal Merge from XML:
   @PG\tID:BAZ_FORMAT\tVN:0.3.0 (esc)
   @PG\tID:PPA-BAZ2BAM\tVN:0.1.0 (esc)
   @PG\tID:PPA-BAZWRITER\tVN:0.2.0 (esc)
-  @PG\tID:pbmerge-0.7.0\tPN:pbmerge\tVN:0.7.0 (esc)
+  @PG\tID:pbmerge-0.7.1\tPN:pbmerge\tVN:0.7.1 (esc)
 
   $ $BAM2SAM --no-header $MERGED_BAM | cut -f 1
   ArminsFakeMovie/0/4267_4289
@@ -98,7 +98,7 @@ Normal Merge from XML (disabled PBI):
   @PG\tID:BAZ_FORMAT\tVN:0.3.0 (esc)
   @PG\tID:PPA-BAZ2BAM\tVN:0.1.0 (esc)
   @PG\tID:PPA-BAZWRITER\tVN:0.2.0 (esc)
-  @PG\tID:pbmerge-0.7.0\tPN:pbmerge\tVN:0.7.0 (esc)
+  @PG\tID:pbmerge-0.7.1\tPN:pbmerge\tVN:0.7.1 (esc)
 
   $ $BAM2SAM --no-header $MERGED_BAM | cut -f 1
   ArminsFakeMovie/0/4267_4289
@@ -129,7 +129,7 @@ Write to stdout:
   @PG\tID:BAZ_FORMAT\tVN:0.3.0 (esc)
   @PG\tID:PPA-BAZ2BAM\tVN:0.1.0 (esc)
   @PG\tID:PPA-BAZWRITER\tVN:0.2.0 (esc)
-  @PG\tID:pbmerge-0.7.0\tPN:pbmerge\tVN:0.7.0 (esc)
+  @PG\tID:pbmerge-0.7.1\tPN:pbmerge\tVN:0.7.1 (esc)
 
   $ $BAM2SAM --no-header $MERGED_BAM | cut -f 1
   ArminsFakeMovie/0/4267_4289
