@@ -10,6 +10,13 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.7.2] - 2016-11-10
+
+### Removed
+- SAM header version equality check for merging BAM files. PacBioBAM version 
+number carries more meaning for PacBio data and thus will be the basis of 
+ensuring compatible merging.
+
 ## [0.7.1] - 2016-11-09
 
 ### Added

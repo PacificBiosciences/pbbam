@@ -30,26 +30,31 @@ if (PacBioBAM_build_tests)
         configure_file(
             ${PacBioBAM_CramTestsDir}/pbmerge_pacbio_ordering.t.in
             ${GeneratedDir}/pbmerge_pacbio_ordering.t
+            @ONLY
         )
  
         configure_file(
             ${PacBioBAM_CramTestsDir}/pbmerge_aligned_ordering.t.in
             ${GeneratedDir}/pbmerge_aligned_ordering.t
+            @ONLY
         )
 
         configure_file(
             ${PacBioBAM_CramTestsDir}/pbmerge_mixed_ordering.t.in
             ${GeneratedDir}/pbmerge_mixed_ordering.t
+            @ONLY
         )
 
         configure_file(
             ${PacBioBAM_CramTestsDir}/pbmerge_dataset.t.in
             ${GeneratedDir}/pbmerge_dataset.t
+            @ONLY
         )
 
         configure_file(
             ${PacBioBAM_CramTestsDir}/pbmerge_fofn.t.in
             ${GeneratedDir}/pbmerge_fofn.t
+            @ONLY
         )
 
         add_test(

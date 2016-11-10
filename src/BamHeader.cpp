@@ -68,25 +68,18 @@ static
 void EnsureCanMerge(const BamHeader& lhs, const BamHeader& rhs)
 {
     // check compatibility
-    const bool samVersionOk = lhs.Version() == rhs.Version();
     const bool sortOrderOk  = lhs.SortOrder() == rhs.SortOrder();
     const bool pbVersionOk  = lhs.PacBioBamVersion() == rhs.PacBioBamVersion();
     const bool sequencesOk  = ( (lhs.SortOrder() == "coordinate") ? lhs.Sequences() == rhs.Sequences()
                                                                   : true);
 
     // if all checks out, return
-    if (samVersionOk && sortOrderOk && pbVersionOk && sequencesOk)
+    if (sortOrderOk && pbVersionOk && sequencesOk)
         return;
 
     // else, format error message & throw
     stringstream e;
     e << "could not merge BAM headers:" << endl;
-
-    if (!samVersionOk) {
-        e << "  mismatched SAM versions (@HD:VN) : ("
-          << lhs.Version() << ", " << rhs.Version()
-          << ")" << endl;
-    }
 
     if (!sortOrderOk) {
         e << "  mismatched sort orders (@HD:SO) : ("

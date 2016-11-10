@@ -392,17 +392,17 @@ TEST(BamHeaderTest, MergeHandlesDuplicateReadGroups)
     EXPECT_EQ(hdrText, merged.ToSam());
 }
 
-TEST(BamHeaderTest, IncompatibleMergeFails)
+TEST(BamHeaderTest, MergeCompatibilityOk)
 {
-    {   // @HD:VN
+    {   // different @HD:VN - this IS allowed (as of SAT-465, pbbam v0.7.2)
         const string hdrText1 = { "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n" };
         const string hdrText2 = { "@HD\tVN:1.0\tSO:unknown\tpb:3.0.1\n" };
         const BamHeader header1(hdrText1);
         const BamHeader header2(hdrText2);
-        EXPECT_THROW(header1 + header2, std::runtime_error);
+        EXPECT_NO_THROW(header1 + header2);
     }
 
-    {   // @HD:SO
+    {   // different @HD:SO
         const string hdrText1 = { "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n" };
         const string hdrText2 = { "@HD\tVN:1.1\tSO:coordinate\tpb:3.0.1\n" };
         const BamHeader header1(hdrText1);
@@ -410,7 +410,7 @@ TEST(BamHeaderTest, IncompatibleMergeFails)
         EXPECT_THROW(header1 + header2, std::runtime_error);
     }
 
-    {   // @HD:pb
+    {   // different @HD:pb
         const string hdrText1 = { "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n" };
         const string hdrText2 = { "@HD\tVN:1.1\tSO:unknown\tpb:3.0.3\n" };
         const BamHeader header1(hdrText1);
