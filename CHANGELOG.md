@@ -10,6 +10,11 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.7.3] - 2016-11-11
+
+### Added
+- Support for S/P2-C2 chemistry and forthcoming 4.0 basecaller
+
 ## [0.7.2] - 2016-11-10
 
 ### Removed
