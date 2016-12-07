@@ -10,6 +10,16 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+### Added
+- Default DataSet 'Version' attribute if none already present (currently 4.0.0)
+
+## [0.7.4] - 2016-11-18
+
+### Changed
+- Compatibility for merging BAM files no longer requires exact match of PacBioBAM
+version number (header @HD:pb tag). As long as both files meet the minimum 
+supported version number, the merge is allowed.
+
 ## [0.7.3] - 2016-11-11
 
 ### Added

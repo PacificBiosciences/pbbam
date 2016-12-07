@@ -1344,7 +1344,7 @@ TEST(DataSetIOTest, InspectMalformedXml)
 
     const string expected =
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-        "<SubreadSet Description=\"Merged dataset from 1 files using DatasetMerger 0.1.2\" "
+        "<SubreadSet CreatedAt=\"2015-08-19T15:39:36.331\" Description=\"Merged dataset from 1 files using DatasetMerger 0.1.2\" "
                     "MetaType=\"PacBio.DataSet.HdfSubreadSet\" Name=\"Subreads from runr000013_42267_150403\" "
                     "Tags=\"pacbio.secondary.instrument=RS\" TimeStampedName=\"hdfsubreadset_2015-08-19T15:39:36.331-07:00\" "
                     "UniqueId=\"b4741521-2a4c-42df-8a13-0a755ca9ed1e\" Version=\"0.5\" "

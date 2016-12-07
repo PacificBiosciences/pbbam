@@ -410,12 +410,12 @@ TEST(BamHeaderTest, MergeCompatibilityOk)
         EXPECT_THROW(header1 + header2, std::runtime_error);
     }
 
-    {   // different @HD:pb
+    {   // different @HD:pb - this IS allowed (as of SAT-529, pbbam 0.7.4)
         const string hdrText1 = { "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n" };
         const string hdrText2 = { "@HD\tVN:1.1\tSO:unknown\tpb:3.0.3\n" };
         const BamHeader header1(hdrText1);
         const BamHeader header2(hdrText2);
-        EXPECT_THROW(header1 + header2, std::runtime_error);
+        EXPECT_NO_THROW(header1 + header2);
     }
 
     {   // @SQ list clash

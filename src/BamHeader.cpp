@@ -64,20 +64,36 @@ static const string token_VN = string("VN");
 static const string token_SO = string("SO");
 static const string token_pb = string("pb");
 
+static inline 
+bool CheckSortOrder(const string& lhs, const string& rhs)
+{ return lhs == rhs; } 
+
+static inline
+bool CheckPbVersion(const string& lhs, const string& rhs)
+{ 
+    return ( Version{ lhs } >= Version::Minimum && 
+             Version{ rhs } >= Version::Minimum);
+}
+
+static inline
+bool CheckSequences(const string& sortOrder, 
+                    const vector<SequenceInfo>& lhs,
+                    const vector<SequenceInfo>& rhs)
+{
+    return ( (sortOrder == "coordinate") ? lhs == rhs : true);
+} 
+
 static
 void EnsureCanMerge(const BamHeader& lhs, const BamHeader& rhs)
 {
     // check compatibility
-    const bool sortOrderOk  = lhs.SortOrder() == rhs.SortOrder();
-    const bool pbVersionOk  = lhs.PacBioBamVersion() == rhs.PacBioBamVersion();
-    const bool sequencesOk  = ( (lhs.SortOrder() == "coordinate") ? lhs.Sequences() == rhs.Sequences()
-                                                                  : true);
-
-    // if all checks out, return
+    const bool sortOrderOk  = CheckSortOrder(lhs.SortOrder(), rhs.SortOrder());
+    const bool pbVersionOk  = CheckPbVersion(lhs.PacBioBamVersion(), rhs.PacBioBamVersion());
+    const bool sequencesOk  = CheckSequences(lhs.SortOrder(), lhs.Sequences(), rhs.Sequences());
     if (sortOrderOk && pbVersionOk && sequencesOk)
         return;
 
-    // else, format error message & throw
+    // if any checks failed, format error message & throw
     stringstream e;
     e << "could not merge BAM headers:" << endl;
 
@@ -88,7 +104,7 @@ void EnsureCanMerge(const BamHeader& lhs, const BamHeader& rhs)
     }
 
     if (!pbVersionOk) {
-        e << "  mismatched PacBio BAM versions (@HD:pb) : ("
+        e << "  incompatible PacBio BAM versions (@HD:pb) : ("
           << lhs.PacBioBamVersion() << ", " << rhs.PacBioBamVersion()
           << ")" << endl;
     }

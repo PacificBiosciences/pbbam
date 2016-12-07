@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <SubreadSet 
-	Description="Merged dataset from 1 files using DatasetMerger 0.1.2" 
+    CreatedAt="2015-08-19T15:39:36.331"
+    Description="Merged dataset from 1 files using DatasetMerger 0.1.2" 
     MetaType="PacBio.DataSet.HdfSubreadSet" 
     Name="Subreads from runr000013_42267_150403" 
     Tags="pacbio.secondary.instrument=RS" 

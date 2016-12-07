@@ -52,9 +52,32 @@ using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
 using namespace std;
 
+namespace PacBio {
+namespace BAM {
+namespace internal {
+
+static const string defaultVersion{ "4.0.0" };
+
+static inline void InitDefaults(DataSet& ds)
+{
+    // provide default 'CreatedAt' & 'Version' attributes if not already present in XML
+
+    if (ds.CreatedAt().empty())
+        ds.CreatedAt(internal::ToIso8601(CurrentTime()));
+    
+    if (ds.Version().empty())
+        ds.Version(internal::defaultVersion);
+}
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio
+
 DataSet::DataSet(void)
     : DataSet(DataSet::GENERIC)
-{ }
+{ 
+    InitDefaults(*this);
+}
 
 DataSet::DataSet(const DataSet::TypeEnum type)
     : d_(nullptr)
@@ -74,14 +97,14 @@ DataSet::DataSet(const DataSet::TypeEnum type)
             throw std::runtime_error("unsupported dataset type"); // unknown type
     }
 
-    CreatedAt(internal::ToIso8601(CurrentTime()));
+    InitDefaults(*this);
 }
 
 DataSet::DataSet(const BamFile& bamFile)
     : d_(DataSetIO::FromUri(bamFile.Filename()))
     , path_(FileUtils::CurrentWorkingDirectory())
 {
-    CreatedAt(internal::ToIso8601(CurrentTime()));
+    InitDefaults(*this);
 }
 
 DataSet::DataSet(const string& filename)
@@ -98,12 +121,15 @@ DataSet::DataSet(const string& filename)
     {
         path_ = FileUtils::CurrentWorkingDirectory();
     }
+    InitDefaults(*this);
 }
 
 DataSet::DataSet(const vector<string>& filenames)
     : d_(DataSetIO::FromUris(filenames))
     , path_(FileUtils::CurrentWorkingDirectory())
-{ }
+{ 
+    InitDefaults(*this);
+}
 
 DataSet::DataSet(const DataSet& other)
     : path_(other.path_)
@@ -148,19 +174,14 @@ vector<BamFile> DataSet::BamFiles(void) const
 {
     const PacBio::BAM::ExternalResources& resources = ExternalResources();
     
-//    cerr << "path: " << this->path_ << endl;
-
     vector<BamFile> result;
     result.reserve(resources.Size());
     for(const ExternalResource& ext : resources) {
-
-//        cerr << ext.ResourceId() << std::endl;
 
         // only bother resolving file path if this is a BAM file
         boost::iterator_range<string::const_iterator> bamFound = boost::algorithm::ifind_first(ext.MetaType(), "bam");
         if (!bamFound.empty()) {
             const string fn = ResolvePath(ext.ResourceId());
-//            const string fn = internal::FileUtils::ResolvedFilePath(ext.ResourceId(), path_);
             result.push_back(BamFile(fn));
         }
     }
@@ -171,8 +192,7 @@ DataSet DataSet::FromXml(const string& xml)
 {
     DataSet result;
     result.d_ = internal::DataSetIO::FromXmlString(xml);
-    if (result.CreatedAt().empty())
-        result.CreatedAt(internal::ToIso8601(internal::CurrentTime()));
+    InitDefaults(result);
     return result;
 }
 

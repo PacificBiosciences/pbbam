@@ -84,6 +84,7 @@ TEST(DataSetCoreTest, DefaultsOk)
     EXPECT_FALSE(dataset.MetaType().empty());
     EXPECT_FALSE(dataset.TimeStampedName().empty());
     EXPECT_FALSE(dataset.UniqueId().empty());
+    EXPECT_FALSE(dataset.Version().empty());
 
     EXPECT_EQ(0, dataset.TimeStampedName().find("pacbio_dataset_"));
 
