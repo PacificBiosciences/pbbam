@@ -38,29 +38,19 @@ endif()
 target_include_directories(pbbam
     PUBLIC
     ${PacBioBAM_IncludeDir}
-    ${HTSLIB_INCLUDE_DIRS}
+    ${hts_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIRS}
 )
 
 # set link dependencies
-#   if htslib provided externally
-if(HTSLIB_LIBRARIES)
-    set(pbbam_all_dependency_libs
-        ${HTSLIB_LIBRARIES}
-        ${ZLIB_LIBRARIES}
-        ${SOCKET_LIBRARIES}
-        ${CMAKE_THREAD_LIBS_INIT}
-    )
-# otherwise, use the "in-project" htslib target
-else()
-    set(pbbam_all_dependency_libs
-        $<TARGET_FILE:hts>
-        ${ZLIB_LIBRARIES}
-        ${SOCKET_LIBRARIES}
-        ${CMAKE_THREAD_LIBS_INIT}
-    )
-endif()
+#if(HTSLIB_LIBRARIES)
+set(pbbam_all_dependency_libs
+    ${hts_LIBRARIES}
+    ${ZLIB_LIBRARIES}
+    ${SOCKET_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
+)
 
 target_link_libraries(pbbam
     PUBLIC
@@ -70,7 +60,7 @@ target_link_libraries(pbbam
 # define include paths for projects that use pbbam
 set(PacBioBAM_INCLUDE_DIRS
     ${PacBioBAM_IncludeDir}
-    ${HTSLIB_INCLUDE_DIRS}
+    ${hts_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIRS}
     CACHE INTERNAL

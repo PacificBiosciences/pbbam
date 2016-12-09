@@ -111,7 +111,7 @@ if(WIN32)
 endif()
 
 # define symbols for projects that use htslib
-set(HTSLIB_INCLUDE_DIRS
+set(hts_INCLUDE_DIRS
     ${CMAKE_BINARY_DIR}/generated
     ${CMAKE_CURRENT_SOURCE_DIR}/htslib
     CACHE INTERNAL
@@ -119,7 +119,7 @@ set(HTSLIB_INCLUDE_DIRS
     FORCE
 )
 
-set(HTSLIB_LIBRARIES
+set(hts_LIBRARIES
     $<TARGET_FILE:hts>
     CACHE INTERNAL
     "${PROJECT_NAME}: Libraries"
@@ -128,7 +128,7 @@ set(HTSLIB_LIBRARIES
 
 target_include_directories(hts
     PUBLIC
-    ${HTSLIB_INCLUDE_DIRS}
+    ${hts_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIRS}
 )
 

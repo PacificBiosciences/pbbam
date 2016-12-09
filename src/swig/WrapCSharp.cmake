@@ -41,6 +41,6 @@ configure_file(
 add_custom_command(
   OUTPUT ${PacBioBAM_CSharpDLL}
   DEPENDS ${SWIG_MODULE_PacBioBam_REAL_NAME}
-  COMMAND bash ./buildAssembly.sh "${HTSLIB_LIBRARIES}"
+  COMMAND bash ./buildAssembly.sh "${hts_LIBRARIES}"
 )
 add_custom_target(CSharpAssembly ALL DEPENDS ${PacBioBAM_CSharpDLL})
