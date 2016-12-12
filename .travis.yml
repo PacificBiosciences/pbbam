@@ -34,9 +34,6 @@ before_install:
   # prep zlib
   - sudo apt-get install -y -qq zlib1g-dev
 
-  # prep htslib
-  - "cd .. && git clone https://github.com/PacificBiosciences/htslib.git && cd htslib && make && sudo make install; cd $TRAVIS_BUILD_DIR"
-
   # prep GoogleTest 
   - sudo apt-get install -y -qq libgtest-dev
 
