@@ -266,6 +266,30 @@ PbiFilter CreateQueryNamesFilterFromFile(const string& value,
 }
 
 static
+PbiFilter CreateZmwFilter(string value,
+                          const Compare::Type compareType)
+{
+
+    if (value.empty())
+        throw std::runtime_error("empty value for ZMW filter property");
+
+    if (isBracketed(value)) {
+        value.erase(0,1);
+        value.pop_back();
+    }
+
+    if (isList(value)) {
+        vector<string> tokens = internal::Split(value, ',');
+        vector<int32_t> zmws;
+        zmws.reserve(tokens.size());
+        for (const auto& t : tokens)
+            zmws.push_back(boost::numeric_cast<int32_t>(stoi(t)));
+        return PbiZmwFilter{ std::move(zmws) };
+    } else
+        return PbiZmwFilter{ boost::numeric_cast<int32_t>(stoi(value)), compareType };
+}
+
+static
 PbiFilter FromDataSetProperty(const Property& property,
                               const DataSet& dataset)
 {
@@ -292,13 +316,13 @@ PbiFilter FromDataSetProperty(const Property& property,
             case BuiltIn::ReferenceIdFilter    : return PbiReferenceIdFilter{ stoi(value), compareType };
             case BuiltIn::ReferenceNameFilter  : return PbiReferenceNameFilter{ value };
             case BuiltIn::ReferenceStartFilter : return PbiReferenceStartFilter{ static_cast<uint32_t>(stoul(value)), compareType };
-            case BuiltIn::ZmwFilter            : return PbiZmwFilter{ stoi(value), compareType };
 
             // (maybe) list-value filters
             case BuiltIn::BarcodeFilter        : return CreateBarcodeFilter(value, compareType);
             case BuiltIn::BarcodeForwardFilter : return CreateBarcodeForwardFilter(value, compareType);
             case BuiltIn::BarcodeReverseFilter : return CreateBarcodeReverseFilter(value, compareType); 
             case BuiltIn::LocalContextFilter   : return CreateLocalContextFilter(value, compareType);
+            case BuiltIn::ZmwFilter            : return CreateZmwFilter(value, compareType);
 
             // other built-ins
             case BuiltIn::QueryNamesFromFileFilter : return CreateQueryNamesFilterFromFile(value, dataset); // compareType ignored

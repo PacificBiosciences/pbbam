@@ -441,4 +441,99 @@ const string xml_none = R"_XML_(
     }
 }
 
+TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
+{
+    const BamFile file{ tests::Data_Dir + "/phi29.bam" };
+    const string xmlHeader = R"_XML_(
+        <?xml version="1.0" encoding="utf-8"?>
+        <pbds:SubreadSet
+           xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd"
+           xmlns:pbsample="http://pacificbiosciences.com/PacBioSampleInfo.xsd"
+           xmlns:pbmeta="http://pacificbiosciences.com/PacBioCollectionMetadata.xsd"
+           xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd"
+           xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd"
+           UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe519c"
+           TimeStampedName="subreadset_150304_231155"
+           MetaType="PacBio.DataSet.SubreadSet"
+           Name="DataSet_SubreadSet"
+           Tags=""
+           Version="3.0.0"
+           CreatedAt="2015-01-27T09:00:01">
+        <pbbase:ExternalResources>
+           <pbbase:ExternalResource
+               UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5193"
+               TimeStampedName="subread_bam_150304_231155"
+               MetaType="PacBio.SubreadFile.SubreadBamFile"
+               ResourceId="phi29.bam">
+               <pbbase:FileIndices>
+                   <pbbase:FileIndex
+                       UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5194"
+                       TimeStampedName="bam_index_150304_231155"
+                       MetaType="PacBio.Index.PacBioIndex"
+                       ResourceId="phi29.bam.pbi"/>
+               </pbbase:FileIndices>
+           </pbbase:ExternalResource>
+        </pbbase:ExternalResources>
+        <pbds:Filters>
+            <pbds:Filter>
+                <pbbase:Properties>)_XML_";
 
+        const string xmlFooter = R"_XML_(
+                </pbbase:Properties>
+            </pbds:Filter>
+        </pbds:Filters>
+        </pbds:SubreadSet>
+        )_XML_";
+
+    size_t count_30422 = 0;
+    size_t count_648 = 0;
+    size_t count_17299 = 0;
+    size_t count_whitelist = 0;
+
+    {   // 30422
+        const string xmlProperty = R"_XML_(<pbbase:Property Name="zm" Operator="=" Value="30422"/>\n)_XML_";
+        const string xml = xmlHeader + xmlProperty + xmlFooter;
+        const DataSet ds = DataSet::FromXml(xml);
+        const PbiFilterQuery query { PbiFilter::FromDataSet(ds), file };
+        for (const auto& r : query) {
+            (void)r;
+            ++count_30422;
+        }
+        EXPECT_EQ(13, count_30422);
+    }
+    {   // 648
+        const string xmlProperty = R"_XML_(<pbbase:Property Name="zm" Operator="=" Value="648"/>\n)_XML_";
+        const string xml = xmlHeader + xmlProperty + xmlFooter;
+        const DataSet ds = DataSet::FromXml(xml);
+        const PbiFilterQuery query { PbiFilter::FromDataSet(ds), file };
+        for (const auto& r : query) {
+            (void)r;
+            ++count_648;
+        }
+        EXPECT_EQ(11, count_648);
+    }
+    {   // 17299
+        const string xmlProperty = R"_XML_(<pbbase:Property Name="zm" Operator="=" Value="17299"/>\n)_XML_";
+        const string xml = xmlHeader + xmlProperty + xmlFooter;
+        const DataSet ds = DataSet::FromXml(xml);
+        const PbiFilterQuery query { PbiFilter::FromDataSet(ds), file };
+        for (const auto& r : query) {
+            (void)r;
+            ++count_17299;
+        }
+        EXPECT_EQ(4, count_17299);
+    }
+    {   // now check whitelist
+        const string xmlProperty = R"_XML_(<pbbase:Property Name="zm" Operator="=" Value="[30422,648,17299]"/>\n)_XML_";
+        const string xml = xmlHeader + xmlProperty + xmlFooter;
+        const DataSet ds = DataSet::FromXml(xml);
+        const PbiFilterQuery query { PbiFilter::FromDataSet(ds), file };
+        for (const auto& r : query) {
+            (void)r;
+            ++count_whitelist;
+        }
+        EXPECT_EQ(count_30422 + count_648 + count_17299, count_whitelist);
+    }
+}
