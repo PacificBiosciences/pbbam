@@ -1314,17 +1314,17 @@ static void TestTransformedXml(void)
         const ExternalResource& resource = resources[i];
         if (i == 0) {
             EXPECT_EQ(string("PacBio.SubreadFile.BaxFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///mnt/secondary-siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.0.bax.h5"),
+            EXPECT_EQ(string("file:///pbi/dept/secondary/siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.0.bax.h5"),
                       resource.ResourceId());
         }
         else if (i == 1) {
             EXPECT_EQ(string("PacBio.SubreadFile.BaxFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///mnt/secondary-siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.1.bax.h5"),
+            EXPECT_EQ(string("file:///pbi/dept/secondary/siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.1.bax.h5"),
                       resource.ResourceId());
         }
         else {
             EXPECT_EQ(string("PacBio.SubreadFile.BaxFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///mnt/secondary-siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.2.bax.h5"),
+            EXPECT_EQ(string("file:///pbi/dept/secondary/siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.2.bax.h5"),
                       resource.ResourceId());
         }
     }

@@ -17,11 +17,11 @@
     UniqueId="abbc9183-b01e-4671-8c12-19efee534647">
    <pbbase:ExternalResources>
       <pbbase:ExternalResource MetaType="PacBio.SubreadFile.BaxFile"
-          ResourceId="file:///mnt/secondary-siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.0.bax.h5"/>
+          ResourceId="file:///pbi/dept/secondary/siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.0.bax.h5"/>
       <pbbase:ExternalResource MetaType="PacBio.SubreadFile.BaxFile"
-          ResourceId="file:///mnt/secondary-siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.1.bax.h5"/>
+          ResourceId="file:///pbi/dept/secondary/siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.1.bax.h5"/>
       <pbbase:ExternalResource MetaType="PacBio.SubreadFile.BaxFile"
-          ResourceId="file:///mnt/secondary-siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.2.bax.h5"/>
+          ResourceId="file:///pbi/dept/secondary/siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.2.bax.h5"/>
    </pbbase:ExternalResources>
    <pbds:DataSetMetadata>
       <pbds:TotalLength>50000000</pbds:TotalLength>
