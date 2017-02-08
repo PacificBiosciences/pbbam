@@ -106,16 +106,16 @@ private:
     {
         if (!stream_)
             return;
-        char c = static_cast<char>(stream_.peek());
-        string line;
-        while (c != '>') {
+        int p = stream_.peek();
+        while (static_cast<char>(p) != '>' && p != EOF) {
             if (!stream_)
                 return;
+            string line;
             std::getline(stream_, line, '\n');
             bases_ += line;
             if (!stream_)
                 return;
-            c = static_cast<char>(stream_.peek());
+            p = stream_.peek();
         }
     }
 };
