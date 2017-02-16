@@ -130,7 +130,7 @@ public:
     /// \p filename may be one of the following types, indicated by its extension:\n
     ///  - %BAM ("*.bam") \n
     ///  - FOFN ("*.fofn") \n
-    ///  - FASTA (".fa" or ".fasta") \n
+    ///  - FASTA ("*.fa" or "*.fasta") \n
     ///  - DataSetXML ("*.xml") \n
     ///
     /// \param[in] filename  input filename
