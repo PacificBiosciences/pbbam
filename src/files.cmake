@@ -16,6 +16,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/BaiIndexedBamReader.h
     ${PacBioBAM_IncludeDir}/pbbam/BamReader.h
     ${PacBioBAM_IncludeDir}/pbbam/CompositeBamReader.h
+    ${PacBioBAM_IncludeDir}/pbbam/CompositeFastaReader.h
     ${PacBioBAM_IncludeDir}/pbbam/BamWriter.h
     ${PacBioBAM_IncludeDir}/pbbam/BarcodeQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/Cigar.h
@@ -29,6 +30,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/EntireFileQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/FastaReader.h
     ${PacBioBAM_IncludeDir}/pbbam/FastaSequence.h
+    ${PacBioBAM_IncludeDir}/pbbam/FastaSequenceQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/FrameEncodingType.h
     ${PacBioBAM_IncludeDir}/pbbam/Frames.h
     ${PacBioBAM_IncludeDir}/pbbam/GenomicInterval.h
@@ -87,6 +89,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/internal/CigarOperation.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/Compare.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/CompositeBamReader.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/CompositeFastaReader.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSet.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetBaseTypes.h
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetBaseTypes.inl
@@ -183,6 +186,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/DataSetXsd.cpp
     ${PacBioBAM_SourceDir}/EntireFileQuery.cpp
     ${PacBioBAM_SourceDir}/FastaReader.cpp
+    ${PacBioBAM_SourceDir}/FastaSequenceQuery.cpp
     ${PacBioBAM_SourceDir}/FileProducer.cpp
     ${PacBioBAM_SourceDir}/FileUtils.cpp
     ${PacBioBAM_SourceDir}/FofnReader.cpp

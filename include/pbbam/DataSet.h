@@ -365,6 +365,18 @@ public:
     ///
     std::vector<BamFile> BamFiles(void) const;
 
+    /// \brief Returns this dataset's primary FASTA resources, with relative
+    ///        filepaths already resolved.
+    ///
+    /// Primary resources are those listed as top-level %ExternalResources, not
+    /// associated files (indices, references, scraps %BAMs, etc.).
+    ///
+    /// \returns vector of filepaths to FASTA resources
+    ///
+    /// \sa DataSet::ResolvedResourceIds
+    ///
+    std::vector<std::string> FastaFiles(void) const;
+
     /// \brief Returns all primary external resource filepaths, with relative
     ///        paths resolved.
     ///

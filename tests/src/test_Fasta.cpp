@@ -43,6 +43,7 @@
 #include <gtest/gtest.h>
 #include <pbbam/FastaReader.h>
 #include <pbbam/FastaSequence.h>
+#include <pbbam/FastaSequenceQuery.h>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -103,3 +104,48 @@ TEST(FastaReaderTest, ReadAllOk)
     }
     EXPECT_EQ(3, count);
 }
+
+TEST(FastaSequenceQueryTest, FromFastaFilename)
+{
+    const string fn = tests::Data_Dir + "/lambdaNEB.fasta";
+
+    {
+        size_t count = 0;
+        FastaSequenceQuery query{ fn } ;
+        for (const auto& seq : query) {
+            (void) seq;
+            ++count;
+        }
+        EXPECT_EQ(1, count);
+    }
+
+    {
+        FastaSequenceQuery query{ fn };
+        const auto first = query.cbegin();
+        const auto& seq = *first;
+        EXPECT_EQ("lambda_NEB3011", seq.Name());
+    }
+
+}
+
+TEST(FastaSequenceQueryTest, FromDataSet)
+{
+    const string fn = tests::Data_Dir + "/referenceset.xml";
+
+    {
+        size_t count = 0;
+        FastaSequenceQuery query{ fn } ;
+        for (const auto& seq : query) {
+            (void) seq;
+            ++count;
+        }
+        EXPECT_EQ(5, count);    // 1 from lambda, 4 from chimera
+    }
+    {
+        FastaSequenceQuery query{ fn };
+        const auto first = query.cbegin();
+        const auto& seq = *first;
+        EXPECT_EQ("lambda_NEB3011", seq.Name());
+    }
+}
+

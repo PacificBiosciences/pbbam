@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pbds:ReferenceSet TimeStampedName="referenceset_150304_231155" MetaType="PacBio.DataSet.ReferenceSet" Name="lambdaNEB" CreatedAt="2016-01-04T18:02:13.181-08:00" UniqueId="3ad75a14-f43a-48bd-9dc1-8a08af29f587" Version="3.0.1" Author="pbscala 0.50.1-SNAPSHOT reference_info_dataset_0.4.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd">
+    <pbbase:ExternalResources>
+        <pbbase:ExternalResource Name="First References FASTA" Description="Points to an example references FASTA file." MetaType="PacBio.ReferenceFile.ReferenceFastaFile" ResourceId="./lambdaNEB.fa" UniqueId="fc549593-3c6b-4d21-82a6-5236fbbdf1c8" TimeStampedName="pacbio_dataset_index-fc549593-3c6b-4d21-82a6-5236fbbdf1c8" Tags="converted">
+            <pbbase:FileIndices>
+                <pbbase:FileIndex UniqueId="3a83d609-f6f1-49df-84d6-ace38fd6e9c2" TimeStampedName="pacbio_dataset_index-3a83d609-f6f1-49df-84d6-ace38fd6e9c2" MetaType="PacBio.Index.SamIndex" ResourceId="./lambdaNEB.fa.fai"/>
+            </pbbase:FileIndices>
+        </pbbase:ExternalResource>
+        <pbbase:ExternalResource Name="Second References FASTA" Description="Points to an example references FASTA file." MetaType="PacBio.ReferenceFile.ReferenceFastaFile" ResourceId="./chimera_minimal.fasta" UniqueId="fc549593-3c6b-4d21-82a6-5236fbbdf1c8" TimeStampedName="pacbio_dataset_index-fc549593-3c6b-4d21-82a6-5236fbbdf1c8" Tags="converted">
+        </pbbase:ExternalResource>
+    </pbbase:ExternalResources>
+    <pbds:DataSetMetadata>
+        <pbds:TotalLength>48502</pbds:TotalLength>
+        <pbds:NumRecords>1</pbds:NumRecords>
+        <pbds:Organism>lambdaNEB</pbds:Organism>
+        <pbds:Ploidy>haploid</pbds:Ploidy>
+        <pbds:Contigs>
+            <pbds:Contig Name="ref000001" Description="lambda_NEB3011" Length="48502" Digest="a1319ff90e994c8190a4fe6569d0822a"/>
+        </pbds:Contigs>
+    </pbds:DataSetMetadata>
+</pbds:ReferenceSet>
