@@ -107,7 +107,7 @@ TEST(FastaReaderTest, ReadAllOk)
 
 TEST(FastaSequenceQueryTest, FromFastaFilename)
 {
-    const string fn = tests::Data_Dir + "/lambdaNEB.fasta";
+    const string fn = tests::Data_Dir + "/lambdaNEB.fa";
 
     {
         size_t count = 0;
