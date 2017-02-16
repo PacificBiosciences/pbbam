@@ -127,9 +127,10 @@ public:
 
     /// \brief Loads a DataSet from a file.
     ///
-    /// \p filename may be one of three types, indicated by its extension:\n
+    /// \p filename may be one of the following types, indicated by its extension:\n
     ///  - %BAM ("*.bam") \n
     ///  - FOFN ("*.fofn") \n
+    ///  - FASTA (".fa" or ".fasta") \n
     ///  - DataSetXML ("*.xml") \n
     ///
     /// \param[in] filename  input filename
