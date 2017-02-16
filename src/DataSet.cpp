@@ -117,7 +117,9 @@ DataSet::DataSet(const string& filename)
     // (any relative paths in the FOFN have already been resolved)
     //
     if (boost::algorithm::iends_with(filename, ".fofn") ||
-        boost::algorithm::iends_with(filename, ".bam"))
+        boost::algorithm::iends_with(filename, ".bam") ||
+        boost::algorithm::iends_with(filename, ".fasta") ||
+        boost::algorithm::iends_with(filename, ".fa"))
     {
         path_ = FileUtils::CurrentWorkingDirectory();
     }
@@ -183,6 +185,24 @@ vector<BamFile> DataSet::BamFiles(void) const
         if (!bamFound.empty()) {
             const string fn = ResolvePath(ext.ResourceId());
             result.push_back(BamFile(fn));
+        }
+    }
+    return result;
+}
+
+vector<string> DataSet::FastaFiles(void) const
+{
+    const PacBio::BAM::ExternalResources& resources = ExternalResources();
+
+    vector<string> result;
+    result.reserve(resources.Size());
+    for(const ExternalResource& ext : resources) {
+
+        // only bother resolving file path if this is a BAM file
+        boost::iterator_range<string::const_iterator> fastaFound = boost::algorithm::ifind_first(ext.MetaType(), "fasta");
+        if (!fastaFound.empty()) {
+            const string fn = ResolvePath(ext.ResourceId());
+            result.push_back(fn);
         }
     }
     return result;

@@ -127,9 +127,10 @@ public:
 
     /// \brief Loads a DataSet from a file.
     ///
-    /// \p filename may be one of three types, indicated by its extension:\n
+    /// \p filename may be one of the following types, indicated by its extension:\n
     ///  - %BAM ("*.bam") \n
     ///  - FOFN ("*.fofn") \n
+    ///  - FASTA ("*.fa" or "*.fasta") \n
     ///  - DataSetXML ("*.xml") \n
     ///
     /// \param[in] filename  input filename
@@ -364,6 +365,18 @@ public:
     /// \sa DataSet::ResolvedResourceIds
     ///
     std::vector<BamFile> BamFiles(void) const;
+
+    /// \brief Returns this dataset's primary FASTA resources, with relative
+    ///        filepaths already resolved.
+    ///
+    /// Primary resources are those listed as top-level %ExternalResources, not
+    /// associated files (indices, references, scraps %BAMs, etc.).
+    ///
+    /// \returns vector of filepaths to FASTA resources
+    ///
+    /// \sa DataSet::ResolvedResourceIds
+    ///
+    std::vector<std::string> FastaFiles(void) const;
 
     /// \brief Returns all primary external resource filepaths, with relative
     ///        paths resolved.

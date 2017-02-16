@@ -13,6 +13,7 @@ guarantees will be maintained within each major version series.
 ### Added
 - Default DataSet 'Version' attribute if none already present (currently 4.0.0)
 - Added whitelist support for filtering ZMWs via DataSetXML.
+- Added iterable query over FASTA files & ReferenceSet datasets.
 
 ### Fixed
 - Bug in the build system preventing clean rebuilds.

@@ -76,6 +76,16 @@ unique_ptr<DataSetBase> FromBam(const string& bamFn)
 }
 
 static
+unique_ptr<DataSetBase> FromFasta(const string& fasta)
+{
+    // make FASTA data set
+    unique_ptr<DataSetBase> dataset(new ReferenceSet);
+    ExternalResources& resources = dataset->ExternalResources();
+    resources.Add(ExternalResource("PacBio.ReferenceFile.ReferenceFastaFile", fasta));
+    return dataset;
+}
+
+static
 unique_ptr<DataSetBase> FromFofn(const string& fofn)
 {
     const string fofnDir = internal::FileUtils::DirectoryName(fofn);
@@ -102,6 +112,11 @@ unique_ptr<DataSetBase> FromUri(const string& uri)
         return FromBam(uri);
     else if (boost::algorithm::iends_with(uri, ".fofn"))
         return FromFofn(uri);
+    else if (boost::algorithm::iends_with(uri, ".fasta") ||
+             boost::algorithm::iends_with(uri, ".fa"))
+    {
+        return FromFasta(uri);
+    }
 
     // unknown filename extension
     throw std::runtime_error("unsupported input file extension");
