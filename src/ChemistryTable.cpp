@@ -36,12 +36,16 @@
 // Author: Lance Hepler
 
 #include "ChemistryTable.h"
+#include "FileUtils.h"
+#include "pugixml/pugixml.hpp"
+#include <fstream>
+using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-extern const std::vector<std::array<std::string, 4>> ChemistryTable = {
+extern const vector<array<string, 4>> ChemistryTable = {
 
     // BindingKit, SequencingKit, BasecallerVersion, Chemistry
 
@@ -82,6 +86,38 @@ extern const std::vector<std::array<std::string, 4>> ChemistryTable = {
     {{"100-862-200", "100-861-800", "4.1", "S/P2-C2"}}
 
 };
+
+vector<array<string, 4>> ChemistryTableFromXml(const string& mappingXml)
+{
+    if (!FileUtils::Exists(mappingXml))
+        return {};
+
+    ifstream in(mappingXml);
+    pugi::xml_document doc;
+    const pugi::xml_parse_result& loadResult = doc.load(in);
+    if (loadResult.status != pugi::status_ok)
+        throw runtime_error(string("could not read XML file, error code:") + to_string(loadResult.status) );
+
+    // parse top-level attributes
+    pugi::xml_node rootNode = doc.document_element();
+    if (rootNode == pugi::xml_node())
+        throw runtime_error("could not fetch XML root node");
+
+    if (string(rootNode.name()) != "MappingTable")
+        throw runtime_error("invalid mapping XML");
+
+    vector<array<string, 4>> table;
+    for (const auto& childNode : rootNode) {
+        const string childName = childNode.name();
+        if (childName != "Mapping") continue;
+        table.emplace_back(array<string, 4>{{
+            childNode.child("BindingKit").child_value(),
+            childNode.child("SequencingKit").child_value(),
+            childNode.child("SoftwareVersion").child_value(),
+            childNode.child("SequencingChemistry").child_value()}});
+    }
+    return table;
+}
 
 } // namespace internal
 } // namespace BAM

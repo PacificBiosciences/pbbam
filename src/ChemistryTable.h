@@ -48,6 +48,8 @@ namespace internal {
 
 extern const std::vector<std::array<std::string, 4>> ChemistryTable;
 
+std::vector<std::array<std::string, 4>> ChemistryTableFromXml(const std::string& mappingXml);
+
 } // namespace internal
 } // namespace BAM
 } // namespace PacBio
