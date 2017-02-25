@@ -127,14 +127,14 @@ const ChemistryTable& GetChemistryTableFromEnv()
     static map<string, ChemistryTable> tableCache;
 
     string chemPath;
-    if (const char* pth = getenv("PACBIO_CHEMISTRY_UPDATE_PATH"))
+    if (const char* pth = getenv("PB_CHEMISTRY_BUNDLE_DIR");
         chemPath = pth;
     else return empty;
 
     auto it = tableCache.find(chemPath);
     if (it != tableCache.end()) return it->second;
 
-    auto tbl = ChemistryTableFromXml(chemPath + "/mapping.xml");
+    auto tbl = ChemistryTableFromXml(chemPath + "/chemistry.xml");
     if (tbl.empty()) return empty;
 
     it = tableCache.emplace(std::move(chemPath), std::move(tbl)).first;
