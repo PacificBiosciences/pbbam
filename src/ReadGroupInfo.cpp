@@ -48,7 +48,6 @@
 #include <sstream>
 #include <stdexcept>
 #include <cstdio>
-#include <cstdlib>
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -698,15 +697,13 @@ string ReadGroupInfo::SequencingChemistryFromTriple(const string& bindingKit,
         throw std::runtime_error("basecaller version too short: " + basecallerVersion);
     const string ver = verFields.at(0) + "." + verFields.at(1);
 
-    if (const char* chemPath = getenv("PACBIO_CHEMISTRY_UPDATE_PATH")) {
-        const string mappingXml = string(chemPath) + "/mapping.xml";
-        for (const auto& row : internal::ChemistryTableFromXml(mappingXml)) {
-            if (bindingKit == row[0] && sequencingKit == row[1] && ver == row[2])
-                return row[3];
-        }
+    // check updated table first, if it exists (empty if not), overriding the built-in lookup
+    for (const auto& row : internal::GetChemistryTableFromEnv()) {
+        if (bindingKit == row[0] && sequencingKit == row[1] && ver == row[2])
+            return row[3];
     }
 
-    for (const auto& row : internal::ChemistryTable) {
+    for (const auto& row : internal::BuiltInChemistryTable) {
         if (bindingKit == row[0] && sequencingKit == row[1] && ver == row[2])
             return row[3];
     }

@@ -39,13 +39,15 @@
 #include "FileUtils.h"
 #include "pugixml/pugixml.hpp"
 #include <fstream>
+#include <map>
+#include <cstdlib>
 using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-extern const vector<array<string, 4>> ChemistryTable = {
+extern const ChemistryTable BuiltInChemistryTable = {
 
     // BindingKit, SequencingKit, BasecallerVersion, Chemistry
 
@@ -87,7 +89,7 @@ extern const vector<array<string, 4>> ChemistryTable = {
 
 };
 
-vector<array<string, 4>> ChemistryTableFromXml(const string& mappingXml)
+ChemistryTable ChemistryTableFromXml(const string& mappingXml)
 {
     if (!FileUtils::Exists(mappingXml))
         return {};
@@ -106,7 +108,7 @@ vector<array<string, 4>> ChemistryTableFromXml(const string& mappingXml)
     if (string(rootNode.name()) != "MappingTable")
         throw runtime_error("invalid mapping XML");
 
-    vector<array<string, 4>> table;
+    ChemistryTable table;
     for (const auto& childNode : rootNode) {
         const string childName = childNode.name();
         if (childName != "Mapping") continue;
@@ -117,6 +119,26 @@ vector<array<string, 4>> ChemistryTableFromXml(const string& mappingXml)
             childNode.child("SequencingChemistry").child_value()}});
     }
     return table;
+}
+
+const ChemistryTable& GetChemistryTableFromEnv()
+{
+    static const ChemistryTable empty{};
+    static map<string, ChemistryTable> tableCache;
+
+    string chemPath;
+    if (const char* pth = getenv("PACBIO_CHEMISTRY_UPDATE_PATH"))
+        chemPath = pth;
+    else return empty;
+
+    auto it = tableCache.find(chemPath);
+    if (it != tableCache.end()) return it->second;
+
+    auto tbl = ChemistryTableFromXml(chemPath + "/mapping.xml");
+    if (tbl.empty()) return empty;
+
+    it = tableCache.emplace(std::move(chemPath), std::move(tbl)).first;
+    return it->second;
 }
 
 } // namespace internal
