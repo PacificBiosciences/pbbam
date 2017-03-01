@@ -42,6 +42,8 @@
 #include "TestData.h"
 #include <gtest/gtest.h>
 #include <pbbam/ReadGroupInfo.h>
+#include <pbbam/exception/BundleChemistryMappingException.h>
+#include <pbbam/exception/InvalidSequencingChemistryException.h>
 #include <string>
 #include <vector>
 #include <cstdlib>
@@ -170,6 +172,14 @@ TEST(ReadGroupInfoTest, SequencingChemistryFromMappingXml)
     EXPECT_THROW(ReadGroupInfo::SequencingChemistryFromTriple("1", "2", "3.4"),
                  InvalidSequencingChemistryException);
     EXPECT_EQ("FOUND", rg.SequencingChemistry());
+
+    EXPECT_EQ(0, setenv(varname, "/dev/null", 0));
+
+    // test that a bogus PB_CHEMISTRY_BUNDLE_DIR throws
+    EXPECT_THROW(ReadGroupInfo::SequencingChemistryFromTriple("1", "2", "3.4"),
+                 BundleChemistryMappingException);
+
+    EXPECT_EQ(0, unsetenv(varname));
 }
 
 TEST(ReadGroupInfoTest, SequencingChemistryThrowsOnBadTriple)
