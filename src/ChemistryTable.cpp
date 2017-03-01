@@ -35,13 +35,20 @@
 
 // Author: Lance Hepler
 
+#include "pbbam/exception/BundleChemistryMappingException.h"
 #include "ChemistryTable.h"
+#include "FileUtils.h"
+#include "pugixml/pugixml.hpp"
+#include <fstream>
+#include <map>
+#include <cstdlib>
+using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-extern const std::vector<std::array<std::string, 4>> ChemistryTable = {
+extern const ChemistryTable BuiltInChemistryTable = {
 
     // BindingKit, SequencingKit, BasecallerVersion, Chemistry
 
@@ -82,6 +89,62 @@ extern const std::vector<std::array<std::string, 4>> ChemistryTable = {
     {{"100-862-200", "100-861-800", "4.1", "S/P2-C2"}}
 
 };
+
+ChemistryTable ChemistryTableFromXml(const string& mappingXml)
+{
+    if (!FileUtils::Exists(mappingXml))
+        throw BundleChemistryMappingException(
+                mappingXml, "PB_CHEMISTRY_BUNDLE_DIR defined but file not found");
+
+    ifstream in(mappingXml);
+    pugi::xml_document doc;
+    const pugi::xml_parse_result& loadResult = doc.load(in);
+    if (loadResult.status != pugi::status_ok)
+        throw BundleChemistryMappingException(
+                mappingXml, string("unparseable XML, error code:") + to_string(loadResult.status));
+
+    // parse top-level attributes
+    pugi::xml_node rootNode = doc.document_element();
+    if (rootNode == pugi::xml_node())
+        throw BundleChemistryMappingException(mappingXml, "could not fetch XML root node");
+
+    if (string(rootNode.name()) != "MappingTable")
+        throw BundleChemistryMappingException(mappingXml, "MappingTable not found");
+
+    ChemistryTable table;
+    try {
+        for (const auto& childNode : rootNode) {
+            const string childName = childNode.name();
+            if (childName != "Mapping") continue;
+            table.emplace_back(array<string, 4>{{
+                childNode.child("BindingKit").child_value(),
+                childNode.child("SequencingKit").child_value(),
+                childNode.child("SoftwareVersion").child_value(),
+                childNode.child("SequencingChemistry").child_value()}});
+        }
+    } catch(...) {
+        throw BundleChemistryMappingException(mappingXml, "Mapping entries unparseable");
+    }
+    return table;
+}
+
+const ChemistryTable& GetChemistryTableFromEnv()
+{
+    static const ChemistryTable empty{};
+    static map<string, ChemistryTable> tableCache;
+
+    string chemPath;
+    if (const char* pth = getenv("PB_CHEMISTRY_BUNDLE_DIR"))
+        chemPath = pth;
+    else return empty;
+
+    auto it = tableCache.find(chemPath);
+    if (it != tableCache.end()) return it->second;
+
+    auto tbl = ChemistryTableFromXml(chemPath + "/chemistry.xml");
+    it = tableCache.emplace(std::move(chemPath), std::move(tbl)).first;
+    return it->second;
+}
 
 } // namespace internal
 } // namespace BAM

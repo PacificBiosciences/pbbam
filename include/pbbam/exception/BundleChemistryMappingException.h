@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2017, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -32,28 +32,50 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
+//
+// File Description
+/// \file BundleChemistryMappingException.h
+/// \brief Defines the BundleChemistryMappingException class.
+//
+// Author: Derek Barnett, Lance Hepler
 
-// Author: Lance Hepler
+#ifndef BUNDLECHEMISTRYMAPPINGEXCEPTION_H
+#define BUNDLECHEMISTRYMAPPINGEXCEPTION_H
 
-#ifndef CHEMISTRYTABLE_H
-#define CHEMISTRYTABLE_H
-
-#include <array>
+#include <exception>
 #include <string>
-#include <vector>
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-typedef std::vector<std::array<std::string, 4>> ChemistryTable;
+/// \brief The BundleChemistryMappingException class represents an exception
+///        that will be thrown when an invalid sequencing chemistry combination
+///        is encountered.
+///
+class BundleChemistryMappingException : public std::exception
+{
+public:
+    BundleChemistryMappingException(const std::string& mappingXml, const std::string& msg)
+        : mappingXml_(mappingXml)
+        , what_(std::string("invalid ") + mappingXml_ + ": " + msg)
+    {
+    }
 
-extern const ChemistryTable BuiltInChemistryTable;
+    // This is a work around for the Intel PHI compiler (icpc)
+    ~BundleChemistryMappingException() throw()
+    {
+    }
 
-const ChemistryTable& GetChemistryTableFromEnv();
+public:
+    const char* what(void) const noexcept override
+    { return what_.c_str(); }
 
-} // namespace internal
+protected:
+    std::string mappingXml_;
+    std::string what_;
+};
+
 } // namespace BAM
 } // namespace PacBio
 
-#endif // CHEMISTRYTABLE_H
+#endif // BUNDLECHEMISTRYMAPPINGEXCEPTION_H
