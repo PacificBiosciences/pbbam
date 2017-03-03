@@ -261,9 +261,10 @@ inline ReadGroupInfo& ReadGroupInfo::SequencingCenter(const std::string& center)
 
 inline std::string ReadGroupInfo::SequencingChemistry(void) const
 {
-    return SequencingChemistryFromTriple(BindingKit(),
-                                         SequencingKit(),
-                                         BasecallerVersion());
+    if (!sequencingChemistry_.empty()) return sequencingChemistry_;
+    return sequencingChemistry_ = SequencingChemistryFromTriple(BindingKit(),
+                                                                SequencingKit(),
+                                                                BasecallerVersion());
 }
 
 inline std::string ReadGroupInfo::SequencingKit(void) const

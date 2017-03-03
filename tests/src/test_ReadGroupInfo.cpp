@@ -39,10 +39,14 @@
 #define private public
 #endif
 
+#include "TestData.h"
 #include <gtest/gtest.h>
 #include <pbbam/ReadGroupInfo.h>
+#include <pbbam/exception/BundleChemistryMappingException.h>
+#include <pbbam/exception/InvalidSequencingChemistryException.h>
 #include <string>
 #include <vector>
+#include <cstdlib>
 using namespace PacBio::BAM;
 using namespace std;
 
@@ -129,6 +133,53 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
           .BasecallerVersion("3.3");
         EXPECT_EQ(chem, rg.SequencingChemistry());
     }
+}
+
+#ifdef _WIN32
+int setenv(const char* name, const char* value, int overwrite)
+{
+    int err = 0;
+    if (!overwrite) {
+        size_t sz = 0;
+        err = getenv_s(&sz, NULL, 0, name);
+        if (err || sz) return err;
+    }
+    return _putenv_s(name, value);
+}
+
+int unsetenv(const char* name) {
+    static const char* empty = "";
+    return _putenv_s(name, empty);
+}
+#endif
+
+TEST(ReadGroupInfoTest, SequencingChemistryFromMappingXml)
+{
+    ReadGroupInfo rg("MAYBE");
+    rg.BindingKit("1").SequencingKit("2").BasecallerVersion("3.4");
+    EXPECT_THROW(rg.SequencingChemistry(), InvalidSequencingChemistryException);
+
+    // set the magic environment variable
+    const char* varname = "PB_CHEMISTRY_BUNDLE_DIR";
+    EXPECT_EQ(0, setenv(varname, tests::Data_Dir.c_str(), 0));
+
+    EXPECT_EQ("FOUND", rg.SequencingChemistry());
+
+    // unset the environment variable
+    EXPECT_EQ(0, unsetenv(varname));
+
+    // test memoization
+    EXPECT_THROW(ReadGroupInfo::SequencingChemistryFromTriple("1", "2", "3.4"),
+                 InvalidSequencingChemistryException);
+    EXPECT_EQ("FOUND", rg.SequencingChemistry());
+
+    EXPECT_EQ(0, setenv(varname, "/dev/null", 0));
+
+    // test that a bogus PB_CHEMISTRY_BUNDLE_DIR throws
+    EXPECT_THROW(ReadGroupInfo::SequencingChemistryFromTriple("1", "2", "3.4"),
+                 BundleChemistryMappingException);
+
+    EXPECT_EQ(0, unsetenv(varname));
 }
 
 TEST(ReadGroupInfoTest, SequencingChemistryThrowsOnBadTriple)

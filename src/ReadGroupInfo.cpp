@@ -696,8 +696,14 @@ string ReadGroupInfo::SequencingChemistryFromTriple(const string& bindingKit,
     if (verFields.size() < 2)
         throw std::runtime_error("basecaller version too short: " + basecallerVersion);
     const string ver = verFields.at(0) + "." + verFields.at(1);
-//    const string ver{ basecallerVersion.substr(0, 3) };
-    for (const auto& row : internal::ChemistryTable) {
+
+    // check updated table first, if it exists (empty if not), overriding the built-in lookup
+    for (const auto& row : internal::GetChemistryTableFromEnv()) {
+        if (bindingKit == row[0] && sequencingKit == row[1] && ver == row[2])
+            return row[3];
+    }
+
+    for (const auto& row : internal::BuiltInChemistryTable) {
         if (bindingKit == row[0] && sequencingKit == row[1] && ver == row[2])
             return row[3];
     }
