@@ -134,7 +134,8 @@ const ChemistryTable& GetChemistryTableFromEnv()
     static map<string, ChemistryTable> tableCache;
 
     string chemPath;
-    if (const char* pth = getenv("PB_CHEMISTRY_BUNDLE_DIR"))
+    const char* pth = getenv("PB_CHEMISTRY_BUNDLE_DIR");
+    if (pth != nullptr && pth[0] != '\0')
         chemPath = pth;
     else return empty;
 
