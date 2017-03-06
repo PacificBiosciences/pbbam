@@ -162,7 +162,7 @@ DataSetBase& DataSetBase::operator+=(const DataSetBase& other)
 {
     // must be same dataset types (or 'other' must be generic)
     if (other.LocalNameLabel() != LocalNameLabel() && other.LocalNameLabel() != "DataSet")
-        throw std::runtime_error("cannot merge incompatible dataset types");
+        throw std::runtime_error("cannot merge different dataset types");
 
     // check filter match
     // check object metadata

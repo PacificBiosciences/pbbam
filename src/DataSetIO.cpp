@@ -69,7 +69,17 @@ unique_ptr<DataSetBase> FromXml(const string& xmlFn)
 static
 unique_ptr<DataSetBase> FromBam(const string& bamFn)
 {
-    unique_ptr<DataSetBase> dataset(new SubreadSet);
+    // peek at sort order to determine if file should be an AlignmentSet or else SubreadSet
+    const auto bamFile = BamFile{ bamFn };
+    const auto& header = bamFile.Header();
+    const auto aligned = header.SortOrder() == "coordinate";
+    
+    unique_ptr<DataSetBase> dataset;
+    if (aligned) 
+        dataset.reset(new AlignmentSet);
+    else 
+        dataset.reset(new SubreadSet);
+    
     ExternalResources& resources = dataset->ExternalResources();
     resources.Add(ExternalResource(BamFile(bamFn)));
     return dataset;
