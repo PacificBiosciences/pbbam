@@ -120,8 +120,7 @@ static const string platformModelType_ASTRO  = string{ "ASTRO" };
 static const string platformModelType_RS     = string{ "RS" };
 static const string platformModelType_SEQUEL = string{ "SEQUEL" };
 
-static
-string BaseFeatureName(const BaseFeature& feature)
+static string BaseFeatureName(const BaseFeature& feature)
 {
     switch(feature) {
         case BaseFeature::DELETION_QV      : return feature_DQ;
@@ -143,179 +142,130 @@ string BaseFeatureName(const BaseFeature& feature)
         case BaseFeature::PULSE_CALL       : return feature_PC;
         case BaseFeature::PRE_PULSE_FRAMES : return feature_PD;
         case BaseFeature::PULSE_CALL_WIDTH : return feature_PX;
-    case BaseFeature::START_FRAME          : return feature_SF;
+        case BaseFeature::START_FRAME      : return feature_SF;
         default:
             throw std::runtime_error{ "unrecognized base feature" };
     }
-    return string{ }; // unreachable
 }
 
-static
-string FrameCodecName(const FrameCodec& codec)
+static string FrameCodecName(const FrameCodec& codec)
 {
     switch (codec) {
         case FrameCodec::RAW : return codec_RAW;
         case FrameCodec::V1  : return codec_V1;
-        default:
-            throw std::runtime_error{ "unrecognized frame codec" };
     }
-    return string{ }; // unreachable
 }
 
-static
-string BarcodeModeName(const BarcodeModeType& mode)
+static string BarcodeModeName(const BarcodeModeType& mode)
 {
     switch (mode) {
         case BarcodeModeType::NONE       : return barcodemode_NONE;
         case BarcodeModeType::SYMMETRIC  : return barcodemode_SYM;
         case BarcodeModeType::ASYMMETRIC : return barcodemode_ASYM;
-        default:
-            throw std::runtime_error{ "unrecognized barcode mode" };
     }
-    return string{ }; // unreachable
 }
 
-static
-string BarcodeQualityName(const BarcodeQualityType& type)
+static string BarcodeQualityName(const BarcodeQualityType& type)
 {
     switch (type) {
         case BarcodeQualityType::NONE  : return barcodequal_NONE;
         case BarcodeQualityType::SCORE : return barcodequal_SCORE;
         case BarcodeQualityType::PROBABILITY : return barcodequal_PROB;
-        default:
-            throw std::runtime_error{ "unrecognized barcode quality type" };
     }
-    return string{ }; // unreachable
 }
 
-static
-string PlatformModelName(const PlatformModelType& type)
+static string PlatformModelName(const PlatformModelType& type)
 {
     switch (type) {
         case PlatformModelType::ASTRO  : return platformModelType_ASTRO;
         case PlatformModelType::RS     : return platformModelType_RS;
         case PlatformModelType::SEQUEL : return platformModelType_SEQUEL;
-        default:
-            throw std::runtime_error{ "unrecognized platform model" };
-    }
-    return string{ }; // unreachable
-}
-
-static map<string, BaseFeature>        nameToFeature;
-static map<string, FrameCodec>         nameToCodec;
-static map<string, BarcodeModeType>    nameToBarcodeMode;
-static map<string, BarcodeQualityType> nameToBarcodeQuality;
-static map<string, PlatformModelType>  nameToPlatformModel;
-
-static inline
-void InitNameToFeature(void)
-{
-    if (nameToFeature.empty()) {
-        nameToFeature[feature_DQ] = BaseFeature::DELETION_QV;
-        nameToFeature[feature_DT] = BaseFeature::DELETION_TAG;
-        nameToFeature[feature_IQ] = BaseFeature::INSERTION_QV;
-        nameToFeature[feature_MQ] = BaseFeature::MERGE_QV;
-        nameToFeature[feature_SQ] = BaseFeature::SUBSTITUTION_QV;
-        nameToFeature[feature_ST] = BaseFeature::SUBSTITUTION_TAG;
-        nameToFeature[feature_IP] = BaseFeature::IPD;
-        nameToFeature[feature_PW] = BaseFeature::PULSE_WIDTH;
-        nameToFeature[feature_PM] = BaseFeature::PKMID;
-        nameToFeature[feature_PA] = BaseFeature::PKMEAN;
-        nameToFeature[feature_PI] = BaseFeature::PKMID2;
-        nameToFeature[feature_PS] = BaseFeature::PKMEAN2;
-        nameToFeature[feature_PQ] = BaseFeature::LABEL_QV;
-        nameToFeature[feature_PT] = BaseFeature::ALT_LABEL;
-        nameToFeature[feature_PV] = BaseFeature::ALT_LABEL_QV;
-        nameToFeature[feature_PC] = BaseFeature::PULSE_CALL;
-        nameToFeature[feature_PG] = BaseFeature::PULSE_MERGE_QV;
-        nameToFeature[feature_PD] = BaseFeature::PRE_PULSE_FRAMES;
-        nameToFeature[feature_PX] = BaseFeature::PULSE_CALL_WIDTH;
-        nameToFeature[feature_SF] = BaseFeature::START_FRAME;
     }
 }
 
-static inline
-void InitNameToCodec(void)
+static const auto nameToFeature = map<string, BaseFeature>
 {
-    if (nameToCodec.empty()) {
-        nameToCodec[codec_RAW] = FrameCodec::RAW;
-        nameToCodec[codec_V1]  = FrameCodec::V1;
-    }
+    { feature_DQ, BaseFeature::DELETION_QV },
+    { feature_DT, BaseFeature::DELETION_TAG },
+    { feature_IQ, BaseFeature::INSERTION_QV },
+    { feature_MQ, BaseFeature::MERGE_QV },
+    { feature_SQ, BaseFeature::SUBSTITUTION_QV },
+    { feature_ST, BaseFeature::SUBSTITUTION_TAG },
+    { feature_IP, BaseFeature::IPD },
+    { feature_PW, BaseFeature::PULSE_WIDTH },
+    { feature_PM, BaseFeature::PKMID },
+    { feature_PA, BaseFeature::PKMEAN },
+    { feature_PI, BaseFeature::PKMID2 },
+    { feature_PS, BaseFeature::PKMEAN2 },
+    { feature_PQ, BaseFeature::LABEL_QV },
+    { feature_PT, BaseFeature::ALT_LABEL },
+    { feature_PV, BaseFeature::ALT_LABEL_QV },
+    { feature_PC, BaseFeature::PULSE_CALL },
+    { feature_PG, BaseFeature::PULSE_MERGE_QV },
+    { feature_PD, BaseFeature::PRE_PULSE_FRAMES },
+    { feature_PX, BaseFeature::PULSE_CALL_WIDTH },
+    { feature_SF, BaseFeature::START_FRAME }
+};
+
+static const auto nameToCodec = map<string, FrameCodec>
+{
+    { codec_RAW, FrameCodec::RAW },
+    { codec_V1,  FrameCodec::V1 }
+};
+
+static const auto nameToBarcodeMode = map<string, BarcodeModeType>
+{
+    { barcodemode_NONE, BarcodeModeType::NONE },
+    { barcodemode_SYM,  BarcodeModeType::SYMMETRIC },
+    { barcodemode_ASYM, BarcodeModeType::ASYMMETRIC }
+};
+
+static const auto nameToBarcodeQuality = map<string, BarcodeQualityType>
+{
+    { barcodequal_NONE,  BarcodeQualityType::NONE },
+    { barcodequal_SCORE, BarcodeQualityType::SCORE },
+    { barcodequal_PROB,  BarcodeQualityType::PROBABILITY }
+};
+
+static const auto nameToPlatformModel = map<string, PlatformModelType>
+{
+    { platformModelType_ASTRO,  PlatformModelType::ASTRO },
+    { platformModelType_RS,     PlatformModelType::RS },
+    { platformModelType_SEQUEL, PlatformModelType::SEQUEL }
+};
+
+static inline bool IsLikelyBarcodeKey(const string& name)
+{
+    return name.find("Barcode") == 0;
 }
 
-static inline
-void InitNameToBarcodeMode(void)
+static inline bool IsBaseFeature(const string& name)
 {
-    if (nameToBarcodeMode.empty()) {
-        nameToBarcodeMode[barcodemode_NONE] = BarcodeModeType::NONE;
-        nameToBarcodeMode[barcodemode_SYM]  = BarcodeModeType::SYMMETRIC;
-        nameToBarcodeMode[barcodemode_ASYM] = BarcodeModeType::ASYMMETRIC;
-    }
-}
-
-static inline
-void InitNameToBarcodeQuality(void)
-{
-    if (nameToBarcodeQuality.empty()) {
-        nameToBarcodeQuality[barcodequal_NONE]  = BarcodeQualityType::NONE;
-        nameToBarcodeQuality[barcodequal_SCORE] = BarcodeQualityType::SCORE;
-        nameToBarcodeQuality[barcodequal_PROB]  = BarcodeQualityType::PROBABILITY;
-    }
-}
-
-static inline
-void InitNameToPlatformModel(void)
-{
-    if (nameToPlatformModel.empty()) {
-        nameToPlatformModel[platformModelType_ASTRO]  = PlatformModelType::ASTRO;
-        nameToPlatformModel[platformModelType_RS]     = PlatformModelType::RS;
-        nameToPlatformModel[platformModelType_SEQUEL] = PlatformModelType::SEQUEL;
-    }
-}
-
-static inline
-bool IsLikelyBarcodeKey(const string& name)
-{ return name.find("Barcode") == 0; }
-
-static inline
-bool IsBaseFeature(const string& name)
-{
-    InitNameToFeature();
     return nameToFeature.find(name) != nameToFeature.cend();
 }
 
-static inline
-BaseFeature BaseFeatureFromName(const string& name)
+static inline BaseFeature BaseFeatureFromName(const string& name)
 {
-    InitNameToFeature();
     return nameToFeature.at(name);
 }
 
-static inline
-FrameCodec FrameCodecFromName(const string& name)
+static inline FrameCodec FrameCodecFromName(const string& name)
 {
-    InitNameToCodec();
     return nameToCodec.at(name);
 }
 
-static inline
-BarcodeModeType BarcodeModeFromName(const string& name)
+static inline BarcodeModeType BarcodeModeFromName(const string& name)
 {
-    InitNameToBarcodeMode();
     return nameToBarcodeMode.at(name);
 }
 
-static inline
-BarcodeQualityType BarcodeQualityFromName(const string& name)
+static inline BarcodeQualityType BarcodeQualityFromName(const string& name)
 {
-    InitNameToBarcodeQuality();
     return nameToBarcodeQuality.at(name);
 }
 
-static inline
-PlatformModelType PlatformModelFromName(const string& name)
+static inline PlatformModelType PlatformModelFromName(const string& name)
 {
-    InitNameToPlatformModel();
     return nameToPlatformModel.at(name);
 }
 
