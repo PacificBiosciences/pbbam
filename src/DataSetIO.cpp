@@ -62,7 +62,7 @@ unique_ptr<DataSetBase> FromXml(const string& xmlFn)
 {
     ifstream in(xmlFn);
     if (!in)
-        throw std::runtime_error("could not open XML file for reading");
+        throw std::runtime_error("could not open XML file for reading: " + xmlFn);
     return XmlReader::FromStream(in);
 }
 
@@ -101,7 +101,7 @@ unique_ptr<DataSetBase> FromFofn(const string& fofn)
     const string fofnDir = internal::FileUtils::DirectoryName(fofn);
     ifstream in(fofn);
     if (!in)
-        throw std::runtime_error("could not open FOFN for reading");
+        throw std::runtime_error("could not open FOFN for reading: " + fofn);
 
     vector<string> filenames = FofnReader::Files(in);
     for (size_t i = 0; i < filenames.size(); ++i)
@@ -129,7 +129,7 @@ unique_ptr<DataSetBase> FromUri(const string& uri)
     }
 
     // unknown filename extension
-    throw std::runtime_error("unsupported input file extension");
+    throw std::runtime_error("unsupported extension on input file: " + uri);
 }
 
 } // namespace internal
@@ -179,7 +179,7 @@ void DataSetIO::ToFile(const std::unique_ptr<DataSetBase>& dataset,
 {
     ofstream out(fn);
     if (!out)
-        throw std::runtime_error("could not open XML for writing");
+        throw std::runtime_error("could not open XML file for writing: " + fn);
     XmlWriter::ToStream(dataset, out);
 }
 
