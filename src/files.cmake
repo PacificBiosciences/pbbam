@@ -31,6 +31,8 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/FastaReader.h
     ${PacBioBAM_IncludeDir}/pbbam/FastaSequence.h
     ${PacBioBAM_IncludeDir}/pbbam/FastaSequenceQuery.h
+    ${PacBioBAM_IncludeDir}/pbbam/FastqReader.h
+    ${PacBioBAM_IncludeDir}/pbbam/FastqSequence.h
     ${PacBioBAM_IncludeDir}/pbbam/FrameEncodingType.h
     ${PacBioBAM_IncludeDir}/pbbam/Frames.h
     ${PacBioBAM_IncludeDir}/pbbam/GenomicInterval.h
@@ -99,6 +101,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetListElement.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/DataSetTypes.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/FastaSequence.inl
+    ${PacBioBAM_IncludeDir}/pbbam/internal/FastqSequence.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/Frames.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/GenomicInterval.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/Interval.inl
@@ -187,6 +190,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/EntireFileQuery.cpp
     ${PacBioBAM_SourceDir}/FastaReader.cpp
     ${PacBioBAM_SourceDir}/FastaSequenceQuery.cpp
+    ${PacBioBAM_SourceDir}/FastqReader.cpp
     ${PacBioBAM_SourceDir}/FileProducer.cpp
     ${PacBioBAM_SourceDir}/FileUtils.cpp
     ${PacBioBAM_SourceDir}/FofnReader.cpp
