@@ -195,7 +195,7 @@ std::vector<std::string> DataSet::AllFiles(void) const
     std::vector<std::string> result;
     internal::GetAllFiles(ExternalResources(), &result);
 
-    // resolve relatrve paths
+    // resolve relative paths
     std::transform(result.begin(), result.end(), result.begin(),
                    [this](const std::string& fn) { return this->ResolvePath(fn); });
     return result;
