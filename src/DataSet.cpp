@@ -46,6 +46,7 @@
 #include "FileUtils.h"
 #include "TimeUtils.h"
 #include <boost/algorithm/string.hpp>
+#include <algorithm>
 #include <unordered_map>
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -57,6 +58,22 @@ namespace BAM {
 namespace internal {
 
 static const string defaultVersion{ "4.0.0" };
+
+static void GetAllFiles(const ExternalResources& resources, std::vector<std::string>* result) 
+{
+    for (const auto& resource : resources) {
+
+         // store this resource's path 
+        result->push_back(resource.ResourceId());
+
+        // store any child indices
+        for (const auto& idx : resource.FileIndices()) 
+            result->push_back(idx.ResourceId());
+        
+        // recurse into any other child resources
+        GetAllFiles(resource.ExternalResources(), result);
+    }
+}
 
 static inline void InitDefaults(DataSet& ds)
 {
@@ -170,6 +187,18 @@ DataSet& DataSet::operator+=(const DataSet& other)
 {
     *d_.get() += *other.d_.get();
     return *this;
+}
+
+std::vector<std::string> DataSet::AllFiles(void) const
+{
+    // get all files
+    std::vector<std::string> result;
+    internal::GetAllFiles(ExternalResources(), &result);
+
+    // resolve relative paths
+    std::transform(result.begin(), result.end(), result.begin(),
+                   [this](const std::string& fn) { return this->ResolvePath(fn); });
+    return result;
 }
 
 vector<BamFile> DataSet::BamFiles(void) const

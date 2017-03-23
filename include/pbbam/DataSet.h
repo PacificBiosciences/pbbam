@@ -353,7 +353,19 @@ public:
 public:
     /// \name Resource Handling
     /// \{
-
+ 
+    /// \brief Returns all of this dataset's resource files, with relative
+    ///        filepaths already resolved.
+    ///
+    /// Includes both primary resources (e.g. subread BAM files), as well as all 
+    /// secondary or child resources (e.g. index files, scraps BAM, etc). 
+    ///
+    /// \returns vector of (resolveD) filepaths
+    ///
+    /// \sa DataSet::ResolvedResourceIds
+    ///
+    std::vector<std::string> AllFiles(void) const;
+ 
     /// \brief Returns this dataset's primary %BAM resources, with relative
     ///        filepaths already resolved.
     ///
