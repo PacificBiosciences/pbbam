@@ -40,7 +40,6 @@
 // Author: Derek Barnett
 
 #include "pbbam/SamTagCodec.h"
-#include "AssertUtils.h"
 #include <boost/lexical_cast.hpp>
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -142,7 +141,8 @@ TagCollection SamTagCodec::Decode(const string& tagString)
         const string& name = token.substr(0, 2);
         const char type = token.at(3);
         const string& remainder = token.substr(5);
-        PB_ASSERT_OR_CONTINUE(!remainder.empty());
+        if (remainder.empty())
+            throw std::runtime_error("malformatted tag: " + token);
 
         switch (type) {
 
@@ -221,14 +221,14 @@ TagCollection SamTagCodec::Decode(const string& tagString)
                     case 'I' : tags[name] = readUnsignedSamMultiValue<uint32_t>(arrayData); break;
                     case 'f' : tags[name] = readFloatSamMultiValue(arrayData);              break;
                     default:
-                        PB_ASSERT_OR_CONTINUE(false);
+                        throw std::runtime_error("unsupported array-tag-type encountered: " + std::string(1, elementType));
                 }
                 break;
             }
 
             // unsupported SAM tag type
             default :
-                PB_ASSERT_OR_CONTINUE(false);
+                throw std::runtime_error("unsupported tag-type encountered: " + std::string(1, type));
         }
     }
 
@@ -242,9 +242,11 @@ string SamTagCodec::Encode(const TagCollection& tags)
 
     const auto tagEnd = tags.cend();
     for (auto tagIter = tags.cbegin(); tagIter != tagEnd; ++tagIter) {
+        
         const string& name = (*tagIter).first;
+        if (name.size() != 2)
+            throw std::runtime_error("malformatted tag name: " + name);
         const Tag& tag = (*tagIter).second;
-        PB_ASSERT_OR_CONTINUE(name.size() == 2);
         if (tag.IsNull())
             continue;
 
@@ -292,7 +294,8 @@ string SamTagCodec::Encode(const TagCollection& tags)
             case TagDataType::FLOAT_ARRAY  : result.append("B:f"); appendSamMultiValue(tag.ToFloatArray(),  result); break;
 
             default :
-                PB_ASSERT_OR_RETURN_VALUE(false, string());
+                throw std::runtime_error("unsupported tag-type encountered: " +
+                                         std::to_string(static_cast<uint16_t>(tag.Type())));
         }
     }
 

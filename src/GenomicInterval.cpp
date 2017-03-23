@@ -40,7 +40,6 @@
 // Author: Derek Barnett
 
 #include "pbbam/GenomicInterval.h"
-#include "AssertUtils.h"
 #include "StringUtils.h"
 #include <cstdlib>
 #include <cstring>
