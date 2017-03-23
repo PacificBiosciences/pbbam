@@ -99,7 +99,13 @@ inline std::string ReadGroupInfo::BasecallerVersion(void) const
 { return basecallerVersion_; }
 
 inline ReadGroupInfo& ReadGroupInfo::BasecallerVersion(const std::string& versionNumber)
-{ basecallerVersion_ = versionNumber; return *this; }
+{
+    if (basecallerVersion_ != versionNumber) { 
+        basecallerVersion_ = versionNumber; 
+        sequencingChemistry_.clear(); // reset cached chemistry name
+    }
+    return *this; 
+}
 
 inline std::string ReadGroupInfo::BaseFeatureTag(const BaseFeature& feature) const
 {
@@ -117,7 +123,13 @@ inline std::string ReadGroupInfo::BindingKit(void) const
 { return bindingKit_; }
 
 inline ReadGroupInfo& ReadGroupInfo::BindingKit(const std::string& kitNumber)
-{ bindingKit_ = kitNumber; return *this; }
+{
+    if (bindingKit_ != kitNumber) { 
+        bindingKit_ = kitNumber;
+        sequencingChemistry_.clear(); // reset cached chemistry name
+    }
+    return *this; 
+}
 
 inline ReadGroupInfo& ReadGroupInfo::ClearBarcodeData(void)
 {
@@ -271,7 +283,12 @@ inline std::string ReadGroupInfo::SequencingKit(void) const
 { return sequencingKit_; }
 
 inline ReadGroupInfo& ReadGroupInfo::SequencingKit(const std::string& kitNumber)
-{ sequencingKit_ = kitNumber; return *this; }
+{ 
+    if (sequencingKit_ != kitNumber) {
+        sequencingKit_ = kitNumber; 
+        sequencingChemistry_.clear(); // reset cached chemistry name
+    }
+    return *this; }
 
 inline std::string ReadGroupInfo::ToSam(const ReadGroupInfo& rg)
 { return rg.ToSam(); }
