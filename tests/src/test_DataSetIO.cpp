@@ -1570,3 +1570,22 @@ TEST(DataSetIOTest, DataSetFromRelativeBamFilename)
     changeCurrentDirectory(startingDirectory);
 }
 
+TEST(DataaSetIOTest, AllFiles) 
+{
+    // check  BamFiles only
+    EXPECT_NO_THROW(
+    {
+        const DataSet dataset(tests::Data_Dir + "/chunking/chunking.subreadset.xml");
+        const auto bamFiles = dataset.BamFiles();
+        EXPECT_EQ(3, bamFiles.size());
+    });
+
+    // now fetch all files (original BAMs plus PBI files)
+    EXPECT_NO_THROW(
+    {
+        const DataSet dataset(tests::Data_Dir + "/chunking/chunking.subreadset.xml");
+        const auto allFiles = dataset.AllFiles();
+        EXPECT_EQ(6, allFiles.size());    
+    });
+}
+
