@@ -40,7 +40,6 @@
 // Author: Derek Barnett
 
 #include "pbbam/BamTagCodec.h"
-#include "AssertUtils.h"
 #include <htslib/kstring.h>
 #include <cstring>
 using namespace PacBio;
@@ -148,14 +147,14 @@ TagCollection BamTagCodec::Decode(const vector<uint8_t>& data)
 
                     // unknown subTagType
                     default:
-                        PB_ASSERT_OR_RETURN_VALUE(false, TagCollection());
+                        throw std::runtime_error("unsupported array-tag-type encountered: " + std::string(1, subTagType));
                 }
                 break;
             }
 
             // unknown tagType
             default:
-                PB_ASSERT_OR_RETURN_VALUE(false, TagCollection());
+                throw std::runtime_error("unsupported tag-type encountered: " + std::string(1, tagType));
         }
     }
 
@@ -168,9 +167,11 @@ vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
 
     const auto tagEnd  = tags.cend();
     for (auto tagIter = tags.cbegin(); tagIter != tagEnd; ++tagIter) {
+
         const string& name = (*tagIter).first;
+        if (name.size() != 2)
+            throw std::runtime_error("malformatted tag name: " + name);
         const Tag& tag = (*tagIter).second;
-        PB_ASSERT_OR_CONTINUE(name.size() == 2);
         if (tag.IsNull())
             continue;
 
@@ -295,8 +296,11 @@ vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
 
             // unsupported tag type
             default :
+            {
                 free(str.s);
-                PB_ASSERT_OR_RETURN_VALUE(false, vector<uint8_t>());
+                throw std::runtime_error("unsupported tag-type encountered: " +
+                                         std::to_string(static_cast<uint16_t>(tag.Type())));
+            }
         }
     }
 
@@ -356,14 +360,14 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
 
                 // unknown subTagType
                 default:
-                    PB_ASSERT_OR_RETURN_VALUE(false, Tag());
+                    throw std::runtime_error("unsupported array-tag-type encountered: " + std::string(1, subTagType));
             }
             break;
         }
 
         // unknown tagType
         default:
-            PB_ASSERT_OR_RETURN_VALUE(false, Tag());
+            throw std::runtime_error("unsupported tag-type encountered: " + std::string(1, tagType));
     }
     return Tag(); // to avoid compiler warning
 }
@@ -448,8 +452,11 @@ vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag,
 
             // unsupported tag type
             default :
+            {
                 free(str.s);
-                PB_ASSERT_OR_RETURN_VALUE(false, vector<uint8_t>());
+                throw std::runtime_error("unsupported tag-type encountered: " +
+                                         std::to_string(static_cast<uint16_t>(tag.Type())));
+            }
         }
     }
 
@@ -475,11 +482,14 @@ uint8_t BamTagCodec::TagTypeCode(const Tag& tag,
             case TagDataType::UINT32 : value = static_cast<int64_t>(tag.ToUInt32()); break;
             default:
                 // non integers not allowed
-                PB_ASSERT_OR_RETURN_VALUE(false, 0);
+                throw std::runtime_error("tag-type not convertible to ASCII, tag-type: " +
+                                         std::to_string(static_cast<uint16_t>(tag.Type())));
         }
-        // printable range
-        PB_ASSERT_OR_RETURN_VALUE(value >= 33,  0);
-        PB_ASSERT_OR_RETURN_VALUE(value <= 126, 0);
+
+        // ensure value is in valid ASCII char range
+        if (value < 33 || value > 126)
+            throw std::runtime_error("invalid integer value for ASCII char, value: " + std::to_string(value) );
+
         return static_cast<uint8_t>('A');
     }
 
@@ -509,7 +519,8 @@ uint8_t BamTagCodec::TagTypeCode(const Tag& tag,
         case TagDataType::FLOAT_ARRAY  : return static_cast<uint8_t>('B');
 
         default:
-            PB_ASSERT_OR_RETURN_VALUE(false, 0);
+            throw std::runtime_error("unsupported tag-type encountered: " +
+                                     std::to_string(static_cast<uint16_t>(tag.Type())));
     }
     return 0; // to avoid compiler warning
 }

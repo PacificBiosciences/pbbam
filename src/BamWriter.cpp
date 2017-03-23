@@ -38,7 +38,6 @@
 #include "pbbam/BamWriter.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/Validator.h"
-#include "AssertUtils.h"
 #include "FileProducer.h"
 #include "MemoryUtils.h"
 #include <htslib/bgzf.h>

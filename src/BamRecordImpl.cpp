@@ -37,12 +37,12 @@
 
 #include "pbbam/BamRecordImpl.h"
 #include "pbbam/BamTagCodec.h"
-#include "AssertUtils.h"
 #include "BamRecordTags.h"
 #include "MemoryUtils.h"
 #include <algorithm>
 #include <iostream>
 #include <utility>
+#include <cassert>
 #include <cstdlib>
 #include <cstring>
 using namespace PacBio;
@@ -53,12 +53,15 @@ BamRecordImpl::BamRecordImpl(void)
     : d_(nullptr)
 {
     InitializeData();
+    assert(d_);
 }
 
 BamRecordImpl::BamRecordImpl(const BamRecordImpl& other)
     : d_(bam_dup1(other.d_.get()), internal::HtslibRecordDeleter())
     , tagOffsets_(other.tagOffsets_)
-{ }
+{ 
+    assert(d_);
+}
 
 BamRecordImpl::BamRecordImpl(BamRecordImpl&& other)
     : d_(nullptr)
@@ -66,6 +69,7 @@ BamRecordImpl::BamRecordImpl(BamRecordImpl&& other)
 {
     d_.swap(other.d_);
     other.d_.reset();
+    assert(d_); 
 }
 
 BamRecordImpl& BamRecordImpl::operator=(const BamRecordImpl& other)
@@ -76,6 +80,7 @@ BamRecordImpl& BamRecordImpl::operator=(const BamRecordImpl& other)
         bam_copy1(d_.get(), other.d_.get());
         tagOffsets_ = other.tagOffsets_;
     }
+    assert(d_);
     return *this;
 }
 
@@ -87,6 +92,7 @@ BamRecordImpl& BamRecordImpl::operator=(BamRecordImpl&& other)
 
         tagOffsets_ = std::move(other.tagOffsets_);
     }
+    assert(d_);
     return *this;
 }
 
@@ -366,10 +372,8 @@ size_t BamRecordImpl::SequenceLength(void) const
 BamRecordImpl& BamRecordImpl::SetSequenceAndQualities(const std::string& sequence,
                                                       const std::string& qualities)
 {
-    // TODO: I'm ok with the assert for now, but how to handle at runtime?
-    if (!qualities.empty()) {
-        PB_ASSERT_OR_RETURN_VALUE(sequence.size() == qualities.size(), *this);
-    }
+    if (!qualities.empty() && (sequence.size() != qualities.size()))
+        throw std::runtime_error("If QUAL provided, must be of the same length as SEQ");
 
     return SetSequenceAndQualitiesInternal(sequence.c_str(),
                                            sequence.size(),
@@ -581,7 +585,7 @@ void BamRecordImpl::UpdateTagMap(void) const
 
                     // unknown subTagType
                     default:
-                        PB_ASSERT_OR_RETURN(false);
+                        throw std::runtime_error("unsupported array-tag-type encountered: " + std::string(1, subTagType));
                 }
 
                 uint32_t numElements = 0;
@@ -592,7 +596,7 @@ void BamRecordImpl::UpdateTagMap(void) const
 
             // unknown tagType
             default:
-                PB_ASSERT_OR_RETURN(false);
+                throw std::runtime_error("unsupported tag-type encountered: " + std::string(1, tagType));
         }
     }
 }

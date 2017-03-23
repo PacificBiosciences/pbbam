@@ -134,7 +134,6 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/virtual/ZmwWhitelistVirtualReader.h
 
     # library-internal headers
-    ${PacBioBAM_SourceDir}/AssertUtils.h
     ${PacBioBAM_SourceDir}/BamRecordTags.h
     ${PacBioBAM_SourceDir}/ChemistryTable.h
     ${PacBioBAM_SourceDir}/DataSetIO.h
@@ -164,7 +163,6 @@ set( PacBioBAM_CPP
 
     ${PacBioBAM_SourceDir}/Accuracy.cpp
     ${PacBioBAM_SourceDir}/AlignmentPrinter.cpp
-    ${PacBioBAM_SourceDir}/AssertUtils.cpp
     ${PacBioBAM_SourceDir}/BaiIndexedBamReader.cpp
     ${PacBioBAM_SourceDir}/BamFile.cpp
     ${PacBioBAM_SourceDir}/BamHeader.cpp

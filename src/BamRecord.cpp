@@ -42,7 +42,6 @@
 #include "pbbam/BamRecord.h"
 #include "pbbam/virtual/VirtualRegionTypeMap.h"
 #include "pbbam/ZmwTypeMap.h"
-#include "AssertUtils.h"
 #include "BamRecordTags.h"
 #include "MemoryUtils.h"
 #include "Pulse2BaseCache.h"
