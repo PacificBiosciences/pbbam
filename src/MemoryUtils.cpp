@@ -39,10 +39,10 @@
 #include <string>
 #include <cstdlib>
 #include <cstring>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
+namespace internal {
 
 // -----------------
 // BamHeaderMemory
@@ -59,12 +59,12 @@ BamHeader BamHeaderMemory::FromRawData(bam_hdr_t* hdr)
         return BamHeader();
 
     // parse normal SAM text input
-    return BamHeader(string(hdr->text, hdr->l_text));
+    return BamHeader(std::string(hdr->text, hdr->l_text));
 }
 
 PBBAM_SHARED_PTR<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& header)
 {
-    const string& text = header.ToSam();
+    const std::string& text = header.ToSam();
     PBBAM_SHARED_PTR<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), internal::HtslibHeaderDeleter());
     rawData->ignore_sam_err = 0;
     rawData->cigar_tab = NULL;
@@ -73,6 +73,10 @@ PBBAM_SHARED_PTR<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& head
     memcpy(rawData->text, text.c_str(), rawData->l_text);
     return rawData;
 }
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio
 
 //PBBAM_SHARED_PTR<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& header)
 //{

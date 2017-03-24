@@ -41,9 +41,9 @@
 #include <htslib/sam.h>
 #include <cstring>
 #include <memory>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
 
 BamRecordBuilder::BamRecordBuilder(void)
 {
@@ -134,7 +134,7 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
     recordRawData->core = core_;
 
     // setup variable length data
-    const vector<uint8_t> encodedTags = BamTagCodec::Encode(tags_);
+    const std::vector<uint8_t> encodedTags = BamTagCodec::Encode(tags_);
 
     const size_t nameLength  = name_.size() + 1;
     const size_t numCigarOps = cigar_.size();
@@ -166,7 +166,7 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
 
     // cigar
     if (cigarLength > 0) {
-        vector<uint32_t> encodedCigar(numCigarOps);
+        std::vector<uint32_t> encodedCigar(numCigarOps);
         for (size_t i = 0; i < numCigarOps; ++i) {
             const CigarOperation& op = cigar_.at(i);
             encodedCigar[i] = op.Length() << BAM_CIGAR_SHIFT;
@@ -399,3 +399,6 @@ BamRecordBuilder& BamRecordBuilder::SetSupplementaryAlignment(bool ok)
     else    core_.flag &= ~BamRecordImpl::SUPPLEMENTARY;
     return *this;
 }
+
+} // namespace BAM
+} // namespace PacBio

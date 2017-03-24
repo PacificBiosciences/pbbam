@@ -46,18 +46,15 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <map>
 #include <cassert>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
 static
-string ToString(const RecordType type)
+std::string ToString(const RecordType type)
 {
-    static const auto lookup = map<RecordType, string>
+    static const auto lookup = std::map<RecordType, std::string>
     {
         { RecordType::ZMW,        "ZMW" },
         { RecordType::HQREGION,   "HQREGION" },
@@ -75,8 +72,6 @@ string ToString(const RecordType type)
 }
 
 } // namespace internal
-} // namespace BAM
-} // namesapce PacBio
 
 // ----------------------------------
 // PbiRawBarcodeData implementation
@@ -440,7 +435,7 @@ PbiRawData::PbiRawData(void)
     , numReads_(0)
 { }
 
-PbiRawData::PbiRawData(const string& pbiFilename)
+PbiRawData::PbiRawData(const std::string& pbiFilename)
     : filename_(pbiFilename)
     , version_(PbiFile::CurrentVersion)
     , sections_(PbiFile::ALL)
@@ -506,3 +501,6 @@ PbiRawData& PbiRawData::operator=(PbiRawData&& other)
 }
 
 PbiRawData::~PbiRawData(void) { }
+
+} // namespace BAM
+} // namesapce PacBio

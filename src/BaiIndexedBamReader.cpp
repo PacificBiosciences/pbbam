@@ -41,10 +41,6 @@
 
 #include "pbbam/BaiIndexedBamReader.h"
 #include "MemoryUtils.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
@@ -81,7 +77,7 @@ public:
             throw std::runtime_error("could not create iterator for requested region");
     }
 
-    void LoadIndex(const string& fn)
+    void LoadIndex(const std::string& fn)
     {
         htsIndex_.reset(bam_index_load(fn.c_str()));
         if (!htsIndex_)
@@ -101,8 +97,6 @@ public:
 };
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
 BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval,
                                          const std::string& filename)
@@ -112,13 +106,13 @@ BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval,
 BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval,
                                          const BamFile& bamFile)
     : BamReader(bamFile)
-    , d_(new BaiIndexedBamReaderPrivate(File(), interval))
+    , d_(new internal::BaiIndexedBamReaderPrivate(File(), interval))
 { }
 
 BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval,
                                          BamFile&& bamFile)
     : BamReader(std::move(bamFile))
-    , d_(new BaiIndexedBamReaderPrivate(File(), interval))
+    , d_(new internal::BaiIndexedBamReaderPrivate(File(), interval))
 { }
 
 const GenomicInterval& BaiIndexedBamReader::Interval(void) const
@@ -139,3 +133,6 @@ BaiIndexedBamReader& BaiIndexedBamReader::Interval(const GenomicInterval& interv
     d_->Interval(Header(), interval);
     return *this;
 }
+
+} // namespace BAM
+} // namespace PacBio

@@ -43,10 +43,9 @@
 #include "SequenceUtils.h"
 #include <sstream>
 
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
+namespace PacBio {
+namespace BAM {
+namespace internal {
 
 const Version Version::Current = Version(3,0,3);
 const Version Version::Minimum = Version(3,0,1);
@@ -70,7 +69,7 @@ Version::Version(const std::string& v)
                 revision_ = std::stoi(fields.at(2));
         }
     } catch (std::exception&) {
-        auto msg = string{ "invalid version number (" + v + "): failed to parse" };
+        auto msg = std::string{ "invalid version number (" + v + "): failed to parse" };
         throw std::runtime_error(msg);
     }
 
@@ -85,3 +84,6 @@ std::string Version::ToString(void) const
     return s.str();
 }
 
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio

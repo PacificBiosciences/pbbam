@@ -44,10 +44,9 @@
 #include "VirtualZmwReader.h"
 #include "pbbam/ReadGroupInfo.h"
 
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
+namespace PacBio {
+namespace BAM {
+namespace internal {
 
 VirtualZmwReader::VirtualZmwReader(const std::string& primaryBamFilepath,
                                    const std::string& scrapsBamFilepath)
@@ -141,3 +140,7 @@ BamHeader VirtualZmwReader::PrimaryHeader(void) const
 
 BamHeader VirtualZmwReader::ScrapsHeader(void) const
 { return scrapsBamFile_->Header(); }
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio

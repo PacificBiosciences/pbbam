@@ -43,24 +43,19 @@
 #include "pbbam/SequenceInfo.h"
 #include "SequenceUtils.h"
 #include <sstream>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-static string token_SN = string("SN");
-static string token_LN = string("LN");
-static string token_AS = string("AS");
-static string token_M5 = string("M5");
-static string token_SP = string("SP");
-static string token_UR = string("UR");
+static std::string token_SN = std::string("SN");
+static std::string token_LN = std::string("LN");
+static std::string token_AS = std::string("AS");
+static std::string token_M5 = std::string("M5");
+static std::string token_SP = std::string("SP");
+static std::string token_UR = std::string("UR");
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
 SequenceInfo::SequenceInfo(void) { }
 
@@ -115,17 +110,17 @@ SequenceInfo& SequenceInfo::operator=(SequenceInfo&& other)
 SequenceInfo SequenceInfo::FromSam(const std::string& sam)
 {
     // pop off '@SQ\t', then split rest of line into tokens
-    const vector<string>& tokens = internal::Split(sam.substr(4), '\t');
+    const std::vector<std::string>& tokens = internal::Split(sam.substr(4), '\t');
     if (tokens.empty())
         return SequenceInfo();
 
     SequenceInfo seq;
-    map<string, string> custom;
+    std::map<std::string, std::string> custom;
 
     // iterate over tokens
-    for (const string& token : tokens) {
-        const string& tokenTag   = token.substr(0,2);
-        const string& tokenValue = token.substr(3);
+    for (const std::string& token : tokens) {
+        const std::string& tokenTag   = token.substr(0,2);
+        const std::string& tokenValue = token.substr(3);
 
         // set sequence info
         if      (tokenTag == internal::token_SN) seq.Name(tokenValue);
@@ -156,7 +151,7 @@ bool SequenceInfo::IsValid(void) const
 
 std::string SequenceInfo::ToSam(void) const
 {
-    stringstream out;
+    std::stringstream out;
     out << "@SQ"
         << internal::MakeSamTag(internal::token_SN, name_);
 
@@ -167,10 +162,13 @@ std::string SequenceInfo::ToSam(void) const
     if (!uri_.empty())        out << internal::MakeSamTag(internal::token_UR, uri_);
 
     // append any custom tags
-    map<string, string>::const_iterator customIter = custom_.cbegin();
-    map<string, string>::const_iterator customEnd  = custom_.cend();
+    std::map<std::string, std::string>::const_iterator customIter = custom_.cbegin();
+    std::map<std::string, std::string>::const_iterator customEnd  = custom_.cend();
     for ( ; customIter != customEnd; ++customIter )
         out << internal::MakeSamTag(customIter->first, customIter->second);
 
     return out.str();
 }
+
+} // namespace BAM
+} // namespace PacBio

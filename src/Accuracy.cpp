@@ -40,8 +40,12 @@
 // Author: Derek Barnett
 
 #include "pbbam/Accuracy.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
+
+namespace PacBio {
+namespace BAM {
 
 const float Accuracy::MIN = 0.0f;
 const float Accuracy::MAX = 1.0f;
+
+} // namespace BAM
+} // namespace PacBio

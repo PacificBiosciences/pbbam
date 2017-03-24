@@ -42,10 +42,9 @@
 #include "pbbam/BarcodeQuery.h"
 #include "pbbam/PbiFilterTypes.h"
 #include "pbbam/CompositeBamReader.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
 
 struct BarcodeQuery::BarcodeQueryPrivate
 {
@@ -66,3 +65,6 @@ BarcodeQuery::~BarcodeQuery(void) { }
 
 bool BarcodeQuery::GetNext(BamRecord &r)
 { return d_->reader_.GetNext(r); }
+
+} // namespace BAM
+} // namespace PacBio

@@ -40,11 +40,14 @@
 // Author: Derek Barnett
 
 #include "pbbam/TagCollection.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
-bool TagCollection::Contains(const string& name) const
+namespace PacBio {
+namespace BAM {
+
+bool TagCollection::Contains(const std::string& name) const
 {
     return count(name) != 0;
 }
+
+} // namespace BAM
+} // namespace PacBio

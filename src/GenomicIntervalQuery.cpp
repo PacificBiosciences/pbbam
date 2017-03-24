@@ -41,9 +41,9 @@
 
 #include "pbbam/GenomicIntervalQuery.h"
 #include "pbbam/CompositeBamReader.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
 
 struct GenomicIntervalQuery::GenomicIntervalQueryPrivate
 {
@@ -71,3 +71,6 @@ GenomicIntervalQuery& GenomicIntervalQuery::Interval(const GenomicInterval& inte
 
 const GenomicInterval& GenomicIntervalQuery::Interval(void) const
 { return d_->reader_.Interval(); }
+
+} // namespace BAM
+} // namespace PacBio

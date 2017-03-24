@@ -40,8 +40,11 @@
 // Author: Derek Barnett
 
 #include "pbbam/QualityValue.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
 
 const uint8_t QualityValue::MAX = 93;
+
+} // namespace BAM
+} // namespace PacBio

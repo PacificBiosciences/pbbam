@@ -48,9 +48,6 @@
 #include <sstream>
 #include <cassert>
 #include <sys/stat.h>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
@@ -59,7 +56,7 @@ namespace internal {
 class BamFilePrivate
 {
 public:
-    BamFilePrivate(const string& fn)
+    BamFilePrivate(const std::string& fn)
         : filename_(fn)
         , firstAlignmentOffset_(-1)
     {
@@ -77,11 +74,11 @@ public:
             // 2:  not seekable (e.g. reading from stdin)
             // 0:  EOF absent
             // -1: some other error
-            stringstream e;
+            std::stringstream e;
             if (eofCheck == 0)
-                e << fn << " : is missing EOF block" << endl;
+                e << fn << " : is missing EOF block" << std::endl;
             else
-                e << fn << " : unknown error while checking EOF block" << endl;
+                e << fn << " : unknown error while checking EOF block" << std::endl;
             throw std::runtime_error(e.str());
         }
 #endif
@@ -94,9 +91,9 @@ public:
         firstAlignmentOffset_ = bgzf_tell(f->fp.bgzf);
     }
 
-    unique_ptr<BamFilePrivate> DeepCopy(void)
+    std::unique_ptr<BamFilePrivate> DeepCopy(void)
     {
-        return unique_ptr<BamFilePrivate>(new BamFilePrivate(filename_));
+        return std::unique_ptr<BamFilePrivate>(new BamFilePrivate(filename_));
     }
 
     bool HasEOF(void) const
@@ -121,7 +118,7 @@ public:
     {
         std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
         if (!f || !f->fp.bgzf)
-            throw std::runtime_error(string("could not open BAM file: ") + filename_);
+            throw std::runtime_error(std::string("could not open BAM file: ") + filename_);
         if (f->format.format != bam)
             throw std::runtime_error("expected BAM, unknown format");
         return f;
@@ -134,8 +131,6 @@ public:
 };
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
 // ------------------------
 // BamFile implementation
@@ -243,3 +238,5 @@ bool BamFile::StandardIndexIsNewer(void) const
     return bamTimestamp <= baiTimestamp;
 }
 
+} // namespace BAM
+} // namespace PacBio

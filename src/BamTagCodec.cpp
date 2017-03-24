@@ -42,9 +42,10 @@
 #include "pbbam/BamTagCodec.h"
 #include <htslib/kstring.h>
 #include <cstring>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
+namespace internal {
 
 template<typename T>
 inline void appendBamValue(const T& value, kstring_t* str)
@@ -53,7 +54,7 @@ inline void appendBamValue(const T& value, kstring_t* str)
 }
 
 template<typename T>
-inline void appendBamMultiValue(const vector<T>& container, kstring_t* str)
+inline void appendBamMultiValue(const std::vector<T>& container, kstring_t* str)
 {
     const uint32_t n = container.size();
     kputsn_(&n, sizeof(n), str);
@@ -70,13 +71,13 @@ inline T readBamValue(const uint8_t* src, size_t& offset)
 }
 
 template<typename T>
-vector<T> readBamMultiValue(const uint8_t* src, size_t& offset)
+std::vector<T> readBamMultiValue(const uint8_t* src, size_t& offset)
 {
     uint32_t numElements;
     memcpy(&numElements, &src[offset], sizeof(uint32_t));
     offset += 4;
 
-    vector<T> result;
+    std::vector<T> result;
     result.reserve(numElements);
     for (size_t i = 0; i < numElements; ++i) {
         const T& value = readBamValue<T>(src, offset);
@@ -85,7 +86,9 @@ vector<T> readBamMultiValue(const uint8_t* src, size_t& offset)
     return result;
 }
 
-TagCollection BamTagCodec::Decode(const vector<uint8_t>& data)
+} // namespace internal
+
+TagCollection BamTagCodec::Decode(const std::vector<uint8_t>& data)
 {
     TagCollection tags;
 
@@ -96,10 +99,13 @@ TagCollection BamTagCodec::Decode(const vector<uint8_t>& data)
     size_t i = 0;
     while (i < numBytes) {
 
-        string tagName;
+        std::string tagName;
         tagName.reserve(2);
         tagName.append(1, pData[i++]);
         tagName.append(1, pData[i++]);
+
+        using internal::readBamMultiValue;
+        using internal::readBamValue;
 
         const char tagType = static_cast<char>(pData[i++]);
         switch (tagType) {
@@ -123,7 +129,7 @@ TagCollection BamTagCodec::Decode(const vector<uint8_t>& data)
             case 'H' :
             {
                 const size_t dataLength = strlen((const char*)&pData[i]);
-                string value;
+                std::string value;
                 value.resize(dataLength);
                 memcpy((char*)value.data(), &pData[i], dataLength);
                 tags[tagName] = value;
@@ -161,14 +167,14 @@ TagCollection BamTagCodec::Decode(const vector<uint8_t>& data)
     return tags;
 }
 
-vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
+std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
 {
     kstring_t str = { 0, 0, NULL };
 
     const auto tagEnd  = tags.cend();
     for (auto tagIter = tags.cbegin(); tagIter != tagEnd; ++tagIter) {
 
-        const string& name = (*tagIter).first;
+        const std::string& name = (*tagIter).first;
         if (name.size() != 2)
             throw std::runtime_error("malformatted tag name: " + name);
         const Tag& tag = (*tagIter).second;
@@ -187,6 +193,9 @@ vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
                 continue;
             }
         }
+
+        using internal::appendBamMultiValue;
+        using internal::appendBamValue;
 
         // "<TYPE>:<DATA>" for all other data
         switch ( tag.Type() ) {
@@ -239,7 +248,7 @@ vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
                     kputc_('H', &str);
                 else
                     kputc_('Z', &str);
-                const string& s = tag.ToString();
+                const std::string& s = tag.ToString();
                 kputsn_(s.c_str(), s.size()+1, &str); // this adds the null-term
                 break;
             }
@@ -304,7 +313,7 @@ vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
         }
     }
 
-    vector<uint8_t> result;
+    std::vector<uint8_t> result;
     result.resize(str.l);
     memcpy((char*)&result[0], str.s, str.l);
     free(str.s);
@@ -313,6 +322,9 @@ vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
 
 Tag BamTagCodec::FromRawData(uint8_t* rawData)
 {
+    using internal::readBamMultiValue;
+    using internal::readBamValue;
+
     size_t offset = 0;
     const char tagType = static_cast<char>(*rawData++);
     switch (tagType) {
@@ -336,7 +348,7 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
         case 'H' :
         {
             const size_t dataLength = strlen((const char*)&rawData[0]);
-            string value;
+            std::string value;
             value.resize(dataLength);
             memcpy((char*)value.data(), &rawData[0], dataLength);
             Tag t(value);
@@ -372,8 +384,8 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
     return Tag(); // to avoid compiler warning
 }
 
-vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag,
-                                       const TagModifier& additionalModifier)
+std::vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag,
+                                            const TagModifier& additionalModifier)
 {
     // temp raw data destination (for use with htslib methods)
     kstring_t str = { 0, 0, NULL };
@@ -387,6 +399,10 @@ vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag,
 
     // for all others
     else {
+
+        using internal::appendBamMultiValue;
+        using internal::appendBamValue;
+
         switch (tag.Type()) {
 
             // single, numeric values
@@ -401,7 +417,7 @@ vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag,
             // string & hex-string values
             case TagDataType::STRING :
             {
-                const string& s = tag.ToString();
+                const std::string& s = tag.ToString();
                 kputsn_(s.c_str(), s.size()+1, &str); // this adds the null-term
                 break;
             }
@@ -461,7 +477,7 @@ vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag,
     }
 
     // store temp contents in actual destination
-    vector<uint8_t> result;
+    std::vector<uint8_t> result;
     result.resize(str.l);
     memcpy((char*)&result[0], str.s, str.l);
     free(str.s);
@@ -524,3 +540,6 @@ uint8_t BamTagCodec::TagTypeCode(const Tag& tag,
     }
     return 0; // to avoid compiler warning
 }
+
+} // namespace BAM
+} // namespace PacBio

@@ -43,10 +43,6 @@
 #include "EnumClassHash.h"
 #include <unordered_map>
 #include <cassert>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {

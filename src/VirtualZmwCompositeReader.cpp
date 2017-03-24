@@ -41,18 +41,18 @@
 
 #include "VirtualZmwCompositeReader.h"
 #include <boost/algorithm/string.hpp>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
+namespace internal {
 
 VirtualZmwCompositeReader::VirtualZmwCompositeReader(const DataSet& dataset)
     : currentReader_(nullptr)
     , filter_(PbiFilter::FromDataSet(dataset))
 {
     // set up source queue
-    string primaryFn;
-    string scrapsFn;
+    std::string primaryFn;
+    std::string scrapsFn;
     const ExternalResources& resources = dataset.ExternalResources();
     for (const ExternalResource& resource : resources) {
 
@@ -105,14 +105,14 @@ VirtualZmwBamRecord VirtualZmwCompositeReader::Next(void)
     }
 
     // no reader active
-    const string msg = { "no readers active, make sure you use "
-                         "VirtualZmwCompositeReader::HasNext before "
-                         "requesting next record"
-                      };
+    const std::string msg = { "no readers active, make sure you use "
+                              "VirtualZmwCompositeReader::HasNext before "
+                              "requesting next record"
+                            };
     throw std::runtime_error(msg);
 }
 
-vector<BamRecord> VirtualZmwCompositeReader::NextRaw(void)
+std::vector<BamRecord> VirtualZmwCompositeReader::NextRaw(void)
 {
     if (currentReader_) {
         const auto result = currentReader_->NextRaw();
@@ -122,10 +122,10 @@ vector<BamRecord> VirtualZmwCompositeReader::NextRaw(void)
     }
 
     // no reader active
-    const string msg = { "no readers active, make sure you use "
-                         "VirtualZmwCompositeReader::HasNext before "
-                         "requesting next group of records"
-                      };
+    const std::string msg = { "no readers active, make sure you use "
+                              "VirtualZmwCompositeReader::HasNext before "
+                              "requesting next group of records"
+                            };
     throw std::runtime_error(msg);
 }
 
@@ -145,3 +145,7 @@ void VirtualZmwCompositeReader::OpenNextReader(void)
             return;
     }
 }
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio

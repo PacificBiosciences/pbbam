@@ -45,9 +45,9 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
 
 BamRecordImpl::BamRecordImpl(void)
     : d_(nullptr)
@@ -98,7 +98,7 @@ BamRecordImpl& BamRecordImpl::operator=(BamRecordImpl&& other)
 
 BamRecordImpl::~BamRecordImpl(void) { }
 
-bool BamRecordImpl::AddTag(const string& tagName,
+bool BamRecordImpl::AddTag(const std::string& tagName,
                            const Tag &value)
 {
     return AddTag(tagName, value, TagModifier::NONE);
@@ -112,7 +112,7 @@ bool BamRecordImpl::AddTag(const BamRecordTag tag,
                  TagModifier::NONE);
 }
 
-bool BamRecordImpl::AddTag(const string& tagName,
+bool BamRecordImpl::AddTag(const std::string& tagName,
                            const Tag& value,
                            const TagModifier additionalModifier)
 {
@@ -133,11 +133,11 @@ bool BamRecordImpl::AddTag(const BamRecordTag tag,
                   additionalModifier);
 }
 
-bool BamRecordImpl::AddTagImpl(const string& tagName,
+bool BamRecordImpl::AddTagImpl(const std::string& tagName,
                                const Tag& value,
                                const TagModifier additionalModifier)
 {
-    const vector<uint8_t> rawData = BamTagCodec::ToRawData(value, additionalModifier);
+    const std::vector<uint8_t> rawData = BamTagCodec::ToRawData(value, additionalModifier);
     if (rawData.empty())
         return false;
 
@@ -196,7 +196,7 @@ BamRecordImpl& BamRecordImpl::CigarData(const std::string& cigarString)
     return CigarData(Cigar::FromStdString(cigarString));
 }
 
-bool BamRecordImpl::EditTag(const string& tagName,
+bool BamRecordImpl::EditTag(const std::string& tagName,
                             const Tag& newValue)
 {
     return EditTag(tagName, newValue, TagModifier::NONE);
@@ -210,7 +210,7 @@ bool BamRecordImpl::EditTag(const BamRecordTag tag,
                    TagModifier::NONE);
 }
 
-bool BamRecordImpl::EditTag(const string& tagName,
+bool BamRecordImpl::EditTag(const std::string& tagName,
                             const Tag& newValue,
                             const TagModifier additionalModifier)
 {
@@ -242,7 +242,7 @@ BamRecordImpl BamRecordImpl::FromRawData(const PBBAM_SHARED_PTR<bam1_t>& rawData
     return result;
 }
 
-bool BamRecordImpl::HasTag(const string& tagName) const
+bool BamRecordImpl::HasTag(const std::string& tagName) const
 {
     if (tagName.size() != 2)
         return false;
@@ -287,9 +287,9 @@ void BamRecordImpl::MaybeReallocData(void)
     }
 }
 
-string BamRecordImpl::Name(void) const
+std::string BamRecordImpl::Name(void) const
 {
-    return string(bam_get_qname(d_));
+    return std::string(bam_get_qname(d_));
 }
 
 BamRecordImpl& BamRecordImpl::Name(const std::string& name)
@@ -331,7 +331,7 @@ QualityValues BamRecordImpl::Qualities(void) const
     return result;
 }
 
-bool BamRecordImpl::RemoveTag(const string& tagName)
+bool BamRecordImpl::RemoveTag(const std::string& tagName)
 {
     const bool removed = RemoveTagImpl(tagName);
     if (removed)
@@ -344,7 +344,7 @@ bool BamRecordImpl::RemoveTag(const BamRecordTag tag)
     return RemoveTag(internal::BamRecordTags::LabelFor(tag));
 }
 
-bool BamRecordImpl::RemoveTagImpl(const string &tagName)
+bool BamRecordImpl::RemoveTagImpl(const std::string &tagName)
 {
     if (tagName.size() != 2)
         return false;
@@ -355,11 +355,11 @@ bool BamRecordImpl::RemoveTagImpl(const string &tagName)
     return ok;
 }
 
-string BamRecordImpl::Sequence(void) const
+std::string BamRecordImpl::Sequence(void) const
 {
-    string result;
+    std::string result;
     result.reserve(d_->core.l_qseq);
-    static const string DnaLookup = string("=ACMGRSVTWYHKDBN");
+    static const std::string DnaLookup = std::string("=ACMGRSVTWYHKDBN");
     const uint8_t* seqData = bam_get_seq(d_);
     for (int i = 0; i < d_->core.l_qseq; ++i)
         result.append(1, DnaLookup[bam_seqi(seqData, i)]);
@@ -444,7 +444,7 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
     return *this;
 }
 
-int BamRecordImpl::TagOffset(const string& tagName) const
+int BamRecordImpl::TagOffset(const std::string& tagName) const
 {
     if (tagName.size() != 2)
         throw std::runtime_error("invalid tag name size");
@@ -460,7 +460,7 @@ int BamRecordImpl::TagOffset(const string& tagName) const
 BamRecordImpl& BamRecordImpl::Tags(const TagCollection& tags)
 {
     // convert tags to binary
-    const vector<uint8_t>& tagData = BamTagCodec::Encode(tags);
+    const std::vector<uint8_t>& tagData = BamTagCodec::Encode(tags);
     const size_t numBytes = tagData.size();
     const uint8_t* data = tagData.data();
 
@@ -484,10 +484,10 @@ TagCollection BamRecordImpl::Tags(void) const
 {
     const uint8_t* tagDataStart = bam_get_aux(d_);
     const size_t numBytes = d_->l_data - (tagDataStart - d_->data);
-    return BamTagCodec::Decode(vector<uint8_t>(tagDataStart, tagDataStart+numBytes));
+    return BamTagCodec::Decode(std::vector<uint8_t>(tagDataStart, tagDataStart+numBytes));
 }
 
-Tag BamRecordImpl::TagValue(const string& tagName) const
+Tag BamRecordImpl::TagValue(const std::string& tagName) const
 {
     if (tagName.size() != 2)
         return Tag();
@@ -600,3 +600,6 @@ void BamRecordImpl::UpdateTagMap(void) const
         }
     }
 }
+
+} // namespace BAM
+} // namespace PacBio

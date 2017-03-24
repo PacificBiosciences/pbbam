@@ -41,17 +41,14 @@
 
 #include "pbbam/DataSetXsd.h"
 #include <unordered_map>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-static map<XsdType, NamespaceInfo> DefaultRegistry(void)
+static std::map<XsdType, NamespaceInfo> DefaultRegistry(void)
 {
-    const auto result = map<XsdType, NamespaceInfo>
+    const auto result = std::map<XsdType, NamespaceInfo>
     {
         { XsdType::NONE,                   NamespaceInfo{ "", "" } },
         { XsdType::AUTOMATION_CONSTRAINTS, NamespaceInfo{ "",       "http://pacificbiosciences.com/PacBioAutomationConstraints.xsd" } },
@@ -72,7 +69,7 @@ static map<XsdType, NamespaceInfo> DefaultRegistry(void)
     return result;
 }
 
-static const auto elementRegistry = unordered_map<string, XsdType>
+static const auto elementRegistry = std::unordered_map<std::string, XsdType>
 {
     // 'pbbase' elements
     //
@@ -179,8 +176,6 @@ static const auto elementRegistry = unordered_map<string, XsdType>
 };
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
 // ---------------
 // NamespaceInfo
@@ -188,8 +183,8 @@ static const auto elementRegistry = unordered_map<string, XsdType>
 
 NamespaceInfo::NamespaceInfo(void) { }
 
-NamespaceInfo::NamespaceInfo(const string& name,
-                             const string& uri)
+NamespaceInfo::NamespaceInfo(const std::string& name,
+                             const std::string& uri)
     : name_(name)
     , uri_(uri)
 { }
@@ -252,8 +247,8 @@ XsdType NamespaceRegistry::XsdForElement(const std::string& elementLabel) const
 
 XsdType NamespaceRegistry::XsdForUri(const std::string& uri) const
 {
-    map<XsdType, NamespaceInfo>::const_iterator iter = data_.cbegin();
-    map<XsdType, NamespaceInfo>::const_iterator end  = data_.cend();
+    std::map<XsdType, NamespaceInfo>::const_iterator iter = data_.cbegin();
+    std::map<XsdType, NamespaceInfo>::const_iterator end  = data_.cend();
     for ( ; iter != end; ++iter ) {
         const NamespaceInfo& info = iter->second;
         if (info.Uri() == uri)
@@ -261,3 +256,6 @@ XsdType NamespaceRegistry::XsdForUri(const std::string& uri) const
     }
     return XsdType::NONE;
 }
+
+} // namespace BAM
+} // namespace PacBio

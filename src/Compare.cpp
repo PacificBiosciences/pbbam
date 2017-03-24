@@ -42,9 +42,6 @@
 #include "pbbam/Compare.h"
 #include <functional>
 #include <unordered_map>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
@@ -52,13 +49,13 @@ namespace internal {
 
 struct TypeAlias
 {
-    string name_;
-    string op_;
-    string opAlpha_;
+    std::string name_;
+    std::string op_;
+    std::string opAlpha_;
 
-    TypeAlias(const string& name = string(),
-              const string& op = string(),
-              const string& opAlpha = string())
+    TypeAlias(const std::string& name = std::string(),
+              const std::string& op = std::string(),
+              const std::string& opAlpha = std::string())
         : name_(name)
         , op_(op)
         , opAlpha_(opAlpha)
@@ -71,7 +68,7 @@ struct CompareTypeHash
     { return std::hash<int>()(static_cast<int>(t)); }
 };
 
-static const unordered_map<string, Compare::Type> opToTypeMap =
+static const std::unordered_map<std::string, Compare::Type> opToTypeMap =
 {
     // basic operators plus some permissiveness for other representations
 
@@ -96,7 +93,7 @@ static const unordered_map<string, Compare::Type> opToTypeMap =
     { "~",     Compare::NOT_CONTAINS }
 };
 
-static const unordered_map<Compare::Type, TypeAlias, CompareTypeHash> typeAliases =
+static const std::unordered_map<Compare::Type, TypeAlias, CompareTypeHash> typeAliases =
 {
     { Compare::EQUAL,              TypeAlias{ "Compare::EQUAL",              "==", "eq"  } },
     { Compare::NOT_EQUAL,          TypeAlias{ "Compare::NOT_EQUAL",          "!=", "ne"  } },
@@ -109,10 +106,8 @@ static const unordered_map<Compare::Type, TypeAlias, CompareTypeHash> typeAliase
 };
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
-Compare::Type Compare::TypeFromOperator(const string& opString)
+Compare::Type Compare::TypeFromOperator(const std::string& opString)
 {
     try {
         return internal::opToTypeMap.at(opString);
@@ -121,7 +116,7 @@ Compare::Type Compare::TypeFromOperator(const string& opString)
     }
 }
 
-string Compare::TypeToName(const Compare::Type& type)
+std::string Compare::TypeToName(const Compare::Type& type)
 {
     try {
         return internal::typeAliases.at(type).name_;
@@ -130,7 +125,7 @@ string Compare::TypeToName(const Compare::Type& type)
     }
 }
 
-string Compare::TypeToOperator(const Compare::Type& type, bool asAlpha)
+std::string Compare::TypeToOperator(const Compare::Type& type, bool asAlpha)
 {
     try {
         return asAlpha ? internal::typeAliases.at(type).opAlpha_
@@ -139,3 +134,6 @@ string Compare::TypeToOperator(const Compare::Type& type, bool asAlpha)
         throw std::runtime_error("invalid comparison type encountered" );
     }
 }
+
+} // namespace BAM
+} // namespace PacBio

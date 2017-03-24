@@ -40,10 +40,10 @@
 #include "DataSetUtils.h"
 #include "TimeUtils.h"
 #include <boost/algorithm/string.hpp>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
+namespace internal {
 
 // ----------------
 // BaseEntityType
@@ -73,9 +73,9 @@ DataEntityType::DataEntityType(const std::string& label, const XsdType& xsd)
 // IndexedDataType
 // -----------------
 
-IndexedDataType::IndexedDataType(const string& metatype,
-                                 const string& filename,
-                                 const string& label, 
+IndexedDataType::IndexedDataType(const std::string& metatype,
+                                 const std::string& filename,
+                                 const std::string& label,
                                  const XsdType &xsd)
     : InputOutputDataType(metatype, filename, label, xsd)
 { }
@@ -89,9 +89,9 @@ IndexedDataType& IndexedDataType::FileIndices(const PacBio::BAM::FileIndices& in
 // InputOutputDataType
 // ---------------------
 
-InputOutputDataType::InputOutputDataType(const string& metatype,
-                                         const string& filename,
-                                         const string& label,
+InputOutputDataType::InputOutputDataType(const std::string& metatype,
+                                         const std::string& filename,
+                                         const std::string& label,
                                          const XsdType &xsd)
     : StrictEntityType(metatype, label, xsd)
 {  
@@ -102,8 +102,8 @@ InputOutputDataType::InputOutputDataType(const string& metatype,
 // StrictEntityType
 // ----------------
 
-StrictEntityType::StrictEntityType(const string& metatype, 
-                                   const string& label, 
+StrictEntityType::StrictEntityType(const std::string& metatype,
+                                   const std::string& label,
                                    const XsdType& xsd)
     : BaseEntityType(label, xsd)
 { 
@@ -112,15 +112,19 @@ StrictEntityType::StrictEntityType(const string& metatype,
 
     // TimeStampedName
     const size_t numChars = metatype.size();
-    string transformedMetatype;
+    std::string transformedMetatype;
     transformedMetatype.resize(numChars);
     for (size_t i = 0; i < numChars; ++i) {
         const char c = metatype.at(i);
         transformedMetatype[i] = ((c == '.') ? '_' : tolower(c));
     }
-    const string& tsn = transformedMetatype + "-" + internal::ToDataSetFormat(internal::CurrentTime());
+    const std::string& tsn = transformedMetatype + "-" + internal::ToDataSetFormat(internal::CurrentTime());
     TimeStampedName(tsn);
 
     // UniqueId
     UniqueId(internal::GenerateUuid());
 }
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio

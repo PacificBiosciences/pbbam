@@ -48,10 +48,6 @@
 #include <deque>
 #include <stdexcept>
 #include <utility>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
@@ -59,8 +55,8 @@ namespace BAM {
 struct ZmwReadStitcher::ZmwReadStitcherPrivate
 {
 public:
-    ZmwReadStitcherPrivate(const string& primaryBamFilePath,
-                           const string& scrapsBamFilePath,
+    ZmwReadStitcherPrivate(const std::string& primaryBamFilePath,
+                           const std::string& scrapsBamFilePath,
                            const PbiFilter& filter)
         : filter_(filter)
     {
@@ -72,8 +68,8 @@ public:
         : filter_(PbiFilter::FromDataSet(dataset))
     {
         // set up source queue
-        string primaryFn;
-        string scrapsFn;
+        std::string primaryFn;
+        std::string scrapsFn;
         const ExternalResources& resources = dataset.ExternalResources();
         for (const ExternalResource& resource : resources) {
 
@@ -124,14 +120,14 @@ public:
         }
 
         // no reader active
-        const string msg = { "no readers active, make sure you use "
-                             "ZmwReadStitcher::HasNext before "
-                             "requesting next record"
-                          };
+        const std::string msg = { "no readers active, make sure you use "
+                                  "ZmwReadStitcher::HasNext before "
+                                  "requesting next record"
+                                };
         throw std::runtime_error(msg);
     }
 
-    vector<BamRecord> NextRaw(void)
+    std::vector<BamRecord> NextRaw(void)
     {
         if (currentReader_) {
             const auto result = currentReader_->NextRaw();
@@ -141,10 +137,10 @@ public:
         }
 
         // no reader active
-        const string msg = { "no readers active, make sure you use "
-                             "ZmwReadStitcher::HasNext before "
-                             "requesting next group of records"
-                          };
+        const std::string msg = { "no readers active, make sure you use "
+                                  "ZmwReadStitcher::HasNext before "
+                                  "requesting next group of records"
+                                };
         throw std::runtime_error(msg);
     }
 
@@ -156,7 +152,7 @@ public:
 
 private:
     std::deque< std::pair<std::string, std::string> > sources_;
-    std::unique_ptr<VirtualZmwReader> currentReader_;
+    std::unique_ptr<internal::VirtualZmwReader> currentReader_;
     PbiFilter filter_;
 
 private:
@@ -169,31 +165,28 @@ private:
             const auto nextSource = sources_.front();
             sources_.pop_front();
 
-            currentReader_.reset(new VirtualZmwReader(nextSource.first,
-                                                      nextSource.second,
-                                                      filter_));
+            currentReader_.reset(new internal::VirtualZmwReader(nextSource.first,
+                                                                nextSource.second,
+                                                                filter_));
             if (currentReader_->HasNext())
                 return;
         }
     }
 };
 
-} // namespace BAM
-} // namespace PacBio
-
 // --------------------------------
 // ZmwReadStitcher implementation
 // --------------------------------
 
-ZmwReadStitcher::ZmwReadStitcher(const string& primaryBamFilePath,
-                                 const string& scrapsBamFilePath)
+ZmwReadStitcher::ZmwReadStitcher(const std::string& primaryBamFilePath,
+                                 const std::string& scrapsBamFilePath)
     : ZmwReadStitcher(primaryBamFilePath,
                       scrapsBamFilePath,
                       PbiFilter{})
 { }
 
-ZmwReadStitcher::ZmwReadStitcher(const string& primaryBamFilePath,
-                                 const string& scrapsBamFilePath,
+ZmwReadStitcher::ZmwReadStitcher(const std::string& primaryBamFilePath,
+                                 const std::string& scrapsBamFilePath,
                                  const PbiFilter& filter)
     : d_(new ZmwReadStitcherPrivate(primaryBamFilePath,
                                     scrapsBamFilePath,
@@ -212,7 +205,7 @@ bool ZmwReadStitcher::HasNext(void)
 VirtualZmwBamRecord ZmwReadStitcher::Next(void)
 { return d_->Next(); }
 
-vector<BamRecord> ZmwReadStitcher::NextRaw(void)
+std::vector<BamRecord> ZmwReadStitcher::NextRaw(void)
 { return d_->NextRaw(); }
 
 BamHeader ZmwReadStitcher::PrimaryHeader(void) const
@@ -221,3 +214,5 @@ BamHeader ZmwReadStitcher::PrimaryHeader(void) const
 BamHeader ZmwReadStitcher::ScrapsHeader(void) const 
 { return d_->ScrapsHeader().DeepCopy(); }
 
+} // namespace BAM
+} // namespace PacBio

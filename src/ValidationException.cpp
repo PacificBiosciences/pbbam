@@ -40,8 +40,9 @@
 // Author: Derek Barnett
 
 #include "pbbam/exception/ValidationException.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
+
+namespace PacBio {
+namespace BAM {
 
 ValidationException::ValidationException(const ErrorMap& fileErrors,
                                          const ErrorMap& readGroupErrors,
@@ -120,3 +121,6 @@ void ValidationException::FormatMessage(void)
 
     msg_ = s.str();
 }
+
+} // namespace BAM
+} // namespace PacBio

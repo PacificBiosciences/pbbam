@@ -41,8 +41,8 @@
 
 #include "pbbam/virtual/VirtualRegionTypeMap.h"
 
-using namespace PacBio;
-using namespace PacBio::BAM;
+namespace PacBio {
+namespace BAM {
 
 std::map<char, VirtualRegionType> VirtualRegionTypeMap::ParseChar
 {
@@ -52,3 +52,6 @@ std::map<char, VirtualRegionType> VirtualRegionTypeMap::ParseChar
     { 'F' , VirtualRegionType::FILTERED },
     { 'L' , VirtualRegionType::LQREGION }
 };
+
+} // namespace BAM
+} // namespace PacBio
