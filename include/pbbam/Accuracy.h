@@ -68,8 +68,12 @@ public:
     ///       to make sure that the acceptable range is respected.
     ///
     Accuracy(float accuracy);
-    Accuracy(const Accuracy& other);
-    ~Accuracy(void);
+
+    Accuracy(const Accuracy& other) = default;
+    Accuracy(Accuracy&& other) = default;
+    Accuracy& operator=(const Accuracy& other) = default;
+    Accuracy& operator=(Accuracy&& other) = default;
+    ~Accuracy(void) = default;
 
     /// \}
 

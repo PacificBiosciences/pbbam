@@ -57,53 +57,9 @@ static std::string token_VN = std::string("VN");
 
 } // namespace internal
 
-ProgramInfo::ProgramInfo(void) { }
-
 ProgramInfo::ProgramInfo(const std::string& id)
     : id_(id)
 { }
-
-ProgramInfo::ProgramInfo(const ProgramInfo& other)
-    : commandLine_(other.commandLine_)
-    , description_(other.description_)
-    , id_(other.id_)
-    , name_(other.name_)
-    , previousProgramId_(other.previousProgramId_)
-    , version_(other.version_)
-{  }
-
-ProgramInfo::ProgramInfo(ProgramInfo&& other)
-    : commandLine_(std::move(other.commandLine_))
-    , description_(std::move(other.description_))
-    , id_(std::move(other.id_))
-    , name_(std::move(other.name_))
-    , previousProgramId_(std::move(other.previousProgramId_))
-    , version_(std::move(other.version_))
-{ }
-
-ProgramInfo::~ProgramInfo(void) { }
-
-ProgramInfo& ProgramInfo::operator=(const ProgramInfo& other)
-{
-    commandLine_ = other.commandLine_;
-    description_ = other.description_;
-    id_ = other.id_;
-    name_ = other.name_;
-    previousProgramId_ = other.previousProgramId_;
-    version_ = other.version_;
-    return *this;
-}
-
-ProgramInfo& ProgramInfo::operator=(ProgramInfo&& other)
-{
-    commandLine_ = std::move(other.commandLine_);
-    description_ = std::move(other.description_);
-    id_ = std::move(other.id_);
-    name_ = std::move(other.name_);
-    previousProgramId_ = std::move(other.previousProgramId_);
-    version_ = std::move(other.version_);
-    return *this;
-}
 
 ProgramInfo ProgramInfo::FromSam(const std::string& sam)
 {

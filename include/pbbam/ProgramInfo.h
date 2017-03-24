@@ -79,7 +79,7 @@ public:
     /// \{
 
     /// \brief Creates an empty program info object.
-    ProgramInfo(void);
+    ProgramInfo(void) = default;
 
     /// \brief Creates a program info object with an ID.
     ///
@@ -88,11 +88,11 @@ public:
     ProgramInfo(const std::string& id);
 
 
-    ProgramInfo(const ProgramInfo& other);
-    ProgramInfo(ProgramInfo&& other);
-    ProgramInfo& operator=(const ProgramInfo& other);
-    ProgramInfo& operator=(ProgramInfo&& other);
-    ~ProgramInfo(void);
+    ProgramInfo(const ProgramInfo& other) = default;
+    ProgramInfo(ProgramInfo&& other) = default;
+    ProgramInfo& operator=(const ProgramInfo& other) = default;
+    ProgramInfo& operator=(ProgramInfo&& other) = default;
+    ~ProgramInfo(void) = default;
 
     /// \}
 

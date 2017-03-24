@@ -209,11 +209,11 @@ public:
                   const std::string& readType,
                   const PlatformModelType platform);
 
-    ReadGroupInfo(const ReadGroupInfo& other);
-    ReadGroupInfo(ReadGroupInfo&& other);
-    ReadGroupInfo& operator=(const ReadGroupInfo& other);
-    ReadGroupInfo& operator=(ReadGroupInfo&& other);
-    ~ReadGroupInfo(void);
+    ReadGroupInfo(const ReadGroupInfo& other) = default;
+    ReadGroupInfo(ReadGroupInfo&& other) = default;
+    ReadGroupInfo& operator=(const ReadGroupInfo& other) = default;
+    ReadGroupInfo& operator=(ReadGroupInfo&& other) = default;
+    ~ReadGroupInfo(void) = default;
 
     /// \}
 

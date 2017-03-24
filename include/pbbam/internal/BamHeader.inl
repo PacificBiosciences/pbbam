@@ -68,22 +68,6 @@ inline BamHeader::BamHeader(void)
     : d_(new internal::BamHeaderPrivate)
 { }
 
-inline BamHeader::BamHeader(const BamHeader& other)
-    : d_(other.d_)
-{ }
-
-inline BamHeader::BamHeader(BamHeader&& other)
-    : d_(std::move(other.d_))
-{ }
-
-inline BamHeader& BamHeader::operator=(const BamHeader& other)
-{ d_ = other.d_; return *this; }
-
-inline BamHeader& BamHeader::operator=(BamHeader&& other)
-{ d_ = std::move(other.d_); return *this; }
-
-inline BamHeader::~BamHeader(void) { }
-
 inline BamHeader BamHeader::operator+(const BamHeader& other) const
 { return DeepCopy() += other; }
 

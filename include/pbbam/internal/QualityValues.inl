@@ -80,31 +80,15 @@ inline QualityValues::QualityValues(const QualityValues::const_iterator first,
     assign(first, last);
 }
 
-inline QualityValues::QualityValues(const QualityValues& other)
-    : std::vector<QualityValue>(other)
-{ }
-
 inline QualityValues::QualityValues(std::vector<QualityValue>&& quals)
     : std::vector<QualityValue>(std::move(quals))
 { }
 
-inline QualityValues::QualityValues(QualityValues&& other)
-    : std::vector<QualityValue>(std::move(other))
-{ }
-
-inline QualityValues& QualityValues::operator=(const QualityValues& other)
-{ std::vector<QualityValue>::operator=(other); return *this; }
-
 inline QualityValues& QualityValues::operator=(const std::vector<QualityValue>& quals)
 { std::vector<QualityValue>::operator=(quals); return *this; }
 
-inline QualityValues& QualityValues::operator=(QualityValues&& other)
-{ std::vector<QualityValue>::operator=(std::move(other)); return *this; }
-
 inline QualityValues& QualityValues::operator=(std::vector<QualityValue>&& quals)
 { std::vector<QualityValue>::operator=(std::move(quals)); return *this; }
-
-inline QualityValues::~QualityValues(void) { }
 
 inline std::vector<QualityValue>::const_iterator QualityValues::cbegin(void) const
 { return std::vector<QualityValue>::cbegin(); }

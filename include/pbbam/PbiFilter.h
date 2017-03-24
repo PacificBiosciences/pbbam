@@ -251,9 +251,9 @@ public:
     PbiFilter(std::vector<PbiFilter>&& filters);
 
     PbiFilter(const PbiFilter& other);
-    PbiFilter(PbiFilter&& other) noexcept;
+    PbiFilter(PbiFilter&& other) noexcept = default;
     PbiFilter& operator=(const PbiFilter& other);
-    PbiFilter& operator=(PbiFilter&& other) noexcept;
+    PbiFilter& operator=(PbiFilter&& other) noexcept = default;
     ~PbiFilter(void);
 
     /// \}

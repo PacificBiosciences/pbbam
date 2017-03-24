@@ -89,11 +89,12 @@ public:
     Frames(void);
     Frames(const std::vector<uint16_t>& frames);
     Frames(std::vector<uint16_t>&& frames);
-    Frames(const Frames& other);
-    Frames(Frames&& other);
-    Frames& operator=(const Frames& other);
-    Frames& operator=(Frames&& other);
-    ~Frames(void);
+
+    Frames(const Frames& other) = default;
+    Frames(Frames&& other) = default;
+    Frames& operator=(const Frames& other)= default;
+    Frames& operator=(Frames&& other)= default;
+    ~Frames(void)= default;
 
     /// \}
 

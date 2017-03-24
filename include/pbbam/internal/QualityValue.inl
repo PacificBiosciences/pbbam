@@ -52,12 +52,6 @@ inline QualityValue::QualityValue(const uint8_t value)
         value_ = QualityValue::MAX;
 }
 
-inline QualityValue::QualityValue(const QualityValue& other)
-    : value_(other.value_)
-{ }
-
-inline QualityValue::~QualityValue(void) { }
-
 inline char QualityValue::Fastq(void) const
 { return static_cast<char>(value_ + 33); }
 
