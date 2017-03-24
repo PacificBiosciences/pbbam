@@ -43,21 +43,17 @@
 #include <memory>
 #include <vector>
 #include <cassert>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
 static
-void UpdateRegistry(const string& attributeName,
-                    const string& attributeValue,
+void UpdateRegistry(const std::string& attributeName,
+                    const std::string& attributeValue,
                     NamespaceRegistry& registry)
 {
-    vector<string> nameParts = Split(attributeName, ':');
+    std::vector<std::string> nameParts = Split(attributeName, ':');
     assert(!nameParts.empty());
     if (nameParts.size() > 2)
         throw std::runtime_error("malformed xmlns attribute: " + attributeName);
@@ -69,8 +65,8 @@ void UpdateRegistry(const string& attributeName,
         registry.SetDefaultXsd(xsd);
     else {
         assert(nameParts.size() == 2);
-        const string& name = nameParts.at(1);
-        const string& uri  = attributeValue;
+        const std::string& name = nameParts.at(1);
+        const std::string& uri  = attributeValue;
         NamespaceInfo namespaceInfo(name, uri);
         registry.Register(xsd, namespaceInfo);
     }
@@ -83,7 +79,7 @@ void FromXml(const pugi::xml_node& xmlNode, DataSetElement& parent)
     //
     // pugi::xml separates XML parts into more node types than we use
     //
-    const string& label = xmlNode.name();
+    const std::string& label = xmlNode.name();
     if (label.empty())
         return;
 
@@ -109,16 +105,12 @@ void FromXml(const pugi::xml_node& xmlNode, DataSetElement& parent)
     parent.AddChild(e);
 }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
-
-std::unique_ptr<DataSetBase> XmlReader::FromStream(istream& in)
+std::unique_ptr<DataSetBase> XmlReader::FromStream(std::istream& in)
 {
     pugi::xml_document doc;
     const pugi::xml_parse_result& loadResult = doc.load(in);
     if (loadResult.status != pugi::status_ok)
-        throw std::runtime_error(string("could not read XML file, error code:") + to_string(loadResult.status) );
+        throw std::runtime_error(std::string("could not read XML file, error code:") + std::to_string(loadResult.status) );
 
     // parse top-level attributes
     pugi::xml_node rootNode = doc.document_element();
@@ -130,12 +122,12 @@ std::unique_ptr<DataSetBase> XmlReader::FromStream(istream& in)
     dataset->Label(rootNode.name());
 
     // iterate attributes, capture namespace info
-    const string xmlnsPrefix("xmlns");
+    const std::string xmlnsPrefix("xmlns");
     auto attrIter = rootNode.attributes_begin();
     auto attrEnd  = rootNode.attributes_end();
     for ( ; attrIter != attrEnd; ++attrIter ) {
-        const string& name = attrIter->name();
-        const string& value = attrIter->value();
+        const std::string& name = attrIter->name();
+        const std::string& value = attrIter->value();
         dataset->Attribute(name, value);
 
         if (name.find(xmlnsPrefix) == 0)
@@ -152,3 +144,7 @@ std::unique_ptr<DataSetBase> XmlReader::FromStream(istream& in)
 
     return dataset;
 }
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio

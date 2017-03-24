@@ -45,26 +45,22 @@
 #include <cassert>
 #include <sys/stat.h>
 #include <unistd.h>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
 // pops "file://" scheme off the front of a URI/filepath, if found
-static string removeFileUriScheme(const string& uri)
+static std::string removeFileUriScheme(const std::string& uri)
 {
     assert(!uri.empty());
 
     auto schemeLess = uri;
-    const auto fileScheme = string{"file://"};
+    const auto fileScheme = std::string{"file://"};
     const auto schemeFound = schemeLess.find(fileScheme);
-    if (schemeFound != string::npos) {
+    if (schemeFound != std::string::npos) {
         if (schemeFound != 0)
-            throw runtime_error("Malformed URI: scheme not at beginning");
+            throw std::runtime_error("Malformed URI: scheme not at beginning");
         schemeLess = schemeLess.substr(fileScheme.size());
     }
     return schemeLess;
@@ -73,7 +69,7 @@ static string removeFileUriScheme(const string& uri)
 #ifdef PBBAM_WIN_FILEPATHS
 
 static
-string removeDiskName(const string& filePath)
+std::string removeDiskName(const std::string& filePath)
 {
     if (filePath.size() >= 2) {
         const char firstChar = filePath.at(0);
@@ -85,7 +81,7 @@ string removeDiskName(const string& filePath)
 
 static const char native_pathSeparator = '\\';
 
-static bool native_pathIsAbsolute(const string& filePath)
+static bool native_pathIsAbsolute(const std::string& filePath)
 {
     assert(!filePath.empty());
 
@@ -109,8 +105,8 @@ static bool native_pathIsAbsolute(const string& filePath)
     return false;
 }
 
-static string native_resolvedFilePath(const string& filePath,
-                                      const string& from)
+static std::string native_resolvedFilePath(const std::string& filePath,
+                                           const std::string& from)
 {
     // strip file:// scheme if present
     auto schemeLess = removeFileUriScheme(filePath);
@@ -143,11 +139,11 @@ static string native_resolvedFilePath(const string& filePath,
 
 static const char native_pathSeparator = '/';
 
-static bool native_pathIsAbsolute(const string& filePath)
+static bool native_pathIsAbsolute(const std::string& filePath)
 { return filePath.at(0) == '/'; }
 
-static string native_resolvedFilePath(const string& filePath,
-                                      const string& from)
+static std::string native_resolvedFilePath(const std::string& filePath,
+                                           const std::string& from)
 {
     // strip file:// scheme if present
     auto schemeLess = removeFileUriScheme(filePath);
@@ -175,7 +171,7 @@ static string native_resolvedFilePath(const string& filePath,
 #endif // PBBAM_WIN_FILEPATHS
 
 // see http://stackoverflow.com/questions/2869594/how-return-a-stdstring-from-cs-getcwd-function
-string FileUtils::CurrentWorkingDirectory(void)
+std::string FileUtils::CurrentWorkingDirectory(void)
 {
     const size_t chunkSize = 1024;
     const size_t maxNumChunks = 20;
@@ -183,33 +179,33 @@ string FileUtils::CurrentWorkingDirectory(void)
     // stack-based buffer for 'normal' case
     char buffer[chunkSize];
     if (getcwd(buffer, sizeof(buffer)) != NULL)
-        return string(buffer);
+        return std::string(buffer);
 
     // if error is not ERANGE, then it's not a problem of too-long name... something else happened
     if (errno != ERANGE)
-        throw runtime_error("could not determine current working directory path");
+        throw std::runtime_error("could not determine current working directory path");
 
     // long path - use heap, trying progressively longer buffers
     for (size_t chunks = 2; chunks < maxNumChunks; ++chunks) {
-        unique_ptr<char> cwd(new char[chunkSize*chunks]);
+        std::unique_ptr<char> cwd(new char[chunkSize*chunks]);
         if (getcwd(cwd.get(), chunkSize*chunks) != NULL)
-            return string(cwd.get());
+            return std::string(cwd.get());
 
         // if error is not ERANGE, then it's not a problem of too-long name... something else happened
         if (errno != ERANGE)
-            throw runtime_error("could not determine current working directory path");
+            throw std::runtime_error("could not determine current working directory path");
     }
 
     // crazy long path name
-    throw runtime_error("could determine current working directory - extremely long path");
+    throw std::runtime_error("could determine current working directory - extremely long path");
 }
 
-string FileUtils::DirectoryName(const string& file)
+std::string FileUtils::DirectoryName(const std::string& file)
 {
     const size_t found = file.rfind(Separator(), file.length());
-    if (found != string::npos)
+    if (found != std::string::npos)
         return file.substr(0, found);
-    return string(".");
+    return std::string(".");
 }
 
 bool FileUtils::Exists(const char* fn)
@@ -218,16 +214,16 @@ bool FileUtils::Exists(const char* fn)
     return (stat(fn, &buf) != -1);
 }
 
-chrono::system_clock::time_point FileUtils::LastModified(const char* fn)
+std::chrono::system_clock::time_point FileUtils::LastModified(const char* fn)
 {
     struct stat s;
     if (stat(fn, &s) != 0)
-        throw runtime_error("could not get file timestamp");
-    return chrono::system_clock::from_time_t(s.st_mtime);
+        throw std::runtime_error("could not get file timestamp");
+    return std::chrono::system_clock::from_time_t(s.st_mtime);
 }
 
-string FileUtils::ResolvedFilePath(const string& filePath,
-                                   const string& from)
+std::string FileUtils::ResolvedFilePath(const std::string& filePath,
+                                        const std::string& from)
 { return native_resolvedFilePath(filePath, from); }
 
 constexpr char FileUtils::Separator(void)
@@ -237,7 +233,7 @@ off_t FileUtils::Size(const char* fn)
 {
     struct stat s;
     if (stat(fn, &s) != 0)
-        throw runtime_error("could not determine file size");
+        throw std::runtime_error("could not determine file size");
     return s.st_size;
 }
 

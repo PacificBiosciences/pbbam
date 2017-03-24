@@ -47,10 +47,6 @@
 #include <htslib/hts.h>
 #include <cassert>
 #include <cstdio>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
@@ -87,10 +83,8 @@ public:
 };
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
-BamReader::BamReader(const string& fn)
+BamReader::BamReader(const std::string& fn)
     : BamReader(BamFile(fn))
 { }
 
@@ -161,7 +155,7 @@ bool BamReader::GetNext(BamRecord& record)
 
     // error corrupted file
     else {
-        auto errorMsg = string{"corrupted BAM file: "};
+        auto errorMsg = std::string{"corrupted BAM file: "};
         if (result == -2)
             errorMsg += "probably truncated";
         else if (result == -3)
@@ -169,10 +163,10 @@ bool BamReader::GetNext(BamRecord& record)
         else if (result == -4)
             errorMsg += "could not read BAM record's' variable-length data";
         else
-            errorMsg += "unknown reason " + to_string(result);
-        errorMsg += string{" ("};
+            errorMsg += "unknown reason " + std::to_string(result);
+        errorMsg += std::string{" ("};
         errorMsg += Filename();
-        errorMsg += string{")"};
+        errorMsg += std::string{")"};
         throw std::runtime_error{errorMsg};
     }
 }
@@ -193,3 +187,6 @@ int64_t BamReader::VirtualTell(void) const
 {
     return bgzf_tell(Bgzf());
 }
+
+} // namespace BAM
+} // namespace PacBio

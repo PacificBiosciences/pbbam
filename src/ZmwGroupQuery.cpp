@@ -46,10 +46,9 @@
 #include "MemoryUtils.h"
 #include <algorithm>
 #include <deque>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
 
 struct ZmwGroupQuery::ZmwGroupQueryPrivate
 {
@@ -110,3 +109,6 @@ ZmwGroupQuery::~ZmwGroupQuery(void) { }
 
 bool ZmwGroupQuery::GetNext(std::vector<BamRecord>& records)
 { return d_->GetNext(records); }
+
+} // namespace BAM
+} // namespace PacBio

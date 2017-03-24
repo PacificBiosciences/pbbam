@@ -43,10 +43,6 @@
 #include "pbbam/PbiIndexedBamReader.h"
 #include "VirtualZmwReader.h"
 #include <cassert>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
@@ -54,26 +50,26 @@ namespace BAM {
 struct WhitelistedZmwReadStitcher::WhitelistedZmwReadStitcherPrivate
 {
 public:
-    WhitelistedZmwReadStitcherPrivate(const vector<int32_t>& zmwWhitelist,
-                                      const string& primaryBamFilePath,
-                                      const string& scrapsBamFilePath)
+    WhitelistedZmwReadStitcherPrivate(const std::vector<int32_t>& zmwWhitelist,
+                                      const std::string& primaryBamFilePath,
+                                      const std::string& scrapsBamFilePath)
         : primaryBamFile_(new BamFile{ primaryBamFilePath })
         , scrapsBamFile_(new BamFile{ scrapsBamFilePath })
         , primaryReader_(new PbiIndexedBamReader{ *primaryBamFile_ })
         , scrapsReader_(new PbiIndexedBamReader{ *scrapsBamFile_ })
     {
         // setup new header for stitched data
-        polyHeader_ = unique_ptr<BamHeader>(new BamHeader(primaryBamFile_->Header().ToSam()));
+        polyHeader_ = std::unique_ptr<BamHeader>(new BamHeader(primaryBamFile_->Header().ToSam()));
         auto readGroups = polyHeader_->ReadGroups();
         if (readGroups.empty())
-            throw runtime_error("Bam header of the primary bam has no read groups.");
+            throw std::runtime_error("Bam header of the primary bam has no read groups.");
         readGroups[0].ReadType("POLYMERASE");
         readGroups[0].Id(readGroups[0].MovieName(), "POLYMERASE");
         if (readGroups.size() > 1)
         {
-            vector<ReadGroupInfo> singleGroup;
-            singleGroup.emplace_back(move(readGroups[0]));
-            readGroups = move(singleGroup);
+            std::vector<ReadGroupInfo> singleGroup;
+            singleGroup.emplace_back(std::move(readGroups[0]));
+            readGroups = std::move(singleGroup);
             polyHeader_->ClearReadGroups();
         }
         polyHeader_->ReadGroups(readGroups);
@@ -90,13 +86,13 @@ public:
     VirtualZmwBamRecord Next(void)
     {
         auto bamRecordVec = NextRaw();
-        VirtualZmwBamRecord stitched(move(bamRecordVec), *polyHeader_);
+        VirtualZmwBamRecord stitched(std::move(bamRecordVec), *polyHeader_);
         return stitched;
     }
 
-    vector<BamRecord> NextRaw(void)
+    std::vector<BamRecord> NextRaw(void)
     {
-        auto result = vector<BamRecord>{ };
+        auto result = std::vector<BamRecord>{ };
         if (!HasNext())
             return result;
 
@@ -121,15 +117,15 @@ public:
     { return scrapsBamFile_->Header(); }
 
 private:
-    unique_ptr<BamFile> primaryBamFile_;
-    unique_ptr<BamFile> scrapsBamFile_;
-    unique_ptr<PbiIndexedBamReader> primaryReader_;
-    unique_ptr<PbiIndexedBamReader> scrapsReader_;
-    unique_ptr<BamHeader> polyHeader_;
-    deque<int32_t>        zmwWhitelist_;
+    std::unique_ptr<BamFile> primaryBamFile_;
+    std::unique_ptr<BamFile> scrapsBamFile_;
+    std::unique_ptr<PbiIndexedBamReader> primaryReader_;
+    std::unique_ptr<PbiIndexedBamReader> scrapsReader_;
+    std::unique_ptr<BamHeader> polyHeader_;
+    std::deque<int32_t>        zmwWhitelist_;
 
 private:
-    void PreFilterZmws(const vector<int32_t>& zmwWhitelist)
+    void PreFilterZmws(const std::vector<int32_t>& zmwWhitelist)
     {
         // fetch input ZMWs
         const PbiRawData primaryIndex(primaryBamFile_->PacBioIndexFilename());
@@ -138,7 +134,7 @@ private:
         const auto& scrapsZmws = scrapsIndex.BasicData().holeNumber_;
 
         // toss them all into a set (for uniqueness & lookup here soon)
-        set<int32_t> inputZmws;
+        std::set<int32_t> inputZmws;
         for (const auto& zmw : primaryZmws)
             inputZmws.insert(zmw);
         for (const auto& zmw : scrapsZmws)
@@ -153,16 +149,13 @@ private:
     }
 };
 
-} // namespace BAM
-} // namespace PacBio
-
 // --------------------------------
 // ZmwReadStitcher implementation
 // --------------------------------
 
-WhitelistedZmwReadStitcher::WhitelistedZmwReadStitcher(const vector<int32_t>& zmwWhitelist,
-                                                       const string& primaryBamFilePath,
-                                                       const string& scrapsBamFilePath)
+WhitelistedZmwReadStitcher::WhitelistedZmwReadStitcher(const std::vector<int32_t>& zmwWhitelist,
+                                                       const std::string& primaryBamFilePath,
+                                                       const std::string& scrapsBamFilePath)
     : d_(new WhitelistedZmwReadStitcherPrivate(zmwWhitelist,
                                                primaryBamFilePath,
                                                scrapsBamFilePath))
@@ -176,7 +169,7 @@ bool WhitelistedZmwReadStitcher::HasNext(void) const
 VirtualZmwBamRecord WhitelistedZmwReadStitcher::Next(void)
 { return d_->Next(); }
 
-vector<BamRecord> WhitelistedZmwReadStitcher::NextRaw(void)
+std::vector<BamRecord> WhitelistedZmwReadStitcher::NextRaw(void)
 { return d_->NextRaw(); }
 
 BamHeader WhitelistedZmwReadStitcher::PrimaryHeader(void) const
@@ -184,3 +177,6 @@ BamHeader WhitelistedZmwReadStitcher::PrimaryHeader(void) const
 
 BamHeader WhitelistedZmwReadStitcher::ScrapsHeader(void) const
 { return d_->ScrapsHeader(); }
+
+} // namespace BAM
+} // namespace PacBio

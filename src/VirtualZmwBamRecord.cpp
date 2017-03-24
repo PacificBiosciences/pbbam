@@ -48,10 +48,6 @@
 #include "pbbam/virtual/VirtualRegionType.h"
 #include "pbbam/virtual/VirtualRegionTypeMap.h"
 
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-
 namespace PacBio {
 namespace BAM {
 namespace internal {
@@ -97,8 +93,6 @@ inline void MoveAppend(std::vector<T>&& src, std::vector<T>& dst) noexcept
 }
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
 VirtualZmwBamRecord::VirtualZmwBamRecord(
     std::vector<BamRecord>&& unorderedSources, const BamHeader& header)
@@ -173,6 +167,8 @@ void VirtualZmwBamRecord::StitchSources(void)
     pa.reserve(stitchedSize);
     pm.reserve(stitchedSize);
     sf.reserve(stitchedSize);
+
+    using internal::MoveAppend;
 
     // Stitch using tmp vars
     for(auto& b : sources_)
@@ -397,3 +393,6 @@ VirtualZmwBamRecord::VirtualRegionsTable(const VirtualRegionType regionType) con
        return iter->second;
    return std::vector<VirtualRegion>();
 }
+
+} // namespace BAM
+} // namespace PacBio

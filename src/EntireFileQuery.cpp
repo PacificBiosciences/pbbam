@@ -41,9 +41,9 @@
 
 #include "pbbam/EntireFileQuery.h"
 #include "pbbam/CompositeBamReader.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
 
 struct EntireFileQuery::EntireFileQueryPrivate
 {
@@ -63,3 +63,6 @@ EntireFileQuery::~EntireFileQuery(void) { }
 
 bool EntireFileQuery::GetNext(BamRecord &r)
 { return d_->reader_.GetNext(r); }
+
+} // namespace BAM
+} // namespace PacBio

@@ -44,10 +44,6 @@
 #include "MemoryUtils.h"
 #include <boost/algorithm/string.hpp>
 #include <vector>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
@@ -93,10 +89,6 @@ inline void MoveAppend(std::vector<T>&& src, std::vector<T>& dst) noexcept
     }
 }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
-
 // ---------------------------
 // PbiIndexIO implementation
 // ---------------------------
@@ -109,7 +101,7 @@ PbiRawData PbiIndexIO::Load(const std::string& pbiFilename)
 }
 
 void PbiIndexIO::Load(PbiRawData& rawData,
-                      const string& filename)
+                      const std::string& filename)
 {
     // open file for reading
     if (!boost::algorithm::iends_with(filename, ".pbi"))
@@ -472,3 +464,7 @@ void PbiIndexIO::WriteBasicData(const PbiRawBasicData& basicData,
     WriteBgzfVector(fp, basicData.ctxtFlag_);
     WriteBgzfVector(fp, basicData.fileOffset_);
 }
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio

@@ -45,9 +45,6 @@
 #include <htslib/hts.h>
 #include <iostream>
 #include <thread>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
@@ -73,7 +70,7 @@ public:
     PBBAM_SHARED_PTR<bam_hdr_t> header_;
 };
 
-BamWriterPrivate::BamWriterPrivate(const string& filename,
+BamWriterPrivate::BamWriterPrivate(const std::string& filename,
                                    const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader,
                                    const BamWriter::CompressionLevel compressionLevel,
                                    const size_t numThreads,
@@ -87,8 +84,8 @@ BamWriterPrivate::BamWriterPrivate(const string& filename,
         throw std::runtime_error("null header");
 
     // open file
-    const string& usingFilename = TempFilename();
-    const string& mode = string("wb") + to_string(static_cast<int>(compressionLevel));
+    const std::string& usingFilename = TempFilename();
+    const std::string& mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
     file_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
     if (!file_)
         throw std::runtime_error("could not open file for writing");
@@ -96,7 +93,7 @@ BamWriterPrivate::BamWriterPrivate(const string& filename,
     // if no explicit thread count given, attempt built-in check
     size_t actualNumThreads = numThreads;
     if (actualNumThreads == 0) {
-        actualNumThreads = thread::hardware_concurrency();
+        actualNumThreads = std::thread::hardware_concurrency();
 
         // if still unknown, default to single-threaded
         if (actualNumThreads == 0)
@@ -154,8 +151,6 @@ inline void BamWriterPrivate::Write(const BamRecordImpl& recordImpl)
 { Write(BamRecord(recordImpl)); }
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
 BamWriter::BamWriter(const std::string& filename,
                      const BamHeader& header,
@@ -197,3 +192,6 @@ void BamWriter::Write(const BamRecord& record, int64_t* vOffset)
 
 void BamWriter::Write(const BamRecordImpl& recordImpl)
 { d_->Write(recordImpl); }
+
+} // namespace BAM
+} // namespace PacBio

@@ -45,10 +45,9 @@
 #include "FileUtils.h"
 #include "TimeUtils.h"
 #include <set>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
 
 // -------------------
 // AlignmentSet
@@ -110,8 +109,8 @@ DataSetBase::DataSetBase(void)
                        XsdType::DATASETS)
 { }
 
-DataSetBase::DataSetBase(const string& metatype,
-                         const string& label,
+DataSetBase::DataSetBase(const std::string& metatype,
+                         const std::string& label,
                          const XsdType& xsd)
     : StrictEntityType(metatype, label, xsd)
 { }
@@ -174,17 +173,17 @@ DataSetBase& DataSetBase::operator+=(const DataSetBase& other)
     return *this;
 }
 
-std::shared_ptr<DataSetBase> DataSetBase::Create(const string& typeName)
+std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName)
 {
-    if (typeName == string("DataSet"))       return make_shared<DataSetBase>();
-    if (typeName == string("SubreadSet"))    return make_shared<SubreadSet>();
-    if (typeName == string("AlignmentSet"))  return make_shared<AlignmentSet>();
-    if (typeName == string("BarcodeSet"))    return make_shared<BarcodeSet>();
-    if (typeName == string("ConsensusAlignmentSet")) return make_shared<ConsensusAlignmentSet>();
-    if (typeName == string("ConsensusReadSet"))      return make_shared<ConsensusReadSet>();
-    if (typeName == string("ContigSet"))     return make_shared<ContigSet>();
-    if (typeName == string("HdfSubreadSet")) return make_shared<HdfSubreadSet>();
-    if (typeName == string("ReferenceSet"))  return make_shared<ReferenceSet>();
+    if (typeName == std::string("DataSet"))       return std::make_shared<DataSetBase>();
+    if (typeName == std::string("SubreadSet"))    return std::make_shared<SubreadSet>();
+    if (typeName == std::string("AlignmentSet"))  return std::make_shared<AlignmentSet>();
+    if (typeName == std::string("BarcodeSet"))    return std::make_shared<BarcodeSet>();
+    if (typeName == std::string("ConsensusAlignmentSet")) return std::make_shared<ConsensusAlignmentSet>();
+    if (typeName == std::string("ConsensusReadSet"))      return std::make_shared<ConsensusReadSet>();
+    if (typeName == std::string("ContigSet"))     return std::make_shared<ContigSet>();
+    if (typeName == std::string("HdfSubreadSet")) return std::make_shared<HdfSubreadSet>();
+    if (typeName == std::string("ReferenceSet"))  return std::make_shared<ReferenceSet>();
 
     // unknown typename
     throw std::runtime_error("unsupported dataset type");
@@ -242,8 +241,8 @@ ExternalResource::ExternalResource(const BamFile& bamFile)
                       XsdType::BASE_DATA_MODEL)
 { }
 
-ExternalResource::ExternalResource(const string& metatype,
-                                   const string& filename)
+ExternalResource::ExternalResource(const std::string& metatype,
+                                   const std::string& filename)
     : IndexedDataType(metatype,
                       filename,
                       "ExternalResource",
@@ -271,16 +270,16 @@ ExternalResources& ExternalResources::operator+=(const ExternalResources& other)
 {
     // only keep unique resource ids
 
-    set<std::string> myResourceIds;
+    std::set<std::string> myResourceIds;
     for (size_t i = 0; i < Size(); ++i) {
         const ExternalResource& resource = this->operator[](i);
         myResourceIds.insert(resource.ResourceId());
     }
 
-    vector<size_t> newResourceIndices;
+    std::vector<size_t> newResourceIndices;
     const size_t numOtherResourceIds = other.Size();
     for (size_t i = 0; i < numOtherResourceIds; ++i) {
-        const string& resourceId = other[i].ResourceId();
+        const std::string& resourceId = other[i].ResourceId();
         auto found = myResourceIds.find(resourceId);
         if (found == myResourceIds.cend())
             newResourceIndices.push_back(i);
@@ -295,7 +294,7 @@ ExternalResources& ExternalResources::operator+=(const ExternalResources& other)
 void ExternalResources::Add(const ExternalResource& ext)
 {
     // disallow external resources w/ duplicate ResourceIds
-    set<std::string> myResourceIds;
+    std::set<std::string> myResourceIds;
     for (size_t i = 0; i < Size(); ++i) {
         const ExternalResource& resource = this->operator[](i);
         myResourceIds.insert(resource.ResourceId());
@@ -304,9 +303,9 @@ void ExternalResources::Add(const ExternalResource& ext)
         AddChild(ext);
 }
 
-vector<BamFile> ExternalResources::BamFiles(void) const
+std::vector<BamFile> ExternalResources::BamFiles(void) const
 {
-    vector<BamFile> result;
+    std::vector<BamFile> result;
     const int numResources = Size();
     result.reserve(numResources);
     for( const ExternalResource& ext : *this )
@@ -321,7 +320,7 @@ void ExternalResources::Remove(const ExternalResource& ext)
 // FileIndex
 // -------------------
 
-FileIndex::FileIndex(const string& metatype, const string& filename)
+FileIndex::FileIndex(const std::string& metatype, const std::string& filename)
     : InputOutputDataType(metatype,
                           filename,
                           "FileIndex",
@@ -478,3 +477,6 @@ SubreadSet::SubreadSet(void)
                   "SubreadSet",
                   XsdType::DATASETS)
 { }
+
+} // namespace BAM
+} // namespace PacBio

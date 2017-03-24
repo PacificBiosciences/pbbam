@@ -42,7 +42,6 @@
 #include <fstream>
 #include <map>
 #include <cstdlib>
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
@@ -90,33 +89,33 @@ extern const ChemistryTable BuiltInChemistryTable = {
 
 };
 
-ChemistryTable ChemistryTableFromXml(const string& mappingXml)
+ChemistryTable ChemistryTableFromXml(const std::string& mappingXml)
 {
     if (!FileUtils::Exists(mappingXml))
         throw BundleChemistryMappingException(
                 mappingXml, "PB_CHEMISTRY_BUNDLE_DIR defined but file not found");
 
-    ifstream in(mappingXml);
+    std::ifstream in(mappingXml);
     pugi::xml_document doc;
     const pugi::xml_parse_result& loadResult = doc.load(in);
     if (loadResult.status != pugi::status_ok)
         throw BundleChemistryMappingException(
-                mappingXml, string("unparseable XML, error code:") + to_string(loadResult.status));
+                mappingXml, std::string("unparseable XML, error code:") + std::to_string(loadResult.status));
 
     // parse top-level attributes
     pugi::xml_node rootNode = doc.document_element();
     if (rootNode == pugi::xml_node())
         throw BundleChemistryMappingException(mappingXml, "could not fetch XML root node");
 
-    if (string(rootNode.name()) != "MappingTable")
+    if (std::string(rootNode.name()) != "MappingTable")
         throw BundleChemistryMappingException(mappingXml, "MappingTable not found");
 
     ChemistryTable table;
     try {
         for (const auto& childNode : rootNode) {
-            const string childName = childNode.name();
+            const std::string childName = childNode.name();
             if (childName != "Mapping") continue;
-            table.emplace_back(array<string, 4>{{
+            table.emplace_back(std::array<std::string, 4>{{
                 childNode.child("BindingKit").child_value(),
                 childNode.child("SequencingKit").child_value(),
                 childNode.child("SoftwareVersion").child_value(),
@@ -131,9 +130,9 @@ ChemistryTable ChemistryTableFromXml(const string& mappingXml)
 const ChemistryTable& GetChemistryTableFromEnv()
 {
     static const ChemistryTable empty{};
-    static map<string, ChemistryTable> tableCache;
+    static std::map<std::string, ChemistryTable> tableCache;
 
-    string chemPath;
+    std::string chemPath;
     const char* pth = getenv("PB_CHEMISTRY_BUNDLE_DIR");
     if (pth != nullptr && pth[0] != '\0')
         chemPath = pth;

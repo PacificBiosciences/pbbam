@@ -45,20 +45,17 @@
 #include <cstring>
 #include <ctype.h>
 #include <stdexcept>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
 // returns sequence name & sets begin/end, from input regionString
-string parseRegionString(const string& reg,
-                         PacBio::BAM::Position* begin,
-                         PacBio::BAM::Position* end)
+std::string parseRegionString(const std::string& reg,
+                              PacBio::BAM::Position* begin,
+                              PacBio::BAM::Position* end)
 {
-    const vector<string> parts = internal::Split(reg, ':');
+    const std::vector<std::string> parts = internal::Split(reg, ':');
     if (parts.empty() || parts.size() > 2)
         throw std::runtime_error("malformed region string");
 
@@ -70,7 +67,7 @@ string parseRegionString(const string& reg,
 
     // parse interval from input
     else if (parts.size() == 2) {
-        const vector<string> intervalParts = internal::Split(parts.at(1), '-');
+        const std::vector<std::string> intervalParts = internal::Split(parts.at(1), '-');
         if (intervalParts.empty() || intervalParts.size() >2 )
             throw std::runtime_error("malformed region string");
         *begin = std::stoi(intervalParts.at(0));
@@ -81,8 +78,6 @@ string parseRegionString(const string& reg,
 }
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
 GenomicInterval::GenomicInterval(void) { }
 
@@ -93,7 +88,7 @@ GenomicInterval::GenomicInterval(const std::string& name,
     , interval_(start, stop)
 { }
 
-GenomicInterval::GenomicInterval(const string& samtoolsRegionString)
+GenomicInterval::GenomicInterval(const std::string& samtoolsRegionString)
 {
     Position begin;
     Position end;
@@ -133,3 +128,6 @@ bool GenomicInterval::Intersects(const GenomicInterval& other) const
         return false;
     return interval_.Intersects(other.interval_);
 }
+
+} // namespace BAM
+} // namespace PacBio

@@ -41,9 +41,6 @@
 #include "MemoryUtils.h"
 #include <htslib/hfile.h>
 #include <htslib/sam.h>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
@@ -53,7 +50,7 @@ class SamWriterPrivate : public internal::FileProducer
 {
 public:
     SamWriterPrivate(const std::string& filename,
-                      const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader)
+                     const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader)
         : internal::FileProducer(filename)
         , file_(nullptr)
         , header_(rawHeader)
@@ -62,8 +59,8 @@ public:
             throw std::runtime_error("null header");
 
         // open file
-        const string& usingFilename = TempFilename();
-        const string& mode = string("w");
+        const std::string& usingFilename = TempFilename();
+        const std::string& mode = std::string("w");
         file_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
         if (!file_)
             throw std::runtime_error("could not open file for writing");
@@ -109,10 +106,8 @@ void SamWriterPrivate::Write(const BamRecord& record)
 }
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
-SamWriter::SamWriter(const string& filename, const BamHeader& header)
+SamWriter::SamWriter(const std::string& filename, const BamHeader& header)
     : IRecordWriter()
     , d_(nullptr)
 {
@@ -140,3 +135,6 @@ void SamWriter::Write(const BamRecordImpl& recordImpl)
 {
     d_->Write( BamRecord{recordImpl} );
 }
+
+} // namespace BAM
+} // namespace PacBio

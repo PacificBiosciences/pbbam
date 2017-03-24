@@ -45,9 +45,6 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
@@ -55,9 +52,9 @@ namespace internal {
 
 struct FastaReaderPrivate
 {
-    ifstream stream_;
-    string name_;
-    string bases_;
+    std::ifstream stream_;
+    std::string name_;
+    std::string bases_;
 
     FastaReaderPrivate(const std::string& fn)
         : stream_(fn)
@@ -110,7 +107,7 @@ private:
         while (static_cast<char>(p) != '>' && p != EOF) {
             if (!stream_)
                 return;
-            string line;
+            std::string line;
             std::getline(stream_, line, '\n');
             bases_ += line;
             if (!stream_)
@@ -121,8 +118,6 @@ private:
 };
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
 FastaReader::FastaReader(const std::string& fn)
     : d_{ new internal::FastaReaderPrivate{ fn } }
@@ -143,9 +138,9 @@ FastaReader::~FastaReader(void) { }
 bool FastaReader::GetNext(FastaSequence& record)
 { return d_->GetNext(record); }
 
-vector<FastaSequence> FastaReader::ReadAll(const string& fn)
+std::vector<FastaSequence> FastaReader::ReadAll(const std::string& fn)
 {
-    vector<FastaSequence> result;
+    std::vector<FastaSequence> result;
     result.reserve(256);
     FastaReader reader{ fn };
     FastaSequence s;
@@ -153,3 +148,6 @@ vector<FastaSequence> FastaReader::ReadAll(const string& fn)
         result.emplace_back(s);
     return result;
 }
+
+} // namespace BAM
+} // namespace PacBio

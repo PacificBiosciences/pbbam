@@ -46,39 +46,36 @@
 #include <sstream>
 #include <set>
 #include <cassert>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-static const string prefix_HD = string("@HD");
-static const string prefix_SQ = string("@SQ");
-static const string prefix_RG = string("@RG");
-static const string prefix_PG = string("@PG");
-static const string prefix_CO = string("@CO");
+static const std::string prefix_HD = std::string("@HD");
+static const std::string prefix_SQ = std::string("@SQ");
+static const std::string prefix_RG = std::string("@RG");
+static const std::string prefix_PG = std::string("@PG");
+static const std::string prefix_CO = std::string("@CO");
 
-static const string token_VN = string("VN");
-static const string token_SO = string("SO");
-static const string token_pb = string("pb");
+static const std::string token_VN = std::string("VN");
+static const std::string token_SO = std::string("SO");
+static const std::string token_pb = std::string("pb");
 
 static inline 
-bool CheckSortOrder(const string& lhs, const string& rhs)
+bool CheckSortOrder(const std::string& lhs, const std::string& rhs)
 { return lhs == rhs; } 
 
 static inline
-bool CheckPbVersion(const string& lhs, const string& rhs)
+bool CheckPbVersion(const std::string& lhs, const std::string& rhs)
 { 
     return ( Version{ lhs } >= Version::Minimum && 
              Version{ rhs } >= Version::Minimum);
 }
 
 static inline
-bool CheckSequences(const string& sortOrder, 
-                    const vector<SequenceInfo>& lhs,
-                    const vector<SequenceInfo>& rhs)
+bool CheckSequences(const std::string& sortOrder,
+                    const std::vector<SequenceInfo>& lhs,
+                    const std::vector<SequenceInfo>& rhs)
 {
     return ( (sortOrder == "coordinate") ? lhs == rhs : true);
 } 
@@ -94,37 +91,35 @@ void EnsureCanMerge(const BamHeader& lhs, const BamHeader& rhs)
         return;
 
     // if any checks failed, format error message & throw
-    stringstream e;
-    e << "could not merge BAM headers:" << endl;
+    std::stringstream e;
+    e << "could not merge BAM headers:" << std::endl;
 
     if (!sortOrderOk) {
         e << "  mismatched sort orders (@HD:SO) : ("
           << lhs.SortOrder() << ", " << rhs.SortOrder()
-          << ")" << endl;
+          << ")" << std::endl;
     }
 
     if (!pbVersionOk) {
         e << "  incompatible PacBio BAM versions (@HD:pb) : ("
           << lhs.PacBioBamVersion() << ", " << rhs.PacBioBamVersion()
-          << ")" << endl;
+          << ")" << std::endl;
     }
 
     if (!sequencesOk)
-        e << "  mismatched sequence lists (@SQ entries)" << endl;
+        e << "  mismatched sequence lists (@SQ entries)" << std::endl;
 
     throw std::runtime_error(e.str());
 }
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
-BamHeader::BamHeader(const string& samHeaderText)
+BamHeader::BamHeader(const std::string& samHeaderText)
     : d_(new internal::BamHeaderPrivate)
 {
-    istringstream s(samHeaderText);
-    string line("");
-    string firstToken;
+    std::stringstream s(samHeaderText);
+    std::string line("");
+    std::string firstToken;
     while (getline(s, line)) {
 
         // skip if line is not long enough to contain true values
@@ -137,10 +132,10 @@ BamHeader::BamHeader(const string& samHeaderText)
         if (firstToken == internal::prefix_HD) {
 
             // pop off '@HD\t', then split HD lines into tokens
-            const vector<string>& tokens = internal::Split(line.substr(4), '\t');
-            for (const string& token : tokens) {
-                const string& tokenTag   = token.substr(0,2);
-                const string& tokenValue = token.substr(3);
+            const std::vector<std::string>& tokens = internal::Split(line.substr(4), '\t');
+            for (const std::string& token : tokens) {
+                const std::string& tokenTag   = token.substr(0,2);
+                const std::string& tokenValue = token.substr(3);
 
                 // set header contents
                 if      (tokenTag == internal::token_VN) Version(tokenValue);
@@ -150,7 +145,7 @@ BamHeader::BamHeader(const string& samHeaderText)
 
             // check for required tags
             if (Version().empty())
-                Version(string(hts_version()));
+                Version(std::string(hts_version()));
         }
 
         else if (firstToken == internal::prefix_SQ)
@@ -224,9 +219,9 @@ BamHeader& BamHeader::PacBioBamVersion(const std::string& version)
     d_->pacbioBamVersion_ = version;
     const auto fileVersion = internal::Version{ version };
     if (fileVersion < internal::Version::Minimum) {
-        auto msg  = string{ "invalid PacBio BAM version number" };
+        auto msg  = std::string{ "invalid PacBio BAM version number" };
              msg += ( "(" + fileVersion.ToString() + ")");
-             msg += string{ "is older than the minimum supported version" };
+             msg += std::string{ "is older than the minimum supported version" };
              msg += ( "(" + internal::Version::Minimum.ToString() + ")");
         throw std::runtime_error(msg);
     }
@@ -241,9 +236,9 @@ ProgramInfo BamHeader::Program(const std::string& id) const
     return iter->second;
 }
 
-vector<string> BamHeader::ProgramIds(void) const
+std::vector<std::string> BamHeader::ProgramIds(void) const
 {
-    vector<string> result;
+    std::vector<std::string> result;
     result.reserve(d_->programs_.size());
     const auto end = d_->programs_.cend();
     auto iter = d_->programs_.cbegin();
@@ -252,9 +247,9 @@ vector<string> BamHeader::ProgramIds(void) const
     return result;
 }
 
-vector<ProgramInfo> BamHeader::Programs(void) const
+std::vector<ProgramInfo> BamHeader::Programs(void) const
 {
-    vector<ProgramInfo> result;
+    std::vector<ProgramInfo> result;
     result.reserve(d_->programs_.size());
     const auto end = d_->programs_.cend();
     auto iter = d_->programs_.cbegin();
@@ -263,7 +258,7 @@ vector<ProgramInfo> BamHeader::Programs(void) const
     return result;
 }
 
-BamHeader& BamHeader::Programs(const vector<ProgramInfo>& programs)
+BamHeader& BamHeader::Programs(const std::vector<ProgramInfo>& programs)
 {
     d_->programs_.clear();
     for (const ProgramInfo& pg : programs)
@@ -279,9 +274,9 @@ ReadGroupInfo BamHeader::ReadGroup(const std::string& id) const
     return iter->second;
 }
 
-vector<string> BamHeader::ReadGroupIds(void) const
+std::vector<std::string> BamHeader::ReadGroupIds(void) const
 {
-    vector<string> result;
+    std::vector<std::string> result;
     result.reserve(d_->readGroups_.size());
     const auto end = d_->readGroups_.cend();
     auto iter = d_->readGroups_.cbegin();
@@ -290,9 +285,9 @@ vector<string> BamHeader::ReadGroupIds(void) const
     return result;
 }
 
-vector<ReadGroupInfo> BamHeader::ReadGroups(void) const
+std::vector<ReadGroupInfo> BamHeader::ReadGroups(void) const
 {
-    vector<ReadGroupInfo> result;
+    std::vector<ReadGroupInfo> result;
     result.reserve(d_->readGroups_.size());
     const auto end = d_->readGroups_.cend();
     auto iter = d_->readGroups_.cbegin();
@@ -301,7 +296,7 @@ vector<ReadGroupInfo> BamHeader::ReadGroups(void) const
     return result;
 }
 
-BamHeader& BamHeader::ReadGroups(const vector<ReadGroupInfo>& readGroups)
+BamHeader& BamHeader::ReadGroups(const std::vector<ReadGroupInfo>& readGroups)
 {
     d_->readGroups_.clear();
     for (const ReadGroupInfo& rg : readGroups)
@@ -329,9 +324,9 @@ int32_t BamHeader::SequenceId(const std::string& name) const
     return iter->second;
 }
 
-vector<string> BamHeader::SequenceNames(void) const
+std::vector<std::string> BamHeader::SequenceNames(void) const
 {
-    vector<string> result;
+    std::vector<std::string> result;
     result.reserve(d_->sequences_.size());
     const auto end = d_->sequences_.cend();
     auto iter = d_->sequences_.cbegin();
@@ -340,7 +335,7 @@ vector<string> BamHeader::SequenceNames(void) const
     return result;
 }
 
-BamHeader& BamHeader::Sequences(const vector<SequenceInfo>& sequences)
+BamHeader& BamHeader::Sequences(const std::vector<SequenceInfo>& sequences)
 {
     d_->sequences_.clear();
     for (const SequenceInfo& seq : sequences)
@@ -348,39 +343,42 @@ BamHeader& BamHeader::Sequences(const vector<SequenceInfo>& sequences)
     return *this;
 }
 
-string BamHeader::ToSam(void) const
+std::string BamHeader::ToSam(void) const
 {
     // init stream
-    stringstream out("");
+    std::stringstream out("");
 
     // @HD
-    const string& outputVersion   = (d_->version_.empty() ? string(hts_version()) : d_->version_);
-    const string& outputSortOrder = (d_->sortOrder_.empty() ? string("unknown") : d_->sortOrder_);
-    const string& outputPbBamVersion = (d_->pacbioBamVersion_.empty() ? internal::Version::Current.ToString()
-                                                                      : d_->pacbioBamVersion_);
+    const std::string& outputVersion   = (d_->version_.empty() ? std::string(hts_version()) : d_->version_);
+    const std::string& outputSortOrder = (d_->sortOrder_.empty() ? std::string("unknown") : d_->sortOrder_);
+    const std::string& outputPbBamVersion = (d_->pacbioBamVersion_.empty() ? internal::Version::Current.ToString()
+                                                                           : d_->pacbioBamVersion_);
 
     out << internal::prefix_HD
         << internal::MakeSamTag(internal::token_VN, outputVersion)
         << internal::MakeSamTag(internal::token_SO, outputSortOrder)
         << internal::MakeSamTag(internal::token_pb, outputPbBamVersion)
-        << endl;
+        << std::endl;
 
     // @SQ
     for (const SequenceInfo& seq : d_->sequences_)
-        out << seq.ToSam() << endl;
+        out << seq.ToSam() << std::endl;
 
     // @RG
     for (const auto& rgIter : d_->readGroups_)
-        out << rgIter.second.ToSam() << endl;
+        out << rgIter.second.ToSam() << std::endl;
 
     // @PG
     for (const auto& progIter : d_->programs_)
-        out << progIter.second.ToSam() << endl;
+        out << progIter.second.ToSam() << std::endl;
 
     // @CO
-    for (const string& comment : d_->comments_)
-        out << internal::prefix_CO << '\t' << comment << endl;
+    for (const std::string& comment : d_->comments_)
+        out << internal::prefix_CO << '\t' << comment << std::endl;
 
     // return result
     return out.str();
 }
+
+} // namespace BAM
+} // namespace PacBio

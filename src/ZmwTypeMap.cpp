@@ -41,8 +41,8 @@
 
 #include "pbbam/ZmwTypeMap.h"
 
-using namespace PacBio;
-using namespace PacBio::BAM;
+namespace PacBio {
+namespace BAM {
 
 std::map<char, ZmwType> ZmwTypeMap::ParseChar
 {
@@ -51,3 +51,6 @@ std::map<char, ZmwType> ZmwTypeMap::ParseChar
 	{ 'N' , ZmwType::NORMAL    },
 	{ 'S' , ZmwType::SENTINEL  }
 };
+
+} // namespace BAM
+} // namespace PacBio

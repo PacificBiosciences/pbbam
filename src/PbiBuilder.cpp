@@ -48,9 +48,6 @@
 #include <htslib/bgzf.h>
 #include <thread>
 #include <cassert>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
@@ -74,7 +71,7 @@ public:
 private:
     int32_t lastRefId_;
     Position lastPos_;
-    map<uint32_t, PbiReferenceEntry> rawReferenceEntries_;
+    std::map<uint32_t, PbiReferenceEntry> rawReferenceEntries_;
 };
 
 PbiRawReferenceDataBuilder::PbiRawReferenceDataBuilder(const size_t numReferenceSequences)
@@ -158,11 +155,11 @@ PbiRawReferenceData PbiRawReferenceDataBuilder::Result(void) const {
 class PbiBuilderPrivate : public internal::FileProducer
 {
 public:
-    PbiBuilderPrivate(const string& filename,
+    PbiBuilderPrivate(const std::string& filename,
                       const size_t numReferenceSequences,
                       const PbiBuilder::CompressionLevel compressionLevel,
                       const size_t numThreads);
-    PbiBuilderPrivate(const string& filename,
+    PbiBuilderPrivate(const std::string& filename,
                       const size_t numReferenceSequences,
                       const bool isCoordinateSorted,
                       const PbiBuilder::CompressionLevel compressionLevel,
@@ -178,13 +175,13 @@ public:
     bool HasReferenceData(void) const;
 
 public:
-    unique_ptr<BGZF, HtslibBgzfDeleter> bgzf_;
+    std::unique_ptr<BGZF, HtslibBgzfDeleter> bgzf_;
     PbiRawData rawData_;
     PbiReferenceEntry::Row currentRow_;
-    unique_ptr<PbiRawReferenceDataBuilder> refDataBuilder_;    
+    std::unique_ptr<PbiRawReferenceDataBuilder> refDataBuilder_;
 };
 
-PbiBuilderPrivate::PbiBuilderPrivate(const string& filename,
+PbiBuilderPrivate::PbiBuilderPrivate(const std::string& filename,
                                      const size_t numReferenceSequences,
                                      const PbiBuilder::CompressionLevel compressionLevel,
                                      const size_t numThreads)
@@ -193,15 +190,15 @@ PbiBuilderPrivate::PbiBuilderPrivate(const string& filename,
     , currentRow_(0)
     , refDataBuilder_(nullptr)
 {
-    const string& usingFilename = TempFilename();
-    const string& mode = string("wb") + to_string(static_cast<int>(compressionLevel));
+    const std::string& usingFilename = TempFilename();
+    const std::string& mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
     bgzf_.reset(bgzf_open(usingFilename.c_str(), mode.c_str()));
     if (bgzf_.get() == 0)
         throw std::runtime_error("could not open PBI file for writing");
 
     size_t actualNumThreads = numThreads;
     if (actualNumThreads == 0) {
-        actualNumThreads = thread::hardware_concurrency();
+        actualNumThreads = std::thread::hardware_concurrency();
 
         // if still unknown, default to single-threaded
         if (actualNumThreads == 0)
@@ -216,7 +213,7 @@ PbiBuilderPrivate::PbiBuilderPrivate(const string& filename,
         refDataBuilder_.reset(new PbiRawReferenceDataBuilder(numReferenceSequences));
 }
 
-PbiBuilderPrivate::PbiBuilderPrivate(const string& filename,
+PbiBuilderPrivate::PbiBuilderPrivate(const std::string& filename,
                                      const size_t numReferenceSequences,
                                      const bool isCoordinateSorted,
                                      const PbiBuilder::CompressionLevel compressionLevel,
@@ -226,15 +223,15 @@ PbiBuilderPrivate::PbiBuilderPrivate(const string& filename,
     , currentRow_(0)
     , refDataBuilder_(nullptr)
 {
-    const string& usingFilename = TempFilename();
-    const string& mode = string("wb") + to_string(static_cast<int>(compressionLevel));
+    const std::string& usingFilename = TempFilename();
+    const std::string& mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
     bgzf_.reset(bgzf_open(usingFilename.c_str(), mode.c_str()));
     if (bgzf_.get() == 0)
         throw std::runtime_error("could not open PBI file for writing");
 
     size_t actualNumThreads = numThreads;
     if (actualNumThreads == 0) {
-        actualNumThreads = thread::hardware_concurrency();
+        actualNumThreads = std::thread::hardware_concurrency();
 
         // if still unknown, default to single-threaded
         if (actualNumThreads == 0)
@@ -316,12 +313,12 @@ bool PbiBuilderPrivate::HasBarcodeData(void) const
     if (bcForward.size() != bcReverse.size() &&
         bcForward.size() != bcQuality.size())
     {
-        auto msg = string{ "error: inconsistency in PBI barcode data:\n" };
-        msg +=     string{ "  bcForward has " } + to_string(bcForward.size()) + string{ " elements\n" };
-        msg +=     string{ "  bcReverse has " } + to_string(bcReverse.size()) + string{ " elements\n" };
-        msg +=     string{ "  bcQuality has " } + to_string(bcQuality.size()) + string{ " elements\n" };
-        msg +=     string{ "\n" };
-        msg +=     string{ "  these containers should contain equal number of elements.\n" };
+        auto msg = std::string{ "error: inconsistency in PBI barcode data:\n" };
+        msg +=     std::string{ "  bcForward has " } + std::to_string(bcForward.size()) + std::string{ " elements\n" };
+        msg +=     std::string{ "  bcReverse has " } + std::to_string(bcReverse.size()) + std::string{ " elements\n" };
+        msg +=     std::string{ "  bcQuality has " } + std::to_string(bcQuality.size()) + std::string{ " elements\n" };
+        msg +=     std::string{ "\n" };
+        msg +=     std::string{ "  these containers should contain equal number of elements.\n" };
         throw std::runtime_error(msg);
     }
     assert(bcForward.size() == rawData_.NumReads());
@@ -355,14 +352,12 @@ bool PbiBuilderPrivate::HasReferenceData(void) const
 { return bool(refDataBuilder_); }
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
 // ---------------------------
 // PbiBuilder implementation
 // ---------------------------
 
-PbiBuilder::PbiBuilder(const string& pbiFilename,
+PbiBuilder::PbiBuilder(const std::string& pbiFilename,
                        const CompressionLevel compressionLevel,
                        const size_t numThreads)
     : d_(new internal::PbiBuilderPrivate(pbiFilename,
@@ -371,7 +366,7 @@ PbiBuilder::PbiBuilder(const string& pbiFilename,
                                          numThreads))
 { }
 
-PbiBuilder::PbiBuilder(const string& pbiFilename,
+PbiBuilder::PbiBuilder(const std::string& pbiFilename,
                        const size_t numReferenceSequences,
                        const CompressionLevel compressionLevel,
                        const size_t numThreads)
@@ -381,7 +376,7 @@ PbiBuilder::PbiBuilder(const string& pbiFilename,
                                          numThreads))
 { }
 
-PbiBuilder::PbiBuilder(const string& pbiFilename,
+PbiBuilder::PbiBuilder(const std::string& pbiFilename,
                        const size_t numReferenceSequences,
                        const bool isCoordinateSorted,
                        const CompressionLevel compressionLevel,
@@ -403,3 +398,6 @@ void PbiBuilder::AddRecord(const BamRecord& record, const int64_t vOffset)
 
 const PbiRawData& PbiBuilder::Index(void) const
 { return d_->rawData_; }
+
+} // namespace BAM
+} // namespace PacBio

@@ -41,56 +41,58 @@
 
 #include "pbbam/SamTagCodec.h"
 #include <boost/lexical_cast.hpp>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
+namespace internal {
 
 template<typename T>
 inline void appendSamValue(const T& value,
-                           string& result,
+                           std::string& result,
                            bool force8BitInt = false)
 {
     if (force8BitInt)
-        result.append(boost::lexical_cast<string>(static_cast<int>(value)));
+        result.append(boost::lexical_cast<std::string>(static_cast<int>(value)));
     else
-        result.append(boost::lexical_cast<string>(value));
+        result.append(boost::lexical_cast<std::string>(value));
 }
 
 template<typename T>
 void appendSamMultiValue(const T& container,
-                         string& result,
+                         std::string& result,
                          bool force8BitInt = false)
 {
     auto end = container.cend();
     for (auto iter = container.cbegin(); iter != end; ++iter) {
         result.append(1, ',');
         if ( force8BitInt )
-            result.append(boost::lexical_cast<string>(static_cast<int>(*iter)));
+            result.append(boost::lexical_cast<std::string>(static_cast<int>(*iter)));
         else
-            result.append(boost::lexical_cast<string>(*iter));
+            result.append(boost::lexical_cast<std::string>(*iter));
     }
 }
 
 static
-vector<string>& split(const string& s, char delim, vector<string>& elems)
+std::vector<std::string>& split(const std::string& s, char delim,
+                                std::vector<std::string>& elems)
 {
-    stringstream ss(s);
-    string item;
-    while (getline(ss, item, delim))
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim))
         elems.push_back(item);
     return elems;
 }
 
 static
-vector<string> split(const string& s, char delim) {
-    vector<string> elems;
+std::vector<std::string> split(const std::string& s, char delim) {
+    std::vector<std::string> elems;
     split(s, delim, elems);
     return elems;
 }
 
-vector<float> readFloatSamMultiValue(const string& data)
+std::vector<float> readFloatSamMultiValue(const std::string& data)
 {
-    vector<float> result;
+    std::vector<float> result;
     char* c = (char*)data.c_str();
     const char* end = c + data.length();
     while (c+1 < end) {
@@ -101,9 +103,9 @@ vector<float> readFloatSamMultiValue(const string& data)
 }
 
 template<typename T>
-vector<T> readSignedSamMultiValue(const string& data)
+std::vector<T> readSignedSamMultiValue(const std::string& data)
 {
-    vector<T> result;
+    std::vector<T> result;
     char* c = (char*)data.c_str();
     const char* end = c + data.length();
     while (c+1 < end) {
@@ -115,9 +117,9 @@ vector<T> readSignedSamMultiValue(const string& data)
 }
 
 template<typename T>
-vector<T> readUnsignedSamMultiValue(const string& data)
+std::vector<T> readUnsignedSamMultiValue(const std::string& data)
 {
-    vector<T> result;
+    std::vector<T> result;
     char* c = (char*)data.c_str();
     const char* end = c + data.length();
     while (c+1 < end) {
@@ -127,20 +129,22 @@ vector<T> readUnsignedSamMultiValue(const string& data)
     return result;
 }
 
-TagCollection SamTagCodec::Decode(const string& tagString)
+} // namespace internal
+
+TagCollection SamTagCodec::Decode(const std::string& tagString)
 {
     TagCollection tags;
 
-    const vector<string>& tokens = split(tagString, '\t');
+    const std::vector<std::string>& tokens = internal::split(tagString, '\t');
     const auto end = tokens.cend();
     for (auto iter = tokens.cbegin(); iter != end; ++iter ) {
-        const string& token = (*iter);
+        const std::string& token = (*iter);
         if (token.size() < 6)          // TT:t:X
             continue;
 
-        const string& name = token.substr(0, 2);
+        const std::string& name = token.substr(0, 2);
         const char type = token.at(3);
-        const string& remainder = token.substr(5);
+        const std::string& remainder = token.substr(5);
         if (remainder.empty())
             throw std::runtime_error("malformatted tag: " + token);
 
@@ -211,15 +215,15 @@ TagCollection SamTagCodec::Decode(const string& tagString)
             case 'B' :
             {
                 const char elementType = remainder.at(0);
-                const string& arrayData = remainder.substr(1);
+                const std::string& arrayData = remainder.substr(1);
                 switch (elementType) {
-                    case 'c' : tags[name] = readSignedSamMultiValue<int8_t>(arrayData);     break;
-                    case 'C' : tags[name] = readUnsignedSamMultiValue<uint8_t>(arrayData);  break;
-                    case 's' : tags[name] = readSignedSamMultiValue<int16_t>(arrayData);    break;
-                    case 'S' : tags[name] = readUnsignedSamMultiValue<uint16_t>(arrayData); break;
-                    case 'i' : tags[name] = readSignedSamMultiValue<int32_t>(arrayData);    break;
-                    case 'I' : tags[name] = readUnsignedSamMultiValue<uint32_t>(arrayData); break;
-                    case 'f' : tags[name] = readFloatSamMultiValue(arrayData);              break;
+                    case 'c' : tags[name] = internal::readSignedSamMultiValue<int8_t>(arrayData);     break;
+                    case 'C' : tags[name] = internal::readUnsignedSamMultiValue<uint8_t>(arrayData);  break;
+                    case 's' : tags[name] = internal::readSignedSamMultiValue<int16_t>(arrayData);    break;
+                    case 'S' : tags[name] = internal::readUnsignedSamMultiValue<uint16_t>(arrayData); break;
+                    case 'i' : tags[name] = internal::readSignedSamMultiValue<int32_t>(arrayData);    break;
+                    case 'I' : tags[name] = internal::readUnsignedSamMultiValue<uint32_t>(arrayData); break;
+                    case 'f' : tags[name] = internal::readFloatSamMultiValue(arrayData);              break;
                     default:
                         throw std::runtime_error("unsupported array-tag-type encountered: " + std::string(1, elementType));
                 }
@@ -235,15 +239,15 @@ TagCollection SamTagCodec::Decode(const string& tagString)
     return tags;
 }
 
-string SamTagCodec::Encode(const TagCollection& tags)
+std::string SamTagCodec::Encode(const TagCollection& tags)
 {
-    string result;
+    std::string result;
     result.reserve(1024);
 
     const auto tagEnd = tags.cend();
     for (auto tagIter = tags.cbegin(); tagIter != tagEnd; ++tagIter) {
         
-        const string& name = (*tagIter).first;
+        const std::string& name = (*tagIter).first;
         if (name.size() != 2)
             throw std::runtime_error("malformatted tag name: " + name);
         const Tag& tag = (*tagIter).second;
@@ -269,6 +273,10 @@ string SamTagCodec::Encode(const TagCollection& tags)
         }
 
         // "<TYPE>:<DATA>" for all other data
+
+        using internal::appendSamMultiValue;
+        using internal::appendSamValue;
+
         switch (tag.Type()) {
             case TagDataType::INT8   : result.append("i:"); appendSamValue(tag.ToInt8(),   result, true); break;
             case TagDataType::UINT8  : result.append("i:"); appendSamValue(tag.ToUInt8(),  result, true); break;
@@ -301,3 +309,6 @@ string SamTagCodec::Encode(const TagCollection& tags)
 
     return result;
 }
+
+} // namespace BAM
+} // namespace PacBio

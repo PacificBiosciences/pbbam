@@ -45,9 +45,6 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
@@ -119,8 +116,6 @@ private:
 };
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
 FastqReader::FastqReader(const std::string& fn)
     : d_{ new internal::FastqReaderPrivate{ fn } }
@@ -141,9 +136,9 @@ FastqReader::~FastqReader(void) { }
 bool FastqReader::GetNext(FastqSequence& record)
 { return d_->GetNext(record); }
 
-vector<FastqSequence> FastqReader::ReadAll(const string& fn)
+std::vector<FastqSequence> FastqReader::ReadAll(const std::string& fn)
 {
-    vector<FastqSequence> result;
+    std::vector<FastqSequence> result;
     result.reserve(256);
     FastqReader reader{ fn };
     FastqSequence s;
@@ -151,3 +146,6 @@ vector<FastqSequence> FastqReader::ReadAll(const string& fn)
         result.emplace_back(s);
     return result;
 }
+
+} // namespace BAM
+} // namespace PacBio

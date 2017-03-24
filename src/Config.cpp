@@ -40,8 +40,6 @@
 // Author: Derek Barnett
 
 #include "pbbam/Config.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
 
 namespace PacBio {
 namespace BAM {

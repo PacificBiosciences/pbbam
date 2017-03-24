@@ -37,11 +37,16 @@
 
 #include "pbbam/internal/DataSetElement.h"
 #include "DataSetUtils.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
+
+namespace PacBio {
+namespace BAM {
+namespace internal {
 
 const std::string& DataSetElement::SharedNullString(void)
 {
     return internal::NullObject<std::string>();
 }
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio
