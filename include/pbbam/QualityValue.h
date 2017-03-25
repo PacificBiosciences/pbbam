@@ -86,8 +86,11 @@ public:
     ///
     QualityValue(const uint8_t value = 0);
 
-    QualityValue(const QualityValue& other);
-    ~QualityValue(void);
+    QualityValue(const QualityValue& other) = default;
+    QualityValue(QualityValue&& other) = default;
+    QualityValue& operator=(const QualityValue& other) = default;
+    QualityValue& operator=(QualityValue&& other) = default;
+    ~QualityValue(void) = default;
 
     /// \}
 

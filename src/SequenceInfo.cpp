@@ -57,55 +57,11 @@ static std::string token_UR = std::string("UR");
 
 } // namespace internal
 
-SequenceInfo::SequenceInfo(void) { }
-
 SequenceInfo::SequenceInfo(const std::string& name,
                            const std::string& length)
     : name_(name)
     , length_(length)
 { }
-
-SequenceInfo::SequenceInfo(const SequenceInfo& other)
-    : name_(other.name_)
-    , length_(other.length_)
-    , assemblyId_(other.assemblyId_)
-    , checksum_(other.checksum_)
-    , species_(other.species_)
-    , uri_(other.uri_)
-{  }
-
-SequenceInfo::SequenceInfo(SequenceInfo&& other)
-    : name_(std::move(other.name_))
-    , length_(std::move(other.length_))
-    , assemblyId_(std::move(other.assemblyId_))
-    , checksum_(std::move(other.checksum_))
-    , species_(std::move(other.species_))
-    , uri_(std::move(other.uri_))
-{ }
-
-SequenceInfo::~SequenceInfo(void) { }
-
-SequenceInfo& SequenceInfo::operator=(const SequenceInfo& other)
-{
-    name_ = other.name_;
-    length_ = other.length_;
-    assemblyId_ = other.assemblyId_;
-    checksum_ = other.checksum_;
-    species_ = other.species_;
-    uri_ = other.uri_;
-    return *this;
-}
-
-SequenceInfo& SequenceInfo::operator=(SequenceInfo&& other)
-{
-    name_ = std::move(other.name_);
-    length_ = std::move(other.length_);
-    assemblyId_ = std::move(other.assemblyId_);
-    checksum_ = std::move(other.checksum_);
-    species_ = std::move(other.species_);
-    uri_ = std::move(other.uri_);
-    return *this;
-}
 
 SequenceInfo SequenceInfo::FromSam(const std::string& sam)
 {

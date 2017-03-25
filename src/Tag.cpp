@@ -80,18 +80,6 @@ Tag::Tag(const std::string& value, const TagModifier mod)
                                  "To construct an ASCII char tag, use a single-quoted value (e.g. 'X' instead of \"X\")");
 }
 
-Tag::Tag(const Tag& other)
-    : data_(other.data_)
-    , modifier_(other.modifier_)
-{ }
-
-Tag::Tag(Tag&& other)
-    : data_(std::move(other.data_))
-    , modifier_(std::move(other.modifier_))
-{ }
-
-Tag::~Tag(void) { }
-
 Tag& Tag::operator=(boost::blank value) { data_ = value; return *this; }
 Tag& Tag::operator=(int8_t value)   { data_ = value; return *this; }
 Tag& Tag::operator=(uint8_t value)  { data_ = value; return *this; }
@@ -108,20 +96,6 @@ Tag& Tag::operator=(const std::vector<uint16_t>& value) { data_ = value; return 
 Tag& Tag::operator=(const std::vector<int32_t>& value)  { data_ = value; return *this; }
 Tag& Tag::operator=(const std::vector<uint32_t>& value) { data_ = value; return *this; }
 Tag& Tag::operator=(const std::vector<float>& value)    { data_ = value; return *this; }
-
-Tag& Tag::operator=(const Tag& other)
-{
-    data_ = other.data_;
-    modifier_ = other.modifier_;
-    return *this;
-}
-
-Tag& Tag::operator=(Tag&& other)
-{
-    data_ = std::move(other.data_);
-    modifier_ = std::move(other.modifier_);
-    return *this;
-}
 
 } // namespace BAM
 } // namespace PacBio

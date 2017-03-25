@@ -44,8 +44,6 @@
 namespace PacBio {
 namespace BAM {
 
-inline GenomicInterval::~GenomicInterval(void) { }
-
 inline std::string GenomicInterval::Name(void) const
 { return name_; }
 

@@ -304,128 +304,6 @@ ReadGroupInfo::ReadGroupInfo(const std::string& movieName,
     , pulseWidthCodec_(FrameCodec::V1)
 { }
 
-ReadGroupInfo::ReadGroupInfo(const ReadGroupInfo& other)
-    : id_(other.id_)
-    , sequencingCenter_(other.sequencingCenter_)
-    , date_(other.date_)
-    , flowOrder_(other.flowOrder_)
-    , keySequence_(other.keySequence_)
-    , library_(other.library_)
-    , programs_(other.programs_)
-    , predictedInsertSize_(other.predictedInsertSize_)
-    , movieName_(other.movieName_)
-    , sample_(other.sample_)
-    , platformModel_(other.platformModel_)
-    , readType_(other.readType_)
-    , bindingKit_(other.bindingKit_)
-    , sequencingKit_(other.sequencingKit_)
-    , basecallerVersion_(other.basecallerVersion_)
-    , frameRateHz_(other.frameRateHz_)
-    , control_(other.control_)
-    , ipdCodec_(other.ipdCodec_)
-    , pulseWidthCodec_(other.pulseWidthCodec_)
-    , hasBarcodeData_(other.hasBarcodeData_)
-    , barcodeFile_(other.barcodeFile_)
-    , barcodeHash_(other.barcodeHash_)
-    , barcodeCount_(other.barcodeCount_)
-    , barcodeMode_(other.barcodeMode_)
-    , barcodeQuality_(other.barcodeQuality_)
-    , features_(other.features_)
-{  }
-
-ReadGroupInfo::ReadGroupInfo(ReadGroupInfo&& other)
-    : id_(std::move(other.id_))
-    , sequencingCenter_(std::move(other.sequencingCenter_))
-    , date_(std::move(other.date_))
-    , flowOrder_(std::move(other.flowOrder_))
-    , keySequence_(std::move(other.keySequence_))
-    , library_(std::move(other.library_))
-    , programs_(std::move(other.programs_))
-    , predictedInsertSize_(std::move(other.predictedInsertSize_))
-    , movieName_(std::move(other.movieName_))
-    , sample_(std::move(other.sample_))
-    , platformModel_(std::move(other.platformModel_))
-    , readType_(std::move(other.readType_))
-    , bindingKit_(std::move(other.bindingKit_))
-    , sequencingKit_(std::move(other.sequencingKit_))
-    , basecallerVersion_(std::move(other.basecallerVersion_))
-    , frameRateHz_(std::move(other.frameRateHz_))
-    , control_(std::move(other.control_))
-    , ipdCodec_(std::move(other.ipdCodec_))
-    , pulseWidthCodec_(std::move(other.pulseWidthCodec_))
-    , hasBarcodeData_(std::move(other.hasBarcodeData_))
-    , barcodeFile_(std::move(other.barcodeFile_))
-    , barcodeHash_(std::move(other.barcodeHash_))
-    , barcodeCount_(std::move(other.barcodeCount_))
-    , barcodeMode_(std::move(other.barcodeMode_))
-    , barcodeQuality_(std::move(other.barcodeQuality_))
-    , features_(std::move(other.features_))
-{ }
-
-ReadGroupInfo::~ReadGroupInfo(void) { }
-
-ReadGroupInfo& ReadGroupInfo::operator=(const ReadGroupInfo& other)
-{
-    id_ = other.id_;
-    sequencingCenter_ = other.sequencingCenter_;
-    date_ = other.date_;
-    flowOrder_ = other.flowOrder_;
-    keySequence_ = other.keySequence_;
-    library_ = other.library_;
-    programs_ = other.programs_;
-    platformModel_ = other.platformModel_;
-    predictedInsertSize_ = other.predictedInsertSize_;
-    movieName_ = other.movieName_;
-    sample_ = other.sample_;
-    readType_ = other.readType_;
-    bindingKit_ = other.bindingKit_;
-    sequencingKit_ = other.sequencingKit_;
-    basecallerVersion_ = other.basecallerVersion_;
-    frameRateHz_ = other.frameRateHz_;
-    control_ = other.control_;
-    ipdCodec_ = other.ipdCodec_;
-    pulseWidthCodec_ = other.pulseWidthCodec_;
-    hasBarcodeData_ = other.hasBarcodeData_;
-    barcodeFile_  = other.barcodeFile_;
-    barcodeHash_ = other.barcodeHash_;
-    barcodeCount_ = other.barcodeCount_;
-    barcodeMode_ = other.barcodeMode_;
-    barcodeQuality_ = other.barcodeQuality_;
-    features_ = other.features_;
-    return *this;
-}
-
-ReadGroupInfo& ReadGroupInfo::operator=(ReadGroupInfo&& other)
-{
-    id_ = std::move(other.id_);
-    sequencingCenter_ = std::move(other.sequencingCenter_);
-    date_ = std::move(other.date_);
-    flowOrder_ = std::move(other.flowOrder_);
-    keySequence_ = std::move(other.keySequence_);
-    library_ = std::move(other.library_);
-    programs_ = std::move(other.programs_);
-    platformModel_ = std::move(other.platformModel_);
-    predictedInsertSize_ = std::move(other.predictedInsertSize_);
-    movieName_ = std::move(other.movieName_);
-    sample_ = std::move(other.sample_);
-    readType_ = std::move(other.readType_);
-    bindingKit_ = std::move(other.bindingKit_);
-    sequencingKit_ = std::move(other.sequencingKit_);
-    basecallerVersion_ = std::move(other.basecallerVersion_);
-    frameRateHz_ = std::move(other.frameRateHz_);
-    control_ = std::move(other.control_);
-    ipdCodec_ = std::move(other.ipdCodec_);
-    pulseWidthCodec_ = std::move(other.pulseWidthCodec_);
-    hasBarcodeData_ = std::move(other.hasBarcodeData_);
-    barcodeFile_  = std::move(other.barcodeFile_);
-    barcodeHash_ = std::move(other.barcodeHash_);
-    barcodeCount_ = std::move(other.barcodeCount_);
-    barcodeMode_ = std::move(other.barcodeMode_);
-    barcodeQuality_ = std::move(other.barcodeQuality_);
-    features_ = std::move(other.features_);
-    return *this;
-}
-
 void ReadGroupInfo::DecodeSamDescription(const std::string& description)
 {
     // split on semicolons
@@ -591,8 +469,8 @@ ReadGroupInfo ReadGroupInfo::FromSam(const std::string& sam)
         else if (tokenTag == internal::sam_DS) rg.DecodeSamDescription(tokenValue);
         else if (tokenTag == internal::sam_PM) rg.PlatformModel(internal::PlatformModelFromName(tokenValue));
 
-        // otherwise, "custom" tag
-        else
+        // if not platform name (always "PACBIO" for us), store as a custom tag
+        else if (tokenTag != internal::sam_PL)
             custom[tokenTag] = tokenValue;
     }
     rg.CustomTags(custom);

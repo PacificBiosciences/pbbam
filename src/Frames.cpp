@@ -153,22 +153,6 @@ Frames::Frames(std::vector<uint16_t>&& frames)
     : data_(std::move(frames))
 { }
 
-Frames::Frames(const Frames& other)
-    : data_(other.data_)
-{ }
-
-Frames::Frames(Frames&& other)
-    : data_(std::move(other.data_))
-{ }
-
-Frames::~Frames(void) { }
-
-Frames& Frames::operator=(const Frames& other)
-{ data_ = other.data_; return *this; }
-
-Frames& Frames::operator=(Frames&& other)
-{ data_ = std::move(other.data_); return *this; }
-
 Frames Frames::Decode(const std::vector<uint8_t>& codedData)
 { return Frames(internal::CodeToFrames(codedData)); }
 

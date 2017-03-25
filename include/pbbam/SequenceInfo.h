@@ -79,7 +79,7 @@ public:
     /// \{
 
     /// \brief Creates an empty sequence info object.
-    SequenceInfo(void);
+    SequenceInfo(void) = default;
 
     /// \brief Creates a sequence info object with name & (optional) length.
     ///
@@ -89,11 +89,11 @@ public:
     SequenceInfo(const std::string& name,
                  const std::string& length = "0");
 
-    SequenceInfo(const SequenceInfo& other);
-    SequenceInfo(SequenceInfo&& other);
-    SequenceInfo& operator=(const SequenceInfo& other);
-    SequenceInfo& operator=(SequenceInfo&& other);
-    ~SequenceInfo(void);
+    SequenceInfo(const SequenceInfo& other) = default;
+    SequenceInfo(SequenceInfo&& other) = default;
+    SequenceInfo& operator=(const SequenceInfo& other) = default;
+    SequenceInfo& operator=(SequenceInfo&& other) = default;
+    ~SequenceInfo(void) = default;
 
     /// \}
 

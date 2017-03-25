@@ -79,8 +79,6 @@ std::string parseRegionString(const std::string& reg,
 
 } // namespace internal
 
-GenomicInterval::GenomicInterval(void) { }
-
 GenomicInterval::GenomicInterval(const std::string& name,
                                  const Position& start,
                                  const Position& stop)
@@ -94,18 +92,6 @@ GenomicInterval::GenomicInterval(const std::string& samtoolsRegionString)
     Position end;
     name_ = internal::parseRegionString(samtoolsRegionString, &begin, &end);
     interval_ = PacBio::BAM::Interval<Position>(begin, end);
-}
-
-GenomicInterval::GenomicInterval(const GenomicInterval& other)
-    : name_(other.name_)
-    , interval_(other.interval_)
-{ }
-
-GenomicInterval& GenomicInterval::operator=(const GenomicInterval& other)
-{
-    name_ = other.name_;
-    interval_ = other.interval_;
-    return *this;
 }
 
 bool GenomicInterval::CoveredBy(const GenomicInterval& other) const

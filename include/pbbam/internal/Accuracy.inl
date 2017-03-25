@@ -53,12 +53,6 @@ inline Accuracy::Accuracy(float accuracy)
     accuracy_ = accuracy;
 }
 
-inline Accuracy::Accuracy(const Accuracy &other)
-    : accuracy_(other.accuracy_)
-{ }
-
-inline Accuracy::~Accuracy(void) { }
-
 inline Accuracy::operator float(void) const
 { return accuracy_; }
 

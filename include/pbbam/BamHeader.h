@@ -79,13 +79,22 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
+    ///
+    /// \brief Creates an empty BamHeader
+    ///
     BamHeader(void);
+
+    ///
+    /// \brief Creates a BamHeader from SAM-formatted text
+    /// \param samHeaderText
+    ///
     BamHeader(const std::string& samHeaderText);
-    BamHeader(const BamHeader& other);
-    BamHeader(BamHeader&& other);
-    BamHeader& operator=(const BamHeader& other);
-    BamHeader& operator=(BamHeader&& other);
-    ~BamHeader(void);
+
+    BamHeader(const BamHeader& other) = default;
+    BamHeader(BamHeader&& other) = default;
+    BamHeader& operator=(const BamHeader& other) = default;
+    BamHeader& operator=(BamHeader&& other) = default;
+    ~BamHeader(void) = default;
 
     /// \brief Detaches underlying data from the shared-pointer, returning a
     ///        independent copy of the header contents.
