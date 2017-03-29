@@ -48,6 +48,7 @@
 #include <string>
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 
 namespace PacBio {
 namespace BAM {
@@ -143,6 +144,12 @@ public:
 
     /// \returns true if FASTA file contains a sequence matching \p name
     bool HasSequence(const std::string& name) const;
+
+    /// \returns the names of the sequence at a specific index in the FASTA file
+    std::string Name(const size_t idx) const;
+    
+    /// \returns the names of all sequences stored in the FASTA file
+    std::vector<std::string> Names(void) const;
 
     /// \returns number of sequences stored in FASTA file
     int NumSequences(void) const;
