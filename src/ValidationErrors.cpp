@@ -43,10 +43,10 @@
 #include "pbbam/exception/ValidationException.h"
 #include "StringUtils.h"
 #include <sstream>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
+namespace internal {
 
 const size_t ValidationErrors::MAX;
 
@@ -61,7 +61,7 @@ ValidationErrors::ValidationErrors(const size_t maxNumErrors)
 void ValidationErrors::AddFileError(const std::string& fn,
                                     const std::string& details)
 {
-    string copy = details;
+    std::string copy = details;
     AddFileError(fn, std::move(copy));
 }
 
@@ -75,7 +75,7 @@ void ValidationErrors::AddFileError(const std::string& fn,
 void ValidationErrors::AddReadGroupError(const std::string& rg,
                                          const std::string& details)
 {
-    string copy = details;
+    std::string copy = details;
     AddReadGroupError(rg, std::move(copy));
 }
 
@@ -89,7 +89,7 @@ void ValidationErrors::AddReadGroupError(const std::string& rg,
 void ValidationErrors::AddRecordError(const std::string& name,
                                       const std::string& details)
 {
-    string copy = details;
+    std::string copy = details;
     AddRecordError(name, std::move(copy));
 }
 
@@ -100,25 +100,25 @@ void ValidationErrors::AddRecordError(const std::string& name,
     OnErrorAdded();
 }
 
-void ValidationErrors::AddTagLengthError(const string& name,
-                                         const string& tagLabel,
-                                         const string& tagName,
+void ValidationErrors::AddTagLengthError(const std::string& name,
+                                         const std::string& tagLabel,
+                                         const std::string& tagName,
                                          const size_t observed,
                                          const size_t expected)
 {
-    string copy  = tagLabel;
-    string copy2 = tagName;
+    std::string copy  = tagLabel;
+    std::string copy2 = tagName;
     AddTagLengthError(name, std::move(copy), std::move(copy2), observed, expected);
 }
 
-void ValidationErrors::AddTagLengthError(const string& name,
-                                         string&& tagLabel,
-                                         string&& tagName,
+void ValidationErrors::AddTagLengthError(const std::string& name,
+                                         std::string&& tagLabel,
+                                         std::string&& tagName,
                                          const size_t observed,
                                          const size_t expected)
 {
     // format
-    stringstream s;
+    std::stringstream s;
     s << tagLabel << " tag (" << tagName << ") length: " << observed
       << ", does not match expected length: " << expected;
     AddRecordError(name, s.str());
@@ -142,3 +142,7 @@ void ValidationErrors::ThrowErrors(void)
                               std::move(readGroupErrors_),
                               std::move(recordErrors_));
 }
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio

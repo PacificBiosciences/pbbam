@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2016, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -32,59 +32,82 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file FastqSequence.h
+/// \brief Defines the FastqSequence class.
+//
 // Author: Derek Barnett
 
-#include "AssertUtils.h"
-#include <cstdarg>
-#include <cstdio>
+#ifndef FASTQSEQUENCE_H
+#define FASTQSEQUENCE_H
+
+#include <pbbam/FastaSequence.h>
+#include <pbbam/QualityValues.h>
+
+#include <string>
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-static inline
-void message_out(FILE* stream,
-                 const char* format,
-                 const char* msg)
+///
+/// \brief The FastqSequence class represents a FASTQ record (name, bases, and
+///        qualities)
+///
+class FastqSequence : public FastaSequence
 {
-    fprintf(stream, format, msg);
-    fprintf(stream, "\n");
-    fflush(stream);
-}
+public:
+    /// \name Constructors & Related Methods
+    /// \{
 
-void printInfo(const char* msg, ...) {
+    ///
+    /// \brief FastaSequence
+    /// \param name
+    /// \param bases
+    /// \param qualities
+    ///
+    explicit FastqSequence(const std::string& name,
+                           const std::string& bases,
+                           const QualityValues& qualities);
 
-    va_list ap;
-    va_start(ap, msg);
+    ///
+    /// \brief FastaSequence
+    /// \param name
+    /// \param bases
+    /// \param qualities
+    ///
+    explicit FastqSequence(const std::string& name,
+                           const std::string& bases,
+                           const std::string& qualities);
 
-    char buffer[256] = {'\0' };
-    buffer[255] = '\0';
-    if (msg)
-        vsnprintf(buffer, 255, msg, ap);
-    va_end(ap);
+    FastqSequence(void) = default;
+    FastqSequence(const FastqSequence&) = default;
+    FastqSequence(FastqSequence&&) = default;
+    FastqSequence& operator=(const FastqSequence&) = default;
+    FastqSequence& operator=(FastqSequence&&) = default;
+    ~FastqSequence(void) = default;
 
-    message_out(stdout, "%s", buffer);
-}
+    /// \}
 
-void printError(const char* msg, ...) {
+public:
+    /// \name Attributes
+    /// \{
 
-    va_list ap;
-    va_start(ap, msg);
+    ///
+    /// \brief Qualities
+    /// \return
+    ///
+    QualityValues Qualities(void) const;
 
-    char buffer[256] = {'\0' };
-    buffer[255] = '\0';
-    if (msg)
-        vsnprintf(buffer, 255, msg, ap);
-    va_end(ap);
+    /// \}
 
-    message_out(stderr, "%s", buffer);
-}
+private:
+    QualityValues qualities_;
+};
 
-void printFailedAssert(const char* msg) {
-    printError("ASSERT FAILED: %s", msg);
-}
-
-} // namespace internal
 } // namespace BAM
 } // namespace PacBio
+
+#include "internal/FastqSequence.inl"
+
+#endif // FASTQSEQUENCE_H

@@ -60,7 +60,7 @@ public:
     ///  \{
 
     /// \brief Creates an empty genomic interval
-    GenomicInterval(void);
+    GenomicInterval(void) = default;
 
     /// \brief Creates a genomic interval on sequence with \p name, using range:
     ///       [\p start, \p stop)
@@ -80,10 +80,11 @@ public:
     ///
     GenomicInterval(const std::string& zeroBasedRegionString);
 
-    GenomicInterval(const GenomicInterval& other);
-    GenomicInterval& operator=(const GenomicInterval& other);
-
-    ~GenomicInterval(void);
+    GenomicInterval(const GenomicInterval& other) = default;
+    GenomicInterval(GenomicInterval&& other) = default;
+    GenomicInterval& operator=(const GenomicInterval& other) = default;
+    GenomicInterval& operator=(GenomicInterval&& other) = default;
+    ~GenomicInterval(void) = default;
 
     /// \}
 

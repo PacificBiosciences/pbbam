@@ -41,9 +41,9 @@
 
 #include "pbbam/CigarOperation.h"
 #include <htslib/sam.h>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
 
 CigarOperationType CigarOperation::CharToType(const char c)
 {
@@ -65,3 +65,6 @@ CigarOperationType CigarOperation::CharToType(const char c)
 
 char CigarOperation::TypeToChar(const CigarOperationType type)
 { return bam_cigar_opchr(static_cast<int>(type)); }
+
+} // namespace BAM
+} // namespace PacBio

@@ -115,22 +115,22 @@ public:
                   const QualityValues::const_iterator last);
 
     /// \brief Copy constructor
-    QualityValues(const QualityValues& other);
+    QualityValues(const QualityValues& other) = default;
 
     /// \brief Move constructor
-    QualityValues(QualityValues&& other);
+    QualityValues(QualityValues&& other) = default;
 
     /// \brief Copy assignment operator
     ///
     /// \param[in] other    QualityValues object
     ///
-    QualityValues& operator=(const QualityValues& other);
+    QualityValues& operator=(const QualityValues& other) = default;
 
     /// \brief Move assignment operator
     ///
     /// \param[in] other    QualityValues object
     ///
-    QualityValues& operator=(QualityValues&& other);
+    QualityValues& operator=(QualityValues&& other) = default;
 
     /// \brief Copy assignment operator
     ///
@@ -145,7 +145,7 @@ public:
     QualityValues& operator=(std::vector<QualityValue>&& quals);
 
     /// \brief Destructor
-    ~QualityValues(void);
+    ~QualityValues(void) = default;
 
     /// \}
 

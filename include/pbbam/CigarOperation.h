@@ -104,11 +104,12 @@ public:
     CigarOperation(void);
     CigarOperation(char c, uint32_t length);
     CigarOperation(CigarOperationType op, uint32_t length);
-    CigarOperation(const CigarOperation& other);
-    CigarOperation(CigarOperation&& other);
-    CigarOperation& operator=(const CigarOperation& other);
-    CigarOperation& operator=(CigarOperation&& other);
-    ~CigarOperation(void);
+
+    CigarOperation(const CigarOperation& other) = default;
+    CigarOperation(CigarOperation&& other) = default;
+    CigarOperation& operator=(const CigarOperation& other) = default;
+    CigarOperation& operator=(CigarOperation&& other) = default;
+    ~CigarOperation(void) = default;
 
     /// \}
 

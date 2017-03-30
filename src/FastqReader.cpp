@@ -34,12 +34,12 @@
 // SUCH DAMAGE.
 //
 // File Description
-/// \file FastaReader.cpp
-/// \brief Implements the FastaReader class.
+/// \file FastqReader.cpp
+/// \brief Implements the FastqReader class.
 //
 // Author: Derek Barnett
 
-#include "pbbam/FastaReader.h"
+#include "pbbam/FastqReader.h"
 #include <htslib/faidx.h>
 #include <stdexcept>
 #include <fstream>
@@ -50,25 +50,21 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
-struct FastaReaderPrivate
-{
-    std::ifstream stream_;
-    std::string name_;
-    std::string bases_;
-
-    FastaReaderPrivate(const std::string& fn)
+struct FastqReaderPrivate {
+public:
+    explicit FastqReaderPrivate(const std::string& fn)
         : stream_(fn)
     {
         if (!stream_)
-            throw std::runtime_error("FastaReader - could not open " + fn + " for reading");
+            throw std::runtime_error("FastqReader - could not open " + fn + " for reading");
         FetchNext();
     }
 
-    bool GetNext(FastaSequence& record)
+    bool GetNext(FastqSequence& record)
     {
-        if (name_.empty() && bases_.empty())
+        if (name_.empty() && bases_.empty() && quals_.empty())
             return false;
-        record = FastaSequence { name_, bases_ };
+        record = FastqSequence { name_, bases_, quals_ };
         FetchNext();
         return true;
     }
@@ -78,72 +74,74 @@ private:
     {
         name_.clear();
         bases_.clear();
+        quals_.clear();
+
+        if (!stream_ || stream_.eof())
+            return;
 
         SkipNewlines();
+
         ReadName();
         ReadBases();
+        stream_.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // ignore "comment line"
+        ReadQuals();
     }
 
     inline void SkipNewlines(void)
-    {
-        if (!stream_)
-            return;
-        if (stream_.peek() == '\n')
-            stream_.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }
+     {
+         if (stream_.peek() == '\n')
+             stream_.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+     }
 
-    void ReadName(void) {
-        if (!stream_)
-            return;
-        if (stream_.get() == '>')
-            std::getline(stream_, name_,  '\n');
-    }
+     void ReadName(void) {
+         if (stream_.get() == '@')
+             std::getline(stream_, name_,  '\n');
+     }
 
-    void ReadBases(void)
-    {
-        if (!stream_)
-            return;
-        int p = stream_.peek();
-        while (static_cast<char>(p) != '>' && p != EOF) {
-            if (!stream_)
-                return;
-            std::string line;
-            std::getline(stream_, line, '\n');
-            bases_ += line;
-            if (!stream_)
-                return;
-            p = stream_.peek();
-        }
-    }
+     void ReadBases(void)
+     {
+         std::getline(stream_, bases_,  '\n');
+     }
+
+     void ReadQuals(void)
+     {
+         std::getline(stream_, quals_,  '\n');
+     }
+
+ private:
+     std::ifstream stream_;
+     std::string name_;
+     std::string bases_;
+     std::string quals_;
 };
 
 } // namespace internal
 
-FastaReader::FastaReader(const std::string& fn)
-    : d_{ new internal::FastaReaderPrivate{ fn } }
+FastqReader::FastqReader(const std::string& fn)
+    : d_{ new internal::FastqReaderPrivate{ fn } }
 { }
 
-FastaReader::FastaReader(FastaReader&& other)
+FastqReader::FastqReader(FastqReader&& other)
     : d_{ std::move(other.d_) }
 { }
 
-FastaReader& FastaReader::operator=(FastaReader&& other)
+FastqReader& FastqReader::operator=(FastqReader&& other)
 {
     d_.swap(other.d_);
     return *this;
 }
 
-FastaReader::~FastaReader(void) { }
+FastqReader::~FastqReader(void) { }
 
-bool FastaReader::GetNext(FastaSequence& record)
+bool FastqReader::GetNext(FastqSequence& record)
 { return d_->GetNext(record); }
 
-std::vector<FastaSequence> FastaReader::ReadAll(const std::string& fn)
+std::vector<FastqSequence> FastqReader::ReadAll(const std::string& fn)
 {
-    std::vector<FastaSequence> result;
+    std::vector<FastqSequence> result;
     result.reserve(256);
-    FastaReader reader{ fn };
-    FastaSequence s;
+    FastqReader reader{ fn };
+    FastqSequence s;
     while(reader.GetNext(s))
         result.emplace_back(s);
     return result;

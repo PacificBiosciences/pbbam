@@ -43,10 +43,6 @@
 #include "pbbam/BamFile.h"
 #include "pbbam/PbiBuilder.h"
 #include "pbbam/BamReader.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::PbiFile;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {

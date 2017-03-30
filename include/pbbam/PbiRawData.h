@@ -63,16 +63,16 @@ public:
     /// \{
 
     /// \brief Creates an empty data structure.
-    PbiRawBarcodeData(void);
+    PbiRawBarcodeData(void) = default;
 
     /// \brief Creates an empty data structure, preallocating space for a known
     ///        number of records.
     PbiRawBarcodeData(uint32_t numReads);
 
-    PbiRawBarcodeData(const PbiRawBarcodeData& other);
-    PbiRawBarcodeData(PbiRawBarcodeData&& other);
-    PbiRawBarcodeData& operator=(const PbiRawBarcodeData& other);
-    PbiRawBarcodeData& operator=(PbiRawBarcodeData&& other);
+    PbiRawBarcodeData(const PbiRawBarcodeData& other) = default;
+    PbiRawBarcodeData(PbiRawBarcodeData&& other) = default;
+    PbiRawBarcodeData& operator=(const PbiRawBarcodeData& other) = default;
+    PbiRawBarcodeData& operator=(PbiRawBarcodeData&& other) = default;
 
     /// \}
 
@@ -109,16 +109,16 @@ public:
     /// \{
 
     /// \brief Creates an empty data structure.
-    PbiRawMappedData(void);
+    PbiRawMappedData(void) = default;
 
     /// \brief Creates an empty data structure, preallocating space for a known
     ///        number of records.
     PbiRawMappedData(uint32_t numReads);
 
-    PbiRawMappedData(const PbiRawMappedData& other);
-    PbiRawMappedData(PbiRawMappedData&& other);
-    PbiRawMappedData& operator=(const PbiRawMappedData& other);
-    PbiRawMappedData& operator=(PbiRawMappedData&& other);
+    PbiRawMappedData(const PbiRawMappedData& other) = default;
+    PbiRawMappedData(PbiRawMappedData&& other) = default;
+    PbiRawMappedData& operator=(const PbiRawMappedData& other) = default;
+    PbiRawMappedData& operator=(PbiRawMappedData&& other) = default;
 
     /// \}
 
@@ -229,10 +229,10 @@ public:
     ///
     PbiReferenceEntry(ID id, Row beginRow, Row endRow);
 
-    PbiReferenceEntry(const PbiReferenceEntry& other);
-    PbiReferenceEntry(PbiReferenceEntry&& other);
-    PbiReferenceEntry& operator=(const PbiReferenceEntry& other);
-    PbiReferenceEntry& operator=(PbiReferenceEntry&& other);
+    PbiReferenceEntry(const PbiReferenceEntry& other) = default;
+    PbiReferenceEntry(PbiReferenceEntry&& other) = default;
+    PbiReferenceEntry& operator=(const PbiReferenceEntry& other) = default;
+    PbiReferenceEntry& operator=(PbiReferenceEntry&& other) = default;
 
     bool operator==(const PbiReferenceEntry& other) const;
 
@@ -259,7 +259,7 @@ public:
     /// \{
 
     /// \brief Creates an empty data structure.
-    PbiRawReferenceData(void);
+    PbiRawReferenceData(void) = default;
 
     /// \brief Creates an empty data structure, preallocating space for a
     ///        number of references.
@@ -269,10 +269,10 @@ public:
     ///
     PbiRawReferenceData(uint32_t numRefs);
 
-    PbiRawReferenceData(const PbiRawReferenceData& other);
-    PbiRawReferenceData(PbiRawReferenceData&& other);
-    PbiRawReferenceData& operator=(const PbiRawReferenceData& other);
-    PbiRawReferenceData& operator=(PbiRawReferenceData&& other);
+    PbiRawReferenceData(const PbiRawReferenceData& other) = default;
+    PbiRawReferenceData(PbiRawReferenceData&& other) = default;
+    PbiRawReferenceData& operator=(const PbiRawReferenceData& other) = default;
+    PbiRawReferenceData& operator=(PbiRawReferenceData&& other) = default;
 
     /// \}
 
@@ -295,16 +295,16 @@ public:
     /// \{
 
     /// \brief Creates an empty data structure.
-    PbiRawBasicData(void);
+    PbiRawBasicData(void) = default;
 
     /// \brief Creates an empty data structure, preallocating space for a known
     ///        number of records.
     PbiRawBasicData(uint32_t numReads);
 
-    PbiRawBasicData(const PbiRawBasicData& other);
-    PbiRawBasicData(PbiRawBasicData&& other);
-    PbiRawBasicData& operator=(const PbiRawBasicData& other);
-    PbiRawBasicData& operator=(PbiRawBasicData&& other);
+    PbiRawBasicData(const PbiRawBasicData& other) = default;
+    PbiRawBasicData(PbiRawBasicData&& other) = default;
+    PbiRawBasicData& operator=(const PbiRawBasicData& other) = default;
+    PbiRawBasicData& operator=(PbiRawBasicData&& other) = default;
 
     /// \}
 
@@ -386,11 +386,11 @@ public:
     ///
     explicit PbiRawData(const DataSet& dataset);
 
-    PbiRawData(const PbiRawData& other);
-    PbiRawData(PbiRawData&& other);
-    PbiRawData& operator=(const PbiRawData& other);
-    PbiRawData& operator=(PbiRawData&& other);
-    ~PbiRawData(void);
+    PbiRawData(const PbiRawData& other) = default;
+    PbiRawData(PbiRawData&& other) = default;
+    PbiRawData& operator=(const PbiRawData& other) = default;
+    PbiRawData& operator=(PbiRawData&& other) = default;
+    ~PbiRawData(void) = default;
 
     /// \}
 

@@ -37,16 +37,20 @@
 
 #include "FofnReader.h"
 #include <iostream>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
 
-vector<string> FofnReader::Files(istream& in)
+namespace PacBio {
+namespace BAM {
+namespace internal {
+
+std::vector<std::string> FofnReader::Files(std::istream& in)
 {
-    vector<string> files;
-    string fn;
-    while (getline(in, fn))
+    std::vector<std::string> files;
+    std::string fn;
+    while (std::getline(in, fn))
         files.push_back(fn);
     return files;
 }
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio

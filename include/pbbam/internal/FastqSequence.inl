@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2016, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -34,25 +34,32 @@
 // SUCH DAMAGE.
 //
 // File Description
-/// \file Config.cpp
-/// \brief Initializes global variable defaults.
+/// \file FastqSequence.inl
+/// \brief Inline implementations for the FastqSequence class.
 //
 // Author: Derek Barnett
 
-#include "pbbam/Config.h"
+#include "pbbam/FastqSequence.h"
 
 namespace PacBio {
 namespace BAM {
 
-// Initialized to -1 to indicate default. Client code may set this or not.
-//
-// To respect client code or else fallback to default[OFF], this value should be used like this:
-//
-//    hts_verbose = ( PacBio::BAM::HtslibVerbosity == -1 ? 0 : PacBio::BAM::HtslibVerbosity);
-//
-//
-//
-int HtslibVerbosity = -1;
+inline FastqSequence::FastqSequence(const std::string& name,
+                                    const std::string& bases,
+                                    const QualityValues& qualities)
+    : FastaSequence{name, bases}
+    , qualities_{qualities}
+{ }
+
+inline FastqSequence::FastqSequence(const std::string& name,
+                                    const std::string& bases,
+                                    const std::string& qualities)
+    : FastaSequence{name, bases}
+    , qualities_{QualityValues::FromFastq(qualities)}
+{ }
+
+inline QualityValues FastqSequence::Qualities(void) const
+{ return qualities_; }
 
 } // namespace BAM
 } // namespace PacBio

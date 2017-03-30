@@ -41,14 +41,10 @@
 
 #include "pbbam/PbiFilterQuery.h"
 #include "pbbam/CompositeBamReader.h"
-
-
 #include <iostream>
 
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
+namespace PacBio {
+namespace BAM {
 
 struct PbiFilterQuery::PbiFilterQueryPrivate
 {
@@ -68,3 +64,6 @@ PbiFilterQuery::~PbiFilterQuery(void) { }
 
 bool PbiFilterQuery::GetNext(BamRecord &r)
 { return d_->reader_.GetNext(r); }
+
+} // namespace BAM
+} // namespace PacBio

@@ -40,9 +40,13 @@
 // Author: Derek Barnett
 
 #include "pbbam/IRecordWriter.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
+
+namespace PacBio {
+namespace BAM {
 
 IRecordWriter::IRecordWriter(void) { }
 
 IRecordWriter::~IRecordWriter(void) { }
+
+} // namespace BAM
+} // namespace PacBio

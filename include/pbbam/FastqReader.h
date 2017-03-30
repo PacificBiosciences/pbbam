@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2016, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -34,25 +34,80 @@
 // SUCH DAMAGE.
 //
 // File Description
-/// \file Config.cpp
-/// \brief Initializes global variable defaults.
+/// \file FastqReader.h
+/// \brief Defines the FastqReader class.
 //
 // Author: Derek Barnett
 
-#include "pbbam/Config.h"
+#ifndef FASTQREADER_H
+#define FASTQREADER_H
+
+#include "pbbam/FastqSequence.h"
+#include <memory>
+#include <vector>
 
 namespace PacBio {
 namespace BAM {
 
-// Initialized to -1 to indicate default. Client code may set this or not.
-//
-// To respect client code or else fallback to default[OFF], this value should be used like this:
-//
-//    hts_verbose = ( PacBio::BAM::HtslibVerbosity == -1 ? 0 : PacBio::BAM::HtslibVerbosity);
-//
-//
-//
-int HtslibVerbosity = -1;
+namespace internal { struct FastqReaderPrivate; }
+
+///
+/// \brief The FastqReader provides sequential access to Fastq records.
+///
+class FastqReader
+{
+public:
+    ///
+    /// \brief Reads all Fastq sequences from a file
+    ///
+    /// \param fn   Fastq filename
+    /// \return vector of FastqSequence results
+    ///
+    static std::vector<FastqSequence> ReadAll(const std::string& fn);
+
+public:
+    /// \name Constructors & Related Methods
+    /// \{
+
+    explicit FastqReader(const std::string& fn);
+    FastqReader(FastqReader&& other);
+    FastqReader& operator=(FastqReader&& other);
+    ~FastqReader(void);
+
+    // copy is disabled
+    FastqReader(const FastqReader&) = delete;
+    FastqReader& operator=(const FastqReader&) = delete;
+
+    /// \}
+
+public:
+    /// \name Sequence Access
+    /// \{
+
+    ///
+    /// \brief GetNext
+    ///
+    /// \code{cpp}
+    ///
+    /// FastqReader reader{ fn };
+    /// FastqSequence f;
+    /// while (reader.GetNext(f)) {
+    ///     // do stuff with f
+    /// }
+    /// \endcode
+    ///
+    /// \param[out] record
+    /// \return success/failure
+    ///
+    bool GetNext(FastqSequence& record);
+
+    /// \}
+
+private:
+    std::unique_ptr<internal::FastqReaderPrivate> d_;
+};
 
 } // namespace BAM
 } // namespace PacBio
+
+#endif // FASTQREADER_H

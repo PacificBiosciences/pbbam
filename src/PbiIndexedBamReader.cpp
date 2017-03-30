@@ -41,14 +41,7 @@
 
 #include "pbbam/PbiIndexedBamReader.h"
 #include <htslib/bgzf.h>
-
 #include <iostream>
-
-
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
@@ -57,7 +50,7 @@ namespace internal {
 struct PbiIndexedBamReaderPrivate
 {
 public:
-    PbiIndexedBamReaderPrivate(const string& pbiFilename)
+    PbiIndexedBamReaderPrivate(const std::string& pbiFilename)
         : index_(pbiFilename)
         , currentBlockReadCount_(0)
     { }
@@ -130,8 +123,6 @@ public:
 };
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
 PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter,
                                          const std::string& filename)
@@ -187,3 +178,5 @@ PbiIndexedBamReader& PbiIndexedBamReader::Filter(const PbiFilter& filter)
     return *this;
 }
 
+} // namespace BAM
+} // namespace PacBio

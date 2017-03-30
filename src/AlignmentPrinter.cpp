@@ -47,8 +47,8 @@
 #include <stdexcept>
 #include <sstream>
 
-using namespace PacBio;
-using namespace PacBio::BAM;
+namespace PacBio {
+namespace BAM {
 
 AlignmentPrinter::AlignmentPrinter(const IndexedFastaReader& ifr)
     : ifr_(std::unique_ptr<IndexedFastaReader>(new IndexedFastaReader(ifr)))
@@ -153,3 +153,6 @@ std::string AlignmentPrinter::Print(const BamRecord& record,
 
     return output.str();
 }
+
+} // namespace BAM
+} // namespace PacBio

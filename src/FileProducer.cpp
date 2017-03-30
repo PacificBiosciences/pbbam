@@ -38,17 +38,17 @@
 #include "FileProducer.h"
 #include <exception>
 #include <cstdio>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
 
-FileProducer::FileProducer(const string& targetFilename)
+namespace PacBio {
+namespace BAM {
+namespace internal {
+
+FileProducer::FileProducer(const std::string& targetFilename)
     : FileProducer(targetFilename, targetFilename + ".tmp")
 { }
 
-FileProducer::FileProducer(const string& targetFilename,
-                           const string& tempFilename)
+FileProducer::FileProducer(const std::string& targetFilename,
+                           const std::string& tempFilename)
     : targetFilename_(targetFilename)
     , tempFilename_(tempFilename)
 {
@@ -69,3 +69,7 @@ FileProducer::~FileProducer(void)
                     targetFilename_.c_str());
     }
 }
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio

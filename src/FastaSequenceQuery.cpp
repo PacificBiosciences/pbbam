@@ -41,8 +41,9 @@
 
 #include "pbbam/FastaSequenceQuery.h"
 #include "pbbam/CompositeFastaReader.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
+
+namespace PacBio {
+namespace BAM {
 
 struct FastaSequenceQuery::FastaSequenceQueryPrivate
 {
@@ -62,3 +63,6 @@ FastaSequenceQuery::~FastaSequenceQuery(void) { }
 
 bool FastaSequenceQuery::GetNext(FastaSequence& seq)
 { return d_->reader_.GetNext(seq); }
+
+} // namespace BAM
+} // namespace PacBio

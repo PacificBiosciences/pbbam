@@ -65,18 +65,6 @@ inline CigarOperation::CigarOperation(CigarOperationType op, uint32_t length)
         throw std::runtime_error("CIGAR operation 'M' is not allowed in PacBio BAM files. Use 'X/=' instead.");
 }
 
-inline CigarOperation::CigarOperation(const CigarOperation& other)
-    : type_(other.type_)
-    , length_(other.length_)
-{ }
-
-inline CigarOperation::CigarOperation(CigarOperation&& other)
-    : type_(std::move(other.type_))
-    , length_(std::move(other.length_))
-{ }
-
-inline CigarOperation::~CigarOperation(void) { }
-
 inline uint32_t CigarOperation::Length(void) const
 { return length_; }
 
@@ -94,12 +82,6 @@ inline char CigarOperation::Char(void) const
 
 inline CigarOperation &CigarOperation::Char(const char opChar)
 { type_ = CigarOperation::CharToType(opChar);return *this; }
-
-inline CigarOperation& CigarOperation::operator=(const CigarOperation& other)
-{ type_ = other.type_; length_ = other.length_; return *this; }
-
-inline CigarOperation& CigarOperation::operator=(CigarOperation&& other)
-{ type_ = std::move(other.type_); length_ = std::move(other.length_); return *this; }
 
 inline bool CigarOperation::operator==(const CigarOperation& other) const
 { return type_ == other.type_ && length_ == other.length_; }

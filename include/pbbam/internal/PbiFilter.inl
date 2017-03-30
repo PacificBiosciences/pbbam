@@ -244,19 +244,9 @@ inline PbiFilter::PbiFilter(const PbiFilter& other)
     : d_{ other.d_->DeepCopy() }
 { }
 
-inline PbiFilter::PbiFilter(PbiFilter&& other) noexcept
-    : d_{ std::move(other.d_) }
-{ }
-
 inline PbiFilter& PbiFilter::operator=(const PbiFilter& other)
 {
     d_ = other.d_->DeepCopy();
-    return *this;
-}
-
-inline PbiFilter& PbiFilter::operator=(PbiFilter&& other) noexcept
-{
-    d_ = std::move(other.d_);
     return *this;
 }
 

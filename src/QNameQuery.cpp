@@ -43,10 +43,9 @@
 #include "pbbam/CompositeBamReader.h"
 #include <boost/optional.hpp>
 #include <cassert>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
 
 struct QNameQuery::QNameQueryPrivate
 {
@@ -56,11 +55,11 @@ public:
         , nextRecord_(boost::none)
     { }
 
-    bool GetNext(vector<BamRecord>& records)
+    bool GetNext(std::vector<BamRecord>& records)
     {
         records.clear();
 
-        string groupRecordName;
+        std::string groupRecordName;
 
         if (nextRecord_.is_initialized()) {
             BamRecord r = nextRecord_.get();
@@ -89,7 +88,7 @@ public:
     }
 
 public:
-    unique_ptr<SequentialCompositeBamReader> reader_;
+    std::unique_ptr<SequentialCompositeBamReader> reader_;
     boost::optional<BamRecord> nextRecord_;
 };
 
@@ -100,5 +99,8 @@ QNameQuery::QNameQuery(const DataSet& dataset)
 
 QNameQuery::~QNameQuery(void) { }
 
-bool QNameQuery::GetNext(vector<BamRecord>& records)
+bool QNameQuery::GetNext(std::vector<BamRecord>& records)
 { return d_->GetNext(records); }
+
+} // namespace BAM
+} // namespace PacBio

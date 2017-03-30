@@ -54,7 +54,8 @@ namespace BAM {
 
 IndexedFastaReader::IndexedFastaReader(const std::string& filename)
 {
-    Open(filename);
+    if (!Open(filename))
+        throw std::runtime_error("Cannot open file " + filename);
 }
 
 IndexedFastaReader::IndexedFastaReader(const IndexedFastaReader& src)

@@ -41,12 +41,12 @@
 
 #include "pbbam/Cigar.h"
 #include <sstream>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
-Cigar::Cigar(const string& cigarString)
-    : vector<CigarOperation>()
+namespace PacBio {
+namespace BAM {
+
+Cigar::Cigar(const std::string& cigarString)
+    : std::vector<CigarOperation>()
 {
     size_t numberStart = 0;
     const size_t numChars = cigarString.size();
@@ -61,9 +61,9 @@ Cigar::Cigar(const string& cigarString)
     }
 }
 
-string Cigar::ToStdString(void) const
+std::string Cigar::ToStdString(void) const
 {
-    stringstream s;
+    std::stringstream s;
     const auto end  = this->cend();
     for (auto iter = this->cbegin(); iter != end; ++iter) {
         const CigarOperation& cigar = (*iter);
@@ -72,3 +72,6 @@ string Cigar::ToStdString(void) const
     }
     return s.str();
 }
+
+} // namespace BAM
+} // namespace PacBio

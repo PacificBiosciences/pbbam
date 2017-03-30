@@ -46,61 +46,68 @@
 #include <fstream>
 #include <iostream>
 #include <cassert>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
-
-typedef std::shared_ptr<DataSetBase> DataSetPtr;
 
 namespace PacBio {
 namespace BAM {
+
+typedef std::shared_ptr<DataSetBase> DataSetPtr;
+
 namespace internal {
 
 static
-unique_ptr<DataSetBase> FromXml(const string& xmlFn)
+std::unique_ptr<DataSetBase> FromXml(const std::string& xmlFn)
 {
-    ifstream in(xmlFn);
+    std::ifstream in(xmlFn);
     if (!in)
-        throw std::runtime_error("could not open XML file for reading");
+        throw std::runtime_error("could not open XML file for reading: " + xmlFn);
     return XmlReader::FromStream(in);
 }
 
 static
-unique_ptr<DataSetBase> FromBam(const string& bamFn)
+std::unique_ptr<DataSetBase> FromBam(const std::string& bamFn)
 {
-    unique_ptr<DataSetBase> dataset(new SubreadSet);
+    // peek at sort order to determine if file should be an AlignmentSet or else SubreadSet
+    const auto bamFile = BamFile{ bamFn };
+    const auto& header = bamFile.Header();
+    const auto aligned = header.SortOrder() == "coordinate";
+    
+    std::unique_ptr<DataSetBase> dataset;
+    if (aligned) 
+        dataset.reset(new AlignmentSet);
+    else 
+        dataset.reset(new SubreadSet);
+    
     ExternalResources& resources = dataset->ExternalResources();
     resources.Add(ExternalResource(BamFile(bamFn)));
     return dataset;
 }
 
 static
-unique_ptr<DataSetBase> FromFasta(const string& fasta)
+std::unique_ptr<DataSetBase> FromFasta(const std::string& fasta)
 {
     // make FASTA data set
-    unique_ptr<DataSetBase> dataset(new ReferenceSet);
+    std::unique_ptr<DataSetBase> dataset(new ReferenceSet);
     ExternalResources& resources = dataset->ExternalResources();
     resources.Add(ExternalResource("PacBio.ReferenceFile.ReferenceFastaFile", fasta));
     return dataset;
 }
 
 static
-unique_ptr<DataSetBase> FromFofn(const string& fofn)
+std::unique_ptr<DataSetBase> FromFofn(const std::string& fofn)
 {
-    const string fofnDir = internal::FileUtils::DirectoryName(fofn);
-    ifstream in(fofn);
+    const std::string fofnDir = FileUtils::DirectoryName(fofn);
+    std::ifstream in(fofn);
     if (!in)
-        throw std::runtime_error("could not open FOFN for reading");
+        throw std::runtime_error("could not open FOFN for reading: " + fofn);
 
-    vector<string> filenames = FofnReader::Files(in);
+    std::vector<std::string> filenames = FofnReader::Files(in);
     for (size_t i = 0; i < filenames.size(); ++i)
-        filenames[i] = internal::FileUtils::ResolvedFilePath(filenames[i], fofnDir);
+        filenames[i] = FileUtils::ResolvedFilePath(filenames[i], fofnDir);
     return DataSetIO::FromUris(filenames);
 }
 
 static
-unique_ptr<DataSetBase> FromUri(const string& uri)
+std::unique_ptr<DataSetBase> FromUri(const std::string& uri)
 {
     // NOTE: this says URI, but we're not quite handling filenames as true URIs
     //       basically just treating as a regular filename for now
@@ -119,16 +126,12 @@ unique_ptr<DataSetBase> FromUri(const string& uri)
     }
 
     // unknown filename extension
-    throw std::runtime_error("unsupported input file extension");
+    throw std::runtime_error("unsupported extension on input file: " + uri);
 }
-
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
 std::unique_ptr<DataSetBase> DataSetIO::FromUri(const std::string& uri)
 {
-    return FromUris(vector<string>(1, uri));
+    return FromUris(std::vector<std::string>(1, uri));
 }
 
 std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>& uris)
@@ -137,7 +140,7 @@ std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>&
         throw std::runtime_error("empty input URI list"); // or just return empty, generic DataSet?
 
     // create dataset(s) from URI(s)
-    vector< unique_ptr<DataSetBase> > datasets;
+    std::vector< std::unique_ptr<DataSetBase> > datasets;
     datasets.reserve(uris.size());
     for ( const auto& uri : uris )
         datasets.push_back(internal::FromUri(uri));
@@ -149,29 +152,33 @@ std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>&
 
     // else merge
     else {
-        unique_ptr<DataSetBase>& result = datasets.front();
+        std::unique_ptr<DataSetBase>& result = datasets.front();
         for (size_t i = 1; i < datasets.size(); ++i)
             *result += *datasets.at(i);
-        return unique_ptr<DataSetBase>(result.release());
+        return std::unique_ptr<DataSetBase>(result.release());
     }
 }
 
-std::unique_ptr<DataSetBase> DataSetIO::FromXmlString(const string& xml)
+std::unique_ptr<DataSetBase> DataSetIO::FromXmlString(const std::string& xml)
 {
     if (xml.empty())
         throw std::runtime_error("empty XML string");
-    stringstream s(xml);
+    std::stringstream s(xml);
     return XmlReader::FromStream(s);
 }
 
 void DataSetIO::ToFile(const std::unique_ptr<DataSetBase>& dataset,
-                       const string& fn)
+                       const std::string& fn)
 {
-    ofstream out(fn);
+    std::ofstream out(fn);
     if (!out)
-        throw std::runtime_error("could not open XML for writing");
+        throw std::runtime_error("could not open XML file for writing: " + fn);
     XmlWriter::ToStream(dataset, out);
 }
 
-void DataSetIO::ToStream(const std::unique_ptr<DataSetBase>& dataset, ostream &out)
+void DataSetIO::ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostream &out)
 { XmlWriter::ToStream(dataset, out); }
+
+} // namespace internal
+} // namespace BAM
+} // namespace PacBio

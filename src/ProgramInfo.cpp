@@ -43,87 +43,38 @@
 #include "pbbam/ProgramInfo.h"
 #include "SequenceUtils.h"
 #include <sstream>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-static string token_ID = string("ID");
-static string token_CL = string("CL");
-static string token_DS = string("DS");
-static string token_PN = string("PN");
-static string token_PP = string("PP");
-static string token_VN = string("VN");
+static std::string token_ID = std::string("ID");
+static std::string token_CL = std::string("CL");
+static std::string token_DS = std::string("DS");
+static std::string token_PN = std::string("PN");
+static std::string token_PP = std::string("PP");
+static std::string token_VN = std::string("VN");
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
-
-ProgramInfo::ProgramInfo(void) { }
 
 ProgramInfo::ProgramInfo(const std::string& id)
     : id_(id)
 { }
 
-ProgramInfo::ProgramInfo(const ProgramInfo& other)
-    : commandLine_(other.commandLine_)
-    , description_(other.description_)
-    , id_(other.id_)
-    , name_(other.name_)
-    , previousProgramId_(other.previousProgramId_)
-    , version_(other.version_)
-{  }
-
-ProgramInfo::ProgramInfo(ProgramInfo&& other)
-    : commandLine_(std::move(other.commandLine_))
-    , description_(std::move(other.description_))
-    , id_(std::move(other.id_))
-    , name_(std::move(other.name_))
-    , previousProgramId_(std::move(other.previousProgramId_))
-    , version_(std::move(other.version_))
-{ }
-
-ProgramInfo::~ProgramInfo(void) { }
-
-ProgramInfo& ProgramInfo::operator=(const ProgramInfo& other)
-{
-    commandLine_ = other.commandLine_;
-    description_ = other.description_;
-    id_ = other.id_;
-    name_ = other.name_;
-    previousProgramId_ = other.previousProgramId_;
-    version_ = other.version_;
-    return *this;
-}
-
-ProgramInfo& ProgramInfo::operator=(ProgramInfo&& other)
-{
-    commandLine_ = std::move(other.commandLine_);
-    description_ = std::move(other.description_);
-    id_ = std::move(other.id_);
-    name_ = std::move(other.name_);
-    previousProgramId_ = std::move(other.previousProgramId_);
-    version_ = std::move(other.version_);
-    return *this;
-}
-
-ProgramInfo ProgramInfo::FromSam(const string& sam)
+ProgramInfo ProgramInfo::FromSam(const std::string& sam)
 {
     // pop off '@PG\t', then split rest of line into tokens
-    const vector<string>& tokens = internal::Split(sam.substr(4), '\t');
+    const std::vector<std::string>& tokens = internal::Split(sam.substr(4), '\t');
     if (tokens.empty())
         return ProgramInfo();
 
     ProgramInfo prog;
-    map<string, string> custom;
+    std::map<std::string, std::string> custom;
 
     // iterate over tokens
-    for (const string& token : tokens) {
-        const string& tokenTag   = token.substr(0,2);
-        const string& tokenValue = token.substr(3);
+    for (const std::string& token : tokens) {
+        const std::string& tokenTag   = token.substr(0,2);
+        const std::string& tokenValue = token.substr(3);
 
         // set program contents
         if      (tokenTag == internal::token_ID) prog.Id(tokenValue);
@@ -142,9 +93,9 @@ ProgramInfo ProgramInfo::FromSam(const string& sam)
     return prog;
 }
 
-string ProgramInfo::ToSam(void) const
+std::string ProgramInfo::ToSam(void) const
 {
-    stringstream out;
+    std::stringstream out;
     out << "@PG"
         << internal::MakeSamTag(internal::token_ID, id_);
 
@@ -155,11 +106,13 @@ string ProgramInfo::ToSam(void) const
     if (!commandLine_.empty())       out << internal::MakeSamTag(internal::token_CL, commandLine_);
 
     // append any custom tags
-    map<string, string>::const_iterator customIter = custom_.cbegin();
-    map<string, string>::const_iterator customEnd  = custom_.cend();
+    std::map<std::string, std::string>::const_iterator customIter = custom_.cbegin();
+    std::map<std::string, std::string>::const_iterator customEnd  = custom_.cend();
     for ( ; customIter != customEnd; ++customIter )
         out << internal::MakeSamTag(customIter->first, customIter->second);
 
     return out.str();
 }
 
+} // namespace BAM
+} // namespace PacBio

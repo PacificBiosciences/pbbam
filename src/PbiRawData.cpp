@@ -46,18 +46,15 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <map>
 #include <cassert>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
 static
-string ToString(const RecordType type)
+std::string ToString(const RecordType type)
 {
-    static const auto lookup = map<RecordType, string>
+    static const auto lookup = std::map<RecordType, std::string>
     {
         { RecordType::ZMW,        "ZMW" },
         { RecordType::HQREGION,   "HQREGION" },
@@ -75,48 +72,16 @@ string ToString(const RecordType type)
 }
 
 } // namespace internal
-} // namespace BAM
-} // namesapce PacBio
 
 // ----------------------------------
 // PbiRawBarcodeData implementation
 // ----------------------------------
-
-PbiRawBarcodeData::PbiRawBarcodeData(void) { }
 
 PbiRawBarcodeData::PbiRawBarcodeData(uint32_t numReads)
 {
     bcForward_.reserve(numReads);
     bcReverse_.reserve(numReads);
     bcQual_.reserve(numReads);
-}
-
-PbiRawBarcodeData::PbiRawBarcodeData(const PbiRawBarcodeData& other)
-    : bcForward_(other.bcForward_)
-    , bcReverse_(other.bcReverse_)
-    , bcQual_(other.bcQual_)
-{ }
-
-PbiRawBarcodeData::PbiRawBarcodeData(PbiRawBarcodeData&& other)
-    : bcForward_(std::move(other.bcForward_))
-    , bcReverse_(std::move(other.bcReverse_))
-    , bcQual_(std::move(other.bcQual_))
-{ }
-
-PbiRawBarcodeData& PbiRawBarcodeData::operator=(const PbiRawBarcodeData& other)
-{
-    bcForward_ = other.bcForward_;
-    bcReverse_ = other.bcReverse_;
-    bcQual_ = other.bcQual_;
-    return *this;
-}
-
-PbiRawBarcodeData& PbiRawBarcodeData::operator=(PbiRawBarcodeData&& other)
-{
-    bcForward_ = std::move(other.bcForward_);
-    bcReverse_ = std::move(other.bcReverse_);
-    bcQual_ = std::move(other.bcQual_);
-    return *this;
 }
 
 void PbiRawBarcodeData::AddRecord(const BamRecord& b)
@@ -150,8 +115,6 @@ void PbiRawBarcodeData::AddRecord(const BamRecord& b)
 // PbiRawMappedData implementation
 // ----------------------------------
 
-PbiRawMappedData::PbiRawMappedData(void) { }
-
 PbiRawMappedData::PbiRawMappedData(uint32_t numReads)
 {
     tId_.reserve(numReads);
@@ -163,58 +126,6 @@ PbiRawMappedData::PbiRawMappedData(uint32_t numReads)
     nM_.reserve(numReads);
     nMM_.reserve(numReads);
     mapQV_.reserve(numReads);
-}
-
-PbiRawMappedData::PbiRawMappedData(const PbiRawMappedData& other)
-    : tId_(other.tId_)
-    , tStart_(other.tStart_)
-    , tEnd_(other.tEnd_)
-    , aStart_(other.aStart_)
-    , aEnd_(other.aEnd_)
-    , revStrand_(other.revStrand_)
-    , nM_(other.nM_)
-    , nMM_(other.nMM_)
-    , mapQV_(other.mapQV_)
-{ }
-
-PbiRawMappedData::PbiRawMappedData(PbiRawMappedData&& other)
-    : tId_(std::move(other.tId_))
-    , tStart_(std::move(other.tStart_))
-    , tEnd_(std::move(other.tEnd_))
-    , aStart_(std::move(other.aStart_))
-    , aEnd_(std::move(other.aEnd_))
-    , revStrand_(std::move(other.revStrand_))
-    , nM_(std::move(other.nM_))
-    , nMM_(std::move(other.nMM_))
-    , mapQV_(std::move(other.mapQV_))
-{ }
-
-PbiRawMappedData& PbiRawMappedData::operator=(const PbiRawMappedData& other)
-{
-    tId_ = other.tId_;
-    tStart_ = other.tStart_;
-    tEnd_ = other.tEnd_;
-    aStart_ = other.aStart_;
-    aEnd_ = other.aEnd_;
-    revStrand_ = other.revStrand_;
-    nM_ = other.nM_;
-    nMM_ = other.nMM_;
-    mapQV_ = other.mapQV_;
-    return *this;
-}
-
-PbiRawMappedData& PbiRawMappedData::operator=(PbiRawMappedData&& other)
-{
-    tId_ = std::move(other.tId_);
-    tStart_ = std::move(other.tStart_);
-    tEnd_ = std::move(other.tEnd_);
-    aStart_ = std::move(other.aStart_);
-    aEnd_ = std::move(other.aEnd_);
-    revStrand_ = std::move(other.revStrand_);
-    nM_ = std::move(other.nM_);
-    nMM_ = std::move(other.nMM_);
-    mapQV_ = std::move(other.mapQV_);
-    return *this;
 }
 
 void PbiRawMappedData::AddRecord(const BamRecord& b)
@@ -276,68 +187,16 @@ PbiReferenceEntry::PbiReferenceEntry(ID id, Row beginRow, Row endRow)
     , endRow_(endRow)
 { }
 
-PbiReferenceEntry::PbiReferenceEntry(const PbiReferenceEntry& other)
-    : tId_(other.tId_)
-    , beginRow_(other.beginRow_)
-    , endRow_(other.endRow_)
-{ }
-
-PbiReferenceEntry::PbiReferenceEntry(PbiReferenceEntry&& other)
-    : tId_(std::move(other.tId_))
-    , beginRow_(std::move(other.beginRow_))
-    , endRow_(std::move(other.endRow_))
-{ }
-
-PbiReferenceEntry& PbiReferenceEntry::operator=(const PbiReferenceEntry& other)
-{
-    tId_ = other.tId_;
-    beginRow_ = other.beginRow_;
-    endRow_ = other.endRow_;
-    return *this;
-}
-
-PbiReferenceEntry& PbiReferenceEntry::operator=(PbiReferenceEntry&& other)
-{
-    tId_ = std::move(other.tId_);
-    beginRow_ = std::move(other.beginRow_);
-    endRow_ = std::move(other.endRow_);
-    return *this;
-}
-
 // ------------------------------------
 // PbiRawReferenceData implementation
 // ------------------------------------
 
-PbiRawReferenceData::PbiRawReferenceData(void) { }
-
 PbiRawReferenceData::PbiRawReferenceData(uint32_t numRefs)
 {  entries_.reserve(numRefs); }
 
-PbiRawReferenceData::PbiRawReferenceData(const PbiRawReferenceData& other)
-    : entries_(other.entries_)
-{ }
-
-PbiRawReferenceData::PbiRawReferenceData(PbiRawReferenceData&& other)
-    : entries_(std::move(other.entries_))
-{ }
-
-PbiRawReferenceData& PbiRawReferenceData::operator=(const PbiRawReferenceData& other)
-{
-    entries_ = other.entries_;
-    return *this;
-}
-
-PbiRawReferenceData& PbiRawReferenceData::operator=(PbiRawReferenceData&& other)
-{
-    entries_ = std::move(other.entries_);
-    return *this;
-}
-
 // ----------------------------------
-// PbiRawSubreadData implementation
+// PbiRawBasicData implementation
 // ----------------------------------
-
-PbiRawBasicData::PbiRawBasicData(void) { }
 
 PbiRawBasicData::PbiRawBasicData(uint32_t numReads)
 {
@@ -349,54 +208,6 @@ PbiRawBasicData::PbiRawBasicData(uint32_t numReads)
     ctxtFlag_.reserve(numReads);
     fileOffset_.reserve(numReads);
     fileNumber_.reserve(numReads);
-}
-
-PbiRawBasicData::PbiRawBasicData(const PbiRawBasicData& other)
-    : rgId_(other.rgId_)
-    , qStart_(other.qStart_)
-    , qEnd_(other.qEnd_)
-    , holeNumber_(other.holeNumber_)
-    , readQual_(other.readQual_)
-    , ctxtFlag_(other.ctxtFlag_)
-    , fileOffset_(other.fileOffset_)
-    , fileNumber_(other.fileNumber_)
-{ }
-
-PbiRawBasicData::PbiRawBasicData(PbiRawBasicData&& other)
-    : rgId_(std::move(other.rgId_))
-    , qStart_(std::move(other.qStart_))
-    , qEnd_(std::move(other.qEnd_))
-    , holeNumber_(std::move(other.holeNumber_))
-    , readQual_(std::move(other.readQual_))
-    , ctxtFlag_(std::move(other.ctxtFlag_))
-    , fileOffset_(std::move(other.fileOffset_))
-    , fileNumber_(std::move(other.fileNumber_))
-{ }
-
-PbiRawBasicData& PbiRawBasicData::operator=(const PbiRawBasicData& other)
-{
-    rgId_ = other.rgId_;
-    qStart_ = other.qStart_;
-    qEnd_ = other.qEnd_;
-    holeNumber_ = other.holeNumber_;
-    readQual_ = other.readQual_;
-    ctxtFlag_ = other.ctxtFlag_;
-    fileOffset_ = other.fileOffset_;
-    fileNumber_ = other.fileNumber_;
-    return *this;
-}
-
-PbiRawBasicData& PbiRawBasicData::operator=(PbiRawBasicData&& other)
-{
-    rgId_ = std::move(other.rgId_);
-    qStart_ = std::move(other.qStart_);
-    qEnd_ = std::move(other.qEnd_);
-    holeNumber_ = std::move(other.holeNumber_);
-    readQual_ = std::move(other.readQual_);
-    ctxtFlag_ = std::move(other.ctxtFlag_);
-    fileOffset_ = std::move(other.fileOffset_);
-    fileNumber_ = std::move(other.fileNumber_);
-    return *this;
 }
 
 void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
@@ -440,7 +251,7 @@ PbiRawData::PbiRawData(void)
     , numReads_(0)
 { }
 
-PbiRawData::PbiRawData(const string& pbiFilename)
+PbiRawData::PbiRawData(const std::string& pbiFilename)
     : filename_(pbiFilename)
     , version_(PbiFile::CurrentVersion)
     , sections_(PbiFile::ALL)
@@ -457,52 +268,5 @@ PbiRawData::PbiRawData(const DataSet& dataset)
     internal::PbiIndexIO::LoadFromDataSet(*this, dataset);
 }
 
-PbiRawData::PbiRawData(const PbiRawData& other)
-    : filename_(other.filename_)
-    , version_(other.version_)
-    , sections_(other.sections_)
-    , numReads_(other.numReads_)
-    , barcodeData_(other.barcodeData_)
-    , mappedData_(other.mappedData_)
-    , referenceData_(other.referenceData_)
-    , basicData_(other.basicData_)
-{ }
-
-PbiRawData::PbiRawData(PbiRawData&& other)
-    : filename_(std::move(other.filename_))
-    , version_(std::move(other.version_))
-    , sections_(std::move(other.sections_))
-    , numReads_(std::move(other.numReads_))
-    , barcodeData_(std::move(other.barcodeData_))
-    , mappedData_(std::move(other.mappedData_))
-    , referenceData_(std::move(other.referenceData_))
-    , basicData_(std::move(other.basicData_))
-{ }
-
-PbiRawData& PbiRawData::operator=(const PbiRawData& other)
-{
-    filename_ = other.filename_;
-    version_ = other.version_;
-    sections_ = other.sections_;
-    numReads_ = other.numReads_;
-    barcodeData_ = other.barcodeData_;
-    mappedData_ = other.mappedData_;
-    referenceData_ = other.referenceData_;
-    basicData_ = other.basicData_;
-    return *this;
-}
-
-PbiRawData& PbiRawData::operator=(PbiRawData&& other)
-{
-    filename_ = std::move(other.filename_);
-    version_ = std::move(other.version_);
-    sections_ = std::move(other.sections_);
-    numReads_ = std::move(other.numReads_);
-    barcodeData_ = std::move(other.barcodeData_);
-    mappedData_ = std::move(other.mappedData_);
-    referenceData_ = std::move(other.referenceData_);
-    basicData_ = std::move(other.basicData_);
-    return *this;
-}
-
-PbiRawData::~PbiRawData(void) { }
+} // namespace BAM
+} // namesapce PacBio

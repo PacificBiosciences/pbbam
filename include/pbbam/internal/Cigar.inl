@@ -44,32 +44,6 @@
 namespace PacBio {
 namespace BAM {
 
-inline Cigar::Cigar(void)
-    : std::vector<CigarOperation>()
-{ }
-
-inline Cigar::Cigar(const Cigar& other)
-    : std::vector<CigarOperation>(other)
-{ }
-
-inline Cigar::Cigar(Cigar&& other)
-    : std::vector<CigarOperation>(std::move(other))
-{ }
-
-inline Cigar& Cigar::operator=(const Cigar& other)
-{
-    std::vector<CigarOperation>::operator=(other);
-    return *this;
-}
-
-inline Cigar& Cigar::operator=(Cigar&& other)
-{
-    std::vector<CigarOperation>::operator=(std::move(other));
-    return *this;
-}
-
-inline Cigar::~Cigar(void) { }
-
 inline Cigar Cigar::FromStdString(const std::string& stdString)
 { return Cigar(stdString); }
 

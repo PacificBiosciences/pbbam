@@ -41,9 +41,9 @@
 
 #include "pbbam/Tag.h"
 #include <stdexcept>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
 
 Tag::Tag(void)           : data_(),      modifier_(TagModifier::NONE) { }
 Tag::Tag(int8_t value)   : data_(value), modifier_(TagModifier::NONE) { }
@@ -54,21 +54,21 @@ Tag::Tag(int32_t value)  : data_(value), modifier_(TagModifier::NONE) { }
 Tag::Tag(uint32_t value) : data_(value), modifier_(TagModifier::NONE) { }
 Tag::Tag(float value)    : data_(value), modifier_(TagModifier::NONE) { }
 Tag::Tag(const std::string& value)      : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const vector<int8_t>& value)   : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const vector<uint8_t>& value)  : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const vector<int16_t>& value)  : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const vector<uint16_t>& value) : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const vector<int32_t>& value)  : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const vector<uint32_t>& value) : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const vector<float>& value)    : data_(value), modifier_(TagModifier::NONE) { }
+Tag::Tag(const std::vector<int8_t>& value)   : data_(value), modifier_(TagModifier::NONE) { }
+Tag::Tag(const std::vector<uint8_t>& value)  : data_(value), modifier_(TagModifier::NONE) { }
+Tag::Tag(const std::vector<int16_t>& value)  : data_(value), modifier_(TagModifier::NONE) { }
+Tag::Tag(const std::vector<uint16_t>& value) : data_(value), modifier_(TagModifier::NONE) { }
+Tag::Tag(const std::vector<int32_t>& value)  : data_(value), modifier_(TagModifier::NONE) { }
+Tag::Tag(const std::vector<uint32_t>& value) : data_(value), modifier_(TagModifier::NONE) { }
+Tag::Tag(const std::vector<float>& value)    : data_(value), modifier_(TagModifier::NONE) { }
 
 Tag::Tag(int8_t value, const TagModifier mod)
     : data_(value)
     , modifier_(mod)
 {
     if (mod == TagModifier::HEX_STRING)
-        throw runtime_error("HEX_STRING is not a valid tag modifier for int8_t data. "
-                            "It is intended for string-type data only.");
+        throw std::runtime_error("HEX_STRING is not a valid tag modifier for int8_t data. "
+                                 "It is intended for string-type data only.");
 }
 
 Tag::Tag(const std::string& value, const TagModifier mod)
@@ -76,21 +76,9 @@ Tag::Tag(const std::string& value, const TagModifier mod)
     , modifier_(mod)
 {
     if (mod == TagModifier::ASCII_CHAR)
-        throw runtime_error("ASCII_CHAR is not a valid tag modifier for string-type data. "
-                            "To construct an ASCII char tag, use a single-quoted value (e.g. 'X' instead of \"X\")");
+        throw std::runtime_error("ASCII_CHAR is not a valid tag modifier for string-type data. "
+                                 "To construct an ASCII char tag, use a single-quoted value (e.g. 'X' instead of \"X\")");
 }
-
-Tag::Tag(const Tag& other)
-    : data_(other.data_)
-    , modifier_(other.modifier_)
-{ }
-
-Tag::Tag(Tag&& other)
-    : data_(std::move(other.data_))
-    , modifier_(std::move(other.modifier_))
-{ }
-
-Tag::~Tag(void) { }
 
 Tag& Tag::operator=(boost::blank value) { data_ = value; return *this; }
 Tag& Tag::operator=(int8_t value)   { data_ = value; return *this; }
@@ -101,24 +89,13 @@ Tag& Tag::operator=(int32_t value)  { data_ = value; return *this; }
 Tag& Tag::operator=(uint32_t value) { data_ = value; return *this; }
 Tag& Tag::operator=(float value)    { data_ = value; return *this; }
 Tag& Tag::operator=(const std::string& value)      { data_ = value; return *this; }
-Tag& Tag::operator=(const vector<int8_t>& value)   { data_ = value; return *this; }
-Tag& Tag::operator=(const vector<uint8_t>& value)  { data_ = value; return *this; }
-Tag& Tag::operator=(const vector<int16_t>& value)  { data_ = value; return *this; }
-Tag& Tag::operator=(const vector<uint16_t>& value) { data_ = value; return *this; }
-Tag& Tag::operator=(const vector<int32_t>& value)  { data_ = value; return *this; }
-Tag& Tag::operator=(const vector<uint32_t>& value) { data_ = value; return *this; }
-Tag& Tag::operator=(const vector<float>& value)    { data_ = value; return *this; }
+Tag& Tag::operator=(const std::vector<int8_t>& value)   { data_ = value; return *this; }
+Tag& Tag::operator=(const std::vector<uint8_t>& value)  { data_ = value; return *this; }
+Tag& Tag::operator=(const std::vector<int16_t>& value)  { data_ = value; return *this; }
+Tag& Tag::operator=(const std::vector<uint16_t>& value) { data_ = value; return *this; }
+Tag& Tag::operator=(const std::vector<int32_t>& value)  { data_ = value; return *this; }
+Tag& Tag::operator=(const std::vector<uint32_t>& value) { data_ = value; return *this; }
+Tag& Tag::operator=(const std::vector<float>& value)    { data_ = value; return *this; }
 
-Tag& Tag::operator=(const Tag& other)
-{
-    data_ = other.data_;
-    modifier_ = other.modifier_;
-    return *this;
-}
-
-Tag& Tag::operator=(Tag&& other)
-{
-    data_ = std::move(other.data_);
-    modifier_ = std::move(other.modifier_);
-    return *this;
-}
+} // namespace BAM
+} // namespace PacBio

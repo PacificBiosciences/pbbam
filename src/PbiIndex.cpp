@@ -41,10 +41,9 @@
 
 #include "pbbam/PbiIndex.h"
 #include "PbiIndexIO.h"
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
 
 // ----------------------------------
 // SubreadLookupData implementation
@@ -131,6 +130,8 @@ ReferenceLookupData::ReferenceLookupData(const PbiRawReferenceData& rawData)
     }
 }
 
+namespace internal {
+
 // --------------------------------
 // PbiIndexPrivate implementation
 // --------------------------------
@@ -163,7 +164,7 @@ PbiIndexPrivate::PbiIndexPrivate(PbiRawData&& rawIndex)
     , barcodeData_(std::move(rawIndex.BarcodeData()))
 { }
 
-unique_ptr<PbiIndexPrivate> PbiIndexPrivate::DeepCopy(void) const
+std::unique_ptr<PbiIndexPrivate> PbiIndexPrivate::DeepCopy(void) const
 {
     std::unique_ptr<PbiIndexPrivate> copy(new PbiIndexPrivate);
     copy->filename_ = filename_;
@@ -177,20 +178,22 @@ unique_ptr<PbiIndexPrivate> PbiIndexPrivate::DeepCopy(void) const
     return copy;
 }
 
+} // namespace internal
+
 // -------------------------
 // PbiIndex implementation
 // -------------------------
 
 PbiIndex::PbiIndex(void)
-    : d_(new PbiIndexPrivate)
+    : d_(new internal::PbiIndexPrivate)
 { }
 
-PbiIndex::PbiIndex(const string& pbiFilename)
-    : d_(new PbiIndexPrivate(PbiRawData(pbiFilename)))
+PbiIndex::PbiIndex(const std::string& pbiFilename)
+    : d_(new internal::PbiIndexPrivate(PbiRawData(pbiFilename)))
 { }
 
 PbiIndex::PbiIndex(const PbiIndex& other)
-    : d_(std::forward<unique_ptr<PbiIndexPrivate>>(other.d_->DeepCopy()))
+    : d_(std::forward<std::unique_ptr<internal::PbiIndexPrivate>>(other.d_->DeepCopy()))
 {
     // move is ok, since it's a deep-copied, new object
 }
@@ -214,5 +217,8 @@ PbiIndex& PbiIndex::operator=(PbiIndex&& other)
 
 PbiIndex::~PbiIndex(void) { }
 
-string PbiIndex::Filename(void) const
+std::string PbiIndex::Filename(void) const
 { return d_->filename_; }
+
+} // namespace BAM
+} // namespace PacBio

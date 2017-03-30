@@ -45,10 +45,6 @@
 #include <sstream>
 #include <string>
 #include <cassert>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
@@ -76,7 +72,7 @@ IndexList readLengthHelper(const std::vector<T>& start,
             case Compare::GREATER_THAN_EQUAL : keep = (readLength >= value); break;
             default:
                 assert(false);
-                throw std::runtime_error(string{"read length filter encountered unknown Compare::Type: "} +
+                throw std::runtime_error(std::string{"read length filter encountered unknown Compare::Type: "} +
                                          Compare::TypeToName(cmp));
         }
 
@@ -87,7 +83,7 @@ IndexList readLengthHelper(const std::vector<T>& start,
 }
 
 static
-PbiFilter filterFromMovieName(const string& movieName, bool includeCcs)
+PbiFilter filterFromMovieName(const std::string& movieName, bool includeCcs)
 {
     // we'll match on any rgIds from our candidate list
     auto filter = PbiFilter{ PbiFilter::UNION };
@@ -147,8 +143,6 @@ PbiFilter filterFromMovieName(const string& movieName, bool includeCcs)
 //}
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
 // PbiAlignedLengthFilter
 
@@ -218,22 +212,22 @@ bool PbiQueryLengthFilter::Accepts(const PbiRawData& idx, const size_t row) cons
 struct PbiQueryNameFilter::PbiQueryNameFilterPrivate
 {
 public:
-    typedef pair<int32_t, int32_t>                 QueryInterval;
-    typedef set<QueryInterval>                     QueryIntervals;
-    typedef unordered_map<int32_t, QueryIntervals> ZmwLookup;
-    typedef shared_ptr<ZmwLookup>                  ZmwLookupPtr;
-    typedef unordered_map<int32_t, ZmwLookupPtr>   RgIdLookup;
+    typedef std::pair<int32_t, int32_t>                 QueryInterval;
+    typedef std::set<QueryInterval>                     QueryIntervals;
+    typedef std::unordered_map<int32_t, QueryIntervals> ZmwLookup;
+    typedef std::shared_ptr<ZmwLookup>                  ZmwLookupPtr;
+    typedef std::unordered_map<int32_t, ZmwLookupPtr>   RgIdLookup;
 
 public:
-    PbiQueryNameFilterPrivate(const vector<string>& whitelist)
+    PbiQueryNameFilterPrivate(const std::vector<std::string>& whitelist)
     {
         for (const auto& queryName : whitelist) {
 
             // split name into main parts
             auto nameParts = internal::Split(queryName, '/');
             if (nameParts.size() != 3) {
-                auto msg = string{ "PbiQueryNameFilter error: requested QNAME (" } + queryName;
-                msg += string{ ") is not a valid PacBio BAM QNAME. See spec for details"};
+                auto msg = std::string{ "PbiQueryNameFilter error: requested QNAME (" } + queryName;
+                msg += std::string{ ") is not a valid PacBio BAM QNAME. See spec for details"};
                 throw std::runtime_error(msg);
             }
 
@@ -243,9 +237,9 @@ public:
             // then, ensure read group IDs in lookup table, creating or fetching
             // shared ZmwLookup table if new movie
             //
-            const string& movieName = nameParts.at(0);
+            const std::string& movieName = nameParts.at(0);
             const bool isCCS = (nameParts.at(2) == "ccs" || nameParts.at(2) == "CCS");
-            vector<int32_t> rgIds;
+            std::vector<int32_t> rgIds;
             if (isCCS) {
                 rgIds.push_back( ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "CCS")) );
             } else {
@@ -282,8 +276,8 @@ public:
             if (!isCCS) {
                 const auto queryIntervalParts = internal::Split(nameParts.at(2), '_');
                 if (queryIntervalParts.size() != 2) {
-                    auto msg = string{ "PbiQueryNameFilter error: requested QNAME (" } + queryName;
-                    msg += string{ ") is not a valid PacBio BAM QNAME. See spec for details"};
+                    auto msg = std::string{ "PbiQueryNameFilter error: requested QNAME (" } + queryName;
+                    msg += std::string{ ") is not a valid PacBio BAM QNAME. See spec for details"};
                     throw std::runtime_error(msg);
                 }
                 queryStart = stoi(queryIntervalParts.at(0));
@@ -296,11 +290,11 @@ public:
             if (zmwFound == zmwPtr->end())
                 zmwPtr->emplace(zmw, QueryIntervals{});
             QueryIntervals& queryIntervals = zmwPtr->at(zmw);
-            queryIntervals.emplace(make_pair(queryStart, queryEnd));
+            queryIntervals.emplace(std::make_pair(queryStart, queryEnd));
         }
     }
 
-    PbiQueryNameFilterPrivate(const unique_ptr<PbiQueryNameFilterPrivate>& other)
+    PbiQueryNameFilterPrivate(const std::unique_ptr<PbiQueryNameFilterPrivate>& other)
     {
         if (other)
             lookup_ = other->lookup_;
@@ -328,7 +322,7 @@ public:
         const auto& queryIntervals = zmwFound->second;
         const auto qStart = basicData.qStart_.at(row);
         const auto qEnd   = basicData.qEnd_.at(row);
-        const auto queryInterval = make_pair(qStart, qEnd);
+        const auto queryInterval = std::make_pair(qStart, qEnd);
         return queryIntervals.find(queryInterval) != queryIntervals.end();
     }
 
@@ -337,7 +331,7 @@ private:
 };
 
 PbiQueryNameFilter::PbiQueryNameFilter(const std::string& qname)
-    : d_(new PbiQueryNameFilter::PbiQueryNameFilterPrivate(vector<string>{1, qname}))
+    : d_(new PbiQueryNameFilter::PbiQueryNameFilterPrivate(std::vector<std::string>{1, qname}))
 { }
 //    : compositeFilter_(internal::filterFromQueryName(qname))
 //{ }
@@ -448,3 +442,5 @@ void PbiReferenceNameFilter::Initialize(const PbiRawData& idx) const
     initialized_ = true;
 }
 
+} // namespace BAM
+} // namespace PacBio

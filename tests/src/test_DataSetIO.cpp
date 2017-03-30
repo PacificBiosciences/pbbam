@@ -154,12 +154,68 @@ TEST(DataSetIOTest, FromXmlFile)
 
 TEST(DataSetIOTest, ThrowsOnNonexistentFofnFile)
 {
-    EXPECT_THROW(DataSet{"does/not/exist.fofn"}, std::runtime_error);
+    bool checkedException = false;
+    try
+    {
+        auto ds = DataSet{"does/not/exist.fofn"};
+    }
+    catch(std::runtime_error& e)
+    {
+        const std::string msg = "could not open FOFN for reading: does/not/exist.fofn";
+        EXPECT_EQ(msg, e.what()) ;
+        checkedException = true;
+    }
+    EXPECT_TRUE(checkedException);
 }
 
 TEST(DataSetIOTest, ThrowsOnNonexistentXmlFile)
 {
-    EXPECT_THROW(DataSet{"does/not/exist.xml"}, std::runtime_error);
+    bool checkedException = false;
+    try
+    {
+        auto ds = DataSet{"does/not/exist.xml"};
+    }
+    catch(std::runtime_error& e)
+    {
+        const std::string msg = "could not open XML file for reading: does/not/exist.xml";
+        EXPECT_EQ(msg, e.what()) ;
+        checkedException = true;
+    }
+    EXPECT_TRUE(checkedException);
+}
+
+TEST(DataSetIOTest, ThrowsOnUnsupportedExtension)
+{
+    bool checkedException = false;
+    try
+    {
+        auto ds = DataSet{"bad/extension.foo"};
+    }
+    catch(std::runtime_error& e)
+    {
+        const std::string msg = "unsupported extension on input file: bad/extension.foo";
+        EXPECT_EQ(msg, e.what()) ;
+        checkedException = true;
+    }
+    EXPECT_TRUE(checkedException);
+}
+
+TEST(DataSetIOTest, ThrowsIfCannotOpenSaveFile)
+{
+    bool checkedException = false;
+    try
+    {
+        auto ds = DataSet{};
+        std::string fn = "fake_directory_that_should_not_exist/out.xml";
+        ds.Save(fn);
+    }
+    catch(std::runtime_error& e)
+    {
+        const std::string msg = "could not open XML file for writing: fake_directory_that_should_not_exist/out.xml";
+        EXPECT_EQ(msg, e.what()) ;
+        checkedException = true;
+    }
+    EXPECT_TRUE(checkedException);
 }
 
 TEST(DataSetIOTest, ToXml)
@@ -1512,5 +1568,24 @@ TEST(DataSetIOTest, DataSetFromRelativeBamFilename)
 
     // restore working directory
     changeCurrentDirectory(startingDirectory);
+}
+
+TEST(DataaSetIOTest, AllFiles) 
+{
+    // check  BamFiles only
+    EXPECT_NO_THROW(
+    {
+        const DataSet dataset(tests::Data_Dir + "/chunking/chunking.subreadset.xml");
+        const auto bamFiles = dataset.BamFiles();
+        EXPECT_EQ(3, bamFiles.size());
+    });
+
+    // now fetch all files (original BAMs plus PBI files)
+    EXPECT_NO_THROW(
+    {
+        const DataSet dataset(tests::Data_Dir + "/chunking/chunking.subreadset.xml");
+        const auto allFiles = dataset.AllFiles();
+        EXPECT_EQ(6, allFiles.size());    
+    });
 }
 

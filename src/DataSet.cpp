@@ -46,17 +46,31 @@
 #include "FileUtils.h"
 #include "TimeUtils.h"
 #include <boost/algorithm/string.hpp>
+#include <algorithm>
 #include <unordered_map>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-static const string defaultVersion{ "4.0.0" };
+static const std::string defaultVersion{ "4.0.0" };
+
+static void GetAllFiles(const ExternalResources& resources,
+                        std::vector<std::string>* result)
+{
+    for (const auto& resource : resources) {
+
+         // store this resource's path 
+        result->push_back(resource.ResourceId());
+
+        // store any child indices
+        for (const auto& idx : resource.FileIndices()) 
+            result->push_back(idx.ResourceId());
+        
+        // recurse into any other child resources
+        GetAllFiles(resource.ExternalResources(), result);
+    }
+}
 
 static inline void InitDefaults(DataSet& ds)
 {
@@ -70,13 +84,15 @@ static inline void InitDefaults(DataSet& ds)
 }
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
+
+using internal::DataSetElement;
+using internal::DataSetIO;
+using internal::FileUtils;
 
 DataSet::DataSet(void)
     : DataSet(DataSet::GENERIC)
 { 
-    InitDefaults(*this);
+    internal::InitDefaults(*this);
 }
 
 DataSet::DataSet(const DataSet::TypeEnum type)
@@ -97,17 +113,17 @@ DataSet::DataSet(const DataSet::TypeEnum type)
             throw std::runtime_error("unsupported dataset type"); // unknown type
     }
 
-    InitDefaults(*this);
+    internal::InitDefaults(*this);
 }
 
 DataSet::DataSet(const BamFile& bamFile)
     : d_(DataSetIO::FromUri(bamFile.Filename()))
     , path_(FileUtils::CurrentWorkingDirectory())
 {
-    InitDefaults(*this);
+    internal::InitDefaults(*this);
 }
 
-DataSet::DataSet(const string& filename)
+DataSet::DataSet(const std::string& filename)
     : d_(DataSetIO::FromUri(filename))
     , path_(FileUtils::DirectoryName(filename))
 {
@@ -123,14 +139,14 @@ DataSet::DataSet(const string& filename)
     {
         path_ = FileUtils::CurrentWorkingDirectory();
     }
-    InitDefaults(*this);
+    internal::InitDefaults(*this);
 }
 
-DataSet::DataSet(const vector<string>& filenames)
+DataSet::DataSet(const std::vector<std::string>& filenames)
     : d_(DataSetIO::FromUris(filenames))
     , path_(FileUtils::CurrentWorkingDirectory())
 { 
-    InitDefaults(*this);
+    internal::InitDefaults(*this);
 }
 
 DataSet::DataSet(const DataSet& other)
@@ -172,47 +188,59 @@ DataSet& DataSet::operator+=(const DataSet& other)
     return *this;
 }
 
-vector<BamFile> DataSet::BamFiles(void) const
+std::vector<std::string> DataSet::AllFiles(void) const
+{
+    // get all files
+    std::vector<std::string> result;
+    internal::GetAllFiles(ExternalResources(), &result);
+
+    // resolve relative paths
+    std::transform(result.begin(), result.end(), result.begin(),
+                   [this](const std::string& fn) { return this->ResolvePath(fn); });
+    return result;
+}
+
+std::vector<BamFile> DataSet::BamFiles(void) const
 {
     const PacBio::BAM::ExternalResources& resources = ExternalResources();
     
-    vector<BamFile> result;
+    std::vector<BamFile> result;
     result.reserve(resources.Size());
     for(const ExternalResource& ext : resources) {
 
         // only bother resolving file path if this is a BAM file
-        boost::iterator_range<string::const_iterator> bamFound = boost::algorithm::ifind_first(ext.MetaType(), "bam");
+        boost::iterator_range<std::string::const_iterator> bamFound = boost::algorithm::ifind_first(ext.MetaType(), "bam");
         if (!bamFound.empty()) {
-            const string fn = ResolvePath(ext.ResourceId());
+            const std::string fn = ResolvePath(ext.ResourceId());
             result.push_back(BamFile(fn));
         }
     }
     return result;
 }
 
-vector<string> DataSet::FastaFiles(void) const
+std::vector<std::string> DataSet::FastaFiles(void) const
 {
     const PacBio::BAM::ExternalResources& resources = ExternalResources();
 
-    vector<string> result;
+    std::vector<std::string> result;
     result.reserve(resources.Size());
     for(const ExternalResource& ext : resources) {
 
         // only bother resolving file path if this is a BAM file
-        boost::iterator_range<string::const_iterator> fastaFound = boost::algorithm::ifind_first(ext.MetaType(), "fasta");
+        boost::iterator_range<std::string::const_iterator> fastaFound = boost::algorithm::ifind_first(ext.MetaType(), "fasta");
         if (!fastaFound.empty()) {
-            const string fn = ResolvePath(ext.ResourceId());
+            const std::string fn = ResolvePath(ext.ResourceId());
             result.push_back(fn);
         }
     }
     return result;
 }
 
-DataSet DataSet::FromXml(const string& xml)
+DataSet DataSet::FromXml(const std::string& xml)
 {
     DataSet result;
-    result.d_ = internal::DataSetIO::FromXmlString(xml);
-    InitDefaults(result);
+    result.d_ = DataSetIO::FromXmlString(xml);
+    internal::InitDefaults(result);
     return result;
 }
 
@@ -222,7 +250,7 @@ const NamespaceRegistry& DataSet::Namespaces(void) const
 NamespaceRegistry& DataSet::Namespaces(void)
 { return d_->Namespaces(); }
 
-DataSet::TypeEnum DataSet::NameToType(const string& typeName)
+DataSet::TypeEnum DataSet::NameToType(const std::string& typeName)
 {
     static std::unordered_map<std::string, DataSet::TypeEnum> lookup;
     if (lookup.empty()) {
@@ -239,11 +267,11 @@ DataSet::TypeEnum DataSet::NameToType(const string& typeName)
     return lookup.at(typeName); // throws if unknown typename
 }
 
-vector<string> DataSet::ResolvedResourceIds(void) const
+std::vector<std::string> DataSet::ResolvedResourceIds(void) const
 {
     const PacBio::BAM::ExternalResources& resources = ExternalResources();
 
-    vector<string> result;
+    std::vector<std::string> result;
     result.reserve(resources.Size());
     for(const ExternalResource& ext : resources) {
 //        const string fn = ;
@@ -253,31 +281,31 @@ vector<string> DataSet::ResolvedResourceIds(void) const
     return result;
 }
 
-string DataSet::ResolvePath(const string& originalPath) const
+std::string DataSet::ResolvePath(const std::string& originalPath) const
 { return internal::FileUtils::ResolvedFilePath(originalPath, path_); }
 
 void DataSet::Save(const std::string& outputFilename)
 { DataSetIO::ToFile(d_, outputFilename); }
 
-void DataSet::SaveToStream(ostream& out)
+void DataSet::SaveToStream(std::ostream& out)
 { DataSetIO::ToStream(d_, out); }
 
-set<string> DataSet::SequencingChemistries(void) const
+std::set<std::string> DataSet::SequencingChemistries(void) const
 {
-    const vector<BamFile> bamFiles{ BamFiles() };
+    const std::vector<BamFile> bamFiles{ BamFiles() };
 
-    set<string> result;
+    std::set<std::string> result;
     for(const BamFile& bf : bamFiles) {
         if (!bf.IsPacBioBAM())
             throw std::runtime_error{ "only PacBio BAMs are supported" };
-        const vector<ReadGroupInfo> readGroups{ bf.Header().ReadGroups() };
+        const std::vector<ReadGroupInfo> readGroups{ bf.Header().ReadGroups() };
         for (const ReadGroupInfo& rg : readGroups)
             result.insert(rg.SequencingChemistry());
     }
     return result;
 }
 
-string DataSet::TypeToName(const DataSet::TypeEnum& type)
+std::string DataSet::TypeToName(const DataSet::TypeEnum& type)
 {
     switch(type) {
         case DataSet::GENERIC             : return "DataSet";
@@ -296,23 +324,20 @@ string DataSet::TypeToName(const DataSet::TypeEnum& type)
 
 // Exposed timestamp utils
 
-namespace PacBio {
-namespace BAM {
-
-string CurrentTimestamp(void)
+std::string CurrentTimestamp(void)
 { return internal::ToDataSetFormat(internal::CurrentTime()); }
 
-string ToDataSetFormat(const chrono::system_clock::time_point &tp)
+std::string ToDataSetFormat(const std::chrono::system_clock::time_point &tp)
 { return internal::ToDataSetFormat(tp); }
 
-string ToDataSetFormat(const time_t &t)
-{ return ToDataSetFormat(chrono::system_clock::from_time_t(t)); }
+std::string ToDataSetFormat(const time_t &t)
+{ return ToDataSetFormat(std::chrono::system_clock::from_time_t(t)); }
 
-string ToIso8601(const chrono::system_clock::time_point &tp)
+std::string ToIso8601(const std::chrono::system_clock::time_point &tp)
 { return internal::ToIso8601(tp); }
 
-string ToIso8601(const time_t &t)
-{ return ToIso8601(chrono::system_clock::from_time_t(t)); }
+std::string ToIso8601(const time_t &t)
+{ return ToIso8601(std::chrono::system_clock::from_time_t(t)); }
 
 } // namespace BAM
 } // namespace PacBio

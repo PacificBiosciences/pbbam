@@ -37,14 +37,13 @@
 
 #include "pbbam/BamRecordBuilder.h"
 #include "pbbam/BamTagCodec.h"
-#include "AssertUtils.h"
 #include "MemoryUtils.h"
 #include <htslib/sam.h>
 #include <cstring>
 #include <memory>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
+
+namespace PacBio {
+namespace BAM {
 
 BamRecordBuilder::BamRecordBuilder(void)
 {
@@ -130,12 +129,12 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
 {
     // initialize with basic 'core data'
     PBBAM_SHARED_PTR<bam1_t> recordRawData = internal::BamRecordMemory::GetRawData(record); /*   record.impl_.RawData().get();*/
-    PB_ASSERT_OR_RETURN_VALUE(recordRawData, false);
-    PB_ASSERT_OR_RETURN_VALUE(recordRawData->data, false);
+    if (!recordRawData || !recordRawData->data)
+        throw std::runtime_error("BamRecord memory in invalid state");    
     recordRawData->core = core_;
 
     // setup variable length data
-    const vector<uint8_t> encodedTags = BamTagCodec::Encode(tags_);
+    const std::vector<uint8_t> encodedTags = BamTagCodec::Encode(tags_);
 
     const size_t nameLength  = name_.size() + 1;
     const size_t numCigarOps = cigar_.size();
@@ -147,7 +146,8 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
 
     // realloc if necessary
     uint8_t* varLengthDataBlock = recordRawData->data;
-    PB_ASSERT_OR_RETURN_VALUE(varLengthDataBlock, false);
+    if (!varLengthDataBlock)
+        throw std::runtime_error("BamRecord memory in invalid state");
     size_t allocatedDataLength = recordRawData->m_data;
     if (allocatedDataLength < dataLength) {
         allocatedDataLength = dataLength;
@@ -166,12 +166,13 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
 
     // cigar
     if (cigarLength > 0) {
-        vector<uint32_t> encodedCigar(numCigarOps);
+        std::vector<uint32_t> encodedCigar(numCigarOps);
         for (size_t i = 0; i < numCigarOps; ++i) {
             const CigarOperation& op = cigar_.at(i);
             encodedCigar[i] = op.Length() << BAM_CIGAR_SHIFT;
             const uint8_t type = static_cast<uint8_t>(op.Type());
-            PB_ASSERT_OR_RETURN_VALUE(type >= 0 && type < 8, false);
+            if (type >= 8)
+                throw std::runtime_error("invalid CIGAR op type: " + std::to_string(type));
             encodedCigar[i] |= type;
         }
         memcpy(&varLengthDataBlock[index], &encodedCigar[0], cigarLength);
@@ -202,13 +203,18 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
 
     // tags
     if (tagLength > 0) {
-        PB_ASSERT_OR_RETURN_VALUE(!encodedTags.empty(), false);
+        if (encodedTags.empty())
+            throw std::runtime_error("expected tags but none are encoded");
         memcpy(&varLengthDataBlock[index], &encodedTags[0], tagLength);
         index += tagLength;
     }
 
     // sanity check
-    PB_ASSERT_OR_RETURN_VALUE(index == dataLength, false);
+    if (index != dataLength) {
+        throw std::runtime_error("BAM encoding error: expected to write " +
+                                 std::to_string(dataLength) + " bytes but wrote " +
+                                 std::to_string(index) + " bytes instead");
+    }
     return true;
 }
 
@@ -262,7 +268,8 @@ void BamRecordBuilder::Reset(const BamRecord& prototype)
 
     // reset core data
     const PBBAM_SHARED_PTR<bam1_t> rawData = internal::BamRecordMemory::GetRawData(prototype); //  prototype.impl_.RawData().get();
-    PB_ASSERT_OR_RETURN(rawData);
+    if (!rawData)
+        throw std::runtime_error("BamRecord memory in invalid state");    
     core_ = rawData->core;
 
     // reset variable-length data
@@ -282,7 +289,8 @@ void BamRecordBuilder::Reset(BamRecord&& prototype)
 
     // reset core data
     const PBBAM_SHARED_PTR<bam1_t> rawData = internal::BamRecordMemory::GetRawData(prototype); //  prototype.impl_.RawData().get();
-    PB_ASSERT_OR_RETURN(rawData);
+    if (!rawData)
+        throw std::runtime_error("BamRecord memory in invalid state");    
     core_ = std::move(rawData->core);
 
     // reset variable-length data
@@ -391,3 +399,6 @@ BamRecordBuilder& BamRecordBuilder::SetSupplementaryAlignment(bool ok)
     else    core_.flag &= ~BamRecordImpl::SUPPLEMENTARY;
     return *this;
 }
+
+} // namespace BAM
+} // namespace PacBio

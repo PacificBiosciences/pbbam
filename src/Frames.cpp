@@ -43,16 +43,13 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-static vector<uint16_t> framepoints;
-static vector<uint8_t> frameToCode;
+static std::vector<uint16_t> framepoints;
+static std::vector<uint8_t> frameToCode;
 static uint16_t maxFramepoint;
 
 static
@@ -73,7 +70,7 @@ void InitIpdDownsampling(void)
     const int end = 256/T;
     for (int i = 0; i < end; ++i) {
         grain = pow(B, i);
-        vector<uint16_t> nextOnes;
+        std::vector<uint16_t> nextOnes;
         for (double j = 0; j < T; ++j)
             nextOnes.push_back(j*grain + next);
         next = nextOnes.back() + grain;
@@ -114,12 +111,12 @@ uint16_t CodeToFrames(const uint8_t code)
 }
 
 static
-vector<uint16_t> CodeToFrames(const vector<uint8_t>& codedData)
+std::vector<uint16_t> CodeToFrames(const std::vector<uint8_t>& codedData)
 {
     InitIpdDownsampling();
 
     const size_t length = codedData.size();
-    vector<uint16_t> frames(length, 0);
+    std::vector<uint16_t> frames(length, 0);
     for (size_t i = 0; i < length; ++i)
         frames[i] = CodeToFrames(codedData[i]);
     return frames;
@@ -132,20 +129,18 @@ uint8_t FramesToCode(const uint16_t frame)
 }
 
 static
-vector<uint8_t> FramesToCode(const vector<uint16_t>& frames)
+std::vector<uint8_t> FramesToCode(const std::vector<uint16_t>& frames)
 {
     InitIpdDownsampling();
 
     const size_t length = frames.size();
-    vector<uint8_t> result(length, 0);
+    std::vector<uint8_t> result(length, 0);
     for (size_t i = 0; i < length; ++i)
         result[i] = FramesToCode(frames[i]);
     return result;
 }
 
 } // namespace internal
-} // namespace BAM
-} // namespace PacBio
 
 Frames::Frames(void)
 { }
@@ -158,24 +153,11 @@ Frames::Frames(std::vector<uint16_t>&& frames)
     : data_(std::move(frames))
 { }
 
-Frames::Frames(const Frames& other)
-    : data_(other.data_)
-{ }
-
-Frames::Frames(Frames&& other)
-    : data_(std::move(other.data_))
-{ }
-
-Frames::~Frames(void) { }
-
-Frames& Frames::operator=(const Frames& other)
-{ data_ = other.data_; return *this; }
-
-Frames& Frames::operator=(Frames&& other)
-{ data_ = std::move(other.data_); return *this; }
-
 Frames Frames::Decode(const std::vector<uint8_t>& codedData)
 { return Frames(internal::CodeToFrames(codedData)); }
 
 std::vector<uint8_t> Frames::Encode(const std::vector<uint16_t>& frames)
 { return internal::FramesToCode(frames); }
+
+} // namespace BAM
+} // namespace PacBio
