@@ -219,6 +219,24 @@ int IndexedFastaReader::NumSequences(void) const
     return faidx_nseq(handle_);
 }
 
+std::vector<std::string> IndexedFastaReader::Names(void) const
+{
+    REQUIRE_FAIDX_LOADED;
+    std::vector<std::string> names;
+    names.reserve(NumSequences());
+    for (size_t i = 0; i < NumSequences(); ++i)
+        names.push_back(faidx_iseq(handle_, i));
+    return names;
+}
+
+std::string IndexedFastaReader::Name(const size_t idx) const
+{
+    REQUIRE_FAIDX_LOADED;
+    if (idx >= NumSequences())
+        throw std::runtime_error("FASTA index out of range");
+    return std::string(faidx_iseq(handle_, idx));
+}
+
 bool IndexedFastaReader::HasSequence(const std::string& name) const
 {
     REQUIRE_FAIDX_LOADED;

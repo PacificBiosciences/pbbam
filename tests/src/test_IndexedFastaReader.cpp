@@ -210,3 +210,18 @@ TEST(IndexedFastaReaderTests, Errors)
     EXPECT_THROW(r.SequenceLength("dog"), std::exception);
     EXPECT_THROW(r.Subsequence("dog:0-10"), std::exception);
 }
+
+TEST(IndexedFastaReaderTests, Names)
+{
+    IndexedFastaReader r(lambdaFasta);
+    std::vector<std::string> names = {"lambda_NEB3011"};
+
+    // Test all-name request
+    EXPECT_EQ(names, r.Names());
+
+    // Test single-name query
+    EXPECT_EQ(names[0], r.Name(0));
+
+    // invalid name acces (out of range)
+    EXPECT_THROW(r.Name(1), std::exception);
+}
