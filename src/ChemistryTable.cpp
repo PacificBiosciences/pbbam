@@ -93,7 +93,7 @@ ChemistryTable ChemistryTableFromXml(const std::string& mappingXml)
 {
     if (!FileUtils::Exists(mappingXml))
         throw BundleChemistryMappingException(
-                mappingXml, "PB_CHEMISTRY_BUNDLE_DIR defined but file not found");
+                mappingXml, "SMRT_CHEMISTRY_BUNDLE_DIR defined but file not found");
 
     std::ifstream in(mappingXml);
     pugi::xml_document doc;
@@ -133,7 +133,7 @@ const ChemistryTable& GetChemistryTableFromEnv()
     static std::map<std::string, ChemistryTable> tableCache;
 
     std::string chemPath;
-    const char* pth = getenv("PB_CHEMISTRY_BUNDLE_DIR");
+    const char* pth = getenv("SMRT_CHEMISTRY_BUNDLE_DIR");
     if (pth != nullptr && pth[0] != '\0')
         chemPath = pth;
     else return empty;
