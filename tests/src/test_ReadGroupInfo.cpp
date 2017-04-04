@@ -160,7 +160,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryFromMappingXml)
     EXPECT_THROW(rg.SequencingChemistry(), InvalidSequencingChemistryException);
 
     // set the magic environment variable
-    const char* varname = "PB_CHEMISTRY_BUNDLE_DIR";
+    const char* varname = "SMRT_CHEMISTRY_BUNDLE_DIR";
     EXPECT_EQ(0, setenv(varname, tests::Data_Dir.c_str(), 0));
 
     EXPECT_EQ("FOUND", rg.SequencingChemistry());
@@ -175,7 +175,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryFromMappingXml)
 
     EXPECT_EQ(0, setenv(varname, "/dev/null", 0));
 
-    // test that a bogus PB_CHEMISTRY_BUNDLE_DIR throws
+    // test that a bogus SMRT_CHEMISTRY_BUNDLE_DIR throws
     EXPECT_THROW(ReadGroupInfo::SequencingChemistryFromTriple("1", "2", "3.4"),
                  BundleChemistryMappingException);
 
