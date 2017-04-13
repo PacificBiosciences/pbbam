@@ -108,6 +108,7 @@ static const std::string codec_V1  = std::string{ "CodecV1" };
 static const std::string barcodemode_NONE = std::string{ "None" };
 static const std::string barcodemode_SYM  = std::string{ "Symmetric" };
 static const std::string barcodemode_ASYM = std::string{ "Asymmetric" };
+static const std::string barcodemode_TAIL = std::string{ "Tailed" };
 
 static const std::string barcodequal_NONE  = std::string{ "None" };
 static const std::string barcodequal_SCORE = std::string{ "Score" };
@@ -159,6 +160,7 @@ static std::string BarcodeModeName(const BarcodeModeType& mode)
         case BarcodeModeType::NONE       : return barcodemode_NONE;
         case BarcodeModeType::SYMMETRIC  : return barcodemode_SYM;
         case BarcodeModeType::ASYMMETRIC : return barcodemode_ASYM;
+        case BarcodeModeType::TAILED     : return barcodemode_TAIL;
     }
 }
 
@@ -214,7 +216,8 @@ static const auto nameToBarcodeMode = std::map<std::string, BarcodeModeType>
 {
     { barcodemode_NONE, BarcodeModeType::NONE },
     { barcodemode_SYM,  BarcodeModeType::SYMMETRIC },
-    { barcodemode_ASYM, BarcodeModeType::ASYMMETRIC }
+    { barcodemode_ASYM, BarcodeModeType::ASYMMETRIC },
+    { barcodemode_TAIL, BarcodeModeType::TAILED }
 };
 
 static const auto nameToBarcodeQuality = std::map<std::string, BarcodeQualityType>
