@@ -101,6 +101,7 @@ enum class BarcodeModeType
    NONE
  , SYMMETRIC
  , ASYMMETRIC
+ , TAILED
 };
 
 /// \brief This enum describes the type of value encoded by barcode quality,
