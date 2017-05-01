@@ -522,8 +522,7 @@ uint8_t BamTagCodec::TagTypeCode(const Tag& tag,
         {
             if (tag.HasModifier(TagModifier::HEX_STRING) || additionalModifier == TagModifier::HEX_STRING)
                 return static_cast<uint8_t>('H');
-            else
-                return static_cast<uint8_t>('Z');
+            return static_cast<uint8_t>('Z');
         }
 
         case TagDataType::INT8_ARRAY   : // fall through
