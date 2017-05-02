@@ -124,8 +124,9 @@ ChemistryTable ChemistryTableFromXml(const std::string& mappingXml)
                 childNode.child("SoftwareVersion").child_value(),
                 childNode.child("SequencingChemistry").child_value()}});
         }
-    } catch(...) {
-        throw BundleChemistryMappingException(mappingXml, "Mapping entries unparseable");
+    } catch(std::exception& e) {
+        const std::string msg = std::string{"Mapping entries unparseable - "} + e.what();
+        throw BundleChemistryMappingException(mappingXml, msg);
     }
     return table;
 }
