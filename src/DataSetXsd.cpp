@@ -210,15 +210,19 @@ NamespaceRegistry::NamespaceRegistry(NamespaceRegistry &&other)
 
 NamespaceRegistry& NamespaceRegistry::operator=(const NamespaceRegistry& other)
 {
-    data_ = other.data_;
-    defaultXsdType_ = other.defaultXsdType_;
+    if (this != &other) {
+        data_ = other.data_;
+        defaultXsdType_ = other.defaultXsdType_;
+    }
     return *this;
 }
 
 NamespaceRegistry& NamespaceRegistry::operator=(NamespaceRegistry&& other)
 {
-    data_ = std::move(other.data_);
-    defaultXsdType_ = std::move(other.defaultXsdType_);
+    if (this != &other) {
+        data_ = std::move(other.data_);
+        defaultXsdType_ = std::move(other.defaultXsdType_);
+    }
     return *this;
 }
 

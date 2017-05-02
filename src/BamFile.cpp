@@ -150,12 +150,19 @@ BamFile::BamFile(BamFile&& other)
 
 BamFile& BamFile::operator=(const BamFile& other)
 {
-    d_ = other.d_->DeepCopy();
+    if (this != &other) {
+        d_ = other.d_->DeepCopy();
+    }
     return *this;
 }
 
 BamFile& BamFile::operator=(BamFile&& other)
-{ d_ = std::move(other.d_); return *this; }
+{
+    if (this != &other) { 
+        d_ = std::move(other.d_); 
+    }
+    return *this; 
+}
 
 BamFile::~BamFile(void) { }
 

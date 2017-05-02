@@ -129,7 +129,9 @@ FastaReader::FastaReader(FastaReader&& other)
 
 FastaReader& FastaReader::operator=(FastaReader&& other)
 {
-    d_.swap(other.d_);
+    if (this != &other) {
+        d_.swap(other.d_);
+    }
     return *this;
 }
 
