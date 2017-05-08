@@ -49,6 +49,7 @@
 #include "ValidationErrors.h"
 #include "Version.h"
 #include <boost/algorithm/string.hpp>
+#include <boost/core/ignore_unused.hpp>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -130,7 +131,7 @@ void ValidateReadGroup(const ReadGroupInfo& rg,
     {
         try {
             auto chem = rg.SequencingChemistry();
-            (void)chem;
+            boost::ignore_unused(chem);
         } catch (std::exception& e) {
             errors->AddReadGroupError(id, e.what());
         }
@@ -140,7 +141,7 @@ void ValidateReadGroup(const ReadGroupInfo& rg,
     if (!rg.FrameRateHz().empty()) {
         try {
             const float frameRate = std::stof(rg.FrameRateHz());
-            (void)frameRate;
+            boost::ignore_unused(frameRate);
         } catch (std::exception& e) {
             errors->AddReadGroupError(id, e.what());
         }
@@ -157,7 +158,7 @@ void ValidateHeader(const BamHeader& header,
     // SAM/BAM version
     try {
         Version v(header.Version());
-        (void)v;
+        boost::ignore_unused(v);
     } catch (std::exception& e) {
         errors->AddFileError(fn, std::string("SAM version (@HD:VN) failed: ") + e.what());
     }
@@ -248,7 +249,7 @@ void ValidateRecordReadGroup(const BamRecord& b,
 {
     try {
         auto rg = b.ReadGroup();
-        (void)rg;
+        boost::ignore_unused(rg);
     } catch (std::exception& e) {
         errors->AddRecordError(b.FullName(), e.what());
     }
