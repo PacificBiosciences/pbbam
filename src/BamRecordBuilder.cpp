@@ -96,23 +96,27 @@ BamRecordBuilder::BamRecordBuilder(BamRecordBuilder&& other)
 
 BamRecordBuilder& BamRecordBuilder::operator=(const BamRecordBuilder& other)
 {
-    core_ = other.core_;
-    name_ = other.name_;
-    sequence_  = other.sequence_;
-    qualities_ = other.qualities_;
-    cigar_ = other.cigar_;
-    tags_  = other.tags_;
+    if (this != &other) {
+        core_ = other.core_;
+        name_ = other.name_;
+        sequence_  = other.sequence_;
+        qualities_ = other.qualities_;
+        cigar_ = other.cigar_;
+        tags_  = other.tags_;
+    }
     return *this;
 }
 
 BamRecordBuilder& BamRecordBuilder::operator=(BamRecordBuilder&& other)
 {
-    core_ = std::move(other.core_);
-    name_ = std::move(other.name_);
-    sequence_  = std::move(other.sequence_);
-    qualities_ = std::move(other.qualities_);
-    cigar_ = std::move(other.cigar_);
-    tags_  = std::move(other.tags_);
+    if (this != &other) {
+        core_ = std::move(other.core_);
+        name_ = std::move(other.name_);
+        sequence_  = std::move(other.sequence_);
+        qualities_ = std::move(other.qualities_);
+        cigar_ = std::move(other.cigar_);
+        tags_  = std::move(other.tags_);
+    }
     return *this;
 }
 

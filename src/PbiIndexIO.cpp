@@ -43,6 +43,8 @@
 #include "pbbam/PbiBuilder.h"
 #include "MemoryUtils.h"
 #include <boost/algorithm/string.hpp>
+#include <sstream>
+#include <stdexcept>
 #include <vector>
 
 namespace PacBio {
@@ -87,6 +89,54 @@ inline void MoveAppend(std::vector<T>&& src, std::vector<T>& dst) noexcept
         std::move(src.begin(), src.end(), std::back_inserter(dst));
         src.clear();
     }
+}
+
+static void CheckContainer(const std::string& container,
+                           const size_t expected,
+                           const size_t observed)
+{
+    if (observed != expected)
+    {
+        std::stringstream msg;
+        msg << "PBI index error: expected " << expected
+            << " records in " << container << " field, but found "
+            << observed << " instead";
+        throw std::runtime_error(msg.str());
+    }
+}
+
+static void CheckExpectedSize(const PbiRawBarcodeData& barcodeData,
+                              const size_t numReads)
+{
+    CheckContainer("BarcodeData.bc_forward", numReads, barcodeData.bcForward_.size());
+    CheckContainer("BarcodeData.bc_reverse", numReads, barcodeData.bcReverse_.size());
+    CheckContainer("BarcodeData.bc_qual", numReads, barcodeData.bcReverse_.size());
+}
+
+static void CheckExpectedSize(const PbiRawBasicData& basicData,
+                              const size_t numReads)
+{
+    CheckContainer("BasicData.rgId", numReads, basicData.rgId_.size());
+    CheckContainer("BasicData.qStart", numReads, basicData.qStart_.size());
+    CheckContainer("BasicData.qEnd", numReads, basicData.qEnd_.size());
+    CheckContainer("BasicData.holeNumber", numReads, basicData.holeNumber_.size());
+    CheckContainer("BasicData.readQual", numReads, basicData.readQual_.size());
+    CheckContainer("BasicData.ctxt_flag", numReads, basicData.ctxtFlag_.size());
+    CheckContainer("BasicData.fileOffset", numReads, basicData.fileOffset_.size());
+}
+
+static void CheckExpectedSize(const PbiRawMappedData& mappedData,
+                              const size_t numReads)
+{
+    CheckContainer("MappedData.tId", numReads, mappedData.tId_.size());
+    CheckContainer("MappedData.tStart", numReads, mappedData.tStart_.size());
+    CheckContainer("MappedData.tEnd", numReads, mappedData.tEnd_.size());
+    CheckContainer("MappedData.aStart", numReads, mappedData.aStart_.size());
+    CheckContainer("MappedData.aEnd", numReads, mappedData.aEnd_.size());
+    CheckContainer("MappedData.revStrand", numReads, mappedData.revStrand_.size());
+    CheckContainer("MappedData.nM", numReads, mappedData.nM_.size());
+    CheckContainer("MappedData.nMM", numReads, mappedData.nMM_.size());
+    CheckContainer("MappedData.mapQV", numReads, mappedData.mapQV_.size());
 }
 
 // ---------------------------
@@ -199,16 +249,13 @@ void PbiIndexIO::LoadBarcodeData(PbiRawBarcodeData& barcodeData,
                                  const uint32_t numReads,
                                  BGZF* fp)
 {
-    assert(numReads > 0);
-    (void)numReads; // quash warnings building in release mode
-
+    // read from file
     LoadBgzfVector(fp, barcodeData.bcForward_, numReads);
     LoadBgzfVector(fp, barcodeData.bcReverse_, numReads);
     LoadBgzfVector(fp, barcodeData.bcQual_,    numReads);
 
-    assert(barcodeData.bcForward_.size() == numReads);
-    assert(barcodeData.bcReverse_.size() == numReads);
-    assert(barcodeData.bcQual_.size()    == numReads);
+    // validate
+    CheckExpectedSize(barcodeData, numReads);
 }
 
 void PbiIndexIO::LoadHeader(PbiRawData& index,
@@ -250,9 +297,7 @@ void PbiIndexIO::LoadMappedData(PbiRawMappedData& mappedData,
                                 const uint32_t numReads,
                                 BGZF* fp)
 {
-    assert(numReads > 0);
-    (void)numReads; // quash warnings building in release mode
-
+    // read from file
     LoadBgzfVector(fp, mappedData.tId_,       numReads);
     LoadBgzfVector(fp, mappedData.tStart_,    numReads);
     LoadBgzfVector(fp, mappedData.tEnd_,      numReads);
@@ -263,15 +308,8 @@ void PbiIndexIO::LoadMappedData(PbiRawMappedData& mappedData,
     LoadBgzfVector(fp, mappedData.nMM_,       numReads);
     LoadBgzfVector(fp, mappedData.mapQV_,     numReads);
 
-    assert(mappedData.tId_.size()       == numReads);
-    assert(mappedData.tStart_.size()    == numReads);
-    assert(mappedData.tEnd_.size()      == numReads);
-    assert(mappedData.aStart_.size()    == numReads);
-    assert(mappedData.aEnd_.size()      == numReads);
-    assert(mappedData.revStrand_.size() == numReads);
-    assert(mappedData.nM_.size()        == numReads);
-    assert(mappedData.nMM_.size()       == numReads);
-    assert(mappedData.mapQV_.size()     == numReads);
+    // validate
+    CheckExpectedSize(mappedData, numReads);
 }
 
 void PbiIndexIO::LoadReferenceData(PbiRawReferenceData& referenceData,
@@ -306,9 +344,7 @@ void PbiIndexIO::LoadBasicData(PbiRawBasicData& basicData,
                                  const uint32_t numReads,
                                  BGZF* fp)
 {
-    assert(numReads > 0);
-    (void)numReads; // quash warnings building in release mode
-
+    // read from file
     LoadBgzfVector(fp, basicData.rgId_,       numReads);
     LoadBgzfVector(fp, basicData.qStart_,     numReads);
     LoadBgzfVector(fp, basicData.qEnd_,       numReads);
@@ -317,13 +353,8 @@ void PbiIndexIO::LoadBasicData(PbiRawBasicData& basicData,
     LoadBgzfVector(fp, basicData.ctxtFlag_,   numReads);
     LoadBgzfVector(fp, basicData.fileOffset_, numReads);
 
-    assert(basicData.rgId_.size()       == numReads);
-    assert(basicData.qStart_.size()     == numReads);
-    assert(basicData.qEnd_.size()       == numReads);
-    assert(basicData.holeNumber_.size() == numReads);
-    assert(basicData.readQual_.size()   == numReads);
-    assert(basicData.ctxtFlag_.size()   == numReads);
-    assert(basicData.fileOffset_.size() == numReads);
+    // validate
+    CheckExpectedSize(basicData, numReads);
 }
 
 void PbiIndexIO::Save(const PbiRawData& index,
@@ -352,12 +383,10 @@ void PbiIndexIO::WriteBarcodeData(const PbiRawBarcodeData& barcodeData,
                                   const uint32_t numReads,
                                   BGZF* fp)
 {
-    assert(numReads > 0);
-    assert(barcodeData.bcForward_.size()   == numReads);
-    assert(barcodeData.bcReverse_.size()   == numReads);
-    assert(barcodeData.bcQual_.size()      == numReads);
-    (void)numReads; // quash warnings building in release mode
+    // validate
+    CheckExpectedSize(barcodeData, numReads);
 
+    // write to file
     WriteBgzfVector(fp, barcodeData.bcForward_);
     WriteBgzfVector(fp, barcodeData.bcReverse_);
     WriteBgzfVector(fp, barcodeData.bcQual_);
@@ -394,17 +423,10 @@ void PbiIndexIO::WriteMappedData(const PbiRawMappedData& mappedData,
                                  const uint32_t numReads,
                                  BGZF* fp)
 {
-    assert(mappedData.tId_.size()       == numReads);
-    assert(mappedData.tStart_.size()    == numReads);
-    assert(mappedData.tEnd_.size()      == numReads);
-    assert(mappedData.aStart_.size()    == numReads);
-    assert(mappedData.aEnd_.size()      == numReads);
-    assert(mappedData.revStrand_.size() == numReads);
-    assert(mappedData.nM_.size()        == numReads);
-    assert(mappedData.nMM_.size()       == numReads);
-    assert(mappedData.mapQV_.size()     == numReads);
-    (void)numReads; // quash warnings building in release mode
+    // validate
+    CheckExpectedSize(mappedData, numReads);
 
+    // write to file
     WriteBgzfVector(fp, mappedData.tId_);
     WriteBgzfVector(fp, mappedData.tStart_);
     WriteBgzfVector(fp, mappedData.tEnd_);
@@ -447,15 +469,10 @@ void PbiIndexIO::WriteBasicData(const PbiRawBasicData& basicData,
                                 const uint32_t numReads,
                                 BGZF* fp)
 {
-    assert(basicData.rgId_.size()       == numReads);
-    assert(basicData.qStart_.size()     == numReads);
-    assert(basicData.qEnd_.size()       == numReads);
-    assert(basicData.holeNumber_.size() == numReads);
-    assert(basicData.readQual_.size()   == numReads);
-    assert(basicData.ctxtFlag_.size()   == numReads);
-    assert(basicData.fileOffset_.size() == numReads);
-    (void)numReads; // quash warnings building in release mode
+    // validate
+    CheckExpectedSize(basicData, numReads);
 
+    // write to file
     WriteBgzfVector(fp, basicData.rgId_);
     WriteBgzfVector(fp, basicData.qStart_);
     WriteBgzfVector(fp, basicData.qEnd_);

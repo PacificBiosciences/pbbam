@@ -459,21 +459,25 @@ BamRecord::BamRecord(BamRecord&& other)
 
 BamRecord& BamRecord::operator=(const BamRecord& other)
 {
-    impl_ = other.impl_;
-    header_ = other.header_;
-    alignedStart_ = other.alignedStart_;
-    alignedEnd_ = other.alignedEnd_;
-    p2bCache_.reset(nullptr); // just reset, for now at least
+    if (this != &other) {
+        impl_ = other.impl_;
+        header_ = other.header_;
+        alignedStart_ = other.alignedStart_;
+        alignedEnd_ = other.alignedEnd_;
+        p2bCache_.reset(nullptr); // just reset, for now at least
+    }
     return *this;
 }
 
 BamRecord& BamRecord::operator=(BamRecord&& other)
 {
-    impl_ = std::move(other.impl_);
-    header_ = std::move(other.header_);
-    alignedStart_ = std::move(other.alignedStart_);
-    alignedEnd_ = std::move(other.alignedEnd_);
-    p2bCache_ = std::move(other.p2bCache_);
+    if (this != &other) {
+        impl_ = std::move(other.impl_);
+        header_ = std::move(other.header_);
+        alignedStart_ = std::move(other.alignedStart_);
+        alignedEnd_ = std::move(other.alignedEnd_);
+        p2bCache_ = std::move(other.p2bCache_);
+    }
     return *this;
 }
 

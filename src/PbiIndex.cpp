@@ -205,13 +205,17 @@ PbiIndex::PbiIndex(PbiIndex&& other)
 PbiIndex& PbiIndex::operator=(const PbiIndex& other)
 {
     // move is ok, since it's a deep-copied, new object
-    d_ = other.d_->DeepCopy();
+    if (this != &other) {
+        d_ = other.d_->DeepCopy();
+    }
     return *this;
 }
 
 PbiIndex& PbiIndex::operator=(PbiIndex&& other)
 {
-    d_ = std::move(other.d_);
+    if (this != &other) {
+        d_ = std::move(other.d_);
+    }
     return *this;
 }
 

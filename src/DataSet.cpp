@@ -166,17 +166,21 @@ DataSet::DataSet(DataSet&& other)
 
 DataSet& DataSet::operator=(const DataSet& other)
 {
-    DataSetBase* otherDataset = other.d_.get();
-    DataSetElement* copyDataset = new DataSetElement(*otherDataset);
-    d_.reset(static_cast<DataSetBase*>(copyDataset));
-    path_ = other.path_;
+    if (this != &other) {
+        DataSetBase* otherDataset = other.d_.get();
+        DataSetElement* copyDataset = new DataSetElement(*otherDataset);
+        d_.reset(static_cast<DataSetBase*>(copyDataset));
+        path_ = other.path_;
+    }
     return *this;
 }
 
 DataSet& DataSet::operator=(DataSet&& other)
 {
-    d_ = std::move(other.d_);
-    path_ = std::move(other.path_);
+    if (this != &other) {
+        d_ = std::move(other.d_);
+        path_ = std::move(other.path_);
+    }
     return *this;
 }
 

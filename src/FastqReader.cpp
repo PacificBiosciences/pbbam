@@ -127,7 +127,9 @@ FastqReader::FastqReader(FastqReader&& other)
 
 FastqReader& FastqReader::operator=(FastqReader&& other)
 {
-    d_.swap(other.d_);
+    if (this != &other) {
+        d_.swap(other.d_);
+    }
     return *this;
 }
 
