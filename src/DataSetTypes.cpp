@@ -197,8 +197,8 @@ DataSetMetadata::DataSetMetadata(const std::string& numRecords,
                                  const std::string& totalLength)
     : DataSetElement("DataSetMetadata", XsdType::DATASETS)
 {
-    NumRecords(numRecords);
     TotalLength(totalLength);
+    NumRecords(numRecords);
 }
 
 DEFINE_ACCESSORS(DataSetMetadata, Provenance, Provenance)
@@ -208,8 +208,8 @@ DataSetMetadata& DataSetMetadata::Provenance(const PacBio::BAM::Provenance& prov
 
 DataSetMetadata& DataSetMetadata::operator+=(const DataSetMetadata& other)
 {
-    NumRecords() = NumRecords() + other.NumRecords();
     TotalLength() = TotalLength() + other.TotalLength();
+    NumRecords() = NumRecords() + other.NumRecords();
     // merge add'l
     return *this;
 }

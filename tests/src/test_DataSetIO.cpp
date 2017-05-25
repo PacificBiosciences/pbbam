@@ -1589,3 +1589,51 @@ TEST(DataaSetIOTest, AllFiles)
     });
 }
 
+TEST(DataSetIOTest, MetadataDefaultChildrenProperlyOrderedPerXsd)
+{
+    DataSet dataset(DataSet::ALIGNMENT);
+    dataset.CreatedAt("2015-01-27T09:00:01");
+    dataset.MetaType("PacBio.DataSet.AlignmentSet");
+    dataset.Name("DataSet_AlignmentSet");
+    dataset.Tags("barcode moreTags mapping mytags");
+    dataset.TimeStampedName("my_time_stamped_name");
+    dataset.UniqueId("b095d0a3-94b8-4918-b3af-a3f81bbe519c");
+    dataset.Attribute("xmlns",              "http://pacificbiosciences.com/PacBioDatasets.xsd")
+           .Attribute("xmlns:xsi",          "http://www.w3.org/2001/XMLSchema-instance")
+           .Attribute("xsi:schemaLocation", "http://pacificbiosciences.com/PacBioDatasets.xsd");
+
+    ExternalResource ext("Fake.MetaType", "filename");
+    ext.TimeStampedName("custom_tsn")
+       .UniqueId("my_uuid");
+    dataset.ExternalResources().Add(ext);
+
+    const auto numRecords = std::to_string(42);
+    const auto totalLength = std::to_string(1000);
+    DataSetMetadata metadata(numRecords, totalLength);
+    dataset.Metadata(metadata);
+
+    const string expectedXml =
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+        "<pbds:AlignmentSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.AlignmentSet\" "
+                "Name=\"DataSet_AlignmentSet\" Tags=\"barcode moreTags mapping mytags\" "
+                "TimeStampedName=\"my_time_stamped_name\" "
+                "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"3.0.1\" "
+                "xmlns=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
+                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
+                "xmlns:pbbase=\"http://pacificbiosciences.com/PacBioBaseDataModel.xsd\" "
+                "xmlns:pbds=\"http://pacificbiosciences.com/PacBioDatasets.xsd\">\n"
+        "\t<pbbase:ExternalResources>\n"
+        "\t\t<pbbase:ExternalResource MetaType=\"Fake.MetaType\" ResourceId=\"filename\" TimeStampedName=\"custom_tsn\" UniqueId=\"my_uuid\" Version=\"3.0.1\" />\n"
+        "\t</pbbase:ExternalResources>\n"
+        "\t<pbds:DataSetMetadata>\n"
+        "\t\t<pbds:TotalLength>1000</pbds:TotalLength>\n"
+        "\t\t<pbds:NumRecords>42</pbds:NumRecords>\n"
+        "\t</pbds:DataSetMetadata>\n"
+        "</pbds:AlignmentSet>\n";
+
+    stringstream s;
+    dataset.SaveToStream(s);
+    EXPECT_EQ(expectedXml, s.str());
+}
+
