@@ -10,6 +10,8 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.8.0] - 2017-07-24
+
 ### Added
 - Default DataSet 'Version' attribute if none already present (currently 4.0.0)
 - Added whitelist support for filtering ZMWs via DataSetXML.
@@ -19,6 +21,9 @@ scraps, etc).
 
 ### Fixed
 - Bug in the build system preventing clean rebuilds.
+
+### Removed
+- Dropped the bundled, PacBio-forked version of htslib. Now using stock htslib (v1.3.1+). 
 
 ## [0.7.4] - 2016-11-18
 
