@@ -53,6 +53,17 @@ typedef vector<uint16_t> f_data;
 
 namespace tests {
 
+static 
+ReadGroupInfo MakeReadGroup(const FrameCodec codec,
+                            const std::string& movieName,
+                            const std::string& readType)
+{
+    ReadGroupInfo rg{movieName, readType};
+    rg.IpdCodec(codec);
+    rg.PulseWidthCodec(codec);
+    return rg;
+}
+
 static
 BamRecord MakeRecord(const Position qStart,
                      const Position qEnd,
@@ -64,7 +75,8 @@ BamRecord MakeRecord(const Position qStart,
                      const string& pulseCall = "",
                      const string& pulseBases = "",
                      const string& pulseQuals = "",
-                     const f_data& pulseFrames = f_data())
+                     const f_data& pulseFrames = f_data(),
+                     const FrameCodec codec = FrameCodec::RAW)
 {
     BamRecordImpl impl;
     impl.SetSequenceAndQualities(seq, quals);
@@ -89,7 +101,12 @@ BamRecord MakeRecord(const Position qStart,
     tags["pm"] = pulseFrames;   // pkmid
     impl.Tags(tags);
 
-    return BamRecord(std::move(impl));
+    const auto rg = MakeReadGroup(codec, "movie", "SUBREAD");
+
+    BamRecord bam(std::move(impl));
+    bam.header_.AddReadGroup(rg);
+    bam.ReadGroup(rg);
+    return bam;
 }
 
 static
@@ -101,7 +118,8 @@ BamRecord MakeCCSRecord(const string& seq,
                         const string& pulseCall = "",
                         const string& pulseBases = "",
                         const string& pulseQuals = "",
-                        const f_data& pulseFrames = f_data())
+                        const f_data& pulseFrames = f_data(),
+                        const FrameCodec codec = FrameCodec::RAW)
 {
     BamRecordImpl impl;
     impl.Name("movie/42/ccs");
@@ -125,7 +143,12 @@ BamRecord MakeCCSRecord(const string& seq,
     tags["pm"] = pulseFrames;   // pkmid
     impl.Tags(tags);
 
-    return BamRecord(std::move(impl));
+    const auto rg = MakeReadGroup(codec, "movie", "CCS");
+
+    BamRecord bam(std::move(impl));
+    bam.header_.AddReadGroup(rg);
+    bam.ReadGroup(rg);
+    return bam;
 }
 
 } // namespace tests
@@ -1728,4 +1751,301 @@ TEST(BamRecordTest, CCS_ClipToReference)
     EXPECT_EQ(s3_tagQuals_clipped, view.LabelQVs().Fastq());
     EXPECT_EQ(s3_tagQuals_clipped, view.AltLabelQVs().Fastq());
     EXPECT_EQ(s3_frames_clipped,   view.IPD().Data());
+}
+
+TEST(BamRecordTest, ClipEncodedFrames)
+{
+    const Position qStart  = 500;
+    const Position qEnd    = 510;
+    const string seq       = "AACCGTTAGC";
+    const string quals     = "?]?]?]?]?*";
+    const string tagBases  = "AACCGTTAGC";
+    const string tagQuals  = "?]?]?]?]?*";
+    const f_data frames    = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
+
+    const string pulseCall   = "ttAaAtaCCGggatTTAcatGCt";
+    const string pulseBases  = pulseCall;
+    const string pulseQuals  = "==?=]==?]?====]?]===?*=";
+    const f_data pulseFrames = { 0,0,10,0,10,0,0,20,20,30,0,0,0,0,40,40,10,0,0,0,30,20,0 };
+
+    const int32_t  tId     = 0;
+    const Position tPos    = 100;
+    const uint8_t  mapQual = 80;
+
+    const Position clipStart = 502;
+    const Position clipEnd   = 509;
+
+    const string seq_clipped      = "CCGTTAG";
+    const string quals_clipped    = "?]?]?]?";
+    const string tagBases_clipped = "CCGTTAG";
+    const string tagQuals_clipped = "?]?]?]?";
+    const f_data frames_clipped   = { 20, 20, 30, 40, 40, 10, 30 };
+
+    const string pulseCall_clipped = "CCGggatTTAcatG";
+    const string pulseQuals_clipped = "?]?====]?]===?";
+    const f_data pulseFrames_clipped = { 20,20,30,0,0,0,0,40,40,10,0,0,0,30 };
+
+    const string seq_rev       = "GCTAACGGTT";
+    const string pulseCall_rev = "aGCatgTAAatccCGGtaTtTaa";
+    const string quals_rev     = "*?]?]?]?]?";
+    const string tagQuals_rev  = quals_rev;
+    const f_data frames_rev    = { 20, 30, 10, 40, 40, 30, 20, 20, 10, 10 };
+
+    const string seq_rev_clipped   = "CTAACGG";
+    const string quals_rev_clipped = "?]?]?]?";
+    const string tagBases_rev_clipped = seq_rev_clipped;
+    const string tagQuals_rev_clipped = quals_rev_clipped;
+    const f_data frames_rev_clipped = { 30, 10, 40, 40, 30, 20, 20 };
+
+    const string pulseCall_rev_clipped = "CatgTAAatccCGG";
+    const string pulseQuals_rev_clipped    = "?===]?]====?]?";
+    const f_data pulseFrames_rev_clipped = { 30,0,0,0,10,40,40,0,0,0,0,30,20,20 };
+
+    const string s1_cigar = "10=";
+    const string s2_cigar = "5=3D5=";
+    const string s3_cigar = "4=1D2I2D4=";
+
+    const string s1_cigar_clipped = "7=";
+    const string s2_cigar_clipped = "3=3D4=";
+    const string s3_cigar_clipped = "2=1D2I2D3=";
+
+    const BamRecord prototype = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
+                                                  pulseCall, pulseBases, pulseQuals, pulseFrames, FrameCodec::V1);
+
+    BamRecord s0 = prototype; // unmapped record
+    BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
+    BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
+    BamRecord s3 = prototype.Mapped(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+    BamRecord s1_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s1_cigar, mapQual);
+    BamRecord s2_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s2_cigar, mapQual);
+    BamRecord s3_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s3_cigar, mapQual);
+
+    s0.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
+    s1.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
+    s2.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
+    s3.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
+    s1_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
+    s2_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
+    s3_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
+
+    {   // s0
+
+        EXPECT_FALSE(s0.IsMapped());
+        EXPECT_EQ(clipStart, s0.QueryStart());
+        EXPECT_EQ(clipEnd,   s0.QueryEnd());
+        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.AlignedStart());
+        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.AlignedEnd());
+        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.ReferenceStart());
+        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.ReferenceEnd());
+
+        const BamRecordView view
+        {
+            s0,
+            Orientation::GENOMIC,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+
+        EXPECT_EQ(seq_clipped,       view.Sequence());
+        EXPECT_EQ(quals_clipped,     view.Qualities().Fastq());
+        EXPECT_EQ(tagBases_clipped,  view.DeletionTags());
+        EXPECT_EQ(tagQuals_clipped,  view.DeletionQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped, view.LabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped, view.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames_clipped,    view.IPD().Data());
+        EXPECT_EQ(pulseCall_clipped, view.PulseCalls());
+    }
+
+    {   // s1 - FORWARD
+
+        EXPECT_TRUE(s1.IsMapped());
+        EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
+        EXPECT_EQ(clipStart, s1.QueryStart());
+        EXPECT_EQ(clipEnd,   s1.QueryEnd());
+        EXPECT_EQ(clipStart, s1.AlignedStart());   // queryStart (no soft clips)
+        EXPECT_EQ(clipEnd,   s1.AlignedEnd());     // alignStart + seqLength
+        EXPECT_EQ(102, s1.ReferenceStart());       // 100 + startOffset
+        EXPECT_EQ(109, s1.ReferenceEnd());         // RefStart + 7=
+
+        EXPECT_EQ(s1_cigar_clipped, s1.CigarData().ToStdString());
+
+        const BamRecordView view
+        {
+            s1,
+            Orientation::GENOMIC,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+
+        EXPECT_EQ(seq_clipped,       view.Sequence());
+        EXPECT_EQ(quals_clipped,     view.Qualities().Fastq());
+        EXPECT_EQ(tagBases_clipped,  view.DeletionTags());
+        EXPECT_EQ(tagQuals_clipped,  view.DeletionQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped, view.LabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped, view.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames_clipped,    view.IPD().Data());
+        EXPECT_EQ(pulseCall_clipped, view.PulseCalls());
+    }
+
+    {   // s1 - REVERSE
+
+        EXPECT_TRUE(s1_rev.IsMapped());
+        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(clipStart, s1_rev.QueryStart());
+        EXPECT_EQ(clipEnd,   s1_rev.QueryEnd());
+        EXPECT_EQ(clipStart, s1_rev.AlignedStart());    // queryStart (no soft clips)
+        EXPECT_EQ(clipEnd,   s1_rev.AlignedEnd());      // alignStart + seqLength
+        EXPECT_EQ(102, s1_rev.ReferenceStart());        // 100 + startOffset
+        EXPECT_EQ(109, s1_rev.ReferenceEnd());          // RefStart + 7=
+
+        EXPECT_EQ(s1_cigar_clipped, s1_rev.CigarData().ToStdString());
+
+        const BamRecordView view
+        {
+            s1_rev,
+            Orientation::GENOMIC,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+
+        EXPECT_EQ(seq_rev_clipped,       view.Sequence());
+        EXPECT_EQ(quals_rev_clipped,     view.Qualities().Fastq());
+        EXPECT_EQ(tagBases_rev_clipped,  view.DeletionTags());
+        EXPECT_EQ(tagQuals_rev_clipped,  view.DeletionQVs().Fastq());
+        EXPECT_EQ(pulseQuals_rev_clipped,  view.LabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_rev_clipped,  view.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames_rev_clipped,    view.IPD().Data());
+        EXPECT_EQ(pulseCall_rev_clipped, view.PulseCalls());
+    }
+
+    {   // s2 - FORWARD
+
+        EXPECT_TRUE(s2.IsMapped());
+        EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
+        EXPECT_EQ(clipStart, s2.QueryStart());
+        EXPECT_EQ(clipEnd,   s2.QueryEnd());
+        EXPECT_EQ(clipStart, s2.AlignedStart());   // queryStart (no soft clips)
+        EXPECT_EQ(clipEnd,   s2.AlignedEnd());     // alignStart + seqLength
+        EXPECT_EQ(102, s2.ReferenceStart());       // 100 + startOffset
+        EXPECT_EQ(112, s2.ReferenceEnd());         // RefStart + 7= + 3D
+
+        EXPECT_EQ(s2_cigar_clipped, s2.CigarData().ToStdString());
+
+        const BamRecordView view
+        {
+            s2,
+            Orientation::GENOMIC,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+
+        EXPECT_EQ(seq_clipped,      view.Sequence());
+        EXPECT_EQ(quals_clipped,    view.Qualities().Fastq());
+        EXPECT_EQ(tagBases_clipped, view.DeletionTags());
+        EXPECT_EQ(tagQuals_clipped, view.DeletionQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped, view.LabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped, view.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames_clipped,   view.IPD().Data());
+    }
+
+    {   // s2 - REVERSE
+
+        EXPECT_TRUE(s2_rev.IsMapped());
+        EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
+        EXPECT_EQ(clipStart, s2_rev.QueryStart());
+        EXPECT_EQ(clipEnd,   s2_rev.QueryEnd());
+        EXPECT_EQ(clipStart, s2_rev.AlignedStart());    // queryStart (no soft clips)
+        EXPECT_EQ(clipEnd,   s2_rev.AlignedEnd());      // alignStart + seqLength
+        EXPECT_EQ(102, s2_rev.ReferenceStart());        // 100 + startOffset
+        EXPECT_EQ(112, s2_rev.ReferenceEnd());          // RefStart + 7= + 3D
+
+        EXPECT_EQ(s2_cigar_clipped, s2_rev.CigarData().ToStdString());
+
+        const BamRecordView view
+        {
+            s2_rev,
+            Orientation::GENOMIC,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+
+        EXPECT_EQ(seq_rev_clipped,       view.Sequence());
+        EXPECT_EQ(quals_rev_clipped,     view.Qualities().Fastq());
+        EXPECT_EQ(tagBases_rev_clipped,  view.DeletionTags());
+        EXPECT_EQ(tagQuals_rev_clipped,  view.DeletionQVs().Fastq());
+        EXPECT_EQ(pulseQuals_rev_clipped,  view.LabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_rev_clipped,  view.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames_rev_clipped,    view.IPD().Data());
+        EXPECT_EQ(pulseCall_rev_clipped, view.PulseCalls());
+    }
+
+    {   // s3 - FORWARD
+
+        EXPECT_TRUE(s3.IsMapped());
+        EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+        EXPECT_EQ(clipStart, s3.QueryStart());
+        EXPECT_EQ(clipEnd,   s3.QueryEnd());
+        EXPECT_EQ(clipStart, s3.AlignedStart());     // queryStart (no soft clips)
+        EXPECT_EQ(clipEnd,   s3.AlignedEnd());       // alignStart + seqLength
+        EXPECT_EQ(102, s3.ReferenceStart());         // 100 + startOffset
+        EXPECT_EQ(110, s3.ReferenceEnd());           // RefStart + 5= + 3D
+
+        EXPECT_EQ(s3_cigar_clipped, s3.CigarData().ToStdString());
+
+        const BamRecordView view
+        {
+            s3,
+            Orientation::GENOMIC,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+
+        EXPECT_EQ(seq_clipped,       view.Sequence());
+        EXPECT_EQ(quals_clipped,     view.Qualities().Fastq());
+        EXPECT_EQ(tagBases_clipped,  view.DeletionTags());
+        EXPECT_EQ(tagQuals_clipped,  view.DeletionQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped,  view.LabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_clipped,  view.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames_clipped,    view.IPD().Data());
+        EXPECT_EQ(pulseCall_clipped, view.PulseCalls());
+    }
+
+    {   // s3 - REVERSE
+
+        EXPECT_TRUE(s3_rev.IsMapped());
+        EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
+        EXPECT_EQ(clipStart, s3_rev.QueryStart());
+        EXPECT_EQ(clipEnd,   s3_rev.QueryEnd());
+        EXPECT_EQ(clipStart, s3_rev.AlignedStart());     // queryStart (no soft clips)
+        EXPECT_EQ(clipEnd,   s3_rev.AlignedEnd());       // alignStart + seqLength
+        EXPECT_EQ(102, s3_rev.ReferenceStart());         // 100 + startOffset
+        EXPECT_EQ(110, s3_rev.ReferenceEnd());           // RefStart + 5= + 3D
+
+        EXPECT_EQ(s3_cigar_clipped, s3_rev.CigarData().ToStdString());
+
+        const BamRecordView view
+        {
+            s3_rev,
+            Orientation::GENOMIC,
+            false,
+            false,
+            PulseBehavior::ALL
+        };
+
+        EXPECT_EQ(seq_rev_clipped,       view.Sequence());
+        EXPECT_EQ(quals_rev_clipped,     view.Qualities().Fastq());
+        EXPECT_EQ(tagBases_rev_clipped,  view.DeletionTags());
+        EXPECT_EQ(tagQuals_rev_clipped,  view.DeletionQVs().Fastq());
+        EXPECT_EQ(pulseQuals_rev_clipped,  view.LabelQVs().Fastq());
+        EXPECT_EQ(pulseQuals_rev_clipped,  view.AltLabelQVs().Fastq());
+        EXPECT_EQ(frames_rev_clipped,    view.IPD().Data());
+        EXPECT_EQ(pulseCall_rev_clipped, view.PulseCalls());
+    }
+
 }

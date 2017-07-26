@@ -696,6 +696,9 @@ void BamRecord::ClipFields(const size_t clipFrom,
     }
     impl_.SetSequenceAndQualities(sequence, qualities.Fastq());
 
+    FrameCodec ipdCodec = ReadGroup().IpdCodec();
+    FrameCodec pwCodec = ReadGroup().PulseWidthCodec();
+
     // update BAM tags
     TagCollection tags = impl_.Tags();
     if (HasDeletionQV())
@@ -706,10 +709,18 @@ void BamRecord::ClipFields(const size_t clipFrom,
         tags[internal::Label(BamRecordTag::MERGE_QV)]         = internal::Clip(MergeQV(Orientation::NATIVE), clipFrom, clipLength).Fastq();
     if (HasSubstitutionQV())
         tags[internal::Label(BamRecordTag::SUBSTITUTION_QV)]  = internal::Clip(SubstitutionQV(Orientation::NATIVE), clipFrom, clipLength).Fastq();
-    if (HasIPD())
-        tags[internal::Label(BamRecordTag::IPD)]              = internal::Clip(IPD(Orientation::NATIVE).Data(), clipFrom, clipLength);
-    if (HasPulseWidth())
-        tags[internal::Label(BamRecordTag::PULSE_WIDTH)]      = internal::Clip(PulseWidth(Orientation::NATIVE).Data(), clipFrom, clipLength);
+    if (HasIPD()) {
+        if (ipdCodec == FrameCodec::RAW)
+            tags[internal::Label(BamRecordTag::IPD)]          = internal::Clip(IPD(Orientation::NATIVE).Data(), clipFrom, clipLength);
+        else if (ipdCodec == FrameCodec::V1)
+            tags[internal::Label(BamRecordTag::IPD)]          = internal::Clip(IPD(Orientation::NATIVE).Encode(), clipFrom, clipLength);
+    }
+    if (HasPulseWidth()) {
+        if (pwCodec == FrameCodec::RAW)
+            tags[internal::Label(BamRecordTag::PULSE_WIDTH)]  = internal::Clip(PulseWidth(Orientation::NATIVE).Data(), clipFrom, clipLength);
+        else if (pwCodec == FrameCodec::V1)
+            tags[internal::Label(BamRecordTag::PULSE_WIDTH)]  = internal::Clip(PulseWidth(Orientation::NATIVE).Encode(), clipFrom, clipLength);
+    }
     if (HasDeletionTag())
         tags[internal::Label(BamRecordTag::DELETION_TAG)]     = internal::Clip(DeletionTag(Orientation::NATIVE), clipFrom, clipLength);
     if (HasSubstitutionTag())
