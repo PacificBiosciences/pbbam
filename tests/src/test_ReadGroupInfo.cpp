@@ -35,18 +35,22 @@
 
 // Author: Derek Barnett, Lance Hepler
 
+#include <string>
+#include <vector>
+#include <cstdlib>
+
+#include <gtest/gtest.h>
+
 #ifdef PBBAM_TESTING
 #define private public
 #endif
 
 #include "TestData.h"
-#include <gtest/gtest.h>
+
 #include <pbbam/ReadGroupInfo.h>
 #include <pbbam/exception/BundleChemistryMappingException.h>
 #include <pbbam/exception/InvalidSequencingChemistryException.h>
-#include <string>
-#include <vector>
-#include <cstdlib>
+
 using namespace PacBio::BAM;
 using namespace std;
 

@@ -35,16 +35,19 @@
 
 // Author: Derek Barnett
 
+#include <chrono>
+#include <string>
+
+#include <gtest/gtest.h>
+
 #ifdef PBBAM_TESTING
 #define private public
 #endif
 
-#include <gtest/gtest.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamRecordView.h>
 #include <pbbam/BamTagCodec.h>
-#include <chrono>
-#include <string>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;

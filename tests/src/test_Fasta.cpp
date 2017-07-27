@@ -35,15 +35,18 @@
 
 // Author: Derek Barnett
 
+#include <gtest/gtest.h>
+
 #ifdef PBBAM_TESTING
 #define private public
 #endif
 
 #include "TestData.h"
-#include <gtest/gtest.h>
+
 #include <pbbam/FastaReader.h>
 #include <pbbam/FastaSequence.h>
 #include <pbbam/FastaSequenceQuery.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;

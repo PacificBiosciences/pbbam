@@ -35,23 +35,27 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#define protected public
-#endif
-
-#include "TestData.h"
-#include <gtest/gtest.h>
-#include <htslib/sam.h>
-#include <pbbam/BamFile.h>
-#include <pbbam/BamWriter.h>
-#include <pbbam/EntireFileQuery.h>
 #include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <cstdio>
 #include <cstdlib>
+
+#include <gtest/gtest.h>
+#include <htslib/sam.h>
+
+#ifdef PBBAM_TESTING
+#define private public
+#define protected public
+#endif
+
+#include "TestData.h"
+
+#include <pbbam/BamFile.h>
+#include <pbbam/BamWriter.h>
+#include <pbbam/EntireFileQuery.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::tests;

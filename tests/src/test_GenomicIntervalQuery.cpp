@@ -35,15 +35,19 @@
 
 // Author: Derek Barnett
 
+#include <iostream>
+#include <string>
+
+#include <gtest/gtest.h>
+
 #ifdef PBBAM_TESTING
 #define private public
 #endif
 
 #include "TestData.h"
-#include <gtest/gtest.h>
+
 #include <pbbam/GenomicIntervalQuery.h>
-#include <iostream>
-#include <string>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;

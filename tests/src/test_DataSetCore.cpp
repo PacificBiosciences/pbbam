@@ -35,13 +35,16 @@
 
 // Author: Derek Barnett
 
+#include <string>
+
+#include <gtest/gtest.h>
+
 #ifdef PBBAM_TESTING
 #define private public
 #endif
 
-#include <gtest/gtest.h>
 #include <pbbam/DataSet.h>
-#include <string>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -483,8 +486,9 @@ TEST(DataSetCoreTest, RemoveExternalResources)
     // iterable
     size_t i = 0;
     for (auto r : resources) {
-        if (i == 0)
+        if (i == 0) {
             EXPECT_EQ(string("file2"), r.Name());
+        }
         ++i;
     }
 }

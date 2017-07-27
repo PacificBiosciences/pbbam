@@ -35,15 +35,19 @@
 
 // Author: Derek Barnett
 
+#include <algorithm>
+#include <string>
+
+#include <gtest/gtest.h>
+
 #ifdef PBBAM_TESTING
 #define private public
 #endif
 
 #include "TestData.h"
-#include <gtest/gtest.h>
+
 #include <pbbam/PbiFilterQuery.h>
-#include <algorithm>
-#include <string>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -113,8 +117,11 @@ TEST(PbiFilterQueryTest, QueryOk)
             EXPECT_GE((r.NumMatches()), 1200);
             if (count == 1)
                 EXPECT_EQ(string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2579_4055"), r.FullName());
-            else if (count == 2)
-                EXPECT_EQ(string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/4101_5571"), r.FullName());
+            else {
+                if (count == 2) {
+                    EXPECT_EQ(string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/4101_5571"), r.FullName());
+                }
+            }
         }
         EXPECT_EQ(2, count);
     }

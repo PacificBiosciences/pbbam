@@ -151,6 +151,8 @@ static std::string FrameCodecName(const FrameCodec& codec)
     switch (codec) {
         case FrameCodec::RAW : return codec_RAW;
         case FrameCodec::V1  : return codec_V1;
+        default:
+            throw std::runtime_error{ "unrecognized frame codec" };
     }
 }
 
@@ -161,6 +163,8 @@ static std::string BarcodeModeName(const BarcodeModeType& mode)
         case BarcodeModeType::SYMMETRIC  : return barcodemode_SYM;
         case BarcodeModeType::ASYMMETRIC : return barcodemode_ASYM;
         case BarcodeModeType::TAILED     : return barcodemode_TAIL;
+        default:
+            throw std::runtime_error{ "unrecognized barcode mode type" };
     }
 }
 
@@ -170,6 +174,8 @@ static std::string BarcodeQualityName(const BarcodeQualityType& type)
         case BarcodeQualityType::NONE  : return barcodequal_NONE;
         case BarcodeQualityType::SCORE : return barcodequal_SCORE;
         case BarcodeQualityType::PROBABILITY : return barcodequal_PROB;
+        default:
+            throw std::runtime_error{ "unrecognized barcode quality type" };
     }
 }
 
@@ -179,6 +185,8 @@ static std::string PlatformModelName(const PlatformModelType& type)
         case PlatformModelType::ASTRO  : return platformModelType_ASTRO;
         case PlatformModelType::RS     : return platformModelType_RS;
         case PlatformModelType::SEQUEL : return platformModelType_SEQUEL;
+        default:
+            throw std::runtime_error{ "unrecognized platform model type" };
     }
 }
 

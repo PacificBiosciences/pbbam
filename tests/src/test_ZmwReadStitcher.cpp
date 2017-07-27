@@ -35,18 +35,22 @@
 
 // Author: Derek Barnett
 
+#include <string>
+
+#include <gtest/gtest.h>
+
 #ifdef PBBAM_TESTING
 #define private public
 #endif
 
 #include "TestData.h"
-#include <gtest/gtest.h>
+
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/PbiFilter.h>
 #include <pbbam/virtual/VirtualPolymeraseReader.h>
 #include <pbbam/virtual/VirtualPolymeraseCompositeReader.h>
 #include <pbbam/virtual/ZmwReadStitcher.h>
-#include <string>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;

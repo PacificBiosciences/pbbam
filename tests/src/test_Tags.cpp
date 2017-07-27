@@ -35,21 +35,22 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include <boost/type_traits/is_convertible.hpp>
-#include <gtest/gtest.h>
-#include <pbbam/BamTagCodec.h>
-#include <pbbam/TagCollection.h>
-#include <pbbam/SamTagCodec.h>
 #include <algorithm>
 #include <iostream>
 #include <map>
 #include <string>
-
 #include <typeinfo>
+
+#include <boost/type_traits/is_convertible.hpp>
+#include <gtest/gtest.h>
+
+#ifdef PBBAM_TESTING
+#define private public
+#endif
+
+#include <pbbam/BamTagCodec.h>
+#include <pbbam/TagCollection.h>
+#include <pbbam/SamTagCodec.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -200,7 +201,7 @@ TEST(TagTest, Type_Int8)
     const int8_t v = -42;
     const Tag tag(v);
 
-    int8_t v2;
+    int8_t v2{};
     EXPECT_NO_THROW(v2 = tag.ToInt8());
 
     EXPECT_TRUE(tag.Type() == TagDataType::INT8);
@@ -225,7 +226,7 @@ TEST(TagTest, Type_UInt8)
     const uint8_t v = 42;
     const Tag tag(v);
 
-    uint8_t v2;
+    uint8_t v2{};
     EXPECT_NO_THROW(v2 = tag.ToUInt8());
 
     EXPECT_TRUE(tag.Type() == TagDataType::UINT8);
@@ -335,7 +336,7 @@ TEST(TagTest, Type_Int16)
     const int16_t v = -42;
     const Tag tag(v);
 
-    int16_t v2;
+    int16_t v2{};
     EXPECT_NO_THROW(v2 = tag.ToInt16());
 
     EXPECT_TRUE(tag.Type() == TagDataType::INT16);

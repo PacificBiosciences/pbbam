@@ -35,12 +35,18 @@
 
 // Author: Derek Barnett
 
+#include <string>
+#include <cstdio>
+#include <cstdlib>
+
+#include <gtest/gtest.h>
+
 #ifdef PBBAM_TESTING
 #define private public
 #endif
 
 #include "TestData.h"
-#include <gtest/gtest.h>
+
 #include <pbbam/BamFile.h>
 #include <pbbam/BamReader.h>
 #include <pbbam/BamWriter.h>
@@ -49,9 +55,6 @@
 #include <pbbam/PbiIndex.h>
 #include <pbbam/PbiLookupData.h>
 #include <pbbam/PbiRawData.h>
-#include <string>
-#include <cstdio>
-#include <cstdlib>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
