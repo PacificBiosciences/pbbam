@@ -486,8 +486,9 @@ TEST(DataSetCoreTest, RemoveExternalResources)
     // iterable
     size_t i = 0;
     for (auto r : resources) {
-        if (i == 0)
+        if (i == 0) {
             EXPECT_EQ(string("file2"), r.Name());
+        }
         ++i;
     }
 }

@@ -117,8 +117,11 @@ TEST(PbiFilterQueryTest, QueryOk)
             EXPECT_GE((r.NumMatches()), 1200);
             if (count == 1)
                 EXPECT_EQ(string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2579_4055"), r.FullName());
-            else if (count == 2)
-                EXPECT_EQ(string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/4101_5571"), r.FullName());
+            else {
+                if (count == 2) {
+                    EXPECT_EQ(string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/4101_5571"), r.FullName());
+                }
+            }
         }
         EXPECT_EQ(2, count);
     }
