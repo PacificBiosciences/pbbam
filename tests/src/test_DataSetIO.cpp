@@ -35,21 +35,25 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include "TestData.h"
-#include "../src/FileUtils.h"
-#include <gtest/gtest.h>
-#include <pbbam/DataSet.h>
-#include <pbbam/internal/DataSetElement.h>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
 #include <unistd.h>
+
+#include <gtest/gtest.h>
+
+#ifdef PBBAM_TESTING
+#define private public
+#endif
+
+#include "TestData.h"
+#include "../src/FileUtils.h"
+
+#include <pbbam/DataSet.h>
+#include <pbbam/internal/DataSetElement.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;

@@ -35,15 +35,6 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include <gtest/gtest.h>
-#include <pbbam/BamRecordImpl.h>
-#include <pbbam/BamTagCodec.h>
-#include <pbbam/Tag.h>
-#include <pbbam/TagCollection.h>
 #include <algorithm>
 #include <iostream>
 #include <iterator>
@@ -51,6 +42,18 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <gtest/gtest.h>
+
+#ifdef PBBAM_TESTING
+#define private public
+#endif
+
+#include <pbbam/BamRecordImpl.h>
+#include <pbbam/BamTagCodec.h>
+#include <pbbam/Tag.h>
+#include <pbbam/TagCollection.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 

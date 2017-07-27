@@ -35,22 +35,25 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include <gtest/gtest.h>
-#include <pbbam/BamRecordImpl.h>
-#include <pbbam/BamTagCodec.h>
-#include <pbbam/SamTagCodec.h>
-#include <pbbam/Tag.h>
-#include <pbbam/TagCollection.h>
 #include <algorithm>
 #include <iostream>
 #include <iterator>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <gtest/gtest.h>
+
+#ifdef PBBAM_TESTING
+#define private public
+#endif
+
+#include <pbbam/BamRecordImpl.h>
+#include <pbbam/BamTagCodec.h>
+#include <pbbam/SamTagCodec.h>
+#include <pbbam/Tag.h>
+#include <pbbam/TagCollection.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 
@@ -562,7 +565,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_Preencoded) {
     char* encoded = (char*)::calloc(encodedLength, sizeof(char));
     char* e = encoded;
 
-    uint8_t nucleotideCode;
+    uint8_t nucleotideCode{};
     bool useHighWord = true;
     for (size_t i = 0; i < sequence.size(); ++i) {
         switch (sequence.at(i)) {
@@ -606,7 +609,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_Preencoded_EmptyQual) {
     char* encoded = (char*)::calloc(encodedLength, sizeof(char));
     char* e = encoded;
 
-    uint8_t nucleotideCode;
+    uint8_t nucleotideCode{};
     bool useHighWord = true;
     for (size_t i = 0; i < sequence.size(); ++i) {
         switch (sequence.at(i)) {

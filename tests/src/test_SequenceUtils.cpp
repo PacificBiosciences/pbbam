@@ -35,15 +35,18 @@
 
 // Author: Derek Barnett
 
+#include <string>
+#include <vector>
+#include <climits>
+
+#include <gtest/gtest.h>
+
 #ifdef PBBAM_TESTING
 #define private public
 #endif
 
-#include <gtest/gtest.h>
 #include <pbbam/../../src/SequenceUtils.h>
-#include <string>
-#include <vector>
-#include <climits>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;

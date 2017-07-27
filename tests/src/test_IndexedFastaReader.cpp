@@ -35,19 +35,23 @@
 
 // Author: Derek Barnett
 
+#include <iostream>
+#include <sstream>
+#include <string>
+
+#include <gtest/gtest.h>
+
 #ifdef PBBAM_TESTING
 #define private public
 #endif
 
 #include "TestData.h"
+
 #include "pbbam/IndexedFastaReader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/EntireFileQuery.h"
-#include <gtest/gtest.h>
-#include <iostream>
-#include <sstream>
-#include <string>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;

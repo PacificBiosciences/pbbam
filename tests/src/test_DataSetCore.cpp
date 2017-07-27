@@ -35,13 +35,16 @@
 
 // Author: Derek Barnett
 
+#include <string>
+
+#include <gtest/gtest.h>
+
 #ifdef PBBAM_TESTING
 #define private public
 #endif
 
-#include <gtest/gtest.h>
 #include <pbbam/DataSet.h>
-#include <string>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;

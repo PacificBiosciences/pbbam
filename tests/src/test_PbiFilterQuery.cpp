@@ -35,15 +35,19 @@
 
 // Author: Derek Barnett
 
+#include <algorithm>
+#include <string>
+
+#include <gtest/gtest.h>
+
 #ifdef PBBAM_TESTING
 #define private public
 #endif
 
 #include "TestData.h"
-#include <gtest/gtest.h>
+
 #include <pbbam/PbiFilterQuery.h>
-#include <algorithm>
-#include <string>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;

@@ -35,17 +35,20 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include <gtest/gtest.h>
-#include <htslib/sam.h>
-#include <pbbam/BamHeader.h>
 #include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <gtest/gtest.h>
+#include <htslib/sam.h>
+
+#ifdef PBBAM_TESTING
+#define private public
+#endif
+
+#include <pbbam/BamHeader.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;

@@ -35,25 +35,25 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include "TestData.h"
-#include <gtest/gtest.h>
-#include <pbbam/../../src/FileUtils.h>
-#include <pbbam/../../src/TimeUtils.h>
-
-#include <boost/algorithm/string.hpp>
-
 #include <chrono>
 #include <string>
 #include <vector>
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
-
 #include <iostream>
+
+#include <boost/algorithm/string.hpp>
+#include <gtest/gtest.h>
+
+#ifdef PBBAM_TESTING
+#define private public
+#endif
+
+#include "TestData.h"
+
+#include <pbbam/../../src/FileUtils.h>
+#include <pbbam/../../src/TimeUtils.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
