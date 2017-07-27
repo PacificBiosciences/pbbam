@@ -145,7 +145,7 @@ static inline bool isBracketed(const std::string& value)
     static const std::string closeBrackets = "])}";
     return openBrackets.find(value.at(0)) != std::string::npos &&
            closeBrackets.find(value.at(value.length()-1)) != std::string::npos;
-};
+}
 
 static inline bool isList(const std::string& value)
 {
