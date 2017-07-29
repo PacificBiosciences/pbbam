@@ -80,7 +80,7 @@ set(HTSLIB_SEARCH_DIRS
 set(_htslib_ver_path "htslib-${htslib_FIND_VERSION}")
 
 # Dependencies
-libfind_package(HTSlib ZLIB)
+#libfind_package(HTSlib ZLIB)
 #libfind_package(HTSlib BZip2)
 #libfind_package(HTSlib LibLZMA)
 #libfind_package(HTSlib CURL)
@@ -107,12 +107,12 @@ find_library(HTSlib_LIBRARY
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this lib depends on.
 set(HTSlib_PROCESS_INCLUDES HTSlib_INCLUDE_DIR
-    ZLIB_INCLUDE_DIR
+    ZLIB_CFLAGS
     BZIP2_INCLUDE_DIR
     LIBLZMA_INCLUDE_DIRS
     CURL_INCLUDE_DIRS)
 set(HTSlib_PROCESS_LIBS HTSlib_LIBRARY
-    ZLIB_LIBRARIES
+    ZLIB_LDFLAGS
     BZIP2_LIBRARIES
     LIBLZMA_LIBRARIES
     CURL_LIBRARIES)
