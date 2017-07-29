@@ -19,8 +19,10 @@ endif()
 
 # htslib
 if(NOT HTSLIB_INCLUDE_DIRS OR NOT HTSLIB_LIBRARIES)
-    add_subdirectory(third-party/htslib external/htslib)
-else()
+    find_package(HTSlib)
+    set(hts_INCLUDE_DIRS ${HTSlib_INCLUDE_DIRS})
+    set(hts_LIBRARIES    ${HTSlib_LIBRARIES})
+else()    
     set(hts_INCLUDE_DIRS ${HTSLIB_INCLUDE_DIRS})
     set(hts_LIBRARIES    ${HTSLIB_LIBRARIES})
 endif()

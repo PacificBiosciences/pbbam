@@ -27,7 +27,7 @@ Additional requirements:
 * `Boost`_ (1.55+)
 * `CMake`_ (3.0+)
 * `Google Test`_
-* `htslib`_ (PacBio fork)
+* `htslib`_ (1.3.1+)
 
 For additional languages:
 
@@ -45,7 +45,7 @@ For maximal convenience, install htslib and google test in the same parent direc
 .. _Doxygen: http://www.stack.nl/~dimitri/doxygen/
 .. _gcc: https://gcc.gnu.org/
 .. _Google Test: https://github.com/google/googletest
-.. _htslib: https://github.com/PacificBiosciences/htslib.git 
+.. _htslib: https://github.com/samtools/htslib.git 
 .. _SWIG: http://www.swig.org/
 
 .. _getting_started-build:
@@ -60,6 +60,8 @@ Clone & Build
    instructions for :ref:`additional languages <swig_bindings>`.
 
 The basic steps for obtaining pbbam and building it from source are as follows:
+
+Build and install htslib, per the project's instructions (or on OSX "brew install htslib").
 
 .. code-block:: console
 
@@ -79,14 +81,13 @@ Output:
 You may need to set a few options on the cmake command, to point to dependencies' install locations. 
 Common installation-related options include:
 
-  * HTSLIB_ROOTDIR
   * GTEST_SRC_DIR
   
 Add these using the '-D' argument, like this:
 
 .. code-block:: console
 
-   $ cmake .. -DHTSLIB_ROOTDIR="path/to/htslib"
+   $ cmake .. -DGTEST_SRC_DIR="path/to/googletest"
  
 To run the test suite, run:
 

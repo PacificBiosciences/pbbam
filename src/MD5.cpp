@@ -40,27 +40,51 @@
 // Author: Brett Bowman
 
 #include "pbbam/MD5.h"
-#include <cram/md5.h>
+#include <htslib/hts.h>
+#include <stdexcept>
 
 namespace PacBio {
 namespace BAM {
+
+class Md5ContextHelper
+{
+public:
+    Md5ContextHelper(void)
+        : data_(hts_md5_init())
+    {
+        if (data_ == nullptr)
+            throw std::runtime_error("could not initialize MD5 context");
+    }
+
+    ~Md5ContextHelper(void)
+    {
+        hts_md5_destroy(data_);
+    }
+
+public:
+    std::string Encoded(const std::string& str)
+    {
+        hts_md5_update(data_, reinterpret_cast<void*>(const_cast<char*>(str.c_str())), str.size());
+
+        unsigned char digest[16];
+        hts_md5_final(digest, data_);
+
+        char hexdigest[33]; // leave space for null-term
+        hts_md5_hex(hexdigest, digest);
+
+        return std::string{ hexdigest, 32 };
+    }
+
+private:
+    hts_md5_context* data_;
+};
 
 /// \brief MD5 hash of a string as a 32-digit hexadecimal string
 ///
 std::string MD5Hash(const std::string& str)
 {
-    MD5_CTX md5;
-    unsigned char digest[16];
-    char hexdigest[33];
-
-    MD5_Init(&md5);
-    MD5_Update(&md5, reinterpret_cast<void*>(const_cast<char*>(str.c_str())), str.size());
-    MD5_Final(digest, &md5);
-
-    for (int i = 0; i < 16; ++i)
-        sprintf(&hexdigest[2*i], "%02x", digest[i]);
-
-   return std::string{hexdigest, 32};
+    Md5ContextHelper md5;
+    return md5.Encoded(str);
 }
 
 } // namespace BAM
