@@ -40,7 +40,7 @@ target_include_directories(pbbam
     ${PacBioBAM_IncludeDir}
     ${hts_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
-    ${ZLIB_INCLUDE_DIRS}
+    ${ZLIB_LDFLAGS}
 )
 
 # set link dependencies
