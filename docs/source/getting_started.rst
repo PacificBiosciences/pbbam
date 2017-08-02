@@ -42,6 +42,8 @@ For maximal convenience, install htslib and google test in the same parent direc
 .. _Boost: http://www.boost.org/
 .. _clang: http://clang.llvm.org/
 .. _CMake: https://cmake.org/
+.. _Meson: http://mesonbuild.com/
+.. _Ninja: https://ninja-build.org/ (only required when using Meson, optional for CMake)
 .. _Doxygen: http://www.stack.nl/~dimitri/doxygen/
 .. _gcc: https://gcc.gnu.org/
 .. _Google Test: https://github.com/google/googletest
@@ -63,10 +65,23 @@ The basic steps for obtaining pbbam and building it from source are as follows:
 
 Build and install htslib, per the project's instructions (or on OSX "brew install htslib").
 
+Clone
+^^^^^
+
+You should first clone the repository:
+
 .. code-block:: console
 
    $ git clone https://github.com/PacificBiosciences/pbbam.git
    $ cd pbbam
+
+Building with CMake
+^^^^^^^^^^^^^^^^^^^
+
+When building with CMake, create a separate build directory:
+
+.. code-block:: console
+
    $ mkdir build
    $ cd build
    $ cmake ..
@@ -105,6 +120,34 @@ And then open <pbbam_root>/docs/html/index.html in your favorite browser.
 
 .. _getting_started-integrate:
 
+Building with Meson
+^^^^^^^^^^^^^^^^^^^
+
+Building with Meson is generally faster and more versatile. Meson strictly requires building out of source:
+
+.. code-block:: console
+
+   $ mkdir build
+   $ cd build
+   $ meson --prefix /my/install/prefix -Denable-pbbam-tests=true ..
+   $ ninja
+
+where ninja will by default utilize a number of threads for compilation equal to the number of logical
+cores on your system. Here ``-Denable-pbbam-tests=true`` enables pulling in dependencies for testing. In
+order to run the test suite, run:
+
+.. code-block:: console
+
+   $ ninja test
+
+If you wish to install pbbam, run:
+
+.. code-block:: console
+
+   $ ninja install
+
+and ninja will install pbbam to ``/my/install/prefix``.
+
 Integrate
 ---------
 
@@ -142,4 +185,8 @@ Non-CMake projects
 ``````````````````
 
 If you're using something other than CMake for your project's build system, then you need to point 
-it to pbbam's include directory & library, as well as those of its dependencies (primarily htslib). 
+it to pbbam's include directory & library, as well as those of its dependencies (primarily htslib).
+
+If you built and installed pbbam using Meson, pkg-config files will be available to be consumed by
+projects wishing to utilize pbbam. Autoconf, CMake, Waf, SCons and Meson all have means to determine
+dependency information from pkg-config files.
