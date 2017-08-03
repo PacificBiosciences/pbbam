@@ -19,7 +19,7 @@ pbbam_bam2sam = executable(
     'bam2sam/src/main.cpp',
     'bam2sam/src/Bam2Sam.cpp'
   ],
-  dependencies : pbbam_htslib_dep,
+  dependencies : [pbbam_htslib_dep, pbbam_thread_dep], 
   include_directories : [pbbam_include_directories, include_directories('bam2sam')],
   install : get_option('enable-pbbam-build-tools'),
   build_rpath : pbbam_htslib_libdir,
