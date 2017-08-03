@@ -20,14 +20,6 @@ set_target_properties(pbbam PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}
 )
 
-if(PacBioBAM_wrap_r)
-    # SWIG R does not support std::shared_ptr, but it does support boost::shared_ptr
-    # So force boost if we're wrapping for R.
-    target_compile_definitions(pbbam
-        PUBLIC -DPBBAM_USE_BOOST_SHARED_PTR
-    )
-endif()
-
 if(PacBioBAM_auto_validate)
     target_compile_definitions(pbbam
         PUBLIC "-DPBBAM_AUTOVALIDATE=1"
@@ -74,6 +66,3 @@ set(PacBioBAM_LIBRARIES
     "${PROJECT_NAME}: Libraries"
     FORCE
 )
-
-# add SWIG directory
-add_subdirectory(swig)
