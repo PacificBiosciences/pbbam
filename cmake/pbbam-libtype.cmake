@@ -1,6 +1,6 @@
 
 # determine if we need a shared lib
-if(PacBioBAM_build_shared OR ${wrapping_swig})
+if(PacBioBAM_build_shared)
     set(BUILD_SHARED_LIBS ON)
     set(htslib_build_shared ON CACHE BOOL "force htslibConfig to export proper library name")
     set(PB_LIB_MODE SHARED)

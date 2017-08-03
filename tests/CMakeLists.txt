@@ -37,12 +37,6 @@ if(PacBioBAM_build_tests)
         add_definitions(-D_ALLOW_KEYWORD_MACROS)
     endif()
 
-    if(PacBioBAM_wrap_r)
-        # SWIG R does not support std::shared_ptr, but it does support boost::shared_ptr
-        # So force boost if we're wrapping for R.
-        add_definitions(-DPBBAM_USE_BOOST_SHARED_PTR)
-    endif()
-
     add_executable(test_pbbam ${SOURCES})
     set_target_properties(test_pbbam PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${PacBioBAM_BinDir}
