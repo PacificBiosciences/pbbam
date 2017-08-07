@@ -54,7 +54,7 @@ class BamWriterPrivate : public internal::FileProducer
 {
 public:
     BamWriterPrivate(const std::string& filename,
-                     const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader,
+                     const std::shared_ptr<bam_hdr_t> rawHeader,
                      const BamWriter::CompressionLevel compressionLevel,
                      const size_t numThreads,
                      const BamWriter::BinCalculationMode binCalculationMode);
@@ -67,11 +67,11 @@ public:
 public:
     bool calculateBins_;
     std::unique_ptr<samFile, internal::HtslibFileDeleter> file_;
-    PBBAM_SHARED_PTR<bam_hdr_t> header_;
+    std::shared_ptr<bam_hdr_t> header_;
 };
 
 BamWriterPrivate::BamWriterPrivate(const std::string& filename,
-                                   const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader,
+                                   const std::shared_ptr<bam_hdr_t> rawHeader,
                                    const BamWriter::CompressionLevel compressionLevel,
                                    const size_t numThreads,
                                    const BamWriter::BinCalculationMode binCalculationMode)

@@ -132,7 +132,7 @@ BamRecord BamRecordBuilder::Build(void) const
 bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
 {
     // initialize with basic 'core data'
-    PBBAM_SHARED_PTR<bam1_t> recordRawData = internal::BamRecordMemory::GetRawData(record); /*   record.impl_.RawData().get();*/
+    auto recordRawData = internal::BamRecordMemory::GetRawData(record);
     if (!recordRawData || !recordRawData->data)
         throw std::runtime_error("BamRecord memory in invalid state");    
     recordRawData->core = core_;
@@ -271,7 +271,7 @@ void BamRecordBuilder::Reset(const BamRecord& prototype)
     header_ = prototype.Header();
 
     // reset core data
-    const PBBAM_SHARED_PTR<bam1_t> rawData = internal::BamRecordMemory::GetRawData(prototype); //  prototype.impl_.RawData().get();
+    const auto rawData = internal::BamRecordMemory::GetRawData(prototype); //  prototype.impl_.RawData().get();
     if (!rawData)
         throw std::runtime_error("BamRecord memory in invalid state");    
     core_ = rawData->core;
@@ -292,7 +292,7 @@ void BamRecordBuilder::Reset(BamRecord&& prototype)
     header_ = prototype.Header();
 
     // reset core data
-    const PBBAM_SHARED_PTR<bam1_t> rawData = internal::BamRecordMemory::GetRawData(prototype); //  prototype.impl_.RawData().get();
+    const auto rawData = internal::BamRecordMemory::GetRawData(prototype); //  prototype.impl_.RawData().get();
     if (!rawData)
         throw std::runtime_error("BamRecord memory in invalid state");    
     core_ = std::move(rawData->core);

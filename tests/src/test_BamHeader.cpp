@@ -234,7 +234,7 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
 
 
     const string& text = header.ToSam();
-    PBBAM_SHARED_PTR<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), tests::BamHdrDeleter());
+    std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), tests::BamHdrDeleter());
     rawData->ignore_sam_err = 0;
     rawData->cigar_tab = NULL;
     rawData->l_text = text.size();
@@ -287,7 +287,7 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
 
 
     string text = header.ToSam();
-    PBBAM_SHARED_PTR<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), tests::BamHdrDeleter());
+    std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), tests::BamHdrDeleter());
     rawData->ignore_sam_err = 0;
     rawData->cigar_tab = NULL;
     rawData->l_text = text.size();

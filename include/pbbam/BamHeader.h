@@ -46,6 +46,7 @@
 #include "pbbam/ProgramInfo.h"
 #include "pbbam/ReadGroupInfo.h"
 #include "pbbam/SequenceInfo.h"
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -416,7 +417,7 @@ public:
     /// \}
 
 private:
-    PBBAM_SHARED_PTR<internal::BamHeaderPrivate> d_;
+    std::shared_ptr<internal::BamHeaderPrivate> d_;
 };
 
 } // namespace BAM

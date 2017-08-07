@@ -50,6 +50,7 @@
 #include "pbbam/TagCollection.h"
 #include <htslib/sam.h>
 #include <map>
+#include <memory>
 #include <string>
 
 namespace PacBio {
@@ -595,7 +596,7 @@ public:
 
 private:
     // returns a BamRecordImpl object, with a deep copy of @rawData contents
-    static BamRecordImpl FromRawData(const PBBAM_SHARED_PTR<bam1_t>& rawData);
+    static BamRecordImpl FromRawData(const std::shared_ptr<bam1_t>& rawData);
 
     // internal memory setup/expand methods
     void InitializeData(void);
@@ -619,7 +620,7 @@ private:
 private:
 
     // data members
-    PBBAM_SHARED_PTR<bam1_t> d_;
+    std::shared_ptr<bam1_t> d_;
     mutable std::map<uint16_t, int> tagOffsets_;
 
     // friends

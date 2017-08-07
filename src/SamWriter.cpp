@@ -50,7 +50,7 @@ class SamWriterPrivate : public internal::FileProducer
 {
 public:
     SamWriterPrivate(const std::string& filename,
-                     const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader)
+                     const std::shared_ptr<bam_hdr_t> rawHeader)
         : internal::FileProducer(filename)
         , file_(nullptr)
         , header_(rawHeader)
@@ -76,7 +76,7 @@ public:
 
 private:
     std::unique_ptr<samFile, internal::HtslibFileDeleter> file_;
-    PBBAM_SHARED_PTR<bam_hdr_t> header_;
+    std::shared_ptr<bam_hdr_t> header_;
 };
 
 void SamWriterPrivate::TryFlush(void)
