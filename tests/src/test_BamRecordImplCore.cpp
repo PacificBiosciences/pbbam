@@ -121,7 +121,7 @@ void CheckRawData(const BamRecordImpl& bam)
 
 TEST(BamRecordImplCoreTest, RawDataDefaultValues)
 {
-    PBBAM_SHARED_PTR<bam1_t> rawData(bam_init1(), tests::Bam1Deleter());
+    std::shared_ptr<bam1_t> rawData(bam_init1(), tests::Bam1Deleter());
     ASSERT_TRUE((bool)rawData);
 
     // fixed-length (core) data
@@ -151,7 +151,7 @@ TEST(BamRecordImplCoreTest, DefaultValues)
     // check raw data
     // -------------------------------
 
-    const PBBAM_SHARED_PTR<bam1_t> rawData = bam.d_;
+    const auto rawData = bam.d_;
     ASSERT_TRUE((bool)rawData);
 
     // fixed-length (core) data
@@ -231,7 +231,7 @@ TEST(BamRecordImplCoreTest, CoreSetters)
     // check raw data
     // -------------------------------
 
-    const PBBAM_SHARED_PTR<bam1_t> rawData = bam.d_;
+    const auto rawData = bam.d_;
     ASSERT_TRUE((bool)rawData);
 
     // fixed-length (core) data
@@ -276,7 +276,7 @@ TEST(BamRecordImplCoreTest, CoreSetters)
 TEST(BamRecordImplCoreTest, DeepCopyFromRawData)
 {
     // init raw data
-    PBBAM_SHARED_PTR<bam1_t> rawData(bam_init1(), tests::Bam1Deleter());
+    std::shared_ptr<bam1_t> rawData(bam_init1(), tests::Bam1Deleter());
     ASSERT_TRUE((bool)rawData);
 
     rawData->core.tid = 42;

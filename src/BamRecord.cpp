@@ -122,7 +122,7 @@ std::pair<int32_t, int32_t> AlignedOffsets(const BamRecord& record,
     int32_t startOffset = 0;
     int32_t endOffset = seqLength;
 
-    PBBAM_SHARED_PTR<bam1_t> b = internal::BamRecordMemory::GetRawData(record);
+    const auto b = internal::BamRecordMemory::GetRawData(record);
     uint32_t* cigarData = bam_get_cigar(b.get());
     const size_t numCigarOps = b->core.n_cigar;
     if (numCigarOps > 0) {
@@ -1823,7 +1823,7 @@ size_t BamRecord::NumMatches(void) const
 std::pair<size_t, size_t> BamRecord::NumMatchesAndMismatches(void) const
 {
     std::pair<size_t, size_t> result = std::make_pair(0,0);
-    PBBAM_SHARED_PTR<bam1_t> b = internal::BamRecordMemory::GetRawData(this);
+    auto b = internal::BamRecordMemory::GetRawData(this);
     uint32_t* cigarData = bam_get_cigar(b.get());
     for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
         const CigarOperationType type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
@@ -2253,7 +2253,7 @@ Position BamRecord::ReferenceEnd(void) const
 {
     if (!impl_.IsMapped())
         return PacBio::BAM::UnmappedPosition;
-    PBBAM_SHARED_PTR<bam1_t> htsData = internal::BamRecordMemory::GetRawData(impl_);
+    const auto htsData = internal::BamRecordMemory::GetRawData(impl_);
     if (!htsData)
         return PacBio::BAM::UnmappedPosition;
     return bam_endpos(htsData.get());

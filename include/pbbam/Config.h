@@ -42,6 +42,7 @@
 #ifndef PBBAM_CONFIG_H
 #define PBBAM_CONFIG_H
 
+#include <cstddef>
 #include <cstdint>
 
 #ifndef INT8_MAX
@@ -106,24 +107,6 @@
 #  else
 #    define PBBAM_EXPORT PBBAM_LIBRARY_IMPORT
 #  endif
-#endif
-
-/// \}
-
-/// \name Shared Pointer Settings
-/// \{
-
-// uncomment this define, or pass via command-line (-DPBBAM_USE_BOOST_SHARED_PTR),
-// to use boost::shared_ptr<T> instead of std::shared_ptr<T>
-//
-//#define PBBAM_USE_BOOST_SHARED_PTR
-
-#ifdef PBBAM_USE_BOOST_SHARED_PTR
-#  include <boost/smart_ptr/shared_ptr.hpp>
-#  define PBBAM_SHARED_PTR boost::shared_ptr
-#else
-#  include <memory>
-#  define PBBAM_SHARED_PTR std::shared_ptr
 #endif
 
 /// \}

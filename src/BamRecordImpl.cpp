@@ -235,7 +235,7 @@ bool BamRecordImpl::EditTag(const BamRecordTag tag,
                    additionalModifier);
 }
 
-BamRecordImpl BamRecordImpl::FromRawData(const PBBAM_SHARED_PTR<bam1_t>& rawData)
+BamRecordImpl BamRecordImpl::FromRawData(const std::shared_ptr<bam1_t>& rawData)
 {
     BamRecordImpl result;
     bam_copy1(result.d_.get(), rawData.get());

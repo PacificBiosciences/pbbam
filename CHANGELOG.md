@@ -10,6 +10,12 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.9.0] - 2017-08-07
+
+### Removed
+- Bundled htslib. Now using 'stock' htslib (v1.3.1+).
+- Built-in SWIG wrappers. 
+
 ## [0.8.0] - 2017-07-24
 
 ### Added

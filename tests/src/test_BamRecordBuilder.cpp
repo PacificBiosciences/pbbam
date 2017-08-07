@@ -89,7 +89,7 @@ TEST(BamRecordBuilderTest, DefaultValues)
     BamRecordBuilder builder;
     BamRecord bam = builder.Build();
 
-    const PBBAM_SHARED_PTR<bam1_t> rawData = bam.impl_.d_;
+    const auto rawData = bam.impl_.d_;
     ASSERT_TRUE((bool)rawData);
 
     // fixed-length (core) data
@@ -171,7 +171,7 @@ TEST(BamRecordBuilderTest, CheckSetters)
     // check raw data
     // -------------------------------
 
-    const PBBAM_SHARED_PTR<bam1_t> rawData = bam.impl_.d_;
+    const auto rawData = bam.impl_.d_;
     ASSERT_TRUE((bool)rawData);
 
     // fixed-length (core) data
