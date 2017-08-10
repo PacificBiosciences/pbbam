@@ -14,5 +14,6 @@ tests/bin/test_pbbam
 tests/data/test_group_query/group.fofn
 tests/src/TestData.h
 
-# meson wrapDB directory
-subprojects/
+# Meson WrapDB stuff
+subprojects/packagecache/
+subprojects/googletest*
