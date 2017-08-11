@@ -2,7 +2,7 @@
 # sources #
 ###########
 
-pbbam_cpp_sources = [
+pbbam_cpp_sources = files([
   'Accuracy.cpp',
   'AlignmentPrinter.cpp',
   'BaiIndexedBamReader.cpp',
@@ -80,7 +80,7 @@ pbbam_cpp_sources = [
 
   # XML I/O
   'pugixml/pugixml.cpp'
-]
+])
 
 pbbam_extra_flags = ['-DPBBAM_LIBRARY']
 
@@ -92,25 +92,8 @@ pbbam_lib = library(
   'pbbam',
   pbbam_cpp_sources,
   soversion : 0,
+  version : meson.project_version(),
   install : true,
   dependencies : [pbbam_thread_dep, pbbam_boost_dep, pbbam_zlib_dep, pbbam_htslib_dep],
   include_directories : pbbam_include_directories,
   cpp_args : [pbbam_extra_flags, pbbam_warning_flags])
-
-###################
-# dependency info #
-###################
-
-import('pkgconfig').generate(
-  libraries : pbbam_lib,
-  version : meson.project_version(),
-  name : 'pbbam',
-  requires : 'htslib',
-  filebase : 'pbbam',
-  description : 'Library for accessing PacBio-compatible BAM files')
-
-declare_dependency(
-  include_directories : pbbam_include_directories,
-  link_with : pbbam_lib,
-  version : meson.project_version(),
-  sources : pbbam_cpp_sources)
