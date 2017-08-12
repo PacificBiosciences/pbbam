@@ -55,9 +55,7 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-namespace PacBio {
-namespace BAM {
-namespace tests {
+namespace ValidatorTests {
 
 static BamRecord makeValidMappedRecord(void)
 {
@@ -151,9 +149,7 @@ static const ReadGroupInfo validReadGroup       = makeValidReadGroup();
 static const BamRecord     validMappedRecord    = makeValidMappedRecord();
 static const BamRecord     validUnmappedRecord  = makeValidUnmappedRecord();
 
-} // namespace tests
-} // namespace BAM
-} // namespace PacBio
+} // namespace ValidatorTests
 
 TEST(ValidatorErrorsTest, SetMaxNumErrors)
 {
@@ -213,49 +209,49 @@ TEST(ValidatorErrorsTest, ExceptionFromResults)
 
 TEST(ValidatorTest, ValidReadGroup)
 {
-    ASSERT_NO_THROW(Validator::Validate(tests::validReadGroup));
+    ASSERT_NO_THROW(Validator::Validate(ValidatorTests::validReadGroup));
 }
 
 TEST(ValidatorTest, ReadGroupRequiredComponents)
 {
     {   // missing ID
-        ReadGroupInfo rg = tests::validReadGroup;
+        ReadGroupInfo rg = ValidatorTests::validReadGroup;
         rg.Id("");
         EXPECT_THROW(Validator::Validate(rg), ValidationException);
         EXPECT_FALSE(Validator::IsValid(rg));
     }
     {   // missing movie name
-        ReadGroupInfo rg = tests::validReadGroup;
+        ReadGroupInfo rg = ValidatorTests::validReadGroup;
         rg.MovieName("");
         EXPECT_THROW(Validator::Validate(rg), ValidationException);
         EXPECT_FALSE(Validator::IsValid(rg));
     }
     {   // missing read type
-        ReadGroupInfo rg = tests::validReadGroup;
+        ReadGroupInfo rg = ValidatorTests::validReadGroup;
         rg.ReadType("");
         EXPECT_THROW(Validator::Validate(rg), ValidationException);
         EXPECT_FALSE(Validator::IsValid(rg));
     }
     {   // missing binding kit
-        ReadGroupInfo rg = tests::validReadGroup;
+        ReadGroupInfo rg = ValidatorTests::validReadGroup;
         rg.BindingKit("");
         EXPECT_THROW(Validator::Validate(rg), ValidationException);
         EXPECT_FALSE(Validator::IsValid(rg));
     }
     {   // missing sequencing kit
-        ReadGroupInfo rg = tests::validReadGroup;
+        ReadGroupInfo rg = ValidatorTests::validReadGroup;
         rg.SequencingKit("");
         EXPECT_THROW(Validator::Validate(rg), ValidationException);
         EXPECT_FALSE(Validator::IsValid(rg));
     }
     {   // missing basecaller version
-        ReadGroupInfo rg = tests::validReadGroup;
+        ReadGroupInfo rg = ValidatorTests::validReadGroup;
         rg.BasecallerVersion("");
         EXPECT_THROW(Validator::Validate(rg), ValidationException);
         EXPECT_FALSE(Validator::IsValid(rg));
     }
     {   // missing frame rate
-        ReadGroupInfo rg = tests::validReadGroup;
+        ReadGroupInfo rg = ValidatorTests::validReadGroup;
         rg.FrameRateHz("");
         EXPECT_THROW(Validator::Validate(rg), ValidationException);
         EXPECT_FALSE(Validator::IsValid(rg));
@@ -265,25 +261,25 @@ TEST(ValidatorTest, ReadGroupRequiredComponents)
 TEST(ValidatorTest, ReadGroupValues)
 {
     {   // mismatch expected ID vs stored ID - change ID
-        ReadGroupInfo rg = tests::validReadGroup;
+        ReadGroupInfo rg = ValidatorTests::validReadGroup;
         rg.Id("deadbeef");
         EXPECT_THROW(Validator::Validate(rg), ValidationException);
         EXPECT_FALSE(Validator::IsValid(rg));
     }
     {   // mismatch expected ID vs stored ID - change read type
-        ReadGroupInfo rg = tests::validReadGroup;
+        ReadGroupInfo rg = ValidatorTests::validReadGroup;
         rg.ReadType("SUBREAD");
         EXPECT_THROW(Validator::Validate(rg), ValidationException);
         EXPECT_FALSE(Validator::IsValid(rg));
     }
     {   // mismatch expected ID vs stored ID - change movie name
-        ReadGroupInfo rg = tests::validReadGroup;
+        ReadGroupInfo rg = ValidatorTests::validReadGroup;
         rg.MovieName("foo");
         EXPECT_THROW(Validator::Validate(rg), ValidationException);
         EXPECT_FALSE(Validator::IsValid(rg));
     }
     {   // unknown read type
-        ReadGroupInfo rg = tests::validReadGroup;
+        ReadGroupInfo rg = ValidatorTests::validReadGroup;
         rg.ReadType("FOO");
 
         // recompute ID so we're only checking the new read type, not read ID
@@ -293,25 +289,25 @@ TEST(ValidatorTest, ReadGroupValues)
         EXPECT_FALSE(Validator::IsValid(rg));
     }
     {   // invalid chemistry triple - change binding kit
-        ReadGroupInfo rg = tests::validReadGroup;
+        ReadGroupInfo rg = ValidatorTests::validReadGroup;
         rg.BindingKit("foo");
         EXPECT_THROW(Validator::Validate(rg), ValidationException);
         EXPECT_FALSE(Validator::IsValid(rg));
     }
     {   // invalid chemistry triple - change sequencing kit
-        ReadGroupInfo rg = tests::validReadGroup;
+        ReadGroupInfo rg = ValidatorTests::validReadGroup;
         rg.SequencingKit("foo");
         EXPECT_THROW(Validator::Validate(rg), ValidationException);
         EXPECT_FALSE(Validator::IsValid(rg));
     }
     {   // invalid chemistry triple - change basecaller version
-        ReadGroupInfo rg = tests::validReadGroup;
+        ReadGroupInfo rg = ValidatorTests::validReadGroup;
         rg.BasecallerVersion("0.42");
         EXPECT_THROW(Validator::Validate(rg), ValidationException);
         EXPECT_FALSE(Validator::IsValid(rg));
     }
     { // non-numeric frame rate
-        ReadGroupInfo rg = tests::validReadGroup;
+        ReadGroupInfo rg = ValidatorTests::validReadGroup;
         rg.FrameRateHz("foo");
         EXPECT_THROW(Validator::Validate(rg), ValidationException);
         EXPECT_FALSE(Validator::IsValid(rg));
@@ -411,7 +407,7 @@ TEST(ValidatorTest, ValidRecord)
               "FRAMERATEHZ=75.000000;BINDINGKIT=100356300;SEQUENCINGKIT=100356200"
               "\tPU:movie1\n"
     };
-    BamRecord record(tests::validMappedRecord);
+    BamRecord record(ValidatorTests::validMappedRecord);
     record.header_ = validMappedHeader;
     ASSERT_NO_THROW(Validator::Validate(record));
 }
@@ -437,7 +433,7 @@ void CheckInvalidTagLength(const std::string& tagName, const Tag& tag)
             "SEQUENCINGKIT=100356200;BASECALLERVERSION=2.1;FRAMERATEHZ=75.000000\t"
             "PU:m140906_231018_42161_c100676332550000001823129611271486_s1_p0\n"
     };
-    BamRecord record(tests::validUnmappedRecord);
+    BamRecord record(ValidatorTests::validUnmappedRecord);
     record.header_ = validUnmappedHeader;
 
     ModifyTag(&record, tagName, tag);
@@ -460,7 +456,7 @@ TEST(ValidatorTest, TagDataLengths)
     // queryStart/queryEnd
 
     {   // SEQ
-        BamRecord record(tests::validUnmappedRecord);
+        BamRecord record(ValidatorTests::validUnmappedRecord);
         record.header_ = validUnmappedHeader;
         record.Impl().SetSequenceAndQualities("AA");
         EXPECT_THROW(Validator::Validate(record), ValidationException);
@@ -508,49 +504,49 @@ TEST(ValidatorTest, TagDataValues)
     };
 
     {   // missing qe
-        BamRecord record(tests::validMappedRecord);
+        BamRecord record(ValidatorTests::validMappedRecord);
         record.header_ = validMappedHeader;
         record.Impl().RemoveTag("qe");
         EXPECT_THROW(Validator::Validate(record), ValidationException);
         EXPECT_FALSE(Validator::IsValid(record));
     }
     {   // missing qs
-        BamRecord record(tests::validMappedRecord);
+        BamRecord record(ValidatorTests::validMappedRecord);
         record.header_ = validMappedHeader;
         record.Impl().RemoveTag("qs");
         EXPECT_THROW(Validator::Validate(record), ValidationException);
         EXPECT_FALSE(Validator::IsValid(record));
     }
     {   // queryStart should be < queryEnd
-        BamRecord record(tests::validMappedRecord);
+        BamRecord record(ValidatorTests::validMappedRecord);
         record.header_ = validMappedHeader;
         record.QueryStart(10);
         EXPECT_THROW(Validator::Validate(record), ValidationException);
         EXPECT_FALSE(Validator::IsValid(record));
     }
     {  // missing zm
-        BamRecord record(tests::validMappedRecord);
+        BamRecord record(ValidatorTests::validMappedRecord);
         record.header_ = validMappedHeader;
         record.Impl().RemoveTag("zm");
         EXPECT_THROW(Validator::Validate(record), ValidationException);
         EXPECT_FALSE(Validator::IsValid(record));
     }
     {   // missing np
-        BamRecord record(tests::validMappedRecord);
+        BamRecord record(ValidatorTests::validMappedRecord);
         record.header_ = validMappedHeader;
         record.Impl().RemoveTag("np");
         EXPECT_THROW(Validator::Validate(record), ValidationException);
         EXPECT_FALSE(Validator::IsValid(record));
     }
     {   // numPasses for SUBREAD type records should be 1
-        BamRecord record(tests::validMappedRecord);
+        BamRecord record(ValidatorTests::validMappedRecord);
         record.header_ = validMappedHeader;
         record.NumPasses(42);
         EXPECT_THROW(Validator::Validate(record), ValidationException);
         EXPECT_FALSE(Validator::IsValid(record));
     }
     {   // missing sn
-        BamRecord record(tests::validMappedRecord);
+        BamRecord record(ValidatorTests::validMappedRecord);
         record.header_ = validMappedHeader;
         record.Impl().RemoveTag("sn");
         EXPECT_THROW(Validator::Validate(record), ValidationException);
@@ -569,7 +565,7 @@ TEST(ValidatorTest, MappedRecords)
     };
 
     {   // mapped record should have valid refID
-        BamRecord record(tests::validMappedRecord);
+        BamRecord record(ValidatorTests::validMappedRecord);
         record.header_ = validMappedHeader;
         record.Impl().ReferenceId(-1);
 
@@ -577,7 +573,7 @@ TEST(ValidatorTest, MappedRecords)
         EXPECT_FALSE(Validator::IsValid(record));
     }
     {   // mapped record should have valid position
-        BamRecord record(tests::validMappedRecord);
+        BamRecord record(ValidatorTests::validMappedRecord);
         record.header_ = validMappedHeader;
         record.Impl().Position(-1);
 
@@ -598,7 +594,7 @@ TEST(ValidatorTest, UnmappedRecords)
     };
 
     {   // unmapped should have no refID
-        BamRecord record(tests::validUnmappedRecord);
+        BamRecord record(ValidatorTests::validUnmappedRecord);
         record.header_ = validUnmappedHeader;
         record.Impl().ReferenceId(0);
 
@@ -606,7 +602,7 @@ TEST(ValidatorTest, UnmappedRecords)
         EXPECT_FALSE(Validator::IsValid(record));
     }
     {   // unmapped should have no position
-        BamRecord record(tests::validUnmappedRecord);
+        BamRecord record(ValidatorTests::validUnmappedRecord);
         record.header_ = validUnmappedHeader;
         record.Impl().Position(42);
 

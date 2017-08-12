@@ -35,7 +35,7 @@
 
 // Author: Derek Barnett
 
-#include "TestData.h"
+#include "PbbamTestData.h"
 #include <boost/any.hpp>
 #include <gtest/gtest.h>
 #include <pbbam/EntireFileQuery.h>
@@ -48,15 +48,17 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-const string alignedBamFn      = tests::Data_Dir + "/aligned.bam";
-const string aligned2BamFn     = tests::Data_Dir + "/aligned2.bam";
-const string alignedCopyBamFn  = tests::GeneratedData_Dir + "/aligned.bam";
-const string aligned2CopyBamFn = tests::GeneratedData_Dir + "/aligned2.bam";
+namespace DataSetQueryTests {
 
-const string group_fofn   = tests::Generated_Dir + "/group.fofn";
-const string group_file1  = tests::Data_Dir + "/group/test1.bam";
-const string group_file2  = tests::Data_Dir + "/group/test2.bam";
-const string group_file3  = tests::Data_Dir + "/group/test3.bam";
+const string alignedBamFn      = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+const string aligned2BamFn     = PbbamTestsConfig::Data_Dir + "/aligned2.bam";
+const string alignedCopyBamFn  = PbbamTestsConfig::GeneratedData_Dir + "/aligned.bam";
+const string aligned2CopyBamFn = PbbamTestsConfig::GeneratedData_Dir + "/aligned2.bam";
+
+const string group_fofn   = PbbamTestsConfig::Generated_Dir + "/group.fofn";
+const string group_file1  = PbbamTestsConfig::Data_Dir + "/group/test1.bam";
+const string group_file2  = PbbamTestsConfig::Data_Dir + "/group/test2.bam";
+const string group_file3  = PbbamTestsConfig::Data_Dir + "/group/test3.bam";
 
 const vector<string> group_file1_names =
 {
@@ -98,12 +100,14 @@ bool InGroup(const string& name, const vector<string>& group)
     return false;
 }
 
+} // namespace DataSetQueryTests
+
 TEST(DataSetQueryTest, EntireFileQueryTest)
 {
     // single file
     EXPECT_NO_THROW(
     {
-        BamFile bamFile(alignedBamFn);
+        BamFile bamFile(DataSetQueryTests::alignedBamFn);
 
         DataSet dataset;
         dataset.ExternalResources().Add(bamFile);
@@ -117,7 +121,7 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
         EXPECT_EQ(4, count);
 
         count = 0;
-        EntireFileQuery query2(alignedBamFn); // from BAM filename
+        EntireFileQuery query2(DataSetQueryTests::alignedBamFn); // from BAM filename
         for (const BamRecord& record : query2) {
             (void)record;
             ++count;
@@ -136,7 +140,7 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
     // duplicate file attempt
     EXPECT_NO_THROW(
     {
-        BamFile bamFile(alignedBamFn);
+        BamFile bamFile(DataSetQueryTests::alignedBamFn);
 
         DataSet dataset;
         dataset.ExternalResources().Add(bamFile);
@@ -154,9 +158,9 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
     // true multi-file dataset
     EXPECT_NO_THROW(
     {
-        BamFile file1(group_file1); // 1 read
-        BamFile file2(group_file2); // 4 reads
-        BamFile file3(group_file3); // 13 reads
+        BamFile file1(DataSetQueryTests::group_file1); // 1 read
+        BamFile file2(DataSetQueryTests::group_file2); // 4 reads
+        BamFile file3(DataSetQueryTests::group_file3); // 13 reads
 
         DataSet dataset;
         dataset.ExternalResources().Add(file1);
@@ -168,9 +172,9 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
         for (const BamRecord& record : query) {
 
             // ensure sequential merge of files
-            if (count == 0)     EXPECT_TRUE(InGroup(record.FullName(), group_file1_names));
-            else if (count < 5) EXPECT_TRUE(InGroup(record.FullName(), group_file2_names));
-            else                EXPECT_TRUE(InGroup(record.FullName(), group_file3_names));
+            if (count == 0)     EXPECT_TRUE(DataSetQueryTests::InGroup(record.FullName(), DataSetQueryTests::group_file1_names));
+            else if (count < 5) EXPECT_TRUE(DataSetQueryTests::InGroup(record.FullName(), DataSetQueryTests::group_file2_names));
+            else                EXPECT_TRUE(DataSetQueryTests::InGroup(record.FullName(), DataSetQueryTests::group_file3_names));
 
             ++count;
         }
@@ -182,14 +186,14 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
     {
         int count = 0;
 
-        DataSet dataset(group_fofn);
+        DataSet dataset(DataSetQueryTests::group_fofn);
         EntireFileQuery query(dataset);
         for (const BamRecord& record : query) {
 
             // ensure sequential merge of files
-            if (count == 0)     EXPECT_TRUE(InGroup(record.FullName(), group_file1_names));
-            else if (count < 5) EXPECT_TRUE(InGroup(record.FullName(), group_file2_names));
-            else                EXPECT_TRUE(InGroup(record.FullName(), group_file3_names));
+            if (count == 0)     EXPECT_TRUE(DataSetQueryTests::InGroup(record.FullName(), DataSetQueryTests::group_file1_names));
+            else if (count < 5) EXPECT_TRUE(DataSetQueryTests::InGroup(record.FullName(), DataSetQueryTests::group_file2_names));
+            else                EXPECT_TRUE(DataSetQueryTests::InGroup(record.FullName(), DataSetQueryTests::group_file3_names));
 
             ++count;
         }
@@ -204,7 +208,7 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
     // single file
     EXPECT_NO_THROW(
     {
-        DataSet dataset(alignedBamFn); // from BAM filename
+        DataSet dataset(DataSetQueryTests::alignedBamFn); // from BAM filename
 
         // count records
         int count = 0;
@@ -255,7 +259,7 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
     // duplicate file
     EXPECT_NO_THROW(
     {
-        BamFile bamFile(alignedBamFn);
+        BamFile bamFile(DataSetQueryTests::alignedBamFn);
 
         DataSet dataset;
         dataset.ExternalResources().Add(bamFile);
@@ -318,8 +322,8 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
     // multi file BAM (same record content for easy testing, but different filename(ResourceId)
     EXPECT_NO_THROW(
     {
-        BamFile bamFile(alignedBamFn);
-        BamFile copyFile(alignedCopyBamFn);
+        BamFile bamFile(DataSetQueryTests::alignedBamFn);
+        BamFile copyFile(DataSetQueryTests::alignedCopyBamFn);
 
         DataSet dataset;
         dataset.ExternalResources().Add(bamFile);
@@ -393,7 +397,7 @@ TEST(DataSetQueryTest, ZmwQueryTest)
     // single file
     EXPECT_NO_THROW(
     {
-        BamFile bamFile(aligned2BamFn);
+        BamFile bamFile(DataSetQueryTests::aligned2BamFn);
         ASSERT_TRUE(bamFile.PacBioIndexExists());
         DataSet dataset(bamFile);
 
@@ -410,8 +414,8 @@ TEST(DataSetQueryTest, ZmwQueryTest)
     // multi-file
     EXPECT_NO_THROW(
     {
-        BamFile bamFile(aligned2BamFn);
-        BamFile bamFile2(aligned2CopyBamFn);
+        BamFile bamFile(DataSetQueryTests::aligned2BamFn);
+        BamFile bamFile2(DataSetQueryTests::aligned2CopyBamFn);
         ASSERT_TRUE(bamFile.PacBioIndexExists());
         ASSERT_TRUE(bamFile2.PacBioIndexExists());
 
@@ -437,7 +441,7 @@ TEST(DataSetQueryTest, ZmwGroupQueryTest)
     // single-file
     EXPECT_NO_THROW(
     {
-        BamFile bamFile(aligned2BamFn);
+        BamFile bamFile(DataSetQueryTests::aligned2BamFn);
         ASSERT_TRUE(bamFile.PacBioIndexExists());
         DataSet dataset(bamFile);
 
@@ -461,8 +465,8 @@ TEST(DataSetQueryTest, ZmwGroupQueryTest)
     // multi-file
     EXPECT_NO_THROW(
     {
-        BamFile bamFile(aligned2BamFn);
-        BamFile bamFile2(aligned2CopyBamFn);
+        BamFile bamFile(DataSetQueryTests::aligned2BamFn);
+        BamFile bamFile2(DataSetQueryTests::aligned2CopyBamFn);
         ASSERT_TRUE(bamFile.PacBioIndexExists());
         ASSERT_TRUE(bamFile2.PacBioIndexExists());
 

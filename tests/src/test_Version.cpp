@@ -44,16 +44,12 @@ using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
 using namespace std;
 
-namespace PacBio {
-namespace BAM {
-namespace tests {
+namespace VersionTests {
 
 static inline Version MakeVersion(int x, int y, int z)
 { return Version(x, y, z); }
 
-} // namespace tests
-} // namespace BAM
-} // namespace PacBio
+} // namespace VersionTests
 
 TEST(VersionTest, DefaultOk)
 {
@@ -90,7 +86,7 @@ TEST(VersionTest, CopyAndMoveOk)
 
     }
     {   // move ctor
-        Version v(tests::MakeVersion(3,1,1));
+        Version v(VersionTests::MakeVersion(3,1,1));
         EXPECT_EQ(3, v.Major());
         EXPECT_EQ(1, v.Minor());
         EXPECT_EQ(1, v.Revision());

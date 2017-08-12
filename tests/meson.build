@@ -1,4 +1,4 @@
-pbbam_test_cpp_sources = [
+pbbam_test_cpp_sources = files([
   'src/test_Accuracy.cpp',
   'src/test_AlignmentPrinter.cpp',
   'src/test_BamFile.cpp',
@@ -46,21 +46,20 @@ pbbam_test_cpp_sources = [
   'src/test_Version.cpp',
   'src/test_WhitelistedZmwReadStitcher.cpp',
   'src/test_ZmwReadStitcher.cpp',
-  'src/test_ZmwQuery.cpp'
-]
+  'src/test_ZmwQuery.cpp'])
 
 if get_option('enable-pbbam-tests')
   pbbam_gtest_dep = dependency('gtest', fallback : ['gtest', 'gtest_with_main_dep'])
 
-  pbbam_TestData_h_config = configuration_data()
-  pbbam_TestData_h_config.set('PacBioBAM_BinDir', join_paths([meson.build_root(), 'tools']))
-  pbbam_TestData_h_config.set('PacBioBAM_TestsDir', meson.current_source_dir())
-  pbbam_TestData_h_config.set('CMAKE_CURRENT_BINARY_DIR', meson.current_build_dir())
-  pbbam_TestData_h_config.set('GeneratedDir', meson.current_build_dir())
-  pbbam_TestData_h_config.set('GeneratedTestDataDir', meson.current_build_dir())
+  pbbam_PbbamTestData_h_config = configuration_data()
+  pbbam_PbbamTestData_h_config.set('PacBioBAM_BinDir', join_paths([meson.build_root(), 'tools']))
+  pbbam_PbbamTestData_h_config.set('PacBioBAM_TestsDir', meson.current_source_dir())
+  pbbam_PbbamTestData_h_config.set('CMAKE_CURRENT_BINARY_DIR', meson.current_build_dir())
+  pbbam_PbbamTestData_h_config.set('GeneratedDir', meson.current_build_dir())
+  pbbam_PbbamTestData_h_config.set('GeneratedTestDataDir', meson.current_build_dir())
 
-  configure_file(input : 'src/TestData.h.in', output : 'TestData.h', configuration : pbbam_TestData_h_config)
-  configure_file(input : 'data/group/group.fofn.in', output : 'group.fofn', configuration : pbbam_TestData_h_config)
+  configure_file(input : 'src/PbbamTestData.h.in', output : 'PbbamTestData.h', configuration : pbbam_PbbamTestData_h_config)
+  configure_file(input : 'data/group/group.fofn.in', output : 'group.fofn', configuration : pbbam_PbbamTestData_h_config)
 
   pbbam_test = executable(
     'pbbam_test',

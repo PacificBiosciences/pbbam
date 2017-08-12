@@ -43,7 +43,7 @@
 #define private public
 #endif
 
-#include "TestData.h"
+#include "PbbamTestData.h"
 
 #include <pbbam/ZmwQuery.h>
 

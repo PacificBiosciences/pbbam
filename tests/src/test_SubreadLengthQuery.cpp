@@ -43,7 +43,7 @@
 #define private public
 #endif
 
-#include "TestData.h"
+#include "PbbamTestData.h"
 
 #include <pbbam/SubreadLengthQuery.h>
 
@@ -53,7 +53,7 @@ using namespace std;
 
 TEST(SubreadLengthQueryTest, QueryOk)
 {
-    const auto bamFile = BamFile{ tests::Data_Dir + string{ "/group/test2.bam" } };
+    const auto bamFile = BamFile{ PbbamTestsConfig::Data_Dir + string{ "/group/test2.bam" } };
 
     {
         int count = 0;

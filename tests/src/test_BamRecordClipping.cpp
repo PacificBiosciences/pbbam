@@ -54,7 +54,7 @@ using namespace std;
 
 typedef vector<uint16_t> f_data;
 
-namespace tests {
+namespace BamRecordClippingTests {
 
 static 
 ReadGroupInfo MakeReadGroup(const FrameCodec codec,
@@ -154,7 +154,7 @@ BamRecord MakeCCSRecord(const string& seq,
     return bam;
 }
 
-} // namespace tests
+} // namespace BamRecordClippingTests
 
 TEST(BamRecordClippingTest, ClipToQuery_Basic)
 {
@@ -212,7 +212,7 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     const string s2_cigar_clipped = "3=3D4=";
     const string s3_cigar_clipped = "2=1D2I2D3=";
 
-    const BamRecord prototype = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
+    const BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                                   pulseCall, pulseBases, pulseQuals, pulseFrames);
 
     BamRecord s0 = prototype; // unmapped record
@@ -511,7 +511,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     const string s3_tagQuals_rev_clipped = s3_quals_rev_clipped;
     const f_data s3_frames_rev_clipped = { 40, 40, 30, 20, 20, 10, 10 };
 
-    const BamRecord prototype = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
+    const BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                                   seq, tagBases, tagQuals, frames);
     BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
     BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
@@ -788,7 +788,7 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     const string s3_tagQuals_rev_clipped = s3_quals_rev_clipped;
     const f_data s3_frames_rev_clipped = { 10, 40, 40, 30};
 
-    const BamRecord prototype = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
+    const BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                                   seq, tagBases, tagQuals, frames);
     BamRecord s0 = prototype;
     BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
@@ -1091,7 +1091,7 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     const string s3_tagQuals_rev_clipped = s3_quals_rev_clipped;
     const f_data s3_frames_rev_clipped = { 30, 10, 40, 40 };
 
-    const BamRecord prototype = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
+    const BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                                   seq, tagBases, tagQuals, frames);
     BamRecord s0 = prototype;
     BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
@@ -1407,7 +1407,7 @@ TEST(BamRecordClippingTest, ClippedToQueryCopy)
     const string s3_cigar = "4=1D2I2D4=";
     const string s3_cigar_clipped = "2=1D2I2D3=";
 
-    BamRecord prototype = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
+    BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                             seq, tagBases, tagQuals, frames);
     prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
 
@@ -1465,7 +1465,7 @@ TEST(BamRecordClippingTest, ClippedToReferenceCopy)
     const string s3_tagQuals_clipped = s3_quals_clipped;
     const f_data s3_frames_clipped   = { 20, 20, 30, 40 };
 
-    BamRecord prototype = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
+    BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                             seq, tagBases, tagQuals, frames);
     prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
 
@@ -1526,7 +1526,7 @@ TEST(BamRecordClippingTest, StaticClippedToQuery)
     const string s3_cigar = "4=1D2I2D4=";
     const string s3_cigar_clipped = "2=1D2I2D3=";
 
-    BamRecord prototype = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
+    BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                             seq, tagBases, tagQuals, frames);
     prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
 
@@ -1584,7 +1584,7 @@ TEST(BamRecordClippingTest, StaticClippedToReference)
     const string s3_tagQuals_clipped = s3_quals_clipped;
     const f_data s3_frames_clipped   = { 20, 20, 30, 40 };
 
-    BamRecord prototype = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
+    BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                             seq, tagBases, tagQuals, frames);
     prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
 
@@ -1630,9 +1630,9 @@ TEST(BamRecordTest, ClipCigarData)
     const string tagQuals = "--?]?]?]?]?*+++";
     const f_data frames   = { 40, 40, 10, 10, 20, 20, 30, 40, 40, 10, 30, 20, 10, 10, 10 };
     const uint8_t mapQual = 80;
-    BamRecord s3 = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
+    BamRecord s3 = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                      seq, tagBases, tagQuals, frames);
-    BamRecord s3_rev = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
+    BamRecord s3_rev = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                          seq, tagBases, tagQuals, frames);
 
     const string s3_cigar = "5H2S4=1D2I2D4=3S7H";
@@ -1669,7 +1669,7 @@ TEST(BamRecordTest, CCS_ClipToQuery)
     const string s3_cigar = "4=1D2I2D4=";
     const string s3_cigar_clipped = "2=1D2I2D3=";
 
-    BamRecord prototype = tests::MakeCCSRecord(seq, quals, tagBases, tagQuals, frames,
+    BamRecord prototype = BamRecordClippingTests::MakeCCSRecord(seq, quals, tagBases, tagQuals, frames,
                                                seq, tagBases, tagQuals, frames);
     prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
 
@@ -1723,7 +1723,7 @@ TEST(BamRecordTest, CCS_ClipToReference)
     const string s3_tagQuals_clipped = s3_quals_clipped;
     const f_data s3_frames_clipped   = { 20, 20, 30, 40 };
 
-    BamRecord prototype = tests::MakeCCSRecord(seq, quals, tagBases, tagQuals, frames,
+    BamRecord prototype = BamRecordClippingTests::MakeCCSRecord(seq, quals, tagBases, tagQuals, frames,
                                                seq, tagBases, tagQuals, frames);
     prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
 
@@ -1812,7 +1812,7 @@ TEST(BamRecordTest, ClipEncodedFrames)
     const string s2_cigar_clipped = "3=3D4=";
     const string s3_cigar_clipped = "2=1D2I2D3=";
 
-    const BamRecord prototype = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
+    const BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                                   pulseCall, pulseBases, pulseQuals, pulseFrames, FrameCodec::V1);
 
     BamRecord s0 = prototype; // unmapped record

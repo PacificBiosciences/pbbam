@@ -42,6 +42,7 @@ install_headers([
   'pbbam/IRecordWriter.h',
   'pbbam/LocalContextFlags.h',
   'pbbam/MD5.h',
+  'pbbam/MoveAppend.h',
   'pbbam/Orientation.h',
   'pbbam/PbiBasicTypes.h',
   'pbbam/PbiBuilder.h',

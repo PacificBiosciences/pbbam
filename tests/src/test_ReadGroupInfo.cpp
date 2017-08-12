@@ -45,7 +45,7 @@
 #define private public
 #endif
 
-#include "TestData.h"
+#include "PbbamTestData.h"
 
 #include <pbbam/ReadGroupInfo.h>
 #include <pbbam/exception/BundleChemistryMappingException.h>
@@ -165,7 +165,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryFromMappingXml)
 
     // set the magic environment variable
     const char* varname = "SMRT_CHEMISTRY_BUNDLE_DIR";
-    EXPECT_EQ(0, setenv(varname, tests::Data_Dir.c_str(), 0));
+    EXPECT_EQ(0, setenv(varname, PbbamTestsConfig::Data_Dir.c_str(), 0));
 
     EXPECT_EQ("FOUND", rg.SequencingChemistry());
 

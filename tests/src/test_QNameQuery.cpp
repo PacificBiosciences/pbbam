@@ -35,7 +35,7 @@
 
 // Author: Yuan Li
 
-#include "TestData.h"
+#include "PbbamTestData.h"
 #include <gtest/gtest.h>
 #include <pbbam/QNameQuery.h>
 #include <string>
@@ -43,7 +43,9 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-static const string dataDir = tests::Data_Dir + "/group/";
+namespace QNameQueryTests {
+
+static const string dataDir = PbbamTestsConfig::Data_Dir + "/group/";
 static const string test1fn = string(dataDir) + "test1.bam";
 static const string test2fn = string(dataDir) + "test2.bam";
 static const string test3fn = string(dataDir) + "test3.bam";
@@ -74,23 +76,25 @@ void TestNoneConstQNameQuery(const string& fn, const vector<int>& expected)
     });
 }
 
+} // namespace QNameQueryTests
+
 TEST(QNameQueryTest, CountQSizes)
 {
     // test case 1 has exactly one bamRecord.
-    string fn = test1fn;
+    string fn = QNameQueryTests::test1fn;
     vector<int> expected({1});
-    TestQNameQuery(fn, expected);
-    TestNoneConstQNameQuery(fn, expected);
+    QNameQueryTests::TestQNameQuery(fn, expected);
+    QNameQueryTests::TestNoneConstQNameQuery(fn, expected);
 
     // test case 2 has bamRecords of four subreads.
-    fn = test2fn;
+    fn = QNameQueryTests::test2fn;
     expected = {1, 1, 1, 1};
-    TestQNameQuery(fn, expected);
-    TestNoneConstQNameQuery(fn, expected);
+    QNameQueryTests::TestQNameQuery(fn, expected);
+    QNameQueryTests::TestNoneConstQNameQuery(fn, expected);
 
-    fn = test3fn;
+    fn = QNameQueryTests::test3fn;
     expected = {2,1,1,1,1,1,1,2,1,1,1};
-    TestQNameQuery(fn, expected);
-    TestNoneConstQNameQuery(fn, expected);
+    QNameQueryTests::TestQNameQuery(fn, expected);
+    QNameQueryTests::TestNoneConstQNameQuery(fn, expected);
 }
 

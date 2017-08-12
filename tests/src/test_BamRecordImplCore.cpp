@@ -57,7 +57,7 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-namespace tests {
+namespace BamRecordImplCoreTests {
 
 struct Bam1Deleter
 {
@@ -117,11 +117,11 @@ void CheckRawData(const BamRecordImpl& bam)
     EXPECT_EQ(expectedTotalDataLength, bam.d_->l_data);
 }
 
-} // namespace tests
+} // namespace BamRecordImplCoreTests
 
-TEST(BamRecordImplCoreTest, RawDataDefaultValues)
+TEST(BamRecordImplCoreTestsTest, RawDataDefaultValues)
 {
-    std::shared_ptr<bam1_t> rawData(bam_init1(), tests::Bam1Deleter());
+    std::shared_ptr<bam1_t> rawData(bam_init1(), BamRecordImplCoreTests::Bam1Deleter());
     ASSERT_TRUE((bool)rawData);
 
     // fixed-length (core) data
@@ -143,7 +143,7 @@ TEST(BamRecordImplCoreTest, RawDataDefaultValues)
     EXPECT_EQ(0, rawData->m_data);
 }
 
-TEST(BamRecordImplCoreTest, DefaultValues)
+TEST(BamRecordImplCoreTestsTest, DefaultValues)
 {
     BamRecordImpl bam;
 
@@ -205,10 +205,10 @@ TEST(BamRecordImplCoreTest, DefaultValues)
     EXPECT_EQ(emptyString, bam.CigarData().ToStdString());
     EXPECT_EQ(emptyString, bam.Sequence());
     EXPECT_EQ(emptyString, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplCoreTests::CheckRawData(bam);
 }
 
-TEST(BamRecordImplCoreTest, CoreSetters)
+TEST(BamRecordImplCoreTestsTest, CoreSetters)
 {
     BamRecordImpl bam;
     bam.Bin(42);
@@ -273,10 +273,10 @@ TEST(BamRecordImplCoreTest, CoreSetters)
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags.at("CA").ToUInt8Array());
 }
 
-TEST(BamRecordImplCoreTest, DeepCopyFromRawData)
+TEST(BamRecordImplCoreTestsTest, DeepCopyFromRawData)
 {
     // init raw data
-    std::shared_ptr<bam1_t> rawData(bam_init1(), tests::Bam1Deleter());
+    std::shared_ptr<bam1_t> rawData(bam_init1(), BamRecordImplCoreTests::Bam1Deleter());
     ASSERT_TRUE((bool)rawData);
 
     rawData->core.tid = 42;
@@ -349,7 +349,7 @@ TEST(BamRecordImplCoreTest, DeepCopyFromRawData)
     EXPECT_EQ(42, bam.d_->core.pos);
 }
 
-TEST(BamRecordImplCoreTest, CopyAssignment)
+TEST(BamRecordImplCoreTestsTest, CopyAssignment)
 {
     BamRecordImpl bam1;
     bam1.Bin(42);
@@ -401,11 +401,11 @@ TEST(BamRecordImplCoreTest, CopyAssignment)
     EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags2.at("XY").ToInt32());
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags2.at("CA").ToUInt8Array());
 
-    tests::CheckRawData(bam1);
-    tests::CheckRawData(bam2);
+    BamRecordImplCoreTests::CheckRawData(bam1);
+    BamRecordImplCoreTests::CheckRawData(bam2);
 }
 
-TEST(BamRecordImplCoreTest, SelfAssignmentTolerated)
+TEST(BamRecordImplCoreTestsTest, SelfAssignmentTolerated)
 {
     BamRecordImpl bam1;
     bam1.Bin(42);
@@ -441,10 +441,10 @@ TEST(BamRecordImplCoreTest, SelfAssignmentTolerated)
     EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags1.at("XY").ToInt32());
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags1.at("CA").ToUInt8Array());
 
-    tests::CheckRawData(bam1);
+    BamRecordImplCoreTests::CheckRawData(bam1);
 }
 
-TEST(BamRecordImplCoreTest, CopyConstructor)
+TEST(BamRecordImplCoreTestsTest, CopyConstructor)
 {
     BamRecordImpl bam1;
     bam1.Bin(42);
@@ -495,13 +495,13 @@ TEST(BamRecordImplCoreTest, CopyConstructor)
     EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags2.at("XY").ToInt32());
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags2.at("CA").ToUInt8Array());
 
-    tests::CheckRawData(bam1);
-    tests::CheckRawData(bam2);
+    BamRecordImplCoreTests::CheckRawData(bam1);
+    BamRecordImplCoreTests::CheckRawData(bam2);
 }
 
-TEST(BamRecordImplCoreTest, CreateRecord_InternalTest)
+TEST(BamRecordImplCoreTestsTest, CreateRecord_InternalTest)
 {
-    BamRecordImpl bam = tests::CreateBamImpl();
+    BamRecordImpl bam = BamRecordImplCoreTests::CreateBamImpl();
 
     EXPECT_EQ(42, bam.Bin());
     EXPECT_EQ(42, bam.Flag());
@@ -519,17 +519,17 @@ TEST(BamRecordImplCoreTest, CreateRecord_InternalTest)
     tags["XY"] = static_cast<int32_t>(-42);
     bam.Tags(tags);
 
-    tests::CheckRawData(bam);
+    BamRecordImplCoreTests::CheckRawData(bam);
 }
 
-TEST(BamRecordImplCoreTest, MoveAssignment)
+TEST(BamRecordImplCoreTestsTest, MoveAssignment)
 {
     BamRecordImpl bam;
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpessimizing-move"
 #endif
-    bam = std::move(tests::CreateBamImpl());
+    bam = std::move(BamRecordImplCoreTests::CreateBamImpl());
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
@@ -549,16 +549,16 @@ TEST(BamRecordImplCoreTest, MoveAssignment)
     EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags1.at("XY").ToInt32());
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags1.at("CA").ToUInt8Array());
 
-    tests::CheckRawData(bam);
+    BamRecordImplCoreTests::CheckRawData(bam);
 }
 
-TEST(BamRecordImplCoreTest, MoveConstructor)
+TEST(BamRecordImplCoreTestsTest, MoveConstructor)
 {
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpessimizing-move"
 #endif 
-    BamRecordImpl bam(std::move(tests::CreateBamImpl()));
+    BamRecordImpl bam(std::move(BamRecordImplCoreTests::CreateBamImpl()));
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
@@ -578,10 +578,10 @@ TEST(BamRecordImplCoreTest, MoveConstructor)
     EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags1.at("XY").ToInt32());
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags1.at("CA").ToUInt8Array());
 
-    tests::CheckRawData(bam);
+    BamRecordImplCoreTests::CheckRawData(bam);
 }
 
-TEST(BamRecordImplCoreTest, AlignmentFlags)
+TEST(BamRecordImplCoreTestsTest, AlignmentFlags)
 {
     // same set of flags, different ways of getting there
 

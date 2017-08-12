@@ -44,7 +44,7 @@
 #define private public
 #endif
 
-#include "TestData.h"
+#include "PbbamTestData.h"
 
 #include <pbbam/PbiFilterQuery.h>
 
@@ -54,7 +54,7 @@ using namespace std;
 
 TEST(PbiFilterQueryTest, QueryOk)
 {
-    const auto bamFile = BamFile{ tests::Data_Dir + string{ "/group/test2.bam" } };
+    const auto bamFile = BamFile{ PbbamTestsConfig::Data_Dir + string{ "/group/test2.bam" } };
 
     {
         int count = 0;
@@ -131,7 +131,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 {
     const auto expectedMovieName = string{ "m150404_101626_42267_c100807920800000001823174110291514_s1_p0" };
 
-    const DataSet ds(tests::Data_Dir + "/chunking/chunking.subreadset.xml");
+    const DataSet ds(PbbamTestsConfig::Data_Dir + "/chunking/chunking.subreadset.xml");
     EXPECT_EQ(3, ds.BamFiles().size());
 
     { // movie name
@@ -199,7 +199,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
     }
     { // no <Filters> element present at all
 
-        const DataSet ds(tests::GeneratedData_Dir + "/chunking_missingfilters.subreadset.xml");
+        const DataSet ds(PbbamTestsConfig::GeneratedData_Dir + "/chunking_missingfilters.subreadset.xml");
         const PbiFilter filter = PbiFilter::FromDataSet(ds);
         PbiFilterQuery query(filter, ds);
         int count = 0;
@@ -211,7 +211,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
     }
     { // <Filters> element contains no child <Filter> elements
 
-        const DataSet ds(tests::GeneratedData_Dir + "/chunking_emptyfilters.subreadset.xml");
+        const DataSet ds(PbbamTestsConfig::GeneratedData_Dir + "/chunking_emptyfilters.subreadset.xml");
         const PbiFilter filter = PbiFilter::FromDataSet(ds);
         PbiFilterQuery query(filter, ds);
         int count = 0;
@@ -226,8 +226,8 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 TEST(PbiFilterQueryTest, MissingPbiShouldThrow)
 {
     const PbiFilter filter{ PbiZmwFilter{31883} };
-    const string phi29Bam = tests::GeneratedData_Dir + "/missing_pbi.bam";
-    const string hasPbiBam = tests::Data_Dir + "/polymerase/production.scraps.bam";
+    const string phi29Bam = PbbamTestsConfig::GeneratedData_Dir + "/missing_pbi.bam";
+    const string hasPbiBam = PbbamTestsConfig::Data_Dir + "/polymerase/production.scraps.bam";
 
     { // single file, missing PBI
 
@@ -253,7 +253,7 @@ TEST(PbiFilterQueryTest, MissingPbiShouldThrow)
 
 TEST(PbiFilterQueryTest, QNameWhitelistFile)
 {
-    const DataSet ds(tests::Data_Dir + "/polymerase/qnameFiltered.subreads.dataset.xml");
+    const DataSet ds(PbbamTestsConfig::Data_Dir + "/polymerase/qnameFiltered.subreads.dataset.xml");
     const PbiFilter filter = PbiFilter::FromDataSet(ds);
     PbiFilterQuery query(filter, ds);
     int count = 0;
@@ -266,7 +266,7 @@ TEST(PbiFilterQueryTest, QNameWhitelistFile)
 
 TEST(PbiFilterQueryTest, EmptyFiles)
 {
-    const BamFile file{ tests::Data_Dir + "/empty.bam" };
+    const BamFile file{ PbbamTestsConfig::Data_Dir + "/empty.bam" };
     PbiFilterQuery query{ PbiFilter{}, file };
     size_t count = 0;
     for (const auto& r : query) {
@@ -278,7 +278,7 @@ TEST(PbiFilterQueryTest, EmptyFiles)
 
 TEST(PbiFilterQueryTest, BarcodeData)
 {
-   const BamFile file{ tests::Data_Dir + "/phi29.bam" };
+   const BamFile file{ PbbamTestsConfig::Data_Dir + "/phi29.bam" };
 
    // bc_quality == 1
    {
@@ -424,7 +424,7 @@ const string xml_none = R"_XML_(
 </pbds:SubreadSet>
 )_XML_";
 
-     const BamFile file{ tests::Data_Dir + "/phi29.bam" }; 
+     const BamFile file{ PbbamTestsConfig::Data_Dir + "/phi29.bam" }; 
 
      {   // filter allows all records
          const DataSet ds = DataSet::FromXml(xml_all);
@@ -450,7 +450,7 @@ const string xml_none = R"_XML_(
 
 TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
 {
-    const BamFile file{ tests::Data_Dir + "/phi29.bam" };
+    const BamFile file{ PbbamTestsConfig::Data_Dir + "/phi29.bam" };
     const string xmlHeader = R"_XML_(
         <?xml version="1.0" encoding="utf-8"?>
         <pbds:SubreadSet

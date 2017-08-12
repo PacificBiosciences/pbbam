@@ -41,7 +41,7 @@
 #define private public
 #endif
 
-#include "TestData.h"
+#include "PbbamTestData.h"
 
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamRecord.h>
@@ -93,7 +93,7 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
     bamRecord.impl_.Tags(tags);
 
     // write record to file
-    const string generatedBamFn = tests::GeneratedData_Dir + "/bamwriter_generated.bam";
+    const string generatedBamFn = PbbamTestsConfig::GeneratedData_Dir + "/bamwriter_generated.bam";
     {
         BamWriter writer(generatedBamFn, inputHeader);
         writer.Write(bamRecord);
