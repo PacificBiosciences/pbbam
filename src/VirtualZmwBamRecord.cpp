@@ -1,4 +1,4 @@
-// Copyright (c) 2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2015-2017, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -44,55 +44,13 @@
 #include <stdexcept>
 #include <vector>
 
+#include "pbbam/MoveAppend.h"
 #include "pbbam/virtual/VirtualZmwBamRecord.h"
 #include "pbbam/virtual/VirtualRegionType.h"
 #include "pbbam/virtual/VirtualRegionTypeMap.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
-
-/// \brief Appends content of src vector to dst vector using move semantics.
-///
-/// \param[in]     src  Input vector that will be empty after execution
-/// \param[in,out] dst  Output vector that will be appended to
-///
-template <typename T>
-inline void MoveAppend(std::vector<T>& src, std::vector<T>& dst) noexcept
-{
-    if (dst.empty())
-    {
-        dst = std::move(src);
-    }
-    else
-    {
-        dst.reserve(dst.size() + src.size());
-        std::move(src.begin(), src.end(), std::back_inserter(dst));
-        src.clear();
-    }
-}
-
-/// \brief Appends content of src vector to dst vector using move semantics.
-///
-/// \param[in]     src  Input vector via perfect forwarding
-/// \param[in,out] dst  Output vector that will be appended to
-///
-template <typename T>
-inline void MoveAppend(std::vector<T>&& src, std::vector<T>& dst) noexcept
-{
-    if (dst.empty())
-    {
-        dst = std::move(src);
-    }
-    else
-    {
-        dst.reserve(dst.size() + src.size());
-        std::move(src.begin(), src.end(), std::back_inserter(dst));
-        src.clear();
-    }
-}
-
-} // namespace internal
 
 VirtualZmwBamRecord::VirtualZmwBamRecord(
     std::vector<BamRecord>&& unorderedSources, const BamHeader& header)
@@ -167,8 +125,6 @@ void VirtualZmwBamRecord::StitchSources(void)
     pa.reserve(stitchedSize);
     pm.reserve(stitchedSize);
     sf.reserve(stitchedSize);
-
-    using internal::MoveAppend;
 
     // Stitch using tmp vars
     for(auto& b : sources_)

@@ -44,7 +44,7 @@
 #define private public
 #endif
 
-#include "TestData.h"
+#include "PbbamTestData.h"
 
 #include <pbbam/GenomicIntervalQuery.h>
 
@@ -52,13 +52,15 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-const string inputBamFn = tests::Data_Dir + "/aligned.bam";
+namespace GenomicIntervalQueryTests {
+    const string inputBamFn = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+} // namespace GenomicIntervalQueryTests
 
 TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
 {
     const string rname = "lambda_NEB3011";
 
-    BamFile bamFile(inputBamFn);
+    BamFile bamFile(GenomicIntervalQueryTests::inputBamFn);
 
     // setup with normal interval
     int count = 0;
@@ -122,7 +124,7 @@ TEST(GenomicIntervalQueryTest, NonConstBamRecord)
 {
     EXPECT_NO_THROW(
     {
-        BamFile bamFile(inputBamFn);
+        BamFile bamFile(GenomicIntervalQueryTests::inputBamFn);
         int count = 0;
 
         GenomicInterval interval("lambda_NEB3011", 8000, 10000);
@@ -138,8 +140,8 @@ TEST(GenomicIntervalQueryTest, NonConstBamRecord)
 TEST(GenomicIntervalQueryTest,  MissingBaiShouldThrow)
 {
     GenomicInterval interval("lambda_NEB3011", 0, 100);
-    const string phi29Bam = tests::Data_Dir + "/phi29.bam";
-    const string hasBaiBam = tests::Data_Dir + "/aligned.bam";
+    const string phi29Bam = PbbamTestsConfig::Data_Dir + "/phi29.bam";
+    const string hasBaiBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
 
     {   // single file, missing BAI
         EXPECT_THROW(GenomicIntervalQuery query(interval, phi29Bam), std::runtime_error);

@@ -35,7 +35,7 @@
 
 // Author: Derek Barnett
 
-#include "TestData.h"
+#include "PbbamTestData.h"
 #include <gtest/gtest.h>
 #include <pbbam/DataSet.h>
 #include <pbbam/DataSetXsd.h>

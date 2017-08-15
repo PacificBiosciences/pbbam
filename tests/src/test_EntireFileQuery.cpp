@@ -43,7 +43,7 @@
 #define private public
 #endif
 
-#include "TestData.h"
+#include "PbbamTestData.h"
 
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/BamWriter.h>
@@ -52,13 +52,17 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-const string inputBamFn = tests::Data_Dir + "/aligned.bam";
+namespace EntireFileQueryTests {
+
+const string inputBamFn = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+
+} // namespace EntireFileQueryTests
 
 TEST(EntireFileQueryTest, CountRecords)
 {
     EXPECT_NO_THROW(
     {
-        BamFile bamFile(inputBamFn);
+        BamFile bamFile(EntireFileQueryTests::inputBamFn);
         int count = 0;
         EntireFileQuery entireFile(bamFile);
         for (const BamRecord& record : entireFile) {
@@ -74,7 +78,7 @@ TEST(EntireFileQueryTest, NonConstBamRecord)
 {
     EXPECT_NO_THROW(
     {
-        BamFile bamFile(inputBamFn);
+        BamFile bamFile(EntireFileQueryTests::inputBamFn);
         int count = 0;
         EntireFileQuery entireFile(bamFile);
         for (BamRecord& record : entireFile) {
@@ -91,7 +95,7 @@ TEST(BamRecordTest, HandlesDeletionOK)
     // this file raised no error in Debug mode, but segfaulted when
     // trying to access the aligned qualities in Release mode
 
-    const string problemBamFn = tests::Data_Dir + "/segfault.bam";
+    const string problemBamFn = PbbamTestsConfig::Data_Dir + "/segfault.bam";
     BamFile bamFile(problemBamFn);
     int count = 0;
     EntireFileQuery entireFile(bamFile);
@@ -120,7 +124,7 @@ TEST(BamRecordTest, HandlesDeletionOK)
 TEST(BamRecordTest, ReferenceName)
 {
     {   // check reference name of first record
-        const string exampleBam  = tests::Data_Dir + "/aligned.bam";
+        const string exampleBam  = PbbamTestsConfig::Data_Dir + "/aligned.bam";
         BamFile bamFile(exampleBam);
         EntireFileQuery records(bamFile);
         auto firstIter = records.begin();
@@ -130,7 +134,7 @@ TEST(BamRecordTest, ReferenceName)
     }
 
     {   // unmapped records have no reference name, should throw
-        const string exampleBam  = tests::Data_Dir + "/unmap1.bam";
+        const string exampleBam  = PbbamTestsConfig::Data_Dir + "/unmap1.bam";
         BamFile bamFile(exampleBam);
         EntireFileQuery records(bamFile);
         auto firstIter = records.begin();

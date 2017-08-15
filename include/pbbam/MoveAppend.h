@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2017, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -32,27 +32,60 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
 // Author: Derek Barnett
 
-#ifndef TESTDATA_H
-#define TESTDATA_H
+#ifndef MOVEAPPEND_H
+#define MOVEAPPEND_H
 
-#include <string>
+#include <iterator>
+#include <utility>
+#include <vector>
 
 namespace PacBio {
 namespace BAM {
-namespace tests {
 
-const std::string Source_Dir = std::string("@PacBioBAM_TestsDir@");
-const std::string Bin_Dir    = std::string("@CMAKE_CURRENT_BINARY_DIR@");
-const std::string Data_Dir   = std::string("@PacBioBAM_TestsDir@/data");
-const std::string Generated_Dir     = std::string("@GeneratedDir@");
-const std::string GeneratedData_Dir = std::string("@GeneratedTestDataDir@");
-const std::string Bam2Sam    = std::string("@PacBioBAM_BinDir@/bam2sam");
+// \brief Appends content of src vector to dst vector using move semantics.
+///
+/// \param[in]     src  Input vector that will be empty after execution
+/// \param[in,out] dst  Output vector that will be appended to
+///
+template <typename T>
+inline void MoveAppend(std::vector<T>& src, std::vector<T>& dst) noexcept
+{
+    if (dst.empty())
+    {
+        dst = std::move(src);
+    }
+    else
+    {
+        dst.reserve(dst.size() + src.size());
+        std::move(src.begin(), src.end(), std::back_inserter(dst));
+        src.clear();
+    }
+}
 
-} // namespace tests
+/// \brief Appends content of src vector to dst vector using move semantics.
+///
+/// \param[in]     src  Input vector via perfect forwarding
+/// \param[in,out] dst  Output vector that will be appended to
+///
+template <typename T>
+inline void MoveAppend(std::vector<T>&& src, std::vector<T>& dst) noexcept
+{
+    if (dst.empty())
+    {
+        dst = std::move(src);
+    }
+    else
+    {
+        dst.reserve(dst.size() + src.size());
+        std::move(src.begin(), src.end(), std::back_inserter(dst));
+        src.clear();
+    }
+}
+
 } // namespace BAM
 } // namespace PacBio
 
-#endif // TESTDATA_H
+#endif // MOVEAPPEND_H

@@ -50,7 +50,7 @@
 #define protected public
 #endif
 
-#include "TestData.h"
+#include "PbbamTestData.h"
 
 #include <pbbam/BamFile.h>
 #include <pbbam/BamWriter.h>
@@ -58,12 +58,9 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace PacBio::BAM::tests;
 using namespace std;
 
-namespace PacBio {
-namespace BAM {
-namespace tests {
+namespace EndToEndTests {
 
 struct Bam1Deleter
 {
@@ -92,10 +89,10 @@ struct BamHdrDeleter
     }
 };
 
-const string inputBamFn        = tests::Data_Dir + "/aligned.bam";
-const string goldStandardSamFn = tests::Data_Dir + "/aligned.sam";
-const string generatedBamFn    = tests::GeneratedData_Dir + "/generated.bam";
-const string generatedSamFn    = tests::GeneratedData_Dir + "/generated.sam";
+const string inputBamFn        = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+const string goldStandardSamFn = PbbamTestsConfig::Data_Dir + "/aligned.sam";
+const string generatedBamFn    = PbbamTestsConfig::GeneratedData_Dir + "/generated.bam";
+const string generatedSamFn    = PbbamTestsConfig::GeneratedData_Dir + "/generated.sam";
 const vector<string> generatedFiles = { generatedBamFn, generatedSamFn };
 
 static inline
@@ -104,7 +101,7 @@ int RunBam2Sam(const string& bamFn,
                const string& args = string())
 {
     stringstream s;
-    s << tests::Bam2Sam << " " << args << " " << bamFn << " > " << samFn;
+    s << PbbamTestsConfig::Bam2Sam << " " << args << " " << bamFn << " > " << samFn;
     return system(s.str().c_str());
 }
 
@@ -136,9 +133,7 @@ void CheckGeneratedOutput(void)
     Remove(generatedFiles);
 }
 
-} // namespace tests
-} // namespace BAM
-} // namespace PacBio
+} // namespace EndToEndTests
 
 // sanity check for rest of tests below
 TEST(EndToEndTest, ReadAndWrite_PureHtslib)
@@ -147,24 +142,24 @@ TEST(EndToEndTest, ReadAndWrite_PureHtslib)
 
         // open files
 
-        unique_ptr<samFile, SamFileDeleter> inWrapper(sam_open(inputBamFn.c_str(), "r"));
+        unique_ptr<samFile, EndToEndTests::SamFileDeleter> inWrapper(sam_open(EndToEndTests::inputBamFn.c_str(), "r"));
         samFile* in = inWrapper.get();
         ASSERT_TRUE(in);
 
-        unique_ptr<samFile, SamFileDeleter> outWrapper(sam_open(generatedBamFn.c_str(), "wb"));
+        unique_ptr<samFile, EndToEndTests::SamFileDeleter> outWrapper(sam_open(EndToEndTests::generatedBamFn.c_str(), "wb"));
         samFile* out = outWrapper.get();
         ASSERT_TRUE(out);
 
         // fetch & write header
 
-        unique_ptr<bam_hdr_t, BamHdrDeleter> headerWrapper(sam_hdr_read(in));
+        unique_ptr<bam_hdr_t, EndToEndTests::BamHdrDeleter> headerWrapper(sam_hdr_read(in));
         bam_hdr_t* hdr = headerWrapper.get();
         ASSERT_TRUE(hdr);
         ASSERT_EQ(0, sam_hdr_write(out, hdr));
 
         // fetch & write records
 
-        unique_ptr<bam1_t, Bam1Deleter> record(bam_init1());
+        unique_ptr<bam1_t, EndToEndTests::Bam1Deleter> record(bam_init1());
         bam1_t* b = record.get();
         ASSERT_TRUE(b);
 
@@ -172,7 +167,7 @@ TEST(EndToEndTest, ReadAndWrite_PureHtslib)
             sam_write1(out, hdr, b);
     }
 
-    CheckGeneratedOutput();
+    EndToEndTests::CheckGeneratedOutput();
 }
 
 TEST(EndToEndTest, ReadAndWrite_SingleThread)
@@ -180,10 +175,10 @@ TEST(EndToEndTest, ReadAndWrite_SingleThread)
     EXPECT_NO_THROW(
     {
         // open input BAM file
-        BamFile bamFile(tests::inputBamFn);
+        BamFile bamFile(EndToEndTests::inputBamFn);
 
         // open output BAM file
-        BamWriter writer(tests::generatedBamFn, bamFile.Header(), BamWriter::DefaultCompression, 1);
+        BamWriter writer(EndToEndTests::generatedBamFn, bamFile.Header(), BamWriter::DefaultCompression, 1);
 
         // copy BAM file
         EntireFileQuery entireFile(bamFile);
@@ -191,7 +186,7 @@ TEST(EndToEndTest, ReadAndWrite_SingleThread)
             writer.Write(record);
     });
 
-    CheckGeneratedOutput();
+    EndToEndTests::CheckGeneratedOutput();
 }
 
 TEST(EndToEndTest, ReadAndWrite_APIDefaultThreadCount)
@@ -199,10 +194,10 @@ TEST(EndToEndTest, ReadAndWrite_APIDefaultThreadCount)
     EXPECT_NO_THROW(
     {
         // open input BAM file
-        BamFile bamFile(inputBamFn);
+        BamFile bamFile(EndToEndTests::inputBamFn);
 
         // open output BAM file
-        BamWriter writer(generatedBamFn, bamFile.Header());
+        BamWriter writer(EndToEndTests::generatedBamFn, bamFile.Header());
 
         // copy BAM file
         EntireFileQuery entireFile(bamFile);
@@ -210,7 +205,7 @@ TEST(EndToEndTest, ReadAndWrite_APIDefaultThreadCount)
             writer.Write(record);
     });
 
-    CheckGeneratedOutput();
+    EndToEndTests::CheckGeneratedOutput();
 }
 
 TEST(EndToEndTest, ReadAndWrite_SystemDefaultThreadCount)
@@ -218,10 +213,10 @@ TEST(EndToEndTest, ReadAndWrite_SystemDefaultThreadCount)
     EXPECT_NO_THROW(
     {
         // open input BAM file
-        BamFile bamFile(inputBamFn);
+        BamFile bamFile(EndToEndTests::inputBamFn);
 
         // open output BAM file
-        BamWriter writer(generatedBamFn,
+        BamWriter writer(EndToEndTests::generatedBamFn,
                          bamFile.Header(),
                          BamWriter::DefaultCompression,
                          0);
@@ -232,7 +227,7 @@ TEST(EndToEndTest, ReadAndWrite_SystemDefaultThreadCount)
             writer.Write(record);
     });
 
-    CheckGeneratedOutput();
+    EndToEndTests::CheckGeneratedOutput();
 }
 
 TEST(EndToEndTest, ReadAndWrite_UserThreadCount)
@@ -240,10 +235,10 @@ TEST(EndToEndTest, ReadAndWrite_UserThreadCount)
     EXPECT_NO_THROW(
     {
         // open input BAM file
-        BamFile bamFile(inputBamFn);
+        BamFile bamFile(EndToEndTests::inputBamFn);
 
         // open output BAM file
-        BamWriter writer(generatedBamFn,
+        BamWriter writer(EndToEndTests::generatedBamFn,
                          bamFile.Header(),
                          BamWriter::DefaultCompression,
                          3);
@@ -254,5 +249,5 @@ TEST(EndToEndTest, ReadAndWrite_UserThreadCount)
             writer.Write(record);
     });
 
-    CheckGeneratedOutput();
+    EndToEndTests::CheckGeneratedOutput();
 }

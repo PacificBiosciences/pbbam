@@ -14,8 +14,8 @@ if(PacBioBAM_build_tests)
 
     # generate paths/values used by for unit tests
     configure_file(
-        ${PacBioBAM_TestsDir}/src/TestData.h.in
-        ${CMAKE_BINARY_DIR}/generated/TestData.h
+        ${PacBioBAM_TestsDir}/src/PbbamTestData.h.in
+        ${CMAKE_BINARY_DIR}/generated/PbbamTestData.h
     )
     configure_file(
         ${PacBioBAM_TestsDir}/data/group/group.fofn.in

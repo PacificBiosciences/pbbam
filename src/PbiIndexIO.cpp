@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2017, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -40,6 +40,7 @@
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/EntireFileQuery.h"
+#include "pbbam/MoveAppend.h"
 #include "pbbam/PbiBuilder.h"
 #include "MemoryUtils.h"
 #include <boost/algorithm/string.hpp>
@@ -50,46 +51,6 @@
 namespace PacBio {
 namespace BAM {
 namespace internal {
-
-// \brief Appends content of src vector to dst vector using move semantics.
-///
-/// \param[in]     src  Input vector that will be empty after execution
-/// \param[in,out] dst  Output vector that will be appended to
-///
-template <typename T>
-inline void MoveAppend(std::vector<T>& src, std::vector<T>& dst) noexcept
-{
-    if (dst.empty())
-    {
-        dst = std::move(src);
-    }
-    else
-    {
-        dst.reserve(dst.size() + src.size());
-        std::move(src.begin(), src.end(), std::back_inserter(dst));
-        src.clear();
-    }
-}
-
-/// \brief Appends content of src vector to dst vector using move semantics.
-///
-/// \param[in]     src  Input vector via perfect forwarding
-/// \param[in,out] dst  Output vector that will be appended to
-///
-template <typename T>
-inline void MoveAppend(std::vector<T>&& src, std::vector<T>& dst) noexcept
-{
-    if (dst.empty())
-    {
-        dst = std::move(src);
-    }
-    else
-    {
-        dst.reserve(dst.size() + src.size());
-        std::move(src.begin(), src.end(), std::back_inserter(dst));
-        src.clear();
-    }
-}
 
 static void CheckContainer(const std::string& container,
                            const size_t expected,

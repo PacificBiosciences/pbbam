@@ -52,7 +52,7 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-namespace tests {
+namespace CompareTests {
 
 static inline
 BamRecord makeRecordWithTag(const string& tagName,
@@ -109,12 +109,12 @@ std::vector<BamRecord> makeMappedRecords(void)
     const string s2_cigar = "5=3D5=";
     const string s3_cigar = "4=1D2I2D2X2=";
 
-    BamRecord s1 = tests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    BamRecord s2 = tests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    BamRecord s3 = tests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    BamRecord s1_rev = tests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    BamRecord s2_rev = tests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    BamRecord s3_rev = tests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s1 = CompareTests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s2 = CompareTests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s3 = CompareTests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s1_rev = CompareTests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s2_rev = CompareTests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s3_rev = CompareTests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
 
     s1.Map(0, 100, Strand::FORWARD, s1_cigar, mapQual);
     s2.Map(0, 100, Strand::FORWARD, s2_cigar, mapQual);
@@ -126,7 +126,7 @@ std::vector<BamRecord> makeMappedRecords(void)
     return std::vector<BamRecord> { s1, s2, s3, s1_rev, s2_rev, s3_rev };
 }
 
-} // namespace tests
+} // namespace CompareTests
 
 TEST(CompareTest, TypeToNameOk)
 {
@@ -287,10 +287,10 @@ TEST(CompareTest, BarcodeQualityOk)
 
     auto records = vector<BamRecord>
     {
-        tests::makeRecordWithTag("bq", Tag(q1)),
-        tests::makeRecordWithTag("bq", Tag(q2)),
-        tests::makeRecordWithTag("bq", Tag(q3)),
-        tests::makeRecordWithTag("bq", Tag(q4))
+        CompareTests::makeRecordWithTag("bq", Tag(q1)),
+        CompareTests::makeRecordWithTag("bq", Tag(q2)),
+        CompareTests::makeRecordWithTag("bq", Tag(q3)),
+        CompareTests::makeRecordWithTag("bq", Tag(q4))
     };
     std::sort(records.begin(), records.end(), Compare::BarcodeQuality());
 
@@ -306,10 +306,10 @@ TEST(CompareTest, CustomCompareOk)
 
     auto records = vector<BamRecord>
     {
-        tests::makeRecordWithTag("dt", Tag(string("foo"))),
-        tests::makeRecordWithTag("dt", Tag(string("foo"))),
-        tests::makeRecordWithTag("dt", Tag(string("foo"))),
-        tests::makeRecordWithTag("dt", Tag(string("foo")))
+        CompareTests::makeRecordWithTag("dt", Tag(string("foo"))),
+        CompareTests::makeRecordWithTag("dt", Tag(string("foo"))),
+        CompareTests::makeRecordWithTag("dt", Tag(string("foo"))),
+        CompareTests::makeRecordWithTag("dt", Tag(string("foo")))
     };
     records.push_back(BamRecord());
     records.push_back(BamRecord());
@@ -423,7 +423,7 @@ TEST(CompareTest, NoneOk)
 TEST(CompareTest, NumDeletedBasesOk)
 {
     // create test data
-    auto records = tests::makeMappedRecords();
+    auto records = CompareTests::makeMappedRecords();
 
     // sanity checks on initial conditions
     EXPECT_EQ(6, records.size());
@@ -447,7 +447,7 @@ TEST(CompareTest, NumDeletedBasesOk)
 TEST(CompareTest, NumInsertedBasesOk)
 {
     // create test data
-    auto records = tests::makeMappedRecords();
+    auto records = CompareTests::makeMappedRecords();
 
     // sanity checks on initial conditions
     EXPECT_EQ(6, records.size());
@@ -471,7 +471,7 @@ TEST(CompareTest, NumInsertedBasesOk)
 TEST(CompareTest, NumMatchesOk)
 {
     // create test data
-    auto records = tests::makeMappedRecords();
+    auto records = CompareTests::makeMappedRecords();
 
     // sanity checks on initial conditions
     EXPECT_EQ(6, records.size());
@@ -495,7 +495,7 @@ TEST(CompareTest, NumMatchesOk)
 TEST(CompareTest, NumMismatchesOk)
 {
     // create test data
-    auto records = tests::makeMappedRecords();
+    auto records = CompareTests::makeMappedRecords();
 
     // sanity checks on initial conditions
     EXPECT_EQ(6, records.size());
@@ -525,10 +525,10 @@ TEST(CompareTest, QueryEndOk)
 
     auto records = vector<BamRecord>
     {
-        tests::makeRecordWithTag("qe", Tag(q1)),
-        tests::makeRecordWithTag("qe", Tag(q2)),
-        tests::makeRecordWithTag("qe", Tag(q3)),
-        tests::makeRecordWithTag("qe", Tag(q4))
+        CompareTests::makeRecordWithTag("qe", Tag(q1)),
+        CompareTests::makeRecordWithTag("qe", Tag(q2)),
+        CompareTests::makeRecordWithTag("qe", Tag(q3)),
+        CompareTests::makeRecordWithTag("qe", Tag(q4))
     };
     std::sort(records.begin(), records.end(), Compare::QueryEnd());
 
@@ -547,10 +547,10 @@ TEST(CompareTest, QueryStartOk)
 
     auto records = vector<BamRecord>
     {
-        tests::makeRecordWithTag("qs", Tag(q1)),
-        tests::makeRecordWithTag("qs", Tag(q2)),
-        tests::makeRecordWithTag("qs", Tag(q3)),
-        tests::makeRecordWithTag("qs", Tag(q4))
+        CompareTests::makeRecordWithTag("qs", Tag(q1)),
+        CompareTests::makeRecordWithTag("qs", Tag(q2)),
+        CompareTests::makeRecordWithTag("qs", Tag(q3)),
+        CompareTests::makeRecordWithTag("qs", Tag(q4))
     };
     std::sort(records.begin(), records.end(), Compare::QueryStart());
 
@@ -623,10 +623,10 @@ TEST(CompareTest, ReadAccuracyOk)
 
     auto records = vector<BamRecord>
     {
-        tests::makeRecordWithTag("rq", Tag(a1)),
-        tests::makeRecordWithTag("rq", Tag(a2)),
-        tests::makeRecordWithTag("rq", Tag(a3)),
-        tests::makeRecordWithTag("rq", Tag(a4))
+        CompareTests::makeRecordWithTag("rq", Tag(a1)),
+        CompareTests::makeRecordWithTag("rq", Tag(a2)),
+        CompareTests::makeRecordWithTag("rq", Tag(a3)),
+        CompareTests::makeRecordWithTag("rq", Tag(a4))
     };
     std::sort(records.begin(), records.end(), Compare::ReadAccuracy());
 
@@ -639,7 +639,7 @@ TEST(CompareTest, ReadAccuracyOk)
 TEST(CompareTest, ReferenceEndOk)
 {
     // create test data
-    auto records = tests::makeMappedRecords();
+    auto records = CompareTests::makeMappedRecords();
 
     // sanity checks on initial conditions
     EXPECT_EQ(6, records.size());
@@ -728,10 +728,10 @@ TEST(CompareTest, ZmwOk)
 
     auto records = vector<BamRecord>
     {
-        tests::makeRecordWithTag("zm", Tag(z1)),
-        tests::makeRecordWithTag("zm", Tag(z2)),
-        tests::makeRecordWithTag("zm", Tag(z3)),
-        tests::makeRecordWithTag("zm", Tag(z4))
+        CompareTests::makeRecordWithTag("zm", Tag(z1)),
+        CompareTests::makeRecordWithTag("zm", Tag(z2)),
+        CompareTests::makeRecordWithTag("zm", Tag(z3)),
+        CompareTests::makeRecordWithTag("zm", Tag(z4))
     };
     std::sort(records.begin(), records.end(), Compare::Zmw());
 

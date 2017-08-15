@@ -53,9 +53,7 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-namespace PacBio {
-namespace BAM {
-namespace tests {
+namespace BamHeaderTests {
 
 struct BamHdrDeleter
 {
@@ -66,9 +64,7 @@ struct BamHdrDeleter
     }
 };
 
-} // namespace tests
-} // namespace BAM
-} // namespace PacBio
+} // namespace BamHeaderTests
 
 TEST(BamHeaderTest, DefaultConstruction)
 {
@@ -234,7 +230,7 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
 
 
     const string& text = header.ToSam();
-    std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), tests::BamHdrDeleter());
+    std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), BamHeaderTests::BamHdrDeleter());
     rawData->ignore_sam_err = 0;
     rawData->cigar_tab = NULL;
     rawData->l_text = text.size();
@@ -287,7 +283,7 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
 
 
     string text = header.ToSam();
-    std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), tests::BamHdrDeleter());
+    std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), BamHeaderTests::BamHdrDeleter());
     rawData->ignore_sam_err = 0;
     rawData->cigar_tab = NULL;
     rawData->l_text = text.size();

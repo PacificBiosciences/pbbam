@@ -45,7 +45,7 @@
 #define private public
 #endif
 
-#include "TestData.h"
+#include "PbbamTestData.h"
 
 #include "pbbam/IndexedFastaReader.h"
 #include "pbbam/BamRecord.h"
@@ -56,15 +56,19 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-const string lambdaFasta = tests::Data_Dir + "/lambdaNEB.fa";
-const string singleInsertionBam = tests::Data_Dir + "/aligned.bam";
+namespace IndexedFastaReaderTests {
+
+const string lambdaFasta = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
+const string singleInsertionBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+
+} // namespace IndexedFastaReaderTests
 
 TEST(IndexedFastaReaderTests, PrintSingleInsertion)
 {
-    IndexedFastaReader r(lambdaFasta);
+    IndexedFastaReader r(IndexedFastaReaderTests::lambdaFasta);
 
     // Open BAM file
-    BamFile bamFile(singleInsertionBam);
+    BamFile bamFile(IndexedFastaReaderTests::singleInsertionBam);
     EntireFileQuery bamQuery(bamFile);
 
     auto it = bamQuery.begin();
@@ -176,7 +180,7 @@ TEST(IndexedFastaReaderTests, PrintSingleInsertion)
 
 TEST(IndexedFastaReaderTests, ReadLambda)
 {
-    IndexedFastaReader r(lambdaFasta);
+    IndexedFastaReader r(IndexedFastaReaderTests::lambdaFasta);
 
     EXPECT_TRUE(r.HasSequence("lambda_NEB3011"));
     EXPECT_FALSE(r.HasSequence("dog"));
@@ -198,7 +202,7 @@ TEST(IndexedFastaReaderTests, ReadLambda)
 
 TEST(IndexedFastaReaderTests, Errors)
 {
-    IndexedFastaReader r(lambdaFasta);
+    IndexedFastaReader r(IndexedFastaReaderTests::lambdaFasta);
 
     //
     // attempt access without "opening"
@@ -217,7 +221,7 @@ TEST(IndexedFastaReaderTests, Errors)
 
 TEST(IndexedFastaReaderTests, Names)
 {
-    IndexedFastaReader r(lambdaFasta);
+    IndexedFastaReader r(IndexedFastaReaderTests::lambdaFasta);
     std::vector<std::string> names = {"lambda_NEB3011"};
 
     // Test all-name request

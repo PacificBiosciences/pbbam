@@ -43,7 +43,7 @@
 #define private public
 #endif
 
-#include "TestData.h"
+#include "PbbamTestData.h"
 
 #include <pbbam/AlignmentPrinter.h>
 #include <pbbam/BamFile.h>
@@ -55,15 +55,19 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-const string lambdaFasta = tests::Data_Dir + "/lambdaNEB.fa";
-const string singleInsertionBam = tests::Data_Dir + "/aligned.bam";
+namespace AlignmentPrinterTests {
+
+const string lambdaFasta = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
+const string singleInsertionBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+
+} // namespace AlignmentPrinterTests
 
 TEST(AlignmentPrinterTest, Print)
 {
-    IndexedFastaReader r(lambdaFasta);
+    IndexedFastaReader r(AlignmentPrinterTests::lambdaFasta);
     AlignmentPrinter pretty(r);
 
-    BamFile bamFile(singleInsertionBam);
+    BamFile bamFile(AlignmentPrinterTests::singleInsertionBam);
     EntireFileQuery bamQuery(bamFile);
     auto it = bamQuery.begin();
 

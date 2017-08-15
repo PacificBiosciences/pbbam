@@ -41,7 +41,7 @@
 #define private public
 #endif
 
-#include "TestData.h"
+#include "PbbamTestData.h"
 
 #include <pbbam/FastaReader.h>
 #include <pbbam/FastaSequence.h>
@@ -50,6 +50,8 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
+
+namespace FastaTests {
 
 static void CheckSequence(const size_t index, const FastaSequence& seq)
 {
@@ -75,6 +77,8 @@ static void CheckSequence(const size_t index, const FastaSequence& seq)
     }
 }
 
+} // namespace FastaTests
+
 TEST(FastaSequenceTest, BasicConstructorOk)
 {
     FastaSequence seq{ "1", "GATTACA" };
@@ -84,13 +88,13 @@ TEST(FastaSequenceTest, BasicConstructorOk)
 
 TEST(FastaReaderTest, IterableOk)
 {
-    const string fn = tests::GeneratedData_Dir + "/normal.fa";
+    const string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fa";
     FastaReader reader{ fn };
 
     size_t count = 0;
     FastaSequence seq;
     while (reader.GetNext(seq)) {
-        CheckSequence(count, seq);
+        FastaTests::CheckSequence(count, seq);
         ++count;
     }
     EXPECT_EQ(3, count);
@@ -98,11 +102,11 @@ TEST(FastaReaderTest, IterableOk)
 
 TEST(FastaReaderTest, ReadAllOk)
 {
-    const string fn = tests::GeneratedData_Dir + "/normal.fa";
+    const string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fa";
 
     size_t count = 0;
     for (const auto& seq : FastaReader::ReadAll(fn)) {
-        CheckSequence(count, seq);
+        FastaTests::CheckSequence(count, seq);
         ++count;
     }
     EXPECT_EQ(3, count);
@@ -110,7 +114,7 @@ TEST(FastaReaderTest, ReadAllOk)
 
 TEST(FastaSequenceQueryTest, FromFastaFilename)
 {
-    const string fn = tests::Data_Dir + "/lambdaNEB.fa";
+    const string fn = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
 
     {
         size_t count = 0;
@@ -133,7 +137,7 @@ TEST(FastaSequenceQueryTest, FromFastaFilename)
 
 TEST(FastaSequenceQueryTest, FromDataSet)
 {
-    const string fn = tests::Data_Dir + "/referenceset.xml";
+    const string fn = PbbamTestsConfig::Data_Dir + "/referenceset.xml";
 
     {
         size_t count = 0;

@@ -50,7 +50,7 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-namespace tests {
+namespace BamRecordBuilderTests {
 
 static
 void CheckRawData(const BamRecordImpl& bam)
@@ -82,7 +82,7 @@ static
 void CheckRawData(const BamRecord& bam)
 { CheckRawData(bam.impl_); }
 
-} // namespace tests
+} // namespace BamRecordBuilderTests
 
 TEST(BamRecordBuilderTest, DefaultValues)
 {
@@ -142,7 +142,7 @@ TEST(BamRecordBuilderTest, DefaultValues)
     EXPECT_EQ(emptyString, bam.impl_.CigarData().ToStdString());
     EXPECT_EQ(emptyString, bam.impl_.Sequence());
     EXPECT_EQ(emptyString, bam.impl_.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordBuilderTests::CheckRawData(bam);
 }
 
 TEST(BamRecordBuilderTest, CheckSetters)
