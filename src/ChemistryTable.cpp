@@ -35,6 +35,8 @@
 
 // Author: Lance Hepler
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/exception/BundleChemistryMappingException.h"
 #include "ChemistryTable.h"
 #include "FileUtils.h"

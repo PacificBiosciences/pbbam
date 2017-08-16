@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/BamHeader.h"
 #include "StringUtils.h"
 #include "Version.h"

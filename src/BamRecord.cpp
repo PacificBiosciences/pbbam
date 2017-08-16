@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/BamRecord.h"
 #include "pbbam/virtual/VirtualRegionTypeMap.h"
 #include "pbbam/ZmwTypeMap.h"

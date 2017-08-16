@@ -35,6 +35,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "PbiIndexIO.h"
 
 #include "pbbam/BamFile.h"

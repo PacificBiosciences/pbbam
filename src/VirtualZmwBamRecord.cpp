@@ -39,6 +39,8 @@
 //
 // Author: Armin Töpfer
 
+#include "PbbamInternalConfig.h"
+
 #include <cstdint>
 #include <iostream>
 #include <sstream>

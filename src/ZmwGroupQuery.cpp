@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/ZmwGroupQuery.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/CompositeBamReader.h"

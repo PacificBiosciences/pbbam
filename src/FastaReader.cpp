@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/FastaReader.h"
 #include <htslib/faidx.h>
 #include <stdexcept>

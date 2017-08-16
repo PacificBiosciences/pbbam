@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "ValidationErrors.h"
 #include "pbbam/exception/ValidationException.h"
 #include "StringUtils.h"

@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/Cigar.h"
 #include <cstddef>
 #include <cstdint>

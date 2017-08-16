@@ -35,6 +35,8 @@
 
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/BamRecordBuilder.h"
 #include "pbbam/BamTagCodec.h"
 #include "MemoryUtils.h"

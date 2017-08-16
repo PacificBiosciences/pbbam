@@ -39,6 +39,8 @@
 //
 // Author: Brett Bowman
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/MD5.h"
 #include <htslib/hts.h>
 #include <stdexcept>

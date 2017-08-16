@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/BamReader.h"
 #include "pbbam/Validator.h"
 #include "MemoryUtils.h"

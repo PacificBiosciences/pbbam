@@ -67,7 +67,7 @@ if get_option('enable-tests')
     dependencies : [pbbam_gtest_dep, pbbam_boost_dep, pbbam_htslib_dep],
     include_directories : pbbam_include_directories,
     link_with : pbbam_lib,
-    cpp_args : [pbbam_warning_flags, '-DPBBAM_TESTING'],
+    cpp_args : pbbam_warning_flags,
     install : false)
 
   custom_target('pbbam_generate_data',

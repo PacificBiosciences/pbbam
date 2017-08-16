@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include <cstddef>
 
 #include "pbbam/BaiIndexedBamReader.h"

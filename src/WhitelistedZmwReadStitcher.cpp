@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/virtual/WhitelistedZmwReadStitcher.h"
 #include "pbbam/PbiIndexedBamReader.h"
 #include "VirtualZmwReader.h"

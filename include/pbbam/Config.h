@@ -45,27 +45,11 @@
 /// \name Library Import/Export
 /// \{
 
-#ifndef PBBAM_LIBRARY_EXPORT
-#  if defined(WIN32)
-#    define PBBAM_LIBRARY_EXPORT __declspec(dllexport)
-#  else
-#    define PBBAM_LIBRARY_EXPORT __attribute__((visibility("default")))
-#  endif
-#endif
-
-#ifndef PBBAM_LIBRARY_IMPORT
-#  if defined(WIN32)
-#    define PBBAM_LIBRARY_IMPORT __declspec(dllimport)
-#  else
-#    define PBBAM_LIBRARY_IMPORT
-#  endif
-#endif
-
 #ifndef PBBAM_EXPORT
-#  if defined(PBBAM_LIBRARY)
-#    define PBBAM_EXPORT PBBAM_LIBRARY_EXPORT
+#  if defined(WIN32)
+#    define PBBAM_EXPORT __declspec(dllimport)
 #  else
-#    define PBBAM_EXPORT PBBAM_LIBRARY_IMPORT
+#    define PBBAM_EXPORT
 #  endif
 #endif
 

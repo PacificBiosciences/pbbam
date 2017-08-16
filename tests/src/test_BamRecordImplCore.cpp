@@ -47,9 +47,7 @@
 
 #include <gtest/gtest.h>
 
-#ifdef PBBAM_TESTING
 #define private public
-#endif
 
 #include <pbbam/BamRecordImpl.h>
 #include <pbbam/BamTagCodec.h>

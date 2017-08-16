@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/PbiFilter.h"
 #include "pbbam/PbiFilterTypes.h"
 #include "StringUtils.h"

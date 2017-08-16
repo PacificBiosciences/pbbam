@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/GenomicInterval.h"
 #include "StringUtils.h"
 #include <cstdlib>

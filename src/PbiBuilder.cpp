@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/PbiBuilder.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/PbiRawData.h"

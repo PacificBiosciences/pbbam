@@ -40,6 +40,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/ProgramInfo.h"
 #include "SequenceUtils.h"
 #include <sstream>

@@ -35,6 +35,8 @@
 
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "XmlWriter.h"
 #include "pbbam/DataSet.h"
 #include "pugixml/pugixml.hpp"

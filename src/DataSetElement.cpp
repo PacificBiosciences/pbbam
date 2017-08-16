@@ -35,6 +35,8 @@
 
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/internal/DataSetElement.h"
 #include "DataSetUtils.h"
 

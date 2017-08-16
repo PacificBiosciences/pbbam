@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "BamRecordTags.h"
 #include "EnumClassHash.h"
 #include <unordered_map>

@@ -31,7 +31,6 @@ if(PacBioBAM_build_tests)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PacBioBAM_CXX_FLAGS}")
 
     # define unit test executable
-    add_definitions(-DPBBAM_TESTING)
     if(MSVC)
         # VS2012+ pooh-pooh's Derek's "#define private public" trick
         add_definitions(-D_ALLOW_KEYWORD_MACROS)

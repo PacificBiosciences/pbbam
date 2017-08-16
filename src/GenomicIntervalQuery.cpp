@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/GenomicIntervalQuery.h"
 #include "pbbam/CompositeBamReader.h"
 

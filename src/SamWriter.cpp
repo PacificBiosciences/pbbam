@@ -35,6 +35,8 @@
 
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/SamWriter.h"
 #include "pbbam/Validator.h"
 #include "FileProducer.h"

@@ -39,9 +39,7 @@
 #include <cstddef>
 #include <gtest/gtest.h>
 
-#ifdef PBBAM_TESTING
 #define private public
-#endif
 
 #include "PbbamTestData.h"
 

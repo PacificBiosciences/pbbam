@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/ReadAccuracyQuery.h"
 #include "pbbam/PbiFilterTypes.h"
 #include "pbbam/CompositeBamReader.h"
