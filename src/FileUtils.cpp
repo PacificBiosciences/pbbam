@@ -38,6 +38,7 @@
 #include "FileUtils.h"
 #include "StringUtils.h"
 #include <boost/algorithm/string.hpp>
+#include <cstddef>
 #include <exception>
 #include <fstream>
 #include <iostream>

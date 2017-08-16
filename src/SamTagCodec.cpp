@@ -39,6 +39,9 @@
 //
 // Author: Derek Barnett
 
+#include <cstdint>
+#include <limits>
+
 #include "pbbam/SamTagCodec.h"
 #include <boost/lexical_cast.hpp>
 
@@ -173,9 +176,9 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
                 // negative value (force signed int)
                 if (remainder.at(0) == '-') {
                     const int32_t x = boost::lexical_cast<int32_t>(remainder);
-                    if ( x >= INT8_MIN )
+                    if ( x >= std::numeric_limits<int8_t>::min() )
                         tags[name] = static_cast<int8_t>(x);
-                    else if ( x >= INT16_MIN )
+                    else if ( x >= std::numeric_limits<int16_t>::min() )
                         tags[name] = static_cast<int16_t>(x);
                     else
                         tags[name] = x;
@@ -184,9 +187,9 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
                 // unsigned int
                 else {
                     const uint32_t x = boost::lexical_cast<uint32_t>(remainder);
-                    if ( x <= UINT8_MAX )
+                    if ( x <= std::numeric_limits<uint8_t>::max() )
                         tags[name] = static_cast<uint8_t>(x);
-                    else if ( x <= UINT16_MAX )
+                    else if ( x <= std::numeric_limits<uint16_t>::max() )
                         tags[name] = static_cast<uint16_t>(x);
                     else
                         tags[name] = x;

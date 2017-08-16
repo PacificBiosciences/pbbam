@@ -45,6 +45,8 @@
 #include "pbbam/Config.h"
 #include "pbbam/Compare.h"
 #include "pbbam/PbiBasicTypes.h"
+#include <cstddef>
+#include <cstdint>
 #include <deque>
 #include <map>
 #include <unordered_map>

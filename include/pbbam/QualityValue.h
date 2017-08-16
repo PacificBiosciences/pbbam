@@ -43,6 +43,7 @@
 #define QUALITYVALUE_H
 
 #include "pbbam/Config.h"
+#include <cstdint>
 #include <string>
 #include <vector>
 

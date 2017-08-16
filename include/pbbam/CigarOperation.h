@@ -43,6 +43,7 @@
 #define CIGAROPERATION_H
 
 #include "pbbam/Config.h"
+#include <cstdint>
 #include <stdexcept>
 
 namespace PacBio {

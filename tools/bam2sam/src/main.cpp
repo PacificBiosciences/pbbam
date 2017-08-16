@@ -41,6 +41,7 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <cstddef>
 #include <cstdlib>
 
 static

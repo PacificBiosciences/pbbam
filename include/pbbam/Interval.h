@@ -43,6 +43,7 @@
 #define INTERVAL_H
 
 #include "pbbam/Config.h"
+#include <cstddef>
 #include <string>
 
 #define BOOST_ICL_USE_STATIC_BOUNDED_INTERVALS

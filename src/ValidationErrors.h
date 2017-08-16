@@ -42,6 +42,7 @@
 #ifndef VALIDATIONERRORS_H
 #define VALIDATIONERRORS_H
 
+#include <cstddef>
 #include <limits>
 #include <map>
 #include <string>

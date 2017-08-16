@@ -40,6 +40,7 @@
 #include "DataSetUtils.h"
 #include "TimeUtils.h"
 #include <boost/algorithm/string.hpp>
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

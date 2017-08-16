@@ -48,6 +48,8 @@
 #include "SequenceUtils.h"
 #include <boost/numeric/conversion/cast.hpp>
 #include <htslib/sam.h>
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <stdexcept>
 

@@ -37,6 +37,7 @@
 
 #include <string>
 #include <vector>
+#include <cstddef>
 #include <cstdlib>
 
 #include <gtest/gtest.h>

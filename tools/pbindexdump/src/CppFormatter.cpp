@@ -38,6 +38,7 @@
 #include "CppFormatter.h"
 #include <pbbam/PbiRawData.h>
 
+#include <cstdint>
 #include <iostream>
 #include <sstream>
 

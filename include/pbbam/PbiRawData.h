@@ -44,6 +44,8 @@
 
 #include "pbbam/Config.h"
 #include "pbbam/PbiFile.h"
+#include <cstddef>
+#include <cstdint>
 #include <string>
 #include <vector>
 

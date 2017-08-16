@@ -47,6 +47,8 @@
 #include "pbbam/Config.h"
 #include "pbbam/IRecordWriter.h"
 #include <htslib/sam.h>
+#include <cstddef>
+#include <cstdint>
 #include <string>
 
 namespace PacBio {

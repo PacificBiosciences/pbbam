@@ -36,6 +36,8 @@
 // Author: Derek Barnett
 
 #include <chrono>
+#include <cstdint>
+#include <cstddef>
 #include <string>
 
 #include <gtest/gtest.h>

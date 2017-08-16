@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include <cstdint>
+
 #include "pbbam/QualityValue.h"
 
 namespace PacBio {

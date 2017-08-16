@@ -40,6 +40,8 @@
 #include "MemoryUtils.h"
 #include <htslib/sam.h>
 #include <cstring>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 
 namespace PacBio {

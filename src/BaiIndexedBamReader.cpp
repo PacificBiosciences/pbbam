@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include <cstddef>
+
 #include "pbbam/BaiIndexedBamReader.h"
 #include "MemoryUtils.h"
 

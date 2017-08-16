@@ -36,6 +36,7 @@
 // Author: Derek Barnett
 
 #include <stdexcept>
+#include <cstddef>
 #include <cstdlib>
 #include <unistd.h>
 

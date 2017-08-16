@@ -43,6 +43,8 @@
 #include "pbbam/SequenceInfo.h"
 #include "SequenceUtils.h"
 #include <sstream>
+#include <cstdint>
+#include <limits>
 
 namespace PacBio {
 namespace BAM {
@@ -102,7 +104,7 @@ bool SequenceInfo::IsValid(void) const
 
     // use long instead of int32_t, just to make sure we can catch overflow
     const long l = atol(length_.c_str());
-    return l >= 0 && l <= INT32_MAX;
+    return l >= 0 && l <= std::numeric_limits<int32_t>::max();
 }
 
 std::string SequenceInfo::ToSam(void) const

@@ -39,6 +39,7 @@
 #include "PbIndex.h"
 #include "PbIndexVersion.h"
 #include <cassert>
+#include <cstddef>
 #include <iostream>
 using namespace std;
 

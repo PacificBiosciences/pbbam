@@ -40,6 +40,7 @@
 
 #include "pbbam/Config.h"
 #include <boost/dynamic_bitset.hpp>
+#include <cstddef>
 #include <string>
 #include <cassert>
 #include <cctype>

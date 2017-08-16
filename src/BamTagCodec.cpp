@@ -42,6 +42,8 @@
 #include "pbbam/BamTagCodec.h"
 #include <htslib/kstring.h>
 #include <cstring>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

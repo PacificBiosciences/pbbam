@@ -46,6 +46,8 @@
 #include <sstream>
 #include <set>
 #include <cassert>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

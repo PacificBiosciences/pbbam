@@ -44,6 +44,7 @@
 
 #include "pbbam/Config.h"
 #include "pbbam/TagCollection.h"
+#include <cstdint>
 #include <vector>
 
 namespace PacBio {

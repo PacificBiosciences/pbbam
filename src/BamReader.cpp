@@ -46,6 +46,7 @@
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
 #include <cassert>
+#include <cstdint>
 #include <cstdio>
 
 namespace PacBio {

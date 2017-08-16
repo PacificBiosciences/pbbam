@@ -46,6 +46,8 @@
 #include "MemoryUtils.h"
 #include "PbiIndexIO.h"
 #include <htslib/bgzf.h>
+#include <cstddef>
+#include <cstdint>
 #include <thread>
 #include <cassert>
 

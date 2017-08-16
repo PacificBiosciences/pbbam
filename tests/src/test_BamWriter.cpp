@@ -35,6 +35,7 @@
 
 // Author: Derek Barnett
 
+#include <cstdint>
 #include <gtest/gtest.h>
 
 #ifdef PBBAM_TESTING

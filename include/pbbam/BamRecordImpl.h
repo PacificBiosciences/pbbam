@@ -49,6 +49,8 @@
 #include "pbbam/QualityValues.h"
 #include "pbbam/TagCollection.h"
 #include <htslib/sam.h>
+#include <cstddef>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <string>

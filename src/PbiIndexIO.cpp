@@ -44,6 +44,8 @@
 #include "pbbam/PbiBuilder.h"
 #include "MemoryUtils.h"
 #include <boost/algorithm/string.hpp>
+#include <cstddef>
+#include <cstdint>
 #include <sstream>
 #include <stdexcept>
 #include <vector>

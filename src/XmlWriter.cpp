@@ -38,6 +38,7 @@
 #include "XmlWriter.h"
 #include "pbbam/DataSet.h"
 #include "pugixml/pugixml.hpp"
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <map>

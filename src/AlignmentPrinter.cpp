@@ -42,6 +42,7 @@
 #include "pbbam/AlignmentPrinter.h"
 
 #include <cmath>
+#include <cstddef>
 #include <iostream>
 #include <iomanip>  
 #include <stdexcept>

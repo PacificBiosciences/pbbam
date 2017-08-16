@@ -39,6 +39,9 @@
 //
 // Author: Derek Barnett
 
+#include <cstddef>
+#include <cstdint>
+
 #include "pbbam/PbiIndex.h"
 #include "PbiIndexIO.h"
 

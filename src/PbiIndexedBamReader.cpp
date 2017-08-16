@@ -41,6 +41,8 @@
 
 #include "pbbam/PbiIndexedBamReader.h"
 #include <htslib/bgzf.h>
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
 
 namespace PacBio {

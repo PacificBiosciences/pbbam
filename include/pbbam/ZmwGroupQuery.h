@@ -43,6 +43,7 @@
 #define ZMWGROUPQUERY_H
 
 #include "pbbam/internal/QueryBase.h"
+#include <cstdint>
 #include <vector>
 
 namespace PacBio {

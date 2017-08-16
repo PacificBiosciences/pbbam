@@ -35,6 +35,7 @@
 
 // Author: Derek Barnett
 
+#include <cstddef>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>

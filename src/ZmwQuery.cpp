@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include <cstdint>
+
 #include "pbbam/ZmwQuery.h"
 #include "pbbam/PbiFilterTypes.h"
 #include "pbbam/CompositeBamReader.h"

@@ -45,6 +45,7 @@
 #include "pbbam/Orientation.h"
 #include "pbbam/Position.h"
 #include <htslib/faidx.h>
+#include <cstddef>
 #include <string>
 #include <iostream>
 #include <stdexcept>

@@ -36,6 +36,8 @@
 // Author: Derek Barnett
 
 #include <algorithm>
+#include <cstdint>
+#include <cstddef>
 #include <iostream>
 #include <iterator>
 #include <memory>

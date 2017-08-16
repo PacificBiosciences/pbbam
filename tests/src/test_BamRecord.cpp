@@ -36,6 +36,8 @@
 // Author: Derek Barnett
 
 #include <array>
+#include <cstdint>
+#include <cstddef>
 #include <initializer_list>
 #include <string>
 #include <vector>

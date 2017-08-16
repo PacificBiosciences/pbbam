@@ -41,7 +41,8 @@
 #include "StringUtils.h"
 #include <algorithm>
 #include <string>
-#include <ctype.h>
+#include <cctype>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

@@ -45,6 +45,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <cstdint>
 #include <algorithm>
 #include <fstream>
 #include <iostream>

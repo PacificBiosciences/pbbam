@@ -44,6 +44,8 @@
 #include "pbbam/PbiRawData.h"
 #include <htslib/bgzf.h>
 #include <htslib/sam.h>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>

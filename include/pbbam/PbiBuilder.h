@@ -43,6 +43,8 @@
 #define PBIBUILDER_H
 
 #include "pbbam/Config.h"
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 

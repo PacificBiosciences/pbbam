@@ -45,6 +45,7 @@
 #include "pbbam/Config.h"
 #include "pbbam/Interval.h"
 #include "pbbam/Position.h"
+#include <cstddef>
 #include <string>
 
 namespace PacBio {

@@ -50,6 +50,7 @@
 #include "Version.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/core/ignore_unused.hpp>
+#include <cstddef>
 #include <iostream>
 #include <map>
 #include <sstream>

@@ -40,6 +40,7 @@
 #include "PbIndexDumpVersion.h"
 #include "Settings.h"
 #include <cassert>
+#include <cstddef>
 #include <iostream>
 using namespace std;
 

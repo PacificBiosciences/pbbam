@@ -38,6 +38,7 @@
 #include "PbbamTestData.h"
 #include <gtest/gtest.h>
 #include <pbbam/SamWriter.h>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <string>

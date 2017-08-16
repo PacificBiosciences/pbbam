@@ -40,6 +40,8 @@
 // Author: Derek Barnett
 
 #include "pbbam/Cigar.h"
+#include <cstddef>
+#include <cstdint>
 #include <sstream>
 
 namespace PacBio {

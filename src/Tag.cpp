@@ -40,6 +40,7 @@
 // Author: Derek Barnett
 
 #include "pbbam/Tag.h"
+#include <cstdint>
 #include <stdexcept>
 
 namespace PacBio {

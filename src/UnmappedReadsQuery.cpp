@@ -39,6 +39,7 @@
 //#include "pbbam/BamFile.h"
 //#include "MemoryUtils.h"
 
+//#include <cstdint>
 //#include <iostream>
 
 //using namespace PacBio;

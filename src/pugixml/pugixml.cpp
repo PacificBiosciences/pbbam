@@ -16,20 +16,22 @@
 
 #include "pugixml.hpp"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <cassert>
 
 #ifdef PUGIXML_WCHAR_MODE
-#	include <wchar.h>
+#	include <cwchar>
 #endif
 
 #ifndef PUGIXML_NO_XPATH
-#	include <math.h>
-#	include <float.h>
+#	include <cmath>
+#	include <cfloat>
 #	ifdef PUGIXML_NO_EXCEPTIONS
-#		include <setjmp.h>
+#		include <csetjmp>
 #	endif
 #endif
 

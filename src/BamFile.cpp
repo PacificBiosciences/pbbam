@@ -47,6 +47,7 @@
 #include <memory>
 #include <sstream>
 #include <cassert>
+#include <cstdint>
 #include <sys/stat.h>
 
 namespace PacBio {
