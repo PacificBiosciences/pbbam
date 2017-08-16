@@ -45,6 +45,7 @@
 #include "pbbam/Compare.h"
 #include "pbbam/Config.h"
 #include "pbbam/internal/QueryBase.h"
+#include <cstdint>
 #include <vector>
 
 namespace PacBio {

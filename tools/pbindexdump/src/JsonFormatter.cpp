@@ -38,6 +38,7 @@
 #include "JsonFormatter.h"
 #include "json.hpp"
 #include <pbbam/PbiFile.h>
+#include <cstdint>
 #include <iostream>
 #include <sstream>
 using namespace pbindexdump;

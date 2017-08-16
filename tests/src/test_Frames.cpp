@@ -35,6 +35,7 @@
 
 // Author: Derek Barnett
 
+#include <cstdint>
 #include <string>
 #include <vector>
 

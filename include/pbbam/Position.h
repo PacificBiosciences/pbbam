@@ -43,6 +43,7 @@
 #define POSITION_H
 
 #include "pbbam/Config.h"
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

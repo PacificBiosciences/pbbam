@@ -43,6 +43,8 @@
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <thread>
 

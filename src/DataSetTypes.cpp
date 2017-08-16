@@ -44,6 +44,7 @@
 #include "DataSetUtils.h"
 #include "FileUtils.h"
 #include "TimeUtils.h"
+#include <cstddef>
 #include <set>
 
 namespace PacBio {

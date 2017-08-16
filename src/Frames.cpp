@@ -43,6 +43,9 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <limits>
 
 namespace PacBio {
 namespace BAM {
@@ -76,7 +79,7 @@ void InitIpdDownsampling(void)
         next = nextOnes.back() + grain;
         framepoints.insert(framepoints.end(), nextOnes.cbegin(), nextOnes.cend());
     }
-    assert(framepoints.size()-1 <= UINT8_MAX);
+    assert(framepoints.size()-1 <= std::numeric_limits<uint8_t>::max());
 
     const uint16_t maxElement = (*max_element(framepoints.cbegin(), framepoints.cend()));
     frameToCode.assign(maxElement+1, 0);

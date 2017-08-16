@@ -40,6 +40,7 @@
 // Author: Derek Barnett
 
 #include "pbbam/Compare.h"
+#include <cstddef>
 #include <functional>
 #include <unordered_map>
 

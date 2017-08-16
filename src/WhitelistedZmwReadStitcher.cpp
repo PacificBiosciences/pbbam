@@ -43,6 +43,7 @@
 #include "pbbam/PbiIndexedBamReader.h"
 #include "VirtualZmwReader.h"
 #include <cassert>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

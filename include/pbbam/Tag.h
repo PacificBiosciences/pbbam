@@ -44,6 +44,7 @@
 
 #include "pbbam/Config.h"
 #include <boost/variant.hpp>
+#include <cstdint>
 #include <string>
 #include <vector>
 

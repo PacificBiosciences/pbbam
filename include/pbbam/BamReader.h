@@ -49,6 +49,7 @@
 #include "pbbam/GenomicInterval.h"
 
 #include <htslib/sam.h>
+#include <cstdint>
 #include <memory>
 #include <string>
 

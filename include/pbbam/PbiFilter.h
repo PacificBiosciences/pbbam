@@ -46,6 +46,7 @@
 #include "pbbam/PbiBasicTypes.h"
 #include "pbbam/PbiIndex.h"
 #include <boost/concept_check.hpp>
+#include <cstddef>
 #include <memory>
 #include <string>
 

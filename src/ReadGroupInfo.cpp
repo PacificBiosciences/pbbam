@@ -48,6 +48,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <cstdio>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

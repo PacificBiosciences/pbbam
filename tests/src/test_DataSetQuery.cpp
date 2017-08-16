@@ -43,6 +43,7 @@
 #include <pbbam/ZmwQuery.h>
 #include <pbbam/ZmwGroupQuery.h>
 #include <pbbam/DataSet.h>
+#include <cstdint>
 #include <string>
 using namespace PacBio;
 using namespace PacBio::BAM;

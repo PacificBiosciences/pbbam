@@ -44,6 +44,8 @@
 
 #include "pbbam/Compare.h"
 #include "pbbam/Config.h"
+#include <cstddef>
+#include <cstdint>
 #include <deque>
 #include <utility>
 #include <vector>

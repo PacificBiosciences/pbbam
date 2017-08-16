@@ -43,6 +43,8 @@
 #define FRAMES_H
 
 #include "pbbam/Config.h"
+#include <cstddef>
+#include <cstdint>
 #include <vector>
 
 namespace PacBio {

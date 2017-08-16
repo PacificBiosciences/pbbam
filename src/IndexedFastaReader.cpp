@@ -46,6 +46,7 @@
 #include "pbbam/Orientation.h"
 #include "SequenceUtils.h"
 #include <htslib/faidx.h>
+#include <cstddef>
 #include <iostream>
 #include <cstdlib>
 

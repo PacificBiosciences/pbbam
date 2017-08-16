@@ -42,6 +42,8 @@
 #include "pbbam/PbiFilterTypes.h"
 #include "StringUtils.h"
 #include <boost/algorithm/string.hpp>
+#include <cstddef>
+#include <cstdint>
 #include <sstream>
 #include <string>
 #include <cassert>

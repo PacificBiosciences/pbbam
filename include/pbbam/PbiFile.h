@@ -44,6 +44,8 @@
 
 #include "pbbam/Config.h"
 #include "pbbam/PbiBuilder.h"
+#include <cstddef>
+#include <cstdint>
 #include <string>
 
 namespace PacBio {

@@ -43,6 +43,7 @@
 #include "pbbam/exception/ValidationException.h"
 #include "StringUtils.h"
 #include <sstream>
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

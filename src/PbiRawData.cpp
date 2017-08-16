@@ -44,6 +44,8 @@
 #include "pbbam/BamRecord.h"
 #include "PbiIndexIO.h"
 #include <boost/numeric/conversion/cast.hpp>
+#include <cstddef>
+#include <cstdint>
 #include <map>
 #include <cassert>
 

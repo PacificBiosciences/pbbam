@@ -44,6 +44,7 @@
 
 #include "pbbam/Config.h"
 #include "pbbam/virtual/VirtualZmwBamRecord.h"
+#include <cstdint>
 #include <memory>
 #include <vector>
 #include <string>

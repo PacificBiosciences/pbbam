@@ -44,6 +44,7 @@
 
 #include "pbbam/Config.h"
 #include "pbbam/exception/ValidationException.h"
+#include <cstddef>
 #include <limits>
 
 namespace PacBio {

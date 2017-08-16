@@ -45,6 +45,7 @@
 #include "pbbam/Config.h"
 #include "pbbam/PbiFile.h"
 #include "pbbam/PbiLookupData.h"
+#include <cstdint>
 #include <memory>
 #include <string>
 

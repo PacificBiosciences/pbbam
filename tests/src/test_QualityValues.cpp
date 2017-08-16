@@ -35,6 +35,10 @@
 
 // Author: Derek Barnett
 
+#include <cstddef>
+#include <cstdint>
+#include <limits>
+
 #include <gtest/gtest.h>
 
 #ifdef PBBAM_TESTING
@@ -61,7 +65,7 @@ TEST(QualityValueTest, FromNumber)
     const QualityValue valid(42);
     const QualityValue max(93);
     const QualityValue tooHigh(94);
-    const QualityValue wayTooHigh(INT8_MAX);
+    const QualityValue wayTooHigh(std::numeric_limits<int8_t>::max());
 
     EXPECT_EQ(0,  zero);
     EXPECT_EQ(33, thirtyThree);

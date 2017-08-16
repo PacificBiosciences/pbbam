@@ -43,6 +43,8 @@ Class @ref nlohmann::basic_json is a good entry point for the documentation.
 #include <ciso646>
 #include <cmath>
 #include <cstdio>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <initializer_list>
 #include <iomanip>

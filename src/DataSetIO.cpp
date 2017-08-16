@@ -42,6 +42,7 @@
 #include "XmlReader.h"
 #include "XmlWriter.h"
 #include <boost/algorithm/string.hpp>
+#include <cstddef>
 #include <exception>
 #include <fstream>
 #include <iostream>

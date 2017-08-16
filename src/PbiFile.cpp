@@ -39,6 +39,9 @@
 //
 // Author: Derek Barnett
 
+#include <cstddef>
+#include <cstdint>
+
 #include "pbbam/PbiFile.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/PbiBuilder.h"

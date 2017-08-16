@@ -35,6 +35,8 @@
 
 // Author: Derek Barnett
 
+#include <cstddef>
+
 #include <gtest/gtest.h>
 
 #ifdef PBBAM_TESTING

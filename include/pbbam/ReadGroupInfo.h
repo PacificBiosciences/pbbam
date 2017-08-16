@@ -44,6 +44,8 @@
 
 #include "pbbam/Config.h"
 #include "pbbam/exception/InvalidSequencingChemistryException.h"
+#include <cstddef>
+#include <cstdint>
 #include <map>
 #include <string>
 

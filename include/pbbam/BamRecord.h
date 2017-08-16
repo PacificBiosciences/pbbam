@@ -57,6 +57,8 @@
 #include "pbbam/QualityValues.h"
 #include "pbbam/virtual/VirtualRegionType.h"
 #include "pbbam/ZmwType.h"
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>

@@ -37,6 +37,8 @@
 
 #include <string>
 #include <cstdio>
+#include <cstdint>
+#include <cstddef>
 #include <cstdlib>
 
 #include <gtest/gtest.h>

@@ -42,6 +42,8 @@
 #ifndef BAMRECORDVIEW_H
 #define BAMRECORDVIEW_H
 
+#include <cstdint>
+
 #include "pbbam/BamRecord.h"
 
 namespace PacBio {

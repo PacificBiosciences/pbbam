@@ -46,6 +46,8 @@
 #include "pbbam/ProgramInfo.h"
 #include "pbbam/ReadGroupInfo.h"
 #include "pbbam/SequenceInfo.h"
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <stdexcept>
 #include <string>

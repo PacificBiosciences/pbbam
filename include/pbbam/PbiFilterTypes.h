@@ -46,6 +46,8 @@
 #include "pbbam/PbiFilter.h"
 #include "pbbam/PbiIndex.h"
 #include <boost/optional.hpp>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 

@@ -42,6 +42,8 @@
 #ifndef LOCALCONTEXTFLAGS_H
 #define LOCALCONTEXTFLAGS_H
 
+#include <cstdint>
+
 #include "pbbam/Config.h"
 
 namespace PacBio {

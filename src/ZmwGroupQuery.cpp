@@ -45,6 +45,7 @@
 #include "pbbam/PbiFilterTypes.h"
 #include "MemoryUtils.h"
 #include <algorithm>
+#include <cstdint>
 #include <deque>
 
 namespace PacBio {
