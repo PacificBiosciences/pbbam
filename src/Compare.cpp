@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/Compare.h"
 #include <cstddef>
 #include <functional>

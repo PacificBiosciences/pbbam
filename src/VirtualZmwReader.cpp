@@ -39,6 +39,8 @@
 //
 // Author: Armin Töpfer
 
+#include "PbbamInternalConfig.h"
+
 #include <stdexcept>
 
 #include "VirtualZmwReader.h"

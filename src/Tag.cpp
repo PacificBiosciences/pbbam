@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/Tag.h"
 #include <cstdint>
 #include <stdexcept>

@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/CigarOperation.h"
 #include <htslib/sam.h>
 

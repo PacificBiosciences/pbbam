@@ -41,9 +41,7 @@
 
 #include <gtest/gtest.h>
 
-#ifdef PBBAM_TESTING
 #define private public
-#endif
 
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamRecordView.h>

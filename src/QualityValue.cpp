@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include <cstdint>
 
 #include "pbbam/QualityValue.h"

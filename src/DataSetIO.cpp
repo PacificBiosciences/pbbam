@@ -35,6 +35,8 @@
 
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "DataSetIO.h"
 #include "FileUtils.h"
 #include "FofnReader.h"

@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/BamTagCodec.h"
 #include <htslib/kstring.h>
 #include <cstring>

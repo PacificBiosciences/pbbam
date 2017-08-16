@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/ReadGroupInfo.h"
 #include "pbbam/MD5.h"
 #include "ChemistryTable.h"

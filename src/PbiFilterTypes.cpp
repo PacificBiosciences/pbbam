@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/PbiFilterTypes.h"
 #include "StringUtils.h"
 #include <boost/algorithm/string.hpp>

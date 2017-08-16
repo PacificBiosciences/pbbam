@@ -91,6 +91,13 @@ public:
     ///
     ~SamWriter(void);
 
+    /// Copy and Move constructors are disabled
+    SamWriter(const SamWriter&) = delete;
+    SamWriter& operator=(const SamWriter&) = delete;
+
+    SamWriter(SamWriter&&) = delete;
+    SamWriter& operator=(SamWriter&&) = delete;
+
 public:
     
     /// \brief Try to flush any buffered data to file.
@@ -121,7 +128,6 @@ public:
 
 private:
     std::unique_ptr<internal::SamWriterPrivate> d_;
-    DISABLE_MOVE_AND_COPY(SamWriter);
 };
 
 } // namesapce BAM

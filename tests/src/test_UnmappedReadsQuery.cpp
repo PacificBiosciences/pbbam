@@ -35,9 +35,7 @@
 
 // Author: Derek Barnett
 
-//#ifdef PBBAM_TESTING
 //#define private public
-//#endif
 
 //#include "PbbamTestData.h"
 //#include <gtest/gtest.h>

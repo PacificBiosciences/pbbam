@@ -45,98 +45,12 @@
 /// \name Library Import/Export
 /// \{
 
-#ifndef PBBAM_LIBRARY_EXPORT
-#  if defined(WIN32)
-#    define PBBAM_LIBRARY_EXPORT __declspec(dllexport)
-#  else
-#    define PBBAM_LIBRARY_EXPORT __attribute__((visibility("default")))
-#  endif
-#endif
-
-#ifndef PBBAM_LIBRARY_IMPORT
-#  if defined(WIN32)
-#    define PBBAM_LIBRARY_IMPORT __declspec(dllimport)
-#  else
-#    define PBBAM_LIBRARY_IMPORT
-#  endif
-#endif
-
 #ifndef PBBAM_EXPORT
-#  if defined(PBBAM_LIBRARY)
-#    define PBBAM_EXPORT PBBAM_LIBRARY_EXPORT
+#  if defined(WIN32)
+#    define PBBAM_EXPORT __declspec(dllimport)
 #  else
-#    define PBBAM_EXPORT PBBAM_LIBRARY_IMPORT
+#    define PBBAM_EXPORT
 #  endif
-#endif
-
-/// \}
-
-/// \name Class Definition Helpers
-/// \{
-
-/// \brief Disables the use of copy constructors and assignment operators for a
-///        class.
-///
-/// To use, place the macro in a class's private section:
-/// \code{.cpp}
-/// struct Foo {
-/// private:
-///     DISABLE_COPY(Foo);
-/// };
-/// \endcode
-///
-#ifndef DISABLE_COPY
-#define DISABLE_COPY(Class) \
-    Class(const Class&); \
-    Class& operator=(const Class&)
-#endif
-
-/// \brief Disables the use of move constructors and assignment operators for a
-///        class.
-///
-/// To use, place the macro in a class's private section:
-/// \code{.cpp}
-/// struct Foo {
-/// private:
-///     DISABLE_MOVE(Foo);
-/// };
-/// \endcode
-///
-#ifndef DISABLE_MOVE
-#define DISABLE_MOVE(Class) \
-    Class(Class&&); \
-    Class& operator=(Class&&);
-#endif
-
-/// \brief Disables the use of copy & move constructors and assignment operators f
-///        or a class.
-///
-/// To use, place the macro in a class's private section:
-/// \code{.cpp}
-/// struct Foo {
-/// private:
-///     DISABLE_MOVE_AND_COPY(Foo);
-/// };
-/// \endcode
-///
-#ifndef DISABLE_MOVE_AND_COPY
-#define DISABLE_MOVE_AND_COPY(Class) \
-    DISABLE_MOVE(Class) \
-    DISABLE_COPY(Class)
-#endif
-
-/// \}
-
-// \brief Auto-validation
-//
-// To validate BAM components (header, records, etc.) you can either use the
-// Validator API provided, or enable auto-validation. To compile pbbam for
-// auto-validation, add the -DPacBioBAM_auto_validate=ON option to your cmake
-// invocation.
-//
-//
-#ifndef PBBAM_AUTOVALIDATE
-#  define PBBAM_AUTOVALIDATE 0
 #endif
 
 /// \}

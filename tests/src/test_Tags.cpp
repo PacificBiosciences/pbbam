@@ -46,9 +46,7 @@
 #include <boost/type_traits/is_convertible.hpp>
 #include <gtest/gtest.h>
 
-#ifdef PBBAM_TESTING
 #define private public
-#endif
 
 #include <pbbam/BamTagCodec.h>
 #include <pbbam/TagCollection.h>

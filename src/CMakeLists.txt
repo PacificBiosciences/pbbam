@@ -11,9 +11,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PacBioBAM_CXX_FLAGS}")
 add_library(pbbam ${SOURCES})
 
 # library properties
-target_compile_definitions(pbbam
-    PRIVATE "-DPBBAM_LIBRARY"
-)
 set_target_properties(pbbam PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}
     RUNTIME_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}

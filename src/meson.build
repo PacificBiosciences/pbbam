@@ -82,8 +82,7 @@ pbbam_cpp_sources = files([
   'pugixml/pugixml.cpp'
 ])
 
-pbbam_extra_flags = ['-DPBBAM_LIBRARY']
-
+pbbam_extra_flags = []
 if get_option('enable-auto-validate')
   pbbam_extra_flags += '-DPBBAM_AUTOVALIDATE=1'
 endif

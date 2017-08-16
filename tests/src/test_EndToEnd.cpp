@@ -45,10 +45,8 @@
 #include <gtest/gtest.h>
 #include <htslib/sam.h>
 
-#ifdef PBBAM_TESTING
 #define private public
 #define protected public
-#endif
 
 #include "PbbamTestData.h"
 

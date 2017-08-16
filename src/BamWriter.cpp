@@ -35,11 +35,15 @@
 
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/BamWriter.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/Validator.h"
 #include "FileProducer.h"
 #include "MemoryUtils.h"
+#include "Autovalidate.h"
+
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>

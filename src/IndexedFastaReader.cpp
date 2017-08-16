@@ -39,8 +39,9 @@
 //
 // Author: David Alexander
 
-#include "pbbam/IndexedFastaReader.h"
+#include "PbbamInternalConfig.h"
 
+#include "pbbam/IndexedFastaReader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/GenomicInterval.h"
 #include "pbbam/Orientation.h"

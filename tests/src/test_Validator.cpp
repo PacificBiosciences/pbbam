@@ -38,9 +38,7 @@
 #include <cstdint>
 #include <gtest/gtest.h>
 
-#ifdef PBBAM_TESTING
 #define private public
-#endif
 
 #include <pbbam/BamFile.h>
 #include <pbbam/BamHeader.h>

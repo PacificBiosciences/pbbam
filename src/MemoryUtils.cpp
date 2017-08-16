@@ -35,6 +35,8 @@
 
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "MemoryUtils.h"
 #include <string>
 #include <cstdlib>

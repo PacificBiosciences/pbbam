@@ -43,9 +43,7 @@
 #include <gtest/gtest.h>
 #include <htslib/sam.h>
 
-#ifdef PBBAM_TESTING
 #define private public
-#endif
 
 #include <pbbam/BamHeader.h>
 

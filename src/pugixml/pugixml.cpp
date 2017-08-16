@@ -14,6 +14,8 @@
 #ifndef SOURCE_PUGIXML_CPP
 #define SOURCE_PUGIXML_CPP
 
+#include "../PbbamInternalConfig.h"
+
 #include "pugixml.hpp"
 
 #include <cstddef>

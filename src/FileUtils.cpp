@@ -35,6 +35,8 @@
 
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "FileUtils.h"
 #include "StringUtils.h"
 #include <boost/algorithm/string.hpp>

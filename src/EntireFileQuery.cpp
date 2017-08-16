@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/EntireFileQuery.h"
 #include "pbbam/CompositeBamReader.h"
 

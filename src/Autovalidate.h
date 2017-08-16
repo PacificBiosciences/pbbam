@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2017, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -34,58 +34,24 @@
 // SUCH DAMAGE.
 //
 // File Description
-/// \file Version.cpp
-/// \brief Implements the Version class.
+/// \file Autovalidate.h
+/// \brief Sets the default macro for the autovalidation mode.
 //
 // Author: Derek Barnett
 
-#include "PbbamInternalConfig.h"
+#ifndef AUTOVALIDATE_H
+#define AUTOVALIDATE_H
 
-#include "Version.h"
-#include "SequenceUtils.h"
-#include <sstream>
+// \brief Auto-validation
+//
+// To validate BAM components (header, records, etc.) you can either use the
+// Validator API provided, or enable auto-validation. To compile pbbam for
+// auto-validation, add the -DPacBioBAM_auto_validate=ON option to your cmake
+// invocation.
+//
+//
+#ifndef PBBAM_AUTOVALIDATE
+#  define PBBAM_AUTOVALIDATE 0
+#endif
 
-namespace PacBio {
-namespace BAM {
-namespace internal {
-
-const Version Version::Current = Version(3,0,3);
-const Version Version::Minimum = Version(3,0,1);
-
-// string must be "<major>.<minor>.<version>"
-Version::Version(const std::string& v)
-    : major_(0)
-    , minor_(0)
-    , revision_(0)
-{
-    // parse string
-    try {
-        const auto fields = internal::Split(v, '.');
-        const auto numFields = fields.size();
-        if (numFields == 0)
-            throw std::runtime_error("invalid version number - empty string");
-        major_ = std::stoi(fields.at(0));
-        if (numFields > 1) {
-            minor_ = std::stoi(fields.at(1));
-            if (numFields > 2 )
-                revision_ = std::stoi(fields.at(2));
-        }
-    } catch (std::exception&) {
-        auto msg = std::string{ "invalid version number (" + v + "): failed to parse" };
-        throw std::runtime_error(msg);
-    }
-
-    // ensure valid numbers
-    Check();
-}
-
-std::string Version::ToString(void) const
-{
-    std::stringstream s;
-    s << major_ << '.' << minor_ << '.' << revision_;
-    return s.str();
-}
-
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+#endif // AUTOVALIDATE_H

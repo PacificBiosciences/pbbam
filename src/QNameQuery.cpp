@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/QNameQuery.h"
 #include "pbbam/CompositeBamReader.h"
 #include <boost/optional.hpp>
