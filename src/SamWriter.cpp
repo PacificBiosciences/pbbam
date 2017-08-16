@@ -39,6 +39,8 @@
 #include "pbbam/Validator.h"
 #include "FileProducer.h"
 #include "MemoryUtils.h"
+#include "Autovalidate.h"
+
 #include <htslib/hfile.h>
 #include <htslib/sam.h>
 

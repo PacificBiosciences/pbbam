@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2017, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -34,67 +34,24 @@
 // SUCH DAMAGE.
 //
 // File Description
-/// \file Config.h
-/// \brief Defines library-wide macros & global variables.
+/// \file Autovalidate.h
+/// \brief Sets the default macro for the autovalidation mode.
 //
 // Author: Derek Barnett
 
-#ifndef PBBAM_CONFIG_H
-#define PBBAM_CONFIG_H
+#ifndef AUTOVALIDATE_H
+#define AUTOVALIDATE_H
 
-/// \name Library Import/Export
-/// \{
-
-#ifndef PBBAM_LIBRARY_EXPORT
-#  if defined(WIN32)
-#    define PBBAM_LIBRARY_EXPORT __declspec(dllexport)
-#  else
-#    define PBBAM_LIBRARY_EXPORT __attribute__((visibility("default")))
-#  endif
+// \brief Auto-validation
+//
+// To validate BAM components (header, records, etc.) you can either use the
+// Validator API provided, or enable auto-validation. To compile pbbam for
+// auto-validation, add the -DPacBioBAM_auto_validate=ON option to your cmake
+// invocation.
+//
+//
+#ifndef PBBAM_AUTOVALIDATE
+#  define PBBAM_AUTOVALIDATE 0
 #endif
 
-#ifndef PBBAM_LIBRARY_IMPORT
-#  if defined(WIN32)
-#    define PBBAM_LIBRARY_IMPORT __declspec(dllimport)
-#  else
-#    define PBBAM_LIBRARY_IMPORT
-#  endif
-#endif
-
-#ifndef PBBAM_EXPORT
-#  if defined(PBBAM_LIBRARY)
-#    define PBBAM_EXPORT PBBAM_LIBRARY_EXPORT
-#  else
-#    define PBBAM_EXPORT PBBAM_LIBRARY_IMPORT
-#  endif
-#endif
-
-/// \}
-
-namespace PacBio {
-namespace BAM {
-
-/// \name Verbosity Settings
-/// \{
-
-/// \brief Sets the desired verbosity level of htslib warnings.
-///
-/// Change this value to allow debug/warning statements from htslib itself.
-/// The valid range seems to be [0-3], where 0 indicates OFF, and 3 is the
-/// most verbose.
-///
-/// By default, pbbam disables htslib statements to keep output channels clean.
-/// We rely on exceptions & their associated messages instead.
-///
-/// This global variable is obviously not thread-safe by any means. But as a
-/// debug flag, it is unlikely to cause any real issues. The worst case would be
-/// unexpected presence/absence of output statements.
-///
-extern int HtslibVerbosity;
-
-/// \}
-
-} // namespace BAM
-} // namespace PacBio
-
-#endif // PBBAM_CONFIG_H
+#endif // AUTOVALIDATE_H

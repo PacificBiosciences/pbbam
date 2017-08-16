@@ -43,6 +43,8 @@
 #include "pbbam/PbiFile.h"
 #include "FileUtils.h"
 #include "MemoryUtils.h"
+#include "Autovalidate.h"
+
 #include <htslib/sam.h>
 #include <memory>
 #include <sstream>

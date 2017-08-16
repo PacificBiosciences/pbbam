@@ -157,6 +157,13 @@ public:
     /// Fully flushes all buffered data & closes file.
     ~BamWriter(void);
 
+    /// Copy and Move constructors are disabled
+    BamWriter(const BamWriter&) = delete;
+    BamWriter& operator=(const BamWriter&) = delete;
+
+    BamWriter(BamWriter&&) = delete;
+    BamWriter& operator=(BamWriter&&) = delete;
+
     /// \}
 
 public:
@@ -203,7 +210,6 @@ public:
 
 private:
     std::unique_ptr<internal::BamWriterPrivate> d_;
-    DISABLE_MOVE_AND_COPY(BamWriter);
 };
 
 } // namespace BAM
