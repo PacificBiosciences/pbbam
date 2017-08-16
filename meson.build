@@ -75,7 +75,7 @@ subdir('src')
 #########
 
 pbbam_cram_py = files('tests/scripts/cram.py')
-if get_option('enable-pbbam-build-tools') or get_option('enable-pbbam-tests')
+if get_option('enable-build-tools') or get_option('enable-tests')
   pbbam_python = find_program('python')
   subdir('tools')
 endif
@@ -90,7 +90,7 @@ subdir('tests')
 # documentation #
 #################
 
-if get_option('enable-pbbam-build-docs')
+if get_option('enable-build-docs')
   subdir('docs')
 endif
 

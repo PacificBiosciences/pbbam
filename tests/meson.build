@@ -48,7 +48,7 @@ pbbam_test_cpp_sources = files([
   'src/test_ZmwReadStitcher.cpp',
   'src/test_ZmwQuery.cpp'])
 
-if get_option('enable-pbbam-tests')
+if get_option('enable-tests')
   pbbam_gtest_dep = dependency('gtest_main', fallback : ['gtest', 'gtest_with_main_dep'])
 
   pbbam_PbbamTestData_h_config = configuration_data()
