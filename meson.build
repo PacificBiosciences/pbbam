@@ -71,20 +71,24 @@ subdir('include')
 subdir('src')
 
 #########
-# tools #
-#########
-
-pbbam_cram_py = files('tests/scripts/cram.py')
-if get_option('enable-build-tools') or get_option('enable-tests')
-  pbbam_python = find_program('python')
-  subdir('tools')
-endif
-
-#########
 # tests #
 #########
 
-subdir('tests')
+if get_option('enable-build-tools') or get_option('enable-tests')
+  pbbam_python = find_program('python')
+
+  if get_option('enable-tests')
+    subdir('tests')
+  endif
+endif
+
+#########
+# tools #
+#########
+
+if get_option('enable-build-tools') or get_option('enable-tests')
+  subdir('tools')
+endif
 
 #################
 # documentation #
@@ -111,5 +115,4 @@ pbbam_dep = declare_dependency(
   link_with : pbbam_lib,
   dependencies : pbbam_htslib_dep,
   version : meson.project_version(),
-  sources : pbbam_cpp_sources,
   compile_args : pbbam_warning_flags)
