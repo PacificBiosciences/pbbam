@@ -695,13 +695,13 @@ TEST(TagTest, CastBackToOriginalOk)
 
 TEST(TagTest, ConvertToInt8)
 {
-    Tag zero(int32_t(0));
-    Tag min(int32_t(std::numeric_limits<int8_t>::min()));
-    Tag normal(int32_t(42));
-    Tag max(int32_t(std::numeric_limits<int8_t>::max()));
-    Tag floatTag(float(3.14));
-    Tag stringTag(string("foo"));
-    Tag arrayTag(vector<int8_t>({1, 2, 3}));
+    Tag zero(int32_t{0});
+    Tag min(int32_t{std::numeric_limits<int8_t>::min()});
+    Tag normal(int32_t{42});
+    Tag max(int32_t{std::numeric_limits<int8_t>::max()});
+    Tag floatTag(float{3.14});
+    Tag stringTag(string{"foo"});
+    Tag arrayTag(vector<int8_t>{{1, 2, 3}});
 
     // allowed
     EXPECT_NO_THROW(
@@ -720,13 +720,13 @@ TEST(TagTest, ConvertToInt8)
 
 TEST(TagTest, ConvertToUInt8)
 {
-    Tag zero(int32_t(0));
-    Tag neg(int32_t(-1));
-    Tag normal(int32_t(42));
-    Tag max(int32_t(std::numeric_limits<uint8_t>::max()));
-    Tag floatTag(float(3.14));
-    Tag stringTag(string("foo"));
-    Tag arrayTag(vector<uint8_t>({1, 2, 3}));
+    Tag zero(int32_t{0});
+    Tag neg(int32_t{-1});
+    Tag normal(int32_t{42});
+    Tag max(int32_t{std::numeric_limits<uint8_t>::max()});
+    Tag floatTag(float{3.14});
+    Tag stringTag(string{"foo"});
+    Tag arrayTag(vector<uint8_t>{{1, 2, 3}});
 
     // allowed
     EXPECT_NO_THROW(
@@ -745,13 +745,13 @@ TEST(TagTest, ConvertToUInt8)
 
 TEST(TagTest, ConvertToInt16)
 {
-    Tag zero(int32_t(0));
-    Tag min(int32_t(std::numeric_limits<int16_t>::min()));
-    Tag normal(int32_t(42));
-    Tag max(int32_t(std::numeric_limits<int16_t>::max()));
-    Tag floatTag(float(3.14));
-    Tag stringTag(string("foo"));
-    Tag arrayTag(vector<int16_t>({1, 2, 3}));
+    Tag zero(int32_t{0});
+    Tag min(int32_t{std::numeric_limits<int16_t>::min()});
+    Tag normal(int32_t{42});
+    Tag max(int32_t{std::numeric_limits<int16_t>::max()});
+    Tag floatTag(float{3.14});
+    Tag stringTag(string{"foo"});
+    Tag arrayTag(vector<int16_t>{{1, 2, 3}});
 
     // allowed
     EXPECT_NO_THROW(
@@ -770,13 +770,13 @@ TEST(TagTest, ConvertToInt16)
 
 TEST(TagTest, ConvertToUInt16)
 {
-    Tag zero(int32_t(0));
-    Tag neg(int32_t(-1));
-    Tag normal(int32_t(42));
-    Tag max(int32_t(std::numeric_limits<uint16_t>::max()));
-    Tag floatTag(float(3.14));
-    Tag stringTag(string("foo"));
-    Tag arrayTag(vector<uint16_t>({1, 2, 3}));
+    Tag zero(int32_t{0});
+    Tag neg(int32_t{-1});
+    Tag normal(int32_t{42});
+    Tag max(int32_t{std::numeric_limits<uint16_t>::max()});
+    Tag floatTag(float{3.14});
+    Tag stringTag(string{"foo"});
+    Tag arrayTag(vector<uint16_t>{{1, 2, 3}});
 
     // allowed
     EXPECT_NO_THROW(
@@ -795,13 +795,13 @@ TEST(TagTest, ConvertToUInt16)
 
 TEST(TagTest, ConvertToInt32)
 {
-    Tag zero(int32_t(0));
-    Tag min(int32_t(std::numeric_limits<int32_t>::min()));
-    Tag normal(int32_t(42));
-    Tag max(int32_t(std::numeric_limits<int32_t>::max()));
-    Tag floatTag(float(3.14));
-    Tag stringTag(string("foo"));
-    Tag arrayTag(vector<int32_t>({1, 2, 3}));
+    Tag zero(int32_t{0});
+    Tag min(int32_t{std::numeric_limits<int32_t>::min()});
+    Tag normal(int32_t{42});
+    Tag max(int32_t{std::numeric_limits<int32_t>::max()});
+    Tag floatTag(float{3.14});
+    Tag stringTag(string{"foo"});
+    Tag arrayTag(vector<int32_t>{{1, 2, 3}});
 
     // allowed
     EXPECT_NO_THROW(
@@ -820,13 +820,13 @@ TEST(TagTest, ConvertToInt32)
 
 TEST(TagTest, ConvertToUInt32)
 {
-    Tag zero(int32_t(0));
-    Tag neg(int32_t(-1));
-    Tag normal(int32_t(42));
-    Tag max(uint32_t(std::numeric_limits<uint32_t>::max()));
-    Tag floatTag(float(3.14));
-    Tag stringTag(string("foo"));
-    Tag arrayTag(vector<uint32_t>({1, 2, 3}));
+    Tag zero(int32_t{0});
+    Tag neg(int32_t{-1});
+    Tag normal(int32_t{42});
+    Tag max(uint32_t{std::numeric_limits<uint32_t>::max()});
+    Tag floatTag(float{3.14});
+    Tag stringTag(string{"foo"});
+    Tag arrayTag(vector<uint32_t>{{1, 2, 3}});
 
     // allowed
     EXPECT_NO_THROW(
