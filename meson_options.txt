@@ -1,4 +1,4 @@
 option('enable-build-tools',   type : 'boolean', value : true,  description : 'Build PacBioBAM command line utilities (e.g. pbindex)')
 option('enable-build-docs',    type : 'boolean', value : false, description : 'Build PacBioBAM\'s API documentation')
 option('enable-auto-validate', type : 'boolean', value : false, description : 'Build PacBioBAM with BAM validation')
-option('enable-tests',         type : 'boolean', value : false, description : 'Enable dependencies required for testing')
+option('enable-tests',         type : 'boolean', value : true,  description : 'Enable dependencies required for testing')
