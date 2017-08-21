@@ -1,7 +1,7 @@
 #!/bin/bash -l
 
 set -e
-
+type module >& /dev/null || . /mnt/software/Modules/current/init/bash
 ################
 # DEPENDENCIES #
 ################
