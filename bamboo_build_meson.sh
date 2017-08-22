@@ -18,6 +18,7 @@ module load zlib/1.2.11
 module load htslib/1.5
 module load gtest/1.8.0_p20170819
 module load boost/1.60
+module load cram/0.7
 # remove trailing "/include", because CMake is brain-damaged
 BOOST_ROOT=${BOOST_ROOT%/include}
 # unset these variables to have meson discover all
@@ -39,6 +40,7 @@ for i in static shared; do
   for j in on off; do
     CURRENT_BUILD_DIR="build_libs=${i}_unity=${j}"
     CURRENT_CONFIG="with libs=${i^^} and unity=${j^^}"
+    mkdir -p ${CURRENT_BUILD_DIR}/test-reports
 
     echo "======================"
     echo "Current configuration:"
@@ -61,6 +63,8 @@ for i in static shared; do
     ninja -v -C "${CURRENT_BUILD_DIR}"
 
     # 3. tests
+    GTEST_OUTPUT="xml:${DIR}/test-reports/pbbam_results.xml" ARGS=-V VERBOSE=1 \
     ninja -v -C "${CURRENT_BUILD_DIR}" test
+    # cram --xunit-file=${DIR}/test-reports/pbbam_cramunit.xml generated
   done
-done
+don
