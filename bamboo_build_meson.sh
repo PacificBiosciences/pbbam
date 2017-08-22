@@ -67,4 +67,4 @@ for i in static shared; do
     ninja -v -C "${CURRENT_BUILD_DIR}" test
     # cram --xunit-file=${DIR}/test-reports/pbbam_cramunit.xml generated
   done
-don
+done
