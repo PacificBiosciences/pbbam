@@ -92,7 +92,13 @@ extern const ChemistryTable BuiltInChemistryTable = {
 
     // 5.0 ("Iguana"); S/P2-C2
     {{"100-862-200", "100-861-800", "5.0", "S/P2-C2/5.0"}},
-    {{"100-862-200", "101-093-700", "5.0", "S/P2-C2/5.0"}}
+    {{"100-862-200", "101-093-700", "5.0", "S/P2-C2/5.0"}},
+
+    // 5.0.1 ChemRel ("Sequel® Sequencing Plate Silwet"); S/P2-C2
+    {{"100-862-200", "101-309-500", "5.0", "S/P2-C2/5.0"}},
+    // 5.0.1 ChemRel ("Sequel® Sequencing Plate Silwet (4 rxn)"); S/P2-C2
+    {{"100-862-200", "101-309-400", "5.0", "S/P2-C2/5.0"}}
+    
 
 };
 
