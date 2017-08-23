@@ -71,6 +71,7 @@ pbbam_pbindex = executable(
   dependencies : pbbam_htslib_dep,
   include_directories : [pbbam_include_directories, include_directories('pbindex')],
   link_with : pbbam_lib,
+  build_rpath : pbbam_zlib_libdir,
   install : get_option('enable-build-tools'),
   cpp_args : pbbam_warning_flags)
 
@@ -101,6 +102,7 @@ pbbam_pbindexdump = executable(
   dependencies : pbbam_htslib_dep,
   include_directories : [pbbam_include_directories, include_directories('pbindexdump')],
   link_with : pbbam_lib,
+  build_rpath : pbbam_zlib_libdir,
   install : get_option('enable-build-tools'),
   cpp_args : pbbam_warning_flags)
 
@@ -145,6 +147,7 @@ pbbam_pbmerge = executable(
   dependencies : [pbbam_boost_dep, pbbam_htslib_dep],
   include_directories : [pbbam_include_directories, include_directories('pbmerge')],
   link_with : pbbam_lib,
+  build_rpath : pbbam_zlib_libdir,
   install : get_option('enable-build-tools'),
   cpp_args : pbbam_warning_flags)
 
