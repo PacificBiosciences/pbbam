@@ -16,6 +16,10 @@ if pbbam_htslib_dep.found()
   pbbam_htslib_libdir = pbbam_htslib_dep.get_pkgconfig_variable('libdir')
 endif
 
+if pbbam_zlib_dep.found()
+  pbbam_zlib_libdir = pbbam_zlib_dep.get_pkgconfig_variable('libdir')
+endif
+
 pbbam_bam2sam_cpp_sources = [pbbam_Bam2SamVersion_h]
 pbbam_bam2sam_cpp_sources += files([
   'common/OptionParser.cpp',
@@ -25,10 +29,10 @@ pbbam_bam2sam_cpp_sources += files([
 pbbam_bam2sam = executable(
   'bam2sam',
   pbbam_bam2sam_cpp_sources,
-  dependencies : [pbbam_htslib_dep, pbbam_thread_dep],
+  dependencies : [pbbam_htslib_dep, pbbam_thread_dep, pbbam_zlib_dep],
   include_directories : [pbbam_include_directories, include_directories('bam2sam')],
   install : get_option('enable-build-tools'),
-  build_rpath : pbbam_htslib_libdir,
+  build_rpath : [pbbam_htslib_libdir, pbbam_zlib_libdir],
   cpp_args : pbbam_warning_flags)
 
 # tests
