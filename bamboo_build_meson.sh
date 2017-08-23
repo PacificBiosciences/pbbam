@@ -1,4 +1,4 @@
-#!/bin/bash -l
+#!/bin/bash
 
 set -e
 type module >& /dev/null || . /mnt/software/Modules/current/init/bash
@@ -12,7 +12,10 @@ module load ninja/1.7.2
 
 module load gcc/6.4.0
 module load ccache/3.3.4
-[[ $USER == "bamboo" ]] && export CCACHE_DIR=/mnt/secondary/Share/tmp/bamboo.mobs.ccachedir || true
+if [[ $USER == "bamboo" ]]; then
+  export CCACHE_DIR=/mnt/secondary/Share/tmp/bamboo.mobs.ccachedir
+  export CCACHE_TEMPDIR=/scratch/bamboo.ccache_tempdir
+fi
 module load git/2.8.3
 
 module load zlib/1.2.11
