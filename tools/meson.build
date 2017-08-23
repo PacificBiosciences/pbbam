@@ -16,10 +16,6 @@ if pbbam_htslib_dep.found()
   pbbam_htslib_libdir = pbbam_htslib_dep.get_pkgconfig_variable('libdir')
 endif
 
-if pbbam_zlib_dep.found()
-  pbbam_zlib_libdir = pbbam_zlib_dep.get_pkgconfig_variable('libdir')
-endif
-
 pbbam_bam2sam_cpp_sources = [pbbam_Bam2SamVersion_h]
 pbbam_bam2sam_cpp_sources += files([
   'common/OptionParser.cpp',
