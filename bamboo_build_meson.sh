@@ -65,6 +65,6 @@ for i in static shared; do
     # 3. tests
     GTEST_OUTPUT="xml:${CURRENT_BUILD_DIR}/test-reports/pbbam_results.xml" ARGS=-V VERBOSE=1 \
     ninja -v -C "${CURRENT_BUILD_DIR}" test
-    # cram --xunit-file=${DIR}/test-reports/pbbam_cramunit.xml generated
+    cram --xunit-file=${CURRENT_BUILD_DIR}/test-reports/pbbam_cramunit.xml ${CURRENT_BUILD_DIR}/tools
   done
 done
