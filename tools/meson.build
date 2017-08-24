@@ -25,7 +25,7 @@ pbbam_bam2sam_cpp_sources += files([
 pbbam_bam2sam = executable(
   'bam2sam',
   pbbam_bam2sam_cpp_sources,
-  dependencies : [pbbam_htslib_dep, pbbam_thread_dep],
+  dependencies : [pbbam_htslib_dep, pbbam_thread_dep, pbbam_zlib_dep],
   include_directories : [pbbam_include_directories, include_directories('bam2sam')],
   install : get_option('enable-build-tools'),
   build_rpath : pbbam_htslib_libdir,
@@ -64,7 +64,7 @@ pbbam_pbindex_cpp_sources += files([
 pbbam_pbindex = executable(
   'pbindex',
   pbbam_pbindex_cpp_sources,
-  dependencies : pbbam_htslib_dep,
+  dependencies : [pbbam_htslib_dep, pbbam_zlib_dep],
   include_directories : [pbbam_include_directories, include_directories('pbindex')],
   link_with : pbbam_lib,
   install : get_option('enable-build-tools'),
@@ -94,7 +94,7 @@ pbbam_pbindexdump_cpp_sources += files([
 pbbam_pbindexdump = executable(
   'pbindexdump',
   pbbam_pbindexdump_cpp_sources,
-  dependencies : pbbam_htslib_dep,
+  dependencies : [pbbam_htslib_dep, pbbam_zlib_dep],
   include_directories : [pbbam_include_directories, include_directories('pbindexdump')],
   link_with : pbbam_lib,
   install : get_option('enable-build-tools'),
@@ -138,7 +138,7 @@ pbbam_pbmerge_cpp_sources += files([
 pbbam_pbmerge = executable(
   'pbmerge',
   pbbam_pbmerge_cpp_sources,
-  dependencies : [pbbam_boost_dep, pbbam_htslib_dep],
+  dependencies : [pbbam_boost_dep, pbbam_htslib_dep, pbbam_zlib_dep],
   include_directories : [pbbam_include_directories, include_directories('pbmerge')],
   link_with : pbbam_lib,
   install : get_option('enable-build-tools'),
