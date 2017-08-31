@@ -74,11 +74,13 @@ subdir('src')
 # tests #
 #########
 
-if get_option('enable-build-tools') or get_option('enable-tests')
-  pbbam_python = find_program('python')
+if not meson.is_subproject()
+  if get_option('enable-build-tools') or get_option('enable-tests')
+    pbbam_python = find_program('python')
 
-  if get_option('enable-tests')
-    subdir('tests')
+    if get_option('enable-tests')
+      subdir('tests')
+    endif
   endif
 endif
 
@@ -86,8 +88,10 @@ endif
 # tools #
 #########
 
-if get_option('enable-build-tools') or get_option('enable-tests')
-  subdir('tools')
+if not meson.is_subproject()
+  if get_option('enable-build-tools') or get_option('enable-tests')
+    subdir('tools')
+  endif
 endif
 
 #################
