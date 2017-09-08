@@ -10,6 +10,22 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.10.0] - 2017-09-08
+
+### Changed
+- PbiBuilder backend for generating PBI index files "on-the-fly" along with
+writing BAM files. The previous implementation's memory usage scaled linearly 
+with the number of reads, sometimes reaching huge numbers (several gigs or more).
+The new implementation's memory usage remains constant for any number of reads, 
+without any runtime hit on files/architectures tested. 
+
+### Removed
+- PbiBuilder::Result(). Returned an intermediate snapshot of the index under
+construction. This method isn't usable with the new PbiBuilder backend and was 
+really only useful for initial debugging/testing. It is no longer used in the 
+test framework and is unlikely to be used by client code either. Dropping this 
+method from the API, and thus bumping the version number. 
+
 ## [0.9.0] - 2017-08-07
 
 ### Removed
