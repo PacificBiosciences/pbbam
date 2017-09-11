@@ -45,6 +45,7 @@
 #include <htslib/bgzf.h>
 #include <htslib/sam.h>
 #include <memory>
+#include <cstdio>
 
 namespace PacBio {
 namespace BAM {
@@ -54,6 +55,17 @@ class BamHeader;
 namespace internal {
 
 // intended for use with std::shared_ptr<T>, std::unique_ptr<T>, etc
+
+struct FileDeleter
+{
+    void operator()(std::FILE* fp)
+    {
+        if (fp)
+            std::fclose(fp);
+        fp = nullptr;
+    }
+};
+
 
 struct HtslibBgzfDeleter
 {
