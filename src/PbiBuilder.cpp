@@ -49,6 +49,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <htslib/bgzf.h>
 
+#include <array>
 #include <memory>
 #include <stdexcept>
 #include <tuple>
@@ -374,7 +375,7 @@ class PbiBuilderPrivate
 public:
     PbiBuilderPrivate(const std::string& pbiFilename,
                       const size_t numReferenceSequences,
-                      const bool isCoordinateSorted_,
+                      const bool isCoordinateSorted,
                       const CompressionLevel compressionLevel,
                       const size_t numThreads);
 
@@ -698,9 +699,8 @@ void PbiBuilderPrivate::WriteFromTempFile(PbiTempFile<T>& tempFile, BGZF* bgzf)
 void PbiBuilderPrivate::WritePbiHeader(BGZF* bgzf)
 {
     // 'magic' string
-    char magic[4];
-    strncpy(magic, "PBI\1", 4);
-    auto ret = bgzf_write(bgzf, magic, 4);
+    constexpr static std::array<char, 4> magic{{'P', 'B', 'I', '\1'}};
+    auto ret = bgzf_write(bgzf, magic.data(), 4);
 
     PbiFile::Sections sections = PbiFile::BASIC;
     if (hasMappedData_)  sections |= PbiFile::MAPPED;
