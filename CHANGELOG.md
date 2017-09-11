@@ -10,6 +10,11 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.10.1] - 2017-09-11
+
+### Changed
+- Frames, add mutex to avoid race condition in InitIpdDownsampling(void)
+
 ## [0.10.0] - 2017-09-08
 
 ### Changed

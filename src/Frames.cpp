@@ -48,6 +48,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <mutex>
 
 namespace PacBio {
 namespace BAM {
@@ -56,10 +57,13 @@ namespace internal {
 static std::vector<uint16_t> framepoints;
 static std::vector<uint8_t> frameToCode;
 static uint16_t maxFramepoint;
+static std::mutex initIpdDownsamplingMutex;
 
 static
 void InitIpdDownsampling(void)
 {
+    std::lock_guard<std::mutex> lock(initIpdDownsamplingMutex);
+
     if (!framepoints.empty())
         return;
 
