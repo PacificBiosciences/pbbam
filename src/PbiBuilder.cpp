@@ -112,12 +112,13 @@ inline void SwapEndianness(std::vector<T>& data)
 
 template<typename T>
 inline void WriteBgzfVector(BGZF* fp,
-                            std::vector<T>& data)
+                            std::vector<T>& data,
+                            const size_t numElements)
 {
     assert(fp);
     if (fp->is_be)
         SwapEndianness(data);
-    auto ret = bgzf_write(fp, &data[0], data.size()*sizeof(T));
+    auto ret = bgzf_write(fp, &data[0], numElements*sizeof(T));
     ret = 0;
 }
 
@@ -691,7 +692,7 @@ void PbiBuilderPrivate::WriteFromTempFile(PbiTempFile<T>& tempFile, BGZF* bgzf)
     {
         const auto numRead = tempFile.Read(maxElementCount);
         auto& data = tempFile.Data();
-        WriteBgzfVector(bgzf, data);
+        WriteBgzfVector(bgzf, data, numRead);
         totalNumRead += numRead;
     }
 }
