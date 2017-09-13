@@ -106,13 +106,15 @@ endif
 # dependency info #
 ###################
 
-import('pkgconfig').generate(
-  libraries : pbbam_lib,
-  version : meson.project_version(),
-  name : 'pbbam',
-  requires : 'htslib',
-  filebase : 'pbbam',
-  description : 'Library for accessing PacBio-compatible BAM files')
+if not meson.is_subproject()
+  import('pkgconfig').generate(
+    libraries : pbbam_lib,
+    version : meson.project_version(),
+    name : 'pbbam',
+    requires : 'htslib',
+    filebase : 'pbbam',
+    description : 'Library for accessing PacBio-compatible BAM files')
+endif
 
 pbbam_dep = declare_dependency(
   include_directories : pbbam_include_directories,

@@ -87,12 +87,17 @@ if get_option('enable-auto-validate')
   pbbam_extra_flags += '-DPBBAM_AUTOVALIDATE=1'
 endif
 
+# install library if
+# - either running as a proper project
+# - or using shared libraries
+pbbam_lib_install = (not meson.is_subproject()) or (get_option('default_library') == 'shared')
+
 pbbam_lib = library(
   'pbbam',
   pbbam_cpp_sources,
   soversion : 0,
   version : meson.project_version(),
-  install : true,
+  install : pbbam_lib_install,
   dependencies : [pbbam_thread_dep, pbbam_boost_dep, pbbam_zlib_dep, pbbam_htslib_dep],
   include_directories : pbbam_include_directories,
   cpp_args : [pbbam_extra_flags, pbbam_warning_flags])
