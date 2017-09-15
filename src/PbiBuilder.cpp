@@ -683,7 +683,7 @@ template<typename T>
 void PbiBuilderPrivate::WriteFromTempFile(PbiTempFile<T>& tempFile, BGZF* bgzf)
 {
     using TempFileType = PbiTempFile<T>;
-    constexpr auto maxElementCount = TempFileType::MaxElementCount;
+    static constexpr const auto maxElementCount = TempFileType::MaxElementCount;
 
     tempFile.Rewind();
 
@@ -700,7 +700,7 @@ void PbiBuilderPrivate::WriteFromTempFile(PbiTempFile<T>& tempFile, BGZF* bgzf)
 void PbiBuilderPrivate::WritePbiHeader(BGZF* bgzf)
 {
     // 'magic' string
-    constexpr static std::array<char, 4> magic{{'P', 'B', 'I', '\1'}};
+    static constexpr const std::array<char, 4> magic{{'P', 'B', 'I', '\1'}};
     auto ret = bgzf_write(bgzf, magic.data(), 4);
 
     PbiFile::Sections sections = PbiFile::BASIC;
