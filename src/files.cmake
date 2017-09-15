@@ -65,7 +65,8 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/SamTagCodec.h
     ${PacBioBAM_IncludeDir}/pbbam/SamWriter.h
     ${PacBioBAM_IncludeDir}/pbbam/SequenceInfo.h
-    ${PacBioBAM_IncludeDir}/pbbam/Strand.h  
+    ${PacBioBAM_IncludeDir}/pbbam/Strand.h
+    ${PacBioBAM_IncludeDir}/pbbam/StringUtilities.h
     ${PacBioBAM_IncludeDir}/pbbam/SubreadLengthQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/Tag.h
     ${PacBioBAM_IncludeDir}/pbbam/TagCollection.h

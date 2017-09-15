@@ -38,13 +38,8 @@
 #ifndef STRINGUTILS_H
 #define STRINGUTILS_H
 
-#include <algorithm>
-#include <exception>
-#include <ios>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
+#include "pbbam/SamTagCodec.h"
+#include "pbbam/StringUtilities.h"
 
 namespace PacBio {
 namespace BAM {
@@ -53,18 +48,13 @@ namespace internal {
 inline std::string MakeSamTag(const std::string& tag,
                               const std::string& value)
 {
-    return std::string('\t' + tag + ':' + value);
+    return PacBio::BAM::MakeSamTag(tag, value);
 }
 
 inline std::vector<std::string> Split(const std::string& line,
                                       const char delim = '\t')
 {
-    std::vector<std::string> tokens;
-    std::stringstream lineStream(line);
-    std::string token;
-    while (std::getline(lineStream, token, delim))
-        tokens.push_back(token);
-    return tokens;
+    return PacBio::BAM::Split(line, delim);
 }
 
 } // namespace internal

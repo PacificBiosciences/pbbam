@@ -10,6 +10,11 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.10.2] - 2017-09-14
+
+### Changed
+- Explicitly trim all whitespace from FASTA input.
+
 ## [0.10.1] - 2017-09-11
 
 ### Changed
