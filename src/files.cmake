@@ -56,6 +56,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/Position.h
     ${PacBioBAM_IncludeDir}/pbbam/ProgramInfo.h
     ${PacBioBAM_IncludeDir}/pbbam/PulseBehavior.h
+    ${PacBioBAM_IncludeDir}/pbbam/PulseExclusionReason.h
     ${PacBioBAM_IncludeDir}/pbbam/QNameQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/QualityValue.h
     ${PacBioBAM_IncludeDir}/pbbam/QualityValues.h

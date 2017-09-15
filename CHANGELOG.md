@@ -10,6 +10,15 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.11.0] - 2017-09-15
+
+### Added
+- Support for internal tag: pulse exclusion reason ("pe"). New methods on 
+BamRecord, and new enum PulseExclusionReason.
+
+### Changed
+- Default PacBioBAM format version now 3.0.5
+
 ## [0.10.2] - 2017-09-14
 
 ### Changed

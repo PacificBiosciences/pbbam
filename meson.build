@@ -1,7 +1,7 @@
 project(
   'PacBioBAM',
   'cpp',
-  version : '0.10.2',
+  version : '0.11.0',
   default_options : [
     'buildtype=release',
     'warning_level=3',
