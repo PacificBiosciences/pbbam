@@ -42,6 +42,8 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/FastaReader.h"
+#include "pbbam/StringUtilities.h"
+
 #include <htslib/faidx.h>
 #include <stdexcept>
 #include <fstream>
@@ -84,6 +86,8 @@ private:
         SkipNewlines();
         ReadName();
         ReadBases();
+
+        bases_ = RemoveAllWhitespace(bases_);
     }
 
     inline void SkipNewlines(void)

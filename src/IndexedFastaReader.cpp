@@ -45,10 +45,13 @@
 #include "pbbam/BamRecord.h"
 #include "pbbam/GenomicInterval.h"
 #include "pbbam/Orientation.h"
+#include "pbbam/StringUtilities.h"
 #include "SequenceUtils.h"
+
 #include <htslib/faidx.h>
-#include <cstddef>
 #include <iostream>
+#include <memory>
+#include <cstddef>
 #include <cstdlib>
 
 namespace PacBio {
@@ -113,14 +116,10 @@ std::string IndexedFastaReader::Subsequence(const std::string& id,
     // Derek: *Annoyingly* htslib seems to interpret "end" as inclusive in
     // faidx_fetch_seq, whereas it considers it exclusive in the region spec in
     // fai_fetch.  Can you please verify?
-    char* rawSeq = faidx_fetch_seq(handle_, id.c_str(), begin, end - 1, &len);
+    const std::unique_ptr<char> rawSeq(faidx_fetch_seq(handle_, id.c_str(), begin, end - 1, &len));
     if (rawSeq == nullptr)
         throw std::runtime_error("could not fetch FASTA sequence");
-    else {
-        std::string seq(rawSeq);
-        free(rawSeq);
-        return seq;
-    }
+    return RemoveAllWhitespace(rawSeq.get());
 }
 
 std::string IndexedFastaReader::Subsequence(const GenomicInterval& interval) const
@@ -129,19 +128,15 @@ std::string IndexedFastaReader::Subsequence(const GenomicInterval& interval) con
     return Subsequence(interval.Name(), interval.Start(), interval.Stop());
 }
 
-std::string IndexedFastaReader::Subsequence(const char *htslibRegion) const
+std::string IndexedFastaReader::Subsequence(const char* htslibRegion) const
 {
     REQUIRE_FAIDX_LOADED;
 
     int len;
-    char* rawSeq = fai_fetch(handle_, htslibRegion, &len);
+    const std::unique_ptr<char> rawSeq(fai_fetch(handle_, htslibRegion, &len));
     if (rawSeq == nullptr)
         throw std::runtime_error("could not fetch FASTA sequence");
-    else {
-        std::string seq(rawSeq);
-        free(rawSeq);
-        return seq;
-    }
+    return RemoveAllWhitespace(rawSeq.get());
 }
 
 

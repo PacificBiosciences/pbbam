@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Pacific Biosciences of California, Inc.
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -32,65 +32,65 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-//
-// File Description
-/// \file SamTagCodec.h
-/// \brief Defines the SamTagCodec class.
-//
+
 // Author: Derek Barnett
 
-#ifndef SAMTAGCODEC_H
-#define SAMTAGCODEC_H
+#ifndef PBBAM_STRINGUTILITIES_H
+#define PBBAM_STRINGUTILITIES_H
 
-#include "pbbam/Config.h"
-#include "pbbam/TagCollection.h"
+#include <algorithm>
+#include <sstream>
 #include <string>
+#include <vector>
 
 namespace PacBio {
 namespace BAM {
 
-/// \brief The SamTagCodec class provides text-based encoding/decoding of %BAM
-///        tag data.
+/// \brief Splits a string into tokens
 ///
-/// \note SamTagCodec is mostly an implementation and/or testing detail, and may
-///       be removed from the public API.
+/// \param[in] line     input string
+/// \param[in] delim    character to split on
 ///
-class PBBAM_EXPORT SamTagCodec
+/// \returns vector of tokens
+///
+inline std::vector<std::string> Split(const std::string& line,
+                                      const char delim = '\t')
 {
-public:
-    /// \name Tag Collection Methods
-    /// \{
+    std::vector<std::string> tokens;
+    std::stringstream lineStream(line);
+    std::string token;
+    while (std::getline(lineStream, token, delim))
+        tokens.push_back(token);
+    return tokens;
+}
 
-    /// \brief Creates a TagCollection from SAM-formatted tag data.
-    ///
-    /// \param[in] tagString    SAM-formmated string
-    /// \returns resulting tag collection
-    ///
-    static TagCollection Decode(const std::string& tagString);
-
-    /// \brief Creates SAM-formatted string from a TagCollection.
-    ///
-    /// \param[in] tags     TagCollection containing tag data
-    /// \returns SAM-formatted string
-    ///
-    static std::string Encode(const PacBio::BAM::TagCollection& tags);
-};
-
+/// \brief Remove all whitespace from input string (start, end, & internal)
 ///
-/// \brief creates a tag per the SAM/BAM text format
+/// \param[in] input    original string
 ///
-/// \param tag    tag name
-/// \param value  tag value
+/// \returns new string with no whitespace
 ///
-/// \return formatted tag string
-///
-inline std::string MakeSamTag(const std::string& tag,
-                              const std::string& value)
+inline std::string RemoveAllWhitespace(std::string&& input)
 {
-    return std::string('\t' + tag + ':' + value);
+    input.erase(std::remove_if(input.begin(), input.end(),
+                               [](const char c) { return std::isspace(c); }),
+                input.end());
+    return input;
+}
+
+/// \brief Remove all whitespace from input string (start, end, & internal)
+///
+/// \param[in] input    original string
+///
+/// \returns new string with no whitespace
+///
+inline std::string RemoveAllWhitespace(const std::string& input)
+{
+    auto copy = input;
+    return RemoveAllWhitespace(std::move(copy));
 }
 
 } // namespace BAM
 } // namespace PacBio
 
-#endif // SAMTAGCODEC_H
+#endif // PBBAM_STRINGUTILITIES_H
