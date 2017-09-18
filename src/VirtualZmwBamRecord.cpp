@@ -213,7 +213,7 @@ void VirtualZmwBamRecord::StitchSources(void)
             if (b.HasBarcodes())
                 barcodes = b.Barcodes();
 
-            constexpr auto regionType = VirtualRegionType::SUBREAD;
+            static constexpr const auto regionType = VirtualRegionType::SUBREAD;
             if (!HasVirtualRegionType(regionType))
                 virtualRegionsMap_[regionType] = std::vector<VirtualRegion>();
 
