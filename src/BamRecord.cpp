@@ -363,6 +363,16 @@ void ClipAndGapifyUInts(const BamRecordImpl& impl,
                                                    data, 0, 0);
 }
 
+static inline
+void ClipAndGapifyUInt8s(const BamRecordImpl& impl,
+                         const bool aligned,
+                         const bool exciseSoftClips,
+                         std::vector<uint8_t>* data)
+{
+    ClipAndGapify<std::vector<uint8_t>, uint8_t>(impl, aligned, exciseSoftClips,
+                                                 data, 0, 0);
+}
+
 static
 RecordType NameToType(const std::string& name)
 {
@@ -1441,7 +1451,7 @@ QualityValues BamRecord::FetchQualities(const BamRecordTag tag,
     return quals;
 }
 
-std::vector<uint32_t> BamRecord::FetchUIntsRaw(const BamRecordTag tag) const
+std::vector<uint32_t> BamRecord::FetchUInt32sRaw(const BamRecordTag tag) const
 {
     // fetch tag data
     const Tag& frameTag = impl_.TagValue(tag);
@@ -1453,16 +1463,16 @@ std::vector<uint32_t> BamRecord::FetchUIntsRaw(const BamRecordTag tag) const
     return frameTag.ToUInt32Array();
 }
 
-std::vector<uint32_t> BamRecord::FetchUInts(const BamRecordTag tag,
-                                            const Orientation orientation,
-                                            const bool aligned,
-                                            const bool exciseSoftClips,
-                                            const PulseBehavior pulseBehavior) const
+std::vector<uint32_t> BamRecord::FetchUInt32s(const BamRecordTag tag,
+                                              const Orientation orientation,
+                                              const bool aligned,
+                                              const bool exciseSoftClips,
+                                              const PulseBehavior pulseBehavior) const
 {
     const bool isPulse = internal::BamRecordTags::IsPulse(tag);
 
     // fetch raw
-    auto  arr = FetchUIntsRaw(tag);
+    auto  arr = FetchUInt32sRaw(tag);
     Orientation current = Orientation::NATIVE;
 
     if (isPulse && pulseBehavior == PulseBehavior::BASECALLS_ONLY) {
@@ -1496,6 +1506,64 @@ std::vector<uint32_t> BamRecord::FetchUInts(const BamRecordTag tag,
                                      current,
                                      orientation,
                                      impl_.IsReverseStrand());
+    return arr;
+}
+
+std::vector<uint8_t> BamRecord::FetchUInt8sRaw(const BamRecordTag tag) const
+{
+    // fetch tag data
+    const Tag& frameTag = impl_.TagValue(tag);
+    if (frameTag.IsNull())
+        return std::vector<uint8_t>();
+    if(!frameTag.IsUInt8Array())
+        throw std::runtime_error("Tag data are not a uint8_t array, tag " +
+                                 internal::BamRecordTags::LabelFor(tag));
+    return frameTag.ToUInt8Array();
+}
+
+std::vector<uint8_t> BamRecord::FetchUInt8s(const BamRecordTag tag,
+                                             const Orientation orientation,
+                                             const bool aligned,
+                                             const bool exciseSoftClips,
+                                             const PulseBehavior pulseBehavior) const
+{
+    const bool isPulse = internal::BamRecordTags::IsPulse(tag);
+
+    // fetch raw
+    auto  arr = FetchUInt8sRaw(tag);
+    Orientation current = Orientation::NATIVE;
+
+    if (isPulse && pulseBehavior == PulseBehavior::BASECALLS_ONLY) {
+        // strip 'squashed' pulse loci
+        CalculatePulse2BaseCache();
+        arr = p2bCache_->RemoveSquashedPulses(arr);
+    }
+
+    if (aligned || exciseSoftClips) {
+
+        if (isPulse && pulseBehavior != PulseBehavior::BASECALLS_ONLY)
+            throw std::runtime_error("Cannot return data at all pulses when gapping and/or soft-clipping are requested. "
+                                     "Use PulseBehavior::BASECALLS_ONLY instead.");
+
+        // force into genomic orientation
+        internal::OrientTagDataAsRequested(&arr,
+                                           current,
+                                           Orientation::GENOMIC,
+                                           impl_.IsReverseStrand());
+        current = Orientation::GENOMIC;
+
+        // clip & gapify as requested
+        internal::ClipAndGapifyUInt8s(impl_,
+                                      aligned,
+                                      exciseSoftClips,
+                                      &arr);
+    }
+
+    // return in the orientation requested
+    internal::OrientTagDataAsRequested(&arr,
+                                      current,
+                                      orientation,
+                                      impl_.IsReverseStrand());
     return arr;
 }
 
@@ -2097,6 +2165,44 @@ BamRecord& BamRecord::PulseCallWidth(const Frames& frames,
     return *this;
 }
 
+std::vector<PacBio::BAM::PulseExclusionReason>
+BamRecord::PulseExclusionReason(Orientation orientation,
+                                bool aligned,
+                                bool exciseSoftClips,
+                                PulseBehavior pulseBehavior) const
+{
+    std::vector<PacBio::BAM::PulseExclusionReason> reasons;
+
+    const auto reasonNums = FetchUInt8s(BamRecordTag::PULSE_EXCLUSION,
+                                        orientation,
+                                        aligned,
+                                        exciseSoftClips,
+                                        pulseBehavior);
+
+    std::transform(reasonNums.cbegin(), reasonNums.cend(),
+                   std::back_inserter(reasons),
+                   [](const uint8_t num)
+                   { return static_cast<PacBio::BAM::PulseExclusionReason>(num);
+    });
+
+    return reasons;
+}
+
+BamRecord& BamRecord::PulseExclusionReason(const std::vector<PacBio::BAM::PulseExclusionReason>& reasons)
+{
+    std::vector<uint8_t> reasonNums;
+    std::transform(reasons.cbegin(), reasons.cend(),
+                   std::back_inserter(reasonNums),
+                   [](const PacBio::BAM::PulseExclusionReason& reason)
+                   { return static_cast<uint8_t>(reason); }
+    );
+
+    internal::CreateOrEdit(BamRecordTag::PULSE_EXCLUSION,
+                           reasonNums,
+                           &impl_);
+    return *this;
+}
+
 Frames BamRecord::PulseWidth(Orientation orientation,
                              bool aligned,
                              bool exciseSoftClips) const
@@ -2365,11 +2471,11 @@ std::vector<uint32_t> BamRecord::StartFrame(Orientation orientation,
                                             bool exciseSoftClips,
                                             PulseBehavior pulseBehavior) const
 {
-    return FetchUInts(BamRecordTag::START_FRAME,
-                      orientation,
-                      aligned,
-                      exciseSoftClips,
-                      pulseBehavior);
+    return FetchUInt32s(BamRecordTag::START_FRAME,
+                        orientation,
+                        aligned,
+                        exciseSoftClips,
+                        pulseBehavior);
 }
 
 BamRecord& BamRecord::StartFrame(const std::vector<uint32_t>& startFrame)

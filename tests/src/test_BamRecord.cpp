@@ -2709,3 +2709,23 @@ TEST(BamRecordTest, PulseUIntTags)
         );
     }
 }
+
+TEST(BamRecordTest, PulseExclusionTag)
+{
+    const std::vector<PacBio::BAM::PulseExclusionReason> reasons =
+    {
+        PulseExclusionReason::BASE
+      , PulseExclusionReason::PAUSE
+      , PulseExclusionReason::SHORT_PULSE
+      , PulseExclusionReason::BURST
+      , PulseExclusionReason::BASE
+      , PulseExclusionReason::PAUSE
+    };
+
+    auto bam = BamRecordTests::CreateBam();
+    bam.PulseExclusionReason(reasons);
+
+    auto result = bam.PulseExclusionReason();
+    EXPECT_EQ(reasons, result);
+
+}

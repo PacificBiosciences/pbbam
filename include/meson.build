@@ -59,6 +59,7 @@ if not meson.is_subproject()
       'pbbam/Position.h',
       'pbbam/ProgramInfo.h',
       'pbbam/PulseBehavior.h',
+      'pbbam/PulseExclusionReason.h'
       'pbbam/QNameQuery.h',
       'pbbam/QualityValue.h',
       'pbbam/QualityValues.h',

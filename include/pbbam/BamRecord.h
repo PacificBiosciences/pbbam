@@ -51,6 +51,7 @@
 #include "pbbam/LocalContextFlags.h"
 #include "pbbam/Orientation.h"
 #include "pbbam/PulseBehavior.h"
+#include "pbbam/PulseExclusionReason.h"
 #include "pbbam/ReadGroupInfo.h"
 #include "pbbam/RecordType.h"
 #include "pbbam/Strand.h"
@@ -704,6 +705,16 @@ public:
                           bool exciseSoftClips = false,
                           PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
+    /// \brief Fetches this record's PulseExclusionReason values ("pe" tag).
+    ///
+    /// \returns vector of pulse exclusion reason value
+    ///
+    std::vector<PacBio::BAM::PulseExclusionReason>
+    PulseExclusionReason(Orientation orientation = Orientation::NATIVE,
+                         bool aligned = false,
+                         bool exciseSoftClips = false,
+                         PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+
     /// \brief Fetch this record's PulseMergeQV values ("pg" tag).
     ///
     /// \param[in] orientation     Orientation of output.
@@ -1082,6 +1093,13 @@ public:
     BamRecord& PulseCallWidth(const Frames& frames,
                               const FrameEncodingType encoding);
 
+    ///
+    /// \\brief Sets this record's PulseExclusionReason values ("pe" tag).
+    /// \param[in] reasons
+    /// \return reference to this record
+    ///
+    BamRecord& PulseExclusionReason(const std::vector<PacBio::BAM::PulseExclusionReason>& reasons);
+
     /// \brief Sets this record's PulseMergeQV values ("pg" tag).
     ///
     /// \param[in] pulseMergeQVs
@@ -1261,8 +1279,22 @@ private:
                                  const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     // UInt tags (e.g. start frame)
-    std::vector<uint32_t> FetchUIntsRaw(const BamRecordTag tag) const;
-    std::vector<uint32_t> FetchUInts(const BamRecordTag tag,
+    //
+    // TODO (DB): clean this up w.r.t FetchUInt8s
+    //
+    std::vector<uint32_t> FetchUInt32sRaw(const BamRecordTag tag) const;
+    std::vector<uint32_t> FetchUInt32s(const BamRecordTag tag,
+                                       const Orientation orientation = Orientation::NATIVE,
+                                       const bool aligned = false,
+                                       const bool exciseSoftClips = false,
+                                       const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+
+    // UInt tags (e.g. pulse exclusion)
+    //
+    // ODO (DB): clean this up w.r.t FetchUInt32s
+    //
+    std::vector<uint8_t> FetchUInt8sRaw(const BamRecordTag tag) const;
+    std::vector<uint8_t> FetchUInt8s(const BamRecordTag tag,
                                      const Orientation orientation = Orientation::NATIVE,
                                      const bool aligned = false,
                                      const bool exciseSoftClips = false,
