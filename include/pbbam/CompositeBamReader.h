@@ -215,6 +215,8 @@ public:
     ///
     PbiFilterCompositeBamReader& Filter(const PbiFilter& filter);
 
+    uint32_t NumReads(void) const;
+
     /// \}
 
 private:
@@ -223,6 +225,7 @@ private:
 private:
     container_type mergeQueue_;
     std::vector<std::string> filenames_;
+    uint32_t numReads_;
 };
 
 /// \brief The SequentialCompositeBamReader class provides read access to

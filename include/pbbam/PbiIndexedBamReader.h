@@ -148,6 +148,8 @@ public:
     /// \returns the current filter active on this reader
     const PbiFilter& Filter(void) const;
 
+    uint32_t NumReads(void) const;
+
 //    /// \returns the reader's underlying index data
 //    const PbiIndex& Index(void) const;
 

@@ -85,6 +85,10 @@ public:
     ///
     bool GetNext(BamRecord& r);
 
+    /// \brief Return number of records that pass the provided filter
+    ///
+    uint32_t NumReads(void) const;
+
 private:
     struct PbiFilterQueryPrivate;
     std::unique_ptr<PbiFilterQueryPrivate> d_;

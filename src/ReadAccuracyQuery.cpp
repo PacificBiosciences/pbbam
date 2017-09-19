@@ -71,5 +71,8 @@ ReadAccuracyQuery::~ReadAccuracyQuery(void) { }
 bool ReadAccuracyQuery::GetNext(BamRecord &r)
 { return d_->reader_.GetNext(r); }
 
+uint32_t ReadAccuracyQuery::NumReads(void) const
+{ return d_->reader_.NumReads(); }
+
 } // namespace BAM
 } // namespace PacBio

@@ -73,5 +73,8 @@ SubreadLengthQuery::~SubreadLengthQuery(void) { }
 bool SubreadLengthQuery::GetNext(BamRecord &r)
 { return d_->reader_.GetNext(r); }
 
+uint32_t SubreadLengthQuery::NumReads(void) const
+{ return d_->reader_.NumReads(); }
+
 } // namespace BAM
 } // namespace PacBio

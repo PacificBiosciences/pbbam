@@ -10,6 +10,13 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.12.0] - 2017-09-19
+
+### Added
+- NumReads() for PBI filter-based queries. This allows fetching of the number
+of reads that pass the filter, without needing to iterate over the entire 
+file(s).
+
 ## [0.11.0] - 2017-09-15
 
 ### Added
