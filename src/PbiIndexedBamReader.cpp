@@ -57,6 +57,7 @@ public:
     PbiIndexedBamReaderPrivate(const std::string& pbiFilename)
         : index_(pbiFilename)
         , currentBlockReadCount_(0)
+        , numMatchingReads_(0)
     { }
 
     void ApplyOffsets(void)
@@ -72,19 +73,23 @@ public:
         filter_ = filter;
         currentBlockReadCount_ = 0;
         blocks_.clear();
+        numMatchingReads_ = 0;
 
         // find blocks of reads passing filter criteria
-        const uint32_t numReads = index_.NumReads();
-        if (numReads == 0) {               // empty PBI - no reads to use
+        const uint32_t totalReads = index_.NumReads();
+        if (totalReads == 0) {               // empty PBI - no reads to use
             return;
         } else if (filter_.IsEmpty()) {    // empty filter - use all reads
-            blocks_.push_back(IndexResultBlock{0, numReads});
+            numMatchingReads_ = totalReads;
+            blocks_.push_back(IndexResultBlock{0, totalReads});
         } else {
             IndexList indices;
-            indices.reserve(numReads);
-            for (size_t i = 0; i < numReads; ++i) {
-                if (filter_.Accepts(index_, i))
+            indices.reserve(totalReads);
+            for (size_t i = 0; i < totalReads; ++i) {
+                if (filter_.Accepts(index_, i)) {
                     indices.push_back(i);
+                    ++numMatchingReads_;
+                }
             }
             blocks_ = mergedIndexBlocks(std::move(indices));
         }
@@ -124,6 +129,7 @@ public:
     PbiRawData index_;
     IndexResultBlocks blocks_;
     size_t currentBlockReadCount_;
+    uint32_t numMatchingReads_;
 };
 
 } // namespace internal
@@ -180,6 +186,12 @@ PbiIndexedBamReader& PbiIndexedBamReader::Filter(const PbiFilter& filter)
     assert(d_);
     d_->Filter(filter);
     return *this;
+}
+
+uint32_t PbiIndexedBamReader::NumReads(void) const
+{
+    assert(d_);
+    return d_->numMatchingReads_;
 }
 
 } // namespace BAM

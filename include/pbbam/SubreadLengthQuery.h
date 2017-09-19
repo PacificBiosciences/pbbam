@@ -89,6 +89,8 @@ public:
     ///
     bool GetNext(BamRecord& r);
 
+    uint32_t NumReads(void) const;
+
 private:
     struct SubreadLengthQueryPrivate;
     std::unique_ptr<SubreadLengthQueryPrivate> d_;

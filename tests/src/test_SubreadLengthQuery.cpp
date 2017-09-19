@@ -54,8 +54,11 @@ TEST(SubreadLengthQueryTest, QueryOk)
     const auto bamFile = BamFile{ PbbamTestsConfig::Data_Dir + string{ "/group/test2.bam" } };
 
     {
-        int count = 0;
         SubreadLengthQuery query(500, Compare::GREATER_THAN_EQUAL, bamFile);
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(3, numReads);
+
+        int count = 0;
         for (const auto& r: query) {
             ++count;
             EXPECT_GE((r.QueryEnd() - r.QueryStart()), 500);
@@ -63,8 +66,11 @@ TEST(SubreadLengthQueryTest, QueryOk)
         EXPECT_EQ(3, count);
     }
     {
-        int count = 0;
         SubreadLengthQuery query(1000, Compare::GREATER_THAN_EQUAL, bamFile);
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(2, numReads);
+
+        int count = 0;
         for (const auto& r: query) {
             ++count;
             EXPECT_GE((r.QueryEnd() - r.QueryStart()), 1000);
@@ -72,8 +78,11 @@ TEST(SubreadLengthQueryTest, QueryOk)
         EXPECT_EQ(2, count);
     }
     {
-        int count = 0;
         SubreadLengthQuery query(5000, Compare::GREATER_THAN_EQUAL, bamFile);
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(0, numReads);
+
+        int count = 0;
         for (const auto& r: query) {
             ++count;
             EXPECT_GE((r.QueryEnd() - r.QueryStart()), 5000);

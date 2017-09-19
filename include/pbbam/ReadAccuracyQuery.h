@@ -93,6 +93,8 @@ public:
     ///
     bool GetNext(BamRecord& r);
 
+    uint32_t NumReads(void) const;
+
 private:
     struct ReadAccuracyQueryPrivate;
     std::unique_ptr<ReadAccuracyQueryPrivate> d_;

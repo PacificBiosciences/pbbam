@@ -67,5 +67,10 @@ PbiFilterQuery::~PbiFilterQuery(void) { }
 bool PbiFilterQuery::GetNext(BamRecord &r)
 { return d_->reader_.GetNext(r); }
 
+uint32_t PbiFilterQuery::NumReads(void) const
+{
+    return d_->reader_.NumReads();
+}
+
 } // namespace BAM
 } // namespace PacBio

@@ -245,6 +245,7 @@ inline void GenomicIntervalCompositeBamReader::UpdateSort(void)
 template<typename OrderByType>
 inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(const PbiFilter& filter,
                                                                              const std::vector<BamFile>& bamFiles)
+    : numReads_(0)
 {
     filenames_.reserve(bamFiles.size());
     for(const auto& bamFile : bamFiles)
@@ -255,6 +256,7 @@ inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(con
 template<typename OrderByType>
 inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(const PbiFilter& filter,
                                                                              std::vector<BamFile>&& bamFiles)
+    : numReads_(0)
 {
     filenames_.reserve(bamFiles.size());
     for(auto&& bamFile : bamFiles)
@@ -347,10 +349,25 @@ PbiFilterCompositeBamReader<OrderByType>::Filter(const PbiFilter& filter)
         throw std::runtime_error(e.str());
     }
 
-    // update our actual container and return
+
+    // update our actual container, store num matching reads, sort & and return
     mergeQueue_ = std::move(updatedMergeItems);
+
+    numReads_ = 0;
+    for (const auto& item : mergeQueue_)
+    {
+        PbiIndexedBamReader* pbiReader = dynamic_cast<PbiIndexedBamReader*>(item.reader.get());
+        numReads_ += pbiReader->NumReads();
+    }
+
     UpdateSort();
     return *this;
+}
+
+template<typename OrderByType>
+inline uint32_t PbiFilterCompositeBamReader<OrderByType>::NumReads(void) const
+{
+    return numReads_;
 }
 
 template<typename OrderByType>
