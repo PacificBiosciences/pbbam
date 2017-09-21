@@ -270,6 +270,8 @@ TEST(ReadGroupInfoTest, RemoveBaseFeature)
     rg.BaseFeatureTag(BaseFeature::INSERTION_QV,    "iq");
     rg.BaseFeatureTag(BaseFeature::MERGE_QV,        "mq");
     rg.BaseFeatureTag(BaseFeature::SUBSTITUTION_QV, "sq");
+    rg.BaseFeatureTag(BaseFeature::PULSE_EXCLUSION, "pe");
+
     EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::DELETION_QV));
     EXPECT_EQ("dq", rg.BaseFeatureTag(BaseFeature::DELETION_QV));
 
@@ -280,5 +282,6 @@ TEST(ReadGroupInfoTest, RemoveBaseFeature)
     EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::INSERTION_QV));
     EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::MERGE_QV));
     EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::SUBSTITUTION_QV));
+    EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::PULSE_EXCLUSION));
 }
 

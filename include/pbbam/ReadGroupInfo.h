@@ -80,6 +80,7 @@ enum class BaseFeature
   , PRE_PULSE_FRAMES
   , PULSE_CALL_WIDTH
   , START_FRAME
+  , PULSE_EXCLUSION
 };
 
 /// \brief This enum describes the encoding types used for frame data within a
