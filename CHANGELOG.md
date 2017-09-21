@@ -10,6 +10,9 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.12.1]
+- Added pulse exclusion base feature to read group.
+
 ## [0.12.0] - 2017-09-19
 
 ### Added
