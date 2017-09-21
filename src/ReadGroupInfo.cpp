@@ -92,6 +92,7 @@ static const std::string feature_PC = std::string{ "PulseCall" };
 static const std::string feature_PD = std::string{ "PrePulseFrames" };
 static const std::string feature_PX = std::string{ "PulseCallWidth" };
 static const std::string feature_SF = std::string{ "StartFrame" };
+static const std::string feature_PE = std::string{ "PulseExclusion" };
 
 static const std::string token_RT = std::string{ "READTYPE" };
 static const std::string token_BK = std::string{ "BINDINGKIT" };
@@ -145,6 +146,7 @@ static std::string BaseFeatureName(const BaseFeature& feature)
         case BaseFeature::PRE_PULSE_FRAMES : return feature_PD;
         case BaseFeature::PULSE_CALL_WIDTH : return feature_PX;
         case BaseFeature::START_FRAME      : return feature_SF;
+        case BaseFeature::PULSE_EXCLUSION  : return feature_PE;
         default:
             throw std::runtime_error{ "unrecognized base feature" };
     }
@@ -215,7 +217,8 @@ static const auto nameToFeature = std::map<std::string, BaseFeature>
     { feature_PG, BaseFeature::PULSE_MERGE_QV },
     { feature_PD, BaseFeature::PRE_PULSE_FRAMES },
     { feature_PX, BaseFeature::PULSE_CALL_WIDTH },
-    { feature_SF, BaseFeature::START_FRAME }
+    { feature_SF, BaseFeature::START_FRAME },
+    { feature_PE, BaseFeature::PULSE_EXCLUSION }
 };
 
 static const auto nameToCodec = std::map<std::string, FrameCodec>
