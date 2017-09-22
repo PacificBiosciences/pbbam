@@ -98,12 +98,12 @@ struct NumericConvertVisitor : public boost::static_visitor<DesiredType>
     }
 };
 
-typedef NumericConvertVisitor<int8_t>   ToInt8ConvertVisitor;
-typedef NumericConvertVisitor<uint8_t>  ToUInt8ConvertVisitor;
-typedef NumericConvertVisitor<int16_t>  ToInt16ConvertVisitor;
-typedef NumericConvertVisitor<uint16_t> ToUInt16ConvertVisitor;
-typedef NumericConvertVisitor<int32_t>  ToInt32ConvertVisitor;
-typedef NumericConvertVisitor<uint32_t> ToUInt32ConvertVisitor;
+using ToInt8ConvertVisitor   = NumericConvertVisitor<int8_t>;
+using ToUInt8ConvertVisitor  = NumericConvertVisitor<uint8_t>;
+using ToInt16ConvertVisitor  = NumericConvertVisitor<int16_t>;
+using ToUInt16ConvertVisitor = NumericConvertVisitor<uint16_t>;
+using ToInt32ConvertVisitor  = NumericConvertVisitor<int32_t>;
+using ToUInt32ConvertVisitor = NumericConvertVisitor<uint32_t>;
 
 struct IsEqualVisitor : public boost::static_visitor<bool>
 {
@@ -160,163 +160,163 @@ inline bool Tag::HasModifier(const TagModifier m) const
     return modifier_ == m;
 }
 
-inline bool Tag::IsNull(void) const
+inline bool Tag::IsNull() const
 { return Type() == TagDataType::INVALID; }
 
-inline bool Tag::IsInt8(void) const
+inline bool Tag::IsInt8() const
 { return Type() == TagDataType::INT8; }
 
-inline bool Tag::IsUInt8(void) const
+inline bool Tag::IsUInt8() const
 { return Type() == TagDataType::UINT8; }
 
-inline bool Tag::IsInt16(void) const
+inline bool Tag::IsInt16() const
 { return Type() == TagDataType::INT16; }
 
-inline bool Tag::IsUInt16(void) const
+inline bool Tag::IsUInt16() const
 { return Type() == TagDataType::UINT16; }
 
-inline bool Tag::IsInt32(void) const
+inline bool Tag::IsInt32() const
 { return Type() == TagDataType::INT32; }
 
-inline bool Tag::IsUInt32(void) const
+inline bool Tag::IsUInt32() const
 { return Type() == TagDataType::UINT32; }
 
-inline bool Tag::IsFloat(void) const
+inline bool Tag::IsFloat() const
 { return Type() == TagDataType::FLOAT; }
 
-inline bool Tag::IsString(void) const
+inline bool Tag::IsString() const
 { return Type() == TagDataType::STRING; }
 
-inline bool Tag::IsHexString(void) const
+inline bool Tag::IsHexString() const
 { return IsString() && modifier_ == TagModifier::HEX_STRING; }
 
-inline bool Tag::IsInt8Array(void) const
+inline bool Tag::IsInt8Array() const
 { return Type() == TagDataType::INT8_ARRAY; }
 
-inline bool Tag::IsUInt8Array(void) const
+inline bool Tag::IsUInt8Array() const
 { return Type() == TagDataType::UINT8_ARRAY; }
 
-inline bool Tag::IsInt16Array(void) const
+inline bool Tag::IsInt16Array() const
 { return Type() == TagDataType::INT16_ARRAY; }
 
-inline bool Tag::IsUInt16Array(void) const
+inline bool Tag::IsUInt16Array() const
 { return Type() == TagDataType::UINT16_ARRAY; }
 
-inline bool Tag::IsInt32Array(void) const
+inline bool Tag::IsInt32Array() const
 { return Type() == TagDataType::INT32_ARRAY; }
 
-inline bool Tag::IsUInt32Array(void) const
+inline bool Tag::IsUInt32Array() const
 { return Type() == TagDataType::UINT32_ARRAY; }
 
-inline bool Tag::IsFloatArray(void) const
+inline bool Tag::IsFloatArray() const
 { return Type() == TagDataType::FLOAT_ARRAY; }
 
-inline bool Tag::IsSignedInt(void) const
+inline bool Tag::IsSignedInt() const
 { return IsInt8() || IsInt16() || IsInt32(); }
 
-inline bool Tag::IsUnsignedInt(void) const
+inline bool Tag::IsUnsignedInt() const
 { return IsUInt8() || IsUInt16() || IsUInt32(); }
 
-inline bool Tag::IsIntegral(void) const
+inline bool Tag::IsIntegral() const
 { return IsSignedInt() || IsUnsignedInt(); }
 
-inline bool Tag::IsNumeric(void) const
+inline bool Tag::IsNumeric() const
 { return IsIntegral() || IsFloat(); }
 
-inline bool Tag::IsSignedArray(void) const
+inline bool Tag::IsSignedArray() const
 { return IsInt8Array() || IsInt16Array() || IsInt32Array(); }
 
-inline bool Tag::IsUnsignedArray(void) const
+inline bool Tag::IsUnsignedArray() const
 { return IsUInt8Array() || IsUInt16Array() || IsUInt32Array(); }
 
-inline bool Tag::IsIntegralArray(void) const
+inline bool Tag::IsIntegralArray() const
 { return IsSignedArray() || IsUnsignedArray(); }
 
-inline bool Tag::IsArray(void) const
+inline bool Tag::IsArray() const
 { return IsIntegralArray() || IsFloatArray(); }
 
-inline TagModifier Tag::Modifier(void) const
+inline TagModifier Tag::Modifier() const
 { return modifier_; }
 
 inline Tag& Tag::Modifier(const TagModifier m)
 { modifier_ = m; return *this; }
 
-inline char Tag::ToAscii(void) const
+inline char Tag::ToAscii() const
 { return boost::apply_visitor(internal::AsciiConvertVisitor(), data_); }
 
-inline int8_t Tag::ToInt8(void) const
+inline int8_t Tag::ToInt8() const
 {
     if (IsInt8())
         return boost::get<int8_t>(data_);
     return boost::apply_visitor(internal::ToInt8ConvertVisitor(), data_);
 }
 
-inline uint8_t Tag::ToUInt8(void) const
+inline uint8_t Tag::ToUInt8() const
 {
     if (IsUInt8())
         return boost::get<uint8_t>(data_);
     return boost::apply_visitor(internal::ToUInt8ConvertVisitor(), data_);
 }
 
-inline int16_t Tag::ToInt16(void) const
+inline int16_t Tag::ToInt16() const
 {
     if (IsInt16())
         return boost::get<int16_t>(data_);
     return boost::apply_visitor(internal::ToInt16ConvertVisitor(), data_);
 }
 
-inline uint16_t Tag::ToUInt16(void) const
+inline uint16_t Tag::ToUInt16() const
 {
     if (IsUInt16())
         return boost::get<uint16_t>(data_);
     return boost::apply_visitor(internal::ToUInt16ConvertVisitor(), data_);
 }
 
-inline int32_t Tag::ToInt32(void) const
+inline int32_t Tag::ToInt32() const
 {
     if (IsInt32())
         return boost::get<int32_t>(data_);
     return boost::apply_visitor(internal::ToInt32ConvertVisitor(), data_);
 }
 
-inline uint32_t Tag::ToUInt32(void) const
+inline uint32_t Tag::ToUInt32() const
 {
     if (IsUInt32())
         return boost::get<uint32_t>(data_);
     return boost::apply_visitor(internal::ToUInt32ConvertVisitor(), data_);
 }
 
-inline float Tag::ToFloat(void) const
+inline float Tag::ToFloat() const
 { return boost::get<float>(data_); }
 
-inline std::string Tag::ToString(void) const
+inline std::string Tag::ToString() const
 { return boost::get<std::string>(data_); }
 
-inline std::vector<int8_t> Tag::ToInt8Array(void) const
+inline std::vector<int8_t> Tag::ToInt8Array() const
 { return boost::get< std::vector<int8_t> >(data_); }
 
-inline std::vector<uint8_t> Tag::ToUInt8Array(void) const
+inline std::vector<uint8_t> Tag::ToUInt8Array() const
 { return boost::get< std::vector<uint8_t> >(data_); }
 
-inline std::vector<int16_t> Tag::ToInt16Array(void) const
+inline std::vector<int16_t> Tag::ToInt16Array() const
 { return boost::get< std::vector<int16_t> >(data_); }
 
-inline std::vector<uint16_t> Tag::ToUInt16Array(void) const
+inline std::vector<uint16_t> Tag::ToUInt16Array() const
 { return boost::get< std::vector<uint16_t> >(data_); }
 
-inline std::vector<int32_t> Tag::ToInt32Array(void) const
+inline std::vector<int32_t> Tag::ToInt32Array() const
 { return boost::get< std::vector<int32_t> >(data_); }
 
-inline std::vector<uint32_t> Tag::ToUInt32Array(void) const
+inline std::vector<uint32_t> Tag::ToUInt32Array() const
 { return boost::get< std::vector<uint32_t> >(data_); }
 
-inline std::vector<float> Tag::ToFloatArray(void) const
+inline std::vector<float> Tag::ToFloatArray() const
 { return boost::get< std::vector<float> >(data_); }
 
-inline TagDataType Tag::Type(void) const
+inline TagDataType Tag::Type() const
 { return TagDataType(data_.which()  ); }
 
-inline std::string Tag::Typename(void) const
+inline std::string Tag::Typename() const
 { return boost::apply_visitor(internal::TypenameVisitor(), data_); }
 
 } // namespace BAM

@@ -56,12 +56,12 @@ namespace BAM {
 class InvalidSequencingChemistryException : public std::exception
 {
 public:
-    InvalidSequencingChemistryException(const std::string& bindingKit,
-                                        const std::string& sequencingKit,
-                                        const std::string& basecallerVersion)
-        : bindingKit_(bindingKit)
-        , sequencingKit_(sequencingKit)
-        , basecallerVersion_(basecallerVersion)
+    InvalidSequencingChemistryException(std::string bindingKit,
+                                        std::string sequencingKit,
+                                        std::string basecallerVersion)
+        : bindingKit_(std::move(bindingKit))
+        , sequencingKit_(std::move(sequencingKit))
+        , basecallerVersion_(std::move(basecallerVersion))
     {
         std::stringstream s;
         s << "unsupported sequencing chemistry combination: " << std::endl
@@ -74,20 +74,20 @@ public:
     // This is a work around for the Intel PHI compiler (icpc)
     ~InvalidSequencingChemistryException() throw()
     {
-
     }
+
 public:
-    const std::string& BindingKit(void) const
+    const std::string& BindingKit() const
     { return bindingKit_; }
 
-    const std::string& SequencingKit(void) const
+    const std::string& SequencingKit() const
     { return sequencingKit_; }
 
-    const std::string& BasecallerVersion(void) const
+    const std::string& BasecallerVersion() const
     { return basecallerVersion_; }
 
 public:
-    const char* what(void) const noexcept override
+    const char* what() const noexcept override
     { return what_.c_str(); }
 
 protected:

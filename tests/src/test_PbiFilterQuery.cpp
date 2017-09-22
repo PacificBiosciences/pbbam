@@ -47,6 +47,7 @@
 #include "PbbamTestData.h"
 
 #include <pbbam/PbiFilterQuery.h>
+#include <pbbam/Unused.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -219,7 +220,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 
         int count = 0;
         for (const BamRecord& r : query) {
-            (void)r;
+            UNUSED(r);
             ++count;
         }
         EXPECT_EQ(1220, count);
@@ -234,7 +235,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 
         int count = 0;
         for (const BamRecord& r : query) {
-            (void)r;
+            UNUSED(r);
             ++count;
         }
         EXPECT_EQ(1220, count);
@@ -249,7 +250,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 
         int count = 0;
         for (const BamRecord& r : query) {
-            (void)r;
+            UNUSED(r);
             ++count;
         }
         EXPECT_EQ(1220, count);
@@ -294,7 +295,7 @@ TEST(PbiFilterQueryTest, QNameWhitelistFile)
 
     int count = 0;
     for (const BamRecord& r : query) {
-        (void)r;
+        UNUSED(r);
         ++count;
     }
     EXPECT_EQ(3, count);
@@ -309,7 +310,7 @@ TEST(PbiFilterQueryTest, EmptyFiles)
 
     size_t count = 0;
     for (const auto& r : query) {
-        (void)r;
+        UNUSED(r);
         ++count;
     }
     EXPECT_EQ(0, count);
@@ -327,7 +328,7 @@ TEST(PbiFilterQueryTest, BarcodeData)
 
        size_t count = 0;
        for (const auto& r : query) {
-           (void)r;
+           UNUSED(r);
            ++count;
        }
        EXPECT_EQ(120, count);
@@ -341,7 +342,7 @@ TEST(PbiFilterQueryTest, BarcodeData)
 
        size_t count = 0;
        for (const auto& r : query) {
-           (void)r;
+           UNUSED(r);
            ++count;
        }
        EXPECT_EQ(0, count);
@@ -355,7 +356,7 @@ TEST(PbiFilterQueryTest, BarcodeData)
 
        size_t count = 0;
        for (const auto& r : query) {
-           (void)r;
+           UNUSED(r);
            ++count;
        }
        EXPECT_EQ(40, count);
@@ -370,7 +371,7 @@ TEST(PbiFilterQueryTest, BarcodeData)
 
        size_t count = 0;
        for (const auto& r : query) {
-           (void)r;
+           UNUSED(r);
            ++count;
        }
        EXPECT_EQ(80, count);
@@ -384,7 +385,7 @@ TEST(PbiFilterQueryTest, BarcodeData)
 
        size_t count = 0;
        for (const auto& r : query) {
-           (void)r;
+           UNUSED(r);
            ++count;
        }
        EXPECT_EQ(80, count);
@@ -488,7 +489,7 @@ const string xml_none = R"_XML_(
 
          size_t count = 0;
          for (const auto& r : query) {
-             (void)r;
+             UNUSED(r);
              ++count;
          }
          EXPECT_EQ(120, count);
@@ -501,7 +502,7 @@ const string xml_none = R"_XML_(
 
          size_t count = 0;
          for (const auto& r : query) {
-             (void)r;
+             UNUSED(r);
              ++count;
          }
          EXPECT_EQ(0, count);
@@ -568,7 +569,7 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         EXPECT_EQ(13, numReads);
 
         for (const auto& r : query) {
-            (void)r;
+            UNUSED(r);
             ++count_30422;
         }
         EXPECT_EQ(13, count_30422);
@@ -582,7 +583,7 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         EXPECT_EQ(11, numReads);
 
         for (const auto& r : query) {
-            (void)r;
+            UNUSED(r);
             ++count_648;
         }
         EXPECT_EQ(11, count_648);
@@ -596,7 +597,7 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         EXPECT_EQ(4, numReads);
 
         for (const auto& r : query) {
-            (void)r;
+            UNUSED(r);
             ++count_17299;
         }
         EXPECT_EQ(4, count_17299);
@@ -610,7 +611,7 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         EXPECT_EQ(28, numReads);
 
         for (const auto& r : query) {
-            (void)r;
+            UNUSED(r);
             ++count_whitelist;
         }
         EXPECT_EQ(count_30422 + count_648 + count_17299, count_whitelist);

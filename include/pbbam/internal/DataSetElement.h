@@ -63,23 +63,24 @@ class XmlName
     //  prefix    local name
 
 public:
-    XmlName(const std::string& fullName, bool verbatim = false);
+    XmlName(std::string fullName, bool verbatim = false);
     XmlName(const std::string& localName, const std::string& prefix);
-    XmlName(const XmlName& other);
-    XmlName(XmlName&& other);
-    XmlName& operator=(const XmlName& other);
-    XmlName& operator=(XmlName&& other);
-    ~XmlName(void);
+
+    XmlName(const XmlName&) = default;
+    XmlName(XmlName&&) = default;
+    XmlName& operator=(const XmlName&) = default;
+    XmlName& operator=(XmlName&&) = default;
+    ~XmlName() = default;
 
 public:
     bool operator==(const XmlName& other) const;
     bool operator!=(const XmlName& other) const;
 
 public:
-    const boost::string_ref LocalName(void) const;
-    const boost::string_ref Prefix(void) const;
-    const std::string& QualifiedName(void) const;
-    bool Verbatim(void) const;
+    const boost::string_ref LocalName() const;
+    const boost::string_ref Prefix() const;
+    const std::string& QualifiedName() const;
+    bool Verbatim() const;
 
 private:
     std::string qualifiedName_;
@@ -94,13 +95,17 @@ struct FromInputXml { };
 class DataSetElement
 {
 public:
-    DataSetElement(const std::string& label, const XsdType& xsd = XsdType::NONE);
-    DataSetElement(const std::string& label, const FromInputXml& fromInputXml, const XsdType& xsd = XsdType::NONE);
-    DataSetElement(const DataSetElement& other);
-    DataSetElement(DataSetElement&& other);
-    DataSetElement& operator=(const DataSetElement& other);
-    DataSetElement& operator=(DataSetElement&& other);
-    virtual ~DataSetElement(void);
+    DataSetElement(const std::string& label,
+                   const XsdType& xsd = XsdType::NONE);
+    DataSetElement(const std::string& label,
+                   const FromInputXml& fromInputXml,
+                   const XsdType& xsd = XsdType::NONE);
+
+    DataSetElement(const DataSetElement&) = default;
+    DataSetElement(DataSetElement&&) = default;
+    DataSetElement& operator=(const DataSetElement&) = default;
+    DataSetElement& operator=(DataSetElement&&) = default;
+    virtual ~DataSetElement() = default;
 
 public:
     bool operator==(const DataSetElement& other) const;
@@ -109,23 +114,23 @@ public:
 public:
     const std::string& Attribute(const std::string& name) const;
     std::string& Attribute(const std::string& name);
-    const std::map<std::string, std::string>& Attributes(void) const;
-    std::map<std::string, std::string>& Attributes(void);
+    const std::map<std::string, std::string>& Attributes() const;
+    std::map<std::string, std::string>& Attributes();
     bool HasAttribute(const std::string& name) const;
 
-    const std::vector<DataSetElement>& Children(void) const;
-    std::vector<DataSetElement>& Children(void);
+    const std::vector<DataSetElement>& Children() const;
+    std::vector<DataSetElement>& Children();
     bool HasChild(const std::string& label) const;
 
-    const boost::string_ref LocalNameLabel(void) const;
-    const boost::string_ref PrefixLabel(void) const;
-    const std::string& QualifiedNameLabel(void) const;
-    bool IsVerbatimLabel(void) const;
+    const boost::string_ref LocalNameLabel() const;
+    const boost::string_ref PrefixLabel() const;
+    const std::string& QualifiedNameLabel() const;
+    bool IsVerbatimLabel() const;
 
-    const std::string& Text(void) const;
-    std::string& Text(void);
+    const std::string& Text() const;
+    std::string& Text();
 
-    const XsdType& Xsd(void) const;
+    const XsdType& Xsd() const;
 
 public:
     void Attribute(const std::string& name, const std::string& value);
@@ -133,8 +138,8 @@ public:
     void Text(const std::string& text);
 
 public:
-    size_t NumAttributes(void) const;
-    size_t NumChildren(void) const;
+    size_t NumAttributes() const;
+    size_t NumChildren() const;
 
 public:
     void AddChild(const DataSetElement& e);
@@ -165,7 +170,7 @@ public:
     T& operator[](const std::string& label);
 
 protected:
-    static const std::string& SharedNullString(void);
+    static const std::string& SharedNullString();
 
 public:
     const std::string& ChildText(const std::string& label) const;

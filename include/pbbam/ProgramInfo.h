@@ -79,20 +79,20 @@ public:
     /// \{
 
     /// \brief Creates an empty program info object.
-    ProgramInfo(void) = default;
+    ProgramInfo() = default;
 
     /// \brief Creates a program info object with an ID.
     ///
     /// \param[in] id       program ID (\@PG:ID)
     ///
-    ProgramInfo(const std::string& id);
+    ProgramInfo(std::string id);
 
 
     ProgramInfo(const ProgramInfo& other) = default;
     ProgramInfo(ProgramInfo&& other) = default;
     ProgramInfo& operator=(const ProgramInfo& other) = default;
     ProgramInfo& operator=(ProgramInfo&& other) = default;
-    ~ProgramInfo(void) = default;
+    ~ProgramInfo() = default;
 
     /// \}
 
@@ -105,13 +105,13 @@ public:
     /// Currently this checks to see that ProgramInfo::Id does not contain an
     /// empty string.
     ///
-    bool IsValid(void) const;
+    bool IsValid() const;
 
     /// \brief Converts this object to its SAM-formatted text.
     ///
     /// \returns SAM-formatted text (no trailing newline)
     ///
-    std::string ToSam(void) const;
+    std::string ToSam() const;
 
     /// \}
 
@@ -120,28 +120,28 @@ public:
     /// \{
 
     /// \returns string value of \@PG:CL
-    std::string CommandLine(void) const;
+    std::string CommandLine() const;
 
     /// \returns any non-standard tags added to the \@PG entry
     ///
     /// Result map consists of {tagName => value}.
     ///
-    std::map<std::string, std::string> CustomTags(void) const;
+    std::map<std::string, std::string> CustomTags() const;
 
     /// \returns string value of \@PG:DS
-    std::string Description(void) const;
+    std::string Description() const;
 
     /// \returns string value of \@PG:ID
-    std::string Id(void) const;
+    std::string Id() const;
 
     /// \returns string value of \@PG:PN
-    std::string Name(void) const;
+    std::string Name() const;
 
     /// \returns string value of \@PG:PP
-    std::string PreviousProgramId(void) const;
+    std::string PreviousProgramId() const;
 
     /// \returns string value of \@PG:VN
-    std::string Version(void) const;
+    std::string Version() const;
 
     /// \}
 

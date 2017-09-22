@@ -91,7 +91,7 @@ public:
     ///
     explicit BamReader(BamFile&& bamFile);
 
-    virtual ~BamReader(void);
+    virtual ~BamReader();
 
     /// \}
 
@@ -100,13 +100,13 @@ public:
     /// \{
 
     /// \returns the underlying BamFile
-    const BamFile& File(void) const;
+    const BamFile& File() const;
 
     /// \returns %BAM filename
-    std::string Filename(void) const;
+    std::string Filename() const;
 
     /// \returns BamHeader object from %BAM header contents
-    const BamHeader& Header(void) const;
+    const BamHeader& Header() const;
 
     /// \}
 
@@ -146,7 +146,7 @@ public:
     /// \note This is \b NOT a normal file offset, but the virtual offset used
     ///       in %BAM indexing.
     ///
-    int64_t VirtualTell(void) const;
+    int64_t VirtualTell() const;
 
     /// \}
 
@@ -160,7 +160,7 @@ protected:
     ///
     /// \returns BGZF stream pointer
     ///
-    BGZF* Bgzf(void) const;
+    BGZF* Bgzf() const;
 
     /// \brief Performs the actual raw read of the next record from the BAM
     ///        file.

@@ -45,6 +45,7 @@
 #include "PbbamTestData.h"
 
 #include <pbbam/GenomicIntervalQuery.h>
+#include <pbbam/Unused.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -65,7 +66,7 @@ TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
     GenomicInterval interval(rname, 5000, 6000);
     GenomicIntervalQuery query(interval, bamFile);
     for (const BamRecord& record : query) {
-        (void)record;
+        UNUSED(record);
         ++count;
     }
     EXPECT_EQ(2, count);
@@ -76,7 +77,7 @@ TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
     interval.Stop(9400);
     query.Interval(interval);
     for (const BamRecord& record : query) {
-        (void)record;
+        UNUSED(record);
         ++count;
     }
     EXPECT_EQ(2, count);
@@ -88,7 +89,7 @@ TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
     interval.Stop(2000);
     query.Interval(interval);
     for (const BamRecord& record : query) {
-        (void)record;
+        UNUSED(record);
         ++count;
     }
     EXPECT_EQ(0, count);
@@ -100,7 +101,7 @@ TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
     interval.Stop(100);
     EXPECT_THROW(query.Interval(interval), std::runtime_error);
     for (const BamRecord& record : query) { // iteration is still safe, just returns no data
-        (void)record;
+        UNUSED(record);
         ++count;
     }
     EXPECT_EQ(0, count);
@@ -112,7 +113,7 @@ TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
     query.Interval(interval);
     count = 0;
     for (const BamRecord& record : query) {
-        (void)record;
+        UNUSED(record);
         ++count;
     }
     EXPECT_EQ(2, count);
@@ -128,7 +129,7 @@ TEST(GenomicIntervalQueryTest, NonConstBamRecord)
         GenomicInterval interval("lambda_NEB3011", 8000, 10000);
         GenomicIntervalQuery query(interval, bamFile);
         for (BamRecord& record : query) {
-            (void)record;
+            UNUSED(record);
             ++count;
         }
         EXPECT_EQ(2, count);

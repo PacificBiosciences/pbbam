@@ -46,17 +46,9 @@ namespace internal {
 // -------------------
 
 template<typename T>
-inline QueryIteratorBase<T>::QueryIteratorBase(void)
-    : query_(nullptr)
-{ }
-
-template<typename T>
 inline QueryIteratorBase<T>::QueryIteratorBase(QueryBase<T>& query)
     : query_(&query)
 { ReadNext(); }
-
-template<typename T> inline
-QueryIteratorBase<T>::~QueryIteratorBase(void) { }
 
 template<typename T> inline
 bool QueryIteratorBase<T>::operator==(const QueryIteratorBase<T>& other) const
@@ -71,23 +63,20 @@ bool QueryIteratorBase<T>::operator!=(const QueryIteratorBase<T>& other) const
 // -------------------
 
 template<typename T> inline
-QueryIterator<T>::QueryIterator(void) : QueryIteratorBase<T>() { }
-
-template<typename T> inline
 QueryIterator<T>::QueryIterator(QueryBase<T>& query)
     : QueryIteratorBase<T>(query)
 { }
 
 template<typename T> inline
-T& QueryIterator<T>::operator*(void)
+T& QueryIterator<T>::operator*()
 { return QueryIteratorBase<T>::record_; }
 
 template<typename T> inline
-T* QueryIterator<T>::operator->(void)
+T* QueryIterator<T>::operator->()
 { return &(operator*()); }
 
 template<typename T> inline
-QueryIterator<T>& QueryIterator<T>::operator++(void)
+QueryIterator<T>& QueryIterator<T>::operator++()
 { QueryIteratorBase<T>::ReadNext(); return *this; }
 
 template<typename T> inline
@@ -103,23 +92,20 @@ QueryIterator<T> QueryIterator<T>::operator++(int)
 // --------------------
 
 template<typename T> inline
-QueryConstIterator<T>::QueryConstIterator(void) : QueryIteratorBase<T>() { }
-
-template<typename T> inline
 QueryConstIterator<T>::QueryConstIterator(const QueryBase<T>& query)
     : QueryIteratorBase<T>(const_cast<QueryBase<T>&>(query))
 { }
 
 template<typename T> inline
-const T& QueryConstIterator<T>::operator*(void) const
+const T& QueryConstIterator<T>::operator*() const
 { return QueryIteratorBase<T>::record_; }
 
 template<typename T> inline
-const T* QueryConstIterator<T>::operator->(void) const
+const T* QueryConstIterator<T>::operator->() const
 { return &(operator*()); }
 
 template<typename T> inline
-QueryConstIterator<T>& QueryConstIterator<T>::operator++(void)
+QueryConstIterator<T>& QueryConstIterator<T>::operator++()
 { QueryIteratorBase<T>::ReadNext(); return *this; }
 
 template<typename T> inline
@@ -135,37 +121,31 @@ QueryConstIterator<T> QueryConstIterator<T>::operator++(int)
 // -----------
 
 template<typename T> inline
-QueryBase<T>::QueryBase(void) { }
-
-template<typename T> inline
-QueryBase<T>::~QueryBase(void) { }
-
-template<typename T> inline
-QueryConstIterator<T> QueryBase<T>::begin(void) const
+QueryConstIterator<T> QueryBase<T>::begin() const
 { return QueryConstIterator<T>(*this); }
 
 template<typename T> inline
-QueryIterator<T> QueryBase<T>::begin(void)
+QueryIterator<T> QueryBase<T>::begin()
 { return QueryIterator<T>(*this); }
 
 template<typename T> inline
-QueryConstIterator<T> QueryBase<T>::cbegin(void) const
+QueryConstIterator<T> QueryBase<T>::cbegin() const
 { return QueryConstIterator<T>(*this); }
 
 template<typename T> inline
-QueryConstIterator<T> QueryBase<T>::cend(void) const
+QueryConstIterator<T> QueryBase<T>::cend() const
 { return QueryConstIterator<T>(); }
 
 template<typename T> inline
-QueryConstIterator<T> QueryBase<T>::end(void) const
+QueryConstIterator<T> QueryBase<T>::end() const
 { return QueryConstIterator<T>(); }
 
 template<typename T> inline
-QueryIterator<T> QueryBase<T>::end(void)
+QueryIterator<T> QueryBase<T>::end()
 { return QueryIterator<T>(); }
 
 template<typename T>
-inline void QueryIteratorBase<T>::ReadNext(void)
+inline void QueryIteratorBase<T>::ReadNext()
 {
     assert(query_);
     if (!query_->GetNext(record_))

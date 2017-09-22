@@ -216,7 +216,7 @@ TEST(ReadGroupInfoTest, BasecallerVersion)
           .SequencingKit("100-867-300")
           .BasecallerVersion("3");
         const string chem = rg.SequencingChemistry();
-        (void)chem;
+//        ()chem;
 
     } catch (std::runtime_error& e) {
         EXPECT_EQ(string("basecaller version too short: 3"), string(e.what()));
@@ -233,7 +233,7 @@ TEST(ReadGroupInfoTest, BasecallerVersion)
           .SequencingKit("100-867-300")
           .BasecallerVersion("3.199.dummy");   
         const string chem = rg.SequencingChemistry();
-        (void)chem;
+//        ()chem;
 
     } catch (InvalidSequencingChemistryException& e) {
         EXPECT_EQ("100-619-300", e.BindingKit());

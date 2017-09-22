@@ -53,7 +53,7 @@
 namespace PacBio {
 namespace BAM {
 
-BamRecordImpl::BamRecordImpl(void)
+BamRecordImpl::BamRecordImpl()
     : d_(nullptr)
 {
     InitializeData();
@@ -100,8 +100,6 @@ BamRecordImpl& BamRecordImpl::operator=(BamRecordImpl&& other)
     return *this;
 }
 
-BamRecordImpl::~BamRecordImpl(void) { }
-
 bool BamRecordImpl::AddTag(const std::string& tagName,
                            const Tag &value)
 {
@@ -122,7 +120,7 @@ bool BamRecordImpl::AddTag(const std::string& tagName,
 {
     if (tagName.size() != 2 || HasTag(tagName))
         return false;
-    const bool added = AddTagImpl(tagName, value, additionalModifier);
+    const auto added = AddTagImpl(tagName, value, additionalModifier);
     if (added)
         UpdateTagMap();
     return added;
@@ -153,14 +151,14 @@ bool BamRecordImpl::AddTagImpl(const std::string& tagName,
     return true;
 }
 
-Cigar BamRecordImpl::CigarData(void) const
+Cigar BamRecordImpl::CigarData() const
 {
     Cigar result;
     result.reserve(d_->core.n_cigar);
     uint32_t* cigarData = bam_get_cigar(d_);
     for (uint32_t i = 0; i < d_->core.n_cigar; ++i) {
         const uint32_t length = bam_cigar_oplen(cigarData[i]);
-        const CigarOperationType type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
+        const auto type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
         result.push_back(CigarOperation(type, length));
     }
 
@@ -261,7 +259,7 @@ bool BamRecordImpl::HasTag(const BamRecordTag tag) const
     return HasTag(internal::BamRecordTags::LabelFor(tag));
 }
 
-void BamRecordImpl::InitializeData(void)
+void BamRecordImpl::InitializeData()
 {
     d_.reset(bam_init1(), internal::HtslibRecordDeleter());
     d_->data = (uint8_t*)(calloc(0x800, sizeof(uint8_t)));   // maybe make this value tune-able later?
@@ -280,7 +278,7 @@ void BamRecordImpl::InitializeData(void)
     d_->m_data = 0x800;
 }
 
-void BamRecordImpl::MaybeReallocData(void)
+void BamRecordImpl::MaybeReallocData()
 {
     // about to grow data contents to l_data size, but m_data is our current max.
     // so we may need to grow. if so, use kroundup to double to next power of 2
@@ -291,7 +289,7 @@ void BamRecordImpl::MaybeReallocData(void)
     }
 }
 
-std::string BamRecordImpl::Name(void) const
+std::string BamRecordImpl::Name() const
 {
     return std::string(bam_get_qname(d_));
 }
@@ -318,7 +316,7 @@ BamRecordImpl& BamRecordImpl::Name(const std::string& name)
     return *this;
 }
 
-QualityValues BamRecordImpl::Qualities(void) const
+QualityValues BamRecordImpl::Qualities() const
 {
     if (d_->core.l_qseq == 0)
         return QualityValues();
@@ -353,13 +351,13 @@ bool BamRecordImpl::RemoveTagImpl(const std::string &tagName)
     if (tagName.size() != 2)
         return false;
     uint8_t* data = bam_aux_get(d_.get(), tagName.c_str());
-    if (data == 0)
+    if (data == nullptr)
         return false;
     const bool ok = bam_aux_del(d_.get(), data) == 0;
     return ok;
 }
 
-std::string BamRecordImpl::Sequence(void) const
+std::string BamRecordImpl::Sequence() const
 {
     std::string result;
     result.reserve(d_->core.l_qseq);
@@ -370,7 +368,7 @@ std::string BamRecordImpl::Sequence(void) const
     return result;
 }
 
-size_t BamRecordImpl::SequenceLength(void) const
+size_t BamRecordImpl::SequenceLength() const
 { return d_->core.l_qseq; }
 
 BamRecordImpl& BamRecordImpl::SetSequenceAndQualities(const std::string& sequence,
@@ -412,7 +410,7 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
 {
     // determine change in memory needed
     // diffNumBytes: pos -> growing, neg -> shrinking
-    const int encodedSequenceLength = static_cast<int>((sequenceLength+1)/2);
+    const auto encodedSequenceLength = static_cast<int>((sequenceLength+1)/2);
     const int oldSeqAndQualLength = static_cast<int>((d_->core.l_qseq+1)/2) + d_->core.l_qseq; // encoded seq + qual
     const int newSeqAndQualLength = encodedSequenceLength + sequenceLength;                    // encoded seq + qual
     const int diffNumBytes = newSeqAndQualLength - oldSeqAndQualLength;
@@ -439,7 +437,7 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
 
     // fill in quality values
     uint8_t* encodedQualities = bam_get_qual(d_);
-    if ( (qualities == 0 ) || (strlen(qualities) == 0) )
+    if ( (qualities == nullptr ) || (strlen(qualities) == 0) )
         memset(encodedQualities, 0xff, sequenceLength);
     else {
         for (size_t i = 0; i < sequenceLength; ++i)
@@ -484,7 +482,7 @@ BamRecordImpl& BamRecordImpl::Tags(const TagCollection& tags)
     return *this;
 }
 
-TagCollection BamRecordImpl::Tags(void) const
+TagCollection BamRecordImpl::Tags() const
 {
     const uint8_t* tagDataStart = bam_get_aux(d_);
     const size_t numBytes = d_->l_data - (tagDataStart - d_->data);
@@ -515,7 +513,7 @@ Tag BamRecordImpl::TagValue(const BamRecordTag tag) const
     return TagValue(internal::BamRecordTags::LabelFor(tag));
 }
 
-void BamRecordImpl::UpdateTagMap(void) const
+void BamRecordImpl::UpdateTagMap() const
 {
     // clear out offsets, leave map structure basically intact
     auto tagIter = tagOffsets_.begin();
@@ -524,7 +522,7 @@ void BamRecordImpl::UpdateTagMap(void) const
         tagIter->second = -1;
 
     const uint8_t* tagStart = bam_get_aux(d_);
-    if (tagStart == 0)
+    if (tagStart == nullptr)
         return;
     const ptrdiff_t numBytes = d_->l_data - (tagStart - d_->data);
 
@@ -542,7 +540,7 @@ void BamRecordImpl::UpdateTagMap(void) const
         tagOffsets_[tagNameCode] = i;
 
         // skip tag contents
-        const char tagType = static_cast<char>(tagStart[i++]);
+        const auto tagType = static_cast<char>(tagStart[i++]);
         switch (tagType) {
             case 'A' :
             case 'a' :

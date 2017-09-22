@@ -50,7 +50,7 @@ struct FileUtils
 public:
 
     /// \returns application's current working directory
-    static std::string CurrentWorkingDirectory(void);
+    static std::string CurrentWorkingDirectory();
 
     /// Parses a filepath for the the directory name for a file.
     ///
@@ -110,7 +110,7 @@ public:
                                         const std::string& from = ".");
 
     /// \returns native path separator
-    constexpr static char Separator(void);
+    constexpr static char Separator();
 
     /// Check size of file.
     ///

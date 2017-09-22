@@ -56,19 +56,19 @@ template<typename T>
 class QueryIteratorBase
 {
 public:
-    virtual ~QueryIteratorBase(void);
+    ~QueryIteratorBase() = default;
 
     bool operator==(const QueryIteratorBase<T>& other) const;
     bool operator!=(const QueryIteratorBase<T>& other) const;
 
 protected:
-    QueryIteratorBase(void);
+    QueryIteratorBase() = default;
     QueryIteratorBase(QueryBase<T>& query);
 
-    void ReadNext(void);
+    void ReadNext();
 
 protected:
-    QueryBase<T>* query_;
+    QueryBase<T>* query_ = nullptr;
     T record_;
 };
 
@@ -76,13 +76,13 @@ template<typename T>
 class QueryIterator : public QueryIteratorBase<T>
 {
 public:
-    QueryIterator(void);
+    QueryIterator() = default;
     QueryIterator(QueryBase<T>& query);
 
-    T& operator*(void);
-    T* operator->(void);
+    T& operator*();
+    T* operator->();
 
-    QueryIterator<T>& operator++(void);
+    QueryIterator<T>& operator++();
     QueryIterator<T> operator++(int);
 };
 
@@ -90,13 +90,13 @@ template<typename T>
 class QueryConstIterator : public QueryIteratorBase<T>
 {
 public:
-    QueryConstIterator(void);
+    QueryConstIterator() = default;
     QueryConstIterator(const QueryBase<T>& query);
 
-    const T& operator*(void) const;
-    const T* operator->(void) const;
+    const T& operator*() const;
+    const T* operator->() const;
 
-    QueryConstIterator<T>& operator++(void);
+    QueryConstIterator<T>& operator++();
     QueryConstIterator<T> operator++(int);
 };
 
@@ -104,30 +104,30 @@ template<typename T>
 class QueryBase {
 
 public:
-    typedef QueryIterator<T>      iterator;
-    typedef QueryConstIterator<T> const_iterator;
+    using iterator = QueryIterator<T>;
+    using const_iterator = QueryConstIterator<T>;
 
 public:
-    virtual ~QueryBase(void);
+    virtual ~QueryBase() = default;
 
 public:
-    QueryConstIterator<T> begin(void) const;
-    QueryConstIterator<T> cbegin(void) const;
-    QueryIterator<T> begin(void);
+    QueryConstIterator<T> begin() const;
+    QueryConstIterator<T> cbegin() const;
+    QueryIterator<T> begin();
 
-    QueryConstIterator<T> end(void) const;
-    QueryConstIterator<T> cend(void) const;
-    QueryIterator<T> end(void);
+    QueryConstIterator<T> end() const;
+    QueryConstIterator<T> cend() const;
+    QueryIterator<T> end();
 
 public:
     virtual bool GetNext(T& r) =0;
 
 protected:
-    QueryBase(void);
+    QueryBase() = default;
 };
 
-typedef QueryBase<BamRecord>               IQuery;
-typedef QueryBase<std::vector<BamRecord> > IGroupQuery;
+using IQuery = QueryBase<BamRecord>;
+using IGroupQuery = QueryBase<std::vector<BamRecord>>;
 
 } // namespace internal
 } // namespace BAM

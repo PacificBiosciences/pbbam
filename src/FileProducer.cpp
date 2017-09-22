@@ -49,10 +49,10 @@ FileProducer::FileProducer(const std::string& targetFilename)
     : FileProducer(targetFilename, targetFilename + ".tmp")
 { }
 
-FileProducer::FileProducer(const std::string& targetFilename,
-                           const std::string& tempFilename)
-    : targetFilename_(targetFilename)
-    , tempFilename_(tempFilename)
+FileProducer::FileProducer(std::string targetFilename,
+                           std::string tempFilename)
+    : targetFilename_(std::move(targetFilename))
+    , tempFilename_(std::move(tempFilename))
 {
     // override renaming if writing to stdout
     //
@@ -62,7 +62,7 @@ FileProducer::FileProducer(const std::string& targetFilename,
         tempFilename_ = "-";
 }
 
-FileProducer::~FileProducer(void)
+FileProducer::~FileProducer()
 {
     // skip renaming if there is a 'live' exception
     // or if writing to stdout

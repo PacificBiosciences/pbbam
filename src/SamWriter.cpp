@@ -75,7 +75,7 @@ public:
             throw std::runtime_error("could not write header");
     }
 
-    void TryFlush(void);
+    void TryFlush();
     void Write(const BamRecord& record);
 
 private:
@@ -83,7 +83,7 @@ private:
     std::shared_ptr<bam_hdr_t> header_;
 };
 
-void SamWriterPrivate::TryFlush(void)
+void SamWriterPrivate::TryFlush()
 {
     const auto ret = file_.get()->fp.hfile;
     if (ret != 0)
@@ -123,9 +123,9 @@ SamWriter::SamWriter(const std::string& filename, const BamHeader& header)
                                            });
 }
 
-SamWriter::~SamWriter(void) { }
+SamWriter::~SamWriter() { }
 
-void SamWriter::TryFlush(void)
+void SamWriter::TryFlush()
 {
     d_->TryFlush();
 }

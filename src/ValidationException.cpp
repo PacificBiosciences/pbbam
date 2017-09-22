@@ -68,19 +68,19 @@ ValidationException::ValidationException(ErrorMap&& fileErrors,
     FormatMessage();
 }
 
-const ValidationException::ErrorMap& ValidationException::FileErrors(void) const
+const ValidationException::ErrorMap& ValidationException::FileErrors() const
 { return fileErrors_; }
 
-const ValidationException::ErrorMap& ValidationException::ReadGroupErrors(void) const
+const ValidationException::ErrorMap& ValidationException::ReadGroupErrors() const
 { return readGroupErrors_; }
 
-const ValidationException::ErrorMap& ValidationException::RecordErrors(void) const
+const ValidationException::ErrorMap& ValidationException::RecordErrors() const
 { return recordErrors_; }
 
-const char* ValidationException::what(void) const noexcept
+const char* ValidationException::what() const noexcept
 { return msg_.c_str(); }
 
-void ValidationException::FormatMessage(void)
+void ValidationException::FormatMessage()
 {
     std::stringstream s;
     s << "Validation failed: " << std::endl;

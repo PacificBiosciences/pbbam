@@ -128,7 +128,7 @@ size_t NumVirtualRecords(const string& primaryBamFn,
     size_t count = 0;
     while (stitcher.HasNext()) {
         const auto record = stitcher.Next();
-        (void)record;
+//        ()record;
         ++count;
     }
     return count;
@@ -143,7 +143,7 @@ TEST(ZmwReadStitching, FromBams_NoFilter)
     size_t count = 0;
     while (stitcher.HasNext()) {
         const auto record = stitcher.Next();
-        (void)record;
+//        ()record;
         ++count;
     }
     EXPECT_EQ(3, count);
@@ -183,7 +183,7 @@ TEST(ZmwReadStitching, FromDataSet_NoFilter)
     size_t numObservedRecords = 0;
     while (stitcher.HasNext()) {
         const auto record = stitcher.Next();
-        (void)record;
+//        ()record;
         ++numObservedRecords;
     }
     EXPECT_EQ(numExpectedRecords, numObservedRecords);
@@ -214,7 +214,7 @@ TEST(ZmwReadStitching, FromDataSet_Filtered)
     size_t numObservedRecords = 0;
     while (stitcher.HasNext()) {
         const auto record = stitcher.Next();
-        (void)record;
+//        ()record;
         ++numObservedRecords;
     }
     EXPECT_EQ(1, numObservedRecords);
@@ -242,7 +242,7 @@ TEST(ZmwReadStitching, EmptyScrapsFile)
     ZmwReadStitcher stitcher(primaryBamFn, scrapsBamFn);
     while (stitcher.HasNext()) {
         auto record = stitcher.Next();
-        (void)record;
+//        ()record;
         ++count;
     }
     EXPECT_EQ(3, count);
@@ -497,7 +497,7 @@ TEST(ZmwReadStitching, LegacyTypedefsOk)
         size_t count = 0;
         while (reader.HasNext()) {
             const auto record = reader.Next();
-            (void)record;
+//            ()record;
             ++count;
         }
         EXPECT_EQ(3, count);

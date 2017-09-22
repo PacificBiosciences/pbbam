@@ -58,7 +58,7 @@ namespace PbiFilterTests {
 // helper structs & methods
 
 static
-PbiRawData test2Bam_RawIndex(void)
+PbiRawData test2Bam_RawIndex()
 {
     PbiRawData index;
     index.NumReads(4);
@@ -119,7 +119,7 @@ void checkFilterInternals(const PbiFilter& filter,
 struct SimpleFilter
 {
     bool Accepts(const PbiRawData& idx, const size_t row) const
-    { (void)idx; (void)row; return true; }
+    { /*()idx; ()row;*/ return true; }
 };
 
 struct NoncompliantFilter { };
@@ -128,7 +128,7 @@ struct SortUniqueTestFilter
 {
     bool Accepts(const PbiRawData& idx, const size_t row) const
     {
-        (void)idx;
+//        ()idx;
         switch(row) {
             case 0: // fall through
             case 1: // .
@@ -147,7 +147,7 @@ struct SortUniqueTestFilter2
 {
     bool Accepts(const PbiRawData& idx, const size_t row) const
     {
-        (void)idx;
+//        ()idx;
         switch(row) {
             case 3: // fall through
             case 7: // .
@@ -159,11 +159,11 @@ struct SortUniqueTestFilter2
 };
 
 static inline
-PbiFilter emptyFilter(void)
+PbiFilter emptyFilter()
 { return PbiFilter{ }; }
 
 static inline
-PbiFilter simpleFilter(void)
+PbiFilter simpleFilter()
 { return PbiFilter{ SimpleFilter{ } }; }
 
 } // namespace PbiFilterTests

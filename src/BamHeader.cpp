@@ -88,9 +88,9 @@ static
 void EnsureCanMerge(const BamHeader& lhs, const BamHeader& rhs)
 {
     // check compatibility
-    const bool sortOrderOk  = CheckSortOrder(lhs.SortOrder(), rhs.SortOrder());
-    const bool pbVersionOk  = CheckPbVersion(lhs.PacBioBamVersion(), rhs.PacBioBamVersion());
-    const bool sequencesOk  = CheckSequences(lhs.SortOrder(), lhs.Sequences(), rhs.Sequences());
+    const auto sortOrderOk  = CheckSortOrder(lhs.SortOrder(), rhs.SortOrder());
+    const auto pbVersionOk  = CheckPbVersion(lhs.PacBioBamVersion(), rhs.PacBioBamVersion());
+    const auto sequencesOk  = CheckSequences(lhs.SortOrder(), lhs.Sequences(), rhs.Sequences());
     if (sortOrderOk && pbVersionOk && sequencesOk)
         return;
 
@@ -136,10 +136,10 @@ BamHeader::BamHeader(const std::string& samHeaderText)
         if (firstToken == internal::BamHeaderPrefixHD) {
 
             // pop off '@HD\t', then split HD lines into tokens
-            const std::vector<std::string>& tokens = internal::Split(line.substr(4), '\t');
-            for (const std::string& token : tokens) {
-                const std::string& tokenTag   = token.substr(0,2);
-                const std::string& tokenValue = token.substr(3);
+            const auto tokens = internal::Split(line.substr(4), '\t');
+            for (const auto& token : tokens) {
+                const auto tokenTag   = token.substr(0,2);
+                const auto tokenValue = token.substr(3);
 
                 // set header contents
                 if      (tokenTag == internal::BamHeaderTokenVN) Version(tokenValue);
@@ -196,14 +196,14 @@ BamHeader& BamHeader::AddSequence(const SequenceInfo& sequence)
     return *this;
 }
 
-BamHeader& BamHeader::ClearSequences(void)
+BamHeader& BamHeader::ClearSequences()
 {
     d_->sequenceIdLookup_.clear();
     d_->sequences_.clear();
     return *this;
 }
 
-BamHeader BamHeader::DeepCopy(void) const
+BamHeader BamHeader::DeepCopy() const
 {
     BamHeader result;
     result.d_->version_ = d_->version_;
@@ -240,7 +240,7 @@ ProgramInfo BamHeader::Program(const std::string& id) const
     return iter->second;
 }
 
-std::vector<std::string> BamHeader::ProgramIds(void) const
+std::vector<std::string> BamHeader::ProgramIds() const
 {
     std::vector<std::string> result;
     result.reserve(d_->programs_.size());
@@ -251,7 +251,7 @@ std::vector<std::string> BamHeader::ProgramIds(void) const
     return result;
 }
 
-std::vector<ProgramInfo> BamHeader::Programs(void) const
+std::vector<ProgramInfo> BamHeader::Programs() const
 {
     std::vector<ProgramInfo> result;
     result.reserve(d_->programs_.size());
@@ -265,7 +265,7 @@ std::vector<ProgramInfo> BamHeader::Programs(void) const
 BamHeader& BamHeader::Programs(const std::vector<ProgramInfo>& programs)
 {
     d_->programs_.clear();
-    for (const ProgramInfo& pg : programs)
+    for (const auto& pg : programs)
         d_->programs_[pg.Id()] = pg;
     return *this;
 }
@@ -278,7 +278,7 @@ ReadGroupInfo BamHeader::ReadGroup(const std::string& id) const
     return iter->second;
 }
 
-std::vector<std::string> BamHeader::ReadGroupIds(void) const
+std::vector<std::string> BamHeader::ReadGroupIds() const
 {
     std::vector<std::string> result;
     result.reserve(d_->readGroups_.size());
@@ -289,7 +289,7 @@ std::vector<std::string> BamHeader::ReadGroupIds(void) const
     return result;
 }
 
-std::vector<ReadGroupInfo> BamHeader::ReadGroups(void) const
+std::vector<ReadGroupInfo> BamHeader::ReadGroups() const
 {
     std::vector<ReadGroupInfo> result;
     result.reserve(d_->readGroups_.size());
@@ -303,7 +303,7 @@ std::vector<ReadGroupInfo> BamHeader::ReadGroups(void) const
 BamHeader& BamHeader::ReadGroups(const std::vector<ReadGroupInfo>& readGroups)
 {
     d_->readGroups_.clear();
-    for (const ReadGroupInfo& rg : readGroups)
+    for (const auto& rg : readGroups)
         d_->readGroups_[rg.Id()] = rg;
     return *this;
 }
@@ -315,7 +315,7 @@ SequenceInfo BamHeader::Sequence(const std::string& name) const
     const auto iter = d_->sequenceIdLookup_.find(name);
     if (iter == d_->sequenceIdLookup_.cend())
         return SequenceInfo();
-    const int index = iter->second;
+    const auto index = iter->second;
     assert(index >= 0 && (size_t)index < d_->sequences_.size());
     return d_->sequences_.at(index);
 }
@@ -328,7 +328,7 @@ int32_t BamHeader::SequenceId(const std::string& name) const
     return iter->second;
 }
 
-std::vector<std::string> BamHeader::SequenceNames(void) const
+std::vector<std::string> BamHeader::SequenceNames() const
 {
     std::vector<std::string> result;
     result.reserve(d_->sequences_.size());
@@ -342,21 +342,21 @@ std::vector<std::string> BamHeader::SequenceNames(void) const
 BamHeader& BamHeader::Sequences(const std::vector<SequenceInfo>& sequences)
 {
     d_->sequences_.clear();
-    for (const SequenceInfo& seq : sequences)
+    for (const auto& seq : sequences)
         AddSequence(seq);
     return *this;
 }
 
-std::string BamHeader::ToSam(void) const
+std::string BamHeader::ToSam() const
 {
     // init stream
     std::stringstream out("");
 
     // @HD
-    const std::string& outputVersion   = (d_->version_.empty() ? std::string(hts_version()) : d_->version_);
-    const std::string& outputSortOrder = (d_->sortOrder_.empty() ? std::string("unknown") : d_->sortOrder_);
-    const std::string& outputPbBamVersion = (d_->pacbioBamVersion_.empty() ? internal::Version::Current.ToString()
-                                                                           : d_->pacbioBamVersion_);
+    const auto& outputVersion   = (d_->version_.empty() ? std::string(hts_version()) : d_->version_);
+    const auto& outputSortOrder = (d_->sortOrder_.empty() ? std::string("unknown") : d_->sortOrder_);
+    const auto& outputPbBamVersion = (d_->pacbioBamVersion_.empty() ? internal::Version::Current.ToString()
+                                                                    : d_->pacbioBamVersion_);
 
     out << internal::BamHeaderPrefixHD
         << internal::MakeSamTag(internal::BamHeaderTokenVN, outputVersion)
@@ -365,7 +365,7 @@ std::string BamHeader::ToSam(void) const
         << std::endl;
 
     // @SQ
-    for (const SequenceInfo& seq : d_->sequences_)
+    for (const auto& seq : d_->sequences_)
         out << seq.ToSam() << std::endl;
 
     // @RG
@@ -377,7 +377,7 @@ std::string BamHeader::ToSam(void) const
         out << progIter.second.ToSam() << std::endl;
 
     // @CO
-    for (const std::string& comment : d_->comments_)
+    for (const auto& comment : d_->comments_)
         out << internal::BamHeaderPrefixCO << '\t' << comment << std::endl;
 
     // return result

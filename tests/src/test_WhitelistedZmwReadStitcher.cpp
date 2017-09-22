@@ -245,7 +245,7 @@ TEST(WhitelistedZmwReadStitching, EmptyScrapsFileOk)
     WhitelistedZmwReadStitcher stitcher(whitelist, primaryBamFn, scrapsBamFn);
     while (stitcher.HasNext()) {
         auto record = stitcher.Next();
-        (void)record;
+//        ()record;
         ++count;
     }
     EXPECT_EQ(2, count);

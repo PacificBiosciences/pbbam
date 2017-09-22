@@ -44,16 +44,19 @@
 #include "XmlReader.h"
 #include "XmlWriter.h"
 #include <boost/algorithm/string.hpp>
-#include <cstddef>
+
+#include <algorithm>
 #include <exception>
 #include <fstream>
 #include <iostream>
+
 #include <cassert>
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {
 
-typedef std::shared_ptr<DataSetBase> DataSetPtr;
+using DataSetPtr = std::shared_ptr<DataSetBase>;
 
 namespace internal {
 
@@ -76,11 +79,11 @@ std::unique_ptr<DataSetBase> FromBam(const std::string& bamFn)
     
     std::unique_ptr<DataSetBase> dataset;
     if (aligned) 
-        dataset.reset(new AlignmentSet);
+        dataset = std::make_unique<AlignmentSet>();
     else 
-        dataset.reset(new SubreadSet);
+        dataset = std::make_unique<SubreadSet>();
     
-    ExternalResources& resources = dataset->ExternalResources();
+    auto& resources = dataset->ExternalResources();
     resources.Add(ExternalResource(BamFile(bamFn)));
     return dataset;
 }
@@ -89,23 +92,26 @@ static
 std::unique_ptr<DataSetBase> FromFasta(const std::string& fasta)
 {
     // make FASTA data set
-    std::unique_ptr<DataSetBase> dataset(new ReferenceSet);
-    ExternalResources& resources = dataset->ExternalResources();
+    auto dataset = std::make_unique<ReferenceSet>();
+    auto& resources = dataset->ExternalResources();
     resources.Add(ExternalResource("PacBio.ReferenceFile.ReferenceFastaFile", fasta));
-    return dataset;
+    return std::move(dataset);
 }
 
 static
 std::unique_ptr<DataSetBase> FromFofn(const std::string& fofn)
 {
-    const std::string fofnDir = FileUtils::DirectoryName(fofn);
+    const auto fofnDir = FileUtils::DirectoryName(fofn);
     std::ifstream in(fofn);
     if (!in)
         throw std::runtime_error("could not open FOFN for reading: " + fofn);
 
-    std::vector<std::string> filenames = FofnReader::Files(in);
-    for (size_t i = 0; i < filenames.size(); ++i)
-        filenames[i] = FileUtils::ResolvedFilePath(filenames[i], fofnDir);
+    auto filenames = FofnReader::Files(in);
+    std::transform(filenames.begin(), filenames.end(), filenames.begin(),
+                   [&fofnDir](const std::string fn)
+                   {
+                       return FileUtils::ResolvedFilePath(fn, fofnDir);
+                   });
     return DataSetIO::FromUris(filenames);
 }
 
@@ -146,7 +152,7 @@ std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>&
     std::vector< std::unique_ptr<DataSetBase> > datasets;
     datasets.reserve(uris.size());
     for ( const auto& uri : uris )
-        datasets.push_back(internal::FromUri(uri));
+        datasets.emplace_back(internal::FromUri(uri));
     assert(!datasets.empty());
 
     // if only 1, just return
@@ -155,10 +161,10 @@ std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>&
 
     // else merge
     else {
-        std::unique_ptr<DataSetBase>& result = datasets.front();
-        for (size_t i = 1; i < datasets.size(); ++i)
-            *result += *datasets.at(i);
-        return std::unique_ptr<DataSetBase>(result.release());
+        auto& result = datasets.front();
+        for (const auto& dataset : datasets)
+            *result += *dataset;
+        return std::move(result);
     }
 }
 

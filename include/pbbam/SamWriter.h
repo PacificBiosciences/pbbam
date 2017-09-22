@@ -89,7 +89,7 @@ public:
 
     /// Fully flushes all buffered data & closes file.
     ///
-    ~SamWriter(void);
+    ~SamWriter() override;
 
     /// Copy and Move constructors are disabled
     SamWriter(const SamWriter&) = delete;
@@ -108,7 +108,7 @@ public:
     ///
     /// \throws std::runtime_error if flush fails
     ///
-    void TryFlush(void) override;
+    void TryFlush() override;
 
     /// \brief Write a record to the output SAM file.
     ///

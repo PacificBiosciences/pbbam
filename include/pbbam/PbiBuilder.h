@@ -168,7 +168,7 @@ public:
     ///
     /// \note Exceptions are swallowed. Use Close() if you want to catch them.
     ///
-    ~PbiBuilder(void) noexcept;
+    ~PbiBuilder() noexcept;
 
     /// \}
 
@@ -202,7 +202,7 @@ public:
     ///       scope and data will be written, but exceptions swallowed (to avoid
     ///       throwing from destructor).
     ///
-    void Close(void);
+    void Close();
 
     /// \}
 

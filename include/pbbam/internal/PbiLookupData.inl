@@ -67,7 +67,7 @@ inline IndexResultBlocks mergedIndexBlocks(IndexList&& indices)
         if (indices.at(i) == indices.at(i-1)+1)
             ++result.back().numReads_;
         else
-            result.push_back(IndexResultBlock(indices.at(i), 1));
+            result.emplace_back(indices.at(i), 1);
     }
     return result;
 }
@@ -78,7 +78,7 @@ inline IndexResultBlocks mergedIndexBlocks(const IndexList& indices)
     return mergedIndexBlocks(std::move(copy));
 }
 
-inline size_t nullIndex(void)
+inline size_t nullIndex()
 { return static_cast<size_t>(-1); }
 
 inline void pushBackIndices(IndexList& result,
@@ -92,9 +92,6 @@ inline void pushBackIndices(IndexList& result,
 // -----------------
 // OrderedLookup
 // -----------------
-
-template<typename T>
-inline OrderedLookup<T>::OrderedLookup(void) { }
 
 template<typename T>
 inline OrderedLookup<T>::OrderedLookup(const container_type& data)
@@ -131,35 +128,35 @@ inline bool OrderedLookup<T>::operator!=(const OrderedLookup<T>& other) const
 { return !(*this == other); }
 
 template<typename T>
-inline typename OrderedLookup<T>::iterator OrderedLookup<T>::begin(void)
+inline typename OrderedLookup<T>::iterator OrderedLookup<T>::begin()
 { return data_.begin(); }
 
 template<typename T>
-inline typename OrderedLookup<T>::const_iterator OrderedLookup<T>::begin(void) const
+inline typename OrderedLookup<T>::const_iterator OrderedLookup<T>::begin() const
 { return data_.cbegin(); }
 
 template<typename T>
-inline typename OrderedLookup<T>::const_iterator OrderedLookup<T>::cbegin(void) const
+inline typename OrderedLookup<T>::const_iterator OrderedLookup<T>::cbegin() const
 { return data_.cbegin(); }
 
 template<typename T>
-inline typename OrderedLookup<T>::iterator OrderedLookup<T>::end(void)
+inline typename OrderedLookup<T>::iterator OrderedLookup<T>::end()
 { return data_.end(); }
 
 template<typename T>
-inline typename OrderedLookup<T>::const_iterator OrderedLookup<T>::end(void) const
+inline typename OrderedLookup<T>::const_iterator OrderedLookup<T>::end() const
 { return data_.cend(); }
 
 template<typename T>
-inline typename OrderedLookup<T>::const_iterator OrderedLookup<T>::cend(void) const
+inline typename OrderedLookup<T>::const_iterator OrderedLookup<T>::cend() const
 { return data_.cend(); }
 
 template<typename T>
-inline bool OrderedLookup<T>::empty(void) const
+inline bool OrderedLookup<T>::empty() const
 { return data_.empty(); }
 
 template<typename T>
-inline size_t OrderedLookup<T>::size(void) const
+inline size_t OrderedLookup<T>::size() const
 { return data_.size(); }
 
 template<typename T>
@@ -217,7 +214,7 @@ OrderedLookup<T>::LookupIndices(const OrderedLookup::key_type& key,
 }
 
 template<typename T>
-inline std::vector<T> OrderedLookup<T>::Unpack(void) const
+inline std::vector<T> OrderedLookup<T>::Unpack() const
 {
     auto result = std::vector<T>{ };
     auto iter = cbegin();
@@ -236,9 +233,6 @@ inline std::vector<T> OrderedLookup<T>::Unpack(void) const
 // -----------------
 // UnorderedLookup
 // -----------------
-
-template<typename T>
-inline UnorderedLookup<T>::UnorderedLookup(void) { }
 
 template<typename T>
 inline UnorderedLookup<T>::UnorderedLookup(const container_type& data)
@@ -275,35 +269,35 @@ inline bool UnorderedLookup<T>::operator!=(const UnorderedLookup<T>& other) cons
 { return !(*this == other); }
 
 template<typename T>
-inline typename UnorderedLookup<T>::iterator UnorderedLookup<T>::begin(void)
+inline typename UnorderedLookup<T>::iterator UnorderedLookup<T>::begin()
 { return data_.begin(); }
 
 template<typename T>
-inline typename UnorderedLookup<T>::const_iterator UnorderedLookup<T>::begin(void) const
+inline typename UnorderedLookup<T>::const_iterator UnorderedLookup<T>::begin() const
 { return data_.cbegin(); }
 
 template<typename T>
-inline typename UnorderedLookup<T>::const_iterator UnorderedLookup<T>::cbegin(void) const
+inline typename UnorderedLookup<T>::const_iterator UnorderedLookup<T>::cbegin() const
 { return data_.cbegin(); }
 
 template<typename T>
-inline typename UnorderedLookup<T>::iterator UnorderedLookup<T>::end(void)
+inline typename UnorderedLookup<T>::iterator UnorderedLookup<T>::end()
 { return data_.end(); }
 
 template<typename T>
-inline typename UnorderedLookup<T>::const_iterator UnorderedLookup<T>::end(void) const
+inline typename UnorderedLookup<T>::const_iterator UnorderedLookup<T>::end() const
 { return data_.cend(); }
 
 template<typename T>
-inline typename UnorderedLookup<T>::const_iterator UnorderedLookup<T>::cend(void) const
+inline typename UnorderedLookup<T>::const_iterator UnorderedLookup<T>::cend() const
 { return data_.cend(); }
 
 template<typename T>
-inline bool UnorderedLookup<T>::empty(void) const
+inline bool UnorderedLookup<T>::empty() const
 { return data_.empty(); }
 
 template<typename T>
-inline size_t UnorderedLookup<T>::size(void) const
+inline size_t UnorderedLookup<T>::size() const
 { return data_.size(); }
 
 template<typename T>
@@ -349,7 +343,7 @@ UnorderedLookup<T>::LookupIndices(const UnorderedLookup::key_type& key,
 }
 
 template<typename T>
-inline std::vector<T> UnorderedLookup<T>::Unpack(void) const
+inline std::vector<T> UnorderedLookup<T>::Unpack() const
 {
     auto result = std::vector<T>{ };
     auto iter = cbegin();
@@ -410,7 +404,7 @@ inline IndexList BasicLookupData::IndicesMulti(const BasicLookupData::Field& fie
     return result;
 }
 
-inline const std::vector<int64_t>& BasicLookupData::VirtualFileOffsets(void) const
+inline const std::vector<int64_t>& BasicLookupData::VirtualFileOffsets() const
 { return fileOffset_; }
 
 // -------------------
@@ -448,7 +442,7 @@ inline IndexList MappedLookupData::Indices(const MappedLookupData::Field& field,
                                            const Compare::Type& compareType) const
 {
     assert(field == MappedLookupData::STRAND);
-    (void)field; // quash warnings building in release mode
+//    ()field; // quash warnings building in release mode
 
     if (compareType == Compare::EQUAL) {
         if (strand == Strand::FORWARD)

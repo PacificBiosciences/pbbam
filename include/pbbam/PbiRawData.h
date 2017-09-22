@@ -65,7 +65,7 @@ public:
     /// \{
 
     /// \brief Creates an empty data structure.
-    PbiRawBarcodeData(void) = default;
+    PbiRawBarcodeData() = default;
 
     /// \brief Creates an empty data structure, preallocating space for a known
     ///        number of records.
@@ -111,7 +111,7 @@ public:
     /// \{
 
     /// \brief Creates an empty data structure.
-    PbiRawMappedData(void) = default;
+    PbiRawMappedData() = default;
 
     /// \brief Creates an empty data structure, preallocating space for a known
     ///        number of records.
@@ -203,8 +203,8 @@ public:
 class PBBAM_EXPORT PbiReferenceEntry
 {
 public:
-    typedef uint32_t ID;
-    typedef uint32_t Row;
+    using ID  = uint32_t;
+    using Row = uint32_t;
 
 public:
     static const ID  UNMAPPED_ID;
@@ -219,7 +219,7 @@ public:
     /// - default ID:   PbiReferenceEntry::UNMAPPED_ID \n
     /// - default rows: PbiReferenceEntry::UNSET_ROW
     ///
-    PbiReferenceEntry(void);
+    PbiReferenceEntry();
 
     /// \brief Creates a reference entry, with no rows set.
     ///
@@ -261,7 +261,7 @@ public:
     /// \{
 
     /// \brief Creates an empty data structure.
-    PbiRawReferenceData(void) = default;
+    PbiRawReferenceData() = default;
 
     /// \brief Creates an empty data structure, preallocating space for a
     ///        number of references.
@@ -297,7 +297,7 @@ public:
     /// \{
 
     /// \brief Creates an empty data structure.
-    PbiRawBasicData(void) = default;
+    PbiRawBasicData() = default;
 
     /// \brief Creates an empty data structure, preallocating space for a known
     ///        number of records.
@@ -342,7 +342,7 @@ public:
 /// \deprecated For legacy-code support only, and will be removed soon.
 ///             Use PbiRawBasicData instead.
 ///
-typedef PbiRawBasicData PbiRawSubreadData;
+using PbiRawSubreadData = PbiRawBasicData;
 
 /// \brief The PbiRawData class provides an representation of raw PBI index
 ///        data, used mostly for construction or I/O.
@@ -363,7 +363,7 @@ public:
 
     /// \brief Creates an empty raw data structure, ready for building.
     ///
-    PbiRawData(void);
+    PbiRawData() = default;
 
     /// \brief Loads raw PBI data from a file.
     ///
@@ -392,7 +392,7 @@ public:
     PbiRawData(PbiRawData&& other) = default;
     PbiRawData& operator=(const PbiRawData& other) = default;
     PbiRawData& operator=(PbiRawData&& other) = default;
-    ~PbiRawData(void) = default;
+    ~PbiRawData() = default;
 
     /// \}
 
@@ -401,13 +401,13 @@ public:
     /// \{
 
     /// \returns true if index has BarcodeData section
-    bool HasBarcodeData(void) const;
+    bool HasBarcodeData() const;
 
     /// \returns true if index has MappedData section
-    bool HasMappedData(void) const;
+    bool HasMappedData() const;
 
     /// \returns true if index has ReferenceData section
-    bool HasReferenceData(void) const;
+    bool HasReferenceData() const;
 
     /// \returns true if index has \b section
     /// \param[in] section PbiFile::Section identifier
@@ -420,16 +420,16 @@ public:
     ///       code or aggregated from a DataSet, rather than loaded from a
     ///       single PBI file.
     ///
-    std::string Filename(void) const;
+    std::string Filename() const;
 
     /// \returns enum flags representing the file sections present
-    PbiFile::Sections FileSections(void) const;
+    PbiFile::Sections FileSections() const;
 
     /// \returns the number of records in the PBI(s)
-    uint32_t NumReads(void) const;
+    uint32_t NumReads() const;
 
     /// \returns the PBI file's version
-    PbiFile::VersionEnum Version(void) const;
+    PbiFile::VersionEnum Version() const;
 
     /// \}
 
@@ -441,22 +441,22 @@ public:
     ///
     /// May be empty, check result of HasBarcodeData.
     ///
-    const PbiRawBarcodeData& BarcodeData(void) const;
+    const PbiRawBarcodeData& BarcodeData() const;
 
     /// \returns const reference to BasicData lookup structure
-    const PbiRawBasicData& BasicData(void) const;
+    const PbiRawBasicData& BasicData() const;
 
     /// \returns const reference to MappedData lookup structure
     ///
     /// May be empty, check result of HasMappedData.
     ///
-    const PbiRawMappedData& MappedData(void) const;
+    const PbiRawMappedData& MappedData() const;
 
     /// \returns const reference to reference data lookup structure
     ///
     /// May be empty, check result of HasReferenceData.
     ///
-    const PbiRawReferenceData& ReferenceData(void) const;
+    const PbiRawReferenceData& ReferenceData() const;
 
     /// \}
 
@@ -495,30 +495,30 @@ public:
     ///
     /// May be empty, check result of HasBarcodeData.
     ///
-    PbiRawBarcodeData& BarcodeData(void);
+    PbiRawBarcodeData& BarcodeData();
 
     /// \returns reference to BasicData lookup structure
-    PbiRawBasicData& BasicData(void);
+    PbiRawBasicData& BasicData();
 
     /// \returns reference to MappedData lookup structure
     ///
     /// May be empty, check result of HasMappedData.
     ///
-    PbiRawMappedData& MappedData(void);
+    PbiRawMappedData& MappedData();
 
     /// \returns reference to reference data lookup structure
     ///
     /// May be empty, check result of HasReferenceData.
     ///
-    PbiRawReferenceData& ReferenceData(void);
+    PbiRawReferenceData& ReferenceData();
 
     /// \}
 
 private:
     std::string          filename_;
-    PbiFile::VersionEnum version_;
-    PbiFile::Sections    sections_;
-    uint32_t             numReads_;
+    PbiFile::VersionEnum version_ = PbiFile::CurrentVersion;
+    PbiFile::Sections    sections_ = PbiFile::ALL;
+    uint32_t             numReads_ = 0;
     PbiRawBarcodeData    barcodeData_;
     PbiRawMappedData     mappedData_;
     PbiRawReferenceData  referenceData_;

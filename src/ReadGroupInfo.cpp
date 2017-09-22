@@ -286,40 +286,29 @@ static inline PlatformModelType PlatformModelFromName(const std::string& name)
 
 } // namespace internal
 
-ReadGroupInfo::ReadGroupInfo(void)
-    : platformModel_(PlatformModelType::SEQUEL)
-    , readType_("UNKNOWN")
-    , ipdCodec_(FrameCodec::V1)
-    , pulseWidthCodec_(FrameCodec::V1)
+ReadGroupInfo::ReadGroupInfo()
+    : readType_("UNKNOWN")
 { }
 
-ReadGroupInfo::ReadGroupInfo(const std::string& id)
-    : id_(id)
-    , platformModel_(PlatformModelType::SEQUEL)
+ReadGroupInfo::ReadGroupInfo(std::string id)
+    : id_(std::move(id))
     , readType_("UNKNOWN")
-    , ipdCodec_(FrameCodec::V1)
-    , pulseWidthCodec_(FrameCodec::V1)
 { }
 
-ReadGroupInfo::ReadGroupInfo(const std::string& movieName,
-                             const std::string& readType)
+ReadGroupInfo::ReadGroupInfo(std::string movieName,
+                             std::string readType)
     : id_(MakeReadGroupId(movieName, readType))
-    , movieName_(movieName)
-    , platformModel_(PlatformModelType::SEQUEL)
-    , readType_(readType)
-    , ipdCodec_(FrameCodec::V1)
-    , pulseWidthCodec_(FrameCodec::V1)
+    , movieName_(std::move(movieName))
+    , readType_(std::move(readType))
 { }
 
-ReadGroupInfo::ReadGroupInfo(const std::string& movieName,
-                             const std::string& readType,
+ReadGroupInfo::ReadGroupInfo(std::string movieName,
+                             std::string readType,
                              const PlatformModelType platform)
     : id_(MakeReadGroupId(movieName, readType))
-    , movieName_(movieName)
-    , platformModel_(platform)
+    , movieName_(std::move(movieName))
+    , platformModel_(std::move(platform))
     , readType_(readType)
-    , ipdCodec_(FrameCodec::V1)
-    , pulseWidthCodec_(FrameCodec::V1)
 { }
 
 void ReadGroupInfo::DecodeSamDescription(const std::string& description)
@@ -408,22 +397,21 @@ void ReadGroupInfo::DecodeSamDescription(const std::string& description)
                        hasBarcodeQuality);
 }
 
-std::string ReadGroupInfo::EncodeSamDescription(void) const
+std::string ReadGroupInfo::EncodeSamDescription() const
 {
     auto result = std::string{ };
     result.reserve(256);
-    result.append(std::string(internal::token_RT+"=" + readType_));
+    result.append(std::string{internal::token_RT + "=" + readType_});
 
     static const auto SEP   = std::string{";"};
     static const auto COLON = std::string{":"};
     static const auto EQ    = std::string{"="};
 
     auto featureName = std::string{ };
-    const auto featureEnd = features_.cend();
-    auto featureIter = features_.cbegin();
-    for ( ; featureIter != featureEnd; ++featureIter ) {
-        featureName = internal::BaseFeatureName(featureIter->first);
-        if (featureName.empty() || featureIter->second.empty())
+    for (const auto& feature : features_) {
+
+        featureName = internal::BaseFeatureName(feature.first);
+        if (featureName.empty() || feature.second.empty())
             continue;
         else if (featureName == internal::feature_IP) {
             featureName.append(COLON);
@@ -433,7 +421,7 @@ std::string ReadGroupInfo::EncodeSamDescription(void) const
             featureName.append(COLON);
             featureName.append(internal::FrameCodecName(pulseWidthCodec_));
         }
-        result.append(std::string(SEP + featureName + EQ + featureIter->second));
+        result.append(std::string{SEP + featureName + EQ + feature.second});
     }
 
     if (!bindingKit_.empty())        result.append(SEP + internal::token_BK +EQ + bindingKit_);
@@ -557,14 +545,14 @@ std::string ReadGroupInfo::SequencingChemistryFromTriple(const std::string& bind
                                               basecallerVersion);
 }
 
-std::string ReadGroupInfo::ToSam(void) const
+std::string ReadGroupInfo::ToSam() const
 {
     std::stringstream out;
     out << "@RG"
         << internal::MakeSamTag(internal::sam_ID, id_)
         << internal::MakeSamTag(internal::sam_PL, Platform());
 
-    auto description = EncodeSamDescription();
+    const auto description = EncodeSamDescription();
     if (!description.empty())
         out << internal::MakeSamTag(internal::sam_DS, description);
 
@@ -581,10 +569,8 @@ std::string ReadGroupInfo::ToSam(void) const
     out << internal::MakeSamTag(internal::sam_PM, internal::PlatformModelName(platformModel_));
 
     // append any custom tags
-    auto customIter = custom_.cbegin();
-    auto customEnd  = custom_.cend();
-    for ( ; customIter != customEnd; ++customIter )
-        out << internal::MakeSamTag(customIter->first, customIter->second);
+    for (const auto& attribute : custom_)
+        out << internal::MakeSamTag(attribute.first, attribute.second);
 
     return out.str();
 }

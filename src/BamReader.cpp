@@ -60,21 +60,14 @@ namespace internal {
 struct BamReaderPrivate
 {
 public:
-    BamReaderPrivate(const BamFile& bamFile)
-        : htsFile_(nullptr)
-        , bamFile_(bamFile)
+    BamReaderPrivate(BamFile bamFile)
+        : htsFile_{nullptr}
+        , bamFile_{std::move(bamFile)}
     {
         DoOpen();
     }
 
-    BamReaderPrivate(BamFile&& bamFile)
-        : htsFile_(nullptr)
-        , bamFile_(std::move(bamFile))
-    {
-        DoOpen();
-    }
-
-    void DoOpen(void) {
+    void DoOpen() {
 
         // fetch file pointer
         htsFile_.reset(sam_open(bamFile_.Filename().c_str(), "rb"));
@@ -107,9 +100,9 @@ BamReader::BamReader(BamFile&& bamFile)
     VirtualSeek(d_->bamFile_.FirstAlignmentOffset());
 }
 
-BamReader::~BamReader(void) { }
+BamReader::~BamReader() { }
 
-BGZF* BamReader::Bgzf(void) const
+BGZF* BamReader::Bgzf() const
 {
     assert(d_);
     assert(d_->htsFile_);
@@ -117,19 +110,19 @@ BGZF* BamReader::Bgzf(void) const
     return d_->htsFile_->fp.bgzf;
 }
 
-const BamFile& BamReader::File(void) const
+const BamFile& BamReader::File() const
 {
     assert(d_);
     return d_->bamFile_;
 }
 
-std::string BamReader::Filename(void) const
+std::string BamReader::Filename() const
 {
     assert(d_);
     return d_->bamFile_.Filename();
 }
 
-const BamHeader& BamReader::Header(void) const
+const BamHeader& BamReader::Header() const
 {
     assert(d_);
     return d_->bamFile_.Header();
@@ -188,7 +181,7 @@ void BamReader::VirtualSeek(int64_t virtualOffset)
         throw std::runtime_error("Failed to seek in BAM file");
 }
 
-int64_t BamReader::VirtualTell(void) const
+int64_t BamReader::VirtualTell() const
 {
     return bgzf_tell(Bgzf());
 }

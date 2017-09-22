@@ -60,7 +60,7 @@ using namespace std;
 //        int count = 0;
 //        EntireFileQuery entireFile(bamFile);
 //        for (const BamRecord& record : entireFile) {
-//            (void)record;
+//            ()record;
 //            ++count;
 //        }
 

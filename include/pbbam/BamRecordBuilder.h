@@ -66,14 +66,14 @@ public:
     /// \{
 
     /// \brief Creates an empty %BAM record builder.
-    BamRecordBuilder(void);
+    BamRecordBuilder();
 
     /// \brief Creates an empty %BAM record builder, with header info to apply
     ///        to built records.
     ///
     /// \param[in] header   BamHeader object
     ///
-    explicit BamRecordBuilder(const BamHeader& header);
+    explicit BamRecordBuilder(BamHeader header);
 
     /// \brief Creates record builder with inital record data.
     ///
@@ -82,11 +82,11 @@ public:
     ///
     BamRecordBuilder(const BamRecord& prototype);
 
-    BamRecordBuilder(const BamRecordBuilder& other);
-    BamRecordBuilder(BamRecordBuilder&& other);
-    BamRecordBuilder& operator=(const BamRecordBuilder& other);
-    BamRecordBuilder& operator=(BamRecordBuilder&& other);
-    ~BamRecordBuilder(void);
+    BamRecordBuilder(const BamRecordBuilder& other) = default;
+    BamRecordBuilder(BamRecordBuilder&& other) = default;
+    BamRecordBuilder& operator=(const BamRecordBuilder& other) = default;
+    BamRecordBuilder& operator=(BamRecordBuilder&& other) = default;
+    ~BamRecordBuilder() = default;
 
     /// \}
 
@@ -98,7 +98,7 @@ public:
     ///
     /// \returns newly-built BamRecord object
     ///
-    BamRecord Build(void) const;
+    BamRecord Build() const;
 
     /// \brief Replaces an existing BamRecord's data with current builder
     ///        attributes.
@@ -110,7 +110,7 @@ public:
 
     /// \brief Resets builder attributes to default values.
     ///
-    void Reset(void);
+    void Reset();
 
     /// \brief Resets builder attributes with \p prototype's data.
     ///

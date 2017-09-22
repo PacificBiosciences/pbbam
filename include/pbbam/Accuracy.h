@@ -73,13 +73,13 @@ public:
     Accuracy(Accuracy&& other) = default;
     Accuracy& operator=(const Accuracy& other) = default;
     Accuracy& operator=(Accuracy&& other) = default;
-    ~Accuracy(void) = default;
+    ~Accuracy() = default;
 
     /// \}
 
 public:
     /// \returns Accuracy as float primitive
-    operator float(void) const;
+    operator float() const;
 
 private:
     float accuracy_;

@@ -61,13 +61,13 @@ public:
     ///  \{
 
     /// \brief Creates an empty genomic interval
-    GenomicInterval(void) = default;
+    GenomicInterval() = default;
 
     /// \brief Creates a genomic interval on sequence with \p name, using range:
     ///       [\p start, \p stop)
-    GenomicInterval(const std::string& name,
-                    const Position& start,
-                    const Position& stop);
+    GenomicInterval(std::string name,
+                    Position start,
+                    Position stop);
 
     /// \brief Creates a genomic interval, using REGION string
     ///
@@ -85,7 +85,7 @@ public:
     GenomicInterval(GenomicInterval&& other) = default;
     GenomicInterval& operator=(const GenomicInterval& other) = default;
     GenomicInterval& operator=(GenomicInterval&& other) = default;
-    ~GenomicInterval(void) = default;
+    ~GenomicInterval() = default;
 
     /// \}
 
@@ -117,10 +117,10 @@ public:
     /// \returns true if underlying Interval::IsValid(), and id/endpoints are
     ///          non-negative.
     ///
-    bool IsValid(void) const;
+    bool IsValid() const;
 
     /// \returns length of underlying
-    size_t Length(void) const;
+    size_t Length() const;
 
     /// \}
 
@@ -130,16 +130,16 @@ public:
     /// \{
 
     /// \returns interval reference name
-    std::string Name(void) const;
+    std::string Name() const;
 
     /// \returns underlying Interval object
-    PacBio::BAM::Interval<Position> Interval(void) const;
+    PacBio::BAM::Interval<Position> Interval() const;
 
     /// \returns interval start coordinate
-    Position Start(void) const;
+    Position Start() const;
 
     /// \returns interval stop coordinate
-    Position Stop(void) const;
+    Position Stop() const;
 
     /// \}
 

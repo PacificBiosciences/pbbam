@@ -57,7 +57,7 @@ public:
     static const Version Minimum;
 
 public:
-    constexpr Version(void);
+    constexpr Version();
 
     Version(int major, int minor, int revision);
 
@@ -68,7 +68,7 @@ public:
     Version(Version&& other) = default;
     Version& operator=(const Version&) = default;
     Version& operator=(Version&&) = default;
-    ~Version(void) = default;
+    ~Version() = default;
 
 public:
     bool operator==(const Version& other) const;
@@ -79,13 +79,13 @@ public:
     bool operator>=(const Version& other) const;
 
 public:
-    std::string ToString(void) const;
-    operator std::string(void) const;
+    std::string ToString() const;
+    operator std::string() const;
 
 public:
-    int Major(void) const;
-    int Minor(void) const;
-    int Revision(void) const;
+    int Major() const;
+    int Minor() const;
+    int Revision() const;
 
 public:
     Version& Major(int major);
@@ -98,7 +98,7 @@ private:
     int revision_;
 
 private:
-    void Check(void) const;
+    void Check() const;
 };
 
 inline std::ostream& operator<<(std::ostream& out, const Version& version)
@@ -107,7 +107,7 @@ inline std::ostream& operator<<(std::ostream& out, const Version& version)
     return out;
 }
 
-inline constexpr Version::Version(void)
+inline constexpr Version::Version()
     : major_(0)
     , minor_(0)
     , revision_(0)
@@ -163,16 +163,16 @@ inline bool Version::operator>(const Version& other) const
 inline bool Version::operator>=(const Version& other) const
 { return !(*this < other); }
 
-inline Version::operator std::string(void) const
+inline Version::operator std::string() const
 { return ToString(); }
 
-inline void Version::Check(void) const
+inline void Version::Check() const
 {
     if (major_ < 0 || minor_ < 0 || revision_ < 0)
         throw std::runtime_error("version cannot contain negative numbers");
 }
 
-inline int Version::Major(void) const
+inline int Version::Major() const
 { return major_; }
 
 inline Version& Version::Major(int major)
@@ -182,7 +182,7 @@ inline Version& Version::Major(int major)
     return *this;
 }
 
-inline int Version::Minor(void) const
+inline int Version::Minor() const
 { return minor_; }
 
 inline Version& Version::Minor(int minor)
@@ -192,7 +192,7 @@ inline Version& Version::Minor(int minor)
     return *this;
 }
 
-inline int Version::Revision(void) const
+inline int Version::Revision() const
 { return revision_; }
 
 inline Version& Version::Revision(int revision)

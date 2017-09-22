@@ -60,7 +60,7 @@ public:
         , numMatchingReads_(0)
     { }
 
-    void ApplyOffsets(void)
+    void ApplyOffsets()
     {
         const std::vector<int64_t>& fileOffsets = index_.BasicData().fileOffset_;
         for (IndexResultBlock& block : blocks_)
@@ -81,7 +81,7 @@ public:
             return;
         } else if (filter_.IsEmpty()) {    // empty filter - use all reads
             numMatchingReads_ = totalReads;
-            blocks_.push_back(IndexResultBlock{0, totalReads});
+            blocks_.emplace_back(0, totalReads);
         } else {
             IndexList indices;
             indices.reserve(totalReads);
@@ -167,7 +167,7 @@ PbiIndexedBamReader::PbiIndexedBamReader(BamFile&& bamFile)
     , d_(new internal::PbiIndexedBamReaderPrivate(File().PacBioIndexFilename()))
 { }
 
-PbiIndexedBamReader::~PbiIndexedBamReader(void) { }
+PbiIndexedBamReader::~PbiIndexedBamReader() { }
 
 int PbiIndexedBamReader::ReadRawData(BGZF* bgzf, bam1_t* b)
 {
@@ -175,7 +175,7 @@ int PbiIndexedBamReader::ReadRawData(BGZF* bgzf, bam1_t* b)
     return d_->ReadRawData(bgzf, b);
 }
 
-const PbiFilter& PbiIndexedBamReader::Filter(void) const
+const PbiFilter& PbiIndexedBamReader::Filter() const
 {
     assert(d_);
     return d_->filter_;
@@ -188,7 +188,7 @@ PbiIndexedBamReader& PbiIndexedBamReader::Filter(const PbiFilter& filter)
     return *this;
 }
 
-uint32_t PbiIndexedBamReader::NumReads(void) const
+uint32_t PbiIndexedBamReader::NumReads() const
 {
     assert(d_);
     return d_->numMatchingReads_;

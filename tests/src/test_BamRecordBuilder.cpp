@@ -245,7 +245,7 @@ TEST(BamRecordBuilderTest, CheckSetters)
 //               .BuildInPlace(record);
 //    }
 //    auto end = std::chrono::steady_clock::now();
-//    (void)record;
+//    ()record;
 //    auto diff = end - start;
 //    std::cout << std::chrono::duration <double, std::milli>(diff).count() << " ms" << std::endl;
 //}
@@ -270,7 +270,7 @@ TEST(BamRecordBuilderTest, CheckSetters)
 //        record.Tags(tags);
 //    }
 //    auto end = std::chrono::steady_clock::now();
-//    (void)record;
+//    ()record;
 //    auto diff = end - start;
 //    std::cout << std::chrono::duration <double, std::milli>(diff).count() << " ms" << std::endl;
 //}

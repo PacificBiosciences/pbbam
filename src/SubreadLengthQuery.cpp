@@ -68,12 +68,12 @@ SubreadLengthQuery::SubreadLengthQuery(const int32_t length,
     , d_(new SubreadLengthQueryPrivate(length, compareType, dataset))
 { }
 
-SubreadLengthQuery::~SubreadLengthQuery(void) { }
+SubreadLengthQuery::~SubreadLengthQuery() { }
 
 bool SubreadLengthQuery::GetNext(BamRecord &r)
 { return d_->reader_.GetNext(r); }
 
-uint32_t SubreadLengthQuery::NumReads(void) const
+uint32_t SubreadLengthQuery::NumReads() const
 { return d_->reader_.NumReads(); }
 
 } // namespace BAM

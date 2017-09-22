@@ -67,7 +67,7 @@ namespace BAM {
 struct PBBAM_EXPORT IndexResultBlock
 {
 public:
-    IndexResultBlock(void);
+    IndexResultBlock() = default;
     IndexResultBlock(size_t idx, size_t numReads);
 
 public:
@@ -75,14 +75,14 @@ public:
     bool operator!=(const IndexResultBlock& other) const;
 
 public:
-    size_t  firstIndex_;     ///< index of block's first record in BAM/PBI files (e.g. i-th record)
-    size_t  numReads_;       ///< number of reads in this block
-    int64_t virtualOffset_;  ///< virtual offset of first record in this block
+    size_t  firstIndex_ = 0;     ///< index of block's first record in BAM/PBI files (e.g. i-th record)
+    size_t  numReads_ = 0;       ///< number of reads in this block
+    int64_t virtualOffset_ = -1;  ///< virtual offset of first record in this block
 };
 
 /// \brief container of PBI result blocks
 ///
-typedef std::deque<IndexResultBlock> IndexResultBlocks;
+using IndexResultBlocks = std::deque<IndexResultBlock>;
 
 /// \brief container of raw PBI indices
 ///
@@ -91,7 +91,7 @@ typedef std::deque<IndexResultBlock> IndexResultBlocks;
 /// and then be merged down into IndexResultBlocks for actual data file
 /// random-access.
 ///
-typedef std::vector<size_t> IndexList;
+using IndexList = std::vector<size_t>;
 
 /// \brief pair representing a range of PBI indices: where interval
 ///        is [first, second)
@@ -100,7 +100,7 @@ typedef std::vector<size_t> IndexList;
 ///
 /// \sa PbiReferenceEntry, PbiRawReferenceData, & ReferenceLookupData
 ///
-typedef std::pair<size_t, size_t> IndexRange;
+using IndexRange = std::pair<size_t, size_t>;
 
 } // namespace BAM
 } // namespace PacBio

@@ -68,7 +68,7 @@ public:
     ///  \{
 
     /// \brief Default constructor - creates an empty QualityValues object.
-    QualityValues(void);
+    QualityValues();
 
     /// \brief Creates a QualityValues object from a FASTQ-encoded string.
     ///
@@ -146,7 +146,7 @@ public:
     QualityValues& operator=(std::vector<QualityValue>&& quals);
 
     /// \brief Destructor
-    ~QualityValues(void) = default;
+    ~QualityValues() = default;
 
     /// \}
 
@@ -164,22 +164,22 @@ public:
     /// \{
 
     /// \returns a const_iterator to the beginning of the sequence
-    std::vector<QualityValue>::const_iterator cbegin(void) const;
+    std::vector<QualityValue>::const_iterator cbegin() const;
 
     /// \returns a const_iterator to the element following the last element
-    std::vector<QualityValue>::const_iterator cend(void) const;
+    std::vector<QualityValue>::const_iterator cend() const;
 
     /// \returns a const_iterator to the beginning of the sequence
-    std::vector<QualityValue>::const_iterator begin(void) const;
+    std::vector<QualityValue>::const_iterator begin() const;
 
     /// \returns a const_iterator to the element following the last element
-    std::vector<QualityValue>::const_iterator end(void) const;
+    std::vector<QualityValue>::const_iterator end() const;
 
     /// \returns an iterator to the beginning of the sequence
-    std::vector<QualityValue>::iterator begin(void);
+    std::vector<QualityValue>::iterator begin();
 
     /// \returns an iterator to the element following the last element
-    std::vector<QualityValue>::iterator end(void);
+    std::vector<QualityValue>::iterator end();
 
     /// \}
 
@@ -188,7 +188,7 @@ public:
     /// \{
 
     /// \returns the FASTQ-encoded string for this sequence of quality values
-    std::string Fastq(void) const;
+    std::string Fastq() const;
 
     /// \}
 };

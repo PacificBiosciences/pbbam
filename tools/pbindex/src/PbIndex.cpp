@@ -44,7 +44,7 @@
 using namespace pbindex;
 using namespace std;
 
-Settings::Settings(void)
+Settings::Settings()
     : printPbiContents_(false)
 { }
 

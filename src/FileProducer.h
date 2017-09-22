@@ -57,7 +57,7 @@ namespace internal {
 class FileProducer {
 
 protected:
-    FileProducer(void) = delete;
+    FileProducer() = delete;
 
     // Initializes FileProducer with specified target filename. Temp filename is
     // set to target filename plus ".tmp" suffix.
@@ -65,8 +65,8 @@ protected:
 
     // Initializes FileProducer with specified target filename & explicit temp
     // filename.
-    FileProducer(const std::string& targetFilename,
-                 const std::string& tempFilename);
+    FileProducer(std::string targetFilename,
+                 std::string tempFilename);
 
     // Renames temp file to target filename.
     //
@@ -75,13 +75,13 @@ protected:
     //
     // Remaming will not occur if there is a 'live' exception being thrown.
     //
-    ~FileProducer(void);
+    ~FileProducer();
 
 protected:
-    const std::string& TargetFilename(void) const
+    const std::string& TargetFilename() const
     { return targetFilename_; }
 
-    const std::string& TempFilename(void) const
+    const std::string& TempFilename() const
     { return tempFilename_; }
 
 private:

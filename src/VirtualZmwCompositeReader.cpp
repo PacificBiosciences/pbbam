@@ -92,12 +92,12 @@ VirtualZmwCompositeReader::VirtualZmwCompositeReader(const DataSet& dataset)
     OpenNextReader();
 }
 
-bool VirtualZmwCompositeReader::HasNext(void)
+bool VirtualZmwCompositeReader::HasNext()
 {
     return (currentReader_ && currentReader_->HasNext());
 }
 
-VirtualZmwBamRecord VirtualZmwCompositeReader::Next(void)
+VirtualZmwBamRecord VirtualZmwCompositeReader::Next()
 {
     if (currentReader_) {
         const auto result = currentReader_->Next();
@@ -114,7 +114,7 @@ VirtualZmwBamRecord VirtualZmwCompositeReader::Next(void)
     throw std::runtime_error(msg);
 }
 
-std::vector<BamRecord> VirtualZmwCompositeReader::NextRaw(void)
+std::vector<BamRecord> VirtualZmwCompositeReader::NextRaw()
 {
     if (currentReader_) {
         const auto result = currentReader_->NextRaw();
@@ -131,7 +131,7 @@ std::vector<BamRecord> VirtualZmwCompositeReader::NextRaw(void)
     throw std::runtime_error(msg);
 }
 
-void VirtualZmwCompositeReader::OpenNextReader(void)
+void VirtualZmwCompositeReader::OpenNextReader()
 {
     currentReader_.reset(nullptr);
 

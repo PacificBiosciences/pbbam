@@ -92,9 +92,9 @@ VirtualZmwReader::VirtualZmwReader(const std::string& primaryBamFilepath,
     stitchedHeader_->ReadGroups(readGroups);
 }
 
-VirtualZmwReader::~VirtualZmwReader(void) { }
+VirtualZmwReader::~VirtualZmwReader() { }
 
-bool VirtualZmwReader::HasNext(void)
+bool VirtualZmwReader::HasNext()
 {
     // Return true until both iterators are at the end of the query
     return primaryIt_ != primaryQuery_->end() ||
@@ -102,10 +102,10 @@ bool VirtualZmwReader::HasNext(void)
 }
 
 // This method is not thread safe
-VirtualZmwBamRecord VirtualZmwReader::Next(void)
+VirtualZmwBamRecord VirtualZmwReader::Next()
 { return VirtualZmwBamRecord{ NextRaw(), *stitchedHeader_ }; }
 
-std::vector<BamRecord> VirtualZmwReader::NextRaw(void)
+std::vector<BamRecord> VirtualZmwReader::NextRaw()
 {
     std::vector<BamRecord> bamRecordVec;
 
@@ -137,10 +137,10 @@ std::vector<BamRecord> VirtualZmwReader::NextRaw(void)
     return bamRecordVec;
 }
 
-BamHeader VirtualZmwReader::PrimaryHeader(void) const
+BamHeader VirtualZmwReader::PrimaryHeader() const
 { return primaryBamFile_->Header(); }
 
-BamHeader VirtualZmwReader::ScrapsHeader(void) const
+BamHeader VirtualZmwReader::ScrapsHeader() const
 { return scrapsBamFile_->Header(); }
 
 } // namespace internal

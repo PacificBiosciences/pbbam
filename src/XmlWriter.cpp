@@ -52,7 +52,7 @@ namespace internal {
 static
 std::string Prefix(const std::string& input)
 {
-    const size_t colonFound = input.find(':');
+    const auto colonFound = input.find(':');
     if (colonFound == std::string::npos || colonFound == 0)
         return std::string();
     return input.substr(0, colonFound);
@@ -71,7 +71,7 @@ std::string OutputName(const DataSetElement& node,
         // if no namespace prefix, prepend the appropriate one & return
         if (node.PrefixLabel().empty()) {
             static const std::string colon = ":";
-            XsdType xsdType = node.Xsd();
+            auto xsdType = node.Xsd();
             if (xsdType == XsdType::NONE)
                 xsdType = registry.XsdForElement(node.LocalNameLabel().to_string());
             return registry.Namespace(xsdType).Name() + colon + node.LocalNameLabel().to_string();

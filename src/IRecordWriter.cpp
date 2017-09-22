@@ -46,9 +46,5 @@
 namespace PacBio {
 namespace BAM {
 
-IRecordWriter::IRecordWriter(void) { }
-
-IRecordWriter::~IRecordWriter(void) { }
-
 } // namespace BAM
 } // namespace PacBio

@@ -44,19 +44,19 @@
 namespace PacBio {
 namespace BAM {
 
-inline std::string GenomicInterval::Name(void) const
+inline std::string GenomicInterval::Name() const
 { return name_; }
 
 inline GenomicInterval& GenomicInterval::Name(const std::string& name)
 { name_ = name; return *this; }
 
-inline PacBio::BAM::Interval<Position> GenomicInterval::Interval(void) const
+inline PacBio::BAM::Interval<Position> GenomicInterval::Interval() const
 { return interval_; }
 
 inline GenomicInterval& GenomicInterval::Interval(const PacBio::BAM::Interval<Position>& interval)
 { interval_ = interval; return *this; }
 
-inline bool GenomicInterval::IsValid(void) const
+inline bool GenomicInterval::IsValid() const
 {
     return !name_.empty() &&
            interval_.Start() >= 0 &&
@@ -64,16 +64,16 @@ inline bool GenomicInterval::IsValid(void) const
            interval_.IsValid();
 }
 
-inline size_t GenomicInterval::Length(void) const
+inline size_t GenomicInterval::Length() const
 { return interval_.Length(); }
 
-inline Position GenomicInterval::Start(void) const
+inline Position GenomicInterval::Start() const
 { return interval_.Start(); }
 
 inline GenomicInterval& GenomicInterval::Start(const Position start)
 { interval_.Start(start); return *this; }
 
-inline Position GenomicInterval::Stop(void) const
+inline Position GenomicInterval::Stop() const
 { return interval_.Stop(); }
 
 inline GenomicInterval& GenomicInterval::Stop(const Position stop)

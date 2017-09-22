@@ -72,7 +72,7 @@ public:
     explicit FastqReader(const std::string& fn);
     FastqReader(FastqReader&& other);
     FastqReader& operator=(FastqReader&& other);
-    ~FastqReader(void);
+    ~FastqReader();
 
     // copy is disabled
     FastqReader(const FastqReader&) = delete;

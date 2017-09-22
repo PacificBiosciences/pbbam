@@ -53,6 +53,7 @@
 #include <pbbam/BamFile.h>
 #include <pbbam/BamWriter.h>
 #include <pbbam/EntireFileQuery.h>
+#include <pbbam/Unused.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -119,7 +120,7 @@ void Remove(const vector<string>& files)
 }
 
 static inline
-void CheckGeneratedOutput(void)
+void CheckGeneratedOutput()
 {
     // convert to sam & diff against gold standard
     const int convertRet = RunBam2Sam(generatedBamFn, generatedSamFn);
@@ -161,8 +162,10 @@ TEST(EndToEndTest, ReadAndWrite_PureHtslib)
         bam1_t* b = record.get();
         ASSERT_TRUE(b);
 
-        while (sam_read1(in, hdr, b) >= 0)
-            sam_write1(out, hdr, b);
+        while (sam_read1(in, hdr, b) >= 0) {
+            const auto ret = sam_write1(out, hdr, b);
+            UNUSED(ret);
+        }
     }
 
     EndToEndTests::CheckGeneratedOutput();

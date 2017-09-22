@@ -60,7 +60,7 @@ static uint16_t maxFramepoint;
 static std::mutex initIpdDownsamplingMutex;
 
 static
-void InitIpdDownsampling(void)
+void InitIpdDownsampling()
 {
     std::lock_guard<std::mutex> lock(initIpdDownsamplingMutex);
 
@@ -124,7 +124,7 @@ std::vector<uint16_t> CodeToFrames(const std::vector<uint8_t>& codedData)
 {
     InitIpdDownsampling();
 
-    const size_t length = codedData.size();
+    const auto length = codedData.size();
     std::vector<uint16_t> frames(length, 0);
     for (size_t i = 0; i < length; ++i)
         frames[i] = CodeToFrames(codedData[i]);
@@ -142,7 +142,7 @@ std::vector<uint8_t> FramesToCode(const std::vector<uint16_t>& frames)
 {
     InitIpdDownsampling();
 
-    const size_t length = frames.size();
+    const auto length = frames.size();
     std::vector<uint8_t> result(length, 0);
     for (size_t i = 0; i < length; ++i)
         result[i] = FramesToCode(frames[i]);
@@ -151,14 +151,9 @@ std::vector<uint8_t> FramesToCode(const std::vector<uint16_t>& frames)
 
 } // namespace internal
 
-Frames::Frames(void)
-{ }
+Frames::Frames() { }
 
-Frames::Frames(const std::vector<uint16_t>& frames)
-    : data_(frames)
-{ }
-
-Frames::Frames(std::vector<uint16_t>&& frames)
+Frames::Frames(std::vector<uint16_t> frames)
     : data_(std::move(frames))
 { }
 

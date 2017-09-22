@@ -66,7 +66,7 @@ ZmwQuery::ZmwQuery(const std::vector<int32_t>& zmwWhitelist,
     , d_(new ZmwQueryPrivate(zmwWhitelist, dataset))
 { }
 
-ZmwQuery::~ZmwQuery(void) { }
+ZmwQuery::~ZmwQuery() { }
 
 bool ZmwQuery::GetNext(BamRecord &r)
 { return d_->reader_.GetNext(r); }

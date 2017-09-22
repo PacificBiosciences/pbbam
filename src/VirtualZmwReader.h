@@ -84,33 +84,33 @@ public:
                      const std::string& scrapsBamFilepath,
                      const PbiFilter& filter);
 
-    VirtualZmwReader(void) = delete;
+    VirtualZmwReader() = delete;
     VirtualZmwReader(const VirtualZmwReader&) = delete;
     VirtualZmwReader(VirtualZmwReader&&) = delete;
     VirtualZmwReader& operator=(const VirtualZmwReader&) = delete;
     VirtualZmwReader& operator=(VirtualZmwReader&&) = delete;
-    ~VirtualZmwReader(void);
+    ~VirtualZmwReader();
 
 public:
 
     /// \returns the BamHeader associated with this reader's "primary" %BAM file
-    BamHeader PrimaryHeader(void) const;
+    BamHeader PrimaryHeader() const;
 
     /// \returns the BamHeader associated with this reader's "scraps" %BAM file
-    BamHeader ScrapsHeader(void) const;
+    BamHeader ScrapsHeader() const;
 
 public:
 
     /// \returns true if more ZMWs are available for reading.
-    bool HasNext(void);
+    bool HasNext();
 
     /// \returns the next stitched polymerase read
-    VirtualZmwBamRecord Next(void);
+    VirtualZmwBamRecord Next();
 
     /// \returns the next set of reads that belong to one ZMW.
     ///          This enables stitching records in a distinct thread.
     ///
-    std::vector<BamRecord> NextRaw(void);
+    std::vector<BamRecord> NextRaw();
 
 private:
     std::unique_ptr<BamFile>          primaryBamFile_;

@@ -78,7 +78,7 @@ Frames VirtualZmwBamRecord::IPDV1Frames(Orientation orientation) const
 }
 
 
-void VirtualZmwBamRecord::StitchSources(void)
+void VirtualZmwBamRecord::StitchSources()
 {
     const auto& firstRecord = sources_[0];
     const auto& lastRecord = sources_[sources_.size() - 1];
@@ -341,7 +341,7 @@ void VirtualZmwBamRecord::StitchSources(void)
 
 
 std::map<VirtualRegionType, std::vector<VirtualRegion>>
-VirtualZmwBamRecord::VirtualRegionsMap(void) const
+VirtualZmwBamRecord::VirtualRegionsMap() const
 { return virtualRegionsMap_; }
 
 std::vector<VirtualRegion>

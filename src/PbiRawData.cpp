@@ -173,7 +173,7 @@ uint32_t PbiRawMappedData::NumInsertedBasesAt(size_t recordIndex) const
 const PbiReferenceEntry::ID  PbiReferenceEntry::UNMAPPED_ID = static_cast<PbiReferenceEntry::ID>(-1);
 const PbiReferenceEntry::Row PbiReferenceEntry::UNSET_ROW   = static_cast<PbiReferenceEntry::Row>(-1);
 
-PbiReferenceEntry::PbiReferenceEntry(void)
+PbiReferenceEntry::PbiReferenceEntry()
     : tId_(UNMAPPED_ID)
     , beginRow_(UNSET_ROW)
     , endRow_(UNSET_ROW)
@@ -220,8 +220,8 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
     auto rgId = b.ReadGroupId();
     if (rgId.empty())
         rgId = MakeReadGroupId(b.MovieName(), internal::ToString(b.Type()));
-    const uint32_t rawid = std::stoul(rgId, nullptr, 16);
-    const int32_t id = static_cast<int32_t>(rawid);
+    const auto rawid = std::stoul(rgId, nullptr, 16);
+    const auto id = static_cast<int32_t>(rawid);
     rgId_.push_back(id);
 
     // query start/end
@@ -249,25 +249,14 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
 // PbiRawData implementation
 // ----------------------------------
 
-PbiRawData::PbiRawData(void)
-    : version_(PbiFile::CurrentVersion)
-    , sections_(PbiFile::ALL)
-    , numReads_(0)
-{ }
-
 PbiRawData::PbiRawData(const std::string& pbiFilename)
     : filename_(pbiFilename)
-    , version_(PbiFile::CurrentVersion)
-    , sections_(PbiFile::ALL)
-    , numReads_(0)
 {
     internal::PbiIndexIO::Load(*this, pbiFilename);
 }
 
 PbiRawData::PbiRawData(const DataSet& dataset)
-    : version_(PbiFile::CurrentVersion)
-    , sections_(PbiFile::BASIC | PbiFile::MAPPED | PbiFile::BARCODE)
-    , numReads_(0)
+    : sections_(PbiFile::BASIC | PbiFile::MAPPED | PbiFile::BARCODE)
 {
     internal::PbiIndexIO::LoadFromDataSet(*this, dataset);
 }

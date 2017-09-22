@@ -108,7 +108,7 @@ ZmwGroupQuery::ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist,
     , d_(new ZmwGroupQueryPrivate(zmwWhitelist, dataset))
 { }
 
-ZmwGroupQuery::~ZmwGroupQuery(void) { }
+ZmwGroupQuery::~ZmwGroupQuery() { }
 
 bool ZmwGroupQuery::GetNext(std::vector<BamRecord>& records)
 { return d_->GetNext(records); }

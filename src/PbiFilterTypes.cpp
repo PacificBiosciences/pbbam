@@ -105,47 +105,6 @@ PbiFilter filterFromMovieName(const std::string& movieName, bool includeCcs)
     return filter;
 }
 
-//static
-//PbiFilter filterFromQueryName(const string& queryName)
-//{
-//    // split full name into moviename, holenumber
-//    const auto nameParts = internal::Split(queryName, '/');
-//    if (nameParts.size() != 3) {
-//        auto msg = string{ "PbiQueryNameFilter error: requested QNAME (" } + queryName;
-//        msg += string{ ") is not a valid PacBio BAM QNAME. See spec for details"};
-//        throw std::runtime_error(msg);
-//    }
-//
-//    // main filter: {union of candidate rgIds} && zmw [&& qStart && qEnd](non-CCS reads)
-//    auto filter = PbiFilter{ };
-//    filter.Add(PbiZmwFilter{ stoi(nameParts.at(1)) }); // hole number
-//
-//    const auto movieName = nameParts.at(0);
-//
-//    // CCS (only 1 possible candidate rgId)
-//    if (nameParts.at(2) == "ccs")
-//        filter.Add(PbiReadGroupFilter{ MakeReadGroupId(movieName, "CCS") });
-//
-//    // all other read types
-//    else {
-//        // we'll match on any read type that matches our qname
-//        // (except for CCS since it has a different QNAME anyway)
-//        const auto rgIdFilter = filterFromMovieName(movieName, false);
-//        filter.Add(rgIdFilter);
-//
-//        // add qStart/qEnd filters to our main filter
-//        const auto queryIntervalParts = internal::Split(nameParts.at(2), '_');
-//        if (queryIntervalParts.size() != 2) {
-//            auto msg = string{ "PbiQueryNameFilter error: requested QNAME (" } + queryName;
-//            msg += string{ ") is not a valid PacBio BAM QNAME. See spec for details"};
-//            throw std::runtime_error(msg);
-//        }
-//        filter.Add(PbiQueryStartFilter{ stoi(queryIntervalParts.at(0)) });
-//        filter.Add(PbiQueryEndFilter{ stoi(queryIntervalParts.at(1)) });
-//    }
-//    return filter;
-//}
-
 } // namespace internal
 
 // PbiAlignedLengthFilter
@@ -216,11 +175,11 @@ bool PbiQueryLengthFilter::Accepts(const PbiRawData& idx, const size_t row) cons
 struct PbiQueryNameFilter::PbiQueryNameFilterPrivate
 {
 public:
-    typedef std::pair<int32_t, int32_t>                 QueryInterval;
-    typedef std::set<QueryInterval>                     QueryIntervals;
-    typedef std::unordered_map<int32_t, QueryIntervals> ZmwLookup;
-    typedef std::shared_ptr<ZmwLookup>                  ZmwLookupPtr;
-    typedef std::unordered_map<int32_t, ZmwLookupPtr>   RgIdLookup;
+    using QueryInterval  = std::pair<int32_t, int32_t>;
+    using QueryIntervals = std::set<QueryInterval>;
+    using ZmwLookup      = std::unordered_map<int32_t, QueryIntervals>;
+    using ZmwLookupPtr   = std::shared_ptr<ZmwLookup>;
+    using RgIdLookup     = std::unordered_map<int32_t, ZmwLookupPtr>;
 
 public:
     PbiQueryNameFilterPrivate(const std::vector<std::string>& whitelist)
@@ -337,65 +296,25 @@ private:
 PbiQueryNameFilter::PbiQueryNameFilter(const std::string& qname)
     : d_(new PbiQueryNameFilter::PbiQueryNameFilterPrivate(std::vector<std::string>{1, qname}))
 { }
-//    : compositeFilter_(internal::filterFromQueryName(qname))
-//{ }
 
 PbiQueryNameFilter::PbiQueryNameFilter(const std::vector<std::string>& whitelist)
     : d_(new PbiQueryNameFilter::PbiQueryNameFilterPrivate(whitelist))
 { }
-//    : compositeFilter_(PbiFilter::UNION)
-//{
-//    try {
-//        for (const auto& qname : whitelist)
-//            compositeFilter_.Add(internal::filterFromQueryName(qname));
-//    }
-//    // simply re-throw our own exception
-//    catch (std::runtime_error&) {
-//        throw;
-//    }
-//    // we may hit other exceptions (e.g. in stoi()) - but we'll pin on a bit of extra data
-//    catch (std::exception& e) {
-//        auto msg = string{ "PbiQueryNameFilter encountered error: " } + e.what();
-//        throw std::runtime_error(msg);
-//    }
-//}
-
-//PbiQueryNameFilter::PbiQueryNameFilter(std::vector<std::string>&& whitelist)
-//    : d_(new PbiQueryNameFilter::PbiQueryNameFilterPrivate(whitelist))
-//{ }
-//    : compositeFilter_(PbiFilter::UNION)
-//{
-//    try {
-//        for (const auto& qname : whitelist)
-//            compositeFilter_.Add(internal::filterFromQueryName(qname));
-//    }
-//    // simply re-throw our own exception
-//    catch (std::runtime_error&) {
-//        throw;
-//    }
-//    // we may hit other exceptions (e.g. in stoi()) - but we'll pin on a bit of extra data
-//    catch (std::exception& e) {
-//        auto msg = string{ "PbiQueryNameFilter encountered error: " } + e.what();
-//        throw std::runtime_error(msg);
-//    }
-//}
 
 PbiQueryNameFilter::PbiQueryNameFilter(const PbiQueryNameFilter& other)
     : d_(new PbiQueryNameFilter::PbiQueryNameFilterPrivate(other.d_))
 { }
 
-PbiQueryNameFilter::~PbiQueryNameFilter(void) { }
+PbiQueryNameFilter::~PbiQueryNameFilter() { }
 
 bool PbiQueryNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
 { return d_->Accepts(idx, row); }
-//{ return compositeFilter_.Accepts(idx, row); }
 
 // PbiReferenceNameFilter
 
-PbiReferenceNameFilter::PbiReferenceNameFilter(const std::string& rname,
-                                               const Compare::Type cmp)
-    : initialized_(false)
-    , rname_(rname)
+PbiReferenceNameFilter::PbiReferenceNameFilter(std::string rname,
+                                               Compare::Type cmp)
+    : rname_(std::move(rname))
     , cmp_(cmp)
 {
     if (cmp != Compare::EQUAL && cmp != Compare::NOT_EQUAL) {
@@ -407,14 +326,12 @@ PbiReferenceNameFilter::PbiReferenceNameFilter(const std::string& rname,
 }
 
 PbiReferenceNameFilter::PbiReferenceNameFilter(const std::vector<std::string>& whitelist)
-    : initialized_(false)
-    , rnameWhitelist_(whitelist)
+    : rnameWhitelist_(whitelist)
     , cmp_(Compare::EQUAL)
 { }
 
 PbiReferenceNameFilter::PbiReferenceNameFilter(std::vector<std::string>&& whitelist)
-    : initialized_(false)
-    , rnameWhitelist_(std::move(whitelist))
+    : rnameWhitelist_(std::move(whitelist))
     , cmp_(Compare::EQUAL)
 { }
 

@@ -135,20 +135,20 @@ public:
     constexpr static size_t MaxElementCount = MaxBufferSize / ElementSize;
 
 public:
-    PbiTempFile(const std::string& fn);
-    ~PbiTempFile(void);
+    PbiTempFile(std::string fn);
+    ~PbiTempFile();
 
 public:
-    void Close(void);
-    const std::vector<T>& Data(void) const;
-    std::vector<T>& Data(void);
-    void Flush(void);
+    void Close();
+    const std::vector<T>& Data() const;
+    std::vector<T>& Data();
+    void Flush();
     size_t Read(const size_t count);
-    void Rewind(void);
+    void Rewind();
     void Write(T value);
 
 private:
-    void WriteToFile(void);
+    void WriteToFile();
 
 private:
 
@@ -162,8 +162,8 @@ private:
 };
 
 template<typename T>
-PbiTempFile<T>::PbiTempFile(const std::string& fn)
-    : fn_{fn}
+PbiTempFile<T>::PbiTempFile(std::string fn)
+    : fn_{std::move(fn)}
     , fp_{std::fopen(fn_.c_str(), "w+b")}
 {
     if (fp_ == nullptr)
@@ -172,31 +172,31 @@ PbiTempFile<T>::PbiTempFile(const std::string& fn)
 }
 
 template<typename T>
-PbiTempFile<T>::~PbiTempFile(void)
+PbiTempFile<T>::~PbiTempFile()
 {
     remove(fn_.c_str());
 }
 
 template<typename T>
-void PbiTempFile<T>::Close(void)
+void PbiTempFile<T>::Close()
 {
     Flush(); // dtor will take care of closing file handle
 }
 
 template<typename T>
-const std::vector<T>& PbiTempFile<T>::Data(void) const
+const std::vector<T>& PbiTempFile<T>::Data() const
 {
     return buffer_;
 }
 
 template<typename T>
-std::vector<T>& PbiTempFile<T>::Data(void)
+std::vector<T>& PbiTempFile<T>::Data()
 {
     return buffer_;
 }
 
 template<typename T>
-void PbiTempFile<T>::Flush(void)
+void PbiTempFile<T>::Flush()
 {
     WriteToFile();
     buffer_.clear();
@@ -212,7 +212,7 @@ size_t PbiTempFile<T>::Read(const size_t count)
 }
 
 template<typename T>
-void PbiTempFile<T>::Rewind(void)
+void PbiTempFile<T>::Rewind()
 {
     Flush();
 
@@ -232,7 +232,7 @@ void PbiTempFile<T>::Write(T value)
 }
 
 template<typename T>
-void PbiTempFile<T>::WriteToFile(void)
+void PbiTempFile<T>::WriteToFile()
 {
     numElementsWritten_ += fwrite(buffer_.data(), ElementSize,
                                   buffer_.size(), fp_.get());
@@ -254,7 +254,7 @@ public:
     bool AddRecord(const BamRecord& record,
                    const int32_t rowNumber);
 
-    PbiRawReferenceData Result(void) const;
+    PbiRawReferenceData Result() const;
 
     void WriteData(BGZF* bgzf);
 
@@ -324,7 +324,7 @@ bool PbiReferenceDataBuilder::AddRecord(const BamRecord& record,
     return true;
 }
 
-PbiRawReferenceData PbiReferenceDataBuilder::Result(void) const
+PbiRawReferenceData PbiReferenceDataBuilder::Result() const
 {
     // PbiReferenceEntries will be sorted thanks to std::map
     // tId will be at end since we're sorting on the uint cast of -1
@@ -380,11 +380,11 @@ public:
                       const CompressionLevel compressionLevel,
                       const size_t numThreads);
 
-    ~PbiBuilderPrivate(void) noexcept;
+    ~PbiBuilderPrivate() noexcept;
 
 public:
     void AddRecord(const BamRecord& record, const int64_t vOffset);
-    void Close(void);
+    void Close();
 
 private:
     // store record data
@@ -394,7 +394,7 @@ private:
     void AddReferenceData(const BamRecord& record, const uint32_t currentRow);
 
     // read from temp files & write PBI data
-    void OpenPbiFile(void);
+    void OpenPbiFile();
 
     template<typename T>
     void WriteFromTempFile(PbiTempFile<T>& tempFile, BGZF* bgzf);
@@ -470,10 +470,10 @@ PbiBuilderPrivate::PbiBuilderPrivate(const std::string& pbiFilename,
     , pbiFilename_{pbiFilename}
 {
     if (isCoordinateSorted && numReferenceSequences > 0)
-        refDataBuilder_.reset(new PbiReferenceDataBuilder{numReferenceSequences});
+        refDataBuilder_ = std::make_unique<PbiReferenceDataBuilder>(numReferenceSequences);
 }
 
-PbiBuilderPrivate::~PbiBuilderPrivate(void) noexcept
+PbiBuilderPrivate::~PbiBuilderPrivate() noexcept
 {
     if (!isClosed_)
     {
@@ -520,7 +520,7 @@ void PbiBuilderPrivate::AddBarcodeData(const BamRecord& b)
 void PbiBuilderPrivate::AddBasicData(const BamRecord& b, const int64_t vOffset)
 {
     // read group ID
-    const auto rgId = [&b](void) -> int32_t
+    const auto rgId = [&b]() -> int32_t
     {
         auto rgIdString = b.ReadGroupId();
         if (rgIdString.empty())
@@ -570,7 +570,7 @@ void PbiBuilderPrivate::AddMappedData(const BamRecord& b)
     const auto aStart = static_cast<uint32_t>(b.AlignedStart());
     const auto aEnd   = static_cast<uint32_t>(b.AlignedEnd());
 
-    const auto isReverseStrand = [&b](void) -> uint8_t
+    const auto isReverseStrand = [&b]() -> uint8_t
     {
         return (b.AlignedStrand() == Strand::REVERSE ? 1 : 0);
     }();
@@ -624,7 +624,7 @@ void PbiBuilderPrivate::AddReferenceData(const BamRecord& b,
     }
 }
 
-void PbiBuilderPrivate::Close(void)
+void PbiBuilderPrivate::Close()
 {
     // open PBI file for writing
     OpenPbiFile();
@@ -672,7 +672,7 @@ void PbiBuilderPrivate::Close(void)
     isClosed_ = true;
 }
 
-void PbiBuilderPrivate::OpenPbiFile(void)
+void PbiBuilderPrivate::OpenPbiFile()
 {
     outFile_.reset(bgzf_open(pbiFilename_.c_str(), "wb"));
     if (outFile_ == nullptr)
@@ -767,14 +767,14 @@ PbiBuilder::PbiBuilder(const std::string& pbiFilename,
                                          numThreads}}
 { }
 
-PbiBuilder::~PbiBuilder(void) noexcept { }
+PbiBuilder::~PbiBuilder() noexcept { }
 
 void PbiBuilder::AddRecord(const BamRecord& record, const int64_t vOffset)
 {
     d_->AddRecord(record, vOffset);
 }
 
-void PbiBuilder::Close(void)
+void PbiBuilder::Close()
 {
     d_->Close();
 }

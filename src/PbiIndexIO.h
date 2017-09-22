@@ -42,6 +42,7 @@
 #include "pbbam/DataSet.h"
 #include "pbbam/PbiFile.h"
 #include "pbbam/PbiRawData.h"
+#include "pbbam/Unused.h"
 #include <htslib/bgzf.h>
 #include <htslib/sam.h>
 #include <cstddef>
@@ -120,16 +121,17 @@ inline void PbiIndexIO::LoadBgzfVector(BGZF* fp,
 {
     assert(fp);
     data.resize(numReads);
-    bgzf_read(fp, &data[0], numReads*sizeof(T));
+    auto ret = bgzf_read(fp, &data[0], numReads*sizeof(T));
     if (fp->is_be)
         SwapEndianness(data);
+    UNUSED(ret);
 }
 
 template<typename T>
 inline void PbiIndexIO::SwapEndianness(std::vector<T>& data)
 {
-    const size_t elementSize = sizeof(T);
-    const size_t numReads = data.size();
+    const auto elementSize = sizeof(T);
+    const auto numReads = data.size();
     switch (elementSize) {
         case 1 : break; // no swapping necessary
         case 2 :
@@ -157,7 +159,8 @@ inline void PbiIndexIO::WriteBgzfVector(BGZF* fp,
     std::vector<T> output = data;
     if (fp->is_be)
         SwapEndianness(output);
-    bgzf_write(fp, &output[0], data.size()*sizeof(T));
+    auto ret = bgzf_write(fp, &output[0], data.size()*sizeof(T));
+    UNUSED(ret);
 }
 
 } // namespace internal

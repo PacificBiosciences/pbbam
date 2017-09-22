@@ -51,7 +51,7 @@ class BamRecordImpl;
 class IRecordWriter
 {
 public:
-    virtual ~IRecordWriter(void);
+    virtual ~IRecordWriter() = default;
 
 public:
 
@@ -63,7 +63,7 @@ public:
     ///
     /// \throws std::runtime_error if flush fails
     ///
-    virtual void TryFlush(void) =0;
+    virtual void TryFlush() =0;
 
 
     /// \brief Write a record to the output %BAM file.
@@ -83,7 +83,7 @@ public:
     virtual void Write(const BamRecordImpl& recordImpl) =0;
 
 protected:
-    IRecordWriter(void);
+    IRecordWriter() = default;
 };
 
 } // namespace BAM

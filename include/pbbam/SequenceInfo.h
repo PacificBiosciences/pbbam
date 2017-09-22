@@ -78,22 +78,19 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    /// \brief Creates an empty sequence info object.
-    SequenceInfo(void) = default;
-
     /// \brief Creates a sequence info object with name & (optional) length.
     ///
     /// \param[in] name       sequence name (\@SQ:SN)
     /// \param[in] length     sequence length (\@SQ:LN)
     ///
-    SequenceInfo(const std::string& name,
-                 const std::string& length = "0");
+    SequenceInfo(std::string name, std::string length = "0");
 
-    SequenceInfo(const SequenceInfo& other) = default;
-    SequenceInfo(SequenceInfo&& other) = default;
-    SequenceInfo& operator=(const SequenceInfo& other) = default;
-    SequenceInfo& operator=(SequenceInfo&& other) = default;
-    ~SequenceInfo(void) = default;
+    SequenceInfo() = default;
+    SequenceInfo(const SequenceInfo&) = default;
+    SequenceInfo(SequenceInfo&&) = default;
+    SequenceInfo& operator=(const SequenceInfo&) = default;
+    SequenceInfo& operator=(SequenceInfo&&) = default;
+    ~SequenceInfo() = default;
 
     /// \}
 
@@ -115,13 +112,13 @@ public:
     /// Currently this checks to see that Name is non-empty and Length is within
     /// the accepted range.
     ///
-    bool IsValid(void) const;
+    bool IsValid() const;
 
     /// \brief Converts this object to its SAM-formatted text.
     ///
     /// \returns SAM-formatted text (no trailing newline)
     ///
-    std::string ToSam(void) const;
+    std::string ToSam() const;
 
     /// \}
 
@@ -130,28 +127,28 @@ public:
     /// \{
 
     /// \returns string value of \@SQ:AS
-    std::string AssemblyId(void) const;
+    std::string AssemblyId() const;
 
     /// \returns string value of \@SQ:M5
-    std::string Checksum(void) const;
+    std::string Checksum() const;
 
     /// \returns any non-standard tags added to the \@PG entry
     ///
     /// Result map consists of {tagName => value}.
     ///
-    std::map<std::string, std::string> CustomTags(void) const;
+    std::map<std::string, std::string> CustomTags() const;
 
     /// \returns string value of \@SQ:LN
-    std::string Length(void) const;
+    std::string Length() const;
 
     /// \returns string value of \@SQ:SN
-    std::string Name(void) const;
+    std::string Name() const;
 
     /// \returns string value of \@SQ:SP
-    std::string Species(void) const;
+    std::string Species() const;
 
     /// \returns string value of \@SQ:UR
-    std::string Uri(void) const;
+    std::string Uri() const;
 
     /// \}
 

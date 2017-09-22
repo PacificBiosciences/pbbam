@@ -133,7 +133,7 @@ std::pair<int32_t, int32_t> AlignedOffsets(const BamRecord& record,
 
         // start offset
         for (size_t i = 0; i < numCigarOps; ++i) {
-            const CigarOperationType type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
+            const auto type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
             if (type == CigarOperationType::HARD_CLIP) {
                 if (startOffset != 0 && startOffset != seqLength) {
                     startOffset = -1;
@@ -148,7 +148,7 @@ std::pair<int32_t, int32_t> AlignedOffsets(const BamRecord& record,
 
         // end offset
         for (int i = numCigarOps-1; i >= 0; --i) {
-            const CigarOperationType type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
+            const auto type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
             if (type == CigarOperationType::HARD_CLIP) {
                 if (endOffset != 0 && endOffset != seqLength) {
                     endOffset = -1;
@@ -428,27 +428,20 @@ bool ConsumesReference(const CigarOperationType type)
 
 const float BamRecord::photonFactor = 10.0;
 
-BamRecord::BamRecord(void)
+BamRecord::BamRecord()
     : alignedStart_(PacBio::BAM::UnmappedPosition)
     , alignedEnd_(PacBio::BAM::UnmappedPosition)
     , p2bCache_(nullptr)
 { }
 
-BamRecord::BamRecord(const BamHeader& header)
-    : header_(header)
+BamRecord::BamRecord(BamHeader header)
+    : header_(std::move(header))
     , alignedStart_(PacBio::BAM::UnmappedPosition)
     , alignedEnd_(PacBio::BAM::UnmappedPosition)
     , p2bCache_(nullptr)
 { }
 
-BamRecord::BamRecord(const BamRecordImpl& impl)
-    : impl_(impl)
-    , alignedStart_(PacBio::BAM::UnmappedPosition)
-    , alignedEnd_(PacBio::BAM::UnmappedPosition)
-    , p2bCache_(nullptr)
-{ }
-
-BamRecord::BamRecord(BamRecordImpl&& impl)
+BamRecord::BamRecord(BamRecordImpl impl)
     : impl_(std::move(impl))
     , alignedStart_(PacBio::BAM::UnmappedPosition)
     , alignedEnd_(PacBio::BAM::UnmappedPosition)
@@ -495,23 +488,23 @@ BamRecord& BamRecord::operator=(BamRecord&& other)
     return *this;
 }
 
-BamRecord::~BamRecord(void) { }
+BamRecord::~BamRecord() { }
 
-Position BamRecord::AlignedEnd(void) const
+Position BamRecord::AlignedEnd() const
 {
     if (alignedEnd_ == PacBio::BAM::UnmappedPosition)
         CalculateAlignedPositions();
     return alignedEnd_;
 }
 
-Position BamRecord::AlignedStart(void) const
+Position BamRecord::AlignedStart() const
 {
     if (alignedStart_ == PacBio::BAM::UnmappedPosition)
         CalculateAlignedPositions();
     return alignedStart_;
 }
 
-Strand BamRecord::AlignedStrand(void) const
+Strand BamRecord::AlignedStrand() const
 { return impl_.IsReverseStrand() ? Strand::REVERSE : Strand::FORWARD; }
 
 QualityValues BamRecord::AltLabelQV(Orientation orientation,
@@ -554,13 +547,13 @@ BamRecord& BamRecord::AltLabelTag(const std::string& tags)
     return *this;
 }
 
-int16_t BamRecord::BarcodeForward(void) const
+int16_t BamRecord::BarcodeForward() const
 { return Barcodes().first; }
 
-int16_t BamRecord::BarcodeReverse(void) const
+int16_t BamRecord::BarcodeReverse() const
 { return Barcodes().second; }
 
-uint8_t BamRecord::BarcodeQuality(void) const
+uint8_t BamRecord::BarcodeQuality() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::BARCODE_QUALITY);
     const auto bq = impl_.TagValue(tagName);
@@ -577,7 +570,7 @@ BamRecord& BamRecord::BarcodeQuality(const uint8_t quality)
     return *this;
 }
 
-std::pair<int16_t,int16_t> BamRecord::Barcodes(void) const
+std::pair<int16_t,int16_t> BamRecord::Barcodes() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::BARCODES);
     const Tag& bc = impl_.TagValue(tagName);
@@ -610,7 +603,7 @@ BamRecord& BamRecord::Barcodes(const std::pair<int16_t,int16_t>& barcodeIds)
     return *this;
 }
 
-void BamRecord::CalculateAlignedPositions(void) const
+void BamRecord::CalculateAlignedPositions() const
 {
     // reset
     ResetCachedPositions();
@@ -646,7 +639,7 @@ void BamRecord::CalculateAlignedPositions(void) const
     }
 }
 
-void BamRecord::CalculatePulse2BaseCache(void) const
+void BamRecord::CalculatePulse2BaseCache() const
 {
     // skip already calculated
     if (p2bCache_)
@@ -660,7 +653,7 @@ void BamRecord::CalculatePulse2BaseCache(void) const
                                        false,
                                        false,
                                        PulseBehavior::ALL);
-    p2bCache_.reset(new internal::Pulse2BaseCache{ pulseCalls });
+    p2bCache_ = std::make_unique<internal::Pulse2BaseCache>(pulseCalls);
 }
 
 Cigar BamRecord::CigarData(bool exciseAllClips) const
@@ -1567,120 +1560,120 @@ std::vector<uint8_t> BamRecord::FetchUInt8s(const BamRecordTag tag,
     return arr;
 }
 
-std::string BamRecord::FullName(void) const
+std::string BamRecord::FullName() const
 { return impl_.Name(); }
 
-bool BamRecord::HasAltLabelQV(void) const
+bool BamRecord::HasAltLabelQV() const
 { return impl_.HasTag(BamRecordTag::ALT_LABEL_QV); }
 
-bool BamRecord::HasAltLabelTag(void) const
+bool BamRecord::HasAltLabelTag() const
 { return impl_.HasTag(BamRecordTag::ALT_LABEL_TAG); }
 
-bool BamRecord::HasBarcodes(void) const
+bool BamRecord::HasBarcodes() const
 { return impl_.HasTag(BamRecordTag::BARCODES); }
 
-bool BamRecord::HasBarcodeQuality(void) const
+bool BamRecord::HasBarcodeQuality() const
 { return impl_.HasTag(BamRecordTag::BARCODE_QUALITY); }
 
-bool BamRecord::HasLabelQV(void) const
+bool BamRecord::HasLabelQV() const
 { return impl_.HasTag(BamRecordTag::LABEL_QV); }
 
-bool BamRecord::HasDeletionQV(void) const
+bool BamRecord::HasDeletionQV() const
 { return impl_.HasTag(BamRecordTag::DELETION_QV); }
 
-bool BamRecord::HasDeletionTag(void) const
+bool BamRecord::HasDeletionTag() const
 { return impl_.HasTag(BamRecordTag::DELETION_TAG); }
 
-bool BamRecord::HasHoleNumber(void) const
+bool BamRecord::HasHoleNumber() const
 {
     return impl_.HasTag(BamRecordTag::HOLE_NUMBER)
           && !impl_.TagValue(BamRecordTag::HOLE_NUMBER).IsNull();
 }
 
-bool BamRecord::HasInsertionQV(void) const
+bool BamRecord::HasInsertionQV() const
 { return impl_.HasTag(BamRecordTag::INSERTION_QV); }
 
-bool BamRecord::HasNumPasses(void) const
+bool BamRecord::HasNumPasses() const
 { return impl_.HasTag(BamRecordTag::NUM_PASSES); }
 
-bool BamRecord::HasPreBaseFrames(void) const
+bool BamRecord::HasPreBaseFrames() const
 { return HasIPD(); }
 
-bool BamRecord::HasIPD(void) const
+bool BamRecord::HasIPD() const
 { return impl_.HasTag(BamRecordTag::IPD); }
 
-bool BamRecord::HasLocalContextFlags(void) const
+bool BamRecord::HasLocalContextFlags() const
 { return impl_.HasTag(BamRecordTag::CONTEXT_FLAGS); }
 
-bool BamRecord::HasMergeQV(void) const
+bool BamRecord::HasMergeQV() const
 { return impl_.HasTag(BamRecordTag::MERGE_QV); }
 
-bool BamRecord::HasPulseMergeQV(void) const
+bool BamRecord::HasPulseMergeQV() const
 { return impl_.HasTag(BamRecordTag::PULSE_MERGE_QV); }
 
-bool BamRecord::HasPkmean(void) const
+bool BamRecord::HasPkmean() const
 { return impl_.HasTag(BamRecordTag::PKMEAN); }
 
-bool BamRecord::HasPkmean2(void) const
+bool BamRecord::HasPkmean2() const
 { return impl_.HasTag(BamRecordTag::PKMEAN_2); }
 
-bool BamRecord::HasPkmid(void) const
+bool BamRecord::HasPkmid() const
 { return impl_.HasTag(BamRecordTag::PKMID); }
 
-bool BamRecord::HasPkmid2(void) const
+bool BamRecord::HasPkmid2() const
 { return impl_.HasTag(BamRecordTag::PKMID_2); }
 
-bool BamRecord::HasPrePulseFrames(void) const
+bool BamRecord::HasPrePulseFrames() const
 { return impl_.HasTag(BamRecordTag::PRE_PULSE_FRAMES); }
 
-bool BamRecord::HasPulseCall(void) const
+bool BamRecord::HasPulseCall() const
 { return impl_.HasTag(BamRecordTag::PULSE_CALL)
           && !impl_.TagValue(BamRecordTag::PULSE_CALL).IsNull();
 }
 
-bool BamRecord::HasPulseCallWidth(void) const
+bool BamRecord::HasPulseCallWidth() const
 { return impl_.HasTag(BamRecordTag::PULSE_CALL_WIDTH); }
 
-bool BamRecord::HasPulseWidth(void) const
+bool BamRecord::HasPulseWidth() const
 { return impl_.HasTag(BamRecordTag::PULSE_WIDTH); }
 
-bool BamRecord::HasQueryEnd(void) const
+bool BamRecord::HasQueryEnd() const
 { return impl_.HasTag(BamRecordTag::QUERY_END); }
 
-bool BamRecord::HasQueryStart(void) const
+bool BamRecord::HasQueryStart() const
 { return impl_.HasTag(BamRecordTag::QUERY_START); }
 
-bool BamRecord::HasReadAccuracy(void) const
+bool BamRecord::HasReadAccuracy() const
 { return impl_.HasTag(BamRecordTag::READ_ACCURACY)
           && !impl_.TagValue(BamRecordTag::READ_ACCURACY).IsNull();
 }
 
-bool BamRecord::HasScrapRegionType(void) const
+bool BamRecord::HasScrapRegionType() const
 { return impl_.HasTag(BamRecordTag::SCRAP_REGION_TYPE)
           && !impl_.TagValue(BamRecordTag::SCRAP_REGION_TYPE).IsNull();
 }
 
-bool BamRecord::HasScrapZmwType(void) const
+bool BamRecord::HasScrapZmwType() const
 { return impl_.HasTag(BamRecordTag::SCRAP_ZMW_TYPE)
           && !impl_.TagValue(BamRecordTag::SCRAP_ZMW_TYPE).IsNull();
 }
 
-bool BamRecord::HasStartFrame(void) const
+bool BamRecord::HasStartFrame() const
 { return impl_.HasTag(BamRecordTag::START_FRAME); }
 
-bool BamRecord::HasSignalToNoise(void) const
+bool BamRecord::HasSignalToNoise() const
 { return impl_.HasTag(BamRecordTag::SNR); }
 
-bool BamRecord::HasSubstitutionQV(void) const
+bool BamRecord::HasSubstitutionQV() const
 { return impl_.HasTag(BamRecordTag::SUBSTITUTION_QV); }
 
-bool BamRecord::HasSubstitutionTag(void) const
+bool BamRecord::HasSubstitutionTag() const
 { return impl_.HasTag(BamRecordTag::SUBSTITUTION_TAG); }
 
-BamHeader BamRecord::Header(void) const
+BamHeader BamRecord::Header() const
 { return header_; }
 
-int32_t BamRecord::HoleNumber(void) const
+int32_t BamRecord::HoleNumber() const
 {
     const Tag& holeNumber = impl_.TagValue(BamRecordTag::HOLE_NUMBER);
     if (!holeNumber.IsNull())
@@ -1698,10 +1691,10 @@ BamRecord& BamRecord::HoleNumber(const int32_t holeNumber)
     return *this;
 }
 
-BamRecordImpl& BamRecord::Impl(void)
+BamRecordImpl& BamRecord::Impl()
 { return impl_; }
 
-const BamRecordImpl& BamRecord::Impl(void) const
+const BamRecordImpl& BamRecord::Impl() const
 { return impl_; }
 
 QualityValues BamRecord::InsertionQV(Orientation orientation,
@@ -1771,7 +1764,7 @@ Frames BamRecord::IPDRaw(Orientation orientation) const
     return frames;
 }
 
-bool BamRecord::IsMapped(void) const
+bool BamRecord::IsMapped() const
 { return impl_.IsMapped(); }
 
 QualityValues BamRecord::LabelQV(Orientation orientation,
@@ -1794,7 +1787,7 @@ BamRecord& BamRecord::LabelQV(const QualityValues& labelQVs)
     return *this;
 }
 
-LocalContextFlags BamRecord::LocalContextFlags(void) const
+LocalContextFlags BamRecord::LocalContextFlags() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::CONTEXT_FLAGS);
     const Tag& cxTag = impl_.TagValue(tagName);
@@ -1845,7 +1838,7 @@ BamRecord& BamRecord::Map(const int32_t referenceId,
     return *this;
 }
 
-uint8_t BamRecord::MapQuality(void) const
+uint8_t BamRecord::MapQuality() const
 { return impl_.MapQuality(); }
 
 QualityValues BamRecord::MergeQV(Orientation orientation,
@@ -1866,10 +1859,10 @@ BamRecord& BamRecord::MergeQV(const QualityValues& mergeQVs)
     return *this;
 }
 
-std::string BamRecord::MovieName(void) const
+std::string BamRecord::MovieName() const
 { return ReadGroup().MovieName(); }
 
-size_t BamRecord::NumDeletedBases(void) const
+size_t BamRecord::NumDeletedBases() const
 {
     auto tEnd = ReferenceEnd();
     auto tStart = ReferenceStart();
@@ -1879,7 +1872,7 @@ size_t BamRecord::NumDeletedBases(void) const
     return (tEnd - tStart - nM - nMM);
 }
 
-size_t BamRecord::NumInsertedBases(void) const
+size_t BamRecord::NumInsertedBases() const
 {
     auto aEnd = AlignedEnd();
     auto aStart = AlignedStart();
@@ -1889,16 +1882,16 @@ size_t BamRecord::NumInsertedBases(void) const
     return (aEnd - aStart - nM - nMM);
 }
 
-size_t BamRecord::NumMatches(void) const
+size_t BamRecord::NumMatches() const
 { return NumMatchesAndMismatches().first; }
 
-std::pair<size_t, size_t> BamRecord::NumMatchesAndMismatches(void) const
+std::pair<size_t, size_t> BamRecord::NumMatchesAndMismatches() const
 {
     std::pair<size_t, size_t> result = std::make_pair(0,0);
     auto b = internal::BamRecordMemory::GetRawData(this);
     uint32_t* cigarData = bam_get_cigar(b.get());
     for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
-        const CigarOperationType type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
+        const auto type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
         if (type == CigarOperationType::SEQUENCE_MATCH)
             result.first += bam_cigar_oplen(cigarData[i]);
         else if (type == CigarOperationType::SEQUENCE_MISMATCH)
@@ -1907,10 +1900,10 @@ std::pair<size_t, size_t> BamRecord::NumMatchesAndMismatches(void) const
     return result;
 }
 
-size_t BamRecord::NumMismatches(void) const
+size_t BamRecord::NumMismatches() const
 { return NumMatchesAndMismatches().second; }
 
-int32_t BamRecord::NumPasses(void) const
+int32_t BamRecord::NumPasses() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::NUM_PASSES);
     const Tag& numPasses = impl_.TagValue(tagName);
@@ -2239,7 +2232,7 @@ QualityValues BamRecord::Qualities(Orientation orientation,
                           exciseSoftClips);
 }
 
-Position BamRecord::QueryEnd(void) const
+Position BamRecord::QueryEnd() const
 {
     // try 'qe' tag
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::QUERY_END);
@@ -2275,7 +2268,7 @@ BamRecord& BamRecord::QueryEnd(const Position pos)
    return *this;
 }
 
-Position BamRecord::QueryStart(void) const
+Position BamRecord::QueryStart() const
 {
     // try 'qs' tag
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::QUERY_START);
@@ -2311,11 +2304,11 @@ BamRecord& BamRecord::QueryStart(const Position pos)
    return *this;
 }
 
-Accuracy BamRecord::ReadAccuracy(void) const
+Accuracy BamRecord::ReadAccuracy() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::READ_ACCURACY);
     const Tag& readAccuracy = impl_.TagValue(tagName);
-    return Accuracy(readAccuracy.ToFloat());
+    return { readAccuracy.ToFloat() };
 }
 
 BamRecord& BamRecord::ReadAccuracy(const Accuracy& accuracy)
@@ -2326,7 +2319,7 @@ BamRecord& BamRecord::ReadAccuracy(const Accuracy& accuracy)
     return *this;
 }
 
-ReadGroupInfo BamRecord::ReadGroup(void) const
+ReadGroupInfo BamRecord::ReadGroup() const
 { return header_.ReadGroup(ReadGroupId()); }
 
 BamRecord& BamRecord::ReadGroup(const ReadGroupInfo& rg)
@@ -2338,7 +2331,7 @@ BamRecord& BamRecord::ReadGroup(const ReadGroupInfo& rg)
    return *this;
 }
 
-std::string BamRecord::ReadGroupId(void) const
+std::string BamRecord::ReadGroupId() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::READ_GROUP);
     const Tag& rgTag = impl_.TagValue(tagName);
@@ -2356,10 +2349,10 @@ BamRecord& BamRecord::ReadGroupId(const std::string& id)
    return *this;
 }
 
-int32_t BamRecord::ReadGroupNumericId(void) const
+int32_t BamRecord::ReadGroupNumericId() const
 { return ReadGroupInfo::IdToInt(ReadGroupId()); }
 
-Position BamRecord::ReferenceEnd(void) const
+Position BamRecord::ReferenceEnd() const
 {
     if (!impl_.IsMapped())
         return PacBio::BAM::UnmappedPosition;
@@ -2369,10 +2362,10 @@ Position BamRecord::ReferenceEnd(void) const
     return bam_endpos(htsData.get());
 }
 
-int32_t BamRecord::ReferenceId(void) const
+int32_t BamRecord::ReferenceId() const
 { return impl_.ReferenceId(); }
 
-std::string BamRecord::ReferenceName(void) const
+std::string BamRecord::ReferenceName() const
 {
     if (IsMapped())
         return Header().SequenceName(ReferenceId());
@@ -2380,22 +2373,22 @@ std::string BamRecord::ReferenceName(void) const
         throw std::runtime_error("unmapped record has no associated reference name");
 }
 
-Position BamRecord::ReferenceStart(void) const
+Position BamRecord::ReferenceStart() const
 { return impl_.Position(); }
 
-void BamRecord::ResetCachedPositions(void) const
+void BamRecord::ResetCachedPositions() const
 {
     alignedEnd_   = PacBio::BAM::UnmappedPosition;
     alignedStart_ = PacBio::BAM::UnmappedPosition;
 }
 
-void BamRecord::ResetCachedPositions(void)
+void BamRecord::ResetCachedPositions()
 {
     alignedEnd_   = PacBio::BAM::UnmappedPosition;
     alignedStart_ = PacBio::BAM::UnmappedPosition;
 }
 
-VirtualRegionType BamRecord::ScrapRegionType(void) const
+VirtualRegionType BamRecord::ScrapRegionType() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::SCRAP_REGION_TYPE);
     const Tag& srTag = impl_.TagValue(tagName);
@@ -2418,7 +2411,7 @@ BamRecord& BamRecord::ScrapRegionType(const char type)
     return *this;
 }
 
-ZmwType BamRecord::ScrapZmwType(void) const
+ZmwType BamRecord::ScrapZmwType() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::SCRAP_ZMW_TYPE);
     const Tag& szTag = impl_.TagValue(tagName);
@@ -2451,7 +2444,7 @@ std::string BamRecord::Sequence(const Orientation orientation,
                       exciseSoftClips);
 }
 
-std::vector<float> BamRecord::SignalToNoise(void) const
+std::vector<float> BamRecord::SignalToNoise() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::SNR);
     const Tag& snTag = impl_.TagValue(tagName);
@@ -2522,7 +2515,7 @@ BamRecord& BamRecord::SubstitutionTag(const std::string& tags)
     return *this;
 }
 
-RecordType BamRecord::Type(void) const
+RecordType BamRecord::Type() const
 {
     try {
         const std::string& typeName = ReadGroup().ReadType();

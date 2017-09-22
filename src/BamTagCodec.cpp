@@ -111,7 +111,7 @@ TagCollection BamTagCodec::Decode(const std::vector<uint8_t>& data)
         using internal::readBamMultiValue;
         using internal::readBamValue;
 
-        const char tagType = static_cast<char>(pData[i++]);
+        const auto tagType = static_cast<char>(pData[i++]);
         switch (tagType) {
             case 'A' :
             case 'a' :
@@ -173,7 +173,7 @@ TagCollection BamTagCodec::Decode(const std::vector<uint8_t>& data)
 
 std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
 {
-    kstring_t str = { 0, 0, NULL };
+    kstring_t str = { 0, 0, nullptr };
 
     const auto tagEnd  = tags.cend();
     for (auto tagIter = tags.cbegin(); tagIter != tagEnd; ++tagIter) {
@@ -330,7 +330,7 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
     using internal::readBamValue;
 
     size_t offset = 0;
-    const char tagType = static_cast<char>(*rawData++);
+    const auto tagType = static_cast<char>(*rawData++);
     switch (tagType) {
         case 'A' :
         case 'a' :
@@ -392,7 +392,7 @@ std::vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag,
                                             const TagModifier& additionalModifier)
 {
     // temp raw data destination (for use with htslib methods)
-    kstring_t str = { 0, 0, NULL };
+    kstring_t str = { 0, 0, nullptr };
 
     // "<TYPE>:<DATA>" for printable, ASCII char
     if (tag.HasModifier(TagModifier::ASCII_CHAR) || additionalModifier == TagModifier::ASCII_CHAR) {

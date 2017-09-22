@@ -48,7 +48,6 @@
 namespace PacBio {
 namespace BAM {
 
-Tag::Tag(void)           : data_(),      modifier_(TagModifier::NONE) { }
 Tag::Tag(int8_t value)   : data_(value), modifier_(TagModifier::NONE) { }
 Tag::Tag(uint8_t value)  : data_(value), modifier_(TagModifier::NONE) { }
 Tag::Tag(int16_t value)  : data_(value), modifier_(TagModifier::NONE) { }

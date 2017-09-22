@@ -66,11 +66,11 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    IndexedFastaReader(void) = delete;
+    IndexedFastaReader() = delete;
     IndexedFastaReader(const std::string& filename);
     IndexedFastaReader(const IndexedFastaReader& src);
     IndexedFastaReader& operator=(const IndexedFastaReader& rhs);
-    ~IndexedFastaReader(void);
+    ~IndexedFastaReader();
 
     /// \}
 
@@ -150,10 +150,10 @@ public:
     std::string Name(const size_t idx) const;
     
     /// \returns the names of all sequences stored in the FASTA file
-    std::vector<std::string> Names(void) const;
+    std::vector<std::string> Names() const;
 
     /// \returns number of sequences stored in FASTA file
-    int NumSequences(void) const;
+    int NumSequences() const;
 
     /// \returns length of FASTA sequence
     ///
@@ -168,7 +168,7 @@ private:
     faidx_t* handle_;
 
 private:
-    void Close(void);
+    void Close();
     bool Open(const std::string& filename);
 };
 
