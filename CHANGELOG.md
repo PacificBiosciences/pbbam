@@ -10,8 +10,15 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
-## [0.12.1]
-- Added pulse exclusion base feature to read group.
+## [0.12.2] - 2017-09-22
+
+### Added 
+- HasPulseExclusion() to BamRecord (& derived types). 
+
+## [0.12.1] - 2017-09-21
+
+### Added
+- Pulse exclusion base feature to read group.
 
 ## [0.12.0] - 2017-09-19
 
