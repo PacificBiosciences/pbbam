@@ -10,6 +10,7 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+<<<<<<< HEAD
 ## [0.12.2] - 2017-09-22
 
 ### Added 
