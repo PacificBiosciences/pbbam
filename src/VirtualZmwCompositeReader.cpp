@@ -70,8 +70,8 @@ VirtualZmwCompositeReader::VirtualZmwCompositeReader(const DataSet& dataset)
             primaryFn = dataset.ResolvePath(resource.ResourceId());
 
             // check for associated scraps file
-            const ExternalResources& childResources = resource.ExternalResources();
-            for (const ExternalResource& childResource : childResources) {
+            const auto& childResources = resource.ExternalResources();
+            for (const auto& childResource : childResources) {
                 const auto& childMetatype = childResource.MetaType();
                 if (childMetatype == "PacBio.SubreadFile.ScrapsBamFile" ||
                     childMetatype == "PacBio.SubreadFile.HqScrapsBamFile")
@@ -85,7 +85,7 @@ VirtualZmwCompositeReader::VirtualZmwCompositeReader(const DataSet& dataset)
 
         // queue up source for later
         if (!primaryFn.empty() && !scrapsFn.empty())
-            sources_.push_back(make_pair(primaryFn,scrapsFn));
+            sources_.emplace_back(std::make_pair(primaryFn,scrapsFn));
     }
 
     // open first available source
@@ -140,9 +140,9 @@ void VirtualZmwCompositeReader::OpenNextReader()
         const auto nextSource = sources_.front();
         sources_.pop_front();
 
-        currentReader_.reset(new VirtualZmwReader(nextSource.first,
-                                                  nextSource.second,
-                                                  filter_));
+        currentReader_ = std::make_unique<VirtualZmwReader>(nextSource.first,
+                                                            nextSource.second,
+                                                            filter_);
         if (currentReader_->HasNext())
             return;
     }

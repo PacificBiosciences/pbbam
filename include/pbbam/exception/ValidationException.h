@@ -65,12 +65,9 @@ public:
     using ErrorMap  = std::map<std::string, ErrorList>;
 
 public:
-    ValidationException(const ErrorMap& fileErrors,
-                        const ErrorMap& readGroupErrors,
-                        const ErrorMap& recordErrors);
-    ValidationException(ErrorMap&& fileErrors,
-                        ErrorMap&& readGroupErrors,
-                        ErrorMap&& recordErrors);
+    ValidationException(ErrorMap fileErrors,
+                        ErrorMap readGroupErrors,
+                        ErrorMap recordErrors);
 
     // This is a work around for the Intel PHI compiler (icpc)
     ~ValidationException() throw()

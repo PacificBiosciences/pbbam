@@ -102,7 +102,7 @@ public:
 
             // queue up source for later
             if (!primaryFn.empty() && !scrapsFn.empty())
-                sources_.push_back(make_pair(primaryFn,scrapsFn));
+                sources_.emplace_back(make_pair(primaryFn,scrapsFn));
         }
 
         OpenNextReader();
@@ -167,9 +167,9 @@ private:
             const auto nextSource = sources_.front();
             sources_.pop_front();
 
-            currentReader_.reset(new internal::VirtualZmwReader(nextSource.first,
-                                                                nextSource.second,
-                                                                filter_));
+            currentReader_ = std::make_unique<internal::VirtualZmwReader>(nextSource.first,
+                                                                          nextSource.second,
+                                                                          filter_);
             if (currentReader_->HasNext())
                 return;
         }

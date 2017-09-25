@@ -93,9 +93,8 @@ public:
 
     /// Copy and Move constructors are disabled
     SamWriter(const SamWriter&) = delete;
-    SamWriter& operator=(const SamWriter&) = delete;
-
     SamWriter(SamWriter&&) = delete;
+    SamWriter& operator=(const SamWriter&) = delete;
     SamWriter& operator=(SamWriter&&) = delete;
 
 public:

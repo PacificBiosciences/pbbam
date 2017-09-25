@@ -59,22 +59,22 @@ VirtualZmwReader::VirtualZmwReader(const std::string& primaryBamFilepath,
                                    const std::string& scrapsBamFilepath,
                                    const PbiFilter& filter)
 {
-    primaryBamFile_.reset(new BamFile{ primaryBamFilepath });
-    scrapsBamFile_.reset(new BamFile{ scrapsBamFilepath });
+    primaryBamFile_ = std::make_unique<BamFile>(primaryBamFilepath);
+    scrapsBamFile_ = std::make_unique<BamFile>(scrapsBamFilepath);
 
     if (filter.IsEmpty()) {
-        primaryQuery_.reset(new EntireFileQuery(*primaryBamFile_));
-        scrapsQuery_.reset(new EntireFileQuery(*scrapsBamFile_));
+        primaryQuery_ = std::make_unique<EntireFileQuery>(*primaryBamFile_);
+        scrapsQuery_ = std::make_unique<EntireFileQuery>(*scrapsBamFile_);
     }
     else {
-        primaryQuery_.reset(new PbiFilterQuery{ filter, *primaryBamFile_ });
-        scrapsQuery_.reset(new PbiFilterQuery{ filter, *scrapsBamFile_ });
+        primaryQuery_ = std::make_unique<PbiFilterQuery>(filter, *primaryBamFile_);
+        scrapsQuery_ = std::make_unique<PbiFilterQuery>(filter, *scrapsBamFile_);
     }
 
     primaryIt_ = (primaryQuery_->begin());
     scrapsIt_ = (scrapsQuery_->begin());
 
-    stitchedHeader_.reset(new BamHeader{ primaryBamFile_->Header().ToSam() });
+    stitchedHeader_ = std::make_unique<BamHeader>(primaryBamFile_->Header().ToSam());
 
     // update stitched read group in header
     auto readGroups = stitchedHeader_->ReadGroups();

@@ -62,7 +62,7 @@ public:
         , scrapsReader_(new PbiIndexedBamReader{ *scrapsBamFile_ })
     {
         // setup new header for stitched data
-        polyHeader_ = std::unique_ptr<BamHeader>(new BamHeader(primaryBamFile_->Header().ToSam()));
+        polyHeader_ = std::make_unique<BamHeader>(primaryBamFile_->Header().ToSam());
         auto readGroups = polyHeader_->ReadGroups();
         if (readGroups.empty())
             throw std::runtime_error("Bam header of the primary bam has no read groups.");

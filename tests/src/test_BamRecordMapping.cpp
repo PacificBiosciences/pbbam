@@ -51,7 +51,7 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-typedef vector<uint16_t> f_data;
+using f_data = vector<uint16_t>;
 
 namespace BamRecordMappingTests {
 

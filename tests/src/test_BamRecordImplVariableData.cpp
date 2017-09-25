@@ -605,9 +605,9 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_Preencoded_EmptyQual) {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "";
 
-    const size_t encodedLength = static_cast<size_t>((sequence.size()+1)/2);
-    char* encoded = (char*)::calloc(encodedLength, sizeof(char));
-    char* e = encoded;
+    const auto encodedLength = static_cast<size_t>((sequence.size()+1)/2);
+    auto* encoded = (char*)::calloc(encodedLength, sizeof(char));
+    auto* e = encoded;
 
     uint8_t nucleotideCode{};
     bool useHighWord = true;

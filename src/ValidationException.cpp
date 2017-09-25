@@ -46,20 +46,9 @@
 namespace PacBio {
 namespace BAM {
 
-ValidationException::ValidationException(const ErrorMap& fileErrors,
-                                         const ErrorMap& readGroupErrors,
-                                         const ErrorMap& recordErrors)
-    : std::runtime_error("")
-    , fileErrors_(fileErrors)
-    , readGroupErrors_(readGroupErrors)
-    , recordErrors_(recordErrors)
-{
-    FormatMessage();
-}
-
-ValidationException::ValidationException(ErrorMap&& fileErrors,
-                                         ErrorMap&& readGroupErrors,
-                                         ErrorMap&& recordErrors)
+ValidationException::ValidationException(ErrorMap fileErrors,
+                                         ErrorMap readGroupErrors,
+                                         ErrorMap recordErrors)
     : std::runtime_error("")
     , fileErrors_(std::move(fileErrors))
     , readGroupErrors_(std::move(readGroupErrors))

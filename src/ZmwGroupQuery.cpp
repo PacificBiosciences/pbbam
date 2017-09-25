@@ -55,8 +55,7 @@ namespace BAM {
 
 struct ZmwGroupQuery::ZmwGroupQueryPrivate
 {
-    typedef PbiFilterCompositeBamReader<Compare::Zmw> ReaderType;
-    typedef std::unique_ptr<ReaderType> ReaderPtr;
+    using ReaderType = PbiFilterCompositeBamReader<Compare::Zmw>;
 
     ZmwGroupQueryPrivate(const std::vector<int32_t>& zmwWhitelist,
                          const DataSet& dataset)
@@ -69,7 +68,7 @@ struct ZmwGroupQuery::ZmwGroupQueryPrivate
                          whitelist_.end());
 
         if (!whitelist_.empty()) {
-            reader_ = ReaderPtr(new ReaderType(PbiZmwFilter{whitelist_.front()}, dataset));
+            reader_ = std::make_unique<ReaderType>(PbiZmwFilter{whitelist_.front()}, dataset);
             whitelist_.pop_front();
         }
     }
@@ -99,7 +98,7 @@ struct ZmwGroupQuery::ZmwGroupQueryPrivate
     }
 
     std::deque<int32_t> whitelist_;
-    ReaderPtr reader_;
+    std::unique_ptr<ReaderType> reader_;
 };
 
 ZmwGroupQuery::ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist,

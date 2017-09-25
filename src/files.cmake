@@ -200,7 +200,6 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/GenomicInterval.cpp
     ${PacBioBAM_SourceDir}/GenomicIntervalQuery.cpp
     ${PacBioBAM_SourceDir}/IndexedFastaReader.cpp
-    ${PacBioBAM_SourceDir}/IRecordWriter.cpp
     ${PacBioBAM_SourceDir}/MD5.cpp
     ${PacBioBAM_SourceDir}/MemoryUtils.cpp
     ${PacBioBAM_SourceDir}/PbiBuilder.cpp

@@ -61,7 +61,7 @@ pbindexdump::Settings fromCommandLine(optparse::OptionParser& parser,
         settings.inputPbiFilename_ = parser.args().front();
     else {
         assert(numPositionalArgs > 1);
-        settings.errors_.push_back("pbindexdump does not support more than one input file per run");
+        settings.errors_.emplace_back("pbindexdump does not support more than one input file per run");
     }
 
     // output format
@@ -78,7 +78,7 @@ pbindexdump::Settings fromCommandLine(optparse::OptionParser& parser,
         if (options.is_set("json_indent_level") ||
             options.is_set("json_raw"))
         {
-            settings.errors_.push_back("JSON formatting options not valid on non-JSON output");
+            settings.errors_.emplace_back("JSON formatting options not valid on non-JSON output");
         }
     }
 
