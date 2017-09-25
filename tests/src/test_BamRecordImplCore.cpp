@@ -69,7 +69,7 @@ struct Bam1Deleter
 };
 
 static
-BamRecordImpl CreateBamImpl(void)
+BamRecordImpl CreateBamImpl()
 {
     BamRecordImpl bam;
     bam.Bin(42);

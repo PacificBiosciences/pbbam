@@ -93,7 +93,7 @@ BamRecord makeRecord(const Position qStart,
 }
 
 static
-std::vector<BamRecord> makeMappedRecords(void)
+std::vector<BamRecord> makeMappedRecords()
 {
     const Position qStart = 500;
     const Position qEnd   = 510;

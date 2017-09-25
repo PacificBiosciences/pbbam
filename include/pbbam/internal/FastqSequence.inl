@@ -44,21 +44,21 @@
 namespace PacBio {
 namespace BAM {
 
-inline FastqSequence::FastqSequence(const std::string& name,
-                                    const std::string& bases,
-                                    const QualityValues& qualities)
-    : FastaSequence{name, bases}
-    , qualities_{qualities}
+inline FastqSequence::FastqSequence(std::string name,
+                                    std::string bases,
+                                    QualityValues qualities)
+    : FastaSequence{std::move(name), std::move(bases)}
+    , qualities_{std::move(qualities)}
 { }
 
-inline FastqSequence::FastqSequence(const std::string& name,
-                                    const std::string& bases,
-                                    const std::string& qualities)
-    : FastaSequence{name, bases}
+inline FastqSequence::FastqSequence(std::string name,
+                                    std::string bases,
+                                    std::string qualities)
+    : FastaSequence{std::move(name), std::move(bases)}
     , qualities_{QualityValues::FromFastq(qualities)}
 { }
 
-inline QualityValues FastqSequence::Qualities(void) const
+inline QualityValues FastqSequence::Qualities() const
 { return qualities_; }
 
 } // namespace BAM

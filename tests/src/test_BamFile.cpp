@@ -48,6 +48,7 @@
 
 #include <pbbam/BamFile.h>
 #include <pbbam/EntireFileQuery.h>
+#include <pbbam/Unused.h>
 #include <pbbam/../../src/FileUtils.h>
 
 using namespace PacBio;
@@ -62,7 +63,7 @@ void CheckFile(const T& input, const size_t expectedCount)
     size_t observedCount = 0;
     EntireFileQuery entireFile(input);
     for (const BamRecord& r : entireFile) {
-        (void)r;
+        UNUSED(r);
         ++observedCount;
     }
     EXPECT_EQ(expectedCount, observedCount);

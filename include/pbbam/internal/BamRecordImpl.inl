@@ -44,55 +44,55 @@
 namespace PacBio {
 namespace BAM {
 
-inline uint32_t BamRecordImpl::Bin(void) const
+inline uint32_t BamRecordImpl::Bin() const
 { return d_->core.bin; }
 
 inline BamRecordImpl& BamRecordImpl::Bin(uint32_t bin)
 { d_->core.bin = bin; return *this; }
 
-inline uint32_t BamRecordImpl::Flag(void) const
+inline uint32_t BamRecordImpl::Flag() const
 { return d_->core.flag; }
 
 inline BamRecordImpl& BamRecordImpl::Flag(uint32_t flag)
 { d_->core.flag = flag; return *this; }
 
-inline int32_t BamRecordImpl::InsertSize(void) const
+inline int32_t BamRecordImpl::InsertSize() const
 { return d_->core.isize; }
 
 inline BamRecordImpl& BamRecordImpl::InsertSize(int32_t iSize)
 { d_->core.isize = iSize; return *this; }
 
-inline uint8_t BamRecordImpl::MapQuality(void) const
+inline uint8_t BamRecordImpl::MapQuality() const
 { return d_->core.qual; }
 
 inline BamRecordImpl& BamRecordImpl::MapQuality(uint8_t mapQual)
 { d_->core.qual = mapQual; return *this; }
 
-inline PacBio::BAM::Position BamRecordImpl::MatePosition(void) const
+inline PacBio::BAM::Position BamRecordImpl::MatePosition() const
 { return d_->core.mpos; }
 
 inline BamRecordImpl& BamRecordImpl::MatePosition(PacBio::BAM::Position pos)
 { d_->core.mpos = pos; return *this; }
 
-inline int32_t BamRecordImpl::MateReferenceId(void) const
+inline int32_t BamRecordImpl::MateReferenceId() const
 { return d_->core.mtid; }
 
 inline BamRecordImpl& BamRecordImpl::MateReferenceId(int32_t id)
 { d_->core.mtid = id; return *this; }
 
-inline PacBio::BAM::Position BamRecordImpl::Position(void) const
+inline PacBio::BAM::Position BamRecordImpl::Position() const
 { return d_->core.pos; }
 
 inline BamRecordImpl& BamRecordImpl::Position(PacBio::BAM::Position pos)
 { d_->core.pos = pos; return *this; }
 
-inline int32_t BamRecordImpl::ReferenceId(void) const
+inline int32_t BamRecordImpl::ReferenceId() const
 { return d_->core.tid; }
 
 inline BamRecordImpl& BamRecordImpl::ReferenceId(int32_t id)
 { d_->core.tid = id; return *this; }
 
-inline bool BamRecordImpl::IsDuplicate(void) const
+inline bool BamRecordImpl::IsDuplicate() const
 { return (d_->core.flag & BamRecordImpl::DUPLICATE) != 0; }
 
 inline BamRecordImpl& BamRecordImpl::SetDuplicate(bool ok)
@@ -102,7 +102,7 @@ inline BamRecordImpl& BamRecordImpl::SetDuplicate(bool ok)
     return *this;
 }
 
-inline bool BamRecordImpl::IsFailedQC(void) const
+inline bool BamRecordImpl::IsFailedQC() const
 { return (d_->core.flag & BamRecordImpl::FAILED_QC) != 0; }
 
 inline BamRecordImpl& BamRecordImpl::SetFailedQC(bool ok)
@@ -112,7 +112,7 @@ inline BamRecordImpl& BamRecordImpl::SetFailedQC(bool ok)
     return *this;
 }
 
-inline bool BamRecordImpl::IsFirstMate(void) const
+inline bool BamRecordImpl::IsFirstMate() const
 { return (d_->core.flag & BamRecordImpl::MATE_1) != 0; }
 
 inline BamRecordImpl& BamRecordImpl::SetFirstMate(bool ok)
@@ -122,7 +122,7 @@ inline BamRecordImpl& BamRecordImpl::SetFirstMate(bool ok)
     return *this;
 }
 
-inline bool BamRecordImpl::IsMapped(void) const
+inline bool BamRecordImpl::IsMapped() const
 { return (d_->core.flag & BamRecordImpl::UNMAPPED) == 0; }
 
 inline BamRecordImpl& BamRecordImpl::SetMapped(bool ok)
@@ -132,7 +132,7 @@ inline BamRecordImpl& BamRecordImpl::SetMapped(bool ok)
     return *this;
 }
 
-inline bool BamRecordImpl::IsMateMapped(void) const
+inline bool BamRecordImpl::IsMateMapped() const
 { return (d_->core.flag & BamRecordImpl::MATE_UNMAPPED) == 0; }
 
 inline BamRecordImpl& BamRecordImpl::SetMateMapped(bool ok)
@@ -142,7 +142,7 @@ inline BamRecordImpl& BamRecordImpl::SetMateMapped(bool ok)
     return *this;
 }
 
-inline bool BamRecordImpl::IsMateReverseStrand(void) const
+inline bool BamRecordImpl::IsMateReverseStrand() const
 { return (d_->core.flag & BamRecordImpl::MATE_REVERSE_STRAND) != 0; }
 
 inline BamRecordImpl& BamRecordImpl::SetMateReverseStrand(bool ok)
@@ -152,7 +152,7 @@ inline BamRecordImpl& BamRecordImpl::SetMateReverseStrand(bool ok)
     return *this;
 }
 
-inline bool BamRecordImpl::IsPaired(void) const
+inline bool BamRecordImpl::IsPaired() const
 { return (d_->core.flag & BamRecordImpl::PAIRED) != 0; }
 
 inline BamRecordImpl& BamRecordImpl::SetPaired(bool ok)
@@ -162,7 +162,7 @@ inline BamRecordImpl& BamRecordImpl::SetPaired(bool ok)
     return *this;
 }
 
-inline bool BamRecordImpl::IsPrimaryAlignment(void) const
+inline bool BamRecordImpl::IsPrimaryAlignment() const
 { return (d_->core.flag & BamRecordImpl::SECONDARY) == 0; }
 
 inline BamRecordImpl& BamRecordImpl::SetPrimaryAlignment(bool ok)
@@ -172,7 +172,7 @@ inline BamRecordImpl& BamRecordImpl::SetPrimaryAlignment(bool ok)
     return *this;
 }
 
-inline bool BamRecordImpl::IsProperPair(void) const
+inline bool BamRecordImpl::IsProperPair() const
 { return (d_->core.flag & BamRecordImpl::PROPER_PAIR) != 0; }
 
 inline BamRecordImpl& BamRecordImpl::SetProperPair(bool ok)
@@ -182,7 +182,7 @@ inline BamRecordImpl& BamRecordImpl::SetProperPair(bool ok)
     return *this;
 }
 
-inline bool BamRecordImpl::IsReverseStrand(void) const
+inline bool BamRecordImpl::IsReverseStrand() const
 { return (d_->core.flag & BamRecordImpl::REVERSE_STRAND) != 0; }
 
 inline BamRecordImpl& BamRecordImpl::SetReverseStrand(bool ok)
@@ -192,7 +192,7 @@ inline BamRecordImpl& BamRecordImpl::SetReverseStrand(bool ok)
     return *this;
 }
 
-inline bool BamRecordImpl::IsSecondMate(void) const
+inline bool BamRecordImpl::IsSecondMate() const
 { return (d_->core.flag & BamRecordImpl::MATE_2) != 0; }
 
 inline BamRecordImpl& BamRecordImpl::SetSecondMate(bool ok)
@@ -202,7 +202,7 @@ inline BamRecordImpl& BamRecordImpl::SetSecondMate(bool ok)
     return *this;
 }
 
-inline bool BamRecordImpl::IsSupplementaryAlignment(void) const
+inline bool BamRecordImpl::IsSupplementaryAlignment() const
 { return (d_->core.flag & BamRecordImpl::SUPPLEMENTARY) != 0; }
 
 inline BamRecordImpl& BamRecordImpl::SetSupplementaryAlignment(bool ok)

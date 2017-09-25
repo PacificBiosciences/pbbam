@@ -48,22 +48,21 @@
 namespace PacBio {
 namespace BAM {
 
-Tag::Tag(void)           : data_(),      modifier_(TagModifier::NONE) { }
-Tag::Tag(int8_t value)   : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(uint8_t value)  : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(int16_t value)  : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(uint16_t value) : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(int32_t value)  : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(uint32_t value) : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(float value)    : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const std::string& value)      : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const std::vector<int8_t>& value)   : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const std::vector<uint8_t>& value)  : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const std::vector<int16_t>& value)  : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const std::vector<uint16_t>& value) : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const std::vector<int32_t>& value)  : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const std::vector<uint32_t>& value) : data_(value), modifier_(TagModifier::NONE) { }
-Tag::Tag(const std::vector<float>& value)    : data_(value), modifier_(TagModifier::NONE) { }
+Tag::Tag(int8_t value)   : data_(value) { }
+Tag::Tag(uint8_t value)  : data_(value) { }
+Tag::Tag(int16_t value)  : data_(value) { }
+Tag::Tag(uint16_t value) : data_(value) { }
+Tag::Tag(int32_t value)  : data_(value) { }
+Tag::Tag(uint32_t value) : data_(value) { }
+Tag::Tag(float value)    : data_(value) { }
+Tag::Tag(const std::string& value)      : data_(value) { }
+Tag::Tag(const std::vector<int8_t>& value)   : data_(value) { }
+Tag::Tag(const std::vector<uint8_t>& value)  : data_(value) { }
+Tag::Tag(const std::vector<int16_t>& value)  : data_(value) { }
+Tag::Tag(const std::vector<uint16_t>& value) : data_(value) { }
+Tag::Tag(const std::vector<int32_t>& value)  : data_(value) { }
+Tag::Tag(const std::vector<uint32_t>& value) : data_(value) { }
+Tag::Tag(const std::vector<float>& value)    : data_(value) { }
 
 Tag::Tag(int8_t value, const TagModifier mod)
     : data_(value)

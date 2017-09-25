@@ -65,7 +65,7 @@ BarcodeQuery::BarcodeQuery(const int16_t barcode,
     , d_(new BarcodeQueryPrivate(barcode, dataset))
 { }
 
-BarcodeQuery::~BarcodeQuery(void) { }
+BarcodeQuery::~BarcodeQuery() { }
 
 bool BarcodeQuery::GetNext(BamRecord &r)
 { return d_->reader_.GetNext(r); }

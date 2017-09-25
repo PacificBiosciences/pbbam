@@ -70,12 +70,12 @@ public:
 
     VirtualZmwCompositeReader(const DataSet& dataset);
 
-    VirtualZmwCompositeReader(void) = delete;
+    VirtualZmwCompositeReader() = delete;
     VirtualZmwCompositeReader(const VirtualZmwCompositeReader&) = delete;
     VirtualZmwCompositeReader(VirtualZmwCompositeReader&&) = delete;
     VirtualZmwCompositeReader& operator=(const VirtualZmwCompositeReader&) = delete;
     VirtualZmwCompositeReader& operator=(VirtualZmwCompositeReader&&) = delete;
-    ~VirtualZmwCompositeReader(void) = default;
+    ~VirtualZmwCompositeReader() = default;
 
     /// \}
 
@@ -84,16 +84,16 @@ public:
     ///
 
     /// \returns true if more ZMWs/files are available for reading.
-    bool HasNext(void);
+    bool HasNext();
 
     /// \returns the next stitched polymerase read
-    VirtualZmwBamRecord Next(void);
+    VirtualZmwBamRecord Next();
 
     /// \returns the next set of reads that belong to one ZMW from one %BAM
     ///          resource (a primary %BAM and/or its scraps file). This enables
     ///          stitching records in a distinct thread.
     ///
-    std::vector<BamRecord> NextRaw(void);
+    std::vector<BamRecord> NextRaw();
 
     /// \}
 
@@ -103,7 +103,7 @@ private:
     PbiFilter filter_;
 
 private:
-    void OpenNextReader(void);
+    void OpenNextReader();
 };
 
 } // namespace internal

@@ -63,7 +63,7 @@ GenomicIntervalQuery::GenomicIntervalQuery(const GenomicInterval& interval,
     , d_(new GenomicIntervalQueryPrivate(interval, dataset))
 { }
 
-GenomicIntervalQuery::~GenomicIntervalQuery(void) { }
+GenomicIntervalQuery::~GenomicIntervalQuery() { }
 
 bool GenomicIntervalQuery::GetNext(BamRecord &r)
 { return d_->reader_.GetNext(r); }
@@ -71,7 +71,7 @@ bool GenomicIntervalQuery::GetNext(BamRecord &r)
 GenomicIntervalQuery& GenomicIntervalQuery::Interval(const GenomicInterval& interval)
 { d_->reader_.Interval(interval); return *this; }
 
-const GenomicInterval& GenomicIntervalQuery::Interval(void) const
+const GenomicInterval& GenomicIntervalQuery::Interval() const
 { return d_->reader_.Interval(); }
 
 } // namespace BAM

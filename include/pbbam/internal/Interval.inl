@@ -45,7 +45,7 @@ namespace PacBio {
 namespace BAM {
 
 template<typename T>
-inline Interval<T>::Interval(void)
+inline Interval<T>::Interval()
     : data_(boost::icl::discrete_interval<T>::right_open(0,0))
 { }
 
@@ -85,15 +85,15 @@ inline bool Interval<T>::Intersects(const Interval<T>& other) const
 { return boost::icl::intersects(data_, other.data_); }
 
 template<typename T>
-inline bool Interval<T>::IsValid(void) const
+inline bool Interval<T>::IsValid() const
 { return !boost::icl::is_empty(data_); }
 
 template<typename T>
-inline size_t Interval<T>::Length(void) const
+inline size_t Interval<T>::Length() const
 { return boost::icl::length(data_); }
 
 template<typename T>
-inline T Interval<T>::Start(void) const
+inline T Interval<T>::Start() const
 { return data_.lower(); }
 
 template<typename T>
@@ -104,7 +104,7 @@ inline Interval<T>& Interval<T>::Start(const T& start)
 }
 
 template<typename T>
-inline T Interval<T>::Stop(void) const
+inline T Interval<T>::Stop() const
 { return data_.upper(); }
 
 template<typename T>

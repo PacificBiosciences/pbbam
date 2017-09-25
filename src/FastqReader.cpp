@@ -72,7 +72,7 @@ public:
     }
 
 private:
-    void FetchNext(void)
+    void FetchNext()
     {
         name_.clear();
         bases_.clear();
@@ -89,23 +89,23 @@ private:
         ReadQuals();
     }
 
-    inline void SkipNewlines(void)
+    inline void SkipNewlines()
      {
          if (stream_.peek() == '\n')
              stream_.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
      }
 
-     void ReadName(void) {
+     void ReadName() {
          if (stream_.get() == '@')
              std::getline(stream_, name_,  '\n');
      }
 
-     void ReadBases(void)
+     void ReadBases()
      {
          std::getline(stream_, bases_,  '\n');
      }
 
-     void ReadQuals(void)
+     void ReadQuals()
      {
          std::getline(stream_, quals_,  '\n');
      }
@@ -135,7 +135,7 @@ FastqReader& FastqReader::operator=(FastqReader&& other)
     return *this;
 }
 
-FastqReader::~FastqReader(void) { }
+FastqReader::~FastqReader() { }
 
 bool FastqReader::GetNext(FastqSequence& record)
 { return d_->GetNext(record); }

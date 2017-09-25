@@ -63,11 +63,14 @@ namespace internal {
 class PbiIndexPrivate
 {
 public:
-    PbiIndexPrivate(void);
+    PbiIndexPrivate() = default;
     PbiIndexPrivate(const PbiRawData& rawIndex);
     PbiIndexPrivate(PbiRawData&& rawIndex);
 
-    std::unique_ptr<PbiIndexPrivate> DeepCopy(void) const;
+    PbiIndexPrivate(const PbiIndexPrivate&) = delete;
+    PbiIndexPrivate& operator=(const PbiIndexPrivate&) = delete;
+
+    std::unique_ptr<PbiIndexPrivate> DeepCopy() const;
 
 public:
     bool HasSection(const PbiFile::Section flag) const;
@@ -81,20 +84,15 @@ private:
 
 public:
     std::string filename_;
-    PbiFile::VersionEnum version_;
-    PbiFile::Sections sections_;
-    uint32_t numReads_;
+    PbiFile::VersionEnum version_ = PbiFile::CurrentVersion;
+    PbiFile::Sections sections_ = PbiFile::BASIC;
+    uint32_t numReads_ = 0;
 
     // lookup structures
     BasicLookupData     basicData_;
     MappedLookupData    mappedData_;
     ReferenceLookupData referenceData_;
     BarcodeLookupData   barcodeData_;
-
-private:
-    // not-implemented - ensure no copy
-    PbiIndexPrivate(const PbiIndexPrivate& other);
-    PbiIndexPrivate& operator=(const PbiIndexPrivate& other);
 };
 
 inline bool PbiIndexPrivate::HasSection(const PbiFile::Section flag) const
@@ -128,37 +126,37 @@ PbiIndexPrivate::MergeBlocksWithOffsets(const IndexList& indices) const
 
 } // namespace internal
 
-inline PbiFile::Sections PbiIndex::FileSections(void) const
+inline PbiFile::Sections PbiIndex::FileSections() const
 { return d_->sections_; }
 
-inline bool PbiIndex::HasBarcodeData(void) const
+inline bool PbiIndex::HasBarcodeData() const
 { return d_->HasSection(PbiFile::BARCODE); }
 
-inline bool PbiIndex::HasMappedData(void) const
+inline bool PbiIndex::HasMappedData() const
 { return d_->HasSection(PbiFile::MAPPED); }
 
-inline bool PbiIndex::HasReferenceData(void) const
+inline bool PbiIndex::HasReferenceData() const
 { return d_->HasSection(PbiFile::REFERENCE); }
 
 inline bool PbiIndex::HasSection(const PbiFile::Section section) const
 { return d_->HasSection(section); }
 
-inline uint32_t PbiIndex::NumReads(void) const
+inline uint32_t PbiIndex::NumReads() const
 { return d_->numReads_; }
 
-inline PbiFile::VersionEnum PbiIndex::Version(void) const
+inline PbiFile::VersionEnum PbiIndex::Version() const
 { return d_->version_; }
 
-inline const BarcodeLookupData& PbiIndex::BarcodeData(void) const
+inline const BarcodeLookupData& PbiIndex::BarcodeData() const
 { return d_->barcodeData_; }
 
-inline const BasicLookupData& PbiIndex::BasicData(void) const
+inline const BasicLookupData& PbiIndex::BasicData() const
 { return d_->basicData_; }
 
-inline const MappedLookupData& PbiIndex::MappedData(void) const
+inline const MappedLookupData& PbiIndex::MappedData() const
 { return d_->mappedData_; }
 
-inline const ReferenceLookupData& PbiIndex::ReferenceData(void) const
+inline const ReferenceLookupData& PbiIndex::ReferenceData() const
 { return d_->referenceData_; }
 
 } // namespace BAM

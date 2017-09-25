@@ -90,7 +90,7 @@ std::string ToDataSetFormat(const std::chrono::system_clock::time_point& tp)
 }
 
 inline
-std::chrono::system_clock::time_point CurrentTime(void)
+std::chrono::system_clock::time_point CurrentTime()
 { return std::chrono::system_clock::now(); }
 
 } // namespace PacBio

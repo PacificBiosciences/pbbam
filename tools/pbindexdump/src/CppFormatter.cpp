@@ -105,7 +105,7 @@ CppFormatter::CppFormatter(const Settings& settings)
     : IFormatter(settings)
 { }
 
-void CppFormatter::Run(void)
+void CppFormatter::Run()
 {
     using namespace PacBio::BAM;
 

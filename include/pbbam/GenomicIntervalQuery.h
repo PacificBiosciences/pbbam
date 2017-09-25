@@ -75,7 +75,7 @@ public:
     ///
     GenomicIntervalQuery(const GenomicInterval& interval,
                          const PacBio::BAM::DataSet& dataset);
-    ~GenomicIntervalQuery(void);
+    ~GenomicIntervalQuery() override;
 
 public:
     /// \brief Main iteration point for record access.
@@ -83,7 +83,7 @@ public:
     /// Most client code should not need to use this method directly. Use
     /// iterators instead.
     ///
-    bool GetNext(BamRecord& r);
+    bool GetNext(BamRecord& r) override;
 
 public:
     /// \brief Sets a new genomic interval.
@@ -99,7 +99,7 @@ public:
     GenomicIntervalQuery& Interval(const GenomicInterval& interval);
 
     /// \returns Current genomic interval active on this query.
-    const GenomicInterval& Interval(void) const;
+    const GenomicInterval& Interval() const;
 
 private:
     struct GenomicIntervalQueryPrivate;

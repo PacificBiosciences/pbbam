@@ -54,6 +54,7 @@
 #include <pbbam/PbiIndex.h>
 #include <pbbam/PbiLookupData.h>
 #include <pbbam/PbiRawData.h>
+#include <pbbam/Unused.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -65,7 +66,7 @@ const string test2BamFn = PbbamTestsConfig::Data_Dir + "/aligned2.bam";
 const string phi29BamFn = PbbamTestsConfig::Data_Dir + "/phi29.bam";
 
 static
-PbiRawData Test2Bam_CoreIndexData(void)
+PbiRawData Test2Bam_CoreIndexData()
 
 {
     PbiRawData rawData;
@@ -109,7 +110,7 @@ PbiRawData Test2Bam_CoreIndexData(void)
 //       content itself is equal. So we'll just track these index values separately, for now at least.
 //
 static
-PbiRawData Test2Bam_ExistingIndex(void)
+PbiRawData Test2Bam_ExistingIndex()
 {
     PbiRawData index = Test2Bam_CoreIndexData();
     index.BasicData().fileOffset_ = { 33816576, 33825163, 33831333, 33834264, 33836542, 33838065, 33849818, 33863499, 33874621, 1392836608 };
@@ -117,7 +118,7 @@ PbiRawData Test2Bam_ExistingIndex(void)
 }
 
 static
-PbiRawData Test2Bam_NewIndex(void)
+PbiRawData Test2Bam_NewIndex()
 {
     PbiRawData index = Test2Bam_CoreIndexData();
     index.BasicData().fileOffset_ = { 33816576, 236126208, 391315456, 469106688, 537067520, 587792384, 867303424, 1182793728, 1449787392, 1582628864 };
@@ -263,8 +264,8 @@ TEST(PacBioIndexTest, CreateFromExistingBam)
     cmd += PacBioIndexTests::test2BamFn;
     cmd += " ";
     cmd += tempBamFn;
-    int cmdResult = system(cmd.c_str());
-    (void)cmdResult;
+    const auto cmdResult = system(cmd.c_str());
+    UNUSED(cmdResult);
 
     BamFile bamFile(tempBamFn);
     PbiFile::CreateFrom(bamFile);
@@ -383,8 +384,8 @@ TEST(PacBioIndexTest, BasicAndBarodeSectionsOnly)
     cmd += PacBioIndexTests::phi29BamFn;
     cmd += " ";
     cmd += tempDir;
-    int cmdResult = system(cmd.c_str());
-    (void)cmdResult;
+    const auto cmdResult = system(cmd.c_str());
+    UNUSED(cmdResult);
 
     BamFile bamFile(tempBamFn);
     PbiFile::CreateFrom(bamFile);
@@ -414,11 +415,9 @@ TEST(PacBioIndexTest, BasicAndBarodeSectionsOnly)
     EXPECT_EQ(expectedBcReverse, barcodeData.bcReverse_);
     EXPECT_EQ(expectedBcQuality, barcodeData.bcQual_);
 
-
     // clean up temp file(s)
     remove(tempBamFn.c_str());
     remove(tempPbiFn.c_str());
-
 }
 
 

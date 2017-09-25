@@ -48,7 +48,7 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
-static std::map<XsdType, NamespaceInfo> DefaultRegistry(void)
+static std::map<XsdType, NamespaceInfo> DefaultRegistry()
 {
     const auto result = std::map<XsdType, NamespaceInfo>
     {
@@ -183,57 +183,24 @@ static const auto elementRegistry = std::unordered_map<std::string, XsdType>
 // NamespaceInfo
 // ---------------
 
-NamespaceInfo::NamespaceInfo(void) { }
-
-NamespaceInfo::NamespaceInfo(const std::string& name,
-                             const std::string& uri)
-    : name_(name)
-    , uri_(uri)
+NamespaceInfo::NamespaceInfo(std::string name,
+                             std::string uri)
+    : name_(std::move(name))
+    , uri_(std::move(uri))
 { }
 
 // -------------------
 // NamespaceRegistry
 // -------------------
 
-NamespaceRegistry::NamespaceRegistry(void)
+NamespaceRegistry::NamespaceRegistry()
     : data_(internal::DefaultRegistry())
-    , defaultXsdType_(XsdType::DATASETS)
 { }
 
-NamespaceRegistry::NamespaceRegistry(const NamespaceRegistry &other)
-    : data_(other.data_)
-    , defaultXsdType_(other.defaultXsdType_)
-{ }
-
-NamespaceRegistry::NamespaceRegistry(NamespaceRegistry &&other)
-    : data_(std::move(other.data_))
-    , defaultXsdType_(std::move(other.defaultXsdType_))
-{ }
-
-NamespaceRegistry& NamespaceRegistry::operator=(const NamespaceRegistry& other)
-{
-    if (this != &other) {
-        data_ = other.data_;
-        defaultXsdType_ = other.defaultXsdType_;
-    }
-    return *this;
-}
-
-NamespaceRegistry& NamespaceRegistry::operator=(NamespaceRegistry&& other)
-{
-    if (this != &other) {
-        data_ = std::move(other.data_);
-        defaultXsdType_ = std::move(other.defaultXsdType_);
-    }
-    return *this;
-}
-
-NamespaceRegistry::~NamespaceRegistry(void) { }
-
-const NamespaceInfo& NamespaceRegistry::DefaultNamespace(void) const
+const NamespaceInfo& NamespaceRegistry::DefaultNamespace() const
 { return Namespace(DefaultXsd()); }
 
-XsdType NamespaceRegistry::DefaultXsd(void) const
+XsdType NamespaceRegistry::DefaultXsd() const
 { return defaultXsdType_; }
 
 const NamespaceInfo& NamespaceRegistry::Namespace(const XsdType& xsd) const
@@ -253,12 +220,11 @@ XsdType NamespaceRegistry::XsdForElement(const std::string& elementLabel) const
 
 XsdType NamespaceRegistry::XsdForUri(const std::string& uri) const
 {
-    std::map<XsdType, NamespaceInfo>::const_iterator iter = data_.cbegin();
-    std::map<XsdType, NamespaceInfo>::const_iterator end  = data_.cend();
-    for ( ; iter != end; ++iter ) {
-        const NamespaceInfo& info = iter->second;
+    for (const auto& entry : data_)
+    {
+        const auto& info = entry.second;
         if (info.Uri() == uri)
-            return iter->first;
+            return entry.first;
     }
     return XsdType::NONE;
 }

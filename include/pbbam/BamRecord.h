@@ -96,15 +96,14 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    BamRecord(void);
-    BamRecord(const BamHeader& header);
-    BamRecord(const BamRecordImpl& impl);
-    BamRecord(BamRecordImpl&& impl);
+    BamRecord();
+    BamRecord(BamHeader header);
+    BamRecord(BamRecordImpl impl);
     BamRecord(const BamRecord& other);
     BamRecord(BamRecord&& other);
     BamRecord& operator=(const BamRecord& other);
     BamRecord& operator=(BamRecord&& other);
-    virtual ~BamRecord(void);
+    virtual ~BamRecord();
 
     /// \}
 
@@ -115,67 +114,67 @@ public:
     /// \returns this record's full name
     /// \sa BamRecordImpl::Name
     ///
-    std::string FullName(void) const;
+    std::string FullName() const;
 
     /// \returns shared pointer to this record's associated BamHeader
-    BamHeader Header(void) const;
+    BamHeader Header() const;
 
     /// \returns ZMW hole number
     /// \throws if missing zm tag & record name does not contain hole number
     ///
-    int32_t HoleNumber(void) const;
+    int32_t HoleNumber() const;
 
     /// \returns this record's LocalContextFlags
-    PacBio::BAM::LocalContextFlags LocalContextFlags(void) const;
+    PacBio::BAM::LocalContextFlags LocalContextFlags() const;
 
     /// \returns this record's movie name
-    std::string MovieName(void) const;
+    std::string MovieName() const;
 
     /// \returns "number of complete passes of the insert"
-    int32_t NumPasses(void) const;
+    int32_t NumPasses() const;
 
     /// \returns the record's query end position, or Sequence().length() if not
     ///          stored
     /// \note QueryEnd is in polymerase read coordinates, NOT genomic
     ///       coordinates.
     ///
-    Position QueryEnd(void) const;
+    Position QueryEnd() const;
 
     /// \returns the record's query start position, or 0 if not stored
     ///
     /// \note QueryStart is in polymerase read coordinates, NOT genomic
     ///       coordinates.
     ///
-    Position QueryStart(void) const;
+    Position QueryStart() const;
 
     /// \returns this record's expected read accuracy [0, 1000]
-    Accuracy ReadAccuracy(void) const;
+    Accuracy ReadAccuracy() const;
 
     /// \returns ReadGroupInfo object for this record
-    ReadGroupInfo ReadGroup(void) const;
+    ReadGroupInfo ReadGroup() const;
 
     /// \returns string ID of this record's read group
     /// \sa ReadGroupInfo::Id
     ///
-    std::string ReadGroupId(void) const;
+    std::string ReadGroupId() const;
 
     /// \returns integer value for this record's read group ID
-    int32_t ReadGroupNumericId(void) const;
+    int32_t ReadGroupNumericId() const;
 
     /// \returns this scrap record's scrap region type
-    VirtualRegionType ScrapRegionType(void) const;
+    VirtualRegionType ScrapRegionType() const;
 
     /// \returns this scrap record's scrap ZMW type
-    ZmwType ScrapZmwType(void) const;
+    ZmwType ScrapZmwType() const;
 
     /// \returns this record's average signal-to-noise for each of A, C, G,
     ///          and T
     ///
-    std::vector<float> SignalToNoise(void) const;
+    std::vector<float> SignalToNoise() const;
 
     /// \returns this record's type
     /// \sa RecordType
-    RecordType Type(void) const;
+    RecordType Type() const;
 
     /// \}
 
@@ -188,17 +187,17 @@ public:
     /// \note AlignedEnd is in polymerase read coordinates, NOT genomic
     ///       coordinates.
     ///
-    Position AlignedEnd(void) const;
+    Position AlignedEnd() const;
 
     /// \returns the record's aligned start position
     ///
     /// \note AlignedStart is in polymerase read coordinates, NOT genomic
     ///       coordinates.
     ///
-    Position AlignedStart(void) const;
+    Position AlignedStart() const;
 
     /// \returns the record's strand as a Strand enum value
-    Strand AlignedStrand(void) const;
+    Strand AlignedStrand() const;
 
     /// \returns the record's CIGAR data as a Cigar object
     ///
@@ -208,41 +207,41 @@ public:
     Cigar CigarData(bool exciseAllClips = false) const;
 
     /// \returns true if this record was mapped by aligner
-    bool IsMapped(void) const;
+    bool IsMapped() const;
 
     /// \returns this record's mapping quality. A value of 255 indicates
     ///          "unknown"
     ///
-    uint8_t MapQuality(void) const;
+    uint8_t MapQuality() const;
 
     /// \returns the number of deleted bases (relative to reference)
-    size_t NumDeletedBases(void) const;
+    size_t NumDeletedBases() const;
 
     /// \returns the number of inserted bases (relative to reference)
-    size_t NumInsertedBases(void) const;
+    size_t NumInsertedBases() const;
 
     /// \returns the number of matching bases (sum of '=' CIGAR op lengths)
-    size_t NumMatches(void) const;
+    size_t NumMatches() const;
 
     /// \returns a tuple containing NumMatches (first) and NumMismatches
     ///         (second)
     ///
-    std::pair<size_t, size_t> NumMatchesAndMismatches(void) const;
+    std::pair<size_t, size_t> NumMatchesAndMismatches() const;
 
     /// \returns the number of mismatching bases (sum of 'X' CIGAR op lengths)
-    size_t NumMismatches(void) const;
+    size_t NumMismatches() const;
 
     /// \returns this record's reference ID, or -1 if unmapped.
     ///
     /// \note This is only a valid identifier within this %BAM file
     ///
-    int32_t ReferenceId(void) const;
+    int32_t ReferenceId() const;
 
     /// \returns this record's reference name.
     ///
     /// \throws an exception if unmapped record.
     ///
-    std::string ReferenceName(void) const;
+    std::string ReferenceName() const;
 
     /// \returns the record's reference end position, or UnmappedPosition if
     ///          unmapped
@@ -250,7 +249,7 @@ public:
     /// \note ReferenceEnd is in reference coordinates, NOT polymerase read
     ///       coordinates.
     ///
-    Position ReferenceEnd(void) const;
+    Position ReferenceEnd() const;
 
     /// \returns the record's reference start position, or UnmappedPosition if
     ///          unmapped
@@ -258,7 +257,7 @@ public:
     /// \note ReferenceStart is in reference coordinates, NOT polymerase read
     ///       coordinates.
     ///
-    Position ReferenceStart(void) const;
+    Position ReferenceStart() const;
 
     /// \}
 
@@ -271,28 +270,28 @@ public:
     /// \throws std::runtime_error if barcode data is absent or malformed.
     /// \sa HasBarcodes
     ///
-    int16_t BarcodeForward(void) const;
+    int16_t BarcodeForward() const;
 
     /// \returns barcode call confidence (Phred-scaled posterior probability
     ///          of correct barcode call)
     ///
     /// \sa HasBarcodeQuality
     ///
-    uint8_t BarcodeQuality(void) const;
+    uint8_t BarcodeQuality() const;
 
     /// \returns reverse barcode id
     ///
     /// \throws std::runtime_error if barcode data is absent or malformed.
     /// \sa HasBarcodes
     ///
-    int16_t BarcodeReverse(void) const;
+    int16_t BarcodeReverse() const;
 
     /// \returns the forward and reverse barcode ids
     ///
     /// \throws std::runtime_error if barcode data is absent or malformed.
     /// \sa HasBarcodes
     ///
-    std::pair<int16_t,int16_t> Barcodes(void) const;
+    std::pair<int16_t,int16_t> Barcodes() const;
 
     /// \}
 
@@ -301,105 +300,105 @@ public:
     /// \{
 
     /// \returns true if this record has AltLabelQV data
-    bool HasAltLabelQV(void) const;
+    bool HasAltLabelQV() const;
 
     /// \returns true if this record has AltLabelTag data
-    bool HasAltLabelTag(void) const;
+    bool HasAltLabelTag() const;
 
     /// \returns true if this record has Barcode data
-    bool HasBarcodes(void) const;
+    bool HasBarcodes() const;
 
     /// \returns true is this record has BarcodeQuality data
-    bool HasBarcodeQuality(void) const;
+    bool HasBarcodeQuality() const;
 
     /// \returns true if this record has DeletionQV data
-    bool HasDeletionQV(void) const;
+    bool HasDeletionQV() const;
 
     /// \returns true if this record has DeletionTag data
-    bool HasDeletionTag(void) const;
+    bool HasDeletionTag() const;
 
     /// \returns true if this record has a HoleNumber
-    bool HasHoleNumber(void) const;
+    bool HasHoleNumber() const;
 
     /// \returns true if this record has InsertionQV data
-    bool HasInsertionQV(void) const;
+    bool HasInsertionQV() const;
 
     /// \returns true if this record has IPD data
-    bool HasIPD(void) const;
+    bool HasIPD() const;
 
     /// \returns true if this record has LabelQV data
-    bool HasLabelQV(void) const;
+    bool HasLabelQV() const;
 
     /// \returns true if this record has LocalContextFlags (absent in CCS)
-    bool HasLocalContextFlags(void) const;
+    bool HasLocalContextFlags() const;
 
     /// \returns true if this record has MergeQV data
-    bool HasMergeQV(void) const;
+    bool HasMergeQV() const;
 
     /// \returns true if this record has NumPasses data
-    bool HasNumPasses(void) const;
+    bool HasNumPasses() const;
 
     /// \returns true if this record has Pkmean data
-    bool HasPkmean(void) const;
+    bool HasPkmean() const;
 
     /// \returns true if this record has Pkmid data
-    bool HasPkmid(void) const;
+    bool HasPkmid() const;
 
     /// \returns true if this record has Pkmean2 data
-    bool HasPkmean2(void) const;
+    bool HasPkmean2() const;
 
     /// \returns true if this record has Pkmid2 data
-    bool HasPkmid2(void) const;
+    bool HasPkmid2() const;
 
     /// \returns true if this record has PreBaseFrames aka IPD data
-    bool HasPreBaseFrames(void) const;
+    bool HasPreBaseFrames() const;
 
     /// \returns true if this record has PrePulseFrames data
-    bool HasPrePulseFrames(void) const;
+    bool HasPrePulseFrames() const;
 
     /// \returns true if this record has PulseCall data
-    bool HasPulseCall(void) const;
+    bool HasPulseCall() const;
 
     /// \returns true if this record has PulseCallWidth data
-    bool HasPulseCallWidth(void) const;
+    bool HasPulseCallWidth() const;
 
     /// \returns true if this record has PulseExclusion data
     bool HasPulseExclusion(void) const;
 
     /// \returns true if this record has PulseMergeQV data
-    bool HasPulseMergeQV(void) const;
+    bool HasPulseMergeQV() const;
 
     /// \returns true if this record has PulseWidth data
-    bool HasPulseWidth(void) const;
+    bool HasPulseWidth() const;
 
     /// \returns true if this record has ReadAccuracyTag data
-    bool HasReadAccuracy(void) const;
+    bool HasReadAccuracy() const;
 
     /// \returns true if this record has QueryEnd data
-    bool HasQueryEnd(void) const;
+    bool HasQueryEnd() const;
 
     /// \returns true if this record has QueryStart data
-    bool HasQueryStart(void) const;
+    bool HasQueryStart() const;
 
     /// \returns true if this record has ScrapRegionType data (only in SCRAP)
-    bool HasScrapRegionType(void) const;
+    bool HasScrapRegionType() const;
 
     /// \returns true if this record has scrap ZMW type data (only in SCRAP)
-    bool HasScrapZmwType(void) const;
+    bool HasScrapZmwType() const;
 
     /// \returns true if this record has signal-to-noise data (absent in
     ///          POLYMERASE)
     ///
-    bool HasSignalToNoise(void) const;
+    bool HasSignalToNoise() const;
 
     /// \returns true if this record has StartFrame data
-    bool HasStartFrame(void) const;
+    bool HasStartFrame() const;
 
     /// \returns true if this record has SubstitutionQV data
-    bool HasSubstitutionQV(void) const;
+    bool HasSubstitutionQV() const;
 
     /// \returns true if this record has SubstitutionTag data
-    bool HasSubstitutionTag(void) const;
+    bool HasSubstitutionTag() const;
 
     /// \}
 
@@ -778,7 +777,7 @@ public:
     ///
     /// \returns const reference to underlying BamRecordImpl object
     ///
-    const BamRecordImpl& Impl(void) const;
+    const BamRecordImpl& Impl() const;
 
     /// \warning This method should be considered temporary and avoided as much
     ///          as possible. Direct access to the internal object is likely to
@@ -786,7 +785,7 @@ public:
     ///
     /// \returns reference to underlying BamRecordImpl object
     ///
-    BamRecordImpl& Impl(void);
+    BamRecordImpl& Impl();
 
     /// \}
 
@@ -1140,7 +1139,7 @@ public:
     ///       build, etc.) It's essentially a workaround and will likely be
     ///       removed from the API.
     ///
-    void ResetCachedPositions(void) const;
+    void ResetCachedPositions() const;
 
     /// \brief Resets cached aligned start/end.
     ///
@@ -1149,13 +1148,13 @@ public:
     ///       build, etc.) It's essentially a workaround and will likely be
     ///       removed from the API.
     ///
-    void ResetCachedPositions(void);
+    void ResetCachedPositions();
 
     /// \brief Updates the record's name (BamRecord::FullName) to reflect
     ///        modifications to name components (movie name, ZMW hole number,
     ///        etc.)
     ///
-    void UpdateName(void);
+    void UpdateName();
 
     /// \}
 
@@ -1307,8 +1306,8 @@ private:
     ///\internal
     /// marked const to allow calling from const methods
     /// but updates our mutable cached values
-    void CalculateAlignedPositions(void) const;
-    void CalculatePulse2BaseCache(void) const;
+    void CalculateAlignedPositions() const;
+    void CalculatePulse2BaseCache() const;
 
     friend class internal::BamRecordMemory;
 };

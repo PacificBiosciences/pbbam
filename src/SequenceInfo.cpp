@@ -52,25 +52,25 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
-static std::string token_SN = std::string("SN");
-static std::string token_LN = std::string("LN");
-static std::string token_AS = std::string("AS");
-static std::string token_M5 = std::string("M5");
-static std::string token_SP = std::string("SP");
-static std::string token_UR = std::string("UR");
+static const std::string token_SN{"SN"};
+static const std::string token_LN{"LN"};
+static const std::string token_AS{"AS"};
+static const std::string token_M5 = std::string("M5");
+static const std::string token_SP = std::string("SP");
+static const std::string token_UR = std::string("UR");
 
 } // namespace internal
 
-SequenceInfo::SequenceInfo(const std::string& name,
-                           const std::string& length)
-    : name_(name)
-    , length_(length)
+SequenceInfo::SequenceInfo(std::string name,
+                           std::string length)
+    : name_(std::move(name))
+    , length_(std::move(length))
 { }
 
 SequenceInfo SequenceInfo::FromSam(const std::string& sam)
 {
     // pop off '@SQ\t', then split rest of line into tokens
-    const std::vector<std::string>& tokens = internal::Split(sam.substr(4), '\t');
+    const auto tokens = internal::Split(sam.substr(4), '\t');
     if (tokens.empty())
         return SequenceInfo();
 
@@ -99,7 +99,7 @@ SequenceInfo SequenceInfo::FromSam(const std::string& sam)
     return seq;
 }
 
-bool SequenceInfo::IsValid(void) const
+bool SequenceInfo::IsValid() const
 {
     if (name_.empty())
         return false;
@@ -109,7 +109,7 @@ bool SequenceInfo::IsValid(void) const
     return l >= 0 && l <= std::numeric_limits<int32_t>::max();
 }
 
-std::string SequenceInfo::ToSam(void) const
+std::string SequenceInfo::ToSam() const
 {
     std::stringstream out;
     out << "@SQ"
@@ -122,10 +122,8 @@ std::string SequenceInfo::ToSam(void) const
     if (!uri_.empty())        out << internal::MakeSamTag(internal::token_UR, uri_);
 
     // append any custom tags
-    std::map<std::string, std::string>::const_iterator customIter = custom_.cbegin();
-    std::map<std::string, std::string>::const_iterator customEnd  = custom_.cend();
-    for ( ; customIter != customEnd; ++customIter )
-        out << internal::MakeSamTag(customIter->first, customIter->second);
+    for (const auto& attribute : custom_)
+        out << internal::MakeSamTag(attribute.first, attribute.second);
 
     return out.str();
 }

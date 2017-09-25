@@ -73,12 +73,12 @@ public:
     ///
     AlignmentPrinter(const IndexedFastaReader& ifr);
 
-    AlignmentPrinter(void) = delete;
+    AlignmentPrinter() = delete;
     AlignmentPrinter(const AlignmentPrinter&) = delete;
     AlignmentPrinter(AlignmentPrinter&&) = default;
     AlignmentPrinter& operator=(const AlignmentPrinter&) = delete;
     AlignmentPrinter& operator=(AlignmentPrinter&&) = default;
-    ~AlignmentPrinter(void) = default;
+    ~AlignmentPrinter() = default;
 
     /// \}
 

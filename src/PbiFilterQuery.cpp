@@ -62,12 +62,12 @@ PbiFilterQuery::PbiFilterQuery(const PbiFilter& filter, const DataSet& dataset)
     , d_(new PbiFilterQueryPrivate(filter, dataset))
 { }
 
-PbiFilterQuery::~PbiFilterQuery(void) { }
+PbiFilterQuery::~PbiFilterQuery() { }
 
 bool PbiFilterQuery::GetNext(BamRecord &r)
 { return d_->reader_.GetNext(r); }
 
-uint32_t PbiFilterQuery::NumReads(void) const
+uint32_t PbiFilterQuery::NumReads() const
 {
     return d_->reader_.NumReads();
 }

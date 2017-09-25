@@ -63,14 +63,14 @@ template<typename T>
 class Interval
 {
 public:
-    typedef boost::icl::discrete_interval<T> interval_type;
+    using interval_type = boost::icl::discrete_interval<T>;
 
 public:
     /// \name Constructors & Related Methods
     /// \{
 
     /// \brief Creates an empty interval [0,0)
-    Interval(void);
+    Interval();
 
     /// \brief Creates a 'singleton' interval [val,val+1)
     Interval(const T val);
@@ -99,7 +99,7 @@ public:
     /// \{
 
     /// \returns interval's start coordinate
-    T Start(void) const;
+    T Start() const;
 
     /// Sets this interval's start coordinate.
     ///
@@ -109,7 +109,7 @@ public:
     Interval<T>& Start(const T& start);
 
     /// \returns interval's stop coordinate
-    T Stop(void) const;
+    T Stop() const;
 
     /// Sets this interval's stop coordinate.
     ///
@@ -133,10 +133,10 @@ public:
     bool Intersects(const Interval<T>& other) const;
 
     /// \returns true if interval is valid (e.g. start < stop)
-    bool IsValid(void) const;
+    bool IsValid() const;
 
     /// \returns interval length
-    size_t Length(void) const;
+    size_t Length() const;
 
     /// \}
 

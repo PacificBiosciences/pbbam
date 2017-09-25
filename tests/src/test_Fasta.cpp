@@ -46,6 +46,7 @@
 #include <pbbam/FastaReader.h>
 #include <pbbam/FastaSequence.h>
 #include <pbbam/FastaSequenceQuery.h>
+#include <pbbam/Unused.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -120,7 +121,7 @@ TEST(FastaSequenceQueryTest, FromFastaFilename)
         size_t count = 0;
         FastaSequenceQuery query{ fn } ;
         for (const auto& seq : query) {
-            (void) seq;
+            UNUSED(seq);
             ++count;
         }
         EXPECT_EQ(1, count);
@@ -143,7 +144,7 @@ TEST(FastaSequenceQueryTest, FromDataSet)
         size_t count = 0;
         FastaSequenceQuery query{ fn } ;
         for (const auto& seq : query) {
-            (void) seq;
+            UNUSED(seq);
             ++count;
         }
         EXPECT_EQ(5, count);    // 1 from lambda, 4 from chimera

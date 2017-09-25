@@ -56,7 +56,7 @@ namespace BAM {
 // AlignmentSet
 // -------------------
 
-AlignmentSet::AlignmentSet(void)
+AlignmentSet::AlignmentSet()
     : DataSetBase("PacBio.DataSet.AlignmentSet",
                   "AlignmentSet",
                   XsdType::DATASETS)
@@ -66,7 +66,7 @@ AlignmentSet::AlignmentSet(void)
 // BarcodeSet
 // -------------------
 
-BarcodeSet::BarcodeSet(void)
+BarcodeSet::BarcodeSet()
     : DataSetBase("PacBio.DataSet.BarcodeSet",
                   "BarcodeSet",
                   XsdType::DATASETS)
@@ -76,7 +76,7 @@ BarcodeSet::BarcodeSet(void)
 // ConsensusAlignmentSet
 // -----------------------
 
-ConsensusAlignmentSet::ConsensusAlignmentSet(void)
+ConsensusAlignmentSet::ConsensusAlignmentSet()
     : DataSetBase("PacBio.DataSet.ConsensusAlignmentSet",
                   "ConsensusAlignmentSet",
                   XsdType::DATASETS)
@@ -86,7 +86,7 @@ ConsensusAlignmentSet::ConsensusAlignmentSet(void)
 // ConsensusReadSet
 // -------------------
 
-ConsensusReadSet::ConsensusReadSet(void)
+ConsensusReadSet::ConsensusReadSet()
     : DataSetBase("PacBio.DataSet.ConsensusReadSet",
                   "ConsensusReadSet",
                   XsdType::DATASETS)
@@ -96,7 +96,7 @@ ConsensusReadSet::ConsensusReadSet(void)
 // ContigSet
 // -------------------
 
-ContigSet::ContigSet(void)
+ContigSet::ContigSet()
     : DataSetBase("PacBio.DataSet.ContigSet",
                   "ContigSet",
                   XsdType::DATASETS)
@@ -106,7 +106,7 @@ ContigSet::ContigSet(void)
 // DataSetBase
 // -------------------
 
-DataSetBase::DataSetBase(void)
+DataSetBase::DataSetBase()
     : StrictEntityType("PacBio.DataSet.DataSet",
                        "DataSet",
                        XsdType::DATASETS)
@@ -133,7 +133,7 @@ DEFINE_ACCESSORS(DataSetBase, DataSetMetadata, Metadata)
 DataSetBase& DataSetBase::Metadata(const PacBio::BAM::DataSetMetadata& metadata)
 { Metadata() = metadata; return *this; }
 
-const PacBio::BAM::SubDataSets& DataSetBase::SubDataSets(void) const
+const PacBio::BAM::SubDataSets& DataSetBase::SubDataSets() const
 {
     try {
         return Child<PacBio::BAM::SubDataSets>("DataSets");
@@ -142,7 +142,7 @@ const PacBio::BAM::SubDataSets& DataSetBase::SubDataSets(void) const
     }
 }
 
-PacBio::BAM::SubDataSets& DataSetBase::SubDataSets(void)
+PacBio::BAM::SubDataSets& DataSetBase::SubDataSets()
 {
     if (!HasChild("DataSets"))
         AddChild(internal::NullObject<PacBio::BAM::SubDataSets>());
@@ -152,10 +152,10 @@ PacBio::BAM::SubDataSets& DataSetBase::SubDataSets(void)
 DataSetBase& DataSetBase::SubDataSets(const PacBio::BAM::SubDataSets &subdatasets)
 { SubDataSets() = subdatasets; return *this;  }
 
-DataSetBase* DataSetBase::DeepCopy(void) const
+DataSetBase* DataSetBase::DeepCopy() const
 {
-    DataSetElement* copyDataset = new DataSetElement(*this);
-    DataSetBase* result = static_cast<DataSetBase*>(copyDataset);
+    auto* copyDataset = new DataSetElement(*this);
+    auto* result = static_cast<DataSetBase*>(copyDataset);
     result->registry_ = registry_;
     return result;
 }
@@ -221,7 +221,7 @@ DataSetMetadata& DataSetMetadata::operator+=(const DataSetMetadata& other)
 // ExtensionElement
 // -------------------
 
-ExtensionElement::ExtensionElement(void)
+ExtensionElement::ExtensionElement()
     : DataSetElement("ExtensionElement", XsdType::BASE_DATA_MODEL)
 { }
 
@@ -229,7 +229,7 @@ ExtensionElement::ExtensionElement(void)
 // Extensions
 // -------------------
 
-Extensions::Extensions(void)
+Extensions::Extensions()
     : DataSetListElement<ExtensionElement>("Extensions", XsdType::BASE_DATA_MODEL)
 { }
 
@@ -257,14 +257,14 @@ DEFINE_ACCESSORS(ExternalResource, ExternalResources, ExternalResources)
 ExternalResource& ExternalResource::ExternalResources(const PacBio::BAM::ExternalResources& resources)
 { ExternalResources() = resources; return *this; }
 
-BamFile ExternalResource::ToBamFile(void) const
+BamFile ExternalResource::ToBamFile() const
 { return BamFile(ResourceId()); }
 
 // -------------------
 // ExternalResources
 // -------------------
 
-ExternalResources::ExternalResources(void)
+ExternalResources::ExternalResources()
     : DataSetListElement<ExternalResource>("ExternalResources",
                                            XsdType::BASE_DATA_MODEL)
 { }
@@ -306,7 +306,7 @@ void ExternalResources::Add(const ExternalResource& ext)
         AddChild(ext);
 }
 
-std::vector<BamFile> ExternalResources::BamFiles(void) const
+std::vector<BamFile> ExternalResources::BamFiles() const
 {
     std::vector<BamFile> result;
     const int numResources = Size();
@@ -334,7 +334,7 @@ FileIndex::FileIndex(const std::string& metatype, const std::string& filename)
 // FileIndices
 // -------------------
 
-FileIndices::FileIndices(void)
+FileIndices::FileIndices()
     : DataSetListElement<FileIndex>("FileIndices", XsdType::BASE_DATA_MODEL)
 { }
 
@@ -348,7 +348,7 @@ void FileIndices::Remove(const FileIndex& index)
 // Filter
 // -------------------
 
-Filter::Filter(void)
+Filter::Filter()
     : DataSetElement("Filter", XsdType::DATASETS)
 { }
 
@@ -361,7 +361,7 @@ Filter& Filter::Properties(const PacBio::BAM::Properties& properties)
 // Filters
 // -------------------
 
-Filters::Filters(void)
+Filters::Filters()
     : DataSetListElement<Filter>("Filters", XsdType::DATASETS)
 { }
 
@@ -382,7 +382,7 @@ void Filters::Remove(const Filter& filter)
 // HdfSubreadSet
 // -------------------
 
-HdfSubreadSet::HdfSubreadSet(void)
+HdfSubreadSet::HdfSubreadSet()
     : DataSetBase("PacBio.DataSet.HdfSubreadSet",
                   "HdfSubreadSet",
                   XsdType::DATASETS)
@@ -392,7 +392,7 @@ HdfSubreadSet::HdfSubreadSet(void)
 // ParentTool
 // -------------------
 
-ParentTool::ParentTool(void)
+ParentTool::ParentTool()
     : BaseEntityType("ParentTool", XsdType::DATASETS)
 { }
 
@@ -400,7 +400,7 @@ ParentTool::ParentTool(void)
 // Properties
 // -------------------
 
-Properties::Properties(void)
+Properties::Properties()
     : DataSetListElement<Property>("Properties", XsdType::BASE_DATA_MODEL)
 { }
 
@@ -428,7 +428,7 @@ Property::Property(const std::string& name,
 // Provenance
 // -------------------
 
-Provenance::Provenance(void)
+Provenance::Provenance()
     : DataSetElement("Provenance", XsdType::DATASETS)
 { }
 
@@ -438,7 +438,7 @@ DEFINE_ACCESSORS(Provenance, ParentTool, ParentTool)
 // ReferenceSet
 // -------------------
 
-ReferenceSet::ReferenceSet(void)
+ReferenceSet::ReferenceSet()
     : DataSetBase("PacBio.DataSet.ReferenceSet",
                   "ReferenceSet",
                   XsdType::DATASETS)
@@ -448,7 +448,7 @@ ReferenceSet::ReferenceSet(void)
 // SubDataSets
 // -------------------
 
-SubDataSets::SubDataSets(void)
+SubDataSets::SubDataSets()
     : internal::DataSetListElement<DataSetBase>("DataSets", XsdType::DATASETS)
 { }
 
@@ -475,7 +475,7 @@ void SubDataSets::Remove(const DataSetBase& subdataset)
 // SubreadSet
 // -------------------
 
-SubreadSet::SubreadSet(void)
+SubreadSet::SubreadSet()
     : DataSetBase("PacBio.DataSet.SubreadSet",
                   "SubreadSet",
                   XsdType::DATASETS)

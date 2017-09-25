@@ -66,9 +66,9 @@ public:
     /// \param bases
     /// \param qualities
     ///
-    explicit FastqSequence(const std::string& name,
-                           const std::string& bases,
-                           const QualityValues& qualities);
+    explicit FastqSequence(std::string name,
+                           std::string bases,
+                           QualityValues qualities);
 
     ///
     /// \brief FastaSequence
@@ -76,16 +76,16 @@ public:
     /// \param bases
     /// \param qualities
     ///
-    explicit FastqSequence(const std::string& name,
-                           const std::string& bases,
-                           const std::string& qualities);
+    explicit FastqSequence(std::string name,
+                           std::string bases,
+                           std::string qualities);
 
-    FastqSequence(void) = default;
+    FastqSequence() = default;
     FastqSequence(const FastqSequence&) = default;
     FastqSequence(FastqSequence&&) = default;
     FastqSequence& operator=(const FastqSequence&) = default;
     FastqSequence& operator=(FastqSequence&&) = default;
-    ~FastqSequence(void) = default;
+    ~FastqSequence() = default;
 
     /// \}
 
@@ -97,7 +97,7 @@ public:
     /// \brief Qualities
     /// \return
     ///
-    QualityValues Qualities(void) const;
+    QualityValues Qualities() const;
 
     /// \}
 

@@ -174,14 +174,14 @@ static std::string native_resolvedFilePath(const std::string& filePath,
 #endif // PBBAM_WIN_FILEPATHS
 
 // see http://stackoverflow.com/questions/2869594/how-return-a-stdstring-from-cs-getcwd-function
-std::string FileUtils::CurrentWorkingDirectory(void)
+std::string FileUtils::CurrentWorkingDirectory()
 {
     const size_t chunkSize = 1024;
     const size_t maxNumChunks = 20;
 
     // stack-based buffer for 'normal' case
     char buffer[chunkSize];
-    if (getcwd(buffer, sizeof(buffer)) != NULL)
+    if (getcwd(buffer, sizeof(buffer)) != nullptr)
         return std::string(buffer);
 
     // if error is not ERANGE, then it's not a problem of too-long name... something else happened
@@ -191,7 +191,7 @@ std::string FileUtils::CurrentWorkingDirectory(void)
     // long path - use heap, trying progressively longer buffers
     for (size_t chunks = 2; chunks < maxNumChunks; ++chunks) {
         std::unique_ptr<char> cwd(new char[chunkSize*chunks]);
-        if (getcwd(cwd.get(), chunkSize*chunks) != NULL)
+        if (getcwd(cwd.get(), chunkSize*chunks) != nullptr)
             return std::string(cwd.get());
 
         // if error is not ERANGE, then it's not a problem of too-long name... something else happened
@@ -205,7 +205,7 @@ std::string FileUtils::CurrentWorkingDirectory(void)
 
 std::string FileUtils::DirectoryName(const std::string& file)
 {
-    const size_t found = file.rfind(Separator(), file.length());
+    const auto found = file.rfind(Separator(), file.length());
     if (found != std::string::npos)
         return file.substr(0, found);
     return std::string(".");
@@ -229,7 +229,7 @@ std::string FileUtils::ResolvedFilePath(const std::string& filePath,
                                         const std::string& from)
 { return native_resolvedFilePath(filePath, from); }
 
-constexpr char FileUtils::Separator(void)
+constexpr char FileUtils::Separator()
 { return native_pathSeparator; }
 
 off_t FileUtils::Size(const char* fn)

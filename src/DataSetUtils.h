@@ -49,21 +49,21 @@ namespace internal {
 static const std::string XML_VERSION = std::string { "3.0.1" };
 
 template<typename T>
-inline const T& NullObject(void)
+inline const T& NullObject()
 {
     static const T empty;
     return empty;
 }
 
 template<>
-inline const PacBio::BAM::DataSetMetadata& NullObject(void)
+inline const PacBio::BAM::DataSetMetadata& NullObject()
 {
     static const PacBio::BAM::DataSetMetadata empty("", "");
     return empty;
 }
 
 inline
-std::string GenerateUuid(void)
+std::string GenerateUuid()
 {
     static boost::uuids::random_generator gen;
     const boost::uuids::uuid uuid = gen();
@@ -77,7 +77,7 @@ std::string GenerateUuid(void)
 #ifndef FETCH_CHILD_CONST_REF
 #define FETCH_CHILD_CONST_REF(Class, Type, Method) \
     \
-    const PacBio::BAM::Type& Class::Method(void) const \
+    const PacBio::BAM::Type& Class::Method() const \
     { \
         try { \
             return Child<PacBio::BAM::Type>(#Type); \
@@ -90,7 +90,7 @@ std::string GenerateUuid(void)
 #ifndef FETCH_CHILD_REF
 #define FETCH_CHILD_REF(Class, Type, Method) \
     \
-    PacBio::BAM::Type& Class::Method(void) \
+    PacBio::BAM::Type& Class::Method() \
     { \
         if (!HasChild(#Type)) \
             AddChild(internal::NullObject<PacBio::BAM::Type>()); \

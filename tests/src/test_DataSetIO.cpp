@@ -77,21 +77,21 @@ const string subread2XmlFn    = PbbamTestsConfig::Data_Dir + "/dataset/subread_d
 const string subread3XmlFn    = PbbamTestsConfig::Data_Dir + "/dataset/subread_dataset3.xml";
 const string transformedXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/transformed_rs_subread_dataset.xml";
 
-static void TestFromXmlString(void);
-static void TestAli1Xml(void);
-static void TestAli2Xml(void);
-static void TestAli3Xml(void);
-static void TestAli4Xml(void);
-static void TestMappingStaggeredXml(void);
-static void TestBarcodeXml(void);
-static void TestCcsReadXml(void);
-static void TestLambdaContigsXml(void);
-static void TestPbalchemyXml(void);
-static void TestReferenceXml(void);
-static void TestSubread1Xml(void);
-static void TestSubread2Xml(void);
-static void TestSubread3Xml(void);
-static void TestTransformedXml(void);
+static void TestFromXmlString();
+static void TestAli1Xml();
+static void TestAli2Xml();
+static void TestAli3Xml();
+static void TestAli4Xml();
+static void TestMappingStaggeredXml();
+static void TestBarcodeXml();
+static void TestCcsReadXml();
+static void TestLambdaContigsXml();
+static void TestPbalchemyXml();
+static void TestReferenceXml();
+static void TestSubread1Xml();
+static void TestSubread2Xml();
+static void TestSubread3Xml();
+static void TestTransformedXml();
 
 static inline
 void changeCurrentDirectory(const std::string& dir)
@@ -372,7 +372,7 @@ TEST(DataSetIOTest, ToXml)
 
 namespace DataSetIOTests {
 
-static void TestFromXmlString(void)
+static void TestFromXmlString()
 {
     const string inputXml =
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
@@ -509,7 +509,7 @@ static void TestFromXmlString(void)
     EXPECT_EQ("chr1", property2.Value());
 }
 
-static void TestAli1Xml(void)
+static void TestAli1Xml()
 {
     const DataSet dataset(DataSetIOTests::ali1XmlFn);
     EXPECT_EQ(DataSet::ALIGNMENT, dataset.Type());
@@ -598,7 +598,7 @@ static void TestAli1Xml(void)
     }
 }
 
-static void TestAli2Xml(void)
+static void TestAli2Xml()
 {
     const DataSet dataset(DataSetIOTests::ali2XmlFn);
     EXPECT_EQ(DataSet::ALIGNMENT, dataset.Type());
@@ -687,7 +687,7 @@ static void TestAli2Xml(void)
     }
 }
 
-static void TestAli3Xml(void)
+static void TestAli3Xml()
 {
     const DataSet dataset(DataSetIOTests::ali3XmlFn);
     EXPECT_EQ(DataSet::ALIGNMENT, dataset.Type());
@@ -776,7 +776,7 @@ static void TestAli3Xml(void)
     }
 }
 
-static void TestAli4Xml(void)
+static void TestAli4Xml()
 {
     const DataSet dataset(DataSetIOTests::ali4XmlFn);
     EXPECT_EQ(DataSet::ALIGNMENT, dataset.Type());
@@ -865,7 +865,7 @@ static void TestAli4Xml(void)
     }
 }
 
-static void TestMappingStaggeredXml(void)
+static void TestMappingStaggeredXml()
 {
     const DataSet dataset(DataSetIOTests::mappingStaggeredXmlFn);
     EXPECT_EQ(DataSet::GENERIC, dataset.Type());
@@ -952,7 +952,7 @@ static void TestMappingStaggeredXml(void)
     }
 }
 
-static void TestBarcodeXml(void)
+static void TestBarcodeXml()
 {
     const DataSet dataset(DataSetIOTests::barcodeXmlFn);
     EXPECT_EQ(DataSet::BARCODE, dataset.Type());
@@ -986,7 +986,7 @@ static void TestBarcodeXml(void)
     EXPECT_EQ(string("paired"), metadata.ChildText("BarcodeConstruction"));
 }
 
-static void TestCcsReadXml(void)
+static void TestCcsReadXml()
 {
     const DataSet dataset(DataSetIOTests::ccsReadXmlFn);
     EXPECT_EQ(DataSet::CONSENSUS_READ, dataset.Type());
@@ -1036,7 +1036,7 @@ static void TestCcsReadXml(void)
     }
 }
 
-static void TestLambdaContigsXml(void)
+static void TestLambdaContigsXml()
 {
     const DataSet dataset(DataSetIOTests::lambdaContigsXmlFn);
     EXPECT_EQ(DataSet::REFERENCE, dataset.Type());
@@ -1059,7 +1059,7 @@ static void TestLambdaContigsXml(void)
     EXPECT_EQ(string("file:tests/data/lambda_contigs.fasta"), resource.ResourceId());
 }
 
-static void TestPbalchemyXml(void)
+static void TestPbalchemyXml()
 {
     const DataSet dataset(DataSetIOTests::pbalchemyXmlFn);
     EXPECT_EQ(DataSet::GENERIC, dataset.Type());
@@ -1088,7 +1088,7 @@ static void TestPbalchemyXml(void)
 
 }
 
-static void TestReferenceXml(void)
+static void TestReferenceXml()
 {
     const DataSet dataset(DataSetIOTests::referenceXmlFn);
     EXPECT_EQ(DataSet::REFERENCE, dataset.Type());
@@ -1145,7 +1145,7 @@ static void TestReferenceXml(void)
     EXPECT_EQ(string("f627c795efad7ce0050ed42b942d408e"), contig.Attribute("Digest"));
 }
 
-static void TestSubread1Xml(void)
+static void TestSubread1Xml()
 {
     const DataSet dataset(DataSetIOTests::subread1XmlFn);
     EXPECT_EQ(DataSet::SUBREAD, dataset.Type());
@@ -1215,7 +1215,7 @@ static void TestSubread1Xml(void)
     EXPECT_EQ(string("500000"), metadata.TotalLength());
 }
 
-static void TestSubread2Xml(void)
+static void TestSubread2Xml()
 {
     const DataSet dataset(DataSetIOTests::subread2XmlFn);
     EXPECT_EQ(DataSet::SUBREAD, dataset.Type());
@@ -1285,7 +1285,7 @@ static void TestSubread2Xml(void)
     EXPECT_EQ(string("500000"), metadata.TotalLength());
 }
 
-static void TestSubread3Xml(void)
+static void TestSubread3Xml()
 {
     const DataSet dataset(DataSetIOTests::subread3XmlFn);
     EXPECT_EQ(DataSet::SUBREAD, dataset.Type());
@@ -1355,7 +1355,7 @@ static void TestSubread3Xml(void)
     EXPECT_EQ(string("500000"), metadata.TotalLength());
 }
 
-static void TestTransformedXml(void)
+static void TestTransformedXml()
 {
     const DataSet dataset(DataSetIOTests::transformedXmlFn);
     EXPECT_EQ(DataSet::HDF_SUBREAD, dataset.Type());

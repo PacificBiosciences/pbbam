@@ -45,6 +45,7 @@
 
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/BamWriter.h>
+#include <pbbam/Unused.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -64,7 +65,7 @@ TEST(EntireFileQueryTest, CountRecords)
         int count = 0;
         EntireFileQuery entireFile(bamFile);
         for (const BamRecord& record : entireFile) {
-            (void)record;
+            UNUSED(record);
             ++count;
         }
 
@@ -80,7 +81,7 @@ TEST(EntireFileQueryTest, NonConstBamRecord)
         int count = 0;
         EntireFileQuery entireFile(bamFile);
         for (BamRecord& record : entireFile) {
-            (void)record;
+            UNUSED(record);
             ++count;
         }
 

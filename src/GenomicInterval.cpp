@@ -43,10 +43,10 @@
 
 #include "pbbam/GenomicInterval.h"
 #include "StringUtils.h"
+#include <stdexcept>
+#include <cctype>
 #include <cstdlib>
 #include <cstring>
-#include <ctype.h>
-#include <stdexcept>
 
 namespace PacBio {
 namespace BAM {
@@ -81,11 +81,11 @@ std::string parseRegionString(const std::string& reg,
 
 } // namespace internal
 
-GenomicInterval::GenomicInterval(const std::string& name,
-                                 const Position& start,
-                                 const Position& stop)
-    : name_(name)
-    , interval_(start, stop)
+GenomicInterval::GenomicInterval(std::string name,
+                                 Position start,
+                                 Position stop)
+    : name_(std::move(name))
+    , interval_(std::move(start), std::move(stop))
 { }
 
 GenomicInterval::GenomicInterval(const std::string& samtoolsRegionString)

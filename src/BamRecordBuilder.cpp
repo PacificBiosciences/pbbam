@@ -49,7 +49,7 @@
 namespace PacBio {
 namespace BAM {
 
-BamRecordBuilder::BamRecordBuilder(void)
+BamRecordBuilder::BamRecordBuilder()
 {
     // ensure proper clean slate
     Reset();
@@ -61,8 +61,8 @@ BamRecordBuilder::BamRecordBuilder(void)
     cigar_.reserve(256);
 }
 
-BamRecordBuilder::BamRecordBuilder(const BamHeader& header)
-    : header_(header)
+BamRecordBuilder::BamRecordBuilder(BamHeader header)
+    : header_(std::move(header))
 {
     // ensure proper clean slate
     Reset();
@@ -80,53 +80,7 @@ BamRecordBuilder::BamRecordBuilder(const BamRecord& prototype)
     Reset(prototype);
 }
 
-BamRecordBuilder::BamRecordBuilder(const BamRecordBuilder& other)
-    : core_(other.core_)
-    , name_(other.name_)
-    , sequence_(other.sequence_)
-    , qualities_(other.qualities_)
-    , cigar_(other.cigar_)
-    , tags_(other.tags_)
-{ }
-
-BamRecordBuilder::BamRecordBuilder(BamRecordBuilder&& other)
-    : core_(std::move(other.core_))
-    , name_(std::move(other.name_))
-    , sequence_(std::move(other.sequence_))
-    , qualities_(std::move(other.qualities_))
-    , cigar_(std::move(other.cigar_))
-    , tags_(std::move(other.tags_))
-{  }
-
-BamRecordBuilder& BamRecordBuilder::operator=(const BamRecordBuilder& other)
-{
-    if (this != &other) {
-        core_ = other.core_;
-        name_ = other.name_;
-        sequence_  = other.sequence_;
-        qualities_ = other.qualities_;
-        cigar_ = other.cigar_;
-        tags_  = other.tags_;
-    }
-    return *this;
-}
-
-BamRecordBuilder& BamRecordBuilder::operator=(BamRecordBuilder&& other)
-{
-    if (this != &other) {
-        core_ = std::move(other.core_);
-        name_ = std::move(other.name_);
-        sequence_  = std::move(other.sequence_);
-        qualities_ = std::move(other.qualities_);
-        cigar_ = std::move(other.cigar_);
-        tags_  = std::move(other.tags_);
-    }
-    return *this;
-}
-
-BamRecordBuilder::~BamRecordBuilder(void) { }
-
-BamRecord BamRecordBuilder::Build(void) const
+BamRecord BamRecordBuilder::Build() const
 {
     BamRecord result(header_);
     BuildInPlace(result);
@@ -176,9 +130,9 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
     if (cigarLength > 0) {
         std::vector<uint32_t> encodedCigar(numCigarOps);
         for (size_t i = 0; i < numCigarOps; ++i) {
-            const CigarOperation& op = cigar_.at(i);
+            const auto& op = cigar_.at(i);
             encodedCigar[i] = op.Length() << BAM_CIGAR_SHIFT;
-            const uint8_t type = static_cast<uint8_t>(op.Type());
+            const auto type = static_cast<uint8_t>(op.Type());
             if (type >= 8)
                 throw std::runtime_error("invalid CIGAR op type: " + std::to_string(type));
             encodedCigar[i] |= type;
@@ -254,7 +208,7 @@ BamRecordBuilder& BamRecordBuilder::Name(std::string&& name)
     return *this;
 }
 
-void BamRecordBuilder::Reset(void)
+void BamRecordBuilder::Reset()
 {
     // zeroize fixed-length data
     memset(&core_, 0, sizeof(bam1_core_t));

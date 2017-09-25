@@ -44,7 +44,7 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
-const std::string& DataSetElement::SharedNullString(void)
+const std::string& DataSetElement::SharedNullString()
 {
     return internal::NullObject<std::string>();
 }

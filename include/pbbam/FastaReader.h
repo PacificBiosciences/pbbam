@@ -70,9 +70,9 @@ public:
     /// \{
 
     explicit FastaReader(const std::string& fn);
-    FastaReader(FastaReader&& other);
-    FastaReader& operator=(FastaReader&& other);
-    ~FastaReader(void);
+    FastaReader(FastaReader&&) = default;
+    FastaReader& operator=(FastaReader&&) = default;
+    ~FastaReader();
 
     // copy is disabled
     FastaReader(const FastaReader&) = delete;

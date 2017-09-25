@@ -59,22 +59,22 @@ VirtualZmwReader::VirtualZmwReader(const std::string& primaryBamFilepath,
                                    const std::string& scrapsBamFilepath,
                                    const PbiFilter& filter)
 {
-    primaryBamFile_.reset(new BamFile{ primaryBamFilepath });
-    scrapsBamFile_.reset(new BamFile{ scrapsBamFilepath });
+    primaryBamFile_ = std::make_unique<BamFile>(primaryBamFilepath);
+    scrapsBamFile_ = std::make_unique<BamFile>(scrapsBamFilepath);
 
     if (filter.IsEmpty()) {
-        primaryQuery_.reset(new EntireFileQuery(*primaryBamFile_));
-        scrapsQuery_.reset(new EntireFileQuery(*scrapsBamFile_));
+        primaryQuery_ = std::make_unique<EntireFileQuery>(*primaryBamFile_);
+        scrapsQuery_ = std::make_unique<EntireFileQuery>(*scrapsBamFile_);
     }
     else {
-        primaryQuery_.reset(new PbiFilterQuery{ filter, *primaryBamFile_ });
-        scrapsQuery_.reset(new PbiFilterQuery{ filter, *scrapsBamFile_ });
+        primaryQuery_ = std::make_unique<PbiFilterQuery>(filter, *primaryBamFile_);
+        scrapsQuery_ = std::make_unique<PbiFilterQuery>(filter, *scrapsBamFile_);
     }
 
     primaryIt_ = (primaryQuery_->begin());
     scrapsIt_ = (scrapsQuery_->begin());
 
-    stitchedHeader_.reset(new BamHeader{ primaryBamFile_->Header().ToSam() });
+    stitchedHeader_ = std::make_unique<BamHeader>(primaryBamFile_->Header().ToSam());
 
     // update stitched read group in header
     auto readGroups = stitchedHeader_->ReadGroups();
@@ -92,9 +92,9 @@ VirtualZmwReader::VirtualZmwReader(const std::string& primaryBamFilepath,
     stitchedHeader_->ReadGroups(readGroups);
 }
 
-VirtualZmwReader::~VirtualZmwReader(void) { }
+VirtualZmwReader::~VirtualZmwReader() { }
 
-bool VirtualZmwReader::HasNext(void)
+bool VirtualZmwReader::HasNext()
 {
     // Return true until both iterators are at the end of the query
     return primaryIt_ != primaryQuery_->end() ||
@@ -102,10 +102,10 @@ bool VirtualZmwReader::HasNext(void)
 }
 
 // This method is not thread safe
-VirtualZmwBamRecord VirtualZmwReader::Next(void)
+VirtualZmwBamRecord VirtualZmwReader::Next()
 { return VirtualZmwBamRecord{ NextRaw(), *stitchedHeader_ }; }
 
-std::vector<BamRecord> VirtualZmwReader::NextRaw(void)
+std::vector<BamRecord> VirtualZmwReader::NextRaw()
 {
     std::vector<BamRecord> bamRecordVec;
 
@@ -137,10 +137,10 @@ std::vector<BamRecord> VirtualZmwReader::NextRaw(void)
     return bamRecordVec;
 }
 
-BamHeader VirtualZmwReader::PrimaryHeader(void) const
+BamHeader VirtualZmwReader::PrimaryHeader() const
 { return primaryBamFile_->Header(); }
 
-BamHeader VirtualZmwReader::ScrapsHeader(void) const
+BamHeader VirtualZmwReader::ScrapsHeader() const
 { return scrapsBamFile_->Header(); }
 
 } // namespace internal

@@ -681,7 +681,7 @@ public:
     PbiQueryNameFilter(const std::vector<std::string>& whitelist);
 
     PbiQueryNameFilter(const PbiQueryNameFilter& other);
-    ~PbiQueryNameFilter(void);
+    ~PbiQueryNameFilter();
 
 public:
     /// \brief Performs the actual index lookup.
@@ -914,8 +914,8 @@ public:
     /// \param[in] rname    reference ID to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiReferenceNameFilter(const std::string& rname,
-                           const Compare::Type cmp = Compare::EQUAL);
+    PbiReferenceNameFilter(std::string rname,
+                           Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a 'whitelisted' reference name filter.
     ///
@@ -945,7 +945,7 @@ public:
     bool Accepts(const PbiRawData& idx, const size_t row) const;
 
 private:
-    mutable bool initialized_;
+    mutable bool initialized_ = false;
     mutable PbiFilter subFilter_;
     std::string rname_;
     boost::optional<std::vector<std::string> > rnameWhitelist_;

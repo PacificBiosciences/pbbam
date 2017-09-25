@@ -50,6 +50,7 @@
 
 #include "PbbamTestData.h"
 
+#include <pbbam/Unused.h>
 #include <pbbam/../../src/FileUtils.h>
 #include <pbbam/../../src/TimeUtils.h>
 
@@ -81,8 +82,8 @@ TEST(FileUtilsTest, LastModifiedOk)
     const string tmp = PbbamTestsConfig::GeneratedData_Dir + "/pbbam_lastmod_check.tmp";
     const string rmCmd = string("rm ") + tmp;
     const string touchCmd = string("touch  ") + tmp;
-    int ret =  system(rmCmd.c_str());
-    (void)ret; // unused
+    const auto ret = system(rmCmd.c_str());
+    UNUSED(ret);
     ASSERT_EQ(0, system(touchCmd.c_str()));
 
     const auto stamp = FileUtils::LastModified(tmp);

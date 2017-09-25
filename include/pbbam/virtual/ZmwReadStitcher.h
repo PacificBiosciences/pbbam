@@ -79,12 +79,12 @@ public:
     /// maybe filtered, from DataSet input
     ZmwReadStitcher(const DataSet& dataset);
 
-    ZmwReadStitcher(void) = delete;
+    ZmwReadStitcher() = delete;
     ZmwReadStitcher(const ZmwReadStitcher&) = delete;
     ZmwReadStitcher(ZmwReadStitcher&&) = delete;
     ZmwReadStitcher& operator=(const ZmwReadStitcher&) = delete;
     ZmwReadStitcher& operator=(ZmwReadStitcher&&) = delete;
-    ~ZmwReadStitcher(void);
+    ~ZmwReadStitcher();
 
     /// \}
 
@@ -93,10 +93,10 @@ public:
     /// \{
 
     /// \returns the BamHeader associated with this reader's "primary" %BAM file
-    BamHeader PrimaryHeader(void) const;
+    BamHeader PrimaryHeader() const;
 
     /// \returns the BamHeader associated with this reader's "scraps" %BAM file
-    BamHeader ScrapsHeader(void) const;
+    BamHeader ScrapsHeader() const;
 
     /// \}
 
@@ -105,15 +105,15 @@ public:
     ///
 
     /// \returns true if more ZMWs are available for reading.
-    bool HasNext(void);
+    bool HasNext();
 
     /// \returns the next stitched polymerase read
-    VirtualZmwBamRecord Next(void);
+    VirtualZmwBamRecord Next();
 
     /// \returns the next set of reads that belong to one ZMW.
     ///          This enables stitching records in a distinct thread.
     ///
-    std::vector<BamRecord> NextRaw(void);
+    std::vector<BamRecord> NextRaw();
 
     /// \}
 

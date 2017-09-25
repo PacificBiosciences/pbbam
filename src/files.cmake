@@ -72,6 +72,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/Tag.h
     ${PacBioBAM_IncludeDir}/pbbam/TagCollection.h
 #    ${PacBioBAM_IncludeDir}/pbbam/UnmappedReadsQuery.h
+    ${PacBioBAM_IncludeDir}/pbbam/Unused.h
     ${PacBioBAM_IncludeDir}/pbbam/Validator.h
     ${PacBioBAM_IncludeDir}/pbbam/ZmwGroupQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/ZmwQuery.h
@@ -79,6 +80,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/ZmwTypeMap.h
 
     # exception headers
+    ${PacBioBAM_IncludeDir}/pbbam/exception/BundleChemistryMappingException.h
     ${PacBioBAM_IncludeDir}/pbbam/exception/InvalidSequencingChemistryException.h
     ${PacBioBAM_IncludeDir}/pbbam/exception/ValidationException.h
 
@@ -198,7 +200,6 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/GenomicInterval.cpp
     ${PacBioBAM_SourceDir}/GenomicIntervalQuery.cpp
     ${PacBioBAM_SourceDir}/IndexedFastaReader.cpp
-    ${PacBioBAM_SourceDir}/IRecordWriter.cpp
     ${PacBioBAM_SourceDir}/MD5.cpp
     ${PacBioBAM_SourceDir}/MemoryUtils.cpp
     ${PacBioBAM_SourceDir}/PbiBuilder.cpp

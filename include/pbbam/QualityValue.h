@@ -91,7 +91,7 @@ public:
     QualityValue(QualityValue&& other) = default;
     QualityValue& operator=(const QualityValue& other) = default;
     QualityValue& operator=(QualityValue&& other) = default;
-    ~QualityValue(void) = default;
+    ~QualityValue() = default;
 
     /// \}
 
@@ -100,10 +100,10 @@ public:
     /// \{
 
     /// \returns the FASTQ-encoding char for this QualityValue
-    char Fastq(void) const;
+    char Fastq() const;
 
     /// \returns the integer value of this QualityValue
-    operator uint8_t(void) const;
+    operator uint8_t() const;
 
     /// \}
 

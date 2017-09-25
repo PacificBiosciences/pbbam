@@ -122,13 +122,13 @@ void PbiIndexIO::Load(PbiRawData& rawData,
     if (!boost::algorithm::iends_with(filename, ".pbi"))
         throw std::runtime_error("unsupported file extension");
     std::unique_ptr<BGZF, HtslibBgzfDeleter> bgzf(bgzf_open(filename.c_str(), "rb"));
-    BGZF* fp = bgzf.get();
-    if (fp == 0)
+    auto* fp = bgzf.get();
+    if (fp == nullptr)
         throw std::runtime_error("could not open PBI file for reading");
 
     // load data
     LoadHeader(rawData, fp);
-    const uint32_t numReads = rawData.NumReads();
+    const auto numReads = rawData.NumReads();
     if (numReads > 0) {
         LoadBasicData(rawData.BasicData(), numReads, fp);
         if (rawData.HasMappedData())
@@ -151,14 +151,14 @@ void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData,
     uint16_t fileNumber = 0;
     for (const auto& bamFile : bamFiles) {
         PbiRawData currentPbi{bamFile.PacBioIndexFilename()};
-        const size_t currentPbiCount = currentPbi.NumReads();
+        const auto currentPbiCount = currentPbi.NumReads();
 
         // read count
-        aggregateData.NumReads(aggregateData.NumReads()+currentPbiCount);
+        aggregateData.NumReads(aggregateData.NumReads() + currentPbiCount);
 
         // BasicData
-        PbiRawBasicData& aggregateBasicData = aggregateData.BasicData();
-        PbiRawBasicData& currentBasicData   = currentPbi.BasicData();
+        auto& aggregateBasicData = aggregateData.BasicData();
+        auto& currentBasicData   = currentPbi.BasicData();
         MoveAppend(std::move(currentBasicData.rgId_),       aggregateBasicData.rgId_);
         MoveAppend(std::move(currentBasicData.qStart_),     aggregateBasicData.qStart_);
         MoveAppend(std::move(currentBasicData.qEnd_),       aggregateBasicData.qEnd_);
@@ -169,9 +169,9 @@ void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData,
         MoveAppend(std::vector<uint16_t>(currentPbiCount, fileNumber), aggregateBasicData.fileNumber_);
 
         // BarcodeData
-        PbiRawBarcodeData& aggregateBarcodeData = aggregateData.BarcodeData();
+        auto& aggregateBarcodeData = aggregateData.BarcodeData();
         if (currentPbi.HasBarcodeData()) {
-            PbiRawBarcodeData& currentBarcodeData  = currentPbi.BarcodeData();
+            auto& currentBarcodeData  = currentPbi.BarcodeData();
             MoveAppend(std::move(currentBarcodeData.bcForward_), aggregateBarcodeData.bcForward_);
             MoveAppend(std::move(currentBarcodeData.bcReverse_), aggregateBarcodeData.bcReverse_);
             MoveAppend(std::move(currentBarcodeData.bcQual_),    aggregateBarcodeData.bcQual_);
@@ -182,9 +182,9 @@ void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData,
         }
 
         // MappedData
-        PbiRawMappedData& aggregateMappedData = aggregateData.MappedData();
+        auto& aggregateMappedData = aggregateData.MappedData();
         if (currentPbi.HasMappedData()) {
-            PbiRawMappedData& currentMappedData  = currentPbi.MappedData();
+            auto& currentMappedData  = currentPbi.MappedData();
             MoveAppend(std::move(currentMappedData.tId_),       aggregateMappedData.tId_);
             MoveAppend(std::move(currentMappedData.tStart_),    aggregateMappedData.tStart_);
             MoveAppend(std::move(currentMappedData.tEnd_),      aggregateMappedData.tEnd_);
@@ -226,11 +226,9 @@ void PbiIndexIO::LoadBarcodeData(PbiRawBarcodeData& barcodeData,
 void PbiIndexIO::LoadHeader(PbiRawData& index,
                             BGZF* fp)
 {
-    size_t bytesRead = 0;
-
     // 'magic' string
     char magic[4];
-    bytesRead = bgzf_read(fp, magic, 4);
+    auto bytesRead = bgzf_read(fp, magic, 4);
     if (bytesRead != 4 || strncmp(magic, "PBI\1", 4))
         throw std::runtime_error("expected PBI file, found unknown format instead");
 
@@ -238,9 +236,9 @@ void PbiIndexIO::LoadHeader(PbiRawData& index,
     uint32_t version;
     uint16_t sections;
     uint32_t numReads;
-    bgzf_read(fp, &version,  sizeof(version));
-    bgzf_read(fp, &sections, sizeof(sections));
-    bgzf_read(fp, &numReads, sizeof(numReads));
+    bytesRead = bgzf_read(fp, &version,  sizeof(version));
+    bytesRead = bgzf_read(fp, &sections, sizeof(sections));
+    bytesRead = bgzf_read(fp, &numReads, sizeof(numReads));
     if (fp->is_be) {
         version  = ed_swap_4(version);
         sections = ed_swap_2(sections);
@@ -285,24 +283,26 @@ void PbiIndexIO::LoadReferenceData(PbiRawReferenceData& referenceData,
 
     // num refs
     uint32_t numRefs;
-    bgzf_read(fp, &numRefs, 4);
+    auto ret = bgzf_read(fp, &numRefs, 4);
     if (fp->is_be)
         numRefs = ed_swap_4(numRefs);
 
     // reference entries
     referenceData.entries_.clear();
     referenceData.entries_.resize(numRefs);
-    for (size_t i = 0; i < numRefs; ++i) {
-        PbiReferenceEntry& entry = referenceData.entries_[i];
-        bgzf_read(fp, &entry.tId_,      4);
-        bgzf_read(fp, &entry.beginRow_, 4);
-        bgzf_read(fp, &entry.endRow_,   4);
+    for (auto& entry : referenceData.entries_) {
+//    for (size_t i = 0; i < numRefs; ++i) {
+//        PbiReferenceEntry& entry = referenceData.entries_[i];
+        ret = bgzf_read(fp, &entry.tId_,      4);
+        ret = bgzf_read(fp, &entry.beginRow_, 4);
+        ret = bgzf_read(fp, &entry.endRow_,   4);
         if (fp->is_be) {
             entry.tId_      = ed_swap_4(entry.tId_);
             entry.beginRow_ = ed_swap_4(entry.beginRow_);
             entry.endRow_   = ed_swap_4(entry.endRow_);
         }
     }
+    UNUSED(ret);
 }
 
 void PbiIndexIO::LoadBasicData(PbiRawBasicData& basicData,
@@ -326,12 +326,12 @@ void PbiIndexIO::Save(const PbiRawData& index,
                       const std::string& filename)
 {
     std::unique_ptr<BGZF, HtslibBgzfDeleter> bgzf(bgzf_open(filename.c_str(), "wb"));
-    BGZF* fp = bgzf.get();
-    if (fp == 0)
+    auto* fp = bgzf.get();
+    if (fp == nullptr)
         throw std::runtime_error("could not open PBI file for writing");
 
     WriteHeader(index, fp);
-    const uint32_t numReads = index.NumReads();
+    const auto numReads = index.NumReads();
     if (numReads > 0) {
         WriteBasicData(index.BasicData(), numReads, fp);
 
@@ -363,25 +363,26 @@ void PbiIndexIO::WriteHeader(const PbiRawData& index,
     // 'magic' string
     char magic[4];
     strncpy(magic, "PBI\1", 4);
-    bgzf_write(fp, magic, 4);
+    auto ret = bgzf_write(fp, magic, 4);
 
     // version, pbi_flags, & n_reads
-    uint32_t version   = static_cast<uint32_t>(index.Version());
-    uint16_t pbi_flags = static_cast<uint16_t>(index.FileSections());
-    uint32_t numReads  = index.NumReads();
+    auto version   = static_cast<uint32_t>(index.Version());
+    auto pbi_flags = static_cast<uint16_t>(index.FileSections());
+    auto numReads  = static_cast<uint16_t>(index.NumReads());
     if (fp->is_be) {
         version   = ed_swap_4(version);
         pbi_flags = ed_swap_2(pbi_flags);
         numReads  = ed_swap_4(numReads);
     }
-    bgzf_write(fp, &version,   4);
-    bgzf_write(fp, &pbi_flags, 2);
-    bgzf_write(fp, &numReads,  4);
+    ret = bgzf_write(fp, &version,   4);
+    ret = bgzf_write(fp, &pbi_flags, 2);
+    ret = bgzf_write(fp, &numReads,  4);
 
     // reserved space
     char reserved[18];
     memset(reserved, 0, 18);
-    bgzf_write(fp, reserved, 18);
+    ret = bgzf_write(fp, reserved, 18);
+    UNUSED(ret);
 }
 
 void PbiIndexIO::WriteMappedData(const PbiRawMappedData& mappedData,
@@ -407,27 +408,26 @@ void PbiIndexIO::WriteReferenceData(const PbiRawReferenceData& referenceData,
                                     BGZF* fp)
 {
     // num_refs
-    uint32_t numRefs = referenceData.entries_.size();
+    auto numRefs = referenceData.entries_.size();
     if (fp->is_be)
         numRefs = ed_swap_4(numRefs);
-    bgzf_write(fp, &numRefs, 4);
+    auto ret = bgzf_write(fp, &numRefs, 4);
 
     // reference entries
-    numRefs = referenceData.entries_.size(); // need to reset after maybe endian-swapping
-    for (size_t i = 0; i < numRefs; ++i) {
-        const PbiReferenceEntry& entry = referenceData.entries_[i];
-        uint32_t tId      = entry.tId_;
-        uint32_t beginRow = entry.beginRow_;
-        uint32_t endRow   = entry.endRow_;
+    for (const auto& entry : referenceData.entries_) {
+        auto tId      = entry.tId_;
+        auto beginRow = entry.beginRow_;
+        auto endRow   = entry.endRow_;
         if (fp->is_be) {
             tId      = ed_swap_4(tId);
             beginRow = ed_swap_4(beginRow);
             endRow   = ed_swap_4(endRow);
         }
-        bgzf_write(fp, &tId,      4);
-        bgzf_write(fp, &beginRow, 4);
-        bgzf_write(fp, &endRow,   4);
+        ret = bgzf_write(fp, &tId,      4);
+        ret = bgzf_write(fp, &beginRow, 4);
+        ret = bgzf_write(fp, &endRow,   4);
     }
+    UNUSED(ret);
 }
 
 void PbiIndexIO::WriteBasicData(const PbiRawBasicData& basicData,

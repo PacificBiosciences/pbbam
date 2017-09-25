@@ -51,7 +51,7 @@ using namespace std;
 namespace DataSetCoreTests {
 
 static inline
-DataSet CreateDataSet(void)
+DataSet CreateDataSet()
 {
     DataSet d;
     d.Name("foo");

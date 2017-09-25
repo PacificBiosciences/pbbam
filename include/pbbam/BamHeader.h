@@ -85,7 +85,7 @@ public:
     ///
     /// \brief Creates an empty BamHeader
     ///
-    BamHeader(void);
+    BamHeader();
 
     ///
     /// \brief Creates a BamHeader from SAM-formatted text
@@ -97,7 +97,7 @@ public:
     BamHeader(BamHeader&& other) = default;
     BamHeader& operator=(const BamHeader& other) = default;
     BamHeader& operator=(BamHeader&& other) = default;
-    ~BamHeader(void) = default;
+    ~BamHeader() = default;
 
     /// \brief Detaches underlying data from the shared-pointer, returning a
     ///        independent copy of the header contents.
@@ -105,7 +105,7 @@ public:
     /// This ensures that any modifications to the newly returned BamHeader do
     /// not affect other BamHeader objects that were sharing its underlying data.
     ///
-    BamHeader DeepCopy(void) const;
+    BamHeader DeepCopy() const;
 
     /// \}
 
@@ -152,20 +152,20 @@ public:
     /// \note This is different from the SAM/BAM version number
     /// \sa BamHeader::Version.
     ///
-    std::string PacBioBamVersion(void) const;
+    std::string PacBioBamVersion() const;
 
     /// \returns the sort order used
     ///
     /// Valid values: "unknown", "unsorted", "queryname", or "coordinate"
     ///
-    std::string SortOrder(void) const;
+    std::string SortOrder() const;
 
     /// \returns the SAM/BAM version number (\@HD:VN)
     ///
     /// \note This is different from the %PacBio %BAM version number
     /// \sa BamHeader::PacBioBamVersion
     ///
-    std::string Version(void) const;
+    std::string Version() const;
 
     /// \}
 
@@ -183,12 +183,12 @@ public:
     ReadGroupInfo ReadGroup(const std::string& id) const;
 
     /// \returns vector of read group IDs listed in this header
-    std::vector<std::string> ReadGroupIds(void) const;
+    std::vector<std::string> ReadGroupIds() const;
 
     /// \returns vector of ReadGroupInfo objects, representing all read groups
     ///          listed in this header
     ///
-    std::vector<ReadGroupInfo> ReadGroups(void) const;
+    std::vector<ReadGroupInfo> ReadGroups() const;
 
     /// \}
 
@@ -200,7 +200,7 @@ public:
     bool HasSequence(const std::string& name) const;
 
     /// \returns number of sequences (\@SQ entries) stored in this header
-    size_t NumSequences(void) const;
+    size_t NumSequences() const;
 
     /// \returns numeric ID for sequence matching \p name (\@SQ:SN)
     ///
@@ -229,7 +229,7 @@ public:
     ///
     /// Position in the vector is equivalent to SequenceId.
     ///
-    std::vector<std::string> SequenceNames(void) const;
+    std::vector<std::string> SequenceNames() const;
 
     /// \returns SequenceInfo object at index \p id
     ///
@@ -244,7 +244,7 @@ public:
     /// \returns vector of SequenceInfo objects representing the sequences
     ///          (\@SQ entries) stored in this header
     ///
-    std::vector<SequenceInfo> Sequences(void) const;
+    std::vector<SequenceInfo> Sequences() const;
 
     /// \}
 
@@ -263,12 +263,12 @@ public:
     ProgramInfo Program(const std::string& id) const;
 
     /// \returns vector of program IDs (\@PG:ID)
-    std::vector<std::string> ProgramIds(void) const;
+    std::vector<std::string> ProgramIds() const;
 
     /// \returns vector of ProgramInfo objects representing program entries
     ///          (\@PG) stored in this heder
     ///
-    std::vector<ProgramInfo> Programs(void) const;
+    std::vector<ProgramInfo> Programs() const;
 
     /// \}
 
@@ -277,7 +277,7 @@ public:
     /// \{
 
     /// \returns vector of comment (\@CO) strings
-    std::vector<std::string> Comments(void) const;
+    std::vector<std::string> Comments() const;
 
     /// \}
 
@@ -286,7 +286,7 @@ public:
     /// \{
 
     /// \returns SAM-header-formatted string representing this header's data
-    std::string ToSam(void) const;
+    std::string ToSam() const;
 
     /// \}
 
@@ -333,7 +333,7 @@ public:
     ///
     /// \returns reference to this object
     ///
-    BamHeader& ClearReadGroups(void);
+    BamHeader& ClearReadGroups();
 
     /// \brief Replaces this header's list of read group entries with those in
     ///        \p readGroups.
@@ -358,7 +358,7 @@ public:
     ///
     /// \returns reference to this object
     ///
-    BamHeader& ClearSequences(void);
+    BamHeader& ClearSequences();
 
     /// \brief Replaces this header's list of sequence entries with those in
     ///       \p sequences.
@@ -383,7 +383,7 @@ public:
     ///
     /// \returns reference to this object
     ///
-    BamHeader& ClearPrograms(void);
+    BamHeader& ClearPrograms();
 
     /// \brief Replaces this header's list of program entries with those in
     ///        \p programs.
@@ -408,7 +408,7 @@ public:
     ///
     /// \returns reference to this object
     ///
-    BamHeader& ClearComments(void);
+    BamHeader& ClearComments();
 
     /// \brief Replaces this header's list of comments with those in \p comments.
     ///

@@ -46,20 +46,9 @@
 namespace PacBio {
 namespace BAM {
 
-ValidationException::ValidationException(const ErrorMap& fileErrors,
-                                         const ErrorMap& readGroupErrors,
-                                         const ErrorMap& recordErrors)
-    : std::runtime_error("")
-    , fileErrors_(fileErrors)
-    , readGroupErrors_(readGroupErrors)
-    , recordErrors_(recordErrors)
-{
-    FormatMessage();
-}
-
-ValidationException::ValidationException(ErrorMap&& fileErrors,
-                                         ErrorMap&& readGroupErrors,
-                                         ErrorMap&& recordErrors)
+ValidationException::ValidationException(ErrorMap fileErrors,
+                                         ErrorMap readGroupErrors,
+                                         ErrorMap recordErrors)
     : std::runtime_error("")
     , fileErrors_(std::move(fileErrors))
     , readGroupErrors_(std::move(readGroupErrors))
@@ -68,19 +57,19 @@ ValidationException::ValidationException(ErrorMap&& fileErrors,
     FormatMessage();
 }
 
-const ValidationException::ErrorMap& ValidationException::FileErrors(void) const
+const ValidationException::ErrorMap& ValidationException::FileErrors() const
 { return fileErrors_; }
 
-const ValidationException::ErrorMap& ValidationException::ReadGroupErrors(void) const
+const ValidationException::ErrorMap& ValidationException::ReadGroupErrors() const
 { return readGroupErrors_; }
 
-const ValidationException::ErrorMap& ValidationException::RecordErrors(void) const
+const ValidationException::ErrorMap& ValidationException::RecordErrors() const
 { return recordErrors_; }
 
-const char* ValidationException::what(void) const noexcept
+const char* ValidationException::what() const noexcept
 { return msg_.c_str(); }
 
-void ValidationException::FormatMessage(void)
+void ValidationException::FormatMessage()
 {
     std::stringstream s;
     s << "Validation failed: " << std::endl;

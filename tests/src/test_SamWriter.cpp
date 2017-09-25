@@ -63,7 +63,7 @@ TEST(SamWriterTest, HeaderOk)
         {
             const BamHeader inputHeader(hdrText);
             SamWriter writer(generatedFn, inputHeader);
-            (void)writer;
+//            ()writer;
         };
 
         // check header

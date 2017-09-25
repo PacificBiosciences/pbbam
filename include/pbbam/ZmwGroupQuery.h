@@ -74,7 +74,7 @@ public:
     ///
     ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist,
                   const DataSet& dataset);
-    ~ZmwGroupQuery(void);
+    ~ZmwGroupQuery();
 
 public:
     /// \brief Main iteration point for record access.
@@ -82,7 +82,7 @@ public:
     /// Most client code should not need to use this method directly. Use
     /// iterators instead.
     ///
-    bool GetNext(std::vector<BamRecord>& records);
+    bool GetNext(std::vector<BamRecord>& records) override;
 
 private:
     struct ZmwGroupQueryPrivate;

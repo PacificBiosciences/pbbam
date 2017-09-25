@@ -79,7 +79,7 @@ Version::Version(const std::string& v)
     Check();
 }
 
-std::string Version::ToString(void) const
+std::string Version::ToString() const
 {
     std::stringstream s;
     s << major_ << '.' << minor_ << '.' << revision_;

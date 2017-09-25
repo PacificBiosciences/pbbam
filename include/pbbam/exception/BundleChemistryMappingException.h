@@ -55,9 +55,9 @@ namespace BAM {
 class BundleChemistryMappingException : public std::exception
 {
 public:
-    BundleChemistryMappingException(const std::string& mappingXml, const std::string& msg)
-        : mappingXml_(mappingXml)
-        , what_(std::string("invalid ") + mappingXml_ + ": " + msg)
+    BundleChemistryMappingException(std::string mappingXml, std::string msg)
+        : mappingXml_(std::move(mappingXml))
+        , what_(std::string("invalid ") + mappingXml_ + ": " + std::move(msg))
     {
     }
 
@@ -67,7 +67,7 @@ public:
     }
 
 public:
-    const char* what(void) const noexcept override
+    const char* what() const noexcept override
     { return what_.c_str(); }
 
 protected:

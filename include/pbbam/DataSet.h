@@ -107,7 +107,7 @@ public:
 
     /// \brief Constructs an empty, generic DataSet.
     ///
-    DataSet(void);
+    DataSet();
 
     /// \brief Constructs an empty DataSet of the type specified.
     ///
@@ -148,10 +148,10 @@ public:
     DataSet(const std::vector<std::string>& filenames);
 
     DataSet(const DataSet& other);
-    DataSet(DataSet&& other);
+    DataSet(DataSet&&) = default;
     DataSet& operator=(const DataSet& other);
-    DataSet& operator=(DataSet&& other);
-    ~DataSet(void);
+    DataSet& operator=(DataSet&&) = default;
+    ~DataSet() = default;
 
     /// \brief Creates a DataSet from "raw" XML data.
     ///
@@ -227,70 +227,70 @@ public:
     /// \returns const reference to attribute's value (empty string if not
     ///          present)
     ///
-    const std::string& CreatedAt(void) const;
+    const std::string& CreatedAt() const;
 
     /// \brief Fetches the value of dataset's Format attribute.
     ///
     /// \returns const reference to attribute's value (empty string if not
     ///          present)
     ///
-    const std::string& Format(void) const;
+    const std::string& Format() const;
 
     /// \brief Fetches the value of dataset's MetaType attribute.
     ///
     /// \returns const reference to attribute's value (empty string if not
     ///          present)
     ///
-    const std::string& MetaType(void) const;
+    const std::string& MetaType() const;
 
     /// \brief Fetches the value of dataset's ModifiedAt attribute.
     ///
     /// \returns const reference to attribute's value (empty string if not
     ///          present)
     ///
-    const std::string& ModifiedAt(void) const;
+    const std::string& ModifiedAt() const;
 
     /// \brief Fetches the value of dataset's Name attribute.
     ///
     /// \returns const reference to attribute's value (empty string if not
     ///          present)
     ///
-    const std::string& Name(void) const;
+    const std::string& Name() const;
 
     /// \brief Fetches the value of dataset's ResourceId attribute.
     ///
     /// \returns const reference to attribute's value (empty string if not
     ///          present)
     ///
-    const std::string& ResourceId(void) const;
+    const std::string& ResourceId() const;
 
     /// \brief Fetches the value of dataset's Tags attribute.
     ///
     /// \returns const reference to attribute's value (empty string if not
     ///          present)
     ///
-    const std::string& Tags(void) const;
+    const std::string& Tags() const;
 
     /// \brief Fetches the value of dataset's TimeStampedName attribute.
     ///
     /// \returns const reference to attribute's value (empty string if not
     ///          present)
     ///
-    const std::string& TimeStampedName(void) const;
+    const std::string& TimeStampedName() const;
 
     /// \brief Fetches the value of dataset's UniqueId attribute.
     ///
     /// \returns const reference to attribute's value (empty string if not
     ///          present)
     ///
-    const std::string& UniqueId(void) const;
+    const std::string& UniqueId() const;
 
     /// \brief Fetches the value of dataset's Version attribute.
     ///
     /// \returns const reference to attribute's value (empty string if not
     ///          present)
     ///
-    const std::string& Version(void) const;
+    const std::string& Version() const;
 
     /// \}
 
@@ -302,13 +302,13 @@ public:
     ///
     /// \returns dataset type enum
     ///
-    PacBio::BAM::DataSet::TypeEnum Type(void) const;
+    PacBio::BAM::DataSet::TypeEnum Type() const;
 
     /// \brief Fetches the dataset's type.
     ///
     /// \returns printable dataset type
     ///
-    std::string TypeName(void) const;
+    std::string TypeName() const;
 
     /// \}
 
@@ -321,32 +321,32 @@ public:
     /// \returns const reference to child element
     /// \throws std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::Extensions& Extensions(void) const;
+    const PacBio::BAM::Extensions& Extensions() const;
 
     /// \brief Fetches the dataset's ExternalResources element.
     ///
     /// \returns const reference to child element
     /// \throws std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::ExternalResources& ExternalResources(void) const;
+    const PacBio::BAM::ExternalResources& ExternalResources() const;
 
     /// \brief Fetches the dataset's Filters element.
     ///
     /// \returns const reference to child element
     ///
-    const PacBio::BAM::Filters& Filters(void) const;
+    const PacBio::BAM::Filters& Filters() const;
 
     /// \brief Fetches the dataset's DataSetMetadata element.
     ///
     /// \returns const reference to child element
     ///
-    const PacBio::BAM::DataSetMetadata& Metadata(void) const;
+    const PacBio::BAM::DataSetMetadata& Metadata() const;
 
     /// \brief Fetches the dataset's DataSets element.
     ///
     /// \returns const reference to child element
     ///
-    const PacBio::BAM::SubDataSets& SubDataSets(void) const;
+    const PacBio::BAM::SubDataSets& SubDataSets() const;
 
     /// \}
 
@@ -364,7 +364,7 @@ public:
     ///
     /// \sa DataSet::ResolvedResourceIds
     ///
-    std::vector<std::string> AllFiles(void) const;
+    std::vector<std::string> AllFiles() const;
  
     /// \brief Returns this dataset's primary %BAM resources, with relative
     ///        filepaths already resolved.
@@ -376,7 +376,7 @@ public:
     ///
     /// \sa DataSet::ResolvedResourceIds
     ///
-    std::vector<BamFile> BamFiles(void) const;
+    std::vector<BamFile> BamFiles() const;
 
     /// \brief Returns this dataset's primary FASTA resources, with relative
     ///        filepaths already resolved.
@@ -388,7 +388,7 @@ public:
     ///
     /// \sa DataSet::ResolvedResourceIds
     ///
-    std::vector<std::string> FastaFiles(void) const;
+    std::vector<std::string> FastaFiles() const;
 
     /// \brief Returns all primary external resource filepaths, with relative
     ///        paths resolved.
@@ -400,7 +400,7 @@ public:
     ///
     /// \returns resourceIds
     ///
-    std::vector<std::string> ResolvedResourceIds(void) const;
+    std::vector<std::string> ResolvedResourceIds() const;
 
     /// \brief Resolves a filepath (that may be relative to the dataset).
     ///
@@ -423,7 +423,7 @@ public:
     ///
     /// \sa ReadGroupInfo::SequencingChemistry
     ///
-    std::set<std::string> SequencingChemistries(void) const;
+    std::set<std::string> SequencingChemistries() const;
 
     /// \}
 
@@ -435,7 +435,7 @@ public:
     ///
     /// \returns const reference to dataset's NamespaceRegistry
     ///
-    const NamespaceRegistry& Namespaces(void) const;
+    const NamespaceRegistry& Namespaces() const;
 
     /// \}
 
@@ -466,7 +466,7 @@ public:
     /// \returns non-const reference to attribute's value (empty string if this
     ///          is a new attribute)
     ///
-    std::string& CreatedAt(void);
+    std::string& CreatedAt();
 
     /// \brief Fetches the value of dataset's Format attribute.
     ///
@@ -475,7 +475,7 @@ public:
     /// \returns non-const reference to attribute's value (empty string if this
     ///          is a new attribute)
     ///
-    std::string& Format(void);
+    std::string& Format();
 
     /// \brief Fetches the value of dataset's MetaType attribute.
     ///
@@ -484,7 +484,7 @@ public:
     /// \returns non-const reference to attribute's value (empty string if this
     ///          is a new attribute)
     ///
-    std::string& MetaType(void);
+    std::string& MetaType();
 
     /// \brief Fetches the value of dataset's ModifiedAt attribute.
     ///
@@ -493,7 +493,7 @@ public:
     /// \returns non-const reference to attribute's value (empty string if this
     ///          is a new attribute)
     ///
-    std::string& ModifiedAt(void);
+    std::string& ModifiedAt();
 
     /// \brief Fetches the value of dataset's Name attribute.
     ///
@@ -502,7 +502,7 @@ public:
     /// \returns non-const reference to attribute's value (empty string if this
     ///          is a new attribute)
     ///
-    std::string& Name(void);
+    std::string& Name();
 
     /// \brief Fetches the value of dataset's ResourceId attribute.
     ///
@@ -511,7 +511,7 @@ public:
     /// \returns non-const reference to attribute's value (empty string if this
     ///          is a new attribute)
     ///
-    std::string& ResourceId(void);
+    std::string& ResourceId();
 
     /// \brief Fetches the value of dataset's Tags attribute.
     ///
@@ -520,7 +520,7 @@ public:
     /// \returns non-const reference to attribute's value (empty string if this
     ///          is a new attribute)
     ///
-    std::string& Tags(void);
+    std::string& Tags();
 
     /// \brief Fetches the value of dataset's TimeStampedName attribute.
     ///
@@ -529,7 +529,7 @@ public:
     /// \returns non-const reference to attribute's value (empty string if this
     ///          is a new attribute)
     ///
-    std::string& TimeStampedName(void);
+    std::string& TimeStampedName();
 
     /// \brief Fetches the value of dataset's UniqueId attribute.
     ///
@@ -538,7 +538,7 @@ public:
     /// \returns non-const reference to attribute's value (empty string if this
     ///          is a new attribute)
     ///
-    std::string& UniqueId(void);
+    std::string& UniqueId();
 
     /// \brief Fetches the value of dataset's Version attribute.
     ///
@@ -547,7 +547,7 @@ public:
     /// \returns non-const reference to attribute's value (empty string if this
     ///          is a new attribute)
     ///
-    std::string& Version(void);
+    std::string& Version();
     
     /// \}
 
@@ -686,7 +686,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::Extensions& Extensions(void);
+    PacBio::BAM::Extensions& Extensions();
 
     /// \brief Fetches the dataset's ExternalResources element.
     ///
@@ -694,7 +694,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::ExternalResources& ExternalResources(void);
+    PacBio::BAM::ExternalResources& ExternalResources();
 
     /// \brief Fetches the dataset's Filters element.
     ///
@@ -702,7 +702,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::Filters& Filters(void);
+    PacBio::BAM::Filters& Filters();
 
     /// \brief Fetches the dataset's DataSetMetadata element.
     ///
@@ -710,7 +710,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::DataSetMetadata& Metadata(void);
+    PacBio::BAM::DataSetMetadata& Metadata();
 
     /// \brief Fetches the dataset's DataSets element.
     ///
@@ -718,7 +718,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::SubDataSets& SubDataSets(void);
+    PacBio::BAM::SubDataSets& SubDataSets();
 
     /// \}
 
@@ -781,7 +781,7 @@ public:
     ///
     /// \returns non-const reference to dataset's NamespaceRegistry
     ///
-    NamespaceRegistry& Namespaces(void);
+    NamespaceRegistry& Namespaces();
 
     /// \}
 
@@ -799,7 +799,7 @@ private:
 ///
 /// \sa ToDataSetFormat
 ///
-PBBAM_EXPORT std::string CurrentTimestamp(void);
+PBBAM_EXPORT std::string CurrentTimestamp();
 
 /// \brief Converts a time_point to "DataSetXML-formatted" timestamp.
 ///

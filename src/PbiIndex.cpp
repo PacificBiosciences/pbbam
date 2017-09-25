@@ -54,8 +54,6 @@ namespace BAM {
 // SubreadLookupData implementation
 // ----------------------------------
 
-BasicLookupData::BasicLookupData(void) { }
-
 BasicLookupData::BasicLookupData(const PbiRawBasicData& rawData)
     : rgId_(rawData.rgId_)
     , qStart_(rawData.qStart_)
@@ -70,7 +68,6 @@ BasicLookupData::BasicLookupData(const PbiRawBasicData& rawData)
 // MappedLookupData implementation
 // ----------------------------------
 
-MappedLookupData::MappedLookupData(void) { }
 
 MappedLookupData::MappedLookupData(const PbiRawMappedData& rawData)
     : tId_(rawData.tId_)
@@ -110,8 +107,6 @@ MappedLookupData::MappedLookupData(const PbiRawMappedData& rawData)
 // BarcodeLookupData implementation
 // ----------------------------------
 
-BarcodeLookupData::BarcodeLookupData(void) { }
-
 BarcodeLookupData::BarcodeLookupData(const PbiRawBarcodeData& rawData)
     : bcForward_(rawData.bcForward_)
     , bcReverse_(rawData.bcReverse_)
@@ -122,8 +117,6 @@ BarcodeLookupData::BarcodeLookupData(const PbiRawBarcodeData& rawData)
 // ----------------------------------
 // ReferenceLookupData implementation
 // ----------------------------------
-
-ReferenceLookupData::ReferenceLookupData(void) { }
 
 ReferenceLookupData::ReferenceLookupData(const PbiRawReferenceData& rawData)
 {
@@ -140,12 +133,6 @@ namespace internal {
 // --------------------------------
 // PbiIndexPrivate implementation
 // --------------------------------
-
-PbiIndexPrivate::PbiIndexPrivate(void)
-    : version_(PbiFile::CurrentVersion)
-    , sections_(PbiFile::BASIC)
-    , numReads_(0)
-{ }
 
 PbiIndexPrivate::PbiIndexPrivate(const PbiRawData& rawIndex)
     : filename_(rawIndex.Filename())
@@ -169,9 +156,9 @@ PbiIndexPrivate::PbiIndexPrivate(PbiRawData&& rawIndex)
     , barcodeData_(std::move(rawIndex.BarcodeData()))
 { }
 
-std::unique_ptr<PbiIndexPrivate> PbiIndexPrivate::DeepCopy(void) const
+std::unique_ptr<PbiIndexPrivate> PbiIndexPrivate::DeepCopy() const
 {
-    std::unique_ptr<PbiIndexPrivate> copy(new PbiIndexPrivate);
+    auto copy = std::make_unique<PbiIndexPrivate>();
     copy->filename_ = filename_;
     copy->version_  = version_;
     copy->sections_ = sections_;
@@ -189,12 +176,12 @@ std::unique_ptr<PbiIndexPrivate> PbiIndexPrivate::DeepCopy(void) const
 // PbiIndex implementation
 // -------------------------
 
-PbiIndex::PbiIndex(void)
-    : d_(new internal::PbiIndexPrivate)
+PbiIndex::PbiIndex()
+    : d_(std::make_unique<internal::PbiIndexPrivate>())
 { }
 
 PbiIndex::PbiIndex(const std::string& pbiFilename)
-    : d_(new internal::PbiIndexPrivate(PbiRawData(pbiFilename)))
+    : d_(std::make_unique<internal::PbiIndexPrivate>(PbiRawData(pbiFilename)))
 { }
 
 PbiIndex::PbiIndex(const PbiIndex& other)
@@ -202,10 +189,6 @@ PbiIndex::PbiIndex(const PbiIndex& other)
 {
     // move is ok, since it's a deep-copied, new object
 }
-
-PbiIndex::PbiIndex(PbiIndex&& other)
-    : d_(std::move(other.d_))
-{ }
 
 PbiIndex& PbiIndex::operator=(const PbiIndex& other)
 {
@@ -216,17 +199,9 @@ PbiIndex& PbiIndex::operator=(const PbiIndex& other)
     return *this;
 }
 
-PbiIndex& PbiIndex::operator=(PbiIndex&& other)
-{
-    if (this != &other) {
-        d_ = std::move(other.d_);
-    }
-    return *this;
-}
+PbiIndex::~PbiIndex() { }
 
-PbiIndex::~PbiIndex(void) { }
-
-std::string PbiIndex::Filename(void) const
+std::string PbiIndex::Filename() const
 { return d_->filename_; }
 
 } // namespace BAM

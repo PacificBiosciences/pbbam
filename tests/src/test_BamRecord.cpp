@@ -56,7 +56,7 @@ using namespace std;
 namespace BamRecordTests {
 
 static
-BamRecordImpl CreateBamImpl(void)
+BamRecordImpl CreateBamImpl()
 {
     TagCollection tags;
     tags["HX"] = string("1abc75");
@@ -78,7 +78,7 @@ BamRecordImpl CreateBamImpl(void)
 }
 
 static inline
-BamRecord CreateBam(void)
+BamRecord CreateBam()
 { return BamRecord{ CreateBamImpl() }; }
 
 static
@@ -258,18 +258,18 @@ public:
         assert(12 == init.size());
     }
 
-    T ForwardGenomic(void) const               { return d_.at(0); }
-    T ForwardNative(void) const                { return d_.at(1); }
-    T ForwardGenomicAligned(void) const        { return d_.at(2); }
-    T ForwardNativeAligned(void) const         { return d_.at(3); }
-    T ForwardGenomicAlignedClipped(void) const { return d_.at(4); }
-    T ForwardNativeAlignedClipped(void) const  { return d_.at(5); }
-    T ReverseGenomic(void) const               { return d_.at(6); }
-    T ReverseNative(void) const                { return d_.at(7); }
-    T ReverseGenomicAligned(void) const        { return d_.at(8); }
-    T ReverseNativeAligned(void) const         { return d_.at(9); }
-    T ReverseGenomicAlignedClipped(void) const { return d_.at(10); }
-    T ReverseNativeAlignedClipped(void) const  { return d_.at(11); }
+    T ForwardGenomic() const               { return d_.at(0); }
+    T ForwardNative() const                { return d_.at(1); }
+    T ForwardGenomicAligned() const        { return d_.at(2); }
+    T ForwardNativeAligned() const         { return d_.at(3); }
+    T ForwardGenomicAlignedClipped() const { return d_.at(4); }
+    T ForwardNativeAlignedClipped() const  { return d_.at(5); }
+    T ReverseGenomic() const               { return d_.at(6); }
+    T ReverseNative() const                { return d_.at(7); }
+    T ReverseGenomicAligned() const        { return d_.at(8); }
+    T ReverseNativeAligned() const         { return d_.at(9); }
+    T ReverseGenomicAlignedClipped() const { return d_.at(10); }
+    T ReverseNativeAlignedClipped() const  { return d_.at(11); }
 
 private:
     vector<T> d_;

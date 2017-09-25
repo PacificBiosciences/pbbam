@@ -80,10 +80,10 @@ public:
     PbiIndex(const std::string& pbiFilename);
 
     PbiIndex(const PbiIndex& other);
-    PbiIndex(PbiIndex&& other);
+    PbiIndex(PbiIndex&&) = default;
     PbiIndex& operator=(const PbiIndex& other);
-    PbiIndex& operator=(PbiIndex&& other);
-    ~PbiIndex(void);
+    PbiIndex& operator=(PbiIndex&&) = default;
+    ~PbiIndex();
 
     /// \}
 
@@ -92,13 +92,13 @@ public:
     /// \{
 
     /// \returns true if index has BarcodeData section
-    bool HasBarcodeData(void) const;
+    bool HasBarcodeData() const;
 
     /// \returns true if index has MappedData section
-    bool HasMappedData(void) const;
+    bool HasMappedData() const;
 
     /// \returns true if index has ReferenceData section
-    bool HasReferenceData(void) const;
+    bool HasReferenceData() const;
 
     /// \returns true if index has \b section
     /// \param[in] section PbiFile::Section identifier
@@ -110,16 +110,16 @@ public:
     /// \note Returns an empty string if the underlying data was generated, not
     ///       loaded from file.
     ///
-    std::string Filename(void) const;
+    std::string Filename() const;
 
     /// \returns enum flags representing the file sections present
-    PbiFile::Sections FileSections(void) const;
+    PbiFile::Sections FileSections() const;
 
     /// \returns the number of records in the PBI (& associated %BAM)
-    uint32_t NumReads(void) const;
+    uint32_t NumReads() const;
 
     /// \returns the PBI file's version
-    PbiFile::VersionEnum Version(void) const;
+    PbiFile::VersionEnum Version() const;
 
     /// \}
 
@@ -131,27 +131,27 @@ public:
     ///
     /// May be empty, check result of HasBarcodeData.
     ///
-    const BarcodeLookupData& BarcodeData(void) const;
+    const BarcodeLookupData& BarcodeData() const;
 
     /// \returns const reference to BasicData lookup structure
-    const BasicLookupData& BasicData(void) const;
+    const BasicLookupData& BasicData() const;
 
     /// \returns const reference to MappedData lookup structure
     ///
     /// May be empty, check result of HasMappedData.
     ///
-    const MappedLookupData& MappedData(void) const;
+    const MappedLookupData& MappedData() const;
 
     /// \returns const reference to reference data lookup structure
     ///
     /// May be empty, check result of HasReferenceData.
     ///
-    const ReferenceLookupData& ReferenceData(void) const;
+    const ReferenceLookupData& ReferenceData() const;
 
     /// }
 
 private:
-    PbiIndex(void);
+    PbiIndex();
     std::unique_ptr<internal::PbiIndexPrivate> d_;
 };
 

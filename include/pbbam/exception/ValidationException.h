@@ -61,27 +61,25 @@ namespace BAM {
 class ValidationException : public std::runtime_error
 {
 public:
-    typedef std::vector<std::string>         ErrorList;
-    typedef std::map<std::string, ErrorList> ErrorMap;
+    using ErrorList = std::vector<std::string>;
+    using ErrorMap  = std::map<std::string, ErrorList>;
 
 public:
-    ValidationException(const ErrorMap& fileErrors,
-                        const ErrorMap& readGroupErrors,
-                        const ErrorMap& recordErrors);
-    ValidationException(ErrorMap&& fileErrors,
-                        ErrorMap&& readGroupErrors,
-                        ErrorMap&& recordErrors);
+    ValidationException(ErrorMap fileErrors,
+                        ErrorMap readGroupErrors,
+                        ErrorMap recordErrors);
+
     // This is a work around for the Intel PHI compiler (icpc)
     ~ValidationException() throw()
     {
-
     }
-public:
-    const ErrorMap& FileErrors(void) const;
-    const ErrorMap& ReadGroupErrors(void) const;
-    const ErrorMap& RecordErrors(void) const;
 
-    const char* what(void) const noexcept override;
+public:
+    const ErrorMap& FileErrors() const;
+    const ErrorMap& ReadGroupErrors() const;
+    const ErrorMap& RecordErrors() const;
+
+    const char* what() const noexcept override;
 
 private:
     ErrorMap fileErrors_;
@@ -90,7 +88,7 @@ private:
     std::string msg_;
 
 private:
-    void FormatMessage(void);
+    void FormatMessage();
 };
 
 } // namespace BAM

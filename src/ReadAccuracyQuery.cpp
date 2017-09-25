@@ -66,12 +66,12 @@ ReadAccuracyQuery::ReadAccuracyQuery(const Accuracy accuracy,
     , d_(new ReadAccuracyQueryPrivate(accuracy, compareType, dataset))
 { }
 
-ReadAccuracyQuery::~ReadAccuracyQuery(void) { }
+ReadAccuracyQuery::~ReadAccuracyQuery() { }
 
 bool ReadAccuracyQuery::GetNext(BamRecord &r)
 { return d_->reader_.GetNext(r); }
 
-uint32_t ReadAccuracyQuery::NumReads(void) const
+uint32_t ReadAccuracyQuery::NumReads() const
 { return d_->reader_.NumReads(); }
 
 } // namespace BAM

@@ -56,7 +56,7 @@ using namespace std;
 
 namespace ValidatorTests {
 
-static BamRecord makeValidMappedRecord(void)
+static BamRecord makeValidMappedRecord()
 {
     BamRecordImpl impl;
     impl.Bin(4680);
@@ -94,7 +94,7 @@ static BamRecord makeValidMappedRecord(void)
     return BamRecord(impl);
 }
 
-static BamRecord makeValidUnmappedRecord(void)
+static BamRecord makeValidUnmappedRecord()
 {
     BamRecordImpl impl;
     impl.Bin(4680);
@@ -130,7 +130,7 @@ static BamRecord makeValidUnmappedRecord(void)
     return BamRecord(impl);
 }
 
-static ReadGroupInfo makeValidReadGroup(void)
+static ReadGroupInfo makeValidReadGroup()
 {
     ReadGroupInfo rg("f5b4ffb6");
     rg.MovieName("movie32");

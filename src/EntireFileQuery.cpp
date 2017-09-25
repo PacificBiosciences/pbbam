@@ -61,7 +61,7 @@ EntireFileQuery::EntireFileQuery(const DataSet &dataset)
     , d_(new EntireFileQueryPrivate(dataset))
 { }
 
-EntireFileQuery::~EntireFileQuery(void) { }
+EntireFileQuery::~EntireFileQuery() { }
 
 bool EntireFileQuery::GetNext(BamRecord &r)
 { return d_->reader_.GetNext(r); }

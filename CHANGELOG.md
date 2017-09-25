@@ -10,6 +10,11 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.13.0] = 2017-09-25
+
+### Changed
+- Ran clang-tidy (modernize) over codebase to clean up legacy coding styles.
+
 ## [0.12.2] - 2017-09-22
 
 ### Added 
@@ -19,6 +24,7 @@ guarantees will be maintained within each major version series.
 
 ### Added
 - Pulse exclusion base feature to read group.
+>>>>>>> 944ae0ecab8ada1aa4af4716c4e3333621bbcb1d
 
 ## [0.12.0] - 2017-09-19
 

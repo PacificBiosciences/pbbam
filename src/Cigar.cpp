@@ -65,7 +65,7 @@ Cigar::Cigar(const std::string& cigarString)
     }
 }
 
-std::string Cigar::ToStdString(void) const
+std::string Cigar::ToStdString() const
 {
     std::stringstream s;
     const auto end  = this->cend();

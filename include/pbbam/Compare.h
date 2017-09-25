@@ -142,7 +142,7 @@ private:
     template<typename ValueType>
     struct MemberFunctionBaseHelper : public Compare::Base
     {
-        typedef ValueType (BamRecord::*MemberFnType)(void) const;
+        using MemberFnType = ValueType (BamRecord::*)() const;
     };
 
 public:

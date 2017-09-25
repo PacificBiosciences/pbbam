@@ -76,7 +76,7 @@ public:
     ///
     BarcodeQuery(const int16_t barcode, const DataSet& dataset);
 
-    ~BarcodeQuery(void);
+    ~BarcodeQuery() override;
 
 public:
 
@@ -85,7 +85,7 @@ public:
     /// Most client code should not need to use this method directly. Use
     /// iterators instead.
     ///
-    bool GetNext(BamRecord& r);
+    bool GetNext(BamRecord& r) override;
 
 private:
     struct BarcodeQueryPrivate;

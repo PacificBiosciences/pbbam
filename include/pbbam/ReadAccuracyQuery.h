@@ -82,7 +82,7 @@ public:
                       const Compare::Type compareType,
                       const DataSet& dataset);
 
-    ~ReadAccuracyQuery(void);
+    ~ReadAccuracyQuery() override;
 
 public:
 
@@ -91,9 +91,9 @@ public:
     /// Most client code should not need to use this method directly. Use
     /// iterators instead.
     ///
-    bool GetNext(BamRecord& r);
+    bool GetNext(BamRecord& r) override;
 
-    uint32_t NumReads(void) const;
+    uint32_t NumReads() const;
 
 private:
     struct ReadAccuracyQueryPrivate;

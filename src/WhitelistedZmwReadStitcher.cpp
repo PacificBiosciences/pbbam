@@ -62,7 +62,7 @@ public:
         , scrapsReader_(new PbiIndexedBamReader{ *scrapsBamFile_ })
     {
         // setup new header for stitched data
-        polyHeader_ = std::unique_ptr<BamHeader>(new BamHeader(primaryBamFile_->Header().ToSam()));
+        polyHeader_ = std::make_unique<BamHeader>(primaryBamFile_->Header().ToSam());
         auto readGroups = polyHeader_->ReadGroups();
         if (readGroups.empty())
             throw std::runtime_error("Bam header of the primary bam has no read groups.");
@@ -81,19 +81,19 @@ public:
         PreFilterZmws(zmwWhitelist);
     }
 
-    bool HasNext(void) const
+    bool HasNext() const
     {
         return !zmwWhitelist_.empty();
     }
 
-    VirtualZmwBamRecord Next(void)
+    VirtualZmwBamRecord Next()
     {
         auto bamRecordVec = NextRaw();
         VirtualZmwBamRecord stitched(std::move(bamRecordVec), *polyHeader_);
         return stitched;
     }
 
-    std::vector<BamRecord> NextRaw(void)
+    std::vector<BamRecord> NextRaw()
     {
         auto result = std::vector<BamRecord>{ };
         if (!HasNext())
@@ -113,10 +113,10 @@ public:
         return result;
     }
 
-    BamHeader PrimaryHeader(void) const
+    BamHeader PrimaryHeader() const
     { return primaryBamFile_->Header(); }
 
-    BamHeader ScrapsHeader(void) const
+    BamHeader ScrapsHeader() const
     { return scrapsBamFile_->Header(); }
 
 private:
@@ -164,21 +164,21 @@ WhitelistedZmwReadStitcher::WhitelistedZmwReadStitcher(const std::vector<int32_t
                                                scrapsBamFilePath))
 { }
 
-WhitelistedZmwReadStitcher::~WhitelistedZmwReadStitcher(void) { }
+WhitelistedZmwReadStitcher::~WhitelistedZmwReadStitcher() { }
 
-bool WhitelistedZmwReadStitcher::HasNext(void) const
+bool WhitelistedZmwReadStitcher::HasNext() const
 { return d_->HasNext(); }
 
-VirtualZmwBamRecord WhitelistedZmwReadStitcher::Next(void)
+VirtualZmwBamRecord WhitelistedZmwReadStitcher::Next()
 { return d_->Next(); }
 
-std::vector<BamRecord> WhitelistedZmwReadStitcher::NextRaw(void)
+std::vector<BamRecord> WhitelistedZmwReadStitcher::NextRaw()
 { return d_->NextRaw(); }
 
-BamHeader WhitelistedZmwReadStitcher::PrimaryHeader(void) const
+BamHeader WhitelistedZmwReadStitcher::PrimaryHeader() const
 { return d_->PrimaryHeader(); }
 
-BamHeader WhitelistedZmwReadStitcher::ScrapsHeader(void) const
+BamHeader WhitelistedZmwReadStitcher::ScrapsHeader() const
 { return d_->ScrapsHeader(); }
 
 } // namespace BAM

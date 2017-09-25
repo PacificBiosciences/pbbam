@@ -75,7 +75,7 @@ public:
     static Cigar FromStdString(const std::string& stdString);
 
     /// \brief Creates an empty Cigar.
-    Cigar(void) = default;
+    Cigar() = default;
 
     /// \brief Creates a Cigar object from SAM/BAM string input
     ///
@@ -87,7 +87,7 @@ public:
     Cigar(Cigar&& other) = default;
     Cigar& operator=(const Cigar& other) = default;
     Cigar& operator=(Cigar&& other) = default;
-    ~Cigar(void) = default;
+    ~Cigar() = default;
 
     /// \}
 
@@ -99,7 +99,7 @@ public:
     ///
     /// \returns SAM/BAM formatted std::string
     ///
-    std::string ToStdString(void) const;
+    std::string ToStdString() const;
 
     /// \}
 };

@@ -61,7 +61,7 @@ FastaSequenceQuery::FastaSequenceQuery(const DataSet &dataset)
     , d_(new FastaSequenceQueryPrivate(dataset))
 { }
 
-FastaSequenceQuery::~FastaSequenceQuery(void) { }
+FastaSequenceQuery::~FastaSequenceQuery() { }
 
 bool FastaSequenceQuery::GetNext(FastaSequence& seq)
 { return d_->reader_.GetNext(seq); }

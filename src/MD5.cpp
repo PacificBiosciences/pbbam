@@ -51,14 +51,14 @@ namespace BAM {
 class Md5ContextHelper
 {
 public:
-    Md5ContextHelper(void)
+    Md5ContextHelper()
         : data_(hts_md5_init())
     {
         if (data_ == nullptr)
             throw std::runtime_error("could not initialize MD5 context");
     }
 
-    ~Md5ContextHelper(void)
+    ~Md5ContextHelper()
     {
         hts_md5_destroy(data_);
     }
