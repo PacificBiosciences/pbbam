@@ -2725,6 +2725,7 @@ TEST(BamRecordTest, PulseExclusionTag)
     auto bam = BamRecordTests::CreateBam();
     bam.PulseExclusionReason(reasons);
 
+    EXPECT_TRUE(bam.HasPulseExclusion());
     auto result = bam.PulseExclusionReason();
     EXPECT_EQ(reasons, result);
 

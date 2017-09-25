@@ -362,6 +362,9 @@ public:
     /// \returns true if this record has PulseCallWidth data
     bool HasPulseCallWidth() const;
 
+    /// \returns true if this record has PulseExclusion data
+    bool HasPulseExclusion(void) const;
+
     /// \returns true if this record has PulseMergeQV data
     bool HasPulseMergeQV() const;
 

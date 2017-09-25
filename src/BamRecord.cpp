@@ -1631,7 +1631,10 @@ bool BamRecord::HasPulseCall() const
           && !impl_.TagValue(BamRecordTag::PULSE_CALL).IsNull();
 }
 
-bool BamRecord::HasPulseCallWidth() const
+bool BamRecord::HasPulseExclusion(void) const
+{ return impl_.HasTag(BamRecordTag::PULSE_EXCLUSION); }
+
+bool BamRecord::HasPulseCallWidth(void) const
 { return impl_.HasTag(BamRecordTag::PULSE_CALL_WIDTH); }
 
 bool BamRecord::HasPulseWidth() const
