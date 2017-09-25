@@ -105,6 +105,7 @@ void VirtualZmwBamRecord::StitchSources()
     std::vector<float>    pa;
     std::vector<float>    pm;
     std::vector<uint32_t> sf;
+    std::vector<PacBio::BAM::PulseExclusionReason> pe;
 
     // initialize capacity
     const auto stitchedSize = lastRecord.QueryEnd() - firstRecord.QueryStart();
@@ -128,6 +129,7 @@ void VirtualZmwBamRecord::StitchSources()
     pa.reserve(stitchedSize);
     pm.reserve(stitchedSize);
     sf.reserve(stitchedSize);
+    pe.reserve(stitchedSize);
 
     // Stitch using tmp vars
     for(auto& b : sources_)
@@ -192,6 +194,9 @@ void VirtualZmwBamRecord::StitchSources()
 
         if (b.HasPkmean2())
             MoveAppend(b.Pkmean2(), pa);
+
+        if (b.HasPulseExclusion())
+            MoveAppend(b.PulseExclusionReason(), pe);
 
         if (b.HasStartFrame())
             MoveAppend(b.StartFrame(), sf);
@@ -286,6 +291,10 @@ void VirtualZmwBamRecord::StitchSources()
         this->LabelQV(labelQv);
     if (!alternativeLabelQv.empty())
         this->AltLabelQV(alternativeLabelQv);
+
+    // PulseExclusionReason
+    if (!pe.empty())
+        this->PulseExclusionReason(pe);
 
     // 16 bit arrays
     if (!ipd.Data().empty())
