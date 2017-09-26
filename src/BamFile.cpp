@@ -42,6 +42,7 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/BamFile.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiFile.h"
 #include "FileUtils.h"
 #include "MemoryUtils.h"

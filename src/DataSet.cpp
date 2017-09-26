@@ -43,6 +43,7 @@
 
 #include "pbbam/DataSet.h"
 #include "pbbam/DataSetTypes.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 #include "DataSetIO.h"
 #include "FileUtils.h"

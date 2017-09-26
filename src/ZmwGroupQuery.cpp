@@ -44,6 +44,7 @@
 #include "pbbam/ZmwGroupQuery.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/CompositeBamReader.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiFilterTypes.h"
 #include "MemoryUtils.h"
 #include <algorithm>

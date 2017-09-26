@@ -38,6 +38,8 @@
 #include "PbbamInternalConfig.h"
 
 #include "DataSetIO.h"
+
+#include "pbbam/MakeUnique.h"
 #include "FileUtils.h"
 #include "FofnReader.h"
 #include "StringUtils.h"

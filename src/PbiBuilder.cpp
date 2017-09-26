@@ -43,6 +43,7 @@
 
 #include "pbbam/PbiBuilder.h"
 #include "pbbam/BamRecord.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiRawData.h"
 #include "MemoryUtils.h"
 

@@ -44,6 +44,7 @@
 #include "pbbam/virtual/ZmwReadStitcher.h"
 #include "pbbam/DataSet.h"
 #include "pbbam/EntireFileQuery.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiFilter.h"
 #include "pbbam/PbiFilterQuery.h"
 #include "VirtualZmwReader.h"

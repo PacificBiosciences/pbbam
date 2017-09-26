@@ -10,6 +10,11 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.13.2] - 2017-09-25
+
+### Added
+- Backward compatibility for C++11 (std::make_unique which is 11/14 agnostic).
+
 ## [0.13.1] - 2017-09-25
 
 ### Added
