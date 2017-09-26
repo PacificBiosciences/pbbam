@@ -42,6 +42,7 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/virtual/WhitelistedZmwReadStitcher.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiIndexedBamReader.h"
 #include "VirtualZmwReader.h"
 #include <cassert>

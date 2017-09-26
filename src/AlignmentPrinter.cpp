@@ -42,7 +42,7 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/AlignmentPrinter.h"
-
+#include "pbbam/MakeUnique.h"
 #include <cmath>
 #include <cstddef>
 #include <iostream>

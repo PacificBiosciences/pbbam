@@ -42,6 +42,7 @@
 #include "PbbamInternalConfig.h"
 
 #include "VirtualZmwCompositeReader.h"
+#include "pbbam/MakeUnique.h"
 #include <boost/algorithm/string.hpp>
 
 namespace PacBio {

@@ -1,4 +1,4 @@
-// Copyright (c) 2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2017, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -23,7 +23,7 @@
 // BIOSCIENCES AND ITS CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 // WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 // OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT  SHALL PACIFIC BIOSCIENCES OR ITS
+// DISCLAIMED. IN NO EVENT SHALL PACIFIC BIOSCIENCES OR ITS
 // CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
 // SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
 // LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
@@ -32,27 +32,33 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
+//
+// File Description
+/// \file BamRecord.h
+/// \brief Defines the BamRecord class.
+//
 // Author: Derek Barnett
 
-#include "PbIndexDump.h"
-#include "CppFormatter.h"
-#include "JsonFormatter.h"
-#include "pbbam/MakeUnique.h"
-#include <cassert>
-using namespace pbindexdump;
-using namespace std;
+#ifndef PBBAM_MAKE_UNIQUE_H
+#define PBBAM_MAKE_UNIQUE_H
 
-void PbIndexDump::Run(const Settings& settings)
+// Only include if in pre-C++14 mode
+//
+#if __cplusplus <= 201103L 
+
+#include <cstddef>
+#include <memory>
+
+namespace std {
+
+template<typename T, typename... Args>
+inline std::unique_ptr<T> make_unique(Args&&... args)
 {
-    std::unique_ptr<IFormatter> formatter(nullptr);
-    if      (settings.format_ == "json") formatter = std::make_unique<JsonFormatter>(settings);
-    else if (settings.format_ == "cpp")  formatter = std::make_unique<CppFormatter>(settings);
-    else {
-        string msg = { "unsupported output format requested: " };
-        msg += settings.format_;
-        throw runtime_error(msg);
-    }
-    assert(formatter);
-    formatter->Run();
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
+
+} // namespace std
+
+#endif  // < C++14
+
+#endif // PBBAM_MAKE_UNIQUE_H

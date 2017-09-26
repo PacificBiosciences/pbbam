@@ -41,6 +41,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/Interval.h
     ${PacBioBAM_IncludeDir}/pbbam/IRecordWriter.h
     ${PacBioBAM_IncludeDir}/pbbam/LocalContextFlags.h
+    ${PacBioBAM_IncludeDir}/pbbam/MakeUnique.h
     ${PacBioBAM_IncludeDir}/pbbam/MD5.h
     ${PacBioBAM_IncludeDir}/pbbam/Orientation.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiBasicTypes.h

@@ -42,6 +42,7 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/BamRecord.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/virtual/VirtualRegionTypeMap.h"
 #include "pbbam/ZmwTypeMap.h"
 #include "BamRecordTags.h"

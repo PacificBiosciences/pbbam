@@ -43,6 +43,7 @@ if not meson.is_subproject()
       'pbbam/Interval.h',
       'pbbam/IRecordWriter.h',
       'pbbam/LocalContextFlags.h',
+      'pbbam/MakeUnique.h',
       'pbbam/MD5.h',
       'pbbam/MoveAppend.h',
       'pbbam/Orientation.h',

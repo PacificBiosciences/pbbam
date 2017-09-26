@@ -40,6 +40,7 @@
 // Author: Derek Barnett
 
 #include "pbbam/PbiFilter.h"
+#include "pbbam/MakeUnique.h"
 #include <algorithm>
 #include <iostream>
 #include <map>

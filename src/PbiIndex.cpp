@@ -45,6 +45,7 @@
 #include <cstdint>
 
 #include "pbbam/PbiIndex.h"
+#include "pbbam/MakeUnique.h"
 #include "PbiIndexIO.h"
 
 namespace PacBio {
