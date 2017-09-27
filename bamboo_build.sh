@@ -16,6 +16,8 @@ fi
 # tool deps
 CMAKE_VERSION=3
 
+mkdir -p build
+cd build
 if [ $(basename `pwd`) != build ]; then
   echo $0 must be run from the build directory.  Current directory is `pwd`
   exit 1
