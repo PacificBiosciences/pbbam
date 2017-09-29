@@ -62,7 +62,7 @@ rsync -avx --delete prefix/ pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}/
 tar zcf ${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}
 sha1sum pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz | awk -e '{print $1}' >| pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz.sha1
 md5sum pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz | awk -e '{print $1}' >| pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz.md5
-NEXUS_URL=http://nexus/repository/maven-releases/pacbio/seq/pa/pbbam/${PBBAM_VERSION}.${BUILD_NUMBER}
+NEXUS_URL=http://ossnexus.pacificbiosciences.com/repository/maven-releases/pacbio/seq/pa/pbbam/${PBBAM_VERSION}.${BUILD_NUMBER}
 curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz.md5 $NEXUS_URL/pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz.md5
 curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz.sha1 $NEXUS_URL/pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz.sha1
 curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz $NEXUS_URL/pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz
