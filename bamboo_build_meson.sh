@@ -13,7 +13,7 @@ module load ninja/1.7.2
 module load gcc/6.4.0
 module load ccache/3.3.4
 if [[ $USER == "bamboo" ]]; then
-  export CCACHE_DIR=/mnt/secondary/Share/tmp/bamboo.mobs.ccachedir
+  export CCACHE_DIR=/mnt/secondary/Share/tmp/bamboo.${bamboo_shortPlanKey}.ccachedir
   export CCACHE_TEMPDIR=/scratch/bamboo.ccache_tempdir
 fi
 module load git/2.8.3
