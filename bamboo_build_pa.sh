@@ -14,7 +14,7 @@ PBBAM_VERSION=$(grep 'PacBioBAM VERSION ' src/pbbam/CMakeLists.txt|sed -e 's/.*V
 # project(PacBioBAM VERSION 0.13.2 LANGUAGES CXX C)
 BUILD_NUMBER=0
 if [ -n "$bamboo_planRepository_branchName" ]; then
-  BUILD_NUMBER=SNAPSHOT${bamboo_globalBuildNumber:-0}
+  BUILD_NUMBER=${bamboo_globalBuildNumber:-0}
 fi
 
 rm -f *.tgz || true
@@ -54,17 +54,19 @@ cd ../..
 if [ ! -n "$bamboo_planRepository_branchName" ]; then
   exit
 fi
-if [ ! "$bamboo_planRepository_branchName" = "develop" ]; then
-  echo "[INFO]  pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz if the branch is develop"
+if [ "$bamboo_planRepository_branchName" = "develop" ]; then
+  ${SNAPSHOT}="SNAPSHOT"
+else
+  echo "[INFO] pbbam-${PBBAM_VERSION}.SNAPSHOT${BUILD_NUMBER}-x86_64.tgz if the branch is develop"
   exit
 fi
 
-rsync -avx --delete prefix/ pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}/
+rsync -ax --delete prefix/ pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}/
 
-tar zcf pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}
-sha1sum pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz | awk -e '{print $1}' >| pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz.sha1
-md5sum pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz | awk -e '{print $1}' >| pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz.md5
-NEXUS_URL=http://ossnexus.pacificbiosciences.com/repository/maven-releases/pacbio/seq/pa/pbbam/${PBBAM_VERSION}.${BUILD_NUMBER}
-curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz.md5 $NEXUS_URL/pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz.md5
-curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz.sha1 $NEXUS_URL/pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz.sha1
-curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz $NEXUS_URL/pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz
+tar zcf pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz pbbam-${SNAPSHOT}${PBBAM_VERSION}.${BUILD_NUMBER}
+sha1sum pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz | awk -e '{print $1}' >| pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.sha1
+md5sum  pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz | awk -e '{print $1}' >| pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.md5
+NEXUS_URL=http://ossnexus.pacificbiosciences.com/repository/maven-snapshots/pacbio/seq/pa/pbbam/${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}
+curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.md5  $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.md5
+curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.sha1 $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.sha1
+curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz      $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz
