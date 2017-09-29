@@ -73,7 +73,7 @@ else
   echo "[INFO] pbbam-${PBBAM_VERSION}.SNAPSHOT${BUILD_NUMBER}-x86_64.tgz if the branch is develop"
   exit
 fi
-NEXUS_URL=http://ossnexus.pacificbiosciences.com/repository/maven-snapshots/pacbio/seq/pa/pbbam/${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}
+NEXUS_URL=http://ossnexus.pacificbiosciences.com/repository/maven-snapshots/pacbio/seq/pa/pbbam/${PBBAM_VERSION}.${BUILD_NUMBER}
 curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.md5  $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.md5
 curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.sha1 $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.sha1
 curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz      $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz
