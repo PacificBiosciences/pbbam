@@ -56,16 +56,23 @@ if [ ! -n "$bamboo_planRepository_branchName" ]; then
 fi
 if [ "$bamboo_planRepository_branchName" = "develop" ]; then
   SNAPSHOT="SNAPSHOT"
+elif [ "$bamboo_planRepository_branchName" = "master" ]; then
+  SNAPSHOT=""
 else
-  echo "[INFO] pbbam-${PBBAM_VERSION}.SNAPSHOT${BUILD_NUMBER}-x86_64.tgz if the branch is develop"
-  exit
+  SNAPSHOT="_branch_"
 fi
 
 rsync -ax --delete prefix/ pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}/
 
-tar zcf pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz pbbam-${SNAPSHOT}${PBBAM_VERSION}.${BUILD_NUMBER}
+tar zcf pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}
 sha1sum pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz | awk -e '{print $1}' >| pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.sha1
 md5sum  pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz | awk -e '{print $1}' >| pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.md5
+if [ "$bamboo_planRepository_branchName" = "develop" -o "$bamboo_planRepository_branchName" = "master" ]; then
+  : # no-op
+else
+  echo "[INFO] pbbam-${PBBAM_VERSION}.SNAPSHOT${BUILD_NUMBER}-x86_64.tgz if the branch is develop"
+  exit
+fi
 NEXUS_URL=http://ossnexus.pacificbiosciences.com/repository/maven-snapshots/pacbio/seq/pa/pbbam/${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}
 curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.md5  $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.md5
 curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.sha1 $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.sha1
