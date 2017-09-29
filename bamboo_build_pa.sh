@@ -59,7 +59,7 @@ fi
 
 rsync -avx --delete prefix/ pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}/
 
-tar zcf ${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}
+tar zcf pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}
 sha1sum pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz | awk -e '{print $1}' >| pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz.sha1
 md5sum pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz | awk -e '{print $1}' >| pbbam-${PBBAM_VERSION}.${BUILD_NUMBER}-x86_64.tgz.md5
 NEXUS_URL=http://ossnexus.pacificbiosciences.com/repository/maven-releases/pacbio/seq/pa/pbbam/${PBBAM_VERSION}.${BUILD_NUMBER}
