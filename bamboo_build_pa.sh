@@ -14,9 +14,11 @@ PBBAM_VERSION=$(grep 'PacBioBAM VERSION ' src/pbbam/CMakeLists.txt|sed -e 's/.*V
 # project(PacBioBAM VERSION 0.13.2 LANGUAGES CXX C)
 BUILD_NUMBER=0
 if [ -n "$bamboo_planRepository_branchName" ]; then
-  BUILD_NUMBER=SNAPTHOT${bamboo_globalBuildNumber:-0}
+  BUILD_NUMBER=SNAPSHOT${bamboo_globalBuildNumber:-0}
 fi
 
+rm -f *.tgz || true
+rm -rf pbbam* || true
 rm -rf prefix && mkdir -p prefix
 cd src/htslib-${HTSLIB_VERSION}
 export CCACHE_BASEDIR=$PWD
