@@ -55,7 +55,7 @@ if [ ! -n "$bamboo_planRepository_branchName" ]; then
   exit
 fi
 if [ "$bamboo_planRepository_branchName" = "develop" ]; then
-  ${SNAPSHOT}="SNAPSHOT"
+  SNAPSHOT="SNAPSHOT"
 else
   echo "[INFO] pbbam-${PBBAM_VERSION}.SNAPSHOT${BUILD_NUMBER}-x86_64.tgz if the branch is develop"
   exit
