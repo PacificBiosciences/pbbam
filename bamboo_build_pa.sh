@@ -52,7 +52,7 @@ tar c include/pbbam | tar xv -C ../../prefix/
 cd ../..
 
 if [ ! -n "$bamboo_planRepository_branchName" ]; then
-  exit
+  SNAPSHOT="_branch_"
 fi
 if [ "$bamboo_planRepository_branchName" = "develop" ]; then
   SNAPSHOT="SNAPSHOT"
@@ -68,12 +68,55 @@ tar zcf pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz pbbam-${PBB
 sha1sum pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz | awk -e '{print $1}' >| pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.sha1
 md5sum  pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz | awk -e '{print $1}' >| pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.md5
 if [ "$bamboo_planRepository_branchName" = "develop" -o "$bamboo_planRepository_branchName" = "master" ]; then
-  : # no-op
+  NEXUS_URL=http://ossnexus.pacificbiosciences.com/repository/maven-snapshots/pacbio/seq/pa/pbbam/${PBBAM_VERSION}.${BUILD_NUMBER}
+  curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.md5  $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.md5
+  curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.sha1 $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.sha1
+  curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz      $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz
 else
   echo "[INFO] pbbam-${PBBAM_VERSION}.SNAPSHOT${BUILD_NUMBER}-x86_64.tgz if the branch is develop"
+fi
+
+# GCC BUILD
+
+rm -rf gccbuild && mkdir -p gccbuild
+cd src/htslib-${HTSLIB_VERSION}
+export CCACHE_BASEDIR=$PWD
+make distclean
+CFLAGS='-fPIC -O' bash ./configure --prefix=$PWD/../../gccbuild
+VERBOSE=1 make install
+rm -rf $PWD/../../gccbuild/lib/pkgconfig
+
+cd -
+cd src/pbbam
+export CCACHE_BASEDIR=$PWD
+rm -rf build && mkdir -p build
+cd build
+CFLAGS=-fPIC CXXFLAGS=-fPIC
+cmake \
+  -DPacBioBAM_build_shared=OFF \
+  -DPacBioBAM_build_docs=OFF \
+  -DPacBioBAM_build_tests=OFF \
+  -DHTSLIB_INCLUDE_DIRS=$PWD/../../../gccbuild/include \
+  -DHTSLIB_LIBRARIES=$PWD/../../../gccbuild/lib/libhts.a \
+  -DBoost_INCLUDE_DIRS=/mnt/software/b/boost/1.60/include \
+  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  -DCMAKE_SKIP_BUILD_RPATH=FALSE ..
+VERBOSE=1 make -j
+tar c bin lib | tar xv -C ../../../gccbuild/
+cd ..
+tar c include/pbbam | tar xv -C ../../gccbuild/
+cd ../..
+
+rsync -ax --delete gccbuild/ pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}gcc/
+
+tar zcf pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}gcc-x86_64.tgz pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}gcc
+sha1sum pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}gcc-x86_64.tgz | awk -e '{print $1}' >| pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}gcc-x86_64.tgz.sha1
+md5sum  pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}gcc-x86_64.tgz | awk -e '{print $1}' >| pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}gcc-x86_64.tgz.md5
+if [ "$bamboo_planRepository_branchName" = "develop" -o "$bamboo_planRepository_branchName" = "master" ]; then
+  curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}gcc-x86_64.tgz.md5  $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}gcc-x86_64.tgz.md5
+  curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}gcc-x86_64.tgz.sha1 $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}gcc-x86_64.tgz.sha1
+  curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}gcc-x86_64.tgz      $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}gcc-x86_64.tgz
+else
+  echo "[INFO] pbbam-${PBBAM_VERSION}.SNAPSHOT${BUILD_NUMBER}gcc-x86_64.tgz if the branch is develop"
   exit
 fi
-NEXUS_URL=http://ossnexus.pacificbiosciences.com/repository/maven-snapshots/pacbio/seq/pa/pbbam/${PBBAM_VERSION}.${BUILD_NUMBER}
-curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.md5  $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.md5
-curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.sha1 $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz.sha1
-curl -L -fvn --upload-file pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz      $NEXUS_URL/pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz
