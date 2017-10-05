@@ -93,7 +93,7 @@ cd src/pbbam
 export CCACHE_BASEDIR=$PWD
 rm -rf build && mkdir -p build
 cd build
-curl -sL -O http://nexus/repository/unsupported/distfiles/libquadmath-devel-4.8.5-11.el7.x86_64.rpm
+curl -sL -O http://nexus/repository/maven-thirdparty/libquadmath/4.8.5-11/libquadmath-devel-4.8.5-11.el7.x86_64.rpm
 rpm2cpio libquadmath-devel-4.8.5-11.el7.x86_64.rpm | cpio -vid
 CXXFLAGS="-fPIC -I$PWD/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include" \
 CFLAGS="-fPIC" \
