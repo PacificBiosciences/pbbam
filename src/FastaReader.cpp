@@ -39,7 +39,11 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/FastaReader.h"
+#include "pbbam/StringUtilities.h"
+
 #include <htslib/faidx.h>
 #include <stdexcept>
 #include <fstream>
@@ -74,7 +78,7 @@ struct FastaReaderPrivate
     }
 
 private:
-    void FetchNext(void)
+    void FetchNext()
     {
         name_.clear();
         bases_.clear();
@@ -82,9 +86,11 @@ private:
         SkipNewlines();
         ReadName();
         ReadBases();
+
+        bases_ = RemoveAllWhitespace(bases_);
     }
 
-    inline void SkipNewlines(void)
+    inline void SkipNewlines()
     {
         if (!stream_)
             return;
@@ -92,14 +98,14 @@ private:
             stream_.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
-    void ReadName(void) {
+    void ReadName() {
         if (!stream_)
             return;
         if (stream_.get() == '>')
             std::getline(stream_, name_,  '\n');
     }
 
-    void ReadBases(void)
+    void ReadBases()
     {
         if (!stream_)
             return;
@@ -123,19 +129,7 @@ FastaReader::FastaReader(const std::string& fn)
     : d_{ new internal::FastaReaderPrivate{ fn } }
 { }
 
-FastaReader::FastaReader(FastaReader&& other)
-    : d_{ std::move(other.d_) }
-{ }
-
-FastaReader& FastaReader::operator=(FastaReader&& other)
-{
-    if (this != &other) {
-        d_.swap(other.d_);
-    }
-    return *this;
-}
-
-FastaReader::~FastaReader(void) { }
+FastaReader::~FastaReader() { }
 
 bool FastaReader::GetNext(FastaSequence& record)
 { return d_->GetNext(record); }

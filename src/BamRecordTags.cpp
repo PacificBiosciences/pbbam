@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "BamRecordTags.h"
 #include "EnumClassHash.h"
 #include <unordered_map>
@@ -72,6 +74,7 @@ const BamRecordTags::TagLookupType BamRecordTags::tagLookup =
     { BamRecordTag::PRE_PULSE_FRAMES,  {"pd", true}  },
     { BamRecordTag::PULSE_CALL,        {"pc", true}  },
     { BamRecordTag::PULSE_CALL_WIDTH,  {"px", true}  },
+    { BamRecordTag::PULSE_EXCLUSION,   {"pe", true}  },
     { BamRecordTag::PULSE_MERGE_QV,    {"pg", true}  },
     { BamRecordTag::PULSE_WIDTH,       {"pw", false} }, // 'pulse' in the name; but stored per-base, not per-pulse
     { BamRecordTag::QUERY_END,         {"qe", false} },

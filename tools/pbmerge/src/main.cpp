@@ -86,7 +86,7 @@ public:
     std::vector<std::string> errors_;
 
 private:
-    Settings(void) { }
+    Settings() { }
 };
 
 } // namespace pbmerge

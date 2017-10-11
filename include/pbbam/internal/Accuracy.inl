@@ -53,7 +53,7 @@ inline Accuracy::Accuracy(float accuracy)
     accuracy_ = accuracy;
 }
 
-inline Accuracy::operator float(void) const
+inline Accuracy::operator float() const
 { return accuracy_; }
 
 } // namespace BAM

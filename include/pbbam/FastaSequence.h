@@ -63,12 +63,12 @@ public:
     ///
     explicit FastaSequence(std::string name, std::string bases);
 
-    FastaSequence(void) = default;
+    FastaSequence() = default;
     FastaSequence(const FastaSequence&) = default;
     FastaSequence(FastaSequence&&) = default;
     FastaSequence& operator=(const FastaSequence&) = default;
     FastaSequence& operator=(FastaSequence&&) = default;
-    ~FastaSequence(void) = default;
+    ~FastaSequence() = default;
 
     /// \}
 
@@ -80,13 +80,13 @@ public:
     /// \brief Name
     /// \return
     ///
-    std::string Name(void) const;
+    std::string Name() const;
 
     ///
     /// \brief Bases
     /// \return
     ///
-    std::string Bases(void) const;
+    std::string Bases() const;
 
     /// \}
 

@@ -35,11 +35,9 @@
 
 // Author: Derek Barnett
 
-//#ifdef PBBAM_TESTING
 //#define private public
-//#endif
 
-//#include "TestData.h"
+//#include "PbbamTestData.h"
 //#include <gtest/gtest.h>
 //#include <pbbam/EntireFileQuery.h>
 
@@ -49,8 +47,8 @@
 //using namespace PacBio::BAM;
 //using namespace std;
 
-//const string inputBamFn1 = tests::Data_Dir + "/unmap1.bam";
-//const string inputBamFn2 = tests::Data_Dir + "/unmap2.bam";
+//const string inputBamFn1 = PbbamTestsConfig::Data_Dir + "/unmap1.bam";
+//const string inputBamFn2 = PbbamTestsConfig::Data_Dir + "/unmap2.bam";
 
 //TEST(UnmappedReadsQueryTest, UnmappedOnlyFile)
 //{

@@ -74,7 +74,7 @@ public:
     VirtualZmwBamRecord(std::vector<BamRecord>&& unorderedSources,
                         const BamHeader& header);
 
-    VirtualZmwBamRecord(void) = delete;
+    VirtualZmwBamRecord() = delete;
     VirtualZmwBamRecord(const VirtualZmwBamRecord&) = default;
     VirtualZmwBamRecord(VirtualZmwBamRecord&&) = default;
     VirtualZmwBamRecord& operator=(const VirtualZmwBamRecord&) = default;
@@ -97,7 +97,7 @@ public:
 
     /// \brief Provides all annotations of the polymerase read as a map (type => regions)
     ///
-    std::map<VirtualRegionType, std::vector<VirtualRegion>> VirtualRegionsMap(void) const;
+    std::map<VirtualRegionType, std::vector<VirtualRegion>> VirtualRegionsMap() const;
 
     /// \brief Provides annotations of the polymerase read for a given VirtualRegionType.
     ///
@@ -113,7 +113,7 @@ private:
     std::map<VirtualRegionType, std::vector<VirtualRegion>> virtualRegionsMap_;
 
 private:
-    void StitchSources(void);
+    void StitchSources();
 };
 
 } // namespace BAM

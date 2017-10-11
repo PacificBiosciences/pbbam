@@ -76,6 +76,20 @@ public:
     static std::string Encode(const PacBio::BAM::TagCollection& tags);
 };
 
+///
+/// \brief creates a tag per the SAM/BAM text format
+///
+/// \param tag    tag name
+/// \param value  tag value
+///
+/// \return formatted tag string
+///
+inline std::string MakeSamTag(const std::string& tag,
+                              const std::string& value)
+{
+    return std::string('\t' + tag + ':' + value);
+}
+
 } // namespace BAM
 } // namespace PacBio
 

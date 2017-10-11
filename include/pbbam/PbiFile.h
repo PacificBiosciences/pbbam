@@ -44,6 +44,8 @@
 
 #include "pbbam/Config.h"
 #include "pbbam/PbiBuilder.h"
+#include <cstddef>
+#include <cstdint>
 #include <string>
 
 namespace PacBio {
@@ -67,7 +69,7 @@ namespace PbiFile
 
     /// \brief Helper typedef for storing multiple Section flags.
     ///
-    typedef uint16_t Sections;
+    using Sections = uint16_t;
 
     /// \brief This enum describes the PBI file version.
     enum VersionEnum

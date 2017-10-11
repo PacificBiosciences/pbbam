@@ -44,6 +44,7 @@
 
 #include "pbbam/Config.h"
 #include "pbbam/BamHeader.h"
+#include <cstdint>
 #include <string>
 
 namespace PacBio {
@@ -75,7 +76,7 @@ public:
     BamFile(BamFile&& other);
     BamFile& operator=(const BamFile& other);
     BamFile& operator=(BamFile&& other);
-    ~BamFile(void);
+    ~BamFile();
 
     /// \}
 
@@ -92,7 +93,7 @@ public:
     /// \throws if PBI file could not be properly created and/or
     ///         written to disk
     ///
-    void CreatePacBioIndex(void) const;
+    void CreatePacBioIndex() const;
 
     /// \brief Creates a ".bai" file for this %BAM file.
     ///
@@ -102,7 +103,7 @@ public:
     /// \throws if BAI file could not be properly created (e.g. this
     ///         %BAM is not coordinate-sorted) or could not be written to disk
     ///
-    void CreateStandardIndex(void) const;
+    void CreateStandardIndex() const;
 
     /// \brief Creates a ".pbi" file if one does not exist or is older than its
     ///        %BAM file.
@@ -119,7 +120,7 @@ public:
     /// \throws if PBI file could not be properly created and/or
     ///         written to disk
     ///
-    void EnsurePacBioIndexExists(void) const;
+    void EnsurePacBioIndexExists() const;
 
     /// \brief Creates a ".bai" file if one does not exist or is older than its
     ///        %BAM file.
@@ -135,35 +136,35 @@ public:
     /// \throws if BAI file could not be properly created (e.g. this
     ///         %BAM is not coordinate-sorted) or could not be written to disk
     ///
-    void EnsureStandardIndexExists(void) const;
+    void EnsureStandardIndexExists() const;
 
     /// \returns %BAM filename
-    std::string Filename(void) const;
+    std::string Filename() const;
 
     /// \returns true if %BAM file has EOF marker (empty BGZF block). Streamed
     ///          input (filename: "-")
-    bool HasEOF(void) const;
+    bool HasEOF() const;
 
     /// \returns true if ".pbi" exists and is newer than this %BAM file.
-    bool PacBioIndexExists(void) const;
+    bool PacBioIndexExists() const;
 
     /// \returns filename of %PacBio index file (".pbi")
     /// \note No guarantee is made on the existence of this file.
     ///       This method simply returns the expected filename.
-    std::string PacBioIndexFilename(void) const;
+    std::string PacBioIndexFilename() const;
 
     /// \returns true if ".pbi" has a more recent timestamp than this file
-    bool PacBioIndexIsNewer(void) const;
+    bool PacBioIndexIsNewer() const;
 
     /// \returns true if ".bai" exists
-    bool StandardIndexExists(void) const;
+    bool StandardIndexExists() const;
 
     /// \note No guarantee is made on the existence of this file.
     ///       This method simply returns the expected filename.
-    std::string StandardIndexFilename(void) const;
+    std::string StandardIndexFilename() const;
 
     /// \returns true if ".bai" has a more recent timestamp than this file
-    bool StandardIndexIsNewer(void) const;
+    bool StandardIndexIsNewer() const;
 
     /// \}
 
@@ -175,11 +176,11 @@ public:
     bool HasReference(const std::string& name) const;
 
     /// \returns const reference to BamHeader containing the file's metadata
-    const BamHeader& Header(void) const;
+    const BamHeader& Header() const;
 
     /// \returns true if file is a %PacBio %BAM file (i.e. has non-empty version
     ///          associated with header "pb" tag)
-    bool IsPacBioBAM(void) const;
+    bool IsPacBioBAM() const;
 
     /// \returns ID for reference \p name (can be used for e.g.
     ///          GenomicIntervalQuery), or -1 if not found
@@ -204,7 +205,7 @@ public:
     ///          use. Note that this is a BGZF \b virtual offset, not a
     ///          'normal' file position.
     ///
-    int64_t FirstAlignmentOffset(void) const;
+    int64_t FirstAlignmentOffset() const;
 
     /// \}
 

@@ -44,6 +44,7 @@
 #include <pbbam/CompositeBamReader.h>
 #include <pbbam/PbiBuilder.h>
 
+#include <cstdint>
 #include <deque>
 #include <memory>
 #include <stdexcept>

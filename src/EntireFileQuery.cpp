@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/EntireFileQuery.h"
 #include "pbbam/CompositeBamReader.h"
 
@@ -59,7 +61,7 @@ EntireFileQuery::EntireFileQuery(const DataSet &dataset)
     , d_(new EntireFileQueryPrivate(dataset))
 { }
 
-EntireFileQuery::~EntireFileQuery(void) { }
+EntireFileQuery::~EntireFileQuery() { }
 
 bool EntireFileQuery::GetNext(BamRecord &r)
 { return d_->reader_.GetNext(r); }

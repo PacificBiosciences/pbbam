@@ -35,17 +35,21 @@
 
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/BamRecordBuilder.h"
 #include "pbbam/BamTagCodec.h"
 #include "MemoryUtils.h"
 #include <htslib/sam.h>
 #include <cstring>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 
 namespace PacBio {
 namespace BAM {
 
-BamRecordBuilder::BamRecordBuilder(void)
+BamRecordBuilder::BamRecordBuilder()
 {
     // ensure proper clean slate
     Reset();
@@ -57,8 +61,8 @@ BamRecordBuilder::BamRecordBuilder(void)
     cigar_.reserve(256);
 }
 
-BamRecordBuilder::BamRecordBuilder(const BamHeader& header)
-    : header_(header)
+BamRecordBuilder::BamRecordBuilder(BamHeader header)
+    : header_(std::move(header))
 {
     // ensure proper clean slate
     Reset();
@@ -76,53 +80,7 @@ BamRecordBuilder::BamRecordBuilder(const BamRecord& prototype)
     Reset(prototype);
 }
 
-BamRecordBuilder::BamRecordBuilder(const BamRecordBuilder& other)
-    : core_(other.core_)
-    , name_(other.name_)
-    , sequence_(other.sequence_)
-    , qualities_(other.qualities_)
-    , cigar_(other.cigar_)
-    , tags_(other.tags_)
-{ }
-
-BamRecordBuilder::BamRecordBuilder(BamRecordBuilder&& other)
-    : core_(std::move(other.core_))
-    , name_(std::move(other.name_))
-    , sequence_(std::move(other.sequence_))
-    , qualities_(std::move(other.qualities_))
-    , cigar_(std::move(other.cigar_))
-    , tags_(std::move(other.tags_))
-{  }
-
-BamRecordBuilder& BamRecordBuilder::operator=(const BamRecordBuilder& other)
-{
-    if (this != &other) {
-        core_ = other.core_;
-        name_ = other.name_;
-        sequence_  = other.sequence_;
-        qualities_ = other.qualities_;
-        cigar_ = other.cigar_;
-        tags_  = other.tags_;
-    }
-    return *this;
-}
-
-BamRecordBuilder& BamRecordBuilder::operator=(BamRecordBuilder&& other)
-{
-    if (this != &other) {
-        core_ = std::move(other.core_);
-        name_ = std::move(other.name_);
-        sequence_  = std::move(other.sequence_);
-        qualities_ = std::move(other.qualities_);
-        cigar_ = std::move(other.cigar_);
-        tags_  = std::move(other.tags_);
-    }
-    return *this;
-}
-
-BamRecordBuilder::~BamRecordBuilder(void) { }
-
-BamRecord BamRecordBuilder::Build(void) const
+BamRecord BamRecordBuilder::Build() const
 {
     BamRecord result(header_);
     BuildInPlace(result);
@@ -132,7 +90,7 @@ BamRecord BamRecordBuilder::Build(void) const
 bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
 {
     // initialize with basic 'core data'
-    PBBAM_SHARED_PTR<bam1_t> recordRawData = internal::BamRecordMemory::GetRawData(record); /*   record.impl_.RawData().get();*/
+    auto recordRawData = internal::BamRecordMemory::GetRawData(record);
     if (!recordRawData || !recordRawData->data)
         throw std::runtime_error("BamRecord memory in invalid state");    
     recordRawData->core = core_;
@@ -172,9 +130,9 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
     if (cigarLength > 0) {
         std::vector<uint32_t> encodedCigar(numCigarOps);
         for (size_t i = 0; i < numCigarOps; ++i) {
-            const CigarOperation& op = cigar_.at(i);
+            const auto& op = cigar_.at(i);
             encodedCigar[i] = op.Length() << BAM_CIGAR_SHIFT;
-            const uint8_t type = static_cast<uint8_t>(op.Type());
+            const auto type = static_cast<uint8_t>(op.Type());
             if (type >= 8)
                 throw std::runtime_error("invalid CIGAR op type: " + std::to_string(type));
             encodedCigar[i] |= type;
@@ -250,7 +208,7 @@ BamRecordBuilder& BamRecordBuilder::Name(std::string&& name)
     return *this;
 }
 
-void BamRecordBuilder::Reset(void)
+void BamRecordBuilder::Reset()
 {
     // zeroize fixed-length data
     memset(&core_, 0, sizeof(bam1_core_t));
@@ -271,7 +229,7 @@ void BamRecordBuilder::Reset(const BamRecord& prototype)
     header_ = prototype.Header();
 
     // reset core data
-    const PBBAM_SHARED_PTR<bam1_t> rawData = internal::BamRecordMemory::GetRawData(prototype); //  prototype.impl_.RawData().get();
+    const auto rawData = internal::BamRecordMemory::GetRawData(prototype); //  prototype.impl_.RawData().get();
     if (!rawData)
         throw std::runtime_error("BamRecord memory in invalid state");    
     core_ = rawData->core;
@@ -292,7 +250,7 @@ void BamRecordBuilder::Reset(BamRecord&& prototype)
     header_ = prototype.Header();
 
     // reset core data
-    const PBBAM_SHARED_PTR<bam1_t> rawData = internal::BamRecordMemory::GetRawData(prototype); //  prototype.impl_.RawData().get();
+    const auto rawData = internal::BamRecordMemory::GetRawData(prototype); //  prototype.impl_.RawData().get();
     if (!rawData)
         throw std::runtime_error("BamRecord memory in invalid state");    
     core_ = std::move(rawData->core);

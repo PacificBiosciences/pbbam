@@ -45,6 +45,8 @@
 #include "pbbam/Config.h"
 #include "pbbam/Compare.h"
 #include "pbbam/PbiBasicTypes.h"
+#include <cstddef>
+#include <cstdint>
 #include <deque>
 #include <map>
 #include <unordered_map>
@@ -75,11 +77,11 @@ template<typename T>
 class OrderedLookup
 {
 public:
-    typedef T                                       key_type;
-    typedef IndexList                               value_type;
-    typedef std::map<key_type, value_type>          container_type;
-    typedef typename container_type::iterator       iterator;
-    typedef typename container_type::const_iterator const_iterator;
+    using key_type       = T;
+    using value_type     = IndexList;
+    using container_type = std::map<key_type, value_type>;
+    using iterator       = typename container_type::iterator;
+    using const_iterator = typename container_type::const_iterator;
 
 public:
     /// \name Constructors & Related Methods
@@ -87,7 +89,7 @@ public:
 
     /// \brief Creates an empty OrderedLookup structure.
     ///
-    OrderedLookup(void);
+    OrderedLookup() = default;
 
     /// \brief Creates an OrderedLookup struture, from another's underlying
     ///        lookup container.
@@ -136,32 +138,32 @@ public:
     /// \{
 
     /// \returns an iterator to the first element in the underlying container
-    iterator begin(void);
+    iterator begin();
 
     /// \returns a const iterator to the first element in the underlying
     ///          container
-    const_iterator begin(void) const;
+    const_iterator begin() const;
 
     /// \returns a const iterator to the first element in the underlying
     ///
-    const_iterator cbegin(void) const;
+    const_iterator cbegin() const;
 
     /// \returns an iterator after the last element in the underlying container
-    iterator end(void);
+    iterator end();
 
     /// \returns a const iterator after the last element in the underlying
     ///          container
-    const_iterator end(void) const;
+    const_iterator end() const;
 
     /// \returns a const iterator after the last element in the underlying
     ///          container
-    const_iterator cend(void) const;
+    const_iterator cend() const;
 
     /// \returns true if underlying container is empty
-    bool empty(void) const;
+    bool empty() const;
 
     /// \returns number of keys in the container
-    size_t size(void) const;
+    size_t size() const;
 
     /// \}
 
@@ -185,7 +187,7 @@ public:
     /// \returns raw data values, where i is the index into the %BAM file, and
     ///          rawData[i] is the key value
     ///
-    std::vector<T> Unpack(void) const;
+    std::vector<T> Unpack() const;
 
     /// \}
 
@@ -218,11 +220,11 @@ template<typename T>
 class UnorderedLookup
 {
 public:
-    typedef T                                        key_type;
-    typedef IndexList                                value_type;
-    typedef std::unordered_map<key_type, value_type> container_type;
-    typedef typename container_type::iterator        iterator;
-    typedef typename container_type::const_iterator  const_iterator;
+    using key_type       = T;
+    using value_type     = IndexList;
+    using container_type = std::unordered_map<key_type, value_type>;
+    using iterator       = typename container_type::iterator;
+    using const_iterator = typename container_type::const_iterator;
 
 public:
     /// \name Constructors & Related Methods
@@ -230,7 +232,7 @@ public:
 
     /// \brief Creates an empty UnorderedLookup structure.
     ///
-    UnorderedLookup(void);
+    UnorderedLookup() = default;
 
     /// \brief Creates an UnorderedLookup struture, from another's underlying
     ///        lookup container.
@@ -279,32 +281,32 @@ public:
     /// \{
 
     /// \returns an iterator to the first element in the underlying container
-    iterator begin(void);
+    iterator begin();
 
     /// \returns a const iterator to the first element in the underlying
     ///          container
-    const_iterator begin(void) const;
+    const_iterator begin() const;
 
     /// \returns a const iterator to the first element in the underlying
     ///
-    const_iterator cbegin(void) const;
+    const_iterator cbegin() const;
 
     /// \returns an iterator after the last element in the underlying container
-    iterator end(void);
+    iterator end();
 
     /// \returns a const iterator after the last element in the underlying
     ///          container
-    const_iterator end(void) const;
+    const_iterator end() const;
 
     /// \returns a const iterator after the last element in the underlying
     ///          container
-    const_iterator cend(void) const;
+    const_iterator cend() const;
 
     /// \returns true if underlying container is empty
-    bool empty(void) const;
+    bool empty() const;
 
     /// \returns number of keys in the container
-    size_t size(void) const;
+    size_t size() const;
 
     /// \}
 
@@ -328,7 +330,7 @@ public:
     /// \returns raw data values, where i is the index into the %BAM file, and
     ///          rawData[i] is the key value
     ///
-    std::vector<T> Unpack(void) const;
+    std::vector<T> Unpack() const;
 
     /// \}
 
@@ -365,7 +367,7 @@ public:
     /// \{
 
     /// \brief Creates an empty lookup data object.
-    BasicLookupData(void);
+    BasicLookupData() = default;
 
     /// \brief Creates a lookup data object from the corresponding raw data.
     ///
@@ -439,7 +441,7 @@ public:
 
     /// \returns the \b virtual file offsets for all records
     ///
-    const std::vector<int64_t>& VirtualFileOffsets(void) const;
+    const std::vector<int64_t>& VirtualFileOffsets() const;
 
     /// \}
 
@@ -493,7 +495,7 @@ public:
     /// \{
 
     /// \brief Creates an empty lookup data object.
-    MappedLookupData(void);
+    MappedLookupData() = default;
 
     /// \brief Creates a lookup data object from the corresponding raw data.
     ///
@@ -583,7 +585,7 @@ public:
 
     /// \brief Creates an empty lookup data object.
     ///
-    ReferenceLookupData(void);
+    ReferenceLookupData() = default;
 
     /// \brief Creates a lookup data object from the corresponding raw data.
     ///
@@ -644,7 +646,7 @@ public:
 
     /// \brief Creates an empty lookup data object.
     ///
-    BarcodeLookupData(void);
+    BarcodeLookupData() = default;
 
     /// \brief Creates a lookup data object from the corresponding raw data.
     ///

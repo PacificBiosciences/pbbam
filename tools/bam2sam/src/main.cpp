@@ -41,6 +41,7 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <cstddef>
 #include <cstdlib>
 
 static
@@ -60,7 +61,7 @@ bam2sam::Settings fromCommandLine(optparse::OptionParser& parser,
         settings.inputFilename_ = parser.args().front();
     else {
         assert(numPositionalArgs > 1);
-        settings.errors_.push_back("bam2sam does not support more than one input file per run");
+        settings.errors_.emplace_back("bam2sam does not support more than one input file per run");
     }
 
     // header options
@@ -70,7 +71,7 @@ bam2sam::Settings fromCommandLine(optparse::OptionParser& parser,
         settings.printHeaderOnly_ = options.get("header_only");
 
     if (settings.noHeader_ && settings.printHeaderOnly_)
-        settings.errors_.push_back("conflicting arguments requested: --no-header and --header-only");
+        settings.errors_.emplace_back("conflicting arguments requested: --no-header and --header-only");
 
     return settings;
 }

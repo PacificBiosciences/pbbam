@@ -35,9 +35,12 @@
 
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "XmlWriter.h"
 #include "pbbam/DataSet.h"
 #include "pugixml/pugixml.hpp"
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -49,7 +52,7 @@ namespace internal {
 static
 std::string Prefix(const std::string& input)
 {
-    const size_t colonFound = input.find(':');
+    const auto colonFound = input.find(':');
     if (colonFound == std::string::npos || colonFound == 0)
         return std::string();
     return input.substr(0, colonFound);
@@ -68,7 +71,7 @@ std::string OutputName(const DataSetElement& node,
         // if no namespace prefix, prepend the appropriate one & return
         if (node.PrefixLabel().empty()) {
             static const std::string colon = ":";
-            XsdType xsdType = node.Xsd();
+            auto xsdType = node.Xsd();
             if (xsdType == XsdType::NONE)
                 xsdType = registry.XsdForElement(node.LocalNameLabel().to_string());
             return registry.Namespace(xsdType).Name() + colon + node.LocalNameLabel().to_string();
@@ -86,39 +89,34 @@ void ToXml(const DataSetElement& node,
            pugi::xml_node& parentXml)
 {
     // create child of parent, w/ label & text
-    const std::string& label = OutputName(node, registry);
+    const auto label = OutputName(node, registry);
     if (label.empty())
         return; // error?
-    pugi::xml_node xmlNode = parentXml.append_child(label.c_str());
+    auto xmlNode = parentXml.append_child(label.c_str());
 
     if (!node.Text().empty())
         xmlNode.text().set(node.Text().c_str());
 
     // store XSD type for later
-    const std::string prefix = Prefix(label);
+    const auto prefix = Prefix(label);
     if (!prefix.empty())
         xsdPrefixesUsed[node.Xsd()] = prefix;
 
     // add attributes
-    auto attrIter = node.Attributes().cbegin();
-    auto attrEnd  = node.Attributes().cend();
-    for ( ; attrIter != attrEnd; ++attrIter) {
-        const std::string& name = attrIter->first;
+    for (const auto& attribute : node.Attributes())
+    {
+        const auto& name = attribute.first;
         if (name.empty())
             continue;
-        pugi::xml_attribute attr = xmlNode.append_attribute(name.c_str());
-        attr.set_value(attrIter->second.c_str());
+        auto attr = xmlNode.append_attribute(name.c_str());
+        attr.set_value(attribute.second.c_str());
     }
 
     // additional stuff later? (e.g. comments)
 
     // iterate children, recursively building up subtree
-    auto childIter = node.Children().cbegin();
-    auto childEnd  = node.Children().cend();
-    for ( ; childIter != childEnd; ++childIter) {
-        const DataSetElement& child = (*childIter);
+    for (const auto& child : node.Children())
         ToXml(child, registry, xsdPrefixesUsed, xmlNode);
-    }
 }
 
 void XmlWriter::ToStream(const DataSetBase& dataset,
@@ -126,27 +124,25 @@ void XmlWriter::ToStream(const DataSetBase& dataset,
 {
     pugi::xml_document doc;
 
-    const NamespaceRegistry& registry = dataset.Namespaces();
+    const auto& registry = dataset.Namespaces();
 
     // create top-level dataset XML node
-    const std::string& label = internal::OutputName(dataset, registry);
+    const auto label = internal::OutputName(dataset, registry);
     if (label.empty())
         throw std::runtime_error("could not convert dataset node to XML");
-    pugi::xml_node root = doc.append_child(label.c_str());
+    auto root = doc.append_child(label.c_str());
 
-    const std::string& text = dataset.Text();
+    const auto& text = dataset.Text();
     if (!text.empty())
         root.text().set(text.c_str());
 
     // add top-level attributes
-    auto attrIter = dataset.Attributes().cbegin();
-    auto attrEnd  = dataset.Attributes().cend();
-    for ( ; attrIter != attrEnd; ++attrIter) {
-        const std::string name = attrIter->first;
-        const std::string value = attrIter->second;
+    for (const auto& attribute : dataset.Attributes()) {
+        const auto& name = attribute.first;
+        const auto& value = attribute.second;
         if (name.empty())
             continue;
-        pugi::xml_attribute attr = root.append_attribute(name.c_str());
+        auto attr = root.append_attribute(name.c_str());
         attr.set_value(value.c_str());
     }
 
@@ -154,47 +150,42 @@ void XmlWriter::ToStream(const DataSetBase& dataset,
     xsdPrefixesUsed[dataset.Xsd()] = Prefix(label);
 
     // iterate children, recursively building up subtree
-    auto childIter = dataset.Children().cbegin();
-    auto childEnd  = dataset.Children().cend();
-    for ( ; childIter != childEnd; ++childIter) {
-        const DataSetElement& child = (*childIter);
+    for (const auto& child : dataset.Children())
         ToXml(child, registry, xsdPrefixesUsed, root);
-    }
 
     // write XML to stream
-    pugi::xml_node decl = doc.prepend_child(pugi::node_declaration);
+    auto decl = doc.prepend_child(pugi::node_declaration);
     decl.append_attribute("version")  = "1.0";
     decl.append_attribute("encoding") = "utf-8";
 
     // add XSD namespace attributes
-    pugi::xml_attribute xmlnsDefaultAttribute = root.attribute("xmlns");
+    auto xmlnsDefaultAttribute = root.attribute("xmlns");
     if (xmlnsDefaultAttribute.empty()) {
         xmlnsDefaultAttribute = root.append_attribute("xmlns");
         xmlnsDefaultAttribute.set_value(registry.DefaultNamespace().Uri().c_str());
     }
-    pugi::xml_attribute xsiAttribute = root.attribute("xmlns:xsi");
+    auto xsiAttribute = root.attribute("xmlns:xsi");
     if (xsiAttribute.empty()) {
         xsiAttribute = root.append_attribute("xmlns:xsi");
         xsiAttribute.set_value("http://www.w3.org/2001/XMLSchema-instance");
     }
-    pugi::xml_attribute xsiSchemaLocationAttribute = root.attribute("xsi:schemaLocation");
+    auto xsiSchemaLocationAttribute = root.attribute("xsi:schemaLocation");
     if (xsiSchemaLocationAttribute.empty()) {
         xsiSchemaLocationAttribute = root.append_attribute("xsi:schemaLocation");
         xsiSchemaLocationAttribute.set_value(registry.DefaultNamespace().Uri().c_str());
     }
 
     static const std::string xmlnsPrefix = "xmlns:";
-    std::map<XsdType, std::string>::const_iterator prefixIter = xsdPrefixesUsed.cbegin();
-    std::map<XsdType, std::string>::const_iterator prefixEnd  = xsdPrefixesUsed.cend();
-    for ( ; prefixIter != prefixEnd; ++prefixIter ) {
-        const XsdType& xsd = prefixIter->first;
-        const std::string& prefix = prefixIter->second;
-        if (xsd == XsdType::NONE || prefix.empty())
+    for (const auto prefixIter : xsdPrefixesUsed) {
+        const auto& xsdType = prefixIter.first;
+        const auto& prefix = prefixIter.second;
+        if (xsdType == XsdType::NONE || prefix.empty())
             continue;
-        const NamespaceInfo& nsInfo = registry.Namespace(xsd);
+
+        const auto& nsInfo = registry.Namespace(xsdType);
         assert(nsInfo.Name() == prefix);
-        const std::string xmlnsName = xmlnsPrefix + prefix;
-        pugi::xml_attribute xmlnsAttribute = root.attribute(xmlnsName.c_str());
+        const auto xmlnsName = xmlnsPrefix + prefix;
+        auto xmlnsAttribute = root.attribute(xmlnsName.c_str());
         if (xmlnsAttribute.empty()) {
             xmlnsAttribute = root.append_attribute(xmlnsName.c_str());
             xmlnsAttribute.set_value(nsInfo.Uri().c_str());

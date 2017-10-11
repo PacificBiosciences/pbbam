@@ -27,7 +27,7 @@ Additional requirements:
 * `Boost`_ (1.55+)
 * `CMake`_ (3.0+)
 * `Google Test`_
-* `htslib`_ (PacBio fork)
+* `htslib`_ (1.3.1+)
 
 For additional languages:
 
@@ -42,10 +42,12 @@ For maximal convenience, install htslib and google test in the same parent direc
 .. _Boost: http://www.boost.org/
 .. _clang: http://clang.llvm.org/
 .. _CMake: https://cmake.org/
+.. _Meson: http://mesonbuild.com/
+.. _Ninja: https://ninja-build.org/ (only required when using Meson, optional for CMake)
 .. _Doxygen: http://www.stack.nl/~dimitri/doxygen/
 .. _gcc: https://gcc.gnu.org/
 .. _Google Test: https://github.com/google/googletest
-.. _htslib: https://github.com/PacificBiosciences/htslib.git 
+.. _htslib: https://github.com/samtools/htslib.git 
 .. _SWIG: http://www.swig.org/
 
 .. _getting_started-build:
@@ -61,10 +63,25 @@ Clone & Build
 
 The basic steps for obtaining pbbam and building it from source are as follows:
 
+Build and install htslib, per the project's instructions (or on OSX "brew install htslib").
+
+Clone
+^^^^^
+
+You should first clone the repository:
+
 .. code-block:: console
 
    $ git clone https://github.com/PacificBiosciences/pbbam.git
    $ cd pbbam
+
+Building with CMake
+^^^^^^^^^^^^^^^^^^^
+
+When building with CMake, create a separate build directory:
+
+.. code-block:: console
+
    $ mkdir build
    $ cd build
    $ cmake ..
@@ -79,14 +96,13 @@ Output:
 You may need to set a few options on the cmake command, to point to dependencies' install locations. 
 Common installation-related options include:
 
-  * HTSLIB_ROOTDIR
   * GTEST_SRC_DIR
   
 Add these using the '-D' argument, like this:
 
 .. code-block:: console
 
-   $ cmake .. -DHTSLIB_ROOTDIR="path/to/htslib"
+   $ cmake .. -DGTEST_SRC_DIR="path/to/googletest"
  
 To run the test suite, run:
 
@@ -103,6 +119,34 @@ To build a local copy of the (Doxygen-style) API documentation, run:
 And then open <pbbam_root>/docs/html/index.html in your favorite browser.
 
 .. _getting_started-integrate:
+
+Building with Meson
+^^^^^^^^^^^^^^^^^^^
+
+Building with Meson is generally faster and more versatile. Meson strictly requires building out of source:
+
+.. code-block:: console
+
+   $ mkdir build
+   $ cd build
+   $ meson --prefix /my/install/prefix -Denable-tests=true ..
+   $ ninja
+
+where ninja will by default utilize a number of threads for compilation equal to the number of logical
+cores on your system. Here ``-Denable-tests=true`` enables pulling in dependencies for testing. In
+order to run the test suite, run:
+
+.. code-block:: console
+
+   $ ninja test
+
+If you wish to install pbbam, run:
+
+.. code-block:: console
+
+   $ ninja install
+
+and ninja will install pbbam to ``/my/install/prefix``.
 
 Integrate
 ---------
@@ -141,4 +185,8 @@ Non-CMake projects
 ``````````````````
 
 If you're using something other than CMake for your project's build system, then you need to point 
-it to pbbam's include directory & library, as well as those of its dependencies (primarily htslib). 
+it to pbbam's include directory & library, as well as those of its dependencies (primarily htslib).
+
+If you built and installed pbbam using Meson, pkg-config files will be available to be consumed by
+projects wishing to utilize pbbam. Autoconf, CMake, Waf, SCons and Meson all have means to determine
+dependency information from pkg-config files.

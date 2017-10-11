@@ -35,76 +35,83 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include "TestData.h"
-#include "../src/FileUtils.h"
-#include <gtest/gtest.h>
-#include <pbbam/DataSet.h>
-#include <pbbam/internal/DataSetElement.h>
+#include <cstddef>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
 #include <unistd.h>
+
+#include <gtest/gtest.h>
+
+#define private public
+
+#include "PbbamTestData.h"
+#include "../src/FileUtils.h"
+
+#include <pbbam/DataSet.h>
+#include <pbbam/internal/DataSetElement.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-const string alignedBamFn  = tests::Data_Dir + "/aligned.bam";
-const string bamGroupFofn  = tests::Generated_Dir + "/group.fofn";
+namespace DataSetIOTests {
 
-const string ali1XmlFn = tests::Data_Dir + "/dataset/ali1.xml";
-const string ali2XmlFn = tests::Data_Dir + "/dataset/ali2.xml";
-const string ali3XmlFn = tests::Data_Dir + "/dataset/ali3.xml";
-const string ali4XmlFn = tests::Data_Dir + "/dataset/ali4.xml";
-const string mappingStaggeredXmlFn = tests::Data_Dir + "/dataset/bam_mapping_staggered.xml";
-const string barcodeXmlFn = tests::Data_Dir + "/dataset/barcode.dataset.xml";
-const string ccsReadXmlFn = tests::Data_Dir + "/dataset/ccsread.dataset.xml";
-const string lambdaContigsXmlFn = tests::Data_Dir + "/dataset/lambda_contigs.xml";
-const string pbalchemyXmlFn   = tests::Data_Dir + "/dataset/pbalchemy10kbp.xml";
-const string referenceXmlFn   = tests::Data_Dir + "/dataset/reference.dataset.xml";
-const string subread1XmlFn    = tests::Data_Dir + "/dataset/subread_dataset1.xml";
-const string subread2XmlFn    = tests::Data_Dir + "/dataset/subread_dataset2.xml";
-const string subread3XmlFn    = tests::Data_Dir + "/dataset/subread_dataset3.xml";
-const string transformedXmlFn = tests::Data_Dir + "/dataset/transformed_rs_subread_dataset.xml";
+const string alignedBamFn  = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+const string bamGroupFofn  = PbbamTestsConfig::Generated_Dir + "/group.fofn";
 
-static void TestFromXmlString(void);
-static void TestAli1Xml(void);
-static void TestAli2Xml(void);
-static void TestAli3Xml(void);
-static void TestAli4Xml(void);
-static void TestMappingStaggeredXml(void);
-static void TestBarcodeXml(void);
-static void TestCcsReadXml(void);
-static void TestLambdaContigsXml(void);
-static void TestPbalchemyXml(void);
-static void TestReferenceXml(void);
-static void TestSubread1Xml(void);
-static void TestSubread2Xml(void);
-static void TestSubread3Xml(void);
-static void TestTransformedXml(void);
+const string ali1XmlFn = PbbamTestsConfig::Data_Dir + "/dataset/ali1.xml";
+const string ali2XmlFn = PbbamTestsConfig::Data_Dir + "/dataset/ali2.xml";
+const string ali3XmlFn = PbbamTestsConfig::Data_Dir + "/dataset/ali3.xml";
+const string ali4XmlFn = PbbamTestsConfig::Data_Dir + "/dataset/ali4.xml";
+const string mappingStaggeredXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/bam_mapping_staggered.xml";
+const string barcodeXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/barcode.dataset.xml";
+const string ccsReadXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/ccsread.dataset.xml";
+const string lambdaContigsXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/lambda_contigs.xml";
+const string pbalchemyXmlFn   = PbbamTestsConfig::Data_Dir + "/dataset/pbalchemy10kbp.xml";
+const string referenceXmlFn   = PbbamTestsConfig::Data_Dir + "/dataset/reference.dataset.xml";
+const string subread1XmlFn    = PbbamTestsConfig::Data_Dir + "/dataset/subread_dataset1.xml";
+const string subread2XmlFn    = PbbamTestsConfig::Data_Dir + "/dataset/subread_dataset2.xml";
+const string subread3XmlFn    = PbbamTestsConfig::Data_Dir + "/dataset/subread_dataset3.xml";
+const string transformedXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/transformed_rs_subread_dataset.xml";
+
+static void TestFromXmlString();
+static void TestAli1Xml();
+static void TestAli2Xml();
+static void TestAli3Xml();
+static void TestAli4Xml();
+static void TestMappingStaggeredXml();
+static void TestBarcodeXml();
+static void TestCcsReadXml();
+static void TestLambdaContigsXml();
+static void TestPbalchemyXml();
+static void TestReferenceXml();
+static void TestSubread1Xml();
+static void TestSubread2Xml();
+static void TestSubread3Xml();
+static void TestTransformedXml();
 
 static inline
 void changeCurrentDirectory(const std::string& dir)
 { ASSERT_EQ(0, chdir(dir.c_str())); }
 
+} // namespace DataSetIOTests
+
 TEST(DataSetIOTest, FromBamFilename)
 {
-    DataSet dataset(alignedBamFn);
+    DataSet dataset(DataSetIOTests::alignedBamFn);
 
     EXPECT_EQ(1, dataset.ExternalResources().Size());
     const ExternalResource& bamRef = dataset.ExternalResources()[0];
 
-    EXPECT_EQ(alignedBamFn, bamRef.ResourceId());
+    EXPECT_EQ(DataSetIOTests::alignedBamFn, bamRef.ResourceId());
 }
 
 TEST(DataSetIOTest, FromBamFilenames)
 {
-    std::ifstream fofn(bamGroupFofn);
+    std::ifstream fofn(DataSetIOTests::bamGroupFofn);
     std::vector<std::string> files;
     std::string file;
     while (std::getline(fofn, file)) if (!file.empty()) files.emplace_back(file);
@@ -114,42 +121,42 @@ TEST(DataSetIOTest, FromBamFilenames)
 
 TEST(DataSetIOTest, FromBamFileObject)
 {
-    BamFile bamFile(alignedBamFn);
+    BamFile bamFile(DataSetIOTests::alignedBamFn);
     DataSet dataset(bamFile.Filename());
 
     EXPECT_EQ(1, dataset.ExternalResources().Size());
     const ExternalResource& bamRef = dataset.ExternalResources()[0];
 
-    EXPECT_EQ(alignedBamFn, bamRef.ResourceId());
+    EXPECT_EQ(DataSetIOTests::alignedBamFn, bamRef.ResourceId());
 }
 
 TEST(DataSetIOTest, FromFofn)
 {
-    DataSet dataset(bamGroupFofn);
+    DataSet dataset(DataSetIOTests::bamGroupFofn);
     EXPECT_EQ(3, dataset.ExternalResources().Size());
 }
 
 TEST(DataSetIOTest, FromXml)
 {
-    EXPECT_NO_THROW(TestFromXmlString());
+    EXPECT_NO_THROW(DataSetIOTests::TestFromXmlString());
 }
 
 TEST(DataSetIOTest, FromXmlFile)
 {
-    EXPECT_NO_THROW(TestAli1Xml());
-    EXPECT_NO_THROW(TestAli2Xml());
-    EXPECT_NO_THROW(TestAli3Xml());
-    EXPECT_NO_THROW(TestAli4Xml());
-    EXPECT_NO_THROW(TestMappingStaggeredXml());
-    EXPECT_NO_THROW(TestBarcodeXml());
-    EXPECT_NO_THROW(TestCcsReadXml());
-    EXPECT_NO_THROW(TestLambdaContigsXml());
-    EXPECT_NO_THROW(TestPbalchemyXml());
-    EXPECT_NO_THROW(TestReferenceXml());
-    EXPECT_NO_THROW(TestSubread1Xml());
-    EXPECT_NO_THROW(TestSubread2Xml());
-    EXPECT_NO_THROW(TestSubread3Xml());
-    EXPECT_NO_THROW(TestTransformedXml());
+    EXPECT_NO_THROW(DataSetIOTests::TestAli1Xml());
+    EXPECT_NO_THROW(DataSetIOTests::TestAli2Xml());
+    EXPECT_NO_THROW(DataSetIOTests::TestAli3Xml());
+    EXPECT_NO_THROW(DataSetIOTests::TestAli4Xml());
+    EXPECT_NO_THROW(DataSetIOTests::TestMappingStaggeredXml());
+    EXPECT_NO_THROW(DataSetIOTests::TestBarcodeXml());
+    EXPECT_NO_THROW(DataSetIOTests::TestCcsReadXml());
+    EXPECT_NO_THROW(DataSetIOTests::TestLambdaContigsXml());
+    EXPECT_NO_THROW(DataSetIOTests::TestPbalchemyXml());
+    EXPECT_NO_THROW(DataSetIOTests::TestReferenceXml());
+    EXPECT_NO_THROW(DataSetIOTests::TestSubread1Xml());
+    EXPECT_NO_THROW(DataSetIOTests::TestSubread2Xml());
+    EXPECT_NO_THROW(DataSetIOTests::TestSubread3Xml());
+    EXPECT_NO_THROW(DataSetIOTests::TestTransformedXml());
 }
 
 TEST(DataSetIOTest, ThrowsOnNonexistentFofnFile)
@@ -363,7 +370,9 @@ TEST(DataSetIOTest, ToXml)
     EXPECT_EQ(expectedXml, s.str());
 }
 
-static void TestFromXmlString(void)
+namespace DataSetIOTests {
+
+static void TestFromXmlString()
 {
     const string inputXml =
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
@@ -500,9 +509,9 @@ static void TestFromXmlString(void)
     EXPECT_EQ("chr1", property2.Value());
 }
 
-static void TestAli1Xml(void)
+static void TestAli1Xml()
 {
-    const DataSet dataset(ali1XmlFn);
+    const DataSet dataset(DataSetIOTests::ali1XmlFn);
     EXPECT_EQ(DataSet::ALIGNMENT, dataset.Type());
     EXPECT_EQ(string("2015-01-27T09:00:01"),                  dataset.CreatedAt());
     EXPECT_EQ(string("PacBio.DataSet.AlignmentSet"),          dataset.MetaType());
@@ -589,9 +598,9 @@ static void TestAli1Xml(void)
     }
 }
 
-static void TestAli2Xml(void)
+static void TestAli2Xml()
 {
-    const DataSet dataset(ali2XmlFn);
+    const DataSet dataset(DataSetIOTests::ali2XmlFn);
     EXPECT_EQ(DataSet::ALIGNMENT, dataset.Type());
     EXPECT_EQ(string("2015-01-27T09:00:01"),                  dataset.CreatedAt());
     EXPECT_EQ(string("PacBio.DataSet.AlignmentSet"),          dataset.MetaType());
@@ -678,9 +687,9 @@ static void TestAli2Xml(void)
     }
 }
 
-static void TestAli3Xml(void)
+static void TestAli3Xml()
 {
-    const DataSet dataset(ali3XmlFn);
+    const DataSet dataset(DataSetIOTests::ali3XmlFn);
     EXPECT_EQ(DataSet::ALIGNMENT, dataset.Type());
     EXPECT_EQ(string("2015-01-27T09:00:01"),                  dataset.CreatedAt());
     EXPECT_EQ(string("PacBio.DataSet.AlignmentSet"),          dataset.MetaType());
@@ -767,9 +776,9 @@ static void TestAli3Xml(void)
     }
 }
 
-static void TestAli4Xml(void)
+static void TestAli4Xml()
 {
-    const DataSet dataset(ali4XmlFn);
+    const DataSet dataset(DataSetIOTests::ali4XmlFn);
     EXPECT_EQ(DataSet::ALIGNMENT, dataset.Type());
     EXPECT_EQ(string("2015-01-27T09:00:01"),                  dataset.CreatedAt());
     EXPECT_EQ(string("PacBio.DataSet.AlignmentSet"),          dataset.MetaType());
@@ -856,9 +865,9 @@ static void TestAli4Xml(void)
     }
 }
 
-static void TestMappingStaggeredXml(void)
+static void TestMappingStaggeredXml()
 {
-    const DataSet dataset(mappingStaggeredXmlFn);
+    const DataSet dataset(DataSetIOTests::mappingStaggeredXmlFn);
     EXPECT_EQ(DataSet::GENERIC, dataset.Type());
     EXPECT_EQ(string("2015-05-13T10:58:26"),    dataset.CreatedAt());
     EXPECT_EQ(string("PacBio.DataSet.DataSet"), dataset.MetaType());
@@ -943,9 +952,9 @@ static void TestMappingStaggeredXml(void)
     }
 }
 
-static void TestBarcodeXml(void)
+static void TestBarcodeXml()
 {
-    const DataSet dataset(barcodeXmlFn);
+    const DataSet dataset(DataSetIOTests::barcodeXmlFn);
     EXPECT_EQ(DataSet::BARCODE, dataset.Type());
     EXPECT_EQ(string("2015-01-27T09:00:01"),    dataset.CreatedAt());
     EXPECT_EQ(string("PacBio.DataSet.BarcodeSet"), dataset.MetaType());
@@ -977,9 +986,9 @@ static void TestBarcodeXml(void)
     EXPECT_EQ(string("paired"), metadata.ChildText("BarcodeConstruction"));
 }
 
-static void TestCcsReadXml(void)
+static void TestCcsReadXml()
 {
-    const DataSet dataset(ccsReadXmlFn);
+    const DataSet dataset(DataSetIOTests::ccsReadXmlFn);
     EXPECT_EQ(DataSet::CONSENSUS_READ, dataset.Type());
     EXPECT_EQ(string("2015-01-27T09:00:01"),    dataset.CreatedAt());
     EXPECT_EQ(string("PacBio.DataSet.ConsensusReadSet"), dataset.MetaType());
@@ -1027,9 +1036,9 @@ static void TestCcsReadXml(void)
     }
 }
 
-static void TestLambdaContigsXml(void)
+static void TestLambdaContigsXml()
 {
-    const DataSet dataset(lambdaContigsXmlFn);
+    const DataSet dataset(DataSetIOTests::lambdaContigsXmlFn);
     EXPECT_EQ(DataSet::REFERENCE, dataset.Type());
     EXPECT_EQ(string("2015-05-28T10:56:36"),    dataset.CreatedAt());
     EXPECT_EQ(string("PacBio.DataSet.ReferenceSet"), dataset.MetaType());
@@ -1050,9 +1059,9 @@ static void TestLambdaContigsXml(void)
     EXPECT_EQ(string("file:tests/data/lambda_contigs.fasta"), resource.ResourceId());
 }
 
-static void TestPbalchemyXml(void)
+static void TestPbalchemyXml()
 {
-    const DataSet dataset(pbalchemyXmlFn);
+    const DataSet dataset(DataSetIOTests::pbalchemyXmlFn);
     EXPECT_EQ(DataSet::GENERIC, dataset.Type());
     EXPECT_EQ(string("2015-05-22T16:56:16"),    dataset.CreatedAt());
     EXPECT_EQ(string("PacBio.DataSet.DataSet"), dataset.MetaType());
@@ -1079,9 +1088,9 @@ static void TestPbalchemyXml(void)
 
 }
 
-static void TestReferenceXml(void)
+static void TestReferenceXml()
 {
-    const DataSet dataset(referenceXmlFn);
+    const DataSet dataset(DataSetIOTests::referenceXmlFn);
     EXPECT_EQ(DataSet::REFERENCE, dataset.Type());
     EXPECT_EQ(string("2015-01-27T09:00:01"),    dataset.CreatedAt());
     EXPECT_EQ(string("PacBio.DataSet.ReferenceSet"), dataset.MetaType());
@@ -1136,9 +1145,9 @@ static void TestReferenceXml(void)
     EXPECT_EQ(string("f627c795efad7ce0050ed42b942d408e"), contig.Attribute("Digest"));
 }
 
-static void TestSubread1Xml(void)
+static void TestSubread1Xml()
 {
-    const DataSet dataset(subread1XmlFn);
+    const DataSet dataset(DataSetIOTests::subread1XmlFn);
     EXPECT_EQ(DataSet::SUBREAD, dataset.Type());
     EXPECT_EQ(string("2015-01-27T09:00:01"),    dataset.CreatedAt());
     EXPECT_EQ(string("PacBio.DataSet.SubreadSet"), dataset.MetaType());
@@ -1206,9 +1215,9 @@ static void TestSubread1Xml(void)
     EXPECT_EQ(string("500000"), metadata.TotalLength());
 }
 
-static void TestSubread2Xml(void)
+static void TestSubread2Xml()
 {
-    const DataSet dataset(subread2XmlFn);
+    const DataSet dataset(DataSetIOTests::subread2XmlFn);
     EXPECT_EQ(DataSet::SUBREAD, dataset.Type());
     EXPECT_EQ(string("2015-01-27T09:00:01"),    dataset.CreatedAt());
     EXPECT_EQ(string("PacBio.DataSet.SubreadSet"), dataset.MetaType());
@@ -1276,9 +1285,9 @@ static void TestSubread2Xml(void)
     EXPECT_EQ(string("500000"), metadata.TotalLength());
 }
 
-static void TestSubread3Xml(void)
+static void TestSubread3Xml()
 {
-    const DataSet dataset(subread3XmlFn);
+    const DataSet dataset(DataSetIOTests::subread3XmlFn);
     EXPECT_EQ(DataSet::SUBREAD, dataset.Type());
     EXPECT_EQ(string("2015-01-27T09:00:01"), dataset.CreatedAt());
     EXPECT_EQ(string("PacBio.DataSet.SubreadSet"), dataset.MetaType());
@@ -1346,9 +1355,9 @@ static void TestSubread3Xml(void)
     EXPECT_EQ(string("500000"), metadata.TotalLength());
 }
 
-static void TestTransformedXml(void)
+static void TestTransformedXml()
 {
-    const DataSet dataset(transformedXmlFn);
+    const DataSet dataset(DataSetIOTests::transformedXmlFn);
     EXPECT_EQ(DataSet::HDF_SUBREAD, dataset.Type());
     EXPECT_EQ(string("PacBio.DataSet.SubreadSet"), dataset.MetaType());
     EXPECT_EQ(string("Subreads from run r001173_42129_130607"), dataset.Name());
@@ -1390,9 +1399,11 @@ static void TestTransformedXml(void)
     EXPECT_EQ(string("50000000"), metadata.TotalLength());
 }
 
+} // namespace DataSetIOTests
+
 TEST(DataSetIOTest, InspectMalformedXml)
 {
-    const string xmlFn = tests::Data_Dir + "/dataset/malformed.xml";
+    const string xmlFn = PbbamTestsConfig::Data_Dir + "/dataset/malformed.xml";
 
     DataSet ds(xmlFn);
     stringstream s;
@@ -1533,7 +1544,7 @@ TEST(DataSetIOTest, RelativePathCarriedThroughOk_FromString)
 
 TEST(DataSetIOTest, RelativePathCarriedThroughOk_FromFile)
 {
-    DataSet dataset(tests::Data_Dir + "/relative/relative.xml");
+    DataSet dataset(PbbamTestsConfig::Data_Dir + "/relative/relative.xml");
     auto resources = dataset.ExternalResources();
     EXPECT_EQ("./a/test.bam",  resources[0].ResourceId());
     EXPECT_EQ("./b/test1.bam", resources[1].ResourceId());
@@ -1554,8 +1565,8 @@ TEST(DataSetIOTest, DataSetFromRelativeBamFilename)
     // cache initial directory and move to location so we can test relatvie filename ok
     const string startingDirectory = internal::FileUtils::CurrentWorkingDirectory();
 
-    const string targetDirectory = tests::Data_Dir + "/dataset";
-    changeCurrentDirectory(targetDirectory);
+    const string targetDirectory = PbbamTestsConfig::Data_Dir + "/dataset";
+    DataSetIOTests::changeCurrentDirectory(targetDirectory);
     ASSERT_EQ(targetDirectory, internal::FileUtils::CurrentWorkingDirectory());
 
     EXPECT_NO_THROW(
@@ -1567,7 +1578,7 @@ TEST(DataSetIOTest, DataSetFromRelativeBamFilename)
     });
 
     // restore working directory
-    changeCurrentDirectory(startingDirectory);
+    DataSetIOTests::changeCurrentDirectory(startingDirectory);
 }
 
 TEST(DataaSetIOTest, AllFiles) 
@@ -1575,7 +1586,7 @@ TEST(DataaSetIOTest, AllFiles)
     // check  BamFiles only
     EXPECT_NO_THROW(
     {
-        const DataSet dataset(tests::Data_Dir + "/chunking/chunking.subreadset.xml");
+        const DataSet dataset(PbbamTestsConfig::Data_Dir + "/chunking/chunking.subreadset.xml");
         const auto bamFiles = dataset.BamFiles();
         EXPECT_EQ(3, bamFiles.size());
     });
@@ -1583,7 +1594,7 @@ TEST(DataaSetIOTest, AllFiles)
     // now fetch all files (original BAMs plus PBI files)
     EXPECT_NO_THROW(
     {
-        const DataSet dataset(tests::Data_Dir + "/chunking/chunking.subreadset.xml");
+        const DataSet dataset(PbbamTestsConfig::Data_Dir + "/chunking/chunking.subreadset.xml");
         const auto allFiles = dataset.AllFiles();
         EXPECT_EQ(6, allFiles.size());    
     });

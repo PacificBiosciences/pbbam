@@ -43,6 +43,7 @@
 #define CIGAROPERATION_H
 
 #include "pbbam/Config.h"
+#include <cstdint>
 #include <stdexcept>
 
 namespace PacBio {
@@ -101,28 +102,28 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    CigarOperation(void);
+    CigarOperation() = default;
     CigarOperation(char c, uint32_t length);
     CigarOperation(CigarOperationType op, uint32_t length);
 
-    CigarOperation(const CigarOperation& other) = default;
-    CigarOperation(CigarOperation&& other) = default;
-    CigarOperation& operator=(const CigarOperation& other) = default;
-    CigarOperation& operator=(CigarOperation&& other) = default;
-    ~CigarOperation(void) = default;
+    CigarOperation(const CigarOperation&) = default;
+    CigarOperation(CigarOperation&&) = default;
+    CigarOperation& operator=(const CigarOperation&) = default;
+    CigarOperation& operator=(CigarOperation&&) = default;
+    ~CigarOperation() = default;
 
     /// \}
 
 public:
 
     /// \returns operation type as SAM/BAM char code
-    inline char Char(void) const;
+    inline char Char() const;
 
     /// \returns operation length
-    inline uint32_t Length(void) const;
+    inline uint32_t Length() const;
 
     /// \returns operation type as CigarOperationType enum value
-    inline CigarOperationType Type(void) const;
+    inline CigarOperationType Type() const;
 
     /// \}
 
@@ -163,8 +164,8 @@ public:
     /// \}
 
 private:
-    CigarOperationType type_;
-    uint32_t length_;
+    CigarOperationType type_ = CigarOperationType::UNKNOWN_OP;
+    uint32_t length_ = 0;
 };
 
 } // namespace BAM

@@ -35,11 +35,14 @@
 
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/DataSetTypes.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 #include "DataSetUtils.h"
 #include "TimeUtils.h"
 #include <boost/algorithm/string.hpp>
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

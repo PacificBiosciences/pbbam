@@ -7,6 +7,7 @@
 
 #include "OptionParser.h"
 
+#include <cstddef>
 #include <cstdlib>
 #include <algorithm>
 #include <complex>

@@ -35,33 +35,38 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include "TestData.h"
-#include <gtest/gtest.h>
-#include <pbbam/GenomicIntervalQuery.h>
 #include <iostream>
 #include <string>
+
+#include <gtest/gtest.h>
+
+#define private public
+
+#include "PbbamTestData.h"
+
+#include <pbbam/GenomicIntervalQuery.h>
+#include <pbbam/Unused.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-const string inputBamFn = tests::Data_Dir + "/aligned.bam";
+namespace GenomicIntervalQueryTests {
+    const string inputBamFn = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+} // namespace GenomicIntervalQueryTests
 
 TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
 {
     const string rname = "lambda_NEB3011";
 
-    BamFile bamFile(inputBamFn);
+    BamFile bamFile(GenomicIntervalQueryTests::inputBamFn);
 
     // setup with normal interval
     int count = 0;
     GenomicInterval interval(rname, 5000, 6000);
     GenomicIntervalQuery query(interval, bamFile);
     for (const BamRecord& record : query) {
-        (void)record;
+        UNUSED(record);
         ++count;
     }
     EXPECT_EQ(2, count);
@@ -72,7 +77,7 @@ TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
     interval.Stop(9400);
     query.Interval(interval);
     for (const BamRecord& record : query) {
-        (void)record;
+        UNUSED(record);
         ++count;
     }
     EXPECT_EQ(2, count);
@@ -84,7 +89,7 @@ TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
     interval.Stop(2000);
     query.Interval(interval);
     for (const BamRecord& record : query) {
-        (void)record;
+        UNUSED(record);
         ++count;
     }
     EXPECT_EQ(0, count);
@@ -96,7 +101,7 @@ TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
     interval.Stop(100);
     EXPECT_THROW(query.Interval(interval), std::runtime_error);
     for (const BamRecord& record : query) { // iteration is still safe, just returns no data
-        (void)record;
+        UNUSED(record);
         ++count;
     }
     EXPECT_EQ(0, count);
@@ -108,7 +113,7 @@ TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
     query.Interval(interval);
     count = 0;
     for (const BamRecord& record : query) {
-        (void)record;
+        UNUSED(record);
         ++count;
     }
     EXPECT_EQ(2, count);
@@ -118,13 +123,13 @@ TEST(GenomicIntervalQueryTest, NonConstBamRecord)
 {
     EXPECT_NO_THROW(
     {
-        BamFile bamFile(inputBamFn);
+        BamFile bamFile(GenomicIntervalQueryTests::inputBamFn);
         int count = 0;
 
         GenomicInterval interval("lambda_NEB3011", 8000, 10000);
         GenomicIntervalQuery query(interval, bamFile);
         for (BamRecord& record : query) {
-            (void)record;
+            UNUSED(record);
             ++count;
         }
         EXPECT_EQ(2, count);
@@ -134,8 +139,8 @@ TEST(GenomicIntervalQueryTest, NonConstBamRecord)
 TEST(GenomicIntervalQueryTest,  MissingBaiShouldThrow)
 {
     GenomicInterval interval("lambda_NEB3011", 0, 100);
-    const string phi29Bam = tests::Data_Dir + "/phi29.bam";
-    const string hasBaiBam = tests::Data_Dir + "/aligned.bam";
+    const string phi29Bam = PbbamTestsConfig::Data_Dir + "/phi29.bam";
+    const string hasBaiBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
 
     {   // single file, missing BAI
         EXPECT_THROW(GenomicIntervalQuery query(interval, phi29Bam), std::runtime_error);

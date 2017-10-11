@@ -39,7 +39,11 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/Cigar.h"
+#include <cstddef>
+#include <cstdint>
 #include <sstream>
 
 namespace PacBio {
@@ -61,7 +65,7 @@ Cigar::Cigar(const std::string& cigarString)
     }
 }
 
-std::string Cigar::ToStdString(void) const
+std::string Cigar::ToStdString() const
 {
     std::stringstream s;
     const auto end  = this->cend();

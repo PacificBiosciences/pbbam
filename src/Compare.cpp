@@ -39,7 +39,10 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/Compare.h"
+#include <cstddef>
 #include <functional>
 #include <unordered_map>
 
@@ -53,12 +56,12 @@ struct TypeAlias
     std::string op_;
     std::string opAlpha_;
 
-    TypeAlias(const std::string& name = std::string(),
-              const std::string& op = std::string(),
-              const std::string& opAlpha = std::string())
-        : name_(name)
-        , op_(op)
-        , opAlpha_(opAlpha)
+    TypeAlias(std::string name = std::string(),
+              std::string op = std::string(),
+              std::string opAlpha = std::string())
+        : name_(std::move(name))
+        , op_(std::move(op))
+        , opAlpha_(std::move(opAlpha))
     { }
 };
 

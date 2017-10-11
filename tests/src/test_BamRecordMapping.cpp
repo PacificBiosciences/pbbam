@@ -35,23 +35,25 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
+#include <cstdint>
+#include <chrono>
+#include <string>
 
 #include <gtest/gtest.h>
+
+#define private public
+
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamRecordView.h>
 #include <pbbam/BamTagCodec.h>
-#include <chrono>
-#include <string>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-typedef vector<uint16_t> f_data;
+using f_data = vector<uint16_t>;
 
-namespace tests {
+namespace BamRecordMappingTests {
 
 static
 BamRecord MakeRecord(const Position qStart,
@@ -83,7 +85,7 @@ BamRecord MakeRecord(const Position qStart,
     return BamRecord(std::move(impl));
 }
 
-} // namespace tests
+} // namespace BamRecordMappingTests
 
 TEST(BamRecordMappingTest, BasicMap)
 {
@@ -106,12 +108,12 @@ TEST(BamRecordMappingTest, BasicMap)
     const string s2_cigar = "5=3D5=";
     const string s3_cigar = "4=1D2I2D4=";
 
-    BamRecord s1 = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    BamRecord s2 = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    BamRecord s3 = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    BamRecord s1_rev = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    BamRecord s2_rev = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    BamRecord s3_rev = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s1 = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s2 = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s3 = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s1_rev = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s2_rev = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s3_rev = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
 
     s1.Map(0, 100, Strand::FORWARD, s1_cigar, mapQual);
     s2.Map(0, 100, Strand::FORWARD, s2_cigar, mapQual);
@@ -396,12 +398,12 @@ TEST(BamRecordMappingTest, SoftClipMapping)
     const string s2_cigar = "2S5=3D5=3S";
     const string s3_cigar = "2S4=1D2I2D4=3S";
 
-    BamRecord s1 = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    BamRecord s2 = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    BamRecord s3 = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    BamRecord s1_rev = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    BamRecord s2_rev = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    BamRecord s3_rev = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s1 = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s2 = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s3 = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s1_rev = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s2_rev = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    BamRecord s3_rev = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
 
     s1.Map(0, 100, Strand::FORWARD, s1_cigar, mapQual);
     s2.Map(0, 100, Strand::FORWARD, s2_cigar, mapQual);
@@ -666,7 +668,7 @@ TEST(BamRecordMappingTest, MappedCopy)
     const uint8_t mapQual = 80;
     const string cigar    = "4=1D2I2D4=";
 
-    const BamRecord orig = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    const BamRecord orig = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     const BamRecord mapped = orig.Mapped(0, 100, Strand::FORWARD, cigar, mapQual);
 
     EXPECT_TRUE(mapped.IsMapped());
@@ -711,7 +713,7 @@ TEST(BamRecordMappingTest, StaticMapped)
     const uint8_t mapQual = 80;
     const string cigar    = "4=1D2I2D4=";
 
-    const BamRecord orig = tests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
+    const BamRecord orig = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     const BamRecord mapped = BamRecord::Mapped(orig, 0, 100, Strand::FORWARD, cigar, mapQual);
 
     EXPECT_TRUE(mapped.IsMapped());

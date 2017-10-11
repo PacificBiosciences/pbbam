@@ -39,10 +39,13 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "ValidationErrors.h"
 #include "pbbam/exception/ValidationException.h"
 #include "StringUtils.h"
 #include <sstream>
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {
@@ -124,19 +127,19 @@ void ValidationErrors::AddTagLengthError(const std::string& name,
     AddRecordError(name, s.str());
 }
 
-bool ValidationErrors::IsEmpty(void) const
+bool ValidationErrors::IsEmpty() const
 {
     return currentNumErrors_ == 0;
 }
 
-void ValidationErrors::OnErrorAdded(void)
+void ValidationErrors::OnErrorAdded()
 {
     ++currentNumErrors_;
     if (currentNumErrors_ == maxNumErrors_)
         ThrowErrors();
 }
 
-void ValidationErrors::ThrowErrors(void)
+void ValidationErrors::ThrowErrors()
 {
     throw ValidationException(std::move(fileErrors_),
                               std::move(readGroupErrors_),

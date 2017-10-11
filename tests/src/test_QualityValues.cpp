@@ -35,12 +35,16 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
+#include <cstddef>
+#include <cstdint>
+#include <limits>
 
 #include <gtest/gtest.h>
+
+#define private public
+
 #include <pbbam/QualityValues.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -59,7 +63,7 @@ TEST(QualityValueTest, FromNumber)
     const QualityValue valid(42);
     const QualityValue max(93);
     const QualityValue tooHigh(94);
-    const QualityValue wayTooHigh(INT8_MAX);
+    const QualityValue wayTooHigh(std::numeric_limits<int8_t>::max());
 
     EXPECT_EQ(0,  zero);
     EXPECT_EQ(33, thirtyThree);

@@ -35,14 +35,16 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include "TestData.h"
-#include <gtest/gtest.h>
-#include <pbbam/ZmwQuery.h>
 #include <string>
+
+#include <gtest/gtest.h>
+
+#define private public
+
+#include "PbbamTestData.h"
+
+#include <pbbam/ZmwQuery.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -58,7 +60,7 @@ using namespace std;
 //        int count = 0;
 //        EntireFileQuery entireFile(bamFile);
 //        for (const BamRecord& record : entireFile) {
-//            (void)record;
+//            ()record;
 //            ++count;
 //        }
 

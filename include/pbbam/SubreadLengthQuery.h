@@ -45,6 +45,7 @@
 #include "pbbam/Compare.h"
 #include "pbbam/Config.h"
 #include "pbbam/internal/QueryBase.h"
+#include <cstdint>
 #include <vector>
 
 namespace PacBio {
@@ -78,7 +79,7 @@ public:
                        const Compare::Type compareType,
                        const DataSet& dataset);
 
-    ~SubreadLengthQuery(void);
+    ~SubreadLengthQuery();
 
 public:
     /// \brief Main iteration point for record access.
@@ -86,7 +87,9 @@ public:
     /// Most client code should not need to use this method directly. Use
     /// iterators instead.
     ///
-    bool GetNext(BamRecord& r);
+    bool GetNext(BamRecord& r) override;
+
+    uint32_t NumReads() const;
 
 private:
     struct SubreadLengthQueryPrivate;

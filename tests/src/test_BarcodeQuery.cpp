@@ -35,14 +35,16 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include "TestData.h"
-#include <gtest/gtest.h>
-#include <pbbam/BarcodeQuery.h>
 #include <string>
+
+#include <gtest/gtest.h>
+
+#define private public
+
+#include "PbbamTestData.h"
+
+#include <pbbam/BarcodeQuery.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;

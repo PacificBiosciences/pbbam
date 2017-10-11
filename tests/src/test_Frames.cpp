@@ -35,19 +35,21 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include <gtest/gtest.h>
-#include <pbbam/Frames.h>
+#include <cstdint>
 #include <string>
 #include <vector>
+
+#include <gtest/gtest.h>
+
+#define private public
+
+#include <pbbam/Frames.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-namespace tests {
+namespace FramesTests {
 
 static const vector<uint16_t> testFrames =
 {
@@ -77,21 +79,21 @@ static const vector<uint8_t> encodedFrames =
     255, 254,  255
 };
 
-} // namespace tests
+} // namespace FramesTests
 
 TEST(FramesTest, Constructors)
 {
     const Frames f;
     ASSERT_TRUE(f.Data().empty());
 
-    const Frames f2(tests::testFrames);
+    const Frames f2(FramesTests::testFrames);
     const auto d = f2.Data();
-    ASSERT_EQ(tests::testFrames, d);
+    ASSERT_EQ(FramesTests::testFrames, d);
 }
 
 TEST(FramesTest, Encoded)
 {
-    const Frames f(tests::testFrames);
+    const Frames f(FramesTests::testFrames);
     const auto e = f.Encode();
-    ASSERT_EQ(tests::encodedFrames, e);
+    ASSERT_EQ(FramesTests::encodedFrames, e);
 }

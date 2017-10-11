@@ -60,6 +60,7 @@
 #ifndef OPTIONPARSER_H_
 #define OPTIONPARSER_H_
 
+#include <cstddef>
 #include <iostream>
 #include <list>
 #include <map>

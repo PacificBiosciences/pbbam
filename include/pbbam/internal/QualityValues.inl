@@ -45,7 +45,7 @@
 namespace PacBio {
 namespace BAM {
 
-inline QualityValues::QualityValues(void)
+inline QualityValues::QualityValues()
     : std::vector<QualityValue>()
 { }
 
@@ -90,28 +90,28 @@ inline QualityValues& QualityValues::operator=(const std::vector<QualityValue>& 
 inline QualityValues& QualityValues::operator=(std::vector<QualityValue>&& quals)
 { std::vector<QualityValue>::operator=(std::move(quals)); return *this; }
 
-inline std::vector<QualityValue>::const_iterator QualityValues::cbegin(void) const
+inline std::vector<QualityValue>::const_iterator QualityValues::cbegin() const
 { return std::vector<QualityValue>::cbegin(); }
 
-inline std::vector<QualityValue>::const_iterator QualityValues::cend(void) const
+inline std::vector<QualityValue>::const_iterator QualityValues::cend() const
 { return std::vector<QualityValue>::cend(); }
 
-inline std::vector<QualityValue>::const_iterator QualityValues::begin(void) const
+inline std::vector<QualityValue>::const_iterator QualityValues::begin() const
 { return std::vector<QualityValue>::begin(); }
 
-inline std::vector<QualityValue>::const_iterator QualityValues::end(void) const
+inline std::vector<QualityValue>::const_iterator QualityValues::end() const
 { return std::vector<QualityValue>::end(); }
 
-inline std::vector<QualityValue>::iterator QualityValues::begin(void)
+inline std::vector<QualityValue>::iterator QualityValues::begin()
 { return std::vector<QualityValue>::begin(); }
 
-inline std::vector<QualityValue>::iterator QualityValues::end(void)
+inline std::vector<QualityValue>::iterator QualityValues::end()
 { return std::vector<QualityValue>::end(); }
 
 inline QualityValues QualityValues::FromFastq(const std::string& fastq)
 { return QualityValues(fastq); }
 
-inline std::string QualityValues::Fastq(void) const
+inline std::string QualityValues::Fastq() const
 {
     std::string result;
     result.reserve(size());

@@ -44,6 +44,8 @@
 #define COMPARE_H
 
 #include "pbbam/BamRecord.h"
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <string>
 #include <utility>
@@ -140,7 +142,7 @@ private:
     template<typename ValueType>
     struct MemberFunctionBaseHelper : public Compare::Base
     {
-        typedef ValueType (BamRecord::*MemberFnType)(void) const;
+        using MemberFnType = ValueType (BamRecord::*)() const;
     };
 
 public:

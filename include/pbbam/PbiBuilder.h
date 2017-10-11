@@ -43,6 +43,8 @@
 #define PBIBUILDER_H
 
 #include "pbbam/Config.h"
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -163,10 +165,10 @@ public:
 
     /// \brief Destroys builder, writing its data out to PBI file.
     ///
-    /// On destruction, data summaries are calculated, raw data is written to
-    /// file, and file handle closed.
     ///
-    ~PbiBuilder(void);
+    /// \note Exceptions are swallowed. Use Close() if you want to catch them.
+    ///
+    ~PbiBuilder() noexcept;
 
     /// \}
 
@@ -193,10 +195,14 @@ public:
     ///
     void AddRecord(const BamRecord& record, const int64_t vOffset);
 
-    /// \returns const reference to current raw index data. Mostly only used for
-    ///          testing; shouldn't be needed by most client code.
+    /// \brief Writes data out to PBI file & closes builder.
     ///
-    const PbiRawData& Index(void) const;
+    /// \note Any exceptions are thrown to caller. If you don't care about
+    ///       catching exceptions with file I/O, just let the builder go out of
+    ///       scope and data will be written, but exceptions swallowed (to avoid
+    ///       throwing from destructor).
+    ///
+    void Close();
 
     /// \}
 

@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/ReadGroupInfo.h"
 #include "pbbam/MD5.h"
 #include "ChemistryTable.h"
@@ -48,6 +50,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <cstdio>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -88,6 +92,7 @@ static const std::string feature_PC = std::string{ "PulseCall" };
 static const std::string feature_PD = std::string{ "PrePulseFrames" };
 static const std::string feature_PX = std::string{ "PulseCallWidth" };
 static const std::string feature_SF = std::string{ "StartFrame" };
+static const std::string feature_PE = std::string{ "PulseExclusion" };
 
 static const std::string token_RT = std::string{ "READTYPE" };
 static const std::string token_BK = std::string{ "BINDINGKIT" };
@@ -141,6 +146,7 @@ static std::string BaseFeatureName(const BaseFeature& feature)
         case BaseFeature::PRE_PULSE_FRAMES : return feature_PD;
         case BaseFeature::PULSE_CALL_WIDTH : return feature_PX;
         case BaseFeature::START_FRAME      : return feature_SF;
+        case BaseFeature::PULSE_EXCLUSION  : return feature_PE;
         default:
             throw std::runtime_error{ "unrecognized base feature" };
     }
@@ -151,6 +157,8 @@ static std::string FrameCodecName(const FrameCodec& codec)
     switch (codec) {
         case FrameCodec::RAW : return codec_RAW;
         case FrameCodec::V1  : return codec_V1;
+        default:
+            throw std::runtime_error{ "unrecognized frame codec" };
     }
 }
 
@@ -161,6 +169,8 @@ static std::string BarcodeModeName(const BarcodeModeType& mode)
         case BarcodeModeType::SYMMETRIC  : return barcodemode_SYM;
         case BarcodeModeType::ASYMMETRIC : return barcodemode_ASYM;
         case BarcodeModeType::TAILED     : return barcodemode_TAIL;
+        default:
+            throw std::runtime_error{ "unrecognized barcode mode type" };
     }
 }
 
@@ -170,6 +180,8 @@ static std::string BarcodeQualityName(const BarcodeQualityType& type)
         case BarcodeQualityType::NONE  : return barcodequal_NONE;
         case BarcodeQualityType::SCORE : return barcodequal_SCORE;
         case BarcodeQualityType::PROBABILITY : return barcodequal_PROB;
+        default:
+            throw std::runtime_error{ "unrecognized barcode quality type" };
     }
 }
 
@@ -179,6 +191,8 @@ static std::string PlatformModelName(const PlatformModelType& type)
         case PlatformModelType::ASTRO  : return platformModelType_ASTRO;
         case PlatformModelType::RS     : return platformModelType_RS;
         case PlatformModelType::SEQUEL : return platformModelType_SEQUEL;
+        default:
+            throw std::runtime_error{ "unrecognized platform model type" };
     }
 }
 
@@ -203,7 +217,8 @@ static const auto nameToFeature = std::map<std::string, BaseFeature>
     { feature_PG, BaseFeature::PULSE_MERGE_QV },
     { feature_PD, BaseFeature::PRE_PULSE_FRAMES },
     { feature_PX, BaseFeature::PULSE_CALL_WIDTH },
-    { feature_SF, BaseFeature::START_FRAME }
+    { feature_SF, BaseFeature::START_FRAME },
+    { feature_PE, BaseFeature::PULSE_EXCLUSION }
 };
 
 static const auto nameToCodec = std::map<std::string, FrameCodec>
@@ -271,40 +286,29 @@ static inline PlatformModelType PlatformModelFromName(const std::string& name)
 
 } // namespace internal
 
-ReadGroupInfo::ReadGroupInfo(void)
-    : platformModel_(PlatformModelType::SEQUEL)
-    , readType_("UNKNOWN")
-    , ipdCodec_(FrameCodec::V1)
-    , pulseWidthCodec_(FrameCodec::V1)
+ReadGroupInfo::ReadGroupInfo()
+    : readType_("UNKNOWN")
 { }
 
-ReadGroupInfo::ReadGroupInfo(const std::string& id)
-    : id_(id)
-    , platformModel_(PlatformModelType::SEQUEL)
+ReadGroupInfo::ReadGroupInfo(std::string id)
+    : id_(std::move(id))
     , readType_("UNKNOWN")
-    , ipdCodec_(FrameCodec::V1)
-    , pulseWidthCodec_(FrameCodec::V1)
 { }
 
-ReadGroupInfo::ReadGroupInfo(const std::string& movieName,
-                             const std::string& readType)
+ReadGroupInfo::ReadGroupInfo(std::string movieName,
+                             std::string readType)
     : id_(MakeReadGroupId(movieName, readType))
-    , movieName_(movieName)
-    , platformModel_(PlatformModelType::SEQUEL)
-    , readType_(readType)
-    , ipdCodec_(FrameCodec::V1)
-    , pulseWidthCodec_(FrameCodec::V1)
+    , movieName_(std::move(movieName))
+    , readType_(std::move(readType))
 { }
 
-ReadGroupInfo::ReadGroupInfo(const std::string& movieName,
-                             const std::string& readType,
+ReadGroupInfo::ReadGroupInfo(std::string movieName,
+                             std::string readType,
                              const PlatformModelType platform)
     : id_(MakeReadGroupId(movieName, readType))
-    , movieName_(movieName)
-    , platformModel_(platform)
+    , movieName_(std::move(movieName))
+    , platformModel_(std::move(platform))
     , readType_(readType)
-    , ipdCodec_(FrameCodec::V1)
-    , pulseWidthCodec_(FrameCodec::V1)
 { }
 
 void ReadGroupInfo::DecodeSamDescription(const std::string& description)
@@ -393,22 +397,21 @@ void ReadGroupInfo::DecodeSamDescription(const std::string& description)
                        hasBarcodeQuality);
 }
 
-std::string ReadGroupInfo::EncodeSamDescription(void) const
+std::string ReadGroupInfo::EncodeSamDescription() const
 {
     auto result = std::string{ };
     result.reserve(256);
-    result.append(std::string(internal::token_RT+"=" + readType_));
+    result.append(std::string{internal::token_RT + "=" + readType_});
 
     static const auto SEP   = std::string{";"};
     static const auto COLON = std::string{":"};
     static const auto EQ    = std::string{"="};
 
     auto featureName = std::string{ };
-    const auto featureEnd = features_.cend();
-    auto featureIter = features_.cbegin();
-    for ( ; featureIter != featureEnd; ++featureIter ) {
-        featureName = internal::BaseFeatureName(featureIter->first);
-        if (featureName.empty() || featureIter->second.empty())
+    for (const auto& feature : features_) {
+
+        featureName = internal::BaseFeatureName(feature.first);
+        if (featureName.empty() || feature.second.empty())
             continue;
         else if (featureName == internal::feature_IP) {
             featureName.append(COLON);
@@ -418,7 +421,7 @@ std::string ReadGroupInfo::EncodeSamDescription(void) const
             featureName.append(COLON);
             featureName.append(internal::FrameCodecName(pulseWidthCodec_));
         }
-        result.append(std::string(SEP + featureName + EQ + featureIter->second));
+        result.append(std::string{SEP + featureName + EQ + feature.second});
     }
 
     if (!bindingKit_.empty())        result.append(SEP + internal::token_BK +EQ + bindingKit_);
@@ -542,14 +545,14 @@ std::string ReadGroupInfo::SequencingChemistryFromTriple(const std::string& bind
                                               basecallerVersion);
 }
 
-std::string ReadGroupInfo::ToSam(void) const
+std::string ReadGroupInfo::ToSam() const
 {
     std::stringstream out;
     out << "@RG"
         << internal::MakeSamTag(internal::sam_ID, id_)
         << internal::MakeSamTag(internal::sam_PL, Platform());
 
-    auto description = EncodeSamDescription();
+    const auto description = EncodeSamDescription();
     if (!description.empty())
         out << internal::MakeSamTag(internal::sam_DS, description);
 
@@ -566,10 +569,8 @@ std::string ReadGroupInfo::ToSam(void) const
     out << internal::MakeSamTag(internal::sam_PM, internal::PlatformModelName(platformModel_));
 
     // append any custom tags
-    auto customIter = custom_.cbegin();
-    auto customEnd  = custom_.cend();
-    for ( ; customIter != customEnd; ++customIter )
-        out << internal::MakeSamTag(customIter->first, customIter->second);
+    for (const auto& attribute : custom_)
+        out << internal::MakeSamTag(attribute.first, attribute.second);
 
     return out.str();
 }

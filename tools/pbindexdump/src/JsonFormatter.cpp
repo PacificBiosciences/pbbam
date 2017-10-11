@@ -38,6 +38,7 @@
 #include "JsonFormatter.h"
 #include "json.hpp"
 #include <pbbam/PbiFile.h>
+#include <cstdint>
 #include <iostream>
 #include <sstream>
 using namespace pbindexdump;
@@ -54,7 +55,7 @@ JsonFormatter::JsonFormatter(const Settings& settings)
     , index_(settings.inputPbiFilename_)
 { }
 
-void JsonFormatter::FormatMetadata(void)
+void JsonFormatter::FormatMetadata()
 {
     auto version = string{ };
     switch (index_.Version()) {
@@ -75,7 +76,7 @@ void JsonFormatter::FormatMetadata(void)
     json_["numReads"]     = index_.NumReads();
 }
 
-void JsonFormatter::FormatRaw(void)
+void JsonFormatter::FormatRaw()
 {
     const PbiRawBasicData& basicData = index_.BasicData();
     json_["basicData"]["rgId"]       = basicData.rgId_;
@@ -110,7 +111,7 @@ void JsonFormatter::FormatRaw(void)
     }
 }
 
-void JsonFormatter::FormatRecords(void)
+void JsonFormatter::FormatRecords()
 {
     nlohmann::json reads;
     const uint32_t numReads = index_.NumReads();
@@ -160,7 +161,7 @@ void JsonFormatter::FormatRecords(void)
     json_["reads"] = reads;
 }
 
-void JsonFormatter::FormatReferences(void)
+void JsonFormatter::FormatReferences()
 {
     if (index_.HasReferenceData()) {
         const PbiRawReferenceData& referenceData = index_.ReferenceData();
@@ -176,12 +177,12 @@ void JsonFormatter::FormatReferences(void)
     }
 }
 
-void JsonFormatter::Print(void)
+void JsonFormatter::Print()
 {
     cout << json_.dump(settings_.jsonIndentLevel_) << endl;
 }
 
-void JsonFormatter::Run(void)
+void JsonFormatter::Run()
 {
     FormatMetadata();
     FormatReferences();

@@ -45,9 +45,13 @@
 #include "pbbam/DataSet.h"
 #include "pbbam/PbiBasicTypes.h"
 #include "pbbam/PbiIndex.h"
+#include "pbbam/PbiRawData.h"
+#include "pbbam/Unused.h"
 #include <boost/concept_check.hpp>
+#include <cstddef>
 #include <memory>
 #include <string>
+#include <tuple>
 
 namespace PacBio {
 namespace BAM {
@@ -67,9 +71,9 @@ struct PbiFilterConcept
         //
         //    bool Accepts(const PbiRawData& index, const size_t row) const;
         //
-        const PbiRawData index;
-        bool result = filter.Accepts(index, 0);
-        (void)result;
+        PbiRawData index;
+        auto result = filter.Accepts(index, 0);
+        UNUSED(result);
     }
 
 private:
@@ -254,7 +258,7 @@ public:
     PbiFilter(PbiFilter&& other) noexcept = default;
     PbiFilter& operator=(const PbiFilter& other);
     PbiFilter& operator=(PbiFilter&& other) noexcept = default;
-    ~PbiFilter(void);
+    ~PbiFilter() = default;
 
     /// \}
 
@@ -309,7 +313,7 @@ public:
     PbiFilter& Add(std::vector<PbiFilter>&& filters);
 
     /// \returns true if this filter has no child filters.
-    bool IsEmpty(void) const;
+    bool IsEmpty() const;
 
     /// \}
 

@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "Version.h"
 #include "SequenceUtils.h"
 #include <sstream>
@@ -47,7 +49,7 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
-const Version Version::Current = Version(3,0,3);
+const Version Version::Current = Version(3,0,5);
 const Version Version::Minimum = Version(3,0,1);
 
 // string must be "<major>.<minor>.<version>"
@@ -77,7 +79,7 @@ Version::Version(const std::string& v)
     Check();
 }
 
-std::string Version::ToString(void) const
+std::string Version::ToString() const
 {
     std::stringstream s;
     s << major_ << '.' << minor_ << '.' << revision_;

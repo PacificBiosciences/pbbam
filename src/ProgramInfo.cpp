@@ -40,6 +40,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/ProgramInfo.h"
 #include "SequenceUtils.h"
 #include <sstream>
@@ -48,23 +50,23 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
-static std::string token_ID = std::string("ID");
-static std::string token_CL = std::string("CL");
-static std::string token_DS = std::string("DS");
-static std::string token_PN = std::string("PN");
-static std::string token_PP = std::string("PP");
-static std::string token_VN = std::string("VN");
+static std::string ProgramInfoTokenID{"ID"};
+static std::string ProgramInfoTokenCL{"CL"};
+static std::string ProgramInfoTokenDS{"DS"};
+static std::string ProgramInfoTokenPN{"PN"};
+static std::string ProgramInfoTokenPP{"PP"};
+static std::string ProgramInfoTokenVN{"VN"};
 
 } // namespace internal
 
-ProgramInfo::ProgramInfo(const std::string& id)
-    : id_(id)
+ProgramInfo::ProgramInfo(std::string id)
+    : id_(std::move(id))
 { }
 
 ProgramInfo ProgramInfo::FromSam(const std::string& sam)
 {
     // pop off '@PG\t', then split rest of line into tokens
-    const std::vector<std::string>& tokens = internal::Split(sam.substr(4), '\t');
+    const auto tokens = internal::Split(sam.substr(4), '\t');
     if (tokens.empty())
         return ProgramInfo();
 
@@ -72,17 +74,17 @@ ProgramInfo ProgramInfo::FromSam(const std::string& sam)
     std::map<std::string, std::string> custom;
 
     // iterate over tokens
-    for (const std::string& token : tokens) {
-        const std::string& tokenTag   = token.substr(0,2);
-        const std::string& tokenValue = token.substr(3);
+    for (const auto& token : tokens) {
+        const auto tokenTag   = token.substr(0,2);
+        const auto tokenValue = token.substr(3);
 
         // set program contents
-        if      (tokenTag == internal::token_ID) prog.Id(tokenValue);
-        else if (tokenTag == internal::token_CL) prog.CommandLine(tokenValue);
-        else if (tokenTag == internal::token_DS) prog.Description(tokenValue);
-        else if (tokenTag == internal::token_PN) prog.Name(tokenValue);
-        else if (tokenTag == internal::token_PP) prog.PreviousProgramId(tokenValue);
-        else if (tokenTag == internal::token_VN) prog.Version(tokenValue);
+        if      (tokenTag == internal::ProgramInfoTokenID) prog.Id(tokenValue);
+        else if (tokenTag == internal::ProgramInfoTokenCL) prog.CommandLine(tokenValue);
+        else if (tokenTag == internal::ProgramInfoTokenDS) prog.Description(tokenValue);
+        else if (tokenTag == internal::ProgramInfoTokenPN) prog.Name(tokenValue);
+        else if (tokenTag == internal::ProgramInfoTokenPP) prog.PreviousProgramId(tokenValue);
+        else if (tokenTag == internal::ProgramInfoTokenVN) prog.Version(tokenValue);
 
         // otherwise, "custom" tag
         else
@@ -93,24 +95,21 @@ ProgramInfo ProgramInfo::FromSam(const std::string& sam)
     return prog;
 }
 
-std::string ProgramInfo::ToSam(void) const
+std::string ProgramInfo::ToSam() const
 {
     std::stringstream out;
     out << "@PG"
-        << internal::MakeSamTag(internal::token_ID, id_);
+        << internal::MakeSamTag(internal::ProgramInfoTokenID, id_);
 
-    if (!name_.empty())              out << internal::MakeSamTag(internal::token_PN, name_);
-    if (!version_.empty())           out << internal::MakeSamTag(internal::token_VN, version_);
-    if (!description_.empty())       out << internal::MakeSamTag(internal::token_DS, description_);
-    if (!previousProgramId_.empty()) out << internal::MakeSamTag(internal::token_PP, previousProgramId_);
-    if (!commandLine_.empty())       out << internal::MakeSamTag(internal::token_CL, commandLine_);
+    if (!name_.empty())              out << internal::MakeSamTag(internal::ProgramInfoTokenPN, name_);
+    if (!version_.empty())           out << internal::MakeSamTag(internal::ProgramInfoTokenVN, version_);
+    if (!description_.empty())       out << internal::MakeSamTag(internal::ProgramInfoTokenDS, description_);
+    if (!previousProgramId_.empty()) out << internal::MakeSamTag(internal::ProgramInfoTokenPP, previousProgramId_);
+    if (!commandLine_.empty())       out << internal::MakeSamTag(internal::ProgramInfoTokenCL, commandLine_);
 
     // append any custom tags
-    std::map<std::string, std::string>::const_iterator customIter = custom_.cbegin();
-    std::map<std::string, std::string>::const_iterator customEnd  = custom_.cend();
-    for ( ; customIter != customEnd; ++customIter )
-        out << internal::MakeSamTag(customIter->first, customIter->second);
-
+    for (const auto& attribute: custom_)
+        out << internal::MakeSamTag(attribute.first, attribute.second);
     return out.str();
 }
 

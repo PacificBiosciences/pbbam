@@ -44,6 +44,7 @@
 
 #include "pbbam/Config.h"
 #include "pbbam/exception/ValidationException.h"
+#include <cstddef>
 #include <limits>
 
 namespace PacBio {
@@ -109,6 +110,8 @@ public:
     static bool IsValid(const BamRecord& record);
 
 public:
+    Validator() = delete;
+
     /// \brief Checks that a %BAM file's header conforms to the
     ///        %PacBio specification.
     ///
@@ -178,10 +181,6 @@ public:
     ///
     static void ValidateFileMetadata(const BamFile& file,
                                      const size_t maxErrors = std::numeric_limits<size_t>::max());
-
-private:
-    // hidden constructor
-    Validator(void) = delete;
 };
 
 } // namespace BAM

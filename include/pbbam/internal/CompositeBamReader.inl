@@ -59,7 +59,7 @@ inline CompositeMergeItem::CompositeMergeItem(std::unique_ptr<BamReader>&& rdr)
 { }
 
 inline CompositeMergeItem::CompositeMergeItem(std::unique_ptr<BamReader>&& rdr,
-                              BamRecord&& rec)
+                                              BamRecord&& rec)
     : reader(std::move(rdr))
     , record(std::move(rec))
 { }
@@ -76,14 +76,12 @@ inline CompositeMergeItem& CompositeMergeItem::operator=(CompositeMergeItem&& ot
     return *this;
 }
 
-inline CompositeMergeItem::~CompositeMergeItem(void) { }
-
 template<typename CompareType>
 inline bool CompositeMergeItemSorter<CompareType>::operator()(const CompositeMergeItem& lhs,
                                                               const CompositeMergeItem& rhs)
 {
-    const BamRecord& l = lhs.record;
-    const BamRecord& r = rhs.record;
+    const auto& l = lhs.record;
+    const auto& r = rhs.record;
     return CompareType()(l, r);
 }
 
@@ -142,7 +140,7 @@ inline bool GenomicIntervalCompositeBamReader::GetNext(BamRecord& record)
     return true;
 }
 
-inline const GenomicInterval& GenomicIntervalCompositeBamReader::Interval(void) const
+inline const GenomicInterval& GenomicIntervalCompositeBamReader::Interval() const
 { return interval_; }
 
 inline GenomicIntervalCompositeBamReader& GenomicIntervalCompositeBamReader::Interval(const GenomicInterval& interval)
@@ -159,7 +157,7 @@ inline GenomicIntervalCompositeBamReader& GenomicIntervalCompositeBamReader::Int
         mergeItems_.pop_front();
 
         // reset interval
-        BaiIndexedBamReader* baiReader = dynamic_cast<BaiIndexedBamReader*>(firstItem.reader.get());
+        auto* baiReader = dynamic_cast<BaiIndexedBamReader*>(firstItem.reader.get());
         assert(baiReader);
         baiReader->Interval(interval);
 
@@ -235,7 +233,7 @@ struct PositionSorter : std::binary_function<internal::CompositeMergeItem, inter
     }
 };
 
-inline void GenomicIntervalCompositeBamReader::UpdateSort(void)
+inline void GenomicIntervalCompositeBamReader::UpdateSort()
 { std::sort(mergeItems_.begin(), mergeItems_.end(), PositionSorter{ }); }
 
 // ------------------------------
@@ -245,6 +243,7 @@ inline void GenomicIntervalCompositeBamReader::UpdateSort(void)
 template<typename OrderByType>
 inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(const PbiFilter& filter,
                                                                              const std::vector<BamFile>& bamFiles)
+    : numReads_(0)
 {
     filenames_.reserve(bamFiles.size());
     for(const auto& bamFile : bamFiles)
@@ -255,6 +254,7 @@ inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(con
 template<typename OrderByType>
 inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(const PbiFilter& filter,
                                                                              std::vector<BamFile>&& bamFiles)
+    : numReads_(0)
 {
     filenames_.reserve(bamFiles.size());
     for(auto&& bamFile : bamFiles)
@@ -311,7 +311,7 @@ PbiFilterCompositeBamReader<OrderByType>::Filter(const PbiFilter& filter)
         mergeQueue_.pop_front();
 
         // reset request
-        PbiIndexedBamReader* pbiReader = dynamic_cast<PbiIndexedBamReader*>(firstItem.reader.get());
+        auto* pbiReader = dynamic_cast<PbiIndexedBamReader*>(firstItem.reader.get());
         assert(pbiReader);
         pbiReader->Filter(filter);
 
@@ -347,14 +347,29 @@ PbiFilterCompositeBamReader<OrderByType>::Filter(const PbiFilter& filter)
         throw std::runtime_error(e.str());
     }
 
-    // update our actual container and return
+
+    // update our actual container, store num matching reads, sort & and return
     mergeQueue_ = std::move(updatedMergeItems);
+
+    numReads_ = 0;
+    for (const auto& item : mergeQueue_)
+    {
+        auto* pbiReader = dynamic_cast<PbiIndexedBamReader*>(item.reader.get());
+        numReads_ += pbiReader->NumReads();
+    }
+
     UpdateSort();
     return *this;
 }
 
 template<typename OrderByType>
-inline void PbiFilterCompositeBamReader<OrderByType>::UpdateSort(void)
+inline uint32_t PbiFilterCompositeBamReader<OrderByType>::NumReads() const
+{
+    return numReads_;
+}
+
+template<typename OrderByType>
+inline void PbiFilterCompositeBamReader<OrderByType>::UpdateSort()
 { std::stable_sort(mergeQueue_.begin(), mergeQueue_.end(), merge_sorter_type{}); }
 
 // ------------------------------

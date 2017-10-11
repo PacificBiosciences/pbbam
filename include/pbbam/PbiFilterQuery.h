@@ -74,7 +74,7 @@ public:
     ///
     PbiFilterQuery(const PbiFilter& filter, const DataSet& dataset);
 
-    ~PbiFilterQuery(void);
+    ~PbiFilterQuery() override;
 
 public:
 
@@ -83,7 +83,11 @@ public:
     /// Most client code should not need to use this method directly. Use
     /// iterators instead.
     ///
-    bool GetNext(BamRecord& r);
+    bool GetNext(BamRecord& r) override;
+
+    /// \brief Return number of records that pass the provided filter
+    ///
+    uint32_t NumReads() const;
 
 private:
     struct PbiFilterQueryPrivate;

@@ -44,6 +44,7 @@
 
 #include "pbbam/Config.h"
 #include "pbbam/virtual/VirtualZmwBamRecord.h"
+#include <cstdint>
 #include <memory>
 #include <vector>
 #include <string>
@@ -93,12 +94,12 @@ public:
                               const std::string& primaryBamFilePath,
                               const std::string& scrapsBamFilePath);
 
-    WhitelistedZmwReadStitcher(void) = delete;
+    WhitelistedZmwReadStitcher() = delete;
     WhitelistedZmwReadStitcher(const WhitelistedZmwReadStitcher&) = delete;
     WhitelistedZmwReadStitcher(WhitelistedZmwReadStitcher&&)      = delete;
     WhitelistedZmwReadStitcher& operator=(const WhitelistedZmwReadStitcher&) = delete;
     WhitelistedZmwReadStitcher& operator=(WhitelistedZmwReadStitcher&&)      = delete;
-    ~WhitelistedZmwReadStitcher(void);
+    ~WhitelistedZmwReadStitcher();
 
     /// \}
 
@@ -107,15 +108,15 @@ public:
     /// \{
 
     /// \returns true if more ZMWs are available for reading.
-    bool HasNext(void) const;
+    bool HasNext() const;
 
     /// \returns the re-stitched polymerase read from the next ZMW in the whitelist
-    VirtualZmwBamRecord Next(void);
+    VirtualZmwBamRecord Next();
 
     /// \returns the set of reads that belong to the next ZMW in the whitelist.
     ///          This enables stitching records in a distinct thread.
     ///
-    std::vector<BamRecord> NextRaw(void);
+    std::vector<BamRecord> NextRaw();
 
     /// \}
 
@@ -124,10 +125,10 @@ public:
     /// \{
 
     /// \returns the BamHeader associated with this reader's "primary" %BAM file
-    BamHeader PrimaryHeader(void) const;
+    BamHeader PrimaryHeader() const;
 
     /// \returns the BamHeader associated with this reader's "scraps" %BAM file
-    BamHeader ScrapsHeader(void) const;
+    BamHeader ScrapsHeader() const;
 
     /// \}
 

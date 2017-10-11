@@ -35,12 +35,12 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
 #include <gtest/gtest.h>
+
+#define private public
+
 #include <pbbam/../../src/TimeUtils.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;

@@ -39,6 +39,11 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
+#include <cstdint>
+#include <limits>
+
 #include "pbbam/SamTagCodec.h"
 #include <boost/lexical_cast.hpp>
 
@@ -73,9 +78,9 @@ void appendSamMultiValue(const T& container,
 }
 
 static
-std::vector<std::string>& split(const std::string& s, char delim,
-                                std::vector<std::string>& elems)
+std::vector<std::string> split(const std::string& s, char delim)
 {
+    std::vector<std::string> elems;
     std::stringstream ss(s);
     std::string item;
     while (std::getline(ss, item, delim))
@@ -83,22 +88,13 @@ std::vector<std::string>& split(const std::string& s, char delim,
     return elems;
 }
 
-static
-std::vector<std::string> split(const std::string& s, char delim) {
-    std::vector<std::string> elems;
-    split(s, delim, elems);
-    return elems;
-}
-
 std::vector<float> readFloatSamMultiValue(const std::string& data)
 {
     std::vector<float> result;
-    char* c = (char*)data.c_str();
+    auto* c = const_cast<char*>(data.c_str());
     const char* end = c + data.length();
-    while (c+1 < end) {
-        const float value = strtof(c+1, &c); // c+1 to skip comma
-        result.push_back(value);
-    }
+    while (c + 1 < end)
+        result.emplace_back(strtof(c+1, &c));
     return result;
 }
 
@@ -106,13 +102,10 @@ template<typename T>
 std::vector<T> readSignedSamMultiValue(const std::string& data)
 {
     std::vector<T> result;
-    char* c = (char*)data.c_str();
+    auto* c = const_cast<char*>(data.c_str());
     const char* end = c + data.length();
-    while (c+1 < end) {
-        const T value = strtol(c+1, &c, 0); // c+1 to skip comma
-        result.push_back(value);
-    }
-
+    while (c + 1 < end)
+        result.emplace_back(strtol(c + 1, &c, 0));
     return result;
 }
 
@@ -120,12 +113,10 @@ template<typename T>
 std::vector<T> readUnsignedSamMultiValue(const std::string& data)
 {
     std::vector<T> result;
-    char* c = (char*)data.c_str();
+    auto* c = const_cast<char*>(data.c_str());
     const char* end = c + data.length();
-    while (c+1 < end) {
-        const T value = strtoul(c+1, &c, 0); // c+1 to skip comma
-        result.push_back(value);
-    }
+    while (c + 1 < end)
+        result.emplace_back(strtoul(c + 1, &c, 0));
     return result;
 }
 
@@ -135,16 +126,14 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
 {
     TagCollection tags;
 
-    const std::vector<std::string>& tokens = internal::split(tagString, '\t');
-    const auto end = tokens.cend();
-    for (auto iter = tokens.cbegin(); iter != end; ++iter ) {
-        const std::string& token = (*iter);
+    const auto tokens = internal::split(tagString, '\t');
+    for (const auto& token : tokens) {
         if (token.size() < 6)          // TT:t:X
             continue;
 
-        const std::string& name = token.substr(0, 2);
-        const char type = token.at(3);
-        const std::string& remainder = token.substr(5);
+        const auto name = token.substr(0, 2);
+        const auto type = token.at(3);
+        const auto remainder = token.substr(5);
         if (remainder.empty())
             throw std::runtime_error("malformatted tag: " + token);
 
@@ -172,10 +161,10 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
 
                 // negative value (force signed int)
                 if (remainder.at(0) == '-') {
-                    const int32_t x = boost::lexical_cast<int32_t>(remainder);
-                    if ( x >= INT8_MIN )
+                    const auto x = boost::lexical_cast<int32_t>(remainder);
+                    if ( x >= std::numeric_limits<int8_t>::min() )
                         tags[name] = static_cast<int8_t>(x);
-                    else if ( x >= INT16_MIN )
+                    else if ( x >= std::numeric_limits<int16_t>::min() )
                         tags[name] = static_cast<int16_t>(x);
                     else
                         tags[name] = x;
@@ -183,10 +172,10 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
 
                 // unsigned int
                 else {
-                    const uint32_t x = boost::lexical_cast<uint32_t>(remainder);
-                    if ( x <= UINT8_MAX )
+                    const auto x = boost::lexical_cast<uint32_t>(remainder);
+                    if ( x <= std::numeric_limits<uint8_t>::max() )
                         tags[name] = static_cast<uint8_t>(x);
-                    else if ( x <= UINT16_MAX )
+                    else if ( x <= std::numeric_limits<uint16_t>::max() )
                         tags[name] = static_cast<uint16_t>(x);
                     else
                         tags[name] = x;
@@ -214,8 +203,8 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
 
             case 'B' :
             {
-                const char elementType = remainder.at(0);
-                const std::string& arrayData = remainder.substr(1);
+                const auto elementType = remainder.at(0);
+                const auto arrayData = remainder.substr(1);
                 switch (elementType) {
                     case 'c' : tags[name] = internal::readSignedSamMultiValue<int8_t>(arrayData);     break;
                     case 'C' : tags[name] = internal::readUnsignedSamMultiValue<uint8_t>(arrayData);  break;
@@ -244,13 +233,13 @@ std::string SamTagCodec::Encode(const TagCollection& tags)
     std::string result;
     result.reserve(1024);
 
-    const auto tagEnd = tags.cend();
-    for (auto tagIter = tags.cbegin(); tagIter != tagEnd; ++tagIter) {
-        
-        const std::string& name = (*tagIter).first;
+    for (const auto& tagIter : tags)
+    {
+        const auto& name = tagIter.first;
         if (name.size() != 2)
             throw std::runtime_error("malformatted tag name: " + name);
-        const Tag& tag = (*tagIter).second;
+
+        const auto& tag = tagIter.second;
         if (tag.IsNull())
             continue;
 
@@ -264,7 +253,7 @@ std::string SamTagCodec::Encode(const TagCollection& tags)
 
         // "<TYPE>:<DATA>" for printable, ASCII char
         if (tag.HasModifier(TagModifier::ASCII_CHAR)) {
-            char c = tag.ToAscii();
+            const auto c = tag.ToAscii();
             if (c != '\0') {
                 result.append("A:");
                 result.append(1, c);

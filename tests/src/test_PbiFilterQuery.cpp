@@ -35,26 +35,34 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include "TestData.h"
-#include <gtest/gtest.h>
-#include <pbbam/PbiFilterQuery.h>
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <string>
+
+#include <gtest/gtest.h>
+
+#define private public
+
+#include "PbbamTestData.h"
+
+#include <pbbam/PbiFilterQuery.h>
+#include <pbbam/Unused.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
 TEST(PbiFilterQueryTest, QueryOk)
 {
-    const auto bamFile = BamFile{ tests::Data_Dir + string{ "/group/test2.bam" } };
+    const auto bamFile = BamFile{ PbbamTestsConfig::Data_Dir + string{ "/group/test2.bam" } };
 
     {
-        int count = 0;
         PbiFilterQuery query( PbiQueryLengthFilter{ 500, Compare::GREATER_THAN_EQUAL}, bamFile);
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(3, numReads);
+
+        int count = 0;
         for (const auto& r: query) {
             ++count;
             EXPECT_GE((r.QueryEnd() - r.QueryStart()), 500);
@@ -69,8 +77,11 @@ TEST(PbiFilterQueryTest, QueryOk)
             PbiReferenceStartFilter{9200, Compare::GREATER_THAN_EQUAL}
         });
 
-        int count = 0;
         PbiFilterQuery query(filter, bamFile);
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(1, numReads);
+
+        int count = 0;
         for (const auto& r: query) {
             ++count;
             EXPECT_EQ(Strand::REVERSE, r.AlignedStrand());
@@ -87,8 +98,11 @@ TEST(PbiFilterQueryTest, QueryOk)
             PbiReferenceStartFilter{9200, Compare::GREATER_THAN_EQUAL}
         });
 
-        int count = 0;
         PbiFilterQuery query(filter, bamFile);
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(1, numReads);
+
+        int count = 0;
         for (const auto& r: query) {
             ++count;
             EXPECT_EQ(Strand::FORWARD, r.AlignedStrand());
@@ -105,16 +119,22 @@ TEST(PbiFilterQueryTest, QueryOk)
             PbiNumMatchesFilter{1200, Compare::GREATER_THAN_EQUAL}
         });
 
-        int count = 0;
         PbiFilterQuery query(filter, bamFile);
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(2, numReads);
+
+        int count = 0;
         for (const auto& r: query) {
             ++count;
             EXPECT_EQ(string("b89a4406"), r.ReadGroupId());
             EXPECT_GE((r.NumMatches()), 1200);
             if (count == 1)
                 EXPECT_EQ(string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2579_4055"), r.FullName());
-            else if (count == 2)
-                EXPECT_EQ(string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/4101_5571"), r.FullName());
+            else {
+                if (count == 2) {
+                    EXPECT_EQ(string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/4101_5571"), r.FullName());
+                }
+            }
         }
         EXPECT_EQ(2, count);
     }
@@ -124,13 +144,16 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 {
     const auto expectedMovieName = string{ "m150404_101626_42267_c100807920800000001823174110291514_s1_p0" };
 
-    const DataSet ds(tests::Data_Dir + "/chunking/chunking.subreadset.xml");
+    const DataSet ds(PbbamTestsConfig::Data_Dir + "/chunking/chunking.subreadset.xml");
     EXPECT_EQ(3, ds.BamFiles().size());
 
     { // movie name
 
-        int count = 0;
         PbiFilterQuery query{ PbiMovieNameFilter{expectedMovieName}, ds };
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(1220, numReads);
+
+        int count = 0;
         for (const BamRecord& r : query) {
             EXPECT_EQ(expectedMovieName, r.MovieName());
             ++count;
@@ -146,8 +169,11 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 
     { // min ZMW
 
-        int count = 0;
         PbiFilterQuery query{ PbiZmwFilter{54, Compare::GREATER_THAN}, ds };
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(1220, numReads);
+
+        int count = 0;
         for (const BamRecord& r : query) {
             EXPECT_GT(r.HoleNumber(), 54);
             ++count;
@@ -157,8 +183,11 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 
     { // max ZMW
 
-        int count = 0;
         PbiFilterQuery query{ PbiZmwFilter{1816, Compare::LESS_THAN}, ds };
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(150, numReads);
+
+        int count = 0;
         for (const BamRecord& r : query) {
             EXPECT_LT(r.HoleNumber(),1816);
             ++count;
@@ -170,6 +199,9 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 
         const PbiFilter filter = PbiFilter::FromDataSet(ds);
         PbiFilterQuery query(filter, ds);
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(150, numReads);
+
         int count = 0;
         for (const BamRecord& r : query) {
             EXPECT_EQ(expectedMovieName, r.MovieName());
@@ -183,33 +215,42 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
     { // empty filter object - should return all records from the same dataset
 
         PbiFilterQuery query(PbiFilter{ }, ds);
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(1220, numReads);
+
         int count = 0;
         for (const BamRecord& r : query) {
-            (void)r;
+            UNUSED(r);
             ++count;
         }
         EXPECT_EQ(1220, count);
     }
     { // no <Filters> element present at all
 
-        const DataSet ds(tests::GeneratedData_Dir + "/chunking_missingfilters.subreadset.xml");
+        const DataSet ds(PbbamTestsConfig::GeneratedData_Dir + "/chunking_missingfilters.subreadset.xml");
         const PbiFilter filter = PbiFilter::FromDataSet(ds);
         PbiFilterQuery query(filter, ds);
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(1220, numReads);
+
         int count = 0;
         for (const BamRecord& r : query) {
-            (void)r;
+            UNUSED(r);
             ++count;
         }
         EXPECT_EQ(1220, count);
     }
     { // <Filters> element contains no child <Filter> elements
 
-        const DataSet ds(tests::GeneratedData_Dir + "/chunking_emptyfilters.subreadset.xml");
+        const DataSet ds(PbbamTestsConfig::GeneratedData_Dir + "/chunking_emptyfilters.subreadset.xml");
         const PbiFilter filter = PbiFilter::FromDataSet(ds);
         PbiFilterQuery query(filter, ds);
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(1220, numReads);
+
         int count = 0;
         for (const BamRecord& r : query) {
-            (void)r;
+            UNUSED(r);
             ++count;
         }
         EXPECT_EQ(1220, count);
@@ -219,8 +260,8 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 TEST(PbiFilterQueryTest, MissingPbiShouldThrow)
 {
     const PbiFilter filter{ PbiZmwFilter{31883} };
-    const string phi29Bam = tests::GeneratedData_Dir + "/missing_pbi.bam";
-    const string hasPbiBam = tests::Data_Dir + "/polymerase/production.scraps.bam";
+    const string phi29Bam = PbbamTestsConfig::GeneratedData_Dir + "/missing_pbi.bam";
+    const string hasPbiBam = PbbamTestsConfig::Data_Dir + "/polymerase/production.scraps.bam";
 
     { // single file, missing PBI
 
@@ -246,12 +287,15 @@ TEST(PbiFilterQueryTest, MissingPbiShouldThrow)
 
 TEST(PbiFilterQueryTest, QNameWhitelistFile)
 {
-    const DataSet ds(tests::Data_Dir + "/polymerase/qnameFiltered.subreads.dataset.xml");
+    const DataSet ds(PbbamTestsConfig::Data_Dir + "/polymerase/qnameFiltered.subreads.dataset.xml");
     const PbiFilter filter = PbiFilter::FromDataSet(ds);
     PbiFilterQuery query(filter, ds);
+    const auto numReads = query.NumReads();
+    EXPECT_EQ(3, numReads);
+
     int count = 0;
     for (const BamRecord& r : query) {
-        (void)r;
+        UNUSED(r);
         ++count;
     }
     EXPECT_EQ(3, count);
@@ -259,11 +303,14 @@ TEST(PbiFilterQueryTest, QNameWhitelistFile)
 
 TEST(PbiFilterQueryTest, EmptyFiles)
 {
-    const BamFile file{ tests::Data_Dir + "/empty.bam" };
+    const BamFile file{ PbbamTestsConfig::Data_Dir + "/empty.bam" };
     PbiFilterQuery query{ PbiFilter{}, file };
+    const auto numReads = query.NumReads();
+    EXPECT_EQ(0, numReads);
+
     size_t count = 0;
     for (const auto& r : query) {
-        (void)r;
+        UNUSED(r);
         ++count;
     }
     EXPECT_EQ(0, count);
@@ -271,14 +318,17 @@ TEST(PbiFilterQueryTest, EmptyFiles)
 
 TEST(PbiFilterQueryTest, BarcodeData)
 {
-   const BamFile file{ tests::Data_Dir + "/phi29.bam" };
+   const BamFile file{ PbbamTestsConfig::Data_Dir + "/phi29.bam" };
 
    // bc_quality == 1
    {
-       size_t count = 0;
        PbiFilterQuery query{ PbiBarcodeQualityFilter{1}, file };
+       const auto numReads = query.NumReads();
+       EXPECT_EQ(120, numReads);
+
+       size_t count = 0;
        for (const auto& r : query) {
-           (void)r;
+           UNUSED(r);
            ++count;
        }
        EXPECT_EQ(120, count);
@@ -286,10 +336,13 @@ TEST(PbiFilterQueryTest, BarcodeData)
 
    // bc_quality != 1
    {
-       size_t count = 0;
        PbiFilterQuery query{ PbiBarcodeQualityFilter{1, Compare::NOT_EQUAL}, file };
+       const auto numReads = query.NumReads();
+       EXPECT_EQ(0, numReads);
+
+       size_t count = 0;
        for (const auto& r : query) {
-           (void)r;
+           UNUSED(r);
            ++count;
        }
        EXPECT_EQ(0, count);
@@ -297,10 +350,13 @@ TEST(PbiFilterQueryTest, BarcodeData)
 
    // bc_forward == 0
    {
-       size_t count = 0;
        PbiFilterQuery query{ PbiBarcodeForwardFilter{0}, file };
+       const auto numReads = query.NumReads();
+       EXPECT_EQ(40, numReads);
+
+       size_t count = 0;
        for (const auto& r : query) {
-           (void)r;
+           UNUSED(r);
            ++count;
        }
        EXPECT_EQ(40, count);
@@ -308,11 +364,14 @@ TEST(PbiFilterQueryTest, BarcodeData)
 
    // bc_forward == [0,2]
    {
-       size_t count = 0;
        const auto ids = vector<int16_t>{ 0, 2 };
        PbiFilterQuery query{ PbiBarcodeForwardFilter{ ids }, file };
+       const auto numReads = query.NumReads();
+       EXPECT_EQ(80, numReads);
+
+       size_t count = 0;
        for (const auto& r : query) {
-           (void)r;
+           UNUSED(r);
            ++count;
        }
        EXPECT_EQ(80, count);
@@ -320,10 +379,13 @@ TEST(PbiFilterQueryTest, BarcodeData)
 
    // bc_reverse != 0
    {
-       size_t count = 0;
        PbiFilterQuery query{ PbiBarcodeReverseFilter{0, Compare::NOT_EQUAL}, file };
+       const auto numReads = query.NumReads();
+       EXPECT_EQ(80, numReads);
+
+       size_t count = 0;
        for (const auto& r : query) {
-           (void)r;
+           UNUSED(r);
            ++count;
        }
        EXPECT_EQ(80, count);
@@ -417,14 +479,17 @@ const string xml_none = R"_XML_(
 </pbds:SubreadSet>
 )_XML_";
 
-     const BamFile file{ tests::Data_Dir + "/phi29.bam" }; 
+     const BamFile file{ PbbamTestsConfig::Data_Dir + "/phi29.bam" }; 
 
      {   // filter allows all records
          const DataSet ds = DataSet::FromXml(xml_all);
          const PbiFilterQuery query { PbiFilter::FromDataSet(ds), file };
+         const auto numReads = query.NumReads();
+         EXPECT_EQ(120, numReads);
+
          size_t count = 0;
          for (const auto& r : query) {
-             (void)r;
+             UNUSED(r);
              ++count;
          }
          EXPECT_EQ(120, count);
@@ -432,9 +497,12 @@ const string xml_none = R"_XML_(
      {    // filter allows no records
          const DataSet ds = DataSet::FromXml(xml_none);
          const PbiFilterQuery query { PbiFilter::FromDataSet(ds), file };
+         const auto numReads = query.NumReads();
+         EXPECT_EQ(0, numReads);
+
          size_t count = 0;
          for (const auto& r : query) {
-             (void)r;
+             UNUSED(r);
              ++count;
          }
          EXPECT_EQ(0, count);
@@ -443,7 +511,7 @@ const string xml_none = R"_XML_(
 
 TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
 {
-    const BamFile file{ tests::Data_Dir + "/phi29.bam" };
+    const BamFile file{ PbbamTestsConfig::Data_Dir + "/phi29.bam" };
     const string xmlHeader = R"_XML_(
         <?xml version="1.0" encoding="utf-8"?>
         <pbds:SubreadSet
@@ -497,8 +565,11 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         const string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query { PbiFilter::FromDataSet(ds), file };
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(13, numReads);
+
         for (const auto& r : query) {
-            (void)r;
+            UNUSED(r);
             ++count_30422;
         }
         EXPECT_EQ(13, count_30422);
@@ -508,8 +579,11 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         const string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query { PbiFilter::FromDataSet(ds), file };
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(11, numReads);
+
         for (const auto& r : query) {
-            (void)r;
+            UNUSED(r);
             ++count_648;
         }
         EXPECT_EQ(11, count_648);
@@ -519,8 +593,11 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         const string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query { PbiFilter::FromDataSet(ds), file };
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(4, numReads);
+
         for (const auto& r : query) {
-            (void)r;
+            UNUSED(r);
             ++count_17299;
         }
         EXPECT_EQ(4, count_17299);
@@ -530,8 +607,11 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         const string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query { PbiFilter::FromDataSet(ds), file };
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(28, numReads);
+
         for (const auto& r : query) {
-            (void)r;
+            UNUSED(r);
             ++count_whitelist;
         }
         EXPECT_EQ(count_30422 + count_648 + count_17299, count_whitelist);

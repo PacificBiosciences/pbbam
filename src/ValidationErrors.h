@@ -42,6 +42,7 @@
 #ifndef VALIDATIONERRORS_H
 #define VALIDATIONERRORS_H
 
+#include <cstddef>
 #include <limits>
 #include <map>
 #include <string>
@@ -94,8 +95,8 @@ public:
                            const size_t expected);
 
 public:
-    bool IsEmpty(void) const;
-    void ThrowErrors(void);
+    bool IsEmpty() const;
+    void ThrowErrors();
 
 private:
     size_t maxNumErrors_;
@@ -105,7 +106,7 @@ private:
     ErrorMap recordErrors_;
 
 private:
-    void OnErrorAdded(void);
+    void OnErrorAdded();
 };
 
 } // namespace internal

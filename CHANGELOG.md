@@ -10,6 +10,81 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.13.2] - 2017-09-25
+
+### Added
+- Backward compatibility for C++11 (std::make_unique which is 11/14 agnostic).
+
+## [0.13.1] - 2017-09-25
+
+### Added
+- Support for "pe" tag in stitched, virtual reads. 
+
+## [0.13.0] - 2017-09-25
+
+### Changed
+- Ran clang-tidy (modernize) over codebase to clean up legacy coding styles.
+
+## [0.12.2] - 2017-09-22
+
+### Added 
+- HasPulseExclusion() to BamRecord (& derived types). 
+
+## [0.12.1] - 2017-09-21
+
+### Added
+- Pulse exclusion base feature to read group.
+
+## [0.12.0] - 2017-09-19
+
+### Added
+- NumReads() for PBI filter-based queries. This allows fetching of the number
+of reads that pass the filter, without needing to iterate over the entire 
+file(s).
+
+## [0.11.0] - 2017-09-15
+
+### Added
+- Support for internal tag: pulse exclusion reason ("pe"). New methods on 
+BamRecord, and new enum PulseExclusionReason.
+
+### Changed
+- Default PacBioBAM format version now 3.0.5
+
+## [0.10.2] - 2017-09-14
+
+### Changed
+- Explicitly trim all whitespace from FASTA input.
+
+## [0.10.1] - 2017-09-11
+
+### Changed
+- Frames, add mutex to avoid race condition in InitIpdDownsampling(void)
+
+## [0.10.0] - 2017-09-08
+
+### Changed
+- PbiBuilder backend for generating PBI index files "on-the-fly" along with
+writing BAM files. The previous implementation's memory usage scaled linearly 
+with the number of reads, sometimes reaching huge numbers (several gigs or more).
+The new implementation's memory usage remains constant for any number of reads, 
+without any runtime hit on files/architectures tested. 
+
+### Removed
+- PbiBuilder::Result(). Returned an intermediate snapshot of the index under
+construction. This method isn't usable with the new PbiBuilder backend and was 
+really only useful for initial debugging/testing. It is no longer used in the 
+test framework and is unlikely to be used by client code either. Dropping this 
+method from the API, and thus bumping the version number. 
+
+## [0.9.0] - 2017-08-07
+
+### Removed
+- Bundled htslib. Now using 'stock' htslib (v1.3.1+).
+- Built-in SWIG wrappers. 
+
+## [0.8.0] - 2017-07-24
+
 ### Added
 - Default DataSet 'Version' attribute if none already present (currently 4.0.0)
 - Added whitelist support for filtering ZMWs via DataSetXML.
@@ -19,6 +94,9 @@ scraps, etc).
 
 ### Fixed
 - Bug in the build system preventing clean rebuilds.
+
+### Removed
+- Dropped the bundled, PacBio-forked version of htslib. Now using stock htslib (v1.3.1+). 
 
 ## [0.7.4] - 2016-11-18
 

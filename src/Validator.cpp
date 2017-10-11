@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/Validator.h"
 
 #include "pbbam/BamFile.h"
@@ -50,6 +52,7 @@
 #include "Version.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/core/ignore_unused.hpp>
+#include <cstddef>
 #include <iostream>
 #include <map>
 #include <sstream>

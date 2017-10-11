@@ -48,16 +48,16 @@ class JsonFormatter : public IFormatter
 {
 public:
     JsonFormatter(const Settings& settings);
-    void Run(void);
+    void Run();
 
 private:
-    void FormatMetadata(void);
-    void FormatReferences(void);
+    void FormatMetadata();
+    void FormatReferences();
 
-    void FormatRaw(void);
-    void FormatRecords(void);
+    void FormatRaw();
+    void FormatRecords();
 
-    void Print(void);
+    void Print();
 
 private:
     PacBio::BAM::PbiRawData index_;

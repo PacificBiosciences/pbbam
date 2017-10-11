@@ -9,7 +9,7 @@ if (CMAKE_VERSION VERSION_LESS "3.1")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")        # gcc
     endif()
 else() # 3.1+
-    set(CMAKE_CXX_STANDARD          11)
+    set(CMAKE_CXX_STANDARD          14)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
@@ -33,7 +33,7 @@ endif()
 
 # Turn on windows-style filepath resolution.
 # We need to add this #define early (not just in the C# SWIG wrapper)
-if(WIN32 AND PacBioBAM_wrap_csharp)
+if(WIN32)
     add_definitions(-DPBBAM_WIN_FILEPATHS)
 endif()
 

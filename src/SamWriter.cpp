@@ -35,10 +35,15 @@
 
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/SamWriter.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/Validator.h"
 #include "FileProducer.h"
 #include "MemoryUtils.h"
+#include "Autovalidate.h"
+
 #include <htslib/hfile.h>
 #include <htslib/sam.h>
 
@@ -50,7 +55,7 @@ class SamWriterPrivate : public internal::FileProducer
 {
 public:
     SamWriterPrivate(const std::string& filename,
-                     const PBBAM_SHARED_PTR<bam_hdr_t> rawHeader)
+                     const std::shared_ptr<bam_hdr_t> rawHeader)
         : internal::FileProducer(filename)
         , file_(nullptr)
         , header_(rawHeader)
@@ -59,8 +64,8 @@ public:
             throw std::runtime_error("null header");
 
         // open file
-        const std::string& usingFilename = TempFilename();
-        const std::string& mode = std::string("w");
+        const auto& usingFilename = TempFilename();
+        const auto mode = std::string("w");
         file_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
         if (!file_)
             throw std::runtime_error("could not open file for writing");
@@ -71,18 +76,18 @@ public:
             throw std::runtime_error("could not write header");
     }
 
-    void TryFlush(void);
+    void TryFlush();
     void Write(const BamRecord& record);
 
 private:
     std::unique_ptr<samFile, internal::HtslibFileDeleter> file_;
-    PBBAM_SHARED_PTR<bam_hdr_t> header_;
+    std::shared_ptr<bam_hdr_t> header_;
 };
 
-void SamWriterPrivate::TryFlush(void)
+void SamWriterPrivate::TryFlush()
 {
     const auto ret = file_.get()->fp.hfile;
-    if (ret != 0)
+    if (ret != nullptr)
         throw std::runtime_error("could not flush output buffer contents");
 }
 
@@ -109,19 +114,20 @@ void SamWriterPrivate::Write(const BamRecord& record)
 
 SamWriter::SamWriter(const std::string& filename, const BamHeader& header)
     : IRecordWriter()
-    , d_(nullptr)
+    , d_{ std::make_unique<internal::SamWriterPrivate>
+        (filename, internal::BamHeaderMemory::MakeRawHeader(header))}
 {
 #if PBBAM_AUTOVALIDATE
     Validator::Validate(header);
 #endif
-    d_.reset(new internal::SamWriterPrivate{ filename,
-                                             internal::BamHeaderMemory::MakeRawHeader(header)
-                                           });
+//    d_.reset(new internal::SamWriterPrivate{ filename,
+//                                             internal::BamHeaderMemory::MakeRawHeader(header)
+//                                           });
 }
 
-SamWriter::~SamWriter(void) { }
+SamWriter::~SamWriter() { }
 
-void SamWriter::TryFlush(void)
+void SamWriter::TryFlush()
 {
     d_->TryFlush();
 }

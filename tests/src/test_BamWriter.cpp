@@ -35,16 +35,18 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include "TestData.h"
+#include <cstdint>
 #include <gtest/gtest.h>
+
+#define private public
+
+#include "PbbamTestData.h"
+
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamWriter.h>
 #include <pbbam/EntireFileQuery.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -90,7 +92,7 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
     bamRecord.impl_.Tags(tags);
 
     // write record to file
-    const string generatedBamFn = tests::GeneratedData_Dir + "/bamwriter_generated.bam";
+    const string generatedBamFn = PbbamTestsConfig::GeneratedData_Dir + "/bamwriter_generated.bam";
     {
         BamWriter writer(generatedBamFn, inputHeader);
         writer.Write(bamRecord);

@@ -43,6 +43,8 @@ Class @ref nlohmann::basic_json is a good entry point for the documentation.
 #include <ciso646>
 #include <cmath>
 #include <cstdio>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <initializer_list>
 #include <iomanip>
@@ -4054,7 +4056,7 @@ class basic_json
     */
     friend bool operator<(const value_t lhs, const value_t rhs)
     {
-        static constexpr std::array<uint8_t, 7> order = {{
+        static constexpr const std::array<uint8_t, 7> order = {{
                 0, // null
                 3, // object
                 4, // array

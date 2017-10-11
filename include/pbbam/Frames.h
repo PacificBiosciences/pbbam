@@ -43,6 +43,8 @@
 #define FRAMES_H
 
 #include "pbbam/Config.h"
+#include <cstddef>
+#include <cstdint>
 #include <vector>
 
 namespace PacBio {
@@ -86,15 +88,14 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    Frames(void);
-    Frames(const std::vector<uint16_t>& frames);
-    Frames(std::vector<uint16_t>&& frames);
+    Frames(std::vector<uint16_t> frames);
 
-    Frames(const Frames& other) = default;
-    Frames(Frames&& other) = default;
-    Frames& operator=(const Frames& other)= default;
-    Frames& operator=(Frames&& other)= default;
-    ~Frames(void)= default;
+    Frames();
+    Frames(const Frames&) = default;
+    Frames(Frames&&) = default;
+    Frames& operator=(const Frames&) = default;
+    Frames& operator=(Frames&&) = default;
+    ~Frames() = default;
 
     /// \}
 
@@ -103,8 +104,8 @@ public:
     /// \{
 
     /// \returns Frame data in expanded (not encoded) form
-    std::vector<uint16_t>& DataRaw(void);
-    const std::vector<uint16_t>& Data(void) const;
+    std::vector<uint16_t>& DataRaw();
+    const std::vector<uint16_t>& Data() const;
 
     /// \}
 
@@ -113,7 +114,7 @@ public:
     /// \{
 
     /// \returns Frame data in (lossy, 8-bit) encoded form.
-    std::vector<uint8_t> Encode(void) const;
+    std::vector<uint8_t> Encode() const;
 
     /// \}
 
@@ -131,28 +132,28 @@ public:
     /// \{
 
     /// \returns A const_iterator to the beginning of the sequence.
-    std::vector<uint16_t>::const_iterator cbegin(void) const;
+    std::vector<uint16_t>::const_iterator cbegin() const;
 
     /// \returns A const_iterator to the element past the end of the sequence.
-    std::vector<uint16_t>::const_iterator cend(void) const;
+    std::vector<uint16_t>::const_iterator cend() const;
 
     /// \returns A const_iterator to the beginning of the sequence.
-    std::vector<uint16_t>::const_iterator begin(void) const;
+    std::vector<uint16_t>::const_iterator begin() const;
 
     /// \returns A const_iterator to the element past the end of the sequence.
-    std::vector<uint16_t>::const_iterator end(void) const;
+    std::vector<uint16_t>::const_iterator end() const;
 
     /// \returns An iterator to the beginning of the sequence.
-    std::vector<uint16_t>::iterator begin(void);
+    std::vector<uint16_t>::iterator begin();
 
     /// \returns An iterator to the element past the end of the sequence.
-    std::vector<uint16_t>::iterator end(void);
+    std::vector<uint16_t>::iterator end();
 
     /// \returns The number of frame data points.
-    size_t size(void) const;
+    size_t size() const;
 
     /// \returns True if the container is empty, false otherwise.
-    bool empty(void) const;
+    bool empty() const;
 
     /// \} 
 

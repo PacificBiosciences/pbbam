@@ -39,9 +39,12 @@
 //
 // Author: Armin Töpfer
 
-#include "pbbam/AlignmentPrinter.h"
+#include "PbbamInternalConfig.h"
 
+#include "pbbam/AlignmentPrinter.h"
+#include "pbbam/MakeUnique.h"
 #include <cmath>
+#include <cstddef>
 #include <iostream>
 #include <iomanip>  
 #include <stdexcept>
@@ -51,7 +54,7 @@ namespace PacBio {
 namespace BAM {
 
 AlignmentPrinter::AlignmentPrinter(const IndexedFastaReader& ifr)
-    : ifr_(std::unique_ptr<IndexedFastaReader>(new IndexedFastaReader(ifr)))
+    : ifr_{std::make_unique<IndexedFastaReader>(ifr)}
 { }
 
 std::string AlignmentPrinter::Print(const BamRecord& record,
@@ -71,8 +74,8 @@ std::string AlignmentPrinter::Print(const BamRecord& record,
 
 	for (size_t i = 0; i < seq.size();)
 	{
-		std::string refCoordStr = std::to_string(refCoord);
-		std::string seqCoordStr = std::to_string(seqCoord);
+        auto refCoordStr = std::to_string(refCoord);
+        auto seqCoordStr = std::to_string(seqCoord);
 
 		size_t maxCoordLength = std::max(refCoordStr.size(), seqCoordStr.size());
 		while (refCoordStr.size() < maxCoordLength)

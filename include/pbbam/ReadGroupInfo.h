@@ -44,6 +44,8 @@
 
 #include "pbbam/Config.h"
 #include "pbbam/exception/InvalidSequencingChemistryException.h"
+#include <cstddef>
+#include <cstdint>
 #include <map>
 #include <string>
 
@@ -78,6 +80,7 @@ enum class BaseFeature
   , PRE_PULSE_FRAMES
   , PULSE_CALL_WIDTH
   , START_FRAME
+  , PULSE_EXCLUSION
 };
 
 /// \brief This enum describes the encoding types used for frame data within a
@@ -179,13 +182,13 @@ public:
     /// \{
 
     /// \brief Creates an empty read group info object.
-    ReadGroupInfo(void);
+    ReadGroupInfo();
 
     /// \brief Creates a read group info object with an ID.
     ///
     /// \param[in] id   string representation of read group ID
     ///
-    ReadGroupInfo(const std::string& id);
+    ReadGroupInfo(std::string id);
 
     /// \brief Creates a read group info object from a movie name & read type.
     ///
@@ -194,8 +197,7 @@ public:
     ///
     /// \sa RecordType
     ///
-    ReadGroupInfo(const std::string& movieName,
-                  const std::string& readType);
+    ReadGroupInfo(std::string movieName, std::string readType);
 
     /// \brief Creates a read group info object from a movie name, read type,
     ///        and platform model.
@@ -206,15 +208,15 @@ public:
     ///
     /// \sa RecordType
     ///
-    ReadGroupInfo(const std::string& movieName,
-                  const std::string& readType,
+    ReadGroupInfo(std::string movieName,
+                  std::string readType,
                   const PlatformModelType platform);
 
-    ReadGroupInfo(const ReadGroupInfo& other) = default;
-    ReadGroupInfo(ReadGroupInfo&& other) = default;
-    ReadGroupInfo& operator=(const ReadGroupInfo& other) = default;
-    ReadGroupInfo& operator=(ReadGroupInfo&& other) = default;
-    ~ReadGroupInfo(void) = default;
+    ReadGroupInfo(const ReadGroupInfo&) = default;
+    ReadGroupInfo(ReadGroupInfo&&) = default;
+    ReadGroupInfo& operator=(const ReadGroupInfo&) = default;
+    ReadGroupInfo& operator=(ReadGroupInfo&&) = default;
+    ~ReadGroupInfo() = default;
 
     /// \}
 
@@ -235,13 +237,13 @@ public:
     /// Currently this checks to see that ReadGroupInfo::Id does not contain an
     /// empty string.
     ///
-    bool IsValid(void) const;
+    bool IsValid() const;
 
     /// \brief Converts this object to its SAM-formatted text.
     ///
     /// \returns SAM-formatted text (no trailing newline)
     ///
-    std::string ToSam(void) const;
+    std::string ToSam() const;
 
     /// \}
 
@@ -254,113 +256,113 @@ public:
     /// \throws std::runtime_error if barcode data not set.
     ///         Check HasBarcodeData if this data may be absent.
     ///
-    size_t BarcodeCount(void) const;
+    size_t BarcodeCount() const;
 
     /// \returns name of FASTA file containing barcode sequences
     ///
     /// \throws std::runtime_error if barcode data not set.
     ///         Check HasBarcodeData if this data may be absent.
     ///
-    std::string  BarcodeFile(void) const;
+    std::string  BarcodeFile() const;
 
     /// \returns MD5 hash of the contents of BarcodeFile
     ///
     /// \throws std::runtime_error if barcode data not set.
     ///         Check HasBarcodeData if this data may be absent.
     ///
-    std::string BarcodeHash(void) const;
+    std::string BarcodeHash() const;
 
     /// \returns experimental design type of barcodes
     ///
     /// \throws std::runtime_error if barcode data not set.
     ///         Check HasBarcodeData if this data may be absent.
     ///
-    BarcodeModeType BarcodeMode(void) const;
+    BarcodeModeType BarcodeMode() const;
 
     /// \returns type of value encoded in the 'bq' tag
     ///
     /// \throws std::runtime_error if barcode data is not set.
     ///         Check HasBarcodeData if this data may be absent.
     ///
-    BarcodeQualityType BarcodeQuality(void) const;
+    BarcodeQualityType BarcodeQuality() const;
 
     /// \returns basecaller version number (e.g. "2.1")
-    std::string BasecallerVersion(void) const;
+    std::string BasecallerVersion() const;
 
     /// \returns tag name in use for the specified for base feature
     std::string BaseFeatureTag(const BaseFeature& feature) const;
 
     /// \returns binding kit part number (e.g. "100236500")
-    std::string BindingKit(void) const;
+    std::string BindingKit() const;
 
     /// \returns true if reads are classified as spike-in controls
-    bool Control(void) const;
+    bool Control() const;
 
     /// \returns any non-standard tags added to the \@PG entry
     ///
     /// Result map consists of {tagName => value}.
     ///
-    std::map<std::string, std::string> CustomTags(void) const;
+    std::map<std::string, std::string> CustomTags() const;
 
     /// \returns string value of \@RG:DT
-    std::string Date(void) const;
+    std::string Date() const;
 
     /// \returns string value of \@RG:FO
-    std::string FlowOrder(void) const;
+    std::string FlowOrder() const;
 
     /// \returns frame rate in Hz
-    std::string FrameRateHz(void) const;
+    std::string FrameRateHz() const;
 
     /// \returns true if read group has barcode data
-    bool HasBarcodeData(void) const;
+    bool HasBarcodeData() const;
 
     /// \returns true if read group has an entry for the specified base feature
     bool HasBaseFeature(const BaseFeature& feature) const;
 
     /// \returns string value of \@RG:ID
-    std::string Id(void) const;
+    std::string Id() const;
 
     /// \returns codec type in use for IPD
-    FrameCodec IpdCodec(void) const;
+    FrameCodec IpdCodec() const;
 
     /// \returns string value of \@RG:KS
-    std::string KeySequence(void) const;
+    std::string KeySequence() const;
 
     /// \returns string value of \@RG:LB
-    std::string Library(void) const;
+    std::string Library() const;
 
     /// \returns movie name (stored in \@RG:PU)
-    std::string MovieName(void) const;
+    std::string MovieName() const;
 
     /// \returns string value of \@RG:PL
-    std::string Platform(void) const;
+    std::string Platform() const;
 
     /// \returns string value of \@RG:PM
-    PlatformModelType PlatformModel(void) const;
+    PlatformModelType PlatformModel() const;
 
     /// \returns string value of \@RG:PI
-    std::string PredictedInsertSize(void) const;
+    std::string PredictedInsertSize() const;
 
     /// \returns string value of \@RG:PG
-    std::string Programs(void) const;
+    std::string Programs() const;
 
     /// \returns codec type in use for PulseWidth
-    FrameCodec PulseWidthCodec(void) const;
+    FrameCodec PulseWidthCodec() const;
 
     /// \returns string value of read type
-    std::string ReadType(void) const;
+    std::string ReadType() const;
 
     /// \returns string value of \@RG:SM
-    std::string Sample(void) const;
+    std::string Sample() const;
 
     /// \returns string value of \@RG:CN
-    std::string SequencingCenter(void) const;
+    std::string SequencingCenter() const;
 
     /// \returns sequencing chemistry name
-    std::string SequencingChemistry(void) const;
+    std::string SequencingChemistry() const;
 
     /// \returns sequencing kit part number
-    std::string SequencingKit(void) const;
+    std::string SequencingKit() const;
 
     /// \}
 
@@ -420,13 +422,13 @@ public:
     ///
     /// \returns reference to this read group
     ///
-    ReadGroupInfo& ClearBarcodeData(void);
+    ReadGroupInfo& ClearBarcodeData();
 
     /// \brief Removes all base features from this read group.
     ///
     /// \returns reference to this read group
     ///
-    ReadGroupInfo& ClearBaseFeatures(void);
+    ReadGroupInfo& ClearBaseFeatures();
 
     /// \brief Sets whether read group's records are classifed as spike-in
     ///        controls.
@@ -591,7 +593,7 @@ private:
     std::string movieName_;             // PU
     std::string sample_;                // SM
 
-    PlatformModelType platformModel_;   // PM
+    PlatformModelType platformModel_ = PlatformModelType::SEQUEL;   // PM
 
     // DS:<Description> components
     std::string readType_;
@@ -601,8 +603,8 @@ private:
     mutable std::string sequencingChemistry_;
     std::string frameRateHz_;
     bool        control_ = false;
-    FrameCodec  ipdCodec_;
-    FrameCodec  pulseWidthCodec_;
+    FrameCodec  ipdCodec_ = FrameCodec::V1;
+    FrameCodec  pulseWidthCodec_ = FrameCodec::V1;
     bool        hasBarcodeData_ = false;
     std::string barcodeFile_;
     std::string barcodeHash_;
@@ -615,7 +617,7 @@ private:
     std::map<std::string, std::string> custom_; // tag => value
 
 private:
-    std::string EncodeSamDescription(void) const;
+    std::string EncodeSamDescription() const;
     void DecodeSamDescription(const std::string& description);
 };
 

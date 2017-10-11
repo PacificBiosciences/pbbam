@@ -35,17 +35,22 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include "TestData.h"
+#include <cstdint>
+#include <cstddef>
 #include <gtest/gtest.h>
+
+#define private public
+
+#include "PbbamTestData.h"
+
 #include <pbbam/FastqReader.h>
 #include <pbbam/FastqSequence.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
+
+namespace FastqTests {
 
 static void CheckSequence(const size_t index, const FastqSequence& seq)
 {
@@ -86,6 +91,8 @@ static void CheckSequence(const size_t index, const FastqSequence& seq)
     }
 }
 
+} // namespace FastqTests
+
 TEST(FastqSequenceTest, BasicConstructorsOk)
 {
     FastqSequence seq1{ "1", "GATTACA", "[[[[[[["};
@@ -102,13 +109,13 @@ TEST(FastqSequenceTest, BasicConstructorsOk)
 
 TEST(FastqReaderTest, IterableOk)
 {
-    const string fn = tests::GeneratedData_Dir + "/normal.fq";
+    const string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fq";
     FastqReader reader{ fn };
 
     size_t count = 0;
     FastqSequence seq;
     while (reader.GetNext(seq)) {
-        CheckSequence(count, seq);
+        FastqTests::CheckSequence(count, seq);
         ++count;
     }
     EXPECT_EQ(3, count);
@@ -116,11 +123,11 @@ TEST(FastqReaderTest, IterableOk)
 
 TEST(FastqReaderTest, ReadAllOk)
 {
-    const string fn = tests::GeneratedData_Dir + "/normal.fq";
+    const string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fq";
 
     size_t count = 0;
     for (const auto& seq : FastqReader::ReadAll(fn)) {
-        CheckSequence(count, seq);
+        FastqTests::CheckSequence(count, seq);
         ++count;
     }
     EXPECT_EQ(3, count);

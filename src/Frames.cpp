@@ -39,10 +39,16 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/Frames.h"
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <limits>
+#include <mutex>
 
 namespace PacBio {
 namespace BAM {
@@ -51,10 +57,13 @@ namespace internal {
 static std::vector<uint16_t> framepoints;
 static std::vector<uint8_t> frameToCode;
 static uint16_t maxFramepoint;
+static std::mutex initIpdDownsamplingMutex;
 
 static
-void InitIpdDownsampling(void)
+void InitIpdDownsampling()
 {
+    std::lock_guard<std::mutex> lock(initIpdDownsamplingMutex);
+
     if (!framepoints.empty())
         return;
 
@@ -76,7 +85,7 @@ void InitIpdDownsampling(void)
         next = nextOnes.back() + grain;
         framepoints.insert(framepoints.end(), nextOnes.cbegin(), nextOnes.cend());
     }
-    assert(framepoints.size()-1 <= UINT8_MAX);
+    assert(framepoints.size()-1 <= std::numeric_limits<uint8_t>::max());
 
     const uint16_t maxElement = (*max_element(framepoints.cbegin(), framepoints.cend()));
     frameToCode.assign(maxElement+1, 0);
@@ -115,7 +124,7 @@ std::vector<uint16_t> CodeToFrames(const std::vector<uint8_t>& codedData)
 {
     InitIpdDownsampling();
 
-    const size_t length = codedData.size();
+    const auto length = codedData.size();
     std::vector<uint16_t> frames(length, 0);
     for (size_t i = 0; i < length; ++i)
         frames[i] = CodeToFrames(codedData[i]);
@@ -133,7 +142,7 @@ std::vector<uint8_t> FramesToCode(const std::vector<uint16_t>& frames)
 {
     InitIpdDownsampling();
 
-    const size_t length = frames.size();
+    const auto length = frames.size();
     std::vector<uint8_t> result(length, 0);
     for (size_t i = 0; i < length; ++i)
         result[i] = FramesToCode(frames[i]);
@@ -142,14 +151,9 @@ std::vector<uint8_t> FramesToCode(const std::vector<uint16_t>& frames)
 
 } // namespace internal
 
-Frames::Frames(void)
-{ }
+Frames::Frames() { }
 
-Frames::Frames(const std::vector<uint16_t>& frames)
-    : data_(frames)
-{ }
-
-Frames::Frames(std::vector<uint16_t>&& frames)
+Frames::Frames(std::vector<uint16_t> frames)
     : data_(std::move(frames))
 { }
 

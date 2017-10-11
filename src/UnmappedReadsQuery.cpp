@@ -35,10 +35,13 @@
 
 // Author: Derek Barnett
 
+//#include "PbbamInternalConfig.h"
+
 //#include "pbbam/UnmappedReadsQuery.h"
 //#include "pbbam/BamFile.h"
 //#include "MemoryUtils.h"
 
+//#include <cstdint>
 //#include <iostream>
 
 //using namespace PacBio;

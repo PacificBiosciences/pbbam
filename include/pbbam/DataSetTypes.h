@@ -92,20 +92,20 @@ public:
     ///
     /// \returns const reference to element text (empty string if not present)
     ///
-    const std::string& NumRecords(void) const;
+    const std::string& NumRecords() const;
 
     /// \brief Fetches the text of the TotalLength element.
     ///
     /// \returns const reference to element text (empty string if not present)
     ///
-    const std::string& TotalLength(void) const;
+    const std::string& TotalLength() const;
 
     /// \brief Fetches the Provenance element.
     ///
     /// \returns const reference to child element
     /// \throws std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::Provenance& Provenance(void) const;
+    const PacBio::BAM::Provenance& Provenance() const;
 
     /// \}
 
@@ -119,7 +119,7 @@ public:
     ///
     /// \returns non-const reference to element text
     ///
-    std::string& NumRecords(void);
+    std::string& NumRecords();
 
     /// \brief Fetches the text of the TotalLength element.
     ///
@@ -127,7 +127,7 @@ public:
     ///
     /// \returns non-const reference to element text
     ///
-    std::string& TotalLength(void);
+    std::string& TotalLength();
 
     /// \brief Fetches Provenance element.
     ///
@@ -135,7 +135,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::Provenance& Provenance(void);
+    PacBio::BAM::Provenance& Provenance();
 
     /// \}
 
@@ -175,7 +175,7 @@ public:
 ///
 class PBBAM_EXPORT ExtensionElement : public internal::DataSetElement  {
 public:
-    ExtensionElement(void);
+    ExtensionElement();
 };
 
 /// \brief The Extensions class represents an %Extensions element in DataSetXML.
@@ -187,7 +187,7 @@ class PBBAM_EXPORT Extensions : public internal::DataSetListElement<ExtensionEle
 {
 public:
     /// \brief Creates an empty extensions list.
-    Extensions(void);
+    Extensions();
 };
 
 class ExternalResources;
@@ -219,7 +219,7 @@ public:
     /// \returns const reference to child element
     /// \throws std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::ExternalResources& ExternalResources(void) const;
+    const PacBio::BAM::ExternalResources& ExternalResources() const;
 
 public:
     /// \brief Fetches the resource's ExternalResources child element.
@@ -228,7 +228,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::ExternalResources& ExternalResources(void);
+    PacBio::BAM::ExternalResources& ExternalResources();
 
     /// \brief Sets this resource's ExternalResources child element.
     ///
@@ -250,7 +250,7 @@ public:
     ///             cannot resolve relative filepaths and will be removed in the
     ///             near future.
     ///
-    BamFile ToBamFile(void) const;
+    BamFile ToBamFile() const;
 };
 
 /// \brief The ExternalResources class represents an %ExternalResources element
@@ -263,7 +263,7 @@ class PBBAM_EXPORT ExternalResources : public internal::DataSetListElement<Exter
 {
 public:
     /// \brief Creates an empty resource list.
-    ExternalResources(void);
+    ExternalResources();
 
     /// \brief Merges \p other resource list with this one.
     ExternalResources& operator+=(const ExternalResources& other);
@@ -281,7 +281,7 @@ public:
     /// \deprecated Use DataSet::BamFiles instead. This method cannot resolve
     ///             relative filepaths and will be removed in the near future.
     ///
-    std::vector<BamFile> BamFiles(void) const;
+    std::vector<BamFile> BamFiles() const;
 };
 
 /// \brief The FileIndex class represents a %FileIndex element in DataSetXML.
@@ -310,7 +310,7 @@ class PBBAM_EXPORT FileIndices : public internal::DataSetListElement<FileIndex>
 {
 public:
     /// \brief Creates an empty index list.
-    FileIndices(void);
+    FileIndices();
 
 public:
     /// \brief Adds a FileIndex to this list.
@@ -334,7 +334,7 @@ class PBBAM_EXPORT Filter : public internal::DataSetElement
 {
 public:
     /// \brief Creates an empty filter.
-    Filter(void);
+    Filter();
 
 public:
     /// \brief Fetches the filter's property list element.
@@ -342,7 +342,7 @@ public:
     /// \returns const reference to child element
     /// \throws std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::Properties& Properties(void) const;
+    const PacBio::BAM::Properties& Properties() const;
 
 public:
     /// \brief Fetches the filter's property list child element.
@@ -351,7 +351,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::Properties& Properties(void);
+    PacBio::BAM::Properties& Properties();
 
     /// \brief Sets this filter's Properties child element.
     ///
@@ -373,7 +373,7 @@ class PBBAM_EXPORT Filters : public internal::DataSetListElement<Filter>
 {
 public:
     /// \brief Creates an empty filter list.
-    Filters(void);
+    Filters();
 
     /// \brief Merges \p other filter list with this one.
     Filters& operator+=(const Filters& other);
@@ -391,7 +391,7 @@ public:
 class PBBAM_EXPORT ParentTool : public internal::BaseEntityType {
 public:
     /// \brief Creates an empty %ParentTool element.
-    ParentTool(void);
+    ParentTool();
 };
 
 /// \brief The Property class represents a %Property element in DataSetXML.
@@ -420,19 +420,19 @@ public:
     ///
     /// \returns const reference to attribute value
     ///
-    const std::string& Name(void) const;
+    const std::string& Name() const;
 
     /// \brief Fetches the value of property's Operator attribute.
     ///
     /// \returns const reference to attribute value
     ///
-    const std::string& Operator(void) const;
+    const std::string& Operator() const;
 
     /// \brief Fetches the value of property's Value attribute.
     ///
     /// \returns const reference to attribute value
     ///
-    const std::string& Value(void) const;
+    const std::string& Value() const;
 
 public:
 
@@ -440,19 +440,19 @@ public:
     ///
     /// \returns non-const reference to attribute value
     ///
-    std::string& Name(void);
+    std::string& Name();
 
     /// \brief Fetches the value of property's Operator attribute.
     ///
     /// \returns non-const reference to attribute value
     ///
-    std::string& Operator(void);
+    std::string& Operator();
 
     /// \brief Fetches the value of property's Value attribute.
     ///
     /// \returns nonconst reference to attribute value
     ///
-    std::string& Value(void);
+    std::string& Value();
 
 public:
     /// \brief Sets this property's Name attribute.
@@ -486,7 +486,7 @@ class PBBAM_EXPORT Properties : public internal::DataSetListElement<Property>
 {
 public:
     /// \brief Creates an empty property list.
-    Properties(void);
+    Properties();
 
 public:
     /// \brief Adds a property to this list.
@@ -502,7 +502,7 @@ class PBBAM_EXPORT Provenance : public internal::DataSetElement
 {
 public:
     /// \brief Creates a empty provenance element.
-    Provenance(void);
+    Provenance();
 
 public:
     /// \brief Fetches the value of CreatedBy attribute.
@@ -510,35 +510,35 @@ public:
     /// \returns const reference to attribute value (empty string if not
     ///          present)
     ///
-    const std::string& CreatedBy(void) const;
+    const std::string& CreatedBy() const;
 
     /// \brief Fetches the value of CommonServicesInstanceId attribute.
     ///
     /// \returns const reference to attribute value (empty string if not
     ///          present)
     ///
-    const std::string& CommonServicesInstanceId(void) const;
+    const std::string& CommonServicesInstanceId() const;
 
     /// \brief Fetches the value of CreatorUserId attribute.
     ///
     /// \returns const reference to attribute value (empty string if not
     ///          present)
     ///
-    const std::string& CreatorUserId(void) const;
+    const std::string& CreatorUserId() const;
 
     /// \brief Fetches the value of ParentJobId attribute.
     ///
     /// \returns const reference to attribute value (empty string if not
     ///          present)
     ///
-    const std::string& ParentJobId(void) const;
+    const std::string& ParentJobId() const;
 
     /// \brief Fetches the ParentTool child element.
     ///
     /// \returns const reference to child element
     /// \throws std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::ParentTool& ParentTool(void) const;
+    const PacBio::BAM::ParentTool& ParentTool() const;
 
 public:
 
@@ -549,7 +549,7 @@ public:
     /// \returns non-const reference to attribute value (empty string if this is
     ///          a new attribute)
     ///
-    std::string& CreatedBy(void);
+    std::string& CreatedBy();
 
     /// \brief Fetches the value of CommonServicesInstanceId attribute.
     ///
@@ -558,7 +558,7 @@ public:
     /// \returns non-const reference to attribute value (empty string if this is
     ///          a new attribute)
     ///
-    std::string& CommonServicesInstanceId(void);
+    std::string& CommonServicesInstanceId();
 
     /// \brief Fetches the value of CreatorUserId attribute.
     ///
@@ -567,7 +567,7 @@ public:
     /// \returns non-const reference to attribute value (empty string if this is
     ///          a new attribute)
     ///
-    std::string& CreatorUserId(void);
+    std::string& CreatorUserId();
 
     /// \brief Fetches the value of ParentJobId attribute.
     ///
@@ -576,7 +576,7 @@ public:
     /// \returns non-const reference to attribute value (empty string if this is
     ///          a new attribute)
     ///
-    std::string& ParentJobId(void);
+    std::string& ParentJobId();
 
     /// \brief Fetches the ParentTool element element.
     ///
@@ -584,7 +584,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::ParentTool& ParentTool(void);
+    PacBio::BAM::ParentTool& ParentTool();
 
 public:
 
@@ -655,7 +655,7 @@ public:
 
 public:
     /// \brief Creates an empty, generic DataSetBase.
-    DataSetBase(void);
+    DataSetBase();
 
 protected:
     /// \brief Creates a DataSetBase with key values initialized.
@@ -664,7 +664,7 @@ protected:
                 const XsdType& xsd);
 
     /// \brief Returns a new DataSetBase containing a deep copy of contents
-    DataSetBase* DeepCopy(void) const;
+    DataSetBase* DeepCopy() const;
 
 public:
     /// \brief Merges dataset contents.
@@ -682,32 +682,32 @@ public:
     /// \returns const reference to child element
     /// \throws std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::ExternalResources& ExternalResources(void) const;
+    const PacBio::BAM::ExternalResources& ExternalResources() const;
 
     /// \brief Fetches the dataset's Filters element.
     ///
     /// \returns const reference to child element
     ///
-    const PacBio::BAM::Filters& Filters(void) const;
+    const PacBio::BAM::Filters& Filters() const;
 
     /// \brief Fetches the dataset's DataSetMetadata element.
     ///
     /// \returns const reference to child element
     ///
-    const PacBio::BAM::DataSetMetadata& Metadata(void) const;
+    const PacBio::BAM::DataSetMetadata& Metadata() const;
 
     /// \brief Fetches the dataset's DataSets element.
     ///
     /// \returns const reference to child element
     ///
-    const PacBio::BAM::SubDataSets& SubDataSets(void) const;
+    const PacBio::BAM::SubDataSets& SubDataSets() const;
 
 public:
     /// \brief Access this dataset's namespace info.
     ///
     /// \returns const reference to dataset's NamespaceRegistry
     ///
-    const NamespaceRegistry& Namespaces(void) const;
+    const NamespaceRegistry& Namespaces() const;
 
 public:
     /// \brief Fetches the dataset's ExternalResources element.
@@ -716,7 +716,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::ExternalResources& ExternalResources(void);
+    PacBio::BAM::ExternalResources& ExternalResources();
 
     /// \brief Fetches the dataset's Filters element.
     ///
@@ -724,7 +724,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::Filters& Filters(void);
+    PacBio::BAM::Filters& Filters();
 
     /// \brief Fetches the dataset's DataSetMetadata element.
     ///
@@ -732,7 +732,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::DataSetMetadata& Metadata(void);
+    PacBio::BAM::DataSetMetadata& Metadata();
 
     /// \brief Fetches the dataset's DataSets element.
     ///
@@ -740,7 +740,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::SubDataSets& SubDataSets(void);
+    PacBio::BAM::SubDataSets& SubDataSets();
 
 public:
     /// \brief Sets this dataset's ExternalResources element.
@@ -784,7 +784,7 @@ public:
     ///
     /// \returns non-const reference to dataset's NamespaceRegistry
     ///
-    NamespaceRegistry& Namespaces(void);
+    NamespaceRegistry& Namespaces();
 
 private:
     NamespaceRegistry registry_;
@@ -797,7 +797,7 @@ class PBBAM_EXPORT AlignmentSet : public DataSetBase
 {
 public:
     /// \brief Creates an empty AlignmentSet dataset.
-    AlignmentSet(void);
+    AlignmentSet();
 };
 
 /// \brief The BarcodeSet class represents a %BarcodeSet root element in
@@ -807,7 +807,7 @@ class PBBAM_EXPORT BarcodeSet : public DataSetBase
 {
 public:
     /// \brief Creates an empty BarcodeSet dataset.
-    BarcodeSet(void);
+    BarcodeSet();
 };
 
 /// \brief The ConsensusAlignmentSet class represents a %ConsensusAlignmentSet
@@ -817,7 +817,7 @@ class PBBAM_EXPORT ConsensusAlignmentSet : public DataSetBase
 {
 public:
     /// \brief Creates an empty ConsensusAlignmentSet dataset.
-    ConsensusAlignmentSet(void);
+    ConsensusAlignmentSet();
 };
 
 /// \brief The ConsensusReadSet class represents a %ConsensusReadSet root
@@ -827,7 +827,7 @@ class PBBAM_EXPORT ConsensusReadSet : public DataSetBase
 {
 public:
     /// \brief Creates an empty ConsensusReadSet dataset.
-    ConsensusReadSet(void);
+    ConsensusReadSet();
 };
 
 /// \brief The ContigSet class represents a %ContigSet root element in
@@ -837,7 +837,7 @@ class PBBAM_EXPORT ContigSet : public DataSetBase
 {
 public:
     /// \brief Creates an empty ContigSet dataset.
-    ContigSet(void);
+    ContigSet();
 };
 
 /// \brief The HdfSubreadSet class represents a %HdfSubreadSet root element in
@@ -847,7 +847,7 @@ class PBBAM_EXPORT HdfSubreadSet : public DataSetBase
 {
 public:
     /// \brief Creates an empty HdfSubreadSet dataset.
-    HdfSubreadSet(void);
+    HdfSubreadSet();
 };
 
 /// \brief The ReferenceSet class represents a %ReferenceSet root element in
@@ -857,7 +857,7 @@ class PBBAM_EXPORT ReferenceSet : public DataSetBase
 {
 public:
     /// \brief Creates an empty ReferenceSet dataset.
-    ReferenceSet(void);
+    ReferenceSet();
 };
 
 /// \brief The SubDataSets class represents a %DataSets list element in
@@ -869,7 +869,7 @@ class PBBAM_EXPORT SubDataSets : public internal::DataSetListElement<DataSetBase
 {
 public:
     /// \brief Creates an empty list of sub-datasets.
-    SubDataSets(void);
+    SubDataSets();
 
 public:
     /// \brief Adds \p other sub-dataset to this list.
@@ -893,7 +893,7 @@ class PBBAM_EXPORT SubreadSet : public DataSetBase
 {
 public:
     /// \brief Creates an empty SubreadSet dataset.
-    SubreadSet(void);
+    SubreadSet();
 };
 
 } // namespace BAM

@@ -38,6 +38,7 @@
 #include "CppFormatter.h"
 #include <pbbam/PbiRawData.h>
 
+#include <cstdint>
 #include <iostream>
 #include <sstream>
 
@@ -104,7 +105,7 @@ CppFormatter::CppFormatter(const Settings& settings)
     : IFormatter(settings)
 { }
 
-void CppFormatter::Run(void)
+void CppFormatter::Run()
 {
     using namespace PacBio::BAM;
 

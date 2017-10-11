@@ -40,6 +40,7 @@
 // Author: Derek Barnett
 
 #include "pbbam/PbiFilter.h"
+#include "pbbam/MakeUnique.h"
 #include <algorithm>
 #include <iostream>
 #include <map>
@@ -77,7 +78,7 @@ public:
     FilterWrapper(FilterWrapper&&) noexcept = default;
     FilterWrapper& operator=(const FilterWrapper& other);
     FilterWrapper& operator=(FilterWrapper&&) noexcept = default;
-    ~FilterWrapper(void);
+    ~FilterWrapper() = default;
 
 public:
     bool Accepts(const PacBio::BAM::PbiRawData& idx, const size_t row) const;
@@ -85,8 +86,8 @@ public:
 private:
     struct WrapperInterface
     {
-        virtual ~WrapperInterface(void) = default;
-        virtual WrapperInterface* Clone(void) const =0;
+        virtual ~WrapperInterface() = default;
+        virtual WrapperInterface* Clone() const =0;
         virtual bool Accepts(const PacBio::BAM::PbiRawData& idx,
                              const size_t row) const =0;
     };
@@ -96,8 +97,9 @@ private:
     {
         WrapperImpl(T x);
         WrapperImpl(const WrapperImpl& other);
-        WrapperInterface* Clone(void) const;
-        bool Accepts(const PacBio::BAM::PbiRawData& idx, const size_t row) const;
+        WrapperInterface* Clone() const override;
+        bool Accepts(const PacBio::BAM::PbiRawData& idx,
+                     const size_t row) const override;
         T data_;
     };
 
@@ -124,8 +126,6 @@ inline FilterWrapper& FilterWrapper::operator=(const FilterWrapper& other)
     return *this;
 }
 
-inline FilterWrapper::~FilterWrapper(void) { }
-
 inline bool FilterWrapper::Accepts(const PbiRawData& idx, const size_t row) const
 { return self_->Accepts(idx, row); }
 
@@ -148,7 +148,7 @@ inline FilterWrapper::WrapperImpl<T>::WrapperImpl(const WrapperImpl& other)
 { }
 
 template<typename T>
-inline FilterWrapper::WrapperInterface* FilterWrapper::WrapperImpl<T>::Clone(void) const
+inline FilterWrapper::WrapperInterface* FilterWrapper::WrapperImpl<T>::Clone() const
 { return new WrapperImpl(*this); }
 
 template<typename T>
@@ -168,9 +168,9 @@ struct PbiFilterPrivate
         filters_.emplace_back(std::move(filter));
     }
 
-    std::unique_ptr<internal::PbiFilterPrivate> DeepCopy(void)
+    std::unique_ptr<internal::PbiFilterPrivate> DeepCopy()
     {
-        auto copy = std::unique_ptr<PbiFilterPrivate>{ new PbiFilterPrivate{type_} };
+        auto copy = std::make_unique<PbiFilterPrivate>(type_);
         copy->filters_ = this->filters_;
         return copy;
     }
@@ -250,8 +250,6 @@ inline PbiFilter& PbiFilter::operator=(const PbiFilter& other)
     return *this;
 }
 
-inline PbiFilter::~PbiFilter(void) { }
-
 inline bool PbiFilter::Accepts(const PacBio::BAM::PbiRawData& idx,
                                const size_t row) const
 { return d_->Accepts(idx, row); }
@@ -295,7 +293,7 @@ inline PbiFilter& PbiFilter::Add(std::vector<PbiFilter>&& filters)
     return *this;
 }
 
-inline bool PbiFilter::IsEmpty(void) const
+inline bool PbiFilter::IsEmpty() const
 { return d_->filters_.empty(); }
 
 } // namespace BAM

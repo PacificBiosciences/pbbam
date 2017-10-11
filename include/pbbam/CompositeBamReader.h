@@ -78,7 +78,7 @@ public:
     CompositeMergeItem(std::unique_ptr<BamReader>&& rdr, BamRecord&& rec);
     CompositeMergeItem(CompositeMergeItem&& other);
     CompositeMergeItem& operator=(CompositeMergeItem&& other);
-    ~CompositeMergeItem(void);
+    ~CompositeMergeItem() = default;
 };
 
 /// \internal
@@ -140,12 +140,12 @@ public:
 
     /// \returns the current specified interval
     ///
-    const GenomicInterval& Interval(void) const;
+    const GenomicInterval& Interval() const;
 
     /// \}
 
 private:
-    void UpdateSort(void);
+    void UpdateSort();
 
 private:
     GenomicInterval interval_;
@@ -180,11 +180,11 @@ template<typename OrderByType>
 class PBBAM_EXPORT PbiFilterCompositeBamReader
 {
 public:
-    typedef internal::CompositeMergeItem                      value_type;
-    typedef internal::CompositeMergeItemSorter<OrderByType>   merge_sorter_type;
-    typedef std::deque<value_type>                            container_type;
-    typedef typename container_type::iterator                 iterator;
-    typedef typename container_type::const_iterator           const_iterator;
+    using value_type        = internal::CompositeMergeItem;
+    using merge_sorter_type = internal::CompositeMergeItemSorter<OrderByType>;
+    using container_type    = std::deque<value_type>;
+    using iterator          = typename container_type::iterator;
+    using const_iterator    = typename container_type::const_iterator;
 
 public:
     /// \name Contstructors & Related Methods
@@ -215,14 +215,17 @@ public:
     ///
     PbiFilterCompositeBamReader& Filter(const PbiFilter& filter);
 
+    uint32_t NumReads() const;
+
     /// \}
 
 private:
-    void UpdateSort(void);
+    void UpdateSort();
 
 private:
     container_type mergeQueue_;
     std::vector<std::string> filenames_;
+    uint32_t numReads_;
 };
 
 /// \brief The SequentialCompositeBamReader class provides read access to

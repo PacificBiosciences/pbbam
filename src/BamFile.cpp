@@ -39,14 +39,20 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/BamFile.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiFile.h"
 #include "FileUtils.h"
 #include "MemoryUtils.h"
+#include "Autovalidate.h"
+
 #include <htslib/sam.h>
 #include <memory>
 #include <sstream>
 #include <cassert>
+#include <cstdint>
 #include <sys/stat.h>
 
 namespace PacBio {
@@ -68,7 +74,7 @@ public:
 
 #if !defined (PBBAM_NO_CHECK_EOF) || PBBAM_AUTOVALIDATE
         // sanity check on file
-        const int eofCheck = bgzf_check_EOF(f->fp.bgzf);
+        const auto eofCheck = bgzf_check_EOF(f->fp.bgzf);
         if (eofCheck <= 0 ) {
             // 1:  EOF present & correct
             // 2:  not seekable (e.g. reading from stdin)
@@ -91,12 +97,12 @@ public:
         firstAlignmentOffset_ = bgzf_tell(f->fp.bgzf);
     }
 
-    std::unique_ptr<BamFilePrivate> DeepCopy(void)
+    std::unique_ptr<BamFilePrivate> DeepCopy()
     {
-        return std::unique_ptr<BamFilePrivate>(new BamFilePrivate(filename_));
+        return std::make_unique<BamFilePrivate>(filename_);
     }
 
-    bool HasEOF(void) const
+    bool HasEOF() const
     {
         // streamed input is unknown, since it's not random-accessible
         if (filename_ == "-")
@@ -114,7 +120,7 @@ public:
         return bgzf_check_EOF(f->fp.bgzf);
     }
 
-    std::unique_ptr<samFile, internal::HtslibFileDeleter> RawOpen(void) const
+    std::unique_ptr<samFile, internal::HtslibFileDeleter> RawOpen() const
     {
         std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
         if (!f || !f->fp.bgzf)
@@ -158,62 +164,62 @@ BamFile& BamFile::operator=(const BamFile& other)
 
 BamFile& BamFile::operator=(BamFile&& other)
 {
-    if (this != &other) { 
-        d_ = std::move(other.d_); 
+    if (this != &other) {
+        d_ = std::move(other.d_);
     }
-    return *this; 
+    return *this;
 }
 
-BamFile::~BamFile(void) { }
+BamFile::~BamFile() { }
 
-void BamFile::CreatePacBioIndex(void) const
+void BamFile::CreatePacBioIndex() const
 {
     PbiFile::CreateFrom(*this);
 }
 
-void BamFile::CreateStandardIndex(void) const
+void BamFile::CreateStandardIndex() const
 {
     if (bam_index_build(d_->filename_.c_str(), 0) != 0)
         throw std::runtime_error("could not build BAI index");
 }
 
-void BamFile::EnsurePacBioIndexExists(void) const
+void BamFile::EnsurePacBioIndexExists() const
 {
     if (!PacBioIndexExists())
         CreatePacBioIndex();
 }
 
-void BamFile::EnsureStandardIndexExists(void) const
+void BamFile::EnsureStandardIndexExists() const
 {
     if (!StandardIndexExists())
         CreateStandardIndex();
 }
 
-std::string BamFile::Filename(void) const
+std::string BamFile::Filename() const
 { return d_->filename_; }
 
-int64_t BamFile::FirstAlignmentOffset(void) const
+int64_t BamFile::FirstAlignmentOffset() const
 { return d_->firstAlignmentOffset_; }
 
-bool BamFile::HasEOF(void) const
+bool BamFile::HasEOF() const
 { return d_->HasEOF(); }
 
 bool BamFile::HasReference(const std::string& name) const
 { return d_->header_.HasSequence(name); }
 
-const BamHeader& BamFile::Header(void) const
+const BamHeader& BamFile::Header() const
 { return d_->header_; }
 
-bool BamFile::IsPacBioBAM(void) const
+bool BamFile::IsPacBioBAM() const
 { return !d_->header_.PacBioBamVersion().empty(); }
 
-bool BamFile::PacBioIndexExists(void) const
+bool BamFile::PacBioIndexExists() const
 { return internal::FileUtils::Exists(PacBioIndexFilename()); }
 
-std::string BamFile::PacBioIndexFilename(void) const
+std::string BamFile::PacBioIndexFilename() const
 { return d_->filename_ + ".pbi"; }
 
-bool BamFile::PacBioIndexIsNewer(void) const
+bool BamFile::PacBioIndexIsNewer() const
 {
     const auto bamTimestamp = internal::FileUtils::LastModified(Filename());
     const auto pbiTimestamp = internal::FileUtils::LastModified(PacBioIndexFilename());
@@ -232,13 +238,13 @@ uint32_t BamFile::ReferenceLength(const int id) const
 std::string BamFile::ReferenceName(const int id) const
 { return d_->header_.SequenceName(id); }
 
-bool BamFile::StandardIndexExists(void) const
+bool BamFile::StandardIndexExists() const
 { return internal::FileUtils::Exists(StandardIndexFilename()); }
 
-std::string BamFile::StandardIndexFilename(void) const
+std::string BamFile::StandardIndexFilename() const
 { return d_->filename_ + ".bai"; }
 
-bool BamFile::StandardIndexIsNewer(void) const 
+bool BamFile::StandardIndexIsNewer() const 
 { 
     const auto bamTimestamp  = internal::FileUtils::LastModified(Filename());
     const auto baiTimestamp = internal::FileUtils::LastModified(StandardIndexFilename());

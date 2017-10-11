@@ -35,18 +35,24 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
+#include <cstddef>
 
-#include "TestData.h"
 #include <gtest/gtest.h>
+
+#define private public
+
+#include "PbbamTestData.h"
+
 #include <pbbam/FastaReader.h>
 #include <pbbam/FastaSequence.h>
 #include <pbbam/FastaSequenceQuery.h>
+#include <pbbam/Unused.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
+
+namespace FastaTests {
 
 static void CheckSequence(const size_t index, const FastaSequence& seq)
 {
@@ -72,6 +78,8 @@ static void CheckSequence(const size_t index, const FastaSequence& seq)
     }
 }
 
+} // namespace FastaTests
+
 TEST(FastaSequenceTest, BasicConstructorOk)
 {
     FastaSequence seq{ "1", "GATTACA" };
@@ -81,13 +89,13 @@ TEST(FastaSequenceTest, BasicConstructorOk)
 
 TEST(FastaReaderTest, IterableOk)
 {
-    const string fn = tests::GeneratedData_Dir + "/normal.fa";
+    const string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fa";
     FastaReader reader{ fn };
 
     size_t count = 0;
     FastaSequence seq;
     while (reader.GetNext(seq)) {
-        CheckSequence(count, seq);
+        FastaTests::CheckSequence(count, seq);
         ++count;
     }
     EXPECT_EQ(3, count);
@@ -95,11 +103,11 @@ TEST(FastaReaderTest, IterableOk)
 
 TEST(FastaReaderTest, ReadAllOk)
 {
-    const string fn = tests::GeneratedData_Dir + "/normal.fa";
+    const string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fa";
 
     size_t count = 0;
     for (const auto& seq : FastaReader::ReadAll(fn)) {
-        CheckSequence(count, seq);
+        FastaTests::CheckSequence(count, seq);
         ++count;
     }
     EXPECT_EQ(3, count);
@@ -107,13 +115,13 @@ TEST(FastaReaderTest, ReadAllOk)
 
 TEST(FastaSequenceQueryTest, FromFastaFilename)
 {
-    const string fn = tests::Data_Dir + "/lambdaNEB.fa";
+    const string fn = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
 
     {
         size_t count = 0;
         FastaSequenceQuery query{ fn } ;
         for (const auto& seq : query) {
-            (void) seq;
+            UNUSED(seq);
             ++count;
         }
         EXPECT_EQ(1, count);
@@ -130,13 +138,13 @@ TEST(FastaSequenceQueryTest, FromFastaFilename)
 
 TEST(FastaSequenceQueryTest, FromDataSet)
 {
-    const string fn = tests::Data_Dir + "/referenceset.xml";
+    const string fn = PbbamTestsConfig::Data_Dir + "/referenceset.xml";
 
     {
         size_t count = 0;
         FastaSequenceQuery query{ fn } ;
         for (const auto& seq : query) {
-            (void) seq;
+            UNUSED(seq);
             ++count;
         }
         EXPECT_EQ(5, count);    // 1 from lambda, 4 from chimera

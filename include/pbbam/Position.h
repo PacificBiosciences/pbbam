@@ -43,6 +43,7 @@
 #define POSITION_H
 
 #include "pbbam/Config.h"
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -53,7 +54,7 @@ namespace BAM {
 /// We use a signed integer because SAM/BAM uses the -1 value to indicate
 /// unknown or unmapped positions.
 ///
-typedef int32_t Position;
+using Position = int32_t;
 
 /// \brief This constant is widely used as a "missing" or "invalid" position
 ///        marker.

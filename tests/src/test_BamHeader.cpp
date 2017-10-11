@@ -35,24 +35,23 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include <gtest/gtest.h>
-#include <htslib/sam.h>
-#include <pbbam/BamHeader.h>
 #include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <gtest/gtest.h>
+#include <htslib/sam.h>
+
+#define private public
+
+#include <pbbam/BamHeader.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-namespace PacBio {
-namespace BAM {
-namespace tests {
+namespace BamHeaderTests {
 
 struct BamHdrDeleter
 {
@@ -63,9 +62,7 @@ struct BamHdrDeleter
     }
 };
 
-} // namespace tests
-} // namespace BAM
-} // namespace PacBio
+} // namespace BamHeaderTests
 
 TEST(BamHeaderTest, DefaultConstruction)
 {
@@ -231,9 +228,9 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
 
 
     const string& text = header.ToSam();
-    PBBAM_SHARED_PTR<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), tests::BamHdrDeleter());
+    std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), BamHeaderTests::BamHdrDeleter());
     rawData->ignore_sam_err = 0;
-    rawData->cigar_tab = NULL;
+    rawData->cigar_tab = nullptr;
     rawData->l_text = text.size();
     rawData->text = (char*)calloc(rawData->l_text + 1, 1);
     memcpy(rawData->text, text.c_str(), rawData->l_text);
@@ -284,9 +281,9 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
 
 
     string text = header.ToSam();
-    PBBAM_SHARED_PTR<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), tests::BamHdrDeleter());
+    std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()), BamHeaderTests::BamHdrDeleter());
     rawData->ignore_sam_err = 0;
-    rawData->cigar_tab = NULL;
+    rawData->cigar_tab = nullptr;
     rawData->l_text = text.size();
     rawData->text = (char*)calloc(rawData->l_text + 1, 1);
     memcpy(rawData->text, text.c_str(), rawData->l_text);

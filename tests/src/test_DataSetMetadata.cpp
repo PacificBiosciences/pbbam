@@ -35,9 +35,7 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
 #define private public
-#endif
 
 #include <gtest/gtest.h>
 #include <pbbam/dataset/DataSet.h>
@@ -46,7 +44,7 @@ using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-namespace tests {
+namespace DataSetMetadataTests {
 
 //static inline
 //DataSet CreateDataSet(void)
@@ -56,7 +54,7 @@ namespace tests {
 //    return d;
 //}
 
-} // namespace tests
+} // namespace DataSetMetadataTests
 
 TEST(DataSetMetadataTest, DummyTest) {
     EXPECT_TRUE(true);

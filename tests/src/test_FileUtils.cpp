@@ -35,25 +35,24 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include "TestData.h"
-#include <gtest/gtest.h>
-#include <pbbam/../../src/FileUtils.h>
-#include <pbbam/../../src/TimeUtils.h>
-
-#include <boost/algorithm/string.hpp>
-
 #include <chrono>
 #include <string>
 #include <vector>
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
-
 #include <iostream>
+
+#include <boost/algorithm/string.hpp>
+#include <gtest/gtest.h>
+
+#define private public
+
+#include "PbbamTestData.h"
+
+#include <pbbam/Unused.h>
+#include <pbbam/../../src/FileUtils.h>
+#include <pbbam/../../src/TimeUtils.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -64,7 +63,7 @@ TEST(FileUtilsTest, ExistsOk)
 {
     EXPECT_FALSE(FileUtils::Exists("does_not_exist.txt"));
 
-    const string tmp = tests::GeneratedData_Dir + "/pbbam_exists_check.tmp";
+    const string tmp = PbbamTestsConfig::GeneratedData_Dir + "/pbbam_exists_check.tmp";
     const string cmd = string("touch ") + tmp;
     ASSERT_EQ(0, system(cmd.c_str()));
     EXPECT_TRUE(FileUtils::Exists(tmp));
@@ -80,11 +79,11 @@ TEST(FileUtilsTest, LastModifiedOk)
     const auto nowDuration = now.time_since_epoch();
     const auto nowSeconds = chrono::duration_cast<chrono::seconds>(nowDuration).count();
 
-    const string tmp = tests::GeneratedData_Dir + "/pbbam_lastmod_check.tmp";
+    const string tmp = PbbamTestsConfig::GeneratedData_Dir + "/pbbam_lastmod_check.tmp";
     const string rmCmd = string("rm ") + tmp;
     const string touchCmd = string("touch  ") + tmp;
-    int ret =  system(rmCmd.c_str());
-    (void)ret; // unused
+    const auto ret = system(rmCmd.c_str());
+    UNUSED(ret);
     ASSERT_EQ(0, system(touchCmd.c_str()));
 
     const auto stamp = FileUtils::LastModified(tmp);
@@ -143,7 +142,7 @@ TEST(FileUtilsTest, ResolvedFilePathOk)
 
 TEST(FileUtilsTest, SizeOk)
 {
-    const string tmp = tests::GeneratedData_Dir + "/pbbam_empty_file.tmp";
+    const string tmp = PbbamTestsConfig::GeneratedData_Dir + "/pbbam_empty_file.tmp";
     const string cmd = string("touch ") + tmp;
     ASSERT_EQ(0, system(cmd.c_str()));
     EXPECT_EQ(0, FileUtils::Size(tmp));

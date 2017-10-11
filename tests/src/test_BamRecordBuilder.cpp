@@ -35,19 +35,22 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
+#include <chrono>
+#include <cstdint>
+#include <cstddef>
+#include <string>
 
 #include <gtest/gtest.h>
+
+#define private public
+
 #include <pbbam/BamRecordBuilder.h>
 #include <pbbam/BamTagCodec.h>
-#include <chrono>
-#include <string>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-namespace tests {
+namespace BamRecordBuilderTests {
 
 static
 void CheckRawData(const BamRecordImpl& bam)
@@ -79,14 +82,14 @@ static
 void CheckRawData(const BamRecord& bam)
 { CheckRawData(bam.impl_); }
 
-} // namespace tests
+} // namespace BamRecordBuilderTests
 
 TEST(BamRecordBuilderTest, DefaultValues)
 {
     BamRecordBuilder builder;
     BamRecord bam = builder.Build();
 
-    const PBBAM_SHARED_PTR<bam1_t> rawData = bam.impl_.d_;
+    const auto rawData = bam.impl_.d_;
     ASSERT_TRUE((bool)rawData);
 
     // fixed-length (core) data
@@ -139,7 +142,7 @@ TEST(BamRecordBuilderTest, DefaultValues)
     EXPECT_EQ(emptyString, bam.impl_.CigarData().ToStdString());
     EXPECT_EQ(emptyString, bam.impl_.Sequence());
     EXPECT_EQ(emptyString, bam.impl_.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordBuilderTests::CheckRawData(bam);
 }
 
 TEST(BamRecordBuilderTest, CheckSetters)
@@ -168,7 +171,7 @@ TEST(BamRecordBuilderTest, CheckSetters)
     // check raw data
     // -------------------------------
 
-    const PBBAM_SHARED_PTR<bam1_t> rawData = bam.impl_.d_;
+    const auto rawData = bam.impl_.d_;
     ASSERT_TRUE((bool)rawData);
 
     // fixed-length (core) data
@@ -242,7 +245,7 @@ TEST(BamRecordBuilderTest, CheckSetters)
 //               .BuildInPlace(record);
 //    }
 //    auto end = std::chrono::steady_clock::now();
-//    (void)record;
+//    ()record;
 //    auto diff = end - start;
 //    std::cout << std::chrono::duration <double, std::milli>(diff).count() << " ms" << std::endl;
 //}
@@ -267,7 +270,7 @@ TEST(BamRecordBuilderTest, CheckSetters)
 //        record.Tags(tags);
 //    }
 //    auto end = std::chrono::steady_clock::now();
-//    (void)record;
+//    ()record;
 //    auto diff = end - start;
 //    std::cout << std::chrono::duration <double, std::milli>(diff).count() << " ms" << std::endl;
 //}

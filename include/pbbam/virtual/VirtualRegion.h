@@ -80,12 +80,12 @@ public:
                   const int barcodeRight,
                   const int score = 0);
 
-    VirtualRegion(void) = default;
+    VirtualRegion() = default;
     VirtualRegion(const VirtualRegion&) = default;
     VirtualRegion(VirtualRegion&&) = default;
     VirtualRegion& operator=(const VirtualRegion&) = default; // un-"delete"-ed for SWIG
     VirtualRegion& operator=(VirtualRegion&&) = default;
-    ~VirtualRegion(void) = default;
+    ~VirtualRegion() = default;
 
     bool operator==(const VirtualRegion &v1) const;
 

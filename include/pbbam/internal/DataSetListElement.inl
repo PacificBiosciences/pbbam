@@ -61,31 +61,31 @@ inline T& DataSetListElement<T>::operator[](size_t index)
 { return static_cast<T&>(children_.at(index)); }
 
 template<class T>
-inline size_t DataSetListElement<T>::Size(void) const
+inline size_t DataSetListElement<T>::Size() const
 { return NumChildren(); }
 
 template<class T>
-inline DataSetListIterator<T> DataSetListElement<T>::begin(void)
+inline DataSetListIterator<T> DataSetListElement<T>::begin()
 { return DataSetListIterator<T>(this, 0); }
 
 template<class T>
-inline DataSetListConstIterator<T> DataSetListElement<T>::begin(void) const
+inline DataSetListConstIterator<T> DataSetListElement<T>::begin() const
 { return DataSetListConstIterator<T>(this, 0); }
 
 template<class T>
-inline DataSetListConstIterator<T> DataSetListElement<T>::cbegin(void) const
+inline DataSetListConstIterator<T> DataSetListElement<T>::cbegin() const
 { return DataSetListConstIterator<T>(this, 0); }
 
 template<class T>
-inline DataSetListIterator<T> DataSetListElement<T>::end(void)
+inline DataSetListIterator<T> DataSetListElement<T>::end()
 { return DataSetListIterator<T>(this, NumChildren()); }
 
 template<class T>
-inline DataSetListConstIterator<T> DataSetListElement<T>::end(void) const
+inline DataSetListConstIterator<T> DataSetListElement<T>::end() const
 { return DataSetListConstIterator<T>(this, NumChildren()); }
 
 template<class T>
-inline DataSetListConstIterator<T>DataSetListElement<T>::cend(void) const
+inline DataSetListConstIterator<T>DataSetListElement<T>::cend() const
 { return DataSetListConstIterator<T>(this, NumChildren()); }
 
 // -------------------------
@@ -109,7 +109,7 @@ inline DataSetListIteratorBase<T>::DataSetListIteratorBase(const DataSetListElem
 { }
 
 template<class T>
-inline void DataSetListIteratorBase<T>::ReadNext(void)
+inline void DataSetListIteratorBase<T>::ReadNext()
 {
     if (index_ >= parent_->NumChildren()) {
         parent_ = nullptr;
@@ -128,15 +128,15 @@ inline DataSetListIterator<T>::DataSetListIterator(const DataSetListElement<T>* 
 { }
 
 template<class T>
-inline T& DataSetListIterator<T>::operator*(void)
+inline T& DataSetListIterator<T>::operator*()
 { return DataSetListIteratorBase<T>::parent_->template Child<T>(DataSetListIteratorBase<T>::index_); }
 
 template<class T>
-inline T* DataSetListIterator<T>::operator->(void)
+inline T* DataSetListIterator<T>::operator->()
 { return &(operator*()); }
 
 template<class T>
-inline DataSetListIterator<T>& DataSetListIterator<T>::operator++(void)
+inline DataSetListIterator<T>& DataSetListIterator<T>::operator++()
 { DataSetListIteratorBase<T>::ReadNext(); return *this; }
 
 template<class T>
@@ -157,15 +157,15 @@ inline DataSetListConstIterator<T>::DataSetListConstIterator(const DataSetListEl
 { }
 
 template<class T>
-inline const T& DataSetListConstIterator<T>::operator*(void) const
+inline const T& DataSetListConstIterator<T>::operator*() const
 { return DataSetListIteratorBase<T>::parent_->template Child<T>(DataSetListIteratorBase<T>::index_); }
 
 template<class T>
-inline const T* DataSetListConstIterator<T>::operator->(void) const
+inline const T* DataSetListConstIterator<T>::operator->() const
 { return &(operator*()); }
 
 template<class T>
-inline DataSetListConstIterator<T>& DataSetListConstIterator<T>::operator++(void)
+inline DataSetListConstIterator<T>& DataSetListConstIterator<T>::operator++()
 { DataSetListIteratorBase<T>::ReadNext(); return *this; }
 
 template<class T>

@@ -63,25 +63,25 @@ protected:
                    const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 
 public:
-    const std::string& CreatedAt(void) const;
-    const std::string& Description(void) const;
-    const PacBio::BAM::Extensions& Extensions(void) const;
-    const std::string& Format(void) const;
-    const std::string& ModifiedAt(void) const;
-    const std::string& Name(void) const;
-    const std::string& ResourceId(void) const;
-    const std::string& Tags(void) const;
-    const std::string& Version(void) const;
+    const std::string& CreatedAt() const;
+    const std::string& Description() const;
+    const PacBio::BAM::Extensions& Extensions() const;
+    const std::string& Format() const;
+    const std::string& ModifiedAt() const;
+    const std::string& Name() const;
+    const std::string& ResourceId() const;
+    const std::string& Tags() const;
+    const std::string& Version() const;
 
-    std::string& CreatedAt(void);
-    std::string& Description(void);
-    PacBio::BAM::Extensions& Extensions(void);
-    std::string& Format(void);
-    std::string& ModifiedAt(void);
-    std::string& Name(void);
-    std::string& ResourceId(void);
-    std::string& Tags(void);
-    std::string& Version(void);
+    std::string& CreatedAt();
+    std::string& Description();
+    PacBio::BAM::Extensions& Extensions();
+    std::string& Format();
+    std::string& ModifiedAt();
+    std::string& Name();
+    std::string& ResourceId();
+    std::string& Tags();
+    std::string& Version();
 
     BaseEntityType& CreatedAt(const std::string& createdAt);
     BaseEntityType& Description(const std::string& description);
@@ -101,21 +101,21 @@ protected:
                    const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 
 public:
-    const std::string& Checksum(void) const;
-    const std::string& EncodedValue(void) const;
-    const std::string& MetaType(void) const;
-    const std::string& SimpleValue(void) const;
-    const std::string& TimeStampedName(void) const;
-    const std::string& UniqueId(void) const;
-    const std::string& ValueDataType(void) const;
+    const std::string& Checksum() const;
+    const std::string& EncodedValue() const;
+    const std::string& MetaType() const;
+    const std::string& SimpleValue() const;
+    const std::string& TimeStampedName() const;
+    const std::string& UniqueId() const;
+    const std::string& ValueDataType() const;
 
-    std::string& Checksum(void);
-    std::string& EncodedValue(void);
-    std::string& MetaType(void);
-    std::string& SimpleValue(void);
-    std::string& TimeStampedName(void);
-    std::string& UniqueId(void);
-    std::string& ValueDataType(void);
+    std::string& Checksum();
+    std::string& EncodedValue();
+    std::string& MetaType();
+    std::string& SimpleValue();
+    std::string& TimeStampedName();
+    std::string& UniqueId();
+    std::string& ValueDataType();
 
     DataEntityType& Checksum(const std::string& checksum);
     DataEntityType& EncodedValue(const std::string& encodedValue);
@@ -134,13 +134,13 @@ protected:
                      const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 
 public:
-    const std::string& MetaType(void) const;
-    const std::string& TimeStampedName(void) const;
-    const std::string& UniqueId(void) const;
+    const std::string& MetaType() const;
+    const std::string& TimeStampedName() const;
+    const std::string& UniqueId() const;
 
-    std::string& MetaType(void);
-    std::string& TimeStampedName(void);
-    std::string& UniqueId(void);
+    std::string& MetaType();
+    std::string& TimeStampedName();
+    std::string& UniqueId();
 
     StrictEntityType& MetaType(const std::string& metatype);
     StrictEntityType& TimeStampedName(const std::string& timeStampedName);
@@ -165,8 +165,8 @@ protected:
                     const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 
 public:
-    const PacBio::BAM::FileIndices& FileIndices(void) const;
-    PacBio::BAM::FileIndices& FileIndices(void);
+    const PacBio::BAM::FileIndices& FileIndices() const;
+    PacBio::BAM::FileIndices& FileIndices();
     IndexedDataType& FileIndices(const PacBio::BAM::FileIndices& indices);
 };
 

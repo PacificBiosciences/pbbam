@@ -35,25 +35,28 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include <gtest/gtest.h>
-#include <pbbam/BamRecord.h>
-#include <pbbam/BamTagCodec.h>
 #include <array>
+#include <cstdint>
+#include <cstddef>
 #include <initializer_list>
 #include <string>
 #include <vector>
+
+#include <gtest/gtest.h>
+
+#define private public
+
+#include <pbbam/BamRecord.h>
+#include <pbbam/BamTagCodec.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-namespace tests {
+namespace BamRecordTests {
 
 static
-BamRecordImpl CreateBamImpl(void)
+BamRecordImpl CreateBamImpl()
 {
     TagCollection tags;
     tags["HX"] = string("1abc75");
@@ -75,7 +78,7 @@ BamRecordImpl CreateBamImpl(void)
 }
 
 static inline
-BamRecord CreateBam(void)
+BamRecord CreateBam()
 { return BamRecord{ CreateBamImpl() }; }
 
 static
@@ -255,18 +258,18 @@ public:
         assert(12 == init.size());
     }
 
-    T ForwardGenomic(void) const               { return d_.at(0); }
-    T ForwardNative(void) const                { return d_.at(1); }
-    T ForwardGenomicAligned(void) const        { return d_.at(2); }
-    T ForwardNativeAligned(void) const         { return d_.at(3); }
-    T ForwardGenomicAlignedClipped(void) const { return d_.at(4); }
-    T ForwardNativeAlignedClipped(void) const  { return d_.at(5); }
-    T ReverseGenomic(void) const               { return d_.at(6); }
-    T ReverseNative(void) const                { return d_.at(7); }
-    T ReverseGenomicAligned(void) const        { return d_.at(8); }
-    T ReverseNativeAligned(void) const         { return d_.at(9); }
-    T ReverseGenomicAlignedClipped(void) const { return d_.at(10); }
-    T ReverseNativeAlignedClipped(void) const  { return d_.at(11); }
+    T ForwardGenomic() const               { return d_.at(0); }
+    T ForwardNative() const                { return d_.at(1); }
+    T ForwardGenomicAligned() const        { return d_.at(2); }
+    T ForwardNativeAligned() const         { return d_.at(3); }
+    T ForwardGenomicAlignedClipped() const { return d_.at(4); }
+    T ForwardNativeAlignedClipped() const  { return d_.at(5); }
+    T ReverseGenomic() const               { return d_.at(6); }
+    T ReverseNative() const                { return d_.at(7); }
+    T ReverseGenomicAligned() const        { return d_.at(8); }
+    T ReverseNativeAligned() const         { return d_.at(9); }
+    T ReverseGenomicAlignedClipped() const { return d_.at(10); }
+    T ReverseNativeAlignedClipped() const  { return d_.at(11); }
 
 private:
     vector<T> d_;
@@ -276,7 +279,7 @@ private:
 template<typename DataType, typename MakeRecordType, typename FetchDataType>
 void CheckAlignAndClip(const string& cigar,
                        const DataType& input,
-                       const tests::ExpectedResult<DataType>& e,
+                       const BamRecordTests::ExpectedResult<DataType>& e,
                        const MakeRecordType& makeRecord,
                        const FetchDataType& fetchData)
 {
@@ -305,8 +308,8 @@ void CheckPulseDataAlignAndClip(const string& cigar,
                                 const string& seqBases,
                                 const string& pulseCalls,
                                 const DataType& input,
-                                const tests::ExpectedResult<DataType>& allPulses,
-                                const tests::ExpectedResult<DataType>& basecallsOnly,
+                                const BamRecordTests::ExpectedResult<DataType>& allPulses,
+                                const BamRecordTests::ExpectedResult<DataType>& basecallsOnly,
                                 const MakeRecordType& makeRecord,
                                 const FetchDataType& fetchData)
 {
@@ -380,7 +383,7 @@ void CheckFrameTagsClippedAndAligned(const string& cigar,
     auto makeRecord = [](const vector<uint16_t>& frames,
                          const string& cigar,
                          const Strand strand)
-    { return tests::MakeCigaredFrameRecord(frames, cigar, strand); };
+    { return BamRecordTests::MakeCigaredFrameRecord(frames, cigar, strand); };
 
     // IPD
     CheckAlignAndClip(cigar, input, e, makeRecord,
@@ -410,7 +413,7 @@ void CheckQualityTagsClippedAndAligned(const string& cigar,
     auto makeRecord = [](const string& quals,
                          const string& cigar,
                          const Strand strand)
-    { return tests::MakeCigaredQualRecord(quals, cigar, strand); };
+    { return BamRecordTests::MakeCigaredQualRecord(quals, cigar, strand); };
 
     // DeletionQV
     CheckAlignAndClip(cigar, input, e, makeRecord,
@@ -460,7 +463,7 @@ void CheckQualitiesClippedAndAligned(const string& cigar,
                          const Strand strand)
     {
         const string seq = string(quals.size(), 'N');
-        auto record = tests::MakeCigaredRecord(seq, cigar, strand);
+        auto record = BamRecordTests::MakeCigaredRecord(seq, cigar, strand);
         record.Impl().SetSequenceAndQualities(seq, quals);
         return record;
     };
@@ -484,7 +487,7 @@ void CheckSequenceClippedAndAligned(const string& cigar,
     auto makeRecord = [](const string& seq,
                          const string& cigar,
                          const Strand strand)
-    { return tests::MakeCigaredRecord(seq, cigar, strand); };
+    { return BamRecordTests::MakeCigaredRecord(seq, cigar, strand); };
 
     // SEQ
     CheckAlignAndClip(cigar, input, e, makeRecord,
@@ -650,7 +653,7 @@ void CheckPulseUIntTags(const string& cigar,
 
 
 
-} // namespace tests
+} // namespace BamRecordTests
 
 TEST(BamRecordTest, DefaultValues)
 {
@@ -717,13 +720,13 @@ TEST(BamRecordTest, DefaultValues)
     EXPECT_THROW(bam.SubstitutionTag(), std::exception);
 
     // raw data
-    tests::CheckRawData(bam);
+    BamRecordTests::CheckRawData(bam);
 }
 
 TEST(BamRecordTest, FromBamRecordImpl)
 {
     // check generic data
-    BamRecordImpl genericBam = tests::CreateBamImpl();
+    BamRecordImpl genericBam = BamRecordTests::CreateBamImpl();
 
     EXPECT_EQ(42, genericBam.Bin());
     EXPECT_EQ(42, genericBam.Flag());
@@ -789,7 +792,7 @@ TEST(BamRecordTest, FromBamRecordImpl)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpessimizing-move"
 #endif
-    BamRecord bam3(move(tests::CreateBamImpl()));
+    BamRecord bam3(move(BamRecordTests::CreateBamImpl()));
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
@@ -815,7 +818,7 @@ TEST(BamRecordTest, FromBamRecordImpl)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpessimizing-move"
 #endif
-    bam4 = move(tests::CreateBamImpl());
+    bam4 = move(BamRecordTests::CreateBamImpl());
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
@@ -872,13 +875,13 @@ TEST(BamRecordTest, SelfAssignmentTolerated)
     EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags1.at("XY").ToInt32());
     EXPECT_EQ(vector<uint8_t>({34, 5, 125}), fetchedTags1.at("CA").ToUInt8Array());
 
-    tests::CheckRawData(bam1);
+    BamRecordTests::CheckRawData(bam1);
 }
 
 TEST(BamRecordTest, CoreSetters)
 {
     // create basic BAM with (generic) data
-    BamRecord bam = tests::CreateBam();
+    BamRecord bam = BamRecordTests::CreateBam();
 
     QualityValues testQVs;
     testQVs.push_back(0);
@@ -938,14 +941,14 @@ TEST(BamRecordTest, CoreSetters)
     EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags.at("XY").ToInt32());
     EXPECT_EQ(vector<uint8_t>({34, 5, 125}), fetchedTags.at("CA").ToUInt8Array());
 
-    tests::CheckRawData(bam);
+    BamRecordTests::CheckRawData(bam);
 }
 
 TEST(BamRecordTest, SequenceOrientation)
 {
     {
         SCOPED_TRACE("Simple CIGAR Sequence");
-        tests::CheckSequenceClippedAndAligned(
+        BamRecordTests::CheckSequenceClippedAndAligned(
             "13=",                  // CIGAR
             "ATATATCCCGGCG",        // input
             {
@@ -970,7 +973,7 @@ TEST(BamRecordTest, QualitiesOrientation)
 {
     {
         SCOPED_TRACE("Simple CIGAR Qualities");
-        tests::CheckQualitiesClippedAndAligned(
+        BamRecordTests::CheckQualitiesClippedAndAligned(
             "13=",                  // CIGAR
             "?]?]?]?]?]?]*",        // input
             {
@@ -995,7 +998,7 @@ TEST(BamRecordTest, SequenceTagsOrientation)
 {
     {
         SCOPED_TRACE("Simple CIGAR Base Tags");
-        tests::CheckBaseTagsClippedAndAligned(
+        BamRecordTests::CheckBaseTagsClippedAndAligned(
             "13=",                  // CIGAR
             "ATATATCCCGGCG",        // input
             {
@@ -1020,7 +1023,7 @@ TEST(BamRecordTest, FrameTagsOrientation)
 {
     {
         SCOPED_TRACE("Simple CIGAR Frames");
-        tests::CheckFrameTagsClippedAndAligned(
+        BamRecordTests::CheckFrameTagsClippedAndAligned(
             "5=",                   // CIGAR
             { 0, 1, 2, 3, 4 },      // input
             {
@@ -1045,7 +1048,7 @@ TEST(BamRecordTest, QualityTagsOrientation)
 {
     {
         SCOPED_TRACE("Simple CIGAR Quality Tags");
-        tests::CheckQualityTagsClippedAndAligned(
+        BamRecordTests::CheckQualityTagsClippedAndAligned(
             "13=",                  // CIGAR
             "?]?]?]?]?]?]*",        // input
             {
@@ -1070,7 +1073,7 @@ TEST(BamRecordTest, SequenceClippedAndAligned)
 {
     {
         SCOPED_TRACE("CIGAR: 10=");
-        tests::CheckSequenceClippedAndAligned(
+        BamRecordTests::CheckSequenceClippedAndAligned(
             "10=",              // CIGAR
             "ATCCGCGGTT",       // input
             {
@@ -1091,7 +1094,7 @@ TEST(BamRecordTest, SequenceClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 3=4N3=");
-        tests::CheckSequenceClippedAndAligned(
+        BamRecordTests::CheckSequenceClippedAndAligned(
             "3=4N3=",       // CIGAR
             "ACGTTT",        // input
             {
@@ -1112,7 +1115,7 @@ TEST(BamRecordTest, SequenceClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 1S8=1S");
-        tests::CheckSequenceClippedAndAligned(
+        BamRecordTests::CheckSequenceClippedAndAligned(
             "1S8=1S",           // CIGAR
             "ACCCGCGGTT",       // input
             {
@@ -1133,7 +1136,7 @@ TEST(BamRecordTest, SequenceClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 1H8=1H");
-        tests::CheckSequenceClippedAndAligned(
+        BamRecordTests::CheckSequenceClippedAndAligned(
             "1H8=1H",           // CIGAR
             "ATCGCGGT",         // input
             {
@@ -1154,7 +1157,7 @@ TEST(BamRecordTest, SequenceClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 2S6=2S");
-        tests::CheckSequenceClippedAndAligned(
+        BamRecordTests::CheckSequenceClippedAndAligned(
             "2S6=2S",           // CIGAR
             "AGCCGCGGTT",       // input
             {
@@ -1175,7 +1178,7 @@ TEST(BamRecordTest, SequenceClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 2S3=2I3=2S");
-        tests::CheckSequenceClippedAndAligned(
+        BamRecordTests::CheckSequenceClippedAndAligned(
             "2S3=2I3=2S",           // CIGAR
             "ATCCGNNCGGTT",         // input
             {
@@ -1196,7 +1199,7 @@ TEST(BamRecordTest, SequenceClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 2H6=2H");
-        tests::CheckSequenceClippedAndAligned(
+        BamRecordTests::CheckSequenceClippedAndAligned(
             "2H6=2H",       // CIGAR
             "CAGCGG",       // input
             {
@@ -1221,7 +1224,7 @@ TEST(BamRecordTest, ClippingOrientationAndAlignment)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
-        tests::CheckSequenceClippedAndAligned(
+        BamRecordTests::CheckSequenceClippedAndAligned(
             "4=3D4=",           // CIGAR
             "AACCGTTA",         // input
             {
@@ -1242,7 +1245,7 @@ TEST(BamRecordTest, ClippingOrientationAndAlignment)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
-        tests::CheckSequenceClippedAndAligned(
+        BamRecordTests::CheckSequenceClippedAndAligned(
             "4=1D2I2D4=",           // CIGAR
             "ATCCTAGGTT",           // input
             {
@@ -1263,7 +1266,7 @@ TEST(BamRecordTest, ClippingOrientationAndAlignment)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
-        tests::CheckSequenceClippedAndAligned(
+        BamRecordTests::CheckSequenceClippedAndAligned(
             "4=1D2P2I2P2D4=",           // CIGAR
             "ATCCTAGGTT",               // input
             {
@@ -1284,7 +1287,7 @@ TEST(BamRecordTest, ClippingOrientationAndAlignment)
     }
     {
         SCOPED_TRACE("CIGAR: 2S4=3D4=3S");
-        tests::CheckSequenceClippedAndAligned(
+        BamRecordTests::CheckSequenceClippedAndAligned(
             "2S4=3D4=3S",               // CIGAR
             "TTAACCGTTACCG",            // input
             {
@@ -1305,7 +1308,7 @@ TEST(BamRecordTest, ClippingOrientationAndAlignment)
     }
     {
         SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
-        tests::CheckSequenceClippedAndAligned(
+        BamRecordTests::CheckSequenceClippedAndAligned(
             "2H4=3D4=3H",       // CIGAR
             "AACCGTTA",         // input
             {
@@ -1326,7 +1329,7 @@ TEST(BamRecordTest, ClippingOrientationAndAlignment)
     }
     {
         SCOPED_TRACE("CIGAR: 2H2S4=3D4=3S3H");
-        tests::CheckSequenceClippedAndAligned(
+        BamRecordTests::CheckSequenceClippedAndAligned(
             "2H2S4=3D4=3S3H",           // CIGAR
             "TTAACCGTTACCG",            // input
             {
@@ -1351,7 +1354,7 @@ TEST(BamRecordTest, QualityTagsClippedAndAligned)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
-        tests::CheckQualityTagsClippedAndAligned(
+        BamRecordTests::CheckQualityTagsClippedAndAligned(
             "4=3D4=",           // CIGAR
             "?]?]?]?@",         // input
             {
@@ -1372,7 +1375,7 @@ TEST(BamRecordTest, QualityTagsClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
-        tests::CheckQualityTagsClippedAndAligned(
+        BamRecordTests::CheckQualityTagsClippedAndAligned(
             "4=1D2I2D4=",           // CIGAR
             "?]?]87?]?@",           // input
             {
@@ -1393,7 +1396,7 @@ TEST(BamRecordTest, QualityTagsClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
-        tests::CheckQualityTagsClippedAndAligned(
+        BamRecordTests::CheckQualityTagsClippedAndAligned(
             "4=1D2P2I2P2D4=",       // CIGAR
             "?]?]87?]?@",           // input
         {
@@ -1414,7 +1417,7 @@ TEST(BamRecordTest, QualityTagsClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 3S4=3D4=3S");
-        tests::CheckQualityTagsClippedAndAligned(
+        BamRecordTests::CheckQualityTagsClippedAndAligned(
             "3S4=3D4=3S",               // CIGAR
             "vvv?]?]?]?@xxx",           // input
             {
@@ -1435,7 +1438,7 @@ TEST(BamRecordTest, QualityTagsClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
-        tests::CheckQualityTagsClippedAndAligned(
+        BamRecordTests::CheckQualityTagsClippedAndAligned(
             "2H4=3D4=3H",       // CIGAR
             "?]?]?]?@",         // input
             {
@@ -1456,7 +1459,7 @@ TEST(BamRecordTest, QualityTagsClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 2H3S4=3D4=3S3H");
-        tests::CheckQualityTagsClippedAndAligned(
+        BamRecordTests::CheckQualityTagsClippedAndAligned(
             "2H3S4=3D4=3S3H",           // CIGAR
             "vvv?]?]?]?@xxx",           // input
             {
@@ -1481,7 +1484,7 @@ TEST(BamRecordTest, BaseTagsClippedAndAligned)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
-        tests::CheckBaseTagsClippedAndAligned(
+        BamRecordTests::CheckBaseTagsClippedAndAligned(
             "4=3D4=",           // CIGAR
             "AACCGTTA",         // input
             {
@@ -1502,7 +1505,7 @@ TEST(BamRecordTest, BaseTagsClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
-        tests::CheckBaseTagsClippedAndAligned(
+        BamRecordTests::CheckBaseTagsClippedAndAligned(
             "4=1D2I2D4=",           // CIGAR
             "ATCCTAGGTT",           // input
             {
@@ -1523,7 +1526,7 @@ TEST(BamRecordTest, BaseTagsClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
-        tests::CheckBaseTagsClippedAndAligned(
+        BamRecordTests::CheckBaseTagsClippedAndAligned(
             "4=1D2P2I2P2D4=",           // CIGAR
             "ATCCTAGGTT",               // input
             {
@@ -1544,7 +1547,7 @@ TEST(BamRecordTest, BaseTagsClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 3S4=3D4=3S");
-        tests::CheckBaseTagsClippedAndAligned(
+        BamRecordTests::CheckBaseTagsClippedAndAligned(
             "3S4=3D4=3S",               // CIGAR
             "TTTAACCGTTACCG",           // input
             {
@@ -1565,7 +1568,7 @@ TEST(BamRecordTest, BaseTagsClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
-        tests::CheckBaseTagsClippedAndAligned(
+        BamRecordTests::CheckBaseTagsClippedAndAligned(
             "2H4=3D4=3H",       // CIGAR
             "AACCGTTA",         // input
             {
@@ -1586,7 +1589,7 @@ TEST(BamRecordTest, BaseTagsClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 2H3S4=3D4=3S3H");
-        tests::CheckBaseTagsClippedAndAligned(
+        BamRecordTests::CheckBaseTagsClippedAndAligned(
             "2H3S4=3D4=3S3H",           // CIGAR
             "TTTAACCGTTACCG",           // input
             {
@@ -1611,7 +1614,7 @@ TEST(BamRecordTest, FrameTagsClippedAndAligned)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
-        tests::CheckFrameTagsClippedAndAligned(
+        BamRecordTests::CheckFrameTagsClippedAndAligned(
             "4=3D4=",                                           // CIGAR
             { 10, 20, 10, 20, 10, 20, 10, 30 },                 // input
             {
@@ -1632,7 +1635,7 @@ TEST(BamRecordTest, FrameTagsClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
-        tests::CheckFrameTagsClippedAndAligned(
+        BamRecordTests::CheckFrameTagsClippedAndAligned(
             "4=1D2I2D4=",                                               // CIGAR
             { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },                 // input
             {
@@ -1653,7 +1656,7 @@ TEST(BamRecordTest, FrameTagsClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
-        tests::CheckFrameTagsClippedAndAligned(
+        BamRecordTests::CheckFrameTagsClippedAndAligned(
             "4=1D2P2I2P2D4=",                                                   // CIGAR
             { 10, 20, 10, 20, 80, 70, 10, 20, 10, 30 },                         // input
         {
@@ -1674,7 +1677,7 @@ TEST(BamRecordTest, FrameTagsClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 3S4=3D4=3S");
-        tests::CheckFrameTagsClippedAndAligned(
+        BamRecordTests::CheckFrameTagsClippedAndAligned(
             "3S4=3D4=3S",                                                               // CIGAR
             { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },                 // input
             {
@@ -1695,7 +1698,7 @@ TEST(BamRecordTest, FrameTagsClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
-        tests::CheckFrameTagsClippedAndAligned(
+        BamRecordTests::CheckFrameTagsClippedAndAligned(
             "2H4=3D4=3H",                                       // CIGAR
             { 10, 20, 10, 20, 10, 20, 10, 30 },                 // input
             {
@@ -1716,7 +1719,7 @@ TEST(BamRecordTest, FrameTagsClippedAndAligned)
     }
     {
         SCOPED_TRACE("CIGAR: 2H3S4=3D4=3S3H");
-        tests::CheckFrameTagsClippedAndAligned(
+        BamRecordTests::CheckFrameTagsClippedAndAligned(
             "2H3S4=3D4=3S3H",                                                           // CIGAR
             { 40, 40, 40, 10, 20, 10, 20, 10, 20, 10, 30, 50, 50, 50 },                 // input
             {
@@ -1741,7 +1744,7 @@ TEST(BamRecordTest, PulseBaseTags)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
-        tests::CheckPulseBaseTags(
+        BamRecordTests::CheckPulseBaseTags(
             "4=3D4=",           // CIGAR
             "AACCGTTA",         // seqBases
             "AAaaCCGggTTA",     // pulseCalls
@@ -1781,7 +1784,7 @@ TEST(BamRecordTest, PulseBaseTags)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
-        tests::CheckPulseBaseTags(
+        BamRecordTests::CheckPulseBaseTags(
             "4=1D2I2D4=",       // CIGAR
             "ATCCTAGGTT",       // seqBases
             "ATttCCTtAGGggTT",  // pulseCalls
@@ -1821,7 +1824,7 @@ TEST(BamRecordTest, PulseBaseTags)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
-        tests::CheckPulseBaseTags(
+        BamRecordTests::CheckPulseBaseTags(
             "4=1D2P2I2P2D4=",   // CIGAR
             "ATCCTAGGTT",       // seqBases
             "ATttCCTtAGGggTT",  // pulseCalls
@@ -1858,7 +1861,7 @@ TEST(BamRecordTest, PulseBaseTags)
     }
     {
         SCOPED_TRACE("CIGAR: 3S4=3D4=3S");
-        tests::CheckPulseBaseTags(
+        BamRecordTests::CheckPulseBaseTags(
             "3S4=3D4=3S",               // CIGAR
             "TTTAACCGTTACCG",           // seqBases
             "TTTttAACCccGTTAaaCCG",     // pulseCalls
@@ -1898,7 +1901,7 @@ TEST(BamRecordTest, PulseBaseTags)
     }
     {
         SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
-        tests::CheckPulseBaseTags(
+        BamRecordTests::CheckPulseBaseTags(
             "2H4=3D4=3H",       // CIGAR
             "AACCGTTA",         // seqBases
             "AAaaCCGggTTA",     // pulseCalls
@@ -1938,7 +1941,7 @@ TEST(BamRecordTest, PulseBaseTags)
     }
     {
         SCOPED_TRACE("CIGAR: 2H3S4=3D4=3S3H");
-        tests::CheckPulseBaseTags(
+        BamRecordTests::CheckPulseBaseTags(
             "2H3S4=3D4=3S3H",           // CIGAR
             "TTTAACCGTTACCG",           // seqBases
             "TTTttAACCccGTTAaaCCG",     // pulseCalls
@@ -1982,7 +1985,7 @@ TEST(BamRecordTest, PulseQualityTags)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
-        tests::CheckPulseQualityTags(
+        BamRecordTests::CheckPulseQualityTags(
             "4=3D4=",           // CIGAR
             "AACCGTTA",         // seqBases
             "AAaaCCGggTTA",     // pulseCalls
@@ -2022,7 +2025,7 @@ TEST(BamRecordTest, PulseQualityTags)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
-        tests::CheckPulseQualityTags(
+        BamRecordTests::CheckPulseQualityTags(
             "4=1D2I2D4=",       // CIGAR
             "ATCCTAGGTT",       // seqBases
             "ATttCCTtAGGggTT",  // pulseCalls
@@ -2062,7 +2065,7 @@ TEST(BamRecordTest, PulseQualityTags)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
-        tests::CheckPulseQualityTags(
+        BamRecordTests::CheckPulseQualityTags(
             "4=1D2P2I2P2D4=",   // CIGAR
             "ATCCTAGGTT",       // seqBases
             "ATttCCTtAGGggTT",  // pulseCalls
@@ -2099,7 +2102,7 @@ TEST(BamRecordTest, PulseQualityTags)
     }
     {
         SCOPED_TRACE("CIGAR: 3S4=3D4=3S");
-        tests::CheckPulseQualityTags(
+        BamRecordTests::CheckPulseQualityTags(
             "3S4=3D4=3S",               // CIGAR
             "TTTAACCGTTACCG",           // seqBases
             "TTTttAACCccGTTAaaCCG",     // pulseCalls
@@ -2139,7 +2142,7 @@ TEST(BamRecordTest, PulseQualityTags)
     }
     {
         SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
-        tests::CheckPulseQualityTags(
+        BamRecordTests::CheckPulseQualityTags(
             "2H4=3D4=3H",       // CIGAR
             "AACCGTTA",         // seqBases
             "AAaaCCGggTTA",     // pulseCalls
@@ -2179,7 +2182,7 @@ TEST(BamRecordTest, PulseQualityTags)
     }
     {
         SCOPED_TRACE("CIGAR: 2H3S4=3D4=3S3H");
-        tests::CheckPulseQualityTags(
+        BamRecordTests::CheckPulseQualityTags(
             "2H3S4=3D4=3S3H",           // CIGAR
             "TTTAACCGTTACCG",           // seqBases
             "TTTttAACCccGTTAaaCCG",     // pulseCalls
@@ -2223,7 +2226,7 @@ TEST(BamRecordTest, PulseFrameTags)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
-        tests::CheckPulseFrameTags(
+        BamRecordTests::CheckPulseFrameTags(
             "4=3D4=",       // CIGAR
             "AACCGTTA",     // seqBases
             "AAaaCCGggTTA", // pulseCalls
@@ -2263,7 +2266,7 @@ TEST(BamRecordTest, PulseFrameTags)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
-        tests::CheckPulseFrameTags(
+        BamRecordTests::CheckPulseFrameTags(
             "4=1D2I2D4=",       // CIGAR
             "ATCCTAGGTT",       // seqBases
             "ATttCCTtAGGggTT",  // pulseCalls
@@ -2303,7 +2306,7 @@ TEST(BamRecordTest, PulseFrameTags)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
-        tests::CheckPulseFrameTags(
+        BamRecordTests::CheckPulseFrameTags(
             "4=1D2P2I2P2D4=",   // CIGAR
             "ATCCTAGGTT",       // seqBases
             "ATttCCTtAGGggTT",  // pulseCalls
@@ -2343,7 +2346,7 @@ TEST(BamRecordTest, PulseFrameTags)
     }
     {
         SCOPED_TRACE("CIGAR: 3S4=3D4=3S");
-        tests::CheckPulseFrameTags(
+        BamRecordTests::CheckPulseFrameTags(
             "3S4=3D4=3S",               // CIGAR
             "TTTAACCGTTACCG",           // seqBases
             "TTTttAACCccGTTAaaCCG",     // pulseCalls
@@ -2383,7 +2386,7 @@ TEST(BamRecordTest, PulseFrameTags)
     }
     {
         SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
-        tests::CheckPulseFrameTags(
+        BamRecordTests::CheckPulseFrameTags(
             "2H4=3D4=3H",       // CIGAR
             "AACCGTTA",         // seqBases
             "AAaaCCGggTTA",     // pulseCalls
@@ -2423,7 +2426,7 @@ TEST(BamRecordTest, PulseFrameTags)
     }
     {
         SCOPED_TRACE("CIGAR: 2H3S4=3D4=3S3H");
-        tests::CheckPulseFrameTags(
+        BamRecordTests::CheckPulseFrameTags(
             "2H3S4=3D4=3S3H",           // CIGAR
             "TTTAACCGTTACCG",           // seqBases
             "TTTttAACCccGTTAaaCCG",     // pulseCalls
@@ -2467,7 +2470,7 @@ TEST(BamRecordTest, PulseUIntTags)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
-        tests::CheckPulseUIntTags(
+        BamRecordTests::CheckPulseUIntTags(
             "4=3D4=",       // CIGAR
             "AACCGTTA",     // seqBases
             "AAaaCCGggTTA", // pulseCalls
@@ -2507,7 +2510,7 @@ TEST(BamRecordTest, PulseUIntTags)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2I2D4=");
-        tests::CheckPulseUIntTags(
+        BamRecordTests::CheckPulseUIntTags(
             "4=1D2I2D4=",       // CIGAR
             "ATCCTAGGTT",       // seqBases
             "ATttCCTtAGGggTT",  // pulseCalls
@@ -2547,7 +2550,7 @@ TEST(BamRecordTest, PulseUIntTags)
     }
     {
         SCOPED_TRACE("CIGAR: 4=1D2P2I2P2D4=");
-        tests::CheckPulseUIntTags(
+        BamRecordTests::CheckPulseUIntTags(
             "4=1D2P2I2P2D4=",   // CIGAR
             "ATCCTAGGTT",       // seqBases
             "ATttCCTtAGGggTT",  // pulseCalls
@@ -2587,7 +2590,7 @@ TEST(BamRecordTest, PulseUIntTags)
     }
     {
         SCOPED_TRACE("CIGAR: 3S4=3D4=3S");
-        tests::CheckPulseUIntTags(
+        BamRecordTests::CheckPulseUIntTags(
             "3S4=3D4=3S",               // CIGAR
             "TTTAACCGTTACCG",           // seqBases
             "TTTttAACCccGTTAaaCCG",     // pulseCalls
@@ -2627,7 +2630,7 @@ TEST(BamRecordTest, PulseUIntTags)
     }
     {
         SCOPED_TRACE("CIGAR: 2H4=3D4=3H");
-        tests::CheckPulseUIntTags(
+        BamRecordTests::CheckPulseUIntTags(
             "2H4=3D4=3H",       // CIGAR
             "AACCGTTA",         // seqBases
             "AAaaCCGggTTA",     // pulseCalls
@@ -2667,7 +2670,7 @@ TEST(BamRecordTest, PulseUIntTags)
     }
     {
         SCOPED_TRACE("CIGAR: 2H3S4=3D4=3S3H");
-        tests::CheckPulseUIntTags(
+        BamRecordTests::CheckPulseUIntTags(
             "2H3S4=3D4=3S3H",           // CIGAR
             "TTTAACCGTTACCG",           // seqBases
             "TTTttAACCccGTTAaaCCG",     // pulseCalls
@@ -2705,4 +2708,25 @@ TEST(BamRecordTest, PulseUIntTags)
             }
         );
     }
+}
+
+TEST(BamRecordTest, PulseExclusionTag)
+{
+    const std::vector<PacBio::BAM::PulseExclusionReason> reasons =
+    {
+        PulseExclusionReason::BASE
+      , PulseExclusionReason::PAUSE
+      , PulseExclusionReason::SHORT_PULSE
+      , PulseExclusionReason::BURST
+      , PulseExclusionReason::BASE
+      , PulseExclusionReason::PAUSE
+    };
+
+    auto bam = BamRecordTests::CreateBam();
+    bam.PulseExclusionReason(reasons);
+
+    EXPECT_TRUE(bam.HasPulseExclusion());
+    auto result = bam.PulseExclusionReason();
+    EXPECT_EQ(reasons, result);
+
 }

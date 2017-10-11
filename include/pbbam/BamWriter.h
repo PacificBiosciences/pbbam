@@ -47,6 +47,8 @@
 #include "pbbam/Config.h"
 #include "pbbam/IRecordWriter.h"
 #include <htslib/sam.h>
+#include <cstddef>
+#include <cstdint>
 #include <string>
 
 namespace PacBio {
@@ -153,7 +155,14 @@ public:
               const BinCalculationMode binCalculationMode = BamWriter::BinCalculation_ON);
 
     /// Fully flushes all buffered data & closes file.
-    ~BamWriter(void);
+    ~BamWriter() override;
+
+    /// Copy and Move constructors are disabled
+    BamWriter(const BamWriter&) = delete;
+    BamWriter& operator=(const BamWriter&) = delete;
+
+    BamWriter(BamWriter&&) = delete;
+    BamWriter& operator=(BamWriter&&) = delete;
 
     /// \}
 
@@ -170,7 +179,7 @@ public:
     ///
     /// \throws std::runtime_error if flush fails
     ///
-    void TryFlush(void);
+    void TryFlush() override;
 
     /// \brief Write a record to the output %BAM file.
     ///
@@ -178,7 +187,7 @@ public:
     ///
     /// \throws std::runtime_error on failure to write
     ///
-    void Write(const BamRecord& record);
+    void Write(const BamRecord& record) override;
 
     /// \brief Write a record to the output %BAM file.
     ///
@@ -195,13 +204,12 @@ public:
     ///
     /// \throws std::runtime_error on failure to write
     ///
-    void Write(const BamRecordImpl& recordImpl);
+    void Write(const BamRecordImpl& recordImpl) override;
 
     /// \}
 
 private:
     std::unique_ptr<internal::BamWriterPrivate> d_;
-    DISABLE_MOVE_AND_COPY(BamWriter);
 };
 
 } // namespace BAM

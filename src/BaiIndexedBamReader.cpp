@@ -39,6 +39,10 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
+#include <cstddef>
+
 #include "pbbam/BaiIndexedBamReader.h"
 #include "MemoryUtils.h"
 
@@ -115,7 +119,7 @@ BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval,
     , d_(new internal::BaiIndexedBamReaderPrivate(File(), interval))
 { }
 
-const GenomicInterval& BaiIndexedBamReader::Interval(void) const
+const GenomicInterval& BaiIndexedBamReader::Interval() const
 {
     assert(d_);
     return d_->interval_;

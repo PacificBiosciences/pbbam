@@ -39,12 +39,16 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/ZmwGroupQuery.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/CompositeBamReader.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiFilterTypes.h"
 #include "MemoryUtils.h"
 #include <algorithm>
+#include <cstdint>
 #include <deque>
 
 namespace PacBio {
@@ -52,8 +56,7 @@ namespace BAM {
 
 struct ZmwGroupQuery::ZmwGroupQueryPrivate
 {
-    typedef PbiFilterCompositeBamReader<Compare::Zmw> ReaderType;
-    typedef std::unique_ptr<ReaderType> ReaderPtr;
+    using ReaderType = PbiFilterCompositeBamReader<Compare::Zmw>;
 
     ZmwGroupQueryPrivate(const std::vector<int32_t>& zmwWhitelist,
                          const DataSet& dataset)
@@ -66,7 +69,7 @@ struct ZmwGroupQuery::ZmwGroupQueryPrivate
                          whitelist_.end());
 
         if (!whitelist_.empty()) {
-            reader_ = ReaderPtr(new ReaderType(PbiZmwFilter{whitelist_.front()}, dataset));
+            reader_ = std::make_unique<ReaderType>(PbiZmwFilter{whitelist_.front()}, dataset);
             whitelist_.pop_front();
         }
     }
@@ -96,7 +99,7 @@ struct ZmwGroupQuery::ZmwGroupQueryPrivate
     }
 
     std::deque<int32_t> whitelist_;
-    ReaderPtr reader_;
+    std::unique_ptr<ReaderType> reader_;
 };
 
 ZmwGroupQuery::ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist,
@@ -105,7 +108,7 @@ ZmwGroupQuery::ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist,
     , d_(new ZmwGroupQueryPrivate(zmwWhitelist, dataset))
 { }
 
-ZmwGroupQuery::~ZmwGroupQuery(void) { }
+ZmwGroupQuery::~ZmwGroupQuery() { }
 
 bool ZmwGroupQuery::GetNext(std::vector<BamRecord>& records)
 { return d_->GetNext(records); }

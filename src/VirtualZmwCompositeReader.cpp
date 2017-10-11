@@ -39,7 +39,10 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "VirtualZmwCompositeReader.h"
+#include "pbbam/MakeUnique.h"
 #include <boost/algorithm/string.hpp>
 
 namespace PacBio {
@@ -68,8 +71,8 @@ VirtualZmwCompositeReader::VirtualZmwCompositeReader(const DataSet& dataset)
             primaryFn = dataset.ResolvePath(resource.ResourceId());
 
             // check for associated scraps file
-            const ExternalResources& childResources = resource.ExternalResources();
-            for (const ExternalResource& childResource : childResources) {
+            const auto& childResources = resource.ExternalResources();
+            for (const auto& childResource : childResources) {
                 const auto& childMetatype = childResource.MetaType();
                 if (childMetatype == "PacBio.SubreadFile.ScrapsBamFile" ||
                     childMetatype == "PacBio.SubreadFile.HqScrapsBamFile")
@@ -83,19 +86,19 @@ VirtualZmwCompositeReader::VirtualZmwCompositeReader(const DataSet& dataset)
 
         // queue up source for later
         if (!primaryFn.empty() && !scrapsFn.empty())
-            sources_.push_back(make_pair(primaryFn,scrapsFn));
+            sources_.emplace_back(std::make_pair(primaryFn,scrapsFn));
     }
 
     // open first available source
     OpenNextReader();
 }
 
-bool VirtualZmwCompositeReader::HasNext(void)
+bool VirtualZmwCompositeReader::HasNext()
 {
     return (currentReader_ && currentReader_->HasNext());
 }
 
-VirtualZmwBamRecord VirtualZmwCompositeReader::Next(void)
+VirtualZmwBamRecord VirtualZmwCompositeReader::Next()
 {
     if (currentReader_) {
         const auto result = currentReader_->Next();
@@ -112,7 +115,7 @@ VirtualZmwBamRecord VirtualZmwCompositeReader::Next(void)
     throw std::runtime_error(msg);
 }
 
-std::vector<BamRecord> VirtualZmwCompositeReader::NextRaw(void)
+std::vector<BamRecord> VirtualZmwCompositeReader::NextRaw()
 {
     if (currentReader_) {
         const auto result = currentReader_->NextRaw();
@@ -129,7 +132,7 @@ std::vector<BamRecord> VirtualZmwCompositeReader::NextRaw(void)
     throw std::runtime_error(msg);
 }
 
-void VirtualZmwCompositeReader::OpenNextReader(void)
+void VirtualZmwCompositeReader::OpenNextReader()
 {
     currentReader_.reset(nullptr);
 
@@ -138,9 +141,9 @@ void VirtualZmwCompositeReader::OpenNextReader(void)
         const auto nextSource = sources_.front();
         sources_.pop_front();
 
-        currentReader_.reset(new VirtualZmwReader(nextSource.first,
-                                                  nextSource.second,
-                                                  filter_));
+        currentReader_ = std::make_unique<VirtualZmwReader>(nextSource.first,
+                                                            nextSource.second,
+                                                            filter_);
         if (currentReader_->HasNext())
             return;
     }

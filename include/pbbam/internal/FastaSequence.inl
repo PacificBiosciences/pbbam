@@ -50,10 +50,10 @@ inline FastaSequence::FastaSequence(std::string name,
     , bases_{std::move(bases)}
 { }
 
-inline std::string FastaSequence::Bases(void) const
+inline std::string FastaSequence::Bases() const
 { return bases_; }
 
-inline std::string FastaSequence::Name(void) const
+inline std::string FastaSequence::Name() const
 { return name_; }
 
 } // namespace BAM

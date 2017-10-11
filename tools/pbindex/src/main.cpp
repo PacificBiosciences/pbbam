@@ -39,6 +39,7 @@
 #include "PbIndex.h"
 #include "PbIndexVersion.h"
 #include <cassert>
+#include <cstddef>
 #include <iostream>
 using namespace std;
 
@@ -47,7 +48,7 @@ pbindex::Settings fromCommandLine(optparse::OptionParser& parser,
                                   int argc, char* argv[])
 {
     const optparse::Values options = parser.parse_args(argc, argv);
-    (void)options;
+//    ()options;
 
     pbindex::Settings settings;
 

@@ -39,6 +39,10 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
+#include <cstdint>
+
 #include "pbbam/ZmwQuery.h"
 #include "pbbam/PbiFilterTypes.h"
 #include "pbbam/CompositeBamReader.h"
@@ -62,7 +66,7 @@ ZmwQuery::ZmwQuery(const std::vector<int32_t>& zmwWhitelist,
     , d_(new ZmwQueryPrivate(zmwWhitelist, dataset))
 { }
 
-ZmwQuery::~ZmwQuery(void) { }
+ZmwQuery::~ZmwQuery() { }
 
 bool ZmwQuery::GetNext(BamRecord &r)
 { return d_->reader_.GetNext(r); }

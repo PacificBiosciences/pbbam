@@ -35,28 +35,30 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
+#include <cstddef>
+#include <string>
 
 #include <gtest/gtest.h>
+
+#define private public
+
 #include <pbbam/DataSet.h>
-#include <string>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-namespace tests {
+namespace DataSetCoreTests {
 
 static inline
-DataSet CreateDataSet(void)
+DataSet CreateDataSet()
 {
     DataSet d;
     d.Name("foo");
     return d;
 }
 
-} // namespace tests
+} // namespace DataSetCoreTests
 
 TEST(DataSetCoreTest, XmlNameParts)
 {
@@ -174,7 +176,7 @@ TEST(DataSetCoreTest, MoveOk)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpessimizing-move"
 #endif
-    DataSet d2(std::move(tests::CreateDataSet()));
+    DataSet d2(std::move(DataSetCoreTests::CreateDataSet()));
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
@@ -186,7 +188,7 @@ TEST(DataSetCoreTest, MoveOk)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpessimizing-move"
 #endif
-    d3 = std::move(tests::CreateDataSet());
+    d3 = std::move(DataSetCoreTests::CreateDataSet());
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif 
@@ -483,8 +485,9 @@ TEST(DataSetCoreTest, RemoveExternalResources)
     // iterable
     size_t i = 0;
     for (auto r : resources) {
-        if (i == 0)
+        if (i == 0) {
             EXPECT_EQ(string("file2"), r.Name());
+        }
         ++i;
     }
 }

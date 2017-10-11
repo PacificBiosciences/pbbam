@@ -39,8 +39,11 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/DataSet.h"
 #include "pbbam/DataSetTypes.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 #include "DataSetIO.h"
 #include "FileUtils.h"
@@ -89,7 +92,7 @@ using internal::DataSetElement;
 using internal::DataSetIO;
 using internal::FileUtils;
 
-DataSet::DataSet(void)
+DataSet::DataSet()
     : DataSet(DataSet::GENERIC)
 { 
     internal::InitDefaults(*this);
@@ -100,15 +103,15 @@ DataSet::DataSet(const DataSet::TypeEnum type)
     , path_(FileUtils::CurrentWorkingDirectory())
 {
     switch(type) {
-        case DataSet::GENERIC             : d_.reset(new DataSetBase); break;
-        case DataSet::ALIGNMENT           : d_.reset(new AlignmentSet); break;
-        case DataSet::BARCODE             : d_.reset(new BarcodeSet); break;
-        case DataSet::CONSENSUS_ALIGNMENT : d_.reset(new ConsensusAlignmentSet); break;
-        case DataSet::CONSENSUS_READ      : d_.reset(new ConsensusReadSet); break;
-        case DataSet::CONTIG              : d_.reset(new ContigSet); break;
-        case DataSet::HDF_SUBREAD         : d_.reset(new HdfSubreadSet); break;
-        case DataSet::REFERENCE           : d_.reset(new ReferenceSet); break;
-        case DataSet::SUBREAD             : d_.reset(new SubreadSet); break;
+        case DataSet::GENERIC             : d_ = std::make_unique<DataSetBase>(); break;
+        case DataSet::ALIGNMENT           : d_ = std::make_unique<AlignmentSet>(); break;
+        case DataSet::BARCODE             : d_ = std::make_unique<BarcodeSet>(); break;
+        case DataSet::CONSENSUS_ALIGNMENT : d_ = std::make_unique<ConsensusAlignmentSet>(); break;
+        case DataSet::CONSENSUS_READ      : d_ = std::make_unique<ConsensusReadSet>(); break;
+        case DataSet::CONTIG              : d_ = std::make_unique<ContigSet>(); break;
+        case DataSet::HDF_SUBREAD         : d_ = std::make_unique<HdfSubreadSet>(); break;
+        case DataSet::REFERENCE           : d_ = std::make_unique<ReferenceSet>(); break;
+        case DataSet::SUBREAD             : d_ = std::make_unique<SubreadSet>(); break;
         default:
             throw std::runtime_error("unsupported dataset type"); // unknown type
     }
@@ -153,38 +156,20 @@ DataSet::DataSet(const DataSet& other)
     : path_(other.path_)
 {
     DataSetBase* otherDataset = other.d_.get();
-    DataSetElement* copyDataset = new DataSetElement(*otherDataset);
+    auto copyDataset = new DataSetElement(*otherDataset);
     d_.reset(static_cast<DataSetBase*>(copyDataset));
-}
-
-DataSet::DataSet(DataSet&& other)
-    : d_(std::move(other.d_))
-    , path_(std::move(other.path_))
-{
-    assert(other.d_.get() == nullptr);
 }
 
 DataSet& DataSet::operator=(const DataSet& other)
 {
     if (this != &other) {
         DataSetBase* otherDataset = other.d_.get();
-        DataSetElement* copyDataset = new DataSetElement(*otherDataset);
+        auto copyDataset = new DataSetElement(*otherDataset);
         d_.reset(static_cast<DataSetBase*>(copyDataset));
         path_ = other.path_;
     }
     return *this;
 }
-
-DataSet& DataSet::operator=(DataSet&& other)
-{
-    if (this != &other) {
-        d_ = std::move(other.d_);
-        path_ = std::move(other.path_);
-    }
-    return *this;
-}
-
-DataSet::~DataSet(void) { }
 
 DataSet& DataSet::operator+=(const DataSet& other)
 {
@@ -192,7 +177,7 @@ DataSet& DataSet::operator+=(const DataSet& other)
     return *this;
 }
 
-std::vector<std::string> DataSet::AllFiles(void) const
+std::vector<std::string> DataSet::AllFiles() const
 {
     // get all files
     std::vector<std::string> result;
@@ -204,7 +189,7 @@ std::vector<std::string> DataSet::AllFiles(void) const
     return result;
 }
 
-std::vector<BamFile> DataSet::BamFiles(void) const
+std::vector<BamFile> DataSet::BamFiles() const
 {
     const PacBio::BAM::ExternalResources& resources = ExternalResources();
     
@@ -216,13 +201,13 @@ std::vector<BamFile> DataSet::BamFiles(void) const
         boost::iterator_range<std::string::const_iterator> bamFound = boost::algorithm::ifind_first(ext.MetaType(), "bam");
         if (!bamFound.empty()) {
             const std::string fn = ResolvePath(ext.ResourceId());
-            result.push_back(BamFile(fn));
+            result.emplace_back(fn);
         }
     }
     return result;
 }
 
-std::vector<std::string> DataSet::FastaFiles(void) const
+std::vector<std::string> DataSet::FastaFiles() const
 {
     const PacBio::BAM::ExternalResources& resources = ExternalResources();
 
@@ -248,10 +233,10 @@ DataSet DataSet::FromXml(const std::string& xml)
     return result;
 }
 
-const NamespaceRegistry& DataSet::Namespaces(void) const
+const NamespaceRegistry& DataSet::Namespaces() const
 { return d_->Namespaces(); }
 
-NamespaceRegistry& DataSet::Namespaces(void)
+NamespaceRegistry& DataSet::Namespaces()
 { return d_->Namespaces(); }
 
 DataSet::TypeEnum DataSet::NameToType(const std::string& typeName)
@@ -271,7 +256,7 @@ DataSet::TypeEnum DataSet::NameToType(const std::string& typeName)
     return lookup.at(typeName); // throws if unknown typename
 }
 
-std::vector<std::string> DataSet::ResolvedResourceIds(void) const
+std::vector<std::string> DataSet::ResolvedResourceIds() const
 {
     const PacBio::BAM::ExternalResources& resources = ExternalResources();
 
@@ -294,7 +279,7 @@ void DataSet::Save(const std::string& outputFilename)
 void DataSet::SaveToStream(std::ostream& out)
 { DataSetIO::ToStream(d_, out); }
 
-std::set<std::string> DataSet::SequencingChemistries(void) const
+std::set<std::string> DataSet::SequencingChemistries() const
 {
     const std::vector<BamFile> bamFiles{ BamFiles() };
 
@@ -328,7 +313,7 @@ std::string DataSet::TypeToName(const DataSet::TypeEnum& type)
 
 // Exposed timestamp utils
 
-std::string CurrentTimestamp(void)
+std::string CurrentTimestamp()
 { return internal::ToDataSetFormat(internal::CurrentTime()); }
 
 std::string ToDataSetFormat(const std::chrono::system_clock::time_point &tp)

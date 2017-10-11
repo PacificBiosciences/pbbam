@@ -64,7 +64,7 @@ public:
 
 } // namespace internal
 
-inline BamHeader::BamHeader(void)
+inline BamHeader::BamHeader()
     : d_(new internal::BamHeaderPrivate)
 { }
 
@@ -80,16 +80,16 @@ inline BamHeader& BamHeader::AddProgram(const ProgramInfo& pg)
 inline BamHeader& BamHeader::AddReadGroup(const ReadGroupInfo& readGroup)
 { d_->readGroups_[readGroup.Id()] = readGroup; return *this; }
 
-inline BamHeader& BamHeader::ClearComments(void)
+inline BamHeader& BamHeader::ClearComments()
 { d_->comments_.clear(); return* this; }
 
-inline BamHeader& BamHeader::ClearPrograms(void)
+inline BamHeader& BamHeader::ClearPrograms()
 { d_->programs_.clear(); return *this; }
 
-inline BamHeader& BamHeader::ClearReadGroups(void)
+inline BamHeader& BamHeader::ClearReadGroups()
 { d_->readGroups_.clear(); return *this; }
 
-inline std::vector<std::string> BamHeader::Comments(void) const
+inline std::vector<std::string> BamHeader::Comments() const
 { return d_->comments_; }
 
 inline BamHeader& BamHeader::Comments(const std::vector<std::string>& comments)
@@ -104,10 +104,10 @@ inline bool BamHeader::HasReadGroup(const std::string& id) const
 inline bool BamHeader::HasSequence(const std::string& name) const
 { return d_->sequenceIdLookup_.find(name) != d_->sequenceIdLookup_.cend(); }
 
-inline size_t BamHeader::NumSequences(void) const
+inline size_t BamHeader::NumSequences() const
 { return d_->sequences_.size(); }
 
-inline std::string BamHeader::PacBioBamVersion(void) const
+inline std::string BamHeader::PacBioBamVersion() const
 { return d_->pacbioBamVersion_; }
 
 inline SequenceInfo BamHeader::Sequence(const int32_t id) const
@@ -119,16 +119,16 @@ inline std::string BamHeader::SequenceLength(const int32_t id) const
 inline std::string BamHeader::SequenceName(const int32_t id) const
 { return Sequence(id).Name(); }
 
-inline std::vector<SequenceInfo> BamHeader::Sequences(void) const
+inline std::vector<SequenceInfo> BamHeader::Sequences() const
 { return d_->sequences_; }
 
-inline std::string BamHeader::SortOrder(void) const
+inline std::string BamHeader::SortOrder() const
 { return d_->sortOrder_; }
 
 inline BamHeader& BamHeader::SortOrder(const std::string& order)
 { d_->sortOrder_ = order; return *this; }
 
-inline std::string BamHeader::Version(void) const
+inline std::string BamHeader::Version() const
 { return d_->version_; }
 
 inline BamHeader& BamHeader::Version(const std::string& version)

@@ -44,6 +44,7 @@
 
 #include "pbbam/Config.h"
 #include "pbbam/internal/QueryBase.h"
+#include <cstdint>
 #include <vector>
 
 namespace PacBio {
@@ -75,7 +76,7 @@ public:
     ZmwQuery(const std::vector<int32_t>& zmwWhitelist,
              const DataSet& dataset);
 
-    ~ZmwQuery(void);
+    ~ZmwQuery();
 
 public:
     /// \brief Main iteration point for record access.
@@ -83,7 +84,7 @@ public:
     /// Most client code should not need to use this method directly. Use
     /// iterators instead.
     ///
-    bool GetNext(BamRecord& r);
+    bool GetNext(BamRecord& r) override;
 
 private:
     struct ZmwQueryPrivate;

@@ -39,8 +39,12 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/PbiIndexedBamReader.h"
 #include <htslib/bgzf.h>
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
 
 namespace PacBio {
@@ -53,9 +57,10 @@ public:
     PbiIndexedBamReaderPrivate(const std::string& pbiFilename)
         : index_(pbiFilename)
         , currentBlockReadCount_(0)
+        , numMatchingReads_(0)
     { }
 
-    void ApplyOffsets(void)
+    void ApplyOffsets()
     {
         const std::vector<int64_t>& fileOffsets = index_.BasicData().fileOffset_;
         for (IndexResultBlock& block : blocks_)
@@ -68,19 +73,23 @@ public:
         filter_ = filter;
         currentBlockReadCount_ = 0;
         blocks_.clear();
+        numMatchingReads_ = 0;
 
         // find blocks of reads passing filter criteria
-        const uint32_t numReads = index_.NumReads();
-        if (numReads == 0) {               // empty PBI - no reads to use
+        const uint32_t totalReads = index_.NumReads();
+        if (totalReads == 0) {               // empty PBI - no reads to use
             return;
         } else if (filter_.IsEmpty()) {    // empty filter - use all reads
-            blocks_.push_back(IndexResultBlock{0, numReads});
+            numMatchingReads_ = totalReads;
+            blocks_.emplace_back(0, totalReads);
         } else {
             IndexList indices;
-            indices.reserve(numReads);
-            for (size_t i = 0; i < numReads; ++i) {
-                if (filter_.Accepts(index_, i))
+            indices.reserve(totalReads);
+            for (size_t i = 0; i < totalReads; ++i) {
+                if (filter_.Accepts(index_, i)) {
                     indices.push_back(i);
+                    ++numMatchingReads_;
+                }
             }
             blocks_ = mergedIndexBlocks(std::move(indices));
         }
@@ -120,6 +129,7 @@ public:
     PbiRawData index_;
     IndexResultBlocks blocks_;
     size_t currentBlockReadCount_;
+    uint32_t numMatchingReads_;
 };
 
 } // namespace internal
@@ -157,7 +167,7 @@ PbiIndexedBamReader::PbiIndexedBamReader(BamFile&& bamFile)
     , d_(new internal::PbiIndexedBamReaderPrivate(File().PacBioIndexFilename()))
 { }
 
-PbiIndexedBamReader::~PbiIndexedBamReader(void) { }
+PbiIndexedBamReader::~PbiIndexedBamReader() { }
 
 int PbiIndexedBamReader::ReadRawData(BGZF* bgzf, bam1_t* b)
 {
@@ -165,7 +175,7 @@ int PbiIndexedBamReader::ReadRawData(BGZF* bgzf, bam1_t* b)
     return d_->ReadRawData(bgzf, b);
 }
 
-const PbiFilter& PbiIndexedBamReader::Filter(void) const
+const PbiFilter& PbiIndexedBamReader::Filter() const
 {
     assert(d_);
     return d_->filter_;
@@ -176,6 +186,12 @@ PbiIndexedBamReader& PbiIndexedBamReader::Filter(const PbiFilter& filter)
     assert(d_);
     d_->Filter(filter);
     return *this;
+}
+
+uint32_t PbiIndexedBamReader::NumReads() const
+{
+    assert(d_);
+    return d_->numMatchingReads_;
 }
 
 } // namespace BAM

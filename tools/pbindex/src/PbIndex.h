@@ -46,7 +46,7 @@ namespace pbindex {
 class Settings
 {
 public:
-    Settings(void);
+    Settings();
 
 public:
 

@@ -35,33 +35,37 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
+#include <string>
 
-#include "TestData.h"
 #include <gtest/gtest.h>
+
+#define private public
+
+#include "PbbamTestData.h"
 
 #include <pbbam/AlignmentPrinter.h>
 #include <pbbam/BamFile.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/IndexedFastaReader.h>
-#include <string>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
 
-const string lambdaFasta = tests::Data_Dir + "/lambdaNEB.fa";
-const string singleInsertionBam = tests::Data_Dir + "/aligned.bam";
+namespace AlignmentPrinterTests {
+
+const string lambdaFasta = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
+const string singleInsertionBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+
+} // namespace AlignmentPrinterTests
 
 TEST(AlignmentPrinterTest, Print)
 {
-    IndexedFastaReader r(lambdaFasta);
+    IndexedFastaReader r(AlignmentPrinterTests::lambdaFasta);
     AlignmentPrinter pretty(r);
 
-    BamFile bamFile(singleInsertionBam);
+    BamFile bamFile(AlignmentPrinterTests::singleInsertionBam);
     EntireFileQuery bamQuery(bamFile);
     auto it = bamQuery.begin();
 

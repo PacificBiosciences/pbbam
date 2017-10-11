@@ -49,7 +49,10 @@
 #include "pbbam/QualityValues.h"
 #include "pbbam/TagCollection.h"
 #include <htslib/sam.h>
+#include <cstddef>
+#include <cstdint>
 #include <map>
+#include <memory>
 #include <string>
 
 namespace PacBio {
@@ -91,12 +94,12 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    BamRecordImpl(void);
+    BamRecordImpl();
     BamRecordImpl(const BamRecordImpl& other);
     BamRecordImpl(BamRecordImpl&& other);
     BamRecordImpl& operator=(const BamRecordImpl& other);
     BamRecordImpl& operator=(BamRecordImpl&& other);
-    virtual ~BamRecordImpl(void);
+    virtual ~BamRecordImpl() = default;
 
     /// \}
 
@@ -105,28 +108,28 @@ public:
     /// \{
 
     /// \returns this record's assigned (BAI) index bin ID.
-    uint32_t Bin(void) const;
+    uint32_t Bin() const;
 
     /// \returns this record's alignment flag, in raw integer form.
-    uint32_t Flag(void) const;
+    uint32_t Flag() const;
 
     /// \returns this record's insert size
-    int32_t InsertSize(void) const;
+    int32_t InsertSize() const;
 
     /// \returns this record's mapping quality. A value of 255 indicates "unknown"
-    uint8_t MapQuality(void) const;
+    uint8_t MapQuality() const;
 
     /// \returns this record's mate's mapped position, or -1 if unmapped
-    PacBio::BAM::Position MatePosition(void) const;
+    PacBio::BAM::Position MatePosition() const;
 
     /// \returns this record's mate's mapped reference ID, or -1 if unmapped
-    int32_t MateReferenceId(void) const;
+    int32_t MateReferenceId() const;
 
     /// \returns this record's mapped position, or -1 if unmapped
-    PacBio::BAM::Position Position(void) const;
+    PacBio::BAM::Position Position() const;
 
     /// \returns this record's mate's mapped reference ID, or -1 if unmapped
-    int32_t ReferenceId(void) const;
+    int32_t ReferenceId() const;
 
     /// Sets the record's (BAI) index bin ID.
     ///
@@ -191,40 +194,40 @@ public:
     /// \{
 
     /// \returns true if this record is a PCR/optical duplicate
-    bool IsDuplicate(void) const;
+    bool IsDuplicate() const;
 
     /// \returns true if this record failed quality controls
-    bool IsFailedQC(void) const;
+    bool IsFailedQC() const;
 
     /// \returns true if this record is the first mate of a pair
-    bool IsFirstMate(void) const;
+    bool IsFirstMate() const;
 
     /// \returns true if this record was mapped by aligner
-    bool IsMapped(void) const;
+    bool IsMapped() const;
 
     /// \returns true if this record's mate was mapped by aligner
-    bool IsMateMapped(void) const;
+    bool IsMateMapped() const;
 
     /// \returns true if this record's mate was mapped to the reverse strand
-    bool IsMateReverseStrand(void) const;
+    bool IsMateReverseStrand() const;
 
     /// \returns true if this record comes from paired-end sequencing
-    bool IsPaired(void) const;
+    bool IsPaired() const;
 
     /// \returns true if this record is a read's primary alignment
-    bool IsPrimaryAlignment(void) const;
+    bool IsPrimaryAlignment() const;
 
     /// \returns true if this record & its mate were properly aligned
-    bool IsProperPair(void) const;
+    bool IsProperPair() const;
 
     /// \returns true if this record was mapped to the reverse strand
-    bool IsReverseStrand(void) const;
+    bool IsReverseStrand() const;
 
     /// \returns true if this record is the second mate of a pair
-    bool IsSecondMate(void) const;
+    bool IsSecondMate() const;
 
     /// \returns true if this record is a supplementary alignment
-    bool IsSupplementaryAlignment(void) const;
+    bool IsSupplementaryAlignment() const;
 
     /// Sets whether this record is a PCR/optical duplicate
     BamRecordImpl& SetDuplicate(bool ok);
@@ -269,7 +272,7 @@ public:
     /// \{
 
     /// \returns the record's CIGAR data as a Cigar object
-    Cigar CigarData(void) const;
+    Cigar CigarData() const;
 
     /// Sets the record's CIGAR data using a Cigar object
     ///
@@ -288,7 +291,7 @@ public:
     // TODO: CIGAR iterator - Cigar only or here as well ??
 
     /// \returns the record's query name
-    std::string Name(void) const;
+    std::string Name() const;
 
     /// Sets the record's "query name".
     ///
@@ -303,12 +306,12 @@ public:
     ///       some data sets, the quality values are not provided. In that
     ///       case, this method will return an empty container.
     ///
-    QualityValues Qualities(void) const;
+    QualityValues Qualities() const;
 
     /// \returns the record's DNA sequence.
-    std::string Sequence(void) const;
+    std::string Sequence() const;
 
-    size_t SequenceLength(void) const;
+    size_t SequenceLength() const;
 
     /// \brief Sets the record's DNA sequence and quality values
     ///
@@ -350,7 +353,7 @@ public:
     ///
     BamRecordImpl& SetSequenceAndQualities(const char* sequence,
                                            const size_t sequenceLength,
-                                           const char* qualities = 0);
+                                           const char* qualities = nullptr);
 
     /// \brief Sets the record's DNA sequence and quality values.
     ///
@@ -377,7 +380,7 @@ public:
     ///
     BamRecordImpl& SetPreencodedSequenceAndQualities(const char* encodedSequence,
                                                      const size_t rawSequenceLength,
-                                                     const char* qualities = 0);
+                                                     const char* qualities = nullptr);
 
     /// \}
 
@@ -386,7 +389,7 @@ public:
     /// \{
 
     /// \returns record's full tag data as a TagCollection object
-    TagCollection Tags(void) const;
+    TagCollection Tags() const;
 
     /// \brief Sets the record's full tag data via a TagCollection object
     ///
@@ -595,12 +598,12 @@ public:
 
 private:
     // returns a BamRecordImpl object, with a deep copy of @rawData contents
-    static BamRecordImpl FromRawData(const PBBAM_SHARED_PTR<bam1_t>& rawData);
+    static BamRecordImpl FromRawData(const std::shared_ptr<bam1_t>& rawData);
 
     // internal memory setup/expand methods
-    void InitializeData(void);
-    void MaybeReallocData(void);
-    void UpdateTagMap(void) const; // allowed to be called from const methods
+    void InitializeData();
+    void MaybeReallocData();
+    void UpdateTagMap() const; // allowed to be called from const methods
                                    // (lazy update on request)
 
     // internal tag helper methods
@@ -619,7 +622,7 @@ private:
 private:
 
     // data members
-    PBBAM_SHARED_PTR<bam1_t> d_;
+    std::shared_ptr<bam1_t> d_;
     mutable std::map<uint16_t, int> tagOffsets_;
 
     // friends

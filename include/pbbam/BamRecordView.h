@@ -42,6 +42,8 @@
 #ifndef BAMRECORDVIEW_H
 #define BAMRECORDVIEW_H
 
+#include <cstdint>
+
 #include "pbbam/BamRecord.h"
 
 namespace PacBio {
@@ -84,73 +86,73 @@ public:
 public:
 
     /// \returns BamRecord::AltLabelQV with this view's parameters applied
-    QualityValues AltLabelQVs(void) const;
+    QualityValues AltLabelQVs() const;
 
     /// \returns BamRecord::AltLabelTag with this view's parameters applied
-    std::string AltLabelTags(void) const;
+    std::string AltLabelTags() const;
 
     /// \returns BamRecord::DeletionQV with this view's parameters applied
-    QualityValues DeletionQVs(void) const;
+    QualityValues DeletionQVs() const;
 
     /// \returns BamRecord::DeletionTag with this view's parameters applied
-    std::string DeletionTags(void) const;
+    std::string DeletionTags() const;
 
     /// \returns BamRecord::InsertionQV with this view's parameters applied
-    QualityValues InsertionQVs(void) const;
+    QualityValues InsertionQVs() const;
 
     /// \returns BamRecord::IPD with this view's parameters applied
-    Frames IPD(void) const;
+    Frames IPD() const;
 
     /// \returns BamRecord::LabelQV with this view's parameters applied
-    QualityValues LabelQVs(void) const;
+    QualityValues LabelQVs() const;
 
     /// \returns BamRecord::MergeQV with this view's parameters applied
-    QualityValues MergeQVs(void) const;
+    QualityValues MergeQVs() const;
 
     /// \returns BamRecord::PulseMergeQV with this view's parameters applied
-    QualityValues PulseMergeQVs(void) const;
+    QualityValues PulseMergeQVs() const;
 
     /// \returns BamRecord::Pkmean with this view's parameters applied
-    std::vector<float> Pkmean(void) const;
+    std::vector<float> Pkmean() const;
 
     /// \returns BamRecord::Pkmid with this view's parameters applied
-    std::vector<float> Pkmid(void) const;
+    std::vector<float> Pkmid() const;
 
     /// \returns BamRecord::Pkmean2 with this view's parameters applied
-    std::vector<float> Pkmean2(void) const;
+    std::vector<float> Pkmean2() const;
 
     /// \returns BamRecord::Pkmid2 with this view's parameters applied
-    std::vector<float> Pkmid2(void) const;
+    std::vector<float> Pkmid2() const;
 
     /// \returns BamRecord::PreBaseFrames with this view's parameters applied
-    Frames PrebaseFrames(void) const;
+    Frames PrebaseFrames() const;
 
     /// \returns BamRecord::PrePulseFrames with this view's parameters applied
-    Frames PrePulseFrames(void) const;
+    Frames PrePulseFrames() const;
 
     /// \returns BamRecord::PulseCalls with this view's parameters applied
-    std::string PulseCalls(void) const;
+    std::string PulseCalls() const;
 
     /// \returns BamRecord::PulseCallWidth with this view's parameters applied
-    Frames PulseCallWidth(void) const;
+    Frames PulseCallWidth() const;
 
     /// \returns BamRecord::PulseWidths with this view's parameters applied
-    Frames PulseWidths(void) const;
+    Frames PulseWidths() const;
 
     /// \returns BamRecord::Qualities with this view's parameters applied
-    QualityValues Qualities(void) const;
+    QualityValues Qualities() const;
 
     /// \returns BamRecord::Sequence with this view's parameters applied
-    std::string Sequence(void) const;
+    std::string Sequence() const;
 
     /// \returns BamRecord::StartFrame with this view's parameters applied
-    std::vector<uint32_t> StartFrames(void) const;
+    std::vector<uint32_t> StartFrames() const;
 
     /// \returns BamRecord::SubstitutionQV with this view's parameters applied
-    QualityValues SubstitutionQVs(void) const;
+    QualityValues SubstitutionQVs() const;
 
     /// \returns BamRecord::SubstitutionTag with this view's parameters applied
-    std::string SubstitutionTags(void) const;
+    std::string SubstitutionTags() const;
 
 private:
     const BamRecord& record_;

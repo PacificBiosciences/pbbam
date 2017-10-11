@@ -206,14 +206,14 @@ inline bool BasicDataFilterBase<T, field>::BasicDataFilterBase::Accepts(const Pb
 }
 
 // this typedef exists purely so that the next method signature isn't 2 screen widths long
-typedef BasicDataFilterBase<LocalContextFlags, BasicLookupData::CONTEXT_FLAG> LocalContextFilter__;
+using LocalContextFilter__ = BasicDataFilterBase<LocalContextFlags, BasicLookupData::CONTEXT_FLAG>;
 
 template<>
 inline bool LocalContextFilter__::BasicDataFilterBase::Accepts(const PbiRawData& idx,
                                                                const size_t row) const
 {
-    const PbiRawBasicData& basicData = idx.BasicData();
-    const LocalContextFlags rowFlags = static_cast<LocalContextFlags>(basicData.ctxtFlag_.at(row));
+    const auto& basicData = idx.BasicData();
+    const auto rowFlags = static_cast<LocalContextFlags>(basicData.ctxtFlag_.at(row));
     return FilterBase<LocalContextFlags>::CompareHelper(rowFlags);
 }
 

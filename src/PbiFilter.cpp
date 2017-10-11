@@ -39,12 +39,15 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/PbiFilter.h"
 #include "pbbam/PbiFilterTypes.h"
 #include "StringUtils.h"
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <cstdint>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -145,7 +148,7 @@ static inline bool isBracketed(const std::string& value)
     static const std::string closeBrackets = "])}";
     return openBrackets.find(value.at(0)) != std::string::npos &&
            closeBrackets.find(value.at(value.length()-1)) != std::string::npos;
-};
+}
 
 static inline bool isList(const std::string& value)
 {

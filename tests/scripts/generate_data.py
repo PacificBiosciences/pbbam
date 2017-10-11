@@ -1,9 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import unicode_literals
 
 import os, shutil, sys
-import StringIO
+from io import StringIO
 
 # FASTA generation
 fastaSeq_1 = """TAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAAC
@@ -51,7 +52,7 @@ def fileLinker(func):
 
 # return a copy of original, minues any lines that contain an entry in blacklist
 def trimXmlElements(original, blacklist):
-    out = StringIO.StringIO()
+    out = StringIO()
     for line in original.splitlines():
         if all(x not in line for x in blacklist):
             out.write(line + '\n')
@@ -161,13 +162,13 @@ class TestDataGenerator:
 
         # skip file if it exists
         os.chdir(self.generatedDataDir)
-        filenames = self.outputFiles.keys()
+        filenames = list(self.outputFiles.keys())
         for file in filenames:
             if os.path.exists(file) :
                 del self.outputFiles[file]
 
         # skip symlink if it exists
-        symlinks = self.outputSymlinks.keys()
+        symlinks = list(self.outputSymlinks.keys())
         for link in symlinks:
             if os.path.lexists(link):
                 del self.outputSymlinks[link]
@@ -176,9 +177,9 @@ class TestDataGenerator:
         # else silent success
         if self.outputFiles or self.outputSymlinks:
             print('Generating test data in %s ' % self.generatedDataDir)
-            for file, func in self.outputFiles.iteritems():
+            for file, func in self.outputFiles.items():
                 func(file)
-            for link, func in self.outputSymlinks.iteritems():
+            for link, func in self.outputSymlinks.items():
                 func(link)
 
 # script entry point

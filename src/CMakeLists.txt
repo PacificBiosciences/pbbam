@@ -11,22 +11,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PacBioBAM_CXX_FLAGS}")
 add_library(pbbam ${SOURCES})
 
 # library properties
-target_compile_definitions(pbbam
-    PRIVATE "-DPBBAM_LIBRARY"
-)
 set_target_properties(pbbam PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}
     RUNTIME_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}
     LIBRARY_OUTPUT_DIRECTORY ${PacBioBAM_LibDir}
 )
-
-if(PacBioBAM_wrap_r)
-    # SWIG R does not support std::shared_ptr, but it does support boost::shared_ptr
-    # So force boost if we're wrapping for R.
-    target_compile_definitions(pbbam
-        PUBLIC -DPBBAM_USE_BOOST_SHARED_PTR
-    )
-endif()
 
 if(PacBioBAM_auto_validate)
     target_compile_definitions(pbbam
@@ -74,6 +63,3 @@ set(PacBioBAM_LIBRARIES
     "${PROJECT_NAME}: Libraries"
     FORCE
 )
-
-# add SWIG directory
-add_subdirectory(swig)

@@ -59,44 +59,6 @@ inline DataSetElement::DataSetElement(const std::string& label,
     , label_(label, true)
 { }
 
-inline DataSetElement::DataSetElement(const DataSetElement& other)
-    : xsd_(other.xsd_)
-    , label_(other.label_)
-    , text_(other.text_)
-    , attributes_(other.attributes_)
-    , children_(other.children_)
-{ }
-
-inline DataSetElement::DataSetElement(DataSetElement&& other)
-    : xsd_(std::move(other.xsd_))
-    , label_(std::move(other.label_))
-    , text_(std::move(other.text_))
-    , attributes_(std::move(other.attributes_))
-    , children_(std::move(other.children_))
-{ }
-
-inline DataSetElement& DataSetElement::operator=(const DataSetElement& other)
-{
-    xsd_ = other.xsd_;
-    label_ = other.label_;
-    text_ = other.text_;
-    attributes_ = other.attributes_;
-    children_ = other.children_;
-    return *this;
-}
-
-inline DataSetElement& DataSetElement::operator=(DataSetElement&& other)
-{
-    xsd_ = std::move(other.xsd_);
-    label_ = std::move(other.label_);
-    text_ = std::move(other.text_);
-    attributes_ = std::move(other.attributes_);
-    children_ = std::move(other.children_);
-    return *this;
-}
-
-inline DataSetElement::~DataSetElement(void) { }
-
 inline bool DataSetElement::operator==(const DataSetElement& other) const
 {
     return xsd_   == other.xsd_   &&
@@ -142,10 +104,10 @@ inline const std::string& DataSetElement::Attribute(const std::string& name) con
 inline void DataSetElement::Attribute(const std::string& name, const std::string& value)
 { attributes_[name] = value; }
 
-inline const std::map<std::string, std::string>& DataSetElement::Attributes(void) const
+inline const std::map<std::string, std::string>& DataSetElement::Attributes() const
 { return attributes_; }
 
-inline std::map<std::string, std::string>& DataSetElement::Attributes(void)
+inline std::map<std::string, std::string>& DataSetElement::Attributes()
 { return attributes_; }
 
 template<typename T>
@@ -173,10 +135,10 @@ inline T& DataSetElement::Child(const std::string& label)
     }
 }
 
-inline const std::vector<DataSetElement>& DataSetElement::Children(void) const
+inline const std::vector<DataSetElement>& DataSetElement::Children() const
 { return children_; }
 
-inline std::vector<DataSetElement>& DataSetElement::Children(void)
+inline std::vector<DataSetElement>& DataSetElement::Children()
 { return children_; }
 
 inline const std::string& DataSetElement::ChildText(const std::string& label) const
@@ -210,25 +172,25 @@ inline int DataSetElement::IndexOf(const std::string& label) const
     return -1;
 }
 
-inline const boost::string_ref DataSetElement::LocalNameLabel(void) const
+inline const boost::string_ref DataSetElement::LocalNameLabel() const
 { return label_.LocalName(); }
 
-inline const boost::string_ref DataSetElement::PrefixLabel(void) const
+inline const boost::string_ref DataSetElement::PrefixLabel() const
 { return label_.Prefix(); }
 
-inline const std::string& DataSetElement::QualifiedNameLabel(void) const
+inline const std::string& DataSetElement::QualifiedNameLabel() const
 { return label_.QualifiedName(); }
 
-//inline std::string& DataSetElement::Label(void)
+//inline std::string& DataSetElement::Label()
 //{ return label_.QualifiedName(); }
 
 inline void DataSetElement::Label(const std::string& label)
 { label_ = XmlName(label, true); }
 
-inline size_t DataSetElement::NumAttributes(void) const
+inline size_t DataSetElement::NumAttributes() const
 { return attributes_.size(); }
 
-inline size_t DataSetElement::NumChildren(void) const
+inline size_t DataSetElement::NumChildren() const
 { return children_.size(); }
 
 inline void DataSetElement::RemoveChild(const DataSetElement& e)
@@ -253,27 +215,27 @@ inline void DataSetElement::ChildText(const std::string& label,
     }
 }
 
-inline bool DataSetElement::IsVerbatimLabel(void) const
+inline bool DataSetElement::IsVerbatimLabel() const
 { return label_.Verbatim(); }
 
-inline const std::string& DataSetElement::Text(void) const
+inline const std::string& DataSetElement::Text() const
 { return text_; }
 
-inline std::string& DataSetElement::Text(void)
+inline std::string& DataSetElement::Text()
 { return text_; }
 
 inline void DataSetElement::Text(const std::string& text)
 { text_ = text; }
 
-inline const XsdType& DataSetElement::Xsd(void) const
+inline const XsdType& DataSetElement::Xsd() const
 { return xsd_; }
 
 // ----------------
 // XmlName
 // ----------------
 
-inline XmlName::XmlName(const std::string& fullName, bool verbatim)
-    : qualifiedName_(fullName)
+inline XmlName::XmlName(std::string fullName, bool verbatim)
+    : qualifiedName_(std::move(fullName))
     , prefixSize_(0)
     , localNameOffset_(0)
     , localNameSize_(0)
@@ -312,60 +274,22 @@ inline XmlName::XmlName(const std::string& localName,
         ++localNameOffset_;
 }
 
-inline XmlName::XmlName(const XmlName& other)
-    : qualifiedName_(other.qualifiedName_)
-    , prefixSize_(other.prefixSize_)
-    , localNameOffset_(other.localNameOffset_)
-    , localNameSize_(other.localNameSize_)
-    , verbatim_(other.verbatim_)
-{ }
-
-inline XmlName::XmlName(XmlName&& other)
-    : qualifiedName_(std::move(other.qualifiedName_))
-    , prefixSize_(std::move(other.prefixSize_))
-    , localNameOffset_(std::move(other.localNameOffset_))
-    , localNameSize_(std::move(other.localNameSize_))
-    , verbatim_(std::move(other.verbatim_))
-{ }
-
-inline XmlName& XmlName::operator=(const XmlName& other)
-{
-    qualifiedName_   = other.qualifiedName_;
-    prefixSize_      = other.prefixSize_;
-    localNameOffset_ = other.localNameOffset_;
-    localNameSize_   = other.localNameSize_;
-    verbatim_        = other.verbatim_;
-    return *this;
-}
-
-inline XmlName& XmlName::operator=(XmlName&& other)
-{
-    qualifiedName_   = std::move(other.qualifiedName_);
-    prefixSize_      = std::move(other.prefixSize_);
-    localNameOffset_ = std::move(other.localNameOffset_);
-    localNameSize_   = std::move(other.localNameSize_);
-    verbatim_        = std::move(other.verbatim_);
-    return *this;
-}
-
-inline XmlName::~XmlName(void) { }
-
 inline bool XmlName::operator==(const XmlName& other) const
 { return qualifiedName_ == other.qualifiedName_; }
 
 inline bool XmlName::operator!=(const XmlName& other) const
 { return !(*this == other); }
 
-inline const boost::string_ref XmlName::LocalName(void) const
+inline const boost::string_ref XmlName::LocalName() const
 { return boost::string_ref(qualifiedName_.data() + localNameOffset_, localNameSize_); }
 
-inline const boost::string_ref XmlName::Prefix(void) const
+inline const boost::string_ref XmlName::Prefix() const
 { return boost::string_ref(qualifiedName_.data(), prefixSize_); }
 
-inline const std::string& XmlName::QualifiedName(void) const
+inline const std::string& XmlName::QualifiedName() const
 { return qualifiedName_; }
 
-inline bool XmlName::Verbatim(void) const
+inline bool XmlName::Verbatim() const
 { return verbatim_; }
 
 } // namespace internal

@@ -80,18 +80,18 @@ public:
     ///
     /// This constructor only exists for STL container compatibility.
     ///
-    NamespaceInfo(void);
+    NamespaceInfo() = default;
 
     /// \brief Creates a valid info entry.
-    NamespaceInfo(const std::string& name,
-                  const std::string& uri);
+    NamespaceInfo(std::string name,
+                  std::string uri);
 
 public:
     /// \brief Fetches namespace name (i.e. prefix)
-    const std::string& Name(void) const { return name_; }
+    const std::string& Name() const { return name_; }
 
     /// \brief Fetches namespace URI.
-    const std::string& Uri(void) const { return uri_; }
+    const std::string& Uri() const { return uri_; }
 
 private:
     std::string name_;
@@ -110,12 +110,12 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    NamespaceRegistry(void);
-    NamespaceRegistry(const NamespaceRegistry& other);
-    NamespaceRegistry(NamespaceRegistry&& other);
-    NamespaceRegistry& operator=(const NamespaceRegistry& other);
-    NamespaceRegistry& operator=(NamespaceRegistry&& other);
-    ~NamespaceRegistry(void);
+    NamespaceRegistry();
+    NamespaceRegistry(const NamespaceRegistry& other) = default;
+    NamespaceRegistry(NamespaceRegistry&& other) = default;
+    NamespaceRegistry& operator=(const NamespaceRegistry& other) = default;
+    NamespaceRegistry& operator=(NamespaceRegistry&& other) = default;
+    ~NamespaceRegistry() = default;
 
     /// \}
 
@@ -124,10 +124,10 @@ public:
     /// \{
 
     /// \brief Fetches namespace info for the dataset's default XSD type.
-    const NamespaceInfo& DefaultNamespace(void) const;
+    const NamespaceInfo& DefaultNamespace() const;
 
     /// \brief Fetches dataset's default XSD type.
-    XsdType DefaultXsd(void) const;
+    XsdType DefaultXsd() const;
 
     /// \brief Fetches namespace info for the requested XSD type.
     const NamespaceInfo& Namespace(const XsdType& xsd) const;
@@ -148,7 +148,7 @@ public:
 
 private:
     std::map<XsdType, NamespaceInfo> data_;
-    XsdType defaultXsdType_;
+    XsdType defaultXsdType_ = XsdType::DATASETS;
 };
 
 } // namespace PacBio

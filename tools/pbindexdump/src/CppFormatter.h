@@ -46,7 +46,7 @@ class CppFormatter : public IFormatter
 {
 public:
     CppFormatter(const Settings& settings);
-    void Run(void);
+    void Run();
 };
 
 } // namespace pbindexdump

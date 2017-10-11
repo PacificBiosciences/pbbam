@@ -89,7 +89,13 @@ public:
 
     /// Fully flushes all buffered data & closes file.
     ///
-    ~SamWriter(void);
+    ~SamWriter() override;
+
+    /// Copy and Move constructors are disabled
+    SamWriter(const SamWriter&) = delete;
+    SamWriter(SamWriter&&) = delete;
+    SamWriter& operator=(const SamWriter&) = delete;
+    SamWriter& operator=(SamWriter&&) = delete;
 
 public:
     
@@ -101,7 +107,7 @@ public:
     ///
     /// \throws std::runtime_error if flush fails
     ///
-    void TryFlush(void) override;
+    void TryFlush() override;
 
     /// \brief Write a record to the output SAM file.
     ///
@@ -121,7 +127,6 @@ public:
 
 private:
     std::unique_ptr<internal::SamWriterPrivate> d_;
-    DISABLE_MOVE_AND_COPY(SamWriter);
 };
 
 } // namesapce BAM

@@ -137,7 +137,7 @@ public:
     ///
     PbiIndexedBamReader(BamFile&& bamFile);
 
-    ~PbiIndexedBamReader(void);
+    ~PbiIndexedBamReader() override;
 
     /// \}
 
@@ -146,10 +146,12 @@ public:
     /// \{
 
     /// \returns the current filter active on this reader
-    const PbiFilter& Filter(void) const;
+    const PbiFilter& Filter() const;
+
+    uint32_t NumReads() const;
 
 //    /// \returns the reader's underlying index data
-//    const PbiIndex& Index(void) const;
+//    const PbiIndex& Index() const;
 
 public:
     /// \brief Sets a new filter on the reader.
@@ -162,7 +164,7 @@ public:
     /// \}
 
 protected:
-    int ReadRawData(BGZF* bgzf, bam1_t* b);
+    int ReadRawData(BGZF* bgzf, bam1_t* b) override;
 
 private:
     std::unique_ptr<internal::PbiIndexedBamReaderPrivate> d_;

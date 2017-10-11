@@ -106,7 +106,7 @@ public:
     /// \{
 
     /// \returns the current GenomicInterval in use by this reader
-    const GenomicInterval& Interval(void) const;
+    const GenomicInterval& Interval() const;
 
     /// \brief Sets a new genomic interval on the reader.
     ///
@@ -118,7 +118,7 @@ public:
     /// \}
 
 protected:
-    int ReadRawData(BGZF* bgzf, bam1_t* b);
+    int ReadRawData(BGZF* bgzf, bam1_t* b) override;
 
 private:
     std::unique_ptr<internal::BaiIndexedBamReaderPrivate> d_;

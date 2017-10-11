@@ -41,6 +41,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/Interval.h
     ${PacBioBAM_IncludeDir}/pbbam/IRecordWriter.h
     ${PacBioBAM_IncludeDir}/pbbam/LocalContextFlags.h
+    ${PacBioBAM_IncludeDir}/pbbam/MakeUnique.h
     ${PacBioBAM_IncludeDir}/pbbam/MD5.h
     ${PacBioBAM_IncludeDir}/pbbam/Orientation.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiBasicTypes.h
@@ -56,6 +57,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/Position.h
     ${PacBioBAM_IncludeDir}/pbbam/ProgramInfo.h
     ${PacBioBAM_IncludeDir}/pbbam/PulseBehavior.h
+    ${PacBioBAM_IncludeDir}/pbbam/PulseExclusionReason.h
     ${PacBioBAM_IncludeDir}/pbbam/QNameQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/QualityValue.h
     ${PacBioBAM_IncludeDir}/pbbam/QualityValues.h
@@ -65,11 +67,13 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/SamTagCodec.h
     ${PacBioBAM_IncludeDir}/pbbam/SamWriter.h
     ${PacBioBAM_IncludeDir}/pbbam/SequenceInfo.h
-    ${PacBioBAM_IncludeDir}/pbbam/Strand.h  
+    ${PacBioBAM_IncludeDir}/pbbam/Strand.h
+    ${PacBioBAM_IncludeDir}/pbbam/StringUtilities.h
     ${PacBioBAM_IncludeDir}/pbbam/SubreadLengthQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/Tag.h
     ${PacBioBAM_IncludeDir}/pbbam/TagCollection.h
 #    ${PacBioBAM_IncludeDir}/pbbam/UnmappedReadsQuery.h
+    ${PacBioBAM_IncludeDir}/pbbam/Unused.h
     ${PacBioBAM_IncludeDir}/pbbam/Validator.h
     ${PacBioBAM_IncludeDir}/pbbam/ZmwGroupQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/ZmwQuery.h
@@ -77,6 +81,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/ZmwTypeMap.h
 
     # exception headers
+    ${PacBioBAM_IncludeDir}/pbbam/exception/BundleChemistryMappingException.h
     ${PacBioBAM_IncludeDir}/pbbam/exception/InvalidSequencingChemistryException.h
     ${PacBioBAM_IncludeDir}/pbbam/exception/ValidationException.h
 
@@ -196,7 +201,6 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/GenomicInterval.cpp
     ${PacBioBAM_SourceDir}/GenomicIntervalQuery.cpp
     ${PacBioBAM_SourceDir}/IndexedFastaReader.cpp
-    ${PacBioBAM_SourceDir}/IRecordWriter.cpp
     ${PacBioBAM_SourceDir}/MD5.cpp
     ${PacBioBAM_SourceDir}/MemoryUtils.cpp
     ${PacBioBAM_SourceDir}/PbiBuilder.cpp

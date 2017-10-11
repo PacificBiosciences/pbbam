@@ -44,6 +44,7 @@
 
 #include "pbbam/Config.h"
 #include <boost/variant.hpp>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -127,7 +128,7 @@ public:
     /// \{
 
     /// \brief Creates an empty, null tag
-    Tag(void);
+    Tag() = default;
 
     /// \brief Creates a Tag from a signed 8-bit integer or character.
     ///
@@ -204,7 +205,7 @@ public:
     
     Tag(const Tag& other) = default;
     Tag(Tag&& other) = default;
-    ~Tag(void) = default;
+    ~Tag() = default;
 
     Tag& operator=(boost::blank value);
     Tag& operator=(int8_t value);
@@ -242,76 +243,76 @@ public:
     /// \returns ASCII character value
     /// \throws std::runtime_error if not ASCII-compatible
     ///
-    char ToAscii(void) const;
+    char ToAscii() const;
 
     /// \returns tag data as signed 8-bit (casting if needed)
     /// \throws std::runtime_error if not integral data, or out of valid range
-    int8_t ToInt8(void) const;
+    int8_t ToInt8() const;
 
     /// \returns tag data as unsigned 8-bit (casting if needed)
     /// \throws std::runtime_error if not integral data, or out of valid range
-    uint8_t ToUInt8(void) const;
+    uint8_t ToUInt8() const;
 
     /// \returns tag data as signed 16-bit (casting if needed)
     /// \throws std::runtime_error if not integral data, or out of valid range
-    int16_t ToInt16(void) const;
+    int16_t ToInt16() const;
 
     /// \returns tag data as unsigned 16-bit (casting if needed)
     /// \throws std::runtime_error if not integral data, or out of valid range
-    uint16_t ToUInt16(void) const;
+    uint16_t ToUInt16() const;
 
     /// \returns tag data as signed 32-bit (casting if needed)
     /// \throws std::runtime_error if not integral data, or out of valid range
-    int32_t ToInt32(void) const;
+    int32_t ToInt32() const;
 
     /// \returns tag data as unsigned 32-bit (casting if needed)
     /// \throws std::runtime_error if not integral data, or out of valid range
-    uint32_t ToUInt32(void) const;
+    uint32_t ToUInt32() const;
 
     /// \returns tag data as float
     /// \throws std::runtime_error if tag does not contain a value of
     ///         explicit type: float
-    float ToFloat(void) const;
+    float ToFloat() const;
 
     /// \returns tag data as std::string
     /// \throws std::runtime_error if tag does not contain a value of explicit
     ///         type: std::string
-    std::string ToString(void) const;
+    std::string ToString() const;
 
     /// \returns tag data as std::vector<int8_t>
     /// \throws std::runtime_error if tag does not contain a value of explicit
     ///         type: std::vector<int8_t>
-    std::vector<int8_t> ToInt8Array(void) const;
+    std::vector<int8_t> ToInt8Array() const;
 
     /// \returns tag data as std::vector<uint8_t>
     /// \throws std::runtime_error if tag does not contain a value of explicit
     ///         type: std::vector<uint8_t>
-    std::vector<uint8_t> ToUInt8Array(void) const;
+    std::vector<uint8_t> ToUInt8Array() const;
 
     /// \returns tag data as std::vector<int16_t>
     /// \throws std::runtime_error if tag does not contain a value of explicit
     ///         type: std::vector<int16_t>
-    std::vector<int16_t> ToInt16Array(void) const;
+    std::vector<int16_t> ToInt16Array() const;
 
     /// \returns tag data as std::vector<uint16_t>
     /// \throws std::runtime_error if tag does not contain a value of explicit
     ///         type: std::vector<uint16_t>
-    std::vector<uint16_t> ToUInt16Array(void) const;
+    std::vector<uint16_t> ToUInt16Array() const;
 
     /// \returns tag data as std::vector<int32_t>
     /// \throws std::runtime_error if tag does not contain a value of explicit
     ///         type: std::vector<int32_t>
-    std::vector<int32_t> ToInt32Array(void) const;
+    std::vector<int32_t> ToInt32Array() const;
 
     /// \returns tag data as std::vector<uint32_t>
     /// \throws std::runtime_error if tag does not contain a value of explicit
     ///         type: std::vector<uint32_t>
-    std::vector<uint32_t> ToUInt32Array(void) const;
+    std::vector<uint32_t> ToUInt32Array() const;
 
     /// \returns tag data as std::vector<float>
     /// \throws std::runtime_error if tag does not contain a value of explicit
     ///         type: std::vector<float>
-    std::vector<float> ToFloatArray(void) const;
+    std::vector<float> ToFloatArray() const;
 
     /// \}
 
@@ -321,80 +322,80 @@ public:
     ///
 
     /// \returns true if tag is null (e.g. default-constructed)
-    bool IsNull(void) const;
+    bool IsNull() const;
 
     /// \returns true if tag contains a value of type: int8_t
-    bool IsInt8(void) const;
+    bool IsInt8() const;
 
     /// \returns true if tag contains a value of type: uint8_t
-    bool IsUInt8(void) const;
+    bool IsUInt8() const;
 
     /// \returns true if tag contains a value of type: int16_t
-    bool IsInt16(void) const;
+    bool IsInt16() const;
 
     /// \returns true if tag contains a value of type: uint16_t
-    bool IsUInt16(void) const;
+    bool IsUInt16() const;
 
     /// \returns true if tag contains a value of type: int32_t
-    bool IsInt32(void) const;
+    bool IsInt32() const;
 
     /// \returns true if tag contains a value of type: uint32_t
-    bool IsUInt32(void) const;
+    bool IsUInt32() const;
 
     /// \returns true if tag contains a value of type: float
-    bool IsFloat(void) const;
+    bool IsFloat() const;
 
     /// \returns true if tag contains a value of type: std::string
-    bool IsString(void) const;
+    bool IsString() const;
 
     /// \returns true if tag contains a value of type: std::string \b AND has a
     ///          TagModifier of TagModifier::HEX_STRING
-    bool IsHexString(void) const;
+    bool IsHexString() const;
 
     /// \returns true if tag contains a value of type: std::vector<int8_t>
-    bool IsInt8Array(void) const;
+    bool IsInt8Array() const;
 
     /// \returns true if tag contains a value of type: std::vector<uint8_t>
-    bool IsUInt8Array(void) const;
+    bool IsUInt8Array() const;
 
     /// \returns true if tag contains a value of type: std::vector<int16_t>
-    bool IsInt16Array(void) const;
+    bool IsInt16Array() const;
 
     /// \returns true if tag contains a value of type: std::vector<uint16_t>
-    bool IsUInt16Array(void) const;
+    bool IsUInt16Array() const;
 
     /// \returns true if tag contains a value of type: std::vector<int32_t>
-    bool IsInt32Array(void) const;
+    bool IsInt32Array() const;
 
     /// \returns true if tag contains a value of type: std::vector<uint32_t>
-    bool IsUInt32Array(void) const;
+    bool IsUInt32Array() const;
 
     /// \returns true if tag contains a value of type: std::vector<float>
-    bool IsFloatArray(void) const;
+    bool IsFloatArray() const;
 
     /// \returns true if tag contains a value with any signed integer type
-    bool IsSignedInt(void) const;
+    bool IsSignedInt() const;
 
     /// \returns true if tag contains a value with any unsigned integer type
-    bool IsUnsignedInt(void) const;
+    bool IsUnsignedInt() const;
 
     /// \returns true if tag contains a value with any integer type
-    bool IsIntegral(void) const;
+    bool IsIntegral() const;
 
     /// \returns true if tag contains a value with any integer or float type
-    bool IsNumeric(void) const;
+    bool IsNumeric() const;
 
     /// \returns true if tag contains a vector containing signed integers
-    bool IsSignedArray(void) const;
+    bool IsSignedArray() const;
 
     /// \returns true if tag contains a vector containing unsigned integers
-    bool IsUnsignedArray(void) const;
+    bool IsUnsignedArray() const;
 
     /// \returns true if tag contains a vector containing integers
-    bool IsIntegralArray(void) const;
+    bool IsIntegralArray() const;
 
     /// \returns true if tag contains a vector (integers or floats)
-    bool IsArray(void) const;
+    bool IsArray() const;
 
     /// \}
 
@@ -403,16 +404,16 @@ public:
     /// \{
 
     /// \returns enum value for current tag data
-    TagDataType Type(void) const;
+    TagDataType Type() const;
 
     /// \returns printable type name for current tag data
-    std::string Typename(void) const;
+    std::string Typename() const;
 
     /// \returns true if tag data modifier \p m is set
     bool HasModifier(const TagModifier m) const;
 
     /// \returns current tag data modifier
-    TagModifier Modifier(void) const;
+    TagModifier Modifier() const;
 
     /// \brief Sets tag data modifier.
     ///
@@ -425,25 +426,25 @@ public:
 
 private :
     // NOTE - keep this synced with TagDataType enum ordering
-    typedef boost::variant<boost::blank, // <-- default constructor creates variant of this type
-                           int8_t,
-                           uint8_t,
-                           int16_t,
-                           uint16_t,
-                           int32_t,
-                           uint32_t,
-                           float,
-                           std::string,
-                           std::vector<int8_t>,
-                           std::vector<uint8_t>,
-                           std::vector<int16_t>,
-                           std::vector<uint16_t>,
-                           std::vector<int32_t>,
-                           std::vector<uint32_t>,
-                           std::vector<float> > var_t;
+    using var_t = boost::variant<boost::blank, // <-- default constructor creates variant of this type
+                                 int8_t,
+                                 uint8_t,
+                                 int16_t,
+                                 uint16_t,
+                                 int32_t,
+                                 uint32_t,
+                                 float,
+                                 std::string,
+                                 std::vector<int8_t>,
+                                 std::vector<uint8_t>,
+                                 std::vector<int16_t>,
+                                 std::vector<uint16_t>,
+                                 std::vector<int32_t>,
+                                 std::vector<uint32_t>,
+                                 std::vector<float> >;
 
     var_t data_;
-    TagModifier modifier_;
+    TagModifier modifier_ = TagModifier::NONE;
 };
 
 } // namespace BAM

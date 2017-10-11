@@ -35,22 +35,25 @@
 
 // Author: Derek Barnett
 
-#ifdef PBBAM_TESTING
-#define private public
-#endif
-
-#include <gtest/gtest.h>
-#include <pbbam/BamRecordImpl.h>
-#include <pbbam/BamTagCodec.h>
-#include <pbbam/SamTagCodec.h>
-#include <pbbam/Tag.h>
-#include <pbbam/TagCollection.h>
 #include <algorithm>
+#include <cstdint>
+#include <cstddef>
 #include <iostream>
 #include <iterator>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <gtest/gtest.h>
+
+#define private public
+
+#include <pbbam/BamRecordImpl.h>
+#include <pbbam/BamTagCodec.h>
+#include <pbbam/SamTagCodec.h>
+#include <pbbam/Tag.h>
+#include <pbbam/TagCollection.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 
@@ -58,7 +61,7 @@ using namespace PacBio::BAM;
 //       every possible combination of variable data, and then manipulate each
 //       element within each combo to shrink & expand.
 
-namespace tests {
+namespace BamRecordImplVariableDataTests {
 
 static
 void CheckRawData(const BamRecordImpl& bam)
@@ -85,12 +88,12 @@ void CheckRawData(const BamRecordImpl& bam)
     EXPECT_EQ(expectedTotalDataLength, bam.d_->l_data);
 }
 
-} // namespace tests
+} // namespace BamRecordImplVariableDataTests
 
 TEST(BamRecordImplVariableDataTest, InitEmpty)
 {
     BamRecordImpl bam;
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, TagOnly_InitEmpty)
@@ -98,7 +101,7 @@ TEST(BamRecordImplVariableDataTest, TagOnly_InitEmpty)
     BamRecordImpl bam;
     bam.Tags(TagCollection());
     EXPECT_EQ(0, bam.Tags().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, TagOnly_InitNormal)
@@ -191,7 +194,7 @@ TEST(BamRecordImplVariableDataTest, TagOnly_ThenOverwriteWithEmptyTags)
     bam.Tags(TagCollection());
 
     EXPECT_EQ(0, bam.Tags().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarOnly_InitEmpty)
@@ -199,7 +202,7 @@ TEST(BamRecordImplVariableDataTest, CigarOnly_InitEmpty)
     BamRecordImpl bam;
     bam.CigarData(std::string());
     EXPECT_EQ(0, bam.CigarData().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarOnly_InitNormal_CigarObject)
@@ -212,7 +215,7 @@ TEST(BamRecordImplVariableDataTest, CigarOnly_InitNormal_CigarObject)
 
     EXPECT_EQ(cigar, bam.CigarData());
     EXPECT_TRUE("100=" == bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarOnly_InitNormal_StdString)
@@ -223,7 +226,7 @@ TEST(BamRecordImplVariableDataTest, CigarOnly_InitNormal_StdString)
     bam.CigarData(cigar);
 
     EXPECT_EQ(cigar, bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarOnly_ThenOverwriteWithLongerCigar)
@@ -236,7 +239,7 @@ TEST(BamRecordImplVariableDataTest, CigarOnly_ThenOverwriteWithLongerCigar)
     bam.CigarData(longerCigar);
 
     EXPECT_EQ(longerCigar, bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarOnly_ThenOverwriteWithShorterCigar)
@@ -249,7 +252,7 @@ TEST(BamRecordImplVariableDataTest, CigarOnly_ThenOverwriteWithShorterCigar)
     bam.CigarData(cigar);
 
     EXPECT_EQ(cigar, bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarOnly_ThenOverwriteWithEmptyCigar)
@@ -262,7 +265,7 @@ TEST(BamRecordImplVariableDataTest, CigarOnly_ThenOverwriteWithEmptyCigar)
     bam.CigarData(empty);
 
     EXPECT_EQ(empty, bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarTag_Init_Normal)
@@ -291,7 +294,7 @@ TEST(BamRecordImplVariableDataTest, CigarTag_Init_Normal)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarTag_Init_EmptyCigar)
@@ -322,7 +325,7 @@ TEST(BamRecordImplVariableDataTest, CigarTag_Init_EmptyCigar)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarTag_Init_EmptyTag)
@@ -335,7 +338,7 @@ TEST(BamRecordImplVariableDataTest, CigarTag_Init_EmptyTag)
 
     EXPECT_EQ(cigar, bam.CigarData().ToStdString());
     EXPECT_EQ(0,     bam.Tags().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithLongerCigar)
@@ -366,7 +369,7 @@ TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithLongerCigar)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithShorterCigar)
@@ -397,7 +400,7 @@ TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithShorterCigar)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithEmptyCigar)
@@ -428,7 +431,7 @@ TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithEmptyCigar)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithLongerTags)
@@ -463,7 +466,7 @@ TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithLongerTags)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithShorterTags)
@@ -496,7 +499,7 @@ TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithShorterTags)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithEmptyTags)
@@ -515,7 +518,7 @@ TEST(BamRecordImplVariableDataTest, CigarTag_ThenOverwriteWithEmptyTags)
 
     EXPECT_EQ(cigar, bam.CigarData().ToStdString());
     EXPECT_EQ(0,     bam.Tags().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_Empty)
@@ -524,7 +527,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_Empty)
     bam.SetSequenceAndQualities(std::string(), std::string());
     EXPECT_EQ(0, bam.Sequence().size());
     EXPECT_EQ(0, bam.Qualities().Fastq().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_NormalQual)
@@ -537,7 +540,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_NormalQual)
 
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_EmptyQual)
@@ -550,7 +553,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_EmptyQual)
 
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_Preencoded) {
@@ -562,7 +565,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_Preencoded) {
     char* encoded = (char*)::calloc(encodedLength, sizeof(char));
     char* e = encoded;
 
-    uint8_t nucleotideCode;
+    uint8_t nucleotideCode{};
     bool useHighWord = true;
     for (size_t i = 0; i < sequence.size(); ++i) {
         switch (sequence.at(i)) {
@@ -591,7 +594,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_Preencoded) {
 
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 
     if (encoded)
         free(encoded);
@@ -602,11 +605,11 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_Preencoded_EmptyQual) {
     const std::string sequence  = "ACGTACGTACGT";
     const std::string qualities = "";
 
-    const size_t encodedLength = static_cast<size_t>((sequence.size()+1)/2);
-    char* encoded = (char*)::calloc(encodedLength, sizeof(char));
-    char* e = encoded;
+    const auto encodedLength = static_cast<size_t>((sequence.size()+1)/2);
+    auto* encoded = (char*)::calloc(encodedLength, sizeof(char));
+    auto* e = encoded;
 
-    uint8_t nucleotideCode;
+    uint8_t nucleotideCode{};
     bool useHighWord = true;
     for (size_t i = 0; i < sequence.size(); ++i) {
         switch (sequence.at(i)) {
@@ -635,7 +638,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_Preencoded_EmptyQual) {
 
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 
     if (encoded)
         free(encoded);
@@ -654,7 +657,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_ThenOverwriteWithLongerSeq_Norma
 
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualOnly_ThenOverwriteWithLongerSeq_EmptyQual)
@@ -670,7 +673,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_ThenOverwriteWithLongerSeq_Empty
 
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualOnly_ThenOverwriteWithShorterSeq_NormalQual)
@@ -686,7 +689,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_ThenOverwriteWithShorterSeq_Norm
 
     EXPECT_EQ(shortSeq,  bam.Sequence());
     EXPECT_EQ(shortQual, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualOnly_ThenOverwriteWithShorterSeq_EmptyQual)
@@ -702,7 +705,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_ThenOverwriteWithShorterSeq_Empt
 
     EXPECT_EQ(shortSeq,  bam.Sequence());
     EXPECT_EQ(shortQual, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualOnly_ThenOverwriteWithEmptySeq)
@@ -717,7 +720,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_ThenOverwriteWithEmptySeq)
 
     EXPECT_EQ(empty, bam.Sequence());
     EXPECT_EQ(empty, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualTag_Init_Normal)
@@ -748,7 +751,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualTag_Init_Normal)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualTag_Init_EmptySeqQual)
@@ -779,7 +782,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualTag_Init_EmptySeqQual)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualTag_Init_EmptyQual)
@@ -810,7 +813,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualTag_Init_EmptyQual)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualTag_Init_EmptyTag)
@@ -825,7 +828,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualTag_Init_EmptyTag)
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(0,         bam.Tags().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithLongerSeq_NormalQual)
@@ -859,7 +862,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithLongerSeq_Normal
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithLongerSeq_EmptyQual)
@@ -893,7 +896,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithLongerSeq_EmptyQ
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithShorterSeq_NormalQual)
@@ -927,7 +930,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithShorterSeq_Norma
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithShorterSeq_EmptyQual)
@@ -961,7 +964,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithShorterSeq_Empty
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithEmptySeq)
@@ -994,7 +997,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithEmptySeq)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithLongerTags)
@@ -1031,7 +1034,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithLongerTags)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithShorterTags)
@@ -1066,7 +1069,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithShorterTags)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithEmptyTags)
@@ -1087,7 +1090,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualTag_ThenOverwriteWithEmptyTags)
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(0,         bam.Tags().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigar_Init_Normal)
@@ -1103,7 +1106,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_Init_Normal)
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigar_Init_EmptySeqQual)
@@ -1119,7 +1122,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_Init_EmptySeqQual)
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigar_Init_EmptyQual)
@@ -1135,7 +1138,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_Init_EmptyQual)
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigar_Init_EmptyCigar)
@@ -1151,7 +1154,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_Init_EmptyCigar)
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithLongerSeq_NormalQual)
@@ -1170,7 +1173,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithLongerSeq_Norm
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithLongerSeq_EmptyQual)
@@ -1189,7 +1192,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithLongerSeq_Empt
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithShorterSeq_NormalQual)
@@ -1208,7 +1211,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithShorterSeq_Nor
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
     EXPECT_EQ(shortSeq,  bam.Sequence());
     EXPECT_EQ(shortQual, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithShorterSeq_EmptyQual)
@@ -1227,7 +1230,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithShorterSeq_Emp
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
     EXPECT_EQ(shortSeq,  bam.Sequence());
     EXPECT_EQ(shortQual, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithEmptySeq)
@@ -1245,7 +1248,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithEmptySeq)
     EXPECT_EQ(empty, bam.Sequence());
     EXPECT_EQ(empty, bam.Qualities().Fastq());
     EXPECT_EQ(cigar, bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithLongerCigar)
@@ -1263,7 +1266,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithLongerCigar)
     EXPECT_EQ(sequence,    bam.Sequence());
     EXPECT_EQ(qualities,   bam.Qualities().Fastq());
     EXPECT_EQ(longerCigar, bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithShorterCigar)
@@ -1281,7 +1284,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithShorterCigar)
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithEmptyCigar)
@@ -1299,7 +1302,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigar_ThenOverwriteWithEmptyCigar)
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(empty,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_Init_Normal)
@@ -1333,7 +1336,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_Init_Normal)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_Init_EmptySeqQual)
@@ -1367,7 +1370,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_Init_EmptySeqQual)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_Init_EmptyQual)
@@ -1401,7 +1404,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_Init_EmptyQual)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_Init_EmptyCigar)
@@ -1435,7 +1438,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_Init_EmptyCigar)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_Init_EmptyTag)
@@ -1453,7 +1456,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_Init_EmptyTag)
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
     EXPECT_EQ(0,         bam.Tags().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithLongerSeq_NormalQual)
@@ -1490,7 +1493,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithLongerSeq_N
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithLongerSeq_EmptyQual)
@@ -1527,7 +1530,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithLongerSeq_E
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithShorterSeq_NormalQual)
@@ -1564,7 +1567,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithShorterSeq_
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithShorterSeq_EmptyQual)
@@ -1601,7 +1604,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithShorterSeq_
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithEmptySeq)
@@ -1637,7 +1640,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithEmptySeq)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithLongerCigar)
@@ -1673,7 +1676,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithLongerCigar
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithShorterCigar)
@@ -1709,7 +1712,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithShorterCiga
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithEmptyCigar)
@@ -1745,7 +1748,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithEmptyCigar)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithLongerTags)
@@ -1785,7 +1788,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithLongerTags)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithShorterTags)
@@ -1823,7 +1826,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithShorterTags
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithEmptyTags)
@@ -1848,7 +1851,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualCigarTag_ThenOverwriteWithEmptyTags)
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
     EXPECT_EQ(0,         bam.Tags().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameOnly_InitEmpty)
@@ -1856,7 +1859,7 @@ TEST(BamRecordImplVariableDataTest, NameOnly_InitEmpty)
     BamRecordImpl bam;
     bam.Name(std::string());
     EXPECT_EQ(0, bam.Name().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameOnly_InitNormal)
@@ -1867,7 +1870,7 @@ TEST(BamRecordImplVariableDataTest, NameOnly_InitNormal)
     bam.Name(readName);
 
     EXPECT_EQ(readName, bam.Name());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameOnly_ThenOverwriteWithLongerName)
@@ -1880,7 +1883,7 @@ TEST(BamRecordImplVariableDataTest, NameOnly_ThenOverwriteWithLongerName)
     bam.Name(longerName);
 
     EXPECT_EQ(longerName, bam.Name());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameOnly_ThenOverwriteWithShorterName)
@@ -1893,7 +1896,7 @@ TEST(BamRecordImplVariableDataTest, NameOnly_ThenOverwriteWithShorterName)
     bam.Name(readName);
 
     EXPECT_EQ(readName, bam.Name());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameOnly_ThenOverwriteWithEmptyName)
@@ -1906,7 +1909,7 @@ TEST(BamRecordImplVariableDataTest, NameOnly_ThenOverwriteWithEmptyName)
     bam.Name(emptyName);
 
     EXPECT_EQ(emptyName, bam.Name());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameTag_Init_Normal)
@@ -1935,7 +1938,7 @@ TEST(BamRecordImplVariableDataTest, NameTag_Init_Normal)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameTag_Init_EmptyName)
@@ -1964,7 +1967,7 @@ TEST(BamRecordImplVariableDataTest, NameTag_Init_EmptyName)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameTag_Init_EmptyTag)
@@ -1977,7 +1980,7 @@ TEST(BamRecordImplVariableDataTest, NameTag_Init_EmptyTag)
 
     EXPECT_EQ(readName, bam.Name());
     EXPECT_EQ(0,        bam.Tags().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameTag_ThenOverwriteWithLongerName)
@@ -2008,7 +2011,7 @@ TEST(BamRecordImplVariableDataTest, NameTag_ThenOverwriteWithLongerName)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameTag_ThenOverwriteWithShorterName)
@@ -2039,7 +2042,7 @@ TEST(BamRecordImplVariableDataTest, NameTag_ThenOverwriteWithShorterName)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameTag_ThenOverwriteWithEmptyName)
@@ -2070,7 +2073,7 @@ TEST(BamRecordImplVariableDataTest, NameTag_ThenOverwriteWithEmptyName)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameTag_ThenOverwriteWithLongerTags)
@@ -2105,7 +2108,7 @@ TEST(BamRecordImplVariableDataTest, NameTag_ThenOverwriteWithLongerTags)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameTag_ThenOverwriteWithShorterTags)
@@ -2138,7 +2141,7 @@ TEST(BamRecordImplVariableDataTest, NameTag_ThenOverwriteWithShorterTags)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameTag_ThenOverwriteWithEmptyTags)
@@ -2158,7 +2161,7 @@ TEST(BamRecordImplVariableDataTest, NameTag_ThenOverwriteWithEmptyTags)
 
     EXPECT_EQ(readName, bam.Name());
     EXPECT_EQ(0,        bam.Tags().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigar_Init_Normal)
@@ -2172,7 +2175,7 @@ TEST(BamRecordImplVariableDataTest, NameCigar_Init_Normal)
 
     EXPECT_EQ(readName, bam.Name());
     EXPECT_EQ(cigar,    bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigar_Init_EmptyName)
@@ -2186,7 +2189,7 @@ TEST(BamRecordImplVariableDataTest, NameCigar_Init_EmptyName)
 
     EXPECT_EQ(readName, bam.Name());
     EXPECT_EQ(cigar,    bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigar_Init_EmptyCigar)
@@ -2200,7 +2203,7 @@ TEST(BamRecordImplVariableDataTest, NameCigar_Init_EmptyCigar)
 
     EXPECT_EQ(readName, bam.Name());
     EXPECT_EQ(cigar,    bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithLongerName)
@@ -2216,7 +2219,7 @@ TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithLongerName)
 
     EXPECT_EQ(longerName, bam.Name());
     EXPECT_EQ(cigar,      bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithShorterName)
@@ -2232,7 +2235,7 @@ TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithShorterName)
 
     EXPECT_EQ(readName, bam.Name());
     EXPECT_EQ(cigar,    bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithEmptyName)
@@ -2248,7 +2251,7 @@ TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithEmptyName)
 
     EXPECT_EQ(empty, bam.Name());
     EXPECT_EQ(cigar, bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithLongerCigar)
@@ -2264,7 +2267,7 @@ TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithLongerCigar)
 
     EXPECT_EQ(readName,    bam.Name());
     EXPECT_EQ(longerCigar, bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithShorterCigar)
@@ -2280,7 +2283,7 @@ TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithShorterCigar)
 
     EXPECT_EQ(readName, bam.Name());
     EXPECT_EQ(cigar,    bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithEmptyCigar)
@@ -2296,7 +2299,7 @@ TEST(BamRecordImplVariableDataTest, NameCigar_ThenOverwriteWithEmptyCigar)
 
     EXPECT_EQ(readName, bam.Name());
     EXPECT_EQ(empty,    bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigarTag_Init_Normal)
@@ -2328,7 +2331,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_Init_Normal)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigarTag_Init_EmptyName)
@@ -2360,7 +2363,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_Init_EmptyName)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigarTag_Init_EmptyCigar)
@@ -2392,7 +2395,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_Init_EmptyCigar)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigarTag_Init_EmptyTag)
@@ -2408,7 +2411,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_Init_EmptyTag)
     EXPECT_EQ(readName, bam.Name());
     EXPECT_EQ(cigar,    bam.CigarData().ToStdString());
     EXPECT_EQ(0,        bam.Tags().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithLongerName)
@@ -2442,7 +2445,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithLongerName)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithShorterName)
@@ -2476,7 +2479,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithShorterName)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithEmptyName)
@@ -2510,7 +2513,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithEmptyName)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithLongerCigar)
@@ -2544,7 +2547,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithLongerCigar)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithShorterCigar)
@@ -2578,7 +2581,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithShorterCigar)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithEmptyCigar)
@@ -2612,7 +2615,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithEmptyCigar)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithLongerTags)
@@ -2650,7 +2653,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithLongerTags)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithShorterTags)
@@ -2686,7 +2689,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithShorterTags)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithEmptyTags)
@@ -2709,7 +2712,7 @@ TEST(BamRecordImplVariableDataTest, NameCigarTag_ThenOverwriteWithEmptyTags)
     EXPECT_EQ(readName, bam.Name());
     EXPECT_EQ(cigar,    bam.CigarData().ToStdString());
     EXPECT_EQ(0,        bam.Tags().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQual_Init_Normal)
@@ -2725,7 +2728,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQual_Init_Normal)
     EXPECT_EQ(readName,  bam.Name());
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQual_Init_EmptySeqQual)
@@ -2741,7 +2744,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQual_Init_EmptySeqQual)
     EXPECT_EQ(readName,  bam.Name());
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQual_Init_EmptyQual)
@@ -2757,7 +2760,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQual_Init_EmptyQual)
     EXPECT_EQ(readName,  bam.Name());
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithLongerName)
@@ -2775,7 +2778,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithLongerName)
     EXPECT_EQ(longerName, bam.Name());
     EXPECT_EQ(sequence,   bam.Sequence());
     EXPECT_EQ(qualities,  bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithShorterName)
@@ -2793,7 +2796,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithShorterName)
     EXPECT_EQ(readName,  bam.Name());
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithEmptyName)
@@ -2811,7 +2814,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithEmptyName)
     EXPECT_EQ(empty,     bam.Name());
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithLongerSeq_NormalQual)
@@ -2830,7 +2833,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithLongerSeq_Norma
     EXPECT_EQ(readName,  bam.Name());
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithLongerSeq_EmptyQual)
@@ -2849,7 +2852,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithLongerSeq_Empty
     EXPECT_EQ(readName,  bam.Name());
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithShorterSeq_NormalQual)
@@ -2868,7 +2871,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithShorterSeq_Norm
     EXPECT_EQ(readName,  bam.Name());
     EXPECT_EQ(shortSeq,  bam.Sequence());
     EXPECT_EQ(shortQual, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithShorterSeq_EmptyQual)
@@ -2887,7 +2890,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithShorterSeq_Empt
     EXPECT_EQ(readName,  bam.Name());
     EXPECT_EQ(shortSeq,  bam.Sequence());
     EXPECT_EQ(shortQual, bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithEmptySeq)
@@ -2905,7 +2908,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQual_ThenOverwriteWithEmptySeq)
     EXPECT_EQ(readName, bam.Name());
     EXPECT_EQ(empty,    bam.Sequence());
     EXPECT_EQ(empty,    bam.Qualities().Fastq());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_Init_Normal)
@@ -2939,7 +2942,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_Init_Normal)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_Init_EmptyName)
@@ -2973,7 +2976,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_Init_EmptyName)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_Init_EmptySeqQual)
@@ -3007,7 +3010,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_Init_EmptySeqQual)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_Init_EmptyQual)
@@ -3041,7 +3044,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_Init_EmptyQual)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_Init_EmptyTag)
@@ -3060,7 +3063,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_Init_EmptyTag)
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(0,         bam.Tags().size());
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithLongerName)
@@ -3096,7 +3099,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithLongerName)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithShorterName)
@@ -3132,7 +3135,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithShorterName)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithEmptyName)
@@ -3168,7 +3171,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithEmptyName)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithLongerSeq_NormalQual)
@@ -3205,7 +3208,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithLongerSeq_No
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithLongerSeq_EmptyQual)
@@ -3242,7 +3245,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithLongerSeq_Em
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithShorterSeq_NormalQual)
@@ -3279,7 +3282,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithShorterSeq_N
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithShorterSeq_EmptyQual)
@@ -3316,7 +3319,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithShorterSeq_E
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithEmptySeq)
@@ -3352,7 +3355,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithEmptySeq)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithLongerTags)
@@ -3392,7 +3395,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithLongerTags)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithShorterTags)
@@ -3430,7 +3433,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithShorterTags)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithEmptyTags)
@@ -3455,7 +3458,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualTag_ThenOverwriteWithEmptyTags)
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(0,         bam.Tags().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_Init_Normal)
@@ -3474,7 +3477,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_Init_Normal)
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_Init_EmptyName)
@@ -3493,7 +3496,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_Init_EmptyName)
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_Init_EmptySeqQual)
@@ -3512,7 +3515,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_Init_EmptySeqQual)
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_Init_EmptyQual)
@@ -3531,7 +3534,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_Init_EmptyQual)
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_Init_EmptyCigar)
@@ -3550,7 +3553,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_Init_EmptyCigar)
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithLongerName)
@@ -3571,7 +3574,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithLongerName
     EXPECT_EQ(sequence,    bam.Sequence());
     EXPECT_EQ(qualities,   bam.Qualities().Fastq());
     EXPECT_EQ(cigar,       bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithShorterName)
@@ -3592,7 +3595,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithShorterNam
     EXPECT_EQ(sequence,    bam.Sequence());
     EXPECT_EQ(qualities,   bam.Qualities().Fastq());
     EXPECT_EQ(cigar,       bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithEmptyName)
@@ -3613,7 +3616,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithEmptyName)
     EXPECT_EQ(sequence,    bam.Sequence());
     EXPECT_EQ(qualities,   bam.Qualities().Fastq());
     EXPECT_EQ(cigar,       bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithLongerSeq_NormalQual)
@@ -3635,7 +3638,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithLongerSeq_
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithLongerSeq_EmptyQual)
@@ -3657,7 +3660,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithLongerSeq_
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithShorterSeq_NormalQual)
@@ -3679,7 +3682,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithShorterSeq
     EXPECT_EQ(shortSeq,  bam.Sequence());
     EXPECT_EQ(shortQual, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithShorterSeq_EmptyQual)
@@ -3701,7 +3704,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithShorterSeq
     EXPECT_EQ(shortSeq,  bam.Sequence());
     EXPECT_EQ(shortQual, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithEmptySeq)
@@ -3722,7 +3725,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithEmptySeq)
     EXPECT_EQ(empty,    bam.Sequence());
     EXPECT_EQ(empty,    bam.Qualities().Fastq());
     EXPECT_EQ(cigar,    bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithLongerCigar)
@@ -3743,7 +3746,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithLongerCiga
     EXPECT_EQ(sequence,    bam.Sequence());
     EXPECT_EQ(qualities,   bam.Qualities().Fastq());
     EXPECT_EQ(longerCigar, bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithShorterCigar)
@@ -3764,7 +3767,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithShorterCig
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithEmptyCigar)
@@ -3785,7 +3788,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigar_ThenOverwriteWithEmptyCigar
     EXPECT_EQ(sequence,  bam.Sequence());
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(empty,     bam.CigarData().ToStdString());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -3824,7 +3827,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_Normal)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_EmptyName)
@@ -3861,7 +3864,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_EmptyName)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_EmptySeqQual)
@@ -3898,7 +3901,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_EmptySeqQual)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_EmptyQual)
@@ -3935,7 +3938,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_EmptyQual)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_EmptyCigar)
@@ -3972,7 +3975,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_EmptyCigar)
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_EmptyTag)
@@ -3993,7 +3996,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_Init_EmptyTag)
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
     EXPECT_EQ(0,         bam.Tags().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithLongerName)
@@ -4032,7 +4035,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithLongerN
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithShorterName)
@@ -4071,7 +4074,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithShorter
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithEmptyName)
@@ -4110,7 +4113,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithEmptyNa
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithLongerSeq_NormalQual)
@@ -4150,7 +4153,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithLongerS
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithLongerSeq_EmptyQual)
@@ -4190,7 +4193,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithLongerS
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithShorterSeq_NormalQual)
@@ -4230,7 +4233,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithShorter
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithShorterSeq_EmptyQual)
@@ -4270,7 +4273,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithShorter
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithEmptySeq)
@@ -4309,7 +4312,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithEmptySe
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithLongerCigar)
@@ -4348,7 +4351,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithLongerC
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithShorterCigar)
@@ -4387,7 +4390,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithShorter
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithEmptyCigar)
@@ -4426,7 +4429,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithEmptyCi
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithLongerTags)
@@ -4469,7 +4472,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithLongerT
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithShorterTags)
@@ -4510,7 +4513,7 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithShorter
     const std::string sam = SamTagCodec::Encode(bam.Tags());
     EXPECT_EQ(expected, sam);
 
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }
 
 TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithEmptyTags)
@@ -4538,5 +4541,5 @@ TEST(BamRecordImplVariableDataTest, NameSeqQualCigarTag_ThenOverwriteWithEmptyTa
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     EXPECT_EQ(cigar,     bam.CigarData().ToStdString());
     EXPECT_EQ(0,         bam.Tags().size());
-    tests::CheckRawData(bam);
+    BamRecordImplVariableDataTests::CheckRawData(bam);
 }

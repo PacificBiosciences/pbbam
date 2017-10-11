@@ -39,6 +39,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/QNameQuery.h"
 #include "pbbam/CompositeBamReader.h"
 #include <boost/optional.hpp>
@@ -97,7 +99,7 @@ QNameQuery::QNameQuery(const DataSet& dataset)
     , d_(new QNameQueryPrivate(dataset))
 { }
 
-QNameQuery::~QNameQuery(void) { }
+QNameQuery::~QNameQuery() { }
 
 bool QNameQuery::GetNext(std::vector<BamRecord>& records)
 { return d_->GetNext(records); }

@@ -1,4 +1,4 @@
-// Copyright (c) 2015, Pacific Biosciences of California, Inc.
+// Copyright (c) 2015-2017, Pacific Biosciences of California, Inc.
 //
 // All rights reserved.
 //
@@ -39,60 +39,21 @@
 //
 // Author: Armin Töpfer
 
+#include "PbbamInternalConfig.h"
+
+#include <cstdint>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <vector>
 
+#include "pbbam/MoveAppend.h"
 #include "pbbam/virtual/VirtualZmwBamRecord.h"
 #include "pbbam/virtual/VirtualRegionType.h"
 #include "pbbam/virtual/VirtualRegionTypeMap.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
-
-/// \brief Appends content of src vector to dst vector using move semantics.
-///
-/// \param[in]     src  Input vector that will be empty after execution
-/// \param[in,out] dst  Output vector that will be appended to
-///
-template <typename T>
-inline void MoveAppend(std::vector<T>& src, std::vector<T>& dst) noexcept
-{
-    if (dst.empty())
-    {
-        dst = std::move(src);
-    }
-    else
-    {
-        dst.reserve(dst.size() + src.size());
-        std::move(src.begin(), src.end(), std::back_inserter(dst));
-        src.clear();
-    }
-}
-
-/// \brief Appends content of src vector to dst vector using move semantics.
-///
-/// \param[in]     src  Input vector via perfect forwarding
-/// \param[in,out] dst  Output vector that will be appended to
-///
-template <typename T>
-inline void MoveAppend(std::vector<T>&& src, std::vector<T>& dst) noexcept
-{
-    if (dst.empty())
-    {
-        dst = std::move(src);
-    }
-    else
-    {
-        dst.reserve(dst.size() + src.size());
-        std::move(src.begin(), src.end(), std::back_inserter(dst));
-        src.clear();
-    }
-}
-
-} // namespace internal
 
 VirtualZmwBamRecord::VirtualZmwBamRecord(
     std::vector<BamRecord>&& unorderedSources, const BamHeader& header)
@@ -117,7 +78,7 @@ Frames VirtualZmwBamRecord::IPDV1Frames(Orientation orientation) const
 }
 
 
-void VirtualZmwBamRecord::StitchSources(void)
+void VirtualZmwBamRecord::StitchSources()
 {
     const auto& firstRecord = sources_[0];
     const auto& lastRecord = sources_[sources_.size() - 1];
@@ -144,6 +105,7 @@ void VirtualZmwBamRecord::StitchSources(void)
     std::vector<float>    pa;
     std::vector<float>    pm;
     std::vector<uint32_t> sf;
+    std::vector<PacBio::BAM::PulseExclusionReason> pe;
 
     // initialize capacity
     const auto stitchedSize = lastRecord.QueryEnd() - firstRecord.QueryStart();
@@ -167,8 +129,7 @@ void VirtualZmwBamRecord::StitchSources(void)
     pa.reserve(stitchedSize);
     pm.reserve(stitchedSize);
     sf.reserve(stitchedSize);
-
-    using internal::MoveAppend;
+    pe.reserve(stitchedSize);
 
     // Stitch using tmp vars
     for(auto& b : sources_)
@@ -234,6 +195,9 @@ void VirtualZmwBamRecord::StitchSources(void)
         if (b.HasPkmean2())
             MoveAppend(b.Pkmean2(), pa);
 
+        if (b.HasPulseExclusion())
+            MoveAppend(b.PulseExclusionReason(), pe);
+
         if (b.HasStartFrame())
             MoveAppend(b.StartFrame(), sf);
 
@@ -254,7 +218,7 @@ void VirtualZmwBamRecord::StitchSources(void)
             if (b.HasBarcodes())
                 barcodes = b.Barcodes();
 
-            constexpr auto regionType = VirtualRegionType::SUBREAD;
+            static constexpr const auto regionType = VirtualRegionType::SUBREAD;
             if (!HasVirtualRegionType(regionType))
                 virtualRegionsMap_[regionType] = std::vector<VirtualRegion>();
 
@@ -328,6 +292,10 @@ void VirtualZmwBamRecord::StitchSources(void)
     if (!alternativeLabelQv.empty())
         this->AltLabelQV(alternativeLabelQv);
 
+    // PulseExclusionReason
+    if (!pe.empty())
+        this->PulseExclusionReason(pe);
+
     // 16 bit arrays
     if (!ipd.Data().empty())
         this->IPD(ipd, FrameEncodingType::LOSSLESS);
@@ -382,7 +350,7 @@ void VirtualZmwBamRecord::StitchSources(void)
 
 
 std::map<VirtualRegionType, std::vector<VirtualRegion>>
-VirtualZmwBamRecord::VirtualRegionsMap(void) const
+VirtualZmwBamRecord::VirtualRegionsMap() const
 { return virtualRegionsMap_; }
 
 std::vector<VirtualRegion>

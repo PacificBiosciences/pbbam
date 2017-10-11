@@ -62,7 +62,7 @@ public:
     /// \{
 
     FastaSequenceQuery(const PacBio::BAM::DataSet& dataset);
-    ~FastaSequenceQuery(void);
+    ~FastaSequenceQuery() override;
 
     /// \}
 
@@ -72,7 +72,7 @@ public:
     /// Most client code should not need to use this method directly. Use
     /// iterators instead.
     ///
-    bool GetNext(FastaSequence& seq);
+    bool GetNext(FastaSequence& seq) override;
 
 private:
     struct FastaSequenceQueryPrivate;

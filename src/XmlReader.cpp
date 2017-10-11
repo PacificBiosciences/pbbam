@@ -35,6 +35,8 @@
 
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "XmlReader.h"
 #include "StringUtils.h"
 #include "pugixml/pugixml.hpp"
