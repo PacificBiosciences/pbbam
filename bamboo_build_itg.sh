@@ -70,7 +70,7 @@ md5sum  pbbam-${PBBAM_VERSION}.${SNAPSHOT}${BUILD_NUMBER}-x86_64.tgz | awk -e '{
 if [ "$bamboo_planRepository_branchName" = "develop" ]; then
   NEXUS_URL=http://ossnexus.pacificbiosciences.com/repository/maven-snapshots/pacbio/itg/pbbam/${PBBAM_VERSION}.${BUILD_NUMBER}
 elif [ "$bamboo_planRepository_branchName" = "master" ]; then
-  NEXUS_URL=http://ossnexus.pacificbiosciences.com/repository/maven-release/pacbio/itg/pbbam/${PBBAM_VERSION}.${BUILD_NUMBER}
+  NEXUS_URL=http://ossnexus.pacificbiosciences.com/repository/maven-releases/pacbio/itg/pbbam/${PBBAM_VERSION}.${BUILD_NUMBER}
 else
   echo "[INFO] pbbam-${PBBAM_VERSION}.SNAPSHOT${BUILD_NUMBER}-x86_64.tgz if the branch was develop"
   exit
