@@ -120,7 +120,7 @@ inline void WriteBgzfVector(BGZF* fp,
     if (fp->is_be)
         SwapEndianness(data);
     auto ret = bgzf_write(fp, &data[0], numElements*sizeof(T));
-    ret = 0;
+    assert(ret >= 0);
 }
 
 // --------------------------
@@ -345,6 +345,7 @@ void PbiReferenceDataBuilder::WriteData(BGZF* bgzf)
     if (bgzf->is_be)
         numRefs = ed_swap_4(numRefs);
     auto ret = bgzf_write(bgzf, &numRefs, 4);
+    assert(ret > 0);
 
     // reference entries
     numRefs = refData.entries_.size(); // need to reset after maybe endian-swapping
@@ -361,8 +362,11 @@ void PbiReferenceDataBuilder::WriteData(BGZF* bgzf)
             endRow   = ed_swap_4(endRow);
         }
         ret = bgzf_write(bgzf, &tId,      4);
+        assert(ret > 0);
         ret = bgzf_write(bgzf, &beginRow, 4);
+        assert(ret > 0);
         ret = bgzf_write(bgzf, &endRow,   4);
+        assert(ret > 0);
     }
 }
 
@@ -703,6 +707,7 @@ void PbiBuilderPrivate::WritePbiHeader(BGZF* bgzf)
     // 'magic' string
     static constexpr const std::array<char, 4> magic{{'P', 'B', 'I', '\1'}};
     auto ret = bgzf_write(bgzf, magic.data(), 4);
+    assert(ret > 0);
 
     PbiFile::Sections sections = PbiFile::BASIC;
     if (hasMappedData_)  sections |= PbiFile::MAPPED;
@@ -720,13 +725,17 @@ void PbiBuilderPrivate::WritePbiHeader(BGZF* bgzf)
         numReads  = ed_swap_4(numReads);
     }
     ret = bgzf_write(bgzf, &version,   4);
+    assert(ret > 0);
     ret = bgzf_write(bgzf, &pbi_flags, 2);
+    assert(ret > 0);
     ret = bgzf_write(bgzf, &numReads,  4);
+    assert(ret > 0);
 
     // reserved space
     char reserved[18];
     memset(reserved, 0, 18);
     ret = bgzf_write(bgzf, reserved, 18);
+    assert(ret > 0);
 }
 
 void PbiBuilderPrivate::WriteReferenceData(BGZF* bgzf)
