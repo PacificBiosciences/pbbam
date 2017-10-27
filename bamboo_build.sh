@@ -22,6 +22,7 @@ module load ccache/3.3.4
 module load cmake/3.9.0
 module load ninja/1.7.2
 module load swig
+module load htslib/1.3.1
 module load zlib/1.2.11
 module load boost/1.60
 set -vx
@@ -50,9 +51,7 @@ function resolve_dep {
 }
   
 # external lib deps
-#resolve_dep boost boost 1.58
 resolve_dep google gtest 1.7.0 src
-#resolve_dep pacbio/sat/htslib htslib 4
 
 # mhsieh invasion
 CFLAGS="-fPIC"
@@ -60,14 +59,8 @@ CXXFLAGS="-fPIC"
 LDFLAGS="-static-libstdc++ -static-libgcc"
 export CFLAGS CXXFLAGS LDFLAGS
 
-# TODO use standard names in cmake for this project, so these -D options can be added by resolve_dep rather than by hand
-#cmake -DBOOST_ROOT=`pwd`/boost-1.58 -DGTEST_SRC_DIR=`pwd`/gtest-1.7.0 -Dhtslib_DIR=`pwd`/htslib-4 ..
-#cmake -DBOOST_ROOT=`pwd`/boost-1.58 -DGTEST_SRC_DIR=`pwd`/gtest-1.7.0 -DHTSLIB_INCLUDE_DIRS=/pbi/dept/secondary/builds/develop/current_thirdpartyall-release_installdir/htslib/htslib_1.3.2/include -DHTSLIB_LIBRARIES=/pbi/dept/secondary/builds/develop/current_thirdpartyall-release_installdir/htslib/htslib_1.3.2/lib/libhts.so ..
 cmake \
-            -DBOOST_ROOT=${BOOST_ROOT} \
             -DGTEST_SRC_DIR=$(pwd)/gtest-1.7.0 \
-            -DHTSLIB_INCLUDE_DIRS=/pbi/dept/secondary/builds/develop/current_thirdpartyall-release_installdir/htslib/htslib_1.3.2/include \
-            -DHTSLIB_LIBRARIES=/pbi/dept/secondary/builds/develop/current_thirdpartyall-release_installdir/htslib/htslib_1.3.2/lib/libhts.so \
             ..
 
 make -j
