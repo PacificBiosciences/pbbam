@@ -111,6 +111,15 @@ inline void SwapEndianness(std::vector<T>& data)
     }
 }
 
+void bgzf_write_safe(BGZF *fp, const void *data, size_t length)
+{
+    auto ret = ::bgzf_write(fp, data, length);
+    if (ret < 0U) {
+        auto msg = "Non-zero returned from bgzf_write(). Out of disk space?";
+        throw std::runtime_error(msg);
+    }
+}
+
 template<typename T>
 inline void WriteBgzfVector(BGZF* fp,
                             std::vector<T>& data,
@@ -119,8 +128,7 @@ inline void WriteBgzfVector(BGZF* fp,
     assert(fp);
     if (fp->is_be)
         SwapEndianness(data);
-    auto ret = bgzf_write(fp, &data[0], numElements*sizeof(T));
-    ret = 0;
+    bgzf_write_safe(fp, &data[0], numElements*sizeof(T));
 }
 
 // --------------------------
@@ -344,7 +352,7 @@ void PbiReferenceDataBuilder::WriteData(BGZF* bgzf)
     uint32_t numRefs = refData.entries_.size();
     if (bgzf->is_be)
         numRefs = ed_swap_4(numRefs);
-    auto ret = bgzf_write(bgzf, &numRefs, 4);
+    bgzf_write_safe(bgzf, &numRefs, 4);
 
     // reference entries
     numRefs = refData.entries_.size(); // need to reset after maybe endian-swapping
@@ -360,9 +368,9 @@ void PbiReferenceDataBuilder::WriteData(BGZF* bgzf)
             beginRow = ed_swap_4(beginRow);
             endRow   = ed_swap_4(endRow);
         }
-        ret = bgzf_write(bgzf, &tId,      4);
-        ret = bgzf_write(bgzf, &beginRow, 4);
-        ret = bgzf_write(bgzf, &endRow,   4);
+        bgzf_write_safe(bgzf, &tId,      4);
+        bgzf_write_safe(bgzf, &beginRow, 4);
+        bgzf_write_safe(bgzf, &endRow,   4);
     }
 }
 
@@ -702,7 +710,7 @@ void PbiBuilderPrivate::WritePbiHeader(BGZF* bgzf)
 {
     // 'magic' string
     static constexpr const std::array<char, 4> magic{{'P', 'B', 'I', '\1'}};
-    auto ret = bgzf_write(bgzf, magic.data(), 4);
+    bgzf_write_safe(bgzf, magic.data(), 4);
 
     PbiFile::Sections sections = PbiFile::BASIC;
     if (hasMappedData_)  sections |= PbiFile::MAPPED;
@@ -719,14 +727,14 @@ void PbiBuilderPrivate::WritePbiHeader(BGZF* bgzf)
         pbi_flags = ed_swap_2(pbi_flags);
         numReads  = ed_swap_4(numReads);
     }
-    ret = bgzf_write(bgzf, &version,   4);
-    ret = bgzf_write(bgzf, &pbi_flags, 2);
-    ret = bgzf_write(bgzf, &numReads,  4);
+    bgzf_write_safe(bgzf, &version,   4);
+    bgzf_write_safe(bgzf, &pbi_flags, 2);
+    bgzf_write_safe(bgzf, &numReads,  4);
 
     // reserved space
     char reserved[18];
     memset(reserved, 0, 18);
-    ret = bgzf_write(bgzf, reserved, 18);
+    bgzf_write_safe(bgzf, reserved, 18);
 }
 
 void PbiBuilderPrivate::WriteReferenceData(BGZF* bgzf)
