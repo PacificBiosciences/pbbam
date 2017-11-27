@@ -618,7 +618,7 @@ void BamRecord::CalculateAlignedPositions() const
     const RecordType type  = Type();
     const Position qStart  = (type == RecordType::CCS) ? Position(0) : QueryStart();
     const Position qEnd    = (type == RecordType::CCS) ? Position(seqLength) : QueryEnd();
-    
+
     if (qStart == PacBio::BAM::UnmappedPosition || qEnd == PacBio::BAM::UnmappedPosition)
         return;
 
@@ -690,20 +690,9 @@ BamRecord& BamRecord::Clip(const ClipType clipType,
     }
 }
 
-void BamRecord::ClipFields(const size_t clipFrom,
-                           const size_t clipLength)
+void BamRecord::ClipTags(const size_t clipFrom,
+                         const size_t clipLength)
 {
-    const bool isForwardStrand = (AlignedStrand() == Strand::FORWARD);
-
-    // clip seq, quals
-    std::string sequence = internal::Clip(Sequence(Orientation::NATIVE), clipFrom, clipLength);
-    QualityValues qualities = internal::Clip(Qualities(Orientation::NATIVE), clipFrom, clipLength);
-    if (!isForwardStrand) {
-        internal::ReverseComplement(sequence);
-        internal::Reverse(qualities);
-    }
-    impl_.SetSequenceAndQualities(sequence, qualities.Fastq());
-
     FrameCodec ipdCodec = ReadGroup().IpdCodec();
     FrameCodec pwCodec = ReadGroup().PulseWidthCodec();
 
@@ -769,6 +758,23 @@ void BamRecord::ClipFields(const size_t clipFrom,
     }
 
     impl_.Tags(tags);
+}
+
+void BamRecord::ClipFields(const size_t clipFrom,
+                           const size_t clipLength)
+{
+    const bool isForwardStrand = (AlignedStrand() == Strand::FORWARD);
+
+    // clip seq, quals
+    std::string sequence = internal::Clip(Sequence(Orientation::NATIVE), clipFrom, clipLength);
+    QualityValues qualities = internal::Clip(Qualities(Orientation::NATIVE), clipFrom, clipLength);
+    if (!isForwardStrand) {
+        internal::ReverseComplement(sequence);
+        internal::Reverse(qualities);
+    }
+    impl_.SetSequenceAndQualities(sequence, qualities.Fastq());
+
+    ClipTags(clipFrom, clipLength);
 }
 
 BamRecord& BamRecord::ClipToQuery(const Position start,
