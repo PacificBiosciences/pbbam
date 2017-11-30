@@ -25,6 +25,11 @@ if(PacBioBAM_build_tests)
     enable_testing()
 endif()
 
+STRING(TOLOWER "${PBBAM_PERMISSIVE_CIGAR}" PBBAM_PERMISSIVE_CIGAR_LOWER)
+if (DEFINED PBBAM_PERMISSIVE_CIGAR)
+    add_definitions(-DPBBAM_PERMISSIVE_CIGAR)
+endif()
+
 # project paths
 set(PacBioBAM_RootDir       ${CMAKE_CURRENT_LIST_DIR})
 set(PacBioBAM_DocsDir       ${PacBioBAM_RootDir}/docs)
