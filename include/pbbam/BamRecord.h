@@ -1230,11 +1230,16 @@ private:
     /// pulse to bam mapping cache
     mutable std::unique_ptr<internal::Pulse2BaseCache> p2bCache_;
 
+public:
+    /// clips the PacBio tags to a specified length
+    void ClipTags(const size_t clipPos, const size_t clipLength);
+
 private:
     ///\internal
     /// clipping methods
 
     void ClipFields(const size_t clipPos, const size_t clipLength);
+
     BamRecord& ClipToQuery(const PacBio::BAM::Position start,
                            const PacBio::BAM::Position end);
     BamRecord& ClipToReference(const PacBio::BAM::Position start,
