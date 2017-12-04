@@ -99,4 +99,4 @@ pbbam_lib = library(
   install : pbbam_lib_install,
   dependencies : [pbbam_thread_dep, pbbam_boost_dep, pbbam_zlib_dep, pbbam_htslib_dep],
   include_directories : pbbam_include_directories,
-  cpp_args : [pbbam_extra_flags, pbbam_warning_flags])
+  cpp_args : [pbbam_extra_flags, pbbam_warning_flags, pbbam_macros])

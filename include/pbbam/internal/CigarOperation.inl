@@ -48,16 +48,20 @@ inline CigarOperation::CigarOperation(char c, uint32_t length)
     : type_(CigarOperation::CharToType(c))
     , length_(length)
 {
-    if (type_ == CigarOperationType::ALIGNMENT_MATCH)
-        throw std::runtime_error("CIGAR operation 'M' is not allowed in PacBio BAM files. Use 'X/=' instead.");
+    #ifndef PBBAM_PERMISSIVE_CIGAR
+        if (type_ == CigarOperationType::ALIGNMENT_MATCH)
+            throw std::runtime_error("CIGAR operation 'M' is not allowed in PacBio BAM files. Use 'X/=' instead.");
+    #endif
 }
 
 inline CigarOperation::CigarOperation(CigarOperationType op, uint32_t length)
     : type_(op)
     , length_(length)
 {
-    if (type_ == CigarOperationType::ALIGNMENT_MATCH)
-        throw std::runtime_error("CIGAR operation 'M' is not allowed in PacBio BAM files. Use 'X/=' instead.");
+    #ifndef PBBAM_PERMISSIVE_CIGAR
+        if (type_ == CigarOperationType::ALIGNMENT_MATCH)
+            throw std::runtime_error("CIGAR operation 'M' is not allowed in PacBio BAM files. Use 'X/=' instead.");
+    #endif
 }
 
 inline uint32_t CigarOperation::Length() const

@@ -36,6 +36,11 @@ if cpp.get_id() == 'clang'
   endforeach
 endif
 
+pbbam_macros = []
+if get_option('PBBAM_PERMISSIVE_CIGAR')
+  pbbam_macros += ['-DPBBAM_PERMISSIVE_CIGAR']
+endif
+
 ################
 # dependencies #
 ################
@@ -121,4 +126,4 @@ pbbam_dep = declare_dependency(
   link_with : pbbam_lib,
   dependencies : pbbam_htslib_dep,
   version : meson.project_version(),
-  compile_args : pbbam_warning_flags)
+  compile_args : pbbam_warning_flags + pbbam_macros)
