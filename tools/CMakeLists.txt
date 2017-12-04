@@ -43,5 +43,6 @@ if (PacBioBAM_build_tools)
     add_subdirectory(pbindex)
     add_subdirectory(pbindexdump)
     add_subdirectory(pbmerge)
+    add_subdirectory(pbbamify)
 
 endif()

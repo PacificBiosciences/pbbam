@@ -169,3 +169,53 @@ if get_option('enable-tests') and not get_option('enable-auto-validate')
     pbmerge_dataset_t,
     pbmerge_fofn_t])
 endif
+
+############
+# pbbamify #
+############
+
+pbbam_PbBamifyVersion_h_config = configuration_data()
+pbbam_PbBamifyVersion_h_config.set('PbBamify_VERSION', meson.project_version())
+pbbam_PbBamifyVersion_h_config.set('PacBioBAM_VERSION', meson.project_version())
+pbbam_PbBamifyVersion_h_config.set('PacBioBAM_BinDir', meson.current_build_dir())
+pbbam_PbBamifyVersion_h_config.set('PacBioBAM_TestsDir', join_paths([meson.current_source_dir(), '../tests']))
+pbbam_PbBamifyVersion_h_config.set('GeneratedTestDataDir', join_paths(meson.current_build_dir()))
+pbbam_PbBamifyVersion_h_config.set('GeneratedDir', join_paths(meson.current_build_dir(), '../tests'))
+pbbam_PbBamifyVersion_h = configure_file(
+  input : files('pbbamify/src/PbBamifyVersion.h.in'),
+  output : 'PbBamifyVersion.h',
+  configuration : pbbam_PbBamifyVersion_h_config)
+
+pbbam_pbbamify_cpp_sources = [pbbam_PbBamifyVersion_h]
+pbbam_pbbamify_cpp_sources += files([
+  'common/OptionParser.cpp',
+  'pbbamify/src/main.cpp',
+  'pbbamify/src/PbBamify.cpp',
+  'pbbamify/src/QueryLookup.cpp'
+  ])
+
+pbbam_pbbamify = executable(
+  'pbbamify',
+  pbbam_pbbamify_cpp_sources,
+  dependencies : [pbbam_boost_dep, pbbam_htslib_dep, pbbam_zlib_dep],
+  include_directories : [pbbam_include_directories, include_directories('pbbamify')],
+  link_with : pbbam_lib,
+  install : get_option('enable-build-tools'),
+  cpp_args : pbbam_warning_flags)
+
+
+# tests
+# These will only work with enable-permissive-cigar flag turned on.
+if get_option('enable-tests') and get_option('enable-permissive-cigar')
+  pbbamify_t = configure_file(
+    input : pbbam_cram_pbbamify_t_in,
+    output : 'pbbamify.t',
+    configuration : pbbam_PbBamifyVersion_h_config)
+
+  test(
+    'pbbamifyCramTests',
+    pbbam_python,
+    args : pbbam_cram_py + [pbbamify_t])
+endif
+
+### Tests will be added later.

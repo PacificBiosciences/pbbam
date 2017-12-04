@@ -41,3 +41,8 @@ custom_target('pbbam_generate_data',
   install : false)
 
 test('pbbam test', pbbam_test)
+
+pbbamify_synthetic_dataset = configure_file(
+  input : files('data/pbbamify/synthetic_movie_all.subreadset.xml.in'),
+  output : 'synthetic_movie_all.subreadset.xml',
+  configuration : pbbam_PbbamTestData_h_config)

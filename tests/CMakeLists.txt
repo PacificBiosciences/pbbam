@@ -21,6 +21,10 @@ if(PacBioBAM_build_tests)
         ${PacBioBAM_TestsDir}/data/group/group.fofn.in
         ${CMAKE_BINARY_DIR}/generated/group.fofn
     )
+    configure_file(
+        ${PacBioBAM_TestsDir}/data/pbbamify/synthetic_movie_all.subreadset.xml.in
+        ${CMAKE_BINARY_DIR}/generated/synthetic_movie_all.subreadset.xml
+    )
 
     # grab PacBioBAM unit test source files
     include(files.cmake)

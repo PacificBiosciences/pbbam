@@ -57,3 +57,4 @@ pbbam_cram_pbmerge_aligned_ordering_t_in = files('cram/pbmerge_aligned_ordering.
 pbbam_cram_pbmerge_mixed_ordering_t_in = files('cram/pbmerge_mixed_ordering.t.in')
 pbbam_cram_pbmerge_dataset_t_in = files('cram/pbmerge_dataset.t.in')
 pbbam_cram_pbmerge_fofn_t_in = files('cram/pbmerge_fofn.t.in')
+pbbam_cram_pbbamify_t_in = files('cram/pbbamify.t.in')
