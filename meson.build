@@ -38,7 +38,7 @@ if cpp.get_id() == 'clang'
 endif
 
 pbbam_macros = []
-if get_option('PBBAM_PERMISSIVE_CIGAR')
+if get_option('enable-permissive-cigar')
   pbbam_macros += ['-DPBBAM_PERMISSIVE_CIGAR']
 endif
 

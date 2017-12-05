@@ -18,7 +18,7 @@ option('enable-tests',
     value : true,
     description : 'Enable dependencies required for testing')
 
-option('PBBAM_PERMISSIVE_CIGAR',
+option('enable-permissive-cigar',
     type : 'boolean',
     value : false,
     description : 'Allows loading BAM records which contain "M" operations in CIGAR strings.')
