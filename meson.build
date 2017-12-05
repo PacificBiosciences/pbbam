@@ -4,6 +4,7 @@ project(
   version : '0.13.2',
   default_options : [
     'buildtype=release',
+    'default_library=static',
     'warning_level=3',
     'cpp_std=c++14'],
   license : 'BSD-3',
@@ -37,7 +38,7 @@ if cpp.get_id() == 'clang'
 endif
 
 pbbam_macros = []
-if get_option('PBBAM_PERMISSIVE_CIGAR')
+if get_option('enable-permissive-cigar')
   pbbam_macros += ['-DPBBAM_PERMISSIVE_CIGAR']
 endif
 

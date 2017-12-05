@@ -94,7 +94,11 @@ pbbam_lib_install = (not meson.is_subproject()) or (get_option('default_library'
 pbbam_lib = library(
   'pbbam',
   pbbam_cpp_sources,
-  soversion : 0,
+  # use boost SONAME practice:
+  #   cause ld startup issues before
+  #   you even have the chance of running
+  #   into ABI issues.
+  soversion : meson.project_version(),
   version : meson.project_version(),
   install : pbbam_lib_install,
   dependencies : [pbbam_thread_dep, pbbam_boost_dep, pbbam_zlib_dep, pbbam_htslib_dep],
