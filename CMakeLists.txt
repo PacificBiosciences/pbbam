@@ -25,8 +25,10 @@ if(PacBioBAM_build_tests)
     enable_testing()
 endif()
 
+set(PacBioBAM_permissive_cigar  OFF)
 STRING(TOLOWER "${PBBAM_PERMISSIVE_CIGAR}" PBBAM_PERMISSIVE_CIGAR_LOWER)
 if (DEFINED PBBAM_PERMISSIVE_CIGAR)
+    set(PacBioBAM_permissive_cigar  ON)
     add_definitions(-DPBBAM_PERMISSIVE_CIGAR)
 endif()
 
