@@ -27,7 +27,7 @@ Additional requirements:
 * `Boost`_ (1.55+)
 * `CMake`_ (3.0+)
 * `Google Test`_
-* `htslib`_ (1.3.1+)
+* `htslib`_ (1.4+)
 
 For additional languages:
 

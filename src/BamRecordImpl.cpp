@@ -263,6 +263,7 @@ void BamRecordImpl::InitializeData()
 {
     d_.reset(bam_init1(), internal::HtslibRecordDeleter());
     d_->data = (uint8_t*)(calloc(0x800, sizeof(uint8_t)));   // maybe make this value tune-able later?
+    d_->m_data = 0x800;
 
     // init unmapped
     Position(PacBio::BAM::UnmappedPosition);
@@ -272,10 +273,10 @@ void BamRecordImpl::InitializeData()
     SetMapped(false);
     MapQuality(255);
 
-    // initialized with NULL term for qname
-    d_->core.l_qname = 1;
-    d_->l_data = 1;
-    d_->m_data = 0x800;
+    // initialized with empty qname (null term + 3 'extra nulls' for alignment
+    d_->core.l_extranul = 3;
+    d_->core.l_qname = 4;
+    d_->l_data = 4;
 }
 
 void BamRecordImpl::MaybeReallocData()
@@ -299,7 +300,10 @@ BamRecordImpl& BamRecordImpl::Name(const std::string& name)
     // determine change in memory needed
     // diffNumBytes: pos -> growing, neg -> shrinking
     const size_t numChars = name.size() + 1; // +1 for NULL-term
-    const int diffNumBytes = numChars - d_->core.l_qname;
+    const size_t numExtraNulls = 4 - (numChars % 4);
+    const size_t totalNameSize = numChars + numExtraNulls;
+
+    const int diffNumBytes = totalNameSize - d_->core.l_qname;
     const int oldLengthData = d_->l_data;
     d_->l_data += diffNumBytes;
     MaybeReallocData();
@@ -307,12 +311,14 @@ BamRecordImpl& BamRecordImpl::Name(const std::string& name)
     // shift trailing data (cigar, seq, qual, tags) as needed
     const uint32_t* oldCigarStart = bam_get_cigar(d_);
     const size_t trailingDataLength = oldLengthData - ((uint8_t*)oldCigarStart - d_->data);
-    d_->core.l_qname = numChars;
+    d_->core.l_qname = totalNameSize;
+    d_->core.l_extranul = numExtraNulls;
     uint32_t* newCigarStart = bam_get_cigar(d_);
     memmove(newCigarStart, oldCigarStart, trailingDataLength);
 
     // fill in new name
     memcpy(d_->data, name.c_str(), numChars);
+    memset(d_->data + numChars, '\0', numExtraNulls);
     return *this;
 }
 

@@ -22,7 +22,7 @@ module load ccache/3.3.4
 module load cmake/3.9.0
 module load ninja/1.7.2
 module load swig
-module load htslib/1.3.1
+module load htslib/1.6
 module load zlib/1.2.11
 module load boost/1.60
 set -vx
