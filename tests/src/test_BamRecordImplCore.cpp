@@ -95,15 +95,15 @@ static
 void CheckRawData(const BamRecordImpl& bam)
 {
     // ensure raw data (lengths at least) matches API-facing data
-
-    const uint32_t expectedNameLength  = bam.Name().size() + 1;
+    const uint32_t expectedNameBytes   = bam.Name().size() + 1; // include NULL term
+    const uint32_t expectedNameNulls   = 4 - (expectedNameBytes % 4);
+    const uint32_t expectedNameLength  = expectedNameBytes + expectedNameNulls;
     const uint32_t expectedNumCigarOps = bam.CigarData().size();
     const int32_t  expectedSeqLength   = bam.Sequence().length();
     const size_t   expectedTagsLength  = BamTagCodec::Encode(bam.Tags()).size();
 
     //  Name        CIGAR         Sequence       Quals      Tags
     // l_qname + (n_cigar * 4) + (l_qseq+1)/2 + l_qseq + << TAGS >>
-
     const int expectedTotalDataLength = expectedNameLength +
                                         (expectedNumCigarOps * 4) +
                                         (expectedSeqLength+1)/2 +
@@ -111,6 +111,7 @@ void CheckRawData(const BamRecordImpl& bam)
                                          expectedTagsLength;
 
     EXPECT_TRUE((bool)bam.d_);
+    EXPECT_EQ(expectedNameNulls,       bam.d_->core.l_extranul);
     EXPECT_EQ(expectedNameLength,      bam.d_->core.l_qname);
     EXPECT_EQ(expectedNumCigarOps,     bam.d_->core.n_cigar);
     EXPECT_EQ(expectedSeqLength,       bam.d_->core.l_qseq);
@@ -139,8 +140,8 @@ TEST(BamRecordImplCoreTestsTest, RawDataDefaultValues)
 
     // variable length data
     EXPECT_EQ(0, rawData->data);
-    EXPECT_EQ(0, rawData->l_data);
-    EXPECT_EQ(0, rawData->m_data);
+    EXPECT_EQ(0, rawData->l_data);          // initial aligned QNAME
+    EXPECT_EQ(0, rawData->m_data); // check this if we change or tune later
 }
 
 TEST(BamRecordImplCoreTestsTest, DefaultValues)
@@ -160,7 +161,8 @@ TEST(BamRecordImplCoreTestsTest, DefaultValues)
     EXPECT_EQ(-1, rawData->core.pos);
     EXPECT_EQ(0, rawData->core.bin);
     EXPECT_EQ(255, rawData->core.qual);
-    EXPECT_EQ(1, rawData->core.l_qname);
+    EXPECT_EQ(3, rawData->core.l_extranul); // alignment nulls
+    EXPECT_EQ(4, rawData->core.l_qname);    // normal null term + alignment nulls
     EXPECT_EQ(BamRecordImpl::UNMAPPED, rawData->core.flag);
     EXPECT_EQ(0, rawData->core.n_cigar);
     EXPECT_EQ(0, rawData->core.l_qseq);
@@ -170,8 +172,8 @@ TEST(BamRecordImplCoreTestsTest, DefaultValues)
 
     // variable length data
     EXPECT_TRUE(rawData->data != nullptr);
-    EXPECT_EQ(1, rawData->l_data);
-    EXPECT_EQ((int)0x800, rawData->m_data);  // check this if we change or tune later
+    EXPECT_EQ(4, rawData->l_data);          // initial aligned QNAME
+    EXPECT_EQ((int)0x800, rawData->m_data); // check this if we change or tune later
 
     // -------------------------------
     // check data via API calls
@@ -239,7 +241,8 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
     EXPECT_EQ(42, rawData->core.pos);
     EXPECT_EQ(42, rawData->core.bin);
     EXPECT_EQ(42, rawData->core.qual);
-    EXPECT_EQ(1,  rawData->core.l_qname);    // initialized w/ NULL-term
+    EXPECT_EQ(3,  rawData->core.l_extranul);    // alignment nulls
+    EXPECT_EQ(4,  rawData->core.l_qname);       // normal null term + alignment nulls
     EXPECT_EQ(42, rawData->core.flag);
     EXPECT_EQ(0,  rawData->core.n_cigar);
     EXPECT_EQ(0,  rawData->core.l_qseq);
@@ -249,7 +252,7 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
 
     // variable length data
     EXPECT_TRUE(rawData->data != nullptr);
-    EXPECT_EQ(29, rawData->l_data);         // NULL-term qname + tags
+    EXPECT_EQ(32, rawData->l_data);         // aligned qname + tags
     EXPECT_EQ((int)0x800, rawData->m_data); // check this if we change or tune later
 
     // -------------------------------

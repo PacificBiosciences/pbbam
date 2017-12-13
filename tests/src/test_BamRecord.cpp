@@ -85,7 +85,9 @@ static
 void CheckRawData(const BamRecordImpl& bam)
 {
     // ensure raw data (lengths at least) matches API-facing data
-    const uint32_t expectedNameLength  = bam.Name().size() + 1;
+    const uint32_t expectedNameBytes   = bam.Name().size() + 1; // include NULL term
+    const uint32_t expectedNameNulls   = 4 - (expectedNameBytes % 4);
+    const uint32_t expectedNameLength  = expectedNameBytes + expectedNameNulls;
     const uint32_t expectedNumCigarOps = bam.CigarData().size();
     const int32_t  expectedSeqLength   = bam.Sequence().length();
     const size_t   expectedTagsLength  = BamTagCodec::Encode(bam.Tags()).size();
@@ -97,7 +99,9 @@ void CheckRawData(const BamRecordImpl& bam)
                                         (expectedSeqLength+1)/2 +
                                          expectedSeqLength +
                                          expectedTagsLength;
+
     EXPECT_TRUE((bool)bam.d_);
+    EXPECT_EQ(expectedNameNulls,       bam.d_->core.l_extranul);
     EXPECT_EQ(expectedNameLength,      bam.d_->core.l_qname);
     EXPECT_EQ(expectedNumCigarOps,     bam.d_->core.n_cigar);
     EXPECT_EQ(expectedSeqLength,       bam.d_->core.l_qseq);

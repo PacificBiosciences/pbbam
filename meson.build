@@ -1,7 +1,7 @@
 project(
   'PacBioBAM',
   'cpp',
-  version : '0.13.2',
+  version : '0.14.0',
   default_options : [
     'buildtype=release',
     'default_library=static',
@@ -62,7 +62,7 @@ pbbam_boost_dep = dependency('boost', required : true)
 pbbam_zlib_dep = dependency('zlib', required : true)
 
 # htslib
-pbbam_htslib_dep = dependency('htslib', required : true)
+pbbam_htslib_dep = dependency('htslib', required : true, version : '>=1.4')
 
 ###########
 # headers #
