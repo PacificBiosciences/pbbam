@@ -3,9 +3,9 @@ type module >& /dev/null || . /mnt/software/Modules/current/init/bash
 
 module use /mnt/software/modulefiles
 module use /pbi/dept/primary/modulefiles
-   
-module load cmake/3.9.0
-module load ccache/3.3.4
+
+module load cmake
+module load ccache
 export CCACHE_DIR="/mnt/secondary/Share/tmp/bamboo.${bamboo_shortPlanKey}.ccache"
 # module load composer_xe/2017.4.196
 

@@ -1,8 +1,8 @@
 #!/bin/bash -vex
 type module >& /dev/null || . /mnt/software/Modules/current/init/bash
 
-module load cmake/3.9.0
-module load ccache/3.3.4
+module load cmake
+module load ccache
 export CCACHE_DIR="/mnt/secondary/Share/tmp/bamboo.${bamboo_shortPlanKey}.ccache"
 
 HTSLIB_VERSION=$(/bin/ls -d src/htslib-*|sed -e 's/.*htslib-//'|sort -V|tail -1)

@@ -17,15 +17,15 @@ set +vx
 type module >& /dev/null || . /mnt/software/Modules/current/init/bash
 #module load pacbio-devtools
 module purge
-module load samtools/1.6
-module load gcc/6.4.0
-module load ccache/3.3.4
-module load cmake/3.9.0
-module load ninja/1.7.2
+module load samtools
+module load gcc
+module load ccache
+module load cmake
+module load ninja
 module load swig
-module load htslib/1.6
-module load zlib/1.2.11
-module load boost/1.60
+module load htslib
+module load zlib
+module load boost
 set -vx
 
 BOOST_ROOT=${BOOST_ROOT%/include}
@@ -73,7 +73,7 @@ if [ -z "${DIR}" ]
 fi
 mkdir -p ${DIR}/test-reports
 GTEST_OUTPUT="xml:${DIR}/test-reports/pbbam_results.xml" ARGS=-V VERBOSE=1 make test
-module load /mnt/software/modulefiles/cram/0.7
+module load cram
 cram --xunit-file=${DIR}/test-reports/pbbam_cramunit.xml generated
 rm -f /tmp/pbbam_*
 
