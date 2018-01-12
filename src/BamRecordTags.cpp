@@ -65,6 +65,7 @@ const BamRecordTags::TagLookupType BamRecordTags::tagLookup =
     { BamRecordTag::INSERTION_QV,      {"iq", false} },
     { BamRecordTag::IPD,               {"ip", false} },
     { BamRecordTag::LABEL_QV,          {"pq", true}  },
+    { BamRecordTag::LONG_CIGAR,        {"CG", false} },
     { BamRecordTag::MERGE_QV,          {"mq", false} },
     { BamRecordTag::NUM_PASSES,        {"np", false} },
     { BamRecordTag::PKMEAN,            {"pa", true}  },

@@ -58,6 +58,7 @@ enum class BamRecordTag
   , INSERTION_QV
   , IPD
   , LABEL_QV
+  , LONG_CIGAR
   , MERGE_QV
   , NUM_PASSES
   , PKMEAN
