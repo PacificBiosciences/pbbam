@@ -250,8 +250,9 @@ BamRecordImpl& BamRecordImpl::CigarData(const Cigar& cigar)
             cigarData[i] = bam_cigar_gen(op.Length(), static_cast<int>(op.Type()));
         }
         if (HasTag("CG"))
-            RemoveTag("CG");
-        AddTag("CG", Tag{cigarData});
+            EditTag("CG", Tag{cigarData});
+        else
+            AddTag("CG", Tag{cigarData});
     }
 
     return *this;
