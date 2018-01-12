@@ -10,6 +10,11 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.15.0] - 2018-01-12
+
+### Added
+- Support for long CIGARs (>64K operations).
+
 ## [0.14.0] - 2017-12-12
 
 ### Added
@@ -18,7 +23,6 @@ adding extra null terminators to make the subsequent CIGAR section 32-bit aligne
 
 ### Changed
 - Requirements for htslib version used. Must now be htslib v1.4+.
-
 
 ## [0.13.2] - 2017-09-25
 
