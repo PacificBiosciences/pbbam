@@ -41,6 +41,9 @@
 #include "pbbam/BamTagCodec.h"
 #include "BamRecordTags.h"
 #include "MemoryUtils.h"
+
+#include <htslib/hts_endian.h>
+
 #include <algorithm>
 #include <iostream>
 #include <utility>
@@ -52,6 +55,56 @@
 
 namespace PacBio {
 namespace BAM {
+
+namespace {
+
+Cigar FetchRawCigar(const uint32_t* const src, const uint32_t len)
+{
+    Cigar result;
+    result.reserve(len);
+    for (uint32_t i = 0; i < len; ++i)
+    {
+        const uint32_t length = bam_cigar_oplen(src[i]);
+        const auto type = static_cast<CigarOperationType>(bam_cigar_op(src[i]));
+        result.push_back(CigarOperation(type, length));
+    }
+    return result;
+}
+
+bool HasLongCigar(const bam1_t* const b)
+{
+    auto* c = &b->core;
+
+    // if empty CIGAR or unmapped
+    if (c->n_cigar == 0 || c->tid < 0 || c->pos < 0)
+        return false;
+
+    // if existing CIGAR doesn't look like a 'fake CIGAR'
+    const auto firstCigarOp = *(bam_get_cigar(b));
+    if (bam_cigar_op(firstCigarOp) != static_cast<uint32_t>(CigarOperationType::SOFT_CLIP) ||
+        bam_cigar_oplen(firstCigarOp) != c->l_qseq)
+    {
+        return false;
+    }
+
+    // if CG tag missing, not expected type
+    const uint8_t* const CG = bam_aux_get(b, "CG");
+    if (CG == nullptr)
+        return false;
+    if (CG[0] != 'B' || CG[1] != 'I')
+        return false;
+
+    // if CG tag data is empty
+    uint32_t numElements = 0;
+    memcpy(&numElements, &CG[2], sizeof(uint32_t));
+    if (numElements == 0)
+        return false;
+
+    // we've found long CIGAR data in the CG tag
+    return true;
+}
+
+} // namespace anonymous
 
 BamRecordImpl::BamRecordImpl()
     : d_(nullptr)
@@ -153,41 +206,53 @@ bool BamRecordImpl::AddTagImpl(const std::string& tagName,
 
 Cigar BamRecordImpl::CigarData() const
 {
-    Cigar result;
-    result.reserve(d_->core.n_cigar);
-    uint32_t* cigarData = bam_get_cigar(d_);
-    for (uint32_t i = 0; i < d_->core.n_cigar; ++i) {
-        const uint32_t length = bam_cigar_oplen(cigarData[i]);
-        const auto type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
-        result.push_back(CigarOperation(type, length));
+    const auto* b = d_.get();
+    if (HasLongCigar(b))
+    {
+        // fetch long CIGAR from tag
+        const auto cigarTag = TagValue("CG");
+        const auto cigarTagValue = cigarTag.ToUInt32Array();
+        return FetchRawCigar(cigarTagValue.data(), cigarTagValue.size());
     }
-
-    return result;
+    else
+    {
+        // fetch normal, short CIGAR from the standard location
+        return FetchRawCigar(bam_get_cigar(b), b->core.n_cigar);
+    }
 }
 
 BamRecordImpl& BamRecordImpl::CigarData(const Cigar& cigar)
 {
-    // determine change in memory needed
-    // diffNumBytes: pos -> growing, neg -> shrinking
-    const size_t numCigarOps = cigar.size();
-    const int diffNumCigars = numCigarOps - d_->core.n_cigar;
-    const int diffNumBytes  = diffNumCigars * sizeof(uint32_t);
-    const int oldLengthData = d_->l_data;
-    d_->l_data += diffNumBytes;
-    MaybeReallocData();
+    // Set normal, "short" CIGAR and remove CG tag if present.
+    if (cigar.size() < 65536)
+    {
+        SetCigarData(cigar);
+        if (HasTag("CG"))
+            RemoveTag("CG");
+    }
 
-    // shift trailing data (seq, qual, tags) as needed
-    const uint8_t* oldSequenceStart = bam_get_seq(d_);
-    const size_t trailingDataLength = oldLengthData - (oldSequenceStart - d_->data);
-    d_->core.n_cigar = numCigarOps;
-    uint8_t* newSequenceStart = bam_get_seq(d_);
-    memmove(newSequenceStart, oldSequenceStart, trailingDataLength);
+    // Set long CIGAR data
+    else
+    {
+        // Add the 'fake' CIGAR in normal place.
+        Cigar fake;
+        fake.emplace_back(CigarOperationType::SOFT_CLIP, SequenceLength());
+        const uint32_t alignedLength = static_cast<uint32_t>(bam_cigar2rlen(d_->core.n_cigar, bam_get_cigar(d_.get())));
+        fake.emplace_back(CigarOperationType::REFERENCE_SKIP, alignedLength);
+        SetCigarData(fake);
 
-    // fill in new CIGAR data
-    uint32_t* cigarDataStart = bam_get_cigar(d_);
-    for (size_t i = 0; i < numCigarOps; ++i) {
-        const CigarOperation& cigarOp = cigar.at(i);
-        cigarDataStart[i] = bam_cigar_gen(cigarOp.Length(), static_cast<int>(cigarOp.Type()));
+        // Add raw CIGAR data to CG tag.
+        std::vector<uint32_t> cigarData(cigar.size());
+        cigarData.reserve(cigar.size());
+        for (size_t i = 0; i < cigar.size(); ++i)
+        {
+            const CigarOperation& op = cigar.at(i);
+            cigarData[i] = bam_cigar_gen(op.Length(), static_cast<int>(op.Type()));
+        }
+        if (HasTag("CG"))
+            EditTag("CG", Tag{cigarData});
+        else
+            AddTag("CG", Tag{cigarData});
     }
 
     return *this;
@@ -376,6 +441,32 @@ std::string BamRecordImpl::Sequence() const
 
 size_t BamRecordImpl::SequenceLength() const
 { return d_->core.l_qseq; }
+
+void BamRecordImpl::SetCigarData(const Cigar& cigar)
+{
+    // determine change in memory needed
+    // diffNumBytes: pos -> growing, neg -> shrinking
+    const size_t numCigarOps = cigar.size();
+    const int diffNumCigars = numCigarOps - d_->core.n_cigar;
+    const int diffNumBytes  = diffNumCigars * sizeof(uint32_t);
+    const int oldLengthData = d_->l_data;
+    d_->l_data += diffNumBytes;
+    MaybeReallocData();
+
+    // shift trailing data (seq, qual, tags) as needed
+    const uint8_t* oldSequenceStart = bam_get_seq(d_);
+    const size_t trailingDataLength = oldLengthData - (oldSequenceStart - d_->data);
+    d_->core.n_cigar = numCigarOps;
+    uint8_t* newSequenceStart = bam_get_seq(d_);
+    memmove(newSequenceStart, oldSequenceStart, trailingDataLength);
+
+    // fill in new CIGAR data
+    uint32_t* cigarDataStart = bam_get_cigar(d_);
+    for (size_t i = 0; i < numCigarOps; ++i) {
+        const CigarOperation& cigarOp = cigar.at(i);
+        cigarDataStart[i] = bam_cigar_gen(cigarOp.Length(), static_cast<int>(cigarOp.Type()));
+    }
+}
 
 BamRecordImpl& BamRecordImpl::SetSequenceAndQualities(const std::string& sequence,
                                                       const std::string& qualities)

@@ -27,6 +27,7 @@ pbbam_test_cpp_sources = files([
   'test_GenomicIntervalQuery.cpp',
   'test_IndexedFastaReader.cpp',
   'test_Intervals.cpp',
+  'test_LongCigar.cpp',
   'test_PacBioIndex.cpp',
   'test_PbiFilter.cpp',
   'test_PbiFilterQuery.cpp',

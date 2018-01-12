@@ -613,6 +613,9 @@ private:
     bool RemoveTagImpl(const std::string& tagName);
     int TagOffset(const std::string& tagName) const;
 
+    // internal CIGAR handling
+    void SetCigarData(const Cigar& cigar);
+
     // core seq/qual logic shared by the public API
     BamRecordImpl& SetSequenceAndQualitiesInternal(const char* sequence,
                                                       const size_t sequenceLength,
