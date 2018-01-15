@@ -85,6 +85,7 @@ if not meson.is_subproject()
     pbbam_python = find_program('python')
 
     if get_option('enable-tests')
+      pbbam_clang_formatter = find_program('tools/check-formatting')
       subdir('tests')
     endif
   endif
