@@ -35,9 +35,9 @@
 
 // Author: Derek Barnett
 
+#include <climits>
 #include <string>
 #include <vector>
-#include <climits>
 
 #include <gtest/gtest.h>
 
@@ -52,33 +52,33 @@ using namespace std;
 
 TEST(SequenceUtilsTest, ComplementChar)
 {
-                        // complement
-    const char A = 'A'; // T
-    const char B = 'B'; // V
-    const char C = 'C'; // G
-    const char D = 'D'; // H
-    const char E = 'E'; // null
-    const char F = 'F'; // null
-    const char G = 'G'; // C
-    const char H = 'H'; // D
-    const char I = 'I'; // null
-    const char J = 'J'; // null
-    const char K = 'K'; // M
-    const char L = 'L'; // null
-    const char M = 'M'; // K
-    const char N = 'N'; // N
-    const char O = 'O'; // null
-    const char P = 'P'; // null
-    const char Q = 'Q'; // null
-    const char R = 'R'; // Y
-    const char S = 'S'; // S
-    const char T = 'T'; // A
-    const char U = 'U'; // A
-    const char V = 'V'; // B
-    const char W = 'W'; // W
-    const char X = 'X'; // null
-    const char Y = 'Y'; // R
-    const char Z = 'Z'; // null
+    // complement
+    const char A = 'A';  // T
+    const char B = 'B';  // V
+    const char C = 'C';  // G
+    const char D = 'D';  // H
+    const char E = 'E';  // null
+    const char F = 'F';  // null
+    const char G = 'G';  // C
+    const char H = 'H';  // D
+    const char I = 'I';  // null
+    const char J = 'J';  // null
+    const char K = 'K';  // M
+    const char L = 'L';  // null
+    const char M = 'M';  // K
+    const char N = 'N';  // N
+    const char O = 'O';  // null
+    const char P = 'P';  // null
+    const char Q = 'Q';  // null
+    const char R = 'R';  // Y
+    const char S = 'S';  // S
+    const char T = 'T';  // A
+    const char U = 'U';  // A
+    const char V = 'V';  // B
+    const char W = 'W';  // W
+    const char X = 'X';  // null
+    const char Y = 'Y';  // R
+    const char Z = 'Z';  // null
 
     EXPECT_EQ(T, Complement(A));
     EXPECT_EQ(V, Complement(B));

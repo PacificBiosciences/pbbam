@@ -42,9 +42,9 @@
 #ifndef DATASETXSD_H
 #define DATASETXSD_H
 
-#include "pbbam/Config.h"
 #include <map>
 #include <string>
+#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -53,22 +53,21 @@ namespace BAM {
 ///
 enum class XsdType
 {
-    NONE
-
-  , AUTOMATION_CONSTRAINTS
-  , BASE_DATA_MODEL
-  , COLLECTION_METADATA
-  , COMMON_MESSAGES
-  , DATA_MODEL
-  , DATA_STORE
-  , DATASETS
-  , DECL_DATA
-  , PART_NUMBERS
-  , PRIMARY_METRICS
-  , REAGENT_KIT
-  , RIGHTS_AND_ROLES
-  , SAMPLE_INFO
-  , SEEDING_DATA
+    NONE,
+    AUTOMATION_CONSTRAINTS,
+    BASE_DATA_MODEL,
+    COLLECTION_METADATA,
+    COMMON_MESSAGES,
+    DATA_MODEL,
+    DATA_STORE,
+    DATASETS,
+    DECL_DATA,
+    PART_NUMBERS,
+    PRIMARY_METRICS,
+    REAGENT_KIT,
+    RIGHTS_AND_ROLES,
+    SAMPLE_INFO,
+    SEEDING_DATA
 };
 
 /// \brief The NamespaceInfo class provides XML namespace info (prefix & URI).
@@ -83,8 +82,7 @@ public:
     NamespaceInfo() = default;
 
     /// \brief Creates a valid info entry.
-    NamespaceInfo(std::string name,
-                  std::string uri);
+    NamespaceInfo(std::string name, std::string uri);
 
 public:
     /// \brief Fetches namespace name (i.e. prefix)
@@ -151,7 +149,7 @@ private:
     XsdType defaultXsdType_ = XsdType::DATASETS;
 };
 
-} // namespace PacBio
-} // namespace BAM
+}  // namespace PacBio
+}  // namespace BAM
 
-#endif // DATASETXSD_H
+#endif  // DATASETXSD_H

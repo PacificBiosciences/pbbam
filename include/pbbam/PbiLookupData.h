@@ -42,15 +42,15 @@
 #ifndef PBILOOKUPDATA_H
 #define PBILOOKUPDATA_H
 
-#include "pbbam/Config.h"
-#include "pbbam/Compare.h"
-#include "pbbam/PbiBasicTypes.h"
 #include <cstddef>
 #include <cstdint>
 #include <deque>
 #include <map>
 #include <unordered_map>
 #include <vector>
+#include "pbbam/Compare.h"
+#include "pbbam/Config.h"
+#include "pbbam/PbiBasicTypes.h"
 
 namespace PacBio {
 namespace BAM {
@@ -73,14 +73,14 @@ class PbiRawReferenceData;
 /// \param T    type of key stored (Accuracy for readAccuracy, int32_t for ZMW,
 ///             etc.)
 ///
-template<typename T>
+template <typename T>
 class OrderedLookup
 {
 public:
-    using key_type       = T;
-    using value_type     = IndexList;
+    using key_type = T;
+    using value_type = IndexList;
     using container_type = std::map<key_type, value_type>;
-    using iterator       = typename container_type::iterator;
+    using iterator = typename container_type::iterator;
     using const_iterator = typename container_type::const_iterator;
 
 public:
@@ -179,8 +179,7 @@ public:
     /// \returns sorted list of unique indices that satisfy the lookup key &
     ///          compare type
     ///
-    IndexList LookupIndices(const key_type& key,
-                            const Compare::Type& compare) const;
+    IndexList LookupIndices(const key_type& key, const Compare::Type& compare) const;
 
     /// \brief Converts the lookup structure back into its raw data.
     ///
@@ -192,11 +191,9 @@ public:
     /// \}
 
 private:
-    IndexList LookupInclusiveRange(const const_iterator& begin,
-                                   const const_iterator& end) const;
+    IndexList LookupInclusiveRange(const const_iterator& begin, const const_iterator& end) const;
 
-    IndexList LookupExclusiveRange(const const_iterator& begin,
-                                   const const_iterator& end,
+    IndexList LookupExclusiveRange(const const_iterator& begin, const const_iterator& end,
                                    const key_type& key) const;
 
 private:
@@ -216,14 +213,14 @@ private:
 /// \param T    type of key stored (Accuracy for readAccuracy, int32_t for ZMW,
 ///             etc.)
 ///
-template<typename T>
+template <typename T>
 class UnorderedLookup
 {
 public:
-    using key_type       = T;
-    using value_type     = IndexList;
+    using key_type = T;
+    using value_type = IndexList;
     using container_type = std::unordered_map<key_type, value_type>;
-    using iterator       = typename container_type::iterator;
+    using iterator = typename container_type::iterator;
     using const_iterator = typename container_type::const_iterator;
 
 public:
@@ -322,8 +319,7 @@ public:
     /// \returns sorted list of unique indices that satisfy the lookup key &
     ///          compare type
     ///
-    IndexList LookupIndices(const key_type& key,
-                            const Compare::Type& compare) const;
+    IndexList LookupIndices(const key_type& key, const Compare::Type& compare) const;
 
     /// \brief Converts the lookup structure back into its raw data.
     ///
@@ -335,9 +331,8 @@ public:
     /// \}
 
 private:
-    template<typename Compare>
-    IndexList LookupHelper(const key_type& key,
-                           const Compare& cmp) const;
+    template <typename Compare>
+    IndexList LookupHelper(const key_type& key, const Compare& cmp) const;
 
 private:
     container_type data_;
@@ -353,13 +348,13 @@ public:
     ///        section.
     enum Field
     {
-        RG_ID
-      , Q_START
-      , Q_END
-      , ZMW
-      , READ_QUALITY
-      , CONTEXT_FLAG
-      , VIRTUAL_OFFSET
+        RG_ID,
+        Q_START,
+        Q_END,
+        ZMW,
+        READ_QUALITY,
+        CONTEXT_FLAG,
+        VIRTUAL_OFFSET
     };
 
 public:
@@ -414,9 +409,8 @@ public:
     ///
     /// \returns sorted list of unique indices that satisfy the lookup
     ///
-    template<typename T>
-    IndexList Indices(const BasicLookupData::Field& field,
-                      const T& value,
+    template <typename T>
+    IndexList Indices(const BasicLookupData::Field& field, const T& value,
                       const Compare::Type& compareType = Compare::EQUAL) const;
 
     /// \brief This method dispatches a multi-value lookup query to the proper
@@ -435,9 +429,8 @@ public:
     ///
     /// \returns sorted list of unique indices that satisfy the lookup
     ///
-    template<typename T>
-    IndexList IndicesMulti(const BasicLookupData::Field& field,
-                           const std::vector<T>& values) const;
+    template <typename T>
+    IndexList IndicesMulti(const BasicLookupData::Field& field, const std::vector<T>& values) const;
 
     /// \returns the \b virtual file offsets for all records
     ///
@@ -453,10 +446,10 @@ public:
     UnorderedLookup<int32_t> rgId_;
 
     // numeric comparisons make sense, keep key ordering preserved
-    OrderedLookup<int32_t>  qStart_;
-    OrderedLookup<int32_t>  qEnd_;
-    OrderedLookup<int32_t>  holeNumber_;
-    OrderedLookup<float>    readQual_;
+    OrderedLookup<int32_t> qStart_;
+    OrderedLookup<int32_t> qEnd_;
+    OrderedLookup<int32_t> holeNumber_;
+    OrderedLookup<float> readQual_;
 
     // see if this works, or if can use unordered, 'direct' query
     OrderedLookup<uint8_t> ctxtFlag_;
@@ -477,17 +470,17 @@ public:
     ///        section.
     enum Field
     {
-        T_ID
-      , T_START
-      , T_END
-      , A_START
-      , A_END
-      , N_M
-      , N_MM
-      , N_INS
-      , N_DEL
-      , MAP_QUALITY
-      , STRAND
+        T_ID,
+        T_START,
+        T_END,
+        A_START,
+        A_END,
+        N_M,
+        N_MM,
+        N_INS,
+        N_DEL,
+        MAP_QUALITY,
+        STRAND
     };
 
 public:
@@ -522,9 +515,8 @@ public:
     ///
     /// \returns sorted list of unique indices that satisfy the lookup
     ///
-    template<typename T>
-    IndexList Indices(const MappedLookupData::Field& field,
-                      const T& value,
+    template <typename T>
+    IndexList Indices(const MappedLookupData::Field& field, const T& value,
                       const Compare::Type& compareType = Compare::EQUAL) const;
 
     /// \brief This method dispatches a multi-value lookup query to the proper
@@ -543,7 +535,7 @@ public:
     ///
     /// \returns sorted list of unique indices that satisfy the lookup
     ///
-    template<typename T>
+    template <typename T>
     IndexList IndicesMulti(const MappedLookupData::Field& field,
                            const std::vector<T>& values) const;
 
@@ -554,14 +546,14 @@ public:
     /// \{
 
     // numeric comparisons make sense, keep key ordering preserved
-    OrderedLookup<int32_t>  tId_;
+    OrderedLookup<int32_t> tId_;
     OrderedLookup<uint32_t> tStart_;
     OrderedLookup<uint32_t> tEnd_;
     OrderedLookup<uint32_t> aStart_;
     OrderedLookup<uint32_t> aEnd_;
     OrderedLookup<uint32_t> nM_;
     OrderedLookup<uint32_t> nMM_;
-    OrderedLookup<uint8_t>  mapQV_;
+    OrderedLookup<uint8_t> mapQV_;
 
     // generated values, not stored directly in PBI file
     OrderedLookup<uint32_t> nIns_;
@@ -635,9 +627,9 @@ public:
     ///        section.
     enum Field
     {
-        BC_FORWARD
-      , BC_REVERSE
-      , BC_QUALITY
+        BC_FORWARD,
+        BC_REVERSE,
+        BC_QUALITY
     };
 
 public:
@@ -673,9 +665,8 @@ public:
     ///
     /// \returns sorted list of unique indices that satisfy the lookup
     ///
-    template<typename T>
-    IndexList Indices(const BarcodeLookupData::Field& field,
-                      const T& value,
+    template <typename T>
+    IndexList Indices(const BarcodeLookupData::Field& field, const T& value,
                       const Compare::Type& compareType = Compare::EQUAL) const;
 
     /// \brief This method dispatches a multi-value lookup query to the proper
@@ -694,7 +685,7 @@ public:
     ///
     /// \returns sorted list of unique indices that satisfy the lookup
     ///
-    template<typename T>
+    template <typename T>
     IndexList IndicesMulti(const BarcodeLookupData::Field& field,
                            const std::vector<T>& values) const;
 
@@ -707,14 +698,14 @@ public:
     // numeric comparisons make sense, keep key ordering preserved
     OrderedLookup<int16_t> bcForward_;
     OrderedLookup<int16_t> bcReverse_;
-    OrderedLookup<int8_t>  bcQual_;
+    OrderedLookup<int8_t> bcQual_;
 
     /// \}
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "internal/PbiLookupData.inl"
 
-#endif // PBILOOKUPDATA_H
+#endif  // PBILOOKUPDATA_H

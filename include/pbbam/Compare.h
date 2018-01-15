@@ -43,12 +43,12 @@
 #ifndef COMPARE_H
 #define COMPARE_H
 
-#include "pbbam/BamRecord.h"
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <string>
 #include <utility>
+#include "pbbam/BamRecord.h"
 
 namespace PacBio {
 namespace BAM {
@@ -64,22 +64,22 @@ namespace BAM {
 struct PBBAM_EXPORT Compare
 {
 public:
-
     /// \name Comparison Type
     /// \{
 
     /// \brief This enum defines the supported comparison types
     ///        { ==, !=, <, <=, >, >=, & (contains), ~ (not contains) }.
     ///
-    enum Type {
-        EQUAL = 0
-      , NOT_EQUAL
-      , LESS_THAN
-      , LESS_THAN_EQUAL
-      , GREATER_THAN
-      , GREATER_THAN_EQUAL
-      , CONTAINS
-      , NOT_CONTAINS
+    enum Type
+    {
+        EQUAL = 0,
+        NOT_EQUAL,
+        LESS_THAN,
+        LESS_THAN_EQUAL,
+        GREATER_THAN,
+        GREATER_THAN_EQUAL,
+        CONTAINS,
+        NOT_CONTAINS
     };
 
     /// \brief Convert operator string to Compare::Type.
@@ -114,13 +114,11 @@ public:
     /// \returns the printable operator string
     /// \throws std::runtime_error on unknown Compare::Type
     ///
-    static std::string TypeToOperator(const Compare::Type& type,
-                                      bool asAlpha = false);
+    static std::string TypeToOperator(const Compare::Type& type, bool asAlpha = false);
 
     /// \}
 
 public:
-
     /// \name Comparison Function Objects
     /// \{
 
@@ -130,7 +128,9 @@ public:
     ///
     /// Custom comparators may be used by inheriting from this class.
     ///
-    struct Base : public std::function<bool(const BamRecord&, const BamRecord&)> { };
+    struct Base : public std::function<bool(const BamRecord&, const BamRecord&)>
+    {
+    };
 
 private:
     /// \internal
@@ -139,7 +139,7 @@ private:
     /// MemberFunctionBase, since we need to use it in the template signature.
     /// This keeps that a lot easier to read.
     ///
-    template<typename ValueType>
+    template <typename ValueType>
     struct MemberFunctionBaseHelper : public Compare::Base
     {
         using MemberFnType = ValueType (BamRecord::*)() const;
@@ -156,16 +156,14 @@ public:
     /// Custom comparators will work for any BamRecord member function that does
     /// not take any input parameters.
     ///
-    template<typename ValueType,
-             typename MemberFunctionBaseHelper<ValueType>::MemberFnType fn,
-             typename CompareType = std::less<ValueType> >
+    template <typename ValueType, typename MemberFunctionBaseHelper<ValueType>::MemberFnType fn,
+              typename CompareType = std::less<ValueType> >
     struct MemberFunctionBase : public Compare::MemberFunctionBaseHelper<ValueType>
     {
         bool operator()(const BamRecord& lhs, const BamRecord& rhs) const;
     };
 
 public:
-
     /// \brief Compares on BamRecord::AlignedEnd.
     ///
     /// Example:
@@ -174,7 +172,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct AlignedEnd : public MemberFunctionBase<Position, &BamRecord::AlignedEnd> { };
+    struct AlignedEnd : public MemberFunctionBase<Position, &BamRecord::AlignedEnd>
+    {
+    };
 
     /// \brief Compares on BamRecord::AlignedStart.
     ///
@@ -184,7 +184,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct AlignedStart : public MemberFunctionBase<Position, &BamRecord::AlignedStart> { };
+    struct AlignedStart : public MemberFunctionBase<Position, &BamRecord::AlignedStart>
+    {
+    };
 
     /// \brief Compares on BamRecord::AlignedStrand
     ///
@@ -194,7 +196,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct AlignedStrand : public MemberFunctionBase<Strand, &BamRecord::AlignedStrand> { };
+    struct AlignedStrand : public MemberFunctionBase<Strand, &BamRecord::AlignedStrand>
+    {
+    };
 
     /// \brief Compares on BamRecord::BarcodeForward.
     ///
@@ -204,7 +208,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct BarcodeForward : public MemberFunctionBase<int16_t, &BamRecord::BarcodeForward> { };
+    struct BarcodeForward : public MemberFunctionBase<int16_t, &BamRecord::BarcodeForward>
+    {
+    };
 
     /// \brief Compares on BamRecord::BarcodeQuality.
     ///
@@ -214,7 +220,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct BarcodeQuality : public MemberFunctionBase<uint8_t, &BamRecord::BarcodeQuality> { };
+    struct BarcodeQuality : public MemberFunctionBase<uint8_t, &BamRecord::BarcodeQuality>
+    {
+    };
 
     /// \brief Compares on BamRecord::BarcodeReverse.
     ///
@@ -224,7 +232,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct BarcodeReverse: public MemberFunctionBase<int16_t, &BamRecord::BarcodeReverse> { };
+    struct BarcodeReverse : public MemberFunctionBase<int16_t, &BamRecord::BarcodeReverse>
+    {
+    };
 
     /// \brief Compares on BamRecord::FullName.
     ///
@@ -234,7 +244,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct FullName : public MemberFunctionBase<std::string, &BamRecord::FullName> { };
+    struct FullName : public MemberFunctionBase<std::string, &BamRecord::FullName>
+    {
+    };
 
     /// \brief Compares on BamRecord::LocalContextFlags.
     ///
@@ -244,7 +256,10 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct LocalContextFlag : public MemberFunctionBase<LocalContextFlags, &BamRecord::LocalContextFlags> { };
+    struct LocalContextFlag
+        : public MemberFunctionBase<LocalContextFlags, &BamRecord::LocalContextFlags>
+    {
+    };
 
     /// \brief Compares on BamRecord::MapQuality.
     ///
@@ -254,7 +269,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct MapQuality : public MemberFunctionBase<uint8_t, &BamRecord::MapQuality> { };
+    struct MapQuality : public MemberFunctionBase<uint8_t, &BamRecord::MapQuality>
+    {
+    };
 
     /// \brief Compares on BamRecord::MovieName.
     ///
@@ -264,7 +281,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct MovieName : public MemberFunctionBase<std::string, &BamRecord::MovieName> { };
+    struct MovieName : public MemberFunctionBase<std::string, &BamRecord::MovieName>
+    {
+    };
 
     /// \brief Provides an operator() is essentially a no-op for
     ///        comparing/sorting.
@@ -284,7 +303,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct NumDeletedBases : public MemberFunctionBase<size_t, &BamRecord::NumDeletedBases> { };
+    struct NumDeletedBases : public MemberFunctionBase<size_t, &BamRecord::NumDeletedBases>
+    {
+    };
 
     /// \brief Compares on BamRecord::NumInsertedBases.
     ///
@@ -294,7 +315,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct NumInsertedBases : public MemberFunctionBase<size_t, &BamRecord::NumInsertedBases> { };
+    struct NumInsertedBases : public MemberFunctionBase<size_t, &BamRecord::NumInsertedBases>
+    {
+    };
 
     /// \brief Compares on BamRecord::NumMatches.
     ///
@@ -304,7 +327,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct NumMatches : public MemberFunctionBase<size_t, &BamRecord::NumMatches> { };
+    struct NumMatches : public MemberFunctionBase<size_t, &BamRecord::NumMatches>
+    {
+    };
 
     /// \brief Compares on BamRecord::NumMismatches.
     ///
@@ -314,7 +339,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct NumMismatches : public MemberFunctionBase<size_t, &BamRecord::NumMismatches> { };
+    struct NumMismatches : public MemberFunctionBase<size_t, &BamRecord::NumMismatches>
+    {
+    };
 
     /// \brief Compares on BamRecord::QueryEnd.
     ///
@@ -324,7 +351,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct QueryEnd : public MemberFunctionBase<Position, &BamRecord::QueryEnd> { };
+    struct QueryEnd : public MemberFunctionBase<Position, &BamRecord::QueryEnd>
+    {
+    };
 
     /// \brief Compares on BamRecord::QueryStart.
     ///
@@ -334,7 +363,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct QueryStart : public MemberFunctionBase<Position, &BamRecord::QueryStart> { };
+    struct QueryStart : public MemberFunctionBase<Position, &BamRecord::QueryStart>
+    {
+    };
 
     /// \brief Compares on BamRecord::ReadAccuracy.
     ///
@@ -344,7 +375,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct ReadAccuracy : public MemberFunctionBase<Accuracy, &BamRecord::ReadAccuracy> { };
+    struct ReadAccuracy : public MemberFunctionBase<Accuracy, &BamRecord::ReadAccuracy>
+    {
+    };
 
     /// \brief Compares on BamRecord::ReadGroupId.
     ///
@@ -359,7 +392,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct ReadGroupId : public MemberFunctionBase<std::string, &BamRecord::ReadGroupId> { };
+    struct ReadGroupId : public MemberFunctionBase<std::string, &BamRecord::ReadGroupId>
+    {
+    };
 
     /// \brief Compares on BamRecord::ReadGroupNumericId.
     ///
@@ -369,7 +404,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct ReadGroupNumericId : public MemberFunctionBase<int32_t, &BamRecord::ReadGroupNumericId> { };
+    struct ReadGroupNumericId : public MemberFunctionBase<int32_t, &BamRecord::ReadGroupNumericId>
+    {
+    };
 
     /// \brief Compares on BamRecord::ReferenceEnd.
     ///
@@ -379,7 +416,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct ReferenceEnd : public MemberFunctionBase<Position, &BamRecord::ReferenceEnd> { };
+    struct ReferenceEnd : public MemberFunctionBase<Position, &BamRecord::ReferenceEnd>
+    {
+    };
 
     /// \brief Compares on BamRecord::ReferenceId.
     ///
@@ -389,7 +428,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct ReferenceId : public MemberFunctionBase<int32_t, &BamRecord::ReferenceId> { };
+    struct ReferenceId : public MemberFunctionBase<int32_t, &BamRecord::ReferenceId>
+    {
+    };
 
     /// \brief Compares on BamRecord::ReferenceName.
     ///
@@ -399,7 +440,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct ReferenceName : public MemberFunctionBase<std::string, &BamRecord::ReferenceName> { };
+    struct ReferenceName : public MemberFunctionBase<std::string, &BamRecord::ReferenceName>
+    {
+    };
 
     /// \brief Compares on BamRecord::ReferenceStart.
     ///
@@ -409,7 +452,9 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct ReferenceStart : public MemberFunctionBase<Position, &BamRecord::ReferenceStart> { };
+    struct ReferenceStart : public MemberFunctionBase<Position, &BamRecord::ReferenceStart>
+    {
+    };
 
     /// \brief Compares on BamRecord::HoleNumber.
     ///
@@ -419,14 +464,16 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct Zmw : public MemberFunctionBase<int32_t, &BamRecord::HoleNumber> { };
+    struct Zmw : public MemberFunctionBase<int32_t, &BamRecord::HoleNumber>
+    {
+    };
 
     /// \}
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/Compare.inl"
 
-#endif // COMPARE_H
+#endif  // COMPARE_H

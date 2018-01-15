@@ -42,9 +42,9 @@
 #ifndef CIGAROPERATION_H
 #define CIGAROPERATION_H
 
-#include "pbbam/Config.h"
 #include <cstdint>
 #include <stdexcept>
+#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -62,16 +62,16 @@ namespace BAM {
 ///
 enum class CigarOperationType
 {
-    UNKNOWN_OP        = -1 ///< unknown/invalid CIGAR operator
-  , ALIGNMENT_MATCH   = 0  ///< alignment match (can be a sequence match or mismatch) [M]
-  , INSERTION              ///< insertion to the reference [I]
-  , DELETION               ///< deletion from the reference [D]
-  , REFERENCE_SKIP         ///< skipped region from the reference [N]
-  , SOFT_CLIP              ///< soft clipping (clipped sequences present in SEQ) [S]
-  , HARD_CLIP         = 5  ///< hard clipping (clipped sequences NOT present in SEQ) [H]
-  , PADDING                ///< padding (silent deletion from padded reference) [P]
-  , SEQUENCE_MATCH         ///< sequence match [=]
-  , SEQUENCE_MISMATCH      ///< sequence mismatch [X]
+    UNKNOWN_OP = -1,      ///< unknown/invalid CIGAR operator
+    ALIGNMENT_MATCH = 0,  ///< alignment match (can be a sequence match or mismatch) [M]
+    INSERTION,            ///< insertion to the reference [I]
+    DELETION,             ///< deletion from the reference [D]
+    REFERENCE_SKIP,       ///< skipped region from the reference [N]
+    SOFT_CLIP,            ///< soft clipping (clipped sequences present in SEQ) [S]
+    HARD_CLIP = 5,        ///< hard clipping (clipped sequences NOT present in SEQ) [H]
+    PADDING,              ///< padding (silent deletion from padded reference) [P]
+    SEQUENCE_MATCH,       ///< sequence match [=]
+    SEQUENCE_MISMATCH     ///< sequence mismatch [X]
 };
 
 /// \brief The CigarOperation class represents a single CIGAR operation
@@ -80,7 +80,6 @@ enum class CigarOperationType
 class PBBAM_EXPORT CigarOperation
 {
 public:
-
     /// \name Operation Type Conversion Methods
     /// \{
 
@@ -115,7 +114,6 @@ public:
     /// \}
 
 public:
-
     /// \returns operation type as SAM/BAM char code
     inline char Char() const;
 
@@ -168,9 +166,9 @@ private:
     uint32_t length_ = 0;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/CigarOperation.inl"
 
-#endif // CIGAROPERATION_H
+#endif  // CIGAROPERATION_H

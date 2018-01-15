@@ -46,11 +46,11 @@
 /// \{
 
 #ifndef PBBAM_EXPORT
-#  if defined(WIN32)
-#    define PBBAM_EXPORT __declspec(dllimport)
-#  else
-#    define PBBAM_EXPORT
-#  endif
+#if defined(WIN32)
+#define PBBAM_EXPORT __declspec(dllimport)
+#else
+#define PBBAM_EXPORT
+#endif
 #endif
 
 /// \}
@@ -78,7 +78,7 @@ extern int HtslibVerbosity;
 
 /// \}
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // PBBAM_CONFIG_H
+#endif  // PBBAM_CONFIG_H

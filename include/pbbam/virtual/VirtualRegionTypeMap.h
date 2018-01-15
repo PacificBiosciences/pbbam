@@ -56,10 +56,10 @@ namespace BAM {
 class VirtualRegionTypeMap
 {
 public:
-	static std::map<char, VirtualRegionType> ParseChar;
+    static std::map<char, VirtualRegionType> ParseChar;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // VIRTUALREGIONTYPEMAP_H
+#endif  // VIRTUALREGIONTYPEMAP_H

@@ -43,8 +43,8 @@
 
 #include "PbbamTestData.h"
 
-#include <pbbam/EntireFileQuery.h>
 #include <pbbam/BamWriter.h>
+#include <pbbam/EntireFileQuery.h>
 #include <pbbam/Unused.h>
 
 using namespace PacBio;
@@ -55,12 +55,11 @@ namespace EntireFileQueryTests {
 
 const string inputBamFn = PbbamTestsConfig::Data_Dir + "/aligned.bam";
 
-} // namespace EntireFileQueryTests
+}  // namespace EntireFileQueryTests
 
 TEST(EntireFileQueryTest, CountRecords)
 {
-    EXPECT_NO_THROW(
-    {
+    EXPECT_NO_THROW({
         BamFile bamFile(EntireFileQueryTests::inputBamFn);
         int count = 0;
         EntireFileQuery entireFile(bamFile);
@@ -75,8 +74,7 @@ TEST(EntireFileQueryTest, CountRecords)
 
 TEST(EntireFileQueryTest, NonConstBamRecord)
 {
-    EXPECT_NO_THROW(
-    {
+    EXPECT_NO_THROW({
         BamFile bamFile(EntireFileQueryTests::inputBamFn);
         int count = 0;
         EntireFileQuery entireFile(bamFile);
@@ -100,17 +98,20 @@ TEST(BamRecordTest, HandlesDeletionOK)
     EntireFileQuery entireFile(bamFile);
     for (const BamRecord& record : entireFile) {
 
-        const auto rawQualities     = record.Qualities(Orientation::GENOMIC, false);
+        const auto rawQualities = record.Qualities(Orientation::GENOMIC, false);
         const auto alignedQualities = record.Qualities(Orientation::GENOMIC, true);
 
         const string rawExpected =
-            "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII";
+            "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
+            "IIIIIIIIIIIII";
 
         // 1=1D98=
         const string alignedExpected =
-            "I!IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII";
+            "I!"
+            "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
+            "IIIIIIIIIIII";
 
-        EXPECT_EQ(rawExpected,     rawQualities.Fastq());
+        EXPECT_EQ(rawExpected, rawQualities.Fastq());
         EXPECT_EQ(alignedExpected, alignedQualities.Fastq());
 
         ++count;
@@ -119,11 +120,10 @@ TEST(BamRecordTest, HandlesDeletionOK)
     EXPECT_EQ(1, count);
 }
 
-
 TEST(BamRecordTest, ReferenceName)
 {
-    {   // check reference name of first record
-        const string exampleBam  = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+    {  // check reference name of first record
+        const string exampleBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
         BamFile bamFile(exampleBam);
         EntireFileQuery records(bamFile);
         auto firstIter = records.begin();
@@ -132,8 +132,8 @@ TEST(BamRecordTest, ReferenceName)
         EXPECT_EQ("lambda_NEB3011", firstRecord.ReferenceName());
     }
 
-    {   // unmapped records have no reference name, should throw
-        const string exampleBam  = PbbamTestsConfig::Data_Dir + "/unmap1.bam";
+    {  // unmapped records have no reference name, should throw
+        const string exampleBam = PbbamTestsConfig::Data_Dir + "/unmap1.bam";
         BamFile bamFile(exampleBam);
         EntireFileQuery records(bamFile);
         auto firstIter = records.begin();

@@ -35,10 +35,10 @@
 
 // Author: Derek Barnett
 
-#include <stdexcept>
+#include <unistd.h>
 #include <cstddef>
 #include <cstdlib>
-#include <unistd.h>
+#include <stdexcept>
 
 #include <gtest/gtest.h>
 
@@ -46,10 +46,10 @@
 
 #include "PbbamTestData.h"
 
+#include <pbbam/../../src/FileUtils.h>
 #include <pbbam/BamFile.h>
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/Unused.h>
-#include <pbbam/../../src/FileUtils.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -57,7 +57,7 @@ using namespace std;
 
 namespace BamFileTests {
 
-template<typename T>
+template <typename T>
 void CheckFile(const T& input, const size_t expectedCount)
 {
     size_t observedCount = 0;
@@ -69,16 +69,16 @@ void CheckFile(const T& input, const size_t expectedCount)
     EXPECT_EQ(expectedCount, observedCount);
 }
 
-} // namespace BamFileTests
+}  // namespace BamFileTests
 
 TEST(BamFileTest, NonExistentFileThrows)
 {
-    EXPECT_THROW(BamFile{ "does_not_exist.bam" }, std::runtime_error);
+    EXPECT_THROW(BamFile{"does_not_exist.bam"}, std::runtime_error);
 }
 
 TEST(BamFileTest, NonBamFileThrows)
 {
-    EXPECT_THROW(BamFile { PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa.fai" }, std::runtime_error);
+    EXPECT_THROW(BamFile{PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa.fai"}, std::runtime_error);
 }
 
 TEST(BamFileTest, RelativePathBamOk)
@@ -90,15 +90,15 @@ TEST(BamFileTest, RelativePathBamOk)
     ASSERT_EQ(0, chdir("relative/a"));
 
     // BamFile from relative BAM fn
-    BamFileTests::CheckFile(BamFile{ "../b/test1.bam" }, 3);
+    BamFileTests::CheckFile(BamFile{"../b/test1.bam"}, 3);
 
     // dataset from relative BAM fn
-    BamFileTests::CheckFile(DataSet{ "../b/test1.bam" }, 3);
+    BamFileTests::CheckFile(DataSet{"../b/test1.bam"}, 3);
 
     // dataset from BamFile object (itself from relative BAM fn)
     {
         auto file = BamFile{"../b/test1.bam"};
-        BamFileTests::CheckFile(DataSet{ file }, 3);
+        BamFileTests::CheckFile(DataSet{file}, 3);
     }
 
     // restore working directory
@@ -113,7 +113,7 @@ TEST(BamFileTest, RelativePathXmlOk)
     ASSERT_EQ(0, chdir(PbbamTestsConfig::Data_Dir.c_str()));
 
     // dataset from XML containing relative paths
-    BamFileTests::CheckFile(DataSet{ "relative/relative.xml" }, 9);
+    BamFileTests::CheckFile(DataSet{"relative/relative.xml"}, 9);
 
     // restore working directory
     ASSERT_EQ(0, chdir(cwd.c_str()));
@@ -127,10 +127,10 @@ TEST(BamFileTest, RelativePathFofnOk)
     ASSERT_EQ(0, chdir(PbbamTestsConfig::Data_Dir.c_str()));
 
     // dataset from FOFN containing relative paths
-    BamFileTests::CheckFile(DataSet{ "relative/relative.fofn" }, 9);
+    BamFileTests::CheckFile(DataSet{"relative/relative.fofn"}, 9);
 
     // NOTE: doesn't yet support a FOFN containing an XML with relative paths
-//       BamFileTests::CheckFile(DataSet{ "relative/relative2.fofn" }, 60);
+    //       BamFileTests::CheckFile(DataSet{ "relative/relative2.fofn" }, 60);
 
     // restore working directory
     ASSERT_EQ(0, chdir(cwd.c_str()));
@@ -138,5 +138,6 @@ TEST(BamFileTest, RelativePathFofnOk)
 
 TEST(BamFileTest, TruncatedFileThrowsOk)
 {
-    EXPECT_THROW(BamFile{ PbbamTestsConfig::GeneratedData_Dir + "/truncated.bam" }, std::runtime_error);
+    EXPECT_THROW(BamFile{PbbamTestsConfig::GeneratedData_Dir + "/truncated.bam"},
+                 std::runtime_error);
 }

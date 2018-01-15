@@ -42,10 +42,12 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/PbiIndexedBamReader.h"
-#include <htslib/bgzf.h>
+
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+
+#include <htslib/bgzf.h>
 
 namespace PacBio {
 namespace BAM {
@@ -55,10 +57,9 @@ struct PbiIndexedBamReaderPrivate
 {
 public:
     PbiIndexedBamReaderPrivate(const std::string& pbiFilename)
-        : index_(pbiFilename)
-        , currentBlockReadCount_(0)
-        , numMatchingReads_(0)
-    { }
+        : index_(pbiFilename), currentBlockReadCount_(0), numMatchingReads_(0)
+    {
+    }
 
     void ApplyOffsets()
     {
@@ -77,9 +78,9 @@ public:
 
         // find blocks of reads passing filter criteria
         const uint32_t totalReads = index_.NumReads();
-        if (totalReads == 0) {               // empty PBI - no reads to use
+        if (totalReads == 0) {  // empty PBI - no reads to use
             return;
-        } else if (filter_.IsEmpty()) {    // empty filter - use all reads
+        } else if (filter_.IsEmpty()) {  // empty filter - use all reads
             numMatchingReads_ = totalReads;
             blocks_.emplace_back(0, totalReads);
         } else {
@@ -101,14 +102,12 @@ public:
     int ReadRawData(BGZF* bgzf, bam1_t* b)
     {
         // no data to fetch, return false
-        if (blocks_.empty())
-            return -1; // "EOF"
+        if (blocks_.empty()) return -1;  // "EOF"
 
         // if on new block, seek to its first record
         if (currentBlockReadCount_ == 0) {
             auto seekResult = bgzf_seek(bgzf, blocks_.at(0).virtualOffset_, SEEK_SET);
-            if (seekResult == -1)
-                throw std::runtime_error("could not seek in BAM file");
+            if (seekResult == -1) throw std::runtime_error("could not seek in BAM file");
         }
 
         // read next record
@@ -132,22 +131,20 @@ public:
     uint32_t numMatchingReads_;
 };
 
-} // namespace internal
+}  // namespace internal
 
-PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter,
-                                         const std::string& filename)
+PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter, const std::string& filename)
     : PbiIndexedBamReader(filter, BamFile(filename))
-{ }
+{
+}
 
-PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter,
-                                         const BamFile& bamFile)
+PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter, const BamFile& bamFile)
     : PbiIndexedBamReader(bamFile)
 {
     Filter(filter);
 }
 
-PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter,
-                                         BamFile&& bamFile)
+PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter, BamFile&& bamFile)
     : PbiIndexedBamReader(std::move(bamFile))
 {
     Filter(filter);
@@ -155,19 +152,21 @@ PbiIndexedBamReader::PbiIndexedBamReader(const PbiFilter& filter,
 
 PbiIndexedBamReader::PbiIndexedBamReader(const std::string& bamFilename)
     : PbiIndexedBamReader(BamFile(bamFilename))
-{ }
+{
+}
 
 PbiIndexedBamReader::PbiIndexedBamReader(const BamFile& bamFile)
-    : BamReader(bamFile)
-    , d_(new internal::PbiIndexedBamReaderPrivate(File().PacBioIndexFilename()))
-{ }
+    : BamReader(bamFile), d_(new internal::PbiIndexedBamReaderPrivate(File().PacBioIndexFilename()))
+{
+}
 
 PbiIndexedBamReader::PbiIndexedBamReader(BamFile&& bamFile)
     : BamReader(std::move(bamFile))
     , d_(new internal::PbiIndexedBamReaderPrivate(File().PacBioIndexFilename()))
-{ }
+{
+}
 
-PbiIndexedBamReader::~PbiIndexedBamReader() { }
+PbiIndexedBamReader::~PbiIndexedBamReader() {}
 
 int PbiIndexedBamReader::ReadRawData(BGZF* bgzf, bam1_t* b)
 {
@@ -194,5 +193,5 @@ uint32_t PbiIndexedBamReader::NumReads() const
     return d_->numMatchingReads_;
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

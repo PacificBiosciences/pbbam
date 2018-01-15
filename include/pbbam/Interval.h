@@ -42,9 +42,9 @@
 #ifndef INTERVAL_H
 #define INTERVAL_H
 
-#include "pbbam/Config.h"
 #include <cstddef>
 #include <string>
+#include "pbbam/Config.h"
 
 #define BOOST_ICL_USE_STATIC_BOUNDED_INTERVALS
 #include <boost/icl/discrete_interval.hpp>
@@ -59,7 +59,7 @@ namespace BAM {
 ///       Client code should primarily work with GenomicInterval, which does
 ///       enforce this distinction.
 ///
-template<typename T>
+template <typename T>
 class Interval
 {
 public:
@@ -144,9 +144,9 @@ private:
     interval_type data_;
 };
 
-} // namespace BAM
-} // namspace PacBio
+}  // namespace BAM
+}  // namspace PacBio
 
 #include "pbbam/internal/Interval.inl"
 
-#endif // GENOMICINTERVAL_H
+#endif  // GENOMICINTERVAL_H

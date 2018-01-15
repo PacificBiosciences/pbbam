@@ -42,23 +42,25 @@
 #ifndef BAMRECORDIMPL_H
 #define BAMRECORDIMPL_H
 
-#include "pbbam/BamRecordTag.h"
-#include "pbbam/Cigar.h"
-#include "pbbam/Config.h"
-#include "pbbam/Position.h"
-#include "pbbam/QualityValues.h"
-#include "pbbam/TagCollection.h"
 #include <htslib/sam.h>
 #include <cstddef>
 #include <cstdint>
 #include <map>
 #include <memory>
 #include <string>
+#include "pbbam/BamRecordTag.h"
+#include "pbbam/Cigar.h"
+#include "pbbam/Config.h"
+#include "pbbam/Position.h"
+#include "pbbam/QualityValues.h"
+#include "pbbam/TagCollection.h"
 
 namespace PacBio {
 namespace BAM {
 
-namespace internal { class BamRecordMemory; }
+namespace internal {
+class BamRecordMemory;
+}
 
 /// \brief The BamRecordImpl class holds all data necessary for creating,
 ///        querying or editing a generic %BAM record.
@@ -72,23 +74,24 @@ namespace internal { class BamRecordMemory; }
 class PBBAM_EXPORT BamRecordImpl
 {
 public:
-
+    // clang-format off
     /// These flags describe the alignment status of the record.
     enum AlignmentFlag
     {
-        PAIRED              = 0x0001    ///< Record comes from paired-end sequencing
-      , PROPER_PAIR         = 0x0002    ///< Each mate of a pair was properly aligned ("proper" as determined by aligner)
-      , UNMAPPED            = 0x0004    ///< Record was not mapped by aligner
-      , MATE_UNMAPPED       = 0x0008    ///< Record's mate was not mapped by aligner
-      , REVERSE_STRAND      = 0x0010    ///< Record was aligned to reverse strand (Sequence() is reverse-complemented)
-      , MATE_REVERSE_STRAND = 0x0020    ///< Record's mate was aligned to reverse strand (mate's Sequence() is reverse-complemented)
-      , MATE_1              = 0x0040    ///< Record is first mate of pair
-      , MATE_2              = 0x0080    ///< Record is second mate of pair
-      , SECONDARY           = 0x0100    ///< Record is a secondary alignment
-      , FAILED_QC           = 0x0200    ///< Record failed quality controls
-      , DUPLICATE           = 0x0400    ///< Record is a PCR/optical duplicate
-      , SUPPLEMENTARY       = 0x0800    ///< Record is a supplementary alignment
+        PAIRED              = 0x0001,   ///< Record comes from paired-end sequencing
+        PROPER_PAIR         = 0x0002,   ///< Each mate of a pair was properly aligned ("proper" as determined by aligner)
+        UNMAPPED            = 0x0004,   ///< Record was not mapped by aligner
+        MATE_UNMAPPED       = 0x0008,   ///< Record's mate was not mapped by aligner
+        REVERSE_STRAND      = 0x0010,   ///< Record was aligned to reverse strand (Sequence() is reverse-complemented)
+        MATE_REVERSE_STRAND = 0x0020,   ///< Record's mate was aligned to reverse strand (mate's Sequence() is reverse-complemented)
+        MATE_1              = 0x0040,   ///< Record is first mate of pair
+        MATE_2              = 0x0080,   ///< Record is second mate of pair
+        SECONDARY           = 0x0100,   ///< Record is a secondary alignment
+        FAILED_QC           = 0x0200,   ///< Record failed quality controls
+        DUPLICATE           = 0x0400,   ///< Record is a PCR/optical duplicate
+        SUPPLEMENTARY       = 0x0800    ///< Record is a supplementary alignment
     };
+    // clang-format on
 
 public:
     /// \name Constructors & Related Methods
@@ -351,8 +354,7 @@ public:
     ///
     /// \returns reference to this record.
     ///
-    BamRecordImpl& SetSequenceAndQualities(const char* sequence,
-                                           const size_t sequenceLength,
+    BamRecordImpl& SetSequenceAndQualities(const char* sequence, const size_t sequenceLength,
                                            const char* qualities = nullptr);
 
     /// \brief Sets the record's DNA sequence and quality values.
@@ -411,8 +413,7 @@ public:
     ///
     /// \returns true if tag was successfully added.
     ///
-    bool AddTag(const std::string& tagName,
-                const Tag& value);
+    bool AddTag(const std::string& tagName, const Tag& value);
 
     /// \brief Adds a new tag to this record.
     ///
@@ -423,8 +424,7 @@ public:
     ///                     to be added
     /// \returns true if tag was successfully added.
     ///
-    bool AddTag(const BamRecordTag tag,
-                const Tag& value);
+    bool AddTag(const BamRecordTag tag, const Tag& value);
 
     /// \brief Adds a new tag to this record, with an optional modifier.
     ///
@@ -444,9 +444,7 @@ public:
     ///
     /// \returns true if tag was successfully added.
     ///
-    bool AddTag(const std::string& tagName,
-                const Tag& value,
-                const TagModifier additionalModifier);
+    bool AddTag(const std::string& tagName, const Tag& value, const TagModifier additionalModifier);
 
     /// \brief Adds a new tag to this record, with an optional modifier.
     ///
@@ -460,9 +458,7 @@ public:
     ///
     /// \returns true if tag was successfully added.
     ///
-    bool AddTag(const BamRecordTag tag,
-                const Tag& value,
-                const TagModifier additionalModifier);
+    bool AddTag(const BamRecordTag tag, const Tag& value, const TagModifier additionalModifier);
 
     /// \brief Edits an existing tag on this record.
     ///
@@ -481,8 +477,7 @@ public:
     ///
     /// \returns true if tag was successfully edited.
     ///
-    bool EditTag(const std::string& tagName,
-                 const Tag& newValue);
+    bool EditTag(const std::string& tagName, const Tag& newValue);
 
     /// \brief Edits an existing tag on this record.
     ///
@@ -494,8 +489,7 @@ public:
     ///
     /// \returns true if tag was successfully edited.
     ///
-    bool EditTag(const BamRecordTag tag,
-                 const Tag& newValue);
+    bool EditTag(const BamRecordTag tag, const Tag& newValue);
 
     /// \brief Edits an existing tag on this record.
     ///
@@ -516,8 +510,7 @@ public:
     ///
     /// \returns true if tag was successfully edited.
     ///
-    bool EditTag(const std::string& tagName,
-                 const Tag& value,
+    bool EditTag(const std::string& tagName, const Tag& value,
                  const TagModifier additionalModifier);
 
     /// \brief Edits an existing tag on this record.
@@ -532,10 +525,7 @@ public:
     ///
     /// \returns true if tag was successfully edited.
     ///
-    bool EditTag(const BamRecordTag tag,
-                 const Tag& value,
-                 const TagModifier additionalModifier);
-
+    bool EditTag(const BamRecordTag tag, const Tag& value, const TagModifier additionalModifier);
 
     /// \returns true if a tag with this name is present in this record.
     bool HasTag(const std::string& tagName) const;
@@ -590,9 +580,8 @@ public:
 
     // change above to Tag();
 
-//    template<typename T>
-//    T TagValue(const std::string& tagName) const;
-
+    //    template<typename T>
+    //    T TagValue(const std::string& tagName) const;
 
     /// \}
 
@@ -603,12 +592,11 @@ private:
     // internal memory setup/expand methods
     void InitializeData();
     void MaybeReallocData();
-    void UpdateTagMap() const; // allowed to be called from const methods
-                                   // (lazy update on request)
+    void UpdateTagMap() const;  // allowed to be called from const methods
+                                // (lazy update on request)
 
     // internal tag helper methods
-    bool AddTagImpl(const std::string& tagName,
-                    const Tag& value,
+    bool AddTagImpl(const std::string& tagName, const Tag& value,
                     const TagModifier additionalModifier);
     bool RemoveTagImpl(const std::string& tagName);
     int TagOffset(const std::string& tagName) const;
@@ -618,12 +606,10 @@ private:
 
     // core seq/qual logic shared by the public API
     BamRecordImpl& SetSequenceAndQualitiesInternal(const char* sequence,
-                                                      const size_t sequenceLength,
-                                                      const char* qualities,
-                                                      bool isPreencoded);
+                                                   const size_t sequenceLength,
+                                                   const char* qualities, bool isPreencoded);
 
 private:
-
     // data members
     std::shared_ptr<bam1_t> d_;
     mutable std::map<uint16_t, int> tagOffsets_;
@@ -632,9 +618,9 @@ private:
     friend class internal::BamRecordMemory;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/BamRecordImpl.inl"
 
-#endif // BAMRECORDIMPL_H
+#endif  // BAMRECORDIMPL_H

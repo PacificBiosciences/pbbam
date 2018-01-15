@@ -42,12 +42,12 @@
 #ifndef WHITELISTEDZMWREADSTITCHER_H
 #define WHITELISTEDZMWREADSTITCHER_H
 
-#include "pbbam/Config.h"
-#include "pbbam/virtual/VirtualZmwBamRecord.h"
 #include <cstdint>
 #include <memory>
-#include <vector>
 #include <string>
+#include <vector>
+#include "pbbam/Config.h"
+#include "pbbam/virtual/VirtualZmwBamRecord.h"
 
 namespace PacBio {
 namespace BAM {
@@ -91,14 +91,14 @@ public:
     ///         if malformed data encountered
     ///
     WhitelistedZmwReadStitcher(const std::vector<int32_t>& zmwWhitelist,
-                              const std::string& primaryBamFilePath,
-                              const std::string& scrapsBamFilePath);
+                               const std::string& primaryBamFilePath,
+                               const std::string& scrapsBamFilePath);
 
     WhitelistedZmwReadStitcher() = delete;
     WhitelistedZmwReadStitcher(const WhitelistedZmwReadStitcher&) = delete;
-    WhitelistedZmwReadStitcher(WhitelistedZmwReadStitcher&&)      = delete;
+    WhitelistedZmwReadStitcher(WhitelistedZmwReadStitcher&&) = delete;
     WhitelistedZmwReadStitcher& operator=(const WhitelistedZmwReadStitcher&) = delete;
-    WhitelistedZmwReadStitcher& operator=(WhitelistedZmwReadStitcher&&)      = delete;
+    WhitelistedZmwReadStitcher& operator=(WhitelistedZmwReadStitcher&&) = delete;
     ~WhitelistedZmwReadStitcher();
 
     /// \}
@@ -137,7 +137,7 @@ private:
     std::unique_ptr<WhitelistedZmwReadStitcherPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // WHITELISTEDZMWREADSTITCHER
+#endif  // WHITELISTEDZMWREADSTITCHER

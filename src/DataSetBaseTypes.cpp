@@ -37,12 +37,15 @@
 
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/DataSetTypes.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
+
+#include <cstddef>
+
+#include <boost/algorithm/string.hpp>
+
 #include "DataSetUtils.h"
 #include "TimeUtils.h"
-#include <boost/algorithm/string.hpp>
-#include <cstddef>
+#include "pbbam/DataSetTypes.h"
 
 namespace PacBio {
 namespace BAM {
@@ -55,14 +58,16 @@ namespace internal {
 BaseEntityType::BaseEntityType(const std::string& label, const XsdType& xsd)
     : DataSetElement(label, xsd)
 {
-    if (Version().empty())
-        Version(internal::XML_VERSION);
+    if (Version().empty()) Version(internal::XML_VERSION);
 }
 
 DEFINE_ACCESSORS(BaseEntityType, Extensions, Extensions)
 
 BaseEntityType& BaseEntityType::Extensions(const PacBio::BAM::Extensions& extensions)
-{ Extensions() = extensions; return *this; }
+{
+    Extensions() = extensions;
+    return *this;
+}
 
 // ----------------
 // DataEntityType
@@ -70,34 +75,35 @@ BaseEntityType& BaseEntityType::Extensions(const PacBio::BAM::Extensions& extens
 
 DataEntityType::DataEntityType(const std::string& label, const XsdType& xsd)
     : BaseEntityType(label, xsd)
-{ }
+{
+}
 
 // -----------------
 // IndexedDataType
 // -----------------
 
-IndexedDataType::IndexedDataType(const std::string& metatype,
-                                 const std::string& filename,
-                                 const std::string& label,
-                                 const XsdType &xsd)
+IndexedDataType::IndexedDataType(const std::string& metatype, const std::string& filename,
+                                 const std::string& label, const XsdType& xsd)
     : InputOutputDataType(metatype, filename, label, xsd)
-{ }
+{
+}
 
 DEFINE_ACCESSORS(IndexedDataType, FileIndices, FileIndices)
 
 IndexedDataType& IndexedDataType::FileIndices(const PacBio::BAM::FileIndices& indices)
-{ FileIndices() = indices; return *this; }
+{
+    FileIndices() = indices;
+    return *this;
+}
 
 // ---------------------
 // InputOutputDataType
 // ---------------------
 
-InputOutputDataType::InputOutputDataType(const std::string& metatype,
-                                         const std::string& filename,
-                                         const std::string& label,
-                                         const XsdType &xsd)
+InputOutputDataType::InputOutputDataType(const std::string& metatype, const std::string& filename,
+                                         const std::string& label, const XsdType& xsd)
     : StrictEntityType(metatype, label, xsd)
-{  
+{
     ResourceId(filename);
 }
 
@@ -105,11 +111,10 @@ InputOutputDataType::InputOutputDataType(const std::string& metatype,
 // StrictEntityType
 // ----------------
 
-StrictEntityType::StrictEntityType(const std::string& metatype,
-                                   const std::string& label,
+StrictEntityType::StrictEntityType(const std::string& metatype, const std::string& label,
                                    const XsdType& xsd)
     : BaseEntityType(label, xsd)
-{ 
+{
     // MetaType
     MetaType(metatype);
 
@@ -121,13 +126,14 @@ StrictEntityType::StrictEntityType(const std::string& metatype,
         const char c = metatype.at(i);
         transformedMetatype[i] = ((c == '.') ? '_' : tolower(c));
     }
-    const std::string& tsn = transformedMetatype + "-" + internal::ToDataSetFormat(internal::CurrentTime());
+    const std::string& tsn =
+        transformedMetatype + "-" + internal::ToDataSetFormat(internal::CurrentTime());
     TimeStampedName(tsn);
 
     // UniqueId
     UniqueId(internal::GenerateUuid());
 }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio

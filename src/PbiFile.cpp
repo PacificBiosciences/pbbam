@@ -41,26 +41,24 @@
 
 #include "PbbamInternalConfig.h"
 
+#include "pbbam/PbiFile.h"
+
 #include <cstddef>
 #include <cstdint>
 
-#include "pbbam/PbiFile.h"
 #include "pbbam/BamFile.h"
-#include "pbbam/PbiBuilder.h"
 #include "pbbam/BamReader.h"
+#include "pbbam/PbiBuilder.h"
 
 namespace PacBio {
 namespace BAM {
 namespace PbiFile {
 
-void CreateFrom(const BamFile& bamFile,
-                const PbiBuilder::CompressionLevel compressionLevel,
+void CreateFrom(const BamFile& bamFile, const PbiBuilder::CompressionLevel compressionLevel,
                 const size_t numThreads)
 {
-    PbiBuilder builder(bamFile.PacBioIndexFilename(),
-                       bamFile.Header().Sequences().size(),
-                       compressionLevel,
-                       numThreads);
+    PbiBuilder builder(bamFile.PacBioIndexFilename(), bamFile.Header().Sequences().size(),
+                       compressionLevel, numThreads);
     BamReader reader(bamFile);
     BamRecord b;
     int64_t offset = reader.VirtualTell();
@@ -70,6 +68,6 @@ void CreateFrom(const BamFile& bamFile,
     }
 }
 
-} // namespace PbiFile
-} // namespace BAM
-} // namespace PacBio
+}  // namespace PbiFile
+}  // namespace BAM
+}  // namespace PacBio

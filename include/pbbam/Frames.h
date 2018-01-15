@@ -42,10 +42,10 @@
 #ifndef FRAMES_H
 #define FRAMES_H
 
-#include "pbbam/Config.h"
 #include <cstddef>
 #include <cstdint>
 #include <vector>
+#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -155,7 +155,7 @@ public:
     /// \returns True if the container is empty, false otherwise.
     bool empty() const;
 
-    /// \} 
+    /// \}
 
 public:
     /// \name Access Data
@@ -181,9 +181,9 @@ private:
     std::vector<uint16_t> data_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/Frames.inl"
 
-#endif // FRAMES_H
+#endif  // FRAMES_H

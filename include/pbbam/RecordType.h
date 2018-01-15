@@ -51,17 +51,17 @@ namespace BAM {
 ///
 enum class RecordType
 {
-    ZMW         ///< Polymerase read
-  , HQREGION    ///< High-quality region
-  , SUBREAD     ///< Subread (
-  , CCS         ///< Circular consensus sequence
-  , SCRAP       ///< Additional sequence (barcodes, adapters, etc.)
-  , UNKNOWN     ///< Unknown read type
+    ZMW,       ///< Polymerase read
+    HQREGION,  ///< High-quality region
+    SUBREAD,   ///< Subread (
+    CCS,       ///< Circular consensus sequence
+    SCRAP,     ///< Additional sequence (barcodes, adapters, etc.)
+    UNKNOWN,   ///< Unknown read type
 
-  , POLYMERASE = ZMW ///< \deprecated as of PacBio BAM spec v 3.0.4 (use RecordType::ZMW instead)
+    POLYMERASE = ZMW  ///< \deprecated as of PacBio BAM spec v 3.0.4 (use RecordType::ZMW instead)
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // RECORDTYPE_H
+#endif  // RECORDTYPE_H

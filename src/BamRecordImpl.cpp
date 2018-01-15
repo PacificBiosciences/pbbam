@@ -38,20 +38,21 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/BamRecordImpl.h"
-#include "pbbam/BamTagCodec.h"
-#include "BamRecordTags.h"
-#include "MemoryUtils.h"
-
-#include <htslib/hts_endian.h>
 
 #include <algorithm>
-#include <iostream>
-#include <utility>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
+#include <utility>
+
+#include <htslib/hts_endian.h>
+
+#include "BamRecordTags.h"
+#include "MemoryUtils.h"
+#include "pbbam/BamTagCodec.h"
 
 namespace PacBio {
 namespace BAM {
@@ -62,8 +63,7 @@ Cigar FetchRawCigar(const uint32_t* const src, const uint32_t len)
 {
     Cigar result;
     result.reserve(len);
-    for (uint32_t i = 0; i < len; ++i)
-    {
+    for (uint32_t i = 0; i < len; ++i) {
         const uint32_t length = bam_cigar_oplen(src[i]);
         const auto type = static_cast<CigarOperationType>(bam_cigar_op(src[i]));
         result.push_back(CigarOperation(type, length));
@@ -76,64 +76,55 @@ bool HasLongCigar(const bam1_t* const b)
     auto* c = &b->core;
 
     // if empty CIGAR or unmapped
-    if (c->n_cigar == 0 || c->tid < 0 || c->pos < 0)
-        return false;
+    if (c->n_cigar == 0 || c->tid < 0 || c->pos < 0) return false;
 
     // if existing CIGAR doesn't look like a 'fake CIGAR'
     const auto firstCigarOp = *(bam_get_cigar(b));
     if (bam_cigar_op(firstCigarOp) != static_cast<uint32_t>(CigarOperationType::SOFT_CLIP) ||
-        bam_cigar_oplen(firstCigarOp) != c->l_qseq)
-    {
+        bam_cigar_oplen(firstCigarOp) != c->l_qseq) {
         return false;
     }
 
     // if CG tag missing, not expected type
     const uint8_t* const CG = bam_aux_get(b, "CG");
-    if (CG == nullptr)
-        return false;
-    if (CG[0] != 'B' || CG[1] != 'I')
-        return false;
+    if (CG == nullptr) return false;
+    if (CG[0] != 'B' || CG[1] != 'I') return false;
 
     // if CG tag data is empty
     uint32_t numElements = 0;
     memcpy(&numElements, &CG[2], sizeof(uint32_t));
-    if (numElements == 0)
-        return false;
+    if (numElements == 0) return false;
 
     // we've found long CIGAR data in the CG tag
     return true;
 }
 
-} // namespace anonymous
+}  // namespace anonymous
 
-BamRecordImpl::BamRecordImpl()
-    : d_(nullptr)
+BamRecordImpl::BamRecordImpl() : d_(nullptr)
 {
     InitializeData();
     assert(d_);
 }
 
 BamRecordImpl::BamRecordImpl(const BamRecordImpl& other)
-    : d_(bam_dup1(other.d_.get()), internal::HtslibRecordDeleter())
-    , tagOffsets_(other.tagOffsets_)
-{ 
+    : d_(bam_dup1(other.d_.get()), internal::HtslibRecordDeleter()), tagOffsets_(other.tagOffsets_)
+{
     assert(d_);
 }
 
 BamRecordImpl::BamRecordImpl(BamRecordImpl&& other)
-    : d_(nullptr)
-    , tagOffsets_(std::move(other.tagOffsets_))
+    : d_(nullptr), tagOffsets_(std::move(other.tagOffsets_))
 {
     d_.swap(other.d_);
     other.d_.reset();
-    assert(d_); 
+    assert(d_);
 }
 
 BamRecordImpl& BamRecordImpl::operator=(const BamRecordImpl& other)
 {
-    if (this != & other) {
-        if (d_ == nullptr)
-            InitializeData();
+    if (this != &other) {
+        if (d_ == nullptr) InitializeData();
         bam_copy1(d_.get(), other.d_.get());
         tagOffsets_ = other.tagOffsets_;
     }
@@ -143,7 +134,7 @@ BamRecordImpl& BamRecordImpl::operator=(const BamRecordImpl& other)
 
 BamRecordImpl& BamRecordImpl::operator=(BamRecordImpl&& other)
 {
-    if (this != & other) {
+    if (this != &other) {
         d_.swap(other.d_);
         other.d_.reset();
 
@@ -153,69 +144,51 @@ BamRecordImpl& BamRecordImpl::operator=(BamRecordImpl&& other)
     return *this;
 }
 
-bool BamRecordImpl::AddTag(const std::string& tagName,
-                           const Tag &value)
+bool BamRecordImpl::AddTag(const std::string& tagName, const Tag& value)
 {
     return AddTag(tagName, value, TagModifier::NONE);
 }
 
-bool BamRecordImpl::AddTag(const BamRecordTag tag,
-                           const Tag& value)
+bool BamRecordImpl::AddTag(const BamRecordTag tag, const Tag& value)
 {
-   return AddTag(internal::BamRecordTags::LabelFor(tag),
-                 value,
-                 TagModifier::NONE);
+    return AddTag(internal::BamRecordTags::LabelFor(tag), value, TagModifier::NONE);
 }
 
-bool BamRecordImpl::AddTag(const std::string& tagName,
-                           const Tag& value,
+bool BamRecordImpl::AddTag(const std::string& tagName, const Tag& value,
                            const TagModifier additionalModifier)
 {
-    if (tagName.size() != 2 || HasTag(tagName))
-        return false;
+    if (tagName.size() != 2 || HasTag(tagName)) return false;
     const auto added = AddTagImpl(tagName, value, additionalModifier);
-    if (added)
-        UpdateTagMap();
+    if (added) UpdateTagMap();
     return added;
 }
 
-bool BamRecordImpl::AddTag(const BamRecordTag tag,
-                           const Tag& value,
+bool BamRecordImpl::AddTag(const BamRecordTag tag, const Tag& value,
                            const TagModifier additionalModifier)
 {
-    return AddTag(internal::BamRecordTags::LabelFor(tag),
-                  value,
-                  additionalModifier);
+    return AddTag(internal::BamRecordTags::LabelFor(tag), value, additionalModifier);
 }
 
-bool BamRecordImpl::AddTagImpl(const std::string& tagName,
-                               const Tag& value,
+bool BamRecordImpl::AddTagImpl(const std::string& tagName, const Tag& value,
                                const TagModifier additionalModifier)
 {
     const std::vector<uint8_t> rawData = BamTagCodec::ToRawData(value, additionalModifier);
-    if (rawData.empty())
-        return false;
+    if (rawData.empty()) return false;
 
-    bam_aux_append(d_.get(),
-                   tagName.c_str(),
-                   BamTagCodec::TagTypeCode(value, additionalModifier),
-                   rawData.size(),
-                   const_cast<uint8_t*>(rawData.data()));
+    bam_aux_append(d_.get(), tagName.c_str(), BamTagCodec::TagTypeCode(value, additionalModifier),
+                   rawData.size(), const_cast<uint8_t*>(rawData.data()));
     return true;
 }
 
 Cigar BamRecordImpl::CigarData() const
 {
     const auto* b = d_.get();
-    if (HasLongCigar(b))
-    {
+    if (HasLongCigar(b)) {
         // fetch long CIGAR from tag
         const auto cigarTag = TagValue("CG");
         const auto cigarTagValue = cigarTag.ToUInt32Array();
         return FetchRawCigar(cigarTagValue.data(), cigarTagValue.size());
-    }
-    else
-    {
+    } else {
         // fetch normal, short CIGAR from the standard location
         return FetchRawCigar(bam_get_cigar(b), b->core.n_cigar);
     }
@@ -224,28 +197,25 @@ Cigar BamRecordImpl::CigarData() const
 BamRecordImpl& BamRecordImpl::CigarData(const Cigar& cigar)
 {
     // Set normal, "short" CIGAR and remove CG tag if present.
-    if (cigar.size() < 65536)
-    {
+    if (cigar.size() < 65536) {
         SetCigarData(cigar);
-        if (HasTag("CG"))
-            RemoveTag("CG");
+        if (HasTag("CG")) RemoveTag("CG");
     }
 
     // Set long CIGAR data
-    else
-    {
+    else {
         // Add the 'fake' CIGAR in normal place.
         Cigar fake;
         fake.emplace_back(CigarOperationType::SOFT_CLIP, SequenceLength());
-        const uint32_t alignedLength = static_cast<uint32_t>(bam_cigar2rlen(d_->core.n_cigar, bam_get_cigar(d_.get())));
+        const uint32_t alignedLength =
+            static_cast<uint32_t>(bam_cigar2rlen(d_->core.n_cigar, bam_get_cigar(d_.get())));
         fake.emplace_back(CigarOperationType::REFERENCE_SKIP, alignedLength);
         SetCigarData(fake);
 
         // Add raw CIGAR data to CG tag.
         std::vector<uint32_t> cigarData(cigar.size());
         cigarData.reserve(cigar.size());
-        for (size_t i = 0; i < cigar.size(); ++i)
-        {
+        for (size_t i = 0; i < cigar.size(); ++i) {
             const CigarOperation& op = cigar.at(i);
             cigarData[i] = bam_cigar_gen(op.Length(), static_cast<int>(op.Type()));
         }
@@ -263,43 +233,33 @@ BamRecordImpl& BamRecordImpl::CigarData(const std::string& cigarString)
     return CigarData(Cigar::FromStdString(cigarString));
 }
 
-bool BamRecordImpl::EditTag(const std::string& tagName,
-                            const Tag& newValue)
+bool BamRecordImpl::EditTag(const std::string& tagName, const Tag& newValue)
 {
     return EditTag(tagName, newValue, TagModifier::NONE);
 }
 
-bool BamRecordImpl::EditTag(const BamRecordTag tag,
-                            const Tag& newValue)
+bool BamRecordImpl::EditTag(const BamRecordTag tag, const Tag& newValue)
 {
-    return EditTag(internal::BamRecordTags::LabelFor(tag),
-                   newValue,
-                   TagModifier::NONE);
+    return EditTag(internal::BamRecordTags::LabelFor(tag), newValue, TagModifier::NONE);
 }
 
-bool BamRecordImpl::EditTag(const std::string& tagName,
-                            const Tag& newValue,
+bool BamRecordImpl::EditTag(const std::string& tagName, const Tag& newValue,
                             const TagModifier additionalModifier)
 {
     // try remove old value (with delayed tag map update)
     const bool removed = RemoveTagImpl(tagName);
-    if (!removed)
-        return false;
+    if (!removed) return false;
 
     // if old value removed, add new value
     const bool added = AddTagImpl(tagName, newValue, additionalModifier);
-    if (added)
-        UpdateTagMap();
+    if (added) UpdateTagMap();
     return added;
 }
 
-bool BamRecordImpl::EditTag(const BamRecordTag tag,
-                            const Tag& newValue,
+bool BamRecordImpl::EditTag(const BamRecordTag tag, const Tag& newValue,
                             const TagModifier additionalModifier)
 {
-    return EditTag(internal::BamRecordTags::LabelFor(tag),
-                   newValue,
-                   additionalModifier);
+    return EditTag(internal::BamRecordTags::LabelFor(tag), newValue, additionalModifier);
 }
 
 BamRecordImpl BamRecordImpl::FromRawData(const std::shared_ptr<bam1_t>& rawData)
@@ -311,12 +271,11 @@ BamRecordImpl BamRecordImpl::FromRawData(const std::shared_ptr<bam1_t>& rawData)
 
 bool BamRecordImpl::HasTag(const std::string& tagName) const
 {
-    if (tagName.size() != 2)
-        return false;
+    if (tagName.size() != 2) return false;
     return TagOffset(tagName) != -1;
 
     // 27635
-//    return bam_aux_get(d_.get(), tagName.c_str()) != 0;
+    //    return bam_aux_get(d_.get(), tagName.c_str()) != 0;
 }
 
 bool BamRecordImpl::HasTag(const BamRecordTag tag) const
@@ -327,7 +286,8 @@ bool BamRecordImpl::HasTag(const BamRecordTag tag) const
 void BamRecordImpl::InitializeData()
 {
     d_.reset(bam_init1(), internal::HtslibRecordDeleter());
-    d_->data = (uint8_t*)(calloc(0x800, sizeof(uint8_t)));   // maybe make this value tune-able later?
+    d_->data =
+        (uint8_t*)(calloc(0x800, sizeof(uint8_t)));  // maybe make this value tune-able later?
     d_->m_data = 0x800;
 
     // init unmapped
@@ -355,16 +315,13 @@ void BamRecordImpl::MaybeReallocData()
     }
 }
 
-std::string BamRecordImpl::Name() const
-{
-    return std::string(bam_get_qname(d_));
-}
+std::string BamRecordImpl::Name() const { return std::string(bam_get_qname(d_)); }
 
 BamRecordImpl& BamRecordImpl::Name(const std::string& name)
 {
     // determine change in memory needed
     // diffNumBytes: pos -> growing, neg -> shrinking
-    const size_t numChars = name.size() + 1; // +1 for NULL-term
+    const size_t numChars = name.size() + 1;  // +1 for NULL-term
     const size_t numExtraNulls = 4 - (numChars % 4);
     const size_t totalNameSize = numChars + numExtraNulls;
 
@@ -389,12 +346,10 @@ BamRecordImpl& BamRecordImpl::Name(const std::string& name)
 
 QualityValues BamRecordImpl::Qualities() const
 {
-    if (d_->core.l_qseq == 0)
-        return QualityValues();
+    if (d_->core.l_qseq == 0) return QualityValues();
 
     uint8_t* qualData = bam_get_qual(d_);
-    if (qualData[0] == 0xff)
-        return QualityValues();
+    if (qualData[0] == 0xff) return QualityValues();
 
     const size_t numQuals = d_->core.l_qseq;
     QualityValues result;
@@ -407,8 +362,7 @@ QualityValues BamRecordImpl::Qualities() const
 bool BamRecordImpl::RemoveTag(const std::string& tagName)
 {
     const bool removed = RemoveTagImpl(tagName);
-    if (removed)
-        UpdateTagMap();
+    if (removed) UpdateTagMap();
     return removed;
 }
 
@@ -417,13 +371,11 @@ bool BamRecordImpl::RemoveTag(const BamRecordTag tag)
     return RemoveTag(internal::BamRecordTags::LabelFor(tag));
 }
 
-bool BamRecordImpl::RemoveTagImpl(const std::string &tagName)
+bool BamRecordImpl::RemoveTagImpl(const std::string& tagName)
 {
-    if (tagName.size() != 2)
-        return false;
+    if (tagName.size() != 2) return false;
     uint8_t* data = bam_aux_get(d_.get(), tagName.c_str());
-    if (data == nullptr)
-        return false;
+    if (data == nullptr) return false;
     const bool ok = bam_aux_del(d_.get(), data) == 0;
     return ok;
 }
@@ -439,8 +391,7 @@ std::string BamRecordImpl::Sequence() const
     return result;
 }
 
-size_t BamRecordImpl::SequenceLength() const
-{ return d_->core.l_qseq; }
+size_t BamRecordImpl::SequenceLength() const { return d_->core.l_qseq; }
 
 void BamRecordImpl::SetCigarData(const Cigar& cigar)
 {
@@ -448,7 +399,7 @@ void BamRecordImpl::SetCigarData(const Cigar& cigar)
     // diffNumBytes: pos -> growing, neg -> shrinking
     const size_t numCigarOps = cigar.size();
     const int diffNumCigars = numCigarOps - d_->core.n_cigar;
-    const int diffNumBytes  = diffNumCigars * sizeof(uint32_t);
+    const int diffNumBytes = diffNumCigars * sizeof(uint32_t);
     const int oldLengthData = d_->l_data;
     d_->l_data += diffNumBytes;
     MaybeReallocData();
@@ -474,9 +425,7 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualities(const std::string& sequenc
     if (!qualities.empty() && (sequence.size() != qualities.size()))
         throw std::runtime_error("If QUAL provided, must be of the same length as SEQ");
 
-    return SetSequenceAndQualitiesInternal(sequence.c_str(),
-                                           sequence.size(),
-                                           qualities.c_str(),
+    return SetSequenceAndQualitiesInternal(sequence.c_str(), sequence.size(), qualities.c_str(),
                                            false);
 }
 
@@ -484,20 +433,14 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualities(const char* sequence,
                                                       const size_t sequenceLength,
                                                       const char* qualities)
 {
-    return SetSequenceAndQualitiesInternal(sequence,
-                                           sequenceLength,
-                                           qualities,
-                                           false);
+    return SetSequenceAndQualitiesInternal(sequence, sequenceLength, qualities, false);
 }
 
 BamRecordImpl& BamRecordImpl::SetPreencodedSequenceAndQualities(const char* encodedSequence,
                                                                 const size_t rawSequenceLength,
                                                                 const char* qualities)
 {
-    return SetSequenceAndQualitiesInternal(encodedSequence,
-                                           rawSequenceLength,
-                                           qualities,
-                                           true);
+    return SetSequenceAndQualitiesInternal(encodedSequence, rawSequenceLength, qualities, true);
 }
 
 BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequence,
@@ -507,9 +450,10 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
 {
     // determine change in memory needed
     // diffNumBytes: pos -> growing, neg -> shrinking
-    const auto encodedSequenceLength = static_cast<int>((sequenceLength+1)/2);
-    const int oldSeqAndQualLength = static_cast<int>((d_->core.l_qseq+1)/2) + d_->core.l_qseq; // encoded seq + qual
-    const int newSeqAndQualLength = encodedSequenceLength + sequenceLength;                    // encoded seq + qual
+    const auto encodedSequenceLength = static_cast<int>((sequenceLength + 1) / 2);
+    const int oldSeqAndQualLength =
+        static_cast<int>((d_->core.l_qseq + 1) / 2) + d_->core.l_qseq;       // encoded seq + qual
+    const int newSeqAndQualLength = encodedSequenceLength + sequenceLength;  // encoded seq + qual
     const int diffNumBytes = newSeqAndQualLength - oldSeqAndQualLength;
     const int oldLengthData = d_->l_data;
     d_->l_data += diffNumBytes;
@@ -529,12 +473,12 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
     } else {
         memset(pEncodedSequence, 0, encodedSequenceLength);
         for (size_t i = 0; i < sequenceLength; ++i)
-            pEncodedSequence[i>>1] |= seq_nt16_table[(int)sequence[i]] << ((~i&1)<<2);
+            pEncodedSequence[i >> 1] |= seq_nt16_table[(int)sequence[i]] << ((~i & 1) << 2);
     }
 
     // fill in quality values
     uint8_t* encodedQualities = bam_get_qual(d_);
-    if ( (qualities == nullptr ) || (strlen(qualities) == 0) )
+    if ((qualities == nullptr) || (strlen(qualities) == 0))
         memset(encodedQualities, 0xff, sequenceLength);
     else {
         for (size_t i = 0; i < sequenceLength; ++i)
@@ -545,13 +489,12 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
 
 int BamRecordImpl::TagOffset(const std::string& tagName) const
 {
-    if (tagName.size() != 2)
-        throw std::runtime_error("invalid tag name size");
+    if (tagName.size() != 2) throw std::runtime_error("invalid tag name size");
 
-    if (tagOffsets_.empty())
-        UpdateTagMap();
+    if (tagOffsets_.empty()) UpdateTagMap();
 
-    const uint16_t tagCode = (static_cast<uint8_t>(tagName.at(0)) << 8) | static_cast<uint8_t>(tagName.at(1));
+    const uint16_t tagCode =
+        (static_cast<uint8_t>(tagName.at(0)) << 8) | static_cast<uint8_t>(tagName.at(1));
     const auto found = tagOffsets_.find(tagCode);
     return (found != tagOffsets_.cend() ? found->second : -1);
 }
@@ -583,23 +526,20 @@ TagCollection BamRecordImpl::Tags() const
 {
     const uint8_t* tagDataStart = bam_get_aux(d_);
     const size_t numBytes = d_->l_data - (tagDataStart - d_->data);
-    return BamTagCodec::Decode(std::vector<uint8_t>(tagDataStart, tagDataStart+numBytes));
+    return BamTagCodec::Decode(std::vector<uint8_t>(tagDataStart, tagDataStart + numBytes));
 }
 
 Tag BamRecordImpl::TagValue(const std::string& tagName) const
 {
-    if (tagName.size() != 2)
-        return Tag();
+    if (tagName.size() != 2) return Tag();
 
     const int offset = TagOffset(tagName);
-    if (offset == -1)
-        return Tag();
+    if (offset == -1) return Tag();
 
     bam1_t* b = d_.get();
     assert(bam_get_aux(b));
     uint8_t* tagData = bam_get_aux(b) + offset;
-    if (offset >= b->l_data)
-        return Tag();
+    if (offset >= b->l_data) return Tag();
 
     // skip tag name
     return BamTagCodec::FromRawData(tagData);
@@ -614,13 +554,12 @@ void BamRecordImpl::UpdateTagMap() const
 {
     // clear out offsets, leave map structure basically intact
     auto tagIter = tagOffsets_.begin();
-    auto tagEnd  = tagOffsets_.end();
-    for ( ; tagIter != tagEnd; ++tagIter )
+    auto tagEnd = tagOffsets_.end();
+    for (; tagIter != tagEnd; ++tagIter)
         tagIter->second = -1;
 
     const uint8_t* tagStart = bam_get_aux(d_);
-    if (tagStart == nullptr)
-        return;
+    if (tagStart == nullptr) return;
     const ptrdiff_t numBytes = d_->l_data - (tagStart - d_->data);
 
     // NOTE: using a 16-bit 'code' for tag name here instead of string, to avoid
@@ -629,62 +568,64 @@ void BamRecordImpl::UpdateTagMap() const
     //
     uint16_t tagNameCode;
     int64_t i = 0;
-    while(i < numBytes) {
+    while (i < numBytes) {
 
         // store (tag name code -> start offset into tag data)
-        tagNameCode = static_cast<char>(tagStart[i]) << 8 | static_cast<char>(tagStart[i+1]);
+        tagNameCode = static_cast<char>(tagStart[i]) << 8 | static_cast<char>(tagStart[i + 1]);
         i += 2;
         tagOffsets_[tagNameCode] = i;
 
         // skip tag contents
         const auto tagType = static_cast<char>(tagStart[i++]);
         switch (tagType) {
-            case 'A' :
-            case 'a' :
-            case 'c' :
-            case 'C' :
-            {
+            case 'A':
+            case 'a':
+            case 'c':
+            case 'C': {
                 i += 1;
                 break;
             }
-            case 's' :
-            case 'S' :
-            {
+            case 's':
+            case 'S': {
                 i += 2;
                 break;
             }
-            case 'i' :
-            case 'I' :
-            case 'f' :
-            {
+            case 'i':
+            case 'I':
+            case 'f': {
                 i += 4;
                 break;
             }
 
-            case 'Z' :
-            case 'H' :
-            {
+            case 'Z':
+            case 'H': {
                 // null-terminated string
                 i += strlen((const char*)&tagStart[i]) + 1;
                 break;
             }
 
-            case 'B' :
-            {
+            case 'B': {
                 const char subTagType = tagStart[i++];
                 size_t elementSize = 0;
                 switch (subTagType) {
-                    case 'c' :
-                    case 'C' : elementSize = 1; break;
-                    case 's' :
-                    case 'S' : elementSize = 2; break;
-                    case 'i' :
-                    case 'I' :
-                    case 'f' : elementSize = 4; break;
+                    case 'c':
+                    case 'C':
+                        elementSize = 1;
+                        break;
+                    case 's':
+                    case 'S':
+                        elementSize = 2;
+                        break;
+                    case 'i':
+                    case 'I':
+                    case 'f':
+                        elementSize = 4;
+                        break;
 
                     // unknown subTagType
                     default:
-                        throw std::runtime_error("unsupported array-tag-type encountered: " + std::string(1, subTagType));
+                        throw std::runtime_error("unsupported array-tag-type encountered: " +
+                                                 std::string(1, subTagType));
                 }
 
                 uint32_t numElements = 0;
@@ -695,10 +636,11 @@ void BamRecordImpl::UpdateTagMap() const
 
             // unknown tagType
             default:
-                throw std::runtime_error("unsupported tag-type encountered: " + std::string(1, tagType));
+                throw std::runtime_error("unsupported tag-type encountered: " +
+                                         std::string(1, tagType));
         }
     }
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

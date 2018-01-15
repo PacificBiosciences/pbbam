@@ -38,6 +38,7 @@
 #include "PbbamInternalConfig.h"
 
 #include "FofnReader.h"
+
 #include <iostream>
 
 namespace PacBio {
@@ -53,6 +54,6 @@ std::vector<std::string> FofnReader::Files(std::istream& in)
     return files;
 }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio

@@ -42,10 +42,10 @@
 #ifndef BAMTAGCODEC_H
 #define BAMTAGCODEC_H
 
-#include "pbbam/Config.h"
-#include "pbbam/TagCollection.h"
 #include <cstdint>
 #include <vector>
+#include "pbbam/Config.h"
+#include "pbbam/TagCollection.h"
 
 namespace PacBio {
 namespace BAM {
@@ -104,8 +104,8 @@ public:
     ///
     /// \returns vector of bytes (encoded BAM data)
     ///
-    static std::vector<uint8_t> ToRawData(const PacBio::BAM::Tag& tag,
-                                          const TagModifier& additionalModifier = TagModifier::NONE);
+    static std::vector<uint8_t> ToRawData(
+        const PacBio::BAM::Tag& tag, const TagModifier& additionalModifier = TagModifier::NONE);
 
     /// \brief Creates a Tag object from binary BAM data.
     ///
@@ -119,7 +119,7 @@ public:
     /// \}
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // BAMTAGCODEC_H
+#endif  // BAMTAGCODEC_H

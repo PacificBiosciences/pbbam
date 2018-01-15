@@ -35,12 +35,15 @@
 
 // Author: Derek Barnett
 
-#include "PbbamTestData.h"
 #include <gtest/gtest.h>
 #include <pbbam/DataSet.h>
 #include <pbbam/DataSetXsd.h>
-#include <string>
 #include <sstream>
+#include <string>
+#include "PbbamTestData.h"
+
+// clang-format off
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -180,3 +183,5 @@ TEST(DataSetXsdTest, ElementRegistryOk)
         EXPECT_TRUE(output.find("custom_base:AutomationParameters") != string::npos);
     }
 }
+
+// clang-format on

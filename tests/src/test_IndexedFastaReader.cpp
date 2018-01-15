@@ -45,10 +45,10 @@
 
 #include "PbbamTestData.h"
 
-#include "pbbam/IndexedFastaReader.h"
-#include "pbbam/BamRecord.h"
 #include "pbbam/BamFile.h"
+#include "pbbam/BamRecord.h"
 #include "pbbam/EntireFileQuery.h"
+#include "pbbam/IndexedFastaReader.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -59,7 +59,7 @@ namespace IndexedFastaReaderTests {
 const string lambdaFasta = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
 const string singleInsertionBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
 
-} // namespace IndexedFastaReaderTests
+}  // namespace IndexedFastaReaderTests
 
 TEST(IndexedFastaReaderTests, PrintSingleInsertion)
 {
@@ -72,40 +72,48 @@ TEST(IndexedFastaReaderTests, PrintSingleInsertion)
     auto it = bamQuery.begin();
     auto record = *it++;
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-        r.ReferenceSubsequence(record, Orientation::NATIVE, true));
+              r.ReferenceSubsequence(record, Orientation::NATIVE, true));
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-        r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
+              r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-        r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
+              r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-        r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
+              r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
     record = *it++;
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-        r.ReferenceSubsequence(record, Orientation::NATIVE, true));
+              r.ReferenceSubsequence(record, Orientation::NATIVE, true));
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-        r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
+              r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-        r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
+              r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-        r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
+              r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
     record = *it++;
-    EXPECT_EQ("----------------------------------------------------AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
+    EXPECT_EQ(
+        "----------------------------------------------------"
+        "AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
         r.ReferenceSubsequence(record, Orientation::NATIVE, true));
     EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
-        r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
-    EXPECT_EQ("----------------------------------------------------AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
+              r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
+    EXPECT_EQ(
+        "----------------------------------------------------"
+        "AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
         r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
     EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
-        r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
+              r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
     record = *it++;
-    EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA----------------------------------------------------",
+    EXPECT_EQ(
+        "AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA-----------------------------"
+        "-----------------------",
         r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
-    EXPECT_EQ("----------------------------------------------------TTGCCGCTGTT-ACCGTGCTGCGATCTTCTGCCATCGACGGACGTCCCACATTGGTGACTT",
+    EXPECT_EQ(
+        "----------------------------------------------------TTGCCGCTGTT-"
+        "ACCGTGCTGCGATCTTCTGCCATCGACGGACGTCCCACATTGGTGACTT",
         r.ReferenceSubsequence(record, Orientation::NATIVE, true));
     EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
-        r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
+              r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
     EXPECT_EQ("TTGCCGCTGTT-ACCGTGCTGCGATCTTCTGCCATCGACGGACGTCCCACATTGGTGACTT",
-        r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
+              r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
 
     // {
     //     std::stringstream output;

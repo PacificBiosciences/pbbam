@@ -54,7 +54,6 @@ public:
     virtual ~IRecordWriter() = default;
 
 public:
-
     /// \brief Try to flush any buffered data to file.
     ///
     /// \note The underlying implementation may not necessarily flush buffered
@@ -63,8 +62,7 @@ public:
     ///
     /// \throws std::runtime_error if flush fails
     ///
-    virtual void TryFlush() =0;
-
+    virtual void TryFlush() = 0;
 
     /// \brief Write a record to the output %BAM file.
     ///
@@ -72,7 +70,7 @@ public:
     ///
     /// \throws std::runtime_error on failure to write
     ///
-    virtual void Write(const BamRecord& record) =0;
+    virtual void Write(const BamRecord& record) = 0;
 
     /// \brief Write a record to the output %BAM file.
     ///
@@ -80,13 +78,13 @@ public:
     ///
     /// \throws std::runtime_error on failure to write
     ///
-    virtual void Write(const BamRecordImpl& recordImpl) =0;
+    virtual void Write(const BamRecordImpl& recordImpl) = 0;
 
 protected:
     IRecordWriter() = default;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // IRECORDWRITER_H
+#endif  // IRECORDWRITER_H

@@ -42,21 +42,23 @@
 #ifndef BAMHEADER_H
 #define BAMHEADER_H
 
-#include "pbbam/Config.h"
-#include "pbbam/ProgramInfo.h"
-#include "pbbam/ReadGroupInfo.h"
-#include "pbbam/SequenceInfo.h"
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "pbbam/Config.h"
+#include "pbbam/ProgramInfo.h"
+#include "pbbam/ReadGroupInfo.h"
+#include "pbbam/SequenceInfo.h"
 
 namespace PacBio {
 namespace BAM {
 
-namespace internal { class BamHeaderPrivate; }
+namespace internal {
+class BamHeaderPrivate;
+}
 
 /// \brief The BamHeader class represents the header section of the %BAM file.
 ///
@@ -291,7 +293,6 @@ public:
     /// \}
 
 public:
-
     /// \name General Attributes
     /// \{
 
@@ -422,9 +423,9 @@ private:
     std::shared_ptr<internal::BamHeaderPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/BamHeader.inl"
 
-#endif // BAMHEADER_H
+#endif  // BAMHEADER_H

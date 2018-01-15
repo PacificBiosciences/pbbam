@@ -42,14 +42,16 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/ZmwGroupQuery.h"
+
+#include <algorithm>
+#include <cstdint>
+#include <deque>
+
+#include "MemoryUtils.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/CompositeBamReader.h"
 #include "pbbam/MakeUnique.h"
 #include "pbbam/PbiFilterTypes.h"
-#include "MemoryUtils.h"
-#include <algorithm>
-#include <cstdint>
-#include <deque>
 
 namespace PacBio {
 namespace BAM {
@@ -58,15 +60,11 @@ struct ZmwGroupQuery::ZmwGroupQueryPrivate
 {
     using ReaderType = PbiFilterCompositeBamReader<Compare::Zmw>;
 
-    ZmwGroupQueryPrivate(const std::vector<int32_t>& zmwWhitelist,
-                         const DataSet& dataset)
-        : whitelist_(zmwWhitelist.cbegin(), zmwWhitelist.cend())
-        , reader_(nullptr)
+    ZmwGroupQueryPrivate(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset)
+        : whitelist_(zmwWhitelist.cbegin(), zmwWhitelist.cend()), reader_(nullptr)
     {
         std::sort(whitelist_.begin(), whitelist_.end());
-        whitelist_.erase(std::unique(whitelist_.begin(),
-                                     whitelist_.end()),
-                         whitelist_.end());
+        whitelist_.erase(std::unique(whitelist_.begin(), whitelist_.end()), whitelist_.end());
 
         if (!whitelist_.empty()) {
             reader_ = std::make_unique<ReaderType>(PbiZmwFilter{whitelist_.front()}, dataset);
@@ -77,8 +75,7 @@ struct ZmwGroupQuery::ZmwGroupQueryPrivate
     bool GetNext(std::vector<BamRecord>& records)
     {
         records.clear();
-        if (!reader_)
-            return false;
+        if (!reader_) return false;
 
         // get all records matching ZMW
         BamRecord r;
@@ -102,16 +99,14 @@ struct ZmwGroupQuery::ZmwGroupQueryPrivate
     std::unique_ptr<ReaderType> reader_;
 };
 
-ZmwGroupQuery::ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist,
-                             const DataSet& dataset)
-    : internal::IGroupQuery()
-    , d_(new ZmwGroupQueryPrivate(zmwWhitelist, dataset))
-{ }
+ZmwGroupQuery::ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset)
+    : internal::IGroupQuery(), d_(new ZmwGroupQueryPrivate(zmwWhitelist, dataset))
+{
+}
 
-ZmwGroupQuery::~ZmwGroupQuery() { }
+ZmwGroupQuery::~ZmwGroupQuery() {}
 
-bool ZmwGroupQuery::GetNext(std::vector<BamRecord>& records)
-{ return d_->GetNext(records); }
+bool ZmwGroupQuery::GetNext(std::vector<BamRecord>& records) { return d_->GetNext(records); }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

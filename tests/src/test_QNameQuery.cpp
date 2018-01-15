@@ -35,10 +35,10 @@
 
 // Author: Yuan Li
 
-#include "PbbamTestData.h"
 #include <gtest/gtest.h>
 #include <pbbam/QNameQuery.h>
 #include <string>
+#include "PbbamTestData.h"
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -50,11 +50,9 @@ static const string test1fn = string(dataDir) + "test1.bam";
 static const string test2fn = string(dataDir) + "test2.bam";
 static const string test3fn = string(dataDir) + "test3.bam";
 
-static
-void TestQNameQuery(const string& fn, const vector<int>& expected)
+static void TestQNameQuery(const string& fn, const vector<int>& expected)
 {
-    EXPECT_NO_THROW(
-    {
+    EXPECT_NO_THROW({
         vector<int> counts;
         QNameQuery qQuery(fn);
         for (const vector<BamRecord>& records : qQuery)
@@ -63,11 +61,9 @@ void TestQNameQuery(const string& fn, const vector<int>& expected)
     });
 }
 
-static
-void TestNoneConstQNameQuery(const string& fn, const vector<int>& expected)
+static void TestNoneConstQNameQuery(const string& fn, const vector<int>& expected)
 {
-    EXPECT_NO_THROW(
-    {
+    EXPECT_NO_THROW({
         vector<int> counts;
         QNameQuery qQuery(fn);
         for (vector<BamRecord>& records : qQuery)
@@ -76,7 +72,7 @@ void TestNoneConstQNameQuery(const string& fn, const vector<int>& expected)
     });
 }
 
-} // namespace QNameQueryTests
+}  // namespace QNameQueryTests
 
 TEST(QNameQueryTest, CountQSizes)
 {
@@ -93,8 +89,7 @@ TEST(QNameQueryTest, CountQSizes)
     QNameQueryTests::TestNoneConstQNameQuery(fn, expected);
 
     fn = QNameQueryTests::test3fn;
-    expected = {2,1,1,1,1,1,1,2,1,1,1};
+    expected = {2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1};
     QNameQueryTests::TestQNameQuery(fn, expected);
     QNameQueryTests::TestNoneConstQNameQuery(fn, expected);
 }
-

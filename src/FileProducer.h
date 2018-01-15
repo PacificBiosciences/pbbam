@@ -38,8 +38,8 @@
 #ifndef FILEPRODUCER_H
 #define FILEPRODUCER_H
 
+#include <cstdio>
 #include <string>
-#include <stdio.h>
 
 namespace PacBio {
 namespace BAM {
@@ -54,7 +54,8 @@ namespace internal {
 //
 // If destruction is triggered by an exception, no renaming will occur.
 //
-class FileProducer {
+class FileProducer
+{
 
 protected:
     FileProducer() = delete;
@@ -65,8 +66,7 @@ protected:
 
     // Initializes FileProducer with specified target filename & explicit temp
     // filename.
-    FileProducer(std::string targetFilename,
-                 std::string tempFilename);
+    FileProducer(std::string targetFilename, std::string tempFilename);
 
     // Renames temp file to target filename.
     //
@@ -78,19 +78,17 @@ protected:
     ~FileProducer();
 
 protected:
-    const std::string& TargetFilename() const
-    { return targetFilename_; }
+    const std::string& TargetFilename() const { return targetFilename_; }
 
-    const std::string& TempFilename() const
-    { return tempFilename_; }
+    const std::string& TempFilename() const { return tempFilename_; }
 
 private:
     std::string targetFilename_;
     std::string tempFilename_;
 };
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // FILEPRODUCER_H
+#endif  // FILEPRODUCER_H

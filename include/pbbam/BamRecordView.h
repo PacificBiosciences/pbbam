@@ -77,14 +77,11 @@ public:
     /// \param[in] exciseSoftClips  if true, any soft-clipped positions will be
     ///                             removed from query ends
     ///
-    BamRecordView(const BamRecord& record,
-                  const Orientation orientation,
-                  const bool aligned,
+    BamRecordView(const BamRecord& record, const Orientation orientation, const bool aligned,
                   const bool exciseSoftClips,
                   const PulseBehavior pulseBehavior = PulseBehavior::ALL);
 
 public:
-
     /// \returns BamRecord::AltLabelQV with this view's parameters applied
     QualityValues AltLabelQVs() const;
 
@@ -162,9 +159,9 @@ private:
     PulseBehavior pulseBehavior_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/BamRecordView.inl"
 
-#endif // BAMRECORDVIEW_H
+#endif  // BAMRECORDVIEW_H

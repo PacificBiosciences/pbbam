@@ -42,10 +42,10 @@
 #ifndef BARCODEQUERY_H
 #define BARCODEQUERY_H
 
-#include "pbbam/Config.h"
-#include "pbbam/internal/QueryBase.h"
 #include <cstdint>
 #include <vector>
+#include "pbbam/Config.h"
+#include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {
 namespace BAM {
@@ -79,7 +79,6 @@ public:
     ~BarcodeQuery() override;
 
 public:
-
     /// \brief Main iteration point for record access.
     ///
     /// Most client code should not need to use this method directly. Use
@@ -92,7 +91,7 @@ private:
     std::unique_ptr<BarcodeQueryPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // BARCODEQUERY_H
+#endif  // BARCODEQUERY_H

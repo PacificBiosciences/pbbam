@@ -42,11 +42,11 @@
 #ifndef READACCURACYQUERY_H
 #define READACCURACYQUERY_H
 
+#include <vector>
 #include "pbbam/Accuracy.h"
 #include "pbbam/Compare.h"
 #include "pbbam/Config.h"
 #include "pbbam/internal/QueryBase.h"
-#include <vector>
 
 namespace PacBio {
 namespace BAM {
@@ -65,7 +65,6 @@ namespace BAM {
 class PBBAM_EXPORT ReadAccuracyQuery : public internal::IQuery
 {
 public:
-
     /// \brief Creates a new ReadAccuracyQuery, limiting record results to only
     ///        those matching a read accuracy criterion.
     ///
@@ -78,14 +77,12 @@ public:
     /// \throws std::runtime_error on failure to open/read underlying %BAM or PBI
     ///         files.
     ///
-    ReadAccuracyQuery(const Accuracy accuracy,
-                      const Compare::Type compareType,
+    ReadAccuracyQuery(const Accuracy accuracy, const Compare::Type compareType,
                       const DataSet& dataset);
 
     ~ReadAccuracyQuery() override;
 
 public:
-
     /// \brief Main iteration point for record access.
     ///
     /// Most client code should not need to use this method directly. Use
@@ -100,7 +97,7 @@ private:
     std::unique_ptr<ReadAccuracyQueryPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // READACCURACYQUERY_H
+#endif  // READACCURACYQUERY_H

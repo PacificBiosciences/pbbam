@@ -46,8 +46,7 @@
 namespace PacBio {
 namespace BAM {
 
-ValidationException::ValidationException(ErrorMap fileErrors,
-                                         ErrorMap readGroupErrors,
+ValidationException::ValidationException(ErrorMap fileErrors, ErrorMap readGroupErrors,
                                          ErrorMap recordErrors)
     : std::runtime_error("")
     , fileErrors_(std::move(fileErrors))
@@ -57,17 +56,19 @@ ValidationException::ValidationException(ErrorMap fileErrors,
     FormatMessage();
 }
 
-const ValidationException::ErrorMap& ValidationException::FileErrors() const
-{ return fileErrors_; }
+const ValidationException::ErrorMap& ValidationException::FileErrors() const { return fileErrors_; }
 
 const ValidationException::ErrorMap& ValidationException::ReadGroupErrors() const
-{ return readGroupErrors_; }
+{
+    return readGroupErrors_;
+}
 
 const ValidationException::ErrorMap& ValidationException::RecordErrors() const
-{ return recordErrors_; }
+{
+    return recordErrors_;
+}
 
-const char* ValidationException::what() const noexcept
-{ return msg_.c_str(); }
+const char* ValidationException::what() const noexcept { return msg_.c_str(); }
 
 void ValidationException::FormatMessage()
 {
@@ -77,8 +78,8 @@ void ValidationException::FormatMessage()
     // file errors
     if (!fileErrors_.empty()) {
         auto fileIter = fileErrors_.cbegin();
-        auto fileEnd  = fileErrors_.cend();
-        for ( ; fileIter != fileEnd; ++fileIter) {
+        auto fileEnd = fileErrors_.cend();
+        for (; fileIter != fileEnd; ++fileIter) {
             s << "  In file (" << fileIter->first << ") : " << std::endl;
             const auto& errors = fileIter->second;
             for (const auto& e : errors)
@@ -89,8 +90,8 @@ void ValidationException::FormatMessage()
     // read group errors
     if (!readGroupErrors_.empty()) {
         auto rgIter = readGroupErrors_.cbegin();
-        auto rgEnd  = readGroupErrors_.cend();
-        for ( ; rgIter != rgEnd; ++rgIter) {
+        auto rgEnd = readGroupErrors_.cend();
+        for (; rgIter != rgEnd; ++rgIter) {
             s << "  In read group (" << rgIter->first << ") : " << std::endl;
             const auto& errors = rgIter->second;
             for (const auto& e : errors)
@@ -101,8 +102,8 @@ void ValidationException::FormatMessage()
     // record errors
     if (!recordErrors_.empty()) {
         auto recIter = recordErrors_.cbegin();
-        auto recEnd  = recordErrors_.cend();
-        for ( ; recIter != recEnd; ++recIter) {
+        auto recEnd = recordErrors_.cend();
+        for (; recIter != recEnd; ++recIter) {
             s << "  In record (" << recIter->first << ") : " << std::endl;
             const auto& errors = recIter->second;
             for (const auto& e : errors)
@@ -113,5 +114,5 @@ void ValidationException::FormatMessage()
     msg_ = s.str();
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

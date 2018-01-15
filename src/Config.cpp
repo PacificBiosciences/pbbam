@@ -56,5 +56,5 @@ namespace BAM {
 //
 int HtslibVerbosity = -1;
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

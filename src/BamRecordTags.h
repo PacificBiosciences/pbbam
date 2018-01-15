@@ -42,13 +42,14 @@
 #ifndef BAMRECORDTAGS_H
 #define BAMRECORDTAGS_H
 
+#include <cassert>
+#include <string>
+#include <unordered_map>
+
+#include "EnumClassHash.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamRecordImpl.h"
 #include "pbbam/BamRecordTag.h"
-#include "EnumClassHash.h"
-#include <string>
-#include <unordered_map>
-#include <cassert>
 
 namespace PacBio {
 namespace BAM {
@@ -64,12 +65,10 @@ public:
 private:
     struct BamRecordTagData
     {
-        const std::string label_; //[3]; // 2-char tag plus NULL
+        const std::string label_;  //[3]; // 2-char tag plus NULL
         const bool isPulse_;
     };
-    typedef std::unordered_map<BamRecordTag,
-                               BamRecordTagData,
-                               EnumClassHash> TagLookupType;
+    typedef std::unordered_map<BamRecordTag, BamRecordTagData, EnumClassHash> TagLookupType;
 
     static const TagLookupType tagLookup;
 };
@@ -86,8 +85,8 @@ inline std::string BamRecordTags::LabelFor(const BamRecordTag tag)
     return tagLookup.at(tag).label_;
 }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // BAMRECORDTAGS_H
+#endif  // BAMRECORDTAGS_H

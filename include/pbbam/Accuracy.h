@@ -54,8 +54,8 @@ namespace BAM {
 class PBBAM_EXPORT Accuracy
 {
 public:
-    static const float MIN; ///< Minimum valid accuracy value [0.0]
-    static const float MAX; ///< Maximum valid accuracy value [1.0]
+    static const float MIN;  ///< Minimum valid accuracy value [0.0]
+    static const float MAX;  ///< Maximum valid accuracy value [1.0]
 
 public:
     /// \name Constructors & Related Methods
@@ -85,9 +85,9 @@ private:
     float accuracy_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/Accuracy.inl"
 
-#endif // ACCURACY_H
+#endif  // ACCURACY_H

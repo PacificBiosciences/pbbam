@@ -42,15 +42,17 @@
 #ifndef BAMFILE_H
 #define BAMFILE_H
 
-#include "pbbam/Config.h"
-#include "pbbam/BamHeader.h"
 #include <cstdint>
 #include <string>
+#include "pbbam/BamHeader.h"
+#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
 
-namespace internal { class BamFilePrivate; }
+namespace internal {
+class BamFilePrivate;
+}
 
 /// \brief The BamFile class represents a %BAM file.
 ///
@@ -60,7 +62,6 @@ namespace internal { class BamFilePrivate; }
 class PBBAM_EXPORT BamFile
 {
 public:
-
     /// \name Constructors & Related Methods
     /// \{
 
@@ -81,7 +82,6 @@ public:
     /// \}
 
 public:
-
     /// \name Index & Filename Methods
     /// \{
 
@@ -213,7 +213,7 @@ private:
     std::unique_ptr<internal::BamFilePrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // BAMFILE_H
+#endif  // BAMFILE_H

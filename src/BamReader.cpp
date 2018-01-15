@@ -42,16 +42,18 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/BamReader.h"
-#include "pbbam/Validator.h"
-#include "MemoryUtils.h"
-#include "Autovalidate.h"
+
+#include <cassert>
+#include <cstdint>
+#include <cstdio>
 
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
-#include <cassert>
-#include <cstdint>
-#include <cstdio>
+
+#include "Autovalidate.h"
+#include "MemoryUtils.h"
+#include "pbbam/Validator.h"
 
 namespace PacBio {
 namespace BAM {
@@ -60,19 +62,17 @@ namespace internal {
 struct BamReaderPrivate
 {
 public:
-    BamReaderPrivate(BamFile bamFile)
-        : htsFile_{nullptr}
-        , bamFile_{std::move(bamFile)}
+    BamReaderPrivate(BamFile bamFile) : htsFile_{nullptr}, bamFile_{std::move(bamFile)}
     {
         DoOpen();
     }
 
-    void DoOpen() {
+    void DoOpen()
+    {
 
         // fetch file pointer
         htsFile_.reset(sam_open(bamFile_.Filename().c_str(), "rb"));
-        if (!htsFile_)
-            throw std::runtime_error("could not open BAM file for reading");
+        if (!htsFile_) throw std::runtime_error("could not open BAM file for reading");
     }
 
 public:
@@ -80,27 +80,23 @@ public:
     BamFile bamFile_;
 };
 
-} // namespace internal
+}  // namespace internal
 
-BamReader::BamReader(const std::string& fn)
-    : BamReader(BamFile(fn))
-{ }
+BamReader::BamReader(const std::string& fn) : BamReader(BamFile(fn)) {}
 
-BamReader::BamReader(const BamFile& bamFile)
-    : d_(new internal::BamReaderPrivate(bamFile))
+BamReader::BamReader(const BamFile& bamFile) : d_(new internal::BamReaderPrivate(bamFile))
 {
     // skip header
     VirtualSeek(d_->bamFile_.FirstAlignmentOffset());
 }
 
-BamReader::BamReader(BamFile&& bamFile)
-    : d_(new internal::BamReaderPrivate(std::move(bamFile)))
+BamReader::BamReader(BamFile&& bamFile) : d_(new internal::BamReaderPrivate(std::move(bamFile)))
 {
     // skip header
     VirtualSeek(d_->bamFile_.FirstAlignmentOffset());
 }
 
-BamReader::~BamReader() { }
+BamReader::~BamReader() {}
 
 BGZF* BamReader::Bgzf() const
 {
@@ -169,22 +165,15 @@ bool BamReader::GetNext(BamRecord& record)
     }
 }
 
-int BamReader::ReadRawData(BGZF* bgzf, bam1_t* b)
-{
-    return bam_read1(bgzf, b);
-}
+int BamReader::ReadRawData(BGZF* bgzf, bam1_t* b) { return bam_read1(bgzf, b); }
 
 void BamReader::VirtualSeek(int64_t virtualOffset)
 {
     auto result = bgzf_seek(Bgzf(), virtualOffset, SEEK_SET);
-    if (result != 0)
-        throw std::runtime_error("Failed to seek in BAM file");
+    if (result != 0) throw std::runtime_error("Failed to seek in BAM file");
 }
 
-int64_t BamReader::VirtualTell() const
-{
-    return bgzf_tell(Bgzf());
-}
+int64_t BamReader::VirtualTell() const { return bgzf_tell(Bgzf()); }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

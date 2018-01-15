@@ -52,7 +52,7 @@ using namespace std;
 TEST(QualityValueTest, DefaultsOk)
 {
     const QualityValue value;
-    EXPECT_EQ(0,   value);
+    EXPECT_EQ(0, value);
     EXPECT_EQ('!', value.Fastq());
 }
 
@@ -65,7 +65,7 @@ TEST(QualityValueTest, FromNumber)
     const QualityValue tooHigh(94);
     const QualityValue wayTooHigh(std::numeric_limits<int8_t>::max());
 
-    EXPECT_EQ(0,  zero);
+    EXPECT_EQ(0, zero);
     EXPECT_EQ(33, thirtyThree);
     EXPECT_EQ(42, valid);
     EXPECT_EQ(93, max);
@@ -82,12 +82,12 @@ TEST(QualityValueTest, FromNumber)
 
 TEST(QualityValueTest, FromFastq)
 {
-    const QualityValue zero        = QualityValue::FromFastq('!');
+    const QualityValue zero = QualityValue::FromFastq('!');
     const QualityValue thirtyThree = QualityValue::FromFastq('B');
-    const QualityValue valid       = QualityValue::FromFastq('K');
-    const QualityValue max         = QualityValue::FromFastq('~');
+    const QualityValue valid = QualityValue::FromFastq('K');
+    const QualityValue max = QualityValue::FromFastq('~');
 
-    EXPECT_EQ(0,  zero);
+    EXPECT_EQ(0, zero);
     EXPECT_EQ(33, thirtyThree);
     EXPECT_EQ(42, valid);
     EXPECT_EQ(93, max);
@@ -103,7 +103,7 @@ TEST(QualityValuesTest, Default)
 TEST(QualityValuesTest, FromNumbers)
 {
     const string fastqString = "~~~KKBB!!";
-    const vector<uint8_t> values = { 93, 93, 93, 42, 42, 33, 33, 0, 0 };
+    const vector<uint8_t> values = {93, 93, 93, 42, 42, 33, 33, 0, 0};
 
     QualityValues qvs;
     for (auto qv : values)
@@ -114,7 +114,7 @@ TEST(QualityValuesTest, FromNumbers)
 TEST(QualityValuesTest, FromFastq)
 {
     const string fastqString = "~~~KKBB!!";
-    const vector<uint8_t> values = { 93, 93, 93, 42, 42, 33, 33, 0, 0 };
+    const vector<uint8_t> values = {93, 93, 93, 42, 42, 33, 33, 0, 0};
 
     const QualityValues& qvs = QualityValues::FromFastq(fastqString);
     EXPECT_EQ(fastqString.size(), qvs.size());

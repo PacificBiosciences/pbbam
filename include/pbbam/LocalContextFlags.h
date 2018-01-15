@@ -55,15 +55,14 @@ namespace BAM {
 ///
 enum LocalContextFlags : uint8_t
 {
-    NO_LOCAL_CONTEXT = 0,   ///< No context information available
-    ADAPTER_BEFORE   = 1,   ///< Adapter precedes subread
-    ADAPTER_AFTER    = 2,   ///< Adapter follows subread
-    BARCODE_BEFORE   = 4,   ///< Barcode precedes subread
-    BARCODE_AFTER    = 8,   ///< Barcode follows subread
-    FORWARD_PASS     = 16,  ///< Subread's orientation is 'forward pass'
-    REVERSE_PASS     = 32   ///< Subread's orientation is 'reverse pass'
+    NO_LOCAL_CONTEXT = 0,  ///< No context information available
+    ADAPTER_BEFORE = 1,    ///< Adapter precedes subread
+    ADAPTER_AFTER = 2,     ///< Adapter follows subread
+    BARCODE_BEFORE = 4,    ///< Barcode precedes subread
+    BARCODE_AFTER = 8,     ///< Barcode follows subread
+    FORWARD_PASS = 16,     ///< Subread's orientation is 'forward pass'
+    REVERSE_PASS = 32      ///< Subread's orientation is 'reverse pass'
 };
-
 
 /// \returns a LocalContextFlags value containing the result of the bitwise-OR
 ///          operation of \p lhs and \p rhs.
@@ -73,7 +72,7 @@ constexpr LocalContextFlags operator|(const LocalContextFlags lhs, const LocalCo
     return static_cast<LocalContextFlags>(static_cast<int>(lhs) | static_cast<int>(rhs));
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // LOCALCONTEXTFLAGS_H
+#endif  // LOCALCONTEXTFLAGS_H

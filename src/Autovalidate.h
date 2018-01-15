@@ -51,7 +51,7 @@
 //
 //
 #ifndef PBBAM_AUTOVALIDATE
-#  define PBBAM_AUTOVALIDATE 0
+#define PBBAM_AUTOVALIDATE 0
 #endif
 
-#endif // AUTOVALIDATE_H
+#endif  // AUTOVALIDATE_H

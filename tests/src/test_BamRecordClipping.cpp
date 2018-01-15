@@ -47,6 +47,8 @@
 #include <pbbam/BamRecordView.h>
 #include <pbbam/BamTagCodec.h>
 
+// clang-format off
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -2051,3 +2053,5 @@ TEST(BamRecordTest, ClipEncodedFrames)
     }
 
 }
+
+// clang-format on

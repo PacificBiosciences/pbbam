@@ -42,11 +42,11 @@
 #ifndef SUBREADLENGTHQUERY_H
 #define SUBREADLENGTHQUERY_H
 
+#include <cstdint>
+#include <vector>
 #include "pbbam/Compare.h"
 #include "pbbam/Config.h"
 #include "pbbam/internal/QueryBase.h"
-#include <cstdint>
-#include <vector>
 
 namespace PacBio {
 namespace BAM {
@@ -75,8 +75,7 @@ public:
     /// \throws std::runtime_error on failure to open/read underlying %BAM or PBI
     ///         files.
     ///
-    SubreadLengthQuery(const int32_t length,
-                       const Compare::Type compareType,
+    SubreadLengthQuery(const int32_t length, const Compare::Type compareType,
                        const DataSet& dataset);
 
     ~SubreadLengthQuery();
@@ -96,7 +95,7 @@ private:
     std::unique_ptr<SubreadLengthQueryPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // SUBREADLENGTHQUERY_H
+#endif  // SUBREADLENGTHQUERY_H

@@ -51,7 +51,7 @@ using namespace std;
 
 TEST(SubreadLengthQueryTest, QueryOk)
 {
-    const auto bamFile = BamFile{ PbbamTestsConfig::Data_Dir + string{ "/group/test2.bam" } };
+    const auto bamFile = BamFile{PbbamTestsConfig::Data_Dir + string{"/group/test2.bam"}};
 
     {
         SubreadLengthQuery query(500, Compare::GREATER_THAN_EQUAL, bamFile);
@@ -59,7 +59,7 @@ TEST(SubreadLengthQueryTest, QueryOk)
         EXPECT_EQ(3, numReads);
 
         int count = 0;
-        for (const auto& r: query) {
+        for (const auto& r : query) {
             ++count;
             EXPECT_GE((r.QueryEnd() - r.QueryStart()), 500);
         }
@@ -71,7 +71,7 @@ TEST(SubreadLengthQueryTest, QueryOk)
         EXPECT_EQ(2, numReads);
 
         int count = 0;
-        for (const auto& r: query) {
+        for (const auto& r : query) {
             ++count;
             EXPECT_GE((r.QueryEnd() - r.QueryStart()), 1000);
         }
@@ -83,7 +83,7 @@ TEST(SubreadLengthQueryTest, QueryOk)
         EXPECT_EQ(0, numReads);
 
         int count = 0;
-        for (const auto& r: query) {
+        for (const auto& r : query) {
             ++count;
             EXPECT_GE((r.QueryEnd() - r.QueryStart()), 5000);
         }

@@ -52,8 +52,8 @@ extern const ChemistryTable BuiltInChemistryTable;
 
 const ChemistryTable& GetChemistryTableFromEnv();
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // CHEMISTRYTABLE_H
+#endif  // CHEMISTRYTABLE_H

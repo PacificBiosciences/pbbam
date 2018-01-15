@@ -56,11 +56,11 @@ namespace BAM {
 ///
 enum class FrameEncodingType
 {
-    LOSSY       ///< 8-bit compression (using CodecV1) of frame data
-  , LOSSLESS    ///< 16-bit native frame data
+    LOSSY,    ///< 8-bit compression (using CodecV1) of frame data
+    LOSSLESS  ///< 16-bit native frame data
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // FRAMEENCODINGTYPE_H
+#endif  // FRAMEENCODINGTYPE_H

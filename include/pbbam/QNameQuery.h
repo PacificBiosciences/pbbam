@@ -42,8 +42,8 @@
 #ifndef QNAMEQUERY_H
 #define QNAMEQUERY_H
 
-#include "pbbam/internal/QueryBase.h"
 #include <memory>
+#include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {
 namespace BAM {
@@ -65,7 +65,6 @@ namespace BAM {
 class PBBAM_EXPORT QNameQuery : public internal::IGroupQuery
 {
 public:
-
     /// \brief Creates a new QNameQuery.
     ///
     /// \param[in] dataset      input data source(s)
@@ -88,7 +87,7 @@ private:
     std::unique_ptr<QNameQueryPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // QNAMEQUERY_H
+#endif  // QNAMEQUERY_H

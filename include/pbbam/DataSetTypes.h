@@ -42,11 +42,11 @@
 #ifndef DATASETTYPES_H
 #define DATASETTYPES_H
 
+#include <string>
 #include "pbbam/BamFile.h"
 #include "pbbam/Config.h"
 #include "pbbam/DataSetXsd.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
-#include <string>
 
 namespace PacBio {
 namespace BAM {
@@ -64,8 +64,7 @@ public:
     /// \{
 
     /// \brief Constructs a DataSetMetadata with required fields.
-    DataSetMetadata(const std::string& numRecords,
-                    const std::string& totalLength);
+    DataSetMetadata(const std::string& numRecords, const std::string& totalLength);
 
     /// \}
 
@@ -173,7 +172,8 @@ public:
 /// \brief The ExtensionElement class represents an %ExtensionElement element in
 ///        DataSetXML.
 ///
-class PBBAM_EXPORT ExtensionElement : public internal::DataSetElement  {
+class PBBAM_EXPORT ExtensionElement : public internal::DataSetElement
+{
 public:
     ExtensionElement();
 };
@@ -210,8 +210,7 @@ public:
     /// \brief Creates an ExternalResource with provided \p metatype and
     ///        \p filename as resource ID.
     ///
-    ExternalResource(const std::string& metatype,
-                     const std::string& filename);
+    ExternalResource(const std::string& metatype, const std::string& filename);
 
 public:
     /// \brief Fetches the resource's ExternalResources child element.
@@ -296,8 +295,7 @@ public:
     /// \brief Creates a FileIndex with provided \p metatype and \p filename as
     ///        resource ID.
     ///
-    FileIndex(const std::string& metatype, 
-              const std::string& filename);
+    FileIndex(const std::string& metatype, const std::string& filename);
 };
 
 /// \brief The FileIndices class represents a %FileIndices element in DataSetXML.
@@ -388,7 +386,8 @@ public:
 
 /// \brief The ParentTool class represents a %ParentTool element in DataSetXML.
 ///
-class PBBAM_EXPORT ParentTool : public internal::BaseEntityType {
+class PBBAM_EXPORT ParentTool : public internal::BaseEntityType
+{
 public:
     /// \brief Creates an empty %ParentTool element.
     ParentTool();
@@ -410,12 +409,9 @@ class PBBAM_EXPORT Property : public internal::DataSetElement
 {
 public:
     /// \brief Constructs a filter property.
-    Property(const std::string& name,
-             const std::string& value,
-             const std::string& op);
+    Property(const std::string& name, const std::string& value, const std::string& op);
 
 public:
-
     /// \brief Fetches the value of property's Name attribute.
     ///
     /// \returns const reference to attribute value
@@ -435,7 +431,6 @@ public:
     const std::string& Value() const;
 
 public:
-
     /// \brief Fetches the value of property's Name attribute.
     ///
     /// \returns non-const reference to attribute value
@@ -541,7 +536,6 @@ public:
     const PacBio::BAM::ParentTool& ParentTool() const;
 
 public:
-
     /// \brief Fetches the value of CreatedBy attribute.
     ///
     /// This attribute will be created if it does not yet exist.
@@ -587,7 +581,6 @@ public:
     PacBio::BAM::ParentTool& ParentTool();
 
 public:
-
     /// \brief Sets the CreatedBy attribute.
     ///
     /// This attribute will be created if it does not yet exist.
@@ -647,7 +640,6 @@ class SubDataSets;
 class PBBAM_EXPORT DataSetBase : public internal::StrictEntityType
 {
 public:
-
     /// \brief Creates a DataSetBase object, or one of its subclasses, from an
     ///        XML element name (e.g. SubreadSet)
     ///
@@ -659,9 +651,7 @@ public:
 
 protected:
     /// \brief Creates a DataSetBase with key values initialized.
-    DataSetBase(const std::string& metatype, 
-                const std::string& label, 
-                const XsdType& xsd);
+    DataSetBase(const std::string& metatype, const std::string& label, const XsdType& xsd);
 
     /// \brief Returns a new DataSetBase containing a deep copy of contents
     DataSetBase* DeepCopy() const;
@@ -873,10 +863,10 @@ public:
 
 public:
     /// \brief Adds \p other sub-dataset to this list.
-    SubDataSets& operator+=(const DataSetBase& other); // single
+    SubDataSets& operator+=(const DataSetBase& other);  // single
 
     /// \brief Adds \p other sub-dataset list to this list.
-    SubDataSets& operator+=(const SubDataSets& other); // list
+    SubDataSets& operator+=(const SubDataSets& other);  // list
 
 public:
     /// \brief Adds a sub-dataset to this list.
@@ -896,9 +886,9 @@ public:
     SubreadSet();
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "internal/DataSetTypes.inl"
 
-#endif // DATASETTYPES_H
+#endif  // DATASETTYPES_H

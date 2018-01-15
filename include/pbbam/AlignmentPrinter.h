@@ -101,10 +101,10 @@ public:
     /// \}
 
 private:
-	const std::unique_ptr<IndexedFastaReader> ifr_;
+    const std::unique_ptr<IndexedFastaReader> ifr_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // ALIGNMENTPRINTER_H
+#endif  // ALIGNMENTPRINTER_H

@@ -41,40 +41,38 @@
 
 #include "PbbamInternalConfig.h"
 
+#include "pbbam/SubreadLengthQuery.h"
+
 #include <cstdint>
 
-#include "pbbam/SubreadLengthQuery.h"
-#include "pbbam/PbiFilterTypes.h"
 #include "pbbam/CompositeBamReader.h"
+#include "pbbam/PbiFilterTypes.h"
 
 namespace PacBio {
 namespace BAM {
 
 struct SubreadLengthQuery::SubreadLengthQueryPrivate
 {
-    SubreadLengthQueryPrivate(const int32_t length,
-                              const Compare::Type compareType,
+    SubreadLengthQueryPrivate(const int32_t length, const Compare::Type compareType,
                               const DataSet& dataset)
         : reader_(PbiQueryLengthFilter(length, compareType), dataset)
-    { }
+    {
+    }
 
-    PbiFilterCompositeBamReader<Compare::None> reader_; // unsorted
+    PbiFilterCompositeBamReader<Compare::None> reader_;  // unsorted
 };
 
-SubreadLengthQuery::SubreadLengthQuery(const int32_t length,
-                                       const Compare::Type compareType,
+SubreadLengthQuery::SubreadLengthQuery(const int32_t length, const Compare::Type compareType,
                                        const DataSet& dataset)
-    : internal::IQuery()
-    , d_(new SubreadLengthQueryPrivate(length, compareType, dataset))
-{ }
+    : internal::IQuery(), d_(new SubreadLengthQueryPrivate(length, compareType, dataset))
+{
+}
 
-SubreadLengthQuery::~SubreadLengthQuery() { }
+SubreadLengthQuery::~SubreadLengthQuery() {}
 
-bool SubreadLengthQuery::GetNext(BamRecord &r)
-{ return d_->reader_.GetNext(r); }
+bool SubreadLengthQuery::GetNext(BamRecord& r) { return d_->reader_.GetNext(r); }
 
-uint32_t SubreadLengthQuery::NumReads() const
-{ return d_->reader_.NumReads(); }
+uint32_t SubreadLengthQuery::NumReads() const { return d_->reader_.NumReads(); }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

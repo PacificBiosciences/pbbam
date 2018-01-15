@@ -4,10 +4,12 @@
 namespace PacBio {
 namespace BAM {
 
-template<typename T>
-void UNUSED(const T&) { }
+template <typename T>
+void UNUSED(const T&)
+{
+}
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // PBBAM_UNUSED_H
+#endif  // PBBAM_UNUSED_H

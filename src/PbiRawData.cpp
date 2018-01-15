@@ -42,22 +42,25 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/PbiRawData.h"
-#include "pbbam/BamFile.h"
-#include "pbbam/BamRecord.h"
-#include "PbiIndexIO.h"
-#include <boost/numeric/conversion/cast.hpp>
+
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <map>
-#include <cassert>
+
+#include <boost/numeric/conversion/cast.hpp>
+
+#include "PbiIndexIO.h"
+#include "pbbam/BamFile.h"
+#include "pbbam/BamRecord.h"
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-static
-std::string ToString(const RecordType type)
+static std::string ToString(const RecordType type)
 {
+    // clang-format off
     static const auto lookup = std::map<RecordType, std::string>
     {
         { RecordType::ZMW,        "ZMW" },
@@ -67,6 +70,7 @@ std::string ToString(const RecordType type)
         { RecordType::SCRAP,      "SCRAP" },
         { RecordType::UNKNOWN,    "UNKNOWN" }
     };
+    // clang-format on
 
     try {
         return lookup.at(type);
@@ -75,7 +79,7 @@ std::string ToString(const RecordType type)
     }
 }
 
-} // namespace internal
+}  // namespace internal
 
 // ----------------------------------
 // PbiRawBarcodeData implementation
@@ -101,7 +105,7 @@ void PbiRawBarcodeData::AddRecord(const BamRecord& b)
         const auto bcQuality = boost::numeric_cast<int8_t>(barcodeQuality);
 
         // only store actual data if all values >= 0
-        if (bcForward >= 0 && bcReverse >=0 && bcQuality >= 0) {
+        if (bcForward >= 0 && bcReverse >= 0 && bcQuality >= 0) {
             bcForward_.push_back(bcForward);
             bcReverse_.push_back(bcReverse);
             bcQual_.push_back(bcQuality);
@@ -139,7 +143,7 @@ void PbiRawMappedData::AddRecord(const BamRecord& b)
     tEnd_.push_back(b.ReferenceEnd());
     aStart_.push_back(b.AlignedStart());
     aEnd_.push_back(b.AlignedEnd());
-    revStrand_.push_back( (b.AlignedStrand() == Strand::REVERSE ? 1 : 0) );
+    revStrand_.push_back((b.AlignedStrand() == Strand::REVERSE ? 1 : 0));
     mapQV_.push_back(b.MapQuality());
 
     const auto matchesAndMismatches = b.NumMatchesAndMismatches();
@@ -148,55 +152,52 @@ void PbiRawMappedData::AddRecord(const BamRecord& b)
 }
 
 uint32_t PbiRawMappedData::NumDeletedBasesAt(size_t recordIndex) const
-{ return NumDeletedAndInsertedBasesAt(recordIndex).first; }
+{
+    return NumDeletedAndInsertedBasesAt(recordIndex).first;
+}
 
-std::pair<uint32_t, uint32_t> PbiRawMappedData::NumDeletedAndInsertedBasesAt(size_t recordIndex) const
+std::pair<uint32_t, uint32_t> PbiRawMappedData::NumDeletedAndInsertedBasesAt(
+    size_t recordIndex) const
 {
     const auto aStart = aStart_.at(recordIndex);
-    const auto aEnd   = aEnd_.at(recordIndex);
+    const auto aEnd = aEnd_.at(recordIndex);
     const auto tStart = tStart_.at(recordIndex);
-    const auto tEnd   = tEnd_.at(recordIndex);
-    const auto nM     = nM_.at(recordIndex);
-    const auto nMM    = nMM_.at(recordIndex);
+    const auto tEnd = tEnd_.at(recordIndex);
+    const auto nM = nM_.at(recordIndex);
+    const auto nMM = nMM_.at(recordIndex);
     const auto numIns = (aEnd - aStart - nM - nMM);
     const auto numDel = (tEnd - tStart - nM - nMM);
     return std::make_pair(numDel, numIns);
 }
 
 uint32_t PbiRawMappedData::NumInsertedBasesAt(size_t recordIndex) const
-{ return NumDeletedAndInsertedBasesAt(recordIndex).second; }
+{
+    return NumDeletedAndInsertedBasesAt(recordIndex).second;
+}
 
 // ------------------------------------
 // PbiReferenceEntry implementation
 // ------------------------------------
 
-const PbiReferenceEntry::ID  PbiReferenceEntry::UNMAPPED_ID = static_cast<PbiReferenceEntry::ID>(-1);
-const PbiReferenceEntry::Row PbiReferenceEntry::UNSET_ROW   = static_cast<PbiReferenceEntry::Row>(-1);
+const PbiReferenceEntry::ID PbiReferenceEntry::UNMAPPED_ID = static_cast<PbiReferenceEntry::ID>(-1);
+const PbiReferenceEntry::Row PbiReferenceEntry::UNSET_ROW = static_cast<PbiReferenceEntry::Row>(-1);
 
-PbiReferenceEntry::PbiReferenceEntry()
-    : tId_(UNMAPPED_ID)
-    , beginRow_(UNSET_ROW)
-    , endRow_(UNSET_ROW)
-{ }
+PbiReferenceEntry::PbiReferenceEntry() : tId_(UNMAPPED_ID), beginRow_(UNSET_ROW), endRow_(UNSET_ROW)
+{
+}
 
-PbiReferenceEntry::PbiReferenceEntry(ID id)
-    : tId_(id)
-    , beginRow_(UNSET_ROW)
-    , endRow_(UNSET_ROW)
-{ }
+PbiReferenceEntry::PbiReferenceEntry(ID id) : tId_(id), beginRow_(UNSET_ROW), endRow_(UNSET_ROW) {}
 
 PbiReferenceEntry::PbiReferenceEntry(ID id, Row beginRow, Row endRow)
-    : tId_(id)
-    , beginRow_(beginRow)
-    , endRow_(endRow)
-{ }
+    : tId_(id), beginRow_(beginRow), endRow_(endRow)
+{
+}
 
 // ------------------------------------
 // PbiRawReferenceData implementation
 // ------------------------------------
 
-PbiRawReferenceData::PbiRawReferenceData(uint32_t numRefs)
-{  entries_.reserve(numRefs); }
+PbiRawReferenceData::PbiRawReferenceData(uint32_t numRefs) { entries_.reserve(numRefs); }
 
 // ----------------------------------
 // PbiRawBasicData implementation
@@ -218,8 +219,7 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
 {
     // read group ID
     auto rgId = b.ReadGroupId();
-    if (rgId.empty())
-        rgId = MakeReadGroupId(b.MovieName(), internal::ToString(b.Type()));
+    if (rgId.empty()) rgId = MakeReadGroupId(b.MovieName(), internal::ToString(b.Type()));
     const auto rawid = std::stoul(rgId, nullptr, 16);
     const auto id = static_cast<int32_t>(rawid);
     rgId_.push_back(id);
@@ -236,7 +236,8 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
     // add'l basic data
     holeNumber_.push_back(b.HasHoleNumber() ? b.HoleNumber() : 0);
     readQual_.push_back(b.HasReadAccuracy() ? static_cast<float>(b.ReadAccuracy()) : 0.0f);
-    ctxtFlag_.push_back(b.HasLocalContextFlags() ? b.LocalContextFlags() : LocalContextFlags::NO_LOCAL_CONTEXT);
+    ctxtFlag_.push_back(b.HasLocalContextFlags() ? b.LocalContextFlags()
+                                                 : LocalContextFlags::NO_LOCAL_CONTEXT);
 
     // virtual offset of record start
     fileOffset_.push_back(offset);
@@ -249,8 +250,7 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
 // PbiRawData implementation
 // ----------------------------------
 
-PbiRawData::PbiRawData(const std::string& pbiFilename)
-    : filename_(pbiFilename)
+PbiRawData::PbiRawData(const std::string& pbiFilename) : filename_(pbiFilename)
 {
     internal::PbiIndexIO::Load(*this, pbiFilename);
 }
@@ -261,5 +261,5 @@ PbiRawData::PbiRawData(const DataSet& dataset)
     internal::PbiIndexIO::LoadFromDataSet(*this, dataset);
 }
 
-} // namespace BAM
-} // namesapce PacBio
+}  // namespace BAM
+}  // namesapce PacBio

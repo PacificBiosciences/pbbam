@@ -112,7 +112,7 @@ TEST(BamRecordImplTagsTest, SimpleAddTag)
     // fail on invalid adds
     EXPECT_FALSE(bam.AddTag("", (int32_t)-42));
     EXPECT_FALSE(bam.AddTag("some_too_long_name", (int32_t)-42));
-    EXPECT_FALSE(bam.AddTag("XY", (int32_t)-42));                   // reject duplicate
+    EXPECT_FALSE(bam.AddTag("XY", (int32_t)-42));  // reject duplicate
 }
 
 TEST(BamRecordImplTagsTest, SimpleRemoveTag)
@@ -148,7 +148,7 @@ TEST(BamRecordImplTagsTest, SimpleRemoveTag)
     // fail on invalid removes
     EXPECT_FALSE(bam.RemoveTag(""));
     EXPECT_FALSE(bam.RemoveTag("some_too_long_name"));
-    EXPECT_FALSE(bam.RemoveTag("zz"));                 // reject remove unknown
+    EXPECT_FALSE(bam.RemoveTag("zz"));  // reject remove unknown
 }
 
 TEST(BamRecordImplTagsTest, SimpleEditTag)
@@ -183,7 +183,7 @@ TEST(BamRecordImplTagsTest, SimpleEditTag)
     // fail on invalid edits
     EXPECT_FALSE(bam.EditTag("", 500));
     EXPECT_FALSE(bam.EditTag("some_too_long_name", 500));
-    EXPECT_FALSE(bam.EditTag("zz", 500));                 // reject edit unknown
+    EXPECT_FALSE(bam.EditTag("zz", 500));  // reject edit unknown
 }
 
 TEST(BamRecordImplTagsTest, SimpleQueryTag)
@@ -201,9 +201,9 @@ TEST(BamRecordImplTagsTest, SimpleQueryTag)
     EXPECT_TRUE(bam.HasTag("CA"));
     EXPECT_TRUE(bam.HasTag("XY"));
 
-    EXPECT_EQ(string("1abc75"),              bam.TagValue("HX").ToString());
+    EXPECT_EQ(string("1abc75"), bam.TagValue("HX").ToString());
     EXPECT_EQ(vector<uint8_t>({34, 5, 125}), bam.TagValue("CA").ToUInt8Array());
-    EXPECT_EQ((int32_t)-42,                  bam.TagValue("XY").ToInt32());
+    EXPECT_EQ((int32_t)-42, bam.TagValue("XY").ToInt32());
 
     EXPECT_FALSE(bam.HasTag("zz"));
     EXPECT_FALSE(bam.HasTag(""));
@@ -213,4 +213,3 @@ TEST(BamRecordImplTagsTest, SimpleQueryTag)
     EXPECT_EQ(Tag(), bam.TagValue(""));
     EXPECT_EQ(Tag(), bam.TagValue("some_too_long_name"));
 }
-

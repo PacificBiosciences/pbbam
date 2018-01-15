@@ -66,9 +66,7 @@ public:
     /// \param bases
     /// \param qualities
     ///
-    explicit FastqSequence(std::string name,
-                           std::string bases,
-                           QualityValues qualities);
+    explicit FastqSequence(std::string name, std::string bases, QualityValues qualities);
 
     ///
     /// \brief FastaSequence
@@ -76,9 +74,7 @@ public:
     /// \param bases
     /// \param qualities
     ///
-    explicit FastqSequence(std::string name,
-                           std::string bases,
-                           std::string qualities);
+    explicit FastqSequence(std::string name, std::string bases, std::string qualities);
 
     FastqSequence() = default;
     FastqSequence(const FastqSequence&) = default;
@@ -105,9 +101,9 @@ private:
     QualityValues qualities_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "internal/FastqSequence.inl"
 
-#endif // FASTQSEQUENCE_H
+#endif  // FASTQSEQUENCE_H

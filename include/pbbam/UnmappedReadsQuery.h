@@ -67,4 +67,4 @@
 //} // namespace BAM
 //} // namspace PacBio
 
-#endif // UNMAPPEDREADSQUERY_H
+#endif  // UNMAPPEDREADSQUERY_H

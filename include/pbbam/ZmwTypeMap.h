@@ -56,10 +56,10 @@ namespace BAM {
 class ZmwTypeMap
 {
 public:
-	static std::map<char, ZmwType> ParseChar;
+    static std::map<char, ZmwType> ParseChar;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // ZMWTYPEMAP_H
+#endif  // ZMWTYPEMAP_H

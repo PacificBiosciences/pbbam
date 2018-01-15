@@ -35,8 +35,8 @@
 
 // Author: Derek Barnett
 
-#include <cstdint>
 #include <gtest/gtest.h>
+#include <cstdint>
 
 #define private public
 
@@ -54,16 +54,15 @@ using namespace std;
 TEST(BamWriterTest, SingleWrite_UserRecord)
 {
     const string fullName = "test/100/0_5";
-    const string rgId     = "6002b307";
-    const vector<float> expectedSnr = {0.2,0.2,0.2,0.2};
+    const string rgId = "6002b307";
+    const vector<float> expectedSnr = {0.2, 0.2, 0.2, 0.2};
 
     // setup header
     const string hdrText = {
         "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
         "@RG\tID:6002b307\tPL:PACBIO\tDS:READTYPE=SUBREAD;BINDINGKIT=100-619-300;"
-             "SEQUENCINGKIT=100-619-400;BASECALLERVERSION=3.0;FRAMERATEHZ=100\t"
-             "PU:test\tPM:SEQUEL\n"
-    };
+        "SEQUENCINGKIT=100-619-400;BASECALLERVERSION=3.0;FRAMERATEHZ=100\t"
+        "PU:test\tPM:SEQUEL\n"};
     BamHeader inputHeader(hdrText);
 
     // setup record
@@ -101,15 +100,15 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
     // check written header
     BamFile file(generatedBamFn);
     const auto header = file.Header();
-    EXPECT_EQ(std::string("1.1"),     header.Version());
+    EXPECT_EQ(std::string("1.1"), header.Version());
     EXPECT_EQ(std::string("unknown"), header.SortOrder());
-    EXPECT_EQ(std::string("3.0.1"),   header.PacBioBamVersion());
+    EXPECT_EQ(std::string("3.0.1"), header.PacBioBamVersion());
 
     // check written record
     EntireFileQuery entireFile(file);
     auto firstIter = entireFile.begin();
     auto record = *firstIter;
-    EXPECT_EQ(std::string("ACGTC"),        record.Sequence());
+    EXPECT_EQ(std::string("ACGTC"), record.Sequence());
     EXPECT_EQ(std::string("test/100/0_5"), record.FullName());
     EXPECT_TRUE(record.HasHoleNumber());
     EXPECT_TRUE(record.HasNumPasses());
@@ -118,9 +117,9 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
     EXPECT_TRUE(record.HasReadAccuracy());
     EXPECT_TRUE(record.HasSignalToNoise());
     EXPECT_EQ(100, record.HoleNumber());
-    EXPECT_EQ(1,   record.NumPasses());
-    EXPECT_EQ(0,   record.QueryStart());
-    EXPECT_EQ(5,   record.QueryEnd());
+    EXPECT_EQ(1, record.NumPasses());
+    EXPECT_EQ(0, record.QueryStart());
+    EXPECT_EQ(5, record.QueryEnd());
     EXPECT_EQ(expectedSnr, record.SignalToNoise());
     EXPECT_EQ(rgId, record.ReadGroupId());
 

@@ -39,13 +39,15 @@
 //
 // Author: Derek Barnett
 
+#include "pbbam/exception/ValidationException.h"
+
 #include "PbbamInternalConfig.h"
 
-#include "ValidationErrors.h"
-#include "pbbam/exception/ValidationException.h"
-#include "StringUtils.h"
-#include <sstream>
 #include <cstddef>
+#include <sstream>
+
+#include "StringUtils.h"
+#include "ValidationErrors.h"
 
 namespace PacBio {
 namespace BAM {
@@ -54,70 +56,58 @@ namespace internal {
 const size_t ValidationErrors::MAX;
 
 ValidationErrors::ValidationErrors(const size_t maxNumErrors)
-    : maxNumErrors_(maxNumErrors)
-    , currentNumErrors_(0)
+    : maxNumErrors_(maxNumErrors), currentNumErrors_(0)
 {
-    if (maxNumErrors_ == 0)
-        maxNumErrors_ = ValidationErrors::MAX;
+    if (maxNumErrors_ == 0) maxNumErrors_ = ValidationErrors::MAX;
 }
 
-void ValidationErrors::AddFileError(const std::string& fn,
-                                    const std::string& details)
+void ValidationErrors::AddFileError(const std::string& fn, const std::string& details)
 {
     std::string copy = details;
     AddFileError(fn, std::move(copy));
 }
 
-void ValidationErrors::AddFileError(const std::string& fn,
-                                    std::string&& details)
+void ValidationErrors::AddFileError(const std::string& fn, std::string&& details)
 {
     fileErrors_[fn].push_back(std::move(details));
     OnErrorAdded();
 }
 
-void ValidationErrors::AddReadGroupError(const std::string& rg,
-                                         const std::string& details)
+void ValidationErrors::AddReadGroupError(const std::string& rg, const std::string& details)
 {
     std::string copy = details;
     AddReadGroupError(rg, std::move(copy));
 }
 
-void ValidationErrors::AddReadGroupError(const std::string& rg,
-                                         std::string&& details)
+void ValidationErrors::AddReadGroupError(const std::string& rg, std::string&& details)
 {
     readGroupErrors_[rg].push_back(std::move(details));
     OnErrorAdded();
 }
 
-void ValidationErrors::AddRecordError(const std::string& name,
-                                      const std::string& details)
+void ValidationErrors::AddRecordError(const std::string& name, const std::string& details)
 {
     std::string copy = details;
     AddRecordError(name, std::move(copy));
 }
 
-void ValidationErrors::AddRecordError(const std::string& name,
-                                      std::string&& details)
+void ValidationErrors::AddRecordError(const std::string& name, std::string&& details)
 {
     recordErrors_[name].push_back(std::move(details));
     OnErrorAdded();
 }
 
-void ValidationErrors::AddTagLengthError(const std::string& name,
-                                         const std::string& tagLabel,
-                                         const std::string& tagName,
-                                         const size_t observed,
+void ValidationErrors::AddTagLengthError(const std::string& name, const std::string& tagLabel,
+                                         const std::string& tagName, const size_t observed,
                                          const size_t expected)
 {
-    std::string copy  = tagLabel;
+    std::string copy = tagLabel;
     std::string copy2 = tagName;
     AddTagLengthError(name, std::move(copy), std::move(copy2), observed, expected);
 }
 
-void ValidationErrors::AddTagLengthError(const std::string& name,
-                                         std::string&& tagLabel,
-                                         std::string&& tagName,
-                                         const size_t observed,
+void ValidationErrors::AddTagLengthError(const std::string& name, std::string&& tagLabel,
+                                         std::string&& tagName, const size_t observed,
                                          const size_t expected)
 {
     // format
@@ -127,25 +117,20 @@ void ValidationErrors::AddTagLengthError(const std::string& name,
     AddRecordError(name, s.str());
 }
 
-bool ValidationErrors::IsEmpty() const
-{
-    return currentNumErrors_ == 0;
-}
+bool ValidationErrors::IsEmpty() const { return currentNumErrors_ == 0; }
 
 void ValidationErrors::OnErrorAdded()
 {
     ++currentNumErrors_;
-    if (currentNumErrors_ == maxNumErrors_)
-        ThrowErrors();
+    if (currentNumErrors_ == maxNumErrors_) ThrowErrors();
 }
 
 void ValidationErrors::ThrowErrors()
 {
-    throw ValidationException(std::move(fileErrors_),
-                              std::move(readGroupErrors_),
+    throw ValidationException(std::move(fileErrors_), std::move(readGroupErrors_),
                               std::move(recordErrors_));
 }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio

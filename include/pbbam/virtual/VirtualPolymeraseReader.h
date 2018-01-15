@@ -51,7 +51,7 @@ namespace BAM {
 /// \deprecated Use ZmwReadStitcher instead.
 typedef ZmwReadStitcher VirtualPolymeraseReader;
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // VIRTUALPOLYMERASEREADER_H
+#endif  // VIRTUALPOLYMERASEREADER_H

@@ -42,9 +42,12 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/QNameQuery.h"
-#include "pbbam/CompositeBamReader.h"
-#include <boost/optional.hpp>
+
 #include <cassert>
+
+#include <boost/optional.hpp>
+
+#include "pbbam/CompositeBamReader.h"
 
 namespace PacBio {
 namespace BAM {
@@ -53,9 +56,9 @@ struct QNameQuery::QNameQueryPrivate
 {
 public:
     QNameQueryPrivate(const DataSet& dataset)
-        : reader_(new SequentialCompositeBamReader(dataset))
-        , nextRecord_(boost::none)
-    { }
+        : reader_(new SequentialCompositeBamReader(dataset)), nextRecord_(boost::none)
+    {
+    }
 
     bool GetNext(std::vector<BamRecord>& records)
     {
@@ -75,8 +78,7 @@ public:
             if (records.empty()) {
                 groupRecordName = record.FullName();
                 records.push_back(record);
-            }
-            else {
+            } else {
                 assert(!records.empty());
                 if (record.FullName() == groupRecordName)
                     records.push_back(record);
@@ -95,14 +97,13 @@ public:
 };
 
 QNameQuery::QNameQuery(const DataSet& dataset)
-    : internal::IGroupQuery()
-    , d_(new QNameQueryPrivate(dataset))
-{ }
+    : internal::IGroupQuery(), d_(new QNameQueryPrivate(dataset))
+{
+}
 
-QNameQuery::~QNameQuery() { }
+QNameQuery::~QNameQuery() {}
 
-bool QNameQuery::GetNext(std::vector<BamRecord>& records)
-{ return d_->GetNext(records); }
+bool QNameQuery::GetNext(std::vector<BamRecord>& records) { return d_->GetNext(records); }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

@@ -52,11 +52,11 @@ namespace BAM {
 ///
 enum class Strand
 {
-    FORWARD     ///< Forward strand
-  , REVERSE     ///< Reverse strand
+    FORWARD,  ///< Forward strand
+    REVERSE   ///< Reverse strand
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // STRAND_H
+#endif  // STRAND_H

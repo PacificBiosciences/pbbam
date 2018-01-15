@@ -36,8 +36,8 @@
 // Author: Derek Barnett
 
 #include <array>
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 #include <initializer_list>
 #include <string>
 #include <vector>
@@ -48,6 +48,8 @@
 
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamTagCodec.h>
+
+// clang-format off
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -2734,3 +2736,5 @@ TEST(BamRecordTest, PulseExclusionTag)
     EXPECT_EQ(reasons, result);
 
 }
+
+// clang-format on
