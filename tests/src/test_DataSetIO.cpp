@@ -35,23 +35,25 @@
 
 // Author: Derek Barnett
 
+#include <unistd.h>
 #include <cstddef>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <unistd.h>
 
 #include <gtest/gtest.h>
 
 #define private public
 
-#include "PbbamTestData.h"
 #include "../src/FileUtils.h"
+#include "PbbamTestData.h"
 
 #include <pbbam/DataSet.h>
 #include <pbbam/internal/DataSetElement.h>
+
+// clang-format off
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -1648,3 +1650,4 @@ TEST(DataSetIOTest, MetadataDefaultChildrenProperlyOrderedPerXsd)
     EXPECT_EQ(expectedXml, s.str());
 }
 
+// clang-format on

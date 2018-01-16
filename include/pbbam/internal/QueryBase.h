@@ -38,21 +38,21 @@
 #ifndef QUERYBASE_H
 #define QUERYBASE_H
 
+#include <cassert>
+#include <memory>
+#include <vector>
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/DataSet.h"
-#include <memory>
-#include <vector>
-#include <cassert>
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-template<typename T>
+template <typename T>
 class QueryBase;
 
-template<typename T>
+template <typename T>
 class QueryIteratorBase
 {
 public:
@@ -72,7 +72,7 @@ protected:
     T record_;
 };
 
-template<typename T>
+template <typename T>
 class QueryIterator : public QueryIteratorBase<T>
 {
 public:
@@ -86,7 +86,7 @@ public:
     QueryIterator<T> operator++(int);
 };
 
-template<typename T>
+template <typename T>
 class QueryConstIterator : public QueryIteratorBase<T>
 {
 public:
@@ -100,8 +100,9 @@ public:
     QueryConstIterator<T> operator++(int);
 };
 
-template<typename T>
-class QueryBase {
+template <typename T>
+class QueryBase
+{
 
 public:
     using iterator = QueryIterator<T>;
@@ -120,7 +121,7 @@ public:
     QueryIterator<T> end();
 
 public:
-    virtual bool GetNext(T& r) =0;
+    virtual bool GetNext(T& r) = 0;
 
 protected:
     QueryBase() = default;
@@ -129,10 +130,10 @@ protected:
 using IQuery = QueryBase<BamRecord>;
 using IGroupQuery = QueryBase<std::vector<BamRecord>>;
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/QueryBase.inl"
 
-#endif // QUERYBASE_H
+#endif  // QUERYBASE_H

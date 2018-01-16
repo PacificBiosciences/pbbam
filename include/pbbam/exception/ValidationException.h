@@ -62,17 +62,13 @@ class ValidationException : public std::runtime_error
 {
 public:
     using ErrorList = std::vector<std::string>;
-    using ErrorMap  = std::map<std::string, ErrorList>;
+    using ErrorMap = std::map<std::string, ErrorList>;
 
 public:
-    ValidationException(ErrorMap fileErrors,
-                        ErrorMap readGroupErrors,
-                        ErrorMap recordErrors);
+    ValidationException(ErrorMap fileErrors, ErrorMap readGroupErrors, ErrorMap recordErrors);
 
     // This is a work around for the Intel PHI compiler (icpc)
-    ~ValidationException() throw()
-    {
-    }
+    ~ValidationException() throw() {}
 
 public:
     const ErrorMap& FileErrors() const;
@@ -91,7 +87,7 @@ private:
     void FormatMessage();
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // VALIDATIONEXCEPTION_H
+#endif  // VALIDATIONEXCEPTION_H

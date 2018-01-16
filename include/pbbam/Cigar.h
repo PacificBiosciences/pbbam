@@ -42,10 +42,10 @@
 #ifndef CIGAR_H
 #define CIGAR_H
 
-#include "pbbam/CigarOperation.h"
-#include "pbbam/Config.h"
 #include <string>
 #include <vector>
+#include "pbbam/CigarOperation.h"
+#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -104,9 +104,9 @@ public:
     /// \}
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/Cigar.inl"
 
-#endif // CIGAR_H
+#endif  // CIGAR_H

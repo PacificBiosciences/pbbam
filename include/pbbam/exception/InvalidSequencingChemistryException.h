@@ -56,8 +56,7 @@ namespace BAM {
 class InvalidSequencingChemistryException : public std::exception
 {
 public:
-    InvalidSequencingChemistryException(std::string bindingKit,
-                                        std::string sequencingKit,
+    InvalidSequencingChemistryException(std::string bindingKit, std::string sequencingKit,
                                         std::string basecallerVersion)
         : bindingKit_(std::move(bindingKit))
         , sequencingKit_(std::move(sequencingKit))
@@ -72,23 +71,17 @@ public:
     }
 
     // This is a work around for the Intel PHI compiler (icpc)
-    ~InvalidSequencingChemistryException() throw()
-    {
-    }
+    ~InvalidSequencingChemistryException() throw() {}
 
 public:
-    const std::string& BindingKit() const
-    { return bindingKit_; }
+    const std::string& BindingKit() const { return bindingKit_; }
 
-    const std::string& SequencingKit() const
-    { return sequencingKit_; }
+    const std::string& SequencingKit() const { return sequencingKit_; }
 
-    const std::string& BasecallerVersion() const
-    { return basecallerVersion_; }
+    const std::string& BasecallerVersion() const { return basecallerVersion_; }
 
 public:
-    const char* what() const noexcept override
-    { return what_.c_str(); }
+    const char* what() const noexcept override { return what_.c_str(); }
 
 protected:
     std::string bindingKit_;
@@ -97,7 +90,7 @@ protected:
     std::string what_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H
+#endif  // INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H

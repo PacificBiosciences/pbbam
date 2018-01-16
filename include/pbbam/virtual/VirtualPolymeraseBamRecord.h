@@ -50,7 +50,7 @@ namespace BAM {
 /// \deprecated Use VirtualZmwBamRecord instead.
 typedef VirtualZmwBamRecord VirtualPolymeraseBamRecord;
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // VIRTUALPOLYMERASEBAMRECORD_H
+#endif  // VIRTUALPOLYMERASEBAMRECORD_H

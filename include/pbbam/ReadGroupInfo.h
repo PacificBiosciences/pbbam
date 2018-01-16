@@ -42,12 +42,12 @@
 #ifndef READGROUPINFO_H
 #define READGROUPINFO_H
 
-#include "pbbam/Config.h"
-#include "pbbam/exception/InvalidSequencingChemistryException.h"
 #include <cstddef>
 #include <cstdint>
 #include <map>
 #include <string>
+#include "pbbam/Config.h"
+#include "pbbam/exception/InvalidSequencingChemistryException.h"
 
 namespace PacBio {
 namespace BAM {
@@ -59,28 +59,28 @@ namespace BAM {
 ///
 enum class BaseFeature
 {
-    DELETION_QV
-  , DELETION_TAG
-  , INSERTION_QV
-  , MERGE_QV
-  , SUBSTITUTION_QV
-  , SUBSTITUTION_TAG
-  , IPD
-  , PULSE_WIDTH
-  , PKMID
-  , PKMEAN
-  , PKMID2
-  , PKMEAN2
-  , LABEL
-  , LABEL_QV
-  , ALT_LABEL
-  , ALT_LABEL_QV
-  , PULSE_MERGE_QV
-  , PULSE_CALL
-  , PRE_PULSE_FRAMES
-  , PULSE_CALL_WIDTH
-  , START_FRAME
-  , PULSE_EXCLUSION
+    DELETION_QV,
+    DELETION_TAG,
+    INSERTION_QV,
+    MERGE_QV,
+    SUBSTITUTION_QV,
+    SUBSTITUTION_TAG,
+    IPD,
+    PULSE_WIDTH,
+    PKMID,
+    PKMEAN,
+    PKMID2,
+    PKMEAN2,
+    LABEL,
+    LABEL_QV,
+    ALT_LABEL,
+    ALT_LABEL_QV,
+    PULSE_MERGE_QV,
+    PULSE_CALL,
+    PRE_PULSE_FRAMES,
+    PULSE_CALL_WIDTH,
+    START_FRAME,
+    PULSE_EXCLUSION
 };
 
 /// \brief This enum describes the encoding types used for frame data within a
@@ -90,8 +90,8 @@ enum class BaseFeature
 ///
 enum class FrameCodec
 {
-    RAW
-  , V1
+    RAW,
+    V1
 };
 
 /// \brief This enum describes the experimental design of the barcodes within a
@@ -101,10 +101,10 @@ enum class FrameCodec
 ///
 enum class BarcodeModeType
 {
-   NONE
- , SYMMETRIC
- , ASYMMETRIC
- , TAILED
+    NONE,
+    SYMMETRIC,
+    ASYMMETRIC,
+    TAILED
 };
 
 /// \brief This enum describes the type of value encoded by barcode quality,
@@ -114,9 +114,9 @@ enum class BarcodeModeType
 ///
 enum class BarcodeQualityType
 {
-    NONE
-  , SCORE
-  , PROBABILITY
+    NONE,
+    SCORE,
+    PROBABILITY
 };
 
 /// \brief This enum describes the instrument type / platform model,
@@ -126,9 +126,9 @@ enum class BarcodeQualityType
 ///
 enum class PlatformModelType
 {
-    ASTRO
-  , RS
-  , SEQUEL
+    ASTRO,
+    RS,
+    SEQUEL
 };
 
 /// \brief The ReadGroupInfo class represents a read group entry (\@RG) in the
@@ -208,9 +208,7 @@ public:
     ///
     /// \sa RecordType
     ///
-    ReadGroupInfo(std::string movieName,
-                  std::string readType,
-                  const PlatformModelType platform);
+    ReadGroupInfo(std::string movieName, std::string readType, const PlatformModelType platform);
 
     ReadGroupInfo(const ReadGroupInfo&) = default;
     ReadGroupInfo(ReadGroupInfo&&) = default;
@@ -263,7 +261,7 @@ public:
     /// \throws std::runtime_error if barcode data not set.
     ///         Check HasBarcodeData if this data may be absent.
     ///
-    std::string  BarcodeFile() const;
+    std::string BarcodeFile() const;
 
     /// \returns MD5 hash of the contents of BarcodeFile
     ///
@@ -389,10 +387,8 @@ public:
     ///
     /// \returns reference to this object
     ///
-    ReadGroupInfo& BarcodeData(const std::string& barcodeFile,
-                               const std::string& barcodeHash,
-                               size_t barcodeCount,
-                               BarcodeModeType barcodeMode,
+    ReadGroupInfo& BarcodeData(const std::string& barcodeFile, const std::string& barcodeHash,
+                               size_t barcodeCount, BarcodeModeType barcodeMode,
                                BarcodeQualityType barcodeQuality);
 
     /// \brief Sets the basecaller version number.
@@ -408,8 +404,7 @@ public:
     /// \param[in] tag          new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& BaseFeatureTag(const BaseFeature& feature,
-                                  const std::string& tag);
+    ReadGroupInfo& BaseFeatureTag(const BaseFeature& feature, const std::string& tag);
 
     /// \brief Sets the binding kit part number.
     ///
@@ -481,8 +476,7 @@ public:
     /// \param[in] readType     string version of read type
     /// \returns reference to this object
     ///
-    ReadGroupInfo& Id(const std::string& movieName,
-                      const std::string& readType);
+    ReadGroupInfo& Id(const std::string& movieName, const std::string& readType);
 
     /// \brief Sets the codec type used for IPD
     ///
@@ -490,8 +484,7 @@ public:
     /// \param[in] tag      IPD tag
     /// \returns reference to this object
     ///
-    ReadGroupInfo& IpdCodec(const FrameCodec& codec,
-                            const std::string& tag = std::string());
+    ReadGroupInfo& IpdCodec(const FrameCodec& codec, const std::string& tag = std::string());
 
     /// \brief Sets the value for \@RG:KS
     ///
@@ -541,8 +534,7 @@ public:
     /// \param[in] tag      pulse width tag
     /// \returns reference to this object
     ///
-    ReadGroupInfo& PulseWidthCodec(const FrameCodec& codec,
-                                   const std::string& tag = std::string());
+    ReadGroupInfo& PulseWidthCodec(const FrameCodec& codec, const std::string& tag = std::string());
 
     /// \brief Sets the read type.
     ///
@@ -582,18 +574,18 @@ public:
     /// \}
 
 private:
-    std::string id_;                    // ID * must be unique for valid SAM *
-    std::string sequencingCenter_;      // CN
-    std::string date_;                  // DT * (ISO-8601) *
-    std::string flowOrder_;             // FO
-    std::string keySequence_;           // KS
-    std::string library_;               // LB
-    std::string programs_;              // PG
-    std::string predictedInsertSize_;   // PI
-    std::string movieName_;             // PU
-    std::string sample_;                // SM
+    std::string id_;                   // ID * must be unique for valid SAM *
+    std::string sequencingCenter_;     // CN
+    std::string date_;                 // DT * (ISO-8601) *
+    std::string flowOrder_;            // FO
+    std::string keySequence_;          // KS
+    std::string library_;              // LB
+    std::string programs_;             // PG
+    std::string predictedInsertSize_;  // PI
+    std::string movieName_;            // PU
+    std::string sample_;               // SM
 
-    PlatformModelType platformModel_ = PlatformModelType::SEQUEL;   // PM
+    PlatformModelType platformModel_ = PlatformModelType::SEQUEL;  // PM
 
     // DS:<Description> components
     std::string readType_;
@@ -602,19 +594,19 @@ private:
     std::string basecallerVersion_;
     mutable std::string sequencingChemistry_;
     std::string frameRateHz_;
-    bool        control_ = false;
-    FrameCodec  ipdCodec_ = FrameCodec::V1;
-    FrameCodec  pulseWidthCodec_ = FrameCodec::V1;
-    bool        hasBarcodeData_ = false;
+    bool control_ = false;
+    FrameCodec ipdCodec_ = FrameCodec::V1;
+    FrameCodec pulseWidthCodec_ = FrameCodec::V1;
+    bool hasBarcodeData_ = false;
     std::string barcodeFile_;
     std::string barcodeHash_;
-    size_t      barcodeCount_ = 0;
+    size_t barcodeCount_ = 0;
     BarcodeModeType barcodeMode_ = BarcodeModeType::NONE;
     BarcodeQualityType barcodeQuality_ = BarcodeQualityType::NONE;
     std::map<BaseFeature, std::string> features_;
 
     // custom attributes
-    std::map<std::string, std::string> custom_; // tag => value
+    std::map<std::string, std::string> custom_;  // tag => value
 
 private:
     std::string EncodeSamDescription() const;
@@ -629,12 +621,11 @@ private:
 /// \returns hexadecimal string read group ID
 ///
 PBBAM_EXPORT
-std::string MakeReadGroupId(const std::string& movieName,
-                            const std::string& readType);
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType);
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/ReadGroupInfo.inl"
 
-#endif // READGROUPINFO_H
+#endif  // READGROUPINFO_H

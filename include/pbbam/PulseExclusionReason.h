@@ -51,13 +51,13 @@ namespace BAM {
 ///
 enum class PulseExclusionReason : uint8_t
 {
-    BASE = 0
-  , SHORT_PULSE
-  , BURST
-  , PAUSE
+    BASE = 0,
+    SHORT_PULSE,
+    BURST,
+    PAUSE
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // PULSE_EXCLUSION_REASON_H
+#endif  // PULSE_EXCLUSION_REASON_H

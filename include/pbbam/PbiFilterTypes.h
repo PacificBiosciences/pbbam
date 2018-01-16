@@ -42,14 +42,14 @@
 #ifndef PBIFILTERTYPES_H
 #define PBIFILTERTYPES_H
 
-#include "pbbam/Compare.h"
-#include "pbbam/PbiFilter.h"
-#include "pbbam/PbiIndex.h"
 #include <boost/optional.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
+#include "pbbam/Compare.h"
+#include "pbbam/PbiFilter.h"
+#include "pbbam/PbiIndex.h"
 
 namespace PacBio {
 namespace BAM {
@@ -60,20 +60,23 @@ namespace internal {
 ///
 /// Provides basic container for value/compare-type pair
 ///
-template<typename T>
+template <typename T>
 struct FilterBase
 {
 public:
     T value_;
     boost::optional<std::vector<T> > multiValue_;
     Compare::Type cmp_;
+
 protected:
     FilterBase(const T& value, const Compare::Type cmp);
     FilterBase(T&& value, const Compare::Type cmp);
     FilterBase(const std::vector<T>& values);
     FilterBase(std::vector<T>&& values);
+
 protected:
     bool CompareHelper(const T& lhs) const;
+
 private:
     bool CompareSingleHelper(const T& lhs) const;
     bool CompareMultiHelper(const T& lhs) const;
@@ -83,7 +86,7 @@ private:
 ///
 /// Dispatches the lookup to BarcodeLookupData
 ///
-template<typename T, BarcodeLookupData::Field field>
+template <typename T, BarcodeLookupData::Field field>
 struct BarcodeDataFilterBase : public FilterBase<T>
 {
 protected:
@@ -91,6 +94,7 @@ protected:
     BarcodeDataFilterBase(T&& value, const Compare::Type cmp);
     BarcodeDataFilterBase(const std::vector<T>& values);
     BarcodeDataFilterBase(std::vector<T>&& values);
+
 public:
     bool Accepts(const PbiRawData& idx, const size_t row) const;
 };
@@ -99,7 +103,7 @@ public:
 ///
 /// Dispatches the lookup to BasicLookupData
 ///
-template<typename T, BasicLookupData::Field field>
+template <typename T, BasicLookupData::Field field>
 struct BasicDataFilterBase : public FilterBase<T>
 {
 protected:
@@ -107,6 +111,7 @@ protected:
     BasicDataFilterBase(T&& value, const Compare::Type cmp);
     BasicDataFilterBase(const std::vector<T>& values);
     BasicDataFilterBase(std::vector<T>&& values);
+
 public:
     bool Accepts(const PbiRawData& idx, const size_t row) const;
 };
@@ -115,7 +120,7 @@ public:
 ///
 /// Dispatches the lookup to MappedLookupData
 ///
-template<typename T, MappedLookupData::Field field>
+template <typename T, MappedLookupData::Field field>
 struct MappedDataFilterBase : public FilterBase<T>
 {
 protected:
@@ -123,11 +128,12 @@ protected:
     MappedDataFilterBase(T&& value, const Compare::Type cmp);
     MappedDataFilterBase(const std::vector<T>& values);
     MappedDataFilterBase(std::vector<T>&& values);
+
 public:
     bool Accepts(const PbiRawData& idx, const size_t row) const;
 };
 
-} // namespace internal
+}  // namespace internal
 
 /// \brief The PbiAlignedEndFilter class provides a PbiFilter-compatible filter
 ///        on aligned end.
@@ -145,8 +151,7 @@ public:
     /// \param[in] position value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiAlignedEndFilter(const uint32_t position,
-                        const Compare::Type cmp = Compare::EQUAL);
+    PbiAlignedEndFilter(const uint32_t position, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiAlignedLengthFilter class provides a PbiFilter-compatible
@@ -164,8 +169,7 @@ public:
     /// \param[in] length value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiAlignedLengthFilter(const uint32_t length,
-                           const Compare::Type cmp = Compare::EQUAL);
+    PbiAlignedLengthFilter(const uint32_t length, const Compare::Type cmp = Compare::EQUAL);
 
 public:
     /// \brief Performs the actual index lookup.
@@ -191,8 +195,7 @@ public:
     /// \param[in] position value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiAlignedStartFilter(const uint32_t position,
-                          const Compare::Type cmp = Compare::EQUAL);
+    PbiAlignedStartFilter(const uint32_t position, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiAlignedStrandFilter class provides a PbiFilter-compatible
@@ -211,8 +214,7 @@ public:
     /// \param[in] strand  strand value to compare on
     /// \param[in] cmp     compare type
     ///
-    PbiAlignedStrandFilter(const Strand strand,
-                           const Compare::Type cmp = Compare::EQUAL);
+    PbiAlignedStrandFilter(const Strand strand, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiBarcodeFilter class provides a PbiFilter-compatible filter on
@@ -232,8 +234,7 @@ public:
     /// \param[in] barcode  barcode ID to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiBarcodeFilter(const int16_t barcode,
-                     const Compare::Type cmp = Compare::EQUAL);
+    PbiBarcodeFilter(const int16_t barcode, const Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a 'whitelisted' barcode filter.
     ///
@@ -282,8 +283,7 @@ public:
     /// \param[in] bcFwdId  (forward) barcode ID to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiBarcodeForwardFilter(const int16_t bcFwdId,
-                            const Compare::Type cmp = Compare::EQUAL);
+    PbiBarcodeForwardFilter(const int16_t bcFwdId, const Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a 'whitelisted' forward barcode filter.
     ///
@@ -322,8 +322,7 @@ public:
     /// \param[in] bcQuality    barcode quality to compare on
     /// \param[in] cmp          compare type
     ///
-    PbiBarcodeQualityFilter(const uint8_t bcQuality,
-                            const Compare::Type cmp = Compare::EQUAL);
+    PbiBarcodeQualityFilter(const uint8_t bcQuality, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiBarcodeReverseFilter class provides a PbiFilter-compatible
@@ -342,8 +341,7 @@ public:
     /// \param[in] bcRevId  (reverse) barcode ID to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiBarcodeReverseFilter(const int16_t bcRevId,
-                            const Compare::Type cmp = Compare::EQUAL);
+    PbiBarcodeReverseFilter(const int16_t bcRevId, const Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a 'whitelisted' reverse barcode filter.
     ///
@@ -395,9 +393,9 @@ public:
     /// \param[in] bcReverse    reverse barcode ID to compare on
     /// \param[in] cmp          compare type
     ///
-    PbiBarcodesFilter(const int16_t bcForward,
-                      const int16_t bcReverse,
+    PbiBarcodesFilter(const int16_t bcForward, const int16_t bcReverse,
                       const Compare::Type cmp = Compare::EQUAL);
+
 public:
     /// \brief Performs the actual index lookup.
     ///
@@ -424,8 +422,7 @@ public:
     /// \param[in] identity value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiIdentityFilter(const float identity,
-                      const Compare::Type cmp = Compare::EQUAL);
+    PbiIdentityFilter(const float identity, const Compare::Type cmp = Compare::EQUAL);
 
 public:
     /// \brief Performs the actual index lookup.
@@ -445,12 +442,10 @@ public:
 /// Example: \include code/PbiLocalContextFilter.txt
 ///
 struct PbiLocalContextFilter
-    : public internal::BasicDataFilterBase<LocalContextFlags,
-                                           BasicLookupData::CONTEXT_FLAG >
+    : public internal::BasicDataFilterBase<LocalContextFlags, BasicLookupData::CONTEXT_FLAG>
 {
 public:
-    PbiLocalContextFilter(const LocalContextFlags& flags,
-                          const Compare::Type cmp = Compare::EQUAL);
+    PbiLocalContextFilter(const LocalContextFlags& flags, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiMapQualityFilter class provides a PbiFilter-compatible filter on
@@ -469,8 +464,7 @@ public:
     /// \param[in] mapQual  value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiMapQualityFilter(const uint8_t mapQual,
-                        const Compare::Type cmp = Compare::EQUAL);
+    PbiMapQualityFilter(const uint8_t mapQual, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiMovieNameFilter class provides a PbiFilter-compatible filter
@@ -520,7 +514,7 @@ public:
     bool Accepts(const PbiRawData& idx, const size_t row) const;
 
 private:
-   PbiFilter compositeFilter_;
+    PbiFilter compositeFilter_;
 };
 
 /// \brief The PbiNumDeletedBasesFilter class provides a PbiFilter-compatible
@@ -539,8 +533,7 @@ public:
     /// \param[in] numDeletions value to compare on
     /// \param[in] cmp          compare type
     ///
-    PbiNumDeletedBasesFilter(const size_t numDeletions,
-                             const Compare::Type cmp = Compare::EQUAL);
+    PbiNumDeletedBasesFilter(const size_t numDeletions, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiNumInsertededBasesFilter class provides a PbiFilter-compatible
@@ -559,8 +552,7 @@ public:
     /// \param[in] numInsertions    value to compare on
     /// \param[in] cmp              compare type
     ///
-    PbiNumInsertedBasesFilter(const size_t numInsertions,
-                              const Compare::Type cmp = Compare::EQUAL);
+    PbiNumInsertedBasesFilter(const size_t numInsertions, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiNumMatchesFilter class provides a PbiFilter-compatible filter
@@ -570,8 +562,7 @@ public:
 ///
 /// \sa BamRecord::NumMatches
 ///
-struct PbiNumMatchesFilter
-    : public internal::MappedDataFilterBase<size_t, MappedLookupData::N_M>
+struct PbiNumMatchesFilter : public internal::MappedDataFilterBase<size_t, MappedLookupData::N_M>
 {
 public:
     /// \brief Creates a filter on the number of matched bases.
@@ -579,8 +570,7 @@ public:
     /// \param[in] numMatchedBases  value to compare on
     /// \param[in] cmp              compare type
     ///
-    PbiNumMatchesFilter(const size_t numMatchedBases,
-                        const Compare::Type cmp = Compare::EQUAL);
+    PbiNumMatchesFilter(const size_t numMatchedBases, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiNumMismatchesFilter class provides a PbiFilter-compatible
@@ -610,8 +600,7 @@ public:
 ///
 /// \sa BamRecord::QueryEnd
 ///
-struct PbiQueryEndFilter
-    : public internal::BasicDataFilterBase<int32_t, BasicLookupData::Q_END>
+struct PbiQueryEndFilter : public internal::BasicDataFilterBase<int32_t, BasicLookupData::Q_END>
 {
 public:
     /// \brief Creates a filter on query end position.
@@ -619,8 +608,7 @@ public:
     /// \param[in] position value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiQueryEndFilter(const int32_t position,
-                      const Compare::Type cmp = Compare::EQUAL);
+    PbiQueryEndFilter(const int32_t position, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiQueryLengthFilter class provides a PbiFilter-compatible filter
@@ -640,8 +628,7 @@ public:
     /// \param[in] length   value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiQueryLengthFilter(const int32_t length,
-                         const Compare::Type cmp = Compare::EQUAL);
+    PbiQueryLengthFilter(const int32_t length, const Compare::Type cmp = Compare::EQUAL);
 
 public:
     /// \brief Performs the actual index lookup.
@@ -702,8 +689,7 @@ private:
 ///
 /// \sa BamRecord::QueryStart
 ///
-struct PbiQueryStartFilter
-    : public internal::BasicDataFilterBase<int32_t, BasicLookupData::Q_START>
+struct PbiQueryStartFilter : public internal::BasicDataFilterBase<int32_t, BasicLookupData::Q_START>
 {
 public:
     /// \brief Creates a filter on query start position.
@@ -711,8 +697,7 @@ public:
     /// \param[in] position value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiQueryStartFilter(const int32_t position,
-                        const Compare::Type cmp = Compare::EQUAL);
+    PbiQueryStartFilter(const int32_t position, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiReadAccuracyFilter class provides a PbiFilter-compatible filter
@@ -731,8 +716,7 @@ public:
     /// \param[in] accuracy value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiReadAccuracyFilter(const Accuracy accuracy,
-                          const Compare::Type cmp = Compare::EQUAL);
+    PbiReadAccuracyFilter(const Accuracy accuracy, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiReadGroupFilter class provides a PbiFilter-compatible filter
@@ -744,8 +728,7 @@ public:
 ///     BamRecord::ReadGroupId,
 ///     BamRecord::ReadGroupNumericId
 ///
-struct PbiReadGroupFilter
-    : public internal::BasicDataFilterBase<int32_t, BasicLookupData::RG_ID>
+struct PbiReadGroupFilter : public internal::BasicDataFilterBase<int32_t, BasicLookupData::RG_ID>
 {
 public:
     /// \brief Creates a filter on read group (numeric) ID value
@@ -755,8 +738,7 @@ public:
     ///
     /// \sa BamRecord::ReadGroupNumericId
     ///
-    PbiReadGroupFilter(const int32_t rgId,
-                       const Compare::Type cmp = Compare::EQUAL);
+    PbiReadGroupFilter(const int32_t rgId, const Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a filter on printable read group ID value
     ///
@@ -765,8 +747,7 @@ public:
     ///
     /// \sa BamRecord::ReadGroupId
     ///
-    PbiReadGroupFilter(const std::string rgId,
-                       const Compare::Type cmp = Compare::EQUAL);
+    PbiReadGroupFilter(const std::string rgId, const Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a filter on read group (object).
     ///
@@ -775,8 +756,7 @@ public:
     ///
     /// \sa BamRecord::ReadGroup
     ///
-    PbiReadGroupFilter(const ReadGroupInfo& rg,
-                       const Compare::Type cmp = Compare::EQUAL);
+    PbiReadGroupFilter(const ReadGroupInfo& rg, const Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a 'whitelisted' filter on read group numeric IDs.
     ///
@@ -855,8 +835,7 @@ public:
     /// \param[in] tEnd     value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiReferenceEndFilter(const uint32_t tEnd,
-                          const Compare::Type cmp = Compare::EQUAL);
+    PbiReferenceEndFilter(const uint32_t tEnd, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiReferenceIdFilter class provides a PbiFilter-compatible
@@ -866,8 +845,7 @@ public:
 ///
 /// \sa BamRecord::ReferenceId
 ///
-struct PbiReferenceIdFilter
-    : public internal::MappedDataFilterBase<int32_t, MappedLookupData::T_ID>
+struct PbiReferenceIdFilter : public internal::MappedDataFilterBase<int32_t, MappedLookupData::T_ID>
 {
 public:
     /// \brief Creates a single-value reference ID filter.
@@ -875,8 +853,7 @@ public:
     /// \param[in] tId  reference ID to compare on
     /// \param[in] cmp  compare type
     ///
-    PbiReferenceIdFilter(const int32_t tId,
-                         const Compare::Type cmp = Compare::EQUAL);
+    PbiReferenceIdFilter(const int32_t tId, const Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a 'whitelisted' reference ID filter.
     ///
@@ -914,8 +891,7 @@ public:
     /// \param[in] rname    reference ID to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiReferenceNameFilter(std::string rname,
-                           Compare::Type cmp = Compare::EQUAL);
+    PbiReferenceNameFilter(std::string rname, Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a 'whitelisted' reference name filter.
     ///
@@ -973,8 +949,7 @@ public:
     /// \param[in] tStart   value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiReferenceStartFilter(const uint32_t tStart,
-                            const Compare::Type cmp = Compare::EQUAL);
+    PbiReferenceStartFilter(const uint32_t tStart, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiZmwFilter class provides a PbiFilter-compatible filter on
@@ -984,8 +959,7 @@ public:
 ///
 /// \sa BamRecord::HoleNumber
 ///
-struct PbiZmwFilter : public internal::BasicDataFilterBase<int32_t,
-                                                           BasicLookupData::ZMW>
+struct PbiZmwFilter : public internal::BasicDataFilterBase<int32_t, BasicLookupData::ZMW>
 {
 public:
     /// \brief Creates a single-value ZMW hole number filter.
@@ -993,8 +967,7 @@ public:
     /// \param[in] zmw  value to compare on
     /// \param[in] cmp  compare type
     ///
-    PbiZmwFilter(const int32_t zmw,
-                 const Compare::Type cmp = Compare::EQUAL);
+    PbiZmwFilter(const int32_t zmw, const Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a 'whitelisted' ZMW hole number filter.
     ///
@@ -1017,9 +990,9 @@ public:
     PbiZmwFilter(std::vector<int32_t>&& whitelist);
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/PbiFilterTypes.inl"
 
-#endif // PBIFILTERTYPES_H
+#endif  // PBIFILTERTYPES_H

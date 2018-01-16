@@ -40,13 +40,13 @@
 
 #include "pbbam/DataSetXsd.h"
 
-#include <boost/utility/string_ref.hpp>
 #include <algorithm>
+#include <boost/utility/string_ref.hpp>
+#include <cassert>
 #include <map>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <cassert>
 
 namespace PacBio {
 namespace BAM {
@@ -90,15 +90,15 @@ private:
     bool verbatim_;
 };
 
-struct FromInputXml { };
+struct FromInputXml
+{
+};
 
 class DataSetElement
 {
 public:
-    DataSetElement(const std::string& label,
-                   const XsdType& xsd = XsdType::NONE);
-    DataSetElement(const std::string& label,
-                   const FromInputXml& fromInputXml,
+    DataSetElement(const std::string& label, const XsdType& xsd = XsdType::NONE);
+    DataSetElement(const std::string& label, const FromInputXml& fromInputXml,
                    const XsdType& xsd = XsdType::NONE);
 
     DataSetElement(const DataSetElement&) = default;
@@ -145,28 +145,28 @@ public:
     void AddChild(const DataSetElement& e);
     void RemoveChild(const DataSetElement& e);
 
-    template<typename T>
+    template <typename T>
     const T& Child(size_t index) const;
 
-    template<typename T>
+    template <typename T>
     T& Child(size_t index);
 
-    template<typename T>
+    template <typename T>
     const T& Child(const std::string& label) const;
 
-    template<typename T>
+    template <typename T>
     T& Child(const std::string& label);
 
-    template<typename T>
+    template <typename T>
     const T& operator[](size_t index) const;
 
-    template<typename T>
+    template <typename T>
     T& operator[](size_t index);
 
-    template<typename T = DataSetElement>
+    template <typename T = DataSetElement>
     const T& operator[](const std::string& label) const;
 
-    template<typename T = DataSetElement>
+    template <typename T = DataSetElement>
     T& operator[](const std::string& label);
 
 protected:
@@ -188,10 +188,10 @@ private:
     int IndexOf(const std::string& label) const;
 };
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/DataSetElement.inl"
 
-#endif // DATASETELEMENT_H
+#endif  // DATASETELEMENT_H

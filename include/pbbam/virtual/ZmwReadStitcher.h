@@ -42,12 +42,12 @@
 #ifndef ZMWREADSTITCHER_H
 #define ZMWREADSTITCHER_H
 
+#include <memory>
+#include <string>
+#include <vector>
 #include "pbbam/BamRecord.h"
 #include "pbbam/Config.h"
 #include "pbbam/virtual/VirtualZmwBamRecord.h"
-#include <memory>
-#include <vector>
-#include <string>
 
 namespace PacBio {
 namespace BAM {
@@ -68,12 +68,10 @@ public:
     /// \{
 
     /// entire file, from BAM names
-    ZmwReadStitcher(const std::string& primaryBamFilePath,
-                    const std::string& scrapsBamFilePath);
+    ZmwReadStitcher(const std::string& primaryBamFilePath, const std::string& scrapsBamFilePath);
 
     /// filtered input from BAM names
-    ZmwReadStitcher(const std::string& primaryBamFilePath,
-                    const std::string& scrapsBamFilePath,
+    ZmwReadStitcher(const std::string& primaryBamFilePath, const std::string& scrapsBamFilePath,
                     const PbiFilter& filter);
 
     /// maybe filtered, from DataSet input
@@ -122,7 +120,7 @@ private:
     std::unique_ptr<ZmwReadStitcherPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // ZMWREADSTITCHER_H
+#endif  // ZMWREADSTITCHER_H

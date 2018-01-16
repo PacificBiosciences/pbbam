@@ -58,39 +58,48 @@ static void CheckSequence(const size_t index, const FastaSequence& seq)
 {
     SCOPED_TRACE("checking FASTA seq:" + std::to_string(index));
     switch (index) {
-        case 0 :
+        case 0:
             EXPECT_EQ("1", seq.Name());
-            EXPECT_EQ("TAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACAACGCAGCTCCGCCCTCGCGGTGCTCTCCGGGTCTGTGCTGAGGAGAACGCAACTCCGCCGGCGCAGGCG", seq.Bases());
+            EXPECT_EQ(
+                "TAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACAACGCAGCTCCG"
+                "CCCTCGCGGTGCTCTCCGGGTCTGTGCTGAGGAGAACGCAACTCCGCCGGCGCAGGCG",
+                seq.Bases());
             break;
 
-        case 1 :
+        case 1:
             EXPECT_EQ("2", seq.Name());
-            EXPECT_EQ("TAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACAACGCAGCTCCGCCCTCGCGGTGCTCTCCGGGTCTGTGCTGAGGAGAACGCAAC", seq.Bases());
+            EXPECT_EQ(
+                "TAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACAACGCAGCTCCG"
+                "CCCTCGCGGTGCTCTCCGGGTCTGTGCTGAGGAGAACGCAAC",
+                seq.Bases());
             break;
 
-        case 2 :
+        case 2:
             EXPECT_EQ("3", seq.Name());
-            EXPECT_EQ("TAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACACCCTAACCCCAACCCCAACCCCAACCCCAACCCCAACCCCAACCCTAACCCCTAACCCTAACCCT", seq.Bases());
+            EXPECT_EQ(
+                "TAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACACCCTAACCCCA"
+                "ACCCCAACCCCAACCCCAACCCCAACCCCAACCCTAACCCCTAACCCTAACCCT",
+                seq.Bases());
             break;
 
         default:
-            ASSERT_TRUE(false); // invalid index
+            ASSERT_TRUE(false);  // invalid index
     }
 }
 
-} // namespace FastaTests
+}  // namespace FastaTests
 
 TEST(FastaSequenceTest, BasicConstructorOk)
 {
-    FastaSequence seq{ "1", "GATTACA" };
-    EXPECT_EQ("1",       seq.Name());
+    FastaSequence seq{"1", "GATTACA"};
+    EXPECT_EQ("1", seq.Name());
     EXPECT_EQ("GATTACA", seq.Bases());
 }
 
 TEST(FastaReaderTest, IterableOk)
 {
     const string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fa";
-    FastaReader reader{ fn };
+    FastaReader reader{fn};
 
     size_t count = 0;
     FastaSequence seq;
@@ -119,7 +128,7 @@ TEST(FastaSequenceQueryTest, FromFastaFilename)
 
     {
         size_t count = 0;
-        FastaSequenceQuery query{ fn } ;
+        FastaSequenceQuery query{fn};
         for (const auto& seq : query) {
             UNUSED(seq);
             ++count;
@@ -128,12 +137,11 @@ TEST(FastaSequenceQueryTest, FromFastaFilename)
     }
 
     {
-        FastaSequenceQuery query{ fn };
+        FastaSequenceQuery query{fn};
         const auto first = query.cbegin();
         const auto& seq = *first;
         EXPECT_EQ("lambda_NEB3011", seq.Name());
     }
-
 }
 
 TEST(FastaSequenceQueryTest, FromDataSet)
@@ -142,18 +150,17 @@ TEST(FastaSequenceQueryTest, FromDataSet)
 
     {
         size_t count = 0;
-        FastaSequenceQuery query{ fn } ;
+        FastaSequenceQuery query{fn};
         for (const auto& seq : query) {
             UNUSED(seq);
             ++count;
         }
-        EXPECT_EQ(5, count);    // 1 from lambda, 4 from chimera
+        EXPECT_EQ(5, count);  // 1 from lambda, 4 from chimera
     }
     {
-        FastaSequenceQuery query{ fn };
+        FastaSequenceQuery query{fn};
         const auto first = query.cbegin();
         const auto& seq = *first;
         EXPECT_EQ("lambda_NEB3011", seq.Name());
     }
 }
-

@@ -79,7 +79,7 @@ private:
     std::unique_ptr<FastaSequenceQueryPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // FASTASEQUENCEQUERY_H
+#endif  // FASTASEQUENCEQUERY_H

@@ -49,5 +49,5 @@ namespace BAM {
 const float Accuracy::MIN = 0.0f;
 const float Accuracy::MAX = 1.0f;
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

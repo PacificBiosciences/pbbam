@@ -54,8 +54,6 @@ namespace DataSetMetadataTests {
 //    return d;
 //}
 
-} // namespace DataSetMetadataTests
+}  // namespace DataSetMetadataTests
 
-TEST(DataSetMetadataTest, DummyTest) {
-    EXPECT_TRUE(true);
-}
+TEST(DataSetMetadataTest, DummyTest) { EXPECT_TRUE(true); }

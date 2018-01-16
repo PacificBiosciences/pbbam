@@ -53,8 +53,7 @@ namespace BAM {
 ///
 /// \returns vector of tokens
 ///
-inline std::vector<std::string> Split(const std::string& line,
-                                      const char delim = '\t')
+inline std::vector<std::string> Split(const std::string& line, const char delim = '\t')
 {
     std::vector<std::string> tokens;
     std::stringstream lineStream(line);
@@ -72,9 +71,9 @@ inline std::vector<std::string> Split(const std::string& line,
 ///
 inline std::string RemoveAllWhitespace(std::string&& input)
 {
-    input.erase(std::remove_if(input.begin(), input.end(),
-                               [](const char c) { return std::isspace(c); }),
-                input.end());
+    input.erase(
+        std::remove_if(input.begin(), input.end(), [](const char c) { return std::isspace(c); }),
+        input.end());
     return input;
 }
 
@@ -90,7 +89,7 @@ inline std::string RemoveAllWhitespace(const std::string& input)
     return RemoveAllWhitespace(std::move(copy));
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // PBBAM_STRINGUTILITIES_H
+#endif  // PBBAM_STRINGUTILITIES_H

@@ -41,14 +41,14 @@
 
 #include "PbbamInternalConfig.h"
 
-#include <cstdint>
-
 #include "pbbam/QualityValue.h"
+
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
 
 const uint8_t QualityValue::MAX = 93;
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

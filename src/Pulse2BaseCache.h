@@ -38,12 +38,15 @@
 #ifndef PULSE2BASECACHE_H
 #define PULSE2BASECACHE_H
 
-#include "pbbam/Config.h"
-#include <boost/dynamic_bitset.hpp>
-#include <cstddef>
-#include <string>
 #include <cassert>
 #include <cctype>
+#include <cstddef>
+#include <string>
+
+#include <boost/dynamic_bitset.hpp>
+
+#include "pbbam/Config.h"
+
 namespace PacBio {
 namespace BAM {
 namespace internal {
@@ -58,8 +61,7 @@ public:
     ///
     /// \param pulseCalls[in]   string contents of 'pc' tag
     ///
-    Pulse2BaseCache(const std::string& pulseCalls)
-        : data_(pulseCalls.size())
+    Pulse2BaseCache(const std::string& pulseCalls) : data_(pulseCalls.size())
     {
         // basecalled pulse -> data[i] == 1
         // squashed pulse   -> data[i] == 0
@@ -77,50 +79,40 @@ public:
     ~Pulse2BaseCache() = default;
 
 public:
-
     ///
     /// \brief FindFirst
     /// \return
     ///
-    size_t FindFirst() const
-    { return data_.find_first(); }
+    size_t FindFirst() const { return data_.find_first(); }
 
     ///
     /// \brief FindNext
     /// \param from
     /// \return
     ///
-    size_t FindNext(size_t from) const
-    { return data_.find_next(from); }
+    size_t FindNext(size_t from) const { return data_.find_next(from); }
 
     ///
     /// \brief IsBasecallAt
     /// \param pos
     /// \return
     ///
-    bool IsBasecallAt(const size_t pos) const
-    { return data_[pos]; }
+    bool IsBasecallAt(const size_t pos) const { return data_[pos]; }
 
     /// \returns the total number of pulses (basecalled & squashed)
     ///
-    size_t NumPulses() const
-    {
-        return data_.size();
-    }
+    size_t NumPulses() const { return data_.size(); }
 
     /// \returns the total number of basecalled pulses
     ///
-    size_t NumBases() const
-    {
-        return data_.count();
-    }
+    size_t NumBases() const { return data_.count(); }
 
     /// \brief Removes squashed pulse positions from input data.
     ///
     /// \param[in]  Contents of any per-pulse tag.
     /// \returns    Input \p pulseData less all squashed pulses
     ///
-    template<typename T>
+    template <typename T>
     T RemoveSquashedPulses(const T& pulseData) const
     {
         const auto numPulses = pulseData.size();
@@ -137,8 +129,7 @@ public:
         //
         size_t inputIndex = 0;
         for (size_t i = 0; i < numPulses; ++i) {
-            if (data_[i])
-                result.push_back(pulseData.at(inputIndex));
+            if (data_[i]) result.push_back(pulseData.at(inputIndex));
             ++inputIndex;
         }
         return result;
@@ -148,8 +139,8 @@ private:
     boost::dynamic_bitset<> data_;
 };
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // PULSE2BASECACHE_H
+#endif  // PULSE2BASECACHE_H

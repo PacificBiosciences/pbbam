@@ -47,49 +47,49 @@ namespace BAM {
 
 enum class BamRecordTag
 {
-    ALT_LABEL_QV
-  , ALT_LABEL_TAG
-  , BARCODE_QUALITY
-  , BARCODES
-  , CONTEXT_FLAGS
-  , DELETION_QV
-  , DELETION_TAG
-  , HOLE_NUMBER
-  , INSERTION_QV
-  , IPD
-  , LABEL_QV
-  , LONG_CIGAR
-  , MERGE_QV
-  , NUM_PASSES
-  , PKMEAN
-  , PKMEAN_2
-  , PKMID
-  , PKMID_2
-  , PRE_PULSE_FRAMES
-  , PULSE_CALL
-  , PULSE_CALL_WIDTH
-  , PULSE_EXCLUSION
-  , PULSE_MERGE_QV
-  , PULSE_WIDTH
-  , QUERY_END
-  , QUERY_START
-  , READ_ACCURACY
-  , READ_GROUP
-  , SCRAP_REGION_TYPE
-  , SCRAP_ZMW_TYPE
-  , SNR
-  , START_FRAME
-  , SUBSTITUTION_QV
-  , SUBSTITUTION_TAG
+    ALT_LABEL_QV,
+    ALT_LABEL_TAG,
+    BARCODE_QUALITY,
+    BARCODES,
+    CONTEXT_FLAGS,
+    DELETION_QV,
+    DELETION_TAG,
+    HOLE_NUMBER,
+    INSERTION_QV,
+    IPD,
+    LABEL_QV,
+    LONG_CIGAR,
+    MERGE_QV,
+    NUM_PASSES,
+    PKMEAN,
+    PKMEAN_2,
+    PKMID,
+    PKMID_2,
+    PRE_PULSE_FRAMES,
+    PULSE_CALL,
+    PULSE_CALL_WIDTH,
+    PULSE_EXCLUSION,
+    PULSE_MERGE_QV,
+    PULSE_WIDTH,
+    QUERY_END,
+    QUERY_START,
+    READ_ACCURACY,
+    READ_GROUP,
+    SCRAP_REGION_TYPE,
+    SCRAP_ZMW_TYPE,
+    SNR,
+    START_FRAME,
+    SUBSTITUTION_QV,
+    SUBSTITUTION_TAG,
 
-  //
-  // not tags per se, but faking these here to simplify data fetching
-  //
-  , QUAL
-  , SEQ
+    //
+    // not tags per se, but faking these here to simplify data fetching
+    //
+    QUAL,
+    SEQ
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // BAMRECORDTAG_H
+#endif  // BAMRECORDTAG_H

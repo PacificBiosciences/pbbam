@@ -47,9 +47,10 @@ namespace internal {
 //
 // adds iterators for convenience
 //
-template<class T> class DataSetListElement;
+template <class T>
+class DataSetListElement;
 
-template<class T>
+template <class T>
 class DataSetListIteratorBase
 {
 public:
@@ -65,7 +66,7 @@ protected:
     size_t index_;
 };
 
-template<class T>
+template <class T>
 class DataSetListIterator : public DataSetListIteratorBase<T>
 {
 public:
@@ -76,7 +77,7 @@ public:
     DataSetListIterator<T> operator++(int);
 };
 
-template<class T>
+template <class T>
 class DataSetListConstIterator : public DataSetListIteratorBase<T>
 {
 public:
@@ -87,19 +88,19 @@ public:
     DataSetListConstIterator<T> operator++(int);
 };
 
-template<class T>
+template <class T>
 class DataSetListElement : public DataSetElement
 {
 public:
     DataSetListElement(const std::string& label, const XsdType& xsd = XsdType::NONE);
 
-// child access through index
+    // child access through index
 public:
     const T& operator[](size_t index) const;
     T& operator[](size_t index);
     size_t Size() const;
 
-// child access through iterators
+    // child access through iterators
 public:
     DataSetListIterator<T> begin();
     DataSetListConstIterator<T> begin() const;
@@ -109,10 +110,10 @@ public:
     DataSetListConstIterator<T> cend() const;
 };
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/DataSetListElement.inl"
 
-#endif // DATASETLISTELEMENT_H
+#endif  // DATASETLISTELEMENT_H

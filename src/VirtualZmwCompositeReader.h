@@ -42,13 +42,14 @@
 #ifndef VIRTUALZMWCOMPOSITEREADER_H
 #define VIRTUALZMWCOMPOSITEREADER_H
 
-#include "pbbam/DataSet.h"
-#include "pbbam/PbiFilter.h"
-#include "VirtualZmwReader.h"
 #include <deque>
 #include <memory>
 #include <string>
 #include <utility>
+
+#include "VirtualZmwReader.h"
+#include "pbbam/DataSet.h"
+#include "pbbam/PbiFilter.h"
 
 namespace PacBio {
 namespace BAM {
@@ -98,7 +99,7 @@ public:
     /// \}
 
 private:
-    std::deque< std::pair<std::string, std::string> > sources_;
+    std::deque<std::pair<std::string, std::string> > sources_;
     std::unique_ptr<VirtualZmwReader> currentReader_;
     PbiFilter filter_;
 
@@ -106,8 +107,8 @@ private:
     void OpenNextReader();
 };
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // VIRTUALCOMPOSITEREADER_H
+#endif  // VIRTUALCOMPOSITEREADER_H

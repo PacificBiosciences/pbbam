@@ -50,7 +50,7 @@ namespace BAM {
 /// \deprecated Use WhitelistedZmwReadStitcher instead.
 typedef WhitelistedZmwReadStitcher ZmwWhitelistVirtualReader;
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // ZMWWHITELISTVIRTUALREADER_H
+#endif  // ZMWWHITELISTVIRTUALREADER_H

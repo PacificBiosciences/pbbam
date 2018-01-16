@@ -42,10 +42,10 @@
 #ifndef VALIDATOR_H
 #define VALIDATOR_H
 
-#include "pbbam/Config.h"
-#include "pbbam/exception/ValidationException.h"
 #include <cstddef>
 #include <limits>
+#include "pbbam/Config.h"
+#include "pbbam/exception/ValidationException.h"
 
 namespace PacBio {
 namespace BAM {
@@ -183,9 +183,9 @@ public:
                                      const size_t maxErrors = std::numeric_limits<size_t>::max());
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "internal/Validator.inl"
 
-#endif // VALIDATOR_H
+#endif  // VALIDATOR_H

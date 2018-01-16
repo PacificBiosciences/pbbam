@@ -41,11 +41,12 @@
 
 #include "PbbamInternalConfig.h"
 
+#include "pbbam/BarcodeQuery.h"
+
 #include <cstdint>
 
-#include "pbbam/BarcodeQuery.h"
-#include "pbbam/PbiFilterTypes.h"
 #include "pbbam/CompositeBamReader.h"
+#include "pbbam/PbiFilterTypes.h"
 
 namespace PacBio {
 namespace BAM {
@@ -54,21 +55,20 @@ struct BarcodeQuery::BarcodeQueryPrivate
 {
     BarcodeQueryPrivate(const int16_t barcode, const DataSet& dataset)
         : reader_(PbiBarcodeFilter(barcode), dataset)
-    { }
+    {
+    }
 
-    PbiFilterCompositeBamReader<Compare::None> reader_; // unsorted
+    PbiFilterCompositeBamReader<Compare::None> reader_;  // unsorted
 };
 
-BarcodeQuery::BarcodeQuery(const int16_t barcode,
-                           const DataSet& dataset)
-    : internal::IQuery()
-    , d_(new BarcodeQueryPrivate(barcode, dataset))
-{ }
+BarcodeQuery::BarcodeQuery(const int16_t barcode, const DataSet& dataset)
+    : internal::IQuery(), d_(new BarcodeQueryPrivate(barcode, dataset))
+{
+}
 
-BarcodeQuery::~BarcodeQuery() { }
+BarcodeQuery::~BarcodeQuery() {}
 
-bool BarcodeQuery::GetNext(BamRecord &r)
-{ return d_->reader_.GetNext(r); }
+bool BarcodeQuery::GetNext(BamRecord& r) { return d_->reader_.GetNext(r); }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

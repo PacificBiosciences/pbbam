@@ -41,9 +41,10 @@
 
 #include "PbbamInternalConfig.h"
 
+#include "VirtualZmwReader.h"
+
 #include <stdexcept>
 
-#include "VirtualZmwReader.h"
 #include "pbbam/ReadGroupInfo.h"
 
 namespace PacBio {
@@ -53,11 +54,11 @@ namespace internal {
 VirtualZmwReader::VirtualZmwReader(const std::string& primaryBamFilepath,
                                    const std::string& scrapsBamFilepath)
     : VirtualZmwReader(primaryBamFilepath, scrapsBamFilepath, PbiFilter{})
-{ }
+{
+}
 
 VirtualZmwReader::VirtualZmwReader(const std::string& primaryBamFilepath,
-                                   const std::string& scrapsBamFilepath,
-                                   const PbiFilter& filter)
+                                   const std::string& scrapsBamFilepath, const PbiFilter& filter)
 {
     primaryBamFile_ = std::make_unique<BamFile>(primaryBamFilepath);
     scrapsBamFile_ = std::make_unique<BamFile>(scrapsBamFilepath);
@@ -65,8 +66,7 @@ VirtualZmwReader::VirtualZmwReader(const std::string& primaryBamFilepath,
     if (filter.IsEmpty()) {
         primaryQuery_ = std::make_unique<EntireFileQuery>(*primaryBamFile_);
         scrapsQuery_ = std::make_unique<EntireFileQuery>(*scrapsBamFile_);
-    }
-    else {
+    } else {
         primaryQuery_ = std::make_unique<PbiFilterQuery>(filter, *primaryBamFile_);
         scrapsQuery_ = std::make_unique<PbiFilterQuery>(filter, *scrapsBamFile_);
     }
@@ -82,8 +82,7 @@ VirtualZmwReader::VirtualZmwReader(const std::string& primaryBamFilepath,
         throw std::runtime_error("Bam header of the primary bam has no read groups.");
     readGroups[0].ReadType("POLYMERASE");
     readGroups[0].Id(readGroups[0].MovieName(), "POLYMERASE");
-    if (readGroups.size() > 1)
-    {
+    if (readGroups.size() > 1) {
         std::vector<ReadGroupInfo> singleGroup;
         singleGroup.emplace_back(std::move(readGroups[0]));
         readGroups = std::move(singleGroup);
@@ -92,18 +91,19 @@ VirtualZmwReader::VirtualZmwReader(const std::string& primaryBamFilepath,
     stitchedHeader_->ReadGroups(readGroups);
 }
 
-VirtualZmwReader::~VirtualZmwReader() { }
+VirtualZmwReader::~VirtualZmwReader() {}
 
 bool VirtualZmwReader::HasNext()
 {
     // Return true until both iterators are at the end of the query
-    return primaryIt_ != primaryQuery_->end() ||
-            scrapsIt_ != scrapsQuery_->end();
+    return primaryIt_ != primaryQuery_->end() || scrapsIt_ != scrapsQuery_->end();
 }
 
 // This method is not thread safe
 VirtualZmwBamRecord VirtualZmwReader::Next()
-{ return VirtualZmwBamRecord{ NextRaw(), *stitchedHeader_ }; }
+{
+    return VirtualZmwBamRecord{NextRaw(), *stitchedHeader_};
+}
 
 std::vector<BamRecord> VirtualZmwReader::NextRaw()
 {
@@ -117,32 +117,25 @@ std::vector<BamRecord> VirtualZmwReader::NextRaw()
     else if (scrapsIt_ == scrapsQuery_->end())
         currentHoleNumber = (*primaryIt_).HoleNumber();
     else
-        currentHoleNumber = std::min((*primaryIt_).HoleNumber(),
-                                     (*scrapsIt_).HoleNumber());
+        currentHoleNumber = std::min((*primaryIt_).HoleNumber(), (*scrapsIt_).HoleNumber());
 
     // collect subreads or hqregions
-    while (primaryIt_ != primaryQuery_->end() &&
-           currentHoleNumber == (*primaryIt_).HoleNumber())
-    {
+    while (primaryIt_ != primaryQuery_->end() && currentHoleNumber == (*primaryIt_).HoleNumber()) {
         bamRecordVec.push_back(*primaryIt_++);
     }
 
     // collect scraps
-    while (scrapsIt_ != scrapsQuery_->end() &&
-           currentHoleNumber == (*scrapsIt_).HoleNumber())
-    {
+    while (scrapsIt_ != scrapsQuery_->end() && currentHoleNumber == (*scrapsIt_).HoleNumber()) {
         bamRecordVec.push_back(*scrapsIt_++);
     }
 
     return bamRecordVec;
 }
 
-BamHeader VirtualZmwReader::PrimaryHeader() const
-{ return primaryBamFile_->Header(); }
+BamHeader VirtualZmwReader::PrimaryHeader() const { return primaryBamFile_->Header(); }
 
-BamHeader VirtualZmwReader::ScrapsHeader() const
-{ return scrapsBamFile_->Header(); }
+BamHeader VirtualZmwReader::ScrapsHeader() const { return scrapsBamFile_->Header(); }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio

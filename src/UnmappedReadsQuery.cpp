@@ -82,7 +82,6 @@
 //             << "curr_off: " << iterator_->curr_off << endl
 //             << endl;
 
-
 ////        uint32_t read_rest:1, finished:1, dummy:29;
 ////        int tid, beg, end, n_off, i;
 ////        uint64_t curr_off;
@@ -130,7 +129,6 @@
 //    else {
 //        cerr << "UnmappedReadsQuery::HasError() - " << Error() << endl;
 //    }
-
 
 //    return false;
 //}

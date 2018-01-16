@@ -42,8 +42,8 @@
 #ifndef POSITION_H
 #define POSITION_H
 
-#include "pbbam/Config.h"
 #include <cstdint>
+#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -61,7 +61,7 @@ using Position = int32_t;
 ///
 static const Position UnmappedPosition = Position(-1);
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // POSITION_H
+#endif  // POSITION_H

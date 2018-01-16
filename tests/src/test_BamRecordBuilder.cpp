@@ -36,8 +36,8 @@
 // Author: Derek Barnett
 
 #include <chrono>
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 #include <string>
 
 #include <gtest/gtest.h>
@@ -52,37 +52,32 @@ using namespace PacBio::BAM;
 
 namespace BamRecordBuilderTests {
 
-static
-void CheckRawData(const BamRecordImpl& bam)
+static void CheckRawData(const BamRecordImpl& bam)
 {
     // ensure raw data (lengths at least) matches API-facing data
 
-    const uint32_t expectedNameLength  = bam.Name().size() + 1;
+    const uint32_t expectedNameLength = bam.Name().size() + 1;
     const uint32_t expectedNumCigarOps = bam.CigarData().size();
-    const int32_t  expectedSeqLength   = bam.Sequence().length();
-    const size_t   expectedTagsLength  = BamTagCodec::Encode(bam.Tags()).size();
+    const int32_t expectedSeqLength = bam.Sequence().length();
+    const size_t expectedTagsLength = BamTagCodec::Encode(bam.Tags()).size();
 
     //  Name        CIGAR         Sequence       Quals      Tags
     // l_qname + (n_cigar * 4) + (l_qseq+1)/2 + l_qseq + << TAGS >>
 
-    const int expectedTotalDataLength = expectedNameLength +
-                                        (expectedNumCigarOps * 4) +
-                                        (expectedSeqLength+1)/2 +
-                                         expectedSeqLength +
-                                         expectedTagsLength;
+    const int expectedTotalDataLength = expectedNameLength + (expectedNumCigarOps * 4) +
+                                        (expectedSeqLength + 1) / 2 + expectedSeqLength +
+                                        expectedTagsLength;
 
     EXPECT_TRUE((bool)bam.d_);
-    EXPECT_EQ(expectedNameLength,      bam.d_->core.l_qname);
-    EXPECT_EQ(expectedNumCigarOps,     bam.d_->core.n_cigar);
-    EXPECT_EQ(expectedSeqLength,       bam.d_->core.l_qseq);
+    EXPECT_EQ(expectedNameLength, bam.d_->core.l_qname);
+    EXPECT_EQ(expectedNumCigarOps, bam.d_->core.n_cigar);
+    EXPECT_EQ(expectedSeqLength, bam.d_->core.l_qseq);
     EXPECT_EQ(expectedTotalDataLength, bam.d_->l_data);
 }
 
-static
-void CheckRawData(const BamRecord& bam)
-{ CheckRawData(bam.impl_); }
+static void CheckRawData(const BamRecord& bam) { CheckRawData(bam.impl_); }
 
-} // namespace BamRecordBuilderTests
+}  // namespace BamRecordBuilderTests
 
 TEST(BamRecordBuilderTest, DefaultValues)
 {
@@ -97,7 +92,7 @@ TEST(BamRecordBuilderTest, DefaultValues)
     EXPECT_EQ(0, rawData->core.pos);
     EXPECT_EQ(0, rawData->core.bin);
     EXPECT_EQ(0, rawData->core.qual);
-    EXPECT_EQ(1, rawData->core.l_qname);    // initialized w/ NULL-term
+    EXPECT_EQ(1, rawData->core.l_qname);  // initialized w/ NULL-term
     EXPECT_EQ(0, rawData->core.flag);
     EXPECT_EQ(0, rawData->core.n_cigar);
     EXPECT_EQ(0, rawData->core.l_qseq);
@@ -156,14 +151,14 @@ TEST(BamRecordBuilderTest, CheckSetters)
 
     BamRecordBuilder builder;
     builder.Bin(42)
-           .Flag(42)
-           .InsertSize(42)
-           .MapQuality(42)
-           .MatePosition(42)
-           .MateReferenceId(42)
-           .Position(42)
-           .ReferenceId(42)
-           .Tags(tags);
+        .Flag(42)
+        .InsertSize(42)
+        .MapQuality(42)
+        .MatePosition(42)
+        .MateReferenceId(42)
+        .Position(42)
+        .ReferenceId(42)
+        .Tags(tags);
 
     BamRecord bam = builder.Build();
 
@@ -179,18 +174,18 @@ TEST(BamRecordBuilderTest, CheckSetters)
     EXPECT_EQ(42, rawData->core.pos);
     EXPECT_EQ(42, rawData->core.bin);
     EXPECT_EQ(42, rawData->core.qual);
-    EXPECT_EQ(1,  rawData->core.l_qname);    // initialized w/ NULL-term
+    EXPECT_EQ(1, rawData->core.l_qname);  // initialized w/ NULL-term
     EXPECT_EQ(42, rawData->core.flag);
-    EXPECT_EQ(0,  rawData->core.n_cigar);
-    EXPECT_EQ(0,  rawData->core.l_qseq);
+    EXPECT_EQ(0, rawData->core.n_cigar);
+    EXPECT_EQ(0, rawData->core.l_qseq);
     EXPECT_EQ(42, rawData->core.mtid);
     EXPECT_EQ(42, rawData->core.mpos);
     EXPECT_EQ(42, rawData->core.isize);
 
     // variable length data
     EXPECT_TRUE(rawData->data != nullptr);
-    EXPECT_EQ(29, rawData->l_data);         // NULL-term qname + tags
-    EXPECT_EQ((int)0x800, rawData->m_data); // check this if we change or tune later
+    EXPECT_EQ(29, rawData->l_data);          // NULL-term qname + tags
+    EXPECT_EQ((int)0x800, rawData->m_data);  // check this if we change or tune later
 
     // -------------------------------
     // check data via API calls
@@ -250,7 +245,6 @@ TEST(BamRecordBuilderTest, CheckSetters)
 //    std::cout << std::chrono::duration <double, std::milli>(diff).count() << " ms" << std::endl;
 //}
 
-
 //TEST(BamRecordBuilderTest, JustDoingSomeTimings_BamRecordOnly)
 //{
 //    TagCollection tags;
@@ -274,4 +268,3 @@ TEST(BamRecordBuilderTest, CheckSetters)
 //    auto diff = end - start;
 //    std::cout << std::chrono::duration <double, std::milli>(diff).count() << " ms" << std::endl;
 //}
-

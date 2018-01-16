@@ -42,9 +42,9 @@
 #ifndef SEQUENCEINFO_H
 #define SEQUENCEINFO_H
 
-#include "pbbam/Config.h"
 #include <map>
 #include <string>
+#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -210,20 +210,20 @@ public:
     /// \}
 
 private:
-    std::string name_;          // SN:<Name>    * must be unique for valid SAM *
-    std::string length_;        // LN:<Length>  * must be within [0 - 2^31-1] *
-    std::string assemblyId_;    // AS:<AssemblyId>
-    std::string checksum_;      // M5:<Checksum>
-    std::string species_;       // SP:<Species>
-    std::string uri_;           // UR:<URI>
+    std::string name_;        // SN:<Name>    * must be unique for valid SAM *
+    std::string length_;      // LN:<Length>  * must be within [0 - 2^31-1] *
+    std::string assemblyId_;  // AS:<AssemblyId>
+    std::string checksum_;    // M5:<Checksum>
+    std::string species_;     // SP:<Species>
+    std::string uri_;         // UR:<URI>
 
     // custom attributes
-    std::map<std::string, std::string> custom_; // tag => value
+    std::map<std::string, std::string> custom_;  // tag => value
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/SequenceInfo.inl"
 
-#endif // SEQUENCEINFO_H
+#endif  // SEQUENCEINFO_H

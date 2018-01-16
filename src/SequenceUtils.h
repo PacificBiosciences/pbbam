@@ -38,11 +38,12 @@
 #ifndef SEQUENCEUTILS_H
 #define SEQUENCEUTILS_H
 
-#include "StringUtils.h"
 #include <algorithm>
-#include <string>
 #include <cctype>
 #include <cstdint>
+#include <string>
+
+#include "StringUtils.h"
 
 namespace PacBio {
 namespace BAM {
@@ -50,34 +51,30 @@ namespace internal {
 
 inline char Complement(const char character)
 {
-    static char const complementLookup[] =
-    {
-        '\0', 'T', 'V', 'G', 'H',
-        '\0', '\0', 'C', 'D', '\0',
-        '\0', 'M', '\0', 'K', 'N',
-        '\0', '\0', '\0', 'Y', 'S',
-        'A', 'A', 'B', 'W', '\0', 'R'
-    };
-    if (character == '-' || character == '*')
-        return character;
+    static char const complementLookup[] = {'\0', 'T',  'V', 'G',  'H', '\0', '\0', 'C',  'D',
+                                            '\0', '\0', 'M', '\0', 'K', 'N',  '\0', '\0', '\0',
+                                            'Y',  'S',  'A', 'A',  'B', 'W',  '\0', 'R'};
+    if (character == '-' || character == '*') return character;
     return complementLookup[toupper(character) & 0x1f];
 }
 
 //inline void Reverse(std::string& s)
 //{ std::reverse(s.begin(), s.end()); }
 
-template<typename T>
+template <typename T>
 void Reverse(T& input)
-{ std::reverse(input.begin(), input.end()); }
+{
+    std::reverse(input.begin(), input.end());
+}
 
-template<typename T>
+template <typename T>
 T MaybeReverse(T&& input, bool reverse)
-{ 
-    if (reverse) std::reverse(input.begin(), input.end()); 
+{
+    if (reverse) std::reverse(input.begin(), input.end());
     return input;
 }
 
-template<typename T>
+template <typename T>
 T Reversed(const T& input)
 {
     T result = input;
@@ -92,11 +89,12 @@ T Reversed(const T& input)
 //    return result;
 //}
 
-inline void ReverseComplement(std::string& seq) {
+inline void ReverseComplement(std::string& seq)
+{
 
     std::string::iterator sIter = seq.begin();
-    std::string::iterator sEnd  = seq.end();
-    for ( ; sIter != sEnd; ++sIter )
+    std::string::iterator sEnd = seq.end();
+    for (; sIter != sEnd; ++sIter)
         *sIter = Complement(*sIter);
     Reverse(seq);
 }
@@ -112,16 +110,14 @@ inline void ReverseComplementCaseSens(std::string& seq)
 {
     const std::string original = seq;
     int8_t rc_table[128] = {
-        4, 4, 4,   4,  4,   4, 4, 4,  4,  4,  4,  4, 4, 4,  4,  4, 4, 4, 4,
-        4, 4, 4,   4,  4,   4, 4, 4,  4,  4,  4,  4, 4, 32, 4,  4, 4, 4, 4,
-        4, 4, 4,   4,  42,  4, 4, 45, 4,  4,  4,  4, 4, 4,  4,  4, 4, 4, 4,
-        4, 4, 4,   4,  4,   4, 4, 4,  84, 4,  71, 4, 4, 4,  67, 4, 4, 4, 4,
-        4, 4, 78,  4,  4,   4, 4, 4,  65, 65, 4,  4, 4, 4,  4,  4, 4, 4, 4,
-        4, 4, 116, 4,  103, 4, 4, 4,  99, 4,  4,  4, 4, 4,  4,  4, 4, 4, 4,
-        4, 4, 97,  97, 4,   4, 4, 4,  4,  4,  4,  4, 4, 4};
+        4,  4, 4, 4, 4, 4, 4,  4,  4, 4, 4, 4, 4,  4,  4, 4,  4,  4, 4, 4,   4, 4,   4, 4, 4, 4,
+        4,  4, 4, 4, 4, 4, 32, 4,  4, 4, 4, 4, 4,  4,  4, 4,  42, 4, 4, 45,  4, 4,   4, 4, 4, 4,
+        4,  4, 4, 4, 4, 4, 4,  4,  4, 4, 4, 4, 4,  84, 4, 71, 4,  4, 4, 67,  4, 4,   4, 4, 4, 4,
+        78, 4, 4, 4, 4, 4, 65, 65, 4, 4, 4, 4, 4,  4,  4, 4,  4,  4, 4, 116, 4, 103, 4, 4, 4, 99,
+        4,  4, 4, 4, 4, 4, 4,  4,  4, 4, 4, 4, 97, 97, 4, 4,  4,  4, 4, 4,   4, 4,   4, 4};
     std::string reverseCompl(original.length(), 'N');
     for (uint32_t i = 0; i < original.length(); ++i)
-        reverseCompl[original.length()-i-1] = (char)rc_table[(int8_t)original[i]];
+        reverseCompl[original.length() - i - 1] = (char)rc_table[(int8_t)original[i]];
     seq = reverseCompl;
 }
 
@@ -131,7 +127,6 @@ inline std::string MaybeReverseComplementCaseSens(std::string&& seq, bool revers
     return seq;
 }
 
-
 inline std::string ReverseComplemented(const std::string& input)
 {
     std::string result = input;
@@ -139,8 +134,8 @@ inline std::string ReverseComplemented(const std::string& input)
     return result;
 }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // SEQUENCEUTILS_H
+#endif  // SEQUENCEUTILS_H

@@ -42,17 +42,19 @@
 #ifndef PBIINDEXEDBAMREADER_H
 #define PBIINDEXEDBAMREADER_H
 
+#include <string>
 #include "pbbam/BamFile.h"
 #include "pbbam/BamReader.h"
 #include "pbbam/PbiBasicTypes.h"
 #include "pbbam/PbiFilter.h"
 #include "pbbam/PbiIndex.h"
-#include <string>
 
 namespace PacBio {
 namespace BAM {
 
-namespace internal { struct PbiIndexedBamReaderPrivate; }
+namespace internal {
+struct PbiIndexedBamReaderPrivate;
+}
 
 /// \brief The PbiIndexedBamReader class provides read-only iteration over %BAM
 ///        records, limited to some filtering criteria.
@@ -150,8 +152,8 @@ public:
 
     uint32_t NumReads() const;
 
-//    /// \returns the reader's underlying index data
-//    const PbiIndex& Index() const;
+    //    /// \returns the reader's underlying index data
+    //    const PbiIndex& Index() const;
 
 public:
     /// \brief Sets a new filter on the reader.
@@ -170,7 +172,7 @@ private:
     std::unique_ptr<internal::PbiIndexedBamReaderPrivate> d_;
 };
 
-} // namespace internal
-} // namespace BAM
+}  // namespace internal
+}  // namespace BAM
 
-#endif // PBIINDEXEDBAMREADER_H
+#endif  // PBIINDEXEDBAMREADER_H

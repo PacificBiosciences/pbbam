@@ -74,12 +74,15 @@ struct EnumClassHash
     // This is a duplicate of pbcopper/utility/EnumClassHash.h
     //
 
-    template<typename T> size_t operator()(const T t) const
-    { return static_cast<size_t>(t); }
+    template <typename T>
+    size_t operator()(const T t) const
+    {
+        return static_cast<size_t>(t);
+    }
 };
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // ENUMCLASSHASH_H
+#endif  // ENUMCLASSHASH_H

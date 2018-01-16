@@ -42,14 +42,16 @@
 #ifndef FASTAREADER_H
 #define FASTAREADER_H
 
-#include "pbbam/FastaSequence.h"
 #include <memory>
 #include <vector>
+#include "pbbam/FastaSequence.h"
 
 namespace PacBio {
 namespace BAM {
 
-namespace internal { struct FastaReaderPrivate; }
+namespace internal {
+struct FastaReaderPrivate;
+}
 
 ///
 /// \brief The FastaReader provides sequential access to FASTA records.
@@ -107,7 +109,7 @@ private:
     std::unique_ptr<internal::FastaReaderPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // FASTAREADER_H
+#endif  // FASTAREADER_H

@@ -42,8 +42,10 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/MD5.h"
-#include <htslib/hts.h>
+
 #include <stdexcept>
+
+#include <htslib/hts.h>
 
 namespace PacBio {
 namespace BAM {
@@ -51,17 +53,12 @@ namespace BAM {
 class Md5ContextHelper
 {
 public:
-    Md5ContextHelper()
-        : data_(hts_md5_init())
+    Md5ContextHelper() : data_(hts_md5_init())
     {
-        if (data_ == nullptr)
-            throw std::runtime_error("could not initialize MD5 context");
+        if (data_ == nullptr) throw std::runtime_error("could not initialize MD5 context");
     }
 
-    ~Md5ContextHelper()
-    {
-        hts_md5_destroy(data_);
-    }
+    ~Md5ContextHelper() { hts_md5_destroy(data_); }
 
 public:
     std::string Encoded(const std::string& str)
@@ -71,10 +68,10 @@ public:
         unsigned char digest[16];
         hts_md5_final(digest, data_);
 
-        char hexdigest[33]; // leave space for null-term
+        char hexdigest[33];  // leave space for null-term
         hts_md5_hex(hexdigest, digest);
 
-        return std::string{ hexdigest, 32 };
+        return std::string{hexdigest, 32};
     }
 
 private:
@@ -89,8 +86,5 @@ std::string MD5Hash(const std::string& str)
     return md5.Encoded(str);
 }
 
-} // namespace BAM
-} // namespace PacBio
-
-
-
+}  // namespace BAM
+}  // namespace PacBio

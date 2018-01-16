@@ -41,9 +41,10 @@
 
 #include "PbbamInternalConfig.h"
 
+#include "pbbam/BaiIndexedBamReader.h"
+
 #include <cstddef>
 
-#include "pbbam/BaiIndexedBamReader.h"
 #include "MemoryUtils.h"
 
 namespace PacBio {
@@ -53,27 +54,22 @@ namespace internal {
 struct BaiIndexedBamReaderPrivate
 {
 public:
-    BaiIndexedBamReaderPrivate(const BamFile& file,
-                               const GenomicInterval& interval)
-        : htsIndex_(nullptr)
-        , htsIterator_(nullptr)
+    BaiIndexedBamReaderPrivate(const BamFile& file, const GenomicInterval& interval)
+        : htsIndex_(nullptr), htsIterator_(nullptr)
     {
         LoadIndex(file.Filename());
         Interval(file.Header(), interval);
     }
 
-    void Interval(const BamHeader& header,
-                  const GenomicInterval& interval)
+    void Interval(const BamHeader& header, const GenomicInterval& interval)
     {
         htsIterator_.reset(nullptr);
 
         if (header.HasSequence(interval.Name())) {
             auto id = header.SequenceId(interval.Name());
             if (id >= 0 && static_cast<size_t>(id) < header.NumSequences()) {
-                htsIterator_.reset(bam_itr_queryi(htsIndex_.get(),
-                                                  id,
-                                                  interval.Start(),
-                                                  interval.Stop()));
+                htsIterator_.reset(
+                    bam_itr_queryi(htsIndex_.get(), id, interval.Start(), interval.Stop()));
             }
         }
 
@@ -84,8 +80,7 @@ public:
     void LoadIndex(const std::string& fn)
     {
         htsIndex_.reset(bam_index_load(fn.c_str()));
-        if (!htsIndex_)
-            throw std::runtime_error("could not load BAI index data");
+        if (!htsIndex_) throw std::runtime_error("could not load BAI index data");
     }
 
     int ReadRawData(BGZF* bgzf, bam1_t* b)
@@ -96,28 +91,27 @@ public:
 
 public:
     GenomicInterval interval_;
-    std::unique_ptr<hts_idx_t, internal::HtslibIndexDeleter>    htsIndex_;
+    std::unique_ptr<hts_idx_t, internal::HtslibIndexDeleter> htsIndex_;
     std::unique_ptr<hts_itr_t, internal::HtslibIteratorDeleter> htsIterator_;
 };
 
-} // namespace internal
+}  // namespace internal
 
 BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval,
                                          const std::string& filename)
     : BaiIndexedBamReader(interval, BamFile(filename))
-{ }
+{
+}
 
-BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval,
-                                         const BamFile& bamFile)
-    : BamReader(bamFile)
-    , d_(new internal::BaiIndexedBamReaderPrivate(File(), interval))
-{ }
+BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval, const BamFile& bamFile)
+    : BamReader(bamFile), d_(new internal::BaiIndexedBamReaderPrivate(File(), interval))
+{
+}
 
-BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval,
-                                         BamFile&& bamFile)
-    : BamReader(std::move(bamFile))
-    , d_(new internal::BaiIndexedBamReaderPrivate(File(), interval))
-{ }
+BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval, BamFile&& bamFile)
+    : BamReader(std::move(bamFile)), d_(new internal::BaiIndexedBamReaderPrivate(File(), interval))
+{
+}
 
 const GenomicInterval& BaiIndexedBamReader::Interval() const
 {
@@ -138,5 +132,5 @@ BaiIndexedBamReader& BaiIndexedBamReader::Interval(const GenomicInterval& interv
     return *this;
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

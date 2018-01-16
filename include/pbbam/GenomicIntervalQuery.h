@@ -42,9 +42,9 @@
 #ifndef GENOMICINTERVALQUERY_H
 #define GENOMICINTERVALQUERY_H
 
+#include <memory>
 #include "pbbam/GenomicInterval.h"
 #include "pbbam/internal/QueryBase.h"
-#include <memory>
 
 namespace PacBio {
 namespace BAM {
@@ -63,7 +63,6 @@ namespace BAM {
 class PBBAM_EXPORT GenomicIntervalQuery : public internal::IQuery
 {
 public:
-
     /// \brief Constructs a new GenomiIntervalQuery, limiting record results to
     ///        only those overalpping a GenomicInterval.
     ///
@@ -73,8 +72,7 @@ public:
     /// \throws std::runtime_error on failure to open/read underlying %BAM or
     ///         BAI files.
     ///
-    GenomicIntervalQuery(const GenomicInterval& interval,
-                         const PacBio::BAM::DataSet& dataset);
+    GenomicIntervalQuery(const GenomicInterval& interval, const PacBio::BAM::DataSet& dataset);
     ~GenomicIntervalQuery() override;
 
 public:
@@ -106,7 +104,7 @@ private:
     std::unique_ptr<GenomicIntervalQueryPrivate> d_;
 };
 
-} // namespace BAM
-} // namspace PacBio
+}  // namespace BAM
+}  // namspace PacBio
 
-#endif // GENOMICINTERVALQUERY_H
+#endif  // GENOMICINTERVALQUERY_H

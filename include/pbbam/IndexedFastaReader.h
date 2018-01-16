@@ -42,14 +42,14 @@
 #ifndef INDEXEDFASTAREADER_H
 #define INDEXEDFASTAREADER_H
 
-#include "pbbam/Orientation.h"
-#include "pbbam/Position.h"
 #include <htslib/faidx.h>
 #include <cstddef>
-#include <string>
 #include <iostream>
 #include <stdexcept>
+#include <string>
 #include <vector>
+#include "pbbam/Orientation.h"
+#include "pbbam/Position.h"
 
 namespace PacBio {
 namespace BAM {
@@ -60,7 +60,8 @@ class BamRecord;
 /// \brief The IndexedFastaReader class provides random-access to FASTA file
 ///        data.
 ///
-class IndexedFastaReader {
+class IndexedFastaReader
+{
 
 public:
     /// \name Constructors & Related Methods
@@ -88,9 +89,7 @@ public:
     ///
     /// \throws std::runtime_error on failure to fetch sequence
     ///
-    std::string Subsequence(const std::string& id,
-                            Position begin,
-                            Position end) const;
+    std::string Subsequence(const std::string& id, Position begin, Position end) const;
 
     /// \brief Fetches FASTA sequence for desired interval.
     ///
@@ -133,9 +132,9 @@ public:
     /// \throws std::runtime_error on failure to fetch sequence
     ///
     std::string ReferenceSubsequence(const BamRecord& bamRecord,
-                                     const Orientation orientation=Orientation::GENOMIC,
-                                     const bool gapped=false,
-                                     const bool exciseSoftClips=false) const;
+                                     const Orientation orientation = Orientation::GENOMIC,
+                                     const bool gapped = false,
+                                     const bool exciseSoftClips = false) const;
 
     /// \}
 
@@ -148,7 +147,7 @@ public:
 
     /// \returns the names of the sequence at a specific index in the FASTA file
     std::string Name(const size_t idx) const;
-    
+
     /// \returns the names of all sequences stored in the FASTA file
     std::vector<std::string> Names() const;
 

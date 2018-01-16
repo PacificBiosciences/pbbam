@@ -42,21 +42,23 @@
 #ifndef BAMWRITER_H
 #define BAMWRITER_H
 
-#include "pbbam/BamHeader.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
-#include "pbbam/IRecordWriter.h"
 #include <htslib/sam.h>
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include "pbbam/BamHeader.h"
+#include "pbbam/BamRecord.h"
+#include "pbbam/Config.h"
+#include "pbbam/IRecordWriter.h"
 
 namespace PacBio {
 namespace BAM {
 
 class BamFile;
 
-namespace internal { class BamWriterPrivate; }
+namespace internal {
+class BamWriterPrivate;
+}
 
 /// \brief The BamWriter class provides a writing interface for creating
 ///        new %BAM files.
@@ -88,26 +90,26 @@ public:
     ///
     enum CompressionLevel
     {
-        CompressionLevel_0 = 0
-      , CompressionLevel_1 = 1
-      , CompressionLevel_2 = 2
-      , CompressionLevel_3 = 3
-      , CompressionLevel_4 = 4
-      , CompressionLevel_5 = 5
-      , CompressionLevel_6 = 6
-      , CompressionLevel_7 = 7
-      , CompressionLevel_8 = 8
-      , CompressionLevel_9 = 9
+        CompressionLevel_0 = 0,
+        CompressionLevel_1 = 1,
+        CompressionLevel_2 = 2,
+        CompressionLevel_3 = 3,
+        CompressionLevel_4 = 4,
+        CompressionLevel_5 = 5,
+        CompressionLevel_6 = 6,
+        CompressionLevel_7 = 7,
+        CompressionLevel_8 = 8,
+        CompressionLevel_9 = 9,
 
-      , DefaultCompression = -1
-      , NoCompression      = CompressionLevel_0
-      , FastCompression    = CompressionLevel_1
-      , BestCompression    = CompressionLevel_9
+        DefaultCompression = -1,
+        NoCompression = CompressionLevel_0,
+        FastCompression = CompressionLevel_1,
+        BestCompression = CompressionLevel_9
     };
 
     /// \brief This enum allows you to control whether BAI bin numbers are
     ///        calculated for output records.
-    /// 
+    ///
     /// For most cases, the default behavior (ON) should be retained for maximum
     /// compatibility with downstream tools (e.g. samtools index). Disabling bin
     /// calculation should only be used if all records are known to never be
@@ -116,12 +118,11 @@ public:
     ///
     enum BinCalculationMode
     {
-        BinCalculation_ON = 0
-      , BinCalculation_OFF
+        BinCalculation_ON = 0,
+        BinCalculation_OFF
     };
 
 public:
-
     /// \name Constructors & Related Methods
     /// \{
 
@@ -148,8 +149,7 @@ public:
     /// \throws std::runtmie_error if there was a problem opening the file for
     ///         writing or if an error occurred while writing the header
     ///
-    BamWriter(const std::string& filename,
-              const BamHeader& header,
+    BamWriter(const std::string& filename, const BamHeader& header,
               const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
               const size_t numThreads = 4,
               const BinCalculationMode binCalculationMode = BamWriter::BinCalculation_ON);
@@ -167,7 +167,6 @@ public:
     /// \}
 
 public:
-
     /// \name Data Writing & Resource Management
     /// \{
 
@@ -212,7 +211,7 @@ private:
     std::unique_ptr<internal::BamWriterPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // BAMWRITER_H
+#endif  // BAMWRITER_H

@@ -38,9 +38,10 @@
 #ifndef XMLREADER_H
 #define XMLREADER_H
 
-#include "pbbam/DataSet.h"
 #include <iosfwd>
 #include <memory>
+
+#include "pbbam/DataSet.h"
 
 namespace PacBio {
 namespace BAM {
@@ -52,8 +53,8 @@ public:
     static std::unique_ptr<DataSetBase> FromStream(std::istream& in);
 };
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // XMLREADER_H
+#endif  // XMLREADER_H

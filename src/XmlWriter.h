@@ -55,8 +55,8 @@ public:
     static void ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostream& out);
 };
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // XMLWRITER_H
+#endif  // XMLWRITER_H

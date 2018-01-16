@@ -42,10 +42,10 @@
 #ifndef PBIFILTERQUERY_H
 #define PBIFILTERQUERY_H
 
+#include <vector>
 #include "pbbam/Config.h"
 #include "pbbam/PbiFilter.h"
 #include "pbbam/internal/QueryBase.h"
-#include <vector>
 
 namespace PacBio {
 namespace BAM {
@@ -77,7 +77,6 @@ public:
     ~PbiFilterQuery() override;
 
 public:
-
     /// \brief Main iteration point for record access.
     ///
     /// Most client code should not need to use this method directly. Use
@@ -94,7 +93,7 @@ private:
     std::unique_ptr<PbiFilterQueryPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // PBIFILTERQUERY_H
+#endif  // PBIFILTERQUERY_H

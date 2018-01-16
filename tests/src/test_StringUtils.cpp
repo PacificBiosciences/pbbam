@@ -35,8 +35,8 @@
 
 // Author: Derek Barnett
 
-#include <pbbam/StringUtilities.h>
 #include <gtest/gtest.h>
+#include <pbbam/StringUtilities.h>
 
 TEST(StringUtilsTest, BasicSplitWithDefaultDelim)
 {
@@ -88,12 +88,12 @@ TEST(StringUtilsTest, RemoveWhitespaceNormal)
 {
     using PacBio::BAM::RemoveAllWhitespace;
 
-    {   // lvalue
+    {  // lvalue
         const std::string input = " \f\r\v  Lorem ipsum     \tdolor sit\n\namet ";
         const auto result = RemoveAllWhitespace(input);
         EXPECT_EQ("Loremipsumdolorsitamet", result);
     }
-    {   // rvalue
+    {  // rvalue
         const auto result = RemoveAllWhitespace(" \f\r\v  Lorem ipsum     \tdolor sit\n\namet ");
         EXPECT_EQ("Loremipsumdolorsitamet", result);
     }
@@ -103,12 +103,12 @@ TEST(StringUtilsTest, RemoveWhitespaceOnEmptyString)
 {
     using PacBio::BAM::RemoveAllWhitespace;
 
-    {   // lvalue
+    {  // lvalue
         const std::string input = "";
         const auto result = RemoveAllWhitespace(input);
         EXPECT_TRUE(result.empty());
     }
-    {   // rvalue
+    {  // rvalue
         const auto result = RemoveAllWhitespace("");
         EXPECT_TRUE(result.empty());
     }

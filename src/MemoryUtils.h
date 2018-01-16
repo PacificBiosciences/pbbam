@@ -38,14 +38,16 @@
 #ifndef MEMORYUTILS_H
 #define MEMORYUTILS_H
 
-#include "pbbam/Config.h"
+#include <cstdio>
+#include <memory>
+
+#include <htslib/bgzf.h>
+#include <htslib/sam.h>
+
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamRecordImpl.h"
-#include <htslib/bgzf.h>
-#include <htslib/sam.h>
-#include <memory>
-#include <cstdio>
+#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -60,19 +62,16 @@ struct FileDeleter
 {
     void operator()(std::FILE* fp)
     {
-        if (fp)
-            std::fclose(fp);
+        if (fp) std::fclose(fp);
         fp = nullptr;
     }
 };
-
 
 struct HtslibBgzfDeleter
 {
     void operator()(BGZF* bgzf)
     {
-        if (bgzf) 
-            bgzf_close(bgzf);
+        if (bgzf) bgzf_close(bgzf);
         bgzf = nullptr;
     }
 };
@@ -81,8 +80,7 @@ struct HtslibFileDeleter
 {
     void operator()(samFile* file)
     {
-        if (file)
-            sam_close(file);
+        if (file) sam_close(file);
         file = nullptr;
     }
 };
@@ -91,8 +89,7 @@ struct HtslibHeaderDeleter
 {
     void operator()(bam_hdr_t* hdr)
     {
-        if (hdr)
-            bam_hdr_destroy(hdr);
+        if (hdr) bam_hdr_destroy(hdr);
         hdr = nullptr;
     }
 };
@@ -101,8 +98,7 @@ struct HtslibIndexDeleter
 {
     void operator()(hts_idx_t* index)
     {
-        if (index)
-            hts_idx_destroy(index);
+        if (index) hts_idx_destroy(index);
         index = nullptr;
     }
 };
@@ -111,8 +107,7 @@ struct HtslibIteratorDeleter
 {
     void operator()(hts_itr_t* iter)
     {
-        if (iter)
-            hts_itr_destroy(iter);
+        if (iter) hts_itr_destroy(iter);
         iter = nullptr;
     }
 };
@@ -121,8 +116,7 @@ struct HtslibRecordDeleter
 {
     void operator()(bam1_t* b)
     {
-        if (b)
-            bam_destroy1(b);
+        if (b) bam_destroy1(b);
         b = nullptr;
     }
 };
@@ -148,32 +142,36 @@ public:
     static void UpdateRecordTags(const BamRecordImpl& r);
 };
 
-inline const BamRecordImpl& BamRecordMemory::GetImpl(const BamRecord& r)
-{ return r.impl_; }
+inline const BamRecordImpl& BamRecordMemory::GetImpl(const BamRecord& r) { return r.impl_; }
 
-inline const BamRecordImpl& BamRecordMemory::GetImpl(const BamRecord* r)
-{ return r->impl_; }
+inline const BamRecordImpl& BamRecordMemory::GetImpl(const BamRecord* r) { return r->impl_; }
 
 inline std::shared_ptr<bam1_t> BamRecordMemory::GetRawData(const BamRecord& r)
-{ return GetRawData(r.impl_); }
+{
+    return GetRawData(r.impl_);
+}
 
 inline std::shared_ptr<bam1_t> BamRecordMemory::GetRawData(const BamRecord* r)
-{ return GetRawData(r->impl_); }
+{
+    return GetRawData(r->impl_);
+}
 
 inline std::shared_ptr<bam1_t> BamRecordMemory::GetRawData(const BamRecordImpl& impl)
-{ return impl.d_; }
+{
+    return impl.d_;
+}
 
 inline std::shared_ptr<bam1_t> BamRecordMemory::GetRawData(const BamRecordImpl* impl)
-{ return impl->d_; }
+{
+    return impl->d_;
+}
 
-inline void BamRecordMemory::UpdateRecordTags(const BamRecord& r)
-{ UpdateRecordTags(r.impl_); }
+inline void BamRecordMemory::UpdateRecordTags(const BamRecord& r) { UpdateRecordTags(r.impl_); }
 
-inline void BamRecordMemory::UpdateRecordTags(const BamRecordImpl& r)
-{ r.UpdateTagMap(); }
+inline void BamRecordMemory::UpdateRecordTags(const BamRecordImpl& r) { r.UpdateTagMap(); }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // MEMORYUTILS_H
+#endif  // MEMORYUTILS_H

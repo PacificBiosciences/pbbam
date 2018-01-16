@@ -42,54 +42,49 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/IndexedFastaReader.h"
+
+#include <cstddef>
+#include <cstdlib>
+#include <iostream>
+#include <memory>
+
+#include <htslib/faidx.h>
+
+#include "SequenceUtils.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/GenomicInterval.h"
 #include "pbbam/Orientation.h"
 #include "pbbam/StringUtilities.h"
-#include "SequenceUtils.h"
-
-#include <htslib/faidx.h>
-#include <iostream>
-#include <memory>
-#include <cstddef>
-#include <cstdlib>
 
 namespace PacBio {
 namespace BAM {
 
 IndexedFastaReader::IndexedFastaReader(const std::string& filename)
 {
-    if (!Open(filename))
-        throw std::runtime_error("Cannot open file " + filename);
+    if (!Open(filename)) throw std::runtime_error("Cannot open file " + filename);
 }
 
 IndexedFastaReader::IndexedFastaReader(const IndexedFastaReader& src)
 {
-    if (!Open(src.filename_))
-        throw std::runtime_error("Cannot open file " + src.filename_);
+    if (!Open(src.filename_)) throw std::runtime_error("Cannot open file " + src.filename_);
 }
 
 IndexedFastaReader& IndexedFastaReader::operator=(const IndexedFastaReader& rhs)
 {
-    if (&rhs == this)
-        return *this;
+    if (&rhs == this) return *this;
 
     Open(rhs.filename_);
     return *this;
 }
 
-IndexedFastaReader::~IndexedFastaReader()
-{
-    Close();
-}
+IndexedFastaReader::~IndexedFastaReader() { Close(); }
 
-bool IndexedFastaReader::Open(const std::string &filename)
+bool IndexedFastaReader::Open(const std::string& filename)
 {
     auto* handle = fai_load(filename.c_str());
     if (handle == nullptr)
         return false;
-    else
-    {
+    else {
         filename_ = filename;
         handle_ = handle;
         return true;
@@ -99,15 +94,14 @@ bool IndexedFastaReader::Open(const std::string &filename)
 void IndexedFastaReader::Close()
 {
     filename_ = "";
-    if (handle_ != nullptr)
-        fai_destroy(handle_);
+    if (handle_ != nullptr) fai_destroy(handle_);
     handle_ = nullptr;
 }
 
-#define REQUIRE_FAIDX_LOADED if (handle_ == nullptr) throw std::exception()
+#define REQUIRE_FAIDX_LOADED \
+    if (handle_ == nullptr) throw std::exception()
 
-std::string IndexedFastaReader::Subsequence(const std::string& id,
-                                            Position begin,
+std::string IndexedFastaReader::Subsequence(const std::string& id, Position begin,
                                             Position end) const
 {
     REQUIRE_FAIDX_LOADED;
@@ -117,8 +111,7 @@ std::string IndexedFastaReader::Subsequence(const std::string& id,
     // faidx_fetch_seq, whereas it considers it exclusive in the region spec in
     // fai_fetch.  Can you please verify?
     const std::unique_ptr<char> rawSeq(faidx_fetch_seq(handle_, id.c_str(), begin, end - 1, &len));
-    if (rawSeq == nullptr)
-        throw std::runtime_error("could not fetch FASTA sequence");
+    if (rawSeq == nullptr) throw std::runtime_error("could not fetch FASTA sequence");
     return RemoveAllWhitespace(rawSeq.get());
 }
 
@@ -134,47 +127,37 @@ std::string IndexedFastaReader::Subsequence(const char* htslibRegion) const
 
     int len;
     const std::unique_ptr<char> rawSeq(fai_fetch(handle_, htslibRegion, &len));
-    if (rawSeq == nullptr)
-        throw std::runtime_error("could not fetch FASTA sequence");
+    if (rawSeq == nullptr) throw std::runtime_error("could not fetch FASTA sequence");
     return RemoveAllWhitespace(rawSeq.get());
 }
 
-
-std::string
-IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
-                                         const Orientation orientation,
-                                         const bool gapped,
-                                         const bool exciseSoftClips) const
+std::string IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
+                                                     const Orientation orientation,
+                                                     const bool gapped,
+                                                     const bool exciseSoftClips) const
 {
     REQUIRE_FAIDX_LOADED;
 
-    std::string subseq = Subsequence(bamRecord.ReferenceName(),
-                                     bamRecord.ReferenceStart(),
+    std::string subseq = Subsequence(bamRecord.ReferenceName(), bamRecord.ReferenceStart(),
                                      bamRecord.ReferenceEnd());
-    const auto reverse = orientation != Orientation::GENOMIC &&
-                         bamRecord.Impl().IsReverseStrand();
+    const auto reverse = orientation != Orientation::GENOMIC && bamRecord.Impl().IsReverseStrand();
 
-    if (bamRecord.Impl().IsMapped() && gapped)
-    {
+    if (bamRecord.Impl().IsMapped() && gapped) {
         size_t seqIndex = 0;
         const auto& cigar = bamRecord.Impl().CigarData();
         auto cigarIter = cigar.cbegin();
         auto cigarEnd = cigar.cend();
-        for (; cigarIter != cigarEnd; ++cigarIter)
-        {
+        for (; cigarIter != cigarEnd; ++cigarIter) {
             const auto& op = (*cigarIter);
             const auto& type = op.Type();
 
             // do nothing for hard clips
-            if (type != CigarOperationType::HARD_CLIP)
-            {
+            if (type != CigarOperationType::HARD_CLIP) {
                 const auto opLength = op.Length();
 
                 // maybe remove soft clips
-                if (type == CigarOperationType::SOFT_CLIP)
-                {
-                    if (!exciseSoftClips)
-                    {
+                if (type == CigarOperationType::SOFT_CLIP) {
+                    if (!exciseSoftClips) {
                         subseq.reserve(subseq.size() + opLength);
                         subseq.insert(seqIndex, opLength, '-');
                         seqIndex += opLength;
@@ -185,13 +168,10 @@ IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
                 else {
 
                     // maybe add gaps/padding
-                    if (type == CigarOperationType::INSERTION)
-                    {
+                    if (type == CigarOperationType::INSERTION) {
                         subseq.reserve(subseq.size() + opLength);
                         subseq.insert(seqIndex, opLength, '-');
-                    }
-                    else if (type == CigarOperationType::PADDING)
-                    {
+                    } else if (type == CigarOperationType::PADDING) {
                         subseq.reserve(subseq.size() + opLength);
                         subseq.insert(seqIndex, opLength, '*');
                     }
@@ -203,8 +183,7 @@ IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
         }
     }
 
-    if (reverse)
-        internal::ReverseComplementCaseSens(subseq);
+    if (reverse) internal::ReverseComplementCaseSens(subseq);
 
     return subseq;
 }
@@ -228,8 +207,7 @@ std::vector<std::string> IndexedFastaReader::Names() const
 std::string IndexedFastaReader::Name(const size_t idx) const
 {
     REQUIRE_FAIDX_LOADED;
-    if (idx >= NumSequences())
-        throw std::runtime_error("FASTA index out of range");
+    if (idx >= NumSequences()) throw std::runtime_error("FASTA index out of range");
     return {faidx_iseq(handle_, idx)};
 }
 
@@ -245,7 +223,8 @@ int IndexedFastaReader::SequenceLength(const std::string& name) const
     const auto len = faidx_seq_len(handle_, name.c_str());
     if (len < 0)
         throw std::runtime_error("could not determine FASTA sequence length");
-    else return len;
+    else
+        return len;
 }
-
-}}  // PacBio::BAM
+}
+}  // PacBio::BAM

@@ -51,7 +51,7 @@ namespace BAM {
 ///
 std::string MD5Hash(const std::string& str);
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // MD5_H
+#endif  // MD5_H

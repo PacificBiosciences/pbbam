@@ -65,8 +65,7 @@ public:
     /// \param[in] primaryBamFilepath hqregion.bam or subreads.bam file path
     /// \param[in] scrapsBamFilepath  scraps.bam file path
     ///
-    VirtualZmwReader(const std::string& primaryBamFilepath,
-                     const std::string& scrapsBamFilepath);
+    VirtualZmwReader(const std::string& primaryBamFilepath, const std::string& scrapsBamFilepath);
 
     /// \brief Creates a reader that will operate on a primary %BAM file (e.g.
     ///        subread data) and a scraps file, respecting the provided PBI
@@ -80,8 +79,7 @@ public:
     /// \param[in] scrapsBamFilepath  scraps.bam file path
     /// \param[in] filter PBI filter criteria
     ///
-    VirtualZmwReader(const std::string& primaryBamFilepath,
-                     const std::string& scrapsBamFilepath,
+    VirtualZmwReader(const std::string& primaryBamFilepath, const std::string& scrapsBamFilepath,
                      const PbiFilter& filter);
 
     VirtualZmwReader() = delete;
@@ -92,7 +90,6 @@ public:
     ~VirtualZmwReader();
 
 public:
-
     /// \returns the BamHeader associated with this reader's "primary" %BAM file
     BamHeader PrimaryHeader() const;
 
@@ -100,7 +97,6 @@ public:
     BamHeader ScrapsHeader() const;
 
 public:
-
     /// \returns true if more ZMWs are available for reading.
     bool HasNext();
 
@@ -113,17 +109,17 @@ public:
     std::vector<BamRecord> NextRaw();
 
 private:
-    std::unique_ptr<BamFile>          primaryBamFile_;
-    std::unique_ptr<BamFile>          scrapsBamFile_;
+    std::unique_ptr<BamFile> primaryBamFile_;
+    std::unique_ptr<BamFile> scrapsBamFile_;
     std::unique_ptr<internal::IQuery> primaryQuery_;
     std::unique_ptr<internal::IQuery> scrapsQuery_;
-    internal::IQuery::iterator        primaryIt_;
-    internal::IQuery::iterator        scrapsIt_;
-    std::unique_ptr<BamHeader>        stitchedHeader_;
+    internal::IQuery::iterator primaryIt_;
+    internal::IQuery::iterator scrapsIt_;
+    std::unique_ptr<BamHeader> stitchedHeader_;
 };
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // VirtualZmwREADER_H
+#endif  // VirtualZmwREADER_H

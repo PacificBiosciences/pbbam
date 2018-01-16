@@ -42,10 +42,10 @@
 #ifndef QUALITYVALUES_H
 #define QUALITYVALUES_H
 
-#include "pbbam/QualityValue.h"
 #include <cstdint>
 #include <string>
 #include <vector>
+#include "pbbam/QualityValue.h"
 
 namespace PacBio {
 namespace BAM {
@@ -193,9 +193,9 @@ public:
     /// \}
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/QualityValues.inl"
 
-#endif // QUALITYVALUES_H
+#endif  // QUALITYVALUES_H

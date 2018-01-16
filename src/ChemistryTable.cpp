@@ -37,13 +37,15 @@
 
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/exception/BundleChemistryMappingException.h"
 #include "ChemistryTable.h"
-#include "FileUtils.h"
-#include "pugixml/pugixml.hpp"
+
+#include <cstdlib>
 #include <fstream>
 #include <map>
-#include <cstdlib>
+
+#include "FileUtils.h"
+#include "pbbam/exception/BundleChemistryMappingException.h"
+#include "pugixml/pugixml.hpp"
 
 namespace PacBio {
 namespace BAM {
@@ -54,14 +56,14 @@ extern const ChemistryTable BuiltInChemistryTable = {
     // BindingKit, SequencingKit, BasecallerVersion, Chemistry
 
     // RS
-    {{"100356300",   "100356200",   "2.1", "P6-C4"}},
-    {{"100356300",   "100356200",   "2.3", "P6-C4"}},
-    {{"100356300",   "100612400",   "2.1", "P6-C4"}},
-    {{"100356300",   "100612400",   "2.3", "P6-C4"}},
-    {{"100372700",   "100356200",   "2.1", "P6-C4"}},
-    {{"100372700",   "100356200",   "2.3", "P6-C4"}},
-    {{"100372700",   "100612400",   "2.1", "P6-C4"}},
-    {{"100372700",   "100612400",   "2.3", "P6-C4"}},
+    {{"100356300", "100356200", "2.1", "P6-C4"}},
+    {{"100356300", "100356200", "2.3", "P6-C4"}},
+    {{"100356300", "100612400", "2.1", "P6-C4"}},
+    {{"100356300", "100612400", "2.3", "P6-C4"}},
+    {{"100372700", "100356200", "2.1", "P6-C4"}},
+    {{"100372700", "100356200", "2.3", "P6-C4"}},
+    {{"100372700", "100612400", "2.1", "P6-C4"}},
+    {{"100372700", "100612400", "2.3", "P6-C4"}},
 
     // 3.0 ("Dromedary"): S/P1-C1/beta
     {{"100-619-300", "100-620-000", "3.0", "S/P1-C1/beta"}},
@@ -110,21 +112,21 @@ extern const ChemistryTable BuiltInChemistryTable = {
     // 5.0.1 ChemRel ("Sequel® Sequencing Plate Silwet (4 rxn)"); S/P2-C2
     {{"101-365-900", "101-309-400", "5.0", "S/P2-C2/5.0"}}
 
-
 };
 
 ChemistryTable ChemistryTableFromXml(const std::string& mappingXml)
 {
     if (!FileUtils::Exists(mappingXml))
         throw BundleChemistryMappingException(
-                mappingXml, "SMRT_CHEMISTRY_BUNDLE_DIR defined but file not found");
+            mappingXml, "SMRT_CHEMISTRY_BUNDLE_DIR defined but file not found");
 
     std::ifstream in(mappingXml);
     pugi::xml_document doc;
     const pugi::xml_parse_result& loadResult = doc.load(in);
     if (loadResult.status != pugi::status_ok)
         throw BundleChemistryMappingException(
-                mappingXml, std::string("unparseable XML, error code:") + std::to_string(loadResult.status));
+            mappingXml,
+            std::string("unparseable XML, error code:") + std::to_string(loadResult.status));
 
     // parse top-level attributes
     pugi::xml_node rootNode = doc.document_element();
@@ -139,13 +141,13 @@ ChemistryTable ChemistryTableFromXml(const std::string& mappingXml)
         for (const auto& childNode : rootNode) {
             const std::string childName = childNode.name();
             if (childName != "Mapping") continue;
-            table.emplace_back(std::array<std::string, 4>{{
-                childNode.child("BindingKit").child_value(),
-                childNode.child("SequencingKit").child_value(),
-                childNode.child("SoftwareVersion").child_value(),
-                childNode.child("SequencingChemistry").child_value()}});
+            table.emplace_back(
+                std::array<std::string, 4>{{childNode.child("BindingKit").child_value(),
+                                            childNode.child("SequencingKit").child_value(),
+                                            childNode.child("SoftwareVersion").child_value(),
+                                            childNode.child("SequencingChemistry").child_value()}});
         }
-    } catch(std::exception& e) {
+    } catch (std::exception& e) {
         const std::string msg = std::string{"Mapping entries unparseable - "} + e.what();
         throw BundleChemistryMappingException(mappingXml, msg);
     }
@@ -161,7 +163,8 @@ const ChemistryTable& GetChemistryTableFromEnv()
     const char* pth = getenv("SMRT_CHEMISTRY_BUNDLE_DIR");
     if (pth != nullptr && pth[0] != '\0')
         chemPath = pth;
-    else return empty;
+    else
+        return empty;
 
     auto it = tableCache.find(chemPath);
     if (it != tableCache.end()) return it->second;
@@ -171,6 +174,6 @@ const ChemistryTable& GetChemistryTableFromEnv()
     return it->second;
 }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio

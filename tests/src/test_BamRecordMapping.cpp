@@ -35,8 +35,8 @@
 
 // Author: Derek Barnett
 
-#include <cstdint>
 #include <chrono>
+#include <cstdint>
 #include <string>
 
 #include <gtest/gtest.h>
@@ -46,6 +46,8 @@
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamRecordView.h>
 #include <pbbam/BamTagCodec.h>
+
+// clang-format off
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -745,3 +747,5 @@ TEST(BamRecordMappingTest, StaticMapped)
     EXPECT_EQ(tagQuals, view.AltLabelQVs().Fastq());
     EXPECT_EQ(frames,   view.IPD().Data());
 }
+
+// clang-format on

@@ -35,10 +35,10 @@
 
 // Author: Derek Barnett, Lance Hepler
 
-#include <string>
-#include <vector>
 #include <cstddef>
 #include <cstdlib>
+#include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -49,6 +49,8 @@
 #include <pbbam/ReadGroupInfo.h>
 #include <pbbam/exception/BundleChemistryMappingException.h>
 #include <pbbam/exception/InvalidSequencingChemistryException.h>
+
+// clang-format off
 
 using namespace PacBio::BAM;
 using namespace std;
@@ -285,3 +287,4 @@ TEST(ReadGroupInfoTest, RemoveBaseFeature)
     EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::PULSE_EXCLUSION));
 }
 
+// clang-format on

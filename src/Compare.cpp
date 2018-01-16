@@ -42,6 +42,7 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/Compare.h"
+
 #include <cstddef>
 #include <functional>
 #include <unordered_map>
@@ -56,25 +57,25 @@ struct TypeAlias
     std::string op_;
     std::string opAlpha_;
 
-    TypeAlias(std::string name = std::string(),
-              std::string op = std::string(),
+    TypeAlias(std::string name = std::string(), std::string op = std::string(),
               std::string opAlpha = std::string())
-        : name_(std::move(name))
-        , op_(std::move(op))
-        , opAlpha_(std::move(opAlpha))
-    { }
+        : name_(std::move(name)), op_(std::move(op)), opAlpha_(std::move(opAlpha))
+    {
+    }
 };
 
 struct CompareTypeHash
 {
     size_t operator()(const Compare::Type& t) const
-    { return std::hash<int>()(static_cast<int>(t)); }
+    {
+        return std::hash<int>()(static_cast<int>(t));
+    }
 };
 
+// clang-format off
 static const std::unordered_map<std::string, Compare::Type> opToTypeMap =
 {
     // basic operators plus some permissiveness for other representations
-
     { "==",    Compare::EQUAL },
     { "=",     Compare::EQUAL },
     { "eq",    Compare::EQUAL },
@@ -107,15 +108,16 @@ static const std::unordered_map<Compare::Type, TypeAlias, CompareTypeHash> typeA
     { Compare::CONTAINS,           TypeAlias{ "Compare::CONTAINS",           "&",  "and" } },
     { Compare::NOT_CONTAINS,       TypeAlias{ "Compare::NOT_CONTAINS",       "~",  "not" } }
 };
+// clang-format on
 
-} // namespace internal
+}  // namespace internal
 
 Compare::Type Compare::TypeFromOperator(const std::string& opString)
 {
     try {
         return internal::opToTypeMap.at(opString);
     } catch (std::exception&) {
-        throw std::runtime_error(opString + " is not a valid comparison operator." );
+        throw std::runtime_error(opString + " is not a valid comparison operator.");
     }
 }
 
@@ -124,7 +126,7 @@ std::string Compare::TypeToName(const Compare::Type& type)
     try {
         return internal::typeAliases.at(type).name_;
     } catch (std::exception&) {
-        throw std::runtime_error("invalid comparison type encountered" );
+        throw std::runtime_error("invalid comparison type encountered");
     }
 }
 
@@ -134,9 +136,9 @@ std::string Compare::TypeToOperator(const Compare::Type& type, bool asAlpha)
         return asAlpha ? internal::typeAliases.at(type).opAlpha_
                        : internal::typeAliases.at(type).op_;
     } catch (std::exception&) {
-        throw std::runtime_error("invalid comparison type encountered" );
+        throw std::runtime_error("invalid comparison type encountered");
     }
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

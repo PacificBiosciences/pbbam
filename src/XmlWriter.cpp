@@ -38,33 +38,30 @@
 #include "PbbamInternalConfig.h"
 
 #include "XmlWriter.h"
-#include "pbbam/DataSet.h"
-#include "pugixml/pugixml.hpp"
+
 #include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <map>
 
+#include "pbbam/DataSet.h"
+#include "pugixml/pugixml.hpp"
+
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-static
-std::string Prefix(const std::string& input)
+static std::string Prefix(const std::string& input)
 {
     const auto colonFound = input.find(':');
-    if (colonFound == std::string::npos || colonFound == 0)
-        return std::string();
+    if (colonFound == std::string::npos || colonFound == 0) return std::string();
     return input.substr(0, colonFound);
 }
 
-static
-std::string OutputName(const DataSetElement& node,
-                       const NamespaceRegistry& registry)
+static std::string OutputName(const DataSetElement& node, const NamespaceRegistry& registry)
 {
     // if from input XML, respect the namespaces given
-    if (node.IsVerbatimLabel()) 
-        return node.QualifiedNameLabel();
+    if (node.IsVerbatimLabel()) return node.QualifiedNameLabel();
 
     // otherwise, probably user-generated
     else {
@@ -82,32 +79,24 @@ std::string OutputName(const DataSetElement& node,
     }
 }
 
-static
-void ToXml(const DataSetElement& node,
-           const NamespaceRegistry& registry,
-           std::map<XsdType, std::string>& xsdPrefixesUsed,
-           pugi::xml_node& parentXml)
+static void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
+                  std::map<XsdType, std::string>& xsdPrefixesUsed, pugi::xml_node& parentXml)
 {
     // create child of parent, w/ label & text
     const auto label = OutputName(node, registry);
-    if (label.empty())
-        return; // error?
+    if (label.empty()) return;  // error?
     auto xmlNode = parentXml.append_child(label.c_str());
 
-    if (!node.Text().empty())
-        xmlNode.text().set(node.Text().c_str());
+    if (!node.Text().empty()) xmlNode.text().set(node.Text().c_str());
 
     // store XSD type for later
     const auto prefix = Prefix(label);
-    if (!prefix.empty())
-        xsdPrefixesUsed[node.Xsd()] = prefix;
+    if (!prefix.empty()) xsdPrefixesUsed[node.Xsd()] = prefix;
 
     // add attributes
-    for (const auto& attribute : node.Attributes())
-    {
+    for (const auto& attribute : node.Attributes()) {
         const auto& name = attribute.first;
-        if (name.empty())
-            continue;
+        if (name.empty()) continue;
         auto attr = xmlNode.append_attribute(name.c_str());
         attr.set_value(attribute.second.c_str());
     }
@@ -119,8 +108,7 @@ void ToXml(const DataSetElement& node,
         ToXml(child, registry, xsdPrefixesUsed, xmlNode);
 }
 
-void XmlWriter::ToStream(const DataSetBase& dataset,
-                         std::ostream& out)
+void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
 {
     pugi::xml_document doc;
 
@@ -128,20 +116,17 @@ void XmlWriter::ToStream(const DataSetBase& dataset,
 
     // create top-level dataset XML node
     const auto label = internal::OutputName(dataset, registry);
-    if (label.empty())
-        throw std::runtime_error("could not convert dataset node to XML");
+    if (label.empty()) throw std::runtime_error("could not convert dataset node to XML");
     auto root = doc.append_child(label.c_str());
 
     const auto& text = dataset.Text();
-    if (!text.empty())
-        root.text().set(text.c_str());
+    if (!text.empty()) root.text().set(text.c_str());
 
     // add top-level attributes
     for (const auto& attribute : dataset.Attributes()) {
         const auto& name = attribute.first;
         const auto& value = attribute.second;
-        if (name.empty())
-            continue;
+        if (name.empty()) continue;
         auto attr = root.append_attribute(name.c_str());
         attr.set_value(value.c_str());
     }
@@ -155,7 +140,7 @@ void XmlWriter::ToStream(const DataSetBase& dataset,
 
     // write XML to stream
     auto decl = doc.prepend_child(pugi::node_declaration);
-    decl.append_attribute("version")  = "1.0";
+    decl.append_attribute("version") = "1.0";
     decl.append_attribute("encoding") = "utf-8";
 
     // add XSD namespace attributes
@@ -179,8 +164,7 @@ void XmlWriter::ToStream(const DataSetBase& dataset,
     for (const auto prefixIter : xsdPrefixesUsed) {
         const auto& xsdType = prefixIter.first;
         const auto& prefix = prefixIter.second;
-        if (xsdType == XsdType::NONE || prefix.empty())
-            continue;
+        if (xsdType == XsdType::NONE || prefix.empty()) continue;
 
         const auto& nsInfo = registry.Namespace(xsdType);
         assert(nsInfo.Name() == prefix);
@@ -197,10 +181,11 @@ void XmlWriter::ToStream(const DataSetBase& dataset,
     doc.save(out, "\t", pugi::format_default | pugi::format_no_escapes, pugi::encoding_utf8);
 }
 
-void XmlWriter::ToStream(const std::unique_ptr<DataSetBase>& dataset,
-                         std::ostream& out)
-{ ToStream(*dataset.get(), out); }
+void XmlWriter::ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostream& out)
+{
+    ToStream(*dataset.get(), out);
+}
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio

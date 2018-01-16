@@ -50,30 +50,29 @@ using namespace std;
 
 namespace DataSetCoreTests {
 
-static inline
-DataSet CreateDataSet()
+static inline DataSet CreateDataSet()
 {
     DataSet d;
     d.Name("foo");
     return d;
 }
 
-} // namespace DataSetCoreTests
+}  // namespace DataSetCoreTests
 
 TEST(DataSetCoreTest, XmlNameParts)
 {
     internal::XmlName name("ns:node_name");
-    EXPECT_EQ(boost::string_ref("ns"),           name.Prefix());
-    EXPECT_EQ(boost::string_ref("node_name"),    name.LocalName());
+    EXPECT_EQ(boost::string_ref("ns"), name.Prefix());
+    EXPECT_EQ(boost::string_ref("node_name"), name.LocalName());
     EXPECT_EQ(boost::string_ref("ns:node_name"), name.QualifiedName());
 
     internal::XmlName bareName("node_name");
-    EXPECT_EQ(boost::string_ref(""),          bareName.Prefix());
+    EXPECT_EQ(boost::string_ref(""), bareName.Prefix());
     EXPECT_EQ(boost::string_ref("node_name"), bareName.LocalName());
     EXPECT_EQ(boost::string_ref("node_name"), bareName.QualifiedName());
 
     internal::XmlName leadingColon(":node_name");
-    EXPECT_EQ(boost::string_ref(""),           leadingColon.Prefix());
+    EXPECT_EQ(boost::string_ref(""), leadingColon.Prefix());
     EXPECT_EQ(boost::string_ref(":node_name"), leadingColon.LocalName());
     EXPECT_EQ(boost::string_ref(":node_name"), leadingColon.QualifiedName());
 }
@@ -118,7 +117,8 @@ TEST(DataSetCoreTest, TimeStampedNamesOk)
     EXPECT_EQ(0, alignmentSet.TimeStampedName().find("pacbio_dataset_alignmentset-"));
     EXPECT_EQ(0, barcodeSet.TimeStampedName().find("pacbio_dataset_barcodeset-"));
     EXPECT_EQ(0, contigSet.TimeStampedName().find("pacbio_dataset_contigset-"));
-    EXPECT_EQ(0, consensusAlignmentSet.TimeStampedName().find("pacbio_dataset_consensusalignmentset-"));
+    EXPECT_EQ(
+        0, consensusAlignmentSet.TimeStampedName().find("pacbio_dataset_consensusalignmentset-"));
     EXPECT_EQ(0, consensusReadSet.TimeStampedName().find("pacbio_dataset_consensusreadset-"));
     EXPECT_EQ(0, hdfSubreadSet.TimeStampedName().find("pacbio_dataset_hdfsubreadset-"));
     EXPECT_EQ(0, referenceSet.TimeStampedName().find("pacbio_dataset_referenceset-"));
@@ -139,16 +139,16 @@ TEST(DataSetCoreTest, BasicGettersSettersOk)
     dataset.UniqueId("uuid");
     dataset.Version("0.0.0");
 
-    EXPECT_EQ(string("now"),          dataset.CreatedAt());
-    EXPECT_EQ(string("format"),       dataset.Format());
-    EXPECT_EQ(string("meta"),         dataset.MetaType());
-    EXPECT_EQ(string("later"),        dataset.ModifiedAt());
-    EXPECT_EQ(string("foo"),          dataset.Name());
+    EXPECT_EQ(string("now"), dataset.CreatedAt());
+    EXPECT_EQ(string("format"), dataset.Format());
+    EXPECT_EQ(string("meta"), dataset.MetaType());
+    EXPECT_EQ(string("later"), dataset.ModifiedAt());
+    EXPECT_EQ(string("foo"), dataset.Name());
     EXPECT_EQ(string("path/to/file"), dataset.ResourceId());
-    EXPECT_EQ(string("tag tag"),      dataset.Tags());
-    EXPECT_EQ(string("now:30"),       dataset.TimeStampedName());
-    EXPECT_EQ(string("uuid"),         dataset.UniqueId());
-    EXPECT_EQ(string("0.0.0"),        dataset.Version());
+    EXPECT_EQ(string("tag tag"), dataset.Tags());
+    EXPECT_EQ(string("now:30"), dataset.TimeStampedName());
+    EXPECT_EQ(string("uuid"), dataset.UniqueId());
+    EXPECT_EQ(string("0.0.0"), dataset.Version());
 }
 
 TEST(DataSetCoreTest, CopyOk)
@@ -171,7 +171,7 @@ TEST(DataSetCoreTest, MoveOk)
     DataSet d1;
     d1.Name("foo");
 
-    // move ctor
+// move ctor
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpessimizing-move"
@@ -191,7 +191,7 @@ TEST(DataSetCoreTest, MoveOk)
     d3 = std::move(DataSetCoreTests::CreateDataSet());
 #ifdef __clang__
 #pragma clang diagnostic pop
-#endif 
+#endif
     EXPECT_EQ(string("foo"), d3.Name());
 }
 
@@ -210,7 +210,7 @@ TEST(DataSetCoreTest, AddExternalResources)
     dataset.ExternalResources().Add(resource2);
     EXPECT_EQ(2, dataset.ExternalResources().Size());
 
-     // disallow duplicates (checking on ResourceId)
+    // disallow duplicates (checking on ResourceId)
     ExternalResource duplicateResource("metatype", "id");
     dataset.ExternalResources().Add(duplicateResource);
     EXPECT_EQ(2, dataset.ExternalResources().Size());
@@ -246,20 +246,20 @@ TEST(DataSetCoreTest, EditExternalResources)
     // edit
     dataset.ExternalResources()[0].Name("some new name");
     EXPECT_EQ(string("some new name"), dataset.ExternalResources()[0].Name());
-    EXPECT_EQ(string("file2"),         dataset.ExternalResources()[1].Name());
+    EXPECT_EQ(string("file2"), dataset.ExternalResources()[1].Name());
 }
 
 TEST(DataSetCoreTest, NestedExternalResources)
 {
     ExternalResource resource("metatype", "filename");
-    resource.ExternalResources().Add(ExternalResource("metatype.child",  "filename.child"));
+    resource.ExternalResources().Add(ExternalResource("metatype.child", "filename.child"));
     resource.ExternalResources().Add(ExternalResource("metatype.child2", "filename.child2"));
 
     const ExternalResources& childResources = resource.ExternalResources();
     EXPECT_EQ(2, childResources.Size());
-    EXPECT_EQ(string("metatype.child"),  childResources[0].MetaType());
+    EXPECT_EQ(string("metatype.child"), childResources[0].MetaType());
     EXPECT_EQ(string("metatype.child2"), childResources[1].MetaType());
-    EXPECT_EQ(string("filename.child"),  childResources[0].ResourceId());
+    EXPECT_EQ(string("filename.child"), childResources[0].ResourceId());
     EXPECT_EQ(string("filename.child2"), childResources[1].ResourceId());
 }
 
@@ -288,24 +288,24 @@ TEST(DataSetCoreTest, AddFilters)
 
     // direct access
     const Property& p0 = filters[0].Properties()[0];
-    EXPECT_EQ(string("rq"),   p0.Name());
+    EXPECT_EQ(string("rq"), p0.Name());
     EXPECT_EQ(string("0.85"), p0.Value());
-    EXPECT_EQ(string(">"),    p0.Operator());
+    EXPECT_EQ(string(">"), p0.Operator());
 
     const Property& p1 = filters[0].Properties()[1];
     EXPECT_EQ(string("RNAME"), p1.Name());
-    EXPECT_EQ(string("chr1"),  p1.Value());
-    EXPECT_EQ(string("=="),    p1.Operator());
+    EXPECT_EQ(string("chr1"), p1.Value());
+    EXPECT_EQ(string("=="), p1.Operator());
 
     const Property& p2 = filters[1].Properties()[0];
-    EXPECT_EQ(string("rq"),   p2.Name());
+    EXPECT_EQ(string("rq"), p2.Name());
     EXPECT_EQ(string("0.50"), p2.Value());
-    EXPECT_EQ(string(">="),   p2.Operator());
+    EXPECT_EQ(string(">="), p2.Operator());
 
     const Property& p3 = filters[1].Properties()[1];
     EXPECT_EQ(string("RNAME"), p3.Name());
-    EXPECT_EQ(string("chr2"),  p3.Value());
-    EXPECT_EQ(string("!="),    p3.Operator());
+    EXPECT_EQ(string("chr2"), p3.Value());
+    EXPECT_EQ(string("!="), p3.Operator());
 
     // iteratable
     size_t i = 0;
@@ -315,13 +315,13 @@ TEST(DataSetCoreTest, AddFilters)
             const Properties& properties = f.Properties();
             for (const Property& p : properties) {
                 if (j == 0) {
-                    EXPECT_EQ(string("rq"),   p.Name());
+                    EXPECT_EQ(string("rq"), p.Name());
                     EXPECT_EQ(string("0.85"), p.Value());
-                    EXPECT_EQ(string(">"),    p.Operator());
+                    EXPECT_EQ(string(">"), p.Operator());
                 } else {
                     EXPECT_EQ(string("RNAME"), p.Name());
-                    EXPECT_EQ(string("chr1"),  p.Value());
-                    EXPECT_EQ(string("=="),    p.Operator());
+                    EXPECT_EQ(string("chr1"), p.Value());
+                    EXPECT_EQ(string("=="), p.Operator());
                 }
                 ++j;
             }
@@ -329,13 +329,13 @@ TEST(DataSetCoreTest, AddFilters)
             const Properties& properties = f.Properties();
             for (const Property& p : properties) {
                 if (j == 0) {
-                    EXPECT_EQ(string("rq"),   p.Name());
+                    EXPECT_EQ(string("rq"), p.Name());
                     EXPECT_EQ(string("0.50"), p.Value());
-                    EXPECT_EQ(string(">="),   p.Operator());
+                    EXPECT_EQ(string(">="), p.Operator());
                 } else {
                     EXPECT_EQ(string("RNAME"), p.Name());
-                    EXPECT_EQ(string("chr2"),  p.Value());
-                    EXPECT_EQ(string("!="),    p.Operator());
+                    EXPECT_EQ(string("chr2"), p.Value());
+                    EXPECT_EQ(string("!="), p.Operator());
                 }
                 ++j;
             }
@@ -343,7 +343,6 @@ TEST(DataSetCoreTest, AddFilters)
         ++i;
         j = 0;
     }
-
 }
 
 TEST(DataSetCoreTest, EditFilters)
@@ -374,24 +373,24 @@ TEST(DataSetCoreTest, EditFilters)
     p.Operator("==");
 
     const Property& p0 = dataset.Filters()[0].Properties()[0];
-    EXPECT_EQ(string("someNewName"),  p0.Name());
+    EXPECT_EQ(string("someNewName"), p0.Name());
     EXPECT_EQ(string("someNewValue"), p0.Value());
-    EXPECT_EQ(string("=="),           p0.Operator());
+    EXPECT_EQ(string("=="), p0.Operator());
 
     const Property& p1 = dataset.Filters()[0].Properties()[1];
     EXPECT_EQ(string("RNAME"), p1.Name());
-    EXPECT_EQ(string("chr1"),  p1.Value());
-    EXPECT_EQ(string("=="),    p1.Operator());
+    EXPECT_EQ(string("chr1"), p1.Value());
+    EXPECT_EQ(string("=="), p1.Operator());
 
     const Property& p2 = dataset.Filters()[1].Properties()[0];
-    EXPECT_EQ(string("rq"),   p2.Name());
+    EXPECT_EQ(string("rq"), p2.Name());
     EXPECT_EQ(string("0.50"), p2.Value());
-    EXPECT_EQ(string(">="),   p2.Operator());
+    EXPECT_EQ(string(">="), p2.Operator());
 
     const Property& p3 = dataset.Filters()[1].Properties()[1];
     EXPECT_EQ(string("RNAME"), p3.Name());
-    EXPECT_EQ(string("chr2"),  p3.Value());
-    EXPECT_EQ(string("!="),    p3.Operator());
+    EXPECT_EQ(string("chr2"), p3.Value());
+    EXPECT_EQ(string("!="), p3.Operator());
 }
 
 TEST(DataSetCoreTest, AddSubDataSets)

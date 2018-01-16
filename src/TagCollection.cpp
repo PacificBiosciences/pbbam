@@ -46,10 +46,7 @@
 namespace PacBio {
 namespace BAM {
 
-bool TagCollection::Contains(const std::string& name) const
-{
-    return count(name) != 0;
-}
+bool TagCollection::Contains(const std::string& name) const { return count(name) != 0; }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

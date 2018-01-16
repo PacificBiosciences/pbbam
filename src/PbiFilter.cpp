@@ -42,24 +42,28 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/PbiFilter.h"
-#include "pbbam/PbiFilterTypes.h"
-#include "StringUtils.h"
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/numeric/conversion/cast.hpp>
-#include <cstdint>
+
 #include <algorithm>
+#include <cctype>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <unordered_map>
-#include <cctype>
+
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/numeric/conversion/cast.hpp>
+
+#include "StringUtils.h"
+#include "pbbam/PbiFilterTypes.h"
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
+// clang-format off
 enum class BuiltIn
 {
     AlignedEndFilter
@@ -140,6 +144,7 @@ static const std::unordered_map<std::string, LocalContextFlags> contextFlagNames
     { "FORWARD_PASS",     LocalContextFlags::FORWARD_PASS },
     { "REVERSE_PASS",     LocalContextFlags::REVERSE_PASS }
 };
+// clang-format off
 
 // helper methods (for handling maybe-list strings))
 static inline bool isBracketed(const std::string& value)
@@ -147,47 +152,36 @@ static inline bool isBracketed(const std::string& value)
     static const std::string openBrackets = "[({";
     static const std::string closeBrackets = "])}";
     return openBrackets.find(value.at(0)) != std::string::npos &&
-           closeBrackets.find(value.at(value.length()-1)) != std::string::npos;
+           closeBrackets.find(value.at(value.length() - 1)) != std::string::npos;
 }
 
-static inline bool isList(const std::string& value)
-{
-    return value.find(',') != std::string::npos;
-}
+static inline bool isList(const std::string& value) { return value.find(',') != std::string::npos; }
 
-static
-PbiFilter CreateBarcodeFilter(std::string value,
-                              const Compare::Type compareType)
+static PbiFilter CreateBarcodeFilter(std::string value, const Compare::Type compareType)
 {
-    if (value.empty())
-        throw std::runtime_error("empty value for barcode filter property");
+    if (value.empty()) throw std::runtime_error("empty value for barcode filter property");
 
     if (isBracketed(value)) {
-        value.erase(0,1);
+        value.erase(0, 1);
         value.pop_back();
     }
 
     if (isList(value)) {
         std::vector<std::string> barcodes = internal::Split(value, ',');
-        if (barcodes.size() != 2)
-            throw std::runtime_error("only 2 barcode values expected");
-        return PbiBarcodesFilter{ boost::numeric_cast<int16_t>(std::stoi(barcodes.at(0))),
-                                  boost::numeric_cast<int16_t>(std::stoi(barcodes.at(1))),
-                                  compareType
-                                };
+        if (barcodes.size() != 2) throw std::runtime_error("only 2 barcode values expected");
+        return PbiBarcodesFilter{boost::numeric_cast<int16_t>(std::stoi(barcodes.at(0))),
+                                 boost::numeric_cast<int16_t>(std::stoi(barcodes.at(1))),
+                                 compareType};
     } else
-        return PbiBarcodeFilter{ boost::numeric_cast<int16_t>(stoi(value)), compareType };
+        return PbiBarcodeFilter{boost::numeric_cast<int16_t>(stoi(value)), compareType};
 }
 
-static
-PbiFilter CreateBarcodeForwardFilter(std::string value,
-                                     const Compare::Type compareType)
+static PbiFilter CreateBarcodeForwardFilter(std::string value, const Compare::Type compareType)
 {
-    if (value.empty())
-        throw std::runtime_error("empty value for barcode_forward filter property");
+    if (value.empty()) throw std::runtime_error("empty value for barcode_forward filter property");
 
     if (isBracketed(value)) {
-        value.erase(0,1);
+        value.erase(0, 1);
         value.pop_back();
     }
 
@@ -195,22 +189,19 @@ PbiFilter CreateBarcodeForwardFilter(std::string value,
         std::vector<std::string> tokens = internal::Split(value, ',');
         std::vector<int16_t> barcodes;
         barcodes.reserve(tokens.size());
-        for (const auto& t : tokens) 
+        for (const auto& t : tokens)
             barcodes.push_back(boost::numeric_cast<int16_t>(stoi(t)));
-        return PbiBarcodeForwardFilter{ std::move(barcodes) };
+        return PbiBarcodeForwardFilter{std::move(barcodes)};
     } else
-        return PbiBarcodeForwardFilter{ boost::numeric_cast<int16_t>(std::stoi(value)), compareType };
+        return PbiBarcodeForwardFilter{boost::numeric_cast<int16_t>(std::stoi(value)), compareType};
 }
 
-static
-PbiFilter CreateBarcodeReverseFilter(std::string value,
-                                     const Compare::Type compareType)
+static PbiFilter CreateBarcodeReverseFilter(std::string value, const Compare::Type compareType)
 {
-    if (value.empty())
-        throw std::runtime_error("empty value for barcode_reverse filter property");
+    if (value.empty()) throw std::runtime_error("empty value for barcode_reverse filter property");
 
     if (isBracketed(value)) {
-        value.erase(0,1);
+        value.erase(0, 1);
         value.pop_back();
     }
 
@@ -220,39 +211,33 @@ PbiFilter CreateBarcodeReverseFilter(std::string value,
         barcodes.reserve(tokens.size());
         for (const auto& t : tokens)
             barcodes.push_back(boost::numeric_cast<int16_t>(std::stoi(t)));
-        return PbiBarcodeReverseFilter{ std::move(barcodes) };
+        return PbiBarcodeReverseFilter{std::move(barcodes)};
     } else
-        return PbiBarcodeReverseFilter{ boost::numeric_cast<int16_t>(stoi(value)), compareType };
+        return PbiBarcodeReverseFilter{boost::numeric_cast<int16_t>(stoi(value)), compareType};
 }
 
-static
-PbiFilter CreateLocalContextFilter(const std::string& value,
-                                   const Compare::Type compareType)
+static PbiFilter CreateLocalContextFilter(const std::string& value, const Compare::Type compareType)
 {
-    if (value.empty())
-        throw std::runtime_error("empty value for local context filter property");
+    if (value.empty()) throw std::runtime_error("empty value for local context filter property");
 
     LocalContextFlags filterValue = LocalContextFlags::NO_LOCAL_CONTEXT;
 
     // if raw integer
-    if (isdigit(value.at(0)))
-        filterValue = static_cast<LocalContextFlags>(stoi(value));
+    if (isdigit(value.at(0))) filterValue = static_cast<LocalContextFlags>(stoi(value));
 
     // else interpret as flag names
     else {
         std::vector<std::string> tokens = internal::Split(value, '|');
         for (std::string& token : tokens) {
-            boost::algorithm::trim(token); // trim whitespace
+            boost::algorithm::trim(token);  // trim whitespace
             filterValue = (filterValue | contextFlagNames.at(token));
         }
     }
 
-    return PbiFilter{ PbiLocalContextFilter{filterValue, compareType} };
+    return PbiFilter{PbiLocalContextFilter{filterValue, compareType}};
 }
 
-static
-PbiFilter CreateQueryNamesFilterFromFile(const std::string& value,
-                                         const DataSet& dataset)
+static PbiFilter CreateQueryNamesFilterFromFile(const std::string& value, const DataSet& dataset)
 {
     // resolve file from dataset, value
     const std::string resolvedFilename = dataset.ResolvePath(value);
@@ -261,19 +246,16 @@ PbiFilter CreateQueryNamesFilterFromFile(const std::string& value,
     std::ifstream in(resolvedFilename);
     while (std::getline(in, fn))
         whitelist.push_back(fn);
-    return PbiQueryNameFilter{ whitelist };
+    return PbiQueryNameFilter{whitelist};
 }
 
-static
-PbiFilter CreateZmwFilter(std::string value,
-                          const Compare::Type compareType)
+static PbiFilter CreateZmwFilter(std::string value, const Compare::Type compareType)
 {
 
-    if (value.empty())
-        throw std::runtime_error("empty value for ZMW filter property");
+    if (value.empty()) throw std::runtime_error("empty value for ZMW filter property");
 
     if (isBracketed(value)) {
-        value.erase(0,1);
+        value.erase(0, 1);
         value.pop_back();
     }
 
@@ -283,19 +265,20 @@ PbiFilter CreateZmwFilter(std::string value,
         zmws.reserve(tokens.size());
         for (const auto& t : tokens)
             zmws.push_back(boost::numeric_cast<int32_t>(stoi(t)));
-        return PbiZmwFilter{ std::move(zmws) };
+        return PbiZmwFilter{std::move(zmws)};
     } else
-        return PbiZmwFilter{ boost::numeric_cast<int32_t>(stoi(value)), compareType };
+        return PbiZmwFilter{boost::numeric_cast<int32_t>(stoi(value)), compareType};
 }
 
-static
-PbiFilter FromDataSetProperty(const Property& property,
-                              const DataSet& dataset)
+static PbiFilter FromDataSetProperty(const Property& property, const DataSet& dataset)
 {
     try {
         const std::string& value = property.Value();
         const Compare::Type compareType = Compare::TypeFromOperator(property.Operator());
-        const BuiltIn builtInCode = builtInLookup.at(boost::algorithm::to_lower_copy(property.Name()));
+        const BuiltIn builtInCode =
+            builtInLookup.at(boost::algorithm::to_lower_copy(property.Name()));
+
+        // clang-format off
         switch (builtInCode) {
 
             // single-value filters
@@ -319,7 +302,7 @@ PbiFilter FromDataSetProperty(const Property& property,
             // (maybe) list-value filters
             case BuiltIn::BarcodeFilter        : return CreateBarcodeFilter(value, compareType);
             case BuiltIn::BarcodeForwardFilter : return CreateBarcodeForwardFilter(value, compareType);
-            case BuiltIn::BarcodeReverseFilter : return CreateBarcodeReverseFilter(value, compareType); 
+            case BuiltIn::BarcodeReverseFilter : return CreateBarcodeReverseFilter(value, compareType);
             case BuiltIn::LocalContextFilter   : return CreateLocalContextFilter(value, compareType);
             case BuiltIn::ZmwFilter            : return CreateZmwFilter(value, compareType);
 
@@ -329,27 +312,29 @@ PbiFilter FromDataSetProperty(const Property& property,
             default :
                 throw std::exception();
         }
+        // clang-format on
+
         // unreachable
-        return PbiFilter{ };
+        return PbiFilter{};
 
     } catch (std::exception& e) {
         std::stringstream s;
         s << "error: could not create filter from XML Property element: " << std::endl
-          << "  Name:     " << property.Name()     << std::endl
-          << "  Value:    " << property.Value()    << std::endl
+          << "  Name:     " << property.Name() << std::endl
+          << "  Value:    " << property.Value() << std::endl
           << "  Operator: " << property.Operator() << std::endl
           << "  reason:   " << e.what() << std::endl;
         throw std::runtime_error(s.str());
     }
 }
 
-} // namespace internal
+}  // namespace internal
 
 PbiFilter PbiFilter::FromDataSet(const DataSet& dataset)
 {
-    auto datasetFilter = PbiFilter{ PbiFilter::UNION };
+    auto datasetFilter = PbiFilter{PbiFilter::UNION};
     for (auto&& xmlFilter : dataset.Filters()) {
-        auto propertiesFilter = PbiFilter{ };
+        auto propertiesFilter = PbiFilter{};
         for (auto&& xmlProperty : xmlFilter.Properties())
             propertiesFilter.Add(internal::FromDataSetProperty(xmlProperty, dataset));
         datasetFilter.Add(propertiesFilter);
@@ -359,31 +344,31 @@ PbiFilter PbiFilter::FromDataSet(const DataSet& dataset)
 
 PbiFilter PbiFilter::Intersection(const std::vector<PbiFilter>& filters)
 {
-    auto result = PbiFilter{ PbiFilter::INTERSECT };
+    auto result = PbiFilter{PbiFilter::INTERSECT};
     result.Add(filters);
     return result;
 }
 
 PbiFilter PbiFilter::Intersection(std::vector<PbiFilter>&& filters)
 {
-    auto result = PbiFilter{ PbiFilter::INTERSECT };
+    auto result = PbiFilter{PbiFilter::INTERSECT};
     result.Add(std::move(filters));
     return result;
 }
 
 PbiFilter PbiFilter::Union(const std::vector<PbiFilter>& filters)
 {
-    auto result = PbiFilter{ PbiFilter::UNION };
+    auto result = PbiFilter{PbiFilter::UNION};
     result.Add(filters);
     return result;
 }
 
 PbiFilter PbiFilter::Union(std::vector<PbiFilter>&& filters)
 {
-    auto result = PbiFilter{ PbiFilter::UNION };
+    auto result = PbiFilter{PbiFilter::UNION};
     result.Add(std::move(filters));
     return result;
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

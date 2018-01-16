@@ -42,17 +42,19 @@
 #ifndef PBIINDEX_H
 #define PBIINDEX_H
 
-#include "pbbam/Config.h"
-#include "pbbam/PbiFile.h"
-#include "pbbam/PbiLookupData.h"
 #include <cstdint>
 #include <memory>
 #include <string>
+#include "pbbam/Config.h"
+#include "pbbam/PbiFile.h"
+#include "pbbam/PbiLookupData.h"
 
 namespace PacBio {
 namespace BAM {
 
-namespace internal { class PbiIndexPrivate; }
+namespace internal {
+class PbiIndexPrivate;
+}
 
 /// \brief The PbiIndex class provides an representation of PBI index data that
 ///        is rearranged for quick lookups.
@@ -155,9 +157,9 @@ private:
     std::unique_ptr<internal::PbiIndexPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "internal/PbiIndex.inl"
 
-#endif // PBIINDEX_H
+#endif  // PBIINDEX_H

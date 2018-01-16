@@ -65,8 +65,9 @@ namespace internal {
 class ValidationErrors
 {
 public:
-    typedef std::vector<std::string>         ErrorList;
+    typedef std::vector<std::string> ErrorList;
     typedef std::map<std::string, ErrorList> ErrorMap;
+
 public:
     static const size_t MAX = std::numeric_limits<size_t>::max();
 
@@ -83,16 +84,11 @@ public:
     void AddRecordError(const std::string& name, const std::string& details);
     void AddRecordError(const std::string& name, std::string&& details);
 
-    void AddTagLengthError(const std::string& name,
-                           const std::string& tagLabel,
-                           const std::string& tagName,
-                           const size_t observed,
+    void AddTagLengthError(const std::string& name, const std::string& tagLabel,
+                           const std::string& tagName, const size_t observed,
                            const size_t expected);
-    void AddTagLengthError(const std::string& name,
-                           std::string&& tagLabel,
-                           std::string&& tagName,
-                           const size_t observed,
-                           const size_t expected);
+    void AddTagLengthError(const std::string& name, std::string&& tagLabel, std::string&& tagName,
+                           const size_t observed, const size_t expected);
 
 public:
     bool IsEmpty() const;
@@ -109,8 +105,8 @@ private:
     void OnErrorAdded();
 };
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // VALIDATIONERRORS_H
+#endif  // VALIDATIONERRORS_H

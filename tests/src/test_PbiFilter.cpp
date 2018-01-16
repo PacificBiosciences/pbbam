@@ -35,11 +35,11 @@
 
 // Author: Derek Barnett
 
-#include <string>
-#include <cstdio>
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
+#include <cstdio>
 #include <cstdlib>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -48,6 +48,8 @@
 #include "PbbamTestData.h"
 
 #include <pbbam/PbiFilter.h>
+
+// clang-format off
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -1357,3 +1359,5 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
         EXPECT_THROW(PbiFilter::FromDataSet(dataset), std::runtime_error);
     }
 }
+
+// clang-format on

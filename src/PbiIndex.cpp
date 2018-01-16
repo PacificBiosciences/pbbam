@@ -41,12 +41,13 @@
 
 #include "PbbamInternalConfig.h"
 
+#include "pbbam/PbiIndex.h"
+
 #include <cstddef>
 #include <cstdint>
 
-#include "pbbam/PbiIndex.h"
-#include "pbbam/MakeUnique.h"
 #include "PbiIndexIO.h"
+#include "pbbam/MakeUnique.h"
 
 namespace PacBio {
 namespace BAM {
@@ -63,12 +64,12 @@ BasicLookupData::BasicLookupData(const PbiRawBasicData& rawData)
     , readQual_(rawData.readQual_)
     , ctxtFlag_(rawData.ctxtFlag_)
     , fileOffset_(rawData.fileOffset_)
-{ }
+{
+}
 
 // ----------------------------------
 // MappedLookupData implementation
 // ----------------------------------
-
 
 MappedLookupData::MappedLookupData(const PbiRawMappedData& rawData)
     : tId_(rawData.tId_)
@@ -81,8 +82,8 @@ MappedLookupData::MappedLookupData(const PbiRawMappedData& rawData)
     , mapQV_(rawData.mapQV_)
 {
     const size_t numElements = rawData.revStrand_.size();
-    reverseStrand_.reserve(numElements/2);
-    forwardStrand_.reserve(numElements/2);
+    reverseStrand_.reserve(numElements / 2);
+    forwardStrand_.reserve(numElements / 2);
 
     std::map<uint32_t, IndexList> insRawData;
     std::map<uint32_t, IndexList> delRawData;
@@ -109,11 +110,10 @@ MappedLookupData::MappedLookupData(const PbiRawMappedData& rawData)
 // ----------------------------------
 
 BarcodeLookupData::BarcodeLookupData(const PbiRawBarcodeData& rawData)
-    : bcForward_(rawData.bcForward_)
-    , bcReverse_(rawData.bcReverse_)
-    , bcQual_(rawData.bcQual_)
+    : bcForward_(rawData.bcForward_), bcReverse_(rawData.bcReverse_), bcQual_(rawData.bcQual_)
 
-{  }
+{
+}
 
 // ----------------------------------
 // ReferenceLookupData implementation
@@ -144,7 +144,8 @@ PbiIndexPrivate::PbiIndexPrivate(const PbiRawData& rawIndex)
     , mappedData_(rawIndex.MappedData())
     , referenceData_(rawIndex.ReferenceData())
     , barcodeData_(rawIndex.BarcodeData())
-{ }
+{
+}
 
 PbiIndexPrivate::PbiIndexPrivate(PbiRawData&& rawIndex)
     : filename_(rawIndex.Filename())
@@ -155,35 +156,35 @@ PbiIndexPrivate::PbiIndexPrivate(PbiRawData&& rawIndex)
     , mappedData_(std::move(rawIndex.MappedData()))
     , referenceData_(std::move(rawIndex.ReferenceData()))
     , barcodeData_(std::move(rawIndex.BarcodeData()))
-{ }
+{
+}
 
 std::unique_ptr<PbiIndexPrivate> PbiIndexPrivate::DeepCopy() const
 {
     auto copy = std::make_unique<PbiIndexPrivate>();
     copy->filename_ = filename_;
-    copy->version_  = version_;
+    copy->version_ = version_;
     copy->sections_ = sections_;
     copy->numReads_ = numReads_;
-    copy->basicData_     = basicData_;
-    copy->mappedData_    = mappedData_;
+    copy->basicData_ = basicData_;
+    copy->mappedData_ = mappedData_;
     copy->referenceData_ = referenceData_;
-    copy->barcodeData_   = barcodeData_;
+    copy->barcodeData_ = barcodeData_;
     return copy;
 }
 
-} // namespace internal
+}  // namespace internal
 
 // -------------------------
 // PbiIndex implementation
 // -------------------------
 
-PbiIndex::PbiIndex()
-    : d_(std::make_unique<internal::PbiIndexPrivate>())
-{ }
+PbiIndex::PbiIndex() : d_(std::make_unique<internal::PbiIndexPrivate>()) {}
 
 PbiIndex::PbiIndex(const std::string& pbiFilename)
     : d_(std::make_unique<internal::PbiIndexPrivate>(PbiRawData(pbiFilename)))
-{ }
+{
+}
 
 PbiIndex::PbiIndex(const PbiIndex& other)
     : d_(std::forward<std::unique_ptr<internal::PbiIndexPrivate>>(other.d_->DeepCopy()))
@@ -200,10 +201,9 @@ PbiIndex& PbiIndex::operator=(const PbiIndex& other)
     return *this;
 }
 
-PbiIndex::~PbiIndex() { }
+PbiIndex::~PbiIndex() {}
 
-std::string PbiIndex::Filename() const
-{ return d_->filename_; }
+std::string PbiIndex::Filename() const { return d_->filename_; }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

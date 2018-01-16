@@ -42,14 +42,14 @@
 #ifndef DATASET_H
 #define DATASET_H
 
-#include "pbbam/BamFile.h"
-#include "pbbam/Config.h"
-#include "pbbam/DataSetTypes.h"
 #include <chrono>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
+#include "pbbam/BamFile.h"
+#include "pbbam/Config.h"
+#include "pbbam/DataSetTypes.h"
 
 namespace PacBio {
 namespace BAM {
@@ -70,16 +70,17 @@ public:
 
     /// \brief This enum defines the currently-supported DataSet types.
     ///
-    enum TypeEnum {
-        GENERIC = 0
-      , ALIGNMENT
-      , BARCODE
-      , CONSENSUS_ALIGNMENT
-      , CONSENSUS_READ
-      , CONTIG
-      , HDF_SUBREAD
-      , REFERENCE
-      , SUBREAD
+    enum TypeEnum
+    {
+        GENERIC = 0,
+        ALIGNMENT,
+        BARCODE,
+        CONSENSUS_ALIGNMENT,
+        CONSENSUS_READ,
+        CONTIG,
+        HDF_SUBREAD,
+        REFERENCE,
+        SUBREAD
     };
 
     /// \brief Converts printable dataset type to type enum.
@@ -101,7 +102,6 @@ public:
     /// \}
 
 public:
-
     /// \name Constructors & Related Methods
     /// \{
 
@@ -202,7 +202,6 @@ public:
     /// \}
 
 public:
-
     /// \name Attributes
     /// \{
     ///
@@ -353,19 +352,19 @@ public:
 public:
     /// \name Resource Handling
     /// \{
- 
+
     /// \brief Returns all of this dataset's resource files, with relative
     ///        filepaths already resolved.
     ///
-    /// Includes both primary resources (e.g. subread BAM files), as well as all 
-    /// secondary or child resources (e.g. index files, scraps BAM, etc). 
+    /// Includes both primary resources (e.g. subread BAM files), as well as all
+    /// secondary or child resources (e.g. index files, scraps BAM, etc).
     ///
     /// \returns vector of (resolveD) filepaths
     ///
     /// \sa DataSet::ResolvedResourceIds
     ///
     std::vector<std::string> AllFiles() const;
- 
+
     /// \brief Returns this dataset's primary %BAM resources, with relative
     ///        filepaths already resolved.
     ///
@@ -548,7 +547,7 @@ public:
     ///          is a new attribute)
     ///
     std::string& Version();
-    
+
     /// \}
 
 public:
@@ -770,7 +769,7 @@ public:
     /// \returns reference to this dataset object
     ///
     DataSet& SubDataSets(const PacBio::BAM::SubDataSets& subdatasets);
-    
+
     /// \}
 
 public:
@@ -837,9 +836,9 @@ PBBAM_EXPORT std::string ToIso8601(const time_t& t);
 
 /// \}
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/DataSet.inl"
 
-#endif // DATASET_H
+#endif  // DATASET_H

@@ -42,8 +42,8 @@
 #ifndef VirtualZmwBAMRECORD_H
 #define VirtualZmwBAMRECORD_H
 
-#include <vector>
 #include <sstream>
+#include <vector>
 
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
@@ -71,8 +71,7 @@ public:
     ///
     /// \throws std::runtime_error on failure to stitch virtual record
     ///
-    VirtualZmwBamRecord(std::vector<BamRecord>&& unorderedSources,
-                        const BamHeader& header);
+    VirtualZmwBamRecord(std::vector<BamRecord>&& unorderedSources, const BamHeader& header);
 
     VirtualZmwBamRecord() = delete;
     VirtualZmwBamRecord(const VirtualZmwBamRecord&) = default;
@@ -116,7 +115,7 @@ private:
     void StitchSources();
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // VirtualZmwBAMRECORD_H
+#endif  // VirtualZmwBAMRECORD_H

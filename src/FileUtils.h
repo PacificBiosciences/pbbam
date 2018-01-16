@@ -48,7 +48,6 @@ namespace internal {
 struct FileUtils
 {
 public:
-
     /// \returns application's current working directory
     static std::string CurrentWorkingDirectory();
 
@@ -106,8 +105,7 @@ public:
     /// \param[in] from     optional starting directory (useful if not same as application's working directory)
     /// \returns resolved file path
     ///
-    static std::string ResolvedFilePath(const std::string& filePath,
-                                        const std::string& from = ".");
+    static std::string ResolvedFilePath(const std::string& filePath, const std::string& from = ".");
 
     /// \returns native path separator
     constexpr static char Separator();
@@ -129,17 +127,17 @@ public:
     static off_t Size(const std::string& fn);
 };
 
-inline bool FileUtils::Exists(const std::string& fn)
-{ return FileUtils::Exists(fn.c_str()); }
+inline bool FileUtils::Exists(const std::string& fn) { return FileUtils::Exists(fn.c_str()); }
 
 inline std::chrono::system_clock::time_point FileUtils::LastModified(const std::string& fn)
-{ return FileUtils::LastModified(fn.c_str()); }
+{
+    return FileUtils::LastModified(fn.c_str());
+}
 
-inline off_t FileUtils::Size(const std::string& fn)
-{ return FileUtils::Size(fn.c_str()); }
+inline off_t FileUtils::Size(const std::string& fn) { return FileUtils::Size(fn.c_str()); }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // FILEUTILS_H
+#endif  // FILEUTILS_H
