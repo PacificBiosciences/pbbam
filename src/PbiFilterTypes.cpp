@@ -48,6 +48,7 @@
 #include <cstdint>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 #include <boost/algorithm/string.hpp>
 

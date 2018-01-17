@@ -48,8 +48,8 @@
 #include <memory>
 #include <string>
 #include "pbbam/Compare.h"
+#include "pbbam/PbiFile.h"
 #include "pbbam/PbiFilter.h"
-#include "pbbam/PbiIndex.h"
 
 namespace PacBio {
 namespace BAM {
@@ -86,7 +86,7 @@ private:
 ///
 /// Dispatches the lookup to BarcodeLookupData
 ///
-template <typename T, BarcodeLookupData::Field field>
+template <typename T, PbiFile::BarcodeField field>
 struct BarcodeDataFilterBase : public FilterBase<T>
 {
 protected:
@@ -103,7 +103,7 @@ public:
 ///
 /// Dispatches the lookup to BasicLookupData
 ///
-template <typename T, BasicLookupData::Field field>
+template <typename T, PbiFile::BasicField field>
 struct BasicDataFilterBase : public FilterBase<T>
 {
 protected:
@@ -120,7 +120,7 @@ public:
 ///
 /// Dispatches the lookup to MappedLookupData
 ///
-template <typename T, MappedLookupData::Field field>
+template <typename T, PbiFile::MappedField field>
 struct MappedDataFilterBase : public FilterBase<T>
 {
 protected:
@@ -143,7 +143,7 @@ public:
 /// \sa BamRecord::AlignedEnd
 ///
 struct PbiAlignedEndFilter
-    : public internal::MappedDataFilterBase<uint32_t, MappedLookupData::A_END>
+    : public internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::A_END>
 {
 public:
     /// \brief Creates a filter on aligned end.
@@ -187,7 +187,7 @@ public:
 /// \sa BamRecord::AlignedStart
 ///
 struct PbiAlignedStartFilter
-    : public internal::MappedDataFilterBase<uint32_t, MappedLookupData::A_START>
+    : public internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::A_START>
 {
 public:
     /// \brief Creates a filter on aligned start.
@@ -206,7 +206,7 @@ public:
 /// \sa BamRecord::AlignedStrand
 ///
 struct PbiAlignedStrandFilter
-    : public internal::MappedDataFilterBase<Strand, MappedLookupData::STRAND>
+    : public internal::MappedDataFilterBase<Strand, PbiFile::MappedField::STRAND>
 {
 public:
     /// \brief Creates a strand filter.
@@ -275,7 +275,7 @@ private:
 /// \sa BamRecord::BarcodeForward
 ///
 struct PbiBarcodeForwardFilter
-    : public internal::BarcodeDataFilterBase<int16_t, BarcodeLookupData::BC_FORWARD>
+    : public internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_FORWARD>
 {
 public:
     /// \brief Creates a single-value forward barcode filter.
@@ -314,7 +314,7 @@ public:
 /// \sa BamRecord::BarcodeQuality
 ///
 struct PbiBarcodeQualityFilter
-    : public internal::BarcodeDataFilterBase<uint8_t, BarcodeLookupData::BC_QUALITY>
+    : public internal::BarcodeDataFilterBase<uint8_t, PbiFile::BarcodeField::BC_QUALITY>
 {
 public:
     /// \brief Creates a single-value barcode quality filter.
@@ -333,7 +333,7 @@ public:
 /// \sa BamRecord::BarcodeReverse
 ///
 struct PbiBarcodeReverseFilter
-    : public internal::BarcodeDataFilterBase<int16_t, BarcodeLookupData::BC_REVERSE>
+    : public internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_REVERSE>
 {
 public:
     /// \brief Creates a single-value reverse barcode filter.
@@ -442,7 +442,7 @@ public:
 /// Example: \include code/PbiLocalContextFilter.txt
 ///
 struct PbiLocalContextFilter
-    : public internal::BasicDataFilterBase<LocalContextFlags, BasicLookupData::CONTEXT_FLAG>
+    : public internal::BasicDataFilterBase<LocalContextFlags, PbiFile::BasicField::CONTEXT_FLAG>
 {
 public:
     PbiLocalContextFilter(const LocalContextFlags& flags, const Compare::Type cmp = Compare::EQUAL);
@@ -456,7 +456,7 @@ public:
 /// \sa BamRecord::MapQuality
 ///
 struct PbiMapQualityFilter
-    : public internal::MappedDataFilterBase<uint8_t, MappedLookupData::MAP_QUALITY>
+    : public internal::MappedDataFilterBase<uint8_t, PbiFile::MappedField::MAP_QUALITY>
 {
 public:
     /// \brief Creates a map quality filter.
@@ -525,7 +525,7 @@ private:
 /// \sa BamRecord::NumDeletedBases
 ///
 struct PbiNumDeletedBasesFilter
-    : public internal::MappedDataFilterBase<size_t, MappedLookupData::N_DEL>
+    : public internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_DEL>
 {
 public:
     /// \brief Creates a filter on the number of deleted bases.
@@ -544,7 +544,7 @@ public:
 /// \sa BamRecord::NumInsertedBases
 ///
 struct PbiNumInsertedBasesFilter
-    : public internal::MappedDataFilterBase<size_t, MappedLookupData::N_INS>
+    : public internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_INS>
 {
 public:
     /// \brief Creates a filter on the number of inserted bases.
@@ -562,7 +562,8 @@ public:
 ///
 /// \sa BamRecord::NumMatches
 ///
-struct PbiNumMatchesFilter : public internal::MappedDataFilterBase<size_t, MappedLookupData::N_M>
+struct PbiNumMatchesFilter
+    : public internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_M>
 {
 public:
     /// \brief Creates a filter on the number of matched bases.
@@ -581,7 +582,7 @@ public:
 /// \sa BamRecord::NumMismatches
 ///
 struct PbiNumMismatchesFilter
-    : public internal::MappedDataFilterBase<size_t, MappedLookupData::N_MM>
+    : public internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_MM>
 {
 public:
     /// \brief Creates a filter on the number of mismatched bases.
@@ -600,7 +601,7 @@ public:
 ///
 /// \sa BamRecord::QueryEnd
 ///
-struct PbiQueryEndFilter : public internal::BasicDataFilterBase<int32_t, BasicLookupData::Q_END>
+struct PbiQueryEndFilter : public internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::Q_END>
 {
 public:
     /// \brief Creates a filter on query end position.
@@ -689,7 +690,8 @@ private:
 ///
 /// \sa BamRecord::QueryStart
 ///
-struct PbiQueryStartFilter : public internal::BasicDataFilterBase<int32_t, BasicLookupData::Q_START>
+struct PbiQueryStartFilter
+    : public internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::Q_START>
 {
 public:
     /// \brief Creates a filter on query start position.
@@ -708,7 +710,7 @@ public:
 /// \sa BamRecord::ReadAccuracy
 ///
 struct PbiReadAccuracyFilter
-    : public internal::BasicDataFilterBase<Accuracy, BasicLookupData::READ_QUALITY>
+    : public internal::BasicDataFilterBase<Accuracy, PbiFile::BasicField::READ_QUALITY>
 {
 public:
     /// \brief Creates a filter on read accuracy.
@@ -728,7 +730,8 @@ public:
 ///     BamRecord::ReadGroupId,
 ///     BamRecord::ReadGroupNumericId
 ///
-struct PbiReadGroupFilter : public internal::BasicDataFilterBase<int32_t, BasicLookupData::RG_ID>
+struct PbiReadGroupFilter
+    : public internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::RG_ID>
 {
 public:
     /// \brief Creates a filter on read group (numeric) ID value
@@ -827,7 +830,7 @@ public:
 /// \sa BamRecord::ReferenceEnd
 ///
 struct PbiReferenceEndFilter
-    : public internal::MappedDataFilterBase<uint32_t, MappedLookupData::T_END>
+    : public internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::T_END>
 {
 public:
     /// \brief Creates a filter on reference end.
@@ -845,7 +848,8 @@ public:
 ///
 /// \sa BamRecord::ReferenceId
 ///
-struct PbiReferenceIdFilter : public internal::MappedDataFilterBase<int32_t, MappedLookupData::T_ID>
+struct PbiReferenceIdFilter
+    : public internal::MappedDataFilterBase<int32_t, PbiFile::MappedField::T_ID>
 {
 public:
     /// \brief Creates a single-value reference ID filter.
@@ -941,7 +945,7 @@ private:
 /// \sa BamRecord::ReferenceStart
 ///
 struct PbiReferenceStartFilter
-    : public internal::MappedDataFilterBase<uint32_t, MappedLookupData::T_START>
+    : public internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::T_START>
 {
 public:
     /// \brief Creates a filter on reference start.
@@ -959,7 +963,7 @@ public:
 ///
 /// \sa BamRecord::HoleNumber
 ///
-struct PbiZmwFilter : public internal::BasicDataFilterBase<int32_t, BasicLookupData::ZMW>
+struct PbiZmwFilter : public internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::ZMW>
 {
 public:
     /// \brief Creates a single-value ZMW hole number filter.

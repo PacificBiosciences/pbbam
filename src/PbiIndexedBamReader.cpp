@@ -92,11 +92,29 @@ public:
                     ++numMatchingReads_;
                 }
             }
-            blocks_ = mergedIndexBlocks(std::move(indices));
+            blocks_ = MergedIndexBlocks(std::move(indices));
         }
 
         // apply offsets
         ApplyOffsets();
+    }
+
+    IndexResultBlocks MergedIndexBlocks(IndexList indices) const
+    {
+        if (indices.empty()) return IndexResultBlocks{};
+
+        std::sort(indices.begin(), indices.end());
+        auto newEndIter = std::unique(indices.begin(), indices.end());
+        auto numIndices = std::distance(indices.begin(), newEndIter);
+        assert(!indices.empty());
+        auto result = IndexResultBlocks{IndexResultBlock(indices.at(0), 1)};
+        for (auto i = 1; i < numIndices; ++i) {
+            if (indices.at(i) == indices.at(i - 1) + 1)
+                ++result.back().numReads_;
+            else
+                result.emplace_back(indices.at(i), 1);
+        }
+        return result;
     }
 
     int ReadRawData(BGZF* bgzf, bam1_t* b)

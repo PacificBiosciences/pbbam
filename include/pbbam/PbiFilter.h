@@ -49,7 +49,6 @@
 #include <tuple>
 #include "pbbam/DataSet.h"
 #include "pbbam/PbiBasicTypes.h"
-#include "pbbam/PbiIndex.h"
 #include "pbbam/PbiRawData.h"
 #include "pbbam/Unused.h"
 

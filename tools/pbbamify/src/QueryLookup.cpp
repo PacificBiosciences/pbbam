@@ -38,7 +38,6 @@
 #include "QueryLookup.h"
 
 #include <pbbam/PbiRawData.h>
-#include <pbbam/PbiLookupData.h>
 #include <ostream>
 #include <string>
 #include <iostream>
