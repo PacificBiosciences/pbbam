@@ -100,6 +100,13 @@ if [ ${BUILD_NUMBER} != 0  ]; then
     NEXUS_REPO=maven-releases
   else
     NEXUS_REPO=maven-snapshots
+    rm -rf /mnt/software/p/pbbam/snapshot/lib
+    rm -rf /mnt/software/p/pbbam/snapshot/bin
+    rm -rf /mnt/software/p/pbbam/snapshot/include
+    rsync -av lib/libpbbam.so /mnt/software/p/pbbam/snapshot/lib/
+    rsync -av include/pbbam /mnt/software/p/pbbam/snapshot/include/
+    rsync -av --exclude bgzip --exclude htsfile --exclude tabix \
+        bin/ /mnt/software/p/pbbam/snapshot/bin/
   fi
   # gradle or maven could do this...
   md5sum $f | awk -e '{print $1}' >| ${f}.md5
@@ -111,4 +118,3 @@ if [ ${BUILD_NUMBER} != 0  ]; then
     curl -fv -n --upload-file $f${ext} ${NEXUS_URL}
   done
 fi
-
