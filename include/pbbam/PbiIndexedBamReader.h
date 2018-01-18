@@ -47,7 +47,6 @@
 #include "pbbam/BamReader.h"
 #include "pbbam/PbiBasicTypes.h"
 #include "pbbam/PbiFilter.h"
-#include "pbbam/PbiIndex.h"
 
 namespace PacBio {
 namespace BAM {

@@ -338,11 +338,6 @@ public:
     /// \}
 };
 
-/// \deprecated For legacy-code support only, and will be removed soon.
-///             Use PbiRawBasicData instead.
-///
-using PbiRawSubreadData = PbiRawBasicData;
-
 /// \brief The PbiRawData class provides an representation of raw PBI index
 ///        data, used mostly for construction or I/O.
 ///

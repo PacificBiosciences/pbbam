@@ -50,9 +50,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/PbiFilter.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiFilterQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiFilterTypes.h
-    ${PacBioBAM_IncludeDir}/pbbam/PbiIndex.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiIndexedBamReader.h
-    ${PacBioBAM_IncludeDir}/pbbam/PbiLookupData.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiRawData.h
     ${PacBioBAM_IncludeDir}/pbbam/Position.h
     ${PacBioBAM_IncludeDir}/pbbam/ProgramInfo.h
@@ -113,8 +111,6 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/internal/PbiBasicTypes.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/PbiFilter.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/PbiFilterTypes.inl
-    ${PacBioBAM_IncludeDir}/pbbam/internal/PbiIndex.inl
-    ${PacBioBAM_IncludeDir}/pbbam/internal/PbiLookupData.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/PbiRawData.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/ProgramInfo.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/QualityValue.inl
@@ -208,7 +204,6 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/PbiFilter.cpp
     ${PacBioBAM_SourceDir}/PbiFilterQuery.cpp
     ${PacBioBAM_SourceDir}/PbiFilterTypes.cpp
-    ${PacBioBAM_SourceDir}/PbiIndex.cpp
     ${PacBioBAM_SourceDir}/PbiIndexedBamReader.cpp
     ${PacBioBAM_SourceDir}/PbiIndexIO.cpp
     ${PacBioBAM_SourceDir}/PbiRawData.cpp

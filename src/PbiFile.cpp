@@ -52,10 +52,10 @@
 
 namespace PacBio {
 namespace BAM {
-namespace PbiFile {
 
-void CreateFrom(const BamFile& bamFile, const PbiBuilder::CompressionLevel compressionLevel,
-                const size_t numThreads)
+void PbiFile::CreateFrom(const BamFile& bamFile,
+                         const PbiBuilder::CompressionLevel compressionLevel,
+                         const size_t numThreads)
 {
     PbiBuilder builder(bamFile.PacBioIndexFilename(), bamFile.Header().Sequences().size(),
                        compressionLevel, numThreads);
@@ -68,6 +68,5 @@ void CreateFrom(const BamFile& bamFile, const PbiBuilder::CompressionLevel compr
     }
 }
 
-}  // namespace PbiFile
 }  // namespace BAM
 }  // namespace PacBio

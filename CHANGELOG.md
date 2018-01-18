@@ -10,6 +10,13 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.16.0] - 2018-01-17
+
+### Removed
+- Removed the PbiIndex class and its "lookup data"-related helpers. These were 
+never as useful as initially intended. PbiRawData and its related classes are the 
+recommended interface for working with PBI index data.
+
 ## [0.15.0] - 2018-01-12
 
 ### Added

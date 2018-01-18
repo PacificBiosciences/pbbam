@@ -45,7 +45,6 @@ pbbam_cpp_sources = files([
   'PbiFilter.cpp',
   'PbiFilterQuery.cpp',
   'PbiFilterTypes.cpp',
-  'PbiIndex.cpp',
   'PbiIndexedBamReader.cpp',
   'PbiIndexIO.cpp',
   'PbiRawData.cpp',

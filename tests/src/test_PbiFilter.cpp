@@ -679,9 +679,6 @@ TEST(PbiFilterTest, QueryLengthFilterOk)
 
 TEST(PbiFilterTest, QueryNameFilterOk)
 {
-    const auto bamFile = BamFile{ PbbamTestsConfig::Data_Dir + string{ "/group/test2.bam" } };
-    const auto index = PbiIndex{ bamFile.PacBioIndexFilename() };
-
     {
         const auto filter = PbiFilter{ PbiQueryNameFilter{ "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2579_4055" } };
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1});
