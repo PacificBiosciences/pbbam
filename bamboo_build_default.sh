@@ -103,8 +103,8 @@ if [ ${BUILD_NUMBER} != 0  ]; then
     rm -rf /mnt/software/p/pbbam/snapshot/lib
     rm -rf /mnt/software/p/pbbam/snapshot/bin
     rm -rf /mnt/software/p/pbbam/snapshot/include
-    rsync -av lib/libpbbam.so /mnt/software/p/pbbam/snapshot/lib/
-    rsync -av include/pbbam /mnt/software/p/pbbam/snapshot/include/
+    rsync -av lib/libpbbam.a /mnt/software/p/pbbam/snapshot/lib/
+    rsync -av ../include/pbbam /mnt/software/p/pbbam/snapshot/include/
     rsync -av --exclude bgzip --exclude htsfile --exclude tabix \
         bin/ /mnt/software/p/pbbam/snapshot/bin/
   fi
