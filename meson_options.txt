@@ -1,24 +1,24 @@
-option('enable-build-tools',
+option('build-tools',
     type : 'boolean',
     value : true,
     description : 'Build PacBioBAM command line utilities (e.g. pbindex)')
 
-option('enable-build-docs',
+option('build-docs',
     type : 'boolean',
     value : false,
     description : 'Build PacBioBAM\'s API documentation')
 
-option('enable-auto-validate',
+option('auto-validate',
     type : 'boolean',
     value : false,
     description : 'Build PacBioBAM with BAM validation')
 
-option('enable-tests',
+option('tests',
     type : 'boolean',
     value : true,
     description : 'Enable dependencies required for testing')
 
-option('enable-permissive-cigar',
+option('permissive-cigar',
     type : 'boolean',
     value : false,
     description : 'Allows loading BAM records which contain "M" operations in CIGAR strings.')

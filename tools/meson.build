@@ -27,12 +27,12 @@ pbbam_bam2sam = executable(
   pbbam_bam2sam_cpp_sources,
   dependencies : [pbbam_htslib_dep, pbbam_thread_dep, pbbam_zlib_dep],
   include_directories : [pbbam_include_directories, include_directories('bam2sam')],
-  install : get_option('enable-build-tools'),
+  install : get_option('build-tools'),
   build_rpath : pbbam_htslib_libdir,
   cpp_args : pbbam_warning_flags)
 
 # tests
-if get_option('enable-tests')
+if get_option('tests')
   bam2sam_t = configure_file(
     input : pbbam_cram_bam2sam_t_in,
     output : 'bam2sam.t',
@@ -67,7 +67,7 @@ pbbam_pbindex = executable(
   dependencies : [pbbam_htslib_dep, pbbam_zlib_dep],
   include_directories : [pbbam_include_directories, include_directories('pbindex')],
   link_with : pbbam_lib,
-  install : get_option('enable-build-tools'),
+  install : get_option('build-tools'),
   cpp_args : pbbam_warning_flags)
 
 ###############
@@ -97,11 +97,11 @@ pbbam_pbindexdump = executable(
   dependencies : [pbbam_htslib_dep, pbbam_zlib_dep],
   include_directories : [pbbam_include_directories, include_directories('pbindexdump')],
   link_with : pbbam_lib,
-  install : get_option('enable-build-tools'),
+  install : get_option('build-tools'),
   cpp_args : pbbam_warning_flags)
 
 # tests
-if get_option('enable-tests')
+if get_option('tests')
   pbindexdump_json_t = configure_file(
     input : pbbam_cram_pbindexdump_json_t_in,
     output : 'pbindexdump_json.t',
@@ -141,11 +141,11 @@ pbbam_pbmerge = executable(
   dependencies : [pbbam_boost_dep, pbbam_htslib_dep, pbbam_zlib_dep],
   include_directories : [pbbam_include_directories, include_directories('pbmerge')],
   link_with : pbbam_lib,
-  install : get_option('enable-build-tools'),
+  install : get_option('build-tools'),
   cpp_args : pbbam_warning_flags)
 
 # tests
-if get_option('enable-tests') and not get_option('enable-auto-validate')
+if get_option('tests') and not get_option('auto-validate')
   pbmerge_pacbio_ordering_t = configure_file(
     input : pbbam_cram_pbmerge_pacbio_ordering_t_in,
     output : 'pbmerge_pacbio_ordering.t', configuration : pbbam_PbMergeVersion_h_config)
@@ -200,13 +200,13 @@ pbbam_pbbamify = executable(
   dependencies : [pbbam_boost_dep, pbbam_htslib_dep, pbbam_zlib_dep],
   include_directories : [pbbam_include_directories, include_directories('pbbamify')],
   link_with : pbbam_lib,
-  install : get_option('enable-build-tools'),
+  install : get_option('build-tools'),
   cpp_args : pbbam_warning_flags)
 
 
 # tests
-# These will only work with enable-permissive-cigar flag turned on.
-if get_option('enable-tests') and get_option('enable-permissive-cigar')
+# These will only work with permissive-cigar flag turned on.
+if get_option('tests') and get_option('permissive-cigar')
   pbbamify_t = configure_file(
     input : pbbam_cram_pbbamify_t_in,
     output : 'pbbamify.t',
