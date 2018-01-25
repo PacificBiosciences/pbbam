@@ -4,7 +4,6 @@ project(
   version : '0.16.0',
   default_options : [
     'buildtype=release',
-    'default_library=static',
     'warning_level=3',
     'cpp_std=c++14'],
   license : 'BSD-3',
@@ -38,7 +37,7 @@ if cpp.get_id() == 'clang'
 endif
 
 pbbam_macros = []
-if get_option('enable-permissive-cigar')
+if get_option('permissive-cigar')
   pbbam_macros += ['-DPBBAM_PERMISSIVE_CIGAR']
 endif
 
@@ -81,10 +80,10 @@ subdir('src')
 #########
 
 if not meson.is_subproject()
-  if get_option('enable-build-tools') or get_option('enable-tests')
+  if get_option('build-tools') or get_option('tests')
     pbbam_python = find_program('python')
 
-    if get_option('enable-tests')
+    if get_option('tests')
       pbbam_clang_formatter = find_program('tools/check-formatting')
       subdir('tests')
     endif
@@ -96,7 +95,7 @@ endif
 #########
 
 if not meson.is_subproject()
-  if get_option('enable-build-tools') or get_option('enable-tests')
+  if get_option('build-tools') or get_option('tests')
     subdir('tools')
   endif
 endif
@@ -105,7 +104,7 @@ endif
 # documentation #
 #################
 
-if get_option('enable-build-docs')
+if get_option('build-docs')
   subdir('docs')
 endif
 

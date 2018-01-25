@@ -60,8 +60,8 @@ for i in static shared; do
       --wrap-mode nofallback \
       --default-library "${i}" \
       --unity "${j}" \
-      -Denable-build-tools=true \
-      -Denable-tests=true \
+      -Dbuild-tools=true \
+      -Dtests=true \
       "${CURRENT_BUILD_DIR}" .
 
     # 2. build

@@ -81,7 +81,7 @@ pbbam_cpp_sources = files([
 ])
 
 pbbam_extra_flags = []
-if get_option('enable-auto-validate')
+if get_option('auto-validate')
   pbbam_extra_flags += '-DPBBAM_AUTOVALIDATE=1'
 endif
 
