@@ -49,9 +49,13 @@
 #include <cstdio>
 #include <memory>
 #include <stdexcept>
+#include <thread>
 #include <tuple>
 
 #include <htslib/bgzf.h>
+#include <htslib/hfile.h>
+#include <htslib/hts.h>
+
 #include <boost/numeric/conversion/cast.hpp>
 
 #include "MemoryUtils.h"
@@ -424,6 +428,8 @@ private:
     // output file info
     std::string pbiFilename_;
     std::unique_ptr<BGZF, internal::HtslibBgzfDeleter> outFile_ = nullptr;
+    CompressionLevel compressionLevel_;
+    size_t numThreads_;
 
     // tracking data
     uint32_t currentRow_ = 0;
@@ -457,6 +463,8 @@ PbiBuilderPrivate::PbiBuilderPrivate(const std::string& pbiFilename,
     , bcReverseFile_{pbiFilename + ".bcReverse.tmp"}
     , bcQualFile_{pbiFilename + ".bcQual.tmp"}
     , pbiFilename_{pbiFilename}
+    , compressionLevel_{compressionLevel}
+    , numThreads_{numThreads}
 {
     if (isCoordinateSorted && numReferenceSequences > 0)
         refDataBuilder_ = std::make_unique<PbiReferenceDataBuilder>(numReferenceSequences);
@@ -638,8 +646,22 @@ void PbiBuilderPrivate::Close()
 
 void PbiBuilderPrivate::OpenPbiFile()
 {
-    outFile_.reset(bgzf_open(pbiFilename_.c_str(), "wb"));
+    // open file handle
+    const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel_));
+    outFile_.reset(bgzf_open(pbiFilename_.c_str(), mode.c_str()));
     if (outFile_ == nullptr) throw std::runtime_error("could not open output file");
+
+    // if no explicit thread count given, attempt built-in check
+    size_t actualNumThreads = numThreads_;
+    if (actualNumThreads == 0) {
+        actualNumThreads = std::thread::hardware_concurrency();
+
+        // if still unknown, default to single-threaded
+        if (actualNumThreads == 0) actualNumThreads = 1;
+    }
+
+    // if multithreading requested, enable it
+    if (actualNumThreads > 1) bgzf_mt(outFile_.get(), actualNumThreads, 256);
 }
 
 template <typename T>
