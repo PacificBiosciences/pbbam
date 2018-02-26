@@ -60,6 +60,11 @@ struct PbiFilterQuery::PbiFilterQueryPrivate
     PbiFilterCompositeBamReader<Compare::None> reader_;  // unsorted
 };
 
+PbiFilterQuery::PbiFilterQuery(const DataSet& dataset)
+    : PbiFilterQuery{PbiFilter::FromDataSet(dataset), dataset}
+{
+}
+
 PbiFilterQuery::PbiFilterQuery(const PbiFilter& filter, const DataSet& dataset)
     : internal::IQuery(), d_(new PbiFilterQueryPrivate(filter, dataset))
 {
