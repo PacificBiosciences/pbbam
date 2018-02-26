@@ -63,6 +63,17 @@ namespace BAM {
 class PBBAM_EXPORT PbiFilterQuery : public internal::IQuery
 {
 public:
+    ///
+    /// \brief Creates a new PbiFilterQuery, limiting record results to only
+    ///        those matching filter criteria defined in the DataSet XML.
+    ///
+    /// \param[in] dataset input data source(s)
+    ///
+    /// \throws std::runtime_error on failure to open/read underlying %BAM or
+    ///         PBI files.
+    ///
+    PbiFilterQuery(const DataSet& dataset);
+
     /// \brief Creates a new PbiFilterQuery, limiting record results to only
     ///        those matching filter criteria
     ///
