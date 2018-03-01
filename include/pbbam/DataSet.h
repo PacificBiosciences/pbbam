@@ -80,7 +80,8 @@ public:
         CONTIG,
         HDF_SUBREAD,
         REFERENCE,
-        SUBREAD
+        SUBREAD,
+        TRANSCRIPT
     };
 
     /// \brief Converts printable dataset type to type enum.
