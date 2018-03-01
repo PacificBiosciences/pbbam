@@ -886,6 +886,16 @@ public:
     SubreadSet();
 };
 
+/// \brief The TranscriptSet class represents a %TranscriptSet root element in
+///        DataSetXML.
+///
+class PBBAM_EXPORT TranscriptSet : public DataSetBase
+{
+public:
+    /// \brief Creates an empty TranscriptSet dataset.
+    TranscriptSet();
+};
+
 }  // namespace BAM
 }  // namespace PacBio
 

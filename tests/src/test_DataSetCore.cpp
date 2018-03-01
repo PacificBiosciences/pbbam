@@ -112,6 +112,7 @@ TEST(DataSetCoreTest, TimeStampedNamesOk)
     HdfSubreadSet hdfSubreadSet;
     ReferenceSet referenceSet;
     SubreadSet subreadSet;
+    TranscriptSet transcriptSet;
 
     EXPECT_EQ(0, dataset.TimeStampedName().find("pacbio_dataset_dataset-"));
     EXPECT_EQ(0, alignmentSet.TimeStampedName().find("pacbio_dataset_alignmentset-"));
@@ -123,6 +124,7 @@ TEST(DataSetCoreTest, TimeStampedNamesOk)
     EXPECT_EQ(0, hdfSubreadSet.TimeStampedName().find("pacbio_dataset_hdfsubreadset-"));
     EXPECT_EQ(0, referenceSet.TimeStampedName().find("pacbio_dataset_referenceset-"));
     EXPECT_EQ(0, subreadSet.TimeStampedName().find("pacbio_dataset_subreadset-"));
+    EXPECT_EQ(0, transcriptSet.TimeStampedName().find("pacbio_dataset_transcriptset-"));
 }
 
 TEST(DataSetCoreTest, BasicGettersSettersOk)

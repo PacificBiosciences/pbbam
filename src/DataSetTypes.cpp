@@ -191,6 +191,7 @@ std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName)
     if (typeName == std::string("ContigSet")) return std::make_shared<ContigSet>();
     if (typeName == std::string("HdfSubreadSet")) return std::make_shared<HdfSubreadSet>();
     if (typeName == std::string("ReferenceSet")) return std::make_shared<ReferenceSet>();
+    if (typeName == std::string("TranscriptSet")) return std::make_shared<TranscriptSet>();
 
     // unknown typename
     throw std::runtime_error("unsupported dataset type");
@@ -459,6 +460,15 @@ void SubDataSets::Remove(const DataSetBase& subdataset) { RemoveChild(subdataset
 // -------------------
 
 SubreadSet::SubreadSet() : DataSetBase("PacBio.DataSet.SubreadSet", "SubreadSet", XsdType::DATASETS)
+{
+}
+
+// -------------------
+// TranscriptSet
+// -------------------
+
+TranscriptSet::TranscriptSet()
+    : DataSetBase("PacBio.DataSet.TranscriptSet", "TranscriptSet", XsdType::DATASETS)
 {
 }
 

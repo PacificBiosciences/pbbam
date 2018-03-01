@@ -260,6 +260,7 @@ DataSet::TypeEnum DataSet::NameToType(const std::string& typeName)
         lookup["HdfSubreadSet"] = DataSet::HDF_SUBREAD;
         lookup["ReferenceSet"] = DataSet::REFERENCE;
         lookup["SubreadSet"] = DataSet::SUBREAD;
+        lookup["TranscriptSet"] = DataSet::TRANSCRIPT;
     }
     return lookup.at(typeName);  // throws if unknown typename
 }
@@ -322,6 +323,8 @@ std::string DataSet::TypeToName(const DataSet::TypeEnum& type)
             return "ReferenceSet";
         case DataSet::SUBREAD:
             return "SubreadSet";
+        case DataSet::TRANSCRIPT:
+            return "TranscriptSet";
         default:
             throw std::runtime_error("unsupported dataset type");  // unknown type
     }
