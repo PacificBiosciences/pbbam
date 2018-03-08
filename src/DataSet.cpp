@@ -125,6 +125,9 @@ DataSet::DataSet(const DataSet::TypeEnum type)
         case DataSet::SUBREAD:
             d_ = std::make_unique<SubreadSet>();
             break;
+        case DataSet::TRANSCRIPT:
+            d_ = std::make_unique<TranscriptSet>();
+            break;
         default:
             throw std::runtime_error("unsupported dataset type");  // unknown type
     }
