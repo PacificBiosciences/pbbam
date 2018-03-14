@@ -50,11 +50,11 @@ namespace BAM {
 ///
 enum class PulseBehavior
 {
-    BASECALLS_ONLY  ///< "Squashed" pulses not included, only basecalls.
-  , ALL             ///< All pulses included.
+    BASECALLS_ONLY,  ///< "Squashed" pulses not included, only basecalls.
+    ALL              ///< All pulses included.
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // PULSEBEHAVIOR_H
+#endif  // PULSEBEHAVIOR_H

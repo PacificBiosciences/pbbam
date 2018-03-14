@@ -42,10 +42,10 @@
 #ifndef ZMWQUERY_H
 #define ZMWQUERY_H
 
-#include "pbbam/Config.h"
-#include "pbbam/internal/QueryBase.h"
 #include <cstdint>
 #include <vector>
+#include "pbbam/Config.h"
+#include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {
 namespace BAM {
@@ -73,8 +73,7 @@ public:
     /// \throws std::runtime_error on failure to open/read underlying %BAM or
     ///         PBI files.
     ///
-    ZmwQuery(const std::vector<int32_t>& zmwWhitelist,
-             const DataSet& dataset);
+    ZmwQuery(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset);
 
     ~ZmwQuery();
 
@@ -91,7 +90,7 @@ private:
     std::unique_ptr<ZmwQueryPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // ZMWQUERY_H
+#endif  // ZMWQUERY_H

@@ -3,7 +3,7 @@
 ########################################################################
 
 cmake_policy(SET CMP0048 NEW)  # lets us set version in project()
-project(PacBioBAM VERSION 0.13.2 LANGUAGES CXX C)
+project(PacBioBAM VERSION 0.16.0 LANGUAGES CXX C)
 cmake_minimum_required(VERSION 3.0)
 
 # project name & version
@@ -23,6 +23,13 @@ option(PacBioBAM_auto_validate "Build PacBioBAM with auto-validation enabled."  
 
 if(PacBioBAM_build_tests)
     enable_testing()
+endif()
+
+set(PacBioBAM_permissive_cigar  OFF)
+STRING(TOLOWER "${PBBAM_PERMISSIVE_CIGAR}" PBBAM_PERMISSIVE_CIGAR_LOWER)
+if (DEFINED PBBAM_PERMISSIVE_CIGAR)
+    set(PacBioBAM_permissive_cigar  ON)
+    add_definitions(-DPBBAM_PERMISSIVE_CIGAR)
 endif()
 
 # project paths

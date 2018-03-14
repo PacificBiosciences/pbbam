@@ -41,20 +41,19 @@
 
 #include "PbbamInternalConfig.h"
 
+#include "pbbam/SamTagCodec.h"
+
 #include <cstdint>
 #include <limits>
 
-#include "pbbam/SamTagCodec.h"
 #include <boost/lexical_cast.hpp>
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-template<typename T>
-inline void appendSamValue(const T& value,
-                           std::string& result,
-                           bool force8BitInt = false)
+template <typename T>
+inline void appendSamValue(const T& value, std::string& result, bool force8BitInt = false)
 {
     if (force8BitInt)
         result.append(boost::lexical_cast<std::string>(static_cast<int>(value)));
@@ -62,23 +61,20 @@ inline void appendSamValue(const T& value,
         result.append(boost::lexical_cast<std::string>(value));
 }
 
-template<typename T>
-void appendSamMultiValue(const T& container,
-                         std::string& result,
-                         bool force8BitInt = false)
+template <typename T>
+void appendSamMultiValue(const T& container, std::string& result, bool force8BitInt = false)
 {
     auto end = container.cend();
     for (auto iter = container.cbegin(); iter != end; ++iter) {
         result.append(1, ',');
-        if ( force8BitInt )
+        if (force8BitInt)
             result.append(boost::lexical_cast<std::string>(static_cast<int>(*iter)));
         else
             result.append(boost::lexical_cast<std::string>(*iter));
     }
 }
 
-static
-std::vector<std::string> split(const std::string& s, char delim)
+static std::vector<std::string> split(const std::string& s, char delim)
 {
     std::vector<std::string> elems;
     std::stringstream ss(s);
@@ -94,11 +90,11 @@ std::vector<float> readFloatSamMultiValue(const std::string& data)
     auto* c = const_cast<char*>(data.c_str());
     const char* end = c + data.length();
     while (c + 1 < end)
-        result.emplace_back(strtof(c+1, &c));
+        result.emplace_back(strtof(c + 1, &c));
     return result;
 }
 
-template<typename T>
+template <typename T>
 std::vector<T> readSignedSamMultiValue(const std::string& data)
 {
     std::vector<T> result;
@@ -109,7 +105,7 @@ std::vector<T> readSignedSamMultiValue(const std::string& data)
     return result;
 }
 
-template<typename T>
+template <typename T>
 std::vector<T> readUnsignedSamMultiValue(const std::string& data)
 {
     std::vector<T> result;
@@ -120,7 +116,7 @@ std::vector<T> readUnsignedSamMultiValue(const std::string& data)
     return result;
 }
 
-} // namespace internal
+}  // namespace internal
 
 TagCollection SamTagCodec::Decode(const std::string& tagString)
 {
@@ -128,43 +124,40 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
 
     const auto tokens = internal::split(tagString, '\t');
     for (const auto& token : tokens) {
-        if (token.size() < 6)          // TT:t:X
+        if (token.size() < 6)  // TT:t:X
             continue;
 
         const auto name = token.substr(0, 2);
         const auto type = token.at(3);
         const auto remainder = token.substr(5);
-        if (remainder.empty())
-            throw std::runtime_error("malformatted tag: " + token);
+        if (remainder.empty()) throw std::runtime_error("malformatted tag: " + token);
 
         switch (type) {
 
             // technically only 'A' is allowed in SAM chars,
             // but we'll be a little permissive
-            case 'A' :
-            case 'a' :
-            {
+            case 'A':
+            case 'a': {
                 tags[name] = Tag(static_cast<char>(remainder.at(0), TagModifier::ASCII_CHAR));
                 break;
             }
 
             // technically only 'i' is allowed in SAM ints, but we'll be a little
             // permissive since SAM might be a bit more "user-edited" than BAM
-            case 'c' :
-            case 'C' :
-            case 's' :
-            case 'S' :
-            case 'i' :
-            case 'I' :
-            {
+            case 'c':
+            case 'C':
+            case 's':
+            case 'S':
+            case 'i':
+            case 'I': {
                 // check out boost::numeric cast for these conversions
 
                 // negative value (force signed int)
                 if (remainder.at(0) == '-') {
                     const auto x = boost::lexical_cast<int32_t>(remainder);
-                    if ( x >= std::numeric_limits<int8_t>::min() )
+                    if (x >= std::numeric_limits<int8_t>::min())
                         tags[name] = static_cast<int8_t>(x);
-                    else if ( x >= std::numeric_limits<int16_t>::min() )
+                    else if (x >= std::numeric_limits<int16_t>::min())
                         tags[name] = static_cast<int16_t>(x);
                     else
                         tags[name] = x;
@@ -173,9 +166,9 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
                 // unsigned int
                 else {
                     const auto x = boost::lexical_cast<uint32_t>(remainder);
-                    if ( x <= std::numeric_limits<uint8_t>::max() )
+                    if (x <= std::numeric_limits<uint8_t>::max())
                         tags[name] = static_cast<uint8_t>(x);
-                    else if ( x <= std::numeric_limits<uint16_t>::max() )
+                    else if (x <= std::numeric_limits<uint16_t>::max())
                         tags[name] = static_cast<uint16_t>(x);
                     else
                         tags[name] = x;
@@ -183,45 +176,57 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
                 break;
             }
 
-            case 'f' :
-            {
+            case 'f': {
                 tags[name] = boost::lexical_cast<float>(remainder);
                 break;
             }
 
-            case 'Z' :
-            {
+            case 'Z': {
                 tags[name] = remainder;
                 break;
             }
 
-            case 'H' :
-            {
+            case 'H': {
                 tags[name] = Tag(remainder, TagModifier::HEX_STRING);
                 break;
             }
 
-            case 'B' :
-            {
+            case 'B': {
                 const auto elementType = remainder.at(0);
                 const auto arrayData = remainder.substr(1);
                 switch (elementType) {
-                    case 'c' : tags[name] = internal::readSignedSamMultiValue<int8_t>(arrayData);     break;
-                    case 'C' : tags[name] = internal::readUnsignedSamMultiValue<uint8_t>(arrayData);  break;
-                    case 's' : tags[name] = internal::readSignedSamMultiValue<int16_t>(arrayData);    break;
-                    case 'S' : tags[name] = internal::readUnsignedSamMultiValue<uint16_t>(arrayData); break;
-                    case 'i' : tags[name] = internal::readSignedSamMultiValue<int32_t>(arrayData);    break;
-                    case 'I' : tags[name] = internal::readUnsignedSamMultiValue<uint32_t>(arrayData); break;
-                    case 'f' : tags[name] = internal::readFloatSamMultiValue(arrayData);              break;
+                    case 'c':
+                        tags[name] = internal::readSignedSamMultiValue<int8_t>(arrayData);
+                        break;
+                    case 'C':
+                        tags[name] = internal::readUnsignedSamMultiValue<uint8_t>(arrayData);
+                        break;
+                    case 's':
+                        tags[name] = internal::readSignedSamMultiValue<int16_t>(arrayData);
+                        break;
+                    case 'S':
+                        tags[name] = internal::readUnsignedSamMultiValue<uint16_t>(arrayData);
+                        break;
+                    case 'i':
+                        tags[name] = internal::readSignedSamMultiValue<int32_t>(arrayData);
+                        break;
+                    case 'I':
+                        tags[name] = internal::readUnsignedSamMultiValue<uint32_t>(arrayData);
+                        break;
+                    case 'f':
+                        tags[name] = internal::readFloatSamMultiValue(arrayData);
+                        break;
                     default:
-                        throw std::runtime_error("unsupported array-tag-type encountered: " + std::string(1, elementType));
+                        throw std::runtime_error("unsupported array-tag-type encountered: " +
+                                                 std::string(1, elementType));
                 }
                 break;
             }
 
             // unsupported SAM tag type
-            default :
-                throw std::runtime_error("unsupported tag-type encountered: " + std::string(1, type));
+            default:
+                throw std::runtime_error("unsupported tag-type encountered: " +
+                                         std::string(1, type));
         }
     }
 
@@ -233,19 +238,15 @@ std::string SamTagCodec::Encode(const TagCollection& tags)
     std::string result;
     result.reserve(1024);
 
-    for (const auto& tagIter : tags)
-    {
+    for (const auto& tagIter : tags) {
         const auto& name = tagIter.first;
-        if (name.size() != 2)
-            throw std::runtime_error("malformatted tag name: " + name);
+        if (name.size() != 2) throw std::runtime_error("malformatted tag name: " + name);
 
         const auto& tag = tagIter.second;
-        if (tag.IsNull())
-            continue;
+        if (tag.IsNull()) continue;
 
         // tab separator
-        if (!result.empty())
-            result.append(1, '\t');
+        if (!result.empty()) result.append(1, '\t');
 
         // "<TAG>:"
         result.append(name);
@@ -267,30 +268,71 @@ std::string SamTagCodec::Encode(const TagCollection& tags)
         using internal::appendSamValue;
 
         switch (tag.Type()) {
-            case TagDataType::INT8   : result.append("i:"); appendSamValue(tag.ToInt8(),   result, true); break;
-            case TagDataType::UINT8  : result.append("i:"); appendSamValue(tag.ToUInt8(),  result, true); break;
-            case TagDataType::INT16  : result.append("i:"); appendSamValue(tag.ToInt16(),  result); break;
-            case TagDataType::UINT16 : result.append("i:"); appendSamValue(tag.ToUInt16(), result); break;
-            case TagDataType::INT32  : result.append("i:"); appendSamValue(tag.ToInt32(),  result); break;
-            case TagDataType::UINT32 : result.append("i:"); appendSamValue(tag.ToUInt32(), result); break;
-            case TagDataType::FLOAT  : result.append("f:"); appendSamValue(tag.ToFloat(),  result); break;
+            case TagDataType::INT8:
+                result.append("i:");
+                appendSamValue(tag.ToInt8(), result, true);
+                break;
+            case TagDataType::UINT8:
+                result.append("i:");
+                appendSamValue(tag.ToUInt8(), result, true);
+                break;
+            case TagDataType::INT16:
+                result.append("i:");
+                appendSamValue(tag.ToInt16(), result);
+                break;
+            case TagDataType::UINT16:
+                result.append("i:");
+                appendSamValue(tag.ToUInt16(), result);
+                break;
+            case TagDataType::INT32:
+                result.append("i:");
+                appendSamValue(tag.ToInt32(), result);
+                break;
+            case TagDataType::UINT32:
+                result.append("i:");
+                appendSamValue(tag.ToUInt32(), result);
+                break;
+            case TagDataType::FLOAT:
+                result.append("f:");
+                appendSamValue(tag.ToFloat(), result);
+                break;
 
-            case TagDataType::STRING :
-            {
+            case TagDataType::STRING: {
                 result.append(tag.HasModifier(TagModifier::HEX_STRING) ? "H:" : "Z:");
                 result.append(tag.ToString());
                 break;
             }
 
-            case TagDataType::INT8_ARRAY   : result.append("B:c"); appendSamMultiValue(tag.ToInt8Array(),   result, true); break;
-            case TagDataType::UINT8_ARRAY  : result.append("B:C"); appendSamMultiValue(tag.ToUInt8Array(),  result, true); break;
-            case TagDataType::INT16_ARRAY  : result.append("B:s"); appendSamMultiValue(tag.ToInt16Array(),  result); break;
-            case TagDataType::UINT16_ARRAY : result.append("B:S"); appendSamMultiValue(tag.ToUInt16Array(), result); break;
-            case TagDataType::INT32_ARRAY  : result.append("B:i"); appendSamMultiValue(tag.ToInt32Array(),  result); break;
-            case TagDataType::UINT32_ARRAY : result.append("B:I"); appendSamMultiValue(tag.ToUInt32Array(), result); break;
-            case TagDataType::FLOAT_ARRAY  : result.append("B:f"); appendSamMultiValue(tag.ToFloatArray(),  result); break;
+            case TagDataType::INT8_ARRAY:
+                result.append("B:c");
+                appendSamMultiValue(tag.ToInt8Array(), result, true);
+                break;
+            case TagDataType::UINT8_ARRAY:
+                result.append("B:C");
+                appendSamMultiValue(tag.ToUInt8Array(), result, true);
+                break;
+            case TagDataType::INT16_ARRAY:
+                result.append("B:s");
+                appendSamMultiValue(tag.ToInt16Array(), result);
+                break;
+            case TagDataType::UINT16_ARRAY:
+                result.append("B:S");
+                appendSamMultiValue(tag.ToUInt16Array(), result);
+                break;
+            case TagDataType::INT32_ARRAY:
+                result.append("B:i");
+                appendSamMultiValue(tag.ToInt32Array(), result);
+                break;
+            case TagDataType::UINT32_ARRAY:
+                result.append("B:I");
+                appendSamMultiValue(tag.ToUInt32Array(), result);
+                break;
+            case TagDataType::FLOAT_ARRAY:
+                result.append("B:f");
+                appendSamMultiValue(tag.ToFloatArray(), result);
+                break;
 
-            default :
+            default:
                 throw std::runtime_error("unsupported tag-type encountered: " +
                                          std::to_string(static_cast<uint16_t>(tag.Type())));
         }
@@ -299,5 +341,5 @@ std::string SamTagCodec::Encode(const TagCollection& tags)
     return result;
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

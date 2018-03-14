@@ -42,9 +42,9 @@
 #ifndef PROGRAMINFO_H
 #define PROGRAMINFO_H
 
-#include "pbbam/Config.h"
 #include <map>
 #include <string>
+#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -86,7 +86,6 @@ public:
     /// \param[in] id       program ID (\@PG:ID)
     ///
     ProgramInfo(std::string id);
-
 
     ProgramInfo(const ProgramInfo& other) = default;
     ProgramInfo(ProgramInfo&& other) = default;
@@ -203,20 +202,20 @@ public:
     /// \}
 
 private:
-    std::string commandLine_;       // CL:<CommandLine>
-    std::string description_;       // DS:<Description>
-    std::string id_;                // ID:<ID>  * must be unique for valid SAM *
-    std::string name_;              // PN:<Name>
-    std::string previousProgramId_; // PP:<PreviousProgramID>
-    std::string version_;           // VN:<Version>
+    std::string commandLine_;        // CL:<CommandLine>
+    std::string description_;        // DS:<Description>
+    std::string id_;                 // ID:<ID>  * must be unique for valid SAM *
+    std::string name_;               // PN:<Name>
+    std::string previousProgramId_;  // PP:<PreviousProgramID>
+    std::string version_;            // VN:<Version>
 
     // custom attributes
-    std::map<std::string, std::string> custom_;     // tag => value
+    std::map<std::string, std::string> custom_;  // tag => value
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/ProgramInfo.inl"
 
-#endif // PROGRAMINFO_H
+#endif  // PROGRAMINFO_H

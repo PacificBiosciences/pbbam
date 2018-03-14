@@ -43,14 +43,14 @@
 #include <string>
 #include <typeinfo>
 
-#include <boost/type_traits/is_convertible.hpp>
 #include <gtest/gtest.h>
+#include <boost/type_traits/is_convertible.hpp>
 
 #define private public
 
 #include <pbbam/BamTagCodec.h>
-#include <pbbam/TagCollection.h>
 #include <pbbam/SamTagCodec.h>
+#include <pbbam/TagCollection.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -58,23 +58,23 @@ using namespace std;
 
 TEST(TagTest, TagConstruction)
 {
-    int8_t   i8   = 0;
-    uint8_t  u8   = 0;
-    int16_t  i16  = 0;
-    uint16_t  u16 = 0;
-    int32_t  i32  = 0;
-    uint32_t u32  = 0;
-    float    f    = 0.0;
-    string   str  = "";
-    vector<int8_t>   i8_array;
-    vector<uint8_t>  u8_array;
-    vector<int16_t>  i16_array;
+    int8_t i8 = 0;
+    uint8_t u8 = 0;
+    int16_t i16 = 0;
+    uint16_t u16 = 0;
+    int32_t i32 = 0;
+    uint32_t u32 = 0;
+    float f = 0.0;
+    string str = "";
+    vector<int8_t> i8_array;
+    vector<uint8_t> u8_array;
+    vector<int16_t> i16_array;
     vector<uint16_t> u16_array;
-    vector<int32_t>  i32_array;
+    vector<int32_t> i32_array;
     vector<uint32_t> u32_Array;
-    vector<float>    float_array;
+    vector<float> float_array;
 
-    signed char   c  = 'A';
+    signed char c = 'A';
     unsigned char uc = 'A';
 
     Tag i8Tag(i8);
@@ -96,43 +96,43 @@ TEST(TagTest, TagConstruction)
     Tag charTag(c, TagModifier::ASCII_CHAR);
     Tag ucharTag(uc, TagModifier::ASCII_CHAR);
 
-    EXPECT_TRUE(i8Tag.Type()     == TagDataType::INT8);
-    EXPECT_TRUE(u8Tag.Type()     == TagDataType::UINT8);
-    EXPECT_TRUE(i16Tag.Type()    == TagDataType::INT16);
-    EXPECT_TRUE(u16Tag.Type()    == TagDataType::UINT16);
-    EXPECT_TRUE(i32Tag.Type()    == TagDataType::INT32);
-    EXPECT_TRUE(u32Tag.Type()    == TagDataType::UINT32);
-    EXPECT_TRUE(floatTag.Type()  == TagDataType::FLOAT);
+    EXPECT_TRUE(i8Tag.Type() == TagDataType::INT8);
+    EXPECT_TRUE(u8Tag.Type() == TagDataType::UINT8);
+    EXPECT_TRUE(i16Tag.Type() == TagDataType::INT16);
+    EXPECT_TRUE(u16Tag.Type() == TagDataType::UINT16);
+    EXPECT_TRUE(i32Tag.Type() == TagDataType::INT32);
+    EXPECT_TRUE(u32Tag.Type() == TagDataType::UINT32);
+    EXPECT_TRUE(floatTag.Type() == TagDataType::FLOAT);
     EXPECT_TRUE(stringTag.Type() == TagDataType::STRING);
-    EXPECT_TRUE(i8_array_Tag.Type()    == TagDataType::INT8_ARRAY);
-    EXPECT_TRUE(u8_array_Tag.Type()    == TagDataType::UINT8_ARRAY);
-    EXPECT_TRUE(i16_array_Tag.Type()   == TagDataType::INT16_ARRAY);
-    EXPECT_TRUE(u16_array_Tag.Type()   == TagDataType::UINT16_ARRAY);
-    EXPECT_TRUE(i32_array_Tag.Type()   == TagDataType::INT32_ARRAY);
-    EXPECT_TRUE(u32_array_Tag.Type()   == TagDataType::UINT32_ARRAY);
+    EXPECT_TRUE(i8_array_Tag.Type() == TagDataType::INT8_ARRAY);
+    EXPECT_TRUE(u8_array_Tag.Type() == TagDataType::UINT8_ARRAY);
+    EXPECT_TRUE(i16_array_Tag.Type() == TagDataType::INT16_ARRAY);
+    EXPECT_TRUE(u16_array_Tag.Type() == TagDataType::UINT16_ARRAY);
+    EXPECT_TRUE(i32_array_Tag.Type() == TagDataType::INT32_ARRAY);
+    EXPECT_TRUE(u32_array_Tag.Type() == TagDataType::UINT32_ARRAY);
     EXPECT_TRUE(float_array_Tag.Type() == TagDataType::FLOAT_ARRAY);
 
-    EXPECT_TRUE(charTag.ToAscii()  == 'A');
+    EXPECT_TRUE(charTag.ToAscii() == 'A');
     EXPECT_TRUE(ucharTag.ToAscii() == 'A');
 }
 
 TEST(TagTest, CopyAndCompare)
 {
-    int8_t   i8   = 0;
-    uint8_t  u8   = 0;
-    int16_t  i16  = 0;
-    uint16_t  u16 = 0;
-    int32_t  i32  = 0;
-    uint32_t u32  = 0;
-    float    f    = 0.0;
-    string   str  = "";
-    vector<int8_t>   i8_array;
-    vector<uint8_t>  u8_array;
-    vector<int16_t>  i16_array;
+    int8_t i8 = 0;
+    uint8_t u8 = 0;
+    int16_t i16 = 0;
+    uint16_t u16 = 0;
+    int32_t i32 = 0;
+    uint32_t u32 = 0;
+    float f = 0.0;
+    string str = "";
+    vector<int8_t> i8_array;
+    vector<uint8_t> u8_array;
+    vector<int16_t> i16_array;
     vector<uint16_t> u16_array;
-    vector<int32_t>  i32_array;
+    vector<int32_t> i32_array;
     vector<uint32_t> u32_Array;
-    vector<float>    float_array;
+    vector<float> float_array;
 
     Tag i8Tag(i8);
     Tag u8Tag(u8);
@@ -185,15 +185,15 @@ TEST(TagTest, CopyAndCompare)
 
 TEST(TagTest, Type_None)
 {
-     Tag tag;
+    Tag tag;
 
-     EXPECT_TRUE(tag.Type() == TagDataType::INVALID);
-     EXPECT_TRUE(tag.IsNull());
-     EXPECT_TRUE(tag.Typename() == "none");
+    EXPECT_TRUE(tag.Type() == TagDataType::INVALID);
+    EXPECT_TRUE(tag.IsNull());
+    EXPECT_TRUE(tag.Typename() == "none");
 
-     EXPECT_FALSE(tag.IsNumeric());
-     EXPECT_FALSE(tag.IsString());
-     EXPECT_FALSE(tag.IsArray());
+    EXPECT_FALSE(tag.IsNumeric());
+    EXPECT_FALSE(tag.IsString());
+    EXPECT_FALSE(tag.IsArray());
 }
 
 TEST(TagTest, Type_Int8)
@@ -248,19 +248,19 @@ TEST(TagTest, Type_UInt8)
 
 TEST(TagTest, Type_Ascii)
 {
-    const char          c  = '$';
-    const signed char   sc = '$';
+    const char c = '$';
+    const signed char sc = '$';
     const unsigned char uc = '$';
     const uint8_t u8 = 65;
-    const int8_t  i8 = 66;
+    const int8_t i8 = 66;
 
-    { // old style: construct-then-modify
+    {  // old style: construct-then-modify
 
         Tag fromPlainChar = Tag(c);
         Tag fromSignedChar = Tag(sc);
         Tag fromUnsignedChar = Tag(uc);
         Tag fromUint8 = Tag(u8);
-        Tag fromInt8  = Tag(i8);
+        Tag fromInt8 = Tag(i8);
         fromPlainChar.Modifier(TagModifier::ASCII_CHAR);
         fromSignedChar.Modifier(TagModifier::ASCII_CHAR);
         fromUnsignedChar.Modifier(TagModifier::ASCII_CHAR);
@@ -293,13 +293,13 @@ TEST(TagTest, Type_Ascii)
         EXPECT_EQ('B', fromInt8.ToAscii());
     }
 
-    { // new style: construct directly as ASCII
+    {  // new style: construct directly as ASCII
 
-        const Tag fromPlainChar    = Tag(c,  TagModifier::ASCII_CHAR);
-        const Tag fromSignedChar   = Tag(sc, TagModifier::ASCII_CHAR);
+        const Tag fromPlainChar = Tag(c, TagModifier::ASCII_CHAR);
+        const Tag fromSignedChar = Tag(sc, TagModifier::ASCII_CHAR);
         const Tag fromUnsignedChar = Tag(uc, TagModifier::ASCII_CHAR);
         const Tag fromUint8 = Tag(u8, TagModifier::ASCII_CHAR);
-        const Tag fromInt8  = Tag(i8, TagModifier::ASCII_CHAR);
+        const Tag fromInt8 = Tag(i8, TagModifier::ASCII_CHAR);
 
         EXPECT_TRUE(fromPlainChar.HasModifier(TagModifier::ASCII_CHAR));
         EXPECT_TRUE(fromPlainChar.IsIntegral());
@@ -482,7 +482,7 @@ TEST(TagTest, Type_String)
 
 TEST(TagTest, Type_Int8Array)
 {
-    const vector<int8_t> v = { -42, 100, 0 };
+    const vector<int8_t> v = {-42, 100, 0};
     const Tag tag(v);
 
     vector<int8_t> v2;
@@ -505,7 +505,7 @@ TEST(TagTest, Type_Int8Array)
 
 TEST(TagTest, Type_UInt8Array)
 {
-    const vector<uint8_t> v = { 42, 200, 0 };
+    const vector<uint8_t> v = {42, 200, 0};
     const Tag tag(v);
 
     vector<uint8_t> v2;
@@ -528,7 +528,7 @@ TEST(TagTest, Type_UInt8Array)
 
 TEST(TagTest, Type_Int16Array)
 {
-    const vector<int16_t> v = { 42, -300, 0 };
+    const vector<int16_t> v = {42, -300, 0};
     const Tag tag(v);
 
     vector<int16_t> v2;
@@ -551,7 +551,7 @@ TEST(TagTest, Type_Int16Array)
 
 TEST(TagTest, Type_UInt16Array)
 {
-    const vector<uint16_t> v = { 42, 300, 0 };
+    const vector<uint16_t> v = {42, 300, 0};
     const Tag tag(v);
 
     vector<uint16_t> v2;
@@ -569,12 +569,13 @@ TEST(TagTest, Type_UInt16Array)
     EXPECT_FALSE(tag.IsNull());
     EXPECT_FALSE(tag.IsNumeric());
 
-    EXPECT_EQ(v, v2);;
+    EXPECT_EQ(v, v2);
+    ;
 }
 
 TEST(TagTest, Type_Int32Array)
 {
-    const vector<int32_t> v = { 42, -300, 0 };
+    const vector<int32_t> v = {42, -300, 0};
     const Tag tag(v);
 
     vector<int32_t> v2;
@@ -597,7 +598,7 @@ TEST(TagTest, Type_Int32Array)
 
 TEST(TagTest, Type_UInt32Array)
 {
-    const vector<uint32_t> v = { 42, 300, 0 };
+    const vector<uint32_t> v = {42, 300, 0};
     const Tag tag(v);
 
     vector<uint32_t> v2;
@@ -620,7 +621,7 @@ TEST(TagTest, Type_UInt32Array)
 
 TEST(TagTest, Type_FloatArray)
 {
-    const vector<float> v = { 1.1f, 1.2f, 1.3f };
+    const vector<float> v = {1.1f, 1.2f, 1.3f};
     const Tag tag(v);
 
     vector<float> v2;
@@ -642,21 +643,21 @@ TEST(TagTest, Type_FloatArray)
 
 TEST(TagTest, CastBackToOriginalOk)
 {
-    int8_t   i8   = 0;
-    uint8_t  u8   = 0;
-    int16_t  i16  = 0;
-    uint16_t  u16 = 0;
-    int32_t  i32  = 0;
-    uint32_t u32  = 0;
-    float    f    = 0.0;
-    string   str  = "";
-    vector<int8_t>   i8_array;
-    vector<uint8_t>  u8_array;
-    vector<int16_t>  i16_array;
+    int8_t i8 = 0;
+    uint8_t u8 = 0;
+    int16_t i16 = 0;
+    uint16_t u16 = 0;
+    int32_t i32 = 0;
+    uint32_t u32 = 0;
+    float f = 0.0;
+    string str = "";
+    vector<int8_t> i8_array;
+    vector<uint8_t> u8_array;
+    vector<int16_t> i16_array;
     vector<uint16_t> u16_array;
-    vector<int32_t>  i32_array;
+    vector<int32_t> i32_array;
     vector<uint32_t> u32_array;
-    vector<float>    float_array;
+    vector<float> float_array;
 
     Tag i8Tag(i8);
     Tag u8Tag(u8);
@@ -704,8 +705,7 @@ TEST(TagTest, ConvertToInt8)
     Tag arrayTag(vector<int8_t>{{1, 2, 3}});
 
     // allowed
-    EXPECT_NO_THROW(
-    {
+    EXPECT_NO_THROW({
         zero.ToInt8();
         min.ToInt8();
         normal.ToInt8();
@@ -713,9 +713,9 @@ TEST(TagTest, ConvertToInt8)
     });
 
     // not allowed
-    EXPECT_THROW(floatTag.ToInt8(),  std::exception);
+    EXPECT_THROW(floatTag.ToInt8(), std::exception);
     EXPECT_THROW(stringTag.ToInt8(), std::exception);
-    EXPECT_THROW(arrayTag.ToInt8(),  std::exception);
+    EXPECT_THROW(arrayTag.ToInt8(), std::exception);
 }
 
 TEST(TagTest, ConvertToUInt8)
@@ -729,18 +729,17 @@ TEST(TagTest, ConvertToUInt8)
     Tag arrayTag(vector<uint8_t>{{1, 2, 3}});
 
     // allowed
-    EXPECT_NO_THROW(
-    {
+    EXPECT_NO_THROW({
         zero.ToUInt8();
         normal.ToUInt8();
         max.ToUInt8();
     });
 
     // not allowed
-    EXPECT_THROW(neg.ToUInt8(),       std::exception);
-    EXPECT_THROW(floatTag.ToUInt8(),  std::exception);
+    EXPECT_THROW(neg.ToUInt8(), std::exception);
+    EXPECT_THROW(floatTag.ToUInt8(), std::exception);
     EXPECT_THROW(stringTag.ToUInt8(), std::exception);
-    EXPECT_THROW(arrayTag.ToUInt8(),  std::exception);
+    EXPECT_THROW(arrayTag.ToUInt8(), std::exception);
 }
 
 TEST(TagTest, ConvertToInt16)
@@ -754,8 +753,7 @@ TEST(TagTest, ConvertToInt16)
     Tag arrayTag(vector<int16_t>{{1, 2, 3}});
 
     // allowed
-    EXPECT_NO_THROW(
-    {
+    EXPECT_NO_THROW({
         zero.ToInt16();
         min.ToInt16();
         normal.ToInt16();
@@ -763,9 +761,9 @@ TEST(TagTest, ConvertToInt16)
     });
 
     // not allowed
-    EXPECT_THROW(floatTag.ToInt16(),  std::exception);
+    EXPECT_THROW(floatTag.ToInt16(), std::exception);
     EXPECT_THROW(stringTag.ToInt16(), std::exception);
-    EXPECT_THROW(arrayTag.ToInt16(),  std::exception);
+    EXPECT_THROW(arrayTag.ToInt16(), std::exception);
 }
 
 TEST(TagTest, ConvertToUInt16)
@@ -779,18 +777,17 @@ TEST(TagTest, ConvertToUInt16)
     Tag arrayTag(vector<uint16_t>{{1, 2, 3}});
 
     // allowed
-    EXPECT_NO_THROW(
-    {
+    EXPECT_NO_THROW({
         zero.ToUInt16();
         normal.ToUInt16();
         max.ToUInt16();
     });
 
     // not allowed
-    EXPECT_THROW(neg.ToUInt16(),       std::exception);
-    EXPECT_THROW(floatTag.ToUInt16(),  std::exception);
+    EXPECT_THROW(neg.ToUInt16(), std::exception);
+    EXPECT_THROW(floatTag.ToUInt16(), std::exception);
     EXPECT_THROW(stringTag.ToUInt16(), std::exception);
-    EXPECT_THROW(arrayTag.ToUInt16(),  std::exception);
+    EXPECT_THROW(arrayTag.ToUInt16(), std::exception);
 }
 
 TEST(TagTest, ConvertToInt32)
@@ -804,8 +801,7 @@ TEST(TagTest, ConvertToInt32)
     Tag arrayTag(vector<int32_t>{{1, 2, 3}});
 
     // allowed
-    EXPECT_NO_THROW(
-    {
+    EXPECT_NO_THROW({
         zero.ToInt32();
         min.ToInt32();
         normal.ToInt32();
@@ -813,9 +809,9 @@ TEST(TagTest, ConvertToInt32)
     });
 
     // not allowed
-    EXPECT_THROW(floatTag.ToInt32(),  std::exception);
+    EXPECT_THROW(floatTag.ToInt32(), std::exception);
     EXPECT_THROW(stringTag.ToInt32(), std::exception);
-    EXPECT_THROW(arrayTag.ToInt32(),  std::exception);
+    EXPECT_THROW(arrayTag.ToInt32(), std::exception);
 }
 
 TEST(TagTest, ConvertToUInt32)
@@ -829,18 +825,17 @@ TEST(TagTest, ConvertToUInt32)
     Tag arrayTag(vector<uint32_t>{{1, 2, 3}});
 
     // allowed
-    EXPECT_NO_THROW(
-    {
+    EXPECT_NO_THROW({
         zero.ToUInt32();
         normal.ToUInt32();
         max.ToUInt32();
     });
 
     // not allowed
-    EXPECT_THROW(neg.ToUInt32(),       std::exception);
-    EXPECT_THROW(floatTag.ToUInt32(),  std::exception);
+    EXPECT_THROW(neg.ToUInt32(), std::exception);
+    EXPECT_THROW(floatTag.ToUInt32(), std::exception);
     EXPECT_THROW(stringTag.ToUInt32(), std::exception);
-    EXPECT_THROW(arrayTag.ToUInt32(),  std::exception);
+    EXPECT_THROW(arrayTag.ToUInt32(), std::exception);
 }
 
 TEST(TagCollectionTest, DefaultConstruction)
@@ -868,10 +863,10 @@ TEST(TagCollectionTest, AddSimpleTags)
     EXPECT_TRUE(tags.Contains("HX"));
     EXPECT_FALSE(tags.Contains("ZZ"));
 
-    EXPECT_TRUE( tags["XY"].ToInt32() == intValue );
-    EXPECT_TRUE( tags["ST"].ToString() == strValue );
-    EXPECT_TRUE( tags["HX"].ToString() == hexStrValue );
-    EXPECT_TRUE( tags["HX"].HasModifier(TagModifier::HEX_STRING) );
+    EXPECT_TRUE(tags["XY"].ToInt32() == intValue);
+    EXPECT_TRUE(tags["ST"].ToString() == strValue);
+    EXPECT_TRUE(tags["HX"].ToString() == hexStrValue);
+    EXPECT_TRUE(tags["HX"].HasModifier(TagModifier::HEX_STRING));
 }
 
 TEST(SamTagCodecTest, DecodeTest)
@@ -889,7 +884,7 @@ TEST(SamTagCodecTest, DecodeTest)
     expected["ST"] = string("foo");
     expected["XY"] = int32_t(-42);
     expected["HX"] = Tag("1abc75", TagModifier::HEX_STRING);
-    expected["VC"] = vector<int32_t>( { 42, -100, 37, 2048 } );
+    expected["VC"] = vector<int32_t>({42, -100, 37, 2048});
 
     TagCollection tags = SamTagCodec::Decode(tagString);
 
@@ -902,7 +897,7 @@ TEST(SamTagCodecTest, DecodeTest)
     EXPECT_TRUE(tags["HX"].HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(string("1abc75"), tags["HX"].ToString());
     EXPECT_EQ((int8_t)-42, tags["XY"].ToInt8());
-    EXPECT_EQ(vector<int32_t>( { 42, -100, 37, 2048 } ), tags["VC"].ToInt32Array());
+    EXPECT_EQ(vector<int32_t>({42, -100, 37, 2048}), tags["VC"].ToInt32Array());
 }
 
 TEST(SamTagCodecTest, EncodeTest)
@@ -911,7 +906,7 @@ TEST(SamTagCodecTest, EncodeTest)
     tags["ST"] = string("foo");
     tags["XY"] = int32_t(-42);
     tags["HX"] = Tag("1abc75", TagModifier::HEX_STRING);
-    tags["VC"] = vector<int32_t>( { 42, -100, 37, 2048 } );
+    tags["VC"] = vector<int32_t>({42, -100, 37, 2048});
 
     // "HX:H:1abc75\tST:Z:foo\0\tVC:B:i,42,-100,37,2048\tXY:i:-42"
     string expected;
@@ -947,8 +942,7 @@ TEST(BamTagCodecTest, DecodeTest)
     const int32_t x = -42;
     char valueBytes[sizeof x];
     std::copy(static_cast<const char*>(static_cast<const void*>(&x)),
-              static_cast<const char*>(static_cast<const void*>(&x)) + sizeof x,
-              valueBytes);
+              static_cast<const char*>(static_cast<const void*>(&x)) + sizeof x, valueBytes);
     data.push_back(valueBytes[0]);
     data.push_back(valueBytes[1]);
     data.push_back(valueBytes[2]);
@@ -1032,8 +1026,7 @@ TEST(BamTagCodecTest, EncodeTest)
     const int32_t x = -42;
     char valueBytes[sizeof x];
     std::copy(static_cast<const char*>(static_cast<const void*>(&x)),
-              static_cast<const char*>(static_cast<const void*>(&x)) + sizeof x,
-              valueBytes);
+              static_cast<const char*>(static_cast<const void*>(&x)) + sizeof x, valueBytes);
     expected.push_back(valueBytes[0]);
     expected.push_back(valueBytes[1]);
     expected.push_back(valueBytes[2]);
@@ -1052,40 +1045,40 @@ TEST(BamTagCodecTest, AsciiTagsTest)
 {
     vector<uint8_t> expected;
     expected.reserve(20);
-    expected.push_back('I'); // I8:A:B
+    expected.push_back('I');  // I8:A:B
     expected.push_back('8');
     expected.push_back('A');
     expected.push_back('B');
-    expected.push_back('P'); // PC:A:$
+    expected.push_back('P');  // PC:A:$
     expected.push_back('C');
     expected.push_back('A');
     expected.push_back('$');
-    expected.push_back('S'); // SC:A:$
+    expected.push_back('S');  // SC:A:$
     expected.push_back('C');
     expected.push_back('A');
     expected.push_back('$');
-    expected.push_back('U'); // U8:A:A
+    expected.push_back('U');  // U8:A:A
     expected.push_back('8');
     expected.push_back('A');
     expected.push_back('A');
-    expected.push_back('U'); // UC:A:$
+    expected.push_back('U');  // UC:A:$
     expected.push_back('C');
     expected.push_back('A');
     expected.push_back('$');
 
-    const char          c  = '$';
-    const signed char   sc = '$';
+    const char c = '$';
+    const signed char sc = '$';
     const unsigned char uc = '$';
     const uint8_t u8 = 65;
-    const int8_t  i8 = 66;
+    const int8_t i8 = 66;
 
-    { // old style: construct-then-modify
+    {  // old style: construct-then-modify
 
         Tag fromPlainChar = Tag(c);
         Tag fromSignedChar = Tag(sc);
         Tag fromUnsignedChar = Tag(uc);
         Tag fromUint8 = Tag(u8);
-        Tag fromInt8  = Tag(i8);
+        Tag fromInt8 = Tag(i8);
         fromPlainChar.Modifier(TagModifier::ASCII_CHAR);
         fromSignedChar.Modifier(TagModifier::ASCII_CHAR);
         fromUnsignedChar.Modifier(TagModifier::ASCII_CHAR);
@@ -1103,13 +1096,13 @@ TEST(BamTagCodecTest, AsciiTagsTest)
         EXPECT_EQ(expected, data);
     }
 
-    { // new style: construct directly as ASCII
+    {  // new style: construct directly as ASCII
 
-        const Tag fromPlainChar    = Tag(c,  TagModifier::ASCII_CHAR);
-        const Tag fromSignedChar   = Tag(sc, TagModifier::ASCII_CHAR);
+        const Tag fromPlainChar = Tag(c, TagModifier::ASCII_CHAR);
+        const Tag fromSignedChar = Tag(sc, TagModifier::ASCII_CHAR);
         const Tag fromUnsignedChar = Tag(uc, TagModifier::ASCII_CHAR);
         const Tag fromUint8 = Tag(u8, TagModifier::ASCII_CHAR);
-        const Tag fromInt8  = Tag(i8, TagModifier::ASCII_CHAR);
+        const Tag fromInt8 = Tag(i8, TagModifier::ASCII_CHAR);
 
         TagCollection tags;
         tags["PC"] = fromPlainChar;

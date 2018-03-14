@@ -27,7 +27,7 @@ Additional requirements:
 * `Boost`_ (1.55+)
 * `CMake`_ (3.0+)
 * `Google Test`_
-* `htslib`_ (1.3.1+)
+* `htslib`_ (1.4+)
 
 For additional languages:
 
@@ -129,11 +129,11 @@ Building with Meson is generally faster and more versatile. Meson strictly requi
 
    $ mkdir build
    $ cd build
-   $ meson --prefix /my/install/prefix -Denable-tests=true ..
+   $ meson --prefix /my/install/prefix -Dtests=true ..
    $ ninja
 
 where ninja will by default utilize a number of threads for compilation equal to the number of logical
-cores on your system. Here ``-Denable-tests=true`` enables pulling in dependencies for testing. In
+cores on your system. Here ``-Dtests=true`` enables pulling in dependencies for testing. In
 order to run the test suite, run:
 
 .. code-block:: console

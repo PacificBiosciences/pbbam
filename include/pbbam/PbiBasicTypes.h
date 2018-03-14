@@ -42,13 +42,13 @@
 #ifndef PBIBASICTYPES_H
 #define PBIBASICTYPES_H
 
-#include "pbbam/Compare.h"
-#include "pbbam/Config.h"
 #include <cstddef>
 #include <cstdint>
 #include <deque>
 #include <utility>
 #include <vector>
+#include "pbbam/Compare.h"
+#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -75,8 +75,8 @@ public:
     bool operator!=(const IndexResultBlock& other) const;
 
 public:
-    size_t  firstIndex_ = 0;     ///< index of block's first record in BAM/PBI files (e.g. i-th record)
-    size_t  numReads_ = 0;       ///< number of reads in this block
+    size_t firstIndex_ = 0;  ///< index of block's first record in BAM/PBI files (e.g. i-th record)
+    size_t numReads_ = 0;    ///< number of reads in this block
     int64_t virtualOffset_ = -1;  ///< virtual offset of first record in this block
 };
 
@@ -102,9 +102,9 @@ using IndexList = std::vector<size_t>;
 ///
 using IndexRange = std::pair<size_t, size_t>;
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/PbiBasicTypes.inl"
 
-#endif // PBIBASICTYPES_H
+#endif  // PBIBASICTYPES_H

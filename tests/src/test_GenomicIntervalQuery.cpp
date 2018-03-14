@@ -52,8 +52,8 @@ using namespace PacBio::BAM;
 using namespace std;
 
 namespace GenomicIntervalQueryTests {
-    const string inputBamFn = PbbamTestsConfig::Data_Dir + "/aligned.bam";
-} // namespace GenomicIntervalQueryTests
+const string inputBamFn = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+}  // namespace GenomicIntervalQueryTests
 
 TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
 {
@@ -100,7 +100,7 @@ TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
     interval.Start(0);
     interval.Stop(100);
     EXPECT_THROW(query.Interval(interval), std::runtime_error);
-    for (const BamRecord& record : query) { // iteration is still safe, just returns no data
+    for (const BamRecord& record : query) {  // iteration is still safe, just returns no data
         UNUSED(record);
         ++count;
     }
@@ -121,8 +121,7 @@ TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
 
 TEST(GenomicIntervalQueryTest, NonConstBamRecord)
 {
-    EXPECT_NO_THROW(
-    {
+    EXPECT_NO_THROW({
         BamFile bamFile(GenomicIntervalQueryTests::inputBamFn);
         int count = 0;
 
@@ -136,27 +135,28 @@ TEST(GenomicIntervalQueryTest, NonConstBamRecord)
     });
 }
 
-TEST(GenomicIntervalQueryTest,  MissingBaiShouldThrow)
+TEST(GenomicIntervalQueryTest, MissingBaiShouldThrow)
 {
     GenomicInterval interval("lambda_NEB3011", 0, 100);
     const string phi29Bam = PbbamTestsConfig::Data_Dir + "/phi29.bam";
     const string hasBaiBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
 
-    {   // single file, missing BAI
+    {  // single file, missing BAI
         EXPECT_THROW(GenomicIntervalQuery query(interval, phi29Bam), std::runtime_error);
     }
 
-    {   // from dataset, all missing BAI
+    {  // from dataset, all missing BAI
         DataSet ds;
         ds.ExternalResources().Add(ExternalResource("PacBio.SubreadFile.SubreadBamFile", phi29Bam));
         ds.ExternalResources().Add(ExternalResource("PacBio.SubreadFile.SubreadBamFile", phi29Bam));
         EXPECT_THROW(GenomicIntervalQuery query(interval, ds), std::runtime_error);
     }
 
-    {   // from dataset, mixed BAI presence
+    {  // from dataset, mixed BAI presence
         DataSet ds;
         ds.ExternalResources().Add(ExternalResource("PacBio.SubreadFile.SubreadBamFile", phi29Bam));
-        ds.ExternalResources().Add(ExternalResource("PacBio.AlignmentFile.AlignmentBamFile", hasBaiBam));
+        ds.ExternalResources().Add(
+            ExternalResource("PacBio.AlignmentFile.AlignmentBamFile", hasBaiBam));
         EXPECT_THROW(GenomicIntervalQuery query(interval, ds), std::runtime_error);
     }
 }

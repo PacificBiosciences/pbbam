@@ -1,13 +1,13 @@
 #!/bin/bash -vex
 type module >& /dev/null || . /mnt/software/Modules/current/init/bash
 
-module load cmake/3.9.0
-module load ccache/3.3.4
+module load cmake
+module load ccache
 export CCACHE_DIR="/mnt/secondary/Share/tmp/bamboo.${bamboo_shortPlanKey}.ccache"
 
 HTSLIB_VERSION=$(/bin/ls -d src/htslib-*|sed -e 's/.*htslib-//'|sort -V|tail -1)
 PBBAM_VERSION=$(grep 'PacBioBAM VERSION ' src/pbbam/CMakeLists.txt|sed -e 's/.*VERSION //'|awk '{print $1}')
-# project(PacBioBAM VERSION 0.13.2 LANGUAGES CXX C)
+# project(PacBioBAM VERSION 0.14.0 LANGUAGES CXX C)
 BUILD_NUMBER=0
 if [ -n "$bamboo_planRepository_branchName" ]; then
   BUILD_NUMBER=${bamboo_globalBuildNumber:-0}
@@ -20,7 +20,7 @@ PREFIX=$(readlink -f prefix)
 cd src/htslib-${HTSLIB_VERSION}
 export CCACHE_BASEDIR=$PWD
 make distclean
-CC=gcc CFLAGS='-fPIC -O' bash ./configure --prefix=$PWD/../../prefix
+CC=gcc CFLAGS='-fPIC -O' bash ./configure --prefix=$PWD/../../prefix --disable-bz2 --disable-lzma --disable-libcurl
 VERBOSE=1 make install
 rm -rf $PWD/../../prefix/lib/pkgconfig
 

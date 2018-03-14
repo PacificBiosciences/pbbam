@@ -54,12 +54,12 @@ namespace BAM {
 ///
 enum class ClipType
 {
-    CLIP_NONE           ///< No clipping will be performed.
-  , CLIP_TO_QUERY       ///< Clipping positions are in polymerase coordinates.
-  , CLIP_TO_REFERENCE   ///< Clipping positions are in genomic coordinates.
+    CLIP_NONE,         ///< No clipping will be performed.
+    CLIP_TO_QUERY,     ///< Clipping positions are in polymerase coordinates.
+    CLIP_TO_REFERENCE  ///< Clipping positions are in genomic coordinates.
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // CLIPTYPE_H
+#endif  // CLIPTYPE_H

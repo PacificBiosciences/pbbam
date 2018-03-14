@@ -35,8 +35,8 @@
 
 // Author: Derek Barnett
 
-#include <cstdint>
 #include <algorithm>
+#include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
@@ -46,6 +46,8 @@
 #define private public
 
 #include <pbbam/Compare.h>
+
+// clang-format off
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -739,3 +741,5 @@ TEST(CompareTest, ZmwOk)
     EXPECT_EQ(z1, records.at(2).HoleNumber());
     EXPECT_EQ(z3, records.at(3).HoleNumber());
 }
+
+// clang-format on

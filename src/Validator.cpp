@@ -43,32 +43,38 @@
 
 #include "pbbam/Validator.h"
 
+#include <cstddef>
+#include <iostream>
+#include <map>
+#include <set>
+#include <sstream>
+#include <stdexcept>
+#include <vector>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/core/ignore_unused.hpp>
+
+#include "ValidationErrors.h"
+#include "Version.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/EntireFileQuery.h"
 #include "pbbam/ReadGroupInfo.h"
-#include "ValidationErrors.h"
-#include "Version.h"
-#include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
-#include <cstddef>
-#include <iostream>
-#include <map>
-#include <sstream>
-#include <stdexcept>
-#include <set>
-#include <vector>
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
-struct ilexcompare_wrapper {
+struct ilexcompare_wrapper
+{
     bool operator()(const std::string& lhs, const std::string& rhs) const
-    { return boost::ilexicographical_compare(lhs, rhs); }
+    {
+        return boost::ilexicographical_compare(lhs, rhs);
+    }
 };
 
+// clang-format off
 static const std::set<std::string, ilexcompare_wrapper> AcceptedSortOrders = {
     "unknown",
     "unsorted",
@@ -84,26 +90,21 @@ static const std::set<std::string> AcceptedReadTypes = {
     "SCRAP",
     "UNKNOWN"
 };
+// clang-format on
 
-static
-void ValidateReadGroup(const ReadGroupInfo& rg,
-                       std::unique_ptr<ValidationErrors>& errors)
+static void ValidateReadGroup(const ReadGroupInfo& rg, std::unique_ptr<ValidationErrors>& errors)
 {
     const std::string& id = rg.Id();
 
     // has required fields
-    if (id.empty())
-        errors->AddReadGroupError(id, "missing ID");
-    if (rg.MovieName().empty())
-        errors->AddReadGroupError(id, "missing movie name (PU tag)");
+    if (id.empty()) errors->AddReadGroupError(id, "missing ID");
+    if (rg.MovieName().empty()) errors->AddReadGroupError(id, "missing movie name (PU tag)");
     // 3.0.2 adds required RG:PM - do not check for now, we'll add version-aware
     // validation down the road
 
     // description tag has required components
-    if (rg.ReadType().empty())
-        errors->AddReadGroupError(id, "missing READTYPE in description");
-    if (rg.BindingKit().empty())
-        errors->AddReadGroupError(id, "missing BINDINGKIT in description");
+    if (rg.ReadType().empty()) errors->AddReadGroupError(id, "missing READTYPE in description");
+    if (rg.BindingKit().empty()) errors->AddReadGroupError(id, "missing BINDINGKIT in description");
     if (rg.SequencingKit().empty())
         errors->AddReadGroupError(id, "missing SEQUENCINGKIT in description");
     if (rg.BasecallerVersion().empty())
@@ -115,8 +116,8 @@ void ValidateReadGroup(const ReadGroupInfo& rg,
     if (!id.empty()) {
         const auto expectedId = MakeReadGroupId(rg.MovieName(), rg.ReadType());
         if (expectedId != id) {
-            const std::string msg = "stored ID: " + id +
-                " does not match computed ID: " + expectedId;
+            const std::string msg =
+                "stored ID: " + id + " does not match computed ID: " + expectedId;
             errors->AddReadGroupError(id, std::move(msg));
         }
     }
@@ -128,10 +129,8 @@ void ValidateReadGroup(const ReadGroupInfo& rg,
     }
 
     // valid read chemistry (binding, sequencing, chemistry)
-    if (!rg.BindingKit().empty() &&
-        !rg.SequencingKit().empty() &&
-        !rg.BasecallerVersion().empty())
-    {
+    if (!rg.BindingKit().empty() && !rg.SequencingKit().empty() &&
+        !rg.BasecallerVersion().empty()) {
         try {
             auto chem = rg.SequencingChemistry();
             boost::ignore_unused(chem);
@@ -151,10 +150,8 @@ void ValidateReadGroup(const ReadGroupInfo& rg,
     }
 }
 
-static
-void ValidateHeader(const BamHeader& header,
-                    const std::string& filename,
-                    std::unique_ptr<ValidationErrors>& errors)
+static void ValidateHeader(const BamHeader& header, const std::string& filename,
+                           std::unique_ptr<ValidationErrors>& errors)
 {
     const std::string& fn = filename;
 
@@ -174,81 +171,72 @@ void ValidateHeader(const BamHeader& header,
     // PacBio version
     try {
         const Version v(header.PacBioBamVersion());
-        const Version minimum(3,0,1);
+        const Version minimum(3, 0, 1);
         if (v < minimum) {
             std::string msg = "PacBioBAM version (@HD:pb) ";
             msg += v.ToString();
-            msg += std::string{ " is older than the minimum supported version " };
-            msg += ( "(" + minimum.ToString() + ")" );
+            msg += std::string{" is older than the minimum supported version "};
+            msg += ("(" + minimum.ToString() + ")");
             errors->AddFileError(fn, std::move(msg));
         }
     } catch (std::exception& e) {
-        errors->AddFileError(fn, std::string("PacBioBAM version (@HD:pb) failed to parse: ") + e.what());
+        errors->AddFileError(
+            fn, std::string("PacBioBAM version (@HD:pb) failed to parse: ") + e.what());
     }
 
     // sequences?
 
     // read groups
-    for (const ReadGroupInfo& rg : header.ReadGroups() )
+    for (const ReadGroupInfo& rg : header.ReadGroups())
         ValidateReadGroup(rg, errors);
 }
 
-static
-void ValidateMetadata(const BamFile& file,
-                      std::unique_ptr<ValidationErrors>& errors)
+static void ValidateMetadata(const BamFile& file, std::unique_ptr<ValidationErrors>& errors)
 {
     // filename
     const std::string fn = file.Filename();
     if (fn == "-") {
-        errors->AddFileError(fn, "validation not is available for streamed BAM. Please "
-                                 "write to a file and run validation on it.");
-        errors->ThrowErrors(); // quit early
+        errors->AddFileError(fn,
+                             "validation not is available for streamed BAM. Please "
+                             "write to a file and run validation on it.");
+        errors->ThrowErrors();  // quit early
     }
-    if (boost::algorithm::ends_with(fn, ".bam") ||
-        boost::algorithm::ends_with(fn, ".bam.tmp"))
-    {
+    if (boost::algorithm::ends_with(fn, ".bam") || boost::algorithm::ends_with(fn, ".bam.tmp")) {
         errors->AddFileError(fn, "non-standard file extension");
     }
 
     // EOF
-    if (!file.HasEOF())
-        errors->AddFileError(fn, "missing end-of-file marker");
+    if (!file.HasEOF()) errors->AddFileError(fn, "missing end-of-file marker");
 
     // has PBI
-    if (!file.PacBioIndexExists())
-        errors->AddFileError(fn, "missing PBI file");
+    if (!file.PacBioIndexExists()) errors->AddFileError(fn, "missing PBI file");
 
     // header
     ValidateHeader(file.Header(), file.Filename(), errors);
 }
 
-void ValidateMappedRecord(const BamRecord& b,
-                          std::unique_ptr<ValidationErrors>& errors)
+void ValidateMappedRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
     const std::string& name = b.FullName();
-    if (b.ReferenceStart() < 0)
-        errors->AddRecordError(name, "mapped record position is invalid");
-    if (b.ReferenceId() < 0)
-        errors->AddRecordError(name, "mapped record reference ID is invalid");
+    if (b.ReferenceStart() < 0) errors->AddRecordError(name, "mapped record position is invalid");
+    if (b.ReferenceId() < 0) errors->AddRecordError(name, "mapped record reference ID is invalid");
 
     // what else??
 }
 
-void ValidateRecordCore(const BamRecord& b,
-                        std::unique_ptr<ValidationErrors>& errors)
+void ValidateRecordCore(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
     const std::string& name = b.FullName();
 
     if (b.Type() != RecordType::CCS) {
         const auto qStart = b.QueryStart();
-        const auto qEnd   = b.QueryEnd();
+        const auto qEnd = b.QueryEnd();
         if (qStart >= qEnd)
             errors->AddRecordError(name, "queryStart (qs) should be < queryEnd (qe)");
     }
 }
 
-void ValidateRecordReadGroup(const BamRecord& b,
-                             std::unique_ptr<ValidationErrors>& errors)
+void ValidateRecordReadGroup(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
     try {
         auto rg = b.ReadGroup();
@@ -258,8 +246,7 @@ void ValidateRecordReadGroup(const BamRecord& b,
     }
 }
 
-void ValidateRecordRequiredTags(const BamRecord& b,
-                                std::unique_ptr<ValidationErrors>& errors)
+void ValidateRecordRequiredTags(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
     const std::string& name = b.FullName();
 
@@ -267,23 +254,20 @@ void ValidateRecordRequiredTags(const BamRecord& b,
 
         // qe/qs
         const bool hasQueryStart = b.HasQueryStart();
-        const bool hasQueryEnd   = b.HasQueryEnd();
+        const bool hasQueryEnd = b.HasQueryEnd();
         if (hasQueryStart && hasQueryEnd) {
             const auto qStart = b.QueryStart();
-            const auto qEnd   = b.QueryEnd();
+            const auto qEnd = b.QueryEnd();
             if (qStart >= qEnd)
                 errors->AddRecordError(name, "queryStart (qs) should be < queryEnd (qe)");
         } else {
-            if (!hasQueryStart)
-                errors->AddRecordError(name, "missing tag: qs (queryStart)");
-            if (!hasQueryEnd)
-                errors->AddRecordError(name, "missing tag: qe (queryEnd)");
+            if (!hasQueryStart) errors->AddRecordError(name, "missing tag: qs (queryStart)");
+            if (!hasQueryEnd) errors->AddRecordError(name, "missing tag: qe (queryEnd)");
         }
     }
 
     // zm
-    if (!b.HasHoleNumber())
-        errors->AddRecordError(name, "missing tag: zm (ZMW hole number)");
+    if (!b.HasHoleNumber()) errors->AddRecordError(name, "missing tag: zm (ZMW hole number)");
 
     // np
     if (!b.HasNumPasses())
@@ -295,20 +279,18 @@ void ValidateRecordRequiredTags(const BamRecord& b,
     }
 
     // rq
-    if (!b.HasReadAccuracy())
-        errors->AddRecordError(name, "missing tag: rq (read accuracy)");
+    if (!b.HasReadAccuracy()) errors->AddRecordError(name, "missing tag: rq (read accuracy)");
 
     // sn
     if (!b.HasSignalToNoise())
         errors->AddRecordError(name, "missing tag: sn (signal-to-noise ratio)");
 }
 
-void ValidateRecordTagLengths(const BamRecord& b,
-                              std::unique_ptr<ValidationErrors>& errors)
+void ValidateRecordTagLengths(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
     const std::string& name = b.FullName();
-    const size_t expectedLength = (b.Type() == RecordType::CCS ? b.Sequence().size()
-                                                               : (b.QueryEnd() - b.QueryStart()));
+    const size_t expectedLength =
+        (b.Type() == RecordType::CCS ? b.Sequence().size() : (b.QueryEnd() - b.QueryStart()));
 
     // check "per-base"-type data lengths are compatible
     if (b.Sequence().size() != expectedLength)
@@ -316,15 +298,18 @@ void ValidateRecordTagLengths(const BamRecord& b,
 
     if (b.HasDeletionQV()) {
         if (b.DeletionQV().size() != expectedLength)
-            errors->AddTagLengthError(name, "DeletionQV", "dq", b.DeletionQV().size(), expectedLength);
+            errors->AddTagLengthError(name, "DeletionQV", "dq", b.DeletionQV().size(),
+                                      expectedLength);
     }
     if (b.HasDeletionTag()) {
         if (b.DeletionTag().size() != expectedLength)
-            errors->AddTagLengthError(name, "DeletionTag", "dt", b.DeletionTag().size(), expectedLength);
+            errors->AddTagLengthError(name, "DeletionTag", "dt", b.DeletionTag().size(),
+                                      expectedLength);
     }
     if (b.HasInsertionQV()) {
         if (b.InsertionQV().size() != expectedLength)
-            errors->AddTagLengthError(name, "InsertionQV", "iq", b.InsertionQV().size(), expectedLength);
+            errors->AddTagLengthError(name, "InsertionQV", "iq", b.InsertionQV().size(),
+                                      expectedLength);
     }
     if (b.HasMergeQV()) {
         if (b.MergeQV().size() != expectedLength)
@@ -332,11 +317,13 @@ void ValidateRecordTagLengths(const BamRecord& b,
     }
     if (b.HasSubstitutionQV()) {
         if (b.SubstitutionQV().size() != expectedLength)
-            errors->AddTagLengthError(name, "SubstitutionQV", "sq", b.SubstitutionQV().size(), expectedLength);
+            errors->AddTagLengthError(name, "SubstitutionQV", "sq", b.SubstitutionQV().size(),
+                                      expectedLength);
     }
     if (b.HasSubstitutionTag()) {
         if (b.SubstitutionTag().size() != expectedLength)
-            errors->AddTagLengthError(name, "SubstitutionTag", "st", b.SubstitutionTag().size(), expectedLength);
+            errors->AddTagLengthError(name, "SubstitutionTag", "st", b.SubstitutionTag().size(),
+                                      expectedLength);
     }
     if (b.HasIPD()) {
         if (b.IPD().size() != expectedLength)
@@ -346,69 +333,64 @@ void ValidateRecordTagLengths(const BamRecord& b,
     // NOTE: disabling "internal" tag checks for now, only checking "standard"
     //       PacBioBAM tags
 
-//    if (b.HasAltLabelQV()) {
-//        if (b.AltLabelQV().size() != expectedLength)
-//            errors->AddTagLengthError(name, "AltLabelQV", "pv", b.AltLabelQV().size(), expectedLength);
-//    }
-//    if (b.HasAltLabelTag()) {
-//        if (b.AltLabelTag().size() != expectedLength)
-//            errors->AddTagLengthError(name, "AltLabelTag", "pt", b.AltLabelTag().size(), expectedLength);
-//    }
-//    if (b.HasLabelQV()) {
-//        if (b.LabelQV().size() != expectedLength)
-//            errors->AddTagLengthError(name, "LabelQV", "pq", b.LabelQV().size(), expectedLength);
-//    }
-//    if (b.HasPkmean()) {
-//        if (b.Pkmean().size() != expectedLength)
-//            errors->AddTagLengthError(name, "Pkmean", "pa", b.Pkmean().size(), expectedLength);
-//    }
-//    if (b.HasPkmean2()) {
-//        if (b.Pkmean2().size() != expectedLength)
-//            errors->AddTagLengthError(name, "Pkmean2", "ps", b.Pkmean2().size(), expectedLength);
-//    }
-//    if (b.HasPkmid()) {
-//        if (b.Pkmid().size() != expectedLength)
-//            errors->AddTagLengthError(name, "Pkmid", "pm", b.Pkmid().size(), expectedLength);
-//    }
-//    if (b.HasPkmid2()) {
-//        if (b.Pkmid2().size() != expectedLength)
-//            errors->AddTagLengthError(name, "Pkmid2", "pi", b.Pkmid2().size(), expectedLength);
-//    }
-//    if (b.HasPrePulseFrames()) {
-//        if (b.PrePulseFrames().size() != expectedLength)
-//            errors->AddTagLengthError(name, "PrePulseFrames", "pd", b.PrePulseFrames().size(), expectedLength);
-//    }
-//    if (b.HasPulseCall()) {
-//        if (b.PulseCall().size() != expectedLength)
-//            errors->AddTagLengthError(name, "PulseCall", "pc", b.PulseCall().size(), expectedLength);
-//    }
-//    if (b.HasPulseCallWidth()) {
-//        if (b.PulseCallWidth().size() != expectedLength)
-//            errors->AddTagLengthError(name, "PulseCallWidth", "px", b.PulseCallWidth().size(), expectedLength);
-//    }
-//    if (b.HasPulseMergeQV()) {
-//        if (b.PulseMergeQV().size() != expectedLength)
-//            errors->AddTagLengthError(name, "PulseMergeQV", "pg", b.PulseMergeQV().size(), expectedLength);
-//    }
-//    if (b.HasPulseWidth()) {
-//        if (b.PulseWidth().size() != expectedLength)
-//            errors->AddTagLengthError(name, "PulseWidth", "pw", b.PulseWidth().size(), expectedLength);
-//    }
+    //    if (b.HasAltLabelQV()) {
+    //        if (b.AltLabelQV().size() != expectedLength)
+    //            errors->AddTagLengthError(name, "AltLabelQV", "pv", b.AltLabelQV().size(), expectedLength);
+    //    }
+    //    if (b.HasAltLabelTag()) {
+    //        if (b.AltLabelTag().size() != expectedLength)
+    //            errors->AddTagLengthError(name, "AltLabelTag", "pt", b.AltLabelTag().size(), expectedLength);
+    //    }
+    //    if (b.HasLabelQV()) {
+    //        if (b.LabelQV().size() != expectedLength)
+    //            errors->AddTagLengthError(name, "LabelQV", "pq", b.LabelQV().size(), expectedLength);
+    //    }
+    //    if (b.HasPkmean()) {
+    //        if (b.Pkmean().size() != expectedLength)
+    //            errors->AddTagLengthError(name, "Pkmean", "pa", b.Pkmean().size(), expectedLength);
+    //    }
+    //    if (b.HasPkmean2()) {
+    //        if (b.Pkmean2().size() != expectedLength)
+    //            errors->AddTagLengthError(name, "Pkmean2", "ps", b.Pkmean2().size(), expectedLength);
+    //    }
+    //    if (b.HasPkmid()) {
+    //        if (b.Pkmid().size() != expectedLength)
+    //            errors->AddTagLengthError(name, "Pkmid", "pm", b.Pkmid().size(), expectedLength);
+    //    }
+    //    if (b.HasPkmid2()) {
+    //        if (b.Pkmid2().size() != expectedLength)
+    //            errors->AddTagLengthError(name, "Pkmid2", "pi", b.Pkmid2().size(), expectedLength);
+    //    }
+    //    if (b.HasPrePulseFrames()) {
+    //        if (b.PrePulseFrames().size() != expectedLength)
+    //            errors->AddTagLengthError(name, "PrePulseFrames", "pd", b.PrePulseFrames().size(), expectedLength);
+    //    }
+    //    if (b.HasPulseCall()) {
+    //        if (b.PulseCall().size() != expectedLength)
+    //            errors->AddTagLengthError(name, "PulseCall", "pc", b.PulseCall().size(), expectedLength);
+    //    }
+    //    if (b.HasPulseCallWidth()) {
+    //        if (b.PulseCallWidth().size() != expectedLength)
+    //            errors->AddTagLengthError(name, "PulseCallWidth", "px", b.PulseCallWidth().size(), expectedLength);
+    //    }
+    //    if (b.HasPulseMergeQV()) {
+    //        if (b.PulseMergeQV().size() != expectedLength)
+    //            errors->AddTagLengthError(name, "PulseMergeQV", "pg", b.PulseMergeQV().size(), expectedLength);
+    //    }
+    //    if (b.HasPulseWidth()) {
+    //        if (b.PulseWidth().size() != expectedLength)
+    //            errors->AddTagLengthError(name, "PulseWidth", "pw", b.PulseWidth().size(), expectedLength);
+    //    }
 }
 
-void ValidateUnmappedRecord(const BamRecord& b,
-                            std::unique_ptr<ValidationErrors>& errors)
+void ValidateUnmappedRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
     const std::string& name = b.FullName();
-    if (b.ReferenceStart() != -1)
-        errors->AddRecordError(name, "unmapped record has a position");
-    if (b.ReferenceId() != -1)
-        errors->AddRecordError(name, "unmapped record has a reference ID");
+    if (b.ReferenceStart() != -1) errors->AddRecordError(name, "unmapped record has a position");
+    if (b.ReferenceId() != -1) errors->AddRecordError(name, "unmapped record has a reference ID");
 }
 
-static
-void ValidateRecord(const BamRecord& b,
-                    std::unique_ptr<ValidationErrors>& errors)
+static void ValidateRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
     ValidateRecordCore(b, errors);
     ValidateRecordReadGroup(b, errors);
@@ -420,54 +402,49 @@ void ValidateRecord(const BamRecord& b,
         ValidateUnmappedRecord(b, errors);
 }
 
-} // namespace internal
+}  // namespace internal
 
 using internal::ValidationErrors;
 
 void Validator::Validate(const BamHeader& header, const size_t maxErrors)
 {
-    std::unique_ptr<ValidationErrors> errors{ new ValidationErrors(maxErrors) };
+    std::unique_ptr<ValidationErrors> errors{new ValidationErrors(maxErrors)};
     internal::ValidateHeader(header, "unknown", errors);
-    if (!errors->IsEmpty())
-        errors->ThrowErrors();
+    if (!errors->IsEmpty()) errors->ThrowErrors();
 }
 
-void Validator::Validate(const ReadGroupInfo& rg,  const size_t maxErrors)
+void Validator::Validate(const ReadGroupInfo& rg, const size_t maxErrors)
 {
-    std::unique_ptr<ValidationErrors> errors{ new ValidationErrors(maxErrors) };
+    std::unique_ptr<ValidationErrors> errors{new ValidationErrors(maxErrors)};
     internal::ValidateReadGroup(rg, errors);
-    if (!errors->IsEmpty())
-        errors->ThrowErrors();
+    if (!errors->IsEmpty()) errors->ThrowErrors();
 }
 
 void Validator::Validate(const BamRecord& b, const size_t maxErrors)
 {
-    std::unique_ptr<ValidationErrors> errors{ new ValidationErrors(maxErrors) };
+    std::unique_ptr<ValidationErrors> errors{new ValidationErrors(maxErrors)};
     internal::ValidateRecord(b, errors);
-    if (!errors->IsEmpty())
-        errors->ThrowErrors();
+    if (!errors->IsEmpty()) errors->ThrowErrors();
 }
 
 void Validator::ValidateEntireFile(const BamFile& file, const size_t maxErrors)
 {
-    std::unique_ptr<ValidationErrors> errors{ new ValidationErrors(maxErrors) };
+    std::unique_ptr<ValidationErrors> errors{new ValidationErrors(maxErrors)};
     internal::ValidateMetadata(file, errors);
 
     EntireFileQuery query(file);
     for (const BamRecord& record : query)
         internal::ValidateRecord(record, errors);
 
-    if (!errors->IsEmpty())
-        errors->ThrowErrors();
+    if (!errors->IsEmpty()) errors->ThrowErrors();
 }
 
 void Validator::ValidateFileMetadata(const BamFile& file, const size_t maxErrors)
 {
-    std::unique_ptr<ValidationErrors> errors{ new ValidationErrors(maxErrors) };
+    std::unique_ptr<ValidationErrors> errors{new ValidationErrors(maxErrors)};
     internal::ValidateMetadata(file, errors);
-    if (!errors->IsEmpty())
-        errors->ThrowErrors();
+    if (!errors->IsEmpty()) errors->ThrowErrors();
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

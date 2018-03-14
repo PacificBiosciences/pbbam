@@ -35,11 +35,11 @@
 
 // Author: Derek Barnett
 
-#include <string>
-#include <cstdio>
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
+#include <cstdio>
 #include <cstdlib>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -48,6 +48,8 @@
 #include "PbbamTestData.h"
 
 #include <pbbam/PbiFilter.h>
+
+// clang-format off
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -677,9 +679,6 @@ TEST(PbiFilterTest, QueryLengthFilterOk)
 
 TEST(PbiFilterTest, QueryNameFilterOk)
 {
-    const auto bamFile = BamFile{ PbbamTestsConfig::Data_Dir + string{ "/group/test2.bam" } };
-    const auto index = PbiIndex{ bamFile.PacBioIndexFilename() };
-
     {
         const auto filter = PbiFilter{ PbiQueryNameFilter{ "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2579_4055" } };
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1});
@@ -1357,3 +1356,5 @@ TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
         EXPECT_THROW(PbiFilter::FromDataSet(dataset), std::runtime_error);
     }
 }
+
+// clang-format on

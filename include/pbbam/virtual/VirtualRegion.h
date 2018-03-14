@@ -43,8 +43,8 @@
 #define VIRTUALREGION_H
 
 #include "pbbam/Config.h"
-#include "pbbam/virtual/VirtualRegionType.h"
 #include "pbbam/LocalContextFlags.h"
+#include "pbbam/virtual/VirtualRegionType.h"
 
 namespace PacBio {
 namespace BAM {
@@ -65,49 +65,34 @@ public:
 public:
     /// \brief Creates a virtual region with basic type & position info.
     ///
-    VirtualRegion(const VirtualRegionType type, 
-                  const int beginPos,
-                  const int endPos,
+    VirtualRegion(const VirtualRegionType type, const int beginPos, const int endPos,
                   const int score = 0);
 
     /// \brief Creates a virtual region with type/position info, as well as context & barcode.
     ///
-    VirtualRegion(const VirtualRegionType type, 
-                  const int beginPos,
-                  const int endPos, 
-                  const LocalContextFlags cxTag, 
-                  const int barcodeLeft,
-                  const int barcodeRight,
+    VirtualRegion(const VirtualRegionType type, const int beginPos, const int endPos,
+                  const LocalContextFlags cxTag, const int barcodeLeft, const int barcodeRight,
                   const int score = 0);
 
     VirtualRegion() = default;
     VirtualRegion(const VirtualRegion&) = default;
     VirtualRegion(VirtualRegion&&) = default;
-    VirtualRegion& operator=(const VirtualRegion&) = default; // un-"delete"-ed for SWIG
+    VirtualRegion& operator=(const VirtualRegion&) = default;  // un-"delete"-ed for SWIG
     VirtualRegion& operator=(VirtualRegion&&) = default;
     ~VirtualRegion() = default;
 
-    bool operator==(const VirtualRegion &v1) const;
-
+    bool operator==(const VirtualRegion& v1) const;
 };
 
-inline VirtualRegion::VirtualRegion(const VirtualRegionType type,
-                                    const int beginPos,
-                                    const int endPos,
-                                    const int score)
-    : type(type)
-    , beginPos(beginPos)
-    , endPos(endPos), cxTag()
-    , score(score)
-{}
+inline VirtualRegion::VirtualRegion(const VirtualRegionType type, const int beginPos,
+                                    const int endPos, const int score)
+    : type(type), beginPos(beginPos), endPos(endPos), cxTag(), score(score)
+{
+}
 
-inline VirtualRegion::VirtualRegion(const VirtualRegionType type,
-                                    const int beginPos,
-                                    const int endPos,
-                                    const LocalContextFlags cxTag,
-                                    const int barcodeLeft,
-                                    const int barcodeRight,
-                                    const int score)
+inline VirtualRegion::VirtualRegion(const VirtualRegionType type, const int beginPos,
+                                    const int endPos, const LocalContextFlags cxTag,
+                                    const int barcodeLeft, const int barcodeRight, const int score)
     : type(type)
     , beginPos(beginPos)
     , endPos(endPos)
@@ -115,16 +100,15 @@ inline VirtualRegion::VirtualRegion(const VirtualRegionType type,
     , barcodeLeft(barcodeLeft)
     , barcodeRight(barcodeRight)
     , score(score)
-{}
+{
+}
 
 inline bool VirtualRegion::operator==(const VirtualRegion& v1) const
 {
-    return (v1.type == this->type &&
-            v1.beginPos == this->beginPos &&
-            v1.endPos == this->endPos);
+    return (v1.type == this->type && v1.beginPos == this->beginPos && v1.endPos == this->endPos);
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // VIRTUALREGION_H
+#endif  // VIRTUALREGION_H

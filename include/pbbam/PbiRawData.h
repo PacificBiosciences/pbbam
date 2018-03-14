@@ -42,12 +42,12 @@
 #ifndef PBIRAWDATA_H
 #define PBIRAWDATA_H
 
-#include "pbbam/Config.h"
-#include "pbbam/PbiFile.h"
 #include <cstddef>
 #include <cstdint>
 #include <string>
 #include <vector>
+#include "pbbam/Config.h"
+#include "pbbam/PbiFile.h"
 
 namespace PacBio {
 namespace BAM {
@@ -96,7 +96,7 @@ public:
 
     std::vector<int16_t> bcForward_;
     std::vector<int16_t> bcReverse_;
-    std::vector<int8_t>  bcQual_;
+    std::vector<int8_t> bcQual_;
 
     /// \}
 };
@@ -170,8 +170,7 @@ public:
     /// \param[in] recordIndex  i-th record in the data set
     /// \returns a pair consisting of (numDeletions,numInsertions)
     ///
-    std::pair<uint32_t, uint32_t>
-    NumDeletedAndInsertedBasesAt(size_t recordIndex) const;
+    std::pair<uint32_t, uint32_t> NumDeletedAndInsertedBasesAt(size_t recordIndex) const;
 
     /// \}
 
@@ -179,15 +178,15 @@ public:
     /// \name Raw Data Containers
     /// \{
 
-    std::vector<int32_t>  tId_;
+    std::vector<int32_t> tId_;
     std::vector<uint32_t> tStart_;
     std::vector<uint32_t> tEnd_;
     std::vector<uint32_t> aStart_;
     std::vector<uint32_t> aEnd_;
-    std::vector<uint8_t>  revStrand_;
+    std::vector<uint8_t> revStrand_;
     std::vector<uint32_t> nM_;
     std::vector<uint32_t> nMM_;
-    std::vector<uint8_t>  mapQV_;
+    std::vector<uint8_t> mapQV_;
 
     /// \}
 };
@@ -203,11 +202,11 @@ public:
 class PBBAM_EXPORT PbiReferenceEntry
 {
 public:
-    using ID  = uint32_t;
+    using ID = uint32_t;
     using Row = uint32_t;
 
 public:
-    static const ID  UNMAPPED_ID;
+    static const ID UNMAPPED_ID;
     static const Row UNSET_ROW;
 
 public:
@@ -244,7 +243,7 @@ public:
     /// \name Reference Data Members
     /// \{
 
-    ID  tId_;
+    ID tId_;
     Row beginRow_;
     Row endRow_;
 
@@ -327,22 +326,17 @@ public:
     /// \name Raw Data Containers
     /// \{
 
-    std::vector<int32_t>  rgId_;
-    std::vector<int32_t>  qStart_;
-    std::vector<int32_t>  qEnd_;
-    std::vector<int32_t>  holeNumber_;
-    std::vector<float>    readQual_;
-    std::vector<uint8_t>  ctxtFlag_;
-    std::vector<int64_t>  fileOffset_;
+    std::vector<int32_t> rgId_;
+    std::vector<int32_t> qStart_;
+    std::vector<int32_t> qEnd_;
+    std::vector<int32_t> holeNumber_;
+    std::vector<float> readQual_;
+    std::vector<uint8_t> ctxtFlag_;
+    std::vector<int64_t> fileOffset_;
     std::vector<uint16_t> fileNumber_;
 
     /// \}
 };
-
-/// \deprecated For legacy-code support only, and will be removed soon.
-///             Use PbiRawBasicData instead.
-///
-using PbiRawSubreadData = PbiRawBasicData;
 
 /// \brief The PbiRawData class provides an representation of raw PBI index
 ///        data, used mostly for construction or I/O.
@@ -515,19 +509,19 @@ public:
     /// \}
 
 private:
-    std::string          filename_;
+    std::string filename_;
     PbiFile::VersionEnum version_ = PbiFile::CurrentVersion;
-    PbiFile::Sections    sections_ = PbiFile::ALL;
-    uint32_t             numReads_ = 0;
-    PbiRawBarcodeData    barcodeData_;
-    PbiRawMappedData     mappedData_;
-    PbiRawReferenceData  referenceData_;
-    PbiRawBasicData      basicData_;
+    PbiFile::Sections sections_ = PbiFile::ALL;
+    uint32_t numReads_ = 0;
+    PbiRawBarcodeData barcodeData_;
+    PbiRawMappedData mappedData_;
+    PbiRawReferenceData referenceData_;
+    PbiRawBasicData basicData_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/PbiRawData.inl"
 
-#endif // PBIRAWDATA_H
+#endif  // PBIRAWDATA_H

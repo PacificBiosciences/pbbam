@@ -56,7 +56,9 @@
 namespace PacBio {
 namespace BAM {
 
-namespace internal { struct BamReaderPrivate; }
+namespace internal {
+struct BamReaderPrivate;
+}
 
 /// \brief The BamReader class provides basic read-access to a %BAM file.
 ///
@@ -186,7 +188,7 @@ private:
     std::unique_ptr<internal::BamReaderPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // BAMREADER_H
+#endif  // BAMREADER_H

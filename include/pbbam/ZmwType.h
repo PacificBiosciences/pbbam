@@ -51,13 +51,13 @@ namespace BAM {
 ///
 enum class ZmwType : char
 {
-    CONTROL   = 'C',
+    CONTROL = 'C',
     MALFORMED = 'M',
-    NORMAL    = 'N',
-    SENTINEL  = 'S'
+    NORMAL = 'N',
+    SENTINEL = 'S'
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // ZMWTYPE_H
+#endif  // ZMWTYPE_H

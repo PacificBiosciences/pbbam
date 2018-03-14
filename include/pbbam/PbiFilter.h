@@ -42,26 +42,27 @@
 #ifndef PBIFILTER_H
 #define PBIFILTER_H
 
-#include "pbbam/DataSet.h"
-#include "pbbam/PbiBasicTypes.h"
-#include "pbbam/PbiIndex.h"
-#include "pbbam/PbiRawData.h"
-#include "pbbam/Unused.h"
 #include <boost/concept_check.hpp>
 #include <cstddef>
 #include <memory>
 #include <string>
 #include <tuple>
+#include "pbbam/DataSet.h"
+#include "pbbam/PbiBasicTypes.h"
+#include "pbbam/PbiRawData.h"
+#include "pbbam/Unused.h"
 
 namespace PacBio {
 namespace BAM {
 
-namespace internal { struct PbiFilterPrivate; }
+namespace internal {
+struct PbiFilterPrivate;
+}
 
 /// \brief The PbiFilterConcept class provides compile-time enforcement of the
 ///        required interface for PbiFilter's child filters.
 ///
-template<typename T>
+template <typename T>
 struct PbiFilterConcept
 {
     BOOST_CONCEPT_USAGE(PbiFilterConcept)
@@ -78,7 +79,7 @@ struct PbiFilterConcept
 
 private:
     T filter;
-//    PbiRawData index;
+    //    PbiRawData index;
 };
 
 /// \brief The PbiFilter class provides a mechanism for performing PBI-enabled
@@ -117,8 +118,8 @@ class PBBAM_EXPORT PbiFilter
 public:
     enum CompositionType
     {
-        INTERSECT
-      , UNION
+        INTERSECT,
+        UNION
     };
 
 public:
@@ -207,7 +208,6 @@ public:
     static PbiFilter FromDataSet(const DataSet& dataset);
 
 public:
-
     /// \brief Creates an empty filter.
     ///
     /// \note An empty filter will result in all records being returned, e.g.
@@ -227,7 +227,7 @@ public:
     ///
     /// \param[in] filter initial child filter
     ///
-    template<typename T>
+    template <typename T>
     PbiFilter(const T& filter);
 
     /// \brief Creates a composite filter (of INTERSECT type) with an initial
@@ -237,7 +237,7 @@ public:
     ///
     /// \param[in] filter initial child filter
     ///
-    template<typename T>
+    template <typename T>
     PbiFilter(T&& filter);
 
     /// \brief Creates a composite filter (of INTERSECT type) with a list of
@@ -272,7 +272,7 @@ public:
     ///                     PbiFilterConcept.
     /// \returns reference to this filter
     ///
-    template<typename T>
+    template <typename T>
     PbiFilter& Add(const T& filter);
 
     /// \brief Adds a new child filter of type T.
@@ -281,7 +281,7 @@ public:
     ///                     PbiFilterConcept.
     /// \returns reference to this filter
     ///
-    template<typename T>
+    template <typename T>
     PbiFilter& Add(T&& filter);
 
     /// \brief Adds a new child filter.
@@ -327,7 +327,7 @@ public:
     /// \param[in] idx  PBI (raw) index object
     /// \param[in] row  record number in %BAM/PBI files
     ///
-    /// \returns true if record at \p row passes this filter criteria, 
+    /// \returns true if record at \p row passes this filter criteria,
     ///          including children (if any)
     ///
     bool Accepts(const BAM::PbiRawData& idx, const size_t row) const;
@@ -338,10 +338,10 @@ private:
     std::unique_ptr<internal::PbiFilterPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#include "pbbam/internal/PbiFilter.inl"
 #include "pbbam/PbiFilterTypes.h"
+#include "pbbam/internal/PbiFilter.inl"
 
-#endif // PBIFILTER_H
+#endif  // PBIFILTER_H

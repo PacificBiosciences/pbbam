@@ -42,14 +42,16 @@
 #ifndef BAIINDEXEDBAMREADER_H
 #define BAIINDEXEDBAMREADER_H
 
-#include "pbbam/BamReader.h"
 #include "pbbam/BamFile.h"
+#include "pbbam/BamReader.h"
 #include "pbbam/GenomicInterval.h"
 
 namespace PacBio {
 namespace BAM {
 
-namespace internal { struct BaiIndexedBamReaderPrivate; }
+namespace internal {
+struct BaiIndexedBamReaderPrivate;
+}
 
 /// \brief The BaiIndexedBamReader class provides read-only iteration over %BAM
 ///        records, bounded by a particular genomic interval.
@@ -72,8 +74,7 @@ public:
     /// \throws std::runtime_error if either file (*.bam or *.bai) fails to open
     ///         for reading, or if the interval is invalid
     ///
-    BaiIndexedBamReader(const GenomicInterval& interval,
-                        const std::string& filename);
+    BaiIndexedBamReader(const GenomicInterval& interval, const std::string& filename);
 
     /// \brief Constructs BAM reader, bounded by a genomic interval.
     ///
@@ -124,7 +125,7 @@ private:
     std::unique_ptr<internal::BaiIndexedBamReaderPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // BAIINDEXEDBAMREADER_H
+#endif  // BAIINDEXEDBAMREADER_H

@@ -42,16 +42,17 @@
 #include "PbbamInternalConfig.h"
 
 #include "VirtualZmwCompositeReader.h"
-#include "pbbam/MakeUnique.h"
+
 #include <boost/algorithm/string.hpp>
+
+#include "pbbam/MakeUnique.h"
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
 VirtualZmwCompositeReader::VirtualZmwCompositeReader(const DataSet& dataset)
-    : currentReader_(nullptr)
-    , filter_(PbiFilter::FromDataSet(dataset))
+    : currentReader_(nullptr), filter_(PbiFilter::FromDataSet(dataset))
 {
     // set up source queue
     std::string primaryFn;
@@ -65,8 +66,7 @@ VirtualZmwCompositeReader::VirtualZmwCompositeReader(const DataSet& dataset)
         // if resource is possible "primary" BAM
         const auto& metatype = resource.MetaType();
         if (metatype == "PacBio.SubreadFile.SubreadBamFile" ||
-            metatype == "PacBio.SubreadFile.HqRegionBamFile")
-        {
+            metatype == "PacBio.SubreadFile.HqRegionBamFile") {
             // possible resolve relative path
             primaryFn = dataset.ResolvePath(resource.ResourceId());
 
@@ -75,8 +75,7 @@ VirtualZmwCompositeReader::VirtualZmwCompositeReader(const DataSet& dataset)
             for (const auto& childResource : childResources) {
                 const auto& childMetatype = childResource.MetaType();
                 if (childMetatype == "PacBio.SubreadFile.ScrapsBamFile" ||
-                    childMetatype == "PacBio.SubreadFile.HqScrapsBamFile")
-                {
+                    childMetatype == "PacBio.SubreadFile.HqScrapsBamFile") {
                     // possible resolve relative path
                     scrapsFn = dataset.ResolvePath(childResource.ResourceId());
                     break;
@@ -86,32 +85,28 @@ VirtualZmwCompositeReader::VirtualZmwCompositeReader(const DataSet& dataset)
 
         // queue up source for later
         if (!primaryFn.empty() && !scrapsFn.empty())
-            sources_.emplace_back(std::make_pair(primaryFn,scrapsFn));
+            sources_.emplace_back(std::make_pair(primaryFn, scrapsFn));
     }
 
     // open first available source
     OpenNextReader();
 }
 
-bool VirtualZmwCompositeReader::HasNext()
-{
-    return (currentReader_ && currentReader_->HasNext());
-}
+bool VirtualZmwCompositeReader::HasNext() { return (currentReader_ && currentReader_->HasNext()); }
 
 VirtualZmwBamRecord VirtualZmwCompositeReader::Next()
 {
     if (currentReader_) {
         const auto result = currentReader_->Next();
-        if (!currentReader_->HasNext())
-            OpenNextReader();
+        if (!currentReader_->HasNext()) OpenNextReader();
         return result;
     }
 
     // no reader active
-    const std::string msg = { "no readers active, make sure you use "
-                              "VirtualZmwCompositeReader::HasNext before "
-                              "requesting next record"
-                            };
+    const std::string msg = {
+        "no readers active, make sure you use "
+        "VirtualZmwCompositeReader::HasNext before "
+        "requesting next record"};
     throw std::runtime_error(msg);
 }
 
@@ -119,16 +114,15 @@ std::vector<BamRecord> VirtualZmwCompositeReader::NextRaw()
 {
     if (currentReader_) {
         const auto result = currentReader_->NextRaw();
-        if (!currentReader_->HasNext())
-            OpenNextReader();
+        if (!currentReader_->HasNext()) OpenNextReader();
         return result;
     }
 
     // no reader active
-    const std::string msg = { "no readers active, make sure you use "
-                              "VirtualZmwCompositeReader::HasNext before "
-                              "requesting next group of records"
-                            };
+    const std::string msg = {
+        "no readers active, make sure you use "
+        "VirtualZmwCompositeReader::HasNext before "
+        "requesting next group of records"};
     throw std::runtime_error(msg);
 }
 
@@ -137,18 +131,16 @@ void VirtualZmwCompositeReader::OpenNextReader()
     currentReader_.reset(nullptr);
 
     // find next source pair with data
-    while(!sources_.empty()) {
+    while (!sources_.empty()) {
         const auto nextSource = sources_.front();
         sources_.pop_front();
 
-        currentReader_ = std::make_unique<VirtualZmwReader>(nextSource.first,
-                                                            nextSource.second,
-                                                            filter_);
-        if (currentReader_->HasNext())
-            return;
+        currentReader_ =
+            std::make_unique<VirtualZmwReader>(nextSource.first, nextSource.second, filter_);
+        if (currentReader_->HasNext()) return;
     }
 }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio

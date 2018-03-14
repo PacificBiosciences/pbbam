@@ -42,11 +42,11 @@
 #ifndef TAG_H
 #define TAG_H
 
-#include "pbbam/Config.h"
 #include <boost/variant.hpp>
 #include <cstdint>
 #include <string>
 #include <vector>
+#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -56,22 +56,22 @@ namespace BAM {
 ///
 enum class TagDataType
 {
-    INVALID      = 0     ///< boost::blank
-  , INT8                 ///< int8_t
-  , UINT8                ///< uint8_t
-  , INT16                ///< int16_t
-  , UINT16               ///< uint16_t
-  , INT32        = 5     ///< int32_t
-  , UINT32               ///< uint32_t
-  , FLOAT                ///< float
-  , STRING               ///< std::string
-  , INT8_ARRAY           ///< std::vector<int8_t>
-  , UINT8_ARRAY  = 10    ///< std::vector<uint8_t>
-  , INT16_ARRAY          ///< std::vector<int16_t>
-  , UINT16_ARRAY         ///< std::vector<uint16_t>
-  , INT32_ARRAY          ///< std::vector<int32_t>
-  , UINT32_ARRAY         ///< std::vector<uint32_t>
-  , FLOAT_ARRAY  = 15    ///< std::vector<float>
+    INVALID = 0,       ///< boost::blank
+    INT8,              ///< int8_t
+    UINT8,             ///< uint8_t
+    INT16,             ///< int16_t
+    UINT16,            ///< uint16_t
+    INT32 = 5,         ///< int32_t
+    UINT32,            ///< uint32_t
+    FLOAT,             ///< float
+    STRING,            ///< std::string
+    INT8_ARRAY,        ///< std::vector<int8_t>
+    UINT8_ARRAY = 10,  ///< std::vector<uint8_t>
+    INT16_ARRAY,       ///< std::vector<int16_t>
+    UINT16_ARRAY,      ///< std::vector<uint16_t>
+    INT32_ARRAY,       ///< std::vector<int32_t>
+    UINT32_ARRAY,      ///< std::vector<uint32_t>
+    FLOAT_ARRAY = 15   ///< std::vector<float>
 };
 
 /// \brief This enum provides additional instructions on interpreting the tag's
@@ -139,8 +139,8 @@ public:
     ///
     Tag(int8_t value);
 
-   /// \brief Creates a Tag from a signed 8-bit integer or character,
-   ///        applying the provided modifier.
+    /// \brief Creates a Tag from a signed 8-bit integer or character,
+    ///        applying the provided modifier.
     ///
     /// This method allows direct construction of an ASCII character, rather
     /// than an 8-bit integer (e.g. Tag('A', TagModifier::ASCII_CHAR) ).
@@ -202,7 +202,7 @@ public:
 
     /// \brief Creates a Tag from a vector of floating-point values.
     Tag(const std::vector<float>& value);
-    
+
     Tag(const Tag& other) = default;
     Tag(Tag&& other) = default;
     ~Tag() = default;
@@ -227,8 +227,8 @@ public:
     Tag& operator=(const Tag& other) = default;
     Tag& operator=(Tag&& other) = default;
 
-    bool operator== (const Tag& other) const;
-    bool operator!= (const Tag& other) const;
+    bool operator==(const Tag& other) const;
+    bool operator!=(const Tag& other) const;
 
     /// \}
 
@@ -317,7 +317,6 @@ public:
     /// \}
 
 public:
-
     /// \name Data Conversion & Validation
     ///
 
@@ -424,7 +423,8 @@ public:
 
     /// \}
 
-private :
+private:
+    // clang-format off
     // NOTE - keep this synced with TagDataType enum ordering
     using var_t = boost::variant<boost::blank, // <-- default constructor creates variant of this type
                                  int8_t,
@@ -445,11 +445,12 @@ private :
 
     var_t data_;
     TagModifier modifier_ = TagModifier::NONE;
+    // clang-format on
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/Tag.inl"
 
-#endif // TAG_H
+#endif  // TAG_H

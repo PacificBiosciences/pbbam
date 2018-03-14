@@ -38,21 +38,23 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/BamWriter.h"
-#include "pbbam/BamFile.h"
-#include "pbbam/MakeUnique.h"
-#include "pbbam/Unused.h"
-#include "pbbam/Validator.h"
-#include "FileProducer.h"
-#include "MemoryUtils.h"
-#include "Autovalidate.h"
 
-#include <htslib/bgzf.h>
-#include <htslib/hfile.h>
-#include <htslib/hts.h>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <thread>
+
+#include <htslib/bgzf.h>
+#include <htslib/hfile.h>
+#include <htslib/hts.h>
+
+#include "Autovalidate.h"
+#include "FileProducer.h"
+#include "MemoryUtils.h"
+#include "pbbam/BamFile.h"
+#include "pbbam/MakeUnique.h"
+#include "pbbam/Unused.h"
+#include "pbbam/Validator.h"
 
 namespace PacBio {
 namespace BAM {
@@ -61,10 +63,8 @@ namespace internal {
 class BamWriterPrivate : public internal::FileProducer
 {
 public:
-    BamWriterPrivate(const std::string& filename,
-                     const std::shared_ptr<bam_hdr_t> rawHeader,
-                     const BamWriter::CompressionLevel compressionLevel,
-                     const size_t numThreads,
+    BamWriterPrivate(const std::string& filename, const std::shared_ptr<bam_hdr_t> rawHeader,
+                     const BamWriter::CompressionLevel compressionLevel, const size_t numThreads,
                      const BamWriter::BinCalculationMode binCalculationMode);
 
 public:
@@ -88,15 +88,13 @@ BamWriterPrivate::BamWriterPrivate(const std::string& filename,
     , file_(nullptr)
     , header_(rawHeader)
 {
-    if (!header_)
-        throw std::runtime_error("null header");
+    if (!header_) throw std::runtime_error("null header");
 
     // open file
     const auto& usingFilename = TempFilename();
     const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
     file_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
-    if (!file_)
-        throw std::runtime_error("could not open file for writing");
+    if (!file_) throw std::runtime_error("could not open file for writing");
 
     // if no explicit thread count given, attempt built-in check
     size_t actualNumThreads = numThreads;
@@ -104,18 +102,15 @@ BamWriterPrivate::BamWriterPrivate(const std::string& filename,
         actualNumThreads = std::thread::hardware_concurrency();
 
         // if still unknown, default to single-threaded
-        if (actualNumThreads == 0)
-            actualNumThreads = 1;
+        if (actualNumThreads == 0) actualNumThreads = 1;
     }
 
     // if multithreading requested, enable it
-    if (actualNumThreads > 1)
-        hts_set_threads(file_.get(), actualNumThreads);
+    if (actualNumThreads > 1) hts_set_threads(file_.get(), actualNumThreads);
 
     // write header
     const auto ret = sam_hdr_write(file_.get(), header_.get());
-    if (ret != 0)
-        throw std::runtime_error("could not write header");
+    if (ret != 0) throw std::runtime_error("could not write header");
 }
 
 void BamWriterPrivate::Write(const BamRecord& record)
@@ -133,8 +128,7 @@ void BamWriterPrivate::Write(const BamRecord& record)
 
     // write record to file
     const auto ret = sam_write1(file_.get(), header_.get(), rawRecord.get());
-    if (ret <= 0)
-        throw std::runtime_error("could not write record");
+    if (ret <= 0) throw std::runtime_error("could not write record");
 }
 
 void BamWriterPrivate::Write(const BamRecord& record, int64_t* vOffset)
@@ -150,60 +144,50 @@ void BamWriterPrivate::Write(const BamRecord& record, int64_t* vOffset)
     // capture virtual offset where we’re about to write
     const auto rawTell = htell(bgzf->fp);
     const auto length = bgzf->block_offset;
-    *vOffset = (rawTell << 16) | length ;
+    *vOffset = (rawTell << 16) | length;
 
     // now write data
     Write(record);
 }
 
 inline void BamWriterPrivate::Write(const BamRecordImpl& recordImpl)
-{ Write(BamRecord(recordImpl)); }
+{
+    Write(BamRecord(recordImpl));
+}
 
-} // namespace internal
+}  // namespace internal
 
-BamWriter::BamWriter(const std::string& filename,
-                     const BamHeader& header,
-                     const BamWriter::CompressionLevel compressionLevel,
-                     const size_t numThreads,
+BamWriter::BamWriter(const std::string& filename, const BamHeader& header,
+                     const BamWriter::CompressionLevel compressionLevel, const size_t numThreads,
                      const BinCalculationMode binCalculationMode)
-    : IRecordWriter()
-    , d_(nullptr)
+    : IRecordWriter(), d_(nullptr)
 {
 #if PBBAM_AUTOVALIDATE
     Validator::Validate(header);
 #endif
-    d_ = std::make_unique<internal::BamWriterPrivate>
-    (
-        filename,
-        internal::BamHeaderMemory::MakeRawHeader(header),
-        compressionLevel,
-        numThreads,
-        binCalculationMode
-    );
+    d_ = std::make_unique<internal::BamWriterPrivate>(
+        filename, internal::BamHeaderMemory::MakeRawHeader(header), compressionLevel, numThreads,
+        binCalculationMode);
 }
 
 BamWriter::~BamWriter()
 {
-   const auto ret = bgzf_flush(d_->file_.get()->fp.bgzf);
-   UNUSED(ret);
+    const auto ret = bgzf_flush(d_->file_.get()->fp.bgzf);
+    UNUSED(ret);
 }
 
 void BamWriter::TryFlush()
 {
     // TODO: sanity checks on file_ & fp
     const auto ret = bgzf_flush(d_->file_.get()->fp.bgzf);
-    if (ret != 0)
-        throw std::runtime_error("could not flush output buffer contents");
+    if (ret != 0) throw std::runtime_error("could not flush output buffer contents");
 }
 
-void BamWriter::Write(const BamRecord& record)
-{ d_->Write(record); }
+void BamWriter::Write(const BamRecord& record) { d_->Write(record); }
 
-void BamWriter::Write(const BamRecord& record, int64_t* vOffset)
-{ d_->Write(record, vOffset); }
+void BamWriter::Write(const BamRecord& record, int64_t* vOffset) { d_->Write(record, vOffset); }
 
-void BamWriter::Write(const BamRecordImpl& recordImpl)
-{ d_->Write(recordImpl); }
+void BamWriter::Write(const BamRecordImpl& recordImpl) { d_->Write(recordImpl); }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

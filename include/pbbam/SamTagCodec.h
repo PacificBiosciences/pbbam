@@ -42,9 +42,9 @@
 #ifndef SAMTAGCODEC_H
 #define SAMTAGCODEC_H
 
+#include <string>
 #include "pbbam/Config.h"
 #include "pbbam/TagCollection.h"
-#include <string>
 
 namespace PacBio {
 namespace BAM {
@@ -84,13 +84,12 @@ public:
 ///
 /// \return formatted tag string
 ///
-inline std::string MakeSamTag(const std::string& tag,
-                              const std::string& value)
+inline std::string MakeSamTag(const std::string& tag, const std::string& value)
 {
     return std::string('\t' + tag + ':' + value);
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // SAMTAGCODEC_H
+#endif  // SAMTAGCODEC_H

@@ -45,7 +45,6 @@ pbbam_cpp_sources = files([
   'PbiFilter.cpp',
   'PbiFilterQuery.cpp',
   'PbiFilterTypes.cpp',
-  'PbiIndex.cpp',
   'PbiIndexedBamReader.cpp',
   'PbiIndexIO.cpp',
   'PbiRawData.cpp',
@@ -82,7 +81,7 @@ pbbam_cpp_sources = files([
 ])
 
 pbbam_extra_flags = []
-if get_option('enable-auto-validate')
+if get_option('auto-validate')
   pbbam_extra_flags += '-DPBBAM_AUTOVALIDATE=1'
 endif
 
@@ -94,9 +93,13 @@ pbbam_lib_install = (not meson.is_subproject()) or (get_option('default_library'
 pbbam_lib = library(
   'pbbam',
   pbbam_cpp_sources,
-  soversion : 0,
+  # use boost SONAME practice:
+  #   cause ld startup issues before
+  #   you even have the chance of running
+  #   into ABI issues.
+  soversion : meson.project_version(),
   version : meson.project_version(),
   install : pbbam_lib_install,
   dependencies : [pbbam_thread_dep, pbbam_boost_dep, pbbam_zlib_dep, pbbam_htslib_dep],
   include_directories : pbbam_include_directories,
-  cpp_args : [pbbam_extra_flags, pbbam_warning_flags])
+  cpp_args : [pbbam_extra_flags, pbbam_warning_flags, pbbam_macros])

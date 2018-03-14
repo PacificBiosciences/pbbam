@@ -42,10 +42,10 @@
 #ifndef QUALITYVALUE_H
 #define QUALITYVALUE_H
 
-#include "pbbam/Config.h"
 #include <cstdint>
 #include <string>
 #include <vector>
+#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -111,9 +111,9 @@ private:
     uint8_t value_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/QualityValue.inl"
 
-#endif // QUALITYVALUE_H
+#endif  // QUALITYVALUE_H

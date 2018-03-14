@@ -42,8 +42,8 @@
 #ifndef ENTIREFILEQUERY_H
 #define ENTIREFILEQUERY_H
 
-#include "pbbam/internal/QueryBase.h"
 #include <memory>
+#include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {
 namespace BAM {
@@ -91,7 +91,7 @@ private:
     std::unique_ptr<EntireFileQueryPrivate> d_;
 };
 
-} // namespace BAM
-} // namspace PacBio
+}  // namespace BAM
+}  // namspace PacBio
 
-#endif // ENTIREFILEQUERY_H
+#endif  // ENTIREFILEQUERY_H

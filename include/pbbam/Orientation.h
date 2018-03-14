@@ -59,11 +59,11 @@ namespace BAM {
 ///
 enum class Orientation
 {
-    NATIVE      ///< Present data in 'raw' original orientation, regardless of aligned Strand
-  , GENOMIC     ///< Present data in aligned orientation, always relative to Strand::FORWARD.
+    NATIVE,  ///< Present data in 'raw' original orientation, regardless of aligned Strand
+    GENOMIC  ///< Present data in aligned orientation, always relative to Strand::FORWARD.
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // ORIENTATION_H
+#endif  // ORIENTATION_H

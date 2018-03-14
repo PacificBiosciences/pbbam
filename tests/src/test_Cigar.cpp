@@ -43,6 +43,8 @@
 
 #include <pbbam/Cigar.h>
 
+// clang-format off
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;
@@ -197,3 +199,5 @@ TEST(CigarStringTest, ToStdString_MultipleOps)
 
     EXPECT_EQ(multiCigar, cigar.ToStdString());
 }
+
+// clang-format on

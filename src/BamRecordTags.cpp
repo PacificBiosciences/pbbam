@@ -42,14 +42,17 @@
 #include "PbbamInternalConfig.h"
 
 #include "BamRecordTags.h"
-#include "EnumClassHash.h"
-#include <unordered_map>
+
 #include <cassert>
+#include <unordered_map>
+
+#include "EnumClassHash.h"
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
+// clang-format off
 const BamRecordTags::TagLookupType BamRecordTags::tagLookup =
 {
     //     enum name                   label  isPulse?
@@ -65,6 +68,7 @@ const BamRecordTags::TagLookupType BamRecordTags::tagLookup =
     { BamRecordTag::INSERTION_QV,      {"iq", false} },
     { BamRecordTag::IPD,               {"ip", false} },
     { BamRecordTag::LABEL_QV,          {"pq", true}  },
+    { BamRecordTag::LONG_CIGAR,        {"CG", false} },
     { BamRecordTag::MERGE_QV,          {"mq", false} },
     { BamRecordTag::NUM_PASSES,        {"np", false} },
     { BamRecordTag::PKMEAN,            {"pa", true}  },
@@ -92,7 +96,8 @@ const BamRecordTags::TagLookupType BamRecordTags::tagLookup =
     { BamRecordTag::SEQ,  {"  ",  false} },
     { BamRecordTag::QUAL, {"  ", false} }
 };
+// clang-format on
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio

@@ -10,6 +10,27 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.16.0] - 2018-01-17
+
+### Removed
+- Removed the PbiIndex class and its "lookup data"-related helpers. These were 
+never as useful as initially intended. PbiRawData and its related classes are the 
+recommended interface for working with PBI index data.
+
+## [0.15.0] - 2018-01-12
+
+### Added
+- Support for long CIGARs (>64K operations).
+
+## [0.14.0] - 2017-12-12
+
+### Added
+- Support for newer style QNAMEs. Recent version of htslib (1.4+) have started
+adding extra null terminators to make the subsequent CIGAR section 32-bit aligned.
+
+### Changed
+- Requirements for htslib version used. Must now be htslib v1.4+.
+
 ## [0.13.2] - 2017-09-25
 
 ### Added

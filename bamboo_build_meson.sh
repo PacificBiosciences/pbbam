@@ -7,22 +7,22 @@ type module >& /dev/null || . /mnt/software/Modules/current/init/bash
 ################
 
 # buildsystem dependencies
-module load meson/0.41.1
-module load ninja/1.7.2
+module load meson
+module load ninja
 
-module load gcc/6.4.0
-module load ccache/3.3.4
+module load gcc
+module load ccache
 if [[ $USER == "bamboo" ]]; then
   export CCACHE_DIR=/mnt/secondary/Share/tmp/bamboo.${bamboo_shortPlanKey}.ccachedir
   export CCACHE_TEMPDIR=/scratch/bamboo.ccache_tempdir
 fi
-module load git/2.8.3
+module load git
 
-module load zlib/1.2.11
-module load htslib/1.5
-module load gtest/1.8.0_p20170819
-module load boost/1.60
-module load cram/0.7
+module load zlib
+module load htslib
+module load gtest
+module load boost
+module load cram
 # remove trailing "/include", because CMake is brain-damaged
 BOOST_ROOT=${BOOST_ROOT%/include}
 # unset these variables to have meson discover all
@@ -60,8 +60,8 @@ for i in static shared; do
       --wrap-mode nofallback \
       --default-library "${i}" \
       --unity "${j}" \
-      -Denable-build-tools=true \
-      -Denable-tests=true \
+      -Dbuild-tools=true \
+      -Dtests=true \
       "${CURRENT_BUILD_DIR}" .
 
     # 2. build

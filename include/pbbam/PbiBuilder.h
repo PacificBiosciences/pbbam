@@ -42,11 +42,11 @@
 #ifndef PBIBUILDER_H
 #define PBIBUILDER_H
 
-#include "pbbam/Config.h"
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
+#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -54,7 +54,9 @@ namespace BAM {
 class BamRecord;
 class PbiRawData;
 
-namespace internal { class PbiBuilderPrivate; }
+namespace internal {
+class PbiBuilderPrivate;
+}
 
 /// \brief The PbiBuilder class construct PBI index data from %BAM record data.
 ///
@@ -77,21 +79,21 @@ public:
     ///
     enum CompressionLevel
     {
-        CompressionLevel_0 = 0
-      , CompressionLevel_1 = 1
-      , CompressionLevel_2 = 2
-      , CompressionLevel_3 = 3
-      , CompressionLevel_4 = 4
-      , CompressionLevel_5 = 5
-      , CompressionLevel_6 = 6
-      , CompressionLevel_7 = 7
-      , CompressionLevel_8 = 8
-      , CompressionLevel_9 = 9
+        CompressionLevel_0 = 0,
+        CompressionLevel_1 = 1,
+        CompressionLevel_2 = 2,
+        CompressionLevel_3 = 3,
+        CompressionLevel_4 = 4,
+        CompressionLevel_5 = 5,
+        CompressionLevel_6 = 6,
+        CompressionLevel_7 = 7,
+        CompressionLevel_8 = 8,
+        CompressionLevel_9 = 9,
 
-      , DefaultCompression = -1
-      , NoCompression      = CompressionLevel_0
-      , FastCompression    = CompressionLevel_1
-      , BestCompression    = CompressionLevel_9
+        DefaultCompression = -1,
+        NoCompression = CompressionLevel_0,
+        FastCompression = CompressionLevel_1,
+        BestCompression = CompressionLevel_9
     };
 
 public:
@@ -132,8 +134,7 @@ public:
     ///
     /// \throws std::runtime_error if PBI file cannot be opened for writing
     ///
-    PbiBuilder(const std::string& pbiFilename,
-               const size_t numReferenceSequences,
+    PbiBuilder(const std::string& pbiFilename, const size_t numReferenceSequences,
                const PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
                const size_t numThreads = 4);
 
@@ -157,8 +158,7 @@ public:
     ///
     /// \throws std::runtime_error if PBI file cannot be opened for writing
     ///
-    PbiBuilder(const std::string& pbiFilename,
-               const size_t numReferenceSequences,
+    PbiBuilder(const std::string& pbiFilename, const size_t numReferenceSequences,
                const bool isCoordinateSorted,
                const PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
                const size_t numThreads = 4);
@@ -210,7 +210,7 @@ private:
     std::unique_ptr<internal::PbiBuilderPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // PBIBUILDER_H
+#endif  // PBIBUILDER_H

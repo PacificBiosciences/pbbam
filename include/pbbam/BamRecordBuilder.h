@@ -42,11 +42,11 @@
 #ifndef BAMRECORDBUILDER_H
 #define BAMRECORDBUILDER_H
 
-#include "pbbam/BamRecord.h"
-#include "pbbam/BamHeader.h"
-#include "pbbam/Config.h"
 #include <cstdint>
 #include <string>
+#include "pbbam/BamHeader.h"
+#include "pbbam/BamRecord.h"
+#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -127,7 +127,6 @@ public:
     /// \}
 
 public:
-
     /// \name Core Attribute Setup
     /// \{
 
@@ -309,9 +308,9 @@ private:
     TagCollection tags_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/BamRecordBuilder.inl"
 
-#endif // BAMRECORDBUILDER_H
+#endif  // BAMRECORDBUILDER_H

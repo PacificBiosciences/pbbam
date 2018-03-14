@@ -44,21 +44,21 @@
 
 // Only include if in pre-C++14 mode
 //
-#if __cplusplus <= 201103L 
+#if __cplusplus <= 201103L
 
 #include <cstddef>
 #include <memory>
 
 namespace std {
 
-template<typename T, typename... Args>
+template <typename T, typename... Args>
 inline std::unique_ptr<T> make_unique(Args&&... args)
 {
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
-} // namespace std
+}  // namespace std
 
 #endif  // < C++14
 
-#endif // PBBAM_MAKE_UNIQUE_H
+#endif  // PBBAM_MAKE_UNIQUE_H

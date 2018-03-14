@@ -92,9 +92,9 @@ private:
     std::deque<std::unique_ptr<FastaReader> > readers_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "internal/CompositeFastaReader.inl"
 
-#endif // COMPOSITEFASTAREADER_H
+#endif  // COMPOSITEFASTAREADER_H

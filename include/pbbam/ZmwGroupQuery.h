@@ -42,9 +42,9 @@
 #ifndef ZMWGROUPQUERY_H
 #define ZMWGROUPQUERY_H
 
-#include "pbbam/internal/QueryBase.h"
 #include <cstdint>
 #include <vector>
+#include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {
 namespace BAM {
@@ -72,8 +72,7 @@ public:
     /// \throws std::runtime_error on failure to open/read underlying %BAM or
     ///         PBI files.
     ///
-    ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist,
-                  const DataSet& dataset);
+    ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset);
     ~ZmwGroupQuery();
 
 public:
@@ -89,7 +88,7 @@ private:
     std::unique_ptr<ZmwGroupQueryPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // ZMWGROUPQUERY_H
+#endif  // ZMWGROUPQUERY_H

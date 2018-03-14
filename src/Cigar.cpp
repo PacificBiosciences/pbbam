@@ -42,6 +42,7 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/Cigar.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <sstream>
@@ -49,8 +50,7 @@
 namespace PacBio {
 namespace BAM {
 
-Cigar::Cigar(const std::string& cigarString)
-    : std::vector<CigarOperation>()
+Cigar::Cigar(const std::string& cigarString) : std::vector<CigarOperation>()
 {
     size_t numberStart = 0;
     const size_t numChars = cigarString.size();
@@ -60,7 +60,7 @@ Cigar::Cigar(const std::string& cigarString)
             const size_t distance = i - numberStart;
             const uint32_t length = stoul(cigarString.substr(numberStart, distance));
             push_back(CigarOperation(c, length));
-            numberStart = i+1;
+            numberStart = i + 1;
         }
     }
 }
@@ -68,14 +68,13 @@ Cigar::Cigar(const std::string& cigarString)
 std::string Cigar::ToStdString() const
 {
     std::stringstream s;
-    const auto end  = this->cend();
+    const auto end = this->cend();
     for (auto iter = this->cbegin(); iter != end; ++iter) {
         const CigarOperation& cigar = (*iter);
-        s << cigar.Length()
-          << cigar.Char();
+        s << cigar.Length() << cigar.Char();
     }
     return s.str();
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

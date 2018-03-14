@@ -42,16 +42,18 @@
 #ifndef SAMWRITER_H
 #define SAMWRITER_H
 
+#include <memory>
+#include <string>
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/IRecordWriter.h"
-#include <memory>
-#include <string>
 
 namespace PacBio {
 namespace BAM {
 
-namespace internal { class SamWriterPrivate; }
+namespace internal {
+class SamWriterPrivate;
+}
 
 /// \brief The SamWriter class provides a writing interface for creating
 ///        new SAM files.
@@ -98,7 +100,6 @@ public:
     SamWriter& operator=(SamWriter&&) = delete;
 
 public:
-    
     /// \brief Try to flush any buffered data to file.
     ///
     /// \note The underlying implementation may not necessarily flush buffered
@@ -129,7 +130,7 @@ private:
     std::unique_ptr<internal::SamWriterPrivate> d_;
 };
 
-} // namesapce BAM
-} // namespace PacBio
+}  // namesapce BAM
+}  // namespace PacBio
 
-#endif // SAMWRITER_H
+#endif  // SAMWRITER_H

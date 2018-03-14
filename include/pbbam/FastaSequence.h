@@ -95,9 +95,9 @@ private:
     std::string bases_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "internal/FastaSequence.inl"
 
-#endif // FASTASEQUENCE_H
+#endif  // FASTASEQUENCE_H

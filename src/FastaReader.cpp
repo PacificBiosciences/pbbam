@@ -42,13 +42,15 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/FastaReader.h"
-#include "pbbam/StringUtilities.h"
 
-#include <htslib/faidx.h>
-#include <stdexcept>
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <stdexcept>
+
+#include <htslib/faidx.h>
+
+#include "pbbam/StringUtilities.h"
 
 namespace PacBio {
 namespace BAM {
@@ -60,8 +62,7 @@ struct FastaReaderPrivate
     std::string name_;
     std::string bases_;
 
-    FastaReaderPrivate(const std::string& fn)
-        : stream_(fn)
+    FastaReaderPrivate(const std::string& fn) : stream_(fn)
     {
         if (!stream_)
             throw std::runtime_error("FastaReader - could not open " + fn + " for reading");
@@ -70,9 +71,8 @@ struct FastaReaderPrivate
 
     bool GetNext(FastaSequence& record)
     {
-        if (name_.empty() && bases_.empty())
-            return false;
-        record = FastaSequence { name_, bases_ };
+        if (name_.empty() && bases_.empty()) return false;
+        record = FastaSequence{name_, bases_};
         FetchNext();
         return true;
     }
@@ -92,58 +92,50 @@ private:
 
     inline void SkipNewlines()
     {
-        if (!stream_)
-            return;
+        if (!stream_) return;
         if (stream_.peek() == '\n')
             stream_.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
-    void ReadName() {
-        if (!stream_)
-            return;
-        if (stream_.get() == '>')
-            std::getline(stream_, name_,  '\n');
+    void ReadName()
+    {
+        if (!stream_) return;
+        if (stream_.get() == '>') std::getline(stream_, name_, '\n');
     }
 
     void ReadBases()
     {
-        if (!stream_)
-            return;
+        if (!stream_) return;
         int p = stream_.peek();
         while (static_cast<char>(p) != '>' && p != EOF) {
-            if (!stream_)
-                return;
+            if (!stream_) return;
             std::string line;
             std::getline(stream_, line, '\n');
             bases_ += line;
-            if (!stream_)
-                return;
+            if (!stream_) return;
             p = stream_.peek();
         }
     }
 };
 
-} // namespace internal
+}  // namespace internal
 
-FastaReader::FastaReader(const std::string& fn)
-    : d_{ new internal::FastaReaderPrivate{ fn } }
-{ }
+FastaReader::FastaReader(const std::string& fn) : d_{new internal::FastaReaderPrivate{fn}} {}
 
-FastaReader::~FastaReader() { }
+FastaReader::~FastaReader() {}
 
-bool FastaReader::GetNext(FastaSequence& record)
-{ return d_->GetNext(record); }
+bool FastaReader::GetNext(FastaSequence& record) { return d_->GetNext(record); }
 
 std::vector<FastaSequence> FastaReader::ReadAll(const std::string& fn)
 {
     std::vector<FastaSequence> result;
     result.reserve(256);
-    FastaReader reader{ fn };
+    FastaReader reader{fn};
     FastaSequence s;
-    while(reader.GetNext(s))
+    while (reader.GetNext(s))
         result.emplace_back(s);
     return result;
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

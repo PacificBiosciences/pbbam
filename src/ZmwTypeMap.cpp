@@ -46,13 +46,15 @@
 namespace PacBio {
 namespace BAM {
 
+// clang-format off
 std::map<char, ZmwType> ZmwTypeMap::ParseChar
 {
-	{ 'C' , ZmwType::CONTROL   },
-	{ 'M' , ZmwType::MALFORMED },
-	{ 'N' , ZmwType::NORMAL    },
-	{ 'S' , ZmwType::SENTINEL  }
+    { 'C' , ZmwType::CONTROL   },
+    { 'M' , ZmwType::MALFORMED },
+    { 'N' , ZmwType::NORMAL    },
+    { 'S' , ZmwType::SENTINEL  }
 };
+// clang-format on
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

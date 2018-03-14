@@ -35,24 +35,24 @@
 
 // Author: Derek Barnett
 
-#include <chrono>
-#include <string>
-#include <vector>
 #include <cctype>
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <string>
+#include <vector>
 
-#include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
+#include <boost/algorithm/string.hpp>
 
 #define private public
 
 #include "PbbamTestData.h"
 
-#include <pbbam/Unused.h>
 #include <pbbam/../../src/FileUtils.h>
 #include <pbbam/../../src/TimeUtils.h>
+#include <pbbam/Unused.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -101,43 +101,47 @@ TEST(FileUtilsTest, ResolvedFilePathOk)
 
     const string absolutePath = "/absolute/path/to/file.txt";
     const string relativePath = "../relative/path/to/file.txt";
-    const string noPathFn     = "file.txt";
-    
+    const string noPathFn = "file.txt";
+
     const string resolvedAbsolutePath = FileUtils::ResolvedFilePath(absolutePath, testFrom);
     const string resolvedRelativePath = FileUtils::ResolvedFilePath(relativePath, testFrom);
-    const string resolvedNoPath       = FileUtils::ResolvedFilePath(noPathFn, testFrom);
+    const string resolvedNoPath = FileUtils::ResolvedFilePath(noPathFn, testFrom);
     const string resolvedAbsolutePath_defaultFrom = FileUtils::ResolvedFilePath(absolutePath);
     const string resolvedRelativePath_defaultFrom = FileUtils::ResolvedFilePath(relativePath);
-    const string resolvedNoPath_defaultFrom       = FileUtils::ResolvedFilePath(noPathFn);
+    const string resolvedNoPath_defaultFrom = FileUtils::ResolvedFilePath(noPathFn);
 
-    EXPECT_EQ("/absolute/path/to/file.txt",                  resolvedAbsolutePath);
+    EXPECT_EQ("/absolute/path/to/file.txt", resolvedAbsolutePath);
     EXPECT_EQ("/path/to/myDir/../relative/path/to/file.txt", resolvedRelativePath);
-    EXPECT_EQ("/path/to/myDir/file.txt",                     resolvedNoPath);
+    EXPECT_EQ("/path/to/myDir/file.txt", resolvedNoPath);
 
-    EXPECT_EQ("/absolute/path/to/file.txt",     resolvedAbsolutePath_defaultFrom);
+    EXPECT_EQ("/absolute/path/to/file.txt", resolvedAbsolutePath_defaultFrom);
     EXPECT_EQ("./../relative/path/to/file.txt", resolvedRelativePath_defaultFrom);
-    EXPECT_EQ("./file.txt",                     resolvedNoPath_defaultFrom);
+    EXPECT_EQ("./file.txt", resolvedNoPath_defaultFrom);
 
     // filenames with URI scheme ("file://")
 
     const string absoluteSchemeFn = "file:///absolute/path/to/file.txt";
     const string relativeSchemeFn = "file://../relative/path/to/file.txt";
-    const string noPathSchemeFn   = "file://file.txt";
+    const string noPathSchemeFn = "file://file.txt";
 
-    const string resolvedAbsoluteSchemePath = FileUtils::ResolvedFilePath(absoluteSchemeFn, testFrom);
-    const string resolvedRelativeSchemePath = FileUtils::ResolvedFilePath(relativeSchemeFn, testFrom);
-    const string resolvedNoPathSchemeFn     = FileUtils::ResolvedFilePath(noPathSchemeFn, testFrom);
-    const string resolvedAbsoluteSchemePath_defaultFrom = FileUtils::ResolvedFilePath(absoluteSchemeFn);
-    const string resolvedRelativeSchemePath_defaultFrom = FileUtils::ResolvedFilePath(relativeSchemeFn);
-    const string resolvedNoPathSchemeFn_defaultFrom     = FileUtils::ResolvedFilePath(noPathSchemeFn);
+    const string resolvedAbsoluteSchemePath =
+        FileUtils::ResolvedFilePath(absoluteSchemeFn, testFrom);
+    const string resolvedRelativeSchemePath =
+        FileUtils::ResolvedFilePath(relativeSchemeFn, testFrom);
+    const string resolvedNoPathSchemeFn = FileUtils::ResolvedFilePath(noPathSchemeFn, testFrom);
+    const string resolvedAbsoluteSchemePath_defaultFrom =
+        FileUtils::ResolvedFilePath(absoluteSchemeFn);
+    const string resolvedRelativeSchemePath_defaultFrom =
+        FileUtils::ResolvedFilePath(relativeSchemeFn);
+    const string resolvedNoPathSchemeFn_defaultFrom = FileUtils::ResolvedFilePath(noPathSchemeFn);
 
-    EXPECT_EQ("/absolute/path/to/file.txt",                  resolvedAbsoluteSchemePath);
+    EXPECT_EQ("/absolute/path/to/file.txt", resolvedAbsoluteSchemePath);
     EXPECT_EQ("/path/to/myDir/../relative/path/to/file.txt", resolvedRelativeSchemePath);
-    EXPECT_EQ("/path/to/myDir/file.txt",                     resolvedNoPathSchemeFn);
+    EXPECT_EQ("/path/to/myDir/file.txt", resolvedNoPathSchemeFn);
 
-    EXPECT_EQ("/absolute/path/to/file.txt",                  resolvedAbsoluteSchemePath_defaultFrom);
+    EXPECT_EQ("/absolute/path/to/file.txt", resolvedAbsoluteSchemePath_defaultFrom);
     EXPECT_EQ("./../relative/path/to/file.txt", resolvedRelativeSchemePath_defaultFrom);
-    EXPECT_EQ("./file.txt",                     resolvedNoPathSchemeFn_defaultFrom);
+    EXPECT_EQ("./file.txt", resolvedNoPathSchemeFn_defaultFrom);
 }
 
 TEST(FileUtilsTest, SizeOk)
@@ -169,20 +173,17 @@ static string removeFileUriScheme(const string& uri)
     const auto fileScheme = string{"file://"};
     const auto schemeFound = schemeLess.find(fileScheme);
     if (schemeFound != string::npos) {
-        if (schemeFound != 0)
-            throw runtime_error("Malformed URI: scheme not at beginning");
+        if (schemeFound != 0) throw runtime_error("Malformed URI: scheme not at beginning");
         schemeLess = schemeLess.substr(fileScheme.size());
     }
     return schemeLess;
 }
 
-static
-string removeDiskName(const string& filePath)
+static string removeDiskName(const string& filePath)
 {
     if (filePath.size() >= 2) {
         const char firstChar = filePath.at(0);
-        if ((isalpha(firstChar) != 0) && (filePath.at(1) == ':'))
-            return filePath.substr(2);
+        if ((isalpha(firstChar) != 0) && (filePath.at(1) == ':')) return filePath.substr(2);
     }
     return filePath;
 }
@@ -194,12 +195,10 @@ static bool native_pathIsAbsolute(const string& filePath)
     assert(!filePath.empty());
 
     // if starts with single slash or double slash [cases 1,3]
-    if (boost::algorithm::starts_with(filePath, "\\"))
-        return true;
+    if (boost::algorithm::starts_with(filePath, "\\")) return true;
 
     // if starts with single or double-dots -> not absolute [case 4 + ".\file.txt"]
-    if (boost::algorithm::starts_with(filePath, "."))
-        return false;
+    if (boost::algorithm::starts_with(filePath, ".")) return false;
 
     // if starts with drive name and colon ("C:\foo\bar.txt")
     if (filePath.size() >= 2) {
@@ -212,16 +211,14 @@ static bool native_pathIsAbsolute(const string& filePath)
     return false;
 }
 
-static string native_resolvedFilePath(const string& filePath,
-                                      const string& from)
+static string native_resolvedFilePath(const string& filePath, const string& from)
 {
     // strip file:// scheme if present
     auto schemeLess = removeFileUriScheme(filePath);
 
     // if empty or already absolute path, just return it
     // upfront empty check simplifies further parsing logic
-    if (schemeLess.empty() || native_pathIsAbsolute(schemeLess))
-        return schemeLess;
+    if (schemeLess.empty() || native_pathIsAbsolute(schemeLess)) return schemeLess;
 
     // else make relative from the provided 'from' directory
     //
@@ -236,17 +233,16 @@ static string native_resolvedFilePath(const string& filePath,
 
     const bool thisDirAtStart = (schemeLess.find(".") == 0);
     if (thisDirAtStart) {
-        if (schemeLess.find(native_pathSeparator) == 1)
-            schemeLess = schemeLess.substr(2);
+        if (schemeLess.find(native_pathSeparator) == 1) schemeLess = schemeLess.substr(2);
     }
     return from + native_pathSeparator + schemeLess;
 }
 
-} // namespace test_windows
+}  // namespace test_windows
 
 TEST(FileUtilsTest, WindowsPathsOk)
 {
-    { // remove disk name
+    {  // remove disk name
 
         // "C:\tmp.txt"
         string f1 = "C:\\tmp.txt";
@@ -265,7 +261,7 @@ TEST(FileUtilsTest, WindowsPathsOk)
         EXPECT_EQ(f4, test_windows::removeDiskName(f4));
     }
 
-    { // isAbsolute ?
+    {  // isAbsolute ?
 
         // "\\server\path\to\tmp.txt"
         EXPECT_TRUE(test_windows::native_pathIsAbsolute("\\\\server\\path\\to\tmp.txt"));
@@ -283,13 +279,13 @@ TEST(FileUtilsTest, WindowsPathsOk)
         EXPECT_FALSE(test_windows::native_pathIsAbsolute("C:..\\path\\to\\tmp.txt"));
     }
 
-    { // resolve file path
+    {  // resolve file path
 
         const string myRootDir = "C:\\path\\to\\myRootDir";
 
         // "\\server\path\to\tmp.txt"
         const string fn1 = "\\\\server\\path\\to\tmp.txt";
-        const string fn1_expected  = fn1;
+        const string fn1_expected = fn1;
         EXPECT_EQ(fn1_expected, test_windows::native_resolvedFilePath(fn1, myRootDir));
 
         // "..\tmp.txt"
@@ -304,7 +300,7 @@ TEST(FileUtilsTest, WindowsPathsOk)
 
         // "C:\path\to\tmp.txt"
         const string fn4 = "C:\\path\\to\\tmp.txt";
-        const string fn4_expected  = fn4;
+        const string fn4_expected = fn4;
         EXPECT_EQ(fn4_expected, test_windows::native_resolvedFilePath(fn4, myRootDir));
 
         // "C:..\path\to\tmp.txt"
@@ -316,10 +312,10 @@ TEST(FileUtilsTest, WindowsPathsOk)
         const string fn6 = "C:tmp.txt";
         const string fn6_expected = "C:\\path\\to\\myRootDir\\tmp.txt";
         EXPECT_EQ(fn6_expected, test_windows::native_resolvedFilePath(fn6, myRootDir));
-        EXPECT_EQ(fn3_expected, test_windows::native_resolvedFilePath(fn6, myRootDir)); // our path is equivalent to fn3's "./temp.txt"
+        EXPECT_EQ(fn3_expected,
+                  test_windows::native_resolvedFilePath(
+                      fn6, myRootDir));  // our path is equivalent to fn3's "./temp.txt"
     }
 }
 //
 // ####################################################################################################
-
-

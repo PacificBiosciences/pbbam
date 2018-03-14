@@ -107,64 +107,50 @@ inline std::ostream& operator<<(std::ostream& out, const Version& version)
     return out;
 }
 
-inline constexpr Version::Version()
-    : major_(0)
-    , minor_(0)
-    , revision_(0)
-{ }
+inline constexpr Version::Version() : major_(0), minor_(0), revision_(0) {}
 
 inline Version::Version(int major, int minor, int revision)
-    : major_(major)
-    , minor_(minor)
-    , revision_(revision)
-{ Check(); }
+    : major_(major), minor_(minor), revision_(revision)
+{
+    Check();
+}
 
 inline bool Version::operator==(const Version& other) const
 {
-    return major_ == other.major_ &&
-           minor_ == other.minor_ &&
-           revision_ == other.revision_;
+    return major_ == other.major_ && minor_ == other.minor_ && revision_ == other.revision_;
 }
 
-inline bool Version::operator!=(const Version& other) const
-{ return !(*this == other); }
+inline bool Version::operator!=(const Version& other) const { return !(*this == other); }
 
 inline bool Version::operator<(const Version& other) const
 {
     // 2.* < 3.*
-    if (major_ < other.major_)
-        return true;
+    if (major_ < other.major_) return true;
 
     // 3. ==  3.
     else if (major_ == other.major_) {
 
         // 3.1.* < 3.2.*
-        if (minor_ < other.minor_)
-            return true;
+        if (minor_ < other.minor_) return true;
 
         // 3.2. == 3.2.
         else if (minor_ == other.minor_) {
 
             // 3.2.1 < 3.2.2
-            if (revision_ < other.revision_)
-                return true;
+            if (revision_ < other.revision_) return true;
         }
     }
 
     // otherwise not less-than
     return false;
 }
-inline bool Version::operator<=(const Version& other) const
-{ return !(*this > other); }
+inline bool Version::operator<=(const Version& other) const { return !(*this > other); }
 
-inline bool Version::operator>(const Version& other) const
-{ return other < *this; }
+inline bool Version::operator>(const Version& other) const { return other < *this; }
 
-inline bool Version::operator>=(const Version& other) const
-{ return !(*this < other); }
+inline bool Version::operator>=(const Version& other) const { return !(*this < other); }
 
-inline Version::operator std::string() const
-{ return ToString(); }
+inline Version::operator std::string() const { return ToString(); }
 
 inline void Version::Check() const
 {
@@ -172,8 +158,7 @@ inline void Version::Check() const
         throw std::runtime_error("version cannot contain negative numbers");
 }
 
-inline int Version::Major() const
-{ return major_; }
+inline int Version::Major() const { return major_; }
 
 inline Version& Version::Major(int major)
 {
@@ -182,8 +167,7 @@ inline Version& Version::Major(int major)
     return *this;
 }
 
-inline int Version::Minor() const
-{ return minor_; }
+inline int Version::Minor() const { return minor_; }
 
 inline Version& Version::Minor(int minor)
 {
@@ -192,8 +176,7 @@ inline Version& Version::Minor(int minor)
     return *this;
 }
 
-inline int Version::Revision() const
-{ return revision_; }
+inline int Version::Revision() const { return revision_; }
 
 inline Version& Version::Revision(int revision)
 {
@@ -202,8 +185,8 @@ inline Version& Version::Revision(int revision)
     return *this;
 }
 
-} // namespace internal
-} // namespace BAM
-} // namespace PacBio
+}  // namespace internal
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // PACBIOBAM_VERSION_H
+#endif  // PACBIOBAM_VERSION_H

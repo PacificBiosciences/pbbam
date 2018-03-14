@@ -42,14 +42,16 @@
 #ifndef FASTQREADER_H
 #define FASTQREADER_H
 
-#include "pbbam/FastqSequence.h"
 #include <memory>
 #include <vector>
+#include "pbbam/FastqSequence.h"
 
 namespace PacBio {
 namespace BAM {
 
-namespace internal { struct FastqReaderPrivate; }
+namespace internal {
+struct FastqReaderPrivate;
+}
 
 ///
 /// \brief The FastqReader provides sequential access to Fastq records.
@@ -107,7 +109,7 @@ private:
     std::unique_ptr<internal::FastqReaderPrivate> d_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // FASTQREADER_H
+#endif  // FASTQREADER_H

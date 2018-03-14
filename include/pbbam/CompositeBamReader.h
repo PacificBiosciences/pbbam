@@ -43,6 +43,11 @@
 #ifndef COMPOSITEBAMREADER_H
 #define COMPOSITEBAMREADER_H
 
+#include <deque>
+#include <functional>
+#include <memory>
+#include <string>
+#include <vector>
 #include "pbbam/BaiIndexedBamReader.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/BamHeader.h"
@@ -52,11 +57,6 @@
 #include "pbbam/DataSet.h"
 #include "pbbam/GenomicInterval.h"
 #include "pbbam/PbiIndexedBamReader.h"
-#include <deque>
-#include <functional>
-#include <memory>
-#include <string>
-#include <vector>
 
 namespace PacBio {
 namespace BAM {
@@ -88,15 +88,14 @@ public:
 /// Essentially just exracts a BamRecord from its parent CompositeMergeItem for
 /// further checks.
 ///
-template<typename CompareType>
-struct CompositeMergeItemSorter : public std::function<bool(const CompositeMergeItem&,
-                                                            const CompositeMergeItem&)>
+template <typename CompareType>
+struct CompositeMergeItemSorter
+    : public std::function<bool(const CompositeMergeItem&, const CompositeMergeItem&)>
 {
-    bool operator()(const CompositeMergeItem& lhs,
-                    const CompositeMergeItem& rhs);
+    bool operator()(const CompositeMergeItem& lhs, const CompositeMergeItem& rhs);
 };
 
-} // namespace internal
+}  // namespace internal
 
 /// \brief The GenomicIntervalCompositeBamReader class provides read access to
 ///        multipe %BAM files, limiting results to a genomic region.
@@ -116,8 +115,7 @@ public:
                                       const std::vector<BamFile>& bamFiles);
     GenomicIntervalCompositeBamReader(const GenomicInterval& interval,
                                       std::vector<BamFile>&& bamFiles);
-    GenomicIntervalCompositeBamReader(const GenomicInterval& interval,
-                                      const DataSet& dataset);
+    GenomicIntervalCompositeBamReader(const GenomicInterval& interval, const DataSet& dataset);
 
     /// \}
 
@@ -176,26 +174,23 @@ private:
 ///       the meantime, use of Compare::None as the OrderByType is recommended,
 ///       to explicitly indicate that no particular ordering is expected.
 ///
-template<typename OrderByType>
+template <typename OrderByType>
 class PBBAM_EXPORT PbiFilterCompositeBamReader
 {
 public:
-    using value_type        = internal::CompositeMergeItem;
+    using value_type = internal::CompositeMergeItem;
     using merge_sorter_type = internal::CompositeMergeItemSorter<OrderByType>;
-    using container_type    = std::deque<value_type>;
-    using iterator          = typename container_type::iterator;
-    using const_iterator    = typename container_type::const_iterator;
+    using container_type = std::deque<value_type>;
+    using iterator = typename container_type::iterator;
+    using const_iterator = typename container_type::const_iterator;
 
 public:
     /// \name Contstructors & Related Methods
     /// \{
 
-    PbiFilterCompositeBamReader(const PbiFilter& filter,
-                                const std::vector<BamFile>& bamFiles);
-    PbiFilterCompositeBamReader(const PbiFilter& filter,
-                                std::vector<BamFile>&& bamFiles);
-    PbiFilterCompositeBamReader(const PbiFilter& filter,
-                                const DataSet& dataset);
+    PbiFilterCompositeBamReader(const PbiFilter& filter, const std::vector<BamFile>& bamFiles);
+    PbiFilterCompositeBamReader(const PbiFilter& filter, std::vector<BamFile>&& bamFiles);
+    PbiFilterCompositeBamReader(const PbiFilter& filter, const DataSet& dataset);
 
     /// \}
 
@@ -264,9 +259,9 @@ private:
     std::deque<std::unique_ptr<BamReader> > readers_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "pbbam/internal/CompositeBamReader.inl"
 
-#endif // COMPOSITEBAMREADER_H
+#endif  // COMPOSITEBAMREADER_H

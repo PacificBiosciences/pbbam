@@ -42,10 +42,10 @@
 #ifndef TAGCOLLECTION_H
 #define TAGCOLLECTION_H
 
-#include "pbbam/Config.h"
-#include "pbbam/Tag.h"
 #include <map>
 #include <string>
+#include "pbbam/Config.h"
+#include "pbbam/Tag.h"
 
 namespace PacBio {
 namespace BAM {
@@ -62,7 +62,7 @@ public:
     bool Contains(const std::string& name) const;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // TAGCOLLECTION_H
+#endif  // TAGCOLLECTION_H

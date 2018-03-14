@@ -42,11 +42,11 @@
 #ifndef GENOMICINTERVAL_H
 #define GENOMICINTERVAL_H
 
+#include <cstddef>
+#include <string>
 #include "pbbam/Config.h"
 #include "pbbam/Interval.h"
 #include "pbbam/Position.h"
-#include <cstddef>
-#include <string>
 
 namespace PacBio {
 namespace BAM {
@@ -65,9 +65,7 @@ public:
 
     /// \brief Creates a genomic interval on sequence with \p name, using range:
     ///       [\p start, \p stop)
-    GenomicInterval(std::string name,
-                    Position start,
-                    Position stop);
+    GenomicInterval(std::string name, Position start, Position stop);
 
     /// \brief Creates a genomic interval, using REGION string
     ///
@@ -123,7 +121,6 @@ public:
     size_t Length() const;
 
     /// \}
-
 
 public:
     /// \name Attributes
@@ -182,9 +179,9 @@ private:
     PacBio::BAM::Interval<Position> interval_;
 };
 
-} // namespace BAM
-} // namspace PacBio
+}  // namespace BAM
+}  // namspace PacBio
 
 #include "pbbam/internal/GenomicInterval.inl"
 
-#endif // GENOMICINTERVAL_H
+#endif  // GENOMICINTERVAL_H

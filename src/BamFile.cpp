@@ -42,18 +42,20 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/BamFile.h"
-#include "pbbam/MakeUnique.h"
-#include "pbbam/PbiFile.h"
-#include "FileUtils.h"
-#include "MemoryUtils.h"
-#include "Autovalidate.h"
 
-#include <htslib/sam.h>
-#include <memory>
-#include <sstream>
+#include <sys/stat.h>
 #include <cassert>
 #include <cstdint>
-#include <sys/stat.h>
+#include <memory>
+#include <sstream>
+
+#include <htslib/sam.h>
+
+#include "Autovalidate.h"
+#include "FileUtils.h"
+#include "MemoryUtils.h"
+#include "pbbam/MakeUnique.h"
+#include "pbbam/PbiFile.h"
 
 namespace PacBio {
 namespace BAM {
@@ -62,20 +64,18 @@ namespace internal {
 class BamFilePrivate
 {
 public:
-    BamFilePrivate(const std::string& fn)
-        : filename_(fn)
-        , firstAlignmentOffset_(-1)
+    BamFilePrivate(const std::string& fn) : filename_(fn), firstAlignmentOffset_(-1)
     {
         // ensure we've updated htslib verbosity with requested verbosity here
-        hts_verbose = ( PacBio::BAM::HtslibVerbosity == -1 ? 0 : PacBio::BAM::HtslibVerbosity);
+        hts_verbose = (PacBio::BAM::HtslibVerbosity == -1 ? 0 : PacBio::BAM::HtslibVerbosity);
 
         // attempt open
         auto f = RawOpen();
 
-#if !defined (PBBAM_NO_CHECK_EOF) || PBBAM_AUTOVALIDATE
+#if !defined(PBBAM_NO_CHECK_EOF) || PBBAM_AUTOVALIDATE
         // sanity check on file
         const auto eofCheck = bgzf_check_EOF(f->fp.bgzf);
-        if (eofCheck <= 0 ) {
+        if (eofCheck <= 0) {
             // 1:  EOF present & correct
             // 2:  not seekable (e.g. reading from stdin)
             // 0:  EOF absent
@@ -105,8 +105,7 @@ public:
     bool HasEOF() const
     {
         // streamed input is unknown, since it's not random-accessible
-        if (filename_ == "-")
-            return false;
+        if (filename_ == "-") return false;
 
         // attempt open
         auto f = RawOpen();
@@ -125,8 +124,7 @@ public:
         std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
         if (!f || !f->fp.bgzf)
             throw std::runtime_error(std::string("could not open BAM file: ") + filename_);
-        if (f->format.format != bam)
-            throw std::runtime_error("expected BAM, unknown format");
+        if (f->format.format != bam) throw std::runtime_error("expected BAM, unknown format");
         return f;
     }
 
@@ -136,23 +134,17 @@ public:
     int64_t firstAlignmentOffset_;
 };
 
-} // namespace internal
+}  // namespace internal
 
 // ------------------------
 // BamFile implementation
 // ------------------------
 
-BamFile::BamFile(const std::string& filename)
-    : d_(new internal::BamFilePrivate(filename))
-{ }
+BamFile::BamFile(const std::string& filename) : d_(new internal::BamFilePrivate(filename)) {}
 
-BamFile::BamFile(const BamFile& other)
-    : d_(other.d_->DeepCopy())
-{ }
+BamFile::BamFile(const BamFile& other) : d_(other.d_->DeepCopy()) {}
 
-BamFile::BamFile(BamFile&& other)
-    : d_(std::move(other.d_))
-{ }
+BamFile::BamFile(BamFile&& other) : d_(std::move(other.d_)) {}
 
 BamFile& BamFile::operator=(const BamFile& other)
 {
@@ -170,12 +162,9 @@ BamFile& BamFile::operator=(BamFile&& other)
     return *this;
 }
 
-BamFile::~BamFile() { }
+BamFile::~BamFile() {}
 
-void BamFile::CreatePacBioIndex() const
-{
-    PbiFile::CreateFrom(*this);
-}
+void BamFile::CreatePacBioIndex() const { PbiFile::CreateFrom(*this); }
 
 void BamFile::CreateStandardIndex() const
 {
@@ -185,39 +174,32 @@ void BamFile::CreateStandardIndex() const
 
 void BamFile::EnsurePacBioIndexExists() const
 {
-    if (!PacBioIndexExists())
-        CreatePacBioIndex();
+    if (!PacBioIndexExists()) CreatePacBioIndex();
 }
 
 void BamFile::EnsureStandardIndexExists() const
 {
-    if (!StandardIndexExists())
-        CreateStandardIndex();
+    if (!StandardIndexExists()) CreateStandardIndex();
 }
 
-std::string BamFile::Filename() const
-{ return d_->filename_; }
+std::string BamFile::Filename() const { return d_->filename_; }
 
-int64_t BamFile::FirstAlignmentOffset() const
-{ return d_->firstAlignmentOffset_; }
+int64_t BamFile::FirstAlignmentOffset() const { return d_->firstAlignmentOffset_; }
 
-bool BamFile::HasEOF() const
-{ return d_->HasEOF(); }
+bool BamFile::HasEOF() const { return d_->HasEOF(); }
 
-bool BamFile::HasReference(const std::string& name) const
-{ return d_->header_.HasSequence(name); }
+bool BamFile::HasReference(const std::string& name) const { return d_->header_.HasSequence(name); }
 
-const BamHeader& BamFile::Header() const
-{ return d_->header_; }
+const BamHeader& BamFile::Header() const { return d_->header_; }
 
-bool BamFile::IsPacBioBAM() const
-{ return !d_->header_.PacBioBamVersion().empty(); }
+bool BamFile::IsPacBioBAM() const { return !d_->header_.PacBioBamVersion().empty(); }
 
 bool BamFile::PacBioIndexExists() const
-{ return internal::FileUtils::Exists(PacBioIndexFilename()); }
+{
+    return internal::FileUtils::Exists(PacBioIndexFilename());
+}
 
-std::string BamFile::PacBioIndexFilename() const
-{ return d_->filename_ + ".pbi"; }
+std::string BamFile::PacBioIndexFilename() const { return d_->filename_ + ".pbi"; }
 
 bool BamFile::PacBioIndexIsNewer() const
 {
@@ -226,30 +208,33 @@ bool BamFile::PacBioIndexIsNewer() const
     return bamTimestamp <= pbiTimestamp;
 }
 
-int BamFile::ReferenceId(const std::string& name) const
-{ return d_->header_.SequenceId(name); }
+int BamFile::ReferenceId(const std::string& name) const { return d_->header_.SequenceId(name); }
 
 uint32_t BamFile::ReferenceLength(const std::string& name) const
-{ return ReferenceLength(ReferenceId(name)); }
+{
+    return ReferenceLength(ReferenceId(name));
+}
 
 uint32_t BamFile::ReferenceLength(const int id) const
-{ return std::stoul(d_->header_.SequenceLength(id)); }
+{
+    return std::stoul(d_->header_.SequenceLength(id));
+}
 
-std::string BamFile::ReferenceName(const int id) const
-{ return d_->header_.SequenceName(id); }
+std::string BamFile::ReferenceName(const int id) const { return d_->header_.SequenceName(id); }
 
 bool BamFile::StandardIndexExists() const
-{ return internal::FileUtils::Exists(StandardIndexFilename()); }
+{
+    return internal::FileUtils::Exists(StandardIndexFilename());
+}
 
-std::string BamFile::StandardIndexFilename() const
-{ return d_->filename_ + ".bai"; }
+std::string BamFile::StandardIndexFilename() const { return d_->filename_ + ".bai"; }
 
-bool BamFile::StandardIndexIsNewer() const 
-{ 
-    const auto bamTimestamp  = internal::FileUtils::LastModified(Filename());
+bool BamFile::StandardIndexIsNewer() const
+{
+    const auto bamTimestamp = internal::FileUtils::LastModified(Filename());
     const auto baiTimestamp = internal::FileUtils::LastModified(StandardIndexFilename());
     return bamTimestamp <= baiTimestamp;
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pbds:SubreadSet CreatedAt="2017-12-05T04:48:31" MetaType="PacBio.DataSet.SubreadSet" Name="pacbio_dataset_subreadset-171205_124831161" Tags="" TimeStampedName="pacbio_dataset_subreadset-171205_124831161" UniqueId="a9e4086c-db3a-bded-923b-3c84fbeae52b" Version="3.0.1" xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+	<pbbase:ExternalResources>
+		<pbbase:ExternalResource MetaType="PacBio.SubreadFile.SubreadBamFile" ResourceId="@PacBioBAM_TestsDir@/data/pbbamify/synthetic_movie_1.subreads.bam" TimeStampedName="pacbio_subreadfile_subreadbamfile-171205_124831158" UniqueId="f44a1fe8-236d-442a-80bb-50733b70cd36">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex MetaType="PacBio.Index.PacBioIndex" ResourceId="@PacBioBAM_TestsDir@/data/pbbamify/synthetic_movie_1.subreads.bam.pbi" TimeStampedName="pacbio_index_pacbioindex-171205_124831159" UniqueId="5de6a1ac-ffbd-41a8-b104-2d7ef4f4ff13"/>
+				<pbbase:FileIndex MetaType="PacBio.Index.BamIndex" ResourceId="@PacBioBAM_TestsDir@/data/pbbamify/synthetic_movie_1.subreads.bam.bai" TimeStampedName="pacbio_index_bamindex-171205_124831158" UniqueId="30a69956-c1ff-4e39-a901-f35041c1071a"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+		<pbbase:ExternalResource MetaType="PacBio.SubreadFile.SubreadBamFile" ResourceId="@PacBioBAM_TestsDir@/data/pbbamify/synthetic_movie_2.subreads.bam" TimeStampedName="pacbio_subreadfile_subreadbamfile-171205_124831158" UniqueId="80a97293-bb25-4cc5-a0b2-5189335beecf">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex MetaType="PacBio.Index.PacBioIndex" ResourceId="@PacBioBAM_TestsDir@/data/pbbamify/synthetic_movie_2.subreads.bam.pbi" TimeStampedName="pacbio_index_pacbioindex-171205_124831158" UniqueId="5482eae8-7c35-48c4-9a6f-dca2c1ee3181"/>
+				<pbbase:FileIndex MetaType="PacBio.Index.BamIndex" ResourceId="@PacBioBAM_TestsDir@/data/pbbamify/synthetic_movie_2.subreads.bam.bai" TimeStampedName="pacbio_index_bamindex-171205_124831158" UniqueId="7e75f3b5-29ee-4c90-b0a6-7bc5e917d41f"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+		<pbbase:ExternalResource MetaType="PacBio.SubreadFile.SubreadBamFile" ResourceId="@PacBioBAM_TestsDir@/data/pbbamify/synthetic_movie_3.subreads.bam" TimeStampedName="pacbio_subreadfile_subreadbamfile-171205_124831158" UniqueId="4ddcb97d-e879-455f-bc99-97b24efe7d65">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex MetaType="PacBio.Index.PacBioIndex" ResourceId="@PacBioBAM_TestsDir@/data/pbbamify/synthetic_movie_3.subreads.bam.pbi" TimeStampedName="pacbio_index_pacbioindex-171205_124831158" UniqueId="d9d1d76b-2a63-4b39-b3bb-709c93c64114"/>
+				<pbbase:FileIndex MetaType="PacBio.Index.BamIndex" ResourceId="@PacBioBAM_TestsDir@/data/pbbamify/synthetic_movie_3.subreads.bam.bai" TimeStampedName="pacbio_index_bamindex-171205_124831158" UniqueId="5310cd63-9f1f-47ee-992d-d60c7b16e278"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+	</pbbase:ExternalResources>
+	<pbds:DataSetMetadata>
+		<pbds:TotalLength>502</pbds:TotalLength>
+		<pbds:NumRecords>6</pbds:NumRecords>
+	</pbds:DataSetMetadata>
+</pbds:SubreadSet>

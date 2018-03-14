@@ -36,8 +36,8 @@
 // Author: Derek Barnett
 
 #include <algorithm>
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <iterator>
 #include <memory>
@@ -61,15 +61,14 @@ namespace BamRecordImplCoreTests {
 
 struct Bam1Deleter
 {
-    void operator()(bam1_t* b) {
-        if (b)
-            bam_destroy1(b);
+    void operator()(bam1_t* b)
+    {
+        if (b) bam_destroy1(b);
         b = nullptr;
     }
 };
 
-static
-BamRecordImpl CreateBamImpl()
+static BamRecordImpl CreateBamImpl()
 {
     BamRecordImpl bam;
     bam.Bin(42);
@@ -91,33 +90,31 @@ BamRecordImpl CreateBamImpl()
     return bam;
 }
 
-static
-void CheckRawData(const BamRecordImpl& bam)
+static void CheckRawData(const BamRecordImpl& bam)
 {
     // ensure raw data (lengths at least) matches API-facing data
-
-    const uint32_t expectedNameLength  = bam.Name().size() + 1;
+    const uint32_t expectedNameBytes = bam.Name().size() + 1;  // include NULL term
+    const uint32_t expectedNameNulls = 4 - (expectedNameBytes % 4);
+    const uint32_t expectedNameLength = expectedNameBytes + expectedNameNulls;
     const uint32_t expectedNumCigarOps = bam.CigarData().size();
-    const int32_t  expectedSeqLength   = bam.Sequence().length();
-    const size_t   expectedTagsLength  = BamTagCodec::Encode(bam.Tags()).size();
+    const int32_t expectedSeqLength = bam.Sequence().length();
+    const size_t expectedTagsLength = BamTagCodec::Encode(bam.Tags()).size();
 
     //  Name        CIGAR         Sequence       Quals      Tags
     // l_qname + (n_cigar * 4) + (l_qseq+1)/2 + l_qseq + << TAGS >>
-
-    const int expectedTotalDataLength = expectedNameLength +
-                                        (expectedNumCigarOps * 4) +
-                                        (expectedSeqLength+1)/2 +
-                                         expectedSeqLength +
-                                         expectedTagsLength;
+    const int expectedTotalDataLength = expectedNameLength + (expectedNumCigarOps * 4) +
+                                        (expectedSeqLength + 1) / 2 + expectedSeqLength +
+                                        expectedTagsLength;
 
     EXPECT_TRUE((bool)bam.d_);
-    EXPECT_EQ(expectedNameLength,      bam.d_->core.l_qname);
-    EXPECT_EQ(expectedNumCigarOps,     bam.d_->core.n_cigar);
-    EXPECT_EQ(expectedSeqLength,       bam.d_->core.l_qseq);
+    EXPECT_EQ(expectedNameNulls, bam.d_->core.l_extranul);
+    EXPECT_EQ(expectedNameLength, bam.d_->core.l_qname);
+    EXPECT_EQ(expectedNumCigarOps, bam.d_->core.n_cigar);
+    EXPECT_EQ(expectedSeqLength, bam.d_->core.l_qseq);
     EXPECT_EQ(expectedTotalDataLength, bam.d_->l_data);
 }
 
-} // namespace BamRecordImplCoreTests
+}  // namespace BamRecordImplCoreTests
 
 TEST(BamRecordImplCoreTestsTest, RawDataDefaultValues)
 {
@@ -139,8 +136,8 @@ TEST(BamRecordImplCoreTestsTest, RawDataDefaultValues)
 
     // variable length data
     EXPECT_EQ(0, rawData->data);
-    EXPECT_EQ(0, rawData->l_data);
-    EXPECT_EQ(0, rawData->m_data);
+    EXPECT_EQ(0, rawData->l_data);  // initial aligned QNAME
+    EXPECT_EQ(0, rawData->m_data);  // check this if we change or tune later
 }
 
 TEST(BamRecordImplCoreTestsTest, DefaultValues)
@@ -160,7 +157,8 @@ TEST(BamRecordImplCoreTestsTest, DefaultValues)
     EXPECT_EQ(-1, rawData->core.pos);
     EXPECT_EQ(0, rawData->core.bin);
     EXPECT_EQ(255, rawData->core.qual);
-    EXPECT_EQ(1, rawData->core.l_qname);
+    EXPECT_EQ(3, rawData->core.l_extranul);  // alignment nulls
+    EXPECT_EQ(4, rawData->core.l_qname);     // normal null term + alignment nulls
     EXPECT_EQ(BamRecordImpl::UNMAPPED, rawData->core.flag);
     EXPECT_EQ(0, rawData->core.n_cigar);
     EXPECT_EQ(0, rawData->core.l_qseq);
@@ -170,7 +168,7 @@ TEST(BamRecordImplCoreTestsTest, DefaultValues)
 
     // variable length data
     EXPECT_TRUE(rawData->data != nullptr);
-    EXPECT_EQ(1, rawData->l_data);
+    EXPECT_EQ(4, rawData->l_data);           // initial aligned QNAME
     EXPECT_EQ((int)0x800, rawData->m_data);  // check this if we change or tune later
 
     // -------------------------------
@@ -225,7 +223,7 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
     tags["HX"].Modifier(TagModifier::HEX_STRING);
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
     tags["XY"] = static_cast<int32_t>(-42);
-    bam.Tags(tags); // (28 bytes encoded)
+    bam.Tags(tags);  // (28 bytes encoded)
 
     // -------------------------------
     // check raw data
@@ -239,18 +237,19 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
     EXPECT_EQ(42, rawData->core.pos);
     EXPECT_EQ(42, rawData->core.bin);
     EXPECT_EQ(42, rawData->core.qual);
-    EXPECT_EQ(1,  rawData->core.l_qname);    // initialized w/ NULL-term
+    EXPECT_EQ(3, rawData->core.l_extranul);  // alignment nulls
+    EXPECT_EQ(4, rawData->core.l_qname);     // normal null term + alignment nulls
     EXPECT_EQ(42, rawData->core.flag);
-    EXPECT_EQ(0,  rawData->core.n_cigar);
-    EXPECT_EQ(0,  rawData->core.l_qseq);
+    EXPECT_EQ(0, rawData->core.n_cigar);
+    EXPECT_EQ(0, rawData->core.l_qseq);
     EXPECT_EQ(42, rawData->core.mtid);
     EXPECT_EQ(42, rawData->core.mpos);
     EXPECT_EQ(42, rawData->core.isize);
 
     // variable length data
     EXPECT_TRUE(rawData->data != nullptr);
-    EXPECT_EQ(29, rawData->l_data);         // NULL-term qname + tags
-    EXPECT_EQ((int)0x800, rawData->m_data); // check this if we change or tune later
+    EXPECT_EQ(32, rawData->l_data);          // aligned qname + tags
+    EXPECT_EQ((int)0x800, rawData->m_data);  // check this if we change or tune later
 
     // -------------------------------
     // check data via API calls
@@ -291,22 +290,21 @@ TEST(BamRecordImplCoreTestsTest, DeepCopyFromRawData)
     const int32_t x = 42;
     char valueBytes[sizeof x];
     std::copy(static_cast<const char*>(static_cast<const void*>(&x)),
-              static_cast<const char*>(static_cast<const void*>(&x)) + sizeof x,
-              valueBytes);
+              static_cast<const char*>(static_cast<const void*>(&x)) + sizeof x, valueBytes);
     bam_aux_append(rawData.get(), "XY", 'i', sizeof(x), (uint8_t*)&valueBytes[0]);
 
     EXPECT_EQ(42, rawData->core.tid);
     EXPECT_EQ(42, rawData->core.pos);
     EXPECT_EQ(42, rawData->core.bin);
     EXPECT_EQ(42, rawData->core.qual);
-    EXPECT_EQ(0,  rawData->core.l_qname);
+    EXPECT_EQ(0, rawData->core.l_qname);
     EXPECT_EQ(42, rawData->core.flag);
-    EXPECT_EQ(0,  rawData->core.n_cigar);
-    EXPECT_EQ(0,  rawData->core.l_qseq);
+    EXPECT_EQ(0, rawData->core.n_cigar);
+    EXPECT_EQ(0, rawData->core.l_qseq);
     EXPECT_EQ(42, rawData->core.mtid);
     EXPECT_EQ(42, rawData->core.mpos);
     EXPECT_EQ(42, rawData->core.isize);
-    const int32_t fetchedX = bam_aux2i( bam_aux_get(rawData.get(), "XY") );
+    const int32_t fetchedX = bam_aux2i(bam_aux_get(rawData.get(), "XY"));
     EXPECT_EQ(42, fetchedX);
 
     // static "ctor"
@@ -317,10 +315,10 @@ TEST(BamRecordImplCoreTestsTest, DeepCopyFromRawData)
     EXPECT_EQ(42, rawData->core.pos);
     EXPECT_EQ(42, rawData->core.bin);
     EXPECT_EQ(42, rawData->core.qual);
-    EXPECT_EQ(0,  rawData->core.l_qname);
+    EXPECT_EQ(0, rawData->core.l_qname);
     EXPECT_EQ(42, rawData->core.flag);
-    EXPECT_EQ(0,  rawData->core.n_cigar);
-    EXPECT_EQ(0,  rawData->core.l_qseq);
+    EXPECT_EQ(0, rawData->core.n_cigar);
+    EXPECT_EQ(0, rawData->core.l_qseq);
     EXPECT_EQ(42, rawData->core.mtid);
     EXPECT_EQ(42, rawData->core.mpos);
     EXPECT_EQ(42, rawData->core.isize);
@@ -337,10 +335,10 @@ TEST(BamRecordImplCoreTestsTest, DeepCopyFromRawData)
     EXPECT_EQ(42, bam.MatePosition());
     EXPECT_EQ(42, bam.Position());
     EXPECT_EQ(42, bam.ReferenceId());
-    EXPECT_EQ(x,  bam.Tags()["XY"].ToInt32());
+    EXPECT_EQ(x, bam.Tags()["XY"].ToInt32());
 
     EXPECT_TRUE(bam.d_->data != nullptr);
-    EXPECT_TRUE(bam.d_->m_data >= (int)0x800); // check this if we change or tune later
+    EXPECT_TRUE(bam.d_->m_data >= (int)0x800);  // check this if we change or tune later
 
     // tweak raw data, make sure we've done a deep copy (so BamRecordImpl isn't changed)
     rawData->core.pos = 37;
@@ -557,7 +555,7 @@ TEST(BamRecordImplCoreTestsTest, MoveConstructor)
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpessimizing-move"
-#endif 
+#endif
     BamRecordImpl bam(std::move(BamRecordImplCoreTests::CreateBamImpl()));
 #ifdef __clang__
 #pragma clang diagnostic pop
@@ -591,12 +589,8 @@ TEST(BamRecordImplCoreTestsTest, AlignmentFlags)
 
     // enum values
     BamRecordImpl bam2;
-    bam2.Flag(BamRecordImpl::DUPLICATE |
-              BamRecordImpl::MATE_1 |
-              BamRecordImpl::REVERSE_STRAND |
-              BamRecordImpl::PROPER_PAIR |
-              BamRecordImpl::PAIRED
-             );
+    bam2.Flag(BamRecordImpl::DUPLICATE | BamRecordImpl::MATE_1 | BamRecordImpl::REVERSE_STRAND |
+              BamRecordImpl::PROPER_PAIR | BamRecordImpl::PAIRED);
 
     // convenience calls
     BamRecordImpl bam3;

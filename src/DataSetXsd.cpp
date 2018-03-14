@@ -42,12 +42,14 @@
 #include "PbbamInternalConfig.h"
 
 #include "pbbam/DataSetXsd.h"
+
 #include <unordered_map>
 
 namespace PacBio {
 namespace BAM {
 namespace internal {
 
+// clang-format off
 static std::map<XsdType, NamespaceInfo> DefaultRegistry()
 {
     const auto result = std::map<XsdType, NamespaceInfo>
@@ -135,6 +137,7 @@ static const auto elementRegistry = std::unordered_map<std::string, XsdType>
     { "SubreadSet",            XsdType::DATASETS },
     { "SummaryStats",          XsdType::DATASETS },
     { "TotalLength",           XsdType::DATASETS },
+    { "TranscriptSet",         XsdType::DATASETS },
 
     // 'pbmeta' elements
     //
@@ -176,41 +179,40 @@ static const auto elementRegistry = std::unordered_map<std::string, XsdType>
     { "BioSamplePointers", XsdType::SAMPLE_INFO },
     { "BioSamples",        XsdType::SAMPLE_INFO }
 };
+// clang-format on
 
-} // namespace internal
+}  // namespace internal
 
 // ---------------
 // NamespaceInfo
 // ---------------
 
-NamespaceInfo::NamespaceInfo(std::string name,
-                             std::string uri)
-    : name_(std::move(name))
-    , uri_(std::move(uri))
-{ }
+NamespaceInfo::NamespaceInfo(std::string name, std::string uri)
+    : name_(std::move(name)), uri_(std::move(uri))
+{
+}
 
 // -------------------
 // NamespaceRegistry
 // -------------------
 
-NamespaceRegistry::NamespaceRegistry()
-    : data_(internal::DefaultRegistry())
-{ }
+NamespaceRegistry::NamespaceRegistry() : data_(internal::DefaultRegistry()) {}
 
-const NamespaceInfo& NamespaceRegistry::DefaultNamespace() const
-{ return Namespace(DefaultXsd()); }
+const NamespaceInfo& NamespaceRegistry::DefaultNamespace() const { return Namespace(DefaultXsd()); }
 
-XsdType NamespaceRegistry::DefaultXsd() const
-{ return defaultXsdType_; }
+XsdType NamespaceRegistry::DefaultXsd() const { return defaultXsdType_; }
 
 const NamespaceInfo& NamespaceRegistry::Namespace(const XsdType& xsd) const
-{ return data_.at(xsd); }
+{
+    return data_.at(xsd);
+}
 
 void NamespaceRegistry::Register(const XsdType& xsd, const NamespaceInfo& namespaceInfo)
-{ data_[xsd] = namespaceInfo; }
+{
+    data_[xsd] = namespaceInfo;
+}
 
-void NamespaceRegistry::SetDefaultXsd(const XsdType& xsd)
-{ defaultXsdType_ = xsd; }
+void NamespaceRegistry::SetDefaultXsd(const XsdType& xsd) { defaultXsdType_ = xsd; }
 
 XsdType NamespaceRegistry::XsdForElement(const std::string& elementLabel) const
 {
@@ -220,14 +222,12 @@ XsdType NamespaceRegistry::XsdForElement(const std::string& elementLabel) const
 
 XsdType NamespaceRegistry::XsdForUri(const std::string& uri) const
 {
-    for (const auto& entry : data_)
-    {
+    for (const auto& entry : data_) {
         const auto& info = entry.second;
-        if (info.Uri() == uri)
-            return entry.first;
+        if (info.Uri() == uri) return entry.first;
     }
     return XsdType::NONE;
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

@@ -62,20 +62,17 @@ public:
     }
 
     // This is a work around for the Intel PHI compiler (icpc)
-    ~BundleChemistryMappingException() throw()
-    {
-    }
+    ~BundleChemistryMappingException() throw() {}
 
 public:
-    const char* what() const noexcept override
-    { return what_.c_str(); }
+    const char* what() const noexcept override { return what_.c_str(); }
 
 protected:
     std::string mappingXml_;
     std::string what_;
 };
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio
 
-#endif // BUNDLECHEMISTRYMAPPINGEXCEPTION_H
+#endif  // BUNDLECHEMISTRYMAPPINGEXCEPTION_H
