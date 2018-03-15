@@ -93,6 +93,9 @@ public:
             settings.verboseLevel_ = 0;
         }
 
+        // Disable validation of CIGARs that might contain 'M'
+        CigarOperation::validate_ = false;
+
         return settings;
     }
 
