@@ -191,7 +191,7 @@ int main(int argc, char* argv[])
             newHeader = PacBio::BAM::pbbamify::Pbbamify::ComposeHeader(dataset, ref_reader, inputBamReader);
         }
 
-        std::shared_ptr<PacBio::BAM::pbbamify::QueryLookup> queryLookup = std::move(PacBio::BAM::pbbamify::CreateQueryLookup(dataset));
+        std::shared_ptr<PacBio::BAM::pbbamify::QueryLookup> queryLookup = PacBio::BAM::pbbamify::CreateQueryLookup(dataset);
         queryLookup->Load();
 
         {   // A block is used here to close the bamWriter and the reference reader.
