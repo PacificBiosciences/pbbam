@@ -84,6 +84,7 @@ for i in "true" "false"; do
       --wrap-mode nofallback \
       --backend ninja \
       --buildtype release \
+      -Db_ndebug=true \
       --strip \
       --default-library shared \
       --warnlevel 3 \
