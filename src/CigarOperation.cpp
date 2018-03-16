@@ -79,5 +79,7 @@ char CigarOperation::TypeToChar(const CigarOperationType type)
     return bam_cigar_opchr(static_cast<int>(type));
 }
 
+bool CigarOperation::validate_ = true;
+
 }  // namespace BAM
 }  // namespace PacBio
