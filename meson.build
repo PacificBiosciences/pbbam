@@ -39,6 +39,10 @@ endif
 pbbam_macros = []
 if get_option('permissive-cigar')
   pbbam_macros += ['-DPBBAM_PERMISSIVE_CIGAR']
+  warning('**********************************************')
+  warning('* You have enabled allowing "M" in BAM files *')
+  warning('*    This is an unsupported combination!     *')
+  warning('**********************************************')
 endif
 
 ################
