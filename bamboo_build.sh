@@ -87,6 +87,7 @@ for i in "true" "false"; do
       --strip \
       --default-library shared \
       --warnlevel 3 \
+      --libdir lib \
       --unity "${j}" \
       --prefix "${PREFIX_ARG:-/usr/local}" \
       -Dbuild-tools=true \
