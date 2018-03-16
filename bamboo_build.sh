@@ -63,49 +63,45 @@ esac
 # by conda and other package managers
 export LDFLAGS="-static-libstdc++ -static-libgcc"
 
-# i : permissive-cigar
-for i in "true" "false"; do
-  # j : unity build
-  for j in "on" "off"; do
-    CURRENT_BUILD_DIR="build_perm-cigar=${i^^}_unity=${j^^}"
-    mkdir -p "${CURRENT_BUILD_DIR}"/test-reports
+# i : unity build
+for i in "on" "off"; do
+  CURRENT_BUILD_DIR="build_unity=${i^^}"
+  mkdir -p "${CURRENT_BUILD_DIR}"/test-reports
 
-    echo "=============================="
-    echo "Current configuration:"
-    echo "  Permissive Cigar:  ${i^^}"
-    echo "  Unity:             ${j^^}"
-    echo "=============================="
+  echo "=============================="
+  echo "Current configuration:"
+  echo "  Unity:             ${i^^}"
+  echo "=============================="
 
-    # 1. configure
-    # '--wrap-mode nofallback' prevents meson from downloading
-    # stuff from the internet or using subprojects.
-    echo "## Configuring source (${CURRENT_BUILD_DIR})"
-    meson \
-      --wrap-mode nofallback \
-      --backend ninja \
-      --buildtype release \
-      -Db_ndebug=true \
-      --strip \
-      --default-library shared \
-      --warnlevel 3 \
-      --libdir lib \
-      --unity "${j}" \
-      --prefix "${PREFIX_ARG:-/usr/local}" \
-      -Dbuild-tools=true \
-      -Dtests=true \
-      -Dpermissive-cigar="${i}" \
-      "${CURRENT_BUILD_DIR}" .
+  # 1. configure
+  # '--wrap-mode nofallback' prevents meson from downloading
+  # stuff from the internet or using subprojects.
+  echo "## Configuring source (${CURRENT_BUILD_DIR})"
+  meson \
+    --wrap-mode nofallback \
+    --backend ninja \
+    --buildtype release \
+    -Db_ndebug=true \
+    --strip \
+    --default-library shared \
+    --warnlevel 3 \
+    --libdir lib \
+    --unity "${i}" \
+    --prefix "${PREFIX_ARG:-/usr/local}" \
+    -Dbuild-tools=true \
+    -Dtests=true \
+    -Dpermissive-cigar=false \
+    "${CURRENT_BUILD_DIR}" .
 
-    # 2. build
-    echo "## Building source (${CURRENT_BUILD_DIR})"
-    ninja -C "${CURRENT_BUILD_DIR}" -v
+  # 2. build
+  echo "## Building source (${CURRENT_BUILD_DIR})"
+  ninja -C "${CURRENT_BUILD_DIR}" -v
 
-    # 3. tests
-    echo "## Tests (${CURRENT_BUILD_DIR})"
-    GTEST_OUTPUT="xml:${CURRENT_BUILD_DIR}/test-reports/pbbam_results.xml" ARGS=-V VERBOSE=1 \
-    ninja -C "${CURRENT_BUILD_DIR}" -v test
-    cram --xunit-file=${CURRENT_BUILD_DIR}/test-reports/pbbam_cramunit.xml ${CURRENT_BUILD_DIR}/tools
-  done
+  # 3. tests
+  echo "## Tests (${CURRENT_BUILD_DIR})"
+  GTEST_OUTPUT="xml:${CURRENT_BUILD_DIR}/test-reports/pbbam_results.xml" ARGS=-V VERBOSE=1 \
+  ninja -C "${CURRENT_BUILD_DIR}" -v test
+  cram --xunit-file=${CURRENT_BUILD_DIR}/test-reports/pbbam_cramunit.xml ${CURRENT_BUILD_DIR}/tools
 done
 
 if [[ -z ${PREFIX_ARG+x} ]]; then
