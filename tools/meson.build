@@ -206,7 +206,7 @@ pbbam_pbbamify = executable(
 
 # tests
 # These will only work with permissive-cigar flag turned on.
-if get_option('tests') and get_option('permissive-cigar')
+if get_option('tests')
   pbbamify_t = configure_file(
     input : pbbam_cram_pbbamify_t_in,
     output : 'pbbamify.t',
