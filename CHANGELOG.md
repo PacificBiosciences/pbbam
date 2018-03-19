@@ -10,6 +10,15 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.17.0] - 2018-03-18
+
+### Added
+- CompressionLevel/NumThreads parameter implementation to PbiBuilder.
+- Dataset ctor to PbiFileQuery.
+- TranscriptSet to XML support.
+- Auto-enabled "permissive CIGAR mode" for pbbamify tool.
+- IndexedBamWriter, for more efficient writing of BAM & PBI simultaneously.
+
 ## [0.16.0] - 2018-01-17
 
 ### Removed

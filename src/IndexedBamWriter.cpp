@@ -51,6 +51,7 @@
 
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiBuilder.h"
 #include "pbbam/Unused.h"
 #include "pbbam/Validator.h"
@@ -65,8 +66,7 @@ namespace internal {
 class IndexedBamWriterPrivate : public internal::FileProducer
 {
 public:
-    IndexedBamWriterPrivate(const std::string& outputFilename,
-                            const std::shared_ptr<bam_hdr_t> rawHeader)
+    IndexedBamWriterPrivate(const std::string& outputFilename, std::shared_ptr<bam_hdr_t> rawHeader)
         : internal::FileProducer{outputFilename}
         , file_{nullptr}
         , header_{rawHeader}
@@ -109,7 +109,7 @@ public:
         // Fetch record's start offset.
         //
         // If we're still in the same block from the last record written, we
-        // need to flush to get the proper offset. This will
+        // need to flush to get the proper offset.
         //
         if (bgzf->block_address == previousBlockAddress_) bgzf_flush(bgzf);
         const int64_t vOffset = bgzf_tell(bgzf);
@@ -136,7 +136,7 @@ public:
 }  // namespace internal
 
 IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamHeader& header)
-    : IRecordWriter{}, d_{nullptr}
+    : IRecordWriter(), d_(nullptr)
 {
 #if PBBAM_AUTOVALIDATE
     Validator::Validate(header);

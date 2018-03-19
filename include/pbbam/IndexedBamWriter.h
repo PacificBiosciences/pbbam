@@ -45,7 +45,6 @@
 #include <memory>
 #include <string>
 
-#include "pbbam/BinCalculationMode.h"
 #include "pbbam/Config.h"
 #include "pbbam/IRecordWriter.h"
 

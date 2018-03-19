@@ -52,7 +52,6 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/PbiFilterQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiFilterTypes.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiIndexedBamReader.h
-    ${PacBioBAM_IncludeDir}/pbbam/PbiIndexedBamWriter.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiRawData.h
     ${PacBioBAM_IncludeDir}/pbbam/Position.h
     ${PacBioBAM_IncludeDir}/pbbam/ProgramInfo.h
