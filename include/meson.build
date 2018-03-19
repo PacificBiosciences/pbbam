@@ -39,6 +39,7 @@ if not meson.is_subproject()
       'pbbam/Frames.h',
       'pbbam/GenomicInterval.h',
       'pbbam/GenomicIntervalQuery.h',
+      'pbbam/IndexedBamWriter.h',
       'pbbam/IndexedFastaReader.h',
       'pbbam/Interval.h',
       'pbbam/IRecordWriter.h',
