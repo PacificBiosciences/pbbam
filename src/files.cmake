@@ -37,6 +37,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/Frames.h
     ${PacBioBAM_IncludeDir}/pbbam/GenomicInterval.h
     ${PacBioBAM_IncludeDir}/pbbam/GenomicIntervalQuery.h
+    ${PacBioBAM_IncludeDir}/pbbam/IndexedBamWriter.h
     ${PacBioBAM_IncludeDir}/pbbam/IndexedFastaReader.h
     ${PacBioBAM_IncludeDir}/pbbam/Interval.h
     ${PacBioBAM_IncludeDir}/pbbam/IRecordWriter.h
@@ -51,6 +52,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/PbiFilterQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiFilterTypes.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiIndexedBamReader.h
+    ${PacBioBAM_IncludeDir}/pbbam/PbiIndexedBamWriter.h
     ${PacBioBAM_IncludeDir}/pbbam/PbiRawData.h
     ${PacBioBAM_IncludeDir}/pbbam/Position.h
     ${PacBioBAM_IncludeDir}/pbbam/ProgramInfo.h
@@ -196,6 +198,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/Frames.cpp
     ${PacBioBAM_SourceDir}/GenomicInterval.cpp
     ${PacBioBAM_SourceDir}/GenomicIntervalQuery.cpp
+    ${PacBioBAM_SourceDir}/IndexedBamWriter.cpp
     ${PacBioBAM_SourceDir}/IndexedFastaReader.cpp
     ${PacBioBAM_SourceDir}/MD5.cpp
     ${PacBioBAM_SourceDir}/MemoryUtils.cpp

@@ -32,6 +32,7 @@ set( PacBioBAMTest_CPP
     ${PacBioBAM_TestsDir}/src/test_FileUtils.cpp
     ${PacBioBAM_TestsDir}/src/test_Frames.cpp
     ${PacBioBAM_TestsDir}/src/test_GenomicIntervalQuery.cpp
+    ${PacBioBAM_TestsDir}/src/test_IndexedBamWriter.cpp
     ${PacBioBAM_TestsDir}/src/test_IndexedFastaReader.cpp
     ${PacBioBAM_TestsDir}/src/test_Intervals.cpp
     ${PacBioBAM_TestsDir}/src/test_LongCigar.cpp

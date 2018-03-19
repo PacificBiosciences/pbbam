@@ -37,6 +37,7 @@ pbbam_cpp_sources = files([
   'Frames.cpp',
   'GenomicInterval.cpp',
   'GenomicIntervalQuery.cpp',
+  'IndexedBamWriter.cpp',
   'IndexedFastaReader.cpp',
   'MD5.cpp',
   'MemoryUtils.cpp',
