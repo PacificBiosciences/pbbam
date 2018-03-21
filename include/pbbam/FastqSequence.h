@@ -93,7 +93,7 @@ public:
     /// \brief Qualities
     /// \return
     ///
-    QualityValues Qualities() const;
+    const QualityValues& Qualities() const;
 
     /// \}
 
