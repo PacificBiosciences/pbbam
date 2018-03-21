@@ -70,13 +70,19 @@ static const std::string recordTypeName_HqRegion = "HQREGION";
 static const std::string recordTypeName_Subread = "SUBREAD";
 static const std::string recordTypeName_CCS = "CCS";
 static const std::string recordTypeName_Scrap = "SCRAP";
+static const std::string recordTypeName_Transcript = "TRANSCRIPT";
 static const std::string recordTypeName_Unknown = "UNKNOWN";
 
 static int32_t HoleNumberFromName(const std::string& fullName)
 {
     const auto mainTokens = Split(fullName, '/');
-    if (mainTokens.size() != 3) throw std::runtime_error("malformed record name");
-    return stoi(mainTokens.at(1));
+    if (mainTokens.at(0) == "transcript") {
+        if (mainTokens.size() != 2) throw std::runtime_error("malformed transcript record name");
+        return std::stoi(mainTokens.at(1));
+    } else {
+        if (mainTokens.size() != 3) throw std::runtime_error("malformed record name");
+        return std::stoi(mainTokens.at(1));
+    }
 }
 
 static Position QueryEndFromName(const std::string& fullName)
@@ -314,6 +320,7 @@ static RecordType NameToType(const std::string& name)
     if (name == recordTypeName_HqRegion) return RecordType::HQREGION;
     if (name == recordTypeName_CCS) return RecordType::CCS;
     if (name == recordTypeName_Scrap) return RecordType::SCRAP;
+    if (name == recordTypeName_Transcript) return RecordType::TRANSCRIPT;
     return RecordType::UNKNOWN;
 }
 
@@ -519,9 +526,9 @@ void BamRecord::CalculateAlignedPositions() const
 
     // get the query start/end
     const size_t seqLength = impl_.SequenceLength();
-    const RecordType type = Type();
-    const Position qStart = (type == RecordType::CCS) ? Position(0) : QueryStart();
-    const Position qEnd = (type == RecordType::CCS) ? Position(seqLength) : QueryEnd();
+    const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
+    const Position qStart = isCcsOrTranscript ? Position(0) : QueryStart();
+    const Position qEnd = isCcsOrTranscript ? Position(seqLength) : QueryEnd();
 
     if (qStart == PacBio::BAM::UnmappedPosition || qEnd == PacBio::BAM::UnmappedPosition) return;
 
@@ -696,9 +703,9 @@ BamRecord& BamRecord::ClipToQuery(const Position start, const Position end)
 {
     // cache original coords, skip out if clip not needed
     const size_t seqLength = impl_.SequenceLength();
-    const RecordType type = Type();
-    const Position origQStart = (type == RecordType::CCS) ? Position(0) : QueryStart();
-    const Position origQEnd = (type == RecordType::CCS) ? Position(seqLength) : QueryEnd();
+    const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
+    const Position origQStart = isCcsOrTranscript ? Position(0) : QueryStart();
+    const Position origQEnd = isCcsOrTranscript ? Position(seqLength) : QueryEnd();
     if (start <= origQStart && end >= origQEnd) return *this;
 
     // determine new offsets into data
@@ -802,9 +809,9 @@ BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
 
     // cache original coords
     const size_t seqLength = impl_.SequenceLength();
-    const RecordType type = Type();
-    const Position origQStart = (type == RecordType::CCS) ? Position(0) : QueryStart();
-    const Position origQEnd = (type == RecordType::CCS) ? Position(seqLength) : QueryEnd();
+    const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
+    const Position origQStart = isCcsOrTranscript ? Position(0) : QueryStart();
+    const Position origQEnd = isCcsOrTranscript ? Position(seqLength) : QueryEnd();
     const Position origTStart = ReferenceStart();
     const Position origTEnd = ReferenceEnd();
     assert(AlignedStart() >= origQStart);
@@ -926,9 +933,9 @@ BamRecord& BamRecord::ClipToReferenceReverse(const PacBio::BAM::Position start,
 
     // cache original coords
     const size_t seqLength = impl_.SequenceLength();
-    const RecordType type = Type();
-    const Position origQStart = (type == RecordType::CCS) ? Position(0) : QueryStart();
-    const Position origQEnd = (type == RecordType::CCS) ? Position(seqLength) : QueryEnd();
+    const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
+    const Position origQStart = isCcsOrTranscript ? Position(0) : QueryStart();
+    const Position origQEnd = isCcsOrTranscript ? Position(seqLength) : QueryEnd();
     const Position origTStart = ReferenceStart();
     const Position origTEnd = ReferenceEnd();
 
@@ -1916,8 +1923,10 @@ Position BamRecord::QueryEnd() const
         return Position(0);
     }
     if (type == RecordType::CCS) throw std::runtime_error("no query end for CCS read type");
+    if (type == RecordType::TRANSCRIPT)
+        throw std::runtime_error("no query end for transcript read type");
 
-    // PacBio BAM, non-CCS
+    // PacBio BAM, non-CCS/transcript
     try {
         return internal::QueryEndFromName(FullName());
     } catch (std::exception&) {
@@ -1948,8 +1957,10 @@ Position BamRecord::QueryStart() const
         return Position(0);
     }
     if (type == RecordType::CCS) throw std::runtime_error("no query start for CCS read type");
+    if (type == RecordType::TRANSCRIPT)
+        throw std::runtime_error("no query start for transcript read type");
 
-    // PacBio BAM, non-CCS
+    // PacBio BAM, non-CCS/transcript
     try {
         return internal::QueryStartFromName(FullName());
     } catch (std::exception&) {
@@ -2137,11 +2148,14 @@ RecordType BamRecord::Type() const
         return internal::NameToType(typeName);
     } catch (std::exception&) {
 
-        // read group not found
-        // peek at name to see if we're CCS
-        if (FullName().find("ccs") != std::string::npos) return RecordType::CCS;
-
-        // otherwise unknown
+        // read group not found, peek at name to see if we're possibly
+        // CCS or TRANSCRIPT
+        //
+        const auto name = FullName();
+        if (name.find("transcript") == 0)
+            return RecordType::TRANSCRIPT;
+        else if (name.find("/ccs") != std::string::npos)
+            return RecordType::CCS;
         else
             return RecordType::UNKNOWN;
     }
@@ -2152,32 +2166,32 @@ void BamRecord::UpdateName()
     std::string newName;
     newName.reserve(100);
 
-    newName += MovieName();
-    newName += "/";
+    const auto& holeNumber = (HasHoleNumber() ? std::to_string(HoleNumber()) : "?");
+    if (Type() == RecordType::TRANSCRIPT) {
+        newName = "transcript/" + holeNumber;
+    } else {
+        newName += MovieName();
+        newName += "/";
+        newName += holeNumber;
+        newName += "/";
 
-    if (HasHoleNumber())
-        newName += std::to_string(HoleNumber());
-    else
-        newName += "?";
+        if (Type() == RecordType::CCS)
+            newName += "ccs";
 
-    newName += "/";
+        else {
+            if (HasQueryStart())
+                newName += std::to_string(QueryStart());
+            else
+                newName += "?";
 
-    if (Type() == RecordType::CCS)
-        newName += "ccs";
-    else {
-        if (HasQueryStart())
-            newName += std::to_string(QueryStart());
-        else
-            newName += "?";
+            newName += '_';
 
-        newName += '_';
-
-        if (HasQueryEnd())
-            newName += std::to_string(QueryEnd());
-        else
-            newName += "?";
+            if (HasQueryEnd())
+                newName += std::to_string(QueryEnd());
+            else
+                newName += "?";
+        }
     }
-
     impl_.Name(newName);
 }
 

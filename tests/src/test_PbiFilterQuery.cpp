@@ -626,3 +626,72 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         EXPECT_EQ(count_30422 + count_648 + count_17299, count_whitelist);
     }
 }
+
+TEST(PbiFilterQueryTest, TranscriptRecords)
+{
+    const std::string transcriptFn = PbbamTestsConfig::Data_Dir + "/transcript.subreads.bam";
+
+    PbiFilterQuery query{PbiFilter{}, transcriptFn};
+    for (const auto& b : query)
+        EXPECT_TRUE(b.HasHoleNumber());
+
+    {  // zmw whitelist
+        const std::vector<int32_t> whitelist = {1, 3};
+
+        std::vector<int32_t> observed;
+
+        PbiFilter filter{PbiZmwFilter{whitelist}};
+        PbiFilterQuery query{filter, transcriptFn};
+        for (const auto& b : query) {
+            observed.push_back(b.HoleNumber());
+        }
+
+        ASSERT_EQ(2, observed.size());
+        EXPECT_EQ(1, observed.at(0));
+        EXPECT_EQ(3, observed.at(1));
+    }
+    {  // zmw bounds
+        const PbiFilter filter{
+            {PbiZmwFilter{2, Compare::GREATER_THAN_EQUAL}, PbiZmwFilter{4, Compare::LESS_THAN}}};
+
+        std::vector<int32_t> observed;
+
+        PbiFilterQuery query{filter, transcriptFn};
+        for (const auto& b : query) {
+            observed.push_back(b.HoleNumber());
+        }
+
+        ASSERT_EQ(2, observed.size());
+        EXPECT_EQ(2, observed.at(0));
+        EXPECT_EQ(3, observed.at(1));
+    }
+    {  // QNAME
+
+        std::vector<int32_t> observed;
+
+        PbiFilter filter{PbiQueryNameFilter{"transcript/2"}};
+        PbiFilterQuery query{filter, transcriptFn};
+        for (const auto& b : query) {
+            observed.push_back(b.HoleNumber());
+        }
+
+        ASSERT_EQ(1, observed.size());
+        EXPECT_EQ(2, observed.at(0));
+    }
+    {  // QNAME whitelist
+
+        const std::vector<std::string> whitelist = {"transcript/1", "transcript/4"};
+
+        std::vector<int32_t> observed;
+
+        PbiFilter filter{PbiQueryNameFilter{whitelist}};
+        PbiFilterQuery query{filter, transcriptFn};
+        for (const auto& b : query) {
+            observed.push_back(b.HoleNumber());
+        }
+
+        ASSERT_EQ(2, observed.size());
+        EXPECT_EQ(1, observed.at(0));
+        EXPECT_EQ(4, observed.at(1));
+    }
+}

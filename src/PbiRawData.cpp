@@ -68,6 +68,7 @@ static std::string ToString(const RecordType type)
         { RecordType::SUBREAD,    "SUBREAD" },
         { RecordType::CCS,        "CCS" },
         { RecordType::SCRAP,      "SCRAP" },
+        { RecordType::TRANSCRIPT, "TRANSCRIPT" },
         { RecordType::UNKNOWN,    "UNKNOWN" }
     };
     // clang-format on
@@ -225,7 +226,7 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
     rgId_.push_back(id);
 
     // query start/end
-    if (b.Type() == RecordType::CCS) {
+    if (IsCcsOrTranscript(b.Type())) {
         qStart_.push_back(-1);
         qEnd_.push_back(-1);
     } else {

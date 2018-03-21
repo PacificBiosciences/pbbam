@@ -2737,4 +2737,26 @@ TEST(BamRecordTest, PulseExclusionTag)
 
 }
 
+TEST(BamRecordTest, TranscriptRecord)
+{
+    const std::string readTypeStr{"TRANSCRIPT"};
+    const auto readGroupId = MakeReadGroupId("transcript", readTypeStr);
+
+    ReadGroupInfo rg{readGroupId};
+    rg.ReadType(readTypeStr);
+
+    BamHeader header;
+    header.Version("1.1")
+        .SortOrder("queryname")
+        .PacBioBamVersion("3.0.1");
+
+    BamRecord bam{header};
+    bam.Impl().Name("transcript/1234");
+
+    EXPECT_EQ(RecordType::TRANSCRIPT, bam.Type());
+    EXPECT_EQ(1234, bam.HoleNumber());
+    EXPECT_THROW({bam.QueryStart();}, std::runtime_error);
+    EXPECT_THROW({bam.QueryEnd();}, std::runtime_error);
+}
+
 // clang-format on
