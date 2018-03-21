@@ -129,11 +129,9 @@ struct QNameSorter : std::binary_function<internal::CompositeMergeItem,
             return lhsZmw < rhsZmw;
 
         // shuffle CCS/transcript reads after all others
-        const auto lhsReadType = l.Type();
-        const auto rhsReadType = r.Type();
-        if (IsCcsOrTranscript(lhsReadType))
+        if (IsCcsOrTranscript(l.Type()))
             return false;
-        if (IsCcsOrTranscript(rhsReadType))
+        if (IsCcsOrTranscript(r.Type()))
             return true;
 
         // sort on qStart, then finally qEnd
