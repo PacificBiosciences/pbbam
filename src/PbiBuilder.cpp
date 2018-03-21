@@ -76,6 +76,7 @@ std::string ToString(const RecordType type)
         { RecordType::SUBREAD,    "SUBREAD" },
         { RecordType::CCS,        "CCS" },
         { RecordType::SCRAP,      "SCRAP" },
+        { RecordType::TRANSCRIPT, "TRANSCRIPT" },
         { RecordType::UNKNOWN,    "UNKNOWN" }
     };
     // clang-format on
@@ -520,9 +521,9 @@ void PbiBuilderPrivate::AddBasicData(const BamRecord& b, const int64_t vOffset)
     }();
 
     // query start/end
-    const auto isCcs = (b.Type() == RecordType::CCS);
-    const auto qStart = int32_t{(isCcs ? -1 : b.QueryStart())};
-    const auto qEnd = int32_t{(isCcs ? -1 : b.QueryEnd())};
+    const auto isCcsOrTranscript = (IsCcsOrTranscript(b.Type()));
+    const auto qStart = int32_t{(isCcsOrTranscript ? -1 : b.QueryStart())};
+    const auto qEnd = int32_t{(isCcsOrTranscript ? -1 : b.QueryEnd())};
 
     // add'l data
     const auto holeNum = int32_t{(b.HasHoleNumber() ? b.HoleNumber() : 0)};

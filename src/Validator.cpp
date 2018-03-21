@@ -226,13 +226,12 @@ void ValidateMappedRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>&
 
 void ValidateRecordCore(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
-    const std::string& name = b.FullName();
-
-    if (b.Type() != RecordType::CCS) {
+    if (!IsCcsOrTranscript(b.Type())) {
         const auto qStart = b.QueryStart();
         const auto qEnd = b.QueryEnd();
-        if (qStart >= qEnd)
-            errors->AddRecordError(name, "queryStart (qs) should be < queryEnd (qe)");
+        if (qStart >= qEnd) {
+            errors->AddRecordError(b.FullName(), "queryStart (qs) should be < queryEnd (qe)");
+        }
     }
 }
 
@@ -248,10 +247,9 @@ void ValidateRecordReadGroup(const BamRecord& b, std::unique_ptr<ValidationError
 
 void ValidateRecordRequiredTags(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
-    const std::string& name = b.FullName();
-
-    if (b.Type() != RecordType::CCS) {
-
+    const auto name = b.FullName();
+    const auto isCcsOrTranscript = IsCcsOrTranscript(b.Type());
+    if (!isCcsOrTranscript) {
         // qe/qs
         const bool hasQueryStart = b.HasQueryStart();
         const bool hasQueryEnd = b.HasQueryEnd();
@@ -274,7 +272,7 @@ void ValidateRecordRequiredTags(const BamRecord& b, std::unique_ptr<ValidationEr
         errors->AddRecordError(name, "missing tag: np (num passes)");
     else {
         const auto numPasses = b.NumPasses();
-        if (b.Type() != RecordType::CCS && numPasses != 1)
+        if (!isCcsOrTranscript && numPasses != 1)
             errors->AddRecordError(name, "np (numPasses) tag for non-CCS records should be 1");
     }
 
@@ -288,9 +286,9 @@ void ValidateRecordRequiredTags(const BamRecord& b, std::unique_ptr<ValidationEr
 
 void ValidateRecordTagLengths(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
-    const std::string& name = b.FullName();
+    const auto name = b.FullName();
     const size_t expectedLength =
-        (b.Type() == RecordType::CCS ? b.Sequence().size() : (b.QueryEnd() - b.QueryStart()));
+        (IsCcsOrTranscript(b.Type()) ? b.Sequence().size() : (b.QueryEnd() - b.QueryStart()));
 
     // check "per-base"-type data lengths are compatible
     if (b.Sequence().size() != expectedLength)
