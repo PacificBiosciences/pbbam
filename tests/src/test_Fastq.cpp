@@ -39,8 +39,6 @@
 #include <cstddef>
 #include <cstdint>
 
-#define private public
-
 #include "PbbamTestData.h"
 
 #include <pbbam/FastqReader.h>

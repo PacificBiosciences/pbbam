@@ -43,8 +43,6 @@
 
 #include <gtest/gtest.h>
 
-#define private public
-
 #include <pbbam/Compare.h>
 
 // clang-format off
@@ -201,34 +199,48 @@ TEST(CompareTest, FromOperatorOk)
 
 TEST(CompareTest, AlignedEndOk)
 {
-    BamRecord r1; r1.alignedEnd_ = 300;
-    BamRecord r2; r2.alignedEnd_ = 200;
-    BamRecord r3; r3.alignedEnd_ = 400;
-    BamRecord r4; r4.alignedEnd_ = 100;
+    BamRecord r1;
+    r1.Map(0, 290, Strand::FORWARD, Cigar{"10="}, 255);
+
+    BamRecord r2;
+    r2.Map(0, 190, Strand::FORWARD, Cigar{"10="}, 255);
+
+    BamRecord r3;
+    r3.Map(0, 290, Strand::FORWARD, Cigar{"10="}, 255);
+
+    BamRecord r4;
+    r4.Map(0, 90, Strand::FORWARD, Cigar{"10="}, 255);
 
     auto records = vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::AlignedEnd());
 
-    EXPECT_EQ(r4.alignedEnd_, records.at(0).AlignedEnd());
-    EXPECT_EQ(r2.alignedEnd_, records.at(1).AlignedEnd());
-    EXPECT_EQ(r1.alignedEnd_, records.at(2).AlignedEnd());
-    EXPECT_EQ(r3.alignedEnd_, records.at(3).AlignedEnd());
+    EXPECT_EQ(r4.AlignedEnd(), records.at(0).AlignedEnd());
+    EXPECT_EQ(r2.AlignedEnd(), records.at(1).AlignedEnd());
+    EXPECT_EQ(r1.AlignedEnd(), records.at(2).AlignedEnd());
+    EXPECT_EQ(r3.AlignedEnd(), records.at(3).AlignedEnd());
 }
 
 TEST(CompareTest, AlignedStartOk)
 {
-    BamRecord r1; r1.alignedStart_ = 300;
-    BamRecord r2; r2.alignedStart_ = 200;
-    BamRecord r3; r3.alignedStart_ = 400;
-    BamRecord r4; r4.alignedStart_ = 100;
+    BamRecord r1;
+    r1.Map(0, 300, Strand::FORWARD, Cigar{"10="}, 255);
+
+    BamRecord r2;
+    r2.Map(0, 200, Strand::FORWARD, Cigar{"10="}, 255);
+
+    BamRecord r3;
+    r3.Map(0, 400, Strand::FORWARD, Cigar{"10="}, 255);
+
+    BamRecord r4;
+    r4.Map(0, 100, Strand::FORWARD, Cigar{"10="}, 255);
 
     auto records = vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::AlignedStart());
 
-    EXPECT_EQ(r4.alignedStart_, records.at(0).AlignedStart());
-    EXPECT_EQ(r2.alignedStart_, records.at(1).AlignedStart());
-    EXPECT_EQ(r1.alignedStart_, records.at(2).AlignedStart());
-    EXPECT_EQ(r3.alignedStart_, records.at(3).AlignedStart());
+    EXPECT_EQ(r4.AlignedStart(), records.at(0).AlignedStart());
+    EXPECT_EQ(r2.AlignedStart(), records.at(1).AlignedStart());
+    EXPECT_EQ(r1.AlignedStart(), records.at(2).AlignedStart());
+    EXPECT_EQ(r3.AlignedStart(), records.at(3).AlignedStart());
 }
 
 TEST(CompareTest, AlignedStrandOk)

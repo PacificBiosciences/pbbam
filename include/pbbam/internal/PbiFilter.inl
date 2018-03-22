@@ -296,5 +296,11 @@ inline PbiFilter& PbiFilter::Add(std::vector<PbiFilter>&& filters)
 inline bool PbiFilter::IsEmpty() const
 { return d_->filters_.empty(); }
 
+inline size_t PbiFilter::NumChildren() const
+{ return d_->filters_.size(); }
+
+inline PbiFilter::CompositionType PbiFilter::Type() const
+{ return d_->type_; }
+
 } // namespace BAM
 } // namespace PacBio

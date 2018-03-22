@@ -92,6 +92,7 @@ public:
 
 public:
     bool IsEmpty() const;
+    size_t MaxNumErrors() const;
     void ThrowErrors();
 
 private:

@@ -47,12 +47,11 @@
 
 #include <gtest/gtest.h>
 
-#define private public
-
 #include <pbbam/BamRecordImpl.h>
 #include <pbbam/BamTagCodec.h>
 #include <pbbam/Tag.h>
 #include <pbbam/TagCollection.h>
+#include "../src/MemoryUtils.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -106,12 +105,14 @@ static void CheckRawData(const BamRecordImpl& bam)
                                         (expectedSeqLength + 1) / 2 + expectedSeqLength +
                                         expectedTagsLength;
 
-    EXPECT_TRUE((bool)bam.d_);
-    EXPECT_EQ(expectedNameNulls, bam.d_->core.l_extranul);
-    EXPECT_EQ(expectedNameLength, bam.d_->core.l_qname);
-    EXPECT_EQ(expectedNumCigarOps, bam.d_->core.n_cigar);
-    EXPECT_EQ(expectedSeqLength, bam.d_->core.l_qseq);
-    EXPECT_EQ(expectedTotalDataLength, bam.d_->l_data);
+    const auto rawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    ASSERT_TRUE(static_cast<bool>(rawData));
+
+    EXPECT_EQ(expectedNameNulls, rawData->core.l_extranul);
+    EXPECT_EQ(expectedNameLength, rawData->core.l_qname);
+    EXPECT_EQ(expectedNumCigarOps, rawData->core.n_cigar);
+    EXPECT_EQ(expectedSeqLength, rawData->core.l_qseq);
+    EXPECT_EQ(expectedTotalDataLength, rawData->l_data);
 }
 
 }  // namespace BamRecordImplCoreTests
@@ -148,8 +149,8 @@ TEST(BamRecordImplCoreTestsTest, DefaultValues)
     // check raw data
     // -------------------------------
 
-    const auto rawData = bam.d_;
-    ASSERT_TRUE((bool)rawData);
+    const auto rawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    ASSERT_TRUE(static_cast<bool>(rawData));
 
     // fixed-length (core) data
     // (forced init unmapped, with NULL-term as QNAME)
@@ -229,8 +230,8 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
     // check raw data
     // -------------------------------
 
-    const auto rawData = bam.d_;
-    ASSERT_TRUE((bool)rawData);
+    const auto rawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    ASSERT_TRUE(static_cast<bool>(rawData));
 
     // fixed-length (core) data
     EXPECT_EQ(42, rawData->core.tid);
@@ -276,7 +277,7 @@ TEST(BamRecordImplCoreTestsTest, DeepCopyFromRawData)
 {
     // init raw data
     std::shared_ptr<bam1_t> rawData(bam_init1(), BamRecordImplCoreTests::Bam1Deleter());
-    ASSERT_TRUE((bool)rawData);
+    ASSERT_TRUE(static_cast<bool>(rawData));
 
     rawData->core.tid = 42;
     rawData->core.pos = 42;
@@ -307,8 +308,12 @@ TEST(BamRecordImplCoreTestsTest, DeepCopyFromRawData)
     const int32_t fetchedX = bam_aux2i(bam_aux_get(rawData.get(), "XY"));
     EXPECT_EQ(42, fetchedX);
 
-    // static "ctor"
-    BamRecordImpl bam = BamRecordImpl::FromRawData(rawData);
+    // create from raw data
+    BamRecordImpl bam = [&rawData]() {
+        BamRecordImpl result;
+        bam_copy1(PacBio::BAM::internal::BamRecordMemory::GetRawData(result).get(), rawData.get());
+        return result;
+    }();
 
     // make sure raw data is still valid
     EXPECT_EQ(42, rawData->core.tid);
@@ -337,14 +342,17 @@ TEST(BamRecordImplCoreTestsTest, DeepCopyFromRawData)
     EXPECT_EQ(42, bam.ReferenceId());
     EXPECT_EQ(x, bam.Tags()["XY"].ToInt32());
 
-    EXPECT_TRUE(bam.d_->data != nullptr);
-    EXPECT_TRUE(bam.d_->m_data >= (int)0x800);  // check this if we change or tune later
+    const auto newBamRawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    ASSERT_TRUE(static_cast<bool>(newBamRawData));
+
+    EXPECT_TRUE(newBamRawData->data != nullptr);
+    EXPECT_TRUE(newBamRawData->m_data >= (int)0x800);  // check this if we change or tune later
 
     // tweak raw data, make sure we've done a deep copy (so BamRecordImpl isn't changed)
     rawData->core.pos = 37;
     EXPECT_EQ(37, rawData->core.pos);
     EXPECT_EQ(42, bam.Position());
-    EXPECT_EQ(42, bam.d_->core.pos);
+    EXPECT_EQ(42, newBamRawData->core.pos);
 }
 
 TEST(BamRecordImplCoreTestsTest, CopyAssignment)
