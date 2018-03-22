@@ -43,7 +43,6 @@ pbbam_test_cpp_sources = files([
   'test_SubreadLengthQuery.cpp',
   'test_Tags.cpp',
   'test_TimeUtils.cpp',
-#  'test_UnmappedReadsQuery.cpp',
   'test_Validator.cpp',
   'test_Version.cpp',
   'test_WhitelistedZmwReadStitcher.cpp',
