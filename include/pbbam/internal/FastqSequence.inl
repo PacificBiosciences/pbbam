@@ -58,7 +58,7 @@ inline FastqSequence::FastqSequence(std::string name,
     , qualities_{QualityValues::FromFastq(qualities)}
 { }
 
-inline QualityValues FastqSequence::Qualities() const
+inline const QualityValues& FastqSequence::Qualities() const
 { return qualities_; }
 
 } // namespace BAM

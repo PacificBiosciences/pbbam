@@ -80,13 +80,13 @@ public:
     /// \brief Name
     /// \return
     ///
-    std::string Name() const;
+    const std::string& Name() const;
 
     ///
     /// \brief Bases
     /// \return
     ///
-    std::string Bases() const;
+    const std::string& Bases() const;
 
     /// \}
 
