@@ -40,8 +40,6 @@
 
 #include <gtest/gtest.h>
 
-#define private public
-
 #include "PbbamTestData.h"
 
 #include <pbbam/EntireFileQuery.h>

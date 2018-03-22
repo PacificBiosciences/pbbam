@@ -39,8 +39,6 @@
 
 #include <gtest/gtest.h>
 
-#define private public
-
 #include <pbbam/BamRecordImpl.h>
 
 using namespace PacBio;

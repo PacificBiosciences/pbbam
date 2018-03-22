@@ -35,13 +35,16 @@
 
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
-#include <pbbam/SamWriter.h>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <string>
+
+#include <gtest/gtest.h>
+
+#include <pbbam/SamWriter.h>
 #include "PbbamTestData.h"
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;

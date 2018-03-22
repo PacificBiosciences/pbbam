@@ -38,8 +38,6 @@
 #include <gtest/gtest.h>
 #include <cstdint>
 
-#define private public
-
 #include "PbbamTestData.h"
 
 #include <pbbam/BamHeader.h>
@@ -67,18 +65,18 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
 
     // setup record
     BamRecord bamRecord(inputHeader);
-    bamRecord.impl_.Name(fullName);
-    bamRecord.impl_.SetSequenceAndQualities("ACGTC", 5);
-    bamRecord.impl_.CigarData("");
-    bamRecord.impl_.Bin(0);
-    bamRecord.impl_.Flag(0);
-    bamRecord.impl_.InsertSize(0);
-    bamRecord.impl_.MapQuality(0);
-    bamRecord.impl_.MatePosition(-1);
-    bamRecord.impl_.MateReferenceId(-1);
-    bamRecord.impl_.Position(-1);
-    bamRecord.impl_.ReferenceId(-1);
-    bamRecord.impl_.SetMapped(false);
+    bamRecord.Impl().Name(fullName);
+    bamRecord.Impl().SetSequenceAndQualities("ACGTC", 5);
+    bamRecord.Impl().CigarData("");
+    bamRecord.Impl().Bin(0);
+    bamRecord.Impl().Flag(0);
+    bamRecord.Impl().InsertSize(0);
+    bamRecord.Impl().MapQuality(0);
+    bamRecord.Impl().MatePosition(-1);
+    bamRecord.Impl().MateReferenceId(-1);
+    bamRecord.Impl().Position(-1);
+    bamRecord.Impl().ReferenceId(-1);
+    bamRecord.Impl().SetMapped(false);
 
     TagCollection tags;
     tags["zm"] = static_cast<int32_t>(100);
@@ -88,7 +86,7 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
     tags["rq"] = static_cast<float>(0.6);
     tags["RG"] = rgId;
     tags["sn"] = expectedSnr;
-    bamRecord.impl_.Tags(tags);
+    bamRecord.Impl().Tags(tags);
 
     // write record to file
     const string generatedBamFn = PbbamTestsConfig::GeneratedData_Dir + "/bamwriter_generated.bam";

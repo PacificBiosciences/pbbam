@@ -39,8 +39,6 @@
 
 #include <gtest/gtest.h>
 
-#define private public
-
 #include <pbbam/GenomicInterval.h>
 
 using namespace PacBio;

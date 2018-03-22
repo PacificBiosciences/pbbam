@@ -35,17 +35,21 @@
 
 // Author: Derek Barnett
 
+#include <cstdint>
+#include <string>
+
 #include <gtest/gtest.h>
+#include <boost/any.hpp>
+
 #include <pbbam/DataSet.h>
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/GenomicIntervalQuery.h>
 #include <pbbam/Unused.h>
 #include <pbbam/ZmwGroupQuery.h>
 #include <pbbam/ZmwQuery.h>
-#include <boost/any.hpp>
-#include <cstdint>
-#include <string>
+
 #include "PbbamTestData.h"
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;

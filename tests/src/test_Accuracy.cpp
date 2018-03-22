@@ -37,8 +37,6 @@
 
 #include <gtest/gtest.h>
 
-#define private public
-
 #include <pbbam/Accuracy.h>
 
 using namespace PacBio;

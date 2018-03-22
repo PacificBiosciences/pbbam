@@ -36,6 +36,7 @@
 // Author: Derek Barnett
 
 #include <gtest/gtest.h>
+
 #include "PbbamTestData.h"
 
 #include <pbbam/BamFile.h>

@@ -46,8 +46,6 @@
 #include <gtest/gtest.h>
 #include <boost/algorithm/string.hpp>
 
-#define private public
-
 #include "PbbamTestData.h"
 
 #include <pbbam/../../src/FileUtils.h>

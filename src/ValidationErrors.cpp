@@ -119,6 +119,8 @@ void ValidationErrors::AddTagLengthError(const std::string& name, std::string&& 
 
 bool ValidationErrors::IsEmpty() const { return currentNumErrors_ == 0; }
 
+size_t ValidationErrors::MaxNumErrors() const { return maxNumErrors_; }
+
 void ValidationErrors::OnErrorAdded()
 {
     ++currentNumErrors_;

@@ -40,8 +40,6 @@
 
 #include <gtest/gtest.h>
 
-#define private public
-
 #include <pbbam/DataSet.h>
 
 using namespace PacBio;

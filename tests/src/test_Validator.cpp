@@ -35,10 +35,9 @@
 
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
 #include <cstdint>
 
-#define private public
+#include <gtest/gtest.h>
 
 #include <pbbam/BamFile.h>
 #include <pbbam/BamHeader.h>
@@ -154,19 +153,19 @@ TEST(ValidatorErrorsTest, SetMaxNumErrors)
 {
     {  // default - use "no max"
         internal::ValidationErrors errors;
-        EXPECT_EQ(internal::ValidationErrors::MAX, errors.maxNumErrors_);
+        EXPECT_EQ(internal::ValidationErrors::MAX, errors.MaxNumErrors());
     }
     {  // max of zero doesn't make sense... make equivalent to "no max"
         internal::ValidationErrors errors(0);
-        EXPECT_EQ(internal::ValidationErrors::MAX, errors.maxNumErrors_);
+        EXPECT_EQ(internal::ValidationErrors::MAX, errors.MaxNumErrors());
     }
     {  // max = 1
         internal::ValidationErrors errors(1);
-        EXPECT_EQ(1, errors.maxNumErrors_);
+        EXPECT_EQ(1, errors.MaxNumErrors());
     }
     {  // max = 10
         internal::ValidationErrors errors(10);
-        EXPECT_EQ(10, errors.maxNumErrors_);
+        EXPECT_EQ(10, errors.MaxNumErrors());
     }
 }
 
