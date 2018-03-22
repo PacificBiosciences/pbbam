@@ -74,7 +74,6 @@ if not meson.is_subproject()
       'pbbam/SubreadLengthQuery.h',
       'pbbam/Tag.h',
       'pbbam/TagCollection.h',
-      'pbbam/UnmappedReadsQuery.h',
       'pbbam/Unused.h',
       'pbbam/Validator.h',
       'pbbam/ZmwGroupQuery.h',

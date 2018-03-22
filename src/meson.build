@@ -60,7 +60,6 @@ pbbam_cpp_sources = files([
   'SubreadLengthQuery.cpp',
   'Tag.cpp',
   'TagCollection.cpp',
-#  'UnmappedReadsQuery.cpp',
   'Validator.cpp',
   'ValidationErrors.cpp',
   'ValidationException.cpp',
