@@ -1,7 +1,7 @@
 project(
   'PacBioBAM',
   'cpp',
-  version : '0.16.0',
+  version : '0.17.0',
   default_options : [
     'buildtype=release',
     'warning_level=3',
@@ -39,6 +39,10 @@ endif
 pbbam_macros = []
 if get_option('permissive-cigar')
   pbbam_macros += ['-DPBBAM_PERMISSIVE_CIGAR']
+  warning('**********************************************')
+  warning('* You have enabled allowing "M" in BAM files *')
+  warning('*    This is an unsupported combination!     *')
+  warning('**********************************************')
 endif
 
 ################

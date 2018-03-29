@@ -36,6 +36,7 @@
 // Author: Derek Barnett
 
 #include <gtest/gtest.h>
+
 #include <pbbam/StringUtilities.h>
 
 TEST(StringUtilsTest, BasicSplitWithDefaultDelim)

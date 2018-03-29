@@ -188,7 +188,7 @@ public:
     using QueryInterval = std::pair<int32_t, int32_t>;
     using QueryIntervals = std::set<QueryInterval>;
     using ZmwLookup = std::unordered_map<int32_t, QueryIntervals>;
-    using ZmwLookupPtr = std::shared_ptr<ZmwLookup>;
+    using ZmwLookupPtr = std::shared_ptr<ZmwLookup>;  // may be shared by more than one rgId
     using RgIdLookup = std::unordered_map<int32_t, ZmwLookupPtr>;
 
 public:
@@ -196,73 +196,12 @@ public:
     {
         for (const auto& queryName : whitelist) {
 
-            // split name into main parts
-            auto nameParts = internal::Split(queryName, '/');
-            if (nameParts.size() != 3) {
-                auto msg = std::string{"PbiQueryNameFilter error: requested QNAME ("} + queryName;
-                msg += std::string{") is not a valid PacBio BAM QNAME. See spec for details"};
-                throw std::runtime_error(msg);
-            }
-
-            //
-            // generate candidate read group IDs from movie name
-            //
-            // then, ensure read group IDs in lookup table, creating or fetching
-            // shared ZmwLookup table if new movie
-            //
-            const std::string& movieName = nameParts.at(0);
-            const bool isCCS = (nameParts.at(2) == "ccs" || nameParts.at(2) == "CCS");
-            std::vector<int32_t> rgIds;
-            if (isCCS) {
-                rgIds.push_back(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "CCS")));
-            } else {
-                rgIds.reserve(6);
-                rgIds.push_back(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "POLYMERASE")));
-                rgIds.push_back(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "HQREGION")));
-                rgIds.push_back(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "SUBREAD")));
-                rgIds.push_back(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "SCRAP")));
-                rgIds.push_back(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "UNKNOWN")));
-                rgIds.push_back(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "ZMW")));
-            }
-            assert(!rgIds.empty());
-            auto rgFound = lookup_.find(rgIds.front());
-            ZmwLookupPtr zmwPtr = nullptr;
-            if (rgFound == lookup_.end()) {
-                zmwPtr = ZmwLookupPtr(new ZmwLookup);
-                for (const auto& rg : rgIds) {
-                    assert(lookup_.find(rg) == lookup_.end());
-                    lookup_.emplace(rg, zmwPtr);
-                }
-            } else {
-#ifndef NDEBUG
-                for (const auto& rg : rgIds)
-                    assert(lookup_.find(rg) != lookup_.end());
-#endif
-                zmwPtr = rgFound->second;
-            }
-
-            // fetch ZMW & QueryStart/QEnd from query name
-            const int32_t zmw = stoi(nameParts.at(1));
-            int32_t queryStart = -1;
-            int32_t queryEnd = -1;
-            if (!isCCS) {
-                const auto queryIntervalParts = internal::Split(nameParts.at(2), '_');
-                if (queryIntervalParts.size() != 2) {
-                    auto msg =
-                        std::string{"PbiQueryNameFilter error: requested QNAME ("} + queryName;
-                    msg += std::string{") is not a valid PacBio BAM QNAME. See spec for details"};
-                    throw std::runtime_error(msg);
-                }
-                queryStart = stoi(queryIntervalParts.at(0));
-                queryEnd = stoi(queryIntervalParts.at(1));
-            }
-
-            // creating new ZMW entry if not yet seen & store QS/QE pair
-            //
-            const auto zmwFound = zmwPtr->find(zmw);
-            if (zmwFound == zmwPtr->end()) zmwPtr->emplace(zmw, QueryIntervals{});
-            QueryIntervals& queryIntervals = zmwPtr->at(zmw);
-            queryIntervals.emplace(std::make_pair(queryStart, queryEnd));
+            if (queryName.find("transcript/") == 0)
+                HandleName(queryName, RecordType::TRANSCRIPT);
+            else if (queryName.find("/ccs") != std::string::npos)
+                HandleName(queryName, RecordType::CCS);
+            else
+                HandleName(queryName, RecordType::UNKNOWN);
         }
     }
 
@@ -293,6 +232,98 @@ public:
         const auto qEnd = basicData.qEnd_.at(row);
         const auto queryInterval = std::make_pair(qStart, qEnd);
         return queryIntervals.find(queryInterval) != queryIntervals.end();
+    }
+
+    std::vector<int32_t> CandidateRgIds(const std::string& movieName, const RecordType type)
+    {
+        if (type == RecordType::CCS)
+            return {ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "CCS"))};
+
+        if (type == RecordType::TRANSCRIPT)
+            return {ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "TRANSCRIPT"))};
+
+        // we can't know for sure from QNAME alone
+        return {ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "POLYMERASE")),
+                ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "HQREGION")),
+                ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "SUBREAD")),
+                ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "SCRAP")),
+                ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "UNKNOWN")),
+                ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "ZMW"))};
+    }
+
+    void HandleName(const std::string& queryName, const RecordType type)
+    {
+        // split name into main parts
+        const auto nameParts = internal::Split(queryName, '/');
+
+        // verify syntax
+        if (IsCcsOrTranscript(type)) {
+            if (nameParts.size() != 2) {
+                const auto typeName = (type == RecordType::CCS) ? "CCS" : "transcript";
+                const auto msg = "PbiQueryNameFilter error: requested QNAME (" + queryName +
+                                 ") is not valid for PacBio " + typeName +
+                                 " reads. See spec for details.";
+                throw std::runtime_error{msg};
+            }
+        } else {
+            if (nameParts.size() != 3) {
+                const auto msg = "PbiQueryNameFilter error: requested QNAME (" + queryName +
+                                 ") is not a valid PacBio BAM QNAME. See spec for details";
+                throw std::runtime_error{msg};
+            }
+        }
+
+        // generate candidate read group IDs from movie name & record type, then
+        // add to lookup table
+        const auto zmwPtr = UpdateRgLookup(CandidateRgIds(nameParts.at(0), type));
+
+        // add qStart/qEnd interval to zmw lookup
+        const auto zmw = std::stoi(nameParts.at(1));
+        if (IsCcsOrTranscript(type))
+            UpdateZmwQueryIntervals(zmwPtr.get(), zmw, -1, -1);
+        else {
+            const auto queryIntervalParts = Split(nameParts.at(2), '_');
+            if (queryIntervalParts.size() != 2) {
+                auto msg = std::string{"PbiQueryNameFilter error: requested QNAME ("} + queryName;
+                msg += std::string{") is not a valid PacBio BAM QNAME. See spec for details"};
+                throw std::runtime_error{msg};
+            }
+            UpdateZmwQueryIntervals(zmwPtr.get(), zmw, std::stoi(queryIntervalParts.at(0)),
+                                    std::stoi(queryIntervalParts.at(1)));
+        }
+    }
+
+    ZmwLookupPtr UpdateRgLookup(std::vector<int32_t>&& rgIds)
+    {
+        assert(!rgIds.empty());
+
+        ZmwLookupPtr zmwPtr;
+
+        const auto rgFound = lookup_.find(rgIds.front());
+        if (rgFound == lookup_.end()) {
+            zmwPtr = std::make_shared<ZmwLookup>();
+            for (const auto& rg : rgIds) {
+                assert(lookup_.find(rg) == lookup_.end());
+                lookup_.emplace(rg, zmwPtr);
+            }
+        } else {
+#ifndef NDEBUG
+            for (const auto& rg : rgIds)
+                assert(lookup_.find(rg) != lookup_.end());
+#endif
+            zmwPtr = rgFound->second;
+        }
+        return zmwPtr;
+    }
+
+    // add QS/QE pair to ZMW lookup
+    void UpdateZmwQueryIntervals(ZmwLookup* const zmwPtr, const int32_t zmw,
+                                 const int32_t queryStart, const int32_t queryEnd)
+    {
+        const auto zmwFound = zmwPtr->find(zmw);
+        if (zmwFound == zmwPtr->end()) zmwPtr->emplace(zmw, QueryIntervals{});
+        auto& queryIntervals = zmwPtr->at(zmw);
+        queryIntervals.emplace(std::make_pair(queryStart, queryEnd));
     }
 
 private:

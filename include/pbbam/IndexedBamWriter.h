@@ -34,52 +34,85 @@
 // SUCH DAMAGE.
 //
 // File Description
-/// \file CigarOperation.cpp
-/// \brief Implements the CigarOperation class.
+/// \file IndexedBamWriter.h
+/// \brief Defines the IndexedBamWriter class.
 //
 // Author: Derek Barnett
 
-#include "PbbamInternalConfig.h"
+#ifndef INDEXEDBAMWRITER_H
+#define INDEXEDBAMWRITER_H
 
-#include "pbbam/CigarOperation.h"
+#include <memory>
+#include <string>
 
-#include <htslib/sam.h>
+#include "pbbam/Config.h"
+#include "pbbam/IRecordWriter.h"
 
 namespace PacBio {
 namespace BAM {
 
-CigarOperationType CigarOperation::CharToType(const char c)
-{
-    switch (c) {
-        case 'S':
-            return CigarOperationType::SOFT_CLIP;
-        case '=':
-            return CigarOperationType::SEQUENCE_MATCH;
-        case 'X':
-            return CigarOperationType::SEQUENCE_MISMATCH;
-        case 'I':
-            return CigarOperationType::INSERTION;
-        case 'D':
-            return CigarOperationType::DELETION;
-        case 'N':
-            return CigarOperationType::REFERENCE_SKIP;
-        case 'H':
-            return CigarOperationType::HARD_CLIP;
-        case 'P':
-            return CigarOperationType::PADDING;
-        case 'M':
-            return CigarOperationType::ALIGNMENT_MATCH;
-        default:
-            return CigarOperationType::UNKNOWN_OP;
-    }
+class BamHeader;
+class BamRecord;
+class BamRecordImpl;
+
+namespace internal {
+class IndexedBamWriterPrivate;
 }
 
-char CigarOperation::TypeToChar(const CigarOperationType type)
+///
+/// \brief The IndexedBamWriter class
+///
+///
+///
+///
+///
+///
+class IndexedBamWriter : public IRecordWriter
 {
-    return bam_cigar_opchr(static_cast<int>(type));
-}
+public:
+    ///
+    /// \brief IndexedBamWriter
+    ///
+    /// \param[in] filename         path to output %BAM file
+    /// \param[in] header           BamHeader object
+    ///
+    /// \throws std::runtime_error if there was a problem opening the file for
+    ///         writing or if an error occurred while writing the header
+    ///
+    IndexedBamWriter(const std::string& outputFilename, const BamHeader& header);
 
-bool CigarOperation::validate_ = true;
+    ~IndexedBamWriter() override;
+
+    IndexedBamWriter(const IndexedBamWriter&) = delete;
+    IndexedBamWriter(IndexedBamWriter&&) = delete;
+    IndexedBamWriter& operator=(const IndexedBamWriter&) = delete;
+    IndexedBamWriter& operator=(IndexedBamWriter&&) = delete;
+
+public:
+    ///
+    /// \brief TryFlush
+    ///
+    void TryFlush() override;
+
+    ///
+    /// \brief Write
+    ///
+    /// \param[in] record
+    ///
+    void Write(const BamRecord& record) override;
+
+    ///
+    /// \brief Write
+    ///
+    /// \param[in] record
+    ///
+    void Write(const BamRecordImpl& record) override;
+
+private:
+    std::unique_ptr<internal::IndexedBamWriterPrivate> d_;
+};
 
 }  // namespace BAM
 }  // namespace PacBio
+
+#endif  // INDEXEDBAMWRITER_H

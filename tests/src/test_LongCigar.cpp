@@ -35,13 +35,15 @@
 
 // Author: Derek Barnett
 
-#include <pbbam/BamReader.h>
-#include <pbbam/BamWriter.h>
-#include "PbbamTestData.h"
-
-#include <gtest/gtest.h>
 #include <iostream>
 #include <string>
+
+#include <gtest/gtest.h>
+
+#include "PbbamTestData.h"
+
+#include <pbbam/BamReader.h>
+#include <pbbam/BamWriter.h>
 
 using BamReader = PacBio::BAM::BamReader;
 using BamRecord = PacBio::BAM::BamRecord;

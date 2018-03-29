@@ -35,10 +35,14 @@
 
 // Author: Yuan Li
 
-#include <gtest/gtest.h>
-#include <pbbam/QNameQuery.h>
 #include <string>
+
+#include <gtest/gtest.h>
+
 #include "PbbamTestData.h"
+
+#include <pbbam/QNameQuery.h>
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace std;

@@ -41,8 +41,6 @@
 
 #include <gtest/gtest.h>
 
-#define private public
-
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamRecordView.h>
 #include <pbbam/BamTagCodec.h>

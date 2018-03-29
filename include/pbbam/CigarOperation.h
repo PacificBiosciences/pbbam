@@ -49,6 +49,10 @@
 namespace PacBio {
 namespace BAM {
 
+namespace pbbamify {
+class Settings;
+}
+
 /// \brief Describes a CIGAR operation.
 ///
 /// Bracketed character is the corresponding SAM/BAM character code.
@@ -164,6 +168,10 @@ public:
 private:
     CigarOperationType type_ = CigarOperationType::UNKNOWN_OP;
     uint32_t length_ = 0;
+
+    // runtime disabling of Cigar validation
+    static bool validate_;
+    friend class pbbamify::Settings;
 };
 
 }  // namespace BAM

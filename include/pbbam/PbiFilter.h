@@ -315,6 +315,12 @@ public:
     /// \returns true if this filter has no child filters.
     bool IsEmpty() const;
 
+    /// \returns number of child filters
+    size_t NumChildren() const;
+
+    /// \returns filter type (intersect, union)
+    CompositionType Type() const;
+
     /// \}
 
 public:

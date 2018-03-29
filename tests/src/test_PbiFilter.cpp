@@ -43,8 +43,6 @@
 
 #include <gtest/gtest.h>
 
-#define private public
-
 #include "PbbamTestData.h"
 
 #include <pbbam/PbiFilter.h>
@@ -74,7 +72,7 @@ PbiRawData test2Bam_RawIndex()
     subreadData.ctxtFlag_   = { 0, 1, 2, 3 };
     subreadData.fileOffset_ = { 35651584, 35655125, 35667128, 35679170 };
 
-    PbiRawMappedData& mappedData = index.mappedData_;
+    PbiRawMappedData& mappedData = index.MappedData();
     mappedData.tId_       = { 0, 0, 0, 0 };
     mappedData.tStart_    = { 9507, 8453, 8455, 9291 };
     mappedData.tEnd_      = { 9903, 9902, 9893, 9900 };
@@ -85,12 +83,12 @@ PbiRawData test2Bam_RawIndex()
     mappedData.nM_        = { 384, 1411, 1393, 598 };
     mappedData.nMM_       = { 0, 0, 0, 0 };
 
-    PbiRawBarcodeData& barcodeData = index.barcodeData_;
+    PbiRawBarcodeData& barcodeData = index.BarcodeData();
     barcodeData.bcForward_ = { 0, 17, 256, 17 };
     barcodeData.bcReverse_ = { 1, 18, 257, 18 };
     barcodeData.bcQual_    = { 42, 80, 42, 110 };
 
-    PbiRawReferenceData& referenceData = index.referenceData_;
+    PbiRawReferenceData& referenceData = index.ReferenceData();
     referenceData.entries_.emplace_back( 0, 0, 3 );
     referenceData.entries_.emplace_back( 1 );
     referenceData.entries_.emplace_back( PbiReferenceEntry::UNMAPPED_ID );
@@ -113,8 +111,8 @@ void checkFilterInternals(const PbiFilter& filter,
                           const size_t expectedNumChildren,
                           const std::vector<size_t> expectedRows)
 {
-    EXPECT_EQ(expectedType,        filter.d_->type_);
-    EXPECT_EQ(expectedNumChildren, filter.d_->filters_.size());
+    EXPECT_EQ(expectedType,        filter.Type());
+    EXPECT_EQ(expectedNumChildren, filter.NumChildren());
     checkFilterRows(filter, expectedRows);
 }
 

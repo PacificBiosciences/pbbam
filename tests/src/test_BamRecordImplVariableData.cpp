@@ -46,13 +46,12 @@
 
 #include <gtest/gtest.h>
 
-#define private public
-
 #include <pbbam/BamRecordImpl.h>
 #include <pbbam/BamTagCodec.h>
 #include <pbbam/SamTagCodec.h>
 #include <pbbam/Tag.h>
 #include <pbbam/TagCollection.h>
+#include "../src/MemoryUtils.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -79,11 +78,14 @@ static void CheckRawData(const BamRecordImpl& bam)
                                         (expectedSeqLength + 1) / 2 + expectedSeqLength +
                                         expectedTagsLength;
 
-    EXPECT_EQ(expectedNameNulls, bam.d_->core.l_extranul);
-    EXPECT_EQ(expectedNameLength, bam.d_->core.l_qname);
-    EXPECT_EQ(expectedNumCigarOps, bam.d_->core.n_cigar);
-    EXPECT_EQ(expectedSeqLength, bam.d_->core.l_qseq);
-    EXPECT_EQ(expectedTotalDataLength, bam.d_->l_data);
+    const auto rawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    ASSERT_TRUE(static_cast<bool>(rawData));
+
+    EXPECT_EQ(expectedNameNulls, rawData->core.l_extranul);
+    EXPECT_EQ(expectedNameLength, rawData->core.l_qname);
+    EXPECT_EQ(expectedNumCigarOps, rawData->core.n_cigar);
+    EXPECT_EQ(expectedSeqLength, rawData->core.l_qseq);
+    EXPECT_EQ(expectedTotalDataLength, rawData->l_data);
 }
 
 }  // namespace BamRecordImplVariableDataTests

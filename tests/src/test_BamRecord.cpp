@@ -44,10 +44,9 @@
 
 #include <gtest/gtest.h>
 
-#define private public
-
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamTagCodec.h>
+#include "../src/MemoryUtils.h"
 
 // clang-format off
 
@@ -87,32 +86,32 @@ static
 void CheckRawData(const BamRecordImpl& bam)
 {
     // ensure raw data (lengths at least) matches API-facing data
-    const uint32_t expectedNameBytes   = bam.Name().size() + 1; // include NULL term
-    const uint32_t expectedNameNulls   = 4 - (expectedNameBytes % 4);
-    const uint32_t expectedNameLength  = expectedNameBytes + expectedNameNulls;
+    const uint32_t expectedNameBytes = bam.Name().size() + 1;  // include NULL term
+    const uint32_t expectedNameNulls = 4 - (expectedNameBytes % 4);
+    const uint32_t expectedNameLength = expectedNameBytes + expectedNameNulls;
     const uint32_t expectedNumCigarOps = bam.CigarData().size();
-    const int32_t  expectedSeqLength   = bam.Sequence().length();
-    const size_t   expectedTagsLength  = BamTagCodec::Encode(bam.Tags()).size();
+    const int32_t expectedSeqLength = bam.Sequence().length();
+    const size_t expectedTagsLength = BamTagCodec::Encode(bam.Tags()).size();
 
     //  Name        CIGAR         Sequence       Quals      Tags
-    // l_qname + (n_cigar * 4) + (l_qseq+1)/2 + l_qseq + << TAGS >>
-    const int expectedTotalDataLength = expectedNameLength +
-                                        (expectedNumCigarOps * 4) +
-                                        (expectedSeqLength+1)/2 +
-                                         expectedSeqLength +
-                                         expectedTagsLength;
+    // l_qname + (n_cigar * 4) + (l_qseq+1)/2 + l_qseq + <encoded length>
+    const int expectedTotalDataLength = expectedNameLength + (expectedNumCigarOps * 4) +
+                                        (expectedSeqLength + 1) / 2 + expectedSeqLength +
+                                        expectedTagsLength;
 
-    EXPECT_TRUE((bool)bam.d_);
-    EXPECT_EQ(expectedNameNulls,       bam.d_->core.l_extranul);
-    EXPECT_EQ(expectedNameLength,      bam.d_->core.l_qname);
-    EXPECT_EQ(expectedNumCigarOps,     bam.d_->core.n_cigar);
-    EXPECT_EQ(expectedSeqLength,       bam.d_->core.l_qseq);
-    EXPECT_EQ(expectedTotalDataLength, bam.d_->l_data);
+    const auto rawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    ASSERT_TRUE(static_cast<bool>(rawData));
+
+    EXPECT_EQ(expectedNameNulls, rawData->core.l_extranul);
+    EXPECT_EQ(expectedNameLength, rawData->core.l_qname);
+    EXPECT_EQ(expectedNumCigarOps, rawData->core.n_cigar);
+    EXPECT_EQ(expectedSeqLength, rawData->core.l_qseq);
+    EXPECT_EQ(expectedTotalDataLength, rawData->l_data);
 }
 
 static inline
 void CheckRawData(const BamRecord& bam)
-{ CheckRawData(bam.impl_); }
+{ CheckRawData(bam.Impl()); }
 
 static
 BamRecordImpl MakeCigaredImpl(const string& seq,
@@ -667,33 +666,33 @@ TEST(BamRecordTest, DefaultValues)
     const string emptyString;
 
     // BamRecordImpl data
-    EXPECT_EQ(0, bam.impl_.Bin());
-    EXPECT_EQ(BamRecordImpl::UNMAPPED, bam.impl_.Flag());  // forced init unmapped
-    EXPECT_EQ(0, bam.impl_.InsertSize());
-    EXPECT_EQ(255, bam.impl_.MapQuality());
-    EXPECT_EQ(-1, bam.impl_.MateReferenceId());
-    EXPECT_EQ(-1, bam.impl_.MatePosition());
-    EXPECT_EQ(-1, bam.impl_.Position());
-    EXPECT_EQ(-1, bam.impl_.ReferenceId());
-    EXPECT_EQ(0, bam.impl_.Tags().size());
+    EXPECT_EQ(0, bam.Impl().Bin());
+    EXPECT_EQ(BamRecordImpl::UNMAPPED, bam.Impl().Flag());  // forced init unmapped
+    EXPECT_EQ(0, bam.Impl().InsertSize());
+    EXPECT_EQ(255, bam.Impl().MapQuality());
+    EXPECT_EQ(-1, bam.Impl().MateReferenceId());
+    EXPECT_EQ(-1, bam.Impl().MatePosition());
+    EXPECT_EQ(-1, bam.Impl().Position());
+    EXPECT_EQ(-1, bam.Impl().ReferenceId());
+    EXPECT_EQ(0, bam.Impl().Tags().size());
 
-    EXPECT_FALSE(bam.impl_.IsDuplicate());
-    EXPECT_FALSE(bam.impl_.IsFailedQC());
-    EXPECT_FALSE(bam.impl_.IsFirstMate());
-    EXPECT_FALSE(bam.impl_.IsMapped());             // forced init unmapped
-    EXPECT_TRUE(bam.impl_.IsMateMapped());
-    EXPECT_FALSE(bam.impl_.IsMateReverseStrand());
-    EXPECT_FALSE(bam.impl_.IsPaired());
-    EXPECT_TRUE(bam.impl_.IsPrimaryAlignment());
-    EXPECT_FALSE(bam.impl_.IsProperPair());
-    EXPECT_FALSE(bam.impl_.IsReverseStrand());
-    EXPECT_FALSE(bam.impl_.IsSecondMate());
-    EXPECT_FALSE(bam.impl_.IsSupplementaryAlignment());
+    EXPECT_FALSE(bam.Impl().IsDuplicate());
+    EXPECT_FALSE(bam.Impl().IsFailedQC());
+    EXPECT_FALSE(bam.Impl().IsFirstMate());
+    EXPECT_FALSE(bam.Impl().IsMapped());             // forced init unmapped
+    EXPECT_TRUE(bam.Impl().IsMateMapped());
+    EXPECT_FALSE(bam.Impl().IsMateReverseStrand());
+    EXPECT_FALSE(bam.Impl().IsPaired());
+    EXPECT_TRUE(bam.Impl().IsPrimaryAlignment());
+    EXPECT_FALSE(bam.Impl().IsProperPair());
+    EXPECT_FALSE(bam.Impl().IsReverseStrand());
+    EXPECT_FALSE(bam.Impl().IsSecondMate());
+    EXPECT_FALSE(bam.Impl().IsSupplementaryAlignment());
 
-    EXPECT_EQ(emptyString, bam.impl_.Name());
-    EXPECT_EQ(emptyString, bam.impl_.CigarData().ToStdString());
-    EXPECT_EQ(emptyString, bam.impl_.Sequence());
-    EXPECT_EQ(emptyString, bam.impl_.Qualities().Fastq());
+    EXPECT_EQ(emptyString, bam.Impl().Name());
+    EXPECT_EQ(emptyString, bam.Impl().CigarData().ToStdString());
+    EXPECT_EQ(emptyString, bam.Impl().Sequence());
+    EXPECT_EQ(emptyString, bam.Impl().Qualities().Fastq());
 
     // PacBio data
     EXPECT_EQ(-1, bam.AlignedStart());
@@ -752,16 +751,16 @@ TEST(BamRecordTest, FromBamRecordImpl)
     // copy ctor
     BamRecord bam1(genericBam);
 
-    EXPECT_EQ(42, bam1.impl_.Bin());
-    EXPECT_EQ(42, bam1.impl_.Flag());
-    EXPECT_EQ(42, bam1.impl_.InsertSize());
-    EXPECT_EQ(42, bam1.impl_.MapQuality());
-    EXPECT_EQ(42, bam1.impl_.MateReferenceId());
-    EXPECT_EQ(42, bam1.impl_.MatePosition());
-    EXPECT_EQ(42, bam1.impl_.Position());
-    EXPECT_EQ(42, bam1.impl_.ReferenceId());
+    EXPECT_EQ(42, bam1.Impl().Bin());
+    EXPECT_EQ(42, bam1.Impl().Flag());
+    EXPECT_EQ(42, bam1.Impl().InsertSize());
+    EXPECT_EQ(42, bam1.Impl().MapQuality());
+    EXPECT_EQ(42, bam1.Impl().MateReferenceId());
+    EXPECT_EQ(42, bam1.Impl().MatePosition());
+    EXPECT_EQ(42, bam1.Impl().Position());
+    EXPECT_EQ(42, bam1.Impl().ReferenceId());
 
-    const TagCollection& bam1Tags = bam1.impl_.Tags();
+    const TagCollection& bam1Tags = bam1.Impl().Tags();
     EXPECT_TRUE(bam1Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(string("1abc75"), bam1Tags.at("HX").ToString());
     EXPECT_EQ(static_cast<int32_t>(-42), bam1Tags.at("XY").ToInt32());
@@ -771,16 +770,16 @@ TEST(BamRecordTest, FromBamRecordImpl)
     BamRecord bam2;
     bam2 = genericBam;
 
-    EXPECT_EQ(42, bam2.impl_.Bin());
-    EXPECT_EQ(42, bam2.impl_.Flag());
-    EXPECT_EQ(42, bam2.impl_.InsertSize());
-    EXPECT_EQ(42, bam2.impl_.MapQuality());
-    EXPECT_EQ(42, bam2.impl_.MateReferenceId());
-    EXPECT_EQ(42, bam2.impl_.MatePosition());
-    EXPECT_EQ(42, bam2.impl_.Position());
-    EXPECT_EQ(42, bam2.impl_.ReferenceId());
+    EXPECT_EQ(42, bam2.Impl().Bin());
+    EXPECT_EQ(42, bam2.Impl().Flag());
+    EXPECT_EQ(42, bam2.Impl().InsertSize());
+    EXPECT_EQ(42, bam2.Impl().MapQuality());
+    EXPECT_EQ(42, bam2.Impl().MateReferenceId());
+    EXPECT_EQ(42, bam2.Impl().MatePosition());
+    EXPECT_EQ(42, bam2.Impl().Position());
+    EXPECT_EQ(42, bam2.Impl().ReferenceId());
 
-    const TagCollection& bam2Tags = bam2.impl_.Tags();
+    const TagCollection& bam2Tags = bam2.Impl().Tags();
     EXPECT_TRUE(bam2Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(string("1abc75"), bam2Tags.at("HX").ToString());
     EXPECT_EQ(static_cast<int32_t>(-42), bam2Tags.at("XY").ToInt32());
@@ -790,8 +789,8 @@ TEST(BamRecordTest, FromBamRecordImpl)
     genericBam.Position(2000);
 
     EXPECT_EQ(2000, genericBam.Position());
-    EXPECT_EQ(42, bam1.impl_.Position());
-    EXPECT_EQ(42, bam2.impl_.Position());
+    EXPECT_EQ(42, bam1.Impl().Position());
+    EXPECT_EQ(42, bam2.Impl().Position());
 
     // move ctor
 #ifdef __clang__
@@ -803,16 +802,16 @@ TEST(BamRecordTest, FromBamRecordImpl)
 #pragma clang diagnostic pop
 #endif
 
-    EXPECT_EQ(42, bam3.impl_.Bin());
-    EXPECT_EQ(42, bam3.impl_.Flag());
-    EXPECT_EQ(42, bam3.impl_.InsertSize());
-    EXPECT_EQ(42, bam3.impl_.MapQuality());
-    EXPECT_EQ(42, bam3.impl_.MateReferenceId());
-    EXPECT_EQ(42, bam3.impl_.MatePosition());
-    EXPECT_EQ(42, bam3.impl_.Position());
-    EXPECT_EQ(42, bam3.impl_.ReferenceId());
+    EXPECT_EQ(42, bam3.Impl().Bin());
+    EXPECT_EQ(42, bam3.Impl().Flag());
+    EXPECT_EQ(42, bam3.Impl().InsertSize());
+    EXPECT_EQ(42, bam3.Impl().MapQuality());
+    EXPECT_EQ(42, bam3.Impl().MateReferenceId());
+    EXPECT_EQ(42, bam3.Impl().MatePosition());
+    EXPECT_EQ(42, bam3.Impl().Position());
+    EXPECT_EQ(42, bam3.Impl().ReferenceId());
 
-    const TagCollection& bam3Tags = bam3.impl_.Tags();
+    const TagCollection& bam3Tags = bam3.Impl().Tags();
     EXPECT_TRUE(bam3Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(string("1abc75"), bam3Tags.at("HX").ToString());
     EXPECT_EQ(static_cast<int32_t>(-42), bam3Tags.at("XY").ToInt32());
@@ -829,16 +828,16 @@ TEST(BamRecordTest, FromBamRecordImpl)
 #pragma clang diagnostic pop
 #endif
 
-    EXPECT_EQ(42, bam4.impl_.Bin());
-    EXPECT_EQ(42, bam4.impl_.Flag());
-    EXPECT_EQ(42, bam4.impl_.InsertSize());
-    EXPECT_EQ(42, bam4.impl_.MapQuality());
-    EXPECT_EQ(42, bam4.impl_.MateReferenceId());
-    EXPECT_EQ(42, bam4.impl_.MatePosition());
-    EXPECT_EQ(42, bam4.impl_.Position());
-    EXPECT_EQ(42, bam4.impl_.ReferenceId());
+    EXPECT_EQ(42, bam4.Impl().Bin());
+    EXPECT_EQ(42, bam4.Impl().Flag());
+    EXPECT_EQ(42, bam4.Impl().InsertSize());
+    EXPECT_EQ(42, bam4.Impl().MapQuality());
+    EXPECT_EQ(42, bam4.Impl().MateReferenceId());
+    EXPECT_EQ(42, bam4.Impl().MatePosition());
+    EXPECT_EQ(42, bam4.Impl().Position());
+    EXPECT_EQ(42, bam4.Impl().ReferenceId());
 
-    const TagCollection& bam4Tags = bam4.impl_.Tags();
+    const TagCollection& bam4Tags = bam4.Impl().Tags();
     EXPECT_TRUE(bam4Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(string("1abc75"), bam4Tags.at("HX").ToString());
     EXPECT_EQ(static_cast<int32_t>(-42), bam4Tags.at("XY").ToInt32());
@@ -848,34 +847,34 @@ TEST(BamRecordTest, FromBamRecordImpl)
 TEST(BamRecordTest, SelfAssignmentTolerated)
 {
     BamRecord bam1;
-    bam1.impl_.Bin(42);
-    bam1.impl_.Flag(42);
-    bam1.impl_.InsertSize(42);
-    bam1.impl_.MapQuality(42);
-    bam1.impl_.MatePosition(42);
-    bam1.impl_.MateReferenceId(42);
-    bam1.impl_.Position(42);
-    bam1.impl_.ReferenceId(42);
+    bam1.Impl().Bin(42);
+    bam1.Impl().Flag(42);
+    bam1.Impl().InsertSize(42);
+    bam1.Impl().MapQuality(42);
+    bam1.Impl().MatePosition(42);
+    bam1.Impl().MateReferenceId(42);
+    bam1.Impl().Position(42);
+    bam1.Impl().ReferenceId(42);
 
     TagCollection tags;
     tags["HX"] = string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
     tags["CA"] = vector<uint8_t>({34, 5, 125});
     tags["XY"] = static_cast<int32_t>(-42);
-    bam1.impl_.Tags(tags);
+    bam1.Impl().Tags(tags);
 
     bam1 = bam1;
 
-    EXPECT_EQ(42, bam1.impl_.Bin());
-    EXPECT_EQ(42, bam1.impl_.Flag());
-    EXPECT_EQ(42, bam1.impl_.InsertSize());
-    EXPECT_EQ(42, bam1.impl_.MapQuality());
-    EXPECT_EQ(42, bam1.impl_.MateReferenceId());
-    EXPECT_EQ(42, bam1.impl_.MatePosition());
-    EXPECT_EQ(42, bam1.impl_.Position());
-    EXPECT_EQ(42, bam1.impl_.ReferenceId());
+    EXPECT_EQ(42, bam1.Impl().Bin());
+    EXPECT_EQ(42, bam1.Impl().Flag());
+    EXPECT_EQ(42, bam1.Impl().InsertSize());
+    EXPECT_EQ(42, bam1.Impl().MapQuality());
+    EXPECT_EQ(42, bam1.Impl().MateReferenceId());
+    EXPECT_EQ(42, bam1.Impl().MatePosition());
+    EXPECT_EQ(42, bam1.Impl().Position());
+    EXPECT_EQ(42, bam1.Impl().ReferenceId());
 
-    const TagCollection& fetchedTags1 = bam1.impl_.Tags();
+    const TagCollection& fetchedTags1 = bam1.Impl().Tags();
     EXPECT_TRUE(fetchedTags1.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(string("1abc75"), fetchedTags1.at("HX").ToString());
     EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags1.at("XY").ToInt32());
@@ -913,14 +912,14 @@ TEST(BamRecordTest, CoreSetters)
 //    bam.SubstitutionTags(testTags);
 
     // check generic data
-    EXPECT_EQ(42, bam.impl_.Bin());
-    EXPECT_EQ(42, bam.impl_.Flag());
-    EXPECT_EQ(42, bam.impl_.InsertSize());
-    EXPECT_EQ(42, bam.impl_.MapQuality());
-    EXPECT_EQ(42, bam.impl_.MateReferenceId());
-    EXPECT_EQ(42, bam.impl_.MatePosition());
-    EXPECT_EQ(42, bam.impl_.Position());
-    EXPECT_EQ(42, bam.impl_.ReferenceId());
+    EXPECT_EQ(42, bam.Impl().Bin());
+    EXPECT_EQ(42, bam.Impl().Flag());
+    EXPECT_EQ(42, bam.Impl().InsertSize());
+    EXPECT_EQ(42, bam.Impl().MapQuality());
+    EXPECT_EQ(42, bam.Impl().MateReferenceId());
+    EXPECT_EQ(42, bam.Impl().MatePosition());
+    EXPECT_EQ(42, bam.Impl().Position());
+    EXPECT_EQ(42, bam.Impl().ReferenceId());
 
     // check PacBio data
 //    EXPECT_EQ(42, bam.AlignedStart());
@@ -941,7 +940,7 @@ TEST(BamRecordTest, CoreSetters)
 //    EXPECT_EQ(testTags, bam.SubstitutionTags());
 
     // check tags
-    const TagCollection& fetchedTags = bam.impl_.Tags();
+    const TagCollection& fetchedTags = bam.Impl().Tags();
     EXPECT_TRUE(fetchedTags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(string("1abc75"), fetchedTags.at("HX").ToString());
     EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags.at("XY").ToInt32());
@@ -2735,6 +2734,28 @@ TEST(BamRecordTest, PulseExclusionTag)
     auto result = bam.PulseExclusionReason();
     EXPECT_EQ(reasons, result);
 
+}
+
+TEST(BamRecordTest, TranscriptRecord)
+{
+    const std::string readTypeStr{"TRANSCRIPT"};
+    const auto readGroupId = MakeReadGroupId("transcript", readTypeStr);
+
+    ReadGroupInfo rg{readGroupId};
+    rg.ReadType(readTypeStr);
+
+    BamHeader header;
+    header.Version("1.1")
+        .SortOrder("queryname")
+        .PacBioBamVersion("3.0.1");
+
+    BamRecord bam{header};
+    bam.Impl().Name("transcript/1234");
+
+    EXPECT_EQ(RecordType::TRANSCRIPT, bam.Type());
+    EXPECT_EQ(1234, bam.HoleNumber());
+    EXPECT_THROW({bam.QueryStart();}, std::runtime_error);
+    EXPECT_THROW({bam.QueryEnd();}, std::runtime_error);
 }
 
 // clang-format on

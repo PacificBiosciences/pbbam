@@ -41,8 +41,6 @@
 
 #include <gtest/gtest.h>
 
-#define private public
-
 #include <pbbam/QualityValues.h>
 
 using namespace PacBio;

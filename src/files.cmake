@@ -37,6 +37,7 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/Frames.h
     ${PacBioBAM_IncludeDir}/pbbam/GenomicInterval.h
     ${PacBioBAM_IncludeDir}/pbbam/GenomicIntervalQuery.h
+    ${PacBioBAM_IncludeDir}/pbbam/IndexedBamWriter.h
     ${PacBioBAM_IncludeDir}/pbbam/IndexedFastaReader.h
     ${PacBioBAM_IncludeDir}/pbbam/Interval.h
     ${PacBioBAM_IncludeDir}/pbbam/IRecordWriter.h
@@ -70,7 +71,6 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/SubreadLengthQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/Tag.h
     ${PacBioBAM_IncludeDir}/pbbam/TagCollection.h
-#    ${PacBioBAM_IncludeDir}/pbbam/UnmappedReadsQuery.h
     ${PacBioBAM_IncludeDir}/pbbam/Unused.h
     ${PacBioBAM_IncludeDir}/pbbam/Validator.h
     ${PacBioBAM_IncludeDir}/pbbam/ZmwGroupQuery.h
@@ -196,6 +196,7 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/Frames.cpp
     ${PacBioBAM_SourceDir}/GenomicInterval.cpp
     ${PacBioBAM_SourceDir}/GenomicIntervalQuery.cpp
+    ${PacBioBAM_SourceDir}/IndexedBamWriter.cpp
     ${PacBioBAM_SourceDir}/IndexedFastaReader.cpp
     ${PacBioBAM_SourceDir}/MD5.cpp
     ${PacBioBAM_SourceDir}/MemoryUtils.cpp
@@ -218,7 +219,6 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/SubreadLengthQuery.cpp
     ${PacBioBAM_SourceDir}/Tag.cpp
     ${PacBioBAM_SourceDir}/TagCollection.cpp
-#    ${PacBioBAM_SourceDir}/UnmappedReadsQuery.cpp
     ${PacBioBAM_SourceDir}/Validator.cpp
     ${PacBioBAM_SourceDir}/ValidationErrors.cpp
     ${PacBioBAM_SourceDir}/ValidationException.cpp

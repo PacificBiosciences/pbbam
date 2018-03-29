@@ -42,10 +42,9 @@
 
 #include <gtest/gtest.h>
 
-#define private public
-
 #include <pbbam/BamRecordBuilder.h>
 #include <pbbam/BamTagCodec.h>
+#include "../src/MemoryUtils.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -68,14 +67,15 @@ static void CheckRawData(const BamRecordImpl& bam)
                                         (expectedSeqLength + 1) / 2 + expectedSeqLength +
                                         expectedTagsLength;
 
-    EXPECT_TRUE((bool)bam.d_);
-    EXPECT_EQ(expectedNameLength, bam.d_->core.l_qname);
-    EXPECT_EQ(expectedNumCigarOps, bam.d_->core.n_cigar);
-    EXPECT_EQ(expectedSeqLength, bam.d_->core.l_qseq);
-    EXPECT_EQ(expectedTotalDataLength, bam.d_->l_data);
+    const auto rawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    ASSERT_TRUE(static_cast<bool>(rawData));
+    EXPECT_EQ(expectedNameLength, rawData->core.l_qname);
+    EXPECT_EQ(expectedNumCigarOps, rawData->core.n_cigar);
+    EXPECT_EQ(expectedSeqLength, rawData->core.l_qseq);
+    EXPECT_EQ(expectedTotalDataLength, rawData->l_data);
 }
 
-static void CheckRawData(const BamRecord& bam) { CheckRawData(bam.impl_); }
+static void CheckRawData(const BamRecord& bam) { CheckRawData(bam.Impl()); }
 
 }  // namespace BamRecordBuilderTests
 
@@ -84,8 +84,8 @@ TEST(BamRecordBuilderTest, DefaultValues)
     BamRecordBuilder builder;
     BamRecord bam = builder.Build();
 
-    const auto rawData = bam.impl_.d_;
-    ASSERT_TRUE((bool)rawData);
+    const auto rawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    ASSERT_TRUE(static_cast<bool>(rawData));
 
     // fixed-length (core) data
     EXPECT_EQ(0, rawData->core.tid);
@@ -109,34 +109,34 @@ TEST(BamRecordBuilderTest, DefaultValues)
     // check data via API calls
     // -------------------------------
 
-    EXPECT_EQ(0, bam.impl_.Bin());
-    EXPECT_EQ(0, bam.impl_.Flag());
-    EXPECT_EQ(0, bam.impl_.InsertSize());
-    EXPECT_EQ(0, bam.impl_.MapQuality());
-    EXPECT_EQ(0, bam.impl_.MateReferenceId());
-    EXPECT_EQ(0, bam.impl_.MatePosition());
-    EXPECT_EQ(0, bam.impl_.Position());
-    EXPECT_EQ(0, bam.impl_.ReferenceId());
-    EXPECT_EQ(0, bam.impl_.Tags().size());
+    EXPECT_EQ(0, bam.Impl().Bin());
+    EXPECT_EQ(0, bam.Impl().Flag());
+    EXPECT_EQ(0, bam.Impl().InsertSize());
+    EXPECT_EQ(0, bam.Impl().MapQuality());
+    EXPECT_EQ(0, bam.Impl().MateReferenceId());
+    EXPECT_EQ(0, bam.Impl().MatePosition());
+    EXPECT_EQ(0, bam.Impl().Position());
+    EXPECT_EQ(0, bam.Impl().ReferenceId());
+    EXPECT_EQ(0, bam.Impl().Tags().size());
 
-    EXPECT_FALSE(bam.impl_.IsDuplicate());
-    EXPECT_FALSE(bam.impl_.IsFailedQC());
-    EXPECT_FALSE(bam.impl_.IsFirstMate());
-    EXPECT_TRUE(bam.impl_.IsMapped());
-    EXPECT_TRUE(bam.impl_.IsMateMapped());
-    EXPECT_FALSE(bam.impl_.IsMateReverseStrand());
-    EXPECT_FALSE(bam.impl_.IsPaired());
-    EXPECT_TRUE(bam.impl_.IsPrimaryAlignment());
-    EXPECT_FALSE(bam.impl_.IsProperPair());
-    EXPECT_FALSE(bam.impl_.IsReverseStrand());
-    EXPECT_FALSE(bam.impl_.IsSecondMate());
-    EXPECT_FALSE(bam.impl_.IsSupplementaryAlignment());
+    EXPECT_FALSE(bam.Impl().IsDuplicate());
+    EXPECT_FALSE(bam.Impl().IsFailedQC());
+    EXPECT_FALSE(bam.Impl().IsFirstMate());
+    EXPECT_TRUE(bam.Impl().IsMapped());
+    EXPECT_TRUE(bam.Impl().IsMateMapped());
+    EXPECT_FALSE(bam.Impl().IsMateReverseStrand());
+    EXPECT_FALSE(bam.Impl().IsPaired());
+    EXPECT_TRUE(bam.Impl().IsPrimaryAlignment());
+    EXPECT_FALSE(bam.Impl().IsProperPair());
+    EXPECT_FALSE(bam.Impl().IsReverseStrand());
+    EXPECT_FALSE(bam.Impl().IsSecondMate());
+    EXPECT_FALSE(bam.Impl().IsSupplementaryAlignment());
 
     const std::string emptyString = "";
-    EXPECT_EQ(emptyString, bam.impl_.Name());
-    EXPECT_EQ(emptyString, bam.impl_.CigarData().ToStdString());
-    EXPECT_EQ(emptyString, bam.impl_.Sequence());
-    EXPECT_EQ(emptyString, bam.impl_.Qualities().Fastq());
+    EXPECT_EQ(emptyString, bam.Impl().Name());
+    EXPECT_EQ(emptyString, bam.Impl().CigarData().ToStdString());
+    EXPECT_EQ(emptyString, bam.Impl().Sequence());
+    EXPECT_EQ(emptyString, bam.Impl().Qualities().Fastq());
     BamRecordBuilderTests::CheckRawData(bam);
 }
 
@@ -166,8 +166,8 @@ TEST(BamRecordBuilderTest, CheckSetters)
     // check raw data
     // -------------------------------
 
-    const auto rawData = bam.impl_.d_;
-    ASSERT_TRUE((bool)rawData);
+    const auto rawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    ASSERT_TRUE(static_cast<bool>(rawData));
 
     // fixed-length (core) data
     EXPECT_EQ(42, rawData->core.tid);
@@ -191,80 +191,19 @@ TEST(BamRecordBuilderTest, CheckSetters)
     // check data via API calls
     // -------------------------------
 
-    EXPECT_EQ(42, bam.impl_.Bin());
-    EXPECT_EQ(42, bam.impl_.Flag());
-    EXPECT_EQ(42, bam.impl_.InsertSize());
-    EXPECT_EQ(42, bam.impl_.MapQuality());
-    EXPECT_EQ(42, bam.impl_.MateReferenceId());
-    EXPECT_EQ(42, bam.impl_.MatePosition());
-    EXPECT_EQ(42, bam.impl_.Position());
-    EXPECT_EQ(42, bam.impl_.ReferenceId());
+    EXPECT_EQ(42, bam.Impl().Bin());
+    EXPECT_EQ(42, bam.Impl().Flag());
+    EXPECT_EQ(42, bam.Impl().InsertSize());
+    EXPECT_EQ(42, bam.Impl().MapQuality());
+    EXPECT_EQ(42, bam.Impl().MateReferenceId());
+    EXPECT_EQ(42, bam.Impl().MatePosition());
+    EXPECT_EQ(42, bam.Impl().Position());
+    EXPECT_EQ(42, bam.Impl().ReferenceId());
 
-    const TagCollection& fetchedTags = bam.impl_.Tags();
+    const TagCollection& fetchedTags = bam.Impl().Tags();
 
     EXPECT_TRUE(fetchedTags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), fetchedTags.at("HX").ToString());
     EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags.at("XY").ToInt32());
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags.at("CA").ToUInt8Array());
 }
-
-//#define SEQ_LENGTH  7000
-//#define NUM_RECORDS 1000
-
-//const std::string& TEST_SEQUENCE  = std::string(SEQ_LENGTH, 'G');
-//const std::string& TEST_QUALITIES = std::string(SEQ_LENGTH, '=');
-//const std::string& TEST_NAME      = std::string(SEQ_LENGTH, '/');
-//const std::string& TEST_TAGDATA   = std::string(SEQ_LENGTH, '2');
-
-//TEST(BamRecordBuilderTest, JustDoingSomeTimings_BamRecordBuilder)
-//{
-
-//    BamRecordBuilder builder;
-
-//    TagCollection tags;
-//    tags["aa"] = TEST_TAGDATA;
-//    tags["bb"] = TEST_TAGDATA;
-//    tags["cc"] = TEST_TAGDATA;
-//    tags["dd"] = TEST_TAGDATA;
-//    tags["ee"] = TEST_TAGDATA;
-//    tags["ff"] = TEST_TAGDATA;
-
-//    auto start = std::chrono::steady_clock::now();
-
-//    BamRecord record;
-//    for (size_t i = 0; i < NUM_RECORDS; ++i) {
-//        builder.Sequence(TEST_SEQUENCE)
-//               .Qualities(TEST_QUALITIES)
-//               .Name(TEST_NAME)
-//               .Tags(tags)
-//               .BuildInPlace(record);
-//    }
-//    auto end = std::chrono::steady_clock::now();
-//    ()record;
-//    auto diff = end - start;
-//    std::cout << std::chrono::duration <double, std::milli>(diff).count() << " ms" << std::endl;
-//}
-
-//TEST(BamRecordBuilderTest, JustDoingSomeTimings_BamRecordOnly)
-//{
-//    TagCollection tags;
-//    tags["aa"] = TEST_TAGDATA;
-//    tags["bb"] = TEST_TAGDATA;
-//    tags["cc"] = TEST_TAGDATA;
-//    tags["dd"] = TEST_TAGDATA;
-//    tags["ee"] = TEST_TAGDATA;
-//    tags["ff"] = TEST_TAGDATA;
-
-//    auto start = std::chrono::steady_clock::now();
-
-//    BamRecord record;
-//    for (size_t i = 0; i < NUM_RECORDS; ++i) {
-//        record.SetSequenceAndQualities(TEST_SEQUENCE, TEST_QUALITIES);
-//        record.Name(TEST_NAME);
-//        record.Tags(tags);
-//    }
-//    auto end = std::chrono::steady_clock::now();
-//    ()record;
-//    auto diff = end - start;
-//    std::cout << std::chrono::duration <double, std::milli>(diff).count() << " ms" << std::endl;
-//}

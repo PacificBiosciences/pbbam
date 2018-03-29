@@ -45,8 +45,6 @@
 
 #include <gtest/gtest.h>
 
-#define private public
-
 #include "../src/FileUtils.h"
 #include "PbbamTestData.h"
 

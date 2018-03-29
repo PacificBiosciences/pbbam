@@ -32,6 +32,7 @@ set( PacBioBAMTest_CPP
     ${PacBioBAM_TestsDir}/src/test_FileUtils.cpp
     ${PacBioBAM_TestsDir}/src/test_Frames.cpp
     ${PacBioBAM_TestsDir}/src/test_GenomicIntervalQuery.cpp
+    ${PacBioBAM_TestsDir}/src/test_IndexedBamWriter.cpp
     ${PacBioBAM_TestsDir}/src/test_IndexedFastaReader.cpp
     ${PacBioBAM_TestsDir}/src/test_Intervals.cpp
     ${PacBioBAM_TestsDir}/src/test_LongCigar.cpp
@@ -49,7 +50,6 @@ set( PacBioBAMTest_CPP
     ${PacBioBAM_TestsDir}/src/test_SubreadLengthQuery.cpp
     ${PacBioBAM_TestsDir}/src/test_Tags.cpp
     ${PacBioBAM_TestsDir}/src/test_TimeUtils.cpp
-    # ${PacBioBAM_TestsDir}/src/test_UnmappedReadsQuery.cpp
     ${PacBioBAM_TestsDir}/src/test_Validator.cpp
     ${PacBioBAM_TestsDir}/src/test_Version.cpp
     ${PacBioBAM_TestsDir}/src/test_WhitelistedZmwReadStitcher.cpp

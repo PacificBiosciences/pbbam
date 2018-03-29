@@ -43,8 +43,6 @@
 #include <gtest/gtest.h>
 #include <htslib/sam.h>
 
-#define private public
-
 #include <pbbam/BamHeader.h>
 
 using namespace PacBio;
