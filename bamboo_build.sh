@@ -139,6 +139,12 @@ elif [[ $bamboo_planRepository_branchName == master ]]; then
 elif [[ $bamboo_planRepository_branchName == develop ]]; then
   VERSION="$(${CURRENT_BUILD_DIR}/tools/bam2sam --version)".SNAPSHOT${BUILD_NUMBER}
   NEXUS_REPO=maven-snapshots
+  rm -rf /mnt/secondary/builds/unsupported/pbbam.previous
+  if [[ -e /mnt/secondary/builds/unsupported/pbbam ]]; then
+    mv /mnt/secondary/builds/unsupported/pbbam \
+       /mnt/secondary/builds/unsupported/pbbam.previous
+  fi
+  DESTDIR="/mnt/secondary/builds/unsupported/pbbam/" ninja -C "${CURRENT_BUILD_DIR}" -v install
 else
   exit 0
 fi
