@@ -13,8 +13,6 @@ type module >& /dev/null || . /mnt/software/Modules/current/init/bash
 set +vx
 #module load pacbio-devtools
 module purge
-module load gcc
-module load ccache
 
 module load meson
 module load ninja
@@ -25,7 +23,6 @@ module load samtools
 
 module load boost
 
-module load gtest
 module load cram
 set -vx
 
@@ -65,43 +62,57 @@ export LDFLAGS="-static-libstdc++ -static-libgcc"
 
 # i : unity build
 for i in "on" "off"; do
-  CURRENT_BUILD_DIR="build_unity=${i^^}"
-  mkdir -p "${CURRENT_BUILD_DIR}"/test-reports
+  for j in "system-gcc" "gcc-mobs"; do
+    # 1. load either current MOBS GCC or RHEL-default GCC
+    if [[ ${j} == gcc-mobs ]]; then
+      module load gcc gtest
+    else
+      module load gtest/gcc48
+    fi
+    module load ccache
 
-  echo "=============================="
-  echo "Current configuration:"
-  echo "  Unity:             ${i^^}"
-  echo "=============================="
+    CURRENT_BUILD_DIR="build_unity=${i^^}_gcc=${j}"
+    mkdir -p "${CURRENT_BUILD_DIR}"/test-reports
 
-  # 1. configure
-  # '--wrap-mode nofallback' prevents meson from downloading
-  # stuff from the internet or using subprojects.
-  echo "## Configuring source (${CURRENT_BUILD_DIR})"
-  meson \
-    --wrap-mode nofallback \
-    --backend ninja \
-    --buildtype release \
-    -Db_ndebug=true \
-    --strip \
-    --default-library shared \
-    --warnlevel 3 \
-    --libdir lib \
-    --unity "${i}" \
-    --prefix "${PREFIX_ARG:-/usr/local}" \
-    -Dbuild-tools=true \
-    -Dtests=true \
-    -Dpermissive-cigar=false \
-    "${CURRENT_BUILD_DIR}" .
+    echo "=============================="
+    echo "Current configuration:"
+    echo "  Unity:             ${i^^}"
+    echo "    GCC:             ${j}"
+    echo "=============================="
 
-  # 2. build
-  echo "## Building source (${CURRENT_BUILD_DIR})"
-  ninja -C "${CURRENT_BUILD_DIR}" -v
+    # 2. configure
+    # '--wrap-mode nofallback' prevents meson from downloading
+    # stuff from the internet or using subprojects.
+    echo "## Configuring source (${CURRENT_BUILD_DIR})"
+    meson \
+      --wrap-mode nofallback \
+      --backend ninja \
+      --buildtype release \
+      -Db_ndebug=true \
+      --strip \
+      --default-library shared \
+      --warnlevel 3 \
+      --libdir lib \
+      --unity "${i}" \
+      --prefix "${PREFIX_ARG:-/usr/local}" \
+      -Dbuild-tools=true \
+      -Dtests=true \
+      -Dpermissive-cigar=false \
+      "${CURRENT_BUILD_DIR}" .
 
-  # 3. tests
-  echo "## Tests (${CURRENT_BUILD_DIR})"
-  GTEST_OUTPUT="xml:${CURRENT_BUILD_DIR}/test-reports/pbbam_results.xml" ARGS=-V VERBOSE=1 \
-  ninja -C "${CURRENT_BUILD_DIR}" -v test
-  cram --xunit-file=${CURRENT_BUILD_DIR}/test-reports/pbbam_cramunit.xml ${CURRENT_BUILD_DIR}/tools
+    # 3. build
+    echo "## Building source (${CURRENT_BUILD_DIR})"
+    ninja -C "${CURRENT_BUILD_DIR}" -v
+
+    # 4. tests
+    echo "## Tests (${CURRENT_BUILD_DIR})"
+    GTEST_OUTPUT="xml:${CURRENT_BUILD_DIR}/test-reports/pbbam_results.xml" ARGS=-V VERBOSE=1 \
+    ninja -C "${CURRENT_BUILD_DIR}" -v test
+    cram --xunit-file=${CURRENT_BUILD_DIR}/test-reports/pbbam_cramunit.xml ${CURRENT_BUILD_DIR}/tools
+
+    module unload ccache gtest
+    [[ ${j} == gcc-mobs ]] && module unload gcc
+  done
 done
 
 if [[ -z ${PREFIX_ARG+x} ]]; then
@@ -112,6 +123,9 @@ fi
 echo "###########"
 echo "# INSTALL #"
 echo "###########"
+
+# reload MOBS GCC
+module load gcc
 
 echo "## Cleaning out old installation from /mnt/software"
 rm -rf "${PREFIX_ARG}"/*

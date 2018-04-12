@@ -51,7 +51,7 @@ std::unique_ptr<QueryLookup> CreateQueryLookup(const PacBio::BAM::DataSet& datas
 }
 
 QueryLookup::QueryLookup(const PacBio::BAM::DataSet& dataset)
-                        : dataset_{dataset} {
+                        : dataset_(dataset) {
 
 }
 
