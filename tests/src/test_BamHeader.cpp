@@ -232,7 +232,7 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
     rawData->ignore_sam_err = 0;
     rawData->cigar_tab = nullptr;
     rawData->l_text = text.size();
-    rawData->text = (char*)calloc(rawData->l_text + 1, 1);
+    rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
     memcpy(rawData->text, text.c_str(), rawData->l_text);
 
     const string& rawText = string(rawData->text, rawData->l_text);
@@ -286,7 +286,7 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
     rawData->ignore_sam_err = 0;
     rawData->cigar_tab = nullptr;
     rawData->l_text = text.size();
-    rawData->text = (char*)calloc(rawData->l_text + 1, 1);
+    rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
     memcpy(rawData->text, text.c_str(), rawData->l_text);
 
     const BamHeader newHeader = BamHeader(string(rawData->text, rawData->l_text));

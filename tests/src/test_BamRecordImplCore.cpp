@@ -120,7 +120,7 @@ static void CheckRawData(const BamRecordImpl& bam)
 TEST(BamRecordImplCoreTestsTest, RawDataDefaultValues)
 {
     std::shared_ptr<bam1_t> rawData(bam_init1(), BamRecordImplCoreTests::Bam1Deleter());
-    ASSERT_TRUE((bool)rawData);
+    ASSERT_TRUE(static_cast<bool>(rawData));
 
     // fixed-length (core) data
     EXPECT_EQ(0, rawData->core.tid);
@@ -170,7 +170,7 @@ TEST(BamRecordImplCoreTestsTest, DefaultValues)
     // variable length data
     EXPECT_TRUE(rawData->data != nullptr);
     EXPECT_EQ(4, rawData->l_data);           // initial aligned QNAME
-    EXPECT_EQ((int)0x800, rawData->m_data);  // check this if we change or tune later
+    EXPECT_EQ(int{0x800}, rawData->m_data);  // check this if we change or tune later
 
     // -------------------------------
     // check data via API calls
@@ -250,7 +250,7 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
     // variable length data
     EXPECT_TRUE(rawData->data != nullptr);
     EXPECT_EQ(32, rawData->l_data);          // aligned qname + tags
-    EXPECT_EQ((int)0x800, rawData->m_data);  // check this if we change or tune later
+    EXPECT_EQ(int{0x800}, rawData->m_data);  // check this if we change or tune later
 
     // -------------------------------
     // check data via API calls
@@ -292,7 +292,7 @@ TEST(BamRecordImplCoreTestsTest, DeepCopyFromRawData)
     char valueBytes[sizeof x];
     std::copy(static_cast<const char*>(static_cast<const void*>(&x)),
               static_cast<const char*>(static_cast<const void*>(&x)) + sizeof x, valueBytes);
-    bam_aux_append(rawData.get(), "XY", 'i', sizeof(x), (uint8_t*)&valueBytes[0]);
+    bam_aux_append(rawData.get(), "XY", 'i', sizeof(x), reinterpret_cast<uint8_t*>(&valueBytes[0]));
 
     EXPECT_EQ(42, rawData->core.tid);
     EXPECT_EQ(42, rawData->core.pos);
@@ -346,7 +346,7 @@ TEST(BamRecordImplCoreTestsTest, DeepCopyFromRawData)
     ASSERT_TRUE(static_cast<bool>(newBamRawData));
 
     EXPECT_TRUE(newBamRawData->data != nullptr);
-    EXPECT_TRUE(newBamRawData->m_data >= (int)0x800);  // check this if we change or tune later
+    EXPECT_TRUE(newBamRawData->m_data >= int{0x800});  // check this if we change or tune later
 
     // tweak raw data, make sure we've done a deep copy (so BamRecordImpl isn't changed)
     rawData->core.pos = 37;

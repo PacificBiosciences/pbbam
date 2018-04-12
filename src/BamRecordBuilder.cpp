@@ -114,7 +114,8 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
     if (allocatedDataLength < dataLength) {
         allocatedDataLength = dataLength;
         kroundup32(allocatedDataLength);
-        varLengthDataBlock = (uint8_t*)realloc(varLengthDataBlock, allocatedDataLength);
+        varLengthDataBlock =
+            static_cast<uint8_t*>(realloc(varLengthDataBlock, allocatedDataLength));
     }
     recordRawData->data = varLengthDataBlock;
     recordRawData->l_data = dataLength;

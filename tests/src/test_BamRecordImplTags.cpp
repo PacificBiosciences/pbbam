@@ -55,7 +55,7 @@ TEST(BamRecordImplTagsTest, HasTagTest)
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = (int32_t)-42;
+    tags["XY"] = int32_t{-42};
 
     BamRecordImpl bam;
     bam.Tags(tags);
@@ -91,7 +91,7 @@ TEST(BamRecordImplTagsTest, SimpleAddTag)
     EXPECT_TRUE(bam.HasTag("CA"));
     EXPECT_FALSE(bam.HasTag("XY"));
 
-    bam.AddTag("XY", (int32_t)-42);
+    bam.AddTag("XY", int32_t{-42});
 
     EXPECT_TRUE(bam.HasTag("HX"));
     EXPECT_TRUE(bam.HasTag("CA"));
@@ -108,9 +108,9 @@ TEST(BamRecordImplTagsTest, SimpleAddTag)
     EXPECT_EQ(-42, fetchedTags.at("XY").ToInt32());
 
     // fail on invalid adds
-    EXPECT_FALSE(bam.AddTag("", (int32_t)-42));
-    EXPECT_FALSE(bam.AddTag("some_too_long_name", (int32_t)-42));
-    EXPECT_FALSE(bam.AddTag("XY", (int32_t)-42));  // reject duplicate
+    EXPECT_FALSE(bam.AddTag("", int32_t{-42}));
+    EXPECT_FALSE(bam.AddTag("some_too_long_name", int32_t{-42}));
+    EXPECT_FALSE(bam.AddTag("XY", int32_t{-42}));  // reject duplicate
 }
 
 TEST(BamRecordImplTagsTest, SimpleRemoveTag)
@@ -119,7 +119,7 @@ TEST(BamRecordImplTagsTest, SimpleRemoveTag)
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = (int32_t)-42;
+    tags["XY"] = int32_t{-42};
 
     BamRecordImpl bam;
     bam.Tags(tags);
@@ -155,7 +155,7 @@ TEST(BamRecordImplTagsTest, SimpleEditTag)
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = (int32_t)-42;
+    tags["XY"] = int32_t{-42};
 
     BamRecordImpl bam;
     bam.Tags(tags);
@@ -168,7 +168,7 @@ TEST(BamRecordImplTagsTest, SimpleEditTag)
     EXPECT_TRUE(fetchedTags.Contains("XY"));
     EXPECT_EQ(-42, fetchedTags.at("XY").ToInt32());
 
-    const bool editedOk = bam.EditTag("XY", (int32_t)500);
+    const bool editedOk = bam.EditTag("XY", int32_t{500});
     EXPECT_TRUE(editedOk);
     EXPECT_TRUE(bam.HasTag("XY"));
 
@@ -190,7 +190,7 @@ TEST(BamRecordImplTagsTest, SimpleQueryTag)
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = (int32_t)-42;
+    tags["XY"] = int32_t{-42};
 
     BamRecordImpl bam;
     bam.Tags(tags);
@@ -201,7 +201,7 @@ TEST(BamRecordImplTagsTest, SimpleQueryTag)
 
     EXPECT_EQ(string("1abc75"), bam.TagValue("HX").ToString());
     EXPECT_EQ(vector<uint8_t>({34, 5, 125}), bam.TagValue("CA").ToUInt8Array());
-    EXPECT_EQ((int32_t)-42, bam.TagValue("XY").ToInt32());
+    EXPECT_EQ(int32_t{-42}, bam.TagValue("XY").ToInt32());
 
     EXPECT_FALSE(bam.HasTag("zz"));
     EXPECT_FALSE(bam.HasTag(""));

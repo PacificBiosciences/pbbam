@@ -307,7 +307,7 @@ SequenceInfo BamHeader::Sequence(const std::string& name) const
     const auto iter = d_->sequenceIdLookup_.find(name);
     if (iter == d_->sequenceIdLookup_.cend()) return SequenceInfo();
     const auto index = iter->second;
-    assert(index >= 0 && (size_t)index < d_->sequences_.size());
+    assert(index >= 0 && static_cast<size_t>(index) < d_->sequences_.size());
     return d_->sequences_.at(index);
 }
 
