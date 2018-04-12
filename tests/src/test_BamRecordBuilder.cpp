@@ -103,7 +103,7 @@ TEST(BamRecordBuilderTest, DefaultValues)
     // variable length data
     EXPECT_TRUE(rawData->data != nullptr);
     EXPECT_EQ(1, rawData->l_data);
-    EXPECT_EQ((int)0x800, rawData->m_data);  // check this if we change or tune later
+    EXPECT_EQ(int{0x800}, rawData->m_data);  // check this if we change or tune later
 
     // -------------------------------
     // check data via API calls
@@ -185,7 +185,7 @@ TEST(BamRecordBuilderTest, CheckSetters)
     // variable length data
     EXPECT_TRUE(rawData->data != nullptr);
     EXPECT_EQ(29, rawData->l_data);          // NULL-term qname + tags
-    EXPECT_EQ((int)0x800, rawData->m_data);  // check this if we change or tune later
+    EXPECT_EQ(int{0x800}, rawData->m_data);  // check this if we change or tune later
 
     // -------------------------------
     // check data via API calls

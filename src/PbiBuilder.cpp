@@ -307,7 +307,7 @@ bool PbiReferenceDataBuilder::AddRecord(const BamRecord& record, const int32_t r
             //
             // error: refs are out of order (can stop checking refs)
             //
-            PbiReferenceEntry& currentEntry = rawReferenceEntries_.at((uint32_t)tId);
+            PbiReferenceEntry& currentEntry = rawReferenceEntries_.at(static_cast<uint32_t>(tId));
             if (currentEntry.beginRow_ != PbiReferenceEntry::UNSET_ROW) return false;
         }
         lastRefId_ = tId;
@@ -315,7 +315,7 @@ bool PbiReferenceDataBuilder::AddRecord(const BamRecord& record, const int32_t r
         return false;  // error: positions out of order
 
     // update row numbers
-    PbiReferenceEntry& entry = rawReferenceEntries_.at((uint32_t)tId);
+    PbiReferenceEntry& entry = rawReferenceEntries_.at(static_cast<uint32_t>(tId));
     if (entry.beginRow_ == PbiReferenceEntry::UNSET_ROW) entry.beginRow_ = rowNumber;
     entry.endRow_ = rowNumber + 1;
 

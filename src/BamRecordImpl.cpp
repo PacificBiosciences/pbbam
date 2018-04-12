@@ -286,8 +286,8 @@ bool BamRecordImpl::HasTag(const BamRecordTag tag) const
 void BamRecordImpl::InitializeData()
 {
     d_.reset(bam_init1(), internal::HtslibRecordDeleter());
-    d_->data =
-        (uint8_t*)(calloc(0x800, sizeof(uint8_t)));  // maybe make this value tune-able later?
+    d_->data = static_cast<uint8_t*>(
+        calloc(0x800, sizeof(uint8_t)));  // maybe make this value tune-able later?
     d_->m_data = 0x800;
 
     // init unmapped
@@ -332,7 +332,9 @@ BamRecordImpl& BamRecordImpl::Name(const std::string& name)
 
     // shift trailing data (cigar, seq, qual, tags) as needed
     const uint32_t* oldCigarStart = bam_get_cigar(d_);
-    const size_t trailingDataLength = oldLengthData - ((uint8_t*)oldCigarStart - d_->data);
+    const size_t trailingDataLength =
+        oldLengthData - (reinterpret_cast<const unsigned char*>(oldCigarStart) -
+                         reinterpret_cast<const unsigned char*>(d_->data));
     d_->core.l_qname = totalNameSize;
     d_->core.l_extranul = numExtraNulls;
     uint32_t* newCigarStart = bam_get_cigar(d_);
@@ -461,7 +463,9 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
 
     // shift trailing data (tags) as needed
     const uint8_t* oldTagStart = bam_get_aux(d_);
-    const size_t trailingDataLength = oldLengthData - ((uint8_t*)oldTagStart - d_->data);
+    const size_t trailingDataLength =
+        oldLengthData - (reinterpret_cast<const unsigned char*>(oldTagStart) -
+                         reinterpret_cast<const unsigned char*>(d_->data));
     d_->core.l_qseq = sequenceLength;
     uint8_t* newTagStart = bam_get_aux(d_);
     memmove(newTagStart, oldTagStart, trailingDataLength);
@@ -473,7 +477,8 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
     } else {
         memset(pEncodedSequence, 0, encodedSequenceLength);
         for (size_t i = 0; i < sequenceLength; ++i)
-            pEncodedSequence[i >> 1] |= seq_nt16_table[(int)sequence[i]] << ((~i & 1) << 2);
+            pEncodedSequence[i >> 1] |= seq_nt16_table[static_cast<int>(sequence[i])]
+                                        << ((~i & 1) << 2);
     }
 
     // fill in quality values
@@ -515,7 +520,7 @@ BamRecordImpl& BamRecordImpl::Tags(const TagCollection& tags)
     tagStart = bam_get_aux(d_);
 
     // fill in new tag data
-    memcpy((void*)tagStart, data, numBytes);
+    memcpy(static_cast<void*>(tagStart), data, numBytes);
 
     // update tag info
     UpdateTagMap();
@@ -600,7 +605,7 @@ void BamRecordImpl::UpdateTagMap() const
             case 'Z':
             case 'H': {
                 // null-terminated string
-                i += strlen((const char*)&tagStart[i]) + 1;
+                i += strlen(reinterpret_cast<const char*>(&tagStart[i])) + 1;
                 break;
             }
 

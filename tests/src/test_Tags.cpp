@@ -894,7 +894,7 @@ TEST(SamTagCodecTest, DecodeTest)
     EXPECT_EQ(string("foo"), tags["ST"].ToString());
     EXPECT_TRUE(tags["HX"].HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(string("1abc75"), tags["HX"].ToString());
-    EXPECT_EQ((int8_t)-42, tags["XY"].ToInt8());
+    EXPECT_EQ(int8_t{-42}, tags["XY"].ToInt8());
     EXPECT_EQ(vector<int32_t>({42, -100, 37, 2048}), tags["VC"].ToInt32Array());
 }
 

@@ -71,7 +71,7 @@ std::shared_ptr<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& heade
     rawData->ignore_sam_err = 0;
     rawData->cigar_tab = nullptr;
     rawData->l_text = text.size();
-    rawData->text = (char*)calloc(rawData->l_text + 1, 1);
+    rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
     memcpy(rawData->text, text.c_str(), rawData->l_text);
     return rawData;
 }
