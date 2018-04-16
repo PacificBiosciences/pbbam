@@ -76,7 +76,10 @@ public:
         // If we're still in the same block from the last record written, we
         // need to flush to get the proper offset.
         //
-        if (bgzf->block_address == previousBlockAddress_) bgzf_flush(bgzf);
+        if (bgzf->block_address == previousBlockAddress_) {
+            const auto ret = bgzf_flush(bgzf);
+            UNUSED(ret);
+        }
         const int64_t vOffset = bgzf_tell(bgzf);
 
         // update bin
