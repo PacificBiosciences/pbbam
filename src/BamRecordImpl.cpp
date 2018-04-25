@@ -1,38 +1,3 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
-//
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted (subject to the limitations in the
-// disclaimer below) provided that the following conditions are met:
-//
-//  * Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-//
-//  * Redistributions in binary form must reproduce the above
-//    copyright notice, this list of conditions and the following
-//    disclaimer in the documentation and/or other materials provided
-//    with the distribution.
-//
-//  * Neither the name of Pacific Biosciences nor the names of its
-//    contributors may be used to endorse or promote products derived
-//    from this software without specific prior written permission.
-//
-// NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
-// GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY PACIFIC
-// BIOSCIENCES AND ITS CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL PACIFIC BIOSCIENCES OR ITS
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
-// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-// OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-// SUCH DAMAGE.
-
 // Author: Derek Barnett
 
 #include "PbbamInternalConfig.h"
@@ -286,8 +251,8 @@ bool BamRecordImpl::HasTag(const BamRecordTag tag) const
 void BamRecordImpl::InitializeData()
 {
     d_.reset(bam_init1(), internal::HtslibRecordDeleter());
-    d_->data =
-        (uint8_t*)(calloc(0x800, sizeof(uint8_t)));  // maybe make this value tune-able later?
+    d_->data = static_cast<uint8_t*>(
+        calloc(0x800, sizeof(uint8_t)));  // maybe make this value tune-able later?
     d_->m_data = 0x800;
 
     // init unmapped
@@ -332,7 +297,9 @@ BamRecordImpl& BamRecordImpl::Name(const std::string& name)
 
     // shift trailing data (cigar, seq, qual, tags) as needed
     const uint32_t* oldCigarStart = bam_get_cigar(d_);
-    const size_t trailingDataLength = oldLengthData - ((uint8_t*)oldCigarStart - d_->data);
+    const size_t trailingDataLength =
+        oldLengthData - (reinterpret_cast<const unsigned char*>(oldCigarStart) -
+                         reinterpret_cast<const unsigned char*>(d_->data));
     d_->core.l_qname = totalNameSize;
     d_->core.l_extranul = numExtraNulls;
     uint32_t* newCigarStart = bam_get_cigar(d_);
@@ -461,7 +428,9 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
 
     // shift trailing data (tags) as needed
     const uint8_t* oldTagStart = bam_get_aux(d_);
-    const size_t trailingDataLength = oldLengthData - ((uint8_t*)oldTagStart - d_->data);
+    const size_t trailingDataLength =
+        oldLengthData - (reinterpret_cast<const unsigned char*>(oldTagStart) -
+                         reinterpret_cast<const unsigned char*>(d_->data));
     d_->core.l_qseq = sequenceLength;
     uint8_t* newTagStart = bam_get_aux(d_);
     memmove(newTagStart, oldTagStart, trailingDataLength);
@@ -473,7 +442,8 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
     } else {
         memset(pEncodedSequence, 0, encodedSequenceLength);
         for (size_t i = 0; i < sequenceLength; ++i)
-            pEncodedSequence[i >> 1] |= seq_nt16_table[(int)sequence[i]] << ((~i & 1) << 2);
+            pEncodedSequence[i >> 1] |= seq_nt16_table[static_cast<int>(sequence[i])]
+                                        << ((~i & 1) << 2);
     }
 
     // fill in quality values
@@ -515,7 +485,7 @@ BamRecordImpl& BamRecordImpl::Tags(const TagCollection& tags)
     tagStart = bam_get_aux(d_);
 
     // fill in new tag data
-    memcpy((void*)tagStart, data, numBytes);
+    memcpy(static_cast<void*>(tagStart), data, numBytes);
 
     // update tag info
     UpdateTagMap();
@@ -600,7 +570,7 @@ void BamRecordImpl::UpdateTagMap() const
             case 'Z':
             case 'H': {
                 // null-terminated string
-                i += strlen((const char*)&tagStart[i]) + 1;
+                i += strlen(reinterpret_cast<const char*>(&tagStart[i])) + 1;
                 break;
             }
 

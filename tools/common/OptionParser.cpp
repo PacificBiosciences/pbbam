@@ -17,7 +17,7 @@
 # include <libintl.h>
 # define _(s) gettext(s)
 #else
-# define _(s) ((const char *) (s))
+# define _(s) (static_cast<const char *>(s))
 #endif
 
 using namespace std;

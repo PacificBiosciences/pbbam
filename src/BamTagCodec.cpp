@@ -1,38 +1,3 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
-//
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted (subject to the limitations in the
-// disclaimer below) provided that the following conditions are met:
-//
-//  * Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-//
-//  * Redistributions in binary form must reproduce the above
-//    copyright notice, this list of conditions and the following
-//    disclaimer in the documentation and/or other materials provided
-//    with the distribution.
-//
-//  * Neither the name of Pacific Biosciences nor the names of its
-//    contributors may be used to endorse or promote products derived
-//    from this software without specific prior written permission.
-//
-// NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
-// GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY PACIFIC
-// BIOSCIENCES AND ITS CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL PACIFIC BIOSCIENCES OR ITS
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
-// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-// OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-// SUCH DAMAGE.
-//
 // File Description
 /// \file BamTagCodec.cpp
 /// \brief Implements the BamTagCodec class.
@@ -56,7 +21,7 @@ namespace internal {
 template <typename T>
 inline void appendBamValue(const T& value, kstring_t* str)
 {
-    kputsn_((char*)&value, sizeof(value), str);
+    kputsn_(reinterpret_cast<const char*>(&value), sizeof(value), str);
 }
 
 template <typename T>
@@ -64,7 +29,7 @@ inline void appendBamMultiValue(const std::vector<T>& container, kstring_t* str)
 {
     const uint32_t n = container.size();
     kputsn_(&n, sizeof(n), str);
-    kputsn_((char*)&container[0], n * sizeof(T), str);
+    kputsn_(reinterpret_cast<const char*>(&container[0]), n * sizeof(T), str);
 }
 
 template <typename T>
@@ -146,10 +111,8 @@ TagCollection BamTagCodec::Decode(const std::vector<uint8_t>& data)
 
             case 'Z':
             case 'H': {
-                const size_t dataLength = strlen((const char*)&pData[i]);
-                std::string value;
-                value.resize(dataLength);
-                memcpy((char*)value.data(), &pData[i], dataLength);
+                const size_t dataLength = strlen(reinterpret_cast<const char*>(&pData[i]));
+                std::string value(reinterpret_cast<const char*>(&pData[i]), dataLength);
                 tags[tagName] = value;
                 if (tagType == 'H') tags[tagName].Modifier(TagModifier::HEX_STRING);
                 i += dataLength + 1;
@@ -329,7 +292,7 @@ std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
 
     std::vector<uint8_t> result;
     result.resize(str.l);
-    memcpy((char*)&result[0], str.s, str.l);
+    memcpy(reinterpret_cast<char*>(result.data()), str.s, str.l);
     free(str.s);
     return result;
 }
@@ -366,10 +329,8 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
 
         case 'Z':
         case 'H': {
-            const size_t dataLength = strlen((const char*)&rawData[0]);
-            std::string value;
-            value.resize(dataLength);
-            memcpy((char*)value.data(), &rawData[0], dataLength);
+            const size_t dataLength = strlen(reinterpret_cast<const char*>(&rawData[0]));
+            std::string value(reinterpret_cast<const char*>(&rawData[0]), dataLength);
             Tag t(value);
             if (tagType == 'H') t.Modifier(TagModifier::HEX_STRING);
             return t;
@@ -508,7 +469,7 @@ std::vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag, const TagModifier& a
     // store temp contents in actual destination
     std::vector<uint8_t> result;
     result.resize(str.l);
-    memcpy((char*)&result[0], str.s, str.l);
+    memcpy(reinterpret_cast<char*>(&result[0]), str.s, str.l);
     free(str.s);
     return result;
 }

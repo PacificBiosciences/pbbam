@@ -1,38 +1,3 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
-//
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted (subject to the limitations in the
-// disclaimer below) provided that the following conditions are met:
-//
-//  * Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-//
-//  * Redistributions in binary form must reproduce the above
-//    copyright notice, this list of conditions and the following
-//    disclaimer in the documentation and/or other materials provided
-//    with the distribution.
-//
-//  * Neither the name of Pacific Biosciences nor the names of its
-//    contributors may be used to endorse or promote products derived
-//    from this software without specific prior written permission.
-//
-// NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
-// GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY PACIFIC
-// BIOSCIENCES AND ITS CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL PACIFIC BIOSCIENCES OR ITS
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
-// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-// OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-// SUCH DAMAGE.
-
 // Author: Derek Barnett
 
 #include <algorithm>
@@ -120,7 +85,7 @@ static void CheckRawData(const BamRecordImpl& bam)
 TEST(BamRecordImplCoreTestsTest, RawDataDefaultValues)
 {
     std::shared_ptr<bam1_t> rawData(bam_init1(), BamRecordImplCoreTests::Bam1Deleter());
-    ASSERT_TRUE((bool)rawData);
+    ASSERT_TRUE(static_cast<bool>(rawData));
 
     // fixed-length (core) data
     EXPECT_EQ(0, rawData->core.tid);
@@ -170,7 +135,7 @@ TEST(BamRecordImplCoreTestsTest, DefaultValues)
     // variable length data
     EXPECT_TRUE(rawData->data != nullptr);
     EXPECT_EQ(4, rawData->l_data);           // initial aligned QNAME
-    EXPECT_EQ((int)0x800, rawData->m_data);  // check this if we change or tune later
+    EXPECT_EQ(int{0x800}, rawData->m_data);  // check this if we change or tune later
 
     // -------------------------------
     // check data via API calls
@@ -250,7 +215,7 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
     // variable length data
     EXPECT_TRUE(rawData->data != nullptr);
     EXPECT_EQ(32, rawData->l_data);          // aligned qname + tags
-    EXPECT_EQ((int)0x800, rawData->m_data);  // check this if we change or tune later
+    EXPECT_EQ(int{0x800}, rawData->m_data);  // check this if we change or tune later
 
     // -------------------------------
     // check data via API calls
@@ -292,7 +257,7 @@ TEST(BamRecordImplCoreTestsTest, DeepCopyFromRawData)
     char valueBytes[sizeof x];
     std::copy(static_cast<const char*>(static_cast<const void*>(&x)),
               static_cast<const char*>(static_cast<const void*>(&x)) + sizeof x, valueBytes);
-    bam_aux_append(rawData.get(), "XY", 'i', sizeof(x), (uint8_t*)&valueBytes[0]);
+    bam_aux_append(rawData.get(), "XY", 'i', sizeof(x), reinterpret_cast<uint8_t*>(&valueBytes[0]));
 
     EXPECT_EQ(42, rawData->core.tid);
     EXPECT_EQ(42, rawData->core.pos);
@@ -346,7 +311,7 @@ TEST(BamRecordImplCoreTestsTest, DeepCopyFromRawData)
     ASSERT_TRUE(static_cast<bool>(newBamRawData));
 
     EXPECT_TRUE(newBamRawData->data != nullptr);
-    EXPECT_TRUE(newBamRawData->m_data >= (int)0x800);  // check this if we change or tune later
+    EXPECT_TRUE(newBamRawData->m_data >= int{0x800});  // check this if we change or tune later
 
     // tweak raw data, make sure we've done a deep copy (so BamRecordImpl isn't changed)
     rawData->core.pos = 37;
