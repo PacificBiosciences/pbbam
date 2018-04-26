@@ -5,6 +5,7 @@
 #include "pbbam/BamRecordImpl.h"
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -350,8 +351,8 @@ bool BamRecordImpl::RemoveTagImpl(const std::string& tagName)
 std::string BamRecordImpl::Sequence() const
 {
     std::string result(d_->core.l_qseq, '\0');
-    static const constexpr char DnaLookup[] = {'=', 'A', 'C', 'M', 'G', 'R', 'S', 'V',
-                                               'T', 'W', 'Y', 'H', 'K', 'D', 'B', 'N'};
+    static const constexpr std::array<char, 16> DnaLookup{
+        {'=', 'A', 'C', 'M', 'G', 'R', 'S', 'V', 'T', 'W', 'Y', 'H', 'K', 'D', 'B', 'N'}};
     const uint8_t* seqData = bam_get_seq(d_);
     for (int i = 0; i < d_->core.l_qseq; ++i)
         result[i] = DnaLookup[bam_seqi(seqData, i)];
