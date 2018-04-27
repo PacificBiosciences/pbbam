@@ -13,6 +13,6 @@ public:
     static void Run(const Settings& settings);
 };
 
-} // namespace bam2sam
+}  // namespace bam2sam
 
-#endif // PBIBAM2SAM_H
+#endif  // PBIBAM2SAM_H

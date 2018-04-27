@@ -1,17 +1,17 @@
 // Author: Ivan Sovic
 
 #include "PbBamify.h"
+#include <pbbam/../../src/SequenceUtils.h>
 #include <pbbam/BamRecord.h>
-#include <pbbam/PbiFilter.h>
-#include <pbbam/PbiFilterTypes.h>
-#include <pbbam/PbiFilterQuery.h>
 #include <pbbam/Cigar.h>
 #include <pbbam/MD5.h>
-#include <pbbam/../../src/SequenceUtils.h>
+#include <pbbam/PbiFilter.h>
+#include <pbbam/PbiFilterQuery.h>
+#include <pbbam/PbiFilterTypes.h>
+#include <ctime>
 #include <istream>
 #include <ostream>
 #include <string>
-#include <ctime>
 
 namespace PacBio {
 namespace BAM {
@@ -19,16 +19,14 @@ namespace pbbamify {
 
 // Taken from BamRecord.cpp, since the implementation there
 // is not public.
-static inline
-bool ConsumesQuery(const CigarOperationType type)
+static inline bool ConsumesQuery(const CigarOperationType type)
 {
     return (bam_cigar_type(static_cast<int>(type)) & 0x1) != 0;
 }
 
 // Taken from BamRecord.cpp, since the implementation there
 // is not public.
-static inline
-bool ConsumesReference(const CigarOperationType type)
+static inline bool ConsumesReference(const CigarOperationType type)
 {
     return (bam_cigar_type(static_cast<int>(type)) & 0x2) != 0;
 }
@@ -43,7 +41,7 @@ PacBio::BAM::BamHeader Pbbamify::ComposeHeader(const PacBio::BAM::DataSet& datas
 
     // Merge all the read groups and additional PacBio info.
     const auto& bamFiles = dataset.BamFiles();
-    for (auto& bamFile: bamFiles) {
+    for (auto& bamFile : bamFiles) {
         auto header = bamFile.Header();
         if (!headerInitialized) {
             retHeader = header.DeepCopy();
@@ -55,7 +53,7 @@ PacBio::BAM::BamHeader Pbbamify::ComposeHeader(const PacBio::BAM::DataSet& datas
 
     // Merge the alignment PG to the header.
     auto inputHeader = input.Header();
-    for (auto& program: inputHeader.Programs()) {
+    for (auto& program : inputHeader.Programs()) {
         retHeader.AddProgram(program);
     }
 
@@ -91,14 +89,15 @@ bool Pbbamify::IsHardClipped(const Cigar& cigarData)
 
     // If there is no hard clipping, just return.
     if (cigarData.front().Type() == CigarOperationType::HARD_CLIP ||
-            cigarData.back().Type() == CigarOperationType::HARD_CLIP) {
+        cigarData.back().Type() == CigarOperationType::HARD_CLIP) {
         return true;
     }
 
     return false;
 }
 
-Cigar Pbbamify::ConvertHardToSoftClipping(const Cigar& cigarData) {
+Cigar Pbbamify::ConvertHardToSoftClipping(const Cigar& cigarData)
+{
     Cigar softCigar;
 
     // If it's empty, just return.
@@ -108,10 +107,11 @@ Cigar Pbbamify::ConvertHardToSoftClipping(const Cigar& cigarData) {
 
     CigarOperationType prevOp = CigarOperationType::UNKNOWN_OP;
 
-    for (const auto& cigar: cigarData) {
+    for (const auto& cigar : cigarData) {
         // Change H to S.
-        CigarOperationType op = (cigar.Type() == CigarOperationType::HARD_CLIP) ?
-                                    CigarOperationType::SOFT_CLIP : cigar.Type();
+        CigarOperationType op = (cigar.Type() == CigarOperationType::HARD_CLIP)
+                                    ? CigarOperationType::SOFT_CLIP
+                                    : cigar.Type();
         auto len = cigar.Length();
 
         // Merge or add.
@@ -136,9 +136,8 @@ size_t Pbbamify::SequenceLengthFromCigar(const Cigar& cigarData)
         return len;
     }
 
-    for (const auto& cigar: cigarData) {
-        if (ConsumesQuery(cigar.Type()) ||
-                cigar.Type() == CigarOperationType::HARD_CLIP) {
+    for (const auto& cigar : cigarData) {
+        if (ConsumesQuery(cigar.Type()) || cigar.Type() == CigarOperationType::HARD_CLIP) {
             len += cigar.Length();
         }
     }
@@ -148,7 +147,7 @@ size_t Pbbamify::SequenceLengthFromCigar(const Cigar& cigarData)
 
 bool Pbbamify::CheckIsCigarBasic(const Cigar& cigarData)
 {
-    for (const auto& cigar: cigarData) {
+    for (const auto& cigar : cigarData) {
         if (cigar.Type() == CigarOperationType::ALIGNMENT_MATCH) {
             return true;
         }
@@ -167,10 +166,11 @@ Cigar Pbbamify::BasicToExtendedCigar(const PacBio::BAM::IndexedFastaReader& inde
     Cigar extCigar;
 
     std::string qseq = record.Impl().Sequence();
-    std::string rseq = indexedRefReader.ReferenceSubsequence(record, Orientation::GENOMIC, false, false);
+    std::string rseq =
+        indexedRefReader.ReferenceSubsequence(record, Orientation::GENOMIC, false, false);
 
     size_t qpos = 0, rpos = 0;  // The rpos should be 0 because the reference portion is yanked out.
-    for (const auto& cigar: cigarData) {
+    for (const auto& cigar : cigarData) {
         // This shouldn't happen, but let's keep it safe.
         if (cigar.Length() == 0) {
             continue;
@@ -178,16 +178,16 @@ Cigar Pbbamify::BasicToExtendedCigar(const PacBio::BAM::IndexedFastaReader& inde
 
         if (cigar.Type() == CigarOperationType::ALIGNMENT_MATCH) {
             // Decode the prev op.
-            CigarOperationType prevOp = (qseq[qpos] == rseq[rpos]) ?
-                                        CigarOperationType::SEQUENCE_MATCH :
-                                        CigarOperationType::SEQUENCE_MISMATCH;
+            CigarOperationType prevOp = (qseq[qpos] == rseq[rpos])
+                                            ? CigarOperationType::SEQUENCE_MATCH
+                                            : CigarOperationType::SEQUENCE_MISMATCH;
             size_t prevCount = 0;
 
             for (size_t i = 0; i < cigar.Length(); ++i) {
                 // Decode the new op.
-                CigarOperationType op = (qseq[qpos + i] == rseq[rpos + i]) ?
-                                        CigarOperationType::SEQUENCE_MATCH :
-                                        CigarOperationType::SEQUENCE_MISMATCH;
+                CigarOperationType op = (qseq[qpos + i] == rseq[rpos + i])
+                                            ? CigarOperationType::SEQUENCE_MATCH
+                                            : CigarOperationType::SEQUENCE_MISMATCH;
 
                 if (op == prevOp) {
                     ++prevCount;
@@ -218,23 +218,27 @@ Cigar Pbbamify::BasicToExtendedCigar(const PacBio::BAM::IndexedFastaReader& inde
 }
 
 bool Pbbamify::AugmentAlignments(const BamHeader& newHeader,
-                                const std::shared_ptr<QueryLookup> queryLookup,
-                                const PacBio::BAM::IndexedFastaReader& indexedRefReader,
-                                PacBio::BAM::BamReader& input,
-                                PacBio::BAM::BamWriter& writer,
-                                int32_t verboseLevel) {
+                                 const std::shared_ptr<QueryLookup> queryLookup,
+                                 const PacBio::BAM::IndexedFastaReader& indexedRefReader,
+                                 PacBio::BAM::BamReader& input, PacBio::BAM::BamWriter& writer,
+                                 int32_t verboseLevel)
+{
 
     // Clock is just for the verbose functionality.
     clock_t timerStart = clock();
 
     // Sets the frequency of the proof of life when
     // processing larger input BAMs.
-    int32_t verboseFrequency = (verboseLevel <= 2) ? 1000000 :
-                                (verboseLevel == 3) ? 100000 :
-                                (verboseLevel == 4) ? 10000 :
-                                (verboseLevel == 5) ? 1000 :
-                                (verboseLevel == 6) ? 100 :
-                                (verboseLevel == 7) ? 10 : 1;
+    int32_t verboseFrequency =
+        (verboseLevel <= 2)
+            ? 1000000
+            : (verboseLevel == 3)
+                  ? 100000
+                  : (verboseLevel == 4)
+                        ? 10000
+                        : (verboseLevel == 5)
+                              ? 1000
+                              : (verboseLevel == 6) ? 100 : (verboseLevel == 7) ? 10 : 1;
 
     // Counters for verbose output.
     size_t numRecords = 0, numWithoutSeq = 0;
@@ -247,9 +251,11 @@ bool Pbbamify::AugmentAlignments(const BamHeader& newHeader,
 
         // Proof of life.
         if (verboseLevel > 1 && (numRecords % verboseFrequency) == 0) {
-            double elapsedTime = static_cast<double>(clock() - timerStart) / (60.0 * CLOCKS_PER_SEC);
+            double elapsedTime =
+                static_cast<double>(clock() - timerStart) / (60.0 * CLOCKS_PER_SEC);
             elapsedTime = static_cast<int64_t>(elapsedTime * 100.0) / 100.0;
-            std::cerr << "[INFO] Processed " << numRecords << " alignments in " << elapsedTime << " min." << std::endl;
+            std::cerr << "[INFO] Processed " << numRecords << " alignments in " << elapsedTime
+                      << " min." << std::endl;
         }
 
         // Some mappers do not output sequences for secondary alignments.
@@ -271,13 +277,17 @@ bool Pbbamify::AugmentAlignments(const BamHeader& newHeader,
     }
 
     if (verboseLevel > 0 && numWithoutSeq) {
-        std::cerr << "[Warning] Found " << numWithoutSeq << " alignments without a seq field which were not converted (most likely secondary alignments)." << std::endl;
+        std::cerr << "[Warning] Found " << numWithoutSeq
+                  << " alignments without a seq field which were not converted (most likely "
+                     "secondary alignments)."
+                  << std::endl;
     }
 
     if (verboseLevel > 1) {
         double elapsedTime = static_cast<double>(clock() - timerStart) / (60.0 * CLOCKS_PER_SEC);
         elapsedTime = static_cast<int64_t>(elapsedTime * 100.0) / 100.0;
-        std::cerr << "[INFO] Done processing " << numRecords << " alignments in " << elapsedTime << " min." << std::endl;
+        std::cerr << "[INFO] Done processing " << numRecords << " alignments in " << elapsedTime
+                  << " min." << std::endl;
     }
 
     return true;
@@ -286,15 +296,16 @@ bool Pbbamify::AugmentAlignments(const BamHeader& newHeader,
 bool Pbbamify::AugmentAlignment(const BamHeader& newHeader,
                                 const std::shared_ptr<QueryLookup> queryLookup,
                                 const PacBio::BAM::IndexedFastaReader& indexedRefReader,
-                                BamRecord& record,
-                                int32_t verboseLevel) {
+                                BamRecord& record, int32_t verboseLevel)
+{
 
     // Find the BAM record in the original PacBio dataset.
     BamRecord datasetRecord;
     bool isFound = queryLookup->Find(record.FullName(), datasetRecord);
     if (isFound == 0) {
         if (verboseLevel > 0) {
-            std::cerr << "[Warning] No records found for query '" << record.FullName() << "'. Skipping." << std::endl;
+            std::cerr << "[Warning] No records found for query '" << record.FullName()
+                      << "'. Skipping." << std::endl;
         }
         return false;
     }
@@ -312,11 +323,9 @@ bool Pbbamify::AugmentAlignment(const BamHeader& newHeader,
     size_t recordSeqLen = SequenceLengthFromCigar(cigar);
     if (recordSeqLen != datasetRecord.Impl().SequenceLength()) {
         if (verboseLevel > 0) {
-            std::cerr << "[Warning] Sequence '" << record.FullName()
-                        << "' (length " << recordSeqLen
-                        << ") is not of the same length as the PacBio BAM sequence (length "
-                        << datasetRecord.Impl().SequenceLength() << ")! Skipping."
-                        << std::endl;
+            std::cerr << "[Warning] Sequence '" << record.FullName() << "' (length " << recordSeqLen
+                      << ") is not of the same length as the PacBio BAM sequence (length "
+                      << datasetRecord.Impl().SequenceLength() << ")! Skipping." << std::endl;
         }
         return false;
     }
@@ -332,7 +341,7 @@ bool Pbbamify::AugmentAlignment(const BamHeader& newHeader,
     // dataset to be the correct answer to any of these. The rest are
     // produced by a mapper.
     // For example, BLASR will generate a RG tag even if the input was FASTA.
-    for (auto& tag: datasetRecord.Impl().Tags()) {
+    for (auto& tag : datasetRecord.Impl().Tags()) {
         if (record.Impl().Tags().Contains(tag.first)) {
             record.Impl().EditTag(tag.first, tag.second);
         } else {
@@ -387,6 +396,6 @@ bool Pbbamify::AugmentAlignment(const BamHeader& newHeader,
     return true;
 }
 
-} // namespace pbbamify
-} // namespace BAM
-} // namespace PacBio
+}  // namespace pbbamify
+}  // namespace BAM
+}  // namespace PacBio

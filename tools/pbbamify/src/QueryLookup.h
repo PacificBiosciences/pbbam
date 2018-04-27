@@ -6,8 +6,8 @@
 #include <cstdint>
 #include <memory>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include <pbbam/BamReader.h>
 #include <pbbam/DataSet.h>
@@ -26,12 +26,14 @@ class QueryLookup;
 std::unique_ptr<QueryLookup> CreateQueryLookup(const PacBio::BAM::DataSet& dataset);
 
 /// \brief A simple container to hold the location of a read.
-class QueryLocation {
+class QueryLocation
+{
 public:
-    QueryLocation()
-                 : fileNumber{0}, fileOffset{0} { }
+    QueryLocation() : fileNumber{0}, fileOffset{0} {}
     QueryLocation(uint16_t _fileNumber, int64_t _fileOffset)
-                 : fileNumber{_fileNumber}, fileOffset{_fileOffset} { }
+        : fileNumber{_fileNumber}, fileOffset{_fileOffset}
+    {
+    }
 
     uint16_t fileNumber;
     int64_t fileOffset;
@@ -41,7 +43,8 @@ public:
 ///        hash lookup where the key is the read's qname, and the value is a
 ///        QueryLocation object pointing to the exact location of the read. The BAM
 ///        record can then be loaded by setting the virtual offset and calling GetNext().
-class QueryLookup {
+class QueryLookup
+{
 public:
     friend std::unique_ptr<QueryLookup> CreateQueryLookup(const PacBio::BAM::DataSet& dataset);
 
@@ -71,8 +74,8 @@ private:
     std::unordered_map<std::string, QueryLocation> lookup_;
 };
 
-} // namespace pbbamify
-} // namespace BAM
-} // namespace PacBio
+}  // namespace pbbamify
+}  // namespace BAM
+}  // namespace PacBio
 
 #endif

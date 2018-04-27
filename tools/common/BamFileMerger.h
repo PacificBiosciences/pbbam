@@ -28,16 +28,15 @@ public:
     ///
     /// \throws std::runtime_error if any any errors encountered while reading or writing
     ///
-    static void Merge(const PacBio::BAM::DataSet& dataset,
-                      const std::string& outputFilename,
+    static void Merge(const PacBio::BAM::DataSet& dataset, const std::string& outputFilename,
                       const PacBio::BAM::ProgramInfo& mergeProgram = PacBio::BAM::ProgramInfo(),
                       bool createPbi = true);
 };
 
-} // namespace common
-} // namespace BAM
-} // namespace PacBio
+}  // namespace common
+}  // namespace BAM
+}  // namespace PacBio
 
 #include "BamFileMerger.inl"
 
-#endif // BAMFILEMERGER_H
+#endif  // BAMFILEMERGER_H

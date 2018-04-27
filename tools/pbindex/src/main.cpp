@@ -1,19 +1,17 @@
 // Author: Derek Barnett
 
-#include "../common/OptionParser.h"
-#include "PbIndex.h"
-#include "PbIndexVersion.h"
 #include <cassert>
 #include <cstddef>
 #include <iostream>
+#include "../common/OptionParser.h"
+#include "PbIndex.h"
+#include "PbIndexVersion.h"
 using namespace std;
 
-static
-pbindex::Settings fromCommandLine(optparse::OptionParser& parser,
-                                  int argc, char* argv[])
+static pbindex::Settings fromCommandLine(optparse::OptionParser& parser, int argc, char* argv[])
 {
     const optparse::Values options = parser.parse_args(argc, argv);
-//    ()options;
+    //    ()options;
 
     pbindex::Settings settings;
 
@@ -36,9 +34,10 @@ int main(int argc, char* argv[])
 {
     // setup help & options
     optparse::OptionParser parser;
-    parser.description("pbindex creates a index file that enables random-access to PacBio-specific data in BAM files. "
-                       "Generated index filename will be the same as input BAM plus .pbi suffix."
-                       );
+    parser.description(
+        "pbindex creates a index file that enables random-access to PacBio-specific data in BAM "
+        "files. "
+        "Generated index filename will be the same as input BAM plus .pbi suffix.");
     parser.prog("pbindex");
     parser.usage("pbindex <input>");
     parser.version(pbindex::Version);
@@ -46,10 +45,7 @@ int main(int argc, char* argv[])
     parser.add_help_option(true);
 
     auto ioGroup = optparse::OptionGroup(parser, "Input/Output");
-    ioGroup.add_option("")
-           .dest("input")
-           .metavar("input")
-           .help("Input BAM file");
+    ioGroup.add_option("").dest("input").metavar("input").help("Input BAM file");
     parser.add_option_group(ioGroup);
 
     // parse command line for settings
