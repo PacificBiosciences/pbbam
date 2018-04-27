@@ -77,7 +77,7 @@ static PbiFilter filterFromMovieName(const std::string& movieName, bool includeC
     }
 
     //
-    // For all other movie names, we can't determine read type, so we'll match
+    // For all other movie names, we can't determine read type up front, so we'll match
     // on any rgIds from a candidate list.
     //
     auto filter = PbiFilter{PbiFilter::UNION};
