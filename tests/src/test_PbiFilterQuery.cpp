@@ -193,10 +193,10 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
     }
     {  // no <Filters> element present at all
 
-        const DataSet ds(PbbamTestsConfig::GeneratedData_Dir +
-                         "/chunking_missingfilters.subreadset.xml");
-        const PbiFilter filter = PbiFilter::FromDataSet(ds);
-        PbiFilterQuery query(filter, ds);
+        const DataSet dsData(PbbamTestsConfig::GeneratedData_Dir +
+                             "/chunking_missingfilters.subreadset.xml");
+        const PbiFilter filter = PbiFilter::FromDataSet(dsData);
+        PbiFilterQuery query(filter, dsData);
         const auto numReads = query.NumReads();
         EXPECT_EQ(1220, numReads);
 
@@ -209,10 +209,10 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
     }
     {  // <Filters> element contains no child <Filter> elements
 
-        const DataSet ds(PbbamTestsConfig::GeneratedData_Dir +
-                         "/chunking_emptyfilters.subreadset.xml");
-        const PbiFilter filter = PbiFilter::FromDataSet(ds);
-        PbiFilterQuery query(filter, ds);
+        const DataSet dsData(PbbamTestsConfig::GeneratedData_Dir +
+                             "/chunking_emptyfilters.subreadset.xml");
+        const PbiFilter filter = PbiFilter::FromDataSet(dsData);
+        PbiFilterQuery query(filter, dsData);
         const auto numReads = query.NumReads();
         EXPECT_EQ(1220, numReads);
 
@@ -604,8 +604,8 @@ TEST(PbiFilterQueryTest, TranscriptRecords)
         std::vector<int32_t> observed;
 
         PbiFilter filter{PbiZmwFilter{whitelist}};
-        PbiFilterQuery query{filter, transcriptFn};
-        for (const auto& b : query) {
+        PbiFilterQuery queryData{filter, transcriptFn};
+        for (const auto& b : queryData) {
             observed.push_back(b.HoleNumber());
         }
 
@@ -619,8 +619,8 @@ TEST(PbiFilterQueryTest, TranscriptRecords)
 
         std::vector<int32_t> observed;
 
-        PbiFilterQuery query{filter, transcriptFn};
-        for (const auto& b : query) {
+        PbiFilterQuery queryData{filter, transcriptFn};
+        for (const auto& b : queryData) {
             observed.push_back(b.HoleNumber());
         }
 
@@ -633,8 +633,8 @@ TEST(PbiFilterQueryTest, TranscriptRecords)
         std::vector<int32_t> observed;
 
         PbiFilter filter{PbiQueryNameFilter{"transcript/2"}};
-        PbiFilterQuery query{filter, transcriptFn};
-        for (const auto& b : query) {
+        PbiFilterQuery queryData{filter, transcriptFn};
+        for (const auto& b : queryData) {
             observed.push_back(b.HoleNumber());
         }
 
@@ -648,8 +648,8 @@ TEST(PbiFilterQueryTest, TranscriptRecords)
         std::vector<int32_t> observed;
 
         PbiFilter filter{PbiQueryNameFilter{whitelist}};
-        PbiFilterQuery query{filter, transcriptFn};
-        for (const auto& b : query) {
+        PbiFilterQuery queryData{filter, transcriptFn};
+        for (const auto& b : queryData) {
             observed.push_back(b.HoleNumber());
         }
 

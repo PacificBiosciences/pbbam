@@ -888,9 +888,9 @@ static void TestMappingStaggeredXml()
             EXPECT_EQ(string("c5402d06-4643-057c-e300-fe229b4e8909"), subdataset.UniqueId());
             EXPECT_EQ(string("2.3.0"), subdataset.Version());
 
-            const ExternalResources& resources = subdataset.ExternalResources();
-            ASSERT_EQ(1, resources.Size());
-            const ExternalResource& resource = resources[0];
+            const ExternalResources& subResources = subdataset.ExternalResources();
+            ASSERT_EQ(1, subResources.Size());
+            const ExternalResource& resource = subResources[0];
             EXPECT_EQ(string("file:tests/data/bam_mapping_2.bam"), resource.ResourceId());
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
@@ -905,9 +905,9 @@ static void TestMappingStaggeredXml()
             EXPECT_EQ(string("f8b54a55-5fb7-706f-ab35-39afc9c86924"), subdataset.UniqueId());
             EXPECT_EQ(string("2.3.0"), subdataset.Version());
 
-            const ExternalResources& resources = subdataset.ExternalResources();
-            ASSERT_EQ(1, resources.Size());
-            const ExternalResource& resource = resources[0];
+            const ExternalResources& subResources = subdataset.ExternalResources();
+            ASSERT_EQ(1, subResources.Size());
+            const ExternalResource& resource = subResources[0];
             EXPECT_EQ(string("file:tests/data/bam_mapping_1.bam"), resource.ResourceId());
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());

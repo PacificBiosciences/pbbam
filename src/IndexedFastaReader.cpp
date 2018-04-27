@@ -164,7 +164,7 @@ std::vector<std::string> IndexedFastaReader::Names() const
     REQUIRE_FAIDX_LOADED;
     std::vector<std::string> names;
     names.reserve(NumSequences());
-    for (size_t i = 0; i < NumSequences(); ++i)
+    for (int i = 0; i < NumSequences(); ++i)
         names.emplace_back(faidx_iseq(handle_, i));
     return names;
 }
@@ -172,7 +172,8 @@ std::vector<std::string> IndexedFastaReader::Names() const
 std::string IndexedFastaReader::Name(const size_t idx) const
 {
     REQUIRE_FAIDX_LOADED;
-    if (idx >= NumSequences()) throw std::runtime_error("FASTA index out of range");
+    if (static_cast<int>(idx) >= NumSequences())
+        throw std::runtime_error("FASTA index out of range");
     return {faidx_iseq(handle_, idx)};
 }
 

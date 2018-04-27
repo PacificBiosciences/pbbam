@@ -170,15 +170,15 @@ static void ClipAndGapify(const BamRecordImpl& impl, const bool aligned, const b
     const bool clipOrGapRequested = aligned || exciseSoftClips;
     if (impl.IsMapped() && clipOrGapRequested) {
         // determine final container length
-        auto incrementsOutputLength = [](const CigarOperationType type, const bool aligned,
-                                         const bool exciseSoftClips) {
+        auto incrementsOutputLength = [](const CigarOperationType type, const bool isAligned,
+                                         const bool exciseSoftClipsFromAln) {
             if (type == CigarOperationType::HARD_CLIP ||
                 type == CigarOperationType::REFERENCE_SKIP) {
                 return false;
-            } else if (type == CigarOperationType::SOFT_CLIP && exciseSoftClips) {
+            } else if (type == CigarOperationType::SOFT_CLIP && exciseSoftClipsFromAln) {
                 return false;
-            } else if (!aligned && (type == CigarOperationType::DELETION ||
-                                    type == CigarOperationType::PADDING)) {
+            } else if (!isAligned && (type == CigarOperationType::DELETION ||
+                                      type == CigarOperationType::PADDING)) {
                 return false;
             } else
                 return true;
