@@ -105,35 +105,35 @@ static void ExpectRawIndicesEqual(const PbiRawData& expected, const PbiRawData& 
     // mapped data
     EXPECT_EQ(expected.HasMappedData(), actual.HasMappedData());
     if (expected.HasMappedData() && actual.HasMappedData()) {
-        const PbiRawMappedData& e = expected.MappedData();
-        const PbiRawMappedData& a = actual.MappedData();
-        EXPECT_EQ(e.tId_, a.tId_);
-        EXPECT_EQ(e.tStart_, a.tStart_);
-        EXPECT_EQ(e.tEnd_, a.tEnd_);
-        EXPECT_EQ(e.aStart_, a.aStart_);
-        EXPECT_EQ(e.aEnd_, a.aEnd_);
-        EXPECT_EQ(e.revStrand_, a.revStrand_);
-        EXPECT_EQ(e.nM_, a.nM_);
-        EXPECT_EQ(e.nMM_, a.nMM_);
-        EXPECT_EQ(e.mapQV_, a.mapQV_);
+        const PbiRawMappedData& e2 = expected.MappedData();
+        const PbiRawMappedData& a2 = actual.MappedData();
+        EXPECT_EQ(e2.tId_, a2.tId_);
+        EXPECT_EQ(e2.tStart_, a2.tStart_);
+        EXPECT_EQ(e2.tEnd_, a2.tEnd_);
+        EXPECT_EQ(e2.aStart_, a2.aStart_);
+        EXPECT_EQ(e2.aEnd_, a2.aEnd_);
+        EXPECT_EQ(e2.revStrand_, a2.revStrand_);
+        EXPECT_EQ(e2.nM_, a2.nM_);
+        EXPECT_EQ(e2.nMM_, a2.nMM_);
+        EXPECT_EQ(e2.mapQV_, a2.mapQV_);
     }
 
     // reference data
     EXPECT_EQ(expected.HasReferenceData(), actual.HasReferenceData());
     if (expected.HasReferenceData() && actual.HasReferenceData()) {
-        const PbiRawReferenceData& e = expected.ReferenceData();
-        const PbiRawReferenceData& a = actual.ReferenceData();
-        EXPECT_EQ(e.entries_, a.entries_);
+        const PbiRawReferenceData& e2 = expected.ReferenceData();
+        const PbiRawReferenceData& a2 = actual.ReferenceData();
+        EXPECT_EQ(e2.entries_, a2.entries_);
     }
 
     // barcode data
     EXPECT_EQ(expected.HasBarcodeData(), actual.HasBarcodeData());
     if (expected.HasBarcodeData() && actual.HasBarcodeData()) {
-        const PbiRawBarcodeData& e = expected.BarcodeData();
-        const PbiRawBarcodeData& a = actual.BarcodeData();
-        EXPECT_EQ(e.bcForward_, a.bcForward_);
-        EXPECT_EQ(e.bcReverse_, a.bcReverse_);
-        EXPECT_EQ(e.bcQual_, a.bcQual_);
+        const PbiRawBarcodeData& e2 = expected.BarcodeData();
+        const PbiRawBarcodeData& a2 = actual.BarcodeData();
+        EXPECT_EQ(e2.bcForward_, a2.bcForward_);
+        EXPECT_EQ(e2.bcReverse_, a2.bcReverse_);
+        EXPECT_EQ(e2.bcQual_, a2.bcQual_);
     }
 }
 

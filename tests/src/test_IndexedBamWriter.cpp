@@ -42,12 +42,12 @@ TEST(IndexedBamWriter, WritesValidIndex)
         BamReader reader{outBam};
         BamRecord b;
         for (size_t i = 0; i < offsets.size(); ++i) {
-            auto canRead = [](BamReader& reader, BamRecord& record,
-                              size_t i) -> ::testing::AssertionResult {
-                if (reader.GetNext(record))
-                    return ::testing::AssertionSuccess() << "i: " << i;
+            auto canRead = [](BamReader& myReader, BamRecord& record,
+                              size_t loopI) -> ::testing::AssertionResult {
+                if (myReader.GetNext(record))
+                    return ::testing::AssertionSuccess() << "i: " << loopI;
                 else
-                    return ::testing::AssertionFailure() << "i: " << i;
+                    return ::testing::AssertionFailure() << "i: " << loopI;
             };
 
             reader.VirtualSeek(offsets.at(i));

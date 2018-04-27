@@ -161,8 +161,8 @@ TEST(ReadGroupInfoTest, SequencingChemistryThrowsOnBadTriple)
 
     // now check thrown contents
     try {
-        ReadGroupInfo rg("BAD");
-        rg.BindingKit("100372700")
+        ReadGroupInfo rg2("BAD");
+        rg2.BindingKit("100372700")
           .SequencingKit("100-619-400")
           .BasecallerVersion("2.0");
     } catch (InvalidSequencingChemistryException& e) {

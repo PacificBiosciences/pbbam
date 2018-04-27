@@ -319,10 +319,10 @@ void CheckBaseTagsClippedAndAligned(const string& cigar,
                                     const ExpectedResult<string>& e)
 {
     // aligned record + DeletionTag, SubstitutionTag
-    auto makeRecord = [](const string& bases,
-                         const string& cigar,
-                         const Strand strand)
-    { return MakeCigaredBaseRecord(bases, cigar, strand); };
+    auto makeRecord = [](const string& newBases,
+                         const string& newCigar,
+                         const Strand newStrand)
+    { return MakeCigaredBaseRecord(newBases, newCigar, newStrand); };
 
     // DeletionTag
     CheckAlignAndClip(cigar, input, e, makeRecord,
@@ -350,10 +350,10 @@ void CheckFrameTagsClippedAndAligned(const string& cigar,
 {
 
     // aligned record + IPD, PulseWidth
-    auto makeRecord = [](const vector<uint16_t>& frames,
-                         const string& cigar,
-                         const Strand strand)
-    { return BamRecordTests::MakeCigaredFrameRecord(frames, cigar, strand); };
+    auto makeRecord = [](const vector<uint16_t>& newFrames,
+                         const string& newCigar,
+                         const Strand newStrand)
+    { return BamRecordTests::MakeCigaredFrameRecord(newFrames, newCigar, newStrand); };
 
     // IPD
     CheckAlignAndClip(cigar, input, e, makeRecord,
@@ -380,10 +380,10 @@ void CheckQualityTagsClippedAndAligned(const string& cigar,
                                        const ExpectedResult<string>& e)
 {
     // aligned record + DeletionQV, InsertionQV, MergeQV, SubstitutionQV
-    auto makeRecord = [](const string& quals,
-                         const string& cigar,
-                         const Strand strand)
-    { return BamRecordTests::MakeCigaredQualRecord(quals, cigar, strand); };
+    auto makeRecord = [](const string& newQuals,
+                         const string& newCigar,
+                         const Strand newStrand)
+    { return BamRecordTests::MakeCigaredQualRecord(newQuals, newCigar, newStrand); };
 
     // DeletionQV
     CheckAlignAndClip(cigar, input, e, makeRecord,
@@ -428,13 +428,13 @@ void CheckQualitiesClippedAndAligned(const string& cigar,
                                      const ExpectedResult<string>& e)
 {
     // aligned record w/ dummy SEQ & QUALs under test
-    auto makeRecord = [](const string& quals,
-                         const string& cigar,
-                         const Strand strand)
+    auto makeRecord = [](const string& newQuals,
+                         const string& newCigar,
+                         const Strand newStrand)
     {
-        const string seq = string(quals.size(), 'N');
-        auto record = BamRecordTests::MakeCigaredRecord(seq, cigar, strand);
-        record.Impl().SetSequenceAndQualities(seq, quals);
+        const string seq = string(newQuals.size(), 'N');
+        auto record = BamRecordTests::MakeCigaredRecord(seq, newCigar, newStrand);
+        record.Impl().SetSequenceAndQualities(seq, newQuals);
         return record;
     };
 
@@ -454,10 +454,10 @@ void CheckSequenceClippedAndAligned(const string& cigar,
                                     const ExpectedResult<string>& e)
 {
     // aligned record w/ SEQ
-    auto makeRecord = [](const string& seq,
-                         const string& cigar,
-                         const Strand strand)
-    { return BamRecordTests::MakeCigaredRecord(seq, cigar, strand); };
+    auto makeRecord = [](const string& newSeq,
+                         const string& newCigar,
+                         const Strand newStrand)
+    { return BamRecordTests::MakeCigaredRecord(newSeq, newCigar, newStrand); };
 
     // SEQ
     CheckAlignAndClip(cigar, input, e, makeRecord,
@@ -478,12 +478,12 @@ void CheckPulseBaseTags(const string& cigar,
                         const ExpectedResult<string>& basecallsOnly)
 {
     // aligned record + AltLabelTag
-    auto makeRecord = [](const string& seqBases,
-                         const string& pulseCalls,
-                         const string& pulseBases,
-                         const string& cigar,
-                         const Strand strand)
-    { return MakeCigaredPulseBaseRecord(seqBases, pulseCalls, pulseBases, cigar, strand); };
+    auto makeRecord = [](const string& newSeqBases,
+                         const string& newPulseCalls,
+                         const string& newPulseBases,
+                         const string& newCigar,
+                         const Strand newStrand)
+    { return MakeCigaredPulseBaseRecord(newSeqBases, newPulseCalls, newPulseBases, newCigar, newStrand); };
 
     // AltLabelTag
     CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseBases, allPulses, basecallsOnly, makeRecord,
@@ -514,12 +514,12 @@ void CheckPulseFrameTags(const string& cigar,
                          const ExpectedResult<vector<uint16_t>>& basecallsOnly)
 {
     // aligned record + PrePulseFrames
-    auto makeRecord = [](const string& seqBases,
-                         const string& pulseCalls,
-                         const vector<uint16_t>& pulseFrames,
-                         const string& cigar,
-                         const Strand strand)
-    { return MakeCigaredPulseFrameRecord(seqBases, pulseCalls, pulseFrames, cigar, strand); };
+    auto makeRecord = [](const string& newSeqBases,
+                         const string& newPulseCalls,
+                         const vector<uint16_t>& newPulseFrames,
+                         const string& newCigar,
+                         const Strand newStrand)
+    { return MakeCigaredPulseFrameRecord(newSeqBases, newPulseCalls, newPulseFrames, newCigar, newStrand); };
 
     // PrePulseFrame
     CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseFrames, allPulses, basecallsOnly, makeRecord,
@@ -558,12 +558,12 @@ void CheckPulseQualityTags(const string& cigar,
                            const ExpectedResult<string>& basecallsOnly)
 {
     // aligned record + AltLabelQV
-    auto makeRecord = [](const string& seqBases,
-                         const string& pulseCalls,
-                         const string& pulseQuals,
-                         const string& cigar,
-                         const Strand strand)
-    { return MakeCigaredPulseQualRecord(seqBases, pulseCalls, pulseQuals, cigar, strand); };
+    auto makeRecord = [](const string& newSeqBases,
+                         const string& newPulseCalls,
+                         const string& newPulseQuals,
+                         const string& newCigar,
+                         const Strand newStrand)
+    { return MakeCigaredPulseQualRecord(newSeqBases, newPulseCalls, newPulseQuals, newCigar, newStrand); };
 
     // AltLabelQV
     CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseQuals, allPulses, basecallsOnly, makeRecord,
@@ -603,12 +603,12 @@ void CheckPulseUIntTags(const string& cigar,
                         const ExpectedResult<vector<uint32_t>>& basecallsOnly)
 {
    // aligned record + StartFrame
-   auto makeRecord = [](const string& seqBases,
-                        const string& pulseCalls,
-                        const vector<uint32_t>& startFrames,
-                        const string& cigar,
-                        const Strand strand)
-   { return MakeCigaredPulseUIntRecord(seqBases, pulseCalls, startFrames, cigar, strand); };
+   auto makeRecord = [](const string& newSeqBases,
+                        const string& newPulseCalls,
+                        const vector<uint32_t>& newStartFrames,
+                        const string& newCigar,
+                        const Strand newStrand)
+   { return MakeCigaredPulseUIntRecord(newSeqBases, newPulseCalls, newStartFrames, newCigar, newStrand); };
 
    // StartFrame
    CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, startFrames, allPulses, basecallsOnly, makeRecord,
