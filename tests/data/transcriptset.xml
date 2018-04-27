@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pbds:TranscriptSet CreatedAt="2018-04-20T17:33:59.218Z" MetaType="PacBio.DataSet.TranscriptSet" Name="2016-08-30_AppsInst_SMS_Flea_IsoSeq_RC0_largeSizeTranscripts_2 (P5--P3) (unpolished)" Tags="barcoded,unpolished" TimeStampedName="2016-08-30_AppsInst_SMS_Flea_IsoSeq_RC0_largeSizeTranscripts_2 (P5--P3) (unpolished)-180420_173359218" UniqueId="66b978ae-27bb-a9e9-abde-5a4e00d256e3" Version="3.0.1" xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDatasets.xsd">
+	<pbbase:ExternalResources>
+		<pbbase:ExternalResource MetaType="PacBio.TranscriptReadFile.TranscriptReadBamFile" ResourceId="./transcript.subreads.bam" TimeStampedName="pacbio_transcriptreadfile_transcriptreadbamfile-180420_173359218" UniqueId="47874301-b8c8-415e-bcb9-d547a8527a78" Version="3.0.1">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex MetaType="PacBio.Index.PacBioIndex" ResourceId="./transcript.subreads.bam.pbi" TimeStampedName="pacbio_index_pacbioindex-180420_173359218" UniqueId="097702db-54b9-4b7b-aa87-f21bfb820097" Version="3.0.1"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+	</pbbase:ExternalResources>
+	<pbds:Filters>
+		<pbds:Filter>
+			<pbbase:Properties>
+				<pbbase:Property Name="movie" Operator="=" Value="transcript"/>
+			</pbbase:Properties>
+		</pbds:Filter>
+	</pbds:Filters>
+	<pbds:DataSetMetadata>
+		<pbds:TotalLength>0</pbds:TotalLength>
+		<pbds:NumRecords>4</pbds:NumRecords>
+	</pbds:DataSetMetadata>
+</pbds:TranscriptSet>

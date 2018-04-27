@@ -657,4 +657,32 @@ TEST(PbiFilterQueryTest, TranscriptRecords)
         EXPECT_EQ(1, observed.at(0));
         EXPECT_EQ(4, observed.at(1));
     }
+
+    {  // movie name
+        std::vector<int32_t> observed;
+
+        PbiFilter filter{PbiMovieNameFilter{"transcript"}};
+        PbiFilterQuery query{filter, transcriptFn};
+        for (const auto& b : query) {
+            observed.push_back(b.HoleNumber());
+        }
+
+        EXPECT_EQ(4, observed.size());
+    }
+
+    {  // movie name from DataSet
+
+        const std::string datasetFn = PbbamTestsConfig::Data_Dir + "/transcriptset.xml";
+
+        std::vector<int32_t> observed;
+
+        PacBio::BAM::DataSet ds(datasetFn);
+        PacBio::BAM::PbiFilter filter = PacBio::BAM::PbiFilter::FromDataSet(ds);
+        PbiFilterQuery query{filter, ds};
+        for (const auto& b : query) {
+            observed.push_back(b.HoleNumber());
+        }
+
+        EXPECT_EQ(4, observed.size());
+    }
 }
