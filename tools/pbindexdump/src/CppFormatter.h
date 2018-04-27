@@ -14,6 +14,6 @@ public:
     void Run();
 };
 
-} // namespace pbindexdump
+}  // namespace pbindexdump
 
-#endif // CPPFORMATTER_H
+#endif  // CPPFORMATTER_H

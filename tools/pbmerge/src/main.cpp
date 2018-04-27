@@ -1,10 +1,10 @@
 // Author: Derek Barnett
 
-#include "../common/OptionParser.h"
-#include "../common/BamFileMerger.h"
-#include "PbMergeVersion.h"
 #include <cassert>
 #include <iostream>
+#include "../common/BamFileMerger.h"
+#include "../common/OptionParser.h"
+#include "PbMergeVersion.h"
 using namespace std;
 
 namespace pbmerge {
@@ -12,8 +12,7 @@ namespace pbmerge {
 class Settings
 {
 public:
-    static Settings FromCommandLine(optparse::OptionParser& parser,
-                                    int argc, char* argv[])
+    static Settings FromCommandLine(optparse::OptionParser& parser, int argc, char* argv[])
     {
         pbmerge::Settings settings;
         const optparse::Values options = parser.parse_args(argc, argv);
@@ -29,16 +28,16 @@ public:
         if (options.is_set("output"))
             settings.outputFilename_ = options["output"];
         else
-            settings.outputFilename_ = "-"; // stdout
+            settings.outputFilename_ = "-";  // stdout
 
         // PBI?
         if (settings.outputFilename_ == "-")
-            settings.createPbi_ = false; // always skip PBI if writing to stdout
+            settings.createPbi_ = false;  // always skip PBI if writing to stdout
         else {
             if (options.is_set("no_pbi"))
-                settings.createPbi_ = !options.get("no_pbi"); // user-disabled
+                settings.createPbi_ = !options.get("no_pbi");  // user-disabled
             else
-                settings.createPbi_ = true; // not specified, go ahead and generate by default
+                settings.createPbi_ = true;  // not specified, go ahead and generate by default
         }
 
         return settings;
@@ -51,19 +50,19 @@ public:
     std::vector<std::string> errors_;
 
 private:
-    Settings() { }
+    Settings() {}
 };
 
-} // namespace pbmerge
+}  // namespace pbmerge
 
 int main(int argc, char* argv[])
 {
     // setup help & options
     optparse::OptionParser parser;
-    parser.description("pbmerge merges PacBio BAM files. If the input is DataSetXML, "
-                       "any filters will be applied. If no output filename is specified, "
-                       "new BAM will be written to stdout."
-                       );
+    parser.description(
+        "pbmerge merges PacBio BAM files. If the input is DataSetXML, "
+        "any filters will be applied. If no output filename is specified, "
+        "new BAM will be written to stdout.");
     parser.prog("pbmerge");
     parser.usage("pbmerge [options] [-o <out.bam>] <INPUT>");
     parser.version(pbmerge::Version);
@@ -71,25 +70,19 @@ int main(int argc, char* argv[])
     parser.add_help_option(true);
 
     auto ioGroup = optparse::OptionGroup(parser, "Input/Output");
-    ioGroup.add_option("-o")
-           .dest("output")
-           .metavar("output")
-           .help("Output BAM filename. ");
+    ioGroup.add_option("-o").dest("output").metavar("output").help("Output BAM filename. ");
     ioGroup.add_option("--no-pbi")
-            .dest("no_pbi")
-            .action("store_true")
-            .help("Set this option to skip PBI index file creation. PBI creation is "
-                  "automatically skipped if no output filename is provided."
-                  );
-    ioGroup.add_option("")
-           .dest("input")
-           .metavar("INPUT")
-           .help("Input may be one of:\n"
-                 "    DataSetXML, list of BAM files, or FOFN\n\n"
-                 "    fofn: pbmerge -o merged.bam bams.fofn\n\n"
-                 "    bams: pbmerge -o merged.bam 1.bam 2.bam 3.bam\n\n"
-                 "    xml:  pbmerge -o merged.bam foo.subreadset.xml\n\n"
-                 );
+        .dest("no_pbi")
+        .action("store_true")
+        .help(
+            "Set this option to skip PBI index file creation. PBI creation is "
+            "automatically skipped if no output filename is provided.");
+    ioGroup.add_option("").dest("input").metavar("INPUT").help(
+        "Input may be one of:\n"
+        "    DataSetXML, list of BAM files, or FOFN\n\n"
+        "    fofn: pbmerge -o merged.bam bams.fofn\n\n"
+        "    bams: pbmerge -o merged.bam 1.bam 2.bam 3.bam\n\n"
+        "    xml:  pbmerge -o merged.bam foo.subreadset.xml\n\n");
     parser.add_option_group(ioGroup);
 
     // parse command line for settings
@@ -107,9 +100,9 @@ int main(int argc, char* argv[])
     try {
         // setup our @PG entry to add to header
         PacBio::BAM::ProgramInfo mergeProgram;
-        mergeProgram.Id(string("pbmerge-")+pbmerge::Version)
-                    .Name("pbmerge")
-                    .Version(pbmerge::Version);
+        mergeProgram.Id(string("pbmerge-") + pbmerge::Version)
+            .Name("pbmerge")
+            .Version(pbmerge::Version);
 
         PacBio::BAM::DataSet dataset;
         if (settings.inputFilenames_.size() == 1)
@@ -117,22 +110,17 @@ int main(int argc, char* argv[])
         else
             dataset = PacBio::BAM::DataSet(settings.inputFilenames_);
 
-
-        PacBio::BAM::common::BamFileMerger::Merge(dataset,
-                                                  settings.outputFilename_,
-                                                  mergeProgram,
+        PacBio::BAM::common::BamFileMerger::Merge(dataset, settings.outputFilename_, mergeProgram,
                                                   settings.createPbi_);
 
-
-//        PacBio::BAM::common::BamFileMerger merger(dataset,
-//                                                  settings.outputFilename_,
-//                                                  mergeProgram,
-//                                                  settings.createPbi_);
-//        merger.Merge();
+        //        PacBio::BAM::common::BamFileMerger merger(dataset,
+        //                                                  settings.outputFilename_,
+        //                                                  mergeProgram,
+        //                                                  settings.createPbi_);
+        //        merger.Merge();
 
         return EXIT_SUCCESS;
-    }
-    catch (std::exception& e) {
+    } catch (std::exception& e) {
         cerr << "ERROR: " << e.what() << endl;
         return EXIT_FAILURE;
     }

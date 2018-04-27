@@ -6,4 +6,4 @@ PLATFORM=$(uname)
 TOOLSPATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 CLANGFORMAT="${TOOLSPATH}/${PLATFORM}/clang-format -style=file"
 
-find include src tests/src tests/unit \( -name *.cpp -or -name *.h \) -not -name pugi* -print0 | xargs -n1 -0 ${CLANGFORMAT} -i
+find include src tests/src tools \( -name *.cpp -or -name *.h \) -not -name pugi* -print0 | xargs -n1 -0 ${CLANGFORMAT} -i

@@ -3,26 +3,21 @@
 #include "PbIndex.h"
 #include <pbbam/BamFile.h>
 #include <pbbam/PbiRawData.h>
-#include <iostream>
 #include <cassert>
 #include <cstdlib>
+#include <iostream>
 using namespace pbindex;
 using namespace std;
 
-Settings::Settings()
-    : printPbiContents_(false)
-{ }
+Settings::Settings() : printPbiContents_(false) {}
 
 int PbIndex::Create(const Settings& settings)
 {
-    try
-    {
+    try {
         PacBio::BAM::BamFile bamFile(settings.inputBamFilename_);
         bamFile.CreatePacBioIndex();
         return EXIT_SUCCESS;
-    }
-    catch (std::runtime_error& e)
-    {
+    } catch (std::runtime_error& e) {
         cerr << "pbindex ERROR: " << e.what() << endl;
         return EXIT_FAILURE;
     }
@@ -35,9 +30,8 @@ int PbIndex::Create(const Settings& settings)
 
 int PbIndex::Run(const Settings& settings)
 {
-//    if (settings.printPbiContents_)
-//        return Print(settings);
-//    else
-        return Create(settings);
+    //    if (settings.printPbiContents_)
+    //        return Print(settings);
+    //    else
+    return Create(settings);
 }
-

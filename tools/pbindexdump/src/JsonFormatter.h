@@ -3,9 +3,9 @@
 #ifndef JSONFORMATTER_H
 #define JSONFORMATTER_H
 
+#include <pbbam/PbiRawData.h>
 #include "IFormatter.h"
 #include "json.hpp"
-#include <pbbam/PbiRawData.h>
 
 namespace pbindexdump {
 
@@ -29,6 +29,6 @@ private:
     nlohmann::json json_;
 };
 
-} // namespace pbindexdump
+}  // namespace pbindexdump
 
-#endif // JSONFORMATTER_H
+#endif  // JSONFORMATTER_H

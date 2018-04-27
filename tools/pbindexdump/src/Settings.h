@@ -11,11 +11,7 @@ namespace pbindexdump {
 class Settings
 {
 public:
-    Settings(void)
-        : format_("json")
-        , jsonIndentLevel_(4)
-        , jsonRaw_(false)
-    { }
+    Settings(void) : format_("json"), jsonIndentLevel_(4), jsonRaw_(false) {}
 
 public:
     std::string inputPbiFilename_;
@@ -25,6 +21,6 @@ public:
     std::vector<std::string> errors_;
 };
 
-} // namespace pbindexdump
+}  // namespace pbindexdump
 
-#endif // SETTINGS_H
+#endif  // SETTINGS_H
