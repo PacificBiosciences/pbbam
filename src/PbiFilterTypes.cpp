@@ -67,7 +67,19 @@ IndexList readLengthHelper(const std::vector<T>& start, const std::vector<T>& en
 
 static PbiFilter filterFromMovieName(const std::string& movieName, bool includeCcs)
 {
-    // we'll match on any rgIds from our candidate list
+    //
+    // All transcript-type reads (movieName == "transcript") have the same
+    // read group ID. Calculate once & and create filters from that ID.
+    //
+    if (movieName == "transcript") {
+        static const auto transcriptRgId = MakeReadGroupId("transcript", "TRANSCRIPT");
+        return PbiFilter{PbiReadGroupFilter{transcriptRgId}};
+    }
+
+    //
+    // For all other movie names, we can't determine read type, so we'll match
+    // on any rgIds from a candidate list.
+    //
     auto filter = PbiFilter{PbiFilter::UNION};
     filter.Add({PbiReadGroupFilter{MakeReadGroupId(movieName, "POLYMERASE")},
                 PbiReadGroupFilter{MakeReadGroupId(movieName, "HQREGION")},
