@@ -24,7 +24,7 @@ namespace common {
 class ICollator
 {
 public:
-    ~ICollator(void) { }
+    virtual ~ICollator(void) = default;
 
     bool GetNext(BamRecord& record)
     {

@@ -10,7 +10,7 @@ namespace pbindexdump {
 class IFormatter
 {
 public:
-    ~IFormatter(void) { }
+    virtual ~IFormatter(void) = default;
 
 public:
     virtual void Run(void) =0;
