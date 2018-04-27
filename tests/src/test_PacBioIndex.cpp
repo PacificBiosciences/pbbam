@@ -216,7 +216,7 @@ TEST(PacBioIndexTest, CreateOnTheFly)
                                                      33874621, 1392836608};
         BamRecord r;
         BamReader reader(PacBioIndexTests::test2BamFn);
-        for (int i = 0; i < originalFileOffsets.size(); ++i) {
+        for (size_t i = 0; i < originalFileOffsets.size(); ++i) {
             reader.VirtualSeek(originalFileOffsets.at(i));
             EXPECT_TRUE(CanRead(reader, r, i));
         }
@@ -226,11 +226,11 @@ TEST(PacBioIndexTest, CreateOnTheFly)
     {
         BamRecord r;
         BamReader reader(tempBamFn);
-        for (int i = 0; i < expectedNewOffsets.size(); ++i) {
+        for (size_t i = 0; i < expectedNewOffsets.size(); ++i) {
             reader.VirtualSeek(expectedNewOffsets.at(i));
             EXPECT_TRUE(CanRead(reader, r, i));
         }
-        for (int i = 0; i < observedOffsets.size(); ++i) {
+        for (size_t i = 0; i < observedOffsets.size(); ++i) {
             reader.VirtualSeek(observedOffsets.at(i));
             EXPECT_TRUE(CanRead(reader, r, i));
         }

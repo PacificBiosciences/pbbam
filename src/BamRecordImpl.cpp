@@ -47,7 +47,7 @@ bool HasLongCigar(const bam1_t* const b)
     // if existing CIGAR doesn't look like a 'fake CIGAR'
     const auto firstCigarOp = *(bam_get_cigar(b));
     if (bam_cigar_op(firstCigarOp) != static_cast<uint32_t>(CigarOperationType::SOFT_CLIP) ||
-        bam_cigar_oplen(firstCigarOp) != c->l_qseq) {
+        static_cast<int32_t>(bam_cigar_oplen(firstCigarOp)) != c->l_qseq) {
         return false;
     }
 
@@ -274,7 +274,11 @@ void BamRecordImpl::MaybeReallocData()
 {
     // about to grow data contents to l_data size, but m_data is our current max.
     // so we may need to grow. if so, use kroundup to double to next power of 2
-    if (d_->m_data < d_->l_data) {
+    //
+    // from sam.h:
+    //   decltype(m_data) = uint32_t
+    //   decltype(l_data) = int
+    if (d_->m_data < static_cast<uint32_t>(d_->l_data)) {
         d_->m_data = d_->l_data;
         kroundup32(d_->m_data);
         d_->data = static_cast<uint8_t*>(realloc(d_->data, d_->m_data));
