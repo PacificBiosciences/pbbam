@@ -527,7 +527,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_Preencoded)
     const std::string sequence = "ACGTACGTACGT";
     const std::string qualities = "?]?]?]?]?]?]";
 
-    const size_t encodedLength = static_cast<size_t>((sequence.size() + 1) / 2);
+    const size_t encodedLength = (sequence.size() + 1) / 2;
     char* encoded = static_cast<char*>(std::calloc(encodedLength, sizeof(char)));
     char* e = encoded;
 
@@ -579,7 +579,7 @@ TEST(BamRecordImplVariableDataTest, SeqQualOnly_Init_Preencoded_EmptyQual)
     const std::string sequence = "ACGTACGTACGT";
     const std::string qualities = "";
 
-    const auto encodedLength = static_cast<size_t>((sequence.size() + 1) / 2);
+    const auto encodedLength = (sequence.size() + 1) / 2;
     auto* encoded = static_cast<char*>(std::calloc(encodedLength, sizeof(char)));
     auto* e = encoded;
 

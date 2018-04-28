@@ -6915,7 +6915,7 @@ basic_json_parser_59:
 
             // return float_val if the whole number was translated and NAN
             // otherwise
-            return (reinterpret_cast<lexer_char_t*>(endptr) == m_cursor) ? float_val : NAN;
+            return (reinterpret_cast<lexer_char_t*>(endptr) == m_cursor) ? float_val : static_cast<long double>(NAN);
         }
 
       private:
@@ -7290,8 +7290,7 @@ no parse error occurred.
 */
 inline nlohmann::json operator "" _json(const char* s, std::size_t)
 {
-    return nlohmann::json::parse(reinterpret_cast<nlohmann::json::string_t::value_type*>
-                                 (const_cast<char*>(s)));
+    return nlohmann::json::parse(s);
 }
 
 #endif

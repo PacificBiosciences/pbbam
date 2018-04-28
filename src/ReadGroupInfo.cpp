@@ -319,7 +319,7 @@ void ReadGroupInfo::DecodeSamDescription(const std::string& description)
                 barcodeHash_ = value;
                 hasBarcodeHash = true;
             } else if (key == internal::token_BC) {
-                barcodeCount_ = static_cast<size_t>(std::stoul(value));
+                barcodeCount_ = std::stoul(value);
                 hasBarcodeCount = true;
             } else if (key == internal::token_BM) {
                 barcodeMode_ = internal::BarcodeModeFromName(value);

@@ -203,7 +203,7 @@ void PbiIndexIO::LoadHeader(PbiRawData& index, BGZF* fp)
     }
 
     index.Version(PbiFile::VersionEnum(version));
-    index.FileSections(PbiFile::Sections(sections));
+    index.FileSections(sections);
     index.NumReads(numReads);
 
     // skip reserved section
@@ -311,7 +311,7 @@ void PbiIndexIO::WriteHeader(const PbiRawData& index, BGZF* fp)
 
     // version, pbi_flags, & n_reads
     auto version = static_cast<uint32_t>(index.Version());
-    auto pbi_flags = static_cast<uint16_t>(index.FileSections());
+    uint16_t pbi_flags = index.FileSections();
     auto numReads = static_cast<uint16_t>(index.NumReads());
     if (fp->is_be) {
         version = ed_swap_4(version);

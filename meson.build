@@ -17,7 +17,15 @@ project(
 pbbam_warning_flags = []
 cpp = meson.get_compiler('cpp')
 foreach cflag: [
-  '-Wshadow']
+  '-Wduplicated-cond',
+  '-Wduplicated-branches',
+  '-Wlogical-op',
+  '-Wrestrict',
+  '-Wnull-dereference',
+  '-Wuseless-cast',
+  '-Wdouble-promotion',
+  '-Wshadow',
+  '-Wformat=1']
     if cpp.has_argument(cflag)
       pbbam_warning_flags += cflag
     endif

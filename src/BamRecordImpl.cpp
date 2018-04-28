@@ -424,7 +424,7 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
     // diffNumBytes: pos -> growing, neg -> shrinking
     const auto encodedSequenceLength = static_cast<int>((sequenceLength + 1) / 2);
     const int oldSeqAndQualLength =
-        static_cast<int>((d_->core.l_qseq + 1) / 2) + d_->core.l_qseq;       // encoded seq + qual
+        ((d_->core.l_qseq + 1) / 2) + d_->core.l_qseq;                       // encoded seq + qual
     const int newSeqAndQualLength = encodedSequenceLength + sequenceLength;  // encoded seq + qual
     const int diffNumBytes = newSeqAndQualLength - oldSeqAndQualLength;
     const int oldLengthData = d_->l_data;
@@ -432,10 +432,9 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
     MaybeReallocData();
 
     // shift trailing data (tags) as needed
-    const uint8_t* oldTagStart = bam_get_aux(d_);
+    const unsigned char* oldTagStart = bam_get_aux(d_);
     const size_t trailingDataLength =
-        oldLengthData - (reinterpret_cast<const unsigned char*>(oldTagStart) -
-                         reinterpret_cast<const unsigned char*>(d_->data));
+        oldLengthData - (oldTagStart - reinterpret_cast<const unsigned char*>(d_->data));
     d_->core.l_qseq = sequenceLength;
     uint8_t* newTagStart = bam_get_aux(d_);
     memmove(newTagStart, oldTagStart, trailingDataLength);

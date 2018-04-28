@@ -24,7 +24,7 @@ using Position = int32_t;
 /// \brief This constant is widely used as a "missing" or "invalid" position
 ///        marker.
 ///
-static const Position UnmappedPosition = Position(-1);
+static const Position UnmappedPosition{-1};
 
 }  // namespace BAM
 }  // namespace PacBio
