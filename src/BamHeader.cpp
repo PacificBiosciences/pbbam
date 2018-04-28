@@ -59,20 +59,20 @@ static void EnsureCanMerge(const BamHeader& lhs, const BamHeader& rhs)
     if (sortOrderOk && pbVersionOk && sequencesOk) return;
 
     // if any checks failed, format error message & throw
-    std::stringstream e;
-    e << "could not merge BAM headers:" << std::endl;
+    std::ostringstream e;
+    e << "could not merge BAM headers:\n";
 
     if (!sortOrderOk) {
         e << "  mismatched sort orders (@HD:SO) : (" << lhs.SortOrder() << ", " << rhs.SortOrder()
-          << ")" << std::endl;
+          << ")\n";
     }
 
     if (!pbVersionOk) {
         e << "  incompatible PacBio BAM versions (@HD:pb) : (" << lhs.PacBioBamVersion() << ", "
-          << rhs.PacBioBamVersion() << ")" << std::endl;
+          << rhs.PacBioBamVersion() << ")\n";
     }
 
-    if (!sequencesOk) e << "  mismatched sequence lists (@SQ entries)" << std::endl;
+    if (!sequencesOk) e << "  mismatched sequence lists (@SQ entries)\n";
 
     throw std::runtime_error(e.str());
 }
@@ -81,8 +81,8 @@ static void EnsureCanMerge(const BamHeader& lhs, const BamHeader& rhs)
 
 BamHeader::BamHeader(const std::string& samHeaderText) : d_(new internal::BamHeaderPrivate)
 {
-    std::stringstream s(samHeaderText);
-    std::string line("");
+    std::istringstream s{samHeaderText};
+    std::string line;
     std::string firstToken;
     while (getline(s, line)) {
 
@@ -305,7 +305,7 @@ BamHeader& BamHeader::Sequences(const std::vector<SequenceInfo>& sequences)
 std::string BamHeader::ToSam() const
 {
     // init stream
-    std::stringstream out("");
+    std::ostringstream out;
 
     // @HD
     const auto outputVersion = (d_->version_.empty() ? std::string(hts_version()) : d_->version_);
@@ -317,23 +317,23 @@ std::string BamHeader::ToSam() const
     out << internal::BamHeaderPrefixHD
         << internal::MakeSamTag(internal::BamHeaderTokenVN, outputVersion)
         << internal::MakeSamTag(internal::BamHeaderTokenSO, outputSortOrder)
-        << internal::MakeSamTag(internal::BamHeaderTokenpb, outputPbBamVersion) << std::endl;
+        << internal::MakeSamTag(internal::BamHeaderTokenpb, outputPbBamVersion) << '\n';
 
     // @SQ
     for (const auto& seq : d_->sequences_)
-        out << seq.ToSam() << std::endl;
+        out << seq.ToSam() << '\n';
 
     // @RG
     for (const auto& rgIter : d_->readGroups_)
-        out << rgIter.second.ToSam() << std::endl;
+        out << rgIter.second.ToSam() << '\n';
 
     // @PG
     for (const auto& progIter : d_->programs_)
-        out << progIter.second.ToSam() << std::endl;
+        out << progIter.second.ToSam() << '\n';
 
     // @CO
     for (const auto& comment : d_->comments_)
-        out << internal::BamHeaderPrefixCO << '\t' << comment << std::endl;
+        out << internal::BamHeaderPrefixCO << '\t' << comment << '\n';
 
     // return result
     return out.str();

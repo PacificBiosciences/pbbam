@@ -37,18 +37,18 @@ const char* ValidationException::what() const noexcept { return msg_.c_str(); }
 
 void ValidationException::FormatMessage()
 {
-    std::stringstream s;
-    s << "Validation failed: " << std::endl;
+    std::ostringstream s;
+    s << "Validation failed:\n";
 
     // file errors
     if (!fileErrors_.empty()) {
         auto fileIter = fileErrors_.cbegin();
         auto fileEnd = fileErrors_.cend();
         for (; fileIter != fileEnd; ++fileIter) {
-            s << "  In file (" << fileIter->first << ") : " << std::endl;
+            s << "  In file (" << fileIter->first << ") : \n";
             const auto& errors = fileIter->second;
             for (const auto& e : errors)
-                s << "    " << e << std::endl;
+                s << "    " << e << '\n';
         }
     }
 
@@ -57,10 +57,10 @@ void ValidationException::FormatMessage()
         auto rgIter = readGroupErrors_.cbegin();
         auto rgEnd = readGroupErrors_.cend();
         for (; rgIter != rgEnd; ++rgIter) {
-            s << "  In read group (" << rgIter->first << ") : " << std::endl;
+            s << "  In read group (" << rgIter->first << ") :\n";
             const auto& errors = rgIter->second;
             for (const auto& e : errors)
-                s << "    " << e << std::endl;
+                s << "    " << e << '\n';
         }
     }
 
@@ -69,10 +69,10 @@ void ValidationException::FormatMessage()
         auto recIter = recordErrors_.cbegin();
         auto recEnd = recordErrors_.cend();
         for (; recIter != recEnd; ++recIter) {
-            s << "  In record (" << recIter->first << ") : " << std::endl;
+            s << "  In record (" << recIter->first << ") : \n";
             const auto& errors = recIter->second;
             for (const auto& e : errors)
-                s << "    " << e << std::endl;
+                s << "    " << e << '\n';
         }
     }
 

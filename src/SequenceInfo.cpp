@@ -76,7 +76,7 @@ bool SequenceInfo::IsValid() const
 
 std::string SequenceInfo::ToSam() const
 {
-    std::stringstream out;
+    std::ostringstream out;
     out << "@SQ" << internal::MakeSamTag(internal::token_SN, name_);
 
     // clang-format off

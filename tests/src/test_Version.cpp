@@ -288,7 +288,7 @@ TEST(VersionTest, OutputStreamOk)
     Version v(3, 1, 4);
     Version v2(4, 10, 0);
 
-    stringstream s;
+    ostringstream s;
     s << v << ", " << v2 << ", " << v << endl;
 
     EXPECT_EQ(string("3.1.4, 4.10.0, 3.1.4\n"), s.str());

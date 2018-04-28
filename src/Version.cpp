@@ -43,7 +43,7 @@ Version::Version(const std::string& v) : major_(0), minor_(0), revision_(0)
 
 std::string Version::ToString() const
 {
-    std::stringstream s;
+    std::ostringstream s;
     s << major_ << '.' << minor_ << '.' << revision_;
     return s.str();
 }

@@ -68,7 +68,7 @@ static string str_replace(const string& s, const string& patt, const string& rep
 }
 static string str_format(const string& s, size_t pre, size_t len, bool indent_first = true)
 {
-    stringstream ss;
+    ostringstream ss;
     string p;
     if (indent_first) p = string(pre, ' ');
 
@@ -96,7 +96,7 @@ static string str_format(const string& s, size_t pre, size_t len, bool indent_fi
 }
 static string str_inc(const string& s)
 {
-    stringstream ss;
+    ostringstream ss;
     string v = (s != "") ? s : "0";
     long i;
     istringstream(v) >> i;
@@ -358,7 +358,7 @@ void OptionParser::process_opt(const Option& o, const string& opt, const string&
 
 string OptionParser::format_option_help(unsigned int indent /* = 2 */) const
 {
-    stringstream ss;
+    ostringstream ss;
 
     if (_opts.empty()) return ss.str();
 
@@ -371,7 +371,7 @@ string OptionParser::format_option_help(unsigned int indent /* = 2 */) const
 
 string OptionParser::format_help() const
 {
-    stringstream ss;
+    ostringstream ss;
 
     if (usage() != SUPPRESS_USAGE) ss << get_usage() << endl;
 
@@ -405,7 +405,7 @@ void OptionParser::set_usage(const string& u)
 }
 string OptionParser::format_usage(const string& u) const
 {
-    stringstream ss;
+    ostringstream ss;
     ss << _("Usage") << ": " << u << endl;
     return ss.str();
 }
@@ -454,7 +454,7 @@ void Values::is_set_by_user(const string& d, bool yes)
 string Option::check_type(const string& opt, const string& val) const
 {
     istringstream ss(val);
-    stringstream err;
+    ostringstream err;
 
     if (type() == "int" || type() == "long") {
         long t;
@@ -497,7 +497,7 @@ string Option::format_option_help(unsigned int indent /* = 2 */) const
         mvar_long = "=" + mvar;
     }
 
-    stringstream ss;
+    ostringstream ss;
     ss << string(indent, ' ');
 
     if (not _short_opts.empty()) {
@@ -515,7 +515,7 @@ string Option::format_option_help(unsigned int indent /* = 2 */) const
 
 string Option::format_help(unsigned int indent /* = 2 */) const
 {
-    stringstream ss;
+    ostringstream ss;
     string h = format_option_help(indent);
     unsigned int width = cols();
     unsigned int opt_width = min(width * 3 / 10, 36u);

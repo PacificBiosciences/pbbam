@@ -59,14 +59,14 @@ const vector<string> generatedFiles = {generatedBamFn, generatedSamFn};
 static inline int RunBam2Sam(const string& bamFn, const string& samFn,
                              const string& args = string())
 {
-    stringstream s;
+    ostringstream s;
     s << PbbamTestsConfig::Bam2Sam << " " << args << " " << bamFn << " > " << samFn;
     return system(s.str().c_str());
 }
 
 static inline int RunDiff(const string& fn1, const string& fn2)
 {
-    stringstream s;
+    ostringstream s;
     s << "diff " << fn1 << " " << fn2;
     return system(s.str().c_str());
 }

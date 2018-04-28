@@ -153,10 +153,10 @@ inline GenomicIntervalCompositeBamReader& GenomicIntervalCompositeBamReader::Int
 
     // throw if any files missing BAI
     if (!missingBai.empty()) {
-        std::stringstream e;
-        e << "failed to open GenomicIntervalCompositeBamReader because the following files are missing a BAI file:" << std::endl;
+        std::ostringstream e;
+        e << "failed to open GenomicIntervalCompositeBamReader because the following files are missing a BAI file:\n";
         for (const auto& fn : missingBai)
-            e << "  " << fn << std::endl;
+            e << "  " << fn << '\n';
         throw std::runtime_error(e.str());
     }
 
@@ -305,10 +305,10 @@ PbiFilterCompositeBamReader<OrderByType>::Filter(const PbiFilter& filter)
 
     // throw if any files missing PBI
     if (!missingPbi.empty()) {
-        std::stringstream e;
-        e << "failed to open PbiFilterCompositeBamReader because the following files are missing a PBI file:" << std::endl;
+        std::ostringstream e;
+        e << "failed to open PbiFilterCompositeBamReader because the following files are missing a PBI file:\n";
         for (const auto& fn : missingPbi)
-            e << "  " << fn << std::endl;
+            e << "  " << fn << '\n';
         throw std::runtime_error(e.str());
     }
 

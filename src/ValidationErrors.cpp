@@ -76,7 +76,7 @@ void ValidationErrors::AddTagLengthError(const std::string& name, std::string&& 
                                          const size_t expected)
 {
     // format
-    std::stringstream s;
+    std::ostringstream s;
     s << tagLabel << " tag (" << tagName << ") length: " << observed
       << ", does not match expected length: " << expected;
     AddRecordError(name, s.str());

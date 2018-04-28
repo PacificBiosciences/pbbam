@@ -27,7 +27,7 @@ static void CheckContainer(const std::string& container, const size_t expected,
                            const size_t observed)
 {
     if (observed != expected) {
-        std::stringstream msg;
+        std::ostringstream msg;
         msg << "PBI index error: expected " << expected << " records in " << container
             << " field, but found " << observed << " instead";
         throw std::runtime_error(msg.str());
