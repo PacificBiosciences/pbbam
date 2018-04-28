@@ -308,10 +308,9 @@ std::string BamHeader::ToSam() const
     std::stringstream out("");
 
     // @HD
-    const auto& outputVersion = (d_->version_.empty() ? std::string(hts_version()) : d_->version_);
-    const auto& outputSortOrder =
-        (d_->sortOrder_.empty() ? std::string("unknown") : d_->sortOrder_);
-    const auto& outputPbBamVersion =
+    const auto outputVersion = (d_->version_.empty() ? std::string(hts_version()) : d_->version_);
+    const auto outputSortOrder = (d_->sortOrder_.empty() ? std::string("unknown") : d_->sortOrder_);
+    const auto outputPbBamVersion =
         (d_->pacbioBamVersion_.empty() ? internal::Version::Current.ToString()
                                        : d_->pacbioBamVersion_);
 

@@ -59,7 +59,7 @@ static const std::set<std::string> AcceptedReadTypes = {
 
 static void ValidateReadGroup(const ReadGroupInfo& rg, std::unique_ptr<ValidationErrors>& errors)
 {
-    const std::string& id = rg.Id();
+    const std::string id = rg.Id();
 
     // has required fields
     if (id.empty()) errors->AddReadGroupError(id, "missing ID");
@@ -182,7 +182,7 @@ static void ValidateMetadata(const BamFile& file, std::unique_ptr<ValidationErro
 
 void ValidateMappedRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
-    const std::string& name = b.FullName();
+    const std::string name = b.FullName();
     if (b.ReferenceStart() < 0) errors->AddRecordError(name, "mapped record position is invalid");
     if (b.ReferenceId() < 0) errors->AddRecordError(name, "mapped record reference ID is invalid");
 
@@ -348,7 +348,7 @@ void ValidateRecordTagLengths(const BamRecord& b, std::unique_ptr<ValidationErro
 
 void ValidateUnmappedRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
-    const std::string& name = b.FullName();
+    const std::string name = b.FullName();
     if (b.ReferenceStart() != -1) errors->AddRecordError(name, "unmapped record has a position");
     if (b.ReferenceId() != -1) errors->AddRecordError(name, "unmapped record has a reference ID");
 }

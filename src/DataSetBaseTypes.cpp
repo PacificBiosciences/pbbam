@@ -91,7 +91,7 @@ StrictEntityType::StrictEntityType(const std::string& metatype, const std::strin
         const char c = metatype.at(i);
         transformedMetatype[i] = ((c == '.') ? '_' : tolower(c));
     }
-    const std::string& tsn =
+    const std::string tsn =
         transformedMetatype + "-" + internal::ToDataSetFormat(internal::CurrentTime());
     TimeStampedName(tsn);
 

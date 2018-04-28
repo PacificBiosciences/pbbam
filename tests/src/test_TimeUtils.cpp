@@ -25,6 +25,6 @@ TEST(TimeUtilsTest, ToDataSetFormat)
     const auto timestamp = std::chrono::system_clock::from_time_t(rawTime);
 
     const auto expected = string{"831031_061230"};  // no ms in test case
-    const std::string& actual = internal::ToDataSetFormat(timestamp);
+    const std::string actual = internal::ToDataSetFormat(timestamp);
     EXPECT_EQ(expected, actual);
 }

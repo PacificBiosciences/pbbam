@@ -433,7 +433,7 @@ TEST(ValidatorTest, TagDataLengths)
     CheckInvalidTagLength("dt", string("AA"));                 // DeletionTag
     CheckInvalidTagLength("st", string("AA"));                 // SubstitutionTag
 
-    const auto& f = Frames{vector<uint16_t>{42, 42, 42}};
+    const Frames f{{42, 42, 42}};
     const auto& frames = f.Data();
     CheckInvalidTagLength("ip", frames);  // IPD
 

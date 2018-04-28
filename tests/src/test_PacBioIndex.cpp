@@ -161,7 +161,7 @@ TEST(PacBioIndexTest, CreateFromExistingBam)
     EXPECT_EQ(10, index.NumReads());
     EXPECT_TRUE(index.HasMappedData());
 
-    const PbiRawData& expectedIndex = PacBioIndexTests::Test2Bam_ExistingIndex();
+    const PbiRawData expectedIndex = PacBioIndexTests::Test2Bam_ExistingIndex();
     PacBioIndexTests::ExpectRawIndicesEqual(expectedIndex, index);
 
     // clean up temp file(s)
@@ -237,8 +237,8 @@ TEST(PacBioIndexTest, CreateOnTheFly)
     }
 
     // compare data in new PBI file, to expected data
-    const PbiRawData& expectedIndex = PacBioIndexTests::Test2Bam_NewIndex();
-    const PbiRawData& fromBuilt = PbiRawData(tempPbiFn);
+    const PbiRawData expectedIndex = PacBioIndexTests::Test2Bam_NewIndex();
+    const PbiRawData fromBuilt = PbiRawData(tempPbiFn);
     PacBioIndexTests::ExpectRawIndicesEqual(expectedIndex, fromBuilt);
 
     // straight diff of newly-generated PBI file to existing PBI
@@ -256,10 +256,10 @@ TEST(PacBioIndexTest, CreateOnTheFly)
 TEST(PacBioIndexTest, RawLoadFromPbiFile)
 {
     const BamFile bamFile(PacBioIndexTests::test2BamFn);
-    const string& pbiFilename = bamFile.PacBioIndexFilename();
+    const string pbiFilename = bamFile.PacBioIndexFilename();
     const PbiRawData loadedIndex(pbiFilename);
 
-    const PbiRawData& expectedIndex = PacBioIndexTests::Test2Bam_ExistingIndex();
+    const PbiRawData expectedIndex = PacBioIndexTests::Test2Bam_ExistingIndex();
     PacBioIndexTests::ExpectRawIndicesEqual(expectedIndex, loadedIndex);
 }
 

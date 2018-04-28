@@ -97,7 +97,7 @@ ChemistryTable ChemistryTableFromXml(const std::string& mappingXml)
 
     std::ifstream in(mappingXml);
     pugi::xml_document doc;
-    const pugi::xml_parse_result& loadResult = doc.load(in);
+    const pugi::xml_parse_result loadResult = doc.load(in);
     if (loadResult.status != pugi::status_ok)
         throw BundleChemistryMappingException(
             mappingXml,

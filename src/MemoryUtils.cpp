@@ -30,7 +30,7 @@ BamHeader BamHeaderMemory::FromRawData(bam_hdr_t* hdr)
 
 std::shared_ptr<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& header)
 {
-    const std::string& text = header.ToSam();
+    const std::string text = header.ToSam();
     std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()),
                                        internal::HtslibHeaderDeleter());
     rawData->ignore_sam_err = 0;

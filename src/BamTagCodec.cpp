@@ -51,7 +51,7 @@ std::vector<T> readBamMultiValue(const uint8_t* src, size_t& offset)
     std::vector<T> result;
     result.reserve(numElements);
     for (size_t i = 0; i < numElements; ++i) {
-        const T& value = readBamValue<T>(src, offset);
+        const T value = readBamValue<T>(src, offset);
         result.push_back(value);
     }
     return result;
@@ -415,7 +415,7 @@ std::vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag, const TagModifier& a
 
             // string & hex-string values
             case TagDataType::STRING: {
-                const std::string& s = tag.ToString();
+                const std::string s = tag.ToString();
                 kputsn_(s.c_str(), s.size() + 1, &str);  // this adds the null-term
                 break;
             }
