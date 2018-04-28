@@ -217,8 +217,7 @@ Cigar Pbbamify::BasicToExtendedCigar(const PacBio::BAM::IndexedFastaReader& inde
     return extCigar;
 }
 
-bool Pbbamify::AugmentAlignments(const BamHeader& newHeader,
-                                 const std::shared_ptr<QueryLookup> queryLookup,
+bool Pbbamify::AugmentAlignments(const std::shared_ptr<QueryLookup> queryLookup,
                                  const PacBio::BAM::IndexedFastaReader& indexedRefReader,
                                  PacBio::BAM::BamReader& input, PacBio::BAM::BamWriter& writer,
                                  int32_t verboseLevel)
@@ -265,7 +264,7 @@ bool Pbbamify::AugmentAlignments(const BamHeader& newHeader,
         }
 
         // Update the BAM record with additional data from the PacBio dataset.
-        int rv = AugmentAlignment(newHeader, queryLookup, indexedRefReader, record, verboseLevel);
+        int rv = AugmentAlignment(queryLookup, indexedRefReader, record, verboseLevel);
 
         // In case of failure, skip the alignment. Failures should be reported by AugmentAlignment.
         if (rv == false) {
@@ -293,8 +292,7 @@ bool Pbbamify::AugmentAlignments(const BamHeader& newHeader,
     return true;
 }
 
-bool Pbbamify::AugmentAlignment(const BamHeader& newHeader,
-                                const std::shared_ptr<QueryLookup> queryLookup,
+bool Pbbamify::AugmentAlignment(const std::shared_ptr<QueryLookup> queryLookup,
                                 const PacBio::BAM::IndexedFastaReader& indexedRefReader,
                                 BamRecord& record, int32_t verboseLevel)
 {

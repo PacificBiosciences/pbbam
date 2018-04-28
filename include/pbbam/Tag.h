@@ -168,8 +168,8 @@ public:
     /// \brief Creates a Tag from a vector of floating-point values.
     Tag(const std::vector<float>& value);
 
-    Tag(const Tag& other) = default;
-    Tag(Tag&& other) = default;
+    Tag(const Tag&) = default;
+    Tag(Tag&&) = default;
     ~Tag() = default;
 
     Tag& operator=(boost::blank value);
@@ -189,8 +189,8 @@ public:
     Tag& operator=(const std::vector<uint32_t>& value);
     Tag& operator=(const std::vector<float>& value);
 
-    Tag& operator=(const Tag& other) = default;
-    Tag& operator=(Tag&& other) = default;
+    Tag& operator=(const Tag&) = default;
+    Tag& operator=(Tag&&) = default;
 
     bool operator==(const Tag& other) const;
     bool operator!=(const Tag& other) const;

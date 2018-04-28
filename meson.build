@@ -17,25 +17,11 @@ project(
 pbbam_warning_flags = []
 cpp = meson.get_compiler('cpp')
 foreach cflag: [
-  '-Wno-unused-result',
-  '-Wno-unused-parameter',
-  '-Wno-sign-compare',
-  '-Wno-non-virtual-dtor']
+  '-Wshadow']
     if cpp.has_argument(cflag)
       pbbam_warning_flags += cflag
     endif
 endforeach
-
-if cpp.get_id() == 'clang'
-  foreach cflag: [
-    '-Wno-unused-private-field',
-    '-Wno-unused-command-line-argument',
-    '-Wno-keyword-macro']
-      if cpp.has_argument(cflag)
-        pbbam_warning_flags += cflag
-      endif
-  endforeach
-endif
 
 pbbam_macros = []
 if get_option('permissive-cigar')

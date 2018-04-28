@@ -52,10 +52,10 @@ public:
     ///
     ProgramInfo(std::string id);
 
-    ProgramInfo(const ProgramInfo& other) = default;
-    ProgramInfo(ProgramInfo&& other) = default;
-    ProgramInfo& operator=(const ProgramInfo& other) = default;
-    ProgramInfo& operator=(ProgramInfo&& other) = default;
+    ProgramInfo(const ProgramInfo&) = default;
+    ProgramInfo(ProgramInfo&&) = default;
+    ProgramInfo& operator=(const ProgramInfo&) = default;
+    ProgramInfo& operator=(ProgramInfo&&) = default;
     ~ProgramInfo() = default;
 
     /// \}

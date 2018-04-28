@@ -36,8 +36,7 @@ public:
     ///
     /// \returns true if the record was successfully augmented, false otherwise.
     ///
-    static bool AugmentAlignments(const BamHeader& new_header,
-                                  const std::shared_ptr<QueryLookup> queryLookup,
+    static bool AugmentAlignments(const std::shared_ptr<QueryLookup> queryLookup,
                                   const PacBio::BAM::IndexedFastaReader& indexedRefReader,
                                   PacBio::BAM::BamReader& input, PacBio::BAM::BamWriter& writer,
                                   int32_t verboseLevel);
@@ -49,8 +48,7 @@ public:
     ///
     /// \returns true if the record was successfully augmented, false otherwise.
     ///
-    static bool AugmentAlignment(const BamHeader& newHeader,
-                                 const std::shared_ptr<QueryLookup> queryLookup,
+    static bool AugmentAlignment(const std::shared_ptr<QueryLookup> queryLookup,
                                  const PacBio::BAM::IndexedFastaReader& indexedRefReader,
                                  BamRecord& record, int32_t verboseLevel);
 

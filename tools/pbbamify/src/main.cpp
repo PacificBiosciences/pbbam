@@ -162,8 +162,7 @@ int main(int argc, char* argv[])
             PacBio::BAM::IndexedFastaReader indexedRefReader(settings.referenceFilename_);
             PacBio::BAM::BamWriter bamWriter(settings.outputFilename_, newHeader);
             bool augment_rv = PacBio::BAM::pbbamify::Pbbamify::AugmentAlignments(
-                newHeader, queryLookup, indexedRefReader, inputBamReader, bamWriter,
-                settings.verboseLevel_);
+                queryLookup, indexedRefReader, inputBamReader, bamWriter, settings.verboseLevel_);
             if (augment_rv == false) {
                 return EXIT_FAILURE;
             }

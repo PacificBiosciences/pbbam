@@ -81,22 +81,22 @@ public:
                   const QualityValues::const_iterator last);
 
     /// \brief Copy constructor
-    QualityValues(const QualityValues& other) = default;
+    QualityValues(const QualityValues&) = default;
 
     /// \brief Move constructor
-    QualityValues(QualityValues&& other) = default;
+    QualityValues(QualityValues&&) = default;
 
     /// \brief Copy assignment operator
     ///
     /// \param[in] other    QualityValues object
     ///
-    QualityValues& operator=(const QualityValues& other) = default;
+    QualityValues& operator=(const QualityValues&) = default;
 
     /// \brief Move assignment operator
     ///
     /// \param[in] other    QualityValues object
     ///
-    QualityValues& operator=(QualityValues&& other) = default;
+    QualityValues& operator=(QualityValues&&) = default;
 
     /// \brief Copy assignment operator
     ///
