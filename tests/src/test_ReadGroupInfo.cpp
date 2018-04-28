@@ -36,7 +36,7 @@ TEST(ReadGroupInfoTest, FrameCodecSetOk)
 TEST(ReadGroupInfoTest, SequencingChemistryOk)
 {
     {   // P6-C4
-        const string& chem = "P6-C4";
+        const string chem{"P6-C4"};
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100356300","100356200","2.1"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100356300","100356200","2.3"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100356300","100612400","2.1"));
@@ -54,7 +54,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
     }
 
     {   // S/P1-C1/beta
-        const string& chem = "S/P1-C1/beta";
+        const string chem{"S/P1-C1/beta"};
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-620-000","3.0"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-620-000","3.1"));
 
@@ -66,7 +66,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
     }
 
     {   // S/P1-C1.1 (Echidna)
-        const string& chem = "S/P1-C1.1";
+        const string chem{"S/P1-C1.1"};
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-867-300","3.1"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-867-300","3.2"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-867-300","3.3"));
@@ -79,7 +79,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
     }
 
     {   // S/P1-C1.2 (Flea)
-        const string& chem = "S/P1-C1.2";
+        const string chem{"S/P1-C1.2"};
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-902-100","3.1"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-902-100","3.2"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-902-100","3.3"));
@@ -91,7 +91,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
         EXPECT_EQ(chem, rg.SequencingChemistry());
     }
     {   // S/P1-C1.3 (Goat)
-        const string& chem = "S/P1-C1.3";
+        const string chem{"S/P1-C1.3"};
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-972-200","3.2"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-972-200","3.3"));
 

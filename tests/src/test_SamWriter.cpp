@@ -17,7 +17,7 @@ using namespace std;
 TEST(SamWriterTest, HeaderOk)
 {
     // setup header
-    const string hdrText = {
+    const string hdrText{
         "@HD\tVN:1.1\tSO:unknown\tpb:3.0.3\n"
         "@RG\tID:6002b307\tPL:PACBIO\tDS:READTYPE=SUBREAD;BINDINGKIT=100-619-300;"
         "SEQUENCINGKIT=100-619-400;BASECALLERVERSION=3.0;FRAMERATEHZ=100\t"
@@ -48,8 +48,8 @@ TEST(SamWriterTest, SingleRecordOk)
 {
 
     // setup header
-    const string hdrLine1 = {"@HD\tVN:1.1\tSO:unknown\tpb:3.0.3"};
-    const string hdrLine2 = {
+    const string hdrLine1{"@HD\tVN:1.1\tSO:unknown\tpb:3.0.3"};
+    const string hdrLine2{
         "@RG\tID:6002b307\tPL:PACBIO\tDS:READTYPE=SUBREAD;BINDINGKIT=100-619-300;"
         "SEQUENCINGKIT=100-619-400;BASECALLERVERSION=3.0;FRAMERATEHZ=100\t"
         "PU:test\tPM:SEQUEL"};
@@ -81,7 +81,7 @@ TEST(SamWriterTest, SingleRecordOk)
     tags["sn"] = vector<float>{0.2f, 0.2f, 0.2f, 0.2f};
     record.Impl().Tags(tags);
 
-    const string expectedSamRecord = {
+    const string expectedSamRecord{
         "test/100/0_5\t4\t*\t0\t0\t*\t*\t0\t0\tACGTC\t@@@@@\tRG:Z:6002b307\t"
         "np:i:1\tqe:i:5\tqs:i:0\trq:f:0.6\tsn:B:f,0.2,0.2,0.2,0.2\tzm:i:100"};
 

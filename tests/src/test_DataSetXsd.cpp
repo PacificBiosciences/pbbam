@@ -78,7 +78,7 @@ TEST(DataSetXsdTest, EditDatasetRegistry)
 
     dataset.Namespaces().Register(XsdType::BASE_DATA_MODEL, NamespaceInfo("custom", "http://custom/uri.xsd"));
 
-    const string expectedXml =
+    const string expectedXml{
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
         "<pbds:AlignmentSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.AlignmentSet\" "
                 "Name=\"DataSet_AlignmentSet\" Tags=\"barcode moreTags mapping mytags\" "
@@ -92,7 +92,7 @@ TEST(DataSetXsdTest, EditDatasetRegistry)
         "\t<custom:ExternalResources>\n"
         "\t\t<custom:ExternalResource MetaType=\"Fake.MetaType\" ResourceId=\"filename\" TimeStampedName=\"custom_tsn\" UniqueId=\"my_uuid\" Version=\"3.0.1\" />\n"
         "\t</custom:ExternalResources>\n"
-        "</pbds:AlignmentSet>\n";
+        "</pbds:AlignmentSet>\n"};
 
     stringstream s;
     dataset.SaveToStream(s);

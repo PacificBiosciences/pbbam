@@ -477,7 +477,7 @@ int BamRecordImpl::TagOffset(const std::string& tagName) const
 BamRecordImpl& BamRecordImpl::Tags(const TagCollection& tags)
 {
     // convert tags to binary
-    const std::vector<uint8_t>& tagData = BamTagCodec::Encode(tags);
+    const std::vector<uint8_t> tagData = BamTagCodec::Encode(tags);
     const size_t numBytes = tagData.size();
     const uint8_t* data = tagData.data();
 

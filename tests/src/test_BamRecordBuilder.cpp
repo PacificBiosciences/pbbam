@@ -165,7 +165,7 @@ TEST(BamRecordBuilderTest, CheckSetters)
     EXPECT_EQ(42, bam.Impl().Position());
     EXPECT_EQ(42, bam.Impl().ReferenceId());
 
-    const TagCollection& fetchedTags = bam.Impl().Tags();
+    const TagCollection fetchedTags = bam.Impl().Tags();
 
     EXPECT_TRUE(fetchedTags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), fetchedTags.at("HX").ToString());

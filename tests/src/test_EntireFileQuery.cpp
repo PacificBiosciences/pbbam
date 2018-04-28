@@ -64,15 +64,15 @@ TEST(BamRecordTest, HandlesDeletionOK)
         const auto rawQualities = record.Qualities(Orientation::GENOMIC, false);
         const auto alignedQualities = record.Qualities(Orientation::GENOMIC, true);
 
-        const string rawExpected =
+        const string rawExpected{
             "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
-            "IIIIIIIIIIIII";
+            "IIIIIIIIIIIII"};
 
         // 1=1D98=
-        const string alignedExpected =
+        const string alignedExpected{
             "I!"
             "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
-            "IIIIIIIIIIII";
+            "IIIIIIIIIIII"};
 
         EXPECT_EQ(rawExpected, rawQualities.Fastq());
         EXPECT_EQ(alignedExpected, alignedQualities.Fastq());

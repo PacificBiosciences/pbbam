@@ -250,7 +250,7 @@ TEST(DataSetIOTest, ToXml)
     dataset.SubDataSets().Add(subDataSet2);
 
     // write dataset
-    const string expectedXml =
+    const string expectedXml{
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
         "<pbds:AlignmentSet "
                 "CreatedAt=\"2015-01-27T09:00:01\" "
@@ -328,7 +328,7 @@ TEST(DataSetIOTest, ToXml)
         "\t\t\t</pbds:Filters>\n"
         "\t\t</pbds:DataSet>\n"
         "\t</pbds:DataSets>\n"
-        "</pbds:AlignmentSet>\n";
+        "</pbds:AlignmentSet>\n"};
 
     stringstream s;
     dataset.SaveToStream(s);
@@ -339,7 +339,7 @@ namespace DataSetIOTests {
 
 static void TestFromXmlString()
 {
-    const string inputXml =
+    const string inputXml{
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
         "<pbds:AlignmentSet "
             "CreatedAt=\"2015-01-27T09:00:01\" "
@@ -403,7 +403,7 @@ static void TestFromXmlString()
         "\t\t\t</pbds:Filters>\n"
         "\t\t</pbds:DataSet>\n"
         "\t</pbds:DataSets>\n"
-        "</pbds:AlignmentSet>\n";
+        "</pbds:AlignmentSet>\n"};
 
     const DataSet dataset = DataSet::FromXml(inputXml);
 
@@ -1374,7 +1374,7 @@ TEST(DataSetIOTest, InspectMalformedXml)
     stringstream s;
     ds.SaveToStream(s);
 
-    const string expected =
+    const string expected{
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
         "<SubreadSet CreatedAt=\"2015-08-19T15:39:36.331\" Description=\"Merged dataset from 1 files using DatasetMerger 0.1.2\" "
                     "MetaType=\"PacBio.DataSet.HdfSubreadSet\" Name=\"Subreads from runr000013_42267_150403\" "
@@ -1449,14 +1449,14 @@ TEST(DataSetIOTest, InspectMalformedXml)
                             "TimeStampedName=\"biosample_2015-08-19T15:39:36.331-07:00\" UniqueId=\"251acf71-9eb0-489e-9dd1-cdbd11432752\" />\n"
         "\t\t</ns1:BioSamples>\n"
         "\t</DataSetMetadata>\n"
-        "</SubreadSet>\n";
+        "</SubreadSet>\n"};
 
     EXPECT_EQ(expected, s.str());
 }
 
 TEST(DataSetIOTest, RelativePathCarriedThroughOk_FromString)
 {
-    const string inputXml =
+    const string inputXml{
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
         "<pbds:AlignmentSet "
             "CreatedAt=\"2015-01-27T09:00:01\" "
@@ -1496,7 +1496,7 @@ TEST(DataSetIOTest, RelativePathCarriedThroughOk_FromString)
         "\t\t\t</pbbase:FileIndices>\n"
         "\t\t</pbbase:ExternalResource>\n"
         "\t</pbbase:ExternalResources>\n"
-        "</pbds:AlignmentSet>\n";
+        "</pbds:AlignmentSet>\n"};
 
     auto dataset = DataSet::FromXml(inputXml);
 
@@ -1538,7 +1538,7 @@ TEST(DataSetIOTest, DataSetFromRelativeBamFilename)
     {
         const string relativeBamFn = "../phi29.bam";
         const DataSet ds(relativeBamFn);
-        const auto& files = ds.BamFiles();
+        const auto files = ds.BamFiles();
         EXPECT_EQ(1, files.size());
     });
 
@@ -1588,7 +1588,7 @@ TEST(DataSetIOTest, MetadataDefaultChildrenProperlyOrderedPerXsd)
     DataSetMetadata metadata(numRecords, totalLength);
     dataset.Metadata(metadata);
 
-    const string expectedXml =
+    const string expectedXml{
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
         "<pbds:AlignmentSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.AlignmentSet\" "
                 "Name=\"DataSet_AlignmentSet\" Tags=\"barcode moreTags mapping mytags\" "
@@ -1606,7 +1606,7 @@ TEST(DataSetIOTest, MetadataDefaultChildrenProperlyOrderedPerXsd)
         "\t\t<pbds:TotalLength>1000</pbds:TotalLength>\n"
         "\t\t<pbds:NumRecords>42</pbds:NumRecords>\n"
         "\t</pbds:DataSetMetadata>\n"
-        "</pbds:AlignmentSet>\n";
+        "</pbds:AlignmentSet>\n"};
 
     stringstream s;
     dataset.SaveToStream(s);

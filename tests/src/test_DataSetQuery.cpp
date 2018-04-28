@@ -31,16 +31,16 @@ const string group_file1 = PbbamTestsConfig::Data_Dir + "/group/test1.bam";
 const string group_file2 = PbbamTestsConfig::Data_Dir + "/group/test2.bam";
 const string group_file3 = PbbamTestsConfig::Data_Dir + "/group/test3.bam";
 
-const vector<string> group_file1_names = {
+const vector<string> group_file1_names{
     "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/24962/0_427"};
 
-const vector<string> group_file2_names = {
+const vector<string> group_file2_names{
     "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2114_2531",
     "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2579_4055",
     "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/4101_5571",
     "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/5615_6237"};
 
-const vector<string> group_file3_names = {
+const vector<string> group_file3_names{
     "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/45203/0_893",
     "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/45203/0_893",
     "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/46835/3759_4005",

@@ -33,7 +33,7 @@ TEST(BamRecordImplTagsTest, HasTagTest)
     EXPECT_FALSE(bam.HasTag(""));
     EXPECT_FALSE(bam.HasTag("some_too_long_name"));
 
-    const TagCollection& fetchedTags = bam.Tags();
+    const TagCollection fetchedTags = bam.Tags();
     EXPECT_TRUE(fetchedTags.Contains("HX"));
     EXPECT_TRUE(fetchedTags.Contains("CA"));
     EXPECT_TRUE(fetchedTags.Contains("XY"));
@@ -62,7 +62,7 @@ TEST(BamRecordImplTagsTest, SimpleAddTag)
     EXPECT_TRUE(bam.HasTag("CA"));
     EXPECT_TRUE(bam.HasTag("XY"));
 
-    const TagCollection& fetchedTags = bam.Tags();
+    const TagCollection fetchedTags = bam.Tags();
     EXPECT_TRUE(fetchedTags.Contains("HX"));
     EXPECT_TRUE(fetchedTags.Contains("CA"));
     EXPECT_TRUE(fetchedTags.Contains("XY"));
@@ -100,7 +100,7 @@ TEST(BamRecordImplTagsTest, SimpleRemoveTag)
     EXPECT_TRUE(bam.HasTag("CA"));
     EXPECT_FALSE(bam.HasTag("XY"));
 
-    const TagCollection& fetchedTags = bam.Tags();
+    const TagCollection fetchedTags = bam.Tags();
     EXPECT_TRUE(fetchedTags.Contains("HX"));
     EXPECT_TRUE(fetchedTags.Contains("CA"));
     EXPECT_FALSE(fetchedTags.Contains("XY"));
@@ -127,7 +127,7 @@ TEST(BamRecordImplTagsTest, SimpleEditTag)
 
     EXPECT_TRUE(bam.HasTag("XY"));
 
-    const TagCollection& fetchedTags = bam.Tags();
+    const TagCollection fetchedTags = bam.Tags();
     EXPECT_TRUE(fetchedTags.Contains("HX"));
     EXPECT_TRUE(fetchedTags.Contains("CA"));
     EXPECT_TRUE(fetchedTags.Contains("XY"));
@@ -137,7 +137,7 @@ TEST(BamRecordImplTagsTest, SimpleEditTag)
     EXPECT_TRUE(editedOk);
     EXPECT_TRUE(bam.HasTag("XY"));
 
-    const TagCollection& fetchedTags2 = bam.Tags();
+    const TagCollection fetchedTags2 = bam.Tags();
     EXPECT_TRUE(fetchedTags2.Contains("HX"));
     EXPECT_TRUE(fetchedTags2.Contains("CA"));
     EXPECT_TRUE(fetchedTags2.Contains("XY"));

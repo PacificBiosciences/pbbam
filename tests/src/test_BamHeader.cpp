@@ -46,7 +46,7 @@ TEST(BamHeaderTest, DefaultConstruction)
 
 TEST(BamHeaderTest, DecodeTest)
 {
-    const string& text =
+    const string text{
         "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
         "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
         "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
@@ -55,7 +55,7 @@ TEST(BamHeaderTest, DecodeTest)
         "@RG\tID:rg3\tSM:condition1\n"
         "@PG\tID:_foo_\tPN:ide\n"
         "@CO\tipsum and so on\n"
-        "@CO\tcitation needed\n";
+        "@CO\tcitation needed\n"};
 
     BamHeader header = BamHeader(text);
 
@@ -135,7 +135,7 @@ TEST(BamHeaderTest, EncodeTest)
         .AddComment("ipsum and so on")
         .AddComment("citation needed");
 
-    const string& expectedText =
+    const string expectedText{
         "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
         "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
         "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
@@ -144,9 +144,9 @@ TEST(BamHeaderTest, EncodeTest)
         "@RG\tID:rg3\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:condition1\tPM:SEQUEL\n"
         "@PG\tID:_foo_\tPN:ide\n"
         "@CO\tipsum and so on\n"
-        "@CO\tcitation needed\n";
+        "@CO\tcitation needed\n"};
 
-    const string& text = header.ToSam();
+    const string text = header.ToSam();
     EXPECT_EQ(expectedText, text);
 }
 
@@ -180,7 +180,7 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
         .AddComment("ipsum and so on")
         .AddComment("citation needed");
 
-    const string& expectedText =
+    const string expectedText{
         "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
         "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
         "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
@@ -189,9 +189,9 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
         "@RG\tID:rg3\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:condition1\tPM:SEQUEL\n"
         "@PG\tID:_foo_\tPN:ide\n"
         "@CO\tipsum and so on\n"
-        "@CO\tcitation needed\n";
+        "@CO\tcitation needed\n"};
 
-    const string& text = header.ToSam();
+    const string text = header.ToSam();
     std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()),
                                        BamHeaderTests::BamHdrDeleter());
     rawData->ignore_sam_err = 0;
@@ -200,7 +200,7 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
     rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
     memcpy(rawData->text, text.c_str(), rawData->l_text);
 
-    const string& rawText = string(rawData->text, rawData->l_text);
+    const string rawText(rawData->text, rawData->l_text);
     EXPECT_EQ(expectedText, rawText);
 }
 
@@ -234,7 +234,7 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
         .AddComment("ipsum and so on")
         .AddComment("citation needed");
 
-    const string& expectedText =
+    const string expectedText{
         "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
         "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
         "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
@@ -243,7 +243,7 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
         "@RG\tID:rg3\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:condition1\tPM:SEQUEL\n"
         "@PG\tID:_foo_\tPN:ide\n"
         "@CO\tipsum and so on\n"
-        "@CO\tcitation needed\n";
+        "@CO\tcitation needed\n"};
 
     string text = header.ToSam();
     std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()),
@@ -266,7 +266,7 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
 
 TEST(BamHeaderTest, MergeOk)
 {
-    const string hdrText1 = {
+    const string hdrText1{
         "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
         "@RG\tID:a955def6\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;"
         "InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;Ipd:CodecV1=ip;BINDINGKIT=100356300;"
@@ -277,7 +277,7 @@ TEST(BamHeaderTest, MergeOk)
         "@PG\tID:bax2bam-0.0.2\tPN:bax2bam\tVN:0.0.2\n"
         "@CO\tcomment1\n"};
 
-    const string hdrText2 = {
+    const string hdrText2{
         "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
         "@RG\tID:e83fc9c6\tPL:PACBIO\tDS:READTYPE=SCRAP;DeletionQV=dq;DeletionTag=dt;"
         "InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;"
@@ -291,7 +291,7 @@ TEST(BamHeaderTest, MergeOk)
         "@PG\tID:bazwriter-0.15.0\tPN:bazwriter\tVN:0.15.0\n"
         "@CO\tcomment2\n"};
 
-    const string mergedText = {
+    const string mergedText{
         "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
         "@RG\tID:a955def6\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;"
         "InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;Ipd:CodecV1=ip;BINDINGKIT=100356300;"
@@ -335,7 +335,7 @@ TEST(BamHeaderTest, MergeOk)
 
 TEST(BamHeaderTest, MergeHandlesDuplicateReadGroups)
 {
-    const string hdrText = {
+    const string hdrText{
         "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
         "@RG\tID:a955def6\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;"
         "InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;Ipd:CodecV1=ip;BINDINGKIT=100356300;"
@@ -378,11 +378,11 @@ TEST(BamHeaderTest, MergeCompatibilityOk)
     }
 
     {  // @SQ list clash
-        const string hdrText1 = {
+        const string hdrText1{
             "@HD\tVN:1.1\tSO:coordinate\tpb:3.0.1\n"
             "@SQ\tSN:foo\tLN:42\n"
             "@SQ\tSN:bar\tLN:24\n"};
-        const string hdrText2 = {
+        const string hdrText2{
             "@HD\tVN:1.1\tSO:coordinate\tpb:3.0.1\n"
             "@SQ\tSN:foo\tLN:42\n"
             "@SQ\tSN:baz\tLN:99\n"};

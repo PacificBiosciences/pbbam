@@ -455,7 +455,7 @@ BamRecord& BamRecord::BarcodeQuality(const uint8_t quality)
 std::pair<int16_t, int16_t> BamRecord::Barcodes() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::BARCODES);
-    const Tag& bc = impl_.TagValue(tagName);
+    const Tag bc = impl_.TagValue(tagName);
     if (bc.IsNull()) throw std::runtime_error("barcode tag (bc) was requested but is missing");
 
     // NOTE: barcodes are still stored, per the spec, as uint16, even though
@@ -1042,7 +1042,7 @@ std::vector<uint16_t> BamRecord::EncodePhotons(const std::vector<float>& data)
 
 std::string BamRecord::FetchBasesRaw(const BamRecordTag tag) const
 {
-    const Tag& seqTag = impl_.TagValue(tag);
+    const Tag seqTag = impl_.TagValue(tag);
     return seqTag.ToString();
 }
 
@@ -1096,7 +1096,7 @@ std::string BamRecord::FetchBases(const BamRecordTag tag, const Orientation orie
 Frames BamRecord::FetchFramesRaw(const BamRecordTag tag) const
 {
     Frames frames;
-    const Tag& frameTag = impl_.TagValue(tag);
+    const Tag frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) return frames;  // throw ?
 
     // lossy frame codes
@@ -1154,7 +1154,7 @@ Frames BamRecord::FetchFrames(const BamRecordTag tag, const Orientation orientat
 
 std::vector<float> BamRecord::FetchPhotonsRaw(const BamRecordTag tag) const
 {
-    const Tag& frameTag = impl_.TagValue(tag);
+    const Tag frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) return std::vector<float>();
     if (!frameTag.IsUInt16Array())
         throw std::runtime_error("Photons are not a uint16_t array, tag " +
@@ -1207,7 +1207,7 @@ std::vector<float> BamRecord::FetchPhotons(const BamRecordTag tag, const Orienta
 
 QualityValues BamRecord::FetchQualitiesRaw(const BamRecordTag tag) const
 {
-    const Tag& qvsTag = impl_.TagValue(tag);
+    const Tag qvsTag = impl_.TagValue(tag);
     return QualityValues::FromFastq(qvsTag.ToString());
 }
 
@@ -1261,7 +1261,7 @@ QualityValues BamRecord::FetchQualities(const BamRecordTag tag, const Orientatio
 std::vector<uint32_t> BamRecord::FetchUInt32sRaw(const BamRecordTag tag) const
 {
     // fetch tag data
-    const Tag& frameTag = impl_.TagValue(tag);
+    const Tag frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) return std::vector<uint32_t>();
     if (!frameTag.IsUInt32Array())
         throw std::runtime_error("Tag data are not a uint32_t array, tag " +
@@ -1309,7 +1309,7 @@ std::vector<uint32_t> BamRecord::FetchUInt32s(const BamRecordTag tag, const Orie
 std::vector<uint8_t> BamRecord::FetchUInt8sRaw(const BamRecordTag tag) const
 {
     // fetch tag data
-    const Tag& frameTag = impl_.TagValue(tag);
+    const Tag frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) return std::vector<uint8_t>();
     if (!frameTag.IsUInt8Array())
         throw std::runtime_error("Tag data are not a uint8_t array, tag " +
@@ -1452,7 +1452,7 @@ BamHeader BamRecord::Header() const { return header_; }
 
 int32_t BamRecord::HoleNumber() const
 {
-    const Tag& holeNumber = impl_.TagValue(BamRecordTag::HOLE_NUMBER);
+    const Tag holeNumber = impl_.TagValue(BamRecordTag::HOLE_NUMBER);
     if (!holeNumber.IsNull()) return holeNumber.ToInt32();
 
     // missing zm tag - try to pull from name
@@ -1499,7 +1499,7 @@ Frames BamRecord::IPDRaw(Orientation orientation) const
 {
     Frames frames;
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::IPD);
-    const Tag& frameTag = impl_.TagValue(tagName);
+    const Tag frameTag = impl_.TagValue(tagName);
     if (frameTag.IsNull()) return frames;
 
     // lossy frame codes
@@ -1541,7 +1541,7 @@ BamRecord& BamRecord::LabelQV(const QualityValues& labelQVs)
 LocalContextFlags BamRecord::LocalContextFlags() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::CONTEXT_FLAGS);
-    const Tag& cxTag = impl_.TagValue(tagName);
+    const Tag cxTag = impl_.TagValue(tagName);
     return static_cast<PacBio::BAM::LocalContextFlags>(cxTag.ToUInt8());
 }
 
@@ -1641,7 +1641,7 @@ size_t BamRecord::NumMismatches() const { return NumMatchesAndMismatches().secon
 int32_t BamRecord::NumPasses() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::NUM_PASSES);
-    const Tag& numPasses = impl_.TagValue(tagName);
+    const Tag numPasses = impl_.TagValue(tagName);
     return numPasses.ToInt32();
 }
 
@@ -1756,7 +1756,7 @@ Frames BamRecord::PulseWidthRaw(Orientation orientation, bool aligned, bool exci
 {
     Frames frames;
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::PULSE_WIDTH);
-    const Tag& frameTag = impl_.TagValue(tagName);
+    const Tag frameTag = impl_.TagValue(tagName);
     if (frameTag.IsNull()) return frames;
 
     // lossy frame codes
@@ -1877,7 +1877,7 @@ Position BamRecord::QueryEnd() const
 {
     // try 'qe' tag
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::QUERY_END);
-    const Tag& qe = impl_.TagValue(tagName);
+    const Tag qe = impl_.TagValue(tagName);
     if (!qe.IsNull()) return qe.ToInt32();
 
     // tag missing, need to check movie name (fallback for non-PB BAMs, but ignore for CCS reads)
@@ -1911,7 +1911,7 @@ Position BamRecord::QueryStart() const
 {
     // try 'qs' tag
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::QUERY_START);
-    const Tag& qs = impl_.TagValue(tagName);
+    const Tag qs = impl_.TagValue(tagName);
     if (!qs.IsNull()) return qs.ToInt32();
 
     // tag missing, need to check movie name (fallback for non-PB BAMs, but ignore for CCS reads)
@@ -1944,7 +1944,7 @@ BamRecord& BamRecord::QueryStart(const Position pos)
 Accuracy BamRecord::ReadAccuracy() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::READ_ACCURACY);
-    const Tag& readAccuracy = impl_.TagValue(tagName);
+    const Tag readAccuracy = impl_.TagValue(tagName);
     return {readAccuracy.ToFloat()};
 }
 
@@ -1966,7 +1966,7 @@ BamRecord& BamRecord::ReadGroup(const ReadGroupInfo& rg)
 std::string BamRecord::ReadGroupId() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::READ_GROUP);
-    const Tag& rgTag = impl_.TagValue(tagName);
+    const Tag rgTag = impl_.TagValue(tagName);
     if (rgTag.IsNull()) return std::string();
     return rgTag.ToString();
 }
@@ -2015,7 +2015,7 @@ void BamRecord::ResetCachedPositions()
 VirtualRegionType BamRecord::ScrapRegionType() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::SCRAP_REGION_TYPE);
-    const Tag& srTag = impl_.TagValue(tagName);
+    const Tag srTag = impl_.TagValue(tagName);
     return VirtualRegionTypeMap::ParseChar[srTag.ToUInt8()];
 }
 
@@ -2034,7 +2034,7 @@ BamRecord& BamRecord::ScrapRegionType(const char type)
 ZmwType BamRecord::ScrapZmwType() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::SCRAP_ZMW_TYPE);
-    const Tag& szTag = impl_.TagValue(tagName);
+    const Tag szTag = impl_.TagValue(tagName);
     return ZmwTypeMap::ParseChar[szTag.ToUInt8()];
 }
 
@@ -2059,7 +2059,7 @@ std::string BamRecord::Sequence(const Orientation orientation, bool aligned,
 std::vector<float> BamRecord::SignalToNoise() const
 {
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::SNR);
-    const Tag& snTag = impl_.TagValue(tagName);
+    const Tag snTag = impl_.TagValue(tagName);
     return snTag.ToFloatArray();
 }
 
@@ -2109,7 +2109,7 @@ BamRecord& BamRecord::SubstitutionTag(const std::string& tags)
 RecordType BamRecord::Type() const
 {
     try {
-        const std::string& typeName = ReadGroup().ReadType();
+        const std::string typeName = ReadGroup().ReadType();
         return internal::NameToType(typeName);
     } catch (std::exception&) {
 
@@ -2131,7 +2131,7 @@ void BamRecord::UpdateName()
     std::string newName;
     newName.reserve(100);
 
-    const auto& holeNumber = (HasHoleNumber() ? std::to_string(HoleNumber()) : "?");
+    const auto holeNumber = (HasHoleNumber() ? std::to_string(HoleNumber()) : "?");
     if (Type() == RecordType::TRANSCRIPT) {
         newName = "transcript/" + holeNumber;
     } else {

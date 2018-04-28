@@ -43,8 +43,8 @@ SequenceInfo SequenceInfo::FromSam(const std::string& sam)
 
     // iterate over tokens
     for (const std::string& token : tokens) {
-        const std::string& tokenTag = token.substr(0, 2);
-        const std::string& tokenValue = token.substr(3);
+        const std::string tokenTag = token.substr(0, 2);
+        const std::string tokenValue = token.substr(3);
 
         // set sequence info
         // clang-format off

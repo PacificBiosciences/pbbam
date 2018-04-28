@@ -1000,7 +1000,7 @@ TEST(BamTagCodecTest, EncodeTest)
     tags["CA"] = charArray;
     tags["XY"] = x;
 
-    const vector<uint8_t>& data = BamTagCodec::Encode(tags);
+    const vector<uint8_t> data = BamTagCodec::Encode(tags);
     EXPECT_EQ(expected, data);
 }
 
@@ -1055,7 +1055,7 @@ TEST(BamTagCodecTest, AsciiTagsTest)
         tags["U8"] = fromUint8;
         tags["I8"] = fromInt8;
 
-        const vector<uint8_t>& data = BamTagCodec::Encode(tags);
+        const vector<uint8_t> data = BamTagCodec::Encode(tags);
         EXPECT_EQ(expected, data);
     }
 
@@ -1074,7 +1074,7 @@ TEST(BamTagCodecTest, AsciiTagsTest)
         tags["U8"] = fromUint8;
         tags["I8"] = fromInt8;
 
-        const vector<uint8_t>& data = BamTagCodec::Encode(tags);
+        const vector<uint8_t> data = BamTagCodec::Encode(tags);
         EXPECT_EQ(expected, data);
     }
 }

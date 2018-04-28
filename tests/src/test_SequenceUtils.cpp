@@ -73,8 +73,8 @@ TEST(SequenceUtilsTest, ComplementChar)
 
 TEST(SequenceUtilsTest, ReverseComplement)
 {
-    string input1 = "ATATATCCCGGCG";
-    const string rc1 = "CGCCGGGATATAT";
+    string input1{"ATATATCCCGGCG"};
+    const string rc1{"CGCCGGGATATAT"};
 
     ReverseComplement(input1);
     EXPECT_EQ(rc1, input1);

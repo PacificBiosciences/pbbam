@@ -109,7 +109,7 @@ std::string IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
 
     if (bamRecord.Impl().IsMapped() && gapped) {
         size_t seqIndex = 0;
-        const auto& cigar = bamRecord.Impl().CigarData();
+        const auto cigar = bamRecord.Impl().CigarData();
         auto cigarIter = cigar.cbegin();
         auto cigarEnd = cigar.cend();
         for (; cigarIter != cigarEnd; ++cigarIter) {

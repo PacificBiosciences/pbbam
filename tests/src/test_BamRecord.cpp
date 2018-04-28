@@ -707,7 +707,7 @@ TEST(BamRecordTest, FromBamRecordImpl)
     EXPECT_EQ(42, genericBam.Position());
     EXPECT_EQ(42, genericBam.ReferenceId());
 
-    const TagCollection& genericTags = genericBam.Tags();
+    const TagCollection genericTags = genericBam.Tags();
     EXPECT_TRUE(genericTags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(string("1abc75"), genericTags.at("HX").ToString());
     EXPECT_EQ(static_cast<int32_t>(-42), genericTags.at("XY").ToInt32());
@@ -725,7 +725,7 @@ TEST(BamRecordTest, FromBamRecordImpl)
     EXPECT_EQ(42, bam1.Impl().Position());
     EXPECT_EQ(42, bam1.Impl().ReferenceId());
 
-    const TagCollection& bam1Tags = bam1.Impl().Tags();
+    const TagCollection bam1Tags = bam1.Impl().Tags();
     EXPECT_TRUE(bam1Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(string("1abc75"), bam1Tags.at("HX").ToString());
     EXPECT_EQ(static_cast<int32_t>(-42), bam1Tags.at("XY").ToInt32());
@@ -744,7 +744,7 @@ TEST(BamRecordTest, FromBamRecordImpl)
     EXPECT_EQ(42, bam2.Impl().Position());
     EXPECT_EQ(42, bam2.Impl().ReferenceId());
 
-    const TagCollection& bam2Tags = bam2.Impl().Tags();
+    const TagCollection bam2Tags = bam2.Impl().Tags();
     EXPECT_TRUE(bam2Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(string("1abc75"), bam2Tags.at("HX").ToString());
     EXPECT_EQ(static_cast<int32_t>(-42), bam2Tags.at("XY").ToInt32());
@@ -776,7 +776,7 @@ TEST(BamRecordTest, FromBamRecordImpl)
     EXPECT_EQ(42, bam3.Impl().Position());
     EXPECT_EQ(42, bam3.Impl().ReferenceId());
 
-    const TagCollection& bam3Tags = bam3.Impl().Tags();
+    const TagCollection bam3Tags = bam3.Impl().Tags();
     EXPECT_TRUE(bam3Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(string("1abc75"), bam3Tags.at("HX").ToString());
     EXPECT_EQ(static_cast<int32_t>(-42), bam3Tags.at("XY").ToInt32());
@@ -802,7 +802,7 @@ TEST(BamRecordTest, FromBamRecordImpl)
     EXPECT_EQ(42, bam4.Impl().Position());
     EXPECT_EQ(42, bam4.Impl().ReferenceId());
 
-    const TagCollection& bam4Tags = bam4.Impl().Tags();
+    const TagCollection bam4Tags = bam4.Impl().Tags();
     EXPECT_TRUE(bam4Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(string("1abc75"), bam4Tags.at("HX").ToString());
     EXPECT_EQ(static_cast<int32_t>(-42), bam4Tags.at("XY").ToInt32());
@@ -839,7 +839,7 @@ TEST(BamRecordTest, SelfAssignmentTolerated)
     EXPECT_EQ(42, bam1.Impl().Position());
     EXPECT_EQ(42, bam1.Impl().ReferenceId());
 
-    const TagCollection& fetchedTags1 = bam1.Impl().Tags();
+    const TagCollection fetchedTags1 = bam1.Impl().Tags();
     EXPECT_TRUE(fetchedTags1.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(string("1abc75"), fetchedTags1.at("HX").ToString());
     EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags1.at("XY").ToInt32());
@@ -905,7 +905,7 @@ TEST(BamRecordTest, CoreSetters)
 //    EXPECT_EQ(testTags, bam.SubstitutionTags());
 
     // check tags
-    const TagCollection& fetchedTags = bam.Impl().Tags();
+    const TagCollection fetchedTags = bam.Impl().Tags();
     EXPECT_TRUE(fetchedTags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(string("1abc75"), fetchedTags.at("HX").ToString());
     EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags.at("XY").ToInt32());
