@@ -60,10 +60,10 @@ public:
     ///
     BamHeader(const std::string& samHeaderText);
 
-    BamHeader(const BamHeader& other) = default;
-    BamHeader(BamHeader&& other) = default;
-    BamHeader& operator=(const BamHeader& other) = default;
-    BamHeader& operator=(BamHeader&& other) = default;
+    BamHeader(const BamHeader&) = default;
+    BamHeader(BamHeader&&) = default;
+    BamHeader& operator=(const BamHeader&) = default;
+    BamHeader& operator=(BamHeader&&) = default;
     ~BamHeader() = default;
 
     /// \brief Detaches underlying data from the shared-pointer, returning a

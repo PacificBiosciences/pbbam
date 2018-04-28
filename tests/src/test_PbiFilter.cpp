@@ -83,7 +83,7 @@ void checkFilterInternals(const PbiFilter& filter,
 
 struct SimpleFilter
 {
-    bool Accepts(const PbiRawData& idx, const size_t row) const
+    bool Accepts(const PbiRawData& /* idx */, const size_t /* row */) const
     { /*()idx; ()row;*/ return true; }
 };
 
@@ -91,7 +91,7 @@ struct NoncompliantFilter { };
 
 struct SortUniqueTestFilter
 {
-    bool Accepts(const PbiRawData& idx, const size_t row) const
+    bool Accepts(const PbiRawData& /* idx */, const size_t row) const
     {
 //        ()idx;
         switch(row) {
@@ -110,7 +110,7 @@ struct SortUniqueTestFilter
 
 struct SortUniqueTestFilter2
 {
-    bool Accepts(const PbiRawData& idx, const size_t row) const
+    bool Accepts(const PbiRawData& /* idx */, const size_t row) const
     {
 //        ()idx;
         switch(row) {

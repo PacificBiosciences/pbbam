@@ -219,10 +219,10 @@ public:
     ///
     PbiFilter(std::vector<PbiFilter>&& filters);
 
-    PbiFilter(const PbiFilter& other);
-    PbiFilter(PbiFilter&& other) noexcept = default;
-    PbiFilter& operator=(const PbiFilter& other);
-    PbiFilter& operator=(PbiFilter&& other) noexcept = default;
+    PbiFilter(const PbiFilter&);
+    PbiFilter(PbiFilter&&) noexcept = default;
+    PbiFilter& operator=(const PbiFilter&);
+    PbiFilter& operator=(PbiFilter&&) noexcept = default;
     ~PbiFilter() = default;
 
     /// \}

@@ -44,10 +44,10 @@ public:
     ///
     GenomicInterval(const std::string& zeroBasedRegionString);
 
-    GenomicInterval(const GenomicInterval& other) = default;
-    GenomicInterval(GenomicInterval&& other) = default;
-    GenomicInterval& operator=(const GenomicInterval& other) = default;
-    GenomicInterval& operator=(GenomicInterval&& other) = default;
+    GenomicInterval(const GenomicInterval&) = default;
+    GenomicInterval(GenomicInterval&&) = default;
+    GenomicInterval& operator=(const GenomicInterval&) = default;
+    GenomicInterval& operator=(GenomicInterval&&) = default;
     ~GenomicInterval() = default;
 
     /// \}

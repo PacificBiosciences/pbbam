@@ -1752,7 +1752,8 @@ BamRecord& BamRecord::PrePulseFrames(const Frames& frames, const FrameEncodingTy
     return *this;
 }
 
-Frames BamRecord::PulseWidthRaw(Orientation orientation, bool aligned, bool exciseSoftClips) const
+Frames BamRecord::PulseWidthRaw(Orientation orientation, bool /* aligned */,
+                                bool /* exciseSoftClips */) const
 {
     Frames frames;
     const auto tagName = internal::BamRecordTags::LabelFor(BamRecordTag::PULSE_WIDTH);
