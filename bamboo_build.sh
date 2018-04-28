@@ -85,6 +85,7 @@ for i in "on" "off"; do
     # stuff from the internet or using subprojects.
     echo "## Configuring source (${CURRENT_BUILD_DIR})"
     meson \
+      --werror \
       --wrap-mode nofallback \
       --backend ninja \
       --buildtype release \
