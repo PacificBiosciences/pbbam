@@ -62,7 +62,7 @@ ProgramInfo ProgramInfo::FromSam(const std::string& sam)
 
 std::string ProgramInfo::ToSam() const
 {
-    std::stringstream out;
+    std::ostringstream out;
     out << "@PG" << internal::MakeSamTag(internal::ProgramInfoTokenID, id_);
 
     // clang-format off

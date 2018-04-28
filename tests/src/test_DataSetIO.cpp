@@ -330,7 +330,7 @@ TEST(DataSetIOTest, ToXml)
         "\t</pbds:DataSets>\n"
         "</pbds:AlignmentSet>\n"};
 
-    stringstream s;
+    ostringstream s;
     dataset.SaveToStream(s);
     EXPECT_EQ(expectedXml, s.str());
 }
@@ -1371,7 +1371,7 @@ TEST(DataSetIOTest, InspectMalformedXml)
     const string xmlFn = PbbamTestsConfig::Data_Dir + "/dataset/malformed.xml";
 
     DataSet ds(xmlFn);
-    stringstream s;
+    ostringstream s;
     ds.SaveToStream(s);
 
     const string expected{
@@ -1500,7 +1500,7 @@ TEST(DataSetIOTest, RelativePathCarriedThroughOk_FromString)
 
     auto dataset = DataSet::FromXml(inputXml);
 
-    stringstream stream;
+    ostringstream stream;
     dataset.SaveToStream(stream);
     auto outputXml = stream.str();
 
@@ -1515,7 +1515,7 @@ TEST(DataSetIOTest, RelativePathCarriedThroughOk_FromFile)
     EXPECT_EQ("./b/test1.bam", resources[1].ResourceId());
     EXPECT_EQ("./b/test2.bam", resources[2].ResourceId());
 
-    stringstream out;
+    ostringstream out;
     dataset.SaveToStream(out);
 
     auto newDataset = DataSet::FromXml(out.str());
@@ -1608,7 +1608,7 @@ TEST(DataSetIOTest, MetadataDefaultChildrenProperlyOrderedPerXsd)
         "\t</pbds:DataSetMetadata>\n"
         "</pbds:AlignmentSet>\n"};
 
-    stringstream s;
+    ostringstream s;
     dataset.SaveToStream(s);
     EXPECT_EQ(expectedXml, s.str());
 }

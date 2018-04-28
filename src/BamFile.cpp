@@ -45,11 +45,11 @@ public:
             // 2:  not seekable (e.g. reading from stdin)
             // 0:  EOF absent
             // -1: some other error
-            std::stringstream e;
+            std::ostringstream e;
             if (eofCheck == 0)
-                e << fn << " : is missing EOF block" << std::endl;
+                e << fn << " : is missing EOF block\n";
             else
-                e << fn << " : unknown error while checking EOF block" << std::endl;
+                e << fn << " : unknown error while checking EOF block\n";
             throw std::runtime_error(e.str());
         }
 #endif

@@ -27,11 +27,11 @@ public:
         , sequencingKit_(std::move(sequencingKit))
         , basecallerVersion_(std::move(basecallerVersion))
     {
-        std::stringstream s;
-        s << "unsupported sequencing chemistry combination: " << std::endl
-          << "    binding kit:        " << bindingKit_ << std::endl
-          << "    sequencing kit:     " << sequencingKit_ << std::endl
-          << "    basecaller version: " << basecallerVersion_ << std::endl;
+        std::ostringstream s;
+        s << "unsupported sequencing chemistry combination:\n"
+          << "    binding kit:        " << bindingKit_ << '\n'
+          << "    sequencing kit:     " << sequencingKit_ << '\n'
+          << "    basecaller version: " << basecallerVersion_ << '\n';
         what_ = s.str();
     }
 

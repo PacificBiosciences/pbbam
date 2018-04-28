@@ -32,7 +32,7 @@ Cigar::Cigar(const std::string& cigarString) : std::vector<CigarOperation>()
 
 std::string Cigar::ToStdString() const
 {
-    std::stringstream s;
+    std::ostringstream s;
     const auto endIt = this->cend();
     for (auto iter = this->cbegin(); iter != endIt; ++iter) {
         const CigarOperation& cigar = (*iter);

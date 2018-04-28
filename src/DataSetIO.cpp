@@ -127,7 +127,7 @@ std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>&
 std::unique_ptr<DataSetBase> DataSetIO::FromXmlString(const std::string& xml)
 {
     if (xml.empty()) throw std::runtime_error("empty XML string");
-    std::stringstream s(xml);
+    std::istringstream s{xml};
     return XmlReader::FromStream(s);
 }
 

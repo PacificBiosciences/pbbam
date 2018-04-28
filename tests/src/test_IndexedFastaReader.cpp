@@ -79,7 +79,7 @@ TEST(IndexedFastaReaderTests, PrintSingleInsertion)
               r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
 
     // {
-    //     std::stringstream output;
+    //     std::ostringstream output;
     //     auto itSS = bamQuery.begin();
     //     {
     //         const auto recordSS = *itSS;

@@ -1734,7 +1734,7 @@ class basic_json
     */
     string_t dump(const int indent = -1) const
     {
-        std::stringstream ss;
+        std::ostringstream ss;
 
         if (indent >= 0)
         {

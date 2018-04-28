@@ -283,12 +283,12 @@ static PbiFilter FromDataSetProperty(const Property& property, const DataSet& da
         return PbiFilter{};
 
     } catch (std::exception& e) {
-        std::stringstream s;
-        s << "error: could not create filter from XML Property element: " << std::endl
-          << "  Name:     " << property.Name() << std::endl
-          << "  Value:    " << property.Value() << std::endl
-          << "  Operator: " << property.Operator() << std::endl
-          << "  reason:   " << e.what() << std::endl;
+        std::ostringstream s;
+        s << "error: could not create filter from XML Property element:\n"
+          << "  Name:     " << property.Name() << '\n'
+          << "  Value:    " << property.Value() << '\n'
+          << "  Operator: " << property.Operator() << '\n'
+          << "  reason:   " << e.what() << '\n';
         throw std::runtime_error(s.str());
     }
 }

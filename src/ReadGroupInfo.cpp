@@ -437,7 +437,7 @@ ReadGroupInfo ReadGroupInfo::FromSam(const std::string& sam)
 
 std::string ReadGroupInfo::IntToId(const int32_t id)
 {
-    std::stringstream s;
+    std::ostringstream s;
     s << std::setfill('0') << std::setw(8) << std::hex << id;
     return s.str();
 }
@@ -490,7 +490,7 @@ std::string ReadGroupInfo::SequencingChemistryFromTriple(const std::string& bind
 
 std::string ReadGroupInfo::ToSam() const
 {
-    std::stringstream out;
+    std::ostringstream out;
     out << "@RG" << internal::MakeSamTag(internal::sam_ID, id_)
         << internal::MakeSamTag(internal::sam_PL, Platform());
 

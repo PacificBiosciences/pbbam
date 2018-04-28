@@ -94,7 +94,7 @@ TEST(DataSetXsdTest, EditDatasetRegistry)
         "\t</custom:ExternalResources>\n"
         "</pbds:AlignmentSet>\n"};
 
-    stringstream s;
+    ostringstream s;
     dataset.SaveToStream(s);
     EXPECT_EQ(expectedXml, s.str());
 }
@@ -112,7 +112,7 @@ TEST(DataSetXsdTest, ElementRegistryOk)
         metadata.AddChild(internal::DataSetElement("BioSamples"));
         metadata.AddChild(internal::DataSetElement("AutomationParameters"));
 
-        stringstream s;
+        ostringstream s;
         ds.SaveToStream(s);
         const string output = s.str();
 
@@ -140,7 +140,7 @@ TEST(DataSetXsdTest, ElementRegistryOk)
         metadata.AddChild(internal::DataSetElement("BioSamples"));
         metadata.AddChild(internal::DataSetElement("AutomationParameters"));
 
-        stringstream s;
+        ostringstream s;
         ds.SaveToStream(s);
         const string output = s.str();
 
