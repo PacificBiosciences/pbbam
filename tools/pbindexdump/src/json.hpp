@@ -7290,8 +7290,7 @@ no parse error occurred.
 */
 inline nlohmann::json operator "" _json(const char* s, std::size_t)
 {
-    return nlohmann::json::parse(reinterpret_cast<nlohmann::json::string_t::value_type*>
-                                 (const_cast<char*>(s)));
+    return nlohmann::json::parse(s);
 }
 
 #endif

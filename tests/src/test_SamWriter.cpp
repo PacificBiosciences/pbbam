@@ -72,10 +72,10 @@ TEST(SamWriterTest, SingleRecordOk)
     record.Impl().SetMapped(false);
 
     TagCollection tags;
-    tags["zm"] = static_cast<int32_t>(100);
-    tags["qs"] = static_cast<Position>(0);
-    tags["qe"] = static_cast<Position>(5);
-    tags["np"] = static_cast<int32_t>(1);
+    tags["zm"] = int32_t{100};
+    tags["qs"] = int32_t{0};
+    tags["qe"] = int32_t{5};
+    tags["np"] = int32_t{1};
     tags["rq"] = static_cast<float>(0.6);
     tags["RG"] = std::string{"6002b307"};
     tags["sn"] = vector<float>{0.2f, 0.2f, 0.2f, 0.2f};

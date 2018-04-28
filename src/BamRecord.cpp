@@ -241,7 +241,7 @@ static void ClipAndGapify(const BamRecordImpl& impl, const bool aligned, const b
 static inline void ClipAndGapifyBases(const BamRecordImpl& impl, const bool aligned,
                                       const bool exciseSoftClips, std::string* seq)
 {
-    ClipAndGapify<std::string, char>(impl, aligned, exciseSoftClips, seq, char('*'), char('-'));
+    ClipAndGapify<std::string, char>(impl, aligned, exciseSoftClips, seq, '*', '-');
 }
 
 static inline void ClipAndGapifyFrames(const BamRecordImpl& impl, const bool aligned,
@@ -492,7 +492,7 @@ void BamRecord::CalculateAlignedPositions() const
     // get the query start/end
     const size_t seqLength = impl_.SequenceLength();
     const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
-    const Position qStart = isCcsOrTranscript ? Position(0) : QueryStart();
+    const Position qStart = isCcsOrTranscript ? 0 : QueryStart();
     const Position qEnd = isCcsOrTranscript ? Position(seqLength) : QueryEnd();
 
     if (qStart == PacBio::BAM::UnmappedPosition || qEnd == PacBio::BAM::UnmappedPosition) return;
@@ -669,7 +669,7 @@ BamRecord& BamRecord::ClipToQuery(const Position start, const Position end)
     // cache original coords, skip out if clip not needed
     const size_t seqLength = impl_.SequenceLength();
     const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
-    const Position origQStart = isCcsOrTranscript ? Position(0) : QueryStart();
+    const Position origQStart = isCcsOrTranscript ? 0 : QueryStart();
     const Position origQEnd = isCcsOrTranscript ? Position(seqLength) : QueryEnd();
     if (start <= origQStart && end >= origQEnd) return *this;
 
@@ -775,7 +775,7 @@ BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
     // cache original coords
     const size_t seqLength = impl_.SequenceLength();
     const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
-    const Position origQStart = isCcsOrTranscript ? Position(0) : QueryStart();
+    const Position origQStart = isCcsOrTranscript ? 0 : QueryStart();
     const Position origQEnd = isCcsOrTranscript ? Position(seqLength) : QueryEnd();
     const Position origTStart = ReferenceStart();
     const Position origTEnd = ReferenceEnd();
@@ -899,7 +899,7 @@ BamRecord& BamRecord::ClipToReferenceReverse(const PacBio::BAM::Position start,
     // cache original coords
     const size_t seqLength = impl_.SequenceLength();
     const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
-    const Position origQStart = isCcsOrTranscript ? Position(0) : QueryStart();
+    const Position origQStart = isCcsOrTranscript ? 0 : QueryStart();
     const Position origQEnd = isCcsOrTranscript ? Position(seqLength) : QueryEnd();
     const Position origTStart = ReferenceStart();
     const Position origTEnd = ReferenceEnd();
@@ -1886,7 +1886,7 @@ Position BamRecord::QueryEnd() const
     try {
         type = Type();
     } catch (std::exception&) {
-        return Position(0);
+        return 0;
     }
     if (type == RecordType::CCS) throw std::runtime_error("no query end for CCS read type");
     if (type == RecordType::TRANSCRIPT)
@@ -1897,7 +1897,7 @@ Position BamRecord::QueryEnd() const
         return internal::QueryEndFromName(FullName());
     } catch (std::exception&) {
         // return fallback position
-        return Position(0);
+        return 0;
     }
 }
 
@@ -1920,7 +1920,7 @@ Position BamRecord::QueryStart() const
     try {
         type = Type();
     } catch (std::exception&) {
-        return Position(0);
+        return 0;
     }
     if (type == RecordType::CCS) throw std::runtime_error("no query start for CCS read type");
     if (type == RecordType::TRANSCRIPT)
@@ -1931,7 +1931,7 @@ Position BamRecord::QueryStart() const
         return internal::QueryStartFromName(FullName());
     } catch (std::exception&) {
         // return fallback position
-        return Position(0);
+        return 0;
     }
 }
 

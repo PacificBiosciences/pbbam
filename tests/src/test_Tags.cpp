@@ -845,7 +845,7 @@ TEST(SamTagCodecTest, DecodeTest)
 
     TagCollection expected;
     expected["ST"] = string("foo");
-    expected["XY"] = int32_t(-42);
+    expected["XY"] = int32_t{-42};
     expected["HX"] = Tag("1abc75", TagModifier::HEX_STRING);
     expected["VC"] = vector<int32_t>({42, -100, 37, 2048});
 
@@ -867,7 +867,7 @@ TEST(SamTagCodecTest, EncodeTest)
 {
     TagCollection tags;
     tags["ST"] = string("foo");
-    tags["XY"] = int32_t(-42);
+    tags["XY"] = int32_t{-42};
     tags["HX"] = Tag("1abc75", TagModifier::HEX_STRING);
     tags["VC"] = vector<int32_t>({42, -100, 37, 2048});
 

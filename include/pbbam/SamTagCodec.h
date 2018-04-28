@@ -51,7 +51,7 @@ public:
 ///
 inline std::string MakeSamTag(const std::string& tag, const std::string& value)
 {
-    return std::string('\t' + tag + ':' + value);
+    return '\t' + tag + ':' + value;
 }
 
 }  // namespace BAM

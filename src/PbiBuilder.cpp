@@ -660,7 +660,7 @@ void PbiBuilderPrivate::WritePbiHeader(BGZF* bgzf)
 
     // version, pbi_flags, & n_reads
     auto version = static_cast<uint32_t>(PbiFile::CurrentVersion);
-    auto pbi_flags = static_cast<uint16_t>(sections);
+    uint16_t pbi_flags = sections;
     auto numReads = currentRow_;
     if (bgzf->is_be) {
         version = ed_swap_4(version);
