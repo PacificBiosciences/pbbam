@@ -25,7 +25,7 @@ inline std::string ToIso8601(const std::chrono::system_clock::time_point& tp)
         gmtime(&ttime_t);  // static obj, no free needed (may not be thread-safe though)
 
     // format output
-    char date_time_format[] = "%FT%T";
+    constexpr static const char date_time_format[] = "%FT%T";
     char date_time_str[50];
     strftime(date_time_str, sizeof(date_time_str), date_time_format, ttm);
     std::string result(date_time_str);
@@ -49,7 +49,7 @@ inline std::string ToDataSetFormat(const std::chrono::system_clock::time_point& 
         gmtime(&ttime_t);  // static obj, no free needed (may not be thread-safe though)
 
     // format output
-    char date_time_format[] = "%y%m%d_%H%M%S";
+    constexpr static const char date_time_format[] = "%y%m%d_%H%M%S";
     char date_time_str[50];
     strftime(date_time_str, sizeof(date_time_str), date_time_format, ttm);
     std::string result(date_time_str);
