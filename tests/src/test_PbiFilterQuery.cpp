@@ -662,8 +662,8 @@ TEST(PbiFilterQueryTest, TranscriptRecords)
         std::vector<int32_t> observed;
 
         PbiFilter filter{PbiMovieNameFilter{"transcript"}};
-        PbiFilterQuery query{filter, transcriptFn};
-        for (const auto& b : query) {
+        PbiFilterQuery queryData{filter, transcriptFn};
+        for (const auto& b : queryData) {
             observed.push_back(b.HoleNumber());
         }
 
@@ -678,8 +678,8 @@ TEST(PbiFilterQueryTest, TranscriptRecords)
 
         PacBio::BAM::DataSet ds(datasetFn);
         PacBio::BAM::PbiFilter filter = PacBio::BAM::PbiFilter::FromDataSet(ds);
-        PbiFilterQuery query{filter, ds};
-        for (const auto& b : query) {
+        PbiFilterQuery queryData{filter, ds};
+        for (const auto& b : queryData) {
             observed.push_back(b.HoleNumber());
         }
 

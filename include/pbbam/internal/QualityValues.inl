@@ -81,8 +81,8 @@ inline std::string QualityValues::Fastq() const
     std::string result;
     result.reserve(size());
     auto iter = cbegin();
-    const auto end = cend();
-    for (; iter != end; ++iter)
+    const auto endIt = cend();
+    for (; iter != endIt; ++iter)
         result.push_back((*iter).Fastq());
     return result;
 }

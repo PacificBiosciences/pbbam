@@ -1268,7 +1268,7 @@ class basic_json
                value_t manual_type = value_t::array)
     {
         // the initializer list could describe an object
-        bool is_object = true;
+        bool init_is_object = true;
 
         // check if each element is an array with two elements whose first element
         // is a string
@@ -1279,7 +1279,7 @@ class basic_json
             {
                 // we found an element that makes it impossible to use the
                 // initializer list as object
-                is_object = false;
+                init_is_object = false;
                 break;
             }
         }
@@ -1290,17 +1290,17 @@ class basic_json
             // if array is wanted, do not create an object though possible
             if (manual_type == value_t::array)
             {
-                is_object = false;
+                init_is_object = false;
             }
 
             // if object is wanted but impossible, throw an exception
-            if (manual_type == value_t::object and not is_object)
+            if (manual_type == value_t::object and not init_is_object)
             {
                 throw std::domain_error("cannot create object from initializer list");
             }
         }
 
-        if (is_object)
+        if (init_is_object)
         {
             // the initializer list is a list of pairs -> create object
             m_type = value_t::object;
@@ -1411,10 +1411,10 @@ class basic_json
     basic_json(size_type\, const basic_json&)
     constructor.,basic_json__size_type_basic_json}
     */
-    basic_json(size_type count, const basic_json& value)
+    basic_json(size_type cnt, const basic_json& value)
         : m_type(value_t::array)
     {
-        m_value.array = create<array_t>(count, value);
+        m_value.array = create<array_t>(cnt, value);
     }
 
     /*!
@@ -3809,7 +3809,7 @@ class basic_json
 
     @liveexample{The example shows how insert is used.,insert__count}
     */
-    iterator insert(const_iterator pos, size_type count, const basic_json& value)
+    iterator insert(const_iterator pos, size_type cnt, const basic_json& value)
     {
         // insert only works for arrays
         if (m_type != value_t::array)
@@ -3825,7 +3825,7 @@ class basic_json
 
         // insert to array and return iterator
         iterator result(this);
-        result.m_it.array_iterator = m_value.array->insert(pos.m_it.array_iterator, count, value);
+        result.m_it.array_iterator = m_value.array->insert(pos.m_it.array_iterator, cnt, value);
         return result;
     }
 
