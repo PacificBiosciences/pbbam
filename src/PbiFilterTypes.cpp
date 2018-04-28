@@ -118,9 +118,9 @@ bool PbiIdentityFilter::Accepts(const PbiRawData& idx, const size_t row) const
     const auto& qStart = basicData.qStart_.at(row);
     const auto& qEnd = basicData.qEnd_.at(row);
 
-    const auto readLength = qEnd - qStart;
-    const auto nonMatches = nMM + nDel + nIns;
-    const float identity = 1.0 - (static_cast<float>(nonMatches) / static_cast<float>(readLength));
+    const float readLength = qEnd - qStart;
+    const float nonMatches = nMM + nDel + nIns;
+    const float identity = 1.0f - (nonMatches / readLength);
 
     return CompareHelper(identity);
 }

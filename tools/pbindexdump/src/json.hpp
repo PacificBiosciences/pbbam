@@ -6915,7 +6915,7 @@ basic_json_parser_59:
 
             // return float_val if the whole number was translated and NAN
             // otherwise
-            return (reinterpret_cast<lexer_char_t*>(endptr) == m_cursor) ? float_val : NAN;
+            return (reinterpret_cast<lexer_char_t*>(endptr) == m_cursor) ? float_val : static_cast<long double>(NAN);
         }
 
       private:
