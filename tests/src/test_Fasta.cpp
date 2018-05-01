@@ -13,7 +13,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace FastaTests {
 
@@ -61,7 +60,7 @@ TEST(FastaSequenceTest, BasicConstructorOk)
 
 TEST(FastaReaderTest, IterableOk)
 {
-    const string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fa";
+    const std::string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fa";
     FastaReader reader{fn};
 
     size_t count = 0;
@@ -75,7 +74,7 @@ TEST(FastaReaderTest, IterableOk)
 
 TEST(FastaReaderTest, ReadAllOk)
 {
-    const string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fa";
+    const std::string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fa";
 
     size_t count = 0;
     for (const auto& seq : FastaReader::ReadAll(fn)) {
@@ -87,7 +86,7 @@ TEST(FastaReaderTest, ReadAllOk)
 
 TEST(FastaSequenceQueryTest, FromFastaFilename)
 {
-    const string fn = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
+    const std::string fn = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
 
     {
         size_t count = 0;
@@ -109,7 +108,7 @@ TEST(FastaSequenceQueryTest, FromFastaFilename)
 
 TEST(FastaSequenceQueryTest, FromDataSet)
 {
-    const string fn = PbbamTestsConfig::Data_Dir + "/referenceset.xml";
+    const std::string fn = PbbamTestsConfig::Data_Dir + "/referenceset.xml";
 
     {
         size_t count = 0;

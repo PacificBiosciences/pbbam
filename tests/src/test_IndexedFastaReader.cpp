@@ -15,12 +15,11 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace IndexedFastaReaderTests {
 
-const string lambdaFasta = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
-const string singleInsertionBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+const std::string lambdaFasta = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
+const std::string singleInsertionBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
 
 }  // namespace IndexedFastaReaderTests
 
@@ -156,14 +155,14 @@ TEST(IndexedFastaReaderTests, ReadLambda)
     EXPECT_EQ(1, r.NumSequences());
     EXPECT_EQ(48502, r.SequenceLength("lambda_NEB3011"));
 
-    string seq = r.Subsequence("lambda_NEB3011:0-10");
+    std::string seq = r.Subsequence("lambda_NEB3011:0-10");
     EXPECT_EQ("GGGCGGCGAC", seq);
 
-    string seq2 = r.Subsequence("lambda_NEB3011", 0, 10);
+    std::string seq2 = r.Subsequence("lambda_NEB3011", 0, 10);
     EXPECT_EQ("GGGCGGCGAC", seq2);
 
     // subsequence extending beyond bounds returns clipped
-    string seq3 = r.Subsequence("lambda_NEB3011", 48400, 48600);
+    std::string seq3 = r.Subsequence("lambda_NEB3011", 48400, 48600);
     EXPECT_EQ(102, seq3.length());
 
     // bad subsequence

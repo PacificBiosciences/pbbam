@@ -1,13 +1,16 @@
 // Author: Derek Barnett
 
 #include "PbIndex.h"
-#include <pbbam/BamFile.h>
-#include <pbbam/PbiRawData.h>
+
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
+#include <stdexcept>
+
+#include <pbbam/BamFile.h>
+#include <pbbam/PbiRawData.h>
+
 using namespace pbindex;
-using namespace std;
 
 Settings::Settings() : printPbiContents_(false) {}
 
@@ -18,7 +21,7 @@ int PbIndex::Create(const Settings& settings)
         bamFile.CreatePacBioIndex();
         return EXIT_SUCCESS;
     } catch (std::runtime_error& e) {
-        cerr << "pbindex ERROR: " << e.what() << endl;
+        std::cerr << "pbindex ERROR: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
 }

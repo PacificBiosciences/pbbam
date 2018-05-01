@@ -20,27 +20,26 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace DataSetIOTests {
 
-const string alignedBamFn  = PbbamTestsConfig::Data_Dir + "/aligned.bam";
-const string bamGroupFofn  = PbbamTestsConfig::Generated_Dir + "/group.fofn";
+const std::string alignedBamFn  = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+const std::string bamGroupFofn  = PbbamTestsConfig::Generated_Dir + "/group.fofn";
 
-const string ali1XmlFn = PbbamTestsConfig::Data_Dir + "/dataset/ali1.xml";
-const string ali2XmlFn = PbbamTestsConfig::Data_Dir + "/dataset/ali2.xml";
-const string ali3XmlFn = PbbamTestsConfig::Data_Dir + "/dataset/ali3.xml";
-const string ali4XmlFn = PbbamTestsConfig::Data_Dir + "/dataset/ali4.xml";
-const string mappingStaggeredXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/bam_mapping_staggered.xml";
-const string barcodeXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/barcode.dataset.xml";
-const string ccsReadXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/ccsread.dataset.xml";
-const string lambdaContigsXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/lambda_contigs.xml";
-const string pbalchemyXmlFn   = PbbamTestsConfig::Data_Dir + "/dataset/pbalchemy10kbp.xml";
-const string referenceXmlFn   = PbbamTestsConfig::Data_Dir + "/dataset/reference.dataset.xml";
-const string subread1XmlFn    = PbbamTestsConfig::Data_Dir + "/dataset/subread_dataset1.xml";
-const string subread2XmlFn    = PbbamTestsConfig::Data_Dir + "/dataset/subread_dataset2.xml";
-const string subread3XmlFn    = PbbamTestsConfig::Data_Dir + "/dataset/subread_dataset3.xml";
-const string transformedXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/transformed_rs_subread_dataset.xml";
+const std::string ali1XmlFn = PbbamTestsConfig::Data_Dir + "/dataset/ali1.xml";
+const std::string ali2XmlFn = PbbamTestsConfig::Data_Dir + "/dataset/ali2.xml";
+const std::string ali3XmlFn = PbbamTestsConfig::Data_Dir + "/dataset/ali3.xml";
+const std::string ali4XmlFn = PbbamTestsConfig::Data_Dir + "/dataset/ali4.xml";
+const std::string mappingStaggeredXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/bam_mapping_staggered.xml";
+const std::string barcodeXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/barcode.dataset.xml";
+const std::string ccsReadXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/ccsread.dataset.xml";
+const std::string lambdaContigsXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/lambda_contigs.xml";
+const std::string pbalchemyXmlFn   = PbbamTestsConfig::Data_Dir + "/dataset/pbalchemy10kbp.xml";
+const std::string referenceXmlFn   = PbbamTestsConfig::Data_Dir + "/dataset/reference.dataset.xml";
+const std::string subread1XmlFn    = PbbamTestsConfig::Data_Dir + "/dataset/subread_dataset1.xml";
+const std::string subread2XmlFn    = PbbamTestsConfig::Data_Dir + "/dataset/subread_dataset2.xml";
+const std::string subread3XmlFn    = PbbamTestsConfig::Data_Dir + "/dataset/subread_dataset3.xml";
+const std::string transformedXmlFn = PbbamTestsConfig::Data_Dir + "/dataset/transformed_rs_subread_dataset.xml";
 
 static void TestFromXmlString();
 static void TestAli1Xml();
@@ -250,7 +249,7 @@ TEST(DataSetIOTest, ToXml)
     dataset.SubDataSets().Add(subDataSet2);
 
     // write dataset
-    const string expectedXml{
+    const std::string expectedXml{
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
         "<pbds:AlignmentSet "
                 "CreatedAt=\"2015-01-27T09:00:01\" "
@@ -330,7 +329,7 @@ TEST(DataSetIOTest, ToXml)
         "\t</pbds:DataSets>\n"
         "</pbds:AlignmentSet>\n"};
 
-    ostringstream s;
+    std::ostringstream s;
     dataset.SaveToStream(s);
     EXPECT_EQ(expectedXml, s.str());
 }
@@ -339,7 +338,7 @@ namespace DataSetIOTests {
 
 static void TestFromXmlString()
 {
-    const string inputXml{
+    const std::string inputXml{
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
         "<pbds:AlignmentSet "
             "CreatedAt=\"2015-01-27T09:00:01\" "
@@ -478,15 +477,15 @@ static void TestAli1Xml()
 {
     const DataSet dataset(DataSetIOTests::ali1XmlFn);
     EXPECT_EQ(DataSet::ALIGNMENT, dataset.Type());
-    EXPECT_EQ(string("2015-01-27T09:00:01"),                  dataset.CreatedAt());
-    EXPECT_EQ(string("PacBio.DataSet.AlignmentSet"),          dataset.MetaType());
-    EXPECT_EQ(string("DataSet_AlignmentSet"),                 dataset.Name());
-    EXPECT_EQ(string("barcode moreTags mapping mytags"),      dataset.Tags());
-    EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
-    EXPECT_EQ(string("2.3.0"),                                dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(std::string("2015-01-27T09:00:01"),                  dataset.CreatedAt());
+    EXPECT_EQ(std::string("PacBio.DataSet.AlignmentSet"),          dataset.MetaType());
+    EXPECT_EQ(std::string("DataSet_AlignmentSet"),                 dataset.Name());
+    EXPECT_EQ(std::string("barcode moreTags mapping mytags"),      dataset.Tags());
+    EXPECT_EQ(std::string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
+    EXPECT_EQ(std::string("2.3.0"),                                dataset.Version());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(std::string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
 
@@ -495,28 +494,28 @@ static void TestAli1Xml()
     for (size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
-            EXPECT_EQ(string("First Alignments BAM"), resource.Name());
-            EXPECT_EQ(string("Points to an example Alignments BAM file."), resource.Description());
-            EXPECT_EQ(string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/alignments0.bam"), resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("First Alignments BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to an example Alignments BAM file."), resource.Description());
+            EXPECT_EQ(std::string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/alignments0.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:///mnt/path/to/alignments0.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("file:///mnt/path/to/alignments0.pbi"), index.ResourceId());
         }
         else {
-            EXPECT_EQ(string("Second Alignments BAM"), resource.Name());
-            EXPECT_EQ(string("Points to another example Alignments BAM file, by relative path."), resource.Description());
-            EXPECT_EQ(string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:./alignments1.bam"),  resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("Second Alignments BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to another example Alignments BAM file, by relative path."), resource.Description());
+            EXPECT_EQ(std::string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:./alignments1.bam"),  resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:///mnt/path/to/alignments1.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("file:///mnt/path/to/alignments1.pbi"), index.ResourceId());
         }
     }
 
@@ -525,12 +524,12 @@ static void TestAli1Xml()
     for (size_t i = 0; i < subdatasets.Size(); ++i) {
         const DataSetBase& subdataset = subdatasets[i];
         if (i == 0) {
-            EXPECT_EQ(string(""), subdataset.CreatedAt());
-            EXPECT_EQ(string(""), subdataset.MetaType());
-            EXPECT_EQ(string("HighQuality Read Alignments"), subdataset.Name());
-            EXPECT_EQ(string(""), subdataset.Tags());
-            EXPECT_EQ(string("ab95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
-            EXPECT_EQ(string("2.3.0"), subdataset.Version());
+            EXPECT_EQ(std::string(""), subdataset.CreatedAt());
+            EXPECT_EQ(std::string(""), subdataset.MetaType());
+            EXPECT_EQ(std::string("HighQuality Read Alignments"), subdataset.Name());
+            EXPECT_EQ(std::string(""), subdataset.Tags());
+            EXPECT_EQ(std::string("ab95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
+            EXPECT_EQ(std::string("2.3.0"), subdataset.Version());
 
             const Filters& filters = subdataset.Filters();
             ASSERT_EQ(1, filters.Size());
@@ -538,17 +537,17 @@ static void TestAli1Xml()
             const Properties& properties = filter.Properties();
             ASSERT_EQ(1, properties.Size());
             const Property& property = properties[0];
-            EXPECT_EQ(string("rq"), property.Name());
-            EXPECT_EQ(string("0.85"), property.Value());
-            EXPECT_EQ(string(">"), property.Operator());
+            EXPECT_EQ(std::string("rq"), property.Name());
+            EXPECT_EQ(std::string("0.85"), property.Value());
+            EXPECT_EQ(std::string(">"), property.Operator());
         }
         else {
-            EXPECT_EQ(string(""), subdataset.CreatedAt());
-            EXPECT_EQ(string(""), subdataset.MetaType());
-            EXPECT_EQ(string("Alignments to chromosome 1"), subdataset.Name());
-            EXPECT_EQ(string(""), subdataset.Tags());
-            EXPECT_EQ(string("ac95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
-            EXPECT_EQ(string("2.3.0"), subdataset.Version());
+            EXPECT_EQ(std::string(""), subdataset.CreatedAt());
+            EXPECT_EQ(std::string(""), subdataset.MetaType());
+            EXPECT_EQ(std::string("Alignments to chromosome 1"), subdataset.Name());
+            EXPECT_EQ(std::string(""), subdataset.Tags());
+            EXPECT_EQ(std::string("ac95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
+            EXPECT_EQ(std::string("2.3.0"), subdataset.Version());
 
             const Filters& filters = subdataset.Filters();
             ASSERT_EQ(1, filters.Size());
@@ -556,9 +555,9 @@ static void TestAli1Xml()
             const Properties& properties = filter.Properties();
             ASSERT_EQ(1, properties.Size());
             const Property& property = properties[0];
-            EXPECT_EQ(string("RNAME"), property.Name());
-            EXPECT_EQ(string("chr1"), property.Value());
-            EXPECT_EQ(string("=="), property.Operator());
+            EXPECT_EQ(std::string("RNAME"), property.Name());
+            EXPECT_EQ(std::string("chr1"), property.Value());
+            EXPECT_EQ(std::string("=="), property.Operator());
         }
     }
 }
@@ -567,15 +566,15 @@ static void TestAli2Xml()
 {
     const DataSet dataset(DataSetIOTests::ali2XmlFn);
     EXPECT_EQ(DataSet::ALIGNMENT, dataset.Type());
-    EXPECT_EQ(string("2015-01-27T09:00:01"),                  dataset.CreatedAt());
-    EXPECT_EQ(string("PacBio.DataSet.AlignmentSet"),          dataset.MetaType());
-    EXPECT_EQ(string("DataSet_AlignmentSet"),                 dataset.Name());
-    EXPECT_EQ(string("barcode moreTags mapping mytags"),      dataset.Tags());
-    EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
-    EXPECT_EQ(string("2.3.0"),                                dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(std::string("2015-01-27T09:00:01"),                  dataset.CreatedAt());
+    EXPECT_EQ(std::string("PacBio.DataSet.AlignmentSet"),          dataset.MetaType());
+    EXPECT_EQ(std::string("DataSet_AlignmentSet"),                 dataset.Name());
+    EXPECT_EQ(std::string("barcode moreTags mapping mytags"),      dataset.Tags());
+    EXPECT_EQ(std::string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
+    EXPECT_EQ(std::string("2.3.0"),                                dataset.Version());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(std::string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
 
@@ -584,28 +583,28 @@ static void TestAli2Xml()
     for (size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
-            EXPECT_EQ(string("First Alignments BAM"), resource.Name());
-            EXPECT_EQ(string("Points to an example Alignments BAM file."), resource.Description());
-            EXPECT_EQ(string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/alignments2.bam"), resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("First Alignments BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to an example Alignments BAM file."), resource.Description());
+            EXPECT_EQ(std::string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/alignments2.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:///mnt/path/to/alignments2.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("file:///mnt/path/to/alignments2.pbi"), index.ResourceId());
         }
         else {
-            EXPECT_EQ(string("Second Alignments BAM"), resource.Name());
-            EXPECT_EQ(string("Points to another example Alignments BAM file, by relative path."), resource.Description());
-            EXPECT_EQ(string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:./alignments3.bam"),  resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("Second Alignments BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to another example Alignments BAM file, by relative path."), resource.Description());
+            EXPECT_EQ(std::string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:./alignments3.bam"),  resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:///mnt/path/to/alignments3.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("file:///mnt/path/to/alignments3.pbi"), index.ResourceId());
         }
     }
 
@@ -614,12 +613,12 @@ static void TestAli2Xml()
     for (size_t i = 0; i < subdatasets.Size(); ++i) {
         const DataSetBase& subdataset = subdatasets[i];
         if (i == 0) {
-            EXPECT_EQ(string(""), subdataset.CreatedAt());
-            EXPECT_EQ(string(""), subdataset.MetaType());
-            EXPECT_EQ(string("HighQuality Read Alignments"), subdataset.Name());
-            EXPECT_EQ(string(""), subdataset.Tags());
-            EXPECT_EQ(string("ab95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
-            EXPECT_EQ(string("2.3.0"), subdataset.Version());
+            EXPECT_EQ(std::string(""), subdataset.CreatedAt());
+            EXPECT_EQ(std::string(""), subdataset.MetaType());
+            EXPECT_EQ(std::string("HighQuality Read Alignments"), subdataset.Name());
+            EXPECT_EQ(std::string(""), subdataset.Tags());
+            EXPECT_EQ(std::string("ab95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
+            EXPECT_EQ(std::string("2.3.0"), subdataset.Version());
 
             const Filters& filters = subdataset.Filters();
             ASSERT_EQ(1, filters.Size());
@@ -627,17 +626,17 @@ static void TestAli2Xml()
             const Properties& properties = filter.Properties();
             ASSERT_EQ(1, properties.Size());
             const Property& property = properties[0];
-            EXPECT_EQ(string("rq"), property.Name());
-            EXPECT_EQ(string("0.85"), property.Value());
-            EXPECT_EQ(string(">"), property.Operator());
+            EXPECT_EQ(std::string("rq"), property.Name());
+            EXPECT_EQ(std::string("0.85"), property.Value());
+            EXPECT_EQ(std::string(">"), property.Operator());
         }
         else {
-            EXPECT_EQ(string(""), subdataset.CreatedAt());
-            EXPECT_EQ(string(""), subdataset.MetaType());
-            EXPECT_EQ(string("Alignments to chromosome 1"), subdataset.Name());
-            EXPECT_EQ(string(""), subdataset.Tags());
-            EXPECT_EQ(string("ac95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
-            EXPECT_EQ(string("2.3.0"), subdataset.Version());
+            EXPECT_EQ(std::string(""), subdataset.CreatedAt());
+            EXPECT_EQ(std::string(""), subdataset.MetaType());
+            EXPECT_EQ(std::string("Alignments to chromosome 1"), subdataset.Name());
+            EXPECT_EQ(std::string(""), subdataset.Tags());
+            EXPECT_EQ(std::string("ac95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
+            EXPECT_EQ(std::string("2.3.0"), subdataset.Version());
 
             const Filters& filters = subdataset.Filters();
             ASSERT_EQ(1, filters.Size());
@@ -645,9 +644,9 @@ static void TestAli2Xml()
             const Properties& properties = filter.Properties();
             ASSERT_EQ(1, properties.Size());
             const Property& property = properties[0];
-            EXPECT_EQ(string("RNAME"), property.Name());
-            EXPECT_EQ(string("chr1"), property.Value());
-            EXPECT_EQ(string("=="), property.Operator());
+            EXPECT_EQ(std::string("RNAME"), property.Name());
+            EXPECT_EQ(std::string("chr1"), property.Value());
+            EXPECT_EQ(std::string("=="), property.Operator());
         }
     }
 }
@@ -656,15 +655,15 @@ static void TestAli3Xml()
 {
     const DataSet dataset(DataSetIOTests::ali3XmlFn);
     EXPECT_EQ(DataSet::ALIGNMENT, dataset.Type());
-    EXPECT_EQ(string("2015-01-27T09:00:01"),                  dataset.CreatedAt());
-    EXPECT_EQ(string("PacBio.DataSet.AlignmentSet"),          dataset.MetaType());
-    EXPECT_EQ(string("DataSet_AlignmentSet"),                 dataset.Name());
-    EXPECT_EQ(string("barcode moreTags mapping mytags"),      dataset.Tags());
-    EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
-    EXPECT_EQ(string("2.3.0"),                                dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(std::string("2015-01-27T09:00:01"),                  dataset.CreatedAt());
+    EXPECT_EQ(std::string("PacBio.DataSet.AlignmentSet"),          dataset.MetaType());
+    EXPECT_EQ(std::string("DataSet_AlignmentSet"),                 dataset.Name());
+    EXPECT_EQ(std::string("barcode moreTags mapping mytags"),      dataset.Tags());
+    EXPECT_EQ(std::string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
+    EXPECT_EQ(std::string("2.3.0"),                                dataset.Version());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(std::string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
 
@@ -673,28 +672,28 @@ static void TestAli3Xml()
     for (size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
-            EXPECT_EQ(string("First Alignments BAM"), resource.Name());
-            EXPECT_EQ(string("Points to an example Alignments BAM file."), resource.Description());
-            EXPECT_EQ(string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/alignments2.bam"), resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("First Alignments BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to an example Alignments BAM file."), resource.Description());
+            EXPECT_EQ(std::string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/alignments2.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:///mnt/path/to/alignments2.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("file:///mnt/path/to/alignments2.pbi"), index.ResourceId());
         }
         else {
-            EXPECT_EQ(string("Second Alignments BAM"), resource.Name());
-            EXPECT_EQ(string("Points to another example Alignments BAM file, by relative path."), resource.Description());
-            EXPECT_EQ(string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:./alignments3.bam"),  resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("Second Alignments BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to another example Alignments BAM file, by relative path."), resource.Description());
+            EXPECT_EQ(std::string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:./alignments3.bam"),  resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:///mnt/path/to/alignments3.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("file:///mnt/path/to/alignments3.pbi"), index.ResourceId());
         }
     }
 
@@ -703,12 +702,12 @@ static void TestAli3Xml()
     for (size_t i = 0; i < subdatasets.Size(); ++i) {
         const DataSetBase& subdataset = subdatasets[i];
         if (i == 0) {
-            EXPECT_EQ(string(""), subdataset.CreatedAt());
-            EXPECT_EQ(string(""), subdataset.MetaType());
-            EXPECT_EQ(string("HighQuality Read Alignments"), subdataset.Name());
-            EXPECT_EQ(string(""), subdataset.Tags());
-            EXPECT_EQ(string("ab95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
-            EXPECT_EQ(string("2.3.0"), subdataset.Version());
+            EXPECT_EQ(std::string(""), subdataset.CreatedAt());
+            EXPECT_EQ(std::string(""), subdataset.MetaType());
+            EXPECT_EQ(std::string("HighQuality Read Alignments"), subdataset.Name());
+            EXPECT_EQ(std::string(""), subdataset.Tags());
+            EXPECT_EQ(std::string("ab95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
+            EXPECT_EQ(std::string("2.3.0"), subdataset.Version());
 
             const Filters& filters = subdataset.Filters();
             ASSERT_EQ(1, filters.Size());
@@ -716,17 +715,17 @@ static void TestAli3Xml()
             const Properties& properties = filter.Properties();
             ASSERT_EQ(1, properties.Size());
             const Property& property = properties[0];
-            EXPECT_EQ(string("rq"), property.Name());
-            EXPECT_EQ(string("0.75"), property.Value());
-            EXPECT_EQ(string(">"), property.Operator());
+            EXPECT_EQ(std::string("rq"), property.Name());
+            EXPECT_EQ(std::string("0.75"), property.Value());
+            EXPECT_EQ(std::string(">"), property.Operator());
         }
         else {
-            EXPECT_EQ(string(""), subdataset.CreatedAt());
-            EXPECT_EQ(string(""), subdataset.MetaType());
-            EXPECT_EQ(string("Alignments to chromosome 1"), subdataset.Name());
-            EXPECT_EQ(string(""), subdataset.Tags());
-            EXPECT_EQ(string("ac95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
-            EXPECT_EQ(string("2.3.0"), subdataset.Version());
+            EXPECT_EQ(std::string(""), subdataset.CreatedAt());
+            EXPECT_EQ(std::string(""), subdataset.MetaType());
+            EXPECT_EQ(std::string("Alignments to chromosome 1"), subdataset.Name());
+            EXPECT_EQ(std::string(""), subdataset.Tags());
+            EXPECT_EQ(std::string("ac95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
+            EXPECT_EQ(std::string("2.3.0"), subdataset.Version());
 
             const Filters& filters = subdataset.Filters();
             ASSERT_EQ(1, filters.Size());
@@ -734,9 +733,9 @@ static void TestAli3Xml()
             const Properties& properties = filter.Properties();
             ASSERT_EQ(1, properties.Size());
             const Property& property = properties[0];
-            EXPECT_EQ(string("RNAME"), property.Name());
-            EXPECT_EQ(string("chr1"), property.Value());
-            EXPECT_EQ(string("=="), property.Operator());
+            EXPECT_EQ(std::string("RNAME"), property.Name());
+            EXPECT_EQ(std::string("chr1"), property.Value());
+            EXPECT_EQ(std::string("=="), property.Operator());
         }
     }
 }
@@ -745,15 +744,15 @@ static void TestAli4Xml()
 {
     const DataSet dataset(DataSetIOTests::ali4XmlFn);
     EXPECT_EQ(DataSet::ALIGNMENT, dataset.Type());
-    EXPECT_EQ(string("2015-01-27T09:00:01"),                  dataset.CreatedAt());
-    EXPECT_EQ(string("PacBio.DataSet.AlignmentSet"),          dataset.MetaType());
-    EXPECT_EQ(string("DataSet_AlignmentSet"),                 dataset.Name());
-    EXPECT_EQ(string("barcode moreTags mapping mytags"),      dataset.Tags());
-    EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
-    EXPECT_EQ(string("2.3.0"),                                dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(std::string("2015-01-27T09:00:01"),                  dataset.CreatedAt());
+    EXPECT_EQ(std::string("PacBio.DataSet.AlignmentSet"),          dataset.MetaType());
+    EXPECT_EQ(std::string("DataSet_AlignmentSet"),                 dataset.Name());
+    EXPECT_EQ(std::string("barcode moreTags mapping mytags"),      dataset.Tags());
+    EXPECT_EQ(std::string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
+    EXPECT_EQ(std::string("2.3.0"),                                dataset.Version());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(std::string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
 
@@ -762,28 +761,28 @@ static void TestAli4Xml()
     for (size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
-            EXPECT_EQ(string("First Alignments BAM"), resource.Name());
-            EXPECT_EQ(string("Points to an example Alignments BAM file."), resource.Description());
-            EXPECT_EQ(string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/alignments0.bam"), resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("First Alignments BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to an example Alignments BAM file."), resource.Description());
+            EXPECT_EQ(std::string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/alignments0.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:///mnt/path/to/alignments0.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("file:///mnt/path/to/alignments0.pbi"), index.ResourceId());
         }
         else {
-            EXPECT_EQ(string("Second Alignments BAM"), resource.Name());
-            EXPECT_EQ(string("Points to another example Alignments BAM file, by relative path."), resource.Description());
-            EXPECT_EQ(string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:./alignments1.bam"),  resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("Second Alignments BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to another example Alignments BAM file, by relative path."), resource.Description());
+            EXPECT_EQ(std::string("AlignmentFile.AlignmentBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:./alignments1.bam"),  resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:///mnt/path/to/alignments1.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("file:///mnt/path/to/alignments1.pbi"), index.ResourceId());
         }
     }
 
@@ -792,12 +791,12 @@ static void TestAli4Xml()
     for (size_t i = 0; i < subdatasets.Size(); ++i) {
         const DataSetBase& subdataset = subdatasets[i];
         if (i == 0) {
-            EXPECT_EQ(string(""), subdataset.CreatedAt());
-            EXPECT_EQ(string(""), subdataset.MetaType());
-            EXPECT_EQ(string("HighQuality Read Alignments"), subdataset.Name());
-            EXPECT_EQ(string(""), subdataset.Tags());
-            EXPECT_EQ(string("ab95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
-            EXPECT_EQ(string("2.3.0"), subdataset.Version());
+            EXPECT_EQ(std::string(""), subdataset.CreatedAt());
+            EXPECT_EQ(std::string(""), subdataset.MetaType());
+            EXPECT_EQ(std::string("HighQuality Read Alignments"), subdataset.Name());
+            EXPECT_EQ(std::string(""), subdataset.Tags());
+            EXPECT_EQ(std::string("ab95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
+            EXPECT_EQ(std::string("2.3.0"), subdataset.Version());
 
             const Filters& filters = subdataset.Filters();
             ASSERT_EQ(1, filters.Size());
@@ -805,17 +804,17 @@ static void TestAli4Xml()
             const Properties& properties = filter.Properties();
             ASSERT_EQ(1, properties.Size());
             const Property& property = properties[0];
-            EXPECT_EQ(string("rq"), property.Name());
-            EXPECT_EQ(string("0.85"), property.Value());
-            EXPECT_EQ(string(">"), property.Operator());
+            EXPECT_EQ(std::string("rq"), property.Name());
+            EXPECT_EQ(std::string("0.85"), property.Value());
+            EXPECT_EQ(std::string(">"), property.Operator());
         }
         else {
-            EXPECT_EQ(string(""), subdataset.CreatedAt());
-            EXPECT_EQ(string(""), subdataset.MetaType());
-            EXPECT_EQ(string("Alignments to chromosome 1"), subdataset.Name());
-            EXPECT_EQ(string(""), subdataset.Tags());
-            EXPECT_EQ(string("ac95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
-            EXPECT_EQ(string("2.3.0"), subdataset.Version());
+            EXPECT_EQ(std::string(""), subdataset.CreatedAt());
+            EXPECT_EQ(std::string(""), subdataset.MetaType());
+            EXPECT_EQ(std::string("Alignments to chromosome 1"), subdataset.Name());
+            EXPECT_EQ(std::string(""), subdataset.Tags());
+            EXPECT_EQ(std::string("ac95d0a3-94b8-4918-b3af-a3f81bbe519c"), subdataset.UniqueId());
+            EXPECT_EQ(std::string("2.3.0"), subdataset.Version());
 
             const Filters& filters = subdataset.Filters();
             ASSERT_EQ(1, filters.Size());
@@ -823,9 +822,9 @@ static void TestAli4Xml()
             const Properties& properties = filter.Properties();
             ASSERT_EQ(1, properties.Size());
             const Property& property = properties[0];
-            EXPECT_EQ(string("RNAME"), property.Name());
-            EXPECT_EQ(string("chr1"), property.Value());
-            EXPECT_EQ(string("=="), property.Operator());
+            EXPECT_EQ(std::string("RNAME"), property.Name());
+            EXPECT_EQ(std::string("chr1"), property.Value());
+            EXPECT_EQ(std::string("=="), property.Operator());
         }
     }
 }
@@ -834,15 +833,15 @@ static void TestMappingStaggeredXml()
 {
     const DataSet dataset(DataSetIOTests::mappingStaggeredXmlFn);
     EXPECT_EQ(DataSet::GENERIC, dataset.Type());
-    EXPECT_EQ(string("2015-05-13T10:58:26"),    dataset.CreatedAt());
-    EXPECT_EQ(string("PacBio.DataSet.DataSet"), dataset.MetaType());
-    EXPECT_EQ(string(""), dataset.Name());
-    EXPECT_EQ(string(""), dataset.Tags());
-    EXPECT_EQ(string("30f72098-bc5b-e06b-566c-8b28dda909a8"), dataset.UniqueId());
-    EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(std::string("2015-05-13T10:58:26"),    dataset.CreatedAt());
+    EXPECT_EQ(std::string("PacBio.DataSet.DataSet"), dataset.MetaType());
+    EXPECT_EQ(std::string(""), dataset.Name());
+    EXPECT_EQ(std::string(""), dataset.Tags());
+    EXPECT_EQ(std::string("30f72098-bc5b-e06b-566c-8b28dda909a8"), dataset.UniqueId());
+    EXPECT_EQ(std::string("2.3.0"), dataset.Version());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(std::string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
 
@@ -851,28 +850,28 @@ static void TestMappingStaggeredXml()
     for (size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
-            EXPECT_EQ(string(""), resource.Name());
-            EXPECT_EQ(string(""), resource.Description());
-            EXPECT_EQ(string(""), resource.MetaType());
-            EXPECT_EQ(string("file:tests/data/bam_mapping_1.bam"), resource.ResourceId());
-            EXPECT_EQ(string(""), resource.Tags());
+            EXPECT_EQ(std::string(""), resource.Name());
+            EXPECT_EQ(std::string(""), resource.Description());
+            EXPECT_EQ(std::string(""), resource.MetaType());
+            EXPECT_EQ(std::string("file:tests/data/bam_mapping_1.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string(""), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:tests/data/bam_mapping_1.bam.bai"), index.ResourceId());
+            EXPECT_EQ(std::string("file:tests/data/bam_mapping_1.bam.bai"), index.ResourceId());
         }
         else {
-            EXPECT_EQ(string(""), resource.Name());
-            EXPECT_EQ(string(""), resource.Description());
-            EXPECT_EQ(string(""), resource.MetaType());
-            EXPECT_EQ(string("file:tests/data/bam_mapping_2.bam"), resource.ResourceId());
-            EXPECT_EQ(string(""), resource.Tags());
+            EXPECT_EQ(std::string(""), resource.Name());
+            EXPECT_EQ(std::string(""), resource.Description());
+            EXPECT_EQ(std::string(""), resource.MetaType());
+            EXPECT_EQ(std::string("file:tests/data/bam_mapping_2.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string(""), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:tests/data/bam_mapping_2.bam.bai"), index.ResourceId());
+            EXPECT_EQ(std::string("file:tests/data/bam_mapping_2.bam.bai"), index.ResourceId());
         }
     }
 
@@ -881,38 +880,38 @@ static void TestMappingStaggeredXml()
     for (size_t i = 0; i < subdatasets.Size(); ++i) {
         const DataSetBase& subdataset = subdatasets[i];
         if (i == 0) {
-            EXPECT_EQ(string("2015-05-13T10:58:26"),    subdataset.CreatedAt());
-            EXPECT_EQ(string(""), subdataset.MetaType());
-            EXPECT_EQ(string(""), subdataset.Name());
-            EXPECT_EQ(string(""), subdataset.Tags());
-            EXPECT_EQ(string("c5402d06-4643-057c-e300-fe229b4e8909"), subdataset.UniqueId());
-            EXPECT_EQ(string("2.3.0"), subdataset.Version());
+            EXPECT_EQ(std::string("2015-05-13T10:58:26"),    subdataset.CreatedAt());
+            EXPECT_EQ(std::string(""), subdataset.MetaType());
+            EXPECT_EQ(std::string(""), subdataset.Name());
+            EXPECT_EQ(std::string(""), subdataset.Tags());
+            EXPECT_EQ(std::string("c5402d06-4643-057c-e300-fe229b4e8909"), subdataset.UniqueId());
+            EXPECT_EQ(std::string("2.3.0"), subdataset.Version());
 
             const ExternalResources& subResources = subdataset.ExternalResources();
             ASSERT_EQ(1, subResources.Size());
             const ExternalResource& resource = subResources[0];
-            EXPECT_EQ(string("file:tests/data/bam_mapping_2.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string("file:tests/data/bam_mapping_2.bam"), resource.ResourceId());
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:tests/data/bam_mapping_2.bam.bai"), index.ResourceId());
+            EXPECT_EQ(std::string("file:tests/data/bam_mapping_2.bam.bai"), index.ResourceId());
         }
         else {
-            EXPECT_EQ(string("2015-05-13T10:58:26"),    subdataset.CreatedAt());
-            EXPECT_EQ(string(""), subdataset.MetaType());
-            EXPECT_EQ(string(""), subdataset.Name());
-            EXPECT_EQ(string(""), subdataset.Tags());
-            EXPECT_EQ(string("f8b54a55-5fb7-706f-ab35-39afc9c86924"), subdataset.UniqueId());
-            EXPECT_EQ(string("2.3.0"), subdataset.Version());
+            EXPECT_EQ(std::string("2015-05-13T10:58:26"),    subdataset.CreatedAt());
+            EXPECT_EQ(std::string(""), subdataset.MetaType());
+            EXPECT_EQ(std::string(""), subdataset.Name());
+            EXPECT_EQ(std::string(""), subdataset.Tags());
+            EXPECT_EQ(std::string("f8b54a55-5fb7-706f-ab35-39afc9c86924"), subdataset.UniqueId());
+            EXPECT_EQ(std::string("2.3.0"), subdataset.Version());
 
             const ExternalResources& subResources = subdataset.ExternalResources();
             ASSERT_EQ(1, subResources.Size());
             const ExternalResource& resource = subResources[0];
-            EXPECT_EQ(string("file:tests/data/bam_mapping_1.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string("file:tests/data/bam_mapping_1.bam"), resource.ResourceId());
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:tests/data/bam_mapping_1.bam.bai"), index.ResourceId());
+            EXPECT_EQ(std::string("file:tests/data/bam_mapping_1.bam.bai"), index.ResourceId());
         }
     }
 }
@@ -921,15 +920,15 @@ static void TestBarcodeXml()
 {
     const DataSet dataset(DataSetIOTests::barcodeXmlFn);
     EXPECT_EQ(DataSet::BARCODE, dataset.Type());
-    EXPECT_EQ(string("2015-01-27T09:00:01"),    dataset.CreatedAt());
-    EXPECT_EQ(string("PacBio.DataSet.BarcodeSet"), dataset.MetaType());
-    EXPECT_EQ(string("DataSet_BarcodeSet"), dataset.Name());
-    EXPECT_EQ(string("barcode moreTags mapping mytags"), dataset.Tags());
-    EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
-    EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(std::string("2015-01-27T09:00:01"),    dataset.CreatedAt());
+    EXPECT_EQ(std::string("PacBio.DataSet.BarcodeSet"), dataset.MetaType());
+    EXPECT_EQ(std::string("DataSet_BarcodeSet"), dataset.Name());
+    EXPECT_EQ(std::string("barcode moreTags mapping mytags"), dataset.Tags());
+    EXPECT_EQ(std::string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
+    EXPECT_EQ(std::string("2.3.0"), dataset.Version());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(std::string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
     EXPECT_EQ(0, dataset.SubDataSets().Size());
@@ -937,33 +936,33 @@ static void TestBarcodeXml()
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(1, resources.Size());
     const ExternalResource& resource = resources[0];
-    EXPECT_EQ(string("First Barcodes FASTA"), resource.Name());
-    EXPECT_EQ(string("Points to an example Barcodes FASTA file."), resource.Description());
-    EXPECT_EQ(string("BarcodeFile.BarcodeFastaFile"), resource.MetaType());
-    EXPECT_EQ(string("file:///mnt/path/to/barcode.fasta"), resource.ResourceId());
-    EXPECT_EQ(string("Example"), resource.Tags());
+    EXPECT_EQ(std::string("First Barcodes FASTA"), resource.Name());
+    EXPECT_EQ(std::string("Points to an example Barcodes FASTA file."), resource.Description());
+    EXPECT_EQ(std::string("BarcodeFile.BarcodeFastaFile"), resource.MetaType());
+    EXPECT_EQ(std::string("file:///mnt/path/to/barcode.fasta"), resource.ResourceId());
+    EXPECT_EQ(std::string("Example"), resource.Tags());
 
     const DataSetMetadata& metadata = dataset.Metadata();
-    EXPECT_EQ(string("30"),     metadata.NumRecords());
-    EXPECT_EQ(string("400"),    metadata.TotalLength());
+    EXPECT_EQ(std::string("30"),     metadata.NumRecords());
+    EXPECT_EQ(std::string("400"),    metadata.TotalLength());
 
     // access metadata extensions directly for now
-    EXPECT_EQ(string("paired"), metadata.ChildText("BarcodeConstruction"));
+    EXPECT_EQ(std::string("paired"), metadata.ChildText("BarcodeConstruction"));
 }
 
 static void TestCcsReadXml()
 {
     const DataSet dataset(DataSetIOTests::ccsReadXmlFn);
     EXPECT_EQ(DataSet::CONSENSUS_READ, dataset.Type());
-    EXPECT_EQ(string("2015-01-27T09:00:01"),    dataset.CreatedAt());
-    EXPECT_EQ(string("PacBio.DataSet.ConsensusReadSet"), dataset.MetaType());
-    EXPECT_EQ(string("DataSet_ConsensusReadSet"), dataset.Name());
-    EXPECT_EQ(string("barcode moreTags mapping mytags"), dataset.Tags());
-    EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
-    EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(std::string("2015-01-27T09:00:01"),    dataset.CreatedAt());
+    EXPECT_EQ(std::string("PacBio.DataSet.ConsensusReadSet"), dataset.MetaType());
+    EXPECT_EQ(std::string("DataSet_ConsensusReadSet"), dataset.Name());
+    EXPECT_EQ(std::string("barcode moreTags mapping mytags"), dataset.Tags());
+    EXPECT_EQ(std::string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
+    EXPECT_EQ(std::string("2.3.0"), dataset.Version());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(std::string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
     EXPECT_EQ(0, dataset.SubDataSets().Size());
@@ -973,30 +972,30 @@ static void TestCcsReadXml()
     for (size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
-            EXPECT_EQ(string("First ConsensusRead BAM"), resource.Name());
-            EXPECT_EQ(string("Points to an example ConsensusRead BAM file."), resource.Description());
-            EXPECT_EQ(string("PacBio.ConsensusReadFile.ConsensusReadBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/ccsreads0.bam"), resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("First ConsensusRead BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to an example ConsensusRead BAM file."), resource.Description());
+            EXPECT_EQ(std::string("PacBio.ConsensusReadFile.ConsensusReadBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/ccsreads0.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("PacBio.Index.PacBioIndex"), index.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/ccsreads0.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("PacBio.Index.PacBioIndex"), index.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/ccsreads0.pbi"), index.ResourceId());
         }
         else {
-            EXPECT_EQ(string("Second ConsensusRead BAM"), resource.Name());
-            EXPECT_EQ(string("Points to another example ConsensusRead BAM file."), resource.Description());
-            EXPECT_EQ(string("PacBio.ConsensusReadFile.ConsensusReadBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/ccsreads1.bam"), resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("Second ConsensusRead BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to another example ConsensusRead BAM file."), resource.Description());
+            EXPECT_EQ(std::string("PacBio.ConsensusReadFile.ConsensusReadBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/ccsreads1.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("PacBio.Index.PacBioIndex"), index.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/ccsreads0.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("PacBio.Index.PacBioIndex"), index.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/ccsreads0.pbi"), index.ResourceId());
         }
     }
 }
@@ -1005,15 +1004,15 @@ static void TestLambdaContigsXml()
 {
     const DataSet dataset(DataSetIOTests::lambdaContigsXmlFn);
     EXPECT_EQ(DataSet::REFERENCE, dataset.Type());
-    EXPECT_EQ(string("2015-05-28T10:56:36"),    dataset.CreatedAt());
-    EXPECT_EQ(string("PacBio.DataSet.ReferenceSet"), dataset.MetaType());
-    EXPECT_EQ(string(""), dataset.Name());
-    EXPECT_EQ(string(""), dataset.Tags());
-    EXPECT_EQ(string("596e87db-34f9-d2fd-c905-b017543170e1"), dataset.UniqueId());
-    EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(std::string("2015-05-28T10:56:36"),    dataset.CreatedAt());
+    EXPECT_EQ(std::string("PacBio.DataSet.ReferenceSet"), dataset.MetaType());
+    EXPECT_EQ(std::string(""), dataset.Name());
+    EXPECT_EQ(std::string(""), dataset.Tags());
+    EXPECT_EQ(std::string("596e87db-34f9-d2fd-c905-b017543170e1"), dataset.UniqueId());
+    EXPECT_EQ(std::string("2.3.0"), dataset.Version());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(std::string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
     EXPECT_EQ(0, dataset.SubDataSets().Size());
@@ -1021,33 +1020,33 @@ static void TestLambdaContigsXml()
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(1, resources.Size());
     const ExternalResource& resource = resources[0];
-    EXPECT_EQ(string("file:tests/data/lambda_contigs.fasta"), resource.ResourceId());
+    EXPECT_EQ(std::string("file:tests/data/lambda_contigs.fasta"), resource.ResourceId());
 }
 
 static void TestPbalchemyXml()
 {
     const DataSet dataset(DataSetIOTests::pbalchemyXmlFn);
     EXPECT_EQ(DataSet::GENERIC, dataset.Type());
-    EXPECT_EQ(string("2015-05-22T16:56:16"),    dataset.CreatedAt());
-    EXPECT_EQ(string("PacBio.DataSet.DataSet"), dataset.MetaType());
-    EXPECT_EQ(string(""), dataset.Name());
-    EXPECT_EQ(string(""), dataset.Tags());
-    EXPECT_EQ(string("58e3f7c5-24c1-b58b-fbd5-37de268cc2f0"), dataset.UniqueId());
-    EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(std::string("2015-05-22T16:56:16"),    dataset.CreatedAt());
+    EXPECT_EQ(std::string("PacBio.DataSet.DataSet"), dataset.MetaType());
+    EXPECT_EQ(std::string(""), dataset.Name());
+    EXPECT_EQ(std::string(""), dataset.Tags());
+    EXPECT_EQ(std::string("58e3f7c5-24c1-b58b-fbd5-37de268cc2f0"), dataset.UniqueId());
+    EXPECT_EQ(std::string("2.3.0"), dataset.Version());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(std::string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.SubDataSets().Size());
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(1, resources.Size());
     const ExternalResource& resource = resources[0];
-    EXPECT_EQ(string("file:tests/data/pbalchemy10kbp.pbalign.sorted.pbver1.bam"), resource.ResourceId());
+    EXPECT_EQ(std::string("file:tests/data/pbalchemy10kbp.pbalign.sorted.pbver1.bam"), resource.ResourceId());
     const FileIndices& fileIndices = resource.FileIndices();
     ASSERT_EQ(1, fileIndices.Size());
     const FileIndex& index = fileIndices[0];
-    EXPECT_EQ(string("file:tests/data/pbalchemy10kbp.pbalign.sorted.pbver1.bam.bai"), index.ResourceId());
+    EXPECT_EQ(std::string("file:tests/data/pbalchemy10kbp.pbalign.sorted.pbver1.bam.bai"), index.ResourceId());
 
     // TYPOs: Should be Filter Properties/Property not Parameter(s)
 
@@ -1057,15 +1056,15 @@ static void TestReferenceXml()
 {
     const DataSet dataset(DataSetIOTests::referenceXmlFn);
     EXPECT_EQ(DataSet::REFERENCE, dataset.Type());
-    EXPECT_EQ(string("2015-01-27T09:00:01"),    dataset.CreatedAt());
-    EXPECT_EQ(string("PacBio.DataSet.ReferenceSet"), dataset.MetaType());
-    EXPECT_EQ(string("DataSet_ReferenceSet"), dataset.Name());
-    EXPECT_EQ(string("barcode moreTags mapping mytags"), dataset.Tags());
-    EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
-    EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(std::string("2015-01-27T09:00:01"),    dataset.CreatedAt());
+    EXPECT_EQ(std::string("PacBio.DataSet.ReferenceSet"), dataset.MetaType());
+    EXPECT_EQ(std::string("DataSet_ReferenceSet"), dataset.Name());
+    EXPECT_EQ(std::string("barcode moreTags mapping mytags"), dataset.Tags());
+    EXPECT_EQ(std::string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
+    EXPECT_EQ(std::string("2.3.0"), dataset.Version());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(std::string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
     EXPECT_EQ(0, dataset.SubDataSets().Size());
@@ -1073,84 +1072,84 @@ static void TestReferenceXml()
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(1, resources.Size());
     const ExternalResource& resource = resources[0];
-    EXPECT_EQ(string("First References FASTA"), resource.Name());
-    EXPECT_EQ(string("Points to an example references FASTA file."), resource.Description());
-    EXPECT_EQ(string("PacBio.ReferenceFile.ReferenceFastaFile"), resource.MetaType());
-    EXPECT_EQ(string("file:///mnt/path/to/reference.fasta"), resource.ResourceId());
-    EXPECT_EQ(string("Example"), resource.Tags());
+    EXPECT_EQ(std::string("First References FASTA"), resource.Name());
+    EXPECT_EQ(std::string("Points to an example references FASTA file."), resource.Description());
+    EXPECT_EQ(std::string("PacBio.ReferenceFile.ReferenceFastaFile"), resource.MetaType());
+    EXPECT_EQ(std::string("file:///mnt/path/to/reference.fasta"), resource.ResourceId());
+    EXPECT_EQ(std::string("Example"), resource.Tags());
     const FileIndices& fileIndices = resource.FileIndices();
     ASSERT_EQ(2, fileIndices.Size());
     for (size_t i = 0; i < fileIndices.Size(); ++i) {
         const FileIndex& index = fileIndices[i];
         if (i == 0) {
-            EXPECT_EQ(string("PacBio.Index.SaWriterIndex"), index.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/reference.fasta.sa"), index.ResourceId());
+            EXPECT_EQ(std::string("PacBio.Index.SaWriterIndex"), index.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/reference.fasta.sa"), index.ResourceId());
         }
         else {
-            EXPECT_EQ(string("PacBio.Index.SamIndex"), index.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/reference.fasta.fai"), index.ResourceId());
+            EXPECT_EQ(std::string("PacBio.Index.SamIndex"), index.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/reference.fasta.fai"), index.ResourceId());
         }
     }
 
     const DataSetMetadata& metadata = dataset.Metadata();
-    EXPECT_EQ(string("500"),     metadata.NumRecords());
-    EXPECT_EQ(string("5000000"), metadata.TotalLength());
+    EXPECT_EQ(std::string("500"),     metadata.NumRecords());
+    EXPECT_EQ(std::string("5000000"), metadata.TotalLength());
 
     // access metadata extensions directly for now
-    EXPECT_EQ(string("Tribble"), metadata.ChildText("Organism"));
-    EXPECT_EQ(string("Diploid"), metadata.ChildText("Ploidy"));
+    EXPECT_EQ(std::string("Tribble"), metadata.ChildText("Organism"));
+    EXPECT_EQ(std::string("Diploid"), metadata.ChildText("Ploidy"));
 
     const internal::DataSetListElement<internal::DataSetElement>& contigs =
             metadata.Child<internal::DataSetListElement<internal::DataSetElement> >("Contigs");
     ASSERT_EQ(1, contigs.NumChildren());
     const internal::DataSetElement& contig = contigs[0];
-    EXPECT_EQ(string("gi|229359445|emb|AM181176.4|"), contig.Attribute("Name"));
-    EXPECT_EQ(string("Pseudomonas fluorescens SBW25 complete genome|quiver"), contig.Attribute("Description"));
-    EXPECT_EQ(string("6722109"), contig.Attribute("Length"));
-    EXPECT_EQ(string("f627c795efad7ce0050ed42b942d408e"), contig.Attribute("Digest"));
+    EXPECT_EQ(std::string("gi|229359445|emb|AM181176.4|"), contig.Attribute("Name"));
+    EXPECT_EQ(std::string("Pseudomonas fluorescens SBW25 complete genome|quiver"), contig.Attribute("Description"));
+    EXPECT_EQ(std::string("6722109"), contig.Attribute("Length"));
+    EXPECT_EQ(std::string("f627c795efad7ce0050ed42b942d408e"), contig.Attribute("Digest"));
 }
 
 static void TestSubread1Xml()
 {
     const DataSet dataset(DataSetIOTests::subread1XmlFn);
     EXPECT_EQ(DataSet::SUBREAD, dataset.Type());
-    EXPECT_EQ(string("2015-01-27T09:00:01"),    dataset.CreatedAt());
-    EXPECT_EQ(string("PacBio.DataSet.SubreadSet"), dataset.MetaType());
-    EXPECT_EQ(string("DataSet_SubreadSet"), dataset.Name());
-    EXPECT_EQ(string("barcode moreTags mapping mytags"), dataset.Tags());
-    EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
-    EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(std::string("2015-01-27T09:00:01"),    dataset.CreatedAt());
+    EXPECT_EQ(std::string("PacBio.DataSet.SubreadSet"), dataset.MetaType());
+    EXPECT_EQ(std::string("DataSet_SubreadSet"), dataset.Name());
+    EXPECT_EQ(std::string("barcode moreTags mapping mytags"), dataset.Tags());
+    EXPECT_EQ(std::string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
+    EXPECT_EQ(std::string("2.3.0"), dataset.Version());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(std::string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(2, resources.Size());
     for (size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
-            EXPECT_EQ(string("First Subreads BAM"), resource.Name());
-            EXPECT_EQ(string("Points to an example Subreads BAM file."), resource.Description());
-            EXPECT_EQ(string("SubreadFile.SubreadBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/subreads0.bam"), resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("First Subreads BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to an example Subreads BAM file."), resource.Description());
+            EXPECT_EQ(std::string("SubreadFile.SubreadBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/subreads0.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:///mnt/path/to/subreads0.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("file:///mnt/path/to/subreads0.pbi"), index.ResourceId());
         }
         else {
-            EXPECT_EQ(string("Second Subreads BAM"), resource.Name());
-            EXPECT_EQ(string("Points to another example Subreads BAM file."), resource.Description());
-            EXPECT_EQ(string("SubreadFile.SubreadBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/subreads1.bam"), resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("Second Subreads BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to another example Subreads BAM file."), resource.Description());
+            EXPECT_EQ(std::string("SubreadFile.SubreadBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/subreads1.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:///mnt/path/to/subreads0.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("file:///mnt/path/to/subreads0.pbi"), index.ResourceId());
         }
     }
 
@@ -1162,65 +1161,65 @@ static void TestSubread1Xml()
             const Properties& properties = filter.Properties();
             ASSERT_EQ(1, properties.Size());
             const Property& property = properties[0];
-            EXPECT_EQ(string("rq"), property.Name());
-            EXPECT_EQ(string("0.75"), property.Value());
-            EXPECT_EQ(string(">"), property.Operator());
+            EXPECT_EQ(std::string("rq"), property.Name());
+            EXPECT_EQ(std::string("0.75"), property.Value());
+            EXPECT_EQ(std::string(">"), property.Operator());
         } else {
             const Properties& properties = filter.Properties();
             ASSERT_EQ(1, properties.Size());
             const Property& property = properties[0];
-            EXPECT_EQ(string("QNAME"), property.Name());
-            EXPECT_EQ(string("100/0/0_100"), property.Value());
-            EXPECT_EQ(string("=="), property.Operator());
+            EXPECT_EQ(std::string("QNAME"), property.Name());
+            EXPECT_EQ(std::string("100/0/0_100"), property.Value());
+            EXPECT_EQ(std::string("=="), property.Operator());
         }
     }
 
     const DataSetMetadata& metadata = dataset.Metadata();
-    EXPECT_EQ(string("500"),    metadata.NumRecords());
-    EXPECT_EQ(string("500000"), metadata.TotalLength());
+    EXPECT_EQ(std::string("500"),    metadata.NumRecords());
+    EXPECT_EQ(std::string("500000"), metadata.TotalLength());
 }
 
 static void TestSubread2Xml()
 {
     const DataSet dataset(DataSetIOTests::subread2XmlFn);
     EXPECT_EQ(DataSet::SUBREAD, dataset.Type());
-    EXPECT_EQ(string("2015-01-27T09:00:01"),    dataset.CreatedAt());
-    EXPECT_EQ(string("PacBio.DataSet.SubreadSet"), dataset.MetaType());
-    EXPECT_EQ(string("DataSet_SubreadSet"), dataset.Name());
-    EXPECT_EQ(string("barcode moreTags mapping mytags"), dataset.Tags());
-    EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
-    EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(std::string("2015-01-27T09:00:01"),    dataset.CreatedAt());
+    EXPECT_EQ(std::string("PacBio.DataSet.SubreadSet"), dataset.MetaType());
+    EXPECT_EQ(std::string("DataSet_SubreadSet"), dataset.Name());
+    EXPECT_EQ(std::string("barcode moreTags mapping mytags"), dataset.Tags());
+    EXPECT_EQ(std::string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
+    EXPECT_EQ(std::string("2.3.0"), dataset.Version());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(std::string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(2, resources.Size());
     for (size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
-            EXPECT_EQ(string("First Subreads BAM"), resource.Name());
-            EXPECT_EQ(string("Points to an example Subreads BAM file."), resource.Description());
-            EXPECT_EQ(string("SubreadFile.SubreadBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/subreads2.bam"), resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("First Subreads BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to an example Subreads BAM file."), resource.Description());
+            EXPECT_EQ(std::string("SubreadFile.SubreadBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/subreads2.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:///mnt/path/to/subreads2.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("file:///mnt/path/to/subreads2.pbi"), index.ResourceId());
         }
         else {
-            EXPECT_EQ(string("Second Subreads BAM"), resource.Name());
-            EXPECT_EQ(string("Points to another example Subreads BAM file."), resource.Description());
-            EXPECT_EQ(string("SubreadFile.SubreadBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/subreads3.bam"), resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("Second Subreads BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to another example Subreads BAM file."), resource.Description());
+            EXPECT_EQ(std::string("SubreadFile.SubreadBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/subreads3.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:///mnt/path/to/subreads3.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("file:///mnt/path/to/subreads3.pbi"), index.ResourceId());
         }
     }
 
@@ -1232,65 +1231,65 @@ static void TestSubread2Xml()
             const Properties& properties = filter.Properties();
             ASSERT_EQ(1, properties.Size());
             const Property& property = properties[0];
-            EXPECT_EQ(string("rq"), property.Name());
-            EXPECT_EQ(string("0.75"), property.Value());
-            EXPECT_EQ(string(">"), property.Operator());
+            EXPECT_EQ(std::string("rq"), property.Name());
+            EXPECT_EQ(std::string("0.75"), property.Value());
+            EXPECT_EQ(std::string(">"), property.Operator());
         } else {
             const Properties& properties = filter.Properties();
             ASSERT_EQ(1, properties.Size());
             const Property& property = properties[0];
-            EXPECT_EQ(string("QNAME"), property.Name());
-            EXPECT_EQ(string("100/0/0_100"), property.Value());
-            EXPECT_EQ(string("=="), property.Operator());
+            EXPECT_EQ(std::string("QNAME"), property.Name());
+            EXPECT_EQ(std::string("100/0/0_100"), property.Value());
+            EXPECT_EQ(std::string("=="), property.Operator());
         }
     }
 
     const DataSetMetadata& metadata = dataset.Metadata();
-    EXPECT_EQ(string("500"),    metadata.NumRecords());
-    EXPECT_EQ(string("500000"), metadata.TotalLength());
+    EXPECT_EQ(std::string("500"),    metadata.NumRecords());
+    EXPECT_EQ(std::string("500000"), metadata.TotalLength());
 }
 
 static void TestSubread3Xml()
 {
     const DataSet dataset(DataSetIOTests::subread3XmlFn);
     EXPECT_EQ(DataSet::SUBREAD, dataset.Type());
-    EXPECT_EQ(string("2015-01-27T09:00:01"), dataset.CreatedAt());
-    EXPECT_EQ(string("PacBio.DataSet.SubreadSet"), dataset.MetaType());
-    EXPECT_EQ(string("DataSet_SubreadSet"), dataset.Name());
-    EXPECT_EQ(string("barcode moreTags mapping mytags"), dataset.Tags());
-    EXPECT_EQ(string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
-    EXPECT_EQ(string("2.3.0"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
+    EXPECT_EQ(std::string("2015-01-27T09:00:01"), dataset.CreatedAt());
+    EXPECT_EQ(std::string("PacBio.DataSet.SubreadSet"), dataset.MetaType());
+    EXPECT_EQ(std::string("DataSet_SubreadSet"), dataset.Name());
+    EXPECT_EQ(std::string("barcode moreTags mapping mytags"), dataset.Tags());
+    EXPECT_EQ(std::string("b095d0a3-94b8-4918-b3af-a3f81bbe519c"), dataset.UniqueId());
+    EXPECT_EQ(std::string("2.3.0"), dataset.Version());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(std::string("http://www.w3.org/2001/XMLSchema-instance"),        dataset.Attribute("xmlns:xsi"));
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xsi:schemaLocation"));
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(2, resources.Size());
     for (size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
-            EXPECT_EQ(string("First Subreads BAM"), resource.Name());
-            EXPECT_EQ(string("Points to an example Subreads BAM file."), resource.Description());
-            EXPECT_EQ(string("SubreadFile.SubreadBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/subreads2.bam"), resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("First Subreads BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to an example Subreads BAM file."), resource.Description());
+            EXPECT_EQ(std::string("SubreadFile.SubreadBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/subreads2.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:///mnt/path/to/subreads2.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("file:///mnt/path/to/subreads2.pbi"), index.ResourceId());
         }
         else {
-            EXPECT_EQ(string("Second Subreads BAM"), resource.Name());
-            EXPECT_EQ(string("Points to another example Subreads BAM file."), resource.Description());
-            EXPECT_EQ(string("SubreadFile.SubreadBamFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///mnt/path/to/subreads3.bam"), resource.ResourceId());
-            EXPECT_EQ(string("Example"), resource.Tags());
+            EXPECT_EQ(std::string("Second Subreads BAM"), resource.Name());
+            EXPECT_EQ(std::string("Points to another example Subreads BAM file."), resource.Description());
+            EXPECT_EQ(std::string("SubreadFile.SubreadBamFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:///mnt/path/to/subreads3.bam"), resource.ResourceId());
+            EXPECT_EQ(std::string("Example"), resource.Tags());
 
             const FileIndices& fileIndices = resource.FileIndices();
             ASSERT_EQ(1, fileIndices.Size());
             const FileIndex& index = fileIndices[0];
-            EXPECT_EQ(string("file:///mnt/path/to/subreads3.pbi"), index.ResourceId());
+            EXPECT_EQ(std::string("file:///mnt/path/to/subreads3.pbi"), index.ResourceId());
         }
     }
 
@@ -1302,38 +1301,38 @@ static void TestSubread3Xml()
             const Properties& properties = filter.Properties();
             ASSERT_EQ(1, properties.Size());
             const Property& property = properties[0];
-            EXPECT_EQ(string("rq"), property.Name());
-            EXPECT_EQ(string("0.85"), property.Value());
-            EXPECT_EQ(string(">"), property.Operator());
+            EXPECT_EQ(std::string("rq"), property.Name());
+            EXPECT_EQ(std::string("0.85"), property.Value());
+            EXPECT_EQ(std::string(">"), property.Operator());
         } else {
             const Properties& properties = filter.Properties();
             ASSERT_EQ(1, properties.Size());
             const Property& property = properties[0];
-            EXPECT_EQ(string("QNAME"), property.Name());
-            EXPECT_EQ(string("100/0/0_100"), property.Value());
-            EXPECT_EQ(string("=="), property.Operator());
+            EXPECT_EQ(std::string("QNAME"), property.Name());
+            EXPECT_EQ(std::string("100/0/0_100"), property.Value());
+            EXPECT_EQ(std::string("=="), property.Operator());
         }
     }
 
     const DataSetMetadata& metadata = dataset.Metadata();
-    EXPECT_EQ(string("500"),    metadata.NumRecords());
-    EXPECT_EQ(string("500000"), metadata.TotalLength());
+    EXPECT_EQ(std::string("500"),    metadata.NumRecords());
+    EXPECT_EQ(std::string("500000"), metadata.TotalLength());
 }
 
 static void TestTransformedXml()
 {
     const DataSet dataset(DataSetIOTests::transformedXmlFn);
     EXPECT_EQ(DataSet::HDF_SUBREAD, dataset.Type());
-    EXPECT_EQ(string("PacBio.DataSet.SubreadSet"), dataset.MetaType());
-    EXPECT_EQ(string("Subreads from run r001173_42129_130607"), dataset.Name());
-    EXPECT_EQ(string("pacbio.secondary.instrument=RS"), dataset.Tags());
-    EXPECT_EQ(string("abbc9183-b01e-4671-8c12-19efee534647"), dataset.UniqueId());
-    EXPECT_EQ(string("0.5"), dataset.Version());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
-    EXPECT_EQ(string("http://www.w3.org/2001/XMLSchema"),         dataset.Attribute("xmlns:xs"));
-    EXPECT_EQ(string("http://www.w3.org/2005/xpath-functions"), dataset.Attribute("xmlns:fn"));
-    EXPECT_EQ(string("java:java.util.UUID"), dataset.Attribute("xmlns:uuid"));
-    EXPECT_EQ(string("http://whatever"), dataset.Attribute("xmlns:bax"));
+    EXPECT_EQ(std::string("PacBio.DataSet.SubreadSet"), dataset.MetaType());
+    EXPECT_EQ(std::string("Subreads from run r001173_42129_130607"), dataset.Name());
+    EXPECT_EQ(std::string("pacbio.secondary.instrument=RS"), dataset.Tags());
+    EXPECT_EQ(std::string("abbc9183-b01e-4671-8c12-19efee534647"), dataset.UniqueId());
+    EXPECT_EQ(std::string("0.5"), dataset.Version());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), dataset.Attribute("xmlns"));
+    EXPECT_EQ(std::string("http://www.w3.org/2001/XMLSchema"),         dataset.Attribute("xmlns:xs"));
+    EXPECT_EQ(std::string("http://www.w3.org/2005/xpath-functions"), dataset.Attribute("xmlns:fn"));
+    EXPECT_EQ(std::string("java:java.util.UUID"), dataset.Attribute("xmlns:uuid"));
+    EXPECT_EQ(std::string("http://whatever"), dataset.Attribute("xmlns:bax"));
 
     EXPECT_EQ(0, dataset.Filters().Size());
     EXPECT_EQ(0, dataset.SubDataSets().Size());
@@ -1343,38 +1342,38 @@ static void TestTransformedXml()
     for (size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
-            EXPECT_EQ(string("PacBio.SubreadFile.BaxFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///pbi/dept/secondary/siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.0.bax.h5"),
+            EXPECT_EQ(std::string("PacBio.SubreadFile.BaxFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:///pbi/dept/secondary/siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.0.bax.h5"),
                       resource.ResourceId());
         }
         else if (i == 1) {
-            EXPECT_EQ(string("PacBio.SubreadFile.BaxFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///pbi/dept/secondary/siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.1.bax.h5"),
+            EXPECT_EQ(std::string("PacBio.SubreadFile.BaxFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:///pbi/dept/secondary/siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.1.bax.h5"),
                       resource.ResourceId());
         }
         else {
-            EXPECT_EQ(string("PacBio.SubreadFile.BaxFile"), resource.MetaType());
-            EXPECT_EQ(string("file:///pbi/dept/secondary/siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.2.bax.h5"),
+            EXPECT_EQ(std::string("PacBio.SubreadFile.BaxFile"), resource.MetaType());
+            EXPECT_EQ(std::string("file:///pbi/dept/secondary/siv/testdata/LIMS/2590727/0001/Analysis_Results/m130608_033634_42129_c100515232550000001823076608221351_s1_p0.2.bax.h5"),
                       resource.ResourceId());
         }
     }
 
     const DataSetMetadata& metadata = dataset.Metadata();
-    EXPECT_EQ(string("150000"),   metadata.NumRecords());
-    EXPECT_EQ(string("50000000"), metadata.TotalLength());
+    EXPECT_EQ(std::string("150000"),   metadata.NumRecords());
+    EXPECT_EQ(std::string("50000000"), metadata.TotalLength());
 }
 
 } // namespace DataSetIOTests
 
 TEST(DataSetIOTest, InspectMalformedXml)
 {
-    const string xmlFn = PbbamTestsConfig::Data_Dir + "/dataset/malformed.xml";
+    const std::string xmlFn = PbbamTestsConfig::Data_Dir + "/dataset/malformed.xml";
 
     DataSet ds(xmlFn);
-    ostringstream s;
+    std::ostringstream s;
     ds.SaveToStream(s);
 
-    const string expected{
+    const std::string expected{
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
         "<SubreadSet CreatedAt=\"2015-08-19T15:39:36.331\" Description=\"Merged dataset from 1 files using DatasetMerger 0.1.2\" "
                     "MetaType=\"PacBio.DataSet.HdfSubreadSet\" Name=\"Subreads from runr000013_42267_150403\" "
@@ -1456,7 +1455,7 @@ TEST(DataSetIOTest, InspectMalformedXml)
 
 TEST(DataSetIOTest, RelativePathCarriedThroughOk_FromString)
 {
-    const string inputXml{
+    const std::string inputXml{
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
         "<pbds:AlignmentSet "
             "CreatedAt=\"2015-01-27T09:00:01\" "
@@ -1500,7 +1499,7 @@ TEST(DataSetIOTest, RelativePathCarriedThroughOk_FromString)
 
     auto dataset = DataSet::FromXml(inputXml);
 
-    ostringstream stream;
+    std::ostringstream stream;
     dataset.SaveToStream(stream);
     auto outputXml = stream.str();
 
@@ -1515,7 +1514,7 @@ TEST(DataSetIOTest, RelativePathCarriedThroughOk_FromFile)
     EXPECT_EQ("./b/test1.bam", resources[1].ResourceId());
     EXPECT_EQ("./b/test2.bam", resources[2].ResourceId());
 
-    ostringstream out;
+    std::ostringstream out;
     dataset.SaveToStream(out);
 
     auto newDataset = DataSet::FromXml(out.str());
@@ -1528,15 +1527,15 @@ TEST(DataSetIOTest, RelativePathCarriedThroughOk_FromFile)
 TEST(DataSetIOTest, DataSetFromRelativeBamFilename)
 {
     // cache initial directory and move to location so we can test relatvie filename ok
-    const string startingDirectory = internal::FileUtils::CurrentWorkingDirectory();
+    const std::string startingDirectory = internal::FileUtils::CurrentWorkingDirectory();
 
-    const string targetDirectory = PbbamTestsConfig::Data_Dir + "/dataset";
+    const std::string targetDirectory = PbbamTestsConfig::Data_Dir + "/dataset";
     DataSetIOTests::changeCurrentDirectory(targetDirectory);
     ASSERT_EQ(targetDirectory, internal::FileUtils::CurrentWorkingDirectory());
 
     EXPECT_NO_THROW(
     {
-        const string relativeBamFn = "../phi29.bam";
+        const std::string relativeBamFn = "../phi29.bam";
         const DataSet ds(relativeBamFn);
         const auto files = ds.BamFiles();
         EXPECT_EQ(1, files.size());
@@ -1588,7 +1587,7 @@ TEST(DataSetIOTest, MetadataDefaultChildrenProperlyOrderedPerXsd)
     DataSetMetadata metadata(numRecords, totalLength);
     dataset.Metadata(metadata);
 
-    const string expectedXml{
+    const std::string expectedXml{
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
         "<pbds:AlignmentSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.AlignmentSet\" "
                 "Name=\"DataSet_AlignmentSet\" Tags=\"barcode moreTags mapping mytags\" "
@@ -1608,7 +1607,7 @@ TEST(DataSetIOTest, MetadataDefaultChildrenProperlyOrderedPerXsd)
         "\t</pbds:DataSetMetadata>\n"
         "</pbds:AlignmentSet>\n"};
 
-    ostringstream s;
+    std::ostringstream s;
     dataset.SaveToStream(s);
     EXPECT_EQ(expectedXml, s.str());
 }

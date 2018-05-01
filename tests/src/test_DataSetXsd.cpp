@@ -14,7 +14,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 TEST(DataSetXsdTest, DefaultsOk)
 {
@@ -26,13 +25,13 @@ TEST(DataSetXsdTest, DefaultsOk)
 
     EXPECT_EQ(XsdType::DATASETS, registry.DefaultXsd());
 
-    EXPECT_EQ(string("pbds"),   dsInfo.Name());
-    EXPECT_EQ(string("pbbase"), baseInfo.Name());
-    EXPECT_EQ(string("pbds"),   defaultInfo.Name());
+    EXPECT_EQ(std::string("pbds"),   dsInfo.Name());
+    EXPECT_EQ(std::string("pbbase"), baseInfo.Name());
+    EXPECT_EQ(std::string("pbds"),   defaultInfo.Name());
 
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioBaseDataModel.xsd"), baseInfo.Uri());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"),      dsInfo.Uri());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"),      defaultInfo.Uri());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioBaseDataModel.xsd"), baseInfo.Uri());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"),      dsInfo.Uri());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"),      defaultInfo.Uri());
 }
 
 TEST(DataSetXsdTest, EditDefaultOk)
@@ -43,8 +42,8 @@ TEST(DataSetXsdTest, EditDefaultOk)
     const NamespaceInfo& defaultInfo = registry.DefaultNamespace();
 
     EXPECT_EQ(XsdType::DATASETS, registry.DefaultXsd());
-    EXPECT_EQ(string("pbds"), defaultInfo.Name());
-    EXPECT_EQ(string("http://pacificbiosciences.com/PacBioDatasets.xsd"), defaultInfo.Uri());
+    EXPECT_EQ(std::string("pbds"), defaultInfo.Name());
+    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), defaultInfo.Uri());
 }
 
 TEST(DataSetXsdTest, EditRegistryOk)
@@ -54,8 +53,8 @@ TEST(DataSetXsdTest, EditRegistryOk)
 
     const NamespaceInfo& dsInfo = registry.Namespace(XsdType::DATASETS);
 
-    EXPECT_EQ(string("custom"),                dsInfo.Name());
-    EXPECT_EQ(string("http://custom/uri.xsd"), dsInfo.Uri());
+    EXPECT_EQ(std::string("custom"),                dsInfo.Name());
+    EXPECT_EQ(std::string("http://custom/uri.xsd"), dsInfo.Uri());
 }
 
 TEST(DataSetXsdTest, EditDatasetRegistry)
@@ -78,7 +77,7 @@ TEST(DataSetXsdTest, EditDatasetRegistry)
 
     dataset.Namespaces().Register(XsdType::BASE_DATA_MODEL, NamespaceInfo("custom", "http://custom/uri.xsd"));
 
-    const string expectedXml{
+    const std::string expectedXml{
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
         "<pbds:AlignmentSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.AlignmentSet\" "
                 "Name=\"DataSet_AlignmentSet\" Tags=\"barcode moreTags mapping mytags\" "
@@ -94,7 +93,7 @@ TEST(DataSetXsdTest, EditDatasetRegistry)
         "\t</custom:ExternalResources>\n"
         "</pbds:AlignmentSet>\n"};
 
-    ostringstream s;
+    std::ostringstream s;
     dataset.SaveToStream(s);
     EXPECT_EQ(expectedXml, s.str());
 }
@@ -112,15 +111,15 @@ TEST(DataSetXsdTest, ElementRegistryOk)
         metadata.AddChild(internal::DataSetElement("BioSamples"));
         metadata.AddChild(internal::DataSetElement("AutomationParameters"));
 
-        ostringstream s;
+        std::ostringstream s;
         ds.SaveToStream(s);
-        const string output = s.str();
+        const std::string output = s.str();
 
         // check that default namespace is propagated properly
-        EXPECT_TRUE(output.find("pbds:SummaryStats") != string::npos);
-        EXPECT_TRUE(output.find("pbmeta:CopyFiles") != string::npos);
-        EXPECT_TRUE(output.find("pbsample:BioSamples") != string::npos);
-        EXPECT_TRUE(output.find("pbbase:AutomationParameters") != string::npos);
+        EXPECT_TRUE(output.find("pbds:SummaryStats") != std::string::npos);
+        EXPECT_TRUE(output.find("pbmeta:CopyFiles") != std::string::npos);
+        EXPECT_TRUE(output.find("pbsample:BioSamples") != std::string::npos);
+        EXPECT_TRUE(output.find("pbbase:AutomationParameters") != std::string::npos);
     }
 
     { // custom namespaces
@@ -140,15 +139,15 @@ TEST(DataSetXsdTest, ElementRegistryOk)
         metadata.AddChild(internal::DataSetElement("BioSamples"));
         metadata.AddChild(internal::DataSetElement("AutomationParameters"));
 
-        ostringstream s;
+        std::ostringstream s;
         ds.SaveToStream(s);
-        const string output = s.str();
+        const std::string output = s.str();
 
         // check that custom namespace is propagated properly
-        EXPECT_TRUE(output.find("custom_ds:SummaryStats") != string::npos);
-        EXPECT_TRUE(output.find("custom_meta:CopyFiles") != string::npos);
-        EXPECT_TRUE(output.find("custom_sample:BioSamples") != string::npos);
-        EXPECT_TRUE(output.find("custom_base:AutomationParameters") != string::npos);
+        EXPECT_TRUE(output.find("custom_ds:SummaryStats") != std::string::npos);
+        EXPECT_TRUE(output.find("custom_meta:CopyFiles") != std::string::npos);
+        EXPECT_TRUE(output.find("custom_sample:BioSamples") != std::string::npos);
+        EXPECT_TRUE(output.find("custom_base:AutomationParameters") != std::string::npos);
     }
 }
 

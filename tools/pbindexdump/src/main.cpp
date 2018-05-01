@@ -3,11 +3,14 @@
 #include <cassert>
 #include <cstddef>
 #include <iostream>
+#include <string>
+#include <vector>
+
 #include "../common/OptionParser.h"
+
 #include "PbIndexDump.h"
 #include "PbIndexDumpVersion.h"
 #include "Settings.h"
-using namespace std;
 
 static pbindexdump::Settings fromCommandLine(optparse::OptionParser& parser, int argc, char* argv[])
 {
@@ -15,7 +18,7 @@ static pbindexdump::Settings fromCommandLine(optparse::OptionParser& parser, int
     pbindexdump::Settings settings;
 
     // input
-    const vector<string> positionalArgs = parser.args();
+    const std::vector<std::string> positionalArgs = parser.args();
     const size_t numPositionalArgs = positionalArgs.size();
     if (numPositionalArgs == 0)
         settings.inputPbiFilename_ = "-";  // stdin
@@ -86,10 +89,10 @@ int main(int argc, char* argv[])
     // parse command line for settings
     const pbindexdump::Settings settings = fromCommandLine(parser, argc, argv);
     if (!settings.errors_.empty()) {
-        cerr << endl;
+        std::cerr << std::endl;
         for (const auto e : settings.errors_)
-            cerr << "ERROR: " << e << endl;
-        cerr << endl;
+            std::cerr << "ERROR: " << e << std::endl;
+        std::cerr << std::endl;
         parser.print_help();
         return EXIT_FAILURE;
     }
@@ -99,7 +102,7 @@ int main(int argc, char* argv[])
         pbindexdump::PbIndexDump::Run(settings);
         return EXIT_SUCCESS;
     } catch (std::exception& e) {
-        cerr << "ERROR: " << e.what() << endl;
+        std::cerr << "ERROR: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
 }

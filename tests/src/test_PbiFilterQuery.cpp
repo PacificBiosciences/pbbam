@@ -3,7 +3,9 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <set>
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -14,11 +16,10 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 TEST(PbiFilterQueryTest, QueryOk)
 {
-    const auto bamFile = BamFile{PbbamTestsConfig::Data_Dir + string{"/group/test2.bam"}};
+    const auto bamFile = BamFile{PbbamTestsConfig::Data_Dir + std::string{"/group/test2.bam"}};
 
     {
         PbiFilterQuery query(PbiQueryLengthFilter{500, Compare::GREATER_THAN_EQUAL}, bamFile);
@@ -47,9 +48,10 @@ TEST(PbiFilterQueryTest, QueryOk)
             ++count;
             EXPECT_EQ(Strand::REVERSE, r.AlignedStrand());
             EXPECT_GE((r.ReferenceStart()), 9200);
-            EXPECT_EQ(string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/"
-                             "5615_6237"),
-                      r.FullName());
+            EXPECT_EQ(
+                std::string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/"
+                            "5615_6237"),
+                r.FullName());
         }
         EXPECT_EQ(1, count);
     }
@@ -68,9 +70,10 @@ TEST(PbiFilterQueryTest, QueryOk)
             ++count;
             EXPECT_EQ(Strand::FORWARD, r.AlignedStrand());
             EXPECT_GE((r.ReferenceStart()), 9200);
-            EXPECT_EQ(string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/"
-                             "2114_2531"),
-                      r.FullName());
+            EXPECT_EQ(
+                std::string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/"
+                            "2114_2531"),
+                r.FullName());
         }
         EXPECT_EQ(1, count);
     }
@@ -87,17 +90,19 @@ TEST(PbiFilterQueryTest, QueryOk)
         int count = 0;
         for (const auto& r : query) {
             ++count;
-            EXPECT_EQ(string("b89a4406"), r.ReadGroupId());
+            EXPECT_EQ(std::string("b89a4406"), r.ReadGroupId());
             EXPECT_GE((r.NumMatches()), 1200);
             if (count == 1)
-                EXPECT_EQ(string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/"
-                                 "14743/2579_4055"),
-                          r.FullName());
+                EXPECT_EQ(
+                    std::string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/"
+                                "14743/2579_4055"),
+                    r.FullName());
             else {
                 if (count == 2) {
-                    EXPECT_EQ(string("m140905_042212_sidney_c100564852550000001823085912221377_s1_"
-                                     "X0/14743/4101_5571"),
-                              r.FullName());
+                    EXPECT_EQ(
+                        std::string("m140905_042212_sidney_c100564852550000001823085912221377_s1_"
+                                    "X0/14743/4101_5571"),
+                        r.FullName());
                 }
             }
         }
@@ -108,7 +113,7 @@ TEST(PbiFilterQueryTest, QueryOk)
 TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 {
     const auto expectedMovieName =
-        string{"m150404_101626_42267_c100807920800000001823174110291514_s1_p0"};
+        std::string{"m150404_101626_42267_c100807920800000001823174110291514_s1_p0"};
 
     const DataSet ds(PbbamTestsConfig::Data_Dir + "/chunking/chunking.subreadset.xml");
     EXPECT_EQ(3, ds.BamFiles().size());
@@ -128,8 +133,8 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
     }
 
     {  // sequencing chemistries
-        set<string> chems{ds.SequencingChemistries()};
-        set<string> expected{"P6-C4"};
+        std::set<std::string> chems{ds.SequencingChemistries()};
+        std::set<std::string> expected{"P6-C4"};
         EXPECT_TRUE(equal(chems.begin(), chems.end(), expected.begin()));
     }
 
@@ -228,8 +233,8 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 TEST(PbiFilterQueryTest, MissingPbiShouldThrow)
 {
     const PbiFilter filter{PbiZmwFilter{31883}};
-    const string phi29Bam = PbbamTestsConfig::GeneratedData_Dir + "/missing_pbi.bam";
-    const string hasPbiBam = PbbamTestsConfig::Data_Dir + "/polymerase/production.scraps.bam";
+    const std::string phi29Bam = PbbamTestsConfig::GeneratedData_Dir + "/missing_pbi.bam";
+    const std::string hasPbiBam = PbbamTestsConfig::Data_Dir + "/polymerase/production.scraps.bam";
 
     {  // single file, missing PBI
 
@@ -332,7 +337,7 @@ TEST(PbiFilterQueryTest, BarcodeData)
 
     // bc_forward == [0,2]
     {
-        const auto ids = vector<int16_t>{0, 2};
+        const auto ids = std::vector<int16_t>{0, 2};
         PbiFilterQuery query{PbiBarcodeForwardFilter{ids}, file};
         const auto numReads = query.NumReads();
         EXPECT_EQ(80, numReads);
@@ -363,7 +368,7 @@ TEST(PbiFilterQueryTest, BarcodeData)
 TEST(PbiFilterQueryTest, BarcodeQualityFromXml)
 {
 
-    const string xml_all = R"_XML_(
+    const std::string xml_all = R"_XML_(
 <?xml version="1.0" encoding="utf-8"?>
 <pbds:SubreadSet 
    xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd" 
@@ -405,7 +410,7 @@ TEST(PbiFilterQueryTest, BarcodeQualityFromXml)
 </pbds:SubreadSet>
 )_XML_";
 
-    const string xml_none = R"_XML_(
+    const std::string xml_none = R"_XML_(
 <?xml version="1.0" encoding="utf-8"?>
 <pbds:SubreadSet
    xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd"
@@ -480,7 +485,7 @@ TEST(PbiFilterQueryTest, BarcodeQualityFromXml)
 TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
 {
     const BamFile file{PbbamTestsConfig::Data_Dir + "/phi29.bam"};
-    const string xmlHeader = R"_XML_(
+    const std::string xmlHeader = R"_XML_(
         <?xml version="1.0" encoding="utf-8"?>
         <pbds:SubreadSet
            xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd"
@@ -516,7 +521,7 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
             <pbds:Filter>
                 <pbbase:Properties>)_XML_";
 
-    const string xmlFooter = R"_XML_(
+    const std::string xmlFooter = R"_XML_(
                 </pbbase:Properties>
             </pbds:Filter>
         </pbds:Filters>
@@ -529,9 +534,9 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
     size_t count_whitelist = 0;
 
     {  // 30422
-        const string xmlProperty =
+        const std::string xmlProperty =
             R"_XML_(<pbbase:Property Name="zm" Operator="=" Value="30422"/>\n)_XML_";
-        const string xml = xmlHeader + xmlProperty + xmlFooter;
+        const std::string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
         const auto numReads = query.NumReads();
@@ -544,9 +549,9 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         EXPECT_EQ(13, count_30422);
     }
     {  // 648
-        const string xmlProperty =
+        const std::string xmlProperty =
             R"_XML_(<pbbase:Property Name="zm" Operator="=" Value="648"/>\n)_XML_";
-        const string xml = xmlHeader + xmlProperty + xmlFooter;
+        const std::string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
         const auto numReads = query.NumReads();
@@ -559,9 +564,9 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         EXPECT_EQ(11, count_648);
     }
     {  // 17299
-        const string xmlProperty =
+        const std::string xmlProperty =
             R"_XML_(<pbbase:Property Name="zm" Operator="=" Value="17299"/>\n)_XML_";
-        const string xml = xmlHeader + xmlProperty + xmlFooter;
+        const std::string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
         const auto numReads = query.NumReads();
@@ -574,9 +579,9 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         EXPECT_EQ(4, count_17299);
     }
     {  // now check whitelist
-        const string xmlProperty =
+        const std::string xmlProperty =
             R"_XML_(<pbbase:Property Name="zm" Operator="=" Value="[30422,648,17299]"/>\n)_XML_";
-        const string xml = xmlHeader + xmlProperty + xmlFooter;
+        const std::string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
         const auto numReads = query.NumReads();

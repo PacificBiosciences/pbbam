@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -16,7 +17,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace PbiFilterTests {
 
@@ -539,7 +539,7 @@ TEST(PbiFilterTest, MapQualityFilterOk)
 
 TEST(PbiFilterTest, MovieNameFilterOk)
 {
-    const auto bamFile = BamFile{ PbbamTestsConfig::Data_Dir + string{ "/group/test2.bam" } };
+    const auto bamFile = BamFile{ PbbamTestsConfig::Data_Dir + std::string{ "/group/test2.bam" } };
     const auto index = PbiRawData{ bamFile.PacBioIndexFilename() };
 
     {
@@ -555,7 +555,7 @@ TEST(PbiFilterTest, MovieNameFilterOk)
             EXPECT_TRUE(filter.Accepts(index, row));
     }
     {
-        const auto names = vector<string>{"does_not_exist",
+        const auto names = std::vector<std::string>{"does_not_exist",
                                           "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0"};
         const auto filter = PbiFilter{ PbiMovieNameFilter{ names } };
         const auto expectedRows = std::vector<size_t>{0,1,2,3};
@@ -656,7 +656,7 @@ TEST(PbiFilterTest, QueryNameFilterOk)
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{});
     }
     {
-        const auto names = vector<string>{"m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2579_4055",
+        const auto names = std::vector<std::string>{"m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2579_4055",
                                           "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/5615_6237"};
         const auto filter = PbiFilter{ PbiQueryNameFilter{ names } };
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1,3});
@@ -739,17 +739,17 @@ TEST(PbiFilterTest, ReadGroupFilterOk)
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
     { // multi-ID
-        const auto ids = vector<int32_t>({-1197849594, 200});
+        const auto ids = std::vector<int32_t>({-1197849594, 200});
         const auto filter = PbiReadGroupFilter{ ids };
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
     { // multi-string
-        const auto ids = vector<string>({"b89a4406", "deadbeef"});
+        const auto ids = std::vector<std::string>({"b89a4406", "deadbeef"});
         const auto filter = PbiReadGroupFilter{ ids };
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
     { // multi-ReadGroupInfo
-        const auto ids = vector<ReadGroupInfo>({ ReadGroupInfo("b89a4406"), ReadGroupInfo("deadbeef")});
+        const auto ids = std::vector<ReadGroupInfo>({ ReadGroupInfo("b89a4406"), ReadGroupInfo("deadbeef")});
         const auto filter = PbiReadGroupFilter{ ids };
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
@@ -778,7 +778,7 @@ TEST(PbiFilterTest, ReferenceIdFilterOk)
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{});
     }
     {
-        const auto ids = vector<int32_t>({0, 42});
+        const auto ids = std::vector<int32_t>({0, 42});
         const auto filter = PbiFilter{ PbiReferenceIdFilter{ ids } };
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
@@ -786,7 +786,7 @@ TEST(PbiFilterTest, ReferenceIdFilterOk)
 
 TEST(PbiFilterTest, ReferenceNameFilterOk)
 {
-    const auto bamFile = BamFile{ PbbamTestsConfig::Data_Dir + string{ "/group/test2.bam" } };
+    const auto bamFile = BamFile{ PbbamTestsConfig::Data_Dir + std::string{ "/group/test2.bam" } };
     const auto index = PbiRawData{ bamFile.PacBioIndexFilename() };
 
     {
@@ -803,7 +803,7 @@ TEST(PbiFilterTest, ReferenceNameFilterOk)
             EXPECT_TRUE(filter.Accepts(index, row));
     }
     {
-        const auto names = vector<string>({ "lambda_NEB3011" }); // this file only has 1 :(
+        const auto names = std::vector<std::string>({ "lambda_NEB3011" }); // this file only has 1 :(
         const auto filter = PbiFilter{ PbiReferenceNameFilter{ names } };
         const auto expectedRows = std::vector<size_t>{0,1,2,3};
         for (size_t row : expectedRows)
@@ -840,7 +840,7 @@ TEST(PbiFilterTest, ZmwFilterOk)
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{});
     }
     {
-        const auto zmws = vector<int32_t>({14743,42,200});
+        const auto zmws = std::vector<int32_t>({14743,42,200});
         const auto filter = PbiFilter{ PbiZmwFilter{ zmws } };
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }

@@ -16,7 +16,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace BamFileTests {
 
@@ -48,7 +47,7 @@ TEST(BamFileTest, RelativePathBamOk)
 {
     // cache current working directory, then drill down so we can point to
     // BAMs using relative path
-    const string cwd = internal::FileUtils::CurrentWorkingDirectory();
+    const std::string cwd = internal::FileUtils::CurrentWorkingDirectory();
     ASSERT_EQ(0, chdir(PbbamTestsConfig::Data_Dir.c_str()));
     ASSERT_EQ(0, chdir("relative/a"));
 
@@ -72,7 +71,7 @@ TEST(BamFileTest, RelativePathXmlOk)
 {
     // cache current working directory, then drill down so we can point to
     // BAMs using relative path
-    const string cwd = internal::FileUtils::CurrentWorkingDirectory();
+    const std::string cwd = internal::FileUtils::CurrentWorkingDirectory();
     ASSERT_EQ(0, chdir(PbbamTestsConfig::Data_Dir.c_str()));
 
     // dataset from XML containing relative paths
@@ -86,7 +85,7 @@ TEST(BamFileTest, RelativePathFofnOk)
 {
     // cache current working directory, then drill down so we can point to
     // BAMs using relative path
-    const string cwd = internal::FileUtils::CurrentWorkingDirectory();
+    const std::string cwd = internal::FileUtils::CurrentWorkingDirectory();
     ASSERT_EQ(0, chdir(PbbamTestsConfig::Data_Dir.c_str()));
 
     // dataset from FOFN containing relative paths

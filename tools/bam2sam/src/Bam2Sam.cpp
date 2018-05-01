@@ -1,12 +1,14 @@
 // Author: Derek Barnett
 
-#include "Bam2Sam.h"
-#include <htslib/sam.h>
 #include <cassert>
 #include <memory>
 #include <stdexcept>
+
+#include <htslib/sam.h>
+
+#include "Bam2Sam.h"
+
 using namespace bam2sam;
-using namespace std;
 
 namespace bam2sam {
 
@@ -45,18 +47,18 @@ void PbBam2Sam::Run(const Settings& settings)
 
     // open files
 
-    unique_ptr<samFile, HtslibFileDeleter> inFileWrapper(
+    std::unique_ptr<samFile, HtslibFileDeleter> inFileWrapper(
         sam_open(settings.inputFilename_.c_str(), "rb"));
     samFile* in = inFileWrapper.get();
     if (!in || !in->fp.bgzf) throw std::runtime_error("could not read from stdin");
 
-    unique_ptr<samFile, HtslibFileDeleter> outFileWrapper(sam_open("-", "w"));
+    std::unique_ptr<samFile, HtslibFileDeleter> outFileWrapper(sam_open("-", "w"));
     samFile* out = outFileWrapper.get();
     if (!out) throw std::runtime_error("could not write to stdout");
 
     // fetch & write header
 
-    unique_ptr<bam_hdr_t, HtslibHeaderDeleter> headerWrapper(bam_hdr_read(in->fp.bgzf));
+    std::unique_ptr<bam_hdr_t, HtslibHeaderDeleter> headerWrapper(bam_hdr_read(in->fp.bgzf));
     bam_hdr_t* hdr = headerWrapper.get();
     if (!hdr) throw std::runtime_error("could not read header");
 
@@ -68,7 +70,7 @@ void PbBam2Sam::Run(const Settings& settings)
 
     // fetch & write records
 
-    unique_ptr<bam1_t, HtslibRecordDeleter> recordWrapper(bam_init1());
+    std::unique_ptr<bam1_t, HtslibRecordDeleter> recordWrapper(bam_init1());
     bam1_t* b = recordWrapper.get();
 
     while ((htslibResult = sam_read1(in, hdr, b)) >= 0) {

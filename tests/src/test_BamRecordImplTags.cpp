@@ -1,6 +1,8 @@
 // Author: Derek Barnett
 
 #include <cstdint>
+#include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -8,7 +10,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 // NOTE: these tests check "high-level" tag query/manipulation via BamRecordImpl.
 //       For raw Tag/TagCollection tests, see test_Tags.cpp
@@ -164,8 +165,8 @@ TEST(BamRecordImplTagsTest, SimpleQueryTag)
     EXPECT_TRUE(bam.HasTag("CA"));
     EXPECT_TRUE(bam.HasTag("XY"));
 
-    EXPECT_EQ(string("1abc75"), bam.TagValue("HX").ToString());
-    EXPECT_EQ(vector<uint8_t>({34, 5, 125}), bam.TagValue("CA").ToUInt8Array());
+    EXPECT_EQ(std::string("1abc75"), bam.TagValue("HX").ToString());
+    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), bam.TagValue("CA").ToUInt8Array());
     EXPECT_EQ(int32_t{-42}, bam.TagValue("XY").ToInt32());
 
     EXPECT_FALSE(bam.HasTag("zz"));

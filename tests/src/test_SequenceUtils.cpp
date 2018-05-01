@@ -11,7 +11,6 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
-using namespace std;
 
 TEST(SequenceUtilsTest, ComplementChar)
 {
@@ -73,8 +72,8 @@ TEST(SequenceUtilsTest, ComplementChar)
 
 TEST(SequenceUtilsTest, ReverseComplement)
 {
-    string input1{"ATATATCCCGGCG"};
-    const string rc1{"CGCCGGGATATAT"};
+    std::string input1{"ATATATCCCGGCG"};
+    const std::string rc1{"CGCCGGGATATAT"};
 
     ReverseComplement(input1);
     EXPECT_EQ(rc1, input1);

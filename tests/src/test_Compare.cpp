@@ -14,12 +14,11 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace CompareTests {
 
 static inline
-BamRecord makeRecordWithTag(const string& tagName,
+BamRecord makeRecordWithTag(const std::string& tagName,
                             const Tag& tag)
 {
     auto r = BamRecord{ };
@@ -30,11 +29,11 @@ BamRecord makeRecordWithTag(const string& tagName,
 static
 BamRecord makeRecord(const Position qStart,
                      const Position qEnd,
-                     const string& seq,
-                     const string& quals,
-                     const string& tagBases,
-                     const string& tagQuals,
-                     const vector<uint16_t>& frames)
+                     const std::string& seq,
+                     const std::string& quals,
+                     const std::string& tagBases,
+                     const std::string& tagQuals,
+                     const std::vector<uint16_t>& frames)
 {
     BamRecordImpl impl;
     impl.SetSequenceAndQualities(seq, quals);
@@ -62,16 +61,16 @@ std::vector<BamRecord> makeMappedRecords()
 {
     const Position qStart = 500;
     const Position qEnd   = 510;
-    const string seq      = "AACCGTTAGC";
-    const string quals    = "?]?]?]?]?*";
-    const string tagBases = "AACCGTTAGC";
-    const string tagQuals = "?]?]?]?]?*";
-    const vector<uint16_t> frames  = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
+    const std::string seq      = "AACCGTTAGC";
+    const std::string quals    = "?]?]?]?]?*";
+    const std::string tagBases = "AACCGTTAGC";
+    const std::string tagQuals = "?]?]?]?]?*";
+    const std::vector<uint16_t> frames  = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
     const uint8_t mapQual = 80;
 
-    const string s1_cigar = "10=";
-    const string s2_cigar = "5=3D5=";
-    const string s3_cigar = "4=1D2I2D2X2=";
+    const std::string s1_cigar = "10=";
+    const std::string s2_cigar = "5=3D5=";
+    const std::string s3_cigar = "4=1D2I2D2X2=";
 
     BamRecord s1 = CompareTests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     BamRecord s2 = CompareTests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
@@ -94,14 +93,14 @@ std::vector<BamRecord> makeMappedRecords()
 
 TEST(CompareTest, TypeToNameOk)
 {
-    EXPECT_EQ(string{"Compare::EQUAL"},              Compare::TypeToName(Compare::EQUAL));
-    EXPECT_EQ(string{"Compare::NOT_EQUAL"},          Compare::TypeToName(Compare::NOT_EQUAL));
-    EXPECT_EQ(string{"Compare::LESS_THAN"},          Compare::TypeToName(Compare::LESS_THAN));
-    EXPECT_EQ(string{"Compare::LESS_THAN_EQUAL"},    Compare::TypeToName(Compare::LESS_THAN_EQUAL));
-    EXPECT_EQ(string{"Compare::GREATER_THAN"},       Compare::TypeToName(Compare::GREATER_THAN));
-    EXPECT_EQ(string{"Compare::GREATER_THAN_EQUAL"}, Compare::TypeToName(Compare::GREATER_THAN_EQUAL));
-    EXPECT_EQ(string{"Compare::CONTAINS"},           Compare::TypeToName(Compare::CONTAINS));
-    EXPECT_EQ(string{"Compare::NOT_CONTAINS"},       Compare::TypeToName(Compare::NOT_CONTAINS));
+    EXPECT_EQ(std::string{"Compare::EQUAL"},              Compare::TypeToName(Compare::EQUAL));
+    EXPECT_EQ(std::string{"Compare::NOT_EQUAL"},          Compare::TypeToName(Compare::NOT_EQUAL));
+    EXPECT_EQ(std::string{"Compare::LESS_THAN"},          Compare::TypeToName(Compare::LESS_THAN));
+    EXPECT_EQ(std::string{"Compare::LESS_THAN_EQUAL"},    Compare::TypeToName(Compare::LESS_THAN_EQUAL));
+    EXPECT_EQ(std::string{"Compare::GREATER_THAN"},       Compare::TypeToName(Compare::GREATER_THAN));
+    EXPECT_EQ(std::string{"Compare::GREATER_THAN_EQUAL"}, Compare::TypeToName(Compare::GREATER_THAN_EQUAL));
+    EXPECT_EQ(std::string{"Compare::CONTAINS"},           Compare::TypeToName(Compare::CONTAINS));
+    EXPECT_EQ(std::string{"Compare::NOT_CONTAINS"},       Compare::TypeToName(Compare::NOT_CONTAINS));
 
     // invalid type throws
     EXPECT_THROW(Compare::TypeToName(static_cast<Compare::Type>(42)), std::runtime_error);
@@ -110,25 +109,25 @@ TEST(CompareTest, TypeToNameOk)
 TEST(CompareTest, TypeToOperatorOk)
 {
     { // normal
-        EXPECT_EQ(Compare::TypeToOperator(Compare::EQUAL),              string{"=="});
-        EXPECT_EQ(Compare::TypeToOperator(Compare::NOT_EQUAL),          string{"!="});
-        EXPECT_EQ(Compare::TypeToOperator(Compare::LESS_THAN),          string{"<"});
-        EXPECT_EQ(Compare::TypeToOperator(Compare::LESS_THAN_EQUAL),    string{"<="});
-        EXPECT_EQ(Compare::TypeToOperator(Compare::GREATER_THAN),       string{">"});
-        EXPECT_EQ(Compare::TypeToOperator(Compare::GREATER_THAN_EQUAL), string{">="});
-        EXPECT_EQ(Compare::TypeToOperator(Compare::CONTAINS),           string{"&"});
-        EXPECT_EQ(Compare::TypeToOperator(Compare::NOT_CONTAINS),       string{"~"});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::EQUAL),              std::string{"=="});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::NOT_EQUAL),          std::string{"!="});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::LESS_THAN),          std::string{"<"});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::LESS_THAN_EQUAL),    std::string{"<="});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::GREATER_THAN),       std::string{">"});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::GREATER_THAN_EQUAL), std::string{">="});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::CONTAINS),           std::string{"&"});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::NOT_CONTAINS),       std::string{"~"});
     }
 
     { // alpha
-        EXPECT_EQ(Compare::TypeToOperator(Compare::EQUAL, true),              string{"eq"});
-        EXPECT_EQ(Compare::TypeToOperator(Compare::NOT_EQUAL, true),          string{"ne"});
-        EXPECT_EQ(Compare::TypeToOperator(Compare::LESS_THAN, true),          string{"lt"});
-        EXPECT_EQ(Compare::TypeToOperator(Compare::LESS_THAN_EQUAL, true),    string{"lte"});
-        EXPECT_EQ(Compare::TypeToOperator(Compare::GREATER_THAN, true),       string{"gt"});
-        EXPECT_EQ(Compare::TypeToOperator(Compare::GREATER_THAN_EQUAL, true), string{"gte"});
-        EXPECT_EQ(Compare::TypeToOperator(Compare::CONTAINS, true),           string{"and"});
-        EXPECT_EQ(Compare::TypeToOperator(Compare::NOT_CONTAINS, true),       string{"not"});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::EQUAL, true),              std::string{"eq"});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::NOT_EQUAL, true),          std::string{"ne"});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::LESS_THAN, true),          std::string{"lt"});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::LESS_THAN_EQUAL, true),    std::string{"lte"});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::GREATER_THAN, true),       std::string{"gt"});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::GREATER_THAN_EQUAL, true), std::string{"gte"});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::CONTAINS, true),           std::string{"and"});
+        EXPECT_EQ(Compare::TypeToOperator(Compare::NOT_CONTAINS, true),       std::string{"not"});
     }
 
     // invalid type throws
@@ -176,7 +175,7 @@ TEST(CompareTest, AlignedEndOk)
     BamRecord r4;
     r4.Map(0, 90, Strand::FORWARD, Cigar{"10="}, 255);
 
-    auto records = vector<BamRecord>{ r1, r2, r3, r4 };
+    auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::AlignedEnd());
 
     EXPECT_EQ(r4.AlignedEnd(), records.at(0).AlignedEnd());
@@ -199,7 +198,7 @@ TEST(CompareTest, AlignedStartOk)
     BamRecord r4;
     r4.Map(0, 100, Strand::FORWARD, Cigar{"10="}, 255);
 
-    auto records = vector<BamRecord>{ r1, r2, r3, r4 };
+    auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::AlignedStart());
 
     EXPECT_EQ(r4.AlignedStart(), records.at(0).AlignedStart());
@@ -215,7 +214,7 @@ TEST(CompareTest, AlignedStrandOk)
     BamRecord r3; r3.Impl().SetReverseStrand(true);
     BamRecord r4; r4.Impl().SetReverseStrand(false);
 
-    auto records = vector<BamRecord>{ r1, r2, r3, r4 };
+    auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::AlignedStrand());
 
     EXPECT_EQ(Strand::FORWARD, records.at(0).AlignedStrand());
@@ -231,7 +230,7 @@ TEST(CompareTest, BarcodeForwardOk)
     BamRecord r3; r3.Barcodes(std::make_pair<int16_t,int16_t>(40,10));
     BamRecord r4; r4.Barcodes(std::make_pair<int16_t,int16_t>(10,40));
 
-    auto records = vector<BamRecord>{ r1, r2, r3, r4 };
+    auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::BarcodeForward());
 
     EXPECT_EQ(r4.BarcodeForward(), records.at(0).BarcodeForward());
@@ -247,7 +246,7 @@ TEST(CompareTest, BarcodeReverseOk)
     BamRecord r3; r3.Barcodes(std::make_pair<int16_t,int16_t>(40,10));
     BamRecord r4; r4.Barcodes(std::make_pair<int16_t,int16_t>(10,40));
 
-    auto records = vector<BamRecord>{ r1, r2, r3, r4 };
+    auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::BarcodeReverse());
 
     EXPECT_EQ(r3.BarcodeReverse(), records.at(0).BarcodeReverse());
@@ -263,7 +262,7 @@ TEST(CompareTest, BarcodeQualityOk)
     uint8_t q3 = 40;
     uint8_t q4 = 10;
 
-    auto records = vector<BamRecord>
+    auto records = std::vector<BamRecord>
     {
         CompareTests::makeRecordWithTag("bq", Tag(q1)),
         CompareTests::makeRecordWithTag("bq", Tag(q2)),
@@ -282,12 +281,12 @@ TEST(CompareTest, CustomCompareOk)
 {
     struct CustomCompare : public Compare::MemberFunctionBase<bool, &BamRecord::HasDeletionTag> { };
 
-    auto records = vector<BamRecord>
+    auto records = std::vector<BamRecord>
     {
-        CompareTests::makeRecordWithTag("dt", Tag(string("foo"))),
-        CompareTests::makeRecordWithTag("dt", Tag(string("foo"))),
-        CompareTests::makeRecordWithTag("dt", Tag(string("foo"))),
-        CompareTests::makeRecordWithTag("dt", Tag(string("foo")))
+        CompareTests::makeRecordWithTag("dt", Tag(std::string("foo"))),
+        CompareTests::makeRecordWithTag("dt", Tag(std::string("foo"))),
+        CompareTests::makeRecordWithTag("dt", Tag(std::string("foo"))),
+        CompareTests::makeRecordWithTag("dt", Tag(std::string("foo")))
     };
     records.push_back(BamRecord());
     records.push_back(BamRecord());
@@ -314,7 +313,7 @@ TEST(CompareTest, FullNameOk)
     BamRecord r3; r3.Impl().Name("d");
     BamRecord r4; r4.Impl().Name("a");
 
-    auto records = vector<BamRecord>{ r1, r2, r3, r4 };
+    auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::FullName());
 
     EXPECT_EQ(r4.FullName(), records.at(0).FullName());
@@ -330,7 +329,7 @@ TEST(CompareTest, LocalContextFlagOk)
     BamRecord r3; r3.LocalContextFlags(LocalContextFlags::REVERSE_PASS);
     BamRecord r4; r4.LocalContextFlags(LocalContextFlags::NO_LOCAL_CONTEXT);
 
-    auto records = vector<BamRecord>{ r1, r2, r3, r4 };
+    auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::LocalContextFlag());
 
     EXPECT_EQ(r4.LocalContextFlags(), records.at(0).LocalContextFlags());
@@ -346,7 +345,7 @@ TEST(CompareTest, MapQualityOk)
     BamRecord r3; r3.Impl().MapQuality(40);
     BamRecord r4; r4.Impl().MapQuality(10);
 
-    auto records = vector<BamRecord>{ r1, r2, r3, r4 };
+    auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::MapQuality());
 
     EXPECT_EQ(r4.MapQuality(), records.at(0).MapQuality());
@@ -373,7 +372,7 @@ TEST(CompareTest, MovieNameOk)
     BamRecord r3(header); r3.ReadGroup(rg4);
     BamRecord r4(header); r4.ReadGroup(rg1);
 
-    auto records = vector<BamRecord>{ r1, r2, r3, r4 };
+    auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::MovieName());
 
     EXPECT_EQ(r4.MovieName(), records.at(0).MovieName());
@@ -389,7 +388,7 @@ TEST(CompareTest, NoneOk)
     BamRecord r3; r3.Impl().Name("d");
     BamRecord r4; r4.Impl().Name("a");
 
-    auto records = vector<BamRecord>{ r1, r2, r3, r4 };
+    auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::None());
 
     EXPECT_EQ(r1.FullName(), records.at(0).FullName());
@@ -501,7 +500,7 @@ TEST(CompareTest, QueryEndOk)
     Position q3 = 40;
     Position q4 = 10;
 
-    auto records = vector<BamRecord>
+    auto records = std::vector<BamRecord>
     {
         CompareTests::makeRecordWithTag("qe", Tag(q1)),
         CompareTests::makeRecordWithTag("qe", Tag(q2)),
@@ -523,7 +522,7 @@ TEST(CompareTest, QueryStartOk)
     Position q3 = 40;
     Position q4 = 10;
 
-    auto records = vector<BamRecord>
+    auto records = std::vector<BamRecord>
     {
         CompareTests::makeRecordWithTag("qs", Tag(q1)),
         CompareTests::makeRecordWithTag("qs", Tag(q2)),
@@ -556,7 +555,7 @@ TEST(CompareTest, ReadGroupIdOk)
     BamRecord r3(header); r3.ReadGroup(rg4); // -> 54397cd6
     BamRecord r4(header); r4.ReadGroup(rg1); // -> a60ddc69
 
-    auto records = vector<BamRecord>{ r1, r2, r3, r4 };
+    auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::ReadGroupId()); // lexical, NOT numeric ordering
 
     EXPECT_EQ(r3.ReadGroupId(), records.at(0).ReadGroupId());
@@ -583,7 +582,7 @@ TEST(CompareTest, ReadGroupNumericIdOk)
     BamRecord r3(header); r3.ReadGroup(rg4); // ->  1413053654
     BamRecord r4(header); r4.ReadGroup(rg1); // ->  1153643386
 
-    auto records = vector<BamRecord>{ r1, r2, r3, r4 };
+    auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::ReadGroupNumericId()); // numeric ordering
 
     EXPECT_EQ(r1.ReadGroupNumericId(), records.at(0).ReadGroupNumericId());
@@ -599,7 +598,7 @@ TEST(CompareTest, ReadAccuracyOk)
     Accuracy a3 = 40;
     Accuracy a4 = 10;
 
-    auto records = vector<BamRecord>
+    auto records = std::vector<BamRecord>
     {
         CompareTests::makeRecordWithTag("rq", Tag(a1)),
         CompareTests::makeRecordWithTag("rq", Tag(a2)),
@@ -645,7 +644,7 @@ TEST(CompareTest, ReferenceIdOk)
     BamRecord r3; r3.Impl().ReferenceId(40);
     BamRecord r4; r4.Impl().ReferenceId(10);
 
-    auto records = vector<BamRecord>{ r1, r2, r3, r4 };
+    auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::ReferenceId());
 
     EXPECT_EQ(r4.ReferenceId(), records.at(0).ReferenceId());
@@ -672,7 +671,7 @@ TEST(CompareTest, ReferenceNameOk)
     BamRecord r3(header); r3.Impl().SetMapped(true); r3.Impl().ReferenceId(3);
     BamRecord r4(header); r4.Impl().SetMapped(true); r4.Impl().ReferenceId(0);
 
-    auto records = vector<BamRecord>{ r1, r2, r3, r4 };
+    auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::ReferenceName());
 
     EXPECT_EQ(seq1.Name(), records.at(0).ReferenceName());
@@ -688,7 +687,7 @@ TEST(CompareTest, ReferenceStartOk)
     BamRecord r3; r3.Impl().Position(40);
     BamRecord r4; r4.Impl().Position(10);
 
-    auto records = vector<BamRecord>{ r1, r2, r3, r4 };
+    auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::ReferenceStart());
 
     EXPECT_EQ(r4.ReferenceStart(), records.at(0).ReferenceStart());
@@ -704,7 +703,7 @@ TEST(CompareTest, ZmwOk)
     int32_t z3 = 40;
     int32_t z4 = 10;
 
-    auto records = vector<BamRecord>
+    auto records = std::vector<BamRecord>
     {
         CompareTests::makeRecordWithTag("zm", Tag(z1)),
         CompareTests::makeRecordWithTag("zm", Tag(z2)),
