@@ -2,10 +2,13 @@
 
 #include <cassert>
 #include <iostream>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
 #include "../common/BamFileMerger.h"
 #include "../common/OptionParser.h"
 #include "PbMergeVersion.h"
-using namespace std;
 
 namespace pbmerge {
 
@@ -18,7 +21,7 @@ public:
         const optparse::Values options = parser.parse_args(argc, argv);
 
         // input
-        const vector<string> positionalArgs = parser.args();
+        const std::vector<std::string> positionalArgs = parser.args();
         if (positionalArgs.empty())
             settings.errors_.push_back("at least input one file must be specified");
         else
@@ -88,10 +91,10 @@ int main(int argc, char* argv[])
     // parse command line for settings
     const pbmerge::Settings settings = pbmerge::Settings::FromCommandLine(parser, argc, argv);
     if (!settings.errors_.empty()) {
-        cerr << endl;
+        std::cerr << std::endl;
         for (const auto e : settings.errors_)
-            cerr << "ERROR: " << e << endl;
-        cerr << endl;
+            std::cerr << "ERROR: " << e << std::endl;
+        std::cerr << std::endl;
         parser.print_help();
         return EXIT_FAILURE;
     }
@@ -100,7 +103,7 @@ int main(int argc, char* argv[])
     try {
         // setup our @PG entry to add to header
         PacBio::BAM::ProgramInfo mergeProgram;
-        mergeProgram.Id(string("pbmerge-") + pbmerge::Version)
+        mergeProgram.Id(std::string("pbmerge-") + pbmerge::Version)
             .Name("pbmerge")
             .Version(pbmerge::Version);
 
@@ -121,7 +124,7 @@ int main(int argc, char* argv[])
 
         return EXIT_SUCCESS;
     } catch (std::exception& e) {
-        cerr << "ERROR: " << e.what() << endl;
+        std::cerr << "ERROR: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
 }

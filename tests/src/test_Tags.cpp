@@ -7,6 +7,7 @@
 #include <map>
 #include <string>
 #include <typeinfo>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <boost/type_traits/is_convertible.hpp>
@@ -17,7 +18,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 TEST(TagTest, TagConstruction)
 {
@@ -28,14 +28,14 @@ TEST(TagTest, TagConstruction)
     int32_t i32 = 0;
     uint32_t u32 = 0;
     float f = 0.0;
-    string str = "";
-    vector<int8_t> i8_array;
-    vector<uint8_t> u8_array;
-    vector<int16_t> i16_array;
-    vector<uint16_t> u16_array;
-    vector<int32_t> i32_array;
-    vector<uint32_t> u32_Array;
-    vector<float> float_array;
+    std::string str = "";
+    std::vector<int8_t> i8_array;
+    std::vector<uint8_t> u8_array;
+    std::vector<int16_t> i16_array;
+    std::vector<uint16_t> u16_array;
+    std::vector<int32_t> i32_array;
+    std::vector<uint32_t> u32_Array;
+    std::vector<float> float_array;
 
     signed char c = 'A';
     unsigned char uc = 'A';
@@ -88,14 +88,14 @@ TEST(TagTest, CopyAndCompare)
     int32_t i32 = 0;
     uint32_t u32 = 0;
     float f = 0.0;
-    string str = "";
-    vector<int8_t> i8_array;
-    vector<uint8_t> u8_array;
-    vector<int16_t> i16_array;
-    vector<uint16_t> u16_array;
-    vector<int32_t> i32_array;
-    vector<uint32_t> u32_Array;
-    vector<float> float_array;
+    std::string str = "";
+    std::vector<int8_t> i8_array;
+    std::vector<uint8_t> u8_array;
+    std::vector<int16_t> i16_array;
+    std::vector<uint16_t> u16_array;
+    std::vector<int32_t> i32_array;
+    std::vector<uint32_t> u32_Array;
+    std::vector<float> float_array;
 
     Tag i8Tag(i8);
     Tag u8Tag(u8);
@@ -413,10 +413,10 @@ TEST(TagTest, Type_Float)
 
 TEST(TagTest, Type_String)
 {
-    const string v = "foo_who";
+    const std::string v = "foo_who";
     const Tag tag(v);
 
-    string v2;
+    std::string v2;
     EXPECT_NO_THROW(v2 = tag.ToString());
 
     EXPECT_TRUE(tag.Type() == TagDataType::STRING);
@@ -445,10 +445,10 @@ TEST(TagTest, Type_String)
 
 TEST(TagTest, Type_Int8Array)
 {
-    const vector<int8_t> v = {-42, 100, 0};
+    const std::vector<int8_t> v = {-42, 100, 0};
     const Tag tag(v);
 
-    vector<int8_t> v2;
+    std::vector<int8_t> v2;
     EXPECT_NO_THROW(v2 = tag.ToInt8Array());
 
     EXPECT_TRUE(tag.Type() == TagDataType::INT8_ARRAY);
@@ -468,10 +468,10 @@ TEST(TagTest, Type_Int8Array)
 
 TEST(TagTest, Type_UInt8Array)
 {
-    const vector<uint8_t> v = {42, 200, 0};
+    const std::vector<uint8_t> v = {42, 200, 0};
     const Tag tag(v);
 
-    vector<uint8_t> v2;
+    std::vector<uint8_t> v2;
     EXPECT_NO_THROW(v2 = tag.ToUInt8Array());
 
     EXPECT_TRUE(tag.Type() == TagDataType::UINT8_ARRAY);
@@ -491,10 +491,10 @@ TEST(TagTest, Type_UInt8Array)
 
 TEST(TagTest, Type_Int16Array)
 {
-    const vector<int16_t> v = {42, -300, 0};
+    const std::vector<int16_t> v = {42, -300, 0};
     const Tag tag(v);
 
-    vector<int16_t> v2;
+    std::vector<int16_t> v2;
     EXPECT_NO_THROW(v2 = tag.ToInt16Array());
 
     EXPECT_TRUE(tag.Type() == TagDataType::INT16_ARRAY);
@@ -514,10 +514,10 @@ TEST(TagTest, Type_Int16Array)
 
 TEST(TagTest, Type_UInt16Array)
 {
-    const vector<uint16_t> v = {42, 300, 0};
+    const std::vector<uint16_t> v = {42, 300, 0};
     const Tag tag(v);
 
-    vector<uint16_t> v2;
+    std::vector<uint16_t> v2;
     EXPECT_NO_THROW(v2 = tag.ToUInt16Array());
 
     EXPECT_TRUE(tag.Type() == TagDataType::UINT16_ARRAY);
@@ -538,10 +538,10 @@ TEST(TagTest, Type_UInt16Array)
 
 TEST(TagTest, Type_Int32Array)
 {
-    const vector<int32_t> v = {42, -300, 0};
+    const std::vector<int32_t> v = {42, -300, 0};
     const Tag tag(v);
 
-    vector<int32_t> v2;
+    std::vector<int32_t> v2;
     EXPECT_NO_THROW(v2 = tag.ToInt32Array());
 
     EXPECT_TRUE(tag.Type() == TagDataType::INT32_ARRAY);
@@ -561,10 +561,10 @@ TEST(TagTest, Type_Int32Array)
 
 TEST(TagTest, Type_UInt32Array)
 {
-    const vector<uint32_t> v = {42, 300, 0};
+    const std::vector<uint32_t> v = {42, 300, 0};
     const Tag tag(v);
 
-    vector<uint32_t> v2;
+    std::vector<uint32_t> v2;
     EXPECT_NO_THROW(v2 = tag.ToUInt32Array());
 
     EXPECT_TRUE(tag.Type() == TagDataType::UINT32_ARRAY);
@@ -584,10 +584,10 @@ TEST(TagTest, Type_UInt32Array)
 
 TEST(TagTest, Type_FloatArray)
 {
-    const vector<float> v = {1.1f, 1.2f, 1.3f};
+    const std::vector<float> v = {1.1f, 1.2f, 1.3f};
     const Tag tag(v);
 
-    vector<float> v2;
+    std::vector<float> v2;
     EXPECT_NO_THROW(v2 = tag.ToFloatArray());
 
     EXPECT_TRUE(tag.Type() == TagDataType::FLOAT_ARRAY);
@@ -613,14 +613,14 @@ TEST(TagTest, CastBackToOriginalOk)
     int32_t i32 = 0;
     uint32_t u32 = 0;
     float f = 0.0;
-    string str = "";
-    vector<int8_t> i8_array;
-    vector<uint8_t> u8_array;
-    vector<int16_t> i16_array;
-    vector<uint16_t> u16_array;
-    vector<int32_t> i32_array;
-    vector<uint32_t> u32_array;
-    vector<float> float_array;
+    std::string str = "";
+    std::vector<int8_t> i8_array;
+    std::vector<uint8_t> u8_array;
+    std::vector<int16_t> i16_array;
+    std::vector<uint16_t> u16_array;
+    std::vector<int32_t> i32_array;
+    std::vector<uint32_t> u32_array;
+    std::vector<float> float_array;
 
     Tag i8Tag(i8);
     Tag u8Tag(u8);
@@ -664,8 +664,8 @@ TEST(TagTest, ConvertToInt8)
     Tag normal(int32_t{42});
     Tag max(int32_t{std::numeric_limits<int8_t>::max()});
     Tag floatTag(float{3.14});
-    Tag stringTag(string{"foo"});
-    Tag arrayTag(vector<int8_t>{{1, 2, 3}});
+    Tag stringTag(std::string{"foo"});
+    Tag arrayTag(std::vector<int8_t>{{1, 2, 3}});
 
     // allowed
     EXPECT_NO_THROW({
@@ -688,8 +688,8 @@ TEST(TagTest, ConvertToUInt8)
     Tag normal(int32_t{42});
     Tag max(int32_t{std::numeric_limits<uint8_t>::max()});
     Tag floatTag(float{3.14});
-    Tag stringTag(string{"foo"});
-    Tag arrayTag(vector<uint8_t>{{1, 2, 3}});
+    Tag stringTag(std::string{"foo"});
+    Tag arrayTag(std::vector<uint8_t>{{1, 2, 3}});
 
     // allowed
     EXPECT_NO_THROW({
@@ -712,8 +712,8 @@ TEST(TagTest, ConvertToInt16)
     Tag normal(int32_t{42});
     Tag max(int32_t{std::numeric_limits<int16_t>::max()});
     Tag floatTag(float{3.14});
-    Tag stringTag(string{"foo"});
-    Tag arrayTag(vector<int16_t>{{1, 2, 3}});
+    Tag stringTag(std::string{"foo"});
+    Tag arrayTag(std::vector<int16_t>{{1, 2, 3}});
 
     // allowed
     EXPECT_NO_THROW({
@@ -736,8 +736,8 @@ TEST(TagTest, ConvertToUInt16)
     Tag normal(int32_t{42});
     Tag max(int32_t{std::numeric_limits<uint16_t>::max()});
     Tag floatTag(float{3.14});
-    Tag stringTag(string{"foo"});
-    Tag arrayTag(vector<uint16_t>{{1, 2, 3}});
+    Tag stringTag(std::string{"foo"});
+    Tag arrayTag(std::vector<uint16_t>{{1, 2, 3}});
 
     // allowed
     EXPECT_NO_THROW({
@@ -760,8 +760,8 @@ TEST(TagTest, ConvertToInt32)
     Tag normal(int32_t{42});
     Tag max(int32_t{std::numeric_limits<int32_t>::max()});
     Tag floatTag(float{3.14});
-    Tag stringTag(string{"foo"});
-    Tag arrayTag(vector<int32_t>{{1, 2, 3}});
+    Tag stringTag(std::string{"foo"});
+    Tag arrayTag(std::vector<int32_t>{{1, 2, 3}});
 
     // allowed
     EXPECT_NO_THROW({
@@ -784,8 +784,8 @@ TEST(TagTest, ConvertToUInt32)
     Tag normal(int32_t{42});
     Tag max(uint32_t{std::numeric_limits<uint32_t>::max()});
     Tag floatTag(float{3.14});
-    Tag stringTag(string{"foo"});
-    Tag arrayTag(vector<uint32_t>{{1, 2, 3}});
+    Tag stringTag(std::string{"foo"});
+    Tag arrayTag(std::vector<uint32_t>{{1, 2, 3}});
 
     // allowed
     EXPECT_NO_THROW({
@@ -811,8 +811,8 @@ TEST(TagCollectionTest, DefaultConstruction)
 TEST(TagCollectionTest, AddSimpleTags)
 {
     const int32_t intValue = -42;
-    const string strValue = "foo";
-    const string hexStrValue = "1abc75";
+    const std::string strValue = "foo";
+    const std::string hexStrValue = "1abc75";
 
     TagCollection tags;
     tags["ST"] = strValue;
@@ -834,7 +834,7 @@ TEST(TagCollectionTest, AddSimpleTags)
 
 TEST(SamTagCodecTest, DecodeTest)
 {
-    string tagString;
+    std::string tagString;
     tagString.append("HX:H:1abc75");
     tagString.append("\t");
     tagString.append("ST:Z:foo");
@@ -844,10 +844,10 @@ TEST(SamTagCodecTest, DecodeTest)
     tagString.append("XY:i:-42");
 
     TagCollection expected;
-    expected["ST"] = string("foo");
+    expected["ST"] = std::string("foo");
     expected["XY"] = int32_t{-42};
     expected["HX"] = Tag("1abc75", TagModifier::HEX_STRING);
-    expected["VC"] = vector<int32_t>({42, -100, 37, 2048});
+    expected["VC"] = std::vector<int32_t>({42, -100, 37, 2048});
 
     TagCollection tags = SamTagCodec::Decode(tagString);
 
@@ -856,23 +856,23 @@ TEST(SamTagCodecTest, DecodeTest)
     EXPECT_TRUE(tags.Contains("XY"));
     EXPECT_TRUE(tags.Contains("VC"));
 
-    EXPECT_EQ(string("foo"), tags["ST"].ToString());
+    EXPECT_EQ(std::string("foo"), tags["ST"].ToString());
     EXPECT_TRUE(tags["HX"].HasModifier(TagModifier::HEX_STRING));
-    EXPECT_EQ(string("1abc75"), tags["HX"].ToString());
+    EXPECT_EQ(std::string("1abc75"), tags["HX"].ToString());
     EXPECT_EQ(int8_t{-42}, tags["XY"].ToInt8());
-    EXPECT_EQ(vector<int32_t>({42, -100, 37, 2048}), tags["VC"].ToInt32Array());
+    EXPECT_EQ(std::vector<int32_t>({42, -100, 37, 2048}), tags["VC"].ToInt32Array());
 }
 
 TEST(SamTagCodecTest, EncodeTest)
 {
     TagCollection tags;
-    tags["ST"] = string("foo");
+    tags["ST"] = std::string("foo");
     tags["XY"] = int32_t{-42};
     tags["HX"] = Tag("1abc75", TagModifier::HEX_STRING);
-    tags["VC"] = vector<int32_t>({42, -100, 37, 2048});
+    tags["VC"] = std::vector<int32_t>({42, -100, 37, 2048});
 
     // "HX:H:1abc75\tST:Z:foo\0\tVC:B:i,42,-100,37,2048\tXY:i:-42"
-    string expected;
+    std::string expected;
     expected.append("HX:H:1abc75");
     expected.append("\t");
     expected.append("ST:Z:foo");
@@ -881,13 +881,13 @@ TEST(SamTagCodecTest, EncodeTest)
     expected.append("\t");
     expected.append("XY:i:-42");
 
-    const string sam = SamTagCodec::Encode(tags);
+    const std::string sam = SamTagCodec::Encode(tags);
     EXPECT_EQ(expected, sam);
 }
 
 TEST(BamTagCodecTest, DecodeTest)
 {
-    vector<uint8_t> data;
+    std::vector<uint8_t> data;
     data.push_back(uint8_t('H'));
     data.push_back(uint8_t('X'));
     data.push_back(uint8_t('H'));
@@ -925,7 +925,7 @@ TEST(BamTagCodecTest, DecodeTest)
     data.push_back(numCharsValueBytes[2]);
     data.push_back(numCharsValueBytes[3]);
 
-    const vector<uint8_t> charArray = vector<uint8_t>({34, 5, 125});
+    const std::vector<uint8_t> charArray = std::vector<uint8_t>({34, 5, 125});
     data.push_back(charArray.at(0));
     data.push_back(charArray.at(1));
     data.push_back(charArray.at(2));
@@ -933,25 +933,25 @@ TEST(BamTagCodecTest, DecodeTest)
     TagCollection tags = BamTagCodec::Decode(data);
 
     EXPECT_TRUE(tags["HX"].HasModifier(TagModifier::HEX_STRING));
-    EXPECT_EQ(string("1abc75"), tags["HX"].ToString());
+    EXPECT_EQ(std::string("1abc75"), tags["HX"].ToString());
     EXPECT_EQ(x, tags["XY"].ToInt32());
     EXPECT_EQ(charArray, tags["CA"].ToUInt8Array());
 
     // sanity check - convert tags back to SAM
-    string expected;
+    std::string expected;
     expected.append("CA:B:C,34,5,125");
     expected.append("\t");
     expected.append("HX:H:1abc75");
     expected.append("\t");
     expected.append("XY:i:-42");
 
-    const string sam = SamTagCodec::Encode(tags);
+    const std::string sam = SamTagCodec::Encode(tags);
     EXPECT_EQ(expected, sam);
 }
 
 TEST(BamTagCodecTest, EncodeTest)
 {
-    vector<uint8_t> expected;
+    std::vector<uint8_t> expected;
 
     expected.push_back('C');
     expected.push_back('A');
@@ -967,7 +967,7 @@ TEST(BamTagCodecTest, EncodeTest)
     expected.push_back(numCharsValueBytes[2]);
     expected.push_back(numCharsValueBytes[3]);
 
-    const vector<uint8_t> charArray = vector<uint8_t>({34, 5, 125});
+    const std::vector<uint8_t> charArray = std::vector<uint8_t>({34, 5, 125});
     expected.push_back(charArray.at(0));
     expected.push_back(charArray.at(1));
     expected.push_back(charArray.at(2));
@@ -1000,13 +1000,13 @@ TEST(BamTagCodecTest, EncodeTest)
     tags["CA"] = charArray;
     tags["XY"] = x;
 
-    const vector<uint8_t> data = BamTagCodec::Encode(tags);
+    const std::vector<uint8_t> data = BamTagCodec::Encode(tags);
     EXPECT_EQ(expected, data);
 }
 
 TEST(BamTagCodecTest, AsciiTagsTest)
 {
-    vector<uint8_t> expected;
+    std::vector<uint8_t> expected;
     expected.reserve(20);
     expected.push_back('I');  // I8:A:B
     expected.push_back('8');
@@ -1055,7 +1055,7 @@ TEST(BamTagCodecTest, AsciiTagsTest)
         tags["U8"] = fromUint8;
         tags["I8"] = fromInt8;
 
-        const vector<uint8_t> data = BamTagCodec::Encode(tags);
+        const std::vector<uint8_t> data = BamTagCodec::Encode(tags);
         EXPECT_EQ(expected, data);
     }
 
@@ -1074,7 +1074,7 @@ TEST(BamTagCodecTest, AsciiTagsTest)
         tags["U8"] = fromUint8;
         tags["I8"] = fromInt8;
 
-        const vector<uint8_t> data = BamTagCodec::Encode(tags);
+        const std::vector<uint8_t> data = BamTagCodec::Encode(tags);
         EXPECT_EQ(expected, data);
     }
 }

@@ -12,7 +12,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace BamHeaderTests {
 
@@ -46,7 +45,7 @@ TEST(BamHeaderTest, DefaultConstruction)
 
 TEST(BamHeaderTest, DecodeTest)
 {
-    const string text{
+    const std::string text{
         "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
         "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
         "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
@@ -59,39 +58,39 @@ TEST(BamHeaderTest, DecodeTest)
 
     BamHeader header = BamHeader(text);
 
-    EXPECT_EQ(string("1.1"), header.Version());
-    EXPECT_EQ(string("queryname"), header.SortOrder());
-    EXPECT_EQ(string("3.0.1"), header.PacBioBamVersion());
+    EXPECT_EQ(std::string("1.1"), header.Version());
+    EXPECT_EQ(std::string("queryname"), header.SortOrder());
+    EXPECT_EQ(std::string("3.0.1"), header.PacBioBamVersion());
 
     EXPECT_EQ(3, header.ReadGroups().size());
     EXPECT_TRUE(header.HasReadGroup("rg1"));
     EXPECT_TRUE(header.HasReadGroup("rg2"));
     EXPECT_TRUE(header.HasReadGroup("rg3"));
 
-    EXPECT_EQ(string("control"), header.ReadGroup("rg1").Sample());
-    EXPECT_EQ(string("condition1"), header.ReadGroup("rg2").Sample());
-    EXPECT_EQ(string("condition1"), header.ReadGroup("rg3").Sample());
+    EXPECT_EQ(std::string("control"), header.ReadGroup("rg1").Sample());
+    EXPECT_EQ(std::string("condition1"), header.ReadGroup("rg2").Sample());
+    EXPECT_EQ(std::string("condition1"), header.ReadGroup("rg3").Sample());
 
     EXPECT_EQ(2, header.Sequences().size());
     EXPECT_TRUE(header.HasSequence("chr1"));
     EXPECT_TRUE(header.HasSequence("chr2"));
-    EXPECT_EQ(string("chocobo"), header.Sequence("chr1").Species());
-    EXPECT_EQ(string("chocobo"), header.Sequence("chr2").Species());
-    EXPECT_EQ(string("2038"), header.Sequence("chr1").Length());
-    EXPECT_EQ(string("3042"), header.Sequence("chr2").Length());
+    EXPECT_EQ(std::string("chocobo"), header.Sequence("chr1").Species());
+    EXPECT_EQ(std::string("chocobo"), header.Sequence("chr2").Species());
+    EXPECT_EQ(std::string("2038"), header.Sequence("chr1").Length());
+    EXPECT_EQ(std::string("3042"), header.Sequence("chr2").Length());
 
     EXPECT_EQ(1, header.Programs().size());
     EXPECT_TRUE(header.HasProgram("_foo_"));
-    EXPECT_EQ(string("ide"), header.Program("_foo_").Name());
+    EXPECT_EQ(std::string("ide"), header.Program("_foo_").Name());
 
     EXPECT_EQ(2, header.Comments().size());
-    EXPECT_EQ(string("ipsum and so on"), header.Comments().at(0));
-    EXPECT_EQ(string("citation needed"), header.Comments().at(1));
+    EXPECT_EQ(std::string("ipsum and so on"), header.Comments().at(0));
+    EXPECT_EQ(std::string("citation needed"), header.Comments().at(1));
 }
 
 TEST(BamHeaderTest, VersionCheckOk)
 {
-    auto expectFail = [](string&& label, string&& text) {
+    auto expectFail = [](std::string&& label, std::string&& text) {
         SCOPED_TRACE(label);
         EXPECT_THROW(BamHeader{text}, std::runtime_error);
     };
@@ -135,7 +134,7 @@ TEST(BamHeaderTest, EncodeTest)
         .AddComment("ipsum and so on")
         .AddComment("citation needed");
 
-    const string expectedText{
+    const std::string expectedText{
         "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
         "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
         "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
@@ -146,7 +145,7 @@ TEST(BamHeaderTest, EncodeTest)
         "@CO\tipsum and so on\n"
         "@CO\tcitation needed\n"};
 
-    const string text = header.ToSam();
+    const std::string text = header.ToSam();
     EXPECT_EQ(expectedText, text);
 }
 
@@ -180,7 +179,7 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
         .AddComment("ipsum and so on")
         .AddComment("citation needed");
 
-    const string expectedText{
+    const std::string expectedText{
         "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
         "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
         "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
@@ -191,7 +190,7 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
         "@CO\tipsum and so on\n"
         "@CO\tcitation needed\n"};
 
-    const string text = header.ToSam();
+    const std::string text = header.ToSam();
     std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()),
                                        BamHeaderTests::BamHdrDeleter());
     rawData->ignore_sam_err = 0;
@@ -200,7 +199,7 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
     rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
     memcpy(rawData->text, text.c_str(), rawData->l_text);
 
-    const string rawText(rawData->text, rawData->l_text);
+    const std::string rawText(rawData->text, rawData->l_text);
     EXPECT_EQ(expectedText, rawText);
 }
 
@@ -234,7 +233,7 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
         .AddComment("ipsum and so on")
         .AddComment("citation needed");
 
-    const string expectedText{
+    const std::string expectedText{
         "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
         "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
         "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
@@ -245,7 +244,7 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
         "@CO\tipsum and so on\n"
         "@CO\tcitation needed\n"};
 
-    string text = header.ToSam();
+    std::string text = header.ToSam();
     std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()),
                                        BamHeaderTests::BamHdrDeleter());
     rawData->ignore_sam_err = 0;
@@ -254,7 +253,7 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
     rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
     memcpy(rawData->text, text.c_str(), rawData->l_text);
 
-    const BamHeader newHeader = BamHeader(string(rawData->text, rawData->l_text));
+    const BamHeader newHeader = BamHeader(std::string(rawData->text, rawData->l_text));
 
     EXPECT_EQ(header.Version(), newHeader.Version());
     EXPECT_EQ(header.SortOrder(), newHeader.SortOrder());
@@ -266,7 +265,7 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
 
 TEST(BamHeaderTest, MergeOk)
 {
-    const string hdrText1{
+    const std::string hdrText1{
         "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
         "@RG\tID:a955def6\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;"
         "InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;Ipd:CodecV1=ip;BINDINGKIT=100356300;"
@@ -277,7 +276,7 @@ TEST(BamHeaderTest, MergeOk)
         "@PG\tID:bax2bam-0.0.2\tPN:bax2bam\tVN:0.0.2\n"
         "@CO\tcomment1\n"};
 
-    const string hdrText2{
+    const std::string hdrText2{
         "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
         "@RG\tID:e83fc9c6\tPL:PACBIO\tDS:READTYPE=SCRAP;DeletionQV=dq;DeletionTag=dt;"
         "InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:Frames=ip;"
@@ -291,7 +290,7 @@ TEST(BamHeaderTest, MergeOk)
         "@PG\tID:bazwriter-0.15.0\tPN:bazwriter\tVN:0.15.0\n"
         "@CO\tcomment2\n"};
 
-    const string mergedText{
+    const std::string mergedText{
         "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
         "@RG\tID:a955def6\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;"
         "InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;Ipd:CodecV1=ip;BINDINGKIT=100356300;"
@@ -335,7 +334,7 @@ TEST(BamHeaderTest, MergeOk)
 
 TEST(BamHeaderTest, MergeHandlesDuplicateReadGroups)
 {
-    const string hdrText{
+    const std::string hdrText{
         "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
         "@RG\tID:a955def6\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;"
         "InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;Ipd:CodecV1=ip;BINDINGKIT=100356300;"
@@ -354,35 +353,35 @@ TEST(BamHeaderTest, MergeHandlesDuplicateReadGroups)
 TEST(BamHeaderTest, MergeCompatibilityOk)
 {
     {  // different @HD:VN - this IS allowed (as of SAT-465, pbbam v0.7.2)
-        const string hdrText1 = {"@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"};
-        const string hdrText2 = {"@HD\tVN:1.0\tSO:unknown\tpb:3.0.1\n"};
+        const std::string hdrText1 = {"@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"};
+        const std::string hdrText2 = {"@HD\tVN:1.0\tSO:unknown\tpb:3.0.1\n"};
         const BamHeader header1(hdrText1);
         const BamHeader header2(hdrText2);
         EXPECT_NO_THROW(header1 + header2);
     }
 
     {  // different @HD:SO
-        const string hdrText1 = {"@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"};
-        const string hdrText2 = {"@HD\tVN:1.1\tSO:coordinate\tpb:3.0.1\n"};
+        const std::string hdrText1 = {"@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"};
+        const std::string hdrText2 = {"@HD\tVN:1.1\tSO:coordinate\tpb:3.0.1\n"};
         const BamHeader header1(hdrText1);
         const BamHeader header2(hdrText2);
         EXPECT_THROW(header1 + header2, std::runtime_error);
     }
 
     {  // different @HD:pb - this IS allowed (as of SAT-529, pbbam 0.7.4)
-        const string hdrText1 = {"@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"};
-        const string hdrText2 = {"@HD\tVN:1.1\tSO:unknown\tpb:3.0.3\n"};
+        const std::string hdrText1 = {"@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"};
+        const std::string hdrText2 = {"@HD\tVN:1.1\tSO:unknown\tpb:3.0.3\n"};
         const BamHeader header1(hdrText1);
         const BamHeader header2(hdrText2);
         EXPECT_NO_THROW(header1 + header2);
     }
 
     {  // @SQ list clash
-        const string hdrText1{
+        const std::string hdrText1{
             "@HD\tVN:1.1\tSO:coordinate\tpb:3.0.1\n"
             "@SQ\tSN:foo\tLN:42\n"
             "@SQ\tSN:bar\tLN:24\n"};
-        const string hdrText2{
+        const std::string hdrText2{
             "@HD\tVN:1.1\tSO:coordinate\tpb:3.0.1\n"
             "@SQ\tSN:foo\tLN:42\n"
             "@SQ\tSN:baz\tLN:99\n"};

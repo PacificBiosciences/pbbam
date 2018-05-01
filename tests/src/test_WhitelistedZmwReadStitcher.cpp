@@ -14,7 +14,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace WhitelistedZmwReadStitcherTests {
 

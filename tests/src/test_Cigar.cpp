@@ -10,7 +10,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 TEST(CigarTest, TypeToCar)
 {
@@ -86,14 +85,14 @@ TEST(CigarTest, SetTypeYieldsCorrectOperation)
 
 TEST(CigarStringTest, FromStdString_Empty)
 {
-    const string emptyCigar = "";
+    const std::string emptyCigar = "";
     Cigar cigar = Cigar::FromStdString(emptyCigar);
     EXPECT_TRUE(cigar.empty());
 }
 
 TEST(CigarStringTest, FromStdString_SingleOp)
 {
-    const string singleCigar = "100=";
+    const std::string singleCigar = "100=";
 
     Cigar cigar = Cigar::FromStdString(singleCigar);
     ASSERT_TRUE(cigar.size() == 1);
@@ -105,7 +104,7 @@ TEST(CigarStringTest, FromStdString_SingleOp)
 
 TEST(CigarStringTest, FromStdString_MultipleOps)
 {
-    const string multiCigar = "100=2D34I6=6X6=";
+    const std::string multiCigar = "100=2D34I6=6X6=";
 
     Cigar cigar = Cigar::FromStdString(multiCigar);
     ASSERT_TRUE(cigar.size() == 6);
@@ -133,14 +132,14 @@ TEST(CigarStringTest, FromStdString_MultipleOps)
 
 TEST(CigarStringTest, ToStdString_Empty)
 {
-    const string empty;
+    const std::string empty;
     Cigar cigar;
     EXPECT_EQ(empty, cigar.ToStdString());
 }
 
 TEST(CigarStringTest, ToStdString_SingleOp)
 {
-    const string singleCigar = "100=";
+    const std::string singleCigar = "100=";
 
     Cigar cigar;
     cigar.push_back( CigarOperation(CigarOperationType::SEQUENCE_MATCH, 100) );
@@ -150,7 +149,7 @@ TEST(CigarStringTest, ToStdString_SingleOp)
 
 TEST(CigarStringTest, ToStdString_MultipleOps)
 {
-    const string multiCigar = "100=2D34I6=6X6=";
+    const std::string multiCigar = "100=2D34I6=6X6=";
 
     Cigar cigar;
     cigar.push_back(CigarOperation(CigarOperationType::SEQUENCE_MATCH,  100));

@@ -10,11 +10,10 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 TEST(SubreadLengthQueryTest, QueryOk)
 {
-    const auto bamFile = BamFile{PbbamTestsConfig::Data_Dir + string{"/group/test2.bam"}};
+    const auto bamFile = BamFile{PbbamTestsConfig::Data_Dir + std::string{"/group/test2.bam"}};
 
     {
         SubreadLengthQuery query(500, Compare::GREATER_THAN_EQUAL, bamFile);

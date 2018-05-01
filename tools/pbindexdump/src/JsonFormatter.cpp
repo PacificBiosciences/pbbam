@@ -1,14 +1,18 @@
 // Author: Derek Barnett
 
 #include "JsonFormatter.h"
-#include <pbbam/PbiFile.h>
+
 #include <cstdint>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
+#include <string>
+
+#include <pbbam/PbiFile.h>
 #include "json.hpp"
+
 using namespace pbindexdump;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace pbindexdump {
 
@@ -21,7 +25,7 @@ JsonFormatter::JsonFormatter(const Settings& settings)
 
 void JsonFormatter::FormatMetadata()
 {
-    auto version = string{};
+    auto version = std::string{};
     switch (index_.Version()) {
         case PbiFile::Version_3_0_0:
             version = "3.0.0";
@@ -30,7 +34,7 @@ void JsonFormatter::FormatMetadata()
             version = "3.0.1";
             break;
         default:
-            throw runtime_error("unsupported PBI version encountered");
+            throw std::runtime_error("unsupported PBI version encountered");
     }
 
     nlohmann::json fileSections;
@@ -145,7 +149,7 @@ void JsonFormatter::FormatReferences()
     }
 }
 
-void JsonFormatter::Print() { cout << json_.dump(settings_.jsonIndentLevel_) << endl; }
+void JsonFormatter::Print() { std::cout << json_.dump(settings_.jsonIndentLevel_) << std::endl; }
 
 void JsonFormatter::Run()
 {

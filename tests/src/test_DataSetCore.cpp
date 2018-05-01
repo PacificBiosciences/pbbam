@@ -9,7 +9,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace DataSetCoreTests {
 
@@ -61,7 +60,7 @@ TEST(DataSetCoreTest, DefaultsOk)
     EXPECT_EQ(0, dataset.Filters().Size());
     EXPECT_EQ(0, dataset.SubDataSets().Size());
 
-    EXPECT_EQ(string{"3.0.1"}, dataset.Version());
+    EXPECT_EQ(std::string{"3.0.1"}, dataset.Version());
 }
 
 TEST(DataSetCoreTest, TimeStampedNamesOk)
@@ -104,16 +103,16 @@ TEST(DataSetCoreTest, BasicGettersSettersOk)
     dataset.UniqueId("uuid");
     dataset.Version("0.0.0");
 
-    EXPECT_EQ(string("now"), dataset.CreatedAt());
-    EXPECT_EQ(string("format"), dataset.Format());
-    EXPECT_EQ(string("meta"), dataset.MetaType());
-    EXPECT_EQ(string("later"), dataset.ModifiedAt());
-    EXPECT_EQ(string("foo"), dataset.Name());
-    EXPECT_EQ(string("path/to/file"), dataset.ResourceId());
-    EXPECT_EQ(string("tag tag"), dataset.Tags());
-    EXPECT_EQ(string("now:30"), dataset.TimeStampedName());
-    EXPECT_EQ(string("uuid"), dataset.UniqueId());
-    EXPECT_EQ(string("0.0.0"), dataset.Version());
+    EXPECT_EQ(std::string("now"), dataset.CreatedAt());
+    EXPECT_EQ(std::string("format"), dataset.Format());
+    EXPECT_EQ(std::string("meta"), dataset.MetaType());
+    EXPECT_EQ(std::string("later"), dataset.ModifiedAt());
+    EXPECT_EQ(std::string("foo"), dataset.Name());
+    EXPECT_EQ(std::string("path/to/file"), dataset.ResourceId());
+    EXPECT_EQ(std::string("tag tag"), dataset.Tags());
+    EXPECT_EQ(std::string("now:30"), dataset.TimeStampedName());
+    EXPECT_EQ(std::string("uuid"), dataset.UniqueId());
+    EXPECT_EQ(std::string("0.0.0"), dataset.Version());
 }
 
 TEST(DataSetCoreTest, CopyOk)
@@ -123,12 +122,12 @@ TEST(DataSetCoreTest, CopyOk)
 
     // copy ctor
     DataSet d2(d1);
-    EXPECT_EQ(string("foo"), d2.Name());
+    EXPECT_EQ(std::string("foo"), d2.Name());
 
     // copy assignment
     DataSet d3;
     d3 = d1;
-    EXPECT_EQ(string("foo"), d3.Name());
+    EXPECT_EQ(std::string("foo"), d3.Name());
 }
 
 TEST(DataSetCoreTest, MoveOk)
@@ -145,7 +144,7 @@ TEST(DataSetCoreTest, MoveOk)
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
-    EXPECT_EQ(string("foo"), d2.Name());
+    EXPECT_EQ(std::string("foo"), d2.Name());
 
     // move assignment
     DataSet d3;
@@ -157,7 +156,7 @@ TEST(DataSetCoreTest, MoveOk)
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
-    EXPECT_EQ(string("foo"), d3.Name());
+    EXPECT_EQ(std::string("foo"), d3.Name());
 }
 
 TEST(DataSetCoreTest, AddExternalResources)
@@ -182,16 +181,16 @@ TEST(DataSetCoreTest, AddExternalResources)
 
     // direct access
     const ExternalResources& resources = dataset.ExternalResources();
-    EXPECT_EQ(string("file1"), resources[0].Name());
-    EXPECT_EQ(string("file2"), resources[1].Name());
+    EXPECT_EQ(std::string("file1"), resources[0].Name());
+    EXPECT_EQ(std::string("file2"), resources[1].Name());
 
     // iterable
     size_t i = 0;
     for (auto r : resources) {
         if (i == 0)
-            EXPECT_EQ(string("file1"), r.Name());
+            EXPECT_EQ(std::string("file1"), r.Name());
         else
-            EXPECT_EQ(string("file2"), r.Name());
+            EXPECT_EQ(std::string("file2"), r.Name());
         ++i;
     }
 }
@@ -210,8 +209,8 @@ TEST(DataSetCoreTest, EditExternalResources)
 
     // edit
     dataset.ExternalResources()[0].Name("some new name");
-    EXPECT_EQ(string("some new name"), dataset.ExternalResources()[0].Name());
-    EXPECT_EQ(string("file2"), dataset.ExternalResources()[1].Name());
+    EXPECT_EQ(std::string("some new name"), dataset.ExternalResources()[0].Name());
+    EXPECT_EQ(std::string("file2"), dataset.ExternalResources()[1].Name());
 }
 
 TEST(DataSetCoreTest, NestedExternalResources)
@@ -222,10 +221,10 @@ TEST(DataSetCoreTest, NestedExternalResources)
 
     const ExternalResources& childResources = resource.ExternalResources();
     EXPECT_EQ(2, childResources.Size());
-    EXPECT_EQ(string("metatype.child"), childResources[0].MetaType());
-    EXPECT_EQ(string("metatype.child2"), childResources[1].MetaType());
-    EXPECT_EQ(string("filename.child"), childResources[0].ResourceId());
-    EXPECT_EQ(string("filename.child2"), childResources[1].ResourceId());
+    EXPECT_EQ(std::string("metatype.child"), childResources[0].MetaType());
+    EXPECT_EQ(std::string("metatype.child2"), childResources[1].MetaType());
+    EXPECT_EQ(std::string("filename.child"), childResources[0].ResourceId());
+    EXPECT_EQ(std::string("filename.child2"), childResources[1].ResourceId());
 }
 
 TEST(DataSetCoreTest, AddFilters)
@@ -253,24 +252,24 @@ TEST(DataSetCoreTest, AddFilters)
 
     // direct access
     const Property& p0 = filters[0].Properties()[0];
-    EXPECT_EQ(string("rq"), p0.Name());
-    EXPECT_EQ(string("0.85"), p0.Value());
-    EXPECT_EQ(string(">"), p0.Operator());
+    EXPECT_EQ(std::string("rq"), p0.Name());
+    EXPECT_EQ(std::string("0.85"), p0.Value());
+    EXPECT_EQ(std::string(">"), p0.Operator());
 
     const Property& p1 = filters[0].Properties()[1];
-    EXPECT_EQ(string("RNAME"), p1.Name());
-    EXPECT_EQ(string("chr1"), p1.Value());
-    EXPECT_EQ(string("=="), p1.Operator());
+    EXPECT_EQ(std::string("RNAME"), p1.Name());
+    EXPECT_EQ(std::string("chr1"), p1.Value());
+    EXPECT_EQ(std::string("=="), p1.Operator());
 
     const Property& p2 = filters[1].Properties()[0];
-    EXPECT_EQ(string("rq"), p2.Name());
-    EXPECT_EQ(string("0.50"), p2.Value());
-    EXPECT_EQ(string(">="), p2.Operator());
+    EXPECT_EQ(std::string("rq"), p2.Name());
+    EXPECT_EQ(std::string("0.50"), p2.Value());
+    EXPECT_EQ(std::string(">="), p2.Operator());
 
     const Property& p3 = filters[1].Properties()[1];
-    EXPECT_EQ(string("RNAME"), p3.Name());
-    EXPECT_EQ(string("chr2"), p3.Value());
-    EXPECT_EQ(string("!="), p3.Operator());
+    EXPECT_EQ(std::string("RNAME"), p3.Name());
+    EXPECT_EQ(std::string("chr2"), p3.Value());
+    EXPECT_EQ(std::string("!="), p3.Operator());
 
     // iteratable
     size_t i = 0;
@@ -280,13 +279,13 @@ TEST(DataSetCoreTest, AddFilters)
             const Properties& properties = f.Properties();
             for (const Property& p : properties) {
                 if (j == 0) {
-                    EXPECT_EQ(string("rq"), p.Name());
-                    EXPECT_EQ(string("0.85"), p.Value());
-                    EXPECT_EQ(string(">"), p.Operator());
+                    EXPECT_EQ(std::string("rq"), p.Name());
+                    EXPECT_EQ(std::string("0.85"), p.Value());
+                    EXPECT_EQ(std::string(">"), p.Operator());
                 } else {
-                    EXPECT_EQ(string("RNAME"), p.Name());
-                    EXPECT_EQ(string("chr1"), p.Value());
-                    EXPECT_EQ(string("=="), p.Operator());
+                    EXPECT_EQ(std::string("RNAME"), p.Name());
+                    EXPECT_EQ(std::string("chr1"), p.Value());
+                    EXPECT_EQ(std::string("=="), p.Operator());
                 }
                 ++j;
             }
@@ -294,13 +293,13 @@ TEST(DataSetCoreTest, AddFilters)
             const Properties& properties = f.Properties();
             for (const Property& p : properties) {
                 if (j == 0) {
-                    EXPECT_EQ(string("rq"), p.Name());
-                    EXPECT_EQ(string("0.50"), p.Value());
-                    EXPECT_EQ(string(">="), p.Operator());
+                    EXPECT_EQ(std::string("rq"), p.Name());
+                    EXPECT_EQ(std::string("0.50"), p.Value());
+                    EXPECT_EQ(std::string(">="), p.Operator());
                 } else {
-                    EXPECT_EQ(string("RNAME"), p.Name());
-                    EXPECT_EQ(string("chr2"), p.Value());
-                    EXPECT_EQ(string("!="), p.Operator());
+                    EXPECT_EQ(std::string("RNAME"), p.Name());
+                    EXPECT_EQ(std::string("chr2"), p.Value());
+                    EXPECT_EQ(std::string("!="), p.Operator());
                 }
                 ++j;
             }
@@ -338,24 +337,24 @@ TEST(DataSetCoreTest, EditFilters)
     p.Operator("==");
 
     const Property& p0 = dataset.Filters()[0].Properties()[0];
-    EXPECT_EQ(string("someNewName"), p0.Name());
-    EXPECT_EQ(string("someNewValue"), p0.Value());
-    EXPECT_EQ(string("=="), p0.Operator());
+    EXPECT_EQ(std::string("someNewName"), p0.Name());
+    EXPECT_EQ(std::string("someNewValue"), p0.Value());
+    EXPECT_EQ(std::string("=="), p0.Operator());
 
     const Property& p1 = dataset.Filters()[0].Properties()[1];
-    EXPECT_EQ(string("RNAME"), p1.Name());
-    EXPECT_EQ(string("chr1"), p1.Value());
-    EXPECT_EQ(string("=="), p1.Operator());
+    EXPECT_EQ(std::string("RNAME"), p1.Name());
+    EXPECT_EQ(std::string("chr1"), p1.Value());
+    EXPECT_EQ(std::string("=="), p1.Operator());
 
     const Property& p2 = dataset.Filters()[1].Properties()[0];
-    EXPECT_EQ(string("rq"), p2.Name());
-    EXPECT_EQ(string("0.50"), p2.Value());
-    EXPECT_EQ(string(">="), p2.Operator());
+    EXPECT_EQ(std::string("rq"), p2.Name());
+    EXPECT_EQ(std::string("0.50"), p2.Value());
+    EXPECT_EQ(std::string(">="), p2.Operator());
 
     const Property& p3 = dataset.Filters()[1].Properties()[1];
-    EXPECT_EQ(string("RNAME"), p3.Name());
-    EXPECT_EQ(string("chr2"), p3.Value());
-    EXPECT_EQ(string("!="), p3.Operator());
+    EXPECT_EQ(std::string("RNAME"), p3.Name());
+    EXPECT_EQ(std::string("chr2"), p3.Value());
+    EXPECT_EQ(std::string("!="), p3.Operator());
 }
 
 TEST(DataSetCoreTest, AddSubDataSets)
@@ -375,16 +374,16 @@ TEST(DataSetCoreTest, AddSubDataSets)
 
     // direct access
     const SubDataSets& subdatasets = dataset.SubDataSets();
-    EXPECT_EQ(string("subset_1"), subdatasets[0].Name());
-    EXPECT_EQ(string("subset_2"), subdatasets[1].Name());
+    EXPECT_EQ(std::string("subset_1"), subdatasets[0].Name());
+    EXPECT_EQ(std::string("subset_2"), subdatasets[1].Name());
 
     // iterable
     size_t i = 0;
     for (const DataSetBase& ds : subdatasets) {
         if (i == 0)
-            EXPECT_EQ(string("subset_1"), ds.Name());
+            EXPECT_EQ(std::string("subset_1"), ds.Name());
         else
-            EXPECT_EQ(string("subset_2"), ds.Name());
+            EXPECT_EQ(std::string("subset_2"), ds.Name());
         ++i;
     }
 }
@@ -409,16 +408,16 @@ TEST(DataSetCoreTest, EditSubDataSets)
 
     // direct access
     const SubDataSets& subdatasets = dataset.SubDataSets();
-    EXPECT_EQ(string("subset_1_edited"), subdatasets[0].Name());
-    EXPECT_EQ(string("subset_2"), subdatasets[1].Name());
+    EXPECT_EQ(std::string("subset_1_edited"), subdatasets[0].Name());
+    EXPECT_EQ(std::string("subset_2"), subdatasets[1].Name());
 
     // iterable
     size_t i = 0;
     for (const DataSetBase& ds : subdatasets) {
         if (i == 0)
-            EXPECT_EQ(string("subset_1_edited"), ds.Name());
+            EXPECT_EQ(std::string("subset_1_edited"), ds.Name());
         else
-            EXPECT_EQ(string("subset_2"), ds.Name());
+            EXPECT_EQ(std::string("subset_2"), ds.Name());
         ++i;
     }
 }
@@ -444,13 +443,13 @@ TEST(DataSetCoreTest, RemoveExternalResources)
 
     // direct access
     const ExternalResources& resources = dataset.ExternalResources();
-    EXPECT_EQ(string("file2"), resources[0].Name());
+    EXPECT_EQ(std::string("file2"), resources[0].Name());
 
     // iterable
     size_t i = 0;
     for (auto r : resources) {
         if (i == 0) {
-            EXPECT_EQ(string("file2"), r.Name());
+            EXPECT_EQ(std::string("file2"), r.Name());
         }
         ++i;
     }

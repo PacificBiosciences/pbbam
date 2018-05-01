@@ -1,6 +1,7 @@
 // Author: Yuan Li
 
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -10,32 +11,31 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace QNameQueryTests {
 
-static const string dataDir = PbbamTestsConfig::Data_Dir + "/group/";
-static const string test1fn = string(dataDir) + "test1.bam";
-static const string test2fn = string(dataDir) + "test2.bam";
-static const string test3fn = string(dataDir) + "test3.bam";
+static const std::string dataDir = PbbamTestsConfig::Data_Dir + "/group/";
+static const std::string test1fn = std::string(dataDir) + "test1.bam";
+static const std::string test2fn = std::string(dataDir) + "test2.bam";
+static const std::string test3fn = std::string(dataDir) + "test3.bam";
 
-static void TestQNameQuery(const string& fn, const vector<int>& expected)
+static void TestQNameQuery(const std::string& fn, const std::vector<int>& expected)
 {
     EXPECT_NO_THROW({
-        vector<int> counts;
+        std::vector<int> counts;
         QNameQuery qQuery(fn);
-        for (const vector<BamRecord>& records : qQuery)
+        for (const std::vector<BamRecord>& records : qQuery)
             counts.push_back(records.size());
         EXPECT_EQ(expected, counts);
     });
 }
 
-static void TestNoneConstQNameQuery(const string& fn, const vector<int>& expected)
+static void TestNoneConstQNameQuery(const std::string& fn, const std::vector<int>& expected)
 {
     EXPECT_NO_THROW({
-        vector<int> counts;
+        std::vector<int> counts;
         QNameQuery qQuery(fn);
-        for (vector<BamRecord>& records : qQuery)
+        for (std::vector<BamRecord>& records : qQuery)
             counts.push_back(records.size());
         EXPECT_EQ(expected, counts);
     });
@@ -46,8 +46,8 @@ static void TestNoneConstQNameQuery(const string& fn, const vector<int>& expecte
 TEST(QNameQueryTest, CountQSizes)
 {
     // test case 1 has exactly one bamRecord.
-    string fn = QNameQueryTests::test1fn;
-    vector<int> expected({1});
+    std::string fn = QNameQueryTests::test1fn;
+    std::vector<int> expected({1});
     QNameQueryTests::TestQNameQuery(fn, expected);
     QNameQueryTests::TestNoneConstQNameQuery(fn, expected);
 

@@ -15,7 +15,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace ZmwReadStitcherTests {
 
@@ -82,7 +81,7 @@ static void Compare(const BamRecord& b1, const BamRecord& b2)
     EXPECT_EQ(b1.PulseMergeQV(), b2.PulseMergeQV());
 }
 
-static size_t NumVirtualRecords(const string& primaryBamFn, const string& scrapsBamFn)
+static size_t NumVirtualRecords(const std::string& primaryBamFn, const std::string& scrapsBamFn)
 {
     ZmwReadStitcher stitcher(primaryBamFn, scrapsBamFn);
     size_t count = 0;
@@ -127,15 +126,18 @@ TEST(ZmwReadStitching, FromBams_Filtered)
 TEST(ZmwReadStitching, FromDataSet_NoFilter)
 {
     // dataset contains these resources (subreads/scraps + hqregion/scraps BAMs)
-    const string primaryFn1 = PbbamTestsConfig::Data_Dir + "/polymerase/production.subreads.bam";
-    const string scrapsFn1 = PbbamTestsConfig::Data_Dir + "/polymerase/production.scraps.bam";
-    const string primaryFn2 = PbbamTestsConfig::Data_Dir + "/polymerase/production_hq.hqregion.bam";
-    const string scrapsFn2 = PbbamTestsConfig::Data_Dir + "/polymerase/production_hq.scraps.bam";
+    const std::string primaryFn1 =
+        PbbamTestsConfig::Data_Dir + "/polymerase/production.subreads.bam";
+    const std::string scrapsFn1 = PbbamTestsConfig::Data_Dir + "/polymerase/production.scraps.bam";
+    const std::string primaryFn2 =
+        PbbamTestsConfig::Data_Dir + "/polymerase/production_hq.hqregion.bam";
+    const std::string scrapsFn2 =
+        PbbamTestsConfig::Data_Dir + "/polymerase/production_hq.scraps.bam";
     const size_t numExpectedRecords =
         ZmwReadStitcherTests::NumVirtualRecords(primaryFn1, scrapsFn1) +
         ZmwReadStitcherTests::NumVirtualRecords(primaryFn2, scrapsFn2);
 
-    const string datasetFn =
+    const std::string datasetFn =
         PbbamTestsConfig::Data_Dir + "/polymerase/multiple_resources.subread.dataset.xml";
 
     DataSet ds{datasetFn};
@@ -152,12 +154,15 @@ TEST(ZmwReadStitching, FromDataSet_NoFilter)
 TEST(ZmwReadStitching, FromDataSet_Filtered)
 {
     // dataset contains these resources (subreads/scraps + hqregion/scraps BAMs)
-    const string primaryFn1 = PbbamTestsConfig::Data_Dir + "/polymerase/production.subreads.bam";
-    const string scrapsFn1 = PbbamTestsConfig::Data_Dir + "/polymerase/production.scraps.bam";
-    const string primaryFn2 = PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam";
-    const string scrapsFn2 = PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam";
-    const string primaryFn3 = PbbamTestsConfig::Data_Dir + "/polymerase/production_hq.hqregion.bam";
-    const string scrapsFn3 = PbbamTestsConfig::Data_Dir + "/polymerase/production_hq.scraps.bam";
+    const std::string primaryFn1 =
+        PbbamTestsConfig::Data_Dir + "/polymerase/production.subreads.bam";
+    const std::string scrapsFn1 = PbbamTestsConfig::Data_Dir + "/polymerase/production.scraps.bam";
+    const std::string primaryFn2 = PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam";
+    const std::string scrapsFn2 = PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam";
+    const std::string primaryFn3 =
+        PbbamTestsConfig::Data_Dir + "/polymerase/production_hq.hqregion.bam";
+    const std::string scrapsFn3 =
+        PbbamTestsConfig::Data_Dir + "/polymerase/production_hq.scraps.bam";
     const size_t totalRecords = ZmwReadStitcherTests::NumVirtualRecords(primaryFn1, scrapsFn1) +
                                 ZmwReadStitcherTests::NumVirtualRecords(primaryFn2, scrapsFn2) +
                                 ZmwReadStitcherTests::NumVirtualRecords(primaryFn3, scrapsFn3);
@@ -165,7 +170,7 @@ TEST(ZmwReadStitching, FromDataSet_Filtered)
 
     // our filter will remove the 2 "production" BAM pairs
     // using a ZMW filter that only the "internal" pair should pass
-    const string datasetFn =
+    const std::string datasetFn =
         PbbamTestsConfig::Data_Dir + "/polymerase/filtered_resources.subread.dataset.xml";
 
     DataSet ds{datasetFn};

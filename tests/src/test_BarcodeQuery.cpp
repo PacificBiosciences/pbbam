@@ -10,7 +10,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 TEST(BarcodeQueryTest, QueryOk)
 {

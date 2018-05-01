@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 #include <cstdint>
+#include <string>
+#include <vector>
 
 #include "PbbamTestData.h"
 
@@ -12,16 +14,15 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 TEST(BamWriterTest, SingleWrite_UserRecord)
 {
-    const string fullName = "test/100/0_5";
-    const string rgId = "6002b307";
-    const vector<float> expectedSnr = {0.2, 0.2, 0.2, 0.2};
+    const std::string fullName = "test/100/0_5";
+    const std::string rgId = "6002b307";
+    const std::vector<float> expectedSnr = {0.2, 0.2, 0.2, 0.2};
 
     // setup header
-    const string hdrText = {
+    const std::string hdrText = {
         "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
         "@RG\tID:6002b307\tPL:PACBIO\tDS:READTYPE=SUBREAD;BINDINGKIT=100-619-300;"
         "SEQUENCINGKIT=100-619-400;BASECALLERVERSION=3.0;FRAMERATEHZ=100\t"
@@ -54,7 +55,8 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
     bamRecord.Impl().Tags(tags);
 
     // write record to file
-    const string generatedBamFn = PbbamTestsConfig::GeneratedData_Dir + "/bamwriter_generated.bam";
+    const std::string generatedBamFn =
+        PbbamTestsConfig::GeneratedData_Dir + "/bamwriter_generated.bam";
     {
         BamWriter writer(generatedBamFn, inputHeader);
         writer.Write(bamRecord);
