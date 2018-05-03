@@ -33,21 +33,21 @@ class IndexedBamWriterPrivate : public internal::FileProducer
 public:
     IndexedBamWriterPrivate(const std::string& outputFilename, std::shared_ptr<bam_hdr_t> rawHeader)
         : internal::FileProducer{outputFilename}
-        , file_{nullptr}
         , header_{rawHeader}
         , builder_{outputFilename + ".pbi"}
         , previousBlockAddress_{0}
     {
-        if (!header_) throw std::runtime_error("null header");
+        if (!header_) throw std::runtime_error{"null header"};
 
         // open file
         const auto& usingFilename = TempFilename();
         file_.reset(sam_open(usingFilename.c_str(), "wb"));
-        if (!file_) throw std::runtime_error("could not open file for writing");
+        if (!file_)
+            throw std::runtime_error{"could not open file" + usingFilename + " for writing"};
 
         // write header
         const auto ret = sam_hdr_write(file_.get(), header_.get());
-        if (ret != 0) throw std::runtime_error("could not write header");
+        if (ret != 0) throw std::runtime_error{"could not write header"};
 
         // store first alignment block
         previousBlockAddress_ = file_.get()->fp.bgzf->block_address;
@@ -87,7 +87,7 @@ public:
 
         // write record to file & PBI builder
         const auto ret = sam_write1(file_.get(), header_.get(), rawRecord.get());
-        if (ret <= 0) throw std::runtime_error("could not write record");
+        if (ret <= 0) throw std::runtime_error{"could not write record"};
         builder_.AddRecord(record, vOffset);
 
         // update block address
@@ -104,7 +104,7 @@ public:
 }  // namespace internal
 
 IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamHeader& header)
-    : IRecordWriter(), d_(nullptr)
+    : IRecordWriter()
 {
 #if PBBAM_AUTOVALIDATE
     Validator::Validate(header);
@@ -118,7 +118,7 @@ IndexedBamWriter::~IndexedBamWriter() {}
 void IndexedBamWriter::TryFlush()
 {
     const auto ret = bgzf_flush(d_->file_.get()->fp.bgzf);
-    if (ret != 0) throw std::runtime_error("could not flush output buffer contents");
+    if (ret != 0) throw std::runtime_error{"could not flush output buffer contents"};
 }
 
 void IndexedBamWriter::Write(const BamRecord& record) { d_->Write(record); }

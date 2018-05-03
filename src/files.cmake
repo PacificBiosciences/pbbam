@@ -217,8 +217,6 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/SamWriter.cpp
     ${PacBioBAM_SourceDir}/SequenceInfo.cpp
     ${PacBioBAM_SourceDir}/SubreadLengthQuery.cpp
-    ${PacBioBAM_SourceDir}/Tag.cpp
-    ${PacBioBAM_SourceDir}/TagCollection.cpp
     ${PacBioBAM_SourceDir}/Validator.cpp
     ${PacBioBAM_SourceDir}/ValidationErrors.cpp
     ${PacBioBAM_SourceDir}/ValidationException.cpp

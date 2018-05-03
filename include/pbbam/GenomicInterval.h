@@ -114,14 +114,14 @@ public:
     /// \param[in] name
     /// \returns reference to this interval
     ///
-    GenomicInterval& Name(const std::string& name);
+    GenomicInterval& Name(std::string name);
 
     /// Sets this underlying Interval
     ///
     /// \param[in] interval
     /// \returns reference to this interval
     ///
-    GenomicInterval& Interval(const PacBio::BAM::Interval<Position>& interval);
+    GenomicInterval& Interval(PacBio::BAM::Interval<Position> interval);
 
     /// Sets this interval's start coordinate.
     ///

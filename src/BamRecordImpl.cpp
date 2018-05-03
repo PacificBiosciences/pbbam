@@ -74,13 +74,12 @@ BamRecordImpl::BamRecordImpl() : d_(nullptr)
 }
 
 BamRecordImpl::BamRecordImpl(const BamRecordImpl& other)
-    : d_(bam_dup1(other.d_.get()), internal::HtslibRecordDeleter()), tagOffsets_(other.tagOffsets_)
+    : d_{bam_dup1(other.d_.get()), internal::HtslibRecordDeleter()}, tagOffsets_{other.tagOffsets_}
 {
     assert(d_);
 }
 
-BamRecordImpl::BamRecordImpl(BamRecordImpl&& other)
-    : d_(nullptr), tagOffsets_(std::move(other.tagOffsets_))
+BamRecordImpl::BamRecordImpl(BamRecordImpl&& other) : tagOffsets_{std::move(other.tagOffsets_)}
 {
     d_.swap(other.d_);
     other.d_.reset();
@@ -138,7 +137,7 @@ bool BamRecordImpl::AddTag(const BamRecordTag tag, const Tag& value,
 bool BamRecordImpl::AddTagImpl(const std::string& tagName, const Tag& value,
                                const TagModifier additionalModifier)
 {
-    const std::vector<uint8_t> rawData = BamTagCodec::ToRawData(value, additionalModifier);
+    const auto rawData = BamTagCodec::ToRawData(value, additionalModifier);
     if (rawData.empty()) return false;
 
     bam_aux_append(d_.get(), tagName.c_str(), BamTagCodec::TagTypeCode(value, additionalModifier),
@@ -395,7 +394,7 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualities(const std::string& sequenc
                                                       const std::string& qualities)
 {
     if (!qualities.empty() && (sequence.size() != qualities.size()))
-        throw std::runtime_error("If QUAL provided, must be of the same length as SEQ");
+        throw std::runtime_error{"If QUAL provided, must be of the same length as SEQ"};
 
     return SetSequenceAndQualitiesInternal(sequence.c_str(), sequence.size(), qualities.c_str(),
                                            false);
@@ -463,7 +462,7 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
 
 int BamRecordImpl::TagOffset(const std::string& tagName) const
 {
-    if (tagName.size() != 2) throw std::runtime_error("invalid tag name size");
+    if (tagName.size() != 2) throw std::runtime_error{"invalid tag name size"};
 
     if (tagOffsets_.empty()) UpdateTagMap();
 
@@ -505,15 +504,15 @@ TagCollection BamRecordImpl::Tags() const
 
 Tag BamRecordImpl::TagValue(const std::string& tagName) const
 {
-    if (tagName.size() != 2) return Tag();
+    if (tagName.size() != 2) return {};
 
     const int offset = TagOffset(tagName);
-    if (offset == -1) return Tag();
+    if (offset == -1) return {};
 
     bam1_t* b = d_.get();
     assert(bam_get_aux(b));
     uint8_t* tagData = bam_get_aux(b) + offset;
-    if (offset >= b->l_data) return Tag();
+    if (offset >= b->l_data) return {};
 
     // skip tag name
     return BamTagCodec::FromRawData(tagData);
@@ -527,10 +526,8 @@ Tag BamRecordImpl::TagValue(const BamRecordTag tag) const
 void BamRecordImpl::UpdateTagMap() const
 {
     // clear out offsets, leave map structure basically intact
-    auto tagIter = tagOffsets_.begin();
-    auto tagEnd = tagOffsets_.end();
-    for (; tagIter != tagEnd; ++tagIter)
-        tagIter->second = -1;
+    for (auto& tag : tagOffsets_)
+        tag.second = -1;
 
     const uint8_t* tagStart = bam_get_aux(d_);
     if (tagStart == nullptr) return;
@@ -598,8 +595,8 @@ void BamRecordImpl::UpdateTagMap() const
 
                     // unknown subTagType
                     default:
-                        throw std::runtime_error("unsupported array-tag-type encountered: " +
-                                                 std::string(1, subTagType));
+                        throw std::runtime_error{"unsupported array-tag-type encountered: " +
+                                                 std::string{1, subTagType}};
                 }
 
                 uint32_t numElements = 0;
@@ -610,8 +607,8 @@ void BamRecordImpl::UpdateTagMap() const
 
             // unknown tagType
             default:
-                throw std::runtime_error("unsupported tag-type encountered: " +
-                                         std::string(1, tagType));
+                throw std::runtime_error{"unsupported tag-type encountered: " +
+                                         std::string{1, tagType}};
         }
     }
 }

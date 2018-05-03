@@ -26,12 +26,12 @@ namespace BAM {
 
 IndexedFastaReader::IndexedFastaReader(const std::string& filename)
 {
-    if (!Open(filename)) throw std::runtime_error("Cannot open file " + filename);
+    if (!Open(filename)) throw std::runtime_error{"Cannot open file " + filename};
 }
 
 IndexedFastaReader::IndexedFastaReader(const IndexedFastaReader& src)
 {
-    if (!Open(src.filename_)) throw std::runtime_error("Cannot open file " + src.filename_);
+    if (!Open(src.filename_)) throw std::runtime_error{"Cannot open file " + src.filename_};
 }
 
 IndexedFastaReader& IndexedFastaReader::operator=(const IndexedFastaReader& rhs)
@@ -44,13 +44,13 @@ IndexedFastaReader& IndexedFastaReader::operator=(const IndexedFastaReader& rhs)
 
 IndexedFastaReader::~IndexedFastaReader() { Close(); }
 
-bool IndexedFastaReader::Open(const std::string& filename)
+bool IndexedFastaReader::Open(std::string filename)
 {
     auto* handle = fai_load(filename.c_str());
     if (handle == nullptr)
         return false;
     else {
-        filename_ = filename;
+        filename_ = std::move(filename);
         handle_ = handle;
         return true;
     }
@@ -58,13 +58,15 @@ bool IndexedFastaReader::Open(const std::string& filename)
 
 void IndexedFastaReader::Close()
 {
-    filename_ = "";
+    filename_.clear();
     if (handle_ != nullptr) fai_destroy(handle_);
     handle_ = nullptr;
 }
 
-#define REQUIRE_FAIDX_LOADED \
-    if (handle_ == nullptr) throw std::exception()
+#define REQUIRE_FAIDX_LOADED                     \
+    if (handle_ == nullptr) throw std::exception \
+        {                                        \
+        }
 
 std::string IndexedFastaReader::Subsequence(const std::string& id, Position begin,
                                             Position end) const
@@ -75,8 +77,8 @@ std::string IndexedFastaReader::Subsequence(const std::string& id, Position begi
     // Derek: *Annoyingly* htslib seems to interpret "end" as inclusive in
     // faidx_fetch_seq, whereas it considers it exclusive in the region spec in
     // fai_fetch.  Can you please verify?
-    const std::unique_ptr<char> rawSeq(faidx_fetch_seq(handle_, id.c_str(), begin, end - 1, &len));
-    if (rawSeq == nullptr) throw std::runtime_error("could not fetch FASTA sequence");
+    const std::unique_ptr<char> rawSeq{faidx_fetch_seq(handle_, id.c_str(), begin, end - 1, &len)};
+    if (rawSeq == nullptr) throw std::runtime_error{"could not fetch FASTA sequence"};
     return RemoveAllWhitespace(rawSeq.get());
 }
 
@@ -92,7 +94,7 @@ std::string IndexedFastaReader::Subsequence(const char* htslibRegion) const
 
     int len;
     const std::unique_ptr<char> rawSeq(fai_fetch(handle_, htslibRegion, &len));
-    if (rawSeq == nullptr) throw std::runtime_error("could not fetch FASTA sequence");
+    if (rawSeq == nullptr) throw std::runtime_error{"could not fetch FASTA sequence"};
     return RemoveAllWhitespace(rawSeq.get());
 }
 
@@ -109,12 +111,10 @@ std::string IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
 
     if (bamRecord.Impl().IsMapped() && gapped) {
         size_t seqIndex = 0;
+
         const auto cigar = bamRecord.Impl().CigarData();
-        auto cigarIter = cigar.cbegin();
-        auto cigarEnd = cigar.cend();
-        for (; cigarIter != cigarEnd; ++cigarIter) {
-            const auto& op = (*cigarIter);
-            const auto& type = op.Type();
+        for (const auto& op : cigar) {
+            const auto type = op.Type();
 
             // do nothing for hard clips
             if (type != CigarOperationType::HARD_CLIP) {
@@ -173,7 +173,7 @@ std::string IndexedFastaReader::Name(const size_t idx) const
 {
     REQUIRE_FAIDX_LOADED;
     if (static_cast<int>(idx) >= NumSequences())
-        throw std::runtime_error("FASTA index out of range");
+        throw std::runtime_error{"FASTA index out of range"};
     return {faidx_iseq(handle_, idx)};
 }
 
@@ -188,7 +188,7 @@ int IndexedFastaReader::SequenceLength(const std::string& name) const
     REQUIRE_FAIDX_LOADED;
     const auto len = faidx_seq_len(handle_, name.c_str());
     if (len < 0)
-        throw std::runtime_error("could not determine FASTA sequence length");
+        throw std::runtime_error{"could not determine FASTA sequence length"};
     else
         return len;
 }

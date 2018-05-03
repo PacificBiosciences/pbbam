@@ -1,3 +1,0 @@
-PbiFilter result{ PbiFilter::UNION };
-result.Add(filters);
-return result;

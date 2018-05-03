@@ -91,55 +91,24 @@ public:
     /// \name Set Operations
     /// \{
 
-    /// \brief Creates a PbiFilter that acts as intersection of the input
-    ///        filters.
-    ///
-    /// A record must satisfy \b all of this filter's direct "child" filters.
-    ///
-    /// Equivalent to:
-    /// \include code/PbiFilter_Intersection_Copy.txt
-    ///
-    /// \param[in] filters  vector of child filters
-    /// \returns composite filter
-    ///
-    static PbiFilter Intersection(const std::vector<PbiFilter>& filters);
-
     /// \brief Creates a PbiFilter that acts as an intersection of the input
     ///        filters.
     ///
     /// A record must satisfy \b all of this filter's direct "child" filters.
     ///
-    /// Equivalent to:
-    /// \include code/PbiFilter_Intersection_Move.txt
-    ///
     /// \param[in] filters  vector of child filters
     /// \returns composite filter
     ///
-    static PbiFilter Intersection(std::vector<PbiFilter>&& filters);
+    static PbiFilter Intersection(std::vector<PbiFilter> filters);
 
     /// \brief Creates a PbiFilter that acts as a union of the input filters.
     ///
     /// A record must satisfy \b any of this filter's direct "child" filters.
     ///
-    /// Equivalent to:
-    /// \include code/PbiFilter_Union_Copy.txt
-    ///
     /// \param[in] filters  vector of child filters
     /// \returns composite filter
     ///
-    static PbiFilter Union(const std::vector<PbiFilter>& filters);
-
-    /// \brief Creates a PbiFilter that acts as a union of the input filters.
-    ///
-    /// A record must satisfy \b any of this filter's direct "child" filters.
-    ///
-    /// Equivalent to:
-    /// \include code/PbiFilter_Union_Move.txt
-    ///
-    /// \param[in] filters  vector of child filters
-    /// \returns composite filter
-    ///
-    static PbiFilter Union(std::vector<PbiFilter>&& filters);
+    static PbiFilter Union(std::vector<PbiFilter> filters);
 
     /// \}
 
@@ -193,31 +162,14 @@ public:
     /// \param[in] filter initial child filter
     ///
     template <typename T>
-    PbiFilter(const T& filter);
-
-    /// \brief Creates a composite filter (of INTERSECT type) with an initial
-    ///        child filter.
-    ///
-    /// \note T must satisfy PbiFilterConcept
-    ///
-    /// \param[in] filter initial child filter
-    ///
-    template <typename T>
-    PbiFilter(T&& filter);
-
-    /// \brief Creates a composite filter (of INTERSECT type) with a list of
-    ///        initial child filters.
-    ///
-    /// \param[in] filters initial child filters
-    ///
-    PbiFilter(const std::vector<PbiFilter>& filters);
+    PbiFilter(T filter);
 
     /// \brief Creates composite filter (of INTERSECT type) with a list of
     ///        initial child filters.
     ///
     /// \param[in] filters initial child filters
     ///
-    PbiFilter(std::vector<PbiFilter>&& filters);
+    PbiFilter(std::vector<PbiFilter> filters);
 
     PbiFilter(const PbiFilter&);
     PbiFilter(PbiFilter&&) noexcept = default;
@@ -238,44 +190,21 @@ public:
     /// \returns reference to this filter
     ///
     template <typename T>
-    PbiFilter& Add(const T& filter);
-
-    /// \brief Adds a new child filter of type T.
-    ///
-    /// \param[in] filter   additional child filter. Type T must satisfy
-    ///                     PbiFilterConcept.
-    /// \returns reference to this filter
-    ///
-    template <typename T>
-    PbiFilter& Add(T&& filter);
+    PbiFilter& Add(T filter);
 
     /// \brief Adds a new child filter.
     ///
     /// \param[in] filter   additional child filter
     /// \returns reference to this filter
     ///
-    PbiFilter& Add(const PbiFilter& filter);
-
-    /// \brief Adds a new child filter.
-    ///
-    /// \param[in] filter   additional child filter
-    /// \returns reference to this filter
-    ///
-    PbiFilter& Add(PbiFilter&& filter);
+    PbiFilter& Add(PbiFilter filter);
 
     /// \brief Add child filters.
     ///
     /// \param[in] filters  additional child filters
     /// \returns reference to this filter
     ///
-    PbiFilter& Add(const std::vector<PbiFilter>& filters);
-
-    /// \brief Add child filters.
-    ///
-    /// \param[in] filters  additional child filters
-    /// \returns reference to this filter
-    ///
-    PbiFilter& Add(std::vector<PbiFilter>&& filters);
+    PbiFilter& Add(std::vector<PbiFilter> filters);
 
     /// \returns true if this filter has no child filters.
     bool IsEmpty() const;

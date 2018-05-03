@@ -5,12 +5,14 @@
 // Author: Derek Barnett
 
 #include "pbbam/PbiFilter.h"
-#include "pbbam/MakeUnique.h"
+
 #include <algorithm>
 #include <iostream>
 #include <map>
 #include <set>
 #include <vector>
+
+#include "pbbam/MakeUnique.h"
 
 namespace PacBio {
 namespace BAM {
@@ -78,11 +80,11 @@ private:
 
 template<typename T>
 inline FilterWrapper::FilterWrapper(T x)
-    : self_(new WrapperImpl<T>(std::move(x)))
+    : self_{std::make_unique<WrapperImpl<T>>(std::move(x))}
 { }
 
 inline FilterWrapper::FilterWrapper(const FilterWrapper& other)
-    : self_(other.self_->Clone())
+    : self_{other.self_->Clone()}
 { }
 
 inline FilterWrapper& FilterWrapper::operator=(const FilterWrapper& other)
@@ -100,7 +102,7 @@ inline bool FilterWrapper::Accepts(const PbiRawData& idx, const size_t row) cons
 
 template<typename T>
 inline FilterWrapper::WrapperImpl<T>::WrapperImpl(T x)
-    : FilterWrapper::WrapperInterface()
+    : FilterWrapper::WrapperInterface{}
     , data_(std::move(x))
 {
     BOOST_CONCEPT_ASSERT((PbiFilterConcept<T>));
@@ -108,7 +110,7 @@ inline FilterWrapper::WrapperImpl<T>::WrapperImpl(T x)
 
 template<typename T>
 inline FilterWrapper::WrapperImpl<T>::WrapperImpl(const WrapperImpl& other)
-    : FilterWrapper::WrapperInterface()
+    : FilterWrapper::WrapperInterface{}
     , data_(other.data_)
 { }
 
@@ -123,12 +125,12 @@ inline bool FilterWrapper::WrapperImpl<T>::Accepts(const PbiRawData& idx,
 
 struct PbiFilterPrivate
 {
-    PbiFilterPrivate(PbiFilter::CompositionType type)
-        : type_(type)
+    PbiFilterPrivate(PbiFilter::CompositionType type = PbiFilter::INTERSECT)
+        : type_{type}
     { }
 
     template<typename T>
-    void Add(T&& filter)
+    void Add(T filter)
     {
         filters_.emplace_back(std::move(filter));
     }
@@ -166,7 +168,7 @@ struct PbiFilterPrivate
 
         else
             //assert(false); // invalid composite filter type
-            throw std::runtime_error("invalid composite filter type in PbiFilterPrivate::Accepts");
+            throw std::runtime_error{"invalid composite filter type in PbiFilterPrivate::Accepts"};
     }
 
     PbiFilter::CompositionType type_;
@@ -176,31 +178,18 @@ struct PbiFilterPrivate
 } // namespace internal
 
 inline PbiFilter::PbiFilter(const CompositionType type)
-    : d_{ new internal::PbiFilterPrivate{ type } }
+    : d_{std::make_unique<internal::PbiFilterPrivate>(type) }
 { }
 
 template<typename T> inline
-PbiFilter::PbiFilter(const T& filter)
-    : d_{ new internal::PbiFilterPrivate{ PbiFilter::INTERSECT } }
-{
-    Add(filter);
-}
-
-template<typename T> inline
-PbiFilter::PbiFilter(T&& filter)
-    : d_{ new internal::PbiFilterPrivate{ PbiFilter::INTERSECT } }
+PbiFilter::PbiFilter(T filter)
+    : d_{std::make_unique<internal::PbiFilterPrivate>() }
 {
     Add(std::move(filter));
 }
 
-inline PbiFilter::PbiFilter(const std::vector<PbiFilter>& filters)
-    : d_{ new internal::PbiFilterPrivate{ PbiFilter::INTERSECT } }
-{
-    Add(filters);
-}
-
-inline PbiFilter::PbiFilter(std::vector<PbiFilter>&& filters)
-    : d_{ new internal::PbiFilterPrivate{ PbiFilter::INTERSECT} }
+inline PbiFilter::PbiFilter(std::vector<PbiFilter> filters)
+    : d_{std::make_unique<internal::PbiFilterPrivate>() }
 {
     Add(std::move(filters));
 }
@@ -220,38 +209,19 @@ inline bool PbiFilter::Accepts(const PacBio::BAM::PbiRawData& idx,
 { return d_->Accepts(idx, row); }
 
 template<typename T>
-inline PbiFilter& PbiFilter::Add(const T& filter)
-{
-    T copy = filter;
-    return Add(std::move(copy));
-}
-
-template<typename T>
-inline PbiFilter& PbiFilter::Add(T&& filter)
+inline PbiFilter& PbiFilter::Add(T filter)
 {
     d_->Add(std::move(filter));
     return *this;
 }
 
-inline PbiFilter& PbiFilter::Add(const PbiFilter& filter)
-{
-    PbiFilter copy = filter;
-    return Add(std::move(copy));
-}
-
-inline PbiFilter& PbiFilter::Add(PbiFilter&& filter)
+inline PbiFilter& PbiFilter::Add(PbiFilter filter)
 {
     d_->Add(std::move(filter));
     return *this;
 }
 
-inline PbiFilter& PbiFilter::Add(const std::vector<PbiFilter>& filters)
-{
-    std::vector<PbiFilter> copy = filters;
-    return Add(std::move(copy));
-}
-
-inline PbiFilter& PbiFilter::Add(std::vector<PbiFilter>&& filters)
+inline PbiFilter& PbiFilter::Add(std::vector<PbiFilter> filters)
 {
     for (auto&& filter : filters)
         d_->Add(std::move(filter));

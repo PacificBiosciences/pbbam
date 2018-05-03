@@ -26,7 +26,7 @@ struct ZmwGroupQuery::ZmwGroupQueryPrivate
     using ReaderType = PbiFilterCompositeBamReader<Compare::Zmw>;
 
     ZmwGroupQueryPrivate(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset)
-        : whitelist_(zmwWhitelist.cbegin(), zmwWhitelist.cend()), reader_(nullptr)
+        : whitelist_(zmwWhitelist.cbegin(), zmwWhitelist.cend())
     {
         std::sort(whitelist_.begin(), whitelist_.end());
         whitelist_.erase(std::unique(whitelist_.begin(), whitelist_.end()), whitelist_.end());
@@ -55,7 +55,7 @@ struct ZmwGroupQuery::ZmwGroupQueryPrivate
 
         // otherwise destroy reader, next iteration will return false
         else
-            reader_.reset(nullptr);
+            reader_.reset();
 
         return true;
     }
@@ -65,7 +65,7 @@ struct ZmwGroupQuery::ZmwGroupQueryPrivate
 };
 
 ZmwGroupQuery::ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset)
-    : internal::IGroupQuery(), d_(new ZmwGroupQueryPrivate(zmwWhitelist, dataset))
+    : internal::IGroupQuery(), d_{std::make_unique<ZmwGroupQueryPrivate>(zmwWhitelist, dataset)}
 {
 }
 

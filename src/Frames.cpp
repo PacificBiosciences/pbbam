@@ -110,11 +110,11 @@ static std::vector<uint8_t> FramesToCode(const std::vector<uint16_t>& frames)
 
 Frames::Frames() {}
 
-Frames::Frames(std::vector<uint16_t> frames) : data_(std::move(frames)) {}
+Frames::Frames(std::vector<uint16_t> frames) : data_{std::move(frames)} {}
 
 Frames Frames::Decode(const std::vector<uint8_t>& codedData)
 {
-    return Frames(internal::CodeToFrames(codedData));
+    return Frames{internal::CodeToFrames(codedData)};
 }
 
 std::vector<uint8_t> Frames::Encode(const std::vector<uint16_t>& frames)

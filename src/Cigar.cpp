@@ -15,7 +15,7 @@
 namespace PacBio {
 namespace BAM {
 
-Cigar::Cigar(const std::string& cigarString) : std::vector<CigarOperation>()
+Cigar::Cigar(const std::string& cigarString) : std::vector<CigarOperation>{}
 {
     size_t numberStart = 0;
     const size_t numChars = cigarString.size();

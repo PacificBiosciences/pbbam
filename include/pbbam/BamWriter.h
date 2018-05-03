@@ -122,12 +122,10 @@ public:
     /// Fully flushes all buffered data & closes file.
     ~BamWriter() override;
 
-    /// Copy and Move constructors are disabled
     BamWriter(const BamWriter&) = delete;
     BamWriter& operator=(const BamWriter&) = delete;
-
-    BamWriter(BamWriter&&) = delete;
-    BamWriter& operator=(BamWriter&&) = delete;
+    BamWriter(BamWriter&&) = default;
+    BamWriter& operator=(BamWriter&&) = default;
 
     /// \}
 

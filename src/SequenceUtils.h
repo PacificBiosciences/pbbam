@@ -56,11 +56,7 @@ T Reversed(const T& input)
 
 inline void ReverseComplement(std::string& seq)
 {
-
-    std::string::iterator sIter = seq.begin();
-    std::string::iterator sEnd = seq.end();
-    for (; sIter != sEnd; ++sIter)
-        *sIter = Complement(*sIter);
+    std::transform(seq.begin(), seq.end(), seq.begin(), Complement);
     Reverse(seq);
 }
 

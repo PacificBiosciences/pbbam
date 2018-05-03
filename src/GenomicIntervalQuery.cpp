@@ -9,6 +9,7 @@
 #include "pbbam/GenomicIntervalQuery.h"
 
 #include "pbbam/CompositeBamReader.h"
+#include "pbbam/MakeUnique.h"
 
 namespace PacBio {
 namespace BAM {
@@ -16,7 +17,7 @@ namespace BAM {
 struct GenomicIntervalQuery::GenomicIntervalQueryPrivate
 {
     GenomicIntervalQueryPrivate(const GenomicInterval& interval, const DataSet& dataset)
-        : reader_(interval, dataset)
+        : reader_{interval, dataset}
     {
     }
 
@@ -24,7 +25,7 @@ struct GenomicIntervalQuery::GenomicIntervalQueryPrivate
 };
 
 GenomicIntervalQuery::GenomicIntervalQuery(const GenomicInterval& interval, const DataSet& dataset)
-    : internal::IQuery(), d_(new GenomicIntervalQueryPrivate(interval, dataset))
+    : internal::IQuery(), d_{std::make_unique<GenomicIntervalQueryPrivate>(interval, dataset)}
 {
 }
 

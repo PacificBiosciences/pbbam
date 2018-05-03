@@ -20,20 +20,21 @@ namespace internal {
 class SamWriterPrivate : public internal::FileProducer
 {
 public:
-    SamWriterPrivate(const std::string& filename, const std::shared_ptr<bam_hdr_t> rawHeader)
-        : internal::FileProducer(filename), file_(nullptr), header_(rawHeader)
+    SamWriterPrivate(std::string filename, const std::shared_ptr<bam_hdr_t> rawHeader)
+        : internal::FileProducer{std::move(filename)}, header_{rawHeader}
     {
-        if (!header_) throw std::runtime_error("null header");
+        if (!header_) throw std::runtime_error{"null header"};
 
         // open file
         const auto& usingFilename = TempFilename();
-        const auto mode = std::string("w");
+        const std::string mode(1, 'w');
         file_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
-        if (!file_) throw std::runtime_error("could not open file for writing");
+        if (!file_)
+            throw std::runtime_error{"could not open file: " + usingFilename + "for writing"};
 
         // write header
-        const int ret = sam_hdr_write(file_.get(), header_.get());
-        if (ret != 0) throw std::runtime_error("could not write header");
+        const auto ret = sam_hdr_write(file_.get(), header_.get());
+        if (ret != 0) throw std::runtime_error{"could not write header"};
     }
 
     void TryFlush();
@@ -47,7 +48,7 @@ private:
 void SamWriterPrivate::TryFlush()
 {
     const auto ret = file_.get()->fp.hfile;
-    if (ret != nullptr) throw std::runtime_error("could not flush output buffer contents");
+    if (ret != nullptr) throw std::runtime_error{"could not flush output buffer contents"};
 }
 
 void SamWriterPrivate::Write(const BamRecord& record)
@@ -69,17 +70,14 @@ void SamWriterPrivate::Write(const BamRecord& record)
 
 }  // namespace internal
 
-SamWriter::SamWriter(const std::string& filename, const BamHeader& header)
+SamWriter::SamWriter(std::string filename, const BamHeader& header)
     : IRecordWriter()
     , d_{std::make_unique<internal::SamWriterPrivate>(
-          filename, internal::BamHeaderMemory::MakeRawHeader(header))}
+          std::move(filename), internal::BamHeaderMemory::MakeRawHeader(header))}
 {
 #if PBBAM_AUTOVALIDATE
     Validator::Validate(header);
 #endif
-    //    d_.reset(new internal::SamWriterPrivate{ filename,
-    //                                             internal::BamHeaderMemory::MakeRawHeader(header)
-    //                                           });
 }
 
 SamWriter::~SamWriter() {}

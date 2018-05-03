@@ -11,6 +11,7 @@
 #include <iostream>
 
 #include "pbbam/CompositeBamReader.h"
+#include "pbbam/MakeUnique.h"
 
 namespace PacBio {
 namespace BAM {
@@ -18,7 +19,7 @@ namespace BAM {
 struct PbiFilterQuery::PbiFilterQueryPrivate
 {
     PbiFilterQueryPrivate(const PbiFilter& filter, const DataSet& dataset)
-        : reader_(filter, dataset)
+        : reader_{filter, dataset}
     {
     }
 
@@ -31,7 +32,7 @@ PbiFilterQuery::PbiFilterQuery(const DataSet& dataset)
 }
 
 PbiFilterQuery::PbiFilterQuery(const PbiFilter& filter, const DataSet& dataset)
-    : internal::IQuery(), d_(new PbiFilterQueryPrivate(filter, dataset))
+    : internal::IQuery(), d_{std::make_unique<PbiFilterQueryPrivate>(filter, dataset)}
 {
 }
 

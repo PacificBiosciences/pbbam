@@ -34,10 +34,10 @@ public:
     ///
     Accuracy(float accuracy);
 
-    Accuracy(const Accuracy& other) = default;
-    Accuracy(Accuracy&& other) = default;
-    Accuracy& operator=(const Accuracy& other) = default;
-    Accuracy& operator=(Accuracy&& other) = default;
+    Accuracy(const Accuracy&) = default;
+    Accuracy(Accuracy&&) = default;
+    Accuracy& operator=(const Accuracy&) = default;
+    Accuracy& operator=(Accuracy&&) = default;
     ~Accuracy() = default;
 
     /// \}

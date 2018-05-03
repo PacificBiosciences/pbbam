@@ -9,6 +9,7 @@
 #include "pbbam/ReadAccuracyQuery.h"
 
 #include "pbbam/CompositeBamReader.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiFilterTypes.h"
 
 namespace PacBio {
@@ -18,7 +19,7 @@ struct ReadAccuracyQuery::ReadAccuracyQueryPrivate
 {
     ReadAccuracyQueryPrivate(const Accuracy accuracy, const Compare::Type compareType,
                              const DataSet& dataset)
-        : reader_(PbiReadAccuracyFilter(accuracy, compareType), dataset)
+        : reader_{PbiReadAccuracyFilter{accuracy, compareType}, dataset}
     {
     }
 
@@ -27,7 +28,8 @@ struct ReadAccuracyQuery::ReadAccuracyQueryPrivate
 
 ReadAccuracyQuery::ReadAccuracyQuery(const Accuracy accuracy, const Compare::Type compareType,
                                      const DataSet& dataset)
-    : internal::IQuery(), d_(new ReadAccuracyQueryPrivate(accuracy, compareType, dataset))
+    : internal::IQuery()
+    , d_{std::make_unique<ReadAccuracyQueryPrivate>(accuracy, compareType, dataset)}
 {
 }
 

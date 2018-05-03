@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <string>
+
 #include "pbbam/BamHeader.h"
 #include "pbbam/Config.h"
 
@@ -36,7 +37,7 @@ public:
     /// \param[in] filename %BAM filename
     /// \throws std::exception on failure to open %BAM file for reading
     ///
-    BamFile(const std::string& filename);
+    BamFile(std::string filename);
 
     BamFile(const BamFile& other);
     BamFile(BamFile&& other);
@@ -104,7 +105,7 @@ public:
     void EnsureStandardIndexExists() const;
 
     /// \returns %BAM filename
-    std::string Filename() const;
+    const std::string& Filename() const;
 
     /// \returns true if %BAM file has EOF marker (empty BGZF block). Streamed
     ///          input (filename: "-")

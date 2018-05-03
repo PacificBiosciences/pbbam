@@ -34,10 +34,8 @@ public:
     Compare::Type cmp_;
 
 protected:
-    FilterBase(const T& value, const Compare::Type cmp);
-    FilterBase(T&& value, const Compare::Type cmp);
-    FilterBase(const std::vector<T>& values);
-    FilterBase(std::vector<T>&& values);
+    FilterBase(T value, const Compare::Type cmp);
+    FilterBase(std::vector<T> values);
 
 protected:
     bool CompareHelper(const T& lhs) const;
@@ -55,10 +53,8 @@ template <typename T, PbiFile::BarcodeField field>
 struct BarcodeDataFilterBase : public FilterBase<T>
 {
 protected:
-    BarcodeDataFilterBase(const T& value, const Compare::Type cmp);
-    BarcodeDataFilterBase(T&& value, const Compare::Type cmp);
-    BarcodeDataFilterBase(const std::vector<T>& values);
-    BarcodeDataFilterBase(std::vector<T>&& values);
+    BarcodeDataFilterBase(T value, const Compare::Type cmp);
+    BarcodeDataFilterBase(std::vector<T> values);
 
 public:
     bool Accepts(const PbiRawData& idx, const size_t row) const;
@@ -72,10 +68,8 @@ template <typename T, PbiFile::BasicField field>
 struct BasicDataFilterBase : public FilterBase<T>
 {
 protected:
-    BasicDataFilterBase(const T& value, const Compare::Type cmp);
-    BasicDataFilterBase(T&& value, const Compare::Type cmp);
-    BasicDataFilterBase(const std::vector<T>& values);
-    BasicDataFilterBase(std::vector<T>&& values);
+    BasicDataFilterBase(T value, const Compare::Type cmp);
+    BasicDataFilterBase(std::vector<T> values);
 
 public:
     bool Accepts(const PbiRawData& idx, const size_t row) const;
@@ -89,10 +83,8 @@ template <typename T, PbiFile::MappedField field>
 struct MappedDataFilterBase : public FilterBase<T>
 {
 protected:
-    MappedDataFilterBase(const T& value, const Compare::Type cmp);
-    MappedDataFilterBase(T&& value, const Compare::Type cmp);
-    MappedDataFilterBase(const std::vector<T>& values);
-    MappedDataFilterBase(std::vector<T>&& values);
+    MappedDataFilterBase(T value, const Compare::Type cmp);
+    MappedDataFilterBase(std::vector<T> values);
 
 public:
     bool Accepts(const PbiRawData& idx, const size_t row) const;
@@ -209,17 +201,7 @@ public:
     ///
     /// \param[in] whitelist  barcode IDs to compare on
     ///
-    PbiBarcodeFilter(const std::vector<int16_t>& whitelist);
-
-    /// \brief Creates a 'whitelisted' barcode filter.
-    ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly, in either bc_forward or bc_reverse.
-    ///
-    /// \param[in] whitelist  barcode IDs to compare on
-    ///
-    PbiBarcodeFilter(std::vector<int16_t>&& whitelist);
+    PbiBarcodeFilter(std::vector<int16_t> whitelist);
 
 public:
     /// \brief Performs the actual index lookup.
@@ -258,17 +240,7 @@ public:
     ///
     /// \param[in] whitelist  barcode IDs to compare on
     ///
-    PbiBarcodeForwardFilter(const std::vector<int16_t>& whitelist);
-
-    /// \brief Creates a 'whitelisted' forward barcode filter.
-    ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly, in bc_forward.
-    ///
-    /// \param[in] whitelist  barcode IDs to compare on
-    ///
-    PbiBarcodeForwardFilter(std::vector<int16_t>&& whitelist);
+    PbiBarcodeForwardFilter(std::vector<int16_t> whitelist);
 };
 
 /// \brief The PbiBarcodeQualityFilter class provides a PbiFilter-compatible
@@ -316,17 +288,7 @@ public:
     ///
     /// \param[in] whitelist  barcode IDs to compare on
     ///
-    PbiBarcodeReverseFilter(const std::vector<int16_t>& whitelist);
-
-    /// \brief Creates a 'whitelisted' reverse barcode filter.
-    ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly, in bc_reverse.
-    ///
-    /// \param[in] whitelist  barcode IDs to compare on
-    ///
-    PbiBarcodeReverseFilter(std::vector<int16_t>&& whitelist);
+    PbiBarcodeReverseFilter(std::vector<int16_t> whitelist);
 };
 
 /// \brief The PbiBarcodesFilter class provides a PbiFilter-compatible filter on
@@ -460,16 +422,6 @@ public:
     /// \param[in] whitelist    movie names to compare on
     ///
     PbiMovieNameFilter(const std::vector<std::string>& whitelist);
-
-    /// \brief Creates a 'whitelisted' movie name filter.
-    ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
-    ///
-    /// \param[in] whitelist    movie names to compare on
-    ///
-    PbiMovieNameFilter(std::vector<std::string>&& whitelist);
 
 public:
     /// \brief Performs the actual index lookup.
@@ -715,7 +667,7 @@ public:
     ///
     /// \sa BamRecord::ReadGroupId
     ///
-    PbiReadGroupFilter(const std::string rgId, const Compare::Type cmp = Compare::EQUAL);
+    PbiReadGroupFilter(const std::string& rgId, const Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a filter on read group (object).
     ///
@@ -734,17 +686,7 @@ public:
     ///
     /// \param[in] whitelist    read group IDs to compare on
     ///
-    PbiReadGroupFilter(const std::vector<int32_t>& whitelist);
-
-    /// \brief Creates a 'whitelisted' filter on read group numeric IDs.
-    ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
-    ///
-    /// \param[in] whitelist    read group IDs to compare on
-    ///
-    PbiReadGroupFilter(std::vector<int32_t>&& whitelist);
+    PbiReadGroupFilter(std::vector<int32_t> whitelist);
 
     /// \brief Creates a 'whitelisted' filter on read group printable IDs.
     ///
@@ -756,16 +698,6 @@ public:
     ///
     PbiReadGroupFilter(const std::vector<std::string>& whitelist);
 
-    /// \brief Creates a 'whitelisted' filter on read group printable IDs.
-    ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
-    ///
-    /// \param[in] whitelist    read group ID strings to compare on
-    ///
-    PbiReadGroupFilter(std::vector<std::string>&& whitelist);
-
     /// \brief Creates a 'whitelisted' filter using read group objects.
     ///
     /// \note There is no compare type parameter here, it is always
@@ -775,16 +707,6 @@ public:
     /// \param[in] whitelist    read group objects to compare on
     ///
     PbiReadGroupFilter(const std::vector<ReadGroupInfo>& whitelist);
-
-    /// \brief Creates a 'whitelisted' filter using read group objects.
-    ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
-    ///
-    /// \param[in] whitelist    read group objects to compare on
-    ///
-    PbiReadGroupFilter(std::vector<ReadGroupInfo>&& whitelist);
 };
 
 /// \brief The PbiReferenceEndFilter class provides a PbiFilter-compatible
@@ -832,17 +754,7 @@ public:
     ///
     /// \param[in] whitelist    reference IDs to compare on
     ///
-    PbiReferenceIdFilter(const std::vector<int32_t>& whitelist);
-
-    /// \brief Creates a 'whitelisted' reference ID filter.
-    ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
-    ///
-    /// \param[in] whitelist    reference IDs to compare on
-    ///
-    PbiReferenceIdFilter(std::vector<int32_t>&& whitelist);
+    PbiReferenceIdFilter(std::vector<int32_t> whitelist);
 };
 
 /// \brief The PbiReferenceNameFilter class provides a PbiFilter-compatible
@@ -870,17 +782,7 @@ public:
     ///
     /// \param[in] whitelist    reference names to compare on
     ///
-    PbiReferenceNameFilter(const std::vector<std::string>& whitelist);
-
-    /// \brief Creates a 'whitelisted' reference name filter.
-    ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
-    ///
-    /// \param[in] whitelist    reference names to compare on
-    ///
-    PbiReferenceNameFilter(std::vector<std::string>&& whitelist);
+    PbiReferenceNameFilter(std::vector<std::string> whitelist);
 
 public:
     /// \brief Performs the actual index lookup.
@@ -946,17 +848,7 @@ public:
     ///
     /// \param[in] whitelist    ZMW hole numbers to compare on
     ///
-    PbiZmwFilter(const std::vector<int32_t>& whitelist);
-
-    /// \brief Creates a 'whitelisted' ZMW hole number filter.
-    ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
-    ///
-    /// \param[in] whitelist    ZMW hole numbers to compare on
-    ///
-    PbiZmwFilter(std::vector<int32_t>&& whitelist);
+    PbiZmwFilter(std::vector<int32_t> whitelist);
 };
 
 }  // namespace BAM

@@ -41,7 +41,7 @@ public:
     /// \throws std::runtime_error if either file (*.bam or *.pbi) cannot be
     ///         read
     ///
-    PbiIndexedBamReader(const PbiFilter& filter, const std::string& bamFilename);
+    PbiIndexedBamReader(PbiFilter filter, const std::string& bamFilename);
 
     /// \brief Constructs %BAM reader, with an initial filter.
     ///
@@ -53,19 +53,7 @@ public:
     /// \throws std::runtime_error if either file (*.bam or *.pbi) cannot be
     ///         read
     ///
-    PbiIndexedBamReader(const PbiFilter& filter, const BamFile& bamFile);
-
-    /// \brief Constructs %BAM reader, with an initial filter.
-    ///
-    /// All reads that satisfy the filter will be available.
-    ///
-    /// \param[in] filter       PbiFilter or compatible object
-    /// \param[in] bamFile      input BamFile object
-    ///
-    /// \throws std::runtime_error if either file (*.bam or *.pbi) cannot be
-    ///         read
-    ///
-    PbiIndexedBamReader(const PbiFilter& filter, BamFile&& bamFile);
+    PbiIndexedBamReader(PbiFilter filter, BamFile bamFile);
 
     /// \brief Constructs %BAM reader, with no initial filter.
     ///
@@ -89,19 +77,7 @@ public:
     /// \throws std::runtime_error if either file (*.bam or *.pbi) cannot be
     ///         read
     ///
-    PbiIndexedBamReader(const BamFile& bamFile);
-
-    /// \brief Constructs %BAM reader, with no initial filter.
-    ///
-    /// Useful for delaying either specifying the filtering criteria or
-    /// performing the PBI lookups.
-    ///
-    /// \param[in] bamFile      input BamFile object
-    ///
-    /// \throws std::runtime_error if either file (*.bam or *.pbi) cannot be
-    ///         read
-    ///
-    PbiIndexedBamReader(BamFile&& bamFile);
+    PbiIndexedBamReader(BamFile bamFile);
 
     ~PbiIndexedBamReader() override;
 
@@ -125,7 +101,7 @@ public:
     /// \param[in] filter
     /// \returns reference to this reader
     ///
-    PbiIndexedBamReader& Filter(const PbiFilter& filter);
+    PbiIndexedBamReader& Filter(PbiFilter filter);
 
     /// \}
 

@@ -15,6 +15,8 @@
 
 #include <htslib/faidx.h>
 
+#include "pbbam/MakeUnique.h"
+
 namespace PacBio {
 namespace BAM {
 namespace internal {
@@ -22,10 +24,10 @@ namespace internal {
 struct FastqReaderPrivate
 {
 public:
-    explicit FastqReaderPrivate(const std::string& fn) : stream_(fn)
+    explicit FastqReaderPrivate(const std::string& fn) : stream_{fn}
     {
         if (!stream_)
-            throw std::runtime_error("FastqReader - could not open " + fn + " for reading");
+            throw std::runtime_error{"FastqReader - could not open " + fn + " for reading"};
         FetchNext();
     }
 
@@ -78,16 +80,9 @@ private:
 
 }  // namespace internal
 
-FastqReader::FastqReader(const std::string& fn) : d_{new internal::FastqReaderPrivate{fn}} {}
-
-FastqReader::FastqReader(FastqReader&& other) : d_{std::move(other.d_)} {}
-
-FastqReader& FastqReader::operator=(FastqReader&& other)
+FastqReader::FastqReader(const std::string& fn)
+    : d_{std::make_unique<internal::FastqReaderPrivate>(fn)}
 {
-    if (this != &other) {
-        d_.swap(other.d_);
-    }
-    return *this;
 }
 
 FastqReader::~FastqReader() {}

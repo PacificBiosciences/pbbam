@@ -27,14 +27,13 @@ struct ZmwReadStitcher::ZmwReadStitcherPrivate
 public:
     ZmwReadStitcherPrivate(std::string primaryBamFilePath, std::string scrapsBamFilePath,
                            PbiFilter filter)
-        : filter_(std::move(filter))
+        : filter_{std::move(filter)}
     {
-        sources_.push_back(
-            std::make_pair(std::move(primaryBamFilePath), std::move(scrapsBamFilePath)));
+        sources_.push_back({std::move(primaryBamFilePath), std::move(scrapsBamFilePath)});
         OpenNextReader();
     }
 
-    ZmwReadStitcherPrivate(const DataSet& dataset) : filter_(PbiFilter::FromDataSet(dataset))
+    ZmwReadStitcherPrivate(const DataSet& dataset) : filter_{PbiFilter::FromDataSet(dataset)}
     {
         // set up source queue
         std::string primaryFn;
@@ -67,7 +66,7 @@ public:
 
             // queue up source for later
             if (!primaryFn.empty() && !scrapsFn.empty())
-                sources_.emplace_back(make_pair(primaryFn, scrapsFn));
+                sources_.emplace_back(std::make_pair(primaryFn, scrapsFn));
         }
 
         OpenNextReader();
@@ -85,11 +84,10 @@ public:
         }
 
         // no reader active
-        const std::string msg = {
+        throw std::runtime_error{
             "no readers active, make sure you use "
             "ZmwReadStitcher::HasNext before "
             "requesting next record"};
-        throw std::runtime_error(msg);
     }
 
     std::vector<BamRecord> NextRaw()
@@ -101,11 +99,10 @@ public:
         }
 
         // no reader active
-        const std::string msg = {
+        throw std::runtime_error{
             "no readers active, make sure you use "
             "ZmwReadStitcher::HasNext before "
             "requesting next group of records"};
-        throw std::runtime_error(msg);
     }
 
     BamHeader PrimaryHeader() const { return currentReader_->PrimaryHeader(); }
@@ -138,19 +135,20 @@ private:
 // ZmwReadStitcher implementation
 // --------------------------------
 
-ZmwReadStitcher::ZmwReadStitcher(const std::string& primaryBamFilePath,
-                                 const std::string& scrapsBamFilePath)
-    : ZmwReadStitcher(primaryBamFilePath, scrapsBamFilePath, PbiFilter{})
+ZmwReadStitcher::ZmwReadStitcher(std::string primaryBamFilePath, std::string scrapsBamFilePath)
+    : ZmwReadStitcher{std::move(primaryBamFilePath), std::move(scrapsBamFilePath), PbiFilter{}}
 {
 }
 
-ZmwReadStitcher::ZmwReadStitcher(const std::string& primaryBamFilePath,
-                                 const std::string& scrapsBamFilePath, const PbiFilter& filter)
-    : d_(new ZmwReadStitcherPrivate(primaryBamFilePath, scrapsBamFilePath, filter))
+ZmwReadStitcher::ZmwReadStitcher(std::string primaryBamFilePath, std::string scrapsBamFilePath,
+                                 PbiFilter filter)
+    : d_{std::make_unique<ZmwReadStitcherPrivate>(std::move(primaryBamFilePath),
+                                                  std::move(scrapsBamFilePath), std::move(filter))}
 {
 }
 
-ZmwReadStitcher::ZmwReadStitcher(const DataSet& dataset) : d_(new ZmwReadStitcherPrivate(dataset))
+ZmwReadStitcher::ZmwReadStitcher(const DataSet& dataset)
+    : d_{std::make_unique<ZmwReadStitcherPrivate>(dataset)}
 {
 }
 

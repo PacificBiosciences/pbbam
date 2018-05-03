@@ -21,9 +21,9 @@
 namespace PacBio {
 namespace BAM {
 
-VirtualZmwBamRecord::VirtualZmwBamRecord(std::vector<BamRecord>&& unorderedSources,
+VirtualZmwBamRecord::VirtualZmwBamRecord(std::vector<BamRecord> unorderedSources,
                                          const BamHeader& header)
-    : BamRecord(header), sources_(std::move(unorderedSources))
+    : BamRecord{header}, sources_{std::move(unorderedSources)}
 {
     // Sort sources by queryStart
     std::sort(sources_.begin(), sources_.end(), [](const BamRecord& l1, const BamRecord& l2) {
@@ -149,7 +149,7 @@ void VirtualZmwBamRecord::StitchSources()
             const VirtualRegionType regionType = b.ScrapRegionType();
 
             if (!HasVirtualRegionType(regionType))
-                virtualRegionsMap_[regionType] = std::vector<VirtualRegion>();
+                virtualRegionsMap_[regionType] = std::vector<VirtualRegion>{};
 
             virtualRegionsMap_[regionType].emplace_back(regionType, b.QueryStart(), b.QueryEnd());
         }
@@ -160,7 +160,7 @@ void VirtualZmwBamRecord::StitchSources()
 
             static constexpr const auto regionType = VirtualRegionType::SUBREAD;
             if (!HasVirtualRegionType(regionType))
-                virtualRegionsMap_[regionType] = std::vector<VirtualRegion>();
+                virtualRegionsMap_[regionType] = std::vector<VirtualRegion>{};
 
             virtualRegionsMap_[regionType].emplace_back(regionType, b.QueryStart(), b.QueryEnd(),
                                                         b.LocalContextFlags(), barcodes.first,
@@ -178,7 +178,7 @@ void VirtualZmwBamRecord::StitchSources()
             if (!this->HasScrapZmwType())
                 this->ScrapZmwType(b.ScrapZmwType());
             else if (this->ScrapZmwType() != b.ScrapZmwType())
-                throw std::runtime_error("ScrapZmwTypes do not match");
+                throw std::runtime_error{"ScrapZmwTypes do not match"};
         }
     }
 
@@ -196,7 +196,7 @@ void VirtualZmwBamRecord::StitchSources()
     this->QueryEnd(lastRecord.QueryEnd());
     this->UpdateName();
 
-    std::string qualitiesStr = qualities.Fastq();
+    const std::string qualitiesStr = qualities.Fastq();
     if (sequence.size() == qualitiesStr.size())
         this->Impl().SetSequenceAndQualities(sequence, qualitiesStr);
     else
@@ -242,7 +242,7 @@ void VirtualZmwBamRecord::StitchSources()
                 virtualRegionsMap_[VirtualRegionType::HQREGION].emplace_back(
                     VirtualRegionType::HQREGION, 0, lq.beginPos);
             else
-                throw std::runtime_error("Unknown HQREGION");
+                throw std::runtime_error{"Unknown HQREGION"};
         } else {
             int beginPos = 0;
             for (const auto& lqregion : virtualRegionsMap_[VirtualRegionType::LQREGION]) {
@@ -269,7 +269,7 @@ std::vector<VirtualRegion> VirtualZmwBamRecord::VirtualRegionsTable(
 {
     const auto iter = virtualRegionsMap_.find(regionType);
     if (iter != virtualRegionsMap_.cend()) return iter->second;
-    return std::vector<VirtualRegion>();
+    return {};
 }
 
 }  // namespace BAM

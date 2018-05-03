@@ -13,7 +13,7 @@ namespace BAM {
 namespace internal {
 
 template<typename T>
-inline bool InAsciiRange(const T& x)
+inline bool InAsciiRange(const T x)
 { return (x >=33 && x <= 127); }
 
 struct AsciiConvertVisitor : public boost::static_visitor<char>
@@ -29,14 +29,14 @@ struct AsciiConvertVisitor : public boost::static_visitor<char>
     // anything else always throws
     template<typename T>
     char operator()(const T&) const
-    { throw std::runtime_error("conversion not supported"); return 0; }
+    { throw std::runtime_error{"conversion not supported"}; return 0; }
 
 private:
     template<typename T>
     char Helper(const T& x) const
     {
         if (!InAsciiRange(x))
-            throw std::runtime_error("not valid ASCII");
+            throw std::runtime_error{"not valid ASCII"};
         return static_cast<char>(x);
     }
 };
@@ -57,7 +57,7 @@ struct NumericConvertVisitor : public boost::static_visitor<DesiredType>
     {
         const std::string from = typeid(t).name();
         const std::string to   = typeid(DesiredType).name();
-        const std::string msg  = std::string("conversion not supported: ") + from + " -> " + to;
+        const std::string msg  = "conversion not supported: " + from + " -> " + to;
         throw std::runtime_error(msg);
         return 0;
     }
@@ -109,6 +109,135 @@ struct TypenameVisitor : public boost::static_visitor<std::string>
 };
 
 } // namespace internal
+
+inline Tag::Tag(int8_t value) : data_{value} {}
+inline Tag::Tag(uint8_t value) : data_{value} {}
+inline Tag::Tag(int16_t value) : data_{value} {}
+inline Tag::Tag(uint16_t value) : data_{value} {}
+inline Tag::Tag(int32_t value) : data_{value} {}
+inline Tag::Tag(uint32_t value) : data_{value} {}
+inline Tag::Tag(float value) : data_{value} {}
+inline Tag::Tag(std::string value) : data_{std::move(value)} {}
+inline Tag::Tag(std::vector<int8_t> value) : data_{std::move(value)} {}
+inline Tag::Tag(std::vector<uint8_t> value) : data_{std::move(value)} {}
+inline Tag::Tag(std::vector<int16_t> value) : data_{std::move(value)} {}
+inline Tag::Tag(std::vector<uint16_t> value) : data_{std::move(value)} {}
+inline Tag::Tag(std::vector<int32_t> value) : data_{std::move(value)} {}
+inline Tag::Tag(std::vector<uint32_t> value) : data_{std::move(value)} {}
+inline Tag::Tag(std::vector<float> value) : data_{std::move(value)} {}
+
+inline Tag::Tag(int8_t value, const TagModifier mod) : data_{value}, modifier_(mod)
+{
+    if (mod == TagModifier::HEX_STRING)
+        throw std::runtime_error{
+            "HEX_STRING is not a valid tag modifier for int8_t data. "
+            "It is intended for string-type data only."};
+}
+
+inline Tag::Tag(std::string value, TagModifier mod) : data_{std::move(value)}, modifier_{mod}
+{
+    if (mod == TagModifier::ASCII_CHAR)
+        throw std::runtime_error{
+            "ASCII_CHAR is not a valid tag modifier for string-type data. "
+            "To construct an ASCII char tag, use a single-quoted value (e.g. 'X' instead of "
+            "\"X\")"};
+}
+
+inline Tag& Tag::operator=(boost::blank value)
+{
+    data_ = value;
+    return *this;
+}
+
+inline Tag& Tag::operator=(int8_t value)
+{
+    data_ = value;
+    return *this;
+}
+
+inline Tag& Tag::operator=(uint8_t value)
+{
+    data_ = value;
+    return *this;
+}
+
+inline Tag& Tag::operator=(int16_t value)
+{
+    data_ = value;
+    return *this;
+}
+
+inline Tag& Tag::operator=(uint16_t value)
+{
+    data_ = value;
+    return *this;
+}
+
+inline Tag& Tag::operator=(int32_t value)
+{
+    data_ = value;
+    return *this;
+}
+
+inline Tag& Tag::operator=(uint32_t value)
+{
+    data_ = value;
+    return *this;
+}
+
+inline Tag& Tag::operator=(float value)
+{
+    data_ = value;
+    return *this;
+}
+
+inline Tag& Tag::operator=(std::string value)
+{
+    data_ = std::move(value);
+    return *this;
+}
+
+inline Tag& Tag::operator=(std::vector<int8_t> value)
+{
+    data_ = std::move(value);
+    return *this;
+}
+
+inline Tag& Tag::operator=(std::vector<uint8_t> value)
+{
+    data_ = std::move(value);
+    return *this;
+}
+
+inline Tag& Tag::operator=(std::vector<int16_t> value)
+{
+    data_ = std::move(value);
+    return *this;
+}
+
+inline Tag& Tag::operator=(std::vector<uint16_t> value)
+{
+    data_ = std::move(value);
+    return *this;
+}
+
+inline Tag& Tag::operator=(std::vector<int32_t> value)
+{
+    data_ = std::move(value);
+    return *this;
+}
+
+inline Tag& Tag::operator=(std::vector<uint32_t> value)
+{
+    data_ = std::move(value);
+    return *this;
+}
+
+inline Tag& Tag::operator=(std::vector<float> value)
+{
+    data_ = std::move(value);
+    return *this;
+}
 
 inline bool Tag::operator== (const Tag& other) const
 {

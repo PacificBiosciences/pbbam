@@ -7,24 +7,19 @@
 
 #include "pbbam/CompositeFastaReader.h"
 
+#include "pbbam/MakeUnique.h"
+
 namespace PacBio {
 namespace BAM {
 
-
 inline CompositeFastaReader::CompositeFastaReader(const std::vector<std::string>& fastaFiles)
 {
-    for (auto&& fn : fastaFiles)
-        readers_.emplace_back(new FastaReader{ fn });
-}
-
-inline CompositeFastaReader::CompositeFastaReader(std::vector<std::string>&& fastaFiles)
-{
-    for (auto&& fn : fastaFiles)
-        readers_.emplace_back(new FastaReader{ std::move(fn) });
+    for (const auto& fn : fastaFiles)
+        readers_.emplace_back(std::make_unique<FastaReader>(fn));
 }
 
 inline CompositeFastaReader::CompositeFastaReader(const DataSet& dataset)
-    : CompositeFastaReader(dataset.FastaFiles())
+    : CompositeFastaReader{dataset.FastaFiles()}
 { }
 
 inline bool CompositeFastaReader::GetNext(FastaSequence& seq)

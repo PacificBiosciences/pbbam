@@ -24,7 +24,7 @@ std::string parseRegionString(const std::string& reg, PacBio::BAM::Position* beg
                               PacBio::BAM::Position* end)
 {
     const std::vector<std::string> parts = internal::Split(reg, ':');
-    if (parts.empty() || parts.size() > 2) throw std::runtime_error("malformed region string");
+    if (parts.empty() || parts.size() > 2) throw std::runtime_error{"malformed region string"};
 
     // given name only, default min,max intervals
     if (parts.size() == 1) {
@@ -36,7 +36,7 @@ std::string parseRegionString(const std::string& reg, PacBio::BAM::Position* beg
     else if (parts.size() == 2) {
         const std::vector<std::string> intervalParts = internal::Split(parts.at(1), '-');
         if (intervalParts.empty() || intervalParts.size() > 2)
-            throw std::runtime_error("malformed region string");
+            throw std::runtime_error{"malformed region string"};
         *begin = std::stoi(intervalParts.at(0));
         *end = std::stoi(intervalParts.at(1));
     }
@@ -47,7 +47,7 @@ std::string parseRegionString(const std::string& reg, PacBio::BAM::Position* beg
 }  // namespace internal
 
 GenomicInterval::GenomicInterval(std::string name, Position start, Position stop)
-    : name_(std::move(name)), interval_(std::move(start), std::move(stop))
+    : name_{std::move(name)}, interval_{std::move(start), std::move(stop)}
 {
 }
 

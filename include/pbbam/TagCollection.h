@@ -24,7 +24,7 @@ class PBBAM_EXPORT TagCollection : public std::map<std::string, Tag>
 {
 public:
     /// \returns true if the collection contains a tag with \p name
-    bool Contains(const std::string& name) const;
+    inline bool Contains(const std::string& name) const { return count(name) != 0; }
 };
 
 }  // namespace BAM

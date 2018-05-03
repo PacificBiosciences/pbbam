@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <map>
+#include <tuple>
 
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -41,7 +42,7 @@ static std::string ToString(const RecordType type)
     try {
         return lookup.at(type);
     } catch (std::exception&) {
-        throw std::runtime_error("error: unknown RecordType encountered");
+        throw std::runtime_error{"error: unknown RecordType encountered"};
     }
 }
 
@@ -64,11 +65,11 @@ void PbiRawBarcodeData::AddRecord(const BamRecord& b)
     if (b.HasBarcodes() && b.HasBarcodeQuality()) {
 
         // fetch data from record
-        const auto barcodes = b.Barcodes();
-        const auto barcodeQuality = b.BarcodeQuality();
-        const auto bcForward = barcodes.first;
-        const auto bcReverse = barcodes.second;
-        const auto bcQuality = boost::numeric_cast<int8_t>(barcodeQuality);
+        int16_t bcForward;
+        int16_t bcReverse;
+        std::tie(bcForward, bcReverse) = b.Barcodes();
+
+        const auto bcQuality = boost::numeric_cast<int8_t>(b.BarcodeQuality());
 
         // only store actual data if all values >= 0
         if (bcForward >= 0 && bcReverse >= 0 && bcQuality >= 0) {
@@ -131,9 +132,10 @@ std::pair<uint32_t, uint32_t> PbiRawMappedData::NumDeletedAndInsertedBasesAt(
     const auto tEnd = tEnd_.at(recordIndex);
     const auto nM = nM_.at(recordIndex);
     const auto nMM = nMM_.at(recordIndex);
+
     const auto numIns = (aEnd - aStart - nM - nMM);
     const auto numDel = (tEnd - tStart - nM - nMM);
-    return std::make_pair(numDel, numIns);
+    return {numDel, numIns};
 }
 
 uint32_t PbiRawMappedData::NumInsertedBasesAt(size_t recordIndex) const
@@ -148,11 +150,11 @@ uint32_t PbiRawMappedData::NumInsertedBasesAt(size_t recordIndex) const
 const PbiReferenceEntry::ID PbiReferenceEntry::UNMAPPED_ID = static_cast<PbiReferenceEntry::ID>(-1);
 const PbiReferenceEntry::Row PbiReferenceEntry::UNSET_ROW = static_cast<PbiReferenceEntry::Row>(-1);
 
-PbiReferenceEntry::PbiReferenceEntry() : tId_(UNMAPPED_ID), beginRow_(UNSET_ROW), endRow_(UNSET_ROW)
+PbiReferenceEntry::PbiReferenceEntry() : tId_{UNMAPPED_ID}, beginRow_{UNSET_ROW}, endRow_{UNSET_ROW}
 {
 }
 
-PbiReferenceEntry::PbiReferenceEntry(ID id) : tId_(id), beginRow_(UNSET_ROW), endRow_(UNSET_ROW) {}
+PbiReferenceEntry::PbiReferenceEntry(ID id) : tId_{id}, beginRow_{UNSET_ROW}, endRow_{UNSET_ROW} {}
 
 PbiReferenceEntry::PbiReferenceEntry(ID id, Row beginRow, Row endRow)
     : tId_(id), beginRow_(beginRow), endRow_(endRow)
@@ -216,13 +218,13 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
 // PbiRawData implementation
 // ----------------------------------
 
-PbiRawData::PbiRawData(const std::string& pbiFilename) : filename_(pbiFilename)
+PbiRawData::PbiRawData(std::string pbiFilename) : filename_{std::move(pbiFilename)}
 {
-    internal::PbiIndexIO::Load(*this, pbiFilename);
+    internal::PbiIndexIO::Load(*this, filename_);
 }
 
 PbiRawData::PbiRawData(const DataSet& dataset)
-    : sections_(PbiFile::BASIC | PbiFile::MAPPED | PbiFile::BARCODE)
+    : sections_{PbiFile::BASIC | PbiFile::MAPPED | PbiFile::BARCODE}
 {
     internal::PbiIndexIO::LoadFromDataSet(*this, dataset);
 }

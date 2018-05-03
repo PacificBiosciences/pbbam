@@ -52,17 +52,16 @@ public:
     /// \throws std::runtime_error if there was a problem opening the file for
     ///         writing or if an error occurred while writing the header
     ///
-    SamWriter(const std::string& filename, const BamHeader& header);
+    SamWriter(std::string filename, const BamHeader& header);
 
     /// Fully flushes all buffered data & closes file.
     ///
     ~SamWriter() override;
 
-    /// Copy and Move constructors are disabled
     SamWriter(const SamWriter&) = delete;
-    SamWriter(SamWriter&&) = delete;
+    SamWriter(SamWriter&&) = default;
     SamWriter& operator=(const SamWriter&) = delete;
-    SamWriter& operator=(SamWriter&&) = delete;
+    SamWriter& operator=(SamWriter&&) = default;
 
 public:
     /// \brief Try to flush any buffered data to file.

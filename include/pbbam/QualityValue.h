@@ -52,10 +52,10 @@ public:
     ///
     QualityValue(const uint8_t value = 0);
 
-    QualityValue(const QualityValue& other) = default;
-    QualityValue(QualityValue&& other) = default;
-    QualityValue& operator=(const QualityValue& other) = default;
-    QualityValue& operator=(QualityValue&& other) = default;
+    QualityValue(const QualityValue&) = default;
+    QualityValue(QualityValue&&) = default;
+    QualityValue& operator=(const QualityValue&) = default;
+    QualityValue& operator=(QualityValue&&) = default;
     ~QualityValue() = default;
 
     /// \}

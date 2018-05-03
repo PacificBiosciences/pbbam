@@ -92,9 +92,6 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    /// \brief Creates an empty, null tag
-    Tag() = default;
-
     /// \brief Creates a Tag from a signed 8-bit integer or character.
     ///
     /// Without a TagModifier, the resulting Tag will be annotated as containing
@@ -139,37 +136,40 @@ public:
     Tag(float value);
 
     /// \brief Creates a Tag from string data.
-    Tag(const std::string& value);
+    Tag(std::string value);
 
     /// \brief Creates a Tag from string data, adding modifier.
     ///
     /// \throws runtime_error if \p modifier is not valid for string data
     ///
-    Tag(const std::string& value, const TagModifier mod);
+    Tag(std::string value, TagModifier mod);
 
     /// \brief Creates a Tag from a vector of 8-bit integers.
-    Tag(const std::vector<int8_t>& value);
+    Tag(std::vector<int8_t> value);
 
     /// \brief Creates a Tag from a vector of 8-bit unsigned integers.
-    Tag(const std::vector<uint8_t>& value);
+    Tag(std::vector<uint8_t> value);
 
     /// \brief Creates a Tag from a vector of 16-bit integers.
-    Tag(const std::vector<int16_t>& value);
+    Tag(std::vector<int16_t> value);
 
     /// \brief Creates a Tag from a vector of 16-bit unsigned integers.
-    Tag(const std::vector<uint16_t>& value);
+    Tag(std::vector<uint16_t> value);
 
     /// Constructs a Tag from a vector of 32-bit integers.
-    Tag(const std::vector<int32_t>& value);
+    Tag(std::vector<int32_t> value);
 
     /// \brief Creates a Tag from a vector of 32-bit unsigned integers.
-    Tag(const std::vector<uint32_t>& value);
+    Tag(std::vector<uint32_t> value);
 
     /// \brief Creates a Tag from a vector of floating-point values.
-    Tag(const std::vector<float>& value);
+    Tag(std::vector<float> value);
 
+    Tag() = default;
     Tag(const Tag&) = default;
     Tag(Tag&&) = default;
+    Tag& operator=(const Tag&) = default;
+    Tag& operator=(Tag&&) = default;
     ~Tag() = default;
 
     Tag& operator=(boost::blank value);
@@ -180,17 +180,14 @@ public:
     Tag& operator=(int32_t value);
     Tag& operator=(uint32_t value);
     Tag& operator=(float value);
-    Tag& operator=(const std::string& value);
-    Tag& operator=(const std::vector<int8_t>& value);
-    Tag& operator=(const std::vector<uint8_t>& value);
-    Tag& operator=(const std::vector<int16_t>& value);
-    Tag& operator=(const std::vector<uint16_t>& value);
-    Tag& operator=(const std::vector<int32_t>& value);
-    Tag& operator=(const std::vector<uint32_t>& value);
-    Tag& operator=(const std::vector<float>& value);
-
-    Tag& operator=(const Tag&) = default;
-    Tag& operator=(Tag&&) = default;
+    Tag& operator=(std::string value);
+    Tag& operator=(std::vector<int8_t> value);
+    Tag& operator=(std::vector<uint8_t> value);
+    Tag& operator=(std::vector<int16_t> value);
+    Tag& operator=(std::vector<uint16_t> value);
+    Tag& operator=(std::vector<int32_t> value);
+    Tag& operator=(std::vector<uint32_t> value);
+    Tag& operator=(std::vector<float> value);
 
     bool operator==(const Tag& other) const;
     bool operator!=(const Tag& other) const;

@@ -36,7 +36,7 @@ public:
     ///
     /// \throws std::runtime_error on failure to stitch virtual record
     ///
-    VirtualZmwBamRecord(std::vector<BamRecord>&& unorderedSources, const BamHeader& header);
+    VirtualZmwBamRecord(std::vector<BamRecord> unorderedSources, const BamHeader& header);
 
     VirtualZmwBamRecord() = delete;
     VirtualZmwBamRecord(const VirtualZmwBamRecord&) = default;

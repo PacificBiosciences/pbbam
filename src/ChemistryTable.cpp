@@ -92,24 +92,23 @@ extern const ChemistryTable BuiltInChemistryTable = {
 ChemistryTable ChemistryTableFromXml(const std::string& mappingXml)
 {
     if (!FileUtils::Exists(mappingXml))
-        throw BundleChemistryMappingException(
-            mappingXml, "SMRT_CHEMISTRY_BUNDLE_DIR defined but file not found");
+        throw BundleChemistryMappingException{
+            mappingXml, "SMRT_CHEMISTRY_BUNDLE_DIR defined but file not found"};
 
     std::ifstream in(mappingXml);
     pugi::xml_document doc;
     const pugi::xml_parse_result loadResult = doc.load(in);
     if (loadResult.status != pugi::status_ok)
-        throw BundleChemistryMappingException(
-            mappingXml,
-            std::string("unparseable XML, error code:") + std::to_string(loadResult.status));
+        throw BundleChemistryMappingException{
+            mappingXml, "unparseable XML, error code:" + std::to_string(loadResult.status)};
 
     // parse top-level attributes
     pugi::xml_node rootNode = doc.document_element();
     if (rootNode == pugi::xml_node())
-        throw BundleChemistryMappingException(mappingXml, "could not fetch XML root node");
+        throw BundleChemistryMappingException{mappingXml, "could not fetch XML root node"};
 
     if (std::string(rootNode.name()) != "MappingTable")
-        throw BundleChemistryMappingException(mappingXml, "MappingTable not found");
+        throw BundleChemistryMappingException{mappingXml, "MappingTable not found"};
 
     ChemistryTable table;
     try {
@@ -124,7 +123,7 @@ ChemistryTable ChemistryTableFromXml(const std::string& mappingXml)
         }
     } catch (std::exception& e) {
         const std::string msg = std::string{"Mapping entries unparseable - "} + e.what();
-        throw BundleChemistryMappingException(mappingXml, msg);
+        throw BundleChemistryMappingException{mappingXml, msg};
     }
     return table;
 }

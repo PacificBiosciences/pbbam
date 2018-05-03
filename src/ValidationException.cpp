@@ -13,10 +13,10 @@ namespace BAM {
 
 ValidationException::ValidationException(ErrorMap fileErrors, ErrorMap readGroupErrors,
                                          ErrorMap recordErrors)
-    : std::runtime_error("")
-    , fileErrors_(std::move(fileErrors))
-    , readGroupErrors_(std::move(readGroupErrors))
-    , recordErrors_(std::move(recordErrors))
+    : std::runtime_error{""}
+    , fileErrors_{std::move(fileErrors)}
+    , readGroupErrors_{std::move(readGroupErrors)}
+    , recordErrors_{std::move(recordErrors)}
 {
     FormatMessage();
 }
@@ -42,36 +42,27 @@ void ValidationException::FormatMessage()
 
     // file errors
     if (!fileErrors_.empty()) {
-        auto fileIter = fileErrors_.cbegin();
-        auto fileEnd = fileErrors_.cend();
-        for (; fileIter != fileEnd; ++fileIter) {
-            s << "  In file (" << fileIter->first << ") : \n";
-            const auto& errors = fileIter->second;
-            for (const auto& e : errors)
+        for (const auto& fileError : fileErrors_) {
+            s << "  In file (" << fileError.first << ") : \n";
+            for (const auto& e : fileError.second)
                 s << "    " << e << '\n';
         }
     }
 
     // read group errors
     if (!readGroupErrors_.empty()) {
-        auto rgIter = readGroupErrors_.cbegin();
-        auto rgEnd = readGroupErrors_.cend();
-        for (; rgIter != rgEnd; ++rgIter) {
-            s << "  In read group (" << rgIter->first << ") :\n";
-            const auto& errors = rgIter->second;
-            for (const auto& e : errors)
+        for (const auto& rgError : readGroupErrors_) {
+            s << "  In read group (" << rgError.first << ") :\n";
+            for (const auto& e : rgError.second)
                 s << "    " << e << '\n';
         }
     }
 
     // record errors
     if (!recordErrors_.empty()) {
-        auto recIter = recordErrors_.cbegin();
-        auto recEnd = recordErrors_.cend();
-        for (; recIter != recEnd; ++recIter) {
-            s << "  In record (" << recIter->first << ") : \n";
-            const auto& errors = recIter->second;
-            for (const auto& e : errors)
+        for (const auto& recordError : readGroupErrors_) {
+            s << "  In record (" << recordError.first << ") : \n";
+            for (const auto& e : recordError.second)
                 s << "    " << e << '\n';
         }
     }

@@ -132,7 +132,7 @@ DataSetBase& DataSetBase::operator+=(const DataSetBase& other)
 {
     // must be same dataset types (or 'other' must be generic)
     if (other.LocalNameLabel() != LocalNameLabel() && other.LocalNameLabel() != "DataSet")
-        throw std::runtime_error("cannot merge different dataset types");
+        throw std::runtime_error{"cannot merge different dataset types"};
 
     // check filter match
     // check object metadata
@@ -159,7 +159,7 @@ std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName)
     if (typeName == std::string("TranscriptSet")) return std::make_shared<TranscriptSet>();
 
     // unknown typename
-    throw std::runtime_error("unsupported dataset type");
+    throw std::runtime_error{"unsupported dataset type"};
 }
 
 // -------------------

@@ -11,22 +11,17 @@ namespace BAM {
 
 template<typename T>
 inline Interval<T>::Interval()
-    : data_(boost::icl::discrete_interval<T>::right_open(0,0))
+    : data_{boost::icl::discrete_interval<T>::right_open(0,0)}
 { }
 
 template<typename T>
 inline Interval<T>::Interval(const T val)
-    : data_(boost::icl::discrete_interval<T>::right_open(val,val+1))
+    : data_{boost::icl::discrete_interval<T>::right_open(val,val+1)}
 { }
 
 template<typename T>
 inline Interval<T>::Interval(const T start, const T stop)
-    : data_(boost::icl::discrete_interval<T>::right_open(start,stop))
-{ }
-
-template<typename T>
-inline Interval<T>::Interval(const Interval<T>& other)
-    : data_(boost::icl::discrete_interval<T>::right_open(other.Start(), other.Stop()))
+    : data_{boost::icl::discrete_interval<T>::right_open(start,stop)}
 { }
 
 template<typename T>

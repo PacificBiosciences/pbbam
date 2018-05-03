@@ -15,10 +15,10 @@ inline BamRecordView::BamRecordView(const BamRecord& record,
                                     const bool exciseSoftClips,
                                     const PulseBehavior pulseBehavior)
     : record_(record)
-    , orientation_(orientation)
-    , aligned_(aligned)
-    , exciseSoftClips_(exciseSoftClips)
-    , pulseBehavior_(pulseBehavior)
+    , orientation_{orientation}
+    , aligned_{aligned}
+    , exciseSoftClips_{exciseSoftClips}
+    , pulseBehavior_{pulseBehavior}
 { }
 
 inline QualityValues BamRecordView::AltLabelQVs() const

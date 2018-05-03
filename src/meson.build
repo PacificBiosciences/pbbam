@@ -58,8 +58,6 @@ pbbam_cpp_sources = files([
   'SamWriter.cpp',
   'SequenceInfo.cpp',
   'SubreadLengthQuery.cpp',
-  'Tag.cpp',
-  'TagCollection.cpp',
   'Validator.cpp',
   'ValidationErrors.cpp',
   'ValidationException.cpp',
