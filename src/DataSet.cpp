@@ -94,7 +94,7 @@ DataSet::DataSet(const DataSet::TypeEnum type)
             d_ = std::make_unique<TranscriptSet>();
             break;
         default:
-            throw std::runtime_error("unsupported dataset type");  // unknown type
+            throw std::runtime_error{"unsupported dataset type"};
     }
 
     internal::InitDefaults(*this);
@@ -294,7 +294,7 @@ std::string DataSet::TypeToName(const DataSet::TypeEnum& type)
         case DataSet::TRANSCRIPT:
             return "TranscriptSet";
         default:
-            throw std::runtime_error("unsupported dataset type");  // unknown type
+            throw std::runtime_error{"unsupported dataset type"};
     }
 }
 

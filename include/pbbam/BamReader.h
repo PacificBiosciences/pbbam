@@ -7,16 +7,17 @@
 #ifndef BAMREADER_H
 #define BAMREADER_H
 
+#include <cstdint>
+#include <memory>
+#include <string>
+
+#include <htslib/sam.h>
+
 #include "pbbam/BamFile.h"
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/Config.h"
 #include "pbbam/GenomicInterval.h"
-
-#include <htslib/sam.h>
-#include <cstdint>
-#include <memory>
-#include <string>
 
 namespace PacBio {
 namespace BAM {
@@ -42,21 +43,14 @@ public:
     /// \param[in] fn %BAM filename
     /// \throws std::runtime_error if failed to open
     ///
-    explicit BamReader(const std::string& fn);
+    explicit BamReader(std::string fn);
 
     /// \brief Opens BAM file for reading.
     ///
     /// \param[in] bamFile BamFile object
     /// \throws std::runtime_error if failed to open
     ///
-    explicit BamReader(const BamFile& bamFile);
-
-    /// \brief Opens BAM file for reading.
-    ///
-    /// \param[in] bamFile BamFile object
-    /// \throws std::runtime_error if failed to open
-    ///
-    explicit BamReader(BamFile&& bamFile);
+    explicit BamReader(BamFile bamFile);
 
     virtual ~BamReader();
 
@@ -70,7 +64,7 @@ public:
     const BamFile& File() const;
 
     /// \returns %BAM filename
-    std::string Filename() const;
+    const std::string& Filename() const;
 
     /// \returns BamHeader object from %BAM header contents
     const BamHeader& Header() const;

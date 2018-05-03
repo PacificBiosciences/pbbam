@@ -10,7 +10,7 @@ namespace PacBio {
 namespace BAM {
 
 inline QualityValue::QualityValue(const uint8_t value)
-    : value_(value)
+    : value_{value}
 {
     // clamp QV
     if (value_ > QualityValue::MAX)

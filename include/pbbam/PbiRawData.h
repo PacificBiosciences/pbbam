@@ -29,17 +29,16 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    /// \brief Creates an empty data structure.
-    PbiRawBarcodeData() = default;
-
     /// \brief Creates an empty data structure, preallocating space for a known
     ///        number of records.
     PbiRawBarcodeData(uint32_t numReads);
 
+    PbiRawBarcodeData() = default;
     PbiRawBarcodeData(const PbiRawBarcodeData&) = default;
     PbiRawBarcodeData(PbiRawBarcodeData&&) = default;
     PbiRawBarcodeData& operator=(const PbiRawBarcodeData&) = default;
     PbiRawBarcodeData& operator=(PbiRawBarcodeData&&) = default;
+    ~PbiRawBarcodeData() = default;
 
     /// \}
 
@@ -75,17 +74,16 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    /// \brief Creates an empty data structure.
-    PbiRawMappedData() = default;
-
     /// \brief Creates an empty data structure, preallocating space for a known
     ///        number of records.
     PbiRawMappedData(uint32_t numReads);
 
+    PbiRawMappedData() = default;
     PbiRawMappedData(const PbiRawMappedData&) = default;
     PbiRawMappedData(PbiRawMappedData&&) = default;
     PbiRawMappedData& operator=(const PbiRawMappedData&) = default;
     PbiRawMappedData& operator=(PbiRawMappedData&&) = default;
+    ~PbiRawMappedData() = default;
 
     /// \}
 
@@ -199,6 +197,7 @@ public:
     PbiReferenceEntry(PbiReferenceEntry&&) = default;
     PbiReferenceEntry& operator=(const PbiReferenceEntry&) = default;
     PbiReferenceEntry& operator=(PbiReferenceEntry&&) = default;
+    ~PbiReferenceEntry() = default;
 
     bool operator==(const PbiReferenceEntry& other) const;
 
@@ -224,9 +223,6 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    /// \brief Creates an empty data structure.
-    PbiRawReferenceData() = default;
-
     /// \brief Creates an empty data structure, preallocating space for a
     ///        number of references.
     ///
@@ -235,10 +231,12 @@ public:
     ///
     PbiRawReferenceData(uint32_t numRefs);
 
+    PbiRawReferenceData() = default;
     PbiRawReferenceData(const PbiRawReferenceData&) = default;
     PbiRawReferenceData(PbiRawReferenceData&&) = default;
     PbiRawReferenceData& operator=(const PbiRawReferenceData&) = default;
     PbiRawReferenceData& operator=(PbiRawReferenceData&&) = default;
+    ~PbiRawReferenceData() = default;
 
     /// \}
 
@@ -260,17 +258,16 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    /// \brief Creates an empty data structure.
-    PbiRawBasicData() = default;
-
     /// \brief Creates an empty data structure, preallocating space for a known
     ///        number of records.
     PbiRawBasicData(uint32_t numReads);
 
+    PbiRawBasicData() = default;
     PbiRawBasicData(const PbiRawBasicData&) = default;
     PbiRawBasicData(PbiRawBasicData&&) = default;
     PbiRawBasicData& operator=(const PbiRawBasicData&) = default;
     PbiRawBasicData& operator=(PbiRawBasicData&&) = default;
+    ~PbiRawBasicData() = default;
 
     /// \}
 
@@ -320,17 +317,13 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    /// \brief Creates an empty raw data structure, ready for building.
-    ///
-    PbiRawData() = default;
-
     /// \brief Loads raw PBI data from a file.
     ///
     /// \param[in] pbiFilename      ".pbi" filename
     ///
     /// \throws std::runtime_error if file contents cannot be loaded properly
     ///
-    PbiRawData(const std::string& pbiFilename);
+    PbiRawData(std::string pbiFilename);
 
     /// \brief Loads a raw, aggregate PBI data from a dataset
     ///
@@ -347,6 +340,7 @@ public:
     ///
     explicit PbiRawData(const DataSet& dataset);
 
+    PbiRawData() = default;
     PbiRawData(const PbiRawData&) = default;
     PbiRawData(PbiRawData&&) = default;
     PbiRawData& operator=(const PbiRawData&) = default;

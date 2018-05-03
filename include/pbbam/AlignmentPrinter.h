@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+
 #include "pbbam/BamRecord.h"
 #include "pbbam/IndexedFastaReader.h"
 #include "pbbam/Orientation.h"

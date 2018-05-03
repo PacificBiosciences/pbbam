@@ -32,8 +32,14 @@ namespace BAM {
 struct PBBAM_EXPORT IndexResultBlock
 {
 public:
-    IndexResultBlock() = default;
     IndexResultBlock(size_t idx, size_t numReads);
+
+    IndexResultBlock() = default;
+    IndexResultBlock(const IndexResultBlock&) = default;
+    IndexResultBlock(IndexResultBlock&&) = default;
+    IndexResultBlock& operator=(const IndexResultBlock&) = default;
+    IndexResultBlock& operator=(IndexResultBlock&&) = default;
+    ~IndexResultBlock() = default;
 
 public:
     bool operator==(const IndexResultBlock& other) const;

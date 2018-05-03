@@ -13,6 +13,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "pbbam/Accuracy.h"
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecordImpl.h"

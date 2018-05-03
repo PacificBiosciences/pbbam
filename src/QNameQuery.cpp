@@ -13,6 +13,7 @@
 #include <boost/optional.hpp>
 
 #include "pbbam/CompositeBamReader.h"
+#include "pbbam/MakeUnique.h"
 
 namespace PacBio {
 namespace BAM {
@@ -21,7 +22,7 @@ struct QNameQuery::QNameQueryPrivate
 {
 public:
     QNameQueryPrivate(const DataSet& dataset)
-        : reader_(new SequentialCompositeBamReader(dataset)), nextRecord_(boost::none)
+        : reader_{std::make_unique<SequentialCompositeBamReader>(dataset)}, nextRecord_(boost::none)
     {
     }
 
@@ -62,7 +63,7 @@ public:
 };
 
 QNameQuery::QNameQuery(const DataSet& dataset)
-    : internal::IGroupQuery(), d_(new QNameQueryPrivate(dataset))
+    : internal::IGroupQuery(), d_{std::make_unique<QNameQueryPrivate>(dataset)}
 {
 }
 

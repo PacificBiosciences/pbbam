@@ -10,26 +10,21 @@
 namespace PacBio {
 namespace BAM {
 
-inline QualityValues::QualityValues()
-    : std::vector<QualityValue>()
-{ }
-
 inline QualityValues::QualityValues(const std::string& fastqString)
-    : std::vector<QualityValue>()
+    : std::vector<QualityValue>{}
 {
     resize(fastqString.size());
     std::transform(fastqString.cbegin(), fastqString.cend(),
                    begin(), QualityValue::FromFastq);
 }
 
-inline QualityValues::QualityValues(const std::vector<QualityValue>& quals)
-    : std::vector<QualityValue>(quals)
+inline QualityValues::QualityValues(std::vector<QualityValue> quals)
+    : std::vector<QualityValue>{std::move(quals)}
 { }
 
 inline QualityValues::QualityValues(const std::vector<uint8_t>& quals)
-    : std::vector<QualityValue>()
+    : std::vector<QualityValue>(quals.size())
 {
-    resize(quals.size());
     std::copy(quals.cbegin(), quals.cend(), begin());
 }
 
@@ -40,19 +35,12 @@ inline QualityValues::QualityValues(const std::vector<uint8_t>::const_iterator f
 
 inline QualityValues::QualityValues(const QualityValues::const_iterator first,
                                     const QualityValues::const_iterator last)
-    : std::vector<QualityValue>()
+    : std::vector<QualityValue>{}
 {
     assign(first, last);
 }
 
-inline QualityValues::QualityValues(std::vector<QualityValue>&& quals)
-    : std::vector<QualityValue>(std::move(quals))
-{ }
-
-inline QualityValues& QualityValues::operator=(const std::vector<QualityValue>& quals)
-{ std::vector<QualityValue>::operator=(quals); return *this; }
-
-inline QualityValues& QualityValues::operator=(std::vector<QualityValue>&& quals)
+inline QualityValues& QualityValues::operator=(std::vector<QualityValue> quals)
 { std::vector<QualityValue>::operator=(std::move(quals)); return *this; }
 
 inline std::vector<QualityValue>::const_iterator QualityValues::cbegin() const
@@ -74,16 +62,14 @@ inline std::vector<QualityValue>::iterator QualityValues::end()
 { return std::vector<QualityValue>::end(); }
 
 inline QualityValues QualityValues::FromFastq(const std::string& fastq)
-{ return QualityValues(fastq); }
+{ return QualityValues{fastq}; }
 
 inline std::string QualityValues::Fastq() const
 {
     std::string result;
     result.reserve(size());
-    auto iter = cbegin();
-    const auto endIt = cend();
-    for (; iter != endIt; ++iter)
-        result.push_back((*iter).Fastq());
+    for (const auto qv : *this)
+        result.push_back(qv.Fastq());
     return result;
 }
 

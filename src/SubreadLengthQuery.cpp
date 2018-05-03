@@ -11,6 +11,7 @@
 #include <cstdint>
 
 #include "pbbam/CompositeBamReader.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiFilterTypes.h"
 
 namespace PacBio {
@@ -29,7 +30,8 @@ struct SubreadLengthQuery::SubreadLengthQueryPrivate
 
 SubreadLengthQuery::SubreadLengthQuery(const int32_t length, const Compare::Type compareType,
                                        const DataSet& dataset)
-    : internal::IQuery(), d_(new SubreadLengthQueryPrivate(length, compareType, dataset))
+    : internal::IQuery()
+    , d_{std::make_unique<SubreadLengthQueryPrivate>(length, compareType, dataset)}
 {
 }
 

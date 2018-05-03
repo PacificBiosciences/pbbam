@@ -30,7 +30,7 @@ static void CheckContainer(const std::string& container, const size_t expected,
         std::ostringstream msg;
         msg << "PBI index error: expected " << expected << " records in " << container
             << " field, but found " << observed << " instead";
-        throw std::runtime_error(msg.str());
+        throw std::runtime_error{msg.str()};
     }
 }
 
@@ -80,10 +80,11 @@ void PbiIndexIO::Load(PbiRawData& rawData, const std::string& filename)
 {
     // open file for reading
     if (!boost::algorithm::iends_with(filename, ".pbi"))
-        throw std::runtime_error("unsupported file extension");
+        throw std::runtime_error{"unsupported file extension on " + filename};
     std::unique_ptr<BGZF, HtslibBgzfDeleter> bgzf(bgzf_open(filename.c_str(), "rb"));
     auto* fp = bgzf.get();
-    if (fp == nullptr) throw std::runtime_error("could not open PBI file for reading");
+    if (fp == nullptr)
+        throw std::runtime_error{"could not open PBI file: " + filename + "for reading"};
 
     // load data
     LoadHeader(rawData, fp);
@@ -187,7 +188,7 @@ void PbiIndexIO::LoadHeader(PbiRawData& index, BGZF* fp)
     char magic[4];
     auto bytesRead = bgzf_read(fp, magic, 4);
     if (bytesRead != 4 || strncmp(magic, "PBI\1", 4))
-        throw std::runtime_error("expected PBI file, found unknown format instead");
+        throw std::runtime_error{"expected PBI file, found unknown format instead"};
 
     // version, pbi_flags, & n_reads
     uint32_t version;
@@ -277,7 +278,8 @@ void PbiIndexIO::Save(const PbiRawData& index, const std::string& filename)
 {
     std::unique_ptr<BGZF, HtslibBgzfDeleter> bgzf(bgzf_open(filename.c_str(), "wb"));
     auto* fp = bgzf.get();
-    if (fp == nullptr) throw std::runtime_error("could not open PBI file for writing");
+    if (fp == nullptr)
+        throw std::runtime_error{"could not open PBI file: " + filename + "for writing"};
 
     WriteHeader(index, fp);
     const auto numReads = index.NumReads();

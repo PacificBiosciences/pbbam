@@ -68,11 +68,10 @@ VirtualZmwBamRecord VirtualZmwCompositeReader::Next()
     }
 
     // no reader active
-    const std::string msg = {
+    throw std::runtime_error{
         "no readers active, make sure you use "
         "VirtualZmwCompositeReader::HasNext before "
         "requesting next record"};
-    throw std::runtime_error(msg);
 }
 
 std::vector<BamRecord> VirtualZmwCompositeReader::NextRaw()
@@ -84,11 +83,10 @@ std::vector<BamRecord> VirtualZmwCompositeReader::NextRaw()
     }
 
     // no reader active
-    const std::string msg = {
+    throw std::runtime_error{
         "no readers active, make sure you use "
         "VirtualZmwCompositeReader::HasNext before "
         "requesting next group of records"};
-    throw std::runtime_error(msg);
 }
 
 void VirtualZmwCompositeReader::OpenNextReader()

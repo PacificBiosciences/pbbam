@@ -12,14 +12,14 @@ namespace BAM {
 inline std::string GenomicInterval::Name() const
 { return name_; }
 
-inline GenomicInterval& GenomicInterval::Name(const std::string& name)
-{ name_ = name; return *this; }
+inline GenomicInterval& GenomicInterval::Name(std::string name)
+{ name_ = std::move(name); return *this; }
 
 inline PacBio::BAM::Interval<Position> GenomicInterval::Interval() const
 { return interval_; }
 
-inline GenomicInterval& GenomicInterval::Interval(const PacBio::BAM::Interval<Position>& interval)
-{ interval_ = interval; return *this; }
+inline GenomicInterval& GenomicInterval::Interval(PacBio::BAM::Interval<Position> interval)
+{ interval_ = std::move(interval); return *this; }
 
 inline bool GenomicInterval::IsValid() const
 {

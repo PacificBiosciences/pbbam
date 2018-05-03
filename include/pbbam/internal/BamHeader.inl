@@ -30,20 +30,20 @@ public:
 } // namespace internal
 
 inline BamHeader::BamHeader()
-    : d_(new internal::BamHeaderPrivate)
+    : d_{std::make_shared<internal::BamHeaderPrivate>()}
 { }
 
 inline BamHeader BamHeader::operator+(const BamHeader& other) const
 { return DeepCopy() += other; }
 
-inline BamHeader& BamHeader::AddComment(const std::string& comment)
-{ d_->comments_.push_back(comment); return *this; }
+inline BamHeader& BamHeader::AddComment(std::string comment)
+{ d_->comments_.push_back(std::move(comment)); return *this; }
 
-inline BamHeader& BamHeader::AddProgram(const ProgramInfo& pg)
-{ d_->programs_[pg.Id()] = pg; return *this; }
+inline BamHeader& BamHeader::AddProgram(ProgramInfo pg)
+{ d_->programs_[pg.Id()] = std::move(pg); return *this; }
 
-inline BamHeader& BamHeader::AddReadGroup(const ReadGroupInfo& readGroup)
-{ d_->readGroups_[readGroup.Id()] = readGroup; return *this; }
+inline BamHeader& BamHeader::AddReadGroup(ReadGroupInfo readGroup)
+{ d_->readGroups_[readGroup.Id()] = std::move(readGroup); return *this; }
 
 inline BamHeader& BamHeader::ClearComments()
 { d_->comments_.clear(); return* this; }
@@ -57,8 +57,8 @@ inline BamHeader& BamHeader::ClearReadGroups()
 inline std::vector<std::string> BamHeader::Comments() const
 { return d_->comments_; }
 
-inline BamHeader& BamHeader::Comments(const std::vector<std::string>& comments)
-{ d_->comments_ = comments; return *this; }
+inline BamHeader& BamHeader::Comments(std::vector<std::string> comments)
+{ d_->comments_ = std::move(comments); return *this; }
 
 inline bool BamHeader::HasProgram(const std::string& id) const
 { return d_->programs_.find(id) != d_->programs_.cend(); }
@@ -90,14 +90,14 @@ inline std::vector<SequenceInfo> BamHeader::Sequences() const
 inline std::string BamHeader::SortOrder() const
 { return d_->sortOrder_; }
 
-inline BamHeader& BamHeader::SortOrder(const std::string& order)
-{ d_->sortOrder_ = order; return *this; }
+inline BamHeader& BamHeader::SortOrder(std::string order)
+{ d_->sortOrder_ = std::move(order); return *this; }
 
 inline std::string BamHeader::Version() const
 { return d_->version_; }
 
-inline BamHeader& BamHeader::Version(const std::string& version)
-{ d_->version_ = version; return *this; }
+inline BamHeader& BamHeader::Version(std::string version)
+{ d_->version_ = std::move(version); return *this; }
 
 } // namespace BAM
 } // namespace PacBio

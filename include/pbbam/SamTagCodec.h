@@ -49,9 +49,9 @@ public:
 ///
 /// \return formatted tag string
 ///
-inline std::string MakeSamTag(const std::string& tag, const std::string& value)
+inline std::string MakeSamTag(std::string tag, std::string value)
 {
-    return '\t' + tag + ':' + value;
+    return '\t' + std::move(tag) + ':' + std::move(value);
 }
 
 }  // namespace BAM

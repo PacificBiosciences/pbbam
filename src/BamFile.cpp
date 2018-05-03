@@ -29,7 +29,7 @@ namespace internal {
 class BamFilePrivate
 {
 public:
-    BamFilePrivate(const std::string& fn) : filename_(fn), firstAlignmentOffset_(-1)
+    BamFilePrivate(std::string fn) : filename_{std::move(fn)}, firstAlignmentOffset_{-1}
     {
         // ensure we've updated htslib verbosity with requested verbosity here
         hts_verbose = (PacBio::BAM::HtslibVerbosity == -1 ? 0 : PacBio::BAM::HtslibVerbosity);
@@ -50,7 +50,7 @@ public:
                 e << fn << " : is missing EOF block\n";
             else
                 e << fn << " : unknown error while checking EOF block\n";
-            throw std::runtime_error(e.str());
+            throw std::runtime_error{e.str()};
         }
 #endif
 
@@ -87,9 +87,8 @@ public:
     std::unique_ptr<samFile, internal::HtslibFileDeleter> RawOpen() const
     {
         std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
-        if (!f || !f->fp.bgzf)
-            throw std::runtime_error(std::string("could not open BAM file: ") + filename_);
-        if (f->format.format != bam) throw std::runtime_error("expected BAM, unknown format");
+        if (!f || !f->fp.bgzf) throw std::runtime_error{"could not open BAM file: " + filename_};
+        if (f->format.format != bam) throw std::runtime_error{"expected BAM, unknown format"};
         return f;
     }
 
@@ -105,11 +104,14 @@ public:
 // BamFile implementation
 // ------------------------
 
-BamFile::BamFile(const std::string& filename) : d_(new internal::BamFilePrivate(filename)) {}
+BamFile::BamFile(std::string filename)
+    : d_{std::make_unique<internal::BamFilePrivate>(std::move(filename))}
+{
+}
 
-BamFile::BamFile(const BamFile& other) : d_(other.d_->DeepCopy()) {}
+BamFile::BamFile(const BamFile& other) : d_{other.d_->DeepCopy()} {}
 
-BamFile::BamFile(BamFile&& other) : d_(std::move(other.d_)) {}
+BamFile::BamFile(BamFile&& other) : d_{std::move(other.d_)} {}
 
 BamFile& BamFile::operator=(const BamFile& other)
 {
@@ -134,7 +136,7 @@ void BamFile::CreatePacBioIndex() const { PbiFile::CreateFrom(*this); }
 void BamFile::CreateStandardIndex() const
 {
     if (bam_index_build(d_->filename_.c_str(), 0) != 0)
-        throw std::runtime_error("could not build BAI index");
+        throw std::runtime_error{"could not build BAI index"};
 }
 
 void BamFile::EnsurePacBioIndexExists() const
@@ -147,7 +149,7 @@ void BamFile::EnsureStandardIndexExists() const
     if (!StandardIndexExists()) CreateStandardIndex();
 }
 
-std::string BamFile::Filename() const { return d_->filename_; }
+const std::string& BamFile::Filename() const { return d_->filename_; }
 
 int64_t BamFile::FirstAlignmentOffset() const { return d_->firstAlignmentOffset_; }
 

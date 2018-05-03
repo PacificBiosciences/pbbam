@@ -40,20 +40,12 @@ public:
     ValidationErrors(const size_t maxNumErrors = ValidationErrors::MAX);
 
 public:
-    void AddFileError(const std::string& fn, const std::string& details);
-    void AddFileError(const std::string& fn, std::string&& details);
-
-    void AddReadGroupError(const std::string& rg, const std::string& details);
-    void AddReadGroupError(const std::string& rg, std::string&& details);
-
-    void AddRecordError(const std::string& name, const std::string& details);
-    void AddRecordError(const std::string& name, std::string&& details);
-
+    void AddFileError(const std::string& fn, std::string details);
+    void AddReadGroupError(const std::string& rg, std::string details);
+    void AddRecordError(const std::string& name, std::string details);
     void AddTagLengthError(const std::string& name, const std::string& tagLabel,
                            const std::string& tagName, const size_t observed,
                            const size_t expected);
-    void AddTagLengthError(const std::string& name, std::string&& tagLabel, std::string&& tagName,
-                           const size_t observed, const size_t expected);
 
 public:
     bool IsEmpty() const;

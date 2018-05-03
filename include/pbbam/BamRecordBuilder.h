@@ -47,10 +47,10 @@ public:
     ///
     BamRecordBuilder(const BamRecord& prototype);
 
-    BamRecordBuilder(const BamRecordBuilder& other) = default;
-    BamRecordBuilder(BamRecordBuilder&& other) = default;
-    BamRecordBuilder& operator=(const BamRecordBuilder& other) = default;
-    BamRecordBuilder& operator=(BamRecordBuilder&& other) = default;
+    BamRecordBuilder(const BamRecordBuilder&) = default;
+    BamRecordBuilder(BamRecordBuilder&&) = default;
+    BamRecordBuilder& operator=(const BamRecordBuilder&) = default;
+    BamRecordBuilder& operator=(BamRecordBuilder&&) = default;
     ~BamRecordBuilder() = default;
 
     /// \}
@@ -81,13 +81,7 @@ public:
     ///
     /// \param[in] prototype
     ///
-    void Reset(const BamRecord& prototype);
-
-    /// \brief Resets builder attributes with \p prototype's data.
-    ///
-    /// \param[in] prototype
-    ///
-    void Reset(BamRecord&& prototype);
+    void Reset(BamRecord prototype);
 
     /// \}
 
@@ -205,61 +199,31 @@ public:
     ///
     /// \returns reference to this builder
     ///
-    BamRecordBuilder& Cigar(const PacBio::BAM::Cigar& cigar);
-
-    /// \brief Sets the record's CIGAR data.
-    ///
-    /// \returns reference to this builder
-    ///
-    BamRecordBuilder& Cigar(PacBio::BAM::Cigar&& cigar);
+    BamRecordBuilder& Cigar(PacBio::BAM::Cigar cigar);
 
     /// \brief Sets the record's name.
     ///
     /// \returns reference to this builder
     ///
-    BamRecordBuilder& Name(const std::string& name);
-
-    /// \brief Sets the record's name.
-    ///
-    /// \returns reference to this builder
-    ///
-    BamRecordBuilder& Name(std::string&& name);
+    BamRecordBuilder& Name(std::string name);
 
     /// \brief Sets the record's qualities.
     ///
     /// \returns reference to this builder
     ///
-    BamRecordBuilder& Qualities(const std::string& qualities);
-
-    /// \brief Sets the record's qualities.
-    ///
-    /// \returns reference to this builder
-    ///
-    BamRecordBuilder& Qualities(std::string&& qualities);
+    BamRecordBuilder& Qualities(std::string qualities);
 
     /// \brief Sets the record's sequence.
     ///
     /// \returns reference to this builder
     ///
-    BamRecordBuilder& Sequence(const std::string& sequence);
-
-    /// \brief Sets the record's sequence.
-    ///
-    /// \returns reference to this builder
-    ///
-    BamRecordBuilder& Sequence(std::string&& sequence);
+    BamRecordBuilder& Sequence(std::string sequence);
 
     /// \brief Sets the record's tags.
     ///
     /// \returns reference to this builder
     ///
-    BamRecordBuilder& Tags(const TagCollection& tags);
-
-    /// \brief Sets the record's tags.
-    ///
-    /// \returns reference to this builder
-    ///
-    BamRecordBuilder& Tags(TagCollection&& tags);
+    BamRecordBuilder& Tags(TagCollection tags);
 
     /// \}
 

@@ -11,6 +11,7 @@
 #include <cstdint>
 
 #include "pbbam/CompositeBamReader.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiFilterTypes.h"
 
 namespace PacBio {
@@ -18,16 +19,16 @@ namespace BAM {
 
 struct ZmwQuery::ZmwQueryPrivate
 {
-    ZmwQueryPrivate(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset)
-        : reader_(PbiZmwFilter(zmwWhitelist), dataset)
+    ZmwQueryPrivate(std::vector<int32_t> zmwWhitelist, const DataSet& dataset)
+        : reader_{PbiZmwFilter{std::move(zmwWhitelist)}, dataset}
     {
     }
 
     PbiFilterCompositeBamReader<Compare::Zmw> reader_;
 };
 
-ZmwQuery::ZmwQuery(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset)
-    : internal::IQuery(), d_(new ZmwQueryPrivate(zmwWhitelist, dataset))
+ZmwQuery::ZmwQuery(std::vector<int32_t> zmwWhitelist, const DataSet& dataset)
+    : internal::IQuery(), d_{std::make_unique<ZmwQueryPrivate>(zmwWhitelist, dataset)}
 {
 }
 

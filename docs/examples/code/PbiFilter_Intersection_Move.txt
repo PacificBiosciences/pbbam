@@ -1,3 +1,0 @@
-PbiFilter result{ PbiFilter::INTERSECT };
-result.Add(std::move(filters));
-return result;

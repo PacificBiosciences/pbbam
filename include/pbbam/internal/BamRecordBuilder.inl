@@ -30,19 +30,13 @@ inline BamRecordBuilder& BamRecordBuilder::MateReferenceId(const int32_t id)
 inline BamRecordBuilder& BamRecordBuilder::Position(const int32_t pos)
 { core_.pos = pos; return *this; }
 
-inline BamRecordBuilder& BamRecordBuilder::Qualities(const std::string& qualities)
-{ qualities_ = qualities; return *this; }
-
-inline BamRecordBuilder& BamRecordBuilder::Qualities(std::string&& qualities)
+inline BamRecordBuilder& BamRecordBuilder::Qualities(std::string qualities)
 { qualities_ = std::move(qualities); return *this; }
 
 inline BamRecordBuilder& BamRecordBuilder::ReferenceId(const int32_t id)
 { core_.tid = id; return *this; }
 
-inline BamRecordBuilder& BamRecordBuilder::Tags(const TagCollection& tags)
-{ tags_ = tags; return *this; }
-
-inline BamRecordBuilder& BamRecordBuilder::Tags(TagCollection&& tags)
+inline BamRecordBuilder& BamRecordBuilder::Tags(TagCollection tags)
 { tags_ = std::move(tags); return *this; }
 
 } // namespace BAM

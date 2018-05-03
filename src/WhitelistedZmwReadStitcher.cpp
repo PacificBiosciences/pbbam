@@ -24,16 +24,16 @@ public:
     WhitelistedZmwReadStitcherPrivate(const std::vector<int32_t>& zmwWhitelist,
                                       const std::string& primaryBamFilePath,
                                       const std::string& scrapsBamFilePath)
-        : primaryBamFile_(new BamFile{primaryBamFilePath})
-        , scrapsBamFile_(new BamFile{scrapsBamFilePath})
-        , primaryReader_(new PbiIndexedBamReader{*primaryBamFile_})
-        , scrapsReader_(new PbiIndexedBamReader{*scrapsBamFile_})
+        : primaryBamFile_{std::make_unique<BamFile>(primaryBamFilePath)}
+        , scrapsBamFile_{std::make_unique<BamFile>(scrapsBamFilePath)}
+        , primaryReader_{std::make_unique<PbiIndexedBamReader>(*primaryBamFile_)}
+        , scrapsReader_{std::make_unique<PbiIndexedBamReader>(*scrapsBamFile_)}
     {
         // setup new header for stitched data
         polyHeader_ = std::make_unique<BamHeader>(primaryBamFile_->Header().ToSam());
         auto readGroups = polyHeader_->ReadGroups();
         if (readGroups.empty())
-            throw std::runtime_error("Bam header of the primary bam has no read groups.");
+            throw std::runtime_error{"Bam header of the primary bam has no read groups."};
         readGroups[0].ReadType("POLYMERASE");
         readGroups[0].Id(readGroups[0].MovieName(), "POLYMERASE");
         if (readGroups.size() > 1) {
@@ -53,20 +53,19 @@ public:
     VirtualZmwBamRecord Next()
     {
         auto bamRecordVec = NextRaw();
-        VirtualZmwBamRecord stitched(std::move(bamRecordVec), *polyHeader_);
-        return stitched;
+        return {std::move(bamRecordVec), *polyHeader_};
     }
 
     std::vector<BamRecord> NextRaw()
     {
-        auto result = std::vector<BamRecord>{};
+        std::vector<BamRecord> result;
         if (!HasNext()) return result;
 
         const auto& zmw = zmwWhitelist_.front();
         primaryReader_->Filter(PbiZmwFilter{zmw});
         scrapsReader_->Filter(PbiZmwFilter{zmw});
 
-        auto record = BamRecord{};
+        BamRecord record;
         while (primaryReader_->GetNext(record))
             result.push_back(record);
         while (scrapsReader_->GetNext(record))
@@ -92,8 +91,8 @@ private:
     void PreFilterZmws(const std::vector<int32_t>& zmwWhitelist)
     {
         // fetch input ZMWs
-        const PbiRawData primaryIndex(primaryBamFile_->PacBioIndexFilename());
-        const PbiRawData scrapsIndex(scrapsBamFile_->PacBioIndexFilename());
+        const PbiRawData primaryIndex{primaryBamFile_->PacBioIndexFilename()};
+        const PbiRawData scrapsIndex{scrapsBamFile_->PacBioIndexFilename()};
         const auto& primaryZmws = primaryIndex.BasicData().holeNumber_;
         const auto& scrapsZmws = scrapsIndex.BasicData().holeNumber_;
 
@@ -119,7 +118,8 @@ private:
 WhitelistedZmwReadStitcher::WhitelistedZmwReadStitcher(const std::vector<int32_t>& zmwWhitelist,
                                                        const std::string& primaryBamFilePath,
                                                        const std::string& scrapsBamFilePath)
-    : d_(new WhitelistedZmwReadStitcherPrivate(zmwWhitelist, primaryBamFilePath, scrapsBamFilePath))
+    : d_{std::make_unique<WhitelistedZmwReadStitcherPrivate>(zmwWhitelist, primaryBamFilePath,
+                                                             scrapsBamFilePath)}
 {
 }
 

@@ -39,10 +39,10 @@ public:
     BamRecord record;
 
 public:
-    CompositeMergeItem(std::unique_ptr<BamReader>&& rdr);
-    CompositeMergeItem(std::unique_ptr<BamReader>&& rdr, BamRecord&& rec);
-    CompositeMergeItem(CompositeMergeItem&& other);
-    CompositeMergeItem& operator=(CompositeMergeItem&& other);
+    CompositeMergeItem(std::unique_ptr<BamReader> rdr);
+    CompositeMergeItem(std::unique_ptr<BamReader> rdr, BamRecord rec);
+    CompositeMergeItem(CompositeMergeItem&&) = default;
+    CompositeMergeItem& operator=(CompositeMergeItem&&) = default;
     ~CompositeMergeItem() = default;
 };
 
@@ -78,8 +78,6 @@ public:
 
     GenomicIntervalCompositeBamReader(const GenomicInterval& interval,
                                       const std::vector<BamFile>& bamFiles);
-    GenomicIntervalCompositeBamReader(const GenomicInterval& interval,
-                                      std::vector<BamFile>&& bamFiles);
     GenomicIntervalCompositeBamReader(const GenomicInterval& interval, const DataSet& dataset);
 
     /// \}
@@ -154,7 +152,6 @@ public:
     /// \{
 
     PbiFilterCompositeBamReader(const PbiFilter& filter, const std::vector<BamFile>& bamFiles);
-    PbiFilterCompositeBamReader(const PbiFilter& filter, std::vector<BamFile>&& bamFiles);
     PbiFilterCompositeBamReader(const PbiFilter& filter, const DataSet& dataset);
 
     /// \}
@@ -202,8 +199,7 @@ public:
     /// \name Contstructors & Related Methods
     /// \{
 
-    SequentialCompositeBamReader(const std::vector<BamFile>& bamFiles);
-    SequentialCompositeBamReader(std::vector<BamFile>&& bamFiles);
+    SequentialCompositeBamReader(std::vector<BamFile> bamFiles);
     SequentialCompositeBamReader(const DataSet& dataset);
 
     /// \}

@@ -11,6 +11,7 @@
 #include <cstdint>
 
 #include "pbbam/CompositeBamReader.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiFilterTypes.h"
 
 namespace PacBio {
@@ -19,7 +20,7 @@ namespace BAM {
 struct BarcodeQuery::BarcodeQueryPrivate
 {
     BarcodeQueryPrivate(const int16_t barcode, const DataSet& dataset)
-        : reader_(PbiBarcodeFilter(barcode), dataset)
+        : reader_{PbiBarcodeFilter{barcode}, dataset}
     {
     }
 
@@ -27,7 +28,7 @@ struct BarcodeQuery::BarcodeQueryPrivate
 };
 
 BarcodeQuery::BarcodeQuery(const int16_t barcode, const DataSet& dataset)
-    : internal::IQuery(), d_(new BarcodeQueryPrivate(barcode, dataset))
+    : internal::IQuery(), d_{std::make_unique<BarcodeQueryPrivate>(barcode, dataset)}
 {
 }
 

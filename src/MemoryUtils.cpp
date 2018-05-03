@@ -19,7 +19,7 @@ namespace internal {
 BamHeader BamHeaderMemory::FromRawData(bam_hdr_t* hdr)
 {
     // null input - error
-    if (hdr == nullptr) throw std::runtime_error("invalid BAM header");
+    if (hdr == nullptr) throw std::runtime_error{"invalid BAM header"};
 
     // empty text input - ok
     if (hdr->text == nullptr || hdr->l_text == 0) return BamHeader();

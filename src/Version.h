@@ -29,8 +29,8 @@ public:
     // string must be "<major>.<minor>.<version>"
     Version(const std::string& v);
 
-    Version(const Version& other) = default;
-    Version(Version&& other) = default;
+    Version(const Version&) = default;
+    Version(Version&&) = default;
     Version& operator=(const Version&) = default;
     Version& operator=(Version&&) = default;
     ~Version() = default;
@@ -72,10 +72,10 @@ inline std::ostream& operator<<(std::ostream& out, const Version& version)
     return out;
 }
 
-inline constexpr Version::Version() : major_(0), minor_(0), revision_(0) {}
+inline constexpr Version::Version() : major_{0}, minor_{0}, revision_{0} {}
 
 inline Version::Version(int major, int minor, int revision)
-    : major_(major), minor_(minor), revision_(revision)
+    : major_{major}, minor_{minor}, revision_{revision}
 {
     Check();
 }
@@ -120,7 +120,7 @@ inline Version::operator std::string() const { return ToString(); }
 inline void Version::Check() const
 {
     if (major_ < 0 || minor_ < 0 || revision_ < 0)
-        throw std::runtime_error("version cannot contain negative numbers");
+        throw std::runtime_error{"version cannot contain negative numbers"};
 }
 
 inline int Version::Major() const { return major_; }
