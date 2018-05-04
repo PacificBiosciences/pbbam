@@ -126,4 +126,4 @@ pbbam_dep = declare_dependency(
   link_with : pbbam_lib,
   dependencies : pbbam_htslib_dep,
   version : meson.project_version(),
-  compile_args : pbbam_warning_flags + pbbam_macros)
+  compile_args : pbbam_macros)
