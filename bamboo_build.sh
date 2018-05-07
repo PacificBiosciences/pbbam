@@ -93,7 +93,7 @@ echo "## Creating artifact"
 # install into staging dir with --prefix /usr/local
 # in order to sidestep all the artifact policy
 rm -rf staging
-meson configure -Dprefix=/usr/local "${CURRENT_BUILD_DIR}"
+meson configure -Dprefix=/usr/local -Dtests=false "${CURRENT_BUILD_DIR}"
 DESTDIR="${PWD}/staging" ninja -C "${CURRENT_BUILD_DIR}" -v install
 
 if [[ ${BUILD_NUMBER} = 0 ]]; then
