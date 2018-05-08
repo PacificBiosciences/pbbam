@@ -1,6 +1,10 @@
 subdir('src')
 
-pbbam_cram_script = find_program('cram')
+pbbam_cram_script = find_program('cram', required : false)
+if not pbbam_cram_script.found()
+  warning('Using bundled cram script')
+  pbbam_cram_script = find_program('scripts/cram.py', required : true)
+endif
 
 pbbam_gtest_dep = dependency('gtest_main', fallback : ['gtest', 'gtest_main_dep'])
 
