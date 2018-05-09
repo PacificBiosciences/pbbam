@@ -39,19 +39,7 @@ public:
     /// \throws std::runtime_error if either file (*.bam or *.bai) fails to open
     ///         for reading, or if the interval is invalid
     ///
-    BaiIndexedBamReader(const GenomicInterval& interval, const std::string& filename);
-
-    /// \brief Constructs BAM reader, bounded by a genomic interval.
-    ///
-    /// All reads that overlap the interval will be available.
-    ///
-    /// \param[in] interval iteration will be bounded by this GenomicInterval.
-    /// \param[in] bamFile input BamFile object
-    ///
-    /// \throws std::runtime_error if either file (*.bam or *.bai) fails to open
-    ///         for reading, or if the interval is invalid
-    ///
-    BaiIndexedBamReader(const GenomicInterval& interval, const BamFile& bamFile);
+    BaiIndexedBamReader(const GenomicInterval& interval, std::string filename);
 
     /// \brief Constructs %BAM reader, bounded by a genomic interval.
     ///
@@ -63,7 +51,7 @@ public:
     /// \throws std::runtime_error if either file (*.bam or *.bai) fails to open
     ///         for reading, or if the interval is invalid
     ///
-    BaiIndexedBamReader(const GenomicInterval& interval, BamFile&& bamFile);
+    BaiIndexedBamReader(const GenomicInterval& interval, BamFile bamFile);
 
     /// \}
 

@@ -112,7 +112,7 @@ TEST(BamRecordBuilderTest, CheckSetters)
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = static_cast<int32_t>(-42);
+    tags["XY"] = int32_t{-42};
 
     BamRecordBuilder builder;
     builder.Bin(42)
@@ -165,10 +165,10 @@ TEST(BamRecordBuilderTest, CheckSetters)
     EXPECT_EQ(42, bam.Impl().Position());
     EXPECT_EQ(42, bam.Impl().ReferenceId());
 
-    const TagCollection& fetchedTags = bam.Impl().Tags();
+    const TagCollection fetchedTags = bam.Impl().Tags();
 
     EXPECT_TRUE(fetchedTags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), fetchedTags.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags.at("XY").ToInt32());
+    EXPECT_EQ(int32_t{-42}, fetchedTags.at("XY").ToInt32());
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags.at("CA").ToUInt8Array());
 }

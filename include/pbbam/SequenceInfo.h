@@ -126,14 +126,14 @@ public:
     /// \param[in] id      new value
     /// \returns reference to this object
     ///
-    SequenceInfo& AssemblyId(const std::string& id);
+    SequenceInfo& AssemblyId(std::string id);
 
     /// \brief Sets the value for \@SQ:M5
     ///
     /// \param[in] checksum      new value
     /// \returns reference to this object
     ///
-    SequenceInfo& Checksum(const std::string& checksum);
+    SequenceInfo& Checksum(std::string checksum);
 
     /// \brief Sets a new collection of non-standard tags.
     ///
@@ -142,35 +142,35 @@ public:
     /// \param[in] custom      new tags
     /// \returns reference to this object
     ///
-    SequenceInfo& CustomTags(const std::map<std::string, std::string>& custom);
+    SequenceInfo& CustomTags(std::map<std::string, std::string> custom);
 
     /// \brief Sets the value for \@SQ:LN
     ///
     /// \param[in] length      new value
     /// \returns reference to this object
     ///
-    SequenceInfo& Length(const std::string& length);
+    SequenceInfo& Length(std::string length);
 
     /// \brief Sets the value for \@SQ:SN
     ///
     /// \param[in] name      new value
     /// \returns reference to this object
     ///
-    SequenceInfo& Name(const std::string& name);
+    SequenceInfo& Name(std::string name);
 
     /// \brief Sets the value for \@SQ:SP
     ///
     /// \param[in] species     new value
     /// \returns reference to this object
     ///
-    SequenceInfo& Species(const std::string& species);
+    SequenceInfo& Species(std::string species);
 
     /// \brief Sets the value for \@SQ:UR
     ///
     /// \param[in] uri      new value
     /// \returns reference to this object
     ///
-    SequenceInfo& Uri(const std::string& uri);
+    SequenceInfo& Uri(std::string uri);
 
     /// \}
 

@@ -96,7 +96,7 @@ inline void PbiIndexIO::SwapEndianness(std::vector<T>& data)
                 ed_swap_8p(&data[i]);
             break;
         default:
-            throw std::runtime_error("unsupported element size");
+            throw std::runtime_error{"unsupported element size"};
     }
 }
 

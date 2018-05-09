@@ -25,13 +25,13 @@ static std::string ProgramInfoTokenVN{"VN"};
 
 }  // namespace internal
 
-ProgramInfo::ProgramInfo(std::string id) : id_(std::move(id)) {}
+ProgramInfo::ProgramInfo(std::string id) : id_{std::move(id)} {}
 
 ProgramInfo ProgramInfo::FromSam(const std::string& sam)
 {
     // pop off '@PG\t', then split rest of line into tokens
     const auto tokens = internal::Split(sam.substr(4), '\t');
-    if (tokens.empty()) return ProgramInfo();
+    if (tokens.empty()) return {};
 
     ProgramInfo prog;
     std::map<std::string, std::string> custom;
@@ -39,21 +39,21 @@ ProgramInfo ProgramInfo::FromSam(const std::string& sam)
     // iterate over tokens
     for (const auto& token : tokens) {
         const auto tokenTag = token.substr(0, 2);
-        const auto tokenValue = token.substr(3);
+        auto tokenValue = token.substr(3);
 
         // set program contents
         // clang-format off
-        if      (tokenTag == internal::ProgramInfoTokenID) prog.Id(tokenValue);
-        else if (tokenTag == internal::ProgramInfoTokenCL) prog.CommandLine(tokenValue);
-        else if (tokenTag == internal::ProgramInfoTokenDS) prog.Description(tokenValue);
-        else if (tokenTag == internal::ProgramInfoTokenPN) prog.Name(tokenValue);
-        else if (tokenTag == internal::ProgramInfoTokenPP) prog.PreviousProgramId(tokenValue);
-        else if (tokenTag == internal::ProgramInfoTokenVN) prog.Version(tokenValue);
+        if      (tokenTag == internal::ProgramInfoTokenID) prog.Id(std::move(tokenValue));
+        else if (tokenTag == internal::ProgramInfoTokenCL) prog.CommandLine(std::move(tokenValue));
+        else if (tokenTag == internal::ProgramInfoTokenDS) prog.Description(std::move(tokenValue));
+        else if (tokenTag == internal::ProgramInfoTokenPN) prog.Name(std::move(tokenValue));
+        else if (tokenTag == internal::ProgramInfoTokenPP) prog.PreviousProgramId(std::move(tokenValue));
+        else if (tokenTag == internal::ProgramInfoTokenVN) prog.Version(std::move(tokenValue));
         // clang-format on
 
         // otherwise, "custom" tag
         else
-            custom[tokenTag] = tokenValue;
+            custom[tokenTag] = std::move(tokenValue);
     }
 
     prog.CustomTags(custom);
@@ -62,7 +62,7 @@ ProgramInfo ProgramInfo::FromSam(const std::string& sam)
 
 std::string ProgramInfo::ToSam() const
 {
-    std::stringstream out;
+    std::ostringstream out;
     out << "@PG" << internal::MakeSamTag(internal::ProgramInfoTokenID, id_);
 
     // clang-format off

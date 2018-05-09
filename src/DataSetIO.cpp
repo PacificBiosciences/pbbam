@@ -30,7 +30,7 @@ namespace internal {
 static std::unique_ptr<DataSetBase> FromXml(const std::string& xmlFn)
 {
     std::ifstream in(xmlFn);
-    if (!in) throw std::runtime_error("could not open XML file for reading: " + xmlFn);
+    if (!in) throw std::runtime_error{"could not open XML file for reading: " + xmlFn};
     return XmlReader::FromStream(in);
 }
 
@@ -65,7 +65,7 @@ static std::unique_ptr<DataSetBase> FromFofn(const std::string& fofn)
 {
     const auto fofnDir = FileUtils::DirectoryName(fofn);
     std::ifstream in(fofn);
-    if (!in) throw std::runtime_error("could not open FOFN for reading: " + fofn);
+    if (!in) throw std::runtime_error{"could not open FOFN for reading: " + fofn};
 
     auto filenames = FofnReader::Files(in);
     std::transform(
@@ -92,7 +92,7 @@ static std::unique_ptr<DataSetBase> FromUri(const std::string& uri)
     }
 
     // unknown filename extension
-    throw std::runtime_error("unsupported extension on input file: " + uri);
+    throw std::runtime_error{"unsupported extension on input file: " + uri};
 }
 
 std::unique_ptr<DataSetBase> DataSetIO::FromUri(const std::string& uri)
@@ -103,7 +103,7 @@ std::unique_ptr<DataSetBase> DataSetIO::FromUri(const std::string& uri)
 std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>& uris)
 {
     if (uris.empty())
-        throw std::runtime_error("empty input URI list");  // or just return empty, generic DataSet?
+        throw std::runtime_error{"empty input URI list"};  // or just return empty, generic DataSet?
 
     // create dataset(s) from URI(s)
     std::vector<std::unique_ptr<DataSetBase> > datasets;
@@ -126,15 +126,15 @@ std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>&
 
 std::unique_ptr<DataSetBase> DataSetIO::FromXmlString(const std::string& xml)
 {
-    if (xml.empty()) throw std::runtime_error("empty XML string");
-    std::stringstream s(xml);
+    if (xml.empty()) throw std::runtime_error{"empty XML string"};
+    std::istringstream s{xml};
     return XmlReader::FromStream(s);
 }
 
 void DataSetIO::ToFile(const std::unique_ptr<DataSetBase>& dataset, const std::string& fn)
 {
     std::ofstream out(fn);
-    if (!out) throw std::runtime_error("could not open XML file for writing: " + fn);
+    if (!out) throw std::runtime_error{"could not open XML file for writing: " + fn};
     XmlWriter::ToStream(dataset, out);
 }
 

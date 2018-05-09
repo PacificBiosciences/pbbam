@@ -14,12 +14,11 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace AlignmentPrinterTests {
 
-const string lambdaFasta = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
-const string singleInsertionBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+const std::string lambdaFasta = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
+const std::string singleInsertionBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
 
 }  // namespace AlignmentPrinterTests
 
@@ -33,7 +32,7 @@ TEST(AlignmentPrinterTest, Print)
     auto it = bamQuery.begin();
 
     // funky formatting used to format alignments
-    auto expected = string{
+    auto expected = std::string{
         "Read        : singleInsertion/100/0_49\n"
         "Reference   : lambda_NEB3011\n"
         "\n"
@@ -54,7 +53,7 @@ TEST(AlignmentPrinterTest, Print)
     auto record = *it++;
     EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
 
-    expected = string{
+    expected = std::string{
         "Read        : singleInsertion/200/0_49\n"
         "Reference   : lambda_NEB3011\n"
         "\n"
@@ -75,7 +74,7 @@ TEST(AlignmentPrinterTest, Print)
     record = *it++;
     EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
 
-    expected = string{
+    expected = std::string{
         "Read        : singleInsertion/100/0_111\n"
         "Reference   : lambda_NEB3011\n"
         "\n"
@@ -97,7 +96,7 @@ TEST(AlignmentPrinterTest, Print)
     record = *it++;
     EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
 
-    expected = string{
+    expected = std::string{
         "Read        : singleInsertion/100/0_111\n"
         "Reference   : lambda_NEB3011\n"
         "\n"

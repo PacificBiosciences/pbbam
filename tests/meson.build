@@ -1,6 +1,10 @@
 subdir('src')
 
-pbbam_cram_py = files('scripts/cram.py')
+pbbam_cram_script = find_program('cram', required : false)
+if not pbbam_cram_script.found()
+  warning('Using bundled cram script')
+  pbbam_cram_script = find_program('scripts/cram.py', required : true)
+endif
 
 pbbam_gtest_dep = dependency('gtest_main', fallback : ['gtest', 'gtest_main_dep'])
 
@@ -40,7 +44,14 @@ custom_target('pbbam_generate_data',
   build_by_default : true,
   install : false)
 
-test('pbbam test', pbbam_test)
+test(
+  'pbbam unit tests',
+  pbbam_test,
+  args : [
+    '--gtest_output=xml:' + join_paths(meson.build_root(), 'pbbam-unit-tests.xml')],
+  env : [
+    'ARGS=-V',
+    'VERBOSE=1'])
 
 test('pbbam formatting check', pbbam_clang_formatter, args : ['--all'], workdir : meson.source_root())
 

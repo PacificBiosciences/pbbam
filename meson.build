@@ -5,9 +5,10 @@ project(
   default_options : [
     'buildtype=release',
     'warning_level=3',
-    'cpp_std=c++11'],
+    'cpp_std=c++11',
+    'b_ndebug=if-release'],
   license : 'BSD-3',
-  meson_version : '>= 0.41.1')
+  meson_version : '>= 0.46.0')
 
 ############
 # CXXFLAGS #
@@ -16,25 +17,19 @@ project(
 pbbam_warning_flags = []
 cpp = meson.get_compiler('cpp')
 foreach cflag: [
-  '-Wno-unused-result',
-  '-Wno-unused-parameter',
-  '-Wno-sign-compare',
-  '-Wno-non-virtual-dtor']
+  '-Wduplicated-cond',
+  '-Wduplicated-branches',
+  '-Wlogical-op',
+  '-Wrestrict',
+  '-Wnull-dereference',
+  '-Wuseless-cast',
+  '-Wdouble-promotion',
+  '-Wshadow',
+  '-Wformat=1']
     if cpp.has_argument(cflag)
       pbbam_warning_flags += cflag
     endif
 endforeach
-
-if cpp.get_id() == 'clang'
-  foreach cflag: [
-    '-Wno-unused-private-field',
-    '-Wno-unused-command-line-argument',
-    '-Wno-keyword-macro']
-      if cpp.has_argument(cflag)
-        pbbam_warning_flags += cflag
-      endif
-  endforeach
-endif
 
 pbbam_macros = []
 if get_option('permissive-cigar')
@@ -131,4 +126,4 @@ pbbam_dep = declare_dependency(
   link_with : pbbam_lib,
   dependencies : pbbam_htslib_dep,
   version : meson.project_version(),
-  compile_args : pbbam_warning_flags + pbbam_macros)
+  compile_args : pbbam_macros)

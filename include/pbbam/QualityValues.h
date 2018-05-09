@@ -33,7 +33,6 @@ public:
     ///  \{
 
     /// \brief Default constructor - creates an empty QualityValues object.
-    QualityValues();
 
     /// \brief Creates a QualityValues object from a FASTQ-encoded string.
     ///
@@ -46,14 +45,7 @@ public:
     ///
     /// \param[in] quals    vector of QualityValue elements
     ///
-    explicit QualityValues(const std::vector<QualityValue>& quals);
-
-    /// \brief Creates a QualityValues object from a vector of QualityValue
-    ///        elements.
-    ///
-    /// \param[in] quals    vector of QualityValue elements
-    ///
-    QualityValues(std::vector<QualityValue>&& quals);
+    QualityValues(std::vector<QualityValue> quals);
 
     /// \brief Creates a QualityValues object from a vector of (numeric) quality
     ///        values.
@@ -80,38 +72,14 @@ public:
     QualityValues(const QualityValues::const_iterator first,
                   const QualityValues::const_iterator last);
 
-    /// \brief Copy constructor
-    QualityValues(const QualityValues& other) = default;
-
-    /// \brief Move constructor
-    QualityValues(QualityValues&& other) = default;
-
-    /// \brief Copy assignment operator
-    ///
-    /// \param[in] other    QualityValues object
-    ///
-    QualityValues& operator=(const QualityValues& other) = default;
-
-    /// \brief Move assignment operator
-    ///
-    /// \param[in] other    QualityValues object
-    ///
-    QualityValues& operator=(QualityValues&& other) = default;
-
-    /// \brief Copy assignment operator
-    ///
-    /// \param[in] quals    vector of QualityValue elements
-    ///
-    QualityValues& operator=(const std::vector<QualityValue>& quals);
-
-    /// \brief Move assignment operator
-    ///
-    /// \param[in] quals    vector of QualityValue elements
-    ///
-    QualityValues& operator=(std::vector<QualityValue>&& quals);
-
-    /// \brief Destructor
+    QualityValues() = default;
+    QualityValues(const QualityValues&) = default;
+    QualityValues(QualityValues&&) = default;
+    QualityValues& operator=(const QualityValues&) = default;
+    QualityValues& operator=(QualityValues&&) = default;
     ~QualityValues() = default;
+
+    QualityValues& operator=(std::vector<QualityValue> quals);
 
     /// \}
 

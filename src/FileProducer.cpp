@@ -11,13 +11,13 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
-FileProducer::FileProducer(const std::string& targetFilename)
-    : FileProducer(targetFilename, targetFilename + ".tmp")
+FileProducer::FileProducer(std::string targetFilename)
+    : FileProducer(std::move(targetFilename), targetFilename + ".tmp")
 {
 }
 
 FileProducer::FileProducer(std::string targetFilename, std::string tempFilename)
-    : targetFilename_(std::move(targetFilename)), tempFilename_(std::move(tempFilename))
+    : targetFilename_{std::move(targetFilename)}, tempFilename_{std::move(tempFilename)}
 {
     // override renaming if writing to stdout
     //

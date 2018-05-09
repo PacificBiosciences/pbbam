@@ -14,7 +14,6 @@ public:
     Settings();
 
 public:
-
 public:
     std::string inputBamFilename_;
     bool printPbiContents_;
@@ -25,11 +24,12 @@ class PbIndex
 {
 public:
     static int Run(const Settings& settings);
+
 private:
     static int Create(const Settings& settings);
-//    static int Print(const Settings& settings);
+    //    static int Print(const Settings& settings);
 };
 
-} // namespace pbindex
+}  // namespace pbindex
 
-#endif // PBINDEX_H
+#endif  // PBINDEX_H

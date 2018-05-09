@@ -10,8 +10,8 @@ namespace PacBio {
 namespace BAM {
 
 inline IndexResultBlock::IndexResultBlock(size_t idx, size_t numReads)
-    : firstIndex_(idx)
-    , numReads_(numReads)
+    : firstIndex_{idx}
+    , numReads_{numReads}
 { }
 
 inline bool IndexResultBlock::operator==(const IndexResultBlock& other) const

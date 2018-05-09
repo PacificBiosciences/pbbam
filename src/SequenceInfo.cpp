@@ -21,9 +21,9 @@ namespace internal {
 static const std::string token_SN{"SN"};
 static const std::string token_LN{"LN"};
 static const std::string token_AS{"AS"};
-static const std::string token_M5 = std::string("M5");
-static const std::string token_SP = std::string("SP");
-static const std::string token_UR = std::string("UR");
+static const std::string token_M5{"M5"};
+static const std::string token_SP{"SP"};
+static const std::string token_UR{"UR"};
 
 }  // namespace internal
 
@@ -36,32 +36,32 @@ SequenceInfo SequenceInfo::FromSam(const std::string& sam)
 {
     // pop off '@SQ\t', then split rest of line into tokens
     const auto tokens = internal::Split(sam.substr(4), '\t');
-    if (tokens.empty()) return SequenceInfo();
+    if (tokens.empty()) return {};
 
     SequenceInfo seq;
     std::map<std::string, std::string> custom;
 
     // iterate over tokens
-    for (const std::string& token : tokens) {
-        const std::string& tokenTag = token.substr(0, 2);
-        const std::string& tokenValue = token.substr(3);
+    for (const auto& token : tokens) {
+        const auto tokenTag = token.substr(0, 2);
+        auto tokenValue = token.substr(3);
 
         // set sequence info
         // clang-format off
-        if      (tokenTag == internal::token_SN) seq.Name(tokenValue);
-        else if (tokenTag == internal::token_LN) seq.Length(tokenValue);
-        else if (tokenTag == internal::token_AS) seq.AssemblyId(tokenValue);
-        else if (tokenTag == internal::token_M5) seq.Checksum(tokenValue);
-        else if (tokenTag == internal::token_SP) seq.Species(tokenValue);
-        else if (tokenTag == internal::token_UR) seq.Uri(tokenValue);
+        if      (tokenTag == internal::token_SN) seq.Name(std::move(tokenValue));
+        else if (tokenTag == internal::token_LN) seq.Length(std::move(tokenValue));
+        else if (tokenTag == internal::token_AS) seq.AssemblyId(std::move(tokenValue));
+        else if (tokenTag == internal::token_M5) seq.Checksum(std::move(tokenValue));
+        else if (tokenTag == internal::token_SP) seq.Species(std::move(tokenValue));
+        else if (tokenTag == internal::token_UR) seq.Uri(std::move(tokenValue));
         // clang-format on
 
         // otherwise, "custom" tag
         else
-            custom[tokenTag] = tokenValue;
+            custom[tokenTag] = std::move(tokenValue);
     }
 
-    seq.CustomTags(custom);
+    seq.CustomTags(std::move(custom));
     return seq;
 }
 
@@ -76,7 +76,7 @@ bool SequenceInfo::IsValid() const
 
 std::string SequenceInfo::ToSam() const
 {
-    std::stringstream out;
+    std::ostringstream out;
     out << "@SQ" << internal::MakeSamTag(internal::token_SN, name_);
 
     // clang-format off
@@ -88,8 +88,8 @@ std::string SequenceInfo::ToSam() const
     // clang-format on
 
     // append any custom tags
-    for (const auto& attribute : custom_)
-        out << internal::MakeSamTag(attribute.first, attribute.second);
+    for (auto&& attribute : custom_)
+        out << internal::MakeSamTag(std::move(attribute.first), std::move(attribute.second));
 
     return out.str();
 }

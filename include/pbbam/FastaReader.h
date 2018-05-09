@@ -37,13 +37,11 @@ public:
     /// \{
 
     explicit FastaReader(const std::string& fn);
+    FastaReader(const FastaReader&) = delete;
     FastaReader(FastaReader&&) = default;
+    FastaReader& operator=(const FastaReader&) = delete;
     FastaReader& operator=(FastaReader&&) = default;
     ~FastaReader();
-
-    // copy is disabled
-    FastaReader(const FastaReader&) = delete;
-    FastaReader& operator=(const FastaReader&) = delete;
 
     /// \}
 

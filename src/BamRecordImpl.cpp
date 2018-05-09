@@ -5,6 +5,7 @@
 #include "pbbam/BamRecordImpl.h"
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -46,7 +47,7 @@ bool HasLongCigar(const bam1_t* const b)
     // if existing CIGAR doesn't look like a 'fake CIGAR'
     const auto firstCigarOp = *(bam_get_cigar(b));
     if (bam_cigar_op(firstCigarOp) != static_cast<uint32_t>(CigarOperationType::SOFT_CLIP) ||
-        bam_cigar_oplen(firstCigarOp) != c->l_qseq) {
+        static_cast<int32_t>(bam_cigar_oplen(firstCigarOp)) != c->l_qseq) {
         return false;
     }
 
@@ -73,13 +74,12 @@ BamRecordImpl::BamRecordImpl() : d_(nullptr)
 }
 
 BamRecordImpl::BamRecordImpl(const BamRecordImpl& other)
-    : d_(bam_dup1(other.d_.get()), internal::HtslibRecordDeleter()), tagOffsets_(other.tagOffsets_)
+    : d_{bam_dup1(other.d_.get()), internal::HtslibRecordDeleter()}, tagOffsets_{other.tagOffsets_}
 {
     assert(d_);
 }
 
-BamRecordImpl::BamRecordImpl(BamRecordImpl&& other)
-    : d_(nullptr), tagOffsets_(std::move(other.tagOffsets_))
+BamRecordImpl::BamRecordImpl(BamRecordImpl&& other) : tagOffsets_{std::move(other.tagOffsets_)}
 {
     d_.swap(other.d_);
     other.d_.reset();
@@ -137,7 +137,7 @@ bool BamRecordImpl::AddTag(const BamRecordTag tag, const Tag& value,
 bool BamRecordImpl::AddTagImpl(const std::string& tagName, const Tag& value,
                                const TagModifier additionalModifier)
 {
-    const std::vector<uint8_t> rawData = BamTagCodec::ToRawData(value, additionalModifier);
+    const auto rawData = BamTagCodec::ToRawData(value, additionalModifier);
     if (rawData.empty()) return false;
 
     bam_aux_append(d_.get(), tagName.c_str(), BamTagCodec::TagTypeCode(value, additionalModifier),
@@ -273,7 +273,11 @@ void BamRecordImpl::MaybeReallocData()
 {
     // about to grow data contents to l_data size, but m_data is our current max.
     // so we may need to grow. if so, use kroundup to double to next power of 2
-    if (d_->m_data < d_->l_data) {
+    //
+    // from sam.h:
+    //   decltype(m_data) = uint32_t
+    //   decltype(l_data) = int
+    if (d_->m_data < static_cast<uint32_t>(d_->l_data)) {
         d_->m_data = d_->l_data;
         kroundup32(d_->m_data);
         d_->data = static_cast<uint8_t*>(realloc(d_->data, d_->m_data));
@@ -349,12 +353,12 @@ bool BamRecordImpl::RemoveTagImpl(const std::string& tagName)
 
 std::string BamRecordImpl::Sequence() const
 {
-    std::string result;
-    result.reserve(d_->core.l_qseq);
-    static const std::string DnaLookup = std::string("=ACMGRSVTWYHKDBN");
+    std::string result(d_->core.l_qseq, '\0');
+    static const constexpr std::array<char, 16> DnaLookup{
+        {'=', 'A', 'C', 'M', 'G', 'R', 'S', 'V', 'T', 'W', 'Y', 'H', 'K', 'D', 'B', 'N'}};
     const uint8_t* seqData = bam_get_seq(d_);
     for (int i = 0; i < d_->core.l_qseq; ++i)
-        result.append(1, DnaLookup[bam_seqi(seqData, i)]);
+        result[i] = DnaLookup[bam_seqi(seqData, i)];
     return result;
 }
 
@@ -390,7 +394,7 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualities(const std::string& sequenc
                                                       const std::string& qualities)
 {
     if (!qualities.empty() && (sequence.size() != qualities.size()))
-        throw std::runtime_error("If QUAL provided, must be of the same length as SEQ");
+        throw std::runtime_error{"If QUAL provided, must be of the same length as SEQ"};
 
     return SetSequenceAndQualitiesInternal(sequence.c_str(), sequence.size(), qualities.c_str(),
                                            false);
@@ -419,7 +423,7 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
     // diffNumBytes: pos -> growing, neg -> shrinking
     const auto encodedSequenceLength = static_cast<int>((sequenceLength + 1) / 2);
     const int oldSeqAndQualLength =
-        static_cast<int>((d_->core.l_qseq + 1) / 2) + d_->core.l_qseq;       // encoded seq + qual
+        ((d_->core.l_qseq + 1) / 2) + d_->core.l_qseq;                       // encoded seq + qual
     const int newSeqAndQualLength = encodedSequenceLength + sequenceLength;  // encoded seq + qual
     const int diffNumBytes = newSeqAndQualLength - oldSeqAndQualLength;
     const int oldLengthData = d_->l_data;
@@ -427,10 +431,9 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
     MaybeReallocData();
 
     // shift trailing data (tags) as needed
-    const uint8_t* oldTagStart = bam_get_aux(d_);
+    const unsigned char* oldTagStart = bam_get_aux(d_);
     const size_t trailingDataLength =
-        oldLengthData - (reinterpret_cast<const unsigned char*>(oldTagStart) -
-                         reinterpret_cast<const unsigned char*>(d_->data));
+        oldLengthData - (oldTagStart - reinterpret_cast<const unsigned char*>(d_->data));
     d_->core.l_qseq = sequenceLength;
     uint8_t* newTagStart = bam_get_aux(d_);
     memmove(newTagStart, oldTagStart, trailingDataLength);
@@ -459,7 +462,7 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
 
 int BamRecordImpl::TagOffset(const std::string& tagName) const
 {
-    if (tagName.size() != 2) throw std::runtime_error("invalid tag name size");
+    if (tagName.size() != 2) throw std::runtime_error{"invalid tag name size"};
 
     if (tagOffsets_.empty()) UpdateTagMap();
 
@@ -472,7 +475,7 @@ int BamRecordImpl::TagOffset(const std::string& tagName) const
 BamRecordImpl& BamRecordImpl::Tags(const TagCollection& tags)
 {
     // convert tags to binary
-    const std::vector<uint8_t>& tagData = BamTagCodec::Encode(tags);
+    const std::vector<uint8_t> tagData = BamTagCodec::Encode(tags);
     const size_t numBytes = tagData.size();
     const uint8_t* data = tagData.data();
 
@@ -501,15 +504,15 @@ TagCollection BamRecordImpl::Tags() const
 
 Tag BamRecordImpl::TagValue(const std::string& tagName) const
 {
-    if (tagName.size() != 2) return Tag();
+    if (tagName.size() != 2) return {};
 
     const int offset = TagOffset(tagName);
-    if (offset == -1) return Tag();
+    if (offset == -1) return {};
 
     bam1_t* b = d_.get();
     assert(bam_get_aux(b));
     uint8_t* tagData = bam_get_aux(b) + offset;
-    if (offset >= b->l_data) return Tag();
+    if (offset >= b->l_data) return {};
 
     // skip tag name
     return BamTagCodec::FromRawData(tagData);
@@ -523,10 +526,8 @@ Tag BamRecordImpl::TagValue(const BamRecordTag tag) const
 void BamRecordImpl::UpdateTagMap() const
 {
     // clear out offsets, leave map structure basically intact
-    auto tagIter = tagOffsets_.begin();
-    auto tagEnd = tagOffsets_.end();
-    for (; tagIter != tagEnd; ++tagIter)
-        tagIter->second = -1;
+    for (auto& tag : tagOffsets_)
+        tag.second = -1;
 
     const uint8_t* tagStart = bam_get_aux(d_);
     if (tagStart == nullptr) return;
@@ -594,8 +595,8 @@ void BamRecordImpl::UpdateTagMap() const
 
                     // unknown subTagType
                     default:
-                        throw std::runtime_error("unsupported array-tag-type encountered: " +
-                                                 std::string(1, subTagType));
+                        throw std::runtime_error{"unsupported array-tag-type encountered: " +
+                                                 std::string{1, subTagType}};
                 }
 
                 uint32_t numElements = 0;
@@ -606,8 +607,8 @@ void BamRecordImpl::UpdateTagMap() const
 
             // unknown tagType
             default:
-                throw std::runtime_error("unsupported tag-type encountered: " +
-                                         std::string(1, tagType));
+                throw std::runtime_error{"unsupported tag-type encountered: " +
+                                         std::string{1, tagType}};
         }
     }
 }

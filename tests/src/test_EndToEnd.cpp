@@ -6,6 +6,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <htslib/sam.h>
@@ -19,7 +20,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace EndToEndTests {
 
@@ -50,28 +50,28 @@ struct BamHdrDeleter
     }
 };
 
-const string inputBamFn = PbbamTestsConfig::Data_Dir + "/aligned.bam";
-const string goldStandardSamFn = PbbamTestsConfig::Data_Dir + "/aligned.sam";
-const string generatedBamFn = PbbamTestsConfig::GeneratedData_Dir + "/generated.bam";
-const string generatedSamFn = PbbamTestsConfig::GeneratedData_Dir + "/generated.sam";
-const vector<string> generatedFiles = {generatedBamFn, generatedSamFn};
+const std::string inputBamFn = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+const std::string goldStandardSamFn = PbbamTestsConfig::Data_Dir + "/aligned.sam";
+const std::string generatedBamFn = PbbamTestsConfig::GeneratedData_Dir + "/generated.bam";
+const std::string generatedSamFn = PbbamTestsConfig::GeneratedData_Dir + "/generated.sam";
+const std::vector<std::string> generatedFiles = {generatedBamFn, generatedSamFn};
 
-static inline int RunBam2Sam(const string& bamFn, const string& samFn,
-                             const string& args = string())
+static inline int RunBam2Sam(const std::string& bamFn, const std::string& samFn,
+                             const std::string& args = std::string())
 {
-    stringstream s;
+    std::ostringstream s;
     s << PbbamTestsConfig::Bam2Sam << " " << args << " " << bamFn << " > " << samFn;
     return system(s.str().c_str());
 }
 
-static inline int RunDiff(const string& fn1, const string& fn2)
+static inline int RunDiff(const std::string& fn1, const std::string& fn2)
 {
-    stringstream s;
+    std::ostringstream s;
     s << "diff " << fn1 << " " << fn2;
     return system(s.str().c_str());
 }
 
-static inline void Remove(const vector<string>& files)
+static inline void Remove(const std::vector<std::string>& files)
 {
     for (const auto& fn : files)
         remove(fn.c_str());
@@ -98,26 +98,26 @@ TEST(EndToEndTest, ReadAndWrite_PureHtslib)
 
         // open files
 
-        unique_ptr<samFile, EndToEndTests::SamFileDeleter> inWrapper(
+        std::unique_ptr<samFile, EndToEndTests::SamFileDeleter> inWrapper(
             sam_open(EndToEndTests::inputBamFn.c_str(), "r"));
         samFile* in = inWrapper.get();
         ASSERT_TRUE(in);
 
-        unique_ptr<samFile, EndToEndTests::SamFileDeleter> outWrapper(
+        std::unique_ptr<samFile, EndToEndTests::SamFileDeleter> outWrapper(
             sam_open(EndToEndTests::generatedBamFn.c_str(), "wb"));
         samFile* out = outWrapper.get();
         ASSERT_TRUE(out);
 
         // fetch & write header
 
-        unique_ptr<bam_hdr_t, EndToEndTests::BamHdrDeleter> headerWrapper(sam_hdr_read(in));
+        std::unique_ptr<bam_hdr_t, EndToEndTests::BamHdrDeleter> headerWrapper(sam_hdr_read(in));
         bam_hdr_t* hdr = headerWrapper.get();
         ASSERT_TRUE(hdr);
         ASSERT_EQ(0, sam_hdr_write(out, hdr));
 
         // fetch & write records
 
-        unique_ptr<bam1_t, EndToEndTests::Bam1Deleter> record(bam_init1());
+        std::unique_ptr<bam1_t, EndToEndTests::Bam1Deleter> record(bam_init1());
         bam1_t* b = record.get();
         ASSERT_TRUE(b);
 

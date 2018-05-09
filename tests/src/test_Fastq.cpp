@@ -11,7 +11,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace FastqTests {
 
@@ -75,7 +74,7 @@ TEST(FastqSequenceTest, BasicConstructorsOk)
     EXPECT_EQ("GATTACA", seq1.Bases());
     EXPECT_EQ("[[[[[[[", seq1.Qualities().Fastq());
 
-    const auto quals = vector<uint8_t>{58, 58, 58, 58, 58, 58, 58};
+    const auto quals = std::vector<uint8_t>{58, 58, 58, 58, 58, 58, 58};
     FastqSequence seq2{"1", "GATTACA", QualityValues{quals}};
     EXPECT_EQ("1", seq2.Name());
     EXPECT_EQ("GATTACA", seq2.Bases());
@@ -84,7 +83,7 @@ TEST(FastqSequenceTest, BasicConstructorsOk)
 
 TEST(FastqReaderTest, IterableOk)
 {
-    const string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fq";
+    const std::string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fq";
     FastqReader reader{fn};
 
     size_t count = 0;
@@ -98,7 +97,7 @@ TEST(FastqReaderTest, IterableOk)
 
 TEST(FastqReaderTest, ReadAllOk)
 {
-    const string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fq";
+    const std::string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fq";
 
     size_t count = 0;
     for (const auto& seq : FastqReader::ReadAll(fn)) {

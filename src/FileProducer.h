@@ -27,7 +27,7 @@ protected:
 
     // Initializes FileProducer with specified target filename. Temp filename is
     // set to target filename plus ".tmp" suffix.
-    FileProducer(const std::string& targetFilename);
+    FileProducer(std::string targetFilename);
 
     // Initializes FileProducer with specified target filename & explicit temp
     // filename.

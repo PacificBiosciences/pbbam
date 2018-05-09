@@ -74,10 +74,10 @@ public:
     /// \{
 
     NamespaceRegistry();
-    NamespaceRegistry(const NamespaceRegistry& other) = default;
-    NamespaceRegistry(NamespaceRegistry&& other) = default;
-    NamespaceRegistry& operator=(const NamespaceRegistry& other) = default;
-    NamespaceRegistry& operator=(NamespaceRegistry&& other) = default;
+    NamespaceRegistry(const NamespaceRegistry&) = default;
+    NamespaceRegistry(NamespaceRegistry&&) = default;
+    NamespaceRegistry& operator=(const NamespaceRegistry&) = default;
+    NamespaceRegistry& operator=(NamespaceRegistry&&) = default;
     ~NamespaceRegistry() = default;
 
     /// \}

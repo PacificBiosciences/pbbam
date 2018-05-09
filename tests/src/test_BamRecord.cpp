@@ -17,7 +17,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace BamRecordTests {
 
@@ -25,10 +24,10 @@ static
 BamRecordImpl CreateBamImpl()
 {
     TagCollection tags;
-    tags["HX"] = string("1abc75");
+    tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = vector<uint8_t>({34, 5, 125});
-    tags["XY"] = static_cast<int32_t>(-42);
+    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["XY"] = int32_t{-42};
 
     BamRecordImpl bam;
     bam.Bin(42);
@@ -79,58 +78,58 @@ void CheckRawData(const BamRecord& bam)
 { CheckRawData(bam.Impl()); }
 
 static
-BamRecordImpl MakeCigaredImpl(const string& seq,
-                              const string& cigar,
+BamRecordImpl MakeCigaredImpl(const std::string& seq,
+                              const std::string& cigar,
                               const Strand strand)
 {
     BamRecordImpl impl;
     impl.SetMapped(true).ReferenceId(0).Position(0).MapQuality(0);
     impl.CigarData(Cigar::FromStdString(cigar));
     impl.MateReferenceId(-1).MatePosition(-1).InsertSize(0);
-    impl.SetSequenceAndQualities(seq, string(seq.size(), '*'));
+    impl.SetSequenceAndQualities(seq, std::string(seq.size(), '*'));
     impl.SetReverseStrand(strand == Strand::REVERSE);
     return impl;
 }
 
 static inline
-BamRecord MakeCigaredRecord(const string& seq,
-                            const string& cigar,
+BamRecord MakeCigaredRecord(const std::string& seq,
+                            const std::string& cigar,
                             const Strand strand)
 { return BamRecord{ MakeCigaredImpl(seq, cigar, strand) }; }
 
 static
-BamRecord MakeCigaredBaseRecord(const string& bases,
-                                const string& cigar,
+BamRecord MakeCigaredBaseRecord(const std::string& bases,
+                                const std::string& cigar,
                                 const Strand strand)
 {
     TagCollection tags;
     tags["dt"] = bases;
     tags["st"] = bases;
 
-    const string seq = string(bases.size(), 'N');
+    const std::string seq = std::string(bases.size(), 'N');
     BamRecordImpl impl = MakeCigaredImpl(seq, cigar, strand);
     impl.Tags(tags);
     return BamRecord(std::move(impl));
 }
 
 static
-BamRecord MakeCigaredFrameRecord(const vector<uint16_t>& frames,
-                                 const string& cigar,
+BamRecord MakeCigaredFrameRecord(const std::vector<uint16_t>& frames,
+                                 const std::string& cigar,
                                  const Strand strand)
 {
     TagCollection tags;
     tags["ip"] = frames;
     tags["pw"] = frames;
 
-    const string seq = string(frames.size(), 'N');
+    const std::string seq = std::string(frames.size(), 'N');
     BamRecordImpl impl = MakeCigaredImpl(seq, cigar, strand);
     impl.Tags(tags);
     return BamRecord(std::move(impl));
 }
 
 static
-BamRecord MakeCigaredQualRecord(const string& quals,
-                                const string& cigar,
+BamRecord MakeCigaredQualRecord(const std::string& quals,
+                                const std::string& cigar,
                                 const Strand strand)
 {
     TagCollection tags;
@@ -139,17 +138,17 @@ BamRecord MakeCigaredQualRecord(const string& quals,
     tags["mq"] = quals;
     tags["sq"] = quals;
 
-    const string seq = string(quals.size(), 'N');
+    const std::string seq = std::string(quals.size(), 'N');
     BamRecordImpl impl = MakeCigaredImpl(seq, cigar, strand);
     impl.Tags(tags);
     return BamRecord(std::move(impl));
 }
 
 static
-BamRecord MakeCigaredPulseBaseRecord(const string& seqBases,
-                                     const string& pulseCalls,
-                                     const string& pulseBases,
-                                     const string& cigar,
+BamRecord MakeCigaredPulseBaseRecord(const std::string& seqBases,
+                                     const std::string& pulseCalls,
+                                     const std::string& pulseBases,
+                                     const std::string& cigar,
                                      const Strand strand)
 {
     TagCollection tags;
@@ -162,10 +161,10 @@ BamRecord MakeCigaredPulseBaseRecord(const string& seqBases,
 }
 
 static
-BamRecord MakeCigaredPulseQualRecord(const string& seqBases,
-                                     const string& pulseCalls,
-                                     const string& pulseQuals,
-                                     const string& cigar,
+BamRecord MakeCigaredPulseQualRecord(const std::string& seqBases,
+                                     const std::string& pulseCalls,
+                                     const std::string& pulseQuals,
+                                     const std::string& cigar,
                                      const Strand strand)
 {
     TagCollection tags;
@@ -180,10 +179,10 @@ BamRecord MakeCigaredPulseQualRecord(const string& seqBases,
 }
 
 static
-BamRecord MakeCigaredPulseFrameRecord(const string& seqBases,
-                                     const string& pulseCalls,
-                                     const vector<uint16_t>& pulseFrames,
-                                     const string& cigar,
+BamRecord MakeCigaredPulseFrameRecord(const std::string& seqBases,
+                                     const std::string& pulseCalls,
+                                     const std::vector<uint16_t>& pulseFrames,
+                                     const std::string& cigar,
                                      const Strand strand)
 {
     TagCollection tags;
@@ -197,10 +196,10 @@ BamRecord MakeCigaredPulseFrameRecord(const string& seqBases,
 }
 
 static
-BamRecord MakeCigaredPulseUIntRecord(const string& seqBases,
-                                     const string& pulseCalls,
-                                     const vector<uint32_t>& pulseUInts,
-                                     const string& cigar,
+BamRecord MakeCigaredPulseUIntRecord(const std::string& seqBases,
+                                     const std::string& pulseCalls,
+                                     const std::vector<uint32_t>& pulseUInts,
+                                     const std::string& cigar,
                                      const Strand strand)
 {
     TagCollection tags;
@@ -242,12 +241,12 @@ public:
     T ReverseNativeAlignedClipped() const  { return d_.at(11); }
 
 private:
-    vector<T> d_;
+    std::vector<T> d_;
 };
 
 // generic data type checker on the various requested states
 template<typename DataType, typename MakeRecordType, typename FetchDataType>
-void CheckAlignAndClip(const string& cigar,
+void CheckAlignAndClip(const std::string& cigar,
                        const DataType& input,
                        const BamRecordTests::ExpectedResult<DataType>& e,
                        const MakeRecordType& makeRecord,
@@ -274,9 +273,9 @@ void CheckAlignAndClip(const string& cigar,
 }
 
 template<typename DataType, typename MakeRecordType, typename FetchDataType>
-void CheckPulseDataAlignAndClip(const string& cigar,
-                                const string& seqBases,
-                                const string& pulseCalls,
+void CheckPulseDataAlignAndClip(const std::string& cigar,
+                                const std::string& seqBases,
+                                const std::string& pulseCalls,
                                 const DataType& input,
                                 const BamRecordTests::ExpectedResult<DataType>& allPulses,
                                 const BamRecordTests::ExpectedResult<DataType>& basecallsOnly,
@@ -314,15 +313,15 @@ void CheckPulseDataAlignAndClip(const string& cigar,
 }
 
 static
-void CheckBaseTagsClippedAndAligned(const string& cigar,
-                                    const string& input,
-                                    const ExpectedResult<string>& e)
+void CheckBaseTagsClippedAndAligned(const std::string& cigar,
+                                    const std::string& input,
+                                    const ExpectedResult<std::string>& e)
 {
     // aligned record + DeletionTag, SubstitutionTag
-    auto makeRecord = [](const string& bases,
-                         const string& cigar,
-                         const Strand strand)
-    { return MakeCigaredBaseRecord(bases, cigar, strand); };
+    auto makeRecord = [](const std::string& newBases,
+                         const std::string& newCigar,
+                         const Strand newStrand)
+    { return MakeCigaredBaseRecord(newBases, newCigar, newStrand); };
 
     // DeletionTag
     CheckAlignAndClip(cigar, input, e, makeRecord,
@@ -344,16 +343,16 @@ void CheckBaseTagsClippedAndAligned(const string& cigar,
 }
 
 static
-void CheckFrameTagsClippedAndAligned(const string& cigar,
-                                     const vector<uint16_t>& input,
-                                     const ExpectedResult<vector<uint16_t> >& e)
+void CheckFrameTagsClippedAndAligned(const std::string& cigar,
+                                     const std::vector<uint16_t>& input,
+                                     const ExpectedResult<std::vector<uint16_t> >& e)
 {
 
     // aligned record + IPD, PulseWidth
-    auto makeRecord = [](const vector<uint16_t>& frames,
-                         const string& cigar,
-                         const Strand strand)
-    { return BamRecordTests::MakeCigaredFrameRecord(frames, cigar, strand); };
+    auto makeRecord = [](const std::vector<uint16_t>& newFrames,
+                         const std::string& newCigar,
+                         const Strand newStrand)
+    { return BamRecordTests::MakeCigaredFrameRecord(newFrames, newCigar, newStrand); };
 
     // IPD
     CheckAlignAndClip(cigar, input, e, makeRecord,
@@ -375,15 +374,15 @@ void CheckFrameTagsClippedAndAligned(const string& cigar,
 }
 
 static
-void CheckQualityTagsClippedAndAligned(const string& cigar,
-                                       const string& input,
-                                       const ExpectedResult<string>& e)
+void CheckQualityTagsClippedAndAligned(const std::string& cigar,
+                                       const std::string& input,
+                                       const ExpectedResult<std::string>& e)
 {
     // aligned record + DeletionQV, InsertionQV, MergeQV, SubstitutionQV
-    auto makeRecord = [](const string& quals,
-                         const string& cigar,
-                         const Strand strand)
-    { return BamRecordTests::MakeCigaredQualRecord(quals, cigar, strand); };
+    auto makeRecord = [](const std::string& newQuals,
+                         const std::string& newCigar,
+                         const Strand newStrand)
+    { return BamRecordTests::MakeCigaredQualRecord(newQuals, newCigar, newStrand); };
 
     // DeletionQV
     CheckAlignAndClip(cigar, input, e, makeRecord,
@@ -423,18 +422,18 @@ void CheckQualityTagsClippedAndAligned(const string& cigar,
 }
 
 static
-void CheckQualitiesClippedAndAligned(const string& cigar,
-                                     const string& input,
-                                     const ExpectedResult<string>& e)
+void CheckQualitiesClippedAndAligned(const std::string& cigar,
+                                     const std::string& input,
+                                     const ExpectedResult<std::string>& e)
 {
     // aligned record w/ dummy SEQ & QUALs under test
-    auto makeRecord = [](const string& quals,
-                         const string& cigar,
-                         const Strand strand)
+    auto makeRecord = [](const std::string& newQuals,
+                         const std::string& newCigar,
+                         const Strand newStrand)
     {
-        const string seq = string(quals.size(), 'N');
-        auto record = BamRecordTests::MakeCigaredRecord(seq, cigar, strand);
-        record.Impl().SetSequenceAndQualities(seq, quals);
+        const std::string seq = std::string(newQuals.size(), 'N');
+        auto record = BamRecordTests::MakeCigaredRecord(seq, newCigar, newStrand);
+        record.Impl().SetSequenceAndQualities(seq, newQuals);
         return record;
     };
 
@@ -449,15 +448,15 @@ void CheckQualitiesClippedAndAligned(const string& cigar,
 }
 
 static
-void CheckSequenceClippedAndAligned(const string& cigar,
-                                    const string& input,
-                                    const ExpectedResult<string>& e)
+void CheckSequenceClippedAndAligned(const std::string& cigar,
+                                    const std::string& input,
+                                    const ExpectedResult<std::string>& e)
 {
     // aligned record w/ SEQ
-    auto makeRecord = [](const string& seq,
-                         const string& cigar,
-                         const Strand strand)
-    { return BamRecordTests::MakeCigaredRecord(seq, cigar, strand); };
+    auto makeRecord = [](const std::string& newSeq,
+                         const std::string& newCigar,
+                         const Strand newStrand)
+    { return BamRecordTests::MakeCigaredRecord(newSeq, newCigar, newStrand); };
 
     // SEQ
     CheckAlignAndClip(cigar, input, e, makeRecord,
@@ -470,20 +469,20 @@ void CheckSequenceClippedAndAligned(const string& cigar,
 }
 
 static
-void CheckPulseBaseTags(const string& cigar,
-                        const string& seqBases,
-                        const string& pulseCalls,
-                        const string& pulseBases,
-                        const ExpectedResult<string>& allPulses,
-                        const ExpectedResult<string>& basecallsOnly)
+void CheckPulseBaseTags(const std::string& cigar,
+                        const std::string& seqBases,
+                        const std::string& pulseCalls,
+                        const std::string& pulseBases,
+                        const ExpectedResult<std::string>& allPulses,
+                        const ExpectedResult<std::string>& basecallsOnly)
 {
     // aligned record + AltLabelTag
-    auto makeRecord = [](const string& seqBases,
-                         const string& pulseCalls,
-                         const string& pulseBases,
-                         const string& cigar,
-                         const Strand strand)
-    { return MakeCigaredPulseBaseRecord(seqBases, pulseCalls, pulseBases, cigar, strand); };
+    auto makeRecord = [](const std::string& newSeqBases,
+                         const std::string& newPulseCalls,
+                         const std::string& newPulseBases,
+                         const std::string& newCigar,
+                         const Strand newStrand)
+    { return MakeCigaredPulseBaseRecord(newSeqBases, newPulseCalls, newPulseBases, newCigar, newStrand); };
 
     // AltLabelTag
     CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseBases, allPulses, basecallsOnly, makeRecord,
@@ -506,20 +505,20 @@ void CheckPulseBaseTags(const string& cigar,
 }
 
 static
-void CheckPulseFrameTags(const string& cigar,
-                         const string& seqBases,
-                         const string& pulseCalls,
-                         const vector<uint16_t>& pulseFrames,
-                         const ExpectedResult<vector<uint16_t>>& allPulses,
-                         const ExpectedResult<vector<uint16_t>>& basecallsOnly)
+void CheckPulseFrameTags(const std::string& cigar,
+                         const std::string& seqBases,
+                         const std::string& pulseCalls,
+                         const std::vector<uint16_t>& pulseFrames,
+                         const ExpectedResult<std::vector<uint16_t>>& allPulses,
+                         const ExpectedResult<std::vector<uint16_t>>& basecallsOnly)
 {
     // aligned record + PrePulseFrames
-    auto makeRecord = [](const string& seqBases,
-                         const string& pulseCalls,
-                         const vector<uint16_t>& pulseFrames,
-                         const string& cigar,
-                         const Strand strand)
-    { return MakeCigaredPulseFrameRecord(seqBases, pulseCalls, pulseFrames, cigar, strand); };
+    auto makeRecord = [](const std::string& newSeqBases,
+                         const std::string& newPulseCalls,
+                         const std::vector<uint16_t>& newPulseFrames,
+                         const std::string& newCigar,
+                         const Strand newStrand)
+    { return MakeCigaredPulseFrameRecord(newSeqBases, newPulseCalls, newPulseFrames, newCigar, newStrand); };
 
     // PrePulseFrame
     CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseFrames, allPulses, basecallsOnly, makeRecord,
@@ -550,20 +549,20 @@ void CheckPulseFrameTags(const string& cigar,
 */
 
 static
-void CheckPulseQualityTags(const string& cigar,
-                           const string& seqBases,
-                           const string& pulseCalls,
-                           const string& pulseQuals,
-                           const ExpectedResult<string>& allPulses,
-                           const ExpectedResult<string>& basecallsOnly)
+void CheckPulseQualityTags(const std::string& cigar,
+                           const std::string& seqBases,
+                           const std::string& pulseCalls,
+                           const std::string& pulseQuals,
+                           const ExpectedResult<std::string>& allPulses,
+                           const ExpectedResult<std::string>& basecallsOnly)
 {
     // aligned record + AltLabelQV
-    auto makeRecord = [](const string& seqBases,
-                         const string& pulseCalls,
-                         const string& pulseQuals,
-                         const string& cigar,
-                         const Strand strand)
-    { return MakeCigaredPulseQualRecord(seqBases, pulseCalls, pulseQuals, cigar, strand); };
+    auto makeRecord = [](const std::string& newSeqBases,
+                         const std::string& newPulseCalls,
+                         const std::string& newPulseQuals,
+                         const std::string& newCigar,
+                         const Strand newStrand)
+    { return MakeCigaredPulseQualRecord(newSeqBases, newPulseCalls, newPulseQuals, newCigar, newStrand); };
 
     // AltLabelQV
     CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseQuals, allPulses, basecallsOnly, makeRecord,
@@ -595,20 +594,20 @@ void CheckPulseQualityTags(const string& cigar,
 }
 
 static
-void CheckPulseUIntTags(const string& cigar,
-                        const string& seqBases,
-                        const string& pulseCalls,
-                        const vector<uint32_t>& startFrames,
-                        const ExpectedResult<vector<uint32_t>>& allPulses,
-                        const ExpectedResult<vector<uint32_t>>& basecallsOnly)
+void CheckPulseUIntTags(const std::string& cigar,
+                        const std::string& seqBases,
+                        const std::string& pulseCalls,
+                        const std::vector<uint32_t>& startFrames,
+                        const ExpectedResult<std::vector<uint32_t>>& allPulses,
+                        const ExpectedResult<std::vector<uint32_t>>& basecallsOnly)
 {
    // aligned record + StartFrame
-   auto makeRecord = [](const string& seqBases,
-                        const string& pulseCalls,
-                        const vector<uint32_t>& startFrames,
-                        const string& cigar,
-                        const Strand strand)
-   { return MakeCigaredPulseUIntRecord(seqBases, pulseCalls, startFrames, cigar, strand); };
+   auto makeRecord = [](const std::string& newSeqBases,
+                        const std::string& newPulseCalls,
+                        const std::vector<uint32_t>& newStartFrames,
+                        const std::string& newCigar,
+                        const Strand newStrand)
+   { return MakeCigaredPulseUIntRecord(newSeqBases, newPulseCalls, newStartFrames, newCigar, newStrand); };
 
    // StartFrame
    CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, startFrames, allPulses, basecallsOnly, makeRecord,
@@ -628,7 +627,7 @@ void CheckPulseUIntTags(const string& cigar,
 TEST(BamRecordTest, DefaultValues)
 {
     BamRecord bam;
-    const string emptyString;
+    const std::string emptyString;
 
     // BamRecordImpl data
     EXPECT_EQ(0, bam.Impl().Bin());
@@ -671,8 +670,8 @@ TEST(BamRecordTest, DefaultValues)
 
     EXPECT_THROW(bam.HoleNumber(), std::exception);
     EXPECT_THROW(bam.NumPasses(), std::exception);
-    EXPECT_EQ(Position(0), bam.QueryEnd());
-    EXPECT_EQ(Position(0), bam.QueryStart());
+    EXPECT_EQ(int32_t{0}, bam.QueryEnd());
+    EXPECT_EQ(int32_t{0}, bam.QueryStart());
     EXPECT_THROW(bam.ReadAccuracy(), std::exception);
 
     EXPECT_FALSE(bam.HasDeletionQV());
@@ -707,11 +706,11 @@ TEST(BamRecordTest, FromBamRecordImpl)
     EXPECT_EQ(42, genericBam.Position());
     EXPECT_EQ(42, genericBam.ReferenceId());
 
-    const TagCollection& genericTags = genericBam.Tags();
+    const TagCollection genericTags = genericBam.Tags();
     EXPECT_TRUE(genericTags.at("HX").HasModifier(TagModifier::HEX_STRING));
-    EXPECT_EQ(string("1abc75"), genericTags.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), genericTags.at("XY").ToInt32());
-    EXPECT_EQ(vector<uint8_t>({34, 5, 125}), genericTags.at("CA").ToUInt8Array());
+    EXPECT_EQ(std::string("1abc75"), genericTags.at("HX").ToString());
+    EXPECT_EQ(int32_t{-42}, genericTags.at("XY").ToInt32());
+    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), genericTags.at("CA").ToUInt8Array());
 
     // copy ctor
     BamRecord bam1(genericBam);
@@ -725,11 +724,11 @@ TEST(BamRecordTest, FromBamRecordImpl)
     EXPECT_EQ(42, bam1.Impl().Position());
     EXPECT_EQ(42, bam1.Impl().ReferenceId());
 
-    const TagCollection& bam1Tags = bam1.Impl().Tags();
+    const TagCollection bam1Tags = bam1.Impl().Tags();
     EXPECT_TRUE(bam1Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
-    EXPECT_EQ(string("1abc75"), bam1Tags.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), bam1Tags.at("XY").ToInt32());
-    EXPECT_EQ(vector<uint8_t>({34, 5, 125}), bam1Tags.at("CA").ToUInt8Array());
+    EXPECT_EQ(std::string("1abc75"), bam1Tags.at("HX").ToString());
+    EXPECT_EQ(int32_t{-42}, bam1Tags.at("XY").ToInt32());
+    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), bam1Tags.at("CA").ToUInt8Array());
 
     // copy assignment
     BamRecord bam2;
@@ -744,11 +743,11 @@ TEST(BamRecordTest, FromBamRecordImpl)
     EXPECT_EQ(42, bam2.Impl().Position());
     EXPECT_EQ(42, bam2.Impl().ReferenceId());
 
-    const TagCollection& bam2Tags = bam2.Impl().Tags();
+    const TagCollection bam2Tags = bam2.Impl().Tags();
     EXPECT_TRUE(bam2Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
-    EXPECT_EQ(string("1abc75"), bam2Tags.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), bam2Tags.at("XY").ToInt32());
-    EXPECT_EQ(vector<uint8_t>({34, 5, 125}), bam2Tags.at("CA").ToUInt8Array());
+    EXPECT_EQ(std::string("1abc75"), bam2Tags.at("HX").ToString());
+    EXPECT_EQ(int32_t{-42}, bam2Tags.at("XY").ToInt32());
+    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), bam2Tags.at("CA").ToUInt8Array());
 
     // change genericBam, make sure we deep copied bam1 & bam2
     genericBam.Position(2000);
@@ -762,7 +761,7 @@ TEST(BamRecordTest, FromBamRecordImpl)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpessimizing-move"
 #endif
-    BamRecord bam3(move(BamRecordTests::CreateBamImpl()));
+    BamRecord bam3(std::move(BamRecordTests::CreateBamImpl()));
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
@@ -776,11 +775,11 @@ TEST(BamRecordTest, FromBamRecordImpl)
     EXPECT_EQ(42, bam3.Impl().Position());
     EXPECT_EQ(42, bam3.Impl().ReferenceId());
 
-    const TagCollection& bam3Tags = bam3.Impl().Tags();
+    const TagCollection bam3Tags = bam3.Impl().Tags();
     EXPECT_TRUE(bam3Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
-    EXPECT_EQ(string("1abc75"), bam3Tags.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), bam3Tags.at("XY").ToInt32());
-    EXPECT_EQ(vector<uint8_t>({34, 5, 125}), bam3Tags.at("CA").ToUInt8Array());
+    EXPECT_EQ(std::string("1abc75"), bam3Tags.at("HX").ToString());
+    EXPECT_EQ(int32_t{-42}, bam3Tags.at("XY").ToInt32());
+    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), bam3Tags.at("CA").ToUInt8Array());
 
     // move assignment
     BamRecord bam4;
@@ -788,7 +787,7 @@ TEST(BamRecordTest, FromBamRecordImpl)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpessimizing-move"
 #endif
-    bam4 = move(BamRecordTests::CreateBamImpl());
+    bam4 = std::move(BamRecordTests::CreateBamImpl());
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
@@ -802,11 +801,11 @@ TEST(BamRecordTest, FromBamRecordImpl)
     EXPECT_EQ(42, bam4.Impl().Position());
     EXPECT_EQ(42, bam4.Impl().ReferenceId());
 
-    const TagCollection& bam4Tags = bam4.Impl().Tags();
+    const TagCollection bam4Tags = bam4.Impl().Tags();
     EXPECT_TRUE(bam4Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
-    EXPECT_EQ(string("1abc75"), bam4Tags.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), bam4Tags.at("XY").ToInt32());
-    EXPECT_EQ(vector<uint8_t>({34, 5, 125}), bam4Tags.at("CA").ToUInt8Array());
+    EXPECT_EQ(std::string("1abc75"), bam4Tags.at("HX").ToString());
+    EXPECT_EQ(int32_t{-42}, bam4Tags.at("XY").ToInt32());
+    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), bam4Tags.at("CA").ToUInt8Array());
 }
 
 TEST(BamRecordTest, SelfAssignmentTolerated)
@@ -822,10 +821,10 @@ TEST(BamRecordTest, SelfAssignmentTolerated)
     bam1.Impl().ReferenceId(42);
 
     TagCollection tags;
-    tags["HX"] = string("1abc75");
+    tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = vector<uint8_t>({34, 5, 125});
-    tags["XY"] = static_cast<int32_t>(-42);
+    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["XY"] = int32_t{-42};
     bam1.Impl().Tags(tags);
 
     bam1 = bam1;
@@ -839,11 +838,11 @@ TEST(BamRecordTest, SelfAssignmentTolerated)
     EXPECT_EQ(42, bam1.Impl().Position());
     EXPECT_EQ(42, bam1.Impl().ReferenceId());
 
-    const TagCollection& fetchedTags1 = bam1.Impl().Tags();
+    const TagCollection fetchedTags1 = bam1.Impl().Tags();
     EXPECT_TRUE(fetchedTags1.at("HX").HasModifier(TagModifier::HEX_STRING));
-    EXPECT_EQ(string("1abc75"), fetchedTags1.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags1.at("XY").ToInt32());
-    EXPECT_EQ(vector<uint8_t>({34, 5, 125}), fetchedTags1.at("CA").ToUInt8Array());
+    EXPECT_EQ(std::string("1abc75"), fetchedTags1.at("HX").ToString());
+    EXPECT_EQ(int32_t{-42}, fetchedTags1.at("XY").ToInt32());
+    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags1.at("CA").ToUInt8Array());
 
     BamRecordTests::CheckRawData(bam1);
 }
@@ -857,7 +856,7 @@ TEST(BamRecordTest, CoreSetters)
     testQVs.push_back(0);
     testQVs.push_back(1);
 
-    const string testTags = "GATTACA";
+    const std::string testTags = "GATTACA";
 
     // now set PacBio data
 //    bam.AlignedStart(42);
@@ -905,11 +904,11 @@ TEST(BamRecordTest, CoreSetters)
 //    EXPECT_EQ(testTags, bam.SubstitutionTags());
 
     // check tags
-    const TagCollection& fetchedTags = bam.Impl().Tags();
+    const TagCollection fetchedTags = bam.Impl().Tags();
     EXPECT_TRUE(fetchedTags.at("HX").HasModifier(TagModifier::HEX_STRING));
-    EXPECT_EQ(string("1abc75"), fetchedTags.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags.at("XY").ToInt32());
-    EXPECT_EQ(vector<uint8_t>({34, 5, 125}), fetchedTags.at("CA").ToUInt8Array());
+    EXPECT_EQ(std::string("1abc75"), fetchedTags.at("HX").ToString());
+    EXPECT_EQ(int32_t{-42}, fetchedTags.at("XY").ToInt32());
+    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags.at("CA").ToUInt8Array());
 
     BamRecordTests::CheckRawData(bam);
 }

@@ -18,10 +18,7 @@ inline std::vector<uint16_t>& Frames::DataRaw()
 inline std::vector<uint8_t> Frames::Encode() const
 { return Frames::Encode(data_); }
 
-inline Frames& Frames::Data(const std::vector<uint16_t>& frames)
-{ data_ = frames; return *this; }
-
-inline Frames& Frames::Data(std::vector<uint16_t>&& frames)
+inline Frames& Frames::Data(std::vector<uint16_t> frames)
 { data_ = std::move(frames); return *this; }
 
 inline std::vector<uint16_t>::const_iterator Frames::begin() const

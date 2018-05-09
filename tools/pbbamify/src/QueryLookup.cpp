@@ -3,30 +3,29 @@
 #include "QueryLookup.h"
 
 #include <pbbam/PbiRawData.h>
+#include <iostream>
 #include <ostream>
 #include <string>
-#include <iostream>
 
 namespace PacBio {
 namespace BAM {
 namespace pbbamify {
 
-std::unique_ptr<QueryLookup> CreateQueryLookup(const PacBio::BAM::DataSet& dataset) {
+std::unique_ptr<QueryLookup> CreateQueryLookup(const PacBio::BAM::DataSet& dataset)
+{
     return std::unique_ptr<QueryLookup>(new QueryLookup(dataset));
 }
 
-QueryLookup::QueryLookup(const PacBio::BAM::DataSet& dataset)
-                        : dataset_(dataset) {
+QueryLookup::QueryLookup(const PacBio::BAM::DataSet& dataset) : dataset_(dataset) {}
 
-}
-
-void QueryLookup::Load() {
+void QueryLookup::Load()
+{
     std::vector<BamFile> bamFiles(dataset_.BamFiles());
 
     // Merge all the read groups for a unified read group lookup.
     PacBio::BAM::BamHeader jointHeader;
     bool headerInitialized = false;
-    for (auto& bamFile: bamFiles) {
+    for (auto& bamFile : bamFiles) {
         auto header = bamFile.Header();
         if (!headerInitialized) {
             jointHeader = header.DeepCopy();
@@ -39,7 +38,7 @@ void QueryLookup::Load() {
     // Set-up a vector of readers for each BAM in the PacBio dataset
     // to allow for random access.
     readers_.clear();
-    for (auto& file: bamFiles) {
+    for (auto& file : bamFiles) {
         auto new_reader = std::make_shared<BamReader>(file);
         readers_.push_back(new_reader);
     }
@@ -80,14 +79,16 @@ void QueryLookup::Load() {
             oss << movieName << '/' << zmw << '/' << "ccs";
             qName = oss.str();
         } else {
-            std::string message = std::string("Unknown read group type '") + type + std::string("'.");
+            std::string message =
+                std::string("Unknown read group type '") + type + std::string("'.");
             throw std::runtime_error(message);
         }
 
         // Sanity check.
         auto it = lookup_.find(qName);
         if (it != lookup_.end()) {
-            std::string message = std::string("More than 1 occurrence of qname '") + qName + std::string("'. Duplicate reads in the dataset?");
+            std::string message = std::string("More than 1 occurrence of qname '") + qName +
+                                  std::string("'. Duplicate reads in the dataset?");
             throw std::runtime_error(message);
         }
 
@@ -95,7 +96,8 @@ void QueryLookup::Load() {
     }
 }
 
-bool QueryLookup::Find(const std::string& qName, BamRecord& record) const {
+bool QueryLookup::Find(const std::string& qName, BamRecord& record) const
+{
     auto it = lookup_.find(qName);
 
     if (it == lookup_.end()) {
@@ -111,6 +113,6 @@ bool QueryLookup::Find(const std::string& qName, BamRecord& record) const {
     return true;
 }
 
-} // namespace pbbamify
-} // namespace BAM
-} // namespace PacBio
+}  // namespace pbbamify
+}  // namespace BAM
+}  // namespace PacBio

@@ -35,7 +35,9 @@ public:
     IndexedFastaReader() = delete;
     IndexedFastaReader(const std::string& filename);
     IndexedFastaReader(const IndexedFastaReader& src);
+    IndexedFastaReader(IndexedFastaReader&&) = default;
     IndexedFastaReader& operator=(const IndexedFastaReader& rhs);
+    IndexedFastaReader& operator=(IndexedFastaReader&&) = default;
     ~IndexedFastaReader();
 
     /// \}
@@ -133,7 +135,7 @@ private:
 
 private:
     void Close();
-    bool Open(const std::string& filename);
+    bool Open(std::string filename);
 };
 
 }  // namespace BAM

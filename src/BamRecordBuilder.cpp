@@ -29,7 +29,7 @@ BamRecordBuilder::BamRecordBuilder()
     cigar_.reserve(256);
 }
 
-BamRecordBuilder::BamRecordBuilder(BamHeader header) : header_(std::move(header))
+BamRecordBuilder::BamRecordBuilder(BamHeader header) : header_{std::move(header)}
 {
     // ensure proper clean slate
     Reset();
@@ -41,14 +41,14 @@ BamRecordBuilder::BamRecordBuilder(BamHeader header) : header_(std::move(header)
     cigar_.reserve(256);
 }
 
-BamRecordBuilder::BamRecordBuilder(const BamRecord& prototype) : header_(prototype.Header())
+BamRecordBuilder::BamRecordBuilder(const BamRecord& prototype) : header_{prototype.Header()}
 {
     Reset(prototype);
 }
 
 BamRecord BamRecordBuilder::Build() const
 {
-    BamRecord result(header_);
+    BamRecord result{header_};
     BuildInPlace(result);
     return result;
 }
@@ -58,11 +58,11 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
     // initialize with basic 'core data'
     auto recordRawData = internal::BamRecordMemory::GetRawData(record);
     if (!recordRawData || !recordRawData->data)
-        throw std::runtime_error("BamRecord memory in invalid state");
+        throw std::runtime_error{"BamRecord memory in invalid state"};
     recordRawData->core = core_;
 
     // setup variable length data
-    const std::vector<uint8_t> encodedTags = BamTagCodec::Encode(tags_);
+    const auto encodedTags = BamTagCodec::Encode(tags_);
 
     const size_t nameLength = name_.size() + 1;
     const size_t numCigarOps = cigar_.size();
@@ -74,7 +74,8 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
 
     // realloc if necessary
     uint8_t* varLengthDataBlock = recordRawData->data;
-    if (!varLengthDataBlock) throw std::runtime_error("BamRecord memory in invalid state");
+    if (!varLengthDataBlock) throw std::runtime_error{"BamRecord memory in invalid state"};
+
     size_t allocatedDataLength = recordRawData->m_data;
     if (allocatedDataLength < dataLength) {
         allocatedDataLength = dataLength;
@@ -100,7 +101,7 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
             encodedCigar[i] = op.Length() << BAM_CIGAR_SHIFT;
             const auto type = static_cast<uint8_t>(op.Type());
             if (type >= 8)
-                throw std::runtime_error("invalid CIGAR op type: " + std::to_string(type));
+                throw std::runtime_error{"invalid CIGAR op type: " + std::to_string(type)};
             encodedCigar[i] |= type;
         }
         memcpy(&varLengthDataBlock[index], &encodedCigar[0], cigarLength);
@@ -131,42 +132,28 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
 
     // tags
     if (tagLength > 0) {
-        if (encodedTags.empty()) throw std::runtime_error("expected tags but none are encoded");
+        if (encodedTags.empty()) throw std::runtime_error{"expected tags but none are encoded"};
         memcpy(&varLengthDataBlock[index], &encodedTags[0], tagLength);
         index += tagLength;
     }
 
     // sanity check
     if (index != dataLength) {
-        throw std::runtime_error("BAM encoding error: expected to write " +
+        throw std::runtime_error{"BAM encoding error: expected to write " +
                                  std::to_string(dataLength) + " bytes but wrote " +
-                                 std::to_string(index) + " bytes instead");
+                                 std::to_string(index) + " bytes instead"};
     }
     return true;
 }
 
-BamRecordBuilder& BamRecordBuilder::Cigar(const PacBio::BAM::Cigar& cigar)
-{
-    core_.n_cigar = cigar.size();
-    cigar_ = cigar;
-    return *this;
-}
-
-BamRecordBuilder& BamRecordBuilder::Cigar(PacBio::BAM::Cigar&& cigar)
+BamRecordBuilder& BamRecordBuilder::Cigar(PacBio::BAM::Cigar cigar)
 {
     core_.n_cigar = cigar.size();
     cigar_ = std::move(cigar);
     return *this;
 }
 
-BamRecordBuilder& BamRecordBuilder::Name(const std::string& name)
-{
-    core_.l_qname = name.size() + 1;  // (NULL-term)
-    name_ = name;
-    return *this;
-}
-
-BamRecordBuilder& BamRecordBuilder::Name(std::string&& name)
+BamRecordBuilder& BamRecordBuilder::Name(std::string name)
 {
     core_.l_qname = name.size() + 1;  // (NULL-term)
     name_ = std::move(name);
@@ -187,17 +174,11 @@ void BamRecordBuilder::Reset()
     tags_.clear();
 }
 
-void BamRecordBuilder::Reset(const BamRecord& prototype)
+void BamRecordBuilder::Reset(BamRecord prototype)
 {
     // ensure clean slate
     Reset();
     header_ = prototype.Header();
-
-    // reset core data
-    const auto rawData =
-        internal::BamRecordMemory::GetRawData(prototype);  //  prototype.impl_.RawData().get();
-    if (!rawData) throw std::runtime_error("BamRecord memory in invalid state");
-    core_ = rawData->core;
 
     // reset variable-length data
     const BamRecordImpl& impl = internal::BamRecordMemory::GetImpl(prototype);
@@ -206,37 +187,15 @@ void BamRecordBuilder::Reset(const BamRecord& prototype)
     qualities_ = impl.Qualities().Fastq();
     cigar_ = impl.CigarData();
     tags_ = impl.Tags();
-}
-
-void BamRecordBuilder::Reset(BamRecord&& prototype)
-{
-    // ensure clean slate
-    Reset();
-    header_ = prototype.Header();
 
     // reset core data
     const auto rawData =
         internal::BamRecordMemory::GetRawData(prototype);  //  prototype.impl_.RawData().get();
-    if (!rawData) throw std::runtime_error("BamRecord memory in invalid state");
+    if (!rawData) throw std::runtime_error{"BamRecord memory in invalid state"};
     core_ = std::move(rawData->core);
-
-    // reset variable-length data
-    const BamRecordImpl& impl = internal::BamRecordMemory::GetImpl(prototype);
-    name_ = impl.Name();
-    sequence_ = impl.Sequence();
-    qualities_ = impl.Qualities().Fastq();
-    cigar_ = impl.CigarData();
-    tags_ = impl.Tags();
 }
 
-BamRecordBuilder& BamRecordBuilder::Sequence(const std::string& sequence)
-{
-    core_.l_qseq = sequence.size();
-    sequence_ = sequence;
-    return *this;
-}
-
-BamRecordBuilder& BamRecordBuilder::Sequence(std::string&& sequence)
+BamRecordBuilder& BamRecordBuilder::Sequence(std::string sequence)
 {
     core_.l_qseq = sequence.size();
     sequence_ = std::move(sequence);

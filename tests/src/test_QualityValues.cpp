@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -10,7 +12,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 TEST(QualityValueTest, DefaultsOk)
 {
@@ -60,13 +61,13 @@ TEST(QualityValuesTest, Default)
 {
     const QualityValues qvs;
     EXPECT_TRUE(qvs.empty());
-    EXPECT_EQ(string(), qvs.Fastq());
+    EXPECT_EQ(std::string(), qvs.Fastq());
 }
 
 TEST(QualityValuesTest, FromNumbers)
 {
-    const string fastqString = "~~~KKBB!!";
-    const vector<uint8_t> values = {93, 93, 93, 42, 42, 33, 33, 0, 0};
+    const std::string fastqString = "~~~KKBB!!";
+    const std::vector<uint8_t> values = {93, 93, 93, 42, 42, 33, 33, 0, 0};
 
     QualityValues qvs;
     for (auto qv : values)
@@ -76,10 +77,10 @@ TEST(QualityValuesTest, FromNumbers)
 
 TEST(QualityValuesTest, FromFastq)
 {
-    const string fastqString = "~~~KKBB!!";
-    const vector<uint8_t> values = {93, 93, 93, 42, 42, 33, 33, 0, 0};
+    const std::string fastqString = "~~~KKBB!!";
+    const std::vector<uint8_t> values = {93, 93, 93, 42, 42, 33, 33, 0, 0};
 
-    const QualityValues& qvs = QualityValues::FromFastq(fastqString);
+    const QualityValues qvs = QualityValues::FromFastq(fastqString);
     EXPECT_EQ(fastqString.size(), qvs.size());
     EXPECT_EQ(values.size(), qvs.size());
     for (size_t i = 0; i < fastqString.size(); ++i)

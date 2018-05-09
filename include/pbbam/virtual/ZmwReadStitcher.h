@@ -33,11 +33,11 @@ public:
     /// \{
 
     /// entire file, from BAM names
-    ZmwReadStitcher(const std::string& primaryBamFilePath, const std::string& scrapsBamFilePath);
+    ZmwReadStitcher(std::string primaryBamFilePath, std::string scrapsBamFilePath);
 
     /// filtered input from BAM names
-    ZmwReadStitcher(const std::string& primaryBamFilePath, const std::string& scrapsBamFilePath,
-                    const PbiFilter& filter);
+    ZmwReadStitcher(std::string primaryBamFilePath, std::string scrapsBamFilePath,
+                    PbiFilter filter);
 
     /// maybe filtered, from DataSet input
     ZmwReadStitcher(const DataSet& dataset);

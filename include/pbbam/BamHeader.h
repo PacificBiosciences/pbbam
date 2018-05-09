@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+
 #include "pbbam/Config.h"
 #include "pbbam/ProgramInfo.h"
 #include "pbbam/ReadGroupInfo.h"
@@ -50,20 +51,16 @@ public:
     /// \{
 
     ///
-    /// \brief Creates an empty BamHeader
-    ///
-    BamHeader();
-
-    ///
     /// \brief Creates a BamHeader from SAM-formatted text
     /// \param samHeaderText
     ///
     BamHeader(const std::string& samHeaderText);
 
-    BamHeader(const BamHeader& other) = default;
-    BamHeader(BamHeader&& other) = default;
-    BamHeader& operator=(const BamHeader& other) = default;
-    BamHeader& operator=(BamHeader&& other) = default;
+    BamHeader();
+    BamHeader(const BamHeader&) = default;
+    BamHeader(BamHeader&&) = default;
+    BamHeader& operator=(const BamHeader&) = default;
+    BamHeader& operator=(BamHeader&&) = default;
     ~BamHeader() = default;
 
     /// \brief Detaches underlying data from the shared-pointer, returning a
@@ -275,13 +272,13 @@ public:
     ///
     /// \returns reference to this object
     ///
-    BamHeader& SortOrder(const std::string& order);
+    BamHeader& SortOrder(std::string order);
 
     /// \brief Sets this header's SAM/BAM version number (\@HD:VN).
     ///
     /// \returns reference to this object
     ///
-    BamHeader& Version(const std::string& version);
+    BamHeader& Version(std::string version);
 
     /// \}
 
@@ -293,7 +290,7 @@ public:
     ///
     /// \returns reference to this object
     ///
-    BamHeader& AddReadGroup(const ReadGroupInfo& readGroup);
+    BamHeader& AddReadGroup(ReadGroupInfo readGroup);
 
     /// \brief Removes all read group entries from this header.
     ///
@@ -306,7 +303,7 @@ public:
     ///
     /// \returns reference to this object
     ///
-    BamHeader& ReadGroups(const std::vector<ReadGroupInfo>& readGroups);
+    BamHeader& ReadGroups(std::vector<ReadGroupInfo> readGroups);
 
     /// \}
 
@@ -318,7 +315,7 @@ public:
     ///
     /// \returns reference to this object
     ///
-    BamHeader& AddSequence(const SequenceInfo& sequence);
+    BamHeader& AddSequence(SequenceInfo sequence);
 
     /// \brief Removes all sequence entries from this header.
     ///
@@ -331,7 +328,7 @@ public:
     ///
     /// \returns reference to this object
     ///
-    BamHeader& Sequences(const std::vector<SequenceInfo>& sequences);
+    BamHeader& Sequences(std::vector<SequenceInfo> sequences);
 
     /// \}
 
@@ -343,7 +340,7 @@ public:
     ///
     /// \returns reference to this object
     ///
-    BamHeader& AddProgram(const ProgramInfo& pg);
+    BamHeader& AddProgram(ProgramInfo pg);
 
     /// \brief Removes all program entries from this header.
     ///
@@ -356,7 +353,7 @@ public:
     ///
     /// \returns reference to this object
     ///
-    BamHeader& Programs(const std::vector<ProgramInfo>& programs);
+    BamHeader& Programs(std::vector<ProgramInfo> programs);
 
     /// \}
 
@@ -368,7 +365,7 @@ public:
     ///
     /// \returns reference to this object
     ///
-    BamHeader& AddComment(const std::string& comment);
+    BamHeader& AddComment(std::string comment);
 
     /// \brief Removes all comments from this header.
     ///
@@ -380,7 +377,7 @@ public:
     ///
     /// \returns reference to this object
     ///
-    BamHeader& Comments(const std::vector<std::string>& comments);
+    BamHeader& Comments(std::vector<std::string> comments);
 
     /// \}
 

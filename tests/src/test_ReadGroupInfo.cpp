@@ -16,7 +16,6 @@
 // clang-format off
 
 using namespace PacBio::BAM;
-using namespace std;
 
 TEST(ReadGroupInfoTest, IdFromMovieNameAndReadType)
 {
@@ -36,7 +35,7 @@ TEST(ReadGroupInfoTest, FrameCodecSetOk)
 TEST(ReadGroupInfoTest, SequencingChemistryOk)
 {
     {   // P6-C4
-        const string& chem = "P6-C4";
+        const std::string chem{"P6-C4"};
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100356300","100356200","2.1"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100356300","100356200","2.3"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100356300","100612400","2.1"));
@@ -54,7 +53,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
     }
 
     {   // S/P1-C1/beta
-        const string& chem = "S/P1-C1/beta";
+        const std::string chem{"S/P1-C1/beta"};
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-620-000","3.0"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-620-000","3.1"));
 
@@ -66,7 +65,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
     }
 
     {   // S/P1-C1.1 (Echidna)
-        const string& chem = "S/P1-C1.1";
+        const std::string chem{"S/P1-C1.1"};
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-867-300","3.1"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-867-300","3.2"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-867-300","3.3"));
@@ -79,7 +78,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
     }
 
     {   // S/P1-C1.2 (Flea)
-        const string& chem = "S/P1-C1.2";
+        const std::string chem{"S/P1-C1.2"};
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-902-100","3.1"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-902-100","3.2"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-902-100","3.3"));
@@ -91,7 +90,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
         EXPECT_EQ(chem, rg.SequencingChemistry());
     }
     {   // S/P1-C1.3 (Goat)
-        const string& chem = "S/P1-C1.3";
+        const std::string chem{"S/P1-C1.3"};
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-972-200","3.2"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-972-200","3.3"));
 
@@ -161,14 +160,14 @@ TEST(ReadGroupInfoTest, SequencingChemistryThrowsOnBadTriple)
 
     // now check thrown contents
     try {
-        ReadGroupInfo rg("BAD");
-        rg.BindingKit("100372700")
+        ReadGroupInfo rg2("BAD");
+        rg2.BindingKit("100372700")
           .SequencingKit("100-619-400")
           .BasecallerVersion("2.0");
     } catch (InvalidSequencingChemistryException& e) {
-        EXPECT_EQ(string("100372700"),   e.BindingKit());
-        EXPECT_EQ(string("100-619-400"), e.SequencingKit());
-        EXPECT_EQ(string("2.0"),         e.BasecallerVersion());
+        EXPECT_EQ(std::string("100372700"),   e.BindingKit());
+        EXPECT_EQ(std::string("100-619-400"), e.SequencingKit());
+        EXPECT_EQ(std::string("2.0"),         e.BasecallerVersion());
     }
 }
 
@@ -180,15 +179,15 @@ TEST(ReadGroupInfoTest, BasecallerVersion)
         rg.BindingKit("100-619-300")
           .SequencingKit("100-867-300")
           .BasecallerVersion("3");
-        const string chem = rg.SequencingChemistry();
+        const std::string chem = rg.SequencingChemistry();
 //        ()chem;
 
     } catch (std::runtime_error& e) {
-        EXPECT_EQ(string("basecaller version too short: 3"), string(e.what()));
+        EXPECT_EQ(std::string("basecaller version too short: 3"), std::string(e.what()));
     }
 
     // initial implementation assumed single digit version numbers:
-    //    const string ver{ basecallerVersion.substr(0, 3) };
+    //    const std::string ver{ basecallerVersion.substr(0, 3) };
     // So '3.299.dummy' would incorrectly be interpreted as (OK) '3.2'.
     // 3.
 
@@ -197,7 +196,7 @@ TEST(ReadGroupInfoTest, BasecallerVersion)
         rg.BindingKit("100-619-300")
           .SequencingKit("100-867-300")
           .BasecallerVersion("3.199.dummy");   
-        const string chem = rg.SequencingChemistry();
+        const std::string chem = rg.SequencingChemistry();
 //        ()chem;
 
     } catch (InvalidSequencingChemistryException& e) {

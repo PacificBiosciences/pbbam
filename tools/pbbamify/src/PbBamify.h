@@ -3,12 +3,12 @@
 #ifndef SRC_PBBAMIFY_H_
 #define SRC_PBBAMIFY_H_
 
-#include <cstdint>
 #include <pbbam/BamReader.h>
+#include <pbbam/BamWriter.h>
 #include <pbbam/DataSet.h>
 #include <pbbam/FastaReader.h>
 #include <pbbam/IndexedFastaReader.h>
-#include <pbbam/BamWriter.h>
+#include <cstdint>
 #include "QueryLookup.h"
 
 namespace PacBio {
@@ -19,7 +19,8 @@ namespace pbbamify {
 ///
 /// \throws std::runtime_error if any any errors encountered while reading or writing
 ///
-class Pbbamify {
+class Pbbamify
+{
 public:
     /// \brief Merges all the headers from the dataset and the input, adds the SQ fields with lengths and MD5 checksums.
     ///
@@ -35,12 +36,10 @@ public:
     ///
     /// \returns true if the record was successfully augmented, false otherwise.
     ///
-    static bool AugmentAlignments(const BamHeader& new_header,
-                                 const std::shared_ptr<QueryLookup> queryLookup,
-                                 const PacBio::BAM::IndexedFastaReader& indexedRefReader,
-                                 PacBio::BAM::BamReader& input,
-                                 PacBio::BAM::BamWriter& writer,
-                                 int32_t verboseLevel);
+    static bool AugmentAlignments(const std::shared_ptr<QueryLookup> queryLookup,
+                                  const PacBio::BAM::IndexedFastaReader& indexedRefReader,
+                                  PacBio::BAM::BamReader& input, PacBio::BAM::BamWriter& writer,
+                                  int32_t verboseLevel);
 
     /// \brief Converts a generic BAM record into a PacBio compatible BAM by: adding tags from the PacBio
     ///        dataset, replacing the read group, clipping the tags if needed, converting the CIGAR from basic to
@@ -49,11 +48,9 @@ public:
     ///
     /// \returns true if the record was successfully augmented, false otherwise.
     ///
-    static bool AugmentAlignment(const BamHeader& newHeader,
-                                const std::shared_ptr<QueryLookup> queryLookup,
-                                const PacBio::BAM::IndexedFastaReader& indexedRefReader,
-                                BamRecord& record,
-                                int32_t verboseLevel);
+    static bool AugmentAlignment(const std::shared_ptr<QueryLookup> queryLookup,
+                                 const PacBio::BAM::IndexedFastaReader& indexedRefReader,
+                                 BamRecord& record, int32_t verboseLevel);
 
     /// \brief Checks whether the alignment was hard clipped.
     ///
@@ -88,11 +85,10 @@ public:
     /// \returns A new Cigar object with '=' and 'X' operations instead of 'M's.
     static Cigar BasicToExtendedCigar(const PacBio::BAM::IndexedFastaReader& indexedRefReader,
                                       const BamRecord& record, const Cigar& cigarData);
-
 };
 
-} // namespace pbbamify
-} // namespace BAM
-} // namespace PacBio
+}  // namespace pbbamify
+}  // namespace BAM
+}  // namespace PacBio
 
 #endif

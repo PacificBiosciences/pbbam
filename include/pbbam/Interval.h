@@ -43,7 +43,11 @@ public:
     /// brief Creates an interval from [start, stop) */
     Interval(const T start, const T stop);
 
-    Interval(const Interval<T>& other);
+    Interval(const Interval<T>&) = default;
+    Interval(Interval&&) = default;
+    Interval& operator=(const Interval<T>&) = default;
+    Interval& operator=(Interval<T>&&) = default;
+    ~Interval() = default;
 
     /// \}
 

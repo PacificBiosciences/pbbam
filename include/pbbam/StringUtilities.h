@@ -21,7 +21,7 @@ namespace BAM {
 inline std::vector<std::string> Split(const std::string& line, const char delim = '\t')
 {
     std::vector<std::string> tokens;
-    std::stringstream lineStream(line);
+    std::istringstream lineStream(line);
     std::string token;
     while (std::getline(lineStream, token, delim))
         tokens.push_back(token);
@@ -34,24 +34,12 @@ inline std::vector<std::string> Split(const std::string& line, const char delim 
 ///
 /// \returns new string with no whitespace
 ///
-inline std::string RemoveAllWhitespace(std::string&& input)
+inline std::string RemoveAllWhitespace(std::string input)
 {
     input.erase(
         std::remove_if(input.begin(), input.end(), [](const char c) { return std::isspace(c); }),
         input.end());
     return input;
-}
-
-/// \brief Remove all whitespace from input string (start, end, & internal)
-///
-/// \param[in] input    original string
-///
-/// \returns new string with no whitespace
-///
-inline std::string RemoveAllWhitespace(const std::string& input)
-{
-    auto copy = input;
-    return RemoveAllWhitespace(std::move(copy));
 }
 
 }  // namespace BAM

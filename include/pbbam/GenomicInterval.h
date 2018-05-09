@@ -44,10 +44,10 @@ public:
     ///
     GenomicInterval(const std::string& zeroBasedRegionString);
 
-    GenomicInterval(const GenomicInterval& other) = default;
-    GenomicInterval(GenomicInterval&& other) = default;
-    GenomicInterval& operator=(const GenomicInterval& other) = default;
-    GenomicInterval& operator=(GenomicInterval&& other) = default;
+    GenomicInterval(const GenomicInterval&) = default;
+    GenomicInterval(GenomicInterval&&) = default;
+    GenomicInterval& operator=(const GenomicInterval&) = default;
+    GenomicInterval& operator=(GenomicInterval&&) = default;
     ~GenomicInterval() = default;
 
     /// \}
@@ -114,14 +114,14 @@ public:
     /// \param[in] name
     /// \returns reference to this interval
     ///
-    GenomicInterval& Name(const std::string& name);
+    GenomicInterval& Name(std::string name);
 
     /// Sets this underlying Interval
     ///
     /// \param[in] interval
     /// \returns reference to this interval
     ///
-    GenomicInterval& Interval(const PacBio::BAM::Interval<Position>& interval);
+    GenomicInterval& Interval(PacBio::BAM::Interval<Position> interval);
 
     /// Sets this interval's start coordinate.
     ///

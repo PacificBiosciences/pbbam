@@ -11,10 +11,7 @@ namespace bam2sam {
 class Settings
 {
 public:
-    Settings(void)
-        : noHeader_(false)
-        , printHeaderOnly_(false)
-    { }
+    Settings(void) : noHeader_(false), printHeaderOnly_(false) {}
 
 public:
     std::string inputFilename_;
@@ -23,6 +20,6 @@ public:
     std::vector<std::string> errors_;
 };
 
-} // namespace bam2sam
+}  // namespace bam2sam
 
-#endif // SETTINGS_H
+#endif  // SETTINGS_H

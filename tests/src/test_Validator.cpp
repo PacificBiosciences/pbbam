@@ -1,6 +1,8 @@
 // Author: Derek Barnett
 
 #include <cstdint>
+#include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -16,7 +18,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace ValidatorTests {
 
@@ -37,22 +38,22 @@ static BamRecord makeValidMappedRecord()
     impl.CigarData(Cigar{"10="});
 
     TagCollection tags;
-    tags["RG"] = string{"3f58e5b8"};
-    tags["dq"] = string{"2222'$22'2"};
-    tags["dt"] = string{"NNNNAGNNGN"};
-    tags["iq"] = string{"(+#1'$#*1&"};
-    tags["mq"] = string{"&1~51*5&~2"};
-    tags["sq"] = string{"<32<4<<<<3"};
-    tags["ip"] = vector<uint8_t>{2, 0, 10, 22, 34, 0, 2, 3, 0, 16};
-    tags["np"] = static_cast<int32_t>(1);
-    tags["qe"] = static_cast<int32_t>(10);
-    tags["qs"] = static_cast<int32_t>(0);
-    tags["zm"] = static_cast<int32_t>(54130);
-    tags["cx"] = static_cast<int32_t>(2);
-    tags["AS"] = static_cast<int32_t>(-3020);
-    tags["NM"] = static_cast<int32_t>(134);
+    tags["RG"] = std::string{"3f58e5b8"};
+    tags["dq"] = std::string{"2222'$22'2"};
+    tags["dt"] = std::string{"NNNNAGNNGN"};
+    tags["iq"] = std::string{"(+#1'$#*1&"};
+    tags["mq"] = std::string{"&1~51*5&~2"};
+    tags["sq"] = std::string{"<32<4<<<<3"};
+    tags["ip"] = std::vector<uint8_t>{2, 0, 10, 22, 34, 0, 2, 3, 0, 16};
+    tags["np"] = int32_t{1};
+    tags["qe"] = int32_t{10};
+    tags["qs"] = int32_t{0};
+    tags["zm"] = int32_t{54130};
+    tags["cx"] = int32_t{2};
+    tags["AS"] = int32_t{-3020};
+    tags["NM"] = int32_t{134};
     tags["rq"] = static_cast<float>(0.854);
-    tags["sn"] = vector<float>{2.0, 2.0, 2.0, 2.0};
+    tags["sn"] = std::vector<float>{2.0, 2.0, 2.0, 2.0};
     impl.Tags(tags);
 
     return BamRecord(impl);
@@ -73,22 +74,22 @@ static BamRecord makeValidUnmappedRecord()
     impl.SetSequenceAndQualities("AATGAGGAGA");
 
     TagCollection tags;
-    tags["RG"] = string{"b5482b33"};
-    tags["dq"] = string{"2222222222"};
-    tags["dt"] = string{"NNNNNNNNNN"};
-    tags["iq"] = string{",*11111001"};
-    tags["mq"] = string{"&47088')34"};
-    tags["sq"] = string{"8<4<:<6<0<"};
-    tags["ip"] = vector<uint8_t>{255, 9, 20, 43, 38, 12, 9, 30, 39, 22};
-    tags["np"] = static_cast<int32_t>(1);
-    tags["qe"] = static_cast<int32_t>(10);
-    tags["qs"] = static_cast<int32_t>(0);
-    tags["zm"] = static_cast<int32_t>(8);
-    tags["cx"] = static_cast<int32_t>(2);
-    tags["AS"] = static_cast<int32_t>(-3020);
-    tags["NM"] = static_cast<int32_t>(134);
+    tags["RG"] = std::string{"b5482b33"};
+    tags["dq"] = std::string{"2222222222"};
+    tags["dt"] = std::string{"NNNNNNNNNN"};
+    tags["iq"] = std::string{",*11111001"};
+    tags["mq"] = std::string{"&47088')34"};
+    tags["sq"] = std::string{"8<4<:<6<0<"};
+    tags["ip"] = std::vector<uint8_t>{255, 9, 20, 43, 38, 12, 9, 30, 39, 22};
+    tags["np"] = int32_t{1};
+    tags["qe"] = int32_t{10};
+    tags["qs"] = int32_t{0};
+    tags["zm"] = int32_t{8};
+    tags["cx"] = int32_t{2};
+    tags["AS"] = int32_t{-3020};
+    tags["NM"] = int32_t{134};
     tags["rq"] = static_cast<float>(0.811);
-    tags["sn"] = vector<float>{2.0, 2.0, 2.0, 2.0};
+    tags["sn"] = std::vector<float>{2.0, 2.0, 2.0, 2.0};
     impl.Tags(tags);
 
     return BamRecord(impl);
@@ -149,8 +150,8 @@ TEST(ValidatorErrorsTest, ThrowOnMaxReached)
 
 TEST(ValidatorErrorsTest, ExceptionFromResults)
 {
-    const string error1 = "error1";
-    const string error2 = "error2";
+    const std::string error1 = "error1";
+    const std::string error2 = "error2";
 
     try {
 
@@ -430,10 +431,10 @@ TEST(ValidatorTest, TagDataLengths)
     CheckInvalidTagLength("iq", QualityValues("@@").Fastq());  // InsertionQV
     CheckInvalidTagLength("mq", QualityValues("@@").Fastq());  // MergeQV
     CheckInvalidTagLength("sq", QualityValues("@@").Fastq());  // SubstitutionQV
-    CheckInvalidTagLength("dt", string("AA"));                 // DeletionTag
-    CheckInvalidTagLength("st", string("AA"));                 // SubstitutionTag
+    CheckInvalidTagLength("dt", std::string("AA"));            // DeletionTag
+    CheckInvalidTagLength("st", std::string("AA"));            // SubstitutionTag
 
-    const auto& f = Frames{vector<uint16_t>{42, 42, 42}};
+    const Frames f{{42, 42, 42}};
     const auto& frames = f.Data();
     CheckInvalidTagLength("ip", frames);  // IPD
 

@@ -20,14 +20,13 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
-using namespace std;
 
 TEST(FileUtilsTest, ExistsOk)
 {
     EXPECT_FALSE(FileUtils::Exists("does_not_exist.txt"));
 
-    const string tmp = PbbamTestsConfig::GeneratedData_Dir + "/pbbam_exists_check.tmp";
-    const string cmd = string("touch ") + tmp;
+    const std::string tmp = PbbamTestsConfig::GeneratedData_Dir + "/pbbam_exists_check.tmp";
+    const std::string cmd = std::string("touch ") + tmp;
     ASSERT_EQ(0, system(cmd.c_str()));
     EXPECT_TRUE(FileUtils::Exists(tmp));
 }
@@ -40,38 +39,39 @@ TEST(FileUtilsTest, LastModifiedOk)
 
     const auto now = CurrentTime();
     const auto nowDuration = now.time_since_epoch();
-    const auto nowSeconds = chrono::duration_cast<chrono::seconds>(nowDuration).count();
+    const auto nowSeconds = std::chrono::duration_cast<std::chrono::seconds>(nowDuration).count();
 
-    const string tmp = PbbamTestsConfig::GeneratedData_Dir + "/pbbam_lastmod_check.tmp";
-    const string rmCmd = string("rm ") + tmp;
-    const string touchCmd = string("touch  ") + tmp;
+    const std::string tmp = PbbamTestsConfig::GeneratedData_Dir + "/pbbam_lastmod_check.tmp";
+    const std::string rmCmd = std::string("rm ") + tmp;
+    const std::string touchCmd = std::string("touch  ") + tmp;
     const auto ret = system(rmCmd.c_str());
     UNUSED(ret);
     ASSERT_EQ(0, system(touchCmd.c_str()));
 
     const auto stamp = FileUtils::LastModified(tmp);
     const auto stampDuration = stamp.time_since_epoch();
-    const auto stampSeconds = chrono::duration_cast<chrono::seconds>(stampDuration).count();
+    const auto stampSeconds =
+        std::chrono::duration_cast<std::chrono::seconds>(stampDuration).count();
 
     EXPECT_LE(nowSeconds, stampSeconds);
 }
 
 TEST(FileUtilsTest, ResolvedFilePathOk)
 {
-    const string testFrom = "/path/to/myDir";
+    const std::string testFrom = "/path/to/myDir";
 
     // "raw" filenames - no URI scheme
 
-    const string absolutePath = "/absolute/path/to/file.txt";
-    const string relativePath = "../relative/path/to/file.txt";
-    const string noPathFn = "file.txt";
+    const std::string absolutePath = "/absolute/path/to/file.txt";
+    const std::string relativePath = "../relative/path/to/file.txt";
+    const std::string noPathFn = "file.txt";
 
-    const string resolvedAbsolutePath = FileUtils::ResolvedFilePath(absolutePath, testFrom);
-    const string resolvedRelativePath = FileUtils::ResolvedFilePath(relativePath, testFrom);
-    const string resolvedNoPath = FileUtils::ResolvedFilePath(noPathFn, testFrom);
-    const string resolvedAbsolutePath_defaultFrom = FileUtils::ResolvedFilePath(absolutePath);
-    const string resolvedRelativePath_defaultFrom = FileUtils::ResolvedFilePath(relativePath);
-    const string resolvedNoPath_defaultFrom = FileUtils::ResolvedFilePath(noPathFn);
+    const std::string resolvedAbsolutePath = FileUtils::ResolvedFilePath(absolutePath, testFrom);
+    const std::string resolvedRelativePath = FileUtils::ResolvedFilePath(relativePath, testFrom);
+    const std::string resolvedNoPath = FileUtils::ResolvedFilePath(noPathFn, testFrom);
+    const std::string resolvedAbsolutePath_defaultFrom = FileUtils::ResolvedFilePath(absolutePath);
+    const std::string resolvedRelativePath_defaultFrom = FileUtils::ResolvedFilePath(relativePath);
+    const std::string resolvedNoPath_defaultFrom = FileUtils::ResolvedFilePath(noPathFn);
 
     EXPECT_EQ("/absolute/path/to/file.txt", resolvedAbsolutePath);
     EXPECT_EQ("/path/to/myDir/../relative/path/to/file.txt", resolvedRelativePath);
@@ -83,20 +83,22 @@ TEST(FileUtilsTest, ResolvedFilePathOk)
 
     // filenames with URI scheme ("file://")
 
-    const string absoluteSchemeFn = "file:///absolute/path/to/file.txt";
-    const string relativeSchemeFn = "file://../relative/path/to/file.txt";
-    const string noPathSchemeFn = "file://file.txt";
+    const std::string absoluteSchemeFn = "file:///absolute/path/to/file.txt";
+    const std::string relativeSchemeFn = "file://../relative/path/to/file.txt";
+    const std::string noPathSchemeFn = "file://file.txt";
 
-    const string resolvedAbsoluteSchemePath =
+    const std::string resolvedAbsoluteSchemePath =
         FileUtils::ResolvedFilePath(absoluteSchemeFn, testFrom);
-    const string resolvedRelativeSchemePath =
+    const std::string resolvedRelativeSchemePath =
         FileUtils::ResolvedFilePath(relativeSchemeFn, testFrom);
-    const string resolvedNoPathSchemeFn = FileUtils::ResolvedFilePath(noPathSchemeFn, testFrom);
-    const string resolvedAbsoluteSchemePath_defaultFrom =
+    const std::string resolvedNoPathSchemeFn =
+        FileUtils::ResolvedFilePath(noPathSchemeFn, testFrom);
+    const std::string resolvedAbsoluteSchemePath_defaultFrom =
         FileUtils::ResolvedFilePath(absoluteSchemeFn);
-    const string resolvedRelativeSchemePath_defaultFrom =
+    const std::string resolvedRelativeSchemePath_defaultFrom =
         FileUtils::ResolvedFilePath(relativeSchemeFn);
-    const string resolvedNoPathSchemeFn_defaultFrom = FileUtils::ResolvedFilePath(noPathSchemeFn);
+    const std::string resolvedNoPathSchemeFn_defaultFrom =
+        FileUtils::ResolvedFilePath(noPathSchemeFn);
 
     EXPECT_EQ("/absolute/path/to/file.txt", resolvedAbsoluteSchemePath);
     EXPECT_EQ("/path/to/myDir/../relative/path/to/file.txt", resolvedRelativeSchemePath);
@@ -109,8 +111,8 @@ TEST(FileUtilsTest, ResolvedFilePathOk)
 
 TEST(FileUtilsTest, SizeOk)
 {
-    const string tmp = PbbamTestsConfig::GeneratedData_Dir + "/pbbam_empty_file.tmp";
-    const string cmd = string("touch ") + tmp;
+    const std::string tmp = PbbamTestsConfig::GeneratedData_Dir + "/pbbam_empty_file.tmp";
+    const std::string cmd = std::string("touch ") + tmp;
     ASSERT_EQ(0, system(cmd.c_str()));
     EXPECT_EQ(0, FileUtils::Size(tmp));
 
@@ -128,21 +130,21 @@ TEST(FileUtilsTest, SizeOk)
 //
 namespace test_windows {
 
-static string removeFileUriScheme(const string& uri)
+static std::string removeFileUriScheme(const std::string& uri)
 {
     assert(!uri.empty());
 
     auto schemeLess = uri;
-    const auto fileScheme = string{"file://"};
+    const auto fileScheme = std::string{"file://"};
     const auto schemeFound = schemeLess.find(fileScheme);
-    if (schemeFound != string::npos) {
-        if (schemeFound != 0) throw runtime_error("Malformed URI: scheme not at beginning");
+    if (schemeFound != std::string::npos) {
+        if (schemeFound != 0) throw std::runtime_error("Malformed URI: scheme not at beginning");
         schemeLess = schemeLess.substr(fileScheme.size());
     }
     return schemeLess;
 }
 
-static string removeDiskName(const string& filePath)
+static std::string removeDiskName(const std::string& filePath)
 {
     if (filePath.size() >= 2) {
         const char firstChar = filePath.at(0);
@@ -153,7 +155,7 @@ static string removeDiskName(const string& filePath)
 
 static const char native_pathSeparator = '\\';
 
-static bool native_pathIsAbsolute(const string& filePath)
+static bool native_pathIsAbsolute(const std::string& filePath)
 {
     assert(!filePath.empty());
 
@@ -174,7 +176,7 @@ static bool native_pathIsAbsolute(const string& filePath)
     return false;
 }
 
-static string native_resolvedFilePath(const string& filePath, const string& from)
+static std::string native_resolvedFilePath(const std::string& filePath, const std::string& from)
 {
     // strip file:// scheme if present
     auto schemeLess = removeFileUriScheme(filePath);
@@ -208,19 +210,19 @@ TEST(FileUtilsTest, WindowsPathsOk)
     {  // remove disk name
 
         // "C:\tmp.txt"
-        string f1 = "C:\\tmp.txt";
-        EXPECT_EQ(string("\\tmp.txt"), test_windows::removeDiskName(f1));
+        std::string f1 = "C:\\tmp.txt";
+        EXPECT_EQ(std::string("\\tmp.txt"), test_windows::removeDiskName(f1));
 
         // "C:tmp.txt"
-        string f2 = "C:tmp.txt";
-        EXPECT_EQ(string("tmp.txt"), test_windows::removeDiskName(f2));
+        std::string f2 = "C:tmp.txt";
+        EXPECT_EQ(std::string("tmp.txt"), test_windows::removeDiskName(f2));
 
         // "\tmp.txt"
-        string f3 = "\\tmp.txt";
+        std::string f3 = "\\tmp.txt";
         EXPECT_EQ(f3, test_windows::removeDiskName(f3));
 
         // "tmp.txt"
-        string f4 = "tmp.txt";
+        std::string f4 = "tmp.txt";
         EXPECT_EQ(f4, test_windows::removeDiskName(f4));
     }
 
@@ -244,36 +246,36 @@ TEST(FileUtilsTest, WindowsPathsOk)
 
     {  // resolve file path
 
-        const string myRootDir = "C:\\path\\to\\myRootDir";
+        const std::string myRootDir = "C:\\path\\to\\myRootDir";
 
         // "\\server\path\to\tmp.txt"
-        const string fn1 = "\\\\server\\path\\to\tmp.txt";
-        const string fn1_expected = fn1;
+        const std::string fn1 = "\\\\server\\path\\to\tmp.txt";
+        const std::string fn1_expected = fn1;
         EXPECT_EQ(fn1_expected, test_windows::native_resolvedFilePath(fn1, myRootDir));
 
         // "..\tmp.txt"
-        const string fn2 = "..\\tmp.txt";
-        const string fn2_expected = "C:\\path\\to\\myRootDir\\..\\tmp.txt";
+        const std::string fn2 = "..\\tmp.txt";
+        const std::string fn2_expected = "C:\\path\\to\\myRootDir\\..\\tmp.txt";
         EXPECT_EQ(fn2_expected, test_windows::native_resolvedFilePath(fn2, myRootDir));
 
         // ".\tmp.txt"
-        const string fn3 = ".\\tmp.txt";
-        const string fn3_expected = "C:\\path\\to\\myRootDir\\tmp.txt";
+        const std::string fn3 = ".\\tmp.txt";
+        const std::string fn3_expected = "C:\\path\\to\\myRootDir\\tmp.txt";
         EXPECT_EQ(fn3_expected, test_windows::native_resolvedFilePath(fn3, myRootDir));
 
         // "C:\path\to\tmp.txt"
-        const string fn4 = "C:\\path\\to\\tmp.txt";
-        const string fn4_expected = fn4;
+        const std::string fn4 = "C:\\path\\to\\tmp.txt";
+        const std::string fn4_expected = fn4;
         EXPECT_EQ(fn4_expected, test_windows::native_resolvedFilePath(fn4, myRootDir));
 
         // "C:..\path\to\tmp.txt"
-        const string fn5 = "C:..\\path\\to\\tmp.txt";
-        const string fn5_expected = "C:\\path\\to\\myRootDir\\..\\path\\to\\tmp.txt";
+        const std::string fn5 = "C:..\\path\\to\\tmp.txt";
+        const std::string fn5_expected = "C:\\path\\to\\myRootDir\\..\\path\\to\\tmp.txt";
         EXPECT_EQ(fn5_expected, test_windows::native_resolvedFilePath(fn5, myRootDir));
 
         // "C:tmp.txt"
-        const string fn6 = "C:tmp.txt";
-        const string fn6_expected = "C:\\path\\to\\myRootDir\\tmp.txt";
+        const std::string fn6 = "C:tmp.txt";
+        const std::string fn6_expected = "C:\\path\\to\\myRootDir\\tmp.txt";
         EXPECT_EQ(fn6_expected, test_windows::native_resolvedFilePath(fn6, myRootDir));
         EXPECT_EQ(fn3_expected,
                   test_windows::native_resolvedFilePath(

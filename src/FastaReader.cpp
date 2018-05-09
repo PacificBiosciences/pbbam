@@ -15,6 +15,7 @@
 
 #include <htslib/faidx.h>
 
+#include "pbbam/MakeUnique.h"
 #include "pbbam/StringUtilities.h"
 
 namespace PacBio {
@@ -27,10 +28,10 @@ struct FastaReaderPrivate
     std::string name_;
     std::string bases_;
 
-    FastaReaderPrivate(const std::string& fn) : stream_(fn)
+    FastaReaderPrivate(const std::string& fn) : stream_{fn}
     {
         if (!stream_)
-            throw std::runtime_error("FastaReader - could not open " + fn + " for reading");
+            throw std::runtime_error{"FastaReader - could not open " + fn + " for reading"};
         FetchNext();
     }
 
@@ -52,7 +53,7 @@ private:
         ReadName();
         ReadBases();
 
-        bases_ = RemoveAllWhitespace(bases_);
+        bases_ = RemoveAllWhitespace(std::move(bases_));
     }
 
     inline void SkipNewlines()
@@ -85,7 +86,10 @@ private:
 
 }  // namespace internal
 
-FastaReader::FastaReader(const std::string& fn) : d_{new internal::FastaReaderPrivate{fn}} {}
+FastaReader::FastaReader(const std::string& fn)
+    : d_{std::make_unique<internal::FastaReaderPrivate>(fn)}
+{
+}
 
 FastaReader::~FastaReader() {}
 

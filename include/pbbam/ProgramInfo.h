@@ -43,19 +43,17 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    /// \brief Creates an empty program info object.
-    ProgramInfo() = default;
-
     /// \brief Creates a program info object with an ID.
     ///
     /// \param[in] id       program ID (\@PG:ID)
     ///
     ProgramInfo(std::string id);
 
-    ProgramInfo(const ProgramInfo& other) = default;
-    ProgramInfo(ProgramInfo&& other) = default;
-    ProgramInfo& operator=(const ProgramInfo& other) = default;
-    ProgramInfo& operator=(ProgramInfo&& other) = default;
+    ProgramInfo() = default;
+    ProgramInfo(const ProgramInfo&) = default;
+    ProgramInfo(ProgramInfo&&) = default;
+    ProgramInfo& operator=(const ProgramInfo&) = default;
+    ProgramInfo& operator=(ProgramInfo&&) = default;
     ~ProgramInfo() = default;
 
     /// \}
@@ -118,7 +116,7 @@ public:
     /// \param[in] cmd      new value
     /// \returns reference to this object
     ///
-    ProgramInfo& CommandLine(const std::string& cmd);
+    ProgramInfo& CommandLine(std::string cmd);
 
     /// \brief Sets a new collection of non-standard tags.
     ///
@@ -127,42 +125,42 @@ public:
     /// \param[in] custom      new tags
     /// \returns reference to this object
     ///
-    ProgramInfo& CustomTags(const std::map<std::string, std::string>& custom);
+    ProgramInfo& CustomTags(std::map<std::string, std::string> custom);
 
     /// \brief Sets the value for \@PG:DS
     ///
     /// \param[in] description      new value
     /// \returns reference to this object
     ///
-    ProgramInfo& Description(const std::string& description);
+    ProgramInfo& Description(std::string description);
 
     /// \brief Sets the value for \@PG:ID
     ///
     /// \param[in] id      new value
     /// \returns reference to this object
     ///
-    ProgramInfo& Id(const std::string& id);
+    ProgramInfo& Id(std::string id);
 
     /// \brief Sets the value for \@PG:PN
     ///
     /// \param[in] name      new value
     /// \returns reference to this object
     ///
-    ProgramInfo& Name(const std::string& name);
+    ProgramInfo& Name(std::string name);
 
     /// \brief Sets the value for \@PG:PP
     ///
     /// \param[in] id      new value
     /// \returns reference to this object
     ///
-    ProgramInfo& PreviousProgramId(const std::string& id);
+    ProgramInfo& PreviousProgramId(std::string id);
 
     /// \brief Sets the value for \@PG:VN
     ///
     /// \param[in] version      new value
     /// \returns reference to this object
     ///
-    ProgramInfo& Version(const std::string& version);
+    ProgramInfo& Version(std::string version);
 
     /// \}
 

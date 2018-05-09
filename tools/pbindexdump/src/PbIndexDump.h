@@ -13,6 +13,6 @@ public:
     static void Run(const Settings& settings);
 };
 
-} // namespace pbindex
+}  // namespace pbindex
 
-#endif // PBINDEXDUMP_H
+#endif  // PBINDEXDUMP_H

@@ -12,11 +12,10 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace EntireFileQueryTests {
 
-const string inputBamFn = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+const std::string inputBamFn = PbbamTestsConfig::Data_Dir + "/aligned.bam";
 
 }  // namespace EntireFileQueryTests
 
@@ -55,7 +54,7 @@ TEST(BamRecordTest, HandlesDeletionOK)
     // this file raised no error in Debug mode, but segfaulted when
     // trying to access the aligned qualities in Release mode
 
-    const string problemBamFn = PbbamTestsConfig::Data_Dir + "/segfault.bam";
+    const std::string problemBamFn = PbbamTestsConfig::Data_Dir + "/segfault.bam";
     BamFile bamFile(problemBamFn);
     int count = 0;
     EntireFileQuery entireFile(bamFile);
@@ -64,15 +63,15 @@ TEST(BamRecordTest, HandlesDeletionOK)
         const auto rawQualities = record.Qualities(Orientation::GENOMIC, false);
         const auto alignedQualities = record.Qualities(Orientation::GENOMIC, true);
 
-        const string rawExpected =
+        const std::string rawExpected{
             "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
-            "IIIIIIIIIIIII";
+            "IIIIIIIIIIIII"};
 
         // 1=1D98=
-        const string alignedExpected =
+        const std::string alignedExpected{
             "I!"
             "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
-            "IIIIIIIIIIII";
+            "IIIIIIIIIIII"};
 
         EXPECT_EQ(rawExpected, rawQualities.Fastq());
         EXPECT_EQ(alignedExpected, alignedQualities.Fastq());
@@ -86,7 +85,7 @@ TEST(BamRecordTest, HandlesDeletionOK)
 TEST(BamRecordTest, ReferenceName)
 {
     {  // check reference name of first record
-        const string exampleBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+        const std::string exampleBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
         BamFile bamFile(exampleBam);
         EntireFileQuery records(bamFile);
         auto firstIter = records.begin();
@@ -96,7 +95,7 @@ TEST(BamRecordTest, ReferenceName)
     }
 
     {  // unmapped records have no reference name, should throw
-        const string exampleBam = PbbamTestsConfig::Data_Dir + "/unmap1.bam";
+        const std::string exampleBam = PbbamTestsConfig::Data_Dir + "/unmap1.bam";
         BamFile bamFile(exampleBam);
         EntireFileQuery records(bamFile);
         auto firstIter = records.begin();

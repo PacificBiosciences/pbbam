@@ -12,7 +12,7 @@ namespace internal {
 
 template<typename T>
 inline QueryIteratorBase<T>::QueryIteratorBase(QueryBase<T>& query)
-    : query_(&query)
+    : query_{&query}
 { ReadNext(); }
 
 template<typename T> inline
@@ -29,7 +29,7 @@ bool QueryIteratorBase<T>::operator!=(const QueryIteratorBase<T>& other) const
 
 template<typename T> inline
 QueryIterator<T>::QueryIterator(QueryBase<T>& query)
-    : QueryIteratorBase<T>(query)
+    : QueryIteratorBase<T>{query}
 { }
 
 template<typename T> inline
@@ -58,7 +58,7 @@ QueryIterator<T> QueryIterator<T>::operator++(int)
 
 template<typename T> inline
 QueryConstIterator<T>::QueryConstIterator(const QueryBase<T>& query)
-    : QueryIteratorBase<T>(const_cast<QueryBase<T>&>(query))
+    : QueryIteratorBase<T>{const_cast<QueryBase<T>&>(query)}
 { }
 
 template<typename T> inline

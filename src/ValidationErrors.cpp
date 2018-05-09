@@ -21,42 +21,24 @@ namespace internal {
 const size_t ValidationErrors::MAX;
 
 ValidationErrors::ValidationErrors(const size_t maxNumErrors)
-    : maxNumErrors_(maxNumErrors), currentNumErrors_(0)
+    : maxNumErrors_{maxNumErrors}, currentNumErrors_{0}
 {
     if (maxNumErrors_ == 0) maxNumErrors_ = ValidationErrors::MAX;
 }
 
-void ValidationErrors::AddFileError(const std::string& fn, const std::string& details)
-{
-    std::string copy = details;
-    AddFileError(fn, std::move(copy));
-}
-
-void ValidationErrors::AddFileError(const std::string& fn, std::string&& details)
+void ValidationErrors::AddFileError(const std::string& fn, std::string details)
 {
     fileErrors_[fn].push_back(std::move(details));
     OnErrorAdded();
 }
 
-void ValidationErrors::AddReadGroupError(const std::string& rg, const std::string& details)
-{
-    std::string copy = details;
-    AddReadGroupError(rg, std::move(copy));
-}
-
-void ValidationErrors::AddReadGroupError(const std::string& rg, std::string&& details)
+void ValidationErrors::AddReadGroupError(const std::string& rg, std::string details)
 {
     readGroupErrors_[rg].push_back(std::move(details));
     OnErrorAdded();
 }
 
-void ValidationErrors::AddRecordError(const std::string& name, const std::string& details)
-{
-    std::string copy = details;
-    AddRecordError(name, std::move(copy));
-}
-
-void ValidationErrors::AddRecordError(const std::string& name, std::string&& details)
+void ValidationErrors::AddRecordError(const std::string& name, std::string details)
 {
     recordErrors_[name].push_back(std::move(details));
     OnErrorAdded();
@@ -66,17 +48,8 @@ void ValidationErrors::AddTagLengthError(const std::string& name, const std::str
                                          const std::string& tagName, const size_t observed,
                                          const size_t expected)
 {
-    std::string copy = tagLabel;
-    std::string copy2 = tagName;
-    AddTagLengthError(name, std::move(copy), std::move(copy2), observed, expected);
-}
-
-void ValidationErrors::AddTagLengthError(const std::string& name, std::string&& tagLabel,
-                                         std::string&& tagName, const size_t observed,
-                                         const size_t expected)
-{
     // format
-    std::stringstream s;
+    std::ostringstream s;
     s << tagLabel << " tag (" << tagName << ") length: " << observed
       << ", does not match expected length: " << expected;
     AddRecordError(name, s.str());
@@ -94,8 +67,8 @@ void ValidationErrors::OnErrorAdded()
 
 void ValidationErrors::ThrowErrors()
 {
-    throw ValidationException(std::move(fileErrors_), std::move(readGroupErrors_),
-                              std::move(recordErrors_));
+    throw ValidationException{std::move(fileErrors_), std::move(readGroupErrors_),
+                              std::move(recordErrors_)};
 }
 
 }  // namespace internal

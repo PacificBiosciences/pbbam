@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -14,19 +15,18 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
-using f_data = vector<uint16_t>;
+using f_data = std::vector<uint16_t>;
 
 namespace BamRecordMappingTests {
 
 static
 BamRecord MakeRecord(const Position qStart,
                      const Position qEnd,
-                     const string& seq,
-                     const string& quals,
-                     const string& tagBases,
-                     const string& tagQuals,
+                     const std::string& seq,
+                     const std::string& quals,
+                     const std::string& tagBases,
+                     const std::string& tagQuals,
                      const f_data& frames)
 {
     BamRecordImpl impl;
@@ -56,22 +56,22 @@ TEST(BamRecordMappingTest, BasicMap)
 {
     const Position qStart = 500;
     const Position qEnd   = 510;
-    const string seq      = "AACCGTTAGC";
-    const string quals    = "?]?]?]?]?*";
-    const string tagBases = "AACCGTTAGC";
-    const string tagQuals = "?]?]?]?]?*";
+    const std::string seq      = "AACCGTTAGC";
+    const std::string quals    = "?]?]?]?]?*";
+    const std::string tagBases = "AACCGTTAGC";
+    const std::string tagQuals = "?]?]?]?]?*";
     const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
     const uint8_t mapQual = 80;
 
-    const string seq_rev   = "GCTAACGGTT";
-    const string quals_rev = "*?]?]?]?]?";
-    const string tagBases_rev = seq_rev;
-    const string tagQuals_rev = quals_rev;
+    const std::string seq_rev   = "GCTAACGGTT";
+    const std::string quals_rev = "*?]?]?]?]?";
+    const std::string tagBases_rev = seq_rev;
+    const std::string tagQuals_rev = quals_rev;
     const f_data frames_rev = { 20, 30, 10, 40, 40, 30, 20, 20, 10, 10 };
 
-    const string s1_cigar = "10=";
-    const string s2_cigar = "5=3D5=";
-    const string s3_cigar = "4=1D2I2D4=";
+    const std::string s1_cigar = "10=";
+    const std::string s2_cigar = "5=3D5=";
+    const std::string s3_cigar = "4=1D2I2D4=";
 
     BamRecord s1 = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     BamRecord s2 = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
@@ -334,34 +334,34 @@ TEST(BamRecordMappingTest, SoftClipMapping)
 {
     const Position qStart = 500;
     const Position qEnd   = 515;
-    const string seq      = "TTAACCGTTAGCAAA";
-    const string quals    = "--?]?]?]?]?*+++";
-    const string tagBases = "TTAACCGTTAGCAAA";
-    const string tagQuals = "--?]?]?]?]?*+++";
+    const std::string seq      = "TTAACCGTTAGCAAA";
+    const std::string quals    = "--?]?]?]?]?*+++";
+    const std::string tagBases = "TTAACCGTTAGCAAA";
+    const std::string tagQuals = "--?]?]?]?]?*+++";
     const f_data frames   = { 40, 40, 10, 10, 20, 20, 30, 40, 40, 10, 30, 20, 10, 10, 10 };
     const uint8_t mapQual = 80;
 
-    const string clipped_seq   = "AACCGTTAGC";
-    const string clipped_quals = "?]?]?]?]?*";
-    const string clipped_tagBases   = "AACCGTTAGC";
-    const string clipped_tagQuals = "?]?]?]?]?*";
+    const std::string clipped_seq   = "AACCGTTAGC";
+    const std::string clipped_quals = "?]?]?]?]?*";
+    const std::string clipped_tagBases   = "AACCGTTAGC";
+    const std::string clipped_tagQuals = "?]?]?]?]?*";
     const f_data clipped_frames = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
 
-    const string seq_rev   = "TTTGCTAACGGTTAA";
-    const string quals_rev = "+++*?]?]?]?]?--";
-    const string tagBases_rev = seq_rev;
-    const string tagQuals_rev = quals_rev;
+    const std::string seq_rev   = "TTTGCTAACGGTTAA";
+    const std::string quals_rev = "+++*?]?]?]?]?--";
+    const std::string tagBases_rev = seq_rev;
+    const std::string tagQuals_rev = quals_rev;
     const f_data frames_rev = { 10, 10, 10, 20, 30, 10, 40, 40, 30, 20, 20, 10, 10, 40, 40 };
 
-    const string clipped_seq_rev   = "GCTAACGGTT";
-    const string clipped_quals_rev = "*?]?]?]?]?";
-    const string clipped_tagBases_rev = clipped_seq_rev;
-    const string clipped_tagQuals_rev = clipped_quals_rev;
+    const std::string clipped_seq_rev   = "GCTAACGGTT";
+    const std::string clipped_quals_rev = "*?]?]?]?]?";
+    const std::string clipped_tagBases_rev = clipped_seq_rev;
+    const std::string clipped_tagQuals_rev = clipped_quals_rev;
     const f_data clipped_frames_rev = { 20, 30, 10, 40, 40, 30, 20, 20, 10, 10 };
 
-    const string s1_cigar = "2S10=3S";
-    const string s2_cigar = "2S5=3D5=3S";
-    const string s3_cigar = "2S4=1D2I2D4=3S";
+    const std::string s1_cigar = "2S10=3S";
+    const std::string s2_cigar = "2S5=3D5=3S";
+    const std::string s3_cigar = "2S4=1D2I2D4=3S";
 
     BamRecord s1 = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     BamRecord s2 = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
@@ -625,13 +625,13 @@ TEST(BamRecordMappingTest, MappedCopy)
 {
     const Position qStart = 500;
     const Position qEnd   = 510;
-    const string seq      = "AACCGTTAGC";
-    const string quals    = "?]?]?]?]?*";
-    const string tagBases = "AACCGTTAGC";
-    const string tagQuals = "?]?]?]?]?*";
+    const std::string seq      = "AACCGTTAGC";
+    const std::string quals    = "?]?]?]?]?*";
+    const std::string tagBases = "AACCGTTAGC";
+    const std::string tagQuals = "?]?]?]?]?*";
     const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
     const uint8_t mapQual = 80;
-    const string cigar    = "4=1D2I2D4=";
+    const std::string cigar    = "4=1D2I2D4=";
 
     const BamRecord orig = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     const BamRecord mapped = orig.Mapped(0, 100, Strand::FORWARD, cigar, mapQual);
@@ -670,13 +670,13 @@ TEST(BamRecordMappingTest, StaticMapped)
 {
     const Position qStart = 500;
     const Position qEnd   = 510;
-    const string seq      = "AACCGTTAGC";
-    const string quals    = "?]?]?]?]?*";
-    const string tagBases = "AACCGTTAGC";
-    const string tagQuals = "?]?]?]?]?*";
+    const std::string seq      = "AACCGTTAGC";
+    const std::string quals    = "?]?]?]?]?*";
+    const std::string tagBases = "AACCGTTAGC";
+    const std::string tagQuals = "?]?]?]?]?*";
     const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
     const uint8_t mapQual = 80;
-    const string cigar    = "4=1D2I2D4=";
+    const std::string cigar    = "4=1D2I2D4=";
 
     const BamRecord orig = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     const BamRecord mapped = BamRecord::Mapped(orig, 0, 100, Strand::FORWARD, cigar, mapQual);

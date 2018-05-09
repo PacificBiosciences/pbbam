@@ -40,8 +40,12 @@ if get_option('tests')
 
   test(
     'bam2sam_CramTests',
-    pbbam_python,
-    args : pbbam_cram_py + [bam2sam_t])
+    pbbam_cram_script,
+    args : [
+      '--xunit-file=' + join_paths(meson.build_root(), 'blasr-cram-bam2sam.xml'),
+      '--verbose'] + [
+        bam2sam_t],
+    timeout : 1800)
 endif
 
 ###########
@@ -111,7 +115,15 @@ if get_option('tests')
     output : 'pbindexdump_cpp.t',
     configuration : pbbam_PbIndexDumpVersion_h_config)
 
-  test('pbindexdump_CramTests', pbbam_python, args : pbbam_cram_py + [pbindexdump_json_t, pbindexdump_cpp_t])
+  test(
+    'pbindexdump_CramTests',
+    pbbam_cram_script,
+    args : [
+      '--xunit-file=' + join_paths(meson.build_root(), 'blasr-cram-pbindexdump.xml'),
+      '--verbose'] + [
+        pbindexdump_json_t,
+        pbindexdump_cpp_t],
+    timeout : 1800)
 endif
 
 ###########
@@ -162,12 +174,18 @@ if get_option('tests') and not get_option('auto-validate')
     input : pbbam_cram_pbmerge_fofn_t_in,
     output : 'pbmerge_fofn.t', configuration : pbbam_PbMergeVersion_h_config)
 
-  test('pbmerge_CramTests', pbbam_python, args : pbbam_cram_py + [
-    pbmerge_pacbio_ordering_t,
-    pbmerge_aligned_ordering_t,
-    pbmerge_mixed_ordering_t,
-    pbmerge_dataset_t,
-    pbmerge_fofn_t])
+  test(
+    'pbmerge_CramTests',
+    pbbam_cram_script,
+    args : [
+      '--xunit-file=' + join_paths(meson.build_root(), 'blasr-cram-pbmerge.xml'),
+      '--verbose'] + [
+        pbmerge_pacbio_ordering_t,
+        pbmerge_aligned_ordering_t,
+        pbmerge_mixed_ordering_t,
+        pbmerge_dataset_t,
+        pbmerge_fofn_t],
+    timeout : 1800)
 endif
 
 ############
@@ -205,7 +223,6 @@ pbbam_pbbamify = executable(
 
 
 # tests
-# These will only work with permissive-cigar flag turned on.
 if get_option('tests')
   pbbamify_t = configure_file(
     input : pbbam_cram_pbbamify_t_in,
@@ -213,9 +230,14 @@ if get_option('tests')
     configuration : pbbam_PbBamifyVersion_h_config)
 
   test(
-    'pbbamifyCramTests',
-    pbbam_python,
-    args : pbbam_cram_py + [pbbamify_t])
+    'pbbamify_CramTests',
+    pbbam_cram_script,
+    args : [
+      '--xunit-file=' + join_paths(meson.build_root(), 'blasr-cram-pbbamify.xml'),
+      '--verbose'] + [
+        pbbamify_t],
+    timeout : 1800)
+
 endif
 
 ### Tests will be added later.

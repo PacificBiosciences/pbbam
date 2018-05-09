@@ -25,6 +25,7 @@
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/EntireFileQuery.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/ReadGroupInfo.h"
 
 namespace PacBio {
@@ -40,14 +41,16 @@ struct ilexcompare_wrapper
 };
 
 // clang-format off
-static const std::set<std::string, ilexcompare_wrapper> AcceptedSortOrders = {
+static const std::set<std::string, ilexcompare_wrapper> AcceptedSortOrders
+{
     "unknown",
     "unsorted",
     "queryname",
     "coordinate"
 };
 
-static const std::set<std::string> AcceptedReadTypes = {
+static const std::set<std::string> AcceptedReadTypes
+{
     "POLYMERASE",
     "HQREGION",
     "SUBREAD",
@@ -59,7 +62,7 @@ static const std::set<std::string> AcceptedReadTypes = {
 
 static void ValidateReadGroup(const ReadGroupInfo& rg, std::unique_ptr<ValidationErrors>& errors)
 {
-    const std::string& id = rg.Id();
+    const std::string id = rg.Id();
 
     // has required fields
     if (id.empty()) errors->AddReadGroupError(id, "missing ID");
@@ -81,8 +84,8 @@ static void ValidateReadGroup(const ReadGroupInfo& rg, std::unique_ptr<Validatio
     if (!id.empty()) {
         const auto expectedId = MakeReadGroupId(rg.MovieName(), rg.ReadType());
         if (expectedId != id) {
-            const std::string msg =
-                "stored ID: " + id + " does not match computed ID: " + expectedId;
+            const std::string msg{"stored ID: " + id + " does not match computed ID: " +
+                                  expectedId};
             errors->AddReadGroupError(id, std::move(msg));
         }
     }
@@ -125,28 +128,28 @@ static void ValidateHeader(const BamHeader& header, const std::string& filename,
         Version v(header.Version());
         boost::ignore_unused(v);
     } catch (std::exception& e) {
-        errors->AddFileError(fn, std::string("SAM version (@HD:VN) failed: ") + e.what());
+        errors->AddFileError(fn, std::string{"SAM version (@HD:VN) failed: "} + e.what());
     }
 
     // sort order
     const std::string sortOrder = header.SortOrder();
     if (AcceptedSortOrders.find(sortOrder) == AcceptedSortOrders.end())
-        errors->AddFileError(fn, std::string("unknown sort order: ") + sortOrder);
+        errors->AddFileError(fn, std::string{"unknown sort order: "} + sortOrder);
 
     // PacBio version
     try {
-        const Version v(header.PacBioBamVersion());
-        const Version minimum(3, 0, 1);
+        const Version v{header.PacBioBamVersion()};
+        const Version minimum{3, 0, 1};
         if (v < minimum) {
-            std::string msg = "PacBioBAM version (@HD:pb) ";
+
+            std::string msg{"PacBioBAM version (@HD:pb) "};
             msg += v.ToString();
-            msg += std::string{" is older than the minimum supported version "};
-            msg += ("(" + minimum.ToString() + ")");
+            msg += " is older than the minimum supported version (" + minimum.ToString() + ")";
             errors->AddFileError(fn, std::move(msg));
         }
     } catch (std::exception& e) {
         errors->AddFileError(
-            fn, std::string("PacBioBAM version (@HD:pb) failed to parse: ") + e.what());
+            fn, std::string{"PacBioBAM version (@HD:pb) failed to parse: "} + e.what());
     }
 
     // sequences?
@@ -159,7 +162,7 @@ static void ValidateHeader(const BamHeader& header, const std::string& filename,
 static void ValidateMetadata(const BamFile& file, std::unique_ptr<ValidationErrors>& errors)
 {
     // filename
-    const std::string fn = file.Filename();
+    const std::string fn{file.Filename()};
     if (fn == "-") {
         errors->AddFileError(fn,
                              "validation not is available for streamed BAM. Please "
@@ -182,7 +185,7 @@ static void ValidateMetadata(const BamFile& file, std::unique_ptr<ValidationErro
 
 void ValidateMappedRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
-    const std::string& name = b.FullName();
+    const std::string name{b.FullName()};
     if (b.ReferenceStart() < 0) errors->AddRecordError(name, "mapped record position is invalid");
     if (b.ReferenceId() < 0) errors->AddRecordError(name, "mapped record reference ID is invalid");
 
@@ -348,7 +351,7 @@ void ValidateRecordTagLengths(const BamRecord& b, std::unique_ptr<ValidationErro
 
 void ValidateUnmappedRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
-    const std::string& name = b.FullName();
+    const std::string name{b.FullName()};
     if (b.ReferenceStart() != -1) errors->AddRecordError(name, "unmapped record has a position");
     if (b.ReferenceId() != -1) errors->AddRecordError(name, "unmapped record has a reference ID");
 }
@@ -371,28 +374,28 @@ using internal::ValidationErrors;
 
 void Validator::Validate(const BamHeader& header, const size_t maxErrors)
 {
-    std::unique_ptr<ValidationErrors> errors{new ValidationErrors(maxErrors)};
+    auto errors = std::make_unique<ValidationErrors>(maxErrors);
     internal::ValidateHeader(header, "unknown", errors);
     if (!errors->IsEmpty()) errors->ThrowErrors();
 }
 
 void Validator::Validate(const ReadGroupInfo& rg, const size_t maxErrors)
 {
-    std::unique_ptr<ValidationErrors> errors{new ValidationErrors(maxErrors)};
+    auto errors = std::make_unique<ValidationErrors>(maxErrors);
     internal::ValidateReadGroup(rg, errors);
     if (!errors->IsEmpty()) errors->ThrowErrors();
 }
 
 void Validator::Validate(const BamRecord& b, const size_t maxErrors)
 {
-    std::unique_ptr<ValidationErrors> errors{new ValidationErrors(maxErrors)};
+    auto errors = std::make_unique<ValidationErrors>(maxErrors);
     internal::ValidateRecord(b, errors);
     if (!errors->IsEmpty()) errors->ThrowErrors();
 }
 
 void Validator::ValidateEntireFile(const BamFile& file, const size_t maxErrors)
 {
-    std::unique_ptr<ValidationErrors> errors{new ValidationErrors(maxErrors)};
+    auto errors = std::make_unique<ValidationErrors>(maxErrors);
     internal::ValidateMetadata(file, errors);
 
     EntireFileQuery query(file);
@@ -404,7 +407,7 @@ void Validator::ValidateEntireFile(const BamFile& file, const size_t maxErrors)
 
 void Validator::ValidateFileMetadata(const BamFile& file, const size_t maxErrors)
 {
-    std::unique_ptr<ValidationErrors> errors{new ValidationErrors(maxErrors)};
+    auto errors = std::make_unique<ValidationErrors>(maxErrors);
     internal::ValidateMetadata(file, errors);
     if (!errors->IsEmpty()) errors->ThrowErrors();
 }

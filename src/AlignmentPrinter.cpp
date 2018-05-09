@@ -27,11 +27,11 @@ AlignmentPrinter::AlignmentPrinter(const IndexedFastaReader& ifr)
 
 std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation orientation)
 {
-    std::string seq = record.Sequence(orientation, true, true);
-    std::string ref = ifr_->ReferenceSubsequence(record, orientation, true, true);
+    const std::string seq{record.Sequence(orientation, true, true)};
+    const std::string ref{ifr_->ReferenceSubsequence(record, orientation, true, true)};
 
     if (seq.size() != ref.size())
-        throw std::runtime_error("Sequence and reference parts are of different size");
+        throw std::runtime_error{"Sequence and reference parts are of different size"};
 
     int seqLength = 0;
     float matches = 0;
@@ -49,10 +49,11 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation o
         while (seqCoordStr.size() < maxCoordLength)
             seqCoordStr = " " + seqCoordStr;
 
-        std::string seqWrap = seqCoordStr + " : ";
-        std::string refWrap = refCoordStr + " : ";
+        std::string seqWrap{seqCoordStr + " : "};
+        std::string refWrap{refCoordStr + " : "};
         std::string prettyWrap(maxCoordLength + 3, ' ');
         prettyWrap.reserve(seq.size());
+
         for (int j = 0; i < seq.size() && j < 40; ++i, ++j) {
             refWrap += ref[i];
 
@@ -98,7 +99,7 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation o
 
         pretty += refWrap + '\n' + prettyWrap + '\n' + seqWrap + "\n\n";
     }
-    float similarity = matches / seq.size();
+    const float similarity = matches / seq.size();
 
     std::stringstream output;
 

@@ -48,10 +48,10 @@ public:
     ///
     Cigar(const std::string& cigarString);
 
-    Cigar(const Cigar& other) = default;
-    Cigar(Cigar&& other) = default;
-    Cigar& operator=(const Cigar& other) = default;
-    Cigar& operator=(Cigar&& other) = default;
+    Cigar(const Cigar&) = default;
+    Cigar(Cigar&&) = default;
+    Cigar& operator=(const Cigar&) = default;
+    Cigar& operator=(Cigar&&) = default;
     ~Cigar() = default;
 
     /// \}

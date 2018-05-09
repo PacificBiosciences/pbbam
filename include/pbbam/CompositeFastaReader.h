@@ -36,7 +36,6 @@ public:
     /// \{
 
     CompositeFastaReader(const std::vector<std::string>& fastaFiles);
-    CompositeFastaReader(std::vector<std::string>&& fastaFiles);
     CompositeFastaReader(const DataSet& dataset);
 
     /// \}

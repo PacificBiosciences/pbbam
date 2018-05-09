@@ -19,12 +19,11 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace std;
 
 namespace PacBioIndexTests {
 
-const string test2BamFn = PbbamTestsConfig::Data_Dir + "/aligned2.bam";
-const string phi29BamFn = PbbamTestsConfig::Data_Dir + "/phi29.bam";
+const std::string test2BamFn = PbbamTestsConfig::Data_Dir + "/aligned2.bam";
+const std::string phi29BamFn = PbbamTestsConfig::Data_Dir + "/phi29.bam";
 
 static PbiRawData Test2Bam_CoreIndexData()
 {
@@ -105,35 +104,35 @@ static void ExpectRawIndicesEqual(const PbiRawData& expected, const PbiRawData& 
     // mapped data
     EXPECT_EQ(expected.HasMappedData(), actual.HasMappedData());
     if (expected.HasMappedData() && actual.HasMappedData()) {
-        const PbiRawMappedData& e = expected.MappedData();
-        const PbiRawMappedData& a = actual.MappedData();
-        EXPECT_EQ(e.tId_, a.tId_);
-        EXPECT_EQ(e.tStart_, a.tStart_);
-        EXPECT_EQ(e.tEnd_, a.tEnd_);
-        EXPECT_EQ(e.aStart_, a.aStart_);
-        EXPECT_EQ(e.aEnd_, a.aEnd_);
-        EXPECT_EQ(e.revStrand_, a.revStrand_);
-        EXPECT_EQ(e.nM_, a.nM_);
-        EXPECT_EQ(e.nMM_, a.nMM_);
-        EXPECT_EQ(e.mapQV_, a.mapQV_);
+        const PbiRawMappedData& e2 = expected.MappedData();
+        const PbiRawMappedData& a2 = actual.MappedData();
+        EXPECT_EQ(e2.tId_, a2.tId_);
+        EXPECT_EQ(e2.tStart_, a2.tStart_);
+        EXPECT_EQ(e2.tEnd_, a2.tEnd_);
+        EXPECT_EQ(e2.aStart_, a2.aStart_);
+        EXPECT_EQ(e2.aEnd_, a2.aEnd_);
+        EXPECT_EQ(e2.revStrand_, a2.revStrand_);
+        EXPECT_EQ(e2.nM_, a2.nM_);
+        EXPECT_EQ(e2.nMM_, a2.nMM_);
+        EXPECT_EQ(e2.mapQV_, a2.mapQV_);
     }
 
     // reference data
     EXPECT_EQ(expected.HasReferenceData(), actual.HasReferenceData());
     if (expected.HasReferenceData() && actual.HasReferenceData()) {
-        const PbiRawReferenceData& e = expected.ReferenceData();
-        const PbiRawReferenceData& a = actual.ReferenceData();
-        EXPECT_EQ(e.entries_, a.entries_);
+        const PbiRawReferenceData& e2 = expected.ReferenceData();
+        const PbiRawReferenceData& a2 = actual.ReferenceData();
+        EXPECT_EQ(e2.entries_, a2.entries_);
     }
 
     // barcode data
     EXPECT_EQ(expected.HasBarcodeData(), actual.HasBarcodeData());
     if (expected.HasBarcodeData() && actual.HasBarcodeData()) {
-        const PbiRawBarcodeData& e = expected.BarcodeData();
-        const PbiRawBarcodeData& a = actual.BarcodeData();
-        EXPECT_EQ(e.bcForward_, a.bcForward_);
-        EXPECT_EQ(e.bcReverse_, a.bcReverse_);
-        EXPECT_EQ(e.bcQual_, a.bcQual_);
+        const PbiRawBarcodeData& e2 = expected.BarcodeData();
+        const PbiRawBarcodeData& a2 = actual.BarcodeData();
+        EXPECT_EQ(e2.bcForward_, a2.bcForward_);
+        EXPECT_EQ(e2.bcReverse_, a2.bcReverse_);
+        EXPECT_EQ(e2.bcQual_, a2.bcQual_);
     }
 }
 
@@ -142,10 +141,10 @@ static void ExpectRawIndicesEqual(const PbiRawData& expected, const PbiRawData& 
 TEST(PacBioIndexTest, CreateFromExistingBam)
 {
     // do this in temp directory, so we can ensure write access
-    const string tempDir = PbbamTestsConfig::GeneratedData_Dir + "/";
-    const string tempBamFn = tempDir + "aligned_copy.bam";
-    const string tempPbiFn = tempBamFn + ".pbi";
-    string cmd("cp ");
+    const std::string tempDir = PbbamTestsConfig::GeneratedData_Dir + "/";
+    const std::string tempBamFn = tempDir + "aligned_copy.bam";
+    const std::string tempPbiFn = tempBamFn + ".pbi";
+    std::string cmd("cp ");
     cmd += PacBioIndexTests::test2BamFn;
     cmd += " ";
     cmd += tempBamFn;
@@ -161,7 +160,7 @@ TEST(PacBioIndexTest, CreateFromExistingBam)
     EXPECT_EQ(10, index.NumReads());
     EXPECT_TRUE(index.HasMappedData());
 
-    const PbiRawData& expectedIndex = PacBioIndexTests::Test2Bam_ExistingIndex();
+    const PbiRawData expectedIndex = PacBioIndexTests::Test2Bam_ExistingIndex();
     PacBioIndexTests::ExpectRawIndicesEqual(expectedIndex, index);
 
     // clean up temp file(s)
@@ -180,15 +179,15 @@ TEST(PacBioIndexTest, CreateFromExistingBam)
 TEST(PacBioIndexTest, CreateOnTheFly)
 {
     // do this in temp directory, so we can ensure write access
-    const string tempDir = PbbamTestsConfig::GeneratedData_Dir + "/";
-    const string tempBamFn = tempDir + "temp.bam";
-    const string tempPbiFn = tempBamFn + ".pbi";
+    const std::string tempDir = PbbamTestsConfig::GeneratedData_Dir + "/";
+    const std::string tempBamFn = tempDir + "temp.bam";
+    const std::string tempPbiFn = tempBamFn + ".pbi";
 
     // NOTE: new file differs in size than existing (different write parameters may yield different file sizes, even though content is same)
-    const vector<int64_t> expectedNewOffsets = {33816576,   236126208, 391315456, 469106688,
-                                                537067520,  587792384, 867303424, 1182793728,
-                                                1449787392, 1582628864};
-    vector<int64_t> observedOffsets;
+    const std::vector<int64_t> expectedNewOffsets = {33816576,   236126208, 391315456, 469106688,
+                                                     537067520,  587792384, 867303424, 1182793728,
+                                                     1449787392, 1582628864};
+    std::vector<int64_t> observedOffsets;
 
     // create PBI on the fly from input BAM while we write to new file
     {
@@ -211,12 +210,12 @@ TEST(PacBioIndexTest, CreateOnTheFly)
 
     // sanity check on original file
     {
-        const vector<int64_t> originalFileOffsets = {33816576, 33825163,  33831333, 33834264,
-                                                     33836542, 33838065,  33849818, 33863499,
-                                                     33874621, 1392836608};
+        const std::vector<int64_t> originalFileOffsets = {33816576, 33825163,  33831333, 33834264,
+                                                          33836542, 33838065,  33849818, 33863499,
+                                                          33874621, 1392836608};
         BamRecord r;
         BamReader reader(PacBioIndexTests::test2BamFn);
-        for (int i = 0; i < originalFileOffsets.size(); ++i) {
+        for (size_t i = 0; i < originalFileOffsets.size(); ++i) {
             reader.VirtualSeek(originalFileOffsets.at(i));
             EXPECT_TRUE(CanRead(reader, r, i));
         }
@@ -226,19 +225,19 @@ TEST(PacBioIndexTest, CreateOnTheFly)
     {
         BamRecord r;
         BamReader reader(tempBamFn);
-        for (int i = 0; i < expectedNewOffsets.size(); ++i) {
+        for (size_t i = 0; i < expectedNewOffsets.size(); ++i) {
             reader.VirtualSeek(expectedNewOffsets.at(i));
             EXPECT_TRUE(CanRead(reader, r, i));
         }
-        for (int i = 0; i < observedOffsets.size(); ++i) {
+        for (size_t i = 0; i < observedOffsets.size(); ++i) {
             reader.VirtualSeek(observedOffsets.at(i));
             EXPECT_TRUE(CanRead(reader, r, i));
         }
     }
 
     // compare data in new PBI file, to expected data
-    const PbiRawData& expectedIndex = PacBioIndexTests::Test2Bam_NewIndex();
-    const PbiRawData& fromBuilt = PbiRawData(tempPbiFn);
+    const PbiRawData expectedIndex = PacBioIndexTests::Test2Bam_NewIndex();
+    const PbiRawData fromBuilt = PbiRawData(tempPbiFn);
     PacBioIndexTests::ExpectRawIndicesEqual(expectedIndex, fromBuilt);
 
     // straight diff of newly-generated PBI file to existing PBI
@@ -256,20 +255,20 @@ TEST(PacBioIndexTest, CreateOnTheFly)
 TEST(PacBioIndexTest, RawLoadFromPbiFile)
 {
     const BamFile bamFile(PacBioIndexTests::test2BamFn);
-    const string& pbiFilename = bamFile.PacBioIndexFilename();
+    const std::string pbiFilename = bamFile.PacBioIndexFilename();
     const PbiRawData loadedIndex(pbiFilename);
 
-    const PbiRawData& expectedIndex = PacBioIndexTests::Test2Bam_ExistingIndex();
+    const PbiRawData expectedIndex = PacBioIndexTests::Test2Bam_ExistingIndex();
     PacBioIndexTests::ExpectRawIndicesEqual(expectedIndex, loadedIndex);
 }
 
 TEST(PacBioIndexTest, BasicAndBarodeSectionsOnly)
 {
     // do this in temp directory, so we can ensure write access
-    const string tempDir = PbbamTestsConfig::GeneratedData_Dir + "/";
-    const string tempBamFn = tempDir + "phi29.bam";
-    const string tempPbiFn = tempBamFn + ".pbi";
-    string cmd("cp ");
+    const std::string tempDir = PbbamTestsConfig::GeneratedData_Dir + "/";
+    const std::string tempBamFn = tempDir + "phi29.bam";
+    const std::string tempPbiFn = tempBamFn + ".pbi";
+    std::string cmd("cp ");
     cmd += PacBioIndexTests::phi29BamFn;
     cmd += " ";
     cmd += tempDir;
@@ -286,17 +285,17 @@ TEST(PacBioIndexTest, BasicAndBarodeSectionsOnly)
     EXPECT_FALSE(index.HasMappedData());
     EXPECT_TRUE(index.HasBarcodeData());
 
-    const vector<int16_t> expectedBcForward = {
+    const std::vector<int16_t> expectedBcForward{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
         2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
-    const vector<int16_t> expectedBcReverse = {
+    const std::vector<int16_t> expectedBcReverse{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
         2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
-    const vector<int8_t> expectedBcQuality = {
+    const std::vector<int8_t> expectedBcQuality{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,

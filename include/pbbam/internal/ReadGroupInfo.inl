@@ -13,18 +13,18 @@ namespace BAM {
 inline size_t ReadGroupInfo::BarcodeCount() const
 {
     if (!hasBarcodeData_)
-        throw std::runtime_error("barcode count requested but barcode data is missing");
+        throw std::runtime_error{"barcode count requested but barcode data is missing"};
     return barcodeCount_;
 }
 
-inline ReadGroupInfo& ReadGroupInfo::BarcodeData(const std::string& barcodeFile,
-                                                 const std::string& barcodeHash,
+inline ReadGroupInfo& ReadGroupInfo::BarcodeData(std::string barcodeFile,
+                                                 std::string barcodeHash,
                                                  size_t barcodeCount,
                                                  BarcodeModeType barcodeMode,
                                                  BarcodeQualityType barcodeQuality)
 {
-    barcodeFile_ = barcodeFile;
-    barcodeHash_ = barcodeHash;
+    barcodeFile_ = std::move(barcodeFile);
+    barcodeHash_ = std::move(barcodeHash);
     barcodeCount_ = barcodeCount;
     barcodeMode_ = barcodeMode;
     barcodeQuality_ = barcodeQuality;
@@ -35,62 +35,62 @@ inline ReadGroupInfo& ReadGroupInfo::BarcodeData(const std::string& barcodeFile,
 inline std::string ReadGroupInfo::BarcodeFile() const
 {
     if (!hasBarcodeData_)
-        throw std::runtime_error("barcode file requested but barcode data is missing");
+        throw std::runtime_error{"barcode file requested but barcode data is missing"};
     return barcodeFile_;
 }
 
 inline std::string ReadGroupInfo::BarcodeHash() const
 {
     if (!hasBarcodeData_)
-        throw std::runtime_error("barcode hash requested but barcode data is missing");
+        throw std::runtime_error{"barcode hash requested but barcode data is missing"};
     return barcodeHash_;
 }
 
 inline BarcodeModeType ReadGroupInfo::BarcodeMode() const
 {
     if (!hasBarcodeData_)
-        throw std::runtime_error("barcode mode requested but barcode data is missing");
+        throw std::runtime_error{"barcode mode requested but barcode data is missing"};
     return barcodeMode_;
 }
 
 inline BarcodeQualityType ReadGroupInfo::BarcodeQuality() const
 {
     if (!hasBarcodeData_)
-        throw std::runtime_error("barcode quality requested but barcode data is missing");
+        throw std::runtime_error{"barcode quality requested but barcode data is missing"};
     return barcodeQuality_;
 }
 
 inline std::string ReadGroupInfo::BasecallerVersion() const
 { return basecallerVersion_; }
 
-inline ReadGroupInfo& ReadGroupInfo::BasecallerVersion(const std::string& versionNumber)
+inline ReadGroupInfo& ReadGroupInfo::BasecallerVersion(std::string versionNumber)
 {
     if (basecallerVersion_ != versionNumber) { 
-        basecallerVersion_ = versionNumber; 
+        basecallerVersion_ = std::move(versionNumber);
         sequencingChemistry_.clear(); // reset cached chemistry name
     }
     return *this; 
 }
 
-inline std::string ReadGroupInfo::BaseFeatureTag(const BaseFeature& feature) const
+inline std::string ReadGroupInfo::BaseFeatureTag(BaseFeature feature) const
 {
     const auto iter = features_.find(feature);
     if (iter == features_.end())
-        return std::string();
+        return {};
     return iter->second;
 }
 
-inline ReadGroupInfo& ReadGroupInfo::BaseFeatureTag(const BaseFeature& feature,
-                                                    const std::string& tag)
-{ features_[feature] = tag; return *this; }
+inline ReadGroupInfo& ReadGroupInfo::BaseFeatureTag(BaseFeature feature,
+                                                    std::string tag)
+{ features_[feature] = std::move(tag); return *this; }
 
 inline std::string ReadGroupInfo::BindingKit() const
 { return bindingKit_; }
 
-inline ReadGroupInfo& ReadGroupInfo::BindingKit(const std::string& kitNumber)
+inline ReadGroupInfo& ReadGroupInfo::BindingKit(std::string kitNumber)
 {
     if (bindingKit_ != kitNumber) { 
-        bindingKit_ = kitNumber;
+        bindingKit_ = std::move(kitNumber);
         sequencingChemistry_.clear(); // reset cached chemistry name
     }
     return *this; 
@@ -113,44 +113,44 @@ inline ReadGroupInfo& ReadGroupInfo::ClearBaseFeatures()
 inline bool ReadGroupInfo::Control() const
 { return control_; }
 
-inline ReadGroupInfo& ReadGroupInfo::Control(const bool ctrl)
+inline ReadGroupInfo& ReadGroupInfo::Control(bool ctrl)
 { control_ = ctrl; return *this; }
 
 inline std::map<std::string, std::string> ReadGroupInfo::CustomTags() const
 { return custom_; }
 
-inline ReadGroupInfo& ReadGroupInfo::CustomTags(const std::map<std::string, std::string>& custom)
-{ custom_ = custom; return *this; }
+inline ReadGroupInfo& ReadGroupInfo::CustomTags(std::map<std::string, std::string> custom)
+{ custom_ = std::move(custom); return *this; }
 
 inline std::string ReadGroupInfo::Date() const
 { return date_; }
 
-inline ReadGroupInfo& ReadGroupInfo::Date(const std::string& date)
-{ date_ = date; return *this; }
+inline ReadGroupInfo& ReadGroupInfo::Date(std::string date)
+{ date_ = std::move(date); return *this; }
 
 inline std::string ReadGroupInfo::FlowOrder() const
 { return flowOrder_; }
 
-inline ReadGroupInfo& ReadGroupInfo::FlowOrder(const std::string& order)
-{ flowOrder_ = order; return *this; }
+inline ReadGroupInfo& ReadGroupInfo::FlowOrder(std::string order)
+{ flowOrder_ = std::move(order); return *this; }
 
 inline std::string ReadGroupInfo::FrameRateHz() const
 { return frameRateHz_; }
 
-inline ReadGroupInfo& ReadGroupInfo::FrameRateHz(const std::string& frameRateHz)
-{ frameRateHz_ = frameRateHz; return *this; }
+inline ReadGroupInfo& ReadGroupInfo::FrameRateHz(std::string frameRateHz)
+{ frameRateHz_ = std::move(frameRateHz); return *this; }
 
 inline bool ReadGroupInfo::HasBarcodeData() const
 { return hasBarcodeData_; }
 
-inline bool ReadGroupInfo::HasBaseFeature(const BaseFeature& feature) const
+inline bool ReadGroupInfo::HasBaseFeature(BaseFeature feature) const
 { return features_.find(feature) != features_.end(); }
 
 inline std::string ReadGroupInfo::Id() const
 { return id_; }
 
-inline ReadGroupInfo& ReadGroupInfo::Id(const std::string& id)
-{ id_ = id; return *this; }
+inline ReadGroupInfo& ReadGroupInfo::Id(std::string id)
+{ id_ = std::move(id); return *this; }
 
 inline ReadGroupInfo& ReadGroupInfo::Id(const std::string& movieName,
                                         const std::string& readType)
@@ -171,20 +171,20 @@ inline bool ReadGroupInfo::IsValid() const
 inline std::string ReadGroupInfo::KeySequence() const
 { return keySequence_; }
 
-inline ReadGroupInfo& ReadGroupInfo::KeySequence(const std::string& sequence)
-{ keySequence_ = sequence; return *this; }
+inline ReadGroupInfo& ReadGroupInfo::KeySequence(std::string sequence)
+{ keySequence_ = std::move(sequence); return *this; }
 
 inline std::string ReadGroupInfo::Library() const
 { return library_; }
 
-inline ReadGroupInfo& ReadGroupInfo::Library(const std::string& library)
-{ library_ = library; return *this; }
+inline ReadGroupInfo& ReadGroupInfo::Library(std::string library)
+{ library_ = std::move(library); return *this; }
 
 inline std::string ReadGroupInfo::MovieName() const
 { return movieName_; }
 
-inline ReadGroupInfo& ReadGroupInfo::MovieName(const std::string& movieName)
-{ movieName_ = movieName; return *this; }
+inline ReadGroupInfo& ReadGroupInfo::MovieName(std::string movieName)
+{ movieName_ = std::move(movieName); return *this; }
 
 inline std::string ReadGroupInfo::Platform() const
 { return std::string("PACBIO"); }
@@ -192,20 +192,20 @@ inline std::string ReadGroupInfo::Platform() const
 inline PlatformModelType ReadGroupInfo::PlatformModel() const
 { return platformModel_; }
 
-inline ReadGroupInfo& ReadGroupInfo::PlatformModel(const PlatformModelType& platform)
+inline ReadGroupInfo& ReadGroupInfo::PlatformModel(PlatformModelType platform)
 { platformModel_ = platform; return *this; }
 
 inline std::string ReadGroupInfo::PredictedInsertSize() const
 { return predictedInsertSize_; }
 
-inline ReadGroupInfo& ReadGroupInfo::PredictedInsertSize(const std::string& size)
-{ predictedInsertSize_ = size; return *this; }
+inline ReadGroupInfo& ReadGroupInfo::PredictedInsertSize(std::string size)
+{ predictedInsertSize_ = std::move(size); return *this; }
 
 inline std::string ReadGroupInfo::Programs() const
 { return programs_; }
 
-inline ReadGroupInfo& ReadGroupInfo::Programs(const std::string& programs)
-{ programs_ = programs; return *this; }
+inline ReadGroupInfo& ReadGroupInfo::Programs(std::string programs)
+{ programs_ = std::move(programs); return *this; }
 
 inline FrameCodec ReadGroupInfo::PulseWidthCodec() const
 { return pulseWidthCodec_; }
@@ -213,12 +213,12 @@ inline FrameCodec ReadGroupInfo::PulseWidthCodec() const
 inline std::string ReadGroupInfo::ReadType() const
 { return readType_; }
 
-inline ReadGroupInfo& ReadGroupInfo::ReadType(const std::string& type)
-{ readType_ = type; return *this; }
+inline ReadGroupInfo& ReadGroupInfo::ReadType(std::string type)
+{ readType_ = std::move(type); return *this; }
 
-inline ReadGroupInfo& ReadGroupInfo::RemoveBaseFeature(const BaseFeature& feature)
+inline ReadGroupInfo& ReadGroupInfo::RemoveBaseFeature(BaseFeature feature)
 {
-    auto iter = features_.find(feature);
+    const auto iter = features_.find(feature);
     if (iter != features_.end())
         features_.erase(iter);
     return *this;
@@ -227,14 +227,14 @@ inline ReadGroupInfo& ReadGroupInfo::RemoveBaseFeature(const BaseFeature& featur
 inline std::string ReadGroupInfo::Sample() const
 { return sample_; }
 
-inline ReadGroupInfo& ReadGroupInfo::Sample(const std::string& sample)
-{ sample_ = sample; return *this; }
+inline ReadGroupInfo& ReadGroupInfo::Sample(std::string sample)
+{ sample_ = std::move(sample); return *this; }
 
 inline std::string ReadGroupInfo::SequencingCenter() const
 { return sequencingCenter_; }
 
-inline ReadGroupInfo& ReadGroupInfo::SequencingCenter(const std::string& center)
-{ sequencingCenter_ = center; return *this; }
+inline ReadGroupInfo& ReadGroupInfo::SequencingCenter(std::string center)
+{ sequencingCenter_ = std::move(center); return *this; }
 
 inline std::string ReadGroupInfo::SequencingChemistry() const
 {
@@ -247,10 +247,10 @@ inline std::string ReadGroupInfo::SequencingChemistry() const
 inline std::string ReadGroupInfo::SequencingKit() const
 { return sequencingKit_; }
 
-inline ReadGroupInfo& ReadGroupInfo::SequencingKit(const std::string& kitNumber)
+inline ReadGroupInfo& ReadGroupInfo::SequencingKit(std::string kitNumber)
 { 
     if (sequencingKit_ != kitNumber) {
-        sequencingKit_ = kitNumber; 
+        sequencingKit_ = std::move(kitNumber);
         sequencingChemistry_.clear(); // reset cached chemistry name
     }
     return *this; }

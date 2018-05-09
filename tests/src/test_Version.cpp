@@ -1,6 +1,7 @@
 // Author: Derek Barnett
 
 #include <sstream>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -9,7 +10,6 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 using namespace PacBio::BAM::internal;
-using namespace std;
 
 namespace VersionTests {
 
@@ -265,19 +265,19 @@ TEST(VersionTest, ToStringOk)
 {
     {
         Version v(0, 0, 0);
-        EXPECT_EQ(string("0.0.0"), v.ToString());
+        EXPECT_EQ(std::string("0.0.0"), v.ToString());
     }
     {
         Version v(3, 1, 4);
-        EXPECT_EQ(string("3.1.4"), v.ToString());
+        EXPECT_EQ(std::string("3.1.4"), v.ToString());
     }
     {
         Version v;
         v.Major(4);
-        EXPECT_EQ(string("4.0.0"), v.ToString());
+        EXPECT_EQ(std::string("4.0.0"), v.ToString());
     }
     {
-        const string s = "1.2.3";
+        const std::string s = "1.2.3";
         Version v(s);
         EXPECT_EQ(s, v.ToString());
     }
@@ -288,8 +288,8 @@ TEST(VersionTest, OutputStreamOk)
     Version v(3, 1, 4);
     Version v2(4, 10, 0);
 
-    stringstream s;
-    s << v << ", " << v2 << ", " << v << endl;
+    std::ostringstream s;
+    s << v << ", " << v2 << ", " << v << std::endl;
 
-    EXPECT_EQ(string("3.1.4, 4.10.0, 3.1.4\n"), s.str());
+    EXPECT_EQ(std::string("3.1.4, 4.10.0, 3.1.4\n"), s.str());
 }

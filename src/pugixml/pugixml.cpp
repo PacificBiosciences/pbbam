@@ -14,6 +14,18 @@
 #ifndef SOURCE_PUGIXML_CPP
 #define SOURCE_PUGIXML_CPP
 
+// disable all the warnings in this file
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdouble-promotion"
+
+#if __GNUC__ >= 6
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+#endif
+
+#if !defined(__clang__) and !defined(__INTEL_COMPILER)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
+
 #include "../PbbamInternalConfig.h"
 
 #include "pugixml.hpp"
@@ -11523,3 +11535,5 @@ namespace pugi
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
+
+#pragma GCC diagnostic pop

@@ -18,6 +18,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "StringUtils.h"
+#include "pbbam/MakeUnique.h"
 
 namespace PacBio {
 namespace BAM {
@@ -55,9 +56,8 @@ IndexList readLengthHelper(const std::vector<T>& start, const std::vector<T>& en
                 break;
             default:
                 assert(false);
-                throw std::runtime_error(
-                    std::string{"read length filter encountered unknown Compare::Type: "} +
-                    Compare::TypeToName(cmp));
+                throw std::runtime_error{"read length filter encountered unknown Compare::Type: " +
+                                         Compare::TypeToName(cmp)};
         }
 
         if (keep) result.push_back(i);
@@ -67,7 +67,19 @@ IndexList readLengthHelper(const std::vector<T>& start, const std::vector<T>& en
 
 static PbiFilter filterFromMovieName(const std::string& movieName, bool includeCcs)
 {
-    // we'll match on any rgIds from our candidate list
+    //
+    // All transcript-type reads (movieName == "transcript") have the same
+    // read group ID. Calculate once & and create filters from that ID.
+    //
+    if (movieName == "transcript") {
+        static const auto transcriptRgId = MakeReadGroupId("transcript", "TRANSCRIPT");
+        return PbiFilter{PbiReadGroupFilter{transcriptRgId}};
+    }
+
+    //
+    // For all other movie names, we can't determine read type up front, so we'll match
+    // on any rgIds from a candidate list.
+    //
     auto filter = PbiFilter{PbiFilter::UNION};
     filter.Add({PbiReadGroupFilter{MakeReadGroupId(movieName, "POLYMERASE")},
                 PbiReadGroupFilter{MakeReadGroupId(movieName, "HQREGION")},
@@ -106,9 +118,9 @@ bool PbiIdentityFilter::Accepts(const PbiRawData& idx, const size_t row) const
     const auto& qStart = basicData.qStart_.at(row);
     const auto& qEnd = basicData.qEnd_.at(row);
 
-    const auto readLength = qEnd - qStart;
-    const auto nonMatches = nMM + nDel + nIns;
-    const float identity = 1.0 - (static_cast<float>(nonMatches) / static_cast<float>(readLength));
+    const float readLength = qEnd - qStart;
+    const float nonMatches = nMM + nDel + nIns;
+    const float identity = 1.0f - (nonMatches / readLength);
 
     return CompareHelper(identity);
 }
@@ -116,21 +128,14 @@ bool PbiIdentityFilter::Accepts(const PbiRawData& idx, const size_t row) const
 // PbiMovieNameFilter
 
 PbiMovieNameFilter::PbiMovieNameFilter(const std::string& movieName)
-    : compositeFilter_(internal::filterFromMovieName(movieName, true))  // include CCS
+    : compositeFilter_{internal::filterFromMovieName(movieName, true)}  // include CCS
 {
 }
 
 PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& whitelist)
-    : compositeFilter_(PbiFilter::UNION)
+    : compositeFilter_{PbiFilter::UNION}
 {
     for (const auto& movieName : whitelist)
-        compositeFilter_.Add(internal::filterFromMovieName(movieName, true));  // include CCS
-}
-
-PbiMovieNameFilter::PbiMovieNameFilter(std::vector<std::string>&& whitelist)
-    : compositeFilter_(PbiFilter::UNION)
-{
-    for (auto&& movieName : whitelist)
         compositeFilter_.Add(internal::filterFromMovieName(movieName, true));  // include CCS
 }
 
@@ -225,16 +230,14 @@ public:
         if (IsCcsOrTranscript(type)) {
             if (nameParts.size() != 2) {
                 const auto typeName = (type == RecordType::CCS) ? "CCS" : "transcript";
-                const auto msg = "PbiQueryNameFilter error: requested QNAME (" + queryName +
-                                 ") is not valid for PacBio " + typeName +
-                                 " reads. See spec for details.";
-                throw std::runtime_error{msg};
+                throw std::runtime_error{"PbiQueryNameFilter error: requested QNAME (" + queryName +
+                                         ") is not valid for PacBio " + typeName +
+                                         " reads. See spec for details."};
             }
         } else {
             if (nameParts.size() != 3) {
-                const auto msg = "PbiQueryNameFilter error: requested QNAME (" + queryName +
-                                 ") is not a valid PacBio BAM QNAME. See spec for details";
-                throw std::runtime_error{msg};
+                throw std::runtime_error{"PbiQueryNameFilter error: requested QNAME (" + queryName +
+                                         ") is not a valid PacBio BAM QNAME. See spec for details"};
             }
         }
 
@@ -249,9 +252,8 @@ public:
         else {
             const auto queryIntervalParts = Split(nameParts.at(2), '_');
             if (queryIntervalParts.size() != 2) {
-                auto msg = std::string{"PbiQueryNameFilter error: requested QNAME ("} + queryName;
-                msg += std::string{") is not a valid PacBio BAM QNAME. See spec for details"};
-                throw std::runtime_error{msg};
+                throw std::runtime_error{"PbiQueryNameFilter error: requested QNAME (" + queryName +
+                                         ") is not a valid PacBio BAM QNAME. See spec for details"};
             }
             UpdateZmwQueryIntervals(zmwPtr.get(), zmw, std::stoi(queryIntervalParts.at(0)),
                                     std::stoi(queryIntervalParts.at(1)));
@@ -296,17 +298,18 @@ private:
 };
 
 PbiQueryNameFilter::PbiQueryNameFilter(const std::string& qname)
-    : d_(new PbiQueryNameFilter::PbiQueryNameFilterPrivate(std::vector<std::string>{1, qname}))
+    : d_{std::make_unique<PbiQueryNameFilter::PbiQueryNameFilterPrivate>(
+          std::vector<std::string>{1, qname})}
 {
 }
 
 PbiQueryNameFilter::PbiQueryNameFilter(const std::vector<std::string>& whitelist)
-    : d_(new PbiQueryNameFilter::PbiQueryNameFilterPrivate(whitelist))
+    : d_{std::make_unique<PbiQueryNameFilter::PbiQueryNameFilterPrivate>(whitelist)}
 {
 }
 
 PbiQueryNameFilter::PbiQueryNameFilter(const PbiQueryNameFilter& other)
-    : d_(new PbiQueryNameFilter::PbiQueryNameFilterPrivate(other.d_))
+    : d_{std::make_unique<PbiQueryNameFilter::PbiQueryNameFilterPrivate>(other.d_)}
 {
 }
 
@@ -320,25 +323,18 @@ bool PbiQueryNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
 // PbiReferenceNameFilter
 
 PbiReferenceNameFilter::PbiReferenceNameFilter(std::string rname, Compare::Type cmp)
-    : rname_(std::move(rname)), cmp_(cmp)
+    : rname_{std::move(rname)}, cmp_{cmp}
 {
     if (cmp != Compare::EQUAL && cmp != Compare::NOT_EQUAL) {
-        auto msg = std::string{"Compare type: "};
-        msg += Compare::TypeToName(cmp);
-        msg +=
+        throw std::runtime_error{
+            "Compare type: " + Compare::TypeToName(cmp) +
             " not supported for PbiReferenceNameFilter (use one of Compare::EQUAL or "
-            "Compare::NOT_EQUAL).";
-        throw std::runtime_error(msg);
+            "Compare::NOT_EQUAL)."};
     }
 }
 
-PbiReferenceNameFilter::PbiReferenceNameFilter(const std::vector<std::string>& whitelist)
-    : rnameWhitelist_(whitelist), cmp_(Compare::EQUAL)
-{
-}
-
-PbiReferenceNameFilter::PbiReferenceNameFilter(std::vector<std::string>&& whitelist)
-    : rnameWhitelist_(std::move(whitelist)), cmp_(Compare::EQUAL)
+PbiReferenceNameFilter::PbiReferenceNameFilter(std::vector<std::string> whitelist)
+    : rnameWhitelist_{std::move(whitelist)}, cmp_{Compare::EQUAL}
 {
 }
 
@@ -352,7 +348,7 @@ void PbiReferenceNameFilter::Initialize(const PbiRawData& idx) const
 {
     const auto pbiFilename = idx.Filename();
     const auto bamFilename = pbiFilename.substr(0, pbiFilename.length() - 4);
-    const auto bamFile = BamFile{bamFilename};
+    const BamFile bamFile{bamFilename};
 
     // single-value
     if (rnameWhitelist_ == boost::none) {

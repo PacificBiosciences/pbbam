@@ -51,7 +51,7 @@ std::vector<T> readBamMultiValue(const uint8_t* src, size_t& offset)
     std::vector<T> result;
     result.reserve(numElements);
     for (size_t i = 0; i < numElements; ++i) {
-        const T& value = readBamValue<T>(src, offset);
+        const T value = readBamValue<T>(src, offset);
         result.push_back(value);
     }
     return result;
@@ -146,16 +146,16 @@ TagCollection BamTagCodec::Decode(const std::vector<uint8_t>& data)
 
                     // unknown subTagType
                     default:
-                        throw std::runtime_error("unsupported array-tag-type encountered: " +
-                                                 std::string(1, subTagType));
+                        throw std::runtime_error{"unsupported array-tag-type encountered: " +
+                                                 std::string{1, subTagType}};
                 }
                 break;
             }
 
             // unknown tagType
             default:
-                throw std::runtime_error("unsupported tag-type encountered: " +
-                                         std::string(1, tagType));
+                throw std::runtime_error{"unsupported tag-type encountered: " +
+                                         std::string{1, tagType}};
         }
     }
 
@@ -166,12 +166,12 @@ std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
 {
     kstring_t str = {0, 0, nullptr};
 
-    const auto tagEnd = tags.cend();
-    for (auto tagIter = tags.cbegin(); tagIter != tagEnd; ++tagIter) {
+    for (const auto& tagIter : tags) {
 
-        const std::string& name = (*tagIter).first;
-        if (name.size() != 2) throw std::runtime_error("malformatted tag name: " + name);
-        const Tag& tag = (*tagIter).second;
+        const auto& name = tagIter.first;
+        if (name.size() != 2) throw std::runtime_error{"malformatted tag name: " + name};
+
+        const auto& tag = tagIter.second;
         if (tag.IsNull()) continue;
 
         // "<TAG>:"
@@ -179,7 +179,7 @@ std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
 
         // "<TYPE>:<DATA>" for printable, ASCII char
         if (tag.HasModifier(TagModifier::ASCII_CHAR)) {
-            char c = tag.ToAscii();
+            const char c = tag.ToAscii();
             if (c != '\0') {
                 kputc_('A', &str);
                 kputc_(c, &str);
@@ -233,7 +233,7 @@ std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
                     kputc_('H', &str);
                 else
                     kputc_('Z', &str);
-                const std::string& s = tag.ToString();
+                const auto s = tag.ToString();
                 kputsn_(s.c_str(), s.size() + 1, &str);  // this adds the null-term
                 break;
             }
@@ -284,8 +284,8 @@ std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
             // unsupported tag type
             default: {
                 free(str.s);
-                throw std::runtime_error("unsupported tag-type encountered: " +
-                                         std::to_string(static_cast<uint16_t>(tag.Type())));
+                throw std::runtime_error{"unsupported tag-type encountered: " +
+                                         std::to_string(static_cast<uint16_t>(tag.Type()))};
             }
         }
     }
@@ -307,31 +307,31 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
     switch (tagType) {
         case 'A':
         case 'a': {
-            Tag t = Tag(readBamValue<uint8_t>(rawData, offset));
+            Tag t{readBamValue<uint8_t>(rawData, offset)};
             t.Modifier(TagModifier::ASCII_CHAR);
             return t;
         }
 
         case 'c':
-            return Tag(readBamValue<int8_t>(rawData, offset));
+            return {readBamValue<int8_t>(rawData, offset)};
         case 'C':
-            return Tag(readBamValue<uint8_t>(rawData, offset));
+            return {readBamValue<uint8_t>(rawData, offset)};
         case 's':
-            return Tag(readBamValue<int16_t>(rawData, offset));
+            return {readBamValue<int16_t>(rawData, offset)};
         case 'S':
-            return Tag(readBamValue<uint16_t>(rawData, offset));
+            return {readBamValue<uint16_t>(rawData, offset)};
         case 'i':
-            return Tag(readBamValue<int32_t>(rawData, offset));
+            return {readBamValue<int32_t>(rawData, offset)};
         case 'I':
-            return Tag(readBamValue<uint32_t>(rawData, offset));
+            return {readBamValue<uint32_t>(rawData, offset)};
         case 'f':
-            return Tag(readBamValue<float>(rawData, offset));
+            return {readBamValue<float>(rawData, offset)};
 
         case 'Z':
         case 'H': {
             const size_t dataLength = strlen(reinterpret_cast<const char*>(&rawData[0]));
             std::string value(reinterpret_cast<const char*>(&rawData[0]), dataLength);
-            Tag t(value);
+            Tag t{value};
             if (tagType == 'H') t.Modifier(TagModifier::HEX_STRING);
             return t;
         }
@@ -341,32 +341,32 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
             switch (subTagType) {
 
                 case 'c':
-                    return Tag(readBamMultiValue<int8_t>(rawData, offset));
+                    return {readBamMultiValue<int8_t>(rawData, offset)};
                 case 'C':
-                    return Tag(readBamMultiValue<uint8_t>(rawData, offset));
+                    return {readBamMultiValue<uint8_t>(rawData, offset)};
                 case 's':
-                    return Tag(readBamMultiValue<int16_t>(rawData, offset));
+                    return {readBamMultiValue<int16_t>(rawData, offset)};
                 case 'S':
-                    return Tag(readBamMultiValue<uint16_t>(rawData, offset));
+                    return {readBamMultiValue<uint16_t>(rawData, offset)};
                 case 'i':
-                    return Tag(readBamMultiValue<int32_t>(rawData, offset));
+                    return {readBamMultiValue<int32_t>(rawData, offset)};
                 case 'I':
-                    return Tag(readBamMultiValue<uint32_t>(rawData, offset));
+                    return {readBamMultiValue<uint32_t>(rawData, offset)};
                 case 'f':
-                    return Tag(readBamMultiValue<float>(rawData, offset));
+                    return {readBamMultiValue<float>(rawData, offset)};
 
                 // unknown subTagType
                 default:
-                    throw std::runtime_error("unsupported array-tag-type encountered: " +
-                                             std::string(1, subTagType));
+                    throw std::runtime_error{"unsupported array-tag-type encountered: " +
+                                             std::string{1, subTagType}};
             }
             break;
         }
 
         // unknown tagType
         default:
-            throw std::runtime_error("unsupported tag-type encountered: " +
-                                     std::string(1, tagType));
+            throw std::runtime_error{"unsupported tag-type encountered: " +
+                                     std::string{1, tagType}};
     }
     return Tag();  // to avoid compiler warning
 }
@@ -415,7 +415,7 @@ std::vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag, const TagModifier& a
 
             // string & hex-string values
             case TagDataType::STRING: {
-                const std::string& s = tag.ToString();
+                const auto s = tag.ToString();
                 kputsn_(s.c_str(), s.size() + 1, &str);  // this adds the null-term
                 break;
             }
@@ -460,8 +460,8 @@ std::vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag, const TagModifier& a
             // unsupported tag type
             default: {
                 free(str.s);
-                throw std::runtime_error("unsupported tag-type encountered: " +
-                                         std::to_string(static_cast<uint16_t>(tag.Type())));
+                throw std::runtime_error{"unsupported tag-type encountered: " +
+                                         std::to_string(static_cast<uint16_t>(tag.Type()))};
             }
         }
     }
@@ -499,14 +499,14 @@ uint8_t BamTagCodec::TagTypeCode(const Tag& tag, const TagModifier& additionalMo
                 break;
             default:
                 // non integers not allowed
-                throw std::runtime_error("tag-type not convertible to ASCII, tag-type: " +
-                                         std::to_string(static_cast<uint16_t>(tag.Type())));
+                throw std::runtime_error{"tag-type not convertible to ASCII, tag-type: " +
+                                         std::to_string(static_cast<uint16_t>(tag.Type()))};
         }
 
         // ensure value is in valid ASCII char range
         if (value < 33 || value > 126)
-            throw std::runtime_error("invalid integer value for ASCII char, value: " +
-                                     std::to_string(value));
+            throw std::runtime_error{"invalid integer value for ASCII char, value: " +
+                                     std::to_string(value)};
 
         return static_cast<uint8_t>('A');
     }
@@ -544,8 +544,8 @@ uint8_t BamTagCodec::TagTypeCode(const Tag& tag, const TagModifier& additionalMo
             return static_cast<uint8_t>('B');
 
         default:
-            throw std::runtime_error("unsupported tag-type encountered: " +
-                                     std::to_string(static_cast<uint16_t>(tag.Type())));
+            throw std::runtime_error{"unsupported tag-type encountered: " +
+                                     std::to_string(static_cast<uint16_t>(tag.Type()))};
     }
     return 0;  // to avoid compiler warning
 }

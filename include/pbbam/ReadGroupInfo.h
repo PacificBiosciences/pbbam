@@ -146,7 +146,7 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    /// \brief Creates an empty read group info object.
+    /// \brief Creates an empty read group of UNKNOWN read type.
     ReadGroupInfo();
 
     /// \brief Creates a read group info object with an ID.
@@ -173,7 +173,7 @@ public:
     ///
     /// \sa RecordType
     ///
-    ReadGroupInfo(std::string movieName, std::string readType, const PlatformModelType platform);
+    ReadGroupInfo(std::string movieName, std::string readType, PlatformModelType platform);
 
     ReadGroupInfo(const ReadGroupInfo&) = default;
     ReadGroupInfo(ReadGroupInfo&&) = default;
@@ -253,7 +253,7 @@ public:
     std::string BasecallerVersion() const;
 
     /// \returns tag name in use for the specified for base feature
-    std::string BaseFeatureTag(const BaseFeature& feature) const;
+    std::string BaseFeatureTag(BaseFeature feature) const;
 
     /// \returns binding kit part number (e.g. "100236500")
     std::string BindingKit() const;
@@ -280,7 +280,7 @@ public:
     bool HasBarcodeData() const;
 
     /// \returns true if read group has an entry for the specified base feature
-    bool HasBaseFeature(const BaseFeature& feature) const;
+    bool HasBaseFeature(BaseFeature feature) const;
 
     /// \returns string value of \@RG:ID
     std::string Id() const;
@@ -352,7 +352,7 @@ public:
     ///
     /// \returns reference to this object
     ///
-    ReadGroupInfo& BarcodeData(const std::string& barcodeFile, const std::string& barcodeHash,
+    ReadGroupInfo& BarcodeData(std::string barcodeFile, std::string barcodeHash,
                                size_t barcodeCount, BarcodeModeType barcodeMode,
                                BarcodeQualityType barcodeQuality);
 
@@ -361,7 +361,7 @@ public:
     /// \param[in] versionNumber   new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& BasecallerVersion(const std::string& versionNumber);
+    ReadGroupInfo& BasecallerVersion(std::string versionNumber);
 
     /// \brief Sets the tag to be used for a particular base feature.
     ///
@@ -369,14 +369,14 @@ public:
     /// \param[in] tag          new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& BaseFeatureTag(const BaseFeature& feature, const std::string& tag);
+    ReadGroupInfo& BaseFeatureTag(BaseFeature feature, std::string tag);
 
     /// \brief Sets the binding kit part number.
     ///
     /// \param[in] kitNumber    new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& BindingKit(const std::string& kitNumber);
+    ReadGroupInfo& BindingKit(std::string kitNumber);
 
     /// \brief Removes all barcode data from this read group.
     ///
@@ -396,7 +396,7 @@ public:
     /// \param[in] ctrl     true if records are spike-in controls
     /// \returns reference to this object
     ///
-    ReadGroupInfo& Control(const bool ctrl);
+    ReadGroupInfo& Control(bool ctrl);
 
     /// \brief Sets a new collection of non-standard tags.
     ///
@@ -405,35 +405,35 @@ public:
     /// \param[in] custom      new tags
     /// \returns reference to this object
     ///
-    ReadGroupInfo& CustomTags(const std::map<std::string, std::string>& custom);
+    ReadGroupInfo& CustomTags(std::map<std::string, std::string> custom);
 
     /// \brief Sets the value for \@RG:DT
     ///
     /// \param[in] date      new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& Date(const std::string& date);
+    ReadGroupInfo& Date(std::string date);
 
     /// \brief Sets the value for \@RG:FO
     ///
     /// \param[in] order     new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& FlowOrder(const std::string& order);
+    ReadGroupInfo& FlowOrder(std::string order);
 
     /// \brief Sets the frame rate.
     ///
     /// \param[in] frameRateHz     string value of frame rate in Hz
     /// \returns reference to this object
     ///
-    ReadGroupInfo& FrameRateHz(const std::string& frameRateHz);
+    ReadGroupInfo& FrameRateHz(std::string frameRateHz);
 
     /// \brief Sets the read group's ID.
     ///
     /// \param[in] id     string value of ID
     /// \returns reference to this object
     ///
-    ReadGroupInfo& Id(const std::string& id);
+    ReadGroupInfo& Id(std::string id);
 
     /// \brief Sets the read group's ID, from movie name & read type
     ///
@@ -449,49 +449,49 @@ public:
     /// \param[in] tag      IPD tag
     /// \returns reference to this object
     ///
-    ReadGroupInfo& IpdCodec(const FrameCodec& codec, const std::string& tag = std::string());
+    ReadGroupInfo& IpdCodec(FrameCodec codec, std::string tag = std::string());
 
     /// \brief Sets the value for \@RG:KS
     ///
     /// \param[in] sequence      new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& KeySequence(const std::string& sequence);
+    ReadGroupInfo& KeySequence(std::string sequence);
 
     /// \brief Sets the value for \@RG:LB
     ///
     /// \param[in] library      new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& Library(const std::string& library);
+    ReadGroupInfo& Library(std::string library);
 
     /// \brief Sets the value for movie name (stored in \@RG:PU).
     ///
     /// \param[in] movieName    new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& MovieName(const std::string& movieName);
+    ReadGroupInfo& MovieName(std::string movieName);
 
     /// \brief Sets the value for \@RG:PI
     ///
     /// \param[in] size         new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& PredictedInsertSize(const std::string& size);
+    ReadGroupInfo& PredictedInsertSize(std::string size);
 
     /// \brief Sets the value for \@RG:PG
     ///
     /// \param[in] programs     new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& Programs(const std::string& programs);
+    ReadGroupInfo& Programs(std::string programs);
 
     /// \brief Sets the value for \@RG:PM
     ///
     /// \param[in] platformModel new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& PlatformModel(const PlatformModelType& platform);
+    ReadGroupInfo& PlatformModel(PlatformModelType platform);
 
     /// \brief Sets the codec type used for PulseWidth
     ///
@@ -499,42 +499,42 @@ public:
     /// \param[in] tag      pulse width tag
     /// \returns reference to this object
     ///
-    ReadGroupInfo& PulseWidthCodec(const FrameCodec& codec, const std::string& tag = std::string());
+    ReadGroupInfo& PulseWidthCodec(FrameCodec codec, std::string tag = std::string());
 
     /// \brief Sets the read type.
     ///
     /// \param[in] type    new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& ReadType(const std::string& type);
+    ReadGroupInfo& ReadType(std::string type);
 
     /// \brief Removes a particular base feature from this read group.
     ///
     /// \param[in] feature      feature to remove
     /// \returns reference to this object
     ///
-    ReadGroupInfo& RemoveBaseFeature(const BaseFeature& feature);
+    ReadGroupInfo& RemoveBaseFeature(BaseFeature feature);
 
     /// \brief Sets the value for \@RG:SM
     ///
     /// \param[in] sample       new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& Sample(const std::string& sample);
+    ReadGroupInfo& Sample(std::string sample);
 
     /// \brief Sets the value for \@RG:CN
     ///
     /// \param[in] center       new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& SequencingCenter(const std::string& center);
+    ReadGroupInfo& SequencingCenter(std::string center);
 
     /// \brief Sets the sequencing kit part number.
     ///
     /// \param[in] kitNumber    new value
     /// \returns reference to this object
     ///
-    ReadGroupInfo& SequencingKit(const std::string& kitNumber);
+    ReadGroupInfo& SequencingKit(std::string kitNumber);
 
     /// \}
 

@@ -11,6 +11,7 @@
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
+#include <sstream>
 
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
@@ -18,6 +19,7 @@
 
 #include "Autovalidate.h"
 #include "MemoryUtils.h"
+#include "pbbam/MakeUnique.h"
 #include "pbbam/Validator.h"
 
 namespace PacBio {
@@ -27,17 +29,13 @@ namespace internal {
 struct BamReaderPrivate
 {
 public:
-    BamReaderPrivate(BamFile bamFile) : htsFile_{nullptr}, bamFile_{std::move(bamFile)}
-    {
-        DoOpen();
-    }
+    BamReaderPrivate(BamFile bamFile) : bamFile_{std::move(bamFile)} { DoOpen(); }
 
     void DoOpen()
     {
-
         // fetch file pointer
         htsFile_.reset(sam_open(bamFile_.Filename().c_str(), "rb"));
-        if (!htsFile_) throw std::runtime_error("could not open BAM file for reading");
+        if (!htsFile_) throw std::runtime_error{"could not open BAM file for reading"};
     }
 
 public:
@@ -47,15 +45,10 @@ public:
 
 }  // namespace internal
 
-BamReader::BamReader(const std::string& fn) : BamReader(BamFile(fn)) {}
+BamReader::BamReader(std::string fn) : BamReader{BamFile{std::move(fn)}} {}
 
-BamReader::BamReader(const BamFile& bamFile) : d_(new internal::BamReaderPrivate(bamFile))
-{
-    // skip header
-    VirtualSeek(d_->bamFile_.FirstAlignmentOffset());
-}
-
-BamReader::BamReader(BamFile&& bamFile) : d_(new internal::BamReaderPrivate(std::move(bamFile)))
+BamReader::BamReader(BamFile bamFile)
+    : d_{std::make_unique<internal::BamReaderPrivate>(std::move(bamFile))}
 {
     // skip header
     VirtualSeek(d_->bamFile_.FirstAlignmentOffset());
@@ -77,7 +70,7 @@ const BamFile& BamReader::File() const
     return d_->bamFile_;
 }
 
-std::string BamReader::Filename() const
+const std::string& BamReader::Filename() const
 {
     assert(d_);
     return d_->bamFile_.Filename();
@@ -94,7 +87,7 @@ bool BamReader::GetNext(BamRecord& record)
     assert(Bgzf());
     assert(internal::BamRecordMemory::GetRawData(record).get());
 
-    auto result = ReadRawData(Bgzf(), internal::BamRecordMemory::GetRawData(record).get());
+    const auto result = ReadRawData(Bgzf(), internal::BamRecordMemory::GetRawData(record).get());
 
     // success
     if (result >= 0) {
@@ -114,19 +107,18 @@ bool BamReader::GetNext(BamRecord& record)
 
     // error corrupted file
     else {
-        auto errorMsg = std::string{"corrupted BAM file: "};
+        std::ostringstream msg;
+        msg << "corrupted BAM file: ";
         if (result == -2)
-            errorMsg += "probably truncated";
+            msg << "probably truncated";
         else if (result == -3)
-            errorMsg += "could not read BAM record's' core data";
+            msg << "could not read BAM record's' core data";
         else if (result == -4)
-            errorMsg += "could not read BAM record's' variable-length data";
+            msg << "could not read BAM record's' variable-length data";
         else
-            errorMsg += "unknown reason " + std::to_string(result);
-        errorMsg += std::string{" ("};
-        errorMsg += Filename();
-        errorMsg += std::string{")"};
-        throw std::runtime_error{errorMsg};
+            msg << "unknown reason " + std::to_string(result);
+        msg << " (" << Filename() << ')';
+        throw std::runtime_error{msg.str()};
     }
 }
 
@@ -134,8 +126,8 @@ int BamReader::ReadRawData(BGZF* bgzf, bam1_t* b) { return bam_read1(bgzf, b); }
 
 void BamReader::VirtualSeek(int64_t virtualOffset)
 {
-    auto result = bgzf_seek(Bgzf(), virtualOffset, SEEK_SET);
-    if (result != 0) throw std::runtime_error("Failed to seek in BAM file");
+    const auto result = bgzf_seek(Bgzf(), virtualOffset, SEEK_SET);
+    if (result != 0) throw std::runtime_error{"Failed to seek in BAM file"};
 }
 
 int64_t BamReader::VirtualTell() const { return bgzf_tell(Bgzf()); }

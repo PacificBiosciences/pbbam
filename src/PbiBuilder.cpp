@@ -49,7 +49,7 @@ std::string ToString(const RecordType type)
     try {
         return lookup.at(type);
     } catch (std::exception&) {
-        throw std::runtime_error("error: unknown RecordType encountered");
+        throw std::runtime_error{"error: unknown RecordType encountered"};
     }
 }
 
@@ -80,17 +80,15 @@ inline void SwapEndianness(std::vector<T>& data)
                 ed_swap_8p(&data[i]);
             break;
         default:
-            throw std::runtime_error("unsupported element size");
+            throw std::runtime_error{"unsupported element size"};
     }
 }
 
 void bgzf_write_safe(BGZF* fp, const void* data, size_t length)
 {
-    auto ret = ::bgzf_write(fp, data, length);
-    if (ret < 0U) {
-        auto msg = "Non-zero returned from bgzf_write(). Out of disk space?";
-        throw std::runtime_error(msg);
-    }
+    const auto ret = bgzf_write(fp, data, length);
+    if (ret < 0L)
+        throw std::runtime_error{"Non-zero returned from bgzf_write(). Out of disk space?"};
 }
 
 template <typename T>
@@ -109,9 +107,9 @@ template <typename T>
 class PbiTempFile
 {
 public:
-    constexpr static size_t MaxBufferSize = 0x10000;  // 64K
-    constexpr static size_t ElementSize = sizeof(T);
-    constexpr static size_t MaxElementCount = MaxBufferSize / ElementSize;
+    constexpr static const size_t MaxBufferSize = 0x10000;  // 64K
+    constexpr static const size_t ElementSize = sizeof(T);
+    constexpr static const size_t MaxElementCount = MaxBufferSize / ElementSize;
 
 public:
     PbiTempFile(std::string fn);
@@ -132,7 +130,7 @@ private:
 private:
     // file info
     std::string fn_;
-    std::unique_ptr<FILE, internal::FileDeleter> fp_ = nullptr;
+    std::unique_ptr<FILE, internal::FileDeleter> fp_;
 
     // data storage/tracking
     std::vector<T> buffer_;
@@ -143,7 +141,7 @@ template <typename T>
 PbiTempFile<T>::PbiTempFile(std::string fn)
     : fn_{std::move(fn)}, fp_{std::fopen(fn_.c_str(), "w+b")}
 {
-    if (fp_ == nullptr) throw std::runtime_error("could not open temp file: " + fn_);
+    if (fp_ == nullptr) throw std::runtime_error{"could not open temp file: " + fn_};
     buffer_.reserve(MaxElementCount);
 }
 
@@ -192,7 +190,7 @@ void PbiTempFile<T>::Rewind()
     Flush();
 
     const auto ret = fseek(fp_.get(), 0, SEEK_SET);
-    if (ret != 0) throw std::runtime_error("could not rewind temp file" + fn_);
+    if (ret != 0) throw std::runtime_error{"could not rewind temp file" + fn_};
 }
 
 template <typename T>
@@ -246,7 +244,7 @@ PbiReferenceDataBuilder::PbiReferenceDataBuilder(const size_t numReferenceSequen
         rawReferenceEntries_[i] = PbiReferenceEntry(i);
 
     // also create an "unmapped" entry
-    rawReferenceEntries_[PbiReferenceEntry::UNMAPPED_ID] = PbiReferenceEntry();
+    rawReferenceEntries_[PbiReferenceEntry::UNMAPPED_ID] = PbiReferenceEntry{};
 }
 
 bool PbiReferenceDataBuilder::AddRecord(const BamRecord& record, const int32_t rowNumber)
@@ -295,7 +293,7 @@ PbiRawReferenceData PbiReferenceDataBuilder::Result() const
     // tId will be at end since we're sorting on the uint cast of -1
     PbiRawReferenceData result;
     result.entries_.reserve(rawReferenceEntries_.size());
-    for (auto& entry : rawReferenceEntries_)
+    for (const auto& entry : rawReferenceEntries_)
         result.entries_.push_back(entry.second);
     return result;
 }
@@ -450,9 +448,9 @@ PbiBuilderPrivate::~PbiBuilderPrivate() noexcept
 void PbiBuilderPrivate::AddBarcodeData(const BamRecord& b)
 {
     // initialize w/ 'missing' value
-    auto bcForward = int16_t{-1};
-    auto bcReverse = int16_t{-1};
-    auto bcQuality = int8_t{-1};
+    int16_t bcForward = -1;
+    int16_t bcReverse = -1;
+    int8_t bcQuality = -1;
 
     // check for any barcode data (both required)
     if (b.HasBarcodes() && b.HasBarcodeQuality()) {
@@ -487,15 +485,15 @@ void PbiBuilderPrivate::AddBasicData(const BamRecord& b, const int64_t vOffset)
 
     // query start/end
     const auto isCcsOrTranscript = (IsCcsOrTranscript(b.Type()));
-    const auto qStart = int32_t{(isCcsOrTranscript ? -1 : b.QueryStart())};
-    const auto qEnd = int32_t{(isCcsOrTranscript ? -1 : b.QueryEnd())};
+    const int32_t qStart = (isCcsOrTranscript ? -1 : b.QueryStart());
+    const int32_t qEnd = (isCcsOrTranscript ? -1 : b.QueryEnd());
 
     // add'l data
-    const auto holeNum = int32_t{(b.HasHoleNumber() ? b.HoleNumber() : 0)};
-    const auto readAccuracy =
-        float{(b.HasReadAccuracy() ? boost::numeric_cast<float>(b.ReadAccuracy()) : 0.0F)};
-    const auto ctxt = uint8_t{
-        (b.HasLocalContextFlags() ? b.LocalContextFlags() : LocalContextFlags::NO_LOCAL_CONTEXT)};
+    const int32_t holeNum = (b.HasHoleNumber() ? b.HoleNumber() : 0);
+    const float readAccuracy =
+        (b.HasReadAccuracy() ? boost::numeric_cast<float>(b.ReadAccuracy()) : 0.0F);
+    const uint8_t ctxt =
+        (b.HasLocalContextFlags() ? b.LocalContextFlags() : LocalContextFlags::NO_LOCAL_CONTEXT);
 
     // store
     rgIdFile_.Write(rgId);
@@ -510,7 +508,7 @@ void PbiBuilderPrivate::AddBasicData(const BamRecord& b, const int64_t vOffset)
 void PbiBuilderPrivate::AddMappedData(const BamRecord& b)
 {
     // fetch data
-    const auto tId = int32_t{b.ReferenceId()};
+    const auto tId = b.ReferenceId();
     const auto tStart = static_cast<uint32_t>(b.ReferenceStart());
     const auto tEnd = static_cast<uint32_t>(b.ReferenceEnd());
     const auto aStart = static_cast<uint32_t>(b.AlignedStart());
@@ -523,7 +521,7 @@ void PbiBuilderPrivate::AddMappedData(const BamRecord& b)
     const auto matchData = b.NumMatchesAndMismatches();
     const auto nM = static_cast<uint32_t>(matchData.first);
     const auto nMM = static_cast<uint32_t>(matchData.second);
-    const auto mapQuality = uint8_t{b.MapQuality()};
+    const auto mapQuality = b.MapQuality();
 
     if (tId >= 0) hasMappedData_ = true;
 
@@ -613,9 +611,9 @@ void PbiBuilderPrivate::Close()
 void PbiBuilderPrivate::OpenPbiFile()
 {
     // open file handle
-    const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel_));
+    const auto mode = std::string{"wb"} + std::to_string(static_cast<int>(compressionLevel_));
     outFile_.reset(bgzf_open(pbiFilename_.c_str(), mode.c_str()));
-    if (outFile_ == nullptr) throw std::runtime_error("could not open output file");
+    if (outFile_ == nullptr) throw std::runtime_error{"could not open output file"};
 
     // if no explicit thread count given, attempt built-in check
     size_t actualNumThreads = numThreads_;
@@ -660,7 +658,7 @@ void PbiBuilderPrivate::WritePbiHeader(BGZF* bgzf)
 
     // version, pbi_flags, & n_reads
     auto version = static_cast<uint32_t>(PbiFile::CurrentVersion);
-    auto pbi_flags = static_cast<uint16_t>(sections);
+    uint16_t pbi_flags = sections;
     auto numReads = currentRow_;
     if (bgzf->is_be) {
         version = ed_swap_4(version);
@@ -701,8 +699,8 @@ PbiBuilder::PbiBuilder(const std::string& pbiFilename, const size_t numReference
 PbiBuilder::PbiBuilder(const std::string& pbiFilename, const size_t numReferenceSequences,
                        const bool isCoordinateSorted, const CompressionLevel compressionLevel,
                        const size_t numThreads)
-    : d_{new internal::PbiBuilderPrivate{pbiFilename, numReferenceSequences, isCoordinateSorted,
-                                         compressionLevel, numThreads}}
+    : d_{std::make_unique<internal::PbiBuilderPrivate>(
+          pbiFilename, numReferenceSequences, isCoordinateSorted, compressionLevel, numThreads)}
 {
 }
 

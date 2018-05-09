@@ -124,7 +124,7 @@ static inline bool isList(const std::string& value) { return value.find(',') != 
 
 static PbiFilter CreateBarcodeFilter(std::string value, const Compare::Type compareType)
 {
-    if (value.empty()) throw std::runtime_error("empty value for barcode filter property");
+    if (value.empty()) throw std::runtime_error{"empty value for barcode filter property"};
 
     if (isBracketed(value)) {
         value.erase(0, 1);
@@ -133,7 +133,7 @@ static PbiFilter CreateBarcodeFilter(std::string value, const Compare::Type comp
 
     if (isList(value)) {
         std::vector<std::string> barcodes = internal::Split(value, ',');
-        if (barcodes.size() != 2) throw std::runtime_error("only 2 barcode values expected");
+        if (barcodes.size() != 2) throw std::runtime_error{"only 2 barcode values expected"};
         return PbiBarcodesFilter{boost::numeric_cast<int16_t>(std::stoi(barcodes.at(0))),
                                  boost::numeric_cast<int16_t>(std::stoi(barcodes.at(1))),
                                  compareType};
@@ -143,7 +143,7 @@ static PbiFilter CreateBarcodeFilter(std::string value, const Compare::Type comp
 
 static PbiFilter CreateBarcodeForwardFilter(std::string value, const Compare::Type compareType)
 {
-    if (value.empty()) throw std::runtime_error("empty value for barcode_forward filter property");
+    if (value.empty()) throw std::runtime_error{"empty value for barcode_forward filter property"};
 
     if (isBracketed(value)) {
         value.erase(0, 1);
@@ -163,7 +163,7 @@ static PbiFilter CreateBarcodeForwardFilter(std::string value, const Compare::Ty
 
 static PbiFilter CreateBarcodeReverseFilter(std::string value, const Compare::Type compareType)
 {
-    if (value.empty()) throw std::runtime_error("empty value for barcode_reverse filter property");
+    if (value.empty()) throw std::runtime_error{"empty value for barcode_reverse filter property"};
 
     if (isBracketed(value)) {
         value.erase(0, 1);
@@ -183,7 +183,7 @@ static PbiFilter CreateBarcodeReverseFilter(std::string value, const Compare::Ty
 
 static PbiFilter CreateLocalContextFilter(const std::string& value, const Compare::Type compareType)
 {
-    if (value.empty()) throw std::runtime_error("empty value for local context filter property");
+    if (value.empty()) throw std::runtime_error{"empty value for local context filter property"};
 
     LocalContextFlags filterValue = LocalContextFlags::NO_LOCAL_CONTEXT;
 
@@ -217,7 +217,7 @@ static PbiFilter CreateQueryNamesFilterFromFile(const std::string& value, const 
 static PbiFilter CreateZmwFilter(std::string value, const Compare::Type compareType)
 {
 
-    if (value.empty()) throw std::runtime_error("empty value for ZMW filter property");
+    if (value.empty()) throw std::runtime_error{"empty value for ZMW filter property"};
 
     if (isBracketed(value)) {
         value.erase(0, 1);
@@ -275,7 +275,7 @@ static PbiFilter FromDataSetProperty(const Property& property, const DataSet& da
             case BuiltIn::QueryNamesFromFileFilter : return CreateQueryNamesFilterFromFile(value, dataset); // compareType ignored
 
             default :
-                throw std::exception();
+            throw std::runtime_error{""};
         }
         // clang-format on
 
@@ -283,13 +283,13 @@ static PbiFilter FromDataSetProperty(const Property& property, const DataSet& da
         return PbiFilter{};
 
     } catch (std::exception& e) {
-        std::stringstream s;
-        s << "error: could not create filter from XML Property element: " << std::endl
-          << "  Name:     " << property.Name() << std::endl
-          << "  Value:    " << property.Value() << std::endl
-          << "  Operator: " << property.Operator() << std::endl
-          << "  reason:   " << e.what() << std::endl;
-        throw std::runtime_error(s.str());
+        std::ostringstream s;
+        s << "error: could not create filter from XML Property element:\n"
+          << "  Name:     " << property.Name() << '\n'
+          << "  Value:    " << property.Value() << '\n'
+          << "  Operator: " << property.Operator() << '\n'
+          << "  reason:   " << e.what() << '\n';
+        throw std::runtime_error{s.str()};
     }
 }
 
@@ -297,38 +297,24 @@ static PbiFilter FromDataSetProperty(const Property& property, const DataSet& da
 
 PbiFilter PbiFilter::FromDataSet(const DataSet& dataset)
 {
-    auto datasetFilter = PbiFilter{PbiFilter::UNION};
-    for (auto&& xmlFilter : dataset.Filters()) {
-        auto propertiesFilter = PbiFilter{};
-        for (auto&& xmlProperty : xmlFilter.Properties())
+    PbiFilter datasetFilter{PbiFilter::UNION};
+    for (const auto& xmlFilter : dataset.Filters()) {
+        PbiFilter propertiesFilter;
+        for (const auto& xmlProperty : xmlFilter.Properties())
             propertiesFilter.Add(internal::FromDataSetProperty(xmlProperty, dataset));
         datasetFilter.Add(propertiesFilter);
     }
     return datasetFilter;
 }
 
-PbiFilter PbiFilter::Intersection(const std::vector<PbiFilter>& filters)
-{
-    auto result = PbiFilter{PbiFilter::INTERSECT};
-    result.Add(filters);
-    return result;
-}
-
-PbiFilter PbiFilter::Intersection(std::vector<PbiFilter>&& filters)
+PbiFilter PbiFilter::Intersection(std::vector<PbiFilter> filters)
 {
     auto result = PbiFilter{PbiFilter::INTERSECT};
     result.Add(std::move(filters));
     return result;
 }
 
-PbiFilter PbiFilter::Union(const std::vector<PbiFilter>& filters)
-{
-    auto result = PbiFilter{PbiFilter::UNION};
-    result.Add(filters);
-    return result;
-}
-
-PbiFilter PbiFilter::Union(std::vector<PbiFilter>&& filters)
+PbiFilter PbiFilter::Union(std::vector<PbiFilter> filters)
 {
     auto result = PbiFilter{PbiFilter::UNION};
     result.Add(std::move(filters));

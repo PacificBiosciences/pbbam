@@ -48,7 +48,7 @@ static BamRecordImpl CreateBamImpl()
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = static_cast<int32_t>(-42);
+    tags["XY"] = int32_t{-42};
     bam.Tags(tags);
 
     return bam;
@@ -188,7 +188,7 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = static_cast<int32_t>(-42);
+    tags["XY"] = int32_t{-42};
     bam.Tags(tags);  // (28 bytes encoded)
 
     // -------------------------------
@@ -230,11 +230,11 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
     EXPECT_EQ(42, bam.Position());
     EXPECT_EQ(42, bam.ReferenceId());
 
-    const TagCollection& fetchedTags = bam.Tags();
+    const TagCollection fetchedTags = bam.Tags();
 
     EXPECT_TRUE(fetchedTags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), fetchedTags.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags.at("XY").ToInt32());
+    EXPECT_EQ(int32_t{-42}, fetchedTags.at("XY").ToInt32());
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags.at("CA").ToUInt8Array());
 }
 
@@ -336,7 +336,7 @@ TEST(BamRecordImplCoreTestsTest, CopyAssignment)
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = static_cast<int32_t>(-42);
+    tags["XY"] = int32_t{-42};
     bam1.Tags(tags);
 
     BamRecordImpl bam2;
@@ -351,10 +351,10 @@ TEST(BamRecordImplCoreTestsTest, CopyAssignment)
     EXPECT_EQ(42, bam1.Position());
     EXPECT_EQ(42, bam1.ReferenceId());
 
-    const TagCollection& fetchedTags1 = bam1.Tags();
+    const TagCollection fetchedTags1 = bam1.Tags();
     EXPECT_TRUE(fetchedTags1.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), fetchedTags1.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags1.at("XY").ToInt32());
+    EXPECT_EQ(int32_t{-42}, fetchedTags1.at("XY").ToInt32());
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags1.at("CA").ToUInt8Array());
 
     EXPECT_EQ(42, bam2.Bin());
@@ -366,10 +366,10 @@ TEST(BamRecordImplCoreTestsTest, CopyAssignment)
     EXPECT_EQ(42, bam2.Position());
     EXPECT_EQ(42, bam2.ReferenceId());
 
-    const TagCollection& fetchedTags2 = bam2.Tags();
+    const TagCollection fetchedTags2 = bam2.Tags();
     EXPECT_TRUE(fetchedTags2.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), fetchedTags2.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags2.at("XY").ToInt32());
+    EXPECT_EQ(int32_t{-42}, fetchedTags2.at("XY").ToInt32());
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags2.at("CA").ToUInt8Array());
 
     BamRecordImplCoreTests::CheckRawData(bam1);
@@ -392,7 +392,7 @@ TEST(BamRecordImplCoreTestsTest, SelfAssignmentTolerated)
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = static_cast<int32_t>(-42);
+    tags["XY"] = int32_t{-42};
     bam1.Tags(tags);
 
     bam1 = bam1;
@@ -406,10 +406,10 @@ TEST(BamRecordImplCoreTestsTest, SelfAssignmentTolerated)
     EXPECT_EQ(42, bam1.Position());
     EXPECT_EQ(42, bam1.ReferenceId());
 
-    const TagCollection& fetchedTags1 = bam1.Tags();
+    const TagCollection fetchedTags1 = bam1.Tags();
     EXPECT_TRUE(fetchedTags1.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), fetchedTags1.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags1.at("XY").ToInt32());
+    EXPECT_EQ(int32_t{-42}, fetchedTags1.at("XY").ToInt32());
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags1.at("CA").ToUInt8Array());
 
     BamRecordImplCoreTests::CheckRawData(bam1);
@@ -431,7 +431,7 @@ TEST(BamRecordImplCoreTestsTest, CopyConstructor)
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = static_cast<int32_t>(-42);
+    tags["XY"] = int32_t{-42};
     bam1.Tags(tags);
 
     BamRecordImpl bam2(bam1);
@@ -445,10 +445,10 @@ TEST(BamRecordImplCoreTestsTest, CopyConstructor)
     EXPECT_EQ(42, bam1.Position());
     EXPECT_EQ(42, bam1.ReferenceId());
 
-    const TagCollection& fetchedTags1 = bam1.Tags();
+    const TagCollection fetchedTags1 = bam1.Tags();
     EXPECT_TRUE(fetchedTags1.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), fetchedTags1.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags1.at("XY").ToInt32());
+    EXPECT_EQ(int32_t{-42}, fetchedTags1.at("XY").ToInt32());
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags1.at("CA").ToUInt8Array());
 
     EXPECT_EQ(42, bam2.Bin());
@@ -460,10 +460,10 @@ TEST(BamRecordImplCoreTestsTest, CopyConstructor)
     EXPECT_EQ(42, bam2.Position());
     EXPECT_EQ(42, bam2.ReferenceId());
 
-    const TagCollection& fetchedTags2 = bam2.Tags();
+    const TagCollection fetchedTags2 = bam2.Tags();
     EXPECT_TRUE(fetchedTags2.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), fetchedTags2.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags2.at("XY").ToInt32());
+    EXPECT_EQ(int32_t{-42}, fetchedTags2.at("XY").ToInt32());
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags2.at("CA").ToUInt8Array());
 
     BamRecordImplCoreTests::CheckRawData(bam1);
@@ -487,7 +487,7 @@ TEST(BamRecordImplCoreTestsTest, CreateRecord_InternalTest)
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = static_cast<int32_t>(-42);
+    tags["XY"] = int32_t{-42};
     bam.Tags(tags);
 
     BamRecordImplCoreTests::CheckRawData(bam);
@@ -514,10 +514,10 @@ TEST(BamRecordImplCoreTestsTest, MoveAssignment)
     EXPECT_EQ(42, bam.Position());
     EXPECT_EQ(42, bam.ReferenceId());
 
-    const TagCollection& fetchedTags1 = bam.Tags();
+    const TagCollection fetchedTags1 = bam.Tags();
     EXPECT_TRUE(fetchedTags1.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), fetchedTags1.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags1.at("XY").ToInt32());
+    EXPECT_EQ(int32_t{-42}, fetchedTags1.at("XY").ToInt32());
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags1.at("CA").ToUInt8Array());
 
     BamRecordImplCoreTests::CheckRawData(bam);
@@ -543,10 +543,10 @@ TEST(BamRecordImplCoreTestsTest, MoveConstructor)
     EXPECT_EQ(42, bam.Position());
     EXPECT_EQ(42, bam.ReferenceId());
 
-    const TagCollection& fetchedTags1 = bam.Tags();
+    const TagCollection fetchedTags1 = bam.Tags();
     EXPECT_TRUE(fetchedTags1.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), fetchedTags1.at("HX").ToString());
-    EXPECT_EQ(static_cast<int32_t>(-42), fetchedTags1.at("XY").ToInt32());
+    EXPECT_EQ(int32_t{-42}, fetchedTags1.at("XY").ToInt32());
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags1.at("CA").ToUInt8Array());
 
     BamRecordImplCoreTests::CheckRawData(bam);

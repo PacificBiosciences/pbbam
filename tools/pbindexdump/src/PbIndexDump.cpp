@@ -1,22 +1,29 @@
 // Author: Derek Barnett
 
 #include "PbIndexDump.h"
+
+#include <cassert>
+#include <memory>
+#include <stdexcept>
+#include <string>
+
+#include <pbbam/MakeUnique.h>
+
 #include "CppFormatter.h"
 #include "JsonFormatter.h"
-#include "pbbam/MakeUnique.h"
-#include <cassert>
 using namespace pbindexdump;
-using namespace std;
 
 void PbIndexDump::Run(const Settings& settings)
 {
     std::unique_ptr<IFormatter> formatter(nullptr);
-    if      (settings.format_ == "json") formatter = std::make_unique<JsonFormatter>(settings);
-    else if (settings.format_ == "cpp")  formatter = std::make_unique<CppFormatter>(settings);
+    if (settings.format_ == "json")
+        formatter = std::make_unique<JsonFormatter>(settings);
+    else if (settings.format_ == "cpp")
+        formatter = std::make_unique<CppFormatter>(settings);
     else {
-        string msg = { "unsupported output format requested: " };
+        std::string msg = {"unsupported output format requested: "};
         msg += settings.format_;
-        throw runtime_error(msg);
+        throw std::runtime_error(msg);
     }
     assert(formatter);
     formatter->Run();

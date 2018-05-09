@@ -131,14 +131,7 @@ public:
     /// \param[in] frames data in expanded (not encoded) form
     /// \returns reference to this object
     ///
-    Frames& Data(const std::vector<uint16_t>& frames);
-
-    /// Sets this record's data.
-    ///
-    /// \param[in] frames data in expanded (not encoded) form
-    /// \returns reference to this object
-    ///
-    Frames& Data(std::vector<uint16_t>&& frames);
+    Frames& Data(std::vector<uint16_t> frames);
 
     /// \}
 
