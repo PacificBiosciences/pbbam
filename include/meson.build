@@ -132,6 +132,26 @@ if not meson.is_subproject()
 
   install_headers(
     files([
+      'pbbam/vcf/VcfVariant.h',
+      'pbbam/vcf/VcfFile.h',
+      'pbbam/vcf/VcfFormat.h',
+      'pbbam/vcf/VcfHeader.h',
+      'pbbam/vcf/VcfHeaderTypes.h',
+      'pbbam/vcf/VcfReader.h',
+      'pbbam/vcf/VcfQuery.h',
+      'pbbam/vcf/VcfWriter.h']),
+    subdir : 'pbbam/vcf')
+
+  install_headers(
+    files([
+      'pbbam/vcf/internal/VcfVariant.inl',
+      'pbbam/vcf/internal/VcfFile.inl',
+      'pbbam/vcf/internal/VcfHeader.inl',
+      'pbbam/vcf/internal/VcfHeaderTypes.inl']),
+    subdir : 'pbbam/vcf/internal')
+
+  install_headers(
+    files([
       'pbbam/virtual/VirtualPolymeraseBamRecord.h',
       'pbbam/virtual/VirtualPolymeraseCompositeReader.h',
       'pbbam/virtual/VirtualPolymeraseReader.h',

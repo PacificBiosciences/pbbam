@@ -122,6 +122,21 @@ set( PacBioBAM_H
     ${PacBioBAM_IncludeDir}/pbbam/internal/Tag.inl
     ${PacBioBAM_IncludeDir}/pbbam/internal/Validator.inl
 
+    # vcf headers
+    ${PacBioBAM_IncludeDir}/pbbam/vcf/VcfVariant.h
+    ${PacBioBAM_IncludeDir}/pbbam/vcf/VcfFile.h
+    ${PacBioBAM_IncludeDir}/pbbam/vcf/VcfFormat.h
+    ${PacBioBAM_IncludeDir}/pbbam/vcf/VcfHeader.h
+    ${PacBioBAM_IncludeDir}/pbbam/vcf/VcfHeaderTypes.h
+    ${PacBioBAM_IncludeDir}/pbbam/vcf/VcfReader.h
+    ${PacBioBAM_IncludeDir}/pbbam/vcf/VcfQuery.h
+    ${PacBioBAM_IncludeDir}/pbbam/vcf/VcfWriter.h
+
+    ${PacBioBAM_IncludeDir}/pbbam/vcf/internal/VcfVariant.inl
+    ${PacBioBAM_IncludeDir}/pbbam/vcf/internal/VcfFile.inl
+    ${PacBioBAM_IncludeDir}/pbbam/vcf/internal/VcfHeader.inl
+    ${PacBioBAM_IncludeDir}/pbbam/vcf/internal/VcfHeaderTypes.inl
+ 
     # virtual headers
     ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualPolymeraseBamRecord.h
     ${PacBioBAM_IncludeDir}/pbbam/virtual/VirtualPolymeraseCompositeReader.h
@@ -232,6 +247,14 @@ set( PacBioBAM_CPP
     ${PacBioBAM_SourceDir}/ZmwReadStitcher.cpp
     ${PacBioBAM_SourceDir}/ZmwQuery.cpp
     ${PacBioBAM_SourceDir}/ZmwTypeMap.cpp
+
+    # vcf
+    ${PacBioBAM_SourceDir}/vcf/VcfVariant.cpp
+    ${PacBioBAM_SourceDir}/vcf/VcfFormat.cpp
+    ${PacBioBAM_SourceDir}/vcf/VcfHeader.cpp
+    ${PacBioBAM_SourceDir}/vcf/VcfReader.cpp
+    ${PacBioBAM_SourceDir}/vcf/VcfQuery.cpp
+    ${PacBioBAM_SourceDir}/vcf/VcfWriter.cpp
 
     # XML I/O
     ${PacBioBAM_SourceDir}/pugixml/pugixml.cpp

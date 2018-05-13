@@ -51,6 +51,13 @@ set( PacBioBAMTest_CPP
     ${PacBioBAM_TestsDir}/src/test_Tags.cpp
     ${PacBioBAM_TestsDir}/src/test_TimeUtils.cpp
     ${PacBioBAM_TestsDir}/src/test_Validator.cpp
+    ${PacBioBAM_TestsDir}/src/test_VcfFile.cpp
+    ${PacBioBAM_TestsDir}/src/test_VcfFormat.cpp
+    ${PacBioBAM_TestsDir}/src/test_VcfHeader.cpp
+    ${PacBioBAM_TestsDir}/src/test_VcfReader.cpp
+    ${PacBioBAM_TestsDir}/src/test_VcfQuery.cpp
+    ${PacBioBAM_TestsDir}/src/test_VcfVariant.cpp
+    ${PacBioBAM_TestsDir}/src/test_VcfWriter.cpp
     ${PacBioBAM_TestsDir}/src/test_Version.cpp
     ${PacBioBAM_TestsDir}/src/test_WhitelistedZmwReadStitcher.cpp
     ${PacBioBAM_TestsDir}/src/test_ZmwReadStitcher.cpp
