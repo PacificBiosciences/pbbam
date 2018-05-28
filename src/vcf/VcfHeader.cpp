@@ -7,7 +7,7 @@
 namespace PacBio {
 namespace VCF {
 
-VcfHeader::VcfHeader() : version_{VcfFormat::CurrentVersion()} {}
+VcfHeader::VcfHeader() { Version(VcfFormat::CurrentVersion()); }
 
 VcfHeader::VcfHeader(const std::string& hdrText) { *this = VcfFormat::ParsedHeader(hdrText); }
 

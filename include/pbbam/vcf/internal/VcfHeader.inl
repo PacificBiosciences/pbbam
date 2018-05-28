@@ -34,12 +34,6 @@ inline VcfHeader& VcfHeader::AddFormatDefinition(PacBio::VCF::FormatDefinition f
 
 inline VcfHeader& VcfHeader::AddGeneralDefinition(PacBio::VCF::GeneralDefinition def)
 {
-    // just for now
-    if (def.Id() == "fileformat")
-        version_ = def.Text();
-    else if (def.Id() == "fileDate")
-        fileDate_ = def.Text();
-
     const auto found = generalLookup_.find(def.Id());
     if (found == generalLookup_.cend())
     {
@@ -79,12 +73,12 @@ inline VcfHeader& VcfHeader::AddSample(std::string sample)
 
 inline const std::string& VcfHeader::FileDate() const
 {
-    return fileDate_;
+    return generalDefinitions_.at(generalLookup_.at("fileDate")).Text();
 }
 
 inline VcfHeader& VcfHeader::FileDate(std::string fileDate)
 {
-    fileDate_ = std::move(fileDate);
+    AddGeneralDefinition({"fileDate", std::move(fileDate)});
     return *this;
 }
 
@@ -199,12 +193,12 @@ inline VcfHeader& VcfHeader::Samples(std::vector<Sample> names)
 
 inline const std::string& VcfHeader::Version() const
 {
-    return version_;
+    return generalDefinitions_.at(generalLookup_.at("fileformat")).Text();
 }
 
 inline VcfHeader& VcfHeader::Version(std::string version)
 {
-    version_ = std::move(version);
+    AddGeneralDefinition({"fileformat", std::move(version)});
     return *this;
 }
 

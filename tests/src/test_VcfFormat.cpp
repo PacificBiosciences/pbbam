@@ -127,6 +127,22 @@ TEST(VCF_Format, can_format_basic_header)
     EXPECT_EQ(VcfFormatTests::BasicHeaderText, text);
 }
 
+TEST(VCF_Format, format_basic_header_with_only_filedate)
+{
+    VcfHeader header;
+    header.FileDate("1770704");
+    std::string text;
+    EXPECT_NO_THROW(text = VcfFormat::FormattedHeader(header));
+}
+
+TEST(VCF_Format, format_basic_header_with_only_version)
+{
+    VcfHeader header;
+    header.Version("3.14");
+    std::string text;
+    EXPECT_NO_THROW(text = VcfFormat::FormattedHeader(header));
+}
+
 //## ----------------------------------------------------------------- ##
 //
 //              HEADER PARSING

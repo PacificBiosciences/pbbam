@@ -33,10 +33,6 @@ public:
 
     size_t NumLines() const;
 
-    //
-    // TODO: come back to these as just specific instances of generalDefs,
-    //       once we have lookup in place
-    //
     const std::string& FileDate() const;
     const std::string& Version() const;
 
@@ -94,9 +90,6 @@ public:
     VcfHeader& Samples(std::vector<std::string> names);
 
 private:
-    std::string version_;
-    std::string fileDate_;
-
     std::vector<PacBio::VCF::GeneralDefinition> generalDefinitions_;
     std::vector<PacBio::VCF::InfoDefinition> infoDefinitions_;
     std::vector<PacBio::VCF::FilterDefinition> filterDefinitions_;

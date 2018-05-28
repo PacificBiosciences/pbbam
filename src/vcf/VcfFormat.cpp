@@ -99,7 +99,6 @@ std::string VcfFormat::FormattedHeader(const VcfHeader& header)
 {
     std::ostringstream out;
 
-    // ##fileformat at beginning
     const auto& fileformat = header.GeneralDefinition(Tokens::file_format);
     out << FormattedGeneralDefinition(fileformat) << '\n';
 
