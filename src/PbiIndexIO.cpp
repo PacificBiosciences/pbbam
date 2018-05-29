@@ -4,6 +4,7 @@
 
 #include "PbiIndexIO.h"
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <sstream>
@@ -307,9 +308,8 @@ void PbiIndexIO::WriteBarcodeData(const PbiRawBarcodeData& barcodeData, const ui
 void PbiIndexIO::WriteHeader(const PbiRawData& index, BGZF* fp)
 {
     // 'magic' string
-    char magic[4];
-    strncpy(magic, "PBI\1", 4);
-    auto ret = bgzf_write(fp, magic, 4);
+    constexpr static const std::array<char, 4> magic{{'P', 'B', 'I', '\1'}};
+    auto ret = bgzf_write(fp, magic.data(), 4);
 
     // version, pbi_flags, & n_reads
     auto version = static_cast<uint32_t>(index.Version());
