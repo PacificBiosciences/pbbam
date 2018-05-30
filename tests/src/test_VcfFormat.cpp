@@ -7,6 +7,7 @@
 
 #include "PbbamTestData.h"
 
+using ContigDefinition = PacBio::VCF::ContigDefinition;
 using FilterDefinition = PacBio::VCF::FilterDefinition;
 using FormatDefinition = PacBio::VCF::FormatDefinition;
 using GeneralDefinition = PacBio::VCF::GeneralDefinition;
@@ -19,6 +20,26 @@ using VcfVariant = PacBio::VCF::VcfVariant;
 namespace VcfFormatTests {
 
 static const std::string BasicHeaderText{
+    "##fileformat=VCFv4.2\n"
+    "##fileDate=20180509\n"
+    "##contig=<ID=ctg1,length=4200,assembly=foo,md5=dead123beef>\n"
+    "##INFO=<ID=IMPRECISE,Number=0,Type=Flag,Description=\"Imprecise structural variant\">\n"
+    "##INFO=<ID=SVTYPE,Number=1,Type=String,Description=\"Type of structural variant\">\n"
+    "##INFO=<ID=END,Number=1,Type=Integer,Description=\"End position of the structural variant "
+    "described in this record\">\n"
+    "##INFO=<ID=SVLEN,Number=.,Type=Integer,Description=\"Difference in length between REF and ALT "
+    "alleles\">\n"
+    "##INFO=<ID=SVANN,Number=.,Type=String,Description=\"Repeat annotation of structural "
+    "variant\">\n"
+    "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">\n"
+    "##FORMAT=<ID=AD,Number=1,Type=Integer,Description=\"Per-sample read depth of this structural "
+    "variant\">\n"
+    "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read depth at this position for this "
+    "sample\">\n"
+    "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tUnnamedSample"};
+
+// does not have ##contig line(s) in file
+static const std::string FileHeaderText{
     "##fileformat=VCFv4.2\n"
     "##fileDate=20180509\n"
     "##INFO=<ID=IMPRECISE,Number=0,Type=Flag,Description=\"Imprecise structural variant\">\n"
@@ -57,6 +78,14 @@ TEST(VCF_Format, provides_current_version)
 //              HEADER FORMATTING
 //
 //## ----------------------------------------------------------------- ##
+
+TEST(VCF_Format, can_format_contig_definition)
+{
+    const ContigDefinition def{"ctg1",
+                               {{"length", "4200"}, {"assembly", "foo"}, {"md5", "dead123beef"}}};
+    const auto text = VcfFormat::FormattedContigDefinition(def);
+    EXPECT_EQ("##contig=<ID=ctg1,length=4200,assembly=foo,md5=dead123beef>", text);
+}
 
 TEST(VCF_Format, can_format_filter_definition)
 {
@@ -170,6 +199,37 @@ TEST(VCF_Format, parsing_general_header_definition_throws_on_non_vcf_input)
                  std::runtime_error);
 }
 
+TEST(VCF_Format, can_parse_contig_definition_with_id_only)
+{
+    const auto contig = VcfFormat::ParsedContigDefinition("##contig=<ID=ctg1>");
+    EXPECT_EQ("ctg1", contig.Id());
+    EXPECT_TRUE(contig.Attributes().empty());
+}
+
+TEST(VCF_Format, can_parse_contig_definition_with_attributes)
+{
+    const auto contig =
+        VcfFormat::ParsedContigDefinition("##contig=<ID=ctg1,assembly=foo,length=3>");
+    EXPECT_EQ("ctg1", contig.Id());
+    ASSERT_EQ(2, contig.Attributes().size());
+
+    const auto& firstAttr = contig.Attributes().at(0);
+    EXPECT_EQ("assembly", firstAttr.first);
+    EXPECT_EQ("foo", firstAttr.second);
+
+    const auto& secondAttr = contig.Attributes().at(1);
+    EXPECT_EQ("length", secondAttr.first);
+    EXPECT_EQ("3", secondAttr.second);
+}
+
+TEST(VCF_Format, parsing_contig_header_definition_throws_on_malformed_contig_line)
+{
+    // internal code already checks for "##contig=<"
+
+    EXPECT_THROW(VcfFormat::ParsedContigDefinition("##contig=<foo"), std::runtime_error);
+    EXPECT_THROW(VcfFormat::ParsedContigDefinition("##contig=<ID=,>"), std::runtime_error);
+}
+
 TEST(VCF_Format, can_parse_filter_definition)
 {
     const auto filter =
@@ -239,6 +299,15 @@ TEST(VCF_Format, can_create_header_from_text)
     EXPECT_EQ("SVLEN", infos.at(3).Id());
     EXPECT_EQ("SVANN", infos.at(4).Id());
 
+    const auto& contigs = hdr.ContigDefinitions();
+    ASSERT_EQ(1, contigs.size());
+    EXPECT_EQ("ctg1", contigs.at(0).Id());
+
+    ASSERT_EQ(3, contigs.at(0).Attributes().size());
+    EXPECT_EQ("length", contigs.at(0).Attributes().at(0).first);
+    EXPECT_EQ("assembly", contigs.at(0).Attributes().at(1).first);
+    EXPECT_EQ("md5", contigs.at(0).Attributes().at(2).first);
+
     const auto& filters = hdr.FilterDefinitions();
     ASSERT_EQ(0, filters.size());
 
@@ -283,7 +352,7 @@ TEST(VCF_Format, can_parse_header_from_file)
 {
     const std::string fn{VcfFormatTests::VcfFn};
     const auto header = VcfFormat::HeaderFromFile(fn);
-    EXPECT_EQ(VcfFormatTests::BasicHeaderText, VcfFormat::FormattedHeader(header));
+    EXPECT_EQ(VcfFormatTests::FileHeaderText, VcfFormat::FormattedHeader(header));
 }
 
 //## ----------------------------------------------------------------- ##

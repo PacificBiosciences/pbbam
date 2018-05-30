@@ -6,6 +6,19 @@
 namespace PacBio {
 namespace VCF {
 
+inline VcfHeader& VcfHeader::AddContigDefinition(PacBio::VCF::ContigDefinition contig)
+{
+    const auto found = contigLookup_.find(contig.Id());
+    if (found == contigLookup_.cend())
+    {
+        contigLookup_.insert({contig.Id(), contigDefinitions_.size()});
+        contigDefinitions_.push_back(std::move(contig));
+    }
+    else
+        contigDefinitions_.at(found->second) = std::move(contig);
+    return *this;
+}
+
 inline VcfHeader& VcfHeader::AddFilterDefinition(PacBio::VCF::FilterDefinition filter)
 {
     const auto found = filterLookup_.find(filter.Id());
@@ -68,6 +81,25 @@ inline VcfHeader& VcfHeader::AddSample(std::string sample)
     }
     else
         samples_.at(found->second) = std::move(sample);
+    return *this;
+}
+
+inline const std::vector<PacBio::VCF::ContigDefinition>& VcfHeader::ContigDefinitions() const
+{
+    return contigDefinitions_;
+}
+
+inline const PacBio::VCF::ContigDefinition& VcfHeader::ContigDefinition(const std::string& id) const
+{
+    return contigDefinitions_.at(contigLookup_.at(id));
+}
+
+inline VcfHeader& VcfHeader::ContigDefinitions(std::vector<PacBio::VCF::ContigDefinition> defs)
+{
+    contigDefinitions_.clear();
+    contigLookup_.clear();
+    for (auto&& def : defs)
+        AddContigDefinition(std::move(def));
     return *this;
 }
 

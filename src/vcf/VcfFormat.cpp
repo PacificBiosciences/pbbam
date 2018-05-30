@@ -27,6 +27,7 @@ namespace Tokens {
 static constexpr const char file_format[] = "fileformat";
 
 static constexpr const char double_hash[] = "##";
+static constexpr const char contig_lead[] = "##contig=<";
 static constexpr const char filter_lead[] = "##FILTER=<";
 static constexpr const char format_lead[] = "##FORMAT=<";
 static constexpr const char info_lead[] = "##INFO=<";
@@ -53,6 +54,27 @@ std::string UnquotedText(const std::string& d)
 }  // namespace anonymous
 
 const char* VcfFormat::CurrentVersion() { return current_version; }
+
+std::string VcfFormat::FormattedContigDefinition(const ContigDefinition& def)
+{
+    std::ostringstream text;
+
+    // ID
+    text << Tokens::contig_lead << Tokens::id << '=' << def.Id();
+
+    // attributes
+    if (!def.Attributes().empty()) {
+        text << ',';
+        bool first = true;
+        for (const auto& attr : def.Attributes()) {
+            if (!first) text << ',';
+            text << attr.first << '=' << attr.second;
+            first = false;
+        }
+    }
+    text << '>';
+    return text.str();
+}
 
 std::string VcfFormat::FormattedFilterDefinition(const FilterDefinition& def)
 {
@@ -107,6 +129,10 @@ std::string VcfFormat::FormattedHeader(const VcfHeader& header)
         if (def.Id() != Tokens::file_format) out << FormattedGeneralDefinition(def) << '\n';
     }
 
+    // ##contig
+    for (const auto& contig : header.ContigDefinitions())
+        out << FormattedContigDefinition(contig) << '\n';
+
     // ##FILTER
     for (const auto& filter : header.FilterDefinitions())
         out << FormattedFilterDefinition(filter) << '\n';
@@ -131,6 +157,35 @@ std::string VcfFormat::FormattedHeader(const VcfHeader& header)
     }
 
     return out.str();
+}
+
+ContigDefinition VcfFormat::ParsedContigDefinition(std::string line)
+{
+    // should already be checked by "normal" code path
+    assert(line.find(Tokens::contig_lead) == 0);
+
+    // substring between brackets
+    const auto lastBracketPos = line.find_last_of('>');
+    if (lastBracketPos == std::string::npos)
+        throw std::runtime_error{"VCF format error: malformed ##contig line: " + line};
+    line = std::string(line.cbegin() + 10, line.cbegin() + lastBracketPos);
+
+    std::string id;
+    std::vector<std::pair<std::string, std::string>> attributes;
+
+    const auto fields = PacBio::BAM::Split(line, ',');
+    for (const auto& field : fields) {
+        const auto tokens = PacBio::BAM::Split(field, '=');
+        if (tokens.size() != 2) {
+            throw std::runtime_error{"VCF format error: malformed ##contig line: " + line};
+        }
+        if (tokens[0] == Tokens::id)
+            id = tokens[1];
+        else
+            attributes.push_back(std::make_pair(tokens[0], tokens[1]));
+    }
+
+    return ContigDefinition{std::move(id), std::move(attributes)};
 }
 
 FilterDefinition VcfFormat::ParsedFilterDefinition(std::string line)
@@ -288,7 +343,15 @@ VcfHeader VcfFormat::ParsedHeader(const std::string& hdrText)
         else if (line.find(Tokens::format_lead) == 0)
             hdr.AddFormatDefinition(ParsedFormatDefinition(line));
 
+        // contig line
+        else if (line.find(Tokens::contig_lead) == 0)
+            hdr.AddContigDefinition(ParsedContigDefinition(line));
+
         // general comment line
+        //
+        // NOTE: Check this after all other specific header line types. This
+        //       catches all remaining lines starting with "##"
+        //
         else if (line.find(Tokens::double_hash) == 0)
             hdr.AddGeneralDefinition(ParsedGeneralDefinition(line));
 

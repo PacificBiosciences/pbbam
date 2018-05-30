@@ -57,6 +57,8 @@ public:
     /// \name Header format helpers
     /// \{
 
+    static ContigDefinition ParsedContigDefinition(std::string line);
+
     static FilterDefinition ParsedFilterDefinition(std::string line);
 
     static FormatDefinition ParsedFormatDefinition(std::string line);
@@ -64,6 +66,8 @@ public:
     static GeneralDefinition ParsedGeneralDefinition(const std::string& line);
 
     static InfoDefinition ParsedInfoDefinition(std::string line);
+
+    static std::string FormattedContigDefinition(const ContigDefinition& def);
 
     static std::string FormattedFilterDefinition(const FilterDefinition& def);
 
