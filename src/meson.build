@@ -79,6 +79,7 @@ pbbam_cpp_sources = files([
   'vcf/VcfFormat.cpp',
   'vcf/VcfHeader.cpp',
   'vcf/VcfReader.cpp',
+  'vcf/VcfSort.cpp',
   'vcf/VcfQuery.cpp',
   'vcf/VcfWriter.cpp',
 

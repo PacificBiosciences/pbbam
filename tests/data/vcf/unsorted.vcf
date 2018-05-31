@@ -1,0 +1,12 @@
+##fileformat=VCFv4.2
+##fileDate=20180531
+##contig=<ID=ctg1,length=4200,assembly=foo,md5=dead>
+##contig=<ID=ctg2,length=5000,assembly=foo,md5=beef>
+##contig=<ID=ctg3,length=3000,assembly=foo,md5=1234>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+ctg1	1	variant0	A	T	.	PASS
+ctg1	10	variant1	A	T	.	PASS
+ctg3	50	variant2	A	T	.	PASS
+ctg2	20	variant3	A	T	.	PASS
+ctg3	10	variant4	A	T	.	PASS
+ctg1	5	variant5	A	T	.	PASS
