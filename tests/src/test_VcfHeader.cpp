@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include <pbbam/vcf/VcfHeader.h>
 
+using ContigDefinition = PacBio::VCF::ContigDefinition;
 using FilterDefinition = PacBio::VCF::FilterDefinition;
 using FormatDefinition = PacBio::VCF::FormatDefinition;
 using GeneralDefinition = PacBio::VCF::GeneralDefinition;
@@ -16,6 +17,7 @@ namespace VcfHeaderTests {
 static const std::string BasicHeaderText{
     "##fileformat=VCFv4.2\n"
     "##fileDate=20180509\n"
+    "##contig=<ID=ctg1,length=4200,assembly=foo,md5=dead123beef>\n"
     "##INFO=<ID=IMPRECISE,Number=0,Type=Flag,Description=\"Imprecise structural variant\">\n"
     "##INFO=<ID=SVTYPE,Number=1,Type=String,Description=\"Type of structural variant\">\n"
     "##INFO=<ID=END,Number=1,Type=Integer,Description=\"End position of the structural variant "
@@ -40,6 +42,29 @@ TEST(VCF_GeneralDefinition, throws_on_missing_required_fields)
 
     EXPECT_THROW(GeneralDefinition("", desc), std::runtime_error);
     EXPECT_THROW(GeneralDefinition(id, ""), std::runtime_error);
+}
+
+TEST(VCF_ContigDefinition, throws_on_missing_required_fields)
+{
+    EXPECT_THROW(ContigDefinition(""), std::runtime_error);
+}
+
+TEST(VCF_ContigDefinition, can_edit_and_query_attributes)
+{
+    ContigDefinition contig{"id"};
+
+    EXPECT_TRUE(contig.Attributes().empty());
+
+    const std::vector<std::pair<std::string, std::string>> attributes{{"assembly", "foo"},
+                                                                      {"length", "42"}};
+    contig.Attributes(attributes);
+    ASSERT_EQ(2, contig.Attributes().size());
+    EXPECT_EQ("foo", contig.Attributes().at(0).second);
+    EXPECT_EQ("42", contig.Attributes().at(1).second);
+
+    contig.AddAttribute({"md5", "dead123beef"});
+    ASSERT_EQ(3, contig.Attributes().size());
+    EXPECT_EQ("dead123beef", contig.Attributes().at(2).second);
 }
 
 TEST(VCF_FilterDefinition, throws_on_missing_required_fields)
@@ -82,6 +107,16 @@ TEST(VCF_Header, defaults_to_current_version)
 {
     VcfHeader hdr;
     EXPECT_EQ("VCFv4.2", hdr.Version());
+}
+
+TEST(VCF_Header, can_lookup_contig_defnition_by_id)
+{
+    const VcfHeader hdr{VcfHeaderTests::BasicHeaderText};
+    const auto& contig = hdr.ContigDefinition("ctg1");
+    ASSERT_EQ(3, contig.Attributes().size());
+    EXPECT_EQ("length", contig.Attributes().at(0).first);
+    EXPECT_EQ("assembly", contig.Attributes().at(1).first);
+    EXPECT_EQ("md5", contig.Attributes().at(2).first);
 }
 
 TEST(VCF_Header, can_lookup_format_definition_by_id)

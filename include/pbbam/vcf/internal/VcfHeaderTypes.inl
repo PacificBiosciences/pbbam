@@ -10,6 +10,50 @@ namespace PacBio {
 namespace VCF {
 
 // -------------------
+// ContigDefinition
+// -------------------
+
+inline ContigDefinition::ContigDefinition(std::string id)
+    : ContigDefinition(std::move(id), {})
+{ }
+
+inline ContigDefinition::ContigDefinition(std::string id,
+                                          std::vector<std::pair<std::string, std::string>> attributes)
+    : id_{std::move(id)}
+    , attributes_{std::move(attributes)}
+{
+    if (id_.empty())
+        throw std::runtime_error{"VCF format error: ##contig definition has empty ID field"};
+}
+
+inline ContigDefinition& ContigDefinition::AddAttribute(std::string id, std::string value)
+{
+    return AddAttribute(std::make_pair(std::move(id), std::move(value)));
+}
+
+inline ContigDefinition& ContigDefinition::AddAttribute(std::pair<std::string, std::string> attribute)
+{
+    attributes_.push_back(std::move(attribute));
+    return *this;
+}
+
+inline const std::vector<std::pair<std::string, std::string>>& ContigDefinition::Attributes() const
+{
+    return attributes_;
+}
+
+inline ContigDefinition& ContigDefinition::Attributes(std::vector<std::pair<std::string, std::string>> attributes)
+{
+    attributes_ = std::move(attributes);
+    return *this;
+}
+
+inline const std::string& ContigDefinition::Id() const
+{
+    return id_;
+}
+
+// -------------------
 // FilterDefinition
 // -------------------
 

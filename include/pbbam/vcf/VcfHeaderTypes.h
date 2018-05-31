@@ -3,6 +3,8 @@
 #define PBBAM_VCF_VCFHEADERTYPES_H
 
 #include <string>
+#include <utility>
+#include <vector>
 
 #include <boost/optional.hpp>
 
@@ -10,6 +12,32 @@ namespace PacBio {
 namespace VCF {
 
 using Sample = std::string;
+
+class ContigDefinition
+{
+public:
+    explicit ContigDefinition(std::string id);
+    ContigDefinition(std::string id, std::vector<std::pair<std::string, std::string>> attributes);
+
+    ContigDefinition() = delete;
+    ContigDefinition(const ContigDefinition&) = default;
+    ContigDefinition(ContigDefinition&&) = default;
+    ContigDefinition& operator=(const ContigDefinition&) = default;
+    ContigDefinition& operator=(ContigDefinition&&) = default;
+    ~ContigDefinition() = default;
+
+public:
+    const std::string& Id() const;
+    const std::vector<std::pair<std::string, std::string>>& Attributes() const;
+
+    ContigDefinition& AddAttribute(std::string id, std::string value);
+    ContigDefinition& AddAttribute(std::pair<std::string, std::string> attribute);
+    ContigDefinition& Attributes(std::vector<std::pair<std::string, std::string>> attributes);
+
+private:
+    std::string id_;
+    std::vector<std::pair<std::string, std::string>> attributes_;
+};
 
 ///
 /// \brief The FilterDefinition class

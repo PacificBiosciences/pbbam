@@ -39,6 +39,10 @@ public:
     const std::vector<PacBio::VCF::GeneralDefinition>& GeneralDefinitions() const;
     const PacBio::VCF::GeneralDefinition& GeneralDefinition(const std::string& id) const;
 
+    // ##contig
+    const std::vector<PacBio::VCF::ContigDefinition>& ContigDefinitions() const;
+    const PacBio::VCF::ContigDefinition& ContigDefinition(const std::string& id) const;
+
     // INFO
 
     const std::vector<PacBio::VCF::InfoDefinition>& InfoDefinitions() const;
@@ -69,6 +73,10 @@ public:
     VcfHeader& AddGeneralDefinition(PacBio::VCF::GeneralDefinition def);
     VcfHeader& GeneralDefinitions(std::vector<PacBio::VCF::GeneralDefinition> defs);
 
+    // ##contig
+    VcfHeader& AddContigDefinition(PacBio::VCF::ContigDefinition def);
+    VcfHeader& ContigDefinitions(std::vector<PacBio::VCF::ContigDefinition> defs);
+
     // INFO
 
     VcfHeader& AddInfoDefinition(PacBio::VCF::InfoDefinition info);
@@ -91,12 +99,14 @@ public:
 
 private:
     std::vector<PacBio::VCF::GeneralDefinition> generalDefinitions_;
+    std::vector<PacBio::VCF::ContigDefinition> contigDefinitions_;
     std::vector<PacBio::VCF::InfoDefinition> infoDefinitions_;
     std::vector<PacBio::VCF::FilterDefinition> filterDefinitions_;
     std::vector<PacBio::VCF::FormatDefinition> formatDefinitions_;
     std::vector<PacBio::VCF::Sample> samples_;
 
     std::unordered_map<std::string, size_t> generalLookup_;
+    std::unordered_map<std::string, size_t> contigLookup_;
     std::unordered_map<std::string, size_t> infoLookup_;
     std::unordered_map<std::string, size_t> filterLookup_;
     std::unordered_map<std::string, size_t> formatLookup_;
