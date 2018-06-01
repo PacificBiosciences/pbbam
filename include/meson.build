@@ -138,6 +138,7 @@ if not meson.is_subproject()
       'pbbam/vcf/VcfHeader.h',
       'pbbam/vcf/VcfHeaderTypes.h',
       'pbbam/vcf/VcfReader.h',
+      'pbbam/vcf/VcfSort.h',
       'pbbam/vcf/VcfQuery.h',
       'pbbam/vcf/VcfWriter.h']),
     subdir : 'pbbam/vcf')

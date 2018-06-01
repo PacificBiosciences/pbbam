@@ -55,6 +55,7 @@ set( PacBioBAMTest_CPP
     ${PacBioBAM_TestsDir}/src/test_VcfFormat.cpp
     ${PacBioBAM_TestsDir}/src/test_VcfHeader.cpp
     ${PacBioBAM_TestsDir}/src/test_VcfReader.cpp
+    ${PacBioBAM_TestsDir}/src/test_VcfSort.cpp
     ${PacBioBAM_TestsDir}/src/test_VcfQuery.cpp
     ${PacBioBAM_TestsDir}/src/test_VcfVariant.cpp
     ${PacBioBAM_TestsDir}/src/test_VcfWriter.cpp

@@ -194,6 +194,7 @@ inline size_t VcfHeader::NumLines() const
 {
     // +1 for #CHROM line
     return generalDefinitions_.size() +
+           contigDefinitions_.size() +
            infoDefinitions_.size() +
            filterDefinitions_.size() +
            formatDefinitions_.size() + 1;

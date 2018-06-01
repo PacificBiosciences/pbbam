@@ -437,7 +437,7 @@ std::vector<InfoField> VcfFormat::ParsedInfoFields(const std::string& text)
 VcfVariant VcfFormat::ParsedVariant(const std::string& line)
 {
     const auto fields = PacBio::BAM::Split(line, '\t');
-    if (fields.size() < 8)
+    if (fields.size() < 7)
         throw std::runtime_error{"VCF format error: record is missing required fields: " + line};
 
     // CHROM POS ID REF ALT REF
@@ -458,8 +458,8 @@ VcfVariant VcfFormat::ParsedVariant(const std::string& line)
     auto filter = fields.at(6);
     var.Filter(std::move(filter));
 
-    // INFO
-    var.InfoFields(ParsedInfoFields(fields.at(7)));
+    // INFO (allow empty)
+    if (fields.size() >= 8) var.InfoFields(ParsedInfoFields(fields.at(7)));
 
     // GENOTYPE (samples)
     if (fields.size() > 9) {

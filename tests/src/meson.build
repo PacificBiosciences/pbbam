@@ -48,6 +48,7 @@ pbbam_test_cpp_sources = files([
   'test_VcfFormat.cpp',
   'test_VcfHeader.cpp',
   'test_VcfReader.cpp',
+  'test_VcfSort.cpp',
   'test_VcfQuery.cpp',
   'test_VcfVariant.cpp',
   'test_VcfWriter.cpp',
