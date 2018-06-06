@@ -29,8 +29,8 @@ template<typename ValueType,
 inline bool Compare::MemberFunctionBase<ValueType, fn, CompareType>::operator()(const BamRecord& lhs,
                                                                                 const BamRecord& rhs) const
 {
-    using MemberFnType = typename Compare::MemberFunctionBaseHelper<ValueType>::MemberFnType;
-    using Proxy = internal::MemberFnProxy<MemberFnType, fn>;
+    using MemberFnTypeImpl = typename Compare::MemberFunctionBaseHelper<ValueType>::MemberFnType;
+    using Proxy = internal::MemberFnProxy<MemberFnTypeImpl, fn>;
 
     CompareType cmp;
     return cmp(Proxy::call(lhs), Proxy::call(rhs));

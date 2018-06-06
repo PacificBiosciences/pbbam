@@ -74,6 +74,15 @@ pbbam_cpp_sources = files([
   'ZmwQuery.cpp',
   'ZmwTypeMap.cpp',
 
+  # vcf
+  'vcf/VcfVariant.cpp',
+  'vcf/VcfFormat.cpp',
+  'vcf/VcfHeader.cpp',
+  'vcf/VcfReader.cpp',
+  'vcf/VcfSort.cpp',
+  'vcf/VcfQuery.cpp',
+  'vcf/VcfWriter.cpp',
+
   # XML I/O
   'pugixml/pugixml.cpp'
 ])

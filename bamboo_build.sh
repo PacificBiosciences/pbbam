@@ -53,16 +53,16 @@ export LDFLAGS="-static-libstdc++ -static-libgcc"
 
 # i : unity build
 for i in "on" "off"; do
-  for j in "system-gcc" "gcc-mobs"; do
+  for j in "system-gcc" "gcc/8.1.0" "gcc"; do
     # 1. load either current MOBS GCC or RHEL-default GCC
-    if [[ ${j} == gcc-mobs ]]; then
-      module load gcc gtest
-    else
+    if [[ ${j} == system-gcc ]]; then
       module load gtest/gcc48
+    else
+      module load ${j} gtest
     fi
     module load ccache
 
-    export CURRENT_BUILD_DIR="build_unity=${i^^}_gcc=${j}"
+    export CURRENT_BUILD_DIR="build_unity=${i^^}_gcc=${j/\//_}"
     export ENABLED_TESTS="true"
     export ENABLED_UNITY_BUILD="${i}"
 
@@ -70,7 +70,7 @@ for i in "on" "off"; do
     bash scripts/ci/test.sh
 
     module unload ccache gtest
-    [[ ${j} == gcc-mobs ]] && module unload gcc
+    [[ ${j} != system-gcc ]] && module unload gcc
   done
 done
 
