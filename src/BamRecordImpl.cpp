@@ -12,18 +12,45 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <tuple>
 #include <utility>
 
 #include <htslib/hts_endian.h>
 
+#include "pbbam/BamTagCodec.h"
+
 #include "BamRecordTags.h"
 #include "MemoryUtils.h"
-#include "pbbam/BamTagCodec.h"
+#include "StringUtils.h"
 
 namespace PacBio {
 namespace BAM {
 
 namespace {
+
+static bool DoesHtslibSupportLongCigar()
+{
+    const std::string htsVersion = hts_version();
+
+    // remove any "-<blah>" for non-release versions
+    const auto versionBase = PacBio::BAM::Split(htsVersion, '-');
+    if (versionBase.empty())
+        throw std::runtime_error{"invalid htslib version format: " + htsVersion};
+
+    // grab major/minor version numbers
+    const auto versionParts = PacBio::BAM::Split(versionBase[0], '.');
+    if (versionParts.size() < 2)
+        throw std::runtime_error{"invalid htslib version format: " + htsVersion};
+
+    // check against v1.7
+    const int versionMajor = std::stoi(versionParts[0]);
+    const int versionMinor = std::stoi(versionParts[1]);
+    static constexpr const int v17_major = 1;
+    static constexpr const int v17_minor = 7;
+    return std::tie(versionMajor, versionMinor) >= std::tie(v17_major, v17_minor);
+}
+
+static const bool has_native_long_cigar_support = DoesHtslibSupportLongCigar();
 
 Cigar FetchRawCigar(const uint32_t* const src, const uint32_t len)
 {
@@ -148,27 +175,21 @@ bool BamRecordImpl::AddTagImpl(const std::string& tagName, const Tag& value,
 Cigar BamRecordImpl::CigarData() const
 {
     const auto* b = d_.get();
-    if (HasLongCigar(b)) {
+    if (!has_native_long_cigar_support && HasLongCigar(b)) {
         // fetch long CIGAR from tag
         const auto cigarTag = TagValue("CG");
         const auto cigarTagValue = cigarTag.ToUInt32Array();
         return FetchRawCigar(cigarTagValue.data(), cigarTagValue.size());
     } else {
-        // fetch normal, short CIGAR from the standard location
+        // fetch CIGAR from the standard location
         return FetchRawCigar(bam_get_cigar(b), b->core.n_cigar);
     }
 }
 
 BamRecordImpl& BamRecordImpl::CigarData(const Cigar& cigar)
 {
-    // Set normal, "short" CIGAR and remove CG tag if present.
-    if (cigar.size() < 65536) {
-        SetCigarData(cigar);
-        if (HasTag("CG")) RemoveTag("CG");
-    }
-
-    // Set long CIGAR data
-    else {
+    // if long CIGAR, using htslib version < 1.7, set it "manually"
+    if (!has_native_long_cigar_support && cigar.size() >= 65536) {
         // Add the 'fake' CIGAR in normal place.
         Cigar fake;
         fake.emplace_back(CigarOperationType::SOFT_CLIP, SequenceLength());
@@ -188,6 +209,12 @@ BamRecordImpl& BamRecordImpl::CigarData(const Cigar& cigar)
             EditTag("CG", Tag{cigarData});
         else
             AddTag("CG", Tag{cigarData});
+    }
+
+    // otherwise (v1.7+ or short CIGAR), use standard APIs
+    else {
+        if (HasTag("CG")) RemoveTag("CG");
+        SetCigarData(cigar);
     }
 
     return *this;
