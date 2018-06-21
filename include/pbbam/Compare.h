@@ -434,6 +434,28 @@ public:
     };
 
     /// \}
+
+    template <typename T>
+    static inline bool Check(const T& lhs, const T& rhs, const Compare::Type cmp)
+    {
+        switch (cmp) {
+            case Compare::EQUAL:
+                return lhs == rhs;
+            case Compare::LESS_THAN:
+                return lhs < rhs;
+            case Compare::LESS_THAN_EQUAL:
+                return lhs <= rhs;
+            case Compare::GREATER_THAN:
+                return lhs > rhs;
+            case Compare::GREATER_THAN_EQUAL:
+                return lhs >= rhs;
+            case Compare::NOT_EQUAL:
+                return lhs != rhs;
+            default:
+                assert(false);
+                throw std::runtime_error{"unsupported compare type requested"};
+        }
+    }
 };
 
 }  // namespace BAM

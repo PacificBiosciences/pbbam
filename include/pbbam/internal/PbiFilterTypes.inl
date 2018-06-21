@@ -8,6 +8,8 @@
 #include <cassert>
 #include <stdexcept>
 
+#include <boost/functional/hash/hash.hpp>
+
 namespace PacBio {
 namespace BAM {
 
@@ -50,17 +52,7 @@ inline bool FilterBase<T>::CompareMultiHelper(const T& lhs) const
 template<typename T>
 inline bool FilterBase<T>::CompareSingleHelper(const T& lhs) const
 {
-    switch(cmp_) {
-        case Compare::EQUAL:              return lhs == value_;
-        case Compare::LESS_THAN:          return lhs < value_;
-        case Compare::LESS_THAN_EQUAL:    return lhs <= value_;
-        case Compare::GREATER_THAN:       return lhs > value_;
-        case Compare::GREATER_THAN_EQUAL: return lhs >= value_;
-        case Compare::NOT_EQUAL:          return lhs != value_;
-        default:
-            assert(false);
-            throw std::runtime_error{"unsupported compare type requested"};
-    }
+    return Compare::Check(lhs, value_, cmp_);
 }
 
 template<>
@@ -423,6 +415,67 @@ inline PbiZmwFilter::PbiZmwFilter(const int32_t zmw, const Compare::Type cmp)
 inline PbiZmwFilter::PbiZmwFilter(std::vector<int32_t> whitelist)
     : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::ZMW>{std::move(whitelist)}
 { }
+
+// PbiZmwModuloFilter
+
+inline PbiZmwModuloFilter::PbiZmwModuloFilter(
+        const uint32_t denominator,
+        const uint32_t value,
+        const FilterHash hashType,
+        const Compare::Type cmp)
+    : denominator_{denominator}
+    , value_{value}
+    , hash_{hashType}
+    , cmp_{cmp}
+{ }
+
+inline uint32_t UnsignedLongIntCast(const int32_t zm)
+{
+    return static_cast<uint32_t>(zm);
+}
+
+inline uint32_t BoostHashCombine(const int32_t zm)
+{
+    constexpr static const uint16_t mask = 0xFFFF;
+
+    const uint16_t upper = (zm >> 16) & mask;
+    const uint16_t lower = zm & mask;
+
+    // FIXME: discrepancies with Python API. Will return to nail down.
+
+    size_t seed = 0;
+    boost::hash_combine(seed, upper);
+    boost::hash_combine(seed, lower);
+    return static_cast<uint32_t>(seed);
+}
+
+inline bool PbiZmwModuloFilter::Accepts(const PbiRawData& idx,
+                                        const size_t row) const
+{
+    const auto zm = idx.BasicData().holeNumber_.at(row);
+
+    uint32_t hashValue;
+    switch(hash_)
+    {
+        case FilterHash::UNSIGNED_LONG_CAST :
+        {
+            hashValue = UnsignedLongIntCast(zm);
+            break;
+        }
+
+        case FilterHash::BOOST_HASH_COMBINE :
+        {
+            hashValue = BoostHashCombine(zm);
+            break;
+        }
+
+        default:
+            throw std::runtime_error{"unsupported filter hash type"};
+    }
+
+    const auto modResult = hashValue % denominator_;
+    return Compare::Check(modResult, value_, cmp_);
+}
 
 } // namespace BAM
 } // namespace PacBio
