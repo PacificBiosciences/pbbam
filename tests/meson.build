@@ -44,18 +44,27 @@ custom_target('pbbam_generate_data',
   build_by_default : true,
   install : false)
 
-test(
-  'pbbam unit tests',
-  pbbam_test,
-  args : [
-    '--gtest_output=xml:' + join_paths(meson.build_root(), 'pbbam-unit-tests.xml')],
-  env : [
-    'ARGS=-V',
-    'VERBOSE=1'])
-
-test('pbbam formatting check', pbbam_clang_formatter, args : ['--all'], workdir : meson.source_root())
-
 pbbamify_synthetic_dataset = configure_file(
   input : files('data/pbbamify/synthetic_movie_all.subreadset.xml.in'),
   output : 'synthetic_movie_all.subreadset.xml',
   configuration : pbbam_PbbamTestData_h_config)
+
+#########
+# tests #
+#########
+
+test(
+  'pbbam formatting check',
+  pbbam_clang_formatter,
+  args : [
+    '--all'],
+  workdir : meson.source_root())
+
+test(
+  'pbbam gtest unittests',
+  pbbam_test,
+  args : [
+    '--gtest_output=xml:' + join_paths(meson.build_root(), 'pbbam-gtest-unittests.xml')],
+  env : [
+    'ARGS=-V',
+    'VERBOSE=1'])
