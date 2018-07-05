@@ -42,7 +42,7 @@ if get_option('tests')
     'bam2sam_CramTests',
     pbbam_cram_script,
     args : [
-      '--xunit-file=' + join_paths(meson.build_root(), 'blasr-cram-bam2sam.xml'),
+      '--xunit-file=' + join_paths(meson.build_root(), 'pbbam-cram-bam2sam.xml'),
       '--verbose'] + [
         bam2sam_t],
     timeout : 1800)
@@ -119,7 +119,7 @@ if get_option('tests')
     'pbindexdump_CramTests',
     pbbam_cram_script,
     args : [
-      '--xunit-file=' + join_paths(meson.build_root(), 'blasr-cram-pbindexdump.xml'),
+      '--xunit-file=' + join_paths(meson.build_root(), 'pbbam-cram-pbindexdump.xml'),
       '--verbose'] + [
         pbindexdump_json_t,
         pbindexdump_cpp_t],
@@ -178,7 +178,7 @@ if get_option('tests') and not get_option('auto-validate')
     'pbmerge_CramTests',
     pbbam_cram_script,
     args : [
-      '--xunit-file=' + join_paths(meson.build_root(), 'blasr-cram-pbmerge.xml'),
+      '--xunit-file=' + join_paths(meson.build_root(), 'pbbam-cram-pbmerge.xml'),
       '--verbose'] + [
         pbmerge_pacbio_ordering_t,
         pbmerge_aligned_ordering_t,
@@ -233,7 +233,7 @@ if get_option('tests')
     'pbbamify_CramTests',
     pbbam_cram_script,
     args : [
-      '--xunit-file=' + join_paths(meson.build_root(), 'blasr-cram-pbbamify.xml'),
+      '--xunit-file=' + join_paths(meson.build_root(), 'pbbam-cram-pbbamify.xml'),
       '--verbose'] + [
         pbbamify_t],
     timeout : 1800)

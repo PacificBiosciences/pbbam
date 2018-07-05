@@ -851,6 +851,38 @@ public:
     PbiZmwFilter(std::vector<int32_t> whitelist);
 };
 
+// ----------------------------------------------
+// NOTE: modulo filtering only enabled for ZMW.
+//
+// I need to generalize more if we're going to use
+// this on more fields.
+// ----------------------------------------------
+
+enum class FilterHash
+{
+    UNSIGNED_LONG_CAST,
+    BOOST_HASH_COMBINE,
+};
+
+struct PbiZmwModuloFilter
+{
+    PbiZmwModuloFilter(const uint32_t denominator, const uint32_t value,
+                       const FilterHash hashtype = FilterHash::UNSIGNED_LONG_CAST,
+                       const Compare::Type = Compare::EQUAL);
+
+    /// \brief Performs the actual index lookup.
+    ///
+    /// Most client code should not need to use this method directly.
+    ///
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
+
+private:
+    uint32_t denominator_;
+    uint32_t value_;
+    FilterHash hash_;
+    Compare::Type cmp_;
+};
+
 }  // namespace BAM
 }  // namespace PacBio
 

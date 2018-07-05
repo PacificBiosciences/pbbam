@@ -216,7 +216,6 @@ static PbiFilter CreateQueryNamesFilterFromFile(const std::string& value, const 
 
 static PbiFilter CreateZmwFilter(std::string value, const Compare::Type compareType)
 {
-
     if (value.empty()) throw std::runtime_error{"empty value for ZMW filter property"};
 
     if (isBracketed(value)) {
@@ -235,10 +234,38 @@ static PbiFilter CreateZmwFilter(std::string value, const Compare::Type compareT
         return PbiZmwFilter{boost::numeric_cast<int32_t>(stoi(value)), compareType};
 }
 
+static PbiFilter CreateZmwModuloFilter(const Property& property)
+{
+    if (!property.HasAttribute("Modulo") || !property.HasAttribute("Hash") ||
+        property.Name() != "zm")
+    {
+        throw std::runtime_error{"Modulo filter not supported on property: "};
+    }
+
+    const auto hashType = property.Attribute("Hash");
+    const FilterHash hash = [&hashType]()
+    {
+        if (boost::algorithm::to_lower_copy(hashType) == "uint32cast")
+            return FilterHash::UNSIGNED_LONG_CAST;
+        if (boost::algorithm::to_lower_copy(hashType) == "boosthashcombine")
+            return FilterHash::BOOST_HASH_COMBINE;
+        throw std::runtime_error{"unsuppoerted hash type: " + hashType};
+    }();
+
+    const uint32_t denom = std::stoul(property.Attribute("Modulo"));
+    const uint32_t value = std::stoul(property.Value());
+
+    return PbiZmwModuloFilter{ denom, value, hash, Compare::EQUAL };
+}
+
 static PbiFilter FromDataSetProperty(const Property& property, const DataSet& dataset)
 {
     try {
         const std::string& value = property.Value();
+
+        if (property.Name() == "zm" && property.HasAttribute("Modulo"))
+            return CreateZmwModuloFilter(property);
+
         const Compare::Type compareType = Compare::TypeFromOperator(property.Operator());
         const BuiltIn builtInCode =
             builtInLookup.at(boost::algorithm::to_lower_copy(property.Name()));
