@@ -224,6 +224,8 @@ pbbam_pbbamify = executable(
 
 # tests
 if get_option('tests')
+  pbbam_test_samtools = find_program('samtools', required : true)
+
   pbbamify_t = configure_file(
     input : pbbam_cram_pbbamify_t_in,
     output : 'pbbamify.t',
@@ -236,8 +238,7 @@ if get_option('tests')
       '--xunit-file=' + join_paths(meson.build_root(), 'pbbam-cram-pbbamify.xml'),
       '--verbose'] + [
         pbbamify_t],
+    env : [
+      'SAMTOOLS=' + pbbam_test_samtools.path()],
     timeout : 1800)
-
 endif
-
-### Tests will be added later.
