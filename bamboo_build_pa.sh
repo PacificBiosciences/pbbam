@@ -1,4 +1,13 @@
 #!/bin/bash -vex
+if [[ -e src/htslib-1.6.tar.bz2 ]]; then
+  : #noop
+elif [[ -e src/htslib-1.6 ]]; then
+  cd src
+  wget http://nexus/repository/maven-thirdparty/htslib/1.6/htslib-1.6.tar.bz2
+  cd ..
+fi
+tar jxvf src/htslib-1.6.tar.bz2 -C src
+rm -f src/htslib-1.6.tar.bz2
 type module >& /dev/null || . /mnt/software/Modules/current/init/bash
 
 module use /mnt/software/modulefiles
