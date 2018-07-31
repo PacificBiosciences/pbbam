@@ -16,6 +16,8 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
+// clang-format off
+
 extern const ChemistryTable BuiltInChemistryTable = {
 
     // BindingKit, SequencingKit, BasecallerVersion, Chemistry
@@ -72,22 +74,20 @@ extern const ChemistryTable BuiltInChemistryTable = {
     {{"101-365-900", "100-861-800", "5.0", "S/P2-C2/5.0"}},
     {{"101-365-900", "101-093-700", "5.0", "S/P2-C2/5.0"}},
 
-    // 5.0.1 ChemRel ("Sequel® Sequencing Plate Silwet"); S/P2-C2
-    {{"101-365-900", "101-309-500", "5.0", "S/P2-C2/5.0"}},
-    // 5.0.1 ChemRel ("Sequel® Sequencing Plate Silwet (4 rxn)"); S/P2-C2
-    {{"101-365-900", "101-309-400", "5.0", "S/P2-C2/5.0"}},
+    // 5.0.1 ChemRel; Sequel® Binding Kit 2.1; S/P2-C2
+    {{"101-365-900", "101-309-500", "5.0", "S/P2-C2/5.0"}}, // Sequel® Sequencing Plate 2.1 Silwet (8 rxn)
+    {{"101-365-900", "101-309-400", "5.0", "S/P2-C2/5.0"}}, // Sequel® Sequencing Plate 2.1 Silwet (4 rxn)
 
-    // 5.0.1 ChemRel ("Sequel® Sequencing Plate Silwet - prototype parts"); S/P2-C2
-    {{"101-490-800", "101-490-900", "5.0", "S/P2-C2/5.0"}},
-    // 5.0.1 ChemRel ("Sequel® Sequencing Plate Silwet (4 rxn) - prototype parts"); S/P2-C2
-    {{"101-490-800", "101-491-000", "5.0", "S/P2-C2/5.0"}},
+    // 5.0.1 ChemRel; Sequel® Binding Kit 3.0; S/P3-C3
+    {{"101-500-400", "101-427-500", "5.0", "S/P3-C3/5.0"}}, // Sequel® Sequencing Plate 3.0 (8 rxn)
+    {{"101-500-400", "101-427-800", "5.0", "S/P3-C3/5.0"}}, // Sequel® Sequencing Plate 3.0 (4 rxn)
 
-    // 5.0.1 ChemRel ("Sequel® Sequencing Plate Silwet - prototype parts"); S/P2-C2
-    {{"101-500-400", "101-427-500", "5.0", "S/P2-C2/5.0"}},
-    // 5.0.1 ChemRel ("Sequel® Sequencing Plate Silwet (4 rxn) - prototype parts"); S/P2-C2
-    {{"101-500-400", "101-427-800", "5.0", "S/P2-C2/5.0"}}
-
+    // 5.0.1 ChemRel; Sequel® Dev Binding Kit; S/P2-C2
+    {{"101-490-800", "101-490-900", "5.0", "S/P2-C2/5.0"}}, // Sequel® Dev Sequencing Plate (4 rxn)
+    {{"101-490-800", "101-491-000", "5.0", "S/P2-C2/5.0"}}, // Sequel® Dev Sequencing Plate (8 rxn)
 };
+
+// clang-format on
 
 ChemistryTable ChemistryTableFromXml(const std::string& mappingXml)
 {
