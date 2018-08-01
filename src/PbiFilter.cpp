@@ -21,6 +21,7 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
+#include "FileUtils.h"
 #include "StringUtils.h"
 #include "pbbam/PbiFilterTypes.h"
 
@@ -202,8 +203,31 @@ static PbiFilter CreateLocalContextFilter(const std::string& value, const Compar
     return PbiFilter{PbiLocalContextFilter{filterValue, compareType}};
 }
 
-static PbiFilter CreateQueryNamesFilterFromFile(const std::string& value, const DataSet& dataset)
+static PbiFilter CreateMovieNameFilter(std::string value, const Compare::Type compareType)
 {
+    if (value.empty()) throw std::runtime_error{"empty value for movie property"};
+
+    if (isBracketed(value)) {
+        value.erase(0, 1);
+        value.pop_back();
+    }
+
+    if (isList(value)) {
+
+        if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
+            throw std::runtime_error{"unsupported compare type on movie property"};
+
+        std::vector<std::string> tokens = internal::Split(value, ',');
+        return PbiMovieNameFilter{std::move(tokens), compareType};
+    } else
+        return PbiMovieNameFilter{value, compareType};
+}
+
+static PbiFilter CreateQueryNamesFilterFromFile(const std::string& value, const DataSet& dataset, const Compare::Type compareType)
+{
+    if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
+        throw std::runtime_error{"unsupported compare type on query name property"};
+
     // resolve file from dataset, value
     const std::string resolvedFilename = dataset.ResolvePath(value);
     std::vector<std::string> whitelist;
@@ -211,7 +235,98 @@ static PbiFilter CreateQueryNamesFilterFromFile(const std::string& value, const 
     std::ifstream in(resolvedFilename);
     while (std::getline(in, fn))
         whitelist.push_back(fn);
-    return PbiQueryNameFilter{whitelist};
+    return PbiQueryNameFilter{whitelist, compareType};
+}
+
+static PbiFilter CreateQueryNameFilter(std::string value, const DataSet& dataset, const Compare::Type compareType)
+{
+    if (value.empty()) throw std::runtime_error{"empty value for query name property"};
+
+    // try possible filename first
+    const std::string resolvedFilename = dataset.ResolvePath(value);
+    if (internal::FileUtils::Exists(value))
+        return CreateQueryNamesFilterFromFile(value, dataset, compareType);
+
+    // otherwise "normal" qname (single, or list)
+
+    if (isBracketed(value)) {
+        value.erase(0, 1);
+        value.pop_back();
+    }
+
+    if (isList(value)) {
+
+        if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
+            throw std::runtime_error{"unsupported compare type on query name property"};
+
+        std::vector<std::string> tokens = internal::Split(value, ',');
+        return PbiQueryNameFilter{std::move(tokens), compareType};
+    } else
+        return PbiQueryNameFilter{value, compareType};
+}
+
+static PbiFilter CreateReadGroupFilter(std::string value, const Compare::Type compareType)
+{
+    if (value.empty()) throw std::runtime_error{"empty value for read group property"};
+
+    if (isBracketed(value)) {
+        value.erase(0, 1);
+        value.pop_back();
+    }
+
+    if (isList(value)) {
+
+        if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
+            throw std::runtime_error{"unsupported compare type on read group property"};
+
+        std::vector<std::string> tokens = internal::Split(value, ',');
+        return PbiReadGroupFilter{std::move(tokens), compareType};
+    } else
+        return PbiReadGroupFilter{value, compareType};
+}
+
+static PbiFilter CreateReferenceIdFilter(std::string value, const Compare::Type compareType)
+{
+    if (value.empty()) throw std::runtime_error{"empty value for reference ID property"};
+
+    if (isBracketed(value)) {
+        value.erase(0, 1);
+        value.pop_back();
+    }
+
+    if (isList(value)) {
+
+        if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
+            throw std::runtime_error{"unsupported compare type on reference name ID property"};
+
+        std::vector<std::string> tokens = internal::Split(value, ',');
+        std::vector<int32_t> ids;
+        ids.reserve(tokens.size());
+        for (const auto& t : tokens)
+            ids.push_back(boost::numeric_cast<int32_t>(stoi(t)));
+        return PbiReferenceIdFilter{std::move(ids), compareType};
+    } else
+        return PbiReferenceIdFilter{boost::numeric_cast<int32_t>(stoi(value)), compareType};
+}
+
+static PbiFilter CreateReferenceNameFilter(std::string value, const Compare::Type compareType)
+{
+    if (value.empty()) throw std::runtime_error{"empty value for reference name property"};
+
+    if (isBracketed(value)) {
+        value.erase(0, 1);
+        value.pop_back();
+    }
+
+    if (isList(value)) {
+
+        if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
+            throw std::runtime_error{"unsupported compare type on reference name property"};
+
+        std::vector<std::string> tokens = internal::Split(value, ',');
+        return PbiReferenceNameFilter{std::move(tokens), compareType};
+    } else
+        return PbiReferenceNameFilter{value, compareType};
 }
 
 static PbiFilter CreateZmwFilter(std::string value, const Compare::Type compareType)
@@ -279,16 +394,11 @@ static PbiFilter FromDataSetProperty(const Property& property, const DataSet& da
             case BuiltIn::AlignedStartFilter   : return PbiAlignedStartFilter{ static_cast<uint32_t>(std::stoul(value)), compareType };
             case BuiltIn::BarcodeQualityFilter : return PbiBarcodeQualityFilter{ static_cast<uint8_t>(std::stoul(value)), compareType };
             case BuiltIn::IdentityFilter       : return PbiIdentityFilter{ std::stof(value), compareType };
-            case BuiltIn::MovieNameFilter      : return PbiMovieNameFilter{ value };
             case BuiltIn::QueryEndFilter       : return PbiQueryEndFilter{ std::stoi(value), compareType };
             case BuiltIn::QueryLengthFilter    : return PbiQueryLengthFilter{ std::stoi(value), compareType };
-            case BuiltIn::QueryNameFilter      : return PbiQueryNameFilter{ value };
             case BuiltIn::QueryStartFilter     : return PbiQueryStartFilter{ std::stoi(value), compareType };
             case BuiltIn::ReadAccuracyFilter   : return PbiReadAccuracyFilter{ std::stof(value), compareType };
-            case BuiltIn::ReadGroupFilter      : return PbiReadGroupFilter{ value, compareType };
             case BuiltIn::ReferenceEndFilter   : return PbiReferenceEndFilter{ static_cast<uint32_t>(std::stoul(value)), compareType };
-            case BuiltIn::ReferenceIdFilter    : return PbiReferenceIdFilter{ std::stoi(value), compareType };
-            case BuiltIn::ReferenceNameFilter  : return PbiReferenceNameFilter{ value };
             case BuiltIn::ReferenceStartFilter : return PbiReferenceStartFilter{ static_cast<uint32_t>(std::stoul(value)), compareType };
 
             // (maybe) list-value filters
@@ -296,10 +406,15 @@ static PbiFilter FromDataSetProperty(const Property& property, const DataSet& da
             case BuiltIn::BarcodeForwardFilter : return CreateBarcodeForwardFilter(value, compareType);
             case BuiltIn::BarcodeReverseFilter : return CreateBarcodeReverseFilter(value, compareType);
             case BuiltIn::LocalContextFilter   : return CreateLocalContextFilter(value, compareType);
+            case BuiltIn::MovieNameFilter      : return CreateMovieNameFilter(value, compareType);
+            case BuiltIn::QueryNameFilter      : return CreateQueryNameFilter(value, dataset, compareType);
+            case BuiltIn::ReadGroupFilter      : return CreateReadGroupFilter(value, compareType);
+            case BuiltIn::ReferenceIdFilter    : return CreateReferenceIdFilter(value, compareType);
+            case BuiltIn::ReferenceNameFilter  : return CreateReferenceNameFilter(value, compareType);
             case BuiltIn::ZmwFilter            : return CreateZmwFilter(value, compareType);
 
             // other built-ins
-            case BuiltIn::QueryNamesFromFileFilter : return CreateQueryNamesFilterFromFile(value, dataset); // compareType ignored
+            case BuiltIn::QueryNamesFromFileFilter : return CreateQueryNamesFilterFromFile(value, dataset, compareType);
 
             default :
             throw std::runtime_error{""};
