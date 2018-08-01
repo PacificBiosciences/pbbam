@@ -22,8 +22,9 @@ inline FilterBase<T>::FilterBase(T value, const Compare::Type cmp)
 { }
 
 template <typename T>
-inline FilterBase<T>::FilterBase(std::vector<T> values)
+inline FilterBase<T>::FilterBase(std::vector<T> values, const Compare::Type cmp)
     : multiValue_{std::move(values)}
+    , cmp_{cmp}
 { }
 
 template<typename T>
@@ -38,15 +39,32 @@ inline bool FilterBase<T>::CompareHelper(const T& lhs) const
 template<typename T>
 inline bool FilterBase<T>::CompareMultiHelper(const T& lhs) const
 {
-    // check provided value against all filter criteria,
-    // return true on any exact match
-    auto iter = multiValue_.get().cbegin();
-    const auto end  = multiValue_.get().cend();
-    for (; iter != end; ++iter) {
-        if (*iter == lhs)
-            return true;
+    if (cmp_ == Compare::EQUAL)
+    {
+        // check provided value against all filter criteria,
+        // return true on any exact match
+        auto iter = multiValue_.get().cbegin();
+        const auto end  = multiValue_.get().cend();
+        for (; iter != end; ++iter) {
+            if (*iter == lhs)
+                return true;
+        }
+        return false; // no matches
     }
-    return false; // no matches
+    else if (cmp_ == Compare::NOT_EQUAL)
+    {
+        // check provided value against all filter criteria,
+        // return true on any exact match
+        auto iter = multiValue_.get().cbegin();
+        const auto end  = multiValue_.get().cend();
+        for (; iter != end; ++iter) {
+            if (*iter == lhs)
+                return false;
+        }
+        return true;
+    }
+    else
+        throw std::runtime_error{"unsupported compare type on multivalue filter"};
 }
 
 template<typename T>
@@ -82,8 +100,8 @@ inline BarcodeDataFilterBase<T, field>::BarcodeDataFilterBase(T value, const Com
 { }
 
 template<typename T, PbiFile::BarcodeField field>
-inline BarcodeDataFilterBase<T, field>::BarcodeDataFilterBase(std::vector<T> values)
-    : FilterBase<T>{std::move(values)}
+inline BarcodeDataFilterBase<T, field>::BarcodeDataFilterBase(std::vector<T> values, const Compare::Type cmp)
+    : FilterBase<T>{std::move(values), cmp}
 { }
 
 template<typename T, PbiFile::BarcodeField field>
@@ -109,8 +127,8 @@ inline BasicDataFilterBase<T, field>::BasicDataFilterBase(T value, const Compare
 { }
 
 template<typename T, PbiFile::BasicField field>
-inline BasicDataFilterBase<T, field>::BasicDataFilterBase(std::vector<T> values)
-    : FilterBase<T>{std::move(values)}
+inline BasicDataFilterBase<T, field>::BasicDataFilterBase(std::vector<T> values, const Compare::Type cmp)
+    : FilterBase<T>{std::move(values), cmp}
 { }
 
 template<typename T, PbiFile::BasicField field>
@@ -151,8 +169,8 @@ inline MappedDataFilterBase<T, field>::MappedDataFilterBase(T value, const Compa
 { }
 
 template<typename T, PbiFile::MappedField field>
-inline MappedDataFilterBase<T, field>::MappedDataFilterBase(std::vector<T> values)
-    : FilterBase<T>{std::move(values)}
+inline MappedDataFilterBase<T, field>::MappedDataFilterBase(std::vector<T> values, const Compare::Type cmp)
+    : FilterBase<T>{std::move(values), cmp}
 { }
 
 template<>
@@ -225,9 +243,9 @@ inline PbiBarcodeFilter::PbiBarcodeFilter(const int16_t barcode, const Compare::
                       }
 { }
 
-inline PbiBarcodeFilter::PbiBarcodeFilter(std::vector<int16_t> whitelist)
-    : compositeFilter_{ PbiFilter::Union({ PbiBarcodeForwardFilter{std::move(whitelist)},
-                                           PbiBarcodeReverseFilter{std::move(whitelist)}
+inline PbiBarcodeFilter::PbiBarcodeFilter(std::vector<int16_t> whitelist, const Compare::Type cmp)
+    : compositeFilter_{ PbiFilter::Union({ PbiBarcodeForwardFilter{std::move(whitelist), cmp},
+                                           PbiBarcodeReverseFilter{std::move(whitelist), cmp}
                                          })
                       }
 { }
@@ -241,8 +259,8 @@ inline PbiBarcodeForwardFilter::PbiBarcodeForwardFilter(const int16_t bcFwdId, c
     : internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_FORWARD>{bcFwdId, cmp}
 { }
 
-inline PbiBarcodeForwardFilter::PbiBarcodeForwardFilter(std::vector<int16_t> whitelist)
-    : internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_FORWARD>{std::move(whitelist)}
+inline PbiBarcodeForwardFilter::PbiBarcodeForwardFilter(std::vector<int16_t> whitelist, const Compare::Type cmp)
+    : internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_FORWARD>{std::move(whitelist), cmp}
 { }
 
 // PbiBarcodeQualityFilter
@@ -257,8 +275,8 @@ inline PbiBarcodeReverseFilter::PbiBarcodeReverseFilter(const int16_t bcRevId, c
     : internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_REVERSE>{bcRevId, cmp}
 { }
 
-inline PbiBarcodeReverseFilter::PbiBarcodeReverseFilter(std::vector<int16_t> whitelist)
-    : internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_REVERSE>{std::move(whitelist)}
+inline PbiBarcodeReverseFilter::PbiBarcodeReverseFilter(std::vector<int16_t> whitelist, const Compare::Type cmp)
+    : internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_REVERSE>{std::move(whitelist), cmp}
 { }
 
 // PbiBarcodesFilter
@@ -300,7 +318,12 @@ inline PbiMapQualityFilter::PbiMapQualityFilter(const uint8_t mapQual, const Com
 // PbiMovieNameFilter
 
 inline bool PbiMovieNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
-{ return compositeFilter_.Accepts(idx, row); }
+{
+    const bool found = compositeFilter_.Accepts(idx, row);
+    if (cmp_ == Compare::EQUAL) return found;
+    else if (cmp_ == Compare::NOT_EQUAL) return !found;
+    else throw std::runtime_error{"unsupported compare type on movie name filter"};
+}
 
 // PbiNumDeletedBasesFilter
 
@@ -364,20 +387,20 @@ inline PbiReadGroupFilter::PbiReadGroupFilter(const ReadGroupInfo& rg, const Com
     : PbiReadGroupFilter{rg.Id(), cmp}
 { }
 
-inline PbiReadGroupFilter::PbiReadGroupFilter(std::vector<int32_t> whitelist)
-    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::RG_ID>{std::move(whitelist)}
+inline PbiReadGroupFilter::PbiReadGroupFilter(std::vector<int32_t> whitelist, const Compare::Type cmp)
+    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::RG_ID>{std::move(whitelist), cmp}
 { }
 
-inline PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<std::string>& whitelist)
-    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::RG_ID>{std::vector<int32_t>{}}
+inline PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<std::string>& whitelist, const Compare::Type cmp)
+    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::RG_ID>{std::vector<int32_t>{}, cmp}
 {
     multiValue_->reserve(whitelist.size());
     for (const auto& rg : whitelist)
         multiValue_->push_back(ReadGroupInfo::IdToInt(rg));
 }
 
-inline PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<ReadGroupInfo>& whitelist)
-    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::RG_ID>{std::vector<int32_t>{}}
+inline PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<ReadGroupInfo>& whitelist, const Compare::Type cmp)
+    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::RG_ID>{std::vector<int32_t>{}, cmp}
 {
     multiValue_->reserve(whitelist.size());
     for (const auto& rg : whitelist)
@@ -396,8 +419,8 @@ inline PbiReferenceIdFilter::PbiReferenceIdFilter(const int32_t tId, const Compa
     : internal::MappedDataFilterBase<int32_t, PbiFile::MappedField::T_ID>{tId, cmp}
 { }
 
-inline PbiReferenceIdFilter::PbiReferenceIdFilter(std::vector<int32_t> whitelist)
-    : internal::MappedDataFilterBase<int32_t, PbiFile::MappedField::T_ID>{std::move(whitelist)}
+inline PbiReferenceIdFilter::PbiReferenceIdFilter(std::vector<int32_t> whitelist, const Compare::Type cmp)
+    : internal::MappedDataFilterBase<int32_t, PbiFile::MappedField::T_ID>{std::move(whitelist), cmp}
 { }
 
 // PbiReferenceStartFilter
@@ -412,8 +435,8 @@ inline PbiZmwFilter::PbiZmwFilter(const int32_t zmw, const Compare::Type cmp)
     : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::ZMW>{zmw, cmp}
 { }
 
-inline PbiZmwFilter::PbiZmwFilter(std::vector<int32_t> whitelist)
-    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::ZMW>{std::move(whitelist)}
+inline PbiZmwFilter::PbiZmwFilter(std::vector<int32_t> whitelist, const Compare::Type cmp)
+    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::ZMW>{std::move(whitelist), cmp}
 { }
 
 // PbiZmwModuloFilter
