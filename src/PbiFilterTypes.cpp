@@ -127,13 +127,15 @@ bool PbiIdentityFilter::Accepts(const PbiRawData& idx, const size_t row) const
 
 // PbiMovieNameFilter
 
-PbiMovieNameFilter::PbiMovieNameFilter(const std::string& movieName)
+PbiMovieNameFilter::PbiMovieNameFilter(const std::string& movieName, const Compare::Type cmp)
     : compositeFilter_{internal::filterFromMovieName(movieName, true)}  // include CCS
+    , cmp_{cmp}
 {
 }
 
-PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& whitelist)
-    : compositeFilter_{PbiFilter::UNION}
+PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& whitelist,
+                                       const Compare::Type cmp)
+    : compositeFilter_{PbiFilter::UNION}, cmp_{cmp}
 {
     for (const auto& movieName : whitelist)
         compositeFilter_.Add(internal::filterFromMovieName(movieName, true));  // include CCS
@@ -162,7 +164,9 @@ public:
     using RgIdLookup = std::unordered_map<int32_t, ZmwLookupPtr>;
 
 public:
-    PbiQueryNameFilterPrivate(const std::vector<std::string>& whitelist)
+    PbiQueryNameFilterPrivate(const std::vector<std::string>& whitelist,
+                              const Compare::Type cmp = Compare::EQUAL)
+        : cmp_{cmp}
     {
         for (const auto& queryName : whitelist) {
 
@@ -177,7 +181,10 @@ public:
 
     PbiQueryNameFilterPrivate(const std::unique_ptr<PbiQueryNameFilterPrivate>& other)
     {
-        if (other) lookup_ = other->lookup_;
+        if (other) {
+            lookup_ = other->lookup_;
+            cmp_ = other->cmp_;
+        }
     }
 
     bool Accepts(const PbiRawData& idx, const size_t row) const
@@ -201,7 +208,14 @@ public:
         const auto qStart = basicData.qStart_.at(row);
         const auto qEnd = basicData.qEnd_.at(row);
         const auto queryInterval = std::make_pair(qStart, qEnd);
-        return queryIntervals.find(queryInterval) != queryIntervals.end();
+
+        const bool found = queryIntervals.find(queryInterval) != queryIntervals.end();
+        if (cmp_ == Compare::EQUAL)
+            return found;
+        else if (cmp_ == Compare::NOT_EQUAL)
+            return !found;
+        else
+            throw std::runtime_error{"unsupported compare type on query name filter"};
     }
 
     std::vector<int32_t> CandidateRgIds(const std::string& movieName, const RecordType type)
@@ -295,16 +309,18 @@ public:
 
 private:
     RgIdLookup lookup_;
+    Compare::Type cmp_;
 };
 
-PbiQueryNameFilter::PbiQueryNameFilter(const std::string& qname)
+PbiQueryNameFilter::PbiQueryNameFilter(const std::string& qname, const Compare::Type cmp)
     : d_{std::make_unique<PbiQueryNameFilter::PbiQueryNameFilterPrivate>(
-          std::vector<std::string>{1, qname})}
+          std::vector<std::string>{1, qname}, cmp)}
 {
 }
 
-PbiQueryNameFilter::PbiQueryNameFilter(const std::vector<std::string>& whitelist)
-    : d_{std::make_unique<PbiQueryNameFilter::PbiQueryNameFilterPrivate>(whitelist)}
+PbiQueryNameFilter::PbiQueryNameFilter(const std::vector<std::string>& whitelist,
+                                       const Compare::Type cmp)
+    : d_{std::make_unique<PbiQueryNameFilter::PbiQueryNameFilterPrivate>(whitelist, cmp)}
 {
 }
 
@@ -333,8 +349,9 @@ PbiReferenceNameFilter::PbiReferenceNameFilter(std::string rname, Compare::Type 
     }
 }
 
-PbiReferenceNameFilter::PbiReferenceNameFilter(std::vector<std::string> whitelist)
-    : rnameWhitelist_{std::move(whitelist)}, cmp_{Compare::EQUAL}
+PbiReferenceNameFilter::PbiReferenceNameFilter(std::vector<std::string> whitelist,
+                                               const Compare::Type cmp)
+    : rnameWhitelist_{std::move(whitelist)}, cmp_{cmp}
 {
 }
 
@@ -358,9 +375,10 @@ void PbiReferenceNameFilter::Initialize(const PbiRawData& idx) const
 
     // multi-value whitelist
     else {
-        subFilter_ = PbiFilter(PbiFilter::UNION);
+        std::vector<int32_t> ids;
         for (const auto& rname : rnameWhitelist_.get())
-            subFilter_.Add(PbiReferenceIdFilter{bamFile.ReferenceId(rname)});
+            ids.push_back(bamFile.ReferenceId(rname));
+        subFilter_ = PbiReferenceIdFilter{std::move(ids), cmp_};
     }
     initialized_ = true;
 }
