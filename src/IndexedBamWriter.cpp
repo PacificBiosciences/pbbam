@@ -789,12 +789,13 @@ public:
         struct stat st;
         int ret = 0;
         int64_t lastFileSize = 0;
-        std::vector<uint8_t> buffer(BGZF_MAX_BLOCK_SIZE, 0);
+        int64_t numBytesRead = 0;
 
         auto initBgzf = [&bgzf, &bamFilename]() {
             bgzf.reset(bgzf_open(bamFilename.c_str(), "rb"));
             if (!bgzf) throw std::runtime_error{"could not open BAM for toy train reading"};
             bgzf_index_build_init(bgzf.get());
+            bgzf_mt(bgzf.get(), 8, 256);
         };
 
         // main thread loop
@@ -816,26 +817,39 @@ public:
                 return false;
             });
 
-            // Open BAM reader if not already open.
-            if (!bgzf) initBgzf();
-
-            // Read available data.
-            const int bytesAvailable = bgzf.get()->block_length - bgzf.get()->block_offset;
-            ret = bgzf_read(bgzf.get(), buffer.data(), static_cast<size_t>(bytesAvailable));
-            if (ret < 0) throw std::runtime_error{"error reading from BAM"};
-
             // Quit if writer thread(s) are finished.
             if (done_) break;
+
+            // Don't read unless we can guarantee we won't catch up to the end of the file.
+            // Otherwise htslib will think the file has been truncated and throw errors.
+            // This is a touch tricky because we're reading in multi-thread mode so htslib
+            // will speculatively start grabbing blocks.  So we're going to stay *well* behind
+            // This needs be made more robust.
+            //
+            // Note: It's worth noting that bgzf->block_clength might only be the length of the
+            // compressed *payload*, meaning if there is any other header/metadata/etc on disk
+            // in the actual file, our estimation of our trailing distance might be off.  If
+            // this ever starts throwing exceptions we'll have to look more in to this...
+            while (lastFileSize - numBytesRead > 100*BGZF_MAX_BLOCK_SIZE) {
+                // Open BAM reader if not already open.  Need to make sure we don't open it
+                // until we've already established our trailing distance.
+                if (!bgzf) initBgzf();
+
+                auto result = bgzf_read_block(bgzf.get());
+                if (result != 0) throw std::runtime_error("Error reading from BAM");
+                if (bgzf->block_length == 0) throw std::runtime_error("Failing to trail");
+                numBytesRead += bgzf->block_clength;
+            }
         }
 
         // Try to open BAM if it wasn't opened in main loop.
         if (!bgzf) initBgzf();
 
         // Read any remaining data.
-        ret = bgzf_getc(bgzf.get());
-        while (ret >= 0) {
-            if (ret < 0) throw std::runtime_error{"error reading from BAM"};
-            ret = bgzf_getc(bgzf.get());
+        while (true) {
+            auto result = bgzf_read_block(bgzf.get());
+            if (result != 0) throw std::runtime_error("Error reading from BAM");
+            if (bgzf->block_length == 0) break;
         }
 
         // Dump GZI contents to disk.
