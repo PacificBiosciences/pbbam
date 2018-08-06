@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 
 #include <array>
+#include <atomic>
 #include <cassert>
 #include <condition_variable>
 #include <cstdint>
@@ -712,11 +713,7 @@ public:
 
     void CloseGzi()
     {
-        {
-            std::unique_lock<std::mutex> locker{doneMutex_};
-            done_ = true;
-        }
-        blockWrittenCondition_.notify_one();
+        done_ = true;
         gziThread_.join();
     }
 
@@ -800,25 +797,17 @@ public:
 
         // main thread loop
         while (true) {
-
-            // Check for file size change
-            std::unique_lock<std::mutex> locker{blockWrittenMutex_};
-            blockWrittenCondition_.wait(locker, [this, &bamFilename, &lastFileSize, &st]() {
-                {
-                    std::unique_lock<std::mutex> doneLock{doneMutex_};
-                    if (done_) return true;
-                }
-                if (stat(bamFilename.c_str(), &st) != 0)
-                    throw std::runtime_error{"could not get file information for: " + bamFilename};
-                if (st.st_size > lastFileSize) {
-                    lastFileSize = st.st_size;
-                    return true;
-                }
-                return false;
-            });
-
             // Quit if writer thread(s) are finished.
             if (done_) break;
+
+            if (stat(bamFilename.c_str(), &st) != 0)
+                throw std::runtime_error{"could not get file information for: " + bamFilename};
+            if (st.st_size > lastFileSize) {
+                lastFileSize = st.st_size;
+            } else {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                continue;
+            }
 
             // Don't read unless we can guarantee we won't catch up to the end of the file.
             // Otherwise htslib will think the file has been truncated and throw errors.
@@ -903,16 +892,6 @@ public:
             return fixedLength + qnameLength + remainingLength;
         };
         uncompressedFilePos_ += recordLength(rawRecord.get());
-
-        //
-        // Notify GZI thread every 10 reads. A bit hacly, but it works for prototyping.
-        // We can revisit as needed.
-        //
-        ++recordsWritten_;
-        if (recordsWritten_ == 10) {
-            blockWrittenCondition_.notify_one();
-            recordsWritten_ = 0;
-        }
     }
 
 public:
@@ -922,16 +901,12 @@ public:
     std::unique_ptr<samFile, internal::HtslibFileDeleter> bam_;
     std::unique_ptr<PbiBuilder2> builder_;
 
-    std::mutex blockWrittenMutex_;
-    std::condition_variable blockWrittenCondition_;
     std::thread gziThread_;
 
-    uint8_t recordsWritten_ = 0;
     bool blockWritten_ = false;
     bool isOpen_ = false;
 
-    std::mutex doneMutex_;
-    bool done_ = false;
+    std::atomic<bool> done_{false};
 
     int64_t uncompressedFilePos_ = 0;
 };
