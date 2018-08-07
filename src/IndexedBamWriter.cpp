@@ -851,6 +851,11 @@ public:
                 if (bgzf->block_length == 0) throw std::runtime_error("Failing to trail");
                 numBytesRead += bgzf->block_clength;
             }
+
+            // Only update if thigs have appreciably fallen behind
+            if (lastFileSize - numBytesRead > 1.10 * maxTrailingDistance_)
+                maxTrailingDistance_ = lastFileSize - numBytesRead;
+
         }
 
         // Try to open BAM if it wasn't opened in main loop.
@@ -916,7 +921,12 @@ public:
         uncompressedFilePos_ += recordLength(rawRecord.get());
     }
 
-public:
+    size_t MaxReaderLag() const
+    {
+        return maxTrailingDistance_;
+    }
+
+private:
     std::string bamFilename_;
 
     std::shared_ptr<bam_hdr_t> header_;
@@ -929,6 +939,7 @@ public:
     bool isOpen_ = false;
 
     std::atomic<bool> done_{false};
+    std::atomic<size_t> maxTrailingDistance_{0};
 
     int64_t uncompressedFilePos_ = 0;
 };
@@ -959,6 +970,11 @@ void IndexedBamWriter::TryFlush() {}  // ignore
 void IndexedBamWriter::Write(const BamRecord& record) { d_->Write(record); }
 
 void IndexedBamWriter::Write(const BamRecordImpl& record) { d_->Write(BamRecord{record}); }
+
+size_t IndexedBamWriter::MaxReaderLag() const
+{
+    return d_->MaxReaderLag();
+}
 
 }  // namespace BAM
 }  // namespace PacBio

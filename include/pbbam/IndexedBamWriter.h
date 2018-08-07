@@ -142,6 +142,18 @@ public:
     ///
     void Write(const BamRecordImpl& record) override;
 
+    /// \brief ReaderTrailingDistance
+    ///
+    /// Allows calling code to monitor how far behind (in bytes)
+    /// the reader thread trails behind the tip of the current
+    /// being written BAM file.  May be useful for diagnosing 
+    /// performance issues if the reader thread falls enough behind
+    /// that caching is insufficient to prevent an IO hit from the
+    /// extra read operations.
+    /// 
+    /// Note: Returns a "high water mark", not a current value.
+    size_t MaxReaderLag() const;
+
 private:
     std::unique_ptr<internal::IndexedBamWriterPrivate2> d_;
 };
