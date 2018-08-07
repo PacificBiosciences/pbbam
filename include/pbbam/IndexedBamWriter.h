@@ -26,6 +26,25 @@ namespace internal {
 class IndexedBamWriterPrivate2;
 }
 
+struct IndexedBamWriterConfig
+{
+    std::string outputFilename; 
+    BamHeader header;
+
+    BamWriter::CompressionLevel bamCompressionLevel = BamWriter::DefaultCompression;
+    PbiBuilder::CompressionLevel pbiCompressionLevel = PbiBuilder::DefaultCompression;
+
+    // Number of threads used while writing to BAM file
+    size_t numBamThreads = 4;
+    // Number of threads used while writing to pbi file
+    size_t numPbiThreads = 4;
+    // Number of threads used while doing a trailing read of the BaM file being
+    // written (to help compute indexes)
+    size_t numGziThreads = 4;
+
+    // Max size in memory for temporary files before flushing to disk.
+    size_t tempFileBufferSize = 0x10000;
+};
 ///
 /// \brief The IndexedBamWriter class
 ///
@@ -80,6 +99,22 @@ public:
         const size_t numPbiThreads = 4,
         const size_t numGziThreads = 4,
         const size_t tempFileBufferSize = 0x10000);
+
+    /// \brief IndexedBamWRiter
+    ///
+    /// \param[in] config  Struct containing all the parameters used to construct
+    ///                    this object.  See documentation for other constructor
+    ///                    for more details
+    IndexedBamWriter(const IndexedBamWriterConfig& config)
+        : IndexedBamWriter(config.outputFilename,
+                           config.header,
+                           config.bamCompressionLevel,
+                           config.numBamThreads,
+                           config.pbiCompressionLevel,
+                           config.numPbiThreads,
+                           config.numGziThreads,
+                           config.tempFileBufferSize)
+    {}
 
     IndexedBamWriter(const IndexedBamWriter&) = delete;
     IndexedBamWriter(IndexedBamWriter&&) = default;
