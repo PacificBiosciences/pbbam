@@ -822,8 +822,10 @@ public:
             // Quit if writer thread(s) are finished.
             if (done_) break;
 
-            if (stat(bamFilename.c_str(), &st) != 0)
-                throw std::runtime_error{"could not get file information for: " + bamFilename};
+            if (stat(bamFilename.c_str(), &st) != 0) {
+                gziStatus_ = GziStatus::MISC_ERROR;
+                return;
+            }
             if (st.st_size > lastFileSize) {
                 lastFileSize = st.st_size;
             } else {
@@ -847,8 +849,14 @@ public:
                 if (!bgzf) initBgzf();
 
                 auto result = bgzf_read_block(bgzf.get());
-                if (result != 0) throw std::runtime_error("Error reading from BAM");
-                if (bgzf->block_length == 0) throw std::runtime_error("Failing to trail");
+                if (result != 0) {
+                    gziStatus_ = GziStatus::IO_ERROR;
+                    return;
+                }
+                if (bgzf->block_length == 0) {
+                    gziStatus_ = GziStatus::TRAIL_ERROR;
+                    return;
+                }
                 numBytesRead += bgzf->block_clength;
             }
 
@@ -864,14 +872,18 @@ public:
         // Read any remaining data.
         while (true) {
             auto result = bgzf_read_block(bgzf.get());
-            if (result != 0) throw std::runtime_error("Error reading from BAM");
+            if (result != 0) {
+                gziStatus_ = GziStatus::IO_ERROR;
+                return;
+            }
             if (bgzf->block_length == 0) break;
         }
 
         // Dump GZI contents to disk.
         const std::string gziFn{bamFilename_ + ".gzi"};
         ret = bgzf_index_dump(bgzf.get(), gziFn.c_str(), nullptr);
-        if (ret != 0) throw std::runtime_error{"could not dump GZI contents"};
+        if (ret != 0) 
+            gziStatus_ = GziStatus::GZI_ERROR;
     }
 
 public:
@@ -919,6 +931,22 @@ public:
             return fixedLength + qnameLength + remainingLength;
         };
         uncompressedFilePos_ += recordLength(rawRecord.get());
+
+        // Need to handle any errors from the gzi thread, since it's not set
+        // up to throw without terminating the program
+        auto gstatus = gziStatus_.load();
+        if (gstatus != GziStatus::GOOD) {
+            if (gziStatus_.load() == GziStatus::IO_ERROR)
+                throw std::runtime_error("Error in gzi thread reading from BAM file " + bamFilename_);
+            if (gziStatus_.load() == GziStatus::TRAIL_ERROR)
+                throw std::runtime_error("Gzi reader thread failed to properly trail when reading " + bamFilename_);
+            if (gziStatus_.load() == GziStatus::GZI_ERROR)
+                throw std::runtime_error("Could not dump GZI contents for indexing " + bamFilename_);
+            if (gziStatus_.load() == GziStatus::MISC_ERROR)
+                throw std::runtime_error("Error computing index file for " + bamFilename_);
+            gziStatus_.store(GziStatus::DEAD);
+        }
+        
     }
 
     size_t MaxReaderLag() const
@@ -933,6 +961,20 @@ private:
     std::unique_ptr<samFile, internal::HtslibFileDeleter> bam_;
     std::unique_ptr<PbiBuilder2> builder_;
 
+    // used as a type of error return code for the gziThread, so
+    // that errors are delayed until at least the bam file is
+    // safely written to disk
+    enum class GziStatus {
+        GOOD,
+        IO_ERROR,
+        TRAIL_ERROR,
+        GZI_ERROR,
+        MISC_ERROR,
+        // There was an error, but we've bubbled up the
+        // information already
+        DEAD
+    };
+    std::atomic<GziStatus> gziStatus_ {GziStatus::GOOD};
     std::thread gziThread_;
 
     bool blockWritten_ = false;
