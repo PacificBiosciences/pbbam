@@ -58,6 +58,17 @@ public:
     ///                                 to 1, this will force single-threaded
     ///                                 execution. No checks are made against an
     ///                                 upper limit.
+    /// \param[in] numGziThreads        number of threads used by the trailing 
+    ///                                 reader process used to help compute indexes.
+    ///                                 If set to 0, the writer will attempt to
+    ///                                 determine a reasonable estimate. If set
+    ///                                 to 1, this will force single-threaded
+    ///                                 execution. No checks are made against an
+    ///                                 upper limit.
+    /// \param[in] tempFileBufferBytes  Maximum number of bytes various temporary 
+    ///                                 files can use before they flush to disk.
+    ///                                 Larger numbers require more resources but
+    ///                                 may increase disk IO efficiency.
     ///
     /// \throws std::runtime_error if there was a problem
     ///
@@ -66,7 +77,9 @@ public:
         const BamWriter::CompressionLevel bamCompressionLevel = BamWriter::DefaultCompression,
         const size_t numBamThreads = 4,
         const PbiBuilder::CompressionLevel pbiCompressionLevel = PbiBuilder::DefaultCompression,
-        const size_t numPbiThreads = 4);
+        const size_t numPbiThreads = 4,
+        const size_t numGziThreads = 4,
+        const size_t tempFileBufferSize = 0x10000);
 
     IndexedBamWriter(const IndexedBamWriter&) = delete;
     IndexedBamWriter(IndexedBamWriter&&) = default;

@@ -111,15 +111,15 @@ template <typename T>
 class PbiTempFile2
 {
 public:
-    constexpr static const size_t MaxBufferSize = 0x8000000;  // 64K
     constexpr static const size_t ElementSize = sizeof(T);
-    constexpr static const size_t MaxElementCount = MaxBufferSize / ElementSize;
 
 public:
-    PbiTempFile2(std::string fn) : fn_{std::move(fn)}, fp_{std::fopen(fn_.c_str(), "w+b")}
+    PbiTempFile2(std::string fn, size_t maxBufferSize) 
+        : fn_{std::move(fn)}, fp_{std::fopen(fn_.c_str(), "w+b")}
+        , maxElementCount_{maxBufferSize / ElementSize}
     {
         if (fp_ == nullptr) throw std::runtime_error{"could not open temp file: " + fn_};
-        buffer_.reserve(MaxElementCount);
+        buffer_.reserve(maxElementCount_);
     }
     ~PbiTempFile2() { remove(fn_.c_str()); }
 
@@ -159,7 +159,12 @@ public:
         buffer_.push_back(value);
 
         // maybe flush
-        if (buffer_.size() == MaxElementCount) Flush();
+        if (buffer_.size() == maxElementCount_) Flush();
+    }
+
+    size_t MaxElementCount() const 
+    {
+        return maxElementCount_;
     }
 
 private:
@@ -176,6 +181,7 @@ private:
     // data storage/tracking
     std::vector<T> buffer_;
     size_t numElementsWritten_ = 0;
+    size_t maxElementCount_;
 };
 
 class PbiReferenceDataBuilder2
@@ -289,28 +295,29 @@ class PbiBuilder2
 {
 public:
     PbiBuilder2(const std::string& bamFilename, const std::string& pbiFilename,
-                const PbiBuilder::CompressionLevel compressionLevel, const size_t numThreads)
+                const PbiBuilder::CompressionLevel compressionLevel, const size_t numThreads,
+                const size_t fileBufferSize)
         //                const size_t numReferenceSequences = 0
         //                const bool isCoordinateSorted = false
-        : rgIdFile_{pbiFilename + ".rgId.tmp"},
-          qStartFile_{pbiFilename + ".qStart.tmp"},
-          qEndFile_{pbiFilename + ".qEnd.tmp"},
-          holeNumFile_{pbiFilename + ".holeNum.tmp"},
-          readQualFile_{pbiFilename + ".rq.tmp"},
-          ctxtFile_{pbiFilename + ".ctxt.tmp"},
-          fileOffsetFile_{pbiFilename + ".offset.tmp"},
-          tIdFile_{pbiFilename + ".tId.tmp"},
-          tStartFile_{pbiFilename + ".tStart.tmp"},
-          tEndFile_{pbiFilename + ".tEnd.tmp"},
-          aStartFile_{pbiFilename + ".aStart.tmp"},
-          aEndFile_{pbiFilename + ".aEnd.tmp"},
-          revStrandFile_{pbiFilename + ".revStrand.tmp"},
-          nMFile_{pbiFilename + ".nm.tmp"},
-          nMMFile_{pbiFilename + ".nmm.tmp"},
-          mapQualFile_{pbiFilename + ".mapQual.tmp"},
-          bcForwardFile_{pbiFilename + ".bcForward.tmp"},
-          bcReverseFile_{pbiFilename + ".bcReverse.tmp"},
-          bcQualFile_{pbiFilename + ".bcQual.tmp"},
+        : rgIdFile_{pbiFilename + ".rgId.tmp", fileBufferSize},
+          qStartFile_{pbiFilename + ".qStart.tmp", fileBufferSize},
+          qEndFile_{pbiFilename + ".qEnd.tmp", fileBufferSize},
+          holeNumFile_{pbiFilename + ".holeNum.tmp", fileBufferSize},
+          readQualFile_{pbiFilename + ".rq.tmp", fileBufferSize},
+          ctxtFile_{pbiFilename + ".ctxt.tmp", fileBufferSize},
+          fileOffsetFile_{pbiFilename + ".offset.tmp", fileBufferSize},
+          tIdFile_{pbiFilename + ".tId.tmp", fileBufferSize},
+          tStartFile_{pbiFilename + ".tStart.tmp", fileBufferSize},
+          tEndFile_{pbiFilename + ".tEnd.tmp", fileBufferSize},
+          aStartFile_{pbiFilename + ".aStart.tmp", fileBufferSize},
+          aEndFile_{pbiFilename + ".aEnd.tmp", fileBufferSize},
+          revStrandFile_{pbiFilename + ".revStrand.tmp", fileBufferSize},
+          nMFile_{pbiFilename + ".nm.tmp", fileBufferSize},
+          nMMFile_{pbiFilename + ".nmm.tmp", fileBufferSize},
+          mapQualFile_{pbiFilename + ".mapQual.tmp", fileBufferSize},
+          bcForwardFile_{pbiFilename + ".bcForward.tmp", fileBufferSize},
+          bcReverseFile_{pbiFilename + ".bcReverse.tmp", fileBufferSize},
+          bcQualFile_{pbiFilename + ".bcQual.tmp", fileBufferSize},
           bamFilename_{bamFilename},
           pbiFilename_{pbiFilename},
           compressionLevel_{compressionLevel},
@@ -515,7 +522,7 @@ private:
     void WriteFromTempFile(PbiTempFile2<T>& tempFile, BGZF* bgzf)
     {
         using TempFileType = PbiTempFile2<T>;
-        static constexpr const auto maxElementCount = TempFileType::MaxElementCount;
+        const auto maxElementCount = tempFile.MaxElementCount();
 
         tempFile.Rewind();
 
@@ -599,7 +606,7 @@ private:
                       return lhs.uAddress < rhs.uAddress;
                   });
 
-        static constexpr const auto maxElementCount = PbiTempFile2<int64_t>::MaxElementCount;
+        const auto maxElementCount = fileOffsetFile_.MaxElementCount();
         fileOffsetFile_.Rewind();
 
         size_t k = 0;
@@ -673,12 +680,14 @@ public:
                              const BamWriter::CompressionLevel bamCompressionLevel,
                              const size_t numBamThreads,
                              const PbiBuilder::CompressionLevel pbiCompressionLevel,
-                             const size_t numPbiThreads)
+                             const size_t numPbiThreads,
+                             const size_t numGziThreads,
+                             const size_t tempFileBufferSize)
         : bamFilename_{outputFilename}, header_{header}
     {
         OpenBam(bamCompressionLevel, numBamThreads);
-        OpenGzi();
-        OpenPbi(pbiCompressionLevel, numPbiThreads);
+        OpenGzi(numGziThreads);
+        OpenPbi(pbiCompressionLevel, numPbiThreads, tempFileBufferSize);
 
         isOpen_ = true;
     }
@@ -762,15 +771,27 @@ public:
         uncompressedFilePos_ = headerLength(header_.get());
     }
 
-    void OpenGzi() { gziThread_ = std::thread{&IndexedBamWriterPrivate2::RunGziThread, this}; }
+    void OpenGzi(size_t numThreads) 
+    { 
+        size_t actualNumThreads = numThreads;
+        if (actualNumThreads == 0) {
+            actualNumThreads = std::thread::hardware_concurrency();
 
-    void OpenPbi(const PbiBuilder::CompressionLevel compressionLevel, const size_t numThreads)
-    {
-        builder_ = std::make_unique<PbiBuilder2>(bamFilename_, bamFilename_ + ".pbi",
-                                                 compressionLevel, numThreads);
+            // if still unknown, default to single-threaded
+            if (actualNumThreads == 0) actualNumThreads = 1;
+        }
+        gziThread_ = std::thread{&IndexedBamWriterPrivate2::RunGziThread, this, actualNumThreads}; 
     }
 
-    void RunGziThread()
+    void OpenPbi(const PbiBuilder::CompressionLevel compressionLevel, 
+                 const size_t numThreads,
+                 const size_t fileBufferSize)
+    {
+        builder_ = std::make_unique<PbiBuilder2>(bamFilename_, bamFilename_ + ".pbi",
+                                                 compressionLevel, numThreads, fileBufferSize);
+    }
+
+    void RunGziThread(size_t numThreads)
     {
         //
         // This thread is the GZI index-enabled reader that trails the writer
@@ -788,11 +809,12 @@ public:
         int64_t lastFileSize = 0;
         int64_t numBytesRead = 0;
 
-        auto initBgzf = [&bgzf, &bamFilename]() {
+        auto initBgzf = [&bgzf, &bamFilename, numThreads]() {
             bgzf.reset(bgzf_open(bamFilename.c_str(), "rb"));
             if (!bgzf) throw std::runtime_error{"could not open BAM for toy train reading"};
             bgzf_index_build_init(bgzf.get());
-            bgzf_mt(bgzf.get(), 8, 256);
+            if (numThreads > 1)
+                bgzf_mt(bgzf.get(), numThreads, 256);
         };
 
         // main thread loop
@@ -917,7 +939,9 @@ IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamH
                                    const BamWriter::CompressionLevel bamCompressionLevel,
                                    const size_t numBamThreads,
                                    const PbiBuilder::CompressionLevel pbiCompressionLevel,
-                                   const size_t numPbiThreads)
+                                   const size_t numPbiThreads,
+                                   const size_t numGziThreads,
+                                   const size_t tempFileBufferSize)
     : IRecordWriter(), d_{nullptr}
 {
 #if PBBAM_AUTOVALIDATE
@@ -925,7 +949,7 @@ IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamH
 #endif
     d_ = std::make_unique<internal::IndexedBamWriterPrivate2>(
         outputFilename, internal::BamHeaderMemory::MakeRawHeader(header), bamCompressionLevel,
-        numBamThreads, pbiCompressionLevel, numPbiThreads);
+        numBamThreads, pbiCompressionLevel, numPbiThreads, numGziThreads, tempFileBufferSize);
 }
 
 IndexedBamWriter::~IndexedBamWriter() {}
