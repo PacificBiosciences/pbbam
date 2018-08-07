@@ -111,7 +111,7 @@ template <typename T>
 class PbiTempFile2
 {
 public:
-    constexpr static const size_t MaxBufferSize = 0x10000;  // 64K
+    constexpr static const size_t MaxBufferSize = 0x8000000;  // 64K
     constexpr static const size_t ElementSize = sizeof(T);
     constexpr static const size_t MaxElementCount = MaxBufferSize / ElementSize;
 
