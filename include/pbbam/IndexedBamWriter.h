@@ -28,7 +28,7 @@ class IndexedBamWriterPrivate2;
 
 struct IndexedBamWriterConfig
 {
-    std::string outputFilename; 
+    std::string outputFilename;
     BamHeader header;
 
     BamWriter::CompressionLevel bamCompressionLevel = BamWriter::DefaultCompression;
@@ -77,14 +77,14 @@ public:
     ///                                 to 1, this will force single-threaded
     ///                                 execution. No checks are made against an
     ///                                 upper limit.
-    /// \param[in] numGziThreads        number of threads used by the trailing 
+    /// \param[in] numGziThreads        number of threads used by the trailing
     ///                                 reader process used to help compute indexes.
     ///                                 If set to 0, the writer will attempt to
     ///                                 determine a reasonable estimate. If set
     ///                                 to 1, this will force single-threaded
     ///                                 execution. No checks are made against an
     ///                                 upper limit.
-    /// \param[in] tempFileBufferBytes  Maximum number of bytes various temporary 
+    /// \param[in] tempFileBufferBytes  Maximum number of bytes various temporary
     ///                                 files can use before they flush to disk.
     ///                                 Larger numbers require more resources but
     ///                                 may increase disk IO efficiency.
@@ -96,8 +96,7 @@ public:
         const BamWriter::CompressionLevel bamCompressionLevel = BamWriter::DefaultCompression,
         const size_t numBamThreads = 4,
         const PbiBuilder::CompressionLevel pbiCompressionLevel = PbiBuilder::DefaultCompression,
-        const size_t numPbiThreads = 4,
-        const size_t numGziThreads = 4,
+        const size_t numPbiThreads = 4, const size_t numGziThreads = 4,
         const size_t tempFileBufferSize = 0x10000);
 
     /// \brief IndexedBamWRiter
@@ -106,15 +105,11 @@ public:
     ///                    this object.  See documentation for other constructor
     ///                    for more details
     IndexedBamWriter(const IndexedBamWriterConfig& config)
-        : IndexedBamWriter(config.outputFilename,
-                           config.header,
-                           config.bamCompressionLevel,
-                           config.numBamThreads,
-                           config.pbiCompressionLevel,
-                           config.numPbiThreads,
-                           config.numGziThreads,
-                           config.tempFileBufferSize)
-    {}
+        : IndexedBamWriter(config.outputFilename, config.header, config.bamCompressionLevel,
+                           config.numBamThreads, config.pbiCompressionLevel, config.numPbiThreads,
+                           config.numGziThreads, config.tempFileBufferSize)
+    {
+    }
 
     IndexedBamWriter(const IndexedBamWriter&) = delete;
     IndexedBamWriter(IndexedBamWriter&&) = default;
@@ -146,11 +141,11 @@ public:
     ///
     /// Allows calling code to monitor how far behind (in bytes)
     /// the reader thread trails behind the tip of the current
-    /// being written BAM file.  May be useful for diagnosing 
+    /// being written BAM file.  May be useful for diagnosing
     /// performance issues if the reader thread falls enough behind
     /// that caching is insufficient to prevent an IO hit from the
     /// extra read operations.
-    /// 
+    ///
     /// Note: Returns a "high water mark", not a current value.
     size_t MaxReaderLag() const;
 

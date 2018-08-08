@@ -114,8 +114,9 @@ public:
     constexpr static const size_t ElementSize = sizeof(T);
 
 public:
-    PbiTempFile2(std::string fn, size_t maxBufferSize) 
-        : fn_{std::move(fn)}, fp_{std::fopen(fn_.c_str(), "w+b")}
+    PbiTempFile2(std::string fn, size_t maxBufferSize)
+        : fn_{std::move(fn)}
+        , fp_{std::fopen(fn_.c_str(), "w+b")}
         , maxElementCount_{maxBufferSize / ElementSize}
     {
         if (fp_ == nullptr) throw std::runtime_error{"could not open temp file: " + fn_};
@@ -162,10 +163,7 @@ public:
         if (buffer_.size() == maxElementCount_) Flush();
     }
 
-    size_t MaxElementCount() const 
-    {
-        return maxElementCount_;
-    }
+    size_t MaxElementCount() const { return maxElementCount_; }
 
 private:
     void WriteToFile()
@@ -680,8 +678,7 @@ public:
                              const BamWriter::CompressionLevel bamCompressionLevel,
                              const size_t numBamThreads,
                              const PbiBuilder::CompressionLevel pbiCompressionLevel,
-                             const size_t numPbiThreads,
-                             const size_t numGziThreads,
+                             const size_t numPbiThreads, const size_t numGziThreads,
                              const size_t tempFileBufferSize)
         : bamFilename_{outputFilename}, header_{header}
     {
@@ -771,8 +768,8 @@ public:
         uncompressedFilePos_ = headerLength(header_.get());
     }
 
-    void OpenGzi(size_t numThreads) 
-    { 
+    void OpenGzi(size_t numThreads)
+    {
         size_t actualNumThreads = numThreads;
         if (actualNumThreads == 0) {
             actualNumThreads = std::thread::hardware_concurrency();
@@ -780,11 +777,10 @@ public:
             // if still unknown, default to single-threaded
             if (actualNumThreads == 0) actualNumThreads = 1;
         }
-        gziThread_ = std::thread{&IndexedBamWriterPrivate2::RunGziThread, this, actualNumThreads}; 
+        gziThread_ = std::thread{&IndexedBamWriterPrivate2::RunGziThread, this, actualNumThreads};
     }
 
-    void OpenPbi(const PbiBuilder::CompressionLevel compressionLevel, 
-                 const size_t numThreads,
+    void OpenPbi(const PbiBuilder::CompressionLevel compressionLevel, const size_t numThreads,
                  const size_t fileBufferSize)
     {
         builder_ = std::make_unique<PbiBuilder2>(bamFilename_, bamFilename_ + ".pbi",
@@ -813,8 +809,7 @@ public:
             bgzf.reset(bgzf_open(bamFilename.c_str(), "rb"));
             if (!bgzf) throw std::runtime_error{"could not open BAM for toy train reading"};
             bgzf_index_build_init(bgzf.get());
-            if (numThreads > 1)
-                bgzf_mt(bgzf.get(), numThreads, 256);
+            if (numThreads > 1) bgzf_mt(bgzf.get(), numThreads, 256);
         };
 
         // main thread loop
@@ -843,7 +838,7 @@ public:
             // compressed *payload*, meaning if there is any other header/metadata/etc on disk
             // in the actual file, our estimation of our trailing distance might be off.  If
             // this ever starts throwing exceptions we'll have to look more in to this...
-            while (lastFileSize - numBytesRead > 100*BGZF_MAX_BLOCK_SIZE) {
+            while (lastFileSize - numBytesRead > 100 * BGZF_MAX_BLOCK_SIZE) {
                 // Open BAM reader if not already open.  Need to make sure we don't open it
                 // until we've already established our trailing distance.
                 if (!bgzf) initBgzf();
@@ -863,7 +858,6 @@ public:
             // Only update if thigs have appreciably fallen behind
             if (lastFileSize - numBytesRead > 1.10 * maxTrailingDistance_)
                 maxTrailingDistance_ = lastFileSize - numBytesRead;
-
         }
 
         // Try to open BAM if it wasn't opened in main loop.
@@ -882,8 +876,7 @@ public:
         // Dump GZI contents to disk.
         const std::string gziFn{bamFilename_ + ".gzi"};
         ret = bgzf_index_dump(bgzf.get(), gziFn.c_str(), nullptr);
-        if (ret != 0) 
-            gziStatus_ = GziStatus::GZI_ERROR;
+        if (ret != 0) gziStatus_ = GziStatus::GZI_ERROR;
     }
 
 public:
@@ -937,22 +930,21 @@ public:
         auto gstatus = gziStatus_.load();
         if (gstatus != GziStatus::GOOD) {
             if (gziStatus_.load() == GziStatus::IO_ERROR)
-                throw std::runtime_error("Error in gzi thread reading from BAM file " + bamFilename_);
+                throw std::runtime_error("Error in gzi thread reading from BAM file " +
+                                         bamFilename_);
             if (gziStatus_.load() == GziStatus::TRAIL_ERROR)
-                throw std::runtime_error("Gzi reader thread failed to properly trail when reading " + bamFilename_);
+                throw std::runtime_error(
+                    "Gzi reader thread failed to properly trail when reading " + bamFilename_);
             if (gziStatus_.load() == GziStatus::GZI_ERROR)
-                throw std::runtime_error("Could not dump GZI contents for indexing " + bamFilename_);
+                throw std::runtime_error("Could not dump GZI contents for indexing " +
+                                         bamFilename_);
             if (gziStatus_.load() == GziStatus::MISC_ERROR)
                 throw std::runtime_error("Error computing index file for " + bamFilename_);
             gziStatus_.store(GziStatus::DEAD);
         }
-        
     }
 
-    size_t MaxReaderLag() const
-    {
-        return maxTrailingDistance_;
-    }
+    size_t MaxReaderLag() const { return maxTrailingDistance_; }
 
 private:
     std::string bamFilename_;
@@ -964,7 +956,8 @@ private:
     // used as a type of error return code for the gziThread, so
     // that errors are delayed until at least the bam file is
     // safely written to disk
-    enum class GziStatus {
+    enum class GziStatus
+    {
         GOOD,
         IO_ERROR,
         TRAIL_ERROR,
@@ -974,7 +967,7 @@ private:
         // information already
         DEAD
     };
-    std::atomic<GziStatus> gziStatus_ {GziStatus::GOOD};
+    std::atomic<GziStatus> gziStatus_{GziStatus::GOOD};
     std::thread gziThread_;
 
     bool blockWritten_ = false;
@@ -992,8 +985,7 @@ IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamH
                                    const BamWriter::CompressionLevel bamCompressionLevel,
                                    const size_t numBamThreads,
                                    const PbiBuilder::CompressionLevel pbiCompressionLevel,
-                                   const size_t numPbiThreads,
-                                   const size_t numGziThreads,
+                                   const size_t numPbiThreads, const size_t numGziThreads,
                                    const size_t tempFileBufferSize)
     : IRecordWriter(), d_{nullptr}
 {
@@ -1013,10 +1005,7 @@ void IndexedBamWriter::Write(const BamRecord& record) { d_->Write(record); }
 
 void IndexedBamWriter::Write(const BamRecordImpl& record) { d_->Write(BamRecord{record}); }
 
-size_t IndexedBamWriter::MaxReaderLag() const
-{
-    return d_->MaxReaderLag();
-}
+size_t IndexedBamWriter::MaxReaderLag() const { return d_->MaxReaderLag(); }
 
 }  // namespace BAM
 }  // namespace PacBio
