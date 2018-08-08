@@ -519,7 +519,6 @@ private:
     template <typename T>
     void WriteFromTempFile(PbiTempFile2<T>& tempFile, BGZF* bgzf)
     {
-        using TempFileType = PbiTempFile2<T>;
         const auto maxElementCount = tempFile.MaxElementCount();
 
         tempFile.Rewind();
