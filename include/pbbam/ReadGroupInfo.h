@@ -93,7 +93,8 @@ enum class PlatformModelType
 {
     ASTRO,
     RS,
-    SEQUEL
+    SEQUEL,
+    SEQUELII
 };
 
 /// \brief The ReadGroupInfo class represents a read group entry (\@RG) in the
