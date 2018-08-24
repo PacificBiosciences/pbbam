@@ -107,18 +107,18 @@ std::string ToString2(const RecordType type)
     }
 }
 
-struct PbiFieldBlock
+struct PbiFieldBlock2
 {
     long pos_;  // file position of block start
     size_t n_;  // number of entries in block
 };
 
 template <typename T>
-struct PbiField
+struct PbiField2
 {
     constexpr static const size_t ElementSize = sizeof(T);
 
-    PbiField(size_t maxBufferSize) : maxElementCount_{maxBufferSize / ElementSize}
+    PbiField2(size_t maxBufferSize) : maxElementCount_{maxBufferSize / ElementSize}
     {
         buffer_.reserve(maxElementCount_);
     }
@@ -128,7 +128,7 @@ struct PbiField
 
     size_t maxElementCount_;
     std::vector<T> buffer_;
-    std::vector<PbiFieldBlock> blocks_;
+    std::vector<PbiFieldBlock2> blocks_;
 };
 
 class PbiReferenceDataBuilder2
@@ -440,7 +440,7 @@ public:
     }
 
     template <typename T>
-    void MaybeFlushBuffer(PbiField<T>& field, bool force)
+    void MaybeFlushBuffer(PbiField2<T>& field, bool force)
     {
         // replace with lambda, in FlushBuffer(), once PPA can use C++14 ?
         if (field.IsFull() || force) {
@@ -477,7 +477,7 @@ public:
     }
 
     template <typename T>
-    void LoadFieldBlockFromTempFile(PbiField<T>& field, const PbiFieldBlock& block)
+    void LoadFieldBlockFromTempFile(PbiField2<T>& field, const PbiFieldBlock2& block)
     {
         // seek to block begin
         const auto ret = std::fseek(tempFile_.get(), block.pos_, SEEK_SET);
@@ -496,7 +496,7 @@ public:
     }
 
     template <typename T>
-    void WriteField(PbiField<T>& field)
+    void WriteField(PbiField2<T>& field)
     {
         for (const auto& block : field.blocks_) {
             LoadFieldBlockFromTempFile(field, block);
@@ -539,14 +539,14 @@ public:
     }
 
     template <typename T>
-    void WriteToTempFile(PbiField<T>& field)
+    void WriteToTempFile(PbiField2<T>& field)
     {
         if (field.buffer_.empty()) return;
 
         const long pos = std::ftell(tempFile_.get());
         const size_t numElements =
             std::fwrite(field.buffer_.data(), sizeof(T), field.buffer_.size(), tempFile_.get());
-        field.blocks_.emplace_back(PbiFieldBlock{pos, numElements});
+        field.blocks_.emplace_back(PbiFieldBlock2{pos, numElements});
     }
 
     void WritePbiHeader()
@@ -651,25 +651,25 @@ private:
     size_t numThreads_;
 
     // PBI field buffers
-    PbiField<int32_t> rgIdField_;
-    PbiField<int32_t> qStartField_;
-    PbiField<int32_t> qEndField_;
-    PbiField<int32_t> holeNumField_;
-    PbiField<float> readQualField_;
-    PbiField<uint8_t> ctxtField_;
-    PbiField<uint64_t> fileOffsetField_;
-    PbiField<int32_t> tIdField_;
-    PbiField<uint32_t> tStartField_;
-    PbiField<uint32_t> tEndField_;
-    PbiField<uint32_t> aStartField_;
-    PbiField<uint32_t> aEndField_;
-    PbiField<uint8_t> revStrandField_;
-    PbiField<uint32_t> nMField_;
-    PbiField<uint32_t> nMMField_;
-    PbiField<uint8_t> mapQualField_;
-    PbiField<int16_t> bcForwardField_;
-    PbiField<int16_t> bcReverseField_;
-    PbiField<int8_t> bcQualField_;
+    PbiField2<int32_t> rgIdField_;
+    PbiField2<int32_t> qStartField_;
+    PbiField2<int32_t> qEndField_;
+    PbiField2<int32_t> holeNumField_;
+    PbiField2<float> readQualField_;
+    PbiField2<uint8_t> ctxtField_;
+    PbiField2<uint64_t> fileOffsetField_;
+    PbiField2<int32_t> tIdField_;
+    PbiField2<uint32_t> tStartField_;
+    PbiField2<uint32_t> tEndField_;
+    PbiField2<uint32_t> aStartField_;
+    PbiField2<uint32_t> aEndField_;
+    PbiField2<uint8_t> revStrandField_;
+    PbiField2<uint32_t> nMField_;
+    PbiField2<uint32_t> nMMField_;
+    PbiField2<uint8_t> mapQualField_;
+    PbiField2<int16_t> bcForwardField_;
+    PbiField2<int16_t> bcReverseField_;
+    PbiField2<int8_t> bcQualField_;
 
     // reference data
     std::unique_ptr<PbiReferenceDataBuilder2> refDataBuilder_;
