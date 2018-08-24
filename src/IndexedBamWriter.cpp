@@ -109,8 +109,8 @@ std::string ToString2(const RecordType type)
 
 struct PbiFieldBlock2
 {
-    long pos_;  // file position of block start
-    size_t n_;  // number of entries in block
+    int64_t pos_;  // file position of block start
+    size_t n_;     // number of entries in block
 };
 
 template <typename T>
@@ -543,8 +543,8 @@ public:
     {
         if (field.buffer_.empty()) return;
 
-        const long pos = std::ftell(tempFile_.get());
-        const size_t numElements =
+        const auto pos = std::ftell(tempFile_.get());
+        const auto numElements =
             std::fwrite(field.buffer_.data(), sizeof(T), field.buffer_.size(), tempFile_.get());
         field.blocks_.emplace_back(PbiFieldBlock2{pos, numElements});
     }
