@@ -77,11 +77,11 @@ inline void SwapEndianness2(std::vector<T>& data)
 }
 
 template <typename T>
-inline void WriteBgzfVector2(BGZF* fp, std::vector<T>& data, const size_t numElements)
+inline void WriteBgzfVector2(BGZF* fp, std::vector<T>& data)
 {
     assert(fp);
     if (fp->is_be) SwapEndianness2(data);
-    bgzf_write_safe2(fp, data.data(), numElements * sizeof(T));
+    bgzf_write_safe2(fp, data.data(), data.size() * sizeof(T));
 }
 
 using RecordType = PacBio::BAM::RecordType;
@@ -107,79 +107,28 @@ std::string ToString2(const RecordType type)
     }
 }
 
-template <typename T>
-class PbiTempFile2
+struct PbiFieldBlock2
 {
-public:
+    int64_t pos_;  // file position of block start
+    size_t n_;     // number of entries in block
+};
+
+template <typename T>
+struct PbiField2
+{
     constexpr static const size_t ElementSize = sizeof(T);
 
-public:
-    PbiTempFile2(std::string fn, size_t maxBufferSize)
-        : fn_{std::move(fn)}
-        , fp_{std::fopen(fn_.c_str(), "w+b")}
-        , maxElementCount_{maxBufferSize / ElementSize}
+    PbiField2(size_t maxBufferSize) : maxElementCount_{maxBufferSize / ElementSize}
     {
-        if (fp_ == nullptr) throw std::runtime_error{"could not open temp file: " + fn_};
         buffer_.reserve(maxElementCount_);
     }
-    ~PbiTempFile2() { remove(fn_.c_str()); }
 
-public:
-    void Close()
-    {
-        Flush();  // dtor will take care of closing file handle
-    }
+    void Add(T value) { buffer_.push_back(value); }
+    bool IsFull() const { return buffer_.size() == maxElementCount_; }
 
-    const std::vector<T>& Data() const { return buffer_; }
-
-    std::vector<T>& Data() { return buffer_; }
-
-    void Flush()
-    {
-        WriteToFile();
-        buffer_.clear();
-    }
-
-    size_t Read(const size_t count)
-    {
-        const auto actualCount = std::min(count, numElementsWritten_);
-        buffer_.resize(actualCount);
-        return fread(buffer_.data(), ElementSize, actualCount, fp_.get());
-    }
-
-    void Rewind()
-    {
-        Flush();
-
-        const auto ret = fseek(fp_.get(), 0, SEEK_SET);
-        if (ret != 0) throw std::runtime_error{"could not rewind temp file" + fn_};
-    }
-
-    void Write(T value)
-    {
-        buffer_.push_back(value);
-
-        // maybe flush
-        if (buffer_.size() == maxElementCount_) Flush();
-    }
-
-    size_t MaxElementCount() const { return maxElementCount_; }
-
-private:
-    void WriteToFile()
-    {
-        numElementsWritten_ += fwrite(buffer_.data(), ElementSize, buffer_.size(), fp_.get());
-    }
-
-private:
-    // file info
-    std::string fn_;
-    std::unique_ptr<FILE, internal::FileDeleter> fp_;
-
-    // data storage/tracking
-    std::vector<T> buffer_;
-    size_t numElementsWritten_ = 0;
     size_t maxElementCount_;
+    std::vector<T> buffer_;
+    std::vector<PbiFieldBlock2> blocks_;
 };
 
 class PbiReferenceDataBuilder2
@@ -291,36 +240,47 @@ private:
 // TODO: come back to refseqs, sorting, etc
 class PbiBuilder2
 {
+    enum class FlushMode
+    {
+        FORCE,
+        NO_FORCE
+    };
+
 public:
     PbiBuilder2(const std::string& bamFilename, const std::string& pbiFilename,
                 const PbiBuilder::CompressionLevel compressionLevel, const size_t numThreads,
                 const size_t fileBufferSize)
         //                const size_t numReferenceSequences = 0
         //                const bool isCoordinateSorted = false
-        : rgIdFile_{pbiFilename + ".rgId.tmp", fileBufferSize},
-          qStartFile_{pbiFilename + ".qStart.tmp", fileBufferSize},
-          qEndFile_{pbiFilename + ".qEnd.tmp", fileBufferSize},
-          holeNumFile_{pbiFilename + ".holeNum.tmp", fileBufferSize},
-          readQualFile_{pbiFilename + ".rq.tmp", fileBufferSize},
-          ctxtFile_{pbiFilename + ".ctxt.tmp", fileBufferSize},
-          fileOffsetFile_{pbiFilename + ".offset.tmp", fileBufferSize},
-          tIdFile_{pbiFilename + ".tId.tmp", fileBufferSize},
-          tStartFile_{pbiFilename + ".tStart.tmp", fileBufferSize},
-          tEndFile_{pbiFilename + ".tEnd.tmp", fileBufferSize},
-          aStartFile_{pbiFilename + ".aStart.tmp", fileBufferSize},
-          aEndFile_{pbiFilename + ".aEnd.tmp", fileBufferSize},
-          revStrandFile_{pbiFilename + ".revStrand.tmp", fileBufferSize},
-          nMFile_{pbiFilename + ".nm.tmp", fileBufferSize},
-          nMMFile_{pbiFilename + ".nmm.tmp", fileBufferSize},
-          mapQualFile_{pbiFilename + ".mapQual.tmp", fileBufferSize},
-          bcForwardFile_{pbiFilename + ".bcForward.tmp", fileBufferSize},
-          bcReverseFile_{pbiFilename + ".bcReverse.tmp", fileBufferSize},
-          bcQualFile_{pbiFilename + ".bcQual.tmp", fileBufferSize},
-          bamFilename_{bamFilename},
+        : bamFilename_{bamFilename},
           pbiFilename_{pbiFilename},
+          tempFilename_{pbiFilename + ".build"},
+          tempFile_{std::fopen(tempFilename_.c_str(), "w+b")},
           compressionLevel_{compressionLevel},
-          numThreads_{numThreads}
+          numThreads_{numThreads},
+          rgIdField_{fileBufferSize},
+          qStartField_{fileBufferSize},
+          qEndField_{fileBufferSize},
+          holeNumField_{fileBufferSize},
+          readQualField_{fileBufferSize},
+          ctxtField_{fileBufferSize},
+          fileOffsetField_{fileBufferSize},
+          tIdField_{fileBufferSize},
+          tStartField_{fileBufferSize},
+          tEndField_{fileBufferSize},
+          aStartField_{fileBufferSize},
+          aEndField_{fileBufferSize},
+          revStrandField_{fileBufferSize},
+          nMField_{fileBufferSize},
+          nMMField_{fileBufferSize},
+          mapQualField_{fileBufferSize},
+          bcForwardField_{fileBufferSize},
+          bcReverseField_{fileBufferSize},
+          bcQualField_{fileBufferSize}
     {
+        if (!tempFile_)
+            throw std::runtime_error{"index builder could not open temp file: " + tempFilename_};
+
         // TODO: come back to this
         //        if (isCoordinateSorted && numReferenceSequences > 0)
         //            refDataBuilder_ = std::make_unique<PbiReferenceDataBuilder2>(numReferenceSequences);
@@ -328,71 +288,84 @@ public:
 
     void AddRecord(const BamRecord& b, const int64_t uOffset)
     {
-        // ensure updated data (?)
+        // ensure updated data (necessary?)
         internal::BamRecordMemory::UpdateRecordTags(b);
         b.ResetCachedPositions();
 
-        // store data
+        // store record data & maybe flush to temp file
         AddBasicData(b, uOffset);
         AddMappedData(b);
         AddBarcodeData(b);
         AddReferenceData(b, currentRow_);
+        FlushBuffers(FlushMode::NO_FORCE);
 
-        // increment row counter
         ++currentRow_;
     }
 
-    void Close()
+    void AddBasicData(const BamRecord& b, const int64_t uOffset)
     {
-        if (isClosed_) return;
+        // read group ID
+        const auto rgId = [&b]() -> int32_t {
+            auto rgIdString = b.ReadGroupId();
+            if (rgIdString.empty())
+                rgIdString = MakeReadGroupId(b.MovieName(), ToString2(b.Type()));
+            return std::stoul(rgIdString, nullptr, 16);
+        }();
 
-        // open PBI file for writing
-        OpenPbiFile();
-        auto* bgzf = outFile_.get();
+        // query start/end
+        const auto isCcsOrTranscript = (IsCcsOrTranscript(b.Type()));
+        const int32_t qStart = (isCcsOrTranscript ? -1 : b.QueryStart());
+        const int32_t qEnd = (isCcsOrTranscript ? -1 : b.QueryEnd());
 
-        // header section
-        WritePbiHeader(bgzf);
+        // add'l data
+        const int32_t holeNum = (b.HasHoleNumber() ? b.HoleNumber() : 0);
+        const float readAccuracy =
+            (b.HasReadAccuracy() ? boost::numeric_cast<float>(b.ReadAccuracy()) : 0.0F);
+        const uint8_t ctxt = (b.HasLocalContextFlags() ? b.LocalContextFlags()
+                                                       : LocalContextFlags::NO_LOCAL_CONTEXT);
 
-        // 'basic' data section
-        WriteFromTempFile(rgIdFile_, bgzf);
-        WriteFromTempFile(qStartFile_, bgzf);
-        WriteFromTempFile(qEndFile_, bgzf);
-        WriteFromTempFile(holeNumFile_, bgzf);
-        WriteFromTempFile(readQualFile_, bgzf);
-        WriteFromTempFile(ctxtFile_, bgzf);
-
-        // special vOffset transformation
-        WriteVirtualOffsets(bgzf);
-
-        // mapped data section
-        if (hasMappedData_) {
-            WriteFromTempFile(tIdFile_, bgzf);
-            WriteFromTempFile(tStartFile_, bgzf);
-            WriteFromTempFile(tEndFile_, bgzf);
-            WriteFromTempFile(aStartFile_, bgzf);
-            WriteFromTempFile(aEndFile_, bgzf);
-            WriteFromTempFile(revStrandFile_, bgzf);
-            WriteFromTempFile(nMFile_, bgzf);
-            WriteFromTempFile(nMMFile_, bgzf);
-            WriteFromTempFile(mapQualFile_, bgzf);
-        }
-
-        // reference data section
-        if (refDataBuilder_) WriteReferenceData(bgzf);
-
-        // barcode data section
-        if (hasBarcodeData_) {
-            WriteFromTempFile(bcForwardFile_, bgzf);
-            WriteFromTempFile(bcReverseFile_, bgzf);
-            WriteFromTempFile(bcQualFile_, bgzf);
-        }
-
-        // finally, set flag
-        isClosed_ = true;
+        // store
+        rgIdField_.Add(rgId);
+        qStartField_.Add(qStart);
+        qEndField_.Add(qEnd);
+        holeNumField_.Add(holeNum);
+        ctxtField_.Add(ctxt);
+        readQualField_.Add(readAccuracy);
+        fileOffsetField_.Add(uOffset);
     }
 
-private:
-    // store record data
+    void AddMappedData(const BamRecord& b)
+    {
+        // alignment position
+        const auto tId = b.ReferenceId();
+        const auto tStart = static_cast<uint32_t>(b.ReferenceStart());
+        const auto tEnd = static_cast<uint32_t>(b.ReferenceEnd());
+        const auto aStart = static_cast<uint32_t>(b.AlignedStart());
+        const auto aEnd = static_cast<uint32_t>(b.AlignedEnd());
+        const auto isReverseStrand = [&b]() -> uint8_t {
+            return (b.AlignedStrand() == Strand::REVERSE ? 1 : 0);
+        }();
+
+        // alignment quality
+        const auto matchData = b.NumMatchesAndMismatches();
+        const auto nM = static_cast<uint32_t>(matchData.first);
+        const auto nMM = static_cast<uint32_t>(matchData.second);
+        const auto mapQuality = b.MapQuality();
+
+        if (tId >= 0) hasMappedData_ = true;
+
+        // store
+        tIdField_.Add(tId);
+        tStartField_.Add(tStart);
+        tEndField_.Add(tEnd);
+        aStartField_.Add(aStart);
+        aEndField_.Add(aEnd);
+        revStrandField_.Add(isReverseStrand);
+        nMField_.Add(nM);
+        nMMField_.Add(nMM);
+        mapQualField_.Add(mapQuality);
+    }
+
     void AddBarcodeData(const BamRecord& b)
     {
         // initialize w/ 'missing' value
@@ -416,73 +389,9 @@ private:
         }
 
         // store
-        bcForwardFile_.Write(bcForward);
-        bcReverseFile_.Write(bcReverse);
-        bcQualFile_.Write(bcQuality);
-    }
-
-    void AddBasicData(const BamRecord& b, const int64_t vOffset)
-    {
-        // read group ID
-        const auto rgId = [&b]() -> int32_t {
-            auto rgIdString = b.ReadGroupId();
-            if (rgIdString.empty())
-                rgIdString = MakeReadGroupId(b.MovieName(), ToString2(b.Type()));
-            return std::stoul(rgIdString, nullptr, 16);
-        }();
-
-        // query start/end
-        const auto isCcsOrTranscript = (IsCcsOrTranscript(b.Type()));
-        const int32_t qStart = (isCcsOrTranscript ? -1 : b.QueryStart());
-        const int32_t qEnd = (isCcsOrTranscript ? -1 : b.QueryEnd());
-
-        // add'l data
-        const int32_t holeNum = (b.HasHoleNumber() ? b.HoleNumber() : 0);
-        const float readAccuracy =
-            (b.HasReadAccuracy() ? boost::numeric_cast<float>(b.ReadAccuracy()) : 0.0F);
-        const uint8_t ctxt = (b.HasLocalContextFlags() ? b.LocalContextFlags()
-                                                       : LocalContextFlags::NO_LOCAL_CONTEXT);
-
-        // store
-        rgIdFile_.Write(rgId);
-        qStartFile_.Write(qStart);
-        qEndFile_.Write(qEnd);
-        holeNumFile_.Write(holeNum);
-        ctxtFile_.Write(ctxt);
-        readQualFile_.Write(readAccuracy);
-        fileOffsetFile_.Write(vOffset);
-    }
-
-    void AddMappedData(const BamRecord& b)
-    {
-        // fetch data
-        const auto tId = b.ReferenceId();
-        const auto tStart = static_cast<uint32_t>(b.ReferenceStart());
-        const auto tEnd = static_cast<uint32_t>(b.ReferenceEnd());
-        const auto aStart = static_cast<uint32_t>(b.AlignedStart());
-        const auto aEnd = static_cast<uint32_t>(b.AlignedEnd());
-
-        const auto isReverseStrand = [&b]() -> uint8_t {
-            return (b.AlignedStrand() == Strand::REVERSE ? 1 : 0);
-        }();
-
-        const auto matchData = b.NumMatchesAndMismatches();
-        const auto nM = static_cast<uint32_t>(matchData.first);
-        const auto nMM = static_cast<uint32_t>(matchData.second);
-        const auto mapQuality = b.MapQuality();
-
-        if (tId >= 0) hasMappedData_ = true;
-
-        // store
-        tIdFile_.Write(tId);
-        tStartFile_.Write(tStart);
-        tEndFile_.Write(tEnd);
-        aStartFile_.Write(aStart);
-        aEndFile_.Write(aEnd);
-        revStrandFile_.Write(isReverseStrand);
-        nMFile_.Write(nM);
-        nMMFile_.Write(nMM);
-        mapQualFile_.Write(mapQuality);
+        bcForwardField_.Add(bcForward);
+        bcReverseField_.Add(bcReverse);
+        bcQualField_.Add(bcQuality);
     }
 
     void AddReferenceData(const BamRecord& b, const uint32_t currentRow)
@@ -491,17 +400,30 @@ private:
         // update with info from refDataBuilder
         if (refDataBuilder_) {
             const auto sorted = refDataBuilder_->AddRecord(b, currentRow);
-            if (!sorted) refDataBuilder_.reset(nullptr);
+            if (!sorted) refDataBuilder_.reset();
         }
     }
 
-    // read from temp files & write PBI data
+    void Close()
+    {
+        if (isClosed_) return;
+
+        FlushBuffers(FlushMode::FORCE);
+
+        OpenPbiFile();
+        WritePbiHeader();
+        WriteFromTempFile();
+
+        remove(tempFilename_.c_str());
+        isClosed_ = true;
+    }
+
     void OpenPbiFile()
     {
         // open file handle
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel_));
-        outFile_.reset(bgzf_open(pbiFilename_.c_str(), mode.c_str()));
-        if (outFile_ == nullptr) throw std::runtime_error{"could not open output file"};
+        pbiFile_.reset(bgzf_open(pbiFilename_.c_str(), mode.c_str()));
+        if (pbiFile_ == nullptr) throw std::runtime_error{"could not open output file"};
 
         // if no explicit thread count given, attempt built-in check
         size_t actualNumThreads = numThreads_;
@@ -513,27 +435,123 @@ private:
         }
 
         // if multithreading requested, enable it
-        if (actualNumThreads > 1) bgzf_mt(outFile_.get(), actualNumThreads, 256);
+        if (actualNumThreads > 1) bgzf_mt(pbiFile_.get(), actualNumThreads, 256);
     }
 
     template <typename T>
-    void WriteFromTempFile(PbiTempFile2<T>& tempFile, BGZF* bgzf)
+    void MaybeFlushBuffer(PbiField2<T>& field, bool force)
     {
-        const auto maxElementCount = tempFile.MaxElementCount();
-
-        tempFile.Rewind();
-
-        size_t totalNumRead = 0;
-        for (size_t i = 0; totalNumRead < currentRow_; ++i) {
-            const auto numRead = tempFile.Read(maxElementCount);
-            auto& data = tempFile.Data();
-            WriteBgzfVector2(bgzf, data, numRead);
-            totalNumRead += numRead;
+        // replace with lambda, in FlushBuffer(), once PPA can use C++14 ?
+        if (field.IsFull() || force) {
+            WriteToTempFile(field);
+            field.buffer_.clear();
         }
     }
 
-    void WritePbiHeader(BGZF* bgzf)
+    void FlushBuffers(FlushMode mode)
     {
+        const auto force = (mode == FlushMode::FORCE);
+
+        MaybeFlushBuffer(rgIdField_, force);
+        MaybeFlushBuffer(qStartField_, force);
+        MaybeFlushBuffer(qEndField_, force);
+        MaybeFlushBuffer(holeNumField_, force);
+        MaybeFlushBuffer(readQualField_, force);
+        MaybeFlushBuffer(ctxtField_, force);
+        MaybeFlushBuffer(fileOffsetField_, force);
+
+        MaybeFlushBuffer(tIdField_, force);
+        MaybeFlushBuffer(tStartField_, force);
+        MaybeFlushBuffer(tEndField_, force);
+        MaybeFlushBuffer(aStartField_, force);
+        MaybeFlushBuffer(aEndField_, force);
+        MaybeFlushBuffer(revStrandField_, force);
+        MaybeFlushBuffer(nMField_, force);
+        MaybeFlushBuffer(nMMField_, force);
+        MaybeFlushBuffer(mapQualField_, force);
+
+        MaybeFlushBuffer(bcForwardField_, force);
+        MaybeFlushBuffer(bcReverseField_, force);
+        MaybeFlushBuffer(bcQualField_, force);
+    }
+
+    template <typename T>
+    void LoadFieldBlockFromTempFile(PbiField2<T>& field, const PbiFieldBlock2& block)
+    {
+        // seek to block begin
+        const auto ret = std::fseek(tempFile_.get(), block.pos_, SEEK_SET);
+        if (ret != 0)
+            throw std::runtime_error{"index builder could not seek in temp file: " + tempFilename_};
+
+        // read block elements
+        field.buffer_.assign(block.n_, 0);
+        const auto numElements =
+            std::fread(field.buffer_.data(), sizeof(T), block.n_, tempFile_.get());
+
+        if (numElements != block.n_)
+            throw std::runtime_error{
+                "index builder could not read expected element count from temp file: " +
+                tempFilename_};
+    }
+
+    template <typename T>
+    void WriteField(PbiField2<T>& field)
+    {
+        for (const auto& block : field.blocks_) {
+            LoadFieldBlockFromTempFile(field, block);
+            WriteBgzfVector2(pbiFile_.get(), field.buffer_);
+        }
+    }
+
+    void WriteFromTempFile()
+    {
+        // load from temp file, in PBI format order, and write to index
+
+        WriteField(rgIdField_);
+        WriteField(qStartField_);
+        WriteField(qEndField_);
+        WriteField(holeNumField_);
+        WriteField(readQualField_);
+        WriteField(ctxtField_);
+
+        WriteVirtualOffsets();
+
+        if (hasMappedData_) {
+            WriteField(tIdField_);
+            WriteField(tStartField_);
+            WriteField(tEndField_);
+            WriteField(aStartField_);
+            WriteField(aEndField_);
+            WriteField(revStrandField_);
+            WriteField(nMField_);
+            WriteField(nMMField_);
+            WriteField(mapQualField_);
+        }
+
+        if (refDataBuilder_) WriteReferenceData();
+
+        if (hasBarcodeData_) {
+            WriteField(bcForwardField_);
+            WriteField(bcReverseField_);
+            WriteField(bcQualField_);
+        }
+    }
+
+    template <typename T>
+    void WriteToTempFile(PbiField2<T>& field)
+    {
+        if (field.buffer_.empty()) return;
+
+        const auto pos = std::ftell(tempFile_.get());
+        const auto numElements =
+            std::fwrite(field.buffer_.data(), sizeof(T), field.buffer_.size(), tempFile_.get());
+        field.blocks_.emplace_back(PbiFieldBlock2{pos, numElements});
+    }
+
+    void WritePbiHeader()
+    {
+        BGZF* bgzf = pbiFile_.get();
+
         // 'magic' string
         static constexpr const std::array<char, 4> magic{{'P', 'B', 'I', '\1'}};
         bgzf_write_safe2(bgzf, magic.data(), 4);
@@ -562,7 +580,7 @@ private:
         bgzf_write_safe2(bgzf, reserved, 18);
     }
 
-    void WriteReferenceData(BGZF* bgzf) { refDataBuilder_->WriteData(bgzf); }
+    void WriteReferenceData() { refDataBuilder_->WriteData(pbiFile_.get()); }
 
     std::vector<GzIndexEntry> LoadGzi()
     {
@@ -594,7 +612,7 @@ private:
         return result;
     }
 
-    void WriteVirtualOffsets(BGZF* bgzf)
+    void WriteVirtualOffsets()
     {
         auto index = LoadGzi();
         if (index.empty()) throw std::runtime_error{"empty GZI file"};
@@ -603,64 +621,57 @@ private:
                       return lhs.uAddress < rhs.uAddress;
                   });
 
-        const auto maxElementCount = fileOffsetFile_.MaxElementCount();
-        fileOffsetFile_.Rewind();
-
         size_t k = 0;
-        size_t totalNumRead = 0;
-        for (size_t i = 0; totalNumRead < currentRow_; ++i) {
+        for (const auto& block : fileOffsetField_.blocks_) {
+            LoadFieldBlockFromTempFile(fileOffsetField_, block);
 
-            const auto numRead = fileOffsetFile_.Read(maxElementCount);
-            auto& data = fileOffsetFile_.Data();
-            for (size_t j = 0; j < data.size(); ++j) {
-                if (k < index.size() - 1 &&
-                    (static_cast<uint64_t>(index.at(k + 1).uAddress) <= data[j]))
+            // transform offsets from GZI
+            for (size_t j = 0; j < fileOffsetField_.buffer_.size(); ++j) {
+                if (k < index.size() - 1 && (static_cast<uint64_t>(index.at(k + 1).uAddress) <=
+                                             fileOffsetField_.buffer_[j]))
                     ++k;
                 const GzIndexEntry& e = index.at(k);
-                const int64_t uOffset = data[j] - e.uAddress;
+                const int64_t uOffset = fileOffsetField_.buffer_[j] - e.uAddress;
                 const auto result = ((e.vAddress << 16) | uOffset);
-                data[j] = result;
+                fileOffsetField_.buffer_[j] = result;
             }
-            WriteBgzfVector2(bgzf, data, numRead);
-            totalNumRead += numRead;
+            WriteBgzfVector2(pbiFile_.get(), fileOffsetField_.buffer_);
         }
     }
 
 private:
-    // basic data
-    PbiTempFile2<int32_t> rgIdFile_;
-    PbiTempFile2<int32_t> qStartFile_;
-    PbiTempFile2<int32_t> qEndFile_;
-    PbiTempFile2<int32_t> holeNumFile_;
-    PbiTempFile2<float> readQualFile_;
-    PbiTempFile2<uint8_t> ctxtFile_;
-    PbiTempFile2<uint64_t> fileOffsetFile_;
-
-    // mapped data
-    PbiTempFile2<int32_t> tIdFile_;
-    PbiTempFile2<uint32_t> tStartFile_;
-    PbiTempFile2<uint32_t> tEndFile_;
-    PbiTempFile2<uint32_t> aStartFile_;
-    PbiTempFile2<uint32_t> aEndFile_;
-    PbiTempFile2<uint8_t> revStrandFile_;
-    PbiTempFile2<uint32_t> nMFile_;
-    PbiTempFile2<uint32_t> nMMFile_;
-    PbiTempFile2<uint8_t> mapQualFile_;
-
-    // barcode data
-    PbiTempFile2<int16_t> bcForwardFile_;
-    PbiTempFile2<int16_t> bcReverseFile_;
-    PbiTempFile2<int8_t> bcQualFile_;
-
-    // reference data
-    std::unique_ptr<PbiReferenceDataBuilder2> refDataBuilder_ = nullptr;
-
-    // output file info
+    // file info
     std::string bamFilename_;
     std::string pbiFilename_;
-    std::unique_ptr<BGZF, internal::HtslibBgzfDeleter> outFile_ = nullptr;
+    std::string tempFilename_;
+    std::unique_ptr<FILE, internal::FileDeleter> tempFile_;
+    std::unique_ptr<BGZF, internal::HtslibBgzfDeleter> pbiFile_;
     PbiBuilder::CompressionLevel compressionLevel_;
     size_t numThreads_;
+
+    // PBI field buffers
+    PbiField2<int32_t> rgIdField_;
+    PbiField2<int32_t> qStartField_;
+    PbiField2<int32_t> qEndField_;
+    PbiField2<int32_t> holeNumField_;
+    PbiField2<float> readQualField_;
+    PbiField2<uint8_t> ctxtField_;
+    PbiField2<uint64_t> fileOffsetField_;
+    PbiField2<int32_t> tIdField_;
+    PbiField2<uint32_t> tStartField_;
+    PbiField2<uint32_t> tEndField_;
+    PbiField2<uint32_t> aStartField_;
+    PbiField2<uint32_t> aEndField_;
+    PbiField2<uint8_t> revStrandField_;
+    PbiField2<uint32_t> nMField_;
+    PbiField2<uint32_t> nMMField_;
+    PbiField2<uint8_t> mapQualField_;
+    PbiField2<int16_t> bcForwardField_;
+    PbiField2<int16_t> bcReverseField_;
+    PbiField2<int8_t> bcQualField_;
+
+    // reference data
+    std::unique_ptr<PbiReferenceDataBuilder2> refDataBuilder_;
 
     // tracking data
     uint32_t currentRow_ = 0;
@@ -706,6 +717,7 @@ public:
         CloseGzi();
         ClosePbi();
 
+        remove(std::string{bamFilename_ + ".gzi"}.c_str());
         isOpen_ = false;
     }
 
@@ -720,6 +732,8 @@ public:
     {
         done_ = true;
         gziThread_.join();
+
+        // TODO: remove GZI file, leaving now for debubging
     }
 
     void ClosePbi() { builder_->Close(); }
@@ -969,7 +983,6 @@ private:
     std::atomic<GziStatus> gziStatus_{GziStatus::GOOD};
     std::thread gziThread_;
 
-    bool blockWritten_ = false;
     bool isOpen_ = false;
 
     std::atomic<bool> done_{false};
@@ -988,6 +1001,9 @@ IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamH
                                    const size_t tempFileBufferSize)
     : IRecordWriter(), d_{nullptr}
 {
+    if (tempFileBufferSize % 8 != 0)
+        throw std::runtime_error{"Invalid buffer size for PBI builder. Must be a multiple of 8."};
+
 #if PBBAM_AUTOVALIDATE
     Validator::Validate(header);
 #endif
