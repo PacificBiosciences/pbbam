@@ -89,6 +89,7 @@ static const std::string barcodequal_PROB{"Probability"};
 static const std::string platformModelType_ASTRO{"ASTRO"};
 static const std::string platformModelType_RS{"RS"};
 static const std::string platformModelType_SEQUEL{"SEQUEL"};
+static const std::string platformModelType_SEQUELII{"SEQUELII"};
 
 // clang-format off
 static std::string BaseFeatureName(const BaseFeature& feature)
@@ -156,9 +157,10 @@ static std::string BarcodeQualityName(const BarcodeQualityType& type)
 static std::string PlatformModelName(const PlatformModelType& type)
 {
     switch (type) {
-        case PlatformModelType::ASTRO  : return platformModelType_ASTRO;
-        case PlatformModelType::RS     : return platformModelType_RS;
-        case PlatformModelType::SEQUEL : return platformModelType_SEQUEL;
+        case PlatformModelType::ASTRO    : return platformModelType_ASTRO;
+        case PlatformModelType::RS       : return platformModelType_RS;
+        case PlatformModelType::SEQUEL   : return platformModelType_SEQUEL;
+        case PlatformModelType::SEQUELII : return platformModelType_SEQUELII;
         default:
             throw std::runtime_error{ "unrecognized platform model type" };
     }
