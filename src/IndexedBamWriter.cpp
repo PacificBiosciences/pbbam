@@ -414,8 +414,7 @@ public:
         WritePbiHeader();
         WriteFromTempFile();
 
-        // TODO: remove temp file, leaving now for debugging
-
+        remove(tempFilename_.c_str());
         isClosed_ = true;
     }
 
@@ -718,6 +717,7 @@ public:
         CloseGzi();
         ClosePbi();
 
+        remove(std::string{bamFilename_ + ".gzi"}.c_str());
         isOpen_ = false;
     }
 

@@ -433,8 +433,7 @@ public:
         WritePbiHeader();
         WriteFromTempFile();
 
-        // TODO: remove temp file, leaving now for debugging
-
+        remove(tempFilename_.c_str());
         isClosed_ = true;
     }
 
