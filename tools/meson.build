@@ -28,7 +28,6 @@ pbbam_bam2sam = executable(
   dependencies : [pbbam_htslib_dep, pbbam_thread_dep, pbbam_zlib_dep],
   include_directories : [pbbam_include_directories, include_directories('bam2sam')],
   install : get_option('build-tools'),
-  build_rpath : pbbam_htslib_libdir,
   cpp_args : pbbam_warning_flags)
 
 # tests
