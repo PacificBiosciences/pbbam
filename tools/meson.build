@@ -12,10 +12,6 @@ pbbam_Bam2SamVersion_h = configure_file(
   output : 'Bam2SamVersion.h',
   configuration : pbbam_Bam2SamVersion_h_config)
 
-if pbbam_htslib_dep.found()
-  pbbam_htslib_libdir = pbbam_htslib_dep.get_pkgconfig_variable('libdir')
-endif
-
 pbbam_bam2sam_cpp_sources = [pbbam_Bam2SamVersion_h]
 pbbam_bam2sam_cpp_sources += files([
   'common/OptionParser.cpp',
