@@ -214,9 +214,10 @@ static const std::map<std::string, BarcodeQualityType> nameToBarcodeQuality
 
 static const std::map<std::string, PlatformModelType> nameToPlatformModel
 {
-    { platformModelType_ASTRO,  PlatformModelType::ASTRO },
-    { platformModelType_RS,     PlatformModelType::RS },
-    { platformModelType_SEQUEL, PlatformModelType::SEQUEL }
+    { platformModelType_ASTRO,    PlatformModelType::ASTRO },
+    { platformModelType_RS,       PlatformModelType::RS },
+    { platformModelType_SEQUEL,   PlatformModelType::SEQUEL },
+    { platformModelType_SEQUELII, PlatformModelType::SEQUELII }
 };
 // clang-format on
 
