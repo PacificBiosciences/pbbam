@@ -28,28 +28,6 @@ namespace BAM {
 
 namespace {
 
-static bool DoesHtslibSupportLongCigar()
-{
-    const std::string htsVersion = hts_version();
-
-    // remove any "-<blah>" for non-release versions
-    const auto versionBase = PacBio::BAM::Split(htsVersion, '-');
-    if (versionBase.empty())
-        throw std::runtime_error{"invalid htslib version format: " + htsVersion};
-
-    // grab major/minor version numbers
-    const auto versionParts = PacBio::BAM::Split(versionBase[0], '.');
-    if (versionParts.size() < 2)
-        throw std::runtime_error{"invalid htslib version format: " + htsVersion};
-
-    // check against v1.7
-    const int versionMajor = std::stoi(versionParts[0]);
-    const int versionMinor = std::stoi(versionParts[1]);
-    static constexpr const int v17_major = 1;
-    static constexpr const int v17_minor = 7;
-    return std::tie(versionMajor, versionMinor) >= std::tie(v17_major, v17_minor);
-}
-
 static const bool has_native_long_cigar_support = DoesHtslibSupportLongCigar();
 
 Cigar FetchRawCigar(const uint32_t* const src, const uint32_t len)
