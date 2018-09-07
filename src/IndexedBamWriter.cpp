@@ -627,9 +627,10 @@ public:
 
             // transform offsets from GZI
             for (size_t j = 0; j < fileOffsetField_.buffer_.size(); ++j) {
-                if (k < index.size() - 1 && (static_cast<uint64_t>(index.at(k + 1).uAddress) <=
-                                             fileOffsetField_.buffer_[j]))
+                while ((k < index.size() - 1) && (static_cast<uint64_t>(index.at(k + 1).uAddress) <=
+                                                  fileOffsetField_.buffer_[j])) {
                     ++k;
+                }
                 const GzIndexEntry& e = index.at(k);
                 const int64_t uOffset = fileOffsetField_.buffer_[j] - e.uAddress;
                 const auto result = ((e.vAddress << 16) | uOffset);
