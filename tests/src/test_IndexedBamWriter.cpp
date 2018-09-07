@@ -7,6 +7,7 @@
 #include <pbbam/BamFile.h>
 #include <pbbam/BamReader.h>
 #include <pbbam/BamRecord.h>
+#include <pbbam/EntireFileQuery.h>
 #include <pbbam/IndexedBamWriter.h>
 #include <pbbam/PbiBuilder.h>
 #include <pbbam/PbiRawData.h>
@@ -85,6 +86,40 @@ TEST(IndexedBamWriter, WritesValidIndex)
             EXPECT_EQ(expectedQNames.at(i), b.FullName());
         }
     }
+}
+
+TEST(IndexedBamWriter, HandlesVeryLongReads)
+{
+    using namespace PacBio::BAM;
+
+    const std::string inBamFn = PbbamTestsConfig::Data_Dir + "/long_reads.bam";
+    const std::string outBamFn = PbbamTestsConfig::GeneratedData_Dir + "/long_reads.copy.bam";
+    const std::string outPbiFn = PbbamTestsConfig::GeneratedData_Dir + "/long_reads.copy.bam.pbi";
+
+    // copy file, writing inline PBI index
+    {
+        BamFile file{inBamFn};
+        IndexedBamWriter writer{outBamFn, file.Header()};
+        EntireFileQuery query{file};
+        for (const auto& b : query)
+            writer.Write(b);
+    }
+
+    {
+        const PbiRawData idx{outPbiFn};
+        const auto& offsets = idx.BasicData().fileOffset_;
+
+        BamReader reader{outBamFn};
+        BamRecord b;
+        for (int i = 0; i < 100; ++i)
+        {
+            reader.VirtualSeek(offsets.at(i));
+            reader.GetNext(b);
+        }
+    }
+
+    remove(outBamFn.c_str());
+    remove(outPbiFn.c_str());
 }
 
 // clang-format on
