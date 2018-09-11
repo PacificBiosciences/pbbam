@@ -46,7 +46,8 @@ public:
         HDF_SUBREAD,
         REFERENCE,
         SUBREAD,
-        TRANSCRIPT
+        TRANSCRIPT,
+        TRANSCRIPT_ALIGNMENT
     };
 
     /// \brief Converts printable dataset type to type enum.
