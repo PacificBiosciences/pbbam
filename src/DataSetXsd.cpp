@@ -103,6 +103,7 @@ static const auto elementRegistry = std::unordered_map<std::string, XsdType>
     { "SummaryStats",          XsdType::DATASETS },
     { "TotalLength",           XsdType::DATASETS },
     { "TranscriptSet",         XsdType::DATASETS },
+    { "TranscriptAlignmentSet",XsdType::DATASETS },
 
     // 'pbmeta' elements
     //

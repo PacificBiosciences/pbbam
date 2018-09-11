@@ -93,6 +93,9 @@ DataSet::DataSet(const DataSet::TypeEnum type)
         case DataSet::TRANSCRIPT:
             d_ = std::make_unique<TranscriptSet>();
             break;
+        case DataSet::TRANSCRIPT_ALIGNMENT:
+            d_ = std::make_unique<TranscriptAlignmentSet>();
+            break;
         default:
             throw std::runtime_error{"unsupported dataset type"};
     }
@@ -229,6 +232,7 @@ DataSet::TypeEnum DataSet::NameToType(const std::string& typeName)
         lookup["ReferenceSet"] = DataSet::REFERENCE;
         lookup["SubreadSet"] = DataSet::SUBREAD;
         lookup["TranscriptSet"] = DataSet::TRANSCRIPT;
+        lookup["TranscriptAlignmentSet"] = DataSet::TRANSCRIPT_ALIGNMENT;
     }
     return lookup.at(typeName);  // throws if unknown typename
 }
@@ -293,6 +297,8 @@ std::string DataSet::TypeToName(const DataSet::TypeEnum& type)
             return "SubreadSet";
         case DataSet::TRANSCRIPT:
             return "TranscriptSet";
+        case DataSet::TRANSCRIPT_ALIGNMENT:
+            return "TranscriptAlignmentSet";
         default:
             throw std::runtime_error{"unsupported dataset type"};
     }

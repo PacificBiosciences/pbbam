@@ -10,6 +10,11 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.19.0] - 2018-09-11
+
+### Added
+ - TranscriptAlignmentSet to XML support
+
 ## [0.17.0] - 2018-03-18
 
 ### Added
