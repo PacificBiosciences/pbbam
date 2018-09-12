@@ -10,6 +10,10 @@ tar jxvf src/htslib-1.6.tar.bz2 -C src
 rm -f src/htslib-1.6.tar.bz2
 type module >& /dev/null || . /mnt/software/Modules/current/init/bash
 
+# This command actively relies on sub-scripts having a non-zero exit code.
+# || true is necessary while the rest of this script exits on any "failure"
+source scl_source enable devtoolset-6 || true
+
 module use /mnt/software/modulefiles
 module use /pbi/dept/primary/modulefiles
 
