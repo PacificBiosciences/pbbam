@@ -87,13 +87,38 @@ public:
         BinCalculation_OFF
     };
 
+    ///
+    /// \brief The Config struct provides a "parameter object" for BamWriter
+    ///        settings. This allows for writer configuration without having to
+    ///        refer to ordering of parameters, default values, etc.
+    ///
+    struct Config
+    {
+        Config() = default;
+
+        // zlib compression level
+        CompressionLevel compressionLevel = DefaultCompression;
+
+        // The number of threads for compression. If set to 0, BamWriter will
+        // attempt to determine a reasonable estimate. If set to 1, this will
+        // force single-threaded execution. No checks are made against an upper limit.
+        size_t numThreads = 4;
+
+        // If ON, ensures that proper BAI bin numbers are provided for all records.
+        BamWriter::BinCalculationMode binCalculationMode = BamWriter::BinCalculation_ON;
+
+        // If true, write to <filename>.tmp, and rename  to <filename> in dtor.
+        // This allows downstream checks to see if BAM file may be truncated
+        // due to early termination (e.g. a thrown exception). If false, write
+        // directly to <filename>.
+        bool useTempFile = true;
+    };
+
 public:
     /// \name Constructors & Related Methods
     /// \{
 
     /// \brief Opens a %BAM file for writing & writes the header information.
-    ///
-    /// The error status will be set if either operation fails.
     ///
     /// \note Set \p filename to "-" for stdout.
     ///
@@ -111,13 +136,32 @@ public:
     ///            records written. This extra step may turned off when bin
     ///            numbers are not needed. Though if in doubt, keep the default.
     ///
+    /// \param[in] useTempFile      If true, write to <filename>.tmp, and rename
+    ///                             to <filename>. This provides for downstream
+    ///                             checks to see if BAM file may be truncated
+    ///                             due to early termination (a thrown exception).
+    ///
     /// \throws std::runtmie_error if there was a problem opening the file for
     ///         writing or if an error occurred while writing the header
     ///
     BamWriter(const std::string& filename, const BamHeader& header,
               const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
               const size_t numThreads = 4,
-              const BinCalculationMode binCalculationMode = BamWriter::BinCalculation_ON);
+              const BinCalculationMode binCalculationMode = BamWriter::BinCalculation_ON,
+              const bool useTempFile = true);
+
+    ///
+    /// \brief Opens a %BAM file for writing & writes the header information.
+    ///
+    /// \param[in] filename     path to output %BAM file
+    /// \param[in] header       BamHeader object
+    /// \param[in] config       container for add'l configuration options
+    ///
+    /// \throws std::runtmie_error if there was a problem opening the file for
+    ///         writing or if an error occurred while writing the header
+    ///
+    BamWriter(const std::string& filename, const BamHeader& header,
+              const BamWriter::Config& config);
 
     /// Fully flushes all buffered data & closes file.
     ~BamWriter() override;
