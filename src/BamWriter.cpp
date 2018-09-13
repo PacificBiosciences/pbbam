@@ -25,12 +25,13 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
-class BamWriterPrivate : public internal::FileProducer
+class BamWriterPrivate
 {
 public:
     BamWriterPrivate(const std::string& filename, const std::shared_ptr<bam_hdr_t> rawHeader,
                      const BamWriter::CompressionLevel compressionLevel, const size_t numThreads,
-                     const BamWriter::BinCalculationMode binCalculationMode);
+                     const BamWriter::BinCalculationMode binCalculationMode,
+                     const bool useTempFile);
 
 public:
     void Write(const BamRecord& record);
@@ -41,21 +42,23 @@ public:
     bool calculateBins_;
     std::unique_ptr<samFile, internal::HtslibFileDeleter> file_;
     std::shared_ptr<bam_hdr_t> header_;
+    std::unique_ptr<internal::FileProducer> fileProducer_;
 };
 
 BamWriterPrivate::BamWriterPrivate(const std::string& filename,
                                    const std::shared_ptr<bam_hdr_t> rawHeader,
                                    const BamWriter::CompressionLevel compressionLevel,
                                    const size_t numThreads,
-                                   const BamWriter::BinCalculationMode binCalculationMode)
-    : internal::FileProducer{filename}
-    , calculateBins_{binCalculationMode == BamWriter::BinCalculation_ON}
-    , header_{rawHeader}
+                                   const BamWriter::BinCalculationMode binCalculationMode,
+                                   const bool useTempFile)
+    : calculateBins_{binCalculationMode == BamWriter::BinCalculation_ON}, header_{rawHeader}
 {
     if (!header_) throw std::runtime_error{"null header"};
 
+    if (useTempFile) fileProducer_ = std::make_unique<internal::FileProducer>(filename);
+
     // open file
-    const auto usingFilename = TempFilename();
+    const auto usingFilename = (fileProducer_ ? fileProducer_->TempFilename() : filename);
     const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
     file_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
     if (!file_) throw std::runtime_error{"could not open file for writing"};
@@ -123,7 +126,7 @@ inline void BamWriterPrivate::Write(const BamRecordImpl& recordImpl)
 
 BamWriter::BamWriter(const std::string& filename, const BamHeader& header,
                      const BamWriter::CompressionLevel compressionLevel, const size_t numThreads,
-                     const BinCalculationMode binCalculationMode)
+                     const BinCalculationMode binCalculationMode, const bool useTempFile)
     : IRecordWriter()
 {
 #if PBBAM_AUTOVALIDATE
@@ -131,7 +134,18 @@ BamWriter::BamWriter(const std::string& filename, const BamHeader& header,
 #endif
     d_ = std::make_unique<internal::BamWriterPrivate>(
         filename, internal::BamHeaderMemory::MakeRawHeader(header), compressionLevel, numThreads,
-        binCalculationMode);
+        binCalculationMode, useTempFile);
+}
+
+BamWriter::BamWriter(const std::string& filename, const BamHeader& header,
+                     const BamWriter::Config& config)
+    : BamWriter{filename,
+                header,
+                config.compressionLevel,
+                config.numThreads,
+                config.binCalculationMode,
+                config.useTempFile}
+{
 }
 
 BamWriter::~BamWriter()

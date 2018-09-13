@@ -15,7 +15,11 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-TEST(BamWriterTest, SingleWrite_UserRecord)
+// clang-format off
+
+namespace BamWriterTests {
+
+void checkSingleRecord(bool useTempFile)
 {
     const std::string fullName = "test/100/0_5";
     const std::string rgId = "6002b307";
@@ -58,7 +62,9 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
     const std::string generatedBamFn =
         PbbamTestsConfig::GeneratedData_Dir + "/bamwriter_generated.bam";
     {
-        BamWriter writer(generatedBamFn, inputHeader);
+        BamWriter::Config config;
+        config.useTempFile = useTempFile;
+        BamWriter writer(generatedBamFn, inputHeader, config);
         writer.Write(bamRecord);
     }
 
@@ -91,3 +97,17 @@ TEST(BamWriterTest, SingleWrite_UserRecord)
     // clean up
     remove(generatedBamFn.c_str());
 }
+
+} // namespace BamWriterTests
+
+TEST(BamWriterTest, SingleWrite_UserRecord_WithTempFile)
+{
+    BamWriterTests::checkSingleRecord(true);
+}
+
+TEST(BamWriterTest, SingleWrite_UserRecord_NoTempFile)
+{
+    BamWriterTests::checkSingleRecord(false);
+}
+
+// clang-format on
