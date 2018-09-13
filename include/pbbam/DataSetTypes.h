@@ -861,6 +861,16 @@ public:
     TranscriptSet();
 };
 
+/// \brief The TranscriptAlignmentSet class represents a %TranscriptAlignmentSet
+///        root element in DataSetXML.
+///
+class PBBAM_EXPORT TranscriptAlignmentSet : public DataSetBase
+{
+public:
+    /// \brief Creates an empty TranscriptAlignmentSet dataset.
+    TranscriptAlignmentSet();
+};
+
 }  // namespace BAM
 }  // namespace PacBio
 
