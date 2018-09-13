@@ -194,8 +194,8 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
 
     // query start/end
     if (IsCcsOrTranscript(b.Type())) {
-        qStart_.push_back(-1);
-        qEnd_.push_back(-1);
+        qStart_.push_back(0);
+        qEnd_.push_back(b.Impl().SequenceLength());
     } else {
         qStart_.push_back(b.QueryStart());
         qEnd_.push_back(b.QueryEnd());
