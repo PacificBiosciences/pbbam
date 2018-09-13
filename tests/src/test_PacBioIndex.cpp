@@ -28,7 +28,7 @@ const std::string phi29BamFn = PbbamTestsConfig::Data_Dir + "/phi29.bam";
 static PbiRawData Test2Bam_CoreIndexData()
 {
     PbiRawData rawData;
-    rawData.Version(PbiFile::Version_3_0_1);
+    rawData.Version(PbiFile::CurrentVersion);
     rawData.FileSections(PbiFile::BASIC | PbiFile::MAPPED | PbiFile::REFERENCE);
     rawData.NumReads(10);
 
@@ -86,7 +86,6 @@ static PbiRawData Test2Bam_NewIndex()
 static void ExpectRawIndicesEqual(const PbiRawData& expected, const PbiRawData& actual)
 {
     // header data
-    EXPECT_EQ(expected.Version(), actual.Version());
     EXPECT_EQ(expected.FileSections(), actual.FileSections());
     EXPECT_EQ(expected.NumReads(), actual.NumReads());
 
@@ -156,7 +155,7 @@ TEST(PacBioIndexTest, CreateFromExistingBam)
     EXPECT_EQ(tempPbiFn, bamFile.PacBioIndexFilename());
 
     PbiRawData index(bamFile.PacBioIndexFilename());
-    EXPECT_EQ(PbiFile::Version_3_0_1, index.Version());
+    EXPECT_EQ(PbiFile::CurrentVersion, index.Version());
     EXPECT_EQ(10, index.NumReads());
     EXPECT_TRUE(index.HasMappedData());
 
@@ -238,6 +237,7 @@ TEST(PacBioIndexTest, CreateOnTheFly)
     // compare data in new PBI file, to expected data
     const PbiRawData expectedIndex = PacBioIndexTests::Test2Bam_NewIndex();
     const PbiRawData fromBuilt = PbiRawData(tempPbiFn);
+    EXPECT_EQ(PbiFile::CurrentVersion, fromBuilt.Version());
     PacBioIndexTests::ExpectRawIndicesEqual(expectedIndex, fromBuilt);
 
     // straight diff of newly-generated PBI file to existing PBI
@@ -257,6 +257,7 @@ TEST(PacBioIndexTest, RawLoadFromPbiFile)
     const BamFile bamFile(PacBioIndexTests::test2BamFn);
     const std::string pbiFilename = bamFile.PacBioIndexFilename();
     const PbiRawData loadedIndex(pbiFilename);
+    EXPECT_EQ(PbiFile::Version_3_0_1, loadedIndex.Version());
 
     const PbiRawData expectedIndex = PacBioIndexTests::Test2Bam_ExistingIndex();
     PacBioIndexTests::ExpectRawIndicesEqual(expectedIndex, loadedIndex);
@@ -280,7 +281,7 @@ TEST(PacBioIndexTest, BasicAndBarodeSectionsOnly)
     EXPECT_EQ(tempPbiFn, bamFile.PacBioIndexFilename());
 
     PbiRawData index(bamFile.PacBioIndexFilename());
-    EXPECT_EQ(PbiFile::Version_3_0_1, index.Version());
+    EXPECT_EQ(PbiFile::CurrentVersion, index.Version());
     EXPECT_EQ(120, index.NumReads());
     EXPECT_FALSE(index.HasMappedData());
     EXPECT_TRUE(index.HasBarcodeData());

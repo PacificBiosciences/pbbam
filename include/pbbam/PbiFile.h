@@ -42,8 +42,9 @@ struct PbiFile
     {
         Version_3_0_0 = 0x030000,  ///< v3.0.0
         Version_3_0_1 = 0x030001,  ///< v3.0.1
+        Version_3_0_2 = 0x030002,  ///< v3.0.2
 
-        CurrentVersion = Version_3_0_1  ///< Synonym for the current PBI version.
+        CurrentVersion = Version_3_0_2  ///< Synonym for the current PBI version.
     };
 
     ///
