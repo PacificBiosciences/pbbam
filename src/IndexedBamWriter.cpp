@@ -25,6 +25,7 @@
 
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
+#include "pbbam/BamRecordImpl.h"
 #include "pbbam/BamWriter.h"
 #include "pbbam/MakeUnique.h"
 #include "pbbam/PbiRawData.h"
@@ -314,8 +315,8 @@ public:
 
         // query start/end
         const auto isCcsOrTranscript = (IsCcsOrTranscript(b.Type()));
-        const int32_t qStart = (isCcsOrTranscript ? -1 : b.QueryStart());
-        const int32_t qEnd = (isCcsOrTranscript ? -1 : b.QueryEnd());
+        const int32_t qStart = (isCcsOrTranscript ? 0 : b.QueryStart());
+        const int32_t qEnd = (isCcsOrTranscript ? b.Impl().SequenceLength() : b.QueryEnd());
 
         // add'l data
         const int32_t holeNum = (b.HasHoleNumber() ? b.HoleNumber() : 0);
