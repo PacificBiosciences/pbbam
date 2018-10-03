@@ -11,6 +11,10 @@
 #include <cstdint>
 #include <map>
 #include <string>
+#include <utility>
+
+#include <boost/optional.hpp>
+
 #include "pbbam/Config.h"
 #include "pbbam/exception/InvalidSequencingChemistryException.h"
 
@@ -120,7 +124,21 @@ public:
     ///
     static std::string ToSam(const ReadGroupInfo& rg);
 
+    ///
+    /// \brief GetBaseId
+    ///
+    /// \param  id
+    /// \return the hash portion only of a read group ID, with (optional)
+    ///         barcode labels removed)
+    ///
+    /// \sa ReadGroupInfo::BaseId
+    ///
+    static std::string GetBaseId(const std::string& id);
+
     /// \brief Converts a read group ID (string) to its numeric value.
+    ///
+    /// \note Accepts the optional barcode-labeled IDs. These will be stripped
+    ///       and number calculated from the base value.
     ///
     /// \param[in] rgId     read group ID string
     /// \returns numeric value of ID
@@ -152,6 +170,8 @@ public:
 
     /// \brief Creates a read group info object with an ID.
     ///
+    /// \note \p id can be a "standard" ID or contain barcode labels.
+    ///
     /// \param[in] id   string representation of read group ID
     ///
     ReadGroupInfo(std::string id);
@@ -175,6 +195,37 @@ public:
     /// \sa RecordType
     ///
     ReadGroupInfo(std::string movieName, std::string readType, PlatformModelType platform);
+
+    /// \brief Creates a read group info object with an ID.
+    ///
+    /// \param[in] baseId       string representation of numeric read group ID
+    /// \param[in] barcodes     barcode pair for this read group
+    ///
+    ReadGroupInfo(std::string baseId, std::pair<uint16_t, uint16_t> barcodes);
+
+    /// \brief Creates a read group info object from a movie name & read type.
+    ///
+    /// \param[in] movieName    sequencing movie name
+    /// \param[in] readType     string version of record type
+    /// \param[in] barcodes     barcode pair for this read group
+    ///
+    /// \sa RecordType
+    ///
+    ReadGroupInfo(std::string movieName, std::string readType,
+                  std::pair<uint16_t, uint16_t> barcodes);
+
+    /// \brief Creates a read group info object from a movie name, read type,
+    ///        and platform model.
+    ///
+    /// \param[in] movieName    sequencing movie name
+    /// \param[in] readType     string version of record type
+    /// \param[in] platform     platform model type
+    /// \param[in] barcodes     barcode pair for this read group
+    ///
+    /// \sa RecordType
+    ///
+    ReadGroupInfo(std::string movieName, std::string readType, PlatformModelType platform,
+                  std::pair<uint16_t, uint16_t> barcodes);
 
     ReadGroupInfo(const ReadGroupInfo&) = default;
     ReadGroupInfo(ReadGroupInfo&&) = default;
@@ -215,46 +266,91 @@ public:
     /// \name Attributes
     /// \{
 
-    /// \returns the number of barcode sequences in BarcodeFile
+    /// \returns the number of barcode sequences in BarcodeFile, as stored in
+    ///          the description tag (\@RG:DS)
     ///
     /// \throws std::runtime_error if barcode data not set.
     ///         Check HasBarcodeData if this data may be absent.
     ///
     size_t BarcodeCount() const;
 
-    /// \returns name of FASTA file containing barcode sequences
+    /// \returns name of FASTA file containing barcode sequences, as stored in
+    ///          the description tag (\@RG:DS)
     ///
     /// \throws std::runtime_error if barcode data not set.
     ///         Check HasBarcodeData if this data may be absent.
     ///
     std::string BarcodeFile() const;
 
-    /// \returns MD5 hash of the contents of BarcodeFile
+    /// \returns MD5 hash of the contents of BarcodeFile, as stored in the
+    ///          description tag (\@RG:DS)
     ///
     /// \throws std::runtime_error if barcode data not set.
     ///         Check HasBarcodeData if this data may be absent.
     ///
     std::string BarcodeHash() const;
 
-    /// \returns experimental design type of barcodes
+    /// \returns experimental design type of barcodes, as stored in the
+    ///          description tag (\@RG:DS)
     ///
     /// \throws std::runtime_error if barcode data not set.
     ///         Check HasBarcodeData if this data may be absent.
     ///
     BarcodeModeType BarcodeMode() const;
 
-    /// \returns type of value encoded in the 'bq' tag
+    /// \returns type of value encoded by the 'bq' tag, as stored in the
+    ///          description tag (\@RG:DS)
     ///
     /// \throws std::runtime_error if barcode data is not set.
     ///         Check HasBarcodeData if this data may be absent.
     ///
     BarcodeQualityType BarcodeQuality() const;
 
+    /// \returns barcode pair stored in the read group ID (\@RG:ID)
+    ///
+    /// \note This does **NOT** refer to any data in the description (DS) tag.
+    ///
+    boost::optional<std::pair<uint16_t, uint16_t>> Barcodes() const;
+
+    /// \returns forward barcode label stored in the read group ID (\@RG:ID)
+    ///
+    /// \note This does **NOT** refer to any data in the description (DS) tag.
+    ///
+    boost::optional<uint16_t> BarcodeForward() const;
+
+    /// \returns reverse barcode label stored in the read group ID (\@RG:ID)
+    ///
+    /// \note This does **NOT** refer to any data in the description (DS) tag.
+    ///
+    boost::optional<uint16_t> BarcodeReverse() const;
+
     /// \returns basecaller version number (e.g. "2.1")
     std::string BasecallerVersion() const;
 
     /// \returns tag name in use for the specified for base feature
     std::string BaseFeatureTag(BaseFeature feature) const;
+
+    /// \returns the hash portion only of a read group ID, with (optional)
+    ///          barcode labels removed)
+    ///
+    /// For most read groups (without barcode labels), this will be the same as
+    /// ID(). However, for those read groups with barcoded-labels, this method
+    /// will return the ID without those labels.
+    ///
+    /// Id() should be preferred over this method in most cases. This is
+    /// intended for use with hash-string or integers directly.
+    ///
+    /// For "ID:12345678":
+    ///     rg.Id()     -> "12345678"
+    ///     rg.BaseId() -> "12345678"
+    ///
+    /// For "ID:12345678/0--0":
+    ///     rg.Id()   -> "12345678/0--0";
+    ///     rg.BaseId -> "12345678"
+    ///
+    /// \sa Id
+    ///
+    std::string BaseId() const;
 
     /// \returns binding kit part number (e.g. "100236500")
     std::string BindingKit() const;
@@ -277,13 +373,31 @@ public:
     /// \returns frame rate in Hz
     std::string FrameRateHz() const;
 
-    /// \returns true if read group has barcode data
+    /// \returns true if the read group description (\@RG:DS) contains barcode data
+    ///
+    /// \note This does **NOT** refer to the optional barcode labels.
+    ///
     bool HasBarcodeData() const;
 
     /// \returns true if read group has an entry for the specified base feature
     bool HasBaseFeature(BaseFeature feature) const;
 
-    /// \returns string value of \@RG:ID
+    /// \returns full string value of \@RG:ID, whether optional barcode labels
+    ///          are present
+    ///
+    /// This method should be perferred over BaseId() in most cases,
+    /// e.g. mapping between header info.
+    ///
+    /// For "ID:12345678":
+    ///     rg.Id()     -> "12345678"
+    ///     rg.BaseId() -> "12345678"
+    ///
+    /// For "ID:12345678/0--0":
+    ///     rg.Id()   -> "12345678/0--0";
+    ///     rg.BaseId -> "12345678"
+    ///
+    /// \sa BaseId
+    ///
     std::string Id() const;
 
     /// \returns codec type in use for IPD
@@ -334,7 +448,7 @@ public:
     /// \name Attributes
     /// \{
 
-    /// \brief Sets read group's barcode data.
+    /// \brief Sets barcode data for the read group's description tag.
     ///
     /// Barcode fields are either absent or all must be present.
     ///
@@ -570,6 +684,10 @@ private:
     BarcodeModeType barcodeMode_ = BarcodeModeType::NONE;
     BarcodeQualityType barcodeQuality_ = BarcodeQualityType::NONE;
     std::map<BaseFeature, std::string> features_;
+
+    // (optional) barcode label handling
+    boost::optional<std::pair<uint16_t, uint16_t>> barcodes_ = boost::none;
+    std::string baseId_;
 
     // custom attributes
     std::map<std::string, std::string> custom_;  // tag => value

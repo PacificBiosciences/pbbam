@@ -691,3 +691,44 @@ TEST(PbiFilterQueryTest, TranscriptRecords)
         EXPECT_EQ(4, observed.size());
     }
 }
+
+TEST(PbiFilterQueryTest, BarcodedReadGroupId)
+{
+    const BamFile bamFile{PbbamTestsConfig::Data_Dir + std::string{"/barcoded_read_groups.bam"}};
+
+    {  //  query read group with no barcodes - should catche all, barcoded or not
+        const PbiReadGroupFilter filter{"0d7b28fa"};
+        PbiFilterQuery query{filter, bamFile};
+        size_t count = 0;
+        for (const auto& b : query) {
+            (void)b;
+            ++count;
+        }
+        EXPECT_EQ(5, count);
+    }
+    {  // query read group with barcode label
+
+        const ReadGroupInfo rg{"0d7b28fa/0--0"};
+        PbiReadGroupFilter filter{rg};
+        PbiFilterQuery query{filter, bamFile};
+        size_t count = 0;
+        for (const auto& b : query) {
+            (void)b;
+            ++count;
+        }
+        EXPECT_EQ(1, count);
+    }
+    {  // query multiple read groups with barcode label
+
+        const ReadGroupInfo rg{"0d7b28fa/0--0"};
+        const ReadGroupInfo rg1{"0d7b28fa/1--0"};
+        PbiReadGroupFilter filter{std::vector<ReadGroupInfo>{rg, rg1}};
+        PbiFilterQuery query{filter, bamFile};
+        size_t count = 0;
+        for (const auto& b : query) {
+            (void)b;
+            ++count;
+        }
+        EXPECT_EQ(2, count);
+    }
+}

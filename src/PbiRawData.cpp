@@ -186,7 +186,7 @@ PbiRawBasicData::PbiRawBasicData(uint32_t numReads)
 void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
 {
     // read group ID
-    auto rgId = b.ReadGroupId();
+    auto rgId = b.ReadGroupBaseId();
     if (rgId.empty()) rgId = MakeReadGroupId(b.MovieName(), internal::ToString(b.Type()));
     const auto rawid = std::stoul(rgId, nullptr, 16);
     const auto id = static_cast<int32_t>(rawid);

@@ -327,7 +327,7 @@ public:
     {
         // read group ID
         const auto rgId = [&b]() -> int32_t {
-            auto rgIdString = b.ReadGroupId();
+            auto rgIdString = b.ReadGroupBaseId();
             if (rgIdString.empty()) rgIdString = MakeReadGroupId(b.MovieName(), ToString(b.Type()));
             return std::stoul(rgIdString, nullptr, 16);
         }();
