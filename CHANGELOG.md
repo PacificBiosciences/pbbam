@@ -10,6 +10,11 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.20.0] - 2018-10-03
+
+### Added
+ - Support for (optionally) barcode-labeled read group IDs.
+
 ## [0.19.0] - 2018-09-11
 
 ### Added

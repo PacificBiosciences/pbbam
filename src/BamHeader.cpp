@@ -134,7 +134,7 @@ BamHeader& BamHeader::operator+=(const BamHeader& other)
 
     // merge read groups
     for (const auto& rg : other.ReadGroups()) {
-        if (!HasReadGroup(rg.Id())) AddReadGroup(rg);
+        if (!HasReadGroup(rg.BaseId())) AddReadGroup(rg);
     }
 
     // merge programs
@@ -253,7 +253,7 @@ BamHeader& BamHeader::ReadGroups(std::vector<ReadGroupInfo> readGroups)
 {
     d_->readGroups_.clear();
     for (auto&& rg : readGroups)
-        d_->readGroups_[rg.Id()] = std::move(rg);
+        d_->readGroups_[rg.BaseId()] = std::move(rg);
     return *this;
 }
 

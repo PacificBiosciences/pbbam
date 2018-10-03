@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -247,6 +248,88 @@ TEST(ReadGroupInfoTest, RemoveBaseFeature)
     EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::MERGE_QV));
     EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::SUBSTITUTION_QV));
     EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::PULSE_EXCLUSION));
+}
+
+TEST(ReadGroupInfoTest, BaseIdFromBarcodedId)
+{
+    const ReadGroupInfo rg{"00082ba1/0--1"};
+    EXPECT_EQ("00082ba1/0--1", rg.Id());
+    EXPECT_EQ("00082ba1", rg.BaseId());
+}
+
+TEST(ReadGroupInfoTest, BaseIdFromNonBarcodedId)
+{
+    const ReadGroupInfo rg{"00082ba1"};
+    EXPECT_EQ("00082ba1", rg.Id());
+    EXPECT_EQ("00082ba1", rg.BaseId());
+}
+
+TEST(ReadGroupInfoTest, BarcodeDataFromBarcodedId)
+{
+    const ReadGroupInfo rg{"00082ba1/0--1"};
+    EXPECT_EQ("00082ba1/0--1", rg.Id());
+    EXPECT_EQ("00082ba1", rg.BaseId());
+
+    const auto barcodes = rg.Barcodes();
+    ASSERT_TRUE(barcodes);
+    EXPECT_EQ(0, barcodes->first);
+    EXPECT_EQ(1, barcodes->second);
+    EXPECT_EQ(0, rg.BarcodeForward().get());
+    EXPECT_EQ(1, rg.BarcodeReverse().get());
+}
+
+TEST(ReadGroupInfoTest, BarcodeDataFromIdPlusBarcodesCtor)
+{
+    const ReadGroupInfo rg{"00082ba1", std::pair<uint16_t, uint16_t>(0,1)};
+
+    EXPECT_EQ("00082ba1/0--1", rg.Id());
+    EXPECT_EQ("00082ba1", rg.BaseId());
+
+    const auto barcodes = rg.Barcodes();
+    ASSERT_TRUE(barcodes);
+    EXPECT_EQ(0, barcodes->first);
+    EXPECT_EQ(1, barcodes->second);
+    EXPECT_EQ(0, rg.BarcodeForward().get());
+    EXPECT_EQ(1, rg.BarcodeReverse().get());
+}
+
+TEST(ReadGroupInfoTest, NoBarcodeDataFromNonbarcodedId)
+{
+    {   // "standard" ID
+        const ReadGroupInfo rg{"00082ba1"};
+        EXPECT_EQ("00082ba1", rg.Id());
+        EXPECT_EQ("00082ba1", rg.BaseId());
+
+        const auto barcodes = rg.Barcodes();
+        EXPECT_EQ(boost::none, barcodes);
+        EXPECT_EQ(boost::none, rg.BarcodeForward());
+        EXPECT_EQ(boost::none, rg.BarcodeReverse());
+    }
+    {   // no '/' found
+        const ReadGroupInfo rg{"00082ba1.0--1"};
+        const auto barcodes = rg.Barcodes();
+        EXPECT_EQ(boost::none, barcodes);
+        EXPECT_EQ(boost::none, rg.BarcodeForward());
+        EXPECT_EQ(boost::none, rg.BarcodeReverse());
+    }
+}
+
+TEST(ReadGroupInfoTest, NoBarcodeDataFromEmptyId)
+{
+    const ReadGroupInfo rg{""};
+    const auto barcodes = rg.Barcodes();
+    EXPECT_EQ(boost::none, barcodes);
+    EXPECT_EQ(boost::none, rg.BarcodeForward());
+    EXPECT_EQ(boost::none, rg.BarcodeReverse());
+}
+
+TEST(ReadGroupInfoTest, ThrowsOnConstructingIdFromMalformattedBarcodeLabels)
+{
+    EXPECT_THROW(ReadGroupInfo{"00082ba1/0-1"}, std::runtime_error);
+    EXPECT_THROW(ReadGroupInfo{"00082ba1/0---1"}, std::runtime_error);
+    EXPECT_THROW(ReadGroupInfo{"00082ba1/0..1"};, std::runtime_error);
+    EXPECT_THROW(ReadGroupInfo{"00082ba1/0"}, std::runtime_error);
+    EXPECT_THROW(ReadGroupInfo{"00082ba1/A--B"}, std::runtime_error);
 }
 
 // clang-format on

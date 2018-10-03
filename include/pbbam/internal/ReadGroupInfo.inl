@@ -10,6 +10,54 @@
 namespace PacBio {
 namespace BAM {
 
+inline ReadGroupInfo::ReadGroupInfo()
+    : readType_{"UNKNOWN"}
+{
+}
+
+inline ReadGroupInfo::ReadGroupInfo(std::string id)
+    : readType_{"UNKNOWN"}
+{
+    Id(std::move(id));
+}
+
+inline ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType)
+    : ReadGroupInfo{std::move(movieName),
+                    std::move(readType),
+                    PlatformModelType::SEQUEL}
+{
+}
+
+inline ReadGroupInfo::ReadGroupInfo(std::string movieName,
+                                    std::string readType,
+                                    std::pair<uint16_t, uint16_t> barcodes)
+    : ReadGroupInfo{std::move(movieName),
+                    std::move(readType),
+                    PlatformModelType::SEQUEL,
+                    std::move(barcodes)}
+{
+}
+
+inline ReadGroupInfo::ReadGroupInfo(std::string movieName,
+                                    std::string readType,
+                                    PlatformModelType platform)
+    : platformModel_{std::move(platform)}
+{
+    Id(MakeReadGroupId(movieName, readType));
+    movieName_ = std::move(movieName);
+    readType_ = std::move(readType);
+}
+
+
+inline ReadGroupInfo::ReadGroupInfo(std::string movieName,
+                                    std::string readType,
+                                    PlatformModelType platform,
+                                    std::pair<uint16_t, uint16_t> barcodes)
+    : ReadGroupInfo{MakeReadGroupId(movieName, readType), std::move(barcodes)}
+{
+    platformModel_ = std::move(platform);
+}
+
 inline size_t ReadGroupInfo::BarcodeCount() const
 {
     if (!hasBarcodeData_)
@@ -60,6 +108,25 @@ inline BarcodeQualityType ReadGroupInfo::BarcodeQuality() const
     return barcodeQuality_;
 }
 
+inline boost::optional<uint16_t> ReadGroupInfo::BarcodeForward() const
+{
+    const auto barcodes = Barcodes();
+    if (barcodes) return barcodes->first;
+    return boost::none;
+}
+
+inline boost::optional<uint16_t> ReadGroupInfo::BarcodeReverse() const
+{
+    const auto barcodes = Barcodes();
+    if (barcodes) return barcodes->second;
+    return boost::none;
+}
+
+inline boost::optional<std::pair<uint16_t, uint16_t>> ReadGroupInfo::Barcodes() const
+{
+    return barcodes_;
+}
+
 inline std::string ReadGroupInfo::BasecallerVersion() const
 { return basecallerVersion_; }
 
@@ -84,6 +151,11 @@ inline ReadGroupInfo& ReadGroupInfo::BaseFeatureTag(BaseFeature feature,
                                                     std::string tag)
 { features_[feature] = std::move(tag); return *this; }
 
+inline std::string ReadGroupInfo::BaseId() const
+{
+    return baseId_;
+}
+
 inline std::string ReadGroupInfo::BindingKit() const
 { return bindingKit_; }
 
@@ -105,10 +177,7 @@ inline ReadGroupInfo& ReadGroupInfo::ClearBarcodeData()
 }
 
 inline ReadGroupInfo& ReadGroupInfo::ClearBaseFeatures()
-{
-    features_.clear();
-    return *this;
-}
+{ features_.clear(); return *this; }
 
 inline bool ReadGroupInfo::Control() const
 { return control_; }
@@ -140,6 +209,15 @@ inline std::string ReadGroupInfo::FrameRateHz() const
 inline ReadGroupInfo& ReadGroupInfo::FrameRateHz(std::string frameRateHz)
 { frameRateHz_ = std::move(frameRateHz); return *this; }
 
+inline std::string ReadGroupInfo::GetBaseId(const std::string& id)
+{
+    const auto slashAt = id.find('/');
+    if (slashAt == std::string::npos)
+        return id;
+    else
+        return id.substr(0, slashAt);
+}
+
 inline bool ReadGroupInfo::HasBarcodeData() const
 { return hasBarcodeData_; }
 
@@ -149,16 +227,14 @@ inline bool ReadGroupInfo::HasBaseFeature(BaseFeature feature) const
 inline std::string ReadGroupInfo::Id() const
 { return id_; }
 
-inline ReadGroupInfo& ReadGroupInfo::Id(std::string id)
-{ id_ = std::move(id); return *this; }
-
 inline ReadGroupInfo& ReadGroupInfo::Id(const std::string& movieName,
                                         const std::string& readType)
-{ id_ = MakeReadGroupId(movieName, readType); return *this; }
+{ return Id(MakeReadGroupId(movieName, readType)); }
 
 inline int32_t ReadGroupInfo::IdToInt(const std::string& rgId)
 {
-    const uint32_t rawid = std::stoul(rgId, nullptr, 16);
+    const auto id = GetBaseId(rgId);
+    const uint32_t rawid = std::stoul(id, nullptr, 16);
     return static_cast<int32_t>(rawid);
 }
 

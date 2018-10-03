@@ -12,6 +12,8 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <unordered_map>
+
 #include "pbbam/Compare.h"
 #include "pbbam/PbiFile.h"
 #include "pbbam/PbiFilter.h"
@@ -30,7 +32,7 @@ struct FilterBase
 {
 public:
     T value_;
-    boost::optional<std::vector<T> > multiValue_;
+    boost::optional<std::vector<T>> multiValue_;
     Compare::Type cmp_;
 
 protected:
@@ -653,7 +655,6 @@ public:
 ///     BamRecord::ReadGroupNumericId
 ///
 struct PbiReadGroupFilter
-    : public internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::RG_ID>
 {
 public:
     /// \brief Creates a filter on read group (numeric) ID value
@@ -691,7 +692,8 @@ public:
     ///
     /// \param[in] whitelist    read group IDs to compare on
     ///
-    PbiReadGroupFilter(std::vector<int32_t> whitelist, const Compare::Type cmp = Compare::EQUAL);
+    PbiReadGroupFilter(const std::vector<int32_t>& whitelist,
+                       const Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a 'whitelisted' filter on read group printable IDs.
     ///
@@ -714,6 +716,17 @@ public:
     ///
     PbiReadGroupFilter(const std::vector<ReadGroupInfo>& whitelist,
                        const Compare::Type cmp = Compare::EQUAL);
+
+    /// \brief Performs the actual index lookup.
+    ///
+    /// Most client code should not need to use this method directly.
+    ///
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
+
+private:
+    // RGID number => barcode(s) filter
+    std::unordered_map<int32_t, boost::optional<std::vector<std::pair<int16_t, int16_t>>>> lookup_;
+    Compare::Type cmp_;
 };
 
 /// \brief The PbiReferenceEndFilter class provides a PbiFilter-compatible
@@ -803,7 +816,7 @@ private:
     mutable bool initialized_ = false;
     mutable PbiFilter subFilter_;
     std::string rname_;
-    boost::optional<std::vector<std::string> > rnameWhitelist_;
+    boost::optional<std::vector<std::string>> rnameWhitelist_;
     Compare::Type cmp_;
 
 private:

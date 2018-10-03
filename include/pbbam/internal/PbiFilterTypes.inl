@@ -373,40 +373,6 @@ inline PbiReadAccuracyFilter::PbiReadAccuracyFilter(const Accuracy accuracy, con
     : internal::BasicDataFilterBase<Accuracy, PbiFile::BasicField::READ_QUALITY>{accuracy, cmp}
 { }
 
-// PbiReadGroupFilter
-
-inline PbiReadGroupFilter::PbiReadGroupFilter(const int32_t rgId, const Compare::Type cmp)
-    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::RG_ID>{rgId, cmp}
-{ }
-
-inline PbiReadGroupFilter::PbiReadGroupFilter(const std::string& rgId, const Compare::Type cmp)
-    : PbiReadGroupFilter{ReadGroupInfo::IdToInt(rgId), cmp}
-{ }
-
-inline PbiReadGroupFilter::PbiReadGroupFilter(const ReadGroupInfo& rg, const Compare::Type cmp)
-    : PbiReadGroupFilter{rg.Id(), cmp}
-{ }
-
-inline PbiReadGroupFilter::PbiReadGroupFilter(std::vector<int32_t> whitelist, const Compare::Type cmp)
-    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::RG_ID>{std::move(whitelist), cmp}
-{ }
-
-inline PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<std::string>& whitelist, const Compare::Type cmp)
-    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::RG_ID>{std::vector<int32_t>{}, cmp}
-{
-    multiValue_->reserve(whitelist.size());
-    for (const auto& rg : whitelist)
-        multiValue_->push_back(ReadGroupInfo::IdToInt(rg));
-}
-
-inline PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<ReadGroupInfo>& whitelist, const Compare::Type cmp)
-    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::RG_ID>{std::vector<int32_t>{}, cmp}
-{
-    multiValue_->reserve(whitelist.size());
-    for (const auto& rg : whitelist)
-        multiValue_->push_back(ReadGroupInfo::IdToInt(rg.Id()));
-}
-
 // PbiReferenceEndFilter
 
 inline PbiReferenceEndFilter::PbiReferenceEndFilter(const uint32_t tEnd, const Compare::Type cmp)

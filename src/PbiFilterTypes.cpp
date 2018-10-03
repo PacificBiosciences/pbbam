@@ -336,6 +336,113 @@ bool PbiQueryNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
     return d_->Accepts(idx, row);
 }
 
+// PbiReadGroupFilter
+
+PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<int32_t>& whitelist,
+                                       const Compare::Type cmp)
+    : cmp_{cmp}
+{
+    if (cmp_ != Compare::EQUAL && cmp_ != Compare::NOT_EQUAL) {
+        throw std::runtime_error{
+            "Unsupported compare type for this property. "
+            "Read group filter can only compare EQUAL or NOT_EQUAL"};
+    }
+
+    // Add RG ID & empty filter if not present. The empty filter will work for
+    // non-barcoded IDs that match the expected number(s).
+    //
+    for (const auto& rgId : whitelist) {
+        const auto found = lookup_.find(rgId);
+        if (found == lookup_.cend()) lookup_.emplace(rgId, boost::none);
+    }
+}
+
+PbiReadGroupFilter::PbiReadGroupFilter(const int32_t rgId, const Compare::Type cmp)
+    : PbiReadGroupFilter{std::vector<int32_t>{rgId}, cmp}
+{
+}
+
+PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<ReadGroupInfo>& whitelist,
+                                       const Compare::Type cmp)
+    : cmp_{cmp}
+{
+    if (cmp_ != Compare::EQUAL && cmp_ != Compare::NOT_EQUAL) {
+        throw std::runtime_error{
+            "Unsupported compare type for this property. "
+            "Read group filter can only compare EQUAL or NOT_EQUAL"};
+    }
+
+    for (const auto& rg : whitelist) {
+        // Add RG base ID with no filter if not present. The empty filter will
+        // work for non-barcoded IDs. We'll add to it if the base read group ID
+        // also has barcode labels,so that any barcode pair whitelisted for this
+        // read group filter will be a match.
+        //
+        const auto idNum = ReadGroupInfo::IdToInt(rg.BaseId());
+        const auto found = lookup_.find(idNum);
+        if (found == lookup_.cend()) lookup_.emplace(idNum, boost::none);
+
+        // Maybe add barcodes to base ID
+        const auto barcodes = rg.Barcodes();
+        if (barcodes) {
+            const auto bcFor = static_cast<int16_t>(barcodes->first);
+            const auto bcRev = static_cast<int16_t>(barcodes->second);
+            auto& idBarcodes = lookup_.at(idNum);
+            if (!idBarcodes) idBarcodes = std::vector<std::pair<int16_t, int16_t>>{};
+            idBarcodes->push_back(std::make_pair(bcFor, bcRev));
+        }
+    }
+}
+
+PbiReadGroupFilter::PbiReadGroupFilter(const ReadGroupInfo& rg, const Compare::Type cmp)
+    : PbiReadGroupFilter{std::vector<ReadGroupInfo>{rg}, cmp}
+{
+}
+
+PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<std::string>& whitelist,
+                                       const Compare::Type cmp)
+{
+    std::vector<ReadGroupInfo> readGroups;
+    for (const auto rgId : whitelist)
+        readGroups.push_back(rgId);
+    *this = PbiReadGroupFilter{readGroups, cmp};
+}
+
+PbiReadGroupFilter::PbiReadGroupFilter(const std::string& rgId, const Compare::Type cmp)
+    : PbiReadGroupFilter{ReadGroupInfo{rgId}, cmp}
+{
+}
+
+bool PbiReadGroupFilter::Accepts(const PbiRawData& idx, const size_t row) const
+{
+    const auto accepted = [this](const PbiRawData& index, const size_t i) {
+        // Check that read group base ID is found.
+        const auto rowRgId = index.BasicData().rgId_.at(i);
+        const auto foundAt = lookup_.find(rowRgId);
+        if (foundAt == lookup_.cend()) return false;
+
+        // Read group's base ID is found, check for filtered barcodes.
+        //
+        // For non-barcoded read groups, the filter is empty. This is
+        // essentially a no-op for allowing all candidate rows.
+        //
+        const auto& barcodes = foundAt->second;
+        if (!barcodes) return true;
+
+        // Return success on first match, otherwise no match found.
+        for (const auto bcPair : *barcodes) {
+            if (index.BarcodeData().bcForward_.at(i) == bcPair.first &&
+                index.BarcodeData().bcReverse_.at(i) == bcPair.second) {
+                return true;
+            }
+        }
+        return false;
+
+    }(idx, row);
+
+    return (cmp_ == Compare::EQUAL ? accepted : !accepted);
+}
+
 // PbiReferenceNameFilter
 
 PbiReferenceNameFilter::PbiReferenceNameFilter(std::string rname, Compare::Type cmp)
