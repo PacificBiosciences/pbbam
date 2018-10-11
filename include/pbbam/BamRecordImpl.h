@@ -25,6 +25,7 @@ namespace BAM {
 
 namespace internal {
 class BamRecordMemory;
+class SamWriterPrivate;
 }
 
 /// \brief The BamRecordImpl class holds all data necessary for creating,
@@ -581,6 +582,9 @@ private:
 
     // friends
     friend class internal::BamRecordMemory;
+
+    // remove this when we drop support for htslib pre-v1.7
+    friend class internal::SamWriterPrivate;
 };
 
 }  // namespace BAM

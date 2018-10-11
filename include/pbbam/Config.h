@@ -41,6 +41,13 @@ namespace BAM {
 ///
 extern int HtslibVerbosity;
 
+///
+/// \brief DoesHtslibSupportLongCigar
+///
+/// \return true if runtime htslib is >= v1.7
+///
+bool DoesHtslibSupportLongCigar();
+
 /// \}
 
 }  // namespace BAM

@@ -22,7 +22,7 @@ namespace internal {
 class FileProducer
 {
 
-protected:
+public:
     FileProducer() = delete;
 
     // Initializes FileProducer with specified target filename. Temp filename is
@@ -42,9 +42,8 @@ protected:
     //
     ~FileProducer();
 
-protected:
+public:
     const std::string& TargetFilename() const { return targetFilename_; }
-
     const std::string& TempFilename() const { return tempFilename_; }
 
 private:

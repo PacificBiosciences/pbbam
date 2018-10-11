@@ -157,6 +157,8 @@ std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName)
     if (typeName == std::string("HdfSubreadSet")) return std::make_shared<HdfSubreadSet>();
     if (typeName == std::string("ReferenceSet")) return std::make_shared<ReferenceSet>();
     if (typeName == std::string("TranscriptSet")) return std::make_shared<TranscriptSet>();
+    if (typeName == std::string("TranscriptAlignmentSet"))
+        return std::make_shared<TranscriptAlignmentSet>();
 
     // unknown typename
     throw std::runtime_error{"unsupported dataset type"};
@@ -434,6 +436,16 @@ SubreadSet::SubreadSet() : DataSetBase("PacBio.DataSet.SubreadSet", "SubreadSet"
 
 TranscriptSet::TranscriptSet()
     : DataSetBase("PacBio.DataSet.TranscriptSet", "TranscriptSet", XsdType::DATASETS)
+{
+}
+
+// -------------------
+// TranscriptAlignmentSet
+// -------------------
+
+TranscriptAlignmentSet::TranscriptAlignmentSet()
+    : DataSetBase("PacBio.DataSet.TranscriptAlignmentSet", "TranscriptAlignmentSet",
+                  XsdType::DATASETS)
 {
 }
 

@@ -12,10 +12,6 @@ pbbam_Bam2SamVersion_h = configure_file(
   output : 'Bam2SamVersion.h',
   configuration : pbbam_Bam2SamVersion_h_config)
 
-if pbbam_htslib_dep.found()
-  pbbam_htslib_libdir = pbbam_htslib_dep.get_pkgconfig_variable('libdir')
-endif
-
 pbbam_bam2sam_cpp_sources = [pbbam_Bam2SamVersion_h]
 pbbam_bam2sam_cpp_sources += files([
   'common/OptionParser.cpp',
@@ -25,10 +21,9 @@ pbbam_bam2sam_cpp_sources += files([
 pbbam_bam2sam = executable(
   'bam2sam',
   pbbam_bam2sam_cpp_sources,
-  dependencies : [pbbam_htslib_dep, pbbam_thread_dep, pbbam_zlib_dep],
+  dependencies : [pbbam_htslib_dep, pbbam_thread_dep, pbbam_zlib_dep, pbbam_boost_dep],
   include_directories : [pbbam_include_directories, include_directories('bam2sam')],
   install : get_option('build-tools'),
-  build_rpath : pbbam_htslib_libdir,
   cpp_args : pbbam_warning_flags)
 
 # tests
@@ -68,7 +63,7 @@ pbbam_pbindex_cpp_sources += files([
 pbbam_pbindex = executable(
   'pbindex',
   pbbam_pbindex_cpp_sources,
-  dependencies : [pbbam_htslib_dep, pbbam_zlib_dep],
+  dependencies : [pbbam_htslib_dep, pbbam_zlib_dep, pbbam_boost_dep],
   include_directories : [pbbam_include_directories, include_directories('pbindex')],
   link_with : pbbam_lib,
   install : get_option('build-tools'),
@@ -98,7 +93,7 @@ pbbam_pbindexdump_cpp_sources += files([
 pbbam_pbindexdump = executable(
   'pbindexdump',
   pbbam_pbindexdump_cpp_sources,
-  dependencies : [pbbam_htslib_dep, pbbam_zlib_dep],
+  dependencies : [pbbam_htslib_dep, pbbam_zlib_dep, pbbam_boost_dep],
   include_directories : [pbbam_include_directories, include_directories('pbindexdump')],
   link_with : pbbam_lib,
   install : get_option('build-tools'),

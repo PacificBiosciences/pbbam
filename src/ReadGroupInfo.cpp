@@ -16,6 +16,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <boost/algorithm/string.hpp>
+
 #include "ChemistryTable.h"
 #include "SequenceUtils.h"
 #include "pbbam/MD5.h"
@@ -37,6 +39,7 @@ static const std::string sam_PL{"PL"};
 static const std::string sam_PM{"PM"};
 static const std::string sam_PU{"PU"};
 static const std::string sam_SM{"SM"};
+static const std::string sam_BC{"BC"};
 
 static const std::string feature_DQ{"DeletionQV"};
 static const std::string feature_DT{"DeletionTag"};
@@ -89,6 +92,7 @@ static const std::string barcodequal_PROB{"Probability"};
 static const std::string platformModelType_ASTRO{"ASTRO"};
 static const std::string platformModelType_RS{"RS"};
 static const std::string platformModelType_SEQUEL{"SEQUEL"};
+static const std::string platformModelType_SEQUELII{"SEQUELII"};
 
 // clang-format off
 static std::string BaseFeatureName(const BaseFeature& feature)
@@ -156,9 +160,10 @@ static std::string BarcodeQualityName(const BarcodeQualityType& type)
 static std::string PlatformModelName(const PlatformModelType& type)
 {
     switch (type) {
-        case PlatformModelType::ASTRO  : return platformModelType_ASTRO;
-        case PlatformModelType::RS     : return platformModelType_RS;
-        case PlatformModelType::SEQUEL : return platformModelType_SEQUEL;
+        case PlatformModelType::ASTRO    : return platformModelType_ASTRO;
+        case PlatformModelType::RS       : return platformModelType_RS;
+        case PlatformModelType::SEQUEL   : return platformModelType_SEQUEL;
+        case PlatformModelType::SEQUELII : return platformModelType_SEQUELII;
         default:
             throw std::runtime_error{ "unrecognized platform model type" };
     }
@@ -212,9 +217,10 @@ static const std::map<std::string, BarcodeQualityType> nameToBarcodeQuality
 
 static const std::map<std::string, PlatformModelType> nameToPlatformModel
 {
-    { platformModelType_ASTRO,  PlatformModelType::ASTRO },
-    { platformModelType_RS,     PlatformModelType::RS },
-    { platformModelType_SEQUEL, PlatformModelType::SEQUEL }
+    { platformModelType_ASTRO,    PlatformModelType::ASTRO },
+    { platformModelType_RS,       PlatformModelType::RS },
+    { platformModelType_SEQUEL,   PlatformModelType::SEQUEL },
+    { platformModelType_SEQUELII, PlatformModelType::SEQUELII }
 };
 // clang-format on
 
@@ -252,24 +258,15 @@ static inline PlatformModelType PlatformModelFromName(std::string name)
 
 }  // namespace internal
 
-ReadGroupInfo::ReadGroupInfo() : readType_{"UNKNOWN"} {}
+ReadGroupInfo::ReadGroupInfo(std::string baseId, std::pair<uint16_t, uint16_t> barcodes)
 
-ReadGroupInfo::ReadGroupInfo(std::string id) : id_{std::move(id)}, readType_{"UNKNOWN"} {}
-
-ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType)
-    : id_{MakeReadGroupId(movieName, readType)}
-    , movieName_{std::move(movieName)}
-    , readType_{std::move(readType)}
 {
-}
-
-ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
-                             PlatformModelType platform)
-    : id_{MakeReadGroupId(movieName, readType)}
-    , movieName_{std::move(movieName)}
-    , platformModel_{std::move(platform)}
-    , readType_{std::move(readType)}
-{
+    std::ostringstream id;
+    id << baseId << '/' << std::to_string(barcodes.first) << "--"
+       << std::to_string(barcodes.second);
+    id_ = id.str();
+    baseId_ = std::move(baseId);
+    barcodes_ = std::move(barcodes);
 }
 
 void ReadGroupInfo::DecodeSamDescription(const std::string& description)
@@ -432,6 +429,37 @@ ReadGroupInfo ReadGroupInfo::FromSam(const std::string& sam)
     return rg;
 }
 
+ReadGroupInfo& ReadGroupInfo::Id(std::string id)
+{
+    barcodes_.reset();
+
+    // maybe parse for barcode labels
+    const auto slashAt = id.find('/');
+    if (slashAt != std::string::npos) {
+        // looks like we do, parse & store
+        const auto tokens = internal::Split(id.substr(slashAt + 1), '-');
+        if (tokens.size() != 3) {
+            throw std::runtime_error{
+                "could not fetch barcodes from malformatted read group ID: " + id +
+                " Must be in the form: {RGID_STRING}/{bcForward}--{bcReverse}"};
+        }
+
+        // catch here so we can give more informative message
+        try {
+            barcodes_ = std::pair<uint16_t, uint16_t>(static_cast<uint16_t>(std::stoul(tokens[0])),
+                                                      static_cast<uint16_t>(std::stoul(tokens[2])));
+        } catch (std::exception& e) {
+            throw std::runtime_error{
+                "could not fetch barcodes from malformatted read group ID: " + id_ +
+                " Must be in the form: {RGID_STRING}/{bcForward}--{bcReverse}"};
+        }
+    }
+
+    baseId_ = id.substr(0, slashAt);
+    id_ = std::move(id);
+    return *this;
+}
+
 std::string ReadGroupInfo::IntToId(const int32_t id)
 {
     std::ostringstream s;
@@ -502,6 +530,11 @@ std::string ReadGroupInfo::ToSam() const
     if (!predictedInsertSize_.empty()) out << internal::MakeSamTag(internal::sam_PI, predictedInsertSize_);
     if (!movieName_.empty())           out << internal::MakeSamTag(internal::sam_PU, movieName_);
     if (!sample_.empty())              out << internal::MakeSamTag(internal::sam_SM, sample_);
+    if (barcodes_)
+    {
+        out << '\t' << internal::sam_BC << ':'
+            << barcodes_->first << "--" << barcodes_->second;
+    }
     // clang-format on
 
     out << internal::MakeSamTag(internal::sam_PM, internal::PlatformModelName(platformModel_));

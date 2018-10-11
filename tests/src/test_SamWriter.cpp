@@ -7,7 +7,10 @@
 
 #include <gtest/gtest.h>
 
+#include <pbbam/BamFile.h>
+#include <pbbam/EntireFileQuery.h>
 #include <pbbam/SamWriter.h>
+#include <pbbam/StringUtilities.h>
 #include "PbbamTestData.h"
 
 using namespace PacBio;
@@ -112,4 +115,56 @@ TEST(SamWriterTest, SingleRecordOk)
         // cleanup
         remove(generatedFn.c_str());
     });
+}
+
+TEST(SamWriterTest, LongCigarFormatting)
+{
+    const std::string longCigarFn = PacBio::BAM::PbbamTestsConfig::Data_Dir + "/long-cigar-1.7.bam";
+    const std::string samFn =
+        PacBio::BAM::PbbamTestsConfig::GeneratedData_Dir + "/long-cigar-1.7.sam";
+
+    std::string originalCigar;
+
+    // Generate SAM from long CIGAR BAM
+    {
+        const BamFile inFile{longCigarFn};
+        SamWriter writer{samFn, inFile.Header()};
+        EntireFileQuery query{inFile};
+        for (auto record : query) {
+            originalCigar = record.CigarData().ToStdString();
+            writer.Write(record);
+        }
+    }
+
+    // Verify expected output
+    {
+        std::ifstream f{samFn};
+
+        std::string line1;
+        std::string line2;
+        std::string line3;
+        std::string line4;
+
+        std::getline(f, line1);
+        std::getline(f, line2);
+        std::getline(f, line3);
+        std::getline(f, line4);
+
+        EXPECT_EQ(0, line1.find("@HD"));
+        EXPECT_EQ(0, line2.find("@SQ"));
+        EXPECT_EQ(0, line3.find("@PG"));
+
+        // This is _literal_ value stored in the CIGAR field for this long-CIGAR
+        // record. The real CIGAR data is stored in the "CG" tag.
+        //
+        // That literal value does not belong in SAM (as well as the CG tag).
+        // CIGAR data should be placed in the standard SAM field.
+        //
+        EXPECT_EQ(std::string::npos, line4.find("457350S497223N"));
+        EXPECT_EQ(std::string::npos, line4.find("CG:B:I,"));
+
+        const auto fields = PacBio::BAM::Split(line4);
+        ASSERT_EQ(11, fields.size());
+        EXPECT_EQ(originalCigar, fields.at(5));
+    }
 }

@@ -27,16 +27,19 @@ endif()
 target_include_directories(pbbam
     PUBLIC
     ${PacBioBAM_IncludeDir}
-    ${hts_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
-    ${ZLIB_INCLUDE_DIRS}
+)
+
+target_compile_options(pbbam
+    PUBLIC
+    ${HTSlib_CFLAGS}
+    ${ZLIB_CFLAGS}
 )
 
 # set link dependencies
-#if(HTSLIB_LIBRARIES)
 set(pbbam_all_dependency_libs
-    ${hts_LIBRARIES}
-    ${ZLIB_LIBRARIES}
+    ${HTSlib_LDFLAGS}
+    ${ZLIB_LDFLAGS}
     ${SOCKET_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
 )
@@ -49,9 +52,7 @@ target_link_libraries(pbbam
 # define include paths for projects that use pbbam
 set(PacBioBAM_INCLUDE_DIRS
     ${PacBioBAM_IncludeDir}
-    ${hts_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
-    ${ZLIB_INCLUDE_DIRS}
     CACHE INTERNAL
     "${PROJECT_NAME}: Include Directories"
     FORCE

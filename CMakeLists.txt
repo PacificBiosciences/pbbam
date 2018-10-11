@@ -3,7 +3,7 @@
 ########################################################################
 
 cmake_policy(SET CMP0048 NEW)  # lets us set version in project()
-project(PacBioBAM VERSION 0.17.0 LANGUAGES CXX C)
+project(PacBioBAM VERSION 0.20.0 LANGUAGES CXX C)
 cmake_minimum_required(VERSION 3.0)
 
 # project name & version

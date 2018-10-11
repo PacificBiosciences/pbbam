@@ -1969,6 +1969,8 @@ std::string BamRecord::ReadGroupId() const
     return rgTag.ToString();
 }
 
+std::string BamRecord::ReadGroupBaseId() const { return ReadGroup().BaseId(); }
+
 BamRecord& BamRecord::ReadGroupId(const std::string& id)
 {
     internal::CreateOrEdit(BamRecordTag::READ_GROUP, id, &impl_);
@@ -1976,7 +1978,7 @@ BamRecord& BamRecord::ReadGroupId(const std::string& id)
     return *this;
 }
 
-int32_t BamRecord::ReadGroupNumericId() const { return ReadGroupInfo::IdToInt(ReadGroupId()); }
+int32_t BamRecord::ReadGroupNumericId() const { return ReadGroupInfo::IdToInt(ReadGroupBaseId()); }
 
 Position BamRecord::ReferenceEnd() const
 {

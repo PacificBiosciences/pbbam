@@ -120,9 +120,42 @@ public:
     ReadGroupInfo ReadGroup() const;
 
     /// \returns string ID of this record's read group
+    ///
+    /// This method should be perferred over ReadGroupBaseId() in most cases,
+    /// e.g. mapping between header info.
+    ///
+    /// For "ID:12345678":
+    ///     b.ReadGroupId()     -> "12345678"
+    ///     b.ReadGroupBaseId() -> "12345678"
+    ///
+    /// For "ID:12345678/0--0":
+    ///     b.ReadGroupId()   -> "12345678/0--0";
+    ///     b.ReadGroupBaseId -> "12345678"
+    ///
+    /// \sa BamRecord::ReadGroupBaseId
     /// \sa ReadGroupInfo::Id
+    /// \sa ReadGroupInfo::BaseId
     ///
     std::string ReadGroupId() const;
+
+    /// \returns string base ID (stripped of optional barcode labels)
+    ///
+    /// ReadGroupId() should be preferred over this method in most cases. This
+    /// is intended for use with hash-string or integers directly.
+    ///
+    /// For "ID:12345678":
+    ///     b.ReadGroupId()     -> "12345678"
+    ///     b.ReadGroupBaseId() -> "12345678"
+    ///
+    /// For "ID:12345678/0--0":
+    ///     b.ReadGroupId()   -> "12345678/0--0";
+    ///     b.ReadGroupBaseId -> "12345678"
+    ///
+    /// \sa BamRecord::ReadGroupId
+    /// \sa ReadGroupInfo::Id
+    /// \sa ReadGroupInfo::BaseId
+    ///
+    std::string ReadGroupBaseId() const;
 
     /// \returns integer value for this record's read group ID
     int32_t ReadGroupNumericId() const;
