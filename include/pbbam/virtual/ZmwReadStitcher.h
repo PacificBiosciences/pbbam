@@ -61,6 +61,9 @@ public:
     /// \returns the BamHeader associated with this reader's "scraps" %BAM file
     BamHeader ScrapsHeader() const;
 
+    /// \return the BamHeader associated with the newly stitched BAM data
+    BamHeader StitchedHeader() const;
+
     /// \}
 
 public:
