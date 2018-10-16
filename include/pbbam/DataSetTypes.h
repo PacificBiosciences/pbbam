@@ -741,6 +741,26 @@ public:
     ///
     NamespaceRegistry& Namespaces();
 
+public:
+    /// \brief Saves dataset XML to file.
+    ///
+    /// \param[in] outputFilename destination for XML contents
+    ///
+    /// \throws std::runtime_error if file could be opened or if DataSet
+    ///         elements could not be converted to XML
+    ///
+    void Save(const std::string& outputFilename);
+
+    /// \brief Saves dataset XML to output stream, e.g. std::cout,
+    ///        std::stringstream.
+    ///
+    /// \param[out] out destination for XML contents
+    ///
+    /// \throws std::runtime_error if DataSet elements could not be converted to
+    ///         XML
+    ///
+    void SaveToStream(std::ostream& out);
+
 private:
     NamespaceRegistry registry_;
 };
