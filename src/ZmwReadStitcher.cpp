@@ -109,6 +109,8 @@ public:
 
     BamHeader ScrapsHeader() const { return currentReader_->ScrapsHeader(); }
 
+    BamHeader StitchedHeader() const { return currentReader_->StitchedHeader(); }
+
 private:
     std::deque<std::pair<std::string, std::string> > sources_;
     std::unique_ptr<internal::VirtualZmwReader> currentReader_;
@@ -163,6 +165,8 @@ std::vector<BamRecord> ZmwReadStitcher::NextRaw() { return d_->NextRaw(); }
 BamHeader ZmwReadStitcher::PrimaryHeader() const { return d_->PrimaryHeader().DeepCopy(); }
 
 BamHeader ZmwReadStitcher::ScrapsHeader() const { return d_->ScrapsHeader().DeepCopy(); }
+
+BamHeader ZmwReadStitcher::StitchedHeader() const { return d_->StitchedHeader().DeepCopy(); }
 
 }  // namespace BAM
 }  // namespace PacBio

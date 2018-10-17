@@ -101,6 +101,8 @@ BamHeader VirtualZmwReader::PrimaryHeader() const { return primaryBamFile_->Head
 
 BamHeader VirtualZmwReader::ScrapsHeader() const { return scrapsBamFile_->Header(); }
 
+BamHeader VirtualZmwReader::StitchedHeader() const { return *stitchedHeader_.get(); }
+
 }  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
