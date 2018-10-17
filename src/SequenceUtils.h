@@ -63,7 +63,7 @@ inline void ReverseComplement(std::string& seq)
 inline std::string MaybeReverseComplement(std::string&& seq, bool reverse)
 {
     if (reverse) ReverseComplement(seq);
-    return seq;
+    return std::move(seq);
 }
 
 /// Reverse complement a DNA sequence case-sensitive
@@ -86,7 +86,7 @@ inline void ReverseComplementCaseSens(std::string& seq)
 inline std::string MaybeReverseComplementCaseSens(std::string&& seq, bool reverse)
 {
     if (reverse) ReverseComplementCaseSens(seq);
-    return seq;
+    return std::move(seq);
 }
 
 inline std::string ReverseComplemented(const std::string& input)
