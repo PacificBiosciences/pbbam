@@ -83,6 +83,9 @@ void CppFormatter::Run()
         case PbiFile::Version_3_0_1:
             version = "PbiFile::Version_3_0_1";
             break;
+        case PbiFile::Version_3_0_2:
+            version = "PbiFile::Version_3_0_2";
+            break;
         default:
             throw std::runtime_error("unsupported PBI version encountered");
     }
