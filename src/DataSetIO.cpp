@@ -133,12 +133,22 @@ std::unique_ptr<DataSetBase> DataSetIO::FromXmlString(const std::string& xml)
 
 void DataSetIO::ToFile(const std::unique_ptr<DataSetBase>& dataset, const std::string& fn)
 {
+    DataSetIO::ToFile(*dataset, fn);
+}
+
+void DataSetIO::ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostream& out)
+{
+    DataSetIO::ToStream(*dataset, out);
+}
+
+void DataSetIO::ToFile(const DataSetBase& dataset, const std::string& fn)
+{
     std::ofstream out(fn);
     if (!out) throw std::runtime_error{"could not open XML file for writing: " + fn};
     XmlWriter::ToStream(dataset, out);
 }
 
-void DataSetIO::ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostream& out)
+void DataSetIO::ToStream(const DataSetBase& dataset, std::ostream& out)
 {
     XmlWriter::ToStream(dataset, out);
 }

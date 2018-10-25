@@ -334,6 +334,37 @@ TEST(DataSetIOTest, ToXml)
     EXPECT_EQ(expectedXml, s.str());
 }
 
+TEST(DataSetIOTest, DataSetBaseTypeToXml)
+{
+    // top-level data
+    ContigSet dataset;
+    dataset.CreatedAt("2015-01-27T09:00:01");
+    dataset.Name("DataSet_ContigSet");
+    dataset.Tags("barcode moreTags mapping mytags");
+    dataset.TimeStampedName("my_tsn");
+    dataset.UniqueId("b095d0a3-94b8-4918-b3af-a3f81bbe519c");
+
+    // write dataset
+    const std::string expectedXml{
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+        "<pbds:ContigSet "
+                "CreatedAt=\"2015-01-27T09:00:01\" "
+                "MetaType=\"PacBio.DataSet.ContigSet\" "
+                "Name=\"DataSet_ContigSet\" "
+                "Tags=\"barcode moreTags mapping mytags\" "
+                "TimeStampedName=\"my_tsn\" "
+                "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"3.0.1\" "
+                "xmlns=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
+                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
+                "xmlns:pbds=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" />\n"};
+
+        std::ostringstream s;
+        dataset.SaveToStream(s);
+        EXPECT_EQ(expectedXml, s.str());
+}
+
+
 namespace DataSetIOTests {
 
 static void TestFromXmlString()

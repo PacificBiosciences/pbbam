@@ -11,10 +11,12 @@
 #include <cstddef>
 #include <set>
 
+#include "pbbam/internal/DataSetBaseTypes.h"
+
+#include "DataSetIO.h"
 #include "DataSetUtils.h"
 #include "FileUtils.h"
 #include "TimeUtils.h"
-#include "pbbam/internal/DataSetBaseTypes.h"
 
 namespace PacBio {
 namespace BAM {
@@ -163,6 +165,13 @@ std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName)
     // unknown typename
     throw std::runtime_error{"unsupported dataset type"};
 }
+
+void DataSetBase::Save(const std::string& outputFilename)
+{
+    internal::DataSetIO::ToFile(*this, outputFilename);
+}
+
+void DataSetBase::SaveToStream(std::ostream& out) { internal::DataSetIO::ToStream(*this, out); }
 
 // -------------------
 // DataSetMetadata

@@ -33,6 +33,9 @@ void JsonFormatter::FormatMetadata()
         case PbiFile::Version_3_0_1:
             version = "3.0.1";
             break;
+        case PbiFile::Version_3_0_2:
+            version = "3.0.2";
+            break;
         default:
             throw std::runtime_error("unsupported PBI version encountered");
     }
