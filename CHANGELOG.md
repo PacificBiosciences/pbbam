@@ -10,6 +10,9 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+### Removed
+ - CMake has been removed completely.
+
 ## [0.20.0] - 2018-10-03
 
 ### Added
