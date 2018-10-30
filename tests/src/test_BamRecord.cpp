@@ -9,6 +9,9 @@
 
 #include <gtest/gtest.h>
 
+#include "PbbamTestData.h"
+
+#include <pbbam/BamReader.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamTagCodec.h>
 #include "../src/MemoryUtils.h"
@@ -2720,6 +2723,20 @@ TEST(BamRecordTest, TranscriptRecord)
     EXPECT_EQ(1234, bam.HoleNumber());
     EXPECT_THROW({bam.QueryStart();}, std::runtime_error);
     EXPECT_THROW({bam.QueryEnd();}, std::runtime_error);
+}
+
+TEST(BamRecordTest, NumDeletedBasesExcludesRefskips)
+{
+    const std::string file{PbbamTestsConfig::Data_Dir + "/refskip.bam"};
+
+    BamRecord record;
+    BamReader reader{file};
+    ASSERT_TRUE(reader.GetNext(record));
+
+    // Buggy version had (numDel:4882) due to miscounting of ref-skip CIGAR ops.
+
+    const size_t expectedNumDel = 73;
+    EXPECT_EQ(expectedNumDel, record.NumDeletedBases());
 }
 
 // clang-format on

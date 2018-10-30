@@ -1596,22 +1596,28 @@ std::string BamRecord::MovieName() const { return ReadGroup().MovieName(); }
 
 size_t BamRecord::NumDeletedBases() const
 {
-    auto tEnd = ReferenceEnd();
-    auto tStart = ReferenceStart();
-    auto numMatchesAndMismatches = NumMatchesAndMismatches();
-    auto nM = numMatchesAndMismatches.first;
-    auto nMM = numMatchesAndMismatches.second;
-    return (tEnd - tStart - nM - nMM);
+    size_t count = 0;
+
+    auto b = internal::BamRecordMemory::GetRawData(this);
+    uint32_t* cigarData = bam_get_cigar(b.get());
+    for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
+        const auto type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
+        if (type == CigarOperationType::DELETION) count += bam_cigar_oplen(cigarData[i]);
+    }
+    return count;
 }
 
 size_t BamRecord::NumInsertedBases() const
 {
-    auto aEnd = AlignedEnd();
-    auto aStart = AlignedStart();
-    auto numMatchesAndMismatches = NumMatchesAndMismatches();
-    auto nM = numMatchesAndMismatches.first;
-    auto nMM = numMatchesAndMismatches.second;
-    return (aEnd - aStart - nM - nMM);
+    size_t count = 0;
+
+    auto b = internal::BamRecordMemory::GetRawData(this);
+    uint32_t* cigarData = bam_get_cigar(b.get());
+    for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
+        const auto type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
+        if (type == CigarOperationType::INSERTION) count += bam_cigar_oplen(cigarData[i]);
+    }
+    return count;
 }
 
 size_t BamRecord::NumMatches() const { return NumMatchesAndMismatches().first; }
