@@ -9,11 +9,11 @@
 #include <pbbam/CompositeBamReader.h>
 #include <pbbam/PbiBuilder.h>
 
+#include <cassert>
 #include <cstdint>
 #include <deque>
 #include <memory>
 #include <stdexcept>
-#include <cassert>
 
 namespace PacBio {
 namespace BAM {
@@ -29,14 +29,12 @@ public:
     bool GetNext(BamRecord& record)
     {
         // nothing left to read
-        if (mergeItems_.empty())
-            return false;
+        if (mergeItems_.empty()) return false;
 
         // non-destructive 'pop' of first item from queue
         auto firstIter = mergeItems_.begin();
-        auto firstItem = PacBio::BAM::internal::CompositeMergeItem{ std::move(firstIter->reader),
-                                                                    std::move(firstIter->record)
-                                                                  };
+        auto firstItem = PacBio::BAM::internal::CompositeMergeItem{std::move(firstIter->reader),
+                                                                   std::move(firstIter->record)};
         mergeItems_.pop_front();
 
         // store its record in our output record
@@ -58,23 +56,21 @@ protected:
     std::deque<PacBio::BAM::internal::CompositeMergeItem> mergeItems_;
 
 protected:
-    ICollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader> >&& readers)
+    ICollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>>&& readers)
     {
         for (auto&& reader : readers) {
             auto item = internal::CompositeMergeItem{std::move(reader)};
-            if (item.reader->GetNext(item.record))
-                mergeItems_.push_back(std::move(item));
+            if (item.reader->GetNext(item.record)) mergeItems_.push_back(std::move(item));
         }
     }
 
-    virtual void UpdateSort(void) =0;
+    virtual void UpdateSort(void) = 0;
 };
 
 // QNameCollator
 
-struct QNameSorter : std::binary_function<internal::CompositeMergeItem,
-                                          internal::CompositeMergeItem,
-                                          bool>
+struct QNameSorter
+    : std::binary_function<internal::CompositeMergeItem, internal::CompositeMergeItem, bool>
 {
     bool operator()(const internal::CompositeMergeItem& lhs,
                     const internal::CompositeMergeItem& rhs)
@@ -84,20 +80,16 @@ struct QNameSorter : std::binary_function<internal::CompositeMergeItem,
 
         // movie name
         const int cmp = l.MovieName().compare(r.MovieName());
-        if (cmp != 0)
-            return cmp < 0;
+        if (cmp != 0) return cmp < 0;
 
         // hole number
         const auto lhsZmw = l.HoleNumber();
         const auto rhsZmw = r.HoleNumber();
-        if (lhsZmw != rhsZmw)
-            return lhsZmw < rhsZmw;
+        if (lhsZmw != rhsZmw) return lhsZmw < rhsZmw;
 
         // shuffle CCS/transcript reads after all others
-        if (IsCcsOrTranscript(l.Type()))
-            return false;
-        if (IsCcsOrTranscript(r.Type()))
-            return true;
+        if (IsCcsOrTranscript(l.Type())) return false;
+        if (IsCcsOrTranscript(r.Type())) return true;
 
         // sort on qStart, then finally qEnd
         const auto lhsQStart = l.QueryStart();
@@ -111,10 +103,11 @@ class QNameCollator : public ICollator
 public:
     QNameCollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>>&& readers)
         : ICollator(std::move(readers))
-    { UpdateSort(); }
+    {
+        UpdateSort();
+    }
 
-    void UpdateSort(void)
-    { std::sort(mergeItems_.begin(), mergeItems_.end(), QNameSorter{ }); }
+    void UpdateSort(void) { std::sort(mergeItems_.begin(), mergeItems_.end(), QNameSorter{}); }
 };
 
 // AlignedCollator
@@ -124,19 +117,20 @@ class AlignedCollator : public ICollator
 public:
     AlignedCollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>>&& readers)
         : ICollator(std::move(readers))
-    { UpdateSort(); }
+    {
+        UpdateSort();
+    }
 
     void UpdateSort(void)
-    { std::sort(mergeItems_.begin(), mergeItems_.end(), PacBio::BAM::PositionSorter{ }); }
+    {
+        std::sort(mergeItems_.begin(), mergeItems_.end(), PacBio::BAM::PositionSorter{});
+    }
 };
 
 // BamFileMerger
 
-inline
-void BamFileMerger::Merge(const DataSet& dataset,
-                          const std::string& outputFilename,
-                          const ProgramInfo& mergeProgram,
-                          bool createPbi)
+inline void BamFileMerger::Merge(const DataSet& dataset, const std::string& outputFilename,
+                                 const ProgramInfo& mergeProgram, bool createPbi)
 {
     const PbiFilter filter = PbiFilter::FromDataSet(dataset);
 
@@ -152,9 +146,8 @@ void BamFileMerger::Merge(const DataSet& dataset,
     if (outputFilename.empty())
         throw std::runtime_error("no output filename provide to BamFileMerger");
 
-
     // attempt open input files
-    std::vector<std::unique_ptr<BamReader> > readers;
+    std::vector<std::unique_ptr<BamReader>> readers;
     readers.reserve(inputFilenames_.size());
     for (const auto& fn : inputFilenames_) {
         if (filter.IsEmpty())
@@ -182,8 +175,7 @@ void BamFileMerger::Merge(const DataSet& dataset,
             throw std::runtime_error("BAM file sort orders do not match, aborting merge");
         mergedHeader += headers.at(i);
     }
-    if (mergeProgram.IsValid())
-        mergedHeader.AddProgram(mergeProgram);
+    if (mergeProgram.IsValid()) mergedHeader.AddProgram(mergeProgram);
 
     // setup collator, based on sort order
     std::unique_ptr<ICollator> collator;
@@ -200,10 +192,8 @@ void BamFileMerger::Merge(const DataSet& dataset,
         //       only need to collate entries and update offsets
 
         BamWriter writer(outputFilename, mergedHeader);
-        PbiBuilder builder{ (outputFilename + ".pbi"),
-                            mergedHeader.NumSequences(),
-                            isCoordinateSorted
-                          };
+        PbiBuilder builder{(outputFilename + ".pbi"), mergedHeader.NumSequences(),
+                           isCoordinateSorted};
         BamRecord record;
         int64_t vOffset = 0;
         while (collator->GetNext(record)) {
@@ -221,6 +211,6 @@ void BamFileMerger::Merge(const DataSet& dataset,
     }
 }
 
-} // namespace common
-} // namespace BAM
-} // namespace PacBio
+}  // namespace common
+}  // namespace BAM
+}  // namespace PacBio
