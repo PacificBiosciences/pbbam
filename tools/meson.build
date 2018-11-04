@@ -138,7 +138,6 @@ pbbam_PbMergeVersion_h = configure_file(
 
 pbbam_pbmerge_cpp_sources = [pbbam_PbMergeVersion_h]
 pbbam_pbmerge_cpp_sources += files([
-  'common/BamFileMerger.h',
   'common/OptionParser.cpp',
   'pbmerge/src/main.cpp'])
 

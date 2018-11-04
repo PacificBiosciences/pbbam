@@ -3,40 +3,51 @@
 #ifndef BAMFILEMERGER_H
 #define BAMFILEMERGER_H
 
-#include <pbbam/DataSet.h>
-#include <pbbam/PbiFilter.h>
-#include <pbbam/ProgramInfo.h>
+#include <pbbam/BamHeader.h>
 #include <string>
 #include <vector>
 
 namespace PacBio {
 namespace BAM {
-namespace common {
+
+class DataSet;
 
 class BamFileMerger
 {
 public:
+    /// \brief Runs merger on BAM files.
+    ///
+    /// When this function exits, a merged BAM (and optional PBI) will have been
+    /// written and closed.
+    ///
+    /// \param[in] bamFilenames         input filenames
+    /// \param[in] outputFilename       resulting BAM output
+    /// \param[in] createPbi            if true, creates a PBI alongside output BAM
+    /// \param[in] initialOutputHeader  "seed" header (used by pbmerge to set @PG entry)
+    ///
+    /// \throws std::runtime_error if any any errors encountered while reading or writing
+    ///
+    static void Merge(const std::vector<std::string>& bamFilenames,
+                      const std::string& outputFilename, bool createPbi = true,
+                      BamHeader initialOutputHeader = BamHeader{});
+
     /// \brief Runs merger on a dataset, applying any supplied filters.
     ///
     /// When this function exits, a merged BAM (and optional PBI) will have been
     /// written and closed.
     ///
-    /// \param[in] dataset          provides input filenames & filters
-    /// \param[in] outputFilename   resulting BAM output
-    /// \param[in] mergeProgram     info about the calling program. Adds a @PG entry to merged header.
-    /// \param[in] createPbi        if true, creates a PBI alongside output BAM
+    /// \param[in] dataset              provides input filenames & filters
+    /// \param[in] outputFilename       resulting BAM output
+    /// \param[in] createPbi            if true, creates a PBI alongside output BAM
+    /// \param[in] initialOutputHeader  "seed" header (used by pbmerge to set @PG entry)
     ///
     /// \throws std::runtime_error if any any errors encountered while reading or writing
     ///
     static void Merge(const PacBio::BAM::DataSet& dataset, const std::string& outputFilename,
-                      const PacBio::BAM::ProgramInfo& mergeProgram = PacBio::BAM::ProgramInfo(),
-                      bool createPbi = true);
+                      bool createPbi = true, BamHeader initialOutputHeader = BamHeader{});
 };
 
-}  // namespace common
 }  // namespace BAM
 }  // namespace PacBio
-
-#include "BamFileMerger.inl"
 
 #endif  // BAMFILEMERGER_H

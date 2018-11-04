@@ -1,25 +1,33 @@
+// File Description
+/// \file BamFileMerger.cpp
+/// \brief Implements the BamFileMerger & helper classes.
+//
 // Author: Derek Barnett
 
-#include "BamFileMerger.h"
+#include "PbbamInternalConfig.h"
 
-#include <pbbam/BamHeader.h>
-#include <pbbam/BamReader.h>
-#include <pbbam/BamRecord.h>
-#include <pbbam/BamWriter.h>
-#include <pbbam/CompositeBamReader.h>
-#include <pbbam/PbiBuilder.h>
+#include "pbbam/BamFileMerger.h"
 
-#include <cassert>
-#include <cstdint>
 #include <deque>
 #include <memory>
 #include <stdexcept>
+#include <vector>
+
+#include "pbbam/BamFile.h"
+#include "pbbam/BamHeader.h"
+#include "pbbam/BamReader.h"
+#include "pbbam/BamRecord.h"
+#include "pbbam/CompositeBamReader.h"
+#include "pbbam/DataSet.h"
+#include "pbbam/IndexedBamWriter.h"
+#include "pbbam/PbiBuilder.h"
+#include "pbbam/PbiFilter.h"
+#include "pbbam/PbiIndexedBamReader.h"
+#include "pbbam/RecordType.h"
 
 namespace PacBio {
 namespace BAM {
-namespace common {
-
-// ICollator
+namespace {  // anonymous
 
 class ICollator
 {
@@ -33,8 +41,8 @@ public:
 
         // non-destructive 'pop' of first item from queue
         auto firstIter = mergeItems_.begin();
-        auto firstItem = PacBio::BAM::internal::CompositeMergeItem{std::move(firstIter->reader),
-                                                                   std::move(firstIter->record)};
+        auto firstItem = internal::CompositeMergeItem{std::move(firstIter->reader),
+                                                      std::move(firstIter->record)};
         mergeItems_.pop_front();
 
         // store its record in our output record
@@ -53,10 +61,10 @@ public:
     }
 
 protected:
-    std::deque<PacBio::BAM::internal::CompositeMergeItem> mergeItems_;
+    std::deque<internal::CompositeMergeItem> mergeItems_;
 
 protected:
-    ICollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>>&& readers)
+    ICollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>> readers)
     {
         for (auto&& reader : readers) {
             auto item = internal::CompositeMergeItem{std::move(reader)};
@@ -66,8 +74,6 @@ protected:
 
     virtual void UpdateSort(void) = 0;
 };
-
-// QNameCollator
 
 struct QNameSorter
     : std::binary_function<internal::CompositeMergeItem, internal::CompositeMergeItem, bool>
@@ -101,7 +107,7 @@ struct QNameSorter
 class QNameCollator : public ICollator
 {
 public:
-    QNameCollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>>&& readers)
+    QNameCollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>> readers)
         : ICollator(std::move(readers))
     {
         UpdateSort();
@@ -110,107 +116,93 @@ public:
     void UpdateSort(void) { std::sort(mergeItems_.begin(), mergeItems_.end(), QNameSorter{}); }
 };
 
-// AlignedCollator
-
 class AlignedCollator : public ICollator
 {
 public:
-    AlignedCollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>>&& readers)
-        : ICollator(std::move(readers))
+    AlignedCollator(std::vector<std::unique_ptr<BamReader>> readers) : ICollator(std::move(readers))
     {
         UpdateSort();
     }
 
-    void UpdateSort(void)
-    {
-        std::sort(mergeItems_.begin(), mergeItems_.end(), PacBio::BAM::PositionSorter{});
-    }
+    void UpdateSort(void) { std::sort(mergeItems_.begin(), mergeItems_.end(), PositionSorter{}); }
 };
 
-// BamFileMerger
-
-inline void BamFileMerger::Merge(const DataSet& dataset, const std::string& outputFilename,
-                                 const ProgramInfo& mergeProgram, bool createPbi)
+void MergeImpl(std::vector<BamFile> bamFiles, const std::string& outputFilename,
+               const PbiFilter& filter, bool createPbi, BamHeader initialOutputHeader)
 {
-    const PbiFilter filter = PbiFilter::FromDataSet(dataset);
-
-    std::vector<std::string> inputFilenames_;
-    const auto& bamFiles = dataset.BamFiles();
-    inputFilenames_.reserve(bamFiles.size());
-    for (const auto& file : bamFiles)
-        inputFilenames_.push_back(file.Filename());
-
-    if (inputFilenames_.empty())
-        throw std::runtime_error("no input filenames provided to BamFileMerger");
-
+    // I/O filenames check
+    if (bamFiles.empty()) throw std::runtime_error{"no input filenames provided to BamFileMerger"};
     if (outputFilename.empty())
-        throw std::runtime_error("no output filename provide to BamFileMerger");
+        throw std::runtime_error{"no output filename provide to BamFileMerger"};
 
     // attempt open input files
     std::vector<std::unique_ptr<BamReader>> readers;
-    readers.reserve(inputFilenames_.size());
-    for (const auto& fn : inputFilenames_) {
+    for (const auto& file : bamFiles) {
         if (filter.IsEmpty())
-            readers.emplace_back(new BamReader(fn));
+            readers.emplace_back(std::make_unique<BamReader>(file));
         else
-            readers.emplace_back(new PbiIndexedBamReader(filter, fn));
+            readers.emplace_back(std::make_unique<PbiIndexedBamReader>(filter, file));
     }
+    assert(!readers.empty());
 
     // read headers
     std::vector<BamHeader> headers;
-    headers.reserve(readers.size());
-    for (auto&& reader : readers)
+    for (const auto& reader : readers)
         headers.push_back(reader->Header());
-
-    assert(!readers.empty());
     assert(!headers.empty());
 
     // merge headers
-    BamHeader mergedHeader = headers.front();
-    const std::string& usingSortOrder = mergedHeader.SortOrder();
+    BamHeader mergedHeader = initialOutputHeader;
+    const std::string usingSortOrder = mergedHeader.SortOrder();
     const bool isCoordinateSorted = (usingSortOrder == "coordinate");
-    for (size_t i = 1; i < headers.size(); ++i) {
-        const BamHeader& header = headers.at(i);
+    for (const auto& header : headers) {
         if (header.SortOrder() != usingSortOrder)
-            throw std::runtime_error("BAM file sort orders do not match, aborting merge");
-        mergedHeader += headers.at(i);
+            throw std::runtime_error{"BAM file sort orders do not match, aborting merge"};
+        mergedHeader += header;
     }
-    if (mergeProgram.IsValid()) mergedHeader.AddProgram(mergeProgram);
 
-    // setup collator, based on sort order
+    // setup collator - sort order?
+    //
+    // NOTE: collator takes ownership of readers
+    //
     std::unique_ptr<ICollator> collator;
     if (isCoordinateSorted)
-        collator.reset(new AlignedCollator(std::move(readers)));
+        collator = std::make_unique<AlignedCollator>(std::move(readers));
     else
-        collator.reset(new QNameCollator(std::move(readers)));
-    // NOTE: readers *moved*, so no longer accessible here
+        collator = std::make_unique<QNameCollator>(std::move(readers));
 
-    // do merge, creating PBI on-the-fly
-    if (createPbi && (outputFilename != "-")) {
+    // setup writer - PBI-on-the-fly?
+    std::unique_ptr<IRecordWriter> writer;
+    if (createPbi)
+        writer = std::make_unique<IndexedBamWriter>(outputFilename, mergedHeader);
+    else
+        writer = std::make_unique<BamWriter>(outputFilename, mergedHeader);
 
-        // TODO: this implementation recalculates all PBI values, when we really
-        //       only need to collate entries and update offsets
-
-        BamWriter writer(outputFilename, mergedHeader);
-        PbiBuilder builder{(outputFilename + ".pbi"), mergedHeader.NumSequences(),
-                           isCoordinateSorted};
-        BamRecord record;
-        int64_t vOffset = 0;
-        while (collator->GetNext(record)) {
-            writer.Write(record, &vOffset);
-            builder.AddRecord(record, vOffset);
-        }
-    }
-
-    // otherwise just merge BAM
-    else {
-        BamWriter writer(outputFilename, mergedHeader);
-        BamRecord record;
-        while (collator->GetNext(record))
-            writer.Write(record);
-    }
+    // write collated records
+    BamRecord record;
+    while (collator->GetNext(record))
+        writer->Write(record);
 }
 
-}  // namespace common
+}  // namespace anonymous
+
+void BamFileMerger::Merge(const std::vector<std::string>& bamFilenames,
+                          const std::string& outputFilename, bool createPbi,
+                          BamHeader initialOutputHeader)
+{
+    std::vector<BamFile> bamFiles;
+    for (const auto& fn : bamFilenames)
+        bamFiles.emplace_back(fn);
+
+    MergeImpl(std::move(bamFiles), outputFilename, PbiFilter{}, createPbi, initialOutputHeader);
+}
+
+void BamFileMerger::Merge(const DataSet& dataset, const std::string& outputFilename, bool createPbi,
+                          BamHeader initialOutputHeader)
+{
+    MergeImpl(dataset.BamFiles(), outputFilename, PbiFilter::FromDataSet(dataset), createPbi,
+              initialOutputHeader);
+}
+
 }  // namespace BAM
 }  // namespace PacBio
