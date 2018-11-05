@@ -6,7 +6,10 @@
 #include <string>
 #include <vector>
 
-#include "../common/BamFileMerger.h"
+#include <pbbam/BamFileMerger.h>
+#include <pbbam/DataSet.h>
+#include <pbbam/ProgramInfo.h>
+
 #include "../common/OptionParser.h"
 #include "PbMergeVersion.h"
 
@@ -113,14 +116,8 @@ int main(int argc, char* argv[])
         else
             dataset = PacBio::BAM::DataSet(settings.inputFilenames_);
 
-        PacBio::BAM::common::BamFileMerger::Merge(dataset, settings.outputFilename_, mergeProgram,
-                                                  settings.createPbi_);
-
-        //        PacBio::BAM::common::BamFileMerger merger(dataset,
-        //                                                  settings.outputFilename_,
-        //                                                  mergeProgram,
-        //                                                  settings.createPbi_);
-        //        merger.Merge();
+        PacBio::BAM::BamFileMerger::Merge(dataset, settings.outputFilename_, settings.createPbi_,
+                                          mergeProgram);
 
         return EXIT_SUCCESS;
     } catch (std::exception& e) {
