@@ -128,7 +128,7 @@ public:
 };
 
 void MergeImpl(std::vector<BamFile> bamFiles, const std::string& outputFilename,
-               const PbiFilter& filter, bool createPbi, BamHeader initialOutputHeader)
+               const PbiFilter& filter, bool createPbi, const ProgramInfo& pgInfo)
 {
     // I/O filenames check
     if (bamFiles.empty()) throw std::runtime_error{"no input filenames provided to BamFileMerger"};
@@ -152,14 +152,16 @@ void MergeImpl(std::vector<BamFile> bamFiles, const std::string& outputFilename,
     assert(!headers.empty());
 
     // merge headers
-    BamHeader mergedHeader = initialOutputHeader;
+    BamHeader mergedHeader = headers.at(0);
     const std::string usingSortOrder = mergedHeader.SortOrder();
     const bool isCoordinateSorted = (usingSortOrder == "coordinate");
-    for (const auto& header : headers) {
+    for (size_t i = 1; i < headers.size(); ++i) {
+        const auto& header = headers.at(i);
         if (header.SortOrder() != usingSortOrder)
             throw std::runtime_error{"BAM file sort orders do not match, aborting merge"};
         mergedHeader += header;
     }
+    if (pgInfo.IsValid()) mergedHeader.AddProgram(pgInfo);
 
     // setup collator - sort order?
     //
@@ -188,20 +190,20 @@ void MergeImpl(std::vector<BamFile> bamFiles, const std::string& outputFilename,
 
 void BamFileMerger::Merge(const std::vector<std::string>& bamFilenames,
                           const std::string& outputFilename, bool createPbi,
-                          BamHeader initialOutputHeader)
+                          const ProgramInfo& pgInfo)
 {
     std::vector<BamFile> bamFiles;
     for (const auto& fn : bamFilenames)
         bamFiles.emplace_back(fn);
 
-    MergeImpl(std::move(bamFiles), outputFilename, PbiFilter{}, createPbi, initialOutputHeader);
+    MergeImpl(std::move(bamFiles), outputFilename, PbiFilter{}, createPbi, pgInfo);
 }
 
 void BamFileMerger::Merge(const DataSet& dataset, const std::string& outputFilename, bool createPbi,
-                          BamHeader initialOutputHeader)
+                          const ProgramInfo& pgInfo)
 {
     MergeImpl(dataset.BamFiles(), outputFilename, PbiFilter::FromDataSet(dataset), createPbi,
-              initialOutputHeader);
+              pgInfo);
 }
 
 }  // namespace BAM

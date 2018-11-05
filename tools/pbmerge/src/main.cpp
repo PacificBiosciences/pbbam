@@ -110,9 +110,6 @@ int main(int argc, char* argv[])
             .Name("pbmerge")
             .Version(pbmerge::Version);
 
-        PacBio::BAM::BamHeader initialOutputHeader;
-        initialOutputHeader.AddProgram(std::move(mergeProgram));
-
         PacBio::BAM::DataSet dataset;
         if (settings.inputFilenames_.size() == 1)
             dataset = PacBio::BAM::DataSet(settings.inputFilenames_.front());
@@ -120,7 +117,7 @@ int main(int argc, char* argv[])
             dataset = PacBio::BAM::DataSet(settings.inputFilenames_);
 
         PacBio::BAM::BamFileMerger::Merge(dataset, settings.outputFilename_, settings.createPbi_,
-                                          initialOutputHeader);
+                                          mergeProgram);
 
         return EXIT_SUCCESS;
     } catch (std::exception& e) {
