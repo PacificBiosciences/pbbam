@@ -15,12 +15,17 @@
 namespace PacBio {
 namespace BAM {
 
-FastaWriter::FastaWriter(const std::string& fn) : file_{fn}
+FastaWriter::FastaWriter(const std::string& fn) : IRecordWriter{}, file_{fn}
 {
     if (!file_) throw std::runtime_error{"FastqWriter could not open for writing: " + fn};
 }
 
+void FastaWriter::TryFlush() { file_.flush(); }
+
+void FastaWriter::Write(const BamRecordImpl& bam) { Write(bam.Name(), bam.Sequence()); }
+
 void FastaWriter::Write(const FastaSequence& fastq) { Write(fastq.Name(), fastq.Bases()); }
+
 void FastaWriter::Write(const BamRecord& bam) { Write(bam.FullName(), bam.Sequence()); }
 
 void FastaWriter::Write(const std::string& name, const std::string& bases)
