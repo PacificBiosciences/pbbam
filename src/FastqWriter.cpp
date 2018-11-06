@@ -15,7 +15,7 @@
 namespace PacBio {
 namespace BAM {
 
-FastqWriter::FastqWriter(const std::string& fn) : IRecordWriter{}, file_{fn}
+FastqWriter::FastqWriter(const std::string& fn) : IRecordWriter(), file_{fn}
 {
     if (!file_) throw std::runtime_error{"FastqWriter could not open for writing: " + fn};
 }

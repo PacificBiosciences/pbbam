@@ -11,6 +11,7 @@ namespace PacBio {
 namespace BAM {
 
 class DataSet;
+class IRecordWriter;
 
 class BamFileMerger
 {
@@ -45,6 +46,10 @@ public:
     ///
     static void Merge(const PacBio::BAM::DataSet& dataset, const std::string& outputFilename,
                       bool createPbi = true, const ProgramInfo& pgInfo = ProgramInfo{});
+
+    static void Merge(const std::vector<std::string>& bamFilenames, IRecordWriter& writer);
+
+    static void Merge(const PacBio::BAM::DataSet& dataset, IRecordWriter& writer);
 };
 
 }  // namespace BAM

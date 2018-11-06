@@ -6,6 +6,7 @@
 
 #include "PbbamTestData.h"
 
+#include <pbbam/BamFileMerger.h>
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/FastqReader.h>
 #include <pbbam/FastqSequence.h>
@@ -173,6 +174,48 @@ TEST(FastqWriterTest, WriteStrings)
     ASSERT_EQ(1, seqs.size());
     EXPECT_EQ(name, seqs[0].Name());
     EXPECT_EQ(bases, seqs[0].Bases());
+
+    remove(outFastq.c_str());
+}
+
+TEST(FastqMerging, MergeBamsToFastq)
+{
+    const std::vector<std::string> bamFiles{PbbamTestsConfig::Data_Dir + "/group/test1.bam",
+                                            PbbamTestsConfig::Data_Dir + "/group/test2.bam",
+                                            PbbamTestsConfig::Data_Dir + "/group/test3.bam"};
+
+    const std::string outFastq = PbbamTestsConfig::GeneratedData_Dir + "/out.fq";
+
+    {
+        FastqWriter fastq{outFastq};
+        BamFileMerger::Merge(bamFiles, fastq);
+    }
+
+    const std::vector<std::string> mergedFastqNames{
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2114_2531",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2579_4055",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/4101_5571",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/5615_6237",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/24962/0_427",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/45203/0_893",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/45203/0_893",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/46835/3759_4005",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/46835/4052_4686",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/46835/4732_4869",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/47698/9482_9628",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/47698/9675_10333",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/47698/10378_10609",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/49050/48_1132",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/49050/48_1132",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/49194/0_798",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/49194/845_1541",
+        "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/49521/0_134"};
+
+    const auto seqs = FastqReader::ReadAll(outFastq);
+    ASSERT_EQ(mergedFastqNames.size(), seqs.size());
+
+    for (size_t i = 0; i < seqs.size(); ++i)
+        EXPECT_EQ(mergedFastqNames[i], seqs[i].Name());
 
     remove(outFastq.c_str());
 }
