@@ -19,6 +19,7 @@
 #include "pbbam/BamRecord.h"
 #include "pbbam/CompositeBamReader.h"
 #include "pbbam/DataSet.h"
+#include "pbbam/IRecordWriter.h"
 #include "pbbam/IndexedBamWriter.h"
 #include "pbbam/PbiBuilder.h"
 #include "pbbam/PbiFilter.h"
@@ -127,23 +128,35 @@ public:
     void UpdateSort(void) { std::sort(mergeItems_.begin(), mergeItems_.end(), PositionSorter{}); }
 };
 
-void MergeImpl(std::vector<BamFile> bamFiles, const std::string& outputFilename,
-               const PbiFilter& filter, bool createPbi, const ProgramInfo& pgInfo)
+std::vector<std::unique_ptr<BamReader>> MakeBamReaders(std::vector<BamFile> bamFiles,
+                                                       PbiFilter filter = PbiFilter{})
 {
-    // I/O filenames check
-    if (bamFiles.empty()) throw std::runtime_error{"no input filenames provided to BamFileMerger"};
-    if (outputFilename.empty())
-        throw std::runtime_error{"no output filename provide to BamFileMerger"};
-
-    // attempt open input files
     std::vector<std::unique_ptr<BamReader>> readers;
-    for (const auto& file : bamFiles) {
+    for (auto& file : bamFiles) {
         if (filter.IsEmpty())
-            readers.emplace_back(std::make_unique<BamReader>(file));
+            readers.emplace_back(std::make_unique<BamReader>(std::move(file)));
         else
-            readers.emplace_back(std::make_unique<PbiIndexedBamReader>(filter, file));
+            readers.emplace_back(std::make_unique<PbiIndexedBamReader>(filter, std::move(file)));
     }
     assert(!readers.empty());
+    return readers;
+}
+
+std::unique_ptr<ICollator> MakeCollator(std::vector<std::unique_ptr<BamReader>> readers,
+                                        const bool isCoordinateSorted = false)
+{
+    if (isCoordinateSorted)
+        return std::make_unique<AlignedCollator>(std::move(readers));
+    else
+        return std::make_unique<QNameCollator>(std::move(readers));
+}
+
+std::unique_ptr<IRecordWriter> MakeBamWriter(const std::vector<std::unique_ptr<BamReader>>& readers,
+                                             const std::string& outputFilename,
+                                             const bool createPbi, const ProgramInfo& pgInfo)
+{
+    if (outputFilename.empty())
+        throw std::runtime_error{"no output BAM filename provide to BamFileMerger"};
 
     // read headers
     std::vector<BamHeader> headers;
@@ -154,36 +167,21 @@ void MergeImpl(std::vector<BamFile> bamFiles, const std::string& outputFilename,
     // merge headers
     BamHeader mergedHeader = headers.at(0);
     const std::string usingSortOrder = mergedHeader.SortOrder();
-    const bool isCoordinateSorted = (usingSortOrder == "coordinate");
     for (size_t i = 1; i < headers.size(); ++i) {
         const auto& header = headers.at(i);
         if (header.SortOrder() != usingSortOrder)
             throw std::runtime_error{"BAM file sort orders do not match, aborting merge"};
         mergedHeader += header;
     }
+
+    // maybe add program info
     if (pgInfo.IsValid()) mergedHeader.AddProgram(pgInfo);
 
-    // setup collator - sort order?
-    //
-    // NOTE: collator takes ownership of readers
-    //
-    std::unique_ptr<ICollator> collator;
-    if (isCoordinateSorted)
-        collator = std::make_unique<AlignedCollator>(std::move(readers));
-    else
-        collator = std::make_unique<QNameCollator>(std::move(readers));
-
-    // setup writer - PBI-on-the-fly?
-    std::unique_ptr<IRecordWriter> writer;
+    // create BAM writer (PBI-on-the-fly?)
     if (createPbi)
-        writer = std::make_unique<IndexedBamWriter>(outputFilename, mergedHeader);
+        return std::make_unique<IndexedBamWriter>(outputFilename, mergedHeader);
     else
-        writer = std::make_unique<BamWriter>(outputFilename, mergedHeader);
-
-    // write collated records
-    BamRecord record;
-    while (collator->GetNext(record))
-        writer->Write(record);
+        return std::make_unique<BamWriter>(outputFilename, mergedHeader);
 }
 
 }  // namespace anonymous
@@ -196,14 +194,64 @@ void BamFileMerger::Merge(const std::vector<std::string>& bamFilenames,
     for (const auto& fn : bamFilenames)
         bamFiles.emplace_back(fn);
 
-    MergeImpl(std::move(bamFiles), outputFilename, PbiFilter{}, createPbi, pgInfo);
+    auto readers = MakeBamReaders(std::move(bamFiles));
+    const bool isCoordinateSorted = readers.front()->Header().SortOrder() == "coordinate";
+
+    auto writer = MakeBamWriter(readers, outputFilename, createPbi, pgInfo);
+    auto collator = MakeCollator(std::move(readers), isCoordinateSorted);
+
+    BamRecord record;
+    while (collator->GetNext(record))
+        writer->Write(record);
 }
 
 void BamFileMerger::Merge(const DataSet& dataset, const std::string& outputFilename, bool createPbi,
                           const ProgramInfo& pgInfo)
 {
-    MergeImpl(dataset.BamFiles(), outputFilename, PbiFilter::FromDataSet(dataset), createPbi,
-              pgInfo);
+    std::vector<BamFile> bamFiles = dataset.BamFiles();
+    if (bamFiles.empty()) throw std::runtime_error{"no input filenames provided to BamFileMerger"};
+
+    auto readers = MakeBamReaders(std::move(bamFiles), PbiFilter::FromDataSet(dataset));
+    const bool isCoordinateSorted = readers.front()->Header().SortOrder() == "coordinate";
+
+    auto writer = MakeBamWriter(readers, outputFilename, createPbi, pgInfo);
+    auto collator = MakeCollator(std::move(readers), isCoordinateSorted);
+
+    BamRecord record;
+    while (collator->GetNext(record))
+        writer->Write(record);
+}
+
+void BamFileMerger::Merge(const std::vector<std::string>& bamFilenames, IRecordWriter& writer)
+{
+    std::vector<BamFile> bamFiles;
+    for (const auto& fn : bamFilenames)
+        bamFiles.emplace_back(fn);
+    if (bamFiles.empty()) throw std::runtime_error{"no input filenames provided to BamFileMerger"};
+
+    auto readers = MakeBamReaders(std::move(bamFiles));
+    const bool isCoordinateSorted = readers.front()->Header().SortOrder() == "coordinate";
+
+    auto collator = MakeCollator(std::move(readers), isCoordinateSorted);
+
+    BamRecord record;
+    while (collator->GetNext(record))
+        writer.Write(record);
+}
+
+void BamFileMerger::Merge(const DataSet& dataset, IRecordWriter& writer)
+{
+    std::vector<BamFile> bamFiles = dataset.BamFiles();
+    if (bamFiles.empty()) throw std::runtime_error{"no input filenames provided to BamFileMerger"};
+
+    auto readers = MakeBamReaders(std::move(bamFiles), PbiFilter::FromDataSet(dataset));
+    const bool isCoordinateSorted = readers.front()->Header().SortOrder() == "coordinate";
+
+    auto collator = MakeCollator(std::move(readers), isCoordinateSorted);
+
+    BamRecord record;
+    while (collator->GetNext(record))
+        writer.Write(record);
 }
 
 }  // namespace BAM
