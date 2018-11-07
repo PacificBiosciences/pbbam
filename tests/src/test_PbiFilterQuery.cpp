@@ -482,6 +482,86 @@ TEST(PbiFilterQueryTest, BarcodeQualityFromXml)
     }
 }
 
+TEST(PbiFilterQueryTest, ReadGroupFilterFromXml)
+{
+    const BamFile file{PbbamTestsConfig::Data_Dir + "/phi29.bam"};
+    const std::string xmlHeader = R"_XML_(
+        <?xml version="1.0" encoding="utf-8"?>
+        <pbds:SubreadSet
+           xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd"
+           xmlns:pbsample="http://pacificbiosciences.com/PacBioSampleInfo.xsd"
+           xmlns:pbmeta="http://pacificbiosciences.com/PacBioCollectionMetadata.xsd"
+           xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd"
+           xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd"
+           UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe519c"
+           TimeStampedName="subreadset_150304_231155"
+           MetaType="PacBio.DataSet.SubreadSet"
+           Name="DataSet_SubreadSet"
+           Tags=""
+           Version="3.0.0"
+           CreatedAt="2015-01-27T09:00:01">
+        <pbbase:ExternalResources>
+           <pbbase:ExternalResource
+               UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5193"
+               TimeStampedName="subread_bam_150304_231155"
+               MetaType="PacBio.SubreadFile.SubreadBamFile"
+               ResourceId="phi29.bam">
+               <pbbase:FileIndices>
+                   <pbbase:FileIndex
+                       UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5194"
+                       TimeStampedName="bam_index_150304_231155"
+                       MetaType="PacBio.Index.PacBioIndex"
+                       ResourceId="phi29.bam.pbi"/>
+               </pbbase:FileIndices>
+           </pbbase:ExternalResource>
+        </pbbase:ExternalResources>
+        <pbds:Filters>
+            <pbds:Filter>
+                <pbbase:Properties>)_XML_";
+
+    const std::string xmlFooter = R"_XML_(
+                </pbbase:Properties>
+            </pbds:Filter>
+        </pbds:Filters>
+        </pbds:SubreadSet>
+        )_XML_";
+
+    {  // equal
+        const std::string xmlProperty =
+            R"_XML_(<pbbase:Property Name="qid" Operator="==" Value="-1453990154"/>\n)_XML_";
+        const std::string xml = xmlHeader + xmlProperty + xmlFooter;
+        const DataSet ds = DataSet::FromXml(xml);
+        const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(120, numReads);
+
+        size_t observedReadCount = 0;
+        for (const auto& r : query) {
+            UNUSED(r);
+            ++observedReadCount;
+        }
+        EXPECT_EQ(120, observedReadCount);
+    }
+    {  // not equal
+        const std::string xmlProperty =
+            R"_XML_(<pbbase:Property Name="qid" Operator="!=" Value="-1453990154"/>\n)_XML_";
+        const std::string xml = xmlHeader + xmlProperty + xmlFooter;
+        const DataSet ds = DataSet::FromXml(xml);
+        const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(0, numReads);
+
+        size_t observedReadCount = 0;
+        for (const auto& r : query) {
+            UNUSED(r);
+            ++observedReadCount;
+        }
+        EXPECT_EQ(0, observedReadCount);
+    }
+}
+
 TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
 {
     const BamFile file{PbbamTestsConfig::Data_Dir + "/phi29.bam"};

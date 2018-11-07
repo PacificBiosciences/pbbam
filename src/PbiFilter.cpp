@@ -48,6 +48,7 @@ enum class BuiltIn
   , NumInsertedBasesFilter
   , NumMatchesFilter
   , NumMismatchesFilter
+  , QIdFilter
   , QueryEndFilter
   , QueryLengthFilter
   , QueryNameFilter
@@ -81,6 +82,7 @@ static const std::unordered_map<std::string, BuiltIn> builtInLookup =
     { "identity",      BuiltIn::IdentityFilter },
     { "cx",            BuiltIn::LocalContextFilter },
     { "movie",         BuiltIn::MovieNameFilter },
+    { "qid",           BuiltIn::QIdFilter },
     { "qe",            BuiltIn::QueryEndFilter },
     { "qend",          BuiltIn::QueryEndFilter },
     { "length",        BuiltIn::QueryLengthFilter },
@@ -221,6 +223,31 @@ static PbiFilter CreateMovieNameFilter(std::string value, const Compare::Type co
         return PbiMovieNameFilter{std::move(tokens), compareType};
     } else
         return PbiMovieNameFilter{value, compareType};
+}
+
+static PbiFilter CreateQIdFilter(std::string value, const Compare::Type compareType)
+{
+    if (value.empty()) throw std::runtime_error{"empty value for qid property"};
+
+    if (isBracketed(value)) {
+        value.erase(0, 1);
+        value.pop_back();
+    }
+
+    if (isList(value)) {
+
+        if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
+            throw std::runtime_error{"unsupported compare type on qid property"};
+
+        std::vector<int32_t> rgIds;
+        for (const auto& t : internal::Split(value, ','))
+            rgIds.push_back(static_cast<int32_t>(std::stoul(t)));
+        return PbiReadGroupFilter{rgIds, compareType};
+    } else {
+        const auto n = static_cast<int32_t>(std::stoul(value));
+        return PbiReadGroupFilter{n, compareType};
+    }
+
 }
 
 static PbiFilter CreateQueryNamesFilterFromFile(const std::string& value, const DataSet& dataset, const Compare::Type compareType)
@@ -407,6 +434,7 @@ static PbiFilter FromDataSetProperty(const Property& property, const DataSet& da
             case BuiltIn::BarcodeReverseFilter : return CreateBarcodeReverseFilter(value, compareType);
             case BuiltIn::LocalContextFilter   : return CreateLocalContextFilter(value, compareType);
             case BuiltIn::MovieNameFilter      : return CreateMovieNameFilter(value, compareType);
+            case BuiltIn::QIdFilter            : return CreateQIdFilter(value, compareType);
             case BuiltIn::QueryNameFilter      : return CreateQueryNameFilter(value, dataset, compareType);
             case BuiltIn::ReadGroupFilter      : return CreateReadGroupFilter(value, compareType);
             case BuiltIn::ReferenceIdFilter    : return CreateReferenceIdFilter(value, compareType);
