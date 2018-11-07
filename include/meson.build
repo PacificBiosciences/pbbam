@@ -9,6 +9,7 @@ if not meson.is_subproject()
       'pbbam/AlignmentPrinter.h',
       'pbbam/BaiIndexedBamReader.h',
       'pbbam/BamFile.h',
+      'pbbam/BamFileMerger.h',
       'pbbam/BamHeader.h',
       'pbbam/BamReader.h',
       'pbbam/BamRecord.h',
