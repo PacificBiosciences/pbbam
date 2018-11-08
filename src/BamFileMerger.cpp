@@ -86,17 +86,19 @@ struct QNameSorter
         const BamRecord& r = rhs.record;
 
         // movie name
-        std::string lMovieName, rMovieName; // TODO(CD): memoize movienames?
+        std::string lMovieName, rMovieName;  // TODO(CD): memoize movienames?
         try {
             lMovieName = l.MovieName();
         } catch (std::runtime_error const& err) {
-            std::string msg{lhs.reader->Filename() + ": Could not get MovieName for BamFile. " + err.what()};
+            std::string msg{lhs.reader->Filename() + ": Could not get MovieName for BamFile. " +
+                            err.what()};
             throw std::runtime_error(msg);
         }
         try {
             rMovieName = r.MovieName();
         } catch (std::runtime_error const& err) {
-            std::string msg{lhs.reader->Filename() + ": Could not get MovieName for BamFile. " + err.what()};
+            std::string msg{lhs.reader->Filename() + ": Could not get MovieName for BamFile. " +
+                            err.what()};
             throw std::runtime_error(msg);
         }
         const int cmp = lMovieName.compare(rMovieName);
