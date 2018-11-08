@@ -1592,7 +1592,18 @@ BamRecord& BamRecord::MergeQV(const QualityValues& mergeQVs)
     return *this;
 }
 
-std::string BamRecord::MovieName() const { return ReadGroup().MovieName(); }
+std::string BamRecord::MovieName() const
+{
+    const auto& rgId = ReadGroupId();
+    if (!rgId.empty())
+        return header_.ReadGroup(rgId).MovieName();
+    else {
+        const auto nameParts = internal::Split(FullName(), '/');
+        if (nameParts.empty())
+            throw std::runtime_error{"BAM record has invalid name: '" + FullName() + "'"};
+        return nameParts[0];
+    }
+}
 
 size_t BamRecord::NumDeletedBases() const
 {
