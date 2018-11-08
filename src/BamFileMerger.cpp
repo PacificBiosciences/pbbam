@@ -86,7 +86,20 @@ struct QNameSorter
         const BamRecord& r = rhs.record;
 
         // movie name
-        const int cmp = l.MovieName().compare(r.MovieName());
+        std::string lMovieName, rMovieName; // TODO(CD): memoize movienames?
+        try {
+            lMovieName = l.MovieName();
+        } catch (std::runtime_error const& err) {
+            std::string msg{lhs.reader->Filename() + ": Could not get MovieName for BamFile. " + err.what()};
+            throw std::runtime_error(msg);
+        }
+        try {
+            rMovieName = r.MovieName();
+        } catch (std::runtime_error const& err) {
+            std::string msg{lhs.reader->Filename() + ": Could not get MovieName for BamFile. " + err.what()};
+            throw std::runtime_error(msg);
+        }
+        const int cmp = lMovieName.compare(rMovieName);
         if (cmp != 0) return cmp < 0;
 
         // hole number
