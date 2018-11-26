@@ -87,8 +87,10 @@ public:
     std::unique_ptr<samFile, internal::HtslibFileDeleter> RawOpen() const
     {
         std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
-        if (!f || !f->fp.bgzf) throw std::runtime_error{"could not open BAM file: " + filename_};
-        if (f->format.format != bam) throw std::runtime_error{"expected BAM, unknown format"};
+        if (!f || !f->fp.bgzf)
+            throw std::runtime_error{"could not open BAM file: '" + filename_ + "'"};
+        if (f->format.format != bam)
+            throw std::runtime_error{"expected BAM, unknown format in: '" + filename_ + "'"};
         return f;
     }
 
