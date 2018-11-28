@@ -282,9 +282,7 @@ public:
         if (!tempFile_)
             throw std::runtime_error{"index builder could not open temp file: " + tempFilename_};
 
-        // TODO: come back to this
-        //        if (isCoordinateSorted && numReferenceSequences > 0)
-        //            refDataBuilder_ = std::make_unique<PbiReferenceDataBuilder2>(numReferenceSequences);
+        // TODO: setup for ref data building
     }
 
     void AddRecord(const BamRecord& b, const int64_t uOffset)
@@ -750,7 +748,7 @@ public:
         if (!header_) throw std::runtime_error{"null header"};
 
         // open output BAM
-        const auto usingFilename = bamFilename_;  //= TempFilename();
+        const auto usingFilename = bamFilename_;
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
         bam_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
         if (!bam_) throw std::runtime_error{"could not open file for writing"};

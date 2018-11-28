@@ -244,8 +244,6 @@ std::vector<std::string> DataSet::ResolvedResourceIds() const
     std::vector<std::string> result;
     result.reserve(resources.Size());
     for (const ExternalResource& ext : resources) {
-        //        const string fn = ;
-        //        const string fn = internal::FileUtils::ResolvedFilePath(ext.ResourceId(), path_);
         result.push_back(ResolvePath(ext.ResourceId()));
     }
     return result;

@@ -296,57 +296,7 @@ void ValidateRecordTagLengths(const BamRecord& b, std::unique_ptr<ValidationErro
             errors->AddTagLengthError(name, "IPD", "ip", b.IPD().size(), expectedLength);
     }
 
-    // NOTE: disabling "internal" tag checks for now, only checking "standard"
-    //       PacBioBAM tags
-
-    //    if (b.HasAltLabelQV()) {
-    //        if (b.AltLabelQV().size() != expectedLength)
-    //            errors->AddTagLengthError(name, "AltLabelQV", "pv", b.AltLabelQV().size(), expectedLength);
-    //    }
-    //    if (b.HasAltLabelTag()) {
-    //        if (b.AltLabelTag().size() != expectedLength)
-    //            errors->AddTagLengthError(name, "AltLabelTag", "pt", b.AltLabelTag().size(), expectedLength);
-    //    }
-    //    if (b.HasLabelQV()) {
-    //        if (b.LabelQV().size() != expectedLength)
-    //            errors->AddTagLengthError(name, "LabelQV", "pq", b.LabelQV().size(), expectedLength);
-    //    }
-    //    if (b.HasPkmean()) {
-    //        if (b.Pkmean().size() != expectedLength)
-    //            errors->AddTagLengthError(name, "Pkmean", "pa", b.Pkmean().size(), expectedLength);
-    //    }
-    //    if (b.HasPkmean2()) {
-    //        if (b.Pkmean2().size() != expectedLength)
-    //            errors->AddTagLengthError(name, "Pkmean2", "ps", b.Pkmean2().size(), expectedLength);
-    //    }
-    //    if (b.HasPkmid()) {
-    //        if (b.Pkmid().size() != expectedLength)
-    //            errors->AddTagLengthError(name, "Pkmid", "pm", b.Pkmid().size(), expectedLength);
-    //    }
-    //    if (b.HasPkmid2()) {
-    //        if (b.Pkmid2().size() != expectedLength)
-    //            errors->AddTagLengthError(name, "Pkmid2", "pi", b.Pkmid2().size(), expectedLength);
-    //    }
-    //    if (b.HasPrePulseFrames()) {
-    //        if (b.PrePulseFrames().size() != expectedLength)
-    //            errors->AddTagLengthError(name, "PrePulseFrames", "pd", b.PrePulseFrames().size(), expectedLength);
-    //    }
-    //    if (b.HasPulseCall()) {
-    //        if (b.PulseCall().size() != expectedLength)
-    //            errors->AddTagLengthError(name, "PulseCall", "pc", b.PulseCall().size(), expectedLength);
-    //    }
-    //    if (b.HasPulseCallWidth()) {
-    //        if (b.PulseCallWidth().size() != expectedLength)
-    //            errors->AddTagLengthError(name, "PulseCallWidth", "px", b.PulseCallWidth().size(), expectedLength);
-    //    }
-    //    if (b.HasPulseMergeQV()) {
-    //        if (b.PulseMergeQV().size() != expectedLength)
-    //            errors->AddTagLengthError(name, "PulseMergeQV", "pg", b.PulseMergeQV().size(), expectedLength);
-    //    }
-    //    if (b.HasPulseWidth()) {
-    //        if (b.PulseWidth().size() != expectedLength)
-    //            errors->AddTagLengthError(name, "PulseWidth", "pw", b.PulseWidth().size(), expectedLength);
-    //    }
+    // NOTE: disabling "internal" tag checks for now, only production tags
 }
 
 void ValidateUnmappedRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)

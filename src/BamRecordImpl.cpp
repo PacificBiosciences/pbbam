@@ -243,9 +243,6 @@ bool BamRecordImpl::HasTag(const std::string& tagName) const
 {
     if (tagName.size() != 2) return false;
     return TagOffset(tagName) != -1;
-
-    // 27635
-    //    return bam_aux_get(d_.get(), tagName.c_str()) != 0;
 }
 
 bool BamRecordImpl::HasTag(const BamRecordTag tag) const

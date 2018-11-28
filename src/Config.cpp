@@ -19,13 +19,8 @@
 namespace PacBio {
 namespace BAM {
 
-// Initialized to -1 to indicate default. Client code may set this or not.
-//
-// To respect client code or else fallback to default[OFF], this value should be used like this:
-//
-//    hts_verbose = ( PacBio::BAM::HtslibVerbosity == -1 ? 0 : PacBio::BAM::HtslibVerbosity);
-//
-//
+// Initialized to -1 to indicate default. We will set this to HTS_LOG_OFF unless
+// client code overrides. This keeps htslib from polluting stdout/stderr on its own.
 //
 int HtslibVerbosity = -1;
 
