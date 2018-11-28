@@ -690,12 +690,6 @@ BamRecord& BamRecord::ClipToQuery(const Position start, const Position end)
             const bool consumesQuery = internal::ConsumesQuery(firstOp.Type());
             const bool consumesRef = internal::ConsumesReference(firstOp.Type());
 
-            // if (!consumesQuery)
-            //    just pop (e.g. deletion) ?
-            // else {
-            //    check bounds, like clip to reference ?
-            // }
-
             // CIGAR op ends at or before clip
             if (firstOpLength <= remaining) {
                 cigar.erase(cigar.begin());
@@ -745,7 +739,6 @@ BamRecord& BamRecord::ClipToQuery(const Position start, const Position end)
     // TODO: update name to reflect new QS/QE ???
     internal::CreateOrEdit(BamRecordTag::QUERY_START, start, &impl_);
     internal::CreateOrEdit(BamRecordTag::QUERY_END, end, &impl_);
-    //    UpdateName();
 
     // reset any cached aligned start/end
     ResetCachedPositions();
@@ -880,7 +873,6 @@ BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
     // update query start/end
     internal::CreateOrEdit(BamRecordTag::QUERY_START, qStart, &impl_);
     internal::CreateOrEdit(BamRecordTag::QUERY_END, qEnd, &impl_);
-    //    UpdateName();
 
     // reset any cached aligned start/end
     ResetCachedPositions();

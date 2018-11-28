@@ -189,8 +189,7 @@ void BamRecordBuilder::Reset(BamRecord prototype)
     tags_ = impl.Tags();
 
     // reset core data
-    const auto rawData =
-        internal::BamRecordMemory::GetRawData(prototype);  //  prototype.impl_.RawData().get();
+    const auto rawData = internal::BamRecordMemory::GetRawData(prototype);
     if (!rawData) throw std::runtime_error{"BamRecord memory in invalid state"};
     core_ = std::move(rawData->core);
 }

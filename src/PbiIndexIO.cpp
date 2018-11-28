@@ -246,8 +246,6 @@ void PbiIndexIO::LoadReferenceData(PbiRawReferenceData& referenceData, BGZF* fp)
     referenceData.entries_.clear();
     referenceData.entries_.resize(numRefs);
     for (auto& entry : referenceData.entries_) {
-        //    for (size_t i = 0; i < numRefs; ++i) {
-        //        PbiReferenceEntry& entry = referenceData.entries_[i];
         ret = bgzf_read(fp, &entry.tId_, 4);
         ret = bgzf_read(fp, &entry.beginRow_, 4);
         ret = bgzf_read(fp, &entry.endRow_, 4);
