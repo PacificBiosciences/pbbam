@@ -27,7 +27,7 @@ public:
 
     // Initializes FileProducer with specified target filename. Temp filename is
     // set to target filename plus ".tmp" suffix.
-    FileProducer(std::string targetFilename);
+    explicit FileProducer(std::string targetFilename);
 
     // Initializes FileProducer with specified target filename & explicit temp
     // filename.

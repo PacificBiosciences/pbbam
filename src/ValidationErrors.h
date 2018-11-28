@@ -37,7 +37,7 @@ public:
     static const size_t MAX = std::numeric_limits<size_t>::max();
 
 public:
-    ValidationErrors(const size_t maxNumErrors = ValidationErrors::MAX);
+    explicit ValidationErrors(const size_t maxNumErrors = ValidationErrors::MAX);
 
 public:
     void AddFileError(const std::string& fn, std::string details);

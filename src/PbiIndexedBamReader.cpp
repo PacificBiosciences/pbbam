@@ -23,7 +23,7 @@ namespace internal {
 struct PbiIndexedBamReaderPrivate
 {
 public:
-    PbiIndexedBamReaderPrivate(const std::string& pbiFilename)
+    explicit PbiIndexedBamReaderPrivate(const std::string& pbiFilename)
         : index_{pbiFilename}, currentBlockReadCount_{0}, numMatchingReads_{0}
     {
     }
