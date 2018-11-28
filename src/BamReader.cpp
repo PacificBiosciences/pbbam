@@ -29,7 +29,7 @@ namespace internal {
 struct BamReaderPrivate
 {
 public:
-    BamReaderPrivate(BamFile bamFile) : bamFile_{std::move(bamFile)} { DoOpen(); }
+    explicit BamReaderPrivate(BamFile bamFile) : bamFile_{std::move(bamFile)} { DoOpen(); }
 
     void DoOpen()
     {

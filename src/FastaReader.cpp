@@ -28,7 +28,7 @@ struct FastaReaderPrivate
     std::string name_;
     std::string bases_;
 
-    FastaReaderPrivate(const std::string& fn) : stream_{fn}
+    explicit FastaReaderPrivate(const std::string& fn) : stream_{fn}
     {
         if (!stream_)
             throw std::runtime_error{"FastaReader - could not open " + fn + " for reading"};

@@ -26,7 +26,7 @@ public:
     ///
     /// \param pulseCalls[in]   string contents of 'pc' tag
     ///
-    Pulse2BaseCache(const std::string& pulseCalls) : data_(pulseCalls.size())
+    explicit Pulse2BaseCache(const std::string& pulseCalls) : data_(pulseCalls.size())
     {
         // basecalled pulse -> data[i] == 1
         // squashed pulse   -> data[i] == 0

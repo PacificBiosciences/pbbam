@@ -27,7 +27,7 @@ public:
     Version(int major, int minor, int revision);
 
     // string must be "<major>.<minor>.<version>"
-    Version(const std::string& v);
+    explicit Version(const std::string& v);
 
     Version(const Version&) = default;
     Version(Version&&) = default;
@@ -45,7 +45,7 @@ public:
 
 public:
     std::string ToString() const;
-    operator std::string() const;
+    explicit operator std::string() const;
 
 public:
     int Major() const;

@@ -34,7 +34,7 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    VirtualZmwCompositeReader(const DataSet& dataset);
+    explicit VirtualZmwCompositeReader(const DataSet& dataset);
 
     VirtualZmwCompositeReader() = delete;
     VirtualZmwCompositeReader(const VirtualZmwCompositeReader&) = delete;

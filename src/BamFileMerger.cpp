@@ -65,7 +65,7 @@ protected:
     std::deque<internal::CompositeMergeItem> mergeItems_;
 
 protected:
-    ICollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>> readers)
+    explicit ICollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>> readers)
     {
         for (auto&& reader : readers) {
             auto item = internal::CompositeMergeItem{std::move(reader)};
@@ -123,7 +123,7 @@ struct QNameSorter
 class QNameCollator : public ICollator
 {
 public:
-    QNameCollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>> readers)
+    explicit QNameCollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>> readers)
         : ICollator(std::move(readers))
     {
         UpdateSort();
@@ -135,7 +135,8 @@ public:
 class AlignedCollator : public ICollator
 {
 public:
-    AlignedCollator(std::vector<std::unique_ptr<BamReader>> readers) : ICollator(std::move(readers))
+    explicit AlignedCollator(std::vector<std::unique_ptr<BamReader>> readers)
+        : ICollator(std::move(readers))
     {
         UpdateSort();
     }
