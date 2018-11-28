@@ -54,6 +54,7 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation o
         std::string prettyWrap(maxCoordLength + 3, ' ');
         prettyWrap.reserve(seq.size());
 
+        // clang-format off
         for (int j = 0; i < seq.size() && j < 40; ++i, ++j) {
             refWrap += ref[i];
 
@@ -62,9 +63,9 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation o
                 if (refCoord == 0 || refCoord % 10)
                     prettyWrap += '|';
                 else {
-                    prettyWrap += "\033[1m\x1b[31m";
+                    prettyWrap += "\033" "[1m" "\x1b" "[31m";
                     prettyWrap += '|';
-                    prettyWrap += "\033[0m\x1b[39;49m";
+                    prettyWrap += "\033" "[0m" "\x1b" "[39;49m";
                 }
                 seqWrap += seq[i];
             } else if (seq[i] == '-' || ref[i] == '-') {
@@ -72,9 +73,9 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation o
                 seqWrap += seq[i];
             } else {
                 prettyWrap += '.';
-                seqWrap += "\033[1m\x1b[31m";
+                seqWrap += "\033" "[1m" "\x1b" "[31m";
                 seqWrap += seq[i];
-                seqWrap += "\033[0m\x1b[39;49m";
+                seqWrap += "\033" "[0m" "\x1b" "[39;49m";
             }
             if (seq[i] != '-') {
                 ++seqLength;
@@ -84,6 +85,7 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation o
                 ++refCoord;
             }
         }
+        // clang-format on
 
         refCoordStr = std::to_string(refCoord);
         seqCoordStr = std::to_string(seqCoord);
