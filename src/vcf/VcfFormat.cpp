@@ -434,6 +434,22 @@ std::vector<InfoField> VcfFormat::ParsedInfoFields(const std::string& text)
     return result;
 }
 
+GenotypeField VcfFormat::ParsedGenotypeField(const std::string& field)
+{
+    GenotypeField result;
+    const auto fieldValues = PacBio::BAM::Split(field, ':');
+    for (const auto& fieldValue : fieldValues) {
+        GenotypeData data;
+        const auto genotypeDataValues = PacBio::BAM::Split(fieldValue, ',');
+        if (genotypeDataValues.size() == 1)
+            data.value = genotypeDataValues.at(0);
+        else
+            data.values = genotypeDataValues;
+        result.data.push_back(std::move(data));
+    }
+    return result;
+}
+
 VcfVariant VcfFormat::ParsedVariant(const std::string& line)
 {
     const auto fields = PacBio::BAM::Split(line, '\t');
@@ -463,34 +479,12 @@ VcfVariant VcfFormat::ParsedVariant(const std::string& line)
 
     // GENOTYPE (samples)
     if (fields.size() > 9) {
-        std::vector<std::string> genotypeIds;
-        const auto& formatField = fields.at(8);
-        const auto formatFields = PacBio::BAM::Split(formatField, ':');
-        for (auto&& genotypeId : formatFields)
-            genotypeIds.push_back(genotypeId);
-        var.GenotypeIds(std::move(genotypeIds));
+        var.GenotypeIds(PacBio::BAM::Split(fields.at(8), ':'));
 
-        // per-sample
-        std::vector<GenotypeField> sampleGenotypes;
-        for (size_t i = 9; i < fields.size(); ++i) {
-
-            GenotypeField g;
-
-            const auto& sampleField = fields.at(i);
-            const auto fieldValues = PacBio::BAM::Split(sampleField, ':');
-            for (const auto fieldValue : fieldValues) {
-                GenotypeData data;
-                const auto genotypeDataValues = PacBio::BAM::Split(fieldValue, ',');
-                if (genotypeDataValues.size() == 1)
-                    data.value = genotypeDataValues.at(0);
-                else
-                    data.values = genotypeDataValues;
-                g.data.push_back(std::move(data));
-            }
-
-            sampleGenotypes.push_back(std::move(g));
-        }
-        var.Genotypes(std::move(sampleGenotypes));
+        std::vector<GenotypeField> genotypes;
+        for (size_t i = 9; i < fields.size(); ++i)
+            genotypes.emplace_back(ParsedGenotypeField(fields.at(i)));
+        var.Genotypes(std::move(genotypes));
     }
 
     return var;
@@ -500,30 +494,36 @@ std::string VcfFormat::FormattedInfoField(const InfoField& field)
 {
     std::ostringstream out;
     out << field.id;
-    if (field.value.is_initialized()) {
+    if (field.value.is_initialized())
         out << '=' << field.value.get();
-    } else if (field.values.is_initialized()) {
-        out << '=';
-        bool first = true;
-        for (const auto& value : field.values.get()) {
-            if (!first) out << ',';
-            out << value;
-            first = false;
-        }
-    }
+    else if (field.values.is_initialized())
+        out << '=' << PacBio::BAM::Join(field.values.get(), ',');
     return out.str();
 }
 
 std::string VcfFormat::FormattedInfoFields(const std::vector<InfoField>& fields)
 {
-    std::ostringstream out;
-    bool first = true;
-    for (const auto field : fields) {
-        if (!first) out << ';';
-        out << FormattedInfoField(field);
-        first = false;
+    std::vector<std::string> result;
+    for (const auto& field : fields)
+        result.push_back(FormattedInfoField(field));
+    return PacBio::BAM::Join(result, ';');
+}
+
+std::string VcfFormat::FormattedGenotypeField(const GenotypeField& field)
+{
+    std::string result;
+    bool firstDataEntry = true;
+    for (const auto& d : field.data) {
+        if (!firstDataEntry) result += ':';
+        if (d.value.is_initialized())
+            result += d.value.get();
+        else {
+            assert(d.values.is_initialized());
+            result += PacBio::BAM::Join(d.values.get(), ',');
+        }
+        firstDataEntry = false;
     }
-    return out.str();
+    return result;
 }
 
 std::string VcfFormat::FormattedVariant(const VcfVariant& var)
@@ -536,34 +536,10 @@ std::string VcfFormat::FormattedVariant(const VcfVariant& var)
 
     const auto& genotypeIds = var.GenotypeIds();
     if (!genotypeIds.empty()) {
-        out << '\t';
-        bool firstId = true;
-        for (const auto id : genotypeIds) {
-            if (!firstId) out << ':';
-            out << id;
-            firstId = false;
-        }
-
-        const auto& sampleGenotypes = var.Genotypes();
-        for (const auto sampleGenotype : sampleGenotypes) {
-            out << '\t';
-            bool firstDataEntry = true;
-            for (const auto& d : sampleGenotype.data) {
-                if (!firstDataEntry) out << ':';
-                if (d.value.is_initialized())
-                    out << d.value.get();
-                else {
-                    assert(d.values.is_initialized());
-                    bool firstDatapoint = true;
-                    for (const auto& datapoint : d.values.get()) {
-                        if (!firstDatapoint) out << ',';
-                        out << datapoint;
-                        firstDatapoint = false;
-                    }
-                }
-                firstDataEntry = false;
-            }
-        }
+        out << '\t' << PacBio::BAM::Join(genotypeIds, ':');
+        const auto& genotypes = var.Genotypes();
+        for (const auto& genotype : genotypes)
+            out << '\t' << FormattedGenotypeField(genotype);
     }
     return out.str();
 }
