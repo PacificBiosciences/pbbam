@@ -52,7 +52,7 @@ public:
     bool GetNext(BamRecord& r) override;
 
 private:
-    struct BarcodeQueryPrivate;
+    class BarcodeQueryPrivate;
     std::unique_ptr<BarcodeQueryPrivate> d_;
 };
 

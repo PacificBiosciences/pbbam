@@ -14,8 +14,9 @@
 namespace PacBio {
 namespace BAM {
 
-struct GenomicIntervalQuery::GenomicIntervalQueryPrivate
+class GenomicIntervalQuery::GenomicIntervalQueryPrivate
 {
+public:
     GenomicIntervalQueryPrivate(const GenomicInterval& interval, const DataSet& dataset)
         : reader_{interval, dataset}
     {

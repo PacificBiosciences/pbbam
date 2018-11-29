@@ -26,7 +26,7 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
-struct BamReaderPrivate
+class BamReaderPrivate
 {
 public:
     explicit BamReaderPrivate(BamFile bamFile) : bamFile_{std::move(bamFile)} { DoOpen(); }
@@ -38,7 +38,6 @@ public:
         if (!htsFile_) throw std::runtime_error{"could not open BAM file for reading"};
     }
 
-public:
     std::unique_ptr<samFile, internal::HtslibFileDeleter> htsFile_;
     BamFile bamFile_;
 };

@@ -17,7 +17,7 @@ namespace PacBio {
 namespace BAM {
 
 namespace internal {
-struct PbiIndexedBamReaderPrivate;
+class PbiIndexedBamReaderPrivate;
 }
 
 /// \brief The PbiIndexedBamReader class provides read-only iteration over %BAM
@@ -83,7 +83,6 @@ public:
 
     /// \}
 
-public:
     /// \name Filtering & Index Data
     /// \{
 
@@ -92,10 +91,6 @@ public:
 
     uint32_t NumReads() const;
 
-    //    /// \returns the reader's underlying index data
-    //    const PbiIndex& Index() const;
-
-public:
     /// \brief Sets a new filter on the reader.
     ///
     /// \param[in] filter

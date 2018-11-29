@@ -47,7 +47,6 @@ public:
 
     /// \}
 
-public:
     /// \name Virtual Record Attributes
     ///
 
@@ -76,7 +75,6 @@ private:
     std::vector<BamRecord> sources_;
     std::map<VirtualRegionType, std::vector<VirtualRegion>> virtualRegionsMap_;
 
-private:
     void StitchSources();
 };
 

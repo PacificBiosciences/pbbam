@@ -39,7 +39,6 @@ public:
     QNameQuery(const DataSet& dataset);
     ~QNameQuery() override;
 
-public:
     /// \brief Main iteration point for record access.
     ///
     /// Most client code should not need to use this method directly. Use
@@ -48,7 +47,7 @@ public:
     bool GetNext(std::vector<BamRecord>& records) override;
 
 private:
-    struct QNameQueryPrivate;
+    class QNameQueryPrivate;
     std::unique_ptr<QNameQueryPrivate> d_;
 };
 

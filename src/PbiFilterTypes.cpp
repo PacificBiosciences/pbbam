@@ -163,7 +163,6 @@ public:
     using ZmwLookupPtr = std::shared_ptr<ZmwLookup>;  // may be shared by more than one rgId
     using RgIdLookup = std::unordered_map<int32_t, ZmwLookupPtr>;
 
-public:
     PbiQueryNameFilterPrivate(const std::vector<std::string>& whitelist,
                               const Compare::Type cmp = Compare::EQUAL)
         : cmp_{cmp}

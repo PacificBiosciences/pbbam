@@ -15,7 +15,7 @@ namespace PacBio {
 namespace BAM {
 
 namespace internal {
-struct FastaReaderPrivate;
+class FastaReaderPrivate;
 }
 
 ///

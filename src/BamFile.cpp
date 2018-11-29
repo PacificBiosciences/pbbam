@@ -94,7 +94,6 @@ public:
         return f;
     }
 
-public:
     std::string filename_;
     BamHeader header_;
     int64_t firstAlignmentOffset_;

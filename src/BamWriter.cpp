@@ -33,12 +33,10 @@ public:
                      const BamWriter::BinCalculationMode binCalculationMode,
                      const bool useTempFile);
 
-public:
     void Write(const BamRecord& record);
     void Write(const BamRecord& record, int64_t* vOffset);
     void Write(const BamRecordImpl& recordImpl);
 
-public:
     bool calculateBins_;
     std::unique_ptr<samFile, internal::HtslibFileDeleter> file_;
     std::shared_ptr<bam_hdr_t> header_;

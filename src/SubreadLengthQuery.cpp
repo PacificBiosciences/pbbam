@@ -17,8 +17,9 @@
 namespace PacBio {
 namespace BAM {
 
-struct SubreadLengthQuery::SubreadLengthQueryPrivate
+class SubreadLengthQuery::SubreadLengthQueryPrivate
 {
+public:
     SubreadLengthQueryPrivate(const int32_t length, const Compare::Type compareType,
                               const DataSet& dataset)
         : reader_(PbiQueryLengthFilter(length, compareType), dataset)

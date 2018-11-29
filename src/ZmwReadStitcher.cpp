@@ -22,7 +22,7 @@
 namespace PacBio {
 namespace BAM {
 
-struct ZmwReadStitcher::ZmwReadStitcherPrivate
+class ZmwReadStitcher::ZmwReadStitcherPrivate
 {
 public:
     ZmwReadStitcherPrivate(std::string primaryBamFilePath, std::string scrapsBamFilePath,
@@ -72,7 +72,6 @@ public:
         OpenNextReader();
     }
 
-public:
     bool HasNext() const { return (currentReader_ && currentReader_->HasNext()); }
 
     VirtualZmwBamRecord Next()
@@ -116,7 +115,6 @@ private:
     std::unique_ptr<internal::VirtualZmwReader> currentReader_;
     PbiFilter filter_;
 
-private:
     void OpenNextReader()
     {
         currentReader_.reset(nullptr);

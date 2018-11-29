@@ -21,10 +21,11 @@
 namespace PacBio {
 namespace BAM {
 
-struct ZmwGroupQuery::ZmwGroupQueryPrivate
+class ZmwGroupQuery::ZmwGroupQueryPrivate
 {
     using ReaderType = PbiFilterCompositeBamReader<Compare::Zmw>;
 
+public:
     ZmwGroupQueryPrivate(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset)
         : whitelist_(zmwWhitelist.cbegin(), zmwWhitelist.cend())
     {
@@ -60,6 +61,7 @@ struct ZmwGroupQuery::ZmwGroupQueryPrivate
         return true;
     }
 
+private:
     std::deque<int32_t> whitelist_;
     std::unique_ptr<ReaderType> reader_;
 };

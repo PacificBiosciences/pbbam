@@ -107,10 +107,11 @@ struct PbiFieldBlock
 };
 
 template <typename T>
-struct PbiField
+class PbiField
 {
     constexpr static const size_t ElementSize = sizeof(T);
 
+public:
     PbiField(size_t maxBufferSize) : maxElementCount_{maxBufferSize / ElementSize}
     {
         buffer_.reserve(maxElementCount_);
@@ -132,10 +133,8 @@ class PbiReferenceDataBuilder
 public:
     using ReferenceRows = std::pair<int32_t, int32_t>;  // [startRow, endRow)
 
-public:
     explicit PbiReferenceDataBuilder(const size_t numReferenceSequences);
 
-public:
     bool AddRecord(const BamRecord& record, const int32_t rowNumber);
 
     PbiRawReferenceData Result() const;

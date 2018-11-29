@@ -66,7 +66,6 @@ public:
 protected:
     std::deque<internal::CompositeMergeItem> mergeItems_;
 
-protected:
     explicit ICollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>> readers)
     {
         for (auto&& reader : readers) {
@@ -165,7 +164,6 @@ std::vector<std::unique_ptr<BamReader>> MakeBamReaders(std::vector<BamFile> bamF
 std::unique_ptr<ICollator> MakeCollator(std::vector<std::unique_ptr<BamReader>> readers,
                                         const bool isCoordinateSorted = false)
 {
-
     std::unique_ptr<ICollator> collator;
     if (isCoordinateSorted)
         collator = std::make_unique<AlignedCollator>(std::move(readers));

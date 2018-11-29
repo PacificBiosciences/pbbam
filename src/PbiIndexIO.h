@@ -32,7 +32,6 @@ public:
     static void LoadFromDataSet(PbiRawData& aggregateData, const DataSet& dataset);
     static void Save(const PbiRawData& rawData, const std::string& filename);
 
-public:
     // per-component load
     static void LoadBarcodeData(PbiRawBarcodeData& barcodeData, const uint32_t numReads, BGZF* fp);
     static void LoadHeader(PbiRawData& index, BGZF* fp);
@@ -44,7 +43,6 @@ public:
     template <typename T>
     static void LoadBgzfVector(BGZF* fp, std::vector<T>& data, const uint32_t numReads);
 
-public:
     // per-component write
     static void WriteBarcodeData(const PbiRawBarcodeData& barcodeData, const uint32_t numReads,
                                  BGZF* fp);

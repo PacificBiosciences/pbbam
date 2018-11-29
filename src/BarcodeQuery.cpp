@@ -17,8 +17,9 @@
 namespace PacBio {
 namespace BAM {
 
-struct BarcodeQuery::BarcodeQueryPrivate
+class BarcodeQuery::BarcodeQueryPrivate
 {
+public:
     BarcodeQueryPrivate(const int16_t barcode, const DataSet& dataset)
         : reader_{PbiBarcodeFilter{barcode}, dataset}
     {

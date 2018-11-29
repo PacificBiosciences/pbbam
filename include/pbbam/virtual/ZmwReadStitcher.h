@@ -51,7 +51,6 @@ public:
 
     /// \}
 
-public:
     /// \name File Headers
     /// \{
 
@@ -66,7 +65,6 @@ public:
 
     /// \}
 
-public:
     /// \name Stitched Record Reading
     ///
 
@@ -84,7 +82,7 @@ public:
     /// \}
 
 private:
-    struct ZmwReadStitcherPrivate;
+    class ZmwReadStitcherPrivate;
     std::unique_ptr<ZmwReadStitcherPrivate> d_;
 };
 
