@@ -15,8 +15,9 @@
 namespace PacBio {
 namespace BAM {
 
-struct ReadAccuracyQuery::ReadAccuracyQueryPrivate
+class ReadAccuracyQuery::ReadAccuracyQueryPrivate
 {
+public:
     ReadAccuracyQueryPrivate(const Accuracy accuracy, const Compare::Type compareType,
                              const DataSet& dataset)
         : reader_{PbiReadAccuracyFilter{accuracy, compareType}, dataset}

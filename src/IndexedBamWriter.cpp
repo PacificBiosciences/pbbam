@@ -115,10 +115,11 @@ struct PbiFieldBlock2
 };
 
 template <typename T>
-struct PbiField2
+class PbiField2
 {
     constexpr static const size_t ElementSize = sizeof(T);
 
+public:
     PbiField2(size_t maxBufferSize) : maxElementCount_{maxBufferSize / ElementSize}
     {
         buffer_.reserve(maxElementCount_);
@@ -137,7 +138,6 @@ class PbiReferenceDataBuilder2
 public:
     using ReferenceRows = std::pair<int32_t, int32_t>;  // [startRow, endRow)
 
-public:
     explicit PbiReferenceDataBuilder2(const size_t numReferenceSequences)
     {
         // initialize with number of references we expect to see
@@ -152,7 +152,6 @@ public:
         rawReferenceEntries_[PbiReferenceEntry::UNMAPPED_ID] = PbiReferenceEntry{};
     }
 
-public:
     bool AddRecord(const BamRecord& record, const int32_t rowNumber)
     {
         // fetch ref ID & pos for record
@@ -682,7 +681,6 @@ private:
 
 class IndexedBamWriterPrivate2  //: public internal::FileProducer
 {
-
 public:
     IndexedBamWriterPrivate2(const std::string& outputFilename, std::shared_ptr<bam_hdr_t> header,
                              const BamWriter::CompressionLevel bamCompressionLevel,
@@ -892,7 +890,6 @@ public:
         if (ret != 0) gziStatus_ = GziStatus::GZI_ERROR;
     }
 
-public:
     void Write(const BamRecord& record)
     {
 // TODO: add API to auto-skip this without special compile flag

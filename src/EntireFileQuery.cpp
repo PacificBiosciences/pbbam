@@ -13,8 +13,9 @@
 namespace PacBio {
 namespace BAM {
 
-struct EntireFileQuery::EntireFileQueryPrivate
+class EntireFileQuery::EntireFileQueryPrivate
 {
+public:
     EntireFileQueryPrivate(const DataSet &dataset) : reader_(dataset) {}
 
     SequentialCompositeBamReader reader_;

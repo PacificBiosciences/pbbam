@@ -74,7 +74,6 @@ public:
     ///
     static bool IsValid(const BamRecord& record);
 
-public:
     Validator() = delete;
 
     /// \brief Checks that a %BAM file's header conforms to the

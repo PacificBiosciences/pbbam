@@ -45,9 +45,8 @@ public:
 
     /// \}
 
-public:
     /// \name Stitched Record Reading
-    ///
+    /// \{
 
     /// \returns true if more ZMWs/files are available for reading.
     bool HasNext();
@@ -68,7 +67,6 @@ private:
     std::unique_ptr<VirtualZmwReader> currentReader_;
     PbiFilter filter_;
 
-private:
     void OpenNextReader();
 };
 

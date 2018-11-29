@@ -22,12 +22,9 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
-struct FastaReaderPrivate
+class FastaReaderPrivate
 {
-    std::ifstream stream_;
-    std::string name_;
-    std::string bases_;
-
+public:
     explicit FastaReaderPrivate(const std::string& fn) : stream_{fn}
     {
         if (!stream_)
@@ -82,6 +79,10 @@ private:
             p = stream_.peek();
         }
     }
+
+    std::ifstream stream_;
+    std::string name_;
+    std::string bases_;
 };
 
 }  // namespace internal

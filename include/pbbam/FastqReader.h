@@ -15,7 +15,7 @@ namespace PacBio {
 namespace BAM {
 
 namespace internal {
-struct FastqReaderPrivate;
+class FastqReaderPrivate;
 }
 
 ///

@@ -65,7 +65,7 @@ public:
     const GenomicInterval& Interval() const;
 
 private:
-    struct GenomicIntervalQueryPrivate;
+    class GenomicIntervalQueryPrivate;
     std::unique_ptr<GenomicIntervalQueryPrivate> d_;
 };
 

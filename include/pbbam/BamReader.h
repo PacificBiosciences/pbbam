@@ -23,7 +23,7 @@ namespace PacBio {
 namespace BAM {
 
 namespace internal {
-struct BamReaderPrivate;
+class BamReaderPrivate;
 }
 
 /// \brief The BamReader class provides basic read-access to a %BAM file.

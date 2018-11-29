@@ -52,7 +52,7 @@ public:
     bool GetNext(BamRecord& r) override;
 
 private:
-    struct EntireFileQueryPrivate;
+    class EntireFileQueryPrivate;
     std::unique_ptr<EntireFileQueryPrivate> d_;
 };
 

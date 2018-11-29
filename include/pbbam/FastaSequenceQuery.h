@@ -40,7 +40,7 @@ public:
     bool GetNext(FastaSequence& seq) override;
 
 private:
-    struct FastaSequenceQueryPrivate;
+    class FastaSequenceQueryPrivate;
     std::unique_ptr<FastaSequenceQueryPrivate> d_;
 };
 

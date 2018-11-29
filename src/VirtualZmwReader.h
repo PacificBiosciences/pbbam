@@ -54,7 +54,6 @@ public:
     VirtualZmwReader& operator=(VirtualZmwReader&&) = delete;
     ~VirtualZmwReader();
 
-public:
     /// \returns the BamHeader associated with this reader's "primary" %BAM file
     BamHeader PrimaryHeader() const;
 
@@ -64,7 +63,6 @@ public:
     /// \return the BamHeader associated with the newly stitched BAM data
     BamHeader StitchedHeader() const;
 
-public:
     /// \returns true if more ZMWs are available for reading.
     bool HasNext();
 

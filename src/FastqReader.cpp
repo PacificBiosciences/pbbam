@@ -21,7 +21,7 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
-struct FastqReaderPrivate
+class FastqReaderPrivate
 {
 public:
     explicit FastqReaderPrivate(const std::string& fn) : stream_{fn}
@@ -71,7 +71,6 @@ private:
 
     void ReadQuals() { std::getline(stream_, quals_, '\n'); }
 
-private:
     std::ifstream stream_;
     std::string name_;
     std::string bases_;

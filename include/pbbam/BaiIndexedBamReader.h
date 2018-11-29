@@ -15,7 +15,7 @@ namespace PacBio {
 namespace BAM {
 
 namespace internal {
-struct BaiIndexedBamReaderPrivate;
+class BaiIndexedBamReaderPrivate;
 }
 
 /// \brief The BaiIndexedBamReader class provides read-only iteration over %BAM

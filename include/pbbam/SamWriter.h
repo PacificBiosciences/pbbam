@@ -63,7 +63,6 @@ public:
     SamWriter& operator=(const SamWriter&) = delete;
     SamWriter& operator=(SamWriter&&) = default;
 
-public:
     /// \brief Try to flush any buffered data to file.
     ///
     /// \note The underlying implementation may not necessarily flush buffered

@@ -43,7 +43,6 @@ public:
     Pulse2BaseCache& operator=(Pulse2BaseCache&&) = default;
     ~Pulse2BaseCache() = default;
 
-public:
     ///
     /// \brief FindFirst
     /// \return

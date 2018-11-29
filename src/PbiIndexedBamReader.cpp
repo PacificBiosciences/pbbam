@@ -20,7 +20,7 @@ namespace PacBio {
 namespace BAM {
 namespace internal {
 
-struct PbiIndexedBamReaderPrivate
+class PbiIndexedBamReaderPrivate
 {
 public:
     explicit PbiIndexedBamReaderPrivate(const std::string& pbiFilename)
@@ -107,7 +107,6 @@ public:
         return result;
     }
 
-public:
     PbiFilter filter_;
     PbiRawData index_;
     IndexResultBlocks blocks_;

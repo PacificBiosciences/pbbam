@@ -16,8 +16,9 @@
 namespace PacBio {
 namespace BAM {
 
-struct PbiFilterQuery::PbiFilterQueryPrivate
+class PbiFilterQuery::PbiFilterQueryPrivate
 {
+public:
     PbiFilterQueryPrivate(const PbiFilter& filter, const DataSet& dataset)
         : reader_{filter, dataset}
     {

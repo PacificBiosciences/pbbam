@@ -42,7 +42,6 @@ public:
 
     ~ZmwQuery();
 
-public:
     /// \brief Main iteration point for record access.
     ///
     /// Most client code should not need to use this method directly. Use
@@ -51,7 +50,7 @@ public:
     bool GetNext(BamRecord& r) override;
 
 private:
-    struct ZmwQueryPrivate;
+    class ZmwQueryPrivate;
     std::unique_ptr<ZmwQueryPrivate> d_;
 };
 

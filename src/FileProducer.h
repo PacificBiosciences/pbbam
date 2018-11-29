@@ -21,7 +21,6 @@ namespace internal {
 //
 class FileProducer
 {
-
 public:
     FileProducer() = delete;
 
@@ -42,7 +41,6 @@ public:
     //
     ~FileProducer();
 
-public:
     const std::string& TargetFilename() const { return targetFilename_; }
     const std::string& TempFilename() const { return tempFilename_; }
 

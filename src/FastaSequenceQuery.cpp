@@ -14,8 +14,9 @@
 namespace PacBio {
 namespace BAM {
 
-struct FastaSequenceQuery::FastaSequenceQueryPrivate
+class FastaSequenceQuery::FastaSequenceQueryPrivate
 {
+public:
     FastaSequenceQueryPrivate(const DataSet& dataset) : reader_{dataset} {}
 
     CompositeFastaReader reader_;
