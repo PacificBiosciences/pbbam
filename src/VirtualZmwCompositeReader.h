@@ -12,6 +12,7 @@
 #include <string>
 #include <utility>
 
+#include "VirtualStitching.h"
 #include "VirtualZmwReader.h"
 #include "pbbam/DataSet.h"
 #include "pbbam/PbiFilter.h"
@@ -63,7 +64,7 @@ public:
     /// \}
 
 private:
-    std::deque<std::pair<std::string, std::string> > sources_;
+    StitchingSources sources_;
     std::unique_ptr<VirtualZmwReader> currentReader_;
     PbiFilter filter_;
 

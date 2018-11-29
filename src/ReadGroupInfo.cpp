@@ -269,20 +269,39 @@ ReadGroupInfo::ReadGroupInfo(std::string baseId, std::pair<uint16_t, uint16_t> b
     barcodes_ = std::move(barcodes);
 }
 
+void ReadGroupInfo::DecodeBarcodeKey(const std::string& key, std::string value)
+{
+    if (key == internal::token_BF)
+        barcodeFile_ = std::move(value);
+    else if (key == internal::token_BH)
+        barcodeHash_ = std::move(value);
+    else if (key == internal::token_BC)
+        barcodeCount_ = std::stoul(value);
+    else if (key == internal::token_BM)
+        barcodeMode_ = internal::BarcodeModeFromName(value);
+    else if (key == internal::token_BQ)
+        barcodeQuality_ = internal::BarcodeQualityFromName(value);
+}
+
+void ReadGroupInfo::DecodeFrameCodecKey(const std::string& key, std::string value)
+{
+    const auto keyParts = internal::Split(key, ':');
+    if (keyParts.size() == 2) {
+        const auto& subkey = keyParts.at(0);
+        if (subkey == internal::feature_IP) {
+            ipdCodec_ = internal::FrameCodecFromName(keyParts.at(1));
+            features_[BaseFeature::IPD] = std::move(value);
+        } else if (subkey == internal::feature_PW) {
+            pulseWidthCodec_ = internal::FrameCodecFromName(keyParts.at(1));
+            features_[BaseFeature::PULSE_WIDTH] = std::move(value);
+        }
+    }
+}
+
 void ReadGroupInfo::DecodeSamDescription(const std::string& description)
 {
-    // split on semicolons
-    // for each, split on equal
-    //    determine name ->
-
     const auto tokens = internal::Split(description, ';');
     if (tokens.empty()) return;
-
-    bool hasBarcodeFile = false;
-    bool hasBarcodeHash = false;
-    bool hasBarcodeCount = false;
-    bool hasBarcodeMode = false;
-    bool hasBarcodeQuality = false;
 
     // iterate over tokens
     for (const auto& token : tokens) {
@@ -308,43 +327,15 @@ void ReadGroupInfo::DecodeSamDescription(const std::string& description)
             features_[internal::BaseFeatureFromName(key)] = std::move(value);
 
         // barcode data
-        else if (internal::IsLikelyBarcodeKey(key)) {
-            if (key == internal::token_BF) {
-                barcodeFile_ = std::move(value);
-                hasBarcodeFile = true;
-            } else if (key == internal::token_BH) {
-                barcodeHash_ = std::move(value);
-                hasBarcodeHash = true;
-            } else if (key == internal::token_BC) {
-                barcodeCount_ = std::stoul(value);
-                hasBarcodeCount = true;
-            } else if (key == internal::token_BM) {
-                barcodeMode_ = internal::BarcodeModeFromName(value);
-                hasBarcodeMode = true;
-            } else if (key == internal::token_BQ) {
-                barcodeQuality_ = internal::BarcodeQualityFromName(value);
-                hasBarcodeQuality = true;
-            }
-        }
+        else if (internal::IsLikelyBarcodeKey(key))
+            DecodeBarcodeKey(key, std::move(value));
 
         // frame codecs
-        else {
-            const auto keyParts = internal::Split(key, ':');
-            if (keyParts.size() == 2) {
-                const auto& subkey = keyParts.at(0);
-                if (subkey == internal::feature_IP) {
-                    ipdCodec_ = internal::FrameCodecFromName(keyParts.at(1));
-                    features_[BaseFeature::IPD] = std::move(value);
-                } else if (subkey == internal::feature_PW) {
-                    pulseWidthCodec_ = internal::FrameCodecFromName(keyParts.at(1));
-                    features_[BaseFeature::PULSE_WIDTH] = std::move(value);
-                }
-            }
-        }
+        else
+            DecodeFrameCodecKey(key, std::move(value));
     }
 
-    hasBarcodeData_ = (hasBarcodeFile && hasBarcodeHash && hasBarcodeCount && hasBarcodeMode &&
-                       hasBarcodeQuality);
+    hasBarcodeData_ = !barcodeFile_.empty();
 }
 
 std::string ReadGroupInfo::EncodeSamDescription() const
