@@ -19,41 +19,7 @@ namespace internal {
 VirtualZmwCompositeReader::VirtualZmwCompositeReader(const DataSet& dataset)
     : currentReader_(nullptr), filter_(PbiFilter::FromDataSet(dataset))
 {
-    // set up source queue
-    std::string primaryFn;
-    std::string scrapsFn;
-    const ExternalResources& resources = dataset.ExternalResources();
-    for (const ExternalResource& resource : resources) {
-
-        primaryFn.clear();
-        scrapsFn.clear();
-
-        // if resource is possible "primary" BAM
-        const auto& metatype = resource.MetaType();
-        if (metatype == "PacBio.SubreadFile.SubreadBamFile" ||
-            metatype == "PacBio.SubreadFile.HqRegionBamFile") {
-            // possible resolve relative path
-            primaryFn = dataset.ResolvePath(resource.ResourceId());
-
-            // check for associated scraps file
-            const auto& childResources = resource.ExternalResources();
-            for (const auto& childResource : childResources) {
-                const auto& childMetatype = childResource.MetaType();
-                if (childMetatype == "PacBio.SubreadFile.ScrapsBamFile" ||
-                    childMetatype == "PacBio.SubreadFile.HqScrapsBamFile") {
-                    // possible resolve relative path
-                    scrapsFn = dataset.ResolvePath(childResource.ResourceId());
-                    break;
-                }
-            }
-        }
-
-        // queue up source for later
-        if (!primaryFn.empty() && !scrapsFn.empty())
-            sources_.emplace_back(std::make_pair(primaryFn, scrapsFn));
-    }
-
-    // open first available source
+    sources_ = SourcesFromDataset(dataset);
     OpenNextReader();
 }
 

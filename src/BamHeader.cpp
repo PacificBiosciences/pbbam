@@ -77,6 +77,24 @@ static void EnsureCanMerge(const BamHeader& lhs, const BamHeader& rhs)
     throw std::runtime_error{e.str()};
 }
 
+void ParseHeaderLine(const std::string& line, BamHeader& hdr)
+{
+    // pop off '@HD\t', then split HD lines into tokens
+    const auto tokens = internal::Split(line.substr(4), '\t');
+    for (const auto& token : tokens) {
+        const auto tokenTag = token.substr(0, 2);
+        const auto tokenValue = token.substr(3);
+
+        // set header contents
+        if (tokenTag == BamHeaderTokenVN)
+            hdr.Version(tokenValue);
+        else if (tokenTag == BamHeaderTokenSO)
+            hdr.SortOrder(tokenValue);
+        else if (tokenTag == BamHeaderTokenpb)
+            hdr.PacBioBamVersion(tokenValue);
+    }
+}
+
 }  // namespace internal
 
 BamHeader::BamHeader(const std::string& samHeaderText)
@@ -94,23 +112,7 @@ BamHeader::BamHeader(const std::string& samHeaderText)
         firstToken = line.substr(0, 3);
 
         if (firstToken == internal::BamHeaderPrefixHD) {
-
-            // pop off '@HD\t', then split HD lines into tokens
-            const auto tokens = internal::Split(line.substr(4), '\t');
-            for (const auto& token : tokens) {
-                const auto tokenTag = token.substr(0, 2);
-                const auto tokenValue = token.substr(3);
-
-                // set header contents
-                if (tokenTag == internal::BamHeaderTokenVN)
-                    Version(tokenValue);
-                else if (tokenTag == internal::BamHeaderTokenSO)
-                    SortOrder(tokenValue);
-                else if (tokenTag == internal::BamHeaderTokenpb)
-                    PacBioBamVersion(tokenValue);
-            }
-
-            // check for required tags
+            internal::ParseHeaderLine(line, *this);
             if (Version().empty()) Version(std::string{hts_version()});
         }
 

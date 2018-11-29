@@ -24,6 +24,46 @@
 namespace PacBio {
 namespace BAM {
 
+namespace {
+
+void ClipAndGapify(std::string& subseq, const Cigar& cigar, bool exciseSoftClips)
+{
+    size_t seqIndex = 0;
+    for (const auto& op : cigar) {
+        const auto type = op.Type();
+        const auto opLength = op.Length();
+
+        // do nothing for hard clips
+        if (type == CigarOperationType::HARD_CLIP) continue;
+
+        // maybe remove soft clips
+        if (type == CigarOperationType::SOFT_CLIP) {
+            if (!exciseSoftClips) {
+                subseq.reserve(subseq.size() + opLength);
+                subseq.insert(seqIndex, opLength, '-');
+                seqIndex += opLength;
+            }
+        }
+
+        // for non-clipping operations
+        else {
+            // maybe add gaps/padding
+            if (type == CigarOperationType::INSERTION) {
+                subseq.reserve(subseq.size() + opLength);
+                subseq.insert(seqIndex, opLength, '-');
+            } else if (type == CigarOperationType::PADDING) {
+                subseq.reserve(subseq.size() + opLength);
+                subseq.insert(seqIndex, opLength, '*');
+            }
+
+            // update index
+            seqIndex += opLength;
+        }
+    }
+}
+
+}  // anonymous
+
 IndexedFastaReader::IndexedFastaReader(const std::string& filename)
 {
     if (!Open(filename)) throw std::runtime_error{"Cannot open file " + filename};
@@ -107,47 +147,12 @@ std::string IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
 
     std::string subseq = Subsequence(bamRecord.ReferenceName(), bamRecord.ReferenceStart(),
                                      bamRecord.ReferenceEnd());
-    const auto reverse = orientation != Orientation::GENOMIC && bamRecord.Impl().IsReverseStrand();
 
-    if (bamRecord.Impl().IsMapped() && gapped) {
-        size_t seqIndex = 0;
+    if (bamRecord.Impl().IsMapped() && gapped)
+        ClipAndGapify(subseq, bamRecord.Impl().CigarData(), exciseSoftClips);
 
-        const auto cigar = bamRecord.Impl().CigarData();
-        for (const auto& op : cigar) {
-            const auto type = op.Type();
-
-            // do nothing for hard clips
-            if (type != CigarOperationType::HARD_CLIP) {
-                const auto opLength = op.Length();
-
-                // maybe remove soft clips
-                if (type == CigarOperationType::SOFT_CLIP) {
-                    if (!exciseSoftClips) {
-                        subseq.reserve(subseq.size() + opLength);
-                        subseq.insert(seqIndex, opLength, '-');
-                        seqIndex += opLength;
-                    }
-                }
-
-                // for non-clipping operations
-                else {
-
-                    // maybe add gaps/padding
-                    if (type == CigarOperationType::INSERTION) {
-                        subseq.reserve(subseq.size() + opLength);
-                        subseq.insert(seqIndex, opLength, '-');
-                    } else if (type == CigarOperationType::PADDING) {
-                        subseq.reserve(subseq.size() + opLength);
-                        subseq.insert(seqIndex, opLength, '*');
-                    }
-
-                    // update index
-                    seqIndex += opLength;
-                }
-            }
-        }
-    }
-
+    const auto reverse =
+        (orientation != Orientation::GENOMIC) && bamRecord.Impl().IsReverseStrand();
     if (reverse) internal::ReverseComplementCaseSens(subseq);
 
     return subseq;
