@@ -15,10 +15,13 @@
 #include <set>
 #include <sstream>
 #include <stdexcept>
+#include <tuple>
+#include <unordered_map>
 
 #include <boost/algorithm/string.hpp>
 
 #include "ChemistryTable.h"
+#include "EnumClassHash.h"
 #include "SequenceUtils.h"
 #include "pbbam/MD5.h"
 
@@ -97,76 +100,91 @@ static const std::string platformModelType_SEQUELII{"SEQUELII"};
 // clang-format off
 static std::string BaseFeatureName(const BaseFeature& feature)
 {
-    switch (feature) {
-        case BaseFeature::DELETION_QV      : return feature_DQ;
-        case BaseFeature::DELETION_TAG     : return feature_DT;
-        case BaseFeature::INSERTION_QV     : return feature_IQ;
-        case BaseFeature::MERGE_QV         : return feature_MQ;
-        case BaseFeature::SUBSTITUTION_QV  : return feature_SQ;
-        case BaseFeature::SUBSTITUTION_TAG : return feature_ST;
-        case BaseFeature::IPD              : return feature_IP;
-        case BaseFeature::PULSE_WIDTH      : return feature_PW;
-        case BaseFeature::PKMID            : return feature_PM;
-        case BaseFeature::PKMEAN           : return feature_PA;
-        case BaseFeature::PKMID2           : return feature_PI;
-        case BaseFeature::PKMEAN2          : return feature_PS;
-        case BaseFeature::LABEL_QV         : return feature_PQ;
-        case BaseFeature::ALT_LABEL        : return feature_PT;
-        case BaseFeature::ALT_LABEL_QV     : return feature_PV;
-        case BaseFeature::PULSE_MERGE_QV   : return feature_PG;
-        case BaseFeature::PULSE_CALL       : return feature_PC;
-        case BaseFeature::PRE_PULSE_FRAMES : return feature_PD;
-        case BaseFeature::PULSE_CALL_WIDTH : return feature_PX;
-        case BaseFeature::START_FRAME      : return feature_SF;
-        case BaseFeature::PULSE_EXCLUSION  : return feature_PE;
-        default:
-            throw std::runtime_error{ "unrecognized base feature" };
-    }
+    static const std::unordered_map<BaseFeature, std::string, EnumClassHash> lookup{
+        {BaseFeature::DELETION_QV,      feature_DQ},
+        {BaseFeature::DELETION_TAG,     feature_DT},
+        {BaseFeature::INSERTION_QV,     feature_IQ},
+        {BaseFeature::MERGE_QV,         feature_MQ},
+        {BaseFeature::SUBSTITUTION_QV,  feature_SQ},
+        {BaseFeature::SUBSTITUTION_TAG, feature_ST},
+        {BaseFeature::IPD,              feature_IP},
+        {BaseFeature::PULSE_WIDTH,      feature_PW},
+        {BaseFeature::PKMID,            feature_PM},
+        {BaseFeature::PKMEAN,           feature_PA},
+        {BaseFeature::PKMID2,           feature_PI},
+        {BaseFeature::PKMEAN2,          feature_PS},
+        {BaseFeature::LABEL_QV,         feature_PQ},
+        {BaseFeature::ALT_LABEL,        feature_PT},
+        {BaseFeature::ALT_LABEL_QV,     feature_PV},
+        {BaseFeature::PULSE_MERGE_QV,   feature_PG},
+        {BaseFeature::PULSE_CALL,       feature_PC},
+        {BaseFeature::PRE_PULSE_FRAMES, feature_PD},
+        {BaseFeature::PULSE_CALL_WIDTH, feature_PX},
+        {BaseFeature::START_FRAME,      feature_SF},
+        {BaseFeature::PULSE_EXCLUSION,  feature_PE}
+    };
+
+    const auto found = lookup.find(feature);
+    if (found != lookup.cend())
+        return found->second;
+    throw std::runtime_error{ "unrecognized base feature" };
 }
 
 static std::string FrameCodecName(const FrameCodec& codec)
 {
-    switch (codec) {
-        case FrameCodec::RAW : return codec_RAW;
-        case FrameCodec::V1  : return codec_V1;
-        default:
-            throw std::runtime_error{ "unrecognized frame codec" };
-    }
+    static const std::unordered_map<FrameCodec, std::string, EnumClassHash> lookup{
+        {FrameCodec::RAW, codec_RAW},
+        {FrameCodec::V1,  codec_V1}
+    };
+
+    const auto found = lookup.find(codec);
+    if (found != lookup.cend())
+        return found->second;
+    throw std::runtime_error{ "unrecognized frame codec" };
 }
 
 static std::string BarcodeModeName(const BarcodeModeType& mode)
 {
-    switch (mode) {
-        case BarcodeModeType::NONE       : return barcodemode_NONE;
-        case BarcodeModeType::SYMMETRIC  : return barcodemode_SYM;
-        case BarcodeModeType::ASYMMETRIC : return barcodemode_ASYM;
-        case BarcodeModeType::TAILED     : return barcodemode_TAIL;
-        default:
-            throw std::runtime_error{ "unrecognized barcode mode type" };
-    }
+    static const std::unordered_map<BarcodeModeType, std::string, EnumClassHash> lookup{
+        {BarcodeModeType::NONE,       barcodemode_NONE},
+        {BarcodeModeType::SYMMETRIC,  barcodemode_SYM},
+        {BarcodeModeType::ASYMMETRIC, barcodemode_ASYM},
+        {BarcodeModeType::TAILED,     barcodemode_TAIL}
+    };
+
+    const auto found = lookup.find(mode);
+    if (found != lookup.cend())
+        return found->second;
+    throw std::runtime_error{ "unrecognized barcode mode type" };
 }
 
 static std::string BarcodeQualityName(const BarcodeQualityType& type)
 {
-    switch (type) {
-        case BarcodeQualityType::NONE        : return barcodequal_NONE;
-        case BarcodeQualityType::SCORE       : return barcodequal_SCORE;
-        case BarcodeQualityType::PROBABILITY : return barcodequal_PROB;
-        default:
-            throw std::runtime_error{ "unrecognized barcode quality type" };
-    }
+    static const std::unordered_map<BarcodeQualityType, std::string, EnumClassHash> lookup{
+        {BarcodeQualityType::NONE,        barcodequal_NONE},
+        {BarcodeQualityType::SCORE,       barcodequal_SCORE},
+        {BarcodeQualityType::PROBABILITY, barcodequal_PROB}
+    };
+
+    const auto found = lookup.find(type);
+    if (found != lookup.cend())
+        return found->second;
+    throw std::runtime_error{ "unrecognized barcode quality type" };
 }
 
 static std::string PlatformModelName(const PlatformModelType& type)
 {
-    switch (type) {
-        case PlatformModelType::ASTRO    : return platformModelType_ASTRO;
-        case PlatformModelType::RS       : return platformModelType_RS;
-        case PlatformModelType::SEQUEL   : return platformModelType_SEQUEL;
-        case PlatformModelType::SEQUELII : return platformModelType_SEQUELII;
-        default:
-            throw std::runtime_error{ "unrecognized platform model type" };
-    }
+    static const std::unordered_map<PlatformModelType, std::string, EnumClassHash> lookup{
+        {PlatformModelType::ASTRO,    platformModelType_ASTRO},
+        {PlatformModelType::RS,       platformModelType_RS},
+        {PlatformModelType::SEQUEL,   platformModelType_SEQUEL},
+        {PlatformModelType::SEQUELII, platformModelType_SEQUELII}
+    };
+
+    const auto found = lookup.find(type);
+    if (found != lookup.cend())
+        return found->second;
+    throw std::runtime_error{ "unrecognized platform model type" };
 }
 
 static const std::map<std::string, BaseFeature> nameToFeature
@@ -544,21 +562,26 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 
 bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
 {
-    return id_ == other.id_ && sequencingCenter_ == other.sequencingCenter_ &&
-           date_ == other.date_ && flowOrder_ == other.flowOrder_ &&
-           keySequence_ == other.keySequence_ && library_ == other.library_ &&
-           programs_ == other.programs_ && platformModel_ == other.platformModel_ &&
-           predictedInsertSize_ == other.predictedInsertSize_ && movieName_ == other.movieName_ &&
-           sample_ == other.sample_ && readType_ == other.readType_ &&
-           bindingKit_ == other.bindingKit_ && sequencingKit_ == other.sequencingKit_ &&
-           basecallerVersion_ == other.basecallerVersion_ && frameRateHz_ == other.frameRateHz_ &&
-           control_ == other.control_ && ipdCodec_ == other.ipdCodec_ &&
-           pulseWidthCodec_ == other.pulseWidthCodec_ && hasBarcodeData_ == other.hasBarcodeData_ &&
-           barcodeFile_ == other.barcodeFile_ && barcodeHash_ == other.barcodeHash_ &&
-           barcodeCount_ == other.barcodeCount_ && barcodeMode_ == other.barcodeMode_ &&
-           barcodeQuality_ == other.barcodeQuality_ && features_.size() == other.features_.size() &&
+    const auto lhsFields = std::tie(
+        id_, sequencingCenter_, date_, flowOrder_, keySequence_, library_, programs_,
+        platformModel_, predictedInsertSize_, movieName_, sample_, readType_, bindingKit_,
+        sequencingKit_, basecallerVersion_, frameRateHz_, control_, ipdCodec_, pulseWidthCodec_,
+        hasBarcodeData_, barcodeFile_, barcodeHash_, barcodeCount_, barcodeMode_, barcodeQuality_);
+
+    const auto rhsFields = std::tie(
+        other.id_, other.sequencingCenter_, other.date_, other.flowOrder_, other.keySequence_,
+        other.library_, other.programs_, other.platformModel_, other.predictedInsertSize_,
+        other.movieName_, other.sample_, other.readType_, other.bindingKit_, other.sequencingKit_,
+        other.basecallerVersion_, other.frameRateHz_, other.control_, other.ipdCodec_,
+        other.pulseWidthCodec_, other.hasBarcodeData_, other.barcodeFile_, other.barcodeHash_,
+        other.barcodeCount_, other.barcodeMode_, other.barcodeQuality_);
+
+    // TODO: C++!4 has a std::equal overload that takes the 2nd container's end().
+    //       This allows constant time "false" if the sizes do not match.
+    //
+    return lhsFields == rhsFields && (features_.size() == other.features_.size()) &&
+           (custom_.size() == other.custom_.size()) &&
            std::equal(features_.cbegin(), features_.cend(), other.features_.cbegin()) &&
-           custom_.size() == other.custom_.size() &&
            std::equal(custom_.begin(), custom_.end(), other.custom_.cbegin());
 }
 
