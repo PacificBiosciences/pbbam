@@ -14,7 +14,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 class Pulse2BaseCache
 {
@@ -103,7 +102,6 @@ private:
     boost::dynamic_bitset<> data_;
 };
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

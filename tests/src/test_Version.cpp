@@ -9,7 +9,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
 
 namespace VersionTests {
 

@@ -21,7 +21,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 class PbiIndexIO
 {
@@ -108,7 +107,6 @@ inline void PbiIndexIO::WriteBgzfVector(BGZF* fp, const std::vector<T>& data)
     UNUSED(ret);
 }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

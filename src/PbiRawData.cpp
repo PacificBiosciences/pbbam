@@ -19,34 +19,10 @@
 #include "PbiIndexIO.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
+#include "pbbam/RecordType.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
-
-static std::string ToString(const RecordType type)
-{
-    // clang-format off
-    static const auto lookup = std::map<RecordType, std::string>
-    {
-        { RecordType::ZMW,        "ZMW" },
-        { RecordType::HQREGION,   "HQREGION" },
-        { RecordType::SUBREAD,    "SUBREAD" },
-        { RecordType::CCS,        "CCS" },
-        { RecordType::SCRAP,      "SCRAP" },
-        { RecordType::TRANSCRIPT, "TRANSCRIPT" },
-        { RecordType::UNKNOWN,    "UNKNOWN" }
-    };
-    // clang-format on
-
-    try {
-        return lookup.at(type);
-    } catch (std::exception&) {
-        throw std::runtime_error{"error: unknown RecordType encountered"};
-    }
-}
-
-}  // namespace internal
 
 // ----------------------------------
 // PbiRawBarcodeData implementation
@@ -187,7 +163,7 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
 {
     // read group ID
     auto rgId = b.ReadGroupBaseId();
-    if (rgId.empty()) rgId = MakeReadGroupId(b.MovieName(), internal::ToString(b.Type()));
+    if (rgId.empty()) rgId = MakeReadGroupId(b.MovieName(), ToString(b.Type()));
     const auto rawid = std::stoul(rgId, nullptr, 16);
     const auto id = static_cast<int32_t>(rawid);
     rgId_.push_back(id);
@@ -220,13 +196,13 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
 
 PbiRawData::PbiRawData(std::string pbiFilename) : filename_{std::move(pbiFilename)}
 {
-    internal::PbiIndexIO::Load(*this, filename_);
+    PbiIndexIO::Load(*this, filename_);
 }
 
 PbiRawData::PbiRawData(const DataSet& dataset)
     : sections_{PbiFile::BASIC | PbiFile::MAPPED | PbiFile::BARCODE}
 {
-    internal::PbiIndexIO::LoadFromDataSet(*this, dataset);
+    PbiIndexIO::LoadFromDataSet(*this, dataset);
 }
 
 }  // namespace BAM

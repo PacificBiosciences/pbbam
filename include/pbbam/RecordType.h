@@ -7,6 +7,8 @@
 #ifndef RECORDTYPE_H
 #define RECORDTYPE_H
 
+#include <string>
+
 namespace PacBio {
 namespace BAM {
 
@@ -39,6 +41,15 @@ inline bool IsCcsOrTranscript(const RecordType type)
 {
     return type == RecordType::CCS || type == RecordType::TRANSCRIPT;
 }
+
+///
+/// \brief Returns string representation of RecordType
+///
+/// \param type
+/// \return std::string
+/// \throws std::runtime_error if type is unrecognized
+///
+std::string ToString(const RecordType type);
 
 }  // namespace BAM
 }  // namespace PacBio

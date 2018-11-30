@@ -19,7 +19,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 /// \brief The VirtualZmwCompositeReader provides an interface for
 ///        re-stitching "virtual" polymerase reads from their constituent parts,
@@ -71,7 +70,6 @@ private:
     void OpenNextReader();
 };
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

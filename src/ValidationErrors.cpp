@@ -11,12 +11,11 @@
 #include <cstddef>
 #include <sstream>
 
-#include "StringUtils.h"
 #include "ValidationErrors.h"
+#include "pbbam/StringUtilities.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 const size_t ValidationErrors::MAX;
 
@@ -71,6 +70,5 @@ void ValidationErrors::ThrowErrors()
                               std::move(recordErrors_)};
 }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio

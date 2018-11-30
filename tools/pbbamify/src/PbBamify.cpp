@@ -365,7 +365,7 @@ bool Pbbamify::AugmentAlignment(const std::shared_ptr<QueryLookup> queryLookup,
 
         // Reverse if needed.
         if (record.Impl().IsReverseStrand()) {
-            PacBio::BAM::internal::ReverseComplement(qseq);
+            PacBio::BAM::ReverseComplement(qseq);
             std::reverse(quals.begin(), quals.end());
         }
 

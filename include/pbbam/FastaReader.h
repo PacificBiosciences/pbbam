@@ -14,10 +14,6 @@
 namespace PacBio {
 namespace BAM {
 
-namespace internal {
-class FastaReaderPrivate;
-}
-
 ///
 /// \brief The FastaReader provides sequential access to FASTA records.
 ///
@@ -69,7 +65,8 @@ public:
     /// \}
 
 private:
-    std::unique_ptr<internal::FastaReaderPrivate> d_;
+    class FastaReaderPrivate;
+    std::unique_ptr<FastaReaderPrivate> d_;
 };
 
 }  // namespace BAM

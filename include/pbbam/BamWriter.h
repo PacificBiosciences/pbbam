@@ -21,10 +21,6 @@ namespace BAM {
 
 class BamFile;
 
-namespace internal {
-class BamWriterPrivate;
-}
-
 /// \brief The BamWriter class provides a writing interface for creating
 ///        new %BAM files.
 ///
@@ -215,7 +211,8 @@ public:
     /// \}
 
 private:
-    std::unique_ptr<internal::BamWriterPrivate> d_;
+    class BamWriterPrivate;
+    std::unique_ptr<BamWriterPrivate> d_;
 };
 
 }  // namespace BAM

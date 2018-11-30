@@ -13,7 +13,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 class Version
 {
@@ -144,7 +143,6 @@ inline Version& Version::Revision(int revision)
     return *this;
 }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

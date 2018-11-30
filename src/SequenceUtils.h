@@ -8,11 +8,10 @@
 #include <cstdint>
 #include <string>
 
-#include "StringUtils.h"
+#include "pbbam/StringUtilities.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 inline char Complement(const char character)
 {
@@ -22,9 +21,6 @@ inline char Complement(const char character)
     if (character == '-' || character == '*') return character;
     return complementLookup[toupper(character) & 0x1f];
 }
-
-//inline void Reverse(std::string& s)
-//{ std::reverse(s.begin(), s.end()); }
 
 template <typename T>
 void Reverse(T& input)
@@ -46,14 +42,6 @@ T Reversed(const T& input)
     Reverse(result);
     return result;
 }
-
-//inline std::string Reversed(const std::string& input)
-//{
-//    std::string result = input;
-//    Reverse(result);
-//    return result;
-//}
-
 inline void ReverseComplement(std::string& seq)
 {
     std::transform(seq.begin(), seq.end(), seq.begin(), Complement);
@@ -96,7 +84,6 @@ inline std::string ReverseComplemented(const std::string& input)
     return result;
 }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

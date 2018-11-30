@@ -19,7 +19,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 class VirtualZmwReader
 {
@@ -84,7 +83,6 @@ private:
     std::unique_ptr<BamHeader> stitchedHeader_;
 };
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

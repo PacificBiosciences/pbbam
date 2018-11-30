@@ -28,33 +28,7 @@
 #include "pbbam/BamRecordImpl.h"
 #include "pbbam/MakeUnique.h"
 #include "pbbam/PbiRawData.h"
-
-namespace {
-
-using RecordType = PacBio::BAM::RecordType;
-std::string ToString(const RecordType type)
-{
-    // clang-format off
-    static const auto lookup = std::map<RecordType, std::string>
-    {
-        { RecordType::ZMW,        "ZMW" },
-        { RecordType::HQREGION,   "HQREGION" },
-        { RecordType::SUBREAD,    "SUBREAD" },
-        { RecordType::CCS,        "CCS" },
-        { RecordType::SCRAP,      "SCRAP" },
-        { RecordType::TRANSCRIPT, "TRANSCRIPT" },
-        { RecordType::UNKNOWN,    "UNKNOWN" }
-    };
-    // clang-format on
-
-    try {
-        return lookup.at(type);
-    } catch (std::exception&) {
-        throw std::runtime_error{"error: unknown RecordType encountered"};
-    }
-}
-
-}  // namespace anonymous
+#include "pbbam/RecordType.h"
 
 namespace PacBio {
 namespace BAM {
@@ -219,7 +193,7 @@ void PbiReferenceDataBuilder::WriteData(BGZF* bgzf)
     // num_refs
     uint32_t numRefs = refData.entries_.size();
     if (bgzf->is_be) numRefs = ed_swap_4(numRefs);
-    bgzf_write_safe(bgzf, &numRefs, 4);
+    internal::bgzf_write_safe(bgzf, &numRefs, 4);
 
     // reference entries
     numRefs = refData.entries_.size();  // need to reset after maybe endian-swapping
@@ -233,11 +207,13 @@ void PbiReferenceDataBuilder::WriteData(BGZF* bgzf)
             beginRow = ed_swap_4(beginRow);
             endRow = ed_swap_4(endRow);
         }
-        bgzf_write_safe(bgzf, &tId, 4);
-        bgzf_write_safe(bgzf, &beginRow, 4);
-        bgzf_write_safe(bgzf, &endRow, 4);
+        internal::bgzf_write_safe(bgzf, &tId, 4);
+        internal::bgzf_write_safe(bgzf, &beginRow, 4);
+        internal::bgzf_write_safe(bgzf, &endRow, 4);
     }
 }
+
+}  // namespace internal
 
 // --------------------------------------------
 // PbiBuilderPrivate - builder implementation
@@ -248,7 +224,7 @@ void PbiReferenceDataBuilder::WriteData(BGZF* bgzf)
 // TODO: We **NEED** to sync this up with the builder in IndexedBamWriter. They
 //       differ slightly but should be shareable.
 
-class PbiBuilderPrivate
+class PbiBuilder::PbiBuilderPrivate
 {
     enum class FlushMode
     {
@@ -292,7 +268,8 @@ public:
             throw std::runtime_error{"index builder could not open temp file: " + tempFilename_};
 
         if (isCoordinateSorted && numReferenceSequences > 0)
-            refDataBuilder_ = std::make_unique<PbiReferenceDataBuilder>(numReferenceSequences);
+            refDataBuilder_ =
+                std::make_unique<internal::PbiReferenceDataBuilder>(numReferenceSequences);
     }
 
     ~PbiBuilderPrivate() noexcept
@@ -309,7 +286,7 @@ public:
     void AddRecord(const BamRecord& b, const int64_t uOffset)
     {
         // ensure updated data (necessary?)
-        internal::BamRecordMemory::UpdateRecordTags(b);
+        PacBio::BAM::BamRecordMemory::UpdateRecordTags(b);
         b.ResetCachedPositions();
 
         // store record data & maybe flush to temp file
@@ -458,7 +435,7 @@ public:
     }
 
     template <typename T>
-    void MaybeFlushBuffer(PbiField<T>& field, bool force)
+    void MaybeFlushBuffer(internal::PbiField<T>& field, bool force)
     {
         // replace with lambda, in FlushBuffer(), once PPA can use C++14 ?
         if (field.IsFull() || force) {
@@ -495,7 +472,8 @@ public:
     }
 
     template <typename T>
-    void LoadFieldBlockFromTempFile(PbiField<T>& field, const PbiFieldBlock& block)
+    void LoadFieldBlockFromTempFile(internal::PbiField<T>& field,
+                                    const internal::PbiFieldBlock& block)
     {
         // seek to block begin
         const auto ret = std::fseek(tempFile_.get(), block.pos_, SEEK_SET);
@@ -514,11 +492,11 @@ public:
     }
 
     template <typename T>
-    void WriteField(PbiField<T>& field)
+    void WriteField(internal::PbiField<T>& field)
     {
         for (const auto& block : field.blocks_) {
             LoadFieldBlockFromTempFile(field, block);
-            WriteBgzfVector(pbiFile_.get(), field.buffer_);
+            internal::WriteBgzfVector(pbiFile_.get(), field.buffer_);
         }
     }
 
@@ -556,14 +534,14 @@ public:
     }
 
     template <typename T>
-    void WriteToTempFile(PbiField<T>& field)
+    void WriteToTempFile(internal::PbiField<T>& field)
     {
         if (field.buffer_.empty()) return;
 
         const auto pos = std::ftell(tempFile_.get());
         const auto numElements =
             std::fwrite(field.buffer_.data(), sizeof(T), field.buffer_.size(), tempFile_.get());
-        field.blocks_.emplace_back(PbiFieldBlock{pos, numElements});
+        field.blocks_.emplace_back(internal::PbiFieldBlock{pos, numElements});
     }
 
     void WritePbiHeader()
@@ -572,7 +550,7 @@ public:
 
         // 'magic' string
         static constexpr const std::array<char, 4> magic{{'P', 'B', 'I', '\1'}};
-        bgzf_write_safe(bgzf, magic.data(), 4);
+        internal::bgzf_write_safe(bgzf, magic.data(), 4);
 
         PbiFile::Sections sections = PbiFile::BASIC;
         if (hasMappedData_) sections |= PbiFile::MAPPED;
@@ -588,14 +566,14 @@ public:
             pbi_flags = ed_swap_2(pbi_flags);
             numReads = ed_swap_4(numReads);
         }
-        bgzf_write_safe(bgzf, &version, 4);
-        bgzf_write_safe(bgzf, &pbi_flags, 2);
-        bgzf_write_safe(bgzf, &numReads, 4);
+        internal::bgzf_write_safe(bgzf, &version, 4);
+        internal::bgzf_write_safe(bgzf, &pbi_flags, 2);
+        internal::bgzf_write_safe(bgzf, &numReads, 4);
 
         // reserved space
         char reserved[18];
         memset(reserved, 0, 18);
-        bgzf_write_safe(bgzf, reserved, 18);
+        internal::bgzf_write_safe(bgzf, reserved, 18);
     }
 
     void WriteReferenceData() { refDataBuilder_->WriteData(pbiFile_.get()); }
@@ -605,34 +583,34 @@ private:
     std::string bamFilename_;
     std::string pbiFilename_;
     std::string tempFilename_;
-    std::unique_ptr<FILE, internal::FileDeleter> tempFile_;
-    std::unique_ptr<BGZF, internal::HtslibBgzfDeleter> pbiFile_;
+    std::unique_ptr<FILE, FileDeleter> tempFile_;
+    std::unique_ptr<BGZF, HtslibBgzfDeleter> pbiFile_;
     PbiBuilder::CompressionLevel compressionLevel_;
     size_t numThreads_;
 
     // PBI field buffers
-    PbiField<int32_t> rgIdField_;
-    PbiField<int32_t> qStartField_;
-    PbiField<int32_t> qEndField_;
-    PbiField<int32_t> holeNumField_;
-    PbiField<float> readQualField_;
-    PbiField<uint8_t> ctxtField_;
-    PbiField<uint64_t> fileOffsetField_;
-    PbiField<int32_t> tIdField_;
-    PbiField<uint32_t> tStartField_;
-    PbiField<uint32_t> tEndField_;
-    PbiField<uint32_t> aStartField_;
-    PbiField<uint32_t> aEndField_;
-    PbiField<uint8_t> revStrandField_;
-    PbiField<uint32_t> nMField_;
-    PbiField<uint32_t> nMMField_;
-    PbiField<uint8_t> mapQualField_;
-    PbiField<int16_t> bcForwardField_;
-    PbiField<int16_t> bcReverseField_;
-    PbiField<int8_t> bcQualField_;
+    internal::PbiField<int32_t> rgIdField_;
+    internal::PbiField<int32_t> qStartField_;
+    internal::PbiField<int32_t> qEndField_;
+    internal::PbiField<int32_t> holeNumField_;
+    internal::PbiField<float> readQualField_;
+    internal::PbiField<uint8_t> ctxtField_;
+    internal::PbiField<uint64_t> fileOffsetField_;
+    internal::PbiField<int32_t> tIdField_;
+    internal::PbiField<uint32_t> tStartField_;
+    internal::PbiField<uint32_t> tEndField_;
+    internal::PbiField<uint32_t> aStartField_;
+    internal::PbiField<uint32_t> aEndField_;
+    internal::PbiField<uint8_t> revStrandField_;
+    internal::PbiField<uint32_t> nMField_;
+    internal::PbiField<uint32_t> nMMField_;
+    internal::PbiField<uint8_t> mapQualField_;
+    internal::PbiField<int16_t> bcForwardField_;
+    internal::PbiField<int16_t> bcReverseField_;
+    internal::PbiField<int8_t> bcQualField_;
 
     // reference data
-    std::unique_ptr<PbiReferenceDataBuilder> refDataBuilder_;
+    std::unique_ptr<internal::PbiReferenceDataBuilder> refDataBuilder_;
 
     // tracking data
     uint32_t currentRow_ = 0;
@@ -640,8 +618,6 @@ private:
     bool hasBarcodeData_ = false;
     bool hasMappedData_ = false;
 };
-
-}  // namespace internal
 
 // --------------------------------------------
 // PbiBuilder - builder API
@@ -663,8 +639,8 @@ PbiBuilder::PbiBuilder(const std::string& pbiFilename, const size_t numReference
 PbiBuilder::PbiBuilder(const std::string& pbiFilename, const size_t numReferenceSequences,
                        const bool isCoordinateSorted, const CompressionLevel compressionLevel,
                        const size_t numThreads)
-    : d_{std::make_unique<internal::PbiBuilderPrivate>(
-          pbiFilename, numReferenceSequences, isCoordinateSorted, compressionLevel, numThreads)}
+    : d_{std::make_unique<PbiBuilderPrivate>(pbiFilename, numReferenceSequences, isCoordinateSorted,
+                                             compressionLevel, numThreads)}
 {
 }
 

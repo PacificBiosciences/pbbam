@@ -30,7 +30,7 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
+namespace {
 
 struct ilexcompare_wrapper
 {
@@ -92,7 +92,7 @@ static void ValidateReadGroup(const ReadGroupInfo& rg, std::unique_ptr<Validatio
 
     // valid read type
     if (!rg.ReadType().empty()) {
-        if (internal::AcceptedReadTypes.find(rg.ReadType()) == internal::AcceptedReadTypes.cend())
+        if (AcceptedReadTypes.find(rg.ReadType()) == AcceptedReadTypes.cend())
             errors->AddReadGroupError(id, "read type: " + rg.ReadType() + " is unknown");
     }
 
@@ -318,39 +318,37 @@ static void ValidateRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>
         ValidateUnmappedRecord(b, errors);
 }
 
-}  // namespace internal
-
-using internal::ValidationErrors;
+}  // anonymous
 
 void Validator::Validate(const BamHeader& header, const size_t maxErrors)
 {
     auto errors = std::make_unique<ValidationErrors>(maxErrors);
-    internal::ValidateHeader(header, "unknown", errors);
+    ValidateHeader(header, "unknown", errors);
     if (!errors->IsEmpty()) errors->ThrowErrors();
 }
 
 void Validator::Validate(const ReadGroupInfo& rg, const size_t maxErrors)
 {
     auto errors = std::make_unique<ValidationErrors>(maxErrors);
-    internal::ValidateReadGroup(rg, errors);
+    ValidateReadGroup(rg, errors);
     if (!errors->IsEmpty()) errors->ThrowErrors();
 }
 
 void Validator::Validate(const BamRecord& b, const size_t maxErrors)
 {
     auto errors = std::make_unique<ValidationErrors>(maxErrors);
-    internal::ValidateRecord(b, errors);
+    ValidateRecord(b, errors);
     if (!errors->IsEmpty()) errors->ThrowErrors();
 }
 
 void Validator::ValidateEntireFile(const BamFile& file, const size_t maxErrors)
 {
     auto errors = std::make_unique<ValidationErrors>(maxErrors);
-    internal::ValidateMetadata(file, errors);
+    ValidateMetadata(file, errors);
 
     EntireFileQuery query(file);
     for (const BamRecord& record : query)
-        internal::ValidateRecord(record, errors);
+        ValidateRecord(record, errors);
 
     if (!errors->IsEmpty()) errors->ThrowErrors();
 }
@@ -358,7 +356,7 @@ void Validator::ValidateEntireFile(const BamFile& file, const size_t maxErrors)
 void Validator::ValidateFileMetadata(const BamFile& file, const size_t maxErrors)
 {
     auto errors = std::make_unique<ValidationErrors>(maxErrors);
-    internal::ValidateMetadata(file, errors);
+    ValidateMetadata(file, errors);
     if (!errors->IsEmpty()) errors->ThrowErrors();
 }
 

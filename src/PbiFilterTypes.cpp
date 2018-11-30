@@ -17,12 +17,12 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "StringUtils.h"
 #include "pbbam/MakeUnique.h"
+#include "pbbam/StringUtilities.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
+namespace {
 
 template <typename T>
 IndexList readLengthHelper(const std::vector<T>& start, const std::vector<T>& end, const T& value,
@@ -65,7 +65,7 @@ IndexList readLengthHelper(const std::vector<T>& start, const std::vector<T>& en
     return result;
 }
 
-static PbiFilter filterFromMovieName(const std::string& movieName, bool includeCcs)
+PbiFilter filterFromMovieName(const std::string& movieName, bool includeCcs)
 {
     //
     // All transcript-type reads (movieName == "transcript") have the same
@@ -91,7 +91,7 @@ static PbiFilter filterFromMovieName(const std::string& movieName, bool includeC
     return filter;
 }
 
-}  // namespace internal
+}  // anonymous
 
 // PbiAlignedLengthFilter
 
@@ -128,7 +128,7 @@ bool PbiIdentityFilter::Accepts(const PbiRawData& idx, const size_t row) const
 // PbiMovieNameFilter
 
 PbiMovieNameFilter::PbiMovieNameFilter(const std::string& movieName, const Compare::Type cmp)
-    : compositeFilter_{internal::filterFromMovieName(movieName, true)}  // include CCS
+    : compositeFilter_{filterFromMovieName(movieName, true)}  // include CCS
     , cmp_{cmp}
 {
 }
@@ -138,7 +138,7 @@ PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& whitelist
     : compositeFilter_{PbiFilter::UNION}, cmp_{cmp}
 {
     for (const auto& movieName : whitelist)
-        compositeFilter_.Add(internal::filterFromMovieName(movieName, true));  // include CCS
+        compositeFilter_.Add(filterFromMovieName(movieName, true));  // include CCS
 }
 
 // PbiQueryLengthFilter
@@ -237,7 +237,7 @@ public:
     void HandleName(const std::string& queryName, const RecordType type)
     {
         // split name into main parts
-        const auto nameParts = internal::Split(queryName, '/');
+        const auto nameParts = Split(queryName, '/');
 
         // verify syntax
         if (IsCcsOrTranscript(type)) {

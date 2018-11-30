@@ -18,7 +18,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 class BamRecordTags
 {
@@ -33,8 +32,8 @@ private:
         const std::string label_;  //[3]; // 2-char tag plus NULL
         const bool isPulse_;
     };
-    typedef std::unordered_map<BamRecordTag, BamRecordTagData, EnumClassHash> TagLookupType;
 
+    using TagLookupType = std::unordered_map<BamRecordTag, BamRecordTagData, EnumClassHash>;
     static const TagLookupType tagLookup;
 };
 
@@ -50,7 +49,6 @@ inline std::string BamRecordTags::LabelFor(const BamRecordTag tag)
     return tagLookup.at(tag).label_;
 }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

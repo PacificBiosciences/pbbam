@@ -10,27 +10,28 @@
 
 #include <sstream>
 
-#include "SequenceUtils.h"
+#include "pbbam/SamTagCodec.h"
+#include "pbbam/StringUtilities.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
+namespace {
 
-static std::string ProgramInfoTokenID{"ID"};
-static std::string ProgramInfoTokenCL{"CL"};
-static std::string ProgramInfoTokenDS{"DS"};
-static std::string ProgramInfoTokenPN{"PN"};
-static std::string ProgramInfoTokenPP{"PP"};
-static std::string ProgramInfoTokenVN{"VN"};
+const std::string ProgramInfoTokenID{"ID"};
+const std::string ProgramInfoTokenCL{"CL"};
+const std::string ProgramInfoTokenDS{"DS"};
+const std::string ProgramInfoTokenPN{"PN"};
+const std::string ProgramInfoTokenPP{"PP"};
+const std::string ProgramInfoTokenVN{"VN"};
 
-}  // namespace internal
+}  // anonymous
 
 ProgramInfo::ProgramInfo(std::string id) : id_{std::move(id)} {}
 
 ProgramInfo ProgramInfo::FromSam(const std::string& sam)
 {
     // pop off '@PG\t', then split rest of line into tokens
-    const auto tokens = internal::Split(sam.substr(4), '\t');
+    const auto tokens = Split(sam.substr(4), '\t');
     if (tokens.empty()) return {};
 
     ProgramInfo prog;
@@ -43,12 +44,12 @@ ProgramInfo ProgramInfo::FromSam(const std::string& sam)
 
         // set program contents
         // clang-format off
-        if      (tokenTag == internal::ProgramInfoTokenID) prog.Id(std::move(tokenValue));
-        else if (tokenTag == internal::ProgramInfoTokenCL) prog.CommandLine(std::move(tokenValue));
-        else if (tokenTag == internal::ProgramInfoTokenDS) prog.Description(std::move(tokenValue));
-        else if (tokenTag == internal::ProgramInfoTokenPN) prog.Name(std::move(tokenValue));
-        else if (tokenTag == internal::ProgramInfoTokenPP) prog.PreviousProgramId(std::move(tokenValue));
-        else if (tokenTag == internal::ProgramInfoTokenVN) prog.Version(std::move(tokenValue));
+        if      (tokenTag == ProgramInfoTokenID) prog.Id(std::move(tokenValue));
+        else if (tokenTag == ProgramInfoTokenCL) prog.CommandLine(std::move(tokenValue));
+        else if (tokenTag == ProgramInfoTokenDS) prog.Description(std::move(tokenValue));
+        else if (tokenTag == ProgramInfoTokenPN) prog.Name(std::move(tokenValue));
+        else if (tokenTag == ProgramInfoTokenPP) prog.PreviousProgramId(std::move(tokenValue));
+        else if (tokenTag == ProgramInfoTokenVN) prog.Version(std::move(tokenValue));
         // clang-format on
 
         // otherwise, "custom" tag
@@ -63,19 +64,19 @@ ProgramInfo ProgramInfo::FromSam(const std::string& sam)
 std::string ProgramInfo::ToSam() const
 {
     std::ostringstream out;
-    out << "@PG" << internal::MakeSamTag(internal::ProgramInfoTokenID, id_);
+    out << "@PG" << MakeSamTag(ProgramInfoTokenID, id_);
 
     // clang-format off
-    if (!name_.empty())              out << internal::MakeSamTag(internal::ProgramInfoTokenPN, name_);
-    if (!version_.empty())           out << internal::MakeSamTag(internal::ProgramInfoTokenVN, version_);
-    if (!description_.empty())       out << internal::MakeSamTag(internal::ProgramInfoTokenDS, description_);
-    if (!previousProgramId_.empty()) out << internal::MakeSamTag(internal::ProgramInfoTokenPP, previousProgramId_);
-    if (!commandLine_.empty())       out << internal::MakeSamTag(internal::ProgramInfoTokenCL, commandLine_);
+    if (!name_.empty())              out << MakeSamTag(ProgramInfoTokenPN, name_);
+    if (!version_.empty())           out << MakeSamTag(ProgramInfoTokenVN, version_);
+    if (!description_.empty())       out << MakeSamTag(ProgramInfoTokenDS, description_);
+    if (!previousProgramId_.empty()) out << MakeSamTag(ProgramInfoTokenPP, previousProgramId_);
+    if (!commandLine_.empty())       out << MakeSamTag(ProgramInfoTokenCL, commandLine_);
     // clang-format on
 
     // append any custom tags
     for (const auto& attribute : custom_)
-        out << internal::MakeSamTag(attribute.first, attribute.second);
+        out << MakeSamTag(attribute.first, attribute.second);
     return out.str();
 }
 

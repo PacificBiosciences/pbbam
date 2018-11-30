@@ -36,7 +36,7 @@ public:
 
     ZmwReadStitcherPrivate(const DataSet& dataset) : filter_{PbiFilter::FromDataSet(dataset)}
     {
-        sources_ = internal::SourcesFromDataset(dataset);
+        sources_ = SourcesFromDataset(dataset);
         OpenNextReader();
     }
 
@@ -79,8 +79,8 @@ public:
     BamHeader StitchedHeader() const { return currentReader_->StitchedHeader(); }
 
 private:
-    internal::StitchingSources sources_;
-    std::unique_ptr<internal::VirtualZmwReader> currentReader_;
+    StitchingSources sources_;
+    std::unique_ptr<VirtualZmwReader> currentReader_;
     PbiFilter filter_;
 
     void OpenNextReader()
@@ -92,8 +92,8 @@ private:
             const auto nextSource = sources_.front();
             sources_.pop_front();
 
-            currentReader_ = std::make_unique<internal::VirtualZmwReader>(
-                nextSource.first, nextSource.second, filter_);
+            currentReader_ =
+                std::make_unique<VirtualZmwReader>(nextSource.first, nextSource.second, filter_);
             if (currentReader_->HasNext()) return;
         }
     }

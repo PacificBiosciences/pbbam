@@ -11,7 +11,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 class DataSetIO
 {
@@ -33,7 +32,6 @@ public:
     static void ToStream(const DataSetBase& dataset, std::ostream& out);
 };
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

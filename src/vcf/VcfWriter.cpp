@@ -14,10 +14,10 @@
 namespace PacBio {
 namespace VCF {
 
-struct VcfWriter::VcfWriterPrivate : public PacBio::BAM::internal::FileProducer
+struct VcfWriter::VcfWriterPrivate : public PacBio::BAM::FileProducer
 {
     VcfWriterPrivate(std::string fn, const VcfHeader& header)
-        : PacBio::BAM::internal::FileProducer{std::move(fn)}, out_{TempFilename()}
+        : PacBio::BAM::FileProducer{std::move(fn)}, out_{TempFilename()}
     {
         out_ << VcfFormat::FormattedHeader(header) << '\n';
     }

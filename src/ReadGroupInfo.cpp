@@ -23,12 +23,13 @@
 
 #include "ChemistryTable.h"
 #include "EnumClassHash.h"
-#include "SequenceUtils.h"
 #include "pbbam/MD5.h"
+#include "pbbam/SamTagCodec.h"
+#include "pbbam/StringUtilities.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
+namespace {
 
 static const std::string sam_ID{"ID"};
 static const std::string sam_CN{"CN"};
@@ -275,7 +276,7 @@ static inline PlatformModelType PlatformModelFromName(std::string name)
     return nameToPlatformModel.at(name);
 }
 
-}  // namespace internal
+}  // anonymous
 
 ReadGroupInfo::ReadGroupInfo(std::string baseId, std::pair<uint16_t, uint16_t> barcodes)
 
@@ -290,28 +291,28 @@ ReadGroupInfo::ReadGroupInfo(std::string baseId, std::pair<uint16_t, uint16_t> b
 
 void ReadGroupInfo::DecodeBarcodeKey(const std::string& key, std::string value)
 {
-    if (key == internal::token_BF)
+    if (key == token_BF)
         barcodeFile_ = std::move(value);
-    else if (key == internal::token_BH)
+    else if (key == token_BH)
         barcodeHash_ = std::move(value);
-    else if (key == internal::token_BC)
+    else if (key == token_BC)
         barcodeCount_ = std::stoul(value);
-    else if (key == internal::token_BM)
-        barcodeMode_ = internal::BarcodeModeFromName(value);
-    else if (key == internal::token_BQ)
-        barcodeQuality_ = internal::BarcodeQualityFromName(value);
+    else if (key == token_BM)
+        barcodeMode_ = BarcodeModeFromName(value);
+    else if (key == token_BQ)
+        barcodeQuality_ = BarcodeQualityFromName(value);
 }
 
 void ReadGroupInfo::DecodeFrameCodecKey(const std::string& key, std::string value)
 {
-    const auto keyParts = internal::Split(key, ':');
+    const auto keyParts = Split(key, ':');
     if (keyParts.size() == 2) {
         const auto& subkey = keyParts.at(0);
-        if (subkey == internal::feature_IP) {
-            ipdCodec_ = internal::FrameCodecFromName(keyParts.at(1));
+        if (subkey == feature_IP) {
+            ipdCodec_ = FrameCodecFromName(keyParts.at(1));
             features_[BaseFeature::IPD] = std::move(value);
-        } else if (subkey == internal::feature_PW) {
-            pulseWidthCodec_ = internal::FrameCodecFromName(keyParts.at(1));
+        } else if (subkey == feature_PW) {
+            pulseWidthCodec_ = FrameCodecFromName(keyParts.at(1));
             features_[BaseFeature::PULSE_WIDTH] = std::move(value);
         }
     }
@@ -319,7 +320,7 @@ void ReadGroupInfo::DecodeFrameCodecKey(const std::string& key, std::string valu
 
 void ReadGroupInfo::DecodeSamDescription(const std::string& description)
 {
-    const auto tokens = internal::Split(description, ';');
+    const auto tokens = Split(description, ';');
     if (tokens.empty()) return;
 
     // iterate over tokens
@@ -333,20 +334,20 @@ void ReadGroupInfo::DecodeSamDescription(const std::string& description)
 
         // 'mandatory' items
         // clang-format off
-        if      (key == internal::token_RT) readType_ = std::move(value);
-        else if (key == internal::token_BK) bindingKit_ = std::move(value);
-        else if (key == internal::token_BV) basecallerVersion_ = std::move(value);
-        else if (key == internal::token_SK) sequencingKit_ = std::move(value);
-        else if (key == internal::token_FR) frameRateHz_ = std::move(value);
-        else if (key == internal::token_CT) control_ = (value == "TRUE");
+        if      (key == token_RT) readType_ = std::move(value);
+        else if (key == token_BK) bindingKit_ = std::move(value);
+        else if (key == token_BV) basecallerVersion_ = std::move(value);
+        else if (key == token_SK) sequencingKit_ = std::move(value);
+        else if (key == token_FR) frameRateHz_ = std::move(value);
+        else if (key == token_CT) control_ = (value == "TRUE");
         // clang-format on
 
         // base features
-        else if (internal::IsBaseFeature(key))
-            features_[internal::BaseFeatureFromName(key)] = std::move(value);
+        else if (IsBaseFeature(key))
+            features_[BaseFeatureFromName(key)] = std::move(value);
 
         // barcode data
-        else if (internal::IsLikelyBarcodeKey(key))
+        else if (IsLikelyBarcodeKey(key))
             DecodeBarcodeKey(key, std::move(value));
 
         // frame codecs
@@ -363,38 +364,38 @@ std::string ReadGroupInfo::EncodeSamDescription() const
     constexpr static const char COLON = ':';
     constexpr static const char EQ = '=';
 
-    std::string result{internal::token_RT + EQ + readType_};
+    std::string result{token_RT + EQ + readType_};
 
     std::string featureName;
     for (const auto& feature : features_) {
 
-        featureName = internal::BaseFeatureName(feature.first);
+        featureName = BaseFeatureName(feature.first);
         if (featureName.empty() || feature.second.empty())
             continue;
-        else if (featureName == internal::feature_IP) {
+        else if (featureName == feature_IP) {
             featureName.push_back(COLON);
-            featureName.append(internal::FrameCodecName(ipdCodec_));
-        } else if (featureName == internal::feature_PW) {
+            featureName.append(FrameCodecName(ipdCodec_));
+        } else if (featureName == feature_PW) {
             featureName.push_back(COLON);
-            featureName.append(internal::FrameCodecName(pulseWidthCodec_));
+            featureName.append(FrameCodecName(pulseWidthCodec_));
         }
         result.append(SEP + featureName + EQ + feature.second);
     }
 
     // clang-format off
-    if (!bindingKit_.empty())        result.append(SEP + internal::token_BK + EQ + bindingKit_);
-    if (!sequencingKit_.empty())     result.append(SEP + internal::token_SK + EQ + sequencingKit_);
-    if (!basecallerVersion_.empty()) result.append(SEP + internal::token_BV + EQ + basecallerVersion_);
-    if (!frameRateHz_.empty())       result.append(SEP + internal::token_FR + EQ + frameRateHz_);
-    if (control_)                    result.append(SEP + internal::token_CT + EQ + (control_ ? "TRUE" : "FALSE"));
+    if (!bindingKit_.empty())        result.append(SEP + token_BK + EQ + bindingKit_);
+    if (!sequencingKit_.empty())     result.append(SEP + token_SK + EQ + sequencingKit_);
+    if (!basecallerVersion_.empty()) result.append(SEP + token_BV + EQ + basecallerVersion_);
+    if (!frameRateHz_.empty())       result.append(SEP + token_FR + EQ + frameRateHz_);
+    if (control_)                    result.append(SEP + token_CT + EQ + (control_ ? "TRUE" : "FALSE"));
     // clang-format on
 
     if (hasBarcodeData_) {
-        const std::string barcodeData{
-            SEP + internal::token_BF + EQ + barcodeFile_ + SEP + internal::token_BH + EQ +
-            barcodeHash_ + SEP + internal::token_BC + EQ + std::to_string(barcodeCount_) + SEP +
-            internal::token_BM + EQ + internal::BarcodeModeName(barcodeMode_) + SEP +
-            internal::token_BQ + EQ + internal::BarcodeQualityName(barcodeQuality_)};
+        const std::string barcodeData{SEP + token_BF + EQ + barcodeFile_ + SEP + token_BH + EQ +
+                                      barcodeHash_ + SEP + token_BC + EQ +
+                                      std::to_string(barcodeCount_) + SEP + token_BM + EQ +
+                                      BarcodeModeName(barcodeMode_) + SEP + token_BQ + EQ +
+                                      BarcodeQualityName(barcodeQuality_)};
         result.append(barcodeData);
     }
 
@@ -404,7 +405,7 @@ std::string ReadGroupInfo::EncodeSamDescription() const
 ReadGroupInfo ReadGroupInfo::FromSam(const std::string& sam)
 {
     // pop off '@RG\t', then split rest of line into tokens
-    const auto tokens = internal::Split(sam.substr(4), '\t');
+    const auto tokens = Split(sam.substr(4), '\t');
     if (tokens.empty()) return {};
 
     ReadGroupInfo rg;
@@ -416,22 +417,22 @@ ReadGroupInfo ReadGroupInfo::FromSam(const std::string& sam)
 
         // set read group info
         // clang-format off
-        if      (tokenTag == internal::sam_ID) rg.Id(std::move(tokenValue));
-        else if (tokenTag == internal::sam_CN) rg.SequencingCenter(std::move(tokenValue));
-        else if (tokenTag == internal::sam_DT) rg.Date(std::move(tokenValue));
-        else if (tokenTag == internal::sam_FO) rg.FlowOrder(std::move(tokenValue));
-        else if (tokenTag == internal::sam_KS) rg.KeySequence(std::move(tokenValue));
-        else if (tokenTag == internal::sam_LB) rg.Library(std::move(tokenValue));
-        else if (tokenTag == internal::sam_PG) rg.Programs(std::move(tokenValue));
-        else if (tokenTag == internal::sam_PI) rg.PredictedInsertSize(std::move(tokenValue));
-        else if (tokenTag == internal::sam_PU) rg.MovieName(std::move(tokenValue));
-        else if (tokenTag == internal::sam_SM) rg.Sample(std::move(tokenValue));
-        else if (tokenTag == internal::sam_DS) rg.DecodeSamDescription(std::move(tokenValue));
-        else if (tokenTag == internal::sam_PM) rg.PlatformModel(internal::PlatformModelFromName(std::move(tokenValue)));
+        if      (tokenTag == sam_ID) rg.Id(std::move(tokenValue));
+        else if (tokenTag == sam_CN) rg.SequencingCenter(std::move(tokenValue));
+        else if (tokenTag == sam_DT) rg.Date(std::move(tokenValue));
+        else if (tokenTag == sam_FO) rg.FlowOrder(std::move(tokenValue));
+        else if (tokenTag == sam_KS) rg.KeySequence(std::move(tokenValue));
+        else if (tokenTag == sam_LB) rg.Library(std::move(tokenValue));
+        else if (tokenTag == sam_PG) rg.Programs(std::move(tokenValue));
+        else if (tokenTag == sam_PI) rg.PredictedInsertSize(std::move(tokenValue));
+        else if (tokenTag == sam_PU) rg.MovieName(std::move(tokenValue));
+        else if (tokenTag == sam_SM) rg.Sample(std::move(tokenValue));
+        else if (tokenTag == sam_DS) rg.DecodeSamDescription(std::move(tokenValue));
+        else if (tokenTag == sam_PM) rg.PlatformModel(PlatformModelFromName(std::move(tokenValue)));
         // clang-format on
 
         // if not platform name (always "PACBIO" for us), store as a custom tag
-        else if (tokenTag != internal::sam_PL)
+        else if (tokenTag != sam_PL)
             custom[tokenTag] = std::move(tokenValue);
     }
     rg.CustomTags(std::move(custom));
@@ -447,7 +448,7 @@ ReadGroupInfo& ReadGroupInfo::Id(std::string id)
     const auto slashAt = id.find('/');
     if (slashAt != std::string::npos) {
         // looks like we do, parse & store
-        const auto tokens = internal::Split(id.substr(slashAt + 1), '-');
+        const auto tokens = Split(id.substr(slashAt + 1), '-');
         if (tokens.size() != 3) {
             throw std::runtime_error{
                 "could not fetch barcodes from malformatted read group ID: " + id +
@@ -503,17 +504,17 @@ std::string ReadGroupInfo::SequencingChemistryFromTriple(const std::string& bind
                                                          const std::string& sequencingKit,
                                                          const std::string& basecallerVersion)
 {
-    const auto verFields = internal::Split(basecallerVersion, '.');
+    const auto verFields = Split(basecallerVersion, '.');
     if (verFields.size() < 2)
         throw std::runtime_error{"basecaller version too short: " + basecallerVersion};
     const std::string version{verFields.at(0) + '.' + verFields.at(1)};
 
     // check updated table first, if it exists (empty if not), overriding the built-in lookup
-    for (const auto& row : internal::GetChemistryTableFromEnv()) {
+    for (const auto& row : GetChemistryTableFromEnv()) {
         if (bindingKit == row[0] && sequencingKit == row[1] && version == row[2]) return row[3];
     }
 
-    for (const auto& row : internal::BuiltInChemistryTable) {
+    for (const auto& row : BuiltInChemistryTable()) {
         if (bindingKit == row[0] && sequencingKit == row[1] && version == row[2]) return row[3];
     }
 
@@ -524,34 +525,33 @@ std::string ReadGroupInfo::SequencingChemistryFromTriple(const std::string& bind
 std::string ReadGroupInfo::ToSam() const
 {
     std::ostringstream out;
-    out << "@RG" << internal::MakeSamTag(internal::sam_ID, id_)
-        << internal::MakeSamTag(internal::sam_PL, Platform());
+    out << "@RG" << MakeSamTag(sam_ID, id_) << MakeSamTag(sam_PL, Platform());
 
     const auto description = EncodeSamDescription();
-    if (!description.empty()) out << internal::MakeSamTag(internal::sam_DS, description);
+    if (!description.empty()) out << MakeSamTag(sam_DS, description);
 
     // clang-format off
-    if (!sequencingCenter_.empty())    out << internal::MakeSamTag(internal::sam_CN, sequencingCenter_);
-    if (!date_.empty())                out << internal::MakeSamTag(internal::sam_DT, date_);
-    if (!flowOrder_.empty())           out << internal::MakeSamTag(internal::sam_FO, flowOrder_);
-    if (!keySequence_.empty())         out << internal::MakeSamTag(internal::sam_KS, keySequence_);
-    if (!library_.empty())             out << internal::MakeSamTag(internal::sam_LB, library_);
-    if (!programs_.empty())            out << internal::MakeSamTag(internal::sam_PG, programs_);
-    if (!predictedInsertSize_.empty()) out << internal::MakeSamTag(internal::sam_PI, predictedInsertSize_);
-    if (!movieName_.empty())           out << internal::MakeSamTag(internal::sam_PU, movieName_);
-    if (!sample_.empty())              out << internal::MakeSamTag(internal::sam_SM, sample_);
+    if (!sequencingCenter_.empty())    out << MakeSamTag(sam_CN, sequencingCenter_);
+    if (!date_.empty())                out << MakeSamTag(sam_DT, date_);
+    if (!flowOrder_.empty())           out << MakeSamTag(sam_FO, flowOrder_);
+    if (!keySequence_.empty())         out << MakeSamTag(sam_KS, keySequence_);
+    if (!library_.empty())             out << MakeSamTag(sam_LB, library_);
+    if (!programs_.empty())            out << MakeSamTag(sam_PG, programs_);
+    if (!predictedInsertSize_.empty()) out << MakeSamTag(sam_PI, predictedInsertSize_);
+    if (!movieName_.empty())           out << MakeSamTag(sam_PU, movieName_);
+    if (!sample_.empty())              out << MakeSamTag(sam_SM, sample_);
     if (barcodes_)
     {
-        out << '\t' << internal::sam_BC << ':'
+        out << '\t' << sam_BC << ':'
             << barcodes_->first << "--" << barcodes_->second;
     }
     // clang-format on
 
-    out << internal::MakeSamTag(internal::sam_PM, internal::PlatformModelName(platformModel_));
+    out << MakeSamTag(sam_PM, PlatformModelName(platformModel_));
 
     // append any custom tags
     for (const auto& attribute : custom_)
-        out << internal::MakeSamTag(attribute.first, attribute.second);
+        out << MakeSamTag(attribute.first, attribute.second);
 
     return out.str();
 }

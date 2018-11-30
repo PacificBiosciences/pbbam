@@ -10,7 +10,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 class XmlReader
 {
@@ -18,7 +17,6 @@ public:
     static std::unique_ptr<DataSetBase> FromStream(std::istream& in);
 };
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

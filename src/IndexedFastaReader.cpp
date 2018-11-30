@@ -153,7 +153,7 @@ std::string IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
 
     const auto reverse =
         (orientation != Orientation::GENOMIC) && bamRecord.Impl().IsReverseStrand();
-    if (reverse) internal::ReverseComplementCaseSens(subseq);
+    if (reverse) ReverseComplementCaseSens(subseq);
 
     return subseq;
 }

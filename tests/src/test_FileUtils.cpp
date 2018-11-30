@@ -19,7 +19,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
 
 TEST(FileUtilsTest, ExistsOk)
 {
@@ -37,7 +36,7 @@ TEST(FileUtilsTest, LastModifiedOk)
     //
     // also, I can't seem to get better than second resolution (on OSX 10.9/clang at least, st_mtimespec.tv_nsec is always zero)
 
-    const auto now = CurrentTime();
+    const auto now = TimeUtils::CurrentTime();
     const auto nowDuration = now.time_since_epoch();
     const auto nowSeconds = std::chrono::duration_cast<std::chrono::seconds>(nowDuration).count();
 

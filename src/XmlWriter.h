@@ -11,8 +11,6 @@ namespace BAM {
 
 class DataSetBase;
 
-namespace internal {
-
 class XmlWriter
 {
 public:
@@ -20,7 +18,6 @@ public:
     static void ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostream& out);
 };
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

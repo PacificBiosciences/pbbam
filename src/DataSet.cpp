@@ -22,11 +22,11 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
+namespace {
 
-static const std::string defaultVersion{"4.0.0"};
+const std::string defaultVersion{"4.0.0"};
 
-static void GetAllFiles(const ExternalResources& resources, std::vector<std::string>* result)
+void GetAllFiles(const ExternalResources& resources, std::vector<std::string>* result)
 {
     for (const auto& resource : resources) {
 
@@ -42,25 +42,21 @@ static void GetAllFiles(const ExternalResources& resources, std::vector<std::str
     }
 }
 
-static inline void InitDefaults(DataSet& ds)
+void InitDefaults(DataSet& ds)
 {
     // provide default 'CreatedAt' & 'Version' attributes if not already present in XML
 
-    if (ds.CreatedAt().empty()) ds.CreatedAt(internal::ToIso8601(CurrentTime()));
-
-    if (ds.Version().empty()) ds.Version(internal::defaultVersion);
+    if (ds.CreatedAt().empty()) ds.CreatedAt(TimeUtils::ToIso8601(TimeUtils::CurrentTime()));
+    if (ds.Version().empty()) ds.Version(defaultVersion);
 }
 
-}  // namespace internal
+}  // anonymous
 
 using internal::DataSetElement;
-using internal::DataSetIO;
-using internal::FileUtils;
 
-DataSet::DataSet() : DataSet(DataSet::GENERIC) { internal::InitDefaults(*this); }
+DataSet::DataSet() : DataSet(DataSet::GENERIC) { InitDefaults(*this); }
 
-DataSet::DataSet(const DataSet::TypeEnum type)
-    : d_(nullptr), path_(FileUtils::CurrentWorkingDirectory())
+DataSet::DataSet(const DataSet::TypeEnum type) : path_(FileUtils::CurrentWorkingDirectory())
 {
     switch (type) {
         case DataSet::GENERIC:
@@ -100,13 +96,13 @@ DataSet::DataSet(const DataSet::TypeEnum type)
             throw std::runtime_error{"unsupported dataset type"};
     }
 
-    internal::InitDefaults(*this);
+    InitDefaults(*this);
 }
 
 DataSet::DataSet(const BamFile& bamFile)
     : d_(DataSetIO::FromUri(bamFile.Filename())), path_(FileUtils::CurrentWorkingDirectory())
 {
-    internal::InitDefaults(*this);
+    InitDefaults(*this);
 }
 
 DataSet::DataSet(const std::string& filename)
@@ -123,13 +119,13 @@ DataSet::DataSet(const std::string& filename)
         boost::algorithm::iends_with(filename, ".fa")) {
         path_ = FileUtils::CurrentWorkingDirectory();
     }
-    internal::InitDefaults(*this);
+    InitDefaults(*this);
 }
 
 DataSet::DataSet(const std::vector<std::string>& filenames)
     : d_(DataSetIO::FromUris(filenames)), path_(FileUtils::CurrentWorkingDirectory())
 {
-    internal::InitDefaults(*this);
+    InitDefaults(*this);
 }
 
 DataSet::DataSet(const DataSet& other) : path_(other.path_)
@@ -160,7 +156,7 @@ std::vector<std::string> DataSet::AllFiles() const
 {
     // get all files
     std::vector<std::string> result;
-    internal::GetAllFiles(ExternalResources(), &result);
+    GetAllFiles(ExternalResources(), &result);
 
     // resolve relative paths
     std::transform(result.begin(), result.end(), result.begin(),
@@ -210,7 +206,7 @@ DataSet DataSet::FromXml(const std::string& xml)
 {
     DataSet result;
     result.d_ = DataSetIO::FromXmlString(xml);
-    internal::InitDefaults(result);
+    InitDefaults(result);
     return result;
 }
 
@@ -251,7 +247,7 @@ std::vector<std::string> DataSet::ResolvedResourceIds() const
 
 std::string DataSet::ResolvePath(const std::string& originalPath) const
 {
-    return internal::FileUtils::ResolvedFilePath(originalPath, path_);
+    return FileUtils::ResolvedFilePath(originalPath, path_);
 }
 
 void DataSet::Save(const std::string& outputFilename) { DataSetIO::ToFile(d_, outputFilename); }
@@ -304,26 +300,26 @@ std::string DataSet::TypeToName(const DataSet::TypeEnum& type)
 
 // Exposed timestamp utils
 
-std::string CurrentTimestamp() { return internal::ToDataSetFormat(internal::CurrentTime()); }
+std::string CurrentTimestamp() { return TimeUtils::ToDataSetFormat(TimeUtils::CurrentTime()); }
 
 std::string ToDataSetFormat(const std::chrono::system_clock::time_point& tp)
 {
-    return internal::ToDataSetFormat(tp);
+    return TimeUtils::ToDataSetFormat(tp);
 }
 
 std::string ToDataSetFormat(const time_t& t)
 {
-    return ToDataSetFormat(std::chrono::system_clock::from_time_t(t));
+    return TimeUtils::ToDataSetFormat(std::chrono::system_clock::from_time_t(t));
 }
 
 std::string ToIso8601(const std::chrono::system_clock::time_point& tp)
 {
-    return internal::ToIso8601(tp);
+    return TimeUtils::ToIso8601(tp);
 }
 
 std::string ToIso8601(const time_t& t)
 {
-    return ToIso8601(std::chrono::system_clock::from_time_t(t));
+    return TimeUtils::ToIso8601(std::chrono::system_clock::from_time_t(t));
 }
 
 }  // namespace BAM
