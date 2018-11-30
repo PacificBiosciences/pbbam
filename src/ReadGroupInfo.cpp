@@ -18,6 +18,7 @@
 #include <tuple>
 #include <unordered_map>
 
+#include <boost/algorithm/cxx14/equal.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include "ChemistryTable.h"
@@ -576,13 +577,11 @@ bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
         other.pulseWidthCodec_, other.hasBarcodeData_, other.barcodeFile_, other.barcodeHash_,
         other.barcodeCount_, other.barcodeMode_, other.barcodeQuality_);
 
-    // TODO: C++!4 has a std::equal overload that takes the 2nd container's end().
-    //       This allows constant time "false" if the sizes do not match.
-    //
-    return lhsFields == rhsFields && (features_.size() == other.features_.size()) &&
-           (custom_.size() == other.custom_.size()) &&
-           std::equal(features_.cbegin(), features_.cend(), other.features_.cbegin()) &&
-           std::equal(custom_.begin(), custom_.end(), other.custom_.cbegin());
+    return lhsFields == rhsFields &&
+           boost::algorithm::equal(features_.cbegin(), features_.cend(), other.features_.cbegin(),
+                                   other.features_.cend()) &&
+           boost::algorithm::equal(custom_.cbegin(), custom_.cend(), other.custom_.cbegin(),
+                                   other.custom_.cend());
 }
 
 }  // namespace BAM
