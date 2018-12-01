@@ -14,7 +14,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 VirtualZmwCompositeReader::VirtualZmwCompositeReader(const DataSet& dataset)
     : currentReader_(nullptr), filter_(PbiFilter::FromDataSet(dataset))
@@ -70,6 +69,5 @@ void VirtualZmwCompositeReader::OpenNextReader()
     }
 }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio

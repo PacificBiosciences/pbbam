@@ -10,7 +10,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 class FofnReader
 {
@@ -18,7 +17,6 @@ public:
     static std::vector<std::string> Files(std::istream& in);
 };
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

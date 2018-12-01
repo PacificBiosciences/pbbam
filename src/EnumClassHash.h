@@ -11,7 +11,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 ///
 /// \brief The EnumClassHash struct enables the use of enum class types as keys
@@ -46,7 +45,6 @@ struct EnumClassHash
     }
 };
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

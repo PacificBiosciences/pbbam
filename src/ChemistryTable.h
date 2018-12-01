@@ -9,15 +9,13 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-typedef std::vector<std::array<std::string, 4>> ChemistryTable;
+using ChemistryTable = std::vector<std::array<std::string, 4>>;
 
-extern const ChemistryTable BuiltInChemistryTable;
+const ChemistryTable& BuiltInChemistryTable();
 
 const ChemistryTable& GetChemistryTableFromEnv();
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

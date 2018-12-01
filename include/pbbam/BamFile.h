@@ -16,10 +16,6 @@
 namespace PacBio {
 namespace BAM {
 
-namespace internal {
-class BamFilePrivate;
-}
-
 /// \brief The BamFile class represents a %BAM file.
 ///
 /// It provides access to header metadata and methods for finding/creating
@@ -176,7 +172,8 @@ public:
     /// \}
 
 private:
-    std::unique_ptr<internal::BamFilePrivate> d_;
+    class BamFilePrivate;
+    std::unique_ptr<BamFilePrivate> d_;
 };
 
 }  // namespace BAM

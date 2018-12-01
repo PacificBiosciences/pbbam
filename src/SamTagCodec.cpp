@@ -13,9 +13,11 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include "pbbam/StringUtilities.h"
+
 namespace PacBio {
 namespace BAM {
-namespace internal {
+namespace {
 
 template <typename T>
 inline void appendSamValue(const T& value, std::string& result)
@@ -45,16 +47,6 @@ void appendSamMultiValue_8bit(const T& container, std::string& result)
         result.push_back(',');
         appendSamValue_8bit(x, result);
     }
-}
-
-static std::vector<std::string> split(const std::string& s, char delim)
-{
-    std::vector<std::string> elems;
-    std::istringstream ss{s};
-    std::string item;
-    while (std::getline(ss, item, delim))
-        elems.push_back(item);
-    return elems;
 }
 
 std::vector<float> readFloatSamMultiValue(const std::string& data)
@@ -89,13 +81,13 @@ std::vector<T> readUnsignedSamMultiValue(const std::string& data)
     return result;
 }
 
-}  // namespace internal
+}  // anonymous
 
 TagCollection SamTagCodec::Decode(const std::string& tagString)
 {
     TagCollection tags;
 
-    const auto tokens = internal::split(tagString, '\t');
+    const auto tokens = Split(tagString, '\t');
     for (const auto& token : tokens) {
         if (token.size() < 6)  // TT:t:X
             continue;
@@ -169,25 +161,25 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
                 const auto arrayData = remainder.substr(1);
                 switch (elementType) {
                     case 'c':
-                        tags[name] = internal::readSignedSamMultiValue<int8_t>(arrayData);
+                        tags[name] = readSignedSamMultiValue<int8_t>(arrayData);
                         break;
                     case 'C':
-                        tags[name] = internal::readUnsignedSamMultiValue<uint8_t>(arrayData);
+                        tags[name] = readUnsignedSamMultiValue<uint8_t>(arrayData);
                         break;
                     case 's':
-                        tags[name] = internal::readSignedSamMultiValue<int16_t>(arrayData);
+                        tags[name] = readSignedSamMultiValue<int16_t>(arrayData);
                         break;
                     case 'S':
-                        tags[name] = internal::readUnsignedSamMultiValue<uint16_t>(arrayData);
+                        tags[name] = readUnsignedSamMultiValue<uint16_t>(arrayData);
                         break;
                     case 'i':
-                        tags[name] = internal::readSignedSamMultiValue<int32_t>(arrayData);
+                        tags[name] = readSignedSamMultiValue<int32_t>(arrayData);
                         break;
                     case 'I':
-                        tags[name] = internal::readUnsignedSamMultiValue<uint32_t>(arrayData);
+                        tags[name] = readUnsignedSamMultiValue<uint32_t>(arrayData);
                         break;
                     case 'f':
-                        tags[name] = internal::readFloatSamMultiValue(arrayData);
+                        tags[name] = readFloatSamMultiValue(arrayData);
                         break;
                     default:
                         throw std::runtime_error{"unsupported array-tag-type encountered: " +
@@ -237,12 +229,6 @@ std::string SamTagCodec::Encode(const TagCollection& tags)
         }
 
         // "<TYPE>:<DATA>" for all other data
-
-        using internal::appendSamMultiValue;
-        using internal::appendSamMultiValue_8bit;
-        using internal::appendSamValue;
-        using internal::appendSamValue_8bit;
-
         switch (tag.Type()) {
             case TagDataType::INT8:
                 result.push_back('i');
@@ -337,6 +323,11 @@ std::string SamTagCodec::Encode(const TagCollection& tags)
     }
 
     return result;
+}
+
+std::string MakeSamTag(std::string tag, std::string value)
+{
+    return '\t' + std::move(tag) + ':' + std::move(value);
 }
 
 }  // namespace BAM

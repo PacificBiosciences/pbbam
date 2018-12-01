@@ -16,36 +16,35 @@
 
 #include <htslib/hts.h>
 
-#include "StringUtils.h"
 #include "Version.h"
+#include "pbbam/SamTagCodec.h"
+#include "pbbam/StringUtilities.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
+namespace {
 
-static const std::string BamHeaderPrefixHD{"@HD"};
-static const std::string BamHeaderPrefixSQ{"@SQ"};
-static const std::string BamHeaderPrefixRG{"@RG"};
-static const std::string BamHeaderPrefixPG{"@PG"};
+const std::string BamHeaderPrefixHD{"@HD"};
+const std::string BamHeaderPrefixSQ{"@SQ"};
+const std::string BamHeaderPrefixRG{"@RG"};
+const std::string BamHeaderPrefixPG{"@PG"};
 static const std::string BamHeaderPrefixCO{"@CO"};
 
-static const std::string BamHeaderTokenVN{"VN"};
-static const std::string BamHeaderTokenSO{"SO"};
-static const std::string BamHeaderTokenpb{"pb"};
+const std::string BamHeaderTokenVN{"VN"};
+const std::string BamHeaderTokenSO{"SO"};
+const std::string BamHeaderTokenpb{"pb"};
 
-static inline bool CheckSortOrder(const std::string& lhs, const std::string& rhs)
-{
-    return lhs == rhs;
-}
+bool CheckSortOrder(const std::string& lhs, const std::string& rhs) { return lhs == rhs; }
 
-static inline bool CheckPbVersion(const std::string& lhs, const std::string& rhs)
+bool CheckPbVersion(const std::string& lhs, const std::string& rhs)
 {
+    using Version = PacBio::BAM::Version;
+
     return (Version{lhs} >= Version::Minimum && Version{rhs} >= Version::Minimum);
 }
 
-static inline bool CheckSequences(const std::string& sortOrder,
-                                  const std::vector<SequenceInfo>& lhs,
-                                  const std::vector<SequenceInfo>& rhs)
+bool CheckSequences(const std::string& sortOrder, const std::vector<SequenceInfo>& lhs,
+                    const std::vector<SequenceInfo>& rhs)
 {
     return ((sortOrder == "coordinate") ? lhs == rhs : true);
 }
@@ -80,7 +79,7 @@ static void EnsureCanMerge(const BamHeader& lhs, const BamHeader& rhs)
 void ParseHeaderLine(const std::string& line, BamHeader& hdr)
 {
     // pop off '@HD\t', then split HD lines into tokens
-    const auto tokens = internal::Split(line.substr(4), '\t');
+    const auto tokens = Split(line.substr(4), '\t');
     for (const auto& token : tokens) {
         const auto tokenTag = token.substr(0, 2);
         const auto tokenValue = token.substr(3);
@@ -95,10 +94,9 @@ void ParseHeaderLine(const std::string& line, BamHeader& hdr)
     }
 }
 
-}  // namespace internal
+}  // anonymous
 
-BamHeader::BamHeader(const std::string& samHeaderText)
-    : d_{std::make_shared<internal::BamHeaderPrivate>()}
+BamHeader::BamHeader(const std::string& samHeaderText) : d_{std::make_shared<BamHeaderPrivate>()}
 {
     std::istringstream s{samHeaderText};
     std::string line;
@@ -111,28 +109,28 @@ BamHeader::BamHeader(const std::string& samHeaderText)
         // determine token at beginning of line
         firstToken = line.substr(0, 3);
 
-        if (firstToken == internal::BamHeaderPrefixHD) {
-            internal::ParseHeaderLine(line, *this);
+        if (firstToken == BamHeaderPrefixHD) {
+            ParseHeaderLine(line, *this);
             if (Version().empty()) Version(std::string{hts_version()});
         }
 
-        else if (firstToken == internal::BamHeaderPrefixSQ)
+        else if (firstToken == BamHeaderPrefixSQ)
             AddSequence(SequenceInfo::FromSam(line));
 
-        else if (firstToken == internal::BamHeaderPrefixRG)
+        else if (firstToken == BamHeaderPrefixRG)
             AddReadGroup(ReadGroupInfo::FromSam(line));
 
-        else if (firstToken == internal::BamHeaderPrefixPG)
+        else if (firstToken == BamHeaderPrefixPG)
             AddProgram(ProgramInfo::FromSam(line));
 
-        else if (firstToken == internal::BamHeaderPrefixCO)
+        else if (firstToken == BamHeaderPrefixCO)
             AddComment(line.substr(4));
     }
 }
 
 BamHeader& BamHeader::operator+=(const BamHeader& other)
 {
-    internal::EnsureCanMerge(*this, other);
+    EnsureCanMerge(*this, other);
 
     // merge read groups
     for (const auto& rg : other.ReadGroups()) {
@@ -184,11 +182,11 @@ BamHeader BamHeader::DeepCopy() const
 BamHeader& BamHeader::PacBioBamVersion(const std::string& version)
 {
     d_->pacbioBamVersion_ = version;
-    const internal::Version fileVersion{version};
-    if (fileVersion < internal::Version::Minimum) {
+    const PacBio::BAM::Version fileVersion{version};
+    if (fileVersion < Version::Minimum) {
         throw std::runtime_error{"invalid PacBio BAM version number (" + fileVersion.ToString() +
                                  ") is older than the minimum supported version (" +
-                                 internal::Version::Minimum.ToString() + ")"};
+                                 Version::Minimum.ToString() + ")"};
     }
     return *this;
 }
@@ -303,13 +301,11 @@ std::string BamHeader::ToSam() const
     const auto outputVersion = (d_->version_.empty() ? std::string{hts_version()} : d_->version_);
     const auto outputSortOrder = (d_->sortOrder_.empty() ? std::string{"unknown"} : d_->sortOrder_);
     const auto outputPbBamVersion =
-        (d_->pacbioBamVersion_.empty() ? internal::Version::Current.ToString()
-                                       : d_->pacbioBamVersion_);
+        (d_->pacbioBamVersion_.empty() ? Version::Current.ToString() : d_->pacbioBamVersion_);
 
-    out << internal::BamHeaderPrefixHD
-        << internal::MakeSamTag(internal::BamHeaderTokenVN, outputVersion)
-        << internal::MakeSamTag(internal::BamHeaderTokenSO, outputSortOrder)
-        << internal::MakeSamTag(internal::BamHeaderTokenpb, outputPbBamVersion) << '\n';
+    out << BamHeaderPrefixHD << MakeSamTag(BamHeaderTokenVN, outputVersion)
+        << MakeSamTag(BamHeaderTokenSO, outputSortOrder)
+        << MakeSamTag(BamHeaderTokenpb, outputPbBamVersion) << '\n';
 
     // @SQ
     for (const auto& seq : d_->sequences_)
@@ -325,7 +321,7 @@ std::string BamHeader::ToSam() const
 
     // @CO
     for (const auto& comment : d_->comments_)
-        out << internal::BamHeaderPrefixCO << '\t' << comment << '\n';
+        out << BamHeaderPrefixCO << '\t' << comment << '\n';
 
     // return result
     return out.str();

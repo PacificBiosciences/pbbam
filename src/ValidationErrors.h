@@ -15,7 +15,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 /// The ValidationErrors class catches error messages accumulated during
 /// validation (see Validator).
@@ -58,7 +57,6 @@ private:
     void OnErrorAdded();
 };
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

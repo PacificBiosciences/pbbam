@@ -57,6 +57,7 @@ pbbam_cpp_sources = files([
   'QualityValue.cpp',
   'ReadAccuracyQuery.cpp',
   'ReadGroupInfo.cpp',
+  'RecordType.cpp',
   'SamTagCodec.cpp',
   'SamWriter.cpp',
   'SequenceInfo.cpp',

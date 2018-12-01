@@ -24,9 +24,8 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-class BamReaderPrivate
+class BamReader::BamReaderPrivate
 {
 public:
     explicit BamReaderPrivate(BamFile bamFile) : bamFile_{std::move(bamFile)} { DoOpen(); }
@@ -38,16 +37,13 @@ public:
         if (!htsFile_) throw std::runtime_error{"could not open BAM file for reading"};
     }
 
-    std::unique_ptr<samFile, internal::HtslibFileDeleter> htsFile_;
+    std::unique_ptr<samFile, HtslibFileDeleter> htsFile_;
     BamFile bamFile_;
 };
 
-}  // namespace internal
-
 BamReader::BamReader(std::string fn) : BamReader{BamFile{std::move(fn)}} {}
 
-BamReader::BamReader(BamFile bamFile)
-    : d_{std::make_unique<internal::BamReaderPrivate>(std::move(bamFile))}
+BamReader::BamReader(BamFile bamFile) : d_{std::make_unique<BamReaderPrivate>(std::move(bamFile))}
 {
     // skip header
     VirtualSeek(d_->bamFile_.FirstAlignmentOffset());
@@ -84,13 +80,13 @@ const BamHeader& BamReader::Header() const
 bool BamReader::GetNext(BamRecord& record)
 {
     assert(Bgzf());
-    assert(internal::BamRecordMemory::GetRawData(record).get());
+    assert(BamRecordMemory::GetRawData(record).get());
 
-    const auto result = ReadRawData(Bgzf(), internal::BamRecordMemory::GetRawData(record).get());
+    const auto result = ReadRawData(Bgzf(), BamRecordMemory::GetRawData(record).get());
 
     // success
     if (result >= 0) {
-        internal::BamRecordMemory::UpdateRecordTags(record);
+        BamRecordMemory::UpdateRecordTags(record);
         record.header_ = Header();
         record.ResetCachedPositions();
 

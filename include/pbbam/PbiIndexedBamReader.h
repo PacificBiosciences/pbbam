@@ -16,10 +16,6 @@
 namespace PacBio {
 namespace BAM {
 
-namespace internal {
-class PbiIndexedBamReaderPrivate;
-}
-
 /// \brief The PbiIndexedBamReader class provides read-only iteration over %BAM
 ///        records, limited to some filtering criteria.
 ///
@@ -104,7 +100,8 @@ protected:
     int ReadRawData(BGZF* bgzf, bam1_t* b) override;
 
 private:
-    std::unique_ptr<internal::PbiIndexedBamReaderPrivate> d_;
+    class PbiIndexedBamReaderPrivate;
+    std::unique_ptr<PbiIndexedBamReaderPrivate> d_;
 };
 
 }  // namespace internal

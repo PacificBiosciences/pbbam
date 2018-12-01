@@ -14,10 +14,6 @@
 namespace PacBio {
 namespace BAM {
 
-namespace internal {
-class FastqReaderPrivate;
-}
-
 ///
 /// \brief The FastqReader provides sequential access to Fastq records.
 ///
@@ -69,7 +65,8 @@ public:
     /// \}
 
 private:
-    std::unique_ptr<internal::FastqReaderPrivate> d_;
+    class FastqReaderPrivate;
+    std::unique_ptr<FastqReaderPrivate> d_;
 };
 
 }  // namespace BAM

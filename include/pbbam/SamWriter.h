@@ -16,10 +16,6 @@
 namespace PacBio {
 namespace BAM {
 
-namespace internal {
-class SamWriterPrivate;
-}
-
 /// \brief The SamWriter class provides a writing interface for creating
 ///        new SAM files.
 ///
@@ -90,7 +86,8 @@ public:
     void Write(const BamRecordImpl& recordImpl) override;
 
 private:
-    std::unique_ptr<internal::SamWriterPrivate> d_;
+    class SamWriterPrivate;
+    std::unique_ptr<SamWriterPrivate> d_;
 };
 
 }  // namesapce BAM

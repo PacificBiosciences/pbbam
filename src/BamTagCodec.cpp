@@ -16,7 +16,7 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
+namespace {
 
 template <typename T>
 inline void appendBamValue(const T& value, kstring_t* str)
@@ -57,7 +57,7 @@ std::vector<T> readBamMultiValue(const uint8_t* src, size_t& offset)
     return result;
 }
 
-}  // namespace internal
+}  // anonymous
 
 TagCollection BamTagCodec::Decode(const std::vector<uint8_t>& data)
 {
@@ -74,9 +74,6 @@ TagCollection BamTagCodec::Decode(const std::vector<uint8_t>& data)
         tagName.reserve(2);
         tagName.append(1, pData[i++]);
         tagName.append(1, pData[i++]);
-
-        using internal::readBamMultiValue;
-        using internal::readBamValue;
 
         const auto tagType = static_cast<char>(pData[i++]);
         switch (tagType) {
@@ -187,9 +184,6 @@ std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
             }
         }
 
-        using internal::appendBamMultiValue;
-        using internal::appendBamValue;
-
         // "<TYPE>:<DATA>" for all other data
         switch (tag.Type()) {
             case TagDataType::INT8: {
@@ -299,9 +293,6 @@ std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
 
 Tag BamTagCodec::FromRawData(uint8_t* rawData)
 {
-    using internal::readBamMultiValue;
-    using internal::readBamValue;
-
     size_t offset = 0;
     const auto tagType = static_cast<char>(*rawData++);
     switch (tagType) {
@@ -384,10 +375,6 @@ std::vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag, const TagModifier& a
 
     // for all others
     else {
-
-        using internal::appendBamMultiValue;
-        using internal::appendBamValue;
-
         switch (tag.Type()) {
 
             // single, numeric values

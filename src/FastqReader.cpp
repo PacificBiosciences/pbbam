@@ -19,9 +19,8 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-class FastqReaderPrivate
+class FastqReader::FastqReaderPrivate
 {
 public:
     explicit FastqReaderPrivate(const std::string& fn) : stream_{fn}
@@ -77,12 +76,7 @@ private:
     std::string quals_;
 };
 
-}  // namespace internal
-
-FastqReader::FastqReader(const std::string& fn)
-    : d_{std::make_unique<internal::FastqReaderPrivate>(fn)}
-{
-}
+FastqReader::FastqReader(const std::string& fn) : d_{std::make_unique<FastqReaderPrivate>(fn)} {}
 
 FastqReader::~FastqReader() {}
 

@@ -168,10 +168,10 @@ std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName)
 
 void DataSetBase::Save(const std::string& outputFilename)
 {
-    internal::DataSetIO::ToFile(*this, outputFilename);
+    DataSetIO::ToFile(*this, outputFilename);
 }
 
-void DataSetBase::SaveToStream(std::ostream& out) { internal::DataSetIO::ToStream(*this, out); }
+void DataSetBase::SaveToStream(std::ostream& out) { DataSetIO::ToStream(*this, out); }
 
 // -------------------
 // DataSetMetadata

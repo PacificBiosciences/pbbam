@@ -32,7 +32,7 @@ static void CheckRawData(const BamRecordImpl& bam)
                                         (expectedSeqLength + 1) / 2 + expectedSeqLength +
                                         expectedTagsLength;
 
-    const auto rawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    const auto rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
     ASSERT_TRUE(static_cast<bool>(rawData));
     EXPECT_EQ(expectedNameLength, rawData->core.l_qname);
     EXPECT_EQ(expectedNumCigarOps, rawData->core.n_cigar);
@@ -49,7 +49,7 @@ TEST(BamRecordBuilderTest, DefaultValues)
     BamRecordBuilder builder;
     BamRecord bam = builder.Build();
 
-    const auto rawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    const auto rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
     ASSERT_TRUE(static_cast<bool>(rawData));
 
     // fixed-length (core) data
@@ -131,7 +131,7 @@ TEST(BamRecordBuilderTest, CheckSetters)
     // check raw data
     // -------------------------------
 
-    const auto rawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    const auto rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
     ASSERT_TRUE(static_cast<bool>(rawData));
 
     // fixed-length (core) data

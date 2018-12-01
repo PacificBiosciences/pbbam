@@ -8,10 +8,6 @@
 
 #include <pbbam/../../src/SequenceUtils.h>
 
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
-
 TEST(SequenceUtilsTest, ComplementChar)
 {
     // complement
@@ -41,6 +37,8 @@ TEST(SequenceUtilsTest, ComplementChar)
     const char X = 'X';  // null
     const char Y = 'Y';  // R
     const char Z = 'Z';  // null
+
+    using PacBio::BAM::Complement;
 
     EXPECT_EQ(T, Complement(A));
     EXPECT_EQ(V, Complement(B));
@@ -74,6 +72,8 @@ TEST(SequenceUtilsTest, ReverseComplement)
 {
     std::string input1{"ATATATCCCGGCG"};
     const std::string rc1{"CGCCGGGATATAT"};
+
+    using PacBio::BAM::ReverseComplement;
 
     ReverseComplement(input1);
     EXPECT_EQ(rc1, input1);

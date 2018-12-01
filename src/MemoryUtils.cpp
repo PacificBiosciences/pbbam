@@ -10,11 +10,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
-
-// -----------------
-// BamHeaderMemory
-// -----------------
 
 BamHeader BamHeaderMemory::FromRawData(bam_hdr_t* hdr)
 {
@@ -32,7 +27,7 @@ std::shared_ptr<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& heade
 {
     const std::string text = header.ToSam();
     std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()),
-                                       internal::HtslibHeaderDeleter());
+                                       HtslibHeaderDeleter());
     rawData->ignore_sam_err = 0;
     rawData->cigar_tab = nullptr;
     rawData->l_text = text.size();
@@ -41,6 +36,5 @@ std::shared_ptr<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& heade
     return rawData;
 }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio

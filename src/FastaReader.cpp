@@ -20,9 +20,8 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-class FastaReaderPrivate
+class FastaReader::FastaReaderPrivate
 {
 public:
     explicit FastaReaderPrivate(const std::string& fn) : stream_{fn}
@@ -85,12 +84,7 @@ private:
     std::string bases_;
 };
 
-}  // namespace internal
-
-FastaReader::FastaReader(const std::string& fn)
-    : d_{std::make_unique<internal::FastaReaderPrivate>(fn)}
-{
-}
+FastaReader::FastaReader(const std::string& fn) : d_{std::make_unique<FastaReaderPrivate>(fn)} {}
 
 FastaReader::~FastaReader() {}
 

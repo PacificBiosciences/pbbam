@@ -17,7 +17,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 using StitchingSources = std::deque<std::pair<std::string, std::string>>;
 
@@ -63,7 +62,6 @@ inline StitchingSources SourcesFromDataset(const DataSet& dataset)
     return sources;
 }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

@@ -8,9 +8,8 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-class BamHeaderPrivate
+class BamHeader::BamHeaderPrivate
 {
 public:
     std::string version_;
@@ -27,10 +26,8 @@ public:
     std::map<std::string, int32_t> sequenceIdLookup_;
 };
 
-} // namespace internal
-
 inline BamHeader::BamHeader()
-    : d_{std::make_shared<internal::BamHeaderPrivate>()}
+    : d_{std::make_shared<BamHeaderPrivate>()}
 { }
 
 inline BamHeader BamHeader::operator+(const BamHeader& other) const

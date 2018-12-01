@@ -15,11 +15,12 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "StringUtils.h"
+#include "pbbam/StringUtilities.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
+
+namespace {
 
 // pops "file://" scheme off the front of a URI/filepath, if found
 static std::string removeFileUriScheme(const std::string& uri)
@@ -129,6 +130,8 @@ static std::string native_resolvedFilePath(const std::string& filePath, const st
 
 #endif  // PBBAM_WIN_FILEPATHS
 
+}  // anonymous
+
 // see http://stackoverflow.com/questions/2869594/how-return-a-stdstring-from-cs-getcwd-function
 std::string FileUtils::CurrentWorkingDirectory()
 {
@@ -191,6 +194,5 @@ off_t FileUtils::Size(const char* fn)
     return s.st_size;
 }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio

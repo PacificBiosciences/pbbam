@@ -34,12 +34,7 @@
 namespace PacBio {
 namespace BAM {
 
-namespace internal {
-
-class BamRecordMemory;
 class Pulse2BaseCache;
-
-}  // namespace internal
 
 /// \brief The BamRecord class represents a %PacBio %BAM record.
 ///
@@ -1183,7 +1178,7 @@ private:
 private:
     /// \internal
     /// pulse to bam mapping cache
-    mutable std::unique_ptr<internal::Pulse2BaseCache> p2bCache_;
+    mutable std::unique_ptr<Pulse2BaseCache> p2bCache_;
 
 public:
     /// clips the PacBio tags to a specified length
@@ -1260,7 +1255,7 @@ private:
     void CalculateAlignedPositions() const;
     void CalculatePulse2BaseCache() const;
 
-    friend class internal::BamRecordMemory;
+    friend class BamRecordMemory;
 };
 
 }  // namespace BAM

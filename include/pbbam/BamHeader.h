@@ -22,10 +22,6 @@
 namespace PacBio {
 namespace BAM {
 
-namespace internal {
-class BamHeaderPrivate;
-}
-
 /// \brief The BamHeader class represents the header section of the %BAM file.
 ///
 /// It provides metadata about the file including file version, reference
@@ -382,7 +378,8 @@ public:
     /// \}
 
 private:
-    std::shared_ptr<internal::BamHeaderPrivate> d_;
+    class BamHeaderPrivate;
+    std::shared_ptr<BamHeaderPrivate> d_;
 };
 
 }  // namespace BAM

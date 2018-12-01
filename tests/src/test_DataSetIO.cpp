@@ -204,7 +204,7 @@ TEST(DataSetIOTest, ToXml)
            .Attribute("xsi:schemaLocation", "http://pacificbiosciences.com/PacBioDatasets.xsd");
 
     // external resources
-    ExternalResource resource1("AlignmentFile.AlignmentBamFile", "file:/mnt/path/to/alignments2.bam");    
+    ExternalResource resource1("AlignmentFile.AlignmentBamFile", "file:/mnt/path/to/alignments2.bam");
     resource1.Name("Third Alignments BAM");
     resource1.Description("Points to an example Alignments BAM file.");
     resource1.Tags("Example");
@@ -1558,11 +1558,11 @@ TEST(DataSetIOTest, RelativePathCarriedThroughOk_FromFile)
 TEST(DataSetIOTest, DataSetFromRelativeBamFilename)
 {
     // cache initial directory and move to location so we can test relatvie filename ok
-    const std::string startingDirectory = internal::FileUtils::CurrentWorkingDirectory();
+    const std::string startingDirectory = FileUtils::CurrentWorkingDirectory();
 
     const std::string targetDirectory = PbbamTestsConfig::Data_Dir + "/dataset";
     DataSetIOTests::changeCurrentDirectory(targetDirectory);
-    ASSERT_EQ(targetDirectory, internal::FileUtils::CurrentWorkingDirectory());
+    ASSERT_EQ(targetDirectory, FileUtils::CurrentWorkingDirectory());
 
     EXPECT_NO_THROW(
     {
@@ -1576,7 +1576,7 @@ TEST(DataSetIOTest, DataSetFromRelativeBamFilename)
     DataSetIOTests::changeCurrentDirectory(startingDirectory);
 }
 
-TEST(DataaSetIOTest, AllFiles) 
+TEST(DataaSetIOTest, AllFiles)
 {
     // check  BamFiles only
     EXPECT_NO_THROW(
@@ -1591,7 +1591,7 @@ TEST(DataaSetIOTest, AllFiles)
     {
         const DataSet dataset(PbbamTestsConfig::Data_Dir + "/chunking/chunking.subreadset.xml");
         const auto allFiles = dataset.AllFiles();
-        EXPECT_EQ(6, allFiles.size());    
+        EXPECT_EQ(6, allFiles.size());
     });
 }
 
