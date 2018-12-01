@@ -47,27 +47,27 @@ source scripts/ci/install.sh
 # install into staging dir with --prefix /usr/local
 # in order to sidestep all the artifact policy
 rm -rf staging
-meson configure -Dprefix=/usr/local -Dtests=false "${CURRENT_BUILD_DIR}"
-DESTDIR="${PWD}/staging" ninja -C "${CURRENT_BUILD_DIR}" -v install
+meson configure -Dprefix=/usr/local "${CURRENT_BUILD_DIR:-build}"
+DESTDIR="${PWD}/staging" ninja -C "${CURRENT_BUILD_DIR:-build}" -v install
 
 if [[ ${BUILD_NUMBER} = 0 ]]; then
   exit 0
 elif [[ $bamboo_planRepository_branchName == master ]]; then
-  VERSION="$(${CURRENT_BUILD_DIR}/tools/bam2sam --version)".${BUILD_NUMBER}
+  VERSION="$(${CURRENT_BUILD_DIR:-build}/tools/bam2sam --version)".${BUILD_NUMBER}
   NEXUS_REPO=maven-releases
 elif [[ $bamboo_planRepository_branchName == develop ]]; then
-  VERSION="$(${CURRENT_BUILD_DIR}/tools/bam2sam --version)".SNAPSHOT${BUILD_NUMBER}
+  VERSION="$(${CURRENT_BUILD_DIR:-build}/tools/bam2sam --version)".SNAPSHOT${BUILD_NUMBER}
   NEXUS_REPO=maven-snapshots
   rm -rf /mnt/secondary/builds/unsupported/pbbam.previous
   if [[ -e /mnt/secondary/builds/unsupported/pbbam ]]; then
     mv /mnt/secondary/builds/unsupported/pbbam \
        /mnt/secondary/builds/unsupported/pbbam.previous
   fi
-  DESTDIR="/mnt/secondary/builds/unsupported/pbbam/" ninja -C "${CURRENT_BUILD_DIR}" -v install
+  DESTDIR="/mnt/secondary/builds/unsupported/pbbam/" ninja -C "${CURRENT_BUILD_DIR:-build}" -v install
 else
   exit 0
 fi
-NEXUS_VERSION="$(${CURRENT_BUILD_DIR}/tools/bam2sam --version)".${BUILD_NUMBER}
+NEXUS_VERSION="$(${CURRENT_BUILD_DIR:-build}/tools/bam2sam --version)".${BUILD_NUMBER}
 
 ( cd staging && tar zcf ../pbbam-${VERSION}-x86_64.tgz . )
 md5sum  pbbam-${VERSION}-x86_64.tgz | awk -e '{print $1}' >| pbbam-${VERSION}-x86_64.tgz.md5

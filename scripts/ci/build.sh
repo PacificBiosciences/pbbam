@@ -17,6 +17,7 @@ meson \
   --wrap-mode nofallback \
   --prefix "${PREFIX_ARG:-/usr/local}" \
   -Db_coverage="${ENABLED_COVERAGE:-false}" \
+  -Db_sanitize="${ENABLED_SANITIZERS:-none}" \
   -Dtests="${ENABLED_TESTS:-false}" \
   "${CURRENT_BUILD_DIR:-build}" .
 
