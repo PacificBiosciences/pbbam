@@ -10,4 +10,7 @@ if [[ ${PREFIX_ARG} ]]; then
   rm -rf "${PREFIX_ARG}"/*
 fi
 
+# *never* install with ASAN enabled
+meson configure -Db_sanitize=none "${CURRENT_BUILD_DIR:-build}"
+
 DESTDIR="${DESTDIR:-/}" ninja -C "${CURRENT_BUILD_DIR:-build}" -v install

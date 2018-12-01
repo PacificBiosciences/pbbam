@@ -112,14 +112,14 @@ inline boost::optional<uint16_t> ReadGroupInfo::BarcodeForward() const
 {
     const auto barcodes = Barcodes();
     if (barcodes) return barcodes->first;
-    return boost::none;
+    return boost::make_optional(false, uint16_t{0});
 }
 
 inline boost::optional<uint16_t> ReadGroupInfo::BarcodeReverse() const
 {
     const auto barcodes = Barcodes();
     if (barcodes) return barcodes->second;
-    return boost::none;
+    return boost::make_optional(false, uint16_t{0});
 }
 
 inline boost::optional<std::pair<uint16_t, uint16_t>> ReadGroupInfo::Barcodes() const
