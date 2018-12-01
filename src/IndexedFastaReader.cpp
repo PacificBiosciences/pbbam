@@ -62,6 +62,17 @@ void ClipAndGapify(std::string& subseq, const Cigar& cigar, bool exciseSoftClips
     }
 }
 
+struct FreeDeleter
+{
+    // Need to deallocate the returned pointer from htslib using `free()`,
+    // as `delete`-deallocating a pointer originally allocated with `malloc`
+    // constitutes undefined behavior and ASAN rightfully errors out
+    // with a `alloc-dealloc-mismatch` message.
+    // See also:
+    //   https://github.com/samtools/htslib/blob/develop/htslib/faidx.h#L195
+    void operator()(char* p) const { std::free(p); }
+};
+
 }  // anonymous
 
 IndexedFastaReader::IndexedFastaReader(const std::string& filename)
@@ -117,7 +128,8 @@ std::string IndexedFastaReader::Subsequence(const std::string& id, Position begi
     // Derek: *Annoyingly* htslib seems to interpret "end" as inclusive in
     // faidx_fetch_seq, whereas it considers it exclusive in the region spec in
     // fai_fetch.  Can you please verify?
-    const std::unique_ptr<char> rawSeq{faidx_fetch_seq(handle_, id.c_str(), begin, end - 1, &len)};
+    const std::unique_ptr<char, FreeDeleter> rawSeq{
+        faidx_fetch_seq(handle_, id.c_str(), begin, end - 1, &len)};
     if (rawSeq == nullptr) throw std::runtime_error{"could not fetch FASTA sequence"};
     return RemoveAllWhitespace(rawSeq.get());
 }
@@ -133,7 +145,7 @@ std::string IndexedFastaReader::Subsequence(const char* htslibRegion) const
     REQUIRE_FAIDX_LOADED;
 
     int len;
-    const std::unique_ptr<char> rawSeq(fai_fetch(handle_, htslibRegion, &len));
+    const std::unique_ptr<char, FreeDeleter> rawSeq(fai_fetch(handle_, htslibRegion, &len));
     if (rawSeq == nullptr) throw std::runtime_error{"could not fetch FASTA sequence"};
     return RemoveAllWhitespace(rawSeq.get());
 }
