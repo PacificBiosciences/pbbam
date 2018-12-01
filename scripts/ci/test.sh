@@ -7,24 +7,19 @@ set -vex
 
 type module >& /dev/null || . /mnt/software/Modules/current/init/bash
 
-# Note: htslib v1.7 added native long CIGAR support. pbbam "spoofs" it 
-#       when running <1.7. So we'll always check the default htslib for 
-#       general test success/fail, and then check pre-/post-v1.7 explicitly
-#       to ensure we pass in either context (detectable at runtime).
-
-# default htslib
 ninja -C "${CURRENT_BUILD_DIR:-build}" -v test
 
-# explicit htslib v1.6
-module unload htslib
-module load htslib/1.6
-ninja -C "${CURRENT_BUILD_DIR:-build}" -v test
+############
+# COVERAGE #
+############
 
-# explicit htslib v1.7
-module unload htslib
-module load htslib/1.7
-ninja -C "${CURRENT_BUILD_DIR:-build}" -v test\
-
-# restore default
-module unload htslib
-module load htslib
+if [[ ${ENABLED_COVERAGE} == true ]]; then
+  pushd "${CURRENT_BUILD_DIR:-build}"
+  find . -type f -iname '*.o' | xargs gcov -acbrfu {} \; >/dev/null && \
+    mkdir coverage && pushd coverage && mv ../*.gcov . && \
+    sed -i -e 's@Source:@Source:../@' *.gcov && \
+    sed -i -e 's@Graph:@Graph:../@' *.gcov && \
+    sed -i -e 's@Data:@Data:../@' *.gcov && \
+    rm pugixml* && popd
+  popd
+fi

@@ -10,11 +10,13 @@ set -vex
 # stuff from the internet or using subprojects.
 meson \
   --werror \
+  --buildtype "${BUILDTYPE:-release}" \
   --default-library shared \
   --libdir lib \
   --unity "${ENABLED_UNITY_BUILD:-off}" \
   --wrap-mode nofallback \
   --prefix "${PREFIX_ARG:-/usr/local}" \
+  -Db_coverage="${ENABLED_COVERAGE:-false}" \
   -Dtests="${ENABLED_TESTS:-false}" \
   "${CURRENT_BUILD_DIR:-build}" .
 
