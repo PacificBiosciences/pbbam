@@ -5,15 +5,15 @@ set -vex
 # TEST #
 ########
 
-type module >& /dev/null || . /mnt/software/Modules/current/init/bash
-
 ninja -C "${CURRENT_BUILD_DIR:-build}" -v test
 
 ############
 # COVERAGE #
 ############
 
-if [[ ${ENABLED_COVERAGE} == true ]]; then
+if [[ ${ENABLED_COVERAGE:-false} == true ]]; then
+  module load gcov
+
   pushd "${CURRENT_BUILD_DIR:-build}"
   find . -type f -iname '*.o' | xargs gcov -acbrfu {} \; >/dev/null && \
     mkdir coverage && pushd coverage && mv ../*.gcov . && \
