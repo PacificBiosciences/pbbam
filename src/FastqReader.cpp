@@ -8,13 +8,14 @@
 
 #include "pbbam/FastqReader.h"
 
-#include <fstream>
-#include <iostream>
-#include <limits>
+#include <memory>
 #include <stdexcept>
+#include <string>
 
-#include <htslib/faidx.h>
+#include <htslib/kseq.h>
+#include <zlib.h>
 
+#include "pbbam/FastqSequence.h"
 #include "pbbam/MakeUnique.h"
 
 namespace PacBio {
@@ -22,58 +23,40 @@ namespace BAM {
 
 class FastqReader::FastqReaderPrivate
 {
-public:
-    explicit FastqReaderPrivate(const std::string& fn) : stream_{fn}
+    KSEQ_INIT(gzFile, gzread)
+    struct KSeqDeleter
     {
-        if (!stream_)
-            throw std::runtime_error{"FastqReader - could not open " + fn + " for reading"};
-        FetchNext();
+        void operator()(kseq_t* seq)
+        {
+            if (seq) kseq_destroy(seq);
+            seq = nullptr;
+        }
+    };
+
+public:
+    explicit FastqReaderPrivate(const std::string& fn)
+        : fp_{gzopen(fn.c_str(), "r")}, seq_{kseq_init(fp_)}
+    {
+        if (fp_ == nullptr || seq_.get() == nullptr)
+            throw std::runtime_error{"Could not open " + fn + " for reading"};
     }
+
+    ~FastqReaderPrivate() { gzclose(fp_); }
 
     bool GetNext(FastqSequence& record)
     {
-        if (name_.empty() && bases_.empty() && quals_.empty()) return false;
-        record = FastqSequence{name_, bases_, quals_};
-        FetchNext();
+        const auto result = kseq_read(seq_.get());
+        if (result == -1)  // EOF
+            return false;
+        record = FastqSequence{std::string{seq_->name.s, seq_->name.l},
+                               std::string{seq_->seq.s, seq_->seq.l},
+                               std::string{seq_->qual.s, seq_->qual.l}};
         return true;
     }
 
 private:
-    void FetchNext()
-    {
-        name_.clear();
-        bases_.clear();
-        quals_.clear();
-
-        if (!stream_ || stream_.eof()) return;
-
-        SkipNewlines();
-
-        ReadName();
-        ReadBases();
-        stream_.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // ignore "comment line"
-        ReadQuals();
-    }
-
-    inline void SkipNewlines()
-    {
-        if (stream_.peek() == '\n')
-            stream_.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }
-
-    void ReadName()
-    {
-        if (stream_.get() == '@') std::getline(stream_, name_, '\n');
-    }
-
-    void ReadBases() { std::getline(stream_, bases_, '\n'); }
-
-    void ReadQuals() { std::getline(stream_, quals_, '\n'); }
-
-    std::ifstream stream_;
-    std::string name_;
-    std::string bases_;
-    std::string quals_;
+    gzFile fp_;
+    std::unique_ptr<kseq_t, KSeqDeleter> seq_;
 };
 
 FastqReader::FastqReader(const std::string& fn) : d_{std::make_unique<FastqReaderPrivate>(fn)} {}

@@ -8,80 +8,54 @@
 
 #include "pbbam/FastaReader.h"
 
-#include <fstream>
-#include <iostream>
-#include <limits>
+#include <memory>
 #include <stdexcept>
+#include <string>
 
-#include <htslib/faidx.h>
+#include <htslib/kseq.h>
+#include <zlib.h>
 
+#include "pbbam/FastaSequence.h"
 #include "pbbam/MakeUnique.h"
-#include "pbbam/StringUtilities.h"
 
 namespace PacBio {
 namespace BAM {
 
 class FastaReader::FastaReaderPrivate
 {
-public:
-    explicit FastaReaderPrivate(const std::string& fn) : stream_{fn}
+    KSEQ_INIT(gzFile, gzread)
+    struct KSeqDeleter
     {
-        if (!stream_)
-            throw std::runtime_error{"FastaReader - could not open " + fn + " for reading"};
-        FetchNext();
+        void operator()(kseq_t* seq)
+        {
+            if (seq) kseq_destroy(seq);
+            seq = nullptr;
+        }
+    };
+
+public:
+    explicit FastaReaderPrivate(const std::string& fn)
+        : fp_{gzopen(fn.c_str(), "r")}, seq_{kseq_init(fp_)}
+    {
+        if (fp_ == nullptr || seq_.get() == nullptr)
+            throw std::runtime_error{"Could not open " + fn + " for reading"};
     }
+
+    ~FastaReaderPrivate() { gzclose(fp_); }
 
     bool GetNext(FastaSequence& record)
     {
-        if (name_.empty() && bases_.empty()) return false;
-        record = FastaSequence{name_, bases_};
-        FetchNext();
+        const auto result = kseq_read(seq_.get());
+        if (result == -1)  // EOF
+            return false;
+        record = FastaSequence{std::string{seq_->name.s, seq_->name.l},
+                               std::string{seq_->seq.s, seq_->seq.l}};
         return true;
     }
 
 private:
-    void FetchNext()
-    {
-        name_.clear();
-        bases_.clear();
-
-        SkipNewlines();
-        ReadName();
-        ReadBases();
-
-        bases_ = RemoveAllWhitespace(std::move(bases_));
-    }
-
-    inline void SkipNewlines()
-    {
-        if (!stream_) return;
-        if (stream_.peek() == '\n')
-            stream_.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }
-
-    void ReadName()
-    {
-        if (!stream_) return;
-        if (stream_.get() == '>') std::getline(stream_, name_, '\n');
-    }
-
-    void ReadBases()
-    {
-        if (!stream_) return;
-        int p = stream_.peek();
-        while (static_cast<char>(p) != '>' && p != EOF) {
-            if (!stream_) return;
-            std::string line;
-            std::getline(stream_, line, '\n');
-            bases_ += line;
-            if (!stream_) return;
-            p = stream_.peek();
-        }
-    }
-
-    std::ifstream stream_;
-    std::string name_;
-    std::string bases_;
+    gzFile fp_;
+    std::unique_ptr<kseq_t, KSeqDeleter> seq_;
 };
 
 FastaReader::FastaReader(const std::string& fn) : d_{std::make_unique<FastaReaderPrivate>(fn)} {}

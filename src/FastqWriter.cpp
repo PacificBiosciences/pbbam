@@ -45,7 +45,17 @@ void FastqWriter::Write(const std::string& name, const std::string& bases,
 
 void FastqWriter::Write(const std::string& name, const std::string& bases, const std::string& quals)
 {
-    file_ << "@" << name << '\n' << bases << '\n' << "+\n" << quals << '\n';
+
+    file_ << "@" << name << '\n' << bases << '\n' << "+\n";
+
+    if (!quals.empty())
+        file_ << quals;
+    else {
+        std::string q(bases.size(), '!');
+        file_ << q;
+    }
+
+    file_ << '\n';
 }
 
 }  // namespace BAM
