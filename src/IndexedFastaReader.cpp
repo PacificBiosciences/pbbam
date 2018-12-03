@@ -8,6 +8,7 @@
 
 #include "pbbam/IndexedFastaReader.h"
 
+#include <cassert>
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
@@ -123,6 +124,12 @@ std::string IndexedFastaReader::Subsequence(const std::string& id, Position begi
                                             Position end) const
 {
     REQUIRE_FAIDX_LOADED;
+
+    assert(begin <= end);
+    // htslib is dumb and will not consider empty intervals valid,
+    // that is, a call to faidx_fetch_seq will *always* return a
+    // sequence consisting of at least one base.
+    if (begin == end) return std::string{};
 
     int len;
     // Derek: *Annoyingly* htslib seems to interpret "end" as inclusive in
