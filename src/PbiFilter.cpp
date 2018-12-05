@@ -22,8 +22,8 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #include "FileUtils.h"
-#include "StringUtils.h"
 #include "pbbam/PbiFilterTypes.h"
+#include "pbbam/StringUtilities.h"
 
 namespace PacBio {
 namespace BAM {
@@ -135,7 +135,7 @@ static PbiFilter CreateBarcodeFilter(std::string value, const Compare::Type comp
     }
 
     if (isList(value)) {
-        std::vector<std::string> barcodes = internal::Split(value, ',');
+        std::vector<std::string> barcodes = Split(value, ',');
         if (barcodes.size() != 2) throw std::runtime_error{"only 2 barcode values expected"};
         return PbiBarcodesFilter{boost::numeric_cast<int16_t>(std::stoi(barcodes.at(0))),
                                  boost::numeric_cast<int16_t>(std::stoi(barcodes.at(1))),
@@ -154,7 +154,7 @@ static PbiFilter CreateBarcodeForwardFilter(std::string value, const Compare::Ty
     }
 
     if (isList(value)) {
-        std::vector<std::string> tokens = internal::Split(value, ',');
+        std::vector<std::string> tokens = Split(value, ',');
         std::vector<int16_t> barcodes;
         barcodes.reserve(tokens.size());
         for (const auto& t : tokens)
@@ -174,7 +174,7 @@ static PbiFilter CreateBarcodeReverseFilter(std::string value, const Compare::Ty
     }
 
     if (isList(value)) {
-        std::vector<std::string> tokens = internal::Split(value, ',');
+        std::vector<std::string> tokens = Split(value, ',');
         std::vector<int16_t> barcodes;
         barcodes.reserve(tokens.size());
         for (const auto& t : tokens)
@@ -195,7 +195,7 @@ static PbiFilter CreateLocalContextFilter(const std::string& value, const Compar
 
     // else interpret as flag names
     else {
-        std::vector<std::string> tokens = internal::Split(value, '|');
+        std::vector<std::string> tokens = Split(value, '|');
         for (std::string& token : tokens) {
             boost::algorithm::trim(token);  // trim whitespace
             filterValue = (filterValue | contextFlagNames.at(token));
@@ -219,7 +219,7 @@ static PbiFilter CreateMovieNameFilter(std::string value, const Compare::Type co
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
             throw std::runtime_error{"unsupported compare type on movie property"};
 
-        std::vector<std::string> tokens = internal::Split(value, ',');
+        std::vector<std::string> tokens = Split(value, ',');
         return PbiMovieNameFilter{std::move(tokens), compareType};
     } else
         return PbiMovieNameFilter{value, compareType};
@@ -240,7 +240,7 @@ static PbiFilter CreateQIdFilter(std::string value, const Compare::Type compareT
             throw std::runtime_error{"unsupported compare type on qid property"};
 
         std::vector<int32_t> rgIds;
-        for (const auto& t : internal::Split(value, ','))
+        for (const auto& t : Split(value, ','))
             rgIds.push_back(static_cast<int32_t>(std::stoul(t)));
         return PbiReadGroupFilter{rgIds, compareType};
     } else {
@@ -271,7 +271,7 @@ static PbiFilter CreateQueryNameFilter(std::string value, const DataSet& dataset
 
     // try possible filename first
     const std::string resolvedFilename = dataset.ResolvePath(value);
-    if (internal::FileUtils::Exists(value))
+    if (FileUtils::Exists(value))
         return CreateQueryNamesFilterFromFile(value, dataset, compareType);
 
     // otherwise "normal" qname (single, or list)
@@ -286,7 +286,7 @@ static PbiFilter CreateQueryNameFilter(std::string value, const DataSet& dataset
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
             throw std::runtime_error{"unsupported compare type on query name property"};
 
-        std::vector<std::string> tokens = internal::Split(value, ',');
+        std::vector<std::string> tokens = Split(value, ',');
         return PbiQueryNameFilter{std::move(tokens), compareType};
     } else
         return PbiQueryNameFilter{value, compareType};
@@ -306,7 +306,7 @@ static PbiFilter CreateReadGroupFilter(std::string value, const Compare::Type co
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
             throw std::runtime_error{"unsupported compare type on read group property"};
 
-        std::vector<std::string> tokens = internal::Split(value, ',');
+        std::vector<std::string> tokens = Split(value, ',');
         return PbiReadGroupFilter{std::move(tokens), compareType};
     } else
         return PbiReadGroupFilter{value, compareType};
@@ -326,7 +326,7 @@ static PbiFilter CreateReferenceIdFilter(std::string value, const Compare::Type 
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
             throw std::runtime_error{"unsupported compare type on reference name ID property"};
 
-        std::vector<std::string> tokens = internal::Split(value, ',');
+        std::vector<std::string> tokens = Split(value, ',');
         std::vector<int32_t> ids;
         ids.reserve(tokens.size());
         for (const auto& t : tokens)
@@ -350,7 +350,7 @@ static PbiFilter CreateReferenceNameFilter(std::string value, const Compare::Typ
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
             throw std::runtime_error{"unsupported compare type on reference name property"};
 
-        std::vector<std::string> tokens = internal::Split(value, ',');
+        std::vector<std::string> tokens = Split(value, ',');
         return PbiReferenceNameFilter{std::move(tokens), compareType};
     } else
         return PbiReferenceNameFilter{value, compareType};
@@ -366,7 +366,7 @@ static PbiFilter CreateZmwFilter(std::string value, const Compare::Type compareT
     }
 
     if (isList(value)) {
-        std::vector<std::string> tokens = internal::Split(value, ',');
+        std::vector<std::string> tokens = Split(value, ',');
         std::vector<int32_t> zmws;
         zmws.reserve(tokens.size());
         for (const auto& t : tokens)

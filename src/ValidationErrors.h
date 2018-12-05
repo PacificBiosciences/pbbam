@@ -15,7 +15,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 /// The ValidationErrors class catches error messages accumulated during
 /// validation (see Validator).
@@ -33,13 +32,10 @@ public:
     typedef std::vector<std::string> ErrorList;
     typedef std::map<std::string, ErrorList> ErrorMap;
 
-public:
     static const size_t MAX = std::numeric_limits<size_t>::max();
 
-public:
-    ValidationErrors(const size_t maxNumErrors = ValidationErrors::MAX);
+    explicit ValidationErrors(const size_t maxNumErrors = ValidationErrors::MAX);
 
-public:
     void AddFileError(const std::string& fn, std::string details);
     void AddReadGroupError(const std::string& rg, std::string details);
     void AddRecordError(const std::string& name, std::string details);
@@ -47,7 +43,6 @@ public:
                            const std::string& tagName, const size_t observed,
                            const size_t expected);
 
-public:
     bool IsEmpty() const;
     size_t MaxNumErrors() const;
     void ThrowErrors();
@@ -59,11 +54,9 @@ private:
     ErrorMap readGroupErrors_;
     ErrorMap recordErrors_;
 
-private:
     void OnErrorAdded();
 };
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

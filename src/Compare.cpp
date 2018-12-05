@@ -14,7 +14,7 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
+namespace {
 
 struct TypeAlias
 {
@@ -77,12 +77,12 @@ static const std::unordered_map<Compare::Type, TypeAlias, CompareTypeHash> typeA
 };
 // clang-format on
 
-}  // namespace internal
+}  // anonymous
 
 Compare::Type Compare::TypeFromOperator(const std::string& opString)
 {
     try {
-        return internal::opToTypeMap.at(opString);
+        return opToTypeMap.at(opString);
     } catch (std::exception&) {
         throw std::runtime_error{opString + " is not a valid comparison operator."};
     }
@@ -91,7 +91,7 @@ Compare::Type Compare::TypeFromOperator(const std::string& opString)
 std::string Compare::TypeToName(const Compare::Type& type)
 {
     try {
-        return internal::typeAliases.at(type).name_;
+        return typeAliases.at(type).name_;
     } catch (std::exception&) {
         throw std::runtime_error{"invalid comparison type encountered"};
     }
@@ -100,8 +100,7 @@ std::string Compare::TypeToName(const Compare::Type& type)
 std::string Compare::TypeToOperator(const Compare::Type& type, bool asAlpha)
 {
     try {
-        return asAlpha ? internal::typeAliases.at(type).opAlpha_
-                       : internal::typeAliases.at(type).op_;
+        return asAlpha ? typeAliases.at(type).opAlpha_ : typeAliases.at(type).op_;
     } catch (std::exception&) {
         throw std::runtime_error{"invalid comparison type encountered"};
     }

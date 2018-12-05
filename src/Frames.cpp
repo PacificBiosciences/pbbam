@@ -18,14 +18,14 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
+namespace {
 
 static std::vector<uint16_t> framepoints;
 static std::vector<uint8_t> frameToCode;
 static uint16_t maxFramepoint;
 static std::mutex initIpdDownsamplingMutex;
 
-static void InitIpdDownsampling()
+void InitIpdDownsampling()
 {
     std::lock_guard<std::mutex> lock(initIpdDownsamplingMutex);
 
@@ -77,9 +77,9 @@ static void InitIpdDownsampling()
     maxFramepoint = fu;
 }
 
-static inline uint16_t CodeToFrames(const uint8_t code) { return framepoints[code]; }
+uint16_t CodeToFrames(const uint8_t code) { return framepoints[code]; }
 
-static std::vector<uint16_t> CodeToFrames(const std::vector<uint8_t>& codedData)
+std::vector<uint16_t> CodeToFrames(const std::vector<uint8_t>& codedData)
 {
     InitIpdDownsampling();
 
@@ -90,12 +90,9 @@ static std::vector<uint16_t> CodeToFrames(const std::vector<uint8_t>& codedData)
     return frames;
 }
 
-static inline uint8_t FramesToCode(const uint16_t frame)
-{
-    return frameToCode[std::min(maxFramepoint, frame)];
-}
+uint8_t FramesToCode(const uint16_t frame) { return frameToCode[std::min(maxFramepoint, frame)]; }
 
-static std::vector<uint8_t> FramesToCode(const std::vector<uint16_t>& frames)
+std::vector<uint8_t> FramesToCode(const std::vector<uint16_t>& frames)
 {
     InitIpdDownsampling();
 
@@ -106,7 +103,7 @@ static std::vector<uint8_t> FramesToCode(const std::vector<uint16_t>& frames)
     return result;
 }
 
-}  // namespace internal
+}  // anonmyous
 
 Frames::Frames() {}
 
@@ -114,12 +111,12 @@ Frames::Frames(std::vector<uint16_t> frames) : data_{std::move(frames)} {}
 
 Frames Frames::Decode(const std::vector<uint8_t>& codedData)
 {
-    return Frames{internal::CodeToFrames(codedData)};
+    return Frames{CodeToFrames(codedData)};
 }
 
 std::vector<uint8_t> Frames::Encode(const std::vector<uint16_t>& frames)
 {
-    return internal::FramesToCode(frames);
+    return FramesToCode(frames);
 }
 
 }  // namespace BAM

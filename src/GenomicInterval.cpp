@@ -13,17 +13,17 @@
 #include <cstring>
 #include <stdexcept>
 
-#include "StringUtils.h"
+#include "pbbam/StringUtilities.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
+namespace {
 
 // returns sequence name & sets begin/end, from input regionString
 std::string parseRegionString(const std::string& reg, PacBio::BAM::Position* begin,
                               PacBio::BAM::Position* end)
 {
-    const std::vector<std::string> parts = internal::Split(reg, ':');
+    const std::vector<std::string> parts = Split(reg, ':');
     if (parts.empty() || parts.size() > 2) throw std::runtime_error{"malformed region string"};
 
     // given name only, default min,max intervals
@@ -34,7 +34,7 @@ std::string parseRegionString(const std::string& reg, PacBio::BAM::Position* beg
 
     // parse interval from input
     else if (parts.size() == 2) {
-        const std::vector<std::string> intervalParts = internal::Split(parts.at(1), '-');
+        const std::vector<std::string> intervalParts = Split(parts.at(1), '-');
         if (intervalParts.empty() || intervalParts.size() > 2)
             throw std::runtime_error{"malformed region string"};
         *begin = std::stoi(intervalParts.at(0));
@@ -44,7 +44,7 @@ std::string parseRegionString(const std::string& reg, PacBio::BAM::Position* beg
     return parts.at(0);
 }
 
-}  // namespace internal
+}  // anonymous
 
 GenomicInterval::GenomicInterval(std::string name, Position start, Position stop)
     : name_{std::move(name)}, interval_{std::move(start), std::move(stop)}
@@ -53,9 +53,13 @@ GenomicInterval::GenomicInterval(std::string name, Position start, Position stop
 
 GenomicInterval::GenomicInterval(const std::string& samtoolsRegionString)
 {
-    Position begin;
-    Position end;
-    name_ = internal::parseRegionString(samtoolsRegionString, &begin, &end);
+    Position begin = UnmappedPosition;
+    Position end = UnmappedPosition;
+
+    name_ = parseRegionString(samtoolsRegionString, &begin, &end);
+    if (begin == UnmappedPosition || end == UnmappedPosition)
+        throw std::runtime_error{"malformed region string"};
+
     interval_ = PacBio::BAM::Interval<Position>(begin, end);
 }
 

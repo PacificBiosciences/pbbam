@@ -88,9 +88,13 @@ public:
 
     static std::string FormattedInfoFields(const std::vector<InfoField>& fields);
 
+    static std::string FormattedGenotypeField(const GenotypeField& field);
+
     static InfoField ParsedInfoField(const std::string& text);
 
     static std::vector<InfoField> ParsedInfoFields(const std::string& text);
+
+    static GenotypeField ParsedGenotypeField(const std::string& field);
 
     /// \}
 };

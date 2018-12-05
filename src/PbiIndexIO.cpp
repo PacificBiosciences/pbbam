@@ -22,10 +22,9 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
+namespace {
 
-static void CheckContainer(const std::string& container, const size_t expected,
-                           const size_t observed)
+void CheckContainer(const std::string& container, const size_t expected, const size_t observed)
 {
     if (observed != expected) {
         std::ostringstream msg;
@@ -35,14 +34,14 @@ static void CheckContainer(const std::string& container, const size_t expected,
     }
 }
 
-static void CheckExpectedSize(const PbiRawBarcodeData& barcodeData, const size_t numReads)
+void CheckExpectedSize(const PbiRawBarcodeData& barcodeData, const size_t numReads)
 {
     CheckContainer("BarcodeData.bc_forward", numReads, barcodeData.bcForward_.size());
     CheckContainer("BarcodeData.bc_reverse", numReads, barcodeData.bcReverse_.size());
     CheckContainer("BarcodeData.bc_qual", numReads, barcodeData.bcReverse_.size());
 }
 
-static void CheckExpectedSize(const PbiRawBasicData& basicData, const size_t numReads)
+void CheckExpectedSize(const PbiRawBasicData& basicData, const size_t numReads)
 {
     CheckContainer("BasicData.rgId", numReads, basicData.rgId_.size());
     CheckContainer("BasicData.qStart", numReads, basicData.qStart_.size());
@@ -53,7 +52,7 @@ static void CheckExpectedSize(const PbiRawBasicData& basicData, const size_t num
     CheckContainer("BasicData.fileOffset", numReads, basicData.fileOffset_.size());
 }
 
-static void CheckExpectedSize(const PbiRawMappedData& mappedData, const size_t numReads)
+void CheckExpectedSize(const PbiRawMappedData& mappedData, const size_t numReads)
 {
     CheckContainer("MappedData.tId", numReads, mappedData.tId_.size());
     CheckContainer("MappedData.tStart", numReads, mappedData.tStart_.size());
@@ -66,9 +65,7 @@ static void CheckExpectedSize(const PbiRawMappedData& mappedData, const size_t n
     CheckContainer("MappedData.mapQV", numReads, mappedData.mapQV_.size());
 }
 
-// ---------------------------
-// PbiIndexIO implementation
-// ---------------------------
+}  // anonmyous
 
 PbiRawData PbiIndexIO::Load(const std::string& pbiFilename)
 {
@@ -246,8 +243,6 @@ void PbiIndexIO::LoadReferenceData(PbiRawReferenceData& referenceData, BGZF* fp)
     referenceData.entries_.clear();
     referenceData.entries_.resize(numRefs);
     for (auto& entry : referenceData.entries_) {
-        //    for (size_t i = 0; i < numRefs; ++i) {
-        //        PbiReferenceEntry& entry = referenceData.entries_[i];
         ret = bgzf_read(fp, &entry.tId_, 4);
         ret = bgzf_read(fp, &entry.beginRow_, 4);
         ret = bgzf_read(fp, &entry.endRow_, 4);
@@ -388,6 +383,5 @@ void PbiIndexIO::WriteBasicData(const PbiRawBasicData& basicData, const uint32_t
     WriteBgzfVector(fp, basicData.fileOffset_);
 }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio

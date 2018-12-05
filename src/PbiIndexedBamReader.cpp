@@ -18,12 +18,11 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-struct PbiIndexedBamReaderPrivate
+class PbiIndexedBamReader::PbiIndexedBamReaderPrivate
 {
 public:
-    PbiIndexedBamReaderPrivate(const std::string& pbiFilename)
+    explicit PbiIndexedBamReaderPrivate(const std::string& pbiFilename)
         : index_{pbiFilename}, currentBlockReadCount_{0}, numMatchingReads_{0}
     {
     }
@@ -107,15 +106,12 @@ public:
         return result;
     }
 
-public:
     PbiFilter filter_;
     PbiRawData index_;
     IndexResultBlocks blocks_;
     size_t currentBlockReadCount_;
     uint32_t numMatchingReads_;
 };
-
-}  // namespace internal
 
 PbiIndexedBamReader::PbiIndexedBamReader(PbiFilter filter, const std::string& filename)
     : PbiIndexedBamReader{std::move(filter), BamFile{filename}}
@@ -135,7 +131,7 @@ PbiIndexedBamReader::PbiIndexedBamReader(const std::string& bamFilename)
 
 PbiIndexedBamReader::PbiIndexedBamReader(BamFile bamFile)
     : BamReader{std::move(bamFile)}
-    , d_{std::make_unique<internal::PbiIndexedBamReaderPrivate>(File().PacBioIndexFilename())}
+    , d_{std::make_unique<PbiIndexedBamReaderPrivate>(File().PacBioIndexFilename())}
 {
 }
 

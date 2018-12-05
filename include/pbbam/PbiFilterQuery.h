@@ -52,7 +52,6 @@ public:
 
     ~PbiFilterQuery() override;
 
-public:
     /// \brief Main iteration point for record access.
     ///
     /// Most client code should not need to use this method directly. Use
@@ -65,7 +64,7 @@ public:
     uint32_t NumReads() const;
 
 private:
-    struct PbiFilterQueryPrivate;
+    class PbiFilterQueryPrivate;
     std::unique_ptr<PbiFilterQueryPrivate> d_;
 };
 

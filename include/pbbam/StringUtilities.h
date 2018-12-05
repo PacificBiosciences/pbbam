@@ -11,6 +11,26 @@
 namespace PacBio {
 namespace BAM {
 
+///
+/// \brief Joins tokens into a single string
+///
+/// \param tokens   input strings
+/// \param delim    delimiter character
+///
+/// \return joined string
+///
+inline std::string Join(const std::vector<std::string>& tokens, const char delim)
+{
+    std::string result;
+    bool first = true;
+    for (const auto& token : tokens) {
+        if (!first) result += delim;
+        result += token;
+        first = false;
+    }
+    return result;
+}
+
 /// \brief Splits a string into tokens
 ///
 /// \param[in] line     input string

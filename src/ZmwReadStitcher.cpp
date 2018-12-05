@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include <utility>
 
+#include "VirtualStitching.h"
 #include "VirtualZmwReader.h"
 #include "pbbam/DataSet.h"
 #include "pbbam/EntireFileQuery.h"
@@ -22,7 +23,7 @@
 namespace PacBio {
 namespace BAM {
 
-struct ZmwReadStitcher::ZmwReadStitcherPrivate
+class ZmwReadStitcher::ZmwReadStitcherPrivate
 {
 public:
     ZmwReadStitcherPrivate(std::string primaryBamFilePath, std::string scrapsBamFilePath,
@@ -35,44 +36,10 @@ public:
 
     ZmwReadStitcherPrivate(const DataSet& dataset) : filter_{PbiFilter::FromDataSet(dataset)}
     {
-        // set up source queue
-        std::string primaryFn;
-        std::string scrapsFn;
-        const auto& resources = dataset.ExternalResources();
-        for (const ExternalResource& resource : resources) {
-
-            primaryFn.clear();
-            scrapsFn.clear();
-
-            // if resource is possible "primary" BAM
-            const auto& metatype = resource.MetaType();
-            if (metatype == "PacBio.SubreadFile.SubreadBamFile" ||
-                metatype == "PacBio.SubreadFile.HqRegionBamFile") {
-                // possible resolve relative path
-                primaryFn = dataset.ResolvePath(resource.ResourceId());
-
-                // check for associated scraps file
-                const auto& childResources = resource.ExternalResources();
-                for (const auto& childResource : childResources) {
-                    const auto& childMetatype = childResource.MetaType();
-                    if (childMetatype == "PacBio.SubreadFile.ScrapsBamFile" ||
-                        childMetatype == "PacBio.SubreadFile.HqScrapsBamFile") {
-                        // possible resolve relative path
-                        scrapsFn = dataset.ResolvePath(childResource.ResourceId());
-                        break;
-                    }
-                }
-            }
-
-            // queue up source for later
-            if (!primaryFn.empty() && !scrapsFn.empty())
-                sources_.emplace_back(std::make_pair(primaryFn, scrapsFn));
-        }
-
+        sources_ = SourcesFromDataset(dataset);
         OpenNextReader();
     }
 
-public:
     bool HasNext() const { return (currentReader_ && currentReader_->HasNext()); }
 
     VirtualZmwBamRecord Next()
@@ -112,11 +79,10 @@ public:
     BamHeader StitchedHeader() const { return currentReader_->StitchedHeader(); }
 
 private:
-    std::deque<std::pair<std::string, std::string> > sources_;
-    std::unique_ptr<internal::VirtualZmwReader> currentReader_;
+    StitchingSources sources_;
+    std::unique_ptr<VirtualZmwReader> currentReader_;
     PbiFilter filter_;
 
-private:
     void OpenNextReader()
     {
         currentReader_.reset(nullptr);
@@ -126,8 +92,8 @@ private:
             const auto nextSource = sources_.front();
             sources_.pop_front();
 
-            currentReader_ = std::make_unique<internal::VirtualZmwReader>(
-                nextSource.first, nextSource.second, filter_);
+            currentReader_ =
+                std::make_unique<VirtualZmwReader>(nextSource.first, nextSource.second, filter_);
             if (currentReader_->HasNext()) return;
         }
     }

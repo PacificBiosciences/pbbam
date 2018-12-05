@@ -47,7 +47,6 @@ public:
 
     ~ReadAccuracyQuery() override;
 
-public:
     /// \brief Main iteration point for record access.
     ///
     /// Most client code should not need to use this method directly. Use
@@ -58,7 +57,7 @@ public:
     uint32_t NumReads() const;
 
 private:
-    struct ReadAccuracyQueryPrivate;
+    class ReadAccuracyQueryPrivate;
     std::unique_ptr<ReadAccuracyQueryPrivate> d_;
 };
 

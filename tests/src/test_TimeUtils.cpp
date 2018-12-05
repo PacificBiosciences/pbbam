@@ -10,7 +10,6 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
 
 TEST(TimeUtilsTest, ToIso8601)
 {
@@ -18,7 +17,7 @@ TEST(TimeUtilsTest, ToIso8601)
     const auto timestamp = std::chrono::system_clock::from_time_t(rawTime);
 
     const auto expected = std::string{"1983-10-31T06:12:30Z"};  // no ms in test case
-    const auto actual = internal::ToIso8601(timestamp);
+    const auto actual = TimeUtils::ToIso8601(timestamp);
     EXPECT_EQ(expected, actual);
 }
 
@@ -28,6 +27,6 @@ TEST(TimeUtilsTest, ToDataSetFormat)
     const auto timestamp = std::chrono::system_clock::from_time_t(rawTime);
 
     const auto expected = std::string{"831031_061230"};  // no ms in test case
-    const std::string actual = internal::ToDataSetFormat(timestamp);
+    const std::string actual = TimeUtils::ToDataSetFormat(timestamp);
     EXPECT_EQ(expected, actual);
 }

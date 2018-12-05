@@ -18,7 +18,7 @@
 namespace PacBio {
 namespace BAM {
 
-struct QNameQuery::QNameQueryPrivate
+class QNameQuery::QNameQueryPrivate
 {
 public:
     QNameQueryPrivate(const DataSet& dataset)
@@ -57,7 +57,7 @@ public:
         return !records.empty();
     }
 
-public:
+private:
     std::unique_ptr<SequentialCompositeBamReader> reader_;
     boost::optional<BamRecord> nextRecord_;
 };

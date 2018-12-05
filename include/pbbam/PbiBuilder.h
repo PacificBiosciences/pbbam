@@ -19,10 +19,6 @@ namespace BAM {
 class BamRecord;
 class PbiRawData;
 
-namespace internal {
-class PbiBuilderPrivate;
-}
-
 /// \brief The PbiBuilder class construct PBI index data from %BAM record data.
 ///
 /// Records are added one-by-one. This allows for either whole-file indexing of
@@ -172,7 +168,8 @@ public:
     /// \}
 
 private:
-    std::unique_ptr<internal::PbiBuilderPrivate> d_;
+    class PbiBuilderPrivate;
+    std::unique_ptr<PbiBuilderPrivate> d_;
 };
 
 }  // namespace BAM

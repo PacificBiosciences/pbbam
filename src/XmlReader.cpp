@@ -10,15 +10,18 @@
 #include <memory>
 #include <vector>
 
-#include "StringUtils.h"
+#include "pbbam/StringUtilities.h"
 #include "pugixml/pugixml.hpp"
+
+using DataSetElement = PacBio::BAM::internal::DataSetElement;
+using FromInputXml = PacBio::BAM::internal::FromInputXml;
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
+namespace {
 
-static void UpdateRegistry(const std::string& attributeName, const std::string& attributeValue,
-                           NamespaceRegistry& registry)
+void UpdateRegistry(const std::string& attributeName, const std::string& attributeValue,
+                    NamespaceRegistry& registry)
 {
     std::vector<std::string> nameParts = Split(attributeName, ':');
     assert(!nameParts.empty());
@@ -39,7 +42,7 @@ static void UpdateRegistry(const std::string& attributeName, const std::string& 
     }
 }
 
-static void FromXml(const pugi::xml_node& xmlNode, DataSetElement& parent)
+void FromXml(const pugi::xml_node& xmlNode, DataSetElement& parent)
 {
     // ignore non-named XML nodes
     //
@@ -49,7 +52,7 @@ static void FromXml(const pugi::xml_node& xmlNode, DataSetElement& parent)
     if (label.empty()) return;
 
     // label & text
-    DataSetElement e(xmlNode.name(), FromInputXml());
+    DataSetElement e(xmlNode.name(), FromInputXml{});
     e.Text(xmlNode.text().get());
 
     // iterate attributes
@@ -69,6 +72,8 @@ static void FromXml(const pugi::xml_node& xmlNode, DataSetElement& parent)
     // add our element to its parent
     parent.AddChild(e);
 }
+
+}  // anonymous
 
 std::unique_ptr<DataSetBase> XmlReader::FromStream(std::istream& in)
 {
@@ -103,12 +108,11 @@ std::unique_ptr<DataSetBase> XmlReader::FromStream(std::istream& in)
     auto childEnd = rootNode.end();
     for (; childIter != childEnd; ++childIter) {
         pugi::xml_node childNode = *childIter;
-        internal::FromXml(childNode, *dataset.get());
+        FromXml(childNode, *dataset.get());
     }
 
     return dataset;
 }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio

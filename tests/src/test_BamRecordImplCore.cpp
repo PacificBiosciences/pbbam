@@ -70,7 +70,7 @@ static void CheckRawData(const BamRecordImpl& bam)
                                         (expectedSeqLength + 1) / 2 + expectedSeqLength +
                                         expectedTagsLength;
 
-    const auto rawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    const auto rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
     ASSERT_TRUE(static_cast<bool>(rawData));
 
     EXPECT_EQ(expectedNameNulls, rawData->core.l_extranul);
@@ -114,7 +114,7 @@ TEST(BamRecordImplCoreTestsTest, DefaultValues)
     // check raw data
     // -------------------------------
 
-    const auto rawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    const auto rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
     ASSERT_TRUE(static_cast<bool>(rawData));
 
     // fixed-length (core) data
@@ -195,7 +195,7 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
     // check raw data
     // -------------------------------
 
-    const auto rawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    const auto rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
     ASSERT_TRUE(static_cast<bool>(rawData));
 
     // fixed-length (core) data
@@ -276,7 +276,7 @@ TEST(BamRecordImplCoreTestsTest, DeepCopyFromRawData)
     // create from raw data
     BamRecordImpl bam = [&rawData]() {
         BamRecordImpl result;
-        bam_copy1(PacBio::BAM::internal::BamRecordMemory::GetRawData(result).get(), rawData.get());
+        bam_copy1(PacBio::BAM::BamRecordMemory::GetRawData(result).get(), rawData.get());
         return result;
     }();
 
@@ -307,7 +307,7 @@ TEST(BamRecordImplCoreTestsTest, DeepCopyFromRawData)
     EXPECT_EQ(42, bam.ReferenceId());
     EXPECT_EQ(x, bam.Tags()["XY"].ToInt32());
 
-    const auto newBamRawData = PacBio::BAM::internal::BamRecordMemory::GetRawData(bam);
+    const auto newBamRawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
     ASSERT_TRUE(static_cast<bool>(newBamRawData));
 
     EXPECT_TRUE(newBamRawData->data != nullptr);

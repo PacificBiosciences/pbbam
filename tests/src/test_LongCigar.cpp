@@ -10,9 +10,9 @@
 
 #include <pbbam/BamReader.h>
 #include <pbbam/BamWriter.h>
+#include <pbbam/StringUtilities.h>
 
 #include "../../src/MemoryUtils.h"
-#include "../../src/StringUtils.h"
 
 using BamReader = PacBio::BAM::BamReader;
 using BamRecord = PacBio::BAM::BamRecord;

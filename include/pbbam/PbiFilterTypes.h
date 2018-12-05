@@ -28,7 +28,7 @@ namespace internal {
 /// Provides basic container for value/compare-type pair
 ///
 template <typename T>
-struct FilterBase
+class FilterBase
 {
 public:
     T value_;
@@ -39,7 +39,6 @@ protected:
     FilterBase(T value, const Compare::Type cmp);
     FilterBase(std::vector<T> values, const Compare::Type cmp = Compare::EQUAL);
 
-protected:
     bool CompareHelper(const T& lhs) const;
 
 private:
@@ -52,14 +51,14 @@ private:
 /// Dispatches the lookup to BarcodeLookupData
 ///
 template <typename T, PbiFile::BarcodeField field>
-struct BarcodeDataFilterBase : public FilterBase<T>
+class BarcodeDataFilterBase : public FilterBase<T>
 {
+public:
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
+
 protected:
     BarcodeDataFilterBase(T value, const Compare::Type cmp);
     BarcodeDataFilterBase(std::vector<T> values, const Compare::Type cmp = Compare::EQUAL);
-
-public:
-    bool Accepts(const PbiRawData& idx, const size_t row) const;
 };
 
 /// \internal
@@ -67,14 +66,14 @@ public:
 /// Dispatches the lookup to BasicLookupData
 ///
 template <typename T, PbiFile::BasicField field>
-struct BasicDataFilterBase : public FilterBase<T>
+class BasicDataFilterBase : public FilterBase<T>
 {
+public:
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
+
 protected:
     BasicDataFilterBase(T value, const Compare::Type cmp);
     BasicDataFilterBase(std::vector<T> values, const Compare::Type cmp = Compare::EQUAL);
-
-public:
-    bool Accepts(const PbiRawData& idx, const size_t row) const;
 };
 
 /// \internal
@@ -82,14 +81,14 @@ public:
 /// Dispatches the lookup to MappedLookupData
 ///
 template <typename T, PbiFile::MappedField field>
-struct MappedDataFilterBase : public FilterBase<T>
+class MappedDataFilterBase : public FilterBase<T>
 {
+public:
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
+
 protected:
     MappedDataFilterBase(T value, const Compare::Type cmp);
     MappedDataFilterBase(std::vector<T> values, const Compare::Type cmp = Compare::EQUAL);
-
-public:
-    bool Accepts(const PbiRawData& idx, const size_t row) const;
 };
 
 }  // namespace internal
@@ -101,7 +100,7 @@ public:
 ///
 /// \sa BamRecord::AlignedEnd
 ///
-struct PbiAlignedEndFilter
+class PbiAlignedEndFilter
     : public internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::A_END>
 {
 public:
@@ -120,7 +119,7 @@ public:
 ///
 /// \sa BamRecord::AlignedEnd, BamRecord::AlignedStart
 ///
-struct PbiAlignedLengthFilter : public internal::FilterBase<uint32_t>
+class PbiAlignedLengthFilter : public internal::FilterBase<uint32_t>
 {
 public:
     /// \brief Creates a filter on aligned length.
@@ -130,7 +129,6 @@ public:
     ///
     PbiAlignedLengthFilter(const uint32_t length, const Compare::Type cmp = Compare::EQUAL);
 
-public:
     /// \brief Performs the actual index lookup.
     ///
     /// Most client code should not need to use this method directly.
@@ -145,7 +143,7 @@ public:
 ///
 /// \sa BamRecord::AlignedStart
 ///
-struct PbiAlignedStartFilter
+class PbiAlignedStartFilter
     : public internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::A_START>
 {
 public:
@@ -164,7 +162,7 @@ public:
 ///
 /// \sa BamRecord::AlignedStrand
 ///
-struct PbiAlignedStrandFilter
+class PbiAlignedStrandFilter
     : public internal::MappedDataFilterBase<Strand, PbiFile::MappedField::STRAND>
 {
 public:
@@ -185,7 +183,7 @@ public:
 ///
 /// \sa BamRecord::BarcodeForward, BamRecord::BarcodeReverse
 ///
-struct PbiBarcodeFilter
+class PbiBarcodeFilter
 {
 public:
     /// \brief Creates a single-value barcode filter.
@@ -205,7 +203,6 @@ public:
     ///
     PbiBarcodeFilter(std::vector<int16_t> whitelist, const Compare::Type cmp = Compare::EQUAL);
 
-public:
     /// \brief Performs the actual index lookup.
     ///
     /// Most client code should not need to use this method directly.
@@ -223,7 +220,7 @@ private:
 ///
 /// \sa BamRecord::BarcodeForward
 ///
-struct PbiBarcodeForwardFilter
+class PbiBarcodeForwardFilter
     : public internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_FORWARD>
 {
 public:
@@ -253,7 +250,7 @@ public:
 ///
 /// \sa BamRecord::BarcodeQuality
 ///
-struct PbiBarcodeQualityFilter
+class PbiBarcodeQualityFilter
     : public internal::BarcodeDataFilterBase<uint8_t, PbiFile::BarcodeField::BC_QUALITY>
 {
 public:
@@ -272,7 +269,7 @@ public:
 ///
 /// \sa BamRecord::BarcodeReverse
 ///
-struct PbiBarcodeReverseFilter
+class PbiBarcodeReverseFilter
     : public internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_REVERSE>
 {
 public:
@@ -304,7 +301,7 @@ public:
 ///
 /// \sa BamRecord::Barcodes
 ///
-struct PbiBarcodesFilter
+class PbiBarcodesFilter
 {
 public:
     /// \brief Creates a barcodes filter from a std::pair of IDs.
@@ -327,7 +324,6 @@ public:
     PbiBarcodesFilter(const int16_t bcForward, const int16_t bcReverse,
                       const Compare::Type cmp = Compare::EQUAL);
 
-public:
     /// \brief Performs the actual index lookup.
     ///
     /// Most client code should not need to use this method directly.
@@ -345,7 +341,7 @@ private:
 ///
 /// Example: \include code/PbiIdentityFilter.txt
 ///
-struct PbiIdentityFilter : public internal::FilterBase<float>
+class PbiIdentityFilter : public internal::FilterBase<float>
 {
 public:
     /// \brief Creates a read identity filter.
@@ -355,7 +351,6 @@ public:
     ///
     PbiIdentityFilter(const float identity, const Compare::Type cmp = Compare::EQUAL);
 
-public:
     /// \brief Performs the actual index lookup.
     ///
     /// Most client code should not need to use this method directly.
@@ -372,7 +367,7 @@ public:
 ///
 /// Example: \include code/PbiLocalContextFilter.txt
 ///
-struct PbiLocalContextFilter
+class PbiLocalContextFilter
     : public internal::BasicDataFilterBase<LocalContextFlags, PbiFile::BasicField::CONTEXT_FLAG>
 {
 public:
@@ -386,7 +381,7 @@ public:
 ///
 /// \sa BamRecord::MapQuality
 ///
-struct PbiMapQualityFilter
+class PbiMapQualityFilter
     : public internal::MappedDataFilterBase<uint8_t, PbiFile::MappedField::MAP_QUALITY>
 {
 public:
@@ -405,7 +400,7 @@ public:
 ///
 /// \sa BamRecord::MovieName
 ///
-struct PbiMovieNameFilter
+class PbiMovieNameFilter
 {
 public:
     /// \brief Creates a single-value movie name filter.
@@ -428,7 +423,6 @@ public:
     PbiMovieNameFilter(const std::vector<std::string>& whitelist,
                        const Compare::Type cmp = Compare::EQUAL);
 
-public:
     /// \brief Performs the actual index lookup.
     ///
     /// Most client code should not need to use this method directly.
@@ -447,7 +441,7 @@ private:
 ///
 /// \sa BamRecord::NumDeletedBases
 ///
-struct PbiNumDeletedBasesFilter
+class PbiNumDeletedBasesFilter
     : public internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_DEL>
 {
 public:
@@ -466,7 +460,7 @@ public:
 ///
 /// \sa BamRecord::NumInsertedBases
 ///
-struct PbiNumInsertedBasesFilter
+class PbiNumInsertedBasesFilter
     : public internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_INS>
 {
 public:
@@ -485,8 +479,7 @@ public:
 ///
 /// \sa BamRecord::NumMatches
 ///
-struct PbiNumMatchesFilter
-    : public internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_M>
+class PbiNumMatchesFilter : public internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_M>
 {
 public:
     /// \brief Creates a filter on the number of matched bases.
@@ -504,7 +497,7 @@ public:
 ///
 /// \sa BamRecord::NumMismatches
 ///
-struct PbiNumMismatchesFilter
+class PbiNumMismatchesFilter
     : public internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_MM>
 {
 public:
@@ -524,7 +517,7 @@ public:
 ///
 /// \sa BamRecord::QueryEnd
 ///
-struct PbiQueryEndFilter : public internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::Q_END>
+class PbiQueryEndFilter : public internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::Q_END>
 {
 public:
     /// \brief Creates a filter on query end position.
@@ -544,7 +537,7 @@ public:
 ///
 /// \sa BamRecord::QueryEnd, BamRecord::QueryStart
 ///
-struct PbiQueryLengthFilter : public internal::FilterBase<int32_t>
+class PbiQueryLengthFilter : public internal::FilterBase<int32_t>
 {
 public:
     /// \brief Creates a filter on query length
@@ -554,7 +547,6 @@ public:
     ///
     PbiQueryLengthFilter(const int32_t length, const Compare::Type cmp = Compare::EQUAL);
 
-public:
     /// \brief Performs the actual index lookup.
     ///
     /// Most client code should not need to use this method directly.
@@ -569,7 +561,7 @@ public:
 ///
 /// \sa BamRecord::FullName
 ///
-struct PbiQueryNameFilter
+class PbiQueryNameFilter
 {
 public:
     /// \brief Creates a single-value query name filter.
@@ -595,7 +587,6 @@ public:
     PbiQueryNameFilter(const PbiQueryNameFilter& other);
     ~PbiQueryNameFilter();
 
-public:
     /// \brief Performs the actual index lookup.
     ///
     /// Most client code should not need to use this method directly.
@@ -614,7 +605,7 @@ private:
 ///
 /// \sa BamRecord::QueryStart
 ///
-struct PbiQueryStartFilter
+class PbiQueryStartFilter
     : public internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::Q_START>
 {
 public:
@@ -633,7 +624,7 @@ public:
 ///
 /// \sa BamRecord::ReadAccuracy
 ///
-struct PbiReadAccuracyFilter
+class PbiReadAccuracyFilter
     : public internal::BasicDataFilterBase<Accuracy, PbiFile::BasicField::READ_QUALITY>
 {
 public:
@@ -654,7 +645,7 @@ public:
 ///     BamRecord::ReadGroupId,
 ///     BamRecord::ReadGroupNumericId
 ///
-struct PbiReadGroupFilter
+class PbiReadGroupFilter
 {
 public:
     /// \brief Creates a filter on read group (numeric) ID value
@@ -736,7 +727,7 @@ private:
 ///
 /// \sa BamRecord::ReferenceEnd
 ///
-struct PbiReferenceEndFilter
+class PbiReferenceEndFilter
     : public internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::T_END>
 {
 public:
@@ -755,7 +746,7 @@ public:
 ///
 /// \sa BamRecord::ReferenceId
 ///
-struct PbiReferenceIdFilter
+class PbiReferenceIdFilter
     : public internal::MappedDataFilterBase<int32_t, PbiFile::MappedField::T_ID>
 {
 public:
@@ -784,7 +775,7 @@ public:
 ///
 /// \sa BamRecord::ReferenceName
 ///
-struct PbiReferenceNameFilter
+class PbiReferenceNameFilter
 {
 public:
     /// \brief Creates a single-value reference name filter.
@@ -805,7 +796,6 @@ public:
     PbiReferenceNameFilter(std::vector<std::string> whitelist,
                            const Compare::Type cmp = Compare::EQUAL);
 
-public:
     /// \brief Performs the actual index lookup.
     ///
     /// Most client code should not need to use this method directly.
@@ -819,7 +809,6 @@ private:
     boost::optional<std::vector<std::string>> rnameWhitelist_;
     Compare::Type cmp_;
 
-private:
     // marked const so we can delay setup of filter in Accepts(), once we have
     // access to PBI/BAM input. modified values marked mutable accordingly
     void Initialize(const PbiRawData& idx) const;
@@ -832,7 +821,7 @@ private:
 ///
 /// \sa BamRecord::ReferenceStart
 ///
-struct PbiReferenceStartFilter
+class PbiReferenceStartFilter
     : public internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::T_START>
 {
 public:
@@ -851,7 +840,7 @@ public:
 ///
 /// \sa BamRecord::HoleNumber
 ///
-struct PbiZmwFilter : public internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::ZMW>
+class PbiZmwFilter : public internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::ZMW>
 {
 public:
     /// \brief Creates a single-value ZMW hole number filter.
@@ -885,8 +874,9 @@ enum class FilterHash
     BOOST_HASH_COMBINE,
 };
 
-struct PbiZmwModuloFilter
+class PbiZmwModuloFilter
 {
+public:
     PbiZmwModuloFilter(const uint32_t denominator, const uint32_t value,
                        const FilterHash hashtype = FilterHash::UNSIGNED_LONG_CAST,
                        const Compare::Type = Compare::EQUAL);

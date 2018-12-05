@@ -165,7 +165,9 @@ TEST(IndexedFastaReaderTests, ReadLambda)
     std::string seq3 = r.Subsequence("lambda_NEB3011", 48400, 48600);
     EXPECT_EQ(102, seq3.length());
 
-    // bad subsequence
+    // empty subsequence
+    std::string emptySeq = r.Subsequence("lambda_NEB3011", 10, 10);
+    EXPECT_EQ("", emptySeq);
 }
 
 TEST(IndexedFastaReaderTests, Errors)

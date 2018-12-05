@@ -23,7 +23,7 @@ namespace internal {
 BaseEntityType::BaseEntityType(const std::string& label, const XsdType& xsd)
     : DataSetElement(label, xsd)
 {
-    if (Version().empty()) Version(internal::XML_VERSION);
+    if (Version().empty()) Version(XML_VERSION);
 }
 
 DEFINE_ACCESSORS(BaseEntityType, Extensions, Extensions)
@@ -92,11 +92,11 @@ StrictEntityType::StrictEntityType(const std::string& metatype, const std::strin
         transformedMetatype[i] = ((c == '.') ? '_' : tolower(c));
     }
     const std::string tsn =
-        transformedMetatype + "-" + internal::ToDataSetFormat(internal::CurrentTime());
+        transformedMetatype + "-" + TimeUtils::ToDataSetFormat(TimeUtils::CurrentTime());
     TimeStampedName(tsn);
 
     // UniqueId
-    UniqueId(internal::GenerateUuid());
+    UniqueId(GenerateUuid());
 }
 
 }  // namespace internal

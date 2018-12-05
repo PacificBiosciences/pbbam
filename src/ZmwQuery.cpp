@@ -17,8 +17,9 @@
 namespace PacBio {
 namespace BAM {
 
-struct ZmwQuery::ZmwQueryPrivate
+class ZmwQuery::ZmwQueryPrivate
 {
+public:
     ZmwQueryPrivate(std::vector<int32_t> zmwWhitelist, const DataSet& dataset)
         : reader_{PbiZmwFilter{std::move(zmwWhitelist)}, dataset}
     {

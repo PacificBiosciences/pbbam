@@ -23,10 +23,7 @@
 namespace PacBio {
 namespace BAM {
 
-namespace internal {
-class BamRecordMemory;
-class SamWriterPrivate;
-}
+class SamWriter;
 
 /// \brief The BamRecordImpl class holds all data necessary for creating,
 ///        querying or editing a generic %BAM record.
@@ -581,10 +578,10 @@ private:
     mutable std::map<uint16_t, int> tagOffsets_;
 
     // friends
-    friend class internal::BamRecordMemory;
+    friend class BamRecordMemory;
 
     // remove this when we drop support for htslib pre-v1.7
-    friend class internal::SamWriterPrivate;
+    friend class SamWriter;
 };
 
 }  // namespace BAM

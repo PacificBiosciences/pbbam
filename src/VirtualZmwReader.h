@@ -19,7 +19,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 class VirtualZmwReader
 {
@@ -54,7 +53,6 @@ public:
     VirtualZmwReader& operator=(VirtualZmwReader&&) = delete;
     ~VirtualZmwReader();
 
-public:
     /// \returns the BamHeader associated with this reader's "primary" %BAM file
     BamHeader PrimaryHeader() const;
 
@@ -64,7 +62,6 @@ public:
     /// \return the BamHeader associated with the newly stitched BAM data
     BamHeader StitchedHeader() const;
 
-public:
     /// \returns true if more ZMWs are available for reading.
     bool HasNext();
 
@@ -86,7 +83,6 @@ private:
     std::unique_ptr<BamHeader> stitchedHeader_;
 };
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

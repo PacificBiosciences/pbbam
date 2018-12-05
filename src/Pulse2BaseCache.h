@@ -14,7 +14,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 class Pulse2BaseCache
 {
@@ -26,7 +25,7 @@ public:
     ///
     /// \param pulseCalls[in]   string contents of 'pc' tag
     ///
-    Pulse2BaseCache(const std::string& pulseCalls) : data_(pulseCalls.size())
+    explicit Pulse2BaseCache(const std::string& pulseCalls) : data_(pulseCalls.size())
     {
         // basecalled pulse -> data[i] == 1
         // squashed pulse   -> data[i] == 0
@@ -43,7 +42,6 @@ public:
     Pulse2BaseCache& operator=(Pulse2BaseCache&&) = default;
     ~Pulse2BaseCache() = default;
 
-public:
     ///
     /// \brief FindFirst
     /// \return
@@ -104,7 +102,6 @@ private:
     boost::dynamic_bitset<> data_;
 };
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

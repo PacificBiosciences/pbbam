@@ -15,7 +15,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 // clang-format off
 const BamRecordTags::TagLookupType BamRecordTags::tagLookup =
@@ -63,6 +62,5 @@ const BamRecordTags::TagLookupType BamRecordTags::tagLookup =
 };
 // clang-format on
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio

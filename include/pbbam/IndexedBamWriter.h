@@ -22,10 +22,6 @@ class BamHeader;
 class BamRecord;
 class BamRecordImpl;
 
-namespace internal {
-class IndexedBamWriterPrivate2;
-}
-
 struct IndexedBamWriterConfig
 {
     std::string outputFilename;
@@ -150,7 +146,8 @@ public:
     size_t MaxReaderLag() const;
 
 private:
-    std::unique_ptr<internal::IndexedBamWriterPrivate2> d_;
+    class IndexedBamWriterPrivate2;
+    std::unique_ptr<IndexedBamWriterPrivate2> d_;
 };
 
 }  // namespace BAM

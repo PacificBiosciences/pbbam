@@ -25,7 +25,6 @@ public:
 
     ~Md5ContextHelper() { hts_md5_destroy(data_); }
 
-public:
     std::string Encoded(const std::string& str)
     {
         hts_md5_update(data_, reinterpret_cast<void*>(const_cast<char*>(str.c_str())), str.size());

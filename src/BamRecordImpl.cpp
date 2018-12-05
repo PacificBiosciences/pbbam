@@ -17,11 +17,10 @@
 
 #include <htslib/hts_endian.h>
 
-#include "pbbam/BamTagCodec.h"
-
 #include "BamRecordTags.h"
 #include "MemoryUtils.h"
-#include "StringUtils.h"
+#include "pbbam/BamTagCodec.h"
+#include "pbbam/StringUtilities.h"
 
 namespace PacBio {
 namespace BAM {
@@ -79,7 +78,7 @@ BamRecordImpl::BamRecordImpl() : d_(nullptr)
 }
 
 BamRecordImpl::BamRecordImpl(const BamRecordImpl& other)
-    : d_{bam_dup1(other.d_.get()), internal::HtslibRecordDeleter()}, tagOffsets_{other.tagOffsets_}
+    : d_{bam_dup1(other.d_.get()), HtslibRecordDeleter()}, tagOffsets_{other.tagOffsets_}
 {
     assert(d_);
 }
@@ -121,7 +120,7 @@ bool BamRecordImpl::AddTag(const std::string& tagName, const Tag& value)
 
 bool BamRecordImpl::AddTag(const BamRecordTag tag, const Tag& value)
 {
-    return AddTag(internal::BamRecordTags::LabelFor(tag), value, TagModifier::NONE);
+    return AddTag(BamRecordTags::LabelFor(tag), value, TagModifier::NONE);
 }
 
 bool BamRecordImpl::AddTag(const std::string& tagName, const Tag& value,
@@ -136,7 +135,7 @@ bool BamRecordImpl::AddTag(const std::string& tagName, const Tag& value,
 bool BamRecordImpl::AddTag(const BamRecordTag tag, const Tag& value,
                            const TagModifier additionalModifier)
 {
-    return AddTag(internal::BamRecordTags::LabelFor(tag), value, additionalModifier);
+    return AddTag(BamRecordTags::LabelFor(tag), value, additionalModifier);
 }
 
 bool BamRecordImpl::AddTagImpl(const std::string& tagName, const Tag& value,
@@ -210,7 +209,7 @@ bool BamRecordImpl::EditTag(const std::string& tagName, const Tag& newValue)
 
 bool BamRecordImpl::EditTag(const BamRecordTag tag, const Tag& newValue)
 {
-    return EditTag(internal::BamRecordTags::LabelFor(tag), newValue, TagModifier::NONE);
+    return EditTag(BamRecordTags::LabelFor(tag), newValue, TagModifier::NONE);
 }
 
 bool BamRecordImpl::EditTag(const std::string& tagName, const Tag& newValue,
@@ -229,7 +228,7 @@ bool BamRecordImpl::EditTag(const std::string& tagName, const Tag& newValue,
 bool BamRecordImpl::EditTag(const BamRecordTag tag, const Tag& newValue,
                             const TagModifier additionalModifier)
 {
-    return EditTag(internal::BamRecordTags::LabelFor(tag), newValue, additionalModifier);
+    return EditTag(BamRecordTags::LabelFor(tag), newValue, additionalModifier);
 }
 
 BamRecordImpl BamRecordImpl::FromRawData(const std::shared_ptr<bam1_t>& rawData)
@@ -243,19 +242,16 @@ bool BamRecordImpl::HasTag(const std::string& tagName) const
 {
     if (tagName.size() != 2) return false;
     return TagOffset(tagName) != -1;
-
-    // 27635
-    //    return bam_aux_get(d_.get(), tagName.c_str()) != 0;
 }
 
 bool BamRecordImpl::HasTag(const BamRecordTag tag) const
 {
-    return HasTag(internal::BamRecordTags::LabelFor(tag));
+    return HasTag(BamRecordTags::LabelFor(tag));
 }
 
 void BamRecordImpl::InitializeData()
 {
-    d_.reset(bam_init1(), internal::HtslibRecordDeleter());
+    d_.reset(bam_init1(), HtslibRecordDeleter());
     d_->data = static_cast<uint8_t*>(
         calloc(0x800, sizeof(uint8_t)));  // maybe make this value tune-able later?
     d_->m_data = 0x800;
@@ -344,7 +340,7 @@ bool BamRecordImpl::RemoveTag(const std::string& tagName)
 
 bool BamRecordImpl::RemoveTag(const BamRecordTag tag)
 {
-    return RemoveTag(internal::BamRecordTags::LabelFor(tag));
+    return RemoveTag(BamRecordTags::LabelFor(tag));
 }
 
 bool BamRecordImpl::RemoveTagImpl(const std::string& tagName)
@@ -525,7 +521,7 @@ Tag BamRecordImpl::TagValue(const std::string& tagName) const
 
 Tag BamRecordImpl::TagValue(const BamRecordTag tag) const
 {
-    return TagValue(internal::BamRecordTags::LabelFor(tag));
+    return TagValue(BamRecordTags::LabelFor(tag));
 }
 
 void BamRecordImpl::UpdateTagMap() const

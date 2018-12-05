@@ -18,7 +18,7 @@
 namespace PacBio {
 namespace BAM {
 
-struct WhitelistedZmwReadStitcher::WhitelistedZmwReadStitcherPrivate
+class WhitelistedZmwReadStitcher::WhitelistedZmwReadStitcherPrivate
 {
 public:
     WhitelistedZmwReadStitcherPrivate(const std::vector<int32_t>& zmwWhitelist,
@@ -87,7 +87,6 @@ private:
     std::unique_ptr<BamHeader> polyHeader_;
     std::deque<int32_t> zmwWhitelist_;
 
-private:
     void PreFilterZmws(const std::vector<int32_t>& zmwWhitelist)
     {
         // fetch input ZMWs

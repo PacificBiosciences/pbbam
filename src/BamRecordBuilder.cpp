@@ -56,7 +56,7 @@ BamRecord BamRecordBuilder::Build() const
 bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
 {
     // initialize with basic 'core data'
-    auto recordRawData = internal::BamRecordMemory::GetRawData(record);
+    auto recordRawData = BamRecordMemory::GetRawData(record);
     if (!recordRawData || !recordRawData->data)
         throw std::runtime_error{"BamRecord memory in invalid state"};
     recordRawData->core = core_;
@@ -181,7 +181,7 @@ void BamRecordBuilder::Reset(BamRecord prototype)
     header_ = prototype.Header();
 
     // reset variable-length data
-    const BamRecordImpl& impl = internal::BamRecordMemory::GetImpl(prototype);
+    const BamRecordImpl& impl = BamRecordMemory::GetImpl(prototype);
     name_ = impl.Name();
     sequence_ = impl.Sequence();
     qualities_ = impl.Qualities().Fastq();
@@ -189,8 +189,7 @@ void BamRecordBuilder::Reset(BamRecord prototype)
     tags_ = impl.Tags();
 
     // reset core data
-    const auto rawData =
-        internal::BamRecordMemory::GetRawData(prototype);  //  prototype.impl_.RawData().get();
+    const auto rawData = BamRecordMemory::GetRawData(prototype);
     if (!rawData) throw std::runtime_error{"BamRecord memory in invalid state"};
     core_ = std::move(rawData->core);
 }

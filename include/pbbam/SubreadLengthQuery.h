@@ -45,7 +45,6 @@ public:
 
     ~SubreadLengthQuery();
 
-public:
     /// \brief Main iteration point for record access.
     ///
     /// Most client code should not need to use this method directly. Use
@@ -56,7 +55,7 @@ public:
     uint32_t NumReads() const;
 
 private:
-    struct SubreadLengthQueryPrivate;
+    class SubreadLengthQueryPrivate;
     std::unique_ptr<SubreadLengthQueryPrivate> d_;
 };
 

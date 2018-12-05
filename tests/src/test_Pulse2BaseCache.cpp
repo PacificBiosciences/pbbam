@@ -9,9 +9,7 @@
 
 #include <pbbam/../../src/Pulse2BaseCache.h>
 
-using namespace PacBio;
-using namespace PacBio::BAM;
-using namespace PacBio::BAM::internal;
+using Pulse2BaseCache = PacBio::BAM::Pulse2BaseCache;
 
 TEST(Pulse2BaseCacheTest, CountsDetectedInConstructor)
 {

@@ -24,12 +24,11 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-class BamFilePrivate
+class BamFile::BamFilePrivate
 {
 public:
-    BamFilePrivate(std::string fn) : filename_{std::move(fn)}, firstAlignmentOffset_{-1}
+    explicit BamFilePrivate(std::string fn) : filename_{std::move(fn)}, firstAlignmentOffset_{-1}
     {
         // ensure we've updated htslib verbosity with requested verbosity here
         hts_verbose = (PacBio::BAM::HtslibVerbosity == -1 ? 0 : PacBio::BAM::HtslibVerbosity);
@@ -55,8 +54,8 @@ public:
 #endif
 
         // attempt fetch header
-        std::unique_ptr<bam_hdr_t, internal::HtslibHeaderDeleter> hdr(sam_hdr_read(f.get()));
-        header_ = internal::BamHeaderMemory::FromRawData(hdr.get());
+        std::unique_ptr<bam_hdr_t, HtslibHeaderDeleter> hdr(sam_hdr_read(f.get()));
+        header_ = BamHeaderMemory::FromRawData(hdr.get());
 
         // cache first alignment offset
         firstAlignmentOffset_ = bgzf_tell(f->fp.bgzf);
@@ -77,16 +76,16 @@ public:
         return RawEOFCheck(f) == 1;
     }
 
-    int RawEOFCheck(const std::unique_ptr<samFile, internal::HtslibFileDeleter>& f) const
+    int RawEOFCheck(const std::unique_ptr<samFile, HtslibFileDeleter>& f) const
     {
         assert(f);
         assert(f->fp.bgzf);
         return bgzf_check_EOF(f->fp.bgzf);
     }
 
-    std::unique_ptr<samFile, internal::HtslibFileDeleter> RawOpen() const
+    std::unique_ptr<samFile, HtslibFileDeleter> RawOpen() const
     {
-        std::unique_ptr<samFile, internal::HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
+        std::unique_ptr<samFile, HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
         if (!f || !f->fp.bgzf)
             throw std::runtime_error{"could not open BAM file: '" + filename_ + "'"};
         if (f->format.format != bam)
@@ -94,20 +93,12 @@ public:
         return f;
     }
 
-public:
     std::string filename_;
     BamHeader header_;
     int64_t firstAlignmentOffset_;
 };
 
-}  // namespace internal
-
-// ------------------------
-// BamFile implementation
-// ------------------------
-
-BamFile::BamFile(std::string filename)
-    : d_{std::make_unique<internal::BamFilePrivate>(std::move(filename))}
+BamFile::BamFile(std::string filename) : d_{std::make_unique<BamFilePrivate>(std::move(filename))}
 {
 }
 
@@ -163,17 +154,14 @@ const BamHeader& BamFile::Header() const { return d_->header_; }
 
 bool BamFile::IsPacBioBAM() const { return !d_->header_.PacBioBamVersion().empty(); }
 
-bool BamFile::PacBioIndexExists() const
-{
-    return internal::FileUtils::Exists(PacBioIndexFilename());
-}
+bool BamFile::PacBioIndexExists() const { return FileUtils::Exists(PacBioIndexFilename()); }
 
 std::string BamFile::PacBioIndexFilename() const { return d_->filename_ + ".pbi"; }
 
 bool BamFile::PacBioIndexIsNewer() const
 {
-    const auto bamTimestamp = internal::FileUtils::LastModified(Filename());
-    const auto pbiTimestamp = internal::FileUtils::LastModified(PacBioIndexFilename());
+    const auto bamTimestamp = FileUtils::LastModified(Filename());
+    const auto pbiTimestamp = FileUtils::LastModified(PacBioIndexFilename());
     return bamTimestamp <= pbiTimestamp;
 }
 
@@ -191,17 +179,14 @@ uint32_t BamFile::ReferenceLength(const int id) const
 
 std::string BamFile::ReferenceName(const int id) const { return d_->header_.SequenceName(id); }
 
-bool BamFile::StandardIndexExists() const
-{
-    return internal::FileUtils::Exists(StandardIndexFilename());
-}
+bool BamFile::StandardIndexExists() const { return FileUtils::Exists(StandardIndexFilename()); }
 
 std::string BamFile::StandardIndexFilename() const { return d_->filename_ + ".bai"; }
 
 bool BamFile::StandardIndexIsNewer() const
 {
-    const auto bamTimestamp = internal::FileUtils::LastModified(Filename());
-    const auto baiTimestamp = internal::FileUtils::LastModified(StandardIndexFilename());
+    const auto bamTimestamp = FileUtils::LastModified(Filename());
+    const auto baiTimestamp = FileUtils::LastModified(StandardIndexFilename());
     return bamTimestamp <= baiTimestamp;
 }
 

@@ -49,7 +49,7 @@ public:
     bool GetNext(std::vector<BamRecord>& records) override;
 
 private:
-    struct ZmwGroupQueryPrivate;
+    class ZmwGroupQueryPrivate;
     std::unique_ptr<ZmwGroupQueryPrivate> d_;
 };
 

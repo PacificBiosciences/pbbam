@@ -8,7 +8,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 // The FileProducer class provides functionality for working with a temp
 // file until successful destruction of a FileProducer-derived class.
@@ -21,13 +20,12 @@ namespace internal {
 //
 class FileProducer
 {
-
 public:
     FileProducer() = delete;
 
     // Initializes FileProducer with specified target filename. Temp filename is
     // set to target filename plus ".tmp" suffix.
-    FileProducer(std::string targetFilename);
+    explicit FileProducer(std::string targetFilename);
 
     // Initializes FileProducer with specified target filename & explicit temp
     // filename.
@@ -42,7 +40,6 @@ public:
     //
     ~FileProducer();
 
-public:
     const std::string& TargetFilename() const { return targetFilename_; }
     const std::string& TempFilename() const { return tempFilename_; }
 
@@ -51,7 +48,6 @@ private:
     std::string tempFilename_;
 };
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

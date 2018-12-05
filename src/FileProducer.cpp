@@ -9,7 +9,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 FileProducer::FileProducer(std::string targetFilename)
     : FileProducer(std::move(targetFilename), targetFilename + ".tmp")
@@ -35,6 +34,5 @@ FileProducer::~FileProducer()
     }
 }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio

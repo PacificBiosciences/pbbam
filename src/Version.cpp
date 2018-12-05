@@ -11,11 +11,10 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "SequenceUtils.h"
+#include "pbbam/StringUtilities.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 const Version Version::Current = Version(3, 0, 5);
 const Version Version::Minimum = Version(3, 0, 1);
@@ -25,7 +24,7 @@ Version::Version(const std::string& v) : major_{0}, minor_{0}, revision_{0}
 {
     // parse string
     try {
-        const auto fields = internal::Split(v, '.');
+        const auto fields = Split(v, '.');
         const auto numFields = fields.size();
         if (numFields == 0) throw std::runtime_error{"invalid version number - empty string"};
         major_ = std::stoi(fields.at(0));
@@ -48,6 +47,5 @@ std::string Version::ToString() const
     return s.str();
 }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio

@@ -16,7 +16,7 @@ namespace BAM {
 
 /// \brief The VirtualRegion represents an annotation of a polymerase region.
 ///
-struct VirtualRegion
+class VirtualRegion
 {
 public:
     VirtualRegionType type;
@@ -27,7 +27,6 @@ public:
     int barcodeRight = -1;
     int score = 0;
 
-public:
     /// \brief Creates a virtual region with basic type & position info.
     ///
     VirtualRegion(const VirtualRegionType type_, const int beginPos_, const int endPos_,

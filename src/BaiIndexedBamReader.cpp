@@ -15,9 +15,8 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-struct BaiIndexedBamReaderPrivate
+class BaiIndexedBamReader::BaiIndexedBamReaderPrivate
 {
 public:
     BaiIndexedBamReaderPrivate(const BamFile& file, const GenomicInterval& interval)
@@ -54,13 +53,10 @@ public:
         return hts_itr_next(bgzf, htsIterator_.get(), b, nullptr);
     }
 
-public:
     GenomicInterval interval_;
-    std::unique_ptr<hts_idx_t, internal::HtslibIndexDeleter> htsIndex_;
-    std::unique_ptr<hts_itr_t, internal::HtslibIteratorDeleter> htsIterator_;
+    std::unique_ptr<hts_idx_t, HtslibIndexDeleter> htsIndex_;
+    std::unique_ptr<hts_itr_t, HtslibIteratorDeleter> htsIterator_;
 };
-
-}  // namespace internal
 
 BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval, std::string filename)
     : BaiIndexedBamReader{interval, BamFile{std::move(filename)}}
@@ -69,7 +65,7 @@ BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval, std::s
 
 BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval, BamFile bamFile)
     : BamReader{std::move(bamFile)}
-    , d_{std::make_unique<internal::BaiIndexedBamReaderPrivate>(File(), interval)}
+    , d_{std::make_unique<BaiIndexedBamReaderPrivate>(File(), interval)}
 {
 }
 

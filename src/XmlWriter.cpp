@@ -12,18 +12,20 @@
 #include "pbbam/DataSet.h"
 #include "pugixml/pugixml.hpp"
 
+using DataSetElement = PacBio::BAM::internal::DataSetElement;
+
 namespace PacBio {
 namespace BAM {
-namespace internal {
+namespace {
 
-static std::string Prefix(const std::string& input)
+std::string Prefix(const std::string& input)
 {
     const auto colonFound = input.find(':');
     if (colonFound == std::string::npos || colonFound == 0) return std::string();
     return input.substr(0, colonFound);
 }
 
-static std::string OutputName(const DataSetElement& node, const NamespaceRegistry& registry)
+std::string OutputName(const DataSetElement& node, const NamespaceRegistry& registry)
 {
     // if from input XML, respect the namespaces given
     if (node.IsVerbatimLabel()) return node.QualifiedNameLabel();
@@ -44,8 +46,8 @@ static std::string OutputName(const DataSetElement& node, const NamespaceRegistr
     }
 }
 
-static void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
-                  std::map<XsdType, std::string>& xsdPrefixesUsed, pugi::xml_node& parentXml)
+void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
+           std::map<XsdType, std::string>& xsdPrefixesUsed, pugi::xml_node& parentXml)
 {
     // create child of parent, w/ label & text
     const auto label = OutputName(node, registry);
@@ -73,6 +75,8 @@ static void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
         ToXml(child, registry, xsdPrefixesUsed, xmlNode);
 }
 
+}  // anonymous
+
 void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
 {
     pugi::xml_document doc;
@@ -80,7 +84,7 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
     const auto& registry = dataset.Namespaces();
 
     // create top-level dataset XML node
-    const auto label = internal::OutputName(dataset, registry);
+    const auto label = OutputName(dataset, registry);
     if (label.empty()) throw std::runtime_error{"could not convert dataset node to XML"};
     auto root = doc.append_child(label.c_str());
 
@@ -151,6 +155,5 @@ void XmlWriter::ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostre
     ToStream(*dataset.get(), out);
 }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio

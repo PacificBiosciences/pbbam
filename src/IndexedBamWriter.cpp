@@ -29,6 +29,7 @@
 #include "pbbam/BamWriter.h"
 #include "pbbam/MakeUnique.h"
 #include "pbbam/PbiRawData.h"
+#include "pbbam/RecordType.h"
 #include "pbbam/Unused.h"
 #include "pbbam/Validator.h"
 
@@ -85,29 +86,6 @@ inline void WriteBgzfVector2(BGZF* fp, std::vector<T>& data)
     bgzf_write_safe2(fp, data.data(), data.size() * sizeof(T));
 }
 
-using RecordType = PacBio::BAM::RecordType;
-std::string ToString2(const RecordType type)
-{
-    // clang-format off
-    static const auto lookup = std::map<RecordType, std::string>
-    {
-        { RecordType::ZMW,        "ZMW" },
-        { RecordType::HQREGION,   "HQREGION" },
-        { RecordType::SUBREAD,    "SUBREAD" },
-        { RecordType::CCS,        "CCS" },
-        { RecordType::SCRAP,      "SCRAP" },
-        { RecordType::TRANSCRIPT, "TRANSCRIPT" },
-        { RecordType::UNKNOWN,    "UNKNOWN" }
-    };
-    // clang-format on
-
-    try {
-        return lookup.at(type);
-    } catch (const std::exception&) {
-        throw std::runtime_error{"error: unknown RecordType encountered"};
-    }
-}
-
 struct PbiFieldBlock2
 {
     int64_t pos_;  // file position of block start
@@ -115,10 +93,11 @@ struct PbiFieldBlock2
 };
 
 template <typename T>
-struct PbiField2
+class PbiField2
 {
     constexpr static const size_t ElementSize = sizeof(T);
 
+public:
     PbiField2(size_t maxBufferSize) : maxElementCount_{maxBufferSize / ElementSize}
     {
         buffer_.reserve(maxElementCount_);
@@ -137,7 +116,6 @@ class PbiReferenceDataBuilder2
 public:
     using ReferenceRows = std::pair<int32_t, int32_t>;  // [startRow, endRow)
 
-public:
     explicit PbiReferenceDataBuilder2(const size_t numReferenceSequences)
     {
         // initialize with number of references we expect to see
@@ -152,7 +130,6 @@ public:
         rawReferenceEntries_[PbiReferenceEntry::UNMAPPED_ID] = PbiReferenceEntry{};
     }
 
-public:
     bool AddRecord(const BamRecord& record, const int32_t rowNumber)
     {
         // fetch ref ID & pos for record
@@ -282,15 +259,13 @@ public:
         if (!tempFile_)
             throw std::runtime_error{"index builder could not open temp file: " + tempFilename_};
 
-        // TODO: come back to this
-        //        if (isCoordinateSorted && numReferenceSequences > 0)
-        //            refDataBuilder_ = std::make_unique<PbiReferenceDataBuilder2>(numReferenceSequences);
+        // TODO: setup for ref data building
     }
 
     void AddRecord(const BamRecord& b, const int64_t uOffset)
     {
         // ensure updated data (necessary?)
-        internal::BamRecordMemory::UpdateRecordTags(b);
+        PacBio::BAM::BamRecordMemory::UpdateRecordTags(b);
         b.ResetCachedPositions();
 
         // store record data & maybe flush to temp file
@@ -308,8 +283,7 @@ public:
         // read group ID
         const auto rgId = [&b]() -> int32_t {
             auto rgIdString = b.ReadGroupBaseId();
-            if (rgIdString.empty())
-                rgIdString = MakeReadGroupId(b.MovieName(), ToString2(b.Type()));
+            if (rgIdString.empty()) rgIdString = MakeReadGroupId(b.MovieName(), ToString(b.Type()));
             return std::stoul(rgIdString, nullptr, 16);
         }();
 
@@ -590,7 +564,7 @@ public:
         //
 
         const std::string gziFn{bamFilename_ + ".gzi"};
-        std::unique_ptr<FILE, internal::FileDeleter> gziFile{fopen(gziFn.c_str(), "rb")};
+        std::unique_ptr<FILE, FileDeleter> gziFile{fopen(gziFn.c_str(), "rb")};
         if (!gziFile) throw std::runtime_error{"could not open gzi file"};
 
         uint64_t numElements;
@@ -646,8 +620,8 @@ private:
     std::string bamFilename_;
     std::string pbiFilename_;
     std::string tempFilename_;
-    std::unique_ptr<FILE, internal::FileDeleter> tempFile_;
-    std::unique_ptr<BGZF, internal::HtslibBgzfDeleter> pbiFile_;
+    std::unique_ptr<FILE, FileDeleter> tempFile_;
+    std::unique_ptr<BGZF, HtslibBgzfDeleter> pbiFile_;
     PbiBuilder::CompressionLevel compressionLevel_;
     size_t numThreads_;
 
@@ -682,9 +656,10 @@ private:
     bool hasMappedData_ = false;
 };
 
-class IndexedBamWriterPrivate2  //: public internal::FileProducer
-{
+}  // namespace internal
 
+class IndexedBamWriter::IndexedBamWriterPrivate2  //: public internal::FileProducer
+{
 public:
     IndexedBamWriterPrivate2(const std::string& outputFilename, std::shared_ptr<bam_hdr_t> header,
                              const BamWriter::CompressionLevel bamCompressionLevel,
@@ -750,7 +725,7 @@ public:
         if (!header_) throw std::runtime_error{"null header"};
 
         // open output BAM
-        const auto usingFilename = bamFilename_;  //= TempFilename();
+        const auto usingFilename = bamFilename_;
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
         bam_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
         if (!bam_) throw std::runtime_error{"could not open file for writing"};
@@ -798,8 +773,8 @@ public:
     void OpenPbi(const PbiBuilder::CompressionLevel compressionLevel, const size_t numThreads,
                  const size_t fileBufferSize)
     {
-        builder_ = std::make_unique<PbiBuilder2>(bamFilename_, bamFilename_ + ".pbi",
-                                                 compressionLevel, numThreads, fileBufferSize);
+        builder_ = std::make_unique<internal::PbiBuilder2>(
+            bamFilename_, bamFilename_ + ".pbi", compressionLevel, numThreads, fileBufferSize);
     }
 
     void RunGziThread(size_t numThreads)
@@ -894,7 +869,6 @@ public:
         if (ret != 0) gziStatus_ = GziStatus::GZI_ERROR;
     }
 
-public:
     void Write(const BamRecord& record)
     {
 // TODO: add API to auto-skip this without special compile flag
@@ -909,7 +883,7 @@ public:
         //
         builder_->AddRecord(record, uncompressedFilePos_);
 
-        const auto rawRecord = internal::BamRecordMemory::GetRawData(record);
+        const auto rawRecord = BamRecordMemory::GetRawData(record);
 
         // update bin
         // min_shift=14 & n_lvls=5 are BAM "magic numbers"
@@ -965,8 +939,8 @@ private:
     std::string bamFilename_;
 
     std::shared_ptr<bam_hdr_t> header_;
-    std::unique_ptr<samFile, internal::HtslibFileDeleter> bam_;
-    std::unique_ptr<PbiBuilder2> builder_;
+    std::unique_ptr<samFile, HtslibFileDeleter> bam_;
+    std::unique_ptr<internal::PbiBuilder2> builder_;
 
     // used as a type of error return code for the gziThread, so
     // that errors are delayed until at least the bam file is
@@ -993,8 +967,6 @@ private:
     int64_t uncompressedFilePos_ = 0;
 };
 
-}  // namespace internal
-
 IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamHeader& header,
                                    const BamWriter::CompressionLevel bamCompressionLevel,
                                    const size_t numBamThreads,
@@ -1009,9 +981,9 @@ IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamH
 #if PBBAM_AUTOVALIDATE
     Validator::Validate(header);
 #endif
-    d_ = std::make_unique<internal::IndexedBamWriterPrivate2>(
-        outputFilename, internal::BamHeaderMemory::MakeRawHeader(header), bamCompressionLevel,
-        numBamThreads, pbiCompressionLevel, numPbiThreads, numGziThreads, tempFileBufferSize);
+    d_ = std::make_unique<IndexedBamWriterPrivate2>(
+        outputFilename, BamHeaderMemory::MakeRawHeader(header), bamCompressionLevel, numBamThreads,
+        pbiCompressionLevel, numPbiThreads, numGziThreads, tempFileBufferSize);
 }
 
 IndexedBamWriter::~IndexedBamWriter() {}

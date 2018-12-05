@@ -61,19 +61,18 @@ public:
         return true;
     }
 
+    virtual void UpdateSort(void) = 0;
+
 protected:
     std::deque<internal::CompositeMergeItem> mergeItems_;
 
-protected:
-    ICollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>> readers)
+    explicit ICollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>> readers)
     {
         for (auto&& reader : readers) {
             auto item = internal::CompositeMergeItem{std::move(reader)};
             if (item.reader->GetNext(item.record)) mergeItems_.push_back(std::move(item));
         }
     }
-
-    virtual void UpdateSort(void) = 0;
 };
 
 struct QNameSorter
@@ -123,24 +122,29 @@ struct QNameSorter
 class QNameCollator : public ICollator
 {
 public:
-    QNameCollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>> readers)
+    explicit QNameCollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>> readers)
         : ICollator(std::move(readers))
     {
-        UpdateSort();
     }
 
-    void UpdateSort(void) { std::sort(mergeItems_.begin(), mergeItems_.end(), QNameSorter{}); }
+    void UpdateSort(void) override
+    {
+        std::sort(mergeItems_.begin(), mergeItems_.end(), QNameSorter{});
+    }
 };
 
 class AlignedCollator : public ICollator
 {
 public:
-    AlignedCollator(std::vector<std::unique_ptr<BamReader>> readers) : ICollator(std::move(readers))
+    explicit AlignedCollator(std::vector<std::unique_ptr<BamReader>> readers)
+        : ICollator(std::move(readers))
     {
-        UpdateSort();
     }
 
-    void UpdateSort(void) { std::sort(mergeItems_.begin(), mergeItems_.end(), PositionSorter{}); }
+    void UpdateSort(void) override
+    {
+        std::sort(mergeItems_.begin(), mergeItems_.end(), PositionSorter{});
+    }
 };
 
 std::vector<std::unique_ptr<BamReader>> MakeBamReaders(std::vector<BamFile> bamFiles,
@@ -160,10 +164,13 @@ std::vector<std::unique_ptr<BamReader>> MakeBamReaders(std::vector<BamFile> bamF
 std::unique_ptr<ICollator> MakeCollator(std::vector<std::unique_ptr<BamReader>> readers,
                                         const bool isCoordinateSorted = false)
 {
+    std::unique_ptr<ICollator> collator;
     if (isCoordinateSorted)
-        return std::make_unique<AlignedCollator>(std::move(readers));
+        collator = std::make_unique<AlignedCollator>(std::move(readers));
     else
-        return std::make_unique<QNameCollator>(std::move(readers));
+        collator = std::make_unique<QNameCollator>(std::move(readers));
+    collator->UpdateSort();
+    return collator;
 }
 
 std::unique_ptr<IRecordWriter> MakeBamWriter(const std::vector<std::unique_ptr<BamReader>>& readers,

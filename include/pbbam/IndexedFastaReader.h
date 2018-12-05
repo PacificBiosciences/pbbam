@@ -133,7 +133,6 @@ private:
     std::string filename_;
     faidx_t* handle_;
 
-private:
     void Close();
     bool Open(std::string filename);
 };

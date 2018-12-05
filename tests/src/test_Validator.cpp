@@ -13,7 +13,6 @@
 #include <pbbam/ReadGroupInfo.h>
 #include <pbbam/Validator.h>
 
-#include "../src/StringUtils.h"
 #include "../src/ValidationErrors.h"
 
 using namespace PacBio;
@@ -118,19 +117,19 @@ static const BamRecord validUnmappedRecord = makeValidUnmappedRecord();
 TEST(ValidatorErrorsTest, SetMaxNumErrors)
 {
     {  // default - use "no max"
-        internal::ValidationErrors errors;
-        EXPECT_EQ(internal::ValidationErrors::MAX, errors.MaxNumErrors());
+        ValidationErrors errors;
+        EXPECT_EQ(ValidationErrors::MAX, errors.MaxNumErrors());
     }
     {  // max of zero doesn't make sense... make equivalent to "no max"
-        internal::ValidationErrors errors(0);
-        EXPECT_EQ(internal::ValidationErrors::MAX, errors.MaxNumErrors());
+        ValidationErrors errors(0);
+        EXPECT_EQ(ValidationErrors::MAX, errors.MaxNumErrors());
     }
     {  // max = 1
-        internal::ValidationErrors errors(1);
+        ValidationErrors errors(1);
         EXPECT_EQ(1, errors.MaxNumErrors());
     }
     {  // max = 10
-        internal::ValidationErrors errors(10);
+        ValidationErrors errors(10);
         EXPECT_EQ(10, errors.MaxNumErrors());
     }
 }
@@ -138,11 +137,11 @@ TEST(ValidatorErrorsTest, SetMaxNumErrors)
 TEST(ValidatorErrorsTest, ThrowOnMaxReached)
 {
     {
-        internal::ValidationErrors errors(1);
+        ValidationErrors errors(1);
         EXPECT_THROW(errors.AddFileError("foo", "you"), ValidationException);
     }
     {
-        internal::ValidationErrors errors(2);
+        ValidationErrors errors(2);
         errors.AddFileError("foo", "you");
         EXPECT_THROW(errors.AddFileError("foo", "me"), ValidationException);
     }
@@ -155,7 +154,7 @@ TEST(ValidatorErrorsTest, ExceptionFromResults)
 
     try {
 
-        internal::ValidationErrors errors(4);
+        ValidationErrors errors(4);
         errors.AddFileError("path/to/foo.bam", error1);
         errors.AddFileError("path/to/foo.bam", error2);
         errors.AddReadGroupError("deadbeef", "invalid sequencing chemistry combination detected");

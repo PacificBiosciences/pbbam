@@ -8,6 +8,7 @@
 
 #include "pbbam/IndexedFastaReader.h"
 
+#include <cassert>
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
@@ -23,6 +24,57 @@
 
 namespace PacBio {
 namespace BAM {
+
+namespace {
+
+void ClipAndGapify(std::string& subseq, const Cigar& cigar, bool exciseSoftClips)
+{
+    size_t seqIndex = 0;
+    for (const auto& op : cigar) {
+        const auto type = op.Type();
+        const auto opLength = op.Length();
+
+        // do nothing for hard clips
+        if (type == CigarOperationType::HARD_CLIP) continue;
+
+        // maybe remove soft clips
+        if (type == CigarOperationType::SOFT_CLIP) {
+            if (!exciseSoftClips) {
+                subseq.reserve(subseq.size() + opLength);
+                subseq.insert(seqIndex, opLength, '-');
+                seqIndex += opLength;
+            }
+        }
+
+        // for non-clipping operations
+        else {
+            // maybe add gaps/padding
+            if (type == CigarOperationType::INSERTION) {
+                subseq.reserve(subseq.size() + opLength);
+                subseq.insert(seqIndex, opLength, '-');
+            } else if (type == CigarOperationType::PADDING) {
+                subseq.reserve(subseq.size() + opLength);
+                subseq.insert(seqIndex, opLength, '*');
+            }
+
+            // update index
+            seqIndex += opLength;
+        }
+    }
+}
+
+struct FreeDeleter
+{
+    // Need to deallocate the returned pointer from htslib using `free()`,
+    // as `delete`-deallocating a pointer originally allocated with `malloc`
+    // constitutes undefined behavior and ASAN rightfully errors out
+    // with a `alloc-dealloc-mismatch` message.
+    // See also:
+    //   https://github.com/samtools/htslib/blob/develop/htslib/faidx.h#L195
+    void operator()(char* p) const { std::free(p); }
+};
+
+}  // anonymous
 
 IndexedFastaReader::IndexedFastaReader(const std::string& filename)
 {
@@ -73,11 +125,18 @@ std::string IndexedFastaReader::Subsequence(const std::string& id, Position begi
 {
     REQUIRE_FAIDX_LOADED;
 
+    assert(begin <= end);
+    // htslib is dumb and will not consider empty intervals valid,
+    // that is, a call to faidx_fetch_seq will *always* return a
+    // sequence consisting of at least one base.
+    if (begin == end) return std::string{};
+
     int len;
     // Derek: *Annoyingly* htslib seems to interpret "end" as inclusive in
     // faidx_fetch_seq, whereas it considers it exclusive in the region spec in
     // fai_fetch.  Can you please verify?
-    const std::unique_ptr<char> rawSeq{faidx_fetch_seq(handle_, id.c_str(), begin, end - 1, &len)};
+    const std::unique_ptr<char, FreeDeleter> rawSeq{
+        faidx_fetch_seq(handle_, id.c_str(), begin, end - 1, &len)};
     if (rawSeq == nullptr) throw std::runtime_error{"could not fetch FASTA sequence"};
     return RemoveAllWhitespace(rawSeq.get());
 }
@@ -93,7 +152,7 @@ std::string IndexedFastaReader::Subsequence(const char* htslibRegion) const
     REQUIRE_FAIDX_LOADED;
 
     int len;
-    const std::unique_ptr<char> rawSeq(fai_fetch(handle_, htslibRegion, &len));
+    const std::unique_ptr<char, FreeDeleter> rawSeq(fai_fetch(handle_, htslibRegion, &len));
     if (rawSeq == nullptr) throw std::runtime_error{"could not fetch FASTA sequence"};
     return RemoveAllWhitespace(rawSeq.get());
 }
@@ -107,48 +166,13 @@ std::string IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
 
     std::string subseq = Subsequence(bamRecord.ReferenceName(), bamRecord.ReferenceStart(),
                                      bamRecord.ReferenceEnd());
-    const auto reverse = orientation != Orientation::GENOMIC && bamRecord.Impl().IsReverseStrand();
 
-    if (bamRecord.Impl().IsMapped() && gapped) {
-        size_t seqIndex = 0;
+    if (bamRecord.Impl().IsMapped() && gapped)
+        ClipAndGapify(subseq, bamRecord.Impl().CigarData(), exciseSoftClips);
 
-        const auto cigar = bamRecord.Impl().CigarData();
-        for (const auto& op : cigar) {
-            const auto type = op.Type();
-
-            // do nothing for hard clips
-            if (type != CigarOperationType::HARD_CLIP) {
-                const auto opLength = op.Length();
-
-                // maybe remove soft clips
-                if (type == CigarOperationType::SOFT_CLIP) {
-                    if (!exciseSoftClips) {
-                        subseq.reserve(subseq.size() + opLength);
-                        subseq.insert(seqIndex, opLength, '-');
-                        seqIndex += opLength;
-                    }
-                }
-
-                // for non-clipping operations
-                else {
-
-                    // maybe add gaps/padding
-                    if (type == CigarOperationType::INSERTION) {
-                        subseq.reserve(subseq.size() + opLength);
-                        subseq.insert(seqIndex, opLength, '-');
-                    } else if (type == CigarOperationType::PADDING) {
-                        subseq.reserve(subseq.size() + opLength);
-                        subseq.insert(seqIndex, opLength, '*');
-                    }
-
-                    // update index
-                    seqIndex += opLength;
-                }
-            }
-        }
-    }
-
-    if (reverse) internal::ReverseComplementCaseSens(subseq);
+    const auto reverse =
+        (orientation != Orientation::GENOMIC) && bamRecord.Impl().IsReverseStrand();
+    if (reverse) ReverseComplementCaseSens(subseq);
 
     return subseq;
 }

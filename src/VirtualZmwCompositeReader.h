@@ -12,13 +12,13 @@
 #include <string>
 #include <utility>
 
+#include "VirtualStitching.h"
 #include "VirtualZmwReader.h"
 #include "pbbam/DataSet.h"
 #include "pbbam/PbiFilter.h"
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 /// \brief The VirtualZmwCompositeReader provides an interface for
 ///        re-stitching "virtual" polymerase reads from their constituent parts,
@@ -34,7 +34,7 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    VirtualZmwCompositeReader(const DataSet& dataset);
+    explicit VirtualZmwCompositeReader(const DataSet& dataset);
 
     VirtualZmwCompositeReader() = delete;
     VirtualZmwCompositeReader(const VirtualZmwCompositeReader&) = delete;
@@ -45,9 +45,8 @@ public:
 
     /// \}
 
-public:
     /// \name Stitched Record Reading
-    ///
+    /// \{
 
     /// \returns true if more ZMWs/files are available for reading.
     bool HasNext();
@@ -64,15 +63,13 @@ public:
     /// \}
 
 private:
-    std::deque<std::pair<std::string, std::string> > sources_;
+    StitchingSources sources_;
     std::unique_ptr<VirtualZmwReader> currentReader_;
     PbiFilter filter_;
 
-private:
     void OpenNextReader();
 };
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

@@ -49,10 +49,7 @@ public:
 ///
 /// \return formatted tag string
 ///
-inline std::string MakeSamTag(std::string tag, std::string value)
-{
-    return '\t' + std::move(tag) + ':' + std::move(value);
-}
+std::string MakeSamTag(std::string tag, std::string value);
 
 }  // namespace BAM
 }  // namespace PacBio

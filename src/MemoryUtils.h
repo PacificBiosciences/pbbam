@@ -19,8 +19,6 @@ namespace BAM {
 
 class BamHeader;
 
-namespace internal {
-
 // intended for use with std::shared_ptr<T>, std::unique_ptr<T>, etc
 
 struct FileDeleter
@@ -135,7 +133,6 @@ inline void BamRecordMemory::UpdateRecordTags(const BamRecord& r) { UpdateRecord
 
 inline void BamRecordMemory::UpdateRecordTags(const BamRecordImpl& r) { r.UpdateTagMap(); }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

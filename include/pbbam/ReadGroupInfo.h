@@ -695,6 +695,8 @@ private:
 private:
     std::string EncodeSamDescription() const;
     void DecodeSamDescription(const std::string& description);
+    void DecodeBarcodeKey(const std::string& key, std::string value);
+    void DecodeFrameCodecKey(const std::string& key, std::string value);
 };
 
 /// \brief Creates a read group ID from a movie name & read type.

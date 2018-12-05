@@ -8,9 +8,8 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
-struct FileUtils
+class FileUtils
 {
 public:
     /// \returns application's current working directory
@@ -101,7 +100,6 @@ inline std::chrono::system_clock::time_point FileUtils::LastModified(const std::
 
 inline off_t FileUtils::Size(const std::string& fn) { return FileUtils::Size(fn.c_str()); }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 

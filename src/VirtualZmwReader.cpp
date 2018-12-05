@@ -14,7 +14,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 VirtualZmwReader::VirtualZmwReader(const std::string& primaryBamFilepath,
                                    const std::string& scrapsBamFilepath)
@@ -103,6 +102,5 @@ BamHeader VirtualZmwReader::ScrapsHeader() const { return scrapsBamFile_->Header
 
 BamHeader VirtualZmwReader::StitchedHeader() const { return *stitchedHeader_.get(); }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio

@@ -13,7 +13,6 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
 
 class Version
 {
@@ -21,13 +20,12 @@ public:
     static const Version Current;
     static const Version Minimum;
 
-public:
     constexpr Version();
 
     Version(int major, int minor, int revision);
 
     // string must be "<major>.<minor>.<version>"
-    Version(const std::string& v);
+    explicit Version(const std::string& v);
 
     Version(const Version&) = default;
     Version(Version&&) = default;
@@ -35,7 +33,6 @@ public:
     Version& operator=(Version&&) = default;
     ~Version() = default;
 
-public:
     bool operator==(const Version& other) const;
     bool operator!=(const Version& other) const;
     bool operator<(const Version& other) const;
@@ -43,27 +40,23 @@ public:
     bool operator>(const Version& other) const;
     bool operator>=(const Version& other) const;
 
-public:
     std::string ToString() const;
-    operator std::string() const;
+    explicit operator std::string() const;
 
-public:
     int Major() const;
     int Minor() const;
     int Revision() const;
 
-public:
     Version& Major(int major);
     Version& Minor(int minor);
     Version& Revision(int revision);
 
 private:
+    void Check() const;
+
     int major_;
     int minor_;
     int revision_;
-
-private:
-    void Check() const;
 };
 
 inline std::ostream& operator<<(std::ostream& out, const Version& version)
@@ -150,7 +143,6 @@ inline Version& Version::Revision(int revision)
     return *this;
 }
 
-}  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
 
