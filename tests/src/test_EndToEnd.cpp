@@ -25,7 +25,7 @@ namespace EndToEndTests {
 
 struct Bam1Deleter
 {
-    void operator()(bam1_t* b)
+    void operator()(bam1_t* b) const
     {
         if (b) bam_destroy1(b);
         b = nullptr;
@@ -34,7 +34,7 @@ struct Bam1Deleter
 
 struct SamFileDeleter
 {
-    void operator()(samFile* file)
+    void operator()(samFile* file) const
     {
         if (file) sam_close(file);
         file = nullptr;
@@ -43,7 +43,7 @@ struct SamFileDeleter
 
 struct BamHdrDeleter
 {
-    void operator()(bam_hdr_t* hdr)
+    void operator()(bam_hdr_t* hdr) const
     {
         if (hdr) bam_hdr_destroy(hdr);
         hdr = nullptr;

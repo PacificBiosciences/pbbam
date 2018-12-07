@@ -79,7 +79,7 @@ struct QNameSorter
     : std::binary_function<internal::CompositeMergeItem, internal::CompositeMergeItem, bool>
 {
     bool operator()(const internal::CompositeMergeItem& lhs,
-                    const internal::CompositeMergeItem& rhs)
+                    const internal::CompositeMergeItem& rhs) const
     {
         const BamRecord& l = lhs.record;
         const BamRecord& r = rhs.record;
