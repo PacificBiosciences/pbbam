@@ -105,7 +105,7 @@ std::vector<uint8_t> FramesToCode(const std::vector<uint16_t>& frames)
 
 }  // anonmyous
 
-Frames::Frames() {}
+Frames::Frames() = default;
 
 Frames::Frames(std::vector<uint16_t> frames) : data_{std::move(frames)} {}
 

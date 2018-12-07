@@ -34,7 +34,7 @@ ReadAccuracyQuery::ReadAccuracyQuery(const Accuracy accuracy, const Compare::Typ
 {
 }
 
-ReadAccuracyQuery::~ReadAccuracyQuery() {}
+ReadAccuracyQuery::~ReadAccuracyQuery() = default;
 
 bool ReadAccuracyQuery::GetNext(BamRecord& r) { return d_->reader_.GetNext(r); }
 

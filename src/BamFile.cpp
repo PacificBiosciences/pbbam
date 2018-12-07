@@ -122,7 +122,7 @@ BamFile& BamFile::operator=(BamFile&& other)
     return *this;
 }
 
-BamFile::~BamFile() {}
+BamFile::~BamFile() = default;
 
 void BamFile::CreatePacBioIndex() const { PbiFile::CreateFrom(*this); }
 

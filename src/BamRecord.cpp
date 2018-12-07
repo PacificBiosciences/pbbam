@@ -389,7 +389,7 @@ BamRecord& BamRecord::operator=(BamRecord&& other)
     return *this;
 }
 
-BamRecord::~BamRecord() {}
+BamRecord::~BamRecord() = default;
 
 Position BamRecord::AlignedEnd() const
 {

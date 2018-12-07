@@ -644,7 +644,7 @@ PbiBuilder::PbiBuilder(const std::string& pbiFilename, const size_t numReference
 {
 }
 
-PbiBuilder::~PbiBuilder() noexcept {}
+PbiBuilder::~PbiBuilder() noexcept = default;
 
 void PbiBuilder::AddRecord(const BamRecord& record, const int64_t vOffset)
 {

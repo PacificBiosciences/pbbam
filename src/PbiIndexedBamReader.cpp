@@ -135,7 +135,7 @@ PbiIndexedBamReader::PbiIndexedBamReader(BamFile bamFile)
 {
 }
 
-PbiIndexedBamReader::~PbiIndexedBamReader() {}
+PbiIndexedBamReader::~PbiIndexedBamReader() = default;
 
 int PbiIndexedBamReader::ReadRawData(BGZF* bgzf, bam1_t* b)
 {

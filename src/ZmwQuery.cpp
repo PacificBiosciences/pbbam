@@ -33,7 +33,7 @@ ZmwQuery::ZmwQuery(std::vector<int32_t> zmwWhitelist, const DataSet& dataset)
 {
 }
 
-ZmwQuery::~ZmwQuery() {}
+ZmwQuery::~ZmwQuery() = default;
 
 bool ZmwQuery::GetNext(BamRecord& r) { return d_->reader_.GetNext(r); }
 
