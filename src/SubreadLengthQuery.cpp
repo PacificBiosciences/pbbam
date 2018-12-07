@@ -36,7 +36,7 @@ SubreadLengthQuery::SubreadLengthQuery(const int32_t length, const Compare::Type
 {
 }
 
-SubreadLengthQuery::~SubreadLengthQuery() {}
+SubreadLengthQuery::~SubreadLengthQuery() = default;
 
 bool SubreadLengthQuery::GetNext(BamRecord& r) { return d_->reader_.GetNext(r); }
 

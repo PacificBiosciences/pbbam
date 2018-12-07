@@ -122,7 +122,7 @@ WhitelistedZmwReadStitcher::WhitelistedZmwReadStitcher(const std::vector<int32_t
 {
 }
 
-WhitelistedZmwReadStitcher::~WhitelistedZmwReadStitcher() {}
+WhitelistedZmwReadStitcher::~WhitelistedZmwReadStitcher() = default;
 
 bool WhitelistedZmwReadStitcher::HasNext() const { return d_->HasNext(); }
 

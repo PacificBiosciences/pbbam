@@ -67,7 +67,7 @@ QNameQuery::QNameQuery(const DataSet& dataset)
 {
 }
 
-QNameQuery::~QNameQuery() {}
+QNameQuery::~QNameQuery() = default;
 
 bool QNameQuery::GetNext(std::vector<BamRecord>& records) { return d_->GetNext(records); }
 

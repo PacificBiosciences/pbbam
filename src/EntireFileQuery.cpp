@@ -26,7 +26,7 @@ EntireFileQuery::EntireFileQuery(const DataSet &dataset)
 {
 }
 
-EntireFileQuery::~EntireFileQuery() {}
+EntireFileQuery::~EntireFileQuery() = default;
 
 bool EntireFileQuery::GetNext(BamRecord &r) { return d_->reader_.GetNext(r); }
 

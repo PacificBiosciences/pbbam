@@ -33,7 +33,7 @@ namespace {  // anonymous
 class ICollator
 {
 public:
-    virtual ~ICollator(void) = default;
+    virtual ~ICollator() = default;
 
     bool GetNext(BamRecord& record)
     {
@@ -61,7 +61,7 @@ public:
         return true;
     }
 
-    virtual void UpdateSort(void) = 0;
+    virtual void UpdateSort() = 0;
 
 protected:
     std::deque<internal::CompositeMergeItem> mergeItems_;
@@ -79,7 +79,7 @@ struct QNameSorter
     : std::binary_function<internal::CompositeMergeItem, internal::CompositeMergeItem, bool>
 {
     bool operator()(const internal::CompositeMergeItem& lhs,
-                    const internal::CompositeMergeItem& rhs)
+                    const internal::CompositeMergeItem& rhs) const
     {
         const BamRecord& l = lhs.record;
         const BamRecord& r = rhs.record;
@@ -127,10 +127,7 @@ public:
     {
     }
 
-    void UpdateSort(void) override
-    {
-        std::sort(mergeItems_.begin(), mergeItems_.end(), QNameSorter{});
-    }
+    void UpdateSort() override { std::sort(mergeItems_.begin(), mergeItems_.end(), QNameSorter{}); }
 };
 
 class AlignedCollator : public ICollator
@@ -141,7 +138,7 @@ public:
     {
     }
 
-    void UpdateSort(void) override
+    void UpdateSort() override
     {
         std::sort(mergeItems_.begin(), mergeItems_.end(), PositionSorter{});
     }

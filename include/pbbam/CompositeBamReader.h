@@ -57,7 +57,7 @@ template <typename CompareType>
 struct CompositeMergeItemSorter
     : public std::function<bool(const CompositeMergeItem&, const CompositeMergeItem&)>
 {
-    bool operator()(const CompositeMergeItem& lhs, const CompositeMergeItem& rhs);
+    bool operator()(const CompositeMergeItem& lhs, const CompositeMergeItem& rhs) const;
 };
 
 }  // namespace internal

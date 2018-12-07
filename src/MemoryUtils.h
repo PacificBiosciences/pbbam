@@ -23,7 +23,7 @@ class BamHeader;
 
 struct FileDeleter
 {
-    void operator()(std::FILE* fp)
+    void operator()(std::FILE* fp) const
     {
         if (fp) std::fclose(fp);
         fp = nullptr;
@@ -32,7 +32,7 @@ struct FileDeleter
 
 struct HtslibBgzfDeleter
 {
-    void operator()(BGZF* bgzf)
+    void operator()(BGZF* bgzf) const
     {
         if (bgzf) bgzf_close(bgzf);
         bgzf = nullptr;
@@ -41,7 +41,7 @@ struct HtslibBgzfDeleter
 
 struct HtslibFileDeleter
 {
-    void operator()(samFile* file)
+    void operator()(samFile* file) const
     {
         if (file) sam_close(file);
         file = nullptr;
@@ -50,7 +50,7 @@ struct HtslibFileDeleter
 
 struct HtslibHeaderDeleter
 {
-    void operator()(bam_hdr_t* hdr)
+    void operator()(bam_hdr_t* hdr) const
     {
         if (hdr) bam_hdr_destroy(hdr);
         hdr = nullptr;
@@ -59,7 +59,7 @@ struct HtslibHeaderDeleter
 
 struct HtslibIndexDeleter
 {
-    void operator()(hts_idx_t* index)
+    void operator()(hts_idx_t* index) const
     {
         if (index) hts_idx_destroy(index);
         index = nullptr;
@@ -68,7 +68,7 @@ struct HtslibIndexDeleter
 
 struct HtslibIteratorDeleter
 {
-    void operator()(hts_itr_t* iter)
+    void operator()(hts_itr_t* iter) const
     {
         if (iter) hts_itr_destroy(iter);
         iter = nullptr;
@@ -77,7 +77,7 @@ struct HtslibIteratorDeleter
 
 struct HtslibRecordDeleter
 {
-    void operator()(bam1_t* b)
+    void operator()(bam1_t* b) const
     {
         if (b) bam_destroy1(b);
         b = nullptr;

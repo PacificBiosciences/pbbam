@@ -357,7 +357,7 @@ public:
     bool HasPulseCallWidth() const;
 
     /// \returns true if this record has PulseExclusion data
-    bool HasPulseExclusion(void) const;
+    bool HasPulseExclusion() const;
 
     /// \returns true if this record has PulseMergeQV data
     bool HasPulseMergeQV() const;

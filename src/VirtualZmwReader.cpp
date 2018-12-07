@@ -55,7 +55,7 @@ VirtualZmwReader::VirtualZmwReader(const std::string& primaryBamFilepath,
     stitchedHeader_->ReadGroups(readGroups);
 }
 
-VirtualZmwReader::~VirtualZmwReader() {}
+VirtualZmwReader::~VirtualZmwReader() = default;
 
 bool VirtualZmwReader::HasNext()
 {

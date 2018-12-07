@@ -120,7 +120,7 @@ ZmwReadStitcher::ZmwReadStitcher(const DataSet& dataset)
 {
 }
 
-ZmwReadStitcher::~ZmwReadStitcher() {}
+ZmwReadStitcher::~ZmwReadStitcher() = default;
 
 bool ZmwReadStitcher::HasNext() { return d_->HasNext(); }
 
