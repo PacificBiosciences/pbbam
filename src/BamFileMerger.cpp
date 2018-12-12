@@ -32,7 +32,7 @@ namespace {  // anonymous
 
 using CompositeMergeItem = internal::CompositeMergeItem;
 
-struct QNameSorter : std::binary_function<CompositeMergeItem, CompositeMergeItem, bool>
+struct QNameSorter
 {
     bool operator()(const CompositeMergeItem& lhs, const CompositeMergeItem& rhs) const
     {
@@ -82,9 +82,10 @@ class ICollator
 {
 public:
     virtual bool GetNext(BamRecord&) = 0;
-    virtual ~ICollator() {}
+    virtual ~ICollator() = default;
+
 protected:
-    ICollator() {}
+    ICollator() = default;
 };
 
 template <typename Comp>
@@ -103,12 +104,13 @@ public:
     {
         if (mergeItems_.empty()) return false;
 
-        // move first record into our result
+        // Move first record into our result
         auto& firstItem = const_cast<CompositeMergeItem&>(*mergeItems_.begin());
         auto& firstRecord = firstItem.record;
         std::swap(record, firstRecord);
 
-        // pop, update, insert
+        // Try to read next record from current reader. If available, re-insert
+        // into the set. Otherwise, just drop it (dtor will release resource).
         CompositeMergeItem tmp(std::move(firstItem));
         mergeItems_.erase(mergeItems_.begin());
         if (tmp.reader->GetNext(tmp.record)) mergeItems_.insert(std::move(tmp));
