@@ -70,7 +70,11 @@ struct QNameSorter : std::binary_function<CompositeMergeItem, CompositeMergeItem
         // sort on qStart, then finally qEnd
         const auto lhsQStart = l.QueryStart();
         const auto rhsQStart = r.QueryStart();
-        return lhsQStart < rhsQStart;
+        if (lhsQStart != rhsQStart) return lhsQStart < rhsQStart;
+
+        const auto lhsQEnd = l.QueryEnd();
+        const auto rhsQEnd = r.QueryEnd();
+        return lhsQEnd < rhsQEnd;
     }
 };
 
