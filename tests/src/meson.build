@@ -25,6 +25,7 @@ pbbam_test_cpp_sources = files([
   'test_FileUtils.cpp',
   'test_Frames.cpp',
   'test_GenomicIntervalQuery.cpp',
+  'test_GenomicIntervals.cpp',
   'test_IndexedBamWriter.cpp',
   'test_IndexedFastaReader.cpp',
   'test_Intervals.cpp',
