@@ -9,13 +9,18 @@
 #include "pbbam/DataSet.h"
 
 #include <algorithm>
+#include <map>
 #include <unordered_map>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/icl/interval_set.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/optional.hpp>
 
 #include "DataSetIO.h"
 #include "FileUtils.h"
 #include "TimeUtils.h"
+
 #include "pbbam/DataSetTypes.h"
 #include "pbbam/MakeUnique.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
@@ -265,6 +270,104 @@ std::set<std::string> DataSet::SequencingChemistries() const
         for (const ReadGroupInfo& rg : readGroups)
             result.insert(rg.SequencingChemistry());
     }
+    return result;
+}
+
+std::vector<GenomicInterval> DataSet::GenomicIntervals() const
+{
+    // need to gather the contig lengths
+    std::map<std::string, int32_t> contigLengths;
+    for (const BamFile& b : BamFiles()) {
+        const BamHeader& header = b.Header();
+        const int32_t numContigs = header.NumSequences();
+        for (int32_t i = 0; i < numContigs; ++i) {
+            const std::string refName = header.SequenceName(i);
+            const int32_t refLength = boost::lexical_cast<int32_t>(header.SequenceLength(i));
+
+            const auto it = contigLengths.find(refName);
+            if (it == contigLengths.cend())
+                contigLengths.emplace(refName, refLength);
+            else if (it->second != refLength)
+                throw std::runtime_error{refName + " occurs twice with different lengths ('" +
+                                         std::to_string(it->second) + "' and '" +
+                                         std::to_string(refLength) + "')"};
+        }
+    }
+
+    // with the lengths of all contigs known, we can build
+    // the minimal interval set induced by the filters
+    using intT = boost::icl::interval_set<int32_t>;
+    using intInterval = intT::interval_type;
+
+    std::map<std::string, intT> contigIntervals;
+    int32_t numFilters = 0;
+
+    for (const auto& xmlFilter : Filters()) {
+        ++numFilters;
+        boost::optional<std::string> contigName;
+
+        intT intersectedInterval{intInterval{0, std::numeric_limits<int32_t>::max()}};
+
+        for (const auto& xmlProperty : xmlFilter.Properties()) {
+            const std::string XmlName = xmlProperty.Name();
+            const std::string XmlOperator = xmlProperty.Operator();
+            const std::string XmlValue = xmlProperty.Value();
+
+            if ("rname" == XmlName) {
+                if ("=" == XmlOperator) {
+                    contigName = XmlValue;
+
+                    const auto it = contigLengths.find(XmlValue);
+                    if (it == contigLengths.cend())
+                        throw std::runtime_error{"Could not find contig '" + XmlValue +
+                                                 "' in BAM files"};
+                    else
+                        intersectedInterval &= intInterval(0, it->second);
+                } else
+                    throw std::runtime_error{
+                        '\'' + XmlOperator +
+                        "' is an unrecognized property operator, only '=' is recognized"};
+            } else if ("tstart" == XmlName) {
+                if ((XmlOperator != "<") && (XmlOperator != "<="))
+                    throw std::runtime_error{"tstart only supports '<' and '<=' operators"};
+
+                const int32_t end = boost::lexical_cast<int32_t>(XmlValue) + ("<=" == XmlOperator);
+                intersectedInterval &= intInterval(0, end);
+            } else if ("tend" == XmlName) {
+                if ((XmlOperator != ">") && (XmlOperator != ">="))
+                    throw std::runtime_error{"tend only supports '>' and '>=' operators"};
+
+                const int32_t start =
+                    boost::lexical_cast<int32_t>(XmlValue) - (">=" == XmlOperator);
+                intersectedInterval &= intInterval(start, std::numeric_limits<int32_t>::max());
+            } else
+                throw std::runtime_error{'\'' + XmlName +
+                                         "' is an unrecognized filter property name"};
+        }
+
+        if (contigName)
+            contigIntervals[contigName.value()] |= intersectedInterval;
+        else
+            throw std::runtime_error{"Current filter does not have a valid 'rname' attribute"};
+    }
+
+    // extract all GenomicIntervals
+    std::vector<GenomicInterval> result;
+    if (numFilters) {
+        // have some filters, only return regions passing filters
+        for (const auto& contigs : contigIntervals) {
+            const std::string& contigName = contigs.first;
+            for (const auto& i : contigs.second) {
+                // don't append empty intervals to the result
+                if (boost::icl::length(i)) result.emplace_back(contigName, i.lower(), i.upper());
+            }
+        }
+    } else {
+        // no filters, return complete list of intervals
+        for (const auto& contigs : contigLengths)
+            result.emplace_back(contigs.first, 0, contigs.second);
+    }
+
     return result;
 }
 

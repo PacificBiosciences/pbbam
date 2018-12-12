@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pbds:AlignmentSet CreatedAt="2018-12-11T21:24:26" MetaType="PacBio.DataSet.AlignmentSet" Name="pacbio_dataset_alignmentset-181211_202425989" Tags="" TimeStampedName="pacbio_dataset_alignmentset-181211_202425989" UniqueId="e836d9c0-8b18-4159-fd44-9d49a1400fc5" Version="3.0.1" xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+	<pbbase:ExternalResources>
+		<pbbase:ExternalResource MetaType="PacBio.AlignmentFile.AlignmentBamFile" ResourceId="test_contigs.bam" TimeStampedName="pacbio_alignmentfile_alignmentbamfile-181211_202425989" UniqueId="4828832c-c33b-4f0b-a9ec-e9dba2a84e30">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex MetaType="PacBio.Index.PacBioIndex" ResourceId="test_contigs.bam.pbi" TimeStampedName="pacbio_index_pacbioindex-181211_202426034" UniqueId="8044e806-405a-44b5-9539-665ff7dbd394"/>
+				<pbbase:FileIndex MetaType="PacBio.Index.BamIndex" ResourceId="test_contigs.bam.bai" TimeStampedName="pacbio_index_bamindex-181211_202426034" UniqueId="bb782ecb-a9f4-44a6-be0c-07b3fb6e733e"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+	</pbbase:ExternalResources>
+	<pbds:Filters>
+		<pbds:Filter>
+			<pbbase:Properties>
+				<pbbase:Property Name="rname" Operator="=" Value="contig1"/>
+				<pbbase:Property Name="tstart" Operator="&lt;" Value="10"/>
+				<pbbase:Property Name="tend" Operator="&gt;" Value="3"/>
+			</pbbase:Properties>
+		</pbds:Filter>
+		<pbds:Filter>
+			<pbbase:Properties>
+				<pbbase:Property Name="rname" Operator="=" Value="contig1"/>
+				<pbbase:Property Name="tstart" Operator="&lt;" Value="17"/>
+				<pbbase:Property Name="tend" Operator="&gt;" Value="10"/>
+			</pbbase:Properties>
+		</pbds:Filter>
+	</pbds:Filters>
+	<pbds:DataSetMetadata>
+		<pbds:TotalLength>0</pbds:TotalLength>
+		<pbds:NumRecords>0</pbds:NumRecords>
+	</pbds:DataSetMetadata>
+</pbds:AlignmentSet>
