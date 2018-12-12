@@ -8,8 +8,8 @@
 
 #include "pbbam/BamFileMerger.h"
 
-#include <deque>
 #include <memory>
+#include <set>
 #include <stdexcept>
 #include <vector>
 
@@ -30,56 +30,11 @@ namespace PacBio {
 namespace BAM {
 namespace {  // anonymous
 
-class ICollator
-{
-public:
-    virtual ~ICollator() = default;
-
-    bool GetNext(BamRecord& record)
-    {
-        // nothing left to read
-        if (mergeItems_.empty()) return false;
-
-        // non-destructive 'pop' of first item from queue
-        auto firstIter = mergeItems_.begin();
-        auto firstItem = internal::CompositeMergeItem{std::move(firstIter->reader),
-                                                      std::move(firstIter->record)};
-        mergeItems_.pop_front();
-
-        // store its record in our output record
-        std::swap(record, firstItem.record);
-
-        // try fetch 'next' from first item's reader
-        // if successful, re-insert it into container & re-sort on our new values
-        // otherwise, this item will go out of scope & reader destroyed
-        if (firstItem.reader->GetNext(firstItem.record)) {
-            mergeItems_.push_front(std::move(firstItem));
-            UpdateSort();
-        }
-
-        // return success
-        return true;
-    }
-
-    virtual void UpdateSort() = 0;
-
-protected:
-    std::deque<internal::CompositeMergeItem> mergeItems_;
-
-    explicit ICollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>> readers)
-    {
-        for (auto&& reader : readers) {
-            auto item = internal::CompositeMergeItem{std::move(reader)};
-            if (item.reader->GetNext(item.record)) mergeItems_.push_back(std::move(item));
-        }
-    }
-};
+using CompositeMergeItem = internal::CompositeMergeItem;
 
 struct QNameSorter
-    : std::binary_function<internal::CompositeMergeItem, internal::CompositeMergeItem, bool>
 {
-    bool operator()(const internal::CompositeMergeItem& lhs,
-                    const internal::CompositeMergeItem& rhs) const
+    bool operator()(const CompositeMergeItem& lhs, const CompositeMergeItem& rhs) const
     {
         const BamRecord& l = lhs.record;
         const BamRecord& r = rhs.record;
@@ -115,34 +70,59 @@ struct QNameSorter
         // sort on qStart, then finally qEnd
         const auto lhsQStart = l.QueryStart();
         const auto rhsQStart = r.QueryStart();
-        return lhsQStart < rhsQStart;
+        if (lhsQStart != rhsQStart) return lhsQStart < rhsQStart;
+
+        const auto lhsQEnd = l.QueryEnd();
+        const auto rhsQEnd = r.QueryEnd();
+        return lhsQEnd < rhsQEnd;
     }
 };
 
-class QNameCollator : public ICollator
+class ICollator
 {
 public:
-    explicit QNameCollator(std::vector<std::unique_ptr<PacBio::BAM::BamReader>> readers)
-        : ICollator(std::move(readers))
-    {
-    }
+    virtual bool GetNext(BamRecord&) = 0;
+    virtual ~ICollator() = default;
 
-    void UpdateSort() override { std::sort(mergeItems_.begin(), mergeItems_.end(), QNameSorter{}); }
+protected:
+    ICollator() = default;
 };
 
-class AlignedCollator : public ICollator
+template <typename Comp>
+class CollatorImpl : public ICollator
 {
 public:
-    explicit AlignedCollator(std::vector<std::unique_ptr<BamReader>> readers)
-        : ICollator(std::move(readers))
+    CollatorImpl(std::vector<std::unique_ptr<BamReader>> readers) : ICollator()
     {
+        for (auto&& reader : readers) {
+            auto item = CompositeMergeItem{std::move(reader)};
+            if (item.reader->GetNext(item.record)) mergeItems_.insert(std::move(item));
+        }
     }
 
-    void UpdateSort() override
+    bool GetNext(BamRecord& record) override
     {
-        std::sort(mergeItems_.begin(), mergeItems_.end(), PositionSorter{});
+        if (mergeItems_.empty()) return false;
+
+        // Move first record into our result
+        auto& firstItem = const_cast<CompositeMergeItem&>(*mergeItems_.begin());
+        auto& firstRecord = firstItem.record;
+        std::swap(record, firstRecord);
+
+        // Try to read next record from current reader. If available, re-insert
+        // into the set. Otherwise, just drop it (dtor will release resource).
+        CompositeMergeItem tmp(std::move(firstItem));
+        mergeItems_.erase(mergeItems_.begin());
+        if (tmp.reader->GetNext(tmp.record)) mergeItems_.insert(std::move(tmp));
+        return true;
     }
+
+private:
+    std::multiset<CompositeMergeItem, Comp> mergeItems_;
 };
+
+using QNameCollator = CollatorImpl<QNameSorter>;
+using AlignedCollator = CollatorImpl<PositionSorter>;
 
 std::vector<std::unique_ptr<BamReader>> MakeBamReaders(std::vector<BamFile> bamFiles,
                                                        PbiFilter filter = PbiFilter{})
@@ -166,7 +146,6 @@ std::unique_ptr<ICollator> MakeCollator(std::vector<std::unique_ptr<BamReader>> 
         collator = std::make_unique<AlignedCollator>(std::move(readers));
     else
         collator = std::make_unique<QNameCollator>(std::move(readers));
-    collator->UpdateSort();
     return collator;
 }
 
