@@ -226,12 +226,21 @@ void ClipAndGapify(const BamRecordImpl& impl, const bool aligned, const bool exc
             }
 
             // maybe add deletion/padding values
-            else if (aligned && opType == CigarOperationType::DELETION) {
-                for (size_t i = 0; i < opLength; ++i)
-                    (*seq)[dstIndex++] = deletionNullValue;
-            } else if (aligned && opType == CigarOperationType::PADDING) {
-                for (size_t i = 0; i < opLength; ++i)
-                    (*seq)[dstIndex++] = paddingNullValue;
+            // either way, srcIndex is not incremented
+            else if (opType == CigarOperationType::DELETION) {
+                if (aligned) {
+                    for (size_t i = 0; i < opLength; ++i) {
+                        (*seq)[dstIndex] = deletionNullValue;
+                        ++dstIndex;
+                    }
+                }
+            } else if (opType == CigarOperationType::PADDING) {
+                if (aligned) {
+                    for (size_t i = 0; i < opLength; ++i) {
+                        (*seq)[dstIndex] = paddingNullValue;
+                        ++dstIndex;
+                    }
+                }
             }
 
             // all other CIGAR ops
