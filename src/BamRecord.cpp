@@ -229,13 +229,17 @@ void ClipAndGapify(const BamRecordImpl& impl, const bool aligned, const bool exc
             // either way, srcIndex is not incremented
             else if (opType == CigarOperationType::DELETION) {
                 if (aligned) {
-                    for (size_t i = 0; i < opLength; ++i)
-                        (*seq)[dstIndex++] = deletionNullValue;
+                    for (size_t i = 0; i < opLength; ++i) {
+                        (*seq)[dstIndex] = deletionNullValue;
+                        ++dstIndex;
+                    }
                 }
             } else if (opType == CigarOperationType::PADDING) {
                 if (aligned) {
-                    for (size_t i = 0; i < opLength; ++i)
-                        (*seq)[dstIndex++] = paddingNullValue;
+                    for (size_t i = 0; i < opLength; ++i) {
+                        (*seq)[dstIndex] = paddingNullValue;
+                        ++dstIndex;
+                    }
                 }
             }
 
