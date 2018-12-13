@@ -7,6 +7,9 @@
 
 #include <gtest/gtest.h>
 
+#include "PbbamTestData.h"
+
+#include <pbbam/BamReader.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamRecordView.h>
 #include <pbbam/BamTagCodec.h>
@@ -2014,7 +2017,72 @@ TEST(BamRecordTest, ClipEncodedFrames)
         EXPECT_EQ(frames_rev_clipped,    view.IPD().Data());
         EXPECT_EQ(pulseCall_rev_clipped, view.PulseCalls());
     }
+}
 
+TEST(BamRecordClippingTest, ExciseSoftClipsFromFramesWithDeletions)
+{
+    const std::string expectedName{"m141008_060349_42194_c100704972550000001823137703241586_s1_p0/14/2409_2745"};
+    const PacBio::BAM::Strand expectedStrand = PacBio::BAM::Strand::FORWARD;
+    const std::string expectedCigar{
+        "20S11=1I47=1I2=1I6=1I22=1I2=1I9=1I29=1D6=1I16=1I6=1I7=1I8=2I5=1I5=1I11=1I5=5I2=3I1=1I1=1I1=3I5=2D19=1I14=1I17=28S"};
+    const std::string expectedRawSeq{
+        "CCCCGGGATTCCTCTAGATGCATCAGGTAAGAAAAGTACGATGCTACAGCTTGTGACTGGTGCGGCACTT"
+        "TTGGCTGAGTTTATCCTGTGCCACCTCATGTATTCTGCCCTAGACAGTCGGTCTTGCACGCCATTACTAG"
+        "ACCGACAAAATGGAACCGGGGCCCTTAAACCCCGTTCGAAGGCGTAAGCAAGGAAGATAGGGTTTTATGA"
+        "AACTCTTCCCAGTCAATAATACCAAAAAAACCCCAACCAAGATCGTGACGGATTGCAGAGCGAATCCTAT"
+        "CCGCGCTCGCAATAATTTAGTGTTGATCCAAGCTTGCTGAGGACTAGTAAAGCTTC"};
+    const std::string expectedClippedSeq{
+        "CATCAGGTAAGAAAAGTACGATGCTACAGCTTGTGACTGGTGCGGCACTTTTGGCTGAGTTTATCCTGTG"
+        "CCACCTCATGTATTCTGCCCTAGACAGTCGGTCTTGCACGCCATTACTAGACCGACAAAATGGAACCGGG"
+        "GCCCTTAAACCCCGTTCGAAGGCGTAAGCAAGGAAGATAGGGTTTTATGAAACTCTTCCCAGTCAATAAT"
+        "ACCAAAAAAACCCCAACCAAGATCGTGACGGATTGCAGAGCGAATCCTATCCGCGCTCGCAATAATTTAG"
+        "TGTTGATC"};
+    const std::vector<uint8_t> expectedRawIpds{
+        17,3,8,3,4,1,14,8,2,1,21,3,1,17,22,13,10,9,89,7,4,5,3,17,8,8,18,58,14,
+        25,8,5,9,1,5,0,20,16,15,9,78,19,2,20,23,12,2,5,7,3,5,61,19,12,13,6,65,
+        18,105,2,34,94,3,38,69,16,5,76,1,21,5,3,2,0,32,23,26,9,3,4,18,2,2,12,19,
+        33,63,11,4,25,3,7,7,3,26,48,28,34,1,2,6,31,17,29,68,5,20,79,6,12,10,3,
+        43,72,21,65,8,45,17,14,13,20,7,3,5,8,0,17,11,65,6,7,8,3,6,11,4,1,80,4,
+        16,21,12,4,2,8,1,25,22,36,18,34,11,5,4,33,3,12,1,14,8,22,4,8,76,8,5,18,
+        32,5,33,47,255,36,9,26,2,6,47,0,35,8,8,0,5,37,40,1,11,8,39,60,8,42,0,3,
+        6,11,12,20,24,15,1,10,10,38,25,63,21,28,0,4,17,0,31,23,13,41,23,42,0,7,
+        33,7,23,11,50,30,2,44,21,182,44,105,231,33,255,59,189,253,17,13,7,28,40,
+        84,8,13,34,70,214,174,103,5,8,1,8,9,8,1,12,7,4,17,7,45,2,2,7,10,7,19,28,
+        31,3,18,0,42,0,8,2,9,2,1,11,25,1,35,36,1,7,5,17,12,39,8,31,1,40,41,4,18,
+        2,51,14,1,16,255,2,5,83,2,6,2,1,6,9,10,3,31,19,35,6,16,21,12,28,4,10,10,
+        12,1,105,17,2,11};
+    const std::vector<uint8_t> expectedClippedIpds{
+        4,5,3,17,8,8,18,58,14,25,8,5,9,1,5,0,20,16,15,9,78,19,2,20,23,12,2,5,7,
+        3,5,61,19,12,13,6,65,18,105,2,34,94,3,38,69,16,5,76,1,21,5,3,2,0,32,23,
+        26,9,3,4,18,2,2,12,19,33,63,11,4,25,3,7,7,3,26,48,28,34,1,2,6,31,17,29,
+        68,5,20,79,6,12,10,3,43,72,21,65,8,45,17,14,13,20,7,3,5,8,0,17,11,65,6,
+        7,8,3,6,11,4,1,80,4,16,21,12,4,2,8,1,25,22,36,18,34,11,5,4,33,3,12,1,14,
+        8,22,4,8,76,8,5,18,32,5,33,47,255,36,9,26,2,6,47,0,35,8,8,0,5,37,40,1,
+        11,8,39,60,8,42,0,3,6,11,12,20,24,15,1,10,10,38,25,63,21,28,0,4,17,0,31,
+        23,13,41,23,42,0,7,33,7,23,11,50,30,2,44,21,182,44,105,231,33,255,59,
+        189,253,17,13,7,28,40,84,8,13,34,70,214,174,103,5,8,1,8,9,8,1,12,7,4,17,
+        7,45,2,2,7,10,7,19,28,31,3,18,0,42,0,8,2,9,2,1,11,25,1,35,36,1,7,5,17,
+        12,39,8,31,1,40,41,4,18,2,51,14,1,16,255};
+
+    const std::string fn{PbbamTestsConfig::Data_Dir + "/softclip_deletions.bam"};
+    BamRecord record;
+    BamReader reader{fn};
+    ASSERT_TRUE(reader.GetNext(record));
+
+    EXPECT_EQ(expectedName, record.FullName());
+    EXPECT_EQ(expectedStrand, record.AlignedStrand());
+    EXPECT_EQ(expectedCigar, record.CigarData().ToStdString());
+
+    const auto rawSeq = record.Sequence(PacBio::BAM::Orientation::GENOMIC);
+    const auto clippedSeq = record.Sequence(PacBio::BAM::Orientation::GENOMIC, false, true);
+    EXPECT_EQ(expectedRawSeq, rawSeq);
+    EXPECT_EQ(expectedClippedSeq, clippedSeq);
+
+    ASSERT_TRUE(record.HasIPD());
+    const auto rawIpds = record.IPD(PacBio::BAM::Orientation::GENOMIC).Encode();
+    const auto clippedIpds = record.IPD(PacBio::BAM::Orientation::GENOMIC, false, true).Encode();
+    EXPECT_EQ(expectedRawIpds, rawIpds);
+    EXPECT_EQ(expectedClippedIpds, clippedIpds);
 }
 
 // clang-format on
