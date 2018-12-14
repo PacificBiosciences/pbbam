@@ -11,7 +11,7 @@ namespace PacBio {
 namespace BAM {
 
 FileProducer::FileProducer(std::string targetFilename)
-    : FileProducer(std::move(targetFilename), targetFilename + ".tmp")
+    : FileProducer(targetFilename, targetFilename + ".tmp")
 {
 }
 
