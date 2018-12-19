@@ -26,7 +26,7 @@ class FastaReader::FastaReaderPrivate
     KSEQ_INIT(gzFile, gzread)
     struct KSeqDeleter
     {
-        void operator()(kseq_t* seq)
+        void operator()(kseq_t* seq) const
         {
             if (seq) kseq_destroy(seq);
             seq = nullptr;
@@ -60,7 +60,7 @@ private:
 
 FastaReader::FastaReader(const std::string& fn) : d_{std::make_unique<FastaReaderPrivate>(fn)} {}
 
-FastaReader::~FastaReader() {}
+FastaReader::~FastaReader() = default;
 
 bool FastaReader::GetNext(FastaSequence& record) { return d_->GetNext(record); }
 

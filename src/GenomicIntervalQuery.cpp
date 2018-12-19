@@ -30,7 +30,7 @@ GenomicIntervalQuery::GenomicIntervalQuery(const GenomicInterval& interval, cons
 {
 }
 
-GenomicIntervalQuery::~GenomicIntervalQuery() {}
+GenomicIntervalQuery::~GenomicIntervalQuery() = default;
 
 bool GenomicIntervalQuery::GetNext(BamRecord& r) { return d_->reader_.GetNext(r); }
 

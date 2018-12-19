@@ -328,7 +328,7 @@ PbiQueryNameFilter::PbiQueryNameFilter(const PbiQueryNameFilter& other)
 {
 }
 
-PbiQueryNameFilter::~PbiQueryNameFilter() {}
+PbiQueryNameFilter::~PbiQueryNameFilter() = default;
 
 bool PbiQueryNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
 {

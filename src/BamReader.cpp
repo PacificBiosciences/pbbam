@@ -49,7 +49,7 @@ BamReader::BamReader(BamFile bamFile) : d_{std::make_unique<BamReaderPrivate>(st
     VirtualSeek(d_->bamFile_.FirstAlignmentOffset());
 }
 
-BamReader::~BamReader() {}
+BamReader::~BamReader() = default;
 
 BGZF* BamReader::Bgzf() const
 {

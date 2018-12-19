@@ -20,7 +20,7 @@ public:
     static const Version Current;
     static const Version Minimum;
 
-    constexpr Version();
+    constexpr Version() = default;
 
     Version(int major, int minor, int revision);
 
@@ -54,9 +54,9 @@ public:
 private:
     void Check() const;
 
-    int major_;
-    int minor_;
-    int revision_;
+    int major_ = 0;
+    int minor_ = 0;
+    int revision_ = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& out, const Version& version)
@@ -64,8 +64,6 @@ inline std::ostream& operator<<(std::ostream& out, const Version& version)
     out << version.ToString();
     return out;
 }
-
-inline constexpr Version::Version() : major_{0}, minor_{0}, revision_{0} {}
 
 inline Version::Version(int major, int minor, int revision)
     : major_{major}, minor_{minor}, revision_{revision}

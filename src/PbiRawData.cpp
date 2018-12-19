@@ -126,14 +126,12 @@ uint32_t PbiRawMappedData::NumInsertedBasesAt(size_t recordIndex) const
 const PbiReferenceEntry::ID PbiReferenceEntry::UNMAPPED_ID = static_cast<PbiReferenceEntry::ID>(-1);
 const PbiReferenceEntry::Row PbiReferenceEntry::UNSET_ROW = static_cast<PbiReferenceEntry::Row>(-1);
 
-PbiReferenceEntry::PbiReferenceEntry() : tId_{UNMAPPED_ID}, beginRow_{UNSET_ROW}, endRow_{UNSET_ROW}
-{
-}
+PbiReferenceEntry::PbiReferenceEntry() : PbiReferenceEntry{UNMAPPED_ID, UNSET_ROW, UNSET_ROW} {}
 
-PbiReferenceEntry::PbiReferenceEntry(ID id) : tId_{id}, beginRow_{UNSET_ROW}, endRow_{UNSET_ROW} {}
+PbiReferenceEntry::PbiReferenceEntry(ID id) : PbiReferenceEntry{id, UNSET_ROW, UNSET_ROW} {}
 
 PbiReferenceEntry::PbiReferenceEntry(ID id, Row beginRow, Row endRow)
-    : tId_(id), beginRow_(beginRow), endRow_(endRow)
+    : tId_{id}, beginRow_{beginRow}, endRow_{endRow}
 {
 }
 

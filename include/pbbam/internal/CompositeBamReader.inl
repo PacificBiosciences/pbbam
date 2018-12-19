@@ -33,7 +33,7 @@ inline CompositeMergeItem::CompositeMergeItem(std::unique_ptr<BamReader> rdr,
 
 template<typename CompareType>
 inline bool CompositeMergeItemSorter<CompareType>::operator()(const CompositeMergeItem& lhs,
-                                                              const CompositeMergeItem& rhs)
+                                                              const CompositeMergeItem& rhs) const
 {
     const auto& l = lhs.record;
     const auto& r = rhs.record;
@@ -171,7 +171,7 @@ struct OrderByPosition
 struct PositionSorter : std::binary_function<internal::CompositeMergeItem, internal::CompositeMergeItem, bool>
 {
     bool operator()(const internal::CompositeMergeItem& lhs,
-                    const internal::CompositeMergeItem& rhs)
+                    const internal::CompositeMergeItem& rhs) const
     {
         const BamRecord& l = lhs.record;
         const BamRecord& r = rhs.record;

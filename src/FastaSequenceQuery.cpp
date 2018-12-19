@@ -27,7 +27,7 @@ FastaSequenceQuery::FastaSequenceQuery(const DataSet& dataset)
 {
 }
 
-FastaSequenceQuery::~FastaSequenceQuery() {}
+FastaSequenceQuery::~FastaSequenceQuery() = default;
 
 bool FastaSequenceQuery::GetNext(FastaSequence& seq) { return d_->reader_.GetNext(seq); }
 

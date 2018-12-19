@@ -12,9 +12,11 @@
 #include <set>
 #include <string>
 #include <vector>
+
 #include "pbbam/BamFile.h"
 #include "pbbam/Config.h"
 #include "pbbam/DataSetTypes.h"
+#include "pbbam/GenomicInterval.h"
 
 namespace PacBio {
 namespace BAM {
@@ -390,6 +392,15 @@ public:
     /// \sa ReadGroupInfo::SequencingChemistry
     ///
     std::set<std::string> SequencingChemistries() const;
+
+    /// \brief Return a minimal list of genomic intervals covered by filters.
+    ///
+    /// \param[out] vector of genomic intervals
+    ///
+    /// \throws std::runtime_error if DataSet contains invalid or non-sensical
+    ///         filters, such as rname appearing twice, etc.
+    ///
+    std::vector<GenomicInterval> GenomicIntervals() const;
 
     /// \}
 

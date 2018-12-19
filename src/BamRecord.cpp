@@ -226,12 +226,21 @@ void ClipAndGapify(const BamRecordImpl& impl, const bool aligned, const bool exc
             }
 
             // maybe add deletion/padding values
-            else if (aligned && opType == CigarOperationType::DELETION) {
-                for (size_t i = 0; i < opLength; ++i)
-                    (*seq)[dstIndex++] = deletionNullValue;
-            } else if (aligned && opType == CigarOperationType::PADDING) {
-                for (size_t i = 0; i < opLength; ++i)
-                    (*seq)[dstIndex++] = paddingNullValue;
+            // either way, srcIndex is not incremented
+            else if (opType == CigarOperationType::DELETION) {
+                if (aligned) {
+                    for (size_t i = 0; i < opLength; ++i) {
+                        (*seq)[dstIndex] = deletionNullValue;
+                        ++dstIndex;
+                    }
+                }
+            } else if (opType == CigarOperationType::PADDING) {
+                if (aligned) {
+                    for (size_t i = 0; i < opLength; ++i) {
+                        (*seq)[dstIndex] = paddingNullValue;
+                        ++dstIndex;
+                    }
+                }
             }
 
             // all other CIGAR ops
@@ -389,7 +398,7 @@ BamRecord& BamRecord::operator=(BamRecord&& other)
     return *this;
 }
 
-BamRecord::~BamRecord() {}
+BamRecord::~BamRecord() = default;
 
 Position BamRecord::AlignedEnd() const
 {
@@ -1385,15 +1394,9 @@ bool BamRecord::HasPulseCall() const
            !impl_.TagValue(BamRecordTag::PULSE_CALL).IsNull();
 }
 
-bool BamRecord::HasPulseExclusion(void) const
-{
-    return impl_.HasTag(BamRecordTag::PULSE_EXCLUSION);
-}
+bool BamRecord::HasPulseExclusion() const { return impl_.HasTag(BamRecordTag::PULSE_EXCLUSION); }
 
-bool BamRecord::HasPulseCallWidth(void) const
-{
-    return impl_.HasTag(BamRecordTag::PULSE_CALL_WIDTH);
-}
+bool BamRecord::HasPulseCallWidth() const { return impl_.HasTag(BamRecordTag::PULSE_CALL_WIDTH); }
 
 bool BamRecord::HasPulseWidth() const { return impl_.HasTag(BamRecordTag::PULSE_WIDTH); }
 
