@@ -20,13 +20,15 @@ namespace BAM {
 ///
 enum LocalContextFlags : uint8_t
 {
-    NO_LOCAL_CONTEXT = 0,  ///< No context information available
-    ADAPTER_BEFORE = 1,    ///< Adapter precedes subread
-    ADAPTER_AFTER = 2,     ///< Adapter follows subread
-    BARCODE_BEFORE = 4,    ///< Barcode precedes subread
-    BARCODE_AFTER = 8,     ///< Barcode follows subread
-    FORWARD_PASS = 16,     ///< Subread's orientation is 'forward pass'
-    REVERSE_PASS = 32      ///< Subread's orientation is 'reverse pass'
+    NO_LOCAL_CONTEXT = 0,     ///< No context information available
+    ADAPTER_BEFORE = 1,       ///< Adapter precedes subread
+    ADAPTER_AFTER = 2,        ///< Adapter follows subread
+    BARCODE_BEFORE = 4,       ///< Barcode precedes subread
+    BARCODE_AFTER = 8,        ///< Barcode follows subread
+    FORWARD_PASS = 16,        ///< Subread's orientation is 'forward pass'
+    REVERSE_PASS = 32,        ///< Subread's orientation is 'reverse pass'
+    ADAPTER_BEFORE_BAD = 64,  ///< Adapter preceding subread does not align to adapter reference
+    ADAPTER_AFTER_BAD = 128   ///< Adapter following subread does not align to adapter reference
 };
 
 /// \returns a LocalContextFlags value containing the result of the bitwise-OR

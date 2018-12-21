@@ -10,6 +10,14 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.21.0] - 2018-12-21
+
+### Added
+ - New local context flags: ADAPTER_BEFORE_BAD and ADAPTER_AFTER_BAD.
+
+### Changed
+ - Current PacBioBAM spec now 3.0.7.
+
 ### Removed
  - CMake has been removed completely.
 
