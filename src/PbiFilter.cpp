@@ -104,13 +104,15 @@ static const std::unordered_map<std::string, BuiltIn> builtInLookup =
 
 static const std::unordered_map<std::string, LocalContextFlags> contextFlagNames =
 {
-    { "NO_LOCAL_CONTEXT", LocalContextFlags::NO_LOCAL_CONTEXT },
-    { "ADAPTER_BEFORE",   LocalContextFlags::ADAPTER_BEFORE },
-    { "ADAPTER_AFTER",    LocalContextFlags::ADAPTER_AFTER },
-    { "BARCODE_BEFORE",   LocalContextFlags::BARCODE_BEFORE },
-    { "BARCODE_AFTER",    LocalContextFlags::BARCODE_AFTER },
-    { "FORWARD_PASS",     LocalContextFlags::FORWARD_PASS },
-    { "REVERSE_PASS",     LocalContextFlags::REVERSE_PASS }
+    { "NO_LOCAL_CONTEXT",   LocalContextFlags::NO_LOCAL_CONTEXT },
+    { "ADAPTER_BEFORE",     LocalContextFlags::ADAPTER_BEFORE },
+    { "ADAPTER_AFTER",      LocalContextFlags::ADAPTER_AFTER },
+    { "BARCODE_BEFORE",     LocalContextFlags::BARCODE_BEFORE },
+    { "BARCODE_AFTER",      LocalContextFlags::BARCODE_AFTER },
+    { "FORWARD_PASS",       LocalContextFlags::FORWARD_PASS },
+    { "REVERSE_PASS",       LocalContextFlags::REVERSE_PASS },
+    { "ADAPTER_BEFORE_BAD", LocalContextFlags::ADAPTER_BEFORE_BAD},
+    { "ADAPTER_AFTER_BAD",  LocalContextFlags::ADAPTER_AFTER_BAD}
 };
 // clang-format off
 
