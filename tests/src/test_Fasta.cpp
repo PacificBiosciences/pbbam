@@ -12,6 +12,7 @@
 #include <pbbam/FastaSequenceQuery.h>
 #include <pbbam/FastaWriter.h>
 #include <pbbam/Unused.h>
+#include <boost/algorithm/string.hpp>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -200,4 +201,22 @@ TEST(FastaWriterTest, WriteStrings)
     EXPECT_EQ(bases, seqs[0].Bases());
 
     remove(outFasta.c_str());
+}
+
+TEST(FastaReaderTest, WindowsFormatedFasta)
+{
+    const std::string fn = PbbamTestsConfig::Data_Dir + "/test_windows_format_fasta/windows.fasta";
+
+    {
+        size_t count = 0;
+        FastaReader reader{fn};
+        FastaSequence seq;
+        while (reader.GetNext(seq)) {
+            ++count;
+            bool endOK = (boost::algorithm::ends_with(seq.Name(), "5p") ||
+                          boost::algorithm::ends_with(seq.Name(), "3p"));
+            EXPECT_TRUE(endOK);
+        }
+        EXPECT_EQ(7, count);  // 7 primers in total
+    }
 }
