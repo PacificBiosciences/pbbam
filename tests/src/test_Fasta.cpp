@@ -203,9 +203,10 @@ TEST(FastaWriterTest, WriteStrings)
     remove(outFasta.c_str());
 }
 
-TEST(FastaReaderTest, WindowsFormatedFasta)
+TEST(FastaReaderTest, WindowsFormattedFasta)
 {
-    const std::string fn = PbbamTestsConfig::Data_Dir + "/test_windows_format_fasta/windows.fasta";
+    const std::string fn =
+        PbbamTestsConfig::Data_Dir + "/test_windows_formatted_fasta/windows.fasta";
 
     {
         size_t count = 0;
