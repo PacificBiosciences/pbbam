@@ -156,7 +156,7 @@ public:
     /// \throws std::runtime_error if file could be opened or if DataSet
     ///         elements could not be converted to XML
     ///
-    void Save(const std::string& outputFilename);
+    void Save(const std::string& outputFilename) const;
 
     /// \brief Saves dataset XML to output stream, e.g. std::cout,
     ///        std::stringstream.
@@ -166,7 +166,7 @@ public:
     /// \throws std::runtime_error if DataSet elements could not be converted to
     ///         XML
     ///
-    void SaveToStream(std::ostream& out);
+    void SaveToStream(std::ostream& out) const;
 
     /// \}
 

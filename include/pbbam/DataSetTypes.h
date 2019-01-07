@@ -28,8 +28,13 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
+    DataSetMetadata();
+    DataSetMetadata(const internal::FromInputXml& fromInputXml);
+
     /// \brief Constructs a DataSetMetadata with required fields.
     DataSetMetadata(const std::string& numRecords, const std::string& totalLength);
+    DataSetMetadata(const std::string& numRecords, const std::string& totalLength,
+                    const internal::FromInputXml& fromInputXml);
 
     /// \}
 
@@ -141,6 +146,7 @@ class PBBAM_EXPORT ExtensionElement : public internal::DataSetElement
 {
 public:
     ExtensionElement();
+    ExtensionElement(const internal::FromInputXml& fromInputXml);
 };
 
 /// \brief The Extensions class represents an %Extensions element in DataSetXML.
@@ -148,11 +154,27 @@ public:
 /// The Extensions element is essentially just a list of ExtensionElement
 /// objects.
 ///
-class PBBAM_EXPORT Extensions : public internal::DataSetListElement<ExtensionElement>
+class PBBAM_EXPORT Extensions : public internal::DataSetElement
 {
 public:
     /// \brief Creates an empty extensions list.
     Extensions();
+    Extensions(const internal::FromInputXml& fromInputXml);
+
+public:
+    using value_type = ExtensionElement;
+    using iterator_type = internal::DataSetElementIterator<value_type>;
+    using const_iterator_type = internal::DataSetElementConstIterator<value_type>;
+
+    const value_type& operator[](size_t index) const;
+    value_type& operator[](size_t index);
+
+    iterator_type begin();
+    const_iterator_type begin() const;
+    const_iterator_type cbegin() const;
+    iterator_type end();
+    const_iterator_type end() const;
+    const_iterator_type cend() const;
 };
 
 class ExternalResources;
@@ -176,6 +198,9 @@ public:
     ///        \p filename as resource ID.
     ///
     ExternalResource(const std::string& metatype, const std::string& filename);
+
+    ExternalResource(const std::string& metatype, const std::string& filename,
+                     const internal::FromInputXml& fromInputXml);
 
 public:
     /// \brief Fetches the resource's ExternalResources child element.
@@ -223,11 +248,12 @@ public:
 /// The ExternalResources element is essentially just a list of ExternalResource
 /// elements.
 ///
-class PBBAM_EXPORT ExternalResources : public internal::DataSetListElement<ExternalResource>
+class PBBAM_EXPORT ExternalResources : public internal::DataSetElement
 {
 public:
     /// \brief Creates an empty resource list.
     ExternalResources();
+    ExternalResources(const internal::FromInputXml& fromInputXml);
 
     /// \brief Merges \p other resource list with this one.
     ExternalResources& operator+=(const ExternalResources& other);
@@ -246,6 +272,21 @@ public:
     ///             relative filepaths and will be removed in the near future.
     ///
     std::vector<BamFile> BamFiles() const;
+
+public:
+    using value_type = ExternalResource;
+    using iterator_type = internal::DataSetElementIterator<value_type>;
+    using const_iterator_type = internal::DataSetElementConstIterator<value_type>;
+
+    const value_type& operator[](size_t index) const;
+    value_type& operator[](size_t index);
+
+    iterator_type begin();
+    const_iterator_type begin() const;
+    const_iterator_type cbegin() const;
+    iterator_type end();
+    const_iterator_type end() const;
+    const_iterator_type cend() const;
 };
 
 /// \brief The FileIndex class represents a %FileIndex element in DataSetXML.
@@ -261,6 +302,9 @@ public:
     ///        resource ID.
     ///
     FileIndex(const std::string& metatype, const std::string& filename);
+
+    FileIndex(const std::string& metatype, const std::string& filename,
+              const internal::FromInputXml& fromInputXml);
 };
 
 /// \brief The FileIndices class represents a %FileIndices element in DataSetXML.
@@ -269,11 +313,12 @@ public:
 /// providing information about a data file's index files (e.g. for %BAM files
 /// this will usually be *.bai and/or *.pbi).
 ///
-class PBBAM_EXPORT FileIndices : public internal::DataSetListElement<FileIndex>
+class PBBAM_EXPORT FileIndices : public internal::DataSetElement
 {
 public:
     /// \brief Creates an empty index list.
     FileIndices();
+    FileIndices(const internal::FromInputXml& fromInputXml);
 
 public:
     /// \brief Adds a FileIndex to this list.
@@ -281,6 +326,21 @@ public:
 
     /// \brief Removes a FileIndex from this list.
     void Remove(const FileIndex& index);
+
+public:
+    using value_type = FileIndex;
+    using iterator_type = internal::DataSetElementIterator<value_type>;
+    using const_iterator_type = internal::DataSetElementConstIterator<value_type>;
+
+    const value_type& operator[](size_t index) const;
+    value_type& operator[](size_t index);
+
+    iterator_type begin();
+    const_iterator_type begin() const;
+    const_iterator_type cbegin() const;
+    iterator_type end();
+    const_iterator_type end() const;
+    const_iterator_type cend() const;
 };
 
 /// \brief The Filter class represents a %Filter element in DataSetXML.
@@ -298,6 +358,7 @@ class PBBAM_EXPORT Filter : public internal::DataSetElement
 public:
     /// \brief Creates an empty filter.
     Filter();
+    Filter(const internal::FromInputXml& fromInputXml);
 
 public:
     /// \brief Fetches the filter's property list element.
@@ -332,11 +393,12 @@ public:
 /// purpose, each filter is considered separately (logical OR) to consider which
 /// data passes, e.g. filter1 || filter2 || filter3.
 ///
-class PBBAM_EXPORT Filters : public internal::DataSetListElement<Filter>
+class PBBAM_EXPORT Filters : public internal::DataSetElement
 {
 public:
     /// \brief Creates an empty filter list.
     Filters();
+    Filters(const internal::FromInputXml& fromInputXml);
 
     /// \brief Merges \p other filter list with this one.
     Filters& operator+=(const Filters& other);
@@ -347,6 +409,21 @@ public:
 
     /// \brief Removes a filter from this list.
     void Remove(const Filter& filter);
+
+public:
+    using value_type = Filter;
+    using iterator_type = internal::DataSetElementIterator<value_type>;
+    using const_iterator_type = internal::DataSetElementConstIterator<value_type>;
+
+    const value_type& operator[](size_t index) const;
+    value_type& operator[](size_t index);
+
+    iterator_type begin();
+    const_iterator_type begin() const;
+    const_iterator_type cbegin() const;
+    iterator_type end();
+    const_iterator_type end() const;
+    const_iterator_type cend() const;
 };
 
 /// \brief The ParentTool class represents a %ParentTool element in DataSetXML.
@@ -356,6 +433,7 @@ class PBBAM_EXPORT ParentTool : public internal::BaseEntityType
 public:
     /// \brief Creates an empty %ParentTool element.
     ParentTool();
+    ParentTool(const internal::FromInputXml& fromInputXml);
 };
 
 /// \brief The Property class represents a %Property element in DataSetXML.
@@ -375,6 +453,8 @@ class PBBAM_EXPORT Property : public internal::DataSetElement
 public:
     /// \brief Constructs a filter property.
     Property(const std::string& name, const std::string& value, const std::string& op);
+    Property(const std::string& name, const std::string& value, const std::string& op,
+             const internal::FromInputXml& fromInputXml);
 
 public:
     /// \brief Fetches the value of property's Name attribute.
@@ -442,11 +522,12 @@ public:
 ///
 /// The Properties element is essentially a list of Property elements.
 ///
-class PBBAM_EXPORT Properties : public internal::DataSetListElement<Property>
+class PBBAM_EXPORT Properties : public internal::DataSetElement
 {
 public:
     /// \brief Creates an empty property list.
     Properties();
+    Properties(const internal::FromInputXml& fromInputXml);
 
 public:
     /// \brief Adds a property to this list.
@@ -454,6 +535,21 @@ public:
 
     /// \brief Removes a property from this list.
     void Remove(const Property& property);
+
+public:
+    using value_type = Property;
+    using iterator_type = internal::DataSetElementIterator<value_type>;
+    using const_iterator_type = internal::DataSetElementConstIterator<value_type>;
+
+    const value_type& operator[](size_t index) const;
+    value_type& operator[](size_t index);
+
+    iterator_type begin();
+    const_iterator_type begin() const;
+    const_iterator_type cbegin() const;
+    iterator_type end();
+    const_iterator_type end() const;
+    const_iterator_type cend() const;
 };
 
 /// \brief The Provenance class represents a %Provenance element in DataSetXML.
@@ -463,6 +559,7 @@ class PBBAM_EXPORT Provenance : public internal::DataSetElement
 public:
     /// \brief Creates a empty provenance element.
     Provenance();
+    Provenance(const internal::FromInputXml& fromInputXml);
 
 public:
     /// \brief Fetches the value of CreatedBy attribute.
@@ -609,14 +706,19 @@ public:
     ///        XML element name (e.g. SubreadSet)
     ///
     static std::shared_ptr<DataSetBase> Create(const std::string& typeName);
+    static std::shared_ptr<DataSetBase> Create(const std::string& typeName,
+                                               const internal::FromInputXml& fromInputXml);
 
 public:
     /// \brief Creates an empty, generic DataSetBase.
     DataSetBase();
+    DataSetBase(const internal::FromInputXml& fromInputXml);
 
 protected:
     /// \brief Creates a DataSetBase with key values initialized.
     DataSetBase(const std::string& metatype, const std::string& label, const XsdType& xsd);
+    DataSetBase(const std::string& metatype, const std::string& label,
+                const internal::FromInputXml& fromInputXml, const XsdType& xsd);
 
     /// \brief Returns a new DataSetBase containing a deep copy of contents
     DataSetBase* DeepCopy() const;
@@ -773,6 +875,7 @@ class PBBAM_EXPORT AlignmentSet : public DataSetBase
 public:
     /// \brief Creates an empty AlignmentSet dataset.
     AlignmentSet();
+    AlignmentSet(const internal::FromInputXml& fromInputXml);
 };
 
 /// \brief The BarcodeSet class represents a %BarcodeSet root element in
@@ -783,6 +886,7 @@ class PBBAM_EXPORT BarcodeSet : public DataSetBase
 public:
     /// \brief Creates an empty BarcodeSet dataset.
     BarcodeSet();
+    BarcodeSet(const internal::FromInputXml& fromInputXml);
 };
 
 /// \brief The ConsensusAlignmentSet class represents a %ConsensusAlignmentSet
@@ -793,6 +897,7 @@ class PBBAM_EXPORT ConsensusAlignmentSet : public DataSetBase
 public:
     /// \brief Creates an empty ConsensusAlignmentSet dataset.
     ConsensusAlignmentSet();
+    ConsensusAlignmentSet(const internal::FromInputXml& fromInputXml);
 };
 
 /// \brief The ConsensusReadSet class represents a %ConsensusReadSet root
@@ -803,6 +908,7 @@ class PBBAM_EXPORT ConsensusReadSet : public DataSetBase
 public:
     /// \brief Creates an empty ConsensusReadSet dataset.
     ConsensusReadSet();
+    ConsensusReadSet(const internal::FromInputXml& fromInputXml);
 };
 
 /// \brief The ContigSet class represents a %ContigSet root element in
@@ -813,6 +919,7 @@ class PBBAM_EXPORT ContigSet : public DataSetBase
 public:
     /// \brief Creates an empty ContigSet dataset.
     ContigSet();
+    ContigSet(const internal::FromInputXml& fromInputXml);
 };
 
 /// \brief The HdfSubreadSet class represents a %HdfSubreadSet root element in
@@ -823,6 +930,7 @@ class PBBAM_EXPORT HdfSubreadSet : public DataSetBase
 public:
     /// \brief Creates an empty HdfSubreadSet dataset.
     HdfSubreadSet();
+    HdfSubreadSet(const internal::FromInputXml& fromInputXml);
 };
 
 /// \brief The ReferenceSet class represents a %ReferenceSet root element in
@@ -833,6 +941,7 @@ class PBBAM_EXPORT ReferenceSet : public DataSetBase
 public:
     /// \brief Creates an empty ReferenceSet dataset.
     ReferenceSet();
+    ReferenceSet(const internal::FromInputXml& fromInputXml);
 };
 
 /// \brief The SubDataSets class represents a %DataSets list element in
@@ -840,11 +949,12 @@ public:
 ///
 /// The SubDataSets element is essentially a list of DataSets.
 ///
-class PBBAM_EXPORT SubDataSets : public internal::DataSetListElement<DataSetBase>
+class PBBAM_EXPORT SubDataSets : public internal::DataSetElement
 {
 public:
     /// \brief Creates an empty list of sub-datasets.
     SubDataSets();
+    SubDataSets(const internal::FromInputXml& fromInputXml);
 
 public:
     /// \brief Adds \p other sub-dataset to this list.
@@ -859,6 +969,21 @@ public:
 
     /// \brief Removes a sub-dataset from this list.
     void Remove(const DataSetBase& subdataset);
+
+public:
+    using value_type = DataSetBase;
+    using iterator_type = internal::DataSetElementIterator<value_type>;
+    using const_iterator_type = internal::DataSetElementConstIterator<value_type>;
+
+    const value_type& operator[](size_t index) const;
+    value_type& operator[](size_t index);
+
+    iterator_type begin();
+    const_iterator_type begin() const;
+    const_iterator_type cbegin() const;
+    iterator_type end();
+    const_iterator_type end() const;
+    const_iterator_type cend() const;
 };
 
 /// \brief The SubreadSet class represents a %SubreadSet root element in
@@ -869,6 +994,7 @@ class PBBAM_EXPORT SubreadSet : public DataSetBase
 public:
     /// \brief Creates an empty SubreadSet dataset.
     SubreadSet();
+    SubreadSet(const internal::FromInputXml& fromInputXml);
 };
 
 /// \brief The TranscriptSet class represents a %TranscriptSet root element in
@@ -879,6 +1005,7 @@ class PBBAM_EXPORT TranscriptSet : public DataSetBase
 public:
     /// \brief Creates an empty TranscriptSet dataset.
     TranscriptSet();
+    TranscriptSet(const internal::FromInputXml& fromInputXml);
 };
 
 /// \brief The TranscriptAlignmentSet class represents a %TranscriptAlignmentSet
@@ -889,7 +1016,43 @@ class PBBAM_EXPORT TranscriptAlignmentSet : public DataSetBase
 public:
     /// \brief Creates an empty TranscriptAlignmentSet dataset.
     TranscriptAlignmentSet();
+    TranscriptAlignmentSet(const internal::FromInputXml& fromInputXml);
 };
+
+enum class XmlElementType
+{
+    GENERIC_ELEMENT,
+    DATASET_METADATA,
+    EXTENSION,
+    EXTENSIONS,
+    EXTERNAL_RESOURCE,
+    EXTERNAL_RESOURCES,
+    FILE_INDEX,
+    FILE_INDICES,
+    FILTER,
+    FILTERS,
+    PARENT_TOOL,
+    PROPERTY,
+    PROPERTIES,
+    PROVENANCE,
+
+    GENERIC_DATASET,
+    ALIGNMENT_SET,
+    BARCODE_SET,
+    CONSENSUS_ALIGNMENT_SET,
+    CONSENSUS_READ_SET,
+    CONTIG_SET,
+    HDF_SUBREAD_SET,
+    REFERENCE_SET,
+    SUBREAD_SET,
+    TRANSCRIPT_SET,
+    TRANSCRIPT_ALIGNMENT_SET,
+    SUBDATASETS
+};
+
+/// \returns the enum value for the requested XML element
+///          (generic if not a built-in element type)
+XmlElementType ElementTypeFromName(const std::string& name);
 
 }  // namespace BAM
 }  // namespace PacBio

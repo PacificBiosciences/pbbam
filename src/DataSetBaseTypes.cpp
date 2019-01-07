@@ -11,6 +11,7 @@
 #include "DataSetUtils.h"
 #include "TimeUtils.h"
 #include "pbbam/DataSetTypes.h"
+#include "pbbam/Unused.h"
 
 namespace PacBio {
 namespace BAM {
@@ -24,6 +25,12 @@ BaseEntityType::BaseEntityType(const std::string& label, const XsdType& xsd)
     : DataSetElement(label, xsd)
 {
     if (Version().empty()) Version(XML_VERSION);
+}
+
+BaseEntityType::BaseEntityType(const std::string& label, const FromInputXml& fromInputXml,
+                               const XsdType& xsd)
+    : DataSetElement(label, fromInputXml, xsd)
+{
 }
 
 DEFINE_ACCESSORS(BaseEntityType, Extensions, Extensions)
@@ -43,6 +50,12 @@ DataEntityType::DataEntityType(const std::string& label, const XsdType& xsd)
 {
 }
 
+DataEntityType::DataEntityType(const std::string& label, const FromInputXml& fromInputXml,
+                               const XsdType& xsd)
+    : BaseEntityType(label, fromInputXml, xsd)
+{
+}
+
 // -----------------
 // IndexedDataType
 // -----------------
@@ -50,6 +63,13 @@ DataEntityType::DataEntityType(const std::string& label, const XsdType& xsd)
 IndexedDataType::IndexedDataType(const std::string& metatype, const std::string& filename,
                                  const std::string& label, const XsdType& xsd)
     : InputOutputDataType(metatype, filename, label, xsd)
+{
+}
+
+IndexedDataType::IndexedDataType(const std::string& metatype, const std::string& filename,
+                                 const std::string& label, const FromInputXml& fromInputXml,
+                                 const XsdType& xsd)
+    : InputOutputDataType(metatype, filename, label, fromInputXml, xsd)
 {
 }
 
@@ -68,6 +88,14 @@ IndexedDataType& IndexedDataType::FileIndices(const PacBio::BAM::FileIndices& in
 InputOutputDataType::InputOutputDataType(const std::string& metatype, const std::string& filename,
                                          const std::string& label, const XsdType& xsd)
     : StrictEntityType(metatype, label, xsd)
+{
+    ResourceId(filename);
+}
+
+InputOutputDataType::InputOutputDataType(const std::string& metatype, const std::string& filename,
+                                         const std::string& label, const FromInputXml& fromInputXml,
+                                         const XsdType& xsd)
+    : StrictEntityType(metatype, label, fromInputXml, xsd)
 {
     ResourceId(filename);
 }
@@ -97,6 +125,12 @@ StrictEntityType::StrictEntityType(const std::string& metatype, const std::strin
 
     // UniqueId
     UniqueId(GenerateUuid());
+}
+
+StrictEntityType::StrictEntityType(const std::string& /*metatype*/, const std::string& label,
+                                   const FromInputXml& fromInputXml, const XsdType& xsd)
+    : BaseEntityType(label, fromInputXml, xsd)
+{
 }
 
 }  // namespace internal
