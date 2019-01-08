@@ -14,7 +14,8 @@ inline FastqSequence::FastqSequence(std::string name,
                                     QualityValues qualities)
     : FastaSequence{std::move(name), std::move(bases)}
     , qualities_{std::move(qualities)}
-{ }
+{
+}
 
 inline FastqSequence::FastqSequence(std::string name,
                                     std::string bases,
