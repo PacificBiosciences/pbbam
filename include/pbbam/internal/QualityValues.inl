@@ -6,7 +6,6 @@
 
 #include "pbbam/QualityValues.h"
 #include <algorithm>
-#include <boost/algorithm/string.hpp>
 
 namespace PacBio {
 namespace BAM {
@@ -14,10 +13,8 @@ namespace BAM {
 inline QualityValues::QualityValues(const std::string& fastqString)
     : std::vector<QualityValue>{}
 {
-    std::string fastqString_{std::move(fastqString)};
-    boost::algorithm::trim(fastqString_);
-    resize(fastqString_.size());
-    std::transform(fastqString_.cbegin(), fastqString_.cend(),
+    resize(fastqString.size());
+    std::transform(fastqString.cbegin(), fastqString.cend(),
                    begin(), QualityValue::FromFastq);
 }
 
