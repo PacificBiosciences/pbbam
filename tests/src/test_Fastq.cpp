@@ -219,3 +219,18 @@ TEST(FastqMerging, MergeBamsToFastq)
 
     remove(outFastq.c_str());
 }
+
+TEST(FastqReaderTest, WindowsFormattedFastq)
+{
+    const std::string fn =
+        PbbamTestsConfig::Data_Dir + "/test_windows_formatted_fasta/windows.fastq";
+
+    {
+        FastqReader reader{fn};
+        FastqSequence seq;
+        reader.GetNext(seq);  // 1 sequence in total
+        EXPECT_EQ("C5", seq.Name());
+        EXPECT_EQ("AAGCA", seq.Bases());
+        EXPECT_EQ("~~~~~", seq.Qualities().Fastq());
+    }
+}

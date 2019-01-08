@@ -5,6 +5,7 @@
 // Author: Derek Barnett
 
 #include "pbbam/FastaSequence.h"
+#include <boost/algorithm/string.hpp>
 
 namespace PacBio {
 namespace BAM {
@@ -13,7 +14,10 @@ inline FastaSequence::FastaSequence(std::string name,
                                     std::string bases)
     : name_{std::move(name)}
     , bases_{std::move(bases)}
-{ }
+{
+    boost::algorithm::trim(name_);
+    boost::algorithm::trim(bases_);
+}
 
 inline const std::string& FastaSequence::Bases() const
 { return bases_; }
