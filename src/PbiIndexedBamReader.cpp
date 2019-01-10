@@ -10,10 +10,17 @@
 
 #include <cstddef>
 #include <cstdint>
+
+#include <algorithm>
 #include <iostream>
+#include <stdexcept>
 
 #include <htslib/bgzf.h>
+#include <boost/algorithm/string.hpp>
+#include <boost/optional.hpp>
 
+#include "MemoryUtils.h"
+#include "PbiIndexIO.h"
 #include "pbbam/MakeUnique.h"
 
 namespace PacBio {
@@ -23,37 +30,47 @@ class PbiIndexedBamReader::PbiIndexedBamReaderPrivate
 {
 public:
     explicit PbiIndexedBamReaderPrivate(const std::string& pbiFilename)
-        : index_{pbiFilename}, currentBlockReadCount_{0}, numMatchingReads_{0}
+        : pbiFilename_{pbiFilename}, currentBlockReadCount_{0}, numMatchingReads_{0}
     {
+        PbiIndexIO io{pbiFilename, {PbiFile::Field::VIRTUAL_OFFSET}};
+        header_ = io.Header();
     }
 
-    void ApplyOffsets()
-    {
-        const auto& fileOffsets = index_.BasicData().fileOffset_;
-        for (IndexResultBlock& block : blocks_)
-            block.virtualOffset_ = fileOffsets.at(block.firstIndex_);
-    }
-
-    void Filter(const PbiFilter filter)
+    void Filter(const PbiFilter newFilter)
     {
         // store request & reset counters
-        filter_ = std::move(filter);
+        filter_ = std::move(newFilter);
         currentBlockReadCount_ = 0;
         blocks_.clear();
         numMatchingReads_ = 0;
 
-        // find blocks of reads passing filter criteria
-        const auto totalReads = index_.NumReads();
-        if (totalReads == 0) {  // empty PBI - no reads to use
-            return;
-        } else if (filter_.IsEmpty()) {  // empty filter - use all reads
-            numMatchingReads_ = totalReads;
-            blocks_.emplace_back(0, totalReads);
-        } else {
+        // empty PBI (no reads)
+        if (header_.numReads == 0) return;
+
+        // maybe load/reload index
+        const auto currentFilterFields = filter_.RequiredFields();
+        const auto newFilterFields = newFilter.RequiredFields();
+        const bool shouldLoadFields = !std::equal(
+            currentFilterFields.cbegin(), currentFilterFields.cend(), newFilterFields.cbegin());
+        if (!index_.is_initialized() || shouldLoadFields) {
+            PbiIndexIO io{pbiFilename_, newFilterFields};
+            index_ = io.Load();
+        }
+
+        // empty filter (all reads)
+        if (filter_.IsEmpty()) {
+            numMatchingReads_ = header_.numReads;
+            blocks_.emplace_back(0, header_.numReads);
+        }
+
+        // apply filter, store contiguous blocks of reads
+        else {
+
             IndexList indices;
-            indices.reserve(totalReads);
-            for (size_t i = 0; i < totalReads; ++i) {
-                if (filter_.Accepts(index_, i)) {
+            indices.reserve(header_.numReads);
+            const auto& index = index_.get();
+            for (size_t i = 0; i < header_.numReads; ++i) {
+                if (filter_.Accepts(index, i)) {
                     indices.push_back(i);
                     ++numMatchingReads_;
                 }
@@ -61,8 +78,10 @@ public:
             blocks_ = MergedIndexBlocks(std::move(indices));
         }
 
-        // apply offsets
-        ApplyOffsets();
+        // add virtual offsets to blocks
+        const auto& fileOffsets = index_->BasicData().fileOffset_;
+        for (IndexResultBlock& block : blocks_)
+            block.virtualOffset_ = fileOffsets.at(block.firstIndex_);
     }
 
     IndexResultBlocks MergedIndexBlocks(IndexList indices) const
@@ -106,8 +125,10 @@ public:
         return result;
     }
 
+    std::string pbiFilename_;
     PbiFilter filter_;
-    PbiRawData index_;
+    PbiHeader header_;
+    boost::optional<PbiRawData> index_;  //
     IndexResultBlocks blocks_;
     size_t currentBlockReadCount_;
     uint32_t numMatchingReads_;

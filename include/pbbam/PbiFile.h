@@ -89,6 +89,41 @@ struct PbiFile
         BC_QUALITY
     };
 
+    ///
+    /// \brief PBI data fields
+    ///
+    enum class Field
+    {
+        // TODO(DB): sync back with (remove) other enums
+
+        // basic
+        RG_ID,
+        Q_START,
+        Q_END,
+        ZMW,
+        READ_QUALITY,
+        CONTEXT_FLAG,
+        VIRTUAL_OFFSET,
+
+        // mapped
+        T_ID,
+        T_START,
+        T_END,
+        A_START,
+        A_END,
+        N_M,
+        N_MM,
+        N_INS,
+        N_DEL,
+        MAP_QUALITY,
+        STRAND,
+
+        // barcode
+        BC_FORWARD,
+        BC_REVERSE,
+        BC_QUALITY
+    };
+
     /// \brief Builds PBI index data from the supplied %BAM file and writes a
     ///        ".pbi" file.
     ///
