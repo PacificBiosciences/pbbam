@@ -26,13 +26,6 @@ TEST(PbiFilterQueryTest, QueryOk)
         PbiFilterQuery query(PbiFilter{}, bamFile);
         const auto numReads = query.NumReads();
         EXPECT_EQ(4, numReads);
-
-        // int count = 0;
-        // for (const auto& r : query) {
-        //     ++count;
-        //     EXPECT_GE((r.QueryEnd() - r.QueryStart()), 500);
-        // }
-        // EXPECT_EQ(3, count);
     }
     {
         PbiFilterQuery query(PbiQueryLengthFilter{500, Compare::GREATER_THAN_EQUAL}, bamFile);
