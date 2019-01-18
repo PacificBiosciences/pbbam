@@ -12,6 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <tuple>
 #include <vector>
 
 #include "pbbam/MoveAppend.h"
@@ -25,10 +26,17 @@ VirtualZmwBamRecord::VirtualZmwBamRecord(std::vector<BamRecord> unorderedSources
                                          const BamHeader& header)
     : BamRecord{header}, sources_{std::move(unorderedSources)}
 {
-    // Sort sources by queryStart
+    // Sort sources by queryStart,queryEnd
     std::sort(sources_.begin(), sources_.end(), [](const BamRecord& l1, const BamRecord& l2) {
-        return l1.QueryStart() < l2.QueryStart();
+
+        const auto l1_qStart = l1.QueryStart();
+        const auto l1_qEnd = l1.QueryEnd();
+        const auto l2_qStart = l2.QueryStart();
+        const auto l2_qEnd = l2.QueryEnd();
+
+        return std::tie(l1_qStart, l1_qEnd) < std::tie(l2_qStart, l2_qEnd);
     });
+
     StitchSources();
 }
 
