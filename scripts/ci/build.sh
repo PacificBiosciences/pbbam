@@ -10,7 +10,7 @@ if [[ ${GCC_VERSION} == PA ]]; then
   wget https://github.com/samtools/htslib/releases/download/1.9/htslib-1.9.tar.bz2
   tar -xjf htslib-1.9.tar.bz2
   pushd htslib-1.9
-    ./configure \
+    CFLAGS="-O3" ./configure \
       --prefix="${bamboo_build_working_directory}/staging" \
       --libdir="${bamboo_build_working_directory}/staging/lib" \
       --disable-bz2 \
