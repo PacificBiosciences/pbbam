@@ -21,6 +21,7 @@ module load boost
 
 module load cram
 
+source scripts/ci/setup.sh
 
 case "${bamboo_planRepository_branchName}" in
   develop|master)
@@ -46,7 +47,6 @@ unset BOOST_LIBRARYDIR
 # by conda and other package managers
 export LDFLAGS="-static-libstdc++ -static-libgcc"
 
-source scripts/ci/setup.sh
 source scripts/ci/build.sh
 source scripts/ci/test.sh
 source scripts/ci/install.sh
