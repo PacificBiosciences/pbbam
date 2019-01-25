@@ -24,6 +24,7 @@ case "${GCC_VERSION}" in
 
     export NEXUS_PROJECT=pacbio/seq/pa/pbbam
     export NEXUS_TC=""
+    export _artifact_versionprepend="true"
     ;;
 
   *)
