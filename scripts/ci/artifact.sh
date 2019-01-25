@@ -31,7 +31,7 @@ esac
 
 DESTDIR="${PWD}/staging" ninja -C "${CURRENT_BUILD_DIR:-build}" -v install
 if [[ ${_artifact_versionprepend:-false} == true ]]; then
-  ( cd staging && tar zcf ../pbbam-${VERSION}-x86_64.tgz . --transform "s,^\./,${VERSION}/," )
+  ( cd staging && tar zcf ../pbbam-${VERSION}-x86_64.tgz . --transform "s,^\./,pbbam-${VERSION}/," )
 else
   ( cd staging && tar zcf ../pbbam-${VERSION}-x86_64.tgz . )
 fi
