@@ -21,8 +21,8 @@ module load boost
 
 module load cram
 
-source scripts/ci/setup.sh
 
+export BUILD_NUMBER="0"
 case "${bamboo_planRepository_branchName}" in
   develop|master)
     _install_image_default="${INSTALL_IMAGE:-false}"
@@ -47,6 +47,7 @@ unset BOOST_LIBRARYDIR
 # by conda and other package managers
 export LDFLAGS="-static-libstdc++ -static-libgcc"
 
+source scripts/ci/setup.sh
 source scripts/ci/build.sh
 source scripts/ci/test.sh
 source scripts/ci/install.sh

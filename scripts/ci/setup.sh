@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -vex
 
-export BUILD_NUMBER="0"
 export ENABLED_TESTS="true"
 
 case "${GCC_VERSION}" in
