@@ -30,7 +30,11 @@ case "${bamboo_planRepository_branchName}" in
 esac
 
 DESTDIR="${PWD}/staging" ninja -C "${CURRENT_BUILD_DIR:-build}" -v install
-( cd staging && tar zcf ../pbbam-${VERSION}-x86_64.tgz . )
+if [[ ${_artifact_versionprepend:-false} == true ]]; then
+  ( cd staging && tar --transform "s,^,${VERSION}," zcf ../pbbam-${VERSION}-x86_64.tgz . )
+else
+  ( cd staging && tar zcf ../pbbam-${VERSION}-x86_64.tgz . )
+fi
 
 md5sum  pbbam-${VERSION}-x86_64.tgz | awk -e '{print $1}' >| pbbam-${VERSION}-x86_64.tgz.md5
 sha1sum pbbam-${VERSION}-x86_64.tgz | awk -e '{print $1}' >| pbbam-${VERSION}-x86_64.tgz.sha1
