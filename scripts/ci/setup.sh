@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -vex
 
-export BUILD_NUMBER="0"
 export ENABLED_TESTS="true"
 
 case "${GCC_VERSION}" in
@@ -14,14 +13,21 @@ case "${GCC_VERSION}" in
     module load gtest
     ;;
 
-  *)
-    case "${bamboo_planRepository_branchName}-${BUILDTYPE:-release}-${ENABLED_UNITY_BUILD:-off}-${ENABLED_COVERAGE:-false}" in
-      develop-release-off-false|master-release-off-false)
-        export PREFIX_ARG="/mnt/software/p/pbbam/${bamboo_planRepository_branchName}"
-        export BUILD_NUMBER="${bamboo_globalBuildNumber:-0}"
-        ;;
-    esac
+  PA)
+    # have to build htslib for PA
+    module unload htslib
+    module load zlib
+    module load gtest/gcc48
 
+    # load SCL GCC
+    source /opt/rh/devtoolset-6/enable
+
+    export NEXUS_PROJECT=pacbio/seq/pa/pbbam
+    export NEXUS_TC=""
+    export _artifact_versionprepend="true"
+    ;;
+
+  *)
     module load gcc
     module load gtest
     ;;

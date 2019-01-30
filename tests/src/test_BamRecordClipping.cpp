@@ -13,6 +13,7 @@
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamRecordView.h>
 #include <pbbam/BamTagCodec.h>
+#include <pbbam/EntireFileQuery.h>
 
 // clang-format off
 
@@ -23,7 +24,7 @@ typedef std::vector<uint16_t> f_data;
 
 namespace BamRecordClippingTests {
 
-static 
+static
 ReadGroupInfo MakeReadGroup(const FrameCodec codec,
                             const std::string& movieName,
                             const std::string& readType)
@@ -179,26 +180,18 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     const std::string s2_cigar_clipped = "3=3D4=";
     const std::string s3_cigar_clipped = "2=1D2I2D3=";
 
+    const std::string s1_rev_cigar_clipped = "7=";
+    const std::string s2_rev_cigar_clipped = "4=3D3=";
+    const std::string s3_rev_cigar_clipped = "3=1D2I2D2=";
+
     const BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                                   pulseCall, pulseBases, pulseQuals, pulseFrames);
 
-    BamRecord s0 = prototype; // unmapped record
-    BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
-    BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
-    BamRecord s3 = prototype.Mapped(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
-    BamRecord s1_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s1_cigar, mapQual);
-    BamRecord s2_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s2_cigar, mapQual);
-    BamRecord s3_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s3_cigar, mapQual);
+    {
+        SCOPED_TRACE("s0");
 
-    s0.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
-    s1.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
-    s2.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
-    s3.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
-    s1_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
-    s2_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
-    s3_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
-
-    {   // s0
+        BamRecord s0 = prototype; // unmapped record
+        s0.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_FALSE(s0.IsMapped());
         EXPECT_EQ(clipStart, s0.QueryStart());
@@ -226,8 +219,11 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_EQ(frames_clipped,    view.IPD().Data());
         EXPECT_EQ(pulseCall_clipped, view.PulseCalls());
     }
+    {
+        SCOPED_TRACE("s1 - FORWARD");
 
-    {   // s1 - FORWARD
+        BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
+        s1.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s1.IsMapped());
         EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
@@ -258,19 +254,31 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_EQ(frames_clipped,    view.IPD().Data());
         EXPECT_EQ(pulseCall_clipped, view.PulseCalls());
     }
+    {
+        SCOPED_TRACE("s1 - REVERSE");
 
-    {   // s1 - REVERSE
+        BamRecord s1_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s1_cigar, mapQual);
 
         EXPECT_TRUE(s1_rev.IsMapped());
         EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
-        EXPECT_EQ(clipStart, s1_rev.QueryStart());
-        EXPECT_EQ(clipEnd,   s1_rev.QueryEnd());
-        EXPECT_EQ(clipStart, s1_rev.AlignedStart());    // queryStart (no soft clips)
-        EXPECT_EQ(clipEnd,   s1_rev.AlignedEnd());      // alignStart + seqLength
+        EXPECT_EQ(500,  s1_rev.QueryStart());
+        EXPECT_EQ(510,  s1_rev.QueryEnd());
+        EXPECT_EQ(500,  s1_rev.AlignedStart());    // queryStart (no soft clips)
+        EXPECT_EQ(510,  s1_rev.AlignedEnd());      // alignStart + seqLength
+        EXPECT_EQ(tPos, s1_rev.ReferenceStart());        // 100 + startOffset
+        EXPECT_EQ(110,  s1_rev.ReferenceEnd());          // RefStart + 7=
+        EXPECT_EQ(s1_cigar, s1_rev.CigarData().ToStdString());
+
+        s1_rev.Clip(ClipType::CLIP_TO_QUERY, 502, 509);
+        EXPECT_TRUE(s1_rev.IsMapped());
+        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(502, s1_rev.QueryStart());
+        EXPECT_EQ(509, s1_rev.QueryEnd());
+        EXPECT_EQ(502, s1_rev.AlignedStart());    // queryStart (no soft clips)
+        EXPECT_EQ(509, s1_rev.AlignedEnd());      // alignStart + seqLength
         EXPECT_EQ(102, s1_rev.ReferenceStart());        // 100 + startOffset
         EXPECT_EQ(109, s1_rev.ReferenceEnd());          // RefStart + 7=
-
-        EXPECT_EQ(s1_cigar_clipped, s1_rev.CigarData().ToStdString());
+        EXPECT_EQ(s1_rev_cigar_clipped, s1_rev.CigarData().ToStdString());
 
         const BamRecordView view
         {
@@ -280,7 +288,6 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
             false,
             PulseBehavior::ALL
         };
-
         EXPECT_EQ(seq_rev_clipped,       view.Sequence());
         EXPECT_EQ(quals_rev_clipped,     view.Qualities().Fastq());
         EXPECT_EQ(tagBases_rev_clipped,  view.DeletionTags());
@@ -290,8 +297,11 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_EQ(frames_rev_clipped,    view.IPD().Data());
         EXPECT_EQ(pulseCall_rev_clipped, view.PulseCalls());
     }
+    {
+        SCOPED_TRACE("s2 - FORWARD");
 
-    {   // s2 - FORWARD
+        BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
+        s2.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s2.IsMapped());
         EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
@@ -321,8 +331,11 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_EQ(pulseQuals_clipped, view.AltLabelQVs().Fastq());
         EXPECT_EQ(frames_clipped,   view.IPD().Data());
     }
+    {
+        SCOPED_TRACE("s2 - REVERSE");
 
-    {   // s2 - REVERSE
+        BamRecord s2_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s2_cigar, mapQual);
+        s2_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s2_rev.IsMapped());
         EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
@@ -333,7 +346,7 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_EQ(102, s2_rev.ReferenceStart());        // 100 + startOffset
         EXPECT_EQ(112, s2_rev.ReferenceEnd());          // RefStart + 7= + 3D
 
-        EXPECT_EQ(s2_cigar_clipped, s2_rev.CigarData().ToStdString());
+        EXPECT_EQ(s2_rev_cigar_clipped, s2_rev.CigarData().ToStdString());
 
         const BamRecordView view
         {
@@ -353,8 +366,11 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_EQ(frames_rev_clipped,    view.IPD().Data());
         EXPECT_EQ(pulseCall_rev_clipped, view.PulseCalls());
     }
+    {
+        SCOPED_TRACE("s3 - FORWARD");
 
-    {   // s3 - FORWARD
+        BamRecord s3 = prototype.Mapped(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+        s3.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s3.IsMapped());
         EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
@@ -385,8 +401,11 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_EQ(frames_clipped,    view.IPD().Data());
         EXPECT_EQ(pulseCall_clipped, view.PulseCalls());
     }
+    {
+        SCOPED_TRACE("s3 - REVERSE");
 
-    {   // s3 - REVERSE
+        BamRecord s3_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s3_cigar, mapQual);
+        s3_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s3_rev.IsMapped());
         EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
@@ -397,7 +416,7 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_EQ(102, s3_rev.ReferenceStart());         // 100 + startOffset
         EXPECT_EQ(110, s3_rev.ReferenceEnd());           // RefStart + 5= + 3D
 
-        EXPECT_EQ(s3_cigar_clipped, s3_rev.CigarData().ToStdString());
+        EXPECT_EQ(s3_rev_cigar_clipped, s3_rev.CigarData().ToStdString());
 
         const BamRecordView view
         {
@@ -446,6 +465,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     const std::string s1_tagBases_clipped = s1_seq_clipped;
     const std::string s1_tagQuals_clipped = s1_quals_clipped;
     const f_data s1_frames_clipped   = { 10, 10, 20, 20, 30, 40, 40 };
+    const std::string s1_cigar_rev_clipped = "6=1S";
     const std::string s1_seq_rev_clipped   = "AACGGTT";
     const std::string s1_quals_rev_clipped = "?]?]?]?";
     const std::string s1_tagBases_rev_clipped = s1_seq_rev_clipped;
@@ -459,6 +479,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     const std::string s2_tagBases_clipped = s2_seq_clipped;
     const std::string s2_tagQuals_clipped = s2_quals_clipped;
     const f_data s2_frames_clipped   = { 10, 10, 20, 20, 30, 40, 40 };
+    const std::string s2_cigar_rev_clipped = "1=3D5=1S";
     const std::string s2_seq_rev_clipped   = "AACGGTT";
     const std::string s2_quals_rev_clipped = "?]?]?]?";
     const std::string s2_tagBases_rev_clipped = s2_seq_rev_clipped;
@@ -472,6 +493,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     const std::string s3_tagBases_clipped = s3_seq_clipped;
     const std::string s3_tagQuals_clipped = s3_quals_clipped;
     const f_data s3_frames_clipped   = { 10, 10, 20, 20, 30, 40, 40 };
+    const std::string s3_cigar_rev_clipped = "1D2I2D4=1S";
     const std::string s3_seq_rev_clipped   = "AACGGTT";
     const std::string s3_quals_rev_clipped = "?]?]?]?";
     const std::string s3_tagBases_rev_clipped = s3_seq_rev_clipped;
@@ -480,46 +502,16 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
 
     const BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                                   seq, tagBases, tagQuals, frames);
-    BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
-    BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
-    BamRecord s3 = prototype.Mapped(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
-    BamRecord s1_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s1_cigar, mapQual);
-    BamRecord s2_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s2_cigar, mapQual);
-    BamRecord s3_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s3_cigar, mapQual);
 
-    // sanity checks before clipping
-    EXPECT_TRUE(s1.IsMapped());
-    EXPECT_EQ(tPos, s1.ReferenceStart());
-    EXPECT_EQ(tPos + 10, s1.ReferenceEnd()); // 10=
+    {
+        SCOPED_TRACE("s1 - FORWARD");
 
-    EXPECT_TRUE(s1_rev.IsMapped());
-    EXPECT_EQ(tPos, s1_rev.ReferenceStart());
-    EXPECT_EQ(tPos + 10, s1_rev.ReferenceEnd()); // 10=
+        BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
+        EXPECT_TRUE(s1.IsMapped());
+        EXPECT_EQ(100, s1.ReferenceStart());
+        EXPECT_EQ(110, s1.ReferenceEnd()); // 10=
 
-    EXPECT_TRUE(s2.IsMapped());
-    EXPECT_EQ(tPos, s2.ReferenceStart());
-    EXPECT_EQ(tPos + 13, s2.ReferenceEnd());   // 5= + 3D + 5=
-
-    EXPECT_TRUE(s2_rev.IsMapped());
-    EXPECT_EQ(tPos, s2_rev.ReferenceStart());
-    EXPECT_EQ(tPos + 13, s2_rev.ReferenceEnd());   // 5= + 3D + 5=
-
-    EXPECT_TRUE(s3.IsMapped());
-    EXPECT_EQ(tPos, s3.ReferenceStart());
-    EXPECT_EQ(tPos + 11, s3.ReferenceEnd());   // 4= + 1D + 2D + 4=
-
-    EXPECT_TRUE(s3_rev.IsMapped());
-    EXPECT_EQ(tPos, s3_rev.ReferenceStart());
-    EXPECT_EQ(tPos + 11, s3_rev.ReferenceEnd());   // 4= + 1D + 2D + 4=
-
-    s1.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
-    s2.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
-    s3.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
-    s1_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
-    s2_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
-    s3_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
-
-    {   // s1 - FORWARD
+        s1.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s1.IsMapped());
         EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
@@ -547,19 +539,26 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
         EXPECT_EQ(s1_tagQuals_clipped, view.DeletionQVs().Fastq());
         EXPECT_EQ(s1_frames_clipped,   view.IPD().Data());
     }
+    {
+        SCOPED_TRACE("s1 - REVERSE");
 
-    {   // s1 - REVERSE
+        BamRecord s1_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s1_cigar, mapQual);
+        EXPECT_TRUE(s1_rev.IsMapped());
+        EXPECT_EQ(100, s1_rev.ReferenceStart());
+        EXPECT_EQ(110, s1_rev.ReferenceEnd()); // 10=
+
+        s1_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s1_rev.IsMapped());
         EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s1_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s1_rev.QueryEnd());
-        EXPECT_EQ(clipStart, s1_rev.AlignedStart());    // queryStart (no soft clips)
-        EXPECT_EQ(clipEnd,   s1_rev.AlignedEnd());      // alignStart + seqLength
+        EXPECT_EQ(503, s1_rev.AlignedStart());    // queryStart (no soft clips)
+        EXPECT_EQ(509,   s1_rev.AlignedEnd());      // alignStart + seqLength
         EXPECT_EQ(tPos,      s1_rev.ReferenceStart());  // 100 + startOffset
-        EXPECT_EQ(tPos + 7,  s1_rev.ReferenceEnd());    // RefStart + 7=
+        EXPECT_EQ(tPos + 6,  s1_rev.ReferenceEnd());    // RefStart + 7=
 
-        EXPECT_EQ(s1_cigar_clipped, s1_rev.CigarData().ToStdString());
+        EXPECT_EQ(s1_cigar_rev_clipped, s1_rev.CigarData().ToStdString());
 
         const BamRecordView view
         {
@@ -576,8 +575,15 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
         EXPECT_EQ(s1_tagQuals_rev_clipped, view.DeletionQVs().Fastq());
         EXPECT_EQ(s1_frames_rev_clipped,   view.IPD().Data());
     }
+    {
+        SCOPED_TRACE("s2 - FORWARD");
 
-    {   // s2 - FORWARD
+        BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
+        EXPECT_TRUE(s2.IsMapped());
+        EXPECT_EQ(100, s2.ReferenceStart());
+        EXPECT_EQ(113, s2.ReferenceEnd());   // 5= + 3D + 5=
+
+        s2.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s2.IsMapped());
         EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
@@ -605,19 +611,26 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
         EXPECT_EQ(s2_tagQuals_clipped, view.DeletionQVs().Fastq());
         EXPECT_EQ(s2_frames_clipped,   view.IPD().Data());
     }
+    {
+        SCOPED_TRACE("s2 - REVERSE");
 
-    {   // s2 - REVERSE
+        BamRecord s2_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s2_cigar, mapQual);
+        EXPECT_TRUE(s2_rev.IsMapped());
+        EXPECT_EQ(100, s2_rev.ReferenceStart());
+        EXPECT_EQ(113, s2_rev.ReferenceEnd());   // 5= + 3D + 5=
+
+        s2_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s2_rev.IsMapped());
         EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s2_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s2_rev.QueryEnd());
-        EXPECT_EQ(clipStart, s2_rev.AlignedStart());    // queryStart (no soft clips left)
-        EXPECT_EQ(clipEnd,   s2_rev.AlignedEnd());      // alignStart + seqLength
+        EXPECT_EQ(503, s2_rev.AlignedStart());    // queryStart (no soft clips left)
+        EXPECT_EQ(509,   s2_rev.AlignedEnd());      // alignStart + seqLength
         EXPECT_EQ(tPos,      s2_rev.ReferenceStart());  // 100 + startOffset
-        EXPECT_EQ(tPos + 10, s2_rev.ReferenceEnd());    // RefStart + 5=3D2=
+        EXPECT_EQ(tPos + 9, s2_rev.ReferenceEnd());    // RefStart + 5=3D2=
 
-        EXPECT_EQ(s2_cigar_clipped, s2_rev.CigarData().ToStdString());
+        EXPECT_EQ(s2_cigar_rev_clipped, s2_rev.CigarData().ToStdString());
 
         const BamRecordView view
         {
@@ -635,8 +648,15 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
         EXPECT_EQ(s2_tagQuals_rev_clipped, view.AltLabelQVs().Fastq());
         EXPECT_EQ(s2_frames_rev_clipped,   view.IPD().Data());
     }
+    {
+        SCOPED_TRACE("s3 - FORWARD");
 
-    {   // s3 - FORWARD
+        BamRecord s3 = prototype.Mapped(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+        EXPECT_TRUE(s3.IsMapped());
+        EXPECT_EQ(100, s3.ReferenceStart());
+        EXPECT_EQ(111, s3.ReferenceEnd());   // 4= + 1D + 2D + 4=
+
+        s3.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s3.IsMapped());
         EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
@@ -666,18 +686,26 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
         EXPECT_EQ(s3_tagQuals_clipped, view.AltLabelQVs().Fastq());
         EXPECT_EQ(s3_frames_clipped,   view.IPD().Data());
     }
+    {
+        SCOPED_TRACE("s3 - REVERSE");
 
-    {   // s3 - REVERSE
+        BamRecord s3_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s3_cigar, mapQual);
+        EXPECT_TRUE(s3_rev.IsMapped());
+        EXPECT_EQ(100, s3_rev.ReferenceStart());
+        EXPECT_EQ(111, s3_rev.ReferenceEnd());   // 4= + 1D + 2D + 4=
+
+        s3_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
+
         EXPECT_TRUE(s3_rev.IsMapped());
         EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s3_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s3_rev.QueryEnd());
-        EXPECT_EQ(clipStart, s3_rev.AlignedStart());    // queryStart (no soft clips left)
-        EXPECT_EQ(clipEnd,   s3_rev.AlignedEnd());      // alignStart + seqLength
+        EXPECT_EQ(503, s3_rev.AlignedStart());    // queryStart + 1S
+        EXPECT_EQ(509,   s3_rev.AlignedEnd());      // alignStart + seqLength
         EXPECT_EQ(tPos,      s3_rev.ReferenceStart());  // 100 + startOffset
-        EXPECT_EQ(tPos + 8,  s3_rev.ReferenceEnd());    // RefStart + 4=1D2D1=
+        EXPECT_EQ(tPos + 7,  s3_rev.ReferenceEnd());    // RefStart + 4=1D2D1=
 
-        EXPECT_EQ(s3_cigar_clipped, s3_rev.CigarData().ToStdString());
+        EXPECT_EQ(s3_cigar_rev_clipped, s3_rev.CigarData().ToStdString());
 
         const BamRecordView view
         {
@@ -1779,6 +1807,10 @@ TEST(BamRecordTest, ClipEncodedFrames)
     const std::string s2_cigar_clipped = "3=3D4=";
     const std::string s3_cigar_clipped = "2=1D2I2D3=";
 
+    const std::string s1_cigar_rev_clipped = "7=";
+    const std::string s2_cigar_rev_clipped = "4=3D3=";
+    const std::string s3_cigar_rev_clipped = "3=1D2I2D2=";
+
     const BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                                   pulseCall, pulseBases, pulseQuals, pulseFrames, FrameCodec::V1);
 
@@ -1870,7 +1902,7 @@ TEST(BamRecordTest, ClipEncodedFrames)
         EXPECT_EQ(102, s1_rev.ReferenceStart());        // 100 + startOffset
         EXPECT_EQ(109, s1_rev.ReferenceEnd());          // RefStart + 7=
 
-        EXPECT_EQ(s1_cigar_clipped, s1_rev.CigarData().ToStdString());
+        EXPECT_EQ(s1_cigar_rev_clipped, s1_rev.CigarData().ToStdString());
 
         const BamRecordView view
         {
@@ -1933,7 +1965,7 @@ TEST(BamRecordTest, ClipEncodedFrames)
         EXPECT_EQ(102, s2_rev.ReferenceStart());        // 100 + startOffset
         EXPECT_EQ(112, s2_rev.ReferenceEnd());          // RefStart + 7= + 3D
 
-        EXPECT_EQ(s2_cigar_clipped, s2_rev.CigarData().ToStdString());
+        EXPECT_EQ(s2_cigar_rev_clipped, s2_rev.CigarData().ToStdString());
 
         const BamRecordView view
         {
@@ -1997,7 +2029,7 @@ TEST(BamRecordTest, ClipEncodedFrames)
         EXPECT_EQ(102, s3_rev.ReferenceStart());         // 100 + startOffset
         EXPECT_EQ(110, s3_rev.ReferenceEnd());           // RefStart + 5= + 3D
 
-        EXPECT_EQ(s3_cigar_clipped, s3_rev.CigarData().ToStdString());
+        EXPECT_EQ(s3_cigar_rev_clipped, s3_rev.CigarData().ToStdString());
 
         const BamRecordView view
         {
@@ -2083,6 +2115,67 @@ TEST(BamRecordClippingTest, ExciseSoftClipsFromFramesWithDeletions)
     const auto clippedIpds = record.IPD(PacBio::BAM::Orientation::GENOMIC, false, true).Encode();
     EXPECT_EQ(expectedRawIpds, rawIpds);
     EXPECT_EQ(expectedClippedIpds, clippedIpds);
+}
+
+TEST(BamRecordTest, ClipToQuery_Stranded)
+{
+    using namespace PacBio::BAM;
+
+    const std::string bamFile{PbbamTestsConfig::Data_Dir + "/clip_to_query.bam"};
+
+    bool first = true;
+    EntireFileQuery query{bamFile};
+    for (auto& i : query)
+    {
+        Strand expectedStrand;
+        std::string scope;
+        if (first) {
+            expectedStrand = Strand::FORWARD;
+            scope = "First record (FORWARD strand)";
+        } else {
+            expectedStrand = Strand::REVERSE;
+            scope = "Second record (REVERSE strand)";
+        }
+
+        SCOPED_TRACE(scope);
+
+        // initial
+        EXPECT_EQ(2, i.ReferenceStart());
+        EXPECT_EQ(7, i.ReferenceEnd());
+        EXPECT_EQ(0, i.QueryStart());
+        EXPECT_EQ(8, i.QueryEnd());
+        EXPECT_EQ(expectedStrand, i.AlignedStrand());
+        EXPECT_EQ("1S4=1I1=1S", i.CigarData().ToStdString());
+
+        // first clip
+        i.Clip(ClipType::CLIP_TO_REFERENCE, 3, 6);
+        EXPECT_EQ(3, i.ReferenceStart());
+        EXPECT_EQ(6, i.ReferenceEnd());
+        EXPECT_EQ(2, i.QueryStart());
+        EXPECT_EQ(6, i.QueryEnd());
+        EXPECT_EQ(expectedStrand, i.AlignedStrand());
+        EXPECT_EQ("3=1I", i.CigarData().ToStdString());
+
+        // second clip
+        Position qS;
+        Position qE;
+        if (first) {
+            qS = i.QueryStart();
+            qE = i.QueryEnd() - 1;
+        } else {
+            qS = i.QueryStart() + 1;
+            qE = i.QueryEnd();
+        }
+        i.Clip(ClipType::CLIP_TO_QUERY, qS, qE);
+        EXPECT_EQ(3, i.ReferenceStart());
+        EXPECT_EQ(6, i.ReferenceEnd());
+        EXPECT_EQ(qS, i.QueryStart());
+        EXPECT_EQ(qE, i.QueryEnd());
+        EXPECT_EQ(expectedStrand, i.AlignedStrand());
+        EXPECT_EQ("3=", i.CigarData().ToStdString());
+
+        first = false;
+    }
 }
 
 // clang-format on

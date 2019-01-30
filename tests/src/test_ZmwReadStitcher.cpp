@@ -473,3 +473,14 @@ TEST(ZmwReadStitching, LegacyTypedefsOk)
         EXPECT_FALSE(reader.HasNext());
     }
 }
+
+TEST(ZmwReadStitching, EmptyScrapSorting)
+{
+    ZmwReadStitcher stitcher{PbbamTestsConfig::Data_Dir + "/stitching/test_qstart.subreads.bam",
+                             PbbamTestsConfig::Data_Dir + "/stitching/test_qstart.scraps.bam"};
+    ASSERT_TRUE(stitcher.HasNext());
+
+    const auto record = stitcher.Next();
+    EXPECT_EQ(0, record.QueryStart());
+    EXPECT_EQ(1397, record.QueryEnd());
+}
