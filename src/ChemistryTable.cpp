@@ -134,11 +134,18 @@ const ChemistryTable& BuiltInChemistryTable()
         // 5.0.1 ChemRel; Sequel® Dev Sequencing Plate Dyn Loading (4 rxn)
         {{"101-490-800", "101-644-500", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel® Dev Sequencing Plate Dyn Loading
 
-        // 5.0.1 ChemRel; Sequel® Dev Sequencing Plate Dyn Loading (4 rxn)
-        {{"101-490-800", "101-644-500", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel® Dev Sequencing Plate Dyn Loading
-
         // 5.0.1 ChemRel; Sequel® Sequencing Plate Dyn Loading (4 rxn)
-        {{"101-490-800", "101-717-100", "5.0", "S/P3-C1/5.0-8M"}} // Sequel® Dev Sequencing Plate Dyn Loading
+        {{"101-490-800", "101-717-100", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel® Dev Sequencing Plate Dyn Loading
+
+        // 5.0.1 ChemRel; Sequel® Dev Sequencing Plate Dyn Loading (4 rxn)
+        {{"101-717-300", "101-644-500", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel® Dev Sequencing Plate Dyn Loading
+        // 5.0.1 ChemRel; Sequel® Sequencing Plate Dyn Loading (4 rxn)
+        {{"101-717-300", "101-717-100", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel® Dev Sequencing Plate Dyn Loading
+
+        // 5.0.1 ChemRel; Sequel® Dev Sequencing Plate Dyn Loading (4 rxn)
+        {{"101-717-400", "101-644-500", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel® Dev Sequencing Plate Dyn Loading
+        // 5.0.1 ChemRel; Sequel® Sequencing Plate Dyn Loading (4 rxn)
+        {{"101-717-400", "101-717-100", "5.0", "S/P3-C1/5.0-8M"}} // Sequel® Dev Sequencing Plate Dyn Loading
     };
     // clang-format on
 
