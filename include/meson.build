@@ -110,8 +110,6 @@ if not meson.is_subproject()
       'pbbam/internal/DataSetBaseTypes.inl',
       'pbbam/internal/DataSetElement.h',
       'pbbam/internal/DataSetElement.inl',
-      'pbbam/internal/DataSetListElement.h',
-      'pbbam/internal/DataSetListElement.inl',
       'pbbam/internal/DataSetTypes.inl',
       'pbbam/internal/FastaSequence.inl',
       'pbbam/internal/FastqSequence.inl',

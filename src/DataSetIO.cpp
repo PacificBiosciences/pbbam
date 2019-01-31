@@ -101,8 +101,7 @@ std::unique_ptr<DataSetBase> DataSetIO::FromUri(const std::string& uri)
 
 std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>& uris)
 {
-    if (uris.empty())
-        throw std::runtime_error{"empty input URI list"};  // or just return empty, generic DataSet?
+    if (uris.empty()) throw std::runtime_error{"empty input URI list"};
 
     // create dataset(s) from URI(s)
     std::vector<std::unique_ptr<DataSetBase> > datasets;
@@ -116,9 +115,11 @@ std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>&
 
     // else merge
     else {
-        auto& result = datasets.front();
-        for (const auto& dataset : datasets)
-            *result += *dataset;
+        auto& result = datasets.at(0);
+        for (size_t i = 1; i < datasets.size(); ++i) {
+            const auto& next = datasets.at(i);
+            *result += *next;
+        }
         return std::move(result);
     }
 }

@@ -101,9 +101,6 @@ TEST(CompareTest, TypeToNameOk)
     EXPECT_EQ(std::string{"Compare::GREATER_THAN_EQUAL"}, Compare::TypeToName(Compare::GREATER_THAN_EQUAL));
     EXPECT_EQ(std::string{"Compare::CONTAINS"},           Compare::TypeToName(Compare::CONTAINS));
     EXPECT_EQ(std::string{"Compare::NOT_CONTAINS"},       Compare::TypeToName(Compare::NOT_CONTAINS));
-
-    // invalid type throws
-    EXPECT_THROW(Compare::TypeToName(static_cast<Compare::Type>(42)), std::runtime_error);
 }
 
 TEST(CompareTest, TypeToOperatorOk)
@@ -129,9 +126,6 @@ TEST(CompareTest, TypeToOperatorOk)
         EXPECT_EQ(Compare::TypeToOperator(Compare::CONTAINS, true),           std::string{"and"});
         EXPECT_EQ(Compare::TypeToOperator(Compare::NOT_CONTAINS, true),       std::string{"not"});
     }
-
-    // invalid type throws
-    EXPECT_THROW(Compare::TypeToOperator(static_cast<Compare::Type>(42)), std::runtime_error);
 }
 
 TEST(CompareTest, FromOperatorOk)

@@ -72,7 +72,7 @@ void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
 
     // iterate children, recursively building up subtree
     for (const auto& child : node.Children())
-        ToXml(child, registry, xsdPrefixesUsed, xmlNode);
+        ToXml(*child, registry, xsdPrefixesUsed, xmlNode);
 }
 
 }  // anonymous
@@ -105,7 +105,7 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
 
     // iterate children, recursively building up subtree
     for (const auto& child : dataset.Children())
-        ToXml(child, registry, xsdPrefixesUsed, root);
+        ToXml(*child, registry, xsdPrefixesUsed, root);
 
     // write XML to stream
     auto decl = doc.prepend_child(pugi::node_declaration);

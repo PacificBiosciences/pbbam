@@ -135,17 +135,19 @@ DataSet::DataSet(const std::vector<std::string>& filenames)
 
 DataSet::DataSet(const DataSet& other) : path_(other.path_)
 {
-    DataSetBase* otherDataset = other.d_.get();
-    auto copyDataset = new DataSetElement(*otherDataset);
-    d_.reset(static_cast<DataSetBase*>(copyDataset));
+    std::ostringstream out;
+    DataSetIO::ToStream(other.d_, out);
+    const std::string xml = out.str();
+    d_ = DataSetIO::FromXmlString(xml);
 }
 
 DataSet& DataSet::operator=(const DataSet& other)
 {
     if (this != &other) {
-        DataSetBase* otherDataset = other.d_.get();
-        auto copyDataset = new DataSetElement(*otherDataset);
-        d_.reset(static_cast<DataSetBase*>(copyDataset));
+        std::ostringstream out;
+        DataSetIO::ToStream(other.d_, out);
+        const std::string xml = out.str();
+        d_ = DataSetIO::FromXmlString(xml);
         path_ = other.path_;
     }
     return *this;
@@ -255,9 +257,12 @@ std::string DataSet::ResolvePath(const std::string& originalPath) const
     return FileUtils::ResolvedFilePath(originalPath, path_);
 }
 
-void DataSet::Save(const std::string& outputFilename) { DataSetIO::ToFile(d_, outputFilename); }
+void DataSet::Save(const std::string& outputFilename) const
+{
+    DataSetIO::ToFile(d_, outputFilename);
+}
 
-void DataSet::SaveToStream(std::ostream& out) { DataSetIO::ToStream(d_, out); }
+void DataSet::SaveToStream(std::ostream& out) const { DataSetIO::ToStream(d_, out); }
 
 std::set<std::string> DataSet::SequencingChemistries() const
 {
