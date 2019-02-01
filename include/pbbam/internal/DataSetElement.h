@@ -9,6 +9,7 @@
 #include <boost/utility/string_ref.hpp>
 #include <cassert>
 #include <map>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
