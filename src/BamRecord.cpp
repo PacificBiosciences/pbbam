@@ -549,15 +549,17 @@ Cigar BamRecord::CigarData(bool exciseAllClips) const
     return cigar;
 }
 
-BamRecord& BamRecord::Clip(const ClipType clipType, const Position start, const Position end)
+BamRecord& BamRecord::Clip(const ClipType clipType, const Position start, const Position end,
+                           const bool exciseFlankingInserts)
 {
     switch (clipType) {
         case ClipType::CLIP_NONE:
             return *this;
         case ClipType::CLIP_TO_QUERY:
+            // exciseFlankingInserts ignored, just clipping to query coordinates
             return ClipToQuery(start, end);
         case ClipType::CLIP_TO_REFERENCE:
-            return ClipToReference(start, end);
+            return ClipToReference(start, end, exciseFlankingInserts);
         default:
             throw std::runtime_error{"unsupported clip type requested"};
     }
@@ -836,19 +838,21 @@ BamRecord& BamRecord::ClipToQueryReverse(const PacBio::BAM::Position start,
     return *this;
 }
 
-BamRecord& BamRecord::ClipToReference(const Position start, const Position end)
+BamRecord& BamRecord::ClipToReference(const Position start, const Position end,
+                                      const bool exciseFlankingInserts)
 {
     // skip if not mapped, clipping to reference doesn't make sense
     // or should we even consider throwing here?
     if (!IsMapped()) return *this;
 
     const bool isForwardStrand = (AlignedStrand() == Strand::FORWARD);
-    return (isForwardStrand ? ClipToReferenceForward(start, end)
-                            : ClipToReferenceReverse(start, end));
+    return (isForwardStrand ? ClipToReferenceForward(start, end, exciseFlankingInserts)
+                            : ClipToReferenceReverse(start, end, exciseFlankingInserts));
 }
 
 BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
-                                             const PacBio::BAM::Position end)
+                                             const PacBio::BAM::Position end,
+                                             const bool exciseFlankingInserts)
 {
     assert(IsMapped());
     assert(AlignedStrand() == Strand::FORWARD);
@@ -950,6 +954,26 @@ BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
         }
     }
 
+    if (exciseFlankingInserts) {
+        // check for leading insertion
+        if (!cigar.empty()) {
+            const CigarOperation& op = cigar.front();
+            if (op.Type() == CigarOperationType::INSERTION) {
+                queryPosRemovedFront += op.Length();
+                cigar.erase(cigar.begin());
+            }
+        }
+
+        // check for trailing insertion
+        if (!cigar.empty()) {
+            const CigarOperation& op = cigar.back();
+            if (op.Type() == CigarOperationType::INSERTION) {
+                queryPosRemovedBack += op.Length();
+                cigar.pop_back();
+            }
+        }
+    }
+
     // update CIGAR and position
     impl_.CigarData(cigar);
     impl_.Position(newTStart);
@@ -971,7 +995,8 @@ BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
 }
 
 BamRecord& BamRecord::ClipToReferenceReverse(const PacBio::BAM::Position start,
-                                             const PacBio::BAM::Position end)
+                                             const PacBio::BAM::Position end,
+                                             const bool exciseFlankingInserts)
 {
     assert(IsMapped());
     assert(AlignedStrand() == Strand::REVERSE);
@@ -1065,6 +1090,27 @@ BamRecord& BamRecord::ClipToReferenceReverse(const PacBio::BAM::Position start,
             }
         }
     }
+
+    if (exciseFlankingInserts) {
+        // check for leading insertion
+        if (!cigar.empty()) {
+            const CigarOperation& op = cigar.front();
+            if (op.Type() == CigarOperationType::INSERTION) {
+                queryPosRemovedBack += op.Length();
+                cigar.erase(cigar.begin());
+            }
+        }
+
+        // check for trailing insertion
+        if (!cigar.empty()) {
+            const CigarOperation& op = cigar.back();
+            if (op.Type() == CigarOperationType::INSERTION) {
+                queryPosRemovedFront += op.Length();
+                cigar.pop_back();
+            }
+        }
+    }
+
     impl_.CigarData(cigar);
 
     // update aligned reference position

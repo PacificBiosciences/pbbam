@@ -2178,4 +2178,224 @@ TEST(BamRecordTest, ClipToQuery_Stranded)
     }
 }
 
+TEST(BamRecordTest, ClippingFlankingInserts_IgnoredOnClipToQuery)
+{
+    const Position qStart = 500;
+    const Position qEnd   = 515;
+    const std::string seq      = "TTAACCGTTAGCAAA";
+    const std::string quals    = "--?]?]?]?]?*+++";
+    const std::string tagBases = "TTAACCGTTAGCAAA";
+    const std::string tagQuals = "--?]?]?]?]?*+++";
+    const f_data frames = { 40, 40, 10, 10, 20, 20, 30, 40, 40, 10, 30, 20, 10, 10, 10 };
+
+    const BamRecord prototype =
+        BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals,
+                                           frames, seq, tagBases, tagQuals, frames);
+
+    {   // aligned forward
+
+        const int32_t  tId     = 0;
+        const Position tPos    = 100;
+        const uint8_t  mapQual = 80;
+        const Cigar cigar{"4I5=6I"};
+
+        BamRecord s = prototype.Mapped(tId, tPos, Strand::FORWARD, cigar, mapQual);
+        EXPECT_TRUE(s.IsMapped());
+        EXPECT_EQ(100, s.ReferenceStart());
+        EXPECT_EQ(105, s.ReferenceEnd());
+
+        const size_t clipStart = 502;
+        const size_t clipEnd = 512;
+        const bool exciseFlankingInserts = true;
+
+        s.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd, exciseFlankingInserts);
+
+        EXPECT_TRUE(s.IsMapped());
+        EXPECT_EQ(Strand::FORWARD, s.AlignedStrand());
+        EXPECT_EQ("2I5=3I", s.CigarData().ToStdString());
+
+        EXPECT_EQ(clipStart, s.QueryStart());
+        EXPECT_EQ(clipEnd,   s.QueryEnd());
+        EXPECT_EQ(clipStart, s.AlignedStart());
+        EXPECT_EQ(clipEnd,   s.AlignedEnd());
+        EXPECT_EQ(100,       s.ReferenceStart());
+        EXPECT_EQ(105,       s.ReferenceEnd());
+    }
+    {   // aligned reverse
+
+        const int32_t  tId     = 0;
+        const Position tPos    = 100;
+        const uint8_t  mapQual = 80;
+        const Cigar cigar{"4I5=6I"};
+
+        BamRecord s = prototype.Mapped(tId, tPos, Strand::REVERSE, cigar, mapQual);
+        EXPECT_TRUE(s.IsMapped());
+        EXPECT_EQ(100, s.ReferenceStart());
+        EXPECT_EQ(105, s.ReferenceEnd());
+
+        const size_t clipStart = 502;
+        const size_t clipEnd = 512;
+        const bool exciseFlankingInserts = true;
+
+        s.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd, exciseFlankingInserts);
+
+        EXPECT_TRUE(s.IsMapped());
+        EXPECT_EQ(Strand::REVERSE, s.AlignedStrand());
+        EXPECT_EQ("1I5=4I", s.CigarData().ToStdString());
+
+        EXPECT_EQ(clipStart, s.QueryStart());
+        EXPECT_EQ(clipEnd,   s.QueryEnd());
+        EXPECT_EQ(clipStart, s.AlignedStart());
+        EXPECT_EQ(clipEnd,   s.AlignedEnd());
+        EXPECT_EQ(100,       s.ReferenceStart());
+        EXPECT_EQ(105,       s.ReferenceEnd());
+    }
+}
+
+TEST(BamRecordTest, ClipToReference_Forward_ExciseFlankingInserts)
+{
+    const Position qStart = 500;
+    const Position qEnd   = 526;
+    const std::string seq      = "TTAACCGTTAGCAAATTAACCGTTAG";
+    const std::string quals    = "--?]?]?]?]?*+++--?]?]?]?]?";
+    const std::string tagBases = "TTAACCGTTAGCAAATTAACCGTTAG";
+    const std::string tagQuals = "--?]?]?]?]?*+++--?]?]?]?]?";
+    const f_data frames = {
+        40, 40, 10, 10, 20, 20, 30, 40, 40, 10,
+        30, 20, 10, 10, 10, 40, 40, 10, 10, 20,
+        20, 30, 40, 40, 10, 30 };
+
+    const BamRecord prototype =
+        BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals,
+                                           frames, seq, tagBases, tagQuals, frames);
+
+    const int32_t  tId     = 0;
+    const Position tPos    = 100;
+    const uint8_t  mapQual = 80;
+    const Cigar cigar{"3=6I10=6I1="};
+
+    const size_t clipStart = 103;
+    const size_t clipEnd = 113;
+
+    // ----------------
+    // keep inserts
+
+    bool exciseFlankingInserts = false;
+
+    BamRecord withInserts = prototype.Mapped(tId, tPos, Strand::FORWARD, cigar, mapQual);
+    EXPECT_TRUE(withInserts.IsMapped());
+    EXPECT_EQ(100, withInserts.ReferenceStart());
+    EXPECT_EQ(114, withInserts.ReferenceEnd());
+
+    withInserts.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd, exciseFlankingInserts);
+
+    EXPECT_TRUE(withInserts.IsMapped());
+    EXPECT_EQ(Strand::FORWARD, withInserts.AlignedStrand());
+    EXPECT_EQ("6I10=6I", withInserts.CigarData().ToStdString());
+
+    EXPECT_EQ(503, withInserts.QueryStart());
+    EXPECT_EQ(525, withInserts.QueryEnd());
+    EXPECT_EQ(503, withInserts.AlignedStart());
+    EXPECT_EQ(525, withInserts.AlignedEnd());
+    EXPECT_EQ(103, withInserts.ReferenceStart());
+    EXPECT_EQ(113, withInserts.ReferenceEnd());
+
+    // -----------------
+    // excise inserts
+
+    exciseFlankingInserts = true;
+
+    BamRecord withoutInserts = prototype.Mapped(tId, tPos, Strand::FORWARD, cigar, mapQual);
+    EXPECT_TRUE(withoutInserts.IsMapped());
+    EXPECT_EQ(100, withoutInserts.ReferenceStart());
+    EXPECT_EQ(114, withoutInserts.ReferenceEnd());
+
+    withoutInserts.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd, exciseFlankingInserts);
+
+    EXPECT_TRUE(withoutInserts.IsMapped());
+    EXPECT_EQ(Strand::FORWARD, withoutInserts.AlignedStrand());
+    EXPECT_EQ("10=", withoutInserts.CigarData().ToStdString());
+
+    EXPECT_EQ(509, withoutInserts.QueryStart());
+    EXPECT_EQ(519, withoutInserts.QueryEnd());
+    EXPECT_EQ(509, withoutInserts.AlignedStart());
+    EXPECT_EQ(519, withoutInserts.AlignedEnd());
+    EXPECT_EQ(103, withoutInserts.ReferenceStart());
+    EXPECT_EQ(113, withoutInserts.ReferenceEnd());
+}
+
+TEST(BamRecordTest, ClipToReference_Reverse_ExciseFlankingInserts)
+{
+    const Position qStart = 500;
+    const Position qEnd   = 526;
+    const std::string seq      = "TTAACCGTTAGCAAATTAACCGTTAG";
+    const std::string quals    = "--?]?]?]?]?*+++--?]?]?]?]?";
+    const std::string tagBases = "TTAACCGTTAGCAAATTAACCGTTAG";
+    const std::string tagQuals = "--?]?]?]?]?*+++--?]?]?]?]?";
+    const f_data frames = {
+        40, 40, 10, 10, 20, 20, 30, 40, 40, 10,
+        30, 20, 10, 10, 10, 40, 40, 10, 10, 20,
+        20, 30, 40, 40, 10, 30 };
+
+    const BamRecord prototype =
+        BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals,
+                                           frames, seq, tagBases, tagQuals, frames);
+
+    const int32_t  tId     = 0;
+    const Position tPos    = 100;
+    const uint8_t  mapQual = 80;
+    const Cigar cigar{"3=6I10=6I1="};
+
+    const size_t clipStart = 103;
+    const size_t clipEnd = 113;
+
+    // ----------------
+    // keep inserts
+
+    bool exciseFlankingInserts = false;
+
+    BamRecord withInserts = prototype.Mapped(tId, tPos, Strand::REVERSE, cigar, mapQual);
+
+    EXPECT_TRUE(withInserts.IsMapped());
+    EXPECT_EQ(100, withInserts.ReferenceStart());
+    EXPECT_EQ(114, withInserts.ReferenceEnd());
+
+    withInserts.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd, exciseFlankingInserts);
+
+    EXPECT_TRUE(withInserts.IsMapped());
+    EXPECT_EQ(Strand::REVERSE, withInserts.AlignedStrand());
+    EXPECT_EQ("6I10=6I", withInserts.CigarData().ToStdString());
+
+    EXPECT_EQ(501, withInserts.QueryStart());
+    EXPECT_EQ(523, withInserts.QueryEnd());
+    EXPECT_EQ(501, withInserts.AlignedStart());
+    EXPECT_EQ(523, withInserts.AlignedEnd());
+    EXPECT_EQ(103, withInserts.ReferenceStart());
+    EXPECT_EQ(113, withInserts.ReferenceEnd());
+
+    // -----------------
+    // excise inserts
+
+    exciseFlankingInserts = true;
+
+    BamRecord withoutInserts = prototype.Mapped(tId, tPos, Strand::REVERSE, cigar, mapQual);
+    EXPECT_TRUE(withoutInserts.IsMapped());
+    EXPECT_EQ(100, withoutInserts.ReferenceStart());
+    EXPECT_EQ(114, withoutInserts.ReferenceEnd());
+
+    withoutInserts.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd, exciseFlankingInserts);
+
+    EXPECT_TRUE(withoutInserts.IsMapped());
+    EXPECT_EQ(Strand::REVERSE, withoutInserts.AlignedStrand());
+    EXPECT_EQ("10=", withoutInserts.CigarData().ToStdString());
+
+    EXPECT_EQ(507, withoutInserts.QueryStart());
+    EXPECT_EQ(517, withoutInserts.QueryEnd());
+    EXPECT_EQ(507, withoutInserts.AlignedStart());
+    EXPECT_EQ(517, withoutInserts.AlignedEnd());
+    EXPECT_EQ(103, withoutInserts.ReferenceStart());
+    EXPECT_EQ(113, withoutInserts.ReferenceEnd());
+
+}
+
 // clang-format on

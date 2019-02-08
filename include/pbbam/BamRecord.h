@@ -1137,7 +1137,8 @@ public:
 
     /// Creates a copied record from input, with clipping applied
     static BamRecord Clipped(const BamRecord& input, const ClipType clipType,
-                             const PacBio::BAM::Position start, const PacBio::BAM::Position end);
+                             const PacBio::BAM::Position start, const PacBio::BAM::Position end,
+                             const bool exciseFlankingInserts = false);
 
     /// Creates a copied record from input, with mapping applied
     static BamRecord Mapped(const BamRecord& input, const int32_t referenceId,
@@ -1146,11 +1147,12 @@ public:
 
     /// Applies clipping to this record
     BamRecord& Clip(const ClipType clipType, const PacBio::BAM::Position start,
-                    const PacBio::BAM::Position end);
+                    const PacBio::BAM::Position end, const bool exciseFlankingInserts = false);
 
     /// Creates a copied record from this one, with clipping applied
     BamRecord Clipped(const ClipType clipType, const PacBio::BAM::Position start,
-                      const PacBio::BAM::Position end) const;
+                      const PacBio::BAM::Position end,
+                      const bool exciseFlankingInserts = false) const;
 
     /// Applies mapping to this record
     BamRecord& Map(const int32_t referenceId, const Position refStart, const Strand strand,
@@ -1195,11 +1197,14 @@ private:
                                   const PacBio::BAM::Position end);
     BamRecord& ClipToQueryReverse(const PacBio::BAM::Position start,
                                   const PacBio::BAM::Position end);
-    BamRecord& ClipToReference(const PacBio::BAM::Position start, const PacBio::BAM::Position end);
+    BamRecord& ClipToReference(const PacBio::BAM::Position start, const PacBio::BAM::Position end,
+                               const bool exciseFlankingInserts);
     BamRecord& ClipToReferenceForward(const PacBio::BAM::Position start,
-                                      const PacBio::BAM::Position end);
+                                      const PacBio::BAM::Position end,
+                                      const bool exciseFlankingInserts);
     BamRecord& ClipToReferenceReverse(const PacBio::BAM::Position start,
-                                      const PacBio::BAM::Position end);
+                                      const PacBio::BAM::Position end,
+                                      const bool exciseFlankingInserts);
 
 private:
     ///\internal
