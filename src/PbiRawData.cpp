@@ -204,5 +204,63 @@ PbiRawData::PbiRawData(const DataSet& dataset)
     *this = PbiIndexIO::LoadFromDataSet(dataset);
 }
 
+const PbiRawBarcodeData& PbiRawData::BarcodeData() const { return barcodeData_; }
+
+PbiRawBarcodeData& PbiRawData::BarcodeData() { return barcodeData_; }
+
+const PbiRawBasicData& PbiRawData::BasicData() const { return basicData_; }
+
+PbiRawBasicData& PbiRawData::BasicData() { return basicData_; }
+
+std::string PbiRawData::Filename() const { return filename_; }
+
+PbiFile::Sections PbiRawData::FileSections() const { return sections_; }
+
+PbiRawData& PbiRawData::FileSections(PbiFile::Sections sections)
+{
+    sections_ = sections;
+    return *this;
+}
+
+bool PbiRawData::HasBarcodeData() const { return HasSection(PbiFile::BARCODE); }
+
+bool PbiRawData::HasMappedData() const { return HasSection(PbiFile::MAPPED); }
+
+bool PbiRawData::HasReferenceData() const { return HasSection(PbiFile::REFERENCE); }
+
+bool PbiRawData::HasSection(const PbiFile::Section section) const
+{
+    return (sections_ & section) != 0;
+}
+
+uint32_t PbiRawData::NumReads() const { return numReads_; }
+
+PbiRawData& PbiRawData::NumReads(uint32_t num)
+{
+    numReads_ = num;
+    return *this;
+}
+
+const PbiRawMappedData& PbiRawData::MappedData() const { return mappedData_; }
+
+PbiRawMappedData& PbiRawData::MappedData() { return mappedData_; }
+
+const PbiRawReferenceData& PbiRawData::ReferenceData() const { return referenceData_; }
+
+PbiRawReferenceData& PbiRawData::ReferenceData() { return referenceData_; }
+
+PbiFile::VersionEnum PbiRawData::Version() const { return version_; }
+
+PbiRawData& PbiRawData::Version(PbiFile::VersionEnum version)
+{
+    version_ = version;
+    return *this;
+}
+
+bool PbiReferenceEntry::operator==(const PbiReferenceEntry& other) const
+{
+    return tId_ == other.tId_ && beginRow_ == other.beginRow_ && endRow_ == other.endRow_;
+}
+
 }  // namespace BAM
 }  // namesapce PacBio

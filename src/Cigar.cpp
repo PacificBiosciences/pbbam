@@ -30,6 +30,8 @@ Cigar::Cigar(const std::string& cigarString) : std::vector<CigarOperation>{}
     }
 }
 
+Cigar Cigar::FromStdString(const std::string& stdString) { return Cigar(stdString); }
+
 std::string Cigar::ToStdString() const
 {
     std::ostringstream s;

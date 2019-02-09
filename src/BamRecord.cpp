@@ -565,6 +565,22 @@ BamRecord& BamRecord::Clip(const ClipType clipType, const Position start, const 
     }
 }
 
+BamRecord BamRecord::Clipped(const BamRecord& input, const ClipType clipType,
+                             const PacBio::BAM::Position start, const PacBio::BAM::Position end,
+                             const bool exciseFlankingInserts)
+{
+    return input.Clipped(clipType, start, end, exciseFlankingInserts);
+}
+
+BamRecord BamRecord::Clipped(const ClipType clipType, const PacBio::BAM::Position start,
+                             const PacBio::BAM::Position end,
+                             const bool exciseFlankingInserts) const
+{
+    BamRecord result(*this);
+    result.Clip(clipType, start, end, exciseFlankingInserts);
+    return result;
+}
+
 void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
 {
     const auto ipdCodec = ReadGroup().IpdCodec();
@@ -1694,6 +1710,21 @@ BamRecord& BamRecord::Map(const int32_t referenceId, const Position refStart, co
     alignedEnd_ = PacBio::BAM::UnmappedPosition;
 
     return *this;
+}
+
+BamRecord BamRecord::Mapped(const BamRecord& input, const int32_t referenceId,
+                            const Position refStart, const Strand strand, const Cigar& cigar,
+                            const uint8_t mappingQuality)
+{
+    return input.Mapped(referenceId, refStart, strand, cigar, mappingQuality);
+}
+
+BamRecord BamRecord::Mapped(const int32_t referenceId, const Position refStart, const Strand strand,
+                            const Cigar& cigar, const uint8_t mappingQuality) const
+{
+    BamRecord result(*this);
+    result.Map(referenceId, refStart, strand, cigar, mappingQuality);
+    return result;
 }
 
 uint8_t BamRecord::MapQuality() const { return impl_.MapQuality(); }

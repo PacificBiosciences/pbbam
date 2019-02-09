@@ -9,17 +9,17 @@
 namespace PacBio {
 namespace BAM {
 
-inline Accuracy::Accuracy(float accuracy)
-{
-    if (accuracy < Accuracy::MIN)
-        accuracy = Accuracy::MIN;
-    else if (accuracy > Accuracy::MAX)
-        accuracy = Accuracy::MAX;
-    accuracy_ = accuracy;
-}
+// inline Accuracy::Accuracy(float accuracy)
+// {
+//     if (accuracy < Accuracy::MIN)
+//         accuracy = Accuracy::MIN;
+//     else if (accuracy > Accuracy::MAX)
+//         accuracy = Accuracy::MAX;
+//     accuracy_ = accuracy;
+// }
 
-inline Accuracy::operator float() const
-{ return accuracy_; }
+// inline Accuracy::operator float() const
+// { return accuracy_; }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

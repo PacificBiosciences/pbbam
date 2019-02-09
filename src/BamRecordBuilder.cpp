@@ -46,6 +46,12 @@ BamRecordBuilder::BamRecordBuilder(const BamRecord& prototype) : header_{prototy
     Reset(prototype);
 }
 
+BamRecordBuilder& BamRecordBuilder::Bin(const uint32_t bin)
+{
+    core_.bin = bin;
+    return *this;
+}
+
 BamRecord BamRecordBuilder::Build() const
 {
     BamRecord result{header_};
@@ -153,10 +159,58 @@ BamRecordBuilder& BamRecordBuilder::Cigar(PacBio::BAM::Cigar cigar)
     return *this;
 }
 
+BamRecordBuilder& BamRecordBuilder::Flag(const uint32_t flag)
+{
+    core_.flag = flag;
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::InsertSize(const int32_t iSize)
+{
+    core_.isize = iSize;
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::MapQuality(const uint8_t mapQual)
+{
+    core_.qual = mapQual;
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::MatePosition(const int32_t pos)
+{
+    core_.mpos = pos;
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::MateReferenceId(const int32_t id)
+{
+    core_.mtid = id;
+    return *this;
+}
+
 BamRecordBuilder& BamRecordBuilder::Name(std::string name)
 {
     core_.l_qname = name.size() + 1;  // (NULL-term)
     name_ = std::move(name);
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::Position(const int32_t pos)
+{
+    core_.pos = pos;
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::Qualities(std::string qualities)
+{
+    qualities_ = std::move(qualities);
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::ReferenceId(const int32_t id)
+{
+    core_.tid = id;
     return *this;
 }
 
@@ -306,6 +360,12 @@ BamRecordBuilder& BamRecordBuilder::SetSupplementaryAlignment(bool ok)
         core_.flag |= BamRecordImpl::SUPPLEMENTARY;
     else
         core_.flag &= ~BamRecordImpl::SUPPLEMENTARY;
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::Tags(TagCollection tags)
+{
+    tags_ = std::move(tags);
     return *this;
 }
 

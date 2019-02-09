@@ -28,6 +28,30 @@ const std::string ProgramInfoTokenVN{"VN"};
 
 ProgramInfo::ProgramInfo(std::string id) : id_{std::move(id)} {}
 
+std::string ProgramInfo::CommandLine() const { return commandLine_; }
+
+ProgramInfo& ProgramInfo::CommandLine(std::string cmd)
+{
+    commandLine_ = std::move(cmd);
+    return *this;
+}
+
+std::map<std::string, std::string> ProgramInfo::CustomTags() const { return custom_; }
+
+ProgramInfo& ProgramInfo::CustomTags(std::map<std::string, std::string> custom)
+{
+    custom_ = std::move(custom);
+    return *this;
+}
+
+std::string ProgramInfo::Description() const { return description_; }
+
+ProgramInfo& ProgramInfo::Description(std::string description)
+{
+    description_ = std::move(description);
+    return *this;
+}
+
 ProgramInfo ProgramInfo::FromSam(const std::string& sam)
 {
     // pop off '@PG\t', then split rest of line into tokens
@@ -61,6 +85,34 @@ ProgramInfo ProgramInfo::FromSam(const std::string& sam)
     return prog;
 }
 
+std::string ProgramInfo::Id() const { return id_; }
+
+ProgramInfo& ProgramInfo::Id(std::string id)
+{
+    id_ = std::move(id);
+    return *this;
+}
+
+bool ProgramInfo::IsValid() const { return !id_.empty(); }
+
+std::string ProgramInfo::Name() const { return name_; }
+
+ProgramInfo& ProgramInfo::Name(std::string name)
+{
+    name_ = std::move(name);
+    return *this;
+}
+
+std::string ProgramInfo::PreviousProgramId() const { return previousProgramId_; }
+
+ProgramInfo& ProgramInfo::PreviousProgramId(std::string id)
+{
+    previousProgramId_ = std::move(id);
+    return *this;
+}
+
+std::string ProgramInfo::ToSam(const ProgramInfo& prog) { return prog.ToSam(); }
+
 std::string ProgramInfo::ToSam() const
 {
     std::ostringstream out;
@@ -78,6 +130,14 @@ std::string ProgramInfo::ToSam() const
     for (const auto& attribute : custom_)
         out << MakeSamTag(attribute.first, attribute.second);
     return out.str();
+}
+
+std::string ProgramInfo::Version() const { return version_; }
+
+ProgramInfo& ProgramInfo::Version(std::string version)
+{
+    version_ = std::move(version);
+    return *this;
 }
 
 }  // namespace BAM

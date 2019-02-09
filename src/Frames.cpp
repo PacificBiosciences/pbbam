@@ -109,6 +109,10 @@ Frames::Frames() = default;
 
 Frames::Frames(std::vector<uint16_t> frames) : data_{std::move(frames)} {}
 
+const std::vector<uint16_t>& Frames::Data() const { return data_; }
+
+std::vector<uint16_t>& Frames::DataRaw() { return data_; }
+
 Frames Frames::Decode(const std::vector<uint8_t>& codedData)
 {
     return Frames{CodeToFrames(codedData)};
@@ -118,6 +122,34 @@ std::vector<uint8_t> Frames::Encode(const std::vector<uint16_t>& frames)
 {
     return FramesToCode(frames);
 }
+
+std::vector<uint8_t> Frames::Encode() const { return Frames::Encode(data_); }
+
+Frames& Frames::Data(std::vector<uint16_t> frames)
+{
+    data_ = std::move(frames);
+    return *this;
+}
+
+std::vector<uint16_t>::const_iterator Frames::begin() const { return data_.begin(); }
+
+std::vector<uint16_t>::iterator Frames::begin() { return data_.begin(); }
+
+std::vector<uint16_t>::const_iterator Frames::cbegin() const { return data_.cbegin(); }
+
+std::vector<uint16_t>::const_iterator Frames::cend() const { return data_.cend(); }
+
+std::vector<uint16_t>::const_iterator Frames::end() const { return data_.end(); }
+
+std::vector<uint16_t>::iterator Frames::end() { return data_.end(); }
+
+bool Frames::empty() const { return data_.empty(); }
+
+size_t Frames::size() const { return data_.size(); }
+
+bool Frames::operator==(const Frames& other) const { return data_ == other.data_; }
+
+bool Frames::operator!=(const Frames& other) const { return !(*this == other); }
 
 }  // namespace BAM
 }  // namespace PacBio

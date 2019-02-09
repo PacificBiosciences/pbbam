@@ -9,8 +9,8 @@
 namespace PacBio {
 namespace BAM {
 
-inline Cigar Cigar::FromStdString(const std::string& stdString)
-{ return Cigar(stdString); }
+// inline Cigar Cigar::FromStdString(const std::string& stdString)
+// { return Cigar(stdString); }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

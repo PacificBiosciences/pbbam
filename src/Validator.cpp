@@ -320,6 +320,49 @@ static void ValidateRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>
 
 }  // anonymous
 
+bool Validator::IsValid(const BamFile& file, const bool entireFile)
+{
+    try {
+        if (entireFile)
+            ValidateEntireFile(file, 1);
+        else
+            ValidateFileMetadata(file, 1);
+        return true;
+    } catch (std::exception&) {
+        return false;
+    }
+}
+
+bool Validator::IsValid(const BamHeader& header)
+{
+    try {
+        Validate(header, 1);
+        return true;
+    } catch (std::exception&) {
+        return false;
+    }
+}
+
+bool Validator::IsValid(const BamRecord& record)
+{
+    try {
+        Validate(record, 1);
+        return true;
+    } catch (std::exception&) {
+        return false;
+    }
+}
+
+bool Validator::IsValid(const ReadGroupInfo& rg)
+{
+    try {
+        Validate(rg, 1);
+        return true;
+    } catch (std::exception&) {
+        return false;
+    }
+}
+
 void Validator::Validate(const BamHeader& header, const size_t maxErrors)
 {
     auto errors = std::make_unique<ValidationErrors>(maxErrors);
