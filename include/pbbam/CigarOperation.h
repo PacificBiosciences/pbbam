@@ -142,6 +142,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/CigarOperation.inl"
-
 #endif  // CIGAROPERATION_H

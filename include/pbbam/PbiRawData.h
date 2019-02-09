@@ -484,6 +484,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/PbiRawData.inl"
-
 #endif  // PBIRAWDATA_H

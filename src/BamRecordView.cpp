@@ -1,5 +1,5 @@
 // File Description
-/// \file BamRecordTags.h
+/// \file BamRecordView.cpp
 /// \brief Implements the BamRecordTags utility class.
 //
 // Author: Derek Barnett

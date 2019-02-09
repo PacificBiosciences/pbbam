@@ -179,6 +179,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/ProgramInfo.inl"
-
 #endif  // PROGRAMINFO_H

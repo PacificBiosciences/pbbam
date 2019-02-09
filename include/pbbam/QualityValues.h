@@ -129,6 +129,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/QualityValues.inl"
-
 #endif  // QUALITYVALUES_H

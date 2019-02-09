@@ -8,6 +8,9 @@
 
 #include "pbbam/QualityValues.h"
 
+#include <algorithm>
+#include <boost/algorithm/string.hpp>
+
 namespace PacBio {
 namespace BAM {
 

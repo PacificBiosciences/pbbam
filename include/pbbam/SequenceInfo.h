@@ -189,6 +189,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/SequenceInfo.inl"
-
 #endif  // SEQUENCEINFO_H

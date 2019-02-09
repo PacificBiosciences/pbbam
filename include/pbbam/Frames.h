@@ -142,6 +142,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/Frames.inl"
-
 #endif  // FRAMES_H

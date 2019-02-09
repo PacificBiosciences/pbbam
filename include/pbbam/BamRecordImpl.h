@@ -587,6 +587,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/BamRecordImpl.inl"
-
 #endif  // BAMRECORDIMPL_H

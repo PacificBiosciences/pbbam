@@ -7,6 +7,8 @@
 #include <cstdio>
 #include <exception>
 
+#include <boost/algorithm/string.hpp>
+
 namespace PacBio {
 namespace BAM {
 

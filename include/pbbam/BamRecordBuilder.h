@@ -240,6 +240,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/BamRecordBuilder.inl"
-
 #endif  // BAMRECORDBUILDER_H

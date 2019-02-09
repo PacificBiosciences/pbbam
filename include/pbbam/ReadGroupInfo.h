@@ -712,6 +712,4 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/ReadGroupInfo.inl"
-
 #endif  // READGROUPINFO_H

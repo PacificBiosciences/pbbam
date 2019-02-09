@@ -53,6 +53,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/Accuracy.inl"
-
 #endif  // ACCURACY_H

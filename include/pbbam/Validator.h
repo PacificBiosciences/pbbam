@@ -150,6 +150,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "internal/Validator.inl"
-
 #endif  // VALIDATOR_H

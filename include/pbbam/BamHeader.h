@@ -385,6 +385,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/BamHeader.inl"
-
 #endif  // BAMHEADER_H

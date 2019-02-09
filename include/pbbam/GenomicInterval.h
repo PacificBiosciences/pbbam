@@ -147,6 +147,4 @@ private:
 }  // namespace BAM
 }  // namspace PacBio
 
-#include "pbbam/internal/GenomicInterval.inl"
-
 #endif  // GENOMICINTERVAL_H

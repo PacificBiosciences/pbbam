@@ -69,6 +69,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "internal/FastqSequence.inl"
-
 #endif  // FASTQSEQUENCE_H

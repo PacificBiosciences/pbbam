@@ -63,6 +63,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "internal/FastaSequence.inl"
-
 #endif  // FASTASEQUENCE_H

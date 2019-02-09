@@ -72,6 +72,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/Cigar.inl"
-
 #endif  // CIGAR_H
