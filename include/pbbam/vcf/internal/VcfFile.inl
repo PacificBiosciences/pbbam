@@ -7,14 +7,14 @@
 namespace PacBio {
 namespace VCF {
 
-inline VcfFile::VcfFile(std::string fn)
-    : filename_{std::move(fn)}
-    , header_{VcfFormat::HeaderFromFile(filename_)}
-{ }
+// inline VcfFile::VcfFile(std::string fn)
+//     : filename_{std::move(fn)}
+//     , header_{VcfFormat::HeaderFromFile(filename_)}
+// { }
 
-inline const std::string& VcfFile::Filename() const { return filename_; }
+// inline const std::string& VcfFile::Filename() const { return filename_; }
 
-inline const VcfHeader& VcfFile::Header() const { return header_; }
+// inline const VcfHeader& VcfFile::Header() const { return header_; }
 
 } // namespace VCF
 } // namespace PacBio

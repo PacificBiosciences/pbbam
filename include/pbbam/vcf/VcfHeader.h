@@ -116,6 +116,4 @@ private:
 }  // namespace VCF
 }  // namespace PacBio
 
-#include "pbbam/vcf/internal/VcfHeader.inl"
-
 #endif  // PBBAM_VCF_VCFHEADER_H

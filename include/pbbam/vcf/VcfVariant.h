@@ -10,6 +10,7 @@
 #include <boost/optional.hpp>
 
 #include <pbbam/Position.h>
+#include <pbbam/vcf/VcfHeaderTypes.h>
 
 namespace PacBio {
 namespace VCF {
@@ -143,6 +144,6 @@ private:
 }  // namespace VCF
 }  // namespace PacBio
 
-#include "pbbam/vcf/internal/VcfVariant.inl"
+// #include "pbbam/vcf/internal/VcfVariant.inl"
 
 #endif  // PBBAM_VCF_VARIANT_H

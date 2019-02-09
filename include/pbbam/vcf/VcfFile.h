@@ -34,6 +34,4 @@ private:
 }  // namespace VCF
 }  // namespace PacBio
 
-#include "pbbam/vcf/internal/VcfFile.inl"
-
 #endif  // PBBAM_VCF_VCFFILE_H
