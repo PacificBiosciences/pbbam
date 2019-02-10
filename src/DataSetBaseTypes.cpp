@@ -21,6 +21,18 @@ namespace internal {
 // BaseEntityType
 // ----------------
 
+// ----------------
+// DataEntityType
+// ----------------
+
+// ----------------
+// StrictEntityType
+// ----------------
+
+// ----------------
+// BaseEntityType
+// ----------------
+
 BaseEntityType::BaseEntityType(const std::string& label, const XsdType& xsd)
     : DataSetElement(label, xsd)
 {
@@ -33,11 +45,91 @@ BaseEntityType::BaseEntityType(const std::string& label, const FromInputXml& fro
 {
 }
 
+const std::string& BaseEntityType::CreatedAt() const { return Attribute("CreatedAt"); }
+
+std::string& BaseEntityType::CreatedAt() { return Attribute("CreatedAt"); }
+
+BaseEntityType& BaseEntityType::CreatedAt(const std::string& createdAt)
+{
+    Attribute("CreatedAt", createdAt);
+    return *this;
+}
+
+const std::string& BaseEntityType::Description() const { return Attribute("Description"); }
+
+std::string& BaseEntityType::Description() { return Attribute("Description"); }
+
+BaseEntityType& BaseEntityType::Description(const std::string& description)
+{
+    Attribute("Description", description);
+    return *this;
+}
+
 DEFINE_ACCESSORS(BaseEntityType, Extensions, Extensions)
 
 BaseEntityType& BaseEntityType::Extensions(const PacBio::BAM::Extensions& extensions)
 {
     Extensions() = extensions;
+    return *this;
+}
+
+const std::string& BaseEntityType::Format() const { return Attribute("Format"); }
+
+std::string& BaseEntityType::Format() { return Attribute("Format"); }
+
+BaseEntityType& BaseEntityType::Format(const std::string& format)
+{
+    Attribute("Format", format);
+    return *this;
+}
+
+const std::string& BaseEntityType::ModifiedAt() const { return Attribute("ModifiedAt"); }
+
+std::string& BaseEntityType::ModifiedAt() { return Attribute("ModifiedAt"); }
+
+BaseEntityType& BaseEntityType::ModifiedAt(const std::string& modifiedAt)
+{
+    Attribute("ModifiedAt", modifiedAt);
+    return *this;
+}
+
+const std::string& BaseEntityType::Name() const { return Attribute("Name"); }
+
+std::string& BaseEntityType::Name() { return Attribute("Name"); }
+
+BaseEntityType& BaseEntityType::Name(const std::string& name)
+{
+    Attribute("Name", name);
+    return *this;
+}
+
+const std::string& BaseEntityType::ResourceId() const { return Attribute("ResourceId"); }
+
+std::string& BaseEntityType::ResourceId() { return Attribute("ResourceId"); }
+
+BaseEntityType& BaseEntityType::ResourceId(const std::string& resourceId)
+{
+    Attribute("ResourceId", resourceId);
+    return *this;
+}
+
+const std::string& BaseEntityType::Tags() const { return Attribute("Tags"); }
+
+std::string& BaseEntityType::Tags() { return Attribute("Tags"); }
+
+BaseEntityType& BaseEntityType::Tags(const std::string& tags)
+{
+    Attribute("Tags", tags);
+    return *this;
+}
+
+const std::string& BaseEntityType::Version() const { return Attribute("Version"); }
+
+std::string& BaseEntityType::Version() { return Attribute("Version"); }
+
+BaseEntityType& BaseEntityType::Version(const std::string& version)
+{
+    Attribute("Version", version);
     return *this;
 }
 
@@ -54,6 +146,76 @@ DataEntityType::DataEntityType(const std::string& label, const FromInputXml& fro
                                const XsdType& xsd)
     : BaseEntityType(label, fromInputXml, xsd)
 {
+}
+
+const std::string& DataEntityType::Checksum() const { return ChildText("Checksum"); }
+
+std::string& DataEntityType::Checksum() { return ChildText("Checksum"); }
+
+DataEntityType& DataEntityType::Checksum(const std::string& checksum)
+{
+    ChildText("Checksum", checksum);
+    return *this;
+}
+
+const std::string& DataEntityType::EncodedValue() const { return ChildText("EncodedValue"); }
+
+std::string& DataEntityType::EncodedValue() { return ChildText("EncodedValue"); }
+
+DataEntityType& DataEntityType::EncodedValue(const std::string& encodedValue)
+{
+    ChildText("EncodedValue", encodedValue);
+    return *this;
+}
+
+const std::string& DataEntityType::MetaType() const { return Attribute("MetaType"); }
+
+std::string& DataEntityType::MetaType() { return Attribute("MetaType"); }
+
+DataEntityType& DataEntityType::MetaType(const std::string& metatype)
+{
+    Attribute("MetaType", metatype);
+    return *this;
+}
+
+const std::string& DataEntityType::SimpleValue() const { return Attribute("SimpleValue"); }
+
+std::string& DataEntityType::SimpleValue() { return Attribute("SimpleValue"); }
+
+DataEntityType& DataEntityType::SimpleValue(const std::string& simpleValue)
+{
+    Attribute("SimpleValue", simpleValue);
+    return *this;
+}
+
+const std::string& DataEntityType::TimeStampedName() const { return Attribute("TimeStampedName"); }
+
+std::string& DataEntityType::TimeStampedName() { return Attribute("TimeStampedName"); }
+
+DataEntityType& DataEntityType::TimeStampedName(const std::string& timeStampedName)
+{
+    Attribute("TimeStampedName", timeStampedName);
+    return *this;
+}
+
+const std::string& DataEntityType::UniqueId() const { return Attribute("UniqueId"); }
+
+std::string& DataEntityType::UniqueId() { return Attribute("UniqueId"); }
+
+DataEntityType& DataEntityType::UniqueId(const std::string& uuid)
+{
+    Attribute("UniqueId", uuid);
+    return *this;
+}
+
+const std::string& DataEntityType::ValueDataType() const { return Attribute("ValueDataType"); }
+
+std::string& DataEntityType::ValueDataType() { return Attribute("ValueDataType"); }
+
+DataEntityType& DataEntityType::ValueDataType(const std::string& valueDataType)
+{
+    Attribute("ValueDataType", valueDataType);
+    return *this;
 }
 
 // -----------------
@@ -131,6 +293,39 @@ StrictEntityType::StrictEntityType(const std::string& /*metatype*/, const std::s
                                    const FromInputXml& fromInputXml, const XsdType& xsd)
     : BaseEntityType(label, fromInputXml, xsd)
 {
+}
+
+const std::string& StrictEntityType::MetaType() const { return Attribute("MetaType"); }
+
+std::string& StrictEntityType::MetaType() { return Attribute("MetaType"); }
+
+StrictEntityType& StrictEntityType::MetaType(const std::string& metatype)
+{
+    Attribute("MetaType", metatype);
+    return *this;
+}
+
+const std::string& StrictEntityType::TimeStampedName() const
+{
+    return Attribute("TimeStampedName");
+}
+
+std::string& StrictEntityType::TimeStampedName() { return Attribute("TimeStampedName"); }
+
+StrictEntityType& StrictEntityType::TimeStampedName(const std::string& timeStampedName)
+{
+    Attribute("TimeStampedName", timeStampedName);
+    return *this;
+}
+
+const std::string& StrictEntityType::UniqueId() const { return Attribute("UniqueId"); }
+
+std::string& StrictEntityType::UniqueId() { return Attribute("UniqueId"); }
+
+StrictEntityType& StrictEntityType::UniqueId(const std::string& uuid)
+{
+    Attribute("UniqueId", uuid);
+    return *this;
 }
 
 }  // namespace internal

@@ -144,6 +144,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/DataSetBaseTypes.inl"
-
 #endif  // DATASETBASETYPES_H

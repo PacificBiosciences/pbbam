@@ -97,17 +97,14 @@ if not meson.is_subproject()
       'pbbam/internal/Compare.inl',
       'pbbam/internal/CompositeBamReader.inl',
       'pbbam/internal/DataSetBaseTypes.h',
-      'pbbam/internal/DataSetBaseTypes.inl',
       'pbbam/internal/DataSetElement.h',
       'pbbam/internal/DataSetElement.inl',
-      'pbbam/internal/DataSetTypes.inl',
       'pbbam/internal/Interval.inl',
       'pbbam/internal/PbiBasicTypes.inl',
       'pbbam/internal/PbiFilter.inl',
       'pbbam/internal/PbiFilterTypes.inl',
       'pbbam/internal/QueryBase.h',
-      'pbbam/internal/QueryBase.inl',
-      'pbbam/internal/Tag.inl']),
+      'pbbam/internal/QueryBase.inl']),
     subdir : 'pbbam/internal')
 
   install_headers(

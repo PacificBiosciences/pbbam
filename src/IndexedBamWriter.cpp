@@ -22,6 +22,7 @@
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"

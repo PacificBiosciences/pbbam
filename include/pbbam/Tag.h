@@ -413,6 +413,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/Tag.inl"
-
 #endif  // TAG_H
