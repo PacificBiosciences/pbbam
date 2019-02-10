@@ -25,10 +25,10 @@ public:
 
     VcfReader() = delete;
     VcfReader(const VcfReader&) = delete;
-    VcfReader(VcfReader&&) = default;
+    VcfReader(VcfReader&&);
     VcfReader& operator=(const VcfReader&) = delete;
-    VcfReader& operator=(VcfReader&&) = default;
-    ~VcfReader() = default;
+    VcfReader& operator=(VcfReader&&);
+    ~VcfReader();
 
 public:
     const VcfHeader& Header() const;

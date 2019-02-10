@@ -23,10 +23,7 @@ void SortFile(const VcfFile& file, const std::string& outputFilename);
 /// \param inputFilename
 /// \param outputFilename
 ///
-inline void SortFile(const std::string& inputFilename, const std::string& outputFilename)
-{
-    SortFile(VcfFile{inputFilename}, outputFilename);
-}
+void SortFile(const std::string& inputFilename, const std::string& outputFilename);
 
 }  // namespace VCF
 }  // namespace PacBio

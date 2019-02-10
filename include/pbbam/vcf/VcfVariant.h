@@ -43,11 +43,11 @@ public:
     VcfVariant(std::string id, std::string chrom, PacBio::BAM::Position pos, std::string refAllele,
                std::string altAllele);
 
-    VcfVariant(const VcfVariant&) = default;
-    VcfVariant(VcfVariant&&) = default;
-    VcfVariant& operator=(const VcfVariant&) = default;
-    VcfVariant& operator=(VcfVariant&&) = default;
-    ~VcfVariant() = default;
+    VcfVariant(const VcfVariant&);
+    VcfVariant(VcfVariant&&);
+    VcfVariant& operator=(const VcfVariant&);
+    VcfVariant& operator=(VcfVariant&&);
+    ~VcfVariant();
 
 public:
     // core fields

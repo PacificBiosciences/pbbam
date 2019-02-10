@@ -22,11 +22,11 @@ public:
 
     explicit VcfHeader(const std::string& hdrText);
 
-    VcfHeader(const VcfHeader&) = default;
-    VcfHeader(VcfHeader&&) = default;
-    VcfHeader& operator=(const VcfHeader&) = default;
-    VcfHeader& operator=(VcfHeader&&) = default;
-    ~VcfHeader() = default;
+    VcfHeader(const VcfHeader&);
+    VcfHeader(VcfHeader&&);
+    VcfHeader& operator=(const VcfHeader&);
+    VcfHeader& operator=(VcfHeader&&);
+    ~VcfHeader();
 
 public:
     // general lines

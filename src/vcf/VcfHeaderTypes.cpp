@@ -20,6 +20,16 @@ ContigDefinition::ContigDefinition(std::string id,
         throw std::runtime_error{"VCF format error: ##contig definition has empty ID field"};
 }
 
+ContigDefinition::ContigDefinition(const ContigDefinition&) = default;
+
+ContigDefinition::ContigDefinition(ContigDefinition&&) = default;
+
+ContigDefinition& ContigDefinition::operator=(const ContigDefinition&) = default;
+
+ContigDefinition& ContigDefinition::operator=(ContigDefinition&&) = default;
+
+ContigDefinition::~ContigDefinition() = default;
+
 ContigDefinition& ContigDefinition::AddAttribute(std::string id, std::string value)
 {
     return AddAttribute(std::make_pair(std::move(id), std::move(value)));
@@ -59,6 +69,16 @@ FilterDefinition::FilterDefinition(std::string id, std::string description)
         throw std::runtime_error{"VCF format error: FILTER definition has empty Description field"};
 }
 
+FilterDefinition::FilterDefinition(const FilterDefinition&) = default;
+
+FilterDefinition::FilterDefinition(FilterDefinition&&) = default;
+
+FilterDefinition& FilterDefinition::operator=(const FilterDefinition&) = default;
+
+FilterDefinition& FilterDefinition::operator=(FilterDefinition&&) = default;
+
+FilterDefinition::~FilterDefinition() = default;
+
 const std::string& FilterDefinition::Description() const { return description_; }
 
 const std::string& FilterDefinition::Id() const { return id_; }
@@ -87,6 +107,16 @@ FormatDefinition::FormatDefinition(std::string id, std::string number, std::stri
         throw std::runtime_error{"VCF format error: FORMAT definition has empty Description field"};
 }
 
+FormatDefinition::FormatDefinition(const FormatDefinition&) = default;
+
+FormatDefinition::FormatDefinition(FormatDefinition&&) = default;
+
+FormatDefinition& FormatDefinition::operator=(const FormatDefinition&) = default;
+
+FormatDefinition& FormatDefinition::operator=(FormatDefinition&&) = default;
+
+FormatDefinition::~FormatDefinition() = default;
+
 const std::string& FormatDefinition::Description() const { return description_; }
 
 const std::string& FormatDefinition::Id() const { return id_; }
@@ -108,6 +138,16 @@ GeneralDefinition::GeneralDefinition(std::string id, std::string text)
     if (text_.empty())
         throw std::runtime_error{"VCF format error: general metadata definition has empty value"};
 }
+
+GeneralDefinition::GeneralDefinition(const GeneralDefinition&) = default;
+
+GeneralDefinition::GeneralDefinition(GeneralDefinition&&) = default;
+
+GeneralDefinition& GeneralDefinition::operator=(const GeneralDefinition&) = default;
+
+GeneralDefinition& GeneralDefinition::operator=(GeneralDefinition&&) = default;
+
+GeneralDefinition::~GeneralDefinition() = default;
 
 const std::string& GeneralDefinition::Id() const { return id_; }
 
@@ -140,6 +180,16 @@ InfoDefinition::InfoDefinition(std::string id, std::string number, std::string t
     if (!source.empty()) source_ = std::move(source);
     if (!version.empty()) version_ = std::move(version);
 }
+
+InfoDefinition::InfoDefinition(const InfoDefinition&) = default;
+
+InfoDefinition::InfoDefinition(InfoDefinition&&) = default;
+
+InfoDefinition& InfoDefinition::operator=(const InfoDefinition&) = default;
+
+InfoDefinition& InfoDefinition::operator=(InfoDefinition&&) = default;
+
+InfoDefinition::~InfoDefinition() = default;
 
 const std::string& InfoDefinition::Description() const { return description_; }
 

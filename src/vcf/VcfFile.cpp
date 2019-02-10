@@ -12,6 +12,16 @@ VcfFile::VcfFile(std::string fn)
 {
 }
 
+VcfFile::VcfFile(const VcfFile&) = default;
+
+VcfFile::VcfFile(VcfFile&&) = default;
+
+VcfFile& VcfFile::operator=(const VcfFile&) = default;
+
+VcfFile& VcfFile::operator=(VcfFile&&) = default;
+
+VcfFile::~VcfFile() = default;
+
 const std::string& VcfFile::Filename() const { return filename_; }
 
 const VcfHeader& VcfFile::Header() const { return header_; }

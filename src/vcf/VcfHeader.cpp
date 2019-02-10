@@ -11,6 +11,16 @@ VcfHeader::VcfHeader() { Version(VcfFormat::CurrentVersion()); }
 
 VcfHeader::VcfHeader(const std::string& hdrText) { *this = VcfFormat::ParsedHeader(hdrText); }
 
+VcfHeader::VcfHeader(const VcfHeader&) = default;
+
+VcfHeader::VcfHeader(VcfHeader&&) = default;
+
+VcfHeader& VcfHeader::operator=(const VcfHeader&) = default;
+
+VcfHeader& VcfHeader::operator=(VcfHeader&&) = default;
+
+VcfHeader::~VcfHeader() = default;
+
 VcfHeader& VcfHeader::AddContigDefinition(PacBio::VCF::ContigDefinition contig)
 {
     const auto found = contigLookup_.find(contig.Id());
