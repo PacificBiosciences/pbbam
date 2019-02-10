@@ -84,6 +84,10 @@ SamWriter::SamWriter(std::string filename, const BamHeader& header)
 #endif
 }
 
+SamWriter::SamWriter(SamWriter&&) = default;
+
+SamWriter& SamWriter::operator=(SamWriter&&) = default;
+
 SamWriter::~SamWriter() = default;
 
 void SamWriter::TryFlush()

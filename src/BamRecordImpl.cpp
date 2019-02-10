@@ -113,6 +113,8 @@ BamRecordImpl& BamRecordImpl::operator=(BamRecordImpl&& other)
     return *this;
 }
 
+BamRecordImpl::~BamRecordImpl() = default;
+
 bool BamRecordImpl::AddTag(const std::string& tagName, const Tag& value)
 {
     return AddTag(tagName, value, TagModifier::NONE);

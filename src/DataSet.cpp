@@ -141,6 +141,8 @@ DataSet::DataSet(const DataSet& other) : path_(other.path_)
     d_ = DataSetIO::FromXmlString(xml);
 }
 
+DataSet::DataSet(DataSet&&) = default;
+
 DataSet& DataSet::operator=(const DataSet& other)
 {
     if (this != &other) {
@@ -152,6 +154,10 @@ DataSet& DataSet::operator=(const DataSet& other)
     }
     return *this;
 }
+
+DataSet& DataSet::operator=(DataSet&&) = default;
+
+DataSet::~DataSet() = default;
 
 DataSet& DataSet::operator+=(const DataSet& other)
 {

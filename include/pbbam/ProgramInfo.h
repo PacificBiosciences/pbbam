@@ -49,12 +49,12 @@ public:
     ///
     ProgramInfo(std::string id);
 
-    ProgramInfo() = default;
-    ProgramInfo(const ProgramInfo&) = default;
-    ProgramInfo(ProgramInfo&&) = default;
-    ProgramInfo& operator=(const ProgramInfo&) = default;
-    ProgramInfo& operator=(ProgramInfo&&) = default;
-    ~ProgramInfo() = default;
+    ProgramInfo();
+    ProgramInfo(const ProgramInfo&);
+    ProgramInfo(ProgramInfo&&);
+    ProgramInfo& operator=(const ProgramInfo&);
+    ProgramInfo& operator=(ProgramInfo&&);
+    ~ProgramInfo();
 
     /// \}
 

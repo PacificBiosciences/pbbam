@@ -70,15 +70,15 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    CigarOperation() = default;
+    CigarOperation();
     CigarOperation(char c, uint32_t length);
     CigarOperation(CigarOperationType op, uint32_t length);
 
-    CigarOperation(const CigarOperation&) = default;
-    CigarOperation(CigarOperation&&) = default;
-    CigarOperation& operator=(const CigarOperation&) = default;
-    CigarOperation& operator=(CigarOperation&&) = default;
-    ~CigarOperation() = default;
+    CigarOperation(const CigarOperation&);
+    CigarOperation(CigarOperation&&);
+    CigarOperation& operator=(const CigarOperation&);
+    CigarOperation& operator=(CigarOperation&&);
+    ~CigarOperation();
 
     /// \}
 

@@ -46,6 +46,16 @@ BamRecordBuilder::BamRecordBuilder(const BamRecord& prototype) : header_{prototy
     Reset(prototype);
 }
 
+BamRecordBuilder::BamRecordBuilder(const BamRecordBuilder&) = default;
+
+BamRecordBuilder::BamRecordBuilder(BamRecordBuilder&&) = default;
+
+BamRecordBuilder& BamRecordBuilder::operator=(const BamRecordBuilder&) = default;
+
+BamRecordBuilder& BamRecordBuilder::operator=(BamRecordBuilder&&) = default;
+
+BamRecordBuilder::~BamRecordBuilder() = default;
+
 BamRecordBuilder& BamRecordBuilder::Bin(const uint32_t bin)
 {
     core_.bin = bin;

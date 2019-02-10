@@ -116,11 +116,11 @@ public:
     ///
     DataSet(const std::vector<std::string>& filenames);
 
-    DataSet(const DataSet& other);
-    DataSet(DataSet&&) = default;
-    DataSet& operator=(const DataSet& other);
-    DataSet& operator=(DataSet&&) = default;
-    ~DataSet() = default;
+    DataSet(const DataSet&);
+    DataSet(DataSet&&);
+    DataSet& operator=(const DataSet&);
+    DataSet& operator=(DataSet&&);
+    ~DataSet();
 
     /// \brief Creates a DataSet from "raw" XML data.
     ///

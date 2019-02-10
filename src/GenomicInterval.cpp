@@ -63,6 +63,18 @@ GenomicInterval::GenomicInterval(const std::string& samtoolsRegionString)
     interval_ = PacBio::BAM::Interval<Position>(begin, end);
 }
 
+GenomicInterval::GenomicInterval() = default;
+
+GenomicInterval::GenomicInterval(const GenomicInterval&) = default;
+
+GenomicInterval::GenomicInterval(GenomicInterval&&) = default;
+
+GenomicInterval& GenomicInterval::operator=(const GenomicInterval&) = default;
+
+GenomicInterval& GenomicInterval::operator=(GenomicInterval&&) = default;
+
+GenomicInterval::~GenomicInterval() = default;
+
 bool GenomicInterval::operator==(const GenomicInterval& other) const
 {
     return name_ == other.name_ && interval_ == other.interval_;

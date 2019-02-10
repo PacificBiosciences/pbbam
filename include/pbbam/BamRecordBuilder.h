@@ -47,11 +47,11 @@ public:
     ///
     BamRecordBuilder(const BamRecord& prototype);
 
-    BamRecordBuilder(const BamRecordBuilder&) = default;
-    BamRecordBuilder(BamRecordBuilder&&) = default;
-    BamRecordBuilder& operator=(const BamRecordBuilder&) = default;
-    BamRecordBuilder& operator=(BamRecordBuilder&&) = default;
-    ~BamRecordBuilder() = default;
+    BamRecordBuilder(const BamRecordBuilder&);
+    BamRecordBuilder(BamRecordBuilder&&);
+    BamRecordBuilder& operator=(const BamRecordBuilder&);
+    BamRecordBuilder& operator=(BamRecordBuilder&&);
+    ~BamRecordBuilder();
 
     /// \}
 

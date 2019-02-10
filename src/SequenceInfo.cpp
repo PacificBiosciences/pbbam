@@ -33,6 +33,18 @@ SequenceInfo::SequenceInfo(std::string name, std::string length)
 {
 }
 
+SequenceInfo::SequenceInfo() = default;
+
+SequenceInfo::SequenceInfo(const SequenceInfo&) = default;
+
+SequenceInfo::SequenceInfo(SequenceInfo&&) = default;
+
+SequenceInfo& SequenceInfo::operator=(const SequenceInfo&) = default;
+
+SequenceInfo& SequenceInfo::operator=(SequenceInfo&&) = default;
+
+SequenceInfo::~SequenceInfo() = default;
+
 bool SequenceInfo::operator==(const SequenceInfo& other) const
 {
     return assemblyId_ == other.assemblyId_ && checksum_ == other.checksum_ &&

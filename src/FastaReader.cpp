@@ -60,6 +60,10 @@ private:
 
 FastaReader::FastaReader(const std::string& fn) : d_{std::make_unique<FastaReaderPrivate>(fn)} {}
 
+FastaReader::FastaReader(FastaReader&&) = default;
+
+FastaReader& FastaReader::operator=(FastaReader&&) = default;
+
 FastaReader::~FastaReader() = default;
 
 bool FastaReader::GetNext(FastaSequence& record) { return d_->GetNext(record); }

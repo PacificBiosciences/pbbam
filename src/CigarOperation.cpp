@@ -15,6 +15,8 @@ namespace BAM {
 
 bool CigarOperation::validate_ = true;
 
+CigarOperation::CigarOperation() = default;
+
 CigarOperation::CigarOperation(char c, uint32_t length)
     : type_{CigarOperation::CharToType(c)}, length_{length}
 {
@@ -33,6 +35,16 @@ CigarOperation::CigarOperation(CigarOperationType op, uint32_t length) : type_{o
             "CIGAR operation 'M' is not allowed in PacBio BAM files. Use 'X/=' instead."};
 #endif
 }
+
+CigarOperation::CigarOperation(const CigarOperation&) = default;
+
+CigarOperation::CigarOperation(CigarOperation&&) = default;
+
+CigarOperation& CigarOperation::operator=(const CigarOperation&) = default;
+
+CigarOperation& CigarOperation::operator=(CigarOperation&&) = default;
+
+CigarOperation::~CigarOperation() = default;
 
 bool CigarOperation::operator==(const CigarOperation& other) const
 {

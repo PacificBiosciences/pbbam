@@ -159,13 +159,13 @@ public:
     BamWriter(const std::string& filename, const BamHeader& header,
               const BamWriter::Config& config);
 
+    BamWriter(const BamWriter&) = delete;
+    BamWriter(BamWriter&&);
+    BamWriter& operator=(const BamWriter&) = delete;
+    BamWriter& operator=(BamWriter&&);
+
     /// Fully flushes all buffered data & closes file.
     ~BamWriter() override;
-
-    BamWriter(const BamWriter&) = delete;
-    BamWriter& operator=(const BamWriter&) = delete;
-    BamWriter(BamWriter&&) = default;
-    BamWriter& operator=(BamWriter&&) = default;
 
     /// \}
 

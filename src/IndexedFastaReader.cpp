@@ -86,6 +86,8 @@ IndexedFastaReader::IndexedFastaReader(const IndexedFastaReader& src)
     if (!Open(src.filename_)) throw std::runtime_error{"Cannot open file " + src.filename_};
 }
 
+IndexedFastaReader::IndexedFastaReader(IndexedFastaReader&&) = default;
+
 IndexedFastaReader& IndexedFastaReader::operator=(const IndexedFastaReader& rhs)
 {
     if (&rhs == this) return *this;
@@ -93,6 +95,8 @@ IndexedFastaReader& IndexedFastaReader::operator=(const IndexedFastaReader& rhs)
     Open(rhs.filename_);
     return *this;
 }
+
+IndexedFastaReader& IndexedFastaReader::operator=(IndexedFastaReader&&) = default;
 
 IndexedFastaReader::~IndexedFastaReader() { Close(); }
 

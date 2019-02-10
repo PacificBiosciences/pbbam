@@ -115,7 +115,15 @@ public:
 
 BamHeader::BamHeader() : d_{std::make_shared<BamHeaderPrivate>()} {}
 
-BamHeader BamHeader::operator+(const BamHeader& other) const { return DeepCopy() += other; }
+BamHeader::BamHeader(const BamHeader&) = default;
+
+BamHeader::BamHeader(BamHeader&&) = default;
+
+BamHeader& BamHeader::operator=(const BamHeader&) = default;
+
+BamHeader& BamHeader::operator=(BamHeader&&) = default;
+
+BamHeader::~BamHeader() = default;
 
 BamHeader::BamHeader(const std::string& samHeaderText) : d_{std::make_shared<BamHeaderPrivate>()}
 {
@@ -169,6 +177,8 @@ BamHeader& BamHeader::operator+=(const BamHeader& other)
 
     return *this;
 }
+
+BamHeader BamHeader::operator+(const BamHeader& other) const { return DeepCopy() += other; }
 
 BamHeader& BamHeader::AddComment(std::string comment)
 {

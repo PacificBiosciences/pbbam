@@ -46,6 +46,18 @@ QualityValues::QualityValues(const QualityValues::const_iterator first,
     assign(first, last);
 }
 
+QualityValues::QualityValues() = default;
+
+QualityValues::QualityValues(const QualityValues&) = default;
+
+QualityValues::QualityValues(QualityValues&&) = default;
+
+QualityValues& QualityValues::operator=(const QualityValues&) = default;
+
+QualityValues& QualityValues::operator=(QualityValues&&) = default;
+
+QualityValues::~QualityValues() = default;
+
 QualityValues& QualityValues::operator=(std::vector<QualityValue> quals)
 {
     std::vector<QualityValue>::operator=(std::move(quals));

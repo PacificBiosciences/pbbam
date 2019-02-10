@@ -28,6 +28,18 @@ const std::string ProgramInfoTokenVN{"VN"};
 
 ProgramInfo::ProgramInfo(std::string id) : id_{std::move(id)} {}
 
+ProgramInfo::ProgramInfo() = default;
+
+ProgramInfo::ProgramInfo(const ProgramInfo&) = default;
+
+ProgramInfo::ProgramInfo(ProgramInfo&&) = default;
+
+ProgramInfo& ProgramInfo::operator=(const ProgramInfo&) = default;
+
+ProgramInfo& ProgramInfo::operator=(ProgramInfo&&) = default;
+
+ProgramInfo::~ProgramInfo() = default;
+
 std::string ProgramInfo::CommandLine() const { return commandLine_; }
 
 ProgramInfo& ProgramInfo::CommandLine(std::string cmd)

@@ -65,7 +65,7 @@ public:
     BamRecordImpl(BamRecordImpl&& other);
     BamRecordImpl& operator=(const BamRecordImpl& other);
     BamRecordImpl& operator=(BamRecordImpl&& other);
-    virtual ~BamRecordImpl() = default;
+    virtual ~BamRecordImpl();
 
     /// \}
 

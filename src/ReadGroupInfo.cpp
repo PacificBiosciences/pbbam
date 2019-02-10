@@ -315,6 +315,16 @@ ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
     platformModel_ = std::move(platform);
 }
 
+ReadGroupInfo::ReadGroupInfo(const ReadGroupInfo&) = default;
+
+ReadGroupInfo::ReadGroupInfo(ReadGroupInfo&&) = default;
+
+ReadGroupInfo& ReadGroupInfo::operator=(const ReadGroupInfo&) = default;
+
+ReadGroupInfo& ReadGroupInfo::operator=(ReadGroupInfo&&) = default;
+
+ReadGroupInfo::~ReadGroupInfo() = default;
+
 bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
 {
     const auto lhsFields = std::tie(

@@ -19,6 +19,18 @@ FastaSequence::FastaSequence(std::string name, std::string bases)
     boost::algorithm::trim(bases_);
 }
 
+FastaSequence::FastaSequence() = default;
+
+FastaSequence::FastaSequence(const FastaSequence&) = default;
+
+FastaSequence::FastaSequence(FastaSequence&&) = default;
+
+FastaSequence& FastaSequence::operator=(const FastaSequence&) = default;
+
+FastaSequence& FastaSequence::operator=(FastaSequence&&) = default;
+
+FastaSequence::~FastaSequence() = default;
+
 const std::string& FastaSequence::Bases() const { return bases_; }
 
 const std::string& FastaSequence::Name() const { return name_; }

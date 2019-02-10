@@ -55,9 +55,9 @@ public:
     ~SamWriter() override;
 
     SamWriter(const SamWriter&) = delete;
-    SamWriter(SamWriter&&) = default;
+    SamWriter(SamWriter&&);
     SamWriter& operator=(const SamWriter&) = delete;
-    SamWriter& operator=(SamWriter&&) = default;
+    SamWriter& operator=(SamWriter&&);
 
     /// \brief Try to flush any buffered data to file.
     ///

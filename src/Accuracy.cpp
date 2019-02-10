@@ -23,6 +23,16 @@ Accuracy::Accuracy(float accuracy)
     accuracy_ = accuracy;
 }
 
+Accuracy::Accuracy(const Accuracy&) = default;
+
+Accuracy::Accuracy(Accuracy&&) = default;
+
+Accuracy& Accuracy::operator=(const Accuracy&) = default;
+
+Accuracy& Accuracy::operator=(Accuracy&&) = default;
+
+Accuracy::~Accuracy() = default;
+
 Accuracy::operator float() const { return accuracy_; }
 
 }  // namespace BAM

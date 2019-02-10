@@ -14,6 +14,11 @@
 namespace PacBio {
 namespace BAM {
 
+bool IsCcsOrTranscript(const RecordType type)
+{
+    return type == RecordType::CCS || type == RecordType::TRANSCRIPT;
+}
+
 std::string ToString(const RecordType type)
 {
     // clang-format off

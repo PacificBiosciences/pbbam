@@ -21,6 +21,16 @@ QualityValue::QualityValue(const uint8_t value) : value_{value}
     if (value_ > QualityValue::MAX) value_ = QualityValue::MAX;
 }
 
+QualityValue::QualityValue(const QualityValue&) = default;
+
+QualityValue::QualityValue(QualityValue&&) = default;
+
+QualityValue& QualityValue::operator=(const QualityValue&) = default;
+
+QualityValue& QualityValue::operator=(QualityValue&&) = default;
+
+QualityValue::~QualityValue() = default;
+
 char QualityValue::Fastq() const { return static_cast<char>(value_ + 33); }
 
 QualityValue::operator uint8_t() const { return value_; }

@@ -21,6 +21,18 @@ FastqSequence::FastqSequence(std::string name, std::string bases, std::string qu
 {
 }
 
+FastqSequence::FastqSequence() = default;
+
+FastqSequence::FastqSequence(const FastqSequence&) = default;
+
+FastqSequence::FastqSequence(FastqSequence&&) = default;
+
+FastqSequence& FastqSequence::operator=(const FastqSequence&) = default;
+
+FastqSequence& FastqSequence::operator=(FastqSequence&&) = default;
+
+FastqSequence::~FastqSequence() = default;
+
 const QualityValues& FastqSequence::Qualities() const { return qualities_; }
 
 }  // namespace BAM
