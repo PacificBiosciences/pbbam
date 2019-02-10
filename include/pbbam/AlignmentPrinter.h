@@ -41,10 +41,10 @@ public:
 
     AlignmentPrinter() = delete;
     AlignmentPrinter(const AlignmentPrinter&) = delete;
-    AlignmentPrinter(AlignmentPrinter&&) = default;
+    AlignmentPrinter(AlignmentPrinter&&);
     AlignmentPrinter& operator=(const AlignmentPrinter&) = delete;
-    AlignmentPrinter& operator=(AlignmentPrinter&&) = default;
-    ~AlignmentPrinter() = default;
+    AlignmentPrinter& operator=(AlignmentPrinter&&);
+    ~AlignmentPrinter();
 
     /// \}
 

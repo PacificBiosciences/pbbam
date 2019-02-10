@@ -25,6 +25,12 @@ AlignmentPrinter::AlignmentPrinter(const IndexedFastaReader& ifr)
 {
 }
 
+AlignmentPrinter::AlignmentPrinter(AlignmentPrinter&&) = default;
+
+AlignmentPrinter& AlignmentPrinter::operator=(AlignmentPrinter&&) = default;
+
+AlignmentPrinter::~AlignmentPrinter() = default;
+
 std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation orientation)
 {
     const std::string seq{record.Sequence(orientation, true, true)};

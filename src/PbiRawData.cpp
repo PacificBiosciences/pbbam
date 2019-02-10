@@ -35,6 +35,18 @@ PbiRawBarcodeData::PbiRawBarcodeData(uint32_t numReads)
     bcQual_.reserve(numReads);
 }
 
+PbiRawBarcodeData::PbiRawBarcodeData() = default;
+
+PbiRawBarcodeData::PbiRawBarcodeData(const PbiRawBarcodeData&) = default;
+
+PbiRawBarcodeData::PbiRawBarcodeData(PbiRawBarcodeData&&) = default;
+
+PbiRawBarcodeData& PbiRawBarcodeData::operator=(const PbiRawBarcodeData&) = default;
+
+PbiRawBarcodeData& PbiRawBarcodeData::operator=(PbiRawBarcodeData&&) = default;
+
+PbiRawBarcodeData::~PbiRawBarcodeData() = default;
+
 void PbiRawBarcodeData::AddRecord(const BamRecord& b)
 {
     // check for any barcode data (both required)
@@ -78,6 +90,18 @@ PbiRawMappedData::PbiRawMappedData(uint32_t numReads)
     nMM_.reserve(numReads);
     mapQV_.reserve(numReads);
 }
+
+PbiRawMappedData::PbiRawMappedData() = default;
+
+PbiRawMappedData::PbiRawMappedData(const PbiRawMappedData&) = default;
+
+PbiRawMappedData::PbiRawMappedData(PbiRawMappedData&&) = default;
+
+PbiRawMappedData& PbiRawMappedData::operator=(const PbiRawMappedData&) = default;
+
+PbiRawMappedData& PbiRawMappedData::operator=(PbiRawMappedData&&) = default;
+
+PbiRawMappedData::~PbiRawMappedData() = default;
 
 void PbiRawMappedData::AddRecord(const BamRecord& b)
 {
@@ -135,11 +159,33 @@ PbiReferenceEntry::PbiReferenceEntry(ID id, Row beginRow, Row endRow)
 {
 }
 
+PbiReferenceEntry::PbiReferenceEntry(const PbiReferenceEntry&) = default;
+
+PbiReferenceEntry::PbiReferenceEntry(PbiReferenceEntry&&) = default;
+
+PbiReferenceEntry& PbiReferenceEntry::operator=(const PbiReferenceEntry&) = default;
+
+PbiReferenceEntry& PbiReferenceEntry::operator=(PbiReferenceEntry&&) = default;
+
+PbiReferenceEntry::~PbiReferenceEntry() = default;
+
 // ------------------------------------
 // PbiRawReferenceData implementation
 // ------------------------------------
 
 PbiRawReferenceData::PbiRawReferenceData(uint32_t numRefs) { entries_.reserve(numRefs); }
+
+PbiRawReferenceData::PbiRawReferenceData() = default;
+
+PbiRawReferenceData::PbiRawReferenceData(const PbiRawReferenceData&) = default;
+
+PbiRawReferenceData::PbiRawReferenceData(PbiRawReferenceData&&) = default;
+
+PbiRawReferenceData& PbiRawReferenceData::operator=(const PbiRawReferenceData&) = default;
+
+PbiRawReferenceData& PbiRawReferenceData::operator=(PbiRawReferenceData&&) = default;
+
+PbiRawReferenceData::~PbiRawReferenceData() = default;
 
 // ----------------------------------
 // PbiRawBasicData implementation
@@ -156,6 +202,18 @@ PbiRawBasicData::PbiRawBasicData(uint32_t numReads)
     fileOffset_.reserve(numReads);
     fileNumber_.reserve(numReads);
 }
+
+PbiRawBasicData::PbiRawBasicData() = default;
+
+PbiRawBasicData::PbiRawBasicData(const PbiRawBasicData&) = default;
+
+PbiRawBasicData::PbiRawBasicData(PbiRawBasicData&&) = default;
+
+PbiRawBasicData& PbiRawBasicData::operator=(const PbiRawBasicData&) = default;
+
+PbiRawBasicData& PbiRawBasicData::operator=(PbiRawBasicData&&) = default;
+
+PbiRawBasicData::~PbiRawBasicData() = default;
 
 void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
 {
@@ -203,6 +261,18 @@ PbiRawData::PbiRawData(const DataSet& dataset)
 {
     *this = PbiIndexIO::LoadFromDataSet(dataset);
 }
+
+PbiRawData::PbiRawData() = default;
+
+PbiRawData::PbiRawData(const PbiRawData&) = default;
+
+PbiRawData::PbiRawData(PbiRawData&&) = default;
+
+PbiRawData& PbiRawData::operator=(const PbiRawData&) = default;
+
+PbiRawData& PbiRawData::operator=(PbiRawData&&) = default;
+
+PbiRawData::~PbiRawData() = default;
 
 const PbiRawBarcodeData& PbiRawData::BarcodeData() const { return barcodeData_; }
 

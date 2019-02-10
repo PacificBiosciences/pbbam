@@ -90,8 +90,6 @@ public:
     ///
     struct Config
     {
-        Config() = default;
-
         // zlib compression level
         CompressionLevel compressionLevel = DefaultCompression;
 
