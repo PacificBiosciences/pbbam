@@ -78,6 +78,7 @@ pbbam_cpp_sources = files([
   'VirtualZmwBamRecord.cpp',
   'VirtualZmwCompositeReader.cpp',
   'VirtualZmwReader.cpp',
+  'VirtualRegion.cpp',
   'VirtualRegionTypeMap.cpp',
   'XmlReader.cpp',
   'XmlWriter.cpp',

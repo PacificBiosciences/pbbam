@@ -40,6 +40,16 @@ VirtualZmwBamRecord::VirtualZmwBamRecord(std::vector<BamRecord> unorderedSources
     StitchSources();
 }
 
+VirtualZmwBamRecord::VirtualZmwBamRecord(const VirtualZmwBamRecord&) = default;
+
+VirtualZmwBamRecord::VirtualZmwBamRecord(VirtualZmwBamRecord&&) = default;
+
+VirtualZmwBamRecord& VirtualZmwBamRecord::operator=(const VirtualZmwBamRecord&) = default;
+
+VirtualZmwBamRecord& VirtualZmwBamRecord::operator=(VirtualZmwBamRecord&&) = default;
+
+VirtualZmwBamRecord::~VirtualZmwBamRecord() = default;
+
 bool VirtualZmwBamRecord::HasVirtualRegionType(const VirtualRegionType regionType) const
 {
     return virtualRegionsMap_.find(regionType) != virtualRegionsMap_.end();
