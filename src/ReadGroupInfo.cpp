@@ -100,7 +100,7 @@ static const std::string platformModelType_SEQUEL{"SEQUEL"};
 static const std::string platformModelType_SEQUELII{"SEQUELII"};
 
 // clang-format off
-static std::string BaseFeatureName(const BaseFeature& feature)
+std::string BaseFeatureName(const BaseFeature& feature)
 {
     static const std::unordered_map<BaseFeature, std::string, EnumClassHash> lookup{
         {BaseFeature::DELETION_QV,      feature_DQ},
@@ -132,7 +132,7 @@ static std::string BaseFeatureName(const BaseFeature& feature)
     throw std::runtime_error{ "unrecognized base feature" };
 }
 
-static std::string FrameCodecName(const FrameCodec& codec)
+std::string FrameCodecName(const FrameCodec& codec)
 {
     static const std::unordered_map<FrameCodec, std::string, EnumClassHash> lookup{
         {FrameCodec::RAW, codec_RAW},
@@ -145,7 +145,7 @@ static std::string FrameCodecName(const FrameCodec& codec)
     throw std::runtime_error{ "unrecognized frame codec" };
 }
 
-static std::string BarcodeModeName(const BarcodeModeType& mode)
+std::string BarcodeModeName(const BarcodeModeType& mode)
 {
     static const std::unordered_map<BarcodeModeType, std::string, EnumClassHash> lookup{
         {BarcodeModeType::NONE,       barcodemode_NONE},
@@ -160,7 +160,7 @@ static std::string BarcodeModeName(const BarcodeModeType& mode)
     throw std::runtime_error{ "unrecognized barcode mode type" };
 }
 
-static std::string BarcodeQualityName(const BarcodeQualityType& type)
+std::string BarcodeQualityName(const BarcodeQualityType& type)
 {
     static const std::unordered_map<BarcodeQualityType, std::string, EnumClassHash> lookup{
         {BarcodeQualityType::NONE,        barcodequal_NONE},
@@ -174,7 +174,7 @@ static std::string BarcodeQualityName(const BarcodeQualityType& type)
     throw std::runtime_error{ "unrecognized barcode quality type" };
 }
 
-static std::string PlatformModelName(const PlatformModelType& type)
+std::string PlatformModelName(const PlatformModelType& type)
 {
     static const std::unordered_map<PlatformModelType, std::string, EnumClassHash> lookup{
         {PlatformModelType::ASTRO,    platformModelType_ASTRO},
@@ -244,31 +244,25 @@ static const std::map<std::string, PlatformModelType> nameToPlatformModel
 };
 // clang-format on
 
-static bool IsLikelyBarcodeKey(const std::string& name) { return name.find("Barcode") == 0; }
+bool IsLikelyBarcodeKey(const std::string& name) { return name.find("Barcode") == 0; }
 
-static bool IsBaseFeature(const std::string& name)
+bool IsBaseFeature(const std::string& name)
 {
     return nameToFeature.find(name) != nameToFeature.cend();
 }
 
-static BaseFeature BaseFeatureFromName(const std::string& name) { return nameToFeature.at(name); }
+BaseFeature BaseFeatureFromName(const std::string& name) { return nameToFeature.at(name); }
 
-static FrameCodec FrameCodecFromName(const std::string& name) { return nameToCodec.at(name); }
+FrameCodec FrameCodecFromName(const std::string& name) { return nameToCodec.at(name); }
 
-static BarcodeModeType BarcodeModeFromName(const std::string& name)
-{
-    return nameToBarcodeMode.at(name);
-}
+BarcodeModeType BarcodeModeFromName(const std::string& name) { return nameToBarcodeMode.at(name); }
 
-static BarcodeQualityType BarcodeQualityFromName(const std::string& name)
+BarcodeQualityType BarcodeQualityFromName(const std::string& name)
 {
     return nameToBarcodeQuality.at(name);
 }
 
-static PlatformModelType PlatformModelFromName(std::string name)
-{
-    return nameToPlatformModel.at(name);
-}
+PlatformModelType PlatformModelFromName(std::string name) { return nameToPlatformModel.at(name); }
 
 }  // anonymous
 

@@ -110,7 +110,8 @@ GenomicInterval& GenomicInterval::Interval(PacBio::BAM::Interval<Position> inter
 
 bool GenomicInterval::IsValid() const
 {
-    return !name_.empty() && interval_.Start() >= 0 && interval_.Stop() >= 0 && interval_.IsValid();
+    return (!name_.empty() && (interval_.Start() >= 0) && (interval_.Stop() >= 0) &&
+            interval_.IsValid());
 }
 
 size_t GenomicInterval::Length() const { return interval_.Length(); }

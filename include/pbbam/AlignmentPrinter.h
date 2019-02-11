@@ -67,7 +67,7 @@ public:
     /// \}
 
 private:
-    const std::unique_ptr<IndexedFastaReader> ifr_;
+    std::unique_ptr<IndexedFastaReader> ifr_;
 };
 
 }  // namespace BAM

@@ -2,9 +2,10 @@
 
 #include <pbbam/vcf/VcfVariant.h>
 
+#include <cmath>
+
 #include <pbbam/StringUtilities.h>
 #include <pbbam/vcf/VcfFormat.h>
-#include <cmath>
 
 namespace PacBio {
 namespace VCF {

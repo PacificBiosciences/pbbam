@@ -14,7 +14,7 @@
 
 namespace PacBio {
 namespace BAM {
-namespace internal {
+namespace {
 
 template <typename T>
 bool InAsciiRange(const T x)
@@ -118,7 +118,7 @@ struct TypenameVisitor : public boost::static_visitor<std::string>
     std::string operator()(const std::vector<float>&) const { return "vector<float>"; }
 };
 
-}  // namespace internal
+}  // anonymous
 
 Tag::Tag() = default;
 
@@ -263,7 +263,7 @@ Tag& Tag::operator=(std::vector<float> value)
 
 bool Tag::operator==(const Tag& other) const
 {
-    return boost::apply_visitor(internal::IsEqualVisitor(), data_, other.data_) &&
+    return boost::apply_visitor(IsEqualVisitor(), data_, other.data_) &&
            (modifier_ == other.modifier_);
 }
 
@@ -333,42 +333,42 @@ Tag& Tag::Modifier(const TagModifier m)
     return *this;
 }
 
-char Tag::ToAscii() const { return boost::apply_visitor(internal::AsciiConvertVisitor(), data_); }
+char Tag::ToAscii() const { return boost::apply_visitor(AsciiConvertVisitor(), data_); }
 
 int8_t Tag::ToInt8() const
 {
     if (IsInt8()) return boost::get<int8_t>(data_);
-    return boost::apply_visitor(internal::ToInt8ConvertVisitor(), data_);
+    return boost::apply_visitor(ToInt8ConvertVisitor(), data_);
 }
 
 uint8_t Tag::ToUInt8() const
 {
     if (IsUInt8()) return boost::get<uint8_t>(data_);
-    return boost::apply_visitor(internal::ToUInt8ConvertVisitor(), data_);
+    return boost::apply_visitor(ToUInt8ConvertVisitor(), data_);
 }
 
 int16_t Tag::ToInt16() const
 {
     if (IsInt16()) return boost::get<int16_t>(data_);
-    return boost::apply_visitor(internal::ToInt16ConvertVisitor(), data_);
+    return boost::apply_visitor(ToInt16ConvertVisitor(), data_);
 }
 
 uint16_t Tag::ToUInt16() const
 {
     if (IsUInt16()) return boost::get<uint16_t>(data_);
-    return boost::apply_visitor(internal::ToUInt16ConvertVisitor(), data_);
+    return boost::apply_visitor(ToUInt16ConvertVisitor(), data_);
 }
 
 int32_t Tag::ToInt32() const
 {
     if (IsInt32()) return boost::get<int32_t>(data_);
-    return boost::apply_visitor(internal::ToInt32ConvertVisitor(), data_);
+    return boost::apply_visitor(ToInt32ConvertVisitor(), data_);
 }
 
 uint32_t Tag::ToUInt32() const
 {
     if (IsUInt32()) return boost::get<uint32_t>(data_);
-    return boost::apply_visitor(internal::ToUInt32ConvertVisitor(), data_);
+    return boost::apply_visitor(ToUInt32ConvertVisitor(), data_);
 }
 
 float Tag::ToFloat() const { return boost::get<float>(data_); }
@@ -397,10 +397,7 @@ std::vector<float> Tag::ToFloatArray() const { return boost::get<std::vector<flo
 
 TagDataType Tag::Type() const { return TagDataType(data_.which()); }
 
-std::string Tag::Typename() const
-{
-    return boost::apply_visitor(internal::TypenameVisitor(), data_);
-}
+std::string Tag::Typename() const { return boost::apply_visitor(TypenameVisitor(), data_); }
 
 }  // namespace BAM
 }  // namespace PacBio
