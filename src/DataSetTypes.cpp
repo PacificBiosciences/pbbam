@@ -185,6 +185,10 @@ DataSetBase& DataSetBase::Metadata(const PacBio::BAM::DataSetMetadata& metadata)
     return *this;
 }
 
+const NamespaceRegistry& DataSetBase::Namespaces() const { return registry_; }
+
+NamespaceRegistry& DataSetBase::Namespaces() { return registry_; }
+
 const PacBio::BAM::SubDataSets& DataSetBase::SubDataSets() const
 {
     try {
@@ -324,6 +328,26 @@ DataSetMetadata& DataSetMetadata::operator+=(const DataSetMetadata& other)
     return *this;
 }
 
+const std::string& DataSetMetadata::NumRecords() const { return ChildText("NumRecords"); }
+
+std::string& DataSetMetadata::NumRecords() { return ChildText("NumRecords"); }
+
+DataSetMetadata& DataSetMetadata::NumRecords(const std::string& numRecords)
+{
+    ChildText("NumRecords", numRecords);
+    return *this;
+}
+
+const std::string& DataSetMetadata::TotalLength() const { return ChildText("TotalLength"); }
+
+std::string& DataSetMetadata::TotalLength() { return ChildText("TotalLength"); }
+
+DataSetMetadata& DataSetMetadata::TotalLength(const std::string& totalLength)
+{
+    ChildText("TotalLength", totalLength);
+    return *this;
+}
+
 // -------------------
 // ExtensionElement
 // -------------------
@@ -346,6 +370,37 @@ Extensions::Extensions() : DataSetElement("Extensions", XsdType::BASE_DATA_MODEL
 Extensions::Extensions(const internal::FromInputXml& fromInputXml)
     : DataSetElement("", fromInputXml, XsdType::BASE_DATA_MODEL)
 {
+}
+
+Extensions::iterator_type Extensions::begin() { return Extensions::iterator_type(this, 0); }
+
+Extensions::const_iterator_type Extensions::begin() const { return cbegin(); }
+
+Extensions::const_iterator_type Extensions::cbegin() const
+{
+    return Extensions::const_iterator_type(this, 0);
+}
+
+Extensions::iterator_type Extensions::end()
+{
+    return Extensions::iterator_type(this, NumChildren());
+}
+
+Extensions::const_iterator_type Extensions::end() const { return cend(); }
+
+Extensions::const_iterator_type Extensions::cend() const
+{
+    return Extensions::const_iterator_type(this, NumChildren());
+}
+
+const Extensions::value_type& Extensions::operator[](size_t index) const
+{
+    return dynamic_cast<const Extensions::value_type&>(*(children_.at(index).get()));
+}
+
+Extensions::value_type& Extensions::operator[](size_t index)
+{
+    return dynamic_cast<Extensions::value_type&>(*(children_.at(index).get()));
 }
 
 // -------------------
@@ -442,6 +497,40 @@ std::vector<BamFile> ExternalResources::BamFiles() const
 
 void ExternalResources::Remove(const ExternalResource& ext) { RemoveChild(ext); }
 
+ExternalResources::iterator_type ExternalResources::begin()
+{
+    return ExternalResources::iterator_type(this, 0);
+}
+
+ExternalResources::const_iterator_type ExternalResources::begin() const { return cbegin(); }
+
+ExternalResources::const_iterator_type ExternalResources::cbegin() const
+{
+    return ExternalResources::const_iterator_type(this, 0);
+}
+
+ExternalResources::iterator_type ExternalResources::end()
+{
+    return ExternalResources::iterator_type(this, NumChildren());
+}
+
+ExternalResources::const_iterator_type ExternalResources::end() const { return cend(); }
+
+ExternalResources::const_iterator_type ExternalResources::cend() const
+{
+    return ExternalResources::const_iterator_type(this, NumChildren());
+}
+
+const ExternalResources::value_type& ExternalResources::operator[](size_t index) const
+{
+    return dynamic_cast<const ExternalResources::value_type&>(*(children_.at(index).get()));
+}
+
+ExternalResources::value_type& ExternalResources::operator[](size_t index)
+{
+    return dynamic_cast<ExternalResources::value_type&>(*(children_.at(index).get()));
+}
+
 // -------------------
 // FileIndex
 // -------------------
@@ -472,6 +561,37 @@ FileIndices::FileIndices(const internal::FromInputXml& fromInputXml)
 void FileIndices::Add(const FileIndex& index) { AddChild(index); }
 
 void FileIndices::Remove(const FileIndex& index) { RemoveChild(index); }
+
+FileIndices::iterator_type FileIndices::begin() { return FileIndices::iterator_type(this, 0); }
+
+FileIndices::const_iterator_type FileIndices::begin() const { return cbegin(); }
+
+FileIndices::const_iterator_type FileIndices::cbegin() const
+{
+    return FileIndices::const_iterator_type(this, 0);
+}
+
+FileIndices::iterator_type FileIndices::end()
+{
+    return FileIndices::iterator_type(this, NumChildren());
+}
+
+FileIndices::const_iterator_type FileIndices::end() const { return cend(); }
+
+FileIndices::const_iterator_type FileIndices::cend() const
+{
+    return FileIndices::const_iterator_type(this, NumChildren());
+}
+
+const FileIndices::value_type& FileIndices::operator[](size_t index) const
+{
+    return dynamic_cast<const FileIndices::value_type&>(*(children_.at(index).get()));
+}
+
+FileIndices::value_type& FileIndices::operator[](size_t index)
+{
+    return dynamic_cast<FileIndices::value_type&>(*(children_.at(index).get()));
+}
 
 // -------------------
 // Filter
@@ -514,6 +634,34 @@ void Filters::Add(const Filter& filter) { AddChild(filter); }
 
 void Filters::Remove(const Filter& filter) { RemoveChild(filter); }
 
+Filters::iterator_type Filters::begin() { return Filters::iterator_type(this, 0); }
+
+Filters::const_iterator_type Filters::begin() const { return cbegin(); }
+
+Filters::const_iterator_type Filters::cbegin() const
+{
+    return Filters::const_iterator_type(this, 0);
+}
+
+Filters::iterator_type Filters::end() { return Filters::iterator_type(this, NumChildren()); }
+
+Filters::const_iterator_type Filters::end() const { return cend(); }
+
+Filters::const_iterator_type Filters::cend() const
+{
+    return Filters::const_iterator_type(this, NumChildren());
+}
+
+const Filters::value_type& Filters::operator[](size_t index) const
+{
+    return dynamic_cast<const Filters::value_type&>(*(children_.at(index).get()));
+}
+
+Filters::value_type& Filters::operator[](size_t index)
+{
+    return dynamic_cast<Filters::value_type&>(*(children_.at(index).get()));
+}
+
 // -------------------
 // HdfSubreadSet
 // -------------------
@@ -554,6 +702,37 @@ void Properties::Add(const Property& property) { AddChild(property); }
 
 void Properties::Remove(const Property& property) { RemoveChild(property); }
 
+Properties::iterator_type Properties::begin() { return Properties::iterator_type(this, 0); }
+
+Properties::const_iterator_type Properties::begin() const { return cbegin(); }
+
+Properties::const_iterator_type Properties::cbegin() const
+{
+    return Properties::const_iterator_type(this, 0);
+}
+
+Properties::iterator_type Properties::end()
+{
+    return Properties::iterator_type(this, NumChildren());
+}
+
+Properties::const_iterator_type Properties::end() const { return cend(); }
+
+Properties::const_iterator_type Properties::cend() const
+{
+    return Properties::const_iterator_type(this, NumChildren());
+}
+
+const Properties::value_type& Properties::operator[](size_t index) const
+{
+    return dynamic_cast<const Properties::value_type&>(*(children_.at(index).get()));
+}
+
+Properties::value_type& Properties::operator[](size_t index)
+{
+    return dynamic_cast<Properties::value_type&>(*(children_.at(index).get()));
+}
+
 // -------------------
 // Property
 // -------------------
@@ -575,6 +754,36 @@ Property::Property(const std::string& name, const std::string& value, const std:
     Operator(op);
 }
 
+const std::string& Property::Name() const { return Attribute("Name"); }
+
+std::string& Property::Name() { return Attribute("Name"); }
+
+Property& Property::Name(const std::string& name)
+{
+    Attribute("Name", name);
+    return *this;
+}
+
+const std::string& Property::Operator() const { return Attribute("Operator"); }
+
+std::string& Property::Operator() { return Attribute("Operator"); }
+
+Property& Property::Operator(const std::string& op)
+{
+    Attribute("Operator", op);
+    return *this;
+}
+
+const std::string& Property::Value() const { return Attribute("Value"); }
+
+std::string& Property::Value() { return Attribute("Value"); }
+
+Property& Property::Value(const std::string& value)
+{
+    Attribute("Value", value);
+    return *this;
+}
+
 // -------------------
 // Provenance
 // -------------------
@@ -587,6 +796,58 @@ Provenance::Provenance(const internal::FromInputXml& fromInputXml)
 }
 
 DEFINE_ACCESSORS(Provenance, ParentTool, ParentTool)
+
+const std::string& Provenance::CreatedBy() const { return Attribute("CreatedBy"); }
+
+std::string& Provenance::CreatedBy() { return Attribute("CreatedBy"); }
+
+Provenance& Provenance::CreatedBy(const std::string& createdBy)
+{
+    Attribute("CreatedBy", createdBy);
+    return *this;
+}
+
+const std::string& Provenance::CommonServicesInstanceId() const
+{
+    return ChildText("CommonServicesInstanceId");
+}
+
+std::string& Provenance::CommonServicesInstanceId()
+{
+    return ChildText("CommonServicesInstanceId");
+}
+
+Provenance& Provenance::CommonServicesInstanceId(const std::string& id)
+{
+    ChildText("CommonServicesInstanceId", id);
+    return *this;
+}
+
+const std::string& Provenance::CreatorUserId() const { return ChildText("CreatorUserId"); }
+
+std::string& Provenance::CreatorUserId() { return ChildText("CreatorUserId"); }
+
+Provenance& Provenance::CreatorUserId(const std::string& id)
+{
+    ChildText("CreatorUserId", id);
+    return *this;
+}
+
+const std::string& Provenance::ParentJobId() const { return ChildText("ParentJobId"); }
+
+std::string& Provenance::ParentJobId() { return ChildText("ParentJobId"); }
+
+Provenance& Provenance::ParentJobId(const std::string& id)
+{
+    ChildText("ParentJobId", id);
+    return *this;
+}
+
+Provenance& Provenance::ParentTool(const PacBio::BAM::ParentTool& tool)
+{
+    ParentTool() = tool;
+    return *this;
+}
 
 // -------------------
 // ReferenceSet
@@ -629,6 +890,37 @@ SubDataSets& SubDataSets::operator+=(const SubDataSets& other)
 void SubDataSets::Add(const DataSetBase& subdataset) { AddChild(subdataset); }
 
 void SubDataSets::Remove(const DataSetBase& subdataset) { RemoveChild(subdataset); }
+
+SubDataSets::iterator_type SubDataSets::begin() { return SubDataSets::iterator_type(this, 0); }
+
+SubDataSets::const_iterator_type SubDataSets::begin() const { return cbegin(); }
+
+SubDataSets::const_iterator_type SubDataSets::cbegin() const
+{
+    return SubDataSets::const_iterator_type(this, 0);
+}
+
+SubDataSets::iterator_type SubDataSets::end()
+{
+    return SubDataSets::iterator_type(this, NumChildren());
+}
+
+SubDataSets::const_iterator_type SubDataSets::end() const { return cend(); }
+
+SubDataSets::const_iterator_type SubDataSets::cend() const
+{
+    return SubDataSets::const_iterator_type(this, NumChildren());
+}
+
+const SubDataSets::value_type& SubDataSets::operator[](size_t index) const
+{
+    return dynamic_cast<const SubDataSets::value_type&>(*(children_.at(index).get()));
+}
+
+SubDataSets::value_type& SubDataSets::operator[](size_t index)
+{
+    return dynamic_cast<SubDataSets::value_type&>(*(children_.at(index).get()));
+}
 
 // -------------------
 // SubreadSet

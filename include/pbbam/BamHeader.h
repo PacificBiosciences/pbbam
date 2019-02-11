@@ -53,11 +53,11 @@ public:
     BamHeader(const std::string& samHeaderText);
 
     BamHeader();
-    BamHeader(const BamHeader&) = default;
-    BamHeader(BamHeader&&) = default;
-    BamHeader& operator=(const BamHeader&) = default;
-    BamHeader& operator=(BamHeader&&) = default;
-    ~BamHeader() = default;
+    BamHeader(const BamHeader&);
+    BamHeader(BamHeader&&);
+    BamHeader& operator=(const BamHeader&);
+    BamHeader& operator=(BamHeader&&);
+    ~BamHeader();
 
     /// \brief Detaches underlying data from the shared-pointer, returning a
     ///        independent copy of the header contents.
@@ -384,7 +384,5 @@ private:
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#include "pbbam/internal/BamHeader.inl"
 
 #endif  // BAMHEADER_H

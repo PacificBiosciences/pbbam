@@ -1057,6 +1057,4 @@ XmlElementType ElementTypeFromName(const std::string& name);
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "internal/DataSetTypes.inl"
-
 #endif  // DATASETTYPES_H

@@ -127,6 +127,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/BamRecordView.inl"
-
 #endif  // BAMRECORDVIEW_H

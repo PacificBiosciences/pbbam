@@ -37,10 +37,7 @@ enum class RecordType
 ///
 /// \param[in] type
 ///
-inline bool IsCcsOrTranscript(const RecordType type)
-{
-    return type == RecordType::CCS || type == RecordType::TRANSCRIPT;
-}
+bool IsCcsOrTranscript(const RecordType type);
 
 ///
 /// \brief Returns string representation of RecordType

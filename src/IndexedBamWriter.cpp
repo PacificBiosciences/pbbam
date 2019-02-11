@@ -22,6 +22,7 @@
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
@@ -985,6 +986,10 @@ IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamH
         outputFilename, BamHeaderMemory::MakeRawHeader(header), bamCompressionLevel, numBamThreads,
         pbiCompressionLevel, numPbiThreads, numGziThreads, tempFileBufferSize);
 }
+
+IndexedBamWriter::IndexedBamWriter(IndexedBamWriter&&) = default;
+
+IndexedBamWriter& IndexedBamWriter::operator=(IndexedBamWriter&&) = default;
 
 IndexedBamWriter::~IndexedBamWriter() = default;
 

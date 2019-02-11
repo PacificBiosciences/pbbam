@@ -47,5 +47,10 @@ void SortFile(const VcfFile& file, const std::string& outputFilename)
         writer.Write(var);
 }
 
+void SortFile(const std::string& inputFilename, const std::string& outputFilename)
+{
+    SortFile(VcfFile{inputFilename}, outputFilename);
+}
+
 }  // namespace VCF
 }  // namespace PacBio

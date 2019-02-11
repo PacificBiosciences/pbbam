@@ -59,6 +59,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "internal/CompositeFastaReader.inl"
-
 #endif  // COMPOSITEFASTAREADER_H

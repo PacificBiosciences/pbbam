@@ -41,10 +41,10 @@ public:
 
     AlignmentPrinter() = delete;
     AlignmentPrinter(const AlignmentPrinter&) = delete;
-    AlignmentPrinter(AlignmentPrinter&&) = default;
+    AlignmentPrinter(AlignmentPrinter&&);
     AlignmentPrinter& operator=(const AlignmentPrinter&) = delete;
-    AlignmentPrinter& operator=(AlignmentPrinter&&) = default;
-    ~AlignmentPrinter() = default;
+    AlignmentPrinter& operator=(AlignmentPrinter&&);
+    ~AlignmentPrinter();
 
     /// \}
 
@@ -67,7 +67,7 @@ public:
     /// \}
 
 private:
-    const std::unique_ptr<IndexedFastaReader> ifr_;
+    std::unique_ptr<IndexedFastaReader> ifr_;
 };
 
 }  // namespace BAM

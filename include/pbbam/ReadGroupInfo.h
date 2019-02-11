@@ -227,11 +227,11 @@ public:
     ReadGroupInfo(std::string movieName, std::string readType, PlatformModelType platform,
                   std::pair<uint16_t, uint16_t> barcodes);
 
-    ReadGroupInfo(const ReadGroupInfo&) = default;
-    ReadGroupInfo(ReadGroupInfo&&) = default;
-    ReadGroupInfo& operator=(const ReadGroupInfo&) = default;
-    ReadGroupInfo& operator=(ReadGroupInfo&&) = default;
-    ~ReadGroupInfo() = default;
+    ReadGroupInfo(const ReadGroupInfo&);
+    ReadGroupInfo(ReadGroupInfo&&);
+    ReadGroupInfo& operator=(const ReadGroupInfo&);
+    ReadGroupInfo& operator=(ReadGroupInfo&&);
+    ~ReadGroupInfo();
 
     /// \}
 
@@ -711,7 +711,5 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#include "pbbam/internal/ReadGroupInfo.inl"
 
 #endif  // READGROUPINFO_H

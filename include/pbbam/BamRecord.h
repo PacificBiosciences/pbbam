@@ -1270,6 +1270,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/BamRecord.inl"
-
 #endif  // BAMRECORD_H

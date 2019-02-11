@@ -56,11 +56,11 @@ public:
     Frames(std::vector<uint16_t> frames);
 
     Frames();
-    Frames(const Frames&) = default;
-    Frames(Frames&&) = default;
-    Frames& operator=(const Frames&) = default;
-    Frames& operator=(Frames&&) = default;
-    ~Frames() = default;
+    Frames(const Frames&);
+    Frames(Frames&&);
+    Frames& operator=(const Frames&);
+    Frames& operator=(Frames&&);
+    ~Frames();
 
     /// \}
 
@@ -141,7 +141,5 @@ private:
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#include "pbbam/internal/Frames.inl"
 
 #endif  // FRAMES_H

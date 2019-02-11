@@ -61,6 +61,10 @@ private:
 
 FastqReader::FastqReader(const std::string& fn) : d_{std::make_unique<FastqReaderPrivate>(fn)} {}
 
+FastqReader::FastqReader(FastqReader&&) = default;
+
+FastqReader& FastqReader::operator=(FastqReader&&) = default;
+
 FastqReader::~FastqReader() = default;
 
 bool FastqReader::GetNext(FastqSequence& record) { return d_->GetNext(record); }

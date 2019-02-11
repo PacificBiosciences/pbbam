@@ -36,9 +36,13 @@ VcfWriter::VcfWriter(std::string fn, const VcfHeader& header)
 {
 }
 
-bool VcfWriter::Write(const VcfVariant& var) { return d_->Write(var); }
+VcfWriter::VcfWriter(VcfWriter&&) = default;
+
+VcfWriter& VcfWriter::operator=(VcfWriter&&) = default;
 
 VcfWriter::~VcfWriter() = default;
+
+bool VcfWriter::Write(const VcfVariant& var) { return d_->Write(var); }
 
 }  // namespace VCF
 }  // namespace PacBio

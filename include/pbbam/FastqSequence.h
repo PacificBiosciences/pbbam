@@ -41,12 +41,12 @@ public:
     ///
     explicit FastqSequence(std::string name, std::string bases, std::string qualities);
 
-    FastqSequence() = default;
-    FastqSequence(const FastqSequence&) = default;
-    FastqSequence(FastqSequence&&) = default;
-    FastqSequence& operator=(const FastqSequence&) = default;
-    FastqSequence& operator=(FastqSequence&&) = default;
-    ~FastqSequence() = default;
+    FastqSequence();
+    FastqSequence(const FastqSequence&);
+    FastqSequence(FastqSequence&&);
+    FastqSequence& operator=(const FastqSequence&);
+    FastqSequence& operator=(FastqSequence&&);
+    ~FastqSequence();
 
     /// \}
 
@@ -68,7 +68,5 @@ private:
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#include "internal/FastqSequence.inl"
 
 #endif  // FASTQSEQUENCE_H

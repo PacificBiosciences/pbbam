@@ -3,8 +3,6 @@
 #ifndef PBBAM_STRINGUTILITIES_H
 #define PBBAM_STRINGUTILITIES_H
 
-#include <algorithm>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -19,17 +17,7 @@ namespace BAM {
 ///
 /// \return joined string
 ///
-inline std::string Join(const std::vector<std::string>& tokens, const char delim)
-{
-    std::string result;
-    bool first = true;
-    for (const auto& token : tokens) {
-        if (!first) result += delim;
-        result += token;
-        first = false;
-    }
-    return result;
-}
+std::string Join(const std::vector<std::string>& tokens, const char delim);
 
 /// \brief Splits a string into tokens
 ///
@@ -38,15 +26,7 @@ inline std::string Join(const std::vector<std::string>& tokens, const char delim
 ///
 /// \returns vector of tokens
 ///
-inline std::vector<std::string> Split(const std::string& line, const char delim = '\t')
-{
-    std::vector<std::string> tokens;
-    std::istringstream lineStream(line);
-    std::string token;
-    while (std::getline(lineStream, token, delim))
-        tokens.push_back(token);
-    return tokens;
-}
+std::vector<std::string> Split(const std::string& line, const char delim = '\t');
 
 /// \brief Remove all whitespace from input string (start, end, & internal)
 ///
@@ -54,13 +34,7 @@ inline std::vector<std::string> Split(const std::string& line, const char delim 
 ///
 /// \returns new string with no whitespace
 ///
-inline std::string RemoveAllWhitespace(std::string input)
-{
-    input.erase(
-        std::remove_if(input.begin(), input.end(), [](const char c) { return std::isspace(c); }),
-        input.end());
-    return input;
-}
+std::string RemoveAllWhitespace(std::string input);
 
 }  // namespace BAM
 }  // namespace PacBio

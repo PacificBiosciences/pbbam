@@ -17,11 +17,8 @@ class VcfWriter
 public:
     VcfWriter(std::string filename, const VcfHeader& header);
 
-    VcfWriter() = delete;
-    VcfWriter(const VcfWriter&) = delete;
-    VcfWriter(VcfWriter&&) = default;
-    VcfWriter& operator=(const VcfWriter&) = delete;
-    VcfWriter& operator=(VcfWriter&&) = default;
+    VcfWriter(VcfWriter&&);
+    VcfWriter& operator=(VcfWriter&&);
     ~VcfWriter();
 
 public:

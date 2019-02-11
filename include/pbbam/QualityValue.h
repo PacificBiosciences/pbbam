@@ -52,11 +52,11 @@ public:
     ///
     QualityValue(const uint8_t value = 0);
 
-    QualityValue(const QualityValue&) = default;
-    QualityValue(QualityValue&&) = default;
-    QualityValue& operator=(const QualityValue&) = default;
-    QualityValue& operator=(QualityValue&&) = default;
-    ~QualityValue() = default;
+    QualityValue(const QualityValue&);
+    QualityValue(QualityValue&&);
+    QualityValue& operator=(const QualityValue&);
+    QualityValue& operator=(QualityValue&&);
+    ~QualityValue();
 
     /// \}
 
@@ -78,7 +78,5 @@ private:
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#include "pbbam/internal/QualityValue.inl"
 
 #endif  // QUALITYVALUE_H

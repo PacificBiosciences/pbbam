@@ -32,12 +32,13 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    IndexedFastaReader() = delete;
     IndexedFastaReader(const std::string& filename);
     IndexedFastaReader(const IndexedFastaReader& src);
-    IndexedFastaReader(IndexedFastaReader&&) = default;
+
+    IndexedFastaReader() = delete;
+    IndexedFastaReader(IndexedFastaReader&&);
     IndexedFastaReader& operator=(const IndexedFastaReader& rhs);
-    IndexedFastaReader& operator=(IndexedFastaReader&&) = default;
+    IndexedFastaReader& operator=(IndexedFastaReader&&);
     ~IndexedFastaReader();
 
     /// \}

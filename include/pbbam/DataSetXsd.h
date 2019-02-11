@@ -44,17 +44,17 @@ public:
     ///
     /// This constructor only exists for STL container compatibility.
     ///
-    NamespaceInfo() = default;
+    NamespaceInfo();
 
     /// \brief Creates a valid info entry.
     NamespaceInfo(std::string name, std::string uri);
 
 public:
     /// \brief Fetches namespace name (i.e. prefix)
-    const std::string& Name() const { return name_; }
+    const std::string& Name() const;
 
     /// \brief Fetches namespace URI.
-    const std::string& Uri() const { return uri_; }
+    const std::string& Uri() const;
 
 private:
     std::string name_;
@@ -74,11 +74,11 @@ public:
     /// \{
 
     NamespaceRegistry();
-    NamespaceRegistry(const NamespaceRegistry&) = default;
-    NamespaceRegistry(NamespaceRegistry&&) = default;
-    NamespaceRegistry& operator=(const NamespaceRegistry&) = default;
-    NamespaceRegistry& operator=(NamespaceRegistry&&) = default;
-    ~NamespaceRegistry() = default;
+    NamespaceRegistry(const NamespaceRegistry&);
+    NamespaceRegistry(NamespaceRegistry&&);
+    NamespaceRegistry& operator=(const NamespaceRegistry&);
+    NamespaceRegistry& operator=(NamespaceRegistry&&);
+    ~NamespaceRegistry();
 
     /// \}
 

@@ -28,12 +28,12 @@ public:
     ///
     explicit FastaSequence(std::string name, std::string bases);
 
-    FastaSequence() = default;
-    FastaSequence(const FastaSequence&) = default;
-    FastaSequence(FastaSequence&&) = default;
-    FastaSequence& operator=(const FastaSequence&) = default;
-    FastaSequence& operator=(FastaSequence&&) = default;
-    ~FastaSequence() = default;
+    FastaSequence();
+    FastaSequence(const FastaSequence&);
+    FastaSequence(FastaSequence&&);
+    FastaSequence& operator=(const FastaSequence&);
+    FastaSequence& operator=(FastaSequence&&);
+    ~FastaSequence();
 
     /// \}
 
@@ -62,7 +62,5 @@ private:
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#include "internal/FastaSequence.inl"
 
 #endif  // FASTASEQUENCE_H

@@ -26,7 +26,7 @@ public:
     ///  \{
 
     /// \brief Creates an empty genomic interval
-    GenomicInterval() = default;
+    GenomicInterval();
 
     /// \brief Creates a genomic interval on sequence with \p name, using range:
     ///       [\p start, \p stop)
@@ -44,11 +44,11 @@ public:
     ///
     GenomicInterval(const std::string& zeroBasedRegionString);
 
-    GenomicInterval(const GenomicInterval&) = default;
-    GenomicInterval(GenomicInterval&&) = default;
-    GenomicInterval& operator=(const GenomicInterval&) = default;
-    GenomicInterval& operator=(GenomicInterval&&) = default;
-    ~GenomicInterval() = default;
+    GenomicInterval(const GenomicInterval&);
+    GenomicInterval(GenomicInterval&&);
+    GenomicInterval& operator=(const GenomicInterval&);
+    GenomicInterval& operator=(GenomicInterval&&);
+    ~GenomicInterval();
 
     /// \}
 
@@ -146,7 +146,5 @@ private:
 
 }  // namespace BAM
 }  // namspace PacBio
-
-#include "pbbam/internal/GenomicInterval.inl"
 
 #endif  // GENOMICINTERVAL_H

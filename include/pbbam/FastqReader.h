@@ -33,10 +33,11 @@ public:
     /// \{
 
     explicit FastqReader(const std::string& fn);
+
     FastqReader(const FastqReader&) = delete;
-    FastqReader(FastqReader&& other) = default;
+    FastqReader(FastqReader&&);
     FastqReader& operator=(const FastqReader&) = delete;
-    FastqReader& operator=(FastqReader&& other) = default;
+    FastqReader& operator=(FastqReader&&);
     ~FastqReader();
 
     /// \}

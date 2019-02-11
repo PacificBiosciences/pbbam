@@ -141,6 +141,8 @@ DataSet::DataSet(const DataSet& other) : path_(other.path_)
     d_ = DataSetIO::FromXmlString(xml);
 }
 
+DataSet::DataSet(DataSet&&) = default;
+
 DataSet& DataSet::operator=(const DataSet& other)
 {
     if (this != &other) {
@@ -152,6 +154,10 @@ DataSet& DataSet::operator=(const DataSet& other)
     }
     return *this;
 }
+
+DataSet& DataSet::operator=(DataSet&&) = default;
+
+DataSet::~DataSet() = default;
 
 DataSet& DataSet::operator+=(const DataSet& other)
 {
@@ -169,6 +175,16 @@ std::vector<std::string> DataSet::AllFiles() const
     std::transform(result.begin(), result.end(), result.begin(),
                    [this](const std::string& fn) { return this->ResolvePath(fn); });
     return result;
+}
+
+const std::string& DataSet::Attribute(const std::string& name) const { return d_->Attribute(name); }
+
+std::string& DataSet::Attribute(const std::string& name) { return d_->Attribute(name); }
+
+DataSet& DataSet::Attribute(const std::string& name, const std::string& value)
+{
+    d_->Attribute(name, value);
+    return *this;
 }
 
 std::vector<BamFile> DataSet::BamFiles() const
@@ -190,6 +206,39 @@ std::vector<BamFile> DataSet::BamFiles() const
     return result;
 }
 
+const std::string& DataSet::CreatedAt() const { return d_->CreatedAt(); }
+
+std::string& DataSet::CreatedAt() { return d_->CreatedAt(); }
+
+DataSet& DataSet::CreatedAt(const std::string& createdAt)
+{
+    d_->CreatedAt(createdAt);
+    return *this;
+}
+
+const PacBio::BAM::Extensions& DataSet::Extensions() const { return d_->Extensions(); }
+
+PacBio::BAM::Extensions& DataSet::Extensions() { return d_->Extensions(); }
+
+DataSet& DataSet::Extensions(const PacBio::BAM::Extensions& extensions)
+{
+    d_->Extensions(extensions);
+    return *this;
+}
+
+const PacBio::BAM::ExternalResources& DataSet::ExternalResources() const
+{
+    return d_->ExternalResources();
+}
+
+PacBio::BAM::ExternalResources& DataSet::ExternalResources() { return d_->ExternalResources(); }
+
+DataSet& DataSet::ExternalResources(const PacBio::BAM::ExternalResources& resources)
+{
+    d_->ExternalResources(resources);
+    return *this;
+}
+
 std::vector<std::string> DataSet::FastaFiles() const
 {
     const PacBio::BAM::ExternalResources& resources = ExternalResources();
@@ -209,72 +258,31 @@ std::vector<std::string> DataSet::FastaFiles() const
     return result;
 }
 
+const PacBio::BAM::Filters& DataSet::Filters() const { return d_->Filters(); }
+
+PacBio::BAM::Filters& DataSet::Filters() { return d_->Filters(); }
+
+DataSet& DataSet::Filters(const PacBio::BAM::Filters& filters)
+{
+    d_->Filters(filters);
+    return *this;
+}
+
+const std::string& DataSet::Format() const { return d_->Format(); }
+
+std::string& DataSet::Format() { return d_->Format(); }
+
+DataSet& DataSet::Format(const std::string& format)
+{
+    d_->Format(format);
+    return *this;
+}
+
 DataSet DataSet::FromXml(const std::string& xml)
 {
     DataSet result;
     result.d_ = DataSetIO::FromXmlString(xml);
     InitDefaults(result);
-    return result;
-}
-
-const NamespaceRegistry& DataSet::Namespaces() const { return d_->Namespaces(); }
-
-NamespaceRegistry& DataSet::Namespaces() { return d_->Namespaces(); }
-
-DataSet::TypeEnum DataSet::NameToType(const std::string& typeName)
-{
-    static std::unordered_map<std::string, DataSet::TypeEnum> lookup;
-    if (lookup.empty()) {
-        lookup["DataSet"] = DataSet::GENERIC;
-        lookup["AlignmentSet"] = DataSet::ALIGNMENT;
-        lookup["BarcodeSet"] = DataSet::BARCODE;
-        lookup["ConsensusAlignmentSet"] = DataSet::CONSENSUS_ALIGNMENT;
-        lookup["ConsensusReadSet"] = DataSet::CONSENSUS_READ;
-        lookup["ContigSet"] = DataSet::CONTIG;
-        lookup["HdfSubreadSet"] = DataSet::HDF_SUBREAD;
-        lookup["ReferenceSet"] = DataSet::REFERENCE;
-        lookup["SubreadSet"] = DataSet::SUBREAD;
-        lookup["TranscriptSet"] = DataSet::TRANSCRIPT;
-        lookup["TranscriptAlignmentSet"] = DataSet::TRANSCRIPT_ALIGNMENT;
-    }
-    return lookup.at(typeName);  // throws if unknown typename
-}
-
-std::vector<std::string> DataSet::ResolvedResourceIds() const
-{
-    const PacBio::BAM::ExternalResources& resources = ExternalResources();
-
-    std::vector<std::string> result;
-    result.reserve(resources.Size());
-    for (const ExternalResource& ext : resources) {
-        result.push_back(ResolvePath(ext.ResourceId()));
-    }
-    return result;
-}
-
-std::string DataSet::ResolvePath(const std::string& originalPath) const
-{
-    return FileUtils::ResolvedFilePath(originalPath, path_);
-}
-
-void DataSet::Save(const std::string& outputFilename) const
-{
-    DataSetIO::ToFile(d_, outputFilename);
-}
-
-void DataSet::SaveToStream(std::ostream& out) const { DataSetIO::ToStream(d_, out); }
-
-std::set<std::string> DataSet::SequencingChemistries() const
-{
-    const std::vector<BamFile> bamFiles{BamFiles()};
-
-    std::set<std::string> result;
-    for (const BamFile& bf : bamFiles) {
-        if (!bf.IsPacBioBAM()) throw std::runtime_error{"only PacBio BAMs are supported"};
-        const std::vector<ReadGroupInfo> readGroups{bf.Header().ReadGroups()};
-        for (const ReadGroupInfo& rg : readGroups)
-            result.insert(rg.SequencingChemistry());
-    }
     return result;
 }
 
@@ -376,6 +384,157 @@ std::vector<GenomicInterval> DataSet::GenomicIntervals() const
     return result;
 }
 
+const PacBio::BAM::DataSetMetadata& DataSet::Metadata() const { return d_->Metadata(); }
+
+PacBio::BAM::DataSetMetadata& DataSet::Metadata() { return d_->Metadata(); }
+
+DataSet& DataSet::Metadata(const PacBio::BAM::DataSetMetadata& metadata)
+{
+    d_->Metadata(metadata);
+    return *this;
+}
+
+const std::string& DataSet::MetaType() const { return d_->MetaType(); }
+
+std::string& DataSet::MetaType() { return d_->MetaType(); }
+
+DataSet& DataSet::MetaType(const std::string& metatype)
+{
+    d_->MetaType(metatype);
+    return *this;
+}
+
+const std::string& DataSet::ModifiedAt() const { return d_->ModifiedAt(); }
+
+std::string& DataSet::ModifiedAt() { return d_->ModifiedAt(); }
+
+DataSet& DataSet::ModifiedAt(const std::string& modifiedAt)
+{
+    d_->ModifiedAt(modifiedAt);
+    return *this;
+}
+
+const std::string& DataSet::Name() const { return d_->Name(); }
+
+std::string& DataSet::Name() { return d_->Name(); }
+
+DataSet& DataSet::Name(const std::string& name)
+{
+    d_->Name(name);
+    return *this;
+}
+
+const NamespaceRegistry& DataSet::Namespaces() const { return d_->Namespaces(); }
+
+NamespaceRegistry& DataSet::Namespaces() { return d_->Namespaces(); }
+
+DataSet::TypeEnum DataSet::NameToType(const std::string& typeName)
+{
+    static std::unordered_map<std::string, DataSet::TypeEnum> lookup;
+    if (lookup.empty()) {
+        lookup["DataSet"] = DataSet::GENERIC;
+        lookup["AlignmentSet"] = DataSet::ALIGNMENT;
+        lookup["BarcodeSet"] = DataSet::BARCODE;
+        lookup["ConsensusAlignmentSet"] = DataSet::CONSENSUS_ALIGNMENT;
+        lookup["ConsensusReadSet"] = DataSet::CONSENSUS_READ;
+        lookup["ContigSet"] = DataSet::CONTIG;
+        lookup["HdfSubreadSet"] = DataSet::HDF_SUBREAD;
+        lookup["ReferenceSet"] = DataSet::REFERENCE;
+        lookup["SubreadSet"] = DataSet::SUBREAD;
+        lookup["TranscriptSet"] = DataSet::TRANSCRIPT;
+        lookup["TranscriptAlignmentSet"] = DataSet::TRANSCRIPT_ALIGNMENT;
+    }
+    return lookup.at(typeName);  // throws if unknown typename
+}
+
+std::vector<std::string> DataSet::ResolvedResourceIds() const
+{
+    const PacBio::BAM::ExternalResources& resources = ExternalResources();
+
+    std::vector<std::string> result;
+    result.reserve(resources.Size());
+    for (const ExternalResource& ext : resources) {
+        result.push_back(ResolvePath(ext.ResourceId()));
+    }
+    return result;
+}
+
+std::string DataSet::ResolvePath(const std::string& originalPath) const
+{
+    return FileUtils::ResolvedFilePath(originalPath, path_);
+}
+
+const std::string& DataSet::ResourceId() const { return d_->ResourceId(); }
+
+std::string& DataSet::ResourceId() { return d_->ResourceId(); }
+
+DataSet& DataSet::ResourceId(const std::string& resourceId)
+{
+    d_->ResourceId(resourceId);
+    return *this;
+}
+
+void DataSet::Save(const std::string& outputFilename) const
+{
+    DataSetIO::ToFile(d_, outputFilename);
+}
+
+void DataSet::SaveToStream(std::ostream& out) const { DataSetIO::ToStream(d_, out); }
+
+std::set<std::string> DataSet::SequencingChemistries() const
+{
+    const std::vector<BamFile> bamFiles{BamFiles()};
+
+    std::set<std::string> result;
+    for (const BamFile& bf : bamFiles) {
+        if (!bf.IsPacBioBAM()) throw std::runtime_error{"only PacBio BAMs are supported"};
+        const std::vector<ReadGroupInfo> readGroups{bf.Header().ReadGroups()};
+        for (const ReadGroupInfo& rg : readGroups)
+            result.insert(rg.SequencingChemistry());
+    }
+    return result;
+}
+
+const PacBio::BAM::SubDataSets& DataSet::SubDataSets() const { return d_->SubDataSets(); }
+
+PacBio::BAM::SubDataSets& DataSet::SubDataSets() { return d_->SubDataSets(); }
+
+DataSet& DataSet::SubDataSets(const PacBio::BAM::SubDataSets& subdatasets)
+{
+    d_->SubDataSets(subdatasets);
+    return *this;
+}
+
+const std::string& DataSet::Tags() const { return d_->Tags(); }
+
+std::string& DataSet::Tags() { return d_->Tags(); }
+
+DataSet& DataSet::Tags(const std::string& tags)
+{
+    d_->Tags(tags);
+    return *this;
+}
+
+const std::string& DataSet::TimeStampedName() const { return d_->TimeStampedName(); }
+
+std::string& DataSet::TimeStampedName() { return d_->TimeStampedName(); }
+
+DataSet& DataSet::TimeStampedName(const std::string& timeStampedName)
+{
+    d_->TimeStampedName(timeStampedName);
+    return *this;
+}
+
+PacBio::BAM::DataSet::TypeEnum DataSet::Type() const { return DataSet::NameToType(TypeName()); }
+
+DataSet& DataSet::Type(const DataSet::TypeEnum type)
+{
+    d_->Label(DataSet::TypeToName(type));
+    return *this;
+}
+
+std::string DataSet::TypeName() const { return d_->LocalNameLabel().to_string(); }
+
 std::string DataSet::TypeToName(const DataSet::TypeEnum& type)
 {
     switch (type) {
@@ -404,6 +563,26 @@ std::string DataSet::TypeToName(const DataSet::TypeEnum& type)
         default:
             throw std::runtime_error{"unsupported dataset type"};
     }
+}
+
+const std::string& DataSet::UniqueId() const { return d_->UniqueId(); }
+
+std::string& DataSet::UniqueId() { return d_->UniqueId(); }
+
+DataSet& DataSet::UniqueId(const std::string& uuid)
+{
+    d_->UniqueId(uuid);
+    return *this;
+}
+
+const std::string& DataSet::Version() const { return d_->Version(); }
+
+std::string& DataSet::Version() { return d_->Version(); }
+
+DataSet& DataSet::Version(const std::string& version)
+{
+    d_->Version(version);
+    return *this;
 }
 
 // Exposed timestamp utils

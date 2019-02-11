@@ -63,6 +63,25 @@ GenomicInterval::GenomicInterval(const std::string& samtoolsRegionString)
     interval_ = PacBio::BAM::Interval<Position>(begin, end);
 }
 
+GenomicInterval::GenomicInterval() = default;
+
+GenomicInterval::GenomicInterval(const GenomicInterval&) = default;
+
+GenomicInterval::GenomicInterval(GenomicInterval&&) = default;
+
+GenomicInterval& GenomicInterval::operator=(const GenomicInterval&) = default;
+
+GenomicInterval& GenomicInterval::operator=(GenomicInterval&&) = default;
+
+GenomicInterval::~GenomicInterval() = default;
+
+bool GenomicInterval::operator==(const GenomicInterval& other) const
+{
+    return name_ == other.name_ && interval_ == other.interval_;
+}
+
+bool GenomicInterval::operator!=(const GenomicInterval& other) const { return !(*this == other); }
+
 bool GenomicInterval::CoveredBy(const GenomicInterval& other) const
 {
     if (name_ != other.name_) return false;
@@ -79,6 +98,46 @@ bool GenomicInterval::Intersects(const GenomicInterval& other) const
 {
     if (name_ != other.name_) return false;
     return interval_.Intersects(other.interval_);
+}
+
+PacBio::BAM::Interval<Position> GenomicInterval::Interval() const { return interval_; }
+
+GenomicInterval& GenomicInterval::Interval(PacBio::BAM::Interval<Position> interval)
+{
+    interval_ = std::move(interval);
+    return *this;
+}
+
+bool GenomicInterval::IsValid() const
+{
+    return (!name_.empty() && (interval_.Start() >= 0) && (interval_.Stop() >= 0) &&
+            interval_.IsValid());
+}
+
+size_t GenomicInterval::Length() const { return interval_.Length(); }
+
+std::string GenomicInterval::Name() const { return name_; }
+
+GenomicInterval& GenomicInterval::Name(std::string name)
+{
+    name_ = std::move(name);
+    return *this;
+}
+
+Position GenomicInterval::Start() const { return interval_.Start(); }
+
+GenomicInterval& GenomicInterval::Start(const Position start)
+{
+    interval_.Start(start);
+    return *this;
+}
+
+Position GenomicInterval::Stop() const { return interval_.Stop(); }
+
+GenomicInterval& GenomicInterval::Stop(const Position stop)
+{
+    interval_.Stop(stop);
+    return *this;
 }
 
 }  // namespace BAM

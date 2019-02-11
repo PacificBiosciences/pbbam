@@ -116,11 +116,11 @@ public:
     ///
     DataSet(const std::vector<std::string>& filenames);
 
-    DataSet(const DataSet& other);
-    DataSet(DataSet&&) = default;
-    DataSet& operator=(const DataSet& other);
-    DataSet& operator=(DataSet&&) = default;
-    ~DataSet() = default;
+    DataSet(const DataSet&);
+    DataSet(DataSet&&);
+    DataSet& operator=(const DataSet&);
+    DataSet& operator=(DataSet&&);
+    ~DataSet();
 
     /// \brief Creates a DataSet from "raw" XML data.
     ///
@@ -816,7 +816,5 @@ PBBAM_EXPORT std::string ToIso8601(const time_t& t);
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#include "pbbam/internal/DataSet.inl"
 
 #endif  // DATASET_H

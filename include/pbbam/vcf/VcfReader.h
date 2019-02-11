@@ -28,7 +28,7 @@ public:
     VcfReader(VcfReader&&) = default;
     VcfReader& operator=(const VcfReader&) = delete;
     VcfReader& operator=(VcfReader&&) = default;
-    ~VcfReader() = default;
+    ~VcfReader();
 
 public:
     const VcfHeader& Header() const;

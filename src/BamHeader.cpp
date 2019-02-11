@@ -96,6 +96,35 @@ void ParseHeaderLine(const std::string& line, BamHeader& hdr)
 
 }  // anonymous
 
+class BamHeader::BamHeaderPrivate
+{
+public:
+    std::string version_;
+    std::string pacbioBamVersion_;
+    std::string sortOrder_;
+    std::map<std::string, std::string> headerLineCustom_;
+
+    std::map<std::string, ReadGroupInfo> readGroups_;  // id => read group info
+    std::map<std::string, ProgramInfo> programs_;      // id => program info
+    std::vector<std::string> comments_;
+
+    // we need to preserve insertion order, use lookup for access by name
+    std::vector<SequenceInfo> sequences_;
+    std::map<std::string, int32_t> sequenceIdLookup_;
+};
+
+BamHeader::BamHeader() : d_{std::make_shared<BamHeaderPrivate>()} {}
+
+BamHeader::BamHeader(const BamHeader&) = default;
+
+BamHeader::BamHeader(BamHeader&&) = default;
+
+BamHeader& BamHeader::operator=(const BamHeader&) = default;
+
+BamHeader& BamHeader::operator=(BamHeader&&) = default;
+
+BamHeader::~BamHeader() = default;
+
 BamHeader::BamHeader(const std::string& samHeaderText) : d_{std::make_shared<BamHeaderPrivate>()}
 {
     std::istringstream s{samHeaderText};
@@ -149,6 +178,26 @@ BamHeader& BamHeader::operator+=(const BamHeader& other)
     return *this;
 }
 
+BamHeader BamHeader::operator+(const BamHeader& other) const { return DeepCopy() += other; }
+
+BamHeader& BamHeader::AddComment(std::string comment)
+{
+    d_->comments_.push_back(std::move(comment));
+    return *this;
+}
+
+BamHeader& BamHeader::AddProgram(ProgramInfo pg)
+{
+    d_->programs_[pg.Id()] = std::move(pg);
+    return *this;
+}
+
+BamHeader& BamHeader::AddReadGroup(ReadGroupInfo readGroup)
+{
+    d_->readGroups_[readGroup.Id()] = std::move(readGroup);
+    return *this;
+}
+
 BamHeader& BamHeader::AddSequence(SequenceInfo sequence)
 {
     const std::string name = sequence.Name();
@@ -157,10 +206,36 @@ BamHeader& BamHeader::AddSequence(SequenceInfo sequence)
     return *this;
 }
 
+BamHeader& BamHeader::ClearComments()
+{
+    d_->comments_.clear();
+    return *this;
+}
+
+BamHeader& BamHeader::ClearPrograms()
+{
+    d_->programs_.clear();
+    return *this;
+}
+
+BamHeader& BamHeader::ClearReadGroups()
+{
+    d_->readGroups_.clear();
+    return *this;
+}
+
 BamHeader& BamHeader::ClearSequences()
 {
     d_->sequenceIdLookup_.clear();
     d_->sequences_.clear();
+    return *this;
+}
+
+std::vector<std::string> BamHeader::Comments() const { return d_->comments_; }
+
+BamHeader& BamHeader::Comments(std::vector<std::string> comments)
+{
+    d_->comments_ = std::move(comments);
     return *this;
 }
 
@@ -178,6 +253,25 @@ BamHeader BamHeader::DeepCopy() const
     result.d_->sequenceIdLookup_ = d_->sequenceIdLookup_;
     return result;
 }
+
+bool BamHeader::HasProgram(const std::string& id) const
+{
+    return d_->programs_.find(id) != d_->programs_.cend();
+}
+
+bool BamHeader::HasReadGroup(const std::string& id) const
+{
+    return d_->readGroups_.find(id) != d_->readGroups_.cend();
+}
+
+bool BamHeader::HasSequence(const std::string& name) const
+{
+    return d_->sequenceIdLookup_.find(name) != d_->sequenceIdLookup_.cend();
+}
+
+size_t BamHeader::NumSequences() const { return d_->sequences_.size(); }
+
+std::string BamHeader::PacBioBamVersion() const { return d_->pacbioBamVersion_; }
 
 BamHeader& BamHeader::PacBioBamVersion(const std::string& version)
 {
@@ -257,6 +351,8 @@ BamHeader& BamHeader::ReadGroups(std::vector<ReadGroupInfo> readGroups)
     return *this;
 }
 
+SequenceInfo BamHeader::Sequence(const int32_t id) const { return d_->sequences_.at(id); }
+
 SequenceInfo BamHeader::Sequence(const std::string& name) const
 {
     // TODO: SequenceId(name) throws if not found, should we do so here as well?
@@ -275,6 +371,10 @@ int32_t BamHeader::SequenceId(const std::string& name) const
     return iter->second;
 }
 
+std::string BamHeader::SequenceLength(const int32_t id) const { return Sequence(id).Length(); }
+
+std::string BamHeader::SequenceName(const int32_t id) const { return Sequence(id).Name(); }
+
 std::vector<std::string> BamHeader::SequenceNames() const
 {
     std::vector<std::string> result;
@@ -284,11 +384,21 @@ std::vector<std::string> BamHeader::SequenceNames() const
     return result;
 }
 
+std::vector<SequenceInfo> BamHeader::Sequences() const { return d_->sequences_; }
+
 BamHeader& BamHeader::Sequences(std::vector<SequenceInfo> sequences)
 {
     d_->sequences_.clear();
     for (auto&& seq : sequences)
         AddSequence(std::move(seq));
+    return *this;
+}
+
+std::string BamHeader::SortOrder() const { return d_->sortOrder_; }
+
+BamHeader& BamHeader::SortOrder(std::string order)
+{
+    d_->sortOrder_ = std::move(order);
     return *this;
 }
 
@@ -325,6 +435,14 @@ std::string BamHeader::ToSam() const
 
     // return result
     return out.str();
+}
+
+std::string BamHeader::Version() const { return d_->version_; }
+
+BamHeader& BamHeader::Version(std::string version)
+{
+    d_->version_ = std::move(version);
+    return *this;
 }
 
 }  // namespace BAM

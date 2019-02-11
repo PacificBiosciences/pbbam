@@ -129,6 +129,10 @@ BamWriter::BamWriter(const std::string& filename, const BamHeader& header,
 {
 }
 
+BamWriter::BamWriter(BamWriter&&) = default;
+
+BamWriter& BamWriter::operator=(BamWriter&&) = default;
+
 BamWriter::~BamWriter()
 {
     const auto ret = bgzf_flush(d_->file_.get()->fp.bgzf);

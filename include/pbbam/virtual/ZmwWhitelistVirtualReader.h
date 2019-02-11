@@ -13,7 +13,7 @@ namespace PacBio {
 namespace BAM {
 
 /// \deprecated Use WhitelistedZmwReadStitcher instead.
-typedef WhitelistedZmwReadStitcher ZmwWhitelistVirtualReader;
+using ZmwWhitelistVirtualReader = WhitelistedZmwReadStitcher;
 
 }  // namespace BAM
 }  // namespace PacBio
