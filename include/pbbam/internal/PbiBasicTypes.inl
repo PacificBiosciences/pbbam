@@ -6,23 +6,26 @@
 
 #include "pbbam/PbiBasicTypes.h"
 
+#include <tuple>
+
 namespace PacBio {
 namespace BAM {
 
 inline IndexResultBlock::IndexResultBlock(size_t idx, size_t numReads)
-    : firstIndex_{idx}
-    , numReads_{numReads}
-{ }
+    : firstIndex_{idx}, numReads_{numReads}
+{
+}
 
 inline bool IndexResultBlock::operator==(const IndexResultBlock& other) const
 {
-    return firstIndex_ == other.firstIndex_ &&
-           numReads_ == other.numReads_ &&
-           virtualOffset_ == other.virtualOffset_;
+    return std::tie(firstIndex_, numReads_, virtualOffset_) ==
+           std::tie(other.firstIndex_, other.numReads_, other.virtualOffset_);
 }
 
 inline bool IndexResultBlock::operator!=(const IndexResultBlock& other) const
-{ return !(*this == other); }
+{
+    return !(*this == other);
+}
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

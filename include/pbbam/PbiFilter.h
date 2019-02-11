@@ -10,6 +10,7 @@
 #include <boost/concept_check.hpp>
 #include <cstddef>
 #include <memory>
+#include <set>
 #include <string>
 #include <tuple>
 #include "pbbam/DataSet.h"
@@ -211,6 +212,9 @@ public:
 
     /// \returns number of child filters
     size_t NumChildren() const;
+
+    /// \returns set of PBI fields needed by this filter (union of all child filters)
+    std::set<PbiFile::Field> RequiredFields() const;
 
     /// \returns filter type (intersect, union)
     CompositionType Type() const;

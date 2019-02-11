@@ -110,6 +110,9 @@ public:
     /// \param[in] cmp      compare type
     ///
     PbiAlignedEndFilter(const uint32_t position, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiAlignedLengthFilter class provides a PbiFilter-compatible
@@ -134,6 +137,9 @@ public:
     /// Most client code should not need to use this method directly.
     ///
     bool Accepts(const PbiRawData& idx, const size_t row) const;
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiAlignedStartFilter class provides a PbiFilter-compatible
@@ -153,6 +159,9 @@ public:
     /// \param[in] cmp      compare type
     ///
     PbiAlignedStartFilter(const uint32_t position, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiAlignedStrandFilter class provides a PbiFilter-compatible
@@ -172,6 +181,9 @@ public:
     /// \param[in] cmp     compare type
     ///
     PbiAlignedStrandFilter(const Strand strand, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiBarcodeFilter class provides a PbiFilter-compatible filter on
@@ -209,6 +221,9 @@ public:
     ///
     bool Accepts(const PbiRawData& idx, const size_t row) const;
 
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
+
 private:
     PbiFilter compositeFilter_;
 };
@@ -241,6 +256,9 @@ public:
     ///
     PbiBarcodeForwardFilter(std::vector<int16_t> whitelist,
                             const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiBarcodeQualityFilter class provides a PbiFilter-compatible
@@ -260,6 +278,9 @@ public:
     /// \param[in] cmp          compare type
     ///
     PbiBarcodeQualityFilter(const uint8_t bcQuality, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiBarcodeReverseFilter class provides a PbiFilter-compatible
@@ -290,6 +311,9 @@ public:
     ///
     PbiBarcodeReverseFilter(std::vector<int16_t> whitelist,
                             const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiBarcodesFilter class provides a PbiFilter-compatible filter on
@@ -330,6 +354,9 @@ public:
     ///
     bool Accepts(const PbiRawData& idx, const size_t row) const;
 
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
+
 private:
     PbiFilter compositeFilter_;
 };
@@ -356,6 +383,9 @@ public:
     /// Most client code should not need to use this method directly.
     ///
     bool Accepts(const PbiRawData& idx, const size_t row) const;
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiLocalContextFilter class provides a PbiFilter-compatible
@@ -372,6 +402,9 @@ class PbiLocalContextFilter
 {
 public:
     PbiLocalContextFilter(const LocalContextFlags& flags, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiMapQualityFilter class provides a PbiFilter-compatible filter on
@@ -391,6 +424,9 @@ public:
     /// \param[in] cmp      compare type
     ///
     PbiMapQualityFilter(const uint8_t mapQual, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiMovieNameFilter class provides a PbiFilter-compatible filter
@@ -429,6 +465,9 @@ public:
     ///
     bool Accepts(const PbiRawData& idx, const size_t row) const;
 
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
+
 private:
     PbiFilter compositeFilter_;
     Compare::Type cmp_;
@@ -451,6 +490,9 @@ public:
     /// \param[in] cmp          compare type
     ///
     PbiNumDeletedBasesFilter(const size_t numDeletions, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiNumInsertededBasesFilter class provides a PbiFilter-compatible
@@ -470,6 +512,9 @@ public:
     /// \param[in] cmp              compare type
     ///
     PbiNumInsertedBasesFilter(const size_t numInsertions, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiNumMatchesFilter class provides a PbiFilter-compatible filter
@@ -488,6 +533,9 @@ public:
     /// \param[in] cmp              compare type
     ///
     PbiNumMatchesFilter(const size_t numMatchedBases, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiNumMismatchesFilter class provides a PbiFilter-compatible
@@ -508,6 +556,9 @@ public:
     ///
     PbiNumMismatchesFilter(const size_t numMismatchedBases,
                            const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiQueryEndFilter class provides a PbiFilter-compatible filter
@@ -526,6 +577,9 @@ public:
     /// \param[in] cmp      compare type
     ///
     PbiQueryEndFilter(const int32_t position, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiQueryLengthFilter class provides a PbiFilter-compatible filter
@@ -552,6 +606,9 @@ public:
     /// Most client code should not need to use this method directly.
     ///
     bool Accepts(const PbiRawData& idx, const size_t row) const;
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiQueryNameFilter class provides a PbiFilter-compatible filter
@@ -593,6 +650,9 @@ public:
     ///
     bool Accepts(const PbiRawData& idx, const size_t row) const;
 
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
+
 private:
     struct PbiQueryNameFilterPrivate;
     std::unique_ptr<PbiQueryNameFilterPrivate> d_;
@@ -615,6 +675,9 @@ public:
     /// \param[in] cmp      compare type
     ///
     PbiQueryStartFilter(const int32_t position, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiReadAccuracyFilter class provides a PbiFilter-compatible filter
@@ -634,6 +697,9 @@ public:
     /// \param[in] cmp      compare type
     ///
     PbiReadAccuracyFilter(const Accuracy accuracy, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiReadGroupFilter class provides a PbiFilter-compatible filter
@@ -714,6 +780,9 @@ public:
     ///
     bool Accepts(const PbiRawData& idx, const size_t row) const;
 
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
+
 private:
     // RGID number => barcode(s) filter
     std::unordered_map<int32_t, boost::optional<std::vector<std::pair<int16_t, int16_t>>>> lookup_;
@@ -737,6 +806,9 @@ public:
     /// \param[in] cmp      compare type
     ///
     PbiReferenceEndFilter(const uint32_t tEnd, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiReferenceIdFilter class provides a PbiFilter-compatible
@@ -766,6 +838,9 @@ public:
     /// \param[in] whitelist    reference IDs to compare on
     ///
     PbiReferenceIdFilter(std::vector<int32_t> whitelist, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiReferenceNameFilter class provides a PbiFilter-compatible
@@ -802,6 +877,9 @@ public:
     ///
     bool Accepts(const PbiRawData& idx, const size_t row) const;
 
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
+
 private:
     mutable bool initialized_ = false;
     mutable PbiFilter subFilter_;
@@ -831,6 +909,9 @@ public:
     /// \param[in] cmp      compare type
     ///
     PbiReferenceStartFilter(const uint32_t tStart, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 /// \brief The PbiZmwFilter class provides a PbiFilter-compatible filter on
@@ -859,6 +940,9 @@ public:
     /// \param[in] whitelist    ZMW hole numbers to compare on
     ///
     PbiZmwFilter(std::vector<int32_t> whitelist, const Compare::Type cmp = Compare::EQUAL);
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 };
 
 // ----------------------------------------------
@@ -886,6 +970,9 @@ public:
     /// Most client code should not need to use this method directly.
     ///
     bool Accepts(const PbiRawData& idx, const size_t row) const;
+
+    /// \returns set of PBI fields needed by this filter
+    std::set<PbiFile::Field> RequiredFields() const;
 
 private:
     uint32_t denominator_;

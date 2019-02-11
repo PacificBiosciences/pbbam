@@ -212,17 +212,26 @@ inline PbiAlignedEndFilter::PbiAlignedEndFilter(const uint32_t position, const C
     : internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::A_END>{position, cmp}
 { }
 
+inline std::set<PbiFile::Field> PbiAlignedEndFilter::RequiredFields() const
+{ return {PbiFile::Field::A_END}; }
+
 // PbiAlignedLengthFilter
 
 inline PbiAlignedLengthFilter::PbiAlignedLengthFilter(const uint32_t length, const Compare::Type cmp)
     : internal::FilterBase<uint32_t>{length, cmp}
 { }
 
+inline std::set<PbiFile::Field> PbiAlignedLengthFilter::RequiredFields() const
+{ return {PbiFile::Field::A_START, PbiFile::Field::A_END}; }
+
 // PbiAlignedStartFilter
 
 inline PbiAlignedStartFilter::PbiAlignedStartFilter(const uint32_t position, const Compare::Type cmp)
     : internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::A_START>{position, cmp}
 { }
+
+inline std::set<PbiFile::Field> PbiAlignedStartFilter::RequiredFields() const
+{ return {PbiFile::Field::A_START}; }
 
 // PbiAlignedStrandFilter
 
@@ -233,6 +242,9 @@ inline PbiAlignedStrandFilter::PbiAlignedStrandFilter(const Strand strand, const
         throw std::runtime_error{"Compare type: " + Compare::TypeToName(cmp) + " not supported for PbiAlignedStrandFilter (use one of Compare::EQUAL or Compare::NOT_EQUAL)."};
     }
 }
+
+inline std::set<PbiFile::Field> PbiAlignedStrandFilter::RequiredFields() const
+{ return {PbiFile::Field::STRAND}; }
 
 // PbiBarcodeFilter
 
@@ -253,6 +265,9 @@ inline PbiBarcodeFilter::PbiBarcodeFilter(std::vector<int16_t> whitelist, const 
 inline bool PbiBarcodeFilter::Accepts(const PbiRawData& idx, const size_t row) const
 { return compositeFilter_.Accepts(idx, row); }
 
+inline std::set<PbiFile::Field> PbiBarcodeFilter::RequiredFields() const
+{ return compositeFilter_.RequiredFields(); }
+
 // PbiBarcodeForwardFilter
 
 inline PbiBarcodeForwardFilter::PbiBarcodeForwardFilter(const int16_t bcFwdId, const Compare::Type cmp)
@@ -263,11 +278,17 @@ inline PbiBarcodeForwardFilter::PbiBarcodeForwardFilter(std::vector<int16_t> whi
     : internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_FORWARD>{std::move(whitelist), cmp}
 { }
 
+inline std::set<PbiFile::Field> PbiBarcodeForwardFilter::RequiredFields() const
+{ return {PbiFile::Field::BC_FORWARD}; }
+
 // PbiBarcodeQualityFilter
 
 inline PbiBarcodeQualityFilter::PbiBarcodeQualityFilter(const uint8_t bcQuality, const Compare::Type cmp)
     : internal::BarcodeDataFilterBase<uint8_t, PbiFile::BarcodeField::BC_QUALITY>{bcQuality, cmp}
 { }
+
+inline std::set<PbiFile::Field> PbiBarcodeQualityFilter::RequiredFields() const
+{ return {PbiFile::Field::BC_QUALITY}; }
 
 // PbiBarcodeReverseFilter
 
@@ -278,6 +299,9 @@ inline PbiBarcodeReverseFilter::PbiBarcodeReverseFilter(const int16_t bcRevId, c
 inline PbiBarcodeReverseFilter::PbiBarcodeReverseFilter(std::vector<int16_t> whitelist, const Compare::Type cmp)
     : internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_REVERSE>{std::move(whitelist), cmp}
 { }
+
+inline std::set<PbiFile::Field> PbiBarcodeReverseFilter::RequiredFields() const
+{ return {PbiFile::Field::BC_REVERSE}; }
 
 // PbiBarcodesFilter
 
@@ -295,12 +319,21 @@ inline PbiBarcodesFilter::PbiBarcodesFilter(const int16_t bcForward, const int16
 inline bool PbiBarcodesFilter::Accepts(const PbiRawData& idx, const size_t row) const
 { return compositeFilter_.Accepts(idx, row); }
 
+inline std::set<PbiFile::Field> PbiBarcodesFilter::RequiredFields() const
+{ return compositeFilter_.RequiredFields(); }
+
 // PbiIdentityFilter
 
 inline PbiIdentityFilter::PbiIdentityFilter(const float identity,
                                             const Compare::Type cmp)
     : internal::FilterBase<float>{identity, cmp}
 { }
+
+inline std::set<PbiFile::Field> PbiIdentityFilter::RequiredFields() const
+{ return {PbiFile::Field::N_M, PbiFile::Field::N_MM,
+          PbiFile::Field::Q_START, PbiFile::Field::Q_END,
+          PbiFile::Field::A_START, PbiFile::Field::A_END,
+          PbiFile::Field::T_START, PbiFile::Field::T_END}; }
 
 // PbiLocalContextFilter
 
@@ -309,11 +342,17 @@ inline PbiLocalContextFilter::PbiLocalContextFilter(const LocalContextFlags& fla
     : internal::BasicDataFilterBase<LocalContextFlags, PbiFile::BasicField::CONTEXT_FLAG>{flags, cmp}
 { }
 
+inline std::set<PbiFile::Field> PbiLocalContextFilter::RequiredFields() const
+{ return {PbiFile::Field::CONTEXT_FLAG}; }
+
 // PbiMapQualityFilter
 
 inline PbiMapQualityFilter::PbiMapQualityFilter(const uint8_t mapQual, const Compare::Type cmp)
     : internal::MappedDataFilterBase<uint8_t, PbiFile::MappedField::MAP_QUALITY>{mapQual, cmp}
 { }
+
+inline std::set<PbiFile::Field> PbiMapQualityFilter::RequiredFields() const
+{ return {PbiFile::Field::MAP_QUALITY}; }
 
 // PbiMovieNameFilter
 
@@ -325,11 +364,17 @@ inline bool PbiMovieNameFilter::Accepts(const PbiRawData& idx, const size_t row)
     else throw std::runtime_error{"unsupported compare type on movie name filter"};
 }
 
+inline std::set<PbiFile::Field> PbiMovieNameFilter::RequiredFields() const
+{ return compositeFilter_.RequiredFields(); }
+
 // PbiNumDeletedBasesFilter
 
 inline PbiNumDeletedBasesFilter::PbiNumDeletedBasesFilter(const size_t numDeletions, const Compare::Type cmp)
     : internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_DEL>{numDeletions, cmp}
 { }
+
+inline std::set<PbiFile::Field> PbiNumDeletedBasesFilter::RequiredFields() const
+{ return {PbiFile::Field::N_DEL}; }
 
 // PbiNumInsertedBasesFilter
 
@@ -337,11 +382,17 @@ inline PbiNumInsertedBasesFilter::PbiNumInsertedBasesFilter(const size_t numInse
     : internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_INS>{numInsertions, cmp}
 { }
 
+inline std::set<PbiFile::Field> PbiNumInsertedBasesFilter::RequiredFields() const
+{ return {PbiFile::Field::N_INS}; }
+
 // PbiNumMatchesFilter
 
 inline PbiNumMatchesFilter::PbiNumMatchesFilter(const size_t numMatchedBases, const Compare::Type cmp)
     : internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_M>{numMatchedBases, cmp}
 { }
+
+inline std::set<PbiFile::Field> PbiNumMatchesFilter::RequiredFields() const
+{ return {PbiFile::Field::N_M}; }
 
 // PbiNumMismatchesFilter
 
@@ -349,11 +400,17 @@ inline PbiNumMismatchesFilter::PbiNumMismatchesFilter(const size_t numMismatched
     : internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_MM>{numMismatchedBases, cmp}
 { }
 
+inline std::set<PbiFile::Field> PbiNumMismatchesFilter::RequiredFields() const
+{ return {PbiFile::Field::N_MM}; }
+
 // PbiQueryEndFilter
 
 inline PbiQueryEndFilter::PbiQueryEndFilter(const int32_t position, const Compare::Type cmp)
     : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::Q_END>{position, cmp}
 { }
+
+inline std::set<PbiFile::Field> PbiQueryEndFilter::RequiredFields() const
+{ return {PbiFile::Field::Q_END}; }
 
 // PbiQueryLengthFilter
 
@@ -361,11 +418,17 @@ inline PbiQueryLengthFilter::PbiQueryLengthFilter(const int32_t length, const Co
     : internal::FilterBase<int32_t>{length, cmp}
 { }
 
+inline std::set<PbiFile::Field> PbiQueryLengthFilter::RequiredFields() const
+{ return {PbiFile::Field::Q_START, PbiFile::Field::Q_END}; }
+
 // PbiQueryStartFilter
 
 inline PbiQueryStartFilter::PbiQueryStartFilter(const int32_t position, const Compare::Type cmp)
     : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::Q_START>{position, cmp}
 { }
+
+inline std::set<PbiFile::Field> PbiQueryStartFilter::RequiredFields() const
+{ return {PbiFile::Field::Q_START}; }
 
 // PbiReadAccuracyFilter
 
@@ -373,11 +436,17 @@ inline PbiReadAccuracyFilter::PbiReadAccuracyFilter(const Accuracy accuracy, con
     : internal::BasicDataFilterBase<Accuracy, PbiFile::BasicField::READ_QUALITY>{accuracy, cmp}
 { }
 
+inline std::set<PbiFile::Field> PbiReadAccuracyFilter::RequiredFields() const
+{ return {PbiFile::Field::READ_QUALITY}; }
+
 // PbiReferenceEndFilter
 
 inline PbiReferenceEndFilter::PbiReferenceEndFilter(const uint32_t tEnd, const Compare::Type cmp)
     : internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::T_END>{tEnd, cmp}
 { }
+
+inline std::set<PbiFile::Field> PbiReferenceEndFilter::RequiredFields() const
+{ return {PbiFile::Field::T_END}; }
 
 // PbiReferenceIdFilter
 
@@ -389,11 +458,17 @@ inline PbiReferenceIdFilter::PbiReferenceIdFilter(std::vector<int32_t> whitelist
     : internal::MappedDataFilterBase<int32_t, PbiFile::MappedField::T_ID>{std::move(whitelist), cmp}
 { }
 
+inline std::set<PbiFile::Field> PbiReferenceIdFilter::RequiredFields() const
+{ return {PbiFile::Field::T_ID}; }
+
 // PbiReferenceStartFilter
 
 inline PbiReferenceStartFilter::PbiReferenceStartFilter(const uint32_t tStart, const Compare::Type cmp)
     : internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::T_START>{tStart, cmp}
 { }
+
+inline std::set<PbiFile::Field> PbiReferenceStartFilter::RequiredFields() const
+{ return {PbiFile::Field::T_START}; }
 
 // PbiZmwFilter
 
@@ -404,6 +479,9 @@ inline PbiZmwFilter::PbiZmwFilter(const int32_t zmw, const Compare::Type cmp)
 inline PbiZmwFilter::PbiZmwFilter(std::vector<int32_t> whitelist, const Compare::Type cmp)
     : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::ZMW>{std::move(whitelist), cmp}
 { }
+
+inline std::set<PbiFile::Field> PbiZmwFilter::RequiredFields() const
+{ return {PbiFile::Field::ZMW}; }
 
 // PbiZmwModuloFilter
 
@@ -465,6 +543,9 @@ inline bool PbiZmwModuloFilter::Accepts(const PbiRawData& idx,
     const auto modResult = hashValue % denominator_;
     return Compare::Check(modResult, value_, cmp_);
 }
+
+inline std::set<PbiFile::Field> PbiZmwModuloFilter::RequiredFields() const
+{ return {PbiFile::Field::ZMW}; }
 
 } // namespace BAM
 } // namespace PacBio

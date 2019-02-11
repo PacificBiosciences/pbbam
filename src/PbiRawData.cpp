@@ -194,13 +194,14 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
 
 PbiRawData::PbiRawData(std::string pbiFilename) : filename_{std::move(pbiFilename)}
 {
-    PbiIndexIO::Load(*this, filename_);
+    PbiIndexIO io{filename_};
+    *this = io.Load();
 }
 
 PbiRawData::PbiRawData(const DataSet& dataset)
     : sections_{PbiFile::BASIC | PbiFile::MAPPED | PbiFile::BARCODE}
 {
-    PbiIndexIO::LoadFromDataSet(*this, dataset);
+    *this = PbiIndexIO::LoadFromDataSet(dataset);
 }
 
 }  // namespace BAM

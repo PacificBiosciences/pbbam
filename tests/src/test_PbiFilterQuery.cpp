@@ -22,6 +22,12 @@ TEST(PbiFilterQueryTest, QueryOk)
     const auto bamFile = BamFile{PbbamTestsConfig::Data_Dir + std::string{"/group/test2.bam"}};
 
     {
+        // empty filter - all reads
+        PbiFilterQuery query(PbiFilter{}, bamFile);
+        const auto numReads = query.NumReads();
+        EXPECT_EQ(4, numReads);
+    }
+    {
         PbiFilterQuery query(PbiQueryLengthFilter{500, Compare::GREATER_THAN_EQUAL}, bamFile);
         const auto numReads = query.NumReads();
         EXPECT_EQ(3, numReads);
@@ -370,32 +376,32 @@ TEST(PbiFilterQueryTest, BarcodeQualityFromXml)
 
     const std::string xml_all = R"_XML_(
 <?xml version="1.0" encoding="utf-8"?>
-<pbds:SubreadSet 
-   xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd" 
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<pbds:SubreadSet
+   xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd"
    xmlns:pbsample="http://pacificbiosciences.com/PacBioSampleInfo.xsd"
    xmlns:pbmeta="http://pacificbiosciences.com/PacBioCollectionMetadata.xsd"
    xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd"
-   xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd" 
-   UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe519c" 
-   TimeStampedName="subreadset_150304_231155" 
-   MetaType="PacBio.DataSet.SubreadSet" 
-   Name="DataSet_SubreadSet" 
-   Tags="" 
-   Version="3.0.0" 
-   CreatedAt="2015-01-27T09:00:01"> 
+   xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd"
+   UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe519c"
+   TimeStampedName="subreadset_150304_231155"
+   MetaType="PacBio.DataSet.SubreadSet"
+   Name="DataSet_SubreadSet"
+   Tags=""
+   Version="3.0.0"
+   CreatedAt="2015-01-27T09:00:01">
 <pbbase:ExternalResources>
-   <pbbase:ExternalResource 
-       UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5193" 
-       TimeStampedName="subread_bam_150304_231155" 
-       MetaType="PacBio.SubreadFile.SubreadBamFile" 
+   <pbbase:ExternalResource
+       UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5193"
+       TimeStampedName="subread_bam_150304_231155"
+       MetaType="PacBio.SubreadFile.SubreadBamFile"
        ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.1.subreads.bam">
        <pbbase:FileIndices>
-           <pbbase:FileIndex 
-               UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5194" 
-               TimeStampedName="bam_index_150304_231155" 
-               MetaType="PacBio.Index.PacBioIndex" 
+           <pbbase:FileIndex
+               UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5194"
+               TimeStampedName="bam_index_150304_231155"
+               MetaType="PacBio.Index.PacBioIndex"
                ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.1.subreads.bam.pbi"/>
        </pbbase:FileIndices>
    </pbbase:ExternalResource>
