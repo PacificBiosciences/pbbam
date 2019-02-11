@@ -10,10 +10,6 @@ VcfQuery::VcfQuery(const VcfFile& file)
 {
 }
 
-VcfQuery::VcfQuery(VcfQuery&&) = default;
-
-VcfQuery& VcfQuery::operator=(VcfQuery&&) = default;
-
 VcfQuery::~VcfQuery() = default;
 
 bool VcfQuery::GetNext(VcfVariant& var) { return reader_.GetNext(var); }

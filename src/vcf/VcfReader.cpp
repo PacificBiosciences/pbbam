@@ -18,10 +18,6 @@ VcfReader::VcfReader(const VcfFile& file) : in_{file.Filename()}, header_{file.H
     FetchNext();
 }
 
-VcfReader::VcfReader(VcfReader&&) = default;
-
-VcfReader& VcfReader::operator=(VcfReader&&) = default;
-
 VcfReader::~VcfReader() = default;
 
 void VcfReader::FetchNext()

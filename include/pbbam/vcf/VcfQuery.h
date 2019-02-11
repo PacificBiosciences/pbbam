@@ -22,9 +22,9 @@ public:
 
     VcfQuery() = delete;
     VcfQuery(const VcfQuery&) = delete;
-    VcfQuery(VcfQuery&&);
+    VcfQuery(VcfQuery&&) = default;
     VcfQuery& operator=(const VcfQuery&) = delete;
-    VcfQuery& operator=(VcfQuery&&);
+    VcfQuery& operator=(VcfQuery&&) = default;
     ~VcfQuery();
 
 public:
