@@ -3,6 +3,7 @@
 #include <pbbam/vcf/VcfFormat.h>
 
 #include <cassert>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <sstream>

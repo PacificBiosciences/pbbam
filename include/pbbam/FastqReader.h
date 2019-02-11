@@ -35,9 +35,9 @@ public:
     explicit FastqReader(const std::string& fn);
 
     FastqReader(const FastqReader&) = delete;
-    FastqReader(FastqReader&& other);
+    FastqReader(FastqReader&&);
     FastqReader& operator=(const FastqReader&) = delete;
-    FastqReader& operator=(FastqReader&& other);
+    FastqReader& operator=(FastqReader&&);
     ~FastqReader();
 
     /// \}
