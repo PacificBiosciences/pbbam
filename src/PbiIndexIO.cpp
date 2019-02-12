@@ -142,10 +142,10 @@ void PbiIndexIO::LoadHeader()
     BGZF* bgzf = fp_.get();
 
     // 'magic' string
-    std::array<char, 4> magic;
-    auto bytesRead = bgzf_read(bgzf, magic.data(), 4);
-    if (bytesRead != 4 || strncmp(magic.data(), "PBI\1", 4))
-        throw std::runtime_error{"PbiIndexIO: expected PBI file, found unknown format instead"};
+    char magic[4];
+    auto bytesRead = bgzf_read(bgzf, magic, 4);
+    if (bytesRead != 4 || strncmp(magic, "PBI\1", 4))
+        throw std::runtime_error{"expected PBI file, found unknown format instead"};
 
     // read header metadata
     uint32_t version;

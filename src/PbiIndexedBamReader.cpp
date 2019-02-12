@@ -63,7 +63,7 @@ public:
             blocks_.emplace_back(0, header_.numReads);
         }
 
-        // apply filter, store blocks of contiguous reads
+        // apply filter, store contiguous blocks of reads
         else {
 
             IndexList indices;
@@ -129,7 +129,7 @@ public:
     std::string pbiFilename_;
     PbiFilter filter_;
     PbiHeader header_;
-    boost::optional<PbiRawData> index_;
+    boost::optional<PbiRawData> index_;  //
     IndexResultBlocks blocks_;
     size_t currentBlockReadCount_;
     uint32_t numMatchingReads_;
