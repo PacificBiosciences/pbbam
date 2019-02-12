@@ -10,7 +10,11 @@
 
 #include <algorithm>
 #include <map>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/icl/interval_set.hpp>
@@ -98,7 +102,7 @@ DataSet::DataSet(const DataSet::TypeEnum type) : path_(FileUtils::CurrentWorking
             d_ = std::make_unique<TranscriptAlignmentSet>();
             break;
         default:
-            throw std::runtime_error{"unsupported dataset type"};
+            throw std::runtime_error{"DataSet: unsupported type"};
     }
 
     InitDefaults(*this);
@@ -300,10 +304,11 @@ std::vector<GenomicInterval> DataSet::GenomicIntervals() const
             const auto it = contigLengths.find(refName);
             if (it == contigLengths.cend())
                 contigLengths.emplace(refName, refLength);
-            else if (it->second != refLength)
-                throw std::runtime_error{refName + " occurs twice with different lengths ('" +
-                                         std::to_string(it->second) + "' and '" +
-                                         std::to_string(refLength) + "')"};
+            else if (it->second != refLength) {
+                throw std::runtime_error{
+                    "DataSet: " + refName + " occurs twice with different lengths ('" +
+                    std::to_string(it->second) + "' and '" + std::to_string(refLength) + "')"};
+            }
         }
     }
 
@@ -332,36 +337,38 @@ std::vector<GenomicInterval> DataSet::GenomicIntervals() const
 
                     const auto it = contigLengths.find(XmlValue);
                     if (it == contigLengths.cend())
-                        throw std::runtime_error{"Could not find contig '" + XmlValue +
+                        throw std::runtime_error{"DataSet: Could not find contig '" + XmlValue +
                                                  "' in BAM files"};
                     else
                         intersectedInterval &= intInterval(0, it->second);
                 } else
                     throw std::runtime_error{
-                        '\'' + XmlOperator +
+                        "DatSet: '" + XmlOperator +
                         "' is an unrecognized property operator, only '=' is recognized"};
             } else if ("tstart" == XmlName) {
                 if ((XmlOperator != "<") && (XmlOperator != "<="))
-                    throw std::runtime_error{"tstart only supports '<' and '<=' operators"};
+                    throw std::runtime_error{
+                        "DataSet: tstart only supports '<' and '<=' operators"};
 
                 const int32_t end = boost::lexical_cast<int32_t>(XmlValue) + ("<=" == XmlOperator);
                 intersectedInterval &= intInterval(0, end);
             } else if ("tend" == XmlName) {
                 if ((XmlOperator != ">") && (XmlOperator != ">="))
-                    throw std::runtime_error{"tend only supports '>' and '>=' operators"};
+                    throw std::runtime_error{"DataSet: tend only supports '>' and '>=' operators"};
 
                 const int32_t start =
                     boost::lexical_cast<int32_t>(XmlValue) - (">=" == XmlOperator);
                 intersectedInterval &= intInterval(start, std::numeric_limits<int32_t>::max());
             } else
-                throw std::runtime_error{'\'' + XmlName +
+                throw std::runtime_error{"DataSet: '" + XmlName +
                                          "' is an unrecognized filter property name"};
         }
 
         if (contigName)
             contigIntervals[contigName.value()] |= intersectedInterval;
         else
-            throw std::runtime_error{"Current filter does not have a valid 'rname' attribute"};
+            throw std::runtime_error{
+                "DataSet: current filter does not have a valid 'rname' attribute"};
     }
 
     // extract all GenomicIntervals
@@ -487,7 +494,9 @@ std::set<std::string> DataSet::SequencingChemistries() const
 
     std::set<std::string> result;
     for (const BamFile& bf : bamFiles) {
-        if (!bf.IsPacBioBAM()) throw std::runtime_error{"only PacBio BAMs are supported"};
+        if (!bf.IsPacBioBAM())
+            throw std::runtime_error{
+                "DataSet: only PacBio BAMs are supported for fetching chemistry info"};
         const std::vector<ReadGroupInfo> readGroups{bf.Header().ReadGroups()};
         for (const ReadGroupInfo& rg : readGroups)
             result.insert(rg.SequencingChemistry());
@@ -561,7 +570,7 @@ std::string DataSet::TypeToName(const DataSet::TypeEnum& type)
         case DataSet::TRANSCRIPT_ALIGNMENT:
             return "TranscriptAlignmentSet";
         default:
-            throw std::runtime_error{"unsupported dataset type"};
+            throw std::runtime_error{"DataSet: unsupported dataset type"};
     }
 }
 

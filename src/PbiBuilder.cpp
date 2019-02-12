@@ -55,7 +55,8 @@ inline void SwapEndianness(std::vector<T>& data)
                 ed_swap_8p(&data[i]);
             break;
         default:
-            throw std::runtime_error{"unsupported element size"};
+            throw std::runtime_error{"PbiBuilder: unsupported element size (" +
+                                     std::to_string(elementSize) + ")"};
     }
 }
 
@@ -63,7 +64,8 @@ void bgzf_write_safe(BGZF* fp, const void* data, size_t length)
 {
     const auto ret = bgzf_write(fp, data, length);
     if (ret < 0L)
-        throw std::runtime_error{"Non-zero returned from bgzf_write(). Out of disk space?"};
+        throw std::runtime_error{
+            "PbiBuilder: non-zero returned from bgzf_write(). Out of disk space?"};
 }
 
 template <typename T>
@@ -265,7 +267,7 @@ public:
         , bcQualField_{MaxBufferSize}
     {
         if (!tempFile_)
-            throw std::runtime_error{"index builder could not open temp file: " + tempFilename_};
+            throw std::runtime_error{"PbiBuilder: could not open temp file: " + tempFilename_};
 
         if (isCoordinateSorted && numReferenceSequences > 0)
             refDataBuilder_ =
@@ -419,7 +421,9 @@ public:
         // open file handle
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel_));
         pbiFile_.reset(bgzf_open(pbiFilename_.c_str(), mode.c_str()));
-        if (pbiFile_ == nullptr) throw std::runtime_error{"could not open output file"};
+        if (pbiFile_ == nullptr)
+            throw std::runtime_error{"PbiBuilder: could not open file for writing: " +
+                                     pbiFilename_};
 
         // if no explicit thread count given, attempt built-in check
         size_t actualNumThreads = numThreads_;
@@ -478,7 +482,8 @@ public:
         // seek to block begin
         const auto ret = std::fseek(tempFile_.get(), block.pos_, SEEK_SET);
         if (ret != 0)
-            throw std::runtime_error{"index builder could not seek in temp file: " + tempFilename_};
+            throw std::runtime_error{"PbiBuilder: could not seek in temp file: " + tempFilename_ +
+                                     ", offset: " + std::to_string(block.pos_)};
 
         // read block elements
         field.buffer_.assign(block.n_, 0);
@@ -486,9 +491,8 @@ public:
             std::fread(field.buffer_.data(), sizeof(T), block.n_, tempFile_.get());
 
         if (numElements != block.n_)
-            throw std::runtime_error{
-                "index builder could not read expected element count from temp file: " +
-                tempFilename_};
+            throw std::runtime_error{"PbiBuilder: could not read element count from temp file: " +
+                                     tempFilename_};
     }
 
     template <typename T>

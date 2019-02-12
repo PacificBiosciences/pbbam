@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <memory>
 #include <sstream>
+#include <string>
 
 #include <htslib/sam.h>
 
@@ -46,9 +47,10 @@ public:
             // -1: some other error
             std::ostringstream e;
             if (eofCheck == 0)
-                e << fn << " : is missing EOF block\n";
+                e << "BamFile: missing EOF block in " << fn;
             else
-                e << fn << " : unknown error while checking EOF block\n";
+                e << "BamFile: unknown error encountered while checking EOF in " << fn
+                  << " (status code = " << eofCheck << ')';
             throw std::runtime_error{e.str()};
         }
 #endif
@@ -86,10 +88,10 @@ public:
     std::unique_ptr<samFile, HtslibFileDeleter> RawOpen() const
     {
         std::unique_ptr<samFile, HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
-        if (!f || !f->fp.bgzf)
-            throw std::runtime_error{"could not open BAM file: '" + filename_ + "'"};
+        if (!f || !f->fp.bgzf) throw std::runtime_error{"BamFile: could not open: " + filename_};
         if (f->format.format != bam)
-            throw std::runtime_error{"expected BAM, unknown format in: '" + filename_ + "'"};
+            throw std::runtime_error{"BamFile: expected BAM, encountered un supported format: " +
+                                     filename_};
         return f;
     }
 
@@ -128,8 +130,13 @@ void BamFile::CreatePacBioIndex() const { PbiFile::CreateFrom(*this); }
 
 void BamFile::CreateStandardIndex() const
 {
-    if (bam_index_build(d_->filename_.c_str(), 0) != 0)
-        throw std::runtime_error{"could not build BAI index"};
+    const auto ret = bam_index_build(d_->filename_.c_str(), 0);
+    if (ret != 0) {
+        std::ostringstream s;
+        s << "BamFile: could not create *.bai index for file: " << d_->filename_
+          << " (status code = " << ret << ')';
+        throw std::runtime_error{s.str()};
+    }
 }
 
 void BamFile::EnsurePacBioIndexExists() const

@@ -34,7 +34,9 @@ public:
     {
         // fetch file pointer
         htsFile_.reset(sam_open(bamFile_.Filename().c_str(), "rb"));
-        if (!htsFile_) throw std::runtime_error{"could not open BAM file for reading"};
+        if (!htsFile_)
+            throw std::runtime_error{"BamReader: could not open BAM file for reading: " +
+                                     bamFile_.Filename()};
     }
 
     std::unique_ptr<samFile, HtslibFileDeleter> htsFile_;
@@ -103,7 +105,7 @@ bool BamReader::GetNext(BamRecord& record)
     // error corrupted file
     else {
         std::ostringstream msg;
-        msg << "corrupted BAM file: ";
+        msg << "BamReader: cannot read from corrupted file: " << Filename() << '\n' << "  reason: ";
         if (result == -2)
             msg << "probably truncated";
         else if (result == -3)
@@ -111,8 +113,8 @@ bool BamReader::GetNext(BamRecord& record)
         else if (result == -4)
             msg << "could not read BAM record's' variable-length data";
         else
-            msg << "unknown reason " + std::to_string(result);
-        msg << " (" << Filename() << ')';
+            msg << "unknown reason";
+        msg << " (status code = " << result << ')';
         throw std::runtime_error{msg.str()};
     }
 }
@@ -122,7 +124,12 @@ int BamReader::ReadRawData(BGZF* bgzf, bam1_t* b) { return bam_read1(bgzf, b); }
 void BamReader::VirtualSeek(int64_t virtualOffset)
 {
     const auto result = bgzf_seek(Bgzf(), virtualOffset, SEEK_SET);
-    if (result != 0) throw std::runtime_error{"Failed to seek in BAM file"};
+    if (result != 0) {
+        std::ostringstream s;
+        s << "BamReader: failed to seek in file: " << Filename() << " (offset = " << virtualOffset
+          << ')';
+        throw std::runtime_error{s.str()};
+    }
 }
 
 int64_t BamReader::VirtualTell() const { return bgzf_tell(Bgzf()); }

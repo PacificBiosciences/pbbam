@@ -99,7 +99,8 @@ template <typename T>
 inline const T& DataSetElement::Child(size_t index) const
 {
     DataSetElement* child = children_.at(index).get();
-    if (child == nullptr) throw std::runtime_error{"Cannot access null dataset element."};
+    if (child == nullptr)
+        throw std::runtime_error{"DataSetElement: cannot access null child at index: " + std::to_string(index)};
     const T* c = dynamic_cast<const T*>(child);
     return *c;
 }
@@ -108,7 +109,8 @@ template <typename T>
 inline T& DataSetElement::Child(size_t index)
 {
     DataSetElement* child = children_.at(index).get();
-    if (child == nullptr) throw std::runtime_error{"Cannot access null dataset element."};
+    if (child == nullptr)
+        throw std::runtime_error{"DataSetElement: cannot access null child at index: " + std::to_string(index)};
     T* c = dynamic_cast<T*>(child);
     return *c;
 }

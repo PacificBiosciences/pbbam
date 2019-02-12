@@ -17,7 +17,7 @@ ContigDefinition::ContigDefinition(std::string id,
     : id_{std::move(id)}, attributes_{std::move(attributes)}
 {
     if (id_.empty())
-        throw std::runtime_error{"VCF format error: ##contig definition has empty ID field"};
+        throw std::runtime_error{"VcfFormat: ##contig definition in header has empty ID field"};
 }
 
 ContigDefinition::ContigDefinition(const ContigDefinition&) = default;
@@ -63,10 +63,11 @@ FilterDefinition::FilterDefinition(std::string id, std::string description)
     : id_{std::move(id)}, description_{std::move(description)}
 {
     if (id_.empty())
-        throw std::runtime_error{"VCF format error: FILTER definition has empty ID field"};
+        throw std::runtime_error{"VcfFormat: FILTER definition in header has empty ID field"};
 
     if (description_.empty())
-        throw std::runtime_error{"VCF format error: FILTER definition has empty Description field"};
+        throw std::runtime_error{
+            "VcfFormat: FILTER definition in header has empty Description field"};
 }
 
 FilterDefinition::FilterDefinition(const FilterDefinition&) = default;
@@ -95,16 +96,17 @@ FormatDefinition::FormatDefinition(std::string id, std::string number, std::stri
     , description_{std::move(description)}
 {
     if (id_.empty())
-        throw std::runtime_error{"VCF format error: FORMAT definition has empty ID field"};
+        throw std::runtime_error{"VcfFormat: FORMAT definition in header has empty ID field"};
 
     if (number_.empty())
-        throw std::runtime_error{"VCF format error: FORMAT definition has empty Number field"};
+        throw std::runtime_error{"VcfFormat: FORMAT definition in header has empty Number field"};
 
     if (type_.empty())
-        throw std::runtime_error{"VCF format error: FORMAT definition has empty Type field"};
+        throw std::runtime_error{"VcfFormat: FORMAT definition in header has empty Type field"};
 
     if (description_.empty())
-        throw std::runtime_error{"VCF format error: FORMAT definition has empty Description field"};
+        throw std::runtime_error{
+            "VcfFormat: FORMAT definition in header has empty Description field"};
 }
 
 FormatDefinition::FormatDefinition(const FormatDefinition&) = default;
@@ -133,10 +135,12 @@ GeneralDefinition::GeneralDefinition(std::string id, std::string text)
     : id_{std::move(id)}, text_{std::move(text)}
 {
     if (id_.empty())
-        throw std::runtime_error{"VCF format error: general metadata definition has empty label"};
+        throw std::runtime_error{
+            "VcfFormat: general metadata definition in header has empty label"};
 
     if (text_.empty())
-        throw std::runtime_error{"VCF format error: general metadata definition has empty value"};
+        throw std::runtime_error{
+            "VcfFormat: general metadata definition in header has empty value"};
 }
 
 GeneralDefinition::GeneralDefinition(const GeneralDefinition&) = default;
@@ -166,16 +170,17 @@ InfoDefinition::InfoDefinition(std::string id, std::string number, std::string t
 {
     // verify required fields
     if (id_.empty())
-        throw std::runtime_error{"VCF format error: INFO definition has empty ID field"};
+        throw std::runtime_error{"VcfFormat: INFO definition in header has empty ID field"};
 
     if (number_.empty())
-        throw std::runtime_error{"VCF format error: INFO definition has empty Number field"};
+        throw std::runtime_error{"VcfFormat: INFO definition in header has empty Number field"};
 
     if (type_.empty())
-        throw std::runtime_error{"VCF format error: INFO definition has empty Type field"};
+        throw std::runtime_error{"VcfFormat: INFO definition in header has empty Type field"};
 
     if (description_.empty())
-        throw std::runtime_error{"VCF format error: INFO definition has empty Description field"};
+        throw std::runtime_error{
+            "VcfFormat: INFO definition in header has empty Description field"};
 
     if (!source.empty()) source_ = std::move(source);
     if (!version.empty()) version_ = std::move(version);

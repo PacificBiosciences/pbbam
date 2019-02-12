@@ -64,7 +64,7 @@ inline bool FilterBase<T>::CompareMultiHelper(const T& lhs) const
         return true;
     }
     else
-        throw std::runtime_error{"unsupported compare type on multivalue filter"};
+        throw std::runtime_error{"PbiFilter: multi-valued filters (e.g. whitelists) can only check equality."};
 }
 
 template<typename T>
@@ -88,7 +88,7 @@ inline bool FilterBase<LocalContextFlags>::CompareSingleHelper(const LocalContex
 
         default:
             assert(false);
-            throw std::runtime_error{"unsupported compare type requested"};
+            throw std::runtime_error{"PbiFilter: unknown compare type (" + Compare::TypeToName(cmp_) + ")" };
     }
 }
 
@@ -115,7 +115,7 @@ inline bool BarcodeDataFilterBase<T, field>::BarcodeDataFilterBase::Accepts(cons
         case PbiFile::BarcodeField::BC_QUALITY: return FilterBase<T>::CompareHelper(barcodeData.bcQual_.at(row));
         default:
             assert(false);
-            throw std::runtime_error{"unsupported BarcodeData field requested"};
+            throw std::runtime_error{"PbiFilter: unknown barcode field requested."};
     }
 }
 
@@ -142,10 +142,10 @@ inline bool BasicDataFilterBase<T, field>::BasicDataFilterBase::Accepts(const Pb
         case PbiFile::BasicField::Q_END:        return FilterBase<T>::CompareHelper(basicData.qEnd_.at(row));
         case PbiFile::BasicField::ZMW:          return FilterBase<T>::CompareHelper(basicData.holeNumber_.at(row));
         case PbiFile::BasicField::READ_QUALITY: return FilterBase<T>::CompareHelper(basicData.readQual_.at(row));
-        //   PbiFile::BasicField::CONTEXT_FLAG has its own specialization
+        // NOTE(DB): PbiFile::BasicField::CONTEXT_FLAG has its own specialization
         default:
             assert(false);
-            throw std::runtime_error{"unsupported BasicData field requested"};
+            throw std::runtime_error{"PbiFilter: unknown basic data field requested."};
     }
 }
 
@@ -200,7 +200,7 @@ inline bool MappedDataFilterBase<T, field>::MappedDataFilterBase::Accepts(const 
         case PbiFile::MappedField::MAP_QUALITY: return FilterBase<T>::CompareHelper(mappedData.mapQV_.at(row));
         default:
             assert(false);
-            throw std::runtime_error{"unsupported MappedData field requested"};
+            throw std::runtime_error{"PbiFilter: unknown mapped data field requested."};
     }
 }
 
@@ -238,9 +238,8 @@ inline std::set<PbiFile::Field> PbiAlignedStartFilter::RequiredFields() const
 inline PbiAlignedStrandFilter::PbiAlignedStrandFilter(const Strand strand, const Compare::Type cmp)
     : internal::MappedDataFilterBase<Strand, PbiFile::MappedField::STRAND>{strand, cmp}
 {
-    if (cmp != Compare::EQUAL && cmp != Compare::NOT_EQUAL) {
-        throw std::runtime_error{"Compare type: " + Compare::TypeToName(cmp) + " not supported for PbiAlignedStrandFilter (use one of Compare::EQUAL or Compare::NOT_EQUAL)."};
-    }
+    if (cmp != Compare::EQUAL && cmp != Compare::NOT_EQUAL)
+        throw std::runtime_error{"PbiFilter: compare type for aligned strand must be either EQUAL or NOT_EQUAL"};
 }
 
 inline std::set<PbiFile::Field> PbiAlignedStrandFilter::RequiredFields() const

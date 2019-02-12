@@ -33,7 +33,9 @@ public:
         polyHeader_ = std::make_unique<BamHeader>(primaryBamFile_->Header().ToSam());
         auto readGroups = polyHeader_->ReadGroups();
         if (readGroups.empty())
-            throw std::runtime_error{"Bam header of the primary bam has no read groups."};
+            throw std::runtime_error{
+                "WhitelistedZmwStitcher: no read groups in header of the primary BAM file: " +
+                primaryBamFilePath};
         readGroups[0].ReadType("POLYMERASE");
         readGroups[0].Id(readGroups[0].MovieName(), "POLYMERASE");
         if (readGroups.size() > 1) {

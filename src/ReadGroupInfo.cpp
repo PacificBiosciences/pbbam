@@ -129,7 +129,7 @@ std::string BaseFeatureName(const BaseFeature& feature)
     const auto found = lookup.find(feature);
     if (found != lookup.cend())
         return found->second;
-    throw std::runtime_error{ "unrecognized base feature" };
+    throw std::runtime_error{ "ReadGroupInfo: unrecognized base feature" };
 }
 
 std::string FrameCodecName(const FrameCodec& codec)
@@ -142,7 +142,7 @@ std::string FrameCodecName(const FrameCodec& codec)
     const auto found = lookup.find(codec);
     if (found != lookup.cend())
         return found->second;
-    throw std::runtime_error{ "unrecognized frame codec" };
+    throw std::runtime_error{ "ReadGroupInfo: unrecognized frame codec" };
 }
 
 std::string BarcodeModeName(const BarcodeModeType& mode)
@@ -157,7 +157,7 @@ std::string BarcodeModeName(const BarcodeModeType& mode)
     const auto found = lookup.find(mode);
     if (found != lookup.cend())
         return found->second;
-    throw std::runtime_error{ "unrecognized barcode mode type" };
+    throw std::runtime_error{ "ReadGroupInfo: unrecognized barcode mode type" };
 }
 
 std::string BarcodeQualityName(const BarcodeQualityType& type)
@@ -171,7 +171,7 @@ std::string BarcodeQualityName(const BarcodeQualityType& type)
     const auto found = lookup.find(type);
     if (found != lookup.cend())
         return found->second;
-    throw std::runtime_error{ "unrecognized barcode quality type" };
+    throw std::runtime_error{ "ReadGroupInfo: unrecognized barcode quality type" };
 }
 
 std::string PlatformModelName(const PlatformModelType& type)
@@ -186,7 +186,7 @@ std::string PlatformModelName(const PlatformModelType& type)
     const auto found = lookup.find(type);
     if (found != lookup.cend())
         return found->second;
-    throw std::runtime_error{ "unrecognized platform model type" };
+    throw std::runtime_error{ "ReadGroupInfo: unrecognized platform model type" };
 }
 
 static const std::map<std::string, BaseFeature> nameToFeature
@@ -345,7 +345,8 @@ bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
 size_t ReadGroupInfo::BarcodeCount() const
 {
     if (!hasBarcodeData_)
-        throw std::runtime_error{"barcode count requested but barcode data is missing"};
+        throw std::runtime_error{
+            "ReadGroupInfo: barcode count requested but barcode data is missing"};
     return barcodeCount_;
 }
 
@@ -365,28 +366,32 @@ ReadGroupInfo& ReadGroupInfo::BarcodeData(std::string barcodeFile, std::string b
 std::string ReadGroupInfo::BarcodeFile() const
 {
     if (!hasBarcodeData_)
-        throw std::runtime_error{"barcode file requested but barcode data is missing"};
+        throw std::runtime_error{
+            "ReadGroupInfo: barcode file requested but barcode data is missing"};
     return barcodeFile_;
 }
 
 std::string ReadGroupInfo::BarcodeHash() const
 {
     if (!hasBarcodeData_)
-        throw std::runtime_error{"barcode hash requested but barcode data is missing"};
+        throw std::runtime_error{
+            "ReadGroupInfo: barcode hash requested but barcode data is missing"};
     return barcodeHash_;
 }
 
 BarcodeModeType ReadGroupInfo::BarcodeMode() const
 {
     if (!hasBarcodeData_)
-        throw std::runtime_error{"barcode mode requested but barcode data is missing"};
+        throw std::runtime_error{
+            "ReadGroupInfo: barcode mode requested but barcode data is missing"};
     return barcodeMode_;
 }
 
 BarcodeQualityType ReadGroupInfo::BarcodeQuality() const
 {
     if (!hasBarcodeData_)
-        throw std::runtime_error{"barcode quality requested but barcode data is missing"};
+        throw std::runtime_error{
+            "ReadGroupInfo: barcode quality requested but barcode data is missing"};
     return barcodeQuality_;
 }
 
@@ -682,7 +687,7 @@ ReadGroupInfo& ReadGroupInfo::Id(std::string id)
         const auto tokens = Split(id.substr(slashAt + 1), '-');
         if (tokens.size() != 3) {
             throw std::runtime_error{
-                "could not fetch barcodes from malformatted read group ID: " + id +
+                "ReadGroupInfo: could not fetch barcodes from malformatted read group ID: " + id +
                 " Must be in the form: {RGID_STRING}/{bcForward}--{bcReverse}"};
         }
 
@@ -692,7 +697,7 @@ ReadGroupInfo& ReadGroupInfo::Id(std::string id)
                                                       static_cast<uint16_t>(std::stoul(tokens[2])));
         } catch (std::exception& e) {
             throw std::runtime_error{
-                "could not fetch barcodes from malformatted read group ID: " + id_ +
+                "ReadGroupInfo: could not fetch barcodes from malformatted read group ID: " + id +
                 " Must be in the form: {RGID_STRING}/{bcForward}--{bcReverse}"};
         }
     }
@@ -838,7 +843,8 @@ std::string ReadGroupInfo::SequencingChemistryFromTriple(const std::string& bind
 {
     const auto verFields = Split(basecallerVersion, '.');
     if (verFields.size() < 2)
-        throw std::runtime_error{"basecaller version too short: " + basecallerVersion};
+        throw std::runtime_error{"ReadGroupInfo: basecaller version is too short: " +
+                                 basecallerVersion};
     const std::string version{verFields.at(0) + '.' + verFields.at(1)};
 
     // check updated table first, if it exists (empty if not), overriding the built-in lookup

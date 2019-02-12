@@ -222,7 +222,7 @@ DataSetBase& DataSetBase::operator+=(const DataSetBase& other)
 {
     // must be same dataset types (or 'other' must be generic)
     if (other.LocalNameLabel() != LocalNameLabel() && other.LocalNameLabel() != "DataSet")
-        throw std::runtime_error{"cannot merge different dataset types"};
+        throw std::runtime_error{"DataSet: cannot merge different dataset types"};
 
     // check object metadata
     Metadata() += other.Metadata();
@@ -250,7 +250,7 @@ std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName)
         return std::make_shared<TranscriptAlignmentSet>();
 
     // unknown typename
-    throw std::runtime_error{"unsupported dataset type: " + typeName};
+    throw std::runtime_error{"DataSet: unsupported type: " + typeName};
 }
 
 std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName,
@@ -276,7 +276,7 @@ std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName,
         return std::make_shared<TranscriptAlignmentSet>(fromInputXml);
 
     // unknown typename
-    throw std::runtime_error{"unsupported dataset type: " + typeName};
+    throw std::runtime_error{"DataSet: unsupported type: " + typeName};
 }
 
 void DataSetBase::Save(const std::string& outputFilename)

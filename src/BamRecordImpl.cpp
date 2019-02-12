@@ -601,9 +601,13 @@ BamRecordImpl& BamRecordImpl::SetSecondMate(bool ok)
 BamRecordImpl& BamRecordImpl::SetSequenceAndQualities(const std::string& sequence,
                                                       const std::string& qualities)
 {
-    if (!qualities.empty() && (sequence.size() != qualities.size()))
-        throw std::runtime_error{"If QUAL provided, must be of the same length as SEQ"};
-
+    if (!qualities.empty() && (sequence.size() != qualities.size())) {
+        std::ostringstream s;
+        s << "BamRecord: if qualities are provided, the length must match the sequence length:\n"
+          << "  seq: " << sequence.size() << '\n'
+          << "  qualities: " << qualities.size();
+        throw std::runtime_error{s.str()};
+    }
     return SetSequenceAndQualitiesInternal(sequence.c_str(), sequence.size(), qualities.c_str(),
                                            false);
 }
@@ -679,7 +683,9 @@ BamRecordImpl& BamRecordImpl::SetSupplementaryAlignment(bool ok)
 
 int BamRecordImpl::TagOffset(const std::string& tagName) const
 {
-    if (tagName.size() != 2) throw std::runtime_error{"invalid tag name size"};
+    if (tagName.size() != 2)
+        throw std::runtime_error{"BamRecord: tag name (" + tagName +
+                                 ") must have 2 characters only"};
 
     if (tagOffsets_.empty()) UpdateTagMap();
 
@@ -812,8 +818,9 @@ void BamRecordImpl::UpdateTagMap() const
 
                     // unknown subTagType
                     default:
-                        throw std::runtime_error{"unsupported array-tag-type encountered: " +
-                                                 std::string{1, subTagType}};
+                        throw std::runtime_error{
+                            "BamRecord: unsupported array-tag-type encountered: " +
+                            std::string{1, subTagType}};
                 }
 
                 uint32_t numElements = 0;
@@ -824,7 +831,7 @@ void BamRecordImpl::UpdateTagMap() const
 
             // unknown tagType
             default:
-                throw std::runtime_error{"unsupported tag-type encountered: " +
+                throw std::runtime_error{"BamRecord: unsupported tag-type encountered: " +
                                          std::string{1, tagType}};
         }
     }

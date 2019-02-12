@@ -190,7 +190,7 @@ bool VcfVariant::IsSampleHeterozygous(const size_t sampleIndex) const
     if (fields.size() == 1) fields = PacBio::BAM::Split(data.get(), '|');
 
     if (fields.size() != 2)
-        throw std::runtime_error{"VCF format error: malformatted GT field: " + data.get()};
+        throw std::runtime_error{"VcfFormat: malformatted GT field: " + data.get()};
 
     return fields.at(0) != fields.at(1);
 }

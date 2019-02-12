@@ -52,6 +52,7 @@ public:
 
         // no reader active
         throw std::runtime_error{
+            "ZmwReadStitcher: "
             "no readers active, make sure you use "
             "ZmwReadStitcher::HasNext before "
             "requesting next record"};
@@ -67,6 +68,7 @@ public:
 
         // no reader active
         throw std::runtime_error{
+            "ZmwReadStitcher: "
             "no readers active, make sure you use "
             "ZmwReadStitcher::HasNext before "
             "requesting next group of records"};

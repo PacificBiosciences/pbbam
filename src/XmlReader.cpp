@@ -57,7 +57,7 @@ std::unique_ptr<DataSetBase> MakeDataSetBase(const pugi::xml_node& xmlNode)
             return std::make_unique<DataSetBase>(fromInputXml);
         default:
             // unreachable
-            throw std::runtime_error{"unknown data set label: " + name};
+            throw std::runtime_error{"XmlReader: unknown data set label: " + name};
     }
 }
 
@@ -124,7 +124,7 @@ std::shared_ptr<DataSetElement> MakeElement(const pugi::xml_node& xmlNode)
             return std::make_shared<DataSetElement>(name, fromInputXml);
         default:
             // unreachable
-            throw std::runtime_error{"unknown data element label: " + name};
+            throw std::runtime_error{"XmlReader: unknown data element label: " + name};
     }
 }
 
@@ -134,7 +134,7 @@ void UpdateRegistry(const std::string& attributeName, const std::string& attribu
     std::vector<std::string> nameParts = Split(attributeName, ':');
     assert(!nameParts.empty());
     if (nameParts.size() > 2)
-        throw std::runtime_error{"malformed xmlns attribute: " + attributeName};
+        throw std::runtime_error{"XmlReader: malformed xmlns attribute: " + attributeName};
 
     const bool isDefault = (nameParts.size() == 1);
     const XsdType xsd = registry.XsdForUri(attributeValue);
@@ -187,12 +187,13 @@ std::unique_ptr<DataSetBase> XmlReader::FromStream(std::istream& in)
     pugi::xml_document doc;
     const pugi::xml_parse_result loadResult = doc.load(in);
     if (loadResult.status != pugi::status_ok)
-        throw std::runtime_error{"could not read XML file, error code:" +
+        throw std::runtime_error{"XmlReader: could not read XML file, error code:" +
                                  std::to_string(loadResult.status)};
 
     // parse top-level attributes
     pugi::xml_node rootNode = doc.document_element();
-    if (rootNode == pugi::xml_node()) throw std::runtime_error{"could not fetch XML root node"};
+    if (rootNode == pugi::xml_node())
+        throw std::runtime_error{"XmlReader: could not fetch XML root node"};
 
     // create dataset matching type strings
     auto dataset = MakeDataSetBase(rootNode);

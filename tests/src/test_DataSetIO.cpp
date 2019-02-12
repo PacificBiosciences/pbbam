@@ -132,7 +132,7 @@ TEST(DataSetIOTest, ThrowsOnNonexistentFofnFile)
     }
     catch(std::runtime_error& e)
     {
-        const std::string msg = "could not open FOFN for reading: does/not/exist.fofn";
+        const std::string msg = "DataSet: could not open FOFN for reading: does/not/exist.fofn";
         EXPECT_EQ(msg, e.what()) ;
         checkedException = true;
     }
@@ -148,7 +148,7 @@ TEST(DataSetIOTest, ThrowsOnNonexistentXmlFile)
     }
     catch(std::runtime_error& e)
     {
-        const std::string msg = "could not open XML file for reading: does/not/exist.xml";
+        const std::string msg = "DataSet: could not open XML file for reading: does/not/exist.xml";
         EXPECT_EQ(msg, e.what()) ;
         checkedException = true;
     }
@@ -164,7 +164,7 @@ TEST(DataSetIOTest, ThrowsOnUnsupportedExtension)
     }
     catch(std::runtime_error& e)
     {
-        const std::string msg = "unsupported extension on input file: bad/extension.foo";
+        const std::string msg = "DataSet: unsupported extension on input file: bad/extension.foo";
         EXPECT_EQ(msg, e.what()) ;
         checkedException = true;
     }
@@ -182,7 +182,7 @@ TEST(DataSetIOTest, ThrowsIfCannotOpenSaveFile)
     }
     catch(std::runtime_error& e)
     {
-        const std::string msg = "could not open XML file for writing: fake_directory_that_should_not_exist/out.xml";
+        const std::string msg = "DataSet: could not open XML file for writing: fake_directory_that_should_not_exist/out.xml";
         EXPECT_EQ(msg, e.what()) ;
         checkedException = true;
     }

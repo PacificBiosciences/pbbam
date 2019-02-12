@@ -84,7 +84,7 @@ Compare::Type Compare::TypeFromOperator(const std::string& opString)
     try {
         return opToTypeMap.at(opString);
     } catch (std::exception&) {
-        throw std::runtime_error{opString + " is not a valid comparison operator."};
+        throw std::runtime_error{"Compare: " + opString + " is not a valid comparison operator."};
     }
 }
 
@@ -93,7 +93,7 @@ std::string Compare::TypeToName(const Compare::Type& type)
     try {
         return typeAliases.at(type).name_;
     } catch (std::exception&) {
-        throw std::runtime_error{"invalid comparison type encountered"};
+        throw std::runtime_error{"Compare: invalid comparison type encountered"};
     }
 }
 
@@ -102,7 +102,7 @@ std::string Compare::TypeToOperator(const Compare::Type& type, bool asAlpha)
     try {
         return asAlpha ? typeAliases.at(type).opAlpha_ : typeAliases.at(type).op_;
     } catch (std::exception&) {
-        throw std::runtime_error{"invalid comparison type encountered"};
+        throw std::runtime_error{"Compare: invalid comparison type encountered"};
     }
 }
 

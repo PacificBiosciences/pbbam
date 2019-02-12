@@ -184,7 +184,7 @@ TEST(ReadGroupInfoTest, BasecallerVersion)
 //        ()chem;
 
     } catch (std::runtime_error& e) {
-        EXPECT_EQ(std::string("basecaller version too short: 3"), std::string(e.what()));
+        EXPECT_EQ(std::string("ReadGroupInfo: basecaller version is too short: 3"), std::string(e.what()));
     }
 
     // initial implementation assumed single digit version numbers:
@@ -196,7 +196,7 @@ TEST(ReadGroupInfoTest, BasecallerVersion)
         ReadGroupInfo rg("dummy");
         rg.BindingKit("100-619-300")
           .SequencingKit("100-867-300")
-          .BasecallerVersion("3.199.dummy");   
+          .BasecallerVersion("3.199.dummy");
         const std::string chem = rg.SequencingChemistry();
 //        ()chem;
 
@@ -242,7 +242,7 @@ TEST(ReadGroupInfoTest, RemoveBaseFeature)
 
     rg.RemoveBaseFeature(BaseFeature::DELETION_QV);
     EXPECT_FALSE(rg.HasBaseFeature(BaseFeature::DELETION_QV));
-    
+
     EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::DELETION_TAG));
     EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::INSERTION_QV));
     EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::MERGE_QV));
