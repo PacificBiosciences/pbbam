@@ -109,7 +109,8 @@ public:
         // if on new block, seek to its first record
         if (currentBlockReadCount_ == 0) {
             const auto seekResult = bgzf_seek(bgzf, blocks_.at(0).virtualOffset_, SEEK_SET);
-            if (seekResult == -1) throw std::runtime_error{"could not seek in BAM file"};
+            if (seekResult == -1)
+                throw std::runtime_error{"PbiIndexedBamReader: could not seek in BAM file"};
         }
 
         // read next record

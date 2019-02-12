@@ -36,7 +36,7 @@ struct AsciiConvertVisitor : public boost::static_visitor<char>
     template <typename T>
     char operator()(const T&) const
     {
-        throw std::runtime_error{"conversion not supported"};
+        throw std::runtime_error{"Tag: cannot convert to ASCII"};
         return 0;
     }
 
@@ -44,7 +44,7 @@ private:
     template <typename T>
     char Helper(const T& x) const
     {
-        if (!InAsciiRange(x)) throw std::runtime_error{"not valid ASCII"};
+        if (!InAsciiRange(x)) throw std::runtime_error{"Tag: char is outside valid ASCII range"};
         return static_cast<char>(x);
     }
 };
@@ -66,7 +66,7 @@ struct NumericConvertVisitor : public boost::static_visitor<DesiredType>
     {
         const std::string from = typeid(t).name();
         const std::string to = typeid(DesiredType).name();
-        const std::string msg = "conversion not supported: " + from + " -> " + to;
+        const std::string msg = "Tag: cannot convert type " + from + " to " + to;
         throw std::runtime_error(msg);
         return 0;
     }
@@ -152,7 +152,7 @@ Tag::Tag(int8_t value, const TagModifier mod) : data_{value}, modifier_(mod)
 {
     if (mod == TagModifier::HEX_STRING)
         throw std::runtime_error{
-            "HEX_STRING is not a valid tag modifier for int8_t data. "
+            "Tag: HEX_STRING is not a valid tag modifier for int8_t data. "
             "It is intended for string-type data only."};
 }
 
@@ -160,7 +160,7 @@ Tag::Tag(std::string value, TagModifier mod) : data_{std::move(value)}, modifier
 {
     if (mod == TagModifier::ASCII_CHAR)
         throw std::runtime_error{
-            "ASCII_CHAR is not a valid tag modifier for string-type data. "
+            "Tag: ASCII_CHAR is not a valid tag modifier for string-type data. "
             "To construct an ASCII char tag, use a single-quoted value (e.g. 'X' instead of "
             "\"X\")"};
 }

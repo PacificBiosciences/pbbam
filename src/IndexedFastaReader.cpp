@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <sstream>
 
 #include <htslib/faidx.h>
 
@@ -74,16 +75,26 @@ struct FreeDeleter
     void operator()(char* p) const { std::free(p); }
 };
 
+void RequireFaidxLoaded(faidx_t* handle, const std::string& fn)
+{
+    // TODO(DB): Refactor to eliminate Close(), no need for repeated checking.
+    //           Keeping for now for current API compatibility.
+    if (handle == nullptr)
+        throw std::runtime_error{"IndexedFastaReader: missing *.fai for file: " + fn};
+}
+
 }  // anonymous
 
 IndexedFastaReader::IndexedFastaReader(const std::string& filename)
 {
-    if (!Open(filename)) throw std::runtime_error{"Cannot open file " + filename};
+    Open(filename);
+    RequireFaidxLoaded(handle_, filename);
 }
 
 IndexedFastaReader::IndexedFastaReader(const IndexedFastaReader& src)
 {
-    if (!Open(src.filename_)) throw std::runtime_error{"Cannot open file " + src.filename_};
+    Open(src.filename_);
+    RequireFaidxLoaded(handle_, filename_);
 }
 
 IndexedFastaReader::IndexedFastaReader(IndexedFastaReader&&) = default;
@@ -93,6 +104,7 @@ IndexedFastaReader& IndexedFastaReader::operator=(const IndexedFastaReader& rhs)
     if (&rhs == this) return *this;
 
     Open(rhs.filename_);
+    RequireFaidxLoaded(handle_, filename_);
     return *this;
 }
 
@@ -119,15 +131,10 @@ void IndexedFastaReader::Close()
     handle_ = nullptr;
 }
 
-#define REQUIRE_FAIDX_LOADED                     \
-    if (handle_ == nullptr) throw std::exception \
-        {                                        \
-        }
-
 std::string IndexedFastaReader::Subsequence(const std::string& id, Position begin,
                                             Position end) const
 {
-    REQUIRE_FAIDX_LOADED;
+    RequireFaidxLoaded(handle_, filename_);
 
     assert(begin <= end);
     // htslib is dumb and will not consider empty intervals valid,
@@ -141,23 +148,32 @@ std::string IndexedFastaReader::Subsequence(const std::string& id, Position begi
     // fai_fetch.  Can you please verify?
     const std::unique_ptr<char, FreeDeleter> rawSeq{
         faidx_fetch_seq(handle_, id.c_str(), begin, end - 1, &len)};
-    if (rawSeq == nullptr) throw std::runtime_error{"could not fetch FASTA sequence"};
+    if (rawSeq == nullptr) {
+        std::ostringstream s;
+        s << "IndexedFastaReader: could not fetch FASTA sequence from region: " << id << " ["
+          << begin << ", " << end << ')';
+        throw std::runtime_error{s.str()};
+    }
     return RemoveAllWhitespace(rawSeq.get());
 }
 
 std::string IndexedFastaReader::Subsequence(const GenomicInterval& interval) const
 {
-    REQUIRE_FAIDX_LOADED;
+    RequireFaidxLoaded(handle_, filename_);
     return Subsequence(interval.Name(), interval.Start(), interval.Stop());
 }
 
 std::string IndexedFastaReader::Subsequence(const char* htslibRegion) const
 {
-    REQUIRE_FAIDX_LOADED;
+    RequireFaidxLoaded(handle_, filename_);
 
     int len;
     const std::unique_ptr<char, FreeDeleter> rawSeq(fai_fetch(handle_, htslibRegion, &len));
-    if (rawSeq == nullptr) throw std::runtime_error{"could not fetch FASTA sequence"};
+    if (rawSeq == nullptr) {
+        throw std::runtime_error{
+            "IndexedFastaReader: could not fetch FASTA sequence from region: " +
+            std::string{htslibRegion}};
+    }
     return RemoveAllWhitespace(rawSeq.get());
 }
 
@@ -166,8 +182,7 @@ std::string IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
                                                      const bool gapped,
                                                      const bool exciseSoftClips) const
 {
-    REQUIRE_FAIDX_LOADED;
-
+    RequireFaidxLoaded(handle_, filename_);
     std::string subseq = Subsequence(bamRecord.ReferenceName(), bamRecord.ReferenceStart(),
                                      bamRecord.ReferenceEnd());
 
@@ -183,13 +198,13 @@ std::string IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
 
 int IndexedFastaReader::NumSequences() const
 {
-    REQUIRE_FAIDX_LOADED;
+    RequireFaidxLoaded(handle_, filename_);
     return faidx_nseq(handle_);
 }
 
 std::vector<std::string> IndexedFastaReader::Names() const
 {
-    REQUIRE_FAIDX_LOADED;
+    RequireFaidxLoaded(handle_, filename_);
     std::vector<std::string> names;
     names.reserve(NumSequences());
     for (int i = 0; i < NumSequences(); ++i)
@@ -199,24 +214,29 @@ std::vector<std::string> IndexedFastaReader::Names() const
 
 std::string IndexedFastaReader::Name(const size_t idx) const
 {
-    REQUIRE_FAIDX_LOADED;
-    if (static_cast<int>(idx) >= NumSequences())
-        throw std::runtime_error{"FASTA index out of range"};
+    RequireFaidxLoaded(handle_, filename_);
+    if (static_cast<int>(idx) >= NumSequences()) {
+        std::ostringstream s;
+        s << "IndexedFastaReader: cannot fetch sequence name. Index (" << idx
+          << ") is larger than the number of sequences: (" << NumSequences() << ')';
+        throw std::runtime_error{s.str()};
+    }
     return {faidx_iseq(handle_, idx)};
 }
 
 bool IndexedFastaReader::HasSequence(const std::string& name) const
 {
-    REQUIRE_FAIDX_LOADED;
+    RequireFaidxLoaded(handle_, filename_);
     return (faidx_has_seq(handle_, name.c_str()) != 0);
 }
 
 int IndexedFastaReader::SequenceLength(const std::string& name) const
 {
-    REQUIRE_FAIDX_LOADED;
+    RequireFaidxLoaded(handle_, filename_);
     const auto len = faidx_seq_len(handle_, name.c_str());
     if (len < 0)
-        throw std::runtime_error{"could not determine FASTA sequence length"};
+        throw std::runtime_error{"IndexedFastaReader: could not determine sequence length of " +
+                                 name};
     else
         return len;
 }

@@ -9,6 +9,8 @@
 #include "pbbam/BaiIndexedBamReader.h"
 
 #include <cstddef>
+#include <sstream>
+#include <stdexcept>
 
 #include "MemoryUtils.h"
 #include "pbbam/MakeUnique.h"
@@ -37,14 +39,20 @@ public:
             }
         }
 
-        if (!htsIterator_)
-            throw std::runtime_error{"could not create iterator for requested region"};
+        if (!htsIterator_) {
+            std::ostringstream s;
+            s << "BaiIndexedBamReader: could not create iterator for requested region: "
+              << interval.Name() << " [" << interval.Start() << ", " << interval.Stop() << ')';
+            throw std::runtime_error{s.str()};
+        }
     }
 
     void LoadIndex(const std::string& fn)
     {
         htsIndex_.reset(bam_index_load(fn.c_str()));
-        if (!htsIndex_) throw std::runtime_error{"could not load BAI index data"};
+        if (!htsIndex_)
+            throw std::runtime_error{
+                "BaiIndexedBamReader: could not load *.bai index data for file: " + fn};
     }
 
     int ReadRawData(BGZF* bgzf, bam1_t* b)

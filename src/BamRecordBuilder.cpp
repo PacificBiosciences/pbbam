@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <cstring>
 #include <memory>
+#include <sstream>
 
 #include <htslib/sam.h>
 
@@ -74,7 +75,8 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
     // initialize with basic 'core data'
     auto recordRawData = BamRecordMemory::GetRawData(record);
     if (!recordRawData || !recordRawData->data)
-        throw std::runtime_error{"BamRecord memory in invalid state"};
+        throw std::runtime_error{
+            "BamRecordBuilder: cannot build record, target memory is in an invalid state"};
     recordRawData->core = core_;
 
     // setup variable length data
@@ -90,7 +92,9 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
 
     // realloc if necessary
     uint8_t* varLengthDataBlock = recordRawData->data;
-    if (!varLengthDataBlock) throw std::runtime_error{"BamRecord memory in invalid state"};
+    if (!varLengthDataBlock)
+        throw std::runtime_error{
+            "BamRecordBuilder: cannot build record, target memory is in an invalid state"};
 
     size_t allocatedDataLength = recordRawData->m_data;
     if (allocatedDataLength < dataLength) {
@@ -117,7 +121,8 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
             encodedCigar[i] = op.Length() << BAM_CIGAR_SHIFT;
             const auto type = static_cast<uint8_t>(op.Type());
             if (type >= 8)
-                throw std::runtime_error{"invalid CIGAR op type: " + std::to_string(type)};
+                throw std::runtime_error{"BamRecordBuilder: invalid CIGAR op type: " +
+                                         std::to_string(type)};
             encodedCigar[i] |= type;
         }
         memcpy(&varLengthDataBlock[index], &encodedCigar[0], cigarLength);
@@ -148,16 +153,19 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
 
     // tags
     if (tagLength > 0) {
-        if (encodedTags.empty()) throw std::runtime_error{"expected tags but none are encoded"};
+        if (encodedTags.empty())
+            throw std::runtime_error{"BamRecordBuilder: expected tags but none are present"};
         memcpy(&varLengthDataBlock[index], &encodedTags[0], tagLength);
         index += tagLength;
     }
 
     // sanity check
     if (index != dataLength) {
-        throw std::runtime_error{"BAM encoding error: expected to write " +
-                                 std::to_string(dataLength) + " bytes but wrote " +
-                                 std::to_string(index) + " bytes instead"};
+        std::ostringstream s;
+        s << "BamRecordBuilder: incorrect number of bytes written to record:\n"
+          << "  expected: " << dataLength << '\n'
+          << "  actual: " << index;
+        throw std::runtime_error{s.str()};
     }
     return true;
 }
@@ -254,7 +262,9 @@ void BamRecordBuilder::Reset(BamRecord prototype)
 
     // reset core data
     const auto rawData = BamRecordMemory::GetRawData(prototype);
-    if (!rawData) throw std::runtime_error{"BamRecord memory in invalid state"};
+    if (!rawData)
+        throw std::runtime_error{
+            "BamRecordBuilder: cannot build record, target memory is in an invalid state"};
     core_ = std::move(rawData->core);
 }
 

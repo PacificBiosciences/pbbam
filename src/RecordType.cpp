@@ -37,7 +37,7 @@ std::string ToString(const RecordType type)
     try {
         return lookup.at(type);
     } catch (std::exception&) {
-        throw std::runtime_error{"error: unknown RecordType encountered"};
+        throw std::runtime_error{"BamRecordType: unknown type"};
     }
 }
 

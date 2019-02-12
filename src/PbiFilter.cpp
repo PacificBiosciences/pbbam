@@ -129,7 +129,7 @@ static inline bool isList(const std::string& value) { return value.find(',') != 
 
 static PbiFilter CreateBarcodeFilter(std::string value, const Compare::Type compareType)
 {
-    if (value.empty()) throw std::runtime_error{"empty value for barcode filter property"};
+    if (value.empty()) throw std::runtime_error{"PbiFilter: empty value for barcode filter property"};
 
     if (isBracketed(value)) {
         value.erase(0, 1);
@@ -138,7 +138,7 @@ static PbiFilter CreateBarcodeFilter(std::string value, const Compare::Type comp
 
     if (isList(value)) {
         std::vector<std::string> barcodes = Split(value, ',');
-        if (barcodes.size() != 2) throw std::runtime_error{"only 2 barcode values expected"};
+        if (barcodes.size() != 2) throw std::runtime_error{"PbiFilter: only 2 barcode values expected"};
         return PbiBarcodesFilter{boost::numeric_cast<int16_t>(std::stoi(barcodes.at(0))),
                                  boost::numeric_cast<int16_t>(std::stoi(barcodes.at(1))),
                                  compareType};
@@ -148,7 +148,7 @@ static PbiFilter CreateBarcodeFilter(std::string value, const Compare::Type comp
 
 static PbiFilter CreateBarcodeForwardFilter(std::string value, const Compare::Type compareType)
 {
-    if (value.empty()) throw std::runtime_error{"empty value for barcode_forward filter property"};
+    if (value.empty()) throw std::runtime_error{"PbiFilter: empty value for barcode_forward filter property"};
 
     if (isBracketed(value)) {
         value.erase(0, 1);
@@ -168,7 +168,7 @@ static PbiFilter CreateBarcodeForwardFilter(std::string value, const Compare::Ty
 
 static PbiFilter CreateBarcodeReverseFilter(std::string value, const Compare::Type compareType)
 {
-    if (value.empty()) throw std::runtime_error{"empty value for barcode_reverse filter property"};
+    if (value.empty()) throw std::runtime_error{"PbiFilter: empty value for barcode_reverse filter property"};
 
     if (isBracketed(value)) {
         value.erase(0, 1);
@@ -188,7 +188,7 @@ static PbiFilter CreateBarcodeReverseFilter(std::string value, const Compare::Ty
 
 static PbiFilter CreateLocalContextFilter(const std::string& value, const Compare::Type compareType)
 {
-    if (value.empty()) throw std::runtime_error{"empty value for local context filter property"};
+    if (value.empty()) throw std::runtime_error{"PbiFilter: empty value for local context filter property"};
 
     LocalContextFlags filterValue = LocalContextFlags::NO_LOCAL_CONTEXT;
 
@@ -209,7 +209,7 @@ static PbiFilter CreateLocalContextFilter(const std::string& value, const Compar
 
 static PbiFilter CreateMovieNameFilter(std::string value, const Compare::Type compareType)
 {
-    if (value.empty()) throw std::runtime_error{"empty value for movie property"};
+    if (value.empty()) throw std::runtime_error{"PbiFilter: empty value for movie property"};
 
     if (isBracketed(value)) {
         value.erase(0, 1);
@@ -219,7 +219,7 @@ static PbiFilter CreateMovieNameFilter(std::string value, const Compare::Type co
     if (isList(value)) {
 
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
-            throw std::runtime_error{"unsupported compare type on movie property"};
+            throw std::runtime_error{"PbiFilter: unsupported compare type on movie property"};
 
         std::vector<std::string> tokens = Split(value, ',');
         return PbiMovieNameFilter{std::move(tokens), compareType};
@@ -229,7 +229,7 @@ static PbiFilter CreateMovieNameFilter(std::string value, const Compare::Type co
 
 static PbiFilter CreateQIdFilter(std::string value, const Compare::Type compareType)
 {
-    if (value.empty()) throw std::runtime_error{"empty value for qid property"};
+    if (value.empty()) throw std::runtime_error{"PbiFilter: empty value for qid property"};
 
     if (isBracketed(value)) {
         value.erase(0, 1);
@@ -239,7 +239,7 @@ static PbiFilter CreateQIdFilter(std::string value, const Compare::Type compareT
     if (isList(value)) {
 
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
-            throw std::runtime_error{"unsupported compare type on qid property"};
+            throw std::runtime_error{"PbiFilter: unsupported compare type on qid property"};
 
         std::vector<int32_t> rgIds;
         for (const auto& t : Split(value, ','))
@@ -255,7 +255,7 @@ static PbiFilter CreateQIdFilter(std::string value, const Compare::Type compareT
 static PbiFilter CreateQueryNamesFilterFromFile(const std::string& value, const DataSet& dataset, const Compare::Type compareType)
 {
     if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
-        throw std::runtime_error{"unsupported compare type on query name property"};
+        throw std::runtime_error{"PbiFilter: unsupported compare type on query name property"};
 
     // resolve file from dataset, value
     const std::string resolvedFilename = dataset.ResolvePath(value);
@@ -269,7 +269,7 @@ static PbiFilter CreateQueryNamesFilterFromFile(const std::string& value, const 
 
 static PbiFilter CreateQueryNameFilter(std::string value, const DataSet& dataset, const Compare::Type compareType)
 {
-    if (value.empty()) throw std::runtime_error{"empty value for query name property"};
+    if (value.empty()) throw std::runtime_error{"PbiFilter: empty value for query name property"};
 
     // try possible filename first
     const std::string resolvedFilename = dataset.ResolvePath(value);
@@ -286,7 +286,7 @@ static PbiFilter CreateQueryNameFilter(std::string value, const DataSet& dataset
     if (isList(value)) {
 
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
-            throw std::runtime_error{"unsupported compare type on query name property"};
+            throw std::runtime_error{"PbiFilter: unsupported compare type on query name property"};
 
         std::vector<std::string> tokens = Split(value, ',');
         return PbiQueryNameFilter{std::move(tokens), compareType};
@@ -296,7 +296,7 @@ static PbiFilter CreateQueryNameFilter(std::string value, const DataSet& dataset
 
 static PbiFilter CreateReadGroupFilter(std::string value, const Compare::Type compareType)
 {
-    if (value.empty()) throw std::runtime_error{"empty value for read group property"};
+    if (value.empty()) throw std::runtime_error{"PbiFilter: empty value for read group property"};
 
     if (isBracketed(value)) {
         value.erase(0, 1);
@@ -306,7 +306,7 @@ static PbiFilter CreateReadGroupFilter(std::string value, const Compare::Type co
     if (isList(value)) {
 
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
-            throw std::runtime_error{"unsupported compare type on read group property"};
+            throw std::runtime_error{"PbiFilter: unsupported compare type on read group property"};
 
         std::vector<std::string> tokens = Split(value, ',');
         return PbiReadGroupFilter{std::move(tokens), compareType};
@@ -316,7 +316,7 @@ static PbiFilter CreateReadGroupFilter(std::string value, const Compare::Type co
 
 static PbiFilter CreateReferenceIdFilter(std::string value, const Compare::Type compareType)
 {
-    if (value.empty()) throw std::runtime_error{"empty value for reference ID property"};
+    if (value.empty()) throw std::runtime_error{"PbiFilter: empty value for reference ID property"};
 
     if (isBracketed(value)) {
         value.erase(0, 1);
@@ -326,7 +326,7 @@ static PbiFilter CreateReferenceIdFilter(std::string value, const Compare::Type 
     if (isList(value)) {
 
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
-            throw std::runtime_error{"unsupported compare type on reference name ID property"};
+            throw std::runtime_error{"PbiFilter: unsupported compare type on reference name ID property"};
 
         std::vector<std::string> tokens = Split(value, ',');
         std::vector<int32_t> ids;
@@ -340,7 +340,7 @@ static PbiFilter CreateReferenceIdFilter(std::string value, const Compare::Type 
 
 static PbiFilter CreateReferenceNameFilter(std::string value, const Compare::Type compareType)
 {
-    if (value.empty()) throw std::runtime_error{"empty value for reference name property"};
+    if (value.empty()) throw std::runtime_error{"PbiFilter: empty value for reference name property"};
 
     if (isBracketed(value)) {
         value.erase(0, 1);
@@ -350,7 +350,7 @@ static PbiFilter CreateReferenceNameFilter(std::string value, const Compare::Typ
     if (isList(value)) {
 
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
-            throw std::runtime_error{"unsupported compare type on reference name property"};
+            throw std::runtime_error{"PbiFilter: unsupported compare type on reference name property"};
 
         std::vector<std::string> tokens = Split(value, ',');
         return PbiReferenceNameFilter{std::move(tokens), compareType};
@@ -360,7 +360,7 @@ static PbiFilter CreateReferenceNameFilter(std::string value, const Compare::Typ
 
 static PbiFilter CreateZmwFilter(std::string value, const Compare::Type compareType)
 {
-    if (value.empty()) throw std::runtime_error{"empty value for ZMW filter property"};
+    if (value.empty()) throw std::runtime_error{"PbiFilter: empty value for ZMW filter property"};
 
     if (isBracketed(value)) {
         value.erase(0, 1);
@@ -383,7 +383,7 @@ static PbiFilter CreateZmwModuloFilter(const Property& property)
     if (!property.HasAttribute("Modulo") || !property.HasAttribute("Hash") ||
         property.Name() != "zm")
     {
-        throw std::runtime_error{"Modulo filter not supported on property: "};
+        throw std::runtime_error{"PbiFilter: modulo filter is not supported on property: " + property.Name()};
     }
 
     const auto hashType = property.Attribute("Hash");
@@ -393,7 +393,7 @@ static PbiFilter CreateZmwModuloFilter(const Property& property)
             return FilterHash::UNSIGNED_LONG_CAST;
         if (boost::algorithm::to_lower_copy(hashType) == "boosthashcombine")
             return FilterHash::BOOST_HASH_COMBINE;
-        throw std::runtime_error{"unsuppoerted hash type: " + hashType};
+        throw std::runtime_error{"PbiFilter: unsuppoerted hash type: " + hashType};
     }();
 
     const uint32_t denom = std::stoul(property.Attribute("Modulo"));
@@ -447,7 +447,7 @@ static PbiFilter FromDataSetProperty(const Property& property, const DataSet& da
             case BuiltIn::QueryNamesFromFileFilter : return CreateQueryNamesFilterFromFile(value, dataset, compareType);
 
             default :
-            throw std::runtime_error{""};
+            throw std::runtime_error{"PbiFilter: invalid built-in filter requested"};
         }
         // clang-format on
 
@@ -456,7 +456,7 @@ static PbiFilter FromDataSetProperty(const Property& property, const DataSet& da
 
     } catch (std::exception& e) {
         std::ostringstream s;
-        s << "error: could not create filter from XML Property element:\n"
+        s << "PbiFilter: could not create filter from XML Property element:\n"
           << "  Name:     " << property.Name() << '\n'
           << "  Value:    " << property.Value() << '\n'
           << "  Operator: " << property.Operator() << '\n'

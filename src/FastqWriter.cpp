@@ -17,7 +17,7 @@ namespace BAM {
 
 FastqWriter::FastqWriter(const std::string& fn) : IRecordWriter(), file_{fn}
 {
-    if (!file_) throw std::runtime_error{"FastqWriter could not open for writing: " + fn};
+    if (!file_) throw std::runtime_error{"FastqWriter: could not open file for writing: " + fn};
 }
 
 void FastqWriter::TryFlush() { file_.flush(); }

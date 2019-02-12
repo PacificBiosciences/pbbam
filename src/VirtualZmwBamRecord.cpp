@@ -196,7 +196,7 @@ void VirtualZmwBamRecord::StitchSources()
             if (!this->HasScrapZmwType())
                 this->ScrapZmwType(b.ScrapZmwType());
             else if (this->ScrapZmwType() != b.ScrapZmwType())
-                throw std::runtime_error{"ScrapZmwTypes do not match"};
+                throw std::runtime_error{"VirtualZmwBamRecord: scrap types do not match"};
         }
     }
 
@@ -260,7 +260,7 @@ void VirtualZmwBamRecord::StitchSources()
                 virtualRegionsMap_[VirtualRegionType::HQREGION].emplace_back(
                     VirtualRegionType::HQREGION, 0, lq.beginPos);
             else
-                throw std::runtime_error{"Unknown HQREGION"};
+                throw std::runtime_error{"VirtualZmwBamRecord: unknown HQREGION"};
         } else {
             int beginPos = 0;
             for (const auto& lqregion : virtualRegionsMap_[VirtualRegionType::LQREGION]) {

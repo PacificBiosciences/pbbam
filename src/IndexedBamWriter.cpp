@@ -45,7 +45,8 @@ void bgzf_write_safe2(BGZF* fp, const void* data, size_t length)
 {
     const auto ret = bgzf_write(fp, data, length);
     if (ret < 0L)
-        throw std::runtime_error{"Non-zero returned from bgzf_write(). Out of disk space?"};
+        throw std::runtime_error{
+            "IndexedBamWriter: non-zero returned from bgzf_write(). Out of disk space?"};
 }
 
 struct GzIndexEntry
@@ -75,7 +76,8 @@ inline void SwapEndianness2(std::vector<T>& data)
                 ed_swap_8p(&data[i]);
             break;
         default:
-            throw std::runtime_error{"unsupported element size"};
+            throw std::runtime_error{"IndexedBamWriter: unsupported element size: " +
+                                     std::to_string(elementSize)};
     }
 }
 
@@ -258,7 +260,8 @@ public:
           bcQualField_{fileBufferSize}
     {
         if (!tempFile_)
-            throw std::runtime_error{"index builder could not open temp file: " + tempFilename_};
+            throw std::runtime_error{"IndexedBamWriter: could not open temp file: " +
+                                     tempFilename_};
 
         // TODO: setup for ref data building
     }
@@ -399,7 +402,8 @@ public:
         // open file handle
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel_));
         pbiFile_.reset(bgzf_open(pbiFilename_.c_str(), mode.c_str()));
-        if (pbiFile_ == nullptr) throw std::runtime_error{"could not open output file"};
+        if (pbiFile_ == nullptr)
+            throw std::runtime_error{"IndexedBamWriter: could not open output PBI file"};
 
         // if no explicit thread count given, attempt built-in check
         size_t actualNumThreads = numThreads_;
@@ -457,7 +461,8 @@ public:
         // seek to block begin
         const auto ret = std::fseek(tempFile_.get(), block.pos_, SEEK_SET);
         if (ret != 0)
-            throw std::runtime_error{"index builder could not seek in temp file: " + tempFilename_};
+            throw std::runtime_error{"IndexedBamWriter: could not seek in temp file: " +
+                                     tempFilename_ + ", offset: " + std::to_string(block.pos_)};
 
         // read block elements
         field.buffer_.assign(block.n_, 0);
@@ -466,7 +471,7 @@ public:
 
         if (numElements != block.n_)
             throw std::runtime_error{
-                "index builder could not read expected element count from temp file: " +
+                "IndexedBamWriter: could not read expected element count from temp file: " +
                 tempFilename_};
     }
 
@@ -566,11 +571,11 @@ public:
 
         const std::string gziFn{bamFilename_ + ".gzi"};
         std::unique_ptr<FILE, FileDeleter> gziFile{fopen(gziFn.c_str(), "rb")};
-        if (!gziFile) throw std::runtime_error{"could not open gzi file"};
+        if (!gziFile) throw std::runtime_error{"IndexedBamWriter: could not open gzi file"};
 
         uint64_t numElements;
         const auto ret = fread(&numElements, sizeof(numElements), 1, gziFile.get());
-        if (ret != 1) throw std::runtime_error{"could not read from gziFile"};
+        if (ret != 1) throw std::runtime_error{"IndexedBamWriter: could not read from gziFile"};
         if (ed_is_big()) ed_swap_8(numElements);
 
         std::vector<GzIndexEntry> result;
@@ -591,7 +596,7 @@ public:
     void WriteVirtualOffsets()
     {
         auto index = LoadGzi();
-        if (index.empty()) throw std::runtime_error{"empty GZI file"};
+        if (index.empty()) throw std::runtime_error{"IndexedBamWriter: empty GZI file"};
         std::sort(index.begin(), index.end(),
                   [](const GzIndexEntry& lhs, const GzIndexEntry& rhs) -> bool {
                       return lhs.uAddress < rhs.uAddress;
@@ -723,13 +728,17 @@ public:
         //       prototyping but need to be tune-able via API.
         //
 
-        if (!header_) throw std::runtime_error{"null header"};
+        if (!header_)
+            throw std::runtime_error{"IndexedBamWriter: null header provided for output file: " +
+                                     bamFilename_};
 
         // open output BAM
         const auto usingFilename = bamFilename_;
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
         bam_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
-        if (!bam_) throw std::runtime_error{"could not open file for writing"};
+        if (!bam_)
+            throw std::runtime_error{"IndexedBamWriter: could not open file for writing: " +
+                                     usingFilename};
 
         // maybe set multithreaded writing
         size_t actualNumThreads = numThreads;
@@ -743,7 +752,9 @@ public:
 
         // write header
         auto ret = sam_hdr_write(bam_.get(), header_.get());
-        if (ret != 0) throw std::runtime_error{"could not write header"};
+        if (ret != 0)
+            throw std::runtime_error{"IndexedBamWriter: could not write header to file: " +
+                                     usingFilename};
         ret = bgzf_flush(bam_.get()->fp.bgzf);
 
         // store file positions after header
@@ -798,7 +809,9 @@ public:
 
         auto initBgzf = [&bgzf, &bamFilename, numThreads]() {
             bgzf.reset(bgzf_open(bamFilename.c_str(), "rb"));
-            if (!bgzf) throw std::runtime_error{"could not open BAM for toy train reading"};
+            if (!bgzf)
+                throw std::runtime_error{
+                    "IndexedBamWriter: could not open BAM for 'toy train' reading"};
             bgzf_index_build_init(bgzf.get());
             if (numThreads > 1) bgzf_mt(bgzf.get(), numThreads, 256);
         };
@@ -892,7 +905,7 @@ public:
 
         // write record to file
         const auto ret = sam_write1(bam_.get(), header_.get(), rawRecord.get());
-        if (ret <= 0) throw std::runtime_error{"could not write record"};
+        if (ret <= 0) throw std::runtime_error{"IndexedBamWriter: could not write record to BAM"};
 
         // update file position
         auto recordLength = [](bam1_t* b) {
@@ -920,16 +933,18 @@ public:
         auto gstatus = gziStatus_.load();
         if (gstatus != GziStatus::GOOD) {
             if (gziStatus_.load() == GziStatus::IO_ERROR)
-                throw std::runtime_error("Error in gzi thread reading from BAM file " +
-                                         bamFilename_);
+                throw std::runtime_error(
+                    "IndexedBamWriter: error in gzi thread reading from BAM file " + bamFilename_);
             if (gziStatus_.load() == GziStatus::TRAIL_ERROR)
                 throw std::runtime_error(
-                    "Gzi reader thread failed to properly trail when reading " + bamFilename_);
+                    "IndexedBamWriter: gzi reader thread failed to properly trail when reading " +
+                    bamFilename_);
             if (gziStatus_.load() == GziStatus::GZI_ERROR)
-                throw std::runtime_error("Could not dump GZI contents for indexing " +
-                                         bamFilename_);
+                throw std::runtime_error(
+                    "IndexedBamWriter: could not dump GZI contents for indexing " + bamFilename_);
             if (gziStatus_.load() == GziStatus::MISC_ERROR)
-                throw std::runtime_error("Error computing index file for " + bamFilename_);
+                throw std::runtime_error("IndexedBamWriter: error computing index file for " +
+                                         bamFilename_);
             gziStatus_.store(GziStatus::DEAD);
         }
     }
@@ -977,7 +992,9 @@ IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamH
     : IRecordWriter(), d_{nullptr}
 {
     if (tempFileBufferSize % 8 != 0)
-        throw std::runtime_error{"Invalid buffer size for PBI builder. Must be a multiple of 8."};
+        throw std::runtime_error{"IndexedBamWriter: invalid buffer size for PBI builder (" +
+                                 std::to_string(tempFileBufferSize) +
+                                 "). Must be a multiple of 8."};
 
 #if PBBAM_AUTOVALIDATE
     Validator::Validate(header);

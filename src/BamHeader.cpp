@@ -59,7 +59,7 @@ static void EnsureCanMerge(const BamHeader& lhs, const BamHeader& rhs)
 
     // if any checks failed, format error message & throw
     std::ostringstream e;
-    e << "could not merge BAM headers:\n";
+    e << "BamHeader: could not merge headers:\n";
 
     if (!sortOrderOk) {
         e << "  mismatched sort orders (@HD:SO) : (" << lhs.SortOrder() << ", " << rhs.SortOrder()
@@ -278,9 +278,9 @@ BamHeader& BamHeader::PacBioBamVersion(const std::string& version)
     d_->pacbioBamVersion_ = version;
     const PacBio::BAM::Version fileVersion{version};
     if (fileVersion < Version::Minimum) {
-        throw std::runtime_error{"invalid PacBio BAM version number (" + fileVersion.ToString() +
-                                 ") is older than the minimum supported version (" +
-                                 Version::Minimum.ToString() + ")"};
+        throw std::runtime_error{
+            "BamHeader: invalid PacBio BAM version number (" + fileVersion.ToString() +
+            ") is older than the minimum supported version (" + Version::Minimum.ToString() + ")"};
     }
     return *this;
 }
@@ -288,7 +288,8 @@ BamHeader& BamHeader::PacBioBamVersion(const std::string& version)
 ProgramInfo BamHeader::Program(const std::string& id) const
 {
     const auto iter = d_->programs_.find(id);
-    if (iter == d_->programs_.cend()) throw std::runtime_error{"program ID not found"};
+    if (iter == d_->programs_.cend())
+        throw std::runtime_error{"BamHeader: program ID not found: " + id};
     return iter->second;
 }
 
@@ -321,7 +322,8 @@ BamHeader& BamHeader::Programs(std::vector<ProgramInfo> programs)
 ReadGroupInfo BamHeader::ReadGroup(const std::string& id) const
 {
     const auto iter = d_->readGroups_.find(id);
-    if (iter == d_->readGroups_.cend()) throw std::runtime_error{"read group ID not found"};
+    if (iter == d_->readGroups_.cend())
+        throw std::runtime_error{"BamHeader: read group ID not found: " + id};
     return iter->second;
 }
 
@@ -367,7 +369,8 @@ SequenceInfo BamHeader::Sequence(const std::string& name) const
 int32_t BamHeader::SequenceId(const std::string& name) const
 {
     const auto iter = d_->sequenceIdLookup_.find(name);
-    if (iter == d_->sequenceIdLookup_.cend()) throw std::runtime_error{"sequence not found"};
+    if (iter == d_->sequenceIdLookup_.cend())
+        throw std::runtime_error{"BamHeader: sequence name not found: " + name};
     return iter->second;
 }
 

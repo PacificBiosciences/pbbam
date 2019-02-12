@@ -38,7 +38,7 @@ public:
         : fp_{gzopen(fn.c_str(), "r")}, seq_{kseq_init(fp_)}
     {
         if (fp_ == nullptr || seq_.get() == nullptr)
-            throw std::runtime_error{"Could not open " + fn + " for reading"};
+            throw std::runtime_error{"FastqReader: could not open file for reading: " + fn};
     }
 
     ~FastqReaderPrivate() { gzclose(fp_); }

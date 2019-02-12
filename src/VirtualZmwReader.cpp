@@ -43,7 +43,9 @@ VirtualZmwReader::VirtualZmwReader(const std::string& primaryBamFilepath,
     // update stitched read group in header
     auto readGroups = stitchedHeader_->ReadGroups();
     if (readGroups.empty())
-        throw std::runtime_error{"Bam header of the primary bam has no read groups."};
+        throw std::runtime_error{
+            "VirtualZmwReader: no read groups in header of the primary BAM file: " +
+            primaryBamFilepath};
     readGroups[0].ReadType("POLYMERASE");
     readGroups[0].Id(readGroups[0].MovieName(), "POLYMERASE");
     if (readGroups.size() > 1) {

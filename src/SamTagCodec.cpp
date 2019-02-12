@@ -95,7 +95,7 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
         const auto name = token.substr(0, 2);
         const auto type = token.at(3);
         const auto remainder = token.substr(5);
-        if (remainder.empty()) throw std::runtime_error{"malformatted tag: " + token};
+        if (remainder.empty()) throw std::runtime_error{"SamTagCodec: malformatted tag: " + token};
 
         switch (type) {
 
@@ -182,15 +182,16 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
                         tags[name] = readFloatSamMultiValue(arrayData);
                         break;
                     default:
-                        throw std::runtime_error{"unsupported array-tag-type encountered: " +
-                                                 std::string{1, elementType}};
+                        throw std::runtime_error{
+                            "SamTagCodec: unsupported array-tag-type encountered: " +
+                            std::string{1, elementType}};
                 }
                 break;
             }
 
             // unsupported SAM tag type
             default:
-                throw std::runtime_error{"unsupported tag-type encountered: " +
+                throw std::runtime_error{"SamTagCodec: unsupported tag-type encountered: " +
                                          std::string{1, type}};
         }
     }
@@ -205,7 +206,8 @@ std::string SamTagCodec::Encode(const TagCollection& tags)
 
     for (const auto& tagIter : tags) {
         const auto& name = tagIter.first;
-        if (name.size() != 2) throw std::runtime_error{"malformatted tag name: " + name};
+        if (name.size() != 2)
+            throw std::runtime_error{"SamTagCodec: malformatted tag name: " + name};
 
         const auto& tag = tagIter.second;
         if (tag.IsNull()) continue;
@@ -317,7 +319,7 @@ std::string SamTagCodec::Encode(const TagCollection& tags)
                 break;
 
             default:
-                throw std::runtime_error{"unsupported tag-type encountered: " +
+                throw std::runtime_error{"SamTagCodec: unsupported tag-type encountered: " +
                                          std::to_string(static_cast<uint16_t>(tag.Type()))};
         }
     }

@@ -96,7 +96,7 @@ PbiRawData PbiIndexIO::Load()
 
     // ensure rewind
     const auto ret = bgzf_seek(fp_.get(), header_.firstRecordOffset, SEEK_SET);
-    if (ret != 0) throw std::runtime_error{"could not seek in file: " + pbiFilename_};
+    if (ret != 0) throw std::runtime_error{"PbiIndexIO: could not seek in file: " + pbiFilename_};
 
     // load from PBI sections
     LoadBasicData(rawData);
@@ -145,7 +145,7 @@ void PbiIndexIO::LoadHeader()
     std::array<char, 4> magic;
     auto bytesRead = bgzf_read(bgzf, magic.data(), 4);
     if (bytesRead != 4 || strncmp(magic.data(), "PBI\1", 4))
-        throw std::runtime_error{"expected PBI file, found unknown format instead"};
+        throw std::runtime_error{"PbiIndexIO: expected PBI file, found unknown format instead"};
 
     // read header metadata
     uint32_t version;
@@ -250,9 +250,10 @@ void PbiIndexIO::Open(const std::string& filename)
 {
     // open file handle
     if (!boost::algorithm::iends_with(filename, ".pbi"))
-        throw std::runtime_error{"unsupported file extension on " + filename};
+        throw std::runtime_error{"PbiIndexIO: unsupported file extension on file: " + filename};
     fp_ = std::unique_ptr<BGZF, HtslibBgzfDeleter>(bgzf_open(filename.c_str(), "rb"));
-    if (!fp_) throw std::runtime_error{"could not open PBI file: " + filename + "for reading"};
+    if (!fp_)
+        throw std::runtime_error{"PbiIndexIO: could not open PBI file for reading: " + filename};
 }
 
 void PbiIndexIO::AggregateDataSet(PbiRawData& aggregateData, const DataSet& dataset)
