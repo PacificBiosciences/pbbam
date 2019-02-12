@@ -19,7 +19,6 @@ namespace BAM {
 
 class BamRecord;
 class DataSet;
-class PbiIndexIO;
 
 /// \brief The PbiRawBarcodeData class represents the raw data stored in the
 ///        "BarcodeData" section of the PBI index.
@@ -324,7 +323,7 @@ public:
     ///
     /// \throws std::runtime_error if file contents cannot be loaded properly
     ///
-    explicit PbiRawData(std::string pbiFilename);
+    PbiRawData(std::string pbiFilename);
 
     /// \brief Loads a raw, aggregate PBI data from a dataset
     ///
@@ -477,8 +476,6 @@ private:
     PbiRawMappedData mappedData_;
     PbiRawReferenceData referenceData_;
     PbiRawBasicData basicData_;
-
-    friend class PbiIndexIO;
 };
 
 }  // namespace BAM

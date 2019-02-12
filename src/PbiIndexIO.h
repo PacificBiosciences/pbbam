@@ -7,14 +7,12 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <set>
 #include <string>
 #include <vector>
 
 #include <htslib/bgzf.h>
 #include <htslib/sam.h>
 
-#include "MemoryUtils.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/DataSet.h"
 #include "pbbam/PbiFile.h"
@@ -24,58 +22,39 @@
 namespace PacBio {
 namespace BAM {
 
-struct PbiHeader
-{
-    uint32_t numReads = 0;
-    PbiFile::VersionEnum version = PbiFile::CurrentVersion;
-    PbiFile::Sections sections = PbiFile::ALL;
-    int64_t firstRecordOffset;  // PBI, not BAM. only used internally by PbiIndexIO
-};
-
 class PbiIndexIO
 {
 public:
-    // special dataset-handler
-    static PbiRawData LoadFromDataSet(const DataSet& dataset);
+    // top-level entry points
+    static PbiRawData Load(const std::string& filename);
+    static void Load(PbiRawData& rawData, const std::string& filename);
+    static void LoadFromDataSet(PbiRawData& aggregateData, const DataSet& dataset);
+    static void Save(const PbiRawData& rawData, const std::string& filename);
 
-public:
-    explicit PbiIndexIO(const std::string& pbiFilename);
-    PbiIndexIO(const std::string& pbiFilename, const std::set<PbiFile::Field>& fields);
+    // per-component load
+    static void LoadBarcodeData(PbiRawBarcodeData& barcodeData, const uint32_t numReads, BGZF* fp);
+    static void LoadHeader(PbiRawData& index, BGZF* fp);
+    static void LoadMappedData(PbiRawMappedData& mappedData, const uint32_t numReads, BGZF* fp);
+    static void LoadReferenceData(PbiRawReferenceData& referenceData, BGZF* fp);
+    static void LoadBasicData(PbiRawBasicData& basicData, const uint32_t numReads, BGZF* fp);
 
-    PbiRawData Load();
-    const PbiHeader& Header() const;
-
-private:
-    std::string pbiFilename_;  // empty if from dataset
-    std::set<PbiFile::Field> fields_;
-    std::unique_ptr<BGZF, HtslibBgzfDeleter> fp_;
-    PbiHeader header_;
-
-    // dummy buffer for skipped fields
-    std::vector<int64_t> temp_;
-
-    void LoadBarcodeData(PbiRawData& data);
-    void LoadBasicData(PbiRawData& data);
-    void LoadHeader();
-    void LoadMappedData(PbiRawData& data);
-    void LoadReferenceData(PbiRawData& data);
-    void Open(const std::string& filename);
-
+    // per-data-field load
     template <typename T>
-    void MaybeSaveField(std::vector<T>& dst, const PbiFile::Field field);
+    static void LoadBgzfVector(BGZF* fp, std::vector<T>& data, const uint32_t numReads);
 
+    // per-component write
+    static void WriteBarcodeData(const PbiRawBarcodeData& barcodeData, const uint32_t numReads,
+                                 BGZF* fp);
+    static void WriteHeader(const PbiRawData& index, BGZF* fp);
+    static void WriteMappedData(const PbiRawMappedData& mappedData, const uint32_t numReads,
+                                BGZF* fp);
+    static void WriteReferenceData(const PbiRawReferenceData& referenceData, BGZF* fp);
+    static void WriteBasicData(const PbiRawBasicData& subreadData, const uint32_t numReads,
+                               BGZF* fp);
+
+    // per-data-field write
     template <typename T>
-    void SaveField(std::vector<T>& dst);
-
-    template <size_t ElementSize>
-    void SkipField();
-
-    static void AggregateDataSet(PbiRawData& aggregateData, const DataSet& dataset);
-
-    // // per-data-field load
-    template <typename T>
-    static void LoadBgzfVector(BGZF* fp, std::vector<T>& data, const uint32_t numReads,
-                               const bool maybeSwapEndian = true);
+    static void WriteBgzfVector(BGZF* fp, const std::vector<T>& data);
 
 private:
     // helper functions
@@ -84,13 +63,12 @@ private:
 };
 
 template <typename T>
-inline void PbiIndexIO::LoadBgzfVector(BGZF* fp, std::vector<T>& data, const uint32_t numReads,
-                                       const bool maybeSwapEndian)
+inline void PbiIndexIO::LoadBgzfVector(BGZF* fp, std::vector<T>& data, const uint32_t numReads)
 {
     assert(fp);
     data.resize(numReads);
     auto ret = bgzf_read(fp, &data[0], numReads * sizeof(T));
-    if (fp->is_be && maybeSwapEndian) SwapEndianness(data);
+    if (fp->is_be) SwapEndianness(data);
     UNUSED(ret);
 }
 
@@ -117,6 +95,16 @@ inline void PbiIndexIO::SwapEndianness(std::vector<T>& data)
         default:
             throw std::runtime_error{"unsupported element size"};
     }
+}
+
+template <typename T>
+inline void PbiIndexIO::WriteBgzfVector(BGZF* fp, const std::vector<T>& data)
+{
+    assert(fp);
+    std::vector<T> output = data;
+    if (fp->is_be) SwapEndianness(output);
+    auto ret = bgzf_write(fp, &output[0], data.size() * sizeof(T));
+    UNUSED(ret);
 }
 
 }  // namespace BAM

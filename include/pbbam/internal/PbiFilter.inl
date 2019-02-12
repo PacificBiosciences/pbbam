@@ -49,7 +49,6 @@ public:
 
 public:
     bool Accepts(const PacBio::BAM::PbiRawData& idx, const size_t row) const;
-    std::set<PbiFile::Field> RequiredFields() const;
 
 private:
     struct WrapperInterface
@@ -58,7 +57,6 @@ private:
         virtual WrapperInterface* Clone() const =0;
         virtual bool Accepts(const PacBio::BAM::PbiRawData& idx,
                              const size_t row) const =0;
-        virtual std::set<PbiFile::Field> RequiredFields() const =0;
     };
 
     template<typename T>
@@ -69,7 +67,6 @@ private:
         WrapperInterface* Clone() const override;
         bool Accepts(const PacBio::BAM::PbiRawData& idx,
                      const size_t row) const override;
-        std::set<PbiFile::Field> RequiredFields() const override;
         T data_;
     };
 
@@ -99,9 +96,6 @@ inline FilterWrapper& FilterWrapper::operator=(const FilterWrapper& other)
 inline bool FilterWrapper::Accepts(const PbiRawData& idx, const size_t row) const
 { return self_->Accepts(idx, row); }
 
-inline std::set<PbiFile::Field> FilterWrapper::RequiredFields() const
-{ return self_->RequiredFields(); }
-
 // ----------------
 // WrapperImpl<T>
 // ----------------
@@ -128,10 +122,6 @@ template<typename T>
 inline bool FilterWrapper::WrapperImpl<T>::Accepts(const PbiRawData& idx,
                                                    const size_t row) const
 { return data_.Accepts(idx, row); }
-
-template<typename T>
-inline std::set<PbiFile::Field> FilterWrapper::WrapperImpl<T>::RequiredFields() const
-{ return data_.RequiredFields(); }
 
 struct PbiFilterPrivate
 {
@@ -181,17 +171,6 @@ struct PbiFilterPrivate
             throw std::runtime_error{"PbiFilter: invalid composite filter type"};
     }
 
-    std::set<PbiFile::Field> RequiredFields() const
-    {
-        std::set<PbiFile::Field> result;
-        for (const auto& filter : filters_) {
-            const auto childFields = filter.RequiredFields();
-            for (const auto& field : childFields)
-                result.insert(field);
-        }
-        return result;
-    }
-
     PbiFilter::CompositionType type_;
     std::vector<FilterWrapper> filters_;
 };
@@ -228,9 +207,6 @@ inline PbiFilter& PbiFilter::operator=(const PbiFilter& other)
 inline bool PbiFilter::Accepts(const PacBio::BAM::PbiRawData& idx,
                                const size_t row) const
 { return d_->Accepts(idx, row); }
-
-inline std::set<PbiFile::Field> PbiFilter::RequiredFields() const
-{ return d_->RequiredFields(); }
 
 template<typename T>
 inline PbiFilter& PbiFilter::Add(T filter)
