@@ -336,12 +336,6 @@ bool PbiQueryNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
     return d_->Accepts(idx, row);
 }
 
-std::set<PbiFile::Field> PbiQueryNameFilter::RequiredFields() const
-{
-    return {PbiFile::Field::RG_ID, PbiFile::Field::Q_START, PbiFile::Field::Q_END,
-            PbiFile::Field::ZMW};
-}
-
 // PbiReadGroupFilter
 
 PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<int32_t>& whitelist,
@@ -451,11 +445,6 @@ bool PbiReadGroupFilter::Accepts(const PbiRawData& idx, const size_t row) const
     return (cmp_ == Compare::EQUAL ? accepted : !accepted);
 }
 
-std::set<PbiFile::Field> PbiReadGroupFilter::RequiredFields() const
-{
-    return {PbiFile::Field::RG_ID, PbiFile::Field::BC_FORWARD, PbiFile::Field::BC_REVERSE};
-}
-
 // PbiReferenceNameFilter
 
 PbiReferenceNameFilter::PbiReferenceNameFilter(std::string rname, Compare::Type cmp)
@@ -501,11 +490,6 @@ void PbiReferenceNameFilter::Initialize(const PbiRawData& idx) const
         subFilter_ = PbiReferenceIdFilter{std::move(ids), cmp_};
     }
     initialized_ = true;
-}
-
-std::set<PbiFile::Field> PbiReferenceNameFilter::RequiredFields() const
-{
-    return subFilter_.RequiredFields();
 }
 
 }  // namespace BAM

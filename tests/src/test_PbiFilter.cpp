@@ -85,9 +85,6 @@ struct SimpleFilter
 {
     bool Accepts(const PbiRawData& /* idx */, const size_t /* row */) const
     { /*()idx; ()row;*/ return true; }
-
-    std::set<PbiFile::Field> RequiredFields() const
-    { return {}; }
 };
 
 struct NoncompliantFilter { };
@@ -109,9 +106,6 @@ struct SortUniqueTestFilter
                 return false;
         }
     }
-
-    std::set<PbiFile::Field> RequiredFields() const
-    { return {}; }
 };
 
 struct SortUniqueTestFilter2
@@ -127,9 +121,6 @@ struct SortUniqueTestFilter2
                 return false;
         }
     }
-
-    std::set<PbiFile::Field> RequiredFields() const
-    { return {}; }
 };
 
 static inline
@@ -803,6 +794,7 @@ TEST(PbiFilterTest, ReferenceNameFilterOk)
         const auto expectedRows = std::vector<size_t>{0,1,2,3};
         for (size_t row : expectedRows)
             EXPECT_TRUE(filter.Accepts(index, row));
+
     }
     {
         const auto filter = PbiFilter{ PbiReferenceNameFilter{ "lambda_NEB3011", Compare::NOT_EQUAL } };
