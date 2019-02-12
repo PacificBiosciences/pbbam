@@ -66,6 +66,11 @@ bool HasSection(const PbiFile::Sections sections, const PbiFile::Section section
     return (sections & section) != 0;
 }
 
+bool UseField(const std::set<PbiFile::Field>& fields, const PbiFile::Field field)
+{
+    return fields.find(field) != fields.cend();
+}
+
 }  // anonmyous
 
 PbiIndexIO::PbiIndexIO(const std::string& pbiFilename)
@@ -95,14 +100,17 @@ PbiRawData PbiIndexIO::Load()
     if (header_.numReads == 0) return rawData;
 
     // ensure rewind
-    const auto ret = bgzf_seek(fp_.get(), header_.firstRecordOffset, SEEK_SET);
-    if (ret != 0) throw std::runtime_error{"PbiIndexIO: could not seek in file: " + pbiFilename_};
+    bgzf_seek(fp_.get(), header_.firstRecordOffset, SEEK_SET);
 
     // load from PBI sections
     LoadBasicData(rawData);
-    if (HasSection(header_.sections, PbiFile::MAPPED)) LoadMappedData(rawData);
-    if (HasSection(header_.sections, PbiFile::REFERENCE)) LoadReferenceData(rawData);
+    if (HasSection(header_.sections, PbiFile::MAPPED)) {
+        LoadMappedData(rawData);
+        assert(HasSection(header_.sections, PbiFile::REFERENCE));
+        LoadReferenceData(rawData);
+    }
     if (HasSection(header_.sections, PbiFile::BARCODE)) LoadBarcodeData(rawData);
+
     return rawData;
 }
 
@@ -240,7 +248,7 @@ void PbiIndexIO::SaveField(std::vector<T>& dst)
 template <size_t ElementSize>
 void PbiIndexIO::SkipField()
 {
-    assert(fp_);
+    assert(fp);
     temp_.resize(header_.numReads);
     auto ret = bgzf_read(fp_.get(), &temp_[0], (header_.numReads * ElementSize));
     UNUSED(ret);
