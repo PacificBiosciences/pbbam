@@ -108,9 +108,9 @@ public:
     }
 
     IndexedBamWriter(const IndexedBamWriter&) = delete;
-    IndexedBamWriter(IndexedBamWriter&&) = default;
+    IndexedBamWriter(IndexedBamWriter&&);
     IndexedBamWriter& operator=(const IndexedBamWriter&) = delete;
-    IndexedBamWriter& operator=(IndexedBamWriter&&) = default;
+    IndexedBamWriter& operator=(IndexedBamWriter&&);
     ~IndexedBamWriter() override;
 
 public:

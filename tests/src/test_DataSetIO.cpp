@@ -132,7 +132,7 @@ TEST(DataSetIOTest, ThrowsOnNonexistentFofnFile)
     }
     catch(std::runtime_error& e)
     {
-        const std::string msg = "could not open FOFN for reading: does/not/exist.fofn";
+        const std::string msg = "DataSet: could not open FOFN for reading: does/not/exist.fofn";
         EXPECT_EQ(msg, e.what()) ;
         checkedException = true;
     }
@@ -148,7 +148,7 @@ TEST(DataSetIOTest, ThrowsOnNonexistentXmlFile)
     }
     catch(std::runtime_error& e)
     {
-        const std::string msg = "could not open XML file for reading: does/not/exist.xml";
+        const std::string msg = "DataSet: could not open XML file for reading: does/not/exist.xml";
         EXPECT_EQ(msg, e.what()) ;
         checkedException = true;
     }
@@ -164,7 +164,7 @@ TEST(DataSetIOTest, ThrowsOnUnsupportedExtension)
     }
     catch(std::runtime_error& e)
     {
-        const std::string msg = "unsupported extension on input file: bad/extension.foo";
+        const std::string msg = "DataSet: unsupported extension on input file: bad/extension.foo";
         EXPECT_EQ(msg, e.what()) ;
         checkedException = true;
     }
@@ -182,7 +182,7 @@ TEST(DataSetIOTest, ThrowsIfCannotOpenSaveFile)
     }
     catch(std::runtime_error& e)
     {
-        const std::string msg = "could not open XML file for writing: fake_directory_that_should_not_exist/out.xml";
+        const std::string msg = "DataSet: could not open XML file for writing: fake_directory_that_should_not_exist/out.xml";
         EXPECT_EQ(msg, e.what()) ;
         checkedException = true;
     }
@@ -448,7 +448,7 @@ static void TestFromXmlString()
     EXPECT_EQ("http://www.w3.org/2001/XMLSchema-instance",         dataset.Attribute("xmlns:xsi"));
 
     const ExternalResources& resources = dataset.ExternalResources();
-    EXPECT_EQ(2, resources.Size());
+    EXPECT_EQ(2, resources.NumChildren());
 
     const ExternalResource& resource1 = resources[0];
     EXPECT_EQ("Third Alignments BAM",                      resource1.Name());
@@ -1130,10 +1130,10 @@ static void TestReferenceXml()
     EXPECT_EQ(std::string("Tribble"), metadata.ChildText("Organism"));
     EXPECT_EQ(std::string("Diploid"), metadata.ChildText("Ploidy"));
 
-    const internal::DataSetListElement<internal::DataSetElement>& contigs =
-            metadata.Child<internal::DataSetListElement<internal::DataSetElement> >("Contigs");
+    const internal::DataSetElement& contigs = metadata.Child<internal::DataSetElement>("Contigs");
     ASSERT_EQ(1, contigs.NumChildren());
-    const internal::DataSetElement& contig = contigs[0];
+
+    const internal::DataSetElement& contig = contigs.Child<internal::DataSetElement>(0);
     EXPECT_EQ(std::string("gi|229359445|emb|AM181176.4|"), contig.Attribute("Name"));
     EXPECT_EQ(std::string("Pseudomonas fluorescens SBW25 complete genome|quiver"), contig.Attribute("Description"));
     EXPECT_EQ(std::string("6722109"), contig.Attribute("Length"));
@@ -1497,6 +1497,7 @@ TEST(DataSetIOTest, RelativePathCarriedThroughOk_FromString)
             "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" "
             "Version=\"2.3.0\" "
             "xmlns=\"http://pacificbiosciences.com/PacBioDataModel.xsd\" "
+            "xmlns:pbbase=\"http://pacificbiosciences.com/PacBioBaseDataModel.xsd\" "
             "xmlns:pbds=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
             "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
             "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDataModel.xsd\">\n"

@@ -31,7 +31,8 @@ static std::string removeFileUriScheme(const std::string& uri)
     const auto fileScheme = std::string{"file://"};
     const auto schemeFound = schemeLess.find(fileScheme);
     if (schemeFound != std::string::npos) {
-        if (schemeFound != 0) throw std::runtime_error{"Malformed URI: scheme not at beginning"};
+        if (schemeFound != 0)
+            throw std::runtime_error{"FileUtils: malformed URI, scheme is not at beginning"};
         schemeLess = schemeLess.substr(fileScheme.size());
     }
     return schemeLess;
@@ -144,7 +145,7 @@ std::string FileUtils::CurrentWorkingDirectory()
 
     // if error is not ERANGE, then it's not a problem of too-long name... something else happened
     if (errno != ERANGE)
-        throw std::runtime_error{"could not determine current working directory path"};
+        throw std::runtime_error{"FileUtils: could not determine current working directory path"};
 
     // long path - use heap, trying progressively longer buffers
     for (size_t chunks = 2; chunks < maxNumChunks; ++chunks) {
@@ -153,11 +154,13 @@ std::string FileUtils::CurrentWorkingDirectory()
 
         // if error is not ERANGE, then it's not a problem of too-long name... something else happened
         if (errno != ERANGE)
-            throw std::runtime_error{"could not determine current working directory path"};
+            throw std::runtime_error{
+                "FileUtils: could not determine current working directory path"};
     }
 
     // crazy long path name
-    throw std::runtime_error{"could determine current working directory - extremely long path"};
+    throw std::runtime_error{
+        "FileUtils: could not determine current working directory - extremely long path"};
 }
 
 std::string FileUtils::DirectoryName(const std::string& file)
@@ -176,7 +179,8 @@ bool FileUtils::Exists(const char* fn)
 std::chrono::system_clock::time_point FileUtils::LastModified(const char* fn)
 {
     struct stat s;
-    if (stat(fn, &s) != 0) throw std::runtime_error{"could not get file timestamp"};
+    if (stat(fn, &s) != 0)
+        throw std::runtime_error{"FileUtils: could not get timestamp for file: " + std::string{fn}};
     return std::chrono::system_clock::from_time_t(s.st_mtime);
 }
 
@@ -190,7 +194,8 @@ constexpr char FileUtils::Separator() { return native_pathSeparator; }
 off_t FileUtils::Size(const char* fn)
 {
     struct stat s;
-    if (stat(fn, &s) != 0) throw std::runtime_error{"could not determine file size"};
+    if (stat(fn, &s) != 0)
+        throw std::runtime_error{"FileUtils: could not determine size of file: " + std::string{fn}};
     return s.st_size;
 }
 

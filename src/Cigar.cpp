@@ -15,6 +15,8 @@
 namespace PacBio {
 namespace BAM {
 
+Cigar::Cigar() = default;
+
 Cigar::Cigar(const std::string& cigarString) : std::vector<CigarOperation>{}
 {
     size_t numberStart = 0;
@@ -29,6 +31,18 @@ Cigar::Cigar(const std::string& cigarString) : std::vector<CigarOperation>{}
         }
     }
 }
+
+Cigar::Cigar(const Cigar&) = default;
+
+Cigar::Cigar(Cigar&&) = default;
+
+Cigar& Cigar::operator=(const Cigar&) = default;
+
+Cigar& Cigar::operator=(Cigar&&) = default;
+
+Cigar::~Cigar() = default;
+
+Cigar Cigar::FromStdString(const std::string& stdString) { return Cigar(stdString); }
 
 std::string Cigar::ToStdString() const
 {

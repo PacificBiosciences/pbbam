@@ -25,13 +25,24 @@ AlignmentPrinter::AlignmentPrinter(const IndexedFastaReader& ifr)
 {
 }
 
+AlignmentPrinter::AlignmentPrinter(AlignmentPrinter&&) = default;
+
+AlignmentPrinter& AlignmentPrinter::operator=(AlignmentPrinter&&) = default;
+
+AlignmentPrinter::~AlignmentPrinter() = default;
+
 std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation orientation)
 {
     const std::string seq{record.Sequence(orientation, true, true)};
     const std::string ref{ifr_->ReferenceSubsequence(record, orientation, true, true)};
 
-    if (seq.size() != ref.size())
-        throw std::runtime_error{"Sequence and reference parts are of different size"};
+    if (seq.size() != ref.size()) {
+        std::ostringstream s;
+        s << "AlignmentPrinter: sequence and reference lengths are not equal:\n"
+          << "  seq: " << seq.size() << '\n'
+          << "  ref: " << ref.size();
+        throw std::runtime_error{s.str()};
+    }
 
     int seqLength = 0;
     float matches = 0;

@@ -26,14 +26,14 @@ Version::Version(const std::string& v) : major_{0}, minor_{0}, revision_{0}
     try {
         const auto fields = Split(v, '.');
         const auto numFields = fields.size();
-        if (numFields == 0) throw std::runtime_error{"invalid version number - empty string"};
+        if (numFields == 0) throw std::runtime_error{"Version: empty string"};
         major_ = std::stoi(fields.at(0));
         if (numFields > 1) {
             minor_ = std::stoi(fields.at(1));
             if (numFields > 2) revision_ = std::stoi(fields.at(2));
         }
     } catch (std::exception&) {
-        throw std::runtime_error{"invalid version number (" + v + "): failed to parse"};
+        throw std::runtime_error{"Version: could not parse: " + v};
     }
 
     // ensure valid numbers

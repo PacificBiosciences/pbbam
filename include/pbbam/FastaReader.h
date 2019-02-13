@@ -33,10 +33,11 @@ public:
     /// \{
 
     explicit FastaReader(const std::string& fn);
+
     FastaReader(const FastaReader&) = delete;
-    FastaReader(FastaReader&&) = default;
+    FastaReader(FastaReader&&);
     FastaReader& operator=(const FastaReader&) = delete;
-    FastaReader& operator=(FastaReader&&) = default;
+    FastaReader& operator=(FastaReader&&);
     ~FastaReader();
 
     /// \}

@@ -1,28 +1,28 @@
 // File Description
-/// \file CompositeFastaReader.inl
-/// \brief Inline implementation for the composite FASTA reader, for
-///        working with multiple input files.
+/// \file BamRecordView.cpp
+/// \brief Implements the BamRecordTags utility class.
 //
 // Author: Derek Barnett
 
-#include "pbbam/CompositeFastaReader.h"
+#include "PbbamInternalConfig.h"
 
-#include "pbbam/MakeUnique.h"
+#include "pbbam/CompositeFastaReader.h"
 
 namespace PacBio {
 namespace BAM {
 
-inline CompositeFastaReader::CompositeFastaReader(const std::vector<std::string>& fastaFiles)
+CompositeFastaReader::CompositeFastaReader(const std::vector<std::string>& fastaFiles)
 {
     for (const auto& fn : fastaFiles)
         readers_.emplace_back(std::make_unique<FastaReader>(fn));
 }
 
-inline CompositeFastaReader::CompositeFastaReader(const DataSet& dataset)
+CompositeFastaReader::CompositeFastaReader(const DataSet& dataset)
     : CompositeFastaReader{dataset.FastaFiles()}
-{ }
+{
+}
 
-inline bool CompositeFastaReader::GetNext(FastaSequence& seq)
+bool CompositeFastaReader::GetNext(FastaSequence& seq)
 {
     // try first reader, if successful return true
     // else pop reader and try next, until all readers exhausted
@@ -38,5 +38,5 @@ inline bool CompositeFastaReader::GetNext(FastaSequence& seq)
     return false;
 }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

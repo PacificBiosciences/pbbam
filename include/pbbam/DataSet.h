@@ -116,11 +116,11 @@ public:
     ///
     DataSet(const std::vector<std::string>& filenames);
 
-    DataSet(const DataSet& other);
-    DataSet(DataSet&&) = default;
-    DataSet& operator=(const DataSet& other);
-    DataSet& operator=(DataSet&&) = default;
-    ~DataSet() = default;
+    DataSet(const DataSet&);
+    DataSet(DataSet&&);
+    DataSet& operator=(const DataSet&);
+    DataSet& operator=(DataSet&&);
+    ~DataSet();
 
     /// \brief Creates a DataSet from "raw" XML data.
     ///
@@ -156,7 +156,7 @@ public:
     /// \throws std::runtime_error if file could be opened or if DataSet
     ///         elements could not be converted to XML
     ///
-    void Save(const std::string& outputFilename);
+    void Save(const std::string& outputFilename) const;
 
     /// \brief Saves dataset XML to output stream, e.g. std::cout,
     ///        std::stringstream.
@@ -166,7 +166,7 @@ public:
     /// \throws std::runtime_error if DataSet elements could not be converted to
     ///         XML
     ///
-    void SaveToStream(std::ostream& out);
+    void SaveToStream(std::ostream& out) const;
 
     /// \}
 
@@ -816,7 +816,5 @@ PBBAM_EXPORT std::string ToIso8601(const time_t& t);
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#include "pbbam/internal/DataSet.inl"
 
 #endif  // DATASET_H

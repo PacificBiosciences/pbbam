@@ -70,27 +70,27 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    CigarOperation() = default;
+    CigarOperation();
     CigarOperation(char c, uint32_t length);
     CigarOperation(CigarOperationType op, uint32_t length);
 
-    CigarOperation(const CigarOperation&) = default;
-    CigarOperation(CigarOperation&&) = default;
-    CigarOperation& operator=(const CigarOperation&) = default;
-    CigarOperation& operator=(CigarOperation&&) = default;
-    ~CigarOperation() = default;
+    CigarOperation(const CigarOperation&);
+    CigarOperation(CigarOperation&&);
+    CigarOperation& operator=(const CigarOperation&);
+    CigarOperation& operator=(CigarOperation&&);
+    ~CigarOperation();
 
     /// \}
 
 public:
     /// \returns operation type as SAM/BAM char code
-    inline char Char() const;
+    char Char() const;
 
     /// \returns operation length
-    inline uint32_t Length() const;
+    uint32_t Length() const;
 
     /// \returns operation type as CigarOperationType enum value
-    inline CigarOperationType Type() const;
+    CigarOperationType Type() const;
 
     /// \}
 
@@ -102,19 +102,19 @@ public:
     ///
     /// \param[in] opChar SAM/BAM character code
     /// \returns reference to this operation
-    inline CigarOperation& Char(const char opChar);
+    CigarOperation& Char(const char opChar);
 
     /// Sets this operation length.
     ///
     /// \param[in] length
     /// \returns reference to this operation
-    inline CigarOperation& Length(const uint32_t length);
+    CigarOperation& Length(const uint32_t length);
 
     /// Sets this operation type.
     ///
     /// \param[in] opType CigarOperationType value
     /// \returns reference to this operation
-    inline CigarOperation& Type(const CigarOperationType opType);
+    CigarOperation& Type(const CigarOperationType opType);
 
     /// \}
 
@@ -123,10 +123,10 @@ public:
     /// \{
 
     /// \returns true if both CIGAR operation type & length match
-    inline bool operator==(const CigarOperation& other) const;
+    bool operator==(const CigarOperation& other) const;
 
     /// \returns true if either CIGAR operation type or length differ
-    inline bool operator!=(const CigarOperation& other) const;
+    bool operator!=(const CigarOperation& other) const;
 
     /// \}
 
@@ -141,7 +141,5 @@ private:
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#include "pbbam/internal/CigarOperation.inl"
 
 #endif  // CIGAROPERATION_H

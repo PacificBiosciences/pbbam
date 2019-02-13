@@ -1,7 +1,7 @@
 # PacBio::BAM - change log
 
 All notable changes to this project will be documented in this file.
-This project adheres to [Semantic Versioning](http://semver.org/). 
+This project adheres to [Semantic Versioning](http://semver.org/).
 
 **NOTE:** The current series (0.y.z) is under initial development. Anything may
 change at any time. The public API should not be considered stable yet. Once we
@@ -9,6 +9,16 @@ lock down a version 1.0.0, this will define a reference point & compatibility
 guarantees will be maintained within each major version series.
 
 ## Active
+
+## [0.22.0] - 2019-02-11
+
+### Fixed
+ - Handles zero-length reads for stitching ZMW reads.
+ - Clipping to query on reverse-strand aligned reads.
+ - Removed UB in dataset API.
+
+### Added
+ - "exciseFlankingInserts" option for clipping reads w.r.t reference.
 
 ## [0.21.0] - 2018-12-21
 
@@ -43,8 +53,8 @@ guarantees will be maintained within each major version series.
 ## [0.16.0] - 2018-01-17
 
 ### Removed
-- Removed the PbiIndex class and its "lookup data"-related helpers. These were 
-never as useful as initially intended. PbiRawData and its related classes are the 
+- Removed the PbiIndex class and its "lookup data"-related helpers. These were
+never as useful as initially intended. PbiRawData and its related classes are the
 recommended interface for working with PBI index data.
 
 ## [0.15.0] - 2018-01-12
@@ -69,7 +79,7 @@ adding extra null terminators to make the subsequent CIGAR section 32-bit aligne
 ## [0.13.1] - 2017-09-25
 
 ### Added
-- Support for "pe" tag in stitched, virtual reads. 
+- Support for "pe" tag in stitched, virtual reads.
 
 ## [0.13.0] - 2017-09-25
 
@@ -78,8 +88,8 @@ adding extra null terminators to make the subsequent CIGAR section 32-bit aligne
 
 ## [0.12.2] - 2017-09-22
 
-### Added 
-- HasPulseExclusion() to BamRecord (& derived types). 
+### Added
+- HasPulseExclusion() to BamRecord (& derived types).
 
 ## [0.12.1] - 2017-09-21
 
@@ -90,13 +100,13 @@ adding extra null terminators to make the subsequent CIGAR section 32-bit aligne
 
 ### Added
 - NumReads() for PBI filter-based queries. This allows fetching of the number
-of reads that pass the filter, without needing to iterate over the entire 
+of reads that pass the filter, without needing to iterate over the entire
 file(s).
 
 ## [0.11.0] - 2017-09-15
 
 ### Added
-- Support for internal tag: pulse exclusion reason ("pe"). New methods on 
+- Support for internal tag: pulse exclusion reason ("pe"). New methods on
 BamRecord, and new enum PulseExclusionReason.
 
 ### Changed
@@ -116,23 +126,23 @@ BamRecord, and new enum PulseExclusionReason.
 
 ### Changed
 - PbiBuilder backend for generating PBI index files "on-the-fly" along with
-writing BAM files. The previous implementation's memory usage scaled linearly 
+writing BAM files. The previous implementation's memory usage scaled linearly
 with the number of reads, sometimes reaching huge numbers (several gigs or more).
-The new implementation's memory usage remains constant for any number of reads, 
-without any runtime hit on files/architectures tested. 
+The new implementation's memory usage remains constant for any number of reads,
+without any runtime hit on files/architectures tested.
 
 ### Removed
 - PbiBuilder::Result(). Returned an intermediate snapshot of the index under
-construction. This method isn't usable with the new PbiBuilder backend and was 
-really only useful for initial debugging/testing. It is no longer used in the 
-test framework and is unlikely to be used by client code either. Dropping this 
-method from the API, and thus bumping the version number. 
+construction. This method isn't usable with the new PbiBuilder backend and was
+really only useful for initial debugging/testing. It is no longer used in the
+test framework and is unlikely to be used by client code either. Dropping this
+method from the API, and thus bumping the version number.
 
 ## [0.9.0] - 2017-08-07
 
 ### Removed
 - Bundled htslib. Now using 'stock' htslib (v1.3.1+).
-- Built-in SWIG wrappers. 
+- Built-in SWIG wrappers.
 
 ## [0.8.0] - 2017-07-24
 
@@ -147,13 +157,13 @@ scraps, etc).
 - Bug in the build system preventing clean rebuilds.
 
 ### Removed
-- Dropped the bundled, PacBio-forked version of htslib. Now using stock htslib (v1.3.1+). 
+- Dropped the bundled, PacBio-forked version of htslib. Now using stock htslib (v1.3.1+).
 
 ## [0.7.4] - 2016-11-18
 
 ### Changed
 - Compatibility for merging BAM files no longer requires exact match of PacBioBAM
-version number (header @HD:pb tag). As long as both files meet the minimum 
+version number (header @HD:pb tag). As long as both files meet the minimum
 supported version number, the merge is allowed.
 
 ## [0.7.3] - 2016-11-11
@@ -164,8 +174,8 @@ supported version number, the merge is allowed.
 ## [0.7.2] - 2016-11-10
 
 ### Removed
-- SAM header version equality check for merging BAM files. PacBioBAM version 
-number carries more meaning for PacBio data and thus will be the basis of 
+- SAM header version equality check for merging BAM files. PacBioBAM version
+number carries more meaning for PacBio data and thus will be the basis of
 ensuring compatible merging.
 
 ## [0.7.1] - 2016-11-09
@@ -174,14 +184,14 @@ ensuring compatible merging.
 - (Unindexed) FASTA reader & FastaSequence data structure.
 - Missing unit tests for internal BAM tag access.
 - Chemistry data for basecaller v3.3.
-- Missing parsers for filtering barcode quality ("bq"), barcode forward ("bcf"), 
+- Missing parsers for filtering barcode quality ("bq"), barcode forward ("bcf"),
 and barcode reverse ("bcr") from DataSetXML.
 - Integrated htslib into project.
 
 ### Fixed
 - Reverse complement on padding base.
 
-## [0.7.0] - 2016-09-26 
+## [0.7.0] - 2016-09-26
 
 ### Added
 - Clipping for CCS records
@@ -190,9 +200,9 @@ and barcode reverse ("bcr") from DataSetXML.
 - Cached position data leaking across records while iterating.
 - Rolled back default pulse behavior in internal BAM API, to be backward-
 compatible with existing client code (for now at least). v0.6.0 introduced
-returning basecalled positions ONLY by default, rather than return ALL 
-pulses. 
-- Fixed crash when attempting to read from empty BAM/PBI files using the 
+returning basecalled positions ONLY by default, rather than return ALL
+pulses.
+- Fixed crash when attempting to read from empty BAM/PBI files using the
 PbiFilter-enabled APIs.
 
 ## [0.6.0] - 2016-09-13
@@ -203,9 +213,9 @@ successful completion (i.e. normal BamWriter destruction, not triggered by a
 thrown exception) the file is renamed to the actual requested filename.
 - PBI file creation follows the same temporary naming convention.
 - Support for barcode pair (forward, reverse) in DataSetXML filter.
-- Validation API & 'auto-validate' compile-time switch. 
-- Added support for a batched QNAME whitelist filter in DataSet XML. Uses (new) 
-Property name 'qname_file', with the value being the filepath containing the 
+- Validation API & 'auto-validate' compile-time switch.
+- Added support for a batched QNAME whitelist filter in DataSet XML. Uses (new)
+Property name 'qname_file', with the value being the filepath containing the
 whitelist.
 - Exposed MD5 hashing to API.
 - Ability to remove base features from a ReadGroupInfo object.
@@ -213,7 +223,7 @@ whitelist.
 concatenates all PBI data within the dataset.
 - New SamWriter class to create SAM-formatted output of PacBio BAM data.
 - Extended APIs for accessing "internal BAM" data, including PulseBehavior
-switch for selecting between all pulses & basecalls only. 
+switch for selecting between all pulses & basecalls only.
 
 ### Fixed
 - Improper 'clip to reference' product for BamRecord in some cases.
@@ -225,10 +235,10 @@ aligned reads (bug 31339).
 - RecordType::POLYMERASE renamed to RecordType::ZMW to reflect changes in
 PacBio BAM spec v3.0.4
 - Refactored the 'virtual' reader classes - to match the new nomenclature,
-and to combine the virtual reader & composite readers behind a shared 
-interface. The old class names still exist, as typedefs to the new ones, 
-and the interfaces are completely source-compatible - so as not to break 
-existing code. However, the old classes should be considered deprecated and 
+and to combine the virtual reader & composite readers behind a shared
+interface. The old class names still exist, as typedefs to the new ones,
+and the interfaces are completely source-compatible - so as not to break
+existing code. However, the old classes should be considered deprecated and
 the new ones preferred. Below is the mapping of old -> new:
 
    VirtualPolymeraseBamRecord        ->  VirtualZmwBamRecord
@@ -273,7 +283,7 @@ creating the PBI file alongside.
 - Added BamRecord::Pkmean2 & Pkmid2, 2D equivalent of Pkmean/Pkmid, for internal
 BAMs.
 
-### Removed 
+### Removed
 - samtools dependency
 
 ## [0.4.3] - 2015-12-22
@@ -315,7 +325,7 @@ speedups of orders of magnitude in many cases.
 
 ## [0.3.2] - 2015-12-10
 
-### Added 
+### Added
 - Support for ReadGroupInfo sequencing chemistry data.
 InvalidSequencingChemistryException thrown if an unsupported combination is
 encountered.
@@ -379,7 +389,7 @@ or not.
 supported and will causean exception to be throw if encountered.
 - PBI lookup interface & backend, see PbiIndex.h & PbiLookupData.h for details.
 
-### Added 
+### Added
 - BamFile::PacBioIndexExists() & BamFile::StandardIndexExists() - query the
 existence of index files without auto-building them if they are missing, as in
 BamFile::Ensure*IndexExists().
@@ -410,7 +420,7 @@ number:
  - Removal of 'M' as allowed CIGAR operation. Attempt to use such a CIGAR op
  will throw an exception.
  - Addition of IPD/PulseWidth codec version info in header
-  
+
 ### Added
 - Auto-generation of UTC timestamp for DataSet objects
 - PbiBuilder - allows generation of PBI index data alongside generation or
@@ -421,7 +431,7 @@ rather than building up using DataSet API or loading from existing file.
 - "pbindex" command line tool to generate ".pbi" files from BAM data. The
 executable is built by default, but can be disabled using the cmake option
 "-DPacBioBAM_build_pbindex=OFF".
-  
+
 ### Fixed
 - PBI construction failing on CCS reads
 
@@ -474,17 +484,17 @@ hole numbers.
  - PulseCallWidth() only RC, no clipping
  - PulseCall() case-sensitive RC, no clipping
  - IPDRaw() to avoid up and downscaling for stitching
-- BamRecord::ParseTagName and BamRecord::ParseTagString to convert a two 
+- BamRecord::ParseTagName and BamRecord::ParseTagString to convert a two
   character tag string to a TagName enum and back. Allows a switch over tags.
-- VirtualPolymeraseReader to create VirtualPolymeraseBamRecord from a 
+- VirtualPolymeraseReader to create VirtualPolymeraseBamRecord from a
   subreads|hqregion+scraps.bam
-- VirtualRegion represents annotations of the polymerase reads, for adapters, 
+- VirtualRegion represents annotations of the polymerase reads, for adapters,
   barcodes, lqregions, and hqregions.
-- ReadGroupInfo operator== 
+- ReadGroupInfo operator==
 
 ### Fixed
 
-- Reimplemented QueryStart(int), QueryEnd(int), UpdateName(void), 
+- Reimplemented QueryStart(int), QueryEnd(int), UpdateName(void),
   ReadGroup(ReadGroupInfo&), ReadGroupId(std::string&);
 
 ## [0.0.5] - 2015-05-29
@@ -508,7 +518,7 @@ available - for creating PBI files & generating summary statistics. (bug 26025)
 - BamRecord[Impl] map quality now  initialized with 255 (missing) value, instead
 of 0. (bug 26228)
 - ReadGroupId calculation. (bug 25940)
-  
+
 ## [0.0.4] - 2015-04-22
 
 ### Added
@@ -525,7 +535,7 @@ are now taken care of within the API, not exposed to client code.
 
 ### Removed
 
-- BamReader 
+- BamReader
 
 ### Fixed
 

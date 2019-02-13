@@ -33,6 +33,51 @@ SequenceInfo::SequenceInfo(std::string name, std::string length)
 {
 }
 
+SequenceInfo::SequenceInfo() = default;
+
+SequenceInfo::SequenceInfo(const SequenceInfo&) = default;
+
+SequenceInfo::SequenceInfo(SequenceInfo&&) = default;
+
+SequenceInfo& SequenceInfo::operator=(const SequenceInfo&) = default;
+
+SequenceInfo& SequenceInfo::operator=(SequenceInfo&&) = default;
+
+SequenceInfo::~SequenceInfo() = default;
+
+bool SequenceInfo::operator==(const SequenceInfo& other) const
+{
+    return assemblyId_ == other.assemblyId_ && checksum_ == other.checksum_ &&
+           length_ == other.length_ && name_ == other.name_ && species_ == other.species_ &&
+           uri_ == other.uri_ && custom_ == other.custom_;
+}
+
+bool SequenceInfo::operator!=(const SequenceInfo& other) const { return !(*this == other); }
+
+std::string SequenceInfo::AssemblyId() const { return assemblyId_; }
+
+SequenceInfo& SequenceInfo::AssemblyId(std::string id)
+{
+    assemblyId_ = std::move(id);
+    return *this;
+}
+
+std::string SequenceInfo::Checksum() const { return checksum_; }
+
+SequenceInfo& SequenceInfo::Checksum(std::string checksum)
+{
+    checksum_ = std::move(checksum);
+    return *this;
+}
+
+std::map<std::string, std::string> SequenceInfo::CustomTags() const { return custom_; }
+
+SequenceInfo& SequenceInfo::CustomTags(std::map<std::string, std::string> custom)
+{
+    custom_ = std::move(custom);
+    return *this;
+}
+
 SequenceInfo SequenceInfo::FromSam(const std::string& sam)
 {
     // pop off '@SQ\t', then split rest of line into tokens
@@ -75,6 +120,32 @@ bool SequenceInfo::IsValid() const
     return l >= 0 && l <= std::numeric_limits<int32_t>::max();
 }
 
+std::string SequenceInfo::Length() const { return length_; }
+
+SequenceInfo& SequenceInfo::Length(std::string length)
+{
+    length_ = std::move(length);
+    return *this;
+}
+
+std::string SequenceInfo::Name() const { return name_; }
+
+SequenceInfo& SequenceInfo::Name(std::string name)
+{
+    name_ = std::move(name);
+    return *this;
+}
+
+std::string SequenceInfo::Species() const { return species_; }
+
+SequenceInfo& SequenceInfo::Species(std::string species)
+{
+    species_ = std::move(species);
+    return *this;
+}
+
+std::string SequenceInfo::ToSam(const SequenceInfo& seq) { return seq.ToSam(); }
+
 std::string SequenceInfo::ToSam() const
 {
     std::ostringstream out;
@@ -93,6 +164,14 @@ std::string SequenceInfo::ToSam() const
         out << MakeSamTag(std::move(attribute.first), std::move(attribute.second));
 
     return out.str();
+}
+
+std::string SequenceInfo::Uri() const { return uri_; }
+
+SequenceInfo& SequenceInfo::Uri(std::string uri)
+{
+    uri_ = std::move(uri);
+    return *this;
 }
 
 }  // namespace BAM

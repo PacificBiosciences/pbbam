@@ -6,7 +6,6 @@
 #include <string>
 #include "pbbam/Config.h"
 #include "pbbam/internal/DataSetElement.h"
-#include "pbbam/internal/DataSetListElement.h"
 
 namespace PacBio {
 namespace BAM {
@@ -25,6 +24,8 @@ class BaseEntityType : public DataSetElement
 {
 protected:
     BaseEntityType(const std::string& label, const XsdType& xsd = XsdType::BASE_DATA_MODEL);
+    BaseEntityType(const std::string& label, const FromInputXml& fromInputXml,
+                   const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 
 public:
     const std::string& CreatedAt() const;
@@ -62,6 +63,8 @@ class DataEntityType : public BaseEntityType
 {
 protected:
     DataEntityType(const std::string& label, const XsdType& xsd = XsdType::BASE_DATA_MODEL);
+    DataEntityType(const std::string& label, const FromInputXml& fromInputXml,
+                   const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 
 public:
     const std::string& Checksum() const;
@@ -94,6 +97,9 @@ class StrictEntityType : public BaseEntityType
 protected:
     StrictEntityType(const std::string& metatype, const std::string& label,
                      const XsdType& xsd = XsdType::BASE_DATA_MODEL);
+    StrictEntityType(const std::string& metatype, const std::string& label,
+                     const FromInputXml& fromInputXml,
+                     const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 
 public:
     const std::string& MetaType() const;
@@ -114,6 +120,9 @@ class InputOutputDataType : public StrictEntityType
 protected:
     InputOutputDataType(const std::string& metatype, const std::string& filename,
                         const std::string& label, const XsdType& xsd = XsdType::BASE_DATA_MODEL);
+    InputOutputDataType(const std::string& metatype, const std::string& filename,
+                        const std::string& label, const FromInputXml& fromInputXml,
+                        const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 };
 
 class IndexedDataType : public InputOutputDataType
@@ -121,6 +130,9 @@ class IndexedDataType : public InputOutputDataType
 protected:
     IndexedDataType(const std::string& metatype, const std::string& filename,
                     const std::string& label, const XsdType& xsd = XsdType::BASE_DATA_MODEL);
+    IndexedDataType(const std::string& metatype, const std::string& filename,
+                    const std::string& label, const FromInputXml& fromInputXml,
+                    const XsdType& xsd = XsdType::BASE_DATA_MODEL);
 
 public:
     const PacBio::BAM::FileIndices& FileIndices() const;
@@ -131,7 +143,5 @@ public:
 }  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
-
-#include "pbbam/internal/DataSetBaseTypes.inl"
 
 #endif  // DATASETBASETYPES_H

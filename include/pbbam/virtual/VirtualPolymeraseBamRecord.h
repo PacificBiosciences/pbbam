@@ -13,7 +13,7 @@ namespace PacBio {
 namespace BAM {
 
 /// \deprecated Use VirtualZmwBamRecord instead.
-typedef VirtualZmwBamRecord VirtualPolymeraseBamRecord;
+using VirtualPolymeraseBamRecord = VirtualZmwBamRecord;
 
 }  // namespace BAM
 }  // namespace PacBio

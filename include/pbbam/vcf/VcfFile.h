@@ -16,11 +16,11 @@ public:
     explicit VcfFile(std::string fn);
 
     VcfFile() = delete;
-    VcfFile(const VcfFile&) = default;
-    VcfFile(VcfFile&&) = default;
-    VcfFile& operator=(const VcfFile&) = default;
-    VcfFile& operator=(VcfFile&&) = default;
-    ~VcfFile() = default;
+    VcfFile(const VcfFile&);
+    VcfFile(VcfFile&&);
+    VcfFile& operator=(const VcfFile&);
+    VcfFile& operator=(VcfFile&&);
+    ~VcfFile();
 
 public:
     const std::string& Filename() const;
@@ -33,7 +33,5 @@ private:
 
 }  // namespace VCF
 }  // namespace PacBio
-
-#include "pbbam/vcf/internal/VcfFile.inl"
 
 #endif  // PBBAM_VCF_VCFFILE_H

@@ -50,12 +50,12 @@ public:
     ///
     SequenceInfo(std::string name, std::string length = "0");
 
-    SequenceInfo() = default;
-    SequenceInfo(const SequenceInfo&) = default;
-    SequenceInfo(SequenceInfo&&) = default;
-    SequenceInfo& operator=(const SequenceInfo&) = default;
-    SequenceInfo& operator=(SequenceInfo&&) = default;
-    ~SequenceInfo() = default;
+    SequenceInfo();
+    SequenceInfo(const SequenceInfo&);
+    SequenceInfo(SequenceInfo&&);
+    SequenceInfo& operator=(const SequenceInfo&);
+    SequenceInfo& operator=(SequenceInfo&&);
+    ~SequenceInfo();
 
     /// \}
 
@@ -188,7 +188,5 @@ private:
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#include "pbbam/internal/SequenceInfo.inl"
 
 #endif  // SEQUENCEINFO_H

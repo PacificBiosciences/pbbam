@@ -16,7 +16,7 @@ class BamRecordImpl;
 class IRecordWriter
 {
 public:
-    virtual ~IRecordWriter() = default;
+    virtual ~IRecordWriter();
 
 public:
     /// \brief Try to flush any buffered data to file.
@@ -46,7 +46,7 @@ public:
     virtual void Write(const BamRecordImpl& recordImpl) = 0;
 
 protected:
-    IRecordWriter() = default;
+    IRecordWriter();
 };
 
 }  // namespace BAM

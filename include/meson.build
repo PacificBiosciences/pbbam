@@ -94,43 +94,17 @@ if not meson.is_subproject()
 
   install_headers(
     files([
-      'pbbam/internal/Accuracy.inl',
-      'pbbam/internal/BamHeader.inl',
-      'pbbam/internal/BamRecord.inl',
-      'pbbam/internal/BamRecordBuilder.inl',
-      'pbbam/internal/BamRecordImpl.inl',
-      'pbbam/internal/BamRecordView.inl',
-      'pbbam/internal/Cigar.inl',
-      'pbbam/internal/CigarOperation.inl',
       'pbbam/internal/Compare.inl',
       'pbbam/internal/CompositeBamReader.inl',
-      'pbbam/internal/CompositeFastaReader.inl',
-      'pbbam/internal/DataSet.inl',
       'pbbam/internal/DataSetBaseTypes.h',
-      'pbbam/internal/DataSetBaseTypes.inl',
       'pbbam/internal/DataSetElement.h',
       'pbbam/internal/DataSetElement.inl',
-      'pbbam/internal/DataSetListElement.h',
-      'pbbam/internal/DataSetListElement.inl',
-      'pbbam/internal/DataSetTypes.inl',
-      'pbbam/internal/FastaSequence.inl',
-      'pbbam/internal/FastqSequence.inl',
-      'pbbam/internal/Frames.inl',
-      'pbbam/internal/GenomicInterval.inl',
       'pbbam/internal/Interval.inl',
       'pbbam/internal/PbiBasicTypes.inl',
       'pbbam/internal/PbiFilter.inl',
       'pbbam/internal/PbiFilterTypes.inl',
-      'pbbam/internal/PbiRawData.inl',
-      'pbbam/internal/ProgramInfo.inl',
-      'pbbam/internal/QualityValue.inl',
-      'pbbam/internal/QualityValues.inl',
       'pbbam/internal/QueryBase.h',
-      'pbbam/internal/QueryBase.inl',
-      'pbbam/internal/ReadGroupInfo.inl',
-      'pbbam/internal/SequenceInfo.inl',
-      'pbbam/internal/Tag.inl',
-      'pbbam/internal/Validator.inl']),
+      'pbbam/internal/QueryBase.inl']),
     subdir : 'pbbam/internal')
 
   install_headers(
@@ -145,14 +119,6 @@ if not meson.is_subproject()
       'pbbam/vcf/VcfQuery.h',
       'pbbam/vcf/VcfWriter.h']),
     subdir : 'pbbam/vcf')
-
-  install_headers(
-    files([
-      'pbbam/vcf/internal/VcfVariant.inl',
-      'pbbam/vcf/internal/VcfFile.inl',
-      'pbbam/vcf/internal/VcfHeader.inl',
-      'pbbam/vcf/internal/VcfHeaderTypes.inl']),
-    subdir : 'pbbam/vcf/internal')
 
   install_headers(
     files([

@@ -10,7 +10,11 @@
 
 #include <algorithm>
 #include <map>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/icl/interval_set.hpp>
@@ -98,7 +102,7 @@ DataSet::DataSet(const DataSet::TypeEnum type) : path_(FileUtils::CurrentWorking
             d_ = std::make_unique<TranscriptAlignmentSet>();
             break;
         default:
-            throw std::runtime_error{"unsupported dataset type"};
+            throw std::runtime_error{"DataSet: unsupported type"};
     }
 
     InitDefaults(*this);
@@ -135,21 +139,29 @@ DataSet::DataSet(const std::vector<std::string>& filenames)
 
 DataSet::DataSet(const DataSet& other) : path_(other.path_)
 {
-    DataSetBase* otherDataset = other.d_.get();
-    auto copyDataset = new DataSetElement(*otherDataset);
-    d_.reset(static_cast<DataSetBase*>(copyDataset));
+    std::ostringstream out;
+    DataSetIO::ToStream(other.d_, out);
+    const std::string xml = out.str();
+    d_ = DataSetIO::FromXmlString(xml);
 }
+
+DataSet::DataSet(DataSet&&) = default;
 
 DataSet& DataSet::operator=(const DataSet& other)
 {
     if (this != &other) {
-        DataSetBase* otherDataset = other.d_.get();
-        auto copyDataset = new DataSetElement(*otherDataset);
-        d_.reset(static_cast<DataSetBase*>(copyDataset));
+        std::ostringstream out;
+        DataSetIO::ToStream(other.d_, out);
+        const std::string xml = out.str();
+        d_ = DataSetIO::FromXmlString(xml);
         path_ = other.path_;
     }
     return *this;
 }
+
+DataSet& DataSet::operator=(DataSet&&) = default;
+
+DataSet::~DataSet() = default;
 
 DataSet& DataSet::operator+=(const DataSet& other)
 {
@@ -167,6 +179,16 @@ std::vector<std::string> DataSet::AllFiles() const
     std::transform(result.begin(), result.end(), result.begin(),
                    [this](const std::string& fn) { return this->ResolvePath(fn); });
     return result;
+}
+
+const std::string& DataSet::Attribute(const std::string& name) const { return d_->Attribute(name); }
+
+std::string& DataSet::Attribute(const std::string& name) { return d_->Attribute(name); }
+
+DataSet& DataSet::Attribute(const std::string& name, const std::string& value)
+{
+    d_->Attribute(name, value);
+    return *this;
 }
 
 std::vector<BamFile> DataSet::BamFiles() const
@@ -188,6 +210,39 @@ std::vector<BamFile> DataSet::BamFiles() const
     return result;
 }
 
+const std::string& DataSet::CreatedAt() const { return d_->CreatedAt(); }
+
+std::string& DataSet::CreatedAt() { return d_->CreatedAt(); }
+
+DataSet& DataSet::CreatedAt(const std::string& createdAt)
+{
+    d_->CreatedAt(createdAt);
+    return *this;
+}
+
+const PacBio::BAM::Extensions& DataSet::Extensions() const { return d_->Extensions(); }
+
+PacBio::BAM::Extensions& DataSet::Extensions() { return d_->Extensions(); }
+
+DataSet& DataSet::Extensions(const PacBio::BAM::Extensions& extensions)
+{
+    d_->Extensions(extensions);
+    return *this;
+}
+
+const PacBio::BAM::ExternalResources& DataSet::ExternalResources() const
+{
+    return d_->ExternalResources();
+}
+
+PacBio::BAM::ExternalResources& DataSet::ExternalResources() { return d_->ExternalResources(); }
+
+DataSet& DataSet::ExternalResources(const PacBio::BAM::ExternalResources& resources)
+{
+    d_->ExternalResources(resources);
+    return *this;
+}
+
 std::vector<std::string> DataSet::FastaFiles() const
 {
     const PacBio::BAM::ExternalResources& resources = ExternalResources();
@@ -207,12 +262,173 @@ std::vector<std::string> DataSet::FastaFiles() const
     return result;
 }
 
+const PacBio::BAM::Filters& DataSet::Filters() const { return d_->Filters(); }
+
+PacBio::BAM::Filters& DataSet::Filters() { return d_->Filters(); }
+
+DataSet& DataSet::Filters(const PacBio::BAM::Filters& filters)
+{
+    d_->Filters(filters);
+    return *this;
+}
+
+const std::string& DataSet::Format() const { return d_->Format(); }
+
+std::string& DataSet::Format() { return d_->Format(); }
+
+DataSet& DataSet::Format(const std::string& format)
+{
+    d_->Format(format);
+    return *this;
+}
+
 DataSet DataSet::FromXml(const std::string& xml)
 {
     DataSet result;
     result.d_ = DataSetIO::FromXmlString(xml);
     InitDefaults(result);
     return result;
+}
+
+std::vector<GenomicInterval> DataSet::GenomicIntervals() const
+{
+    // need to gather the contig lengths
+    std::map<std::string, int32_t> contigLengths;
+    for (const BamFile& b : BamFiles()) {
+        const BamHeader& header = b.Header();
+        const int32_t numContigs = header.NumSequences();
+        for (int32_t i = 0; i < numContigs; ++i) {
+            const std::string refName = header.SequenceName(i);
+            const int32_t refLength = boost::lexical_cast<int32_t>(header.SequenceLength(i));
+
+            const auto it = contigLengths.find(refName);
+            if (it == contigLengths.cend())
+                contigLengths.emplace(refName, refLength);
+            else if (it->second != refLength) {
+                throw std::runtime_error{
+                    "DataSet: " + refName + " occurs twice with different lengths ('" +
+                    std::to_string(it->second) + "' and '" + std::to_string(refLength) + "')"};
+            }
+        }
+    }
+
+    // with the lengths of all contigs known, we can build
+    // the minimal interval set induced by the filters
+    using intT = boost::icl::interval_set<int32_t>;
+    using intInterval = intT::interval_type;
+
+    std::map<std::string, intT> contigIntervals;
+    int32_t numFilters = 0;
+
+    for (const auto& xmlFilter : Filters()) {
+        ++numFilters;
+        boost::optional<std::string> contigName;
+
+        intT intersectedInterval{intInterval{0, std::numeric_limits<int32_t>::max()}};
+
+        for (const auto& xmlProperty : xmlFilter.Properties()) {
+            const std::string XmlName = xmlProperty.Name();
+            const std::string XmlOperator = xmlProperty.Operator();
+            const std::string XmlValue = xmlProperty.Value();
+
+            if ("rname" == XmlName) {
+                if ("=" == XmlOperator) {
+                    contigName = XmlValue;
+
+                    const auto it = contigLengths.find(XmlValue);
+                    if (it == contigLengths.cend())
+                        throw std::runtime_error{"DataSet: Could not find contig '" + XmlValue +
+                                                 "' in BAM files"};
+                    else
+                        intersectedInterval &= intInterval(0, it->second);
+                } else
+                    throw std::runtime_error{
+                        "DatSet: '" + XmlOperator +
+                        "' is an unrecognized property operator, only '=' is recognized"};
+            } else if ("tstart" == XmlName) {
+                if ((XmlOperator != "<") && (XmlOperator != "<="))
+                    throw std::runtime_error{
+                        "DataSet: tstart only supports '<' and '<=' operators"};
+
+                const int32_t end = boost::lexical_cast<int32_t>(XmlValue) + ("<=" == XmlOperator);
+                intersectedInterval &= intInterval(0, end);
+            } else if ("tend" == XmlName) {
+                if ((XmlOperator != ">") && (XmlOperator != ">="))
+                    throw std::runtime_error{"DataSet: tend only supports '>' and '>=' operators"};
+
+                const int32_t start =
+                    boost::lexical_cast<int32_t>(XmlValue) - (">=" == XmlOperator);
+                intersectedInterval &= intInterval(start, std::numeric_limits<int32_t>::max());
+            } else
+                throw std::runtime_error{"DataSet: '" + XmlName +
+                                         "' is an unrecognized filter property name"};
+        }
+
+        if (contigName)
+            contigIntervals[contigName.value()] |= intersectedInterval;
+        else
+            throw std::runtime_error{
+                "DataSet: current filter does not have a valid 'rname' attribute"};
+    }
+
+    // extract all GenomicIntervals
+    std::vector<GenomicInterval> result;
+    if (numFilters) {
+        // have some filters, only return regions passing filters
+        for (const auto& contigs : contigIntervals) {
+            const std::string& contigName = contigs.first;
+            for (const auto& i : contigs.second) {
+                // don't append empty intervals to the result
+                if (boost::icl::length(i)) result.emplace_back(contigName, i.lower(), i.upper());
+            }
+        }
+    } else {
+        // no filters, return complete list of intervals
+        for (const auto& contigs : contigLengths)
+            result.emplace_back(contigs.first, 0, contigs.second);
+    }
+
+    return result;
+}
+
+const PacBio::BAM::DataSetMetadata& DataSet::Metadata() const { return d_->Metadata(); }
+
+PacBio::BAM::DataSetMetadata& DataSet::Metadata() { return d_->Metadata(); }
+
+DataSet& DataSet::Metadata(const PacBio::BAM::DataSetMetadata& metadata)
+{
+    d_->Metadata(metadata);
+    return *this;
+}
+
+const std::string& DataSet::MetaType() const { return d_->MetaType(); }
+
+std::string& DataSet::MetaType() { return d_->MetaType(); }
+
+DataSet& DataSet::MetaType(const std::string& metatype)
+{
+    d_->MetaType(metatype);
+    return *this;
+}
+
+const std::string& DataSet::ModifiedAt() const { return d_->ModifiedAt(); }
+
+std::string& DataSet::ModifiedAt() { return d_->ModifiedAt(); }
+
+DataSet& DataSet::ModifiedAt(const std::string& modifiedAt)
+{
+    d_->ModifiedAt(modifiedAt);
+    return *this;
+}
+
+const std::string& DataSet::Name() const { return d_->Name(); }
+
+std::string& DataSet::Name() { return d_->Name(); }
+
+DataSet& DataSet::Name(const std::string& name)
+{
+    d_->Name(name);
+    return *this;
 }
 
 const NamespaceRegistry& DataSet::Namespaces() const { return d_->Namespaces(); }
@@ -255,9 +471,22 @@ std::string DataSet::ResolvePath(const std::string& originalPath) const
     return FileUtils::ResolvedFilePath(originalPath, path_);
 }
 
-void DataSet::Save(const std::string& outputFilename) { DataSetIO::ToFile(d_, outputFilename); }
+const std::string& DataSet::ResourceId() const { return d_->ResourceId(); }
 
-void DataSet::SaveToStream(std::ostream& out) { DataSetIO::ToStream(d_, out); }
+std::string& DataSet::ResourceId() { return d_->ResourceId(); }
+
+DataSet& DataSet::ResourceId(const std::string& resourceId)
+{
+    d_->ResourceId(resourceId);
+    return *this;
+}
+
+void DataSet::Save(const std::string& outputFilename) const
+{
+    DataSetIO::ToFile(d_, outputFilename);
+}
+
+void DataSet::SaveToStream(std::ostream& out) const { DataSetIO::ToStream(d_, out); }
 
 std::set<std::string> DataSet::SequencingChemistries() const
 {
@@ -265,7 +494,9 @@ std::set<std::string> DataSet::SequencingChemistries() const
 
     std::set<std::string> result;
     for (const BamFile& bf : bamFiles) {
-        if (!bf.IsPacBioBAM()) throw std::runtime_error{"only PacBio BAMs are supported"};
+        if (!bf.IsPacBioBAM())
+            throw std::runtime_error{
+                "DataSet: only PacBio BAMs are supported for fetching chemistry info"};
         const std::vector<ReadGroupInfo> readGroups{bf.Header().ReadGroups()};
         for (const ReadGroupInfo& rg : readGroups)
             result.insert(rg.SequencingChemistry());
@@ -273,103 +504,45 @@ std::set<std::string> DataSet::SequencingChemistries() const
     return result;
 }
 
-std::vector<GenomicInterval> DataSet::GenomicIntervals() const
+const PacBio::BAM::SubDataSets& DataSet::SubDataSets() const { return d_->SubDataSets(); }
+
+PacBio::BAM::SubDataSets& DataSet::SubDataSets() { return d_->SubDataSets(); }
+
+DataSet& DataSet::SubDataSets(const PacBio::BAM::SubDataSets& subdatasets)
 {
-    // need to gather the contig lengths
-    std::map<std::string, int32_t> contigLengths;
-    for (const BamFile& b : BamFiles()) {
-        const BamHeader& header = b.Header();
-        const int32_t numContigs = header.NumSequences();
-        for (int32_t i = 0; i < numContigs; ++i) {
-            const std::string refName = header.SequenceName(i);
-            const int32_t refLength = boost::lexical_cast<int32_t>(header.SequenceLength(i));
-
-            const auto it = contigLengths.find(refName);
-            if (it == contigLengths.cend())
-                contigLengths.emplace(refName, refLength);
-            else if (it->second != refLength)
-                throw std::runtime_error{refName + " occurs twice with different lengths ('" +
-                                         std::to_string(it->second) + "' and '" +
-                                         std::to_string(refLength) + "')"};
-        }
-    }
-
-    // with the lengths of all contigs known, we can build
-    // the minimal interval set induced by the filters
-    using intT = boost::icl::interval_set<int32_t>;
-    using intInterval = intT::interval_type;
-
-    std::map<std::string, intT> contigIntervals;
-    int32_t numFilters = 0;
-
-    for (const auto& xmlFilter : Filters()) {
-        ++numFilters;
-        boost::optional<std::string> contigName;
-
-        intT intersectedInterval{intInterval{0, std::numeric_limits<int32_t>::max()}};
-
-        for (const auto& xmlProperty : xmlFilter.Properties()) {
-            const std::string XmlName = xmlProperty.Name();
-            const std::string XmlOperator = xmlProperty.Operator();
-            const std::string XmlValue = xmlProperty.Value();
-
-            if ("rname" == XmlName) {
-                if ("=" == XmlOperator) {
-                    contigName = XmlValue;
-
-                    const auto it = contigLengths.find(XmlValue);
-                    if (it == contigLengths.cend())
-                        throw std::runtime_error{"Could not find contig '" + XmlValue +
-                                                 "' in BAM files"};
-                    else
-                        intersectedInterval &= intInterval(0, it->second);
-                } else
-                    throw std::runtime_error{
-                        '\'' + XmlOperator +
-                        "' is an unrecognized property operator, only '=' is recognized"};
-            } else if ("tstart" == XmlName) {
-                if ((XmlOperator != "<") && (XmlOperator != "<="))
-                    throw std::runtime_error{"tstart only supports '<' and '<=' operators"};
-
-                const int32_t end = boost::lexical_cast<int32_t>(XmlValue) + ("<=" == XmlOperator);
-                intersectedInterval &= intInterval(0, end);
-            } else if ("tend" == XmlName) {
-                if ((XmlOperator != ">") && (XmlOperator != ">="))
-                    throw std::runtime_error{"tend only supports '>' and '>=' operators"};
-
-                const int32_t start =
-                    boost::lexical_cast<int32_t>(XmlValue) - (">=" == XmlOperator);
-                intersectedInterval &= intInterval(start, std::numeric_limits<int32_t>::max());
-            } else
-                throw std::runtime_error{'\'' + XmlName +
-                                         "' is an unrecognized filter property name"};
-        }
-
-        if (contigName)
-            contigIntervals[contigName.value()] |= intersectedInterval;
-        else
-            throw std::runtime_error{"Current filter does not have a valid 'rname' attribute"};
-    }
-
-    // extract all GenomicIntervals
-    std::vector<GenomicInterval> result;
-    if (numFilters) {
-        // have some filters, only return regions passing filters
-        for (const auto& contigs : contigIntervals) {
-            const std::string& contigName = contigs.first;
-            for (const auto& i : contigs.second) {
-                // don't append empty intervals to the result
-                if (boost::icl::length(i)) result.emplace_back(contigName, i.lower(), i.upper());
-            }
-        }
-    } else {
-        // no filters, return complete list of intervals
-        for (const auto& contigs : contigLengths)
-            result.emplace_back(contigs.first, 0, contigs.second);
-    }
-
-    return result;
+    d_->SubDataSets(subdatasets);
+    return *this;
 }
+
+const std::string& DataSet::Tags() const { return d_->Tags(); }
+
+std::string& DataSet::Tags() { return d_->Tags(); }
+
+DataSet& DataSet::Tags(const std::string& tags)
+{
+    d_->Tags(tags);
+    return *this;
+}
+
+const std::string& DataSet::TimeStampedName() const { return d_->TimeStampedName(); }
+
+std::string& DataSet::TimeStampedName() { return d_->TimeStampedName(); }
+
+DataSet& DataSet::TimeStampedName(const std::string& timeStampedName)
+{
+    d_->TimeStampedName(timeStampedName);
+    return *this;
+}
+
+PacBio::BAM::DataSet::TypeEnum DataSet::Type() const { return DataSet::NameToType(TypeName()); }
+
+DataSet& DataSet::Type(const DataSet::TypeEnum type)
+{
+    d_->Label(DataSet::TypeToName(type));
+    return *this;
+}
+
+std::string DataSet::TypeName() const { return d_->LocalNameLabel().to_string(); }
 
 std::string DataSet::TypeToName(const DataSet::TypeEnum& type)
 {
@@ -397,8 +570,28 @@ std::string DataSet::TypeToName(const DataSet::TypeEnum& type)
         case DataSet::TRANSCRIPT_ALIGNMENT:
             return "TranscriptAlignmentSet";
         default:
-            throw std::runtime_error{"unsupported dataset type"};
+            throw std::runtime_error{"DataSet: unsupported dataset type"};
     }
+}
+
+const std::string& DataSet::UniqueId() const { return d_->UniqueId(); }
+
+std::string& DataSet::UniqueId() { return d_->UniqueId(); }
+
+DataSet& DataSet::UniqueId(const std::string& uuid)
+{
+    d_->UniqueId(uuid);
+    return *this;
+}
+
+const std::string& DataSet::Version() const { return d_->Version(); }
+
+std::string& DataSet::Version() { return d_->Version(); }
+
+DataSet& DataSet::Version(const std::string& version)
+{
+    d_->Version(version);
+    return *this;
 }
 
 // Exposed timestamp utils

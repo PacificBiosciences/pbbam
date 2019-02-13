@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <cstring>
 #include <memory>
+#include <sstream>
 
 #include <htslib/sam.h>
 
@@ -46,6 +47,22 @@ BamRecordBuilder::BamRecordBuilder(const BamRecord& prototype) : header_{prototy
     Reset(prototype);
 }
 
+BamRecordBuilder::BamRecordBuilder(const BamRecordBuilder&) = default;
+
+BamRecordBuilder::BamRecordBuilder(BamRecordBuilder&&) = default;
+
+BamRecordBuilder& BamRecordBuilder::operator=(const BamRecordBuilder&) = default;
+
+BamRecordBuilder& BamRecordBuilder::operator=(BamRecordBuilder&&) = default;
+
+BamRecordBuilder::~BamRecordBuilder() = default;
+
+BamRecordBuilder& BamRecordBuilder::Bin(const uint32_t bin)
+{
+    core_.bin = bin;
+    return *this;
+}
+
 BamRecord BamRecordBuilder::Build() const
 {
     BamRecord result{header_};
@@ -58,7 +75,8 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
     // initialize with basic 'core data'
     auto recordRawData = BamRecordMemory::GetRawData(record);
     if (!recordRawData || !recordRawData->data)
-        throw std::runtime_error{"BamRecord memory in invalid state"};
+        throw std::runtime_error{
+            "BamRecordBuilder: cannot build record, target memory is in an invalid state"};
     recordRawData->core = core_;
 
     // setup variable length data
@@ -74,7 +92,9 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
 
     // realloc if necessary
     uint8_t* varLengthDataBlock = recordRawData->data;
-    if (!varLengthDataBlock) throw std::runtime_error{"BamRecord memory in invalid state"};
+    if (!varLengthDataBlock)
+        throw std::runtime_error{
+            "BamRecordBuilder: cannot build record, target memory is in an invalid state"};
 
     size_t allocatedDataLength = recordRawData->m_data;
     if (allocatedDataLength < dataLength) {
@@ -101,7 +121,8 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
             encodedCigar[i] = op.Length() << BAM_CIGAR_SHIFT;
             const auto type = static_cast<uint8_t>(op.Type());
             if (type >= 8)
-                throw std::runtime_error{"invalid CIGAR op type: " + std::to_string(type)};
+                throw std::runtime_error{"BamRecordBuilder: invalid CIGAR op type: " +
+                                         std::to_string(type)};
             encodedCigar[i] |= type;
         }
         memcpy(&varLengthDataBlock[index], &encodedCigar[0], cigarLength);
@@ -132,16 +153,19 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
 
     // tags
     if (tagLength > 0) {
-        if (encodedTags.empty()) throw std::runtime_error{"expected tags but none are encoded"};
+        if (encodedTags.empty())
+            throw std::runtime_error{"BamRecordBuilder: expected tags but none are present"};
         memcpy(&varLengthDataBlock[index], &encodedTags[0], tagLength);
         index += tagLength;
     }
 
     // sanity check
     if (index != dataLength) {
-        throw std::runtime_error{"BAM encoding error: expected to write " +
-                                 std::to_string(dataLength) + " bytes but wrote " +
-                                 std::to_string(index) + " bytes instead"};
+        std::ostringstream s;
+        s << "BamRecordBuilder: incorrect number of bytes written to record:\n"
+          << "  expected: " << dataLength << '\n'
+          << "  actual: " << index;
+        throw std::runtime_error{s.str()};
     }
     return true;
 }
@@ -153,10 +177,58 @@ BamRecordBuilder& BamRecordBuilder::Cigar(PacBio::BAM::Cigar cigar)
     return *this;
 }
 
+BamRecordBuilder& BamRecordBuilder::Flag(const uint32_t flag)
+{
+    core_.flag = flag;
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::InsertSize(const int32_t iSize)
+{
+    core_.isize = iSize;
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::MapQuality(const uint8_t mapQual)
+{
+    core_.qual = mapQual;
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::MatePosition(const int32_t pos)
+{
+    core_.mpos = pos;
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::MateReferenceId(const int32_t id)
+{
+    core_.mtid = id;
+    return *this;
+}
+
 BamRecordBuilder& BamRecordBuilder::Name(std::string name)
 {
     core_.l_qname = name.size() + 1;  // (NULL-term)
     name_ = std::move(name);
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::Position(const int32_t pos)
+{
+    core_.pos = pos;
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::Qualities(std::string qualities)
+{
+    qualities_ = std::move(qualities);
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::ReferenceId(const int32_t id)
+{
+    core_.tid = id;
     return *this;
 }
 
@@ -190,7 +262,9 @@ void BamRecordBuilder::Reset(BamRecord prototype)
 
     // reset core data
     const auto rawData = BamRecordMemory::GetRawData(prototype);
-    if (!rawData) throw std::runtime_error{"BamRecord memory in invalid state"};
+    if (!rawData)
+        throw std::runtime_error{
+            "BamRecordBuilder: cannot build record, target memory is in an invalid state"};
     core_ = std::move(rawData->core);
 }
 
@@ -306,6 +380,12 @@ BamRecordBuilder& BamRecordBuilder::SetSupplementaryAlignment(bool ok)
         core_.flag |= BamRecordImpl::SUPPLEMENTARY;
     else
         core_.flag &= ~BamRecordImpl::SUPPLEMENTARY;
+    return *this;
+}
+
+BamRecordBuilder& BamRecordBuilder::Tags(TagCollection tags)
+{
+    tags_ = std::move(tags);
     return *this;
 }
 

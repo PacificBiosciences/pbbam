@@ -40,7 +40,7 @@ public:
     static Cigar FromStdString(const std::string& stdString);
 
     /// \brief Creates an empty Cigar.
-    Cigar() = default;
+    Cigar();
 
     /// \brief Creates a Cigar object from SAM/BAM string input
     ///
@@ -48,11 +48,11 @@ public:
     ///
     Cigar(const std::string& cigarString);
 
-    Cigar(const Cigar&) = default;
-    Cigar(Cigar&&) = default;
-    Cigar& operator=(const Cigar&) = default;
-    Cigar& operator=(Cigar&&) = default;
-    ~Cigar() = default;
+    Cigar(const Cigar&);
+    Cigar(Cigar&&);
+    Cigar& operator=(const Cigar&);
+    Cigar& operator=(Cigar&&);
+    ~Cigar();
 
     /// \}
 
@@ -71,7 +71,5 @@ public:
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#include "pbbam/internal/Cigar.inl"
 
 #endif  // CIGAR_H

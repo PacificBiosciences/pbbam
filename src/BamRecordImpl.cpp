@@ -113,6 +113,8 @@ BamRecordImpl& BamRecordImpl::operator=(BamRecordImpl&& other)
     return *this;
 }
 
+BamRecordImpl::~BamRecordImpl() = default;
+
 bool BamRecordImpl::AddTag(const std::string& tagName, const Tag& value)
 {
     return AddTag(tagName, value, TagModifier::NONE);
@@ -147,6 +149,14 @@ bool BamRecordImpl::AddTagImpl(const std::string& tagName, const Tag& value,
     bam_aux_append(d_.get(), tagName.c_str(), BamTagCodec::TagTypeCode(value, additionalModifier),
                    rawData.size(), const_cast<uint8_t*>(rawData.data()));
     return true;
+}
+
+uint32_t BamRecordImpl::Bin() const { return d_->core.bin; }
+
+BamRecordImpl& BamRecordImpl::Bin(uint32_t bin)
+{
+    d_->core.bin = bin;
+    return *this;
 }
 
 Cigar BamRecordImpl::CigarData() const
@@ -231,6 +241,14 @@ bool BamRecordImpl::EditTag(const BamRecordTag tag, const Tag& newValue,
     return EditTag(BamRecordTags::LabelFor(tag), newValue, additionalModifier);
 }
 
+uint32_t BamRecordImpl::Flag() const { return d_->core.flag; }
+
+BamRecordImpl& BamRecordImpl::Flag(uint32_t flag)
+{
+    d_->core.flag = flag;
+    return *this;
+}
+
 BamRecordImpl BamRecordImpl::FromRawData(const std::shared_ptr<bam1_t>& rawData)
 {
     BamRecordImpl result;
@@ -268,6 +286,105 @@ void BamRecordImpl::InitializeData()
     d_->core.l_extranul = 3;
     d_->core.l_qname = 4;
     d_->l_data = 4;
+}
+
+int32_t BamRecordImpl::InsertSize() const { return d_->core.isize; }
+
+BamRecordImpl& BamRecordImpl::InsertSize(int32_t iSize)
+{
+    d_->core.isize = iSize;
+    return *this;
+}
+
+bool BamRecordImpl::IsDuplicate() const { return (d_->core.flag & BamRecordImpl::DUPLICATE) != 0; }
+
+bool BamRecordImpl::IsFailedQC() const { return (d_->core.flag & BamRecordImpl::FAILED_QC) != 0; }
+
+bool BamRecordImpl::IsFirstMate() const { return (d_->core.flag & BamRecordImpl::MATE_1) != 0; }
+
+bool BamRecordImpl::IsMapped() const { return (d_->core.flag & BamRecordImpl::UNMAPPED) == 0; }
+
+bool BamRecordImpl::IsMateMapped() const
+{
+    return (d_->core.flag & BamRecordImpl::MATE_UNMAPPED) == 0;
+}
+
+bool BamRecordImpl::IsMateReverseStrand() const
+{
+    return (d_->core.flag & BamRecordImpl::MATE_REVERSE_STRAND) != 0;
+}
+
+bool BamRecordImpl::IsPaired() const { return (d_->core.flag & BamRecordImpl::PAIRED) != 0; }
+
+bool BamRecordImpl::IsPrimaryAlignment() const
+{
+    return (d_->core.flag & BamRecordImpl::SECONDARY) == 0;
+}
+
+bool BamRecordImpl::IsProperPair() const
+{
+    return (d_->core.flag & BamRecordImpl::PROPER_PAIR) != 0;
+}
+
+bool BamRecordImpl::IsReverseStrand() const
+{
+    return (d_->core.flag & BamRecordImpl::REVERSE_STRAND) != 0;
+}
+
+bool BamRecordImpl::IsSecondMate() const { return (d_->core.flag & BamRecordImpl::MATE_2) != 0; }
+
+bool BamRecordImpl::IsSupplementaryAlignment() const
+{
+    return (d_->core.flag & BamRecordImpl::SUPPLEMENTARY) != 0;
+}
+
+uint8_t BamRecordImpl::MapQuality() const { return d_->core.qual; }
+
+BamRecordImpl& BamRecordImpl::MapQuality(uint8_t mapQual)
+{
+    d_->core.qual = mapQual;
+    return *this;
+}
+
+PacBio::BAM::Position BamRecordImpl::MatePosition() const { return d_->core.mpos; }
+
+BamRecordImpl& BamRecordImpl::MatePosition(PacBio::BAM::Position pos)
+{
+    d_->core.mpos = pos;
+    return *this;
+}
+
+int32_t BamRecordImpl::MateReferenceId() const { return d_->core.mtid; }
+
+BamRecordImpl& BamRecordImpl::MateReferenceId(int32_t id)
+{
+    d_->core.mtid = id;
+    return *this;
+}
+
+PacBio::BAM::Position BamRecordImpl::Position() const { return d_->core.pos; }
+
+BamRecordImpl& BamRecordImpl::Position(PacBio::BAM::Position pos)
+{
+    d_->core.pos = pos;
+    return *this;
+}
+
+int32_t BamRecordImpl::ReferenceId() const { return d_->core.tid; }
+
+BamRecordImpl& BamRecordImpl::ReferenceId(int32_t id)
+{
+    d_->core.tid = id;
+    return *this;
+}
+
+BamRecordImpl& BamRecordImpl::SetDuplicate(bool ok)
+{
+    if (ok)
+        d_->core.flag |= BamRecordImpl::DUPLICATE;
+    else
+        d_->core.flag &= ~BamRecordImpl::DUPLICATE;
+    return *this;
 }
 
 void BamRecordImpl::MaybeReallocData()
@@ -391,12 +508,106 @@ void BamRecordImpl::SetCigarData(const Cigar& cigar)
     }
 }
 
+BamRecordImpl& BamRecordImpl::SetFailedQC(bool ok)
+{
+    if (ok)
+        d_->core.flag |= BamRecordImpl::FAILED_QC;
+    else
+        d_->core.flag &= ~BamRecordImpl::FAILED_QC;
+    return *this;
+}
+
+BamRecordImpl& BamRecordImpl::SetFirstMate(bool ok)
+{
+    if (ok)
+        d_->core.flag |= BamRecordImpl::MATE_1;
+    else
+        d_->core.flag &= ~BamRecordImpl::MATE_1;
+    return *this;
+}
+
+BamRecordImpl& BamRecordImpl::SetMapped(bool ok)
+{
+    if (ok)
+        d_->core.flag &= ~BamRecordImpl::UNMAPPED;
+    else
+        d_->core.flag |= BamRecordImpl::UNMAPPED;
+    return *this;
+}
+
+BamRecordImpl& BamRecordImpl::SetMateMapped(bool ok)
+{
+    if (ok)
+        d_->core.flag &= ~BamRecordImpl::MATE_UNMAPPED;
+    else
+        d_->core.flag |= BamRecordImpl::MATE_UNMAPPED;
+    return *this;
+}
+
+BamRecordImpl& BamRecordImpl::SetMateReverseStrand(bool ok)
+{
+    if (ok)
+        d_->core.flag |= BamRecordImpl::MATE_REVERSE_STRAND;
+    else
+        d_->core.flag &= ~BamRecordImpl::MATE_REVERSE_STRAND;
+    return *this;
+}
+
+BamRecordImpl& BamRecordImpl::SetPaired(bool ok)
+{
+    if (ok)
+        d_->core.flag |= BamRecordImpl::PAIRED;
+    else
+        d_->core.flag &= ~BamRecordImpl::PAIRED;
+    return *this;
+}
+
+BamRecordImpl& BamRecordImpl::SetPrimaryAlignment(bool ok)
+{
+    if (ok)
+        d_->core.flag &= ~BamRecordImpl::SECONDARY;
+    else
+        d_->core.flag |= BamRecordImpl::SECONDARY;
+    return *this;
+}
+
+BamRecordImpl& BamRecordImpl::SetProperPair(bool ok)
+{
+    if (ok)
+        d_->core.flag |= BamRecordImpl::PROPER_PAIR;
+    else
+        d_->core.flag &= ~BamRecordImpl::PROPER_PAIR;
+    return *this;
+}
+
+BamRecordImpl& BamRecordImpl::SetReverseStrand(bool ok)
+{
+    if (ok)
+        d_->core.flag |= BamRecordImpl::REVERSE_STRAND;
+    else
+        d_->core.flag &= ~BamRecordImpl::REVERSE_STRAND;
+    return *this;
+}
+
+BamRecordImpl& BamRecordImpl::SetSecondMate(bool ok)
+{
+    if (ok)
+        d_->core.flag |= BamRecordImpl::MATE_2;
+    else
+        d_->core.flag &= ~BamRecordImpl::MATE_2;
+    return *this;
+}
+
 BamRecordImpl& BamRecordImpl::SetSequenceAndQualities(const std::string& sequence,
                                                       const std::string& qualities)
 {
-    if (!qualities.empty() && (sequence.size() != qualities.size()))
-        throw std::runtime_error{"If QUAL provided, must be of the same length as SEQ"};
-
+    if (!qualities.empty() && (sequence.size() != qualities.size())) {
+        std::ostringstream s;
+        s << "BamRecord: if qualities are provided, the length must match the sequence length:\n"
+          << "  seq: " << sequence.size() << '\n'
+          << "  qualities: " << qualities.size();
+        throw std::runtime_error{s.str()};
+    }
     return SetSequenceAndQualitiesInternal(sequence.c_str(), sequence.size(), qualities.c_str(),
                                            false);
 }
@@ -461,9 +672,20 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
     return *this;
 }
 
+BamRecordImpl& BamRecordImpl::SetSupplementaryAlignment(bool ok)
+{
+    if (ok)
+        d_->core.flag |= BamRecordImpl::SUPPLEMENTARY;
+    else
+        d_->core.flag &= ~BamRecordImpl::SUPPLEMENTARY;
+    return *this;
+}
+
 int BamRecordImpl::TagOffset(const std::string& tagName) const
 {
-    if (tagName.size() != 2) throw std::runtime_error{"invalid tag name size"};
+    if (tagName.size() != 2)
+        throw std::runtime_error{"BamRecord: tag name (" + tagName +
+                                 ") must have 2 characters only"};
 
     if (tagOffsets_.empty()) UpdateTagMap();
 
@@ -596,8 +818,9 @@ void BamRecordImpl::UpdateTagMap() const
 
                     // unknown subTagType
                     default:
-                        throw std::runtime_error{"unsupported array-tag-type encountered: " +
-                                                 std::string{1, subTagType}};
+                        throw std::runtime_error{
+                            "BamRecord: unsupported array-tag-type encountered: " +
+                            std::string{1, subTagType}};
                 }
 
                 uint32_t numElements = 0;
@@ -608,7 +831,7 @@ void BamRecordImpl::UpdateTagMap() const
 
             // unknown tagType
             default:
-                throw std::runtime_error{"unsupported tag-type encountered: " +
+                throw std::runtime_error{"BamRecord: unsupported tag-type encountered: " +
                                          std::string{1, tagType}};
         }
     }

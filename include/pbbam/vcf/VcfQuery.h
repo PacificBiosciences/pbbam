@@ -20,12 +20,12 @@ public:
     explicit VcfQuery(std::string fn);
     explicit VcfQuery(const VcfFile& file);
 
-    VcfQuery() = default;
+    VcfQuery() = delete;
     VcfQuery(const VcfQuery&) = delete;
     VcfQuery(VcfQuery&&) = default;
     VcfQuery& operator=(const VcfQuery&) = delete;
     VcfQuery& operator=(VcfQuery&&) = default;
-    ~VcfQuery() = default;
+    ~VcfQuery();
 
 public:
     /// \brief Main iteration point for record access.

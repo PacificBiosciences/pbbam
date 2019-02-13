@@ -43,10 +43,12 @@ int32_t HoleNumberFromName(const std::string& fullName)
 {
     const auto mainTokens = Split(fullName, '/');
     if (mainTokens.at(0) == "transcript") {
-        if (mainTokens.size() != 2) throw std::runtime_error{"malformed transcript record name"};
+        if (mainTokens.size() != 2)
+            throw std::runtime_error{"BamRecord: malformed transcript record name: " + fullName};
         return std::stoi(mainTokens.at(1));
     } else {
-        if (mainTokens.size() != 3) throw std::runtime_error("malformed record name");
+        if (mainTokens.size() != 3)
+            throw std::runtime_error{"BamRecord: malformed record name: " + fullName};
         return std::stoi(mainTokens.at(1));
     }
 }
@@ -54,10 +56,12 @@ int32_t HoleNumberFromName(const std::string& fullName)
 Position QueryEndFromName(const std::string& fullName)
 {
     const auto mainTokens = Split(fullName, '/');
-    if (mainTokens.size() != 3) throw std::runtime_error{"malformed record name"};
+    if (mainTokens.size() != 3)
+        throw std::runtime_error{"BamRecord: malformed record name: " + fullName};
 
     const auto queryTokens = Split(mainTokens.at(2), '_');
-    if (queryTokens.size() != 2) throw std::runtime_error{"malformed record name"};
+    if (queryTokens.size() != 2)
+        throw std::runtime_error{"BamRecord: malformed record name: " + fullName};
 
     return stoi(queryTokens.at(1));
 }
@@ -65,10 +69,12 @@ Position QueryEndFromName(const std::string& fullName)
 Position QueryStartFromName(const std::string& fullName)
 {
     const auto mainTokens = Split(fullName, '/');
-    if (mainTokens.size() != 3) throw std::runtime_error{"malformed record name"};
+    if (mainTokens.size() != 3)
+        throw std::runtime_error{"BamRecord: malformed record name: " + fullName};
 
     const auto queryTokens = Split(mainTokens.at(2), '_');
-    if (queryTokens.size() != 2) throw std::runtime_error{"malformed record name"};
+    if (queryTokens.size() != 2)
+        throw std::runtime_error{"BamRecord: malformed record name: " + fullName};
 
     return stoi(queryTokens.at(0));
 }
@@ -466,18 +472,19 @@ std::pair<int16_t, int16_t> BamRecord::Barcodes() const
 {
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::BARCODES);
     const Tag bc = impl_.TagValue(tagName);
-    if (bc.IsNull()) throw std::runtime_error{"barcode tag (bc) was requested but is missing"};
+    if (bc.IsNull())
+        throw std::runtime_error{"BamRecord: barcode tag (bc) was requested but is missing"};
 
     // NOTE: barcodes are still stored, per the spec, as uint16, even though
     // we're now using them as int16_t in the API (bug 31511)
     //
     if (!bc.IsUInt16Array())
         throw std::runtime_error{
-            "barcode tag (bc) is malformed: should be a uint16_t array of size==2."};
+            "BamRecord: barcode tag (bc) is malformed: should be a uint16_t array of size==2."};
     const auto bcArray = bc.ToUInt16Array();
     if (bcArray.size() != 2)
         throw std::runtime_error{
-            "barcode tag (bc) is malformed: should be a uint16_t array of size==2."};
+            "BamRecord: barcode tag (bc) is malformed: should be a uint16_t array of size==2."};
 
     return {boost::numeric_cast<int16_t>(bcArray[0]), boost::numeric_cast<int16_t>(bcArray[1])};
 }
@@ -529,7 +536,8 @@ void BamRecord::CalculatePulse2BaseCache() const
 
     // else try to calculate p2b cache.
     if (!HasPulseCall())
-        throw std::runtime_error{"BamRecord cannot calculate pulse2base mapping without 'pc' tag."};
+        throw std::runtime_error{
+            "BamRecord: cannot calculate pulse2base mapping without 'pc' tag."};
     const auto pulseCalls =
         FetchBases(BamRecordTag::PULSE_CALL, Orientation::NATIVE, false, false, PulseBehavior::ALL);
     p2bCache_ = std::make_unique<Pulse2BaseCache>(pulseCalls);
@@ -549,18 +557,36 @@ Cigar BamRecord::CigarData(bool exciseAllClips) const
     return cigar;
 }
 
-BamRecord& BamRecord::Clip(const ClipType clipType, const Position start, const Position end)
+BamRecord& BamRecord::Clip(const ClipType clipType, const Position start, const Position end,
+                           const bool exciseFlankingInserts)
 {
     switch (clipType) {
         case ClipType::CLIP_NONE:
             return *this;
         case ClipType::CLIP_TO_QUERY:
+            // exciseFlankingInserts ignored, just clipping to query coordinates
             return ClipToQuery(start, end);
         case ClipType::CLIP_TO_REFERENCE:
-            return ClipToReference(start, end);
+            return ClipToReference(start, end, exciseFlankingInserts);
         default:
-            throw std::runtime_error{"unsupported clip type requested"};
+            throw std::runtime_error{"BamRecord: unsupported clip type requested"};
     }
+}
+
+BamRecord BamRecord::Clipped(const BamRecord& input, const ClipType clipType,
+                             const PacBio::BAM::Position start, const PacBio::BAM::Position end,
+                             const bool exciseFlankingInserts)
+{
+    return input.Clipped(clipType, start, end, exciseFlankingInserts);
+}
+
+BamRecord BamRecord::Clipped(const ClipType clipType, const PacBio::BAM::Position start,
+                             const PacBio::BAM::Position end,
+                             const bool exciseFlankingInserts) const
+{
+    BamRecord result(*this);
+    result.Clip(clipType, start, end, exciseFlankingInserts);
+    return result;
 }
 
 void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
@@ -836,19 +862,21 @@ BamRecord& BamRecord::ClipToQueryReverse(const PacBio::BAM::Position start,
     return *this;
 }
 
-BamRecord& BamRecord::ClipToReference(const Position start, const Position end)
+BamRecord& BamRecord::ClipToReference(const Position start, const Position end,
+                                      const bool exciseFlankingInserts)
 {
     // skip if not mapped, clipping to reference doesn't make sense
     // or should we even consider throwing here?
     if (!IsMapped()) return *this;
 
     const bool isForwardStrand = (AlignedStrand() == Strand::FORWARD);
-    return (isForwardStrand ? ClipToReferenceForward(start, end)
-                            : ClipToReferenceReverse(start, end));
+    return (isForwardStrand ? ClipToReferenceForward(start, end, exciseFlankingInserts)
+                            : ClipToReferenceReverse(start, end, exciseFlankingInserts));
 }
 
 BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
-                                             const PacBio::BAM::Position end)
+                                             const PacBio::BAM::Position end,
+                                             const bool exciseFlankingInserts)
 {
     assert(IsMapped());
     assert(AlignedStrand() == Strand::FORWARD);
@@ -950,6 +978,26 @@ BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
         }
     }
 
+    if (exciseFlankingInserts) {
+        // check for leading insertion
+        if (!cigar.empty()) {
+            const CigarOperation& op = cigar.front();
+            if (op.Type() == CigarOperationType::INSERTION) {
+                queryPosRemovedFront += op.Length();
+                cigar.erase(cigar.begin());
+            }
+        }
+
+        // check for trailing insertion
+        if (!cigar.empty()) {
+            const CigarOperation& op = cigar.back();
+            if (op.Type() == CigarOperationType::INSERTION) {
+                queryPosRemovedBack += op.Length();
+                cigar.pop_back();
+            }
+        }
+    }
+
     // update CIGAR and position
     impl_.CigarData(cigar);
     impl_.Position(newTStart);
@@ -971,7 +1019,8 @@ BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
 }
 
 BamRecord& BamRecord::ClipToReferenceReverse(const PacBio::BAM::Position start,
-                                             const PacBio::BAM::Position end)
+                                             const PacBio::BAM::Position end,
+                                             const bool exciseFlankingInserts)
 {
     assert(IsMapped());
     assert(AlignedStrand() == Strand::REVERSE);
@@ -1065,6 +1114,27 @@ BamRecord& BamRecord::ClipToReferenceReverse(const PacBio::BAM::Position start,
             }
         }
     }
+
+    if (exciseFlankingInserts) {
+        // check for leading insertion
+        if (!cigar.empty()) {
+            const CigarOperation& op = cigar.front();
+            if (op.Type() == CigarOperationType::INSERTION) {
+                queryPosRemovedBack += op.Length();
+                cigar.erase(cigar.begin());
+            }
+        }
+
+        // check for trailing insertion
+        if (!cigar.empty()) {
+            const CigarOperation& op = cigar.back();
+            if (op.Type() == CigarOperationType::INSERTION) {
+                queryPosRemovedFront += op.Length();
+                cigar.pop_back();
+            }
+        }
+    }
+
     impl_.CigarData(cigar);
 
     // update aligned reference position
@@ -1155,7 +1225,8 @@ std::string BamRecord::FetchBases(const BamRecordTag tag, const Orientation orie
 
         if (isPulse && pulseBehavior != PulseBehavior::BASECALLS_ONLY)
             throw std::runtime_error{
-                "Cannot return data at all pulses when gapping and/or soft-clipping are requested. "
+                "BamRecord: cannot return data at all pulses when gapping and/or soft-clipping are "
+                "requested. "
                 "Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
@@ -1211,7 +1282,8 @@ Frames BamRecord::FetchFrames(const BamRecordTag tag, const Orientation orientat
 
         if (isPulse && pulseBehavior != PulseBehavior::BASECALLS_ONLY)
             throw std::runtime_error{
-                "Cannot return data at all pulses when gapping and/or soft-clipping are requested. "
+                "BamRecord: cannot return data at all pulses when gapping and/or soft-clipping are "
+                "requested. "
                 "Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
@@ -1232,7 +1304,7 @@ std::vector<float> BamRecord::FetchPhotonsRaw(const BamRecordTag tag) const
     const Tag frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) return {};
     if (!frameTag.IsUInt16Array())
-        throw std::runtime_error{"Photons are not a uint16_t array, tag " +
+        throw std::runtime_error{"BamRecord: photons are not a uint16_t array, tag " +
                                  BamRecordTags::LabelFor(tag)};
 
     const auto data = frameTag.ToUInt16Array();
@@ -1263,7 +1335,8 @@ std::vector<float> BamRecord::FetchPhotons(const BamRecordTag tag, const Orienta
 
         if (isPulse && pulseBehavior != PulseBehavior::BASECALLS_ONLY)
             throw std::runtime_error{
-                "Cannot return data at all pulses when gapping and/or soft-clipping are requested. "
+                "BamRecord: cannot return data at all pulses when gapping and/or soft-clipping are "
+                "requested. "
                 "Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
@@ -1315,7 +1388,8 @@ QualityValues BamRecord::FetchQualities(const BamRecordTag tag, const Orientatio
 
         if (isPulse && pulseBehavior != PulseBehavior::BASECALLS_ONLY)
             throw std::runtime_error{
-                "Cannot return data at all pulses when gapping and/or soft-clipping are requested. "
+                "BamRecord: cannot return data at all pulses when gapping and/or soft-clipping are "
+                "requested. "
                 "Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
@@ -1337,7 +1411,7 @@ std::vector<uint32_t> BamRecord::FetchUInt32sRaw(const BamRecordTag tag) const
     const Tag frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) return {};
     if (!frameTag.IsUInt32Array())
-        throw std::runtime_error{"Tag data are not a uint32_t array, tag " +
+        throw std::runtime_error{"BamRecord: tag data are not a uint32_t array, tag " +
                                  BamRecordTags::LabelFor(tag)};
     return frameTag.ToUInt32Array();
 }
@@ -1362,7 +1436,8 @@ std::vector<uint32_t> BamRecord::FetchUInt32s(const BamRecordTag tag, const Orie
 
         if (isPulse && pulseBehavior != PulseBehavior::BASECALLS_ONLY)
             throw std::runtime_error{
-                "Cannot return data at all pulses when gapping and/or soft-clipping are requested. "
+                "BamRecord: cannot return data at all pulses when gapping and/or soft-clipping are "
+                "requested. "
                 "Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
@@ -1384,7 +1459,7 @@ std::vector<uint8_t> BamRecord::FetchUInt8sRaw(const BamRecordTag tag) const
     const Tag frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) return {};
     if (!frameTag.IsUInt8Array())
-        throw std::runtime_error{"Tag data are not a uint8_t array, tag " +
+        throw std::runtime_error{"BamRecord: tag data are not a uint8_t array, tag " +
                                  BamRecordTags::LabelFor(tag)};
     return frameTag.ToUInt8Array();
 }
@@ -1409,7 +1484,8 @@ std::vector<uint8_t> BamRecord::FetchUInt8s(const BamRecordTag tag, const Orient
 
         if (isPulse && pulseBehavior != PulseBehavior::BASECALLS_ONLY)
             throw std::runtime_error{
-                "Cannot return data at all pulses when gapping and/or soft-clipping are requested. "
+                "BamRecord: cannot return data at all pulses when gapping and/or soft-clipping are "
+                "requested. "
                 "Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
@@ -1650,6 +1726,21 @@ BamRecord& BamRecord::Map(const int32_t referenceId, const Position refStart, co
     return *this;
 }
 
+BamRecord BamRecord::Mapped(const BamRecord& input, const int32_t referenceId,
+                            const Position refStart, const Strand strand, const Cigar& cigar,
+                            const uint8_t mappingQuality)
+{
+    return input.Mapped(referenceId, refStart, strand, cigar, mappingQuality);
+}
+
+BamRecord BamRecord::Mapped(const int32_t referenceId, const Position refStart, const Strand strand,
+                            const Cigar& cigar, const uint8_t mappingQuality) const
+{
+    BamRecord result(*this);
+    result.Map(referenceId, refStart, strand, cigar, mappingQuality);
+    return result;
+}
+
 uint8_t BamRecord::MapQuality() const { return impl_.MapQuality(); }
 
 QualityValues BamRecord::MergeQV(Orientation orientation, bool aligned, bool exciseSoftClips) const
@@ -1671,7 +1762,7 @@ std::string BamRecord::MovieName() const
     else {
         const auto nameParts = Split(FullName(), '/');
         if (nameParts.empty())
-            throw std::runtime_error{"BAM record has invalid name: '" + FullName() + "'"};
+            throw std::runtime_error{"BamRecord: has invalid name: '" + FullName() + "'"};
         return nameParts[0];
     }
 }
@@ -1973,9 +2064,10 @@ Position BamRecord::QueryEnd() const
     } catch (std::exception&) {
         return 0;
     }
-    if (type == RecordType::CCS) throw std::runtime_error{"no query end for CCS read type"};
+    if (type == RecordType::CCS)
+        throw std::runtime_error{"BamRecord: no query end for CCS read type"};
     if (type == RecordType::TRANSCRIPT)
-        throw std::runtime_error{"no query end for transcript read type"};
+        throw std::runtime_error{"BamRecord: no query end for transcript read type"};
 
     // PacBio BAM, non-CCS/transcript
     try {
@@ -2007,9 +2099,10 @@ Position BamRecord::QueryStart() const
     } catch (std::exception&) {
         return 0;
     }
-    if (type == RecordType::CCS) throw std::runtime_error{"no query start for CCS read type"};
+    if (type == RecordType::CCS)
+        throw std::runtime_error{"BamRecord: no query start for CCS read type"};
     if (type == RecordType::TRANSCRIPT)
-        throw std::runtime_error{"no query start for transcript read type"};
+        throw std::runtime_error{"BamRecord: no query start for transcript read type"};
 
     // PacBio BAM, non-CCS/transcript
     try {
@@ -2083,7 +2176,7 @@ std::string BamRecord::ReferenceName() const
     if (IsMapped())
         return Header().SequenceName(ReferenceId());
     else
-        throw std::runtime_error{"unmapped record has no associated reference name"};
+        throw std::runtime_error{"BamRecord: unmapped record has no associated reference name"};
 }
 
 Position BamRecord::ReferenceStart() const { return impl_.Position(); }

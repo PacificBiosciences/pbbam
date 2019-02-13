@@ -18,6 +18,8 @@ VcfReader::VcfReader(const VcfFile& file) : in_{file.Filename()}, header_{file.H
     FetchNext();
 }
 
+VcfReader::~VcfReader() = default;
+
 void VcfReader::FetchNext()
 {
     line_.clear();

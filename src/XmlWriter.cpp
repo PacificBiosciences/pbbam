@@ -72,7 +72,7 @@ void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
 
     // iterate children, recursively building up subtree
     for (const auto& child : node.Children())
-        ToXml(child, registry, xsdPrefixesUsed, xmlNode);
+        ToXml(*child, registry, xsdPrefixesUsed, xmlNode);
 }
 
 }  // anonymous
@@ -85,7 +85,7 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
 
     // create top-level dataset XML node
     const auto label = OutputName(dataset, registry);
-    if (label.empty()) throw std::runtime_error{"could not convert dataset node to XML"};
+    if (label.empty()) throw std::runtime_error{"XmlReader: could not convert dataset node to XML"};
     auto root = doc.append_child(label.c_str());
 
     const auto& text = dataset.Text();
@@ -105,7 +105,7 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
 
     // iterate children, recursively building up subtree
     for (const auto& child : dataset.Children())
-        ToXml(child, registry, xsdPrefixesUsed, root);
+        ToXml(*child, registry, xsdPrefixesUsed, root);
 
     // write XML to stream
     auto decl = doc.prepend_child(pugi::node_declaration);

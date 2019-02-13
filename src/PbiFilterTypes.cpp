@@ -56,8 +56,9 @@ IndexList readLengthHelper(const std::vector<T>& start, const std::vector<T>& en
                 break;
             default:
                 assert(false);
-                throw std::runtime_error{"read length filter encountered unknown Compare::Type: " +
-                                         Compare::TypeToName(cmp)};
+                throw std::runtime_error{
+                    "PbiFilter: read length filter encountered unknown compare type: " +
+                    Compare::TypeToName(cmp)};
         }
 
         if (keep) result.push_back(i);
@@ -214,7 +215,7 @@ public:
         else if (cmp_ == Compare::NOT_EQUAL)
             return !found;
         else
-            throw std::runtime_error{"unsupported compare type on query name filter"};
+            throw std::runtime_error{"PbiFilter: unsupported compare type on query name filter"};
     }
 
     std::vector<int32_t> CandidateRgIds(const std::string& movieName, const RecordType type)
@@ -243,13 +244,13 @@ public:
         if (IsCcsOrTranscript(type)) {
             if (nameParts.size() != 2) {
                 const auto typeName = (type == RecordType::CCS) ? "CCS" : "transcript";
-                throw std::runtime_error{"PbiQueryNameFilter error: requested QNAME (" + queryName +
+                throw std::runtime_error{"PbiQueryNameFilter: requested QNAME (" + queryName +
                                          ") is not valid for PacBio " + typeName +
                                          " reads. See spec for details."};
             }
         } else {
             if (nameParts.size() != 3) {
-                throw std::runtime_error{"PbiQueryNameFilter error: requested QNAME (" + queryName +
+                throw std::runtime_error{"PbiQueryNameFilter: requested QNAME (" + queryName +
                                          ") is not a valid PacBio BAM QNAME. See spec for details"};
             }
         }
@@ -265,7 +266,7 @@ public:
         else {
             const auto queryIntervalParts = Split(nameParts.at(2), '_');
             if (queryIntervalParts.size() != 2) {
-                throw std::runtime_error{"PbiQueryNameFilter error: requested QNAME (" + queryName +
+                throw std::runtime_error{"PbiQueryNameFilter: requested QNAME (" + queryName +
                                          ") is not a valid PacBio BAM QNAME. See spec for details"};
             }
             UpdateZmwQueryIntervals(zmwPtr.get(), zmw, std::stoi(queryIntervalParts.at(0)),
@@ -342,9 +343,10 @@ PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<int32_t>& whitelist,
     : cmp_{cmp}
 {
     if (cmp_ != Compare::EQUAL && cmp_ != Compare::NOT_EQUAL) {
-        throw std::runtime_error{
-            "Unsupported compare type for this property. "
-            "Read group filter can only compare EQUAL or NOT_EQUAL"};
+        throw std::runtime_error{"PbiFilter: unsupported compare type (" +
+                                 Compare::TypeToName(cmp) +
+                                 ") for this property. "
+                                 "Read group filter can only compare EQUAL or NOT_EQUAL."};
     }
 
     // Add RG ID & empty filter if not present. The empty filter will work for
@@ -366,9 +368,10 @@ PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<ReadGroupInfo>& whiteli
     : cmp_{cmp}
 {
     if (cmp_ != Compare::EQUAL && cmp_ != Compare::NOT_EQUAL) {
-        throw std::runtime_error{
-            "Unsupported compare type for this property. "
-            "Read group filter can only compare EQUAL or NOT_EQUAL"};
+        throw std::runtime_error{"PbiFilter: unsupported compare type (" +
+                                 Compare::TypeToName(cmp) +
+                                 ") for this property. "
+                                 "Read group filter can only compare EQUAL or NOT_EQUAL."};
     }
 
     for (const auto& rg : whitelist) {
@@ -448,10 +451,10 @@ PbiReferenceNameFilter::PbiReferenceNameFilter(std::string rname, Compare::Type 
     : rname_{std::move(rname)}, cmp_{cmp}
 {
     if (cmp != Compare::EQUAL && cmp != Compare::NOT_EQUAL) {
-        throw std::runtime_error{
-            "Compare type: " + Compare::TypeToName(cmp) +
-            " not supported for PbiReferenceNameFilter (use one of Compare::EQUAL or "
-            "Compare::NOT_EQUAL)."};
+        throw std::runtime_error{"PbiFilter: unsupported compare type (" +
+                                 Compare::TypeToName(cmp) +
+                                 ") for this property. "
+                                 "Reference name filter can only compare EQUAL or NOT_EQUAL."};
     }
 }
 

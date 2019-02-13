@@ -32,7 +32,7 @@ public:
                      const BamWriter::BinCalculationMode binCalculationMode, const bool useTempFile)
         : calculateBins_{binCalculationMode == BamWriter::BinCalculation_ON}, header_{rawHeader}
     {
-        if (!header_) throw std::runtime_error{"null header"};
+        if (!header_) throw std::runtime_error{"BamWriter: null header provided for: " + filename};
 
         if (useTempFile) fileProducer_ = std::make_unique<FileProducer>(filename);
 
@@ -40,7 +40,9 @@ public:
         const auto usingFilename = (fileProducer_ ? fileProducer_->TempFilename() : filename);
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
         file_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
-        if (!file_) throw std::runtime_error{"could not open file for writing"};
+        if (!file_)
+            throw std::runtime_error{"BamWriter: could not open BAM file for writing: " +
+                                     usingFilename};
 
         // if no explicit thread count given, attempt built-in check
         size_t actualNumThreads = numThreads;
@@ -56,7 +58,9 @@ public:
 
         // write header
         const auto ret = sam_hdr_write(file_.get(), header_.get());
-        if (ret != 0) throw std::runtime_error{"could not write header"};
+        if (ret != 0)
+            throw std::runtime_error{"BamWriter: could not write header for file: " +
+                                     usingFilename};
     }
 
     void Write(const BamRecord& record)
@@ -75,7 +79,7 @@ public:
 
         // write record to file
         const auto ret = sam_write1(file_.get(), header_.get(), rawRecord.get());
-        if (ret <= 0) throw std::runtime_error{"could not write record"};
+        if (ret <= 0) throw std::runtime_error{"BamWriter: could not write record to file"};
     }
 
     void Write(const BamRecord& record, int64_t* vOffset)
@@ -129,6 +133,10 @@ BamWriter::BamWriter(const std::string& filename, const BamHeader& header,
 {
 }
 
+BamWriter::BamWriter(BamWriter&&) = default;
+
+BamWriter& BamWriter::operator=(BamWriter&&) = default;
+
 BamWriter::~BamWriter()
 {
     const auto ret = bgzf_flush(d_->file_.get()->fp.bgzf);
@@ -139,7 +147,7 @@ void BamWriter::TryFlush()
 {
     // TODO: sanity checks on file_ & fp
     const auto ret = bgzf_flush(d_->file_.get()->fp.bgzf);
-    if (ret != 0) throw std::runtime_error{"could not flush output buffer contents"};
+    if (ret != 0) throw std::runtime_error{"BamWriter: could not flush output buffer contents"};
 }
 
 void BamWriter::Write(const BamRecord& record) { d_->Write(record); }

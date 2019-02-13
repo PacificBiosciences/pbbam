@@ -38,7 +38,7 @@ public:
         : fp_{gzopen(fn.c_str(), "r")}, seq_{kseq_init(fp_)}
     {
         if (fp_ == nullptr || seq_.get() == nullptr)
-            throw std::runtime_error{"Could not open " + fn + " for reading"};
+            throw std::runtime_error{"FastqReader: could not open file for reading: " + fn};
     }
 
     ~FastqReaderPrivate() { gzclose(fp_); }
@@ -60,6 +60,10 @@ private:
 };
 
 FastqReader::FastqReader(const std::string& fn) : d_{std::make_unique<FastqReaderPrivate>(fn)} {}
+
+FastqReader::FastqReader(FastqReader&&) = default;
+
+FastqReader& FastqReader::operator=(FastqReader&&) = default;
 
 FastqReader::~FastqReader() = default;
 

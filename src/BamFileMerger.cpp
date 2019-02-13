@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <set>
+#include <sstream>
 #include <stdexcept>
 #include <vector>
 
@@ -44,16 +45,18 @@ struct QNameSorter
         try {
             lMovieName = l.MovieName();
         } catch (std::runtime_error const& err) {
-            std::string msg{lhs.reader->Filename() + ": Could not get MovieName for BamFile. " +
-                            err.what()};
-            throw std::runtime_error(msg);
+            std::ostringstream s;
+            s << "BamFileMerger: could not get movie name from file: " << lhs.reader->Filename()
+              << " (reason = " << err.what() << ')';
+            throw std::runtime_error(s.str());
         }
         try {
             rMovieName = r.MovieName();
         } catch (std::runtime_error const& err) {
-            std::string msg{lhs.reader->Filename() + ": Could not get MovieName for BamFile. " +
-                            err.what()};
-            throw std::runtime_error(msg);
+            std::ostringstream s;
+            s << "BamFileMerger: could not get movie name from file: " << rhs.reader->Filename()
+              << " (reason = " << err.what() << ')';
+            throw std::runtime_error(s.str());
         }
         const int cmp = lMovieName.compare(rMovieName);
         if (cmp != 0) return cmp < 0;
@@ -154,7 +157,7 @@ std::unique_ptr<IRecordWriter> MakeBamWriter(const std::vector<std::unique_ptr<B
                                              const bool createPbi, const ProgramInfo& pgInfo)
 {
     if (outputFilename.empty())
-        throw std::runtime_error{"no output BAM filename provide to BamFileMerger"};
+        throw std::runtime_error{"BamFileMerger: no output filename provided"};
 
     // read headers
     std::vector<BamHeader> headers;
@@ -168,7 +171,8 @@ std::unique_ptr<IRecordWriter> MakeBamWriter(const std::vector<std::unique_ptr<B
     for (size_t i = 1; i < headers.size(); ++i) {
         const auto& header = headers.at(i);
         if (header.SortOrder() != usingSortOrder)
-            throw std::runtime_error{"BAM file sort orders do not match, aborting merge"};
+            throw std::runtime_error{
+                "BamFileMerger: BAM file sort orders do not match, aborting merge"};
         mergedHeader += header;
     }
 
@@ -207,7 +211,7 @@ void BamFileMerger::Merge(const DataSet& dataset, const std::string& outputFilen
                           const ProgramInfo& pgInfo)
 {
     std::vector<BamFile> bamFiles = dataset.BamFiles();
-    if (bamFiles.empty()) throw std::runtime_error{"no input filenames provided to BamFileMerger"};
+    if (bamFiles.empty()) throw std::runtime_error{"BamFileMerger: no input filenames provided"};
 
     auto readers = MakeBamReaders(std::move(bamFiles), PbiFilter::FromDataSet(dataset));
     const bool isCoordinateSorted = readers.front()->Header().SortOrder() == "coordinate";
@@ -225,7 +229,7 @@ void BamFileMerger::Merge(const std::vector<std::string>& bamFilenames, IRecordW
     std::vector<BamFile> bamFiles;
     for (const auto& fn : bamFilenames)
         bamFiles.emplace_back(fn);
-    if (bamFiles.empty()) throw std::runtime_error{"no input filenames provided to BamFileMerger"};
+    if (bamFiles.empty()) throw std::runtime_error{"BamFileMerger: no input filenames provided"};
 
     auto readers = MakeBamReaders(std::move(bamFiles));
     const bool isCoordinateSorted = readers.front()->Header().SortOrder() == "coordinate";
@@ -240,7 +244,7 @@ void BamFileMerger::Merge(const std::vector<std::string>& bamFilenames, IRecordW
 void BamFileMerger::Merge(const DataSet& dataset, IRecordWriter& writer)
 {
     std::vector<BamFile> bamFiles = dataset.BamFiles();
-    if (bamFiles.empty()) throw std::runtime_error{"no input filenames provided to BamFileMerger"};
+    if (bamFiles.empty()) throw std::runtime_error{"BamFileMerger: no input filenames provided"};
 
     auto readers = MakeBamReaders(std::move(bamFiles), PbiFilter::FromDataSet(dataset));
     const bool isCoordinateSorted = readers.front()->Header().SortOrder() == "coordinate";

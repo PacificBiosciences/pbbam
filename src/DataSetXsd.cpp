@@ -158,11 +158,27 @@ NamespaceInfo::NamespaceInfo(std::string name, std::string uri)
 {
 }
 
+NamespaceInfo::NamespaceInfo() = default;
+
+const std::string& NamespaceInfo::Name() const { return name_; }
+
+const std::string& NamespaceInfo::Uri() const { return uri_; }
+
 // -------------------
 // NamespaceRegistry
 // -------------------
 
 NamespaceRegistry::NamespaceRegistry() : data_(internal::DefaultRegistry()) {}
+
+NamespaceRegistry::NamespaceRegistry(const NamespaceRegistry&) = default;
+
+NamespaceRegistry::NamespaceRegistry(NamespaceRegistry&&) = default;
+
+NamespaceRegistry& NamespaceRegistry::operator=(const NamespaceRegistry&) = default;
+
+NamespaceRegistry& NamespaceRegistry::operator=(NamespaceRegistry&&) = default;
+
+NamespaceRegistry::~NamespaceRegistry() = default;
 
 const NamespaceInfo& NamespaceRegistry::DefaultNamespace() const { return Namespace(DefaultXsd()); }
 

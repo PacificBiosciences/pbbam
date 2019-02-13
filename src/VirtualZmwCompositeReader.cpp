@@ -34,6 +34,7 @@ VirtualZmwBamRecord VirtualZmwCompositeReader::Next()
 
     // no reader active
     throw std::runtime_error{
+        "VirtualZmwCompositeReader: "
         "no readers active, make sure you use "
         "VirtualZmwCompositeReader::HasNext before "
         "requesting next record"};
@@ -49,6 +50,7 @@ std::vector<BamRecord> VirtualZmwCompositeReader::NextRaw()
 
     // no reader active
     throw std::runtime_error{
+        "VirtualZmwCompositeReader: "
         "no readers active, make sure you use "
         "VirtualZmwCompositeReader::HasNext before "
         "requesting next group of records"};

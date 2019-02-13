@@ -4,6 +4,9 @@
 
 #include "pbbam/SamWriter.h"
 
+#include <memory>
+#include <string>
+
 #include <htslib/hfile.h>
 #include <htslib/sam.h>
 
@@ -22,18 +25,20 @@ public:
     SamWriterPrivate(std::string filename, const std::shared_ptr<bam_hdr_t> rawHeader)
         : FileProducer{std::move(filename)}, header_{rawHeader}
     {
-        if (!header_) throw std::runtime_error{"null header"};
+        if (!header_) throw std::runtime_error{"SamWriter: null header provided"};
 
         // open file
         const auto& usingFilename = TempFilename();
         const std::string mode(1, 'w');
         file_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
         if (!file_)
-            throw std::runtime_error{"could not open file: " + usingFilename + "for writing"};
+            throw std::runtime_error{"SamWriter: could not open file for writing: " +
+                                     usingFilename};
 
         // write header
         const auto ret = sam_hdr_write(file_.get(), header_.get());
-        if (ret != 0) throw std::runtime_error{"could not write header"};
+        if (ret != 0)
+            throw std::runtime_error{"SamWriter: could not write header to file: " + usingFilename};
     }
 
     void Write(BamRecord record)
@@ -67,7 +72,7 @@ public:
 
         // write record to file
         const int ret = sam_write1(file_.get(), header_.get(), rawRecord.get());
-        if (ret <= 0) throw std::runtime_error("could not write record");
+        if (ret <= 0) throw std::runtime_error{"SamWriter: could not write record"};
     }
 
     std::unique_ptr<samFile, HtslibFileDeleter> file_;
@@ -84,12 +89,17 @@ SamWriter::SamWriter(std::string filename, const BamHeader& header)
 #endif
 }
 
+SamWriter::SamWriter(SamWriter&&) = default;
+
+SamWriter& SamWriter::operator=(SamWriter&&) = default;
+
 SamWriter::~SamWriter() = default;
 
 void SamWriter::TryFlush()
 {
     const auto ret = d_->file_.get()->fp.hfile;
-    if (ret != nullptr) throw std::runtime_error{"could not flush output buffer contents"};
+    if (ret != nullptr)
+        throw std::runtime_error{"SamWriter: could not flush output buffer contents"};
 }
 
 void SamWriter::Write(const BamRecord& record) { d_->Write(record); }

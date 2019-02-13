@@ -20,11 +20,11 @@ public:
     ContigDefinition(std::string id, std::vector<std::pair<std::string, std::string>> attributes);
 
     ContigDefinition() = delete;
-    ContigDefinition(const ContigDefinition&) = default;
-    ContigDefinition(ContigDefinition&&) = default;
-    ContigDefinition& operator=(const ContigDefinition&) = default;
-    ContigDefinition& operator=(ContigDefinition&&) = default;
-    ~ContigDefinition() = default;
+    ContigDefinition(const ContigDefinition&);
+    ContigDefinition(ContigDefinition&&);
+    ContigDefinition& operator=(const ContigDefinition&);
+    ContigDefinition& operator=(ContigDefinition&&);
+    ~ContigDefinition();
 
 public:
     const std::string& Id() const;
@@ -48,11 +48,11 @@ public:
     FilterDefinition(std::string id, std::string description);
 
     FilterDefinition() = delete;
-    FilterDefinition(const FilterDefinition&) = default;
-    FilterDefinition(FilterDefinition&&) = default;
-    FilterDefinition& operator=(const FilterDefinition&) = default;
-    FilterDefinition& operator=(FilterDefinition&&) = default;
-    ~FilterDefinition() = default;
+    FilterDefinition(const FilterDefinition&);
+    FilterDefinition(FilterDefinition&&);
+    FilterDefinition& operator=(const FilterDefinition&);
+    FilterDefinition& operator=(FilterDefinition&&);
+    ~FilterDefinition();
 
     const std::string& Id() const;
     const std::string& Description() const;
@@ -72,11 +72,11 @@ public:
     FormatDefinition(std::string id, std::string number, std::string type, std::string description);
 
     FormatDefinition() = delete;
-    FormatDefinition(const FormatDefinition&) = default;
-    FormatDefinition(FormatDefinition&&) = default;
-    FormatDefinition& operator=(const FormatDefinition&) = default;
-    FormatDefinition& operator=(FormatDefinition&&) = default;
-    ~FormatDefinition() = default;
+    FormatDefinition(const FormatDefinition&);
+    FormatDefinition(FormatDefinition&&);
+    FormatDefinition& operator=(const FormatDefinition&);
+    FormatDefinition& operator=(FormatDefinition&&);
+    ~FormatDefinition();
 
     const std::string& Id() const;
     const std::string& Number() const;
@@ -99,11 +99,11 @@ public:
     GeneralDefinition(std::string id, std::string text);
 
     GeneralDefinition() = delete;
-    GeneralDefinition(const GeneralDefinition&) = default;
-    GeneralDefinition(GeneralDefinition&&) = default;
-    GeneralDefinition& operator=(const GeneralDefinition&) = default;
-    GeneralDefinition& operator=(GeneralDefinition&&) = default;
-    ~GeneralDefinition() = default;
+    GeneralDefinition(const GeneralDefinition&);
+    GeneralDefinition(GeneralDefinition&&);
+    GeneralDefinition& operator=(const GeneralDefinition&);
+    GeneralDefinition& operator=(GeneralDefinition&&);
+    ~GeneralDefinition();
 
     const std::string& Id() const;
     const std::string& Text() const;
@@ -124,11 +124,11 @@ public:
                    std::string source = std::string{}, std::string version = std::string{});
 
     InfoDefinition() = delete;
-    InfoDefinition(const InfoDefinition&) = default;
-    InfoDefinition(InfoDefinition&&) = default;
-    InfoDefinition& operator=(const InfoDefinition&) = default;
-    InfoDefinition& operator=(InfoDefinition&&) = default;
-    ~InfoDefinition() = default;
+    InfoDefinition(const InfoDefinition&);
+    InfoDefinition(InfoDefinition&&);
+    InfoDefinition& operator=(const InfoDefinition&);
+    InfoDefinition& operator=(InfoDefinition&&);
+    ~InfoDefinition();
 
     const std::string& Id() const;
     const std::string& Number() const;
@@ -155,7 +155,5 @@ private:
 
 }  // namespace VCF
 }  // namespace PacBio
-
-#include "pbbam/vcf/internal/VcfHeaderTypes.inl"
 
 #endif  // PBBAM_VCF_VCFHEADERTYPES_H

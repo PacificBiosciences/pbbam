@@ -65,7 +65,7 @@ public:
     BamRecordImpl(BamRecordImpl&& other);
     BamRecordImpl& operator=(const BamRecordImpl& other);
     BamRecordImpl& operator=(BamRecordImpl&& other);
-    virtual ~BamRecordImpl() = default;
+    virtual ~BamRecordImpl();
 
     /// \}
 
@@ -586,7 +586,5 @@ private:
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#include "pbbam/internal/BamRecordImpl.inl"
 
 #endif  // BAMRECORDIMPL_H

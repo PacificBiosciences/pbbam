@@ -72,12 +72,12 @@ public:
     QualityValues(const QualityValues::const_iterator first,
                   const QualityValues::const_iterator last);
 
-    QualityValues() = default;
-    QualityValues(const QualityValues&) = default;
-    QualityValues(QualityValues&&) = default;
-    QualityValues& operator=(const QualityValues&) = default;
-    QualityValues& operator=(QualityValues&&) = default;
-    ~QualityValues() = default;
+    QualityValues();
+    QualityValues(const QualityValues&);
+    QualityValues(QualityValues&&);
+    QualityValues& operator=(const QualityValues&);
+    QualityValues& operator=(QualityValues&&);
+    ~QualityValues();
 
     QualityValues& operator=(std::vector<QualityValue> quals);
 
@@ -128,7 +128,5 @@ public:
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#include "pbbam/internal/QualityValues.inl"
 
 #endif  // QUALITYVALUES_H

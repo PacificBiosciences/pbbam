@@ -14,6 +14,11 @@
 namespace PacBio {
 namespace BAM {
 
+bool IsCcsOrTranscript(const RecordType type)
+{
+    return (type == RecordType::CCS) || (type == RecordType::TRANSCRIPT);
+}
+
 std::string ToString(const RecordType type)
 {
     // clang-format off
@@ -32,7 +37,7 @@ std::string ToString(const RecordType type)
     try {
         return lookup.at(type);
     } catch (std::exception&) {
-        throw std::runtime_error{"error: unknown RecordType encountered"};
+        throw std::runtime_error{"BamRecordType: unknown type"};
     }
 }
 

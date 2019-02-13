@@ -10,6 +10,8 @@ VcfQuery::VcfQuery(const VcfFile& file)
 {
 }
 
+VcfQuery::~VcfQuery() = default;
+
 bool VcfQuery::GetNext(VcfVariant& var) { return reader_.GetNext(var); }
 
 }  // namespace VCF

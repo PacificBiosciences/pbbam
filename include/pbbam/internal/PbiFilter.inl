@@ -168,7 +168,7 @@ struct PbiFilterPrivate
 
         else
             //assert(false); // invalid composite filter type
-            throw std::runtime_error{"invalid composite filter type in PbiFilterPrivate::Accepts"};
+            throw std::runtime_error{"PbiFilter: invalid composite filter type"};
     }
 
     PbiFilter::CompositionType type_;

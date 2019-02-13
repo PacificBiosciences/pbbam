@@ -39,11 +39,11 @@ public:
     VirtualZmwBamRecord(std::vector<BamRecord> unorderedSources, const BamHeader& header);
 
     VirtualZmwBamRecord() = delete;
-    VirtualZmwBamRecord(const VirtualZmwBamRecord&) = default;
-    VirtualZmwBamRecord(VirtualZmwBamRecord&&) = default;
-    VirtualZmwBamRecord& operator=(const VirtualZmwBamRecord&) = default;
-    VirtualZmwBamRecord& operator=(VirtualZmwBamRecord&&) = default;
-    virtual ~VirtualZmwBamRecord() = default;
+    VirtualZmwBamRecord(const VirtualZmwBamRecord&);
+    VirtualZmwBamRecord(VirtualZmwBamRecord&&);
+    VirtualZmwBamRecord& operator=(const VirtualZmwBamRecord&);
+    VirtualZmwBamRecord& operator=(VirtualZmwBamRecord&&);
+    virtual ~VirtualZmwBamRecord();
 
     /// \}
 
