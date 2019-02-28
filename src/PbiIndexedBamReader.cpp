@@ -22,14 +22,14 @@ namespace BAM {
 class PbiIndexedBamReader::PbiIndexedBamReaderPrivate
 {
 public:
-    explicit PbiIndexedBamReaderPrivate(const std::string& pbiFilename)
-        : index_{pbiFilename}, currentBlockReadCount_{0}, numMatchingReads_{0}
+    explicit PbiIndexedBamReaderPrivate(const std::shared_ptr<PbiRawData>& index)
+        : index_{index}, currentBlockReadCount_{0}, numMatchingReads_{0}
     {
     }
 
     void ApplyOffsets()
     {
-        const auto& fileOffsets = index_.BasicData().fileOffset_;
+        const auto& fileOffsets = index_->BasicData().fileOffset_;
         for (IndexResultBlock& block : blocks_)
             block.virtualOffset_ = fileOffsets.at(block.firstIndex_);
     }
@@ -43,7 +43,7 @@ public:
         numMatchingReads_ = 0;
 
         // find blocks of reads passing filter criteria
-        const auto totalReads = index_.NumReads();
+        const auto totalReads = index_->NumReads();
         if (totalReads == 0) {  // empty PBI - no reads to use
             return;
         } else if (filter_.IsEmpty()) {  // empty filter - use all reads
@@ -52,8 +52,9 @@ public:
         } else {
             IndexList indices;
             indices.reserve(totalReads);
+            const auto& idx = *index_;
             for (size_t i = 0; i < totalReads; ++i) {
-                if (filter_.Accepts(index_, i)) {
+                if (filter_.Accepts(idx, i)) {
                     indices.push_back(i);
                     ++numMatchingReads_;
                 }
@@ -108,7 +109,7 @@ public:
     }
 
     PbiFilter filter_;
-    PbiRawData index_;
+    std::shared_ptr<PbiRawData> index_;
     IndexResultBlocks blocks_;
     size_t currentBlockReadCount_;
     uint32_t numMatchingReads_;
@@ -119,8 +120,21 @@ PbiIndexedBamReader::PbiIndexedBamReader(PbiFilter filter, const std::string& fi
 {
 }
 
+PbiIndexedBamReader::PbiIndexedBamReader(PbiFilter filter, const std::string& filename,
+                                         const std::shared_ptr<PbiRawData>& index)
+    : PbiIndexedBamReader{std::move(filter), BamFile{filename}, index}
+{
+}
+
 PbiIndexedBamReader::PbiIndexedBamReader(PbiFilter filter, BamFile bamFile)
     : PbiIndexedBamReader{std::move(bamFile)}
+{
+    Filter(std::move(filter));
+}
+
+PbiIndexedBamReader::PbiIndexedBamReader(PbiFilter filter, BamFile bamFile,
+                                         const std::shared_ptr<PbiRawData>& index)
+    : PbiIndexedBamReader{std::move(bamFile), index}
 {
     Filter(std::move(filter));
 }
@@ -130,9 +144,20 @@ PbiIndexedBamReader::PbiIndexedBamReader(const std::string& bamFilename)
 {
 }
 
-PbiIndexedBamReader::PbiIndexedBamReader(BamFile bamFile)
-    : BamReader{std::move(bamFile)}
-    , d_{std::make_unique<PbiIndexedBamReaderPrivate>(File().PacBioIndexFilename())}
+PbiIndexedBamReader::PbiIndexedBamReader(const std::string& bamFilename,
+                                         const std::shared_ptr<PbiRawData>& index)
+    : PbiIndexedBamReader{BamFile{bamFilename}, index}
+{
+}
+
+PbiIndexedBamReader::PbiIndexedBamReader(BamFile bamFile) : BamReader{std::move(bamFile)}
+{
+    auto indexCache = MakePbiIndexCache(File());
+    d_ = std::make_unique<PbiIndexedBamReaderPrivate>(indexCache->at(0));
+}
+
+PbiIndexedBamReader::PbiIndexedBamReader(BamFile bamFile, const std::shared_ptr<PbiRawData>& index)
+    : BamReader{std::move(bamFile)}, d_{std::make_unique<PbiIndexedBamReaderPrivate>(index)}
 {
 }
 

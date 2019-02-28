@@ -38,6 +38,8 @@ public:
     ///         read
     ///
     PbiIndexedBamReader(PbiFilter filter, const std::string& bamFilename);
+    PbiIndexedBamReader(PbiFilter filter, const std::string& bamFilename,
+                        const std::shared_ptr<PbiRawData>& index);
 
     /// \brief Constructs %BAM reader, with an initial filter.
     ///
@@ -50,6 +52,8 @@ public:
     ///         read
     ///
     PbiIndexedBamReader(PbiFilter filter, BamFile bamFile);
+    PbiIndexedBamReader(PbiFilter filter, BamFile bamFile,
+                        const std::shared_ptr<PbiRawData>& index);
 
     /// \brief Constructs %BAM reader, with no initial filter.
     ///
@@ -62,6 +66,7 @@ public:
     ///         read
     ///
     PbiIndexedBamReader(const std::string& bamFilename);
+    PbiIndexedBamReader(const std::string& bamFilename, const std::shared_ptr<PbiRawData>& index);
 
     /// \brief Constructs %BAM reader, with no initial filter.
     ///
@@ -74,6 +79,7 @@ public:
     ///         read
     ///
     PbiIndexedBamReader(BamFile bamFile);
+    PbiIndexedBamReader(BamFile bamFile, const std::shared_ptr<PbiRawData>& index);
 
     ~PbiIndexedBamReader() override;
 
@@ -104,7 +110,7 @@ private:
     std::unique_ptr<PbiIndexedBamReaderPrivate> d_;
 };
 
-}  // namespace internal
 }  // namespace BAM
+}  // namespace PacBio
 
 #endif  // PBIINDEXEDBAMREADER_H
