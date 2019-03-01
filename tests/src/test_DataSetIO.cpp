@@ -1644,4 +1644,85 @@ TEST(DataSetIOTest, MetadataDefaultChildrenProperlyOrderedPerXsd)
     EXPECT_EQ(expectedXml, s.str());
 }
 
+TEST(DataSetIOTest, MakeReferenceSetFromSubdataset)
+{
+    // ReferenceSet with ReferenceSet subdataset
+    const std::string referenceSetXml{
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+        "<pbds:ReferenceSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.ReferenceSet\" "
+                "Name=\"DataSet_ReferenceSet\" Tags=\"barcode moreTags mapping mytags\" "
+                "TimeStampedName=\"my_time_stamped_name\" "
+                "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"3.0.1\" "
+                "xmlns=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
+                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
+                "xmlns:pbbase=\"http://pacificbiosciences.com/PacBioBaseDataModel.xsd\" "
+                "xmlns:pbds=\"http://pacificbiosciences.com/PacBioDatasets.xsd\">\n"
+        "\t<pbbase:ExternalResources>\n"
+        "\t\t<pbbase:ExternalResource MetaType=\"Fake.MetaType\" ResourceId=\"filename\" TimeStampedName=\"custom_tsn\" UniqueId=\"my_uuid\" Version=\"3.0.1\" />\n"
+        "\t</pbbase:ExternalResources>\n"
+        "\t<pbds:DataSets>\n"
+        "\t\t<pbds:ReferenceSet> CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.ReferenceSet\" "
+                "Name=\"DataSet_ReferenceSet\" Tags=\"barcode moreTags mapping mytags\" "
+                "TimeStampedName=\"my_time_stamped_name\" "
+                "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"3.0.1\" "
+                "xmlns=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
+                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
+                "xmlns:pbbase=\"http://pacificbiosciences.com/PacBioBaseDataModel.xsd\" "
+                "xmlns:pbds=\"http://pacificbiosciences.com/PacBioDatasets.xsd\">\n"
+        "\t\t\t<pbds:DataSetMetadata>\n"
+        "\t\t\t\t<pbds:TotalLength>1000</pbds:TotalLength>\n"
+        "\t\t\t\t<pbds:NumRecords>42</pbds:NumRecords>\n"
+        "\t\t\t</pbds:DataSetMetadata>\n"
+        "\t\t</pbds:ReferenceSet>\n"
+        "\t</pbds:DataSets>\n"
+        "\t<pbds:DataSetMetadata>\n"
+        "\t\t<pbds:TotalLength>1000</pbds:TotalLength>\n"
+        "\t\t<pbds:NumRecords>42</pbds:NumRecords>\n"
+        "\t</pbds:DataSetMetadata>\n"
+        "</pbds:ReferenceSet>\n"};
+
+    EXPECT_NO_THROW(DataSet::FromXml(referenceSetXml));
+
+    // AlignmentSet with ReferenceSet subdataset
+    const std::string alignmentSetXml{
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+        "<pbds:AlignmentSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.AlignmentSet\" "
+                "Name=\"DataSet_AlignmentSet\" Tags=\"barcode moreTags mapping mytags\" "
+                "TimeStampedName=\"my_time_stamped_name\" "
+                "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"3.0.1\" "
+                "xmlns=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
+                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
+                "xmlns:pbbase=\"http://pacificbiosciences.com/PacBioBaseDataModel.xsd\" "
+                "xmlns:pbds=\"http://pacificbiosciences.com/PacBioDatasets.xsd\">\n"
+        "\t<pbbase:ExternalResources>\n"
+        "\t\t<pbbase:ExternalResource MetaType=\"Fake.MetaType\" ResourceId=\"filename\" TimeStampedName=\"custom_tsn\" UniqueId=\"my_uuid\" Version=\"3.0.1\" />\n"
+        "\t</pbbase:ExternalResources>\n"
+        "\t<pbds:DataSets>\n"
+        "\t\t<pbds:ReferenceSet> CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.ReferenceSet\" "
+                "Name=\"DataSet_ReferenceSet\" Tags=\"barcode moreTags mapping mytags\" "
+                "TimeStampedName=\"my_time_stamped_name\" "
+                "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"3.0.1\" "
+                "xmlns=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
+                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
+                "xmlns:pbbase=\"http://pacificbiosciences.com/PacBioBaseDataModel.xsd\" "
+                "xmlns:pbds=\"http://pacificbiosciences.com/PacBioDatasets.xsd\">\n"
+        "\t\t\t<pbds:DataSetMetadata>\n"
+        "\t\t\t\t<pbds:TotalLength>1000</pbds:TotalLength>\n"
+        "\t\t\t\t<pbds:NumRecords>42</pbds:NumRecords>\n"
+        "\t\t\t</pbds:DataSetMetadata>\n"
+        "\t\t</pbds:ReferenceSet>\n"
+        "\t</pbds:DataSets>\n"
+        "\t<pbds:DataSetMetadata>\n"
+        "\t\t<pbds:TotalLength>1000</pbds:TotalLength>\n"
+        "\t\t<pbds:NumRecords>42</pbds:NumRecords>\n"
+        "\t</pbds:DataSetMetadata>\n"
+        "</pbds:AlignmentSet>\n"};
+
+    EXPECT_NO_THROW(DataSet::FromXml(alignmentSetXml));
+}
+
 // clang-format on
