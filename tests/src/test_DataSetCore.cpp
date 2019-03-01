@@ -501,3 +501,12 @@ TEST(DataSetCoreTest, RemoveSubDataSets)
     dataset.SubDataSets().Remove(sub2);
     EXPECT_EQ(1, dataset.SubDataSets().Size());
 }
+
+TEST(DataSetCoreTest, EnsureCreatedAtAttribute)
+{
+    DataSet ds;
+    ReferenceSet ref;
+
+    EXPECT_FALSE(ds.CreatedAt().empty());
+    EXPECT_FALSE(ref.CreatedAt().empty());
+}

@@ -21,21 +21,10 @@ namespace internal {
 // BaseEntityType
 // ----------------
 
-// ----------------
-// DataEntityType
-// ----------------
-
-// ----------------
-// StrictEntityType
-// ----------------
-
-// ----------------
-// BaseEntityType
-// ----------------
-
 BaseEntityType::BaseEntityType(const std::string& label, const XsdType& xsd)
     : DataSetElement(label, xsd)
 {
+    if (CreatedAt().empty()) CreatedAt(TimeUtils::ToIso8601(TimeUtils::CurrentTime()));
     if (Version().empty()) Version(XML_VERSION);
 }
 
