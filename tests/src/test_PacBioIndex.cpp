@@ -425,3 +425,20 @@ TEST(PacBioIndexTest, AggregatePBI)
     EXPECT_EQ(92, mergedBarcodeData.bcForward_.at(5));
     EXPECT_EQ(-1, mergedBarcodeData.bcForward_.at(12));  // file 3
 }
+
+TEST(PbiIndexCacheTest, LoadsExpectedIndexData)
+{
+    const DataSet ds{PbbamTestsConfig::Data_Dir + "/chunking/chunking.subreadset.xml"};
+
+    std::vector<uint32_t> readCounts;
+    for (const BamFile& bamFile : ds.BamFiles()) {
+        const PbiRawData index{bamFile};
+        readCounts.push_back(index.NumReads());
+    }
+
+    const auto indexCache = MakePbiIndexCache(ds);
+    ASSERT_EQ(3, indexCache->size());
+    EXPECT_EQ(readCounts[0], indexCache->at(0)->NumReads());
+    EXPECT_EQ(readCounts[1], indexCache->at(1)->NumReads());
+    EXPECT_EQ(readCounts[2], indexCache->at(2)->NumReads());
+}

@@ -19,8 +19,9 @@ namespace BAM {
 class PbiFilterQuery::PbiFilterQueryPrivate
 {
 public:
-    PbiFilterQueryPrivate(const PbiFilter& filter, const DataSet& dataset)
-        : reader_{filter, dataset}
+    PbiFilterQueryPrivate(const PbiFilter& filter, const DataSet& dataset,
+                          const PbiIndexCache& cache)
+        : reader_{filter, dataset, cache}
     {
     }
 
@@ -28,12 +29,23 @@ public:
 };
 
 PbiFilterQuery::PbiFilterQuery(const DataSet& dataset)
-    : PbiFilterQuery{PbiFilter::FromDataSet(dataset), dataset}
+    : PbiFilterQuery{PbiFilter::FromDataSet(dataset), dataset, MakePbiIndexCache(dataset)}
+{
+}
+
+PbiFilterQuery::PbiFilterQuery(const DataSet& dataset, const PbiIndexCache& cache)
+    : PbiFilterQuery{PbiFilter::FromDataSet(dataset), dataset, cache}
 {
 }
 
 PbiFilterQuery::PbiFilterQuery(const PbiFilter& filter, const DataSet& dataset)
-    : internal::IQuery(), d_{std::make_unique<PbiFilterQueryPrivate>(filter, dataset)}
+    : PbiFilterQuery{filter, dataset, MakePbiIndexCache(dataset)}
+{
+}
+
+PbiFilterQuery::PbiFilterQuery(const PbiFilter& filter, const DataSet& dataset,
+                               const PbiIndexCache& cache)
+    : internal::IQuery(), d_{std::make_unique<PbiFilterQueryPrivate>(filter, dataset, cache)}
 {
 }
 
