@@ -51,19 +51,11 @@ void GetAllFiles(const ExternalResources& resources, std::vector<std::string>* r
     }
 }
 
-void InitDefaults(DataSet& ds)
-{
-    // provide default 'CreatedAt' & 'Version' attributes if not already present in XML
-
-    if (ds.CreatedAt().empty()) ds.CreatedAt(TimeUtils::ToIso8601(TimeUtils::CurrentTime()));
-    if (ds.Version().empty()) ds.Version(defaultVersion);
-}
-
-}  // anonymous
+}  // namespace
 
 using internal::DataSetElement;
 
-DataSet::DataSet() : DataSet(DataSet::GENERIC) { InitDefaults(*this); }
+DataSet::DataSet() : DataSet(DataSet::GENERIC) {}
 
 DataSet::DataSet(const DataSet::TypeEnum type) : path_(FileUtils::CurrentWorkingDirectory())
 {
@@ -104,14 +96,11 @@ DataSet::DataSet(const DataSet::TypeEnum type) : path_(FileUtils::CurrentWorking
         default:
             throw std::runtime_error{"DataSet: unsupported type"};
     }
-
-    InitDefaults(*this);
 }
 
 DataSet::DataSet(const BamFile& bamFile)
     : d_(DataSetIO::FromUri(bamFile.Filename())), path_(FileUtils::CurrentWorkingDirectory())
 {
-    InitDefaults(*this);
 }
 
 DataSet::DataSet(const std::string& filename)
@@ -128,13 +117,11 @@ DataSet::DataSet(const std::string& filename)
         boost::algorithm::iends_with(filename, ".fa")) {
         path_ = FileUtils::CurrentWorkingDirectory();
     }
-    InitDefaults(*this);
 }
 
 DataSet::DataSet(const std::vector<std::string>& filenames)
     : d_(DataSetIO::FromUris(filenames)), path_(FileUtils::CurrentWorkingDirectory())
 {
-    InitDefaults(*this);
 }
 
 DataSet::DataSet(const DataSet& other) : path_(other.path_)
@@ -286,7 +273,6 @@ DataSet DataSet::FromXml(const std::string& xml)
 {
     DataSet result;
     result.d_ = DataSetIO::FromXmlString(xml);
-    InitDefaults(result);
     return result;
 }
 
