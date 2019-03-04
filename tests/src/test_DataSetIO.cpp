@@ -206,23 +206,27 @@ TEST(DataSetIOTest, ToXml)
     // external resources
     ExternalResource resource1("AlignmentFile.AlignmentBamFile", "file:/mnt/path/to/alignments2.bam");
     resource1.Name("Third Alignments BAM");
+    resource1.CreatedAt("2015-01-27T09:00:01");
     resource1.Description("Points to an example Alignments BAM file.");
     resource1.Tags("Example");
     resource1.TimeStampedName("my_tsn");
     resource1.UniqueId("my_uuid");
     FileIndex pbi1("PacBio.Index.PacBioIndex", "file:/mnt/path/to/alignments2.pbi");
+    pbi1.CreatedAt("2015-01-27T09:00:01");
     pbi1.TimeStampedName("my_tsn");
     pbi1.UniqueId("my_uuid");
     resource1.FileIndices().Add(pbi1);
     dataset.ExternalResources().Add(resource1);
 
     ExternalResource resource2("AlignmentFile.AlignmentBamFile", "file:./alignments3.bam");
+    resource2.CreatedAt("2015-01-27T09:00:01");
     resource2.Name("Fourth Alignments BAM");
     resource2.Description("Points to another example Alignments BAM file, by relative path.");
     resource2.Tags("Example");
     resource2.TimeStampedName("my_tsn");
     resource2.UniqueId("my_uuid");
     FileIndex pbi2("PacBio.Index.PacBioIndex", "file:/mnt/path/to/alignments3.pbi");
+    pbi2.CreatedAt("2015-01-27T09:00:01");
     pbi2.TimeStampedName("my_tsn");
     pbi2.UniqueId("my_uuid");
 
@@ -231,6 +235,7 @@ TEST(DataSetIOTest, ToXml)
 
     // sub-datasets with filters
     DataSetBase subDataSet1;
+    subDataSet1.CreatedAt("2015-01-27T09:00:01");
     subDataSet1.Name("HighQuality Read Alignments");
     subDataSet1.TimeStampedName("my_tsn");
     subDataSet1.UniqueId("ab95d0a3-94b8-4918-b3af-a3f81bbe519c");
@@ -240,6 +245,7 @@ TEST(DataSetIOTest, ToXml)
     dataset.SubDataSets().Add(subDataSet1);
 
     DataSetBase subDataSet2;
+    subDataSet2.CreatedAt("2015-01-27T09:00:01");
     subDataSet2.Name("Alignments to chromosome 1");
     subDataSet2.TimeStampedName("my_tsn");
     subDataSet2.UniqueId("ac95d0a3-94b8-4918-b3af-a3f81bbe519c");
@@ -265,6 +271,7 @@ TEST(DataSetIOTest, ToXml)
                 "xmlns:pbds=\"http://pacificbiosciences.com/PacBioDatasets.xsd\">\n"
         "\t<pbbase:ExternalResources>\n"
         "\t\t<pbbase:ExternalResource "
+                "CreatedAt=\"2015-01-27T09:00:01\" "
                 "Description=\"Points to an example Alignments BAM file.\" "
                 "MetaType=\"AlignmentFile.AlignmentBamFile\" "
                 "Name=\"Third Alignments BAM\" "
@@ -274,6 +281,7 @@ TEST(DataSetIOTest, ToXml)
                 "UniqueId=\"my_uuid\" Version=\"3.0.1\">\n"
         "\t\t\t<pbbase:FileIndices>\n"
         "\t\t\t\t<pbbase:FileIndex "
+                "CreatedAt=\"2015-01-27T09:00:01\" "
                 "MetaType=\"PacBio.Index.PacBioIndex\" "
                 "ResourceId=\"file:/mnt/path/to/alignments2.pbi\" "
                 "TimeStampedName=\"my_tsn\" "
@@ -281,6 +289,7 @@ TEST(DataSetIOTest, ToXml)
         "\t\t\t</pbbase:FileIndices>\n"
         "\t\t</pbbase:ExternalResource>\n"
         "\t\t<pbbase:ExternalResource "
+                "CreatedAt=\"2015-01-27T09:00:01\" "
                 "Description=\"Points to another example Alignments BAM file, by relative path.\" "
                 "MetaType=\"AlignmentFile.AlignmentBamFile\" "
                 "Name=\"Fourth Alignments BAM\" "
@@ -290,6 +299,7 @@ TEST(DataSetIOTest, ToXml)
                 "UniqueId=\"my_uuid\" Version=\"3.0.1\">\n"
         "\t\t\t<pbbase:FileIndices>\n"
         "\t\t\t\t<pbbase:FileIndex "
+                "CreatedAt=\"2015-01-27T09:00:01\" "
                 "MetaType=\"PacBio.Index.PacBioIndex\" "
                 "ResourceId=\"file:/mnt/path/to/alignments3.pbi\" "
                 "TimeStampedName=\"my_tsn\" "
@@ -299,6 +309,7 @@ TEST(DataSetIOTest, ToXml)
         "\t</pbbase:ExternalResources>\n"
         "\t<pbds:DataSets>\n"
         "\t\t<pbds:DataSet "
+                "CreatedAt=\"2015-01-27T09:00:01\" "
                 "MetaType=\"PacBio.DataSet.DataSet\" "
                 "Name=\"HighQuality Read Alignments\" "
                 "TimeStampedName=\"my_tsn\" "
@@ -313,6 +324,7 @@ TEST(DataSetIOTest, ToXml)
         "\t\t\t</pbds:Filters>\n"
         "\t\t</pbds:DataSet>\n"
         "\t\t<pbds:DataSet "
+                "CreatedAt=\"2015-01-27T09:00:01\" "
                 "MetaType=\"PacBio.DataSet.DataSet\" "
                 "Name=\"Alignments to chromosome 1\" "
                 "TimeStampedName=\"my_tsn\" "
@@ -1610,6 +1622,7 @@ TEST(DataSetIOTest, MetadataDefaultChildrenProperlyOrderedPerXsd)
            .Attribute("xsi:schemaLocation", "http://pacificbiosciences.com/PacBioDatasets.xsd");
 
     ExternalResource ext("Fake.MetaType", "filename");
+    ext.CreatedAt("2015-01-27T09:00:01");
     ext.TimeStampedName("custom_tsn")
        .UniqueId("my_uuid");
     dataset.ExternalResources().Add(ext);
@@ -1631,7 +1644,7 @@ TEST(DataSetIOTest, MetadataDefaultChildrenProperlyOrderedPerXsd)
                 "xmlns:pbbase=\"http://pacificbiosciences.com/PacBioBaseDataModel.xsd\" "
                 "xmlns:pbds=\"http://pacificbiosciences.com/PacBioDatasets.xsd\">\n"
         "\t<pbbase:ExternalResources>\n"
-        "\t\t<pbbase:ExternalResource MetaType=\"Fake.MetaType\" ResourceId=\"filename\" TimeStampedName=\"custom_tsn\" UniqueId=\"my_uuid\" Version=\"3.0.1\" />\n"
+        "\t\t<pbbase:ExternalResource CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"Fake.MetaType\" ResourceId=\"filename\" TimeStampedName=\"custom_tsn\" UniqueId=\"my_uuid\" Version=\"3.0.1\" />\n"
         "\t</pbbase:ExternalResources>\n"
         "\t<pbds:DataSetMetadata>\n"
         "\t\t<pbds:TotalLength>1000</pbds:TotalLength>\n"
