@@ -10,6 +10,11 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.23.0] - 2019-03-04
+
+### Added
+ - PbiIndexCache and FastaCache for reusing file data
+
 ## [0.22.0] - 2019-02-11
 
 ### Fixed
