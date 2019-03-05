@@ -21,9 +21,11 @@ namespace BAM {
 class BaiIndexedBamReader::BaiIndexedBamReaderPrivate
 {
 public:
+    BaiIndexedBamReaderPrivate(const BamFile& file) { LoadIndex(file.Filename()); }
+
     BaiIndexedBamReaderPrivate(const BamFile& file, const GenomicInterval& interval)
+        : BaiIndexedBamReaderPrivate(file)
     {
-        LoadIndex(file.Filename());
         Interval(file.Header(), interval);
     }
 
@@ -65,6 +67,16 @@ public:
     std::unique_ptr<hts_idx_t, HtslibIndexDeleter> htsIndex_;
     std::unique_ptr<hts_itr_t, HtslibIteratorDeleter> htsIterator_;
 };
+
+BaiIndexedBamReader::BaiIndexedBamReader(std::string filename)
+    : BaiIndexedBamReader{BamFile{std::move(filename)}}
+{
+}
+
+BaiIndexedBamReader::BaiIndexedBamReader(BamFile bamFile)
+    : BamReader{std::move(bamFile)}, d_{std::make_unique<BaiIndexedBamReaderPrivate>(File())}
+{
+}
 
 BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval, std::string filename)
     : BaiIndexedBamReader{interval, BamFile{std::move(filename)}}

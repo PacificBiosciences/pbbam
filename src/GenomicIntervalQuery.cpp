@@ -17,6 +17,8 @@ namespace BAM {
 class GenomicIntervalQuery::GenomicIntervalQueryPrivate
 {
 public:
+    GenomicIntervalQueryPrivate(const DataSet& dataset) : reader_{dataset} {}
+
     GenomicIntervalQueryPrivate(const GenomicInterval& interval, const DataSet& dataset)
         : reader_{interval, dataset}
     {
@@ -24,6 +26,11 @@ public:
 
     GenomicIntervalCompositeBamReader reader_;
 };
+
+GenomicIntervalQuery::GenomicIntervalQuery(const DataSet& dataset)
+    : internal::IQuery(), d_{std::make_unique<GenomicIntervalQueryPrivate>(dataset)}
+{
+}
 
 GenomicIntervalQuery::GenomicIntervalQuery(const GenomicInterval& interval, const DataSet& dataset)
     : internal::IQuery(), d_{std::make_unique<GenomicIntervalQueryPrivate>(interval, dataset)}

@@ -76,8 +76,51 @@ public:
     /// \name Contstructors & Related Methods
     /// \{
 
+    /// \brief Constructs composite %BAM reader, that can be queried on genomic interval.
+    ///
+    /// \note Using this constructor means that an interval must be provided, via
+    ///       reader.Interval(i), before iterating.
+    ///
+    /// \param[in] bamFiles   input BamFile objects
+    ///
+    /// \throws std::runtime_error if either file (*.bam or *.bai) fails to open
+    ///         for reading, or if the interval is invalid
+    ///
+    GenomicIntervalCompositeBamReader(const std::vector<BamFile>& bamFiles);
+
+    /// \brief Constructs composite %BAM reader, that can be queried on genomic interval.
+    ///
+    /// \note Using this constructor means that an interval must be provided, via
+    ///       reader.Interval(i), before iterating.
+    ///
+    /// \param[in] dataset      input DataSet
+    ///
+    /// \throws std::runtime_error if either file (*.bam or *.bai) fails to open
+    ///         for reading, or if the interval is invalid
+    ///
+    GenomicIntervalCompositeBamReader(const DataSet& dataset);
+
+    /// \brief Constructs composite %BAM reader, limiting record results to
+    ///        only those overalpping a GenomicInterval.
+    ///
+    /// \param[in] interval   genomic interval of interest
+    /// \param[in] bamFiles   input BamFile objects
+    ///
+    /// \throws std::runtime_error on failure to open/read underlying %BAM or
+    ///         BAI files.
+    ///
     GenomicIntervalCompositeBamReader(const GenomicInterval& interval,
                                       const std::vector<BamFile>& bamFiles);
+
+    /// \brief Constructs composite %BAM reader, limiting record results to
+    ///        only those overalpping a GenomicInterval.
+    ///
+    /// \param[in] interval genomic interval of interest
+    /// \param[in] dataset  input data source(s)
+    ///
+    /// \throws std::runtime_error on failure to open/read underlying %BAM or
+    ///         BAI files.
+    ///
     GenomicIntervalCompositeBamReader(const GenomicInterval& interval, const DataSet& dataset);
 
     /// \}

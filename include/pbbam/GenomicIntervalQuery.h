@@ -28,6 +28,19 @@ namespace BAM {
 class PBBAM_EXPORT GenomicIntervalQuery : public internal::IQuery
 {
 public:
+    /// \brief Constructs a new GenomiIntervalQuery, that can be used to retrieve
+    ///        only those records overlapping a GenomicInterval.
+    ///
+    /// \note Using this constructor means that an interval must be provided, via
+    ///       query.Interval(i), before iterating.
+    ///
+    /// \param[in] dataset  input data source(s)
+    ///
+    /// \throws std::runtime_error on failure to open/read underlying %BAM or
+    ///         BAI files.
+    ///
+    GenomicIntervalQuery(const PacBio::BAM::DataSet& dataset);
+
     /// \brief Constructs a new GenomiIntervalQuery, limiting record results to
     ///        only those overalpping a GenomicInterval.
     ///
@@ -70,6 +83,6 @@ private:
 };
 
 }  // namespace BAM
-}  // namspace PacBio
+}  // namespace PacBio
 
 #endif  // GENOMICINTERVALQUERY_H
