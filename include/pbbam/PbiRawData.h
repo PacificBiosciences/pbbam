@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 #include "pbbam/Config.h"
@@ -17,6 +18,7 @@
 namespace PacBio {
 namespace BAM {
 
+class BamFile;
 class BamRecord;
 class DataSet;
 
@@ -477,6 +479,14 @@ private:
     PbiRawReferenceData referenceData_;
     PbiRawBasicData basicData_;
 };
+
+// PBI index caching
+
+using PbiIndexCache = std::shared_ptr<std::vector<std::shared_ptr<PbiRawData>>>;
+
+PbiIndexCache MakePbiIndexCache(const DataSet& dataset);
+PbiIndexCache MakePbiIndexCache(const std::vector<BamFile>&);
+PbiIndexCache MakePbiIndexCache(const BamFile& bamFile);
 
 }  // namespace BAM
 }  // namespace PacBio

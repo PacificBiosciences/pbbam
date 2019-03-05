@@ -331,5 +331,29 @@ bool PbiReferenceEntry::operator==(const PbiReferenceEntry& other) const
     return tId_ == other.tId_ && beginRow_ == other.beginRow_ && endRow_ == other.endRow_;
 }
 
+// PBI index caching
+
+PbiIndexCache MakePbiIndexCache(const DataSet& dataset)
+{
+    return MakePbiIndexCache(dataset.BamFiles());
+}
+
+PbiIndexCache MakePbiIndexCache(const std::vector<BamFile>& bamFiles)
+{
+    PbiIndexCache cache = std::make_shared<std::vector<std::shared_ptr<PbiRawData>>>();
+    auto& indices = *cache.get();
+    for (const auto& bamFile : bamFiles) {
+        const auto& pbiFilename = bamFile.PacBioIndexFilename();
+        indices.push_back(std::make_shared<PbiRawData>(pbiFilename));
+    }
+    return cache;
+}
+
+PbiIndexCache MakePbiIndexCache(const BamFile& bamFile)
+{
+    std::vector<BamFile> bamFiles{bamFile};
+    return MakePbiIndexCache(bamFiles);
+}
+
 }  // namespace BAM
-}  // namesapce PacBio
+}  // namespace PacBio

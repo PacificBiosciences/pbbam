@@ -152,7 +152,12 @@ public:
     /// \{
 
     PbiFilterCompositeBamReader(const PbiFilter& filter, const std::vector<BamFile>& bamFiles);
+    PbiFilterCompositeBamReader(const PbiFilter& filter, const std::vector<BamFile>& bamFiles,
+                                const PbiIndexCache& cache);
+
     PbiFilterCompositeBamReader(const PbiFilter& filter, const DataSet& dataset);
+    PbiFilterCompositeBamReader(const PbiFilter& filter, const DataSet& dataset,
+                                const PbiIndexCache& cache);
 
     /// \}
 
@@ -180,6 +185,7 @@ private:
     void UpdateSort();
 
 private:
+    PbiIndexCache indexCache_;
     container_type mergeQueue_;
     std::vector<std::string> filenames_;
     uint32_t numReads_;

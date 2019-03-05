@@ -39,6 +39,8 @@ public:
     ///
     PbiFilterQuery(const DataSet& dataset);
 
+    PbiFilterQuery(const DataSet& dataset, const PbiIndexCache& cache);
+
     /// \brief Creates a new PbiFilterQuery, limiting record results to only
     ///        those matching filter criteria
     ///
@@ -49,6 +51,8 @@ public:
     ///         PBI files.
     ///
     PbiFilterQuery(const PbiFilter& filter, const DataSet& dataset);
+
+    PbiFilterQuery(const PbiFilter& filter, const DataSet& dataset, const PbiIndexCache& cache);
 
     ~PbiFilterQuery() override;
 

@@ -199,7 +199,14 @@ inline void GenomicIntervalCompositeBamReader::UpdateSort()
 template <typename OrderByType>
 inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(
     const PbiFilter& filter, const std::vector<BamFile>& bamFiles)
-    : numReads_{0}
+    : PbiFilterCompositeBamReader{filter, bamFiles, MakePbiIndexCache(bamFiles)}
+{
+}
+
+template <typename OrderByType>
+inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(
+    const PbiFilter& filter, const std::vector<BamFile>& bamFiles, const PbiIndexCache& cache)
+    : indexCache_{cache}, numReads_{0}
 {
     filenames_.reserve(bamFiles.size());
     for (const auto& bamFile : bamFiles)
@@ -211,6 +218,13 @@ template <typename OrderByType>
 inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(
     const PbiFilter& filter, const DataSet& dataset)
     : PbiFilterCompositeBamReader{filter, dataset.BamFiles()}
+{
+}
+
+template <typename OrderByType>
+inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(
+    const PbiFilter& filter, const DataSet& dataset, const PbiIndexCache& cache)
+    : PbiFilterCompositeBamReader{filter, dataset.BamFiles(), cache}
 {
 }
 
@@ -244,43 +258,23 @@ template <typename OrderByType>
 inline PbiFilterCompositeBamReader<OrderByType>& PbiFilterCompositeBamReader<OrderByType>::Filter(
     const PbiFilter& filter)
 {
+    // std::cerr << "PbiFilterCompositeBamReader<OrderByType>::Filter()\n";
+
+    // reset reader queue
+    mergeQueue_.clear();
+
+    // create readers for files
     container_type updatedMergeItems;
-    std::set<std::string> filesToCreate{filenames_.cbegin(), filenames_.cend()};
-
-    // update existing readers
-    while (!mergeQueue_.empty()) {
-
-        // non-destructive 'pop' of first item from queue
-        auto firstIter = mergeQueue_.begin();
-        internal::CompositeMergeItem firstItem{std::move(firstIter->reader),
-                                               std::move(firstIter->record)};
-        mergeQueue_.pop_front();
-
-        // reset request
-        auto* pbiReader = dynamic_cast<PbiIndexedBamReader*>(firstItem.reader.get());
-        assert(pbiReader);
-        pbiReader->Filter(filter);
-
-        // try fetch 'next' from first item's reader
-        // if successful, re-insert it into container & re-sort on our new values
-        // otherwise, this item will go out of scope & reader destroyed
-        if (firstItem.reader->GetNext(firstItem.record)) {
-            updatedMergeItems.push_front(std::move(firstItem));
-            filesToCreate.erase(firstItem.reader->Filename());
-        }
-    }
-
-    // create readers for files that were not 'active' for the previous
     std::vector<std::string> missingPbi;
-    for (auto&& fn : filesToCreate) {
-        const BamFile bamFile{fn};
+    for (size_t i = 0; i < filenames_.size(); ++i) {
+        const BamFile bamFile{filenames_.at(i)};
         if (bamFile.PacBioIndexExists()) {
-            auto item = internal::CompositeMergeItem{
-                std::unique_ptr<BamReader>{new PbiIndexedBamReader{filter, std::move(bamFile)}}};
+            auto item = internal::CompositeMergeItem{std::unique_ptr<BamReader>{
+                new PbiIndexedBamReader{filter, std::move(bamFile), indexCache_->at(i)}}};
             if (item.reader->GetNext(item.record)) updatedMergeItems.push_back(std::move(item));
             // else not an error, simply no data matching filter
         } else
-            missingPbi.push_back(fn);
+            missingPbi.push_back(filenames_.at(i));
     }
 
     // throw if any files missing PBI
@@ -295,13 +289,11 @@ inline PbiFilterCompositeBamReader<OrderByType>& PbiFilterCompositeBamReader<Ord
 
     // update our actual container, store num matching reads, sort & and return
     mergeQueue_ = std::move(updatedMergeItems);
-
     numReads_ = 0;
     for (const auto& item : mergeQueue_) {
         auto* pbiReader = dynamic_cast<PbiIndexedBamReader*>(item.reader.get());
         numReads_ += pbiReader->NumReads();
     }
-
     UpdateSort();
     return *this;
 }

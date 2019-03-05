@@ -112,6 +112,8 @@ std::shared_ptr<DataSetElement> MakeElement(const pugi::xml_node& xmlNode)
             return std::make_shared<HdfSubreadSet>(fromInputXml);
         case XmlElementType::SUBREAD_SET:
             return std::make_shared<SubreadSet>(fromInputXml);
+        case XmlElementType::REFERENCE_SET:
+            return std::make_shared<ReferenceSet>(fromInputXml);
         case XmlElementType::TRANSCRIPT_SET:
             return std::make_shared<TranscriptSet>(fromInputXml);
         case XmlElementType::TRANSCRIPT_ALIGNMENT_SET:
@@ -180,7 +182,7 @@ void FromXml(const pugi::xml_node& xmlNode, DataSetElement& parent)
     parent.AddChild(e);
 }
 
-}  // anonymous
+}  // namespace
 
 std::unique_ptr<DataSetBase> XmlReader::FromStream(std::istream& in)
 {

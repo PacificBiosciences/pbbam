@@ -71,6 +71,7 @@ TEST(DataSetXsdTest, EditDatasetRegistry)
            .Attribute("xsi:schemaLocation", "http://pacificbiosciences.com/PacBioDatasets.xsd");
 
     ExternalResource ext("Fake.MetaType", "filename");
+    ext.CreatedAt("2015-01-27T09:00:01");
     ext.TimeStampedName("custom_tsn")
        .UniqueId("my_uuid");
     dataset.ExternalResources().Add(ext);
@@ -89,7 +90,7 @@ TEST(DataSetXsdTest, EditDatasetRegistry)
                 "xmlns:custom=\"http://custom/uri.xsd\" "
                 "xmlns:pbds=\"http://pacificbiosciences.com/PacBioDatasets.xsd\">\n"
         "\t<custom:ExternalResources>\n"
-        "\t\t<custom:ExternalResource MetaType=\"Fake.MetaType\" ResourceId=\"filename\" TimeStampedName=\"custom_tsn\" UniqueId=\"my_uuid\" Version=\"3.0.1\" />\n"
+        "\t\t<custom:ExternalResource CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"Fake.MetaType\" ResourceId=\"filename\" TimeStampedName=\"custom_tsn\" UniqueId=\"my_uuid\" Version=\"3.0.1\" />\n"
         "\t</custom:ExternalResources>\n"
         "</pbds:AlignmentSet>\n"};
 
