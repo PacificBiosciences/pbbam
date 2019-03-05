@@ -31,6 +31,7 @@ pbbam_cpp_sources = files([
   'DataSetTypes.cpp',
   'DataSetXsd.cpp',
   'EntireFileQuery.cpp',
+  'FastaCache.cpp',
   'FastaReader.cpp',
   'FastaSequence.cpp',
   'FastaSequenceQuery.cpp',
