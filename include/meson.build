@@ -31,6 +31,7 @@ if not meson.is_subproject()
       'pbbam/DataSetTypes.h',
       'pbbam/DataSetXsd.h',
       'pbbam/EntireFileQuery.h',
+      'pbbam/FastaCache.h',
       'pbbam/FastaReader.h',
       'pbbam/FastaSequence.h',
       'pbbam/FastaSequenceQuery.h',
