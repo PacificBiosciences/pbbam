@@ -25,6 +25,24 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
+    /// \brief Constructs %BAM reader, that can be queried on genomic interval.
+    ///
+    /// \param filename input %BAM filename
+    ///
+    /// \throws std::runtime_error if either file (*.bam or *.bai) fails to open
+    ///         for reading, or if the interval is invalid
+    ///
+    explicit BaiIndexedBamReader(std::string filename);
+
+    /// \brief Constructs %BAM reader, that can be queried on genomic interval.
+    ///
+    /// \param[in] bamFile   input BamFile object
+    ///
+    /// \throws std::runtime_error if either file (*.bam or *.bai) fails to open
+    ///         for reading, or if the interval is invalid
+    ///
+    explicit BaiIndexedBamReader(BamFile bamFile);
+
     /// \brief Constructs %BAM reader, bounded by a genomic interval.
     ///
     /// All reads that overlap the interval will be available.
@@ -41,8 +59,8 @@ public:
     ///
     /// All reads that overlap the interval will be available.
     ///
-    /// \param[in] interval iteration will be bounded by this GenomicInterval.
-    /// \param[in] bamFile input BamFile object
+    /// \param[in] interval     iteration will be bounded by this GenomicInterval.
+    /// \param[in] bamFile      input BamFile object
     ///
     /// \throws std::runtime_error if either file (*.bam or *.bai) fails to open
     ///         for reading, or if the interval is invalid
