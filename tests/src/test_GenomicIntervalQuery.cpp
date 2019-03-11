@@ -122,3 +122,29 @@ TEST(GenomicIntervalQueryTest, MissingBaiShouldThrow)
         EXPECT_THROW(GenomicIntervalQuery query(interval, ds), std::runtime_error);
     }
 }
+
+TEST(GenomicIntervalQueryTest, InitializeWithoutInterval)
+{
+    const std::string rname = "lambda_NEB3011";
+
+    BamFile bamFile(GenomicIntervalQueryTests::inputBamFn);
+
+    // setup without normal interval
+    int count = 0;
+    GenomicIntervalQuery query(bamFile);
+    for (const BamRecord& record : query) {
+        UNUSED(record);
+        ++count;
+    }
+    EXPECT_EQ(0, count);
+
+    // pass in actual interval
+    count = 0;
+    GenomicInterval interval{"lambda_NEB3011", 9300, 9400};
+    query.Interval(interval);
+    for (const BamRecord& record : query) {
+        UNUSED(record);
+        ++count;
+    }
+    EXPECT_EQ(2, count);
+}
