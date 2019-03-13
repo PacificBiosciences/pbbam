@@ -10,10 +10,12 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
-## [0.23.0] - 2019-03-04
+## [0.23.0] - 2019-03-11
 
 ### Added
  - PbiIndexCache and FastaCache for reusing file data
+ - BaiIndexedBamReader and GenomicIntervalQuery can be constructed without
+   initial interval.
 
 ## [0.22.0] - 2019-02-11
 
