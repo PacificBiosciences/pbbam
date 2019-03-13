@@ -10,6 +10,8 @@
 #include <map>
 
 #include "pbbam/DataSet.h"
+
+#include "FileUtils.h"
 #include "pugixml/pugixml.hpp"
 
 using DataSetElement = PacBio::BAM::internal::DataSetElement;
@@ -47,7 +49,8 @@ std::string OutputName(const DataSetElement& node, const NamespaceRegistry& regi
 }
 
 void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
-           std::map<XsdType, std::string>& xsdPrefixesUsed, pugi::xml_node& parentXml)
+           std::map<XsdType, std::string>& xsdPrefixesUsed, pugi::xml_node& parentXml,
+           const DataSetBase& dataset)
 {
     // create child of parent, w/ label & text
     const auto label = OutputName(node, registry);
@@ -64,18 +67,23 @@ void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
     for (const auto& attribute : node.Attributes()) {
         const auto& name = attribute.first;
         if (name.empty()) continue;
+
         auto attr = xmlNode.append_attribute(name.c_str());
-        attr.set_value(attribute.second.c_str());
+        std::string value = attribute.second.c_str();
+        // "absolutize" any paths, except relative paths from verbatim input XML
+        if (!dataset.FromInputXml() && name == "ResourceId")
+            value = FileUtils::ResolvedFilePath(value, dataset.Path());
+        attr.set_value(value.c_str());
     }
 
     // additional stuff later? (e.g. comments)
 
     // iterate children, recursively building up subtree
     for (const auto& child : node.Children())
-        ToXml(*child, registry, xsdPrefixesUsed, xmlNode);
+        ToXml(*child, registry, xsdPrefixesUsed, xmlNode, dataset);
 }
 
-}  // anonymous
+}  // namespace
 
 void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
 {
@@ -105,7 +113,7 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
 
     // iterate children, recursively building up subtree
     for (const auto& child : dataset.Children())
-        ToXml(*child, registry, xsdPrefixesUsed, root);
+        ToXml(*child, registry, xsdPrefixesUsed, root, dataset);
 
     // write XML to stream
     auto decl = doc.prepend_child(pugi::node_declaration);

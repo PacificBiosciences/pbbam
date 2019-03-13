@@ -22,10 +22,10 @@
 #include <boost/optional.hpp>
 
 #include "DataSetIO.h"
+#include "DataSetUtils.h"
 #include "FileUtils.h"
 #include "TimeUtils.h"
 
-#include "pbbam/DataSetTypes.h"
 #include "pbbam/MakeUnique.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 
@@ -57,7 +57,7 @@ using internal::DataSetElement;
 
 DataSet::DataSet() : DataSet(DataSet::GENERIC) {}
 
-DataSet::DataSet(const DataSet::TypeEnum type) : path_(FileUtils::CurrentWorkingDirectory())
+DataSet::DataSet(const DataSet::TypeEnum type)
 {
     switch (type) {
         case DataSet::GENERIC:
@@ -96,15 +96,16 @@ DataSet::DataSet(const DataSet::TypeEnum type) : path_(FileUtils::CurrentWorking
         default:
             throw std::runtime_error{"DataSet: unsupported type"};
     }
+
+    d_->Path(FileUtils::CurrentWorkingDirectory());
 }
 
-DataSet::DataSet(const BamFile& bamFile)
-    : d_(DataSetIO::FromUri(bamFile.Filename())), path_(FileUtils::CurrentWorkingDirectory())
+DataSet::DataSet(const BamFile& bamFile) : d_(DataSetIO::FromUri(bamFile.Filename()))
 {
+    d_->Path(FileUtils::CurrentWorkingDirectory());
 }
 
-DataSet::DataSet(const std::string& filename)
-    : d_(DataSetIO::FromUri(filename)), path_(FileUtils::DirectoryName(filename))
+DataSet::DataSet(const std::string& filename) : d_(DataSetIO::FromUri(filename))
 {
     // for FOFN contents and raw BAM filenames, we can just use the current
     // directory as the starting path.
@@ -115,21 +116,29 @@ DataSet::DataSet(const std::string& filename)
         boost::algorithm::iends_with(filename, ".bam") ||
         boost::algorithm::iends_with(filename, ".fasta") ||
         boost::algorithm::iends_with(filename, ".fa")) {
-        path_ = FileUtils::CurrentWorkingDirectory();
+        d_->Path(FileUtils::CurrentWorkingDirectory());
+    }
+
+    else {
+        if (boost::algorithm::iends_with(filename, ".xml")) d_->FromInputXml(true);
+        d_->Path(FileUtils::DirectoryName(filename));
     }
 }
 
-DataSet::DataSet(const std::vector<std::string>& filenames)
-    : d_(DataSetIO::FromUris(filenames)), path_(FileUtils::CurrentWorkingDirectory())
+DataSet::DataSet(const std::vector<std::string>& filenames) : d_(DataSetIO::FromUris(filenames))
 {
+    d_->Path(FileUtils::CurrentWorkingDirectory());
 }
 
-DataSet::DataSet(const DataSet& other) : path_(other.path_)
+DataSet::DataSet(const DataSet& other)
 {
+    const bool otherFromXml = other.d_->FromInputXml();
     std::ostringstream out;
     DataSetIO::ToStream(other.d_, out);
     const std::string xml = out.str();
     d_ = DataSetIO::FromXmlString(xml);
+    d_->Path(other.d_->Path());
+    d_->FromInputXml(otherFromXml);
 }
 
 DataSet::DataSet(DataSet&&) = default;
@@ -137,11 +146,13 @@ DataSet::DataSet(DataSet&&) = default;
 DataSet& DataSet::operator=(const DataSet& other)
 {
     if (this != &other) {
+        const bool otherFromXml = other.d_->FromInputXml();
         std::ostringstream out;
         DataSetIO::ToStream(other.d_, out);
         const std::string xml = out.str();
         d_ = DataSetIO::FromXmlString(xml);
-        path_ = other.path_;
+        d_->Path(other.d_->Path());
+        d_->FromInputXml(otherFromXml);
     }
     return *this;
 }
@@ -273,6 +284,8 @@ DataSet DataSet::FromXml(const std::string& xml)
 {
     DataSet result;
     result.d_ = DataSetIO::FromXmlString(xml);
+    result.d_->Path(FileUtils::DirectoryName(xml));
+    result.d_->FromInputXml(true);
     return result;
 }
 
@@ -440,6 +453,8 @@ DataSet::TypeEnum DataSet::NameToType(const std::string& typeName)
     return lookup.at(typeName);  // throws if unknown typename
 }
 
+const std::string& DataSet::Path() const { return d_->Path(); }
+
 std::vector<std::string> DataSet::ResolvedResourceIds() const
 {
     const PacBio::BAM::ExternalResources& resources = ExternalResources();
@@ -454,7 +469,7 @@ std::vector<std::string> DataSet::ResolvedResourceIds() const
 
 std::string DataSet::ResolvePath(const std::string& originalPath) const
 {
-    return FileUtils::ResolvedFilePath(originalPath, path_);
+    return FileUtils::ResolvedFilePath(originalPath, d_->Path());
 }
 
 const std::string& DataSet::ResourceId() const { return d_->ResourceId(); }

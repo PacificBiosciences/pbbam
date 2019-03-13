@@ -54,7 +54,7 @@ const std::unordered_map<std::string, PacBio::BAM::XmlElementType> elementTypeLo
 };
 // clang-format on
 
-}  // anonymous
+}  // namespace
 
 namespace PacBio {
 namespace BAM {
@@ -132,22 +132,25 @@ ContigSet::ContigSet(const internal::FromInputXml& fromInputXml)
 
 DataSetBase::DataSetBase()
     : StrictEntityType("PacBio.DataSet.DataSet", "DataSet", XsdType::DATASETS)
+    , path_(FileUtils::CurrentWorkingDirectory())
 {
 }
 
 DataSetBase::DataSetBase(const internal::FromInputXml& fromInputXml)
     : StrictEntityType("", "DataSet", fromInputXml, XsdType::DATASETS)
+    , path_(FileUtils::CurrentWorkingDirectory())
 {
 }
 
 DataSetBase::DataSetBase(const std::string& metatype, const std::string& label, const XsdType& xsd)
-    : StrictEntityType(metatype, label, xsd)
+    : StrictEntityType(metatype, label, xsd), path_(FileUtils::CurrentWorkingDirectory())
 {
 }
 
 DataSetBase::DataSetBase(const std::string& metatype, const std::string& label,
                          const internal::FromInputXml& fromInputXml, const XsdType& xsd)
     : StrictEntityType(metatype, label, fromInputXml, xsd)
+    , path_(FileUtils::CurrentWorkingDirectory())
 {
 }
 
@@ -177,6 +180,10 @@ DataSetBase& DataSetBase::Filters(const PacBio::BAM::Filters& filters)
     return *this;
 }
 
+bool DataSetBase::FromInputXml() const { return fromInputXml_; }
+
+void DataSetBase::FromInputXml(bool ok) { fromInputXml_ = ok; }
+
 DEFINE_ACCESSORS(DataSetBase, DataSetMetadata, Metadata)
 
 DataSetBase& DataSetBase::Metadata(const PacBio::BAM::DataSetMetadata& metadata)
@@ -188,6 +195,10 @@ DataSetBase& DataSetBase::Metadata(const PacBio::BAM::DataSetMetadata& metadata)
 const NamespaceRegistry& DataSetBase::Namespaces() const { return registry_; }
 
 NamespaceRegistry& DataSetBase::Namespaces() { return registry_; }
+
+void DataSetBase::Path(const std::string& path) { path_ = path; }
+
+const std::string& DataSetBase::Path() const { return path_; }
 
 const PacBio::BAM::SubDataSets& DataSetBase::SubDataSets() const
 {
@@ -215,6 +226,7 @@ DataSetBase* DataSetBase::DeepCopy() const
     auto* copyDataset = new DataSetElement(*this);
     auto* result = static_cast<DataSetBase*>(copyDataset);
     result->registry_ = registry_;
+    result->path_ = path_;
     return result;
 }
 

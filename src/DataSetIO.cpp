@@ -92,7 +92,7 @@ std::unique_ptr<DataSetBase> DataSetFromUri(const std::string& uri)
     throw std::runtime_error{"DataSet: unsupported extension on input file: " + uri};
 }
 
-}  // anonymous
+}  // namespace
 
 std::unique_ptr<DataSetBase> DataSetIO::FromUri(const std::string& uri)
 {
@@ -141,14 +141,14 @@ void DataSetIO::ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostre
     DataSetIO::ToStream(*dataset, out);
 }
 
-void DataSetIO::ToFile(const DataSetBase& dataset, const std::string& fn)
+void DataSetIO::ToFile(DataSetBase& dataset, const std::string& fn)
 {
     std::ofstream out(fn);
     if (!out) throw std::runtime_error{"DataSet: could not open XML file for writing: " + fn};
     XmlWriter::ToStream(dataset, out);
 }
 
-void DataSetIO::ToStream(const DataSetBase& dataset, std::ostream& out)
+void DataSetIO::ToStream(DataSetBase& dataset, std::ostream& out)
 {
     XmlWriter::ToStream(dataset, out);
 }
