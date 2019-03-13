@@ -863,8 +863,31 @@ public:
     ///
     void SaveToStream(std::ostream& out);
 
+public:
+    ///
+    /// \returns true if dataset was read from XML input
+    ///
+    bool FromInputXml() const;
+
+    ///
+    /// \brief Indicate that dataset was read from XML input
+    ///
+    void FromInputXml(bool ok);
+
+    ///
+    /// \returns (absolute) path for dataset
+    ///
+    const std::string& Path() const;
+
+    ///
+    /// \brief Set dataset path
+    ///
+    void Path(const std::string& path);
+
 private:
     NamespaceRegistry registry_;
+    std::string path_;
+    bool fromInputXml_ = false;
 };
 
 /// \brief The AlignmentSet class represents an %AlignmentSet root element in
