@@ -21,12 +21,12 @@ namespace BAM {
 class BaiIndexedBamReader::BaiIndexedBamReaderPrivate
 {
 public:
-    BaiIndexedBamReaderPrivate(const BamFile& file) { LoadIndex(file.Filename()); }
+    BaiIndexedBamReaderPrivate(BamFile file) : file_{std::move(file)} { LoadIndex(); }
 
-    BaiIndexedBamReaderPrivate(const BamFile& file, const GenomicInterval& interval)
-        : BaiIndexedBamReaderPrivate(file)
+    BaiIndexedBamReaderPrivate(BamFile file, const GenomicInterval& interval)
+        : BaiIndexedBamReaderPrivate{std::move(file)}
     {
-        Interval(file.Header(), interval);
+        Interval(file_.Header(), interval);
     }
 
     void Interval(const BamHeader& header, const GenomicInterval& interval)
@@ -49,8 +49,9 @@ public:
         }
     }
 
-    void LoadIndex(const std::string& fn)
+    void LoadIndex()
     {
+        const auto& fn = file_.Filename();
         htsIndex_.reset(bam_index_load(fn.c_str()));
         if (!htsIndex_)
             throw std::runtime_error{
@@ -63,6 +64,7 @@ public:
         return hts_itr_next(bgzf, htsIterator_.get(), b, nullptr);
     }
 
+    BamFile file_;
     GenomicInterval interval_;
     std::unique_ptr<hts_idx_t, HtslibIndexDeleter> htsIndex_;
     std::unique_ptr<hts_itr_t, HtslibIteratorDeleter> htsIterator_;
@@ -70,24 +72,23 @@ public:
 
 BaiIndexedBamReader::BaiIndexedBamReader(std::string filename)
     : BaiIndexedBamReader{BamFile{std::move(filename)}}
-{
-}
+{}
 
 BaiIndexedBamReader::BaiIndexedBamReader(BamFile bamFile)
-    : BamReader{std::move(bamFile)}, d_{std::make_unique<BaiIndexedBamReaderPrivate>(File())}
-{
-}
+    : BamReader{bamFile.Filename()}
+    , d_{std::make_unique<BaiIndexedBamReaderPrivate>(std::move(bamFile))}
+{}
 
 BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval, std::string filename)
     : BaiIndexedBamReader{interval, BamFile{std::move(filename)}}
-{
-}
+{}
 
 BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval, BamFile bamFile)
-    : BamReader{std::move(bamFile)}
-    , d_{std::make_unique<BaiIndexedBamReaderPrivate>(File(), interval)}
-{
-}
+    : BamReader{bamFile.Filename()}
+    , d_{std::make_unique<BaiIndexedBamReaderPrivate>(std::move(bamFile), interval)}
+{}
+
+const BamFile& BaiIndexedBamReader::File() const { return d_->file_; }
 
 const GenomicInterval& BaiIndexedBamReader::Interval() const
 {

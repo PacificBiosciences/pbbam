@@ -88,6 +88,8 @@ public:
     /// \name Filtering & Index Data
     /// \{
 
+    const BamFile& File() const;
+
     /// \returns the current filter active on this reader
     const PbiFilter& Filter() const;
 

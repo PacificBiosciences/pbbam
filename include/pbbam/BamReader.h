@@ -34,6 +34,9 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
+    /// \brief Opens BAM for streaming from stdin
+    BamReader();
+
     /// \brief Opens BAM file for reading.
     ///
     /// \param[in] fn %BAM filename
@@ -55,9 +58,6 @@ public:
 public:
     /// \name BAM File Attributes
     /// \{
-
-    /// \returns the underlying BamFile
-    const BamFile& File() const;
 
     /// \returns %BAM filename
     const std::string& Filename() const;

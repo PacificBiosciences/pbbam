@@ -11,11 +11,13 @@
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
+#include <iostream>
 #include <sstream>
 
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
+#include <boost/optional.hpp>
 
 #include "Autovalidate.h"
 #include "MemoryUtils.h"
@@ -28,60 +30,39 @@ namespace BAM {
 class BamReader::BamReaderPrivate
 {
 public:
-    explicit BamReaderPrivate(BamFile bamFile) : bamFile_{std::move(bamFile)} { DoOpen(); }
-
-    void DoOpen()
+    explicit BamReaderPrivate(std::string fn) : filename_{std::move(fn)}
     {
-        // fetch file pointer
-        htsFile_.reset(sam_open(bamFile_.Filename().c_str(), "rb"));
-        if (!htsFile_)
+        htsFile_.reset(sam_open(filename_.c_str(), "rb"));
+        if (!htsFile_ || !htsFile_->fp.bgzf) {
             throw std::runtime_error{"BamReader: could not open BAM file for reading: " +
-                                     bamFile_.Filename()};
+                                     filename_};
+        }
+
+        std::unique_ptr<bam_hdr_t, HtslibHeaderDeleter> hdr(sam_hdr_read(htsFile_.get()));
+        header_ = BamHeaderMemory::FromRawData(hdr.get());
     }
 
+    std::string filename_;
     std::unique_ptr<samFile, HtslibFileDeleter> htsFile_;
-    BamFile bamFile_;
+    BamHeader header_;
 };
 
-BamReader::BamReader(std::string fn) : BamReader{BamFile{std::move(fn)}} {}
+BamReader::BamReader() : d_{std::make_unique<BamReaderPrivate>("-")} {}
 
-BamReader::BamReader(BamFile bamFile) : d_{std::make_unique<BamReaderPrivate>(std::move(bamFile))}
-{
-    // skip header
-    VirtualSeek(d_->bamFile_.FirstAlignmentOffset());
-}
+BamReader::BamReader(std::string fn) : d_{std::make_unique<BamReaderPrivate>(std::move(fn))} {}
+
+BamReader::BamReader(BamFile bamFile) : BamReader(bamFile.Filename()) {}
 
 BamReader::~BamReader() = default;
 
-BGZF* BamReader::Bgzf() const
-{
-    assert(d_);
-    assert(d_->htsFile_);
-    assert(d_->htsFile_->fp.bgzf);
-    return d_->htsFile_->fp.bgzf;
-}
+BGZF* BamReader::Bgzf() const { return d_->htsFile_->fp.bgzf; }
 
-const BamFile& BamReader::File() const
-{
-    assert(d_);
-    return d_->bamFile_;
-}
+const std::string& BamReader::Filename() const { return d_->filename_; }
 
-const std::string& BamReader::Filename() const
-{
-    assert(d_);
-    return d_->bamFile_.Filename();
-}
-
-const BamHeader& BamReader::Header() const
-{
-    assert(d_);
-    return d_->bamFile_.Header();
-}
+const BamHeader& BamReader::Header() const { return d_->header_; }
 
 bool BamReader::GetNext(BamRecord& record)
 {
-    assert(Bgzf());
     assert(BamRecordMemory::GetRawData(record).get());
 
     const auto result = ReadRawData(Bgzf(), BamRecordMemory::GetRawData(record).get());
@@ -89,7 +70,7 @@ bool BamReader::GetNext(BamRecord& record)
     // success
     if (result >= 0) {
         BamRecordMemory::UpdateRecordTags(record);
-        record.header_ = Header();
+        record.header_ = d_->header_;
         record.ResetCachedPositions();
 
 #if PBBAM_AUTOVALIDATE
@@ -113,8 +94,7 @@ bool BamReader::GetNext(BamRecord& record)
         else if (result == -4)
             msg << "could not read BAM record's' variable-length data";
         else
-            msg << "unknown reason";
-        msg << " (status code = " << result << ')';
+            msg << "unknown reason (status code = " << result << ") (" << Filename() << ')';
         throw std::runtime_error{msg.str()};
     }
 }
@@ -124,12 +104,7 @@ int BamReader::ReadRawData(BGZF* bgzf, bam1_t* b) { return bam_read1(bgzf, b); }
 void BamReader::VirtualSeek(int64_t virtualOffset)
 {
     const auto result = bgzf_seek(Bgzf(), virtualOffset, SEEK_SET);
-    if (result != 0) {
-        std::ostringstream s;
-        s << "BamReader: failed to seek in file: " << Filename() << " (offset = " << virtualOffset
-          << ')';
-        throw std::runtime_error{s.str()};
-    }
+    if (result != 0) throw std::runtime_error{"Failed to seek in BAM file"};
 }
 
 int64_t BamReader::VirtualTell() const { return bgzf_tell(Bgzf()); }
