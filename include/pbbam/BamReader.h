@@ -18,6 +18,7 @@
 #include "pbbam/BamRecord.h"
 #include "pbbam/Config.h"
 #include "pbbam/GenomicInterval.h"
+#include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {
 namespace BAM {
@@ -28,7 +29,7 @@ namespace BAM {
 /// records. Derived classes may implement other access schemes (e.g. genomic
 /// region, PBI-enabled record filtering).
 ///
-class PBBAM_EXPORT BamReader
+class PBBAM_EXPORT BamReader : public internal::IQuery
 {
 public:
     /// \name Constructors & Related Methods

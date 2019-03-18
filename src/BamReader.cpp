@@ -47,9 +47,12 @@ public:
     BamHeader header_;
 };
 
-BamReader::BamReader() : d_{std::make_unique<BamReaderPrivate>("-")} {}
+BamReader::BamReader() : internal::IQuery(), d_{std::make_unique<BamReaderPrivate>("-")} {}
 
-BamReader::BamReader(std::string fn) : d_{std::make_unique<BamReaderPrivate>(std::move(fn))} {}
+BamReader::BamReader(std::string fn)
+    : internal::IQuery(), d_{std::make_unique<BamReaderPrivate>(std::move(fn))}
+{
+}
 
 BamReader::BamReader(BamFile bamFile) : BamReader(bamFile.Filename()) {}
 
