@@ -72,21 +72,25 @@ public:
 
 BaiIndexedBamReader::BaiIndexedBamReader(std::string filename)
     : BaiIndexedBamReader{BamFile{std::move(filename)}}
-{}
+{
+}
 
 BaiIndexedBamReader::BaiIndexedBamReader(BamFile bamFile)
     : BamReader{bamFile.Filename()}
     , d_{std::make_unique<BaiIndexedBamReaderPrivate>(std::move(bamFile))}
-{}
+{
+}
 
 BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval, std::string filename)
     : BaiIndexedBamReader{interval, BamFile{std::move(filename)}}
-{}
+{
+}
 
 BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval, BamFile bamFile)
     : BamReader{bamFile.Filename()}
     , d_{std::make_unique<BaiIndexedBamReaderPrivate>(std::move(bamFile), interval)}
-{}
+{
+}
 
 const BamFile& BaiIndexedBamReader::File() const { return d_->file_; }
 

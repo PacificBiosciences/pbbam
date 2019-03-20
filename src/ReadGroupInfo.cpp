@@ -264,7 +264,7 @@ BarcodeQualityType BarcodeQualityFromName(const std::string& name)
 
 PlatformModelType PlatformModelFromName(std::string name) { return nameToPlatformModel.at(name); }
 
-}  // anonymous
+}  // namespace
 
 ReadGroupInfo::ReadGroupInfo(std::string baseId, std::pair<uint16_t, uint16_t> barcodes)
 
@@ -341,6 +341,8 @@ bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
            boost::algorithm::equal(custom_.cbegin(), custom_.cend(), other.custom_.cbegin(),
                                    other.custom_.cend());
 }
+
+bool ReadGroupInfo::operator<(const ReadGroupInfo& other) const { return id_ < other.id_; }
 
 size_t ReadGroupInfo::BarcodeCount() const
 {
