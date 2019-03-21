@@ -73,6 +73,9 @@ public:
     /// \name Random-Access
     /// \{
 
+    /// \returns the underlying BamFile
+    const BamFile& File() const;
+
     /// \returns the current GenomicInterval in use by this reader
     const GenomicInterval& Interval() const;
 
