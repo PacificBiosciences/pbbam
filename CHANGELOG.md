@@ -10,6 +10,12 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.23.1] - 2019-03-21
+
+### Added
+ - Streamable BamReader (via stdin).
+ - Enabled range-for on BamReader, compatible with the other *Query inputs.
+
 ## [0.23.0] - 2019-03-11
 
 ### Added
