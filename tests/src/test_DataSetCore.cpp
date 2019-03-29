@@ -510,3 +510,40 @@ TEST(DataSetCoreTest, EnsureCreatedAtAttribute)
     EXPECT_FALSE(ds.CreatedAt().empty());
     EXPECT_FALSE(ref.CreatedAt().empty());
 }
+
+TEST(DataSetCoreTest, BiosamplesOk)
+{
+    const std::string barcode_1_1{"lbc1--lbc1"};
+    const std::string barcode_1_2{"lbc1--lbc2"};
+    const std::string barcode_2_1{"lbc2--lbc1"};
+    const std::string barcode_2_2{"lbc2--lbc2"};
+
+    BioSample alice{"Alice"};
+    alice.DNABarcodes().Add(barcode_1_1);
+    alice.DNABarcodes().Add(barcode_1_2);
+
+    EXPECT_EQ("Alice", alice.Name());
+    ASSERT_EQ(2, alice.DNABarcodes().Size());
+    EXPECT_EQ(barcode_1_1, alice.DNABarcodes()[0].Name());
+    EXPECT_EQ(barcode_1_2, alice.DNABarcodes()[1].Name());
+
+    BioSample bob{"Bob"};
+    bob.DNABarcodes().Add(barcode_2_1);
+    bob.DNABarcodes().Add(barcode_2_2);
+
+    EXPECT_EQ("Bob", bob.Name());
+    ASSERT_EQ(2, bob.DNABarcodes().Size());
+    EXPECT_EQ(barcode_2_1, bob.DNABarcodes()[0].Name());
+    EXPECT_EQ(barcode_2_2, bob.DNABarcodes()[1].Name());
+
+    DataSet dataset;
+    DataSetMetadata& metadata = dataset.Metadata();
+    EXPECT_EQ(0, metadata.BioSamples().Size());
+
+    metadata.BioSamples().Add(alice);
+    metadata.BioSamples().Add(bob);
+
+    ASSERT_EQ(2, metadata.BioSamples().Size());
+    EXPECT_EQ("Alice", metadata.BioSamples()[0].Name());
+    EXPECT_EQ("Bob", metadata.BioSamples()[1].Name());
+}

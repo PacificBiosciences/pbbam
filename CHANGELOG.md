@@ -10,6 +10,9 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+### Added
+ - Built-in support for dataset elements: BioSample(s) & DNABarcode(s) 
+
 ## [0.23.1] - 2019-03-21
 
 ### Added
