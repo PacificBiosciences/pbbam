@@ -24,11 +24,18 @@ class PBBAM_EXPORT DNABarcode : public internal::DataSetElement
 {
 public:
     DNABarcode(const std::string& name);
+    DNABarcode(const std::string& name, const std::string& uuid);
     DNABarcode(const std::string& name, const internal::FromInputXml& fromInputXml);
+    DNABarcode(const std::string& name, const std::string& uuid,
+               const internal::FromInputXml& fromInputXml);
 
     const std::string& Name() const;
     std::string& Name();
     DNABarcode& Name(const std::string& name);
+
+    const std::string& UniqueId() const;
+    std::string& UniqueId();
+    DNABarcode& UniqueId(const std::string& name);
 };
 
 /// \brief The DNABarcodes class represents an %DNABarcodes element in DataSetXML.

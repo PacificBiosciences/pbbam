@@ -454,12 +454,29 @@ DataSetMetadata& DataSetMetadata::TotalLength(const std::string& totalLength)
 DNABarcode::DNABarcode(const std::string& name) : DataSetElement("DNABarcode", XsdType::SAMPLE_INFO)
 {
     Name(name);
+    UniqueId(internal::GenerateUuid());
+}
+
+DNABarcode::DNABarcode(const std::string& name, const std::string& uuid)
+    : DataSetElement("DNABarcode", XsdType::SAMPLE_INFO)
+{
+    Name(name);
+    UniqueId(uuid);
 }
 
 DNABarcode::DNABarcode(const std::string& name, const internal::FromInputXml& fromInputXml)
     : DataSetElement("", fromInputXml, XsdType::SAMPLE_INFO)
 {
     Name(name);
+    UniqueId(internal::GenerateUuid());
+}
+
+DNABarcode::DNABarcode(const std::string& name, const std::string& uuid,
+                       const internal::FromInputXml& fromInputXml)
+    : DataSetElement("", fromInputXml, XsdType::SAMPLE_INFO)
+{
+    Name(name);
+    UniqueId(uuid);
 }
 
 const std::string& DNABarcode::Name() const { return Attribute("Name"); }
@@ -469,6 +486,16 @@ std::string& DNABarcode::Name() { return Attribute("Name"); }
 DNABarcode& DNABarcode::Name(const std::string& name)
 {
     Attribute("Name", name);
+    return *this;
+}
+
+const std::string& DNABarcode::UniqueId() const { return Attribute("UniqueId"); }
+
+std::string& DNABarcode::UniqueId() { return Attribute("UniqueId"); }
+
+DNABarcode& DNABarcode::UniqueId(const std::string& uuid)
+{
+    Attribute("UniqueId", uuid);
     return *this;
 }
 

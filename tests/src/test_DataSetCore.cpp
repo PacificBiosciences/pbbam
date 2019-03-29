@@ -526,15 +526,19 @@ TEST(DataSetCoreTest, BiosamplesOk)
     ASSERT_EQ(2, alice.DNABarcodes().Size());
     EXPECT_EQ(barcode_1_1, alice.DNABarcodes()[0].Name());
     EXPECT_EQ(barcode_1_2, alice.DNABarcodes()[1].Name());
+    EXPECT_FALSE(alice.DNABarcodes()[0].UniqueId().empty());
+    EXPECT_FALSE(alice.DNABarcodes()[1].UniqueId().empty());
 
     BioSample bob{"Bob"};
     bob.DNABarcodes().Add(barcode_2_1);
-    bob.DNABarcodes().Add(barcode_2_2);
+    bob.DNABarcodes().Add(DNABarcode{barcode_2_2, "explicit_uuid"});
 
     EXPECT_EQ("Bob", bob.Name());
     ASSERT_EQ(2, bob.DNABarcodes().Size());
     EXPECT_EQ(barcode_2_1, bob.DNABarcodes()[0].Name());
     EXPECT_EQ(barcode_2_2, bob.DNABarcodes()[1].Name());
+    EXPECT_FALSE(bob.DNABarcodes()[0].UniqueId().empty());
+    EXPECT_EQ("explicit_uuid", bob.DNABarcodes()[1].UniqueId());
 
     DataSet dataset;
     DataSetMetadata& metadata = dataset.Metadata();
