@@ -16,127 +16,103 @@
 namespace PacBio {
 namespace BAM {
 
-/// \brief The DataSetMetadata class represents the %DataSetMetadata child
-///        element in DataSetXML.
 ///
-/// A few top-level elements are built-in, but as pbbam is not primarily a
-/// DataSetXML API, most of the metadata hierarchy needs to be manually managed.
+/// \brief The DNABarcode class represents a %DNABarcode element in
+///        DataSetXML, consisting of a Name and optional UniqueId.
 ///
-class PBBAM_EXPORT DataSetMetadata : public internal::DataSetElement
+class PBBAM_EXPORT DNABarcode : public internal::DataSetElement
 {
 public:
-    /// \name Constructors & Related Methods
-    /// \{
+    DNABarcode(const std::string& name);
+    DNABarcode(const std::string& name, const std::string& uuid);
+    DNABarcode(const std::string& name, const internal::FromInputXml& fromInputXml);
+    DNABarcode(const std::string& name, const std::string& uuid,
+               const internal::FromInputXml& fromInputXml);
 
-    DataSetMetadata();
-    DataSetMetadata(const internal::FromInputXml& fromInputXml);
+    const std::string& Name() const;
+    std::string& Name();
+    DNABarcode& Name(const std::string& name);
 
-    /// \brief Constructs a DataSetMetadata with required fields.
-    DataSetMetadata(const std::string& numRecords, const std::string& totalLength);
-    DataSetMetadata(const std::string& numRecords, const std::string& totalLength,
-                    const internal::FromInputXml& fromInputXml);
+    const std::string& UniqueId() const;
+    std::string& UniqueId();
+    DNABarcode& UniqueId(const std::string& name);
+};
 
-    /// \}
+/// \brief The DNABarcodes class represents an %DNABarcodes element in DataSetXML.
+///
+/// The DNABarcodes element is essentially just a list of DNABarcode
+/// objects.
+///
+class PBBAM_EXPORT DNABarcodes : public internal::DataSetElement
+{
+public:
+    DNABarcodes();
+    DNABarcodes(const internal::FromInputXml& fromInputXml);
 
 public:
-    /// \name Operators
-    /// \{
-
-    /// \brief Merges DataSetMetadata contents.
-    ///
-    /// Adds contents of \p other to this metadata object
-    ///
-    /// \param[in] other  some other metadata to add to this one
-    /// \returns reference to this object
-    ///
-    DataSetMetadata& operator+=(const DataSetMetadata& other);
-
-    /// \}
+    void Add(const DNABarcode& barcode);
+    void Remove(const DNABarcode& barcode);
 
 public:
-    /// \name Child Elements
-    /// \{
+    using value_type = DNABarcode;
+    using iterator_type = internal::DataSetElementIterator<value_type>;
+    using const_iterator_type = internal::DataSetElementConstIterator<value_type>;
 
-    /// \brief Fetches the text of the NumRecords element.
-    ///
-    /// \returns const reference to element text (empty string if not present)
-    ///
-    const std::string& NumRecords() const;
+    const value_type& operator[](size_t index) const;
+    value_type& operator[](size_t index);
 
-    /// \brief Fetches the text of the TotalLength element.
-    ///
-    /// \returns const reference to element text (empty string if not present)
-    ///
-    const std::string& TotalLength() const;
+    iterator_type begin();
+    const_iterator_type begin() const;
+    const_iterator_type cbegin() const;
+    iterator_type end();
+    const_iterator_type end() const;
+    const_iterator_type cend() const;
+};
 
-    /// \brief Fetches the Provenance element.
-    ///
-    /// \returns const reference to child element
-    /// \throws std::runtime_error if element does not exist
-    ///
-    const PacBio::BAM::Provenance& Provenance() const;
+class PBBAM_EXPORT BioSample : public internal::DataSetElement
+{
+public:
+    BioSample(const std::string& name);
+    BioSample(const std::string& name, const internal::FromInputXml& fromInputXml);
 
-    /// \}
+    const PacBio::BAM::DNABarcodes& DNABarcodes() const;
+    PacBio::BAM::DNABarcodes& DNABarcodes();
+    BioSample& DNABarcodes(const PacBio::BAM::DNABarcodes& barcodes);
+
+    const std::string& Name() const;
+    std::string& Name();
+    BioSample& Name(const std::string& name);
+};
+
+/// \brief The DNABarcodes class represents an %DNABarcodes element in DataSetXML.
+///
+/// The DNABarcodes element is essentially just a list of DNABarcode
+/// objects.
+///
+class PBBAM_EXPORT BioSamples : public internal::DataSetElement
+{
+public:
+    BioSamples();
+    BioSamples(const internal::FromInputXml& fromInputXml);
 
 public:
-    /// \name Child Elements
-    /// \{
-
-    /// \brief Fetches the text of the NumRecords element.
-    ///
-    /// This element will be created if it does not yet exist.
-    ///
-    /// \returns non-const reference to element text
-    ///
-    std::string& NumRecords();
-
-    /// \brief Fetches the text of the TotalLength element.
-    ///
-    /// This element will be created if it does not yet exist.
-    ///
-    /// \returns non-const reference to element text
-    ///
-    std::string& TotalLength();
-
-    /// \brief Fetches Provenance element.
-    ///
-    /// This element will be created if it does not yet exist.
-    ///
-    /// \returns non-const reference to child element
-    ///
-    PacBio::BAM::Provenance& Provenance();
-
-    /// \}
+    void Add(const BioSample& sample);
+    void Remove(const BioSample& sample);
 
 public:
-    /// \name Child Elements
-    /// \{
+    using value_type = BioSample;
+    using iterator_type = internal::DataSetElementIterator<value_type>;
+    using const_iterator_type = internal::DataSetElementConstIterator<value_type>;
 
-    /// \brief Sets the text of the NumRecords element.
-    ///
-    /// This element will be created if it does not yet exist.
-    ///
-    /// \returns reference to this metadata object
-    ///
-    DataSetMetadata& NumRecords(const std::string& numRecords);
+    const value_type& operator[](size_t index) const;
+    value_type& operator[](size_t index);
 
-    /// \brief Sets the text of the TotalLength element.
-    ///
-    /// This element will be created if it does not yet exist.
-    ///
-    /// \returns reference to this metadata object
-    ///
-    DataSetMetadata& TotalLength(const std::string& totalLength);
-
-    /// \brief Sets the Provenance child element.
-    ///
-    /// This element will be created if it does not yet exist.
-    ///
-    /// \returns reference to this metadata object
-    ///
-    DataSetMetadata& Provenance(const PacBio::BAM::Provenance& provenance);
-
-    /// \}
+    iterator_type begin();
+    const_iterator_type begin() const;
+    const_iterator_type cbegin() const;
+    iterator_type end();
+    const_iterator_type end() const;
+    const_iterator_type cend() const;
 };
 
 /// \brief The ExtensionElement class represents an %ExtensionElement element in
@@ -687,6 +663,152 @@ public:
     /// \returns reference to this dataset object
     ///
     Provenance& ParentTool(const PacBio::BAM::ParentTool& tool);
+};
+
+/// \brief The DataSetMetadata class represents the %DataSetMetadata child
+///        element in DataSetXML.
+///
+/// A few top-level elements are built-in, but as pbbam is not primarily a
+/// DataSetXML API, most of the metadata hierarchy needs to be manually managed.
+///
+class PBBAM_EXPORT DataSetMetadata : public internal::DataSetElement
+{
+public:
+    /// \name Constructors & Related Methods
+    /// \{
+
+    DataSetMetadata();
+    DataSetMetadata(const internal::FromInputXml& fromInputXml);
+
+    /// \brief Constructs a DataSetMetadata with required fields.
+    DataSetMetadata(const std::string& numRecords, const std::string& totalLength);
+    DataSetMetadata(const std::string& numRecords, const std::string& totalLength,
+                    const internal::FromInputXml& fromInputXml);
+
+    /// \}
+
+public:
+    /// \name Operators
+    /// \{
+
+    /// \brief Merges DataSetMetadata contents.
+    ///
+    /// Adds contents of \p other to this metadata object
+    ///
+    /// \param[in] other  some other metadata to add to this one
+    /// \returns reference to this object
+    ///
+    DataSetMetadata& operator+=(const DataSetMetadata& other);
+
+    /// \}
+
+public:
+    /// \name Child Elements
+    /// \{
+
+    /// \brief Fetches the text of the NumRecords element.
+    ///
+    /// \returns const reference to element text (empty string if not present)
+    ///
+    const std::string& NumRecords() const;
+
+    /// \brief Fetches the text of the TotalLength element.
+    ///
+    /// \returns const reference to element text (empty string if not present)
+    ///
+    const std::string& TotalLength() const;
+
+    /// \brief Fetches the Provenance element.
+    ///
+    /// \returns const reference to child element
+    /// \throws std::runtime_error if element does not exist
+    ///
+    const PacBio::BAM::Provenance& Provenance() const;
+
+    /// \brief Fetches the BioSamples element.
+    ///
+    /// \returns const reference to child element
+    /// \throws std::runtime_error if element does not exist
+    ///
+    const PacBio::BAM::BioSamples& BioSamples() const;
+
+    /// \}
+
+public:
+    /// \name Child Elements
+    /// \{
+
+    /// \brief Fetches the text of the NumRecords element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \returns non-const reference to element text
+    ///
+    std::string& NumRecords();
+
+    /// \brief Fetches the text of the TotalLength element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \returns non-const reference to element text
+    ///
+    std::string& TotalLength();
+
+    /// \brief Fetches Provenance element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \returns non-const reference to child element
+    ///
+    PacBio::BAM::Provenance& Provenance();
+
+    /// \brief Fetches BioSamples element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \returns non-const reference to child element
+    ///
+    PacBio::BAM::BioSamples& BioSamples();
+
+    /// \}
+
+public:
+    /// \name Child Elements
+    /// \{
+
+    /// \brief Sets the text of the NumRecords element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \returns reference to this metadata object
+    ///
+    DataSetMetadata& NumRecords(const std::string& numRecords);
+
+    /// \brief Sets the text of the TotalLength element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \returns reference to this metadata object
+    ///
+    DataSetMetadata& TotalLength(const std::string& totalLength);
+
+    /// \brief Sets the Provenance child element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \returns reference to this metadata object
+    ///
+    DataSetMetadata& Provenance(const PacBio::BAM::Provenance& provenance);
+
+    /// \brief Sets the BioSamples child element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \returns reference to this metadata object
+    ///
+    DataSetMetadata& BioSamples(const PacBio::BAM::BioSamples& samples);
+
+    /// \}
 };
 
 class SubDataSets;
