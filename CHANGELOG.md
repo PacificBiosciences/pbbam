@@ -10,8 +10,12 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.24.0] - 2019-04-05
+
 ### Added
- - Built-in support for dataset elements: BioSample(s) & DNABarcode(s) 
+ - Built-in support for dataset elements: BioSample(s) & DNABarcode(s).
+ - BaiIndexCache for reusing data from *.bai files(s).
+ - Support in GenomicIntervalQuery for new BaiIndexCache.
 
 ## [0.23.1] - 2019-03-21
 
