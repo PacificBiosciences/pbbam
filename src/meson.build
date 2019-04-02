@@ -5,6 +5,7 @@
 pbbam_cpp_sources = files([
   'Accuracy.cpp',
   'AlignmentPrinter.cpp',
+  'BaiIndexCache.cpp',
   'BaiIndexedBamReader.cpp',
   'BamFile.cpp',
   'BamFileMerger.cpp',
