@@ -13,6 +13,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "pbbam/BaiIndexCache.h"
 #include "pbbam/BaiIndexedBamReader.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/BamHeader.h"
@@ -87,6 +88,8 @@ public:
     ///         for reading, or if the interval is invalid
     ///
     GenomicIntervalCompositeBamReader(const std::vector<BamFile>& bamFiles);
+    GenomicIntervalCompositeBamReader(const std::vector<BamFile>& bamFiles,
+                                      const BaiIndexCache& cache);
 
     /// \brief Constructs composite %BAM reader, that can be queried on genomic interval.
     ///
@@ -99,6 +102,7 @@ public:
     ///         for reading, or if the interval is invalid
     ///
     GenomicIntervalCompositeBamReader(const DataSet& dataset);
+    GenomicIntervalCompositeBamReader(const DataSet& dataset, const BaiIndexCache& cache);
 
     /// \brief Constructs composite %BAM reader, limiting record results to
     ///        only those overalpping a GenomicInterval.
@@ -111,6 +115,9 @@ public:
     ///
     GenomicIntervalCompositeBamReader(const GenomicInterval& interval,
                                       const std::vector<BamFile>& bamFiles);
+    GenomicIntervalCompositeBamReader(const GenomicInterval& interval,
+                                      const std::vector<BamFile>& bamFiles,
+                                      const BaiIndexCache& cache);
 
     /// \brief Constructs composite %BAM reader, limiting record results to
     ///        only those overalpping a GenomicInterval.
@@ -122,6 +129,8 @@ public:
     ///         BAI files.
     ///
     GenomicIntervalCompositeBamReader(const GenomicInterval& interval, const DataSet& dataset);
+    GenomicIntervalCompositeBamReader(const GenomicInterval& interval, const DataSet& dataset,
+                                      const BaiIndexCache& cache);
 
     /// \}
 
@@ -152,6 +161,7 @@ private:
     void UpdateSort();
 
 private:
+    BaiIndexCache indexCache_;
     GenomicInterval interval_;
     std::deque<internal::CompositeMergeItem> mergeItems_;
     std::vector<std::string> filenames_;

@@ -7,6 +7,7 @@ if not meson.is_subproject()
     files([
       'pbbam/Accuracy.h',
       'pbbam/AlignmentPrinter.h',
+      'pbbam/BaiIndexCache.h',
       'pbbam/BaiIndexedBamReader.h',
       'pbbam/BamFile.h',
       'pbbam/BamFileMerger.h',
