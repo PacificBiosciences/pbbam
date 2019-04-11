@@ -5,12 +5,18 @@
 
 #include <gtest/gtest.h>
 
+#include "../src/FileUtils.h"
+#include "PbbamTestData.h"
+
 #include <pbbam/DataSet.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
 
 namespace DataSetCoreTests {
+
+const std::string subreadsetBioSample =
+    PbbamTestsConfig::Data_Dir + "/dataset/biosample.subreadset.xml";
 
 static inline DataSet CreateDataSet()
 {
@@ -550,4 +556,14 @@ TEST(DataSetCoreTest, BiosamplesOk)
     ASSERT_EQ(2, metadata.BioSamples().Size());
     EXPECT_EQ("Alice", metadata.BioSamples()[0].Name());
     EXPECT_EQ("Bob", metadata.BioSamples()[1].Name());
+}
+
+TEST(DataSetCoreTest, BiosamplesFromXML)
+{
+    BAM::DataSet ds{DataSetCoreTests::subreadsetBioSample};
+    const auto& metadata = ds.Metadata();
+    const auto& biosamples = metadata.BioSamples();
+
+    ASSERT_EQ(1, biosamples.Size());
+    EXPECT_EQ("test test", biosamples[0].Name());
 }

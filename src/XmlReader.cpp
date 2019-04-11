@@ -74,6 +74,10 @@ std::shared_ptr<DataSetElement> MakeElement(const pugi::xml_node& xmlNode)
     switch (type) {
         case XmlElementType::DATASET_METADATA:
             return std::make_shared<DataSetMetadata>(fromInputXml);
+        case XmlElementType::BIOSAMPLE:
+            return std::make_shared<BioSample>("", fromInputXml);
+        case XmlElementType::BIOSAMPLES:
+            return std::make_shared<BioSamples>(fromInputXml);
         case XmlElementType::EXTENSION:
             return std::make_shared<ExtensionElement>(fromInputXml);
         case XmlElementType::EXTENSIONS:
