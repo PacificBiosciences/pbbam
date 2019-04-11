@@ -27,6 +27,8 @@ using ElementType = PacBio::BAM::XmlElementType;
 const std::unordered_map<std::string, PacBio::BAM::XmlElementType> elementTypeLookup
 {
     {"DataSetMetadata",        ElementType::DATASET_METADATA},
+    {"BioSample",              ElementType::BIOSAMPLE},
+    {"BioSamples",             ElementType::BIOSAMPLES},
     {"ExtensionElement",       ElementType::EXTENSION},
     {"Extensions",             ElementType::EXTENSIONS},
     {"ExternalResource",       ElementType::EXTERNAL_RESOURCE},
