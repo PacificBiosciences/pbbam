@@ -10,6 +10,14 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [0.25.0] - 2019-04-11
+
+### Changed
+ - Requires C++14 at minimum.
+
+### Fixed
+ - Reading BioSample(s) elements from DataSet XML.
+
 ## [0.24.0] - 2019-04-05
 
 ### Added

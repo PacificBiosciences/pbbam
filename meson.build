@@ -1,11 +1,11 @@
 project(
   'PacBioBAM',
   'cpp',
-  version : '0.24.0',
+  version : '0.25.0',
   default_options : [
     'buildtype=release',
     'warning_level=3',
-    'cpp_std=c++11',
+    'cpp_std=c++14',
     'b_ndebug=if-release'],
   license : 'BSD-3',
   meson_version : '>= 0.46.0')
