@@ -13,7 +13,6 @@
 #include <boost/optional.hpp>
 
 #include "pbbam/CompositeBamReader.h"
-#include "pbbam/MakeUnique.h"
 
 namespace PacBio {
 namespace BAM {

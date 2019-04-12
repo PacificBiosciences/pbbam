@@ -11,7 +11,6 @@
 #include <typeinfo>
 #include <vector>
 
-#include "pbbam/MakeUnique.h"
 #include "pbbam/StringUtilities.h"
 #include "pugixml/pugixml.hpp"
 

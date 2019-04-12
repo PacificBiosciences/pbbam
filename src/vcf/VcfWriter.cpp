@@ -5,7 +5,6 @@
 #include <fstream>
 #include <iostream>
 
-#include <pbbam/MakeUnique.h>
 #include <pbbam/vcf/VcfFormat.h>
 #include <pbbam/vcf/VcfHeader.h>
 #include <pbbam/vcf/VcfVariant.h>

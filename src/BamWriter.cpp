@@ -17,7 +17,6 @@
 #include "FileProducer.h"
 #include "MemoryUtils.h"
 #include "pbbam/BamFile.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/Unused.h"
 #include "pbbam/Validator.h"
 

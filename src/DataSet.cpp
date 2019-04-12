@@ -26,7 +26,6 @@
 #include "FileUtils.h"
 #include "TimeUtils.h"
 
-#include "pbbam/MakeUnique.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 
 namespace PacBio {

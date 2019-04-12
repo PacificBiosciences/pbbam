@@ -14,8 +14,6 @@
 #include <string>
 #include <vector>
 
-#include "pbbam/MakeUnique.h"
-
 namespace PacBio {
 namespace BAM {
 namespace internal {

@@ -26,7 +26,6 @@
 #include "MemoryUtils.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamRecordImpl.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiRawData.h"
 #include "pbbam/RecordType.h"
 

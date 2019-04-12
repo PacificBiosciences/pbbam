@@ -21,7 +21,6 @@
 
 #include "Autovalidate.h"
 #include "MemoryUtils.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/Validator.h"
 
 namespace PacBio {
