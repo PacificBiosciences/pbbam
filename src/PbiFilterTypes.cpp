@@ -92,7 +92,7 @@ PbiFilter filterFromMovieName(const std::string& movieName, bool includeCcs)
     return filter;
 }
 
-}  // anonymous
+}  // namespace
 
 // PbiAlignedLengthFilter
 
@@ -134,11 +134,11 @@ PbiMovieNameFilter::PbiMovieNameFilter(const std::string& movieName, const Compa
 {
 }
 
-PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& whitelist,
+PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& movieNames,
                                        const Compare::Type cmp)
     : compositeFilter_{PbiFilter::UNION}, cmp_{cmp}
 {
-    for (const auto& movieName : whitelist)
+    for (const auto& movieName : movieNames)
         compositeFilter_.Add(filterFromMovieName(movieName, true));  // include CCS
 }
 
@@ -164,11 +164,11 @@ public:
     using ZmwLookupPtr = std::shared_ptr<ZmwLookup>;  // may be shared by more than one rgId
     using RgIdLookup = std::unordered_map<int32_t, ZmwLookupPtr>;
 
-    PbiQueryNameFilterPrivate(const std::vector<std::string>& whitelist,
+    PbiQueryNameFilterPrivate(const std::vector<std::string>& queryNames,
                               const Compare::Type cmp = Compare::EQUAL)
         : cmp_{cmp}
     {
-        for (const auto& queryName : whitelist) {
+        for (const auto& queryName : queryNames) {
 
             if (queryName.find("transcript/") == 0)
                 HandleName(queryName, RecordType::TRANSCRIPT);
@@ -191,28 +191,30 @@ public:
     {
         const auto& basicData = idx.BasicData();
 
-        // see if row's RGID known
-        const auto& rgId = basicData.rgId_.at(row);
-        const auto rgFound = lookup_.find(rgId);
-        if (rgFound == lookup_.end()) return false;
+        const bool found = [&]() {
+            // see if row's RGID known
+            const auto& rgId = basicData.rgId_.at(row);
+            const auto rgFound = lookup_.find(rgId);
+            if (rgFound == lookup_.end()) return false;
 
-        // see if row's ZMW known
-        const auto& zmwPtr = rgFound->second;
-        const auto zmw = basicData.holeNumber_.at(row);
-        const auto zmwFound = zmwPtr->find(zmw);
-        if (zmwFound == zmwPtr->end()) return false;
+            // see if row's ZMW known
+            const auto& zmwPtr = rgFound->second;
+            const auto zmw = basicData.holeNumber_.at(row);
+            const auto zmwFound = zmwPtr->find(zmw);
+            if (zmwFound == zmwPtr->end()) return false;
 
-        // see if row's QueryStart/QueryEnd known
-        // CCS names already covered in lookup construction phase
-        const auto& queryIntervals = zmwFound->second;
-        const auto qStart = basicData.qStart_.at(row);
-        const auto qEnd = basicData.qEnd_.at(row);
-        const auto queryInterval = std::make_pair(qStart, qEnd);
+            // see if row's QueryStart/QueryEnd known
+            // CCS names already covered in lookup construction phase
+            const auto& queryIntervals = zmwFound->second;
+            const auto qStart = basicData.qStart_.at(row);
+            const auto qEnd = basicData.qEnd_.at(row);
+            const auto queryInterval = std::make_pair(qStart, qEnd);
+            return (queryIntervals.find(queryInterval) != queryIntervals.end());
+        }();
 
-        const bool found = queryIntervals.find(queryInterval) != queryIntervals.end();
-        if (cmp_ == Compare::EQUAL)
+        if (cmp_ == Compare::EQUAL || cmp_ == Compare::CONTAINS)
             return found;
-        else if (cmp_ == Compare::NOT_EQUAL)
+        else if (cmp_ == Compare::NOT_EQUAL || cmp_ == Compare::NOT_CONTAINS)
             return !found;
         else
             throw std::runtime_error{"PbiFilter: unsupported compare type on query name filter"};
@@ -318,9 +320,9 @@ PbiQueryNameFilter::PbiQueryNameFilter(const std::string& qname, const Compare::
 {
 }
 
-PbiQueryNameFilter::PbiQueryNameFilter(const std::vector<std::string>& whitelist,
+PbiQueryNameFilter::PbiQueryNameFilter(const std::vector<std::string>& queryNames,
                                        const Compare::Type cmp)
-    : d_{std::make_unique<PbiQueryNameFilter::PbiQueryNameFilterPrivate>(whitelist, cmp)}
+    : d_{std::make_unique<PbiQueryNameFilter::PbiQueryNameFilterPrivate>(queryNames, cmp)}
 {
 }
 
@@ -338,21 +340,25 @@ bool PbiQueryNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
 
 // PbiReadGroupFilter
 
-PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<int32_t>& whitelist,
-                                       const Compare::Type cmp)
+PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<int32_t>& rgIds, const Compare::Type cmp)
     : cmp_{cmp}
 {
-    if (cmp_ != Compare::EQUAL && cmp_ != Compare::NOT_EQUAL) {
-        throw std::runtime_error{"PbiFilter: unsupported compare type (" +
-                                 Compare::TypeToName(cmp) +
-                                 ") for this property. "
-                                 "Read group filter can only compare EQUAL or NOT_EQUAL."};
+    if (cmp_ == Compare::EQUAL)
+        cmp_ = Compare::CONTAINS;
+    else if (cmp_ == Compare::NOT_EQUAL)
+        cmp_ = Compare::NOT_CONTAINS;
+
+    if (cmp_ != Compare::CONTAINS && cmp_ != Compare::NOT_CONTAINS) {
+        throw std::runtime_error{
+            "PbiFilter: unsupported compare type (" + Compare::TypeToName(cmp) +
+            ") for this property. "
+            "Read group filter can only compare equality or presence in whitelist/blacklist."};
     }
 
     // Add RG ID & empty filter if not present. The empty filter will work for
     // non-barcoded IDs that match the expected number(s).
     //
-    for (const auto& rgId : whitelist) {
+    for (const auto& rgId : rgIds) {
         const auto found = lookup_.find(rgId);
         if (found == lookup_.cend()) lookup_.emplace(rgId, boost::none);
     }
@@ -363,18 +369,23 @@ PbiReadGroupFilter::PbiReadGroupFilter(const int32_t rgId, const Compare::Type c
 {
 }
 
-PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<ReadGroupInfo>& whitelist,
+PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<ReadGroupInfo>& readGroups,
                                        const Compare::Type cmp)
     : cmp_{cmp}
 {
-    if (cmp_ != Compare::EQUAL && cmp_ != Compare::NOT_EQUAL) {
-        throw std::runtime_error{"PbiFilter: unsupported compare type (" +
-                                 Compare::TypeToName(cmp) +
-                                 ") for this property. "
-                                 "Read group filter can only compare EQUAL or NOT_EQUAL."};
+    if (cmp_ == Compare::EQUAL)
+        cmp_ = Compare::CONTAINS;
+    else if (cmp_ == Compare::NOT_EQUAL)
+        cmp_ = Compare::NOT_CONTAINS;
+
+    if (cmp_ != Compare::CONTAINS && cmp_ != Compare::NOT_CONTAINS) {
+        throw std::runtime_error{
+            "PbiFilter: unsupported compare type (" + Compare::TypeToName(cmp) +
+            ") for this property. "
+            "Read group filter can only compare equality or presence in whitelist/blacklist."};
     }
 
-    for (const auto& rg : whitelist) {
+    for (const auto& rg : readGroups) {
         // Add RG base ID with no filter if not present. The empty filter will
         // work for non-barcoded IDs. We'll add to it if the base read group ID
         // also has barcode labels,so that any barcode pair whitelisted for this
@@ -401,11 +412,11 @@ PbiReadGroupFilter::PbiReadGroupFilter(const ReadGroupInfo& rg, const Compare::T
 {
 }
 
-PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<std::string>& whitelist,
+PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<std::string>& rgIds,
                                        const Compare::Type cmp)
 {
     std::vector<ReadGroupInfo> readGroups;
-    for (const auto rgId : whitelist)
+    for (const auto rgId : rgIds)
         readGroups.push_back(rgId);
     *this = PbiReadGroupFilter{readGroups, cmp};
 }
@@ -439,10 +450,10 @@ bool PbiReadGroupFilter::Accepts(const PbiRawData& idx, const size_t row) const
             }
         }
         return false;
-
     }(idx, row);
 
-    return (cmp_ == Compare::EQUAL ? accepted : !accepted);
+    assert(cmp_ == Compare::CONTAINS || cmp_ == Compare::NOT_CONTAINS);
+    return (cmp_ == Compare::CONTAINS ? accepted : !accepted);
 }
 
 // PbiReferenceNameFilter
@@ -450,18 +461,14 @@ bool PbiReadGroupFilter::Accepts(const PbiRawData& idx, const size_t row) const
 PbiReferenceNameFilter::PbiReferenceNameFilter(std::string rname, Compare::Type cmp)
     : rname_{std::move(rname)}, cmp_{cmp}
 {
-    if (cmp != Compare::EQUAL && cmp != Compare::NOT_EQUAL) {
-        throw std::runtime_error{"PbiFilter: unsupported compare type (" +
-                                 Compare::TypeToName(cmp) +
-                                 ") for this property. "
-                                 "Reference name filter can only compare EQUAL or NOT_EQUAL."};
-    }
+    Validate();
 }
 
-PbiReferenceNameFilter::PbiReferenceNameFilter(std::vector<std::string> whitelist,
+PbiReferenceNameFilter::PbiReferenceNameFilter(std::vector<std::string> rnames,
                                                const Compare::Type cmp)
-    : rnameWhitelist_{std::move(whitelist)}, cmp_{cmp}
+    : rnameWhitelist_{std::move(rnames)}, cmp_{cmp}
 {
+    Validate();
 }
 
 bool PbiReferenceNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
@@ -472,6 +479,8 @@ bool PbiReferenceNameFilter::Accepts(const PbiRawData& idx, const size_t row) co
 
 void PbiReferenceNameFilter::Initialize(const PbiRawData& idx) const
 {
+
+    // fetch BAM header info associate with this index
     const auto pbiFilename = idx.Filename();
     const auto bamFilename = pbiFilename.substr(0, pbiFilename.length() - 4);
     const BamFile bamFile{bamFilename};
@@ -482,7 +491,7 @@ void PbiReferenceNameFilter::Initialize(const PbiRawData& idx) const
         subFilter_ = PbiReferenceIdFilter{tId, cmp_};
     }
 
-    // multi-value whitelist
+    // multi-value (whitelist/blacklist)
     else {
         std::vector<int32_t> ids;
         for (const auto& rname : rnameWhitelist_.get())
@@ -490,6 +499,24 @@ void PbiReferenceNameFilter::Initialize(const PbiRawData& idx) const
         subFilter_ = PbiReferenceIdFilter{std::move(ids), cmp_};
     }
     initialized_ = true;
+}
+
+void PbiReferenceNameFilter::Validate() const
+{
+    // double-check valid compare type
+    const bool compareTypeOk = [&]() {
+        if (cmp_ == Compare::EQUAL) return true;
+        if (cmp_ == Compare::NOT_EQUAL) return true;
+        if (cmp_ == Compare::CONTAINS) return true;
+        if (cmp_ == Compare::NOT_CONTAINS) return true;
+        return false;
+    }();
+    if (!compareTypeOk) {
+        throw std::runtime_error{
+            "PbiFilter: unsupported compare type (" + Compare::TypeToName(cmp_) +
+            ") for this property. "
+            "Reference name filter can only compare equality or presence in whitelist/blacklist."};
+    }
 }
 
 }  // namespace BAM

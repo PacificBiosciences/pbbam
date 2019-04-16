@@ -845,3 +845,76 @@ TEST(PbiFilterQueryTest, CanReusePbiIndexCache)
         EXPECT_EQ(150, count);
     }
 }
+
+TEST(PbiFilterQueryTest, ConsistentWhitelistAndBlacklist)
+{
+    const std::string fn{PbbamTestsConfig::Data_Dir + "/dataset/qname_filter.bam"};
+
+    const std::vector<std::string> recordNames{"singleInsertion/0/0_10", "singleInsertion/0/10_20",
+                                               "singleInsertion/1/0_10", "singleInsertion/1/10_20"};
+    const std::vector<std::string> whitelist{"singleInsertion/0/0_10", "singleInsertion/1/0_10"};
+    const std::vector<std::string> blacklist{"singleInsertion/0/10_20", "singleInsertion/1/10_20"};
+
+    {  // sanity check on input
+        PbiFilter filter{};
+        PbiFilterQuery query{filter, fn};
+        EXPECT_EQ(4, query.NumReads());
+
+        size_t i = 0;
+        for (const auto& b : query) {
+            EXPECT_EQ(recordNames.at(i), b.FullName());
+            ++i;
+        }
+    }
+    {
+        // whitelist
+        PbiFilter filter{PbiQueryNameFilter{whitelist}};
+        PbiFilterQuery query{filter, fn};
+        EXPECT_EQ(2, query.NumReads());
+
+        size_t i = 0;
+        for (const auto& b : query) {
+            if (i == 0) {
+                EXPECT_EQ(recordNames.at(0), b.FullName());
+            }
+            if (i == 1) {
+                EXPECT_EQ(recordNames.at(2), b.FullName());
+            }
+            ++i;
+        }
+    }
+    {
+        // !whitelist
+        PbiFilter filter{PbiQueryNameFilter{whitelist, Compare::NOT_CONTAINS}};
+        PbiFilterQuery query{filter, fn};
+        EXPECT_EQ(2, query.NumReads());
+
+        size_t i = 0;
+        for (const auto& b : query) {
+            if (i == 0) {
+                EXPECT_EQ(recordNames.at(1), b.FullName());
+            }
+            if (i == 1) {
+                EXPECT_EQ(recordNames.at(3), b.FullName());
+            }
+            ++i;
+        }
+    }
+    {
+        // blacklist
+        PbiFilter filter{PbiQueryNameFilter{blacklist, Compare::NOT_CONTAINS}};
+        PbiFilterQuery query{filter, fn};
+        EXPECT_EQ(2, query.NumReads());
+
+        size_t i = 0;
+        for (const auto& b : query) {
+            if (i == 0) {
+                EXPECT_EQ(recordNames.at(0), b.FullName());
+            }
+            if (i == 1) {
+                EXPECT_EQ(recordNames.at(2), b.FullName());
+            }
+            ++i;
+        }
+    }
+}
