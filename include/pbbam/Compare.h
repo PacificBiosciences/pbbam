@@ -440,6 +440,7 @@ public:
     {
         switch (cmp) {
             case Compare::EQUAL:
+            case Compare::CONTAINS:
                 return lhs == rhs;
             case Compare::LESS_THAN:
                 return lhs < rhs;
@@ -450,6 +451,7 @@ public:
             case Compare::GREATER_THAN_EQUAL:
                 return lhs >= rhs;
             case Compare::NOT_EQUAL:
+            case Compare::NOT_CONTAINS:
                 return lhs != rhs;
             default:
                 assert(false);
