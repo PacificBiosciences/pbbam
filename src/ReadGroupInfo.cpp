@@ -22,7 +22,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include "ChemistryTable.h"
-#include "EnumClassHash.h"
 #include "pbbam/MD5.h"
 #include "pbbam/SamTagCodec.h"
 #include "pbbam/StringUtilities.h"
@@ -102,7 +101,7 @@ static const std::string platformModelType_SEQUELII{"SEQUELII"};
 // clang-format off
 std::string BaseFeatureName(const BaseFeature& feature)
 {
-    static const std::unordered_map<BaseFeature, std::string, EnumClassHash> lookup{
+    static const std::unordered_map<BaseFeature, std::string> lookup{
         {BaseFeature::DELETION_QV,      feature_DQ},
         {BaseFeature::DELETION_TAG,     feature_DT},
         {BaseFeature::INSERTION_QV,     feature_IQ},
@@ -134,7 +133,7 @@ std::string BaseFeatureName(const BaseFeature& feature)
 
 std::string FrameCodecName(const FrameCodec& codec)
 {
-    static const std::unordered_map<FrameCodec, std::string, EnumClassHash> lookup{
+    static const std::unordered_map<FrameCodec, std::string> lookup{
         {FrameCodec::RAW, codec_RAW},
         {FrameCodec::V1,  codec_V1}
     };
@@ -147,7 +146,7 @@ std::string FrameCodecName(const FrameCodec& codec)
 
 std::string BarcodeModeName(const BarcodeModeType& mode)
 {
-    static const std::unordered_map<BarcodeModeType, std::string, EnumClassHash> lookup{
+    static const std::unordered_map<BarcodeModeType, std::string> lookup{
         {BarcodeModeType::NONE,       barcodemode_NONE},
         {BarcodeModeType::SYMMETRIC,  barcodemode_SYM},
         {BarcodeModeType::ASYMMETRIC, barcodemode_ASYM},
@@ -162,7 +161,7 @@ std::string BarcodeModeName(const BarcodeModeType& mode)
 
 std::string BarcodeQualityName(const BarcodeQualityType& type)
 {
-    static const std::unordered_map<BarcodeQualityType, std::string, EnumClassHash> lookup{
+    static const std::unordered_map<BarcodeQualityType, std::string> lookup{
         {BarcodeQualityType::NONE,        barcodequal_NONE},
         {BarcodeQualityType::SCORE,       barcodequal_SCORE},
         {BarcodeQualityType::PROBABILITY, barcodequal_PROB}
@@ -176,7 +175,7 @@ std::string BarcodeQualityName(const BarcodeQualityType& type)
 
 std::string PlatformModelName(const PlatformModelType& type)
 {
-    static const std::unordered_map<PlatformModelType, std::string, EnumClassHash> lookup{
+    static const std::unordered_map<PlatformModelType, std::string> lookup{
         {PlatformModelType::ASTRO,    platformModelType_ASTRO},
         {PlatformModelType::RS,       platformModelType_RS},
         {PlatformModelType::SEQUEL,   platformModelType_SEQUEL},

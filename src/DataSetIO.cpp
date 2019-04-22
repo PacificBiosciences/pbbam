@@ -17,7 +17,6 @@
 #include "FofnReader.h"
 #include "XmlReader.h"
 #include "XmlWriter.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/StringUtilities.h"
 
 namespace PacBio {

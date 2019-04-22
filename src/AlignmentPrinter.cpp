@@ -15,8 +15,6 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "pbbam/MakeUnique.h"
-
 namespace PacBio {
 namespace BAM {
 

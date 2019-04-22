@@ -10,8 +10,6 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "pbbam/MakeUnique.h"
-
 namespace PacBio {
 namespace BAM {
 

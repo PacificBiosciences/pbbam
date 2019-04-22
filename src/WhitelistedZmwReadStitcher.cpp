@@ -12,7 +12,6 @@
 #include <cstdint>
 
 #include "VirtualZmwReader.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiIndexedBamReader.h"
 
 namespace PacBio {

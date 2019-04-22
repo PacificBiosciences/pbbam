@@ -20,7 +20,6 @@
 #include "MemoryUtils.h"
 #include "Pulse2BaseCache.h"
 #include "SequenceUtils.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/StringUtilities.h"
 #include "pbbam/ZmwTypeMap.h"
 #include "pbbam/virtual/VirtualRegionTypeMap.h"

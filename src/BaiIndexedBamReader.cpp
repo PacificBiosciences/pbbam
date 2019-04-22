@@ -15,7 +15,6 @@
 
 #include "MemoryUtils.h"
 #include "pbbam/BaiIndexCache.h"
-#include "pbbam/MakeUnique.h"
 
 namespace PacBio {
 namespace BAM {

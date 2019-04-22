@@ -11,7 +11,6 @@
 #include "pbbam/CompositeBamReader.h"
 #include "pbbam/DataSet.h"
 #include "pbbam/GenomicInterval.h"
-#include "pbbam/MakeUnique.h"
 
 namespace PacBio {
 namespace BAM {

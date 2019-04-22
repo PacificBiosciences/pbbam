@@ -11,7 +11,6 @@
 #include <cstdint>
 
 #include "pbbam/CompositeBamReader.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiFilterTypes.h"
 
 namespace PacBio {

@@ -12,8 +12,6 @@
 #include <set>
 #include <vector>
 
-#include "pbbam/MakeUnique.h"
-
 namespace PacBio {
 namespace BAM {
 namespace internal {
@@ -39,7 +37,8 @@ namespace internal {
 struct FilterWrapper
 {
 public:
-    template<typename T> FilterWrapper(T x);
+    template <typename T>
+    FilterWrapper(T x);
 
     FilterWrapper(const FilterWrapper& other);
     FilterWrapper(FilterWrapper&&) noexcept = default;
@@ -54,19 +53,17 @@ private:
     struct WrapperInterface
     {
         virtual ~WrapperInterface() = default;
-        virtual WrapperInterface* Clone() const =0;
-        virtual bool Accepts(const PacBio::BAM::PbiRawData& idx,
-                             const size_t row) const =0;
+        virtual WrapperInterface* Clone() const = 0;
+        virtual bool Accepts(const PacBio::BAM::PbiRawData& idx, const size_t row) const = 0;
     };
 
-    template<typename T>
+    template <typename T>
     struct WrapperImpl : public WrapperInterface
     {
         WrapperImpl(T x);
         WrapperImpl(const WrapperImpl& other);
         WrapperInterface* Clone() const override;
-        bool Accepts(const PacBio::BAM::PbiRawData& idx,
-                     const size_t row) const override;
+        bool Accepts(const PacBio::BAM::PbiRawData& idx, const size_t row) const override;
         T data_;
     };
 
@@ -78,14 +75,11 @@ private:
 // FilterWrapper
 // ---------------
 
-template<typename T>
-inline FilterWrapper::FilterWrapper(T x)
-    : self_{std::make_unique<WrapperImpl<T>>(std::move(x))}
-{ }
+template <typename T>
+inline FilterWrapper::FilterWrapper(T x) : self_{std::make_unique<WrapperImpl<T>>(std::move(x))}
+{}
 
-inline FilterWrapper::FilterWrapper(const FilterWrapper& other)
-    : self_{other.self_->Clone()}
-{ }
+inline FilterWrapper::FilterWrapper(const FilterWrapper& other) : self_{other.self_->Clone()} {}
 
 inline FilterWrapper& FilterWrapper::operator=(const FilterWrapper& other)
 {
@@ -94,42 +88,43 @@ inline FilterWrapper& FilterWrapper::operator=(const FilterWrapper& other)
 }
 
 inline bool FilterWrapper::Accepts(const PbiRawData& idx, const size_t row) const
-{ return self_->Accepts(idx, row); }
+{
+    return self_->Accepts(idx, row);
+}
 
 // ----------------
 // WrapperImpl<T>
 // ----------------
 
-template<typename T>
+template <typename T>
 inline FilterWrapper::WrapperImpl<T>::WrapperImpl(T x)
-    : FilterWrapper::WrapperInterface{}
-    , data_(std::move(x))
+    : FilterWrapper::WrapperInterface{}, data_(std::move(x))
 {
     BOOST_CONCEPT_ASSERT((PbiFilterConcept<T>));
 }
 
-template<typename T>
+template <typename T>
 inline FilterWrapper::WrapperImpl<T>::WrapperImpl(const WrapperImpl& other)
-    : FilterWrapper::WrapperInterface{}
-    , data_(other.data_)
-{ }
+    : FilterWrapper::WrapperInterface{}, data_(other.data_)
+{}
 
-template<typename T>
+template <typename T>
 inline FilterWrapper::WrapperInterface* FilterWrapper::WrapperImpl<T>::Clone() const
-{ return new WrapperImpl(*this); }
+{
+    return new WrapperImpl(*this);
+}
 
-template<typename T>
-inline bool FilterWrapper::WrapperImpl<T>::Accepts(const PbiRawData& idx,
-                                                   const size_t row) const
-{ return data_.Accepts(idx, row); }
+template <typename T>
+inline bool FilterWrapper::WrapperImpl<T>::Accepts(const PbiRawData& idx, const size_t row) const
+{
+    return data_.Accepts(idx, row);
+}
 
 struct PbiFilterPrivate
 {
-    PbiFilterPrivate(PbiFilter::CompositionType type = PbiFilter::INTERSECT)
-        : type_{type}
-    { }
+    PbiFilterPrivate(PbiFilter::CompositionType type = PbiFilter::INTERSECT) : type_{type} {}
 
-    template<typename T>
+    template <typename T>
     void Add(T filter)
     {
         filters_.emplace_back(std::move(filter));
@@ -145,25 +140,22 @@ struct PbiFilterPrivate
     bool Accepts(const PbiRawData& idx, const size_t row) const
     {
         // no filter -> accepts every record
-        if (filters_.empty())
-            return true;
+        if (filters_.empty()) return true;
 
         // intersection of child filters
         if (type_ == PbiFilter::INTERSECT) {
             for (const auto& filter : filters_) {
-                if (!filter.Accepts(idx, row))
-                    return false; // break early on failure
+                if (!filter.Accepts(idx, row)) return false;  // break early on failure
             }
-            return true; // all passed
+            return true;  // all passed
         }
 
         // union of child filters
         else if (type_ == PbiFilter::UNION) {
             for (const auto& filter : filters_) {
-                if (filter.Accepts(idx, row))
-                    return true; // break early on pass
+                if (filter.Accepts(idx, row)) return true;  // break early on pass
             }
-            return false; // none passed
+            return false;  // none passed
         }
 
         else
@@ -175,28 +167,25 @@ struct PbiFilterPrivate
     std::vector<FilterWrapper> filters_;
 };
 
-} // namespace internal
+}  // namespace internal
 
 inline PbiFilter::PbiFilter(const CompositionType type)
-    : d_{std::make_unique<internal::PbiFilterPrivate>(type) }
-{ }
+    : d_{std::make_unique<internal::PbiFilterPrivate>(type)}
+{}
 
-template<typename T> inline
-PbiFilter::PbiFilter(T filter)
-    : d_{std::make_unique<internal::PbiFilterPrivate>() }
+template <typename T>
+inline PbiFilter::PbiFilter(T filter) : d_{std::make_unique<internal::PbiFilterPrivate>()}
 {
     Add(std::move(filter));
 }
 
 inline PbiFilter::PbiFilter(std::vector<PbiFilter> filters)
-    : d_{std::make_unique<internal::PbiFilterPrivate>() }
+    : d_{std::make_unique<internal::PbiFilterPrivate>()}
 {
     Add(std::move(filters));
 }
 
-inline PbiFilter::PbiFilter(const PbiFilter& other)
-    : d_{ other.d_->DeepCopy() }
-{ }
+inline PbiFilter::PbiFilter(const PbiFilter& other) : d_{other.d_->DeepCopy()} {}
 
 inline PbiFilter& PbiFilter::operator=(const PbiFilter& other)
 {
@@ -204,11 +193,12 @@ inline PbiFilter& PbiFilter::operator=(const PbiFilter& other)
     return *this;
 }
 
-inline bool PbiFilter::Accepts(const PacBio::BAM::PbiRawData& idx,
-                               const size_t row) const
-{ return d_->Accepts(idx, row); }
+inline bool PbiFilter::Accepts(const PacBio::BAM::PbiRawData& idx, const size_t row) const
+{
+    return d_->Accepts(idx, row);
+}
 
-template<typename T>
+template <typename T>
 inline PbiFilter& PbiFilter::Add(T filter)
 {
     d_->Add(std::move(filter));
@@ -228,14 +218,11 @@ inline PbiFilter& PbiFilter::Add(std::vector<PbiFilter> filters)
     return *this;
 }
 
-inline bool PbiFilter::IsEmpty() const
-{ return d_->filters_.empty(); }
+inline bool PbiFilter::IsEmpty() const { return d_->filters_.empty(); }
 
-inline size_t PbiFilter::NumChildren() const
-{ return d_->filters_.size(); }
+inline size_t PbiFilter::NumChildren() const { return d_->filters_.size(); }
 
-inline PbiFilter::CompositionType PbiFilter::Type() const
-{ return d_->type_; }
+inline PbiFilter::CompositionType PbiFilter::Type() const { return d_->type_; }
 
-} // namespace BAM
-} // namespace PacBio
+}  // namespace BAM
+}  // namespace PacBio

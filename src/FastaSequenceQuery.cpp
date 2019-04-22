@@ -9,7 +9,6 @@
 #include "pbbam/FastaSequenceQuery.h"
 
 #include "pbbam/CompositeFastaReader.h"
-#include "pbbam/MakeUnique.h"
 
 namespace PacBio {
 namespace BAM {

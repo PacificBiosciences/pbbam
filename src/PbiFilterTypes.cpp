@@ -17,7 +17,6 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "pbbam/MakeUnique.h"
 #include "pbbam/StringUtilities.h"
 
 namespace PacBio {
