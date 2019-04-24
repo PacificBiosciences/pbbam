@@ -9,7 +9,8 @@
 #include "pbbam/GenomicIntervalQuery.h"
 
 #include "pbbam/CompositeBamReader.h"
-#include "pbbam/MakeUnique.h"
+#include "pbbam/DataSet.h"
+#include "pbbam/GenomicInterval.h"
 
 namespace PacBio {
 namespace BAM {
@@ -17,10 +18,14 @@ namespace BAM {
 class GenomicIntervalQuery::GenomicIntervalQueryPrivate
 {
 public:
-    GenomicIntervalQueryPrivate(const DataSet& dataset) : reader_{dataset} {}
+    GenomicIntervalQueryPrivate(const DataSet& dataset, const BaiIndexCache& cache)
+        : reader_{dataset, cache}
+    {
+    }
 
-    GenomicIntervalQueryPrivate(const GenomicInterval& interval, const DataSet& dataset)
-        : reader_{interval, dataset}
+    GenomicIntervalQueryPrivate(const GenomicInterval& interval, const DataSet& dataset,
+                                const BaiIndexCache& cache)
+        : reader_{interval, dataset, cache}
     {
     }
 
@@ -28,12 +33,24 @@ public:
 };
 
 GenomicIntervalQuery::GenomicIntervalQuery(const DataSet& dataset)
-    : internal::IQuery(), d_{std::make_unique<GenomicIntervalQueryPrivate>(dataset)}
+    : GenomicIntervalQuery(dataset, MakeBaiIndexCache(dataset))
+{
+}
+
+GenomicIntervalQuery::GenomicIntervalQuery(const DataSet& dataset, const BaiIndexCache& cache)
+    : internal::IQuery(), d_{std::make_unique<GenomicIntervalQueryPrivate>(dataset, cache)}
 {
 }
 
 GenomicIntervalQuery::GenomicIntervalQuery(const GenomicInterval& interval, const DataSet& dataset)
-    : internal::IQuery(), d_{std::make_unique<GenomicIntervalQueryPrivate>(interval, dataset)}
+    : GenomicIntervalQuery(interval, dataset, MakeBaiIndexCache(dataset))
+{
+}
+
+GenomicIntervalQuery::GenomicIntervalQuery(const GenomicInterval& interval, const DataSet& dataset,
+                                           const BaiIndexCache& cache)
+    : internal::IQuery()
+    , d_{std::make_unique<GenomicIntervalQueryPrivate>(interval, dataset, cache)}
 {
 }
 

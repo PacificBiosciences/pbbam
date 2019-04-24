@@ -358,6 +358,11 @@ public:
     ///
     std::vector<std::string> FastaFiles() const;
 
+    ///
+    /// \returns (absolute) path for dataset
+    ///
+    const std::string& Path() const;
+
     /// \brief Returns all primary external resource filepaths, with relative
     ///        paths resolved.
     ///
@@ -395,7 +400,7 @@ public:
 
     /// \brief Return a minimal list of genomic intervals covered by filters.
     ///
-    /// \param[out] vector of genomic intervals
+    /// \returns vector of genomic intervals
     ///
     /// \throws std::runtime_error if DataSet contains invalid or non-sensical
     ///         filters, such as rname appearing twice, etc.
@@ -764,7 +769,6 @@ public:
 
 private:
     std::unique_ptr<DataSetBase> d_;
-    std::string path_;
 };
 
 /// \name DataSet Timestamp Utilities

@@ -20,7 +20,6 @@
 #include "Autovalidate.h"
 #include "FileUtils.h"
 #include "MemoryUtils.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiFile.h"
 
 namespace PacBio {

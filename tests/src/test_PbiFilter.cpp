@@ -66,8 +66,14 @@ static const PbiRawData shared_index = test2Bam_RawIndex();
 static
 void checkFilterRows(const PbiFilter& filter, const std::vector<size_t> expectedRows)
 {
-    for (size_t row : expectedRows)
-        EXPECT_TRUE(filter.Accepts(shared_index, row));
+    if (expectedRows.empty())
+    {
+        for (size_t row = 0; row < shared_index.NumReads(); ++row)
+            EXPECT_FALSE(filter.Accepts(shared_index, row));
+    } else {
+        for (size_t row : expectedRows)
+            EXPECT_TRUE(filter.Accepts(shared_index, row));
+    }
 }
 
 static
@@ -150,12 +156,12 @@ TEST(PbiFilterTest, CustomFilterOk)
 {
     { // ctor
         auto filter = PbiFilter{ PbiFilterTests::SimpleFilter{ } };
-        PbiFilterTests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, std::vector<size_t>{});
+        PbiFilterTests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, std::vector<size_t>{0,1,2,3});
     }
     { // Add
         auto filter = PbiFilter{ };
         filter.Add(PbiFilterTests::SimpleFilter{ });
-        PbiFilterTests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, std::vector<size_t>{});
+        PbiFilterTests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, std::vector<size_t>{0,1,2,3});
     }
 
 //    PbiFilter shouldNotCompile = PbiFilter{ PbiFilterTests::NoncompliantFilter{ } };                       // <-- when uncommented, should not compile
@@ -182,9 +188,9 @@ TEST(PbiFilterTest, CopyOk)
         PbiFilter copyAssign;
         copyAssign = original;
 
-        PbiFilterTests::checkFilterInternals(original,   PbiFilter::INTERSECT, 1, std::vector<size_t>{});
-        PbiFilterTests::checkFilterInternals(copyCtor,   PbiFilter::INTERSECT, 1, std::vector<size_t>{});
-        PbiFilterTests::checkFilterInternals(copyAssign, PbiFilter::INTERSECT, 1, std::vector<size_t>{});
+        PbiFilterTests::checkFilterInternals(original,   PbiFilter::INTERSECT, 1, std::vector<size_t>{0,1,2,3});
+        PbiFilterTests::checkFilterInternals(copyCtor,   PbiFilter::INTERSECT, 1, std::vector<size_t>{0,1,2,3});
+        PbiFilterTests::checkFilterInternals(copyAssign, PbiFilter::INTERSECT, 1, std::vector<size_t>{0,1,2,3});
     }
 }
 
@@ -242,11 +248,11 @@ TEST(PbiFilterTest, UnionOk)
             const auto simpleFilter = PbiFilterTests::SimpleFilter{ };
             const auto simpleFilter2 = PbiFilterTests::SimpleFilter{ };
             const auto u = PbiFilter::Union({ simpleFilter, simpleFilter2 });
-            PbiFilterTests::checkFilterInternals(u, PbiFilter::UNION, 2, std::vector<size_t>{});
+            PbiFilterTests::checkFilterInternals(u, PbiFilter::UNION, 2, std::vector<size_t>{0,1,2,3});
         }
         { // move
             const auto u = PbiFilter::Union({ PbiFilterTests::SimpleFilter{ }, PbiFilterTests::SimpleFilter{ } });
-            PbiFilterTests::checkFilterInternals(u, PbiFilter::UNION, 2, std::vector<size_t>{});
+            PbiFilterTests::checkFilterInternals(u, PbiFilter::UNION, 2, std::vector<size_t>{0,1,2,3});
         }
     }
 
@@ -282,11 +288,11 @@ TEST(PbiFilterTest, IntersectOk)
             const auto simpleFilter = PbiFilterTests::SimpleFilter{ };
             const auto simpleFilter2 = PbiFilterTests::SimpleFilter{ };
             const auto i = PbiFilter::Intersection({ simpleFilter, simpleFilter2 });
-            PbiFilterTests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, std::vector<size_t>{});
+            PbiFilterTests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, std::vector<size_t>{0,1,2,3});
         }
         { // move
             const auto i = PbiFilter::Intersection({ PbiFilterTests::SimpleFilter{ }, PbiFilterTests::SimpleFilter{ } });
-            PbiFilterTests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, std::vector<size_t>{});
+            PbiFilterTests::checkFilterInternals(i, PbiFilter::INTERSECT, 2, std::vector<size_t>{0,1,2,3});
         }
     }
 
@@ -415,6 +421,11 @@ TEST(PbiFilterTest, BarcodeForwardFilterOk)
         const auto filter = PbiFilter{ PbiBarcodeForwardFilter{ {0, 256} } };
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0,2});
     }
+    {
+        //blacklist
+        const auto filter = PbiFilter{ PbiBarcodeForwardFilter{ {0, 256}, Compare::NOT_CONTAINS } };
+        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1,3});
+    }
 }
 
 TEST(PbiFilterTest, BarcodeQualityFilterOk)
@@ -442,6 +453,11 @@ TEST(PbiFilterTest, BarcodeReverseFilterOk)
     {
         const auto filter = PbiFilter{ PbiBarcodeReverseFilter{ {1, 257} } };
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0,2});
+    }
+    {
+        // blacklist
+        const auto filter = PbiFilter{ PbiBarcodeReverseFilter{ {1, 257}, Compare::NOT_CONTAINS } };
+        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1,3});
     }
 }
 
@@ -561,6 +577,14 @@ TEST(PbiFilterTest, MovieNameFilterOk)
         const auto expectedRows = std::vector<size_t>{0,1,2,3};
         for (size_t row : expectedRows)
             EXPECT_TRUE(filter.Accepts(index, row));
+    }
+    {
+        // blacklist
+        const auto names = std::vector<std::string>{"does_not_exist",
+                                          "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0"};
+        const auto filter = PbiFilter{ PbiMovieNameFilter{ names, Compare::NOT_CONTAINS } };
+        for (size_t row = 0; row < index.NumReads(); ++row)
+            EXPECT_FALSE(filter.Accepts(index, row));
     }
 }
 
@@ -743,6 +767,11 @@ TEST(PbiFilterTest, ReadGroupFilterOk)
         const auto filter = PbiReadGroupFilter{ ids };
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
+    { // multi-ID blacklist
+        const auto ids = std::vector<int32_t>({-1197849594, 200});
+        const auto filter = PbiReadGroupFilter{ ids, Compare::NOT_CONTAINS };
+        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{});
+    }
     { // multi-string
         const auto ids = std::vector<std::string>({"b89a4406", "deadbeef"});
         const auto filter = PbiReadGroupFilter{ ids };
@@ -781,6 +810,11 @@ TEST(PbiFilterTest, ReferenceIdFilterOk)
         const auto ids = std::vector<int32_t>({0, 42});
         const auto filter = PbiFilter{ PbiReferenceIdFilter{ ids } };
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
+    }
+    {
+        const auto ids = std::vector<int32_t>({0});
+        const auto filter = PbiFilter{ PbiReferenceIdFilter{ ids, Compare::NOT_CONTAINS } };
+        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{});
     }
 }
 
@@ -836,6 +870,7 @@ TEST(PbiFilterTest, ZmwFilterOk)
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
     }
     {
+        // blacklist
         const auto filter = PbiFilter{ PbiZmwFilter{ 14743, Compare::NOT_EQUAL } };
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{});
     }
@@ -843,6 +878,12 @@ TEST(PbiFilterTest, ZmwFilterOk)
         const auto zmws = std::vector<int32_t>({14743,42,200});
         const auto filter = PbiFilter{ PbiZmwFilter{ zmws } };
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0,1,2,3});
+    }
+    {
+        // blacklist
+        const auto zmws = std::vector<int32_t>{14743};
+        const auto filter = PbiFilter{ PbiZmwFilter{zmws, Compare::NOT_CONTAINS}};
+        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{});
     }
 }
 

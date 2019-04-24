@@ -11,8 +11,6 @@
 #include <cassert>
 #include <unordered_map>
 
-#include "EnumClassHash.h"
-
 namespace PacBio {
 namespace BAM {
 

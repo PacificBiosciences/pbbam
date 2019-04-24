@@ -7,8 +7,6 @@
 #include <stdexcept>
 #include <string>
 
-#include <pbbam/MakeUnique.h>
-
 #include "CppFormatter.h"
 #include "JsonFormatter.h"
 using namespace pbindexdump;

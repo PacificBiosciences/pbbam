@@ -11,7 +11,6 @@
 #include <typeinfo>
 #include <vector>
 
-#include "pbbam/MakeUnique.h"
 #include "pbbam/StringUtilities.h"
 #include "pugixml/pugixml.hpp"
 
@@ -74,6 +73,14 @@ std::shared_ptr<DataSetElement> MakeElement(const pugi::xml_node& xmlNode)
     switch (type) {
         case XmlElementType::DATASET_METADATA:
             return std::make_shared<DataSetMetadata>(fromInputXml);
+        case XmlElementType::BIOSAMPLE:
+            return std::make_shared<BioSample>("", fromInputXml);
+        case XmlElementType::BIOSAMPLES:
+            return std::make_shared<BioSamples>(fromInputXml);
+        case XmlElementType::DNA_BARCODE:
+            return std::make_shared<DNABarcode>("", fromInputXml);
+        case XmlElementType::DNA_BARCODES:
+            return std::make_shared<DNABarcodes>(fromInputXml);
         case XmlElementType::EXTENSION:
             return std::make_shared<ExtensionElement>(fromInputXml);
         case XmlElementType::EXTENSIONS:

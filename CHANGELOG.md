@@ -10,6 +10,38 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [1.0.0] - 2019-04-22
+
+### Changed
+ - C++14 is now a *hard* minimum.
+
+### Removed
+ - Headers emulating C++14 features for C++11.
+
+### Fixed
+ - Inconsistent whitelist/blacklist filters in DataSet XML.
+
+## [0.25.0] - 2019-04-11
+
+### Changed
+ - Requires C++14 at minimum.
+
+### Fixed
+ - Reading BioSample(s) elements from DataSet XML.
+
+## [0.24.0] - 2019-04-05
+
+### Added
+ - Built-in support for dataset elements: BioSample(s) & DNABarcode(s).
+ - BaiIndexCache for reusing data from *.bai files(s).
+ - Support in GenomicIntervalQuery for new BaiIndexCache.
+
+## [0.23.1] - 2019-03-21
+
+### Added
+ - Streamable BamReader (via stdin).
+ - Enabled range-for on BamReader, compatible with the other *Query inputs.
+
 ## [0.23.0] - 2019-03-11
 
 ### Added

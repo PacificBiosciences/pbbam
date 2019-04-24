@@ -27,6 +27,10 @@ using ElementType = PacBio::BAM::XmlElementType;
 const std::unordered_map<std::string, PacBio::BAM::XmlElementType> elementTypeLookup
 {
     {"DataSetMetadata",        ElementType::DATASET_METADATA},
+    {"BioSample",              ElementType::BIOSAMPLE},
+    {"BioSamples",             ElementType::BIOSAMPLES},
+    {"DNABarcode",             ElementType::DNA_BARCODE},
+    {"DNABarcodes",            ElementType::DNA_BARCODES},
     {"ExtensionElement",       ElementType::EXTENSION},
     {"Extensions",             ElementType::EXTENSIONS},
     {"ExternalResource",       ElementType::EXTERNAL_RESOURCE},
@@ -54,7 +58,7 @@ const std::unordered_map<std::string, PacBio::BAM::XmlElementType> elementTypeLo
 };
 // clang-format on
 
-}  // anonymous
+}  // namespace
 
 namespace PacBio {
 namespace BAM {
@@ -84,6 +88,85 @@ BarcodeSet::BarcodeSet() : DataSetBase("PacBio.DataSet.BarcodeSet", "BarcodeSet"
 BarcodeSet::BarcodeSet(const internal::FromInputXml& fromInputXml)
     : DataSetBase("", "BarcodeSet", fromInputXml, XsdType::DATASETS)
 {
+}
+
+// -------------------
+// BioSample
+// -------------------
+
+BioSample::BioSample(const std::string& name) : DataSetElement("BioSample", XsdType::SAMPLE_INFO)
+{
+    Name(name);
+}
+
+BioSample::BioSample(const std::string& name, const internal::FromInputXml& fromInputXml)
+    : DataSetElement("", fromInputXml, XsdType::SAMPLE_INFO)
+{
+    Name(name);
+}
+
+DEFINE_ACCESSORS(BioSample, DNABarcodes, DNABarcodes)
+
+BioSample& BioSample::DNABarcodes(const PacBio::BAM::DNABarcodes& barcodes)
+{
+    DNABarcodes() = barcodes;
+    return *this;
+}
+
+const std::string& BioSample::Name() const { return Attribute("Name"); }
+
+std::string& BioSample::Name() { return Attribute("Name"); }
+
+BioSample& BioSample::Name(const std::string& name)
+{
+    Attribute("Name", name);
+    return *this;
+}
+
+// -------------------
+// BioSamples
+// -------------------
+
+BioSamples::BioSamples() : DataSetElement("BioSamples", XsdType::SAMPLE_INFO) {}
+
+BioSamples::BioSamples(const internal::FromInputXml& fromInputXml)
+    : DataSetElement("", fromInputXml, XsdType::SAMPLE_INFO)
+{
+}
+
+void BioSamples::Add(const BioSample& sample) { AddChild(sample); }
+
+void BioSamples::Remove(const BioSample& sample) { RemoveChild(sample); }
+
+BioSamples::iterator_type BioSamples::begin() { return BioSamples::iterator_type(this, 0); }
+
+BioSamples::const_iterator_type BioSamples::begin() const { return cbegin(); }
+
+BioSamples::const_iterator_type BioSamples::cbegin() const
+{
+    return BioSamples::const_iterator_type(this, 0);
+}
+
+BioSamples::iterator_type BioSamples::end()
+{
+    return BioSamples::iterator_type(this, NumChildren());
+}
+
+BioSamples::const_iterator_type BioSamples::end() const { return cend(); }
+
+BioSamples::const_iterator_type BioSamples::cend() const
+{
+    return BioSamples::const_iterator_type(this, NumChildren());
+}
+
+const BioSamples::value_type& BioSamples::operator[](size_t index) const
+{
+    return dynamic_cast<const BioSamples::value_type&>(*(children_.at(index).get()));
+}
+
+BioSamples::value_type& BioSamples::operator[](size_t index)
+{
+    return dynamic_cast<BioSamples::value_type&>(*(children_.at(index).get()));
 }
 
 // -----------------------
@@ -132,22 +215,25 @@ ContigSet::ContigSet(const internal::FromInputXml& fromInputXml)
 
 DataSetBase::DataSetBase()
     : StrictEntityType("PacBio.DataSet.DataSet", "DataSet", XsdType::DATASETS)
+    , path_(FileUtils::CurrentWorkingDirectory())
 {
 }
 
 DataSetBase::DataSetBase(const internal::FromInputXml& fromInputXml)
     : StrictEntityType("", "DataSet", fromInputXml, XsdType::DATASETS)
+    , path_(FileUtils::CurrentWorkingDirectory())
 {
 }
 
 DataSetBase::DataSetBase(const std::string& metatype, const std::string& label, const XsdType& xsd)
-    : StrictEntityType(metatype, label, xsd)
+    : StrictEntityType(metatype, label, xsd), path_(FileUtils::CurrentWorkingDirectory())
 {
 }
 
 DataSetBase::DataSetBase(const std::string& metatype, const std::string& label,
                          const internal::FromInputXml& fromInputXml, const XsdType& xsd)
     : StrictEntityType(metatype, label, fromInputXml, xsd)
+    , path_(FileUtils::CurrentWorkingDirectory())
 {
 }
 
@@ -177,6 +263,10 @@ DataSetBase& DataSetBase::Filters(const PacBio::BAM::Filters& filters)
     return *this;
 }
 
+bool DataSetBase::FromInputXml() const { return fromInputXml_; }
+
+void DataSetBase::FromInputXml(bool ok) { fromInputXml_ = ok; }
+
 DEFINE_ACCESSORS(DataSetBase, DataSetMetadata, Metadata)
 
 DataSetBase& DataSetBase::Metadata(const PacBio::BAM::DataSetMetadata& metadata)
@@ -188,6 +278,10 @@ DataSetBase& DataSetBase::Metadata(const PacBio::BAM::DataSetMetadata& metadata)
 const NamespaceRegistry& DataSetBase::Namespaces() const { return registry_; }
 
 NamespaceRegistry& DataSetBase::Namespaces() { return registry_; }
+
+void DataSetBase::Path(const std::string& path) { path_ = path; }
+
+const std::string& DataSetBase::Path() const { return path_; }
 
 const PacBio::BAM::SubDataSets& DataSetBase::SubDataSets() const
 {
@@ -215,6 +309,7 @@ DataSetBase* DataSetBase::DeepCopy() const
     auto* copyDataset = new DataSetElement(*this);
     auto* result = static_cast<DataSetBase*>(copyDataset);
     result->registry_ = registry_;
+    result->path_ = path_;
     return result;
 }
 
@@ -312,6 +407,14 @@ DataSetMetadata::DataSetMetadata(const std::string& numRecords, const std::strin
     NumRecords(numRecords);
 }
 
+DEFINE_ACCESSORS(DataSetMetadata, BioSamples, BioSamples)
+
+DataSetMetadata& DataSetMetadata::BioSamples(const PacBio::BAM::BioSamples& samples)
+{
+    BioSamples() = samples;
+    return *this;
+}
+
 DEFINE_ACCESSORS(DataSetMetadata, Provenance, Provenance)
 
 DataSetMetadata& DataSetMetadata::Provenance(const PacBio::BAM::Provenance& provenance)
@@ -346,6 +449,104 @@ DataSetMetadata& DataSetMetadata::TotalLength(const std::string& totalLength)
 {
     ChildText("TotalLength", totalLength);
     return *this;
+}
+
+// -------------------
+// DNABarcode
+// -------------------
+
+DNABarcode::DNABarcode(const std::string& name) : DataSetElement("DNABarcode", XsdType::SAMPLE_INFO)
+{
+    Name(name);
+    UniqueId(internal::GenerateUuid());
+}
+
+DNABarcode::DNABarcode(const std::string& name, const std::string& uuid)
+    : DataSetElement("DNABarcode", XsdType::SAMPLE_INFO)
+{
+    Name(name);
+    UniqueId(uuid);
+}
+
+DNABarcode::DNABarcode(const std::string& name, const internal::FromInputXml& fromInputXml)
+    : DataSetElement("", fromInputXml, XsdType::SAMPLE_INFO)
+{
+    Name(name);
+    UniqueId(internal::GenerateUuid());
+}
+
+DNABarcode::DNABarcode(const std::string& name, const std::string& uuid,
+                       const internal::FromInputXml& fromInputXml)
+    : DataSetElement("", fromInputXml, XsdType::SAMPLE_INFO)
+{
+    Name(name);
+    UniqueId(uuid);
+}
+
+const std::string& DNABarcode::Name() const { return Attribute("Name"); }
+
+std::string& DNABarcode::Name() { return Attribute("Name"); }
+
+DNABarcode& DNABarcode::Name(const std::string& name)
+{
+    Attribute("Name", name);
+    return *this;
+}
+
+const std::string& DNABarcode::UniqueId() const { return Attribute("UniqueId"); }
+
+std::string& DNABarcode::UniqueId() { return Attribute("UniqueId"); }
+
+DNABarcode& DNABarcode::UniqueId(const std::string& uuid)
+{
+    Attribute("UniqueId", uuid);
+    return *this;
+}
+
+// -------------------
+// DNABarcodes
+// -------------------
+
+DNABarcodes::DNABarcodes() : DataSetElement("DNABarcodes", XsdType::SAMPLE_INFO) {}
+
+DNABarcodes::DNABarcodes(const internal::FromInputXml& fromInputXml)
+    : DataSetElement("", fromInputXml, XsdType::SAMPLE_INFO)
+{
+}
+
+void DNABarcodes::Add(const DNABarcode& barcode) { AddChild(barcode); }
+
+void DNABarcodes::Remove(const DNABarcode& barcode) { RemoveChild(barcode); }
+
+DNABarcodes::iterator_type DNABarcodes::begin() { return DNABarcodes::iterator_type(this, 0); }
+
+DNABarcodes::const_iterator_type DNABarcodes::begin() const { return cbegin(); }
+
+DNABarcodes::const_iterator_type DNABarcodes::cbegin() const
+{
+    return DNABarcodes::const_iterator_type(this, 0);
+}
+
+DNABarcodes::iterator_type DNABarcodes::end()
+{
+    return DNABarcodes::iterator_type(this, NumChildren());
+}
+
+DNABarcodes::const_iterator_type DNABarcodes::end() const { return cend(); }
+
+DNABarcodes::const_iterator_type DNABarcodes::cend() const
+{
+    return DNABarcodes::const_iterator_type(this, NumChildren());
+}
+
+const DNABarcodes::value_type& DNABarcodes::operator[](size_t index) const
+{
+    return dynamic_cast<const DNABarcodes::value_type&>(*(children_.at(index).get()));
+}
+
+DNABarcodes::value_type& DNABarcodes::operator[](size_t index)
+{
+    return dynamic_cast<DNABarcodes::value_type&>(*(children_.at(index).get()));
 }
 
 // -------------------

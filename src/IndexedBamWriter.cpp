@@ -28,7 +28,6 @@
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamRecordImpl.h"
 #include "pbbam/BamWriter.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiRawData.h"
 #include "pbbam/RecordType.h"
 #include "pbbam/Unused.h"

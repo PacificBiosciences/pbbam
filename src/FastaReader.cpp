@@ -16,7 +16,6 @@
 #include <zlib.h>
 
 #include "pbbam/FastaSequence.h"
-#include "pbbam/MakeUnique.h"
 
 namespace PacBio {
 namespace BAM {

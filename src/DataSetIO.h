@@ -21,9 +21,9 @@ public:
     static std::unique_ptr<DataSetBase> FromXmlString(const std::string& xml);
 
     // output
-    static void ToFile(const DataSetBase& dataset, const std::string& fn);
+    static void ToFile(DataSetBase& dataset, const std::string& fn);
     static void ToFile(const std::unique_ptr<DataSetBase>& dataset, const std::string& fn);
-    static void ToStream(const DataSetBase& dataset, std::ostream& out);
+    static void ToStream(DataSetBase& dataset, std::ostream& out);
     static void ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostream& out);
 };
 

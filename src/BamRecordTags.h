@@ -11,7 +11,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "EnumClassHash.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamRecordImpl.h"
 #include "pbbam/BamRecordTag.h"
@@ -33,7 +32,7 @@ private:
         const bool isPulse_;
     };
 
-    using TagLookupType = std::unordered_map<BamRecordTag, BamRecordTagData, EnumClassHash>;
+    using TagLookupType = std::unordered_map<BamRecordTag, BamRecordTagData>;
     static const TagLookupType tagLookup;
 };
 

@@ -241,6 +241,9 @@ public:
 
     bool operator==(const ReadGroupInfo& other) const;
 
+    /// Enable sort on RG:ID
+    bool operator<(const ReadGroupInfo& other) const;
+
     /// \}
 
 public:

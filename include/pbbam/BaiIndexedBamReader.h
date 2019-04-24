@@ -7,6 +7,11 @@
 #ifndef BAIINDEXEDBAMREADER_H
 #define BAIINDEXEDBAMREADER_H
 
+#include <memory>
+
+#include <htslib/sam.h>
+
+#include "pbbam/BaiIndexCache.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/BamReader.h"
 #include "pbbam/GenomicInterval.h"
@@ -33,6 +38,7 @@ public:
     ///         for reading, or if the interval is invalid
     ///
     explicit BaiIndexedBamReader(std::string filename);
+    BaiIndexedBamReader(std::string filename, const std::shared_ptr<BaiIndexCacheData>& index);
 
     /// \brief Constructs %BAM reader, that can be queried on genomic interval.
     ///
@@ -42,6 +48,7 @@ public:
     ///         for reading, or if the interval is invalid
     ///
     explicit BaiIndexedBamReader(BamFile bamFile);
+    BaiIndexedBamReader(BamFile bamFile, const std::shared_ptr<BaiIndexCacheData>& index);
 
     /// \brief Constructs %BAM reader, bounded by a genomic interval.
     ///
@@ -54,6 +61,8 @@ public:
     ///         for reading, or if the interval is invalid
     ///
     BaiIndexedBamReader(const GenomicInterval& interval, std::string filename);
+    BaiIndexedBamReader(const GenomicInterval& interval, std::string filename,
+                        const std::shared_ptr<BaiIndexCacheData>& index);
 
     /// \brief Constructs %BAM reader, bounded by a genomic interval.
     ///
@@ -66,12 +75,17 @@ public:
     ///         for reading, or if the interval is invalid
     ///
     BaiIndexedBamReader(const GenomicInterval& interval, BamFile bamFile);
+    BaiIndexedBamReader(const GenomicInterval& interval, BamFile bamFile,
+                        const std::shared_ptr<BaiIndexCacheData>& index);
 
     /// \}
 
 public:
     /// \name Random-Access
     /// \{
+
+    /// \returns the underlying BamFile
+    const BamFile& File() const;
 
     /// \returns the current GenomicInterval in use by this reader
     const GenomicInterval& Interval() const;

@@ -15,8 +15,6 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "pbbam/MakeUnique.h"
-
 namespace PacBio {
 namespace BAM {
 
@@ -48,7 +46,7 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation o
     float matches = 0;
     std::string pretty;
     Position refCoord = record.ReferenceStart();
-    Position seqCoord = record.QueryStart();
+    Position seqCoord = BAM::IsCcsOrTranscript(record.Type()) ? 0 : record.QueryStart();
 
     for (size_t i = 0; i < seq.size();) {
         auto refCoordStr = std::to_string(refCoord);

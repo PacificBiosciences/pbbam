@@ -11,7 +11,6 @@
 #include <iostream>
 
 #include "pbbam/CompositeBamReader.h"
-#include "pbbam/MakeUnique.h"
 
 namespace PacBio {
 namespace BAM {
