@@ -57,10 +57,10 @@ pbbam_boost_dep = dependency('boost', required : true)
 #endif()
 
 # zlib
-pbbam_zlib_dep = dependency('zlib', required : true)
+pbbam_zlib_dep = dependency('zlib', required : true, fallback : ['zlib', 'zlib_dep'])
 
 # htslib
-pbbam_htslib_dep = dependency('htslib', required : true, version : '>=1.4')
+pbbam_htslib_dep = dependency('htslib', required : true, version : '>=1.4', fallback : ['htslib', 'htslib_dep'])
 
 ###########
 # headers #
