@@ -23,7 +23,7 @@ namespace {
 
 std::unique_ptr<DataSetBase> MakeDataSetBase(const pugi::xml_node& xmlNode)
 {
-    const FromInputXml fromInputXml;
+    const FromInputXml fromInputXml{};
     std::string name = xmlNode.name();
     const auto foundColon = name.find(':');
     if (foundColon != std::string::npos) {
@@ -68,7 +68,7 @@ std::shared_ptr<DataSetElement> MakeElement(const pugi::xml_node& xmlNode)
         name = name.substr(foundColon + 1);
     }
 
-    const FromInputXml fromInputXml;
+    const FromInputXml fromInputXml{};
     const auto type = ElementTypeFromName(name);
     switch (type) {
         case XmlElementType::DATASET_METADATA:
