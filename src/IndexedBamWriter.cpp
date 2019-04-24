@@ -573,16 +573,18 @@ public:
         if (!gziFile) throw std::runtime_error{"IndexedBamWriter: could not open gzi file"};
 
         uint64_t numElements;
-        const auto ret = fread(&numElements, sizeof(numElements), 1, gziFile.get());
-        if (ret != 1) throw std::runtime_error{"IndexedBamWriter: could not read from gziFile"};
+        if (fread(&numElements, sizeof(numElements), 1, gziFile.get()) < 1)
+            throw std::runtime_error{"IndexedBamWriter: could not read from gziFile"};
         if (ed_is_big()) ed_swap_8(numElements);
 
         std::vector<GzIndexEntry> result;
         result.reserve(numElements);
         for (uint32_t i = 0; i < numElements; ++i) {
             GzIndexEntry entry;
-            fread(&entry.vAddress, sizeof(entry.vAddress), 1, gziFile.get());
-            fread(&entry.uAddress, sizeof(entry.uAddress), 1, gziFile.get());
+            if (fread(&entry.vAddress, sizeof(entry.vAddress), 1, gziFile.get()) < 1)
+                throw std::runtime_error{"IndexedBamWriter: could not read from gziFile"};
+            if (fread(&entry.uAddress, sizeof(entry.uAddress), 1, gziFile.get()) < 1)
+                throw std::runtime_error{"IndexedBamWriter: could not read from gziFile"};
             if (ed_is_big()) {
                 ed_swap_8(entry.vAddress);
                 ed_swap_8(entry.uAddress);
