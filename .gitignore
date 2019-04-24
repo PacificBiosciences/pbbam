@@ -80,8 +80,8 @@ build
 lib
 
 # Meson WrapDB stuff
-subprojects/packagecache/
-subprojects/googletest*
+/subprojects/*
+!/subprojects/*.wrap
 
 # generated Doxyfile
 *Doxyfile
