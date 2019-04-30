@@ -17,20 +17,6 @@ namespace PacBio {
 namespace BAM {
 namespace pbbamify {
 
-// Taken from BamRecord.cpp, since the implementation there
-// is not public.
-static inline bool ConsumesQuery(const CigarOperationType type)
-{
-    return (bam_cigar_type(static_cast<int>(type)) & 0x1) != 0;
-}
-
-// Taken from BamRecord.cpp, since the implementation there
-// is not public.
-static inline bool ConsumesReference(const CigarOperationType type)
-{
-    return (bam_cigar_type(static_cast<int>(type)) & 0x2) != 0;
-}
-
 PacBio::BAM::BamHeader Pbbamify::ComposeHeader(const PacBio::BAM::DataSet& dataset,
                                                PacBio::BAM::FastaReader& refReader,
                                                const PacBio::BAM::BamReader& input)

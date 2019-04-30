@@ -9,6 +9,9 @@
 
 #include <cstdint>
 #include <stdexcept>
+
+#include <htslib/sam.h>
+
 #include "pbbam/Config.h"
 
 namespace PacBio {
@@ -138,6 +141,16 @@ private:
     static bool validate_;
     friend class pbbamify::Settings;
 };
+
+constexpr inline bool ConsumesQuery(const CigarOperationType type)
+{
+    return (bam_cigar_type(static_cast<int>(type)) & 0x1) != 0;
+}
+
+constexpr inline bool ConsumesReference(const CigarOperationType type)
+{
+    return (bam_cigar_type(static_cast<int>(type)) & 0x2) != 0;
+}
 
 }  // namespace BAM
 }  // namespace PacBio

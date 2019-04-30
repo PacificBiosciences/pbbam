@@ -1193,18 +1193,8 @@ private:
     void ClipFields(const size_t clipPos, const size_t clipLength);
 
     BamRecord& ClipToQuery(const PacBio::BAM::Position start, const PacBio::BAM::Position end);
-    BamRecord& ClipToQueryForward(const PacBio::BAM::Position start,
-                                  const PacBio::BAM::Position end);
-    BamRecord& ClipToQueryReverse(const PacBio::BAM::Position start,
-                                  const PacBio::BAM::Position end);
     BamRecord& ClipToReference(const PacBio::BAM::Position start, const PacBio::BAM::Position end,
                                const bool exciseFlankingInserts);
-    BamRecord& ClipToReferenceForward(const PacBio::BAM::Position start,
-                                      const PacBio::BAM::Position end,
-                                      const bool exciseFlankingInserts);
-    BamRecord& ClipToReferenceReverse(const PacBio::BAM::Position start,
-                                      const PacBio::BAM::Position end,
-                                      const bool exciseFlankingInserts);
 
 private:
     ///\internal

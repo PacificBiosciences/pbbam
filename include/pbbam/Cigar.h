@@ -49,9 +49,9 @@ public:
     Cigar(const std::string& cigarString);
 
     Cigar(const Cigar&);
-    Cigar(Cigar&&);
+    Cigar(Cigar&&) noexcept;
     Cigar& operator=(const Cigar&);
-    Cigar& operator=(Cigar&&);
+    Cigar& operator=(Cigar&&) noexcept;
     ~Cigar();
 
     /// \}
@@ -68,6 +68,14 @@ public:
 
     /// \}
 };
+
+///
+/// \brief
+///
+/// \param cigar
+/// \return size_t
+///
+size_t ReferenceLength(const Cigar& cigar);
 
 }  // namespace BAM
 }  // namespace PacBio
