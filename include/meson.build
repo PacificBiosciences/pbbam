@@ -73,6 +73,8 @@ if not meson.is_subproject()
       'pbbam/SamTagCodec.h',
       'pbbam/SamWriter.h',
       'pbbam/SequenceInfo.h',
+      'pbbam/SimpleRead.h',
+      'pbbam/SNR.h',
       'pbbam/Strand.h',
       'pbbam/StringUtilities.h',
       'pbbam/SubreadLengthQuery.h',
