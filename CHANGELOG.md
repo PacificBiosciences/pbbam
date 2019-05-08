@@ -10,6 +10,9 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+### Fixed
+ - Incorrect type displayed in SAM output (pure-text) for floating-point values.
+
 ## [1.0.0] - 2019-04-22
 
 ### Changed
