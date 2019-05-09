@@ -34,11 +34,11 @@ Cigar::Cigar(const std::string& cigarString) : std::vector<CigarOperation>{}
 
 Cigar::Cigar(const Cigar&) = default;
 
-Cigar::Cigar(Cigar&&) = default;
+Cigar::Cigar(Cigar&&) noexcept = default;
 
 Cigar& Cigar::operator=(const Cigar&) = default;
 
-Cigar& Cigar::operator=(Cigar&&) = default;
+Cigar& Cigar::operator=(Cigar&&) noexcept = default;
 
 Cigar::~Cigar() = default;
 
@@ -53,6 +53,15 @@ std::string Cigar::ToStdString() const
         s << cigar.Length() << cigar.Char();
     }
     return s.str();
+}
+
+size_t ReferenceLength(const Cigar& cigar)
+{
+    size_t length = 0;
+    for (const auto& op : cigar) {
+        if (ConsumesReference(op.Type())) length += op.Length();
+    }
+    return length;
 }
 
 }  // namespace BAM
