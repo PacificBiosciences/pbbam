@@ -40,6 +40,7 @@ pbbam_test_cpp_sources = files([
   'test_ReadGroupInfo.cpp',
   'test_SamWriter.cpp',
   'test_SequenceUtils.cpp',
+  'test_SimpleRead.cpp',
   'test_StringUtils.cpp',
   'test_SubreadLengthQuery.cpp',
   'test_Tags.cpp',

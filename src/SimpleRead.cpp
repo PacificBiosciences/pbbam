@@ -10,10 +10,11 @@
 
 #include "Clipping.h"
 #include "SequenceUtils.h"
+#include "SimpleReadImpl.h"
 
 namespace PacBio {
 namespace BAM {
-namespace {
+namespace internal {
 
 template <typename T>
 T clipContainer(const T& input, const size_t pos, const size_t len)
@@ -46,7 +47,7 @@ void ClipMappedRead(MappedSimpleRead& read, internal::ClipResult result, size_t 
     read.TemplateEnd = read.TemplateStart + ReferenceLength(read.Cigar);
 }
 
-}  // namespace
+}  // namespace internal
 
 //
 // SimpleRead
@@ -153,7 +154,8 @@ void ClipToQuery(SimpleRead& read, Position start, Position end)
                                            false};
     auto result = internal::ClipToQuery(clipConfig);
 
-    ClipSimpleRead(read, std::move(result), start, end);
+    // apply clipping
+    internal::ClipSimpleRead(read, std::move(result), start, end);
 }
 
 void ClipToQuery(MappedSimpleRead& read, Position start, Position end)
@@ -173,7 +175,8 @@ void ClipToQuery(MappedSimpleRead& read, Position start, Position end)
                                            true};
     auto result = internal::ClipToQuery(clipConfig);
 
-    ClipMappedRead(read, std::move(result), start, end);
+    // apply clipping
+    internal::ClipMappedRead(read, std::move(result), start, end);
 }
 
 void ClipToReference(MappedSimpleRead& read, Position start, Position end,
@@ -191,7 +194,8 @@ void ClipToReference(MappedSimpleRead& read, Position start, Position end,
         read.TemplateEnd, start, end, exciseFlankingInserts};
     auto result = internal::ClipToReference(clipConfig);
 
-    ClipMappedRead(read, std::move(result), start, end);
+    // apply clipping
+    internal::ClipMappedRead(read, std::move(result), start, end);
 }
 
 }  // namespace BAM
