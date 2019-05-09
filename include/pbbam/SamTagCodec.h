@@ -33,6 +33,15 @@ public:
     ///
     static TagCollection Decode(const std::string& tagString);
 
+    /// \brief Creates SAM-formatted string from a Tag.
+    ///
+    /// \param[in] name 2-character tag name
+    /// \param[in] tag  Tag instance containing data
+    ///
+    /// \return SAM-formatted string
+    ///
+    static std::string Encode(const std::string& name, const PacBio::BAM::Tag& tag);
+
     /// \brief Creates SAM-formatted string from a TagCollection.
     ///
     /// \param[in] tags     TagCollection containing tag data
