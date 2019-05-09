@@ -10,9 +10,44 @@
 
 #include "Clipping.h"
 #include "SequenceUtils.h"
+#include "SimpleReadImpl.h"
 
 namespace PacBio {
 namespace BAM {
+namespace internal {
+
+template <typename T>
+T clipContainer(const T& input, const size_t pos, const size_t len)
+{
+    if (input.empty()) return {};
+    return T{input.cbegin() + pos, input.cbegin() + pos + len};
+}
+
+void ClipSimpleRead(SimpleRead& read, const internal::ClipResult& result, size_t start, size_t end)
+{
+    const auto clipFrom = result.clipOffset_;
+    const auto clipLength = (end - start);
+    read.Sequence = clipContainer(read.Sequence, clipFrom, clipLength);
+    read.Qualities = clipContainer(read.Qualities, clipFrom, clipLength);
+    read.QueryStart = result.qStart_;
+    read.QueryEnd = result.qEnd_;
+    if (read.PulseWidths)
+        read.PulseWidths = clipContainer(read.PulseWidths->Data(), clipFrom, clipLength);
+}
+
+// NOTE: 'result' is moved into here, so we can take the CIGAR
+void ClipMappedRead(MappedSimpleRead& read, internal::ClipResult result, size_t start, size_t end)
+{
+    // clip common data
+    ClipSimpleRead(read, result, start, end);
+
+    // clip mapped data
+    read.Cigar = std::move(result.cigar_);
+    read.TemplateStart = result.refPos_;
+    read.TemplateEnd = read.TemplateStart + ReferenceLength(read.Cigar);
+}
+
+}  // namespace internal
 
 //
 // SimpleRead
@@ -46,6 +81,18 @@ SimpleRead::SimpleRead(std::string name, std::string seq, QualityValues qualitie
     , SignalToNoise{std::move(snr)}
     , QueryStart{qStart}
     , QueryEnd{qEnd}
+{
+}
+
+SimpleRead::SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr,
+                       Position qStart, Position qEnd, Frames pulseWidths)
+    : Name{std::move(name)}
+    , Sequence{std::move(seq)}
+    , Qualities{std::move(qualities)}
+    , SignalToNoise{std::move(snr)}
+    , QueryStart{qStart}
+    , QueryEnd{qEnd}
+    , PulseWidths{std::move(pulseWidths)}
 {
 }
 
@@ -89,13 +136,6 @@ MappedSimpleRead::~MappedSimpleRead() = default;
 // Clipping helpers
 //
 
-template <typename T>
-T clipContainer(const T& input, const size_t pos, const size_t len)
-{
-    if (input.empty()) return {};
-    return T{input.cbegin() + pos, input.cbegin() + pos + len};
-}
-
 void ClipToQuery(SimpleRead& read, Position start, Position end)
 {
     // skip out if clip not needed
@@ -115,12 +155,7 @@ void ClipToQuery(SimpleRead& read, Position start, Position end)
     auto result = internal::ClipToQuery(clipConfig);
 
     // apply clipping
-    const auto clipFrom = result.clipOffset_;
-    const auto clipLength = (end - start);
-    read.Sequence = clipContainer(read.Sequence, clipFrom, clipLength);
-    read.Qualities = clipContainer(read.Qualities, clipFrom, clipLength);
-    read.QueryStart = result.qStart_;
-    read.QueryEnd = result.qEnd_;
+    internal::ClipSimpleRead(read, std::move(result), start, end);
 }
 
 void ClipToQuery(MappedSimpleRead& read, Position start, Position end)
@@ -141,15 +176,7 @@ void ClipToQuery(MappedSimpleRead& read, Position start, Position end)
     auto result = internal::ClipToQuery(clipConfig);
 
     // apply clipping
-    const auto clipFrom = result.clipOffset_;
-    const auto clipLength = (end - start);
-    read.Sequence = clipContainer(read.Sequence, clipFrom, clipLength);
-    read.Qualities = clipContainer(read.Qualities, clipFrom, clipLength);
-    read.QueryStart = result.qStart_;
-    read.QueryEnd = result.qEnd_;
-    read.Cigar = std::move(result.cigar_);
-    read.TemplateStart = result.refPos_;
-    read.TemplateEnd = read.TemplateStart + ReferenceLength(read.Cigar);
+    internal::ClipMappedRead(read, std::move(result), start, end);
 }
 
 void ClipToReference(MappedSimpleRead& read, Position start, Position end,
@@ -168,15 +195,7 @@ void ClipToReference(MappedSimpleRead& read, Position start, Position end,
     auto result = internal::ClipToReference(clipConfig);
 
     // apply clipping
-    const auto clipFrom = result.clipOffset_;
-    const auto clipLength = (end - start);
-    read.Sequence = clipContainer(read.Sequence, clipFrom, clipLength);
-    read.Qualities = clipContainer(read.Qualities, clipFrom, clipLength);
-    read.QueryStart = result.qStart_;
-    read.QueryEnd = result.qEnd_;
-    read.Cigar = std::move(result.cigar_);
-    read.TemplateStart = result.refPos_;
-    read.TemplateEnd = read.TemplateStart + ReferenceLength(read.Cigar);
+    internal::ClipMappedRead(read, std::move(result), start, end);
 }
 
 }  // namespace BAM

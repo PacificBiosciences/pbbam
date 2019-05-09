@@ -9,8 +9,11 @@
 
 #include <string>
 
+#include <boost/optional.hpp>
+
 #include "pbbam/BamRecord.h"
 #include "pbbam/Cigar.h"
+#include "pbbam/Frames.h"
 #include "pbbam/Position.h"
 #include "pbbam/QualityValues.h"
 #include "pbbam/SNR.h"
@@ -26,6 +29,8 @@ public:
     SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr);
     SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr, Position qStart,
                Position qEnd);
+    SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr, Position qStart,
+               Position qEnd, Frames pulseWidths);
 
     SimpleRead(const SimpleRead&);
     SimpleRead(SimpleRead&&);
@@ -40,6 +45,7 @@ public:
     SNR SignalToNoise;
     Position QueryStart;
     Position QueryEnd;
+    boost::optional<Frames> PulseWidths;
 };
 
 class MappedSimpleRead : public SimpleRead
