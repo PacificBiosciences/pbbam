@@ -10,6 +10,11 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [1.0.1] - 2019-05-09
+
+### Added
+ - SimpleRead & MappedSimpleRead for htslib-free processing. 
+
 ### Fixed
  - Incorrect type displayed in SAM output (pure-text) for floating-point values.
 
