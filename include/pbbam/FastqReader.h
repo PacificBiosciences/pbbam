@@ -10,6 +10,7 @@
 #include <memory>
 #include <vector>
 #include "pbbam/FastqSequence.h"
+#include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {
 namespace BAM {
@@ -17,7 +18,7 @@ namespace BAM {
 ///
 /// \brief The FastqReader provides sequential access to Fastq records.
 ///
-class FastqReader
+class FastqReader : public internal::QueryBase<FastqSequence>
 {
 public:
     ///

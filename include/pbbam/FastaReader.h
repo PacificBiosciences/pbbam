@@ -10,6 +10,7 @@
 #include <memory>
 #include <vector>
 #include "pbbam/FastaSequence.h"
+#include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {
 namespace BAM {
@@ -17,7 +18,7 @@ namespace BAM {
 ///
 /// \brief The FastaReader provides sequential access to FASTA records.
 ///
-class FastaReader
+class FastaReader : public internal::QueryBase<FastaSequence>
 {
 public:
     ///

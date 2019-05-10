@@ -75,6 +75,20 @@ TEST(FastaReaderTest, IterableOk)
     EXPECT_EQ(3, count);
 }
 
+TEST(FastaReaderTest, RangeForOk)
+{
+    const std::string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fa";
+
+    size_t count = 0;
+    FastaReader reader{fn};
+    for (const auto& seq : reader) {
+        FastaTests::CheckSequence(count, seq);
+        ++count;
+    }
+
+    EXPECT_EQ(3, count);
+}
+
 TEST(FastaReaderTest, ReadAllOk)
 {
     const std::string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fa";

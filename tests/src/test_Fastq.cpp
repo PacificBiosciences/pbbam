@@ -98,6 +98,19 @@ TEST(FastqReaderTest, IterableOk)
     EXPECT_EQ(3, count);
 }
 
+TEST(FastqReaderTest, RangeForOk)
+{
+    const std::string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fq";
+
+    size_t count = 0;
+    FastqReader reader{fn};
+    for (const auto& seq : reader) {
+        FastqTests::CheckSequence(count, seq);
+        ++count;
+    }
+    EXPECT_EQ(3, count);
+}
+
 TEST(FastqReaderTest, ReadAllOk)
 {
     const std::string fn = PbbamTestsConfig::GeneratedData_Dir + "/normal.fq";

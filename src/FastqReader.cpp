@@ -58,7 +58,10 @@ private:
     std::unique_ptr<kseq_t, KSeqDeleter> seq_;
 };
 
-FastqReader::FastqReader(const std::string& fn) : d_{std::make_unique<FastqReaderPrivate>(fn)} {}
+FastqReader::FastqReader(const std::string& fn)
+    : internal::QueryBase<FastqSequence>{}, d_{std::make_unique<FastqReaderPrivate>(fn)}
+{
+}
 
 FastqReader::FastqReader(FastqReader&&) = default;
 
