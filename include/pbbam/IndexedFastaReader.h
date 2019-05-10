@@ -7,12 +7,13 @@
 #ifndef INDEXEDFASTAREADER_H
 #define INDEXEDFASTAREADER_H
 
-#include <htslib/faidx.h>
 #include <cstddef>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
+
 #include "pbbam/Orientation.h"
 #include "pbbam/Position.h"
 
@@ -32,12 +33,12 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    IndexedFastaReader(const std::string& filename);
-    IndexedFastaReader(const IndexedFastaReader& src);
+    explicit IndexedFastaReader(std::string filename);
 
     IndexedFastaReader() = delete;
+    IndexedFastaReader(const IndexedFastaReader&);
     IndexedFastaReader(IndexedFastaReader&&);
-    IndexedFastaReader& operator=(const IndexedFastaReader& rhs);
+    IndexedFastaReader& operator=(const IndexedFastaReader&);
     IndexedFastaReader& operator=(IndexedFastaReader&&);
     ~IndexedFastaReader();
 
@@ -131,11 +132,8 @@ public:
     /// \}
 
 private:
-    std::string filename_;
-    faidx_t* handle_;
-
-    void Close();
-    bool Open(std::string filename);
+    class IndexedFastaReaderPrivate;
+    std::unique_ptr<IndexedFastaReaderPrivate> d_;
 };
 
 }  // namespace BAM
