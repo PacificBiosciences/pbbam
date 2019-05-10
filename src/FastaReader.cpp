@@ -8,14 +8,7 @@
 
 #include "pbbam/FastaReader.h"
 
-#include <memory>
 #include <stdexcept>
-#include <string>
-
-#include <htslib/kseq.h>
-#include <zlib.h>
-
-#include "pbbam/FastaSequence.h"
 
 #include "KSeqReader.h"
 

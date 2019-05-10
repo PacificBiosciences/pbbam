@@ -8,8 +8,11 @@
 #define FASTAREADER_H
 
 #include <memory>
+#include <string>
 #include <vector>
+
 #include "pbbam/FastaSequence.h"
+
 #include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {

@@ -10,6 +10,8 @@ guarantees will be maintained within each major version series.
 
 ## Active
 
+## [1.0.2] - 2019-05-10
+
 ### Added
  - Range-for iteration on FastaReader & FastqReader
 
