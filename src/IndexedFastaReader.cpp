@@ -199,11 +199,8 @@ int IndexedFastaReader::SequenceLength(const std::string& name) const
 {
     const auto len = faidx_seq_len(d_->handle_.get(), name.c_str());
     if (len < 0) {
-        throw std::runtime_error
-        {
-            "IndexedFastaReader: could not determine sequence length of " + name +
-                " in FASTA file: " + d_->fastaFilename_;
-        };
+        throw std::runtime_error{"IndexedFastaReader: could not determine sequence length of " +
+                                 name + " in FASTA file: " + d_->fastaFilename_};
     }
     return len;
 }
