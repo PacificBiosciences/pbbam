@@ -50,6 +50,7 @@ pbbam_cpp_sources = files([
   'IndexedBamWriter.cpp',
   'IndexedFastaReader.cpp',
   'IRecordWriter.cpp',
+  'KSeqReader.cpp',
   'MD5.cpp',
   'MemoryUtils.cpp',
   'PbiBuilder.cpp',

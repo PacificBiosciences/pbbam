@@ -85,7 +85,6 @@ TEST(FastaReaderTest, RangeForOk)
         FastaTests::CheckSequence(count, seq);
         ++count;
     }
-
     EXPECT_EQ(3, count);
 }
 

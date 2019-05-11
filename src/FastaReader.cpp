@@ -8,53 +8,27 @@
 
 #include "pbbam/FastaReader.h"
 
-#include <memory>
 #include <stdexcept>
-#include <string>
 
-#include <htslib/kseq.h>
-#include <zlib.h>
-
-#include "pbbam/FastaSequence.h"
+#include "KSeqReader.h"
 
 namespace PacBio {
 namespace BAM {
 
-class FastaReader::FastaReaderPrivate
+class FastaReader::FastaReaderPrivate : public KSeqReader
 {
-    KSEQ_INIT(gzFile, gzread)
-    struct KSeqDeleter
-    {
-        void operator()(kseq_t* seq) const
-        {
-            if (seq) kseq_destroy(seq);
-            seq = nullptr;
-        }
-    };
-
 public:
-    explicit FastaReaderPrivate(const std::string& fn)
-        : fp_{gzopen(fn.c_str(), "r")}, seq_{kseq_init(fp_)}
-    {
-        if (fp_ == nullptr || seq_.get() == nullptr)
-            throw std::runtime_error{"FastaReader: could not open file for reading: " + fn};
-    }
-
-    ~FastaReaderPrivate() { gzclose(fp_); }
+    explicit FastaReaderPrivate(const std::string& fn) : KSeqReader{fn} {}
 
     bool GetNext(FastaSequence& record)
     {
-        const auto result = kseq_read(seq_.get());
-        if (result == -1)  // EOF
-            return false;
+        const auto readOk = ReadNext();
+        if (!readOk) return false;
+
         record = FastaSequence{std::string{seq_->name.s, seq_->name.l},
                                std::string{seq_->seq.s, seq_->seq.l}};
         return true;
     }
-
-private:
-    gzFile fp_;
-    std::unique_ptr<kseq_t, KSeqDeleter> seq_;
 };
 
 FastaReader::FastaReader(const std::string& fn)

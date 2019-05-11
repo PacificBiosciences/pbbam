@@ -7,6 +7,7 @@
 #include <memory>
 
 #include <htslib/bgzf.h>
+#include <htslib/faidx.h>
 #include <htslib/sam.h>
 
 #include "pbbam/BamHeader.h"
@@ -30,12 +31,27 @@ struct FileDeleter
     }
 };
 
+// For pointers originating from C 'malloc' (and friends), instead of 'new'
+struct FreeDeleter
+{
+    void operator()(void* p) const { std::free(p); }
+};
+
 struct HtslibBgzfDeleter
 {
     void operator()(BGZF* bgzf) const
     {
         if (bgzf) bgzf_close(bgzf);
         bgzf = nullptr;
+    }
+};
+
+struct HtslibFastaIndexDeleter
+{
+    void operator()(faidx_t* fai) const
+    {
+        if (fai) fai_destroy(fai);
+        fai = nullptr;
     }
 };
 
