@@ -115,5 +115,5 @@ bool QualityValues::operator!=(const std::string& fastq) const
     return *this != QualityValues(fastq);
 }
 
-}  // namespace BA<
+}  // namespace BAM
 }  // namespace PacBio

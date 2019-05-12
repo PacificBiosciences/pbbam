@@ -44,23 +44,30 @@ public:
     FastqReader(FastqReader&&) noexcept;
     FastqReader& operator=(const FastqReader&) = delete;
     FastqReader& operator=(FastqReader&&) noexcept;
-    ~FastqReader();
+    virtual ~FastqReader();
 
     /// \}
 
 public:
-    /// \name Sequence Access
-    /// \{
-
     ///
     /// \brief GetNext
     ///
+    /// Allows iteration with range-for:
     /// \code{cpp}
     ///
-    /// FastqReader reader{ fn };
-    /// FastqSequence f;
-    /// while (reader.GetNext(f)) {
-    ///     // do stuff with f
+    /// FastqReader reader{fn};
+    /// for (const FastqSequence& seq : reader) {
+    ///     // do stuff with seq
+    /// }
+    /// \endcode
+    ///
+    /// or you can iterate 'manually':
+    /// \code{cpp}
+    ///
+    /// FastqReader reader{fn};
+    /// FastqSequence seq;
+    /// while (reader.GetNext(seq)) {
+    ///     // do stuff with seq
     /// }
     /// \endcode
     ///
@@ -68,8 +75,6 @@ public:
     /// \return success/failure
     ///
     bool GetNext(FastqSequence& record);
-
-    /// \}
 
 private:
     class FastqReaderPrivate;
