@@ -19,6 +19,7 @@ namespace internal {
 template <typename T>
 T clipContainer(const T& input, const size_t pos, const size_t len)
 {
+    assert(input.size() >= pos + len);
     if (input.empty()) return {};
     return T{input.cbegin() + pos, input.cbegin() + pos + len};
 }
@@ -36,10 +37,10 @@ void ClipSimpleRead(SimpleRead& read, const internal::ClipResult& result, size_t
 }
 
 // NOTE: 'result' is moved into here, so we can take the CIGAR
-void ClipMappedRead(MappedSimpleRead& read, internal::ClipResult result, size_t start, size_t end)
+void ClipMappedRead(MappedSimpleRead& read, internal::ClipResult result)
 {
     // clip common data
-    ClipSimpleRead(read, result, start, end);
+    ClipSimpleRead(read, result, result.qStart_, result.qEnd_);
 
     // clip mapped data
     read.Cigar = std::move(result.cigar_);
@@ -176,13 +177,27 @@ void ClipToQuery(MappedSimpleRead& read, Position start, Position end)
     auto result = internal::ClipToQuery(clipConfig);
 
     // apply clipping
-    internal::ClipMappedRead(read, std::move(result), start, end);
+    internal::ClipMappedRead(read, std::move(result));
 }
 
 void ClipToReference(MappedSimpleRead& read, Position start, Position end,
                      bool exciseFlankingInserts)
 {
-    // skip out if clip not needed
+    // return emptied read if clip region is disjoint from
+    if (end <= read.TemplateStart || start >= read.TemplateEnd) {
+        read.Sequence.clear();
+        read.Qualities.clear();
+        read.QueryStart = -1;
+        read.QueryEnd = -1;
+        if (read.PulseWidths) read.PulseWidths->DataRaw().clear();
+        read.TemplateStart = -1;
+        read.TemplateEnd = -1;
+        read.Cigar.clear();
+        read.MapQuality = 255;
+        return;
+    }
+
+    // skip out if clip region covers aligned region (no clip needed)
     if (start <= read.TemplateStart && end >= read.TemplateEnd) return;
 
     // calculate clipping
@@ -195,7 +210,7 @@ void ClipToReference(MappedSimpleRead& read, Position start, Position end,
     auto result = internal::ClipToReference(clipConfig);
 
     // apply clipping
-    internal::ClipMappedRead(read, std::move(result), start, end);
+    internal::ClipMappedRead(read, std::move(result));
 }
 
 }  // namespace BAM

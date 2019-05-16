@@ -16,7 +16,7 @@ struct ClipResult;
 void ClipSimpleRead(SimpleRead& read, const internal::ClipResult& result, size_t start, size_t end);
 
 // NOTE: 'result' is moved into here, so we can take the CIGAR
-void ClipMappedRead(MappedSimpleRead& read, internal::ClipResult result, size_t start, size_t end);
+void ClipMappedRead(MappedSimpleRead& read, internal::ClipResult result);
 
 }  // namespace internal
 }  // namespace BAM
