@@ -155,7 +155,7 @@ TEST(SimpleReadTest, ClipToReferenceOutsideAlignedRegion)
     }
     {
         SCOPED_TRACE("clip region starts well after alignment end");
-        shouldClipToEmptyRead(207, 250);
+        shouldClipToEmptyRead(500, 600);
     }
 }
 
