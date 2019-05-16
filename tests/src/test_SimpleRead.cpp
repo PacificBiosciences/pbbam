@@ -59,13 +59,11 @@ TEST(SimpleReadTest, ClipMappedSimpleRead)
     const uint8_t mapQV = 80;
 
     // ClipToReference(read, 102, 107);
-    const size_t clipStart = 102;
-    const size_t clipEnd = 107;
     const internal::ClipResult clipResult{2, 502, 507, 102, Cigar{"2=1D2I2D"}};
 
     MappedSimpleRead read{
         SimpleRead{"name", seq, quals, snr, qStart, qEnd, pw}, strand, tStart, tEnd, cigar, mapQV};
-    internal::ClipMappedRead(read, clipResult, clipStart, clipEnd);
+    internal::ClipMappedRead(read, clipResult);
 
     const std::string expectedSeq = "CCGTT";
     const QualityValues expectedQuals = QualityValues::FromFastq("23456");

@@ -36,7 +36,7 @@ void ClipSimpleRead(SimpleRead& read, const internal::ClipResult& result, size_t
 }
 
 // NOTE: 'result' is moved into here, so we can take the CIGAR
-void ClipMappedRead(MappedSimpleRead& read, internal::ClipResult result, size_t start, size_t end)
+void ClipMappedRead(MappedSimpleRead& read, internal::ClipResult result)
 {
     // clip common data
     ClipSimpleRead(read, result, result.qStart_, result.qEnd_);
@@ -176,7 +176,7 @@ void ClipToQuery(MappedSimpleRead& read, Position start, Position end)
     auto result = internal::ClipToQuery(clipConfig);
 
     // apply clipping
-    internal::ClipMappedRead(read, std::move(result), start, end);
+    internal::ClipMappedRead(read, std::move(result));
 }
 
 void ClipToReference(MappedSimpleRead& read, Position start, Position end,
@@ -209,7 +209,7 @@ void ClipToReference(MappedSimpleRead& read, Position start, Position end,
     auto result = internal::ClipToReference(clipConfig);
 
     // apply clipping
-    internal::ClipMappedRead(read, std::move(result), start, end);
+    internal::ClipMappedRead(read, std::move(result));
 }
 
 }  // namespace BAM
