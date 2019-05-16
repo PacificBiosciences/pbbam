@@ -39,7 +39,7 @@ void ClipSimpleRead(SimpleRead& read, const internal::ClipResult& result, size_t
 void ClipMappedRead(MappedSimpleRead& read, internal::ClipResult result, size_t start, size_t end)
 {
     // clip common data
-    ClipSimpleRead(read, result, start, end);
+    ClipSimpleRead(read, result, result.qStart_, result.qEnd_);
 
     // clip mapped data
     read.Cigar = std::move(result.cigar_);
@@ -182,7 +182,21 @@ void ClipToQuery(MappedSimpleRead& read, Position start, Position end)
 void ClipToReference(MappedSimpleRead& read, Position start, Position end,
                      bool exciseFlankingInserts)
 {
-    // skip out if clip not needed
+    // return emptied read if clip region is disjoint from
+    if (end <= read.TemplateStart || start >= read.TemplateEnd) {
+        read.Sequence.clear();
+        read.Qualities.clear();
+        read.QueryStart = -1;
+        read.QueryEnd = -1;
+        if (read.PulseWidths) read.PulseWidths->DataRaw().clear();
+        read.TemplateStart = -1;
+        read.TemplateEnd = -1;
+        read.Cigar.clear();
+        read.MapQuality = 255;
+        return;
+    }
+
+    // skip out if clip region covers aligned region (no clip needed)
     if (start <= read.TemplateStart && end >= read.TemplateEnd) return;
 
     // calculate clipping
