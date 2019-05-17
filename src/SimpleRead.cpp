@@ -19,8 +19,8 @@ namespace internal {
 template <typename T>
 T clipContainer(const T& input, const size_t pos, const size_t len)
 {
-    assert(input.size() >= pos + len);
     if (input.empty()) return {};
+    assert(input.size() >= pos + len);
     return T{input.cbegin() + pos, input.cbegin() + pos + len};
 }
 
