@@ -328,7 +328,8 @@ PbiRawData& PbiRawData::Version(PbiFile::VersionEnum version)
 
 bool PbiReferenceEntry::operator==(const PbiReferenceEntry& other) const
 {
-    return tId_ == other.tId_ && beginRow_ == other.beginRow_ && endRow_ == other.endRow_;
+    return std::tie(tId_, beginRow_, endRow_) ==
+           std::tie(other.tId_, other.beginRow_, other.endRow_);
 }
 
 // PBI index caching

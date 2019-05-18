@@ -253,7 +253,7 @@ inline DataSetElementIteratorBase::DataSetElementIteratorBase(const DataSetEleme
 
 inline bool DataSetElementIteratorBase::operator==(const DataSetElementIteratorBase& other) const
 {
-    return (parent_ == other.parent_) && (index_ == other.index_);
+    return std::tie(parent_, index_) == std::tie(other.parent_, other.index_);
 }
 
 inline bool DataSetElementIteratorBase::operator!=(const DataSetElementIteratorBase& other) const

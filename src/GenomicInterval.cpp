@@ -79,7 +79,7 @@ GenomicInterval::~GenomicInterval() = default;
 
 bool GenomicInterval::operator==(const GenomicInterval& other) const
 {
-    return name_ == other.name_ && interval_ == other.interval_;
+    return std::tie(name_, interval_) == std::tie(other.name_, other.interval_);
 }
 
 bool GenomicInterval::operator!=(const GenomicInterval& other) const { return !(*this == other); }

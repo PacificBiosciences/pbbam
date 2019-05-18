@@ -10,6 +10,7 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 
 namespace PacBio {
 namespace BAM {
@@ -73,7 +74,8 @@ inline Version::Version(int major, int minor, int revision)
 
 inline bool Version::operator==(const Version& other) const
 {
-    return major_ == other.major_ && minor_ == other.minor_ && revision_ == other.revision_;
+    return std::tie(major_, minor_, revision_) ==
+           std::tie(other.major_, other.minor_, other.revision_);
 }
 
 inline bool Version::operator!=(const Version& other) const { return !(*this == other); }

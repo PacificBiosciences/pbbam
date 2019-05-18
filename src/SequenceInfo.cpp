@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <limits>
 #include <sstream>
+#include <tuple>
 
 #include "pbbam/SamTagCodec.h"
 #include "pbbam/StringUtilities.h"
@@ -47,9 +48,9 @@ SequenceInfo::~SequenceInfo() = default;
 
 bool SequenceInfo::operator==(const SequenceInfo& other) const
 {
-    return assemblyId_ == other.assemblyId_ && checksum_ == other.checksum_ &&
-           length_ == other.length_ && name_ == other.name_ && species_ == other.species_ &&
-           uri_ == other.uri_ && custom_ == other.custom_;
+    return std::tie(assemblyId_, checksum_, length_, name_, species_, uri_, custom_) ==
+           std::tie(other.assemblyId_, other.checksum_, other.length_, other.name_, other.species_,
+                    other.uri_, other.custom_);
 }
 
 bool SequenceInfo::operator!=(const SequenceInfo& other) const { return !(*this == other); }

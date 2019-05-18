@@ -8,6 +8,8 @@
 
 #include "pbbam/CigarOperation.h"
 
+#include <tuple>
+
 #include <htslib/sam.h>
 
 namespace PacBio {
@@ -48,7 +50,7 @@ CigarOperation::~CigarOperation() = default;
 
 bool CigarOperation::operator==(const CigarOperation& other) const
 {
-    return type_ == other.type_ && length_ == other.length_;
+    return std::tie(type_, length_) == std::tie(other.type_, other.length_);
 }
 
 bool CigarOperation::operator!=(const CigarOperation& other) const { return !(*this == other); }
