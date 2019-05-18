@@ -23,11 +23,11 @@ FastaSequence::FastaSequence() = default;
 
 FastaSequence::FastaSequence(const FastaSequence&) = default;
 
-FastaSequence::FastaSequence(FastaSequence&&) = default;
+FastaSequence::FastaSequence(FastaSequence&&) noexcept = default;
 
 FastaSequence& FastaSequence::operator=(const FastaSequence&) = default;
 
-FastaSequence& FastaSequence::operator=(FastaSequence&&) = default;
+FastaSequence& FastaSequence::operator=(FastaSequence&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 FastaSequence::~FastaSequence() = default;
 

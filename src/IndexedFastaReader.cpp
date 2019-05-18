@@ -94,7 +94,7 @@ IndexedFastaReader::IndexedFastaReader(const IndexedFastaReader& other)
 {
 }
 
-IndexedFastaReader::IndexedFastaReader(IndexedFastaReader&&) = default;
+IndexedFastaReader::IndexedFastaReader(IndexedFastaReader&&) noexcept = default;
 
 IndexedFastaReader& IndexedFastaReader::operator=(const IndexedFastaReader& rhs)
 {
@@ -103,7 +103,7 @@ IndexedFastaReader& IndexedFastaReader::operator=(const IndexedFastaReader& rhs)
     return *this;
 }
 
-IndexedFastaReader& IndexedFastaReader::operator=(IndexedFastaReader&&) = default;
+IndexedFastaReader& IndexedFastaReader::operator=(IndexedFastaReader&&) noexcept = default;
 
 IndexedFastaReader::~IndexedFastaReader() = default;
 

@@ -140,7 +140,7 @@ DataSet::DataSet(const DataSet& other)
     d_->FromInputXml(otherFromXml);
 }
 
-DataSet::DataSet(DataSet&&) = default;
+DataSet::DataSet(DataSet&&) noexcept = default;
 
 DataSet& DataSet::operator=(const DataSet& other)
 {
@@ -156,7 +156,7 @@ DataSet& DataSet::operator=(const DataSet& other)
     return *this;
 }
 
-DataSet& DataSet::operator=(DataSet&&) = default;
+DataSet& DataSet::operator=(DataSet&&) noexcept = default;
 
 DataSet::~DataSet() = default;
 

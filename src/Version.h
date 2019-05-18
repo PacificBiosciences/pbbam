@@ -28,9 +28,9 @@ public:
     explicit Version(const std::string& v);
 
     Version(const Version&) = default;
-    Version(Version&&) = default;
+    Version(Version&&) noexcept = default;
     Version& operator=(const Version&) = default;
-    Version& operator=(Version&&) = default;
+    Version& operator=(Version&&) noexcept = default;
     ~Version() = default;
 
     bool operator==(const Version& other) const;

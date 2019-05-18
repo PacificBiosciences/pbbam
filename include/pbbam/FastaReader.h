@@ -39,9 +39,9 @@ public:
     explicit FastaReader(const std::string& fn);
 
     FastaReader(const FastaReader&) = delete;
-    FastaReader(FastaReader&&);
+    FastaReader(FastaReader&&) noexcept;
     FastaReader& operator=(const FastaReader&) = delete;
-    FastaReader& operator=(FastaReader&&);
+    FastaReader& operator=(FastaReader&&) noexcept;
     ~FastaReader();
 
     /// \}

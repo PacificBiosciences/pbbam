@@ -61,9 +61,9 @@ public:
     BamRecord(BamHeader header);
     BamRecord(BamRecordImpl impl);
     BamRecord(const BamRecord& other);
-    BamRecord(BamRecord&& other);
+    BamRecord(BamRecord&& other) noexcept;
     BamRecord& operator=(const BamRecord& other);
-    BamRecord& operator=(BamRecord&& other);
+    BamRecord& operator=(BamRecord&& other) noexcept;
     virtual ~BamRecord();
 
     /// \}

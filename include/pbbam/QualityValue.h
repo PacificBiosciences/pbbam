@@ -53,9 +53,9 @@ public:
     QualityValue(const uint8_t value = 0);
 
     QualityValue(const QualityValue&);
-    QualityValue(QualityValue&&);
+    QualityValue(QualityValue&&) noexcept;
     QualityValue& operator=(const QualityValue&);
-    QualityValue& operator=(QualityValue&&);
+    QualityValue& operator=(QualityValue&&) noexcept;
     ~QualityValue();
 
     /// \}

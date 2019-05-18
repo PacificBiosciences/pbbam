@@ -33,9 +33,9 @@ public:
     explicit KSeqReader(const std::string& fn);
 
     KSeqReader(const KSeqReader&) = delete;
-    KSeqReader(KSeqReader&&);
+    KSeqReader(KSeqReader&&) noexcept;
     KSeqReader& operator=(const KSeqReader&) = delete;
-    KSeqReader& operator=(KSeqReader&&);
+    KSeqReader& operator=(KSeqReader&&) noexcept;
     virtual ~KSeqReader();
 
 protected:

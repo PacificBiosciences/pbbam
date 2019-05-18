@@ -25,11 +25,12 @@ FastqSequence::FastqSequence() = default;
 
 FastqSequence::FastqSequence(const FastqSequence&) = default;
 
-FastqSequence::FastqSequence(FastqSequence&&) = default;
+FastqSequence::FastqSequence(FastqSequence&&) noexcept = default;
 
 FastqSequence& FastqSequence::operator=(const FastqSequence&) = default;
 
-FastqSequence& FastqSequence::operator=(FastqSequence&&) = default;
+FastqSequence& FastqSequence::operator=(FastqSequence&&) noexcept(
+    std::is_nothrow_move_assignable<FastaSequence>::value) = default;
 
 FastqSequence::~FastqSequence() = default;
 

@@ -132,9 +132,9 @@ BamWriter::BamWriter(const std::string& filename, const BamHeader& header,
 {
 }
 
-BamWriter::BamWriter(BamWriter&&) = default;
+BamWriter::BamWriter(BamWriter&&) noexcept = default;
 
-BamWriter& BamWriter::operator=(BamWriter&&) = default;
+BamWriter& BamWriter::operator=(BamWriter&&) noexcept = default;
 
 BamWriter::~BamWriter()
 {

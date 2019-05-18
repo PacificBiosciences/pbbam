@@ -36,9 +36,9 @@ public:
 
     IndexResultBlock() = default;
     IndexResultBlock(const IndexResultBlock&) = default;
-    IndexResultBlock(IndexResultBlock&&) = default;
+    IndexResultBlock(IndexResultBlock&&) noexcept = default;
     IndexResultBlock& operator=(const IndexResultBlock&) = default;
-    IndexResultBlock& operator=(IndexResultBlock&&) = default;
+    IndexResultBlock& operator=(IndexResultBlock&&) noexcept = default;
     ~IndexResultBlock() = default;
 
 public:

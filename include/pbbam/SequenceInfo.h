@@ -52,9 +52,9 @@ public:
 
     SequenceInfo();
     SequenceInfo(const SequenceInfo&);
-    SequenceInfo(SequenceInfo&&);
+    SequenceInfo(SequenceInfo&&) noexcept;
     SequenceInfo& operator=(const SequenceInfo&);
-    SequenceInfo& operator=(SequenceInfo&&);
+    SequenceInfo& operator=(SequenceInfo&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~SequenceInfo();
 
     /// \}

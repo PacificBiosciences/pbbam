@@ -41,9 +41,9 @@ public:
 
     AlignmentPrinter() = delete;
     AlignmentPrinter(const AlignmentPrinter&) = delete;
-    AlignmentPrinter(AlignmentPrinter&&);
+    AlignmentPrinter(AlignmentPrinter&&) noexcept;
     AlignmentPrinter& operator=(const AlignmentPrinter&) = delete;
-    AlignmentPrinter& operator=(AlignmentPrinter&&);
+    AlignmentPrinter& operator=(AlignmentPrinter&&) noexcept;
     ~AlignmentPrinter();
 
     /// \}

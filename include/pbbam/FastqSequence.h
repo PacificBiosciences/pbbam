@@ -7,10 +7,12 @@
 #ifndef FASTQSEQUENCE_H
 #define FASTQSEQUENCE_H
 
+#include <string>
+
+#include "pbbam/Config.h"
+
 #include <pbbam/FastaSequence.h>
 #include <pbbam/QualityValues.h>
-
-#include <string>
 
 namespace PacBio {
 namespace BAM {
@@ -43,9 +45,10 @@ public:
 
     FastqSequence();
     FastqSequence(const FastqSequence&);
-    FastqSequence(FastqSequence&&);
+    FastqSequence(FastqSequence&&) noexcept;
     FastqSequence& operator=(const FastqSequence&);
-    FastqSequence& operator=(FastqSequence&&);
+    FastqSequence& operator=(FastqSequence&&) noexcept(
+        std::is_nothrow_move_assignable<FastaSequence>::value);
     ~FastqSequence();
 
     /// \}

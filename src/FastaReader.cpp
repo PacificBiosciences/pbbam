@@ -36,9 +36,9 @@ FastaReader::FastaReader(const std::string& fn)
 {
 }
 
-FastaReader::FastaReader(FastaReader&&) = default;
+FastaReader::FastaReader(FastaReader&&) noexcept = default;
 
-FastaReader& FastaReader::operator=(FastaReader&&) = default;
+FastaReader& FastaReader::operator=(FastaReader&&) noexcept = default;
 
 FastaReader::~FastaReader() = default;
 

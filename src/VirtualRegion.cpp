@@ -34,11 +34,11 @@ VirtualRegion::VirtualRegion() = default;
 
 VirtualRegion::VirtualRegion(const VirtualRegion&) = default;
 
-VirtualRegion::VirtualRegion(VirtualRegion&&) = default;
+VirtualRegion::VirtualRegion(VirtualRegion&&) noexcept = default;
 
 VirtualRegion& VirtualRegion::operator=(const VirtualRegion&) = default;
 
-VirtualRegion& VirtualRegion::operator=(VirtualRegion&&) = default;
+VirtualRegion& VirtualRegion::operator=(VirtualRegion&&) noexcept = default;
 
 VirtualRegion::~VirtualRegion() = default;
 

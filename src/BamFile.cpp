@@ -105,7 +105,7 @@ BamFile::BamFile(std::string filename) : d_{std::make_unique<BamFilePrivate>(std
 
 BamFile::BamFile(const BamFile& other) : d_{other.d_->DeepCopy()} {}
 
-BamFile::BamFile(BamFile&& other) : d_{std::move(other.d_)} {}
+BamFile::BamFile(BamFile&&) noexcept = default;
 
 BamFile& BamFile::operator=(const BamFile& other)
 {
@@ -115,13 +115,7 @@ BamFile& BamFile::operator=(const BamFile& other)
     return *this;
 }
 
-BamFile& BamFile::operator=(BamFile&& other)
-{
-    if (this != &other) {
-        d_ = std::move(other.d_);
-    }
-    return *this;
-}
+BamFile& BamFile::operator=(BamFile&&) noexcept = default;
 
 BamFile::~BamFile() = default;
 

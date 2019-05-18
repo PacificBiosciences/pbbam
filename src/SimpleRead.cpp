@@ -99,11 +99,11 @@ SimpleRead::SimpleRead(std::string name, std::string seq, QualityValues qualitie
 
 SimpleRead::SimpleRead(const SimpleRead&) = default;
 
-SimpleRead::SimpleRead(SimpleRead&&) = default;
+SimpleRead::SimpleRead(SimpleRead&&) noexcept = default;
 
 SimpleRead& SimpleRead::operator=(const SimpleRead&) = default;
 
-SimpleRead& SimpleRead::operator=(SimpleRead&&) = default;
+SimpleRead& SimpleRead::operator=(SimpleRead&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 SimpleRead::~SimpleRead() = default;
 
@@ -125,11 +125,12 @@ MappedSimpleRead::MappedSimpleRead(const SimpleRead& read, PacBio::BAM::Strand s
 
 MappedSimpleRead::MappedSimpleRead(const MappedSimpleRead&) = default;
 
-MappedSimpleRead::MappedSimpleRead(MappedSimpleRead&&) = default;
+MappedSimpleRead::MappedSimpleRead(MappedSimpleRead&&) noexcept = default;
 
 MappedSimpleRead& MappedSimpleRead::operator=(const MappedSimpleRead&) = default;
 
-MappedSimpleRead& MappedSimpleRead::operator=(MappedSimpleRead&&) = default;
+MappedSimpleRead& MappedSimpleRead::operator=(MappedSimpleRead&&) noexcept(
+    std::is_nothrow_move_assignable<SimpleRead>::value) = default;
 
 MappedSimpleRead::~MappedSimpleRead() = default;
 

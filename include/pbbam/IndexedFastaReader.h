@@ -37,9 +37,9 @@ public:
 
     IndexedFastaReader() = delete;
     IndexedFastaReader(const IndexedFastaReader&);
-    IndexedFastaReader(IndexedFastaReader&&);
+    IndexedFastaReader(IndexedFastaReader&&) noexcept;
     IndexedFastaReader& operator=(const IndexedFastaReader&);
-    IndexedFastaReader& operator=(IndexedFastaReader&&);
+    IndexedFastaReader& operator=(IndexedFastaReader&&) noexcept;
     ~IndexedFastaReader();
 
     /// \}

@@ -30,9 +30,9 @@ public:
 
     FastaSequence();
     FastaSequence(const FastaSequence&);
-    FastaSequence(FastaSequence&&);
+    FastaSequence(FastaSequence&&) noexcept;
     FastaSequence& operator=(const FastaSequence&);
-    FastaSequence& operator=(FastaSequence&&);
+    FastaSequence& operator=(FastaSequence&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~FastaSequence();
 
     /// \}

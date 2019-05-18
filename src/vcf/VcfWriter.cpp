@@ -35,9 +35,9 @@ VcfWriter::VcfWriter(std::string fn, const VcfHeader& header)
 {
 }
 
-VcfWriter::VcfWriter(VcfWriter&&) = default;
+VcfWriter::VcfWriter(VcfWriter&&) noexcept = default;
 
-VcfWriter& VcfWriter::operator=(VcfWriter&&) = default;
+VcfWriter& VcfWriter::operator=(VcfWriter&&) noexcept = default;
 
 VcfWriter::~VcfWriter() = default;
 

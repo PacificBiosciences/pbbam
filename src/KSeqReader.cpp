@@ -19,9 +19,9 @@ KSeqReader::KSeqReader(const std::string& fn) : fp_{gzopen(fn.c_str(), "r")}, se
         throw std::runtime_error{"KSeqReader: could not open file for reading: " + fn};
 }
 
-KSeqReader::KSeqReader(KSeqReader&&) = default;
+KSeqReader::KSeqReader(KSeqReader&&) noexcept = default;
 
-KSeqReader& KSeqReader::operator=(KSeqReader&&) = default;
+KSeqReader& KSeqReader::operator=(KSeqReader&&) noexcept = default;
 
 KSeqReader::~KSeqReader() { gzclose(fp_); }
 

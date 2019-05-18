@@ -7,6 +7,18 @@
 #ifndef PBBAM_CONFIG_H
 #define PBBAM_CONFIG_H
 
+#include <string>
+#include <type_traits>
+
+// string& operator= (string&& str)
+// has been made noexcept only in LWG 2063:
+//   http://cplusplus.github.io/LWG/lwg-defects.html#2063
+// GCC 6+'s "C++11"/SSO std::string is noexcept, but the COW std::string used
+// by RHEL devtoolset-6 isn't, and as such we have to make this conditional
+// See also
+//   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=58265#c13
+#define PBBAM_NOEXCEPT_MOVE_ASSIGN noexcept(std::is_nothrow_move_assignable<std::string>::value)
+
 /// \name Library Import/Export
 /// \{
 

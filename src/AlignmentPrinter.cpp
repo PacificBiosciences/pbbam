@@ -23,9 +23,9 @@ AlignmentPrinter::AlignmentPrinter(const IndexedFastaReader& ifr)
 {
 }
 
-AlignmentPrinter::AlignmentPrinter(AlignmentPrinter&&) = default;
+AlignmentPrinter::AlignmentPrinter(AlignmentPrinter&&) noexcept = default;
 
-AlignmentPrinter& AlignmentPrinter::operator=(AlignmentPrinter&&) = default;
+AlignmentPrinter& AlignmentPrinter::operator=(AlignmentPrinter&&) noexcept = default;
 
 AlignmentPrinter::~AlignmentPrinter() = default;
 

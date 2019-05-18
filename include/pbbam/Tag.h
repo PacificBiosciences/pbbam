@@ -167,9 +167,9 @@ public:
 
     Tag();
     Tag(const Tag&);
-    Tag(Tag&&);
+    Tag(Tag&&) noexcept;
     Tag& operator=(const Tag&);
-    Tag& operator=(Tag&&);
+    Tag& operator=(Tag&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~Tag();
 
     Tag& operator=(boost::blank value);

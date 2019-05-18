@@ -5,6 +5,8 @@
 
 #include <string>
 
+#include "pbbam/Config.h"
+
 #include <pbbam/internal/QueryBase.h>
 
 #include <pbbam/vcf/VcfFile.h>
@@ -22,9 +24,9 @@ public:
 
     VcfQuery() = delete;
     VcfQuery(const VcfQuery&) = delete;
-    VcfQuery(VcfQuery&&) = default;
+    VcfQuery(VcfQuery&&) noexcept;
     VcfQuery& operator=(const VcfQuery&) = delete;
-    VcfQuery& operator=(VcfQuery&&) = default;
+    VcfQuery& operator=(VcfQuery&&) noexcept(std::is_nothrow_move_assignable<VcfReader>::value);
     ~VcfQuery();
 
 public:

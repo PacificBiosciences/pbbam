@@ -37,11 +37,11 @@ SequenceInfo::SequenceInfo() = default;
 
 SequenceInfo::SequenceInfo(const SequenceInfo&) = default;
 
-SequenceInfo::SequenceInfo(SequenceInfo&&) = default;
+SequenceInfo::SequenceInfo(SequenceInfo&&) noexcept = default;
 
 SequenceInfo& SequenceInfo::operator=(const SequenceInfo&) = default;
 
-SequenceInfo& SequenceInfo::operator=(SequenceInfo&&) = default;
+SequenceInfo& SequenceInfo::operator=(SequenceInfo&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 SequenceInfo::~SequenceInfo() = default;
 

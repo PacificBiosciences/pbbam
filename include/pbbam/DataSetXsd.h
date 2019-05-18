@@ -75,9 +75,9 @@ public:
 
     NamespaceRegistry();
     NamespaceRegistry(const NamespaceRegistry&);
-    NamespaceRegistry(NamespaceRegistry&&);
+    NamespaceRegistry(NamespaceRegistry&&) noexcept;
     NamespaceRegistry& operator=(const NamespaceRegistry&);
-    NamespaceRegistry& operator=(NamespaceRegistry&&);
+    NamespaceRegistry& operator=(NamespaceRegistry&&) noexcept;
     ~NamespaceRegistry();
 
     /// \}

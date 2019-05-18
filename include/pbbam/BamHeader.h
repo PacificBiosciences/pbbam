@@ -54,9 +54,9 @@ public:
 
     BamHeader();
     BamHeader(const BamHeader&);
-    BamHeader(BamHeader&&);
+    BamHeader(BamHeader&&) noexcept;
     BamHeader& operator=(const BamHeader&);
-    BamHeader& operator=(BamHeader&&);
+    BamHeader& operator=(BamHeader&&) noexcept;
     ~BamHeader();
 
     /// \brief Detaches underlying data from the shared-pointer, returning a

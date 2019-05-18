@@ -158,9 +158,9 @@ public:
               const BamWriter::Config& config);
 
     BamWriter(const BamWriter&) = delete;
-    BamWriter(BamWriter&&);
+    BamWriter(BamWriter&&) noexcept;
     BamWriter& operator=(const BamWriter&) = delete;
-    BamWriter& operator=(BamWriter&&);
+    BamWriter& operator=(BamWriter&&) noexcept;
 
     /// Fully flushes all buffered data & closes file.
     ~BamWriter() override;
