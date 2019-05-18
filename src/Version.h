@@ -82,25 +82,8 @@ inline bool Version::operator!=(const Version& other) const { return !(*this == 
 
 inline bool Version::operator<(const Version& other) const
 {
-    // 2.* < 3.*
-    if (major_ < other.major_) return true;
-
-    // 3. ==  3.
-    else if (major_ == other.major_) {
-
-        // 3.1.* < 3.2.*
-        if (minor_ < other.minor_) return true;
-
-        // 3.2. == 3.2.
-        else if (minor_ == other.minor_) {
-
-            // 3.2.1 < 3.2.2
-            if (revision_ < other.revision_) return true;
-        }
-    }
-
-    // otherwise not less-than
-    return false;
+    return std::tie(major_, minor_, revision_) <
+           std::tie(other.major_, other.minor_, other.revision_);
 }
 inline bool Version::operator<=(const Version& other) const { return !(*this > other); }
 
