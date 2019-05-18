@@ -54,7 +54,7 @@ std::unique_ptr<DataSetBase> DataSetFromFasta(const std::string& fasta)
     auto dataset = std::make_unique<ReferenceSet>();
     auto& resources = dataset->ExternalResources();
     resources.Add(ExternalResource("PacBio.ReferenceFile.ReferenceFastaFile", fasta));
-    return std::move(dataset);
+    return dataset;
 }
 
 std::unique_ptr<DataSetBase> DataSetFromFofn(const std::string& fofn)
