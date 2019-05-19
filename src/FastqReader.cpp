@@ -37,9 +37,9 @@ FastqReader::FastqReader(const std::string& fn)
 {
 }
 
-FastqReader::FastqReader(FastqReader&&) = default;
+FastqReader::FastqReader(FastqReader&&) noexcept = default;
 
-FastqReader& FastqReader::operator=(FastqReader&&) = default;
+FastqReader& FastqReader::operator=(FastqReader&&) noexcept = default;
 
 FastqReader::~FastqReader() = default;
 

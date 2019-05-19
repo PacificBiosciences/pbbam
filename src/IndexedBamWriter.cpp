@@ -1005,9 +1005,9 @@ IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamH
         pbiCompressionLevel, numPbiThreads, numGziThreads, tempFileBufferSize);
 }
 
-IndexedBamWriter::IndexedBamWriter(IndexedBamWriter&&) = default;
+IndexedBamWriter::IndexedBamWriter(IndexedBamWriter&&) noexcept = default;
 
-IndexedBamWriter& IndexedBamWriter::operator=(IndexedBamWriter&&) = default;
+IndexedBamWriter& IndexedBamWriter::operator=(IndexedBamWriter&&) noexcept = default;
 
 IndexedBamWriter::~IndexedBamWriter() = default;
 

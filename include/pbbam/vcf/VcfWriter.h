@@ -17,8 +17,8 @@ class VcfWriter
 public:
     VcfWriter(std::string filename, const VcfHeader& header);
 
-    VcfWriter(VcfWriter&&);
-    VcfWriter& operator=(VcfWriter&&);
+    VcfWriter(VcfWriter&&) noexcept;
+    VcfWriter& operator=(VcfWriter&&) noexcept;
     ~VcfWriter();
 
 public:

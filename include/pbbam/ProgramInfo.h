@@ -9,6 +9,7 @@
 
 #include <map>
 #include <string>
+
 #include "pbbam/Config.h"
 
 namespace PacBio {
@@ -51,9 +52,9 @@ public:
 
     ProgramInfo();
     ProgramInfo(const ProgramInfo&);
-    ProgramInfo(ProgramInfo&&);
+    ProgramInfo(ProgramInfo&&) noexcept;
     ProgramInfo& operator=(const ProgramInfo&);
-    ProgramInfo& operator=(ProgramInfo&&);
+    ProgramInfo& operator=(ProgramInfo&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~ProgramInfo();
 
     /// \}

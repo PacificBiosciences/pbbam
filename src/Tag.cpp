@@ -124,11 +124,11 @@ Tag::Tag() = default;
 
 Tag::Tag(const Tag&) = default;
 
-Tag::Tag(Tag&&) = default;
+Tag::Tag(Tag&&) noexcept = default;
 
 Tag& Tag::operator=(const Tag&) = default;
 
-Tag& Tag::operator=(Tag&&) = default;
+Tag& Tag::operator=(Tag&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 Tag::~Tag() = default;
 

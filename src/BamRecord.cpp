@@ -361,14 +361,7 @@ BamRecord::BamRecord(const BamRecord& other)
 {
 }
 
-BamRecord::BamRecord(BamRecord&& other)
-    : impl_{std::move(other.impl_)}
-    , header_{std::move(other.header_)}
-    , alignedStart_{std::move(other.alignedStart_)}
-    , alignedEnd_{std::move(other.alignedEnd_)}
-    , p2bCache_{std::move(other.p2bCache_)}
-{
-}
+BamRecord::BamRecord(BamRecord&&) noexcept = default;
 
 BamRecord& BamRecord::operator=(const BamRecord& other)
 {
@@ -382,17 +375,7 @@ BamRecord& BamRecord::operator=(const BamRecord& other)
     return *this;
 }
 
-BamRecord& BamRecord::operator=(BamRecord&& other)
-{
-    if (this != &other) {
-        impl_ = std::move(other.impl_);
-        header_ = std::move(other.header_);
-        alignedStart_ = std::move(other.alignedStart_);
-        alignedEnd_ = std::move(other.alignedEnd_);
-        p2bCache_ = std::move(other.p2bCache_);
-    }
-    return *this;
-}
+BamRecord& BamRecord::operator=(BamRecord&&) noexcept = default;
 
 BamRecord::~BamRecord() = default;
 

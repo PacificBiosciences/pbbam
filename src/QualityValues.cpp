@@ -50,11 +50,11 @@ QualityValues::QualityValues() = default;
 
 QualityValues::QualityValues(const QualityValues&) = default;
 
-QualityValues::QualityValues(QualityValues&&) = default;
+QualityValues::QualityValues(QualityValues&&) noexcept = default;
 
 QualityValues& QualityValues::operator=(const QualityValues&) = default;
 
-QualityValues& QualityValues::operator=(QualityValues&&) = default;
+QualityValues& QualityValues::operator=(QualityValues&&) noexcept = default;
 
 QualityValues::~QualityValues() = default;
 

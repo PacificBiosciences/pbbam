@@ -1,4 +1,3 @@
-
 #include <pbbam/vcf/VcfHeader.h>
 
 #include "pbbam/vcf/VcfHeaderTypes.h"
@@ -22,11 +21,12 @@ ContigDefinition::ContigDefinition(std::string id,
 
 ContigDefinition::ContigDefinition(const ContigDefinition&) = default;
 
-ContigDefinition::ContigDefinition(ContigDefinition&&) = default;
+ContigDefinition::ContigDefinition(ContigDefinition&&) noexcept = default;
 
 ContigDefinition& ContigDefinition::operator=(const ContigDefinition&) = default;
 
-ContigDefinition& ContigDefinition::operator=(ContigDefinition&&) = default;
+ContigDefinition& ContigDefinition::operator=(ContigDefinition&&)
+    PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 ContigDefinition::~ContigDefinition() = default;
 
@@ -72,11 +72,12 @@ FilterDefinition::FilterDefinition(std::string id, std::string description)
 
 FilterDefinition::FilterDefinition(const FilterDefinition&) = default;
 
-FilterDefinition::FilterDefinition(FilterDefinition&&) = default;
+FilterDefinition::FilterDefinition(FilterDefinition&&) noexcept = default;
 
 FilterDefinition& FilterDefinition::operator=(const FilterDefinition&) = default;
 
-FilterDefinition& FilterDefinition::operator=(FilterDefinition&&) = default;
+FilterDefinition& FilterDefinition::operator=(FilterDefinition&&)
+    PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 FilterDefinition::~FilterDefinition() = default;
 
@@ -111,11 +112,12 @@ FormatDefinition::FormatDefinition(std::string id, std::string number, std::stri
 
 FormatDefinition::FormatDefinition(const FormatDefinition&) = default;
 
-FormatDefinition::FormatDefinition(FormatDefinition&&) = default;
+FormatDefinition::FormatDefinition(FormatDefinition&&) noexcept = default;
 
 FormatDefinition& FormatDefinition::operator=(const FormatDefinition&) = default;
 
-FormatDefinition& FormatDefinition::operator=(FormatDefinition&&) = default;
+FormatDefinition& FormatDefinition::operator=(FormatDefinition&&)
+    PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 FormatDefinition::~FormatDefinition() = default;
 
@@ -145,11 +147,12 @@ GeneralDefinition::GeneralDefinition(std::string id, std::string text)
 
 GeneralDefinition::GeneralDefinition(const GeneralDefinition&) = default;
 
-GeneralDefinition::GeneralDefinition(GeneralDefinition&&) = default;
+GeneralDefinition::GeneralDefinition(GeneralDefinition&&) noexcept = default;
 
 GeneralDefinition& GeneralDefinition::operator=(const GeneralDefinition&) = default;
 
-GeneralDefinition& GeneralDefinition::operator=(GeneralDefinition&&) = default;
+GeneralDefinition& GeneralDefinition::operator=(GeneralDefinition&&)
+    PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 GeneralDefinition::~GeneralDefinition() = default;
 
@@ -188,11 +191,11 @@ InfoDefinition::InfoDefinition(std::string id, std::string number, std::string t
 
 InfoDefinition::InfoDefinition(const InfoDefinition&) = default;
 
-InfoDefinition::InfoDefinition(InfoDefinition&&) = default;
+InfoDefinition::InfoDefinition(InfoDefinition&&) noexcept = default;
 
 InfoDefinition& InfoDefinition::operator=(const InfoDefinition&) = default;
 
-InfoDefinition& InfoDefinition::operator=(InfoDefinition&&) = default;
+InfoDefinition& InfoDefinition::operator=(InfoDefinition&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 InfoDefinition::~InfoDefinition() = default;
 

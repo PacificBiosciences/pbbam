@@ -74,9 +74,9 @@ public:
 
     QualityValues();
     QualityValues(const QualityValues&);
-    QualityValues(QualityValues&&);
+    QualityValues(QualityValues&&) noexcept;
     QualityValues& operator=(const QualityValues&);
-    QualityValues& operator=(QualityValues&&);
+    QualityValues& operator=(QualityValues&&) noexcept;
     ~QualityValues();
 
     QualityValues& operator=(std::vector<QualityValue> quals);

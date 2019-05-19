@@ -40,9 +40,9 @@ public:
 
     VirtualZmwBamRecord() = delete;
     VirtualZmwBamRecord(const VirtualZmwBamRecord&);
-    VirtualZmwBamRecord(VirtualZmwBamRecord&&);
+    VirtualZmwBamRecord(VirtualZmwBamRecord&&) noexcept;
     VirtualZmwBamRecord& operator=(const VirtualZmwBamRecord&);
-    VirtualZmwBamRecord& operator=(VirtualZmwBamRecord&&);
+    VirtualZmwBamRecord& operator=(VirtualZmwBamRecord&&) noexcept;
     virtual ~VirtualZmwBamRecord();
 
     /// \}

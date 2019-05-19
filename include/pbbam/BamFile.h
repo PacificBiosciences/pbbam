@@ -36,9 +36,9 @@ public:
     BamFile(std::string filename);
 
     BamFile(const BamFile& other);
-    BamFile(BamFile&& other);
+    BamFile(BamFile&& other) noexcept;
     BamFile& operator=(const BamFile& other);
-    BamFile& operator=(BamFile&& other);
+    BamFile& operator=(BamFile&& other) noexcept;
     ~BamFile();
 
     /// \}

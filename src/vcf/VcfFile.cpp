@@ -14,11 +14,11 @@ VcfFile::VcfFile(std::string fn)
 
 VcfFile::VcfFile(const VcfFile&) = default;
 
-VcfFile::VcfFile(VcfFile&&) = default;
+VcfFile::VcfFile(VcfFile&&) noexcept = default;
 
 VcfFile& VcfFile::operator=(const VcfFile&) = default;
 
-VcfFile& VcfFile::operator=(VcfFile&&) = default;
+VcfFile& VcfFile::operator=(VcfFile&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 VcfFile::~VcfFile() = default;
 

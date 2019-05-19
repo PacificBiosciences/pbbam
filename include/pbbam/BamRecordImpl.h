@@ -62,9 +62,9 @@ public:
 
     BamRecordImpl();
     BamRecordImpl(const BamRecordImpl& other);
-    BamRecordImpl(BamRecordImpl&& other);
+    BamRecordImpl(BamRecordImpl&& other) noexcept;
     BamRecordImpl& operator=(const BamRecordImpl& other);
-    BamRecordImpl& operator=(BamRecordImpl&& other);
+    BamRecordImpl& operator=(BamRecordImpl&& other) noexcept;
     virtual ~BamRecordImpl();
 
     /// \}

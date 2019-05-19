@@ -69,17 +69,17 @@ GenomicInterval::GenomicInterval() = default;
 
 GenomicInterval::GenomicInterval(const GenomicInterval&) = default;
 
-GenomicInterval::GenomicInterval(GenomicInterval&&) = default;
+GenomicInterval::GenomicInterval(GenomicInterval&&) noexcept = default;
 
 GenomicInterval& GenomicInterval::operator=(const GenomicInterval&) = default;
 
-GenomicInterval& GenomicInterval::operator=(GenomicInterval&&) = default;
+GenomicInterval& GenomicInterval::operator=(GenomicInterval&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 GenomicInterval::~GenomicInterval() = default;
 
 bool GenomicInterval::operator==(const GenomicInterval& other) const
 {
-    return name_ == other.name_ && interval_ == other.interval_;
+    return std::tie(name_, interval_) == std::tie(other.name_, other.interval_);
 }
 
 bool GenomicInterval::operator!=(const GenomicInterval& other) const { return !(*this == other); }

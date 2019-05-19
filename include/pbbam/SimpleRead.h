@@ -33,9 +33,9 @@ public:
                Position qEnd, Frames pulseWidths);
 
     SimpleRead(const SimpleRead&);
-    SimpleRead(SimpleRead&&);
+    SimpleRead(SimpleRead&&) noexcept;
     SimpleRead& operator=(const SimpleRead&);
-    SimpleRead& operator=(SimpleRead&&);
+    SimpleRead& operator=(SimpleRead&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~SimpleRead();
 
     // general data
@@ -55,9 +55,10 @@ public:
                      Position templateEnd, PacBio::BAM::Cigar cigar, uint8_t mapQV);
 
     MappedSimpleRead(const MappedSimpleRead&);
-    MappedSimpleRead(MappedSimpleRead&&);
+    MappedSimpleRead(MappedSimpleRead&&) noexcept;
     MappedSimpleRead& operator=(const MappedSimpleRead&);
-    MappedSimpleRead& operator=(MappedSimpleRead&&);
+    MappedSimpleRead& operator=(MappedSimpleRead&&) noexcept(
+        std::is_nothrow_move_assignable<SimpleRead>::value);
     ~MappedSimpleRead();
 
     // mapping data

@@ -44,9 +44,9 @@ public:
     Interval(const T start, const T stop);
 
     Interval(const Interval<T>&) = default;
-    Interval(Interval&&) = default;
+    Interval(Interval&&) noexcept = default;
     Interval& operator=(const Interval<T>&) = default;
-    Interval& operator=(Interval<T>&&) = default;
+    Interval& operator=(Interval<T>&&) noexcept = default;
     ~Interval() = default;
 
     /// \}

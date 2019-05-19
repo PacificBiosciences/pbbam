@@ -49,11 +49,12 @@ BamRecordBuilder::BamRecordBuilder(const BamRecord& prototype) : header_{prototy
 
 BamRecordBuilder::BamRecordBuilder(const BamRecordBuilder&) = default;
 
-BamRecordBuilder::BamRecordBuilder(BamRecordBuilder&&) = default;
+BamRecordBuilder::BamRecordBuilder(BamRecordBuilder&&) noexcept = default;
 
 BamRecordBuilder& BamRecordBuilder::operator=(const BamRecordBuilder&) = default;
 
-BamRecordBuilder& BamRecordBuilder::operator=(BamRecordBuilder&&) = default;
+BamRecordBuilder& BamRecordBuilder::operator=(BamRecordBuilder&&)
+    PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 BamRecordBuilder::~BamRecordBuilder() = default;
 

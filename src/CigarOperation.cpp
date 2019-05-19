@@ -8,6 +8,8 @@
 
 #include "pbbam/CigarOperation.h"
 
+#include <tuple>
+
 #include <htslib/sam.h>
 
 namespace PacBio {
@@ -38,17 +40,17 @@ CigarOperation::CigarOperation(CigarOperationType op, uint32_t length) : type_{o
 
 CigarOperation::CigarOperation(const CigarOperation&) = default;
 
-CigarOperation::CigarOperation(CigarOperation&&) = default;
+CigarOperation::CigarOperation(CigarOperation&&) noexcept = default;
 
 CigarOperation& CigarOperation::operator=(const CigarOperation&) = default;
 
-CigarOperation& CigarOperation::operator=(CigarOperation&&) = default;
+CigarOperation& CigarOperation::operator=(CigarOperation&&) noexcept = default;
 
 CigarOperation::~CigarOperation() = default;
 
 bool CigarOperation::operator==(const CigarOperation& other) const
 {
-    return type_ == other.type_ && length_ == other.length_;
+    return std::tie(type_, length_) == std::tie(other.type_, other.length_);
 }
 
 bool CigarOperation::operator!=(const CigarOperation& other) const { return !(*this == other); }
