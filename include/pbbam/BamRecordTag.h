@@ -7,6 +7,8 @@
 #ifndef BAMRECORDTAG_H
 #define BAMRECORDTAG_H
 
+#include "pbbam/Config.h"
+
 namespace PacBio {
 namespace BAM {
 

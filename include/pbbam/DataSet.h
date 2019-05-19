@@ -7,6 +7,8 @@
 #ifndef DATASET_H
 #define DATASET_H
 
+#include "pbbam/Config.h"
+
 #include <chrono>
 #include <memory>
 #include <set>
@@ -14,7 +16,6 @@
 #include <vector>
 
 #include "pbbam/BamFile.h"
-#include "pbbam/Config.h"
 #include "pbbam/DataSetTypes.h"
 #include "pbbam/GenomicInterval.h"
 

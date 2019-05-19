@@ -7,13 +7,16 @@
 #ifndef BAMWRITER_H
 #define BAMWRITER_H
 
-#include <htslib/sam.h>
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <string>
+
+#include <htslib/sam.h>
+
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
 #include "pbbam/IRecordWriter.h"
 
 namespace PacBio {

@@ -8,6 +8,7 @@
 #define VIRTUALREGION_H
 
 #include "pbbam/Config.h"
+
 #include "pbbam/LocalContextFlags.h"
 #include "pbbam/virtual/VirtualRegionType.h"
 

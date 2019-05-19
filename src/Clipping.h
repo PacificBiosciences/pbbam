@@ -3,9 +3,11 @@
 #ifndef CLIPPING_H
 #define CLIPPING_H
 
-#include "pbbam/Cigar.h"
-#include "pbbam/Position.h"
-#include "pbbam/Strand.h"
+#include "pbbam/Config.h"
+
+#include <pbbam/Cigar.h>
+#include <pbbam/Position.h>
+#include <pbbam/Strand.h>
 
 namespace PacBio {
 namespace BAM {

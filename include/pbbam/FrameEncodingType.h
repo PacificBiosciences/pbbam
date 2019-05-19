@@ -7,6 +7,8 @@
 #ifndef FRAMEENCODINGTYPE_H
 #define FRAMEENCODINGTYPE_H
 
+#include "pbbam/Config.h"
+
 namespace PacBio {
 namespace BAM {
 

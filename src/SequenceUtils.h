@@ -3,6 +3,8 @@
 #ifndef SEQUENCEUTILS_H
 #define SEQUENCEUTILS_H
 
+#include "pbbam/Config.h"
+
 #include <algorithm>
 #include <array>
 #include <cctype>

@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include "../PbbamInternalConfig.h"
+
 #include <pbbam/vcf/VcfHeader.h>
 
 #include <pbbam/vcf/VcfFormat.h>

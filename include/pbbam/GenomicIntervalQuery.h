@@ -7,6 +7,8 @@
 #ifndef GENOMICINTERVALQUERY_H
 #define GENOMICINTERVALQUERY_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 
 #include "pbbam/BaiIndexCache.h"

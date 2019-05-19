@@ -7,6 +7,8 @@
 #ifndef FASTQWRITER_H
 #define FASTQWRITER_H
 
+#include "pbbam/Config.h"
+
 #include <fstream>
 #include <iostream>
 #include <string>

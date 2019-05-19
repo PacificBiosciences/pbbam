@@ -7,6 +7,8 @@
 #ifndef SIMPLEREAD_H
 #define SIMPLEREAD_H
 
+#include "pbbam/Config.h"
+
 #include <string>
 
 #include <boost/optional.hpp>

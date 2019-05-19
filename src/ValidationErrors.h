@@ -7,6 +7,8 @@
 #ifndef VALIDATIONERRORS_H
 #define VALIDATIONERRORS_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <limits>
 #include <map>

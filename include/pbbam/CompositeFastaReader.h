@@ -9,14 +9,15 @@
 #define COMPOSITEFASTAREADER_H
 
 #include "pbbam/Config.h"
-#include "pbbam/DataSet.h"
-#include "pbbam/FastaReader.h"
-#include "pbbam/FastaSequence.h"
 
 #include <deque>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "pbbam/DataSet.h"
+#include "pbbam/FastaReader.h"
+#include "pbbam/FastaSequence.h"
 
 namespace PacBio {
 namespace BAM {

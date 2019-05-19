@@ -3,11 +3,14 @@
 #ifndef DATASETIO_H
 #define DATASETIO_H
 
+#include "pbbam/Config.h"
+
 #include <iosfwd>
 #include <memory>
 #include <string>
 #include <vector>
-#include "pbbam/DataSet.h"
+
+#include <pbbam/DataSet.h>
 
 namespace PacBio {
 namespace BAM {

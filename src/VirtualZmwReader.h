@@ -7,11 +7,12 @@
 #ifndef VIRTUALZMWREADER_H
 #define VIRTUALZMWREADER_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
 #include "pbbam/EntireFileQuery.h"
 #include "pbbam/PbiFilter.h"
 #include "pbbam/PbiFilterQuery.h"

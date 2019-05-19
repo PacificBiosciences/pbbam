@@ -3,6 +3,8 @@
 #ifndef TIMEUTILS_H
 #define TIMEUTILS_H
 
+#include "pbbam/Config.h"
+
 #include <cassert>
 #include <chrono>
 #include <ctime>

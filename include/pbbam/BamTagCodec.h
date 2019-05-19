@@ -7,9 +7,11 @@
 #ifndef BAMTAGCODEC_H
 #define BAMTAGCODEC_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <vector>
-#include "pbbam/Config.h"
+
 #include "pbbam/TagCollection.h"
 
 namespace PacBio {

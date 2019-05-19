@@ -7,6 +7,8 @@
 #ifndef IRECORDWRITER_H
 #define IRECORDWRITER_H
 
+#include "pbbam/Config.h"
+
 namespace PacBio {
 namespace BAM {
 

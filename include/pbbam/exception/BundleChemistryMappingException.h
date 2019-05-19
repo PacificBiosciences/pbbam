@@ -7,6 +7,8 @@
 #ifndef BUNDLECHEMISTRYMAPPINGEXCEPTION_H
 #define BUNDLECHEMISTRYMAPPINGEXCEPTION_H
 
+#include "pbbam/Config.h"
+
 #include <exception>
 #include <string>
 

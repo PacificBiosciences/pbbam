@@ -3,6 +3,8 @@
 #ifndef PBBAM_VCF_VCFFORMAT_H
 #define PBBAM_VCF_VCFFORMAT_H
 
+#include "pbbam/Config.h"
+
 #include <iosfwd>
 #include <string>
 

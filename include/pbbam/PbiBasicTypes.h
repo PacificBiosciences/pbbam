@@ -7,13 +7,15 @@
 #ifndef PBIBASICTYPES_H
 #define PBIBASICTYPES_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <deque>
 #include <utility>
 #include <vector>
+
 #include "pbbam/Compare.h"
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {

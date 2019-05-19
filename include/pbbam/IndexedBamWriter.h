@@ -7,11 +7,12 @@
 #ifndef INDEXEDBAMWRITER_H
 #define INDEXEDBAMWRITER_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 #include <string>
 
 #include "pbbam/BamWriter.h"
-#include "pbbam/Config.h"
 #include "pbbam/IRecordWriter.h"
 #include "pbbam/PbiBuilder.h"
 

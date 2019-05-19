@@ -7,6 +7,8 @@
 #ifndef FASTAWRITER_H
 #define FASTAWRITER_H
 
+#include "pbbam/Config.h"
+
 #include <fstream>
 #include <iostream>
 #include <string>

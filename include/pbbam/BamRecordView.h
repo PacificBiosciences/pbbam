@@ -7,6 +7,8 @@
 #ifndef BAMRECORDVIEW_H
 #define BAMRECORDVIEW_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 
 #include "pbbam/BamRecord.h"

@@ -8,11 +8,14 @@
 #ifndef COMPARE_H
 #define COMPARE_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <string>
 #include <utility>
+
 #include "pbbam/BamRecord.h"
 
 namespace PacBio {

@@ -7,6 +7,8 @@
 #ifndef FASTAREADER_H
 #define FASTAREADER_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 #include <string>
 #include <vector>

@@ -7,6 +7,8 @@
 #ifndef KSEQREADER_H
 #define KSEQREADER_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 #include <string>
 

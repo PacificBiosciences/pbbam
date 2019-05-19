@@ -7,13 +7,14 @@
 #ifndef BAIINDEXCACHE_H
 #define BAIINDEXCACHE_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 #include <string>
 #include <vector>
 
 #include <htslib/hts.h>
 
-#include "pbbam/Config.h"
 #include "pbbam/Position.h"
 
 namespace PacBio {

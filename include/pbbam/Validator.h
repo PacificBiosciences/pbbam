@@ -7,9 +7,11 @@
 #ifndef VALIDATOR_H
 #define VALIDATOR_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <limits>
-#include "pbbam/Config.h"
+
 #include "pbbam/exception/ValidationException.h"
 
 namespace PacBio {

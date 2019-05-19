@@ -7,9 +7,11 @@
 #ifndef DATASETTYPES_H
 #define DATASETTYPES_H
 
-#include <string>
-#include "pbbam/BamFile.h"
 #include "pbbam/Config.h"
+
+#include <string>
+
+#include "pbbam/BamFile.h"
 #include "pbbam/DataSetXsd.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 

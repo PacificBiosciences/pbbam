@@ -7,6 +7,8 @@
 #ifndef BAMREADER_H
 #define BAMREADER_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -16,7 +18,6 @@
 #include "pbbam/BamFile.h"
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
 #include "pbbam/GenomicInterval.h"
 #include "pbbam/internal/QueryBase.h"
 

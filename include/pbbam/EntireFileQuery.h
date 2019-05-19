@@ -7,7 +7,10 @@
 #ifndef ENTIREFILEQUERY_H
 #define ENTIREFILEQUERY_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
+
 #include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {
@@ -57,6 +60,6 @@ private:
 };
 
 }  // namespace BAM
-}  // namspace PacBio
+}  // namespace PacBio
 
 #endif  // ENTIREFILEQUERY_H

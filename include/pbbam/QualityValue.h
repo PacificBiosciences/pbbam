@@ -7,10 +7,11 @@
 #ifndef QUALITYVALUE_H
 #define QUALITYVALUE_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <string>
 #include <vector>
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {

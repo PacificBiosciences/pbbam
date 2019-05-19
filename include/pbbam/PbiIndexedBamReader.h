@@ -7,7 +7,10 @@
 #ifndef PBIINDEXEDBAMREADER_H
 #define PBIINDEXEDBAMREADER_H
 
+#include "pbbam/Config.h"
+
 #include <string>
+
 #include "pbbam/BamFile.h"
 #include "pbbam/BamReader.h"
 #include "pbbam/PbiBasicTypes.h"

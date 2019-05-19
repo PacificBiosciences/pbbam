@@ -7,9 +7,10 @@
 #ifndef DATASETXSD_H
 #define DATASETXSD_H
 
+#include "pbbam/Config.h"
+
 #include <map>
 #include <string>
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {

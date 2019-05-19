@@ -7,6 +7,8 @@
 #ifndef BAMHEADER_H
 #define BAMHEADER_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -14,7 +16,6 @@
 #include <string>
 #include <vector>
 
-#include "pbbam/Config.h"
 #include "pbbam/ProgramInfo.h"
 #include "pbbam/ReadGroupInfo.h"
 #include "pbbam/SequenceInfo.h"

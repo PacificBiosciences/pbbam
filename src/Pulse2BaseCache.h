@@ -3,6 +3,8 @@
 #ifndef PULSE2BASECACHE_H
 #define PULSE2BASECACHE_H
 
+#include "pbbam/Config.h"
+
 #include <cassert>
 #include <cctype>
 #include <cstddef>
@@ -10,8 +12,6 @@
 #include <type_traits>
 
 #include <boost/dynamic_bitset.hpp>
-
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {

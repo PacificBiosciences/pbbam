@@ -7,6 +7,8 @@
 #ifndef FASTQREADER_H
 #define FASTQREADER_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 #include <string>
 #include <vector>

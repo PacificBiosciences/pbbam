@@ -7,6 +7,8 @@
 #ifndef RECORDTYPE_H
 #define RECORDTYPE_H
 
+#include "pbbam/Config.h"
+
 #include <string>
 
 namespace PacBio {
