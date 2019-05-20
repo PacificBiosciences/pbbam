@@ -95,7 +95,8 @@ void FaiIndex::Add(std::string name, FaiEntry entry) { d_->Add(std::move(name), 
 const FaiEntry& FaiIndex::Entry(const std::string& name) const
 {
     const auto found = d_->data_.find(name);
-    if (found == d_->data_.cend()) throw std::runtime_error{""};
+    if (found == d_->data_.cend())
+        throw std::runtime_error{"FaiIndex: could not find entry for sequence name: " + name};
     return found->second;
 }
 
