@@ -8,15 +8,25 @@
 
 #include "pbbam/FastqWriter.h"
 
+#include <stdexcept>
+
 #include "pbbam/BamRecord.h"
 #include "pbbam/FastqSequence.h"
 #include "pbbam/QualityValues.h"
 
+#include "FormatUtils.h"
+
 namespace PacBio {
 namespace BAM {
 
-FastqWriter::FastqWriter(const std::string& fn) : IRecordWriter(), file_{fn}
+FastqWriter::FastqWriter(const std::string& fn) : IRecordWriter()
 {
+    if (!FormatUtils::IsFastqFilename(fn)) {
+        throw std::runtime_error{"FastqReader: filename '" + fn +
+                                 "' is not recognized as a FASTQ file."};
+    }
+
+    file_.open(fn);
     if (!file_) throw std::runtime_error{"FastqWriter: could not open file for writing: " + fn};
 }
 
@@ -45,7 +55,6 @@ void FastqWriter::Write(const std::string& name, const std::string& bases,
 
 void FastqWriter::Write(const std::string& name, const std::string& bases, const std::string& quals)
 {
-
     file_ << "@" << name << '\n' << bases << '\n' << "+\n";
 
     if (!quals.empty())

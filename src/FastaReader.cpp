@@ -8,27 +8,40 @@
 
 #include "pbbam/FastaReader.h"
 
+#include <algorithm>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
+#include "FormatUtils.h"
 #include "KSeqReader.h"
 
 namespace PacBio {
 namespace BAM {
 
-class FastaReader::FastaReaderPrivate : public KSeqReader
+class FastaReader::FastaReaderPrivate
 {
 public:
-    explicit FastaReaderPrivate(const std::string& fn) : KSeqReader{fn} {}
+    explicit FastaReaderPrivate(const std::string& fn)
+    {
+        // validate extension
+        if (!FormatUtils::IsFastaFilename(fn)) {
+            throw std::runtime_error{"FastaReader: filename '" + fn +
+                                     "' is not recognized as a FASTA file."};
+        }
+        reader_ = std::make_unique<KSeqReader>(fn);
+    }
 
     bool GetNext(FastaSequence& record)
     {
-        const auto readOk = ReadNext();
-        if (!readOk) return false;
+        const auto readOk = reader_->ReadNext();
+        if (!readOk) return false;  // not error, could be EOF
 
-        record = FastaSequence{std::string{seq_->name.s, seq_->name.l},
-                               std::string{seq_->seq.s, seq_->seq.l}};
+        record = FastaSequence{reader_->Name(), reader_->Bases()};
         return true;
     }
+
+    std::unique_ptr<KSeqReader> reader_;
 };
 
 FastaReader::FastaReader(const std::string& fn)
@@ -49,9 +62,8 @@ std::vector<FastaSequence> FastaReader::ReadAll(const std::string& fn)
     std::vector<FastaSequence> result;
     result.reserve(256);
     FastaReader reader{fn};
-    FastaSequence s;
-    while (reader.GetNext(s))
-        result.emplace_back(s);
+    for (const auto& seq : reader)
+        result.emplace_back(seq);
     return result;
 }
 

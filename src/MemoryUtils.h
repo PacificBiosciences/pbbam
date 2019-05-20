@@ -11,6 +11,7 @@
 #include <htslib/bgzf.h>
 #include <htslib/faidx.h>
 #include <htslib/sam.h>
+#include <zlib.h>
 
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
@@ -36,6 +37,15 @@ struct FileDeleter
 struct FreeDeleter
 {
     void operator()(void* p) const { std::free(p); }
+};
+
+struct GzFileDeleter
+{
+    void operator()(gzFile fp) const
+    {
+        if (fp) gzclose(fp);
+        fp = nullptr;
+    }
 };
 
 struct HtslibBgzfDeleter

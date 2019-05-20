@@ -15,19 +15,10 @@
 #include <htslib/kseq.h>
 #include <zlib.h>
 
+#include "MemoryUtils.h"
+
 namespace PacBio {
 namespace BAM {
-
-KSEQ_INIT(gzFile, gzread)
-
-struct KSeqDeleter
-{
-    void operator()(kseq_t* seq) const
-    {
-        if (seq) kseq_destroy(seq);
-        seq = nullptr;
-    }
-};
 
 class KSeqReader
 {
@@ -40,10 +31,25 @@ public:
     KSeqReader& operator=(KSeqReader&&) noexcept;
     virtual ~KSeqReader();
 
-protected:
+    std::string Name() const;
+    std::string Bases() const;
+    std::string Qualities() const;
+
     bool ReadNext();
 
-    gzFile fp_;
+private:
+    // specialize kseq for gzstream (handles all of our types)
+    KSEQ_INIT(gzFile, gzread)
+    struct KSeqDeleter
+    {
+        void operator()(kseq_t* seq) const
+        {
+            if (seq) kseq_destroy(seq);
+            seq = nullptr;
+        }
+    };
+
+    std::unique_ptr<gzFile_s, GzFileDeleter> fp_;
     std::unique_ptr<kseq_t, KSeqDeleter> seq_;
 };
 
