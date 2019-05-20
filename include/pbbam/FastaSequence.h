@@ -57,6 +57,9 @@ public:
 
     /// \}
 
+    bool operator==(const FastaSequence& other) const;
+    bool operator!=(const FastaSequence& other) const;
+
 private:
     std::string name_;
     std::string bases_;

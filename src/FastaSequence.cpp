@@ -5,7 +5,9 @@
 #include "pbbam/FastaSequence.h"
 
 #include <cstdio>
+
 #include <exception>
+#include <tuple>
 
 #include <boost/algorithm/string.hpp>
 
@@ -34,6 +36,13 @@ FastaSequence::~FastaSequence() = default;
 const std::string& FastaSequence::Bases() const { return bases_; }
 
 const std::string& FastaSequence::Name() const { return name_; }
+
+bool FastaSequence::operator==(const FastaSequence& other) const
+{
+    return std::tie(name_, bases_) == std::tie(other.name_, other.bases_);
+}
+
+bool FastaSequence::operator!=(const FastaSequence& other) const { return !(*this == other); }
 
 }  // namespace BAM
 }  // namespace PacBio

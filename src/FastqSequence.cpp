@@ -6,6 +6,7 @@
 
 #include <cstdio>
 #include <exception>
+#include <tuple>
 
 namespace PacBio {
 namespace BAM {
@@ -35,6 +36,14 @@ FastqSequence& FastqSequence::operator=(FastqSequence&&) noexcept(
 FastqSequence::~FastqSequence() = default;
 
 const QualityValues& FastqSequence::Qualities() const { return qualities_; }
+
+bool FastqSequence::operator==(const FastqSequence& other) const
+{
+    return std::tie(Name(), Bases(), qualities_) ==
+           std::tie(other.Name(), other.Bases(), other.qualities_);
+}
+
+bool FastqSequence::operator!=(const FastqSequence& other) const { return !(*this == other); }
 
 }  // namespace BAM
 }  // namespace PacBio
