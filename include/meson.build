@@ -21,6 +21,8 @@ if not meson.is_subproject()
       'pbbam/BamTagCodec.h',
       'pbbam/BamWriter.h',
       'pbbam/BarcodeQuery.h',
+      'pbbam/BgzipFastaWriter.h',
+      'pbbam/BgzipFastqWriter.h',
       'pbbam/BgzipWriter.h',
       'pbbam/Cigar.h',
       'pbbam/CigarOperation.h',

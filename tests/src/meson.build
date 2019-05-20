@@ -12,6 +12,8 @@ pbbam_test_cpp_sources = files([
   'test_BamRecordMapping.cpp',
   'test_BamWriter.cpp',
   'test_BarcodeQuery.cpp',
+  'test_BgzipFastaWriter.cpp',
+  'test_BgzipFastqWriter.cpp',
   'test_BgzipWriter.cpp',
   'test_Cigar.cpp',
   'test_Compare.cpp',

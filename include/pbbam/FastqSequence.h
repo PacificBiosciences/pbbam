@@ -65,6 +65,9 @@ public:
 
     /// \}
 
+    bool operator==(const FastqSequence& other) const;
+    bool operator!=(const FastqSequence& other) const;
+
 private:
     QualityValues qualities_;
 };
