@@ -14,9 +14,9 @@
 
 #include "pbbam/BamRecord.h"
 #include "pbbam/FaiIndex.h"
+#include "pbbam/FormatUtils.h"
 #include "pbbam/GenomicInterval.h"
 
-#include "FormatUtils.h"
 #include "IndexedFastqBgzfReader.h"
 #include "IndexedFastqReaderImpl.h"
 #include "IndexedFastqTextReader.h"

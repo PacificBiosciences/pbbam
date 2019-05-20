@@ -19,6 +19,7 @@ pbbam_cpp_sources = files([
   'BamTagCodec.cpp',
   'BamWriter.cpp',
   'BarcodeQuery.cpp',
+  'BgzipWriter.cpp',
   'ChemistryTable.cpp',
   'Cigar.cpp',
   'CigarOperation.cpp',

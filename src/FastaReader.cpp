@@ -13,7 +13,8 @@
 #include <string>
 #include <vector>
 
-#include "FormatUtils.h"
+#include "pbbam/FormatUtils.h"
+
 #include "KSeqReader.h"
 
 namespace PacBio {

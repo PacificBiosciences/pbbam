@@ -2,7 +2,7 @@
 
 #include "PbbamInternalConfig.h"
 
-#include "FormatUtils.h"
+#include "pbbam/FormatUtils.h"
 
 #include <algorithm>
 

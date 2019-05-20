@@ -10,7 +10,8 @@
 
 #include <stdexcept>
 
-#include "FormatUtils.h"
+#include "pbbam/FormatUtils.h"
+
 #include "KSeqReader.h"
 
 namespace PacBio {
