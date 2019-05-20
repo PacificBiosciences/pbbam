@@ -12,9 +12,8 @@
 
 #include "pbbam/BamRecord.h"
 #include "pbbam/FastqSequence.h"
+#include "pbbam/FormatUtils.h"
 #include "pbbam/QualityValues.h"
-
-#include "FormatUtils.h"
 
 namespace PacBio {
 namespace BAM {

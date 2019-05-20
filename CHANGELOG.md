@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+### Added
+ - General-purpose BgzipWriter
+
 ## [1.0.3] - 2019-05-20
 
 ### Added
