@@ -20,18 +20,19 @@ namespace BAM {
 
 BgzipFastqWriter::BgzipFastqWriter(const std::string& fn) : IRecordWriter(), writer_{fn}
 {
-    // if (!FormatUtils::IsFastqFilename(fn)) {
-    //     throw std::runtime_error{"FastqReader: filename '" + fn +
-    //                              "' is not recognized as a FASTQ file."};
-    // }
-
-    // file_.open(fn);
-    // if (!file_) throw std::runtime_error{"FastqWriter: could not open file for writing: " + fn};
+    if (!FormatUtils::IsFastqFilename(fn)) {
+        throw std::runtime_error{"BgzipFastqWriter: filename '" + fn +
+                                 "' is not recognized as a FASTQ file."};
+    }
 }
 
 BgzipFastqWriter::BgzipFastqWriter(const std::string& fn, const BgzipWriterConfig& config)
     : IRecordWriter(), writer_{fn, config}
 {
+    if (!FormatUtils::IsFastqFilename(fn)) {
+        throw std::runtime_error{"BgzipFastqWriter: filename '" + fn +
+                                 "' is not recognized as a FASTQ file."};
+    }
 }
 
 void BgzipFastqWriter::TryFlush() {}

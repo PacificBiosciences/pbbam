@@ -20,25 +20,19 @@ namespace BAM {
 
 BgzipFastaWriter::BgzipFastaWriter(const std::string& fn) : IRecordWriter(), writer_{fn}
 {
-    // if (!FormatUtils::IsFastaFilename(fn)) {
-    //     throw std::runtime_error{"FastaReader: filename '" + fn +
-    //                              "' is not recognized as a FASTA file."};
-    // }
-
-    // file_.open(fn);
-    // if (!file_) throw std::runtime_error{"FastaWriter: could not open file for writing: " + fn};
+    if (!FormatUtils::IsFastaFilename(fn)) {
+        throw std::runtime_error{"BgzipFastaWriter: filename '" + fn +
+                                 "' is not recognized as a FASTA file."};
+    }
 }
 
 BgzipFastaWriter::BgzipFastaWriter(const std::string& fn, const BgzipWriterConfig& config)
     : IRecordWriter(), writer_{fn, config}
 {
-    // if (!FormatUtils::IsFastaFilename(fn)) {
-    //     throw std::runtime_error{"FastaReader: filename '" + fn +
-    //                              "' is not recognized as a FASTA file."};
-    // }
-
-    // file_.open(fn);
-    // if (!file_) throw std::runtime_error{"FastaWriter: could not open file for writing: " + fn};
+    if (!FormatUtils::IsFastaFilename(fn)) {
+        throw std::runtime_error{"BgzipFastaWriter: filename '" + fn +
+                                 "' is not recognized as a FASTA file."};
+    }
 }
 
 void BgzipFastaWriter::TryFlush() {}
