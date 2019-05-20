@@ -7,9 +7,9 @@
 #ifndef FASTQSEQUENCE_H
 #define FASTQSEQUENCE_H
 
-#include <string>
-
 #include "pbbam/Config.h"
+
+#include <string>
 
 #include <pbbam/FastaSequence.h>
 #include <pbbam/QualityValues.h>

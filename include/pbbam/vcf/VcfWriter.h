@@ -3,6 +3,8 @@
 #ifndef PBBAM_VCF_VCFWRITER_H
 #define PBBAM_VCF_VCFWRITER_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 #include <string>
 

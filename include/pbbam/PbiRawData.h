@@ -7,13 +7,14 @@
 #ifndef PBIRAWDATA_H
 #define PBIRAWDATA_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "pbbam/Config.h"
 #include "pbbam/PbiFile.h"
 
 namespace PacBio {

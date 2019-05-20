@@ -3,6 +3,8 @@
 #ifndef PBBAM_VCF_VCFHEADER_H
 #define PBBAM_VCF_VCFHEADER_H
 
+#include "pbbam/Config.h"
+
 #include <stdexcept>
 #include <string>
 #include <unordered_map>

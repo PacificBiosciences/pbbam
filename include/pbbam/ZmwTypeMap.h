@@ -7,9 +7,10 @@
 #ifndef ZMWTYPEMAP_H
 #define ZMWTYPEMAP_H
 
+#include "pbbam/Config.h"
+
 #include <map>
 
-#include "pbbam/Config.h"
 #include "pbbam/ZmwType.h"
 
 namespace PacBio {

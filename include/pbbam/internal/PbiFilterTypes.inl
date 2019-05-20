@@ -4,9 +4,10 @@
 //
 // Author: Derek Barnett
 
+#include "pbbam/PbiFilterTypes.h"
+
 #include <cassert>
 #include <stdexcept>
-#include "pbbam/PbiFilterTypes.h"
 
 #include <boost/functional/hash/hash.hpp>
 

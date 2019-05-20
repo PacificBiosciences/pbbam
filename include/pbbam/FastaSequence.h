@@ -7,6 +7,8 @@
 #ifndef FASTASEQUENCE_H
 #define FASTASEQUENCE_H
 
+#include "pbbam/Config.h"
+
 #include <string>
 
 namespace PacBio {

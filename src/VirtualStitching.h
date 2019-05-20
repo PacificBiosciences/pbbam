@@ -7,13 +7,15 @@
 #ifndef VIRTUALSTITCHING_H
 #define VIRTUALSTITCHING_H
 
+#include "pbbam/Config.h"
+
 #include <deque>
 #include <string>
 #include <utility>
 
 #include <boost/optional.hpp>
 
-#include "pbbam/DataSet.h"
+#include <pbbam/DataSet.h>
 
 namespace PacBio {
 namespace BAM {

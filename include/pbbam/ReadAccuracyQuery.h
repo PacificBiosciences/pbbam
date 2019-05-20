@@ -7,10 +7,12 @@
 #ifndef READACCURACYQUERY_H
 #define READACCURACYQUERY_H
 
+#include "pbbam/Config.h"
+
 #include <vector>
+
 #include "pbbam/Accuracy.h"
 #include "pbbam/Compare.h"
-#include "pbbam/Config.h"
 #include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {

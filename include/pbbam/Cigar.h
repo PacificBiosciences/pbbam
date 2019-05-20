@@ -7,10 +7,12 @@
 #ifndef CIGAR_H
 #define CIGAR_H
 
+#include "pbbam/Config.h"
+
 #include <string>
 #include <vector>
+
 #include "pbbam/CigarOperation.h"
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {

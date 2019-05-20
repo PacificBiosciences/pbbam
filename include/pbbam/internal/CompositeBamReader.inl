@@ -5,12 +5,13 @@
 //
 // Author: Derek Barnett
 
+#include "pbbam/CompositeBamReader.h"
+
 #include <algorithm>
 #include <iostream>
 #include <set>
 #include <sstream>
 #include <stdexcept>
-#include "pbbam/CompositeBamReader.h"
 
 namespace PacBio {
 namespace BAM {

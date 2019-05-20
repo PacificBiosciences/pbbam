@@ -7,6 +7,8 @@
 #ifndef VIRTUALPOLYMERASEBAMRECORD_H
 #define VIRTUALPOLYMERASEBAMRECORD_H
 
+#include "pbbam/Config.h"
+
 #include "pbbam/virtual/VirtualZmwBamRecord.h"
 
 namespace PacBio {

@@ -2,13 +2,13 @@
 #ifndef PBBAM_VCF_VCFHEADERTYPES_H
 #define PBBAM_VCF_VCFHEADERTYPES_H
 
+#include "pbbam/Config.h"
+
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <boost/optional.hpp>
-
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace VCF {

@@ -3,6 +3,8 @@
 #ifndef PBIINDEXIO_H
 #define PBIINDEXIO_H
 
+#include "pbbam/Config.h"
+
 #include <cassert>
 #include <cstddef>
 #include <cstdint>

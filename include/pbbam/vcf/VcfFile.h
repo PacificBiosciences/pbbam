@@ -3,6 +3,8 @@
 #ifndef PBBAM_VCF_VCFFILE_H
 #define PBBAM_VCF_VCFFILE_H
 
+#include "pbbam/Config.h"
+
 #include <string>
 
 #include <pbbam/vcf/VcfHeader.h>

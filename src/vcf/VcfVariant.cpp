@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include "../PbbamInternalConfig.h"
+
 #include <pbbam/vcf/VcfVariant.h>
 
 #include <cmath>

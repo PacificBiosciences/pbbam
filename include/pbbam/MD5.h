@@ -7,6 +7,8 @@
 #ifndef MD5_H
 #define MD5_H
 
+#include "pbbam/Config.h"
+
 #include <string>
 
 namespace PacBio {

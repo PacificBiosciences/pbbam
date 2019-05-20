@@ -1,3 +1,5 @@
+#include "../PbbamInternalConfig.h"
+
 #include <pbbam/vcf/VcfQuery.h>
 
 namespace PacBio {

@@ -3,6 +3,8 @@
 #ifndef MEMORYUTILS_H
 #define MEMORYUTILS_H
 
+#include "pbbam/Config.h"
+
 #include <cstdio>
 #include <memory>
 
@@ -13,7 +15,6 @@
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamRecordImpl.h"
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {

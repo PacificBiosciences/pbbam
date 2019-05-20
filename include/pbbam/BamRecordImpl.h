@@ -7,15 +7,17 @@
 #ifndef BAMRECORDIMPL_H
 #define BAMRECORDIMPL_H
 
+#include "pbbam/Config.h"
+
 #include <htslib/sam.h>
 #include <cstddef>
 #include <cstdint>
 #include <map>
 #include <memory>
 #include <string>
+
 #include "pbbam/BamRecordTag.h"
 #include "pbbam/Cigar.h"
-#include "pbbam/Config.h"
 #include "pbbam/Position.h"
 #include "pbbam/QualityValues.h"
 #include "pbbam/TagCollection.h"

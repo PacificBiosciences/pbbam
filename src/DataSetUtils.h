@@ -3,9 +3,12 @@
 #ifndef DATASETUTILS_H
 #define DATASETUTILS_H
 
+#include "pbbam/Config.h"
+
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
-#include "pbbam/DataSetTypes.h"
+
+#include <pbbam/DataSetTypes.h>
 
 namespace PacBio {
 namespace BAM {

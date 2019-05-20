@@ -7,6 +7,8 @@
 #ifndef PACBIOBAM_VERSION_H
 #define PACBIOBAM_VERSION_H
 
+#include "pbbam/Config.h"
+
 #include <ostream>
 #include <stdexcept>
 #include <string>

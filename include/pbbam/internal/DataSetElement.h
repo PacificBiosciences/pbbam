@@ -3,16 +3,19 @@
 #ifndef DATASETELEMENT_H
 #define DATASETELEMENT_H
 
+#include "pbbam/Config.h"
+
 #include "pbbam/DataSetXsd.h"
 
 #include <algorithm>
-#include <boost/utility/string_ref.hpp>
 #include <cassert>
 #include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
+
+#include <boost/utility/string_ref.hpp>
 
 namespace PacBio {
 namespace BAM {

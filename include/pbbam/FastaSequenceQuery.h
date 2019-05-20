@@ -7,12 +7,14 @@
 #ifndef FASTASEQUENCEQUERY_H
 #define FASTASEQUENCEQUERY_H
 
-#include "pbbam/DataSet.h"
-#include "pbbam/FastaSequence.h"
-#include "pbbam/internal/QueryBase.h"
+#include "pbbam/Config.h"
 
 #include <memory>
 #include <string>
+
+#include "pbbam/DataSet.h"
+#include "pbbam/FastaSequence.h"
+#include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {
 namespace BAM {

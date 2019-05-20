@@ -7,11 +7,12 @@
 #ifndef BAMFILE_H
 #define BAMFILE_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <string>
 
 #include "pbbam/BamHeader.h"
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {

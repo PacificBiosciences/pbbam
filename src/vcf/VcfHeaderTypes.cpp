@@ -1,3 +1,5 @@
+#include "../PbbamInternalConfig.h"
+
 #include <pbbam/vcf/VcfHeader.h>
 
 #include "pbbam/vcf/VcfHeaderTypes.h"

@@ -7,6 +7,8 @@
 #ifndef VIRTUALPOLYMERASECOMPOSITEREADER_H
 #define VIRTUALPOLYMERASECOMPOSITEREADER_H
 
+#include "pbbam/Config.h"
+
 #include "pbbam/virtual/ZmwReadStitcher.h"
 
 namespace PacBio {

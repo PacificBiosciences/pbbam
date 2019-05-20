@@ -4,9 +4,9 @@
 //
 // Author: Derek Barnett
 
-#include "pbbam/exception/ValidationException.h"
-
 #include "PbbamInternalConfig.h"
+
+#include "pbbam/exception/ValidationException.h"
 
 #include <cstddef>
 #include <sstream>

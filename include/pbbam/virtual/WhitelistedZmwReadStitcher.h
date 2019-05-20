@@ -7,11 +7,13 @@
 #ifndef WHITELISTEDZMWREADSTITCHER_H
 #define WHITELISTEDZMWREADSTITCHER_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
-#include "pbbam/Config.h"
+
 #include "pbbam/virtual/VirtualZmwBamRecord.h"
 
 namespace PacBio {

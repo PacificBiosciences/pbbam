@@ -7,9 +7,10 @@
 #ifndef INTERVAL_H
 #define INTERVAL_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <string>
-#include "pbbam/Config.h"
 
 #define BOOST_ICL_USE_STATIC_BOUNDED_INTERVALS
 #include <boost/icl/discrete_interval.hpp>
@@ -114,7 +115,7 @@ private:
 };
 
 }  // namespace BAM
-}  // namspace PacBio
+}  // namespace PacBio
 
 #include "pbbam/internal/Interval.inl"
 

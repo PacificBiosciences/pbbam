@@ -7,15 +7,18 @@
 #ifndef VIRTUALZMWCOMPOSITEREADER_H
 #define VIRTUALZMWCOMPOSITEREADER_H
 
+#include "pbbam/Config.h"
+
 #include <deque>
 #include <memory>
 #include <string>
 #include <utility>
 
+#include <pbbam/DataSet.h>
+#include <pbbam/PbiFilter.h>
+
 #include "VirtualStitching.h"
 #include "VirtualZmwReader.h"
-#include "pbbam/DataSet.h"
-#include "pbbam/PbiFilter.h"
 
 namespace PacBio {
 namespace BAM {

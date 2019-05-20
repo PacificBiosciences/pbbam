@@ -7,12 +7,13 @@
 #ifndef BAMRECORDBUILDER_H
 #define BAMRECORDBUILDER_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <string>
 
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {

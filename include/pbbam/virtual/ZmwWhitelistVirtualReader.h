@@ -7,6 +7,8 @@
 #ifndef ZMWWHITELISTVIRTUALREADER_H
 #define ZMWWHITELISTVIRTUALREADER_H
 
+#include "pbbam/Config.h"
+
 #include "pbbam/virtual/WhitelistedZmwReadStitcher.h"
 
 namespace PacBio {

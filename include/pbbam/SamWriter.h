@@ -7,8 +7,11 @@
 #ifndef SAMWRITER_H
 #define SAMWRITER_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 #include <string>
+
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/IRecordWriter.h"

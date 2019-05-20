@@ -7,6 +7,8 @@
 #ifndef INDEXEDFASTAREADER_H
 #define INDEXEDFASTAREADER_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <iostream>
 #include <memory>

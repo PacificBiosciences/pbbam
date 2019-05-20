@@ -7,6 +7,8 @@
 #ifndef READGROUPINFO_H
 #define READGROUPINFO_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <map>
@@ -15,7 +17,6 @@
 
 #include <boost/optional.hpp>
 
-#include "pbbam/Config.h"
 #include "pbbam/exception/InvalidSequencingChemistryException.h"
 
 namespace PacBio {

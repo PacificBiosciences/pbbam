@@ -7,6 +7,8 @@
 #ifndef ALIGNMENTPRINTER_H
 #define ALIGNMENTPRINTER_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 #include <string>
 

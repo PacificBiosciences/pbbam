@@ -7,10 +7,11 @@
 #ifndef FRAMES_H
 #define FRAMES_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {

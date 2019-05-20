@@ -7,9 +7,9 @@
 #ifndef LOCALCONTEXTFLAGS_H
 #define LOCALCONTEXTFLAGS_H
 
-#include <cstdint>
-
 #include "pbbam/Config.h"
+
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

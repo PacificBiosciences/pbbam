@@ -1,6 +1,8 @@
 #ifndef SIMPLEREADIMPL_H
 #define SIMPLEREADIMPL_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 
 namespace PacBio {

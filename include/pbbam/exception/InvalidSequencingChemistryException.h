@@ -7,6 +7,8 @@
 #ifndef INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H
 #define INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H
 
+#include "pbbam/Config.h"
+
 #include <exception>
 #include <sstream>
 #include <string>

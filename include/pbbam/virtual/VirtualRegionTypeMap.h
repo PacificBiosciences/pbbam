@@ -7,9 +7,10 @@
 #ifndef VIRTUALREGIONTYPEMAP_H
 #define VIRTUALREGIONTYPEMAP_H
 
+#include "pbbam/Config.h"
+
 #include <map>
 
-#include "pbbam/Config.h"
 #include "pbbam/virtual/VirtualRegionType.h"
 
 namespace PacBio {

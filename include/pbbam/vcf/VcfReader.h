@@ -3,12 +3,12 @@
 #ifndef PBBAM_VCF_VCFREADER_H
 #define PBBAM_VCF_VCFREADER_H
 
+#include "pbbam/Config.h"
+
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
-
-#include "pbbam/Config.h"
 
 #include <pbbam/vcf/VcfFile.h>
 #include <pbbam/vcf/VcfHeader.h>

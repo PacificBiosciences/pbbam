@@ -7,12 +7,12 @@
 #ifndef CIGAROPERATION_H
 #define CIGAROPERATION_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <stdexcept>
 
 #include <htslib/sam.h>
-
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {

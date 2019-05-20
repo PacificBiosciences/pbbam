@@ -3,14 +3,14 @@
 #ifndef PBBAM_VCF_VARIANT_H
 #define PBBAM_VCF_VARIANT_H
 
+#include "pbbam/Config.h"
+
 #include <cassert>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 #include <boost/optional.hpp>
-
-#include "pbbam/Config.h"
 
 #include <pbbam/Position.h>
 #include <pbbam/vcf/VcfHeaderTypes.h>

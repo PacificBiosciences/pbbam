@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include "../PbbamInternalConfig.h"
+
 #include <pbbam/vcf/VcfReader.h>
 
 namespace PacBio {

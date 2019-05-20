@@ -7,6 +7,8 @@
 #ifndef BAMRECORD_H
 #define BAMRECORD_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <memory>

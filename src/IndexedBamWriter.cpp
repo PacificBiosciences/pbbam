@@ -4,6 +4,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/IndexedBamWriter.h"
 
 #include <sys/stat.h>

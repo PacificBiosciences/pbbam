@@ -7,6 +7,8 @@
 #ifndef PULSE_EXCLUSION_REASON_H
 #define PULSE_EXCLUSION_REASON_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 
 namespace PacBio {

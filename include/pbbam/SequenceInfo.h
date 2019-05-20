@@ -7,9 +7,10 @@
 #ifndef SEQUENCEINFO_H
 #define SEQUENCEINFO_H
 
+#include "pbbam/Config.h"
+
 #include <map>
 #include <string>
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {

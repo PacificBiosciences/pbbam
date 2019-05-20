@@ -7,10 +7,11 @@
 #ifndef GENOMICINTERVAL_H
 #define GENOMICINTERVAL_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <string>
 
-#include "pbbam/Config.h"
 #include "pbbam/Interval.h"
 #include "pbbam/Position.h"
 
@@ -146,6 +147,6 @@ private:
 };
 
 }  // namespace BAM
-}  // namspace PacBio
+}  // namespace PacBio
 
 #endif  // GENOMICINTERVAL_H

@@ -3,9 +3,12 @@
 #ifndef BAMFILEMERGER_H
 #define BAMFILEMERGER_H
 
-#include <pbbam/ProgramInfo.h>
+#include "pbbam/Config.h"
+
 #include <string>
 #include <vector>
+
+#include <pbbam/ProgramInfo.h>
 
 namespace PacBio {
 namespace BAM {

@@ -7,12 +7,13 @@
 #ifndef VirtualZmwBAMRECORD_H
 #define VirtualZmwBAMRECORD_H
 
+#include "pbbam/Config.h"
+
 #include <sstream>
 #include <vector>
 
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
 #include "pbbam/virtual/VirtualRegion.h"
 #include "pbbam/virtual/VirtualRegionType.h"
 

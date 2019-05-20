@@ -7,9 +7,11 @@
 #ifndef BARCODEQUERY_H
 #define BARCODEQUERY_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <vector>
-#include "pbbam/Config.h"
+
 #include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {

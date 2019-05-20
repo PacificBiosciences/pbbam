@@ -7,9 +7,11 @@
 #ifndef TAGCOLLECTION_H
 #define TAGCOLLECTION_H
 
+#include "pbbam/Config.h"
+
 #include <map>
 #include <string>
-#include "pbbam/Config.h"
+
 #include "pbbam/Tag.h"
 
 namespace PacBio {

@@ -7,8 +7,10 @@
 #ifndef SAMTAGCODEC_H
 #define SAMTAGCODEC_H
 
-#include <string>
 #include "pbbam/Config.h"
+
+#include <string>
+
 #include "pbbam/TagCollection.h"
 
 namespace PacBio {
