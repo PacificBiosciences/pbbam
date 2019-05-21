@@ -36,6 +36,11 @@ const std::string simpleFastqGzipFn    = fastxDataDir + "simple-gzip.fq.gz";
 const std::string simpleFastqBgzfFn    = fastxDataDir + "simple-bgzf.fq.gz";
 const std::string simpleFastqBgzfGziFn = fastxDataDir + "simple-bgzf.fq.gz.gzi";
 
+const std::string chunkingFastaFn    = fastxDataDir + "chunking.fa";
+const std::string chunkingFastaFaiFn = fastxDataDir + "chunking.fa.fai";
+const std::string chunkingFastqFn    = fastxDataDir + "chunking.fq";
+const std::string chunkingFastqFaiFn = fastxDataDir + "chunking.fq.fai";
+
 const std::vector<FastaSequence> ExpectedFasta {
     FastaSequence{ "seq1", "ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACG"},
     FastaSequence{ "seq2", "GCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA"},
@@ -81,6 +86,8 @@ const std::vector<FastqSequence> ExpectedFastq {
         "GCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA",
       R"(~}|{zyxwvutsrqponmlkjihgfedcba`_^]\[ZYXWVUTSRQPONMLKJIHGFEDCBA@)"},
 };
+
+
 
 } // namespace FastxTests
 
