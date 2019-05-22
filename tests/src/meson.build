@@ -67,6 +67,7 @@ pbbam_test_cpp_sources = files([
   'test_VcfWriter.cpp',
   'test_Version.cpp',
   'test_WhitelistedZmwReadStitcher.cpp',
+  'test_ZmwChunkedFastxReader.cpp',
   'test_ZmwReadStitcher.cpp',
   'test_ZmwQuery.cpp'])
 

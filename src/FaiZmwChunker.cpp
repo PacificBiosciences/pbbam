@@ -8,6 +8,8 @@
 
 #include "FaiZmwChunker.h"
 
+#include <cassert>
+
 #include <algorithm>
 #include <numeric>
 #include <stdexcept>
@@ -47,7 +49,7 @@ FaiZmwChunker::FaiZmwChunker(const FaiIndex& index, const size_t numChunks)
     for (const auto& name : names) {
         const int32_t holeNumber = HoleNumber(name);
         if (holeNumber != currentHoleNumber) {
-            rawChunks.emplace_back(FaiZmwChunk{name, index.Entry(name).SeqOffset, 1});
+            rawChunks.emplace_back(FaiZmwChunk{name, index.Entry(name).SeqOffset, 1, 1});
             currentHoleNumber = holeNumber;
         } else
             ++rawChunks.back().NumRecords;
@@ -86,7 +88,8 @@ FaiZmwChunker::FaiZmwChunker(const FaiIndex& index, const size_t numChunks)
 
 FaiZmwChunker::FaiZmwChunker(const std::string& filename, const size_t numChunks)
     : FaiZmwChunker{FaiIndex{filename}, numChunks}
-{}
+{
+}
 
 FaiZmwChunker::FaiZmwChunker(const FaiZmwChunker&) = default;
 

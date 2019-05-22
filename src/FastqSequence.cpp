@@ -37,6 +37,12 @@ FastqSequence::~FastqSequence() = default;
 
 const QualityValues& FastqSequence::Qualities() const { return qualities_; }
 
+FastqSequence& FastqSequence::Qualities(QualityValues quals)
+{
+    qualities_ = std::move(quals);
+    return *this;
+}
+
 bool FastqSequence::operator==(const FastqSequence& other) const
 {
     return std::tie(Name(), Bases(), qualities_) ==

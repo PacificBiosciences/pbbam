@@ -35,7 +35,19 @@ FastaSequence::~FastaSequence() = default;
 
 const std::string& FastaSequence::Bases() const { return bases_; }
 
+FastaSequence& FastaSequence::Bases(std::string bases)
+{
+    bases_ = std::move(bases);
+    return *this;
+}
+
 const std::string& FastaSequence::Name() const { return name_; }
+
+FastaSequence& FastaSequence::Name(std::string name)
+{
+    name_ = std::move(name);
+    return *this;
+}
 
 bool FastaSequence::operator==(const FastaSequence& other) const
 {
