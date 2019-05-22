@@ -117,11 +117,11 @@ BamHeader::BamHeader() : d_{std::make_shared<BamHeaderPrivate>()} {}
 
 BamHeader::BamHeader(const BamHeader&) = default;
 
-BamHeader::BamHeader(BamHeader&&) = default;
+BamHeader::BamHeader(BamHeader&&) noexcept = default;
 
 BamHeader& BamHeader::operator=(const BamHeader&) = default;
 
-BamHeader& BamHeader::operator=(BamHeader&&) = default;
+BamHeader& BamHeader::operator=(BamHeader&&) noexcept = default;
 
 BamHeader::~BamHeader() = default;
 

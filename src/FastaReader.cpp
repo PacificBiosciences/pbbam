@@ -8,60 +8,51 @@
 
 #include "pbbam/FastaReader.h"
 
-#include <memory>
+#include <algorithm>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
-#include <htslib/kseq.h>
-#include <zlib.h>
+#include "pbbam/FormatUtils.h"
 
-#include "pbbam/FastaSequence.h"
+#include "KSeqReader.h"
 
 namespace PacBio {
 namespace BAM {
 
 class FastaReader::FastaReaderPrivate
 {
-    KSEQ_INIT(gzFile, gzread)
-    struct KSeqDeleter
-    {
-        void operator()(kseq_t* seq) const
-        {
-            if (seq) kseq_destroy(seq);
-            seq = nullptr;
-        }
-    };
-
 public:
     explicit FastaReaderPrivate(const std::string& fn)
-        : fp_{gzopen(fn.c_str(), "r")}, seq_{kseq_init(fp_)}
     {
-        if (fp_ == nullptr || seq_.get() == nullptr)
-            throw std::runtime_error{"FastaReader: could not open file for reading: " + fn};
+        // validate extension
+        if (!FormatUtils::IsFastaFilename(fn)) {
+            throw std::runtime_error{"FastaReader: filename '" + fn +
+                                     "' is not recognized as a FASTA file."};
+        }
+        reader_ = std::make_unique<KSeqReader>(fn);
     }
-
-    ~FastaReaderPrivate() { gzclose(fp_); }
 
     bool GetNext(FastaSequence& record)
     {
-        const auto result = kseq_read(seq_.get());
-        if (result == -1)  // EOF
-            return false;
-        record = FastaSequence{std::string{seq_->name.s, seq_->name.l},
-                               std::string{seq_->seq.s, seq_->seq.l}};
+        const auto readOk = reader_->ReadNext();
+        if (!readOk) return false;  // not error, could be EOF
+
+        record = FastaSequence{reader_->Name(), reader_->Bases()};
         return true;
     }
 
-private:
-    gzFile fp_;
-    std::unique_ptr<kseq_t, KSeqDeleter> seq_;
+    std::unique_ptr<KSeqReader> reader_;
 };
 
-FastaReader::FastaReader(const std::string& fn) : d_{std::make_unique<FastaReaderPrivate>(fn)} {}
+FastaReader::FastaReader(const std::string& fn)
+    : internal::QueryBase<FastaSequence>{}, d_{std::make_unique<FastaReaderPrivate>(fn)}
+{
+}
 
-FastaReader::FastaReader(FastaReader&&) = default;
+FastaReader::FastaReader(FastaReader&&) noexcept = default;
 
-FastaReader& FastaReader::operator=(FastaReader&&) = default;
+FastaReader& FastaReader::operator=(FastaReader&&) noexcept = default;
 
 FastaReader::~FastaReader() = default;
 
@@ -72,9 +63,8 @@ std::vector<FastaSequence> FastaReader::ReadAll(const std::string& fn)
     std::vector<FastaSequence> result;
     result.reserve(256);
     FastaReader reader{fn};
-    FastaSequence s;
-    while (reader.GetNext(s))
-        result.emplace_back(s);
+    for (const auto& seq : reader)
+        result.emplace_back(seq);
     return result;
 }
 

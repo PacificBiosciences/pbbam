@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include "../PbbamInternalConfig.h"
+
 #include <pbbam/vcf/VcfSort.h>
 
 #include <algorithm>

@@ -7,10 +7,11 @@
 #ifndef QUALITYVALUE_H
 #define QUALITYVALUE_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <string>
 #include <vector>
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -53,9 +54,9 @@ public:
     QualityValue(const uint8_t value = 0);
 
     QualityValue(const QualityValue&);
-    QualityValue(QualityValue&&);
+    QualityValue(QualityValue&&) noexcept;
     QualityValue& operator=(const QualityValue&);
-    QualityValue& operator=(QualityValue&&);
+    QualityValue& operator=(QualityValue&&) noexcept;
     ~QualityValue();
 
     /// \}

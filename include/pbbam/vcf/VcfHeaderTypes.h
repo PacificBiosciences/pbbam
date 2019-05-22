@@ -2,6 +2,8 @@
 #ifndef PBBAM_VCF_VCFHEADERTYPES_H
 #define PBBAM_VCF_VCFHEADERTYPES_H
 
+#include "pbbam/Config.h"
+
 #include <string>
 #include <utility>
 #include <vector>
@@ -21,9 +23,9 @@ public:
 
     ContigDefinition() = delete;
     ContigDefinition(const ContigDefinition&);
-    ContigDefinition(ContigDefinition&&);
+    ContigDefinition(ContigDefinition&&) noexcept;
     ContigDefinition& operator=(const ContigDefinition&);
-    ContigDefinition& operator=(ContigDefinition&&);
+    ContigDefinition& operator=(ContigDefinition&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~ContigDefinition();
 
 public:
@@ -49,9 +51,9 @@ public:
 
     FilterDefinition() = delete;
     FilterDefinition(const FilterDefinition&);
-    FilterDefinition(FilterDefinition&&);
+    FilterDefinition(FilterDefinition&&) noexcept;
     FilterDefinition& operator=(const FilterDefinition&);
-    FilterDefinition& operator=(FilterDefinition&&);
+    FilterDefinition& operator=(FilterDefinition&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~FilterDefinition();
 
     const std::string& Id() const;
@@ -73,9 +75,9 @@ public:
 
     FormatDefinition() = delete;
     FormatDefinition(const FormatDefinition&);
-    FormatDefinition(FormatDefinition&&);
+    FormatDefinition(FormatDefinition&&) noexcept;
     FormatDefinition& operator=(const FormatDefinition&);
-    FormatDefinition& operator=(FormatDefinition&&);
+    FormatDefinition& operator=(FormatDefinition&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~FormatDefinition();
 
     const std::string& Id() const;
@@ -100,9 +102,9 @@ public:
 
     GeneralDefinition() = delete;
     GeneralDefinition(const GeneralDefinition&);
-    GeneralDefinition(GeneralDefinition&&);
+    GeneralDefinition(GeneralDefinition&&) noexcept;
     GeneralDefinition& operator=(const GeneralDefinition&);
-    GeneralDefinition& operator=(GeneralDefinition&&);
+    GeneralDefinition& operator=(GeneralDefinition&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~GeneralDefinition();
 
     const std::string& Id() const;
@@ -125,9 +127,9 @@ public:
 
     InfoDefinition() = delete;
     InfoDefinition(const InfoDefinition&);
-    InfoDefinition(InfoDefinition&&);
+    InfoDefinition(InfoDefinition&&) noexcept;
     InfoDefinition& operator=(const InfoDefinition&);
-    InfoDefinition& operator=(InfoDefinition&&);
+    InfoDefinition& operator=(InfoDefinition&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~InfoDefinition();
 
     const std::string& Id() const;

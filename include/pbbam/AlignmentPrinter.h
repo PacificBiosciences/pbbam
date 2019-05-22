@@ -7,6 +7,8 @@
 #ifndef ALIGNMENTPRINTER_H
 #define ALIGNMENTPRINTER_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 #include <string>
 
@@ -41,9 +43,9 @@ public:
 
     AlignmentPrinter() = delete;
     AlignmentPrinter(const AlignmentPrinter&) = delete;
-    AlignmentPrinter(AlignmentPrinter&&);
+    AlignmentPrinter(AlignmentPrinter&&) noexcept;
     AlignmentPrinter& operator=(const AlignmentPrinter&) = delete;
-    AlignmentPrinter& operator=(AlignmentPrinter&&);
+    AlignmentPrinter& operator=(AlignmentPrinter&&) noexcept;
     ~AlignmentPrinter();
 
     /// \}

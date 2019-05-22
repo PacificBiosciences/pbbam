@@ -83,12 +83,7 @@ BamRecordImpl::BamRecordImpl(const BamRecordImpl& other)
     assert(d_);
 }
 
-BamRecordImpl::BamRecordImpl(BamRecordImpl&& other) : tagOffsets_{std::move(other.tagOffsets_)}
-{
-    d_.swap(other.d_);
-    other.d_.reset();
-    assert(d_);
-}
+BamRecordImpl::BamRecordImpl(BamRecordImpl&&) noexcept = default;
 
 BamRecordImpl& BamRecordImpl::operator=(const BamRecordImpl& other)
 {
@@ -101,17 +96,7 @@ BamRecordImpl& BamRecordImpl::operator=(const BamRecordImpl& other)
     return *this;
 }
 
-BamRecordImpl& BamRecordImpl::operator=(BamRecordImpl&& other)
-{
-    if (this != &other) {
-        d_.swap(other.d_);
-        other.d_.reset();
-
-        tagOffsets_ = std::move(other.tagOffsets_);
-    }
-    assert(d_);
-    return *this;
-}
+BamRecordImpl& BamRecordImpl::operator=(BamRecordImpl&&) noexcept = default;
 
 BamRecordImpl::~BamRecordImpl() = default;
 

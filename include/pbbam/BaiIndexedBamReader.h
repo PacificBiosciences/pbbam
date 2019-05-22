@@ -7,6 +7,8 @@
 #ifndef BAIINDEXEDBAMREADER_H
 #define BAIINDEXEDBAMREADER_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 
 #include <htslib/sam.h>

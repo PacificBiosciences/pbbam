@@ -8,6 +8,7 @@
 #define VIRTUALREGION_H
 
 #include "pbbam/Config.h"
+
 #include "pbbam/LocalContextFlags.h"
 #include "pbbam/virtual/VirtualRegionType.h"
 
@@ -40,9 +41,9 @@ public:
 
     VirtualRegion();
     VirtualRegion(const VirtualRegion&);
-    VirtualRegion(VirtualRegion&&);
+    VirtualRegion(VirtualRegion&&) noexcept;
     VirtualRegion& operator=(const VirtualRegion&);
-    VirtualRegion& operator=(VirtualRegion&&);
+    VirtualRegion& operator=(VirtualRegion&&) noexcept;
     ~VirtualRegion();
 
     bool operator==(const VirtualRegion& v1) const;

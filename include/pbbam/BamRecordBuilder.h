@@ -7,11 +7,13 @@
 #ifndef BAMRECORDBUILDER_H
 #define BAMRECORDBUILDER_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <string>
+
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -48,9 +50,9 @@ public:
     BamRecordBuilder(const BamRecord& prototype);
 
     BamRecordBuilder(const BamRecordBuilder&);
-    BamRecordBuilder(BamRecordBuilder&&);
+    BamRecordBuilder(BamRecordBuilder&&) noexcept;
     BamRecordBuilder& operator=(const BamRecordBuilder&);
-    BamRecordBuilder& operator=(BamRecordBuilder&&);
+    BamRecordBuilder& operator=(BamRecordBuilder&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~BamRecordBuilder();
 
     /// \}

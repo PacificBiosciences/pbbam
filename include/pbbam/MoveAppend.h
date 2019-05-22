@@ -3,6 +3,8 @@
 #ifndef MOVEAPPEND_H
 #define MOVEAPPEND_H
 
+#include "pbbam/Config.h"
+
 #include <iterator>
 #include <utility>
 #include <vector>

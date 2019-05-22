@@ -3,6 +3,8 @@
 #ifndef XMLWRITER_H
 #define XMLWRITER_H
 
+#include "pbbam/Config.h"
+
 #include <iosfwd>
 #include <memory>
 

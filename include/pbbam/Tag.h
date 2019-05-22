@@ -7,11 +7,13 @@
 #ifndef TAG_H
 #define TAG_H
 
-#include <boost/variant.hpp>
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <string>
 #include <vector>
-#include "pbbam/Config.h"
+
+#include <boost/variant.hpp>
 
 namespace PacBio {
 namespace BAM {
@@ -167,9 +169,9 @@ public:
 
     Tag();
     Tag(const Tag&);
-    Tag(Tag&&);
+    Tag(Tag&&) noexcept;
     Tag& operator=(const Tag&);
-    Tag& operator=(Tag&&);
+    Tag& operator=(Tag&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~Tag();
 
     Tag& operator=(boost::blank value);

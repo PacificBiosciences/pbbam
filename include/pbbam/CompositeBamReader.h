@@ -8,18 +8,20 @@
 #ifndef COMPOSITEBAMREADER_H
 #define COMPOSITEBAMREADER_H
 
+#include "pbbam/Config.h"
+
 #include <deque>
 #include <functional>
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "pbbam/BaiIndexCache.h"
 #include "pbbam/BaiIndexedBamReader.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamReader.h"
 #include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
 #include "pbbam/DataSet.h"
 #include "pbbam/GenomicInterval.h"
 #include "pbbam/PbiIndexedBamReader.h"
@@ -42,8 +44,8 @@ public:
 public:
     CompositeMergeItem(std::unique_ptr<BamReader> rdr);
     CompositeMergeItem(std::unique_ptr<BamReader> rdr, BamRecord rec);
-    CompositeMergeItem(CompositeMergeItem&&) = default;
-    CompositeMergeItem& operator=(CompositeMergeItem&&) = default;
+    CompositeMergeItem(CompositeMergeItem&&) noexcept = default;
+    CompositeMergeItem& operator=(CompositeMergeItem&&) noexcept = default;
     ~CompositeMergeItem() = default;
 };
 

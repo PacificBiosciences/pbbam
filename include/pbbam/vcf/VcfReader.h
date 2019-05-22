@@ -3,8 +3,11 @@
 #ifndef PBBAM_VCF_VCFREADER_H
 #define PBBAM_VCF_VCFREADER_H
 
+#include "pbbam/Config.h"
+
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <string>
 
 #include <pbbam/vcf/VcfFile.h>
@@ -25,9 +28,9 @@ public:
 
     VcfReader() = delete;
     VcfReader(const VcfReader&) = delete;
-    VcfReader(VcfReader&&) = default;
+    VcfReader(VcfReader&&) noexcept;
     VcfReader& operator=(const VcfReader&) = delete;
-    VcfReader& operator=(VcfReader&&) = default;
+    VcfReader& operator=(VcfReader&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~VcfReader();
 
 public:
@@ -39,7 +42,7 @@ private:
     void FetchNext();
 
 private:
-    std::ifstream in_;
+    std::unique_ptr<std::ifstream> in_;
     VcfHeader header_;
     std::string line_;
 };

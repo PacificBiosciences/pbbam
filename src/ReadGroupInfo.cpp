@@ -310,11 +310,11 @@ ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
 
 ReadGroupInfo::ReadGroupInfo(const ReadGroupInfo&) = default;
 
-ReadGroupInfo::ReadGroupInfo(ReadGroupInfo&&) = default;
+ReadGroupInfo::ReadGroupInfo(ReadGroupInfo&&) noexcept = default;
 
 ReadGroupInfo& ReadGroupInfo::operator=(const ReadGroupInfo&) = default;
 
-ReadGroupInfo& ReadGroupInfo::operator=(ReadGroupInfo&&) = default;
+ReadGroupInfo& ReadGroupInfo::operator=(ReadGroupInfo&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 ReadGroupInfo::~ReadGroupInfo() = default;
 

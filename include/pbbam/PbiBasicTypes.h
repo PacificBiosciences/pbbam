@@ -7,13 +7,15 @@
 #ifndef PBIBASICTYPES_H
 #define PBIBASICTYPES_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <deque>
 #include <utility>
 #include <vector>
+
 #include "pbbam/Compare.h"
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -36,9 +38,9 @@ public:
 
     IndexResultBlock() = default;
     IndexResultBlock(const IndexResultBlock&) = default;
-    IndexResultBlock(IndexResultBlock&&) = default;
+    IndexResultBlock(IndexResultBlock&&) noexcept = default;
     IndexResultBlock& operator=(const IndexResultBlock&) = default;
-    IndexResultBlock& operator=(IndexResultBlock&&) = default;
+    IndexResultBlock& operator=(IndexResultBlock&&) noexcept = default;
     ~IndexResultBlock() = default;
 
 public:

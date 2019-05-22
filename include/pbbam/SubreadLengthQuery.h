@@ -7,10 +7,12 @@
 #ifndef SUBREADLENGTHQUERY_H
 #define SUBREADLENGTHQUERY_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <vector>
+
 #include "pbbam/Compare.h"
-#include "pbbam/Config.h"
 #include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {

@@ -3,16 +3,19 @@
 #ifndef MEMORYUTILS_H
 #define MEMORYUTILS_H
 
+#include "pbbam/Config.h"
+
 #include <cstdio>
 #include <memory>
 
 #include <htslib/bgzf.h>
+#include <htslib/faidx.h>
 #include <htslib/sam.h>
+#include <zlib.h>
 
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamRecordImpl.h"
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -30,12 +33,36 @@ struct FileDeleter
     }
 };
 
+// For pointers originating from C 'malloc' (and friends), instead of 'new'
+struct FreeDeleter
+{
+    void operator()(void* p) const { std::free(p); }
+};
+
+struct GzFileDeleter
+{
+    void operator()(gzFile fp) const
+    {
+        if (fp) gzclose(fp);
+        fp = nullptr;
+    }
+};
+
 struct HtslibBgzfDeleter
 {
     void operator()(BGZF* bgzf) const
     {
         if (bgzf) bgzf_close(bgzf);
         bgzf = nullptr;
+    }
+};
+
+struct HtslibFastaIndexDeleter
+{
+    void operator()(faidx_t* fai) const
+    {
+        if (fai) fai_destroy(fai);
+        fai = nullptr;
     }
 };
 

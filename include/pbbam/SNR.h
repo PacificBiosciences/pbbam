@@ -7,10 +7,10 @@
 #ifndef SNR_H
 #define SNR_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <vector>
-
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {

@@ -7,8 +7,11 @@
 #ifndef SAMWRITER_H
 #define SAMWRITER_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 #include <string>
+
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/IRecordWriter.h"
@@ -55,9 +58,9 @@ public:
     ~SamWriter() override;
 
     SamWriter(const SamWriter&) = delete;
-    SamWriter(SamWriter&&);
+    SamWriter(SamWriter&&) noexcept;
     SamWriter& operator=(const SamWriter&) = delete;
-    SamWriter& operator=(SamWriter&&);
+    SamWriter& operator=(SamWriter&&) noexcept;
 
     /// \brief Try to flush any buffered data to file.
     ///

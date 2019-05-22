@@ -7,9 +7,11 @@
 #ifndef GENOMICINTERVAL_H
 #define GENOMICINTERVAL_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <string>
-#include "pbbam/Config.h"
+
 #include "pbbam/Interval.h"
 #include "pbbam/Position.h"
 
@@ -45,9 +47,9 @@ public:
     GenomicInterval(const std::string& zeroBasedRegionString);
 
     GenomicInterval(const GenomicInterval&);
-    GenomicInterval(GenomicInterval&&);
+    GenomicInterval(GenomicInterval&&) noexcept;
     GenomicInterval& operator=(const GenomicInterval&);
-    GenomicInterval& operator=(GenomicInterval&&);
+    GenomicInterval& operator=(GenomicInterval&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~GenomicInterval();
 
     /// \}
@@ -145,6 +147,6 @@ private:
 };
 
 }  // namespace BAM
-}  // namspace PacBio
+}  // namespace PacBio
 
 #endif  // GENOMICINTERVAL_H

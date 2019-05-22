@@ -3,6 +3,8 @@
 #ifndef CHEMISTRYTABLE_H
 #define CHEMISTRYTABLE_H
 
+#include "pbbam/Config.h"
+
 #include <array>
 #include <string>
 #include <vector>

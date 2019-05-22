@@ -13,6 +13,8 @@
 #include "pbbam/EntireFileQuery.h"
 #include "pbbam/IndexedFastaReader.h"
 
+#include "FastxTests.h"
+
 using namespace PacBio;
 using namespace PacBio::BAM;
 
@@ -23,7 +25,59 @@ const std::string singleInsertionBam = PbbamTestsConfig::Data_Dir + "/aligned.ba
 
 }  // namespace IndexedFastaReaderTests
 
-TEST(IndexedFastaReaderTests, PrintSingleInsertion)
+TEST(IndexedFastaReaderTest, throws_on_empty_filename)
+{
+    EXPECT_THROW(IndexedFastaReader reader{""}, std::runtime_error);
+}
+
+TEST(IndexedFastaReaderTest, throws_on_invalid_extension)
+{
+    EXPECT_THROW(IndexedFastaReader reader{"wrong.ext"}, std::runtime_error);
+}
+
+TEST(IndexedFastaReaderTest, can_open_text_fasta_for_reading)
+{
+    const auto& fn = FastxTests::simpleFastaFn;
+    EXPECT_NO_THROW(IndexedFastaReader reader{fn});
+}
+
+TEST(IndexedFastaReaderTest, throws_on_gzip_fasta)
+{
+    const auto& fn = FastxTests::simpleFastaGzipFn;
+    EXPECT_THROW(IndexedFastaReader reader{fn}, std::runtime_error);
+}
+
+TEST(IndexedFastaReaderTest, can_open_bgzf_fasta_for_reading)
+{
+    const auto& fn = FastxTests::simpleFastaBgzfFn;
+    EXPECT_NO_THROW(IndexedFastaReader reader{fn});
+}
+
+TEST(IndexedFastaReaderTest, can_fetch_subsequence_from_lambda)
+{
+    IndexedFastaReader r(IndexedFastaReaderTests::lambdaFasta);
+
+    EXPECT_TRUE(r.HasSequence("lambda_NEB3011"));
+    EXPECT_FALSE(r.HasSequence("dog"));
+    EXPECT_EQ(1, r.NumSequences());
+    EXPECT_EQ(48502, r.SequenceLength("lambda_NEB3011"));
+
+    std::string seq = r.Subsequence("lambda_NEB3011:0-10");
+    EXPECT_EQ("GGGCGGCGAC", seq);
+
+    std::string seq2 = r.Subsequence("lambda_NEB3011", 0, 10);
+    EXPECT_EQ("GGGCGGCGAC", seq2);
+
+    // subsequence extending beyond bounds returns clipped
+    std::string seq3 = r.Subsequence("lambda_NEB3011", 48400, 48600);
+    EXPECT_EQ(102, seq3.length());
+
+    // empty subsequence
+    std::string emptySeq = r.Subsequence("lambda_NEB3011", 10, 10);
+    EXPECT_EQ("", emptySeq);
+}
+
+TEST(IndexedFastaReaderTest, prints_clipped_and_gapped_subsequences_from_lambda)
 {
     IndexedFastaReader r(IndexedFastaReaderTests::lambdaFasta);
 
@@ -76,101 +130,10 @@ TEST(IndexedFastaReaderTests, PrintSingleInsertion)
               r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
     EXPECT_EQ("TTGCCGCTGTT-ACCGTGCTGCGATCTTCTGCCATCGACGGACGTCCCACATTGGTGACTT",
               r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
-
-    // {
-    //     std::ostringstream output;
-    //     auto itSS = bamQuery.begin();
-    //     {
-    //         const auto recordSS = *itSS;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::NATIVE, true) << std::endl;
-    //         output << std::endl;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::NATIVE, true, true) << std::endl;
-    //         output << std::endl;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::GENOMIC, true) << std::endl;
-    //         output << std::endl;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::GENOMIC, true, true) << std::endl;
-    //         output << std::endl;
-    //     }
-    //     ++itSS;
-    //     {
-    //         const auto recordSS = *itSS;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::NATIVE, true) << std::endl;
-    //         output << std::endl;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::NATIVE, true, true) << std::endl;
-    //         output << std::endl;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::GENOMIC, true) << std::endl;
-    //         output << std::endl;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::GENOMIC, true, true) << std::endl;
-    //         output << std::endl;
-    //     }
-    //     ++itSS;
-    //     {
-    //         const auto recordSS = *itSS;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::NATIVE, true) << std::endl;
-    //         output << std::endl;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::NATIVE, true, true) << std::endl;
-    //         output << std::endl;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::GENOMIC, true) << std::endl;
-    //         output << std::endl;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::GENOMIC, true, true) << std::endl;
-    //         output << std::endl;
-    //     }
-    //     ++itSS;
-    //     {
-    //         const auto recordSS = *itSS;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::GENOMIC, true) << std::endl;
-    //         output << std::endl;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::NATIVE, true) << std::endl;
-    //         output << std::endl;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::GENOMIC, true, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::GENOMIC, true, true) << std::endl;
-    //         output << std::endl;
-    //         output << r.ReferenceSubsequence(recordSS, Orientation::NATIVE, true, true) << std::endl;
-    //         output << recordSS.Sequence(Orientation::NATIVE, true, true) << std::endl;
-    //     }
-    //     std::cerr << output.str();
-    // }
 }
 
-TEST(IndexedFastaReaderTests, ReadLambda)
-{
-    IndexedFastaReader r(IndexedFastaReaderTests::lambdaFasta);
-
-    EXPECT_TRUE(r.HasSequence("lambda_NEB3011"));
-    EXPECT_FALSE(r.HasSequence("dog"));
-    EXPECT_EQ(1, r.NumSequences());
-    EXPECT_EQ(48502, r.SequenceLength("lambda_NEB3011"));
-
-    std::string seq = r.Subsequence("lambda_NEB3011:0-10");
-    EXPECT_EQ("GGGCGGCGAC", seq);
-
-    std::string seq2 = r.Subsequence("lambda_NEB3011", 0, 10);
-    EXPECT_EQ("GGGCGGCGAC", seq2);
-
-    // subsequence extending beyond bounds returns clipped
-    std::string seq3 = r.Subsequence("lambda_NEB3011", 48400, 48600);
-    EXPECT_EQ(102, seq3.length());
-
-    // empty subsequence
-    std::string emptySeq = r.Subsequence("lambda_NEB3011", 10, 10);
-    EXPECT_EQ("", emptySeq);
-}
-
-TEST(IndexedFastaReaderTests, Errors)
+// Come back
+TEST(IndexedFastaReaderTest, throws_on_invalid_subsequence_requests)
 {
     IndexedFastaReader r(IndexedFastaReaderTests::lambdaFasta);
 
@@ -189,7 +152,8 @@ TEST(IndexedFastaReaderTests, Errors)
     EXPECT_THROW(r.Subsequence("dog:0-10"), std::exception);
 }
 
-TEST(IndexedFastaReaderTests, Names)
+//
+TEST(IndexedFastaReaderTest, can_fetch_name_info_from_lambda)
 {
     IndexedFastaReader r(IndexedFastaReaderTests::lambdaFasta);
     std::vector<std::string> names = {"lambda_NEB3011"};

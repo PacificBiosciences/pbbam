@@ -3,6 +3,8 @@
 #ifndef XMLREADER_H
 #define XMLREADER_H
 
+#include "pbbam/Config.h"
+
 #include <iosfwd>
 #include <memory>
 

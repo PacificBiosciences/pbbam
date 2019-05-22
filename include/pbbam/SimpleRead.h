@@ -7,10 +7,15 @@
 #ifndef SIMPLEREAD_H
 #define SIMPLEREAD_H
 
+#include "pbbam/Config.h"
+
 #include <string>
+
+#include <boost/optional.hpp>
 
 #include "pbbam/BamRecord.h"
 #include "pbbam/Cigar.h"
+#include "pbbam/Frames.h"
 #include "pbbam/Position.h"
 #include "pbbam/QualityValues.h"
 #include "pbbam/SNR.h"
@@ -26,11 +31,13 @@ public:
     SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr);
     SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr, Position qStart,
                Position qEnd);
+    SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr, Position qStart,
+               Position qEnd, Frames pulseWidths);
 
     SimpleRead(const SimpleRead&);
-    SimpleRead(SimpleRead&&);
+    SimpleRead(SimpleRead&&) noexcept;
     SimpleRead& operator=(const SimpleRead&);
-    SimpleRead& operator=(SimpleRead&&);
+    SimpleRead& operator=(SimpleRead&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~SimpleRead();
 
     // general data
@@ -40,6 +47,7 @@ public:
     SNR SignalToNoise;
     Position QueryStart;
     Position QueryEnd;
+    boost::optional<Frames> PulseWidths;
 };
 
 class MappedSimpleRead : public SimpleRead
@@ -49,9 +57,10 @@ public:
                      Position templateEnd, PacBio::BAM::Cigar cigar, uint8_t mapQV);
 
     MappedSimpleRead(const MappedSimpleRead&);
-    MappedSimpleRead(MappedSimpleRead&&);
+    MappedSimpleRead(MappedSimpleRead&&) noexcept;
     MappedSimpleRead& operator=(const MappedSimpleRead&);
-    MappedSimpleRead& operator=(MappedSimpleRead&&);
+    MappedSimpleRead& operator=(MappedSimpleRead&&) noexcept(
+        std::is_nothrow_move_assignable<SimpleRead>::value);
     ~MappedSimpleRead();
 
     // mapping data

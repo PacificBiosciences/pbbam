@@ -7,9 +7,15 @@
 #ifndef FASTAREADER_H
 #define FASTAREADER_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
+#include <string>
 #include <vector>
+
 #include "pbbam/FastaSequence.h"
+
+#include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {
 namespace BAM {
@@ -17,7 +23,7 @@ namespace BAM {
 ///
 /// \brief The FastaReader provides sequential access to FASTA records.
 ///
-class FastaReader
+class FastaReader : public internal::QueryBase<FastaSequence>
 {
 public:
     ///
@@ -35,26 +41,33 @@ public:
     explicit FastaReader(const std::string& fn);
 
     FastaReader(const FastaReader&) = delete;
-    FastaReader(FastaReader&&);
+    FastaReader(FastaReader&&) noexcept;
     FastaReader& operator=(const FastaReader&) = delete;
-    FastaReader& operator=(FastaReader&&);
+    FastaReader& operator=(FastaReader&&) noexcept;
     ~FastaReader();
 
     /// \}
 
 public:
-    /// \name Sequence Access
-    /// \{
-
     ///
     /// \brief GetNext
     ///
+    /// Allows iteration with range-for:
     /// \code{cpp}
     ///
-    /// FastaReader reader{ fn };
-    /// FastaSequence f;
-    /// while (reader.GetNext(f)) {
-    ///     // do stuff with f
+    /// FastaReader reader{fn};
+    /// for (const FastaSequence& seq : reader) {
+    ///     // do stuff with seq
+    /// }
+    /// \endcode
+    ///
+    /// or you can iterate 'manually':
+    /// \code{cpp}
+    ///
+    /// FastaReader reader{fn};
+    /// FastaSequence seq;
+    /// while (reader.GetNext(seq)) {
+    ///     // do stuff with seq
     /// }
     /// \endcode
     ///
@@ -62,8 +75,6 @@ public:
     /// \return success/failure
     ///
     bool GetNext(FastaSequence& record);
-
-    /// \}
 
 private:
     class FastaReaderPrivate;

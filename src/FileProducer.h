@@ -3,6 +3,8 @@
 #ifndef FILEPRODUCER_H
 #define FILEPRODUCER_H
 
+#include "pbbam/Config.h"
+
 #include <cstdio>
 #include <string>
 

@@ -7,6 +7,8 @@
 #ifndef READGROUPINFO_H
 #define READGROUPINFO_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <map>
@@ -15,7 +17,6 @@
 
 #include <boost/optional.hpp>
 
-#include "pbbam/Config.h"
 #include "pbbam/exception/InvalidSequencingChemistryException.h"
 
 namespace PacBio {
@@ -228,9 +229,9 @@ public:
                   std::pair<uint16_t, uint16_t> barcodes);
 
     ReadGroupInfo(const ReadGroupInfo&);
-    ReadGroupInfo(ReadGroupInfo&&);
+    ReadGroupInfo(ReadGroupInfo&&) noexcept;
     ReadGroupInfo& operator=(const ReadGroupInfo&);
-    ReadGroupInfo& operator=(ReadGroupInfo&&);
+    ReadGroupInfo& operator=(ReadGroupInfo&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~ReadGroupInfo();
 
     /// \}

@@ -111,11 +111,11 @@ Frames::Frames() = default;
 
 Frames::Frames(const Frames&) = default;
 
-Frames::Frames(Frames&&) = default;
+Frames::Frames(Frames&&) noexcept = default;
 
 Frames& Frames::operator=(const Frames&) = default;
 
-Frames& Frames::operator=(Frames&&) = default;
+Frames& Frames::operator=(Frames&&) noexcept = default;
 
 Frames::~Frames() = default;
 

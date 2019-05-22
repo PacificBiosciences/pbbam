@@ -7,11 +7,12 @@
 #ifndef INDEXEDBAMWRITER_H
 #define INDEXEDBAMWRITER_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 #include <string>
 
 #include "pbbam/BamWriter.h"
-#include "pbbam/Config.h"
 #include "pbbam/IRecordWriter.h"
 #include "pbbam/PbiBuilder.h"
 
@@ -108,9 +109,9 @@ public:
     }
 
     IndexedBamWriter(const IndexedBamWriter&) = delete;
-    IndexedBamWriter(IndexedBamWriter&&);
+    IndexedBamWriter(IndexedBamWriter&&) noexcept;
     IndexedBamWriter& operator=(const IndexedBamWriter&) = delete;
-    IndexedBamWriter& operator=(IndexedBamWriter&&);
+    IndexedBamWriter& operator=(IndexedBamWriter&&) noexcept;
     ~IndexedBamWriter() override;
 
 public:

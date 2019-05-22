@@ -7,11 +7,13 @@
 #ifndef ZMWREADSTITCHER_H
 #define ZMWREADSTITCHER_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
 #include "pbbam/virtual/VirtualZmwBamRecord.h"
 
 namespace PacBio {

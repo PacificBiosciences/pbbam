@@ -3,6 +3,8 @@
 #ifndef PBBAM_VCF_VCFFILE_H
 #define PBBAM_VCF_VCFFILE_H
 
+#include "pbbam/Config.h"
+
 #include <string>
 
 #include <pbbam/vcf/VcfHeader.h>
@@ -17,9 +19,9 @@ public:
 
     VcfFile() = delete;
     VcfFile(const VcfFile&);
-    VcfFile(VcfFile&&);
+    VcfFile(VcfFile&&) noexcept;
     VcfFile& operator=(const VcfFile&);
-    VcfFile& operator=(VcfFile&&);
+    VcfFile& operator=(VcfFile&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~VcfFile();
 
 public:

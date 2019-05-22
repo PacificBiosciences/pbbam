@@ -7,12 +7,12 @@
 #ifndef CIGAROPERATION_H
 #define CIGAROPERATION_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <stdexcept>
 
 #include <htslib/sam.h>
-
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -78,9 +78,9 @@ public:
     CigarOperation(CigarOperationType op, uint32_t length);
 
     CigarOperation(const CigarOperation&);
-    CigarOperation(CigarOperation&&);
+    CigarOperation(CigarOperation&&) noexcept;
     CigarOperation& operator=(const CigarOperation&);
-    CigarOperation& operator=(CigarOperation&&);
+    CigarOperation& operator=(CigarOperation&&) noexcept;
     ~CigarOperation();
 
     /// \}

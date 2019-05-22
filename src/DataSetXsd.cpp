@@ -172,11 +172,11 @@ NamespaceRegistry::NamespaceRegistry() : data_(internal::DefaultRegistry()) {}
 
 NamespaceRegistry::NamespaceRegistry(const NamespaceRegistry&) = default;
 
-NamespaceRegistry::NamespaceRegistry(NamespaceRegistry&&) = default;
+NamespaceRegistry::NamespaceRegistry(NamespaceRegistry&&) noexcept = default;
 
 NamespaceRegistry& NamespaceRegistry::operator=(const NamespaceRegistry&) = default;
 
-NamespaceRegistry& NamespaceRegistry::operator=(NamespaceRegistry&&) = default;
+NamespaceRegistry& NamespaceRegistry::operator=(NamespaceRegistry&&) noexcept = default;
 
 NamespaceRegistry::~NamespaceRegistry() = default;
 

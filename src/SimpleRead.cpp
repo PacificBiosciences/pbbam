@@ -10,9 +10,45 @@
 
 #include "Clipping.h"
 #include "SequenceUtils.h"
+#include "SimpleReadImpl.h"
 
 namespace PacBio {
 namespace BAM {
+namespace internal {
+
+template <typename T>
+T clipContainer(const T& input, const size_t pos, const size_t len)
+{
+    if (input.empty()) return {};
+    assert(input.size() >= pos + len);
+    return T{input.cbegin() + pos, input.cbegin() + pos + len};
+}
+
+void ClipSimpleRead(SimpleRead& read, const internal::ClipResult& result, size_t start, size_t end)
+{
+    const auto clipFrom = result.clipOffset_;
+    const auto clipLength = (end - start);
+    read.Sequence = clipContainer(read.Sequence, clipFrom, clipLength);
+    read.Qualities = clipContainer(read.Qualities, clipFrom, clipLength);
+    read.QueryStart = result.qStart_;
+    read.QueryEnd = result.qEnd_;
+    if (read.PulseWidths)
+        read.PulseWidths = clipContainer(read.PulseWidths->Data(), clipFrom, clipLength);
+}
+
+// NOTE: 'result' is moved into here, so we can take the CIGAR
+void ClipMappedRead(MappedSimpleRead& read, internal::ClipResult result)
+{
+    // clip common data
+    ClipSimpleRead(read, result, result.qStart_, result.qEnd_);
+
+    // clip mapped data
+    read.Cigar = std::move(result.cigar_);
+    read.TemplateStart = result.refPos_;
+    read.TemplateEnd = read.TemplateStart + ReferenceLength(read.Cigar);
+}
+
+}  // namespace internal
 
 //
 // SimpleRead
@@ -49,13 +85,25 @@ SimpleRead::SimpleRead(std::string name, std::string seq, QualityValues qualitie
 {
 }
 
+SimpleRead::SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr,
+                       Position qStart, Position qEnd, Frames pulseWidths)
+    : Name{std::move(name)}
+    , Sequence{std::move(seq)}
+    , Qualities{std::move(qualities)}
+    , SignalToNoise{std::move(snr)}
+    , QueryStart{qStart}
+    , QueryEnd{qEnd}
+    , PulseWidths{std::move(pulseWidths)}
+{
+}
+
 SimpleRead::SimpleRead(const SimpleRead&) = default;
 
-SimpleRead::SimpleRead(SimpleRead&&) = default;
+SimpleRead::SimpleRead(SimpleRead&&) noexcept = default;
 
 SimpleRead& SimpleRead::operator=(const SimpleRead&) = default;
 
-SimpleRead& SimpleRead::operator=(SimpleRead&&) = default;
+SimpleRead& SimpleRead::operator=(SimpleRead&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 SimpleRead::~SimpleRead() = default;
 
@@ -77,24 +125,18 @@ MappedSimpleRead::MappedSimpleRead(const SimpleRead& read, PacBio::BAM::Strand s
 
 MappedSimpleRead::MappedSimpleRead(const MappedSimpleRead&) = default;
 
-MappedSimpleRead::MappedSimpleRead(MappedSimpleRead&&) = default;
+MappedSimpleRead::MappedSimpleRead(MappedSimpleRead&&) noexcept = default;
 
 MappedSimpleRead& MappedSimpleRead::operator=(const MappedSimpleRead&) = default;
 
-MappedSimpleRead& MappedSimpleRead::operator=(MappedSimpleRead&&) = default;
+MappedSimpleRead& MappedSimpleRead::operator=(MappedSimpleRead&&) noexcept(
+    std::is_nothrow_move_assignable<SimpleRead>::value) = default;
 
 MappedSimpleRead::~MappedSimpleRead() = default;
 
 //
 // Clipping helpers
 //
-
-template <typename T>
-T clipContainer(const T& input, const size_t pos, const size_t len)
-{
-    if (input.empty()) return {};
-    return T{input.cbegin() + pos, input.cbegin() + pos + len};
-}
 
 void ClipToQuery(SimpleRead& read, Position start, Position end)
 {
@@ -115,12 +157,7 @@ void ClipToQuery(SimpleRead& read, Position start, Position end)
     auto result = internal::ClipToQuery(clipConfig);
 
     // apply clipping
-    const auto clipFrom = result.clipOffset_;
-    const auto clipLength = (end - start);
-    read.Sequence = clipContainer(read.Sequence, clipFrom, clipLength);
-    read.Qualities = clipContainer(read.Qualities, clipFrom, clipLength);
-    read.QueryStart = result.qStart_;
-    read.QueryEnd = result.qEnd_;
+    internal::ClipSimpleRead(read, std::move(result), start, end);
 }
 
 void ClipToQuery(MappedSimpleRead& read, Position start, Position end)
@@ -141,21 +178,27 @@ void ClipToQuery(MappedSimpleRead& read, Position start, Position end)
     auto result = internal::ClipToQuery(clipConfig);
 
     // apply clipping
-    const auto clipFrom = result.clipOffset_;
-    const auto clipLength = (end - start);
-    read.Sequence = clipContainer(read.Sequence, clipFrom, clipLength);
-    read.Qualities = clipContainer(read.Qualities, clipFrom, clipLength);
-    read.QueryStart = result.qStart_;
-    read.QueryEnd = result.qEnd_;
-    read.Cigar = std::move(result.cigar_);
-    read.TemplateStart = result.refPos_;
-    read.TemplateEnd = read.TemplateStart + ReferenceLength(read.Cigar);
+    internal::ClipMappedRead(read, std::move(result));
 }
 
 void ClipToReference(MappedSimpleRead& read, Position start, Position end,
                      bool exciseFlankingInserts)
 {
-    // skip out if clip not needed
+    // return emptied read if clip region is disjoint from
+    if (end <= read.TemplateStart || start >= read.TemplateEnd) {
+        read.Sequence.clear();
+        read.Qualities.clear();
+        read.QueryStart = -1;
+        read.QueryEnd = -1;
+        if (read.PulseWidths) read.PulseWidths->DataRaw().clear();
+        read.TemplateStart = -1;
+        read.TemplateEnd = -1;
+        read.Cigar.clear();
+        read.MapQuality = 255;
+        return;
+    }
+
+    // skip out if clip region covers aligned region (no clip needed)
     if (start <= read.TemplateStart && end >= read.TemplateEnd) return;
 
     // calculate clipping
@@ -168,15 +211,7 @@ void ClipToReference(MappedSimpleRead& read, Position start, Position end,
     auto result = internal::ClipToReference(clipConfig);
 
     // apply clipping
-    const auto clipFrom = result.clipOffset_;
-    const auto clipLength = (end - start);
-    read.Sequence = clipContainer(read.Sequence, clipFrom, clipLength);
-    read.Qualities = clipContainer(read.Qualities, clipFrom, clipLength);
-    read.QueryStart = result.qStart_;
-    read.QueryEnd = result.qEnd_;
-    read.Cigar = std::move(result.cigar_);
-    read.TemplateStart = result.refPos_;
-    read.TemplateEnd = read.TemplateStart + ReferenceLength(read.Cigar);
+    internal::ClipMappedRead(read, std::move(result));
 }
 
 }  // namespace BAM

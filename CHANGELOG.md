@@ -3,12 +3,33 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-**NOTE:** The current series (0.y.z) is under initial development. Anything may
-change at any time. The public API should not be considered stable yet. Once we
-lock down a version 1.0.0, this will define a reference point & compatibility
-guarantees will be maintained within each major version series.
-
 ## Active
+
+### Added
+ - General-purpose BgzipWriter
+ - BgzipFastaWriter and BgzipFastqWriter
+
+## [1.0.3] - 2019-05-20
+
+### Added
+ - IndexedFastqReader for random access to FASTQ subregions
+
+### Fixed
+ - MappedSimpleRead clipping: on disjoint aligned/requested regions and on requests larger
+   than available sequence.
+
+## [1.0.2] - 2019-05-10
+
+### Added
+ - Range-for iteration on FastaReader & FastqReader
+
+## [1.0.1] - 2019-05-09
+
+### Added
+ - SimpleRead & MappedSimpleRead for htslib-free processing. 
+
+### Fixed
+ - Incorrect type displayed in SAM output (pure-text) for floating-point values.
 
 ## [1.0.0] - 2019-04-22
 

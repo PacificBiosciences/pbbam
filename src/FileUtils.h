@@ -3,6 +3,8 @@
 #ifndef FILEUTILS_H
 #define FILEUTILS_H
 
+#include "pbbam/Config.h"
+
 #include <chrono>
 #include <string>
 

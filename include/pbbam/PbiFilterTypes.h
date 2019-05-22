@@ -7,12 +7,15 @@
 #ifndef PBIFILTERTYPES_H
 #define PBIFILTERTYPES_H
 
-#include <boost/optional.hpp>
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <unordered_map>
+
+#include <boost/optional.hpp>
 
 #include "pbbam/Compare.h"
 #include "pbbam/PbiFile.h"

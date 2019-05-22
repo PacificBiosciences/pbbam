@@ -23,11 +23,11 @@ QualityValue::QualityValue(const uint8_t value) : value_{value}
 
 QualityValue::QualityValue(const QualityValue&) = default;
 
-QualityValue::QualityValue(QualityValue&&) = default;
+QualityValue::QualityValue(QualityValue&&) noexcept = default;
 
 QualityValue& QualityValue::operator=(const QualityValue&) = default;
 
-QualityValue& QualityValue::operator=(QualityValue&&) = default;
+QualityValue& QualityValue::operator=(QualityValue&&) noexcept = default;
 
 QualityValue::~QualityValue() = default;
 

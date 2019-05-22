@@ -3,6 +3,9 @@
 #ifndef PBBAM_VCF_VARIANT_H
 #define PBBAM_VCF_VARIANT_H
 
+#include "pbbam/Config.h"
+
+#include <cassert>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -44,9 +47,9 @@ public:
                std::string altAllele);
 
     VcfVariant(const VcfVariant&);
-    VcfVariant(VcfVariant&&);
+    VcfVariant(VcfVariant&&) noexcept;
     VcfVariant& operator=(const VcfVariant&);
-    VcfVariant& operator=(VcfVariant&&);
+    VcfVariant& operator=(VcfVariant&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~VcfVariant();
 
 public:

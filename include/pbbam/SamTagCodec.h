@@ -7,8 +7,10 @@
 #ifndef SAMTAGCODEC_H
 #define SAMTAGCODEC_H
 
-#include <string>
 #include "pbbam/Config.h"
+
+#include <string>
+
 #include "pbbam/TagCollection.h"
 
 namespace PacBio {
@@ -32,6 +34,15 @@ public:
     /// \returns resulting tag collection
     ///
     static TagCollection Decode(const std::string& tagString);
+
+    /// \brief Creates SAM-formatted string from a Tag.
+    ///
+    /// \param[in] name 2-character tag name
+    /// \param[in] tag  Tag instance containing data
+    ///
+    /// \return SAM-formatted string
+    ///
+    static std::string Encode(const std::string& name, const PacBio::BAM::Tag& tag);
 
     /// \brief Creates SAM-formatted string from a TagCollection.
     ///

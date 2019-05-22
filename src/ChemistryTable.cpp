@@ -55,7 +55,7 @@ ChemistryTable ChemistryTableFromXml(const std::string& mappingXml)
     return table;
 }
 
-}  // anonymous
+}  // namespace
 
 const ChemistryTable& BuiltInChemistryTable()
 {
@@ -145,7 +145,10 @@ const ChemistryTable& BuiltInChemistryTable()
         // 5.0.1 ChemRel; Sequel® Dev Sequencing Plate Dyn Loading (4 rxn)
         {{"101-717-400", "101-644-500", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel® Dev Sequencing Plate Dyn Loading
         // 5.0.1 ChemRel; Sequel® Sequencing Plate Dyn Loading (4 rxn)
-        {{"101-717-400", "101-717-100", "5.0", "S/P3-C1/5.0-8M"}} // Sequel® Dev Sequencing Plate Dyn Loading
+        {{"101-717-400", "101-717-100", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel® Dev Sequencing Plate Dyn Loading
+
+        // Sequel® II Binding Kit 2.0EA; Sequel® II Sequencing Plate 2.0EA (4 Rxn)
+        {{"101-789-500", "101-789-300", "5.0", "S/P4-C2/5.0-8M"}}
     };
     // clang-format on
 

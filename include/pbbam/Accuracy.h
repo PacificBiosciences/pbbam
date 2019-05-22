@@ -35,9 +35,9 @@ public:
     Accuracy(float accuracy);
 
     Accuracy(const Accuracy&);
-    Accuracy(Accuracy&&);
+    Accuracy(Accuracy&&) noexcept;
     Accuracy& operator=(const Accuracy&);
-    Accuracy& operator=(Accuracy&&);
+    Accuracy& operator=(Accuracy&&) noexcept;
     ~Accuracy();
 
     /// \}

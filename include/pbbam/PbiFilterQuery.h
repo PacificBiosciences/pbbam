@@ -7,8 +7,10 @@
 #ifndef PBIFILTERQUERY_H
 #define PBIFILTERQUERY_H
 
-#include <vector>
 #include "pbbam/Config.h"
+
+#include <vector>
+
 #include "pbbam/PbiFilter.h"
 #include "pbbam/internal/QueryBase.h"
 

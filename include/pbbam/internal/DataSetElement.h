@@ -3,16 +3,19 @@
 #ifndef DATASETELEMENT_H
 #define DATASETELEMENT_H
 
+#include "pbbam/Config.h"
+
 #include "pbbam/DataSetXsd.h"
 
 #include <algorithm>
-#include <boost/utility/string_ref.hpp>
 #include <cassert>
 #include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
+
+#include <boost/utility/string_ref.hpp>
 
 namespace PacBio {
 namespace BAM {
@@ -33,9 +36,9 @@ public:
     XmlName(const std::string& localName, const std::string& prefix);
 
     XmlName(const XmlName&) = default;
-    XmlName(XmlName&&) = default;
+    XmlName(XmlName&&) noexcept = default;
     XmlName& operator=(const XmlName&) = default;
-    XmlName& operator=(XmlName&&) = default;
+    XmlName& operator=(XmlName&&) noexcept = default;
     ~XmlName() = default;
 
 public:
@@ -68,9 +71,9 @@ public:
                    const XsdType& xsd = XsdType::NONE);
 
     DataSetElement(const DataSetElement&) = default;
-    DataSetElement(DataSetElement&&) = default;
+    DataSetElement(DataSetElement&&) noexcept = default;
     DataSetElement& operator=(const DataSetElement&) = default;
-    DataSetElement& operator=(DataSetElement&&) = default;
+    DataSetElement& operator=(DataSetElement&&) noexcept = default;
     virtual ~DataSetElement() = default;
 
 public:

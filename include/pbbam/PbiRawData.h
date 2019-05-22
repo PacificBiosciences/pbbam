@@ -7,12 +7,14 @@
 #ifndef PBIRAWDATA_H
 #define PBIRAWDATA_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
-#include "pbbam/Config.h"
+
 #include "pbbam/PbiFile.h"
 
 namespace PacBio {
@@ -37,9 +39,9 @@ public:
 
     PbiRawBarcodeData();
     PbiRawBarcodeData(const PbiRawBarcodeData&);
-    PbiRawBarcodeData(PbiRawBarcodeData&&);
+    PbiRawBarcodeData(PbiRawBarcodeData&&) noexcept;
     PbiRawBarcodeData& operator=(const PbiRawBarcodeData&);
-    PbiRawBarcodeData& operator=(PbiRawBarcodeData&&);
+    PbiRawBarcodeData& operator=(PbiRawBarcodeData&&) noexcept;
     ~PbiRawBarcodeData();
 
     /// \}
@@ -82,9 +84,9 @@ public:
 
     PbiRawMappedData();
     PbiRawMappedData(const PbiRawMappedData&);
-    PbiRawMappedData(PbiRawMappedData&&);
+    PbiRawMappedData(PbiRawMappedData&&) noexcept;
     PbiRawMappedData& operator=(const PbiRawMappedData&);
-    PbiRawMappedData& operator=(PbiRawMappedData&&);
+    PbiRawMappedData& operator=(PbiRawMappedData&&) noexcept;
     ~PbiRawMappedData();
 
     /// \}
@@ -196,9 +198,9 @@ public:
     PbiReferenceEntry(ID id, Row beginRow, Row endRow);
 
     PbiReferenceEntry(const PbiReferenceEntry&);
-    PbiReferenceEntry(PbiReferenceEntry&&);
+    PbiReferenceEntry(PbiReferenceEntry&&) noexcept;
     PbiReferenceEntry& operator=(const PbiReferenceEntry&);
-    PbiReferenceEntry& operator=(PbiReferenceEntry&&);
+    PbiReferenceEntry& operator=(PbiReferenceEntry&&) noexcept;
     ~PbiReferenceEntry();
 
     bool operator==(const PbiReferenceEntry& other) const;
@@ -235,9 +237,9 @@ public:
 
     PbiRawReferenceData();
     PbiRawReferenceData(const PbiRawReferenceData&);
-    PbiRawReferenceData(PbiRawReferenceData&&);
+    PbiRawReferenceData(PbiRawReferenceData&&) noexcept;
     PbiRawReferenceData& operator=(const PbiRawReferenceData&);
-    PbiRawReferenceData& operator=(PbiRawReferenceData&&);
+    PbiRawReferenceData& operator=(PbiRawReferenceData&&) noexcept;
     ~PbiRawReferenceData();
 
     /// \}
@@ -266,9 +268,9 @@ public:
 
     PbiRawBasicData();
     PbiRawBasicData(const PbiRawBasicData&);
-    PbiRawBasicData(PbiRawBasicData&&);
+    PbiRawBasicData(PbiRawBasicData&&) noexcept;
     PbiRawBasicData& operator=(const PbiRawBasicData&);
-    PbiRawBasicData& operator=(PbiRawBasicData&&);
+    PbiRawBasicData& operator=(PbiRawBasicData&&) noexcept;
     ~PbiRawBasicData();
 
     /// \}
@@ -344,9 +346,9 @@ public:
 
     PbiRawData();
     PbiRawData(const PbiRawData&);
-    PbiRawData(PbiRawData&&);
+    PbiRawData(PbiRawData&&) noexcept;
     PbiRawData& operator=(const PbiRawData&);
-    PbiRawData& operator=(PbiRawData&&);
+    PbiRawData& operator=(PbiRawData&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~PbiRawData();
 
     /// \}

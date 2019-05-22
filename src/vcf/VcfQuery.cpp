@@ -1,3 +1,5 @@
+#include "../PbbamInternalConfig.h"
+
 #include <pbbam/vcf/VcfQuery.h>
 
 namespace PacBio {
@@ -9,6 +11,11 @@ VcfQuery::VcfQuery(const VcfFile& file)
     : PacBio::BAM::internal::QueryBase<VcfVariant>(), reader_{file}
 {
 }
+
+VcfQuery::VcfQuery(VcfQuery&&) noexcept = default;
+
+VcfQuery& VcfQuery::operator=(VcfQuery&&) noexcept(
+    std::is_nothrow_move_assignable<VcfReader>::value) = default;
 
 VcfQuery::~VcfQuery() = default;
 

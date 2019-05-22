@@ -7,10 +7,11 @@
 #ifndef FRAMES_H
 #define FRAMES_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -57,9 +58,9 @@ public:
 
     Frames();
     Frames(const Frames&);
-    Frames(Frames&&);
+    Frames(Frames&&) noexcept;
     Frames& operator=(const Frames&);
-    Frames& operator=(Frames&&);
+    Frames& operator=(Frames&&) noexcept;
     ~Frames();
 
     /// \}

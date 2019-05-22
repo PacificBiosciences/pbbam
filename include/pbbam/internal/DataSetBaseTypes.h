@@ -3,9 +3,11 @@
 #ifndef DATASETBASETYPES_H
 #define DATASETBASETYPES_H
 
-#include <string>
 #include "pbbam/Config.h"
+
 #include "pbbam/internal/DataSetElement.h"
+
+#include <string>
 
 namespace PacBio {
 namespace BAM {

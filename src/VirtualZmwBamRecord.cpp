@@ -42,11 +42,11 @@ VirtualZmwBamRecord::VirtualZmwBamRecord(std::vector<BamRecord> unorderedSources
 
 VirtualZmwBamRecord::VirtualZmwBamRecord(const VirtualZmwBamRecord&) = default;
 
-VirtualZmwBamRecord::VirtualZmwBamRecord(VirtualZmwBamRecord&&) = default;
+VirtualZmwBamRecord::VirtualZmwBamRecord(VirtualZmwBamRecord&&) noexcept = default;
 
 VirtualZmwBamRecord& VirtualZmwBamRecord::operator=(const VirtualZmwBamRecord&) = default;
 
-VirtualZmwBamRecord& VirtualZmwBamRecord::operator=(VirtualZmwBamRecord&&) = default;
+VirtualZmwBamRecord& VirtualZmwBamRecord::operator=(VirtualZmwBamRecord&&) noexcept = default;
 
 VirtualZmwBamRecord::~VirtualZmwBamRecord() = default;
 

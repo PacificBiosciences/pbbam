@@ -39,11 +39,11 @@ PbiRawBarcodeData::PbiRawBarcodeData() = default;
 
 PbiRawBarcodeData::PbiRawBarcodeData(const PbiRawBarcodeData&) = default;
 
-PbiRawBarcodeData::PbiRawBarcodeData(PbiRawBarcodeData&&) = default;
+PbiRawBarcodeData::PbiRawBarcodeData(PbiRawBarcodeData&&) noexcept = default;
 
 PbiRawBarcodeData& PbiRawBarcodeData::operator=(const PbiRawBarcodeData&) = default;
 
-PbiRawBarcodeData& PbiRawBarcodeData::operator=(PbiRawBarcodeData&&) = default;
+PbiRawBarcodeData& PbiRawBarcodeData::operator=(PbiRawBarcodeData&&) noexcept = default;
 
 PbiRawBarcodeData::~PbiRawBarcodeData() = default;
 
@@ -95,11 +95,11 @@ PbiRawMappedData::PbiRawMappedData() = default;
 
 PbiRawMappedData::PbiRawMappedData(const PbiRawMappedData&) = default;
 
-PbiRawMappedData::PbiRawMappedData(PbiRawMappedData&&) = default;
+PbiRawMappedData::PbiRawMappedData(PbiRawMappedData&&) noexcept = default;
 
 PbiRawMappedData& PbiRawMappedData::operator=(const PbiRawMappedData&) = default;
 
-PbiRawMappedData& PbiRawMappedData::operator=(PbiRawMappedData&&) = default;
+PbiRawMappedData& PbiRawMappedData::operator=(PbiRawMappedData&&) noexcept = default;
 
 PbiRawMappedData::~PbiRawMappedData() = default;
 
@@ -161,11 +161,11 @@ PbiReferenceEntry::PbiReferenceEntry(ID id, Row beginRow, Row endRow)
 
 PbiReferenceEntry::PbiReferenceEntry(const PbiReferenceEntry&) = default;
 
-PbiReferenceEntry::PbiReferenceEntry(PbiReferenceEntry&&) = default;
+PbiReferenceEntry::PbiReferenceEntry(PbiReferenceEntry&&) noexcept = default;
 
 PbiReferenceEntry& PbiReferenceEntry::operator=(const PbiReferenceEntry&) = default;
 
-PbiReferenceEntry& PbiReferenceEntry::operator=(PbiReferenceEntry&&) = default;
+PbiReferenceEntry& PbiReferenceEntry::operator=(PbiReferenceEntry&&) noexcept = default;
 
 PbiReferenceEntry::~PbiReferenceEntry() = default;
 
@@ -179,11 +179,11 @@ PbiRawReferenceData::PbiRawReferenceData() = default;
 
 PbiRawReferenceData::PbiRawReferenceData(const PbiRawReferenceData&) = default;
 
-PbiRawReferenceData::PbiRawReferenceData(PbiRawReferenceData&&) = default;
+PbiRawReferenceData::PbiRawReferenceData(PbiRawReferenceData&&) noexcept = default;
 
 PbiRawReferenceData& PbiRawReferenceData::operator=(const PbiRawReferenceData&) = default;
 
-PbiRawReferenceData& PbiRawReferenceData::operator=(PbiRawReferenceData&&) = default;
+PbiRawReferenceData& PbiRawReferenceData::operator=(PbiRawReferenceData&&) noexcept = default;
 
 PbiRawReferenceData::~PbiRawReferenceData() = default;
 
@@ -207,11 +207,11 @@ PbiRawBasicData::PbiRawBasicData() = default;
 
 PbiRawBasicData::PbiRawBasicData(const PbiRawBasicData&) = default;
 
-PbiRawBasicData::PbiRawBasicData(PbiRawBasicData&&) = default;
+PbiRawBasicData::PbiRawBasicData(PbiRawBasicData&&) noexcept = default;
 
 PbiRawBasicData& PbiRawBasicData::operator=(const PbiRawBasicData&) = default;
 
-PbiRawBasicData& PbiRawBasicData::operator=(PbiRawBasicData&&) = default;
+PbiRawBasicData& PbiRawBasicData::operator=(PbiRawBasicData&&) noexcept = default;
 
 PbiRawBasicData::~PbiRawBasicData() = default;
 
@@ -265,11 +265,11 @@ PbiRawData::PbiRawData() = default;
 
 PbiRawData::PbiRawData(const PbiRawData&) = default;
 
-PbiRawData::PbiRawData(PbiRawData&&) = default;
+PbiRawData::PbiRawData(PbiRawData&&) noexcept = default;
 
 PbiRawData& PbiRawData::operator=(const PbiRawData&) = default;
 
-PbiRawData& PbiRawData::operator=(PbiRawData&&) = default;
+PbiRawData& PbiRawData::operator=(PbiRawData&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 PbiRawData::~PbiRawData() = default;
 
@@ -328,7 +328,8 @@ PbiRawData& PbiRawData::Version(PbiFile::VersionEnum version)
 
 bool PbiReferenceEntry::operator==(const PbiReferenceEntry& other) const
 {
-    return tId_ == other.tId_ && beginRow_ == other.beginRow_ && endRow_ == other.endRow_;
+    return std::tie(tId_, beginRow_, endRow_) ==
+           std::tie(other.tId_, other.beginRow_, other.endRow_);
 }
 
 // PBI index caching

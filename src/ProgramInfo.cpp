@@ -32,11 +32,11 @@ ProgramInfo::ProgramInfo() = default;
 
 ProgramInfo::ProgramInfo(const ProgramInfo&) = default;
 
-ProgramInfo::ProgramInfo(ProgramInfo&&) = default;
+ProgramInfo::ProgramInfo(ProgramInfo&&) noexcept = default;
 
 ProgramInfo& ProgramInfo::operator=(const ProgramInfo&) = default;
 
-ProgramInfo& ProgramInfo::operator=(ProgramInfo&&) = default;
+ProgramInfo& ProgramInfo::operator=(ProgramInfo&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 ProgramInfo::~ProgramInfo() = default;
 

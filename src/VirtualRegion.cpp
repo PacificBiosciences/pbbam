@@ -6,6 +6,8 @@
 
 #include "PbbamInternalConfig.h"
 
+#include <tuple>
+
 #include "pbbam/virtual/VirtualRegion.h"
 
 namespace PacBio {
@@ -34,17 +36,17 @@ VirtualRegion::VirtualRegion() = default;
 
 VirtualRegion::VirtualRegion(const VirtualRegion&) = default;
 
-VirtualRegion::VirtualRegion(VirtualRegion&&) = default;
+VirtualRegion::VirtualRegion(VirtualRegion&&) noexcept = default;
 
 VirtualRegion& VirtualRegion::operator=(const VirtualRegion&) = default;
 
-VirtualRegion& VirtualRegion::operator=(VirtualRegion&&) = default;
+VirtualRegion& VirtualRegion::operator=(VirtualRegion&&) noexcept = default;
 
 VirtualRegion::~VirtualRegion() = default;
 
 bool VirtualRegion::operator==(const VirtualRegion& v1) const
 {
-    return (v1.type == this->type && v1.beginPos == this->beginPos && v1.endPos == this->endPos);
+    return std::tie(type, beginPos, endPos) == std::tie(v1.type, v1.beginPos, v1.endPos);
 }
 
 }  // namespace BAM

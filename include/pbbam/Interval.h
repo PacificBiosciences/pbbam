@@ -7,9 +7,10 @@
 #ifndef INTERVAL_H
 #define INTERVAL_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <string>
-#include "pbbam/Config.h"
 
 #define BOOST_ICL_USE_STATIC_BOUNDED_INTERVALS
 #include <boost/icl/discrete_interval.hpp>
@@ -44,9 +45,9 @@ public:
     Interval(const T start, const T stop);
 
     Interval(const Interval<T>&) = default;
-    Interval(Interval&&) = default;
+    Interval(Interval&&) noexcept = default;
     Interval& operator=(const Interval<T>&) = default;
-    Interval& operator=(Interval<T>&&) = default;
+    Interval& operator=(Interval<T>&&) noexcept = default;
     ~Interval() = default;
 
     /// \}
@@ -114,7 +115,7 @@ private:
 };
 
 }  // namespace BAM
-}  // namspace PacBio
+}  // namespace PacBio
 
 #include "pbbam/internal/Interval.inl"
 

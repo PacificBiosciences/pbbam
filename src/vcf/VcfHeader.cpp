@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include "../PbbamInternalConfig.h"
+
 #include <pbbam/vcf/VcfHeader.h>
 
 #include <pbbam/vcf/VcfFormat.h>
@@ -13,11 +15,11 @@ VcfHeader::VcfHeader(const std::string& hdrText) { *this = VcfFormat::ParsedHead
 
 VcfHeader::VcfHeader(const VcfHeader&) = default;
 
-VcfHeader::VcfHeader(VcfHeader&&) = default;
+VcfHeader::VcfHeader(VcfHeader&&) noexcept = default;
 
 VcfHeader& VcfHeader::operator=(const VcfHeader&) = default;
 
-VcfHeader& VcfHeader::operator=(VcfHeader&&) = default;
+VcfHeader& VcfHeader::operator=(VcfHeader&&) noexcept = default;
 
 VcfHeader::~VcfHeader() = default;
 

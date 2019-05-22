@@ -7,9 +7,12 @@
 #ifndef QUALITYVALUES_H
 #define QUALITYVALUES_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <string>
 #include <vector>
+
 #include "pbbam/QualityValue.h"
 
 namespace PacBio {
@@ -74,9 +77,9 @@ public:
 
     QualityValues();
     QualityValues(const QualityValues&);
-    QualityValues(QualityValues&&);
+    QualityValues(QualityValues&&) noexcept;
     QualityValues& operator=(const QualityValues&);
-    QualityValues& operator=(QualityValues&&);
+    QualityValues& operator=(QualityValues&&) noexcept;
     ~QualityValues();
 
     QualityValues& operator=(std::vector<QualityValue> quals);

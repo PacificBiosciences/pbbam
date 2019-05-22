@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include "../PbbamInternalConfig.h"
+
 #include <pbbam/vcf/VcfVariant.h>
 
 #include <cmath>
@@ -28,11 +30,11 @@ VcfVariant::VcfVariant(std::string id, std::string chrom, PacBio::BAM::Position 
 
 VcfVariant::VcfVariant(const VcfVariant&) = default;
 
-VcfVariant::VcfVariant(VcfVariant&&) = default;
+VcfVariant::VcfVariant(VcfVariant&&) noexcept = default;
 
 VcfVariant& VcfVariant::operator=(const VcfVariant&) = default;
 
-VcfVariant& VcfVariant::operator=(VcfVariant&&) = default;
+VcfVariant& VcfVariant::operator=(VcfVariant&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
 
 VcfVariant::~VcfVariant() = default;
 

@@ -7,6 +7,8 @@
 #ifndef FASTASEQUENCE_H
 #define FASTASEQUENCE_H
 
+#include "pbbam/Config.h"
+
 #include <string>
 
 namespace PacBio {
@@ -30,9 +32,9 @@ public:
 
     FastaSequence();
     FastaSequence(const FastaSequence&);
-    FastaSequence(FastaSequence&&);
+    FastaSequence(FastaSequence&&) noexcept;
     FastaSequence& operator=(const FastaSequence&);
-    FastaSequence& operator=(FastaSequence&&);
+    FastaSequence& operator=(FastaSequence&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
     ~FastaSequence();
 
     /// \}
@@ -54,6 +56,9 @@ public:
     const std::string& Bases() const;
 
     /// \}
+
+    bool operator==(const FastaSequence& other) const;
+    bool operator!=(const FastaSequence& other) const;
 
 private:
     std::string name_;

@@ -25,11 +25,11 @@ Accuracy::Accuracy(float accuracy)
 
 Accuracy::Accuracy(const Accuracy&) = default;
 
-Accuracy::Accuracy(Accuracy&&) = default;
+Accuracy::Accuracy(Accuracy&&) noexcept = default;
 
 Accuracy& Accuracy::operator=(const Accuracy&) = default;
 
-Accuracy& Accuracy::operator=(Accuracy&&) = default;
+Accuracy& Accuracy::operator=(Accuracy&&) noexcept = default;
 
 Accuracy::~Accuracy() = default;
 

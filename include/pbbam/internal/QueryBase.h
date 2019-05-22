@@ -3,12 +3,15 @@
 #ifndef QUERYBASE_H
 #define QUERYBASE_H
 
-#include <cassert>
-#include <memory>
-#include <vector>
+#include "pbbam/Config.h"
+
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/DataSet.h"
+
+#include <cassert>
+#include <memory>
+#include <vector>
 
 namespace PacBio {
 namespace BAM {
