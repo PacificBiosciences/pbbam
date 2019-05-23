@@ -63,6 +63,14 @@ public:
     ///
     const QualityValues& Qualities() const;
 
+    ///
+    /// \brief
+    ///
+    /// \param quals
+    /// \return FastqSequence
+    ///
+    FastqSequence& Qualities(QualityValues quals);
+
     /// \}
 
     bool operator==(const FastqSequence& other) const;

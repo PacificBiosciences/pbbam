@@ -24,6 +24,7 @@ pbbam_test_cpp_sources = files([
   'test_EndToEnd.cpp',
   'test_EntireFileQuery.cpp',
   'test_FaiIndex.cpp',
+  'test_FaiZmwChunker.cpp',
   'test_FastaReader.cpp',
   'test_FastaSequence.cpp',
   'test_FastaSequenceQuery.cpp',
@@ -66,6 +67,7 @@ pbbam_test_cpp_sources = files([
   'test_VcfWriter.cpp',
   'test_Version.cpp',
   'test_WhitelistedZmwReadStitcher.cpp',
+  'test_ZmwChunkedFastxReader.cpp',
   'test_ZmwReadStitcher.cpp',
   'test_ZmwQuery.cpp'])
 
