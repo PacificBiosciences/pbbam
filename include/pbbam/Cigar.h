@@ -50,6 +50,8 @@ public:
     ///
     Cigar(const std::string& cigarString);
 
+    Cigar(std::vector<CigarOperation> cigar);
+
     /// \}
 
 public:

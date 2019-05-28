@@ -40,6 +40,8 @@ Cigar::Cigar(const std::string& cigarString) : std::vector<CigarOperation>{}
     }
 }
 
+Cigar::Cigar(std::vector<CigarOperation> cigar) : std::vector<CigarOperation>{std::move(cigar)} {}
+
 Cigar Cigar::FromStdString(const std::string& stdString) { return Cigar(stdString); }
 
 std::string Cigar::ToStdString() const
