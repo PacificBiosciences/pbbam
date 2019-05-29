@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - General-purpose BgzipWriter
  - BgzipFastaWriter and BgzipFastqWriter
+ - Read-only view to read indices passing a PbiFilter
 
 ## [1.0.3] - 2019-05-20
 
