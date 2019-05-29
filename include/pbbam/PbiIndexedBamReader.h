@@ -105,6 +105,9 @@ public:
     ///
     PbiIndexedBamReader& Filter(PbiFilter filter);
 
+    /// \return list of index blocks (chunks of passing reads) currently in use
+    const IndexResultBlocks& IndexBlocks() const;
+
     /// \}
 
 protected:

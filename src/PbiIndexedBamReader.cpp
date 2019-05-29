@@ -165,30 +165,19 @@ PbiIndexedBamReader::~PbiIndexedBamReader() = default;
 
 const BamFile& PbiIndexedBamReader::File() const { return d_->file_; }
 
-const PbiFilter& PbiIndexedBamReader::Filter() const
-{
-    assert(d_);
-    return d_->filter_;
-}
+const PbiFilter& PbiIndexedBamReader::Filter() const { return d_->filter_; }
 
 PbiIndexedBamReader& PbiIndexedBamReader::Filter(PbiFilter filter)
 {
-    assert(d_);
     d_->Filter(std::move(filter));
     return *this;
 }
 
-uint32_t PbiIndexedBamReader::NumReads() const
-{
-    assert(d_);
-    return d_->numMatchingReads_;
-}
+const IndexResultBlocks& PbiIndexedBamReader::IndexBlocks() const { return d_->blocks_; }
 
-int PbiIndexedBamReader::ReadRawData(BGZF* bgzf, bam1_t* b)
-{
-    assert(d_);
-    return d_->ReadRawData(bgzf, b);
-}
+uint32_t PbiIndexedBamReader::NumReads() const { return d_->numMatchingReads_; }
+
+int PbiIndexedBamReader::ReadRawData(BGZF* bgzf, bam1_t* b) { return d_->ReadRawData(bgzf, b); }
 
 }  // namespace BAM
 }  // namespace PacBio
