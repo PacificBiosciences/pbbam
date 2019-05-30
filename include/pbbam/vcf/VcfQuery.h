@@ -22,13 +22,6 @@ public:
     explicit VcfQuery(std::string fn);
     explicit VcfQuery(const VcfFile& file);
 
-    VcfQuery() = delete;
-    VcfQuery(const VcfQuery&) = delete;
-    VcfQuery(VcfQuery&&) noexcept;
-    VcfQuery& operator=(const VcfQuery&) = delete;
-    VcfQuery& operator=(VcfQuery&&) noexcept(std::is_nothrow_move_assignable<VcfReader>::value);
-    ~VcfQuery();
-
 public:
     /// \brief Main iteration point for record access.
     ///

@@ -46,9 +46,7 @@ public:
     ///
     BgzipWriter(std::string filename, const BgzipWriterConfig& config);
 
-    BgzipWriter(const BgzipWriter&) = delete;
     BgzipWriter(BgzipWriter&&) noexcept;
-    BgzipWriter& operator=(const BgzipWriter&) = delete;
     BgzipWriter& operator=(BgzipWriter&&) noexcept;
     ~BgzipWriter();
 

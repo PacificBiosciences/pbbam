@@ -9,10 +9,23 @@
 #include "pbbam/QualityValues.h"
 
 #include <algorithm>
+#include <cassert>
+#include <type_traits>
+
 #include <boost/algorithm/string.hpp>
 
 namespace PacBio {
 namespace BAM {
+
+static_assert(std::is_copy_constructible<QualityValues>::value,
+              "QualityValues(const QualityValues&) is not = default");
+static_assert(std::is_copy_assignable<QualityValues>::value,
+              "QualityValues& operator=(const QualityValues&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<QualityValues>::value,
+              "QualityValues(QualityValues&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<QualityValues>::value,
+              "QualityValues& operator=(QualityValues&&) is not = noexcept");
 
 QualityValues::QualityValues(const std::string& fastqString) : std::vector<QualityValue>{}
 {
@@ -45,18 +58,6 @@ QualityValues::QualityValues(const QualityValues::const_iterator first,
 {
     assign(first, last);
 }
-
-QualityValues::QualityValues() = default;
-
-QualityValues::QualityValues(const QualityValues&) = default;
-
-QualityValues::QualityValues(QualityValues&&) noexcept = default;
-
-QualityValues& QualityValues::operator=(const QualityValues&) = default;
-
-QualityValues& QualityValues::operator=(QualityValues&&) noexcept = default;
-
-QualityValues::~QualityValues() = default;
 
 QualityValues& QualityValues::operator=(std::vector<QualityValue> quals)
 {

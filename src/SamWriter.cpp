@@ -4,8 +4,10 @@
 
 #include "pbbam/SamWriter.h"
 
+#include <cassert>
 #include <memory>
 #include <string>
+#include <type_traits>
 
 #include <htslib/hfile.h>
 #include <htslib/sam.h>
@@ -77,6 +79,11 @@ public:
     std::unique_ptr<samFile, HtslibFileDeleter> file_;
     std::shared_ptr<bam_hdr_t> header_;
 };
+
+static_assert(!std::is_copy_constructible<SamWriter>::value,
+              "SamWriter(const SamWriter&) is not = delete");
+static_assert(!std::is_copy_assignable<SamWriter>::value,
+              "SamWriter& operator=(const SamWriter&) is not = delete");
 
 SamWriter::SamWriter(std::string filename, const BamHeader& header)
     : IRecordWriter()

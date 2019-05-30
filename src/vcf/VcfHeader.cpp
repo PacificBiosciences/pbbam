@@ -4,24 +4,27 @@
 
 #include <pbbam/vcf/VcfHeader.h>
 
+#include <cassert>
+#include <type_traits>
+
 #include <pbbam/vcf/VcfFormat.h>
 
 namespace PacBio {
 namespace VCF {
 
+static_assert(std::is_copy_constructible<VcfHeader>::value,
+              "VcfHeader(const VcfHeader&) is not = default");
+static_assert(std::is_copy_assignable<VcfHeader>::value,
+              "VcfHeader& operator=(const VcfHeader&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<VcfHeader>::value,
+              "VcfHeader(VcfHeader&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<VcfHeader>::value,
+              "VcfHeader& operator=(VcfHeader&&) is not = noexcept");
+
 VcfHeader::VcfHeader() { Version(VcfFormat::CurrentVersion()); }
 
 VcfHeader::VcfHeader(const std::string& hdrText) { *this = VcfFormat::ParsedHeader(hdrText); }
-
-VcfHeader::VcfHeader(const VcfHeader&) = default;
-
-VcfHeader::VcfHeader(VcfHeader&&) noexcept = default;
-
-VcfHeader& VcfHeader::operator=(const VcfHeader&) = default;
-
-VcfHeader& VcfHeader::operator=(VcfHeader&&) noexcept = default;
-
-VcfHeader::~VcfHeader() = default;
 
 VcfHeader& VcfHeader::AddContigDefinition(PacBio::VCF::ContigDefinition contig)
 {

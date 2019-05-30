@@ -41,13 +41,6 @@ public:
     ///
     AlignmentPrinter(const IndexedFastaReader& ifr);
 
-    AlignmentPrinter() = delete;
-    AlignmentPrinter(const AlignmentPrinter&) = delete;
-    AlignmentPrinter(AlignmentPrinter&&) noexcept;
-    AlignmentPrinter& operator=(const AlignmentPrinter&) = delete;
-    AlignmentPrinter& operator=(AlignmentPrinter&&) noexcept;
-    ~AlignmentPrinter();
-
     /// \}
 
 public:

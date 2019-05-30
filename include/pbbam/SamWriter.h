@@ -55,12 +55,9 @@ public:
 
     /// Fully flushes all buffered data & closes file.
     ///
-    ~SamWriter() override;
-
-    SamWriter(const SamWriter&) = delete;
     SamWriter(SamWriter&&) noexcept;
-    SamWriter& operator=(const SamWriter&) = delete;
     SamWriter& operator=(SamWriter&&) noexcept;
+    ~SamWriter() override;
 
     /// \brief Try to flush any buffered data to file.
     ///

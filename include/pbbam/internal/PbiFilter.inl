@@ -44,7 +44,6 @@ public:
     FilterWrapper(FilterWrapper&&) noexcept = default;
     FilterWrapper& operator=(const FilterWrapper& other);
     FilterWrapper& operator=(FilterWrapper&&) noexcept = default;
-    ~FilterWrapper() = default;
 
 public:
     bool Accepts(const PacBio::BAM::PbiRawData& idx, const size_t row) const;

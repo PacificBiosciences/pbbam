@@ -8,14 +8,22 @@
 
 #include "pbbam/Cigar.h"
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <sstream>
+#include <type_traits>
 
 namespace PacBio {
 namespace BAM {
 
-Cigar::Cigar() = default;
+static_assert(std::is_copy_constructible<Cigar>::value, "Cigar(const Cigar&) is not = default");
+static_assert(std::is_copy_assignable<Cigar>::value,
+              "Cigar& operator=(const Cigar&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<Cigar>::value, "Cigar(Cigar&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<Cigar>::value,
+              "Cigar& operator=(Cigar&&) is not = noexcept");
 
 Cigar::Cigar(const std::string& cigarString) : std::vector<CigarOperation>{}
 {
@@ -31,16 +39,6 @@ Cigar::Cigar(const std::string& cigarString) : std::vector<CigarOperation>{}
         }
     }
 }
-
-Cigar::Cigar(const Cigar&) = default;
-
-Cigar::Cigar(Cigar&&) noexcept = default;
-
-Cigar& Cigar::operator=(const Cigar&) = default;
-
-Cigar& Cigar::operator=(Cigar&&) noexcept = default;
-
-Cigar::~Cigar() = default;
 
 Cigar Cigar::FromStdString(const std::string& stdString) { return Cigar(stdString); }
 

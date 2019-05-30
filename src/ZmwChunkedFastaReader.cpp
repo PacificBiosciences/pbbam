@@ -11,8 +11,10 @@
 #include <cstdio>
 
 #include <algorithm>
+#include <cassert>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include <htslib/kseq.h>
@@ -110,6 +112,11 @@ public:
     bool firstRecord;
     size_t remaining;
 };
+
+static_assert(!std::is_copy_constructible<ZmwChunkedFastaReader>::value,
+              "ZmwChunkedFastaReader(const ZmwChunkedFastaReader&) is not = delete");
+static_assert(!std::is_copy_assignable<ZmwChunkedFastaReader>::value,
+              "ZmwChunkedFastaReader& operator=(const ZmwChunkedFastaReader&) is not = delete");
 
 ZmwChunkedFastaReader::ZmwChunkedFastaReader(const std::string& fn, const size_t numChunks)
     : internal::QueryBase<FastaSequence>{}

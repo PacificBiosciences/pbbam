@@ -17,13 +17,6 @@ class VcfFile
 public:
     explicit VcfFile(std::string fn);
 
-    VcfFile() = delete;
-    VcfFile(const VcfFile&);
-    VcfFile(VcfFile&&) noexcept;
-    VcfFile& operator=(const VcfFile&);
-    VcfFile& operator=(VcfFile&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
-    ~VcfFile();
-
 public:
     const std::string& Filename() const;
     const VcfHeader& Header() const;

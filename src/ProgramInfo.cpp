@@ -8,7 +8,9 @@
 
 #include "pbbam/ProgramInfo.h"
 
+#include <cassert>
 #include <sstream>
+#include <type_traits>
 
 #include "pbbam/SamTagCodec.h"
 #include "pbbam/StringUtilities.h"
@@ -26,19 +28,18 @@ const std::string ProgramInfoTokenVN{"VN"};
 
 }  // anonymous
 
+static_assert(std::is_copy_constructible<ProgramInfo>::value,
+              "ProgramInfo(const ProgramInfo&) is not = default");
+static_assert(std::is_copy_assignable<ProgramInfo>::value,
+              "ProgramInfo& operator=(const ProgramInfo&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<ProgramInfo>::value,
+              "ProgramInfo(ProgramInfo&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<ProgramInfo>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
+
 ProgramInfo::ProgramInfo(std::string id) : id_{std::move(id)} {}
-
-ProgramInfo::ProgramInfo() = default;
-
-ProgramInfo::ProgramInfo(const ProgramInfo&) = default;
-
-ProgramInfo::ProgramInfo(ProgramInfo&&) noexcept = default;
-
-ProgramInfo& ProgramInfo::operator=(const ProgramInfo&) = default;
-
-ProgramInfo& ProgramInfo::operator=(ProgramInfo&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
-
-ProgramInfo::~ProgramInfo() = default;
 
 std::string ProgramInfo::CommandLine() const { return commandLine_; }
 

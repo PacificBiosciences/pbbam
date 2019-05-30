@@ -75,12 +75,7 @@ public:
     QualityValues(const QualityValues::const_iterator first,
                   const QualityValues::const_iterator last);
 
-    QualityValues();
-    QualityValues(const QualityValues&);
-    QualityValues(QualityValues&&) noexcept;
-    QualityValues& operator=(const QualityValues&);
-    QualityValues& operator=(QualityValues&&) noexcept;
-    ~QualityValues();
+    QualityValues() = default;
 
     QualityValues& operator=(std::vector<QualityValue> quals);
 

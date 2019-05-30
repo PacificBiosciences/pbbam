@@ -39,13 +39,6 @@ public:
     ///
     VirtualZmwBamRecord(std::vector<BamRecord> unorderedSources, const BamHeader& header);
 
-    VirtualZmwBamRecord() = delete;
-    VirtualZmwBamRecord(const VirtualZmwBamRecord&);
-    VirtualZmwBamRecord(VirtualZmwBamRecord&&) noexcept;
-    VirtualZmwBamRecord& operator=(const VirtualZmwBamRecord&);
-    VirtualZmwBamRecord& operator=(VirtualZmwBamRecord&&) noexcept;
-    virtual ~VirtualZmwBamRecord();
-
     /// \}
 
     /// \name Virtual Record Attributes

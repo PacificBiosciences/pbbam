@@ -98,8 +98,7 @@ IndexedFastaReader::IndexedFastaReader(IndexedFastaReader&&) noexcept = default;
 
 IndexedFastaReader& IndexedFastaReader::operator=(const IndexedFastaReader& rhs)
 {
-    IndexedFastaReader copy{rhs};
-    *this = std::move(copy);
+    if (this != &rhs) *this = IndexedFastaReader{rhs};
     return *this;
 }
 

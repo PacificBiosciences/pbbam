@@ -43,7 +43,6 @@ public:
 
     explicit IndexedFastqReader(std::string filename);
 
-    IndexedFastqReader() = delete;
     IndexedFastqReader(const IndexedFastqReader&);
     IndexedFastqReader(IndexedFastqReader&&) noexcept;
     IndexedFastqReader& operator=(const IndexedFastqReader& rhs);

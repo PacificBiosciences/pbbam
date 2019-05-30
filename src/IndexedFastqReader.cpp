@@ -133,8 +133,7 @@ IndexedFastqReader::IndexedFastqReader(IndexedFastqReader&&) noexcept = default;
 
 IndexedFastqReader& IndexedFastqReader::operator=(const IndexedFastqReader& rhs)
 {
-    IndexedFastqReader copy{rhs};
-    *this = std::move(copy);
+    if (this != &rhs) *this = IndexedFastqReader{rhs};
     return *this;
 }
 

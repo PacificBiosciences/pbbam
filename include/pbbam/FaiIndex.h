@@ -45,9 +45,7 @@ public:
     explicit FaiIndex(const std::string& fn);
 
     FaiIndex();
-    FaiIndex(const FaiIndex&) = delete;  // ?
     FaiIndex(FaiIndex&&) noexcept;
-    FaiIndex& operator=(const FaiIndex&) = delete;  // ?
     FaiIndex& operator=(FaiIndex&&) noexcept;
     ~FaiIndex();
 

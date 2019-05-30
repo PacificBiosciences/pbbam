@@ -160,9 +160,7 @@ public:
     BamWriter(const std::string& filename, const BamHeader& header,
               const BamWriter::Config& config);
 
-    BamWriter(const BamWriter&) = delete;
     BamWriter(BamWriter&&) noexcept;
-    BamWriter& operator=(const BamWriter&) = delete;
     BamWriter& operator=(BamWriter&&) noexcept;
 
     /// Fully flushes all buffered data & closes file.

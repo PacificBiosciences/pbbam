@@ -44,9 +44,6 @@ public:
 public:
     CompositeMergeItem(std::unique_ptr<BamReader> rdr);
     CompositeMergeItem(std::unique_ptr<BamReader> rdr, BamRecord rec);
-    CompositeMergeItem(CompositeMergeItem&&) noexcept = default;
-    CompositeMergeItem& operator=(CompositeMergeItem&&) noexcept = default;
-    ~CompositeMergeItem() = default;
 };
 
 /// \internal

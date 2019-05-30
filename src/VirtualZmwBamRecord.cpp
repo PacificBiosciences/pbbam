@@ -8,11 +8,13 @@
 
 #include "pbbam/virtual/VirtualZmwBamRecord.h"
 
+#include <cassert>
 #include <cstdint>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <tuple>
+#include <type_traits>
 #include <vector>
 
 #include "pbbam/MoveAppend.h"
@@ -21,6 +23,16 @@
 
 namespace PacBio {
 namespace BAM {
+
+static_assert(std::is_copy_constructible<VirtualZmwBamRecord>::value,
+              "VirtualZmwBamRecord(const VirtualZmwBamRecord&) is not = default");
+static_assert(std::is_copy_assignable<VirtualZmwBamRecord>::value,
+              "VirtualZmwBamRecord& operator=(const VirtualZmwBamRecord&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<VirtualZmwBamRecord>::value,
+              "VirtualZmwBamRecord(VirtualZmwBamRecord&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<VirtualZmwBamRecord>::value,
+              "VirtualZmwBamRecord& operator=(VirtualZmwBamRecord&&) is not = noexcept");
 
 VirtualZmwBamRecord::VirtualZmwBamRecord(std::vector<BamRecord> unorderedSources,
                                          const BamHeader& header)
@@ -39,16 +51,6 @@ VirtualZmwBamRecord::VirtualZmwBamRecord(std::vector<BamRecord> unorderedSources
 
     StitchSources();
 }
-
-VirtualZmwBamRecord::VirtualZmwBamRecord(const VirtualZmwBamRecord&) = default;
-
-VirtualZmwBamRecord::VirtualZmwBamRecord(VirtualZmwBamRecord&&) noexcept = default;
-
-VirtualZmwBamRecord& VirtualZmwBamRecord::operator=(const VirtualZmwBamRecord&) = default;
-
-VirtualZmwBamRecord& VirtualZmwBamRecord::operator=(VirtualZmwBamRecord&&) noexcept = default;
-
-VirtualZmwBamRecord::~VirtualZmwBamRecord() = default;
 
 bool VirtualZmwBamRecord::HasVirtualRegionType(const VirtualRegionType regionType) const
 {
