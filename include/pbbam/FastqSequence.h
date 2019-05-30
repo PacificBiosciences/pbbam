@@ -43,13 +43,7 @@ public:
     ///
     explicit FastqSequence(std::string name, std::string bases, std::string qualities);
 
-    FastqSequence();
-    FastqSequence(const FastqSequence&);
-    FastqSequence(FastqSequence&&) noexcept;
-    FastqSequence& operator=(const FastqSequence&);
-    FastqSequence& operator=(FastqSequence&&) noexcept(
-        std::is_nothrow_move_assignable<FastaSequence>::value);
-    ~FastqSequence();
+    FastqSequence() = default;
 
     /// \}
 

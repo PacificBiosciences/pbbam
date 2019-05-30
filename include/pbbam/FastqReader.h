@@ -40,9 +40,7 @@ public:
 
     explicit FastqReader(const std::string& fn);
 
-    FastqReader(const FastqReader&) = delete;
     FastqReader(FastqReader&&) noexcept;
-    FastqReader& operator=(const FastqReader&) = delete;
     FastqReader& operator=(FastqReader&&) noexcept;
     virtual ~FastqReader();
 

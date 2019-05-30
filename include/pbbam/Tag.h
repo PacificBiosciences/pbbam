@@ -167,12 +167,7 @@ public:
     /// \brief Creates a Tag from a vector of floating-point values.
     Tag(std::vector<float> value);
 
-    Tag();
-    Tag(const Tag&);
-    Tag(Tag&&) noexcept;
-    Tag& operator=(const Tag&);
-    Tag& operator=(Tag&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
-    ~Tag();
+    Tag() = default;
 
     Tag& operator=(boost::blank value);
     Tag& operator=(int8_t value);

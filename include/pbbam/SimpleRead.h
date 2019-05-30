@@ -34,12 +34,6 @@ public:
     SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr, Position qStart,
                Position qEnd, Frames pulseWidths);
 
-    SimpleRead(const SimpleRead&);
-    SimpleRead(SimpleRead&&) noexcept;
-    SimpleRead& operator=(const SimpleRead&);
-    SimpleRead& operator=(SimpleRead&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
-    ~SimpleRead();
-
     // general data
     std::string Name;
     std::string Sequence;
@@ -55,13 +49,6 @@ class MappedSimpleRead : public SimpleRead
 public:
     MappedSimpleRead(const SimpleRead& read, PacBio::BAM::Strand strand, Position templateStart,
                      Position templateEnd, PacBio::BAM::Cigar cigar, uint8_t mapQV);
-
-    MappedSimpleRead(const MappedSimpleRead&);
-    MappedSimpleRead(MappedSimpleRead&&) noexcept;
-    MappedSimpleRead& operator=(const MappedSimpleRead&);
-    MappedSimpleRead& operator=(MappedSimpleRead&&) noexcept(
-        std::is_nothrow_move_assignable<SimpleRead>::value);
-    ~MappedSimpleRead();
 
     // mapping data
     PacBio::BAM::Strand Strand;

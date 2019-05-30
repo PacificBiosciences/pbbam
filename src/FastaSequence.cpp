@@ -6,13 +6,26 @@
 
 #include <cstdio>
 
+#include <cassert>
 #include <exception>
 #include <tuple>
+#include <type_traits>
 
 #include <boost/algorithm/string.hpp>
 
 namespace PacBio {
 namespace BAM {
+
+static_assert(std::is_copy_constructible<FastaSequence>::value,
+              "FastaSequence(const FastaSequence&) is not = default");
+static_assert(std::is_copy_assignable<FastaSequence>::value,
+              "FastaSequence& operator=(const FastaSequence&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<FastaSequence>::value,
+              "FastaSequence(FastaSequence&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<FastaSequence>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
 
 FastaSequence::FastaSequence(std::string name, std::string bases)
     : name_{std::move(name)}, bases_{std::move(bases)}
@@ -20,18 +33,6 @@ FastaSequence::FastaSequence(std::string name, std::string bases)
     boost::algorithm::trim(name_);
     boost::algorithm::trim(bases_);
 }
-
-FastaSequence::FastaSequence() = default;
-
-FastaSequence::FastaSequence(const FastaSequence&) = default;
-
-FastaSequence::FastaSequence(FastaSequence&&) noexcept = default;
-
-FastaSequence& FastaSequence::operator=(const FastaSequence&) = default;
-
-FastaSequence& FastaSequence::operator=(FastaSequence&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
-
-FastaSequence::~FastaSequence() = default;
 
 const std::string& FastaSequence::Bases() const { return bases_; }
 

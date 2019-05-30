@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <set>
 #include <sstream>
+#include <type_traits>
 
 #include <htslib/hts.h>
 
@@ -28,7 +29,7 @@ const std::string BamHeaderPrefixHD{"@HD"};
 const std::string BamHeaderPrefixSQ{"@SQ"};
 const std::string BamHeaderPrefixRG{"@RG"};
 const std::string BamHeaderPrefixPG{"@PG"};
-static const std::string BamHeaderPrefixCO{"@CO"};
+const std::string BamHeaderPrefixCO{"@CO"};
 
 const std::string BamHeaderTokenVN{"VN"};
 const std::string BamHeaderTokenSO{"SO"};
@@ -96,6 +97,16 @@ void ParseHeaderLine(const std::string& line, BamHeader& hdr)
 
 }  // anonymous
 
+static_assert(std::is_copy_constructible<BamHeader>::value,
+              "BamHeader(const BamHeader&) is not = default");
+static_assert(std::is_copy_assignable<BamHeader>::value,
+              "BamHeader& operator=(const BamHeader&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<BamHeader>::value,
+              "BamHeader(BamHeader&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<BamHeader>::value,
+              "BamHeader& operator=(BamHeader&&) is not = noexcept");
+
 class BamHeader::BamHeaderPrivate
 {
 public:
@@ -114,16 +125,6 @@ public:
 };
 
 BamHeader::BamHeader() : d_{std::make_shared<BamHeaderPrivate>()} {}
-
-BamHeader::BamHeader(const BamHeader&) = default;
-
-BamHeader::BamHeader(BamHeader&&) noexcept = default;
-
-BamHeader& BamHeader::operator=(const BamHeader&) = default;
-
-BamHeader& BamHeader::operator=(BamHeader&&) noexcept = default;
-
-BamHeader::~BamHeader() = default;
 
 BamHeader::BamHeader(const std::string& samHeaderText) : d_{std::make_shared<BamHeaderPrivate>()}
 {

@@ -8,28 +8,31 @@
 
 #include "pbbam/QualityValue.h"
 
+#include <algorithm>
+#include <cassert>
 #include <cstdint>
+#include <type_traits>
 
 namespace PacBio {
 namespace BAM {
 
 const uint8_t QualityValue::MAX = 93;
 
-QualityValue::QualityValue(const uint8_t value) : value_{value}
+static_assert(std::is_copy_constructible<QualityValue>::value,
+              "QualityValue(const QualityValue&) is not = default");
+static_assert(std::is_copy_assignable<QualityValue>::value,
+              "QualityValue& operator=(const QualityValue&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<QualityValue>::value,
+              "QualityValue(QualityValue&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<QualityValue>::value,
+              "QualityValue& operator=(QualityValue&&) is not = noexcept");
+
+QualityValue::QualityValue(const uint8_t value)
+    : value_{// clamp QV
+             std::min(value, QualityValue::MAX)}
 {
-    // clamp QV
-    if (value_ > QualityValue::MAX) value_ = QualityValue::MAX;
 }
-
-QualityValue::QualityValue(const QualityValue&) = default;
-
-QualityValue::QualityValue(QualityValue&&) noexcept = default;
-
-QualityValue& QualityValue::operator=(const QualityValue&) = default;
-
-QualityValue& QualityValue::operator=(QualityValue&&) noexcept = default;
-
-QualityValue::~QualityValue() = default;
 
 char QualityValue::Fastq() const { return static_cast<char>(value_ + 33); }
 

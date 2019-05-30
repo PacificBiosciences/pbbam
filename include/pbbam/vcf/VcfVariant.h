@@ -46,12 +46,6 @@ public:
     VcfVariant(std::string id, std::string chrom, PacBio::BAM::Position pos, std::string refAllele,
                std::string altAllele);
 
-    VcfVariant(const VcfVariant&);
-    VcfVariant(VcfVariant&&) noexcept;
-    VcfVariant& operator=(const VcfVariant&);
-    VcfVariant& operator=(VcfVariant&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
-    ~VcfVariant();
-
 public:
     // core fields
 

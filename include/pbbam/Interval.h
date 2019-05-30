@@ -44,12 +44,6 @@ public:
     /// brief Creates an interval from [start, stop) */
     Interval(const T start, const T stop);
 
-    Interval(const Interval<T>&) = default;
-    Interval(Interval&&) noexcept = default;
-    Interval& operator=(const Interval<T>&) = default;
-    Interval& operator=(Interval<T>&&) noexcept = default;
-    ~Interval() = default;
-
     /// \}
 
 public:

@@ -8,7 +8,9 @@
 
 #include "pbbam/FastqReader.h"
 
+#include <cassert>
 #include <stdexcept>
+#include <type_traits>
 
 #include "pbbam/FormatUtils.h"
 
@@ -16,6 +18,11 @@
 
 namespace PacBio {
 namespace BAM {
+
+static_assert(!std::is_copy_constructible<FastqReader>::value,
+              "FastqReader(const FastqReader&) is not = delete");
+static_assert(!std::is_copy_assignable<FastqReader>::value,
+              "FastqReader& operator=(const FastqReader&) is not = delete");
 
 class FastqReader::FastqReaderPrivate
 {

@@ -4,10 +4,12 @@
 
 #include "pbbam/BamWriter.h"
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <thread>
+#include <type_traits>
 
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
@@ -22,6 +24,11 @@
 
 namespace PacBio {
 namespace BAM {
+
+static_assert(!std::is_copy_constructible<BamWriter>::value,
+              "BamWriter(const BamWriter&) is not = delete");
+static_assert(!std::is_copy_assignable<BamWriter>::value,
+              "BamWriter& operator=(const BamWriter&) is not = delete");
 
 class BamWriter::BamWriterPrivate
 {

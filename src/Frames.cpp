@@ -15,6 +15,7 @@
 #include <cstdint>
 #include <limits>
 #include <mutex>
+#include <type_traits>
 
 namespace PacBio {
 namespace BAM {
@@ -105,19 +106,16 @@ std::vector<uint8_t> FramesToCode(const std::vector<uint16_t>& frames)
 
 }  // anonmyous
 
+static_assert(std::is_copy_constructible<Frames>::value, "Frames(const Frames&) is not = default");
+static_assert(std::is_copy_assignable<Frames>::value,
+              "Frames& operator=(const Frames&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<Frames>::value,
+              "Frames(Frames&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<Frames>::value,
+              "Frames& operator=(Frames&&) is not = noexcept");
+
 Frames::Frames(std::vector<uint16_t> frames) : data_{std::move(frames)} {}
-
-Frames::Frames() = default;
-
-Frames::Frames(const Frames&) = default;
-
-Frames::Frames(Frames&&) noexcept = default;
-
-Frames& Frames::operator=(const Frames&) = default;
-
-Frames& Frames::operator=(Frames&&) noexcept = default;
-
-Frames::~Frames() = default;
 
 const std::vector<uint16_t>& Frames::Data() const { return data_; }
 

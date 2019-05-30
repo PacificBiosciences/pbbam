@@ -50,12 +50,7 @@ public:
     ///
     ProgramInfo(std::string id);
 
-    ProgramInfo();
-    ProgramInfo(const ProgramInfo&);
-    ProgramInfo(ProgramInfo&&) noexcept;
-    ProgramInfo& operator=(const ProgramInfo&);
-    ProgramInfo& operator=(ProgramInfo&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
-    ~ProgramInfo();
+    ProgramInfo() = default;
 
     /// \}
 

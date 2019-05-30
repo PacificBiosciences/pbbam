@@ -30,12 +30,7 @@ public:
     ///
     explicit FastaSequence(std::string name, std::string bases);
 
-    FastaSequence();
-    FastaSequence(const FastaSequence&);
-    FastaSequence(FastaSequence&&) noexcept;
-    FastaSequence& operator=(const FastaSequence&);
-    FastaSequence& operator=(FastaSequence&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
-    ~FastaSequence();
+    FastaSequence() = default;
 
     /// \}
 

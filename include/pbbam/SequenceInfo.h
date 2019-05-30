@@ -51,12 +51,7 @@ public:
     ///
     SequenceInfo(std::string name, std::string length = "0");
 
-    SequenceInfo();
-    SequenceInfo(const SequenceInfo&);
-    SequenceInfo(SequenceInfo&&) noexcept;
-    SequenceInfo& operator=(const SequenceInfo&);
-    SequenceInfo& operator=(SequenceInfo&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
-    ~SequenceInfo();
+    SequenceInfo() = default;
 
     /// \}
 

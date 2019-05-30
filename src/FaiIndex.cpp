@@ -8,11 +8,13 @@
 
 #include "pbbam/FaiIndex.h"
 
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <tuple>
+#include <type_traits>
 #include <unordered_map>
 #include <vector>
 
@@ -20,6 +22,11 @@
 
 namespace PacBio {
 namespace BAM {
+
+static_assert(!std::is_copy_constructible<FaiIndex>::value,
+              "FaiIndex(const FaiIndex&) is not = delete");
+static_assert(!std::is_copy_assignable<FaiIndex>::value,
+              "FaiIndex& operator=(const FaiIndex&) is not = delete");
 
 bool operator==(const FaiEntry& lhs, const FaiEntry& rhs)
 {

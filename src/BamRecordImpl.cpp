@@ -71,7 +71,7 @@ bool HasLongCigar(const bam1_t* const b)
 
 }  // namespace anonymous
 
-BamRecordImpl::BamRecordImpl() : d_(nullptr)
+BamRecordImpl::BamRecordImpl() : d_{nullptr}
 {
     InitializeData();
     assert(d_);
@@ -83,8 +83,6 @@ BamRecordImpl::BamRecordImpl(const BamRecordImpl& other)
     assert(d_);
 }
 
-BamRecordImpl::BamRecordImpl(BamRecordImpl&&) noexcept = default;
-
 BamRecordImpl& BamRecordImpl::operator=(const BamRecordImpl& other)
 {
     if (this != &other) {
@@ -95,10 +93,6 @@ BamRecordImpl& BamRecordImpl::operator=(const BamRecordImpl& other)
     assert(d_);
     return *this;
 }
-
-BamRecordImpl& BamRecordImpl::operator=(BamRecordImpl&&) noexcept = default;
-
-BamRecordImpl::~BamRecordImpl() = default;
 
 bool BamRecordImpl::AddTag(const std::string& tagName, const Tag& value)
 {

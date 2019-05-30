@@ -56,12 +56,7 @@ public:
 
     Frames(std::vector<uint16_t> frames);
 
-    Frames();
-    Frames(const Frames&);
-    Frames(Frames&&) noexcept;
-    Frames& operator=(const Frames&);
-    Frames& operator=(Frames&&) noexcept;
-    ~Frames();
+    Frames() = default;
 
     /// \}
 

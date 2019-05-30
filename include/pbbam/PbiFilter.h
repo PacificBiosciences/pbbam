@@ -179,7 +179,6 @@ public:
     PbiFilter(PbiFilter&&) noexcept = default;
     PbiFilter& operator=(const PbiFilter&);
     PbiFilter& operator=(PbiFilter&&) noexcept = default;
-    ~PbiFilter() = default;
 
     /// \}
 

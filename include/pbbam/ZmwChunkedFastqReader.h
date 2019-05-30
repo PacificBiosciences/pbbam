@@ -39,9 +39,7 @@ public:
     ///
     ZmwChunkedFastqReader(const std::string& fn, const size_t numChunks);
 
-    ZmwChunkedFastqReader(const ZmwChunkedFastqReader&) = delete;
     ZmwChunkedFastqReader(ZmwChunkedFastqReader&&) noexcept;
-    ZmwChunkedFastqReader& operator=(const ZmwChunkedFastqReader&) = delete;
     ZmwChunkedFastqReader& operator=(ZmwChunkedFastqReader&&) noexcept;
     ~ZmwChunkedFastqReader();
 

@@ -64,10 +64,10 @@ public:
 
     BamRecordImpl();
     BamRecordImpl(const BamRecordImpl& other);
-    BamRecordImpl(BamRecordImpl&& other) noexcept;
+    BamRecordImpl(BamRecordImpl&& other) noexcept = default;
     BamRecordImpl& operator=(const BamRecordImpl& other);
-    BamRecordImpl& operator=(BamRecordImpl&& other) noexcept;
-    virtual ~BamRecordImpl();
+    BamRecordImpl& operator=(BamRecordImpl&& other) noexcept = default;
+    virtual ~BamRecordImpl() = default;
 
     /// \}
 

@@ -4,12 +4,25 @@
 
 #include "pbbam/FastqSequence.h"
 
+#include <cassert>
 #include <cstdio>
 #include <exception>
 #include <tuple>
+#include <type_traits>
 
 namespace PacBio {
 namespace BAM {
+
+static_assert(std::is_copy_constructible<FastqSequence>::value,
+              "FastqSequence(const FastqSequence&) is not = default");
+static_assert(std::is_copy_assignable<FastqSequence>::value,
+              "FastqSequence& operator=(const FastqSequence&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<FastqSequence>::value,
+              "FastqSequence(FastqSequence&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<FastqSequence>::value ==
+                  std::is_nothrow_move_assignable<FastaSequence>::value,
+              "");
 
 FastqSequence::FastqSequence(std::string name, std::string bases, QualityValues qualities)
     : FastaSequence{std::move(name), std::move(bases)}, qualities_{std::move(qualities)}
@@ -21,19 +34,6 @@ FastqSequence::FastqSequence(std::string name, std::string bases, std::string qu
     , qualities_{QualityValues::FromFastq(qualities)}
 {
 }
-
-FastqSequence::FastqSequence() = default;
-
-FastqSequence::FastqSequence(const FastqSequence&) = default;
-
-FastqSequence::FastqSequence(FastqSequence&&) noexcept = default;
-
-FastqSequence& FastqSequence::operator=(const FastqSequence&) = default;
-
-FastqSequence& FastqSequence::operator=(FastqSequence&&) noexcept(
-    std::is_nothrow_move_assignable<FastaSequence>::value) = default;
-
-FastqSequence::~FastqSequence() = default;
 
 const QualityValues& FastqSequence::Qualities() const { return qualities_; }
 

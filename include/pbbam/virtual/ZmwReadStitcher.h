@@ -44,11 +44,6 @@ public:
     /// maybe filtered, from DataSet input
     ZmwReadStitcher(const DataSet& dataset);
 
-    ZmwReadStitcher() = delete;
-    ZmwReadStitcher(const ZmwReadStitcher&) = delete;
-    ZmwReadStitcher(ZmwReadStitcher&&) = delete;
-    ZmwReadStitcher& operator=(const ZmwReadStitcher&) = delete;
-    ZmwReadStitcher& operator=(ZmwReadStitcher&&) = delete;
     ~ZmwReadStitcher();
 
     /// \}
