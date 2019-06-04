@@ -45,7 +45,7 @@ unset BOOST_LIBRARYDIR
 
 # in order to make shared libraries consumable
 # by conda and other package managers
-export LDFLAGS="-static-libstdc++ -static-libgcc"
+export LDFLAGS=${LDFLAGS:-"-fuse-ld=gold -static-libstdc++ -static-libgcc"}
 
 source scripts/ci/setup.sh
 source scripts/ci/build.sh
