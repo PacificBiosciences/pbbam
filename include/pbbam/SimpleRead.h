@@ -32,7 +32,7 @@ public:
     SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr, Position qStart,
                Position qEnd);
     SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr, Position qStart,
-               Position qEnd, Frames pulseWidths);
+               Position qEnd, Frames pulseWidths, Frames ipd);
 
     // general data
     std::string Name;
@@ -42,6 +42,7 @@ public:
     Position QueryStart;
     Position QueryEnd;
     boost::optional<Frames> PulseWidths;
+    boost::optional<Frames> IPD;
 };
 
 class MappedSimpleRead : public SimpleRead

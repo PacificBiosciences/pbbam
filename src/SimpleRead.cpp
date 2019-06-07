@@ -37,6 +37,7 @@ void ClipSimpleRead(SimpleRead& read, const internal::ClipResult& result, size_t
     read.QueryEnd = result.qEnd_;
     if (read.PulseWidths)
         read.PulseWidths = clipContainer(read.PulseWidths->Data(), clipFrom, clipLength);
+    if (read.IPD) read.IPD = clipContainer(read.IPD->Data(), clipFrom, clipLength);
 }
 
 // NOTE: 'result' is moved into here, so we can take the CIGAR
@@ -100,7 +101,7 @@ SimpleRead::SimpleRead(std::string name, std::string seq, QualityValues qualitie
 }
 
 SimpleRead::SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr,
-                       Position qStart, Position qEnd, Frames pulseWidths)
+                       Position qStart, Position qEnd, Frames pulseWidths, Frames ipd)
     : Name{std::move(name)}
     , Sequence{std::move(seq)}
     , Qualities{std::move(qualities)}
@@ -108,6 +109,7 @@ SimpleRead::SimpleRead(std::string name, std::string seq, QualityValues qualitie
     , QueryStart{qStart}
     , QueryEnd{qEnd}
     , PulseWidths{std::move(pulseWidths)}
+    , IPD{std::move(ipd)}
 {
 }
 
