@@ -5,10 +5,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [1.0.4] - 2019-06-07
+
 ### Added
  - General-purpose BgzipWriter
  - BgzipFastaWriter and BgzipFastqWriter
  - Read-only view to read indices passing a PbiFilter
+ - IPD field to SimpleRead
 
 ## [1.0.3] - 2019-05-20
 
@@ -27,7 +30,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.0.1] - 2019-05-09
 
 ### Added
- - SimpleRead & MappedSimpleRead for htslib-free processing. 
+ - SimpleRead & MappedSimpleRead for htslib-free processing.
 
 ### Fixed
  - Incorrect type displayed in SAM output (pure-text) for floating-point values.
