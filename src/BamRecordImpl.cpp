@@ -69,7 +69,7 @@ bool HasLongCigar(const bam1_t* const b)
     return true;
 }
 
-}  // namespace anonymous
+}  // namespace
 
 BamRecordImpl::BamRecordImpl() : d_{nullptr}
 {
