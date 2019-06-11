@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [1.0.5] - 2019-06-11
+
+### Changed
+ - BAM tag lookup improvements under the hood.
+
 ## [1.0.4] - 2019-06-07
 
 ### Added
