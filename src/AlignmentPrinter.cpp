@@ -119,16 +119,11 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation o
     const float similarity = matches / seq.size();
 
     std::stringstream output;
-
-    output << "Read        : " << record.FullName() << std::endl;
-    output << "Reference   : " << record.ReferenceName() << std::endl;
-    output << std::endl;
-    output << "Read-length : " << seqLength << std::endl;
-    output << "Concordance : " << std::setprecision(3) << (similarity);
-    output << std::endl;
-    output << std::endl;
-    output << pretty;
-
+    output << "Read        : " << record.FullName() << '\n'
+           << "Reference   : " << record.ReferenceName() << "\n\n"
+           << "Read-length : " << seqLength << '\n'
+           << "Concordance : " << std::setprecision(3) << (similarity) << "\n\n"
+           << pretty;
     return output.str();
 }
 
