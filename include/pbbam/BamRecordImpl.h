@@ -15,6 +15,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "pbbam/BamRecordTag.h"
 #include "pbbam/Cigar.h"
@@ -564,6 +565,7 @@ private:
     bool AddTagImpl(const std::string& tagName, const Tag& value,
                     const TagModifier additionalModifier);
     bool RemoveTagImpl(const std::string& tagName);
+
     int TagOffset(const std::string& tagName) const;
 
     // internal CIGAR handling
@@ -577,7 +579,7 @@ private:
 private:
     // data members
     std::shared_ptr<bam1_t> d_;
-    mutable std::map<uint16_t, int> tagOffsets_;
+    mutable std::unordered_map<uint16_t, int> tagOffsets_;
 
     // friends
     friend class BamRecordMemory;
