@@ -5,9 +5,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+### Added
+ - TextFileReader & TextFileWriter for generic line files (plain text or gzipped)
+ - BedReader & BedWriter for BED format support
+
 ## [1.0.6] - 2019-06-14
 
-### Added 
+### Added
  - IFastaWriter & IFastqWriter abstract base classes
 
 ## [1.0.5] - 2019-06-11

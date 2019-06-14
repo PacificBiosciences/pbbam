@@ -13,6 +13,12 @@
 namespace PacBio {
 namespace BAM {
 
+const std::vector<std::string>& FormatUtils::BedExtensions()
+{
+    static const std::vector<std::string> extensions{"bed", "bed.gz"};
+    return extensions;
+}
+
 const std::vector<std::string>& FormatUtils::FastaExtensions()
 {
     static const std::vector<std::string> extensions{"fa", "fasta", "fa.gz", "fasta.gz"};
@@ -36,6 +42,8 @@ HtslibCompression FormatUtils::CompressionType(const std::string& fn)
     if (bgzf == nullptr) throw std::runtime_error{"could not check compression level for: " + fn};
     return CompressionType(bgzf.get());
 }
+
+bool FormatUtils::IsBedFilename(const std::string& fn) { return IsFormat(fn, BedExtensions()); }
 
 bool FormatUtils::IsFastaFilename(const std::string& fn) { return IsFormat(fn, FastaExtensions()); }
 
