@@ -13,7 +13,7 @@
 #include <iostream>
 #include <string>
 
-#include "pbbam/IRecordWriter.h"
+#include "pbbam/IFastaWriter.h"
 
 namespace PacBio {
 namespace BAM {
@@ -22,19 +22,20 @@ class BamRecord;
 class BamRecordImpl;
 class FastaSequence;
 
-class FastaWriter : public IRecordWriter
+class FastaWriter final : public IFastaWriter
 {
 public:
     FastaWriter(const std::string& fn);
 
 public:
+    // IFastaWriter
     void Write(const FastaSequence& fastq);
     void Write(const std::string& name, const std::string& bases);
 
     // IRecordWriter
-    void TryFlush() override;
-    void Write(const BamRecord& bam) override;
-    void Write(const BamRecordImpl& bam) override;
+    void TryFlush();
+    void Write(const BamRecord& bam);
+    void Write(const BamRecordImpl& bam);
 
 private:
     std::ofstream file_;
