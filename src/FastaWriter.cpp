@@ -18,7 +18,7 @@
 namespace PacBio {
 namespace BAM {
 
-FastaWriter::FastaWriter(const std::string& fn) : IRecordWriter()
+FastaWriter::FastaWriter(const std::string& fn) : IFastaWriter{}
 {
     if (!FormatUtils::IsFastaFilename(fn)) {
         throw std::runtime_error{"FastaReader: filename '" + fn +
