@@ -23,9 +23,11 @@ enum class HtslibCompression
 class FormatUtils
 {
 public:
+    static const std::vector<std::string>& BedExtensions();
     static const std::vector<std::string>& FastaExtensions();
     static const std::vector<std::string>& FastqExtensions();
 
+    static bool IsBedFilename(const std::string& fn);
     static bool IsFastaFilename(const std::string& fn);
     static bool IsFastqFilename(const std::string& fn);
 

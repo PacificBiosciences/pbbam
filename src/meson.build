@@ -89,6 +89,8 @@ pbbam_cpp_sources = files([
   'SubreadLengthQuery.cpp',
   'Tag.cpp',
   'TagCollection.cpp',
+  'TextFileReader.cpp',
+  'TextFileWriter.cpp',
   'Validator.cpp',
   'ValidationErrors.cpp',
   'ValidationException.cpp',
@@ -110,6 +112,10 @@ pbbam_cpp_sources = files([
   'ZmwReadStitcher.cpp',
   'ZmwQuery.cpp',
   'ZmwTypeMap.cpp',
+
+  # bed
+  'bed/BedReader.cpp',
+  'bed/BedWriter.cpp',
 
   # vcf
   'vcf/VcfFile.cpp',
