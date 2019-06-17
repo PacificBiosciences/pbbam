@@ -24,6 +24,8 @@ public:
     virtual ~IFastaWriter();
 
 public:
+    using IRecordWriter::Write;
+
     virtual void Write(const FastaSequence& fastq) = 0;
     virtual void Write(const std::string& name, const std::string& bases) = 0;
 
