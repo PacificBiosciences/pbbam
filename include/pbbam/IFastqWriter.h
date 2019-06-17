@@ -25,6 +25,8 @@ public:
     virtual ~IFastqWriter();
 
 public:
+    using IRecordWriter::Write;
+
     virtual void Write(const FastqSequence& fastq) = 0;
     virtual void Write(const std::string& name, const std::string& bases,
                        const QualityValues& quals) = 0;
