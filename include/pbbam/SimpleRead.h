@@ -48,6 +48,7 @@ public:
 class MappedSimpleRead : public SimpleRead
 {
 public:
+    explicit MappedSimpleRead(const BamRecord& bam);
     MappedSimpleRead(const SimpleRead& read, PacBio::BAM::Strand strand, Position templateStart,
                      Position templateEnd, PacBio::BAM::Cigar cigar, uint8_t mapQV);
 

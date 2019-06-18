@@ -9,6 +9,8 @@
 #include "pbbam/SimpleRead.h"
 
 #include <cassert>
+
+#include <stdexcept>
 #include <type_traits>
 
 #include "Clipping.h"
@@ -77,6 +79,10 @@ SimpleRead::SimpleRead(const BamRecord& bam)
     , QueryStart{bam.QueryStart()}
     , QueryEnd{bam.QueryEnd()}
 {
+    if (bam.IsMapped() && (bam.AlignedStrand() == Strand::REVERSE)) {
+        ReverseComplement(Sequence);
+        Reverse(Qualities);
+    }
 }
 
 SimpleRead::SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr)
@@ -127,6 +133,20 @@ static_assert(std::is_nothrow_move_constructible<MappedSimpleRead>::value,
 static_assert(std::is_nothrow_move_assignable<MappedSimpleRead>::value ==
                   std::is_nothrow_move_assignable<SimpleRead>::value,
               "");
+
+MappedSimpleRead::MappedSimpleRead(const BamRecord& bam)
+    : SimpleRead{bam}
+    , Strand{bam.AlignedStrand()}
+    , TemplateStart{bam.ReferenceStart()}
+    , TemplateEnd{bam.ReferenceEnd()}
+    , Cigar{bam.CigarData()}
+    , MapQuality{bam.MapQuality()}
+{
+    if (!bam.IsMapped()) {
+        throw std::runtime_error{"MappedSimpleRead error: input BAM record '" + bam.FullName() +
+                                 "' is not mapped"};
+    }
+}
 
 MappedSimpleRead::MappedSimpleRead(const SimpleRead& read, PacBio::BAM::Strand strand,
                                    Position templateStart, Position templateEnd,
