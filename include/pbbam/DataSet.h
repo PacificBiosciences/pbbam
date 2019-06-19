@@ -118,10 +118,9 @@ public:
     DataSet(const std::vector<std::string>& filenames);
 
     DataSet(const DataSet&);
-    DataSet(DataSet&&) noexcept;
+    DataSet(DataSet&&) noexcept = default;
     DataSet& operator=(const DataSet&);
-    DataSet& operator=(DataSet&&) noexcept;
-    ~DataSet();
+    DataSet& operator=(DataSet&&) noexcept = default;
 
     /// \brief Creates a DataSet from "raw" XML data.
     ///

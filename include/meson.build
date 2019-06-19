@@ -49,6 +49,8 @@ if not meson.is_subproject()
       'pbbam/Frames.h',
       'pbbam/GenomicInterval.h',
       'pbbam/GenomicIntervalQuery.h',
+      'pbbam/IFastaWriter.h',
+      'pbbam/IFastqWriter.h',
       'pbbam/IndexedBamWriter.h',
       'pbbam/IndexedFastaReader.h',
       'pbbam/IndexedFastqReader.h',
@@ -86,6 +88,8 @@ if not meson.is_subproject()
       'pbbam/SubreadLengthQuery.h',
       'pbbam/Tag.h',
       'pbbam/TagCollection.h',
+      'pbbam/TextFileReader.h',
+      'pbbam/TextFileWriter.h',
       'pbbam/Unused.h',
       'pbbam/Validator.h',
       'pbbam/ZmwGroupQuery.h',
@@ -93,6 +97,12 @@ if not meson.is_subproject()
       'pbbam/ZmwType.h',
       'pbbam/ZmwTypeMap.h']),
     subdir : 'pbbam')
+
+  install_headers(
+    files([
+      'pbbam/bed/BedReader.h',
+      'pbbam/bed/BedWriter.h']),
+    subdir : 'pbbam/bed')
 
   install_headers(
     files([

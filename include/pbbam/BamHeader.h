@@ -54,11 +54,6 @@ public:
     BamHeader(const std::string& samHeaderText);
 
     BamHeader();
-    BamHeader(const BamHeader&);
-    BamHeader(BamHeader&&) noexcept;
-    BamHeader& operator=(const BamHeader&);
-    BamHeader& operator=(BamHeader&&) noexcept;
-    ~BamHeader();
 
     /// \brief Detaches underlying data from the shared-pointer, returning a
     ///        independent copy of the header contents.

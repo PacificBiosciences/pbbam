@@ -32,13 +32,7 @@ public:
     SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr, Position qStart,
                Position qEnd);
     SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr, Position qStart,
-               Position qEnd, Frames pulseWidths);
-
-    SimpleRead(const SimpleRead&);
-    SimpleRead(SimpleRead&&) noexcept;
-    SimpleRead& operator=(const SimpleRead&);
-    SimpleRead& operator=(SimpleRead&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
-    ~SimpleRead();
+               Position qEnd, Frames pulseWidths, Frames ipd);
 
     // general data
     std::string Name;
@@ -48,20 +42,15 @@ public:
     Position QueryStart;
     Position QueryEnd;
     boost::optional<Frames> PulseWidths;
+    boost::optional<Frames> IPD;
 };
 
 class MappedSimpleRead : public SimpleRead
 {
 public:
+    explicit MappedSimpleRead(const BamRecord& bam);
     MappedSimpleRead(const SimpleRead& read, PacBio::BAM::Strand strand, Position templateStart,
                      Position templateEnd, PacBio::BAM::Cigar cigar, uint8_t mapQV);
-
-    MappedSimpleRead(const MappedSimpleRead&);
-    MappedSimpleRead(MappedSimpleRead&&) noexcept;
-    MappedSimpleRead& operator=(const MappedSimpleRead&);
-    MappedSimpleRead& operator=(MappedSimpleRead&&) noexcept(
-        std::is_nothrow_move_assignable<SimpleRead>::value);
-    ~MappedSimpleRead();
 
     // mapping data
     PacBio::BAM::Strand Strand;

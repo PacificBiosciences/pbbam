@@ -51,13 +51,8 @@ public:
     ///
     /// \param[in] value    quality value
     ///
-    QualityValue(const uint8_t value = 0);
-
-    QualityValue(const QualityValue&);
-    QualityValue(QualityValue&&) noexcept;
-    QualityValue& operator=(const QualityValue&);
-    QualityValue& operator=(QualityValue&&) noexcept;
-    ~QualityValue();
+    QualityValue(const uint8_t value);
+    QualityValue() = default;
 
     /// \}
 
@@ -74,7 +69,7 @@ public:
     /// \}
 
 private:
-    uint8_t value_;
+    uint8_t value_ = 0;
 };
 
 }  // namespace BAM

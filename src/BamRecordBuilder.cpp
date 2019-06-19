@@ -4,11 +4,13 @@
 
 #include "pbbam/BamRecordBuilder.h"
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <memory>
 #include <sstream>
+#include <type_traits>
 
 #include <htslib/sam.h>
 
@@ -17,6 +19,17 @@
 
 namespace PacBio {
 namespace BAM {
+
+static_assert(std::is_copy_constructible<BamRecordBuilder>::value,
+              "BamRecordBuilder(const BamRecordBuilder&) is not = default");
+static_assert(std::is_copy_assignable<BamRecordBuilder>::value,
+              "BamRecordBuilder& operator=(const BamRecordBuilder&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<BamRecordBuilder>::value,
+              "BamRecordBuilder(BamRecordBuilder&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<BamRecordBuilder>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
 
 BamRecordBuilder::BamRecordBuilder()
 {
@@ -46,17 +59,6 @@ BamRecordBuilder::BamRecordBuilder(const BamRecord& prototype) : header_{prototy
 {
     Reset(prototype);
 }
-
-BamRecordBuilder::BamRecordBuilder(const BamRecordBuilder&) = default;
-
-BamRecordBuilder::BamRecordBuilder(BamRecordBuilder&&) noexcept = default;
-
-BamRecordBuilder& BamRecordBuilder::operator=(const BamRecordBuilder&) = default;
-
-BamRecordBuilder& BamRecordBuilder::operator=(BamRecordBuilder&&)
-    PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
-
-BamRecordBuilder::~BamRecordBuilder() = default;
 
 BamRecordBuilder& BamRecordBuilder::Bin(const uint32_t bin)
 {

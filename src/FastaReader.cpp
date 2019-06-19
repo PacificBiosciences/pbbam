@@ -9,8 +9,10 @@
 #include "pbbam/FastaReader.h"
 
 #include <algorithm>
+#include <cassert>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "pbbam/FormatUtils.h"
@@ -19,6 +21,11 @@
 
 namespace PacBio {
 namespace BAM {
+
+static_assert(!std::is_copy_constructible<FastaReader>::value,
+              "FastaReader(const FastaReader&) is not = delete");
+static_assert(!std::is_copy_assignable<FastaReader>::value,
+              "FastaReader& operator=(const FastaReader&) is not = delete");
 
 class FastaReader::FastaReaderPrivate
 {

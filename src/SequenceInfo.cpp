@@ -8,10 +8,12 @@
 
 #include "pbbam/SequenceInfo.h"
 
+#include <cassert>
 #include <cstdint>
 #include <limits>
 #include <sstream>
 #include <tuple>
+#include <type_traits>
 
 #include "pbbam/SamTagCodec.h"
 #include "pbbam/StringUtilities.h"
@@ -29,22 +31,21 @@ const std::string token_UR{"UR"};
 
 }  // anonymous
 
+static_assert(std::is_copy_constructible<SequenceInfo>::value,
+              "SequenceInfo(const SequenceInfo&) is not = default");
+static_assert(std::is_copy_assignable<SequenceInfo>::value,
+              "SequenceInfo& operator=(const SequenceInfo&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<SequenceInfo>::value,
+              "SequenceInfo(SequenceInfo&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<SequenceInfo>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
+
 SequenceInfo::SequenceInfo(std::string name, std::string length)
     : name_(std::move(name)), length_(std::move(length))
 {
 }
-
-SequenceInfo::SequenceInfo() = default;
-
-SequenceInfo::SequenceInfo(const SequenceInfo&) = default;
-
-SequenceInfo::SequenceInfo(SequenceInfo&&) noexcept = default;
-
-SequenceInfo& SequenceInfo::operator=(const SequenceInfo&) = default;
-
-SequenceInfo& SequenceInfo::operator=(SequenceInfo&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
-
-SequenceInfo::~SequenceInfo() = default;
 
 bool SequenceInfo::operator==(const SequenceInfo& other) const
 {

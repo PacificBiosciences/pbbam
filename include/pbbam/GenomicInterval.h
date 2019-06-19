@@ -28,7 +28,7 @@ public:
     ///  \{
 
     /// \brief Creates an empty genomic interval
-    GenomicInterval();
+    GenomicInterval() = default;
 
     /// \brief Creates a genomic interval on sequence with \p name, using range:
     ///       [\p start, \p stop)
@@ -45,12 +45,6 @@ public:
     ///       coordinate here.
     ///
     GenomicInterval(const std::string& zeroBasedRegionString);
-
-    GenomicInterval(const GenomicInterval&);
-    GenomicInterval(GenomicInterval&&) noexcept;
-    GenomicInterval& operator=(const GenomicInterval&);
-    GenomicInterval& operator=(GenomicInterval&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
-    ~GenomicInterval();
 
     /// \}
 

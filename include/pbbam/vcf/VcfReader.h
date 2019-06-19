@@ -26,13 +26,6 @@ public:
     explicit VcfReader(std::string fn);
     explicit VcfReader(const VcfFile& file);
 
-    VcfReader() = delete;
-    VcfReader(const VcfReader&) = delete;
-    VcfReader(VcfReader&&) noexcept;
-    VcfReader& operator=(const VcfReader&) = delete;
-    VcfReader& operator=(VcfReader&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
-    ~VcfReader();
-
 public:
     const VcfHeader& Header() const;
 
@@ -42,7 +35,7 @@ private:
     void FetchNext();
 
 private:
-    std::unique_ptr<std::ifstream> in_;
+    std::ifstream in_;
     VcfHeader header_;
     std::string line_;
 };

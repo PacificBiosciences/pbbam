@@ -14,7 +14,7 @@
 #include <string>
 
 #include "pbbam/BgzipWriter.h"
-#include "pbbam/IRecordWriter.h"
+#include "pbbam/IFastqWriter.h"
 
 namespace PacBio {
 namespace BAM {
@@ -24,21 +24,22 @@ class BamRecordImpl;
 class FastqSequence;
 class QualityValues;
 
-class BgzipFastqWriter : public IRecordWriter
+class BgzipFastqWriter final : public IFastqWriter
 {
 public:
     explicit BgzipFastqWriter(const std::string& fn);
     BgzipFastqWriter(const std::string& fn, const BgzipWriterConfig& config);
 
 public:
+    // IFastqWriter
     void Write(const FastqSequence& fastq);
     void Write(const std::string& name, const std::string& bases, const QualityValues& quals);
     void Write(const std::string& name, const std::string& bases, const std::string& quals);
 
     // IRecordWriter
-    void TryFlush() override;
-    void Write(const BamRecord& bam) override;
-    void Write(const BamRecordImpl& bam) override;
+    void TryFlush();
+    void Write(const BamRecord& bam);
+    void Write(const BamRecordImpl& bam);
 
 private:
     BgzipWriter writer_;

@@ -37,12 +37,7 @@ public:
     ///        number of records.
     PbiRawBarcodeData(uint32_t numReads);
 
-    PbiRawBarcodeData();
-    PbiRawBarcodeData(const PbiRawBarcodeData&);
-    PbiRawBarcodeData(PbiRawBarcodeData&&) noexcept;
-    PbiRawBarcodeData& operator=(const PbiRawBarcodeData&);
-    PbiRawBarcodeData& operator=(PbiRawBarcodeData&&) noexcept;
-    ~PbiRawBarcodeData();
+    PbiRawBarcodeData() = default;
 
     /// \}
 
@@ -82,12 +77,7 @@ public:
     ///        number of records.
     PbiRawMappedData(uint32_t numReads);
 
-    PbiRawMappedData();
-    PbiRawMappedData(const PbiRawMappedData&);
-    PbiRawMappedData(PbiRawMappedData&&) noexcept;
-    PbiRawMappedData& operator=(const PbiRawMappedData&);
-    PbiRawMappedData& operator=(PbiRawMappedData&&) noexcept;
-    ~PbiRawMappedData();
+    PbiRawMappedData() = default;
 
     /// \}
 
@@ -197,12 +187,6 @@ public:
     ///
     PbiReferenceEntry(ID id, Row beginRow, Row endRow);
 
-    PbiReferenceEntry(const PbiReferenceEntry&);
-    PbiReferenceEntry(PbiReferenceEntry&&) noexcept;
-    PbiReferenceEntry& operator=(const PbiReferenceEntry&);
-    PbiReferenceEntry& operator=(PbiReferenceEntry&&) noexcept;
-    ~PbiReferenceEntry();
-
     bool operator==(const PbiReferenceEntry& other) const;
 
     /// \}
@@ -235,12 +219,7 @@ public:
     ///
     PbiRawReferenceData(uint32_t numRefs);
 
-    PbiRawReferenceData();
-    PbiRawReferenceData(const PbiRawReferenceData&);
-    PbiRawReferenceData(PbiRawReferenceData&&) noexcept;
-    PbiRawReferenceData& operator=(const PbiRawReferenceData&);
-    PbiRawReferenceData& operator=(PbiRawReferenceData&&) noexcept;
-    ~PbiRawReferenceData();
+    PbiRawReferenceData() = default;
 
     /// \}
 
@@ -266,12 +245,7 @@ public:
     ///        number of records.
     PbiRawBasicData(uint32_t numReads);
 
-    PbiRawBasicData();
-    PbiRawBasicData(const PbiRawBasicData&);
-    PbiRawBasicData(PbiRawBasicData&&) noexcept;
-    PbiRawBasicData& operator=(const PbiRawBasicData&);
-    PbiRawBasicData& operator=(PbiRawBasicData&&) noexcept;
-    ~PbiRawBasicData();
+    PbiRawBasicData() = default;
 
     /// \}
 
@@ -344,12 +318,7 @@ public:
     ///
     explicit PbiRawData(const DataSet& dataset);
 
-    PbiRawData();
-    PbiRawData(const PbiRawData&);
-    PbiRawData(PbiRawData&&) noexcept;
-    PbiRawData& operator=(const PbiRawData&);
-    PbiRawData& operator=(PbiRawData&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
-    ~PbiRawData();
+    PbiRawData() = default;
 
     /// \}
 

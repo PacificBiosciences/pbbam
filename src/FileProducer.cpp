@@ -5,7 +5,8 @@
 #include "FileProducer.h"
 
 #include <cstdio>
-#include <exception>
+
+#include <stdexcept>
 
 namespace PacBio {
 namespace BAM {
@@ -18,6 +19,10 @@ FileProducer::FileProducer(std::string targetFilename)
 FileProducer::FileProducer(std::string targetFilename, std::string tempFilename)
     : targetFilename_{std::move(targetFilename)}, tempFilename_{std::move(tempFilename)}
 {
+    if (targetFilename_.empty()) {
+        throw std::runtime_error{"FileProducer error: cannot write to file with empty name"};
+    }
+
     // override renaming if writing to stdout
     //
     // setting temp filename to '-' keeps consistent interfaces

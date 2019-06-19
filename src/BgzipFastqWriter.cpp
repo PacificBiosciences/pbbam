@@ -18,7 +18,7 @@
 namespace PacBio {
 namespace BAM {
 
-BgzipFastqWriter::BgzipFastqWriter(const std::string& fn) : IRecordWriter(), writer_{fn}
+BgzipFastqWriter::BgzipFastqWriter(const std::string& fn) : IFastqWriter{}, writer_{fn}
 {
     if (!FormatUtils::IsFastqFilename(fn)) {
         throw std::runtime_error{"BgzipFastqWriter: filename '" + fn +
@@ -27,7 +27,7 @@ BgzipFastqWriter::BgzipFastqWriter(const std::string& fn) : IRecordWriter(), wri
 }
 
 BgzipFastqWriter::BgzipFastqWriter(const std::string& fn, const BgzipWriterConfig& config)
-    : IRecordWriter(), writer_{fn, config}
+    : IFastqWriter{}, writer_{fn, config}
 {
     if (!FormatUtils::IsFastqFilename(fn)) {
         throw std::runtime_error{"BgzipFastqWriter: filename '" + fn +

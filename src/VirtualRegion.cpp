@@ -6,12 +6,24 @@
 
 #include "PbbamInternalConfig.h"
 
+#include <cassert>
 #include <tuple>
+#include <type_traits>
 
 #include "pbbam/virtual/VirtualRegion.h"
 
 namespace PacBio {
 namespace BAM {
+
+static_assert(std::is_copy_constructible<VirtualRegion>::value,
+              "VirtualRegion(const VirtualRegion&) is not = default");
+static_assert(std::is_copy_assignable<VirtualRegion>::value,
+              "VirtualRegion& operator=(const VirtualRegion&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<VirtualRegion>::value,
+              "VirtualRegion(VirtualRegion&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<VirtualRegion>::value,
+              "VirtualRegion& operator=(VirtualRegion&&) is not = noexcept");
 
 VirtualRegion::VirtualRegion(const VirtualRegionType type_, const int beginPos_, const int endPos_,
                              const int score_)
@@ -31,18 +43,6 @@ VirtualRegion::VirtualRegion(const VirtualRegionType type_, const int beginPos_,
     , score{score_}
 {
 }
-
-VirtualRegion::VirtualRegion() = default;
-
-VirtualRegion::VirtualRegion(const VirtualRegion&) = default;
-
-VirtualRegion::VirtualRegion(VirtualRegion&&) noexcept = default;
-
-VirtualRegion& VirtualRegion::operator=(const VirtualRegion&) = default;
-
-VirtualRegion& VirtualRegion::operator=(VirtualRegion&&) noexcept = default;
-
-VirtualRegion::~VirtualRegion() = default;
 
 bool VirtualRegion::operator==(const VirtualRegion& v1) const
 {

@@ -12,6 +12,8 @@ pbbam_test_cpp_sources = files([
   'test_BamRecordMapping.cpp',
   'test_BamWriter.cpp',
   'test_BarcodeQuery.cpp',
+  'test_BedReader.cpp',
+  'test_BedWriter.cpp',
   'test_BgzipFastaWriter.cpp',
   'test_BgzipFastqWriter.cpp',
   'test_BgzipWriter.cpp',
@@ -24,6 +26,7 @@ pbbam_test_cpp_sources = files([
   'test_EndToEnd.cpp',
   'test_EntireFileQuery.cpp',
   'test_FaiIndex.cpp',
+  'test_FaiZmwChunker.cpp',
   'test_FastaReader.cpp',
   'test_FastaSequence.cpp',
   'test_FastaSequenceQuery.cpp',
@@ -54,6 +57,8 @@ pbbam_test_cpp_sources = files([
   'test_StringUtils.cpp',
   'test_SubreadLengthQuery.cpp',
   'test_Tags.cpp',
+  'test_TextFileReader.cpp',
+  'test_TextFileWriter.cpp',
   'test_TimeUtils.cpp',
   'test_Validator.cpp',
   'test_VcfFile.cpp',
@@ -66,6 +71,7 @@ pbbam_test_cpp_sources = files([
   'test_VcfWriter.cpp',
   'test_Version.cpp',
   'test_WhitelistedZmwReadStitcher.cpp',
+  'test_ZmwChunkedFastxReader.cpp',
   'test_ZmwReadStitcher.cpp',
   'test_ZmwQuery.cpp'])
 

@@ -61,11 +61,6 @@ public:
                                const std::string& primaryBamFilePath,
                                const std::string& scrapsBamFilePath);
 
-    WhitelistedZmwReadStitcher() = delete;
-    WhitelistedZmwReadStitcher(const WhitelistedZmwReadStitcher&) = delete;
-    WhitelistedZmwReadStitcher(WhitelistedZmwReadStitcher&&) = delete;
-    WhitelistedZmwReadStitcher& operator=(const WhitelistedZmwReadStitcher&) = delete;
-    WhitelistedZmwReadStitcher& operator=(WhitelistedZmwReadStitcher&&) = delete;
     ~WhitelistedZmwReadStitcher();
 
     /// \}

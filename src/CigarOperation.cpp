@@ -8,16 +8,26 @@
 
 #include "pbbam/CigarOperation.h"
 
+#include <cassert>
 #include <tuple>
+#include <type_traits>
 
 #include <htslib/sam.h>
 
 namespace PacBio {
 namespace BAM {
 
-bool CigarOperation::validate_ = true;
+static_assert(std::is_copy_constructible<CigarOperation>::value,
+              "CigarOperation(const CigarOperation&) is not = default");
+static_assert(std::is_copy_assignable<CigarOperation>::value,
+              "CigarOperation& operator=(const CigarOperation&) is not = default");
 
-CigarOperation::CigarOperation() = default;
+static_assert(std::is_nothrow_move_constructible<CigarOperation>::value,
+              "CigarOperation(CigarOperation&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<CigarOperation>::value,
+              "CigarOperation& operator=(CigarOperation&&) is not = noexcept");
+
+bool CigarOperation::validate_ = true;
 
 CigarOperation::CigarOperation(char c, uint32_t length)
     : type_{CigarOperation::CharToType(c)}, length_{length}
@@ -37,16 +47,6 @@ CigarOperation::CigarOperation(CigarOperationType op, uint32_t length) : type_{o
             "CIGAR operation 'M' is not allowed in PacBio BAM files. Use 'X/=' instead."};
 #endif
 }
-
-CigarOperation::CigarOperation(const CigarOperation&) = default;
-
-CigarOperation::CigarOperation(CigarOperation&&) noexcept = default;
-
-CigarOperation& CigarOperation::operator=(const CigarOperation&) = default;
-
-CigarOperation& CigarOperation::operator=(CigarOperation&&) noexcept = default;
-
-CigarOperation::~CigarOperation() = default;
 
 bool CigarOperation::operator==(const CigarOperation& other) const
 {

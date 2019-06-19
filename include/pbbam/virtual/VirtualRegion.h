@@ -39,12 +39,7 @@ public:
                   const LocalContextFlags cxTag_, const int barcodeLeft_, const int barcodeRight_,
                   const int score_ = 0);
 
-    VirtualRegion();
-    VirtualRegion(const VirtualRegion&);
-    VirtualRegion(VirtualRegion&&) noexcept;
-    VirtualRegion& operator=(const VirtualRegion&);
-    VirtualRegion& operator=(VirtualRegion&&) noexcept;
-    ~VirtualRegion();
+    VirtualRegion() = default;
 
     bool operator==(const VirtualRegion& v1) const;
 };

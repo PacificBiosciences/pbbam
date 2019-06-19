@@ -8,10 +8,12 @@
 
 #include "pbbam/GenomicInterval.h"
 
+#include <cassert>
 #include <cctype>
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
+#include <type_traits>
 
 #include "pbbam/StringUtilities.h"
 
@@ -47,6 +49,17 @@ std::string parseRegionString(const std::string& reg, PacBio::BAM::Position* beg
 
 }  // anonymous
 
+static_assert(std::is_copy_constructible<GenomicInterval>::value,
+              "GenomicInterval(const GenomicInterval&) is not = default");
+static_assert(std::is_copy_assignable<GenomicInterval>::value,
+              "GenomicInterval& operator=(const GenomicInterval&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<GenomicInterval>::value,
+              "GenomicInterval(GenomicInterval&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<GenomicInterval>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
+
 GenomicInterval::GenomicInterval(std::string name, Position start, Position stop)
     : name_{std::move(name)}, interval_{std::move(start), std::move(stop)}
 {
@@ -64,18 +77,6 @@ GenomicInterval::GenomicInterval(const std::string& samtoolsRegionString)
 
     interval_ = PacBio::BAM::Interval<Position>(begin, end);
 }
-
-GenomicInterval::GenomicInterval() = default;
-
-GenomicInterval::GenomicInterval(const GenomicInterval&) = default;
-
-GenomicInterval::GenomicInterval(GenomicInterval&&) noexcept = default;
-
-GenomicInterval& GenomicInterval::operator=(const GenomicInterval&) = default;
-
-GenomicInterval& GenomicInterval::operator=(GenomicInterval&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
-
-GenomicInterval::~GenomicInterval() = default;
 
 bool GenomicInterval::operator==(const GenomicInterval& other) const
 {

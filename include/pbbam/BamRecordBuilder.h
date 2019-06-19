@@ -49,12 +49,6 @@ public:
     ///
     BamRecordBuilder(const BamRecord& prototype);
 
-    BamRecordBuilder(const BamRecordBuilder&);
-    BamRecordBuilder(BamRecordBuilder&&) noexcept;
-    BamRecordBuilder& operator=(const BamRecordBuilder&);
-    BamRecordBuilder& operator=(BamRecordBuilder&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
-    ~BamRecordBuilder();
-
     /// \}
 
 public:

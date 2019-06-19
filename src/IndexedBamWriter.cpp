@@ -20,6 +20,7 @@
 #include <mutex>
 #include <stdexcept>
 #include <thread>
+#include <type_traits>
 
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
@@ -985,6 +986,11 @@ private:
 
     int64_t uncompressedFilePos_ = 0;
 };
+
+static_assert(!std::is_copy_constructible<IndexedBamWriter>::value,
+              "IndexedBamWriter(const IndexedBamWriter&) is not = delete");
+static_assert(!std::is_copy_assignable<IndexedBamWriter>::value,
+              "IndexedBamWriter& operator=(const IndexedBamWriter&) is not = delete");
 
 IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamHeader& header,
                                    const BamWriter::CompressionLevel bamCompressionLevel,

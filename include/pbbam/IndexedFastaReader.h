@@ -37,7 +37,6 @@ public:
 
     explicit IndexedFastaReader(std::string filename);
 
-    IndexedFastaReader() = delete;
     IndexedFastaReader(const IndexedFastaReader&);
     IndexedFastaReader(IndexedFastaReader&&) noexcept;
     IndexedFastaReader& operator=(const IndexedFastaReader&);

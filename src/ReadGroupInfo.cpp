@@ -8,6 +8,7 @@
 
 #include "pbbam/ReadGroupInfo.h"
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
@@ -16,6 +17,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <tuple>
+#include <type_traits>
 #include <unordered_map>
 
 #include <boost/algorithm/cxx14/equal.hpp>
@@ -265,6 +267,17 @@ PlatformModelType PlatformModelFromName(std::string name) { return nameToPlatfor
 
 }  // namespace
 
+static_assert(std::is_copy_constructible<ReadGroupInfo>::value,
+              "ReadGroupInfo(const ReadGroupInfo&) is not = default");
+static_assert(std::is_copy_assignable<ReadGroupInfo>::value,
+              "ReadGroupInfo& operator=(const ReadGroupInfo&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<ReadGroupInfo>::value,
+              "ReadGroupInfo(ReadGroupInfo&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<ReadGroupInfo>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
+
 ReadGroupInfo::ReadGroupInfo(std::string baseId, std::pair<uint16_t, uint16_t> barcodes)
 
 {
@@ -307,16 +320,6 @@ ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
 {
     platformModel_ = std::move(platform);
 }
-
-ReadGroupInfo::ReadGroupInfo(const ReadGroupInfo&) = default;
-
-ReadGroupInfo::ReadGroupInfo(ReadGroupInfo&&) noexcept = default;
-
-ReadGroupInfo& ReadGroupInfo::operator=(const ReadGroupInfo&) = default;
-
-ReadGroupInfo& ReadGroupInfo::operator=(ReadGroupInfo&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
-
-ReadGroupInfo::~ReadGroupInfo() = default;
 
 bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
 {

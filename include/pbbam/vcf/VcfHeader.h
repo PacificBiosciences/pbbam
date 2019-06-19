@@ -24,12 +24,6 @@ public:
 
     explicit VcfHeader(const std::string& hdrText);
 
-    VcfHeader(const VcfHeader&);
-    VcfHeader(VcfHeader&&) noexcept;
-    VcfHeader& operator=(const VcfHeader&);
-    VcfHeader& operator=(VcfHeader&&) noexcept;
-    ~VcfHeader();
-
 public:
     // general lines
 

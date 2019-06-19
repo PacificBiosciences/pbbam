@@ -12,7 +12,7 @@
 #include <string>
 
 #include "pbbam/BgzipWriter.h"
-#include "pbbam/IRecordWriter.h"
+#include "pbbam/IFastaWriter.h"
 
 namespace PacBio {
 namespace BAM {
@@ -21,20 +21,21 @@ class BamRecord;
 class BamRecordImpl;
 class FastaSequence;
 
-class BgzipFastaWriter : public IRecordWriter
+class BgzipFastaWriter final : public IFastaWriter
 {
 public:
     explicit BgzipFastaWriter(const std::string& fn);
     BgzipFastaWriter(const std::string& fn, const BgzipWriterConfig& config);
 
 public:
+    // IFastaWriter
     void Write(const FastaSequence& fastq);
     void Write(const std::string& name, const std::string& bases);
 
     // IRecordWriter
-    void TryFlush() override;
-    void Write(const BamRecord& bam) override;
-    void Write(const BamRecordImpl& bam) override;
+    void TryFlush();
+    void Write(const BamRecord& bam);
+    void Write(const BamRecordImpl& bam);
 
 private:
     BgzipWriter writer_;

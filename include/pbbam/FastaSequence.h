@@ -30,12 +30,7 @@ public:
     ///
     explicit FastaSequence(std::string name, std::string bases);
 
-    FastaSequence();
-    FastaSequence(const FastaSequence&);
-    FastaSequence(FastaSequence&&) noexcept;
-    FastaSequence& operator=(const FastaSequence&);
-    FastaSequence& operator=(FastaSequence&&) PBBAM_NOEXCEPT_MOVE_ASSIGN;
-    ~FastaSequence();
+    FastaSequence() = default;
 
     /// \}
 
@@ -50,10 +45,26 @@ public:
     const std::string& Name() const;
 
     ///
+    /// \brief
+    ///
+    /// \param name
+    /// \return FastaSequence&
+    ///
+    FastaSequence& Name(std::string name);
+
+    ///
     /// \brief Bases
     /// \return
     ///
     const std::string& Bases() const;
+
+    ///
+    /// \brief
+    ///
+    /// \param bases
+    /// \return FastaSequence&
+    ///
+    FastaSequence& Bases(std::string bases);
 
     /// \}
 

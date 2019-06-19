@@ -8,6 +8,11 @@
 
 #include "pbbam/SimpleRead.h"
 
+#include <cassert>
+
+#include <stdexcept>
+#include <type_traits>
+
 #include "Clipping.h"
 #include "SequenceUtils.h"
 #include "SimpleReadImpl.h"
@@ -34,6 +39,7 @@ void ClipSimpleRead(SimpleRead& read, const internal::ClipResult& result, size_t
     read.QueryEnd = result.qEnd_;
     if (read.PulseWidths)
         read.PulseWidths = clipContainer(read.PulseWidths->Data(), clipFrom, clipLength);
+    if (read.IPD) read.IPD = clipContainer(read.IPD->Data(), clipFrom, clipLength);
 }
 
 // NOTE: 'result' is moved into here, so we can take the CIGAR
@@ -54,6 +60,17 @@ void ClipMappedRead(MappedSimpleRead& read, internal::ClipResult result)
 // SimpleRead
 //
 
+static_assert(std::is_copy_constructible<SimpleRead>::value,
+              "SimpleRead(const SimpleRead&) is not = default");
+static_assert(std::is_copy_assignable<SimpleRead>::value,
+              "SimpleRead& operator=(const SimpleRead&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<SimpleRead>::value,
+              "SimpleRead(SimpleRead&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<SimpleRead>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
+
 SimpleRead::SimpleRead(const BamRecord& bam)
     : Name{bam.FullName()}
     , Sequence{bam.Sequence()}
@@ -62,6 +79,10 @@ SimpleRead::SimpleRead(const BamRecord& bam)
     , QueryStart{bam.QueryStart()}
     , QueryEnd{bam.QueryEnd()}
 {
+    if (bam.IsMapped() && (bam.AlignedStrand() == Strand::REVERSE)) {
+        ReverseComplement(Sequence);
+        Reverse(Qualities);
+    }
 }
 
 SimpleRead::SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr)
@@ -86,7 +107,7 @@ SimpleRead::SimpleRead(std::string name, std::string seq, QualityValues qualitie
 }
 
 SimpleRead::SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr,
-                       Position qStart, Position qEnd, Frames pulseWidths)
+                       Position qStart, Position qEnd, Frames pulseWidths, Frames ipd)
     : Name{std::move(name)}
     , Sequence{std::move(seq)}
     , Qualities{std::move(qualities)}
@@ -94,22 +115,38 @@ SimpleRead::SimpleRead(std::string name, std::string seq, QualityValues qualitie
     , QueryStart{qStart}
     , QueryEnd{qEnd}
     , PulseWidths{std::move(pulseWidths)}
+    , IPD{std::move(ipd)}
 {
 }
-
-SimpleRead::SimpleRead(const SimpleRead&) = default;
-
-SimpleRead::SimpleRead(SimpleRead&&) noexcept = default;
-
-SimpleRead& SimpleRead::operator=(const SimpleRead&) = default;
-
-SimpleRead& SimpleRead::operator=(SimpleRead&&) PBBAM_NOEXCEPT_MOVE_ASSIGN = default;
-
-SimpleRead::~SimpleRead() = default;
 
 //
 // MappedSimpleRead
 //
+
+static_assert(std::is_copy_constructible<MappedSimpleRead>::value,
+              "MappedSimpleRead(const MappedSimpleRead&) is not = default");
+static_assert(std::is_copy_assignable<MappedSimpleRead>::value,
+              "MappedSimpleRead& operator=(const MappedSimpleRead&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<MappedSimpleRead>::value,
+              "MappedSimpleRead(MappedSimpleRead&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<MappedSimpleRead>::value ==
+                  std::is_nothrow_move_assignable<SimpleRead>::value,
+              "");
+
+MappedSimpleRead::MappedSimpleRead(const BamRecord& bam)
+    : SimpleRead{bam}
+    , Strand{bam.AlignedStrand()}
+    , TemplateStart{bam.ReferenceStart()}
+    , TemplateEnd{bam.ReferenceEnd()}
+    , Cigar{bam.CigarData()}
+    , MapQuality{bam.MapQuality()}
+{
+    if (!bam.IsMapped()) {
+        throw std::runtime_error{"MappedSimpleRead error: input BAM record '" + bam.FullName() +
+                                 "' is not mapped"};
+    }
+}
 
 MappedSimpleRead::MappedSimpleRead(const SimpleRead& read, PacBio::BAM::Strand strand,
                                    Position templateStart, Position templateEnd,
@@ -122,17 +159,6 @@ MappedSimpleRead::MappedSimpleRead(const SimpleRead& read, PacBio::BAM::Strand s
     , MapQuality{mapQV}
 {
 }
-
-MappedSimpleRead::MappedSimpleRead(const MappedSimpleRead&) = default;
-
-MappedSimpleRead::MappedSimpleRead(MappedSimpleRead&&) noexcept = default;
-
-MappedSimpleRead& MappedSimpleRead::operator=(const MappedSimpleRead&) = default;
-
-MappedSimpleRead& MappedSimpleRead::operator=(MappedSimpleRead&&) noexcept(
-    std::is_nothrow_move_assignable<SimpleRead>::value) = default;
-
-MappedSimpleRead::~MappedSimpleRead() = default;
 
 //
 // Clipping helpers

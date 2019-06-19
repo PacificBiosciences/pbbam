@@ -45,7 +45,7 @@ public:
     ///
     /// This constructor only exists for STL container compatibility.
     ///
-    NamespaceInfo();
+    NamespaceInfo() = default;
 
     /// \brief Creates a valid info entry.
     NamespaceInfo(std::string name, std::string uri);
@@ -75,11 +75,6 @@ public:
     /// \{
 
     NamespaceRegistry();
-    NamespaceRegistry(const NamespaceRegistry&);
-    NamespaceRegistry(NamespaceRegistry&&) noexcept;
-    NamespaceRegistry& operator=(const NamespaceRegistry&);
-    NamespaceRegistry& operator=(NamespaceRegistry&&) noexcept;
-    ~NamespaceRegistry();
 
     /// \}
 

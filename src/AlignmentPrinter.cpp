@@ -8,26 +8,32 @@
 
 #include "pbbam/AlignmentPrinter.h"
 
+#include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <type_traits>
 
 namespace PacBio {
 namespace BAM {
+
+static_assert(!std::is_copy_constructible<AlignmentPrinter>::value,
+              "AlignmentPrinter(const AlignmentPrinter&) is not = delete");
+static_assert(!std::is_copy_assignable<AlignmentPrinter>::value,
+              "AlignmentPrinter& operator=(const AlignmentPrinter&) is not = delete");
+
+static_assert(std::is_nothrow_move_constructible<AlignmentPrinter>::value,
+              "AlignmentPrinter(AlignmentPrinter&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<AlignmentPrinter>::value,
+              "AlignmentPrinter& operator=(AlignmentPrinter&&) is not = noexcept");
 
 AlignmentPrinter::AlignmentPrinter(const IndexedFastaReader& ifr)
     : ifr_{std::make_unique<IndexedFastaReader>(ifr)}
 {
 }
-
-AlignmentPrinter::AlignmentPrinter(AlignmentPrinter&&) noexcept = default;
-
-AlignmentPrinter& AlignmentPrinter::operator=(AlignmentPrinter&&) noexcept = default;
-
-AlignmentPrinter::~AlignmentPrinter() = default;
 
 std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation orientation)
 {
@@ -113,16 +119,11 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation o
     const float similarity = matches / seq.size();
 
     std::stringstream output;
-
-    output << "Read        : " << record.FullName() << std::endl;
-    output << "Reference   : " << record.ReferenceName() << std::endl;
-    output << std::endl;
-    output << "Read-length : " << seqLength << std::endl;
-    output << "Concordance : " << std::setprecision(3) << (similarity);
-    output << std::endl;
-    output << std::endl;
-    output << pretty;
-
+    output << "Read        : " << record.FullName() << '\n'
+           << "Reference   : " << record.ReferenceName() << "\n\n"
+           << "Read-length : " << seqLength << '\n'
+           << "Concordance : " << std::setprecision(3) << (similarity) << "\n\n"
+           << pretty;
     return output.str();
 }
 
