@@ -17,6 +17,8 @@ pbbam_test_cpp_sources = files([
   'test_BgzipFastaWriter.cpp',
   'test_BgzipFastqWriter.cpp',
   'test_BgzipWriter.cpp',
+  'test_CCSPbiBuilder.cpp',
+  'test_CCSRecordIO.cpp',
   'test_Cigar.cpp',
   'test_Compare.cpp',
   'test_DataSetCore.cpp',
