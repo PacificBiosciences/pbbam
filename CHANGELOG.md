@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## Active
 
 ### Added
+ - CCSRecord API to work with the minimally required data for CCS
  - TextFileReader & TextFileWriter for generic line files (plain text or gzipped)
  - BedReader & BedWriter for BED format support
 
