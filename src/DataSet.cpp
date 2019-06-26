@@ -176,9 +176,21 @@ DataSet& DataSet::Attribute(const std::string& name, const std::string& value)
 
 std::vector<BamFile> DataSet::BamFiles() const
 {
+    std::vector<BamFile> result;
+    std::vector<std::string> fns = BamFilenames();
+    result.reserve(fns.size());
+
+    for (const auto& fn : fns) {
+        result.emplace_back(fn);
+    }
+    return result;
+}
+
+std::vector<std::string> DataSet::BamFilenames() const
+{
+    std::vector<std::string> result;
     const PacBio::BAM::ExternalResources& resources = ExternalResources();
 
-    std::vector<BamFile> result;
     result.reserve(resources.Size());
     for (const ExternalResource& ext : resources) {
 
