@@ -346,6 +346,17 @@ public:
     ///
     std::vector<BamFile> BamFiles() const;
 
+    /// \brief Returns all filenames for BamFiles(), with paths resolved.
+    ///
+    //  Unlike BamFiles(), this does not actually open the BAM files.
+    //  (BamFile(fn) would read the header.)
+    //
+    /// \returns vector of std::string
+    ///
+    /// \sa DataSet::BamFiles
+    ///
+    std::vector<std::string> BamFilenames() const;
+
     /// \brief Returns this dataset's primary FASTA resources, with relative
     ///        filepaths already resolved.
     ///

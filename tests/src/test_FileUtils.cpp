@@ -36,9 +36,9 @@ TEST(FileUtilsTest, LastModifiedOk)
     //
     // also, I can't seem to get better than second resolution (on OSX 10.9/clang at least, st_mtimespec.tv_nsec is always zero)
 
-    const auto now = TimeUtils::CurrentTime();
-    const auto nowDuration = now.time_since_epoch();
-    const auto nowSeconds = std::chrono::duration_cast<std::chrono::seconds>(nowDuration).count();
+    const auto then = TimeUtils::CurrentTime();
+    const auto thenDuration = then.time_since_epoch();
+    const auto thenSeconds = std::chrono::duration_cast<std::chrono::seconds>(thenDuration).count();
 
     const std::string tmp = PbbamTestsConfig::GeneratedData_Dir + "/pbbam_lastmod_check.tmp";
     const std::string rmCmd = std::string("rm ") + tmp;
@@ -52,7 +52,9 @@ TEST(FileUtilsTest, LastModifiedOk)
     const auto stampSeconds =
         std::chrono::duration_cast<std::chrono::seconds>(stampDuration).count();
 
-    EXPECT_LE(nowSeconds, stampSeconds);
+    const int skew = 3600;  // allow 1 hour of clock-skew
+
+    EXPECT_LE(thenSeconds, stampSeconds + skew);
 }
 
 TEST(FileUtilsTest, ResolvedFilePathOk)
