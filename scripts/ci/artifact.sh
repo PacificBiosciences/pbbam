@@ -30,6 +30,26 @@ case "${bamboo_planRepository_branchName}" in
 esac
 
 DESTDIR="${PWD}/staging" ninja -C "${CURRENT_BUILD_DIR:-build}" -v install
+
+# merge pbcopper and pbbam for PA
+pushd "${PWD}/staging/lib"
+  # GNU ld MRI script trick
+  # https://stackoverflow.com/a/23621751
+  echo "create libnew.a" >libnew.mri
+  for i in libpb*.a; do
+    echo "addlib ${i}" >>libnew.mri
+  done
+  echo save >>libnew.mri
+  echo end >>libnew.mri
+  ar -M <libnew.mri
+
+  rm libpb*.a libnew.mri
+  mv libnew.a libpbbam.a
+
+  # remove pkg-config because it confuses PA's build system
+  rm -rf pkgconfig
+popd
+
 if [[ ${_artifact_versionprepend:-false} == true ]]; then
   ( cd staging && tar zcf ../pbbam-${VERSION}-x86_64.tgz . --transform "s,^\./,pbbam-${VERSION}/," )
 else

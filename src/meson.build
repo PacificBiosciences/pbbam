@@ -158,6 +158,6 @@ pbbam_lib = library(
   soversion : meson.project_version(),
   version : meson.project_version(),
   install : pbbam_lib_install,
-  dependencies : [pbbam_thread_dep, pbbam_boost_dep, pbbam_zlib_dep, pbbam_htslib_dep],
+  dependencies : [pbbam_thread_dep, pbbam_boost_dep, pbbam_zlib_dep, pbbam_htslib_dep, pbbam_pbcopper_dep],
   include_directories : pbbam_include_directories,
   cpp_args : [pbbam_extra_flags, pbbam_warning_flags, pbbam_macros])

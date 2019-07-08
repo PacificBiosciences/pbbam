@@ -28,7 +28,7 @@ pbbam_test_cpp_sources += pbbam_PbbamTestData_h
 pbbam_test = executable(
   'pbbam_test',
   pbbam_test_cpp_sources,
-  dependencies : [pbbam_gtest_dep, pbbam_boost_dep, pbbam_htslib_dep, pbbam_zlib_dep],
+  dependencies : [pbbam_gtest_dep, pbbam_boost_dep, pbbam_htslib_dep, pbbam_zlib_dep, pbbam_pbcopper_dep],
   include_directories : pbbam_include_directories,
   link_with : pbbam_lib,
   cpp_args : pbbam_warning_flags,
