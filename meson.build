@@ -62,6 +62,9 @@ pbbam_zlib_dep = dependency('zlib', required : true, fallback : ['zlib', 'zlib_d
 # htslib
 pbbam_htslib_dep = dependency('htslib', required : true, version : '>=1.4', fallback : ['htslib', 'htslib_dep'])
 
+# pbcopper
+pbbam_pbcopper_dep = dependency('pbcopper', required : true, fallback : ['pbcopper', 'pbcopper_dep'])
+
 ###########
 # headers #
 ###########
@@ -113,7 +116,7 @@ endif
 
 if not meson.is_subproject()
   import('pkgconfig').generate(
-    libraries : pbbam_lib,
+    pbbam_lib,
     version : meson.project_version(),
     name : 'pbbam',
     requires : 'htslib',
