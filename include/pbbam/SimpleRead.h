@@ -9,56 +9,28 @@
 
 #include "pbbam/Config.h"
 
-#include <string>
+// #include <string>
 
-#include <boost/optional.hpp>
+// #include <boost/optional.hpp>
 
-#include "pbbam/BamRecord.h"
-#include "pbbam/Cigar.h"
-#include "pbbam/Frames.h"
+// #include "pbbam/BamRecord.h"
+// #include "pbbam/Cigar.h"
+// #include "pbbam/Frames.h"
+// #include "pbbam/Position.h"
+// #include "pbbam/QualityValues.h"
+// #include "pbbam/SNR.h"
+// #include "pbbam/Strand.h"
+
+#include <pbcopper/data/MappedSimpleRead.h>
+#include <pbcopper/data/SimpleRead.h>
+
 #include "pbbam/Position.h"
-#include "pbbam/QualityValues.h"
-#include "pbbam/SNR.h"
-#include "pbbam/Strand.h"
 
 namespace PacBio {
 namespace BAM {
 
-class SimpleRead
-{
-public:
-    explicit SimpleRead(const BamRecord& bam);
-    SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr);
-    SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr, Position qStart,
-               Position qEnd);
-    SimpleRead(std::string name, std::string seq, QualityValues qualities, SNR snr, Position qStart,
-               Position qEnd, Frames pulseWidths, Frames ipd);
-
-    // general data
-    std::string Name;
-    std::string Sequence;
-    QualityValues Qualities;
-    SNR SignalToNoise;
-    Position QueryStart;
-    Position QueryEnd;
-    boost::optional<Frames> PulseWidths;
-    boost::optional<Frames> IPD;
-};
-
-class MappedSimpleRead : public SimpleRead
-{
-public:
-    explicit MappedSimpleRead(const BamRecord& bam);
-    MappedSimpleRead(const SimpleRead& read, PacBio::BAM::Strand strand, Position templateStart,
-                     Position templateEnd, PacBio::BAM::Cigar cigar, uint8_t mapQV);
-
-    // mapping data
-    PacBio::BAM::Strand Strand;
-    Position TemplateStart;
-    Position TemplateEnd;
-    PacBio::BAM::Cigar Cigar;
-    uint8_t MapQuality;
-};
+using SimpleRead = PacBio::Data::SimpleRead;
+using MappedSimpleRead = PacBio::Data::MappedSimpleRead;
 
 ///
 /// \brief

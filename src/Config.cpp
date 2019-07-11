@@ -14,6 +14,7 @@
 
 #include <htslib/hts.h>
 
+#include "pbbam/CigarOperation.h"
 #include "pbbam/StringUtilities.h"
 
 namespace PacBio {
@@ -45,6 +46,13 @@ bool DoesHtslibSupportLongCigar()
     static constexpr const int v17_minor = 7;
     return std::tie(versionMajor, versionMinor) >= std::tie(v17_major, v17_minor);
 }
+
+#ifdef PBBAM_PERMISSIVE_CIGAR
+static const bool PermissiveCigar = []() {
+    CigarOperation::DisableAutoValidation();
+    return true;
+}();
+#endif  // PBBAM_PERMISSIVE_CIGAR
 
 }  // namespace BAM
 }  // namespace PacBio

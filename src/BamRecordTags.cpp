@@ -49,7 +49,7 @@ const BamRecordTags::TagLookupType BamRecordTags::tagLookup =
     { BamRecordTag::READ_GROUP,        {"RG", false} },
     { BamRecordTag::SCRAP_REGION_TYPE, {"sc", false} },
     { BamRecordTag::SCRAP_ZMW_TYPE,    {"sz", false} },
-    { BamRecordTag::SNR,               {"sn", false} },
+    { BamRecordTag::SIGNAL_TO_NOISE,   {"sn", false} },
     { BamRecordTag::START_FRAME,       {"sf", true}  },
     { BamRecordTag::SUBSTITUTION_QV,   {"sq", false} },
     { BamRecordTag::SUBSTITUTION_TAG,  {"st", false} },

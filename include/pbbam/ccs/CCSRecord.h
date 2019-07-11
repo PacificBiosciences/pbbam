@@ -27,7 +27,7 @@ struct CCSRecord
 
     PacBio::BAM::Accuracy Accuracy = 0.0f;
 
-    PacBio::BAM::SNR SignalToNoise = {0.0, 0.0, 0.0, 0.0};
+    PacBio::Data::SNR SignalToNoise = {0.0, 0.0, 0.0, 0.0};
 
     std::string Sequence;
 

@@ -21,7 +21,6 @@ namespace BAM {
 class BamRecord;
 class BamRecordImpl;
 class FastqSequence;
-class QualityValues;
 
 class FastqWriter final : public IFastqWriter
 {
