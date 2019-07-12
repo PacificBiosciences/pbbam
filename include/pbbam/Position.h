@@ -11,6 +11,8 @@
 
 #include <cstdint>
 
+#include <pbcopper/data/Position.h>
+
 namespace PacBio {
 namespace BAM {
 
@@ -20,7 +22,7 @@ namespace BAM {
 /// We use a signed integer because SAM/BAM uses the -1 value to indicate
 /// unknown or unmapped positions.
 ///
-using Position = int32_t;
+using Position = PacBio::Data::Position;
 
 /// \brief This constant is widely used as a "missing" or "invalid" position
 ///        marker.

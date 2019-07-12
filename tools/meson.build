@@ -21,7 +21,7 @@ pbbam_bam2sam_cpp_sources += files([
 pbbam_bam2sam = executable(
   'bam2sam',
   pbbam_bam2sam_cpp_sources,
-  dependencies : [pbbam_htslib_dep, pbbam_thread_dep, pbbam_zlib_dep, pbbam_boost_dep],
+  dependencies : [pbbam_htslib_dep, pbbam_thread_dep, pbbam_zlib_dep, pbbam_boost_dep, pbbam_pbcopper_dep],
   include_directories : [pbbam_include_directories, include_directories('bam2sam')],
   install : get_option('build-tools'),
   cpp_args : pbbam_warning_flags)
@@ -63,7 +63,7 @@ pbbam_pbindex_cpp_sources += files([
 pbbam_pbindex = executable(
   'pbindex',
   pbbam_pbindex_cpp_sources,
-  dependencies : [pbbam_htslib_dep, pbbam_zlib_dep, pbbam_boost_dep],
+  dependencies : [pbbam_htslib_dep, pbbam_zlib_dep, pbbam_boost_dep, pbbam_pbcopper_dep],
   include_directories : [pbbam_include_directories, include_directories('pbindex')],
   link_with : pbbam_lib,
   install : get_option('build-tools'),
@@ -93,7 +93,7 @@ pbbam_pbindexdump_cpp_sources += files([
 pbbam_pbindexdump = executable(
   'pbindexdump',
   pbbam_pbindexdump_cpp_sources,
-  dependencies : [pbbam_htslib_dep, pbbam_zlib_dep, pbbam_boost_dep],
+  dependencies : [pbbam_htslib_dep, pbbam_zlib_dep, pbbam_boost_dep, pbbam_pbcopper_dep],
   include_directories : [pbbam_include_directories, include_directories('pbindexdump')],
   link_with : pbbam_lib,
   install : get_option('build-tools'),
@@ -144,7 +144,7 @@ pbbam_pbmerge_cpp_sources += files([
 pbbam_pbmerge = executable(
   'pbmerge',
   pbbam_pbmerge_cpp_sources,
-  dependencies : [pbbam_boost_dep, pbbam_htslib_dep, pbbam_zlib_dep],
+  dependencies : [pbbam_boost_dep, pbbam_htslib_dep, pbbam_zlib_dep, pbbam_pbcopper_dep],
   include_directories : [pbbam_include_directories, include_directories('pbmerge')],
   link_with : pbbam_lib,
   install : get_option('build-tools'),
@@ -209,7 +209,7 @@ pbbam_pbbamify_cpp_sources += files([
 pbbam_pbbamify = executable(
   'pbbamify',
   pbbam_pbbamify_cpp_sources,
-  dependencies : [pbbam_boost_dep, pbbam_htslib_dep, pbbam_zlib_dep],
+  dependencies : [pbbam_boost_dep, pbbam_htslib_dep, pbbam_zlib_dep, pbbam_pbcopper_dep],
   include_directories : [pbbam_include_directories, include_directories('pbbamify')],
   link_with : pbbam_lib,
   install : get_option('build-tools'),

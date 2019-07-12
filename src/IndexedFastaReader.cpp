@@ -203,5 +203,5 @@ int IndexedFastaReader::SequenceLength(const std::string& name) const
     }
     return len;
 }
-}
-}  // PacBio::BAM
+}  // namespace BAM
+}  // namespace PacBio

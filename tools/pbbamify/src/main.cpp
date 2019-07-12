@@ -58,7 +58,7 @@ public:
         }
 
         // Disable validation of CIGARs that might contain 'M'
-        CigarOperation::validate_ = false;
+        CigarOperation::DisableAutoValidation();
 
         return settings;
     }

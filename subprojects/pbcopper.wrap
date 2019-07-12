@@ -1,4 +1,4 @@
 [wrap-git]
 directory=pbcopper
-url=https://github.com/PacificBiosciences/pbcopper.git
+url=ssh://git@bitbucket.nanofluidics.com:7999/sat/pbcopper.git
 revision=develop

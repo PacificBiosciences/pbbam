@@ -1179,7 +1179,7 @@ bool BamRecord::HasScrapZmwType() const
 
 bool BamRecord::HasStartFrame() const { return impl_.HasTag(BamRecordTag::START_FRAME); }
 
-bool BamRecord::HasSignalToNoise() const { return impl_.HasTag(BamRecordTag::SNR); }
+bool BamRecord::HasSignalToNoise() const { return impl_.HasTag(BamRecordTag::SIGNAL_TO_NOISE); }
 
 bool BamRecord::HasSubstitutionQV() const { return impl_.HasTag(BamRecordTag::SUBSTITUTION_QV); }
 
@@ -1835,14 +1835,14 @@ std::string BamRecord::Sequence(const Orientation orientation, bool aligned,
 
 std::vector<float> BamRecord::SignalToNoise() const
 {
-    const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SNR);
+    const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SIGNAL_TO_NOISE);
     const Tag snTag = impl_.TagValue(tagName);
     return snTag.ToFloatArray();
 }
 
 BamRecord& BamRecord::SignalToNoise(const std::vector<float>& snr)
 {
-    CreateOrEdit(BamRecordTag::SNR, snr, &impl_);
+    CreateOrEdit(BamRecordTag::SIGNAL_TO_NOISE, snr, &impl_);
     return *this;
 }
 

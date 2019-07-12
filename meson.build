@@ -127,6 +127,6 @@ endif
 pbbam_dep = declare_dependency(
   include_directories : pbbam_include_directories,
   link_with : pbbam_lib,
-  dependencies : pbbam_htslib_dep,
+  dependencies : [pbbam_htslib_dep, pbbam_pbcopper_dep],
   version : meson.project_version(),
   compile_args : pbbam_macros)
