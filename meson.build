@@ -115,11 +115,19 @@ endif
 ###################
 
 if not meson.is_subproject()
+  # need to add pbcopper into 'Requires:' field,
+  # but Meson currently only allows this if it's a
+  # 'pkgconfig-dependency object' and not a subproject
+  pbbam_requires = []
+  if pbbam_pbcopper_dep.type_name() == 'pkgconfig'
+    pbbam_requires = [pbbam_pbcopper_dep]
+  endif 
+
   import('pkgconfig').generate(
     pbbam_lib,
     version : meson.project_version(),
     name : 'pbbam',
-    requires : 'htslib',
+    requires : pbbam_requires,
     filebase : 'pbbam',
     description : 'Library for accessing PacBio-compatible BAM files')
 endif
