@@ -13,6 +13,8 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
+using QualityValues = PacBio::Data::QualityValues;
+
 namespace IndexedFastqReaderTests {
 }  // namespace IndexedFastqReaderTests
 

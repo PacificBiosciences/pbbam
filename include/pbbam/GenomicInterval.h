@@ -12,8 +12,9 @@
 #include <cstddef>
 #include <string>
 
+#include <pbcopper/data/Position.h>
+
 #include "pbbam/Interval.h"
-#include "pbbam/Position.h"
 
 namespace PacBio {
 namespace BAM {
@@ -32,7 +33,7 @@ public:
 
     /// \brief Creates a genomic interval on sequence with \p name, using range:
     ///       [\p start, \p stop)
-    GenomicInterval(std::string name, Position start, Position stop);
+    GenomicInterval(std::string name, Data::Position start, Data::Position stop);
 
     /// \brief Creates a genomic interval, using REGION string
     ///
@@ -91,13 +92,13 @@ public:
     std::string Name() const;
 
     /// \returns underlying Interval object
-    PacBio::BAM::Interval<Position> Interval() const;
+    PacBio::BAM::Interval<Data::Position> Interval() const;
 
     /// \returns interval start coordinate
-    Position Start() const;
+    Data::Position Start() const;
 
     /// \returns interval stop coordinate
-    Position Stop() const;
+    Data::Position Stop() const;
 
     /// \}
 
@@ -117,27 +118,27 @@ public:
     /// \param[in] interval
     /// \returns reference to this interval
     ///
-    GenomicInterval& Interval(PacBio::BAM::Interval<Position> interval);
+    GenomicInterval& Interval(PacBio::BAM::Interval<Data::Position> interval);
 
     /// Sets this interval's start coordinate.
     ///
     /// \param[in] start
     /// \returns reference to this interval
     ///
-    GenomicInterval& Start(const Position start);
+    GenomicInterval& Start(const Data::Position start);
 
     /// Sets this interval's stop coordinate.
     ///
     /// \param[in] stop
     /// \returns reference to this interval
     ///
-    GenomicInterval& Stop(const Position stop);
+    GenomicInterval& Stop(const Data::Position stop);
 
     /// \}
 
 private:
     std::string name_;
-    PacBio::BAM::Interval<Position> interval_;
+    PacBio::BAM::Interval<Data::Position> interval_;
 };
 
 }  // namespace BAM

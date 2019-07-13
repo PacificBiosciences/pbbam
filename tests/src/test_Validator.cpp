@@ -9,7 +9,6 @@
 #include <pbbam/BamFile.h>
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamRecord.h>
-#include <pbbam/Cigar.h>
 #include <pbbam/ReadGroupInfo.h>
 #include <pbbam/Validator.h>
 
@@ -17,6 +16,12 @@
 
 using namespace PacBio;
 using namespace PacBio::BAM;
+
+using Cigar = PacBio::Data::Cigar;
+using Frames = PacBio::Data::Frames;
+using Position = PacBio::Data::Position;
+using QualityValues = PacBio::Data::QualityValues;
+using Strand = PacBio::Data::Strand;
 
 namespace ValidatorTests {
 

@@ -5,9 +5,9 @@
 
 #include "pbbam/Config.h"
 
-#include <pbbam/Cigar.h>
-#include <pbbam/Position.h>
-#include <pbbam/Strand.h>
+#include <pbcopper/data/Cigar.h>
+#include <pbcopper/data/Position.h>
+#include <pbcopper/data/Strand.h>
 
 namespace PacBio {
 namespace BAM {
@@ -17,33 +17,35 @@ struct ClipToQueryConfig
 {
     // all clipping
     size_t seqLength_;
-    Position original_qStart_;
-    Position original_qEnd_;
-    Position target_qStart_;
-    Position target_qEnd_;
+    Data::Position original_qStart_;
+    Data::Position original_qEnd_;
+    Data::Position target_qStart_;
+    Data::Position target_qEnd_;
 
     // for clipping mapped reads
-    Position original_tStart_;
-    Strand strand_;
-    Cigar cigar_;
+    Data::Position original_tStart_;
+    Data::Strand strand_;
+    Data::Cigar cigar_;
     bool isMapped_;
 };
 
 struct ClipToReferenceConfig : public ClipToQueryConfig
 {
-    ClipToReferenceConfig(const ClipToQueryConfig& queryConfig, Position originalTEnd,
-                          Position targetTStart, Position targetTEnd, bool exciseFlankingInserts);
+    ClipToReferenceConfig(const ClipToQueryConfig& queryConfig, Data::Position originalTEnd,
+                          Data::Position targetTStart, Data::Position targetTEnd,
+                          bool exciseFlankingInserts);
 
-    Position original_tEnd_;
-    Position target_tStart_;
-    Position target_tEnd_;
+    Data::Position original_tEnd_;
+    Data::Position target_tStart_;
+    Data::Position target_tEnd_;
     bool exciseFlankingInserts_;
 };
 
 struct ClipResult
 {
-    ClipResult(size_t clipOffset, Position qStart, Position qEnd);
-    ClipResult(size_t clipOffset, Position qStart, Position qEnd, Position refPos, Cigar cigar);
+    ClipResult(size_t clipOffset, Data::Position qStart, Data::Position qEnd);
+    ClipResult(size_t clipOffset, Data::Position qStart, Data::Position qEnd, Data::Position refPos,
+               Data::Cigar cigar);
 
     ClipResult(const ClipResult&);
     ClipResult(ClipResult&&) noexcept;
@@ -52,10 +54,10 @@ struct ClipResult
     ~ClipResult();
 
     size_t clipOffset_;
-    Position qStart_;
-    Position qEnd_;
-    Position refPos_;
-    Cigar cigar_;
+    Data::Position qStart_;
+    Data::Position qEnd_;
+    Data::Position refPos_;
+    Data::Cigar cigar_;
 };
 
 // configs are non-const so we can steal the input CIGAR, rather than copy,

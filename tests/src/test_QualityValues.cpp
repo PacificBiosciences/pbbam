@@ -8,10 +8,10 @@
 
 #include <gtest/gtest.h>
 
-#include <pbbam/QualityValues.h>
+#include <pbcopper/data/QualityValues.h>
 
-using namespace PacBio;
-using namespace PacBio::BAM;
+using QualityValue = PacBio::Data::QualityValue;
+using QualityValues = PacBio::Data::QualityValues;
 
 TEST(QualityValueTest, DefaultsOk)
 {

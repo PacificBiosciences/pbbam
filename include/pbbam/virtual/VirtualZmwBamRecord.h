@@ -50,7 +50,7 @@ public:
 
     /// \returns IPD frame data
     ///
-    Frames IPDV1Frames(Orientation orientation = Orientation::NATIVE) const;
+    Data::Frames IPDV1Frames(Orientation orientation = Orientation::NATIVE) const;
 
     /// \brief Provides all annotations of the polymerase read as a map (type => regions)
     ///

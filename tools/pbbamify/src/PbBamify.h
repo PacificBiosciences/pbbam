@@ -3,12 +3,14 @@
 #ifndef SRC_PBBAMIFY_H_
 #define SRC_PBBAMIFY_H_
 
+#include <cstdint>
+
 #include <pbbam/BamReader.h>
 #include <pbbam/BamWriter.h>
 #include <pbbam/DataSet.h>
 #include <pbbam/FastaReader.h>
 #include <pbbam/IndexedFastaReader.h>
-#include <cstdint>
+
 #include "QueryLookup.h"
 
 namespace PacBio {
@@ -56,7 +58,7 @@ public:
     ///
     /// \returns true if the front or back CIGAR op is 'H', false otherwise.
     ///
-    static bool IsHardClipped(const Cigar& cigarData);
+    static bool IsHardClipped(const Data::Cigar& cigarData);
 
     /// \brief If the CIGAR string contains hard clipping operation at the beginning
     ///        or end of the cigarData vector, these are turned to soft clips and
@@ -64,27 +66,27 @@ public:
     ///
     /// \returns a new CIGAR string with only soft clipped bases.
     ///
-    static Cigar ConvertHardToSoftClipping(const Cigar& cigarData);
+    static Data::Cigar ConvertHardToSoftClipping(const Data::Cigar& cigarData);
 
     /// \brief Calculates the total sequence length from CIGAR (including clipping), and not just the aligned length.
     ///        This is used for sanity checking the input BAM records.
     ///
     /// \returns The length of the query sequence calculated from the CIGAR string.
     ///
-    static size_t SequenceLengthFromCigar(const Cigar& cigarData);
+    static size_t SequenceLengthFromCigar(const Data::Cigar& cigarData);
 
     /// \brief Linear pass over the Cigar operations to see if there are any 'M' ops.
     ///
     /// \returns true if there are 'M' operations in the CIGAR object.
     ///
-    static bool CheckIsCigarBasic(const Cigar& cigarData);
+    static bool CheckIsCigarBasic(const Data::Cigar& cigarData);
 
     /// \brief Takes the index and a BAM record, and creates a new Cigar object with extended
     ///        CIGAR operations ('=' and 'X' instead of 'M').
     ///
     /// \returns A new Cigar object with '=' and 'X' operations instead of 'M's.
-    static Cigar BasicToExtendedCigar(const PacBio::BAM::IndexedFastaReader& indexedRefReader,
-                                      const BamRecord& record, const Cigar& cigarData);
+    static Data::Cigar BasicToExtendedCigar(const PacBio::BAM::IndexedFastaReader& indexedRefReader,
+                                            const BamRecord& record, const Data::Cigar& cigarData);
 };
 
 }  // namespace pbbamify

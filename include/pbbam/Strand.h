@@ -11,6 +11,8 @@
 
 #include <pbcopper/data/Strand.h>
 
+#ifndef PBBAM_NODEPRECATED_API
+
 namespace PacBio {
 namespace BAM {
 
@@ -19,4 +21,5 @@ using Strand = PacBio::Data::Strand;
 }  // namespace BAM
 }  // namespace PacBio
 
+#endif  // PBBAM_NODEPRECATED_API
 #endif  // STRAND_H

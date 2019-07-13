@@ -21,6 +21,11 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
+using Cigar = PacBio::Data::Cigar;
+using Frames = PacBio::Data::Frames;
+using QualityValues = PacBio::Data::QualityValues;
+using Strand = PacBio::Data::Strand;
+
 namespace BamRecordTests {
 
 static

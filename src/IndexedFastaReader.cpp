@@ -27,7 +27,7 @@ namespace BAM {
 
 namespace {
 
-void ClipAndGapify(std::string& subseq, const Cigar& cigar, bool exciseSoftClips)
+void ClipAndGapify(std::string& subseq, const Data::Cigar& cigar, bool exciseSoftClips)
 {
     size_t seqIndex = 0;
     for (const auto& op : cigar) {
@@ -35,10 +35,10 @@ void ClipAndGapify(std::string& subseq, const Cigar& cigar, bool exciseSoftClips
         const auto opLength = op.Length();
 
         // do nothing for hard clips
-        if (type == CigarOperationType::HARD_CLIP) continue;
+        if (type == Data::CigarOperationType::HARD_CLIP) continue;
 
         // maybe remove soft clips
-        if (type == CigarOperationType::SOFT_CLIP) {
+        if (type == Data::CigarOperationType::SOFT_CLIP) {
             if (!exciseSoftClips) {
                 subseq.reserve(subseq.size() + opLength);
                 subseq.insert(seqIndex, opLength, '-');
@@ -49,10 +49,10 @@ void ClipAndGapify(std::string& subseq, const Cigar& cigar, bool exciseSoftClips
         // for non-clipping operations
         else {
             // maybe add gaps/padding
-            if (type == CigarOperationType::INSERTION) {
+            if (type == Data::CigarOperationType::INSERTION) {
                 subseq.reserve(subseq.size() + opLength);
                 subseq.insert(seqIndex, opLength, '-');
-            } else if (type == CigarOperationType::PADDING) {
+            } else if (type == Data::CigarOperationType::PADDING) {
                 subseq.reserve(subseq.size() + opLength);
                 subseq.insert(seqIndex, opLength, '*');
             }
@@ -106,8 +106,8 @@ IndexedFastaReader& IndexedFastaReader::operator=(IndexedFastaReader&&) noexcept
 
 IndexedFastaReader::~IndexedFastaReader() = default;
 
-std::string IndexedFastaReader::Subsequence(const std::string& id, Position begin,
-                                            Position end) const
+std::string IndexedFastaReader::Subsequence(const std::string& id, Data::Position begin,
+                                            Data::Position end) const
 {
     assert(begin <= end);
     // htslib is dumb and will not consider empty intervals valid,

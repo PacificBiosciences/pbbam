@@ -8,6 +8,7 @@
 #include <pbbam/BamWriter.h>
 #include <pbbam/DataSet.h>
 #include <pbbam/FastaReader.h>
+
 #include "../common/OptionParser.h"
 #include "PbBamify.h"
 #include "PbBamifyVersion.h"
@@ -58,7 +59,7 @@ public:
         }
 
         // Disable validation of CIGARs that might contain 'M'
-        CigarOperation::DisableAutoValidation();
+        Data::CigarOperation::DisableAutoValidation();
 
         return settings;
     }

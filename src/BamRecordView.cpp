@@ -22,7 +22,7 @@ BamRecordView::BamRecordView(const BamRecord& record, const Orientation orientat
 {
 }
 
-QualityValues BamRecordView::AltLabelQVs() const
+Data::QualityValues BamRecordView::AltLabelQVs() const
 {
     return record_.AltLabelQV(orientation_, aligned_, exciseSoftClips_, pulseBehavior_);
 }
@@ -32,7 +32,7 @@ std::string BamRecordView::AltLabelTags() const
     return record_.AltLabelTag(orientation_, aligned_, exciseSoftClips_, pulseBehavior_);
 }
 
-QualityValues BamRecordView::DeletionQVs() const
+Data::QualityValues BamRecordView::DeletionQVs() const
 {
     return record_.DeletionQV(orientation_, aligned_, exciseSoftClips_);
 }
@@ -42,29 +42,32 @@ std::string BamRecordView::DeletionTags() const
     return record_.DeletionTag(orientation_, aligned_, exciseSoftClips_);
 }
 
-QualityValues BamRecordView::InsertionQVs() const
+Data::QualityValues BamRecordView::InsertionQVs() const
 {
     return record_.InsertionQV(orientation_, aligned_, exciseSoftClips_);
 }
 
-Frames BamRecordView::IPD() const { return record_.IPD(orientation_, aligned_, exciseSoftClips_); }
-
-Frames BamRecordView::PrebaseFrames() const
+Data::Frames BamRecordView::IPD() const
 {
     return record_.IPD(orientation_, aligned_, exciseSoftClips_);
 }
 
-QualityValues BamRecordView::LabelQVs() const
+Data::Frames BamRecordView::PrebaseFrames() const
+{
+    return record_.IPD(orientation_, aligned_, exciseSoftClips_);
+}
+
+Data::QualityValues BamRecordView::LabelQVs() const
 {
     return record_.LabelQV(orientation_, aligned_, exciseSoftClips_, pulseBehavior_);
 }
 
-QualityValues BamRecordView::MergeQVs() const
+Data::QualityValues BamRecordView::MergeQVs() const
 {
     return record_.MergeQV(orientation_, aligned_, exciseSoftClips_);
 }
 
-QualityValues BamRecordView::PulseMergeQVs() const
+Data::QualityValues BamRecordView::PulseMergeQVs() const
 {
     return record_.PulseMergeQV(orientation_, aligned_, exciseSoftClips_, pulseBehavior_);
 }
@@ -89,7 +92,7 @@ std::vector<float> BamRecordView::Pkmid2() const
     return record_.Pkmid2(orientation_, aligned_, exciseSoftClips_, pulseBehavior_);
 }
 
-Frames BamRecordView::PrePulseFrames() const
+Data::Frames BamRecordView::PrePulseFrames() const
 {
     return record_.PrePulseFrames(orientation_, aligned_, exciseSoftClips_, pulseBehavior_);
 }
@@ -99,17 +102,17 @@ std::string BamRecordView::PulseCalls() const
     return record_.PulseCall(orientation_, aligned_, exciseSoftClips_, pulseBehavior_);
 }
 
-Frames BamRecordView::PulseCallWidth() const
+Data::Frames BamRecordView::PulseCallWidth() const
 {
     return record_.PulseCallWidth(orientation_, aligned_, exciseSoftClips_, pulseBehavior_);
 }
 
-Frames BamRecordView::PulseWidths() const
+Data::Frames BamRecordView::PulseWidths() const
 {
     return record_.PulseWidth(orientation_, aligned_, exciseSoftClips_);
 }
 
-QualityValues BamRecordView::Qualities() const
+Data::QualityValues BamRecordView::Qualities() const
 {
     return record_.Qualities(orientation_, aligned_, exciseSoftClips_);
 }
@@ -124,7 +127,7 @@ std::vector<uint32_t> BamRecordView::StartFrames() const
     return record_.StartFrame(orientation_, aligned_, exciseSoftClips_, pulseBehavior_);
 }
 
-QualityValues BamRecordView::SubstitutionQVs() const
+Data::QualityValues BamRecordView::SubstitutionQVs() const
 {
     return record_.SubstitutionQV(orientation_, aligned_, exciseSoftClips_);
 }

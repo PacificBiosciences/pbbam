@@ -10,7 +10,7 @@
 using namespace PacBio;
 using namespace PacBio::CCS;
 
-using Frames = PacBio::BAM::Frames;
+using Frames = PacBio::Data::Frames;
 using LocalContextFlags = PacBio::BAM::LocalContextFlags;
 
 // clang-format off

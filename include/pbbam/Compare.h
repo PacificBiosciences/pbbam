@@ -140,7 +140,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct AlignedEnd : public MemberFunctionBase<Position, &BamRecord::AlignedEnd>
+    struct AlignedEnd : public MemberFunctionBase<Data::Position, &BamRecord::AlignedEnd>
     {
     };
 
@@ -152,7 +152,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct AlignedStart : public MemberFunctionBase<Position, &BamRecord::AlignedStart>
+    struct AlignedStart : public MemberFunctionBase<Data::Position, &BamRecord::AlignedStart>
     {
     };
 
@@ -164,7 +164,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct AlignedStrand : public MemberFunctionBase<Strand, &BamRecord::AlignedStrand>
+    struct AlignedStrand : public MemberFunctionBase<Data::Strand, &BamRecord::AlignedStrand>
     {
     };
 
@@ -319,7 +319,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct QueryEnd : public MemberFunctionBase<Position, &BamRecord::QueryEnd>
+    struct QueryEnd : public MemberFunctionBase<Data::Position, &BamRecord::QueryEnd>
     {
     };
 
@@ -331,7 +331,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct QueryStart : public MemberFunctionBase<Position, &BamRecord::QueryStart>
+    struct QueryStart : public MemberFunctionBase<Data::Position, &BamRecord::QueryStart>
     {
     };
 
@@ -384,7 +384,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct ReferenceEnd : public MemberFunctionBase<Position, &BamRecord::ReferenceEnd>
+    struct ReferenceEnd : public MemberFunctionBase<Data::Position, &BamRecord::ReferenceEnd>
     {
     };
 
@@ -420,7 +420,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct ReferenceStart : public MemberFunctionBase<Position, &BamRecord::ReferenceStart>
+    struct ReferenceStart : public MemberFunctionBase<Data::Position, &BamRecord::ReferenceStart>
     {
     };
 

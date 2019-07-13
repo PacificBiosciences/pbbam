@@ -14,6 +14,8 @@
 
 #include <pbcopper/data/SNR.h>
 
+#ifndef PBBAM_NODEPRECATED_API
+
 namespace PacBio {
 namespace BAM {
 
@@ -23,5 +25,7 @@ constexpr auto ClampSNR = PacBio::Data::ClampSNR;
 
 }  // namespace BAM
 }  // namespace PacBio
+
+#endif  // PBBAM_NODEPRECATED_API
 
 #endif  // SNR_H

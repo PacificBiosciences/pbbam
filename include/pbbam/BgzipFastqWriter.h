@@ -32,7 +32,7 @@ public:
 public:
     // IFastqWriter
     void Write(const FastqSequence& fastq);
-    void Write(const std::string& name, const std::string& bases, const QualityValues& quals);
+    void Write(const std::string& name, const std::string& bases, const Data::QualityValues& quals);
     void Write(const std::string& name, const std::string& bases, const std::string& quals);
 
     // IRecordWriter
