@@ -65,7 +65,7 @@ void CheckExpectedSize(const PbiRawMappedData& mappedData, const size_t numReads
     CheckContainer("MappedData.mapQV", numReads, mappedData.mapQV_.size());
 }
 
-}  // namespace
+}  // anonmyous
 
 PbiRawData PbiIndexIO::Load(const std::string& pbiFilename)
 {
@@ -151,13 +151,13 @@ void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData, const DataSet& datas
             MoveAppend(std::move(currentMappedData.mapQV_), aggregateMappedData.mapQV_);
         } else {
             MoveAppend(std::vector<int32_t>(currentPbiCount, -1), aggregateMappedData.tId_);
-            MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UnmappedPosition),
+            MoveAppend(std::vector<uint32_t>(currentPbiCount, UnmappedPosition),
                        aggregateMappedData.tStart_);
-            MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UnmappedPosition),
+            MoveAppend(std::vector<uint32_t>(currentPbiCount, UnmappedPosition),
                        aggregateMappedData.tEnd_);
-            MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UnmappedPosition),
+            MoveAppend(std::vector<uint32_t>(currentPbiCount, UnmappedPosition),
                        aggregateMappedData.aStart_);
-            MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UnmappedPosition),
+            MoveAppend(std::vector<uint32_t>(currentPbiCount, UnmappedPosition),
                        aggregateMappedData.aEnd_);
             MoveAppend(std::vector<uint8_t>(currentPbiCount, 0), aggregateMappedData.revStrand_);
             MoveAppend(std::vector<uint32_t>(currentPbiCount, 0), aggregateMappedData.nM_);

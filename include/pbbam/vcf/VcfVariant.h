@@ -12,8 +12,7 @@
 
 #include <boost/optional.hpp>
 
-#include <pbcopper/data/Position.h>
-
+#include <pbbam/Position.h>
 #include <pbbam/vcf/VcfHeaderTypes.h>
 
 namespace PacBio {
@@ -44,7 +43,7 @@ public:
 
     explicit VcfVariant(const std::string& text);
 
-    VcfVariant(std::string id, std::string chrom, Data::Position pos, std::string refAllele,
+    VcfVariant(std::string id, std::string chrom, PacBio::BAM::Position pos, std::string refAllele,
                std::string altAllele);
 
 public:
@@ -53,8 +52,8 @@ public:
     const std::string& Chrom() const;
     VcfVariant& Chrom(std::string chrom);
 
-    Data::Position Position() const;
-    VcfVariant& Position(Data::Position pos);
+    PacBio::BAM::Position Position() const;
+    VcfVariant& Position(PacBio::BAM::Position pos);
 
     const std::string& Id() const;
     VcfVariant& Id(std::string id);
@@ -121,7 +120,7 @@ public:
 private:
     // FIXED data
     std::string chrom_;
-    Data::Position pos_;
+    PacBio::BAM::Position pos_;
     std::string id_;
     std::string refAllele_;
     std::string altAllele_;  // multiple? KISS, only add if needed

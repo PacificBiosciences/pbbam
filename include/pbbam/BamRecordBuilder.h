@@ -195,7 +195,7 @@ public:
     ///
     /// \returns reference to this builder
     ///
-    BamRecordBuilder& Cigar(Data::Cigar cigar);
+    BamRecordBuilder& Cigar(PacBio::BAM::Cigar cigar);
 
     /// \brief Sets the record's name.
     ///
@@ -229,7 +229,7 @@ private:
     std::string name_;
     std::string sequence_;
     std::string qualities_;
-    Data::Cigar cigar_;
+    PacBio::BAM::Cigar cigar_;
     TagCollection tags_;
 };
 

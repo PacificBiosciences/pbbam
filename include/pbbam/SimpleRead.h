@@ -9,11 +9,22 @@
 
 #include "pbbam/Config.h"
 
+// #include <string>
+
+// #include <boost/optional.hpp>
+
+// #include "pbbam/BamRecord.h"
+// #include "pbbam/Cigar.h"
+// #include "pbbam/Frames.h"
+// #include "pbbam/Position.h"
+// #include "pbbam/QualityValues.h"
+// #include "pbbam/SNR.h"
+// #include "pbbam/Strand.h"
+
 #include <pbcopper/data/MappedSimpleRead.h>
-#include <pbcopper/data/Position.h>
 #include <pbcopper/data/SimpleRead.h>
 
-#ifndef PBBAM_NODEPRECATED_API
+#include "pbbam/Position.h"
 
 namespace PacBio {
 namespace BAM {
@@ -28,7 +39,7 @@ using MappedSimpleRead = PacBio::Data::MappedSimpleRead;
 /// \param start
 /// \param end
 ///
-void ClipToQuery(Data::SimpleRead& read, Data::Position start, Data::Position end);
+void ClipToQuery(SimpleRead& read, Position start, Position end);
 
 ///
 /// \brief
@@ -37,7 +48,7 @@ void ClipToQuery(Data::SimpleRead& read, Data::Position start, Data::Position en
 /// \param start
 /// \param end
 ///
-void ClipToQuery(Data::MappedSimpleRead& read, Data::Position start, Data::Position end);
+void ClipToQuery(MappedSimpleRead& read, Position start, Position end);
 
 ///
 /// \brief
@@ -47,12 +58,10 @@ void ClipToQuery(Data::MappedSimpleRead& read, Data::Position start, Data::Posit
 /// \param end
 /// \param exciseFlankingInserts
 ///
-void ClipToReference(Data::MappedSimpleRead& read, Data::Position start, Data::Position end,
+void ClipToReference(MappedSimpleRead& read, Position start, Position end,
                      bool exciseFlankingInserts);
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#endif  // PBBAM_NODEPRECATED_API
 
 #endif  // SIMPLEREAD_H

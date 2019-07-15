@@ -24,20 +24,20 @@ static_assert(std::is_nothrow_move_assignable<FastqSequence>::value ==
                   std::is_nothrow_move_assignable<FastaSequence>::value,
               "");
 
-FastqSequence::FastqSequence(std::string name, std::string bases, Data::QualityValues qualities)
+FastqSequence::FastqSequence(std::string name, std::string bases, QualityValues qualities)
     : FastaSequence{std::move(name), std::move(bases)}, qualities_{std::move(qualities)}
 {
 }
 
 FastqSequence::FastqSequence(std::string name, std::string bases, std::string qualities)
     : FastaSequence{std::move(name), std::move(bases)}
-    , qualities_{Data::QualityValues::FromFastq(qualities)}
+    , qualities_{QualityValues::FromFastq(qualities)}
 {
 }
 
-const Data::QualityValues& FastqSequence::Qualities() const { return qualities_; }
+const QualityValues& FastqSequence::Qualities() const { return qualities_; }
 
-FastqSequence& FastqSequence::Qualities(Data::QualityValues quals)
+FastqSequence& FastqSequence::Qualities(QualityValues quals)
 {
     qualities_ = std::move(quals);
     return *this;

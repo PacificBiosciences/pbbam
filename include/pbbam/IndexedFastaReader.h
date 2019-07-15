@@ -16,9 +16,8 @@
 #include <string>
 #include <vector>
 
-#include <pbcopper/data/Position.h>
-
 #include "pbbam/Orientation.h"
+#include "pbbam/Position.h"
 
 namespace PacBio {
 namespace BAM {
@@ -60,7 +59,7 @@ public:
     ///
     /// \throws std::runtime_error on failure to fetch sequence
     ///
-    std::string Subsequence(const std::string& id, Data::Position begin, Data::Position end) const;
+    std::string Subsequence(const std::string& id, Position begin, Position end) const;
 
     /// \brief Fetches FASTA sequence for desired interval.
     ///

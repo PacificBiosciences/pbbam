@@ -173,7 +173,7 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
     return true;
 }
 
-BamRecordBuilder& BamRecordBuilder::Cigar(Data::Cigar cigar)
+BamRecordBuilder& BamRecordBuilder::Cigar(PacBio::BAM::Cigar cigar)
 {
     core_.n_cigar = cigar.size();
     cigar_ = std::move(cigar);

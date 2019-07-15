@@ -12,10 +12,9 @@
 #include <string>
 #include <utility>
 
-#include <pbcopper/data/Position.h>
-#include <pbcopper/data/QualityValues.h>
-
 #include "pbbam/FaiIndex.h"
+#include "pbbam/Position.h"
+#include "pbbam/QualityValues.h"
 
 namespace PacBio {
 namespace BAM {
@@ -25,9 +24,8 @@ class IndexedFastqReaderImpl
 public:
     virtual ~IndexedFastqReaderImpl();
 
-    virtual std::pair<std::string, Data::QualityValues> Subsequence(const std::string& id,
-                                                                    Data::Position start,
-                                                                    Data::Position end) = 0;
+    virtual std::pair<std::string, QualityValues> Subsequence(const std::string& id, Position start,
+                                                              Position end) = 0;
 
     std::string fastqFilename_;
     std::string faiFilename_;

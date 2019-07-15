@@ -216,7 +216,7 @@ public:
 
 private:
     int32_t lastRefId_ = -1;
-    Data::Position lastPos_ = -1;
+    Position lastPos_ = -1;
     std::map<uint32_t, PbiReferenceEntry> rawReferenceEntries_;
 };
 
@@ -324,7 +324,7 @@ public:
         const auto aStart = static_cast<uint32_t>(b.AlignedStart());
         const auto aEnd = static_cast<uint32_t>(b.AlignedEnd());
         const auto isReverseStrand = [&b]() -> uint8_t {
-            return (b.AlignedStrand() == Data::Strand::REVERSE ? 1 : 0);
+            return (b.AlignedStrand() == Strand::REVERSE ? 1 : 0);
         }();
 
         // alignment quality

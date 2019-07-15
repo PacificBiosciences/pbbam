@@ -15,7 +15,7 @@
 
 #include <pbcopper/data/QualityValues.h>
 
-#ifndef PBBAM_NODEPRECATED_API
+#include "pbbam/QualityValue.h"
 
 namespace PacBio {
 namespace BAM {
@@ -24,7 +24,5 @@ using QualityValues = PacBio::Data::QualityValues;
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#endif  // PBBAM_NODEPRECATED_API
 
 #endif  // QUALITYVALUES_H

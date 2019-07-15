@@ -47,7 +47,7 @@ void FastqWriter::Write(const BamRecordImpl& bam)
 }
 
 void FastqWriter::Write(const std::string& name, const std::string& bases,
-                        const Data::QualityValues& quals)
+                        const QualityValues& quals)
 {
     Write(name, bases, quals.Fastq());
 }

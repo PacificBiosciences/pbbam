@@ -20,7 +20,7 @@ TEST(VCF_Variant, default_ctor_provides_proper_default_values)
     VcfVariant v;
 
     EXPECT_TRUE(v.Chrom().empty());
-    EXPECT_EQ(PacBio::Data::UnmappedPosition, v.Position());
+    EXPECT_EQ(PacBio::BAM::UnmappedPosition, v.Position());
     EXPECT_TRUE(v.Id().empty());
     EXPECT_TRUE(v.RefAllele().empty());
     EXPECT_TRUE(v.AltAllele().empty());

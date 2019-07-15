@@ -17,6 +17,9 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
+namespace FastqSequenceTests {
+}  // namespace FastqSequenceTests
+
 TEST(FastqSequenceTest, BasicConstructorsOk)
 {
     FastqSequence seq1{"1", "GATTACA", "[[[[[[["};
@@ -25,7 +28,7 @@ TEST(FastqSequenceTest, BasicConstructorsOk)
     EXPECT_EQ("[[[[[[[", seq1.Qualities().Fastq());
 
     const auto quals = std::vector<uint8_t>{58, 58, 58, 58, 58, 58, 58};
-    FastqSequence seq2{"1", "GATTACA", Data::QualityValues{quals}};
+    FastqSequence seq2{"1", "GATTACA", QualityValues{quals}};
     EXPECT_EQ("1", seq2.Name());
     EXPECT_EQ("GATTACA", seq2.Bases());
     EXPECT_EQ("[[[[[[[", seq2.Qualities().Fastq());

@@ -166,7 +166,7 @@ public:
 /// \sa BamRecord::AlignedStrand
 ///
 class PbiAlignedStrandFilter
-    : public internal::MappedDataFilterBase<Data::Strand, PbiFile::MappedField::STRAND>
+    : public internal::MappedDataFilterBase<Strand, PbiFile::MappedField::STRAND>
 {
 public:
     /// \brief Creates a strand filter.
@@ -174,7 +174,7 @@ public:
     /// \param[in] strand  strand value to compare on
     /// \param[in] cmp     compare type
     ///
-    PbiAlignedStrandFilter(const Data::Strand strand, const Compare::Type cmp = Compare::EQUAL);
+    PbiAlignedStrandFilter(const Strand strand, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiBarcodeFilter class provides a PbiFilter-compatible filter on

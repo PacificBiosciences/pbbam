@@ -50,31 +50,31 @@ public:
 
 public:
     /// \returns BamRecord::AltLabelQV with this view's parameters applied
-    Data::QualityValues AltLabelQVs() const;
+    QualityValues AltLabelQVs() const;
 
     /// \returns BamRecord::AltLabelTag with this view's parameters applied
     std::string AltLabelTags() const;
 
     /// \returns BamRecord::DeletionQV with this view's parameters applied
-    Data::QualityValues DeletionQVs() const;
+    QualityValues DeletionQVs() const;
 
     /// \returns BamRecord::DeletionTag with this view's parameters applied
     std::string DeletionTags() const;
 
     /// \returns BamRecord::InsertionQV with this view's parameters applied
-    Data::QualityValues InsertionQVs() const;
+    QualityValues InsertionQVs() const;
 
     /// \returns BamRecord::IPD with this view's parameters applied
-    Data::Frames IPD() const;
+    Frames IPD() const;
 
     /// \returns BamRecord::LabelQV with this view's parameters applied
-    Data::QualityValues LabelQVs() const;
+    QualityValues LabelQVs() const;
 
     /// \returns BamRecord::MergeQV with this view's parameters applied
-    Data::QualityValues MergeQVs() const;
+    QualityValues MergeQVs() const;
 
     /// \returns BamRecord::PulseMergeQV with this view's parameters applied
-    Data::QualityValues PulseMergeQVs() const;
+    QualityValues PulseMergeQVs() const;
 
     /// \returns BamRecord::Pkmean with this view's parameters applied
     std::vector<float> Pkmean() const;
@@ -89,22 +89,22 @@ public:
     std::vector<float> Pkmid2() const;
 
     /// \returns BamRecord::PreBaseFrames with this view's parameters applied
-    Data::Frames PrebaseFrames() const;
+    Frames PrebaseFrames() const;
 
     /// \returns BamRecord::PrePulseFrames with this view's parameters applied
-    Data::Frames PrePulseFrames() const;
+    Frames PrePulseFrames() const;
 
     /// \returns BamRecord::PulseCalls with this view's parameters applied
     std::string PulseCalls() const;
 
     /// \returns BamRecord::PulseCallWidth with this view's parameters applied
-    Data::Frames PulseCallWidth() const;
+    Frames PulseCallWidth() const;
 
     /// \returns BamRecord::PulseWidths with this view's parameters applied
-    Data::Frames PulseWidths() const;
+    Frames PulseWidths() const;
 
     /// \returns BamRecord::Qualities with this view's parameters applied
-    Data::QualityValues Qualities() const;
+    QualityValues Qualities() const;
 
     /// \returns BamRecord::Sequence with this view's parameters applied
     std::string Sequence() const;
@@ -113,7 +113,7 @@ public:
     std::vector<uint32_t> StartFrames() const;
 
     /// \returns BamRecord::SubstitutionQV with this view's parameters applied
-    Data::QualityValues SubstitutionQVs() const;
+    QualityValues SubstitutionQVs() const;
 
     /// \returns BamRecord::SubstitutionTag with this view's parameters applied
     std::string SubstitutionTags() const;

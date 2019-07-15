@@ -17,9 +17,9 @@
 using BamReader = PacBio::BAM::BamReader;
 using BamRecord = PacBio::BAM::BamRecord;
 using BamWriter = PacBio::BAM::BamWriter;
-using Cigar = PacBio::Data::Cigar;
-using CigarOperation = PacBio::Data::CigarOperation;
-using CigarOperationType = PacBio::Data::CigarOperationType;
+using Cigar = PacBio::BAM::Cigar;
+using CigarOp = PacBio::BAM::CigarOperation;
+using PacBio::BAM::CigarOperationType;
 using Tag = PacBio::BAM::Tag;
 
 // clang-format off

@@ -5,7 +5,10 @@
 
 #include <gtest/gtest.h>
 
-#include <pbcopper/data/Frames.h>
+#include <pbbam/Frames.h>
+
+using namespace PacBio;
+using namespace PacBio::BAM;
 
 namespace FramesTests {
 
@@ -27,17 +30,17 @@ static const std::vector<uint8_t> encodedFrames{
 
 TEST(FramesTest, Constructors)
 {
-    const PacBio::Data::Frames f;
+    const Frames f;
     ASSERT_TRUE(f.Data().empty());
 
-    const PacBio::Data::Frames f2(FramesTests::testFrames);
+    const Frames f2(FramesTests::testFrames);
     const auto d = f2.Data();
     ASSERT_EQ(FramesTests::testFrames, d);
 }
 
 TEST(FramesTest, Encoded)
 {
-    const PacBio::Data::Frames f(FramesTests::testFrames);
+    const Frames f(FramesTests::testFrames);
     const auto e = f.Encode();
     ASSERT_EQ(FramesTests::encodedFrames, e);
 }

@@ -27,10 +27,10 @@ static_assert(std::is_nothrow_move_assignable<VcfVariant>::value ==
 
 VcfVariant::VcfVariant(const std::string& text) { *this = VcfFormat::ParsedVariant(text); }
 
-VcfVariant::VcfVariant() : pos_{Data::UnmappedPosition}, qual_{NAN}, filter_{"PASS"} {}
+VcfVariant::VcfVariant() : pos_{PacBio::BAM::UnmappedPosition}, qual_{NAN}, filter_{"PASS"} {}
 
-VcfVariant::VcfVariant(std::string id, std::string chrom, Data::Position pos, std::string refAllele,
-                       std::string altAllele)
+VcfVariant::VcfVariant(std::string id, std::string chrom, PacBio::BAM::Position pos,
+                       std::string refAllele, std::string altAllele)
     : chrom_{std::move(chrom)}
     , pos_{pos}
     , id_{std::move(id)}
@@ -213,9 +213,9 @@ bool VcfVariant::IsSnp() const
     return refAllele_.size() == 1 && altAllele_.size() == 1 && refAllele_[0] != altAllele_[0];
 }
 
-Data::Position VcfVariant::Position() const { return pos_; }
+PacBio::BAM::Position VcfVariant::Position() const { return pos_; }
 
-VcfVariant& VcfVariant::Position(Data::Position pos)
+VcfVariant& VcfVariant::Position(PacBio::BAM::Position pos)
 {
     pos_ = pos;
     return *this;
