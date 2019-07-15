@@ -1,24 +1,17 @@
 // Author: Ivan Sovic
 
 #include "PbBamify.h"
-
-#include <ctime>
-#include <istream>
-#include <ostream>
-#include <string>
-
-#include <pbcopper/data/Cigar.h>
-
 #include <pbbam/../../src/SequenceUtils.h>
 #include <pbbam/BamRecord.h>
+#include <pbbam/Cigar.h>
 #include <pbbam/MD5.h>
 #include <pbbam/PbiFilter.h>
 #include <pbbam/PbiFilterQuery.h>
 #include <pbbam/PbiFilterTypes.h>
-
-using Cigar = PacBio::Data::Cigar;
-using CigarOperation = PacBio::Data::CigarOperation;
-using CigarOperationType = PacBio::Data::CigarOperationType;
+#include <ctime>
+#include <istream>
+#include <ostream>
+#include <string>
 
 namespace PacBio {
 namespace BAM {

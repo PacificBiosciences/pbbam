@@ -22,7 +22,8 @@ namespace BAM {
 namespace {
 
 // returns sequence name & sets begin/end, from input regionString
-std::string parseRegionString(const std::string& reg, Data::Position* begin, Data::Position* end)
+std::string parseRegionString(const std::string& reg, PacBio::BAM::Position* begin,
+                              PacBio::BAM::Position* end)
 {
     const std::vector<std::string> parts = Split(reg, ':');
     if (parts.empty() || parts.size() > 2)
@@ -46,7 +47,7 @@ std::string parseRegionString(const std::string& reg, Data::Position* begin, Dat
     return parts.at(0);
 }
 
-}  // namespace
+}  // anonymous
 
 static_assert(std::is_copy_constructible<GenomicInterval>::value,
               "GenomicInterval(const GenomicInterval&) is not = default");
@@ -59,22 +60,22 @@ static_assert(std::is_nothrow_move_assignable<GenomicInterval>::value ==
                   std::is_nothrow_move_assignable<std::string>::value,
               "");
 
-GenomicInterval::GenomicInterval(std::string name, Data::Position start, Data::Position stop)
+GenomicInterval::GenomicInterval(std::string name, Position start, Position stop)
     : name_{std::move(name)}, interval_{std::move(start), std::move(stop)}
 {
 }
 
 GenomicInterval::GenomicInterval(const std::string& samtoolsRegionString)
 {
-    Data::Position begin = Data::UnmappedPosition;
-    Data::Position end = Data::UnmappedPosition;
+    Position begin = UnmappedPosition;
+    Position end = UnmappedPosition;
 
     name_ = parseRegionString(samtoolsRegionString, &begin, &end);
-    if (begin == Data::UnmappedPosition || end == Data::UnmappedPosition)
+    if (begin == UnmappedPosition || end == UnmappedPosition)
         throw std::runtime_error{"GenomicInterval: malformed region string (" +
                                  samtoolsRegionString + ")"};
 
-    interval_ = PacBio::BAM::Interval<Data::Position>(begin, end);
+    interval_ = PacBio::BAM::Interval<Position>(begin, end);
 }
 
 bool GenomicInterval::operator==(const GenomicInterval& other) const
@@ -102,9 +103,9 @@ bool GenomicInterval::Intersects(const GenomicInterval& other) const
     return interval_.Intersects(other.interval_);
 }
 
-PacBio::BAM::Interval<Data::Position> GenomicInterval::Interval() const { return interval_; }
+PacBio::BAM::Interval<Position> GenomicInterval::Interval() const { return interval_; }
 
-GenomicInterval& GenomicInterval::Interval(PacBio::BAM::Interval<Data::Position> interval)
+GenomicInterval& GenomicInterval::Interval(PacBio::BAM::Interval<Position> interval)
 {
     interval_ = std::move(interval);
     return *this;
@@ -126,17 +127,17 @@ GenomicInterval& GenomicInterval::Name(std::string name)
     return *this;
 }
 
-Data::Position GenomicInterval::Start() const { return interval_.Start(); }
+Position GenomicInterval::Start() const { return interval_.Start(); }
 
-GenomicInterval& GenomicInterval::Start(const Data::Position start)
+GenomicInterval& GenomicInterval::Start(const Position start)
 {
     interval_.Start(start);
     return *this;
 }
 
-Data::Position GenomicInterval::Stop() const { return interval_.Stop(); }
+Position GenomicInterval::Stop() const { return interval_.Stop(); }
 
-GenomicInterval& GenomicInterval::Stop(const Data::Position stop)
+GenomicInterval& GenomicInterval::Stop(const Position stop)
 {
     interval_.Stop(stop);
     return *this;

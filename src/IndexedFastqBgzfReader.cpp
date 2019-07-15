@@ -87,8 +87,9 @@ int IndexedFastqBgzfReader::FetchRecord()
     return seq_->seq.l;
 }
 
-std::pair<std::string, Data::QualityValues> IndexedFastqBgzfReader::Subsequence(
-    const std::string& id, Data::Position start, Data::Position end)
+std::pair<std::string, QualityValues> IndexedFastqBgzfReader::Subsequence(const std::string& id,
+                                                                          Position start,
+                                                                          Position end)
 {
     // check requested region is valid
     const auto& entry = index_.Entry(id);
@@ -133,7 +134,7 @@ std::pair<std::string, Data::QualityValues> IndexedFastqBgzfReader::Subsequence(
     const std::string seq{seq_->seq.s, seq_->seq.l};
     const std::string quals{seq_->qual.s, seq_->qual.l};
     return std::make_pair(seq.substr(start, length),
-                          Data::QualityValues::FromFastq(quals.substr(start, length)));
+                          QualityValues::FromFastq(quals.substr(start, length)));
 }
 
 }  // namespace BAM

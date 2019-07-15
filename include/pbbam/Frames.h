@@ -15,8 +15,6 @@
 
 #include <pbcopper/data/Frames.h>
 
-#ifndef PBBAM_NODEPRECATED_API
-
 namespace PacBio {
 namespace BAM {
 
@@ -24,7 +22,5 @@ using Frames = PacBio::Data::Frames;
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#endif  // PBBAM_NODEPRECATED_API
 
 #endif  // FRAMES_H

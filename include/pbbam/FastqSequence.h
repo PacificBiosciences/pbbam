@@ -11,9 +11,8 @@
 
 #include <string>
 
-#include <pbcopper/data/QualityValues.h>
-
 #include <pbbam/FastaSequence.h>
+#include <pbbam/QualityValues.h>
 
 namespace PacBio {
 namespace BAM {
@@ -34,7 +33,7 @@ public:
     /// \param bases
     /// \param qualities
     ///
-    explicit FastqSequence(std::string name, std::string bases, Data::QualityValues qualities);
+    explicit FastqSequence(std::string name, std::string bases, QualityValues qualities);
 
     ///
     /// \brief FastaSequence
@@ -56,7 +55,7 @@ public:
     /// \brief Qualities
     /// \return
     ///
-    const Data::QualityValues& Qualities() const;
+    const QualityValues& Qualities() const;
 
     ///
     /// \brief
@@ -64,7 +63,7 @@ public:
     /// \param quals
     /// \return FastqSequence
     ///
-    FastqSequence& Qualities(Data::QualityValues quals);
+    FastqSequence& Qualities(QualityValues quals);
 
     /// \}
 
@@ -72,7 +71,7 @@ public:
     bool operator!=(const FastqSequence& other) const;
 
 private:
-    Data::QualityValues qualities_;
+    QualityValues qualities_;
 };
 
 }  // namespace BAM

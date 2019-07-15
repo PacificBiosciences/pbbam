@@ -51,8 +51,8 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation o
     int seqLength = 0;
     float matches = 0;
     std::string pretty;
-    Data::Position refCoord = record.ReferenceStart();
-    Data::Position seqCoord = BAM::IsCcsOrTranscript(record.Type()) ? 0 : record.QueryStart();
+    Position refCoord = record.ReferenceStart();
+    Position seqCoord = BAM::IsCcsOrTranscript(record.Type()) ? 0 : record.QueryStart();
 
     for (size_t i = 0; i < seq.size();) {
         auto refCoordStr = std::to_string(refCoord);

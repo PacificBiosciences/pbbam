@@ -13,8 +13,6 @@
 
 #include <pbcopper/data/Position.h>
 
-#ifndef PBBAM_NODEPRECATED_API
-
 namespace PacBio {
 namespace BAM {
 
@@ -33,7 +31,5 @@ static const Position UnmappedPosition{-1};
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#endif  // PBBAM_NODEPRECATED_API
 
 #endif  // POSITION_H

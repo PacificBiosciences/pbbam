@@ -25,9 +25,8 @@ class IndexedFastqBgzfReader final : public IndexedFastqReaderImpl
 public:
     IndexedFastqBgzfReader(std::string filename);
 
-    std::pair<std::string, Data::QualityValues> Subsequence(const std::string& id,
-                                                            Data::Position start,
-                                                            Data::Position end) final;
+    std::pair<std::string, QualityValues> Subsequence(const std::string& id, Position start,
+                                                      Position end) final;
 
 private:
     int FetchRecord();

@@ -13,20 +13,20 @@
 namespace PacBio {
 namespace BAM {
 
-void ClipToQuery(Data::SimpleRead& read, Data::Position start, Data::Position end)
+void ClipToQuery(SimpleRead& read, Position start, Position end)
 {
-    Data::ClipToQuery(read, start, end);
+    PacBio::Data::ClipToQuery(read, start, end);
 }
 
-void ClipToQuery(Data::MappedSimpleRead& read, Data::Position start, Data::Position end)
+void ClipToQuery(MappedSimpleRead& read, Position start, Position end)
 {
-    Data::ClipToQuery(read, start, end);
+    PacBio::Data::ClipToQuery(read, start, end);
 }
 
-void ClipToReference(Data::MappedSimpleRead& read, Data::Position start, Data::Position end,
+void ClipToReference(MappedSimpleRead& read, Position start, Position end,
                      bool exciseFlankingInserts)
 {
-    Data::ClipToReference(read, start, end, exciseFlankingInserts);
+    PacBio::Data::ClipToReference(read, start, end, exciseFlankingInserts);
 }
 
 }  // namespace BAM

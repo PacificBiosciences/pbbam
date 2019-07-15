@@ -14,8 +14,6 @@
 
 #include <pbcopper/data/CigarOperation.h>
 
-#ifndef PBBAM_NODEPRECATED_API
-
 namespace PacBio {
 namespace BAM {
 
@@ -27,7 +25,5 @@ constexpr auto ConsumesReference = PacBio::Data::ConsumesReference;
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#endif  // PBBAM_NODEPRECATED_API
 
 #endif  // CIGAROPERATION_H

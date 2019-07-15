@@ -15,7 +15,7 @@
 
 #include <htslib/hts.h>
 
-#include <pbcopper/data/Position.h>
+#include "pbbam/Position.h"
 
 namespace PacBio {
 namespace BAM {
@@ -41,8 +41,8 @@ public:
     ///
     /// \note Does not own the returned pointer; caller is responsible.
     ///
-    hts_itr_t* IteratorForInterval(const int32_t refId, const Data::Position start,
-                                   const Data::Position stop) const;
+    hts_itr_t* IteratorForInterval(const int32_t refId, const Position start,
+                                   const Position stop) const;
 
 private:
     struct BaiIndexCacheDataPrivate;

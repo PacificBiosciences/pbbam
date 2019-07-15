@@ -19,6 +19,8 @@
 
 #include "pbbam/FastqReader.h"
 #include "pbbam/Orientation.h"
+#include "pbbam/Position.h"
+#include "pbbam/QualityValues.h"
 
 #include "internal/QueryBase.h"
 
@@ -63,9 +65,8 @@ public:
     ///
     /// \throws std::runtime_error on failure to fetch data
     ///
-    std::pair<std::string, Data::QualityValues> Subsequence(const std::string& id,
-                                                            Data::Position start,
-                                                            Data::Position end);
+    std::pair<std::string, QualityValues> Subsequence(const std::string& id, Position start,
+                                                      Position end);
 
     /// \brief Fetches sequence & qualities for desired interval.
     ///
@@ -75,7 +76,7 @@ public:
     ///
     /// \throws std::runtime_error on failure to fetch data
     ///
-    std::pair<std::string, Data::QualityValues> Subsequence(const GenomicInterval& interval);
+    std::pair<std::string, QualityValues> Subsequence(const GenomicInterval& interval);
 
     /// \brief Fetches sequence & qualities sequence corresponding to a BamRecord, oriented and
     ///        gapped as requested.
@@ -96,7 +97,7 @@ public:
     ///
     /// \throws std::runtime_error on failure to fetch data
     ///
-    std::pair<std::string, Data::QualityValues> ReferenceSubsequence(
+    std::pair<std::string, QualityValues> ReferenceSubsequence(
         const BamRecord& bamRecord, const Orientation orientation = Orientation::GENOMIC,
         const bool gapped = false, const bool exciseSoftClips = false);
 

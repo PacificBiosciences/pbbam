@@ -13,9 +13,8 @@
 #include <vector>
 
 #include <pbcopper/data/Cigar.h>
-#include <pbcopper/data/CigarOperation.h>
 
-#ifndef PBBAM_NODEPRECATED_API
+#include "pbbam/CigarOperation.h"
 
 namespace PacBio {
 namespace BAM {
@@ -26,7 +25,5 @@ constexpr auto ReferenceLength = PacBio::Data::ReferenceLength;
 
 }  // namespace BAM
 }  // namespace PacBio
-
-#endif  // PBBAM_NODEPRECATED_API
 
 #endif  // CIGAR_H
