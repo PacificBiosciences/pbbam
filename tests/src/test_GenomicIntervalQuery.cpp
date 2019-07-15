@@ -168,7 +168,7 @@ TEST(GenomicIntervalQueryTest, CanReuseBaiIndexCache)
         query.Interval(interval);
 
         // checkout results
-        std::vector<Position> startPositions;
+        std::vector<Data::Position> startPositions;
         for (const BamRecord& r : query) {
             EXPECT_EQ(interval.Name(), r.ReferenceName());
             EXPECT_TRUE(r.ReferenceStart() < interval.Stop());

@@ -107,7 +107,7 @@ void PbiRawMappedData::AddRecord(const BamRecord& b)
     tEnd_.push_back(b.ReferenceEnd());
     aStart_.push_back(b.AlignedStart());
     aEnd_.push_back(b.AlignedEnd());
-    revStrand_.push_back((b.AlignedStrand() == Strand::REVERSE ? 1 : 0));
+    revStrand_.push_back((b.AlignedStrand() == Data::Strand::REVERSE ? 1 : 0));
     mapQV_.push_back(b.MapQuality());
 
     const auto matchesAndMismatches = b.NumMatchesAndMismatches();

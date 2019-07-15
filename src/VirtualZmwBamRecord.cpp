@@ -40,7 +40,6 @@ VirtualZmwBamRecord::VirtualZmwBamRecord(std::vector<BamRecord> unorderedSources
 {
     // Sort sources by queryStart,queryEnd
     std::sort(sources_.begin(), sources_.end(), [](const BamRecord& l1, const BamRecord& l2) {
-
         const auto l1_qStart = l1.QueryStart();
         const auto l1_qEnd = l1.QueryEnd();
         const auto l2_qStart = l2.QueryStart();
@@ -57,11 +56,11 @@ bool VirtualZmwBamRecord::HasVirtualRegionType(const VirtualRegionType regionTyp
     return virtualRegionsMap_.find(regionType) != virtualRegionsMap_.end();
 }
 
-Frames VirtualZmwBamRecord::IPDV1Frames(Orientation orientation) const
+Data::Frames VirtualZmwBamRecord::IPDV1Frames(Orientation orientation) const
 {
     const auto rawFrames = this->IPDRaw(orientation);
     const std::vector<uint8_t> rawData(rawFrames.Data().begin(), rawFrames.Data().end());
-    return Frames::Decode(rawData);
+    return Data::Frames::Decode(rawData);
 }
 
 void VirtualZmwBamRecord::StitchSources()
@@ -75,23 +74,23 @@ void VirtualZmwBamRecord::StitchSources()
     std::string alternativeLabelTag;
     std::string pulseCall;
 
-    QualityValues qualities;
-    QualityValues deletionQv;
-    QualityValues insertionQv;
-    QualityValues mergeQv;
-    QualityValues pulseMergeQv;
-    QualityValues substitutionQv;
-    QualityValues labelQv;
-    QualityValues alternativeLabelQv;
+    Data::QualityValues qualities;
+    Data::QualityValues deletionQv;
+    Data::QualityValues insertionQv;
+    Data::QualityValues mergeQv;
+    Data::QualityValues pulseMergeQv;
+    Data::QualityValues substitutionQv;
+    Data::QualityValues labelQv;
+    Data::QualityValues alternativeLabelQv;
 
-    Frames ipd;
-    Frames pw;
-    Frames pd;
-    Frames px;
+    Data::Frames ipd;
+    Data::Frames pw;
+    Data::Frames pd;
+    Data::Frames px;
     std::vector<float> pa;
     std::vector<float> pm;
     std::vector<uint32_t> sf;
-    std::vector<PacBio::BAM::PulseExclusionReason> pe;
+    std::vector<BAM::PulseExclusionReason> pe;
 
     // initialize capacity
     const auto stitchedSize = lastRecord.QueryEnd() - firstRecord.QueryStart();

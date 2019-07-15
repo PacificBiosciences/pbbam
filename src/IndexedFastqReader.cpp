@@ -27,13 +27,13 @@ namespace BAM {
 
 namespace {
 
-void ClipAndGapify(std::pair<std::string, QualityValues>& seqQual, const Cigar& cigar,
+void ClipAndGapify(std::pair<std::string, Data::QualityValues>& seqQual, const Data::Cigar& cigar,
                    bool exciseSoftClips)
 {
     auto& subseq = seqQual.first;
     auto subQual = seqQual.second.Fastq();
 
-    const char nullQual = QualityValue{0}.Fastq();
+    const char nullQual = Data::QualityValue{0}.Fastq();
 
     size_t seqIndex = 0;
     for (const auto& op : cigar) {
@@ -41,10 +41,10 @@ void ClipAndGapify(std::pair<std::string, QualityValues>& seqQual, const Cigar& 
         const auto opLength = op.Length();
 
         // do nothing for hard clips
-        if (type == CigarOperationType::HARD_CLIP) continue;
+        if (type == Data::CigarOperationType::HARD_CLIP) continue;
 
         // maybe remove soft clips
-        if (type == CigarOperationType::SOFT_CLIP) {
+        if (type == Data::CigarOperationType::SOFT_CLIP) {
             if (!exciseSoftClips) {
                 subseq.reserve(subseq.size() + opLength);
                 subseq.insert(seqIndex, opLength, '-');
@@ -57,12 +57,12 @@ void ClipAndGapify(std::pair<std::string, QualityValues>& seqQual, const Cigar& 
         // for non-clipping operations
         else {
             // maybe add gaps/padding
-            if (type == CigarOperationType::INSERTION) {
+            if (type == Data::CigarOperationType::INSERTION) {
                 subseq.reserve(subseq.size() + opLength);
                 subseq.insert(seqIndex, opLength, '-');
                 subQual.reserve(subseq.size() + opLength);
                 subQual.insert(seqIndex, opLength, nullQual);
-            } else if (type == CigarOperationType::PADDING) {
+            } else if (type == Data::CigarOperationType::PADDING) {
                 subseq.reserve(subseq.size() + opLength);
                 subseq.insert(seqIndex, opLength, '*');
                 subQual.reserve(subseq.size() + opLength);
@@ -74,7 +74,7 @@ void ClipAndGapify(std::pair<std::string, QualityValues>& seqQual, const Cigar& 
         }
     }
 
-    seqQual.second = QualityValues::FromFastq(subQual);
+    seqQual.second = Data::QualityValues::FromFastq(subQual);
 }
 
 std::unique_ptr<IndexedFastqReaderImpl> MakeReaderImpl(std::string filename)
@@ -152,7 +152,7 @@ std::string IndexedFastqReader::Name(const size_t idx) const { return d_->index_
 
 int IndexedFastqReader::NumSequences() const { return d_->index_.Names().size(); }
 
-std::pair<std::string, QualityValues> IndexedFastqReader::ReferenceSubsequence(
+std::pair<std::string, Data::QualityValues> IndexedFastqReader::ReferenceSubsequence(
     const BamRecord& bamRecord, const Orientation orientation, const bool gapped,
     const bool exciseSoftClips)
 {
@@ -182,13 +182,14 @@ int IndexedFastqReader::SequenceLength(const std::string& name) const
     return static_cast<int>(entry.Length);
 }
 
-std::pair<std::string, QualityValues> IndexedFastqReader::Subsequence(const std::string& id,
-                                                                      Position start, Position end)
+std::pair<std::string, Data::QualityValues> IndexedFastqReader::Subsequence(const std::string& id,
+                                                                            Data::Position start,
+                                                                            Data::Position end)
 {
     return d_->Subsequence(id, start, end);
 }
 
-std::pair<std::string, QualityValues> IndexedFastqReader::Subsequence(
+std::pair<std::string, Data::QualityValues> IndexedFastqReader::Subsequence(
     const GenomicInterval& interval)
 {
     return Subsequence(interval.Name(), interval.Start(), interval.Stop());

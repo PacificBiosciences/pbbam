@@ -172,8 +172,8 @@ TEST(BamRecordImplVariableDataTest, CigarOnly_InitEmpty)
 
 TEST(BamRecordImplVariableDataTest, CigarOnly_InitNormal_CigarObject)
 {
-    Cigar cigar;
-    cigar.push_back(CigarOperation('=', 100));
+    Data::Cigar cigar;
+    cigar.push_back(Data::CigarOperation('=', 100));
 
     BamRecordImpl bam;
     bam.CigarData(cigar);

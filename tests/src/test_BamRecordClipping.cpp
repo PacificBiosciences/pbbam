@@ -36,8 +36,8 @@ ReadGroupInfo MakeReadGroup(const FrameCodec codec,
 }
 
 static
-BamRecord MakeRecord(const Position qStart,
-                     const Position qEnd,
+BamRecord MakeRecord(const Data::Position qStart,
+                     const Data::Position qEnd,
                      const std::string& seq,
                      const std::string& quals,
                      const std::string& tagBases,
@@ -126,8 +126,8 @@ BamRecord MakeCCSRecord(const std::string& seq,
 
 TEST(BamRecordClippingTest, ClipToQuery_Basic)
 {
-    const Position qStart  = 500;
-    const Position qEnd    = 510;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 510;
     const std::string seq       = "AACCGTTAGC";
     const std::string quals     = "?]?]?]?]?*";
     const std::string tagBases  = "AACCGTTAGC";
@@ -139,12 +139,12 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     const std::string pulseQuals  = "==?=]==?]?====]?]===?*=";
     const f_data pulseFrames = { 0,0,10,0,10,0,0,20,20,30,0,0,0,0,40,40,10,0,0,0,30,20,0 };
 
-    const int32_t  tId     = 0;
-    const Position tPos    = 100;
-    const uint8_t  mapQual = 80;
+    const int32_t tId         = 0;
+    const Data::Position tPos = 100;
+    const uint8_t mapQual     = 80;
 
-    const Position clipStart = 502;
-    const Position clipEnd   = 509;
+    const Data::Position clipStart = 502;
+    const Data::Position clipEnd   = 509;
 
     const std::string seq_clipped      = "CCGTTAG";
     const std::string quals_clipped    = "?]?]?]?";
@@ -196,10 +196,10 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
         EXPECT_FALSE(s0.IsMapped());
         EXPECT_EQ(clipStart, s0.QueryStart());
         EXPECT_EQ(clipEnd,   s0.QueryEnd());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.AlignedStart());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.AlignedEnd());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.ReferenceStart());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.ReferenceEnd());
+        EXPECT_EQ(Data::UnmappedPosition, s0.AlignedStart());
+        EXPECT_EQ(Data::UnmappedPosition, s0.AlignedEnd());
+        EXPECT_EQ(Data::UnmappedPosition, s0.ReferenceStart());
+        EXPECT_EQ(Data::UnmappedPosition, s0.ReferenceEnd());
 
         const BamRecordView view
         {
@@ -222,11 +222,11 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     {
         SCOPED_TRACE("s1 - FORWARD");
 
-        BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
+        BamRecord s1 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s1_cigar, mapQual);
         s1.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s1.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s1.AlignedStrand());
         EXPECT_EQ(clipStart, s1.QueryStart());
         EXPECT_EQ(clipEnd,   s1.QueryEnd());
         EXPECT_EQ(clipStart, s1.AlignedStart());   // queryStart (no soft clips)
@@ -257,10 +257,10 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     {
         SCOPED_TRACE("s1 - REVERSE");
 
-        BamRecord s1_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s1_cigar, mapQual);
+        BamRecord s1_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s1_cigar, mapQual);
 
         EXPECT_TRUE(s1_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s1_rev.AlignedStrand());
         EXPECT_EQ(500,  s1_rev.QueryStart());
         EXPECT_EQ(510,  s1_rev.QueryEnd());
         EXPECT_EQ(500,  s1_rev.AlignedStart());    // queryStart (no soft clips)
@@ -271,7 +271,7 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
 
         s1_rev.Clip(ClipType::CLIP_TO_QUERY, 502, 509);
         EXPECT_TRUE(s1_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s1_rev.AlignedStrand());
         EXPECT_EQ(502, s1_rev.QueryStart());
         EXPECT_EQ(509, s1_rev.QueryEnd());
         EXPECT_EQ(502, s1_rev.AlignedStart());    // queryStart (no soft clips)
@@ -300,11 +300,11 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     {
         SCOPED_TRACE("s2 - FORWARD");
 
-        BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
+        BamRecord s2 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s2_cigar, mapQual);
         s2.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s2.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s2.AlignedStrand());
         EXPECT_EQ(clipStart, s2.QueryStart());
         EXPECT_EQ(clipEnd,   s2.QueryEnd());
         EXPECT_EQ(clipStart, s2.AlignedStart());   // queryStart (no soft clips)
@@ -334,11 +334,11 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     {
         SCOPED_TRACE("s2 - REVERSE");
 
-        BamRecord s2_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s2_cigar, mapQual);
+        BamRecord s2_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s2_cigar, mapQual);
         s2_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s2_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s2_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s2_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s2_rev.QueryEnd());
         EXPECT_EQ(clipStart, s2_rev.AlignedStart());    // queryStart (no soft clips)
@@ -369,11 +369,11 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     {
         SCOPED_TRACE("s3 - FORWARD");
 
-        BamRecord s3 = prototype.Mapped(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+        BamRecord s3 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
         s3.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s3.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
         EXPECT_EQ(clipStart, s3.QueryStart());
         EXPECT_EQ(clipEnd,   s3.QueryEnd());
         EXPECT_EQ(clipStart, s3.AlignedStart());     // queryStart (no soft clips)
@@ -404,11 +404,11 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     {
         SCOPED_TRACE("s3 - REVERSE");
 
-        BamRecord s3_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s3_cigar, mapQual);
+        BamRecord s3_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s3_cigar, mapQual);
         s3_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s3_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s3_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s3_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s3_rev.QueryEnd());
         EXPECT_EQ(clipStart, s3_rev.AlignedStart());     // queryStart (no soft clips)
@@ -440,23 +440,23 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
 
 TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 515;
-    const std::string seq      = "TTAACCGTTAGCAAA";
-    const std::string seq_rev  = "TTTGCTAACGGTTAA";
-    const std::string quals    = "--?]?]?]?]?*+++";
-    const std::string tagBases = "TTAACCGTTAGCAAA";
-    const std::string tagQuals = "--?]?]?]?]?*+++";
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 515;
+    const std::string seq       = "TTAACCGTTAGCAAA";
+    const std::string seq_rev   = "TTTGCTAACGGTTAA";
+    const std::string quals     = "--?]?]?]?]?*+++";
+    const std::string tagBases  = "TTAACCGTTAGCAAA";
+    const std::string tagQuals  = "--?]?]?]?]?*+++";
     const std::string tagQuals_rev = "+++*?]?]?]?]?--";
     const f_data frames   = { 40, 40, 10, 10, 20, 20, 30, 40, 40, 10, 30, 20, 10, 10, 10 };
     const f_data frames_rev = { 10, 10, 10, 20, 30, 10, 40, 40, 30, 20, 20, 10, 10, 40, 40 };
 
-    const int32_t  tId     = 0;
-    const Position tPos    = 100;
-    const uint8_t  mapQual = 80;
+    const int32_t tId         = 0;
+    const Data::Position tPos = 100;
+    const uint8_t mapQual     = 80;
 
-    const Position clipStart = 502;
-    const Position clipEnd   = 509;
+    const Data::Position clipStart = 502;
+    const Data::Position clipEnd   = 509;
 
     const std::string s1_cigar = "2S10=3S";
     const std::string s1_cigar_clipped = "7=";
@@ -506,7 +506,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     {
         SCOPED_TRACE("s1 - FORWARD");
 
-        BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
+        BamRecord s1 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s1_cigar, mapQual);
         EXPECT_TRUE(s1.IsMapped());
         EXPECT_EQ(100, s1.ReferenceStart());
         EXPECT_EQ(110, s1.ReferenceEnd()); // 10=
@@ -514,7 +514,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
         s1.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s1.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s1.AlignedStrand());
         EXPECT_EQ(clipStart, s1.QueryStart());
         EXPECT_EQ(clipEnd,   s1.QueryEnd());
         EXPECT_EQ(clipStart, s1.AlignedStart());    // queryStart (no soft clips left)
@@ -542,7 +542,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     {
         SCOPED_TRACE("s1 - REVERSE");
 
-        BamRecord s1_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s1_cigar, mapQual);
+        BamRecord s1_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s1_cigar, mapQual);
         EXPECT_TRUE(s1_rev.IsMapped());
         EXPECT_EQ(100, s1_rev.ReferenceStart());
         EXPECT_EQ(110, s1_rev.ReferenceEnd()); // 10=
@@ -550,7 +550,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
         s1_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s1_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s1_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s1_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s1_rev.QueryEnd());
         EXPECT_EQ(503, s1_rev.AlignedStart());    // queryStart (no soft clips)
@@ -578,7 +578,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     {
         SCOPED_TRACE("s2 - FORWARD");
 
-        BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
+        BamRecord s2 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s2_cigar, mapQual);
         EXPECT_TRUE(s2.IsMapped());
         EXPECT_EQ(100, s2.ReferenceStart());
         EXPECT_EQ(113, s2.ReferenceEnd());   // 5= + 3D + 5=
@@ -586,7 +586,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
         s2.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s2.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s2.AlignedStrand());
         EXPECT_EQ(clipStart, s2.QueryStart());
         EXPECT_EQ(clipEnd,   s2.QueryEnd());
         EXPECT_EQ(clipStart, s2.AlignedStart());    // queryStart (no soft clips left)
@@ -614,7 +614,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     {
         SCOPED_TRACE("s2 - REVERSE");
 
-        BamRecord s2_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s2_cigar, mapQual);
+        BamRecord s2_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s2_cigar, mapQual);
         EXPECT_TRUE(s2_rev.IsMapped());
         EXPECT_EQ(100, s2_rev.ReferenceStart());
         EXPECT_EQ(113, s2_rev.ReferenceEnd());   // 5= + 3D + 5=
@@ -622,7 +622,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
         s2_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s2_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s2_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s2_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s2_rev.QueryEnd());
         EXPECT_EQ(503, s2_rev.AlignedStart());    // queryStart (no soft clips left)
@@ -651,7 +651,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     {
         SCOPED_TRACE("s3 - FORWARD");
 
-        BamRecord s3 = prototype.Mapped(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+        BamRecord s3 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
         EXPECT_TRUE(s3.IsMapped());
         EXPECT_EQ(100, s3.ReferenceStart());
         EXPECT_EQ(111, s3.ReferenceEnd());   // 4= + 1D + 2D + 4=
@@ -659,7 +659,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
         s3.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s3.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
         EXPECT_EQ(clipStart, s3.QueryStart());
         EXPECT_EQ(clipEnd,   s3.QueryEnd());
         EXPECT_EQ(clipStart, s3.AlignedStart());    // queryStart (no soft clips left)
@@ -689,7 +689,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     {
         SCOPED_TRACE("s3 - REVERSE");
 
-        BamRecord s3_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s3_cigar, mapQual);
+        BamRecord s3_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s3_cigar, mapQual);
         EXPECT_TRUE(s3_rev.IsMapped());
         EXPECT_EQ(100, s3_rev.ReferenceStart());
         EXPECT_EQ(111, s3_rev.ReferenceEnd());   // 4= + 1D + 2D + 4=
@@ -697,7 +697,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
         s3_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s3_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s3_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s3_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s3_rev.QueryEnd());
         EXPECT_EQ(503, s3_rev.AlignedStart());    // queryStart + 1S
@@ -728,21 +728,21 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
 
 TEST(BamRecordClippingTest, ClipToReference_Basic)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 510;
-    const std::string seq      = "AACCGTTAGC";
-    const std::string quals    = "?]?]?]?]?*";
-    const std::string tagBases = "AACCGTTAGC";
-    const std::string tagQuals = "?]?]?]?]?*";
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 510;
+    const std::string seq       = "AACCGTTAGC";
+    const std::string quals     = "?]?]?]?]?*";
+    const std::string tagBases  = "AACCGTTAGC";
+    const std::string tagQuals  = "?]?]?]?]?*";
     const std::string tagQuals_rev = "*?]?]?]?]?";
     const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
 
-    const int32_t  tId     = 0;
-    const Position tPos    = 100;
-    const uint8_t  mapQual = 80;
+    const int32_t tId         = 0;
+    const Data::Position tPos = 100;
+    const uint8_t mapQual     = 80;
 
-    const Position clipStart = 102;
-    const Position clipEnd   = 107;
+    const Data::Position clipStart = 102;
+    const Data::Position clipEnd   = 107;
 
     const std::string s1_cigar = "10=";
     const std::string s1_cigar_clipped = "5=";
@@ -786,12 +786,12 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     const BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                                   seq, tagBases, tagQuals, frames);
     BamRecord s0 = prototype;
-    BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
-    BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
-    BamRecord s3 = prototype.Mapped(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
-    BamRecord s1_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s1_cigar, mapQual);
-    BamRecord s2_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s2_cigar, mapQual);
-    BamRecord s3_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s3_cigar, mapQual);
+    BamRecord s1 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s1_cigar, mapQual);
+    BamRecord s2 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s2_cigar, mapQual);
+    BamRecord s3 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
+    BamRecord s1_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s1_cigar, mapQual);
+    BamRecord s2_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s2_cigar, mapQual);
+    BamRecord s3_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s3_cigar, mapQual);
 
     s0.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd);
     s1.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd);
@@ -841,7 +841,7 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     {   // s1 - FORWARD
 
         EXPECT_TRUE(s1.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s1.AlignedStrand());
         EXPECT_EQ(502,   s1.QueryStart());
         EXPECT_EQ(507,   s1.QueryEnd());
         EXPECT_EQ(502,   s1.AlignedStart());       // queryStart (no soft clips)
@@ -872,7 +872,7 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     {   // s1 - REVERSE
 
         EXPECT_TRUE(s1_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s1_rev.AlignedStrand());
         EXPECT_EQ(503, s1_rev.QueryStart());
         EXPECT_EQ(508, s1_rev.QueryEnd());
         EXPECT_EQ(503, s1_rev.AlignedStart());          // queryStart (no soft clips)
@@ -903,7 +903,7 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     {   // s2 - FORWARD
 
         EXPECT_TRUE(s2.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s2.AlignedStrand());
         EXPECT_EQ(502, s2.QueryStart());
         EXPECT_EQ(505, s2.QueryEnd());
         EXPECT_EQ(502, s2.AlignedStart());     // queryStart (no soft clips)
@@ -934,7 +934,7 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     {   // s2 - REVERSE
 
         EXPECT_TRUE(s2_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s2_rev.AlignedStrand());
         EXPECT_EQ(505, s2_rev.QueryStart());
         EXPECT_EQ(508, s2_rev.QueryEnd());
         EXPECT_EQ(505, s2_rev.AlignedStart());    // queryStart (no soft clips)
@@ -965,7 +965,7 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     {   // s3 - FORWARD
 
         EXPECT_TRUE(s3.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
         EXPECT_EQ(502, s3.QueryStart());
         EXPECT_EQ(506, s3.QueryEnd());
         EXPECT_EQ(502, s3.AlignedStart());     // queryStart (no soft clips)
@@ -996,7 +996,7 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     {   // s3 - REVERSE
 
         EXPECT_TRUE(s3_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s3_rev.AlignedStrand());
         EXPECT_EQ(504, s3_rev.QueryStart());
         EXPECT_EQ(508, s3_rev.QueryEnd());
         EXPECT_EQ(504, s3_rev.AlignedStart());     // queryStart (no soft clips)
@@ -1027,21 +1027,21 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
 
 TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 515;
-    const std::string seq      = "TTAACCGTTAGCAAA";
-    const std::string quals    = "--?]?]?]?]?*+++";
-    const std::string tagBases = "TTAACCGTTAGCAAA";
-    const std::string tagQuals = "--?]?]?]?]?*+++";
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 515;
+    const std::string seq       = "TTAACCGTTAGCAAA";
+    const std::string quals     = "--?]?]?]?]?*+++";
+    const std::string tagBases  = "TTAACCGTTAGCAAA";
+    const std::string tagQuals  = "--?]?]?]?]?*+++";
     const std::string tagQuals_rev = "+++*?]?]?]?]?--";
     const f_data frames   = { 40, 40, 10, 10, 20, 20, 30, 40, 40, 10, 30, 20, 10, 10, 10 };
 
-    const int32_t  tId     = 0;
-    const Position tPos    = 100;
-    const uint8_t  mapQual = 80;
+    const int32_t tId         = 0;
+    const Data::Position tPos = 100;
+    const uint8_t mapQual     = 80;
 
-    const Position clipStart = 102;
-    const Position clipEnd   = 107;
+    const Data::Position clipStart = 102;
+    const Data::Position clipEnd   = 107;
 
     const std::string seq_rev      = "TTTGCTAACGGTTAA";
     const std::string quals_rev    = "+++*?]?]?]?]?--";
@@ -1089,12 +1089,12 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     const BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                                   seq, tagBases, tagQuals, frames);
     BamRecord s0 = prototype;
-    BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
-    BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
-    BamRecord s3 = prototype.Mapped(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
-    BamRecord s1_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s1_cigar, mapQual);
-    BamRecord s2_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s2_cigar, mapQual);
-    BamRecord s3_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s3_cigar, mapQual);
+    BamRecord s1 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s1_cigar, mapQual);
+    BamRecord s2 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s2_cigar, mapQual);
+    BamRecord s3 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
+    BamRecord s1_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s1_cigar, mapQual);
+    BamRecord s2_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s2_cigar, mapQual);
+    BamRecord s3_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s3_cigar, mapQual);
 
     // sanity checks before clipping
     EXPECT_FALSE(s0.IsMapped());
@@ -1195,7 +1195,7 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     {   // s1 - FORWARD
 
         EXPECT_TRUE(s1.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s1.AlignedStrand());
         EXPECT_EQ(504,   s1.QueryStart());         // new queryStart
         EXPECT_EQ(509,   s1.QueryEnd());           // queryStart + new seqLength
         EXPECT_EQ(504,   s1.AlignedStart());       // queryStart (no soft clips remaining)
@@ -1226,7 +1226,7 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     {   // s1 - REVERSE
 
         EXPECT_TRUE(s1_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s1_rev.AlignedStrand());
         EXPECT_EQ(506,   s1_rev.QueryStart());         // new queryStart
         EXPECT_EQ(511,   s1_rev.QueryEnd());           // queryStart + new seqLength
         EXPECT_EQ(506,   s1_rev.AlignedStart());       // queryStart (no soft clips remaining)
@@ -1257,7 +1257,7 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     {   // s2 - FORWARD
 
         EXPECT_TRUE(s2.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s2.AlignedStrand());
         EXPECT_EQ(504, s2.QueryStart());
         EXPECT_EQ(507, s2.QueryEnd());
         EXPECT_EQ(504, s2.AlignedStart());     // queryStart (no soft clips)
@@ -1288,7 +1288,7 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     {   // s2 - REVERSE
 
         EXPECT_TRUE(s2_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s2_rev.AlignedStrand());
         EXPECT_EQ(508,   s2_rev.QueryStart());         // new queryStart
         EXPECT_EQ(511,   s2_rev.QueryEnd());           // queryStart + new seqLength
         EXPECT_EQ(508,   s2_rev.AlignedStart());       // queryStart (no soft clips remaining)
@@ -1318,7 +1318,7 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
 
     {   // s3 - FORWARD
         EXPECT_TRUE(s3.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
         EXPECT_EQ(504, s3.QueryStart());
         EXPECT_EQ(508, s3.QueryEnd());
         EXPECT_EQ(504, s3.AlignedStart());     // queryStart (no soft clips)
@@ -1348,7 +1348,7 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
 
     {   // s3 - REVERSE
         EXPECT_TRUE(s3_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s3_rev.AlignedStrand());
         EXPECT_EQ(507,   s3_rev.QueryStart());         // new queryStart
         EXPECT_EQ(511,   s3_rev.QueryEnd());           // queryStart + new seqLength
         EXPECT_EQ(507,   s3_rev.AlignedStart());       // queryStart (no soft clips remaining)
@@ -1379,13 +1379,13 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
 
 TEST(BamRecordClippingTest, ClippedToQueryCopy)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 510;
-    const int32_t  tId     = 0;
-    const Position tPos    = 100;
-    const uint8_t  mapQual = 80;
-    const Position clipStart = 502;
-    const Position clipEnd   = 509;
+    const Data::Position qStart    = 500;
+    const Data::Position qEnd      = 510;
+    const int32_t        tId       = 0;
+    const Data::Position tPos      = 100;
+    const uint8_t        mapQual   = 80;
+    const Data::Position clipStart = 502;
+    const Data::Position clipEnd   = 509;
 
     const std::string seq      = "AACCGTTAGC";
     const std::string quals    = "?]?]?]?]?*";
@@ -1404,12 +1404,12 @@ TEST(BamRecordClippingTest, ClippedToQueryCopy)
 
     BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                             seq, tagBases, tagQuals, frames);
-    prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+    prototype.Map(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
 
     BamRecord s3 = prototype.Clipped(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
     EXPECT_TRUE(s3.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
     EXPECT_EQ(clipStart, s3.QueryStart());
     EXPECT_EQ(clipEnd,   s3.QueryEnd());
     EXPECT_EQ(clipStart, s3.AlignedStart());     // queryStart (no soft clips)
@@ -1439,18 +1439,18 @@ TEST(BamRecordClippingTest, ClippedToQueryCopy)
 
 TEST(BamRecordClippingTest, ClippedToReferenceCopy)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 510;
-    const std::string seq      = "AACCGTTAGC";
-    const std::string quals    = "?]?]?]?]?*";
-    const std::string tagBases = "AACCGTTAGC";
-    const std::string tagQuals = "?]?]?]?]?*";
-    const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
-    const int32_t  tId     = 0;
-    const Position tPos    = 100;
-    const uint8_t  mapQual = 80;
-    const Position clipStart = 102;
-    const Position clipEnd   = 107;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 510;
+    const std::string seq       = "AACCGTTAGC";
+    const std::string quals     = "?]?]?]?]?*";
+    const std::string tagBases  = "AACCGTTAGC";
+    const std::string tagQuals  = "?]?]?]?]?*";
+    const f_data frames         = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
+    const int32_t tId           = 0;
+    const Data::Position tPos   = 100;
+    const uint8_t mapQual       = 80;
+    const Data::Position clipStart = 102;
+    const Data::Position clipEnd   = 107;
 
     const std::string s3_cigar = "4=1D2I2D4=";
     const std::string s3_cigar_clipped = "2=1D2I2D";
@@ -1462,13 +1462,13 @@ TEST(BamRecordClippingTest, ClippedToReferenceCopy)
 
     BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                             seq, tagBases, tagQuals, frames);
-    prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+    prototype.Map(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
 
     const BamRecord s3 = prototype.Clipped(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd);
 
     // s3 - FORWARD
     EXPECT_TRUE(s3.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
     EXPECT_EQ(502, s3.QueryStart());
     EXPECT_EQ(506, s3.QueryEnd());
     EXPECT_EQ(502, s3.AlignedStart());     // queryStart (no soft clips)
@@ -1498,13 +1498,13 @@ TEST(BamRecordClippingTest, ClippedToReferenceCopy)
 
 TEST(BamRecordClippingTest, StaticClippedToQuery)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 510;
-    const int32_t  tId     = 0;
-    const Position tPos    = 100;
-    const uint8_t  mapQual = 80;
-    const Position clipStart = 502;
-    const Position clipEnd   = 509;
+    const Data::Position qStart    = 500;
+    const Data::Position qEnd      = 510;
+    const int32_t tId              = 0;
+    const Data::Position tPos      = 100;
+    const uint8_t mapQual          = 80;
+    const Data::Position clipStart = 502;
+    const Data::Position clipEnd   = 509;
 
     const std::string seq      = "AACCGTTAGC";
     const std::string quals    = "?]?]?]?]?*";
@@ -1523,12 +1523,12 @@ TEST(BamRecordClippingTest, StaticClippedToQuery)
 
     BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                             seq, tagBases, tagQuals, frames);
-    prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+    prototype.Map(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
 
     const BamRecord s3 = BamRecord::Clipped(prototype, ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
     EXPECT_TRUE(s3.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
     EXPECT_EQ(clipStart, s3.QueryStart());
     EXPECT_EQ(clipEnd,   s3.QueryEnd());
     EXPECT_EQ(clipStart, s3.AlignedStart());     // queryStart (no soft clips)
@@ -1558,18 +1558,18 @@ TEST(BamRecordClippingTest, StaticClippedToQuery)
 
 TEST(BamRecordClippingTest, StaticClippedToReference)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 510;
-    const std::string seq      = "AACCGTTAGC";
-    const std::string quals    = "?]?]?]?]?*";
-    const std::string tagBases = "AACCGTTAGC";
-    const std::string tagQuals = "?]?]?]?]?*";
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 510;
+    const std::string seq       = "AACCGTTAGC";
+    const std::string quals     = "?]?]?]?]?*";
+    const std::string tagBases  = "AACCGTTAGC";
+    const std::string tagQuals  = "?]?]?]?]?*";
     const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
-    const int32_t  tId     = 0;
-    const Position tPos    = 100;
-    const uint8_t  mapQual = 80;
-    const Position clipStart = 102;
-    const Position clipEnd   = 107;
+    const int32_t tId              = 0;
+    const Data::Position tPos      = 100;
+    const uint8_t mapQual          = 80;
+    const Data::Position clipStart = 102;
+    const Data::Position clipEnd   = 107;
 
     const std::string s3_cigar = "4=1D2I2D4=";
     const std::string s3_cigar_clipped = "2=1D2I2D";
@@ -1581,13 +1581,13 @@ TEST(BamRecordClippingTest, StaticClippedToReference)
 
     BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                             seq, tagBases, tagQuals, frames);
-    prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+    prototype.Map(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
 
     const BamRecord s3 = BamRecord::Clipped(prototype, ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd);
 
     // s3 - FORWARD
     EXPECT_TRUE(s3.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
     EXPECT_EQ(502, s3.QueryStart());
     EXPECT_EQ(506, s3.QueryEnd());
     EXPECT_EQ(502, s3.AlignedStart());     // queryStart (no soft clips)
@@ -1617,12 +1617,12 @@ TEST(BamRecordClippingTest, StaticClippedToReference)
 
 TEST(BamRecordTest, ClipCigarData)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 515;
-    const std::string seq      = "TTAACCGTTAGCAAA";
-    const std::string quals    = "--?]?]?]?]?*+++";
-    const std::string tagBases = "TTAACCGTTAGCAAA";
-    const std::string tagQuals = "--?]?]?]?]?*+++";
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 515;
+    const std::string seq       = "TTAACCGTTAGCAAA";
+    const std::string quals     = "--?]?]?]?]?*+++";
+    const std::string tagBases  = "TTAACCGTTAGCAAA";
+    const std::string tagQuals  = "--?]?]?]?]?*+++";
     const f_data frames   = { 40, 40, 10, 10, 20, 20, 30, 40, 40, 10, 30, 20, 10, 10, 10 };
     const uint8_t mapQual = 80;
     BamRecord s3 = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
@@ -1631,11 +1631,11 @@ TEST(BamRecordTest, ClipCigarData)
                                          seq, tagBases, tagQuals, frames);
 
     const std::string s3_cigar = "5H2S4=1D2I2D4=3S7H";
-    s3.Map(0, 100, Strand::FORWARD, s3_cigar, mapQual);
-    s3_rev.Map(0, 100, Strand::REVERSE, s3_cigar, mapQual);
+    s3.Map(0, 100, Data::Strand::FORWARD, s3_cigar, mapQual);
+    s3_rev.Map(0, 100, Data::Strand::REVERSE, s3_cigar, mapQual);
 
-    const Cigar s3_cigar_raw     = s3.CigarData();
-    const Cigar s3_cigar_clipped = s3.CigarData(true);
+    const Data::Cigar s3_cigar_raw     = s3.CigarData();
+    const Data::Cigar s3_cigar_clipped = s3.CigarData(true);
 
     EXPECT_EQ(s3_cigar, s3_cigar_raw.ToStdString());
     EXPECT_EQ(std::string("4=1D2I2D4="), s3_cigar_clipped.ToStdString());
@@ -1643,11 +1643,11 @@ TEST(BamRecordTest, ClipCigarData)
 
 TEST(BamRecordTest, CCS_ClipToQuery)
 {
-    const int32_t  tId     = 0;
-    const Position tPos    = 100;
-    const uint8_t  mapQual = 80;
-    const Position clipStart = 2;
-    const Position clipEnd   = 9;
+    const int32_t tId              = 0;
+    const Data::Position tPos      = 100;
+    const uint8_t mapQual          = 80;
+    const Data::Position clipStart = 2;
+    const Data::Position clipEnd   = 9;
 
     const std::string seq      = "AACCGTTAGC";
     const std::string quals    = "?]?]?]?]?*";
@@ -1666,12 +1666,12 @@ TEST(BamRecordTest, CCS_ClipToQuery)
 
     BamRecord prototype = BamRecordClippingTests::MakeCCSRecord(seq, quals, tagBases, tagQuals, frames,
                                                seq, tagBases, tagQuals, frames);
-    prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+    prototype.Map(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
 
     BamRecord s3 = prototype.Clipped(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
     EXPECT_TRUE(s3.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
     EXPECT_EQ(0,   s3.AlignedStart());     // record start (no soft clips)
     EXPECT_EQ(7,   s3.AlignedEnd());       // alignStart + clipped seqLength
     EXPECT_EQ(102, s3.ReferenceStart());         // 100 + startOffset
@@ -1704,11 +1704,11 @@ TEST(BamRecordTest, CCS_ClipToReference)
     const std::string tagBases = "AACCGTTAGC";
     const std::string tagQuals = "?]?]?]?]?*";
     const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
-    const int32_t  tId     = 0;
-    const Position tPos    = 100;
-    const uint8_t  mapQual = 80;
-    const Position clipStart = 102;
-    const Position clipEnd   = 107;
+    const int32_t tId         = 0;
+    const Data::Position tPos = 100;
+    const uint8_t mapQual     = 80;
+    const Data::Position clipStart = 102;
+    const Data::Position clipEnd   = 107;
 
     const std::string s3_cigar = "4=1D2I2D4=";
     const std::string s3_cigar_clipped = "2=1D2I2D";
@@ -1720,12 +1720,12 @@ TEST(BamRecordTest, CCS_ClipToReference)
 
     BamRecord prototype = BamRecordClippingTests::MakeCCSRecord(seq, quals, tagBases, tagQuals, frames,
                                                seq, tagBases, tagQuals, frames);
-    prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+    prototype.Map(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
 
     const BamRecord s3 = BamRecord::Clipped(prototype, ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd);
 
     EXPECT_TRUE(s3.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
     EXPECT_EQ(0, s3.AlignedStart());     // record tart (no soft clips)
     EXPECT_EQ(4, s3.AlignedEnd());       // alignStart + clipped seqLength (4)
     EXPECT_EQ(clipStart, s3.ReferenceStart());   // clipStart
@@ -1753,25 +1753,25 @@ TEST(BamRecordTest, CCS_ClipToReference)
 
 TEST(BamRecordTest, ClipEncodedFrames)
 {
-    const Position qStart  = 500;
-    const Position qEnd    = 510;
-    const std::string seq       = "AACCGTTAGC";
-    const std::string quals     = "?]?]?]?]?*";
-    const std::string tagBases  = "AACCGTTAGC";
-    const std::string tagQuals  = "?]?]?]?]?*";
-    const f_data frames    = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
+    const Data::Position qStart  = 500;
+    const Data::Position qEnd    = 510;
+    const std::string seq        = "AACCGTTAGC";
+    const std::string quals      = "?]?]?]?]?*";
+    const std::string tagBases   = "AACCGTTAGC";
+    const std::string tagQuals   = "?]?]?]?]?*";
+    const f_data frames = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
 
     const std::string pulseCall   = "ttAaAtaCCGggatTTAcatGCt";
     const std::string pulseBases  = pulseCall;
     const std::string pulseQuals  = "==?=]==?]?====]?]===?*=";
     const f_data pulseFrames = { 0,0,10,0,10,0,0,20,20,30,0,0,0,0,40,40,10,0,0,0,30,20,0 };
 
-    const int32_t  tId     = 0;
-    const Position tPos    = 100;
-    const uint8_t  mapQual = 80;
+    const int32_t tId         = 0;
+    const Data::Position tPos = 100;
+    const uint8_t mapQual     = 80;
 
-    const Position clipStart = 502;
-    const Position clipEnd   = 509;
+    const Data::Position clipStart = 502;
+    const Data::Position clipEnd   = 509;
 
     const std::string seq_clipped      = "CCGTTAG";
     const std::string quals_clipped    = "?]?]?]?";
@@ -1815,12 +1815,12 @@ TEST(BamRecordTest, ClipEncodedFrames)
                                                   pulseCall, pulseBases, pulseQuals, pulseFrames, FrameCodec::V1);
 
     BamRecord s0 = prototype; // unmapped record
-    BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
-    BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
-    BamRecord s3 = prototype.Mapped(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
-    BamRecord s1_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s1_cigar, mapQual);
-    BamRecord s2_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s2_cigar, mapQual);
-    BamRecord s3_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s3_cigar, mapQual);
+    BamRecord s1 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s1_cigar, mapQual);
+    BamRecord s2 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s2_cigar, mapQual);
+    BamRecord s3 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
+    BamRecord s1_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s1_cigar, mapQual);
+    BamRecord s2_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s2_cigar, mapQual);
+    BamRecord s3_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s3_cigar, mapQual);
 
     s0.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
     s1.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
@@ -1835,10 +1835,10 @@ TEST(BamRecordTest, ClipEncodedFrames)
         EXPECT_FALSE(s0.IsMapped());
         EXPECT_EQ(clipStart, s0.QueryStart());
         EXPECT_EQ(clipEnd,   s0.QueryEnd());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.AlignedStart());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.AlignedEnd());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.ReferenceStart());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.ReferenceEnd());
+        EXPECT_EQ(Data::UnmappedPosition, s0.AlignedStart());
+        EXPECT_EQ(Data::UnmappedPosition, s0.AlignedEnd());
+        EXPECT_EQ(Data::UnmappedPosition, s0.ReferenceStart());
+        EXPECT_EQ(Data::UnmappedPosition, s0.ReferenceEnd());
 
         const BamRecordView view
         {
@@ -1862,7 +1862,7 @@ TEST(BamRecordTest, ClipEncodedFrames)
     {   // s1 - FORWARD
 
         EXPECT_TRUE(s1.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s1.AlignedStrand());
         EXPECT_EQ(clipStart, s1.QueryStart());
         EXPECT_EQ(clipEnd,   s1.QueryEnd());
         EXPECT_EQ(clipStart, s1.AlignedStart());   // queryStart (no soft clips)
@@ -1894,7 +1894,7 @@ TEST(BamRecordTest, ClipEncodedFrames)
     {   // s1 - REVERSE
 
         EXPECT_TRUE(s1_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s1_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s1_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s1_rev.QueryEnd());
         EXPECT_EQ(clipStart, s1_rev.AlignedStart());    // queryStart (no soft clips)
@@ -1926,7 +1926,7 @@ TEST(BamRecordTest, ClipEncodedFrames)
     {   // s2 - FORWARD
 
         EXPECT_TRUE(s2.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s2.AlignedStrand());
         EXPECT_EQ(clipStart, s2.QueryStart());
         EXPECT_EQ(clipEnd,   s2.QueryEnd());
         EXPECT_EQ(clipStart, s2.AlignedStart());   // queryStart (no soft clips)
@@ -1957,7 +1957,7 @@ TEST(BamRecordTest, ClipEncodedFrames)
     {   // s2 - REVERSE
 
         EXPECT_TRUE(s2_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s2_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s2_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s2_rev.QueryEnd());
         EXPECT_EQ(clipStart, s2_rev.AlignedStart());    // queryStart (no soft clips)
@@ -1989,7 +1989,7 @@ TEST(BamRecordTest, ClipEncodedFrames)
     {   // s3 - FORWARD
 
         EXPECT_TRUE(s3.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
         EXPECT_EQ(clipStart, s3.QueryStart());
         EXPECT_EQ(clipEnd,   s3.QueryEnd());
         EXPECT_EQ(clipStart, s3.AlignedStart());     // queryStart (no soft clips)
@@ -2021,7 +2021,7 @@ TEST(BamRecordTest, ClipEncodedFrames)
     {   // s3 - REVERSE
 
         EXPECT_TRUE(s3_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s3_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s3_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s3_rev.QueryEnd());
         EXPECT_EQ(clipStart, s3_rev.AlignedStart());     // queryStart (no soft clips)
@@ -2054,7 +2054,7 @@ TEST(BamRecordTest, ClipEncodedFrames)
 TEST(BamRecordClippingTest, ExciseSoftClipsFromFramesWithDeletions)
 {
     const std::string expectedName{"m141008_060349_42194_c100704972550000001823137703241586_s1_p0/14/2409_2745"};
-    const PacBio::BAM::Strand expectedStrand = PacBio::BAM::Strand::FORWARD;
+    const Data::Strand expectedStrand = Data::Strand::FORWARD;
     const std::string expectedCigar{
         "20S11=1I47=1I2=1I6=1I22=1I2=1I9=1I29=1D6=1I16=1I6=1I7=1I8=2I5=1I5=1I11=1I5=5I2=3I1=1I1=1I1=3I5=2D19=1I14=1I17=28S"};
     const std::string expectedRawSeq{
@@ -2127,13 +2127,13 @@ TEST(BamRecordTest, ClipToQuery_Stranded)
     EntireFileQuery query{bamFile};
     for (auto& i : query)
     {
-        Strand expectedStrand;
+        Data::Strand expectedStrand;
         std::string scope;
         if (first) {
-            expectedStrand = Strand::FORWARD;
+            expectedStrand = Data::Strand::FORWARD;
             scope = "First record (FORWARD strand)";
         } else {
-            expectedStrand = Strand::REVERSE;
+            expectedStrand = Data::Strand::REVERSE;
             scope = "Second record (REVERSE strand)";
         }
 
@@ -2157,8 +2157,8 @@ TEST(BamRecordTest, ClipToQuery_Stranded)
         EXPECT_EQ("3=1I", i.CigarData().ToStdString());
 
         // second clip
-        Position qS;
-        Position qE;
+        Data::Position qS;
+        Data::Position qE;
         if (first) {
             qS = i.QueryStart();
             qE = i.QueryEnd() - 1;
@@ -2180,12 +2180,12 @@ TEST(BamRecordTest, ClipToQuery_Stranded)
 
 TEST(BamRecordTest, ClippingFlankingInserts_IgnoredOnClipToQuery)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 515;
-    const std::string seq      = "TTAACCGTTAGCAAA";
-    const std::string quals    = "--?]?]?]?]?*+++";
-    const std::string tagBases = "TTAACCGTTAGCAAA";
-    const std::string tagQuals = "--?]?]?]?]?*+++";
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 515;
+    const std::string seq       = "TTAACCGTTAGCAAA";
+    const std::string quals     = "--?]?]?]?]?*+++";
+    const std::string tagBases  = "TTAACCGTTAGCAAA";
+    const std::string tagQuals  = "--?]?]?]?]?*+++";
     const f_data frames = { 40, 40, 10, 10, 20, 20, 30, 40, 40, 10, 30, 20, 10, 10, 10 };
 
     const BamRecord prototype =
@@ -2194,12 +2194,12 @@ TEST(BamRecordTest, ClippingFlankingInserts_IgnoredOnClipToQuery)
 
     {   // aligned forward
 
-        const int32_t  tId     = 0;
-        const Position tPos    = 100;
-        const uint8_t  mapQual = 80;
-        const Cigar cigar{"4I5=6I"};
+        const int32_t tId         = 0;
+        const Data::Position tPos = 100;
+        const uint8_t mapQual     = 80;
+        const Data::Cigar cigar{"4I5=6I"};
 
-        BamRecord s = prototype.Mapped(tId, tPos, Strand::FORWARD, cigar, mapQual);
+        BamRecord s = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, cigar, mapQual);
         EXPECT_TRUE(s.IsMapped());
         EXPECT_EQ(100, s.ReferenceStart());
         EXPECT_EQ(105, s.ReferenceEnd());
@@ -2211,7 +2211,7 @@ TEST(BamRecordTest, ClippingFlankingInserts_IgnoredOnClipToQuery)
         s.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd, exciseFlankingInserts);
 
         EXPECT_TRUE(s.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s.AlignedStrand());
         EXPECT_EQ("2I5=3I", s.CigarData().ToStdString());
 
         EXPECT_EQ(clipStart, s.QueryStart());
@@ -2223,12 +2223,12 @@ TEST(BamRecordTest, ClippingFlankingInserts_IgnoredOnClipToQuery)
     }
     {   // aligned reverse
 
-        const int32_t  tId     = 0;
-        const Position tPos    = 100;
-        const uint8_t  mapQual = 80;
-        const Cigar cigar{"4I5=6I"};
+        const int32_t tId         = 0;
+        const Data::Position tPos = 100;
+        const uint8_t mapQual     = 80;
+        const Data::Cigar cigar{"4I5=6I"};
 
-        BamRecord s = prototype.Mapped(tId, tPos, Strand::REVERSE, cigar, mapQual);
+        BamRecord s = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, cigar, mapQual);
         EXPECT_TRUE(s.IsMapped());
         EXPECT_EQ(100, s.ReferenceStart());
         EXPECT_EQ(105, s.ReferenceEnd());
@@ -2240,7 +2240,7 @@ TEST(BamRecordTest, ClippingFlankingInserts_IgnoredOnClipToQuery)
         s.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd, exciseFlankingInserts);
 
         EXPECT_TRUE(s.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s.AlignedStrand());
         EXPECT_EQ("1I5=4I", s.CigarData().ToStdString());
 
         EXPECT_EQ(clipStart, s.QueryStart());
@@ -2254,12 +2254,12 @@ TEST(BamRecordTest, ClippingFlankingInserts_IgnoredOnClipToQuery)
 
 TEST(BamRecordTest, ClipToReference_Forward_ExciseFlankingInserts)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 526;
-    const std::string seq      = "TTAACCGTTAGCAAATTAACCGTTAG";
-    const std::string quals    = "--?]?]?]?]?*+++--?]?]?]?]?";
-    const std::string tagBases = "TTAACCGTTAGCAAATTAACCGTTAG";
-    const std::string tagQuals = "--?]?]?]?]?*+++--?]?]?]?]?";
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 526;
+    const std::string seq       = "TTAACCGTTAGCAAATTAACCGTTAG";
+    const std::string quals     = "--?]?]?]?]?*+++--?]?]?]?]?";
+    const std::string tagBases  = "TTAACCGTTAGCAAATTAACCGTTAG";
+    const std::string tagQuals  = "--?]?]?]?]?*+++--?]?]?]?]?";
     const f_data frames = {
         40, 40, 10, 10, 20, 20, 30, 40, 40, 10,
         30, 20, 10, 10, 10, 40, 40, 10, 10, 20,
@@ -2269,10 +2269,10 @@ TEST(BamRecordTest, ClipToReference_Forward_ExciseFlankingInserts)
         BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals,
                                            frames, seq, tagBases, tagQuals, frames);
 
-    const int32_t  tId     = 0;
-    const Position tPos    = 100;
-    const uint8_t  mapQual = 80;
-    const Cigar cigar{"3=6I10=6I1="};
+    const int32_t tId         = 0;
+    const Data::Position tPos = 100;
+    const uint8_t mapQual     = 80;
+    const Data::Cigar cigar{"3=6I10=6I1="};
 
     const size_t clipStart = 103;
     const size_t clipEnd = 113;
@@ -2282,7 +2282,7 @@ TEST(BamRecordTest, ClipToReference_Forward_ExciseFlankingInserts)
 
     bool exciseFlankingInserts = false;
 
-    BamRecord withInserts = prototype.Mapped(tId, tPos, Strand::FORWARD, cigar, mapQual);
+    BamRecord withInserts = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, cigar, mapQual);
     EXPECT_TRUE(withInserts.IsMapped());
     EXPECT_EQ(100, withInserts.ReferenceStart());
     EXPECT_EQ(114, withInserts.ReferenceEnd());
@@ -2290,7 +2290,7 @@ TEST(BamRecordTest, ClipToReference_Forward_ExciseFlankingInserts)
     withInserts.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd, exciseFlankingInserts);
 
     EXPECT_TRUE(withInserts.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, withInserts.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, withInserts.AlignedStrand());
     EXPECT_EQ("6I10=6I", withInserts.CigarData().ToStdString());
 
     EXPECT_EQ(503, withInserts.QueryStart());
@@ -2305,7 +2305,7 @@ TEST(BamRecordTest, ClipToReference_Forward_ExciseFlankingInserts)
 
     exciseFlankingInserts = true;
 
-    BamRecord withoutInserts = prototype.Mapped(tId, tPos, Strand::FORWARD, cigar, mapQual);
+    BamRecord withoutInserts = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, cigar, mapQual);
     EXPECT_TRUE(withoutInserts.IsMapped());
     EXPECT_EQ(100, withoutInserts.ReferenceStart());
     EXPECT_EQ(114, withoutInserts.ReferenceEnd());
@@ -2313,7 +2313,7 @@ TEST(BamRecordTest, ClipToReference_Forward_ExciseFlankingInserts)
     withoutInserts.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd, exciseFlankingInserts);
 
     EXPECT_TRUE(withoutInserts.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, withoutInserts.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, withoutInserts.AlignedStrand());
     EXPECT_EQ("10=", withoutInserts.CigarData().ToStdString());
 
     EXPECT_EQ(509, withoutInserts.QueryStart());
@@ -2326,12 +2326,12 @@ TEST(BamRecordTest, ClipToReference_Forward_ExciseFlankingInserts)
 
 TEST(BamRecordTest, ClipToReference_Reverse_ExciseFlankingInserts)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 526;
-    const std::string seq      = "TTAACCGTTAGCAAATTAACCGTTAG";
-    const std::string quals    = "--?]?]?]?]?*+++--?]?]?]?]?";
-    const std::string tagBases = "TTAACCGTTAGCAAATTAACCGTTAG";
-    const std::string tagQuals = "--?]?]?]?]?*+++--?]?]?]?]?";
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 526;
+    const std::string seq       = "TTAACCGTTAGCAAATTAACCGTTAG";
+    const std::string quals     = "--?]?]?]?]?*+++--?]?]?]?]?";
+    const std::string tagBases  = "TTAACCGTTAGCAAATTAACCGTTAG";
+    const std::string tagQuals  = "--?]?]?]?]?*+++--?]?]?]?]?";
     const f_data frames = {
         40, 40, 10, 10, 20, 20, 30, 40, 40, 10,
         30, 20, 10, 10, 10, 40, 40, 10, 10, 20,
@@ -2341,10 +2341,10 @@ TEST(BamRecordTest, ClipToReference_Reverse_ExciseFlankingInserts)
         BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals,
                                            frames, seq, tagBases, tagQuals, frames);
 
-    const int32_t  tId     = 0;
-    const Position tPos    = 100;
-    const uint8_t  mapQual = 80;
-    const Cigar cigar{"3=6I10=6I1="};
+    const int32_t tId         = 0;
+    const Data::Position tPos = 100;
+    const uint8_t mapQual     = 80;
+    const Data::Cigar cigar{"3=6I10=6I1="};
 
     const size_t clipStart = 103;
     const size_t clipEnd = 113;
@@ -2354,7 +2354,7 @@ TEST(BamRecordTest, ClipToReference_Reverse_ExciseFlankingInserts)
 
     bool exciseFlankingInserts = false;
 
-    BamRecord withInserts = prototype.Mapped(tId, tPos, Strand::REVERSE, cigar, mapQual);
+    BamRecord withInserts = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, cigar, mapQual);
 
     EXPECT_TRUE(withInserts.IsMapped());
     EXPECT_EQ(100, withInserts.ReferenceStart());
@@ -2363,7 +2363,7 @@ TEST(BamRecordTest, ClipToReference_Reverse_ExciseFlankingInserts)
     withInserts.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd, exciseFlankingInserts);
 
     EXPECT_TRUE(withInserts.IsMapped());
-    EXPECT_EQ(Strand::REVERSE, withInserts.AlignedStrand());
+    EXPECT_EQ(Data::Strand::REVERSE, withInserts.AlignedStrand());
     EXPECT_EQ("6I10=6I", withInserts.CigarData().ToStdString());
 
     EXPECT_EQ(501, withInserts.QueryStart());
@@ -2378,7 +2378,7 @@ TEST(BamRecordTest, ClipToReference_Reverse_ExciseFlankingInserts)
 
     exciseFlankingInserts = true;
 
-    BamRecord withoutInserts = prototype.Mapped(tId, tPos, Strand::REVERSE, cigar, mapQual);
+    BamRecord withoutInserts = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, cigar, mapQual);
     EXPECT_TRUE(withoutInserts.IsMapped());
     EXPECT_EQ(100, withoutInserts.ReferenceStart());
     EXPECT_EQ(114, withoutInserts.ReferenceEnd());
@@ -2386,7 +2386,7 @@ TEST(BamRecordTest, ClipToReference_Reverse_ExciseFlankingInserts)
     withoutInserts.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd, exciseFlankingInserts);
 
     EXPECT_TRUE(withoutInserts.IsMapped());
-    EXPECT_EQ(Strand::REVERSE, withoutInserts.AlignedStrand());
+    EXPECT_EQ(Data::Strand::REVERSE, withoutInserts.AlignedStrand());
     EXPECT_EQ("10=", withoutInserts.CigarData().ToStdString());
 
     EXPECT_EQ(507, withoutInserts.QueryStart());
@@ -2395,7 +2395,6 @@ TEST(BamRecordTest, ClipToReference_Reverse_ExciseFlankingInserts)
     EXPECT_EQ(517, withoutInserts.AlignedEnd());
     EXPECT_EQ(103, withoutInserts.ReferenceStart());
     EXPECT_EQ(113, withoutInserts.ReferenceEnd());
-
 }
 
 // clang-format on

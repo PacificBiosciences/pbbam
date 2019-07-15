@@ -196,12 +196,13 @@ inline MappedDataFilterBase<T, field>::MappedDataFilterBase(std::vector<T> value
 
 template <>
 inline bool
-MappedDataFilterBase<Strand, PbiFile::MappedField::STRAND>::MappedDataFilterBase::Accepts(
+MappedDataFilterBase<Data::Strand, PbiFile::MappedField::STRAND>::MappedDataFilterBase::Accepts(
     const PbiRawData& idx, const size_t row) const
 {
     const PbiRawMappedData& mappedData = idx.MappedData();
-    const Strand strand = (mappedData.revStrand_.at(row) == 1 ? Strand::REVERSE : Strand::FORWARD);
-    return FilterBase<Strand>::CompareHelper(strand);
+    const Data::Strand strand =
+        (mappedData.revStrand_.at(row) == 1 ? Data::Strand::REVERSE : Data::Strand::FORWARD);
+    return FilterBase<Data::Strand>::CompareHelper(strand);
 }
 
 template <typename T, PbiFile::MappedField field>
@@ -260,8 +261,9 @@ inline PbiAlignedStartFilter::PbiAlignedStartFilter(const uint32_t position,
 
 // PbiAlignedStrandFilter
 
-inline PbiAlignedStrandFilter::PbiAlignedStrandFilter(const Strand strand, const Compare::Type cmp)
-    : internal::MappedDataFilterBase<Strand, PbiFile::MappedField::STRAND>{strand, cmp}
+inline PbiAlignedStrandFilter::PbiAlignedStrandFilter(const Data::Strand strand,
+                                                      const Compare::Type cmp)
+    : internal::MappedDataFilterBase<Data::Strand, PbiFile::MappedField::STRAND>{strand, cmp}
 {
     if (cmp != Compare::EQUAL && cmp != Compare::NOT_EQUAL)
         throw std::runtime_error{

@@ -17,10 +17,11 @@
 #include <string>
 #include <unordered_map>
 
+#include <pbcopper/data/Cigar.h>
+#include <pbcopper/data/Position.h>
+#include <pbcopper/data/QualityValues.h>
+
 #include "pbbam/BamRecordTag.h"
-#include "pbbam/Cigar.h"
-#include "pbbam/Position.h"
-#include "pbbam/QualityValues.h"
 #include "pbbam/TagCollection.h"
 
 namespace PacBio {
@@ -89,13 +90,13 @@ public:
     uint8_t MapQuality() const;
 
     /// \returns this record's mate's mapped position, or -1 if unmapped
-    PacBio::BAM::Position MatePosition() const;
+    Data::Position MatePosition() const;
 
     /// \returns this record's mate's mapped reference ID, or -1 if unmapped
     int32_t MateReferenceId() const;
 
     /// \returns this record's mapped position, or -1 if unmapped
-    PacBio::BAM::Position Position() const;
+    Data::Position Position() const;
 
     /// \returns this record's mate's mapped reference ID, or -1 if unmapped
     int32_t ReferenceId() const;
@@ -133,7 +134,7 @@ public:
     /// \param[in] pos mapped position. A value of -1 indicates unmapped.
     /// \returns reference to this record
     ///
-    BamRecordImpl& MatePosition(PacBio::BAM::Position pos);
+    BamRecordImpl& MatePosition(Data::Position pos);
 
     /// Sets this record's mate's mapped reference ID
     ///
@@ -147,7 +148,7 @@ public:
     /// \param[in] pos mapped position. A value of -1 indicates unmapped.
     /// \returns reference to this record
     ///
-    BamRecordImpl& Position(PacBio::BAM::Position pos);
+    BamRecordImpl& Position(Data::Position pos);
 
     /// Sets this record's mapped reference ID
     ///
@@ -241,14 +242,14 @@ public:
     /// \{
 
     /// \returns the record's CIGAR data as a Cigar object
-    Cigar CigarData() const;
+    Data::Cigar CigarData() const;
 
     /// Sets the record's CIGAR data using a Cigar object
     ///
     /// \param[in] cigar PacBio::BAM::Cigar object
     /// \returns reference to this record
     ///
-    BamRecordImpl& CigarData(const Cigar& cigar);
+    BamRecordImpl& CigarData(const Data::Cigar& cigar);
 
     /// Sets the record's CIGAR data using a CIGAR-formatted string.
     ///
@@ -275,7 +276,7 @@ public:
     ///       some data sets, the quality values are not provided. In that
     ///       case, this method will return an empty container.
     ///
-    QualityValues Qualities() const;
+    Data::QualityValues Qualities() const;
 
     /// \returns the record's DNA sequence.
     std::string Sequence() const;
@@ -569,7 +570,7 @@ private:
     int TagOffset(const std::string& tagName) const;
 
     // internal CIGAR handling
-    void SetCigarData(const Cigar& cigar);
+    void SetCigarData(const Data::Cigar& cigar);
 
     // core seq/qual logic shared by the public API
     BamRecordImpl& SetSequenceAndQualitiesInternal(const char* sequence,

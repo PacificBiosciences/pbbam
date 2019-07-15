@@ -11,8 +11,9 @@
 
 #include <string>
 
+#include <pbcopper/data/QualityValues.h>
+
 #include "pbbam/IRecordWriter.h"
-#include "pbbam/QualityValues.h"
 
 namespace PacBio {
 namespace BAM {
@@ -29,7 +30,7 @@ public:
 
     virtual void Write(const FastqSequence& fastq) = 0;
     virtual void Write(const std::string& name, const std::string& bases,
-                       const QualityValues& quals) = 0;
+                       const Data::QualityValues& quals) = 0;
     virtual void Write(const std::string& name, const std::string& bases,
                        const std::string& quals) = 0;
 

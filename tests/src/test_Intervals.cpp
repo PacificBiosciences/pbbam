@@ -9,6 +9,8 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
+using Position = PacBio::Data::Position;
+
 TEST(IntervalTest, Constructors)
 {
     Interval<Position> empty;

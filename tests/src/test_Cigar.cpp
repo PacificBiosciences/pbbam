@@ -4,12 +4,14 @@
 
 #include <gtest/gtest.h>
 
-#include <pbbam/Cigar.h>
+#include <pbcopper/data/Cigar.h>
+#include <pbcopper/data/CigarOperation.h>
 
 // clang-format off
 
-using namespace PacBio;
-using namespace PacBio::BAM;
+using Cigar = PacBio::Data::Cigar;
+using CigarOperation = PacBio::Data::CigarOperation;
+using CigarOperationType = PacBio::Data::CigarOperationType;
 
 TEST(CigarTest, TypeToCar)
 {

@@ -17,14 +17,14 @@ namespace internal {
 namespace {
 
 // returns reference positions removed from beginning
-size_t ClipToQueryImpl(Cigar& cigar, size_t startOffset, size_t endOffset)
+size_t ClipToQueryImpl(Data::Cigar& cigar, size_t startOffset, size_t endOffset)
 {
     size_t refPosRemoved = 0;
     size_t remaining = startOffset;
 
     // clip CIGAR ops from beginning of query sequence
     while ((remaining > 0) && !cigar.empty()) {
-        CigarOperation& op = cigar.front();
+        Data::CigarOperation& op = cigar.front();
         const auto opLength = op.Length();
         const bool consumesQuery = ConsumesQuery(op.Type());
         const bool consumesRef = ConsumesReference(op.Type());
@@ -43,7 +43,7 @@ size_t ClipToQueryImpl(Cigar& cigar, size_t startOffset, size_t endOffset)
     // clip CIGAR ops from end of query sequence
     remaining = endOffset;
     while ((remaining > 0) && !cigar.empty()) {
-        CigarOperation& op = cigar.back();
+        Data::CigarOperation& op = cigar.back();
         const auto opLength = op.Length();
         const bool consumesQuery = ConsumesQuery(op.Type());
 
@@ -63,11 +63,11 @@ void ClipToReferenceImpl(ClipToReferenceConfig& config, size_t* queryPosRemovedF
                          size_t* queryPosRemovedBack)
 {
 
-    const Position newTStart = std::max(config.original_tStart_, config.target_tStart_);
-    const Position newTEnd = std::min(config.original_tEnd_, config.target_tEnd_);
+    const Data::Position newTStart = std::max(config.original_tStart_, config.target_tStart_);
+    const Data::Position newTEnd = std::min(config.original_tEnd_, config.target_tEnd_);
 
     // fetch a 'working copy' of CIGAR data
-    Cigar& cigar = config.cigar_;
+    Data::Cigar& cigar = config.cigar_;
 
     // ------------------------
     // clip leading CIGAR ops
@@ -75,7 +75,7 @@ void ClipToReferenceImpl(ClipToReferenceConfig& config, size_t* queryPosRemovedF
 
     size_t remaining = newTStart - config.original_tStart_;
     while (remaining > 0 && !cigar.empty()) {
-        CigarOperation& firstOp = cigar.front();
+        Data::CigarOperation& firstOp = cigar.front();
         const auto firstOpLength = firstOp.Length();
         const bool consumesQuery = ConsumesQuery(firstOp.Type());
         const bool consumesRef = ConsumesReference(firstOp.Type());
@@ -112,7 +112,7 @@ void ClipToReferenceImpl(ClipToReferenceConfig& config, size_t* queryPosRemovedF
 
     remaining = config.original_tEnd_ - newTEnd;
     while (remaining > 0 && !cigar.empty()) {
-        CigarOperation& lastOp = cigar.back();
+        Data::CigarOperation& lastOp = cigar.back();
         const auto lastOpLength = lastOp.Length();
         const bool consumesQuery = ConsumesQuery(lastOp.Type());
         const bool consumesRef = ConsumesReference(lastOp.Type());
@@ -146,8 +146,8 @@ void ClipToReferenceImpl(ClipToReferenceConfig& config, size_t* queryPosRemovedF
     if (config.exciseFlankingInserts_) {
         // check for leading insertion
         if (!cigar.empty()) {
-            const CigarOperation& op = cigar.front();
-            if (op.Type() == CigarOperationType::INSERTION) {
+            const Data::CigarOperation& op = cigar.front();
+            if (op.Type() == Data::CigarOperationType::INSERTION) {
                 *queryPosRemovedFront += op.Length();
                 cigar.erase(cigar.begin());
             }
@@ -155,8 +155,8 @@ void ClipToReferenceImpl(ClipToReferenceConfig& config, size_t* queryPosRemovedF
 
         // check for trailing insertion
         if (!cigar.empty()) {
-            const CigarOperation& op = cigar.back();
-            if (op.Type() == CigarOperationType::INSERTION) {
+            const Data::CigarOperation& op = cigar.back();
+            if (op.Type() == Data::CigarOperationType::INSERTION) {
                 *queryPosRemovedBack += op.Length();
                 cigar.pop_back();
             }
@@ -166,13 +166,13 @@ void ClipToReferenceImpl(ClipToReferenceConfig& config, size_t* queryPosRemovedF
 
 }  // namespace
 
-ClipResult::ClipResult(size_t clipOffset, Position qStart, Position qEnd)
+ClipResult::ClipResult(size_t clipOffset, Data::Position qStart, Data::Position qEnd)
     : clipOffset_{clipOffset}, qStart_{qStart}, qEnd_{qEnd}
 {
 }
 
-ClipResult::ClipResult(size_t clipOffset, Position qStart, Position qEnd, Position refPos,
-                       Cigar cigar)
+ClipResult::ClipResult(size_t clipOffset, Data::Position qStart, Data::Position qEnd,
+                       Data::Position refPos, Data::Cigar cigar)
     : clipOffset_{clipOffset}
     , qStart_{qStart}
     , qEnd_{qEnd}
@@ -192,8 +192,9 @@ ClipResult& ClipResult::operator=(ClipResult&&) noexcept = default;
 ClipResult::~ClipResult() = default;
 
 ClipToReferenceConfig::ClipToReferenceConfig(const ClipToQueryConfig& queryConfig,
-                                             Position originalTEnd, Position targetTStart,
-                                             Position targetTEnd, bool exciseFlankingInserts)
+                                             Data::Position originalTEnd,
+                                             Data::Position targetTStart, Data::Position targetTEnd,
+                                             bool exciseFlankingInserts)
     : ClipToQueryConfig{queryConfig}
     , original_tEnd_{originalTEnd}
     , target_tStart_{targetTStart}
@@ -210,8 +211,8 @@ ClipResult ClipToQuery(ClipToQueryConfig& config)
         return ClipResult{startOffset, config.target_qStart_, config.target_qEnd_};
 
     // fetch CIGAR (in query orientation)
-    Cigar cigar = std::move(config.cigar_);
-    if (config.strand_ == Strand::REVERSE) {
+    Data::Cigar cigar = std::move(config.cigar_);
+    if (config.strand_ == Data::Strand::REVERSE) {
         std::reverse(cigar.begin(), cigar.end());
     }
 
@@ -220,12 +221,12 @@ ClipResult ClipToQuery(ClipToQueryConfig& config)
     const size_t refPosRemoved = ClipToQueryImpl(cigar, startOffset, endOffset);
 
     // maybe restore CIGAR
-    if (config.strand_ == Strand::REVERSE) {
+    if (config.strand_ == Data::Strand::REVERSE) {
         std::reverse(cigar.begin(), cigar.end());
     }
 
     // return result
-    const Position newPosition = (config.original_tStart_ + refPosRemoved);
+    const Data::Position newPosition = (config.original_tStart_ + refPosRemoved);
     return ClipResult{startOffset, config.target_qStart_, config.target_qEnd_, newPosition,
                       std::move(cigar)};
 }
@@ -236,15 +237,15 @@ ClipResult ClipToReference(ClipToReferenceConfig& config)
 
     size_t queryPosRemovedFront = 0;
     size_t queryPosRemovedBack = 0;
-    if (config.strand_ == Strand::FORWARD)
+    if (config.strand_ == Data::Strand::FORWARD)
         ClipToReferenceImpl(config, &queryPosRemovedFront, &queryPosRemovedBack);
     else
         ClipToReferenceImpl(config, &queryPosRemovedBack, &queryPosRemovedFront);
 
     const size_t clipOffset = queryPosRemovedFront;
-    const Position qStart = config.original_qStart_ + queryPosRemovedFront;
-    const Position qEnd = config.original_qEnd_ - queryPosRemovedBack;
-    const Position newPos = std::max(config.original_tStart_, config.target_tStart_);
+    const Data::Position qStart = config.original_qStart_ + queryPosRemovedFront;
+    const Data::Position qEnd = config.original_qEnd_ - queryPosRemovedBack;
+    const Data::Position newPos = std::max(config.original_tStart_, config.target_tStart_);
     return ClipResult{clipOffset, qStart, qEnd, newPos, config.cigar_};
 }
 

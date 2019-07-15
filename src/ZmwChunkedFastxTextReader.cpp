@@ -135,7 +135,7 @@ FastqSequence ZmwChunkedFastxTextReader::ReadNextFastq(bool skipName)
     // return FASTQ
     std::string name = (skipName ? "" : std::string{seq_->name.s, seq_->name.l});
     std::string bases{seq_->seq.s, seq_->seq.l};
-    QualityValues quals{std::string{seq_->qual.s, seq_->qual.l}};
+    Data::QualityValues quals{std::string{seq_->qual.s, seq_->qual.l}};
     return FastqSequence{std::move(name), std::move(bases), std::move(quals)};
 }
 

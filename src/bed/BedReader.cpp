@@ -74,8 +74,8 @@ public:
         }
 
         // convert fields into interval
-        const Position start = std::stoi(fields[1]);
-        const Position end = std::stoi(fields[2]);
+        const Data::Position start = std::stoi(fields[1]);
+        const Data::Position end = std::stoi(fields[2]);
         return {fields[0], start, end};
     }
 
