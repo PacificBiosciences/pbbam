@@ -13,8 +13,8 @@
 #include <tuple>
 
 #include <htslib/hts.h>
+#include <pbcopper/data/CigarOperation.h>
 
-#include "pbbam/CigarOperation.h"
 #include "pbbam/StringUtilities.h"
 
 namespace PacBio {
@@ -49,7 +49,7 @@ bool DoesHtslibSupportLongCigar()
 
 #ifdef PBBAM_PERMISSIVE_CIGAR
 static const bool PermissiveCigar = []() {
-    CigarOperation::DisableAutoValidation();
+    Data::CigarOperation::DisableAutoValidation();
     return true;
 }();
 #endif  // PBBAM_PERMISSIVE_CIGAR
