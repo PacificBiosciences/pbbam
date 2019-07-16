@@ -13,6 +13,7 @@
 #include <stdexcept>
 
 #include <htslib/faidx.h>
+#include <pbcopper/utility/Deleters.h>
 
 #include "pbbam/BamRecord.h"
 #include "pbbam/GenomicInterval.h"
@@ -119,7 +120,7 @@ std::string IndexedFastaReader::Subsequence(const std::string& id, Position begi
     // Derek: *Annoyingly* htslib seems to interpret "end" as inclusive in
     // faidx_fetch_seq, whereas it considers it exclusive in the region spec in
     // fai_fetch.  Can you please verify?
-    const std::unique_ptr<char, FreeDeleter> rawSeq{
+    const std::unique_ptr<char, Utility::FreeDeleter> rawSeq{
         faidx_fetch_seq(d_->handle_.get(), id.c_str(), begin, end - 1, &len)};
     if (rawSeq == nullptr) {
         std::ostringstream s;
@@ -138,7 +139,7 @@ std::string IndexedFastaReader::Subsequence(const GenomicInterval& interval) con
 std::string IndexedFastaReader::Subsequence(const char* htslibRegion) const
 {
     int len = 0;
-    const std::unique_ptr<char, FreeDeleter> rawSeq(
+    const std::unique_ptr<char, Utility::FreeDeleter> rawSeq(
         fai_fetch(d_->handle_.get(), htslibRegion, &len));
     if (rawSeq == nullptr) {
         throw std::runtime_error{"IndexedFastaReader: could not fetch sequence from region: " +

@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <stdexcept>
 
 namespace PacBio {
