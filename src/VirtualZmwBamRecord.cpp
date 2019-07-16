@@ -17,7 +17,8 @@
 #include <type_traits>
 #include <vector>
 
-#include "pbbam/MoveAppend.h"
+#include <pbcopper/utility/MoveAppend.h>
+
 #include "pbbam/virtual/VirtualRegionType.h"
 #include "pbbam/virtual/VirtualRegionTypeMap.h"
 
@@ -40,7 +41,6 @@ VirtualZmwBamRecord::VirtualZmwBamRecord(std::vector<BamRecord> unorderedSources
 {
     // Sort sources by queryStart,queryEnd
     std::sort(sources_.begin(), sources_.end(), [](const BamRecord& l1, const BamRecord& l2) {
-
         const auto l1_qStart = l1.QueryStart();
         const auto l1_qEnd = l1.QueryEnd();
         const auto l2_qStart = l2.QueryStart();
@@ -121,21 +121,22 @@ void VirtualZmwBamRecord::StitchSources()
     for (auto& b : sources_) {
         sequence.append(b.Sequence());
 
-        MoveAppend(b.Qualities(), qualities);
+        Utility::MoveAppend(b.Qualities(), qualities);
 
-        if (b.HasDeletionQV()) MoveAppend(std::move(b.DeletionQV()), deletionQv);
+        if (b.HasDeletionQV()) Utility::MoveAppend(std::move(b.DeletionQV()), deletionQv);
 
-        if (b.HasInsertionQV()) MoveAppend(std::move(b.InsertionQV()), insertionQv);
+        if (b.HasInsertionQV()) Utility::MoveAppend(std::move(b.InsertionQV()), insertionQv);
 
-        if (b.HasMergeQV()) MoveAppend(std::move(b.MergeQV()), mergeQv);
+        if (b.HasMergeQV()) Utility::MoveAppend(std::move(b.MergeQV()), mergeQv);
 
-        if (b.HasPulseMergeQV()) MoveAppend(std::move(b.PulseMergeQV()), pulseMergeQv);
+        if (b.HasPulseMergeQV()) Utility::MoveAppend(std::move(b.PulseMergeQV()), pulseMergeQv);
 
-        if (b.HasSubstitutionQV()) MoveAppend(std::move(b.SubstitutionQV()), substitutionQv);
+        if (b.HasSubstitutionQV())
+            Utility::MoveAppend(std::move(b.SubstitutionQV()), substitutionQv);
 
-        if (b.HasLabelQV()) MoveAppend(std::move(b.LabelQV()), labelQv);
+        if (b.HasLabelQV()) Utility::MoveAppend(std::move(b.LabelQV()), labelQv);
 
-        if (b.HasAltLabelQV()) MoveAppend(std::move(b.AltLabelQV()), alternativeLabelQv);
+        if (b.HasAltLabelQV()) Utility::MoveAppend(std::move(b.AltLabelQV()), alternativeLabelQv);
 
         if (b.HasDeletionTag()) deletionTag.append(std::move(b.DeletionTag()));
 
@@ -145,25 +146,25 @@ void VirtualZmwBamRecord::StitchSources()
 
         if (b.HasPulseCall()) pulseCall.append(std::move(b.PulseCall()));
 
-        if (b.HasIPD()) MoveAppend(b.IPDRaw().DataRaw(), ipd.DataRaw());
+        if (b.HasIPD()) Utility::MoveAppend(b.IPDRaw().DataRaw(), ipd.DataRaw());
 
-        if (b.HasPulseWidth()) MoveAppend(b.PulseWidthRaw().DataRaw(), pw.DataRaw());
+        if (b.HasPulseWidth()) Utility::MoveAppend(b.PulseWidthRaw().DataRaw(), pw.DataRaw());
 
-        if (b.HasPulseCallWidth()) MoveAppend(b.PulseCallWidth().DataRaw(), px.DataRaw());
+        if (b.HasPulseCallWidth()) Utility::MoveAppend(b.PulseCallWidth().DataRaw(), px.DataRaw());
 
-        if (b.HasPrePulseFrames()) MoveAppend(b.PrePulseFrames().DataRaw(), pd.DataRaw());
+        if (b.HasPrePulseFrames()) Utility::MoveAppend(b.PrePulseFrames().DataRaw(), pd.DataRaw());
 
-        if (b.HasPkmid()) MoveAppend(b.Pkmid(), pm);
+        if (b.HasPkmid()) Utility::MoveAppend(b.Pkmid(), pm);
 
-        if (b.HasPkmean()) MoveAppend(b.Pkmean(), pa);
+        if (b.HasPkmean()) Utility::MoveAppend(b.Pkmean(), pa);
 
-        if (b.HasPkmid2()) MoveAppend(b.Pkmid2(), pm);
+        if (b.HasPkmid2()) Utility::MoveAppend(b.Pkmid2(), pm);
 
-        if (b.HasPkmean2()) MoveAppend(b.Pkmean2(), pa);
+        if (b.HasPkmean2()) Utility::MoveAppend(b.Pkmean2(), pa);
 
-        if (b.HasPulseExclusion()) MoveAppend(b.PulseExclusionReason(), pe);
+        if (b.HasPulseExclusion()) Utility::MoveAppend(b.PulseExclusionReason(), pe);
 
-        if (b.HasStartFrame()) MoveAppend(b.StartFrame(), sf);
+        if (b.HasStartFrame()) Utility::MoveAppend(b.StartFrame(), sf);
 
         if (b.HasScrapRegionType()) {
             const VirtualRegionType regionType = b.ScrapRegionType();
