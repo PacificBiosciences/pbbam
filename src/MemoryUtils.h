@@ -24,21 +24,6 @@ class BamHeader;
 
 // intended for use with std::shared_ptr<T>, std::unique_ptr<T>, etc
 
-struct FileDeleter
-{
-    void operator()(std::FILE* fp) const
-    {
-        if (fp) std::fclose(fp);
-        fp = nullptr;
-    }
-};
-
-// For pointers originating from C 'malloc' (and friends), instead of 'new'
-struct FreeDeleter
-{
-    void operator()(void* p) const { std::free(p); }
-};
-
 struct GzFileDeleter
 {
     void operator()(gzFile fp) const

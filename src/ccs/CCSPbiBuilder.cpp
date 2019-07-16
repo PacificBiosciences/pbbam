@@ -16,6 +16,7 @@
 #include <vector>
 
 #include <htslib/bgzf.h>
+#include <pbcopper/utility/Deleters.h>
 
 #include "pbbam/PbiBuilder.h"
 #include "pbbam/PbiFile.h"
@@ -284,7 +285,7 @@ public:
     std::string bamFilename_;
     std::string pbiFilename_;
     std::string tempFilename_;
-    std::unique_ptr<FILE, PacBio::BAM::FileDeleter> tempFile_;
+    std::unique_ptr<FILE, Utility::FileDeleter> tempFile_;
     std::unique_ptr<BGZF, PacBio::BAM::HtslibBgzfDeleter> pbiFile_;
     PacBio::BAM::PbiBuilder::CompressionLevel compressionLevel_ =
         PacBio::BAM::PbiBuilder::DefaultCompression;
