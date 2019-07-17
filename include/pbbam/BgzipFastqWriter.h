@@ -22,7 +22,6 @@ namespace BAM {
 class BamRecord;
 class BamRecordImpl;
 class FastqSequence;
-class QualityValues;
 
 class BgzipFastqWriter final : public IFastqWriter
 {

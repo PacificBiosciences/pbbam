@@ -25,6 +25,7 @@
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
+#include <pbcopper/utility/Deleters.h>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include "pbbam/BamHeader.h"
@@ -572,7 +573,7 @@ public:
         //
 
         const std::string gziFn{bamFilename_ + ".gzi"};
-        std::unique_ptr<FILE, FileDeleter> gziFile{fopen(gziFn.c_str(), "rb")};
+        std::unique_ptr<FILE, Utility::FileDeleter> gziFile{fopen(gziFn.c_str(), "rb")};
         if (!gziFile) throw std::runtime_error{"IndexedBamWriter: could not open gzi file"};
 
         uint64_t numElements;
@@ -630,7 +631,7 @@ private:
     std::string bamFilename_;
     std::string pbiFilename_;
     std::string tempFilename_;
-    std::unique_ptr<FILE, FileDeleter> tempFile_;
+    std::unique_ptr<FILE, Utility::FileDeleter> tempFile_;
     std::unique_ptr<BGZF, HtslibBgzfDeleter> pbiFile_;
     PbiBuilder::CompressionLevel compressionLevel_;
     size_t numThreads_;

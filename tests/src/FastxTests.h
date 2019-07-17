@@ -15,8 +15,6 @@
 
 using FastaSequence = PacBio::BAM::FastaSequence;
 using FastqSequence = PacBio::BAM::FastqSequence;
-using QualityValue = PacBio::BAM::QualityValue;
-using QualityValues = PacBio::BAM::QualityValues;
 
 namespace FastxTests {
 

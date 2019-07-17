@@ -5,8 +5,19 @@ set -vex
 # BUILD #
 #########
 
-# on PA, need to first build htslib
+# on PA, need to first build pbcopper+htslib
 if [[ ${GCC_VERSION} == PA ]]; then
+  pushd _deps/pbcopper
+    meson \
+      --default-library static \
+      --libdir lib \
+      --wrap-mode nofallback \
+      --prefix "${bamboo_build_working_directory}/staging" \
+      -Dtests=false \
+      build .
+    ninja -C build -v install
+  popd
+
   wget https://github.com/samtools/htslib/releases/download/1.9/htslib-1.9.tar.bz2
   tar -xjf htslib-1.9.tar.bz2
   pushd htslib-1.9

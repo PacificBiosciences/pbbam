@@ -3,14 +3,20 @@ set -vex
 
 export ENABLED_TESTS="true"
 
-case "${GCC_VERSION}" in
-  4.8)
-    module load gtest/gcc48
+case "${bamboo_planRepository_branchName}" in
+  master)
+    _pbcopper_module="pbcopper/master"
     ;;
+  *)
+    _pbcopper_module="pbcopper/develop"
+    ;;
+esac
 
+case "${GCC_VERSION}" in
   next)
     module load gcc/8.1.0
     module load gtest
+    module load ${_pbcopper_module}
     ;;
 
   PA)
@@ -30,6 +36,7 @@ case "${GCC_VERSION}" in
   *)
     module load gcc
     module load gtest
+    module load ${_pbcopper_module}
     ;;
 esac
 

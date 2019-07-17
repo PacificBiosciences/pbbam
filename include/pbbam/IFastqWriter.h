@@ -12,12 +12,12 @@
 #include <string>
 
 #include "pbbam/IRecordWriter.h"
+#include "pbbam/QualityValues.h"
 
 namespace PacBio {
 namespace BAM {
 
 class FastqSequence;
-class QualityValues;
 
 class IFastqWriter : public IRecordWriter
 {

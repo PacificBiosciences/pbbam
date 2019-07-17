@@ -16,8 +16,7 @@
 #include <memory>
 
 #include <htslib/kseq.h>
-
-#include "MemoryUtils.h"
+#include <pbcopper/utility/Deleters.h>
 
 namespace PacBio {
 namespace BAM {
@@ -50,7 +49,7 @@ private:
         }
     };
 
-    std::unique_ptr<FILE, FileDeleter> file_;
+    std::unique_ptr<FILE, Utility::FileDeleter> file_;
     std::unique_ptr<kseq_t, KSeqDeleter> seq_;
 };
 

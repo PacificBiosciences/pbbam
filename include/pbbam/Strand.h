@@ -9,17 +9,12 @@
 
 #include "pbbam/Config.h"
 
+#include <pbcopper/data/Strand.h>
+
 namespace PacBio {
 namespace BAM {
 
-/// \brief This enum defines the strand orientations used for reporting
-///        alignment-related information.
-///
-enum class Strand
-{
-    FORWARD,  ///< Forward strand
-    REVERSE   ///< Reverse strand
-};
+using Strand = PacBio::Data::Strand;
 
 }  // namespace BAM
 }  // namespace PacBio

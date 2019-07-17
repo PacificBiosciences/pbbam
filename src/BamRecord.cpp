@@ -16,8 +16,10 @@
 #include <htslib/sam.h>
 #include <boost/numeric/conversion/cast.hpp>
 
+#include <pbcopper/data/Clipping.h>
+#include <pbcopper/data/internal/ClippingImpl.h>
+
 #include "BamRecordTags.h"
-#include "Clipping.h"
 #include "MemoryUtils.h"
 #include "Pulse2BaseCache.h"
 #include "SequenceUtils.h"
@@ -679,10 +681,10 @@ BamRecord& BamRecord::ClipToQuery(const Position start, const Position end)
     if (start <= origQStart && end >= origQEnd) return *this;
 
     // calculate clipping
-    internal::ClipToQueryConfig clipConfig{
+    Data::ClipToQueryConfig clipConfig{
         impl_.SequenceLength(), origQStart,      origQEnd,          start,           end,
         impl_.Position(),       AlignedStrand(), impl_.CigarData(), impl_.IsMapped()};
-    auto result = internal::ClipToQuery(clipConfig);
+    auto result = Data::ClipToQuery(clipConfig);
 
     // update alignment info
     if (IsMapped()) {
@@ -726,12 +728,12 @@ BamRecord& BamRecord::ClipToReference(const Position start, const Position end,
     assert(AlignedEnd() <= origQEnd);
 
     // calculate clipping
-    internal::ClipToReferenceConfig clipConfig{
-        internal::ClipToQueryConfig{impl_.SequenceLength(), origQStart, origQEnd, start, end,
-                                    impl_.Position(), AlignedStrand(), impl_.CigarData(),
-                                    impl_.IsMapped()},
+    Data::ClipToReferenceConfig clipConfig{
+        Data::ClipToQueryConfig{impl_.SequenceLength(), origQStart, origQEnd, start, end,
+                                impl_.Position(), AlignedStrand(), impl_.CigarData(),
+                                impl_.IsMapped()},
         ReferenceEnd(), start, end, exciseFlankingInserts};
-    auto result = internal::ClipToReference(clipConfig);
+    auto result = Data::ClipToReference(clipConfig);
 
     // update CIGAR and position
     impl_.CigarData(std::move(result.cigar_));
@@ -1179,7 +1181,7 @@ bool BamRecord::HasScrapZmwType() const
 
 bool BamRecord::HasStartFrame() const { return impl_.HasTag(BamRecordTag::START_FRAME); }
 
-bool BamRecord::HasSignalToNoise() const { return impl_.HasTag(BamRecordTag::SNR); }
+bool BamRecord::HasSignalToNoise() const { return impl_.HasTag(BamRecordTag::SIGNAL_TO_NOISE); }
 
 bool BamRecord::HasSubstitutionQV() const { return impl_.HasTag(BamRecordTag::SUBSTITUTION_QV); }
 
@@ -1835,14 +1837,14 @@ std::string BamRecord::Sequence(const Orientation orientation, bool aligned,
 
 std::vector<float> BamRecord::SignalToNoise() const
 {
-    const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SNR);
+    const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SIGNAL_TO_NOISE);
     const Tag snTag = impl_.TagValue(tagName);
     return snTag.ToFloatArray();
 }
 
 BamRecord& BamRecord::SignalToNoise(const std::vector<float>& snr)
 {
-    CreateOrEdit(BamRecordTag::SNR, snr, &impl_);
+    CreateOrEdit(BamRecordTag::SIGNAL_TO_NOISE, snr, &impl_);
     return *this;
 }
 
