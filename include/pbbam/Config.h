@@ -20,6 +20,17 @@
 
 /// \}
 
+/// \name Switch for warnings for the pbbam -> pbcopper Data:: move
+/// \{
+
+#ifdef PACBIO_NODEPRECATED_API
+#define PBBAM_DEPRECATED [[deprecated("Use the version from pbcopper in Data::")]]
+#else
+#define PBBAM_DEPRECATED
+#endif
+
+/// \}
+
 namespace PacBio {
 namespace BAM {
 

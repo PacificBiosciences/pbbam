@@ -19,9 +19,9 @@
 namespace PacBio {
 namespace BAM {
 
-using Cigar = PacBio::Data::Cigar;
+using Cigar PBBAM_DEPRECATED = PacBio::Data::Cigar;
 
-constexpr auto ReferenceLength = PacBio::Data::ReferenceLength;
+PBBAM_DEPRECATED constexpr auto ReferenceLength = PacBio::Data::ReferenceLength;
 
 }  // namespace BAM
 }  // namespace PacBio
