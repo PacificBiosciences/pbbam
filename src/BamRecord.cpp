@@ -1159,7 +1159,17 @@ bool BamRecord::HasPulseWidth() const { return impl_.HasTag(BamRecordTag::PULSE_
 
 bool BamRecord::HasQueryEnd() const { return impl_.HasTag(BamRecordTag::QUERY_END); }
 
+bool BamRecord::HasQueryEndFrameNumber() const
+{
+    return impl_.HasTag(BamRecordTag::QUERY_END_FRAME_NUMBER);
+}
+
 bool BamRecord::HasQueryStart() const { return impl_.HasTag(BamRecordTag::QUERY_START); }
+
+bool BamRecord::HasQueryStartFrameNumber() const
+{
+    return impl_.HasTag(BamRecordTag::QUERY_START_FRAME_NUMBER);
+}
 
 bool BamRecord::HasReadAccuracy() const
 {
@@ -1683,6 +1693,20 @@ BamRecord& BamRecord::QueryEnd(const Position pos)
     return *this;
 }
 
+int32_t BamRecord::QueryEndFrameNumber() const
+{
+    const auto tagName = BamRecordTags::LabelFor(BamRecordTag::QUERY_END_FRAME_NUMBER);
+    const Tag qs = impl_.TagValue(tagName);
+    if (!qs.IsNull()) return qs.ToInt32();
+    return 0;
+}
+
+BamRecord& BamRecord::QueryEndFrameNumber(const int32_t frameNumber)
+{
+    CreateOrEdit(BamRecordTag::QUERY_END_FRAME_NUMBER, frameNumber, &impl_);
+    return *this;
+}
+
 Position BamRecord::QueryStart() const
 {
     // try 'qs' tag
@@ -1715,6 +1739,20 @@ BamRecord& BamRecord::QueryStart(const Position pos)
 {
     CreateOrEdit(BamRecordTag::QUERY_START, static_cast<int32_t>(pos), &impl_);
     UpdateName();
+    return *this;
+}
+
+int32_t BamRecord::QueryStartFrameNumber() const
+{
+    const auto tagName = BamRecordTags::LabelFor(BamRecordTag::QUERY_START_FRAME_NUMBER);
+    const Tag qs = impl_.TagValue(tagName);
+    if (!qs.IsNull()) return qs.ToInt32();
+    return 0;
+}
+
+BamRecord& BamRecord::QueryStartFrameNumber(const int32_t frameNumber)
+{
+    CreateOrEdit(BamRecordTag::QUERY_START_FRAME_NUMBER, frameNumber, &impl_);
     return *this;
 }
 

@@ -103,12 +103,20 @@ public:
     ///
     Position QueryEnd() const;
 
+    /// \returns the number of frames from start of movie to the last base of read
+    ///
+    int32_t QueryEndFrameNumber() const;
+
     /// \returns the record's query start position, or 0 if not stored
     ///
     /// \note QueryStart is in polymerase read coordinates, NOT genomic
     ///       coordinates.
     ///
     Position QueryStart() const;
+
+    /// \returns the number of frames from start of movie to the first base of read
+    ///
+    int32_t QueryStartFrameNumber() const;
 
     /// \returns this record's expected read accuracy [0, 1000]
     Accuracy ReadAccuracy() const;
@@ -373,8 +381,14 @@ public:
     /// \returns true if this record has QueryEnd data
     bool HasQueryEnd() const;
 
+    /// \returns true if this record has QueryEnd data
+    bool HasQueryEndFrameNumber() const;
+
     /// \returns true if this record has QueryStart data
     bool HasQueryStart() const;
+
+    /// \returns true if this record has QueryStartFrameNumber data
+    bool HasQueryStartFrameNumber() const;
 
     /// \returns true if this record has ScrapRegionType data (only in SCRAP)
     bool HasScrapRegionType() const;
@@ -793,6 +807,13 @@ public:
     ///
     BamRecord& QueryEnd(const PacBio::BAM::Position pos);
 
+    /// \brief Sets this record's query end frame number
+    ///
+    /// \param[in] frame number
+    /// \returns reference to this record
+    ///
+    BamRecord& QueryEndFrameNumber(const int32_t frameNumber);
+
     /// \brief Sets this record's query start position.
     ///
     /// \note Changing this will modify the name of non-CCS records.
@@ -801,6 +822,13 @@ public:
     /// \returns reference to this record
     ///
     BamRecord& QueryStart(const PacBio::BAM::Position pos);
+
+    /// \brief Sets this record's query start frame number
+    ///
+    /// \param[in] frame number
+    /// \returns reference to this record
+    ///
+    BamRecord& QueryStartFrameNumber(const int32_t frameNumber);
 
     /// \brief Sets this record's expected read accuracy [0, 1000]
     ///
