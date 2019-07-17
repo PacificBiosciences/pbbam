@@ -18,7 +18,7 @@
 namespace PacBio {
 namespace BAM {
 
-using Frames = PacBio::Data::Frames;
+using Frames PBBAM_DEPRECATED = PacBio::Data::Frames;
 
 }  // namespace BAM
 }  // namespace PacBio

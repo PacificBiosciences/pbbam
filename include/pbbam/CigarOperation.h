@@ -17,11 +17,11 @@
 namespace PacBio {
 namespace BAM {
 
-using CigarOperation = PacBio::Data::CigarOperation;
-using CigarOperationType = PacBio::Data::CigarOperationType;
+using CigarOperation PBBAM_DEPRECATED = PacBio::Data::CigarOperation;
+using CigarOperationType PBBAM_DEPRECATED = PacBio::Data::CigarOperationType;
 
-constexpr auto ConsumesQuery = PacBio::Data::ConsumesQuery;
-constexpr auto ConsumesReference = PacBio::Data::ConsumesReference;
+PBBAM_DEPRECATED constexpr auto ConsumesQuery = PacBio::Data::ConsumesQuery;
+PBBAM_DEPRECATED constexpr auto ConsumesReference = PacBio::Data::ConsumesReference;
 
 }  // namespace BAM
 }  // namespace PacBio
