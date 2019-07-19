@@ -20,9 +20,13 @@
 #include "pbbam/Position.h"
 
 namespace PacBio {
-namespace BAM {
+namespace Data {
 
 class GenomicInterval;
+}
+
+namespace BAM {
+
 class BamRecord;
 
 /// \brief The IndexedFastaReader class provides random-access to FASTA file
@@ -69,7 +73,7 @@ public:
     ///
     /// \throws std::runtime_error on failure to fetch sequence
     ///
-    std::string Subsequence(const GenomicInterval& interval) const;
+    std::string Subsequence(const Data::GenomicInterval& interval) const;
 
     /// \brief Fetches FASTA sequence for desired interval.
     ///

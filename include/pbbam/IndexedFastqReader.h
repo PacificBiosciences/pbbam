@@ -25,10 +25,14 @@
 #include "internal/QueryBase.h"
 
 namespace PacBio {
+namespace Data {
+
+class GenomicInterval;
+}
+
 namespace BAM {
 
 class BamRecord;
-class GenomicInterval;
 class IndexedFastqReaderImpl;
 
 /// \brief The IndexedFastaReader class provides random-access to FASTQ file
@@ -76,7 +80,7 @@ public:
     ///
     /// \throws std::runtime_error on failure to fetch data
     ///
-    std::pair<std::string, QualityValues> Subsequence(const GenomicInterval& interval);
+    std::pair<std::string, QualityValues> Subsequence(const Data::GenomicInterval& interval);
 
     /// \brief Fetches sequence & qualities sequence corresponding to a BamRecord, oriented and
     ///        gapped as requested.
