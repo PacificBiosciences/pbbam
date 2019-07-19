@@ -128,7 +128,6 @@ if not meson.is_subproject()
       'pbbam/internal/DataSetBaseTypes.h',
       'pbbam/internal/DataSetElement.h',
       'pbbam/internal/DataSetElement.inl',
-      'pbbam/internal/Interval.inl',
       'pbbam/internal/PbiBasicTypes.inl',
       'pbbam/internal/PbiFilter.inl',
       'pbbam/internal/PbiFilterTypes.inl',

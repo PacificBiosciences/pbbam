@@ -9,35 +9,25 @@
 
 #include "pbbam/Config.h"
 
-#include <cstdint>
+#include <pbcopper/data/LocalContextFlags.h>
 
 namespace PacBio {
 namespace BAM {
 
-/// \brief The LocalContextFlags enum defines the flags that can be used
-///        to describe a subread's "local context", i.e. whether it is
-///        flanked by barcodes/adapters or its pass orientation.
-///
-enum LocalContextFlags : uint8_t
-{
-    NO_LOCAL_CONTEXT = 0,     ///< No context information available
-    ADAPTER_BEFORE = 1,       ///< Adapter precedes subread
-    ADAPTER_AFTER = 2,        ///< Adapter follows subread
-    BARCODE_BEFORE = 4,       ///< Barcode precedes subread
-    BARCODE_AFTER = 8,        ///< Barcode follows subread
-    FORWARD_PASS = 16,        ///< Subread's orientation is 'forward pass'
-    REVERSE_PASS = 32,        ///< Subread's orientation is 'reverse pass'
-    ADAPTER_BEFORE_BAD = 64,  ///< Adapter preceding subread does not align to adapter reference
-    ADAPTER_AFTER_BAD = 128   ///< Adapter following subread does not align to adapter reference
-};
+using LocalContextFlags PBBAM_DEPRECATED = PacBio::Data::LocalContextFlags;
 
-/// \returns a LocalContextFlags value containing the result of the bitwise-OR
-///          operation of \p lhs and \p rhs.
-// constexpr is implicitly inline
-constexpr LocalContextFlags operator|(const LocalContextFlags lhs, const LocalContextFlags rhs)
-{
-    return static_cast<LocalContextFlags>(static_cast<int>(lhs) | static_cast<int>(rhs));
-}
+// because LocalContextFlags was a C enum and not a
+// C++11 enum class, we need to import all enumerations
+// into the containing scope
+using PacBio::Data::LocalContextFlags::NO_LOCAL_CONTEXT;
+using PacBio::Data::LocalContextFlags::ADAPTER_BEFORE;
+using PacBio::Data::LocalContextFlags::ADAPTER_AFTER;
+using PacBio::Data::LocalContextFlags::BARCODE_BEFORE;
+using PacBio::Data::LocalContextFlags::BARCODE_AFTER;
+using PacBio::Data::LocalContextFlags::FORWARD_PASS;
+using PacBio::Data::LocalContextFlags::REVERSE_PASS;
+using PacBio::Data::LocalContextFlags::ADAPTER_BEFORE_BAD;
+using PacBio::Data::LocalContextFlags::ADAPTER_AFTER_BAD;
 
 }  // namespace BAM
 }  // namespace PacBio

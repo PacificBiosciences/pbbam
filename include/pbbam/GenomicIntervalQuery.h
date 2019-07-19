@@ -15,11 +15,15 @@
 #include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {
+namespace Data {
+
+class GenomicInterval;
+}
+
 namespace BAM {
 
 class BamRecord;
 class DataSet;
-class GenomicInterval;
 
 /// \brief The GenomicIntervalQuery class provides iterable access to a
 ///        DataSet's %BAM records, limiting results to those overlapping a
@@ -58,8 +62,8 @@ public:
     /// \throws std::runtime_error on failure to open/read underlying %BAM or
     ///         BAI files.
     ///
-    GenomicIntervalQuery(const GenomicInterval& interval, const DataSet& dataset);
-    GenomicIntervalQuery(const GenomicInterval& interval, const DataSet& dataset,
+    GenomicIntervalQuery(const Data::GenomicInterval& interval, const DataSet& dataset);
+    GenomicIntervalQuery(const Data::GenomicInterval& interval, const DataSet& dataset,
                          const BaiIndexCache& cache);
 
     ~GenomicIntervalQuery() override;
@@ -83,10 +87,10 @@ public:
     /// \param[in] interval new genomic interval
     /// \returns reference to this query
     ///
-    GenomicIntervalQuery& Interval(const GenomicInterval& interval);
+    GenomicIntervalQuery& Interval(const Data::GenomicInterval& interval);
 
     /// \returns Current genomic interval active on this query.
-    const GenomicInterval& Interval() const;
+    const Data::GenomicInterval& Interval() const;
 
 private:
     class GenomicIntervalQueryPrivate;

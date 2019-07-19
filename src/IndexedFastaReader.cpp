@@ -131,7 +131,7 @@ std::string IndexedFastaReader::Subsequence(const std::string& id, Position begi
     return RemoveAllWhitespace(rawSeq.get());
 }
 
-std::string IndexedFastaReader::Subsequence(const GenomicInterval& interval) const
+std::string IndexedFastaReader::Subsequence(const Data::GenomicInterval& interval) const
 {
     return Subsequence(interval.Name(), interval.Start(), interval.Stop());
 }
