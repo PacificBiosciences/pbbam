@@ -75,7 +75,6 @@ pbbam_cpp_sources = files([
   'SamTagCodec.cpp',
   'SamWriter.cpp',
   'SequenceInfo.cpp',
-  'SimpleRead.cpp',
   'StringUtilities.cpp',
   'SubreadLengthQuery.cpp',
   'Tag.cpp',
