@@ -16,6 +16,9 @@
 #include <utility>
 #include <vector>
 
+#include <pbcopper/data/MappedRead.h>
+#include <pbcopper/data/Read.h>
+
 #include "pbbam/Accuracy.h"
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecordImpl.h"
@@ -1158,6 +1161,24 @@ public:
     static const float photonFactor;
 
     static std::vector<uint16_t> EncodePhotons(const std::vector<float>& data);
+
+    /// \}
+
+public:
+    /// \name [Mapped]Read conversion
+    /// \{
+
+    ///
+    /// \return Data::Read representation of this record
+    ///
+    Data::Read ToRead() const;
+
+    ///
+    /// \return Data::MappedRead representation of this record
+    ///
+    /// \throws std::runtime_error if record is unmapped
+    ///
+    Data::MappedRead ToMappedRead() const;
 
     /// \}
 

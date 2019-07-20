@@ -1923,6 +1923,31 @@ BamRecord& BamRecord::SubstitutionTag(const std::string& tags)
     return *this;
 }
 
+Data::Read BamRecord::ToRead() const
+{
+    Data::Read result{FullName(),      Sequence(),   Qualities(),
+                      SignalToNoise(), QueryStart(), QueryEnd()};
+
+    if (HasIPD()) result.IPD = IPD();
+    if (HasPulseWidth()) result.PulseWidth = PulseWidth().Encode();
+
+    if (IsMapped() && AlignedStrand() == Data::Strand::REVERSE) {
+        ReverseComplement(result.Seq);
+        Reverse(result.Qualities);
+    }
+    return result;
+}
+
+Data::MappedRead BamRecord::ToMappedRead() const
+{
+    if (!IsMapped()) {
+        throw std::runtime_error{"BAM record '" + FullName() +
+                                 "' cannot be converted to MappedRead because it is not mapped"};
+    }
+
+    return {ToRead(), AlignedStrand(), ReferenceStart(), ReferenceEnd(), CigarData(), MapQuality()};
+}
+
 RecordType BamRecord::Type() const
 {
     try {
