@@ -1,14 +1,16 @@
 // Author: Derek Barnett
 
-#ifndef BAM2SAMVERSION_H
-#define BAM2SAMVERSION_H
+#ifndef BAM2SAM_VERSION_H
+#define BAM2SAM_VERSION_H
 
 #include <string>
 
-namespace bam2sam {
+namespace PacBio {
+namespace Bam2Sam {
 
 const std::string Version = std::string("@Bam2Sam_VERSION@");
 
-} // namespace bam2sam
+} // namespace Bam2Sam
+} // namespace PacBio
 
-#endif // BAM2SAMVERSION_H
+#endif // BAM2SAM_VERSION_H

@@ -2,102 +2,99 @@
 
 #include "JsonFormatter.h"
 
+#include <cmath>
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 
 #include <pbbam/PbiFile.h>
-#include "json.hpp"
+#include <pbbam/PbiRawData.h>
 
-using namespace pbindexdump;
-using namespace PacBio::BAM;
+#include <pbcopper/json/JSON.h>
 
-namespace pbindexdump {
+namespace PacBio {
+namespace PbIndexDump {
+namespace {
 
-}  // namespace pbindexdump
-
-JsonFormatter::JsonFormatter(const Settings& settings)
-    : IFormatter(settings), index_(settings.inputPbiFilename_)
+void FormatMetadata(const BAM::PbiRawData& index, JSON::Json& result)
 {
-}
-
-void JsonFormatter::FormatMetadata()
-{
-    auto version = std::string{};
-    switch (index_.Version()) {
-        case PbiFile::Version_3_0_0:
+    std::string version;
+    switch (index.Version()) {
+        case BAM::PbiFile::Version_3_0_0:
             version = "3.0.0";
             break;
-        case PbiFile::Version_3_0_1:
+        case BAM::PbiFile::Version_3_0_1:
             version = "3.0.1";
             break;
-        case PbiFile::Version_3_0_2:
+        case BAM::PbiFile::Version_3_0_2:
             version = "3.0.2";
             break;
         default:
-            throw std::runtime_error("unsupported PBI version encountered");
+            throw std::runtime_error{"unsupported PBI version encountered"};
     }
 
-    nlohmann::json fileSections;
+    JSON::Json fileSections;
     fileSections.push_back("BasicData");
-    if (index_.HasBarcodeData()) fileSections.push_back("BarcodeData");
-    if (index_.HasMappedData()) fileSections.push_back("MappedData");
-    if (index_.HasReferenceData()) fileSections.push_back("ReferenceData");
+    if (index.HasBarcodeData()) fileSections.push_back("BarcodeData");
+    if (index.HasMappedData()) fileSections.push_back("MappedData");
+    if (index.HasReferenceData()) fileSections.push_back("ReferenceData");
 
-    json_["version"] = version;
-    json_["fileSections"] = fileSections;
-    json_["numReads"] = index_.NumReads();
+    result["version"] = version;
+    result["fileSections"] = fileSections;
+    result["numReads"] = index.NumReads();
 }
 
-void JsonFormatter::FormatRaw()
+void FormatRaw(const BAM::PbiRawData& index, JSON::Json& result)
 {
-    const PbiRawBasicData& basicData = index_.BasicData();
-    json_["basicData"]["rgId"] = basicData.rgId_;
-    json_["basicData"]["qStart"] = basicData.qStart_;
-    json_["basicData"]["qEnd"] = basicData.qEnd_;
-    json_["basicData"]["holeNumber"] = basicData.holeNumber_;
-    json_["basicData"]["readQual"] = basicData.readQual_;
-    json_["basicData"]["ctxtFlag"] = basicData.ctxtFlag_;
-    json_["basicData"]["fileOffset"] = basicData.fileOffset_;
+    const BAM::PbiRawBasicData& basicData = index.BasicData();
+    result["basicData"]["rgId"] = basicData.rgId_;
+    result["basicData"]["qStart"] = basicData.qStart_;
+    result["basicData"]["qEnd"] = basicData.qEnd_;
+    result["basicData"]["holeNumber"] = basicData.holeNumber_;
+    result["basicData"]["readQual"] = basicData.readQual_;
+    result["basicData"]["ctxtFlag"] = basicData.ctxtFlag_;
+    result["basicData"]["fileOffset"] = basicData.fileOffset_;
 
-    if (index_.HasBarcodeData()) {
-        const PbiRawBarcodeData& barcodeData = index_.BarcodeData();
-        json_["barcodeData"]["bcForward"] = barcodeData.bcForward_;
-        json_["barcodeData"]["bcReverse"] = barcodeData.bcReverse_;
-        json_["barcodeData"]["bcQuality"] = barcodeData.bcQual_;
+    if (index.HasBarcodeData()) {
+        const BAM::PbiRawBarcodeData& barcodeData = index.BarcodeData();
+        result["barcodeData"]["bcForward"] = barcodeData.bcForward_;
+        result["barcodeData"]["bcReverse"] = barcodeData.bcReverse_;
+        result["barcodeData"]["bcQuality"] = barcodeData.bcQual_;
     }
 
-    if (index_.HasMappedData()) {
-        const PbiRawMappedData& mappedData = index_.MappedData();
+    if (index.HasMappedData()) {
+        const BAM::PbiRawMappedData& mappedData = index.MappedData();
 
         // casts to force -1 if unmapped
-        json_["mappedData"]["tId"] = mappedData.tId_;
-        json_["mappedData"]["tStart"] = mappedData.tStart_;
-        json_["mappedData"]["tEnd"] = mappedData.tEnd_;
+        result["mappedData"]["tId"] = mappedData.tId_;
+        result["mappedData"]["tStart"] = mappedData.tStart_;
+        result["mappedData"]["tEnd"] = mappedData.tEnd_;
 
-        json_["mappedData"]["aStart"] = mappedData.aStart_;
-        json_["mappedData"]["aEnd"] = mappedData.aEnd_;
-        json_["mappedData"]["revStrand"] = mappedData.revStrand_;
-        json_["mappedData"]["nM"] = mappedData.nM_;
-        json_["mappedData"]["nMM"] = mappedData.nMM_;
-        json_["mappedData"]["mapQV"] = mappedData.mapQV_;
+        result["mappedData"]["aStart"] = mappedData.aStart_;
+        result["mappedData"]["aEnd"] = mappedData.aEnd_;
+        result["mappedData"]["revStrand"] = mappedData.revStrand_;
+        result["mappedData"]["nM"] = mappedData.nM_;
+        result["mappedData"]["nMM"] = mappedData.nMM_;
+        result["mappedData"]["mapQV"] = mappedData.mapQV_;
     }
 }
 
-void JsonFormatter::FormatRecords()
+void FormatRecords(const BAM::PbiRawData& index, JSON::Json& result)
 {
-    nlohmann::json reads;
-    const uint32_t numReads = index_.NumReads();
-    const bool hasBarcodeData = index_.HasBarcodeData();
-    const bool hasMappedData = index_.HasMappedData();
+    JSON::Json reads;
+    const uint32_t numReads = index.NumReads();
+    const bool hasBarcodeData = index.HasBarcodeData();
+    const bool hasMappedData = index.HasMappedData();
+
     for (uint32_t i = 0; i < numReads; ++i) {
 
-        nlohmann::json read;
+        JSON::Json read;
 
         // common data
-        const PbiRawBasicData& basicData = index_.BasicData();
+        const BAM::PbiRawBasicData& basicData = index.BasicData();
         read["rgId"] = basicData.rgId_[i];
         read["qStart"] = basicData.qStart_[i];
         read["qEnd"] = basicData.qEnd_[i];
@@ -108,7 +105,7 @@ void JsonFormatter::FormatRecords()
 
         // barcode data, if present
         if (hasBarcodeData) {
-            const PbiRawBarcodeData& barcodeData = index_.BarcodeData();
+            const BAM::PbiRawBarcodeData& barcodeData = index.BarcodeData();
             read["bcForward"] = barcodeData.bcForward_[i];
             read["bcReverse"] = barcodeData.bcReverse_[i];
             read["bcQuality"] = barcodeData.bcQual_[i];
@@ -116,7 +113,7 @@ void JsonFormatter::FormatRecords()
 
         // mapping data, if present
         if (hasMappedData) {
-            const PbiRawMappedData& mappedData = index_.MappedData();
+            const BAM::PbiRawMappedData& mappedData = index.MappedData();
 
             // casts to force -1 if unmapped
             read["tId"] = static_cast<int32_t>(mappedData.tId_[i]);
@@ -133,36 +130,42 @@ void JsonFormatter::FormatRecords()
 
         reads.push_back(std::move(read));
     }
-    json_["reads"] = reads;
+    result["reads"] = reads;
 }
 
-void JsonFormatter::FormatReferences()
+void FormatReferences(const BAM::PbiRawData& index, JSON::Json& result)
 {
-    if (index_.HasReferenceData()) {
-        const PbiRawReferenceData& referenceData = index_.ReferenceData();
-        nlohmann::json references;
-        for (const PbiReferenceEntry& entry : referenceData.entries_) {
-            nlohmann::json element;
+    if (index.HasReferenceData()) {
+        JSON::Json references;
+        const auto& referenceData = index.ReferenceData();
+        for (const auto& entry : referenceData.entries_) {
+            JSON::Json element;
             element["tId"] = static_cast<int32_t>(entry.tId_);
             element["beginRow"] = static_cast<int32_t>(entry.beginRow_);
             element["endRow"] = static_cast<int32_t>(entry.endRow_);
             references.push_back(std::move(element));
         }
-        json_["references"] = references;
+        result["references"] = references;
     }
 }
+}  // namespace
 
-void JsonFormatter::Print() { std::cout << json_.dump(settings_.jsonIndentLevel_) << std::endl; }
-
-void JsonFormatter::Run()
+void JsonFormatter::Run(const Settings& settings)
 {
-    FormatMetadata();
-    FormatReferences();
+    const BAM::PbiRawData index{settings.InputFile};
+    JSON::Json result;
 
-    if (settings_.jsonRaw_)
-        FormatRaw();
+    FormatMetadata(index, result);
+    FormatReferences(index, result);
+
+    if (settings.JsonRaw)
+        FormatRaw(index, result);
     else
-        FormatRecords();
+        FormatRecords(index, result);
 
-    Print();
+    // print
+    std::cout << result.dump(settings.JsonIndentLevel) << '\n';
 }
+
+}  // namespace PbIndexDump
+}  // namespace PacBio

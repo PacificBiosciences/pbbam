@@ -19,7 +19,7 @@ Default settings (JSON):
               "holeNumber": 0,
               "qEnd": 7034,
               "qStart": 2659,
-              "readQuality": 0.00999999977648258,
+              "readQuality": 0.009999999776482582,
               "rgId": -898246524
           }
       ],
@@ -41,7 +41,7 @@ JSON indent level(2):
         "holeNumber": 0,
         "qEnd": 7034,
         "qStart": 2659,
-        "readQuality": 0.00999999977648258,
+        "readQuality": 0.009999999776482582,
         "rgId": -898246524
       }
     ],
@@ -69,7 +69,7 @@ JSON raw:
               2659
           ],
           "readQual": [
-              0.00999999977648258
+              0.009999999776482582
           ],
           "rgId": [
               -898246524

@@ -1,14 +1,16 @@
 // Author: Derek Barnett
 
-#ifndef PBMERGEVERSION_H
-#define PBMERGEVERSION_H
+#ifndef PBMERGE_VERSION_H
+#define PBMERGE_VERSION_H
 
 #include <string>
 
-namespace pbmerge {
+namespace PacBio {
+namespace PbMerge {
 
 const std::string Version = std::string("@PbMerge_VERSION@");
 
-} // namespace pbmerge
+} // namespace PbMerge
+} // namespace PacBio
 
-#endif // PBMERGEVERSION_H
+#endif // PBMERGE_VERSION_H
