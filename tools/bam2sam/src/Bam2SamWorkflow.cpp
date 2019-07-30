@@ -1,16 +1,17 @@
 // Author: Derek Barnett
 
-#include <cassert>
+#include "Bam2SamWorkflow.h"
+
 #include <memory>
 #include <stdexcept>
 
 #include <htslib/sam.h>
 
-#include "Bam2Sam.h"
+#include "Bam2SamSettings.h"
 
-using namespace bam2sam;
-
-namespace bam2sam {
+namespace PacBio {
+namespace Bam2Sam {
+namespace {
 
 struct HtslibFileDeleter
 {
@@ -39,16 +40,18 @@ struct HtslibRecordDeleter
     }
 };
 
-}  // namespace bam2sam
+}  // namespace
 
-void PbBam2Sam::Run(const Settings& settings)
+int Workflow::Runner(const CLI_v2::Results& args)
 {
+    const Settings settings{args};
+
     int htslibResult = 0;
 
     // open files
 
     std::unique_ptr<samFile, HtslibFileDeleter> inFileWrapper(
-        sam_open(settings.inputFilename_.c_str(), "rb"));
+        sam_open(settings.InputFilename.c_str(), "rb"));
     samFile* in = inFileWrapper.get();
     if (!in || !in->fp.bgzf) throw std::runtime_error("could not read from stdin");
 
@@ -62,10 +65,10 @@ void PbBam2Sam::Run(const Settings& settings)
     bam_hdr_t* hdr = headerWrapper.get();
     if (!hdr) throw std::runtime_error("could not read header");
 
-    if (!settings.noHeader_) {
+    if (!settings.NoHeader) {
         htslibResult = sam_hdr_write(out, hdr);
         if (htslibResult != 0) throw std::runtime_error("could not write header");
-        if (settings.printHeaderOnly_) return;
+        if (settings.HeaderOnly) return EXIT_SUCCESS;
     }
 
     // fetch & write records
@@ -77,4 +80,9 @@ void PbBam2Sam::Run(const Settings& settings)
         htslibResult = sam_write1(out, hdr, b);
         if (htslibResult < 0) throw std::runtime_error("error writing record to stdout");
     }
+
+    return EXIT_SUCCESS;
 }
+
+}  // namespace Bam2Sam
+}  // namespace PacBio

@@ -1,159 +1,145 @@
 // Author: Derek Barnett
 
 #include "CppFormatter.h"
-#include <pbbam/PbiRawData.h>
 
 #include <cstdint>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
-using namespace pbindexdump;
+#include <pbbam/PbiFile.h>
+#include <pbbam/PbiRawData.h>
 
-namespace pbindexdump {
+namespace PacBio {
+namespace PbIndexDump {
+namespace {
 
-static std::string printCppReferenceData(const PacBio::BAM::PbiRawReferenceData& referenceData)
+std::string printReferenceData(const BAM::PbiRawReferenceData& referenceData)
 {
-    auto result = std::string{""};
-    for (const PacBio::BAM::PbiReferenceEntry& entry : referenceData.entries_) {
-        if (!result.empty()) result.append(",\n");
-        result.append(std::string{"    PbiReferenceEntry{"} + std::to_string(entry.tId_) + "," +
-                      std::to_string(entry.beginRow_) + "," + std::to_string(entry.endRow_) +
-                      std::string{"}"});
+    std::ostringstream out;
+    for (const auto& entry : referenceData.entries_) {
+        if (!out.str().empty()) out << ",\n";
+
+        out << "    PbiReferenceEntry{" << entry.tId_ << "," << entry.beginRow_ << ","
+            << entry.endRow_ << "}";
     }
-    if (!result.empty()) result.append("\n");
-    return result;
+    if (!out.str().empty()) out << '\n';
+    return out.str();
 }
 
 template <typename T>
-std::string printVectorElements(const std::vector<T>& c)
+std::string printField(const std::vector<T>& c)
 {
-    std::stringstream s;
+    std::ostringstream out;
     for (const auto& e : c)
-        s << e << ",";
-    auto result = s.str();
+        out << e << ",";
+    auto result = out.str();
     if (!result.empty()) result.pop_back();  // remove final comma
     return result;
 }
 
 template <>
-std::string printVectorElements(const std::vector<uint8_t>& c)
+std::string printField(const std::vector<uint8_t>& c)
 {
-    std::stringstream s;
+    std::ostringstream out;
     for (const auto& e : c)
-        s << static_cast<uint16_t>(e)
-          << ",";  // cast to larger uint, force print as number not character
-    auto result = s.str();
+        out << static_cast<uint16_t>(e)
+            << ",";  // cast to larger uint, force print as number not character
+    auto result = out.str();
     if (!result.empty()) result.pop_back();  // remove final comma
     return result;
 }
 
 template <>
-std::string printVectorElements(const std::vector<int8_t>& c)
+std::string printField(const std::vector<int8_t>& c)
 {
-    std::stringstream s;
+    std::ostringstream out;
     for (const auto& e : c)
-        s << static_cast<int16_t>(e)
-          << ",";  // cast to larger int, force print as number not character
-    auto result = s.str();
+        out << static_cast<int16_t>(e)
+            << ",";  // cast to larger int, force print as number not character
+    auto result = out.str();
     if (!result.empty()) result.pop_back();  // remove final comma
     return result;
 }
 
-}  // namespace pbindexdump
+}  // namespace
 
-CppFormatter::CppFormatter(const Settings& settings) : IFormatter(settings) {}
-
-void CppFormatter::Run()
+void CppFormatter::Run(const Settings& settings)
 {
-    using namespace PacBio::BAM;
+    const BAM::PbiRawData rawData{settings.InputFile};
+    const auto& barcodeData = rawData.BarcodeData();
+    const auto& basicData = rawData.BasicData();
+    const auto& mappedData = rawData.MappedData();
+    const auto& referenceData = rawData.ReferenceData();
 
-    const PbiRawData rawData{settings_.inputPbiFilename_};
-    const PbiRawBarcodeData& barcodeData = rawData.BarcodeData();
-    const PbiRawBasicData& basicData = rawData.BasicData();
-    const PbiRawMappedData& mappedData = rawData.MappedData();
-    const PbiRawReferenceData& referenceData = rawData.ReferenceData();
-
-    auto version = std::string{};
+    std::string version;
     switch (rawData.Version()) {
-        case PbiFile::Version_3_0_0:
+        case BAM::PbiFile::Version_3_0_0:
             version = "PbiFile::Version_3_0_0";
             break;
-        case PbiFile::Version_3_0_1:
+        case BAM::PbiFile::Version_3_0_1:
             version = "PbiFile::Version_3_0_1";
             break;
-        case PbiFile::Version_3_0_2:
+        case BAM::PbiFile::Version_3_0_2:
             version = "PbiFile::Version_3_0_2";
             break;
         default:
             throw std::runtime_error("unsupported PBI version encountered");
     }
 
-    auto fileSections = std::string{"PbiFile::BASIC"};
+    std::string fileSections{"PbiFile::BASIC"};
     if (rawData.HasBarcodeData()) fileSections += std::string{" | PbiFile::BARCODE"};
     if (rawData.HasMappedData()) fileSections += std::string{" | PbiFile::MAPPED"};
     if (rawData.HasReferenceData()) fileSections += std::string{" | PbiFile::REFERENCE"};
 
     std::ostringstream s;
-    s << "PbiRawData rawData;" << std::endl
-      << "rawData.Version(" << version << ");" << std::endl
-      << "rawData.FileSections(" << fileSections << ");" << std::endl
-      << "rawData.NumReads(" << rawData.NumReads() << ");" << std::endl
-      << std::endl
-      << "PbiRawBasicData& basicData = rawData.BasicData();" << std::endl
-      << "basicData.rgId_       = {" << printVectorElements(basicData.rgId_) << "};" << std::endl
-      << "basicData.qStart_     = {" << printVectorElements(basicData.qStart_) << "};" << std::endl
-      << "basicData.qEnd_       = {" << printVectorElements(basicData.qEnd_) << "};" << std::endl
-      << "basicData.holeNumber_ = {" << printVectorElements(basicData.holeNumber_) << "};"
-      << std::endl
-      << "basicData.readQual_   = {" << printVectorElements(basicData.readQual_) << "};"
-      << std::endl
-      << "basicData.ctxtFlag_   = {" << printVectorElements(basicData.ctxtFlag_) << "};"
-      << std::endl
-      << "basicData.fileOffset_ = {" << printVectorElements(basicData.fileOffset_) << "};"
-      << std::endl
-      << std::endl;
+    s << "PbiRawData rawData;\n"
+      << "rawData.Version(" << version << ");\n"
+      << "rawData.FileSections(" << fileSections << ");\n"
+      << "rawData.NumReads(" << rawData.NumReads() << ");\n"
+      << '\n'
+      << "PbiRawBasicData& basicData = rawData.BasicData();\n"
+      << "basicData.rgId_       = {" << printField(basicData.rgId_) << "};\n"
+      << "basicData.qStart_     = {" << printField(basicData.qStart_) << "};\n"
+      << "basicData.qEnd_       = {" << printField(basicData.qEnd_) << "};\n"
+      << "basicData.holeNumber_ = {" << printField(basicData.holeNumber_) << "};\n"
+      << "basicData.readQual_   = {" << printField(basicData.readQual_) << "};\n"
+      << "basicData.ctxtFlag_   = {" << printField(basicData.ctxtFlag_) << "};\n"
+      << "basicData.fileOffset_ = {" << printField(basicData.fileOffset_) << "};\n";
 
     if (rawData.HasBarcodeData()) {
-        s << "PbiRawBarcodeData& barcodeData = rawData.BarcodeData();" << std::endl
-          << "barcodeData.bcForward_ = {" << printVectorElements(barcodeData.bcForward_) << "};"
-          << std::endl
-          << "barcodeData.bcReverse_ = {" << printVectorElements(barcodeData.bcReverse_) << "};"
-          << std::endl
-          << "barcodeData.bcQual_    = {" << printVectorElements(barcodeData.bcQual_) << "};"
-          << std::endl
-          << std::endl;
+        s << '\n'
+          << "PbiRawBarcodeData& barcodeData = rawData.BarcodeData();\n"
+          << "barcodeData.bcForward_ = {" << printField(barcodeData.bcForward_) << "};\n"
+          << "barcodeData.bcReverse_ = {" << printField(barcodeData.bcReverse_) << "};\n"
+          << "barcodeData.bcQual_    = {" << printField(barcodeData.bcQual_) << "};\n";
     }
 
     if (rawData.HasMappedData()) {
-        s << "PbiRawMappedData& mappedData = rawData.MappedData();" << std::endl
-          << "mappedData.tId_       = {" << printVectorElements(mappedData.tId_) << "};"
-          << std::endl
-          << "mappedData.tStart_    = {" << printVectorElements(mappedData.tStart_) << "};"
-          << std::endl
-          << "mappedData.tEnd_      = {" << printVectorElements(mappedData.tEnd_) << "};"
-          << std::endl
-          << "mappedData.aStart_    = {" << printVectorElements(mappedData.aStart_) << "};"
-          << std::endl
-          << "mappedData.aEnd_      = {" << printVectorElements(mappedData.aEnd_) << "};"
-          << std::endl
-          << "mappedData.revStrand_ = {" << printVectorElements(mappedData.revStrand_) << "};"
-          << std::endl
-          << "mappedData.nM_        = {" << printVectorElements(mappedData.nM_) << "};" << std::endl
-          << "mappedData.nMM_       = {" << printVectorElements(mappedData.nMM_) << "};"
-          << std::endl
-          << "mappedData.mapQV_     = {" << printVectorElements(mappedData.mapQV_) << "};"
-          << std::endl
-          << std::endl;
+        s << '\n'
+          << "PbiRawMappedData& mappedData = rawData.MappedData();" << std::endl
+          << "mappedData.tId_       = {" << printField(mappedData.tId_) << "};\n"
+          << "mappedData.tStart_    = {" << printField(mappedData.tStart_) << "};\n"
+          << "mappedData.tEnd_      = {" << printField(mappedData.tEnd_) << "};\n"
+          << "mappedData.aStart_    = {" << printField(mappedData.aStart_) << "};\n"
+          << "mappedData.aEnd_      = {" << printField(mappedData.aEnd_) << "};\n"
+          << "mappedData.revStrand_ = {" << printField(mappedData.revStrand_) << "};\n"
+          << "mappedData.nM_        = {" << printField(mappedData.nM_) << "};\n"
+          << "mappedData.nMM_       = {" << printField(mappedData.nMM_) << "};\n"
+          << "mappedData.mapQV_     = {" << printField(mappedData.mapQV_) << "};\n";
     }
 
     if (rawData.HasReferenceData()) {
-        s << "PbiRawReferenceData& referenceData = rawData.ReferenceData();" << std::endl
-          << "referenceData.entries_ = { " << std::endl
-          << printCppReferenceData(referenceData) << "};" << std::endl
-          << std::endl;
+        s << '\n'
+          << "PbiRawReferenceData& referenceData = rawData.ReferenceData();\n"
+          << "referenceData.entries_ = { \n"
+          << printReferenceData(referenceData) << "};\n";
     }
 
-    std::cout << s.str() << std::endl;
+    std::cout << s.str();
 }
+
+}  // namespace PbIndexDump
+}  // namespace PacBio

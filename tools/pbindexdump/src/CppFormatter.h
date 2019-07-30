@@ -1,19 +1,19 @@
 // Author: Derek Barnett
 
-#ifndef CPPFORMATTER_H
-#define CPPFORMATTER_H
+#ifndef PBINDEXDUMP_CPPFORMATTER_H
+#define PBINDEXDUMP_CPPFORMATTER_H
 
-#include "IFormatter.h"
+#include "PbIndexDumpSettings.h"
 
-namespace pbindexdump {
+namespace PacBio {
+namespace PbIndexDump {
 
-class CppFormatter : public IFormatter
+struct CppFormatter
 {
-public:
-    CppFormatter(const Settings& settings);
-    void Run();
+    static void Run(const Settings& settings);
 };
 
-}  // namespace pbindexdump
+}  // namespace PbIndexDump
+}  // namespace PacBio
 
-#endif  // CPPFORMATTER_H
+#endif  // PBINDEXDUMP_CPPFORMATTER_H

@@ -14,9 +14,9 @@ pbbam_Bam2SamVersion_h = configure_file(
 
 pbbam_bam2sam_cpp_sources = [pbbam_Bam2SamVersion_h]
 pbbam_bam2sam_cpp_sources += files([
-  'common/OptionParser.cpp',
   'bam2sam/src/main.cpp',
-  'bam2sam/src/Bam2Sam.cpp'])
+  'bam2sam/src/Bam2SamSettings.cpp',
+  'bam2sam/src/Bam2SamWorkflow.cpp'])
 
 pbbam_bam2sam = executable(
   'bam2sam',
@@ -56,9 +56,9 @@ pbbam_PbIndexVersion_h = configure_file(
 
 pbbam_pbindex_cpp_sources = [pbbam_PbIndexVersion_h]
 pbbam_pbindex_cpp_sources += files([
-  'common/OptionParser.cpp',
   'pbindex/src/main.cpp',
-  'pbindex/src/PbIndex.cpp'])
+  'pbindex/src/PbIndexSettings.cpp',
+  'pbindex/src/PbIndexWorkflow.cpp'])
 
 pbbam_pbindex = executable(
   'pbindex',
@@ -84,10 +84,10 @@ pbbam_PbIndexDumpVersion_h = configure_file(
 
 pbbam_pbindexdump_cpp_sources = [pbbam_PbIndexDumpVersion_h]
 pbbam_pbindexdump_cpp_sources += files([
-  'common/OptionParser.cpp',
   'pbindexdump/src/CppFormatter.cpp',
   'pbindexdump/src/JsonFormatter.cpp',
-  'pbindexdump/src/PbIndexDump.cpp',
+  'pbindexdump/src/PbIndexDumpSettings.cpp',
+  'pbindexdump/src/PbIndexDumpWorkflow.cpp',
   'pbindexdump/src/main.cpp'])
 
 pbbam_pbindexdump = executable(
@@ -138,8 +138,9 @@ pbbam_PbMergeVersion_h = configure_file(
 
 pbbam_pbmerge_cpp_sources = [pbbam_PbMergeVersion_h]
 pbbam_pbmerge_cpp_sources += files([
-  'common/OptionParser.cpp',
-  'pbmerge/src/main.cpp'])
+  'pbmerge/src/main.cpp',
+  'pbmerge/src/PbMergeSettings.cpp',
+  'pbmerge/src/PbMergeWorkflow.cpp'])
 
 pbbam_pbmerge = executable(
   'pbmerge',
@@ -200,9 +201,9 @@ pbbam_PbBamifyVersion_h = configure_file(
 
 pbbam_pbbamify_cpp_sources = [pbbam_PbBamifyVersion_h]
 pbbam_pbbamify_cpp_sources += files([
-  'common/OptionParser.cpp',
   'pbbamify/src/main.cpp',
-  'pbbamify/src/PbBamify.cpp',
+  'pbbamify/src/PbBamifySettings.cpp',
+  'pbbamify/src/PbBamifyWorkflow.cpp',
   'pbbamify/src/QueryLookup.cpp'
   ])
 
