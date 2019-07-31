@@ -1,5 +1,4 @@
 pbbam_test_cpp_sources = files([
-  'test_Accuracy.cpp',
   'test_AlignmentPrinter.cpp',
   'test_BamFile.cpp',
   'test_BamHeader.cpp',
@@ -43,7 +42,6 @@ pbbam_test_cpp_sources = files([
   'test_IndexedBamWriter.cpp',
   'test_IndexedFastaReader.cpp',
   'test_IndexedFastqReader.cpp',
-  'test_Intervals.cpp',
   'test_LongCigar.cpp',
   'test_PacBioIndex.cpp',
   'test_PbiFilter.cpp',

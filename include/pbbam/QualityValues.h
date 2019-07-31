@@ -20,7 +20,7 @@
 namespace PacBio {
 namespace BAM {
 
-using QualityValues = PacBio::Data::QualityValues;
+using QualityValues PBBAM_DEPRECATED = PacBio::Data::QualityValues;
 
 }  // namespace BAM
 }  // namespace PacBio

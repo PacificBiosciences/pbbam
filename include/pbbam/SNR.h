@@ -17,9 +17,9 @@
 namespace PacBio {
 namespace BAM {
 
-using SNR = PacBio::Data::SNR;
+using SNR PBBAM_DEPRECATED = PacBio::Data::SNR;
 
-constexpr auto ClampSNR = PacBio::Data::ClampSNR;
+PBBAM_DEPRECATED constexpr auto ClampSNR = PacBio::Data::ClampSNR;
 
 }  // namespace BAM
 }  // namespace PacBio

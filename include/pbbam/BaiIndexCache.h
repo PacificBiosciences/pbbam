@@ -22,7 +22,6 @@ namespace BAM {
 
 class BamFile;
 class DataSet;
-class GenomicInterval;
 
 ///
 /// \brief Caches contents of *.bai file for re-use by multiple readers.

@@ -341,23 +341,11 @@ TEST(BamRecordMappingTest, SoftClipMapping)
     const f_data frames   = { 40, 40, 10, 10, 20, 20, 30, 40, 40, 10, 30, 20, 10, 10, 10 };
     const uint8_t mapQual = 80;
 
-    const std::string clipped_seq   = "AACCGTTAGC";
-    const std::string clipped_quals = "?]?]?]?]?*";
-    const std::string clipped_tagBases   = "AACCGTTAGC";
-    const std::string clipped_tagQuals = "?]?]?]?]?*";
-    const f_data clipped_frames = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
-
     const std::string seq_rev   = "TTTGCTAACGGTTAA";
     const std::string quals_rev = "+++*?]?]?]?]?--";
     const std::string tagBases_rev = seq_rev;
     const std::string tagQuals_rev = quals_rev;
     const f_data frames_rev = { 10, 10, 10, 20, 30, 10, 40, 40, 30, 20, 20, 10, 10, 40, 40 };
-
-    const std::string clipped_seq_rev   = "GCTAACGGTT";
-    const std::string clipped_quals_rev = "*?]?]?]?]?";
-    const std::string clipped_tagBases_rev = clipped_seq_rev;
-    const std::string clipped_tagQuals_rev = clipped_quals_rev;
-    const f_data clipped_frames_rev = { 20, 30, 10, 40, 40, 30, 20, 20, 10, 10 };
 
     const std::string s1_cigar = "2S10=3S";
     const std::string s2_cigar = "2S5=3D5=3S";

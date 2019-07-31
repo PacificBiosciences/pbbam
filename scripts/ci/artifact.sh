@@ -13,10 +13,10 @@ fi
 # *never* create artifacts with ASAN enabled
 meson configure -Dprefix=/ -Db_sanitize=none "${CURRENT_BUILD_DIR:-build}"
 
-NEXUS_VERSION="$(${CURRENT_BUILD_DIR:-build}/tools/bam2sam --version)".${BUILD_NUMBER}
+NEXUS_VERSION="$(${CURRENT_BUILD_DIR:-build}/tools/pbindex --version | grep -o -E '[[:digit:]]+(\.[[:digit:]]+)*')".${BUILD_NUMBER}
 case "${bamboo_planRepository_branchName}" in
   develop)
-    VERSION="$(${CURRENT_BUILD_DIR:-build}/tools/bam2sam --version)".SNAPSHOT${BUILD_NUMBER}
+    VERSION="$(${CURRENT_BUILD_DIR:-build}/tools/pbindex --version | grep -o -E '[[:digit:]]+(\.[[:digit:]]+)*')".SNAPSHOT${BUILD_NUMBER}
     NEXUS_REPO=maven-snapshots
     ;;
   master)

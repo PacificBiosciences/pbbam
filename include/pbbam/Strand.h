@@ -14,7 +14,7 @@
 namespace PacBio {
 namespace BAM {
 
-using Strand = PacBio::Data::Strand;
+using Strand PBBAM_DEPRECATED = PacBio::Data::Strand;
 
 }  // namespace BAM
 }  // namespace PacBio

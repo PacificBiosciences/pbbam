@@ -1,14 +1,16 @@
 // Author: Derek Barnett
 
-#ifndef PBINDEXDUMPVERSION_H
-#define PBINDEXDUMPVERSION_H
+#ifndef PBINDEXDUMP_VERSION_H
+#define PBINDEXDUMP_VERSION_H
 
 #include <string>
 
-namespace pbindexdump {
+namespace PacBio {
+namespace PbIndexDump {
 
 const std::string Version = std::string("@PbIndexDump_VERSION@");
 
-} // namespace pbindexdump
+} // namespace PbIndexDump
+} // namespace PacBio
 
-#endif // PBINDEXDUMPVERSION_H
+#endif // PBINDEXDUMP_VERSION_H

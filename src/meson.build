@@ -3,7 +3,6 @@
 ###########
 
 pbbam_cpp_sources = files([
-  'Accuracy.cpp',
   'AlignmentPrinter.cpp',
   'BaiIndexCache.cpp',
   'BaiIndexedBamReader.cpp',
@@ -47,7 +46,6 @@ pbbam_cpp_sources = files([
   'FileUtils.cpp',
   'FofnReader.cpp',
   'FormatUtils.cpp',
-  'GenomicInterval.cpp',
   'GenomicIntervalQuery.cpp',
   'IFastaWriter.cpp',
   'IFastqWriter.cpp',
@@ -77,7 +75,6 @@ pbbam_cpp_sources = files([
   'SamTagCodec.cpp',
   'SamWriter.cpp',
   'SequenceInfo.cpp',
-  'SimpleRead.cpp',
   'StringUtilities.cpp',
   'SubreadLengthQuery.cpp',
   'Tag.cpp',

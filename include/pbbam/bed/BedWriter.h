@@ -12,9 +12,12 @@
 #include <memory>
 
 namespace PacBio {
-namespace BAM {
+namespace Data {
 
 class GenomicInterval;
+}
+
+namespace BAM {
 
 class BedWriter
 {
@@ -26,7 +29,7 @@ public:
     ~BedWriter();
 
 public:
-    void Write(const GenomicInterval& interval);
+    void Write(const Data::GenomicInterval& interval);
 
 private:
     class BedWriterPrivate;
