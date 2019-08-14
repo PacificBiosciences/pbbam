@@ -1929,7 +1929,7 @@ Data::Read BamRecord::ToRead() const
                       SignalToNoise(), QueryStart(), QueryEnd()};
 
     if (HasIPD()) result.IPD = IPD();
-    if (HasPulseWidth()) result.PulseWidth = PulseWidth().Encode();
+    if (HasPulseWidth()) result.PulseWidth = PulseWidth();
 
     if (IsMapped() && AlignedStrand() == Data::Strand::REVERSE) {
         ReverseComplement(result.Seq);
