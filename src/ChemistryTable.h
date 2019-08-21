@@ -12,7 +12,7 @@
 namespace PacBio {
 namespace BAM {
 
-using ChemistryTable = std::vector<std::array<std::string, 4>>;
+using ChemistryTable = std::vector<std::array<std::string, 5>>;
 
 const ChemistryTable& BuiltInChemistryTable();
 

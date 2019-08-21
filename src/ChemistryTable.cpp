@@ -42,11 +42,10 @@ ChemistryTable ChemistryTableFromXml(const std::string& mappingXml)
         for (const auto& childNode : rootNode) {
             const std::string childName = childNode.name();
             if (childName != "Mapping") continue;
-            table.emplace_back(
-                std::array<std::string, 4>{{childNode.child("BindingKit").child_value(),
-                                            childNode.child("SequencingKit").child_value(),
-                                            childNode.child("SoftwareVersion").child_value(),
-                                            childNode.child("SequencingChemistry").child_value()}});
+            table.push_back({childNode.child("BindingKit").child_value(),
+                             childNode.child("SequencingKit").child_value(),
+                             childNode.child("SoftwareVersion").child_value(),
+                             childNode.child("SequencingChemistry").child_value()});
         }
     } catch (std::exception& e) {
         const std::string msg = std::string{"Mapping entries unparseable - "} + e.what();
@@ -140,16 +139,16 @@ const ChemistryTable& BuiltInChemistryTable()
         // Sequel® II Binding Kit 2.0; Sequel® II Sequencing Plate 2.0EA (4 Rxn)
         {{"101-789-500", "101-789-300", "5.0", "S/P4-C2/5.0-8M"}},
         // Sequel® II Binding Kit 2.0; Sequel® II Sequencing Plate 2.0 (4 Rxn)
-        {{"101-789-500", "101-826-100", "5.0", "S/P4-C2/5.0-8M"}},
+        {{"101-789-500", "101-826-100", "5.0", "S/P4-C2/5.0-8M", "TAGT-319"}},
         // Sequel® II Binding Kit 2.0; Sequel® II Sequencing Plate 2.0 (4 Rxn) - QC
-        {{"101-789-500", "101-820-300", "5.0", "S/P4-C2/5.0-8M"}},
+        {{"101-789-500", "101-820-300", "5.0", "S/P4-C2/5.0-8M", "TAGT-319"}},
 
         // Sequel® II Binding Kit 2.1; Sequel® II Sequencing Plate 2.0EA (4 Rxn)
         {{"101-820-500", "101-789-300", "5.0", "S/P4.1-C2/5.0-8M"}},
         // Sequel® II Binding Kit 2.1; Sequel® II Sequencing Plate 2.0 (4 Rxn)
-        {{"101-820-500", "101-826-100", "5.0", "S/P4.1-C2/5.0-8M"}},
+        {{"101-820-500", "101-826-100", "5.0", "S/P4.1-C2/5.0-8M", "TAGT-319"}},
         // Sequel® II Binding Kit 2.1; Sequel® II Sequencing Plate 2.0 (4 Rxn) - QC
-        {{"101-820-500", "101-820-300", "5.0", "S/P4.1-C2/5.0-8M"}}
+        {{"101-820-500", "101-820-300", "5.0", "S/P4.1-C2/5.0-8M", "TAGT-319"}}
     };
     // clang-format on
 
