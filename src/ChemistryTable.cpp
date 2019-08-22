@@ -121,20 +121,20 @@ const ChemistryTable& BuiltInChemistryTable()
         {{"101-500-400", "101-646-800", "5.0", "S/P3-C3/5.0", "TAGT-415"}}, // Sequel® Sequencing Plate 3.1 for Dynamic Loading placeholder
 
         // 5.0.1 ChemRel; Sequel® Dev Sequencing Plate Dyn Loading (4 rxn)
-        {{"101-490-800", "101-644-500", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel® Dev Sequencing Plate Dyn Loading
+        {{"101-490-800", "101-644-500", "5.0", "S/P3-C1/5.0-8M", "TAGT-418"}}, // Sequel® Dev Sequencing Plate Dyn Loading
 
         // 5.0.1 ChemRel; Sequel® Sequencing Plate Dyn Loading (4 rxn)
-        {{"101-490-800", "101-717-100", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel® Dev Sequencing Plate Dyn Loading
-
-        // 5.0.1 ChemRel; Sequel® Dev Sequencing Plate Dyn Loading (4 rxn)
-        {{"101-717-300", "101-644-500", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel® Dev Sequencing Plate Dyn Loading
-        // 5.0.1 ChemRel; Sequel® Sequencing Plate Dyn Loading (4 rxn)
-        {{"101-717-300", "101-717-100", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel® Dev Sequencing Plate Dyn Loading
+        {{"101-490-800", "101-717-100", "5.0", "S/P3-C1/5.0-8M", "TAGT-418"}}, // Sequel® Dev Sequencing Plate Dyn Loading
 
         // 5.0.1 ChemRel; Sequel® Dev Sequencing Plate Dyn Loading (4 rxn)
-        {{"101-717-400", "101-644-500", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel® Dev Sequencing Plate Dyn Loading
+        {{"101-717-300", "101-644-500", "5.0", "S/P3-C1/5.0-8M", "TAGT-418"}}, // Sequel® Dev Sequencing Plate Dyn Loading
         // 5.0.1 ChemRel; Sequel® Sequencing Plate Dyn Loading (4 rxn)
-        {{"101-717-400", "101-717-100", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel® Dev Sequencing Plate Dyn Loading
+        {{"101-717-300", "101-717-100", "5.0", "S/P3-C1/5.0-8M", "TAGT-418"}}, // Sequel® Dev Sequencing Plate Dyn Loading
+
+        // 5.0.1 ChemRel; Sequel® Dev Sequencing Plate Dyn Loading (4 rxn)
+        {{"101-717-400", "101-644-500", "5.0", "S/P3-C1/5.0-8M", "TAGT-418"}}, // Sequel® Dev Sequencing Plate Dyn Loading
+        // 5.0.1 ChemRel; Sequel® Sequencing Plate Dyn Loading (4 rxn)
+        {{"101-717-400", "101-717-100", "5.0", "S/P3-C1/5.0-8M", "TAGT-418"}}, // Sequel® Dev Sequencing Plate Dyn Loading
 
         // Sequel® II Binding Kit 2.0; Sequel® II Sequencing Plate 2.0EA (4 Rxn)
         {{"101-789-500", "101-789-300", "5.0", "S/P4-C2/5.0-8M"}},
