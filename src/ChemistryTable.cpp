@@ -114,8 +114,8 @@ const ChemistryTable& BuiltInChemistryTable()
         {{"101-500-400", "101-427-800", "5.0", "S/P3-C3/5.0", "TAGT-415"}}, // Sequel® Sequencing Plate 3.0 (4 rxn)
 
         // 5.0.1 ChemRel; Sequel® Dev Binding Kit; S/P2-C2
-        {{"101-490-800", "101-490-900", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel II® Sequencing Plate (4 rxn)
-        {{"101-490-800", "101-491-000", "5.0", "S/P3-C1/5.0-8M"}}, // Sequel II® Sequencing Plate (8 rxn)
+        {{"101-490-800", "101-490-900", "5.0", "S/P3-C1/5.0-8M", "TAGT-416"}}, // Sequel II® Sequencing Plate (4 rxn)
+        {{"101-490-800", "101-491-000", "5.0", "S/P3-C1/5.0-8M", "TAGT-416"}}, // Sequel II® Sequencing Plate (8 rxn)
 
         // 5.0.1 ChemRel; Sequel® Sequencing Plate 3.1 for Dynamic Loading placeholder (4 rxn)
         {{"101-500-400", "101-646-800", "5.0", "S/P3-C3/5.0", "TAGT-415"}}, // Sequel® Sequencing Plate 3.1 for Dynamic Loading placeholder
