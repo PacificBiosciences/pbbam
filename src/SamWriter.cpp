@@ -4,8 +4,10 @@
 
 #include "pbbam/SamWriter.h"
 
+#include <cassert>
 #include <memory>
 #include <string>
+#include <type_traits>
 
 #include <htslib/hfile.h>
 #include <htslib/sam.h>
@@ -13,7 +15,6 @@
 #include "Autovalidate.h"
 #include "FileProducer.h"
 #include "MemoryUtils.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/Validator.h"
 
 namespace PacBio {
@@ -79,6 +80,11 @@ public:
     std::shared_ptr<bam_hdr_t> header_;
 };
 
+static_assert(!std::is_copy_constructible<SamWriter>::value,
+              "SamWriter(const SamWriter&) is not = delete");
+static_assert(!std::is_copy_assignable<SamWriter>::value,
+              "SamWriter& operator=(const SamWriter&) is not = delete");
+
 SamWriter::SamWriter(std::string filename, const BamHeader& header)
     : IRecordWriter()
     , d_{std::make_unique<SamWriterPrivate>(std::move(filename),
@@ -89,9 +95,9 @@ SamWriter::SamWriter(std::string filename, const BamHeader& header)
 #endif
 }
 
-SamWriter::SamWriter(SamWriter&&) = default;
+SamWriter::SamWriter(SamWriter&&) noexcept = default;
 
-SamWriter& SamWriter::operator=(SamWriter&&) = default;
+SamWriter& SamWriter::operator=(SamWriter&&) noexcept = default;
 
 SamWriter::~SamWriter() = default;
 

@@ -23,10 +23,11 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
+#include <pbcopper/utility/Deleters.h>
+
 #include "MemoryUtils.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamRecordImpl.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiRawData.h"
 #include "pbbam/RecordType.h"
 
@@ -587,7 +588,7 @@ private:
     std::string bamFilename_;
     std::string pbiFilename_;
     std::string tempFilename_;
-    std::unique_ptr<FILE, FileDeleter> tempFile_;
+    std::unique_ptr<FILE, Utility::FileDeleter> tempFile_;
     std::unique_ptr<BGZF, HtslibBgzfDeleter> pbiFile_;
     PbiBuilder::CompressionLevel compressionLevel_;
     size_t numThreads_;

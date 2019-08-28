@@ -3,6 +3,8 @@
 #ifndef FILEPRODUCER_H
 #define FILEPRODUCER_H
 
+#include "pbbam/Config.h"
+
 #include <cstdio>
 #include <string>
 
@@ -38,7 +40,7 @@ public:
     //
     // Remaming will not occur if there is a 'live' exception being thrown.
     //
-    ~FileProducer();
+    virtual ~FileProducer();
 
     const std::string& TargetFilename() const { return targetFilename_; }
     const std::string& TempFilename() const { return tempFilename_; }

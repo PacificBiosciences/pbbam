@@ -7,11 +7,12 @@
 #ifndef BAMFILE_H
 #define BAMFILE_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <string>
 
 #include "pbbam/BamHeader.h"
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -36,9 +37,9 @@ public:
     BamFile(std::string filename);
 
     BamFile(const BamFile& other);
-    BamFile(BamFile&& other);
+    BamFile(BamFile&& other) noexcept;
     BamFile& operator=(const BamFile& other);
-    BamFile& operator=(BamFile&& other);
+    BamFile& operator=(BamFile&& other) noexcept;
     ~BamFile();
 
     /// \}

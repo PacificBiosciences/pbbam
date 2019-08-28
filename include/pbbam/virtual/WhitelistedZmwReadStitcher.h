@@ -7,11 +7,13 @@
 #ifndef WHITELISTEDZMWREADSTITCHER_H
 #define WHITELISTEDZMWREADSTITCHER_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
-#include "pbbam/Config.h"
+
 #include "pbbam/virtual/VirtualZmwBamRecord.h"
 
 namespace PacBio {
@@ -59,11 +61,6 @@ public:
                                const std::string& primaryBamFilePath,
                                const std::string& scrapsBamFilePath);
 
-    WhitelistedZmwReadStitcher() = delete;
-    WhitelistedZmwReadStitcher(const WhitelistedZmwReadStitcher&) = delete;
-    WhitelistedZmwReadStitcher(WhitelistedZmwReadStitcher&&) = delete;
-    WhitelistedZmwReadStitcher& operator=(const WhitelistedZmwReadStitcher&) = delete;
-    WhitelistedZmwReadStitcher& operator=(WhitelistedZmwReadStitcher&&) = delete;
     ~WhitelistedZmwReadStitcher();
 
     /// \}

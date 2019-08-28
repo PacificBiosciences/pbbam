@@ -1,11 +1,14 @@
 // Author: Derek Barnett
 
+#include "../PbbamInternalConfig.h"
+
 #include <pbbam/vcf/VcfWriter.h>
 
+#include <cassert>
 #include <fstream>
 #include <iostream>
+#include <type_traits>
 
-#include <pbbam/MakeUnique.h>
 #include <pbbam/vcf/VcfFormat.h>
 #include <pbbam/vcf/VcfHeader.h>
 #include <pbbam/vcf/VcfVariant.h>
@@ -13,6 +16,11 @@
 
 namespace PacBio {
 namespace VCF {
+
+static_assert(!std::is_copy_constructible<VcfWriter>::value,
+              "VcfWriter(const VcfWriter&) is not = delete");
+static_assert(!std::is_copy_assignable<VcfWriter>::value,
+              "VcfWriter& operator=(const VcfWriter&) is not = delete");
 
 struct VcfWriter::VcfWriterPrivate : public PacBio::BAM::FileProducer
 {
@@ -36,9 +44,9 @@ VcfWriter::VcfWriter(std::string fn, const VcfHeader& header)
 {
 }
 
-VcfWriter::VcfWriter(VcfWriter&&) = default;
+VcfWriter::VcfWriter(VcfWriter&&) noexcept = default;
 
-VcfWriter& VcfWriter::operator=(VcfWriter&&) = default;
+VcfWriter& VcfWriter::operator=(VcfWriter&&) noexcept = default;
 
 VcfWriter::~VcfWriter() = default;
 

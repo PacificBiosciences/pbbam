@@ -7,19 +7,26 @@
 #ifndef INDEXEDFASTAREADER_H
 #define INDEXEDFASTAREADER_H
 
-#include <htslib/faidx.h>
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
+
 #include "pbbam/Orientation.h"
 #include "pbbam/Position.h"
 
 namespace PacBio {
-namespace BAM {
+namespace Data {
 
 class GenomicInterval;
+}
+
+namespace BAM {
+
 class BamRecord;
 
 /// \brief The IndexedFastaReader class provides random-access to FASTA file
@@ -32,13 +39,12 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    IndexedFastaReader(const std::string& filename);
-    IndexedFastaReader(const IndexedFastaReader& src);
+    explicit IndexedFastaReader(std::string filename);
 
-    IndexedFastaReader() = delete;
-    IndexedFastaReader(IndexedFastaReader&&);
-    IndexedFastaReader& operator=(const IndexedFastaReader& rhs);
-    IndexedFastaReader& operator=(IndexedFastaReader&&);
+    IndexedFastaReader(const IndexedFastaReader&);
+    IndexedFastaReader(IndexedFastaReader&&) noexcept;
+    IndexedFastaReader& operator=(const IndexedFastaReader&);
+    IndexedFastaReader& operator=(IndexedFastaReader&&) noexcept;
     ~IndexedFastaReader();
 
     /// \}
@@ -67,7 +73,7 @@ public:
     ///
     /// \throws std::runtime_error on failure to fetch sequence
     ///
-    std::string Subsequence(const GenomicInterval& interval) const;
+    std::string Subsequence(const Data::GenomicInterval& interval) const;
 
     /// \brief Fetches FASTA sequence for desired interval.
     ///
@@ -131,11 +137,8 @@ public:
     /// \}
 
 private:
-    std::string filename_;
-    faidx_t* handle_;
-
-    void Close();
-    bool Open(std::string filename);
+    class IndexedFastaReaderPrivate;
+    std::unique_ptr<IndexedFastaReaderPrivate> d_;
 };
 
 }  // namespace BAM

@@ -7,8 +7,11 @@
 #ifndef POSITION_H
 #define POSITION_H
 
-#include <cstdint>
 #include "pbbam/Config.h"
+
+#include <cstdint>
+
+#include <pbcopper/data/Position.h>
 
 namespace PacBio {
 namespace BAM {
@@ -19,12 +22,12 @@ namespace BAM {
 /// We use a signed integer because SAM/BAM uses the -1 value to indicate
 /// unknown or unmapped positions.
 ///
-using Position = int32_t;
+using Position PBBAM_DEPRECATED = PacBio::Data::Position;
 
 /// \brief This constant is widely used as a "missing" or "invalid" position
 ///        marker.
 ///
-static const Position UnmappedPosition{-1};
+PBBAM_DEPRECATED constexpr Position UnmappedPosition{-1};
 
 }  // namespace BAM
 }  // namespace PacBio

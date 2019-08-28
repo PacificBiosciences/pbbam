@@ -20,20 +20,15 @@ Normal C++:
   basicData.readQual_   = {0.01};
   basicData.ctxtFlag_   = {0};
   basicData.fileOffset_ = {20054016};
-  
-  
+
 --(leave the blank lines above this)--
 
 Request C++, with JSON options (stdout includes usage/help, so we just want to check stderr):
 
   $ $PBINDEXDUMP --format=cpp --json-indent-level=2 $DATADIR/polymerase/production_hq.hqregion.bam.pbi > /dev/null
-  
-  ERROR: JSON formatting options not valid on non-JSON output
-  
+  pbindexdump ERROR: JSON formatting options are not valid on non-JSON output
   [1]
 
   $ $PBINDEXDUMP --format=cpp --json-raw $DATADIR/polymerase/production_hq.hqregion.bam.pbi > /dev/null
-  
-  ERROR: JSON formatting options not valid on non-JSON output
-  
+  pbindexdump ERROR: JSON formatting options are not valid on non-JSON output
   [1]

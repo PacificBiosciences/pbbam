@@ -3,12 +3,84 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-**NOTE:** The current series (0.y.z) is under initial development. Anything may
-change at any time. The public API should not be considered stable yet. Once we
-lock down a version 1.0.0, this will define a reference point & compatibility
-guarantees will be maintained within each major version series.
-
 ## Active
+
+### Added
+ - CCSRecord API to work with the minimally required data for CCS
+ - TextFileReader & TextFileWriter for generic line files (plain text or gzipped)
+ - BedReader & BedWriter for BED format support
+
+## [1.0.6] - 2019-06-14
+
+### Added
+ - IFastaWriter & IFastqWriter abstract base classes
+
+## [1.0.5] - 2019-06-11
+
+### Changed
+ - BAM tag lookup improvements under the hood.
+
+## [1.0.4] - 2019-06-07
+
+### Added
+ - General-purpose BgzipWriter
+ - BgzipFastaWriter and BgzipFastqWriter
+ - Read-only view to read indices passing a PbiFilter
+ - IPD field to SimpleRead
+
+## [1.0.3] - 2019-05-20
+
+### Added
+ - IndexedFastqReader for random access to FASTQ subregions
+
+### Fixed
+ - MappedSimpleRead clipping: on disjoint aligned/requested regions and on requests larger
+   than available sequence.
+
+## [1.0.2] - 2019-05-10
+
+### Added
+ - Range-for iteration on FastaReader & FastqReader
+
+## [1.0.1] - 2019-05-09
+
+### Added
+ - SimpleRead & MappedSimpleRead for htslib-free processing.
+
+### Fixed
+ - Incorrect type displayed in SAM output (pure-text) for floating-point values.
+
+## [1.0.0] - 2019-04-22
+
+### Changed
+ - C++14 is now a *hard* minimum.
+
+### Removed
+ - Headers emulating C++14 features for C++11.
+
+### Fixed
+ - Inconsistent whitelist/blacklist filters in DataSet XML.
+
+## [0.25.0] - 2019-04-11
+
+### Changed
+ - Requires C++14 at minimum.
+
+### Fixed
+ - Reading BioSample(s) elements from DataSet XML.
+
+## [0.24.0] - 2019-04-05
+
+### Added
+ - Built-in support for dataset elements: BioSample(s) & DNABarcode(s).
+ - BaiIndexCache for reusing data from *.bai files(s).
+ - Support in GenomicIntervalQuery for new BaiIndexCache.
+
+## [0.23.1] - 2019-03-21
+
+### Added
+ - Streamable BamReader (via stdin).
+ - Enabled range-for on BamReader, compatible with the other *Query inputs.
 
 ## [0.23.0] - 2019-03-11
 

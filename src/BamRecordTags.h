@@ -7,14 +7,15 @@
 #ifndef BAMRECORDTAGS_H
 #define BAMRECORDTAGS_H
 
+#include "pbbam/Config.h"
+
 #include <cassert>
 #include <string>
 #include <unordered_map>
 
-#include "EnumClassHash.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/BamRecordImpl.h"
-#include "pbbam/BamRecordTag.h"
+#include <pbbam/BamRecord.h>
+#include <pbbam/BamRecordImpl.h>
+#include <pbbam/BamRecordTag.h>
 
 namespace PacBio {
 namespace BAM {
@@ -33,7 +34,7 @@ private:
         const bool isPulse_;
     };
 
-    using TagLookupType = std::unordered_map<BamRecordTag, BamRecordTagData, EnumClassHash>;
+    using TagLookupType = std::unordered_map<BamRecordTag, BamRecordTagData>;
     static const TagLookupType tagLookup;
 };
 

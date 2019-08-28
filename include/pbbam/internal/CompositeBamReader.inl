@@ -5,14 +5,13 @@
 //
 // Author: Derek Barnett
 
+#include "pbbam/CompositeBamReader.h"
+
 #include <algorithm>
 #include <iostream>
 #include <set>
 #include <sstream>
 #include <stdexcept>
-#include "pbbam/CompositeBamReader.h"
-
-#include "pbbam/MakeUnique.h"
 
 namespace PacBio {
 namespace BAM {
@@ -24,11 +23,13 @@ namespace internal {
 
 inline CompositeMergeItem::CompositeMergeItem(std::unique_ptr<BamReader> rdr)
     : reader{std::move(rdr)}
-{}
+{
+}
 
 inline CompositeMergeItem::CompositeMergeItem(std::unique_ptr<BamReader> rdr, BamRecord rec)
     : reader{std::move(rdr)}, record{std::move(rec)}
-{}
+{
+}
 
 template <typename CompareType>
 inline bool CompositeMergeItemSorter<CompareType>::operator()(const CompositeMergeItem& lhs,
@@ -47,7 +48,15 @@ inline bool CompositeMergeItemSorter<CompareType>::operator()(const CompositeMer
 
 inline GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
     const std::vector<BamFile>& bamFiles)
+    : GenomicIntervalCompositeBamReader{bamFiles, MakeBaiIndexCache(bamFiles)}
 {
+}
+
+inline GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
+    const std::vector<BamFile>& bamFiles, const BaiIndexCache& cache)
+{
+    indexCache_ = cache;
+
     filenames_.reserve(bamFiles.size());
     for (const auto& bamFile : bamFiles)
         filenames_.push_back(bamFile.Filename());
@@ -55,11 +64,25 @@ inline GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
 
 inline GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(const DataSet& dataset)
     : GenomicIntervalCompositeBamReader{dataset.BamFiles()}
-{}
+{
+}
+
+inline GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
+    const DataSet& dataset, const BaiIndexCache& cache)
+    : GenomicIntervalCompositeBamReader{dataset.BamFiles(), cache}
+{
+}
 
 inline GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
     const GenomicInterval& interval, const std::vector<BamFile>& bamFiles)
-    : GenomicIntervalCompositeBamReader{bamFiles}
+    : GenomicIntervalCompositeBamReader{interval, bamFiles, MakeBaiIndexCache(bamFiles)}
+{
+}
+
+inline GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
+    const GenomicInterval& interval, const std::vector<BamFile>& bamFiles,
+    const BaiIndexCache& cache)
+    : GenomicIntervalCompositeBamReader{bamFiles, cache}
 {
     Interval(interval);
 }
@@ -67,7 +90,14 @@ inline GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
 inline GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
     const GenomicInterval& interval, const DataSet& dataset)
     : GenomicIntervalCompositeBamReader{interval, dataset.BamFiles()}
-{}
+{
+}
+
+inline GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
+    const GenomicInterval& interval, const DataSet& dataset, const BaiIndexCache& cache)
+    : GenomicIntervalCompositeBamReader{interval, dataset.BamFiles(), cache}
+{
+}
 
 inline bool GenomicIntervalCompositeBamReader::GetNext(BamRecord& record)
 {
@@ -103,39 +133,17 @@ inline const GenomicInterval& GenomicIntervalCompositeBamReader::Interval() cons
 inline GenomicIntervalCompositeBamReader& GenomicIntervalCompositeBamReader::Interval(
     const GenomicInterval& interval)
 {
+    // reset readers
+    mergeItems_.clear();
+
+    // create readers for files
     std::deque<internal::CompositeMergeItem> updatedMergeItems;
-    std::set<std::string> filesToCreate{filenames_.cbegin(), filenames_.cend()};
-
-    // update existing readers
-    while (!mergeItems_.empty()) {
-
-        // non-destructive 'pop' of first item from queue
-        auto firstIter = mergeItems_.begin();
-        internal::CompositeMergeItem firstItem{std::move(firstIter->reader),
-                                               std::move(firstIter->record)};
-        mergeItems_.pop_front();
-
-        // reset interval
-        auto* baiReader = dynamic_cast<BaiIndexedBamReader*>(firstItem.reader.get());
-        assert(baiReader);
-        baiReader->Interval(interval);
-
-        // try fetch 'next' from first item's reader
-        // if successful, re-insert it into container & re-sort on our new values
-        // otherwise, this item will go out of scope & reader destroyed
-        if (firstItem.reader->GetNext(firstItem.record)) {
-            updatedMergeItems.push_front(std::move(firstItem));
-            filesToCreate.erase(firstItem.reader->Filename());
-        }
-    }
-
-    // create readers for files that were not 'active' for the previous
     std::vector<std::string> missingBai;
-    for (auto&& fn : filesToCreate) {
-        BamFile bamFile{fn};
+    for (size_t i = 0; i < filenames_.size(); ++i) {
+        const BamFile bamFile{filenames_.at(i)};
         if (bamFile.StandardIndexExists()) {
-            internal::CompositeMergeItem item{
-                std::unique_ptr<BamReader>{new BaiIndexedBamReader{interval, std::move(bamFile)}}};
+            internal::CompositeMergeItem item{std::unique_ptr<BamReader>{
+                new BaiIndexedBamReader{interval, std::move(bamFile), indexCache_->at(i)}}};
             if (item.reader->GetNext(item.record)) updatedMergeItems.push_back(std::move(item));
             // else not an error, simply no data matching interval
         } else {
@@ -207,7 +215,8 @@ template <typename OrderByType>
 inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(
     const PbiFilter& filter, const std::vector<BamFile>& bamFiles)
     : PbiFilterCompositeBamReader{filter, bamFiles, MakePbiIndexCache(bamFiles)}
-{}
+{
+}
 
 template <typename OrderByType>
 inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(
@@ -224,13 +233,15 @@ template <typename OrderByType>
 inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(
     const PbiFilter& filter, const DataSet& dataset)
     : PbiFilterCompositeBamReader{filter, dataset.BamFiles()}
-{}
+{
+}
 
 template <typename OrderByType>
 inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(
     const PbiFilter& filter, const DataSet& dataset, const PbiIndexCache& cache)
     : PbiFilterCompositeBamReader{filter, dataset.BamFiles(), cache}
-{}
+{
+}
 
 template <typename OrderByType>
 inline bool PbiFilterCompositeBamReader<OrderByType>::GetNext(BamRecord& record)
@@ -326,7 +337,8 @@ inline SequentialCompositeBamReader::SequentialCompositeBamReader(std::vector<Ba
 
 inline SequentialCompositeBamReader::SequentialCompositeBamReader(const DataSet& dataset)
     : SequentialCompositeBamReader{dataset.BamFiles()}
-{}
+{
+}
 
 inline bool SequentialCompositeBamReader::GetNext(BamRecord& record)
 {

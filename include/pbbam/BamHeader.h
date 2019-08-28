@@ -7,6 +7,8 @@
 #ifndef BAMHEADER_H
 #define BAMHEADER_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -14,7 +16,6 @@
 #include <string>
 #include <vector>
 
-#include "pbbam/Config.h"
 #include "pbbam/ProgramInfo.h"
 #include "pbbam/ReadGroupInfo.h"
 #include "pbbam/SequenceInfo.h"
@@ -53,11 +54,6 @@ public:
     BamHeader(const std::string& samHeaderText);
 
     BamHeader();
-    BamHeader(const BamHeader&);
-    BamHeader(BamHeader&&);
-    BamHeader& operator=(const BamHeader&);
-    BamHeader& operator=(BamHeader&&);
-    ~BamHeader();
 
     /// \brief Detaches underlying data from the shared-pointer, returning a
     ///        independent copy of the header contents.

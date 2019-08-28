@@ -13,10 +13,10 @@ fi
 # *never* create artifacts with ASAN enabled
 meson configure -Dprefix=/ -Db_sanitize=none "${CURRENT_BUILD_DIR:-build}"
 
-NEXUS_VERSION="$(${CURRENT_BUILD_DIR:-build}/tools/bam2sam --version)".${BUILD_NUMBER}
+NEXUS_VERSION="$(${CURRENT_BUILD_DIR:-build}/tools/pbindex --version | grep -o -E '[[:digit:]]+(\.[[:digit:]]+)*')".${BUILD_NUMBER}
 case "${bamboo_planRepository_branchName}" in
   develop)
-    VERSION="$(${CURRENT_BUILD_DIR:-build}/tools/bam2sam --version)".SNAPSHOT${BUILD_NUMBER}
+    VERSION="$(${CURRENT_BUILD_DIR:-build}/tools/pbindex --version | grep -o -E '[[:digit:]]+(\.[[:digit:]]+)*')".SNAPSHOT${BUILD_NUMBER}
     NEXUS_REPO=maven-snapshots
     ;;
   master)
@@ -30,6 +30,26 @@ case "${bamboo_planRepository_branchName}" in
 esac
 
 DESTDIR="${PWD}/staging" ninja -C "${CURRENT_BUILD_DIR:-build}" -v install
+
+# merge pbcopper and pbbam for PA
+pushd "${PWD}/staging/lib"
+  # GNU ld MRI script trick
+  # https://stackoverflow.com/a/23621751
+  echo "create libnew.a" >libnew.mri
+  for i in libpb*.a; do
+    echo "addlib ${i}" >>libnew.mri
+  done
+  echo save >>libnew.mri
+  echo end >>libnew.mri
+  ar -M <libnew.mri
+
+  rm libpb*.a libnew.mri
+  mv libnew.a libpbbam.a
+
+  # remove pkg-config because it confuses PA's build system
+  rm -rf pkgconfig
+popd
+
 if [[ ${_artifact_versionprepend:-false} == true ]]; then
   ( cd staging && tar zcf ../pbbam-${VERSION}-x86_64.tgz . --transform "s,^\./,pbbam-${VERSION}/," )
 else

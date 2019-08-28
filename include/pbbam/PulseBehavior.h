@@ -7,6 +7,8 @@
 #ifndef PULSEBEHAVIOR_H
 #define PULSEBEHAVIOR_H
 
+#include "pbbam/Config.h"
+
 namespace PacBio {
 namespace BAM {
 

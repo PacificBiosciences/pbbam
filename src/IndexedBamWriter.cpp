@@ -4,6 +4,8 @@
 //
 // Author: Derek Barnett
 
+#include "PbbamInternalConfig.h"
+
 #include "pbbam/IndexedBamWriter.h"
 
 #include <sys/stat.h>
@@ -18,17 +20,18 @@
 #include <mutex>
 #include <stdexcept>
 #include <thread>
+#include <type_traits>
 
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
+#include <pbcopper/utility/Deleters.h>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamRecordImpl.h"
 #include "pbbam/BamWriter.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/PbiRawData.h"
 #include "pbbam/RecordType.h"
 #include "pbbam/Unused.h"
@@ -570,20 +573,22 @@ public:
         //
 
         const std::string gziFn{bamFilename_ + ".gzi"};
-        std::unique_ptr<FILE, FileDeleter> gziFile{fopen(gziFn.c_str(), "rb")};
+        std::unique_ptr<FILE, Utility::FileDeleter> gziFile{fopen(gziFn.c_str(), "rb")};
         if (!gziFile) throw std::runtime_error{"IndexedBamWriter: could not open gzi file"};
 
         uint64_t numElements;
-        const auto ret = fread(&numElements, sizeof(numElements), 1, gziFile.get());
-        if (ret != 1) throw std::runtime_error{"IndexedBamWriter: could not read from gziFile"};
+        if (fread(&numElements, sizeof(numElements), 1, gziFile.get()) < 1)
+            throw std::runtime_error{"IndexedBamWriter: could not read from gziFile"};
         if (ed_is_big()) ed_swap_8(numElements);
 
         std::vector<GzIndexEntry> result;
         result.reserve(numElements);
         for (uint32_t i = 0; i < numElements; ++i) {
             GzIndexEntry entry;
-            fread(&entry.vAddress, sizeof(entry.vAddress), 1, gziFile.get());
-            fread(&entry.uAddress, sizeof(entry.uAddress), 1, gziFile.get());
+            if (fread(&entry.vAddress, sizeof(entry.vAddress), 1, gziFile.get()) < 1)
+                throw std::runtime_error{"IndexedBamWriter: could not read from gziFile"};
+            if (fread(&entry.uAddress, sizeof(entry.uAddress), 1, gziFile.get()) < 1)
+                throw std::runtime_error{"IndexedBamWriter: could not read from gziFile"};
             if (ed_is_big()) {
                 ed_swap_8(entry.vAddress);
                 ed_swap_8(entry.uAddress);
@@ -626,7 +631,7 @@ private:
     std::string bamFilename_;
     std::string pbiFilename_;
     std::string tempFilename_;
-    std::unique_ptr<FILE, FileDeleter> tempFile_;
+    std::unique_ptr<FILE, Utility::FileDeleter> tempFile_;
     std::unique_ptr<BGZF, HtslibBgzfDeleter> pbiFile_;
     PbiBuilder::CompressionLevel compressionLevel_;
     size_t numThreads_;
@@ -983,6 +988,11 @@ private:
     int64_t uncompressedFilePos_ = 0;
 };
 
+static_assert(!std::is_copy_constructible<IndexedBamWriter>::value,
+              "IndexedBamWriter(const IndexedBamWriter&) is not = delete");
+static_assert(!std::is_copy_assignable<IndexedBamWriter>::value,
+              "IndexedBamWriter& operator=(const IndexedBamWriter&) is not = delete");
+
 IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamHeader& header,
                                    const BamWriter::CompressionLevel bamCompressionLevel,
                                    const size_t numBamThreads,
@@ -1004,9 +1014,9 @@ IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamH
         pbiCompressionLevel, numPbiThreads, numGziThreads, tempFileBufferSize);
 }
 
-IndexedBamWriter::IndexedBamWriter(IndexedBamWriter&&) = default;
+IndexedBamWriter::IndexedBamWriter(IndexedBamWriter&&) noexcept = default;
 
-IndexedBamWriter& IndexedBamWriter::operator=(IndexedBamWriter&&) = default;
+IndexedBamWriter& IndexedBamWriter::operator=(IndexedBamWriter&&) noexcept = default;
 
 IndexedBamWriter::~IndexedBamWriter() = default;
 

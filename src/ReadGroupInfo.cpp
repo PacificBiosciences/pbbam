@@ -8,6 +8,7 @@
 
 #include "pbbam/ReadGroupInfo.h"
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
@@ -16,13 +17,13 @@
 #include <sstream>
 #include <stdexcept>
 #include <tuple>
+#include <type_traits>
 #include <unordered_map>
 
 #include <boost/algorithm/cxx14/equal.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include "ChemistryTable.h"
-#include "EnumClassHash.h"
 #include "pbbam/MD5.h"
 #include "pbbam/SamTagCodec.h"
 #include "pbbam/StringUtilities.h"
@@ -102,7 +103,7 @@ static const std::string platformModelType_SEQUELII{"SEQUELII"};
 // clang-format off
 std::string BaseFeatureName(const BaseFeature& feature)
 {
-    static const std::unordered_map<BaseFeature, std::string, EnumClassHash> lookup{
+    static const std::unordered_map<BaseFeature, std::string> lookup{
         {BaseFeature::DELETION_QV,      feature_DQ},
         {BaseFeature::DELETION_TAG,     feature_DT},
         {BaseFeature::INSERTION_QV,     feature_IQ},
@@ -134,7 +135,7 @@ std::string BaseFeatureName(const BaseFeature& feature)
 
 std::string FrameCodecName(const FrameCodec& codec)
 {
-    static const std::unordered_map<FrameCodec, std::string, EnumClassHash> lookup{
+    static const std::unordered_map<FrameCodec, std::string> lookup{
         {FrameCodec::RAW, codec_RAW},
         {FrameCodec::V1,  codec_V1}
     };
@@ -147,7 +148,7 @@ std::string FrameCodecName(const FrameCodec& codec)
 
 std::string BarcodeModeName(const BarcodeModeType& mode)
 {
-    static const std::unordered_map<BarcodeModeType, std::string, EnumClassHash> lookup{
+    static const std::unordered_map<BarcodeModeType, std::string> lookup{
         {BarcodeModeType::NONE,       barcodemode_NONE},
         {BarcodeModeType::SYMMETRIC,  barcodemode_SYM},
         {BarcodeModeType::ASYMMETRIC, barcodemode_ASYM},
@@ -162,7 +163,7 @@ std::string BarcodeModeName(const BarcodeModeType& mode)
 
 std::string BarcodeQualityName(const BarcodeQualityType& type)
 {
-    static const std::unordered_map<BarcodeQualityType, std::string, EnumClassHash> lookup{
+    static const std::unordered_map<BarcodeQualityType, std::string> lookup{
         {BarcodeQualityType::NONE,        barcodequal_NONE},
         {BarcodeQualityType::SCORE,       barcodequal_SCORE},
         {BarcodeQualityType::PROBABILITY, barcodequal_PROB}
@@ -176,7 +177,7 @@ std::string BarcodeQualityName(const BarcodeQualityType& type)
 
 std::string PlatformModelName(const PlatformModelType& type)
 {
-    static const std::unordered_map<PlatformModelType, std::string, EnumClassHash> lookup{
+    static const std::unordered_map<PlatformModelType, std::string> lookup{
         {PlatformModelType::ASTRO,    platformModelType_ASTRO},
         {PlatformModelType::RS,       platformModelType_RS},
         {PlatformModelType::SEQUEL,   platformModelType_SEQUEL},
@@ -264,7 +265,18 @@ BarcodeQualityType BarcodeQualityFromName(const std::string& name)
 
 PlatformModelType PlatformModelFromName(std::string name) { return nameToPlatformModel.at(name); }
 
-}  // anonymous
+}  // namespace
+
+static_assert(std::is_copy_constructible<ReadGroupInfo>::value,
+              "ReadGroupInfo(const ReadGroupInfo&) is not = default");
+static_assert(std::is_copy_assignable<ReadGroupInfo>::value,
+              "ReadGroupInfo& operator=(const ReadGroupInfo&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<ReadGroupInfo>::value,
+              "ReadGroupInfo(ReadGroupInfo&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<ReadGroupInfo>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
 
 ReadGroupInfo::ReadGroupInfo(std::string baseId, std::pair<uint16_t, uint16_t> barcodes)
 
@@ -309,16 +321,6 @@ ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
     platformModel_ = std::move(platform);
 }
 
-ReadGroupInfo::ReadGroupInfo(const ReadGroupInfo&) = default;
-
-ReadGroupInfo::ReadGroupInfo(ReadGroupInfo&&) = default;
-
-ReadGroupInfo& ReadGroupInfo::operator=(const ReadGroupInfo&) = default;
-
-ReadGroupInfo& ReadGroupInfo::operator=(ReadGroupInfo&&) = default;
-
-ReadGroupInfo::~ReadGroupInfo() = default;
-
 bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
 {
     const auto lhsFields = std::tie(
@@ -341,6 +343,8 @@ bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
            boost::algorithm::equal(custom_.cbegin(), custom_.cend(), other.custom_.cbegin(),
                                    other.custom_.cend());
 }
+
+bool ReadGroupInfo::operator<(const ReadGroupInfo& other) const { return id_ < other.id_; }
 
 size_t ReadGroupInfo::BarcodeCount() const
 {

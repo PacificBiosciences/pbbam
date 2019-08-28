@@ -7,6 +7,8 @@
 #ifndef CLIPTYPE_H
 #define CLIPTYPE_H
 
+#include "pbbam/Config.h"
+
 namespace PacBio {
 namespace BAM {
 

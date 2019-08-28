@@ -37,7 +37,7 @@ static BamRecord makeValidMappedRecord()
     impl.CigarData(Cigar{"10="});
 
     TagCollection tags;
-    tags["RG"] = std::string{"3f58e5b8"};
+    tags["RG"] = std::string{"db972a04"};
     tags["dq"] = std::string{"2222'$22'2"};
     tags["dt"] = std::string{"NNNNAGNNGN"};
     tags["iq"] = std::string{"(+#1'$#*1&"};
@@ -99,9 +99,9 @@ static ReadGroupInfo makeValidReadGroup()
     ReadGroupInfo rg("f5b4ffb6");
     rg.MovieName("movie32");
     rg.ReadType("CCS");
-    rg.BindingKit("100372700");
-    rg.SequencingKit("100612400");
-    rg.BasecallerVersion("2.3");
+    rg.BindingKit("101-789-500");
+    rg.SequencingKit("101-789-300");
+    rg.BasecallerVersion("5.0");
     rg.FrameRateHz("100");
     rg.Control("TRUE");
     return rg;
@@ -280,22 +280,21 @@ TEST(ValidatorTest, ReadGroupValues)
 
 TEST(ValidatorTest, ValidHeader)
 {
-    const BamHeader validMappedHeader{
-        "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.1\n"
+    static const BamHeader validMappedHeader{
+        "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.7\n"
         "@SQ\tSN:ecoliK12_pbi_March2013_2955000_to_2980000\tLN:25000\tM5:"
         "734d5f3b2859595f4bd87a2fe6b7389b\n"
-        "@RG\tID:3f58e5b8\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV="
-        "iq;"
-        "MergeQV=mq;SubstitutionQV=sq;Ipd:CodecV1=ip;BASECALLERVERSION=2.1;"
-        "FRAMERATEHZ=75.000000;BINDINGKIT=100356300;SEQUENCINGKIT=100356200"
-        "\tPU:movie1\n"};
+        "@RG\tID:db972a04\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
+        "BINDINGKIT=101-717-300;SEQUENCINGKIT=101-644-500;BASECALLERVERSION=5.0.0;FRAMERATEHZ=100."
+        "000000"
+        "\tPU:m64004_190414_193017\tPM:SEQUELII\n"};
 
-    const BamHeader validUnmappedHeader{
-        "@HD\tVN:1.5\tSO:unknown\tpb:3.0.1\n"
-        "@RG\tID:b5482b33\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;"
-        "InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;Ipd:CodecV1=ip;BINDINGKIT=100356300;"
-        "SEQUENCINGKIT=100356200;BASECALLERVERSION=2.1;FRAMERATEHZ=75.000000\t"
-        "PU:m140906_231018_42161_c100676332550000001823129611271486_s1_p0\n"};
+    static const BamHeader validUnmappedHeader{
+        "@HD\tVN:1.5\tSO:unknown\tpb:3.0.7\n"
+        "@RG\tID:db972a04\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
+        "BINDINGKIT=101-717-300;SEQUENCINGKIT=101-644-500;BASECALLERVERSION=5.0.0;FRAMERATEHZ=100."
+        "000000\t"
+        "PU:m64004_190414_193017\tPM:SEQUELII\n"};
 
     ASSERT_NO_THROW(Validator::Validate(validMappedHeader));
     ASSERT_NO_THROW(Validator::Validate(validUnmappedHeader));
@@ -303,15 +302,14 @@ TEST(ValidatorTest, ValidHeader)
 
 TEST(ValidatorTest, ValidateHeader)
 {
-    const BamHeader validMappedHeader{
-        "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.1\n"
+    static const BamHeader validMappedHeader{
+        "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.7\n"
         "@SQ\tSN:ecoliK12_pbi_March2013_2955000_to_2980000\tLN:25000\tM5:"
         "734d5f3b2859595f4bd87a2fe6b7389b\n"
-        "@RG\tID:3f58e5b8\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV="
-        "iq;"
-        "MergeQV=mq;SubstitutionQV=sq;Ipd:CodecV1=ip;BASECALLERVERSION=2.1;"
-        "FRAMERATEHZ=75.000000;BINDINGKIT=100356300;SEQUENCINGKIT=100356200"
-        "\tPU:movie1\n"};
+        "@RG\tID:db972a04\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
+        "BINDINGKIT=101-717-300;SEQUENCINGKIT=101-644-500;BASECALLERVERSION=5.0.0;FRAMERATEHZ=100."
+        "000000"
+        "\tPU:m64004_190414_193017\tPM:SEQUELII\n"};
 
     {  // invalid SAM version - non-numeric
         BamHeader header = validMappedHeader.DeepCopy();
@@ -367,15 +365,14 @@ TEST(ValidatorTest, ValidateHeader)
 
 TEST(ValidatorTest, ValidRecord)
 {
-    const BamHeader validMappedHeader{
-        "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.1\n"
+    static const BamHeader validMappedHeader{
+        "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.7\n"
         "@SQ\tSN:ecoliK12_pbi_March2013_2955000_to_2980000\tLN:25000\tM5:"
         "734d5f3b2859595f4bd87a2fe6b7389b\n"
-        "@RG\tID:3f58e5b8\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV="
-        "iq;"
-        "MergeQV=mq;SubstitutionQV=sq;Ipd:CodecV1=ip;BASECALLERVERSION=2.1;"
-        "FRAMERATEHZ=75.000000;BINDINGKIT=100356300;SEQUENCINGKIT=100356200"
-        "\tPU:movie1\n"};
+        "@RG\tID:db972a04\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
+        "BINDINGKIT=101-717-300;SEQUENCINGKIT=101-644-500;BASECALLERVERSION=5.0.0;FRAMERATEHZ=100."
+        "000000"
+        "\tPU:m64004_190414_193017\tPM:SEQUELII\n"};
     BamRecord record(ValidatorTests::validMappedRecord);
     record.header_ = validMappedHeader;
     ASSERT_NO_THROW(Validator::Validate(record));
@@ -392,11 +389,11 @@ static inline void ModifyTag(BamRecord* record, const std::string& tagName, cons
 static inline void CheckInvalidTagLength(const std::string& tagName, const Tag& tag)
 {
     static const BamHeader validUnmappedHeader{
-        "@HD\tVN:1.5\tSO:unknown\tpb:3.0.1\n"
-        "@RG\tID:b5482b33\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;"
-        "InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;Ipd:CodecV1=ip;BINDINGKIT=100356300;"
-        "SEQUENCINGKIT=100356200;BASECALLERVERSION=2.1;FRAMERATEHZ=75.000000\t"
-        "PU:m140906_231018_42161_c100676332550000001823129611271486_s1_p0\n"};
+        "@HD\tVN:1.5\tSO:unknown\tpb:3.0.7\n"
+        "@RG\tID:db972a04\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
+        "BINDINGKIT=101-717-300;SEQUENCINGKIT=101-644-500;BASECALLERVERSION=5.0.0;FRAMERATEHZ=100."
+        "000000\t"
+        "PU:m64004_190414_193017\tPM:SEQUELII\n"};
     BamRecord record(ValidatorTests::validUnmappedRecord);
     record.header_ = validUnmappedHeader;
 
@@ -408,12 +405,12 @@ static inline void CheckInvalidTagLength(const std::string& tagName, const Tag& 
 
 TEST(ValidatorTest, TagDataLengths)
 {
-    const BamHeader validUnmappedHeader{
-        "@HD\tVN:1.5\tSO:unknown\tpb:3.0.1\n"
-        "@RG\tID:b5482b33\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;"
-        "InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;Ipd:CodecV1=ip;BINDINGKIT=100356300;"
-        "SEQUENCINGKIT=100356200;BASECALLERVERSION=2.1;FRAMERATEHZ=75.000000\t"
-        "PU:m140906_231018_42161_c100676332550000001823129611271486_s1_p0\n"};
+    static const BamHeader validUnmappedHeader{
+        "@HD\tVN:1.5\tSO:unknown\tpb:3.0.7\n"
+        "@RG\tID:db972a04\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
+        "BINDINGKIT=101-717-300;SEQUENCINGKIT=101-644-500;BASECALLERVERSION=5.0.0;FRAMERATEHZ=100."
+        "000000\t"
+        "PU:m64004_190414_193017\tPM:SEQUELII\n"};
 
     // make these "variable-length" SEQ/tags too short for the read's stated
     // queryStart/queryEnd
@@ -457,15 +454,14 @@ TEST(ValidatorTest, TagDataLengths)
 
 TEST(ValidatorTest, TagDataValues)
 {
-    const BamHeader validMappedHeader{
-        "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.1\n"
+    static const BamHeader validMappedHeader{
+        "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.7\n"
         "@SQ\tSN:ecoliK12_pbi_March2013_2955000_to_2980000\tLN:25000\tM5:"
         "734d5f3b2859595f4bd87a2fe6b7389b\n"
-        "@RG\tID:3f58e5b8\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV="
-        "iq;"
-        "MergeQV=mq;SubstitutionQV=sq;Ipd:CodecV1=ip;BASECALLERVERSION=2.1;"
-        "FRAMERATEHZ=75.000000;BINDINGKIT=100356300;SEQUENCINGKIT=100356200"
-        "\tPU:movie1\n"};
+        "@RG\tID:db972a04\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
+        "BINDINGKIT=101-717-300;SEQUENCINGKIT=101-644-500;BASECALLERVERSION=5.0.0;FRAMERATEHZ=100."
+        "000000"
+        "\tPU:m64004_190414_193017\tPM:SEQUELII\n"};
 
     {  // missing qe
         BamRecord record(ValidatorTests::validMappedRecord);
@@ -520,12 +516,14 @@ TEST(ValidatorTest, TagDataValues)
 
 TEST(ValidatorTest, MappedRecords)
 {
-    const BamHeader validMappedHeader{
-        "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.1\n"
-        "@RG\tID:b5482b33\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;"
-        "InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;Ipd:CodecV1=ip;BINDINGKIT=100356300;"
-        "SEQUENCINGKIT=100356200;BASECALLERVERSION=2.1;FRAMERATEHZ=75.000000\t"
-        "PU:m140906_231018_42161_c100676332550000001823129611271486_s1_p0\n"};
+    static const BamHeader validMappedHeader{
+        "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.7\n"
+        "@SQ\tSN:ecoliK12_pbi_March2013_2955000_to_2980000\tLN:25000\tM5:"
+        "734d5f3b2859595f4bd87a2fe6b7389b\n"
+        "@RG\tID:db972a04\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
+        "BINDINGKIT=101-717-300;SEQUENCINGKIT=101-644-500;BASECALLERVERSION=5.0.0;FRAMERATEHZ=100."
+        "000000"
+        "\tPU:m64004_190414_193017\tPM:SEQUELII\n"};
 
     {  // mapped record should have valid refID
         BamRecord record(ValidatorTests::validMappedRecord);
@@ -547,12 +545,12 @@ TEST(ValidatorTest, MappedRecords)
 
 TEST(ValidatorTest, UnmappedRecords)
 {
-    const BamHeader validUnmappedHeader{
-        "@HD\tVN:1.5\tSO:unknown\tpb:3.0.1\n"
-        "@RG\tID:b5482b33\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;"
-        "InsertionQV=iq;MergeQV=mq;SubstitutionQV=sq;Ipd:CodecV1=ip;BINDINGKIT=100356300;"
-        "SEQUENCINGKIT=100356200;BASECALLERVERSION=2.1;FRAMERATEHZ=75.000000\t"
-        "PU:m140906_231018_42161_c100676332550000001823129611271486_s1_p0\n"};
+    static const BamHeader validUnmappedHeader{
+        "@HD\tVN:1.5\tSO:unknown\tpb:3.0.7\n"
+        "@RG\tID:db972a04\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
+        "BINDINGKIT=101-717-300;SEQUENCINGKIT=101-644-500;BASECALLERVERSION=5.0.0;FRAMERATEHZ=100."
+        "000000\t"
+        "PU:m64004_190414_193017\tPM:SEQUELII\n"};
 
     {  // unmapped should have no refID
         BamRecord record(ValidatorTests::validUnmappedRecord);

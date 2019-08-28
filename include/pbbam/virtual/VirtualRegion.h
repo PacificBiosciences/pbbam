@@ -8,6 +8,7 @@
 #define VIRTUALREGION_H
 
 #include "pbbam/Config.h"
+
 #include "pbbam/LocalContextFlags.h"
 #include "pbbam/virtual/VirtualRegionType.h"
 
@@ -38,12 +39,7 @@ public:
                   const LocalContextFlags cxTag_, const int barcodeLeft_, const int barcodeRight_,
                   const int score_ = 0);
 
-    VirtualRegion();
-    VirtualRegion(const VirtualRegion&);
-    VirtualRegion(VirtualRegion&&);
-    VirtualRegion& operator=(const VirtualRegion&);
-    VirtualRegion& operator=(VirtualRegion&&);
-    ~VirtualRegion();
+    VirtualRegion() = default;
 
     bool operator==(const VirtualRegion& v1) const;
 };

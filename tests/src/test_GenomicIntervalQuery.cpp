@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <algorithm>
+#include <functional>
 #include <iostream>
 #include <string>
 
@@ -7,6 +9,7 @@
 
 #include "PbbamTestData.h"
 
+#include <pbbam/BaiIndexCache.h>
 #include <pbbam/GenomicIntervalQuery.h>
 #include <pbbam/Unused.h>
 
@@ -15,6 +18,7 @@ using namespace PacBio::BAM;
 
 namespace GenomicIntervalQueryTests {
 const std::string inputBamFn = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+const std::string inputBamFn_2 = PbbamTestsConfig::Data_Dir + "/aligned2.bam";
 }  // namespace GenomicIntervalQueryTests
 
 TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
@@ -147,4 +151,55 @@ TEST(GenomicIntervalQueryTest, InitializeWithoutInterval)
         ++count;
     }
     EXPECT_EQ(2, count);
+}
+
+TEST(GenomicIntervalQueryTest, CanReuseBaiIndexCache)
+{
+    const std::string refName{"lambda_NEB3011"};
+    const std::vector<std::string> filenames{GenomicIntervalQueryTests::inputBamFn,
+                                             GenomicIntervalQueryTests::inputBamFn_2};
+
+    const DataSet ds{filenames};
+    const auto indexCache = MakeBaiIndexCache(ds);
+
+    auto checkInterval = [](GenomicIntervalQuery& query, const GenomicInterval& interval,
+                            const size_t expectedCount) {
+        // update query
+        query.Interval(interval);
+
+        // checkout results
+        std::vector<Position> startPositions;
+        for (const BamRecord& r : query) {
+            EXPECT_EQ(interval.Name(), r.ReferenceName());
+            EXPECT_TRUE(r.ReferenceStart() < interval.Stop());
+            EXPECT_TRUE(r.ReferenceEnd() >= interval.Start());
+            startPositions.push_back(r.ReferenceStart());
+        }
+        EXPECT_EQ(expectedCount, startPositions.size());
+        EXPECT_TRUE(std::is_sorted(startPositions.cbegin(), startPositions.cend()));
+    };
+
+    // reuse cache between interval updates
+    GenomicIntervalQuery query{ds, indexCache};
+    {
+        const GenomicInterval interval{refName, 5000, 8000};
+        const size_t expectedCount = 7;
+        checkInterval(query, interval, expectedCount);
+    }
+    {
+        const GenomicInterval interval{refName, 0, 100};
+        const size_t expectedCount = 1;
+        checkInterval(query, interval, expectedCount);
+    }
+    {
+        const GenomicInterval interval{refName, 9300, 9400};
+        const size_t expectedCount = 2;
+        checkInterval(query, interval, expectedCount);
+    }
+
+    // reuse cache in independent query
+    GenomicIntervalQuery query2{ds, indexCache};
+    const GenomicInterval interval{refName, 5000, 8000};
+    const size_t expectedCount = 7;
+    checkInterval(query2, interval, expectedCount);
 }

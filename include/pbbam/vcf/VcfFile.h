@@ -3,6 +3,8 @@
 #ifndef PBBAM_VCF_VCFFILE_H
 #define PBBAM_VCF_VCFFILE_H
 
+#include "pbbam/Config.h"
+
 #include <string>
 
 #include <pbbam/vcf/VcfHeader.h>
@@ -14,13 +16,6 @@ class VcfFile
 {
 public:
     explicit VcfFile(std::string fn);
-
-    VcfFile() = delete;
-    VcfFile(const VcfFile&);
-    VcfFile(VcfFile&&);
-    VcfFile& operator=(const VcfFile&);
-    VcfFile& operator=(VcfFile&&);
-    ~VcfFile();
 
 public:
     const std::string& Filename() const;

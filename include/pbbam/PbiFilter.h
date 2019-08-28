@@ -7,11 +7,15 @@
 #ifndef PBIFILTER_H
 #define PBIFILTER_H
 
-#include <boost/concept_check.hpp>
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <memory>
 #include <string>
 #include <tuple>
+
+#include <boost/concept_check.hpp>
+
 #include "pbbam/DataSet.h"
 #include "pbbam/PbiBasicTypes.h"
 #include "pbbam/PbiRawData.h"
@@ -175,7 +179,6 @@ public:
     PbiFilter(PbiFilter&&) noexcept = default;
     PbiFilter& operator=(const PbiFilter&);
     PbiFilter& operator=(PbiFilter&&) noexcept = default;
-    ~PbiFilter() = default;
 
     /// \}
 

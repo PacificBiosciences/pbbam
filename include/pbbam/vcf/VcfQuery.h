@@ -3,13 +3,15 @@
 #ifndef PBBAM_VCF_VCFQUERY_H
 #define PBBAM_VCF_VCFQUERY_H
 
-#include <string>
+#include "pbbam/Config.h"
 
-#include <pbbam/internal/QueryBase.h>
+#include <string>
 
 #include <pbbam/vcf/VcfFile.h>
 #include <pbbam/vcf/VcfReader.h>
 #include <pbbam/vcf/VcfVariant.h>
+
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace VCF {
@@ -19,13 +21,6 @@ class VcfQuery : public PacBio::BAM::internal::QueryBase<VcfVariant>
 public:
     explicit VcfQuery(std::string fn);
     explicit VcfQuery(const VcfFile& file);
-
-    VcfQuery() = delete;
-    VcfQuery(const VcfQuery&) = delete;
-    VcfQuery(VcfQuery&&) = default;
-    VcfQuery& operator=(const VcfQuery&) = delete;
-    VcfQuery& operator=(VcfQuery&&) = default;
-    ~VcfQuery();
 
 public:
     /// \brief Main iteration point for record access.

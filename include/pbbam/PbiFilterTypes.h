@@ -7,12 +7,15 @@
 #ifndef PBIFILTERTYPES_H
 #define PBIFILTERTYPES_H
 
-#include <boost/optional.hpp>
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <unordered_map>
+
+#include <boost/optional.hpp>
 
 #include "pbbam/Compare.h"
 #include "pbbam/PbiFile.h"
@@ -37,7 +40,7 @@ public:
 
 protected:
     FilterBase(T value, const Compare::Type cmp);
-    FilterBase(std::vector<T> values, const Compare::Type cmp = Compare::EQUAL);
+    FilterBase(std::vector<T> values, const Compare::Type cmp = Compare::CONTAINS);
 
     bool CompareHelper(const T& lhs) const;
 
@@ -58,7 +61,7 @@ public:
 
 protected:
     BarcodeDataFilterBase(T value, const Compare::Type cmp);
-    BarcodeDataFilterBase(std::vector<T> values, const Compare::Type cmp = Compare::EQUAL);
+    BarcodeDataFilterBase(std::vector<T> values, const Compare::Type cmp = Compare::CONTAINS);
 };
 
 /// \internal
@@ -73,7 +76,7 @@ public:
 
 protected:
     BasicDataFilterBase(T value, const Compare::Type cmp);
-    BasicDataFilterBase(std::vector<T> values, const Compare::Type cmp = Compare::EQUAL);
+    BasicDataFilterBase(std::vector<T> values, const Compare::Type cmp = Compare::CONTAINS);
 };
 
 /// \internal
@@ -88,7 +91,7 @@ public:
 
 protected:
     MappedDataFilterBase(T value, const Compare::Type cmp);
-    MappedDataFilterBase(std::vector<T> values, const Compare::Type cmp = Compare::EQUAL);
+    MappedDataFilterBase(std::vector<T> values, const Compare::Type cmp = Compare::CONTAINS);
 };
 
 }  // namespace internal
@@ -193,15 +196,17 @@ public:
     ///
     PbiBarcodeFilter(const int16_t barcode, const Compare::Type cmp = Compare::EQUAL);
 
-    /// \brief Creates a 'whitelisted' barcode filter.
+    /// \brief Creates a whitelisted or blacklisted barcode filter.
     ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly, in either bc_forward or bc_reverse.
+    /// \note If compare type is Compare::CONTAINS, accepted records will match
+    ///       at least one value from whitelist, in bc_forward.
+    ///       If compare type is Compare::NOT_CONTAINS, accepted records will
+    ///       match no barcodes in the blacklist.
     ///
-    /// \param[in] whitelist  barcode IDs to compare on
+    /// \param[in] barcodes barcode IDs
+    /// \param[in] cmp      compare type
     ///
-    PbiBarcodeFilter(std::vector<int16_t> whitelist, const Compare::Type cmp = Compare::EQUAL);
+    PbiBarcodeFilter(std::vector<int16_t> barcodes, const Compare::Type cmp = Compare::CONTAINS);
 
     /// \brief Performs the actual index lookup.
     ///
@@ -231,16 +236,18 @@ public:
     ///
     PbiBarcodeForwardFilter(const int16_t bcFwdId, const Compare::Type cmp = Compare::EQUAL);
 
-    /// \brief Creates a 'whitelisted' forward barcode filter.
+    /// \brief Creates a whitelisted or blacklisted forward barcode filter.
     ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly, in bc_forward.
+    /// \note If compare type is Compare::CONTAINS, accepted records will match
+    ///       at least one value from whitelist, in bc_forward.
+    ///       If compare type is Compare::NOT_CONTAINS, accepted records will
+    ///       match no values in the blacklist.
     ///
-    /// \param[in] whitelist  barcode IDs to compare on
+    /// \param[in] barcodes barcode IDs
+    /// \param[in] cmp      compare type
     ///
-    PbiBarcodeForwardFilter(std::vector<int16_t> whitelist,
-                            const Compare::Type cmp = Compare::EQUAL);
+    PbiBarcodeForwardFilter(std::vector<int16_t> barcodes,
+                            const Compare::Type cmp = Compare::CONTAINS);
 };
 
 /// \brief The PbiBarcodeQualityFilter class provides a PbiFilter-compatible
@@ -280,16 +287,18 @@ public:
     ///
     PbiBarcodeReverseFilter(const int16_t bcRevId, const Compare::Type cmp = Compare::EQUAL);
 
-    /// \brief Creates a 'whitelisted' reverse barcode filter.
+    /// \brief Creates a whitelisted or blacklisted reverse barcode filter.
     ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly, in bc_reverse.
+    /// \note If compare type is Compare::CONTAINS, accepted records will match
+    ///       at least one value from whitelist, in bc_forward.
+    ///       If compare type is Compare::NOT_CONTAINS, accepted records will
+    ///       match no values in the blacklist.
     ///
-    /// \param[in] whitelist  barcode IDs to compare on
+    /// \param[in] barcodes barcode IDs
+    /// \param[in] cmp      compare type
     ///
-    PbiBarcodeReverseFilter(std::vector<int16_t> whitelist,
-                            const Compare::Type cmp = Compare::EQUAL);
+    PbiBarcodeReverseFilter(std::vector<int16_t> barcodes,
+                            const Compare::Type cmp = Compare::CONTAINS);
 };
 
 /// \brief The PbiBarcodesFilter class provides a PbiFilter-compatible filter on
@@ -412,16 +421,18 @@ public:
     ///
     PbiMovieNameFilter(const std::string& movieName, const Compare::Type cmp = Compare::EQUAL);
 
-    /// \brief Creates a 'whitelisted' movie name filter.
+    /// \brief Creates a whitelisted or blacklisted movie name filter.
     ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
+    /// \note If compare type is Compare::CONTAINS, accepted records will match
+    ///       at least one value from whitelist, in bc_forward.
+    ///       If compare type is Compare::NOT_CONTAINS, accepted records will
+    ///       match no values in the blacklist.
     ///
-    /// \param[in] whitelist    movie names to compare on
+    /// \param[in] movieNames   movie names
+    /// \param[in] cmp          compare type
     ///
-    PbiMovieNameFilter(const std::vector<std::string>& whitelist,
-                       const Compare::Type cmp = Compare::EQUAL);
+    PbiMovieNameFilter(const std::vector<std::string>& movieNames,
+                       const Compare::Type cmp = Compare::CONTAINS);
 
     /// \brief Performs the actual index lookup.
     ///
@@ -573,16 +584,18 @@ public:
     ///
     PbiQueryNameFilter(const std::string& qname, const Compare::Type cmp = Compare::EQUAL);
 
-    /// \brief Creates a 'whitelisted' query name filter.
+    /// \brief Creates a whitelisted or blacklisted query name filter.
     ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
+    /// \note If compare type is Compare::CONTAINS, accepted records will match
+    ///       at least one value from whitelist, in bc_forward.
+    ///       If compare type is Compare::NOT_CONTAINS, accepted records will
+    ///       match no values in the blacklist.
     ///
-    /// \param[in] whitelist    query names to compare on
+    /// \param[in] queryNames   query names
+    /// \param[in] cmp          compare type
     ///
-    PbiQueryNameFilter(const std::vector<std::string>& whitelist,
-                       const Compare::Type cmp = Compare::EQUAL);
+    PbiQueryNameFilter(const std::vector<std::string>& queryNames,
+                       const Compare::Type cmp = Compare::CONTAINS);
 
     PbiQueryNameFilter(const PbiQueryNameFilter& other);
     ~PbiQueryNameFilter();
@@ -675,37 +688,43 @@ public:
     ///
     PbiReadGroupFilter(const ReadGroupInfo& rg, const Compare::Type cmp = Compare::EQUAL);
 
-    /// \brief Creates a 'whitelisted' filter on read group numeric IDs.
+    /// \brief Creates a whitelisted or blacklisted filter on read group numeric IDs.
     ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
+    /// \note If compare type is Compare::CONTAINS, accepted records will match
+    ///       at least one value from whitelist, in bc_forward.
+    ///       If compare type is Compare::NOT_CONTAINS, accepted records will
+    ///       match no values in the blacklist.
     ///
-    /// \param[in] whitelist    read group IDs to compare on
+    /// \param[in] rgIds    numeric read group IDs
+    /// \param[in] cmp      compare type
     ///
-    PbiReadGroupFilter(const std::vector<int32_t>& whitelist,
-                       const Compare::Type cmp = Compare::EQUAL);
+    PbiReadGroupFilter(const std::vector<int32_t>& rgIds,
+                       const Compare::Type cmp = Compare::CONTAINS);
 
-    /// \brief Creates a 'whitelisted' filter on read group printable IDs.
+    /// \brief Creates a whitelisted or blacklisted filter on read group string IDs.
     ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
+    /// \note If compare type is Compare::CONTAINS, accepted records will match
+    ///       at least one value from whitelist, in bc_forward.
+    ///       If compare type is Compare::NOT_CONTAINS, accepted records will
+    ///       match no values in the blacklist.
     ///
-    /// \param[in] whitelist    read group ID strings to compare on
+    /// \param[in] rgIds    read group ID strings
+    /// \param[in] cmp      compare type
     ///
-    PbiReadGroupFilter(const std::vector<std::string>& whitelist,
-                       const Compare::Type cmp = Compare::EQUAL);
+    PbiReadGroupFilter(const std::vector<std::string>& rgIds,
+                       const Compare::Type cmp = Compare::CONTAINS);
 
-    /// \brief Creates a 'whitelisted' filter using read group objects.
+    /// \brief Creates a whitelisted or blacklisted filter on read group objects.
     ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
+    /// \note If compare type is Compare::CONTAINS, accepted records will match
+    ///       at least one value from whitelist, in bc_forward.
+    ///       If compare type is Compare::NOT_CONTAINS, accepted records will
+    ///       match no values in the blacklist.
     ///
-    /// \param[in] whitelist    read group objects to compare on
+    /// \param[in] readGroups   ReadGroupInfo objects
+    /// \param[in] cmp          compare type
     ///
-    PbiReadGroupFilter(const std::vector<ReadGroupInfo>& whitelist,
+    PbiReadGroupFilter(const std::vector<ReadGroupInfo>& readGroups,
                        const Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Performs the actual index lookup.
@@ -757,15 +776,17 @@ public:
     ///
     PbiReferenceIdFilter(const int32_t tId, const Compare::Type cmp = Compare::EQUAL);
 
-    /// \brief Creates a 'whitelisted' reference ID filter.
+    /// \brief Creates a whitelisted or blacklisted reference ID filter.
     ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
+    /// \note If compare type is Compare::CONTAINS, accepted records will match
+    ///       at least one value from whitelist, in bc_forward.
+    ///       If compare type is Compare::NOT_CONTAINS, accepted records will
+    ///       match no values in the blacklist.
     ///
-    /// \param[in] whitelist    reference IDs to compare on
+    /// \param[in] tIds reference IDs
+    /// \param[in] cmp  compare type
     ///
-    PbiReferenceIdFilter(std::vector<int32_t> whitelist, const Compare::Type cmp = Compare::EQUAL);
+    PbiReferenceIdFilter(std::vector<int32_t> tIds, const Compare::Type cmp = Compare::CONTAINS);
 };
 
 /// \brief The PbiReferenceNameFilter class provides a PbiFilter-compatible
@@ -785,16 +806,18 @@ public:
     ///
     PbiReferenceNameFilter(std::string rname, Compare::Type cmp = Compare::EQUAL);
 
-    /// \brief Creates a 'whitelisted' reference name filter.
+    /// \brief Creates a whitelisted or blacklisted reference name filter.
     ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
+    /// \note If compare type is Compare::CONTAINS, accepted records will match
+    ///       at least one value from whitelist, in bc_forward.
+    ///       If compare type is Compare::NOT_CONTAINS, accepted records will
+    ///       match no values in the blacklist.
     ///
-    /// \param[in] whitelist    reference names to compare on
+    /// \param[in] rnames   reference names
+    /// \param[in] cmp      compare type
     ///
-    PbiReferenceNameFilter(std::vector<std::string> whitelist,
-                           const Compare::Type cmp = Compare::EQUAL);
+    PbiReferenceNameFilter(std::vector<std::string> rnames,
+                           const Compare::Type cmp = Compare::CONTAINS);
 
     /// \brief Performs the actual index lookup.
     ///
@@ -812,6 +835,8 @@ private:
     // marked const so we can delay setup of filter in Accepts(), once we have
     // access to PBI/BAM input. modified values marked mutable accordingly
     void Initialize(const PbiRawData& idx) const;
+
+    void Validate() const;
 };
 
 /// \brief The PbiReferenceStartFilter class provides a PbiFilter-compatible
@@ -850,15 +875,17 @@ public:
     ///
     PbiZmwFilter(const int32_t zmw, const Compare::Type cmp = Compare::EQUAL);
 
-    /// \brief Creates a 'whitelisted' ZMW hole number filter.
+    /// \brief Creates a whitelisted or blacklisted ZMW hole number filter.
     ///
-    /// \note There is no compare type parameter here, it is always
-    ///       Compare::EQUAL. Records will match at least one value from the
-    ///       whitelist, exactly.
+    /// \note If compare type is Compare::CONTAINS, accepted records will match
+    ///       at least one value from whitelist, in bc_forward.
+    ///       If compare type is Compare::NOT_CONTAINS, accepted records will
+    ///       match no values in the blacklist.
     ///
-    /// \param[in] whitelist    ZMW hole numbers to compare on
+    /// \param[in] zmws ZMW hole numbers
+    /// \param[in] cmp  compare type
     ///
-    PbiZmwFilter(std::vector<int32_t> whitelist, const Compare::Type cmp = Compare::EQUAL);
+    PbiZmwFilter(std::vector<int32_t> zmws, const Compare::Type cmp = Compare::CONTAINS);
 };
 
 // ----------------------------------------------

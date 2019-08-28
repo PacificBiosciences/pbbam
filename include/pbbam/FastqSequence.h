@@ -7,10 +7,12 @@
 #ifndef FASTQSEQUENCE_H
 #define FASTQSEQUENCE_H
 
-#include <pbbam/FastaSequence.h>
-#include <pbbam/QualityValues.h>
+#include "pbbam/Config.h"
 
 #include <string>
+
+#include <pbbam/FastaSequence.h>
+#include <pbbam/QualityValues.h>
 
 namespace PacBio {
 namespace BAM {
@@ -41,12 +43,7 @@ public:
     ///
     explicit FastqSequence(std::string name, std::string bases, std::string qualities);
 
-    FastqSequence();
-    FastqSequence(const FastqSequence&);
-    FastqSequence(FastqSequence&&);
-    FastqSequence& operator=(const FastqSequence&);
-    FastqSequence& operator=(FastqSequence&&);
-    ~FastqSequence();
+    FastqSequence() = default;
 
     /// \}
 
@@ -60,7 +57,18 @@ public:
     ///
     const QualityValues& Qualities() const;
 
+    ///
+    /// \brief
+    ///
+    /// \param quals
+    /// \return FastqSequence
+    ///
+    FastqSequence& Qualities(QualityValues quals);
+
     /// \}
+
+    bool operator==(const FastqSequence& other) const;
+    bool operator!=(const FastqSequence& other) const;
 
 private:
     QualityValues qualities_;

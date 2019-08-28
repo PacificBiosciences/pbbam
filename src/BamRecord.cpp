@@ -16,11 +16,13 @@
 #include <htslib/sam.h>
 #include <boost/numeric/conversion/cast.hpp>
 
+#include <pbcopper/data/Clipping.h>
+#include <pbcopper/data/internal/ClippingImpl.h>
+
 #include "BamRecordTags.h"
 #include "MemoryUtils.h"
 #include "Pulse2BaseCache.h"
 #include "SequenceUtils.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/StringUtilities.h"
 #include "pbbam/ZmwTypeMap.h"
 #include "pbbam/virtual/VirtualRegionTypeMap.h"
@@ -330,17 +332,7 @@ void OrientTagDataAsRequested(Container* data, Orientation current, Orientation 
     if (current != requested && isReverseStrand) std::reverse(data->begin(), data->end());
 }
 
-bool ConsumesQuery(const CigarOperationType type)
-{
-    return (bam_cigar_type(static_cast<int>(type)) & 0x1) != 0;
-}
-
-bool ConsumesReference(const CigarOperationType type)
-{
-    return (bam_cigar_type(static_cast<int>(type)) & 0x2) != 0;
-}
-
-}  // anonymous
+}  // namespace
 
 const float BamRecord::photonFactor = 10.0;
 
@@ -371,14 +363,7 @@ BamRecord::BamRecord(const BamRecord& other)
 {
 }
 
-BamRecord::BamRecord(BamRecord&& other)
-    : impl_{std::move(other.impl_)}
-    , header_{std::move(other.header_)}
-    , alignedStart_{std::move(other.alignedStart_)}
-    , alignedEnd_{std::move(other.alignedEnd_)}
-    , p2bCache_{std::move(other.p2bCache_)}
-{
-}
+BamRecord::BamRecord(BamRecord&&) noexcept = default;
 
 BamRecord& BamRecord::operator=(const BamRecord& other)
 {
@@ -392,17 +377,7 @@ BamRecord& BamRecord::operator=(const BamRecord& other)
     return *this;
 }
 
-BamRecord& BamRecord::operator=(BamRecord&& other)
-{
-    if (this != &other) {
-        impl_ = std::move(other.impl_);
-        header_ = std::move(other.header_);
-        alignedStart_ = std::move(other.alignedStart_);
-        alignedEnd_ = std::move(other.alignedEnd_);
-        p2bCache_ = std::move(other.p2bCache_);
-    }
-    return *this;
-}
+BamRecord& BamRecord::operator=(BamRecord&&) noexcept = default;
 
 BamRecord::~BamRecord() = default;
 
@@ -698,158 +673,28 @@ void BamRecord::ClipFields(const size_t clipFrom, const size_t clipLength)
 
 BamRecord& BamRecord::ClipToQuery(const Position start, const Position end)
 {
-    if (IsMapped() && (AlignedStrand() == Strand::REVERSE)) return ClipToQueryReverse(start, end);
-    return ClipToQueryForward(start, end);
-}
-
-BamRecord& BamRecord::ClipToQueryForward(const PacBio::BAM::Position start,
-                                         const PacBio::BAM::Position end)
-{
     // cache original coords, skip out if clip not needed
-    const auto seqLength = static_cast<int>(impl_.SequenceLength());
+    const size_t seqLength = impl_.SequenceLength();
     const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
     const Position origQStart = isCcsOrTranscript ? 0 : QueryStart();
     const Position origQEnd = isCcsOrTranscript ? seqLength : QueryEnd();
     if (start <= origQStart && end >= origQEnd) return *this;
 
-    // determine new offsets into data
-    const size_t startOffset = start - origQStart;
-    const size_t endOffset = origQEnd - end;
+    // calculate clipping
+    Data::ClipToQueryConfig clipConfig{
+        impl_.SequenceLength(), origQStart,      origQEnd,          start,           end,
+        impl_.Position(),       AlignedStrand(), impl_.CigarData(), impl_.IsMapped()};
+    auto result = Data::ClipToQuery(clipConfig);
 
-    // maybe update CIGAR & aligned position
+    // update alignment info
     if (IsMapped()) {
-
-        // fetch a 'working copy' of CIGAR data
-        Cigar cigar = impl_.CigarData();
-
-        // clip leading CIGAR ops
-        size_t referencePositionOffset = 0;
-        size_t remaining = startOffset;
-        while (remaining > 0 && !cigar.empty()) {
-            CigarOperation& firstOp = cigar.front();
-            const auto firstOpLength = firstOp.Length();
-            const bool consumesQuery = ConsumesQuery(firstOp.Type());
-            const bool consumesRef = ConsumesReference(firstOp.Type());
-
-            // CIGAR op ends at or before clip
-            if (firstOpLength <= remaining) {
-                cigar.erase(cigar.begin());
-                if (consumesQuery) remaining -= firstOpLength;
-                if (consumesRef) referencePositionOffset += firstOpLength;
-            }
-
-            // CIGAR op straddles clip
-            else {
-                firstOp.Length(firstOpLength - remaining);
-                if (consumesRef) referencePositionOffset += remaining;
-                remaining = 0;
-            }
-        }
-
-        // clip trailing CIGAR ops
-        remaining = endOffset;
-        while (remaining > 0 && !cigar.empty()) {
-            CigarOperation& lastOp = cigar.back();
-            const auto lastOpLength = lastOp.Length();
-            const bool consumesQuery = ConsumesQuery(lastOp.Type());
-
-            // CIGAR op ends at or after clip
-            if (lastOpLength <= remaining) {
-                cigar.pop_back();
-                if (consumesQuery) remaining -= lastOpLength;
-            }
-
-            // CIGAR op straddles clip
-            else {
-                lastOp.Length(lastOpLength - remaining);
-                remaining = 0;
-            }
-        }
-
-        // update CIGAR & position
-        impl_.CigarData(cigar);
-        impl_.Position(impl_.Position() + referencePositionOffset);
+        impl_.CigarData(std::move(result.cigar_));
+        impl_.Position(result.refPos_);
     }
 
-    // clip SEQ, QUAL, & tags
-    const size_t clipFrom = startOffset;
-    const size_t clipLength = (end - start);
-    ClipFields(clipFrom, clipLength);
-
-    // update query start/end
-    // TODO: update name to reflect new QS/QE ???
-    CreateOrEdit(BamRecordTag::QUERY_START, start, &impl_);
-    CreateOrEdit(BamRecordTag::QUERY_END, end, &impl_);
-
-    // reset any cached aligned start/end
-    ResetCachedPositions();
-    return *this;
-}
-
-BamRecord& BamRecord::ClipToQueryReverse(const PacBio::BAM::Position start,
-                                         const PacBio::BAM::Position end)
-{
-    // cache original coords, skip out if clip not needed
-    const int seqLength = impl_.SequenceLength();
-    const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
-    const Position origQStart = isCcsOrTranscript ? 0 : QueryStart();
-    const Position origQEnd = isCcsOrTranscript ? seqLength : QueryEnd();
-    if ((start <= origQStart) && (end >= origQEnd)) return *this;
-
-    // determine new offsets into data
-    const size_t startOffset = start - origQStart;
-    const size_t endOffset = origQEnd - end;
-
-    if (IsMapped()) {
-        Cigar cigar = impl_.CigarData();
-        std::reverse(cigar.begin(), cigar.end());
-
-        size_t refPosRemoved = 0;
-        size_t remaining = startOffset;
-
-        // clip CIGAR ops from beginning of query sequence
-        while ((remaining > 0) && !cigar.empty()) {
-            CigarOperation& op = cigar.front();
-            const auto opLength = op.Length();
-            const bool consumesQuery = ConsumesQuery(op.Type());
-            const bool consumesRef = ConsumesReference(op.Type());
-
-            if (opLength <= remaining) {
-                cigar.erase(cigar.begin());
-                if (consumesQuery) remaining -= opLength;
-                if (consumesRef) refPosRemoved += opLength;
-            } else {
-                op.Length(opLength - remaining);
-                if (consumesRef) refPosRemoved += remaining;
-                remaining = 0;
-            }
-        }
-
-        // clip CIGAR ops from end of query sequence
-        remaining = endOffset;
-        while ((remaining > 0) && !cigar.empty()) {
-            CigarOperation& op = cigar.back();
-            const auto opLength = op.Length();
-            const bool consumesQuery = ConsumesQuery(op.Type());
-
-            if (opLength <= remaining) {
-                cigar.pop_back();
-                if (consumesQuery) remaining -= opLength;
-            } else {
-                op.Length(opLength - remaining);
-                remaining = 0;
-            }
-        }
-
-        // restore CIGAR
-        std::reverse(cigar.begin(), cigar.end());
-        impl_.CigarData(cigar);
-        impl_.Position(impl_.Position() + refPosRemoved);
-    }
-
-    // clip SEQ, QUAL, & tags
-    const size_t clipFrom = startOffset;
-    const size_t clipLength = (end - start);
+    // clip SEQ, QUAL, tags
+    const auto clipFrom = result.clipOffset_;
+    const auto clipLength = (end - start);
     ClipFields(clipFrom, clipLength);
 
     // update query start/end
@@ -869,18 +714,6 @@ BamRecord& BamRecord::ClipToReference(const Position start, const Position end,
     // or should we even consider throwing here?
     if (!IsMapped()) return *this;
 
-    const bool isForwardStrand = (AlignedStrand() == Strand::FORWARD);
-    return (isForwardStrand ? ClipToReferenceForward(start, end, exciseFlankingInserts)
-                            : ClipToReferenceReverse(start, end, exciseFlankingInserts));
-}
-
-BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
-                                             const PacBio::BAM::Position end,
-                                             const bool exciseFlankingInserts)
-{
-    assert(IsMapped());
-    assert(AlignedStrand() == Strand::FORWARD);
-
     // cache original coords
     const int seqLength = static_cast<int>(impl_.SequenceLength());
     const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
@@ -888,269 +721,34 @@ BamRecord& BamRecord::ClipToReferenceForward(const PacBio::BAM::Position start,
     const Position origQEnd = isCcsOrTranscript ? seqLength : QueryEnd();
     const Position origTStart = ReferenceStart();
     const Position origTEnd = ReferenceEnd();
-    assert(AlignedStart() >= origQStart);
-    assert(AlignedEnd() <= origQEnd);
 
     // skip if already within requested clip range
     if (start <= origTStart && end >= origTEnd) return *this;
+    assert(AlignedStart() >= origQStart);
+    assert(AlignedEnd() <= origQEnd);
 
-    const Position newTStart = std::max(origTStart, start);
-    const Position newTEnd = std::min(origTEnd, end);
-
-    // fetch a 'working copy' of CIGAR data
-    Cigar cigar = impl_.CigarData();
-
-    // we're going to skip query sequence outside aligned region
-    size_t queryPosRemovedFront = 0;
-    size_t queryPosRemovedBack = 0;
-
-    // ------------------------
-    // clip leading CIGAR ops
-    // ------------------------
-
-    size_t remaining = newTStart - origTStart;
-    while (remaining > 0 && !cigar.empty()) {
-        CigarOperation& firstOp = cigar.front();
-        const auto firstOpLength = firstOp.Length();
-        const bool consumesQuery = ConsumesQuery(firstOp.Type());
-        const bool consumesRef = ConsumesReference(firstOp.Type());
-
-        if (!consumesRef) {
-
-            // e.g. softclip - just pop it completely
-            cigar.erase(cigar.begin());
-            if (consumesQuery) queryPosRemovedFront += firstOpLength;
-
-        } else {
-            assert(consumesRef);
-
-            // CIGAR ends at or before clip
-            if (firstOpLength <= remaining) {
-                cigar.erase(cigar.begin());
-                if (consumesQuery) queryPosRemovedFront += firstOpLength;
-                if (consumesRef) remaining -= firstOpLength;
-            }
-
-            // CIGAR straddles clip
-            else {
-                assert(firstOpLength > remaining);
-                firstOp.Length(firstOpLength - remaining);
-                if (consumesQuery) queryPosRemovedFront += remaining;
-                remaining = 0;
-            }
-        }
-    }
-
-    // -------------------------
-    // clip trailing CIGAR ops
-    // -------------------------
-
-    remaining = origTEnd - newTEnd;
-    while (remaining > 0 && !cigar.empty()) {
-        CigarOperation& lastOp = cigar.back();
-        const auto lastOpLength = lastOp.Length();
-        const bool consumesQuery = ConsumesQuery(lastOp.Type());
-        const bool consumesRef = ConsumesReference(lastOp.Type());
-
-        if (!consumesRef) {
-
-            // e.g. softclip - just pop it completely
-            cigar.pop_back();
-            if (consumesQuery) queryPosRemovedBack += lastOpLength;
-
-        } else {
-            assert(consumesRef);
-
-            // CIGAR ends at or after clip
-            if (lastOpLength <= remaining) {
-                cigar.pop_back();
-                if (consumesQuery) queryPosRemovedBack += lastOpLength;
-                if (consumesRef) remaining -= lastOpLength;
-            }
-
-            // CIGAR straddles clip
-            else {
-                assert(lastOpLength > remaining);
-                lastOp.Length(lastOpLength - remaining);
-                if (consumesQuery) queryPosRemovedBack += remaining;
-                remaining = 0;
-            }
-        }
-    }
-
-    if (exciseFlankingInserts) {
-        // check for leading insertion
-        if (!cigar.empty()) {
-            const CigarOperation& op = cigar.front();
-            if (op.Type() == CigarOperationType::INSERTION) {
-                queryPosRemovedFront += op.Length();
-                cigar.erase(cigar.begin());
-            }
-        }
-
-        // check for trailing insertion
-        if (!cigar.empty()) {
-            const CigarOperation& op = cigar.back();
-            if (op.Type() == CigarOperationType::INSERTION) {
-                queryPosRemovedBack += op.Length();
-                cigar.pop_back();
-            }
-        }
-    }
+    // calculate clipping
+    Data::ClipToReferenceConfig clipConfig{
+        Data::ClipToQueryConfig{impl_.SequenceLength(), origQStart, origQEnd, start, end,
+                                impl_.Position(), AlignedStrand(), impl_.CigarData(),
+                                impl_.IsMapped()},
+        ReferenceEnd(), start, end, exciseFlankingInserts};
+    auto result = Data::ClipToReference(clipConfig);
 
     // update CIGAR and position
-    impl_.CigarData(cigar);
-    impl_.Position(newTStart);
+    impl_.CigarData(std::move(result.cigar_));
+    impl_.Position(result.refPos_);
 
     // clip SEQ, QUAL, tags
-    const Position qStart = origQStart + queryPosRemovedFront;
-    const Position qEnd = origQEnd - queryPosRemovedBack;
-    const size_t clipFrom = queryPosRemovedFront;
+    const Position qStart = result.qStart_;
+    const Position qEnd = result.qEnd_;
+    const size_t clipFrom = result.clipOffset_;
     const size_t clipLength = qEnd - qStart;
     ClipFields(clipFrom, clipLength);
 
     // update query start/end
     CreateOrEdit(BamRecordTag::QUERY_START, qStart, &impl_);
     CreateOrEdit(BamRecordTag::QUERY_END, qEnd, &impl_);
-
-    // reset any cached aligned start/end
-    ResetCachedPositions();
-    return *this;
-}
-
-BamRecord& BamRecord::ClipToReferenceReverse(const PacBio::BAM::Position start,
-                                             const PacBio::BAM::Position end,
-                                             const bool exciseFlankingInserts)
-{
-    assert(IsMapped());
-    assert(AlignedStrand() == Strand::REVERSE);
-
-    // cache original coords
-    const int seqLength = static_cast<int>(impl_.SequenceLength());
-    const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
-    const Position origQStart = isCcsOrTranscript ? 0 : QueryStart();
-    const Position origQEnd = isCcsOrTranscript ? seqLength : QueryEnd();
-    const Position origTStart = ReferenceStart();
-    const Position origTEnd = ReferenceEnd();
-
-    // skip if already within requested clip range
-    if (start <= origTStart && end >= origTEnd) return *this;
-    assert(AlignedStart() >= origQStart);
-    assert(AlignedEnd() <= origQEnd);
-
-    const Position newTStart = std::max(origTStart, start);
-    const Position newTEnd = std::min(origTEnd, end);
-
-    Cigar cigar = impl_.CigarData();
-
-    size_t queryPosRemovedFront = 0;
-    size_t queryPosRemovedBack = 0;
-
-    // update CIGAR - clip front ops, then clip back ops
-    size_t remaining = newTStart - origTStart;
-    while (remaining > 0 && !cigar.empty()) {
-        CigarOperation& firstOp = cigar.front();
-        const auto firstOpType = firstOp.Type();
-        const auto firstOpLength = firstOp.Length();
-        const bool consumesQuery = ConsumesQuery(firstOpType);
-        const bool consumesRef = ConsumesReference(firstOpType);
-
-        if (!consumesRef) {
-
-            // e.g. softclip - just pop it completely
-            cigar.erase(cigar.begin());
-            if (consumesQuery) queryPosRemovedBack += firstOpLength;
-
-        } else {
-            assert(consumesRef);
-
-            // CIGAR ends at or before clip
-            if (firstOpLength <= remaining) {
-                cigar.erase(cigar.begin());
-                if (consumesQuery) queryPosRemovedBack += firstOpLength;
-                if (consumesRef) remaining -= firstOpLength;
-            }
-
-            // CIGAR straddles clip
-            else {
-                assert(firstOpLength > remaining);
-                firstOp.Length(firstOpLength - remaining);
-                if (consumesQuery) queryPosRemovedBack += remaining;
-                remaining = 0;
-            }
-        }
-    }
-
-    remaining = origTEnd - newTEnd;
-    while (remaining > 0 && !cigar.empty()) {
-        CigarOperation& lastOp = cigar.back();
-        const auto lastOpType = lastOp.Type();
-        const auto lastOpLength = lastOp.Length();
-        const bool consumesQuery = ConsumesQuery(lastOpType);
-        const bool consumesRef = ConsumesReference(lastOpType);
-
-        if (!consumesRef) {
-
-            // e.g. softclip - just pop it completely
-            cigar.pop_back();
-            if (consumesQuery) queryPosRemovedFront += lastOpLength;
-
-        } else {
-            assert(consumesRef);
-
-            // CIGAR ends at or before clip
-            if (lastOpLength <= remaining) {
-                cigar.pop_back();
-                if (consumesQuery) queryPosRemovedFront += lastOpLength;
-                if (consumesRef) remaining -= lastOpLength;
-            }
-
-            // CIGAR straddles clip
-            else {
-                assert(lastOpLength > remaining);
-                lastOp.Length(lastOpLength - remaining);
-                if (consumesQuery) queryPosRemovedFront += remaining;
-                remaining = 0;
-            }
-        }
-    }
-
-    if (exciseFlankingInserts) {
-        // check for leading insertion
-        if (!cigar.empty()) {
-            const CigarOperation& op = cigar.front();
-            if (op.Type() == CigarOperationType::INSERTION) {
-                queryPosRemovedBack += op.Length();
-                cigar.erase(cigar.begin());
-            }
-        }
-
-        // check for trailing insertion
-        if (!cigar.empty()) {
-            const CigarOperation& op = cigar.back();
-            if (op.Type() == CigarOperationType::INSERTION) {
-                queryPosRemovedFront += op.Length();
-                cigar.pop_back();
-            }
-        }
-    }
-
-    impl_.CigarData(cigar);
-
-    // update aligned reference position
-    impl_.Position(newTStart);
-
-    // clip SEQ, QUAL, tags
-    const Position qStart = origQStart + queryPosRemovedFront;
-    const Position qEnd = origQEnd - queryPosRemovedBack;
-    const size_t clipFrom = queryPosRemovedFront;
-    const size_t clipLength = qEnd - qStart;
-    ClipFields(clipFrom, clipLength);
-
-    // update query start/end
-    CreateOrEdit(BamRecordTag::QUERY_START, qStart, &impl_);
-    CreateOrEdit(BamRecordTag::QUERY_END, qEnd, &impl_);
-    //    UpdateName();
 
     // reset any cached aligned start/end
     ResetCachedPositions();
@@ -1561,7 +1159,17 @@ bool BamRecord::HasPulseWidth() const { return impl_.HasTag(BamRecordTag::PULSE_
 
 bool BamRecord::HasQueryEnd() const { return impl_.HasTag(BamRecordTag::QUERY_END); }
 
+bool BamRecord::HasQueryEndFrameNumber() const
+{
+    return impl_.HasTag(BamRecordTag::QUERY_END_FRAME_NUMBER);
+}
+
 bool BamRecord::HasQueryStart() const { return impl_.HasTag(BamRecordTag::QUERY_START); }
+
+bool BamRecord::HasQueryStartFrameNumber() const
+{
+    return impl_.HasTag(BamRecordTag::QUERY_START_FRAME_NUMBER);
+}
 
 bool BamRecord::HasReadAccuracy() const
 {
@@ -1583,7 +1191,7 @@ bool BamRecord::HasScrapZmwType() const
 
 bool BamRecord::HasStartFrame() const { return impl_.HasTag(BamRecordTag::START_FRAME); }
 
-bool BamRecord::HasSignalToNoise() const { return impl_.HasTag(BamRecordTag::SNR); }
+bool BamRecord::HasSignalToNoise() const { return impl_.HasTag(BamRecordTag::SIGNAL_TO_NOISE); }
 
 bool BamRecord::HasSubstitutionQV() const { return impl_.HasTag(BamRecordTag::SUBSTITUTION_QV); }
 
@@ -2085,6 +1693,20 @@ BamRecord& BamRecord::QueryEnd(const Position pos)
     return *this;
 }
 
+int32_t BamRecord::QueryEndFrameNumber() const
+{
+    const auto tagName = BamRecordTags::LabelFor(BamRecordTag::QUERY_END_FRAME_NUMBER);
+    const Tag qs = impl_.TagValue(tagName);
+    if (!qs.IsNull()) return qs.ToInt32();
+    return 0;
+}
+
+BamRecord& BamRecord::QueryEndFrameNumber(const int32_t frameNumber)
+{
+    CreateOrEdit(BamRecordTag::QUERY_END_FRAME_NUMBER, frameNumber, &impl_);
+    return *this;
+}
+
 Position BamRecord::QueryStart() const
 {
     // try 'qs' tag
@@ -2117,6 +1739,20 @@ BamRecord& BamRecord::QueryStart(const Position pos)
 {
     CreateOrEdit(BamRecordTag::QUERY_START, static_cast<int32_t>(pos), &impl_);
     UpdateName();
+    return *this;
+}
+
+int32_t BamRecord::QueryStartFrameNumber() const
+{
+    const auto tagName = BamRecordTags::LabelFor(BamRecordTag::QUERY_START_FRAME_NUMBER);
+    const Tag qs = impl_.TagValue(tagName);
+    if (!qs.IsNull()) return qs.ToInt32();
+    return 0;
+}
+
+BamRecord& BamRecord::QueryStartFrameNumber(const int32_t frameNumber)
+{
+    CreateOrEdit(BamRecordTag::QUERY_START_FRAME_NUMBER, frameNumber, &impl_);
     return *this;
 }
 
@@ -2239,14 +1875,14 @@ std::string BamRecord::Sequence(const Orientation orientation, bool aligned,
 
 std::vector<float> BamRecord::SignalToNoise() const
 {
-    const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SNR);
+    const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SIGNAL_TO_NOISE);
     const Tag snTag = impl_.TagValue(tagName);
     return snTag.ToFloatArray();
 }
 
 BamRecord& BamRecord::SignalToNoise(const std::vector<float>& snr)
 {
-    CreateOrEdit(BamRecordTag::SNR, snr, &impl_);
+    CreateOrEdit(BamRecordTag::SIGNAL_TO_NOISE, snr, &impl_);
     return *this;
 }
 
@@ -2285,6 +1921,31 @@ BamRecord& BamRecord::SubstitutionTag(const std::string& tags)
 {
     CreateOrEdit(BamRecordTag::SUBSTITUTION_TAG, tags, &impl_);
     return *this;
+}
+
+Data::Read BamRecord::ToRead() const
+{
+    Data::Read result{FullName(),      Sequence(),   Qualities(),
+                      SignalToNoise(), QueryStart(), QueryEnd()};
+
+    if (HasIPD()) result.IPD = IPD();
+    if (HasPulseWidth()) result.PulseWidth = PulseWidth();
+
+    if (IsMapped() && AlignedStrand() == Data::Strand::REVERSE) {
+        ReverseComplement(result.Seq);
+        Reverse(result.Qualities);
+    }
+    return result;
+}
+
+Data::MappedRead BamRecord::ToMappedRead() const
+{
+    if (!IsMapped()) {
+        throw std::runtime_error{"BAM record '" + FullName() +
+                                 "' cannot be converted to MappedRead because it is not mapped"};
+    }
+
+    return {ToRead(), AlignedStrand(), ReferenceStart(), ReferenceEnd(), CigarData(), MapQuality()};
 }
 
 RecordType BamRecord::Type() const

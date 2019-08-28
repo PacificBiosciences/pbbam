@@ -1,11 +1,11 @@
 project(
   'PacBioBAM',
   'cpp',
-  version : '0.23.0',
+  version : '1.0.6',
   default_options : [
     'buildtype=release',
     'warning_level=3',
-    'cpp_std=c++11',
+    'cpp_std=c++14',
     'b_ndebug=if-release'],
   license : 'BSD-3',
   meson_version : '>= 0.46.0')
@@ -57,10 +57,13 @@ pbbam_boost_dep = dependency('boost', required : true)
 #endif()
 
 # zlib
-pbbam_zlib_dep = dependency('zlib', required : true)
+pbbam_zlib_dep = dependency('zlib', required : true, fallback : ['zlib', 'zlib_dep'])
 
 # htslib
-pbbam_htslib_dep = dependency('htslib', required : true, version : '>=1.4')
+pbbam_htslib_dep = dependency('htslib', required : true, version : '>=1.4', fallback : ['htslib', 'htslib_dep'])
+
+# pbcopper
+pbbam_pbcopper_dep = dependency('pbcopper', required : true, fallback : ['pbcopper', 'pbcopper_dep'])
 
 ###########
 # headers #
@@ -112,11 +115,19 @@ endif
 ###################
 
 if not meson.is_subproject()
+  # need to add pbcopper into 'Requires:' field,
+  # but Meson currently only allows this if it's a
+  # 'pkgconfig-dependency object' and not a subproject
+  pbbam_requires = []
+  if pbbam_pbcopper_dep.type_name() == 'pkgconfig'
+    pbbam_requires = [pbbam_pbcopper_dep]
+  endif 
+
   import('pkgconfig').generate(
-    libraries : pbbam_lib,
+    pbbam_lib,
     version : meson.project_version(),
     name : 'pbbam',
-    requires : 'htslib',
+    requires : pbbam_requires,
     filebase : 'pbbam',
     description : 'Library for accessing PacBio-compatible BAM files')
 endif
@@ -124,6 +135,6 @@ endif
 pbbam_dep = declare_dependency(
   include_directories : pbbam_include_directories,
   link_with : pbbam_lib,
-  dependencies : pbbam_htslib_dep,
+  dependencies : [pbbam_htslib_dep, pbbam_pbcopper_dep],
   version : meson.project_version(),
   compile_args : pbbam_macros)

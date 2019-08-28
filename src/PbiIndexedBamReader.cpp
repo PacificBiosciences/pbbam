@@ -14,16 +14,14 @@
 
 #include <htslib/bgzf.h>
 
-#include "pbbam/MakeUnique.h"
-
 namespace PacBio {
 namespace BAM {
 
 class PbiIndexedBamReader::PbiIndexedBamReaderPrivate
 {
 public:
-    explicit PbiIndexedBamReaderPrivate(const std::shared_ptr<PbiRawData>& index)
-        : index_{index}, currentBlockReadCount_{0}, numMatchingReads_{0}
+    explicit PbiIndexedBamReaderPrivate(BamFile file, const std::shared_ptr<PbiRawData>& index)
+        : file_{std::move(file)}, index_{index}, currentBlockReadCount_{0}, numMatchingReads_{0}
     {
     }
 
@@ -108,6 +106,7 @@ public:
         return result;
     }
 
+    BamFile file_;
     PbiFilter filter_;
     std::shared_ptr<PbiRawData> index_;
     IndexResultBlocks blocks_;
@@ -150,43 +149,35 @@ PbiIndexedBamReader::PbiIndexedBamReader(const std::string& bamFilename,
 {
 }
 
-PbiIndexedBamReader::PbiIndexedBamReader(BamFile bamFile) : BamReader{std::move(bamFile)}
+PbiIndexedBamReader::PbiIndexedBamReader(BamFile bamFile) : BamReader{bamFile.Filename()}
 {
-    auto indexCache = MakePbiIndexCache(File());
-    d_ = std::make_unique<PbiIndexedBamReaderPrivate>(indexCache->at(0));
+    auto indexCache = MakePbiIndexCache(bamFile);
+    d_ = std::make_unique<PbiIndexedBamReaderPrivate>(std::move(bamFile), indexCache->at(0));
 }
 
 PbiIndexedBamReader::PbiIndexedBamReader(BamFile bamFile, const std::shared_ptr<PbiRawData>& index)
-    : BamReader{std::move(bamFile)}, d_{std::make_unique<PbiIndexedBamReaderPrivate>(index)}
+    : BamReader{bamFile.Filename()}
+    , d_{std::make_unique<PbiIndexedBamReaderPrivate>(std::move(bamFile), index)}
 {
 }
 
 PbiIndexedBamReader::~PbiIndexedBamReader() = default;
 
-int PbiIndexedBamReader::ReadRawData(BGZF* bgzf, bam1_t* b)
-{
-    assert(d_);
-    return d_->ReadRawData(bgzf, b);
-}
+const BamFile& PbiIndexedBamReader::File() const { return d_->file_; }
 
-const PbiFilter& PbiIndexedBamReader::Filter() const
-{
-    assert(d_);
-    return d_->filter_;
-}
+const PbiFilter& PbiIndexedBamReader::Filter() const { return d_->filter_; }
 
 PbiIndexedBamReader& PbiIndexedBamReader::Filter(PbiFilter filter)
 {
-    assert(d_);
     d_->Filter(std::move(filter));
     return *this;
 }
 
-uint32_t PbiIndexedBamReader::NumReads() const
-{
-    assert(d_);
-    return d_->numMatchingReads_;
-}
+const IndexResultBlocks& PbiIndexedBamReader::IndexBlocks() const { return d_->blocks_; }
+
+uint32_t PbiIndexedBamReader::NumReads() const { return d_->numMatchingReads_; }
+
+int PbiIndexedBamReader::ReadRawData(BGZF* bgzf, bam1_t* b) { return d_->ReadRawData(bgzf, b); }
 
 }  // namespace BAM
 }  // namespace PacBio

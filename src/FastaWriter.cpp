@@ -8,15 +8,22 @@
 
 #include "pbbam/FastaWriter.h"
 
+#include <stdexcept>
+
 #include "pbbam/BamRecord.h"
 #include "pbbam/FastqSequence.h"
-#include "pbbam/QualityValues.h"
-
+#include "pbbam/FormatUtils.h"
 namespace PacBio {
 namespace BAM {
 
-FastaWriter::FastaWriter(const std::string& fn) : IRecordWriter(), file_{fn}
+FastaWriter::FastaWriter(const std::string& fn) : IFastaWriter{}
 {
+    if (!FormatUtils::IsFastaFilename(fn)) {
+        throw std::runtime_error{"FastaReader: filename '" + fn +
+                                 "' is not recognized as a FASTA file."};
+    }
+
+    file_.open(fn);
     if (!file_) throw std::runtime_error{"FastaWriter: could not open file for writing: " + fn};
 }
 

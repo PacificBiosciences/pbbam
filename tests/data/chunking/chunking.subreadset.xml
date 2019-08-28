@@ -1,65 +1,32 @@
-<?xml version="1.0" encoding="utf-8"?>
-<pbds:SubreadSet 
-    xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd"
-    xmlns:pbsample="http://pacificbiosciences.com/PacBioSampleInfo.xsd"
-    xmlns:pbmeta="http://pacificbiosciences.com/PacBioCollectionMetadata.xsd"
-    xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd"
-    xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd" 
-    UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe519c" 
-    TimeStampedName="subreadset_150304_231155" 
-    MetaType="PacBio.DataSet.SubreadSet" 
-    Name="DataSet_SubreadSet" 
-    Tags="" 
-    Version="3.0.0" 
-    CreatedAt="2015-01-27T09:00:01"> 
-<pbbase:ExternalResources>
-    <pbbase:ExternalResource 
-        UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5193" 
-        TimeStampedName="subread_bam_150304_231155" 
-        MetaType="PacBio.SubreadFile.SubreadBamFile" 
-        ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.1.subreads.bam">
-        <pbbase:FileIndices>
-            <pbbase:FileIndex 
-                UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5194" 
-                TimeStampedName="bam_index_150304_231155" 
-                MetaType="PacBio.Index.PacBioIndex" 
-                ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.1.subreads.bam.pbi"/>
-        </pbbase:FileIndices>
-    </pbbase:ExternalResource>
-    <pbbase:ExternalResource 
-        UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5197" 
-        TimeStampedName="subread_bam_150304_231155" 
-        MetaType="PacBio.SubreadFile.SubreadBamFile" 
-        ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.2.subreads.bam">
-        <pbbase:FileIndices>
-            <pbbase:FileIndex 
-                UniqueId="b096d0a3-94b8-4918-b3af-a3f81bbe5198" 
-                TimeStampedName="bam_index_150304_231155" 
-                MetaType="PacBio.Index.PacBioIndex" 
-                ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.2.subreads.bam.pbi"/>
-        </pbbase:FileIndices>
-    </pbbase:ExternalResource><pbbase:ExternalResource 
-        UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5195" 
-        TimeStampedName="subread_bam_150304_231155" 
-        MetaType="PacBio.SubreadFile.SubreadBamFile" 
-        ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.3.subreads.bam">
-        <pbbase:FileIndices>
-            <pbbase:FileIndex 
-                UniqueId="b096d0a3-94b8-4918-b3af-a3f81bbe5196" 
-                TimeStampedName="bam_index_150304_231155" 
-                MetaType="PacBio.Index.PacBioIndex" 
-                ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.3.subreads.bam.pbi"/>
-        </pbbase:FileIndices>
-    </pbbase:ExternalResource>
-</pbbase:ExternalResources>
-<pbds:Filters>
-    <pbds:Filter>
-        <pbbase:Properties>
-            <pbbase:Property Name="movie" Operator="=" Value="m150404_101626_42267_c100807920800000001823174110291514_s1_p0"/>
-            <pbbase:Property Name="zm" Operator="lt" Value="1816"/>
-        </pbbase:Properties>
-    </pbds:Filter>
-</pbds:Filters>
+<?xml version="1.0" encoding="UTF-8"?>
+<pbds:SubreadSet xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CreatedAt="2019-07-02T18:22:25" MetaType="PacBio.DataSet.SubreadSet" Name="DataSet_SubreadSet" Tags="" TimeStampedName="pacbio_dataset_subreadset-190702_162225445" UniqueId="649d564c-bef3-f7e0-80fd-c1b623e51121" Version="3.0.1" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+	<pbbase:ExternalResources>
+		<pbbase:ExternalResource MetaType="PacBio.SubreadFile.SubreadBamFile" ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.1.subreads.bam" TimeStampedName="pacbio_subreadfile_subreadbamfile-190702_162225442" UniqueId="55a3a60c-acdb-4c6e-b404-22a25853f205">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex MetaType="PacBio.Index.PacBioIndex" ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.1.subreads.bam.pbi" TimeStampedName="pacbio_index_pacbioindex-190702_162225441" UniqueId="6229e63f-901f-4078-8b3d-f5ca7714dda5"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+		<pbbase:ExternalResource MetaType="PacBio.SubreadFile.SubreadBamFile" ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.2.subreads.bam" TimeStampedName="pacbio_subreadfile_subreadbamfile-190702_162225442" UniqueId="9ce13c61-5b02-4b1d-8c0e-d8b469f565e9">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex MetaType="PacBio.Index.PacBioIndex" ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.2.subreads.bam.pbi" TimeStampedName="pacbio_index_pacbioindex-190702_162225441" UniqueId="aedb108f-35ef-4cce-a8f4-a1c420bfbd70"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+		<pbbase:ExternalResource MetaType="PacBio.SubreadFile.SubreadBamFile" ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.3.subreads.bam" TimeStampedName="pacbio_subreadfile_subreadbamfile-190702_162225442" UniqueId="0c0537e7-f25d-419c-8c4b-526eaf61fdbb">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex MetaType="PacBio.Index.PacBioIndex" ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.3.subreads.bam.pbi" TimeStampedName="pacbio_index_pacbioindex-190702_162225442" UniqueId="10fb8805-20a8-42d7-aaaf-28b5b8ae704f"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+	</pbbase:ExternalResources>
+	<pbds:Filters>
+		<pbds:Filter>
+			<pbbase:Properties>
+				<pbbase:Property Name="movie" Operator="=" Value="m64004_190414_193017"/>
+				<pbbase:Property Name="zm" Operator="lt" Value="1816"/>
+			</pbbase:Properties>
+		</pbds:Filter>
+	</pbds:Filters>
+	<pbds:DataSetMetadata>
+		<pbds:TotalLength>933955</pbds:TotalLength>
+		<pbds:NumRecords>1220</pbds:NumRecords>
+	</pbds:DataSetMetadata>
 </pbds:SubreadSet>

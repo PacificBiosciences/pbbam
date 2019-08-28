@@ -7,12 +7,13 @@
 #ifndef VirtualZmwBAMRECORD_H
 #define VirtualZmwBAMRECORD_H
 
+#include "pbbam/Config.h"
+
 #include <sstream>
 #include <vector>
 
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
 #include "pbbam/virtual/VirtualRegion.h"
 #include "pbbam/virtual/VirtualRegionType.h"
 
@@ -37,13 +38,6 @@ public:
     /// \throws std::runtime_error on failure to stitch virtual record
     ///
     VirtualZmwBamRecord(std::vector<BamRecord> unorderedSources, const BamHeader& header);
-
-    VirtualZmwBamRecord() = delete;
-    VirtualZmwBamRecord(const VirtualZmwBamRecord&);
-    VirtualZmwBamRecord(VirtualZmwBamRecord&&);
-    VirtualZmwBamRecord& operator=(const VirtualZmwBamRecord&);
-    VirtualZmwBamRecord& operator=(VirtualZmwBamRecord&&);
-    virtual ~VirtualZmwBamRecord();
 
     /// \}
 

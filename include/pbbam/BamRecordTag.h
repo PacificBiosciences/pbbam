@@ -7,6 +7,8 @@
 #ifndef BAMRECORDTAG_H
 #define BAMRECORDTAG_H
 
+#include "pbbam/Config.h"
+
 namespace PacBio {
 namespace BAM {
 
@@ -37,12 +39,14 @@ enum class BamRecordTag
     PULSE_MERGE_QV,
     PULSE_WIDTH,
     QUERY_END,
+    QUERY_END_FRAME_NUMBER,
     QUERY_START,
+    QUERY_START_FRAME_NUMBER,
     READ_ACCURACY,
     READ_GROUP,
     SCRAP_REGION_TYPE,
     SCRAP_ZMW_TYPE,
-    SNR,
+    SIGNAL_TO_NOISE,
     START_FRAME,
     SUBSTITUTION_QV,
     SUBSTITUTION_TAG,

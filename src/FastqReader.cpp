@@ -8,62 +8,55 @@
 
 #include "pbbam/FastqReader.h"
 
-#include <memory>
+#include <cassert>
 #include <stdexcept>
-#include <string>
+#include <type_traits>
 
-#include <htslib/kseq.h>
-#include <zlib.h>
+#include "pbbam/FormatUtils.h"
 
-#include "pbbam/FastqSequence.h"
-#include "pbbam/MakeUnique.h"
+#include "KSeqReader.h"
 
 namespace PacBio {
 namespace BAM {
 
+static_assert(!std::is_copy_constructible<FastqReader>::value,
+              "FastqReader(const FastqReader&) is not = delete");
+static_assert(!std::is_copy_assignable<FastqReader>::value,
+              "FastqReader& operator=(const FastqReader&) is not = delete");
+
 class FastqReader::FastqReaderPrivate
 {
-    KSEQ_INIT(gzFile, gzread)
-    struct KSeqDeleter
-    {
-        void operator()(kseq_t* seq) const
-        {
-            if (seq) kseq_destroy(seq);
-            seq = nullptr;
-        }
-    };
-
 public:
     explicit FastqReaderPrivate(const std::string& fn)
-        : fp_{gzopen(fn.c_str(), "r")}, seq_{kseq_init(fp_)}
     {
-        if (fp_ == nullptr || seq_.get() == nullptr)
-            throw std::runtime_error{"FastqReader: could not open file for reading: " + fn};
+        // validate extension
+        if (!FormatUtils::IsFastqFilename(fn)) {
+            throw std::runtime_error{"FastqReader: filename '" + fn +
+                                     "' is not recognized as a FASTQ file."};
+        }
+        reader_ = std::make_unique<KSeqReader>(fn);
     }
-
-    ~FastqReaderPrivate() { gzclose(fp_); }
 
     bool GetNext(FastqSequence& record)
     {
-        const auto result = kseq_read(seq_.get());
-        if (result == -1)  // EOF
-            return false;
-        record = FastqSequence{std::string{seq_->name.s, seq_->name.l},
-                               std::string{seq_->seq.s, seq_->seq.l},
-                               std::string{seq_->qual.s, seq_->qual.l}};
+        const auto ok = reader_->ReadNext();
+        if (!ok) return false;  // not error, could be EOF
+
+        record = FastqSequence{reader_->Name(), reader_->Bases(), reader_->Qualities()};
         return true;
     }
 
-private:
-    gzFile fp_;
-    std::unique_ptr<kseq_t, KSeqDeleter> seq_;
+    std::unique_ptr<KSeqReader> reader_;
 };
 
-FastqReader::FastqReader(const std::string& fn) : d_{std::make_unique<FastqReaderPrivate>(fn)} {}
+FastqReader::FastqReader(const std::string& fn)
+    : internal::QueryBase<FastqSequence>{}, d_{std::make_unique<FastqReaderPrivate>(fn)}
+{
+}
 
-FastqReader::FastqReader(FastqReader&&) = default;
+FastqReader::FastqReader(FastqReader&&) noexcept = default;
 
-FastqReader& FastqReader::operator=(FastqReader&&) = default;
+FastqReader& FastqReader::operator=(FastqReader&&) noexcept = default;
 
 FastqReader::~FastqReader() = default;
 
@@ -74,9 +67,8 @@ std::vector<FastqSequence> FastqReader::ReadAll(const std::string& fn)
     std::vector<FastqSequence> result;
     result.reserve(256);
     FastqReader reader{fn};
-    FastqSequence s;
-    while (reader.GetNext(s))
-        result.emplace_back(s);
+    for (const auto& seq : reader)
+        result.emplace_back(seq);
     return result;
 }
 

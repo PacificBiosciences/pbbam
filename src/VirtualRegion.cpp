@@ -6,10 +6,24 @@
 
 #include "PbbamInternalConfig.h"
 
+#include <cassert>
+#include <tuple>
+#include <type_traits>
+
 #include "pbbam/virtual/VirtualRegion.h"
 
 namespace PacBio {
 namespace BAM {
+
+static_assert(std::is_copy_constructible<VirtualRegion>::value,
+              "VirtualRegion(const VirtualRegion&) is not = default");
+static_assert(std::is_copy_assignable<VirtualRegion>::value,
+              "VirtualRegion& operator=(const VirtualRegion&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<VirtualRegion>::value,
+              "VirtualRegion(VirtualRegion&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<VirtualRegion>::value,
+              "VirtualRegion& operator=(VirtualRegion&&) is not = noexcept");
 
 VirtualRegion::VirtualRegion(const VirtualRegionType type_, const int beginPos_, const int endPos_,
                              const int score_)
@@ -30,21 +44,9 @@ VirtualRegion::VirtualRegion(const VirtualRegionType type_, const int beginPos_,
 {
 }
 
-VirtualRegion::VirtualRegion() = default;
-
-VirtualRegion::VirtualRegion(const VirtualRegion&) = default;
-
-VirtualRegion::VirtualRegion(VirtualRegion&&) = default;
-
-VirtualRegion& VirtualRegion::operator=(const VirtualRegion&) = default;
-
-VirtualRegion& VirtualRegion::operator=(VirtualRegion&&) = default;
-
-VirtualRegion::~VirtualRegion() = default;
-
 bool VirtualRegion::operator==(const VirtualRegion& v1) const
 {
-    return (v1.type == this->type && v1.beginPos == this->beginPos && v1.endPos == this->endPos);
+    return std::tie(type, beginPos, endPos) == std::tie(v1.type, v1.beginPos, v1.endPos);
 }
 
 }  // namespace BAM

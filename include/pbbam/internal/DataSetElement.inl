@@ -100,7 +100,8 @@ inline const T& DataSetElement::Child(size_t index) const
 {
     DataSetElement* child = children_.at(index).get();
     if (child == nullptr)
-        throw std::runtime_error{"DataSetElement: cannot access null child at index: " + std::to_string(index)};
+        throw std::runtime_error{"DataSetElement: cannot access null child at index: " +
+                                 std::to_string(index)};
     const T* c = dynamic_cast<const T*>(child);
     return *c;
 }
@@ -110,7 +111,8 @@ inline T& DataSetElement::Child(size_t index)
 {
     DataSetElement* child = children_.at(index).get();
     if (child == nullptr)
-        throw std::runtime_error{"DataSetElement: cannot access null child at index: " + std::to_string(index)};
+        throw std::runtime_error{"DataSetElement: cannot access null child at index: " +
+                                 std::to_string(index)};
     T* c = dynamic_cast<T*>(child);
     return *c;
 }
@@ -251,7 +253,7 @@ inline DataSetElementIteratorBase::DataSetElementIteratorBase(const DataSetEleme
 
 inline bool DataSetElementIteratorBase::operator==(const DataSetElementIteratorBase& other) const
 {
-    return (parent_ == other.parent_) && (index_ == other.index_);
+    return std::tie(parent_, index_) == std::tie(other.parent_, other.index_);
 }
 
 inline bool DataSetElementIteratorBase::operator!=(const DataSetElementIteratorBase& other) const

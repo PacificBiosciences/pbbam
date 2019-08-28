@@ -25,7 +25,6 @@
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/EntireFileQuery.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/ReadGroupInfo.h"
 
 namespace PacBio {
@@ -318,7 +317,7 @@ static void ValidateRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>
         ValidateUnmappedRecord(b, errors);
 }
 
-}  // anonymous
+}  // namespace
 
 bool Validator::IsValid(const BamFile& file, const bool entireFile)
 {

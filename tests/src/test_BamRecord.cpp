@@ -2739,4 +2739,23 @@ TEST(BamRecordTest, NumDeletedBasesExcludesRefskips)
     EXPECT_EQ(expectedNumDel, record.NumDeletedBases());
 }
 
+TEST(BamRecordTest, SupportWallStartEndTags)
+{
+    const int ws = 100;
+    const int we = 500;
+
+    auto bam = BamRecordTests::CreateBam();
+    bam.QueryStartFrameNumber(ws);
+    bam.QueryEndFrameNumber(we);
+
+    EXPECT_TRUE(bam.Impl().HasTag("ws"));
+    EXPECT_TRUE(bam.Impl().HasTag("we"));
+
+    EXPECT_TRUE(bam.HasQueryStartFrameNumber());
+    EXPECT_TRUE(bam.HasQueryEndFrameNumber());
+
+    EXPECT_EQ(ws, bam.QueryStartFrameNumber());
+    EXPECT_EQ(we, bam.QueryEndFrameNumber());
+}
+
 // clang-format on

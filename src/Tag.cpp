@@ -8,7 +8,9 @@
 
 #include "pbbam/Tag.h"
 
+#include <cassert>
 #include <iostream>
+#include <type_traits>
 
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -120,17 +122,13 @@ struct TypenameVisitor : public boost::static_visitor<std::string>
 
 }  // anonymous
 
-Tag::Tag() = default;
+static_assert(std::is_copy_constructible<Tag>::value, "Tag(const Tag&) is not = default");
+static_assert(std::is_copy_assignable<Tag>::value, "Tag& operator=(const Tag&) is not = default");
 
-Tag::Tag(const Tag&) = default;
-
-Tag::Tag(Tag&&) = default;
-
-Tag& Tag::operator=(const Tag&) = default;
-
-Tag& Tag::operator=(Tag&&) = default;
-
-Tag::~Tag() = default;
+static_assert(std::is_nothrow_move_constructible<Tag>::value, "Tag(Tag&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<Tag>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
 
 Tag::Tag(int8_t value) : data_{value} {}
 Tag::Tag(uint8_t value) : data_{value} {}

@@ -35,24 +35,6 @@ TEST(ReadGroupInfoTest, FrameCodecSetOk)
 
 TEST(ReadGroupInfoTest, SequencingChemistryOk)
 {
-    {   // P6-C4
-        const std::string chem{"P6-C4"};
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100356300","100356200","2.1"));
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100356300","100356200","2.3"));
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100356300","100612400","2.1"));
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100356300","100612400","2.3"));
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100372700","100356200","2.1"));
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100372700","100356200","2.3"));
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100372700","100612400","2.1"));
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100372700","100612400","2.3"));
-
-        ReadGroupInfo rg("dummy");
-        rg.BindingKit("100356300")
-          .SequencingKit("100356200")
-          .BasecallerVersion("2.1");
-        EXPECT_EQ(chem, rg.SequencingChemistry());
-    }
-
     {   // S/P1-C1/beta
         const std::string chem{"S/P1-C1/beta"};
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-620-000","3.0"));

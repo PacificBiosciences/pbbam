@@ -17,7 +17,6 @@
 #include "FofnReader.h"
 #include "XmlReader.h"
 #include "XmlWriter.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/StringUtilities.h"
 
 namespace PacBio {
@@ -55,7 +54,7 @@ std::unique_ptr<DataSetBase> DataSetFromFasta(const std::string& fasta)
     auto dataset = std::make_unique<ReferenceSet>();
     auto& resources = dataset->ExternalResources();
     resources.Add(ExternalResource("PacBio.ReferenceFile.ReferenceFastaFile", fasta));
-    return std::move(dataset);
+    return dataset;
 }
 
 std::unique_ptr<DataSetBase> DataSetFromFofn(const std::string& fofn)
@@ -92,7 +91,7 @@ std::unique_ptr<DataSetBase> DataSetFromUri(const std::string& uri)
     throw std::runtime_error{"DataSet: unsupported extension on input file: " + uri};
 }
 
-}  // anonymous
+}  // namespace
 
 std::unique_ptr<DataSetBase> DataSetIO::FromUri(const std::string& uri)
 {
@@ -141,14 +140,14 @@ void DataSetIO::ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostre
     DataSetIO::ToStream(*dataset, out);
 }
 
-void DataSetIO::ToFile(const DataSetBase& dataset, const std::string& fn)
+void DataSetIO::ToFile(DataSetBase& dataset, const std::string& fn)
 {
     std::ofstream out(fn);
     if (!out) throw std::runtime_error{"DataSet: could not open XML file for writing: " + fn};
     XmlWriter::ToStream(dataset, out);
 }
 
-void DataSetIO::ToStream(const DataSetBase& dataset, std::ostream& out)
+void DataSetIO::ToStream(DataSetBase& dataset, std::ostream& out)
 {
     XmlWriter::ToStream(dataset, out);
 }

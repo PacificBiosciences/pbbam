@@ -7,6 +7,8 @@
 #ifndef BAMREADER_H
 #define BAMREADER_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -16,8 +18,8 @@
 #include "pbbam/BamFile.h"
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
 #include "pbbam/GenomicInterval.h"
+#include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {
 namespace BAM {
@@ -28,11 +30,14 @@ namespace BAM {
 /// records. Derived classes may implement other access schemes (e.g. genomic
 /// region, PBI-enabled record filtering).
 ///
-class PBBAM_EXPORT BamReader
+class PBBAM_EXPORT BamReader : public internal::IQuery
 {
 public:
     /// \name Constructors & Related Methods
     /// \{
+
+    /// \brief Opens BAM for streaming from stdin
+    BamReader();
 
     /// \brief Opens BAM file for reading.
     ///
@@ -55,9 +60,6 @@ public:
 public:
     /// \name BAM File Attributes
     /// \{
-
-    /// \returns the underlying BamFile
-    const BamFile& File() const;
 
     /// \returns %BAM filename
     const std::string& Filename() const;

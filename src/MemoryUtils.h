@@ -3,16 +3,19 @@
 #ifndef MEMORYUTILS_H
 #define MEMORYUTILS_H
 
+#include "pbbam/Config.h"
+
 #include <cstdio>
 #include <memory>
 
 #include <htslib/bgzf.h>
+#include <htslib/faidx.h>
 #include <htslib/sam.h>
+#include <zlib.h>
 
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamRecordImpl.h"
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -21,11 +24,11 @@ class BamHeader;
 
 // intended for use with std::shared_ptr<T>, std::unique_ptr<T>, etc
 
-struct FileDeleter
+struct GzFileDeleter
 {
-    void operator()(std::FILE* fp) const
+    void operator()(gzFile fp) const
     {
-        if (fp) std::fclose(fp);
+        if (fp) gzclose(fp);
         fp = nullptr;
     }
 };
@@ -36,6 +39,15 @@ struct HtslibBgzfDeleter
     {
         if (bgzf) bgzf_close(bgzf);
         bgzf = nullptr;
+    }
+};
+
+struct HtslibFastaIndexDeleter
+{
+    void operator()(faidx_t* fai) const
+    {
+        if (fai) fai_destroy(fai);
+        fai = nullptr;
     }
 };
 

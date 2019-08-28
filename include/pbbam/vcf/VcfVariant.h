@@ -3,6 +3,9 @@
 #ifndef PBBAM_VCF_VARIANT_H
 #define PBBAM_VCF_VARIANT_H
 
+#include "pbbam/Config.h"
+
+#include <cassert>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -42,12 +45,6 @@ public:
 
     VcfVariant(std::string id, std::string chrom, PacBio::BAM::Position pos, std::string refAllele,
                std::string altAllele);
-
-    VcfVariant(const VcfVariant&);
-    VcfVariant(VcfVariant&&);
-    VcfVariant& operator=(const VcfVariant&);
-    VcfVariant& operator=(VcfVariant&&);
-    ~VcfVariant();
 
 public:
     // core fields

@@ -7,6 +7,8 @@
 #ifndef DATASET_H
 #define DATASET_H
 
+#include "pbbam/Config.h"
+
 #include <chrono>
 #include <memory>
 #include <set>
@@ -14,7 +16,6 @@
 #include <vector>
 
 #include "pbbam/BamFile.h"
-#include "pbbam/Config.h"
 #include "pbbam/DataSetTypes.h"
 #include "pbbam/GenomicInterval.h"
 
@@ -117,10 +118,9 @@ public:
     DataSet(const std::vector<std::string>& filenames);
 
     DataSet(const DataSet&);
-    DataSet(DataSet&&);
+    DataSet(DataSet&&) noexcept = default;
     DataSet& operator=(const DataSet&);
-    DataSet& operator=(DataSet&&);
-    ~DataSet();
+    DataSet& operator=(DataSet&&) noexcept = default;
 
     /// \brief Creates a DataSet from "raw" XML data.
     ///
@@ -346,6 +346,17 @@ public:
     ///
     std::vector<BamFile> BamFiles() const;
 
+    /// \brief Returns all filenames for BamFiles(), with paths resolved.
+    ///
+    //  Unlike BamFiles(), this does not actually open the BAM files.
+    //  (BamFile(fn) would read the header.)
+    //
+    /// \returns vector of std::string
+    ///
+    /// \sa DataSet::BamFiles
+    ///
+    std::vector<std::string> BamFilenames() const;
+
     /// \brief Returns this dataset's primary FASTA resources, with relative
     ///        filepaths already resolved.
     ///
@@ -357,6 +368,11 @@ public:
     /// \sa DataSet::ResolvedResourceIds
     ///
     std::vector<std::string> FastaFiles() const;
+
+    ///
+    /// \returns (absolute) path for dataset
+    ///
+    const std::string& Path() const;
 
     /// \brief Returns all primary external resource filepaths, with relative
     ///        paths resolved.
@@ -395,7 +411,7 @@ public:
 
     /// \brief Return a minimal list of genomic intervals covered by filters.
     ///
-    /// \param[out] vector of genomic intervals
+    /// \returns vector of genomic intervals
     ///
     /// \throws std::runtime_error if DataSet contains invalid or non-sensical
     ///         filters, such as rname appearing twice, etc.
@@ -764,7 +780,6 @@ public:
 
 private:
     std::unique_ptr<DataSetBase> d_;
-    std::string path_;
 };
 
 /// \name DataSet Timestamp Utilities

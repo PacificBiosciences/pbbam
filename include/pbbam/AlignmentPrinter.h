@@ -7,6 +7,8 @@
 #ifndef ALIGNMENTPRINTER_H
 #define ALIGNMENTPRINTER_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 #include <string>
 
@@ -38,13 +40,6 @@ public:
     /// \throws std::runtime_error if FASTA file cannot be opened for reading.
     ///
     AlignmentPrinter(const IndexedFastaReader& ifr);
-
-    AlignmentPrinter() = delete;
-    AlignmentPrinter(const AlignmentPrinter&) = delete;
-    AlignmentPrinter(AlignmentPrinter&&);
-    AlignmentPrinter& operator=(const AlignmentPrinter&) = delete;
-    AlignmentPrinter& operator=(AlignmentPrinter&&);
-    ~AlignmentPrinter();
 
     /// \}
 

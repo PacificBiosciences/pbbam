@@ -7,13 +7,16 @@
 #ifndef BAMWRITER_H
 #define BAMWRITER_H
 
-#include <htslib/sam.h>
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <string>
+
+#include <htslib/sam.h>
+
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
 #include "pbbam/IRecordWriter.h"
 
 namespace PacBio {
@@ -157,10 +160,8 @@ public:
     BamWriter(const std::string& filename, const BamHeader& header,
               const BamWriter::Config& config);
 
-    BamWriter(const BamWriter&) = delete;
-    BamWriter(BamWriter&&);
-    BamWriter& operator=(const BamWriter&) = delete;
-    BamWriter& operator=(BamWriter&&);
+    BamWriter(BamWriter&&) noexcept;
+    BamWriter& operator=(BamWriter&&) noexcept;
 
     /// Fully flushes all buffered data & closes file.
     ~BamWriter() override;

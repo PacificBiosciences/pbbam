@@ -3,6 +3,8 @@
 #ifndef PBBAM_VCF_VCFHEADER_H
 #define PBBAM_VCF_VCFHEADER_H
 
+#include "pbbam/Config.h"
+
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -21,12 +23,6 @@ public:
     VcfHeader();
 
     explicit VcfHeader(const std::string& hdrText);
-
-    VcfHeader(const VcfHeader&);
-    VcfHeader(VcfHeader&&);
-    VcfHeader& operator=(const VcfHeader&);
-    VcfHeader& operator=(VcfHeader&&);
-    ~VcfHeader();
 
 public:
     // general lines

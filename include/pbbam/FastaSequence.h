@@ -7,6 +7,8 @@
 #ifndef FASTASEQUENCE_H
 #define FASTASEQUENCE_H
 
+#include "pbbam/Config.h"
+
 #include <string>
 
 namespace PacBio {
@@ -28,12 +30,7 @@ public:
     ///
     explicit FastaSequence(std::string name, std::string bases);
 
-    FastaSequence();
-    FastaSequence(const FastaSequence&);
-    FastaSequence(FastaSequence&&);
-    FastaSequence& operator=(const FastaSequence&);
-    FastaSequence& operator=(FastaSequence&&);
-    ~FastaSequence();
+    FastaSequence() = default;
 
     /// \}
 
@@ -48,12 +45,31 @@ public:
     const std::string& Name() const;
 
     ///
+    /// \brief
+    ///
+    /// \param name
+    /// \return FastaSequence&
+    ///
+    FastaSequence& Name(std::string name);
+
+    ///
     /// \brief Bases
     /// \return
     ///
     const std::string& Bases() const;
 
+    ///
+    /// \brief
+    ///
+    /// \param bases
+    /// \return FastaSequence&
+    ///
+    FastaSequence& Bases(std::string bases);
+
     /// \}
+
+    bool operator==(const FastaSequence& other) const;
+    bool operator!=(const FastaSequence& other) const;
 
 private:
     std::string name_;

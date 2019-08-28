@@ -5,6 +5,7 @@
 #include <iostream>
 #include <limits>
 #include <map>
+#include <sstream>
 #include <string>
 #include <typeinfo>
 #include <vector>
@@ -863,26 +864,60 @@ TEST(SamTagCodecTest, DecodeTest)
     EXPECT_EQ(std::vector<int32_t>({42, -100, 37, 2048}), tags["VC"].ToInt32Array());
 }
 
-TEST(SamTagCodecTest, EncodeTest)
+TEST(SamTagCodecTest, EncodeSingleTag)
+{
+    {  // string
+        const std::string expected{"ST:Z:foo"};
+        const Tag t = std::string{"foo"};
+        EXPECT_EQ(expected, SamTagCodec::Encode("ST", t));
+    }
+    {  // int
+        const std::string expected{"XY:i:-42"};
+        const Tag t = int32_t{-42};
+        EXPECT_EQ(expected, SamTagCodec::Encode("XY", t));
+    }
+    {  // hex string
+        const std::string expected{"HX:H:1abc75"};
+        const Tag t = Tag("1abc75", TagModifier::HEX_STRING);
+        EXPECT_EQ(expected, SamTagCodec::Encode("HX", t));
+    }
+    {  // int array
+        const std::string expected{"VC:B:i,42,-100,37,2048"};
+        const Tag t = std::vector<int32_t>({42, -100, 37, 2048});
+        EXPECT_EQ(expected, SamTagCodec::Encode("VC", t));
+    }
+    {  // float
+        const std::string expected{"rq:f:0.99"};
+        const Tag t = 0.99f;
+        EXPECT_EQ(expected, SamTagCodec::Encode("rq", t));
+    }
+    {  // null tag
+        const std::string expected;
+        const Tag t;
+        EXPECT_TRUE(t.IsNull());
+        EXPECT_EQ(expected, SamTagCodec::Encode("no", t));
+    }
+    {
+        // invalid name
+        EXPECT_THROW(SamTagCodec::Encode("invalid", Tag{}), std::runtime_error);
+    }
+}
+
+TEST(SamTagCodecTest, EncodeTagCollection)
 {
     TagCollection tags;
     tags["ST"] = std::string("foo");
     tags["XY"] = int32_t{-42};
     tags["HX"] = Tag("1abc75", TagModifier::HEX_STRING);
     tags["VC"] = std::vector<int32_t>({42, -100, 37, 2048});
+    tags["rq"] = 0.99f;
 
-    // "HX:H:1abc75\tST:Z:foo\0\tVC:B:i,42,-100,37,2048\tXY:i:-42"
-    std::string expected;
-    expected.append("HX:H:1abc75");
-    expected.append("\t");
-    expected.append("ST:Z:foo");
-    expected.append("\t");
-    expected.append("VC:B:i,42,-100,37,2048");
-    expected.append("\t");
-    expected.append("XY:i:-42");
+    std::ostringstream expected;
+    expected << "HX:H:1abc75" << '\t' << "ST:Z:foo" << '\t' << "VC:B:i,42,-100,37,2048" << '\t'
+             << "XY:i:-42" << '\t' << "rq:f:0.99";
 
     const std::string sam = SamTagCodec::Encode(tags);
-    EXPECT_EQ(expected, sam);
+    EXPECT_EQ(expected.str(), sam);
 }
 
 TEST(BamTagCodecTest, DecodeTest)

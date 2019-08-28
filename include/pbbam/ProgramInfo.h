@@ -7,9 +7,10 @@
 #ifndef PROGRAMINFO_H
 #define PROGRAMINFO_H
 
+#include "pbbam/Config.h"
+
 #include <map>
 #include <string>
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -49,12 +50,7 @@ public:
     ///
     ProgramInfo(std::string id);
 
-    ProgramInfo();
-    ProgramInfo(const ProgramInfo&);
-    ProgramInfo(ProgramInfo&&);
-    ProgramInfo& operator=(const ProgramInfo&);
-    ProgramInfo& operator=(ProgramInfo&&);
-    ~ProgramInfo();
+    ProgramInfo() = default;
 
     /// \}
 

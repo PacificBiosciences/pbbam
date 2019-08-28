@@ -1,14 +1,29 @@
 // Author: Derek Barnett
 
+#include "../PbbamInternalConfig.h"
+
 #include <pbbam/vcf/VcfVariant.h>
 
+#include <cassert>
 #include <cmath>
+#include <type_traits>
 
 #include <pbbam/StringUtilities.h>
 #include <pbbam/vcf/VcfFormat.h>
 
 namespace PacBio {
 namespace VCF {
+
+static_assert(std::is_copy_constructible<VcfVariant>::value,
+              "VcfVariant(const VcfVariant&) is not = default");
+static_assert(std::is_copy_assignable<VcfVariant>::value,
+              "VcfVariant& operator=(const VcfVariant&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<VcfVariant>::value,
+              "VcfVariant(VcfVariant&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<VcfVariant>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
 
 VcfVariant::VcfVariant(const std::string& text) { *this = VcfFormat::ParsedVariant(text); }
 
@@ -25,16 +40,6 @@ VcfVariant::VcfVariant(std::string id, std::string chrom, PacBio::BAM::Position 
     , filter_{"PASS"}
 {
 }
-
-VcfVariant::VcfVariant(const VcfVariant&) = default;
-
-VcfVariant::VcfVariant(VcfVariant&&) = default;
-
-VcfVariant& VcfVariant::operator=(const VcfVariant&) = default;
-
-VcfVariant& VcfVariant::operator=(VcfVariant&&) = default;
-
-VcfVariant::~VcfVariant() = default;
 
 VcfVariant& VcfVariant::AddInfoField(InfoField field)
 {

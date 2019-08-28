@@ -4,10 +4,12 @@
 
 #include "pbbam/BamWriter.h"
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <thread>
+#include <type_traits>
 
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
@@ -17,12 +19,16 @@
 #include "FileProducer.h"
 #include "MemoryUtils.h"
 #include "pbbam/BamFile.h"
-#include "pbbam/MakeUnique.h"
 #include "pbbam/Unused.h"
 #include "pbbam/Validator.h"
 
 namespace PacBio {
 namespace BAM {
+
+static_assert(!std::is_copy_constructible<BamWriter>::value,
+              "BamWriter(const BamWriter&) is not = delete");
+static_assert(!std::is_copy_assignable<BamWriter>::value,
+              "BamWriter& operator=(const BamWriter&) is not = delete");
 
 class BamWriter::BamWriterPrivate
 {
@@ -133,9 +139,9 @@ BamWriter::BamWriter(const std::string& filename, const BamHeader& header,
 {
 }
 
-BamWriter::BamWriter(BamWriter&&) = default;
+BamWriter::BamWriter(BamWriter&&) noexcept = default;
 
-BamWriter& BamWriter::operator=(BamWriter&&) = default;
+BamWriter& BamWriter::operator=(BamWriter&&) noexcept = default;
 
 BamWriter::~BamWriter()
 {

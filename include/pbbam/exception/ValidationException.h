@@ -7,6 +7,8 @@
 #ifndef VALIDATIONEXCEPTION_H
 #define VALIDATIONEXCEPTION_H
 
+#include "pbbam/Config.h"
+
 #include <map>
 #include <sstream>
 #include <stdexcept>

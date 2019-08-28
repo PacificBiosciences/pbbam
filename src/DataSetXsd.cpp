@@ -8,6 +8,8 @@
 
 #include "pbbam/DataSetXsd.h"
 
+#include <cassert>
+#include <type_traits>
 #include <unordered_map>
 
 namespace PacBio {
@@ -153,12 +155,21 @@ static const auto elementRegistry = std::unordered_map<std::string, XsdType>
 // NamespaceInfo
 // ---------------
 
+static_assert(std::is_copy_constructible<NamespaceInfo>::value,
+              "NamespaceInfo(const NamespaceInfo&) is not = default");
+static_assert(std::is_copy_assignable<NamespaceInfo>::value,
+              "NamespaceInfo& operator=(const NamespaceInfo&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<NamespaceInfo>::value,
+              "NamespaceInfo(NamespaceInfo&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<NamespaceInfo>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
+
 NamespaceInfo::NamespaceInfo(std::string name, std::string uri)
-    : name_(std::move(name)), uri_(std::move(uri))
+    : name_{std::move(name)}, uri_{std::move(uri)}
 {
 }
-
-NamespaceInfo::NamespaceInfo() = default;
 
 const std::string& NamespaceInfo::Name() const { return name_; }
 
@@ -168,17 +179,17 @@ const std::string& NamespaceInfo::Uri() const { return uri_; }
 // NamespaceRegistry
 // -------------------
 
-NamespaceRegistry::NamespaceRegistry() : data_(internal::DefaultRegistry()) {}
+static_assert(std::is_copy_constructible<NamespaceRegistry>::value,
+              "NamespaceRegistry(const NamespaceRegistry&) is not = default");
+static_assert(std::is_copy_assignable<NamespaceRegistry>::value,
+              "NamespaceRegistry& operator=(const NamespaceRegistry&) is not = default");
 
-NamespaceRegistry::NamespaceRegistry(const NamespaceRegistry&) = default;
+static_assert(std::is_nothrow_move_constructible<NamespaceRegistry>::value,
+              "NamespaceRegistry(NamespaceRegistry&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<NamespaceRegistry>::value,
+              "NamespaceRegistry& operator=(NamespaceRegistry&&) is not = noexcept");
 
-NamespaceRegistry::NamespaceRegistry(NamespaceRegistry&&) = default;
-
-NamespaceRegistry& NamespaceRegistry::operator=(const NamespaceRegistry&) = default;
-
-NamespaceRegistry& NamespaceRegistry::operator=(NamespaceRegistry&&) = default;
-
-NamespaceRegistry::~NamespaceRegistry() = default;
+NamespaceRegistry::NamespaceRegistry() : data_{internal::DefaultRegistry()} {}
 
 const NamespaceInfo& NamespaceRegistry::DefaultNamespace() const { return Namespace(DefaultXsd()); }
 

@@ -7,11 +7,12 @@
 #ifndef PBIBUILDER_H
 #define PBIBUILDER_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {

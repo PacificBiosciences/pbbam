@@ -7,9 +7,10 @@
 #ifndef DATASETXSD_H
 #define DATASETXSD_H
 
+#include "pbbam/Config.h"
+
 #include <map>
 #include <string>
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -44,7 +45,7 @@ public:
     ///
     /// This constructor only exists for STL container compatibility.
     ///
-    NamespaceInfo();
+    NamespaceInfo() = default;
 
     /// \brief Creates a valid info entry.
     NamespaceInfo(std::string name, std::string uri);
@@ -74,11 +75,6 @@ public:
     /// \{
 
     NamespaceRegistry();
-    NamespaceRegistry(const NamespaceRegistry&);
-    NamespaceRegistry(NamespaceRegistry&&);
-    NamespaceRegistry& operator=(const NamespaceRegistry&);
-    NamespaceRegistry& operator=(NamespaceRegistry&&);
-    ~NamespaceRegistry();
 
     /// \}
 

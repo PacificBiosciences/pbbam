@@ -8,17 +8,20 @@
 #ifndef COMPOSITEBAMREADER_H
 #define COMPOSITEBAMREADER_H
 
+#include "pbbam/Config.h"
+
 #include <deque>
 #include <functional>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "pbbam/BaiIndexCache.h"
 #include "pbbam/BaiIndexedBamReader.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamReader.h"
 #include "pbbam/BamRecord.h"
-#include "pbbam/Config.h"
 #include "pbbam/DataSet.h"
 #include "pbbam/GenomicInterval.h"
 #include "pbbam/PbiIndexedBamReader.h"
@@ -41,9 +44,6 @@ public:
 public:
     CompositeMergeItem(std::unique_ptr<BamReader> rdr);
     CompositeMergeItem(std::unique_ptr<BamReader> rdr, BamRecord rec);
-    CompositeMergeItem(CompositeMergeItem&&) = default;
-    CompositeMergeItem& operator=(CompositeMergeItem&&) = default;
-    ~CompositeMergeItem() = default;
 };
 
 /// \internal
@@ -87,6 +87,8 @@ public:
     ///         for reading, or if the interval is invalid
     ///
     GenomicIntervalCompositeBamReader(const std::vector<BamFile>& bamFiles);
+    GenomicIntervalCompositeBamReader(const std::vector<BamFile>& bamFiles,
+                                      const BaiIndexCache& cache);
 
     /// \brief Constructs composite %BAM reader, that can be queried on genomic interval.
     ///
@@ -99,6 +101,7 @@ public:
     ///         for reading, or if the interval is invalid
     ///
     GenomicIntervalCompositeBamReader(const DataSet& dataset);
+    GenomicIntervalCompositeBamReader(const DataSet& dataset, const BaiIndexCache& cache);
 
     /// \brief Constructs composite %BAM reader, limiting record results to
     ///        only those overalpping a GenomicInterval.
@@ -111,6 +114,9 @@ public:
     ///
     GenomicIntervalCompositeBamReader(const GenomicInterval& interval,
                                       const std::vector<BamFile>& bamFiles);
+    GenomicIntervalCompositeBamReader(const GenomicInterval& interval,
+                                      const std::vector<BamFile>& bamFiles,
+                                      const BaiIndexCache& cache);
 
     /// \brief Constructs composite %BAM reader, limiting record results to
     ///        only those overalpping a GenomicInterval.
@@ -122,6 +128,8 @@ public:
     ///         BAI files.
     ///
     GenomicIntervalCompositeBamReader(const GenomicInterval& interval, const DataSet& dataset);
+    GenomicIntervalCompositeBamReader(const GenomicInterval& interval, const DataSet& dataset,
+                                      const BaiIndexCache& cache);
 
     /// \}
 
@@ -152,6 +160,7 @@ private:
     void UpdateSort();
 
 private:
+    BaiIndexCache indexCache_;
     GenomicInterval interval_;
     std::deque<internal::CompositeMergeItem> mergeItems_;
     std::vector<std::string> filenames_;

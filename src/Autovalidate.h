@@ -7,6 +7,8 @@
 #ifndef AUTOVALIDATE_H
 #define AUTOVALIDATE_H
 
+#include "pbbam/Config.h"
+
 // \brief Auto-validation
 //
 // To validate BAM components (header, records, etc.) you can either use the

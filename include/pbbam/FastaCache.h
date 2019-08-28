@@ -7,12 +7,13 @@
 #ifndef FASTACACHE_H
 #define FASTACACHE_H
 
+#include "pbbam/Config.h"
+
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-#include "pbbam/Config.h"
 #include "pbbam/FastaSequence.h"
 
 namespace PacBio {

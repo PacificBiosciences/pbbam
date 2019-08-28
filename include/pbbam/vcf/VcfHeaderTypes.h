@@ -2,6 +2,8 @@
 #ifndef PBBAM_VCF_VCFHEADERTYPES_H
 #define PBBAM_VCF_VCFHEADERTYPES_H
 
+#include "pbbam/Config.h"
+
 #include <string>
 #include <utility>
 #include <vector>
@@ -18,13 +20,6 @@ class ContigDefinition
 public:
     explicit ContigDefinition(std::string id);
     ContigDefinition(std::string id, std::vector<std::pair<std::string, std::string>> attributes);
-
-    ContigDefinition() = delete;
-    ContigDefinition(const ContigDefinition&);
-    ContigDefinition(ContigDefinition&&);
-    ContigDefinition& operator=(const ContigDefinition&);
-    ContigDefinition& operator=(ContigDefinition&&);
-    ~ContigDefinition();
 
 public:
     const std::string& Id() const;
@@ -47,13 +42,6 @@ class FilterDefinition
 public:
     FilterDefinition(std::string id, std::string description);
 
-    FilterDefinition() = delete;
-    FilterDefinition(const FilterDefinition&);
-    FilterDefinition(FilterDefinition&&);
-    FilterDefinition& operator=(const FilterDefinition&);
-    FilterDefinition& operator=(FilterDefinition&&);
-    ~FilterDefinition();
-
     const std::string& Id() const;
     const std::string& Description() const;
 
@@ -70,13 +58,6 @@ class FormatDefinition
 {
 public:
     FormatDefinition(std::string id, std::string number, std::string type, std::string description);
-
-    FormatDefinition() = delete;
-    FormatDefinition(const FormatDefinition&);
-    FormatDefinition(FormatDefinition&&);
-    FormatDefinition& operator=(const FormatDefinition&);
-    FormatDefinition& operator=(FormatDefinition&&);
-    ~FormatDefinition();
 
     const std::string& Id() const;
     const std::string& Number() const;
@@ -98,13 +79,6 @@ class GeneralDefinition
 public:
     GeneralDefinition(std::string id, std::string text);
 
-    GeneralDefinition() = delete;
-    GeneralDefinition(const GeneralDefinition&);
-    GeneralDefinition(GeneralDefinition&&);
-    GeneralDefinition& operator=(const GeneralDefinition&);
-    GeneralDefinition& operator=(GeneralDefinition&&);
-    ~GeneralDefinition();
-
     const std::string& Id() const;
     const std::string& Text() const;
 
@@ -122,13 +96,6 @@ class InfoDefinition
 public:
     InfoDefinition(std::string id, std::string number, std::string type, std::string description,
                    std::string source = std::string{}, std::string version = std::string{});
-
-    InfoDefinition() = delete;
-    InfoDefinition(const InfoDefinition&);
-    InfoDefinition(InfoDefinition&&);
-    InfoDefinition& operator=(const InfoDefinition&);
-    InfoDefinition& operator=(InfoDefinition&&);
-    ~InfoDefinition();
 
     const std::string& Id() const;
     const std::string& Number() const;

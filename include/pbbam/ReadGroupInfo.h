@@ -7,6 +7,8 @@
 #ifndef READGROUPINFO_H
 #define READGROUPINFO_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <map>
@@ -15,7 +17,6 @@
 
 #include <boost/optional.hpp>
 
-#include "pbbam/Config.h"
 #include "pbbam/exception/InvalidSequencingChemistryException.h"
 
 namespace PacBio {
@@ -227,12 +228,6 @@ public:
     ReadGroupInfo(std::string movieName, std::string readType, PlatformModelType platform,
                   std::pair<uint16_t, uint16_t> barcodes);
 
-    ReadGroupInfo(const ReadGroupInfo&);
-    ReadGroupInfo(ReadGroupInfo&&);
-    ReadGroupInfo& operator=(const ReadGroupInfo&);
-    ReadGroupInfo& operator=(ReadGroupInfo&&);
-    ~ReadGroupInfo();
-
     /// \}
 
 public:
@@ -240,6 +235,9 @@ public:
     /// \{
 
     bool operator==(const ReadGroupInfo& other) const;
+
+    /// Enable sort on RG:ID
+    bool operator<(const ReadGroupInfo& other) const;
 
     /// \}
 

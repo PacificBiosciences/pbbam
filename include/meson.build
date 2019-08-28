@@ -7,6 +7,7 @@ if not meson.is_subproject()
     files([
       'pbbam/Accuracy.h',
       'pbbam/AlignmentPrinter.h',
+      'pbbam/BaiIndexCache.h',
       'pbbam/BaiIndexedBamReader.h',
       'pbbam/BamFile.h',
       'pbbam/BamFileMerger.h',
@@ -20,6 +21,9 @@ if not meson.is_subproject()
       'pbbam/BamTagCodec.h',
       'pbbam/BamWriter.h',
       'pbbam/BarcodeQuery.h',
+      'pbbam/BgzipFastaWriter.h',
+      'pbbam/BgzipFastqWriter.h',
+      'pbbam/BgzipWriter.h',
       'pbbam/Cigar.h',
       'pbbam/CigarOperation.h',
       'pbbam/ClipType.h',
@@ -31,6 +35,7 @@ if not meson.is_subproject()
       'pbbam/DataSetTypes.h',
       'pbbam/DataSetXsd.h',
       'pbbam/EntireFileQuery.h',
+      'pbbam/FaiIndex.h',
       'pbbam/FastaCache.h',
       'pbbam/FastaReader.h',
       'pbbam/FastaSequence.h',
@@ -39,16 +44,19 @@ if not meson.is_subproject()
       'pbbam/FastqReader.h',
       'pbbam/FastqSequence.h',
       'pbbam/FastqWriter.h',
+      'pbbam/FormatUtils.h',
       'pbbam/FrameEncodingType.h',
       'pbbam/Frames.h',
       'pbbam/GenomicInterval.h',
       'pbbam/GenomicIntervalQuery.h',
+      'pbbam/IFastaWriter.h',
+      'pbbam/IFastqWriter.h',
       'pbbam/IndexedBamWriter.h',
       'pbbam/IndexedFastaReader.h',
+      'pbbam/IndexedFastqReader.h',
       'pbbam/Interval.h',
       'pbbam/IRecordWriter.h',
       'pbbam/LocalContextFlags.h',
-      'pbbam/MakeUnique.h',
       'pbbam/MD5.h',
       'pbbam/MoveAppend.h',
       'pbbam/Orientation.h',
@@ -73,11 +81,14 @@ if not meson.is_subproject()
       'pbbam/SamTagCodec.h',
       'pbbam/SamWriter.h',
       'pbbam/SequenceInfo.h',
+      'pbbam/SNR.h',
       'pbbam/Strand.h',
       'pbbam/StringUtilities.h',
       'pbbam/SubreadLengthQuery.h',
       'pbbam/Tag.h',
       'pbbam/TagCollection.h',
+      'pbbam/TextFileReader.h',
+      'pbbam/TextFileWriter.h',
       'pbbam/Unused.h',
       'pbbam/Validator.h',
       'pbbam/ZmwGroupQuery.h',
@@ -85,6 +96,22 @@ if not meson.is_subproject()
       'pbbam/ZmwType.h',
       'pbbam/ZmwTypeMap.h']),
     subdir : 'pbbam')
+
+  install_headers(
+    files([
+      'pbbam/bed/BedReader.h',
+      'pbbam/bed/BedWriter.h']),
+    subdir : 'pbbam/bed')
+
+  install_headers(
+    files([
+      'pbbam/ccs/CCSHeader.h',
+      'pbbam/ccs/CCSPbiBuilder.h',
+      'pbbam/ccs/CCSRecord.h',
+      'pbbam/ccs/CCSRecordFormat.h',
+      'pbbam/ccs/CCSRecordReader.h',
+      'pbbam/ccs/CCSRecordWriter.h']),
+    subdir : 'pbbam/ccs')
 
   install_headers(
     files([
@@ -100,7 +127,6 @@ if not meson.is_subproject()
       'pbbam/internal/DataSetBaseTypes.h',
       'pbbam/internal/DataSetElement.h',
       'pbbam/internal/DataSetElement.inl',
-      'pbbam/internal/Interval.inl',
       'pbbam/internal/PbiBasicTypes.inl',
       'pbbam/internal/PbiFilter.inl',
       'pbbam/internal/PbiFilterTypes.inl',

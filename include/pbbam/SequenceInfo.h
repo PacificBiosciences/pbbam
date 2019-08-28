@@ -7,9 +7,10 @@
 #ifndef SEQUENCEINFO_H
 #define SEQUENCEINFO_H
 
+#include "pbbam/Config.h"
+
 #include <map>
 #include <string>
-#include "pbbam/Config.h"
 
 namespace PacBio {
 namespace BAM {
@@ -50,12 +51,7 @@ public:
     ///
     SequenceInfo(std::string name, std::string length = "0");
 
-    SequenceInfo();
-    SequenceInfo(const SequenceInfo&);
-    SequenceInfo(SequenceInfo&&);
-    SequenceInfo& operator=(const SequenceInfo&);
-    SequenceInfo& operator=(SequenceInfo&&);
-    ~SequenceInfo();
+    SequenceInfo() = default;
 
     /// \}
 

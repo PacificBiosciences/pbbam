@@ -69,9 +69,9 @@ bool HasLongCigar(const bam1_t* const b)
     return true;
 }
 
-}  // namespace anonymous
+}  // namespace
 
-BamRecordImpl::BamRecordImpl() : d_(nullptr)
+BamRecordImpl::BamRecordImpl() : d_{nullptr}
 {
     InitializeData();
     assert(d_);
@@ -80,13 +80,6 @@ BamRecordImpl::BamRecordImpl() : d_(nullptr)
 BamRecordImpl::BamRecordImpl(const BamRecordImpl& other)
     : d_{bam_dup1(other.d_.get()), HtslibRecordDeleter()}, tagOffsets_{other.tagOffsets_}
 {
-    assert(d_);
-}
-
-BamRecordImpl::BamRecordImpl(BamRecordImpl&& other) : tagOffsets_{std::move(other.tagOffsets_)}
-{
-    d_.swap(other.d_);
-    other.d_.reset();
     assert(d_);
 }
 
@@ -100,20 +93,6 @@ BamRecordImpl& BamRecordImpl::operator=(const BamRecordImpl& other)
     assert(d_);
     return *this;
 }
-
-BamRecordImpl& BamRecordImpl::operator=(BamRecordImpl&& other)
-{
-    if (this != &other) {
-        d_.swap(other.d_);
-        other.d_.reset();
-
-        tagOffsets_ = std::move(other.tagOffsets_);
-    }
-    assert(d_);
-    return *this;
-}
-
-BamRecordImpl::~BamRecordImpl() = default;
 
 bool BamRecordImpl::AddTag(const std::string& tagName, const Tag& value)
 {

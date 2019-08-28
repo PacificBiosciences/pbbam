@@ -7,8 +7,11 @@
 #ifndef ZMWGROUPQUERY_H
 #define ZMWGROUPQUERY_H
 
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <vector>
+
 #include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {

@@ -112,8 +112,7 @@ TEST(PbiFilterQueryTest, QueryOk)
 
 TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 {
-    const auto expectedMovieName =
-        std::string{"m150404_101626_42267_c100807920800000001823174110291514_s1_p0"};
+    const std::string expectedMovieName{"m64004_190414_193017"};
 
     const DataSet ds(PbbamTestsConfig::Data_Dir + "/chunking/chunking.subreadset.xml");
     EXPECT_EQ(3, ds.BamFiles().size());
@@ -134,7 +133,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 
     {  // sequencing chemistries
         std::set<std::string> chems{ds.SequencingChemistries()};
-        std::set<std::string> expected{"P6-C4"};
+        std::set<std::string> expected{"S/P3-C1/5.0-8M"};
         EXPECT_TRUE(equal(chems.begin(), chems.end(), expected.begin()));
     }
 
@@ -390,13 +389,13 @@ TEST(PbiFilterQueryTest, BarcodeQualityFromXml)
        UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5193"
        TimeStampedName="subread_bam_150304_231155"
        MetaType="PacBio.SubreadFile.SubreadBamFile"
-       ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.1.subreads.bam">
+       ResourceId="m64004_190414_193017.1.subreads.bam">
        <pbbase:FileIndices>
            <pbbase:FileIndex
                UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5194"
                TimeStampedName="bam_index_150304_231155"
                MetaType="PacBio.Index.PacBioIndex"
-               ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.1.subreads.bam.pbi"/>
+               ResourceId="m64004_190414_193017.1.subreads.bam.pbi"/>
        </pbbase:FileIndices>
    </pbbase:ExternalResource>
 </pbbase:ExternalResources>
@@ -432,13 +431,13 @@ TEST(PbiFilterQueryTest, BarcodeQualityFromXml)
        UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5193"
        TimeStampedName="subread_bam_150304_231155"
        MetaType="PacBio.SubreadFile.SubreadBamFile"
-       ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.1.subreads.bam">
+       ResourceId="m64004_190414_193017.1.subreads.bam">
        <pbbase:FileIndices>
            <pbbase:FileIndex
                UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5194"
                TimeStampedName="bam_index_150304_231155"
                MetaType="PacBio.Index.PacBioIndex"
-               ResourceId="m150404_101626_42267_c100807920800000001823174110291514_s1_p0.1.subreads.bam.pbi"/>
+               ResourceId="m64004_190414_193017.1.subreads.bam.pbi"/>
        </pbbase:FileIndices>
    </pbbase:ExternalResource>
 </pbbase:ExternalResources>
@@ -843,5 +842,78 @@ TEST(PbiFilterQueryTest, CanReusePbiIndexCache)
             ++count;
         }
         EXPECT_EQ(150, count);
+    }
+}
+
+TEST(PbiFilterQueryTest, ConsistentWhitelistAndBlacklist)
+{
+    const std::string fn{PbbamTestsConfig::Data_Dir + "/dataset/qname_filter.bam"};
+
+    const std::vector<std::string> recordNames{"singleInsertion/0/0_10", "singleInsertion/0/10_20",
+                                               "singleInsertion/1/0_10", "singleInsertion/1/10_20"};
+    const std::vector<std::string> whitelist{"singleInsertion/0/0_10", "singleInsertion/1/0_10"};
+    const std::vector<std::string> blacklist{"singleInsertion/0/10_20", "singleInsertion/1/10_20"};
+
+    {  // sanity check on input
+        PbiFilter filter{};
+        PbiFilterQuery query{filter, fn};
+        EXPECT_EQ(4, query.NumReads());
+
+        size_t i = 0;
+        for (const auto& b : query) {
+            EXPECT_EQ(recordNames.at(i), b.FullName());
+            ++i;
+        }
+    }
+    {
+        // whitelist
+        PbiFilter filter{PbiQueryNameFilter{whitelist}};
+        PbiFilterQuery query{filter, fn};
+        EXPECT_EQ(2, query.NumReads());
+
+        size_t i = 0;
+        for (const auto& b : query) {
+            if (i == 0) {
+                EXPECT_EQ(recordNames.at(0), b.FullName());
+            }
+            if (i == 1) {
+                EXPECT_EQ(recordNames.at(2), b.FullName());
+            }
+            ++i;
+        }
+    }
+    {
+        // !whitelist
+        PbiFilter filter{PbiQueryNameFilter{whitelist, Compare::NOT_CONTAINS}};
+        PbiFilterQuery query{filter, fn};
+        EXPECT_EQ(2, query.NumReads());
+
+        size_t i = 0;
+        for (const auto& b : query) {
+            if (i == 0) {
+                EXPECT_EQ(recordNames.at(1), b.FullName());
+            }
+            if (i == 1) {
+                EXPECT_EQ(recordNames.at(3), b.FullName());
+            }
+            ++i;
+        }
+    }
+    {
+        // blacklist
+        PbiFilter filter{PbiQueryNameFilter{blacklist, Compare::NOT_CONTAINS}};
+        PbiFilterQuery query{filter, fn};
+        EXPECT_EQ(2, query.NumReads());
+
+        size_t i = 0;
+        for (const auto& b : query) {
+            if (i == 0) {
+                EXPECT_EQ(recordNames.at(0), b.FullName());
+            }
+            if (i == 1) {
+                EXPECT_EQ(recordNames.at(2), b.FullName());
+            }
+            ++i;
+        }
     }
 }

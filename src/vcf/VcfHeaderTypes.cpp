@@ -1,7 +1,11 @@
-
-#include <pbbam/vcf/VcfHeader.h>
+#include "../PbbamInternalConfig.h"
 
 #include "pbbam/vcf/VcfHeaderTypes.h"
+
+#include <cassert>
+#include <type_traits>
+
+#include <pbbam/vcf/VcfHeader.h>
 
 namespace PacBio {
 namespace VCF {
@@ -10,7 +14,18 @@ namespace VCF {
 // ContigDefinition
 // -------------------
 
-ContigDefinition::ContigDefinition(std::string id) : ContigDefinition(std::move(id), {}) {}
+static_assert(std::is_copy_constructible<ContigDefinition>::value,
+              "ContigDefinition(const ContigDefinition&) is not = default");
+static_assert(std::is_copy_assignable<ContigDefinition>::value,
+              "ContigDefinition& operator=(const ContigDefinition&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<ContigDefinition>::value,
+              "ContigDefinition(ContigDefinition&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<ContigDefinition>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
+
+ContigDefinition::ContigDefinition(std::string id) : ContigDefinition{std::move(id), {}} {}
 
 ContigDefinition::ContigDefinition(std::string id,
                                    std::vector<std::pair<std::string, std::string>> attributes)
@@ -19,16 +34,6 @@ ContigDefinition::ContigDefinition(std::string id,
     if (id_.empty())
         throw std::runtime_error{"VcfFormat: ##contig definition in header has empty ID field"};
 }
-
-ContigDefinition::ContigDefinition(const ContigDefinition&) = default;
-
-ContigDefinition::ContigDefinition(ContigDefinition&&) = default;
-
-ContigDefinition& ContigDefinition::operator=(const ContigDefinition&) = default;
-
-ContigDefinition& ContigDefinition::operator=(ContigDefinition&&) = default;
-
-ContigDefinition::~ContigDefinition() = default;
 
 ContigDefinition& ContigDefinition::AddAttribute(std::string id, std::string value)
 {
@@ -59,6 +64,17 @@ const std::string& ContigDefinition::Id() const { return id_; }
 // FilterDefinition
 // -------------------
 
+static_assert(std::is_copy_constructible<FilterDefinition>::value,
+              "FilterDefinition(const FilterDefinition&) is not = default");
+static_assert(std::is_copy_assignable<FilterDefinition>::value,
+              "FilterDefinition& operator=(const FilterDefinition&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<FilterDefinition>::value,
+              "FilterDefinition(FilterDefinition&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<FilterDefinition>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
+
 FilterDefinition::FilterDefinition(std::string id, std::string description)
     : id_{std::move(id)}, description_{std::move(description)}
 {
@@ -70,16 +86,6 @@ FilterDefinition::FilterDefinition(std::string id, std::string description)
             "VcfFormat: FILTER definition in header has empty Description field"};
 }
 
-FilterDefinition::FilterDefinition(const FilterDefinition&) = default;
-
-FilterDefinition::FilterDefinition(FilterDefinition&&) = default;
-
-FilterDefinition& FilterDefinition::operator=(const FilterDefinition&) = default;
-
-FilterDefinition& FilterDefinition::operator=(FilterDefinition&&) = default;
-
-FilterDefinition::~FilterDefinition() = default;
-
 const std::string& FilterDefinition::Description() const { return description_; }
 
 const std::string& FilterDefinition::Id() const { return id_; }
@@ -87,6 +93,17 @@ const std::string& FilterDefinition::Id() const { return id_; }
 // -------------------
 // FormatDefinition
 // -------------------
+
+static_assert(std::is_copy_constructible<FormatDefinition>::value,
+              "FormatDefinition(const FormatDefinition&) is not = default");
+static_assert(std::is_copy_assignable<FormatDefinition>::value,
+              "FormatDefinition& operator=(const FormatDefinition&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<FormatDefinition>::value,
+              "FormatDefinition(FormatDefinition&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<FormatDefinition>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
 
 FormatDefinition::FormatDefinition(std::string id, std::string number, std::string type,
                                    std::string description)
@@ -109,16 +126,6 @@ FormatDefinition::FormatDefinition(std::string id, std::string number, std::stri
             "VcfFormat: FORMAT definition in header has empty Description field"};
 }
 
-FormatDefinition::FormatDefinition(const FormatDefinition&) = default;
-
-FormatDefinition::FormatDefinition(FormatDefinition&&) = default;
-
-FormatDefinition& FormatDefinition::operator=(const FormatDefinition&) = default;
-
-FormatDefinition& FormatDefinition::operator=(FormatDefinition&&) = default;
-
-FormatDefinition::~FormatDefinition() = default;
-
 const std::string& FormatDefinition::Description() const { return description_; }
 
 const std::string& FormatDefinition::Id() const { return id_; }
@@ -130,6 +137,17 @@ const std::string& FormatDefinition::Type() const { return type_; }
 // -------------------
 // GeneralDefinition
 // -------------------
+
+static_assert(std::is_copy_constructible<GeneralDefinition>::value,
+              "GeneralDefinition(const GeneralDefinition&) is not = default");
+static_assert(std::is_copy_assignable<GeneralDefinition>::value,
+              "GeneralDefinition& operator=(const GeneralDefinition&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<GeneralDefinition>::value,
+              "GeneralDefinition(GeneralDefinition&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<GeneralDefinition>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
 
 GeneralDefinition::GeneralDefinition(std::string id, std::string text)
     : id_{std::move(id)}, text_{std::move(text)}
@@ -143,16 +161,6 @@ GeneralDefinition::GeneralDefinition(std::string id, std::string text)
             "VcfFormat: general metadata definition in header has empty value"};
 }
 
-GeneralDefinition::GeneralDefinition(const GeneralDefinition&) = default;
-
-GeneralDefinition::GeneralDefinition(GeneralDefinition&&) = default;
-
-GeneralDefinition& GeneralDefinition::operator=(const GeneralDefinition&) = default;
-
-GeneralDefinition& GeneralDefinition::operator=(GeneralDefinition&&) = default;
-
-GeneralDefinition::~GeneralDefinition() = default;
-
 const std::string& GeneralDefinition::Id() const { return id_; }
 
 const std::string& GeneralDefinition::Text() const { return text_; }
@@ -160,6 +168,17 @@ const std::string& GeneralDefinition::Text() const { return text_; }
 // -------------------
 // InfoDefinition
 // -------------------
+
+static_assert(std::is_copy_constructible<InfoDefinition>::value,
+              "InfoDefinition(const InfoDefinition&) is not = default");
+static_assert(std::is_copy_assignable<InfoDefinition>::value,
+              "InfoDefinition& operator=(const InfoDefinition&) is not = default");
+
+static_assert(std::is_nothrow_move_constructible<InfoDefinition>::value,
+              "InfoDefinition(InfoDefinition&&) is not = noexcept");
+static_assert(std::is_nothrow_move_assignable<InfoDefinition>::value ==
+                  std::is_nothrow_move_assignable<std::string>::value,
+              "");
 
 InfoDefinition::InfoDefinition(std::string id, std::string number, std::string type,
                                std::string description, std::string source, std::string version)
@@ -185,16 +204,6 @@ InfoDefinition::InfoDefinition(std::string id, std::string number, std::string t
     if (!source.empty()) source_ = std::move(source);
     if (!version.empty()) version_ = std::move(version);
 }
-
-InfoDefinition::InfoDefinition(const InfoDefinition&) = default;
-
-InfoDefinition::InfoDefinition(InfoDefinition&&) = default;
-
-InfoDefinition& InfoDefinition::operator=(const InfoDefinition&) = default;
-
-InfoDefinition& InfoDefinition::operator=(InfoDefinition&&) = default;
-
-InfoDefinition::~InfoDefinition() = default;
 
 const std::string& InfoDefinition::Description() const { return description_; }
 

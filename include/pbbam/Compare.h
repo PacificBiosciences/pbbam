@@ -8,11 +8,14 @@
 #ifndef COMPARE_H
 #define COMPARE_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <string>
 #include <utility>
+
 #include "pbbam/BamRecord.h"
 
 namespace PacBio {
@@ -440,6 +443,7 @@ public:
     {
         switch (cmp) {
             case Compare::EQUAL:
+            case Compare::CONTAINS:
                 return lhs == rhs;
             case Compare::LESS_THAN:
                 return lhs < rhs;
@@ -450,6 +454,7 @@ public:
             case Compare::GREATER_THAN_EQUAL:
                 return lhs >= rhs;
             case Compare::NOT_EQUAL:
+            case Compare::NOT_CONTAINS:
                 return lhs != rhs;
             default:
                 assert(false);

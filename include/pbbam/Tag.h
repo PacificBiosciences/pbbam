@@ -7,11 +7,13 @@
 #ifndef TAG_H
 #define TAG_H
 
-#include <boost/variant.hpp>
+#include "pbbam/Config.h"
+
 #include <cstdint>
 #include <string>
 #include <vector>
-#include "pbbam/Config.h"
+
+#include <boost/variant.hpp>
 
 namespace PacBio {
 namespace BAM {
@@ -165,12 +167,7 @@ public:
     /// \brief Creates a Tag from a vector of floating-point values.
     Tag(std::vector<float> value);
 
-    Tag();
-    Tag(const Tag&);
-    Tag(Tag&&);
-    Tag& operator=(const Tag&);
-    Tag& operator=(Tag&&);
-    ~Tag();
+    Tag() = default;
 
     Tag& operator=(boost::blank value);
     Tag& operator=(int8_t value);

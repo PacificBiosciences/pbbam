@@ -3,8 +3,11 @@
 #ifndef PBBAM_VCF_VCFREADER_H
 #define PBBAM_VCF_VCFREADER_H
 
+#include "pbbam/Config.h"
+
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <string>
 
 #include <pbbam/vcf/VcfFile.h>
@@ -22,13 +25,6 @@ class VcfReader
 public:
     explicit VcfReader(std::string fn);
     explicit VcfReader(const VcfFile& file);
-
-    VcfReader() = delete;
-    VcfReader(const VcfReader&) = delete;
-    VcfReader(VcfReader&&) = default;
-    VcfReader& operator=(const VcfReader&) = delete;
-    VcfReader& operator=(VcfReader&&) = default;
-    ~VcfReader();
 
 public:
     const VcfHeader& Header() const;

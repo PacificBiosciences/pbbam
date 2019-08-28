@@ -204,28 +204,28 @@ TEST(DataSetIOTest, ToXml)
            .Attribute("xsi:schemaLocation", "http://pacificbiosciences.com/PacBioDatasets.xsd");
 
     // external resources
-    ExternalResource resource1("AlignmentFile.AlignmentBamFile", "file:/mnt/path/to/alignments2.bam");
+    ExternalResource resource1("AlignmentFile.AlignmentBamFile", "/mnt/path/to/alignments2.bam");
     resource1.Name("Third Alignments BAM");
     resource1.CreatedAt("2015-01-27T09:00:01");
     resource1.Description("Points to an example Alignments BAM file.");
     resource1.Tags("Example");
     resource1.TimeStampedName("my_tsn");
     resource1.UniqueId("my_uuid");
-    FileIndex pbi1("PacBio.Index.PacBioIndex", "file:/mnt/path/to/alignments2.pbi");
+    FileIndex pbi1("PacBio.Index.PacBioIndex", "/mnt/path/to/alignments2.pbi");
     pbi1.CreatedAt("2015-01-27T09:00:01");
     pbi1.TimeStampedName("my_tsn");
     pbi1.UniqueId("my_uuid");
     resource1.FileIndices().Add(pbi1);
     dataset.ExternalResources().Add(resource1);
 
-    ExternalResource resource2("AlignmentFile.AlignmentBamFile", "file:./alignments3.bam");
+    ExternalResource resource2("AlignmentFile.AlignmentBamFile", "./alignments3.bam");
     resource2.CreatedAt("2015-01-27T09:00:01");
     resource2.Name("Fourth Alignments BAM");
     resource2.Description("Points to another example Alignments BAM file, by relative path.");
     resource2.Tags("Example");
     resource2.TimeStampedName("my_tsn");
     resource2.UniqueId("my_uuid");
-    FileIndex pbi2("PacBio.Index.PacBioIndex", "file:/mnt/path/to/alignments3.pbi");
+    FileIndex pbi2("PacBio.Index.PacBioIndex", "./alignments3.pbi");
     pbi2.CreatedAt("2015-01-27T09:00:01");
     pbi2.TimeStampedName("my_tsn");
     pbi2.UniqueId("my_uuid");
@@ -275,7 +275,7 @@ TEST(DataSetIOTest, ToXml)
                 "Description=\"Points to an example Alignments BAM file.\" "
                 "MetaType=\"AlignmentFile.AlignmentBamFile\" "
                 "Name=\"Third Alignments BAM\" "
-                "ResourceId=\"file:/mnt/path/to/alignments2.bam\" "
+                "ResourceId=\"/mnt/path/to/alignments2.bam\" "
                 "Tags=\"Example\" "
                 "TimeStampedName=\"my_tsn\" "
                 "UniqueId=\"my_uuid\" Version=\"3.0.1\">\n"
@@ -283,7 +283,7 @@ TEST(DataSetIOTest, ToXml)
         "\t\t\t\t<pbbase:FileIndex "
                 "CreatedAt=\"2015-01-27T09:00:01\" "
                 "MetaType=\"PacBio.Index.PacBioIndex\" "
-                "ResourceId=\"file:/mnt/path/to/alignments2.pbi\" "
+                "ResourceId=\"/mnt/path/to/alignments2.pbi\" "
                 "TimeStampedName=\"my_tsn\" "
                 "UniqueId=\"my_uuid\" Version=\"3.0.1\" />\n"
         "\t\t\t</pbbase:FileIndices>\n"
@@ -293,7 +293,7 @@ TEST(DataSetIOTest, ToXml)
                 "Description=\"Points to another example Alignments BAM file, by relative path.\" "
                 "MetaType=\"AlignmentFile.AlignmentBamFile\" "
                 "Name=\"Fourth Alignments BAM\" "
-                "ResourceId=\"file:./alignments3.bam\" "
+                "ResourceId=\"" + dataset.Path() + "/alignments3.bam\" "
                 "Tags=\"Example\" "
                 "TimeStampedName=\"my_tsn\" "
                 "UniqueId=\"my_uuid\" Version=\"3.0.1\">\n"
@@ -301,7 +301,7 @@ TEST(DataSetIOTest, ToXml)
         "\t\t\t\t<pbbase:FileIndex "
                 "CreatedAt=\"2015-01-27T09:00:01\" "
                 "MetaType=\"PacBio.Index.PacBioIndex\" "
-                "ResourceId=\"file:/mnt/path/to/alignments3.pbi\" "
+                "ResourceId=\"" + dataset.Path() + "/alignments3.pbi\" "
                 "TimeStampedName=\"my_tsn\" "
                 "UniqueId=\"my_uuid\" Version=\"3.0.1\" />\n"
         "\t\t\t</pbbase:FileIndices>\n"
@@ -1632,29 +1632,20 @@ TEST(DataSetIOTest, MetadataDefaultChildrenProperlyOrderedPerXsd)
     DataSetMetadata metadata(numRecords, totalLength);
     dataset.Metadata(metadata);
 
-    const std::string expectedXml{
-        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-        "<pbds:AlignmentSet CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"PacBio.DataSet.AlignmentSet\" "
-                "Name=\"DataSet_AlignmentSet\" Tags=\"barcode moreTags mapping mytags\" "
-                "TimeStampedName=\"my_time_stamped_name\" "
-                "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" Version=\"3.0.1\" "
-                "xmlns=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
-                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-                "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
-                "xmlns:pbbase=\"http://pacificbiosciences.com/PacBioBaseDataModel.xsd\" "
-                "xmlns:pbds=\"http://pacificbiosciences.com/PacBioDatasets.xsd\">\n"
-        "\t<pbbase:ExternalResources>\n"
-        "\t\t<pbbase:ExternalResource CreatedAt=\"2015-01-27T09:00:01\" MetaType=\"Fake.MetaType\" ResourceId=\"filename\" TimeStampedName=\"custom_tsn\" UniqueId=\"my_uuid\" Version=\"3.0.1\" />\n"
-        "\t</pbbase:ExternalResources>\n"
-        "\t<pbds:DataSetMetadata>\n"
-        "\t\t<pbds:TotalLength>1000</pbds:TotalLength>\n"
-        "\t\t<pbds:NumRecords>42</pbds:NumRecords>\n"
-        "\t</pbds:DataSetMetadata>\n"
-        "</pbds:AlignmentSet>\n"};
-
     std::ostringstream s;
     dataset.SaveToStream(s);
-    EXPECT_EQ(expectedXml, s.str());
+
+    const std::string result = s.str();
+    const size_t xmlnsFound = result.find("xmlns=");
+    const size_t xmlnsXsiFound = result.find("xmlns:xsi=");
+    const size_t xsiSchemaLocationFound = result.find("xsi:schemaLocation=");
+    const size_t xmlnsPbbaseFound = result.find("xmlns:pbbase=");
+    const size_t xmlnsPbdsFound = result.find("xmlns:pbds=");
+
+    EXPECT_TRUE(xmlnsFound < xmlnsXsiFound);
+    EXPECT_TRUE(xmlnsXsiFound < xsiSchemaLocationFound);
+    EXPECT_TRUE(xsiSchemaLocationFound < xmlnsPbbaseFound);
+    EXPECT_TRUE(xmlnsPbbaseFound < xmlnsPbdsFound);
 }
 
 TEST(DataSetIOTest, MakeReferenceSetFromSubdataset)
@@ -1736,6 +1727,28 @@ TEST(DataSetIOTest, MakeReferenceSetFromSubdataset)
         "</pbds:AlignmentSet>\n"};
 
     EXPECT_NO_THROW(DataSet::FromXml(alignmentSetXml));
+}
+
+TEST(DataSetIOTest, AbsolutePathsForGenericAndDerivedDatasets)
+{
+    DataSet dataset;
+    ReferenceSet referenceDataset;
+
+    dataset.ExternalResources().Add(ExternalResource{"PacBio.SubreadFile.SubreadBamFile", "test.fa"});
+    referenceDataset.ExternalResources().Add(ExternalResource{"PacBio.SubreadFile.SubreadBamFile", "test.fa"});
+
+    const std::string expectedGenericFn{dataset.Path() + "/test.fa"};
+    const std::string expectedReferenceFn{referenceDataset.Path() + "/test.fa"};
+
+    std::ostringstream out;
+    dataset.SaveToStream(out);
+    const std::string genericDatasetXml{out.str()};
+    EXPECT_NE(genericDatasetXml.find(expectedGenericFn), std::string::npos);
+
+    out.str("");
+    referenceDataset.SaveToStream(out);
+    const std::string referenceDatasetXml{out.str()};
+    EXPECT_NE(referenceDatasetXml.find(expectedReferenceFn), std::string::npos);
 }
 
 // clang-format on

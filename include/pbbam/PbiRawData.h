@@ -7,12 +7,14 @@
 #ifndef PBIRAWDATA_H
 #define PBIRAWDATA_H
 
+#include "pbbam/Config.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
-#include "pbbam/Config.h"
+
 #include "pbbam/PbiFile.h"
 
 namespace PacBio {
@@ -35,12 +37,7 @@ public:
     ///        number of records.
     PbiRawBarcodeData(uint32_t numReads);
 
-    PbiRawBarcodeData();
-    PbiRawBarcodeData(const PbiRawBarcodeData&);
-    PbiRawBarcodeData(PbiRawBarcodeData&&);
-    PbiRawBarcodeData& operator=(const PbiRawBarcodeData&);
-    PbiRawBarcodeData& operator=(PbiRawBarcodeData&&);
-    ~PbiRawBarcodeData();
+    PbiRawBarcodeData() = default;
 
     /// \}
 
@@ -80,12 +77,7 @@ public:
     ///        number of records.
     PbiRawMappedData(uint32_t numReads);
 
-    PbiRawMappedData();
-    PbiRawMappedData(const PbiRawMappedData&);
-    PbiRawMappedData(PbiRawMappedData&&);
-    PbiRawMappedData& operator=(const PbiRawMappedData&);
-    PbiRawMappedData& operator=(PbiRawMappedData&&);
-    ~PbiRawMappedData();
+    PbiRawMappedData() = default;
 
     /// \}
 
@@ -195,12 +187,6 @@ public:
     ///
     PbiReferenceEntry(ID id, Row beginRow, Row endRow);
 
-    PbiReferenceEntry(const PbiReferenceEntry&);
-    PbiReferenceEntry(PbiReferenceEntry&&);
-    PbiReferenceEntry& operator=(const PbiReferenceEntry&);
-    PbiReferenceEntry& operator=(PbiReferenceEntry&&);
-    ~PbiReferenceEntry();
-
     bool operator==(const PbiReferenceEntry& other) const;
 
     /// \}
@@ -233,12 +219,7 @@ public:
     ///
     PbiRawReferenceData(uint32_t numRefs);
 
-    PbiRawReferenceData();
-    PbiRawReferenceData(const PbiRawReferenceData&);
-    PbiRawReferenceData(PbiRawReferenceData&&);
-    PbiRawReferenceData& operator=(const PbiRawReferenceData&);
-    PbiRawReferenceData& operator=(PbiRawReferenceData&&);
-    ~PbiRawReferenceData();
+    PbiRawReferenceData() = default;
 
     /// \}
 
@@ -264,12 +245,7 @@ public:
     ///        number of records.
     PbiRawBasicData(uint32_t numReads);
 
-    PbiRawBasicData();
-    PbiRawBasicData(const PbiRawBasicData&);
-    PbiRawBasicData(PbiRawBasicData&&);
-    PbiRawBasicData& operator=(const PbiRawBasicData&);
-    PbiRawBasicData& operator=(PbiRawBasicData&&);
-    ~PbiRawBasicData();
+    PbiRawBasicData() = default;
 
     /// \}
 
@@ -342,12 +318,7 @@ public:
     ///
     explicit PbiRawData(const DataSet& dataset);
 
-    PbiRawData();
-    PbiRawData(const PbiRawData&);
-    PbiRawData(PbiRawData&&);
-    PbiRawData& operator=(const PbiRawData&);
-    PbiRawData& operator=(PbiRawData&&);
-    ~PbiRawData();
+    PbiRawData() = default;
 
     /// \}
 
