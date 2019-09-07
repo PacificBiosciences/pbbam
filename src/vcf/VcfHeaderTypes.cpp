@@ -3,9 +3,12 @@
 #include "pbbam/vcf/VcfHeaderTypes.h"
 
 #include <cassert>
+
 #include <type_traits>
 
 #include <pbbam/vcf/VcfHeader.h>
+
+#include "VcfFormatException.h"
 
 namespace PacBio {
 namespace VCF {
@@ -27,13 +30,15 @@ static_assert(std::is_nothrow_move_assignable<ContigDefinition>::value ==
 
 ContigDefinition::ContigDefinition(std::string id) : ContigDefinition{std::move(id), {}} {}
 
+// clang-format off
 ContigDefinition::ContigDefinition(std::string id,
                                    std::vector<std::pair<std::string, std::string>> attributes)
     : id_{std::move(id)}, attributes_{std::move(attributes)}
 {
     if (id_.empty())
-        throw std::runtime_error{"VcfFormat: ##contig definition in header has empty ID field"};
+        throw VcfFormatException{"##contig definition in header has empty ID field"};
 }
+// clang-format on
 
 ContigDefinition& ContigDefinition::AddAttribute(std::string id, std::string value)
 {
@@ -75,16 +80,17 @@ static_assert(std::is_nothrow_move_assignable<FilterDefinition>::value ==
                   std::is_nothrow_move_assignable<std::string>::value,
               "");
 
+// clang-format off
 FilterDefinition::FilterDefinition(std::string id, std::string description)
     : id_{std::move(id)}, description_{std::move(description)}
 {
     if (id_.empty())
-        throw std::runtime_error{"VcfFormat: FILTER definition in header has empty ID field"};
+        throw VcfFormatException{"FILTER definition in header has empty ID field"};
 
     if (description_.empty())
-        throw std::runtime_error{
-            "VcfFormat: FILTER definition in header has empty Description field"};
+        throw VcfFormatException{"FILTER definition in header has empty Description field"};
 }
+// clang-format on
 
 const std::string& FilterDefinition::Description() const { return description_; }
 
@@ -105,6 +111,7 @@ static_assert(std::is_nothrow_move_assignable<FormatDefinition>::value ==
                   std::is_nothrow_move_assignable<std::string>::value,
               "");
 
+// clang-format off
 FormatDefinition::FormatDefinition(std::string id, std::string number, std::string type,
                                    std::string description)
     : id_{std::move(id)}
@@ -113,18 +120,18 @@ FormatDefinition::FormatDefinition(std::string id, std::string number, std::stri
     , description_{std::move(description)}
 {
     if (id_.empty())
-        throw std::runtime_error{"VcfFormat: FORMAT definition in header has empty ID field"};
+        throw VcfFormatException{"FORMAT definition in header has empty ID field"};
 
     if (number_.empty())
-        throw std::runtime_error{"VcfFormat: FORMAT definition in header has empty Number field"};
+        throw VcfFormatException{"FORMAT definition in header has empty Number field"};
 
     if (type_.empty())
-        throw std::runtime_error{"VcfFormat: FORMAT definition in header has empty Type field"};
+        throw VcfFormatException{"FORMAT definition in header has empty Type field"};
 
     if (description_.empty())
-        throw std::runtime_error{
-            "VcfFormat: FORMAT definition in header has empty Description field"};
+        throw VcfFormatException{"FORMAT definition in header has empty Description field"};
 }
+// clang-format on
 
 const std::string& FormatDefinition::Description() const { return description_; }
 
@@ -149,17 +156,17 @@ static_assert(std::is_nothrow_move_assignable<GeneralDefinition>::value ==
                   std::is_nothrow_move_assignable<std::string>::value,
               "");
 
+// clang-format off
 GeneralDefinition::GeneralDefinition(std::string id, std::string text)
     : id_{std::move(id)}, text_{std::move(text)}
 {
     if (id_.empty())
-        throw std::runtime_error{
-            "VcfFormat: general metadata definition in header has empty label"};
+        throw VcfFormatException{"general metadata definition in header has empty label"};
 
     if (text_.empty())
-        throw std::runtime_error{
-            "VcfFormat: general metadata definition in header has empty value"};
+        throw VcfFormatException{"general metadata definition in header has empty value"};
 }
+// clang-format on
 
 const std::string& GeneralDefinition::Id() const { return id_; }
 
@@ -180,6 +187,7 @@ static_assert(std::is_nothrow_move_assignable<InfoDefinition>::value ==
                   std::is_nothrow_move_assignable<std::string>::value,
               "");
 
+// clang-format off
 InfoDefinition::InfoDefinition(std::string id, std::string number, std::string type,
                                std::string description, std::string source, std::string version)
     : id_{std::move(id)}
@@ -189,21 +197,21 @@ InfoDefinition::InfoDefinition(std::string id, std::string number, std::string t
 {
     // verify required fields
     if (id_.empty())
-        throw std::runtime_error{"VcfFormat: INFO definition in header has empty ID field"};
+        throw VcfFormatException{"INFO definition in header has empty ID field"};
 
     if (number_.empty())
-        throw std::runtime_error{"VcfFormat: INFO definition in header has empty Number field"};
+        throw VcfFormatException{"INFO definition in header has empty Number field"};
 
     if (type_.empty())
-        throw std::runtime_error{"VcfFormat: INFO definition in header has empty Type field"};
+        throw VcfFormatException{"INFO definition in header has empty Type field"};
 
     if (description_.empty())
-        throw std::runtime_error{
-            "VcfFormat: INFO definition in header has empty Description field"};
+        throw VcfFormatException{"INFO definition in header has empty Description field"};
 
     if (!source.empty()) source_ = std::move(source);
     if (!version.empty()) version_ = std::move(version);
 }
+// clang-format on
 
 const std::string& InfoDefinition::Description() const { return description_; }
 

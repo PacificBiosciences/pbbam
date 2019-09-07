@@ -8,6 +8,7 @@
 
 #include "pbbam/BgzipFastqWriter.h"
 
+#include <sstream>
 #include <stdexcept>
 
 #include "pbbam/BamRecord.h"
@@ -17,20 +18,19 @@
 namespace PacBio {
 namespace BAM {
 
-BgzipFastqWriter::BgzipFastqWriter(const std::string& fn) : IFastqWriter{}, writer_{fn}
+BgzipFastqWriter::BgzipFastqWriter(const std::string& fn)
+    : BgzipFastqWriter{fn, BgzipWriterConfig{}}
 {
-    if (!FormatUtils::IsFastqFilename(fn)) {
-        throw std::runtime_error{"BgzipFastqWriter: filename '" + fn +
-                                 "' is not recognized as a FASTQ file."};
-    }
 }
 
 BgzipFastqWriter::BgzipFastqWriter(const std::string& fn, const BgzipWriterConfig& config)
     : IFastqWriter{}, writer_{fn, config}
 {
     if (!FormatUtils::IsFastqFilename(fn)) {
-        throw std::runtime_error{"BgzipFastqWriter: filename '" + fn +
-                                 "' is not recognized as a FASTQ file."};
+        std::ostringstream s;
+        s << "[pbbam] bgzipped FASTQ writer ERROR: not a recognized FASTQ extension:\n"
+          << "  file: " << fn;
+        throw std::runtime_error{s.str()};
     }
 }
 

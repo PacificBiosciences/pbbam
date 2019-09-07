@@ -8,6 +8,7 @@
 
 #include "pbbam/FastqWriter.h"
 
+#include <sstream>
 #include <stdexcept>
 
 #include "pbbam/BamRecord.h"
@@ -21,12 +22,19 @@ namespace BAM {
 FastqWriter::FastqWriter(const std::string& fn) : IFastqWriter{}
 {
     if (!FormatUtils::IsFastqFilename(fn)) {
-        throw std::runtime_error{"FastqReader: filename '" + fn +
-                                 "' is not recognized as a FASTQ file."};
+        std::ostringstream s;
+        s << "[pbbam] FASTQ writer ERROR: not a recognized FASTQ extension:\n"
+          << "  file: " << fn;
+        throw std::runtime_error{s.str()};
     }
 
     file_.open(fn);
-    if (!file_) throw std::runtime_error{"FastqWriter: could not open file for writing: " + fn};
+    if (!file_) {
+        std::ostringstream s;
+        s << "[pbbam] FASTQ writer ERROR: could not open file for writing:\n"
+          << "  file: " << fn;
+        throw std::runtime_error{s.str()};
+    }
 }
 
 void FastqWriter::TryFlush() { file_.flush(); }

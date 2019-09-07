@@ -8,23 +8,32 @@
 
 #include "pbbam/FastaWriter.h"
 
+#include <sstream>
 #include <stdexcept>
 
 #include "pbbam/BamRecord.h"
 #include "pbbam/FastqSequence.h"
 #include "pbbam/FormatUtils.h"
+
 namespace PacBio {
 namespace BAM {
 
 FastaWriter::FastaWriter(const std::string& fn) : IFastaWriter{}
 {
     if (!FormatUtils::IsFastaFilename(fn)) {
-        throw std::runtime_error{"FastaReader: filename '" + fn +
-                                 "' is not recognized as a FASTA file."};
+        std::ostringstream s;
+        s << "[pbbam] FASTA writer ERROR: not a recognized FASTA extension:\n"
+          << "  file: " << fn;
+        throw std::runtime_error{s.str()};
     }
 
     file_.open(fn);
-    if (!file_) throw std::runtime_error{"FastaWriter: could not open file for writing: " + fn};
+    if (!file_) {
+        std::ostringstream s;
+        s << "[pbbam] FASTA writer ERROR: could not open file for writing:\n"
+          << "  file: " << fn;
+        throw std::runtime_error{s.str()};
+    }
 }
 
 void FastaWriter::TryFlush() { file_.flush(); }

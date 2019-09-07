@@ -9,6 +9,7 @@
 #include "ZmwChunkedFastxTextReader.h"
 
 #include <unistd.h>
+
 #include <cassert>
 #include <cstdio>
 
@@ -28,7 +29,7 @@ ZmwChunkedFastxTextReader::ZmwChunkedFastxTextReader(std::string filename, const
     // check file handle
     if (file_ == nullptr) {
         std::ostringstream msg;
-        msg << "ZmwChunkedFastxTextReader: could not open file for reading\n"
+        msg << "[pbbam] chunked FASTX reader ERROR: could not open file:\n"
             << "  file: " << fastxFilename_ << '\n';
         throw std::runtime_error{msg.str()};
     }
@@ -109,7 +110,7 @@ FastaSequence ZmwChunkedFastxTextReader::ReadNextFasta(bool skipName)
     const auto result = FetchRecord(skipName);
     if (result < 0) {
         std::ostringstream msg;
-        msg << "ZmwChunkedFastxTextReader: error reading from\n"
+        msg << "[pbbam] chunked FASTX reader ERROR: could not read FASTA record:\n"
             << "  file: " << fastxFilename_ << '\n'
             << "  reason: likely truncated quality string\n";
         throw std::runtime_error{msg.str()};
@@ -127,7 +128,7 @@ FastqSequence ZmwChunkedFastxTextReader::ReadNextFastq(bool skipName)
     const auto result = FetchRecord(skipName);
     if (result < 0) {
         std::ostringstream msg;
-        msg << "ZmwChunkedFastxTextReader: error reading from\n"
+        msg << "[pbbam] chunked FASTX reader ERROR: could not read FASTQ record:\n"
             << "  file: " << fastxFilename_ << '\n'
             << "  reason: likely truncated quality string\n";
         throw std::runtime_error{msg.str()};
@@ -146,7 +147,8 @@ void ZmwChunkedFastxTextReader::Seek(uint64_t pos)
     auto result = fseek(file_.get(), pos, SEEK_SET);
     if (result != 0) {
         std::ostringstream msg;
-        msg << "ZmwChunkedFastxTextReader: could not seek to requested pos: " << pos << '\n'
+        msg << "[pbbam] chunked FASTX reader ERROR: could not seek to requested pos: " << pos
+            << '\n'
             << "  in file: " << fastxFilename_;
         throw std::runtime_error{msg.str()};
     }

@@ -2,6 +2,7 @@
 
 #include "pbbam/FastaCache.h"
 
+#include <sstream>
 #include <stdexcept>
 
 #include "pbbam/FastaReader.h"
@@ -19,14 +20,22 @@ std::string FastaCacheData::Subsequence(const std::string& name, size_t begin, s
 {
     const auto found = lookup_.find(name);
     if (found == lookup_.cend()) {
-        std::string msg = "Could not find '";
-        msg += name;
-        msg += "' in FastaCacheData::Subsequence()";
-        throw std::runtime_error{msg};
+        std::ostringstream s;
+        s << "[pbbam] FASTA sequence cache ERROR: could not retrieve subsequence, reference '"
+          << name << "' not found";
+        throw std::runtime_error{s.str()};
     }
     const std::string& seq = cache_[found->second].Bases();
 
-    if (begin > end) throw std::runtime_error{"begin > end in FastaCacheData::Subsequence"};
+    if (begin > end) {
+        std::ostringstream s;
+        s << "[pbbam] FASTA sequence cache ERROR: could not retrieve subsequence, requested begin "
+             "> end\n"
+          << "  begin: " << begin << '\n'
+          << "  end: " << end << '\n'
+          << "  rname: " << name;
+        throw std::runtime_error{s.str()};
+    }
     const size_t length = end - begin;
     return seq.substr(begin, length);
 }
@@ -44,10 +53,10 @@ size_t FastaCacheData::SequenceLength(const std::string& name) const
 {
     const auto found = lookup_.find(name);
     if (found == lookup_.cend()) {
-        std::string msg = "Could not find '";
-        msg += name;
-        msg += "' in FastaCacheData::SequenceLength()";
-        throw std::runtime_error{msg};
+        std::ostringstream s;
+        s << "[pbbam] FASTA sequence cache ERROR: could not retrieve sequence loength, reference '"
+          << name << "' not found";
+        throw std::runtime_error{s.str()};
     }
     return cache_[found->second].Bases().size();
 }

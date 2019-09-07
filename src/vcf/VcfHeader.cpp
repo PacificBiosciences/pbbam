@@ -5,6 +5,7 @@
 #include <pbbam/vcf/VcfHeader.h>
 
 #include <cassert>
+
 #include <type_traits>
 
 #include <pbbam/vcf/VcfFormat.h>

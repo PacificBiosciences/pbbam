@@ -8,13 +8,15 @@
 
 #include "pbbam/BaiIndexCache.h"
 
+#include <sstream>
 #include <stdexcept>
 
 #include <htslib/sam.h>
 
-#include "MemoryUtils.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/DataSet.h"
+
+#include "MemoryUtils.h"
 
 namespace PacBio {
 namespace BAM {
@@ -34,8 +36,11 @@ BaiIndexCacheData::BaiIndexCacheData(const std::string& bamFilename)
 {
     d_->htsIndex_.reset(bam_index_load(bamFilename.c_str()));
     if (!d_->htsIndex_) {
-        throw std::runtime_error{"BaiIndexCache: could not load *.bai index data for file: " +
-                                 bamFilename};
+        std::ostringstream s;
+        s << "[pbbam] BAI index cache ERROR: could not load *.bai index data:\n"
+          << "  BAM file: " << bamFilename << '\n'
+          << "  BAI file: " + bamFilename + ".bai";
+        throw std::runtime_error{s.str()};
     }
 }
 

@@ -10,11 +10,13 @@
 
 #include <cassert>
 #include <cstddef>
+
 #include <sstream>
 #include <stdexcept>
 
-#include "MemoryUtils.h"
 #include "pbbam/BaiIndexCache.h"
+
+#include "MemoryUtils.h"
 
 namespace PacBio {
 namespace BAM {
@@ -49,10 +51,14 @@ public:
         }
 
         if (!htsIterator_) {
+            // clang-format off
             std::ostringstream s;
-            s << "BaiIndexedBamReader: could not create iterator for requested region: "
-              << interval.Name() << " [" << interval.Start() << ", " << interval.Stop() << ')';
+            s << "[pbbam] indexed BAM reader ERROR: could not create iterator for requested region: "
+              << interval.Interval() << '\n'
+              << "  BAM file: " << file_.Filename() << '\n'
+              << "  BAI file: " << file_.StandardIndexFilename();
             throw std::runtime_error{s.str()};
+            // clang-format on
         }
     }
 

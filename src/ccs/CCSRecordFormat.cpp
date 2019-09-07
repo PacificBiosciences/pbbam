@@ -30,7 +30,8 @@ namespace CCS {
 CCSHeader CCSRecordFormat::DeserializeHeader(const std::vector<std::string>& lines)
 {
     if (lines.empty())
-        throw std::runtime_error{"CCS record format: cannot create header from empty text"};
+        throw std::runtime_error{
+            "[pbbam] CCS record format ERROR: cannot create header from empty text"};
 
     CCSHeader result;
     std::vector<std::string> fields;
@@ -38,9 +39,9 @@ CCSHeader CCSRecordFormat::DeserializeHeader(const std::vector<std::string>& lin
         fields = PacBio::BAM::Split(line, '=');
         if (fields.size() != 2) {
             std::ostringstream msg;
-            msg << "CCS record format: malformatted header line\n"
-                << line << '\n'
-                << "must have syntax 'name=value'";
+            msg << "[pbbam] CCS record format ERROR: must have syntax 'name=value' in header "
+                   "line:\n"
+                << line;
             throw std::runtime_error{msg.str()};
         }
 
@@ -52,7 +53,7 @@ CCSHeader CCSRecordFormat::DeserializeHeader(const std::vector<std::string>& lin
         else if (fields[0] == FrameRate)         result.FrameRate = fields[1];
         else {
             std::ostringstream msg;
-            msg << "CCS record format: unrecognized header field name: '" << fields[0] << '\'';
+            msg << "[pbbam] CCS record format ERROR: unrecognized header field name: '" << fields[0] << '\'';
             throw std::runtime_error{msg.str()};
         }
         // clang-format on
@@ -78,7 +79,7 @@ CCSRecord CCSRecordFormat::DeserializeRecord(const std::string& line)
     const auto fields = PacBio::BAM::Split(line);
     if (fields.size() != 8) {
         std::ostringstream msg;
-        msg << "CCS record format: malformatted record line\n" << line << '\n';
+        msg << "[pbbam] CCS record format ERROR: malformed record line:\n" << line;
         throw std::runtime_error{msg.str()};
     }
 
@@ -93,7 +94,7 @@ CCSRecord CCSRecordFormat::DeserializeRecord(const std::string& line)
     const auto snrs = PacBio::BAM::Split(fields[5], ',');
     if (snrs.size() != 4) {
         std::ostringstream msg;
-        msg << "CCS record format: SNR field must have 4 values";
+        msg << "[pbbam] CCS record format ERROR: SNR field must have 4 values";
         throw std::runtime_error{msg.str()};
     }
     result.SignalToNoise = {

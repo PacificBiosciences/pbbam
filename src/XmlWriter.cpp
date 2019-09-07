@@ -5,9 +5,11 @@
 #include "XmlWriter.h"
 
 #include <cstddef>
+
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <stdexcept>
 
 #include "pbbam/DataSet.h"
 
@@ -93,7 +95,8 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
 
     // create top-level dataset XML node
     const auto label = OutputName(dataset, registry);
-    if (label.empty()) throw std::runtime_error{"XmlReader: could not convert dataset node to XML"};
+    if (label.empty())
+        throw std::runtime_error{"[pbbam] XML writer ERROR: could not convert dataset node to XML"};
     auto root = doc.append_child(label.c_str());
 
     const auto& text = dataset.Text();

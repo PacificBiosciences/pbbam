@@ -9,6 +9,7 @@
 #include "pbbam/Validator.h"
 
 #include <cstddef>
+
 #include <iostream>
 #include <map>
 #include <set>
@@ -19,13 +20,14 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/core/ignore_unused.hpp>
 
-#include "ValidationErrors.h"
-#include "Version.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/BamHeader.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/EntireFileQuery.h"
 #include "pbbam/ReadGroupInfo.h"
+
+#include "ValidationErrors.h"
+#include "Version.h"
 
 namespace PacBio {
 namespace BAM {

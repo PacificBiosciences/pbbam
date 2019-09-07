@@ -121,7 +121,11 @@ inline bool FilterWrapper::WrapperImpl<T>::Accepts(const PbiRawData& idx, const 
 
 struct PbiFilterPrivate
 {
-    PbiFilterPrivate(PbiFilter::CompositionType type = PbiFilter::INTERSECT) : type_{type} {}
+    PbiFilterPrivate(PbiFilter::CompositionType type = PbiFilter::INTERSECT) : type_{type}
+    {
+        if (type_ != PbiFilter::INTERSECT && type_ != PbiFilter::UNION)
+            throw std::runtime_error{"[pbbam] PBI filter ERROR: invalid composite filter type"};
+    }
 
     template <typename T>
     void Add(T filter)
@@ -150,16 +154,13 @@ struct PbiFilterPrivate
         }
 
         // union of child filters
-        else if (type_ == PbiFilter::UNION) {
+        else {
+            assert(type_ == PbiFilter::UNION);
             for (const auto& filter : filters_) {
                 if (filter.Accepts(idx, row)) return true;  // break early on pass
             }
             return false;  // none passed
         }
-
-        else
-            //assert(false); // invalid composite filter type
-            throw std::runtime_error{"PbiFilter: invalid composite filter type"};
     }
 
     PbiFilter::CompositionType type_;

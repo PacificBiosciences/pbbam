@@ -6,12 +6,15 @@
 
 #include <sys/stat.h>
 #include <unistd.h>
+
 #include <cassert>
 #include <cstddef>
-#include <exception>
+
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <sstream>
+#include <stdexcept>
 
 #include <boost/algorithm/string.hpp>
 
@@ -31,8 +34,12 @@ static std::string removeFileUriScheme(const std::string& uri)
     const auto fileScheme = std::string{"file://"};
     const auto schemeFound = schemeLess.find(fileScheme);
     if (schemeFound != std::string::npos) {
-        if (schemeFound != 0)
-            throw std::runtime_error{"FileUtils: malformed URI, scheme is not at beginning"};
+        if (schemeFound != 0) {
+            std::ostringstream s;
+            s << "[pbbam] file utilities ERROR: malformed URI, scheme is not at beginning:\n"
+              << "  uri: " << uri;
+            throw std::runtime_error{s.str()};
+        }
         schemeLess = schemeLess.substr(fileScheme.size());
     }
     return schemeLess;
@@ -131,7 +138,7 @@ static std::string native_resolvedFilePath(const std::string& filePath, const st
 
 #endif  // PBBAM_WIN_FILEPATHS
 
-}  // anonymous
+}  // namespace
 
 // see http://stackoverflow.com/questions/2869594/how-return-a-stdstring-from-cs-getcwd-function
 std::string FileUtils::CurrentWorkingDirectory()
@@ -145,7 +152,8 @@ std::string FileUtils::CurrentWorkingDirectory()
 
     // if error is not ERANGE, then it's not a problem of too-long name... something else happened
     if (errno != ERANGE)
-        throw std::runtime_error{"FileUtils: could not determine current working directory path"};
+        throw std::runtime_error{
+            "[pbbam] file utilities ERROR: could not determine current working directory path"};
 
     // long path - use heap, trying progressively longer buffers
     for (size_t chunks = 2; chunks < maxNumChunks; ++chunks) {
@@ -155,12 +163,13 @@ std::string FileUtils::CurrentWorkingDirectory()
         // if error is not ERANGE, then it's not a problem of too-long name... something else happened
         if (errno != ERANGE)
             throw std::runtime_error{
-                "FileUtils: could not determine current working directory path"};
+                "[pbbam] file utilities ERROR: could not determine current working directory path"};
     }
 
     // crazy long path name
     throw std::runtime_error{
-        "FileUtils: could not determine current working directory - extremely long path"};
+        "[pbbam] file utilities ERROR: could not determine current working directory - extremely "
+        "long path"};
 }
 
 std::string FileUtils::DirectoryName(const std::string& file)
@@ -179,8 +188,12 @@ bool FileUtils::Exists(const char* fn)
 std::chrono::system_clock::time_point FileUtils::LastModified(const char* fn)
 {
     struct stat s;
-    if (stat(fn, &s) != 0)
-        throw std::runtime_error{"FileUtils: could not get timestamp for file: " + std::string{fn}};
+    if (stat(fn, &s) != 0) {
+        std::ostringstream msg;
+        msg << "[pbbam] file utilities ERROR: could not determine 'last modified' timestamp:\n"
+            << "  file: " << fn;
+        throw std::runtime_error{msg.str()};
+    }
     return std::chrono::system_clock::from_time_t(s.st_mtime);
 }
 
@@ -194,8 +207,12 @@ constexpr char FileUtils::Separator() { return native_pathSeparator; }
 off_t FileUtils::Size(const char* fn)
 {
     struct stat s;
-    if (stat(fn, &s) != 0)
-        throw std::runtime_error{"FileUtils: could not determine size of file: " + std::string{fn}};
+    if (stat(fn, &s) != 0) {
+        std::ostringstream msg;
+        msg << "[pbbam] file utilities ERROR: could not determine file size:\n"
+            << "  file: " << fn;
+        throw std::runtime_error{msg.str()};
+    }
     return s.st_size;
 }
 

@@ -6,8 +6,9 @@
 #include "pbbam/Config.h"
 
 #include <cassert>
-#include <chrono>
 #include <ctime>
+
+#include <chrono>
 #include <stdexcept>
 #include <string>
 

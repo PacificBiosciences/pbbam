@@ -125,68 +125,23 @@ TEST(DataSetIOTest, FromXmlFile)
 
 TEST(DataSetIOTest, ThrowsOnNonexistentFofnFile)
 {
-    bool checkedException = false;
-    try
-    {
-        auto ds = DataSet{"does/not/exist.fofn"};
-    }
-    catch(std::runtime_error& e)
-    {
-        const std::string msg = "DataSet: could not open FOFN for reading: does/not/exist.fofn";
-        EXPECT_EQ(msg, e.what()) ;
-        checkedException = true;
-    }
-    EXPECT_TRUE(checkedException);
+    EXPECT_THROW(DataSet("does/not/exist.fofn"), std::exception);
 }
 
 TEST(DataSetIOTest, ThrowsOnNonexistentXmlFile)
 {
-    bool checkedException = false;
-    try
-    {
-        auto ds = DataSet{"does/not/exist.xml"};
-    }
-    catch(std::runtime_error& e)
-    {
-        const std::string msg = "DataSet: could not open XML file for reading: does/not/exist.xml";
-        EXPECT_EQ(msg, e.what()) ;
-        checkedException = true;
-    }
-    EXPECT_TRUE(checkedException);
+    EXPECT_THROW(DataSet("does/not/exist.xml"), std::exception);
 }
 
 TEST(DataSetIOTest, ThrowsOnUnsupportedExtension)
 {
-    bool checkedException = false;
-    try
-    {
-        auto ds = DataSet{"bad/extension.foo"};
-    }
-    catch(std::runtime_error& e)
-    {
-        const std::string msg = "DataSet: unsupported extension on input file: bad/extension.foo";
-        EXPECT_EQ(msg, e.what()) ;
-        checkedException = true;
-    }
-    EXPECT_TRUE(checkedException);
+    EXPECT_THROW(DataSet("bad/extension.foo"), std::exception);
 }
 
 TEST(DataSetIOTest, ThrowsIfCannotOpenSaveFile)
 {
-    bool checkedException = false;
-    try
-    {
-        auto ds = DataSet{};
-        std::string fn = "fake_directory_that_should_not_exist/out.xml";
-        ds.Save(fn);
-    }
-    catch(std::runtime_error& e)
-    {
-        const std::string msg = "DataSet: could not open XML file for writing: fake_directory_that_should_not_exist/out.xml";
-        EXPECT_EQ(msg, e.what()) ;
-        checkedException = true;
-    }
-    EXPECT_TRUE(checkedException);
+    DataSet ds;
+    EXPECT_THROW(ds.Save("fake_directory_that_should_not_exist/out.xml"), std::exception);
 }
 
 TEST(DataSetIOTest, ToXml)

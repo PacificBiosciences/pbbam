@@ -7,6 +7,7 @@
 #include "PbbamInternalConfig.h"
 
 #include <cassert>
+
 #include <tuple>
 #include <type_traits>
 

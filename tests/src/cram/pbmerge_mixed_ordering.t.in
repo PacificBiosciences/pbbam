@@ -43,13 +43,13 @@ Sanity Check:
 Normal Merge - should fail:
 
   $ $PBMERGE $UNALIGNED_BAM $ALIGNED_BAM > $MERGED_BAM
-  pbmerge ERROR: DataSet: cannot merge different dataset types
+  pbmerge ERROR: [pbbam] dataset ERROR: cannot merge different dataset types
   [1]
 
 Shuffle Input - should fail:
 
   $ $PBMERGE $ALIGNED_BAM $UNALIGNED_BAM > $MERGED_BAM
-  pbmerge ERROR: DataSet: cannot merge different dataset types
+  pbmerge ERROR: [pbbam] dataset ERROR: cannot merge different dataset types
   [1]
 
 Cleanup:

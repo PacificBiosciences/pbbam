@@ -10,6 +10,7 @@
 #include "pbbam/Config.h"
 
 #include <cstddef>
+
 #include <memory>
 #include <string>
 #include <tuple>

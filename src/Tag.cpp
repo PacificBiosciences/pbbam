@@ -9,6 +9,7 @@
 #include "pbbam/Tag.h"
 
 #include <cassert>
+
 #include <iostream>
 #include <type_traits>
 
@@ -38,7 +39,7 @@ struct AsciiConvertVisitor : public boost::static_visitor<char>
     template <typename T>
     char operator()(const T&) const
     {
-        throw std::runtime_error{"Tag: cannot convert to ASCII"};
+        throw std::runtime_error{"[pbbam] tag ERROR: cannot convert to ASCII"};
         return 0;
     }
 
@@ -46,7 +47,8 @@ private:
     template <typename T>
     char Helper(const T& x) const
     {
-        if (!InAsciiRange(x)) throw std::runtime_error{"Tag: char is outside valid ASCII range"};
+        if (!InAsciiRange(x))
+            throw std::runtime_error{"[pbbam] tag ERROR: char is outside valid ASCII range"};
         return static_cast<char>(x);
     }
 };
@@ -68,7 +70,7 @@ struct NumericConvertVisitor : public boost::static_visitor<DesiredType>
     {
         const std::string from = typeid(t).name();
         const std::string to = typeid(DesiredType).name();
-        const std::string msg = "Tag: cannot convert type " + from + " to " + to;
+        const std::string msg = "[pbbam] tag ERROR: cannot convert type " + from + " to " + to;
         throw std::runtime_error(msg);
         return 0;
     }
@@ -120,7 +122,7 @@ struct TypenameVisitor : public boost::static_visitor<std::string>
     std::string operator()(const std::vector<float>&) const { return "vector<float>"; }
 };
 
-}  // anonymous
+}  // namespace
 
 static_assert(std::is_copy_constructible<Tag>::value, "Tag(const Tag&) is not = default");
 static_assert(std::is_copy_assignable<Tag>::value, "Tag& operator=(const Tag&) is not = default");
@@ -150,7 +152,7 @@ Tag::Tag(int8_t value, const TagModifier mod) : data_{value}, modifier_(mod)
 {
     if (mod == TagModifier::HEX_STRING)
         throw std::runtime_error{
-            "Tag: HEX_STRING is not a valid tag modifier for int8_t data. "
+            "[pbbam] tag ERROR: HEX_STRING is not a valid tag modifier for int8_t data. "
             "It is intended for string-type data only."};
 }
 
@@ -158,7 +160,7 @@ Tag::Tag(std::string value, TagModifier mod) : data_{std::move(value)}, modifier
 {
     if (mod == TagModifier::ASCII_CHAR)
         throw std::runtime_error{
-            "Tag: ASCII_CHAR is not a valid tag modifier for string-type data. "
+            "[pbbam] tag ERROR: ASCII_CHAR is not a valid tag modifier for string-type data. "
             "To construct an ASCII char tag, use a single-quoted value (e.g. 'X' instead of "
             "\"X\")"};
 }

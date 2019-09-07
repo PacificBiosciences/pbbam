@@ -11,17 +11,20 @@
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
+
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
 #include <boost/optional.hpp>
 
+#include "pbbam/Validator.h"
+
 #include "Autovalidate.h"
 #include "MemoryUtils.h"
-#include "pbbam/Validator.h"
 
 namespace PacBio {
 namespace BAM {
@@ -33,8 +36,10 @@ public:
     {
         htsFile_.reset(sam_open(filename_.c_str(), "rb"));
         if (!htsFile_ || !htsFile_->fp.bgzf) {
-            throw std::runtime_error{"BamReader: could not open BAM file for reading: " +
-                                     filename_};
+            std::ostringstream s;
+            s << "[pbbam] BAM reader ERROR: could not open:\n"
+              << "  file: " << filename_;
+            throw std::runtime_error{s.str()};
         }
 
         std::unique_ptr<bam_hdr_t, HtslibHeaderDeleter> hdr(sam_hdr_read(htsFile_.get()));
@@ -88,7 +93,9 @@ bool BamReader::GetNext(BamRecord& record)
     // error corrupted file
     else {
         std::ostringstream msg;
-        msg << "BamReader: cannot read from corrupted file: " << Filename() << '\n' << "  reason: ";
+        msg << "[pbbam] BAM reader ERROR: cannot read from corrupted file:\n"
+            << "  file: " << Filename() << '\n'
+            << "  reason: ";
         if (result == -2)
             msg << "probably truncated";
         else if (result == -3)
@@ -106,7 +113,13 @@ int BamReader::ReadRawData(BGZF* bgzf, bam1_t* b) { return bam_read1(bgzf, b); }
 void BamReader::VirtualSeek(int64_t virtualOffset)
 {
     const auto result = bgzf_seek(Bgzf(), virtualOffset, SEEK_SET);
-    if (result != 0) throw std::runtime_error{"Failed to seek in BAM file"};
+    if (result != 0) {
+        std::ostringstream msg;
+        msg << "[pbbam] BAM reader ERROR: failed to seek:\n"
+            << "  file: " << Filename() << '\n'
+            << "  vOffset: " << virtualOffset;
+        throw std::runtime_error{msg.str()};
+    }
 }
 
 int64_t BamReader::VirtualTell() const { return bgzf_tell(Bgzf()); }

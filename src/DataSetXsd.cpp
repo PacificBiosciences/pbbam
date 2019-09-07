@@ -9,6 +9,7 @@
 #include "pbbam/DataSetXsd.h"
 
 #include <cassert>
+
 #include <type_traits>
 #include <unordered_map>
 
