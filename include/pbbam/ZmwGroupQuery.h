@@ -12,25 +12,37 @@
 #include <cstdint>
 #include <vector>
 
+#include "pbbam/DataSet.h"
 #include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {
 namespace BAM {
 
 /// \brief The ZmwGroupQuery class provides iterable access to a DataSet's
-///        %BAM records, limiting results to those matching a ZMW hole number
-///        whitelist, and grouping those results by hole number.
+///        %BAM records, (optionally limiting results to those matching a ZMW
+///        whitelist), grouping those results by hole number.
 ///
 /// Example:
 /// \include code/ZmwGroupQuery.txt
 ///
-/// \note Currently, all %BAM files must have a corresponding ".pbi" index file.
+/// \note %BAM files for whitelisted queries, or with DataSetFilterMode::APPLY,
+///       must have a corresponding ".pbi" index file.
 ///       Use BamFile::EnsurePacBioIndexExists before creating the query if one
 ///       may not be present.
 ///
 class PBBAM_EXPORT ZmwGroupQuery : public internal::IGroupQuery
 {
 public:
+    ///
+    /// \brief Creates a new ZmwGroupQuery that returns BamRecords grouped by ZMW,
+    ///        accessing each file in a 'round-robin' fashion.
+    ///
+    /// \param dataset      input data
+    /// \param filterMode   apply/ignore any filters in XML, if present
+    ///
+    ZmwGroupQuery(const DataSet& dataset,
+                  const DataSetFilterMode filterMode = DataSetFilterMode::APPLY);
+
     /// \brief Creates a new ZmwGroupQuery, limiting record results to only
     ///        those matching a ZMW hole number criterion.
     ///
@@ -53,6 +65,8 @@ public:
 
 private:
     class ZmwGroupQueryPrivate;
+    class RoundRobinZmwGroupQuery;
+    class WhitelistedZmwGroupQuery;
     std::unique_ptr<ZmwGroupQueryPrivate> d_;
 };
 

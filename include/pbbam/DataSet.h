@@ -22,6 +22,15 @@
 namespace PacBio {
 namespace BAM {
 
+///
+/// Used in some cases to use or ignore filters specified in the *.xml.
+///
+enum class DataSetFilterMode
+{
+    APPLY,
+    IGNORE
+};
+
 /// \brief The DataSet class represents a %PacBio analyis dataset (e.g. from
 ///        XML).
 ///
