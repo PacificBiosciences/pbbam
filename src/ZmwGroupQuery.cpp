@@ -140,9 +140,75 @@ private:
     std::deque<internal::CompositeMergeItem> readerItems_;
 };
 
-ZmwGroupQuery::ZmwGroupQuery(const DataSet& dataset, const DataSetFilterMode filterMode)
-    : internal::IGroupQuery(), d_{std::make_unique<RoundRobinZmwGroupQuery>(dataset, filterMode)}
+class ZmwGroupQuery::SequentialZmwGroupQuery : public ZmwGroupQuery::ZmwGroupQueryPrivate
 {
+public:
+    SequentialZmwGroupQuery(const DataSet& dataset, const DataSetFilterMode filterMode)
+        : ZmwGroupQuery::ZmwGroupQueryPrivate()
+    {
+        const auto bamFilenames = dataset.BamFilenames();
+        const auto pbiFilter = PbiFilter::FromDataSet(dataset);
+        for (const auto& fn : bamFilenames) {
+            // create reader for file
+            auto makeReader = [&]() -> std::unique_ptr<BamReader> {
+                if (filterMode == DataSetFilterMode::APPLY)
+                    return std::make_unique<PbiIndexedBamReader>(pbiFilter, fn);
+                else
+                    return std::make_unique<BamReader>(fn);
+            };
+            internal::CompositeMergeItem item{makeReader()};
+
+            // try load first record, ignore file if nothing found
+            if (item.reader->GetNext(item.record)) readerItems_.push_back(std::move(item));
+        }
+    }
+
+    bool GetNext(std::vector<BamRecord>& records) override
+    {
+        records.clear();
+
+        // quick exit if nothing left
+        if (readerItems_.empty()) return false;
+
+        // pop first reader from the queue & store its record
+        auto firstIter = readerItems_.begin();
+        internal::CompositeMergeItem item{std::move(firstIter->reader),
+                                          std::move(firstIter->record)};
+        readerItems_.pop_front();
+        auto zmw = item.record.HoleNumber();
+        records.push_back(item.record);
+
+        while (true) {
+            if (item.reader->GetNext(item.record)) {
+                // if same ZMW, store and continue
+                // else stop reading and keep this reader/record for next time
+                if (item.record.HoleNumber() == zmw)
+                    records.push_back(item.record);
+                else {
+                    readerItems_.push_front(std::move(item));
+                    break;
+                }
+            }
+
+            // no data remaining for this reader, let it go
+            else
+                break;
+        }
+        return !records.empty();
+    }
+
+private:
+    std::deque<internal::CompositeMergeItem> readerItems_;
+};
+
+ZmwGroupQuery::ZmwGroupQuery(const DataSet& dataset, const ZmwFileIterationMode iterationMode,
+                             const DataSetFilterMode filterMode)
+    : internal::IGroupQuery()
+{
+    if (iterationMode == ZmwFileIterationMode::SEQUENTIAL)
+        d_ = std::make_unique<SequentialZmwGroupQuery>(dataset, filterMode);
+    else
+        d_ = std::make_unique<RoundRobinZmwGroupQuery>(dataset, filterMode);
 }
 
 ZmwGroupQuery::ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset)
