@@ -11,6 +11,12 @@ The **pbbam** software package provides components to create, query, & edit PacB
 files and associated indices. These components include a core C++ library, bindings for
 additional languages, and command-line utilities.
 
+## Availability
+Latest `pbbam` can be installed via bioconda package `pbbam`.
+
+Please refer to our [official pbbioconda page](https://github.com/PacificBiosciences/pbbioconda)
+for information on Installation, Support, License, Copyright, and Disclaimer.
+
 ### Note:
 
 This library is **not** intended to be used as a general-purpose BAM utility - all input & output BAMs must adhere to the [PacBio BAM format specification](https://github.com/PacificBiosciences/PacBioFileFormats/blob/3.0/BAM.rst). Non-PacBio BAMs will cause exceptions to be thrown.
