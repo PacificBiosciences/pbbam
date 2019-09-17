@@ -4,23 +4,25 @@
 
 #include "pbbam/BamRecordImpl.h"
 
-#include <algorithm>
-#include <array>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+
+#include <algorithm>
+#include <array>
 #include <iostream>
 #include <tuple>
 #include <utility>
 
 #include <htslib/hts_endian.h>
 
-#include "BamRecordTags.h"
-#include "MemoryUtils.h"
 #include "pbbam/BamTagCodec.h"
 #include "pbbam/StringUtilities.h"
+
+#include "BamRecordTags.h"
+#include "MemoryUtils.h"
 
 namespace PacBio {
 namespace BAM {
@@ -582,9 +584,10 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualities(const std::string& sequenc
 {
     if (!qualities.empty() && (sequence.size() != qualities.size())) {
         std::ostringstream s;
-        s << "BamRecord: if qualities are provided, the length must match the sequence length:\n"
-          << "  seq: " << sequence.size() << '\n'
-          << "  qualities: " << qualities.size();
+        s << "[pbbam] BAM record ERROR: if qualities are provided, the length must match the "
+             "sequence length:\n"
+          << "  sequence length: " << sequence.size() << '\n'
+          << "  qualities length: " << qualities.size();
         throw std::runtime_error{s.str()};
     }
     return SetSequenceAndQualitiesInternal(sequence.c_str(), sequence.size(), qualities.c_str(),
@@ -663,7 +666,7 @@ BamRecordImpl& BamRecordImpl::SetSupplementaryAlignment(bool ok)
 int BamRecordImpl::TagOffset(const std::string& tagName) const
 {
     if (tagName.size() != 2)
-        throw std::runtime_error{"BamRecord: tag name (" + tagName +
+        throw std::runtime_error{"[pbbam] BAM record ERROR: tag name (" + tagName +
                                  ") must have 2 characters only"};
 
     if (tagOffsets_.empty()) UpdateTagMap();
@@ -798,7 +801,7 @@ void BamRecordImpl::UpdateTagMap() const
                     // unknown subTagType
                     default:
                         throw std::runtime_error{
-                            "BamRecord: unsupported array-tag-type encountered: " +
+                            "[pbbam] BAM record ERROR: unsupported array-tag-type encountered: " +
                             std::string{1, subTagType}};
                 }
 
@@ -810,8 +813,9 @@ void BamRecordImpl::UpdateTagMap() const
 
             // unknown tagType
             default:
-                throw std::runtime_error{"BamRecord: unsupported tag-type encountered: " +
-                                         std::string{1, tagType}};
+                throw std::runtime_error{
+                    "[pbbam] BAM record ERROR: unsupported tag-type encountered: " +
+                    std::string{1, tagType}};
         }
     }
 }

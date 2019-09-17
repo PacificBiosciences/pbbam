@@ -38,7 +38,7 @@ const char* ValidationException::what() const noexcept { return msg_.c_str(); }
 void ValidationException::FormatMessage()
 {
     std::ostringstream s;
-    s << "Validation failed:\n";
+    s << "[pbbam] validation failed:\n";
 
     // file errors
     if (!fileErrors_.empty()) {

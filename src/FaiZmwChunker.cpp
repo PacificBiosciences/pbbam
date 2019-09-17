@@ -23,7 +23,8 @@ int32_t HoleNumber(const std::string& name)
 {
     const auto firstSlash = name.find('/');
     if (firstSlash == std::string::npos)
-        throw std::runtime_error{"FaiZmwChunker: could not parse hole number from name: " + name};
+        throw std::runtime_error{
+            "[pbbam] FAI chunking ERROR: could not parse hole number from name: " + name};
 
     auto numberEnd = name.find('/', firstSlash + 1);
     if (numberEnd == std::string::npos) numberEnd = name.size();
@@ -37,7 +38,8 @@ FaiZmwChunker::FaiZmwChunker(const FaiIndex& index, const size_t numChunks)
 {
     // zero chunks is error
     if (numChunks == 0)
-        throw std::runtime_error{"FaiZmwChunker: requested chunk count must be greater than zero"};
+        throw std::runtime_error{
+            "[pbbam] FAI chunking ERROR: requested chunk count must be greater than zero"};
 
     // empty index is not (?), but quick return
     const auto& names = index.Names();

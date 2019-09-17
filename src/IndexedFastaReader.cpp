@@ -74,9 +74,11 @@ public:
     {
         handle_.reset(fai_load(fastaFilename_.c_str()));
         if (handle_ == nullptr) {
-            throw std::runtime_error{
-                "IndexedFastaReader: could not open index file (*.fai) for FASTA file: " +
-                fastaFilename_};
+            std::ostringstream msg;
+            msg << "[pbbam] FASTA reader ERROR: could not load *.fai index data:\n"
+                << "  FASTA file: " << fastaFilename_ << '\n'
+                << "  index file: " << fastaFilename_ << ".fai\n";
+            throw std::runtime_error{msg.str()};
         }
     }
 
@@ -124,8 +126,9 @@ std::string IndexedFastaReader::Subsequence(const std::string& id, Position begi
         faidx_fetch_seq(d_->handle_.get(), id.c_str(), begin, end - 1, &len)};
     if (rawSeq == nullptr) {
         std::ostringstream s;
-        s << "IndexedFastaReader: could not fetch sequence from region: " << id << " [" << begin
-          << ", " << end << ") in FASTA file: " << d_->fastaFilename_;
+        s << "[pbbam] indexed FASTA reader ERROR: could not fetch subsequence from region: " << id
+          << " [" << begin << ", " << end << ")\n"
+          << "  FASTA file: " << d_->fastaFilename_;
         throw std::runtime_error{s.str()};
     }
     return RemoveAllWhitespace(rawSeq.get());
@@ -142,9 +145,11 @@ std::string IndexedFastaReader::Subsequence(const char* htslibRegion) const
     const std::unique_ptr<char, Utility::FreeDeleter> rawSeq(
         fai_fetch(d_->handle_.get(), htslibRegion, &len));
     if (rawSeq == nullptr) {
-        throw std::runtime_error{"IndexedFastaReader: could not fetch sequence from region: " +
-                                 std::string{htslibRegion} + " in FASTA file: " +
-                                 d_->fastaFilename_};
+        std::ostringstream s;
+        s << "[pbbam] indexed FASTA reader ERROR: could not fetch subsequence from region: "
+          << htslibRegion << '\n'
+          << "  FASTA file: " << d_->fastaFilename_;
+        throw std::runtime_error{s.str()};
     }
     return RemoveAllWhitespace(rawSeq.get());
 }
@@ -182,9 +187,9 @@ std::string IndexedFastaReader::Name(const size_t idx) const
 {
     if (static_cast<int>(idx) >= NumSequences()) {
         std::ostringstream s;
-        s << "IndexedFastaReader: cannot fetch sequence name. Index (" << idx
-          << ") is larger than the number of sequences: (" << NumSequences()
-          << ") in FASTA file: " << d_->fastaFilename_;
+        s << "[pbbam] indexed FASTA reader ERROR: cannot fetch sequence name. Index (" << idx
+          << ") is larger than the number of sequences: (" << NumSequences() << ")\n"
+          << "  FASTA file: " << d_->fastaFilename_;
         throw std::runtime_error{s.str()};
     }
     return {faidx_iseq(d_->handle_.get(), idx)};
@@ -199,8 +204,11 @@ int IndexedFastaReader::SequenceLength(const std::string& name) const
 {
     const auto len = faidx_seq_len(d_->handle_.get(), name.c_str());
     if (len < 0) {
-        throw std::runtime_error{"IndexedFastaReader: could not determine sequence length of " +
-                                 name + " in FASTA file: " + d_->fastaFilename_};
+        std::ostringstream s;
+        s << "[pbbam] indexed FASTA reader ERROR: could not determine sequence length of " << name
+          << '\n'
+          << "  FASTA file: " << d_->fastaFilename_;
+        throw std::runtime_error{s.str()};
     }
     return len;
 }

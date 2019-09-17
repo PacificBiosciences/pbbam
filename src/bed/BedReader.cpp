@@ -36,20 +36,26 @@ public:
     {
         // validate extension
         if (!FormatUtils::IsBedFilename(fn)) {
-            throw std::runtime_error{"BedReader ERROR: filename '" + fn +
-                                     "' is not recognized as a BED file."};
-        }
+            std::ostringstream msg;
+            msg << "[pbbam] BED reader ERROR: not a recognized BED extension:\n"
+                << "  filename: " << fn << '\n';
+            throw std::runtime_error{msg.str()};
+        };
 
         // open file stream
         reader_ = std::make_unique<TextFileReader>(fn);
         if (!reader_) {
-            throw std::runtime_error("BedReader ERROR: could not open text file '" + fn +
-                                     "' for reading");
+            std::ostringstream msg;
+            msg << "[pbbam] BED reader ERROR: could not open file:\n"
+                << "  BED file: " << fn << '\n';
+            throw std::runtime_error{msg.str()};
         }
 
         // pre-fetch first record
         GetNext();
     }
+
+    const std::string& Filename() const { return reader_->Filename(); }
 
     void GetNext()
     {
@@ -67,9 +73,9 @@ public:
         const auto fields = PacBio::BAM::Split(line, '\t');
         if (fields.size() < 3) {
             std::ostringstream msg;
-            msg << "BedReader ERROR: invalid BED record. Line:\n"
-                << line << '\n'
-                << "has less than 3 fields.";
+            msg << "[pbbam] BED reader ERROR: invalid BED record. Line has fewer than 3 fields:\n"
+                << line << "'\n"
+                << "  BED file: " << reader_->Filename() << '\n';
             throw std::runtime_error{msg.str()};
         }
 
@@ -93,6 +99,8 @@ BedReader::BedReader(BedReader&&) noexcept = default;
 BedReader& BedReader::operator=(BedReader&&) noexcept = default;
 
 BedReader::~BedReader() = default;
+
+const std::string& BedReader::Filename() const { return d_->Filename(); }
 
 bool BedReader::GetNext(GenomicInterval& interval)
 {

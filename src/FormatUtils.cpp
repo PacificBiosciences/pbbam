@@ -5,6 +5,8 @@
 #include "pbbam/FormatUtils.h"
 
 #include <algorithm>
+#include <sstream>
+#include <stdexcept>
 
 #include <boost/algorithm/string.hpp>
 
@@ -39,7 +41,12 @@ HtslibCompression FormatUtils::CompressionType(BGZF* bgzf)
 HtslibCompression FormatUtils::CompressionType(const std::string& fn)
 {
     std::unique_ptr<BGZF, HtslibBgzfDeleter> bgzf(bgzf_open(fn.c_str(), "rb"));
-    if (bgzf == nullptr) throw std::runtime_error{"could not check compression level for: " + fn};
+    if (bgzf == nullptr) {
+        std::ostringstream s;
+        s << "[pbbam] bgzip utility ERROR: could not open file to determine compression level:\n"
+          << "  file: " << fn;
+        throw std::runtime_error{s.str()};
+    }
     return CompressionType(bgzf.get());
 }
 

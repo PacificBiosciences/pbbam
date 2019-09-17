@@ -57,7 +57,7 @@ std::vector<T> readBamMultiValue(const uint8_t* src, size_t& offset)
     return result;
 }
 
-}  // anonymous
+}  // namespace
 
 TagCollection BamTagCodec::Decode(const std::vector<uint8_t>& data)
 {
@@ -144,7 +144,8 @@ TagCollection BamTagCodec::Decode(const std::vector<uint8_t>& data)
                     // unknown subTagType
                     default:
                         throw std::runtime_error{
-                            "BamTagCodec: unsupported array-tag-type encountered: " +
+                            "[pbbam] BAM tag format ERROR: unsupported array-tag-type "
+                            "encountered: " +
                             std::string{1, subTagType}};
                 }
                 break;
@@ -152,8 +153,9 @@ TagCollection BamTagCodec::Decode(const std::vector<uint8_t>& data)
 
             // unknown tagType
             default:
-                throw std::runtime_error{"BamTagCodec: unsupported tag-type encountered: " +
-                                         std::string{1, tagType}};
+                throw std::runtime_error{
+                    "[pbbam] BAM tag format ERROR: unsupported tag-type encountered: " +
+                    std::string{1, tagType}};
         }
     }
 
@@ -168,7 +170,7 @@ std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
 
         const auto& name = tagIter.first;
         if (name.size() != 2)
-            throw std::runtime_error{"BamTagCodec: tag name (" + name +
+            throw std::runtime_error{"[pbbam] BAM tag format ERROR: tag name (" + name +
                                      ") must have 2 characters only"};
 
         const auto& tag = tagIter.second;
@@ -281,8 +283,9 @@ std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
             // unsupported tag type
             default: {
                 free(str.s);
-                throw std::runtime_error{"BamTagCodec: unsupported tag-type encountered: " +
-                                         std::to_string(static_cast<uint16_t>(tag.Type()))};
+                throw std::runtime_error{
+                    "[pbbam] BAM tag format ERROR: unsupported tag-type encountered: " +
+                    std::to_string(static_cast<uint16_t>(tag.Type()))};
             }
         }
     }
@@ -352,7 +355,7 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
                 // unknown subTagType
                 default:
                     throw std::runtime_error{
-                        "BamTagCodec: unsupported array-tag-type encountered: " +
+                        "[pbbam] BAM tag format ERROR: unsupported array-tag-type encountered: " +
                         std::string{1, subTagType}};
             }
             break;
@@ -360,8 +363,9 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
 
         // unknown tagType
         default:
-            throw std::runtime_error{"BamTagCodec: unsupported tag-type encountered: " +
-                                     std::string{1, tagType}};
+            throw std::runtime_error{
+                "[pbbam] BAM tag format ERROR: unsupported tag-type encountered: " +
+                std::string{1, tagType}};
     }
     return Tag();  // to avoid compiler warning
 }
@@ -451,8 +455,9 @@ std::vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag, const TagModifier& a
             // unsupported tag type
             default: {
                 free(str.s);
-                throw std::runtime_error{"BamTagCodec: unsupported tag-type encountered: " +
-                                         std::to_string(static_cast<uint16_t>(tag.Type()))};
+                throw std::runtime_error{
+                    "[pbbam] BAM tag format ERROR: unsupported tag-type encountered: " +
+                    std::to_string(static_cast<uint16_t>(tag.Type()))};
             }
         }
     }
@@ -491,14 +496,15 @@ uint8_t BamTagCodec::TagTypeCode(const Tag& tag, const TagModifier& additionalMo
             default:
                 // non integers not allowed
                 throw std::runtime_error{
-                    "BamTagCodec: tag-type not convertible to ASCII, tag-type: " +
+                    "[pbbam] BAM tag format ERROR: tag-type not convertible to ASCII, tag-type: " +
                     std::to_string(static_cast<uint16_t>(tag.Type()))};
         }
 
         // ensure value is in valid ASCII char range
         if (value < 33 || value > 126)
-            throw std::runtime_error{"BamTagCodec: invalid integer value for ASCII char, value: " +
-                                     std::to_string(value)};
+            throw std::runtime_error{
+                "[pbbam] BAM tag format ERROR: invalid integer value for ASCII char, value: " +
+                std::to_string(value)};
 
         return static_cast<uint8_t>('A');
     }
@@ -536,8 +542,9 @@ uint8_t BamTagCodec::TagTypeCode(const Tag& tag, const TagModifier& additionalMo
             return static_cast<uint8_t>('B');
 
         default:
-            throw std::runtime_error{"BamTagCodec: unsupported tag-type encountered: " +
-                                     std::to_string(static_cast<uint16_t>(tag.Type()))};
+            throw std::runtime_error{
+                "[pbbam] BAM tag format ERROR: unsupported tag-type encountered: " +
+                std::to_string(static_cast<uint16_t>(tag.Type()))};
     }
     return 0;  // to avoid compiler warning
 }

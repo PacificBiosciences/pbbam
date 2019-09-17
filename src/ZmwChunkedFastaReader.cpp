@@ -8,10 +8,11 @@
 
 #include "pbbam/ZmwChunkedFastaReader.h"
 
+#include <cassert>
 #include <cstdio>
 
 #include <algorithm>
-#include <cassert>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -36,8 +37,10 @@ std::unique_ptr<ZmwChunkedFastxReaderImpl> MakeFastaReaderImpl(std::string filen
 {
     // validate extension
     if (!FormatUtils::IsFastaFilename(filename)) {
-        throw std::runtime_error{"ZmwChunkedFastaReader: filename '" + filename +
-                                 "' is not recognized as a FASTA file."};
+        std::ostringstream msg;
+        msg << "[pbbam] chunked FASTA reader ERROR: not a recognized FASTA extension:\n"
+            << "  file: " << filename;
+        throw std::runtime_error{msg.str()};
     }
 
     // determine subsequence "loader" from compression type: plain-text, bgzf, or unsupported
@@ -51,7 +54,8 @@ std::unique_ptr<ZmwChunkedFastxReaderImpl> MakeFastaReaderImpl(std::string filen
 
         case HtslibCompression::GZIP: {
             std::ostringstream msg;
-            msg << "ZmwChunkedFastaReader: random-access is not supported for plain gzipped "
+            msg << "[pbbam] chunked FASTA reader ERROR: random-access is not supported for plain "
+                   "gzipped "
                    "file "
                 << filename << "\n\n"
                 << "Compressed files must be bgzipped, with accompanying *.gzi "
@@ -67,9 +71,10 @@ std::unique_ptr<ZmwChunkedFastxReaderImpl> MakeFastaReaderImpl(std::string filen
         }
         default:
             assert(false);  // should never get here, the way htslib currently determines type
-            throw std::runtime_error{
-                "ZmwChunkedFastaReader: could not determine compression type for file: " +
-                filename};
+            std::ostringstream msg;
+            msg << "[pbbam] chunked FASTA reader ERROR: could not determine compression type:\n"
+                << "  file: " << filename;
+            throw std::runtime_error{msg.str()};
     }
 }
 

@@ -4,29 +4,48 @@
 
 #include "DataSetIO.h"
 
-#include <algorithm>
 #include <cassert>
 #include <cstddef>
+
+#include <algorithm>
 #include <exception>
 #include <fstream>
 #include <iostream>
+#include <sstream>
+#include <stdexcept>
 
 #include <boost/algorithm/string.hpp>
+
+#include "pbbam/StringUtilities.h"
 
 #include "FileUtils.h"
 #include "FofnReader.h"
 #include "XmlReader.h"
 #include "XmlWriter.h"
-#include "pbbam/StringUtilities.h"
 
 namespace PacBio {
 namespace BAM {
 namespace {
 
+struct DataSetFileException : public std::exception
+{
+    DataSetFileException(std::string filename, std::string reason) : std::exception{}
+    {
+        std::ostringstream s;
+        s << "[pbbam] dataset I/O ERROR: " << reason << ":\n"
+          << "  file: " << filename;
+        msg_ = s.str();
+    }
+
+    const char* what() const noexcept override { return msg_.c_str(); }
+
+    std::string msg_;
+};
+
 std::unique_ptr<DataSetBase> DataSetFromXml(const std::string& xmlFn)
 {
     std::ifstream in(xmlFn);
-    if (!in) throw std::runtime_error{"DataSet: could not open XML file for reading: " + xmlFn};
+    if (!in) throw DataSetFileException{xmlFn, "could not open XML file for reading"};
     return XmlReader::FromStream(in);
 }
 
@@ -61,7 +80,7 @@ std::unique_ptr<DataSetBase> DataSetFromFofn(const std::string& fofn)
 {
     const auto fofnDir = FileUtils::DirectoryName(fofn);
     std::ifstream in(fofn);
-    if (!in) throw std::runtime_error{"DataSet: could not open FOFN for reading: " + fofn};
+    if (!in) throw DataSetFileException{fofn, "could not open FOFN for reading"};
 
     auto filenames = FofnReader::Files(in);
     std::transform(
@@ -88,7 +107,7 @@ std::unique_ptr<DataSetBase> DataSetFromUri(const std::string& uri)
     }
 
     // unknown filename extension
-    throw std::runtime_error{"DataSet: unsupported extension on input file: " + uri};
+    throw DataSetFileException{uri, "unsupported extension on input file"};
 }
 
 }  // namespace
@@ -100,7 +119,7 @@ std::unique_ptr<DataSetBase> DataSetIO::FromUri(const std::string& uri)
 
 std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>& uris)
 {
-    if (uris.empty()) throw std::runtime_error{"DataSet: empty input URI list"};
+    if (uris.empty()) throw std::runtime_error{"[pbbam] dataset I/O ERROR: empty input URI list"};
 
     // create dataset(s) from URI(s)
     std::vector<std::unique_ptr<DataSetBase> > datasets;
@@ -125,7 +144,8 @@ std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>&
 
 std::unique_ptr<DataSetBase> DataSetIO::FromXmlString(const std::string& xml)
 {
-    if (xml.empty()) throw std::runtime_error{"DataSet: cannot load from empty XML string"};
+    if (xml.empty())
+        throw std::runtime_error{"[pbbam] dataset I/O ERROR: cannot load from empty XML string"};
     std::istringstream s{xml};
     return XmlReader::FromStream(s);
 }
@@ -143,7 +163,7 @@ void DataSetIO::ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostre
 void DataSetIO::ToFile(DataSetBase& dataset, const std::string& fn)
 {
     std::ofstream out(fn);
-    if (!out) throw std::runtime_error{"DataSet: could not open XML file for writing: " + fn};
+    if (!out) throw DataSetFileException{fn, "could not open XML file for writing"};
     XmlWriter::ToStream(dataset, out);
 }
 

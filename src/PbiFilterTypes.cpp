@@ -11,6 +11,7 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -56,7 +57,8 @@ IndexList readLengthHelper(const std::vector<T>& start, const std::vector<T>& en
             default:
                 assert(false);
                 throw std::runtime_error{
-                    "PbiFilter: read length filter encountered unknown compare type: " +
+                    "[pbbam] PBI filter ERROR: read length filter encountered unknown compare "
+                    "type: " +
                     Compare::TypeToName(cmp)};
         }
 
@@ -216,7 +218,8 @@ public:
         else if (cmp_ == Compare::NOT_EQUAL || cmp_ == Compare::NOT_CONTAINS)
             return !found;
         else
-            throw std::runtime_error{"PbiFilter: unsupported compare type on query name filter"};
+            throw std::runtime_error{
+                "[pbbam] PBI filter ERROR: unsupported compare type on query name filter"};
     }
 
     std::vector<int32_t> CandidateRgIds(const std::string& movieName, const RecordType type)
@@ -245,13 +248,13 @@ public:
         if (IsCcsOrTranscript(type)) {
             if (nameParts.size() != 2) {
                 const auto typeName = (type == RecordType::CCS) ? "CCS" : "transcript";
-                throw std::runtime_error{"PbiQueryNameFilter: requested QNAME (" + queryName +
+                throw std::runtime_error{"[pbbam] PBI filter ERROR: requested QNAME (" + queryName +
                                          ") is not valid for PacBio " + typeName +
                                          " reads. See spec for details."};
             }
         } else {
             if (nameParts.size() != 3) {
-                throw std::runtime_error{"PbiQueryNameFilter: requested QNAME (" + queryName +
+                throw std::runtime_error{"[pbbam] PBI filter ERROR: requested QNAME (" + queryName +
                                          ") is not a valid PacBio BAM QNAME. See spec for details"};
             }
         }
@@ -267,7 +270,7 @@ public:
         else {
             const auto queryIntervalParts = Split(nameParts.at(2), '_');
             if (queryIntervalParts.size() != 2) {
-                throw std::runtime_error{"PbiQueryNameFilter: requested QNAME (" + queryName +
+                throw std::runtime_error{"[pbbam] PBI filter ERROR: requested QNAME (" + queryName +
                                          ") is not a valid PacBio BAM QNAME. See spec for details"};
             }
             UpdateZmwQueryIntervals(zmwPtr.get(), zmw, std::stoi(queryIntervalParts.at(0)),
@@ -349,7 +352,7 @@ PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<int32_t>& rgIds, const 
 
     if (cmp_ != Compare::CONTAINS && cmp_ != Compare::NOT_CONTAINS) {
         throw std::runtime_error{
-            "PbiFilter: unsupported compare type (" + Compare::TypeToName(cmp) +
+            "[pbbam] PBI filter ERROR: unsupported compare type (" + Compare::TypeToName(cmp) +
             ") for this property. "
             "Read group filter can only compare equality or presence in whitelist/blacklist."};
     }
@@ -379,7 +382,7 @@ PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<ReadGroupInfo>& readGro
 
     if (cmp_ != Compare::CONTAINS && cmp_ != Compare::NOT_CONTAINS) {
         throw std::runtime_error{
-            "PbiFilter: unsupported compare type (" + Compare::TypeToName(cmp) +
+            "[pbbam] PBI filter ERROR: unsupported compare type (" + Compare::TypeToName(cmp) +
             ") for this property. "
             "Read group filter can only compare equality or presence in whitelist/blacklist."};
     }
@@ -512,7 +515,7 @@ void PbiReferenceNameFilter::Validate() const
     }();
     if (!compareTypeOk) {
         throw std::runtime_error{
-            "PbiFilter: unsupported compare type (" + Compare::TypeToName(cmp_) +
+            "[pbbam] PBI filter ERROR: unsupported compare type (" + Compare::TypeToName(cmp_) +
             ") for this property. "
             "Reference name filter can only compare equality or presence in whitelist/blacklist."};
     }

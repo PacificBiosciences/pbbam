@@ -6,6 +6,7 @@
 
 #include <cstdlib>
 #include <cstring>
+
 #include <string>
 
 namespace PacBio {
@@ -14,7 +15,7 @@ namespace BAM {
 BamHeader BamHeaderMemory::FromRawData(bam_hdr_t* hdr)
 {
     // null input - error
-    if (hdr == nullptr) throw std::runtime_error{"MemoryUtils: null BAM header"};
+    if (hdr == nullptr) throw std::runtime_error{"[pbbam] BAM header ERROR: null BAM header"};
 
     // empty text input - ok
     if (hdr->text == nullptr || hdr->l_text == 0) return BamHeader();

@@ -6,6 +6,7 @@
 #include "pbbam/Config.h"
 
 #include <cstdio>
+
 #include <memory>
 
 #include <htslib/bgzf.h>

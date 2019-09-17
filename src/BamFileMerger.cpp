@@ -46,16 +46,18 @@ struct QNameSorter
             lMovieName = l.MovieName();
         } catch (std::runtime_error const& err) {
             std::ostringstream s;
-            s << "BamFileMerger: could not get movie name from file: " << lhs.reader->Filename()
-              << " (reason = " << err.what() << ')';
+            s << "[pbbam] BAM file merging ERROR: could not get movie name:\n"
+              << "  file: " << lhs.reader->Filename() << '\n'
+              << "  reason: " << err.what();
             throw std::runtime_error(s.str());
         }
         try {
             rMovieName = r.MovieName();
         } catch (std::runtime_error const& err) {
             std::ostringstream s;
-            s << "BamFileMerger: could not get movie name from file: " << rhs.reader->Filename()
-              << " (reason = " << err.what() << ')';
+            s << "[pbbam] BAM file merging ERROR: could not get movie name:\n"
+              << "  file: " << rhs.reader->Filename() << '\n'
+              << "  reason: " << err.what();
             throw std::runtime_error(s.str());
         }
         const int cmp = lMovieName.compare(rMovieName);
@@ -157,7 +159,7 @@ std::unique_ptr<IRecordWriter> MakeBamWriter(const std::vector<std::unique_ptr<B
                                              const bool createPbi, const ProgramInfo& pgInfo)
 {
     if (outputFilename.empty())
-        throw std::runtime_error{"BamFileMerger: no output filename provided"};
+        throw std::runtime_error{"[pbbam] BAM file merging ERROR: no output filename provided"};
 
     // read headers
     std::vector<BamHeader> headers;
@@ -172,7 +174,8 @@ std::unique_ptr<IRecordWriter> MakeBamWriter(const std::vector<std::unique_ptr<B
         const auto& header = headers.at(i);
         if (header.SortOrder() != usingSortOrder)
             throw std::runtime_error{
-                "BamFileMerger: BAM file sort orders do not match, aborting merge"};
+                "[pbbam] BAM file merging ERROR: BAM file sort orders do not match, aborting "
+                "merge"};
         mergedHeader += header;
     }
 
@@ -186,7 +189,7 @@ std::unique_ptr<IRecordWriter> MakeBamWriter(const std::vector<std::unique_ptr<B
         return std::make_unique<BamWriter>(outputFilename, mergedHeader);
 }
 
-}  // namespace anonymous
+}  // namespace
 
 void BamFileMerger::Merge(const std::vector<std::string>& bamFilenames,
                           const std::string& outputFilename, bool createPbi,
@@ -211,7 +214,8 @@ void BamFileMerger::Merge(const DataSet& dataset, const std::string& outputFilen
                           const ProgramInfo& pgInfo)
 {
     std::vector<BamFile> bamFiles = dataset.BamFiles();
-    if (bamFiles.empty()) throw std::runtime_error{"BamFileMerger: no input filenames provided"};
+    if (bamFiles.empty())
+        throw std::runtime_error{"[pbbam] BAM file merging ERROR: no input filenames provided"};
 
     auto readers = MakeBamReaders(std::move(bamFiles), PbiFilter::FromDataSet(dataset));
     const bool isCoordinateSorted = readers.front()->Header().SortOrder() == "coordinate";
@@ -229,7 +233,8 @@ void BamFileMerger::Merge(const std::vector<std::string>& bamFilenames, IRecordW
     std::vector<BamFile> bamFiles;
     for (const auto& fn : bamFilenames)
         bamFiles.emplace_back(fn);
-    if (bamFiles.empty()) throw std::runtime_error{"BamFileMerger: no input filenames provided"};
+    if (bamFiles.empty())
+        throw std::runtime_error{"[pbbam] BAM file merging ERROR: no input filenames provided"};
 
     auto readers = MakeBamReaders(std::move(bamFiles));
     const bool isCoordinateSorted = readers.front()->Header().SortOrder() == "coordinate";
@@ -244,7 +249,8 @@ void BamFileMerger::Merge(const std::vector<std::string>& bamFilenames, IRecordW
 void BamFileMerger::Merge(const DataSet& dataset, IRecordWriter& writer)
 {
     std::vector<BamFile> bamFiles = dataset.BamFiles();
-    if (bamFiles.empty()) throw std::runtime_error{"BamFileMerger: no input filenames provided"};
+    if (bamFiles.empty())
+        throw std::runtime_error{"[pbbam] BAM file merging ERROR: no input filenames provided"};
 
     auto readers = MakeBamReaders(std::move(bamFiles), PbiFilter::FromDataSet(dataset));
     const bool isCoordinateSorted = readers.front()->Header().SortOrder() == "coordinate";

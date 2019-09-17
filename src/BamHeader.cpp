@@ -11,15 +11,17 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+
 #include <set>
 #include <sstream>
 #include <type_traits>
 
 #include <htslib/hts.h>
 
-#include "Version.h"
 #include "pbbam/SamTagCodec.h"
 #include "pbbam/StringUtilities.h"
+
+#include "Version.h"
 
 namespace PacBio {
 namespace BAM {
@@ -60,7 +62,7 @@ static void EnsureCanMerge(const BamHeader& lhs, const BamHeader& rhs)
 
     // if any checks failed, format error message & throw
     std::ostringstream e;
-    e << "BamHeader: could not merge headers:\n";
+    e << "[pbbam] BAM header ERROR: could not merge headers:\n";
 
     if (!sortOrderOk) {
         e << "  mismatched sort orders (@HD:SO) : (" << lhs.SortOrder() << ", " << rhs.SortOrder()
@@ -95,7 +97,7 @@ void ParseHeaderLine(const std::string& line, BamHeader& hdr)
     }
 }
 
-}  // anonymous
+}  // namespace
 
 static_assert(std::is_copy_constructible<BamHeader>::value,
               "BamHeader(const BamHeader&) is not = default");
@@ -279,9 +281,10 @@ BamHeader& BamHeader::PacBioBamVersion(const std::string& version)
     d_->pacbioBamVersion_ = version;
     const PacBio::BAM::Version fileVersion{version};
     if (fileVersion < Version::Minimum) {
-        throw std::runtime_error{
-            "BamHeader: invalid PacBio BAM version number (" + fileVersion.ToString() +
-            ") is older than the minimum supported version (" + Version::Minimum.ToString() + ")"};
+        throw std::runtime_error{"[pbbam] BAM header ERROR: invalid PacBio BAM version number (" +
+                                 fileVersion.ToString() +
+                                 ") is older than the minimum supported version (" +
+                                 Version::Minimum.ToString() + ")"};
     }
     return *this;
 }
@@ -290,7 +293,7 @@ ProgramInfo BamHeader::Program(const std::string& id) const
 {
     const auto iter = d_->programs_.find(id);
     if (iter == d_->programs_.cend())
-        throw std::runtime_error{"BamHeader: program ID not found: " + id};
+        throw std::runtime_error{"[pbbam] BAM header ERROR: program ID not found: " + id};
     return iter->second;
 }
 
@@ -324,7 +327,7 @@ ReadGroupInfo BamHeader::ReadGroup(const std::string& id) const
 {
     const auto iter = d_->readGroups_.find(id);
     if (iter == d_->readGroups_.cend())
-        throw std::runtime_error{"BamHeader: read group ID not found: " + id};
+        throw std::runtime_error{"[pbbam] BAM header ERROR: read group ID not found: " + id};
     return iter->second;
 }
 
@@ -371,7 +374,7 @@ int32_t BamHeader::SequenceId(const std::string& name) const
 {
     const auto iter = d_->sequenceIdLookup_.find(name);
     if (iter == d_->sequenceIdLookup_.cend())
-        throw std::runtime_error{"BamHeader: sequence name not found: " + name};
+        throw std::runtime_error{"[pbbam] BAM header ERROR: sequence name not found: " + name};
     return iter->second;
 }
 

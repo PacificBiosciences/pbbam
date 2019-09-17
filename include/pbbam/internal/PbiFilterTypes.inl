@@ -7,6 +7,7 @@
 #include "pbbam/PbiFilterTypes.h"
 
 #include <cassert>
+
 #include <stdexcept>
 
 #include <boost/functional/hash/hash.hpp>
@@ -34,7 +35,8 @@ inline FilterBase<T>::FilterBase(std::vector<T> values, const Compare::Type cmp)
 
     if (cmp_ != Compare::CONTAINS && cmp_ != Compare::NOT_CONTAINS) {
         throw std::runtime_error{
-            "PbiFilter: multi-valued filters (e.g. whitelists) can only check containment."};
+            "[pbbam] PBI filter ERROR: multi-valued filters (e.g. whitelists) can only check for "
+            "containment."};
     }
 }
 
@@ -96,8 +98,8 @@ inline bool FilterBase<LocalContextFlags>::CompareSingleHelper(const LocalContex
 
         default:
             assert(false);
-            throw std::runtime_error{"PbiFilter: unknown compare type (" +
-                                     Compare::TypeToName(cmp_) + ")"};
+            throw std::runtime_error{"[pbbam] PBI filter ERROR: unknown compare type '" +
+                                     Compare::TypeToName(cmp_) + "'"};
     }
 }
 
@@ -128,7 +130,7 @@ inline bool BarcodeDataFilterBase<T, field>::BarcodeDataFilterBase::Accepts(cons
             return FilterBase<T>::CompareHelper(barcodeData.bcQual_.at(row));
         default:
             assert(false);
-            throw std::runtime_error{"PbiFilter: unknown barcode field requested."};
+            throw std::runtime_error{"[pbbam] PBI filter ERROR: unknown barcode field requested."};
     }
 }
 
@@ -164,7 +166,8 @@ inline bool BasicDataFilterBase<T, field>::BasicDataFilterBase::Accepts(const Pb
         // NOTE(DB): PbiFile::BasicField::CONTEXT_FLAG has its own specialization
         default:
             assert(false);
-            throw std::runtime_error{"PbiFilter: unknown basic data field requested."};
+            throw std::runtime_error{
+                "[pbbam] PBI filter ERROR: unknown basic data field requested."};
     }
 }
 
@@ -232,7 +235,8 @@ inline bool MappedDataFilterBase<T, field>::MappedDataFilterBase::Accepts(const 
             return FilterBase<T>::CompareHelper(mappedData.mapQV_.at(row));
         default:
             assert(false);
-            throw std::runtime_error{"PbiFilter: unknown mapped data field requested."};
+            throw std::runtime_error{
+                "[pbbam] PBI filter ERROR: unknown mapped data field requested."};
     }
 }
 
@@ -265,7 +269,8 @@ inline PbiAlignedStrandFilter::PbiAlignedStrandFilter(const Strand strand, const
 {
     if (cmp != Compare::EQUAL && cmp != Compare::NOT_EQUAL)
         throw std::runtime_error{
-            "PbiFilter: compare type for aligned strand must be either EQUAL or NOT_EQUAL"};
+            "[pbbam] PBI filter ERROR: compare type for aligned strand must be either EQUAL or "
+            "NOT_EQUAL"};
 }
 
 // PbiBarcodeFilter
@@ -366,7 +371,8 @@ inline bool PbiMovieNameFilter::Accepts(const PbiRawData& idx, const size_t row)
     else if (cmp_ == Compare::NOT_EQUAL || cmp_ == Compare::NOT_CONTAINS)
         return !found;
     else
-        throw std::runtime_error{"unsupported compare type on movie name filter"};
+        throw std::runtime_error{
+            "[pbbam] PBI filter ERROR: unsupported compare type on movie name filter"};
 }
 
 // PbiNumDeletedBasesFilter
@@ -497,7 +503,7 @@ inline bool PbiZmwModuloFilter::Accepts(const PbiRawData& idx, const size_t row)
         }
 
         default:
-            throw std::runtime_error{"unsupported filter hash type"};
+            throw std::runtime_error{"[pbbam] PBI filter ERROR: unsupported filter hash type"};
     }
 
     const auto modResult = hashValue % denominator_;

@@ -11,8 +11,12 @@
 #include <cassert>
 #include <cstdint>
 
-#include "VirtualZmwReader.h"
+#include <sstream>
+#include <stdexcept>
+
 #include "pbbam/PbiIndexedBamReader.h"
+
+#include "VirtualZmwReader.h"
 
 namespace PacBio {
 namespace BAM {
@@ -31,10 +35,13 @@ public:
         // setup new header for stitched data
         polyHeader_ = std::make_unique<BamHeader>(primaryBamFile_->Header().ToSam());
         auto readGroups = polyHeader_->ReadGroups();
-        if (readGroups.empty())
-            throw std::runtime_error{
-                "WhitelistedZmwStitcher: no read groups in header of the primary BAM file: " +
-                primaryBamFilePath};
+        if (readGroups.empty()) {
+            std::ostringstream msg;
+            msg << "[pbbam] ZMW record stitching ERROR: no read groups in header of the primary "
+                   "BAM:\n"
+                << "  file: " << primaryBamFilePath;
+            throw std::runtime_error{msg.str()};
+        }
         readGroups[0].ReadType("POLYMERASE");
         readGroups[0].Id(readGroups[0].MovieName(), "POLYMERASE");
         if (readGroups.size() > 1) {

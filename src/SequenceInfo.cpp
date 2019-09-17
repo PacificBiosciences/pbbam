@@ -10,6 +10,7 @@
 
 #include <cassert>
 #include <cstdint>
+
 #include <limits>
 #include <sstream>
 #include <tuple>
@@ -29,7 +30,7 @@ const std::string token_M5{"M5"};
 const std::string token_SP{"SP"};
 const std::string token_UR{"UR"};
 
-}  // anonymous
+}  // namespace
 
 static_assert(std::is_copy_constructible<SequenceInfo>::value,
               "SequenceInfo(const SequenceInfo&) is not = default");

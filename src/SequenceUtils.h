@@ -5,10 +5,11 @@
 
 #include "pbbam/Config.h"
 
-#include <algorithm>
-#include <array>
 #include <cctype>
 #include <cstdint>
+
+#include <algorithm>
+#include <array>
 #include <string>
 
 #include "pbbam/StringUtilities.h"

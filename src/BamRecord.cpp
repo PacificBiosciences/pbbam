@@ -10,6 +10,7 @@
 
 #include <cstddef>
 #include <cstdint>
+
 #include <iostream>
 #include <stdexcept>
 
@@ -19,13 +20,14 @@
 #include <pbcopper/data/Clipping.h>
 #include <pbcopper/data/internal/ClippingImpl.h>
 
+#include "pbbam/StringUtilities.h"
+#include "pbbam/ZmwTypeMap.h"
+#include "pbbam/virtual/VirtualRegionTypeMap.h"
+
 #include "BamRecordTags.h"
 #include "MemoryUtils.h"
 #include "Pulse2BaseCache.h"
 #include "SequenceUtils.h"
-#include "pbbam/StringUtilities.h"
-#include "pbbam/ZmwTypeMap.h"
-#include "pbbam/virtual/VirtualRegionTypeMap.h"
 
 namespace PacBio {
 namespace BAM {
@@ -46,11 +48,13 @@ int32_t HoleNumberFromName(const std::string& fullName)
     const auto mainTokens = Split(fullName, '/');
     if (mainTokens.at(0) == "transcript") {
         if (mainTokens.size() != 2)
-            throw std::runtime_error{"BamRecord: malformed transcript record name: " + fullName};
+            throw std::runtime_error{
+                "[pbbam] BAM record ERROR: malformed transcript record name: " + fullName};
         return std::stoi(mainTokens.at(1));
     } else {
         if (mainTokens.size() != 3)
-            throw std::runtime_error{"BamRecord: malformed record name: " + fullName};
+            throw std::runtime_error{"[pbbam] BAM record ERROR: malformed record name: " +
+                                     fullName};
         return std::stoi(mainTokens.at(1));
     }
 }
@@ -59,11 +63,11 @@ Position QueryEndFromName(const std::string& fullName)
 {
     const auto mainTokens = Split(fullName, '/');
     if (mainTokens.size() != 3)
-        throw std::runtime_error{"BamRecord: malformed record name: " + fullName};
+        throw std::runtime_error{"[pbbam] BAM record ERROR: malformed record name: " + fullName};
 
     const auto queryTokens = Split(mainTokens.at(2), '_');
     if (queryTokens.size() != 2)
-        throw std::runtime_error{"BamRecord: malformed record name: " + fullName};
+        throw std::runtime_error{"[pbbam] BAM record ERROR: malformed record name: " + fullName};
 
     return stoi(queryTokens.at(1));
 }
@@ -72,11 +76,11 @@ Position QueryStartFromName(const std::string& fullName)
 {
     const auto mainTokens = Split(fullName, '/');
     if (mainTokens.size() != 3)
-        throw std::runtime_error{"BamRecord: malformed record name: " + fullName};
+        throw std::runtime_error{"[pbbam] BAM record ERROR: malformed record name: " + fullName};
 
     const auto queryTokens = Split(mainTokens.at(2), '_');
     if (queryTokens.size() != 2)
-        throw std::runtime_error{"BamRecord: malformed record name: " + fullName};
+        throw std::runtime_error{"[pbbam] BAM record ERROR: malformed record name: " + fullName};
 
     return stoi(queryTokens.at(0));
 }
@@ -448,18 +452,21 @@ std::pair<int16_t, int16_t> BamRecord::Barcodes() const
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::BARCODES);
     const Tag bc = impl_.TagValue(tagName);
     if (bc.IsNull())
-        throw std::runtime_error{"BamRecord: barcode tag (bc) was requested but is missing"};
+        throw std::runtime_error{
+            "[pbbam] BAM record ERROR: barcode tag (bc) was requested but is missing"};
 
     // NOTE: barcodes are still stored, per the spec, as uint16, even though
     // we're now using them as int16_t in the API (bug 31511)
     //
     if (!bc.IsUInt16Array())
         throw std::runtime_error{
-            "BamRecord: barcode tag (bc) is malformed: should be a uint16_t array of size==2."};
+            "[pbbam] BAM record ERROR: barcode tag (bc) is malformed: should be a uint16_t array "
+            "of size==2."};
     const auto bcArray = bc.ToUInt16Array();
     if (bcArray.size() != 2)
         throw std::runtime_error{
-            "BamRecord: barcode tag (bc) is malformed: should be a uint16_t array of size==2."};
+            "[pbbam] BAM record ERROR: barcode tag (bc) is malformed: should be a uint16_t array "
+            "of size==2."};
 
     return {boost::numeric_cast<int16_t>(bcArray[0]), boost::numeric_cast<int16_t>(bcArray[1])};
 }
@@ -512,7 +519,7 @@ void BamRecord::CalculatePulse2BaseCache() const
     // else try to calculate p2b cache.
     if (!HasPulseCall())
         throw std::runtime_error{
-            "BamRecord: cannot calculate pulse2base mapping without 'pc' tag."};
+            "[pbbam] BAM record ERROR: cannot calculate pulse2base mapping without 'pc' tag."};
     const auto pulseCalls =
         FetchBases(BamRecordTag::PULSE_CALL, Orientation::NATIVE, false, false, PulseBehavior::ALL);
     p2bCache_ = std::make_unique<Pulse2BaseCache>(pulseCalls);
@@ -544,7 +551,7 @@ BamRecord& BamRecord::Clip(const ClipType clipType, const Position start, const 
         case ClipType::CLIP_TO_REFERENCE:
             return ClipToReference(start, end, exciseFlankingInserts);
         default:
-            throw std::runtime_error{"BamRecord: unsupported clip type requested"};
+            throw std::runtime_error{"[pbbam] BAM record ERROR: unsupported clip type requested"};
     }
 }
 
@@ -823,9 +830,8 @@ std::string BamRecord::FetchBases(const BamRecordTag tag, const Orientation orie
 
         if (isPulse && pulseBehavior != PulseBehavior::BASECALLS_ONLY)
             throw std::runtime_error{
-                "BamRecord: cannot return data at all pulses when gapping and/or soft-clipping are "
-                "requested. "
-                "Use PulseBehavior::BASECALLS_ONLY instead."};
+                "[pbbam] BAM record ERROR: cannot return data at all pulses when gapping and/or "
+                "soft-clipping are requested. Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
         OrientBasesAsRequested(&bases, current, Orientation::GENOMIC, impl_.IsReverseStrand(),
@@ -880,9 +886,8 @@ Frames BamRecord::FetchFrames(const BamRecordTag tag, const Orientation orientat
 
         if (isPulse && pulseBehavior != PulseBehavior::BASECALLS_ONLY)
             throw std::runtime_error{
-                "BamRecord: cannot return data at all pulses when gapping and/or soft-clipping are "
-                "requested. "
-                "Use PulseBehavior::BASECALLS_ONLY instead."};
+                "[pbbam] BAM record ERROR: cannot return data at all pulses when gapping and/or "
+                "soft-clipping are requested. Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
         OrientTagDataAsRequested(&frames, current, Orientation::GENOMIC, impl_.IsReverseStrand());
@@ -902,8 +907,9 @@ std::vector<float> BamRecord::FetchPhotonsRaw(const BamRecordTag tag) const
     const Tag frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) return {};
     if (!frameTag.IsUInt16Array())
-        throw std::runtime_error{"BamRecord: photons are not a uint16_t array, tag " +
-                                 BamRecordTags::LabelFor(tag)};
+        throw std::runtime_error{
+            "[pbbam] BAM record ERROR: photons are not a uint16_t array, tag " +
+            BamRecordTags::LabelFor(tag)};
 
     const auto data = frameTag.ToUInt16Array();
     std::vector<float> photons;
@@ -933,9 +939,8 @@ std::vector<float> BamRecord::FetchPhotons(const BamRecordTag tag, const Orienta
 
         if (isPulse && pulseBehavior != PulseBehavior::BASECALLS_ONLY)
             throw std::runtime_error{
-                "BamRecord: cannot return data at all pulses when gapping and/or soft-clipping are "
-                "requested. "
-                "Use PulseBehavior::BASECALLS_ONLY instead."};
+                "[pbbam] BAM record ERROR: cannot return data at all pulses when gapping and/or "
+                "soft-clipping are requested. Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
         OrientTagDataAsRequested(&data, current, Orientation::GENOMIC, impl_.IsReverseStrand());
@@ -986,9 +991,8 @@ QualityValues BamRecord::FetchQualities(const BamRecordTag tag, const Orientatio
 
         if (isPulse && pulseBehavior != PulseBehavior::BASECALLS_ONLY)
             throw std::runtime_error{
-                "BamRecord: cannot return data at all pulses when gapping and/or soft-clipping are "
-                "requested. "
-                "Use PulseBehavior::BASECALLS_ONLY instead."};
+                "[pbbam] BAM record ERROR: cannot return data at all pulses when gapping and/or "
+                "soft-clipping are requested. Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
         OrientTagDataAsRequested(&quals, current, Orientation::GENOMIC, impl_.IsReverseStrand());
@@ -1009,8 +1013,9 @@ std::vector<uint32_t> BamRecord::FetchUInt32sRaw(const BamRecordTag tag) const
     const Tag frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) return {};
     if (!frameTag.IsUInt32Array())
-        throw std::runtime_error{"BamRecord: tag data are not a uint32_t array, tag " +
-                                 BamRecordTags::LabelFor(tag)};
+        throw std::runtime_error{
+            "[pbbam] BAM record ERROR: tag data are not a uint32_t array, tag " +
+            BamRecordTags::LabelFor(tag)};
     return frameTag.ToUInt32Array();
 }
 
@@ -1034,9 +1039,8 @@ std::vector<uint32_t> BamRecord::FetchUInt32s(const BamRecordTag tag, const Orie
 
         if (isPulse && pulseBehavior != PulseBehavior::BASECALLS_ONLY)
             throw std::runtime_error{
-                "BamRecord: cannot return data at all pulses when gapping and/or soft-clipping are "
-                "requested. "
-                "Use PulseBehavior::BASECALLS_ONLY instead."};
+                "[pbbam] BAM record ERROR: cannot return data at all pulses when gapping and/or "
+                "soft-clipping are requested. Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
         OrientTagDataAsRequested(&arr, current, Orientation::GENOMIC, impl_.IsReverseStrand());
@@ -1057,8 +1061,9 @@ std::vector<uint8_t> BamRecord::FetchUInt8sRaw(const BamRecordTag tag) const
     const Tag frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) return {};
     if (!frameTag.IsUInt8Array())
-        throw std::runtime_error{"BamRecord: tag data are not a uint8_t array, tag " +
-                                 BamRecordTags::LabelFor(tag)};
+        throw std::runtime_error{
+            "[pbbam] BAM record ERROR: tag data are not a uint8_t array, tag " +
+            BamRecordTags::LabelFor(tag)};
     return frameTag.ToUInt8Array();
 }
 
@@ -1082,9 +1087,8 @@ std::vector<uint8_t> BamRecord::FetchUInt8s(const BamRecordTag tag, const Orient
 
         if (isPulse && pulseBehavior != PulseBehavior::BASECALLS_ONLY)
             throw std::runtime_error{
-                "BamRecord: cannot return data at all pulses when gapping and/or soft-clipping are "
-                "requested. "
-                "Use PulseBehavior::BASECALLS_ONLY instead."};
+                "[pbbam] BAM record ERROR: cannot return data at all pulses when gapping and/or "
+                "soft-clipping are requested. Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
         OrientTagDataAsRequested(&arr, current, Orientation::GENOMIC, impl_.IsReverseStrand());
@@ -1370,7 +1374,8 @@ std::string BamRecord::MovieName() const
     else {
         const auto nameParts = Split(FullName(), '/');
         if (nameParts.empty())
-            throw std::runtime_error{"BamRecord: has invalid name: '" + FullName() + "'"};
+            throw std::runtime_error{"[pbbam] BAM record ERROR: has malformed name: '" +
+                                     FullName() + "'"};
         return nameParts[0];
     }
 }
@@ -1673,9 +1678,11 @@ Position BamRecord::QueryEnd() const
         return 0;
     }
     if (type == RecordType::CCS)
-        throw std::runtime_error{"BamRecord: no query end for CCS read type"};
+        throw std::runtime_error{
+            "[pbbam] BAM record ERROR: no query end is available for CCS read type"};
     if (type == RecordType::TRANSCRIPT)
-        throw std::runtime_error{"BamRecord: no query end for transcript read type"};
+        throw std::runtime_error{
+            "[pbbam] BAM record ERROR: no query end is available for transcript read type"};
 
     // PacBio BAM, non-CCS/transcript
     try {
@@ -1722,9 +1729,11 @@ Position BamRecord::QueryStart() const
         return 0;
     }
     if (type == RecordType::CCS)
-        throw std::runtime_error{"BamRecord: no query start for CCS read type"};
+        throw std::runtime_error{
+            "[pbbam] BAM record ERROR: no query start is available for CCS read type"};
     if (type == RecordType::TRANSCRIPT)
-        throw std::runtime_error{"BamRecord: no query start for transcript read type"};
+        throw std::runtime_error{
+            "[pbbam] BAM record ERROR: no query start is available for transcript read type"};
 
     // PacBio BAM, non-CCS/transcript
     try {
@@ -1812,7 +1821,8 @@ std::string BamRecord::ReferenceName() const
     if (IsMapped())
         return Header().SequenceName(ReferenceId());
     else
-        throw std::runtime_error{"BamRecord: unmapped record has no associated reference name"};
+        throw std::runtime_error{
+            "[pbbam] BAM record ERROR: unmapped record has no associated reference name"};
 }
 
 Position BamRecord::ReferenceStart() const { return impl_.Position(); }
@@ -1941,7 +1951,7 @@ Data::Read BamRecord::ToRead() const
 Data::MappedRead BamRecord::ToMappedRead() const
 {
     if (!IsMapped()) {
-        throw std::runtime_error{"BAM record '" + FullName() +
+        throw std::runtime_error{"[pbbam] BAM record ERROR: '" + FullName() +
                                  "' cannot be converted to MappedRead because it is not mapped"};
     }
 

@@ -11,6 +11,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -42,7 +43,7 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation o
 
     if (seq.size() != ref.size()) {
         std::ostringstream s;
-        s << "AlignmentPrinter: sequence and reference lengths are not equal:\n"
+        s << "[pbbam] alignment printer ERROR: sequence and reference lengths are not equal:\n"
           << "  seq: " << seq.size() << '\n'
           << "  ref: " << ref.size();
         throw std::runtime_error{s.str()};

@@ -20,7 +20,8 @@ FileProducer::FileProducer(std::string targetFilename, std::string tempFilename)
     : targetFilename_{std::move(targetFilename)}, tempFilename_{std::move(tempFilename)}
 {
     if (targetFilename_.empty()) {
-        throw std::runtime_error{"FileProducer error: cannot write to file with empty name"};
+        throw std::runtime_error{
+            "[pbbam] temp file producer ERROR: cannot write to file with empty filename"};
     }
 
     // override renaming if writing to stdout

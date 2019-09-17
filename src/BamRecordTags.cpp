@@ -9,6 +9,7 @@
 #include "BamRecordTags.h"
 
 #include <cassert>
+
 #include <unordered_map>
 
 namespace PacBio {

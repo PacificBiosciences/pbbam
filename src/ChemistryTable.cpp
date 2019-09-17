@@ -5,11 +5,13 @@
 #include "ChemistryTable.h"
 
 #include <cstdlib>
+
 #include <fstream>
 #include <map>
 
-#include "FileUtils.h"
 #include "pbbam/exception/BundleChemistryMappingException.h"
+
+#include "FileUtils.h"
 #include "pugixml/pugixml.hpp"
 
 namespace PacBio {

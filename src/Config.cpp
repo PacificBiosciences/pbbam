@@ -32,12 +32,14 @@ bool DoesHtslibSupportLongCigar()
     // remove any "-<blah>" for non-release versions
     const auto versionBase = PacBio::BAM::Split(htsVersion, '-');
     if (versionBase.empty())
-        throw std::runtime_error{"invalid htslib version format: " + htsVersion};
+        throw std::runtime_error{"[pbbam] config ERROR: invalid htslib version format: '" +
+                                 htsVersion + "'"};
 
     // grab major/minor version numbers
     const auto versionParts = PacBio::BAM::Split(versionBase[0], '.');
     if (versionParts.size() < 2)
-        throw std::runtime_error{"invalid htslib version format: " + htsVersion};
+        throw std::runtime_error{"[pbbam] config ERROR: invalid htslib version format: '" +
+                                 htsVersion + "'"};
 
     // check against v1.7
     const int versionMajor = std::stoi(versionParts[0]);

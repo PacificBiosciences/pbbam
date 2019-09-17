@@ -9,6 +9,7 @@
 #include "pbbam/ProgramInfo.h"
 
 #include <cassert>
+
 #include <sstream>
 #include <type_traits>
 
@@ -26,7 +27,7 @@ const std::string ProgramInfoTokenPN{"PN"};
 const std::string ProgramInfoTokenPP{"PP"};
 const std::string ProgramInfoTokenVN{"VN"};
 
-}  // anonymous
+}  // namespace
 
 static_assert(std::is_copy_constructible<ProgramInfo>::value,
               "ProgramInfo(const ProgramInfo&) is not = default");

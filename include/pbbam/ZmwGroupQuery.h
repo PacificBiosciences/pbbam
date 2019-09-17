@@ -10,6 +10,7 @@
 #include "pbbam/Config.h"
 
 #include <cstdint>
+
 #include <vector>
 
 #include "pbbam/DataSet.h"

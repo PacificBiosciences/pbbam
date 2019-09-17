@@ -8,11 +8,13 @@
 
 #include "pbbam/PbiBuilder.h"
 
-#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
+
+#include <array>
 #include <memory>
+#include <sstream>
 #include <stdexcept>
 #include <thread>
 #include <tuple>
@@ -25,14 +27,31 @@
 
 #include <pbcopper/utility/Deleters.h>
 
-#include "MemoryUtils.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamRecordImpl.h"
 #include "pbbam/PbiRawData.h"
 #include "pbbam/RecordType.h"
 
+#include "MemoryUtils.h"
+
 namespace PacBio {
 namespace BAM {
+
+struct PbiBuilderException : public std::exception
+{
+    PbiBuilderException(std::string filename, std::string reason)
+    {
+        std::ostringstream s;
+        s << "[pbbam] PBI index builder ERROR: " << reason << ":\n"
+          << "  file: " << filename;
+        msg_ = s.str();
+    }
+
+    const char* what() const noexcept override { return msg_.c_str(); }
+
+    std::string msg_;
+};
+
 namespace internal {
 
 template <typename T>
@@ -56,7 +75,7 @@ inline void SwapEndianness(std::vector<T>& data)
                 ed_swap_8p(&data[i]);
             break;
         default:
-            throw std::runtime_error{"PbiBuilder: unsupported element size (" +
+            throw std::runtime_error{"[pbbam] PBI index builder ERROR: unsupported element size (" +
                                      std::to_string(elementSize) + ")"};
     }
 }
@@ -66,7 +85,8 @@ void bgzf_write_safe(BGZF* fp, const void* data, size_t length)
     const auto ret = bgzf_write(fp, data, length);
     if (ret < 0L)
         throw std::runtime_error{
-            "PbiBuilder: non-zero returned from bgzf_write(). Out of disk space?"};
+            "[pbbam] PBI index builder ERROR: non-zero returned from bgzf_write(). Out of disk "
+            "space?"};
 }
 
 template <typename T>
@@ -267,9 +287,7 @@ public:
         , bcReverseField_{MaxBufferSize}
         , bcQualField_{MaxBufferSize}
     {
-        if (!tempFile_)
-            throw std::runtime_error{"PbiBuilder: could not open temp file: " + tempFilename_};
-
+        if (!tempFile_) throw PbiBuilderException{tempFilename_, "could not open temp file"};
         if (isCoordinateSorted && numReferenceSequences > 0)
             refDataBuilder_ =
                 std::make_unique<internal::PbiReferenceDataBuilder>(numReferenceSequences);
@@ -423,8 +441,7 @@ public:
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel_));
         pbiFile_.reset(bgzf_open(pbiFilename_.c_str(), mode.c_str()));
         if (pbiFile_ == nullptr)
-            throw std::runtime_error{"PbiBuilder: could not open file for writing: " +
-                                     pbiFilename_};
+            throw PbiBuilderException{pbiFilename_, "could not open file for writing"};
 
         // if no explicit thread count given, attempt built-in check
         size_t actualNumThreads = numThreads_;
@@ -482,9 +499,13 @@ public:
     {
         // seek to block begin
         const auto ret = std::fseek(tempFile_.get(), block.pos_, SEEK_SET);
-        if (ret != 0)
-            throw std::runtime_error{"PbiBuilder: could not seek in temp file: " + tempFilename_ +
-                                     ", offset: " + std::to_string(block.pos_)};
+        if (ret != 0) {
+            std::ostringstream s;
+            s << "[pbbam] PBI index builder ERROR: could not seek in temp file:\n"
+              << "  file: " << tempFilename_ << '\n'
+              << "  offset: " << block.pos_;
+            throw std::runtime_error{s.str()};
+        }
 
         // read block elements
         field.buffer_.assign(block.n_, 0);
@@ -492,8 +513,7 @@ public:
             std::fread(field.buffer_.data(), sizeof(T), block.n_, tempFile_.get());
 
         if (numElements != block.n_)
-            throw std::runtime_error{"PbiBuilder: could not read element count from temp file: " +
-                                     tempFilename_};
+            throw PbiBuilderException{tempFilename_, "could not read element count from temp file"};
     }
 
     template <typename T>

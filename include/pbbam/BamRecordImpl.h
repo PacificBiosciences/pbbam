@@ -9,13 +9,15 @@
 
 #include "pbbam/Config.h"
 
-#include <htslib/sam.h>
 #include <cstddef>
 #include <cstdint>
+
 #include <map>
 #include <memory>
 #include <string>
 #include <unordered_map>
+
+#include <htslib/sam.h>
 
 #include "pbbam/BamRecordTag.h"
 #include "pbbam/Cigar.h"

@@ -12,6 +12,7 @@
 
 #include <cstddef>
 #include <cstdint>
+
 #include <functional>
 #include <string>
 #include <utility>
@@ -458,7 +459,8 @@ public:
                 return lhs != rhs;
             default:
                 assert(false);
-                throw std::runtime_error{"unsupported compare type requested"};
+                throw std::runtime_error{
+                    "[pbbam] compare ERROR: encountered unsupported compare type"};
         }
     }
 };

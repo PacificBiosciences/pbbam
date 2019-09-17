@@ -157,16 +157,12 @@ TEST(ReadGroupInfoTest, SequencingChemistryThrowsOnBadTriple)
 TEST(ReadGroupInfoTest, BasecallerVersion)
 {
     // too short
-    try {
+    {
         ReadGroupInfo rg("dummy");
         rg.BindingKit("100-619-300")
           .SequencingKit("100-867-300")
           .BasecallerVersion("3");
-        const std::string chem = rg.SequencingChemistry();
-//        ()chem;
-
-    } catch (std::runtime_error& e) {
-        EXPECT_EQ(std::string("ReadGroupInfo: basecaller version is too short: 3"), std::string(e.what()));
+        EXPECT_THROW(rg.SequencingChemistry(), std::exception);
     }
 
     // initial implementation assumed single digit version numbers:

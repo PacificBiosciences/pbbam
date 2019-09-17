@@ -48,6 +48,8 @@ public:
     /// \}
 
 public:
+    const std::string& Filename() const;
+
     ///
     /// \brief GetNext
     ///
