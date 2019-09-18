@@ -14,10 +14,13 @@
 
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <type_traits>
 
 #include <htslib/hts.h>
 
+#include "pbbam/BamFile.h"
+#include "pbbam/DataSet.h"
 #include "pbbam/SamTagCodec.h"
 #include "pbbam/StringUtilities.h"
 
@@ -127,6 +130,34 @@ public:
 };
 
 BamHeader::BamHeader() : d_{std::make_shared<BamHeaderPrivate>()} {}
+
+BamHeader::BamHeader(const DataSet& dataset) : BamHeader{dataset.BamFilenames()} {}
+
+BamHeader::BamHeader(const std::vector<std::string>& bamFilenames) : BamHeader{}
+{
+    if (bamFilenames.empty())
+        throw std::runtime_error{"[pbbam] BAM header merging ERROR: no input filenames provided"};
+
+    std::vector<BamHeader> headers;
+    for (const auto& fn : bamFilenames) {
+        const BamFile& bamFile{fn};
+        headers.push_back(bamFile.Header());
+    }
+
+    *this = headers.at(0);
+    for (size_t i = 1; i < headers.size(); ++i)
+        *this += headers.at(i);
+}
+
+BamHeader::BamHeader(const std::vector<BamHeader>& headers) : BamHeader()
+{
+    if (headers.empty())
+        throw std::runtime_error{"[pbbam] BAM header merging ERROR: no input headers provided"};
+
+    *this = headers.at(0);
+    for (size_t i = 1; i < headers.size(); ++i)
+        *this += headers.at(i);
+}
 
 BamHeader::BamHeader(const std::string& samHeaderText) : d_{std::make_shared<BamHeaderPrivate>()}
 {
