@@ -1172,14 +1172,15 @@ public:
     ///
     /// \return Data::Read representation of this record
     ///
-    Data::Read ToRead() const;
+    Data::Read ToRead(std::string model = "") const;
 
     ///
     /// \return Data::MappedRead representation of this record
     ///
     /// \throws std::runtime_error if record is unmapped
     ///
-    Data::MappedRead ToMappedRead() const;
+    Data::MappedRead ToMappedRead(std::string model = "", Data::Position startOffset = 0,
+                                  bool pinStart = false, bool pinEnd = false) const;
 
     /// \}
 
