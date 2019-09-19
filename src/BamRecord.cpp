@@ -8,6 +8,7 @@
 
 #include "pbbam/BamRecord.h"
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 
@@ -1933,10 +1934,15 @@ BamRecord& BamRecord::SubstitutionTag(const std::string& tags)
     return *this;
 }
 
-Data::Read BamRecord::ToRead() const
+Data::Read BamRecord::ToRead(std::string model) const
 {
     Data::Read result{FullName(),      Sequence(),   Qualities(),
                       SignalToNoise(), QueryStart(), QueryEnd()};
+    result.Model = std::move(model);
+    result.Flags = LocalContextFlags();
+    result.ReadAccuracy = ReadAccuracy();
+    result.FullLength =
+        (result.Flags & Data::ADAPTER_BEFORE) && (result.Flags & Data::ADAPTER_AFTER);
 
     if (HasIPD()) result.IPD = IPD();
     if (HasPulseWidth()) result.PulseWidth = PulseWidth();
@@ -1948,14 +1954,27 @@ Data::Read BamRecord::ToRead() const
     return result;
 }
 
-Data::MappedRead BamRecord::ToMappedRead() const
+Data::MappedRead BamRecord::ToMappedRead(std::string model, const Data::Position startOffset,
+                                         const bool pinStart, const bool pinEnd) const
 {
     if (!IsMapped()) {
         throw std::runtime_error{"[pbbam] BAM record ERROR: '" + FullName() +
                                  "' cannot be converted to MappedRead because it is not mapped"};
     }
 
-    return {ToRead(), AlignedStrand(), ReferenceStart(), ReferenceEnd(), CigarData(), MapQuality()};
+    Data::MappedRead result{ToRead(std::move(model)), AlignedStrand(), ReferenceStart(),
+                            ReferenceEnd(),           CigarData(),     MapQuality()};
+
+    assert(startOffset >= 0);
+    result.TemplateStart -= startOffset;
+    assert(result.TemplateStart >= 0);
+    result.TemplateEnd -= startOffset;
+    assert(result.TemplateEnd >= 0);
+
+    result.PinStart = pinStart;
+    result.PinEnd = pinEnd;
+
+    return result;
 }
 
 RecordType BamRecord::Type() const
