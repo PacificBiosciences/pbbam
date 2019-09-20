@@ -10,9 +10,6 @@
 using namespace PacBio;
 using namespace PacBio::CCS;
 
-using Frames = PacBio::BAM::Frames;
-using LocalContextFlags = PacBio::BAM::LocalContextFlags;
-
 // clang-format off
 
 namespace CCSPbiBuilderTests {
@@ -24,11 +21,11 @@ const CCSRecord& ValidRecord()
         r.HoleNumber = 4391137;
         r.QueryStart = 0;
         r.QueryEnd = 459;
-        r.LocalContextFlags = LocalContextFlags::ADAPTER_AFTER;
+        r.LocalContextFlags = Data::LocalContextFlags::ADAPTER_AFTER;
         r.Accuracy = 0.8f;
         r.SignalToNoise = {7.6, 13.9, 7.0, 12.2};
         r.Sequence = "GATTACA";
-        r.PulseWidths = Frames{std::vector<uint16_t>{13, 8, 3, 14, 18, 3}};
+        r.PulseWidths = Data::Frames{std::vector<uint16_t>{13, 8, 3, 14, 18, 3}};
         return r;
     }();
     return record;

@@ -8,6 +8,7 @@
 
 #include <gtest/gtest.h>
 
+#include <pbbam/ccs/CCSRecord.h>
 #include <pbbam/ccs/CCSRecordFormat.h>
 #include <pbbam/ccs/CCSRecordReader.h>
 #include <pbbam/ccs/CCSRecordWriter.h>
@@ -16,9 +17,6 @@
 
 using namespace PacBio;
 using namespace PacBio::CCS;
-
-using Frames = PacBio::BAM::Frames;
-using LocalContextFlags = PacBio::BAM::LocalContextFlags;
 
 // clang-format off
 
@@ -54,11 +52,11 @@ const CCSRecord& ValidRecord()
         r.HoleNumber = 4391137;
         r.QueryStart = 0;
         r.QueryEnd = 459;
-        r.LocalContextFlags = LocalContextFlags::ADAPTER_AFTER;
+        r.LocalContextFlags = Data::LocalContextFlags::ADAPTER_AFTER;
         r.Accuracy = 0.8f;
         r.SignalToNoise = {7.6, 13.9, 7.0, 12.2};
         r.Sequence = "GATTACA";
-        r.PulseWidths = Frames{std::vector<uint16_t>{13, 8, 3, 14, 18, 3}};
+        r.PulseWidths = Data::Frames{std::vector<uint16_t>{13, 8, 3, 14, 18, 3}};
         return r;
     }();
     return record;
@@ -233,4 +231,31 @@ TEST(CCSRecordIOTest, can_do_round_trip_read_and_write_to_iostreams)
         ++recordCount;
     }
     EXPECT_EQ(NumOutputRecords, recordCount);
+}
+
+TEST(CCSRecordTest, can_convert_to_read)
+{
+    const int32_t holeNumber = 77;
+    const Data::Position qStart = 1000;
+    const Data::Position qEnd = 1010;
+    const Data::LocalContextFlags ctxtFlags =
+        Data::LocalContextFlags::ADAPTER_BEFORE | Data::LocalContextFlags::ADAPTER_AFTER;
+    const Data::Accuracy acc = 0.95f;
+    const Data::SNR snr{0.4, 0.4, 0.4, 0.4};
+    const std::string seq{"GGTTAACCAA"};
+    const Data::Frames pw{3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
+    const std::string movie = "movie";
+    const std::string chemistry = "chemistry";
+
+    const CCS::CCSRecord ccsRecord{holeNumber, qStart, qEnd, ctxtFlags, acc, snr, seq, pw};
+
+    const auto read = ccsRecord.ToRead(movie, chemistry);
+    EXPECT_EQ(holeNumber, read.Id.HoleNumber);
+    EXPECT_EQ(qStart, read.QueryStart);
+    EXPECT_EQ(qEnd, read.QueryEnd);
+    EXPECT_EQ(ctxtFlags, read.Flags);
+    EXPECT_EQ(acc, read.ReadAccuracy);
+    EXPECT_EQ(snr, read.SignalToNoise);
+    EXPECT_EQ(seq, read.Seq);
+    EXPECT_EQ(pw, read.PulseWidth);
 }
