@@ -273,7 +273,7 @@ TEST(DataSetIOTest, ToXml)
         "\t\t\t<pbds:Filters>\n"
         "\t\t\t\t<pbds:Filter>\n"
         "\t\t\t\t\t<pbbase:Properties>\n"
-        "\t\t\t\t\t\t<pbbase:Property Name=\"rq\" Operator=\">\" Value=\"0.85\" />\n"
+        "\t\t\t\t\t\t<pbbase:Property Name=\"rq\" Operator=\"&gt;\" Value=\"0.85\" />\n"
         "\t\t\t\t\t</pbbase:Properties>\n"
         "\t\t\t\t</pbds:Filter>\n"
         "\t\t\t</pbds:Filters>\n"
@@ -1704,6 +1704,18 @@ TEST(DataSetIOTest, AbsolutePathsForGenericAndDerivedDatasets)
     referenceDataset.SaveToStream(out);
     const std::string referenceDatasetXml{out.str()};
     EXPECT_NE(referenceDatasetXml.find(expectedReferenceFn), std::string::npos);
+}
+
+TEST(DataSetIOTest, AmpersandsAreEscaped)
+{
+    SubreadSet ds;
+    internal::DataSetElement e{"Description", XsdType::COLLECTION_METADATA};
+    e.Text("Transfer location for R&D");
+    ds.AddChild(e);
+
+    std::ostringstream out;
+    ds.SaveToStream(out);
+    EXPECT_TRUE(out.str().find("R&amp;D") != std::string::npos);
 }
 
 // clang-format on
