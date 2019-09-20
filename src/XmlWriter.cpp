@@ -158,7 +158,7 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
 
     // "no escapes" to allow explicit ">" "<" comparison operators in filter parameters
     // we may remove this if/when comparison is separated from the value
-    doc.save(out, "\t", pugi::format_default | pugi::format_no_escapes, pugi::encoding_utf8);
+    doc.save(out, "\t", pugi::format_default, pugi::encoding_utf8);
 }
 
 void XmlWriter::ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostream& out)
