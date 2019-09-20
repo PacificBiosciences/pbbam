@@ -88,7 +88,7 @@ CCSRecord CCSRecordFormat::DeserializeRecord(const std::string& line)
     result.HoleNumber = std::stoi(fields[0]);
     result.QueryStart = std::stoi(fields[1]);
     result.QueryEnd   = std::stoi(fields[2]);
-    result.LocalContextFlags = static_cast<PacBio::BAM::LocalContextFlags>(std::stoul(fields[3]));
+    result.LocalContextFlags = static_cast<Data::LocalContextFlags>(std::stoul(fields[3]));
     result.Accuracy = std::stof(fields[4]);
 
     const auto snrs = PacBio::BAM::Split(fields[5], ',');

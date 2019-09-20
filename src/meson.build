@@ -109,6 +109,7 @@ pbbam_cpp_sources = files([
 
   # ccs
   'ccs/CCSPbiBuilder.cpp',
+  'ccs/CCSRecord.cpp',
   'ccs/CCSRecordFormat.cpp',
   'ccs/CCSRecordReader.cpp',
   'ccs/CCSRecordWriter.cpp',

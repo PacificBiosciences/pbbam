@@ -5,11 +5,12 @@
 
 #include "pbbam/Config.h"
 
-#include "pbbam/Accuracy.h"
-#include "pbbam/Frames.h"
-#include "pbbam/LocalContextFlags.h"
-#include "pbbam/Position.h"
-#include "pbbam/SNR.h"
+#include <pbcopper/data/Accuracy.h>
+#include <pbcopper/data/Frames.h>
+#include <pbcopper/data/LocalContextFlags.h>
+#include <pbcopper/data/Position.h>
+#include <pbcopper/data/Read.h>
+#include <pbcopper/data/SNR.h>
 
 namespace PacBio {
 namespace CCS {
@@ -18,20 +19,24 @@ struct CCSRecord
 {
     int32_t HoleNumber = 0;
 
-    PacBio::BAM::Position QueryStart = 0;
+    Data::Position QueryStart = 0;
 
-    PacBio::BAM::Position QueryEnd = 0;
+    Data::Position QueryEnd = 0;
 
-    PacBio::BAM::LocalContextFlags LocalContextFlags =
-        PacBio::BAM::LocalContextFlags::NO_LOCAL_CONTEXT;
+    Data::LocalContextFlags LocalContextFlags = Data::LocalContextFlags::NO_LOCAL_CONTEXT;
 
-    PacBio::BAM::Accuracy Accuracy = 0.0f;
+    Data::Accuracy Accuracy = 0.0f;
 
-    PacBio::Data::SNR SignalToNoise = {0.0, 0.0, 0.0, 0.0};
+    Data::SNR SignalToNoise = {0.0, 0.0, 0.0, 0.0};
 
     std::string Sequence;
 
-    PacBio::BAM::Frames PulseWidths;
+    Data::Frames PulseWidths;
+
+    ///
+    /// Create a Data::Read from this CCSRecord.
+    ///
+    Data::Read ToRead(std::string movieName, std::string chemistry) const;
 };
 
 }  // namespace CCS
