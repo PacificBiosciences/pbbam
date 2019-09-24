@@ -352,9 +352,6 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
     });
 }
 
-// TODO: implement me
-TEST(DataSetQueryTest, QNameQueryTest) { EXPECT_TRUE(true); }
-
 TEST(DataSetQueryTest, ZmwQueryTest)
 {
     const std::vector<int32_t> whitelist = {13473, 30983};
