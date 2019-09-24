@@ -1944,8 +1944,17 @@ Data::Read BamRecord::ToRead(std::string model) const
     result.FullLength =
         (result.Flags & Data::ADAPTER_BEFORE) && (result.Flags & Data::ADAPTER_AFTER);
 
-    if (HasIPD()) result.IPD = IPD();
-    if (HasPulseWidth()) result.PulseWidth = PulseWidth();
+    if (HasPulseWidth())
+        result.PulseWidth = PulseWidth();
+    else if (RecordType::SUBREAD == Type())
+        throw std::runtime_error{"[pbbam] BAM record ERROR: '" + FullName() +
+                                 "' is missing pulse widths (SAM tag 'pw')"};
+
+    if (HasIPD())
+        result.IPD = IPD();
+    else if (RecordType::SUBREAD == Type())
+        throw std::runtime_error{"[pbbam] BAM record ERROR: '" + FullName() +
+                                 "' is missing interpulse durations (SAM tag 'ip')"};
 
     if (IsMapped() && AlignedStrand() == Data::Strand::REVERSE) {
         ReverseComplement(result.Seq);
