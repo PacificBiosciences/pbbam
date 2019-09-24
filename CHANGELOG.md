@@ -10,6 +10,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - TextFileReader & TextFileWriter for generic line files (plain text or gzipped)
  - BedReader & BedWriter for BED format support
 
+### Removed
+ - Unused built-in "convenience" queries: BarcodeQuery, QNameQuery, ReadAccuracy,
+   SubreadLengthQuery. The same functionality can recreated via providing a
+   PbiFilterQuery with a PbiFilter describing the corresponding criteria.
+
 ## [1.0.6] - 2019-06-14
 
 ### Added
