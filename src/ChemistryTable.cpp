@@ -65,10 +65,6 @@ const ChemistryTable& BuiltInChemistryTable()
 
         // BindingKit, SequencingKit, BasecallerVersion, Chemistry
 
-        // 3.0 ("Dromedary"): S/P1-C1/beta
-        {{"100-619-300", "100-620-000", "3.0", "S/P1-C1/beta"}},
-        {{"100-619-300", "100-620-000", "3.1", "S/P1-C1/beta"}},
-
         // 3.1 ("Echidna"): S/P1-C1.1
         {{"100-619-300", "100-867-300", "3.1", "S/P1-C1.1"}},
         {{"100-619-300", "100-867-300", "3.2", "S/P1-C1.1"}},
