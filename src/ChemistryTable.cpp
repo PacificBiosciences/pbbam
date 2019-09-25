@@ -61,7 +61,7 @@ ChemistryTable ChemistryTableFromXml(const std::string& mappingXml)
 const ChemistryTable& BuiltInChemistryTable()
 {
     // clang-format off
-    static ChemistryTable builtin{
+    const static ChemistryTable builtin{
 
         // BindingKit, SequencingKit, BasecallerVersion, Chemistry
 
