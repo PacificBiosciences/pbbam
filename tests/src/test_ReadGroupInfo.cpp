@@ -63,16 +63,15 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
         EXPECT_EQ(chem, rg.SequencingChemistry());
     }
 
-    {   // S/P1-C1.2 (Flea)
-        const std::string chem{"S/P1-C1.2"};
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-902-100","3.1"));
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-902-100","3.2"));
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-902-100","3.3"));
+    {   // S/P4-C2/5.0-8M (Release 8.0)
+        const std::string chem{"S/P4-C2/5.0-8M"};
+        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("101-789-500", "101-826-100", "5.0"));
+        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("101-789-500", "101-820-300", "5.0"));
 
         ReadGroupInfo rg("dummy");
-        rg.BindingKit("100-619-300")
-          .SequencingKit("100-902-100")
-          .BasecallerVersion("3.1");
+        rg.BindingKit("101-789-500")
+          .SequencingKit("101-826-100")
+          .BasecallerVersion("5.0");
         EXPECT_EQ(chem, rg.SequencingChemistry());
     }
     {   // S/P1-C1.3 (Goat)
