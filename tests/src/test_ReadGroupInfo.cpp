@@ -74,17 +74,6 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
           .BasecallerVersion("5.0");
         EXPECT_EQ(chem, rg.SequencingChemistry());
     }
-    {   // S/P1-C1.3 (Goat)
-        const std::string chem{"S/P1-C1.3"};
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-972-200","3.2"));
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-972-200","3.3"));
-
-        ReadGroupInfo rg("dummy");
-        rg.BindingKit("100-619-300")
-          .SequencingKit("100-972-200")
-          .BasecallerVersion("3.3");
-        EXPECT_EQ(chem, rg.SequencingChemistry());
-    }
 }
 
 #ifdef _WIN32
