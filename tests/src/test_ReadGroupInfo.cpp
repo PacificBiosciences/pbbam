@@ -47,16 +47,19 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
         EXPECT_EQ(chem, rg.SequencingChemistry());
     }
 
-    {   // S/P1-C1.1 (Echidna)
-        const std::string chem{"S/P1-C1.1"};
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-867-300","3.1"));
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-867-300","3.2"));
-        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("100-619-300","100-867-300","3.3"));
+    {   // S/P3-C1/5.0-8M (Release 7.0)
+        const std::string chem{"S/P3-C1/5.0-8M"};
+        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("101-490-800", "101-644-500", "5.0"));
+        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("101-490-800", "101-717-100", "5.0"));
+        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("101-717-300", "101-644-500", "5.0"));
+        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("101-717-300", "101-717-100", "5.0"));
+        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("101-717-400", "101-644-500", "5.0"));
+        EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("101-717-400", "101-717-100", "5.0"));
 
         ReadGroupInfo rg("dummy");
-        rg.BindingKit("100-619-300")
-          .SequencingKit("100-867-300")
-          .BasecallerVersion("3.1");
+        rg.BindingKit("101-490-800")
+          .SequencingKit("101-644-500")
+          .BasecallerVersion("5.0");
         EXPECT_EQ(chem, rg.SequencingChemistry());
     }
 
