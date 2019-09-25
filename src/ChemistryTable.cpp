@@ -65,11 +65,6 @@ const ChemistryTable& BuiltInChemistryTable()
 
         // BindingKit, SequencingKit, BasecallerVersion, Chemistry
 
-        // 4.0 ("Seabiscuit"); S/P2-C2
-        {{"100-862-200", "100-861-800", "4.0", "S/P2-C2"}},
-        {{"100-862-200", "100-861-800", "4.1", "S/P2-C2"}},
-        {{"100-862-200", "101-093-700", "4.1", "S/P2-C2"}},
-
         // 5.0 ("Iguana"); S/P2-C2
         {{"100-862-200", "100-861-800", "5.0", "S/P2-C2/5.0"}},
         {{"100-862-200", "101-093-700", "5.0", "S/P2-C2/5.0"}},
