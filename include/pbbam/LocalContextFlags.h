@@ -16,18 +16,15 @@ namespace BAM {
 
 using LocalContextFlags PBBAM_DEPRECATED = PacBio::Data::LocalContextFlags;
 
-// because LocalContextFlags was a C enum and not a
-// C++11 enum class, we need to import all enumerations
-// into the containing scope
-using PacBio::Data::LocalContextFlags::NO_LOCAL_CONTEXT;
-using PacBio::Data::LocalContextFlags::ADAPTER_BEFORE;
-using PacBio::Data::LocalContextFlags::ADAPTER_AFTER;
-using PacBio::Data::LocalContextFlags::BARCODE_BEFORE;
-using PacBio::Data::LocalContextFlags::BARCODE_AFTER;
-using PacBio::Data::LocalContextFlags::FORWARD_PASS;
-using PacBio::Data::LocalContextFlags::REVERSE_PASS;
-using PacBio::Data::LocalContextFlags::ADAPTER_BEFORE_BAD;
-using PacBio::Data::LocalContextFlags::ADAPTER_AFTER_BAD;
+using PacBio::Data::ADAPTER_AFTER;
+using PacBio::Data::ADAPTER_AFTER_BAD;
+using PacBio::Data::ADAPTER_BEFORE;
+using PacBio::Data::ADAPTER_BEFORE_BAD;
+using PacBio::Data::BARCODE_AFTER;
+using PacBio::Data::BARCODE_BEFORE;
+using PacBio::Data::FORWARD_PASS;
+using PacBio::Data::NO_LOCAL_CONTEXT;
+using PacBio::Data::REVERSE_PASS;
 
 }  // namespace BAM
 }  // namespace PacBio
