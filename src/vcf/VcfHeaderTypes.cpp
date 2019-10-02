@@ -181,11 +181,13 @@ static_assert(std::is_copy_constructible<InfoDefinition>::value,
 static_assert(std::is_copy_assignable<InfoDefinition>::value,
               "InfoDefinition& operator=(const InfoDefinition&) is not = default");
 
+#ifndef __INTEL_COMPILER
 static_assert(std::is_nothrow_move_constructible<InfoDefinition>::value,
               "InfoDefinition(InfoDefinition&&) is not = noexcept");
 static_assert(std::is_nothrow_move_assignable<InfoDefinition>::value ==
                   std::is_nothrow_move_assignable<std::string>::value,
               "");
+#endif
 
 // clang-format off
 InfoDefinition::InfoDefinition(std::string id, std::string number, std::string type,
