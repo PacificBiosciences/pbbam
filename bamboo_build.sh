@@ -10,6 +10,9 @@ type module >& /dev/null || . /mnt/software/Modules/current/init/bash
 
 module purge
 
+[[ ${GCC_VERSION} == ICC ]] && module use /pbi/dept/primary/modulefiles
+module use /mnt/software/modulefiles
+
 module load meson
 module load ninja
 
