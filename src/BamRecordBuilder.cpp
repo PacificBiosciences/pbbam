@@ -27,11 +27,13 @@ static_assert(std::is_copy_constructible<BamRecordBuilder>::value,
 static_assert(std::is_copy_assignable<BamRecordBuilder>::value,
               "BamRecordBuilder& operator=(const BamRecordBuilder&) is not = default");
 
+#ifndef __INTEL_COMPILER
 static_assert(std::is_nothrow_move_constructible<BamRecordBuilder>::value,
               "BamRecordBuilder(BamRecordBuilder&&) is not = noexcept");
 static_assert(std::is_nothrow_move_assignable<BamRecordBuilder>::value ==
                   std::is_nothrow_move_assignable<std::string>::value,
               "");
+#endif
 
 BamRecordBuilder::BamRecordBuilder()
 {
