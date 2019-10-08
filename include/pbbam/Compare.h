@@ -169,6 +169,16 @@ public:
     {
     };
 
+    /// \brief Compares on reference ID, then by position.
+    ///
+    /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
+    ///       ascending value).
+    ///
+    struct AlignmentPosition : public Compare::Base
+    {
+        bool operator()(const BamRecord& lhs, const BamRecord& rhs) const;
+    };
+
     /// \brief Compares on BamRecord::BarcodeForward.
     ///
     /// Example:
@@ -205,7 +215,9 @@ public:
     {
     };
 
-    /// \brief Compares on BamRecord::FullName.
+    /// \brief Compares on BamRecord::FullName (lexicographical).
+    ///
+    /// For PacBio BAM standard-aware sorting on QNAME, use Compare::QName.
     ///
     /// Example:
     /// \include code/Compare_FullName.txt
@@ -310,6 +322,18 @@ public:
     ///
     struct NumMismatches : public MemberFunctionBase<size_t, &BamRecord::NumMismatches>
     {
+    };
+
+    /// \brief Compares BamRecords' QNAMEs, via PacBio BAM spec-aware
+    ///        sorting order.
+    ///
+    /// For lexicographical sorting on QNAME, use Compare::FullName.
+    ///
+    /// \note Only supports sorting by ascending value, per the PacBio BAM spec.
+    ///
+    struct QName : public Compare::Base
+    {
+        bool operator()(const BamRecord& lhs, const BamRecord& rhs) const;
     };
 
     /// \brief Compares on BamRecord::QueryEnd.

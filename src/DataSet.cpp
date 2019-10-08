@@ -389,6 +389,8 @@ std::vector<GenomicInterval> DataSet::GenomicIntervals() const
     return result;
 }
 
+BamHeader DataSet::MergedHeader() const { return BamHeader{*this}; }
+
 const PacBio::BAM::DataSetMetadata& DataSet::Metadata() const { return d_->Metadata(); }
 
 PacBio::BAM::DataSetMetadata& DataSet::Metadata() { return d_->Metadata(); }

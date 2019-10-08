@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "pbbam/BamFile.h"
+#include "pbbam/BamHeader.h"
 #include "pbbam/DataSetTypes.h"
 #include "pbbam/GenomicInterval.h"
 
@@ -377,6 +378,12 @@ public:
     /// \sa DataSet::ResolvedResourceIds
     ///
     std::vector<std::string> FastaFiles() const;
+
+    ///
+    /// \brief Returns a BAM header, resulting from merging this dataset's BAM
+    ///        file headers.
+    ///
+    BamHeader MergedHeader() const;
 
     ///
     /// \returns (absolute) path for dataset

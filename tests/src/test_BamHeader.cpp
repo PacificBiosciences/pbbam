@@ -8,7 +8,11 @@
 #include <gtest/gtest.h>
 #include <htslib/sam.h>
 
+#include <pbbam/BamFile.h>
 #include <pbbam/BamHeader.h>
+#include <pbbam/DataSet.h>
+
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -23,6 +27,20 @@ struct BamHdrDeleter
         hdr = nullptr;
     }
 };
+
+const std::string MergedConstructorText{
+    "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
+    "@RG\tID:8aaede36\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;"
+    "MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:CodecV1=ip;BINDINGKIT=FakeBindKit;"
+    "SEQUENCINGKIT=FakeSeqKit;BASECALLERVERSION=0.2.0;FRAMERATEHZ=100.000000\tPU:"
+    "ArminsFakeMovie\tPM:SEQUEL\n"
+    "@RG\tID:e83fc9c6\tPL:PACBIO\tDS:READTYPE=SCRAP;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;"
+    "MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:CodecV1=ip;BINDINGKIT=FakeBindKit;"
+    "SEQUENCINGKIT=FakeSeqKit;BASECALLERVERSION=0.2.0;FRAMERATEHZ=100.000000\tPU:"
+    "ArminsFakeMovie\tPM:SEQUEL\n"
+    "@PG\tID:BAZ_FORMAT\tVN:0.3.0\n"
+    "@PG\tID:PPA-BAZ2BAM\tVN:0.1.0\n"
+    "@PG\tID:PPA-BAZWRITER\tVN:0.2.0\n"};
 
 }  // namespace BamHeaderTests
 
@@ -389,4 +407,32 @@ TEST(BamHeaderTest, MergeCompatibilityOk)
         const BamHeader header2(hdrText2);
         EXPECT_THROW(header1 + header2, std::runtime_error);
     }
+}
+
+TEST(BamHeaderTest, CanConstructMergedHeaderFromBamFilenames)
+{
+    const std::vector<std::string> bamFilenames{
+        PbbamTestsConfig::Data_Dir + "/polymerase/production.subreads.bam",
+        PbbamTestsConfig::Data_Dir + "/polymerase/production.scraps.bam"};
+
+    const BamHeader header{bamFilenames};
+    EXPECT_EQ(BamHeaderTests::MergedConstructorText, header.ToSam());
+}
+
+TEST(BamHeaderTest, CanConstructMergedHeaderFromDataset)
+{
+    const DataSet dataset{PbbamTestsConfig::Data_Dir +
+                          "/polymerase/consolidate.subread.dataset.xml"};
+    const BamHeader header{dataset};
+    EXPECT_EQ(BamHeaderTests::MergedConstructorText, header.ToSam());
+}
+
+TEST(BamHeaderTest, CanConstructMergedHeaderFromInputHeaders)
+{
+    const BamFile subreadsBam{PbbamTestsConfig::Data_Dir + "/polymerase/production.subreads.bam"};
+    const BamFile scrapsBam{PbbamTestsConfig::Data_Dir + "/polymerase/production.scraps.bam"};
+    const std::vector<BamHeader> headers{subreadsBam.Header(), scrapsBam.Header()};
+
+    const BamHeader header{headers};
+    EXPECT_EQ(BamHeaderTests::MergedConstructorText, header.ToSam());
 }

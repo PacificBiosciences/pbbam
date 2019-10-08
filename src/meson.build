@@ -22,6 +22,7 @@ pbbam_cpp_sources = files([
   'BgzipWriter.cpp',
   'ChemistryTable.cpp',
   'Compare.cpp',
+  'CompositeBamReader.cpp',
   'CompositeFastaReader.cpp',
   'Config.cpp',
   'DataSet.cpp',
