@@ -1,7 +1,7 @@
 project(
   'PacBioBAM',
   'cpp',
-  version : '1.0.6',
+  version : '1.0.7',
   default_options : [
     'buildtype=release',
     'warning_level=3',
@@ -121,7 +121,7 @@ if not meson.is_subproject()
   pbbam_requires = []
   if pbbam_pbcopper_dep.type_name() == 'pkgconfig'
     pbbam_requires = [pbbam_pbcopper_dep]
-  endif 
+  endif
 
   import('pkgconfig').generate(
     pbbam_lib,
