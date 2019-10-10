@@ -8,6 +8,7 @@
 
 #include "pbbam/BgzipFastaWriter.h"
 
+#include <sstream>
 #include <stdexcept>
 
 #include "pbbam/BamRecord.h"
@@ -17,20 +18,19 @@
 namespace PacBio {
 namespace BAM {
 
-BgzipFastaWriter::BgzipFastaWriter(const std::string& fn) : IFastaWriter{}, writer_{fn}
+BgzipFastaWriter::BgzipFastaWriter(const std::string& fn)
+    : BgzipFastaWriter{fn, BgzipWriterConfig{}}
 {
-    if (!FormatUtils::IsFastaFilename(fn)) {
-        throw std::runtime_error{"BgzipFastaWriter: filename '" + fn +
-                                 "' is not recognized as a FASTA file."};
-    }
 }
 
 BgzipFastaWriter::BgzipFastaWriter(const std::string& fn, const BgzipWriterConfig& config)
     : IFastaWriter{}, writer_{fn, config}
 {
     if (!FormatUtils::IsFastaFilename(fn)) {
-        throw std::runtime_error{"BgzipFastaWriter: filename '" + fn +
-                                 "' is not recognized as a FASTA file."};
+        std::ostringstream s;
+        s << "[pbbam] bgzipped FASTA writer ERROR: not a recognized FASTA extension:\n"
+          << "  file: " << fn;
+        throw std::runtime_error{s.str()};
     }
 }
 

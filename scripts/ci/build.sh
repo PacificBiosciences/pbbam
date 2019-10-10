@@ -55,10 +55,12 @@ meson \
   --default-library "${LIBRARYTYPE:-shared}" \
   --libdir lib \
   --unity "${ENABLED_UNITY_BUILD:-off}" \
-  --wrap-mode nofallback \
+  --wrap-mode "${ENABLED_WRAP_MODE:-nofallback}" \
   --prefix "${PREFIX_ARG:-/}" \
   -Db_coverage="${ENABLED_COVERAGE:-false}" \
+  -Db_lto="${ENABLED_LTO:-false}" \
   -Db_sanitize="${ENABLED_SANITIZERS:-none}" \
+  -Dcpp_debugstl="${ENABLED_DEBUGSTL:-false}" \
   -Dtests="${ENABLED_TESTS:-false}" \
   "${CURRENT_BUILD_DIR:-build}" .
 

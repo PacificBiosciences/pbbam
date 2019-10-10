@@ -5,6 +5,7 @@
 #include <pbbam/vcf/VcfWriter.h>
 
 #include <cassert>
+
 #include <fstream>
 #include <iostream>
 #include <type_traits>
@@ -12,6 +13,7 @@
 #include <pbbam/vcf/VcfFormat.h>
 #include <pbbam/vcf/VcfHeader.h>
 #include <pbbam/vcf/VcfVariant.h>
+
 #include "../FileProducer.h"
 
 namespace PacBio {

@@ -9,6 +9,8 @@
 #include "pbbam/FastqReader.h"
 
 #include <cassert>
+
+#include <sstream>
 #include <stdexcept>
 #include <type_traits>
 
@@ -31,8 +33,10 @@ public:
     {
         // validate extension
         if (!FormatUtils::IsFastqFilename(fn)) {
-            throw std::runtime_error{"FastqReader: filename '" + fn +
-                                     "' is not recognized as a FASTQ file."};
+            std::ostringstream s;
+            s << "[pbbam] FASTQ reader ERROR: not a recognized FASTQ extension:\n"
+              << "  file: " << fn;
+            throw std::runtime_error{s.str()};
         }
         reader_ = std::make_unique<KSeqReader>(fn);
     }

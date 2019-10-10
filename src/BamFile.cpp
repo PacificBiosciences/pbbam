@@ -9,18 +9,21 @@
 #include "pbbam/BamFile.h"
 
 #include <sys/stat.h>
+
 #include <cassert>
 #include <cstdint>
+
 #include <memory>
 #include <sstream>
 #include <string>
 
 #include <htslib/sam.h>
 
+#include "pbbam/PbiFile.h"
+
 #include "Autovalidate.h"
 #include "FileUtils.h"
 #include "MemoryUtils.h"
-#include "pbbam/PbiFile.h"
 
 namespace PacBio {
 namespace BAM {
@@ -46,10 +49,12 @@ public:
             // -1: some other error
             std::ostringstream e;
             if (eofCheck == 0)
-                e << "BamFile: missing EOF block in " << fn;
+                e << "[pbbam] BAM file ERROR: missing EOF block:\n"
+                  << "  file: " << fn;
             else
-                e << "BamFile: unknown error encountered while checking EOF in " << fn
-                  << " (status code = " << eofCheck << ')';
+                e << "[pbbam] BAM file ERROR: unknown error encountered while checking EOF:\n"
+                  << "  file: " << fn << '\n'
+                  << "  htslib status code: " << eofCheck;
             throw std::runtime_error{e.str()};
         }
 #endif
@@ -87,10 +92,20 @@ public:
     std::unique_ptr<samFile, HtslibFileDeleter> RawOpen() const
     {
         std::unique_ptr<samFile, HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
-        if (!f || !f->fp.bgzf) throw std::runtime_error{"BamFile: could not open: " + filename_};
-        if (f->format.format != bam)
-            throw std::runtime_error{"BamFile: expected BAM, encountered un supported format: " +
-                                     filename_};
+
+        if (!f || !f->fp.bgzf) {
+            std::ostringstream s;
+            s << "[pbbam] BAM file ERROR: could not open:\n"
+              << "  file: " << filename_;
+            throw std::runtime_error{s.str()};
+        }
+        if (f->format.format != bam) {
+            std::ostringstream s;
+            s << "[pbbam] BAM file ERROR: expected BAM, encountered different format:\n"
+              << "  file: " << filename_;
+            throw std::runtime_error{s.str()};
+        }
+
         return f;
     }
 
@@ -126,8 +141,9 @@ void BamFile::CreateStandardIndex() const
     const auto ret = bam_index_build(d_->filename_.c_str(), 0);
     if (ret != 0) {
         std::ostringstream s;
-        s << "BamFile: could not create *.bai index for file: " << d_->filename_
-          << " (status code = " << ret << ')';
+        s << "[pbbam] BAM file ERROR: could not create *.bai index:\n"
+          << "  file: " << d_->filename_ << '\n'
+          << "  htslib status code: " << ret;
         throw std::runtime_error{s.str()};
     }
 }

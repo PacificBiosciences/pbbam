@@ -9,6 +9,7 @@
 #include "pbbam/FaiIndex.h"
 
 #include <cassert>
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -65,10 +66,12 @@ public:
             const auto numFields = fields.size();
             if (numFields < 5 || numFields > 6) {
                 std::ostringstream msg;
-                msg << "FaiIndex: malformatted index line, incorrect number of fields\n"
+                msg << "[pbbam] FAI index ERROR: malformed index line, incorrect number of "
+                       "fields:\n"
                     << "  expected: 5 for FASTA, or 6 for FASTQ\n"
                     << "  observed: " << numFields << " in line:\n"
-                    << line << '\n';
+                    << line << '\n'
+                    << "  file: " << fn;
                 throw std::runtime_error{msg.str()};
             }
 
@@ -103,7 +106,8 @@ const FaiEntry& FaiIndex::Entry(const std::string& name) const
 {
     const auto found = d_->data_.find(name);
     if (found == d_->data_.cend())
-        throw std::runtime_error{"FaiIndex: could not find entry for sequence name: " + name};
+        throw std::runtime_error{
+            "[pbbam] FAI index ERROR: could not find entry for sequence name: " + name};
     return found->second;
 }
 

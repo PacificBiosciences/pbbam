@@ -23,7 +23,7 @@ IndexedFastqBgzfReader::IndexedFastqBgzfReader(std::string filename)
     // check BGZF file handle
     if (file_ == nullptr) {
         std::ostringstream msg;
-        msg << "IndexedFastqBgzfReader: could not open file for reading\n"
+        msg << "[pbbam] FASTQ reader ERROR: could not open file:\n"
             << "  FASTQ file: " << fastqFilename_ << '\n';
         throw std::runtime_error{msg.str()};
     }
@@ -35,7 +35,7 @@ IndexedFastqBgzfReader::IndexedFastqBgzfReader(std::string filename)
     const auto result = bgzf_index_load(file_.get(), fastqFilename_.c_str(), ".gzi");
     if (result != 0) {
         std::ostringstream msg;
-        msg << "IndexedFastqBgzfReader: could not load bgzf index data\n"
+        msg << "[pbbam] FASTQ reader ERROR: could not load *.gzi index data:\n"
             << "  FASTQ file: " << fastqFilename_ << '\n'
             << "  index file: " << fastqFilename_ << ".gzi\n";
         throw std::runtime_error{msg.str()};
@@ -98,7 +98,7 @@ std::pair<std::string, QualityValues> IndexedFastqBgzfReader::Subsequence(const 
     const int64_t length = std::min(available, requested);
     if ((start < 0) || (end < 0) || (length < 0)) {
         std::ostringstream msg;
-        msg << "IndexedFastqBgzfReader: invalid subsequence region requested from\n"
+        msg << "[pbbam] FASTQ reader ERROR: invalid subsequence region requested:\n"
             << "  FASTQ file: " << fastqFilename_ << '\n'
             << "  requested region: " << id << ':' << start << '-' << end << '\n'
             << "  sequence length:  " << entry.Length << '\n';
@@ -112,7 +112,7 @@ std::pair<std::string, QualityValues> IndexedFastqBgzfReader::Subsequence(const 
     auto result = bgzf_useek(file_.get(), entry.SeqOffset, SEEK_SET);
     if (result != 0) {
         std::ostringstream msg;
-        msg << "IndexedFastqBgzfReader: could not seek to requested region\n"
+        msg << "[pbbam] FASTQ reader ERROR: could not seek to requested region:\n"
             << "  FASTQ file: " << fastqFilename_ << '\n'
             << "  requested region: " << id << ':' << start << '-' << end << '\n';
         throw std::runtime_error{msg.str()};
@@ -123,7 +123,7 @@ std::pair<std::string, QualityValues> IndexedFastqBgzfReader::Subsequence(const 
     result = FetchRecord();
     if (result < 0) {
         std::ostringstream msg;
-        msg << "IndexedFastqBgzfReader: error reading from\n"
+        msg << "[pbbam] FASTQ reader ERROR: could not read FASTQ record:\n"
             << "  FASTQ file: " << fastqFilename_ << '\n'
             << "  requested region: " << id << ':' << start << '-' << end << '\n'
             << "  reason: likely truncated quality string\n";

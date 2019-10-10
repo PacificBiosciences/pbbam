@@ -5,17 +5,21 @@
 #include "pbbam/SamWriter.h"
 
 #include <cassert>
+
 #include <memory>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 
 #include <htslib/hfile.h>
 #include <htslib/sam.h>
 
+#include "pbbam/Validator.h"
+
 #include "Autovalidate.h"
 #include "FileProducer.h"
 #include "MemoryUtils.h"
-#include "pbbam/Validator.h"
 
 namespace PacBio {
 namespace BAM {
@@ -26,20 +30,32 @@ public:
     SamWriterPrivate(std::string filename, const std::shared_ptr<bam_hdr_t> rawHeader)
         : FileProducer{std::move(filename)}, header_{rawHeader}
     {
-        if (!header_) throw std::runtime_error{"SamWriter: null header provided"};
+        if (!header_) {
+            std::ostringstream msg;
+            msg << "[pbbam] SAM writer ERROR: null header provided:\n"
+                << "  file: " << filename;
+            throw std::runtime_error{msg.str()};
+        }
 
         // open file
         const auto& usingFilename = TempFilename();
         const std::string mode(1, 'w');
         file_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
-        if (!file_)
-            throw std::runtime_error{"SamWriter: could not open file for writing: " +
-                                     usingFilename};
+        if (!file_) {
+            std::ostringstream msg;
+            msg << "[pbbam] SAM writer ERROR: could not open file for writing:\n"
+                << "  file: " << usingFilename;
+            throw std::runtime_error{msg.str()};
+        }
 
         // write header
         const auto ret = sam_hdr_write(file_.get(), header_.get());
-        if (ret != 0)
-            throw std::runtime_error{"SamWriter: could not write header to file: " + usingFilename};
+        if (ret != 0) {
+            std::ostringstream msg;
+            msg << "[pbbam] SAM writer ERROR: could not write header:\n"
+                << "  file: " << usingFilename;
+            throw std::runtime_error{msg.str()};
+        }
     }
 
     void Write(BamRecord record)
@@ -73,7 +89,7 @@ public:
 
         // write record to file
         const int ret = sam_write1(file_.get(), header_.get(), rawRecord.get());
-        if (ret <= 0) throw std::runtime_error{"SamWriter: could not write record"};
+        if (ret <= 0) throw std::runtime_error{"[pbbam] SAM writer ERROR: could not write record"};
     }
 
     std::unique_ptr<samFile, HtslibFileDeleter> file_;
@@ -105,7 +121,8 @@ void SamWriter::TryFlush()
 {
     const auto ret = d_->file_.get()->fp.hfile;
     if (ret != nullptr)
-        throw std::runtime_error{"SamWriter: could not flush output buffer contents"};
+        throw std::runtime_error{
+            "[pbbam] SAM writer ERROR: could not flush output buffer contents"};
 }
 
 void SamWriter::Write(const BamRecord& record) { d_->Write(record); }

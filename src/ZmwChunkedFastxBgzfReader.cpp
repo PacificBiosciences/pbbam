@@ -23,7 +23,7 @@ ZmwChunkedFastxBgzfReader::ZmwChunkedFastxBgzfReader(std::string filename, const
     // check BGZF file handle
     if (file_ == nullptr) {
         std::ostringstream msg;
-        msg << "ZmwChunkedFastxBgzfReader: could not open file for reading\n"
+        msg << "[pbbam] chunked FASTX reader ERROR: could not open file:\n"
             << "  file: " << fastxFilename_ << '\n';
         throw std::runtime_error{msg.str()};
     }
@@ -35,7 +35,7 @@ ZmwChunkedFastxBgzfReader::ZmwChunkedFastxBgzfReader(std::string filename, const
     const auto result = bgzf_index_load(file_.get(), fastxFilename_.c_str(), ".gzi");
     if (result != 0) {
         std::ostringstream msg;
-        msg << "ZmwChunkedFastxBgzfReader: could not load bgzf index data\n"
+        msg << "[pbbam] chunked FASTX reader ERROR: could not load bgzf index data:\n"
             << "  file: " << fastxFilename_ << '\n'
             << "  index file: " << fastxFilename_ << ".gzi\n";
         throw std::runtime_error{msg.str()};
@@ -109,7 +109,7 @@ FastaSequence ZmwChunkedFastxBgzfReader::ReadNextFasta(bool skipName)
     const auto result = FetchRecord(skipName);
     if (result < 0) {
         std::ostringstream msg;
-        msg << "ZmwChunkedFastxBgzfReader: error reading from\n"
+        msg << "[pbbam] chunked FASTX reader ERROR: error reading from\n"
             << "  file: " << fastxFilename_ << '\n'
             << "  reason: likely truncated quality string\n";
         throw std::runtime_error{msg.str()};
@@ -127,7 +127,7 @@ FastqSequence ZmwChunkedFastxBgzfReader::ReadNextFastq(bool skipName)
     const auto result = FetchRecord(skipName);
     if (result < 0) {
         std::ostringstream msg;
-        msg << "ZmwChunkedFastxBgzfReader: error reading from\n"
+        msg << "[pbbam] chunked FASTX reader ERROR: could not read record:\n"
             << "  file: " << fastxFilename_ << '\n'
             << "  reason: likely truncated quality string\n";
         throw std::runtime_error{msg.str()};
@@ -146,7 +146,8 @@ void ZmwChunkedFastxBgzfReader::Seek(uint64_t pos)
     auto result = bgzf_useek(file_.get(), pos, SEEK_SET);
     if (result != 0) {
         std::ostringstream msg;
-        msg << "ZmwChunkedFastxBgzfReader: could not seek to requested pos: " << pos << '\n'
+        msg << "[pbbam] chunked FASTX reader ERROR: could not seek to requested pos: " << pos
+            << '\n'
             << "  in file: " << fastxFilename_;
         throw std::runtime_error{msg.str()};
     }

@@ -8,8 +8,10 @@
 
 #include "pbbam/FastaReader.h"
 
-#include <algorithm>
 #include <cassert>
+
+#include <algorithm>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -34,8 +36,10 @@ public:
     {
         // validate extension
         if (!FormatUtils::IsFastaFilename(fn)) {
-            throw std::runtime_error{"FastaReader: filename '" + fn +
-                                     "' is not recognized as a FASTA file."};
+            std::ostringstream s;
+            s << "[pbbam] FASTA reader ERROR: not a recognized FASTA extension:\n"
+              << "  file: " << fn;
+            throw std::runtime_error{s.str()};
         }
         reader_ = std::make_unique<KSeqReader>(fn);
     }

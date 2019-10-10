@@ -8,14 +8,16 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+
 #include <memory>
 #include <sstream>
 #include <type_traits>
 
 #include <htslib/sam.h>
 
-#include "MemoryUtils.h"
 #include "pbbam/BamTagCodec.h"
+
+#include "MemoryUtils.h"
 
 namespace PacBio {
 namespace BAM {
@@ -25,11 +27,13 @@ static_assert(std::is_copy_constructible<BamRecordBuilder>::value,
 static_assert(std::is_copy_assignable<BamRecordBuilder>::value,
               "BamRecordBuilder& operator=(const BamRecordBuilder&) is not = default");
 
+#ifndef __INTEL_COMPILER
 static_assert(std::is_nothrow_move_constructible<BamRecordBuilder>::value,
               "BamRecordBuilder(BamRecordBuilder&&) is not = noexcept");
 static_assert(std::is_nothrow_move_assignable<BamRecordBuilder>::value ==
                   std::is_nothrow_move_assignable<std::string>::value,
               "");
+#endif
 
 BamRecordBuilder::BamRecordBuilder()
 {
@@ -79,7 +83,8 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
     auto recordRawData = BamRecordMemory::GetRawData(record);
     if (!recordRawData || !recordRawData->data)
         throw std::runtime_error{
-            "BamRecordBuilder: cannot build record, target memory is in an invalid state"};
+            "[pbbam] BAM record builder ERROR: cannot build record, target memory is in an invalid "
+            "state"};
     recordRawData->core = core_;
 
     // setup variable length data
@@ -97,7 +102,8 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
     uint8_t* varLengthDataBlock = recordRawData->data;
     if (!varLengthDataBlock)
         throw std::runtime_error{
-            "BamRecordBuilder: cannot build record, target memory is in an invalid state"};
+            "[pbbam] BAM record builder ERROR: cannot build record, target memory is in an invalid "
+            "state"};
 
     size_t allocatedDataLength = recordRawData->m_data;
     if (allocatedDataLength < dataLength) {
@@ -124,8 +130,9 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
             encodedCigar[i] = op.Length() << BAM_CIGAR_SHIFT;
             const auto type = static_cast<uint8_t>(op.Type());
             if (type >= 8)
-                throw std::runtime_error{"BamRecordBuilder: invalid CIGAR op type: " +
-                                         std::to_string(type)};
+                throw std::runtime_error{
+                    "[pbbam] BAM record builder ERROR: invalid CIGAR op type: " +
+                    std::to_string(type)};
             encodedCigar[i] |= type;
         }
         memcpy(&varLengthDataBlock[index], &encodedCigar[0], cigarLength);
@@ -157,7 +164,8 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
     // tags
     if (tagLength > 0) {
         if (encodedTags.empty())
-            throw std::runtime_error{"BamRecordBuilder: expected tags but none are present"};
+            throw std::runtime_error{
+                "[pbbam] BAM record builder ERROR: expected tags but none are present"};
         memcpy(&varLengthDataBlock[index], &encodedTags[0], tagLength);
         index += tagLength;
     }
@@ -165,7 +173,7 @@ bool BamRecordBuilder::BuildInPlace(BamRecord& record) const
     // sanity check
     if (index != dataLength) {
         std::ostringstream s;
-        s << "BamRecordBuilder: incorrect number of bytes written to record:\n"
+        s << "[pbbam] BAM record builder ERROR: incorrect number of bytes written to record:\n"
           << "  expected: " << dataLength << '\n'
           << "  actual: " << index;
         throw std::runtime_error{s.str()};
@@ -267,7 +275,8 @@ void BamRecordBuilder::Reset(BamRecord prototype)
     const auto rawData = BamRecordMemory::GetRawData(prototype);
     if (!rawData)
         throw std::runtime_error{
-            "BamRecordBuilder: cannot build record, target memory is in an invalid state"};
+            "[pbbam] BAM record builder ERROR: cannot build record, target memory is in an invalid "
+            "state"};
     core_ = std::move(rawData->core);
 }
 

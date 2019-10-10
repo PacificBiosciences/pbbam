@@ -9,6 +9,7 @@
 #include "pbbam/Compare.h"
 
 #include <cstddef>
+
 #include <functional>
 #include <unordered_map>
 
@@ -77,14 +78,58 @@ static const std::unordered_map<Compare::Type, TypeAlias, CompareTypeHash> typeA
 };
 // clang-format on
 
-}  // anonymous
+}  // namespace
+
+bool Compare::AlignmentPosition::operator()(const BamRecord& lhs, const BamRecord& rhs) const
+{
+    const int32_t lhsId = lhs.ReferenceId();
+    const int32_t rhsId = rhs.ReferenceId();
+
+    // push unmapped reads to bottom
+    if (lhsId == -1) return false;
+    if (rhsId == -1) return true;
+
+    // compare by refId, then position
+    if (lhsId == rhsId)
+        return lhs.ReferenceStart() < rhs.ReferenceStart();
+    else
+        return lhsId < rhsId;
+}
+
+bool Compare::QName::operator()(const BamRecord& lhs, const BamRecord& rhs) const
+{
+    // movie name
+    const auto lMovieName = lhs.MovieName();
+    const auto rMovieName = rhs.MovieName();
+    const int cmp = lMovieName.compare(rMovieName);
+    if (cmp != 0) return cmp < 0;
+
+    // hole number
+    const auto lhsZmw = lhs.HoleNumber();
+    const auto rhsZmw = rhs.HoleNumber();
+    if (lhsZmw != rhsZmw) return lhsZmw < rhsZmw;
+
+    // shuffle CCS/transcript reads after all others
+    if (IsCcsOrTranscript(lhs.Type())) return false;
+    if (IsCcsOrTranscript(rhs.Type())) return true;
+
+    // sort on qStart, then finally qEnd
+    const auto lhsQStart = lhs.QueryStart();
+    const auto rhsQStart = rhs.QueryStart();
+    if (lhsQStart != rhsQStart) return lhsQStart < rhsQStart;
+
+    const auto lhsQEnd = lhs.QueryEnd();
+    const auto rhsQEnd = rhs.QueryEnd();
+    return lhsQEnd < rhsQEnd;
+}
 
 Compare::Type Compare::TypeFromOperator(const std::string& opString)
 {
     try {
         return opToTypeMap.at(opString);
     } catch (std::exception&) {
-        throw std::runtime_error{"Compare: " + opString + " is not a valid comparison operator."};
+        throw std::runtime_error{"[pbbam] comparison ERROR: " + opString +
+                                 " is not a valid comparison operator."};
     }
 }
 
@@ -93,7 +138,7 @@ std::string Compare::TypeToName(const Compare::Type& type)
     try {
         return typeAliases.at(type).name_;
     } catch (std::exception&) {
-        throw std::runtime_error{"Compare: invalid comparison type encountered"};
+        throw std::runtime_error{"[pbbam] comparison ERROR: invalid comparison type encountered"};
     }
 }
 
@@ -102,7 +147,7 @@ std::string Compare::TypeToOperator(const Compare::Type& type, bool asAlpha)
     try {
         return asAlpha ? typeAliases.at(type).opAlpha_ : typeAliases.at(type).op_;
     } catch (std::exception&) {
-        throw std::runtime_error{"Compare: invalid comparison type encountered"};
+        throw std::runtime_error{"[pbbam] comparison ERROR: invalid comparison type encountered"};
     }
 }
 

@@ -98,7 +98,7 @@ inline Version::operator std::string() const { return ToString(); }
 inline void Version::Check() const
 {
     if (major_ < 0 || minor_ < 0 || revision_ < 0)
-        throw std::runtime_error{"version cannot contain negative numbers"};
+        throw std::runtime_error{"[pbbam] version string ERROR: cannot contain negative numbers"};
 }
 
 inline int Version::Major() const { return major_; }

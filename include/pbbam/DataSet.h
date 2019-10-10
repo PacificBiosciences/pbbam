@@ -16,11 +16,21 @@
 #include <vector>
 
 #include "pbbam/BamFile.h"
+#include "pbbam/BamHeader.h"
 #include "pbbam/DataSetTypes.h"
 #include "pbbam/GenomicInterval.h"
 
 namespace PacBio {
 namespace BAM {
+
+///
+/// Used in some cases to use or ignore filters specified in the *.xml.
+///
+enum class DataSetFilterMode
+{
+    APPLY,
+    IGNORE
+};
 
 /// \brief The DataSet class represents a %PacBio analyis dataset (e.g. from
 ///        XML).
@@ -368,6 +378,12 @@ public:
     /// \sa DataSet::ResolvedResourceIds
     ///
     std::vector<std::string> FastaFiles() const;
+
+    ///
+    /// \brief Returns a BAM header, resulting from merging this dataset's BAM
+    ///        file headers.
+    ///
+    BamHeader MergedHeader() const;
 
     ///
     /// \returns (absolute) path for dataset

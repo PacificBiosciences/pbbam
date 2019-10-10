@@ -5,9 +5,11 @@
 #include "XmlWriter.h"
 
 #include <cstddef>
+
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <stdexcept>
 
 #include "pbbam/DataSet.h"
 
@@ -93,7 +95,8 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
 
     // create top-level dataset XML node
     const auto label = OutputName(dataset, registry);
-    if (label.empty()) throw std::runtime_error{"XmlReader: could not convert dataset node to XML"};
+    if (label.empty())
+        throw std::runtime_error{"[pbbam] XML writer ERROR: could not convert dataset node to XML"};
     auto root = doc.append_child(label.c_str());
 
     const auto& text = dataset.Text();
@@ -155,7 +158,7 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
 
     // "no escapes" to allow explicit ">" "<" comparison operators in filter parameters
     // we may remove this if/when comparison is separated from the value
-    doc.save(out, "\t", pugi::format_default | pugi::format_no_escapes, pugi::encoding_utf8);
+    doc.save(out, "\t", pugi::format_default, pugi::encoding_utf8);
 }
 
 void XmlWriter::ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostream& out)
