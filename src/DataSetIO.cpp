@@ -158,26 +158,28 @@ std::unique_ptr<DataSetBase> DataSetIO::FromXmlString(const std::string& xml)
     return XmlReader::FromStream(s);
 }
 
-void DataSetIO::ToFile(const std::unique_ptr<DataSetBase>& dataset, const std::string& fn)
+void DataSetIO::ToFile(const std::unique_ptr<DataSetBase>& dataset, const std::string& fn,
+                       DataSetPathMode pathMode)
 {
-    DataSetIO::ToFile(*dataset, fn);
+    DataSetIO::ToFile(*dataset, fn, pathMode);
 }
 
-void DataSetIO::ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostream& out)
+void DataSetIO::ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostream& out,
+                         DataSetPathMode pathMode)
 {
-    DataSetIO::ToStream(*dataset, out);
+    DataSetIO::ToStream(*dataset, out, pathMode);
 }
 
-void DataSetIO::ToFile(DataSetBase& dataset, const std::string& fn)
+void DataSetIO::ToFile(DataSetBase& dataset, const std::string& fn, DataSetPathMode pathMode)
 {
     std::ofstream out(fn);
     if (!out) throw DataSetFileException{fn, "could not open XML file for writing"};
-    XmlWriter::ToStream(dataset, out);
+    XmlWriter::ToStream(dataset, out, pathMode);
 }
 
-void DataSetIO::ToStream(DataSetBase& dataset, std::ostream& out)
+void DataSetIO::ToStream(DataSetBase& dataset, std::ostream& out, DataSetPathMode pathMode)
 {
-    XmlWriter::ToStream(dataset, out);
+    XmlWriter::ToStream(dataset, out, pathMode);
 }
 
 }  // namespace BAM

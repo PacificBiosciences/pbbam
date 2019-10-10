@@ -162,21 +162,25 @@ public:
     /// \brief Saves dataset XML to file.
     ///
     /// \param[in] outputFilename destination for XML contents
+    /// \param[in] pathMode       print absolute paths or allow relative
     ///
     /// \throws std::runtime_error if file could be opened or if DataSet
     ///         elements could not be converted to XML
     ///
-    void Save(const std::string& outputFilename) const;
+    void Save(const std::string& outputFilename,
+              DataSetPathMode pathMode = DataSetPathMode::ABSOLUTE) const;
 
     /// \brief Saves dataset XML to output stream, e.g. std::cout,
     ///        std::stringstream.
     ///
-    /// \param[out] out destination for XML contents
+    /// \param[out] out         destination for XML contents
+    /// \param[in]  pathMode    print absolute paths or allow relative
     ///
     /// \throws std::runtime_error if DataSet elements could not be converted to
     ///         XML
     ///
-    void SaveToStream(std::ostream& out) const;
+    void SaveToStream(std::ostream& out,
+                      DataSetPathMode pathMode = DataSetPathMode::ABSOLUTE) const;
 
     /// \}
 

@@ -133,7 +133,7 @@ DataSet::DataSet(const DataSet& other)
 {
     const bool otherFromXml = other.d_->FromInputXml();
     std::ostringstream out;
-    DataSetIO::ToStream(other.d_, out);
+    DataSetIO::ToStream(other.d_, out, DataSetPathMode::ALLOW_RELATIVE);
     const std::string xml = out.str();
     d_ = DataSetIO::FromXmlString(xml);
     d_->Path(other.d_->Path());
@@ -483,12 +483,15 @@ DataSet& DataSet::ResourceId(const std::string& resourceId)
     return *this;
 }
 
-void DataSet::Save(const std::string& outputFilename) const
+void DataSet::Save(const std::string& outputFilename, DataSetPathMode pathMode) const
 {
-    DataSetIO::ToFile(d_, outputFilename);
+    DataSetIO::ToFile(d_, outputFilename, pathMode);
 }
 
-void DataSet::SaveToStream(std::ostream& out) const { DataSetIO::ToStream(d_, out); }
+void DataSet::SaveToStream(std::ostream& out, DataSetPathMode pathMode) const
+{
+    DataSetIO::ToStream(d_, out, pathMode);
+}
 
 std::set<std::string> DataSet::SequencingChemistries() const
 {
