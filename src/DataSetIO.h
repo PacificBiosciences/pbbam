@@ -24,10 +24,12 @@ public:
     static std::unique_ptr<DataSetBase> FromXmlString(const std::string& xml);
 
     // output
-    static void ToFile(DataSetBase& dataset, const std::string& fn);
-    static void ToFile(const std::unique_ptr<DataSetBase>& dataset, const std::string& fn);
-    static void ToStream(DataSetBase& dataset, std::ostream& out);
-    static void ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostream& out);
+    static void ToFile(DataSetBase& dataset, const std::string& fn, DataSetPathMode pathMode);
+    static void ToFile(const std::unique_ptr<DataSetBase>& dataset, const std::string& fn,
+                       DataSetPathMode pathMode);
+    static void ToStream(DataSetBase& dataset, std::ostream& out, DataSetPathMode pathMode);
+    static void ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostream& out,
+                         DataSetPathMode pathMode);
 };
 
 }  // namespace BAM

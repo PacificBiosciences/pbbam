@@ -19,6 +19,16 @@ namespace PacBio {
 namespace BAM {
 
 ///
+/// Set filepath resolving mode for XML output. Default is to always 'absolutize'
+/// paths. Selecting 'ALLOW_RELATIVE' leaves file names verbatim.
+///
+enum class DataSetPathMode
+{
+    ABSOLUTE,
+    ALLOW_RELATIVE
+};
+
+///
 /// \brief The DNABarcode class represents a %DNABarcode element in
 ///        DataSetXML, consisting of a Name and optional UniqueId.
 ///
@@ -971,21 +981,24 @@ public:
     /// \brief Saves dataset XML to file.
     ///
     /// \param[in] outputFilename destination for XML contents
+    /// \param[in] pathMode       print absolute paths or allow relative
     ///
     /// \throws std::runtime_error if file could be opened or if DataSet
     ///         elements could not be converted to XML
     ///
-    void Save(const std::string& outputFilename);
+    void Save(const std::string& outputFilename,
+              DataSetPathMode pathMode = DataSetPathMode::ABSOLUTE);
 
     /// \brief Saves dataset XML to output stream, e.g. std::cout,
     ///        std::stringstream.
     ///
-    /// \param[out] out destination for XML contents
+    /// \param[out] out         destination for XML contents
+    /// \param[in]  pathMode    print absolute paths or allow relative
     ///
     /// \throws std::runtime_error if DataSet elements could not be converted to
     ///         XML
     ///
-    void SaveToStream(std::ostream& out);
+    void SaveToStream(std::ostream& out, DataSetPathMode pathMode = DataSetPathMode::ABSOLUTE);
 
 public:
     ///

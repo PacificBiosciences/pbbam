@@ -375,12 +375,15 @@ std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName,
     throw std::runtime_error{"[pbbam] dataset ERROR: unsupported type: " + typeName};
 }
 
-void DataSetBase::Save(const std::string& outputFilename)
+void DataSetBase::Save(const std::string& outputFilename, DataSetPathMode pathMode)
 {
-    DataSetIO::ToFile(*this, outputFilename);
+    DataSetIO::ToFile(*this, outputFilename, pathMode);
 }
 
-void DataSetBase::SaveToStream(std::ostream& out) { DataSetIO::ToStream(*this, out); }
+void DataSetBase::SaveToStream(std::ostream& out, DataSetPathMode pathMode)
+{
+    DataSetIO::ToStream(*this, out, pathMode);
+}
 
 // -------------------
 // DataSetMetadata
