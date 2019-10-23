@@ -1718,4 +1718,37 @@ TEST(DataSetIOTest, AmpersandsAreEscaped)
     EXPECT_TRUE(out.str().find("R&amp;D") != std::string::npos);
 }
 
+TEST(DataSetIOTest, CanWriteRelativePathsInDoNovoDataset)
+{
+    const std::string file1{"file1.bam"};
+    const std::string file2{"subdir/file2.bam"};
+
+    const std::string relativeResource1{"ResourceId=\"file1.bam\""};
+    const std::string relativeResource2{"ResourceId=\"subdir/file2.bam\""};
+
+    DataSet dataset;
+    dataset.ExternalResources().Add(ExternalResource{"PacBio.SubreadFile.SubreadBamFile", file1});
+    dataset.ExternalResources().Add(ExternalResource{"PacBio.SubreadFile.SubreadBamFile", file2});
+
+    std::ostringstream out;
+    dataset.SaveToStream(out);
+
+    // contains the expected files, but has appended an absolute path
+    const std::string resolvedXml = out.str();
+    EXPECT_NE(std::string::npos, resolvedXml.find(file1));
+    EXPECT_NE(std::string::npos, resolvedXml.find(file2));
+    EXPECT_EQ(std::string::npos, resolvedXml.find(relativeResource1));
+    EXPECT_EQ(std::string::npos, resolvedXml.find(relativeResource2));
+
+    out.str("");
+    dataset.SaveToStream(out, DataSetPathMode::ALLOW_RELATIVE);
+
+    // contains just the verbatim, relative file path
+    const std::string unresolvedXml{out.str()};
+    EXPECT_NE(std::string::npos, unresolvedXml.find(file1));
+    EXPECT_NE(std::string::npos, unresolvedXml.find(file2));
+    EXPECT_NE(std::string::npos, unresolvedXml.find(relativeResource1));
+    EXPECT_NE(std::string::npos, unresolvedXml.find(relativeResource2));
+}
+
 // clang-format on

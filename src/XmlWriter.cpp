@@ -52,7 +52,7 @@ std::string OutputName(const DataSetElement& node, const NamespaceRegistry& regi
 
 void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
            std::map<XsdType, std::string>& xsdPrefixesUsed, pugi::xml_node& parentXml,
-           const DataSetBase& dataset)
+           const DataSetBase& dataset, DataSetPathMode pathMode)
 {
     // create child of parent, w/ label & text
     const auto label = OutputName(node, registry);
@@ -66,6 +66,7 @@ void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
     if (!prefix.empty()) xsdPrefixesUsed[node.Xsd()] = prefix;
 
     // add attributes
+    const bool resolveFilePaths = (pathMode == DataSetPathMode::ABSOLUTE);
     for (const auto& attribute : node.Attributes()) {
         const auto& name = attribute.first;
         if (name.empty()) continue;
@@ -73,7 +74,7 @@ void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
         auto attr = xmlNode.append_attribute(name.c_str());
         std::string value = attribute.second.c_str();
         // "absolutize" any paths, except relative paths from verbatim input XML
-        if (!dataset.FromInputXml() && name == "ResourceId")
+        if (!dataset.FromInputXml() && resolveFilePaths && name == "ResourceId")
             value = FileUtils::ResolvedFilePath(value, dataset.Path());
         attr.set_value(value.c_str());
     }
@@ -82,12 +83,12 @@ void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
 
     // iterate children, recursively building up subtree
     for (const auto& child : node.Children())
-        ToXml(*child, registry, xsdPrefixesUsed, xmlNode, dataset);
+        ToXml(*child, registry, xsdPrefixesUsed, xmlNode, dataset, pathMode);
 }
 
 }  // namespace
 
-void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
+void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out, DataSetPathMode pathMode)
 {
     pugi::xml_document doc;
 
@@ -116,7 +117,7 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
 
     // iterate children, recursively building up subtree
     for (const auto& child : dataset.Children())
-        ToXml(*child, registry, xsdPrefixesUsed, root, dataset);
+        ToXml(*child, registry, xsdPrefixesUsed, root, dataset, pathMode);
 
     // write XML to stream
     auto decl = doc.prepend_child(pugi::node_declaration);
@@ -161,9 +162,10 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out)
     doc.save(out, "\t", pugi::format_default, pugi::encoding_utf8);
 }
 
-void XmlWriter::ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostream& out)
+void XmlWriter::ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostream& out,
+                         DataSetPathMode pathMode)
 {
-    ToStream(*dataset.get(), out);
+    ToStream(*dataset.get(), out, pathMode);
 }
 
 }  // namespace BAM
