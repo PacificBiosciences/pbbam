@@ -64,7 +64,7 @@ TEST(SamWriterTest, SingleRecordOk)
     BamRecord record(inputHeader);
     record.Impl().Name("test/100/0_5");
     record.Impl().SetSequenceAndQualities("ACGTC", 5, "@@@@@");
-    record.Impl().CigarData("");
+    record.Impl().CigarData(Data::Cigar{});
     record.Impl().Bin(0);
     record.Impl().Flag(0);
     record.Impl().InsertSize(0);

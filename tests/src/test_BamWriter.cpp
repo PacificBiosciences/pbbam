@@ -37,7 +37,7 @@ void checkSingleRecord(bool useTempFile)
     BamRecord bamRecord(inputHeader);
     bamRecord.Impl().Name(fullName);
     bamRecord.Impl().SetSequenceAndQualities("ACGTC", 5);
-    bamRecord.Impl().CigarData("");
+    bamRecord.Impl().CigarData(Data::Cigar{});
     bamRecord.Impl().Bin(0);
     bamRecord.Impl().Flag(0);
     bamRecord.Impl().InsertSize(0);
