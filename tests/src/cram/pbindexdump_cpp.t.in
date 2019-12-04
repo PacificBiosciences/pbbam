@@ -26,9 +26,9 @@ Normal C++:
 Request C++, with JSON options (stdout includes usage/help, so we just want to check stderr):
 
   $ $PBINDEXDUMP --format=cpp --json-indent-level=2 $DATADIR/polymerase/production_hq.hqregion.bam.pbi > /dev/null
-  pbindexdump ERROR: JSON formatting options are not valid on non-JSON output
+  >|> \d{8} \d{2}:\d{2}:\d{2}\.\d{3} -|- INFO       -|- Version -|- [0-9,a-f,x]+|| -|- caught exception: "JSON formatting options are not valid on non-JSON output" (re)
   [1]
 
   $ $PBINDEXDUMP --format=cpp --json-raw $DATADIR/polymerase/production_hq.hqregion.bam.pbi > /dev/null
-  pbindexdump ERROR: JSON formatting options are not valid on non-JSON output
+  >|> \d{8} \d{2}:\d{2}:\d{2}\.\d{3} -|- INFO       -|- Version -|- [0-9,a-f,x]+|| -|- caught exception: "JSON formatting options are not valid on non-JSON output" (re)
   [1]
