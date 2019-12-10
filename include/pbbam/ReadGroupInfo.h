@@ -323,6 +323,9 @@ public:
     ///
     boost::optional<uint16_t> BarcodeReverse() const;
 
+    //// \returns string value of \@RG:BC
+    std::string BarcodeSequence() const;
+
     /// \returns basecaller version number (e.g. "2.1")
     std::string BasecallerVersion() const;
 
@@ -469,6 +472,13 @@ public:
     ReadGroupInfo& BarcodeData(std::string barcodeFile, std::string barcodeHash,
                                size_t barcodeCount, BarcodeModeType barcodeMode,
                                BarcodeQualityType barcodeQuality);
+
+    /// \brief Sets the value for \@RG:BC
+    ///
+    /// \param[in] barcodeSequence      new value
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& BarcodeSequence(std::string barcodeSequence);
 
     /// \brief Sets the basecaller version number.
     ///
