@@ -415,6 +415,19 @@ boost::optional<uint16_t> ReadGroupInfo::BarcodeReverse() const
 
 boost::optional<std::pair<uint16_t, uint16_t>> ReadGroupInfo::Barcodes() const { return barcodes_; }
 
+std::string ReadGroupInfo::BarcodeSequence() const
+{
+    const auto found = custom_.find(sam_BC);
+    if (found == custom_.cend()) return {};
+    return found->second;
+}
+
+ReadGroupInfo& ReadGroupInfo::BarcodeSequence(std::string barcodeSequence)
+{
+    custom_[sam_BC] = std::move(barcodeSequence);
+    return *this;
+}
+
 std::string ReadGroupInfo::BasecallerVersion() const { return basecallerVersion_; }
 
 ReadGroupInfo& ReadGroupInfo::BasecallerVersion(std::string versionNumber)
@@ -897,11 +910,6 @@ std::string ReadGroupInfo::ToSam() const
     if (!predictedInsertSize_.empty()) out << MakeSamTag(sam_PI, predictedInsertSize_);
     if (!movieName_.empty())           out << MakeSamTag(sam_PU, movieName_);
     if (!sample_.empty())              out << MakeSamTag(sam_SM, sample_);
-    if (barcodes_)
-    {
-        out << '\t' << sam_BC << ':'
-            << barcodes_->first << "--" << barcodes_->second;
-    }
     // clang-format on
 
     out << MakeSamTag(sam_PM, PlatformModelName(platformModel_));
