@@ -228,7 +228,7 @@ BamHeader& BamHeader::AddProgram(ProgramInfo pg)
 
 BamHeader& BamHeader::AddReadGroup(ReadGroupInfo readGroup)
 {
-    d_->readGroups_[readGroup.Id()] = std::move(readGroup);
+    d_->readGroups_[readGroup.Id().substr(0, 8)] = std::move(readGroup);
     return *this;
 }
 
@@ -295,7 +295,7 @@ bool BamHeader::HasProgram(const std::string& id) const
 
 bool BamHeader::HasReadGroup(const std::string& id) const
 {
-    return d_->readGroups_.find(id) != d_->readGroups_.cend();
+    return d_->readGroups_.find(id.substr(0, 8)) != d_->readGroups_.cend();
 }
 
 bool BamHeader::HasSequence(const std::string& name) const
@@ -356,7 +356,7 @@ BamHeader& BamHeader::Programs(std::vector<ProgramInfo> programs)
 
 ReadGroupInfo BamHeader::ReadGroup(const std::string& id) const
 {
-    const auto iter = d_->readGroups_.find(id);
+    const auto iter = d_->readGroups_.find(id.substr(0, 8));
     if (iter == d_->readGroups_.cend())
         throw std::runtime_error{"[pbbam] BAM header ERROR: read group ID not found: " + id};
     return iter->second;
