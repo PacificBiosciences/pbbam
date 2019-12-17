@@ -718,6 +718,32 @@ private:
 PBBAM_EXPORT
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType);
 
+/// \brief Creates a read group ID from a movie name, read type, and barcode string.
+///
+/// \param[in] movieName        sequencing movie name
+/// \param[in] readType         string version of read type
+/// \param[in] barcodeString    string version of barcode pair ("0--0")
+///
+/// \returns string containing the concatenation of the hex value with barcode label "/x--y"
+///          (e.g. "4c1bc9e4/0--1")
+///
+PBBAM_EXPORT
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
+                            const std::string& barcodeString);
+
+/// \brief Creates a read group ID from a movie name, read type, and barcode IDs
+///
+/// \param[in] movieName    sequencing movie name
+/// \param[in] readType     string version of read type
+/// \param[in] barcodes     pair of barcode indices (0,0)
+///
+/// \returns string containing the concatenation of the hex value with barcode label "/x--y"
+///          (e.g. "4c1bc9e4/0--1")
+///
+PBBAM_EXPORT
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
+                            const std::pair<int16_t, int16_t>& barcodes);
+
 }  // namespace BAM
 }  // namespace PacBio
 
