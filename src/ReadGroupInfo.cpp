@@ -926,5 +926,21 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
     return MD5Hash(movieName + "//" + readType).substr(0, 8);
 }
 
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
+                            const std::string& barcodeString)
+{
+    const std::string baseId{
+        MD5Hash(movieName + "//" + readType + "//" + barcodeString).substr(0, 8)};
+    return baseId + "/" + barcodeString;
+}
+
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
+                            const std::pair<int16_t, int16_t>& barcodes)
+{
+    const std::string barcodeString{std::to_string(barcodes.first) + "--" +
+                                    std::to_string(barcodes.second)};
+    return MakeReadGroupId(movieName, readType, barcodeString);
+}
+
 }  // namespace BAM
 }  // namespace PacBio
