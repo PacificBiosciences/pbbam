@@ -283,7 +283,6 @@ static_assert(std::is_nothrow_move_assignable<ReadGroupInfo>::value ==
 #endif
 
 ReadGroupInfo::ReadGroupInfo(std::string baseId, std::pair<uint16_t, uint16_t> barcodes)
-
 {
     std::ostringstream id;
     id << baseId << '/' << std::to_string(barcodes.first) << "--"
