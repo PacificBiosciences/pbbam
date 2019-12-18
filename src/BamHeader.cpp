@@ -228,7 +228,7 @@ BamHeader& BamHeader::AddProgram(ProgramInfo pg)
 
 BamHeader& BamHeader::AddReadGroup(ReadGroupInfo readGroup)
 {
-    d_->readGroups_[readGroup.Id().substr(0, 8)] = std::move(readGroup);
+    d_->readGroups_[readGroup.BaseId()] = std::move(readGroup);
     return *this;
 }
 
@@ -384,7 +384,7 @@ BamHeader& BamHeader::ReadGroups(std::vector<ReadGroupInfo> readGroups)
 {
     d_->readGroups_.clear();
     for (auto&& rg : readGroups)
-        d_->readGroups_[rg.Id()] = std::move(rg);
+        AddReadGroup(std::move(rg));
     return *this;
 }
 
