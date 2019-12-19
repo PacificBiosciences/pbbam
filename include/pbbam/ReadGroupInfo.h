@@ -323,6 +323,9 @@ public:
     ///
     boost::optional<uint16_t> BarcodeReverse() const;
 
+    //// \returns string value of \@RG:BC
+    std::string BarcodeSequence() const;
+
     /// \returns basecaller version number (e.g. "2.1")
     std::string BasecallerVersion() const;
 
@@ -469,6 +472,13 @@ public:
     ReadGroupInfo& BarcodeData(std::string barcodeFile, std::string barcodeHash,
                                size_t barcodeCount, BarcodeModeType barcodeMode,
                                BarcodeQualityType barcodeQuality);
+
+    /// \brief Sets the value for \@RG:BC
+    ///
+    /// \param[in] barcodeSequence      new value
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& BarcodeSequence(std::string barcodeSequence);
 
     /// \brief Sets the basecaller version number.
     ///
@@ -707,6 +717,32 @@ private:
 ///
 PBBAM_EXPORT
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType);
+
+/// \brief Creates a read group ID from a movie name, read type, and barcode string.
+///
+/// \param[in] movieName        sequencing movie name
+/// \param[in] readType         string version of read type
+/// \param[in] barcodeString    string version of barcode pair ("0--0")
+///
+/// \returns string containing the concatenation of the hex value with barcode label "/x--y"
+///          (e.g. "4c1bc9e4/0--1")
+///
+PBBAM_EXPORT
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
+                            const std::string& barcodeString);
+
+/// \brief Creates a read group ID from a movie name, read type, and barcode IDs
+///
+/// \param[in] movieName    sequencing movie name
+/// \param[in] readType     string version of read type
+/// \param[in] barcodes     pair of barcode indices (0,0)
+///
+/// \returns string containing the concatenation of the hex value with barcode label "/x--y"
+///          (e.g. "4c1bc9e4/0--1")
+///
+PBBAM_EXPORT
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
+                            const std::pair<int16_t, int16_t>& barcodes);
 
 }  // namespace BAM
 }  // namespace PacBio

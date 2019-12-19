@@ -18,6 +18,15 @@
 
 using namespace PacBio::BAM;
 
+TEST(ReadGroupInfoTest, GetBaseId)
+{
+    const std::string a{"123456578"};
+    const std::string b{"123456578/0--0"};
+
+    EXPECT_EQ("123456578", ReadGroupInfo::GetBaseId(a));
+    EXPECT_EQ("123456578", ReadGroupInfo::GetBaseId(b));
+}
+
 TEST(ReadGroupInfoTest, IdFromMovieNameAndReadType)
 {
     ReadGroupInfo rg("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0", "HQREGION");

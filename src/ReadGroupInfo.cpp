@@ -283,7 +283,6 @@ static_assert(std::is_nothrow_move_assignable<ReadGroupInfo>::value ==
 #endif
 
 ReadGroupInfo::ReadGroupInfo(std::string baseId, std::pair<uint16_t, uint16_t> barcodes)
-
 {
     std::ostringstream id;
     id << baseId << '/' << std::to_string(barcodes.first) << "--"
@@ -414,6 +413,19 @@ boost::optional<uint16_t> ReadGroupInfo::BarcodeReverse() const
 }
 
 boost::optional<std::pair<uint16_t, uint16_t>> ReadGroupInfo::Barcodes() const { return barcodes_; }
+
+std::string ReadGroupInfo::BarcodeSequence() const
+{
+    const auto found = custom_.find(sam_BC);
+    if (found == custom_.cend()) return {};
+    return found->second;
+}
+
+ReadGroupInfo& ReadGroupInfo::BarcodeSequence(std::string barcodeSequence)
+{
+    custom_[sam_BC] = std::move(barcodeSequence);
+    return *this;
+}
 
 std::string ReadGroupInfo::BasecallerVersion() const { return basecallerVersion_; }
 
@@ -897,11 +909,6 @@ std::string ReadGroupInfo::ToSam() const
     if (!predictedInsertSize_.empty()) out << MakeSamTag(sam_PI, predictedInsertSize_);
     if (!movieName_.empty())           out << MakeSamTag(sam_PU, movieName_);
     if (!sample_.empty())              out << MakeSamTag(sam_SM, sample_);
-    if (barcodes_)
-    {
-        out << '\t' << sam_BC << ':'
-            << barcodes_->first << "--" << barcodes_->second;
-    }
     // clang-format on
 
     out << MakeSamTag(sam_PM, PlatformModelName(platformModel_));
@@ -916,6 +923,22 @@ std::string ReadGroupInfo::ToSam() const
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType)
 {
     return MD5Hash(movieName + "//" + readType).substr(0, 8);
+}
+
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
+                            const std::string& barcodeString)
+{
+    const std::string baseId{
+        MD5Hash(movieName + "//" + readType + "//" + barcodeString).substr(0, 8)};
+    return baseId + "/" + barcodeString;
+}
+
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
+                            const std::pair<int16_t, int16_t>& barcodes)
+{
+    const std::string barcodeString{std::to_string(barcodes.first) + "--" +
+                                    std::to_string(barcodes.second)};
+    return MakeReadGroupId(movieName, readType, barcodeString);
 }
 
 }  // namespace BAM
