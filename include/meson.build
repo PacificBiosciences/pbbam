@@ -26,6 +26,7 @@ if not meson.is_subproject()
       'pbbam/Cigar.h',
       'pbbam/CigarOperation.h',
       'pbbam/ClipType.h',
+      'pbbam/CollectionMetadata.h',
       'pbbam/Compare.h',
       'pbbam/CompositeBamReader.h',
       'pbbam/CompositeFastaReader.h',

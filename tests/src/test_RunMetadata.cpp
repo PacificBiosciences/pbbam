@@ -5,6 +5,7 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <pbbam/DataSet.h>
 #include <pbbam/RunMetadata.h>
 
 #include "PbbamTestData.h"
@@ -169,30 +170,30 @@ TEST(RunMetadataTest, can_load_single_collection_from_xml_file)
     // -- CollectionMetadata --
     const auto collection = PacBio::BAM::RunMetadata::Collection(xmlFn);
     EXPECT_EQ("Hydrav2-8A-2-Cell2", collection.SubreadSetName());
-    ASSERT_TRUE(collection.HasAutomationParameters());
-    ASSERT_TRUE(collection.HasBindingKit());
-    ASSERT_TRUE(collection.HasControlKit());
-    ASSERT_TRUE(collection.HasSequencingKitPlate());
-    ASSERT_TRUE(collection.HasTemplatePrepKit());
+    EXPECT_TRUE(collection.HasAutomationParameters());
+    EXPECT_TRUE(collection.HasBindingKit());
+    EXPECT_TRUE(collection.HasControlKit());
+    EXPECT_TRUE(collection.HasSequencingKitPlate());
+    EXPECT_TRUE(collection.HasTemplatePrepKit());
 
     // -- AutomationParameters --
     const auto& automationParameters = collection.AutomationParameters();
-
-    // built-ins
+    ASSERT_TRUE(automationParameters.HasParameter("MovieLength"));
     ASSERT_TRUE(automationParameters.HasSNRCut());
     EXPECT_EQ(3.75, automationParameters.SNRCut());
     ASSERT_TRUE(automationParameters.HasInsertSize());
     EXPECT_EQ(2600, automationParameters.InsertSize());
 
-    // generic access
+    // generic parameter access
     ASSERT_TRUE(automationParameters.HasParameter("MovieLength"));
     EXPECT_EQ("360", automationParameters.GetParameter("MovieLength"));
 
+    // iterable parameters
     size_t count = 0;
     for (const auto& p : automationParameters) {
         ++count;
-        ASSERT_TRUE(automationParameters.HasParameter(p.first));
-        EXPECT_EQ(p.second, automationParameters.GetParameter(p.first));
+        ASSERT_TRUE(automationParameters.HasParameter(p.Name()));
+        EXPECT_EQ(p.Value(), automationParameters.GetParameter(p.Name()));
     }
     EXPECT_EQ(16, count);
 
@@ -241,4 +242,47 @@ TEST(RunMetadataTest, can_load_multiple_collections_from_xml_file)
     ASSERT_EQ(2, collections.size());
     EXPECT_TRUE(collections.find("Hydrav2-8A-1-Cell1") != collections.cend());
     EXPECT_TRUE(collections.find("Hydrav2-8A-2-Cell2") != collections.cend());
+}
+
+TEST(RunMetadataTest, can_attach_edited_metadata_to_subreadset)
+{
+    // load run metadata
+    const std::string metadataXml{PacBio::BAM::PbbamTestsConfig::Data_Dir +
+                                  "/run_metadata/id.metadata.xml"};
+
+    auto c = PacBio::BAM::RunMetadata::Collection(metadataXml);
+
+    // do some edits
+    PacBio::BAM::ControlKit& ck = c.ControlKit();
+    ck.LeftAdapter("GATTACA");
+    ck.RightAdapter("GATTACA");
+    ck.Sequence("AACCGGTT");
+    ASSERT_EQ("GATTACA", ck.LeftAdapter());
+    ASSERT_EQ("GATTACA", ck.RightAdapter());
+    ASSERT_EQ("AACCGGTT", ck.Sequence());
+
+    PacBio::BAM::AutomationParameters& parameters = c.AutomationParameters();
+    parameters.InsertSize(10000);
+
+    // load subreadset & attach new run metadata
+    const std::string originalSubreadsetXml{PacBio::BAM::PbbamTestsConfig::Data_Dir +
+                                            "/run_metadata/id.subreadset.xml"};
+    PacBio::BAM::DataSet subreadSet{originalSubreadsetXml};
+    auto& metadata = subreadSet.Metadata();
+    metadata.CollectionMetadata(c);
+
+    // print new dataset contents
+    std::ostringstream out;
+    subreadSet.SaveToStream(out);
+
+    // check for edits in the new dataset output
+    const std::string& output = out.str();
+
+    const std::string adapterSeq =
+        R"(&gt;left_adapter\nGATTACA\n&gt;right_adapter\nGATTACA\n&gt;custom_sequence\nAACCGGTT)";
+    EXPECT_TRUE(output.find(adapterSeq) != std::string::npos);
+
+    const std::string insertSize =
+        R"(<AutomationParameter Name="InsertSize" SimpleValue="10000" ValueDataType="Int32" />)";
+    EXPECT_TRUE(output.find(insertSize) != std::string::npos);
 }

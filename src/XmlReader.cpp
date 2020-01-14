@@ -80,6 +80,10 @@ std::shared_ptr<DataSetElement> MakeElement(const pugi::xml_node& xmlNode)
             return std::make_shared<BioSample>("", fromInputXml);
         case XmlElementType::BIOSAMPLES:
             return std::make_shared<BioSamples>(fromInputXml);
+        case XmlElementType::COLLECTIONS:
+            return std::make_shared<Collections>(fromInputXml);
+        case XmlElementType::COLLECTION_METADATA:
+            return std::make_shared<CollectionMetadata>(fromInputXml);
         case XmlElementType::DNA_BARCODE:
             return std::make_shared<DNABarcode>("", fromInputXml);
         case XmlElementType::DNA_BARCODES:

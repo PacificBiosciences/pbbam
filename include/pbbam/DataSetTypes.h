@@ -12,6 +12,7 @@
 #include <string>
 
 #include "pbbam/BamFile.h"
+#include "pbbam/CollectionMetadata.h"
 #include "pbbam/DataSetXsd.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 
@@ -744,6 +745,16 @@ public:
     ///
     const PacBio::BAM::BioSamples& BioSamples() const;
 
+    ///
+    /// \brief Fetches the CollectionMetadata.
+    ///
+    /// \note Assumes 1 CollectionMetadata child for a given DataSetMetadata instance.
+    ///
+    /// \returns const reference to child element
+    /// \throw std::runtime_error if element does not exist
+    ///
+    const PacBio::BAM::CollectionMetadata& CollectionMetadata() const;
+
     /// \}
 
 public:
@@ -782,6 +793,17 @@ public:
     ///
     PacBio::BAM::BioSamples& BioSamples();
 
+    ///
+    /// \brief Fetches the CollectionMetadata element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \note Assumes 1 CollectionMetadata child for a given DataSetMetadata instance.
+    ///
+    /// \return const CollectionMetadata&
+    ///
+    PacBio::BAM::CollectionMetadata& CollectionMetadata();
+
     /// \}
 
 public:
@@ -819,6 +841,14 @@ public:
     /// \returns reference to this metadata object
     ///
     DataSetMetadata& BioSamples(const PacBio::BAM::BioSamples& samples);
+
+    /// \brief Sets the CollectionMetadata child element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \returns reference to this metadata object
+    ///
+    DataSetMetadata& CollectionMetadata(const PacBio::BAM::CollectionMetadata& metadata);
 
     /// \}
 };
@@ -1187,6 +1217,8 @@ enum class XmlElementType
     BIOSAMPLES,
     DNA_BARCODE,
     DNA_BARCODES,
+    COLLECTIONS,
+    COLLECTION_METADATA,
     EXTENSION,
     EXTENSIONS,
     EXTERNAL_RESOURCE,

@@ -16,110 +16,87 @@ namespace PacBio {
 namespace BAM {
 namespace {
 
-boost::optional<PacBio::BAM::AutomationParameters> AutomationParametersFromXml(
-    const pugi::xml_node& paramsNode)
+std::shared_ptr<internal::DataSetElement> MakeRunMetadataElement(const pugi::xml_node& xmlNode)
 {
-    if (!paramsNode) return boost::none;
-
-    std::map<std::string, std::string> params;
-    for (const auto& child : paramsNode.children()) {
-        if (std::string{child.name()} == Element::AutomationParameter)
-            params.emplace(child.attribute("Name").value(), child.attribute("SimpleValue").value());
-    }
-    return AutomationParameters{std::move(params)};
-}
-
-boost::optional<PacBio::BAM::BindingKit> BindingKitFromXml(const pugi::xml_node& kitNode)
-{
-    if (!kitNode) return boost::none;
-
-    BindingKit kit;
-    kit.PartNumber(kitNode.attribute(Element::PartNumber).value());
-    return kit;
-}
-
-boost::optional<PacBio::BAM::ControlKit> ControlKitFromXml(const pugi::xml_node& kitNode)
-{
-    if (!kitNode) return boost::none;
-
-    std::map<std::string, std::string> data;
-    data.emplace(Element::PartNumber, kitNode.attribute(Element::PartNumber).value());
-
-    const auto customSeqNode = kitNode.child(Element::CustomSequence);
-    if (customSeqNode) {
-
-        const auto lines = [](const std::string& input) {
-            std::vector<std::string> result;
-            size_t pos = 0;
-            size_t found = input.find("\\n");
-            while (found != std::string::npos) {
-                result.push_back(input.substr(pos, found - pos));
-                pos = found + 2;  // "\n"
-                found = input.find("\\n", pos);
-            }
-            result.push_back(input.substr(pos));  // store last
-            return result;
-        }(std::string{customSeqNode.text().get()});
-
-        if (lines.size() != 6) {
-            throw std::runtime_error{
-                "[pbbam] run metadata ERROR: malformatted CustomSequence node"};
-        }
-        data.emplace(Element::LeftAdapter, lines.at(1));
-        data.emplace(Element::RightAdapter, lines.at(3));
-        data.emplace(Element::Sequence, lines.at(5));
+    std::string name = xmlNode.name();
+    const auto foundColon = name.find(':');
+    if (foundColon != std::string::npos) {
+        name = name.substr(foundColon + 1);
     }
 
-    return ControlKit{std::move(data)};
+    const internal::FromInputXml fromInputXml;
+    if (name == Element::Automation) return std::make_shared<Automation>(fromInputXml);
+    if (name == Element::AutomationParameter)
+        return std::make_shared<AutomationParameter>(fromInputXml);
+    if (name == Element::AutomationParameters)
+        return std::make_shared<AutomationParameters>(fromInputXml);
+    if (name == Element::BindingKit) return std::make_shared<BindingKit>(fromInputXml);
+    if (name == Element::Collections) return std::make_shared<Collections>(fromInputXml);
+    if (name == Element::ControlKit) return std::make_shared<ControlKit>(fromInputXml);
+    if (name == Element::SequencingKitPlate)
+        return std::make_shared<SequencingKitPlate>(fromInputXml);
+    if (name == Element::TemplatePrepKit) return std::make_shared<TemplatePrepKit>(fromInputXml);
+
+    return std::make_shared<internal::DataSetElement>(name, internal::FromInputXml{});
 }
 
-boost::optional<PacBio::BAM::SequencingKitPlate> SequencingKitPlateFromXml(
-    const pugi::xml_node& kitNode)
+void FromRunMetadataXml(const pugi::xml_node& xmlNode, internal::DataSetElement& parent)
 {
-    if (!kitNode) return boost::none;
+    const std::string label = xmlNode.name();
+    if (label.empty()) return;
 
-    SequencingKitPlate kit;
-    kit.PartNumber(kitNode.attribute(Element::PartNumber).value());
-    return kit;
-}
+    auto e = MakeRunMetadataElement(xmlNode);
+    e->Label(xmlNode.name());
+    e->Text(xmlNode.text().get());
 
-boost::optional<PacBio::BAM::TemplatePrepKit> TemplatePrepKitFromXml(const pugi::xml_node& kitNode)
-{
-    if (!kitNode) return boost::none;
+    // iterate attributes
+    auto attrIter = xmlNode.attributes_begin();
+    auto attrEnd = xmlNode.attributes_end();
+    for (; attrIter != attrEnd; ++attrIter)
+        e->Attribute(attrIter->name(), attrIter->value());
 
-    std::map<std::string, std::string> data;
-    data.emplace(Element::PartNumber, kitNode.attribute(Element::PartNumber).value());
-    data.emplace(Element::LeftAdaptorSequence,
-                 kitNode.child(Element::LeftAdaptorSequence).text().get());
+    // iterate children, recursively building up subtree
+    auto childIter = xmlNode.begin();
+    auto childEnd = xmlNode.end();
+    for (; childIter != childEnd; ++childIter) {
+        pugi::xml_node childNode = *childIter;
+        FromRunMetadataXml(childNode, *e.get());
+    }
 
-    data.emplace(Element::LeftPrimerSequence,
-                 kitNode.child(Element::LeftPrimerSequence).text().get());
-
-    data.emplace(Element::RightAdaptorSequence,
-                 kitNode.child(Element::RightAdaptorSequence).text().get());
-
-    data.emplace(Element::RightPrimerSequence,
-                 kitNode.child(Element::RightPrimerSequence).text().get());
-
-    return TemplatePrepKit{std::move(data)};
+    parent.AddChild(e);
 }
 
 CollectionMetadata SubreadSetCollection(const std::string& subreadSetName,
                                         const pugi::xml_node& subreadSetNode)
 {
+    // find & initialize CollectionMetadata from node
     const auto cmNode = subreadSetNode.child(Element::DataSetMetadata)
                             .child(Element::Collections)
                             .child(Element::CollectionMetadata);
     if (!cmNode)
         throw std::runtime_error{"[pbbam] run metadata ERROR: XML is missing expected elements"};
 
-    return CollectionMetadata{
-        subreadSetName, AutomationParametersFromXml(
-                            cmNode.child(Element::Automation).child(Element::AutomationParameters)),
-        BindingKitFromXml(cmNode.child(Element::BindingKit)),
-        ControlKitFromXml(cmNode.child(Element::ControlKit)),
-        SequencingKitPlateFromXml(cmNode.child(Element::SequencingKitPlate)),
-        TemplatePrepKitFromXml(cmNode.child(Element::TemplatePrepKit))};
+    CollectionMetadata cm{subreadSetName};
+    cm.Label(cmNode.name());
+
+    // load element attributes
+    auto attrIter = cmNode.attributes_begin();
+    auto attrEnd = cmNode.attributes_end();
+    for (; attrIter != attrEnd; ++attrIter) {
+        const std::string name = attrIter->name();
+        const std::string value = attrIter->value();
+        cm.Attribute(name, value);
+    }
+
+    // load children, recursively
+    auto childIter = cmNode.begin();
+    auto childEnd = cmNode.end();
+    for (; childIter != childEnd; ++childIter) {
+        pugi::xml_node childNode = *childIter;
+        FromRunMetadataXml(childNode, cm);
+    }
+
+    return cm;
 }
 
 pugi::xml_node FetchSubreadSetsNode(const pugi::xml_document& doc)
@@ -129,7 +106,8 @@ pugi::xml_node FetchSubreadSetsNode(const pugi::xml_document& doc)
         throw std::runtime_error{"[pbbam] run metadata ERROR: could not fetch XML root node"};
     if (std::string{rootNode.name()} != Element::PacBioDataModel) {
         throw std::runtime_error{
-            "[pbbam] run metadata ERROR: expected 'PacBioDataModel' as root node, instead found: " +
+            "[pbbam] run metadata ERROR: expected 'PacBioDataModel' as root node, instead "
+            "found: " +
             std::string{rootNode.name()}};
     }
 
