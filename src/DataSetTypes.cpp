@@ -30,6 +30,8 @@ const std::unordered_map<std::string, PacBio::BAM::XmlElementType> elementTypeLo
     {"DataSetMetadata",        ElementType::DATASET_METADATA},
     {"BioSample",              ElementType::BIOSAMPLE},
     {"BioSamples",             ElementType::BIOSAMPLES},
+    {"Collections",            ElementType::COLLECTIONS},
+    {"CollectionMetadata",     ElementType::COLLECTION_METADATA},
     {"DNABarcode",             ElementType::DNA_BARCODE},
     {"DNABarcodes",            ElementType::DNA_BARCODES},
     {"ExtensionElement",       ElementType::EXTENSION},
@@ -416,6 +418,30 @@ DEFINE_ACCESSORS(DataSetMetadata, BioSamples, BioSamples)
 DataSetMetadata& DataSetMetadata::BioSamples(const PacBio::BAM::BioSamples& samples)
 {
     BioSamples() = samples;
+    return *this;
+}
+
+const PacBio::BAM::CollectionMetadata& DataSetMetadata::CollectionMetadata() const
+{
+    const PacBio::BAM::Collections& collections = Child<PacBio::BAM::Collections>("Collections");
+    assert(collections.Size() >= 1);
+    const PacBio::BAM::CollectionMetadata& cm =
+        collections.Child<PacBio::BAM::CollectionMetadata>(0);
+    return cm;
+}
+
+PacBio::BAM::CollectionMetadata& DataSetMetadata::CollectionMetadata()
+{
+    PacBio::BAM::Collections& collections = Child<PacBio::BAM::Collections>("Collections");
+    assert(collections.Size() >= 1);
+    PacBio::BAM::CollectionMetadata& cm = collections.Child<PacBio::BAM::CollectionMetadata>(0);
+    return cm;
+}
+
+DataSetMetadata& DataSetMetadata::CollectionMetadata(
+    const PacBio::BAM::CollectionMetadata& metadata)
+{
+    CollectionMetadata() = metadata;
     return *this;
 }
 
