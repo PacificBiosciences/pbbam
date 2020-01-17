@@ -434,7 +434,7 @@ const PacBio::BAM::CollectionMetadata& DataSetMetadata::CollectionMetadata() con
 PacBio::BAM::CollectionMetadata& DataSetMetadata::CollectionMetadata()
 {
     PacBio::BAM::Collections& collections = Child<PacBio::BAM::Collections>("Collections");
-    assert(collections.Size() >= 1);
+    if (collections.Size() == 0) collections.AddChild(PacBio::BAM::CollectionMetadata{});
     PacBio::BAM::CollectionMetadata& cm = collections.Child<PacBio::BAM::CollectionMetadata>(0);
     return cm;
 }
