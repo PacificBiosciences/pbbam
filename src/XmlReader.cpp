@@ -106,6 +106,8 @@ std::shared_ptr<DataSetElement> MakeElement(const pugi::xml_node& xmlNode)
             return std::make_shared<Filters>(fromInputXml);
         case XmlElementType::PARENT_TOOL:
             return std::make_shared<ParentTool>(fromInputXml);
+        case XmlElementType::PPACONFIG:
+            return std::make_shared<PPAConfig>(fromInputXml);
         case XmlElementType::PROPERTY:
             return std::make_shared<Property>("", "", "", fromInputXml);
         case XmlElementType::PROPERTIES:

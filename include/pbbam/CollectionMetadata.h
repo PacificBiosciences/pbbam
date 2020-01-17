@@ -188,6 +188,17 @@ private:
     mutable boost::optional<CustomSequence> cache_ = boost::none;
 };
 
+class PPAConfig : public internal::DataSetElement
+{
+public:
+    PPAConfig();
+    PPAConfig(const internal::FromInputXml& fromInputXml);
+
+    const std::string& Json() const;
+    std::string& Json();
+    PPAConfig& Json(std::string json);
+};
+
 class SequencingKitPlate : public internal::DataSetElement
 {
 public:
@@ -252,6 +263,11 @@ public:
     PacBio::BAM::ControlKit& ControlKit();
     CollectionMetadata& ControlKit(PacBio::BAM::ControlKit kit);
     bool HasControlKit() const;
+
+    const PacBio::BAM::PPAConfig& PPAConfig() const;
+    PacBio::BAM::PPAConfig& PPAConfig();
+    CollectionMetadata& PPAConfig(PacBio::BAM::PPAConfig config);
+    bool HasPPAConfig() const;
 
     const PacBio::BAM::SequencingKitPlate& SequencingKitPlate() const;
     PacBio::BAM::SequencingKitPlate& SequencingKitPlate();

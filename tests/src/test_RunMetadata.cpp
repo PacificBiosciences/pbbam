@@ -264,6 +264,12 @@ TEST(RunMetadataTest, can_attach_edited_metadata_to_subreadset)
     PacBio::BAM::AutomationParameters& parameters = c.AutomationParameters();
     parameters.InsertSize(10000);
 
+    ASSERT_FALSE(c.HasPPAConfig());
+    const std::string jsonText{R"({"attribute":value})"};
+    PacBio::BAM::PPAConfig& ppaConfig = c.PPAConfig();
+    ppaConfig.Json(jsonText);
+    ASSERT_TRUE(c.HasPPAConfig());
+
     // load subreadset & attach new run metadata
     const std::string originalSubreadsetXml{PacBio::BAM::PbbamTestsConfig::Data_Dir +
                                             "/run_metadata/id.subreadset.xml"};
@@ -285,4 +291,6 @@ TEST(RunMetadataTest, can_attach_edited_metadata_to_subreadset)
     const std::string insertSize =
         R"(<AutomationParameter Name="InsertSize" SimpleValue="10000" ValueDataType="Int32" />)";
     EXPECT_TRUE(output.find(insertSize) != std::string::npos);
+
+    EXPECT_TRUE(output.find(jsonText) != std::string::npos);
 }
