@@ -1228,6 +1228,7 @@ enum class XmlElementType
     FILTER,
     FILTERS,
     PARENT_TOOL,
+    PPACONFIG,
     PROPERTY,
     PROPERTIES,
     PROVENANCE,

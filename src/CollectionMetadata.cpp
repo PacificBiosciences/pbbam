@@ -523,6 +523,31 @@ ControlKit& ControlKit::Sequence(std::string s)
 bool ControlKit::HasSequence() const { return !Sequence().empty(); }
 
 // ----------------------
+// PPAConfig
+// ----------------------
+
+PPAConfig::PPAConfig()
+    : internal::DataSetElement{"PPAConfig", internal::FromInputXml{},  // ensure no prefix
+                               XsdType::NONE}
+{
+}
+
+PPAConfig::PPAConfig(const internal::FromInputXml& fromInputXml)
+    : internal::DataSetElement{"", fromInputXml, XsdType::NONE}
+{
+}
+
+const std::string& PPAConfig::Json() const { return Text(); }
+
+std::string& PPAConfig::Json() { return Text(); }
+
+PPAConfig& PPAConfig::Json(std::string json)
+{
+    Text(std::move(json));
+    return *this;
+}
+
+// ----------------------
 // SequencingKitPlate
 // ----------------------
 
@@ -709,6 +734,16 @@ CollectionMetadata& CollectionMetadata::ControlKit(PacBio::BAM::ControlKit kit)
 }
 
 bool CollectionMetadata::HasControlKit() const { return HasChild("ControlKit"); }
+
+DEFINE_ACCESSORS(CollectionMetadata, PPAConfig, PPAConfig)
+
+CollectionMetadata& CollectionMetadata::PPAConfig(PacBio::BAM::PPAConfig config)
+{
+    PPAConfig() = std::move(config);
+    return *this;
+}
+
+bool CollectionMetadata::HasPPAConfig() const { return HasChild("PPAConfig"); }
 
 DEFINE_ACCESSORS(CollectionMetadata, SequencingKitPlate, SequencingKitPlate)
 

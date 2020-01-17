@@ -43,6 +43,7 @@ const std::unordered_map<std::string, PacBio::BAM::XmlElementType> elementTypeLo
     {"Filter",                 ElementType::FILTER},
     {"Filters",                ElementType::FILTERS},
     {"ParentTool",             ElementType::PARENT_TOOL},
+    {"PPAConfig",              ElementType::PPACONFIG},
     {"Property",               ElementType::PROPERTY},
     {"Properties",             ElementType::PROPERTIES},
     {"Provenance",             ElementType::PROVENANCE},
