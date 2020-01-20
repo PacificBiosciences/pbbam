@@ -67,32 +67,6 @@ IndexList readLengthHelper(const std::vector<T>& start, const std::vector<T>& en
     return result;
 }
 
-PbiFilter filterFromMovieName(const std::string& movieName, bool includeCcs)
-{
-    //
-    // All transcript-type reads (movieName == "transcript") have the same
-    // read group ID. Calculate once & and create filters from that ID.
-    //
-    if (movieName == "transcript") {
-        static const auto transcriptRgId = MakeReadGroupId("transcript", "TRANSCRIPT");
-        return PbiFilter{PbiReadGroupFilter{transcriptRgId}};
-    }
-
-    //
-    // For all other movie names, we can't determine read type up front, so we'll match
-    // on any rgIds from a candidate list.
-    //
-    auto filter = PbiFilter{PbiFilter::UNION};
-    filter.Add({PbiReadGroupFilter{MakeReadGroupId(movieName, "POLYMERASE")},
-                PbiReadGroupFilter{MakeReadGroupId(movieName, "HQREGION")},
-                PbiReadGroupFilter{MakeReadGroupId(movieName, "SUBREAD")},
-                PbiReadGroupFilter{MakeReadGroupId(movieName, "SCRAP")},
-                PbiReadGroupFilter{MakeReadGroupId(movieName, "UNKNOWN")}});
-    if (includeCcs) filter.Add(PbiReadGroupFilter{MakeReadGroupId(movieName, "CCS")});
-
-    return filter;
-}
-
 }  // namespace
 
 // PbiAlignedLengthFilter
@@ -130,17 +104,82 @@ bool PbiIdentityFilter::Accepts(const PbiRawData& idx, const size_t row) const
 // PbiMovieNameFilter
 
 PbiMovieNameFilter::PbiMovieNameFilter(const std::string& movieName, const Compare::Type cmp)
-    : compositeFilter_{filterFromMovieName(movieName, true)}  // include CCS
-    , cmp_{cmp}
+    : PbiMovieNameFilter{{1, movieName}, cmp}
 {
 }
 
 PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& movieNames,
                                        const Compare::Type cmp)
-    : compositeFilter_{PbiFilter::UNION}, cmp_{cmp}
+    : cmp_{cmp}
 {
-    for (const auto& movieName : movieNames)
-        compositeFilter_.Add(filterFromMovieName(movieName, true));  // include CCS
+    if (cmp_ == Compare::EQUAL)
+        cmp_ = Compare::CONTAINS;
+    else if (cmp_ == Compare::NOT_EQUAL)
+        cmp_ = Compare::NOT_CONTAINS;
+
+    if (cmp_ != Compare::CONTAINS && cmp_ != Compare::NOT_CONTAINS) {
+        throw std::runtime_error{
+            "[pbbam] PBI filter ERROR: unsupported compare type (" + Compare::TypeToName(cmp) +
+            ") for this property. "
+            "Movie name filter can only compare equality or presence in whitelist/blacklist."};
+    }
+
+    for (const auto& movieName : movieNames) {
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "CCS")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "TRANSCRIPT")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "POLYMERASE")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "HQREGION")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "SUBREAD")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "SCRAP")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "UNKNOWN")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "ZMW")));
+        movieNames_.insert(movieName);
+    }
+}
+
+bool PbiMovieNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
+{
+    const auto accepted = [this](const PbiRawData& index, const size_t i) {
+
+        // straightforward lookup
+        const auto& rgId = index.BasicData().rgId_.at(i);
+        const auto foundAt = candidateRgIds_.find(rgId);
+        if (foundAt != candidateRgIds_.cend()) return true;
+
+        // if no barcode context available, record movie name fails
+        if (!index.HasBarcodeData()) return false;
+
+        // try barcoded RG IDs
+        const auto& barcodeData = index.BarcodeData();
+        const auto barcodes =
+            std::make_pair(barcodeData.bcForward_.at(i), barcodeData.bcReverse_.at(i));
+        for (const auto& movieName : movieNames_) {
+            const auto tryBarcodedType = [&](const std::string& readType) {
+                const int32_t barcodedId =
+                    ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, readType, barcodes));
+                if (barcodedId == rgId) {
+                    candidateRgIds_.insert(barcodedId);  // found combo, save for future lookup
+                    return true;
+                }
+                return false;
+            };
+
+            if (tryBarcodedType("CCS")) return true;
+            if (tryBarcodedType("TRANSCRIPT")) return true;
+            if (tryBarcodedType("SUBREAD")) return true;
+            if (tryBarcodedType("ZMW")) return true;
+            if (tryBarcodedType("POLYMERASE")) return true;
+            if (tryBarcodedType("HQREGION")) return true;
+            if (tryBarcodedType("SCRAP")) return true;
+            if (tryBarcodedType("UNKNOWN")) return true;
+        }
+
+        // not found at all
+        return false;
+    }(idx, row);
+
+    assert(cmp_ == Compare::CONTAINS || cmp_ == Compare::NOT_CONTAINS);
+    return (cmp_ == Compare::CONTAINS ? accepted : !accepted);
 }
 
 // PbiQueryLengthFilter

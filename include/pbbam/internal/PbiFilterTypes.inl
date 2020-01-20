@@ -361,20 +361,6 @@ inline PbiMapQualityFilter::PbiMapQualityFilter(const uint8_t mapQual, const Com
     : internal::MappedDataFilterBase<uint8_t, PbiFile::MappedField::MAP_QUALITY>{mapQual, cmp}
 {}
 
-// PbiMovieNameFilter
-
-inline bool PbiMovieNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
-{
-    const bool found = compositeFilter_.Accepts(idx, row);
-    if (cmp_ == Compare::EQUAL || cmp_ == Compare::CONTAINS)
-        return found;
-    else if (cmp_ == Compare::NOT_EQUAL || cmp_ == Compare::NOT_CONTAINS)
-        return !found;
-    else
-        throw std::runtime_error{
-            "[pbbam] PBI filter ERROR: unsupported compare type on movie name filter"};
-}
-
 // PbiNumDeletedBasesFilter
 
 inline PbiNumDeletedBasesFilter::PbiNumDeletedBasesFilter(const size_t numDeletions,
