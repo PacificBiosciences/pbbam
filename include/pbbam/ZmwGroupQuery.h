@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "pbbam/DataSet.h"
+#include "pbbam/PbiFilter.h"
 #include "pbbam/internal/QueryBase.h"
 
 namespace PacBio {
@@ -45,8 +46,7 @@ class PBBAM_EXPORT ZmwGroupQuery : public internal::IGroupQuery
 {
 public:
     ///
-    /// \brief Creates a new ZmwGroupQuery that returns BamRecords grouped by ZMW,
-    ///        accessing each file in a 'round-robin' fashion.
+    /// \brief Creates a new ZmwGroupQuery that returns BamRecords grouped by ZMW.
     ///
     /// Iteration may either proceed by fully exhausting each input file before moving
     /// to the next OR by retrieving the 'next' group from a different file, going
@@ -59,6 +59,18 @@ public:
     ZmwGroupQuery(const DataSet& dataset,
                   const ZmwFileIterationMode iterationMode = ZmwFileIterationMode::SEQUENTIAL,
                   const DataSetFilterMode filterMode = DataSetFilterMode::APPLY);
+
+    ///
+    /// \brief Creates a new ZmwGroupQuery, limiting record results to only those
+    ///        matching a PbiFilter criteria.
+    ///
+    /// \note This overload only uses the PbiFilter provided, effectively setting
+    ///       DataSetFilterMode to 'IGNORE'.
+    ///
+    /// \param dataset          input data source(s)
+    /// \param filter           filter criteria
+    ///
+    ZmwGroupQuery(const DataSet& dataset, const PbiFilter& filter);
 
     /// \brief Creates a new ZmwGroupQuery, limiting record results to only
     ///        those matching a ZMW hole number criterion.
