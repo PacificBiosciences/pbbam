@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <set>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -915,5 +916,39 @@ TEST(PbiFilterQueryTest, ConsistentWhitelistAndBlacklist)
             }
             ++i;
         }
+    }
+}
+
+TEST(PbiFilterTest, MovieNameFilterWorksWithBarcodedReadGroups)
+{
+    const auto inputXml = PbbamTestsConfig::Data_Dir + "/barcoded_movie_filter/barcoded.xml";
+    const DataSet dataset{inputXml};
+
+    {  // no filter, data has 2 reads
+        int count = 0;
+        PbiFilterQuery query{PbiFilter{}, dataset};
+        for (const auto& record : query) {
+            std::ignore = record;
+            ++count;
+        }
+        EXPECT_EQ(2, count);
+    }
+    {  // dataset filter has 1 movie name (m54006_200116_134114)
+        int count = 0;
+        PbiFilterQuery query{PbiFilter::FromDataSet(dataset), dataset};
+        for (const auto& record : query) {
+            std::ignore = record;
+            ++count;
+        }
+        EXPECT_EQ(1, count);
+    }
+    {  // use other movie name 'manually'
+        int count = 0;
+        PbiFilterQuery query{PbiMovieNameFilter{"m54006_200116_200000"}, dataset};
+        for (const auto& record : query) {
+            std::ignore = record;
+            ++count;
+        }
+        EXPECT_EQ(1, count);
     }
 }
