@@ -26,7 +26,7 @@ TEST(ZmwQueryTest, whitelist_query_returns_nothing_from_empty_whitelist)
     size_t count = 0;
     PacBio::BAM::ZmwQuery query{whitelist, ZmwQueryTests::input};
     for (const auto& record : query) {
-        (void)record;
+        std::ignore = record;
         ++count;
     }
     EXPECT_EQ(0, count);
@@ -43,7 +43,7 @@ TEST(ZmwQueryTest, whitelist_query_returns_only_requested_zmws)
     size_t count = 0;
     PacBio::BAM::ZmwQuery query{whitelist, ZmwQueryTests::input};
     for (const auto& record : query) {
-        (void)record;
+        std::ignore = record;
         ++count;
     }
     EXPECT_EQ(48, count);
@@ -59,7 +59,7 @@ TEST(ZmwGroupQueryTest, whitelist_query_returns_nothing_from_empty_whitelist)
     for (const auto& zmw : query) {
         ++zmwCount;
         for (const auto& record : zmw) {
-            (void)record;
+            std::ignore = record;
             ++recordCount;
         }
     }
@@ -81,7 +81,7 @@ TEST(ZmwGroupQueryTest, whitelist_query_returns_only_requested_zmws)
     for (const auto& zmw : query) {
         ++zmwCount;
         for (const auto& record : zmw) {
-            (void)record;
+            std::ignore = record;
             ++recordCount;
         }
     }
@@ -101,7 +101,7 @@ TEST(ZmwGroupQueryTest, round_robin_query_can_return_records_applying_dataset_fi
         ++zmwCount;
         size_t zmwRecordCount = 0;
         for (const auto& record : zmw) {
-            (void)record;
+            std::ignore = record;
             ++totalRecordCount;
             ++zmwRecordCount;
         }
@@ -130,7 +130,7 @@ TEST(ZmwGroupQueryTest, round_robin_query_can_return_records_ignoring_dataset_fi
         ++zmwCount;
         if (!zmw.empty()) holeNumbers.push_back(zmw.front().HoleNumber());
         for (const auto& record : zmw) {
-            (void)record;
+            std::ignore = record;
             ++recordCount;
         }
     }
@@ -161,7 +161,7 @@ TEST(ZmwGroupQueryTest, sequential_query_can_return_records_ignoring_dataset_fil
         ++zmwCount;
         if (!zmw.empty() && holeNumbers.size() < 5) holeNumbers.push_back(zmw.front().HoleNumber());
         for (const auto& record : zmw) {
-            (void)record;
+            std::ignore = record;
             ++recordCount;
         }
     }

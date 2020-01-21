@@ -1,7 +1,9 @@
 // Author: Derek Barnett
 
 #include <cstdint>
+
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -10,7 +12,6 @@
 #include <pbbam/DataSet.h>
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/GenomicIntervalQuery.h>
-#include <pbbam/Unused.h>
 #include <pbbam/ZmwGroupQuery.h>
 #include <pbbam/ZmwQuery.h>
 
@@ -77,7 +78,7 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
         int count = 0;
         EntireFileQuery query(dataset);  // from DataSet object
         for (const BamRecord& record : query) {
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
         EXPECT_EQ(4, count);
@@ -85,7 +86,7 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
         count = 0;
         EntireFileQuery query2(DataSetQueryTests::alignedBamFn);  // from BAM filename
         for (const BamRecord& record : query2) {
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
         EXPECT_EQ(4, count);
@@ -93,7 +94,7 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
         count = 0;
         EntireFileQuery query3(bamFile);  // from BamFile object
         for (const BamRecord& record : query3) {
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
         EXPECT_EQ(4, count);
@@ -110,7 +111,7 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
         int count = 0;
         EntireFileQuery query(dataset);
         for (const BamRecord& record : query) {
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
         EXPECT_EQ(4, count);  // same as single
@@ -185,7 +186,7 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         GenomicInterval interval(rname, 5000, 6000);
         GenomicIntervalQuery query(interval, dataset);
         for (const BamRecord& record : query) {
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
         EXPECT_EQ(2, count);
@@ -196,7 +197,7 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         interval.Stop(9500);
         query.Interval(interval);
         for (const BamRecord& record : query) {
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
         EXPECT_EQ(2, count);
@@ -208,7 +209,7 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         interval.Stop(100);
         EXPECT_THROW(query.Interval(interval), std::exception);
         for (const BamRecord& record : query) {  // iteration is still safe, just returns no data
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
         EXPECT_EQ(0, count);
@@ -220,7 +221,7 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         query.Interval(interval);
         count = 0;
         for (const BamRecord& record : query) {
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
         EXPECT_EQ(2, count);
@@ -258,7 +259,7 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         interval.Stop(10000);
         query.Interval(interval);
         for (const BamRecord& record : query) {
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
         EXPECT_EQ(2, count);  // same as single file
@@ -270,7 +271,7 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         interval.Stop(100);
         EXPECT_THROW(query.Interval(interval), std::exception);
         for (const BamRecord& record : query) {  // iteration is still safe, just returns no data
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
         EXPECT_EQ(0, count);  // same as single file
@@ -282,7 +283,7 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         query.Interval(interval);
         count = 0;
         for (const BamRecord& record : query) {
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
         EXPECT_EQ(2, count);  // same as single file
@@ -321,7 +322,7 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         interval.Stop(10000);
         query.Interval(interval);
         for (const BamRecord& record : query) {
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
         EXPECT_EQ(4, count);  // single file * 2
@@ -333,7 +334,7 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         interval.Stop(100);
         EXPECT_THROW(query.Interval(interval), std::exception);
         for (const BamRecord& record : query) {  // iteration is still safe, just returns no data
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
         EXPECT_EQ(0, count);  // single file * 2
@@ -345,7 +346,7 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         query.Interval(interval);
         count = 0;
         for (const BamRecord& record : query) {
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
         EXPECT_EQ(4, count);  // single file * 2
