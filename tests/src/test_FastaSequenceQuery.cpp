@@ -2,7 +2,7 @@
 
 #include <cstddef>
 
-#include <tuple>
+#include <iterator>
 
 #include <gtest/gtest.h>
 
@@ -27,13 +27,8 @@ TEST(FastaSequenceQueryTest, can_read_from_fasta_file)
     const std::string fn = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
 
     {
-        size_t count = 0;
         FastaSequenceQuery query{fn};
-        for (const auto& seq : query) {
-            std::ignore = seq;
-            ++count;
-        }
-        EXPECT_EQ(1, count);
+        EXPECT_EQ(1, std::distance(query.begin(), query.end()));
     }
 
     {
@@ -49,13 +44,8 @@ TEST(FastaSequenceQueryTest, can_read_from_dataset)
     const std::string fn = PbbamTestsConfig::Data_Dir + "/referenceset.xml";
 
     {
-        size_t count = 0;
         FastaSequenceQuery query{fn};
-        for (const auto& seq : query) {
-            std::ignore = seq;
-            ++count;
-        }
-        EXPECT_EQ(5, count);  // 1 from lambda, 4 from chimera
+        EXPECT_EQ(5, std::distance(query.begin(), query.end()));  // 1 from lambda, 4 from chimera
     }
     {
         FastaSequenceQuery query{fn};

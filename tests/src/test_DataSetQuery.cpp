@@ -2,6 +2,7 @@
 
 #include <cstdint>
 
+#include <iterator>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -75,46 +76,27 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
         DataSet dataset;
         dataset.ExternalResources().Add(bamFile);
 
-        int count = 0;
         EntireFileQuery query(dataset);  // from DataSet object
-        for (const BamRecord& record : query) {
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(4, count);
+        EXPECT_EQ(4, std::distance(query.begin(), query.end()));
 
-        count = 0;
         EntireFileQuery query2(DataSetQueryTests::alignedBamFn);  // from BAM filename
-        for (const BamRecord& record : query2) {
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(4, count);
+        EXPECT_EQ(4, std::distance(query2.begin(), query2.end()));
 
-        count = 0;
         EntireFileQuery query3(bamFile);  // from BamFile object
-        for (const BamRecord& record : query3) {
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(4, count);
+        EXPECT_EQ(4, std::distance(query3.begin(), query3.end()));
     });
 
     // duplicate file attempt
     EXPECT_NO_THROW({
         BamFile bamFile(DataSetQueryTests::alignedBamFn);
 
+        // same as single
         DataSet dataset;
         dataset.ExternalResources().Add(bamFile);
         dataset.ExternalResources().Add(bamFile);
 
-        int count = 0;
         EntireFileQuery query(dataset);
-        for (const BamRecord& record : query) {
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(4, count);  // same as single
+        EXPECT_EQ(4, std::distance(query.begin(), query.end()));
     });
 
     // true multi-file dataset
@@ -175,56 +157,37 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
 
 TEST(DataSetQueryTest, GenomicIntervalQueryTest)
 {
-    const std::string rname = "lambda_NEB3011";
+    const std::string rname{"lambda_NEB3011"};
 
     // single file
     EXPECT_NO_THROW({
-        DataSet dataset(DataSetQueryTests::alignedBamFn);  // from BAM filename
+        const DataSet dataset{DataSetQueryTests::alignedBamFn};  // from BAM filename
 
         // count records
-        int count = 0;
         GenomicInterval interval(rname, 5000, 6000);
         GenomicIntervalQuery query(interval, dataset);
-        for (const BamRecord& record : query) {
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(2, count);
+        EXPECT_EQ(2, std::distance(query.begin(), query.end()));
 
         // adjust interval and pass back in
-        count = 0;
         interval.Start(9000);
         interval.Stop(9500);
         query.Interval(interval);
-        for (const BamRecord& record : query) {
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(2, count);
+        EXPECT_EQ(2, std::distance(query.begin(), query.end()));
 
         // unknown ref
-        count = 0;
         interval.Name("does not exist");
         interval.Start(0);
         interval.Stop(100);
         EXPECT_THROW(query.Interval(interval), std::exception);
-        for (const BamRecord& record : query) {  // iteration is still safe, just returns no data
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(0, count);
+        // iteration is still safe, just returns no data
+        EXPECT_EQ(0, std::distance(query.begin(), query.end()));
 
         // adjust again - make sure we can read a real region after an invalid one
         interval.Name(rname);
         interval.Start(5000);
         interval.Stop(6000);
         query.Interval(interval);
-        count = 0;
-        for (const BamRecord& record : query) {
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(2, count);
+        EXPECT_EQ(2, std::distance(query.begin(), query.end()));
     });
 
     // duplicate file
@@ -239,7 +202,6 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         int count = 0;
         int prevId = 0;
         int prevPos = 0;
-
         GenomicInterval interval(rname, 5000, 6000);
         GenomicIntervalQuery query(interval, dataset);
         for (const BamRecord& record : query) {
@@ -254,39 +216,27 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         EXPECT_EQ(2, count);  // same as single file
 
         // adjust interval and pass back in
-        count = 0;
         interval.Start(9000);
         interval.Stop(10000);
         query.Interval(interval);
-        for (const BamRecord& record : query) {
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(2, count);  // same as single file
+        EXPECT_EQ(2, std::distance(query.begin(), query.end()));
 
         // unknown ref
-        count = 0;
         interval.Name("does not exist");
         interval.Start(0);
         interval.Stop(100);
         EXPECT_THROW(query.Interval(interval), std::exception);
-        for (const BamRecord& record : query) {  // iteration is still safe, just returns no data
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(0, count);  // same as single file
+        // iteration is still safe, just returns no data
+        // same count as single file
+        EXPECT_EQ(0, std::distance(query.begin(), query.end()));
 
         // adjust again - make sure we can read a real region after an invalid one
         interval.Name(rname);
         interval.Start(5000);
         interval.Stop(5300);
         query.Interval(interval);
-        count = 0;
-        for (const BamRecord& record : query) {
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(2, count);  // same as single file
+        // same as single file
+        EXPECT_EQ(2, std::distance(query.begin(), query.end()));
     });
 
     // multi file BAM (same record content for easy testing, but different filename(ResourceId)
@@ -302,7 +252,6 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         int count = 0;
         int prevId = 0;
         int prevPos = 0;
-
         GenomicInterval interval(rname, 5000, 6000);
         GenomicIntervalQuery query(interval, dataset);
         for (const BamRecord& record : query) {
@@ -321,11 +270,8 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         interval.Start(9000);
         interval.Stop(10000);
         query.Interval(interval);
-        for (const BamRecord& record : query) {
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(4, count);  // single file * 2
+        // single file * 2
+        EXPECT_EQ(4, std::distance(query.begin(), query.end()));
 
         // unknown ref
         count = 0;
@@ -333,26 +279,21 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
         interval.Start(0);
         interval.Stop(100);
         EXPECT_THROW(query.Interval(interval), std::exception);
-        for (const BamRecord& record : query) {  // iteration is still safe, just returns no data
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(0, count);  // single file * 2
+        // iteration is still safe, just returns no data
+        // single file * 2
+        EXPECT_EQ(0, std::distance(query.begin(), query.end()));
 
         // adjust again - make sure we can read a real region after an invalid one
         interval.Name(rname);
         interval.Start(5000);
         interval.Stop(5300);
         query.Interval(interval);
-        count = 0;
-        for (const BamRecord& record : query) {
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(4, count);  // single file * 2
+        // single file * 2
+        EXPECT_EQ(4, std::distance(query.begin(), query.end()));
     });
 }
 
+// clang-format off
 TEST(DataSetQueryTest, ZmwQueryTest)
 {
     const std::vector<int32_t> whitelist = {13473, 30983};
@@ -363,13 +304,12 @@ TEST(DataSetQueryTest, ZmwQueryTest)
         ASSERT_TRUE(bamFile.PacBioIndexExists());
         DataSet dataset(bamFile);
 
-        int count = 0;
         ZmwQuery query(whitelist, dataset);
-        for (const BamRecord& record : query) {
-            const int32_t holeNumber = record.HoleNumber();
-            EXPECT_TRUE(holeNumber == 13473 || holeNumber == 30983);
-            ++count;
-        }
+        const auto count = std::count_if(query.begin(), query.end(), [](const BamRecord& record){
+            const auto holeNumber = record.HoleNumber();
+            return holeNumber == 13473 ||
+                   holeNumber == 30983;
+        });
         EXPECT_EQ(4, count);
     });
 
@@ -384,16 +324,16 @@ TEST(DataSetQueryTest, ZmwQueryTest)
         dataset.ExternalResources().Add(ExternalResource(bamFile));
         dataset.ExternalResources().Add(ExternalResource(bamFile2));
 
-        int count = 0;
         ZmwQuery query(whitelist, dataset);
-        for (const BamRecord& r : query) {
-            const auto holeNumber = r.HoleNumber();
-            EXPECT_TRUE(holeNumber == 13473 || holeNumber == 30983);
-            ++count;
-        }
+        const auto count = std::count_if(query.begin(), query.end(), [](const BamRecord& record){
+            const auto holeNumber = record.HoleNumber();
+            return holeNumber == 13473 ||
+                   holeNumber == 30983;
+        });
         EXPECT_EQ(8, count);
     });
 }
+// clang-format on
 
 TEST(DataSetQueryTest, ZmwGroupQueryTest)
 {

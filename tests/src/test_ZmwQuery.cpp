@@ -1,8 +1,8 @@
 // Author: Derek Barnett
 
 #include <algorithm>
+#include <iterator>
 #include <string>
-#include <tuple>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -23,13 +23,8 @@ TEST(ZmwQueryTest, whitelist_query_returns_nothing_from_empty_whitelist)
 {
     const std::vector<int32_t> whitelist;
 
-    size_t count = 0;
     PacBio::BAM::ZmwQuery query{whitelist, ZmwQueryTests::input};
-    for (const auto& record : query) {
-        std::ignore = record;
-        ++count;
-    }
-    EXPECT_EQ(0, count);
+    EXPECT_EQ(0, std::distance(query.begin(), query.end()));
 }
 
 TEST(ZmwQueryTest, whitelist_query_returns_only_requested_zmws)
@@ -40,13 +35,8 @@ TEST(ZmwQueryTest, whitelist_query_returns_only_requested_zmws)
         109697  // 10
     };
 
-    size_t count = 0;
     PacBio::BAM::ZmwQuery query{whitelist, ZmwQueryTests::input};
-    for (const auto& record : query) {
-        std::ignore = record;
-        ++count;
-    }
-    EXPECT_EQ(48, count);
+    EXPECT_EQ(48, std::distance(query.begin(), query.end()));
 }
 
 TEST(ZmwGroupQueryTest, whitelist_query_returns_nothing_from_empty_whitelist)
@@ -58,10 +48,7 @@ TEST(ZmwGroupQueryTest, whitelist_query_returns_nothing_from_empty_whitelist)
     PacBio::BAM::ZmwGroupQuery query{whitelist, ZmwQueryTests::input};
     for (const auto& zmw : query) {
         ++zmwCount;
-        for (const auto& record : zmw) {
-            std::ignore = record;
-            ++recordCount;
-        }
+        recordCount += zmw.size();
     }
     EXPECT_EQ(0, zmwCount);
     EXPECT_EQ(0, recordCount);
@@ -80,10 +67,7 @@ TEST(ZmwGroupQueryTest, whitelist_query_returns_only_requested_zmws)
     PacBio::BAM::ZmwGroupQuery query{whitelist, ZmwQueryTests::input};
     for (const auto& zmw : query) {
         ++zmwCount;
-        for (const auto& record : zmw) {
-            std::ignore = record;
-            ++recordCount;
-        }
+        recordCount += zmw.size();
     }
     EXPECT_EQ(3, zmwCount);
     EXPECT_EQ(48, recordCount);
@@ -99,13 +83,8 @@ TEST(ZmwGroupQueryTest, round_robin_query_can_return_records_applying_dataset_fi
                                      PacBio::BAM::DataSetFilterMode::APPLY};
     for (const auto& zmw : query) {
         ++zmwCount;
-        size_t zmwRecordCount = 0;
-        for (const auto& record : zmw) {
-            std::ignore = record;
-            ++totalRecordCount;
-            ++zmwRecordCount;
-        }
-        numRecordsPerZmw.push_back(zmwRecordCount);
+        totalRecordCount += zmw.size();
+        numRecordsPerZmw.push_back(zmw.size());
     }
 
     // zmw < 1816
@@ -129,10 +108,7 @@ TEST(ZmwGroupQueryTest, round_robin_query_can_return_records_ignoring_dataset_fi
     for (const auto& zmw : query) {
         ++zmwCount;
         if (!zmw.empty()) holeNumbers.push_back(zmw.front().HoleNumber());
-        for (const auto& record : zmw) {
-            std::ignore = record;
-            ++recordCount;
-        }
+        recordCount += zmw.size();
     }
     EXPECT_EQ(90, zmwCount);       // 30 + 30 + 30
     EXPECT_EQ(1220, recordCount);  // 432 + 409 + 379
@@ -160,10 +136,7 @@ TEST(ZmwGroupQueryTest, sequential_query_can_return_records_ignoring_dataset_fil
     for (const auto& zmw : query) {
         ++zmwCount;
         if (!zmw.empty() && holeNumbers.size() < 5) holeNumbers.push_back(zmw.front().HoleNumber());
-        for (const auto& record : zmw) {
-            std::ignore = record;
-            ++recordCount;
-        }
+        recordCount += zmw.size();
     }
     EXPECT_EQ(90, zmwCount);       // 30 + 30 + 30
     EXPECT_EQ(1220, recordCount);  // 432 + 409 + 379
@@ -189,10 +162,7 @@ TEST(ZmwGroupQueryTest, can_apply_custom_pbi_filter)
         ++zmwCount;
         ASSERT_TRUE(!zmw.empty());
         holeNumbers.push_back(zmw.front().HoleNumber());
-        for (const auto& record : zmw) {
-            std::ignore = record;
-            ++recordCount;
-        }
+        recordCount += zmw.size();
     }
     EXPECT_EQ(3, zmwCount);
     EXPECT_EQ(15, recordCount);  // 5 + 3 + 7
