@@ -11,9 +11,9 @@
 #include <cstddef>
 
 #include <set>
+#include <tuple>
 #include <unordered_map>
 
-#include "pbbam/Unused.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 
 #include "DataSetIO.h"
@@ -654,7 +654,7 @@ ExternalResource::ExternalResource(const std::string& metatype, const std::strin
                                    const internal::FromInputXml& fromInputXml)
     : IndexedDataType("", filename, "ExternalResource", fromInputXml, XsdType::BASE_DATA_MODEL)
 {
-    UNUSED(metatype);
+    std::ignore = metatype;
 }
 
 DEFINE_ACCESSORS(ExternalResource, ExternalResources, ExternalResources)
@@ -776,7 +776,7 @@ FileIndex::FileIndex(const std::string& metatype, const std::string& filename,
                      const internal::FromInputXml& fromInputXml)
     : InputOutputDataType("", filename, "FileIndex", fromInputXml, XsdType::BASE_DATA_MODEL)
 {
-    UNUSED(metatype);
+    std::ignore = metatype;
 }
 
 // -------------------

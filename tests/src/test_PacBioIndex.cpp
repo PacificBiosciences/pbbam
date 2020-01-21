@@ -3,11 +3,11 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+
 #include <string>
+#include <tuple>
 
 #include <gtest/gtest.h>
-
-#include "PbbamTestData.h"
 
 #include <pbbam/BamFile.h>
 #include <pbbam/BamReader.h>
@@ -15,7 +15,8 @@
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/PbiBuilder.h>
 #include <pbbam/PbiRawData.h>
-#include <pbbam/Unused.h>
+
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -148,7 +149,7 @@ TEST(PacBioIndexTest, CreateFromExistingBam)
     cmd += " ";
     cmd += tempBamFn;
     const auto cmdResult = system(cmd.c_str());
-    UNUSED(cmdResult);
+    std::ignore = cmdResult;
 
     BamFile bamFile(tempBamFn);
     PbiFile::CreateFrom(bamFile);
@@ -274,7 +275,7 @@ TEST(PacBioIndexTest, BasicAndBarodeSectionsOnly)
     cmd += " ";
     cmd += tempDir;
     const auto cmdResult = system(cmd.c_str());
-    UNUSED(cmdResult);
+    std::ignore = cmdResult;
 
     BamFile bamFile(tempBamFn);
     PbiFile::CreateFrom(bamFile);

@@ -22,6 +22,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <thread>
+#include <tuple>
 #include <type_traits>
 
 #include <htslib/bgzf.h>
@@ -36,7 +37,6 @@
 #include "pbbam/BamWriter.h"
 #include "pbbam/PbiRawData.h"
 #include "pbbam/RecordType.h"
-#include "pbbam/Unused.h"
 #include "pbbam/Validator.h"
 
 #include "FileProducer.h"
@@ -740,7 +740,7 @@ public:
     void CloseBam()
     {
         const auto ret = bgzf_flush(bam_.get()->fp.bgzf);
-        UNUSED(ret);
+        std::ignore = ret;
         bam_.reset();
     }
 

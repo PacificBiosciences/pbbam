@@ -2,19 +2,19 @@
 
 #include <cstddef>
 
-#include <gtest/gtest.h>
+#include <tuple>
 
-#include "PbbamTestData.h"
+#include <gtest/gtest.h>
 
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/FastaReader.h>
 #include <pbbam/FastaSequence.h>
 #include <pbbam/FastaSequenceQuery.h>
 #include <pbbam/FastaWriter.h>
-#include <pbbam/Unused.h>
 #include <boost/algorithm/string.hpp>
 
 #include "FastxTests.h"
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -30,7 +30,7 @@ TEST(FastaSequenceQueryTest, can_read_from_fasta_file)
         size_t count = 0;
         FastaSequenceQuery query{fn};
         for (const auto& seq : query) {
-            UNUSED(seq);
+            std::ignore = seq;
             ++count;
         }
         EXPECT_EQ(1, count);
@@ -52,7 +52,7 @@ TEST(FastaSequenceQueryTest, can_read_from_dataset)
         size_t count = 0;
         FastaSequenceQuery query{fn};
         for (const auto& seq : query) {
-            UNUSED(seq);
+            std::ignore = seq;
             ++count;
         }
         EXPECT_EQ(5, count);  // 1 from lambda, 4 from chimera

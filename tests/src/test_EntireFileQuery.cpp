@@ -1,14 +1,14 @@
 // Author: Derek Barnett
 
 #include <string>
+#include <tuple>
 
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
 #include <pbbam/BamWriter.h>
 #include <pbbam/EntireFileQuery.h>
-#include <pbbam/Unused.h>
+
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -26,7 +26,7 @@ TEST(EntireFileQueryTest, CountRecords)
         int count = 0;
         EntireFileQuery entireFile(bamFile);
         for (const BamRecord& record : entireFile) {
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
 
@@ -41,7 +41,7 @@ TEST(EntireFileQueryTest, NonConstBamRecord)
         int count = 0;
         EntireFileQuery entireFile(bamFile);
         for (BamRecord& record : entireFile) {
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
 

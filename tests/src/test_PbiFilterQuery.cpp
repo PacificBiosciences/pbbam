@@ -10,10 +10,9 @@
 
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
 #include <pbbam/PbiFilterQuery.h>
-#include <pbbam/Unused.h>
+
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -191,7 +190,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 
         int count = 0;
         for (const BamRecord& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++count;
         }
         EXPECT_EQ(1220, count);
@@ -207,7 +206,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 
         int count = 0;
         for (const BamRecord& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++count;
         }
         EXPECT_EQ(1220, count);
@@ -223,7 +222,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 
         int count = 0;
         for (const BamRecord& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++count;
         }
         EXPECT_EQ(1220, count);
@@ -267,8 +266,8 @@ TEST(PbiFilterQueryTest, QNameWhitelistFile)
     EXPECT_EQ(3, numReads);
 
     int count = 0;
-    for (const BamRecord& r : query) {
-        UNUSED(r);
+    for (const auto& r : query) {
+        std::ignore = r;
         ++count;
     }
     EXPECT_EQ(3, count);
@@ -283,7 +282,7 @@ TEST(PbiFilterQueryTest, EmptyFiles)
 
     size_t count = 0;
     for (const auto& r : query) {
-        UNUSED(r);
+        std::ignore = r;
         ++count;
     }
     EXPECT_EQ(0, count);
@@ -301,7 +300,7 @@ TEST(PbiFilterQueryTest, BarcodeData)
 
         size_t count = 0;
         for (const auto& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++count;
         }
         EXPECT_EQ(120, count);
@@ -315,7 +314,7 @@ TEST(PbiFilterQueryTest, BarcodeData)
 
         size_t count = 0;
         for (const auto& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++count;
         }
         EXPECT_EQ(0, count);
@@ -329,7 +328,7 @@ TEST(PbiFilterQueryTest, BarcodeData)
 
         size_t count = 0;
         for (const auto& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++count;
         }
         EXPECT_EQ(40, count);
@@ -344,7 +343,7 @@ TEST(PbiFilterQueryTest, BarcodeData)
 
         size_t count = 0;
         for (const auto& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++count;
         }
         EXPECT_EQ(80, count);
@@ -358,7 +357,7 @@ TEST(PbiFilterQueryTest, BarcodeData)
 
         size_t count = 0;
         for (const auto& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++count;
         }
         EXPECT_EQ(80, count);
@@ -462,7 +461,7 @@ TEST(PbiFilterQueryTest, BarcodeQualityFromXml)
 
         size_t count = 0;
         for (const auto& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++count;
         }
         EXPECT_EQ(120, count);
@@ -475,7 +474,7 @@ TEST(PbiFilterQueryTest, BarcodeQualityFromXml)
 
         size_t count = 0;
         for (const auto& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++count;
         }
         EXPECT_EQ(0, count);
@@ -539,7 +538,7 @@ TEST(PbiFilterQueryTest, ReadGroupFilterFromXml)
 
         size_t observedReadCount = 0;
         for (const auto& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++observedReadCount;
         }
         EXPECT_EQ(120, observedReadCount);
@@ -555,7 +554,7 @@ TEST(PbiFilterQueryTest, ReadGroupFilterFromXml)
 
         size_t observedReadCount = 0;
         for (const auto& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++observedReadCount;
         }
         EXPECT_EQ(0, observedReadCount);
@@ -623,7 +622,7 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         EXPECT_EQ(13, numReads);
 
         for (const auto& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++count_30422;
         }
         EXPECT_EQ(13, count_30422);
@@ -638,7 +637,7 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         EXPECT_EQ(11, numReads);
 
         for (const auto& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++count_648;
         }
         EXPECT_EQ(11, count_648);
@@ -653,7 +652,7 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         EXPECT_EQ(4, numReads);
 
         for (const auto& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++count_17299;
         }
         EXPECT_EQ(4, count_17299);
@@ -668,7 +667,7 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         EXPECT_EQ(28, numReads);
 
         for (const auto& r : query) {
-            UNUSED(r);
+            std::ignore = r;
             ++count_whitelist;
         }
         EXPECT_EQ(count_30422 + count_648 + count_17299, count_whitelist);
@@ -781,7 +780,7 @@ TEST(PbiFilterQueryTest, BarcodedReadGroupId)
         PbiFilterQuery query{filter, bamFile};
         size_t count = 0;
         for (const auto& b : query) {
-            (void)b;
+            std::ignore = b;
             ++count;
         }
         EXPECT_EQ(5, count);
@@ -793,7 +792,7 @@ TEST(PbiFilterQueryTest, BarcodedReadGroupId)
         PbiFilterQuery query{filter, bamFile};
         size_t count = 0;
         for (const auto& b : query) {
-            (void)b;
+            std::ignore = b;
             ++count;
         }
         EXPECT_EQ(1, count);
@@ -806,7 +805,7 @@ TEST(PbiFilterQueryTest, BarcodedReadGroupId)
         PbiFilterQuery query{filter, bamFile};
         size_t count = 0;
         for (const auto& b : query) {
-            (void)b;
+            std::ignore = b;
             ++count;
         }
         EXPECT_EQ(2, count);

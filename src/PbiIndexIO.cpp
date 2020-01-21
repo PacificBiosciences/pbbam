@@ -10,11 +10,11 @@
 #include <array>
 #include <sstream>
 #include <stdexcept>
+#include <tuple>
 #include <vector>
 
-#include <boost/algorithm/string.hpp>
-
 #include <pbcopper/utility/MoveAppend.h>
+#include <boost/algorithm/string.hpp>
 
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
@@ -278,7 +278,7 @@ void PbiIndexIO::LoadReferenceData(PbiRawReferenceData& referenceData, BGZF* fp)
             entry.endRow_ = ed_swap_4(entry.endRow_);
         }
     }
-    UNUSED(ret);
+    std::ignore = ret;
 }
 
 void PbiIndexIO::LoadBasicData(PbiRawBasicData& basicData, const uint32_t numReads, BGZF* fp)
@@ -353,7 +353,7 @@ void PbiIndexIO::WriteHeader(const PbiRawData& index, BGZF* fp)
     char reserved[18];
     memset(reserved, 0, 18);
     ret = bgzf_write(fp, reserved, 18);
-    UNUSED(ret);
+    std::ignore = ret;
 }
 
 void PbiIndexIO::WriteMappedData(const PbiRawMappedData& mappedData, const uint32_t numReads,
@@ -395,7 +395,7 @@ void PbiIndexIO::WriteReferenceData(const PbiRawReferenceData& referenceData, BG
         ret = bgzf_write(fp, &beginRow, 4);
         ret = bgzf_write(fp, &endRow, 4);
     }
-    UNUSED(ret);
+    std::ignore = ret;
 }
 
 void PbiIndexIO::WriteBasicData(const PbiRawBasicData& basicData, const uint32_t numReads, BGZF* fp)

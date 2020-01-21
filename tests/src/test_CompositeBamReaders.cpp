@@ -1,11 +1,12 @@
 // Author: Derek Barnett
 
+#include <tuple>
+
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
 #include <pbbam/CompositeBamReader.h>
-#include <pbbam/Unused.h>
+
+#include "PbbamTestData.h"
 
 using namespace PacBio::BAM;
 
@@ -28,7 +29,7 @@ TEST(GenomicIntervalCompositeBamReaderTest, ReuseReader)
     GenomicInterval interval(refName, 5000, 6000);
     GenomicIntervalCompositeBamReader reader{interval, bamFiles};
     for (const auto& record : reader) {
-        UNUSED(record);
+        std::ignore = record;
         ++count;
     }
     EXPECT_EQ(4, count);
@@ -39,7 +40,7 @@ TEST(GenomicIntervalCompositeBamReaderTest, ReuseReader)
     interval.Stop(9400);
     reader.Interval(interval);
     for (const auto& record : reader) {
-        UNUSED(record);
+        std::ignore = record;
         ++count;
     }
     EXPECT_EQ(4, count);
@@ -51,7 +52,7 @@ TEST(GenomicIntervalCompositeBamReaderTest, ReuseReader)
     interval.Stop(2000);
     reader.Interval(interval);
     for (const auto& record : reader) {
-        UNUSED(record);
+        std::ignore = record;
         ++count;
     }
     EXPECT_EQ(0, count);
@@ -63,7 +64,7 @@ TEST(GenomicIntervalCompositeBamReaderTest, ReuseReader)
     interval.Stop(100);
     EXPECT_THROW(reader.Interval(interval), std::runtime_error);
     for (const auto& record : reader) {  // iteration is still safe, just returns no data
-        UNUSED(record);
+        std::ignore = record;
         ++count;
     }
     EXPECT_EQ(0, count);
@@ -75,7 +76,7 @@ TEST(GenomicIntervalCompositeBamReaderTest, ReuseReader)
     reader.Interval(interval);
     count = 0;
     for (const auto& record : reader) {
-        UNUSED(record);
+        std::ignore = record;
         ++count;
     }
     EXPECT_EQ(4, count);
@@ -115,7 +116,7 @@ TEST(GenomicIntervalCompositeBamReaderTest, InitializeWithoutInterval)
     int count = 0;
     GenomicIntervalCompositeBamReader reader{bamFiles};
     for (const auto& record : reader) {
-        UNUSED(record);
+        std::ignore = record;
         ++count;
     }
     EXPECT_EQ(0, count);
@@ -125,7 +126,7 @@ TEST(GenomicIntervalCompositeBamReaderTest, InitializeWithoutInterval)
     GenomicInterval interval{"lambda_NEB3011", 9300, 9400};
     reader.Interval(interval);
     for (const auto& record : reader) {
-        UNUSED(record);
+        std::ignore = record;
         ++count;
     }
     EXPECT_EQ(4, count);
@@ -238,7 +239,7 @@ TEST(SequentialCompositeBamReaderTest, CountRecords)
         int count = 0;
         PacBio::BAM::SequentialCompositeBamReader reader{bamFiles};
         for (const auto& record : reader) {
-            UNUSED(record);
+            std::ignore = record;
             ++count;
         }
         EXPECT_EQ(8, count);

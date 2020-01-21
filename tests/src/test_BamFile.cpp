@@ -1,18 +1,20 @@
 // Author: Derek Barnett
 
 #include <unistd.h>
+
 #include <cstddef>
 #include <cstdlib>
+
 #include <stdexcept>
+#include <tuple>
 
 #include <gtest/gtest.h>
-
-#include "PbbamTestData.h"
 
 #include <pbbam/../../src/FileUtils.h>
 #include <pbbam/BamFile.h>
 #include <pbbam/EntireFileQuery.h>
-#include <pbbam/Unused.h>
+
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -25,7 +27,7 @@ void CheckFile(const T& input, const size_t expectedCount)
     size_t observedCount = 0;
     EntireFileQuery entireFile(input);
     for (const BamRecord& r : entireFile) {
-        UNUSED(r);
+        std::ignore = r;
         ++observedCount;
     }
     EXPECT_EQ(expectedCount, observedCount);

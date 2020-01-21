@@ -4,18 +4,19 @@
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
+
 #include <iostream>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include <gtest/gtest.h>
 #include <boost/algorithm/string.hpp>
 
-#include "PbbamTestData.h"
-
 #include <pbbam/../../src/FileUtils.h>
 #include <pbbam/../../src/TimeUtils.h>
-#include <pbbam/Unused.h>
+
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -44,7 +45,7 @@ TEST(FileUtilsTest, LastModifiedOk)
     const std::string rmCmd = std::string("rm ") + tmp;
     const std::string touchCmd = std::string("touch  ") + tmp;
     const auto ret = system(rmCmd.c_str());
-    UNUSED(ret);
+    std::ignore = ret;
     ASSERT_EQ(0, system(touchCmd.c_str()));
 
     const auto stamp = FileUtils::LastModified(tmp);

@@ -2,21 +2,22 @@
 
 #include <cstdio>
 #include <cstdlib>
+
 #include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include <gtest/gtest.h>
 #include <htslib/sam.h>
 
-#include "PbbamTestData.h"
-
 #include <pbbam/BamFile.h>
 #include <pbbam/BamWriter.h>
 #include <pbbam/EntireFileQuery.h>
-#include <pbbam/Unused.h>
+
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -123,7 +124,7 @@ TEST(EndToEndTest, ReadAndWrite_PureHtslib)
 
         while (sam_read1(in, hdr, b) >= 0) {
             const auto ret = sam_write1(out, hdr, b);
-            UNUSED(ret);
+            std::ignore = ret;
         }
     }
 
