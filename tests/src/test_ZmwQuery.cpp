@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -171,4 +172,31 @@ TEST(ZmwGroupQueryTest, sequential_query_can_return_records_ignoring_dataset_fil
     const std::vector<int32_t> expectedHoleNumbers{55, 480, 678, 918, 1060};
     EXPECT_TRUE(
         std::equal(holeNumbers.cbegin(), holeNumbers.cbegin() + 5, expectedHoleNumbers.cbegin()));
+}
+
+TEST(ZmwGroupQueryTest, can_apply_custom_pbi_filter)
+{
+    size_t zmwCount = 0;
+    size_t recordCount = 0;
+    std::vector<int32_t> holeNumbers;
+
+    PacBio::BAM::PbiFilter zmwRange{
+        {PacBio::BAM::PbiZmwFilter{1600, PacBio::BAM::Compare::GREATER_THAN_EQUAL},
+         PacBio::BAM::PbiZmwFilter{1700, PacBio::BAM::Compare::LESS_THAN}}};
+    PacBio::BAM::ZmwGroupQuery query{ZmwQueryTests::input, zmwRange};
+
+    for (const auto& zmw : query) {
+        ++zmwCount;
+        ASSERT_TRUE(!zmw.empty());
+        holeNumbers.push_back(zmw.front().HoleNumber());
+        for (const auto& record : zmw) {
+            std::ignore = record;
+            ++recordCount;
+        }
+    }
+    EXPECT_EQ(3, zmwCount);
+    EXPECT_EQ(15, recordCount);  // 5 + 3 + 7
+
+    const std::vector<int32_t> expectedHoleNumbers{1603, 1638, 1640};
+    EXPECT_TRUE(std::equal(holeNumbers.cbegin(), holeNumbers.cend(), expectedHoleNumbers.cbegin()));
 }
