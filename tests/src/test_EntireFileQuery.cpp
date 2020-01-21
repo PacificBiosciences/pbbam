@@ -1,7 +1,7 @@
 // Author: Derek Barnett
 
+#include <iterator>
 #include <string>
-#include <tuple>
 
 #include <gtest/gtest.h>
 
@@ -23,29 +23,8 @@ TEST(EntireFileQueryTest, CountRecords)
 {
     EXPECT_NO_THROW({
         BamFile bamFile(EntireFileQueryTests::inputBamFn);
-        int count = 0;
         EntireFileQuery entireFile(bamFile);
-        for (const BamRecord& record : entireFile) {
-            std::ignore = record;
-            ++count;
-        }
-
-        EXPECT_EQ(4, count);
-    });
-}
-
-TEST(EntireFileQueryTest, NonConstBamRecord)
-{
-    EXPECT_NO_THROW({
-        BamFile bamFile(EntireFileQueryTests::inputBamFn);
-        int count = 0;
-        EntireFileQuery entireFile(bamFile);
-        for (BamRecord& record : entireFile) {
-            std::ignore = record;
-            ++count;
-        }
-
-        EXPECT_EQ(4, count);
+        EXPECT_EQ(4, std::distance(entireFile.begin(), entireFile.end()));
     });
 }
 

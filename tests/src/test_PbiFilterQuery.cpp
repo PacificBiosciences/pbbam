@@ -1,11 +1,12 @@
 // Author: Derek Barnett
 
-#include <algorithm>
 #include <cstddef>
 #include <cstdint>
+
+#include <algorithm>
+#include <iterator>
 #include <set>
 #include <string>
-#include <tuple>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -23,58 +24,43 @@ TEST(PbiFilterQueryTest, QueryOk)
 
     {
         PbiFilterQuery query(PbiQueryLengthFilter{500, Compare::GREATER_THAN_EQUAL}, bamFile);
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(3, numReads);
-
-        int count = 0;
-        for (const auto& r : query) {
-            ++count;
-            EXPECT_GE((r.QueryEnd() - r.QueryStart()), 500);
-        }
-        EXPECT_EQ(3, count);
+        EXPECT_EQ(3, query.NumReads());
+        EXPECT_EQ(3, std::distance(query.begin(), query.end()));
     }
     {
         // all records aligned to reverse strand && pos >= 9200
+        const std::string queryName{
+            "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/5615_6237"};
+        const Strand strand = Strand::REVERSE;
+        const Position start = 9200;
         const auto filter =
-            PbiFilter::Intersection({PbiAlignedStrandFilter{Strand::REVERSE},
-                                     PbiReferenceStartFilter{9200, Compare::GREATER_THAN_EQUAL}});
+            PbiFilter::Intersection({PbiAlignedStrandFilter{strand},
+                                     PbiReferenceStartFilter{start, Compare::GREATER_THAN_EQUAL}});
 
         PbiFilterQuery query(filter, bamFile);
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(1, numReads);
-
-        int count = 0;
-        for (const auto& r : query) {
-            ++count;
-            EXPECT_EQ(Strand::REVERSE, r.AlignedStrand());
-            EXPECT_GE((r.ReferenceStart()), 9200);
-            EXPECT_EQ(
-                std::string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/"
-                            "5615_6237"),
-                r.FullName());
-        }
+        EXPECT_EQ(1, query.NumReads());
+        const auto count = std::count_if(query.begin(), query.end(), [&](const BamRecord& r) {
+            return r.AlignedStrand() == strand && r.ReferenceStart() >= start &&
+                   r.FullName() == queryName;
+        });
         EXPECT_EQ(1, count);
     }
     {
         // all records aligned to forward strand && pos >= 9200
+        const std::string queryName{
+            "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2114_2531"};
+        const Strand strand = Strand::FORWARD;
+        const Position start = 9200;
         const auto filter =
             PbiFilter::Intersection({PbiAlignedStrandFilter{Strand::FORWARD},
                                      PbiReferenceStartFilter{9200, Compare::GREATER_THAN_EQUAL}});
 
         PbiFilterQuery query(filter, bamFile);
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(1, numReads);
-
-        int count = 0;
-        for (const auto& r : query) {
-            ++count;
-            EXPECT_EQ(Strand::FORWARD, r.AlignedStrand());
-            EXPECT_GE((r.ReferenceStart()), 9200);
-            EXPECT_EQ(
-                std::string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/"
-                            "2114_2531"),
-                r.FullName());
-        }
+        EXPECT_EQ(1, query.NumReads());
+        const auto count = std::count_if(query.begin(), query.end(), [&](const BamRecord& r) {
+            return r.AlignedStrand() == strand && r.ReferenceStart() >= start &&
+                   r.FullName() == queryName;
+        });
         EXPECT_EQ(1, count);
     }
     {
@@ -110,6 +96,7 @@ TEST(PbiFilterQueryTest, QueryOk)
     }
 }
 
+// clang-format off
 TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 {
     const std::string expectedMovieName{"m64004_190414_193017"};
@@ -120,48 +107,41 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
     {  // movie name
 
         PbiFilterQuery query{PbiMovieNameFilter{expectedMovieName}, ds};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(1220, numReads);
-
-        int count = 0;
-        for (const BamRecord& r : query) {
-            EXPECT_EQ(expectedMovieName, r.MovieName());
-            ++count;
-        }
+        EXPECT_EQ(1220, query.NumReads());
+        const auto count = std::count_if(query.begin(), query.end(),
+            [&](const BamRecord& r) {
+                return r.MovieName() == expectedMovieName;
+            });
         EXPECT_EQ(1220, count);
     }
 
     {  // sequencing chemistries
         std::set<std::string> chems{ds.SequencingChemistries()};
         std::set<std::string> expected{"S/P3-C1/5.0-8M"};
-        EXPECT_TRUE(equal(chems.begin(), chems.end(), expected.begin()));
+        EXPECT_TRUE(std::equal(chems.begin(), chems.end(), expected.begin()));
     }
 
     {  // min ZMW
 
-        PbiFilterQuery query{PbiZmwFilter{54, Compare::GREATER_THAN}, ds};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(1220, numReads);
-
-        int count = 0;
-        for (const BamRecord& r : query) {
-            EXPECT_GT(r.HoleNumber(), 54);
-            ++count;
-        }
+        const int32_t zmw = 54;
+        PbiFilterQuery query{PbiZmwFilter{zmw, Compare::GREATER_THAN}, ds};
+        EXPECT_EQ(1220, query.NumReads());
+        const auto count = std::count_if(query.begin(), query.end(),
+            [&](const BamRecord& r) {
+                return r.HoleNumber() > zmw;
+            });
         EXPECT_EQ(1220, count);
     }
 
     {  // max ZMW
 
+        const int32_t zmw = 1816;
         PbiFilterQuery query{PbiZmwFilter{1816, Compare::LESS_THAN}, ds};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(150, numReads);
-
-        int count = 0;
-        for (const BamRecord& r : query) {
-            EXPECT_LT(r.HoleNumber(), 1816);
-            ++count;
-        }
+        EXPECT_EQ(150, query.NumReads());
+        const auto count = std::count_if(query.begin(), query.end(),
+            [&](const BamRecord& r) {
+                return r.HoleNumber() < zmw;
+            });
         EXPECT_EQ(150, count);
     }
 
@@ -169,65 +149,42 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 
         const PbiFilter filter = PbiFilter::FromDataSet(ds);
         PbiFilterQuery query(filter, ds);
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(150, numReads);
-
-        int count = 0;
-        for (const BamRecord& r : query) {
-            EXPECT_EQ(expectedMovieName, r.MovieName());
-            const auto zmw = r.HoleNumber();
-            EXPECT_GT(zmw, 54);
-            EXPECT_LT(zmw, 1816);
-            ++count;
-        }
+        EXPECT_EQ(150, query.NumReads());
+        const auto count = std::count_if(query.begin(), query.end(),
+            [&](const BamRecord& r) {
+                return r.HoleNumber() > 54 &&
+                       r.HoleNumber() < 1816;
+            });
         EXPECT_EQ(150, count);
     }
     {  // empty filter object - should return all records from the same dataset
 
         PbiFilterQuery query(PbiFilter{}, ds);
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(1220, numReads);
-
-        int count = 0;
-        for (const BamRecord& r : query) {
-            std::ignore = r;
-            ++count;
-        }
-        EXPECT_EQ(1220, count);
+        EXPECT_EQ(1220, query.NumReads());
+        EXPECT_EQ(1220, std::distance(query.begin(), query.end()));
     }
     {  // no <Filters> element present at all
 
         const DataSet dsData(PbbamTestsConfig::GeneratedData_Dir +
                              "/chunking_missingfilters.subreadset.xml");
+
         const PbiFilter filter = PbiFilter::FromDataSet(dsData);
         PbiFilterQuery query(filter, dsData);
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(1220, numReads);
-
-        int count = 0;
-        for (const BamRecord& r : query) {
-            std::ignore = r;
-            ++count;
-        }
-        EXPECT_EQ(1220, count);
+        EXPECT_EQ(1220, query.NumReads());
+        EXPECT_EQ(1220, std::distance(query.begin(), query.end()));
     }
     {  // <Filters> element contains no child <Filter> elements
 
         const DataSet dsData(PbbamTestsConfig::GeneratedData_Dir +
                              "/chunking_emptyfilters.subreadset.xml");
+
         const PbiFilter filter = PbiFilter::FromDataSet(dsData);
         PbiFilterQuery query(filter, dsData);
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(1220, numReads);
-
-        int count = 0;
-        for (const BamRecord& r : query) {
-            std::ignore = r;
-            ++count;
-        }
-        EXPECT_EQ(1220, count);
+        EXPECT_EQ(1220, query.NumReads());
+        EXPECT_EQ(1220, std::distance(query.begin(), query.end()));
     }
 }
+// clang-format on
 
 TEST(PbiFilterQueryTest, MissingPbiShouldThrow)
 {
@@ -262,30 +219,16 @@ TEST(PbiFilterQueryTest, QNameWhitelistFile)
     const DataSet ds(PbbamTestsConfig::Data_Dir + "/polymerase/qnameFiltered.subreads.dataset.xml");
     const PbiFilter filter = PbiFilter::FromDataSet(ds);
     PbiFilterQuery query(filter, ds);
-    const auto numReads = query.NumReads();
-    EXPECT_EQ(3, numReads);
-
-    int count = 0;
-    for (const auto& r : query) {
-        std::ignore = r;
-        ++count;
-    }
-    EXPECT_EQ(3, count);
+    EXPECT_EQ(3, query.NumReads());
+    EXPECT_EQ(3, std::distance(query.begin(), query.end()));
 }
 
 TEST(PbiFilterQueryTest, EmptyFiles)
 {
     const BamFile file{PbbamTestsConfig::Data_Dir + "/empty.bam"};
     PbiFilterQuery query{PbiFilter{}, file};
-    const auto numReads = query.NumReads();
-    EXPECT_EQ(0, numReads);
-
-    size_t count = 0;
-    for (const auto& r : query) {
-        std::ignore = r;
-        ++count;
-    }
-    EXPECT_EQ(0, count);
+    EXPECT_EQ(0, query.NumReads());
+    EXPECT_EQ(0, std::distance(query.begin(), query.end()));
 }
 
 TEST(PbiFilterQueryTest, BarcodeData)
@@ -295,72 +238,37 @@ TEST(PbiFilterQueryTest, BarcodeData)
     // bc_quality == 1
     {
         PbiFilterQuery query{PbiBarcodeQualityFilter{1}, file};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(120, numReads);
-
-        size_t count = 0;
-        for (const auto& r : query) {
-            std::ignore = r;
-            ++count;
-        }
-        EXPECT_EQ(120, count);
+        EXPECT_EQ(120, query.NumReads());
+        EXPECT_EQ(120, std::distance(query.begin(), query.end()));
     }
 
     // bc_quality != 1
     {
         PbiFilterQuery query{PbiBarcodeQualityFilter{1, Compare::NOT_EQUAL}, file};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(0, numReads);
-
-        size_t count = 0;
-        for (const auto& r : query) {
-            std::ignore = r;
-            ++count;
-        }
-        EXPECT_EQ(0, count);
+        EXPECT_EQ(0, query.NumReads());
+        EXPECT_EQ(0, std::distance(query.begin(), query.end()));
     }
 
     // bc_forward == 0
     {
         PbiFilterQuery query{PbiBarcodeForwardFilter{0}, file};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(40, numReads);
-
-        size_t count = 0;
-        for (const auto& r : query) {
-            std::ignore = r;
-            ++count;
-        }
-        EXPECT_EQ(40, count);
+        EXPECT_EQ(40, query.NumReads());
+        EXPECT_EQ(40, std::distance(query.begin(), query.end()));
     }
 
     // bc_forward == [0,2]
     {
         const auto ids = std::vector<int16_t>{0, 2};
         PbiFilterQuery query{PbiBarcodeForwardFilter{ids}, file};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(80, numReads);
-
-        size_t count = 0;
-        for (const auto& r : query) {
-            std::ignore = r;
-            ++count;
-        }
-        EXPECT_EQ(80, count);
+        EXPECT_EQ(80, query.NumReads());
+        EXPECT_EQ(80, std::distance(query.begin(), query.end()));
     }
 
     // bc_reverse != 0
     {
         PbiFilterQuery query{PbiBarcodeReverseFilter{0, Compare::NOT_EQUAL}, file};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(80, numReads);
-
-        size_t count = 0;
-        for (const auto& r : query) {
-            std::ignore = r;
-            ++count;
-        }
-        EXPECT_EQ(80, count);
+        EXPECT_EQ(80, query.NumReads());
+        EXPECT_EQ(80, std::distance(query.begin(), query.end()));
     }
 }
 
@@ -456,28 +364,14 @@ TEST(PbiFilterQueryTest, BarcodeQualityFromXml)
     {  // filter allows all records
         const DataSet ds = DataSet::FromXml(xml_all);
         const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(120, numReads);
-
-        size_t count = 0;
-        for (const auto& r : query) {
-            std::ignore = r;
-            ++count;
-        }
-        EXPECT_EQ(120, count);
+        EXPECT_EQ(120, query.NumReads());
+        EXPECT_EQ(120, std::distance(query.begin(), query.end()));
     }
     {  // filter allows no records
         const DataSet ds = DataSet::FromXml(xml_none);
         const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(0, numReads);
-
-        size_t count = 0;
-        for (const auto& r : query) {
-            std::ignore = r;
-            ++count;
-        }
-        EXPECT_EQ(0, count);
+        EXPECT_EQ(0, query.NumReads());
+        EXPECT_EQ(0, std::distance(query.begin(), query.end()));
     }
 }
 
@@ -533,15 +427,8 @@ TEST(PbiFilterQueryTest, ReadGroupFilterFromXml)
         const std::string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(120, numReads);
-
-        size_t observedReadCount = 0;
-        for (const auto& r : query) {
-            std::ignore = r;
-            ++observedReadCount;
-        }
-        EXPECT_EQ(120, observedReadCount);
+        EXPECT_EQ(120, query.NumReads());
+        EXPECT_EQ(120, std::distance(query.begin(), query.end()));
     }
     {  // not equal
         const std::string xmlProperty =
@@ -549,15 +436,8 @@ TEST(PbiFilterQueryTest, ReadGroupFilterFromXml)
         const std::string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(0, numReads);
-
-        size_t observedReadCount = 0;
-        for (const auto& r : query) {
-            std::ignore = r;
-            ++observedReadCount;
-        }
-        EXPECT_EQ(0, observedReadCount);
+        EXPECT_EQ(0, query.NumReads());
+        EXPECT_EQ(0, std::distance(query.begin(), query.end()));
     }
 }
 
@@ -618,13 +498,8 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         const std::string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(13, numReads);
-
-        for (const auto& r : query) {
-            std::ignore = r;
-            ++count_30422;
-        }
+        EXPECT_EQ(13, query.NumReads());
+        count_30422 = std::distance(query.begin(), query.end());
         EXPECT_EQ(13, count_30422);
     }
     {  // 648
@@ -633,13 +508,8 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         const std::string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(11, numReads);
-
-        for (const auto& r : query) {
-            std::ignore = r;
-            ++count_648;
-        }
+        EXPECT_EQ(11, query.NumReads());
+        count_648 = std::distance(query.begin(), query.end());
         EXPECT_EQ(11, count_648);
     }
     {  // 17299
@@ -648,13 +518,8 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         const std::string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(4, numReads);
-
-        for (const auto& r : query) {
-            std::ignore = r;
-            ++count_17299;
-        }
+        EXPECT_EQ(4, query.NumReads());
+        count_17299 = std::distance(query.begin(), query.end());
         EXPECT_EQ(4, count_17299);
     }
     {  // now check whitelist
@@ -663,13 +528,10 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
         const std::string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(28, numReads);
+        EXPECT_EQ(28, query.NumReads());
+        count_whitelist = std::distance(query.begin(), query.end());
+        EXPECT_EQ(28, count_whitelist);
 
-        for (const auto& r : query) {
-            std::ignore = r;
-            ++count_whitelist;
-        }
         EXPECT_EQ(count_30422 + count_648 + count_17299, count_whitelist);
     }
 }
@@ -777,41 +639,33 @@ TEST(PbiFilterQueryTest, BarcodedReadGroupId)
 
     {  //  query read group with no barcodes - should catche all, barcoded or not
         const PbiReadGroupFilter filter{"0d7b28fa"};
+
         PbiFilterQuery query{filter, bamFile};
-        size_t count = 0;
-        for (const auto& b : query) {
-            std::ignore = b;
-            ++count;
-        }
-        EXPECT_EQ(5, count);
+        EXPECT_EQ(5, query.NumReads());
+        EXPECT_EQ(5, std::distance(query.begin(), query.end()));
     }
     {  // query read group with barcode label
 
         const ReadGroupInfo rg{"0d7b28fa/0--0"};
-        PbiReadGroupFilter filter{rg};
+        const PbiReadGroupFilter filter{rg};
+
         PbiFilterQuery query{filter, bamFile};
-        size_t count = 0;
-        for (const auto& b : query) {
-            std::ignore = b;
-            ++count;
-        }
-        EXPECT_EQ(1, count);
+        EXPECT_EQ(1, query.NumReads());
+        EXPECT_EQ(1, std::distance(query.begin(), query.end()));
     }
     {  // query multiple read groups with barcode label
 
         const ReadGroupInfo rg{"0d7b28fa/0--0"};
         const ReadGroupInfo rg1{"0d7b28fa/1--0"};
-        PbiReadGroupFilter filter{std::vector<ReadGroupInfo>{rg, rg1}};
+        const PbiReadGroupFilter filter{std::vector<ReadGroupInfo>{rg, rg1}};
+
         PbiFilterQuery query{filter, bamFile};
-        size_t count = 0;
-        for (const auto& b : query) {
-            std::ignore = b;
-            ++count;
-        }
-        EXPECT_EQ(2, count);
+        EXPECT_EQ(2, query.NumReads());
+        EXPECT_EQ(2, std::distance(query.begin(), query.end()));
     }
 }
 
+// clang-format off
 TEST(PbiFilterQueryTest, CanReusePbiIndexCache)
 {
     const DataSet ds(PbbamTestsConfig::Data_Dir + "/chunking/chunking.subreadset.xml");
@@ -819,31 +673,30 @@ TEST(PbiFilterQueryTest, CanReusePbiIndexCache)
 
     {
         // min ZMW
-        PbiFilterQuery query{PbiZmwFilter{54, Compare::GREATER_THAN}, ds, indexCache};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(1220, numReads);
+        const int32_t zmw = 54;
 
-        int count = 0;
-        for (const BamRecord& r : query) {
-            EXPECT_GT(r.HoleNumber(), 54);
-            ++count;
-        }
+        PbiFilterQuery query{PbiZmwFilter{zmw, Compare::GREATER_THAN}, ds, indexCache};
+        EXPECT_EQ(1220, query.NumReads());
+        const auto count = std::count_if(query.begin(), query.end(),
+            [&](const BamRecord& r) {
+                return r.HoleNumber() > zmw;
+            });
         EXPECT_EQ(1220, count);
     }
 
     {  // max ZMW
-        PbiFilterQuery query{PbiZmwFilter{1816, Compare::LESS_THAN}, ds, indexCache};
-        const auto numReads = query.NumReads();
-        EXPECT_EQ(150, numReads);
+        const int32_t zmw = 1816;
 
-        int count = 0;
-        for (const BamRecord& r : query) {
-            EXPECT_LT(r.HoleNumber(), 1816);
-            ++count;
-        }
+        PbiFilterQuery query{PbiZmwFilter{zmw, Compare::LESS_THAN}, ds, indexCache};
+        EXPECT_EQ(150, query.NumReads());
+        const auto count = std::count_if(query.begin(), query.end(),
+            [&](const BamRecord& r) {
+                return r.HoleNumber() < zmw;
+            });
         EXPECT_EQ(150, count);
     }
 }
+// clang-format on
 
 TEST(PbiFilterQueryTest, ConsistentWhitelistAndBlacklist)
 {
@@ -875,8 +728,7 @@ TEST(PbiFilterQueryTest, ConsistentWhitelistAndBlacklist)
         for (const auto& b : query) {
             if (i == 0) {
                 EXPECT_EQ(recordNames.at(0), b.FullName());
-            }
-            if (i == 1) {
+            } else if (i == 1) {
                 EXPECT_EQ(recordNames.at(2), b.FullName());
             }
             ++i;
@@ -892,8 +744,7 @@ TEST(PbiFilterQueryTest, ConsistentWhitelistAndBlacklist)
         for (const auto& b : query) {
             if (i == 0) {
                 EXPECT_EQ(recordNames.at(1), b.FullName());
-            }
-            if (i == 1) {
+            } else if (i == 1) {
                 EXPECT_EQ(recordNames.at(3), b.FullName());
             }
             ++i;
@@ -909,8 +760,7 @@ TEST(PbiFilterQueryTest, ConsistentWhitelistAndBlacklist)
         for (const auto& b : query) {
             if (i == 0) {
                 EXPECT_EQ(recordNames.at(0), b.FullName());
-            }
-            if (i == 1) {
+            } else if (i == 1) {
                 EXPECT_EQ(recordNames.at(2), b.FullName());
             }
             ++i;
@@ -924,30 +774,18 @@ TEST(PbiFilterTest, MovieNameFilterWorksWithBarcodedReadGroups)
     const DataSet dataset{inputXml};
 
     {  // no filter, data has 2 reads
-        int count = 0;
         PbiFilterQuery query{PbiFilter{}, dataset};
-        for (const auto& record : query) {
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(2, count);
+        EXPECT_EQ(2, query.NumReads());
+        EXPECT_EQ(2, std::distance(query.begin(), query.end()));
     }
     {  // dataset filter has 1 movie name (m54006_200116_134114)
-        int count = 0;
         PbiFilterQuery query{PbiFilter::FromDataSet(dataset), dataset};
-        for (const auto& record : query) {
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(1, count);
+        EXPECT_EQ(1, query.NumReads());
+        EXPECT_EQ(1, std::distance(query.begin(), query.end()));
     }
     {  // use other movie name 'manually'
-        int count = 0;
         PbiFilterQuery query{PbiMovieNameFilter{"m54006_200116_200000"}, dataset};
-        for (const auto& record : query) {
-            std::ignore = record;
-            ++count;
-        }
-        EXPECT_EQ(1, count);
+        EXPECT_EQ(1, query.NumReads());
+        EXPECT_EQ(1, std::distance(query.begin(), query.end()));
     }
 }

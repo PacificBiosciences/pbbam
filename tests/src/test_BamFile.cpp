@@ -5,8 +5,8 @@
 #include <cstddef>
 #include <cstdlib>
 
+#include <iterator>
 #include <stdexcept>
-#include <tuple>
 
 #include <gtest/gtest.h>
 
@@ -24,13 +24,8 @@ namespace BamFileTests {
 template <typename T>
 void CheckFile(const T& input, const size_t expectedCount)
 {
-    size_t observedCount = 0;
     EntireFileQuery entireFile(input);
-    for (const BamRecord& r : entireFile) {
-        std::ignore = r;
-        ++observedCount;
-    }
-    EXPECT_EQ(expectedCount, observedCount);
+    EXPECT_EQ(expectedCount, std::distance(entireFile.begin(), entireFile.end()));
 }
 
 }  // namespace BamFileTests
