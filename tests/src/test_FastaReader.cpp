@@ -29,6 +29,40 @@ void CheckFastaSequence(const size_t index, const FastaSequence& seq)
     EXPECT_EQ(expected.Bases(), seq.Bases());
 }
 
+void CheckManualIteration(const std::string& fn)
+{
+    FastaReader reader{fn};
+
+    size_t count = 0;
+    FastaSequence seq;
+    while (reader.GetNext(seq)) {
+        CheckFastaSequence(count, seq);
+        ++count;
+    }
+    EXPECT_EQ(FastxTests::ExpectedFasta.size(), count);
+}
+
+void CheckRangeFor(const std::string& fn)
+{
+    size_t count = 0;
+    FastaReader reader{fn};
+    for (const auto& seq : reader) {
+        CheckFastaSequence(count, seq);
+        ++count;
+    }
+    EXPECT_EQ(FastxTests::ExpectedFasta.size(), count);
+}
+
+void CheckReadAll(const std::string& fn)
+{
+    size_t count = 0;
+    for (const auto& seq : FastaReader::ReadAll(fn)) {
+        CheckFastaSequence(count, seq);
+        ++count;
+    }
+    EXPECT_EQ(FastxTests::ExpectedFasta.size(), count);
+}
+
 }  // namespace FastaReaderTests
 
 TEST(FastaReaderTest, throws_on_empty_filename)
@@ -61,135 +95,59 @@ TEST(FastaReaderTest, can_open_bgzf_fasta)
 
 TEST(FastaReaderTest, can_iterate_manually_on_text_fasta)
 {
-    const auto& fn = FastxTests::simpleFastaFn;
-    FastaReader reader{fn};
-
-    size_t count = 0;
-    FastaSequence seq;
-    while (reader.GetNext(seq)) {
-        FastaReaderTests::CheckFastaSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFasta.size(), count);
+    FastaReaderTests::CheckManualIteration(FastxTests::simpleFastaFn);
 }
 
 TEST(FastaReaderTest, can_iterate_manually_on_gzip_fasta)
 {
-    const auto& fn = FastxTests::simpleFastaGzipFn;
-    FastaReader reader{fn};
-
-    size_t count = 0;
-    FastaSequence seq;
-    while (reader.GetNext(seq)) {
-        FastaReaderTests::CheckFastaSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFasta.size(), count);
+    FastaReaderTests::CheckManualIteration(FastxTests::simpleFastaGzipFn);
 }
 
 TEST(FastaReaderTest, can_iterate_manually_on_bgzf_fasta)
 {
-    const auto& fn = FastxTests::simpleFastaBgzfFn;
-    FastaReader reader{fn};
-
-    size_t count = 0;
-    FastaSequence seq;
-    while (reader.GetNext(seq)) {
-        FastaReaderTests::CheckFastaSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFasta.size(), count);
+    FastaReaderTests::CheckManualIteration(FastxTests::simpleFastaBgzfFn);
 }
 
 TEST(FastaReaderTest, can_iterate_using_range_for_on_text_fasta)
 {
-    const auto& fn = FastxTests::simpleFastaFn;
-
-    size_t count = 0;
-    FastaReader reader{fn};
-    for (const auto& seq : reader) {
-        FastaReaderTests::CheckFastaSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFasta.size(), count);
+    FastaReaderTests::CheckRangeFor(FastxTests::simpleFastaFn);
 }
 
 TEST(FastaReaderTest, can_iterate_using_range_for_on_gzip_fasta)
 {
-    const auto& fn = FastxTests::simpleFastaGzipFn;
-
-    size_t count = 0;
-    FastaReader reader{fn};
-    for (const auto& seq : reader) {
-        FastaReaderTests::CheckFastaSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFasta.size(), count);
+    FastaReaderTests::CheckRangeFor(FastxTests::simpleFastaGzipFn);
 }
 
 TEST(FastaReaderTest, can_iterate_using_range_for_on_bgzf_fasta)
 {
-    const auto& fn = FastxTests::simpleFastaBgzfFn;
-
-    size_t count = 0;
-    FastaReader reader{fn};
-    for (const auto& seq : reader) {
-        FastaReaderTests::CheckFastaSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFasta.size(), count);
+    FastaReaderTests::CheckRangeFor(FastxTests::simpleFastaBgzfFn);
 }
 
 TEST(FastaReaderTest, can_read_all_from_text_fasta)
 {
-    const auto& fn = FastxTests::simpleFastaFn;
-
-    size_t count = 0;
-    for (const auto& seq : FastaReader::ReadAll(fn)) {
-        FastaReaderTests::CheckFastaSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFasta.size(), count);
+    FastaReaderTests::CheckReadAll(FastxTests::simpleFastaFn);
 }
 
 TEST(FastaReaderTest, can_read_all_from_gzip_fasta)
 {
-    const auto& fn = FastxTests::simpleFastaGzipFn;
-
-    size_t count = 0;
-    for (const auto& seq : FastaReader::ReadAll(fn)) {
-        FastaReaderTests::CheckFastaSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFasta.size(), count);
+    FastaReaderTests::CheckReadAll(FastxTests::simpleFastaGzipFn);
 }
 
 TEST(FastaReaderTest, can_read_all_from_bgzf_fasta)
 {
-    const auto& fn = FastxTests::simpleFastaBgzfFn;
-
-    size_t count = 0;
-    for (const auto& seq : FastaReader::ReadAll(fn)) {
-        FastaReaderTests::CheckFastaSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFasta.size(), count);
+    FastaReaderTests::CheckReadAll(FastxTests::simpleFastaBgzfFn);
 }
 
 TEST(FastaReaderTest, can_handle_windows_style_newlines)
 {
-    const std::string fn = FastxTests::fastxDataDir + "/windows_formatted.fasta";
-
-    {
-        size_t count = 0;
-        FastaReader reader{fn};
-        FastaSequence seq;
-        while (reader.GetNext(seq)) {
-            ++count;
-            bool endOK = (boost::algorithm::ends_with(seq.Name(), "5p") ||
-                          boost::algorithm::ends_with(seq.Name(), "3p"));
-            EXPECT_TRUE(endOK);
-        }
-        EXPECT_EQ(7, count);  // 7 primers in total
+    size_t count = 0;
+    FastaReader reader{FastxTests::fastxDataDir + "/windows_formatted.fasta"};
+    FastaSequence seq;
+    while (reader.GetNext(seq)) {
+        ++count;
+        const bool endOK = (boost::algorithm::ends_with(seq.Name(), "5p") ||
+                            boost::algorithm::ends_with(seq.Name(), "3p"));
+        EXPECT_TRUE(endOK);
     }
+    EXPECT_EQ(7, count);  // 7 primers in total
 }

@@ -25,7 +25,7 @@ TEST(GenomicIntervalCompositeBamReaderTest, ReuseReader)
                                         BamFile{CompositeBamReaderTests::alignedBamFn}};
 
     // setup with normal interval
-    GenomicInterval interval(refName, 5000, 6000);
+    GenomicInterval interval{refName, 5000, 6000};
     GenomicIntervalCompositeBamReader reader{interval, bamFiles};
     EXPECT_EQ(4, std::distance(reader.begin(), reader.end()));
 

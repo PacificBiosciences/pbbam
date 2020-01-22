@@ -17,6 +17,28 @@
 using TextFileReader = PacBio::BAM::TextFileReader;
 using TextFileWriter = PacBio::BAM::TextFileWriter;
 
+namespace TextFileWriterTests {
+
+const std::vector<std::string> Lines{"foo", "bar", "baz"};
+
+void CheckRoundTrip(const std::string& outFn, const PacBio::BAM::HtslibCompression compressionType)
+{
+    {
+        TextFileWriter writer{outFn};
+        for (const auto& interval : TextFileWriterTests::Lines)
+            writer.Write(interval);
+    }
+    EXPECT_EQ(compressionType, PacBio::BAM::FormatUtils::CompressionType(outFn));
+
+    const auto contents = TextFileReader::ReadAll(outFn);
+    EXPECT_TRUE(std::equal(TextFileWriterTests::Lines.cbegin(), TextFileWriterTests::Lines.cend(),
+                           contents.cbegin()));
+
+    remove(outFn.c_str());
+}
+
+}  // namespace TextFileWriterTests
+
 TEST(TextFileWriterTest, throws_on_empty_filename)
 {
     EXPECT_THROW(TextFileWriter writer{""}, std::runtime_error);
@@ -24,38 +46,14 @@ TEST(TextFileWriterTest, throws_on_empty_filename)
 
 TEST(TextFileWriterTest, can_write_plain_text)
 {
-    const std::string outFn = PacBio::BAM::PbbamTestsConfig::GeneratedData_Dir + "/out.txt";
-    const std::vector<std::string> lines{"foo", "bar", "baz"};
-
-    {
-        TextFileWriter writer{outFn};
-        for (const auto& line : lines)
-            writer.Write(line);
-    }
-    EXPECT_EQ(PacBio::BAM::HtslibCompression::NONE,
-              PacBio::BAM::FormatUtils::CompressionType(outFn));
-
-    const auto contents = TextFileReader::ReadAll(outFn);
-    EXPECT_TRUE(std::equal(lines.cbegin(), lines.cend(), contents.cbegin()));
-
-    remove(outFn.c_str());
+    TextFileWriterTests::CheckRoundTrip(
+        PacBio::BAM::PbbamTestsConfig::GeneratedData_Dir + "/out.txt",
+        PacBio::BAM::HtslibCompression::NONE);
 }
 
 TEST(TextFileWriterTest, can_write_gzipped_text)
 {
-    const std::string outFn = PacBio::BAM::PbbamTestsConfig::GeneratedData_Dir + "/out.txt.gz";
-    const std::vector<std::string> lines{"foo", "bar", "baz"};
-
-    {
-        TextFileWriter writer{outFn};
-        for (const auto& line : lines)
-            writer.Write(line);
-    }
-    EXPECT_EQ(PacBio::BAM::HtslibCompression::GZIP,
-              PacBio::BAM::FormatUtils::CompressionType(outFn));
-
-    const auto contents = TextFileReader::ReadAll(outFn);
-    EXPECT_TRUE(std::equal(lines.cbegin(), lines.cend(), contents.cbegin()));
-
-    remove(outFn.c_str());
+    TextFileWriterTests::CheckRoundTrip(
+        PacBio::BAM::PbbamTestsConfig::GeneratedData_Dir + "/out.txt.gz",
+        PacBio::BAM::HtslibCompression::GZIP);
 }

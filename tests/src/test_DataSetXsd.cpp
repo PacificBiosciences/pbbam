@@ -17,7 +17,7 @@ using namespace PacBio::BAM;
 
 TEST(DataSetXsdTest, DefaultsOk)
 {
-    NamespaceRegistry registry;
+    const NamespaceRegistry registry;
 
     const NamespaceInfo& baseInfo = registry.Namespace(XsdType::BASE_DATA_MODEL);
     const NamespaceInfo& dsInfo   = registry.Namespace(XsdType::DATASETS);
@@ -25,13 +25,13 @@ TEST(DataSetXsdTest, DefaultsOk)
 
     EXPECT_EQ(XsdType::DATASETS, registry.DefaultXsd());
 
-    EXPECT_EQ(std::string("pbds"),   dsInfo.Name());
-    EXPECT_EQ(std::string("pbbase"), baseInfo.Name());
-    EXPECT_EQ(std::string("pbds"),   defaultInfo.Name());
+    EXPECT_EQ("pbds",   dsInfo.Name());
+    EXPECT_EQ("pbbase", baseInfo.Name());
+    EXPECT_EQ("pbds",   defaultInfo.Name());
 
-    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioBaseDataModel.xsd"), baseInfo.Uri());
-    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"),      dsInfo.Uri());
-    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"),      defaultInfo.Uri());
+    EXPECT_EQ("http://pacificbiosciences.com/PacBioBaseDataModel.xsd", baseInfo.Uri());
+    EXPECT_EQ("http://pacificbiosciences.com/PacBioDatasets.xsd",      dsInfo.Uri());
+    EXPECT_EQ("http://pacificbiosciences.com/PacBioDatasets.xsd",      defaultInfo.Uri());
 }
 
 TEST(DataSetXsdTest, EditDefaultOk)
@@ -42,24 +42,24 @@ TEST(DataSetXsdTest, EditDefaultOk)
     const NamespaceInfo& defaultInfo = registry.DefaultNamespace();
 
     EXPECT_EQ(XsdType::DATASETS, registry.DefaultXsd());
-    EXPECT_EQ(std::string("pbds"), defaultInfo.Name());
-    EXPECT_EQ(std::string("http://pacificbiosciences.com/PacBioDatasets.xsd"), defaultInfo.Uri());
+    EXPECT_EQ("pbds", defaultInfo.Name());
+    EXPECT_EQ("http://pacificbiosciences.com/PacBioDatasets.xsd", defaultInfo.Uri());
 }
 
 TEST(DataSetXsdTest, EditRegistryOk)
 {
     NamespaceRegistry registry;
-    registry.Register(XsdType::DATASETS, NamespaceInfo("custom", "http://custom/uri.xsd"));
+    registry.Register(XsdType::DATASETS, NamespaceInfo{"custom", "http://custom/uri.xsd"});
 
     const NamespaceInfo& dsInfo = registry.Namespace(XsdType::DATASETS);
 
-    EXPECT_EQ(std::string("custom"),                dsInfo.Name());
-    EXPECT_EQ(std::string("http://custom/uri.xsd"), dsInfo.Uri());
+    EXPECT_EQ("custom",                dsInfo.Name());
+    EXPECT_EQ("http://custom/uri.xsd", dsInfo.Uri());
 }
 
 TEST(DataSetXsdTest, EditDatasetRegistry)
 {
-    DataSet dataset(DataSet::ALIGNMENT);
+    DataSet dataset{DataSet::ALIGNMENT};
     dataset.CreatedAt("2015-01-27T09:00:01");
     dataset.MetaType("PacBio.DataSet.AlignmentSet");
     dataset.Name("DataSet_AlignmentSet");
@@ -70,13 +70,13 @@ TEST(DataSetXsdTest, EditDatasetRegistry)
            .Attribute("xmlns:xsi",          "http://www.w3.org/2001/XMLSchema-instance")
            .Attribute("xsi:schemaLocation", "http://pacificbiosciences.com/PacBioDatasets.xsd");
 
-    ExternalResource ext("Fake.MetaType", "filename");
+    ExternalResource ext{"Fake.MetaType", "filename"};
     ext.CreatedAt("2015-01-27T09:00:01");
     ext.TimeStampedName("custom_tsn")
        .UniqueId("my_uuid");
     dataset.ExternalResources().Add(ext);
 
-    dataset.Namespaces().Register(XsdType::BASE_DATA_MODEL, NamespaceInfo("custom", "http://custom/uri.xsd"));
+    dataset.Namespaces().Register(XsdType::BASE_DATA_MODEL, NamespaceInfo{"custom", "http://custom/uri.xsd"});
 
     std::ostringstream s;
     dataset.SaveToStream(s);
@@ -92,10 +92,10 @@ TEST(DataSetXsdTest, ElementRegistryOk)
 
         // append child elements that do not have a C++ built-in, nor namespace prefix with addition
         DataSetMetadata& metadata = ds.Metadata();
-        metadata.AddChild(internal::DataSetElement("SummaryStats"));
-        metadata.AddChild(internal::DataSetElement("CopyFiles"));
-        metadata.AddChild(internal::DataSetElement("BioSamples"));
-        metadata.AddChild(internal::DataSetElement("AutomationParameters"));
+        metadata.AddChild(internal::DataSetElement{"SummaryStats"});
+        metadata.AddChild(internal::DataSetElement{"CopyFiles"});
+        metadata.AddChild(internal::DataSetElement{"BioSamples"});
+        metadata.AddChild(internal::DataSetElement{"AutomationParameters"});
 
         std::ostringstream s;
         ds.SaveToStream(s);
@@ -113,17 +113,17 @@ TEST(DataSetXsdTest, ElementRegistryOk)
         DataSet ds;
 
         // setup custom namespaces
-        ds.Namespaces().Register(XsdType::BASE_DATA_MODEL,     NamespaceInfo("custom_base",   "http://custom/base.xsd"));
-        ds.Namespaces().Register(XsdType::COLLECTION_METADATA, NamespaceInfo("custom_meta",   "http://custom/meta.xsd"));
-        ds.Namespaces().Register(XsdType::DATASETS,            NamespaceInfo("custom_ds",     "http://custom/datasets.xsd"));
-        ds.Namespaces().Register(XsdType::SAMPLE_INFO,         NamespaceInfo("custom_sample", "http://custom/base.xsd"));
+        ds.Namespaces().Register(XsdType::BASE_DATA_MODEL,     NamespaceInfo{"custom_base",   "http://custom/base.xsd"});
+        ds.Namespaces().Register(XsdType::COLLECTION_METADATA, NamespaceInfo{"custom_meta",   "http://custom/meta.xsd"});
+        ds.Namespaces().Register(XsdType::DATASETS,            NamespaceInfo{"custom_ds",     "http://custom/datasets.xsd"});
+        ds.Namespaces().Register(XsdType::SAMPLE_INFO,         NamespaceInfo{"custom_sample", "http://custom/base.xsd"});
 
         // append child elements that do not have a C++ built-in, nor namespace prefix with addition
         DataSetMetadata& metadata = ds.Metadata();
-        metadata.AddChild(internal::DataSetElement("SummaryStats"));
-        metadata.AddChild(internal::DataSetElement("CopyFiles"));
-        metadata.AddChild(internal::DataSetElement("BioSamples"));
-        metadata.AddChild(internal::DataSetElement("AutomationParameters"));
+        metadata.AddChild(internal::DataSetElement{"SummaryStats"});
+        metadata.AddChild(internal::DataSetElement{"CopyFiles"});
+        metadata.AddChild(internal::DataSetElement{"BioSamples"});
+        metadata.AddChild(internal::DataSetElement{"AutomationParameters"});
 
         std::ostringstream s;
         ds.SaveToStream(s);

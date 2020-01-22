@@ -23,12 +23,12 @@ const std::string inputBamFn_2 = PbbamTestsConfig::Data_Dir + "/aligned2.bam";
 
 TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
 {
-    const std::string rname = "lambda_NEB3011";
-    const BamFile bamFile(GenomicIntervalQueryTests::inputBamFn);
+    const std::string rname{"lambda_NEB3011"};
+    const BamFile bamFile{GenomicIntervalQueryTests::inputBamFn};
 
     // setup with normal interval
-    GenomicInterval interval(rname, 5000, 6000);
-    GenomicIntervalQuery query(interval, bamFile);
+    GenomicInterval interval{rname, 5000, 6000};
+    GenomicIntervalQuery query{interval, bamFile};
     EXPECT_EQ(2, std::distance(query.begin(), query.end()));
 
     // adjust interval and pass back in
@@ -62,17 +62,15 @@ TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
 
 TEST(GenomicIntervalQueryTest, NonConstBamRecord)
 {
-    EXPECT_NO_THROW({
-        BamFile bamFile(GenomicIntervalQueryTests::inputBamFn);
-        GenomicInterval interval("lambda_NEB3011", 8000, 10000);
-        GenomicIntervalQuery query(interval, bamFile);
-        EXPECT_EQ(2, std::distance(query.begin(), query.end()));
-    });
+    const BamFile bamFile{GenomicIntervalQueryTests::inputBamFn};
+    const GenomicInterval interval{"lambda_NEB3011", 8000, 10000};
+    GenomicIntervalQuery query{interval, bamFile};
+    EXPECT_EQ(2, std::distance(query.begin(), query.end()));
 }
 
 TEST(GenomicIntervalQueryTest, MissingBaiShouldThrow)
 {
-    GenomicInterval interval("lambda_NEB3011", 0, 100);
+    const GenomicInterval interval{"lambda_NEB3011", 0, 100};
     const std::string phi29Bam = PbbamTestsConfig::Data_Dir + "/phi29.bam";
     const std::string hasBaiBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
 
@@ -82,16 +80,16 @@ TEST(GenomicIntervalQueryTest, MissingBaiShouldThrow)
 
     {  // from dataset, all missing BAI
         DataSet ds;
-        ds.ExternalResources().Add(ExternalResource("PacBio.SubreadFile.SubreadBamFile", phi29Bam));
-        ds.ExternalResources().Add(ExternalResource("PacBio.SubreadFile.SubreadBamFile", phi29Bam));
+        ds.ExternalResources().Add(ExternalResource{"PacBio.SubreadFile.SubreadBamFile", phi29Bam});
+        ds.ExternalResources().Add(ExternalResource{"PacBio.SubreadFile.SubreadBamFile", phi29Bam});
         EXPECT_THROW(GenomicIntervalQuery query(interval, ds), std::runtime_error);
     }
 
     {  // from dataset, mixed BAI presence
         DataSet ds;
-        ds.ExternalResources().Add(ExternalResource("PacBio.SubreadFile.SubreadBamFile", phi29Bam));
+        ds.ExternalResources().Add(ExternalResource{"PacBio.SubreadFile.SubreadBamFile", phi29Bam});
         ds.ExternalResources().Add(
-            ExternalResource("PacBio.AlignmentFile.AlignmentBamFile", hasBaiBam));
+            ExternalResource{"PacBio.AlignmentFile.AlignmentBamFile", hasBaiBam});
         EXPECT_THROW(GenomicIntervalQuery query(interval, ds), std::runtime_error);
     }
 }
@@ -100,10 +98,10 @@ TEST(GenomicIntervalQueryTest, InitializeWithoutInterval)
 {
     const std::string rname = "lambda_NEB3011";
 
-    BamFile bamFile(GenomicIntervalQueryTests::inputBamFn);
+    const BamFile bamFile{GenomicIntervalQueryTests::inputBamFn};
 
     // setup without normal interval
-    GenomicIntervalQuery query(bamFile);
+    GenomicIntervalQuery query{bamFile};
     EXPECT_EQ(0, std::distance(query.begin(), query.end()));
 
     // pass in actual interval

@@ -29,13 +29,13 @@ TEST(ReadGroupInfoTest, GetBaseId)
 
 TEST(ReadGroupInfoTest, IdFromMovieNameAndReadType)
 {
-    ReadGroupInfo rg("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0", "HQREGION");
+    const ReadGroupInfo rg{"m140905_042212_sidney_c100564852550000001823085912221377_s1_X0", "HQREGION"};
     EXPECT_EQ("00082ba1", rg.Id());
 }
 
 TEST(ReadGroupInfoTest, FrameCodecSetOk)
 {
-    ReadGroupInfo rg("test");
+    ReadGroupInfo rg{"test"};
     rg.IpdCodec(FrameCodec::V1);
     EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::IPD));
     EXPECT_EQ("ip", rg.BaseFeatureTag(BaseFeature::IPD));
@@ -49,7 +49,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("101-500-400", "101-427-500", "5.0"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("101-500-400", "101-427-800", "5.0"));
 
-        ReadGroupInfo rg("dummy");
+        ReadGroupInfo rg{"dummy"};
         rg.BindingKit("101-500-400")
           .SequencingKit("101-427-500")
           .BasecallerVersion("5.0");
@@ -65,7 +65,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("101-717-400", "101-644-500", "5.0"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("101-717-400", "101-717-100", "5.0"));
 
-        ReadGroupInfo rg("dummy");
+        ReadGroupInfo rg{"dummy"};
         rg.BindingKit("101-490-800")
           .SequencingKit("101-644-500")
           .BasecallerVersion("5.0");
@@ -77,7 +77,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryOk)
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("101-789-500", "101-826-100", "5.0"));
         EXPECT_EQ(chem, ReadGroupInfo::SequencingChemistryFromTriple("101-789-500", "101-820-300", "5.0"));
 
-        ReadGroupInfo rg("dummy");
+        ReadGroupInfo rg{"dummy"};
         rg.BindingKit("101-789-500")
           .SequencingKit("101-826-100")
           .BasecallerVersion("5.0");
@@ -105,14 +105,15 @@ int unsetenv(const char* name) {
 
 TEST(ReadGroupInfoTest, SequencingChemistryFromMappingXml)
 {
-    ReadGroupInfo rg("MAYBE");
-    rg.BindingKit("1").SequencingKit("2").BasecallerVersion("3.4");
+    ReadGroupInfo rg{"MAYBE"};
+    rg.BindingKit("1")
+      .SequencingKit("2")
+      .BasecallerVersion("3.4");
     EXPECT_THROW(rg.SequencingChemistry(), InvalidSequencingChemistryException);
 
     // set the magic environment variable
     const char* varname = "SMRT_CHEMISTRY_BUNDLE_DIR";
     EXPECT_EQ(0, setenv(varname, PbbamTestsConfig::Data_Dir.c_str(), 0));
-
     EXPECT_EQ("FOUND", rg.SequencingChemistry());
 
     // unset the environment variable
@@ -134,23 +135,17 @@ TEST(ReadGroupInfoTest, SequencingChemistryFromMappingXml)
 
 TEST(ReadGroupInfoTest, SequencingChemistryThrowsOnBadTriple)
 {
-    // check that we actually throw
-    ReadGroupInfo rg("BAD");
-    rg.BindingKit("100372700")
-      .SequencingKit("100-619-400")
-      .BasecallerVersion("2.0");
-    EXPECT_THROW(rg.SequencingChemistry(), InvalidSequencingChemistryException);
-
-    // now check thrown contents
     try {
-        ReadGroupInfo rg2("BAD");
-        rg2.BindingKit("100372700")
+        ReadGroupInfo rg{"BAD"};
+        rg.BindingKit("100372700")
           .SequencingKit("100-619-400")
           .BasecallerVersion("2.0");
+        const auto chem = rg.SequencingChemistry();
+        ASSERT_TRUE(false);
     } catch (InvalidSequencingChemistryException& e) {
-        EXPECT_EQ(std::string("100372700"),   e.BindingKit());
-        EXPECT_EQ(std::string("100-619-400"), e.SequencingKit());
-        EXPECT_EQ(std::string("2.0"),         e.BasecallerVersion());
+        EXPECT_EQ("100372700",   e.BindingKit());
+        EXPECT_EQ("100-619-400", e.SequencingKit());
+        EXPECT_EQ("2.0",         e.BasecallerVersion());
     }
 }
 
@@ -158,7 +153,7 @@ TEST(ReadGroupInfoTest, BasecallerVersion)
 {
     // too short
     {
-        ReadGroupInfo rg("dummy");
+        ReadGroupInfo rg{"dummy"};
         rg.BindingKit("100-619-300")
           .SequencingKit("100-867-300")
           .BasecallerVersion("3");
@@ -171,13 +166,12 @@ TEST(ReadGroupInfoTest, BasecallerVersion)
     // 3.
 
     try {
-        ReadGroupInfo rg("dummy");
+        ReadGroupInfo rg{"dummy"};
         rg.BindingKit("100-619-300")
           .SequencingKit("100-867-300")
           .BasecallerVersion("3.199.dummy");
-        const std::string chem = rg.SequencingChemistry();
-//        ()chem;
-
+        const auto chem = rg.SequencingChemistry();
+        ASSERT_TRUE(false);
     } catch (InvalidSequencingChemistryException& e) {
         EXPECT_EQ("100-619-300", e.BindingKit());
         EXPECT_EQ("100-867-300", e.SequencingKit());
@@ -188,7 +182,7 @@ TEST(ReadGroupInfoTest, BasecallerVersion)
 
 TEST(ReadGroupInfoTest, ClearBaseFeatures)
 {
-    ReadGroupInfo rg("test");
+    ReadGroupInfo rg{"test"};
     rg.BaseFeatureTag(BaseFeature::DELETION_QV,     "dq");
     rg.BaseFeatureTag(BaseFeature::DELETION_TAG,    "dt");
     rg.BaseFeatureTag(BaseFeature::INSERTION_QV,    "iq");
@@ -207,7 +201,7 @@ TEST(ReadGroupInfoTest, ClearBaseFeatures)
 
 TEST(ReadGroupInfoTest, RemoveBaseFeature)
 {
-    ReadGroupInfo rg("test");
+    ReadGroupInfo rg{"test"};
     rg.BaseFeatureTag(BaseFeature::DELETION_QV,     "dq");
     rg.BaseFeatureTag(BaseFeature::DELETION_TAG,    "dt");
     rg.BaseFeatureTag(BaseFeature::INSERTION_QV,    "iq");
@@ -258,8 +252,7 @@ TEST(ReadGroupInfoTest, BarcodeDataFromBarcodedId)
 
 TEST(ReadGroupInfoTest, BarcodeDataFromIdPlusBarcodesCtor)
 {
-    const ReadGroupInfo rg{"00082ba1", std::pair<uint16_t, uint16_t>(0,1)};
-
+    const ReadGroupInfo rg{"00082ba1", std::make_pair(0,1)};
     EXPECT_EQ("00082ba1/0--1", rg.Id());
     EXPECT_EQ("00082ba1", rg.BaseId());
 

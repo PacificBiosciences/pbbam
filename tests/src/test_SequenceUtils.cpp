@@ -38,43 +38,39 @@ TEST(SequenceUtilsTest, ComplementChar)
     const char Y = 'Y';  // R
     const char Z = 'Z';  // null
 
-    using PacBio::BAM::Complement;
-
-    EXPECT_EQ(T, Complement(A));
-    EXPECT_EQ(V, Complement(B));
-    EXPECT_EQ(G, Complement(C));
-    EXPECT_EQ(H, Complement(D));
-    EXPECT_EQ(0, Complement(E));
-    EXPECT_EQ(0, Complement(F));
-    EXPECT_EQ(C, Complement(G));
-    EXPECT_EQ(D, Complement(H));
-    EXPECT_EQ(0, Complement(I));
-    EXPECT_EQ(0, Complement(J));
-    EXPECT_EQ(M, Complement(K));
-    EXPECT_EQ(0, Complement(L));
-    EXPECT_EQ(K, Complement(M));
-    EXPECT_EQ(N, Complement(N));
-    EXPECT_EQ(0, Complement(O));
-    EXPECT_EQ(0, Complement(P));
-    EXPECT_EQ(0, Complement(Q));
-    EXPECT_EQ(Y, Complement(R));
-    EXPECT_EQ(S, Complement(S));
-    EXPECT_EQ(A, Complement(T));
-    EXPECT_EQ(A, Complement(U));
-    EXPECT_EQ(B, Complement(V));
-    EXPECT_EQ(W, Complement(W));
-    EXPECT_EQ(0, Complement(X));
-    EXPECT_EQ(R, Complement(Y));
-    EXPECT_EQ(0, Complement(Z));
+    EXPECT_EQ(T, PacBio::BAM::Complement(A));
+    EXPECT_EQ(V, PacBio::BAM::Complement(B));
+    EXPECT_EQ(G, PacBio::BAM::Complement(C));
+    EXPECT_EQ(H, PacBio::BAM::Complement(D));
+    EXPECT_EQ(0, PacBio::BAM::Complement(E));
+    EXPECT_EQ(0, PacBio::BAM::Complement(F));
+    EXPECT_EQ(C, PacBio::BAM::Complement(G));
+    EXPECT_EQ(D, PacBio::BAM::Complement(H));
+    EXPECT_EQ(0, PacBio::BAM::Complement(I));
+    EXPECT_EQ(0, PacBio::BAM::Complement(J));
+    EXPECT_EQ(M, PacBio::BAM::Complement(K));
+    EXPECT_EQ(0, PacBio::BAM::Complement(L));
+    EXPECT_EQ(K, PacBio::BAM::Complement(M));
+    EXPECT_EQ(N, PacBio::BAM::Complement(N));
+    EXPECT_EQ(0, PacBio::BAM::Complement(O));
+    EXPECT_EQ(0, PacBio::BAM::Complement(P));
+    EXPECT_EQ(0, PacBio::BAM::Complement(Q));
+    EXPECT_EQ(Y, PacBio::BAM::Complement(R));
+    EXPECT_EQ(S, PacBio::BAM::Complement(S));
+    EXPECT_EQ(A, PacBio::BAM::Complement(T));
+    EXPECT_EQ(A, PacBio::BAM::Complement(U));
+    EXPECT_EQ(B, PacBio::BAM::Complement(V));
+    EXPECT_EQ(W, PacBio::BAM::Complement(W));
+    EXPECT_EQ(0, PacBio::BAM::Complement(X));
+    EXPECT_EQ(R, PacBio::BAM::Complement(Y));
+    EXPECT_EQ(0, PacBio::BAM::Complement(Z));
 }
 
 TEST(SequenceUtilsTest, ReverseComplement)
 {
-    std::string input1{"ATATATCCCGGCG"};
-    const std::string rc1{"CGCCGGGATATAT"};
+    std::string seq{"ATATATCCCGGCG"};
+    const std::string revComp{"CGCCGGGATATAT"};
 
-    using PacBio::BAM::ReverseComplement;
-
-    ReverseComplement(input1);
-    EXPECT_EQ(rc1, input1);
+    PacBio::BAM::ReverseComplement(seq);
+    EXPECT_EQ(revComp, seq);
 }
