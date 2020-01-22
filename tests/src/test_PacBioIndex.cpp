@@ -241,13 +241,6 @@ TEST(PacBioIndexTest, CreateOnTheFly)
     EXPECT_EQ(PbiFile::CurrentVersion, fromBuilt.Version());
     PacBioIndexTests::ExpectRawIndicesEqual(expectedIndex, fromBuilt);
 
-    // straight diff of newly-generated PBI file to existing PBI
-    // TODO: Come back to this once pbindexump is in place.
-    //       We can't exactly do this since file offsets may differ between 2 BAMs of differing compression levels.
-    //       Should add some sort of BAM checksum based on contents, not just size, for this reason.
-    //    const string pbiDiffCmd = string("diff -q ") + PacBioIndexTests::test2BamFn + ".pbi " + tempPbiFn;
-    //    EXPECT_EQ(0, system(pbiDiffCmd.c_str()));
-
     // clean up temp file(s)
     remove(tempBamFn.c_str());
     remove(tempPbiFn.c_str());

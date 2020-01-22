@@ -29,7 +29,7 @@ TEST(TagTest, TagConstruction)
     int32_t i32 = 0;
     uint32_t u32 = 0;
     float f = 0.0;
-    std::string str = "";
+    std::string str;
     std::vector<int8_t> i8_array;
     std::vector<uint8_t> u8_array;
     std::vector<int16_t> i16_array;
@@ -89,7 +89,7 @@ TEST(TagTest, CopyAndCompare)
     int32_t i32 = 0;
     uint32_t u32 = 0;
     float f = 0.0;
-    std::string str = "";
+    std::string str;
     std::vector<int8_t> i8_array;
     std::vector<uint8_t> u8_array;
     std::vector<int16_t> i16_array;
@@ -614,7 +614,7 @@ TEST(TagTest, CastBackToOriginalOk)
     int32_t i32 = 0;
     uint32_t u32 = 0;
     float f = 0.0;
-    std::string str = "";
+    std::string str;
     std::vector<int8_t> i8_array;
     std::vector<uint8_t> u8_array;
     std::vector<int16_t> i16_array;
@@ -888,7 +888,7 @@ TEST(SamTagCodecTest, EncodeSingleTag)
     }
     {  // float
         const std::string expected{"rq:f:0.99"};
-        const Tag t = 0.99f;
+        const Tag t = 0.99F;
         EXPECT_EQ(expected, SamTagCodec::Encode("rq", t));
     }
     {  // null tag

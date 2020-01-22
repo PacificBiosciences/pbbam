@@ -24,7 +24,7 @@ namespace BamFileTests {
 template <typename T>
 void CheckFile(const T& input, const size_t expectedCount)
 {
-    EntireFileQuery entireFile(input);
+    EntireFileQuery entireFile{input};
     EXPECT_EQ(expectedCount, std::distance(entireFile.begin(), entireFile.end()));
 }
 

@@ -79,6 +79,7 @@ TEST(QualityValuesTest, FromFastq)
     const auto qvs = QualityValues::FromFastq(fastqString);
     EXPECT_EQ(fastqString.size(), qvs.size());
     EXPECT_EQ(values.size(), qvs.size());
-    for (size_t i = 0; i < fastqString.size(); ++i)
+    for (size_t i = 0; i < fastqString.size(); ++i) {
         EXPECT_EQ(values.at(i), qvs.at(i));
+    }
 }

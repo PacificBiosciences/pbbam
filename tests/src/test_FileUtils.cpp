@@ -169,8 +169,9 @@ bool native_pathIsAbsolute(const std::string& filePath)
     // if starts with drive name and colon ("C:\foo\bar.txt")
     if (filePath.size() >= 2) {
         const char firstChar = filePath.at(0);
-        if ((isalpha(firstChar) != 0) && (filePath.at(1) == ':'))
+        if ((isalpha(firstChar) != 0) && (filePath.at(1) == ':')) {
             return native_pathIsAbsolute(removeDiskName(filePath));
+        }
     }
 
     // otherwise, likely relative
@@ -184,7 +185,9 @@ std::string native_resolvedFilePath(const std::string& filePath, const std::stri
 
     // if empty or already absolute path, just return it
     // upfront empty check simplifies further parsing logic
-    if (schemeLess.empty() || native_pathIsAbsolute(schemeLess)) return schemeLess;
+    if (schemeLess.empty() || native_pathIsAbsolute(schemeLess)) {
+        return schemeLess;
+    }
 
     // else make relative from the provided 'from' directory
     //
@@ -247,36 +250,36 @@ TEST(FileUtilsTest, WindowsPathsOk)
 
     {  // resolve file path
 
-        const std::string myRootDir{"C:\\path\\to\\myRootDir"};
+        const std::string myRootDir{R"(C:\path\to\myRootDir)"};
 
         // "\\server\path\to\tmp.txt"
-        const std::string fn1{"\\\\server\\path\\to\tmp.txt"};
-        const std::string fn1_expected{fn1};
+        const std::string fn1{R"(\\server\path\to\tmp.txt)"};
+        const std::string& fn1_expected{fn1};
         EXPECT_EQ(fn1_expected, test_windows::native_resolvedFilePath(fn1, myRootDir));
 
         // "..\tmp.txt"
-        const std::string fn2{"..\\tmp.txt"};
-        const std::string fn2_expected{"C:\\path\\to\\myRootDir\\..\\tmp.txt"};
+        const std::string fn2{R"(..\tmp.txt)"};
+        const std::string fn2_expected{R"(C:\path\to\myRootDir\..\tmp.txt)"};
         EXPECT_EQ(fn2_expected, test_windows::native_resolvedFilePath(fn2, myRootDir));
 
         // ".\tmp.txt"
-        const std::string fn3{".\\tmp.txt"};
-        const std::string fn3_expected{"C:\\path\\to\\myRootDir\\tmp.txt"};
+        const std::string fn3{R"(.\tmp.txt)"};
+        const std::string fn3_expected{R"(C:\path\to\myRootDir\tmp.txt)"};
         EXPECT_EQ(fn3_expected, test_windows::native_resolvedFilePath(fn3, myRootDir));
 
         // "C:\path\to\tmp.txt"
-        const std::string fn4{"C:\\path\\to\\tmp.txt"};
-        const std::string fn4_expected{fn4};
+        const std::string fn4{R"(C:\path\to\tmp.txt)"};
+        const std::string& fn4_expected{fn4};
         EXPECT_EQ(fn4_expected, test_windows::native_resolvedFilePath(fn4, myRootDir));
 
         // "C:..\path\to\tmp.txt"
-        const std::string fn5{"C:..\\path\\to\\tmp.txt"};
-        const std::string fn5_expected{"C:\\path\\to\\myRootDir\\..\\path\\to\\tmp.txt"};
+        const std::string fn5{R"(C:..\path\to\tmp.txt)"};
+        const std::string fn5_expected{R"(C:\path\to\myRootDir\..\path\to\tmp.txt)"};
         EXPECT_EQ(fn5_expected, test_windows::native_resolvedFilePath(fn5, myRootDir));
 
         // "C:tmp.txt"
         const std::string fn6{"C:tmp.txt"};
-        const std::string fn6_expected{"C:\\path\\to\\myRootDir\\tmp.txt"};
+        const std::string fn6_expected{R"(C:\path\to\myRootDir\tmp.txt)"};
         EXPECT_EQ(fn6_expected, test_windows::native_resolvedFilePath(fn6, myRootDir));
         EXPECT_EQ(fn3_expected,
                   test_windows::native_resolvedFilePath(

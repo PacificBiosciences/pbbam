@@ -27,7 +27,9 @@ struct Bam1Deleter
 {
     void operator()(bam1_t* b) const
     {
-        if (b) bam_destroy1(b);
+        if (b != nullptr) {
+            bam_destroy1(b);
+        }
         b = nullptr;
     }
 };
@@ -164,7 +166,7 @@ TEST(BamRecordImplCoreTestsTest, DefaultValues)
     EXPECT_FALSE(bam.IsSecondMate());
     EXPECT_FALSE(bam.IsSupplementaryAlignment());
 
-    const std::string emptyString = "";
+    const std::string emptyString;
     EXPECT_EQ(emptyString, bam.Name());
     EXPECT_EQ(emptyString, bam.CigarData().ToStdString());
     EXPECT_EQ(emptyString, bam.Sequence());
