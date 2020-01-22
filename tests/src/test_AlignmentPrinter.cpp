@@ -17,22 +17,22 @@ using namespace PacBio::BAM;
 
 namespace AlignmentPrinterTests {
 
-const std::string lambdaFasta = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
-const std::string singleInsertionBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
+const std::string lambdaFasta{PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa"};
+const std::string singleInsertionBam{PbbamTestsConfig::Data_Dir + "/aligned.bam"};
 
 }  // namespace AlignmentPrinterTests
 
 TEST(AlignmentPrinterTest, Print)
 {
-    IndexedFastaReader r(AlignmentPrinterTests::lambdaFasta);
-    AlignmentPrinter pretty(r);
+    IndexedFastaReader r{AlignmentPrinterTests::lambdaFasta};
+    AlignmentPrinter pretty{r};
 
-    BamFile bamFile(AlignmentPrinterTests::singleInsertionBam);
-    EntireFileQuery bamQuery(bamFile);
+    const BamFile bamFile{AlignmentPrinterTests::singleInsertionBam};
+    EntireFileQuery bamQuery{bamFile};
     auto it = bamQuery.begin();
 
     // funky formatting used to format alignments
-    auto expected = std::string{
+    std::string expected{
         "Read        : singleInsertion/100/0_49\n"
         "Reference   : lambda_NEB3011\n"
         "\n"
@@ -53,7 +53,7 @@ TEST(AlignmentPrinterTest, Print)
     auto record = *it++;
     EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
 
-    expected = std::string{
+    expected =
         "Read        : singleInsertion/200/0_49\n"
         "Reference   : lambda_NEB3011\n"
         "\n"
@@ -69,12 +69,12 @@ TEST(AlignmentPrinterTest, Print)
         "5249 : ACTGGCTGAT : 5259\n"
         "       |\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||||||\n"
         "  39 : ACTGGCTGAT :   49\n"
-        "\n"};
+        "\n";
 
     record = *it++;
     EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
 
-    expected = std::string{
+    expected =
         "Read        : singleInsertion/100/0_111\n"
         "Reference   : lambda_NEB3011\n"
         "\n"
@@ -91,12 +91,12 @@ TEST(AlignmentPrinterTest, Print)
         "       |||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||| "
         "||||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||||\n"
         "  38 : CAGCACGGTAAACAGCGGCAA :   59\n"
-        "\n"};
+        "\n";
 
     record = *it++;
     EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
 
-    expected = std::string{
+    expected =
         "Read        : singleInsertion/100/0_111\n"
         "Reference   : lambda_NEB3011\n"
         "\n"
@@ -113,7 +113,7 @@ TEST(AlignmentPrinterTest, Print)
         "       |||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||| "
         "||||\x1B[1m\x1B[31m|\x1B[0m\x1B[39;49m||||||\n"
         "  38 : CAGCACGGTAAACAGCGGCAA :   59\n"
-        "\n"};
+        "\n";
 
     record = *it++;
     EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));

@@ -6,14 +6,13 @@
 
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
-#include "pbbam/BamFile.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/EntireFileQuery.h"
-#include "pbbam/IndexedFastaReader.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/EntireFileQuery.h>
+#include <pbbam/IndexedFastaReader.h>
 
 #include "FastxTests.h"
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -55,7 +54,7 @@ TEST(IndexedFastaReaderTest, can_open_bgzf_fasta_for_reading)
 
 TEST(IndexedFastaReaderTest, can_fetch_subsequence_from_lambda)
 {
-    IndexedFastaReader r(IndexedFastaReaderTests::lambdaFasta);
+    IndexedFastaReader r{IndexedFastaReaderTests::lambdaFasta};
 
     EXPECT_TRUE(r.HasSequence("lambda_NEB3011"));
     EXPECT_FALSE(r.HasSequence("dog"));
@@ -79,10 +78,10 @@ TEST(IndexedFastaReaderTest, can_fetch_subsequence_from_lambda)
 
 TEST(IndexedFastaReaderTest, prints_clipped_and_gapped_subsequences_from_lambda)
 {
-    IndexedFastaReader r(IndexedFastaReaderTests::lambdaFasta);
+    IndexedFastaReader r{IndexedFastaReaderTests::lambdaFasta};
 
     // Open BAM file
-    BamFile bamFile(IndexedFastaReaderTests::singleInsertionBam);
+    const BamFile bamFile{IndexedFastaReaderTests::singleInsertionBam};
     EntireFileQuery bamQuery(bamFile);
 
     auto it = bamQuery.begin();
@@ -135,19 +134,7 @@ TEST(IndexedFastaReaderTest, prints_clipped_and_gapped_subsequences_from_lambda)
 // Come back
 TEST(IndexedFastaReaderTest, throws_on_invalid_subsequence_requests)
 {
-    IndexedFastaReader r(IndexedFastaReaderTests::lambdaFasta);
-
-    //
-    // attempt access without "opening"
-    //
-    // EXPECT_THROW(r.NumSequences(), std::exception);
-    // EXPECT_THROW(r.HasSequence("lambda_NEB3011"), std::exception);
-    // EXPECT_THROW(r.SequenceLength("lambda_NEB3011"), std::exception);
-    // EXPECT_THROW(r.Subsequence("lambda_NEB3011:0-10"), std::exception);
-
-    //
-    // invalid accesses after opening
-    //
+    IndexedFastaReader r{IndexedFastaReaderTests::lambdaFasta};
     EXPECT_THROW(r.SequenceLength("dog"), std::exception);
     EXPECT_THROW(r.Subsequence("dog:0-10"), std::exception);
 }
@@ -155,8 +142,8 @@ TEST(IndexedFastaReaderTest, throws_on_invalid_subsequence_requests)
 //
 TEST(IndexedFastaReaderTest, can_fetch_name_info_from_lambda)
 {
-    IndexedFastaReader r(IndexedFastaReaderTests::lambdaFasta);
-    std::vector<std::string> names = {"lambda_NEB3011"};
+    IndexedFastaReader r{IndexedFastaReaderTests::lambdaFasta};
+    const std::vector<std::string> names{"lambda_NEB3011"};
 
     // Test all-name request
     EXPECT_EQ(names, r.Names());

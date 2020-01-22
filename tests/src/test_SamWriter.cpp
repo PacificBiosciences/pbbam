@@ -25,27 +25,23 @@ TEST(SamWriterTest, HeaderOk)
         "SEQUENCINGKIT=100-619-400;BASECALLERVERSION=3.0;FRAMERATEHZ=100\t"
         "PU:test\tPM:SEQUEL\n"};
 
-    EXPECT_NO_THROW({
-        // write header to file
-        const std::string generatedFn =
-            PbbamTestsConfig::GeneratedData_Dir + "/samwriter_hdr_only.sam";
-        {
-            const BamHeader inputHeader(hdrText);
-            SamWriter writer(generatedFn, inputHeader);
-            //            ()writer;
-        };
+    // write header to file
+    const std::string generatedFn = PbbamTestsConfig::GeneratedData_Dir + "/samwriter_hdr_only.sam";
+    {
+        const BamHeader inputHeader{hdrText};
+        SamWriter writer(generatedFn, inputHeader);
+    };
 
-        // check header
-        {
-            std::ifstream f(generatedFn);
-            const std::string text((std::istreambuf_iterator<char>(f)),
-                                   std::istreambuf_iterator<char>());
-            EXPECT_EQ(hdrText, text);
-        }
+    // check header
+    {
+        std::ifstream f{generatedFn};
+        const std::string text{(std::istreambuf_iterator<char>(f)),
+                               std::istreambuf_iterator<char>()};
+        EXPECT_EQ(hdrText, text);
+    }
 
-        // clean up
-        remove(generatedFn.c_str());
-    });
+    // clean up
+    remove(generatedFn.c_str());
 }
 
 TEST(SamWriterTest, SingleRecordOk)
@@ -89,32 +85,30 @@ TEST(SamWriterTest, SingleRecordOk)
         "test/100/0_5\t4\t*\t0\t0\t*\t*\t0\t0\tACGTC\t@@@@@\tRG:Z:6002b307\t"
         "np:i:1\tqe:i:5\tqs:i:0\trq:f:0.6\tsn:B:f,0.2,0.2,0.2,0.2\tzm:i:100"};
 
-    EXPECT_NO_THROW({
-        // write data to file
-        const std::string generatedFn =
-            PbbamTestsConfig::GeneratedData_Dir + "/samwriter_hdr_and_record.sam";
-        {
-            SamWriter writer(generatedFn, inputHeader);
-            writer.Write(record);
-        };
+    // write data to file
+    const std::string generatedFn =
+        PbbamTestsConfig::GeneratedData_Dir + "/samwriter_hdr_and_record.sam";
+    {
+        SamWriter writer(generatedFn, inputHeader);
+        writer.Write(record);
+    };
 
-        // check header & record
-        {
-            std::ifstream f(generatedFn);
-            std::string line1;
-            std::string line2;
-            std::string line3;
-            std::getline(f, line1);
-            std::getline(f, line2);
-            std::getline(f, line3);
-            EXPECT_EQ(hdrLine1, line1);
-            EXPECT_EQ(hdrLine2, line2);
-            EXPECT_EQ(expectedSamRecord, line3);
-        }
+    // check header & record
+    {
+        std::ifstream f{generatedFn};
+        std::string line1;
+        std::string line2;
+        std::string line3;
+        std::getline(f, line1);
+        std::getline(f, line2);
+        std::getline(f, line3);
+        EXPECT_EQ(hdrLine1, line1);
+        EXPECT_EQ(hdrLine2, line2);
+        EXPECT_EQ(expectedSamRecord, line3);
+    }
 
-        // cleanup
-        remove(generatedFn.c_str());
-    });
+    // cleanup
+    remove(generatedFn.c_str());
 }
 
 TEST(SamWriterTest, LongCigarFormatting)

@@ -1,26 +1,15 @@
 // Author: Derek Barnett
 
-#include <cstddef>
-
 #include <iterator>
 
 #include <gtest/gtest.h>
 
-#include <pbbam/EntireFileQuery.h>
-#include <pbbam/FastaReader.h>
-#include <pbbam/FastaSequence.h>
 #include <pbbam/FastaSequenceQuery.h>
-#include <pbbam/FastaWriter.h>
-#include <boost/algorithm/string.hpp>
 
-#include "FastxTests.h"
 #include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-
-namespace FastaSequenceQueryTests {
-}  // namespace FastaSequenceQueryTests
 
 TEST(FastaSequenceQueryTest, can_read_from_fasta_file)
 {

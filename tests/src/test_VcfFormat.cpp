@@ -19,7 +19,7 @@ using VcfVariant = PacBio::VCF::VcfVariant;
 
 namespace VcfFormatTests {
 
-static const std::string BasicHeaderText{
+const std::string BasicHeaderText{
     "##fileformat=VCFv4.2\n"
     "##fileDate=20180509\n"
     "##contig=<ID=ctg1,length=4200,assembly=foo,md5=dead123beef>\n"
@@ -39,7 +39,7 @@ static const std::string BasicHeaderText{
     "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tUnnamedSample"};
 
 // does not have ##contig line(s) in file
-static const std::string FileHeaderText{
+const std::string FileHeaderText{
     "##fileformat=VCFv4.2\n"
     "##fileDate=20180509\n"
     "##INFO=<ID=IMPRECISE,Number=0,Type=Flag,Description=\"Imprecise structural variant\">\n"
@@ -57,13 +57,12 @@ static const std::string FileHeaderText{
     "sample\">\n"
     "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tUnnamedSample"};
 
-static const std::string BasicVariantText{
+const std::string BasicVariantText{
     "chrXVI\t660831\tpbsv.INS.21\tC\tCAAAGGAATGGTAAAGATGGGGGGTCAACGGACAAGGGAAAGGATCCATGGGGGCA\t."
     "\tPASS"
     "\tIMPRECISE;SVTYPE=INS;END=660831;SVLEN=55;MULTI=1,2,3\tGT:AD:DP:AC\t0/1:2:5:1,2"};
 
-static const std::string VcfFn{PacBio::BAM::PbbamTestsConfig::Data_Dir +
-                               "/vcf/structural_variants.vcf"};
+const std::string VcfFn{PacBio::BAM::PbbamTestsConfig::Data_Dir + "/vcf/structural_variants.vcf"};
 
 }  // namespace VcfFormatTests
 

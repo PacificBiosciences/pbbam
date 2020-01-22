@@ -4,8 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/FastaReader.h>
 #include <pbbam/FastaSequence.h>
@@ -15,6 +13,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "FastxTests.h"
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;

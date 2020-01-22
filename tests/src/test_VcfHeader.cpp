@@ -14,7 +14,7 @@ using VcfHeader = PacBio::VCF::VcfHeader;
 
 namespace VcfHeaderTests {
 
-static const std::string BasicHeaderText{
+const std::string BasicHeaderText{
     "##fileformat=VCFv4.2\n"
     "##fileDate=20180509\n"
     "##contig=<ID=ctg1,length=4200,assembly=foo,md5=dead123beef>\n"

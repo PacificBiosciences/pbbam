@@ -26,7 +26,7 @@ namespace PacBioIndexTests {
 const std::string test2BamFn = PbbamTestsConfig::Data_Dir + "/aligned2.bam";
 const std::string phi29BamFn = PbbamTestsConfig::Data_Dir + "/phi29.bam";
 
-static PbiRawData Test2Bam_CoreIndexData()
+PbiRawData Test2Bam_CoreIndexData()
 {
     PbiRawData rawData;
     rawData.Version(PbiFile::CurrentVersion);
@@ -68,7 +68,7 @@ static PbiRawData Test2Bam_CoreIndexData()
 //       compression level, etc. can effect compression ratio, BGZF block sizes, etc. even though the BAM record
 //       content itself is equal. So we'll just track these index values separately, for now at least.
 //
-static PbiRawData Test2Bam_ExistingIndex()
+PbiRawData Test2Bam_ExistingIndex()
 {
     PbiRawData index = Test2Bam_CoreIndexData();
     index.BasicData().fileOffset_ = {33816576, 33825163, 33831333, 33834264, 33836542,
@@ -76,7 +76,7 @@ static PbiRawData Test2Bam_ExistingIndex()
     return index;
 }
 
-static PbiRawData Test2Bam_NewIndex()
+PbiRawData Test2Bam_NewIndex()
 {
     PbiRawData index = Test2Bam_CoreIndexData();
     index.BasicData().fileOffset_ = {33816576,  236126208, 391315456,  469106688,  537067520,
@@ -84,7 +84,7 @@ static PbiRawData Test2Bam_NewIndex()
     return index;
 }
 
-static void ExpectRawIndicesEqual(const PbiRawData& expected, const PbiRawData& actual)
+void ExpectRawIndicesEqual(const PbiRawData& expected, const PbiRawData& actual)
 {
     // header data
     EXPECT_EQ(expected.FileSections(), actual.FileSections());
@@ -144,18 +144,18 @@ TEST(PacBioIndexTest, CreateFromExistingBam)
     const std::string tempDir = PbbamTestsConfig::GeneratedData_Dir + "/";
     const std::string tempBamFn = tempDir + "aligned_copy.bam";
     const std::string tempPbiFn = tempBamFn + ".pbi";
-    std::string cmd("cp ");
+    std::string cmd{"cp "};
     cmd += PacBioIndexTests::test2BamFn;
     cmd += " ";
     cmd += tempBamFn;
     const auto cmdResult = system(cmd.c_str());
     std::ignore = cmdResult;
 
-    BamFile bamFile(tempBamFn);
+    const BamFile bamFile{tempBamFn};
     PbiFile::CreateFrom(bamFile);
     EXPECT_EQ(tempPbiFn, bamFile.PacBioIndexFilename());
 
-    PbiRawData index(bamFile.PacBioIndexFilename());
+    const PbiRawData index{bamFile.PacBioIndexFilename()};
     EXPECT_EQ(PbiFile::CurrentVersion, index.Version());
     EXPECT_EQ(10, index.NumReads());
     EXPECT_TRUE(index.HasMappedData());
@@ -191,14 +191,14 @@ TEST(PacBioIndexTest, CreateOnTheFly)
 
     // create PBI on the fly from input BAM while we write to new file
     {
-        BamFile bamFile(PacBioIndexTests::test2BamFn);
-        BamHeader header = bamFile.Header();
+        const BamFile bamFile{PacBioIndexTests::test2BamFn};
+        const BamHeader header = bamFile.Header();
 
-        BamWriter writer(tempBamFn, header);  // default compression, default thread count
-        PbiBuilder builder(tempPbiFn, header.Sequences().size());
+        BamWriter writer{tempBamFn, header};  // default compression, default thread count
+        PbiBuilder builder{tempPbiFn, header.Sequences().size()};
 
         int64_t vOffset = 0;
-        EntireFileQuery entireFile(bamFile);
+        EntireFileQuery entireFile{bamFile};
         for (const BamRecord& record : entireFile) {
             writer.Write(record, &vOffset);
             builder.AddRecord(record, vOffset);
@@ -214,7 +214,7 @@ TEST(PacBioIndexTest, CreateOnTheFly)
                                                           33836542, 33838065,  33849818, 33863499,
                                                           33874621, 1392836608};
         BamRecord r;
-        BamReader reader(PacBioIndexTests::test2BamFn);
+        BamReader reader{PacBioIndexTests::test2BamFn};
         for (size_t i = 0; i < originalFileOffsets.size(); ++i) {
             reader.VirtualSeek(originalFileOffsets.at(i));
             EXPECT_TRUE(CanRead(reader, r, i));
@@ -224,7 +224,7 @@ TEST(PacBioIndexTest, CreateOnTheFly)
     // attempt to seek in our new file using both expected & observed offsets
     {
         BamRecord r;
-        BamReader reader(tempBamFn);
+        BamReader reader{tempBamFn};
         for (size_t i = 0; i < expectedNewOffsets.size(); ++i) {
             reader.VirtualSeek(expectedNewOffsets.at(i));
             EXPECT_TRUE(CanRead(reader, r, i));
@@ -237,7 +237,7 @@ TEST(PacBioIndexTest, CreateOnTheFly)
 
     // compare data in new PBI file, to expected data
     const PbiRawData expectedIndex = PacBioIndexTests::Test2Bam_NewIndex();
-    const PbiRawData fromBuilt = PbiRawData(tempPbiFn);
+    const PbiRawData fromBuilt{tempPbiFn};
     EXPECT_EQ(PbiFile::CurrentVersion, fromBuilt.Version());
     PacBioIndexTests::ExpectRawIndicesEqual(expectedIndex, fromBuilt);
 
@@ -255,9 +255,9 @@ TEST(PacBioIndexTest, CreateOnTheFly)
 
 TEST(PacBioIndexTest, RawLoadFromPbiFile)
 {
-    const BamFile bamFile(PacBioIndexTests::test2BamFn);
+    const BamFile bamFile{PacBioIndexTests::test2BamFn};
     const std::string pbiFilename = bamFile.PacBioIndexFilename();
-    const PbiRawData loadedIndex(pbiFilename);
+    const PbiRawData loadedIndex{pbiFilename};
     EXPECT_EQ(PbiFile::Version_3_0_1, loadedIndex.Version());
 
     const PbiRawData expectedIndex = PacBioIndexTests::Test2Bam_ExistingIndex();
@@ -277,11 +277,11 @@ TEST(PacBioIndexTest, BasicAndBarodeSectionsOnly)
     const auto cmdResult = system(cmd.c_str());
     std::ignore = cmdResult;
 
-    BamFile bamFile(tempBamFn);
+    const BamFile bamFile{tempBamFn};
     PbiFile::CreateFrom(bamFile);
     EXPECT_EQ(tempPbiFn, bamFile.PacBioIndexFilename());
 
-    PbiRawData index(bamFile.PacBioIndexFilename());
+    const PbiRawData index{bamFile.PacBioIndexFilename()};
     EXPECT_EQ(PbiFile::CurrentVersion, index.Version());
     EXPECT_EQ(120, index.NumReads());
     EXPECT_FALSE(index.HasMappedData());
@@ -315,8 +315,8 @@ TEST(PacBioIndexTest, BasicAndBarodeSectionsOnly)
 
 TEST(PacBioIndexTest, ReferenceDataNotLoadedOnUnsortedBam)
 {
-    BamFile bamFile(PacBioIndexTests::test2BamFn);
-    PbiRawData raw(bamFile.PacBioIndexFilename());
+    const BamFile bamFile{PacBioIndexTests::test2BamFn};
+    const PbiRawData raw{bamFile.PacBioIndexFilename()};
     EXPECT_TRUE(raw.HasReferenceData());
 }
 
@@ -326,12 +326,10 @@ TEST(PacBioIndexTest, LookupLoadFromFileOk)
     const std::vector<int64_t> expectedOffsets{33816576, 33825163, 33831333, 33834264, 33836542,
                                                33838065, 33849818, 33863499, 33874621, 1392836608};
 
-    EXPECT_NO_THROW({
-        BamFile bamFile(PacBioIndexTests::test2BamFn);
-        PbiRawData index(bamFile.PacBioIndexFilename());
-        EXPECT_EQ(expectedNumReads, index.NumReads());
-        EXPECT_EQ(expectedOffsets, index.BasicData().fileOffset_);
-    });
+    const BamFile bamFile{PacBioIndexTests::test2BamFn};
+    const PbiRawData index{bamFile.PacBioIndexFilename()};
+    EXPECT_EQ(expectedNumReads, index.NumReads());
+    EXPECT_EQ(expectedOffsets, index.BasicData().fileOffset_);
 }
 
 TEST(PacBioIndexTest, ThrowOnNonExistentPbiFile)
@@ -342,20 +340,10 @@ TEST(PacBioIndexTest, ThrowOnNonExistentPbiFile)
 TEST(PacBioIndexTest, ThrowOnNonPbiFile)
 {
     // completely wrong format
-    EXPECT_THROW(
-        {
-            const auto fastaFn = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
-            PbiRawData idx{fastaFn};
-        },
-        std::runtime_error);
+    EXPECT_THROW(PbiRawData idx{PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa"}, std::runtime_error);
 
     // BGZF file, but not PBI
-    EXPECT_THROW(
-        {
-            const auto bamFn = PbbamTestsConfig::Data_Dir + "/ex2.bam";
-            PbiRawData idx{bamFn};
-        },
-        std::runtime_error);
+    EXPECT_THROW(PbiRawData idx{PbbamTestsConfig::Data_Dir + "/ex2.bam"}, std::runtime_error);
 }
 
 TEST(PacBioIndexTest, AggregatePBI)

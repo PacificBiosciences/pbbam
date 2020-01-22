@@ -15,19 +15,11 @@ using VcfFormat = PacBio::VCF::VcfFormat;
 using VcfQuery = PacBio::VCF::VcfQuery;
 using VcfWriter = PacBio::VCF::VcfWriter;
 
-namespace VcfWriterTests {
-
-static const std::string VcfFn{PacBio::BAM::PbbamTestsConfig::Data_Dir +
-                               "/vcf/structural_variants.vcf"};
-
-}  // namespace VcfWriterTests
-
 TEST(VCF_Writer, correctly_copies_vcf_file)
 {
-    const std::string intitialFn{VcfWriterTests::VcfFn};
+    const VcfFile initialFile{PacBio::BAM::PbbamTestsConfig::Data_Dir +
+                              "/vcf/structural_variants.vcf"};
     const std::string newFn{PacBio::BAM::PbbamTestsConfig::GeneratedData_Dir + "/temp.vcf"};
-
-    const VcfFile initialFile{VcfWriterTests::VcfFn};
 
     const std::string expectedHeaderText = VcfFormat::FormattedHeader(initialFile.Header());
     std::vector<std::string> expectedVariantsText;
