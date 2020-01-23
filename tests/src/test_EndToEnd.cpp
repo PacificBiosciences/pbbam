@@ -28,7 +28,9 @@ struct Bam1Deleter
 {
     void operator()(bam1_t* b) const
     {
-        if (b) bam_destroy1(b);
+        if (b != nullptr) {
+            bam_destroy1(b);
+        }
         b = nullptr;
     }
 };
@@ -37,7 +39,9 @@ struct SamFileDeleter
 {
     void operator()(samFile* file) const
     {
-        if (file) sam_close(file);
+        if (file != nullptr) {
+            sam_close(file);
+        }
         file = nullptr;
     }
 };
@@ -46,7 +50,9 @@ struct BamHdrDeleter
 {
     void operator()(bam_hdr_t* hdr) const
     {
-        if (hdr) bam_hdr_destroy(hdr);
+        if (hdr != nullptr) {
+            bam_hdr_destroy(hdr);
+        }
         hdr = nullptr;
     }
 };
@@ -57,11 +63,10 @@ const std::string generatedBamFn = PbbamTestsConfig::GeneratedData_Dir + "/gener
 const std::string generatedSamFn = PbbamTestsConfig::GeneratedData_Dir + "/generated.sam";
 const std::vector<std::string> generatedFiles = {generatedBamFn, generatedSamFn};
 
-int RunBam2Sam(const std::string& bamFn, const std::string& samFn,
-               const std::string& args = std::string())
+int RunBam2Sam(const std::string& bamFn, const std::string& samFn)
 {
     std::ostringstream s;
-    s << PbbamTestsConfig::Bam2Sam << " " << args << " " << bamFn << " > " << samFn;
+    s << PbbamTestsConfig::Bam2Sam << " " << bamFn << " > " << samFn;
     return system(s.str().c_str());
 }
 

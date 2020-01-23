@@ -144,7 +144,7 @@ TEST(VCF_Header, can_lookup_sample)
 {
     const VcfHeader hdr{VcfHeaderTests::BasicHeaderText};
     const auto idx = hdr.IndexOfSample("UnnamedSample");
-    const auto sample = hdr.SampleAt(idx);
+    const auto& sample = hdr.SampleAt(idx);
     EXPECT_EQ("UnnamedSample", sample);
 }
 

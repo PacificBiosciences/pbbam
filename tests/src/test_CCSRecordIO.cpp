@@ -213,8 +213,9 @@ TEST(CCSRecordIOTest, can_do_round_trip_read_and_write_to_iostreams)
     std::ostringstream output;
     {
         CCSRecordWriter writer{CCSRecordIOTests::ValidHeader(), output};
-        for (size_t i = 0; i < NumOutputRecords; ++i)
+        for (size_t i = 0; i < NumOutputRecords; ++i) {
             writer.Write(CCSRecordIOTests::ValidRecord());
+        }
     }
 
     // use ostream contents as istream

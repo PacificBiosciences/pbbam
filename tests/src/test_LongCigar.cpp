@@ -75,10 +75,11 @@ TEST(LongCigarTest, ReadAndFetchLongCigar)
     const auto b = LongCigarTests::ReadLongCigarRecord(LongCigarTests::LongCigarBam);
 
     EXPECT_EQ(LongCigarTests::numOps, b.CigarData().size());
-    if (LongCigarTests::has_native_long_cigar_support)
+    if (LongCigarTests::has_native_long_cigar_support) {
         EXPECT_FALSE(b.Impl().HasTag("CG"));
-    else
+    } else {
         EXPECT_TRUE(b.Impl().HasTag("CG"));
+    }
 }
 
 TEST(LongCigarTest, EditLongCigar)
@@ -87,10 +88,11 @@ TEST(LongCigarTest, EditLongCigar)
     b.Impl().CigarData(b.CigarData());
 
     EXPECT_EQ(LongCigarTests::numOps, b.CigarData().size());
-    if (LongCigarTests::has_native_long_cigar_support)
+    if (LongCigarTests::has_native_long_cigar_support) {
         EXPECT_FALSE(b.Impl().HasTag("CG"));
-    else
+    } else {
         EXPECT_TRUE(b.Impl().HasTag("CG"));
+    }
 }
 
 TEST(LongCigarTest, WriteLongCigar)
@@ -100,10 +102,11 @@ TEST(LongCigarTest, WriteLongCigar)
         b.Impl().CigarData(b.CigarData());
 
         EXPECT_EQ(LongCigarTests::numOps, b.CigarData().size());
-        if (LongCigarTests::has_native_long_cigar_support)
+        if (LongCigarTests::has_native_long_cigar_support) {
             EXPECT_FALSE(b.Impl().HasTag("CG"));
-        else
+        } else {
             EXPECT_TRUE(b.Impl().HasTag("CG"));
+        }
 
         BamWriter writer{LongCigarTests::LongCigarOut, b.header_};
         writer.Write(b);
@@ -113,10 +116,11 @@ TEST(LongCigarTest, WriteLongCigar)
         const auto b = LongCigarTests::ReadLongCigarRecord(LongCigarTests::LongCigarOut);
 
         EXPECT_EQ(LongCigarTests::numOps, b.CigarData().size());
-        if (LongCigarTests::has_native_long_cigar_support)
+        if (LongCigarTests::has_native_long_cigar_support) {
             EXPECT_FALSE(b.Impl().HasTag("CG"));
-        else
+        } else {
             EXPECT_TRUE(b.Impl().HasTag("CG"));
+        }
     }
 }
 

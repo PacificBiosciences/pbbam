@@ -21,8 +21,9 @@ void CheckManualIteration(const std::string& fn)
     size_t count = 0;
     std::string line;
     TextFileReader reader{fn};
-    while (reader.GetNext(line))
+    while (reader.GetNext(line)) {
         ++count;
+    }
     EXPECT_EQ(expectedNumLines, count);
 }
 

@@ -57,8 +57,9 @@ TEST(IndexedBamWriter, WritesValidIndex)
         BamReader reader{file};
         IndexedBamWriter writer{outBam, header};
         BamRecord b;
-        while (reader.GetNext(b))
+        while (reader.GetNext(b)) {
             writer.Write(b);
+        }
     }
 
     {   // sequential read of new BAM

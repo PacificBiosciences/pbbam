@@ -23,7 +23,9 @@ struct BamHdrDeleter
 {
     void operator()(bam_hdr_t* hdr) const
     {
-        if (hdr) bam_hdr_destroy(hdr);
+        if (hdr != nullptr) {
+            bam_hdr_destroy(hdr);
+        }
         hdr = nullptr;
     }
 };
