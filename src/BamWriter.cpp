@@ -12,6 +12,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <thread>
+#include <tuple>
 #include <type_traits>
 
 #include <htslib/bgzf.h>
@@ -19,7 +20,6 @@
 #include <htslib/hts.h>
 
 #include "pbbam/BamFile.h"
-#include "pbbam/Unused.h"
 #include "pbbam/Validator.h"
 
 #include "Autovalidate.h"
@@ -112,7 +112,7 @@ public:
 
         // ensure offsets up-to-date
         const auto ret = bgzf_flush(bgzf);
-        UNUSED(ret);
+        std::ignore = ret;
 
         // capture virtual offset where we’re about to write
         const auto rawTell = htell(bgzf->fp);
@@ -162,7 +162,7 @@ BamWriter& BamWriter::operator=(BamWriter&&) noexcept = default;
 BamWriter::~BamWriter()
 {
     const auto ret = bgzf_flush(d_->file_.get()->fp.bgzf);
-    UNUSED(ret);
+    std::ignore = ret;
 }
 
 void BamWriter::TryFlush()

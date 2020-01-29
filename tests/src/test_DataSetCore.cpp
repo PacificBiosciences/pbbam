@@ -15,8 +15,8 @@ using namespace PacBio::BAM;
 
 namespace DataSetCoreTests {
 
-const std::string subreadsetBioSample =
-    PbbamTestsConfig::Data_Dir + "/dataset/biosample.subreadset.xml";
+const std::string subreadsetBioSample{PbbamTestsConfig::Data_Dir +
+                                      "/dataset/biosample.subreadset.xml"};
 
 static inline DataSet CreateDataSet()
 {
@@ -29,17 +29,17 @@ static inline DataSet CreateDataSet()
 
 TEST(DataSetCoreTest, XmlNameParts)
 {
-    internal::XmlName name("ns:node_name");
+    internal::XmlName name{"ns:node_name"};
     EXPECT_EQ(boost::string_ref("ns"), name.Prefix());
     EXPECT_EQ(boost::string_ref("node_name"), name.LocalName());
     EXPECT_EQ(boost::string_ref("ns:node_name"), name.QualifiedName());
 
-    internal::XmlName bareName("node_name");
+    internal::XmlName bareName{"node_name"};
     EXPECT_EQ(boost::string_ref(""), bareName.Prefix());
     EXPECT_EQ(boost::string_ref("node_name"), bareName.LocalName());
     EXPECT_EQ(boost::string_ref("node_name"), bareName.QualifiedName());
 
-    internal::XmlName leadingColon(":node_name");
+    internal::XmlName leadingColon{":node_name"};
     EXPECT_EQ(boost::string_ref(""), leadingColon.Prefix());
     EXPECT_EQ(boost::string_ref(":node_name"), leadingColon.LocalName());
     EXPECT_EQ(boost::string_ref(":node_name"), leadingColon.QualifiedName());
@@ -47,7 +47,7 @@ TEST(DataSetCoreTest, XmlNameParts)
 
 TEST(DataSetCoreTest, DefaultsOk)
 {
-    DataSet dataset;
+    const DataSet dataset;
     EXPECT_EQ(DataSet::GENERIC, dataset.Type());
     EXPECT_FALSE(dataset.CreatedAt().empty());
     EXPECT_FALSE(dataset.MetaType().empty());
@@ -71,16 +71,16 @@ TEST(DataSetCoreTest, DefaultsOk)
 
 TEST(DataSetCoreTest, TimeStampedNamesOk)
 {
-    DataSet dataset;
-    AlignmentSet alignmentSet;
-    BarcodeSet barcodeSet;
-    ContigSet contigSet;
-    ConsensusAlignmentSet consensusAlignmentSet;
-    ConsensusReadSet consensusReadSet;
-    HdfSubreadSet hdfSubreadSet;
-    ReferenceSet referenceSet;
-    SubreadSet subreadSet;
-    TranscriptSet transcriptSet;
+    const DataSet dataset;
+    const AlignmentSet alignmentSet;
+    const BarcodeSet barcodeSet;
+    const ContigSet contigSet;
+    const ConsensusAlignmentSet consensusAlignmentSet;
+    const ConsensusReadSet consensusReadSet;
+    const HdfSubreadSet hdfSubreadSet;
+    const ReferenceSet referenceSet;
+    const SubreadSet subreadSet;
+    const TranscriptSet transcriptSet;
 
     EXPECT_EQ(0, dataset.TimeStampedName().find("pacbio_dataset_dataset-"));
     EXPECT_EQ(0, alignmentSet.TimeStampedName().find("pacbio_dataset_alignmentset-"));
@@ -109,16 +109,16 @@ TEST(DataSetCoreTest, BasicGettersSettersOk)
     dataset.UniqueId("uuid");
     dataset.Version("0.0.0");
 
-    EXPECT_EQ(std::string("now"), dataset.CreatedAt());
-    EXPECT_EQ(std::string("format"), dataset.Format());
-    EXPECT_EQ(std::string("meta"), dataset.MetaType());
-    EXPECT_EQ(std::string("later"), dataset.ModifiedAt());
-    EXPECT_EQ(std::string("foo"), dataset.Name());
-    EXPECT_EQ(std::string("path/to/file"), dataset.ResourceId());
-    EXPECT_EQ(std::string("tag tag"), dataset.Tags());
-    EXPECT_EQ(std::string("now:30"), dataset.TimeStampedName());
-    EXPECT_EQ(std::string("uuid"), dataset.UniqueId());
-    EXPECT_EQ(std::string("0.0.0"), dataset.Version());
+    EXPECT_EQ("now", dataset.CreatedAt());
+    EXPECT_EQ("format", dataset.Format());
+    EXPECT_EQ("meta", dataset.MetaType());
+    EXPECT_EQ("later", dataset.ModifiedAt());
+    EXPECT_EQ("foo", dataset.Name());
+    EXPECT_EQ("path/to/file", dataset.ResourceId());
+    EXPECT_EQ("tag tag", dataset.Tags());
+    EXPECT_EQ("now:30", dataset.TimeStampedName());
+    EXPECT_EQ("uuid", dataset.UniqueId());
+    EXPECT_EQ("0.0.0", dataset.Version());
 }
 
 TEST(DataSetCoreTest, CopyOk)
@@ -127,13 +127,13 @@ TEST(DataSetCoreTest, CopyOk)
     d1.Name("foo");
 
     // copy ctor
-    DataSet d2(d1);
-    EXPECT_EQ(std::string("foo"), d2.Name());
+    const DataSet d2{d1};
+    EXPECT_EQ("foo", d2.Name());
 
     // copy assignment
     DataSet d3;
     d3 = d1;
-    EXPECT_EQ(std::string("foo"), d3.Name());
+    EXPECT_EQ("foo", d3.Name());
 }
 
 TEST(DataSetCoreTest, MoveOk)
@@ -141,28 +141,14 @@ TEST(DataSetCoreTest, MoveOk)
     DataSet d1;
     d1.Name("foo");
 
-// move ctor
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpessimizing-move"
-#endif
-    DataSet d2(std::move(DataSetCoreTests::CreateDataSet()));
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
-    EXPECT_EQ(std::string("foo"), d2.Name());
+    // move ctor
+    DataSet d2{DataSetCoreTests::CreateDataSet()};
+    EXPECT_EQ("foo", d2.Name());
 
     // move assignment
     DataSet d3;
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpessimizing-move"
-#endif
-    d3 = std::move(DataSetCoreTests::CreateDataSet());
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
-    EXPECT_EQ(std::string("foo"), d3.Name());
+    d3 = DataSetCoreTests::CreateDataSet();
+    EXPECT_EQ("foo", d3.Name());
 }
 
 TEST(DataSetCoreTest, AddExternalResources)
@@ -170,10 +156,10 @@ TEST(DataSetCoreTest, AddExternalResources)
     DataSet dataset;
     EXPECT_EQ(0, dataset.ExternalResources().Size());
 
-    ExternalResource resource1("metatype", "id");
+    ExternalResource resource1{"metatype", "id"};
     resource1.Name("file1");
 
-    ExternalResource resource2("metatype", "id2");
+    ExternalResource resource2{"metatype", "id2"};
     resource2.Name("file2");
 
     dataset.ExternalResources().Add(resource1);
@@ -181,22 +167,23 @@ TEST(DataSetCoreTest, AddExternalResources)
     EXPECT_EQ(2, dataset.ExternalResources().Size());
 
     // disallow duplicates (checking on ResourceId)
-    ExternalResource duplicateResource("metatype", "id");
+    const ExternalResource duplicateResource{"metatype", "id"};
     dataset.ExternalResources().Add(duplicateResource);
     EXPECT_EQ(2, dataset.ExternalResources().Size());
 
     // direct access
     const ExternalResources& resources = dataset.ExternalResources();
-    EXPECT_EQ(std::string("file1"), resources[0].Name());
-    EXPECT_EQ(std::string("file2"), resources[1].Name());
+    ASSERT_EQ(2, resources.Size());
+    EXPECT_EQ("file1", resources[0].Name());
+    EXPECT_EQ("file2", resources[1].Name());
 
     // iterable
     size_t i = 0;
     for (auto r : resources) {
         if (i == 0)
-            EXPECT_EQ(std::string("file1"), r.Name());
+            EXPECT_EQ("file1", r.Name());
         else
-            EXPECT_EQ(std::string("file2"), r.Name());
+            EXPECT_EQ("file2", r.Name());
         ++i;
     }
 }
@@ -205,7 +192,7 @@ TEST(DataSetCoreTest, EditExternalResources)
 {
     DataSet dataset;
 
-    ExternalResource resource("metatype", "id");
+    ExternalResource resource{"metatype", "id"};
     resource.Name("file1");
     dataset.ExternalResources().Add(resource);
 
@@ -215,22 +202,22 @@ TEST(DataSetCoreTest, EditExternalResources)
 
     // edit
     dataset.ExternalResources()[0].Name("some new name");
-    EXPECT_EQ(std::string("some new name"), dataset.ExternalResources()[0].Name());
-    EXPECT_EQ(std::string("file2"), dataset.ExternalResources()[1].Name());
+    EXPECT_EQ("some new name", dataset.ExternalResources()[0].Name());
+    EXPECT_EQ("file2", dataset.ExternalResources()[1].Name());
 }
 
 TEST(DataSetCoreTest, NestedExternalResources)
 {
-    ExternalResource resource("metatype", "filename");
-    resource.ExternalResources().Add(ExternalResource("metatype.child", "filename.child"));
-    resource.ExternalResources().Add(ExternalResource("metatype.child2", "filename.child2"));
+    ExternalResource resource{"metatype", "filename"};
+    resource.ExternalResources().Add(ExternalResource{"metatype.child", "filename.child"});
+    resource.ExternalResources().Add(ExternalResource{"metatype.child2", "filename.child2"});
 
     const ExternalResources& childResources = resource.ExternalResources();
-    EXPECT_EQ(2, childResources.Size());
-    EXPECT_EQ(std::string("metatype.child"), childResources[0].MetaType());
-    EXPECT_EQ(std::string("metatype.child2"), childResources[1].MetaType());
-    EXPECT_EQ(std::string("filename.child"), childResources[0].ResourceId());
-    EXPECT_EQ(std::string("filename.child2"), childResources[1].ResourceId());
+    ASSERT_EQ(2, childResources.Size());
+    EXPECT_EQ("metatype.child", childResources[0].MetaType());
+    EXPECT_EQ("metatype.child2", childResources[1].MetaType());
+    EXPECT_EQ("filename.child", childResources[0].ResourceId());
+    EXPECT_EQ("filename.child2", childResources[1].ResourceId());
 }
 
 TEST(DataSetCoreTest, AddFilters)
@@ -239,13 +226,13 @@ TEST(DataSetCoreTest, AddFilters)
     EXPECT_EQ(0, dataset.Filters().Size());
 
     Filter filter;
-    filter.Properties().Add(Property("rq", "0.85", ">"));
-    filter.Properties().Add(Property("RNAME", "chr1", "=="));
+    filter.Properties().Add(Property{"rq", "0.85", ">"});
+    filter.Properties().Add(Property{"RNAME", "chr1", "=="});
     EXPECT_EQ(2, filter.Properties().Size());
 
     Filter filter2;
-    filter2.Properties().Add(Property("rq", "0.50", ">="));
-    filter2.Properties().Add(Property("RNAME", "chr2", "!="));
+    filter2.Properties().Add(Property{"rq", "0.50", ">="});
+    filter2.Properties().Add(Property{"RNAME", "chr2", "!="});
     EXPECT_EQ(2, filter2.Properties().Size());
 
     dataset.Filters().Add(filter);
@@ -258,24 +245,24 @@ TEST(DataSetCoreTest, AddFilters)
 
     // direct access
     const Property& p0 = filters[0].Properties()[0];
-    EXPECT_EQ(std::string("rq"), p0.Name());
-    EXPECT_EQ(std::string("0.85"), p0.Value());
-    EXPECT_EQ(std::string(">"), p0.Operator());
+    EXPECT_EQ("rq", p0.Name());
+    EXPECT_EQ("0.85", p0.Value());
+    EXPECT_EQ(">", p0.Operator());
 
     const Property& p1 = filters[0].Properties()[1];
-    EXPECT_EQ(std::string("RNAME"), p1.Name());
-    EXPECT_EQ(std::string("chr1"), p1.Value());
-    EXPECT_EQ(std::string("=="), p1.Operator());
+    EXPECT_EQ("RNAME", p1.Name());
+    EXPECT_EQ("chr1", p1.Value());
+    EXPECT_EQ("==", p1.Operator());
 
     const Property& p2 = filters[1].Properties()[0];
-    EXPECT_EQ(std::string("rq"), p2.Name());
-    EXPECT_EQ(std::string("0.50"), p2.Value());
-    EXPECT_EQ(std::string(">="), p2.Operator());
+    EXPECT_EQ("rq", p2.Name());
+    EXPECT_EQ("0.50", p2.Value());
+    EXPECT_EQ(">=", p2.Operator());
 
     const Property& p3 = filters[1].Properties()[1];
-    EXPECT_EQ(std::string("RNAME"), p3.Name());
-    EXPECT_EQ(std::string("chr2"), p3.Value());
-    EXPECT_EQ(std::string("!="), p3.Operator());
+    EXPECT_EQ("RNAME", p3.Name());
+    EXPECT_EQ("chr2", p3.Value());
+    EXPECT_EQ("!=", p3.Operator());
 
     // iteratable
     size_t i = 0;
@@ -285,13 +272,13 @@ TEST(DataSetCoreTest, AddFilters)
             const Properties& properties = f.Properties();
             for (const Property& p : properties) {
                 if (j == 0) {
-                    EXPECT_EQ(std::string("rq"), p.Name());
-                    EXPECT_EQ(std::string("0.85"), p.Value());
-                    EXPECT_EQ(std::string(">"), p.Operator());
+                    EXPECT_EQ("rq", p.Name());
+                    EXPECT_EQ("0.85", p.Value());
+                    EXPECT_EQ(">", p.Operator());
                 } else {
-                    EXPECT_EQ(std::string("RNAME"), p.Name());
-                    EXPECT_EQ(std::string("chr1"), p.Value());
-                    EXPECT_EQ(std::string("=="), p.Operator());
+                    EXPECT_EQ("RNAME", p.Name());
+                    EXPECT_EQ("chr1", p.Value());
+                    EXPECT_EQ("==", p.Operator());
                 }
                 ++j;
             }
@@ -299,13 +286,13 @@ TEST(DataSetCoreTest, AddFilters)
             const Properties& properties = f.Properties();
             for (const Property& p : properties) {
                 if (j == 0) {
-                    EXPECT_EQ(std::string("rq"), p.Name());
-                    EXPECT_EQ(std::string("0.50"), p.Value());
-                    EXPECT_EQ(std::string(">="), p.Operator());
+                    EXPECT_EQ("rq", p.Name());
+                    EXPECT_EQ("0.50", p.Value());
+                    EXPECT_EQ(">=", p.Operator());
                 } else {
-                    EXPECT_EQ(std::string("RNAME"), p.Name());
-                    EXPECT_EQ(std::string("chr2"), p.Value());
-                    EXPECT_EQ(std::string("!="), p.Operator());
+                    EXPECT_EQ("RNAME", p.Name());
+                    EXPECT_EQ("chr2", p.Value());
+                    EXPECT_EQ("!=", p.Operator());
                 }
                 ++j;
             }
@@ -321,18 +308,18 @@ TEST(DataSetCoreTest, EditFilters)
     EXPECT_EQ(0, dataset.Filters().Size());
 
     Filter filter;
-    filter.Properties().Add(Property("rq", "0.85", ">"));
-    filter.Properties().Add(Property("RNAME", "chr1", "=="));
+    filter.Properties().Add(Property{"rq", "0.85", ">"});
+    filter.Properties().Add(Property{"RNAME", "chr1", "=="});
     EXPECT_EQ(2, filter.Properties().Size());
 
     Filter filter2;
-    filter2.Properties().Add(Property("rq", "0.50", ">="));
-    filter2.Properties().Add(Property("RNAME", "chr2", "!="));
+    filter2.Properties().Add(Property{"rq", "0.50", ">="});
+    filter2.Properties().Add(Property{"RNAME", "chr2", "!="});
     EXPECT_EQ(2, filter2.Properties().Size());
 
     dataset.Filters().Add(filter);
     dataset.Filters().Add(filter2);
-    EXPECT_EQ(2, dataset.Filters().Size());
+    ASSERT_EQ(2, dataset.Filters().Size());
     EXPECT_EQ(2, dataset.Filters()[0].Properties().Size());
     EXPECT_EQ(2, dataset.Filters()[1].Properties().Size());
 
@@ -343,24 +330,24 @@ TEST(DataSetCoreTest, EditFilters)
     p.Operator("==");
 
     const Property& p0 = dataset.Filters()[0].Properties()[0];
-    EXPECT_EQ(std::string("someNewName"), p0.Name());
-    EXPECT_EQ(std::string("someNewValue"), p0.Value());
-    EXPECT_EQ(std::string("=="), p0.Operator());
+    EXPECT_EQ("someNewName", p0.Name());
+    EXPECT_EQ("someNewValue", p0.Value());
+    EXPECT_EQ("==", p0.Operator());
 
     const Property& p1 = dataset.Filters()[0].Properties()[1];
-    EXPECT_EQ(std::string("RNAME"), p1.Name());
-    EXPECT_EQ(std::string("chr1"), p1.Value());
-    EXPECT_EQ(std::string("=="), p1.Operator());
+    EXPECT_EQ("RNAME", p1.Name());
+    EXPECT_EQ("chr1", p1.Value());
+    EXPECT_EQ("==", p1.Operator());
 
     const Property& p2 = dataset.Filters()[1].Properties()[0];
-    EXPECT_EQ(std::string("rq"), p2.Name());
-    EXPECT_EQ(std::string("0.50"), p2.Value());
-    EXPECT_EQ(std::string(">="), p2.Operator());
+    EXPECT_EQ("rq", p2.Name());
+    EXPECT_EQ("0.50", p2.Value());
+    EXPECT_EQ(">=", p2.Operator());
 
     const Property& p3 = dataset.Filters()[1].Properties()[1];
-    EXPECT_EQ(std::string("RNAME"), p3.Name());
-    EXPECT_EQ(std::string("chr2"), p3.Value());
-    EXPECT_EQ(std::string("!="), p3.Operator());
+    EXPECT_EQ("RNAME", p3.Name());
+    EXPECT_EQ("chr2", p3.Value());
+    EXPECT_EQ("!=", p3.Operator());
 }
 
 TEST(DataSetCoreTest, AddSubDataSets)
@@ -380,16 +367,16 @@ TEST(DataSetCoreTest, AddSubDataSets)
 
     // direct access
     const SubDataSets& subdatasets = dataset.SubDataSets();
-    EXPECT_EQ(std::string("subset_1"), subdatasets[0].Name());
-    EXPECT_EQ(std::string("subset_2"), subdatasets[1].Name());
+    EXPECT_EQ("subset_1", subdatasets[0].Name());
+    EXPECT_EQ("subset_2", subdatasets[1].Name());
 
     // iterable
     size_t i = 0;
     for (const DataSetBase& ds : subdatasets) {
         if (i == 0)
-            EXPECT_EQ(std::string("subset_1"), ds.Name());
+            EXPECT_EQ("subset_1", ds.Name());
         else
-            EXPECT_EQ(std::string("subset_2"), ds.Name());
+            EXPECT_EQ("subset_2", ds.Name());
         ++i;
     }
 }
@@ -414,16 +401,16 @@ TEST(DataSetCoreTest, EditSubDataSets)
 
     // direct access
     const SubDataSets& subdatasets = dataset.SubDataSets();
-    EXPECT_EQ(std::string("subset_1_edited"), subdatasets[0].Name());
-    EXPECT_EQ(std::string("subset_2"), subdatasets[1].Name());
+    EXPECT_EQ("subset_1_edited", subdatasets[0].Name());
+    EXPECT_EQ("subset_2", subdatasets[1].Name());
 
     // iterable
     size_t i = 0;
     for (const DataSetBase& ds : subdatasets) {
         if (i == 0)
-            EXPECT_EQ(std::string("subset_1_edited"), ds.Name());
+            EXPECT_EQ("subset_1_edited", ds.Name());
         else
-            EXPECT_EQ(std::string("subset_2"), ds.Name());
+            EXPECT_EQ("subset_2", ds.Name());
         ++i;
     }
 }
@@ -433,10 +420,10 @@ TEST(DataSetCoreTest, RemoveExternalResources)
     DataSet dataset;
     EXPECT_EQ(0, dataset.ExternalResources().Size());
 
-    ExternalResource resource1("metatype", "id");
+    ExternalResource resource1{"metatype", "id"};
     resource1.Name("file1");
 
-    ExternalResource resource2("metatype", "id2");
+    ExternalResource resource2{"metatype", "id2"};
     resource2.Name("file2");
 
     dataset.ExternalResources().Add(resource1);
@@ -449,13 +436,13 @@ TEST(DataSetCoreTest, RemoveExternalResources)
 
     // direct access
     const ExternalResources& resources = dataset.ExternalResources();
-    EXPECT_EQ(std::string("file2"), resources[0].Name());
+    EXPECT_EQ("file2", resources[0].Name());
 
     // iterable
     size_t i = 0;
     for (auto r : resources) {
         if (i == 0) {
-            EXPECT_EQ(std::string("file2"), r.Name());
+            EXPECT_EQ("file2", r.Name());
         }
         ++i;
     }
@@ -467,13 +454,13 @@ TEST(DataSetCoreTest, RemoveFilters)
     EXPECT_EQ(0, dataset.Filters().Size());
 
     Filter filter;
-    filter.Properties().Add(Property("rq", "0.85", ">"));
-    filter.Properties().Add(Property("RNAME", "chr1", "=="));
+    filter.Properties().Add(Property{"rq", "0.85", ">"});
+    filter.Properties().Add(Property{"RNAME", "chr1", "=="});
     EXPECT_EQ(2, filter.Properties().Size());
 
     Filter filter2;
-    filter2.Properties().Add(Property("rq", "0.50", ">="));
-    filter2.Properties().Add(Property("RNAME", "chr2", "!="));
+    filter2.Properties().Add(Property{"rq", "0.50", ">="});
+    filter2.Properties().Add(Property{"RNAME", "chr2", "!="});
     EXPECT_EQ(2, filter2.Properties().Size());
 
     dataset.Filters().Add(filter);
@@ -510,9 +497,8 @@ TEST(DataSetCoreTest, RemoveSubDataSets)
 
 TEST(DataSetCoreTest, EnsureCreatedAtAttribute)
 {
-    DataSet ds;
-    ReferenceSet ref;
-
+    const DataSet ds;
+    const ReferenceSet ref;
     EXPECT_FALSE(ds.CreatedAt().empty());
     EXPECT_FALSE(ref.CreatedAt().empty());
 }

@@ -81,18 +81,17 @@ private:
 class ZmwGroupQuery::RoundRobinZmwGroupQuery : public ZmwGroupQuery::ZmwGroupQueryPrivate
 {
 public:
-    RoundRobinZmwGroupQuery(const DataSet& dataset, const DataSetFilterMode filterMode)
+    RoundRobinZmwGroupQuery(const DataSet& dataset, const PbiFilter& pbiFilter)
         : ZmwGroupQuery::ZmwGroupQueryPrivate()
     {
         const auto bamFilenames = dataset.BamFilenames();
-        const auto pbiFilter = PbiFilter::FromDataSet(dataset);
         for (const auto& fn : bamFilenames) {
             // create reader for file
             auto makeReader = [&]() -> std::unique_ptr<BamReader> {
-                if (filterMode == DataSetFilterMode::APPLY)
-                    return std::make_unique<PbiIndexedBamReader>(pbiFilter, fn);
-                else
+                if (pbiFilter.IsEmpty())
                     return std::make_unique<BamReader>(fn);
+                else
+                    return std::make_unique<PbiIndexedBamReader>(pbiFilter, fn);
             };
             internal::CompositeMergeItem item{makeReader()};
 
@@ -145,18 +144,17 @@ private:
 class ZmwGroupQuery::SequentialZmwGroupQuery : public ZmwGroupQuery::ZmwGroupQueryPrivate
 {
 public:
-    SequentialZmwGroupQuery(const DataSet& dataset, const DataSetFilterMode filterMode)
+    SequentialZmwGroupQuery(const DataSet& dataset, const PbiFilter& pbiFilter)
         : ZmwGroupQuery::ZmwGroupQueryPrivate()
     {
         const auto bamFilenames = dataset.BamFilenames();
-        const auto pbiFilter = PbiFilter::FromDataSet(dataset);
         for (const auto& fn : bamFilenames) {
             // create reader for file
             auto makeReader = [&]() -> std::unique_ptr<BamReader> {
-                if (filterMode == DataSetFilterMode::APPLY)
-                    return std::make_unique<PbiIndexedBamReader>(pbiFilter, fn);
-                else
+                if (pbiFilter.IsEmpty())
                     return std::make_unique<BamReader>(fn);
+                else
+                    return std::make_unique<PbiIndexedBamReader>(pbiFilter, fn);
             };
             internal::CompositeMergeItem item{makeReader()};
 
@@ -207,10 +205,20 @@ ZmwGroupQuery::ZmwGroupQuery(const DataSet& dataset, const ZmwFileIterationMode 
                              const DataSetFilterMode filterMode)
     : internal::IGroupQuery()
 {
+    PbiFilter filter;
+    if (filterMode == DataSetFilterMode::APPLY) filter = PbiFilter::FromDataSet(dataset);
+
     if (iterationMode == ZmwFileIterationMode::SEQUENTIAL)
-        d_ = std::make_unique<SequentialZmwGroupQuery>(dataset, filterMode);
+        d_ = std::make_unique<SequentialZmwGroupQuery>(dataset, filter);
     else
-        d_ = std::make_unique<RoundRobinZmwGroupQuery>(dataset, filterMode);
+        d_ = std::make_unique<RoundRobinZmwGroupQuery>(dataset, filter);
+}
+
+// ZmwGroupQuery(const DataSet& dataset, const PbiFilter& filter) {}
+
+ZmwGroupQuery::ZmwGroupQuery(const DataSet& dataset, const PbiFilter& filter)
+    : internal::IGroupQuery(), d_{std::make_unique<SequentialZmwGroupQuery>(dataset, filter)}
+{
 }
 
 ZmwGroupQuery::ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset)

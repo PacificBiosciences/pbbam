@@ -20,7 +20,7 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-typedef std::vector<uint16_t> f_data;
+using f_data = std::vector<uint16_t>;
 
 namespace BamRecordClippingTests {
 
@@ -135,7 +135,7 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     const f_data frames    = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
 
     const std::string pulseCall   = "ttAaAtaCCGggatTTAcatGCt";
-    const std::string pulseBases  = pulseCall;
+    const std::string& pulseBases  = pulseCall;
     const std::string pulseQuals  = "==?=]==?]?====]?]===?*=";
     const f_data pulseFrames = { 0,0,10,0,10,0,0,20,20,30,0,0,0,0,40,40,10,0,0,0,30,20,0 };
 
@@ -159,13 +159,12 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     const std::string seq_rev       = "GCTAACGGTT";
     const std::string pulseCall_rev = "aGCatgTAAatccCGGtaTtTaa";
     const std::string quals_rev     = "*?]?]?]?]?";
-    const std::string tagQuals_rev  = quals_rev;
     const f_data frames_rev    = { 20, 30, 10, 40, 40, 30, 20, 20, 10, 10 };
 
     const std::string seq_rev_clipped   = "CTAACGG";
     const std::string quals_rev_clipped = "?]?]?]?";
-    const std::string tagBases_rev_clipped = seq_rev_clipped;
-    const std::string tagQuals_rev_clipped = quals_rev_clipped;
+    const std::string& tagBases_rev_clipped = seq_rev_clipped;
+    const std::string& tagQuals_rev_clipped = quals_rev_clipped;
     const f_data frames_rev_clipped = { 30, 10, 40, 40, 30, 20, 20 };
 
     const std::string pulseCall_rev_clipped = "CatgTAAatccCGG";
@@ -462,42 +461,42 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     const std::string s1_cigar_clipped = "7=";
     const std::string s1_seq_clipped      = "AACCGTT";
     const std::string s1_quals_clipped    = "?]?]?]?";
-    const std::string s1_tagBases_clipped = s1_seq_clipped;
-    const std::string s1_tagQuals_clipped = s1_quals_clipped;
+    const std::string& s1_tagBases_clipped = s1_seq_clipped;
+    const std::string& s1_tagQuals_clipped = s1_quals_clipped;
     const f_data s1_frames_clipped   = { 10, 10, 20, 20, 30, 40, 40 };
     const std::string s1_cigar_rev_clipped = "6=1S";
     const std::string s1_seq_rev_clipped   = "AACGGTT";
     const std::string s1_quals_rev_clipped = "?]?]?]?";
-    const std::string s1_tagBases_rev_clipped = s1_seq_rev_clipped;
-    const std::string s1_tagQuals_rev_clipped = s1_quals_rev_clipped;
+    const std::string& s1_tagBases_rev_clipped = s1_seq_rev_clipped;
+    const std::string& s1_tagQuals_rev_clipped = s1_quals_rev_clipped;
     const f_data s1_frames_rev_clipped = { 40, 40, 30, 20, 20, 10, 10 };
 
     const std::string s2_cigar = "2S5=3D5=3S";
     const std::string s2_cigar_clipped = "5=3D2=";
     const std::string s2_seq_clipped      = "AACCGTT";
     const std::string s2_quals_clipped    = "?]?]?]?";
-    const std::string s2_tagBases_clipped = s2_seq_clipped;
-    const std::string s2_tagQuals_clipped = s2_quals_clipped;
+    const std::string& s2_tagBases_clipped = s2_seq_clipped;
+    const std::string& s2_tagQuals_clipped = s2_quals_clipped;
     const f_data s2_frames_clipped   = { 10, 10, 20, 20, 30, 40, 40 };
     const std::string s2_cigar_rev_clipped = "1=3D5=1S";
     const std::string s2_seq_rev_clipped   = "AACGGTT";
     const std::string s2_quals_rev_clipped = "?]?]?]?";
-    const std::string s2_tagBases_rev_clipped = s2_seq_rev_clipped;
-    const std::string s2_tagQuals_rev_clipped = s2_quals_rev_clipped;
+    const std::string& s2_tagBases_rev_clipped = s2_seq_rev_clipped;
+    const std::string& s2_tagQuals_rev_clipped = s2_quals_rev_clipped;
     const f_data s2_frames_rev_clipped = { 40, 40, 30, 20, 20, 10, 10 };
 
     const std::string s3_cigar = "2S4=1D2I2D4=3S";
     const std::string s3_cigar_clipped = "4=1D2I2D1=";
     const std::string s3_seq_clipped      = "AACCGTT";
     const std::string s3_quals_clipped    = "?]?]?]?";
-    const std::string s3_tagBases_clipped = s3_seq_clipped;
-    const std::string s3_tagQuals_clipped = s3_quals_clipped;
+    const std::string& s3_tagBases_clipped = s3_seq_clipped;
+    const std::string& s3_tagQuals_clipped = s3_quals_clipped;
     const f_data s3_frames_clipped   = { 10, 10, 20, 20, 30, 40, 40 };
     const std::string s3_cigar_rev_clipped = "1D2I2D4=1S";
     const std::string s3_seq_rev_clipped   = "AACGGTT";
     const std::string s3_quals_rev_clipped = "?]?]?]?";
-    const std::string s3_tagBases_rev_clipped = s3_seq_rev_clipped;
-    const std::string s3_tagQuals_rev_clipped = s3_quals_rev_clipped;
+    const std::string& s3_tagBases_rev_clipped = s3_seq_rev_clipped;
+    const std::string& s3_tagQuals_rev_clipped = s3_quals_rev_clipped;
     const f_data s3_frames_rev_clipped = { 40, 40, 30, 20, 20, 10, 10 };
 
     const BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
@@ -748,39 +747,39 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     const std::string s1_cigar_clipped = "5=";
     const std::string s1_seq_clipped      = "CCGTT";
     const std::string s1_quals_clipped    = "?]?]?";
-    const std::string s1_tagBases_clipped = s1_seq_clipped;
-    const std::string s1_tagQuals_clipped = s1_quals_clipped;
+    const std::string& s1_tagBases_clipped = s1_seq_clipped;
+    const std::string& s1_tagQuals_clipped = s1_quals_clipped;
     const f_data s1_frames_clipped   = { 20, 20, 30, 40, 40 };
     const std::string s1_seq_rev_clipped   = "TAACG";
     const std::string s1_quals_rev_clipped = "]?]?]";
-    const std::string s1_tagBases_rev_clipped = s1_seq_rev_clipped;
-    const std::string s1_tagQuals_rev_clipped = s1_quals_rev_clipped;
+    const std::string& s1_tagBases_rev_clipped = s1_seq_rev_clipped;
+    const std::string& s1_tagQuals_rev_clipped = s1_quals_rev_clipped;
     const f_data s1_frames_rev_clipped = { 10, 40, 40, 30, 20 };
 
     const std::string s2_cigar = "5=3D5=";
     const std::string s2_cigar_clipped = "3=2D";
     const std::string s2_seq_clipped      = "CCG";
     const std::string s2_quals_clipped    = "?]?";
-    const std::string s2_tagBases_clipped = s2_seq_clipped;
-    const std::string s2_tagQuals_clipped = s2_quals_clipped;
+    const std::string& s2_tagBases_clipped = s2_seq_clipped;
+    const std::string& s2_tagQuals_clipped = s2_quals_clipped;
     const f_data s2_frames_clipped   = { 20, 20, 30 };
     const std::string s2_seq_rev_clipped   = "TAA";
     const std::string s2_quals_rev_clipped = "]?]";
-    const std::string s2_tagBases_rev_clipped = s2_seq_rev_clipped;
-    const std::string s2_tagQuals_rev_clipped = s2_quals_rev_clipped;
+    const std::string& s2_tagBases_rev_clipped = s2_seq_rev_clipped;
+    const std::string& s2_tagQuals_rev_clipped = s2_quals_rev_clipped;
     const f_data s2_frames_rev_clipped = { 10, 40, 40 };
 
     const std::string s3_cigar = "4=1D2I2D4=";
     const std::string s3_cigar_clipped = "2=1D2I2D";
     const std::string s3_seq_clipped      = "CCGT";
     const std::string s3_quals_clipped    = "?]?]";
-    const std::string s3_tagBases_clipped = s3_seq_clipped;
-    const std::string s3_tagQuals_clipped = s3_quals_clipped;
+    const std::string& s3_tagBases_clipped = s3_seq_clipped;
+    const std::string& s3_tagQuals_clipped = s3_quals_clipped;
     const f_data s3_frames_clipped   = { 20, 20, 30, 40 };
     const std::string s3_seq_rev_clipped   = "TAAC";
     const std::string s3_quals_rev_clipped = "]?]?";
-    const std::string s3_tagBases_rev_clipped = s3_seq_rev_clipped;
-    const std::string s3_tagQuals_rev_clipped = s3_quals_rev_clipped;
+    const std::string& s3_tagBases_rev_clipped = s3_seq_rev_clipped;
+    const std::string& s3_tagQuals_rev_clipped = s3_quals_rev_clipped;
     const f_data s3_frames_rev_clipped = { 10, 40, 40, 30};
 
     const BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
@@ -1051,39 +1050,39 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     const std::string s1_cigar_clipped = "5=";
     const std::string s1_seq_clipped      = "CCGTT";
     const std::string s1_quals_clipped    = "?]?]?";
-    const std::string s1_tagBases_clipped = s1_seq_clipped;
-    const std::string s1_tagQuals_clipped = s1_quals_clipped;
+    const std::string& s1_tagBases_clipped = s1_seq_clipped;
+    const std::string& s1_tagQuals_clipped = s1_quals_clipped;
     const f_data s1_frames_clipped   = { 20, 20, 30, 40, 40 };
     const std::string s1_seq_rev_clipped   = "CTAAC";
     const std::string s1_quals_rev_clipped = "?]?]?";
-    const std::string s1_tagBases_rev_clipped = s1_seq_rev_clipped;
-    const std::string s1_tagQuals_rev_clipped = s1_quals_rev_clipped;
+    const std::string& s1_tagBases_rev_clipped = s1_seq_rev_clipped;
+    const std::string& s1_tagQuals_rev_clipped = s1_quals_rev_clipped;
     const f_data s1_frames_rev_clipped = { 30, 10, 40, 40, 30 };
 
     const std::string s2_cigar = "2S5=3D5=3S";
     const std::string s2_cigar_clipped = "3=2D";
     const std::string s2_seq_clipped      = "CCG";
     const std::string s2_quals_clipped    = "?]?";
-    const std::string s2_tagBases_clipped = s2_seq_clipped;
-    const std::string s2_tagQuals_clipped = s2_quals_clipped;
+    const std::string& s2_tagBases_clipped = s2_seq_clipped;
+    const std::string& s2_tagQuals_clipped = s2_quals_clipped;
     const f_data s2_frames_clipped   = { 20, 20, 30 };
     const std::string s2_seq_rev_clipped   = "CTA";
     const std::string s2_quals_rev_clipped = "?]?";
-    const std::string s2_tagBases_rev_clipped = s2_seq_rev_clipped;
-    const std::string s2_tagQuals_rev_clipped = s2_quals_rev_clipped;
+    const std::string& s2_tagBases_rev_clipped = s2_seq_rev_clipped;
+    const std::string& s2_tagQuals_rev_clipped = s2_quals_rev_clipped;
     const f_data s2_frames_rev_clipped = { 30, 10, 40 };
 
     const std::string s3_cigar = "2S4=1D2I2D4=3S";
     const std::string s3_cigar_clipped = "2=1D2I2D";
     const std::string s3_seq_clipped      = "CCGT";
     const std::string s3_quals_clipped    = "?]?]";
-    const std::string s3_tagBases_clipped = s3_seq_clipped;
-    const std::string s3_tagQuals_clipped = s3_quals_clipped;
+    const std::string& s3_tagBases_clipped = s3_seq_clipped;
+    const std::string& s3_tagQuals_clipped = s3_quals_clipped;
     const f_data s3_frames_clipped   = { 20, 20, 30, 40 };
     const std::string s3_seq_rev_clipped   = "CTAA";
     const std::string s3_quals_rev_clipped = "?]?]";
-    const std::string s3_tagBases_rev_clipped = s3_seq_rev_clipped;
-    const std::string s3_tagQuals_rev_clipped = s3_quals_rev_clipped;
+    const std::string& s3_tagBases_rev_clipped = s3_seq_rev_clipped;
+    const std::string& s3_tagQuals_rev_clipped = s3_quals_rev_clipped;
     const f_data s3_frames_rev_clipped = { 30, 10, 40, 40 };
 
     const BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
@@ -1456,8 +1455,8 @@ TEST(BamRecordClippingTest, ClippedToReferenceCopy)
     const std::string s3_cigar_clipped = "2=1D2I2D";
     const std::string s3_seq_clipped      = "CCGT";
     const std::string s3_quals_clipped    = "?]?]";
-    const std::string s3_tagBases_clipped = s3_seq_clipped;
-    const std::string s3_tagQuals_clipped = s3_quals_clipped;
+    const std::string& s3_tagBases_clipped = s3_seq_clipped;
+    const std::string& s3_tagQuals_clipped = s3_quals_clipped;
     const f_data s3_frames_clipped   = { 20, 20, 30, 40 };
 
     BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
@@ -1575,8 +1574,8 @@ TEST(BamRecordClippingTest, StaticClippedToReference)
     const std::string s3_cigar_clipped = "2=1D2I2D";
     const std::string s3_seq_clipped      = "CCGT";
     const std::string s3_quals_clipped    = "?]?]";
-    const std::string s3_tagBases_clipped = s3_seq_clipped;
-    const std::string s3_tagQuals_clipped = s3_quals_clipped;
+    const std::string& s3_tagBases_clipped = s3_seq_clipped;
+    const std::string& s3_tagQuals_clipped = s3_quals_clipped;
     const f_data s3_frames_clipped   = { 20, 20, 30, 40 };
 
     BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
@@ -1714,8 +1713,8 @@ TEST(BamRecordTest, CCS_ClipToReference)
     const std::string s3_cigar_clipped = "2=1D2I2D";
     const std::string s3_seq_clipped      = "CCGT";
     const std::string s3_quals_clipped    = "?]?]";
-    const std::string s3_tagBases_clipped = s3_seq_clipped;
-    const std::string s3_tagQuals_clipped = s3_quals_clipped;
+    const std::string& s3_tagBases_clipped = s3_seq_clipped;
+    const std::string& s3_tagQuals_clipped = s3_quals_clipped;
     const f_data s3_frames_clipped   = { 20, 20, 30, 40 };
 
     BamRecord prototype = BamRecordClippingTests::MakeCCSRecord(seq, quals, tagBases, tagQuals, frames,
@@ -1762,7 +1761,7 @@ TEST(BamRecordTest, ClipEncodedFrames)
     const f_data frames    = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
 
     const std::string pulseCall   = "ttAaAtaCCGggatTTAcatGCt";
-    const std::string pulseBases  = pulseCall;
+    const std::string& pulseBases  = pulseCall;
     const std::string pulseQuals  = "==?=]==?]?====]?]===?*=";
     const f_data pulseFrames = { 0,0,10,0,10,0,0,20,20,30,0,0,0,0,40,40,10,0,0,0,30,20,0 };
 
@@ -1786,13 +1785,12 @@ TEST(BamRecordTest, ClipEncodedFrames)
     const std::string seq_rev       = "GCTAACGGTT";
     const std::string pulseCall_rev = "aGCatgTAAatccCGGtaTtTaa";
     const std::string quals_rev     = "*?]?]?]?]?";
-    const std::string tagQuals_rev  = quals_rev;
     const f_data frames_rev    = { 20, 30, 10, 40, 40, 30, 20, 20, 10, 10 };
 
     const std::string seq_rev_clipped   = "CTAACGG";
     const std::string quals_rev_clipped = "?]?]?]?";
-    const std::string tagBases_rev_clipped = seq_rev_clipped;
-    const std::string tagQuals_rev_clipped = quals_rev_clipped;
+    const std::string& tagBases_rev_clipped = seq_rev_clipped;
+    const std::string& tagQuals_rev_clipped = quals_rev_clipped;
     const f_data frames_rev_clipped = { 30, 10, 40, 40, 30, 20, 20 };
 
     const std::string pulseCall_rev_clipped = "CatgTAAatccCGG";

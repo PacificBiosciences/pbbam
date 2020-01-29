@@ -2,19 +2,15 @@
 
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
 #include <htslib/hts.h>
 
-#include "pbbam/IndexedFastqReader.h"
+#include <pbbam/IndexedFastqReader.h>
 
 #include "FastxTests.h"
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-
-namespace IndexedFastqReaderTests {
-}  // namespace IndexedFastqReaderTests
 
 TEST(IndexedFastqReaderTest, throws_on_empty_filename)
 {

@@ -1,7 +1,9 @@
 // Author: Derek Barnett
 
 #include <cstdint>
+
 #include <string>
+#include <tuple>
 
 #include <gtest/gtest.h>
 
@@ -17,7 +19,7 @@ using namespace PacBio::BAM;
 
 namespace WhitelistedZmwReadStitcherTests {
 
-static void Compare(const BamRecord& b1, const BamRecord& b2)
+void Compare(const BamRecord& b1, const BamRecord& b2)
 {
     EXPECT_TRUE(b1.HasDeletionQV());
     EXPECT_TRUE(b1.HasDeletionTag());
@@ -84,20 +86,20 @@ static void Compare(const BamRecord& b1, const BamRecord& b2)
 
 TEST(WhitelistedZmwReadStitching, EmptyList)
 {
-    const std::vector<int32_t> whitelist = {};
-    WhitelistedZmwReadStitcher stitcher(
+    const std::vector<int32_t> whitelist;
+    WhitelistedZmwReadStitcher stitcher{
         whitelist, PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
-        PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam");
+        PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam"};
     EXPECT_FALSE(stitcher.HasNext());
     EXPECT_TRUE(stitcher.NextRaw().empty());
 }
 
 TEST(WhitelistedZmwReadStitching, SingleValue)
 {
-    const std::vector<int32_t> whitelist = {200000};
-    WhitelistedZmwReadStitcher stitcher(
+    const std::vector<int32_t> whitelist{200000};
+    WhitelistedZmwReadStitcher stitcher{
         whitelist, PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
-        PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam");
+        PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam"};
 
     // create virtual record
     EXPECT_TRUE(stitcher.HasNext());
@@ -105,8 +107,8 @@ TEST(WhitelistedZmwReadStitching, SingleValue)
     EXPECT_FALSE(stitcher.HasNext());
 
     // fetch original polymerase read (2nd record)
-    BamFile polyBam(PbbamTestsConfig::Data_Dir + "/polymerase/internal.polymerase.bam");
-    EntireFileQuery polyQuery(polyBam);
+    const BamFile polyBam{PbbamTestsConfig::Data_Dir + "/polymerase/internal.polymerase.bam"};
+    EntireFileQuery polyQuery{polyBam};
     auto begin = polyQuery.begin();
     auto end = polyQuery.end();
     EXPECT_TRUE(begin != end);
@@ -122,9 +124,9 @@ TEST(WhitelistedZmwReadStitching, SingleValue)
 TEST(WhitelistedZmwReadStitching, UnknownZmw)
 {
     const std::vector<int32_t> whitelist{42};  // ZMW not in our files
-    WhitelistedZmwReadStitcher stitcher(
+    WhitelistedZmwReadStitcher stitcher{
         whitelist, PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
-        PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam");
+        PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam"};
 
     EXPECT_FALSE(stitcher.HasNext());
     EXPECT_TRUE(stitcher.NextRaw().empty());
@@ -132,10 +134,10 @@ TEST(WhitelistedZmwReadStitching, UnknownZmw)
 
 TEST(WhitelistedZmwReadStitching, MultiValue)
 {
-    const std::vector<int32_t> whitelist = {100000, 300000};
-    WhitelistedZmwReadStitcher stitcher(
+    const std::vector<int32_t> whitelist{100000, 300000};
+    WhitelistedZmwReadStitcher stitcher{
         whitelist, PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
-        PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam");
+        PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam"};
 
     // create virtual records
     EXPECT_TRUE(stitcher.HasNext());
@@ -145,8 +147,8 @@ TEST(WhitelistedZmwReadStitching, MultiValue)
     EXPECT_FALSE(stitcher.HasNext());
 
     // fetch original polymerase reads (2nd record)
-    BamFile polyBam(PbbamTestsConfig::Data_Dir + "/polymerase/internal.polymerase.bam");
-    EntireFileQuery polyQuery(polyBam);
+    const BamFile polyBam{PbbamTestsConfig::Data_Dir + "/polymerase/internal.polymerase.bam"};
+    EntireFileQuery polyQuery{polyBam};
     auto begin = polyQuery.begin();
     auto end = polyQuery.end();
 
@@ -168,9 +170,9 @@ TEST(WhitelistedZmwReadStitching, MultiValue)
 TEST(WhitelistedZmwReadStitching, MultiValue_MixedKnownAndUnknown)
 {
     const std::vector<int32_t> whitelist{42, 200000, 24};
-    WhitelistedZmwReadStitcher stitcher(
+    WhitelistedZmwReadStitcher stitcher{
         whitelist, PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
-        PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam");
+        PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam"};
 
     // everything below should behave exactly as 'SingleValueOk' test,
     // as the unknown ZMWs will have been removed during construction
@@ -181,8 +183,8 @@ TEST(WhitelistedZmwReadStitching, MultiValue_MixedKnownAndUnknown)
     EXPECT_FALSE(stitcher.HasNext());
 
     // fetch original polymerase read (2nd record)
-    BamFile polyBam(PbbamTestsConfig::Data_Dir + "/polymerase/internal.polymerase.bam");
-    EntireFileQuery polyQuery(polyBam);
+    const BamFile polyBam{PbbamTestsConfig::Data_Dir + "/polymerase/internal.polymerase.bam"};
+    EntireFileQuery polyQuery{polyBam};
     auto begin = polyQuery.begin();
     auto end = polyQuery.end();
     EXPECT_TRUE(begin != end);
@@ -197,24 +199,23 @@ TEST(WhitelistedZmwReadStitching, MultiValue_MixedKnownAndUnknown)
 
 TEST(WhitelistedZmwReadStitching, EmptyScrapsFileOk)
 {
-    const std::vector<int32_t> whitelist = {10944689, 10944690};
+    const std::vector<int32_t> whitelist{10944689, 10944690};
     const std::string primaryBamFn =
         PbbamTestsConfig::Data_Dir + "/polymerase/scrapless.subreads.bam";
     const std::string scrapsBamFn = PbbamTestsConfig::Data_Dir + "/polymerase/scrapless.scraps.bam";
 
     int count = 0;
-    WhitelistedZmwReadStitcher stitcher(whitelist, primaryBamFn, scrapsBamFn);
+    WhitelistedZmwReadStitcher stitcher{whitelist, primaryBamFn, scrapsBamFn};
     while (stitcher.HasNext()) {
-        auto record = stitcher.Next();
-        //        ()record;
+        std::ignore = stitcher.Next();
         ++count;
     }
     EXPECT_EQ(2, count);
 
-    const BamFile primaryBam(primaryBamFn);
-    const BamFile scrapsBam(scrapsBamFn);
-    const PbiRawData primaryIdx(primaryBam.PacBioIndexFilename());
-    const PbiRawData scrapsIdx(scrapsBam.PacBioIndexFilename());
+    const BamFile primaryBam{primaryBamFn};
+    const BamFile scrapsBam{scrapsBamFn};
+    const PbiRawData primaryIdx{primaryBam.PacBioIndexFilename()};
+    const PbiRawData scrapsIdx{scrapsBam.PacBioIndexFilename()};
     EXPECT_EQ(3, primaryIdx.NumReads());
     EXPECT_EQ(0, scrapsIdx.NumReads());
 }

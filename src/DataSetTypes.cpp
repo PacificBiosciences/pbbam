@@ -11,9 +11,9 @@
 #include <cstddef>
 
 #include <set>
+#include <tuple>
 #include <unordered_map>
 
-#include "pbbam/Unused.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 
 #include "DataSetIO.h"
@@ -43,6 +43,7 @@ const std::unordered_map<std::string, PacBio::BAM::XmlElementType> elementTypeLo
     {"Filter",                 ElementType::FILTER},
     {"Filters",                ElementType::FILTERS},
     {"ParentTool",             ElementType::PARENT_TOOL},
+    {"PPAConfig",              ElementType::PPACONFIG},
     {"Property",               ElementType::PROPERTY},
     {"Properties",             ElementType::PROPERTIES},
     {"Provenance",             ElementType::PROVENANCE},
@@ -433,7 +434,7 @@ const PacBio::BAM::CollectionMetadata& DataSetMetadata::CollectionMetadata() con
 PacBio::BAM::CollectionMetadata& DataSetMetadata::CollectionMetadata()
 {
     PacBio::BAM::Collections& collections = Child<PacBio::BAM::Collections>("Collections");
-    assert(collections.Size() >= 1);
+    if (collections.Size() == 0) collections.AddChild(PacBio::BAM::CollectionMetadata{});
     PacBio::BAM::CollectionMetadata& cm = collections.Child<PacBio::BAM::CollectionMetadata>(0);
     return cm;
 }
@@ -653,7 +654,7 @@ ExternalResource::ExternalResource(const std::string& metatype, const std::strin
                                    const internal::FromInputXml& fromInputXml)
     : IndexedDataType("", filename, "ExternalResource", fromInputXml, XsdType::BASE_DATA_MODEL)
 {
-    UNUSED(metatype);
+    std::ignore = metatype;
 }
 
 DEFINE_ACCESSORS(ExternalResource, ExternalResources, ExternalResources)
@@ -775,7 +776,7 @@ FileIndex::FileIndex(const std::string& metatype, const std::string& filename,
                      const internal::FromInputXml& fromInputXml)
     : InputOutputDataType("", filename, "FileIndex", fromInputXml, XsdType::BASE_DATA_MODEL)
 {
-    UNUSED(metatype);
+    std::ignore = metatype;
 }
 
 // -------------------

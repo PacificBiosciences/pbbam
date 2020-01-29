@@ -123,7 +123,14 @@ const ChemistryTable& BuiltInChemistryTable()
         // Sequel® II Binding Kit 2.1; Sequel® II Sequencing Plate 2.0 (4 Rxn)
         {{"101-820-500", "101-826-100", "5.0", "S/P4.1-C2/5.0-8M", "TAGT-420"}},
         // Sequel® II Binding Kit 2.1; Sequel® II Sequencing Plate 2.0 (4 Rxn) - QC
-        {{"101-820-500", "101-820-300", "5.0", "S/P4.1-C2/5.0-8M", "TAGT-420"}}
+        {{"101-820-500", "101-820-300", "5.0", "S/P4.1-C2/5.0-8M", "TAGT-420"}},
+
+        // Sequel® II Binding Kit 2.2; Sequel® II Sequencing Plate 2.0 (4 rxn)
+        {{"101-894-200", "101-826-100", "5.0", "S/P5-C2/5.0-8M", "TAGT-905"}},
+        // Sequel® II Binding Kit 2.2; Sequel® II Sequencing Plate 2.0EA (4 rxn)
+        {{"101-894-200", "101-789-300", "5.0", "S/P5-C2/5.0-8M", "TAGT-905"}},
+        // Sequel® II Binding Kit 2.2; Sequel® II Sequencing Plate 2.0 (4 rxn) - QC
+        {{"101-894-200", "101-820-300", "5.0", "S/P5-C2/5.0-8M", "TAGT-905"}},
     };
     // clang-format on
 

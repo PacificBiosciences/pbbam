@@ -97,7 +97,7 @@ TEST(BamRecordBuilderTest, DefaultValues)
     EXPECT_FALSE(bam.Impl().IsSecondMate());
     EXPECT_FALSE(bam.Impl().IsSupplementaryAlignment());
 
-    const std::string emptyString = "";
+    const std::string emptyString;
     EXPECT_EQ(emptyString, bam.Impl().Name());
     EXPECT_EQ(emptyString, bam.Impl().CigarData().ToStdString());
     EXPECT_EQ(emptyString, bam.Impl().Sequence());

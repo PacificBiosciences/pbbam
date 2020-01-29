@@ -12,7 +12,7 @@ using namespace PacBio::BAM;
 
 namespace VersionTests {
 
-static inline Version MakeVersion(int x, int y, int z) { return Version(x, y, z); }
+Version MakeVersion(int x, int y, int z) { return Version{x, y, z}; }
 
 }  // namespace VersionTests
 
@@ -27,18 +27,18 @@ TEST(VersionTest, DefaultOk)
 TEST(VersionTest, CopyAndMoveOk)
 {
     {  // copy ctor
-        Version v1(3, 1, 1);
+        Version v1{3, 1, 1};
         EXPECT_EQ(3, v1.Major());
         EXPECT_EQ(1, v1.Minor());
         EXPECT_EQ(1, v1.Revision());
 
-        Version v2(v1);
+        Version v2{v1};
         EXPECT_EQ(3, v2.Major());
         EXPECT_EQ(1, v2.Minor());
         EXPECT_EQ(1, v2.Revision());
     }
     {  // copy assign
-        Version v1(3, 1, 1);
+        Version v1{3, 1, 1};
         EXPECT_EQ(3, v1.Major());
         EXPECT_EQ(1, v1.Minor());
         EXPECT_EQ(1, v1.Revision());
@@ -50,13 +50,13 @@ TEST(VersionTest, CopyAndMoveOk)
         EXPECT_EQ(1, v2.Revision());
     }
     {  // move ctor
-        Version v(VersionTests::MakeVersion(3, 1, 1));
+        Version v{VersionTests::MakeVersion(3, 1, 1)};
         EXPECT_EQ(3, v.Major());
         EXPECT_EQ(1, v.Minor());
         EXPECT_EQ(1, v.Revision());
     }
     {  // move assign
-        Version v1(3, 1, 1);
+        Version v1{3, 1, 1};
         EXPECT_EQ(3, v1.Major());
         EXPECT_EQ(1, v1.Minor());
         EXPECT_EQ(1, v1.Revision());
@@ -72,7 +72,7 @@ TEST(VersionTest, CopyAndMoveOk)
 TEST(VersionTest, FromIntsOk)
 {
     {  // normal
-        Version v(3, 1, 1);
+        Version v{3, 1, 1};
         EXPECT_EQ(3, v.Major());
         EXPECT_EQ(1, v.Minor());
         EXPECT_EQ(1, v.Revision());
@@ -85,7 +85,7 @@ TEST(VersionTest, FromIntsOk)
 TEST(VersionTest, FromStringOk)
 {
     {  // normal
-        Version v("3.1.1");
+        Version v{"3.1.1"};
         EXPECT_EQ(3, v.Major());
         EXPECT_EQ(1, v.Minor());
         EXPECT_EQ(1, v.Revision());
@@ -103,7 +103,7 @@ TEST(VersionTest, FromStringOk)
 
 TEST(VersionTest, SettersOk)
 {
-    Version v(3, 1, 1);
+    Version v{3, 1, 1};
 
     v.Major(4);
 
@@ -124,9 +124,9 @@ TEST(VersionTest, SettersOk)
     EXPECT_EQ(23, v.Revision());
 
     {  // invalid
-        Version v1(3, 1, 1);
-        Version v2(3, 1, 1);
-        Version v3(3, 1, 1);
+        Version v1{3, 1, 1};
+        Version v2{3, 1, 1};
+        Version v3{3, 1, 1};
         EXPECT_THROW(v1.Major(-1), std::runtime_error);
         EXPECT_THROW(v2.Minor(-1), std::runtime_error);
         EXPECT_THROW(v3.Revision(-1), std::runtime_error);
@@ -135,15 +135,15 @@ TEST(VersionTest, SettersOk)
 
 TEST(VersionTest, ComparisonsOk)
 {
-    const Version v0_0_0 = Version(0, 0, 0);
-    const Version v0_0_4 = Version(0, 0, 4);
-    const Version v0_1_0 = Version(0, 1, 0);
-    const Version v0_1_4 = Version(0, 1, 4);
-    const Version v3_0_0 = Version(3, 0, 0);
-    const Version v3_0_4 = Version(3, 0, 4);
-    const Version v3_1_0 = Version(3, 1, 0);
-    const Version v3_1_4 = Version(3, 1, 4);
-    const Version v3_1_5 = Version(3, 1, 5);
+    const Version v0_0_0{0, 0, 0};
+    const Version v0_0_4{0, 0, 4};
+    const Version v0_1_0{0, 1, 0};
+    const Version v0_1_4{0, 1, 4};
+    const Version v3_0_0{3, 0, 0};
+    const Version v3_0_4{3, 0, 4};
+    const Version v3_1_0{3, 1, 0};
+    const Version v3_1_4{3, 1, 4};
+    const Version v3_1_5{3, 1, 5};
 
     // operator==
     EXPECT_TRUE(v0_0_0 == v0_0_0);
@@ -263,32 +263,32 @@ TEST(VersionTest, ComparisonsOk)
 TEST(VersionTest, ToStringOk)
 {
     {
-        Version v(0, 0, 0);
-        EXPECT_EQ(std::string("0.0.0"), v.ToString());
+        const Version v{0, 0, 0};
+        EXPECT_EQ("0.0.0", v.ToString());
     }
     {
-        Version v(3, 1, 4);
-        EXPECT_EQ(std::string("3.1.4"), v.ToString());
+        const Version v{3, 1, 4};
+        EXPECT_EQ("3.1.4", v.ToString());
     }
     {
         Version v;
         v.Major(4);
-        EXPECT_EQ(std::string("4.0.0"), v.ToString());
+        EXPECT_EQ("4.0.0", v.ToString());
     }
     {
-        const std::string s = "1.2.3";
-        Version v(s);
+        const std::string s{"1.2.3"};
+        const Version v{s};
         EXPECT_EQ(s, v.ToString());
     }
 }
 
 TEST(VersionTest, OutputStreamOk)
 {
-    Version v(3, 1, 4);
-    Version v2(4, 10, 0);
+    const Version v{3, 1, 4};
+    const Version v2{4, 10, 0};
 
     std::ostringstream s;
-    s << v << ", " << v2 << ", " << v << std::endl;
+    s << v << ", " << v2 << ", " << v << '\n';
 
-    EXPECT_EQ(std::string("3.1.4, 4.10.0, 3.1.4\n"), s.str());
+    EXPECT_EQ("3.1.4, 4.10.0, 3.1.4\n", s.str());
 }

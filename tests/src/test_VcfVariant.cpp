@@ -8,7 +8,7 @@ using VcfVariant = PacBio::VCF::VcfVariant;
 
 namespace VcfVariantTests {
 
-static const std::string BasicVariantText{
+const std::string BasicVariantText{
     "chrXVI\t660831\tpbsv.INS.21\tC\tCAAAGGAATGGTAAAGATGGGGGGTCAACGGACAAGGGAAAGGATCCATGGGGGCA\t."
     "\tPASS"
     "\tIMPRECISE;SVTYPE=INS;END=660831;SVLEN=55;MULTI=1,2,3\tGT:AD:DP:AC\t0/1:2:5:1,2"};

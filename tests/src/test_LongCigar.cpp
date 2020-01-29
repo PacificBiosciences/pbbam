@@ -6,13 +6,13 @@
 
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
 #include <pbbam/BamReader.h>
 #include <pbbam/BamWriter.h>
 #include <pbbam/StringUtilities.h>
 
 #include "../../src/MemoryUtils.h"
+
+#include "PbbamTestData.h"
 
 using BamReader = PacBio::BAM::BamReader;
 using BamRecord = PacBio::BAM::BamRecord;
@@ -26,7 +26,7 @@ using Tag = PacBio::BAM::Tag;
 
 namespace LongCigarTests {
 
-static bool DoesHtslibSupportLongCigar()
+bool DoesHtslibSupportLongCigar()
 {
     const std::string htsVersion = hts_version();
 
@@ -49,17 +49,17 @@ static bool DoesHtslibSupportLongCigar()
            std::tie(v17_major, v17_minor);
 }
 
-static const bool has_native_long_cigar_support = DoesHtslibSupportLongCigar();
+const bool has_native_long_cigar_support = DoesHtslibSupportLongCigar();
 
 // BAM record in this file has its CIGAR data in the new "CG" tag
-static const std::string LongCigarBam = PacBio::BAM::PbbamTestsConfig::Data_Dir + "/long-cigar-1.7.bam";
+const std::string LongCigarBam = PacBio::BAM::PbbamTestsConfig::Data_Dir + "/long-cigar-1.7.bam";
 
-static const std::string LongCigarOut =
+const std::string LongCigarOut =
     PacBio::BAM::PbbamTestsConfig::GeneratedData_Dir + "/long-cigar-generated.bam";
 
-static const size_t numOps = 72091;
+const size_t numOps = 72091;
 
-static BamRecord ReadLongCigarRecord(const std::string& fn)
+BamRecord ReadLongCigarRecord(const std::string& fn)
 {
     BamRecord b;
     BamReader reader{fn};
@@ -75,10 +75,11 @@ TEST(LongCigarTest, ReadAndFetchLongCigar)
     const auto b = LongCigarTests::ReadLongCigarRecord(LongCigarTests::LongCigarBam);
 
     EXPECT_EQ(LongCigarTests::numOps, b.CigarData().size());
-    if (LongCigarTests::has_native_long_cigar_support)
+    if (LongCigarTests::has_native_long_cigar_support) {
         EXPECT_FALSE(b.Impl().HasTag("CG"));
-    else
+    } else {
         EXPECT_TRUE(b.Impl().HasTag("CG"));
+    }
 }
 
 TEST(LongCigarTest, EditLongCigar)
@@ -87,38 +88,39 @@ TEST(LongCigarTest, EditLongCigar)
     b.Impl().CigarData(b.CigarData());
 
     EXPECT_EQ(LongCigarTests::numOps, b.CigarData().size());
-    if (LongCigarTests::has_native_long_cigar_support)
+    if (LongCigarTests::has_native_long_cigar_support) {
         EXPECT_FALSE(b.Impl().HasTag("CG"));
-    else
+    } else {
         EXPECT_TRUE(b.Impl().HasTag("CG"));
+    }
 }
 
 TEST(LongCigarTest, WriteLongCigar)
 {
-    SCOPED_TRACE("WriteLongCigar");
-
     {   // edit & write
         auto b = LongCigarTests::ReadLongCigarRecord(LongCigarTests::LongCigarBam);
         b.Impl().CigarData(b.CigarData());
 
         EXPECT_EQ(LongCigarTests::numOps, b.CigarData().size());
-        if (LongCigarTests::has_native_long_cigar_support)
+        if (LongCigarTests::has_native_long_cigar_support) {
             EXPECT_FALSE(b.Impl().HasTag("CG"));
-        else
+        } else {
             EXPECT_TRUE(b.Impl().HasTag("CG"));
+        }
 
         BamWriter writer{LongCigarTests::LongCigarOut, b.header_};
         writer.Write(b);
     }
 
     {   // read back in
-        auto b = LongCigarTests::ReadLongCigarRecord(LongCigarTests::LongCigarOut);
+        const auto b = LongCigarTests::ReadLongCigarRecord(LongCigarTests::LongCigarOut);
 
         EXPECT_EQ(LongCigarTests::numOps, b.CigarData().size());
-        if (LongCigarTests::has_native_long_cigar_support)
+        if (LongCigarTests::has_native_long_cigar_support) {
             EXPECT_FALSE(b.Impl().HasTag("CG"));
-        else
+        } else {
             EXPECT_TRUE(b.Impl().HasTag("CG"));
+        }
     }
 }
 

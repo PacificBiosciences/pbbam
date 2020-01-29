@@ -1,10 +1,9 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
 #include <cstddef>
 #include <cstdint>
 
-#include "PbbamTestData.h"
+#include <gtest/gtest.h>
 
 #include <pbbam/BamFileMerger.h>
 #include <pbbam/EntireFileQuery.h>
@@ -13,6 +12,7 @@
 #include <pbbam/FastqWriter.h>
 
 #include "FastxTests.h"
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -26,6 +26,39 @@ void CheckFastqSequence(const size_t index, const FastqSequence& seq)
     EXPECT_EQ(expected.Name(), seq.Name());
     EXPECT_EQ(expected.Bases(), seq.Bases());
     EXPECT_EQ(expected.Qualities().Fastq(), seq.Qualities().Fastq());
+}
+
+void CheckManualIteration(const std::string& fn)
+{
+    size_t count = 0;
+    FastqSequence seq;
+    FastqReader reader{fn};
+    while (reader.GetNext(seq)) {
+        CheckFastqSequence(count, seq);
+        ++count;
+    }
+    EXPECT_EQ(FastxTests::ExpectedFastq.size(), count);
+}
+
+void CheckRangeFor(const std::string& fn)
+{
+    size_t count = 0;
+    FastqReader reader{fn};
+    for (const auto& seq : reader) {
+        CheckFastqSequence(count, seq);
+        ++count;
+    }
+    EXPECT_EQ(FastxTests::ExpectedFastq.size(), count);
+}
+
+void CheckReadAll(const std::string& fn)
+{
+    size_t count = 0;
+    for (const auto& seq : FastqReader::ReadAll(fn)) {
+        CheckFastqSequence(count, seq);
+        ++count;
+    }
+    EXPECT_EQ(FastxTests::ExpectedFastq.size(), count);
 }
 
 }  // namespace FastqReaderTests
@@ -60,133 +93,57 @@ TEST(FastqReaderTest, can_open_bgzf_fastq)
 
 TEST(FastqReaderTest, can_iterate_manually_on_text_fastq)
 {
-    const auto& fn = FastxTests::simpleFastqFn;
-    FastqReader reader{fn};
-
-    size_t count = 0;
-    FastqSequence seq;
-    while (reader.GetNext(seq)) {
-        FastqReaderTests::CheckFastqSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFastq.size(), count);
+    FastqReaderTests::CheckManualIteration(FastxTests::simpleFastqFn);
 }
 
 TEST(FastqReaderTest, can_iterate_manually_on_gzip_fastq)
 {
-    const auto& fn = FastxTests::simpleFastqGzipFn;
-    FastqReader reader{fn};
-
-    size_t count = 0;
-    FastqSequence seq;
-    while (reader.GetNext(seq)) {
-        FastqReaderTests::CheckFastqSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFastq.size(), count);
+    FastqReaderTests::CheckManualIteration(FastxTests::simpleFastqGzipFn);
 }
 
 TEST(FastqReaderTest, can_iterate_manually_on_bgzf_fastq)
 {
-    const auto& fn = FastxTests::simpleFastqBgzfFn;
-    FastqReader reader{fn};
-
-    size_t count = 0;
-    FastqSequence seq;
-    while (reader.GetNext(seq)) {
-        FastqReaderTests::CheckFastqSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFastq.size(), count);
+    FastqReaderTests::CheckManualIteration(FastxTests::simpleFastqBgzfFn);
 }
 
 TEST(FastqReaderTest, can_iterate_using_range_for_on_text_fastq)
 {
-    const auto& fn = FastxTests::simpleFastqFn;
-
-    size_t count = 0;
-    FastqReader reader{fn};
-    for (const auto& seq : reader) {
-        FastqReaderTests::CheckFastqSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFastq.size(), count);
+    FastqReaderTests::CheckRangeFor(FastxTests::simpleFastqFn);
 }
 
 TEST(FastqReaderTest, can_iterate_using_range_for_on_gzip_fastq)
 {
-    const auto& fn = FastxTests::simpleFastqGzipFn;
-
-    size_t count = 0;
-    FastqReader reader{fn};
-    for (const auto& seq : reader) {
-        FastqReaderTests::CheckFastqSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFastq.size(), count);
+    FastqReaderTests::CheckRangeFor(FastxTests::simpleFastqGzipFn);
 }
 
 TEST(FastqReaderTest, can_iterate_using_range_for_on_bgzf_fastq)
 {
-    const auto& fn = FastxTests::simpleFastqBgzfFn;
-
-    size_t count = 0;
-    FastqReader reader{fn};
-    for (const auto& seq : reader) {
-        FastqReaderTests::CheckFastqSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFastq.size(), count);
+    FastqReaderTests::CheckRangeFor(FastxTests::simpleFastqBgzfFn);
 }
 
 TEST(FastqReaderTest, can_read_all_from_text_fastq)
 {
-    const auto& fn = FastxTests::simpleFastqFn;
-
-    size_t count = 0;
-    for (const auto& seq : FastqReader::ReadAll(fn)) {
-        FastqReaderTests::CheckFastqSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFastq.size(), count);
+    FastqReaderTests::CheckReadAll(FastxTests::simpleFastqFn);
 }
 
 TEST(FastqReaderTest, can_read_all_from_gzip_fastq)
 {
-    const auto& fn = FastxTests::simpleFastqGzipFn;
-
-    size_t count = 0;
-    for (const auto& seq : FastqReader::ReadAll(fn)) {
-        FastqReaderTests::CheckFastqSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFastq.size(), count);
+    FastqReaderTests::CheckReadAll(FastxTests::simpleFastqGzipFn);
 }
 
 TEST(FastqReaderTest, can_read_all_from_bgzf_fastq)
 {
-    const auto& fn = FastxTests::simpleFastqBgzfFn;
-
-    size_t count = 0;
-    for (const auto& seq : FastqReader::ReadAll(fn)) {
-        FastqReaderTests::CheckFastqSequence(count, seq);
-        ++count;
-    }
-    EXPECT_EQ(FastxTests::ExpectedFastq.size(), count);
+    FastqReaderTests::CheckReadAll(FastxTests::simpleFastqBgzfFn);
 }
 
 TEST(FastqReaderTest, can_handle_windows_style_newlines)
 {
-    const std::string fn = FastxTests::fastxDataDir + "/windows_formatted.fastq";
-
-    {
-        FastqReader reader{fn};
-        FastqSequence seq;
-        reader.GetNext(seq);  // 1 sequence in total
-        EXPECT_EQ("C5", seq.Name());
-        EXPECT_EQ("AAGCA", seq.Bases());
-        EXPECT_EQ("~~~~~", seq.Qualities().Fastq());
-    }
+    FastqReader reader{FastxTests::fastxDataDir + "/windows_formatted.fastq"};
+    FastqSequence seq;
+    reader.GetNext(seq);  // 1 sequence in total
+    EXPECT_EQ("C5", seq.Name());
+    EXPECT_EQ("AAGCA", seq.Bases());
+    EXPECT_EQ("~~~~~", seq.Qualities().Fastq());
 }
 
 TEST(FastqMerging, can_merge_bams_to_fastq_output)
@@ -224,7 +181,6 @@ TEST(FastqMerging, can_merge_bams_to_fastq_output)
 
     const auto seqs = FastqReader::ReadAll(outFastq);
     ASSERT_EQ(mergedFastqNames.size(), seqs.size());
-
     for (size_t i = 0; i < seqs.size(); ++i)
         EXPECT_EQ(mergedFastqNames[i], seqs[i].Name());
 

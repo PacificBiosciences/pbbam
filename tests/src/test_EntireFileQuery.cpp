@@ -1,14 +1,14 @@
 // Author: Derek Barnett
 
+#include <iterator>
 #include <string>
 
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
 #include <pbbam/BamWriter.h>
 #include <pbbam/EntireFileQuery.h>
-#include <pbbam/Unused.h>
+
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -21,43 +21,19 @@ const std::string inputBamFn = PbbamTestsConfig::Data_Dir + "/aligned.bam";
 
 TEST(EntireFileQueryTest, CountRecords)
 {
-    EXPECT_NO_THROW({
-        BamFile bamFile(EntireFileQueryTests::inputBamFn);
-        int count = 0;
-        EntireFileQuery entireFile(bamFile);
-        for (const BamRecord& record : entireFile) {
-            UNUSED(record);
-            ++count;
-        }
-
-        EXPECT_EQ(4, count);
-    });
-}
-
-TEST(EntireFileQueryTest, NonConstBamRecord)
-{
-    EXPECT_NO_THROW({
-        BamFile bamFile(EntireFileQueryTests::inputBamFn);
-        int count = 0;
-        EntireFileQuery entireFile(bamFile);
-        for (BamRecord& record : entireFile) {
-            UNUSED(record);
-            ++count;
-        }
-
-        EXPECT_EQ(4, count);
-    });
+    const BamFile bamFile{EntireFileQueryTests::inputBamFn};
+    EntireFileQuery entireFile{bamFile};
+    EXPECT_EQ(4, std::distance(entireFile.begin(), entireFile.end()));
 }
 
 TEST(BamRecordTest, HandlesDeletionOK)
 {
     // this file raised no error in Debug mode, but segfaulted when
     // trying to access the aligned qualities in Release mode
+    const BamFile bamFile{PbbamTestsConfig::Data_Dir + "/segfault.bam"};
 
-    const std::string problemBamFn = PbbamTestsConfig::Data_Dir + "/segfault.bam";
-    BamFile bamFile(problemBamFn);
     int count = 0;
-    EntireFileQuery entireFile(bamFile);
+    EntireFileQuery entireFile{bamFile};
     for (const BamRecord& record : entireFile) {
 
         const auto rawQualities = record.Qualities(Orientation::GENOMIC, false);
@@ -85,9 +61,8 @@ TEST(BamRecordTest, HandlesDeletionOK)
 TEST(BamRecordTest, ReferenceName)
 {
     {  // check reference name of first record
-        const std::string exampleBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
-        BamFile bamFile(exampleBam);
-        EntireFileQuery records(bamFile);
+        const BamFile bamFile{PbbamTestsConfig::Data_Dir + "/aligned.bam"};
+        EntireFileQuery records{bamFile};
         auto firstIter = records.begin();
         auto& firstRecord = *firstIter;
         ASSERT_TRUE(firstRecord.IsMapped());
@@ -95,9 +70,8 @@ TEST(BamRecordTest, ReferenceName)
     }
 
     {  // unmapped records have no reference name, should throw
-        const std::string exampleBam = PbbamTestsConfig::Data_Dir + "/unmap1.bam";
-        BamFile bamFile(exampleBam);
-        EntireFileQuery records(bamFile);
+        const BamFile bamFile{PbbamTestsConfig::Data_Dir + "/unmap1.bam"};
+        EntireFileQuery records{bamFile};
         auto firstIter = records.begin();
         auto& firstRecord = *firstIter;
         ASSERT_FALSE(firstRecord.IsMapped());

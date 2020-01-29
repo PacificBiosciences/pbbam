@@ -99,7 +99,6 @@ struct SortUniqueTestFilter
 {
     bool Accepts(const PbiRawData& /* idx */, const size_t row) const
     {
-//        ()idx;
         switch(row) {
             case 0: // fall through
             case 1: // .
@@ -118,7 +117,6 @@ struct SortUniqueTestFilter2
 {
     bool Accepts(const PbiRawData& /* idx */, const size_t row) const
     {
-//        ()idx;
         switch(row) {
             case 3: // fall through
             case 7: // .
@@ -141,13 +139,13 @@ PbiFilter simpleFilter()
 
 TEST(PbiFilterTest, DefaultCtorOk)
 {
-    auto filter = PbiFilter{ };
+    const PbiFilter filter;
     PbiFilterTests::checkFilterInternals(filter, PbiFilter::INTERSECT, 0, std::vector<size_t>{0,1,2,3});
 }
 
 TEST(PbiFilterTest, CompositionOk)
 {
-    auto filter = PbiFilter{ };
+    PbiFilter filter;
     filter.Add(PbiFilter{ });
     PbiFilterTests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, std::vector<size_t>{0,1,2,3});
 }
@@ -155,11 +153,11 @@ TEST(PbiFilterTest, CompositionOk)
 TEST(PbiFilterTest, CustomFilterOk)
 {
     { // ctor
-        auto filter = PbiFilter{ PbiFilterTests::SimpleFilter{ } };
+        PbiFilter filter{ PbiFilterTests::SimpleFilter{ } };
         PbiFilterTests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, std::vector<size_t>{0,1,2,3});
     }
     { // Add
-        auto filter = PbiFilter{ };
+        PbiFilter filter;
         filter.Add(PbiFilterTests::SimpleFilter{ });
         PbiFilterTests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, std::vector<size_t>{0,1,2,3});
     }
@@ -171,9 +169,9 @@ TEST(PbiFilterTest, CustomFilterOk)
 TEST(PbiFilterTest, CopyOk)
 {
     { // empty
-        const auto original = PbiFilter{ };
+        const PbiFilter original;
 
-        PbiFilter copyCtor(original);
+        const PbiFilter copyCtor{original};
         PbiFilter copyAssign;
         copyAssign = original;
 
@@ -182,9 +180,9 @@ TEST(PbiFilterTest, CopyOk)
         PbiFilterTests::checkFilterInternals(copyAssign, PbiFilter::INTERSECT, 0, std::vector<size_t>{0,1,2,3});
     }
     { // with children
-        const auto original = PbiFilter{ PbiFilterTests::SimpleFilter{ } };
+        const PbiFilter original{ PbiFilterTests::SimpleFilter{ } };
 
-        PbiFilter copyCtor(original);
+        PbiFilter copyCtor{original};
         PbiFilter copyAssign;
         copyAssign = original;
 
@@ -197,7 +195,7 @@ TEST(PbiFilterTest, CopyOk)
 TEST(PbiFilterTest, MoveOk)
 {
     { // empty
-        const auto original = PbiFilterTests::emptyFilter();
+        const PbiFilter original;
 
         PbiFilter moveCtor(PbiFilterTests::emptyFilter());
         PbiFilter moveAssign;

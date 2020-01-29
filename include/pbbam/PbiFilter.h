@@ -20,7 +20,6 @@
 #include "pbbam/DataSet.h"
 #include "pbbam/PbiBasicTypes.h"
 #include "pbbam/PbiRawData.h"
-#include "pbbam/Unused.h"
 
 namespace PacBio {
 namespace BAM {
@@ -43,8 +42,7 @@ struct PbiFilterConcept
         //    bool Accepts(const PbiRawData& index, const size_t row) const;
         //
         PbiRawData index;
-        auto result = filter.Accepts(index, 0);
-        UNUSED(result);
+        std::ignore = filter.Accepts(index, 0);
     }
 
 private:
