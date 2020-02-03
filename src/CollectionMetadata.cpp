@@ -69,14 +69,8 @@ Automation::Automation(const internal::FromInputXml& fromInputXml)
 {
 }
 
-const PacBio::BAM::AutomationParameters& Automation::AutomationParameters() const
-{
-    return Child<PacBio::BAM::AutomationParameters>("AutomationParameters");
-}
-PacBio::BAM::AutomationParameters& Automation::AutomationParameters()
-{
-    return Child<PacBio::BAM::AutomationParameters>("AutomationParameters");
-}
+DEFINE_ACCESSORS(Automation, AutomationParameters, AutomationParameters)
+
 Automation& Automation::AutomationParameters(PacBio::BAM::AutomationParameters params)
 {
     AutomationParameters() = params;
@@ -690,6 +684,16 @@ CollectionMetadata::CollectionMetadata(std::string subreadSetName,
 
 const std::string& CollectionMetadata::SubreadSetName() const { return subreadSetName_; }
 
+DEFINE_ACCESSORS(CollectionMetadata, Automation, Automation)
+
+CollectionMetadata& CollectionMetadata::Automation(PacBio::BAM::Automation automation)
+{
+    Automation() = automation;
+    return *this;
+}
+
+bool CollectionMetadata::HasAutomation() const { return HasChild(Element::Automation); }
+
 const PacBio::BAM::AutomationParameters& CollectionMetadata::AutomationParameters() const
 {
     const PacBio::BAM::Automation& automation = Automation();
@@ -764,16 +768,6 @@ CollectionMetadata& CollectionMetadata::TemplatePrepKit(PacBio::BAM::TemplatePre
 }
 
 bool CollectionMetadata::HasTemplatePrepKit() const { return HasChild("TemplatePrepKit"); }
-
-DEFINE_ACCESSORS(CollectionMetadata, Automation, Automation)
-
-CollectionMetadata& CollectionMetadata::Automation(PacBio::BAM::Automation automation)
-{
-    Automation() = automation;
-    return *this;
-}
-
-bool CollectionMetadata::HasAutomation() const { return HasChild(Element::Automation); }
 
 }  // namespace BAM
 }  // namespace PacBio

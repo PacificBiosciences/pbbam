@@ -294,3 +294,19 @@ TEST(RunMetadataTest, can_attach_edited_metadata_to_subreadset)
 
     EXPECT_TRUE(output.find(jsonText) != std::string::npos);
 }
+
+TEST(RunMetadataTest, can_load_collection_metadata_fields_from_subreadset_xml)
+{
+    const std::string fn =
+        PacBio::BAM::PbbamTestsConfig::Data_Dir + "/run_metadata/barcodes.subreadset.xml";
+
+    const PacBio::BAM::DataSet ds(fn);
+    const PacBio::BAM::CollectionMetadata& cmd = ds.Metadata().CollectionMetadata();
+
+    ASSERT_TRUE(cmd.HasAutomation());
+    const PacBio::BAM::Automation& automation = cmd.Automation();
+
+    ASSERT_TRUE(automation.HasAutomationParameters());
+    ASSERT_TRUE(automation.AutomationParameters().HasSNRCut());
+    ASSERT_EQ(1.5, automation.AutomationParameters().SNRCut());
+}

@@ -138,7 +138,7 @@ public:
 
     const PacBio::BAM::AutomationParameters& AutomationParameters() const;
     PacBio::BAM::AutomationParameters& AutomationParameters();
-    Automation& AutomationParameters(PacBio::BAM::AutomationParameters params);
+    BAM::Automation& AutomationParameters(PacBio::BAM::AutomationParameters params);
     bool HasAutomationParameters() const;
 };
 
@@ -249,6 +249,11 @@ public:
 
     const std::string& SubreadSetName() const;
 
+    const PacBio::BAM::Automation& Automation() const;
+    PacBio::BAM::Automation& Automation();
+    CollectionMetadata& Automation(PacBio::BAM::Automation automation);
+    bool HasAutomation() const;
+
     const PacBio::BAM::AutomationParameters& AutomationParameters() const;
     PacBio::BAM::AutomationParameters& AutomationParameters();
     CollectionMetadata& AutomationParameters(PacBio::BAM::AutomationParameters params);
@@ -281,12 +286,6 @@ public:
 
 private:
     std::string subreadSetName_;
-
-    // helper pass-through for AutomationParameter(s)
-    const PacBio::BAM::Automation& Automation() const;
-    PacBio::BAM::Automation& Automation();
-    CollectionMetadata& Automation(PacBio::BAM::Automation automation);
-    bool HasAutomation() const;
 };
 
 class Collections : public internal::DataSetElement
