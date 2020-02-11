@@ -127,6 +127,7 @@ static const auto elementRegistry = std::unordered_map<std::string, XsdType>
     { "Name",                 XsdType::COLLECTION_METADATA },
     { "OutputOptions",        XsdType::COLLECTION_METADATA },
     { "PlateId",              XsdType::COLLECTION_METADATA },
+    { "PPAConfig",            XsdType::COLLECTION_METADATA },
     { "Primary",              XsdType::COLLECTION_METADATA },
     { "Readout",              XsdType::COLLECTION_METADATA },
     { "ResultsFolder",        XsdType::COLLECTION_METADATA },
