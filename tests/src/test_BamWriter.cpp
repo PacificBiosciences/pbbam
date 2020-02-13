@@ -21,23 +21,22 @@ namespace BamWriterTests {
 
 void checkSingleRecord(bool useTempFile)
 {
-    const std::string fullName = "test/100/0_5";
-    const std::string rgId = "6002b307";
-    const std::vector<float> expectedSnr = {0.2, 0.2, 0.2, 0.2};
+    const std::string fullName{"test/100/0_5"};
+    const std::string rgId{"6002b307"};
+    const std::vector<float> expectedSnr{0.2, 0.2, 0.2, 0.2};
 
     // setup header
-    const std::string hdrText = {
+    const BamHeader inputHeader{
         "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
         "@RG\tID:6002b307\tPL:PACBIO\tDS:READTYPE=SUBREAD;BINDINGKIT=100-619-300;"
         "SEQUENCINGKIT=100-619-400;BASECALLERVERSION=3.0;FRAMERATEHZ=100\t"
         "PU:test\tPM:SEQUEL\n"};
-    BamHeader inputHeader(hdrText);
 
     // setup record
-    BamRecord bamRecord(inputHeader);
+    BamRecord bamRecord{inputHeader};
     bamRecord.Impl().Name(fullName);
     bamRecord.Impl().SetSequenceAndQualities("ACGTC", 5);
-    bamRecord.Impl().CigarData("");
+    bamRecord.Impl().CigarData(Data::Cigar{});
     bamRecord.Impl().Bin(0);
     bamRecord.Impl().Flag(0);
     bamRecord.Impl().InsertSize(0);
@@ -64,23 +63,23 @@ void checkSingleRecord(bool useTempFile)
     {
         BamWriter::Config config;
         config.useTempFile = useTempFile;
-        BamWriter writer(generatedBamFn, inputHeader, config);
+        BamWriter writer{generatedBamFn, inputHeader, config};
         writer.Write(bamRecord);
     }
 
     // check written header
-    BamFile file(generatedBamFn);
-    const auto header = file.Header();
-    EXPECT_EQ(std::string("1.1"), header.Version());
-    EXPECT_EQ(std::string("unknown"), header.SortOrder());
-    EXPECT_EQ(std::string("3.0.1"), header.PacBioBamVersion());
+    const BamFile file{generatedBamFn};
+    const auto& header = file.Header();
+    EXPECT_EQ("1.1", header.Version());
+    EXPECT_EQ("unknown", header.SortOrder());
+    EXPECT_EQ("3.0.1", header.PacBioBamVersion());
 
     // check written record
     EntireFileQuery entireFile(file);
     auto firstIter = entireFile.begin();
     auto record = *firstIter;
-    EXPECT_EQ(std::string("ACGTC"), record.Sequence());
-    EXPECT_EQ(std::string("test/100/0_5"), record.FullName());
+    EXPECT_EQ("ACGTC", record.Sequence());
+    EXPECT_EQ("test/100/0_5", record.FullName());
     EXPECT_TRUE(record.HasHoleNumber());
     EXPECT_TRUE(record.HasNumPasses());
     EXPECT_TRUE(record.HasQueryEnd());

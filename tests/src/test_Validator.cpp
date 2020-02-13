@@ -55,7 +55,7 @@ static BamRecord makeValidMappedRecord()
     tags["sn"] = std::vector<float>{2.0, 2.0, 2.0, 2.0};
     impl.Tags(tags);
 
-    return BamRecord(impl);
+    return impl;
 }
 
 static BamRecord makeValidUnmappedRecord()
@@ -91,7 +91,7 @@ static BamRecord makeValidUnmappedRecord()
     tags["sn"] = std::vector<float>{2.0, 2.0, 2.0, 2.0};
     impl.Tags(tags);
 
-    return BamRecord(impl);
+    return impl;
 }
 
 static ReadGroupInfo makeValidReadGroup()
@@ -380,10 +380,11 @@ TEST(ValidatorTest, ValidRecord)
 
 static inline void ModifyTag(BamRecord* record, const std::string& tagName, const Tag& tag)
 {
-    if (record->Impl().HasTag(tagName))
+    if (record->Impl().HasTag(tagName)) {
         record->Impl().EditTag(tagName, tag);
-    else
+    } else {
         record->Impl().AddTag(tagName, tag);
+    }
 }
 
 static inline void CheckInvalidTagLength(const std::string& tagName, const Tag& tag)

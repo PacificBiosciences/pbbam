@@ -3,6 +3,7 @@
 #include <pbbam/vcf/VcfQuery.h>
 
 #include <cassert>
+
 #include <type_traits>
 
 namespace PacBio {

@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <sstream>
 #include <stdexcept>
 #include <thread>
 #include <vector>
@@ -50,7 +51,7 @@ inline void SwapEndianness(std::vector<T>& data)
                 ed_swap_8p(&data[i]);
             break;
         default:
-            throw std::runtime_error{"CCSPbiBuilder: unsupported element size (" +
+            throw std::runtime_error{"[pbbam] PBI index builder ERROR: unsupported element size (" +
                                      std::to_string(elementSize) + ")"};
     }
 }
@@ -60,7 +61,8 @@ void bgzf_write_safe(BGZF* fp, const void* data, size_t length)
     const auto ret = bgzf_write(fp, data, length);
     if (ret < 0L)
         throw std::runtime_error{
-            "CCSPbiBuilder: non-zero returned from bgzf_write(). Out of disk space?"};
+            "[pbbam] PBI index builder ERROR: non-zero returned from bgzf_write(). Out of disk "
+            "space?"};
 }
 
 template <typename T>
@@ -195,9 +197,12 @@ public:
         // open file handle
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel_));
         pbiFile_.reset(bgzf_open(pbiFilename_.c_str(), mode.c_str()));
-        if (pbiFile_ == nullptr)
-            throw std::runtime_error{"CCSPbiBuilder: could not open file for writing: " +
-                                     pbiFilename_};
+        if (pbiFile_ == nullptr) {
+            std::ostringstream msg;
+            msg << "[pbbam] PBI index builder ERROR: could not open file for writing:\n"
+                << "  file: " << pbiFilename_ << '\n';
+            throw std::runtime_error{msg.str()};
+        }
 
         // if no explicit thread count given, attempt built-in check
         size_t actualNumThreads = numThreads_;
@@ -246,18 +251,25 @@ public:
     {
         // seek to block begin
         const auto ret = std::fseek(tempFile_.get(), block.pos_, SEEK_SET);
-        if (ret != 0)
-            throw std::runtime_error{"CCSPbiBuilder: could not seek in temp file: " +
-                                     tempFilename_ + ", offset: " + std::to_string(block.pos_)};
+        if (ret != 0) {
+            std::ostringstream msg;
+            msg << "[pbbam] PBI builder ERROR: could not seek in temp file:\n"
+                << "  file: " << tempFilename_ << '\n'
+                << "  offset: " << block.pos_ << '\n';
+            throw std::runtime_error{msg.str()};
+        }
 
         // read block elements
         field.buffer_.assign(block.n_, 0);
         const auto numElements =
             std::fread(field.buffer_.data(), sizeof(T), block.n_, tempFile_.get());
 
-        if (numElements != block.n_)
-            throw std::runtime_error{
-                "CCSPbiBuilder: could not read element count from temp file: " + tempFilename_};
+        if (numElements != block.n_) {
+            std::ostringstream msg;
+            msg << "[pbbam] PBI builder ERROR: could not read element count from temp file\n"
+                << "  file: " << tempFilename_ << '\n';
+            throw std::runtime_error{msg.str()};
+        }
     }
 
     template <typename T>

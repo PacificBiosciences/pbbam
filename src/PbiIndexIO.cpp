@@ -4,22 +4,24 @@
 
 #include "PbiIndexIO.h"
 
-#include <array>
 #include <cstddef>
 #include <cstdint>
+
+#include <array>
 #include <sstream>
 #include <stdexcept>
+#include <tuple>
 #include <vector>
 
+#include <pbcopper/utility/MoveAppend.h>
 #include <boost/algorithm/string.hpp>
 
-#include <pbcopper/utility/MoveAppend.h>
-
-#include "MemoryUtils.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/EntireFileQuery.h"
 #include "pbbam/PbiBuilder.h"
+
+#include "MemoryUtils.h"
 
 namespace PacBio {
 namespace BAM {
@@ -29,7 +31,7 @@ void CheckContainer(const std::string& container, const size_t expected, const s
 {
     if (observed != expected) {
         std::ostringstream msg;
-        msg << "PBI index error: expected " << expected << " records in " << container
+        msg << "[pbbam] PBI index I/O ERROR: expected " << expected << " records in " << container
             << " field, but found " << observed << " instead";
         throw std::runtime_error{msg.str()};
     }
@@ -78,12 +80,21 @@ PbiRawData PbiIndexIO::Load(const std::string& pbiFilename)
 void PbiIndexIO::Load(PbiRawData& rawData, const std::string& filename)
 {
     // open file for reading
-    if (!boost::algorithm::iends_with(filename, ".pbi"))
-        throw std::runtime_error{"unsupported file extension on " + filename};
+    if (!boost::algorithm::iends_with(filename, ".pbi")) {
+        std::ostringstream msg;
+        msg << "[pbbam] PBI index I/O ERROR: unsupported file extension:\n"
+            << "  file: " << filename;
+        throw std::runtime_error{msg.str()};
+    }
+
     std::unique_ptr<BGZF, HtslibBgzfDeleter> bgzf(bgzf_open(filename.c_str(), "rb"));
     auto* fp = bgzf.get();
-    if (fp == nullptr)
-        throw std::runtime_error{"could not open PBI file: " + filename + "for reading"};
+    if (fp == nullptr) {
+        std::ostringstream msg;
+        msg << "[pbbam] PBI index I/O ERROR: could not open file for reading:\n"
+            << "  file: " << filename;
+        throw std::runtime_error{msg.str()};
+    }
 
     // load data
     LoadHeader(rawData, fp);
@@ -200,7 +211,8 @@ void PbiIndexIO::LoadHeader(PbiRawData& index, BGZF* fp)
     char magic[4];
     auto bytesRead = bgzf_read(fp, magic, 4);
     if (bytesRead != 4 || strncmp(magic, "PBI\1", 4))
-        throw std::runtime_error{"expected PBI file, found unknown format instead"};
+        throw std::runtime_error{
+            "[pbbam] PBI index I/O ERROR: expected PBI file, found unknown format instead"};
 
     // version, pbi_flags, & n_reads
     uint32_t version;
@@ -266,7 +278,7 @@ void PbiIndexIO::LoadReferenceData(PbiRawReferenceData& referenceData, BGZF* fp)
             entry.endRow_ = ed_swap_4(entry.endRow_);
         }
     }
-    UNUSED(ret);
+    std::ignore = ret;
 }
 
 void PbiIndexIO::LoadBasicData(PbiRawBasicData& basicData, const uint32_t numReads, BGZF* fp)
@@ -288,8 +300,12 @@ void PbiIndexIO::Save(const PbiRawData& index, const std::string& filename)
 {
     std::unique_ptr<BGZF, HtslibBgzfDeleter> bgzf(bgzf_open(filename.c_str(), "wb"));
     auto* fp = bgzf.get();
-    if (fp == nullptr)
-        throw std::runtime_error{"could not open PBI file: " + filename + "for writing"};
+    if (fp == nullptr) {
+        std::ostringstream msg;
+        msg << "[pbbam] PBI index I/O ERROR: could not open file for writing:\n"
+            << "  file: " << filename;
+        throw std::runtime_error{msg.str()};
+    }
 
     WriteHeader(index, fp);
     const auto numReads = index.NumReads();
@@ -337,7 +353,7 @@ void PbiIndexIO::WriteHeader(const PbiRawData& index, BGZF* fp)
     char reserved[18];
     memset(reserved, 0, 18);
     ret = bgzf_write(fp, reserved, 18);
-    UNUSED(ret);
+    std::ignore = ret;
 }
 
 void PbiIndexIO::WriteMappedData(const PbiRawMappedData& mappedData, const uint32_t numReads,
@@ -379,7 +395,7 @@ void PbiIndexIO::WriteReferenceData(const PbiRawReferenceData& referenceData, BG
         ret = bgzf_write(fp, &beginRow, 4);
         ret = bgzf_write(fp, &endRow, 4);
     }
-    UNUSED(ret);
+    std::ignore = ret;
 }
 
 void PbiIndexIO::WriteBasicData(const PbiRawBasicData& basicData, const uint32_t numReads, BGZF* fp)

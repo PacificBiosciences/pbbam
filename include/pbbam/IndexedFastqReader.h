@@ -10,6 +10,7 @@
 #include "pbbam/Config.h"
 
 #include <cstddef>
+
 #include <iostream>
 #include <memory>
 #include <stdexcept>

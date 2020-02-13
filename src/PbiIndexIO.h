@@ -8,8 +8,10 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+
 #include <memory>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include <htslib/bgzf.h>
@@ -19,7 +21,6 @@
 #include "pbbam/DataSet.h"
 #include "pbbam/PbiFile.h"
 #include "pbbam/PbiRawData.h"
-#include "pbbam/Unused.h"
 
 namespace PacBio {
 namespace BAM {
@@ -71,7 +72,7 @@ inline void PbiIndexIO::LoadBgzfVector(BGZF* fp, std::vector<T>& data, const uin
     data.resize(numReads);
     auto ret = bgzf_read(fp, &data[0], numReads * sizeof(T));
     if (fp->is_be) SwapEndianness(data);
-    UNUSED(ret);
+    std::ignore = ret;
 }
 
 template <typename T>
@@ -106,7 +107,7 @@ inline void PbiIndexIO::WriteBgzfVector(BGZF* fp, const std::vector<T>& data)
     std::vector<T> output = data;
     if (fp->is_be) SwapEndianness(output);
     auto ret = bgzf_write(fp, &output[0], data.size() * sizeof(T));
-    UNUSED(ret);
+    std::ignore = ret;
 }
 
 }  // namespace BAM

@@ -29,12 +29,14 @@ public:
         , sequencingKit_(std::move(sequencingKit))
         , basecallerVersion_(std::move(basecallerVersion))
     {
+        // clang-format off
         std::ostringstream s;
-        s << "unsupported sequencing chemistry combination:\n"
+        s << "[pbbam] chemistry compatibility ERROR: unsupported sequencing chemistry combination:\n"
           << "    binding kit:        " << bindingKit_ << '\n'
           << "    sequencing kit:     " << sequencingKit_ << '\n'
           << "    basecaller version: " << basecallerVersion_ << '\n';
         what_ = s.str();
+        // clang-format on
     }
 
     // This is a work around for the Intel PHI compiler (icpc)

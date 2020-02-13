@@ -7,23 +7,42 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+
 #include <iostream>
+#include <sstream>
+#include <stdexcept>
 #include <thread>
+#include <tuple>
 #include <type_traits>
 
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
 
+#include "pbbam/BamFile.h"
+#include "pbbam/Validator.h"
+
 #include "Autovalidate.h"
 #include "FileProducer.h"
 #include "MemoryUtils.h"
-#include "pbbam/BamFile.h"
-#include "pbbam/Unused.h"
-#include "pbbam/Validator.h"
 
 namespace PacBio {
 namespace BAM {
+
+struct BamWriterException : public std::exception
+{
+    BamWriterException(std::string filename, std::string reason) : std::exception{}
+    {
+        std::ostringstream s;
+        s << "[pbbam] BAM writer ERROR: " << reason << ":\n"
+          << "  file: " << filename;
+        msg_ = s.str();
+    }
+
+    const char* what() const noexcept override { return msg_.c_str(); }
+
+    std::string msg_;
+};
 
 static_assert(!std::is_copy_constructible<BamWriter>::value,
               "BamWriter(const BamWriter&) is not = delete");
@@ -38,7 +57,7 @@ public:
                      const BamWriter::BinCalculationMode binCalculationMode, const bool useTempFile)
         : calculateBins_{binCalculationMode == BamWriter::BinCalculation_ON}, header_{rawHeader}
     {
-        if (!header_) throw std::runtime_error{"BamWriter: null header provided for: " + filename};
+        if (!header_) throw BamWriterException{filename, "null header provided"};
 
         if (useTempFile) fileProducer_ = std::make_unique<FileProducer>(filename);
 
@@ -46,9 +65,7 @@ public:
         const auto usingFilename = (fileProducer_ ? fileProducer_->TempFilename() : filename);
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
         file_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
-        if (!file_)
-            throw std::runtime_error{"BamWriter: could not open BAM file for writing: " +
-                                     usingFilename};
+        if (!file_) throw BamWriterException{usingFilename, "could not open file for writing"};
 
         // if no explicit thread count given, attempt built-in check
         size_t actualNumThreads = numThreads;
@@ -64,9 +81,7 @@ public:
 
         // write header
         const auto ret = sam_hdr_write(file_.get(), header_.get());
-        if (ret != 0)
-            throw std::runtime_error{"BamWriter: could not write header for file: " +
-                                     usingFilename};
+        if (ret != 0) throw BamWriterException{usingFilename, "could not write header"};
     }
 
     void Write(const BamRecord& record)
@@ -85,7 +100,8 @@ public:
 
         // write record to file
         const auto ret = sam_write1(file_.get(), header_.get(), rawRecord.get());
-        if (ret <= 0) throw std::runtime_error{"BamWriter: could not write record to file"};
+        if (ret <= 0)
+            throw BamWriterException{fileProducer_->TempFilename(), "could not write record"};
     }
 
     void Write(const BamRecord& record, int64_t* vOffset)
@@ -96,7 +112,7 @@ public:
 
         // ensure offsets up-to-date
         const auto ret = bgzf_flush(bgzf);
-        UNUSED(ret);
+        std::ignore = ret;
 
         // capture virtual offset where we’re about to write
         const auto rawTell = htell(bgzf->fp);
@@ -146,14 +162,15 @@ BamWriter& BamWriter::operator=(BamWriter&&) noexcept = default;
 BamWriter::~BamWriter()
 {
     const auto ret = bgzf_flush(d_->file_.get()->fp.bgzf);
-    UNUSED(ret);
+    std::ignore = ret;
 }
 
 void BamWriter::TryFlush()
 {
-    // TODO: sanity checks on file_ & fp
     const auto ret = bgzf_flush(d_->file_.get()->fp.bgzf);
-    if (ret != 0) throw std::runtime_error{"BamWriter: could not flush output buffer contents"};
+    if (ret != 0)
+        throw BamWriterException{d_->fileProducer_->TempFilename(),
+                                 "could not flush buffer contents"};
 }
 
 void BamWriter::Write(const BamRecord& record) { d_->Write(record); }

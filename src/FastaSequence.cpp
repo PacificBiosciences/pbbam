@@ -4,9 +4,9 @@
 
 #include "pbbam/FastaSequence.h"
 
+#include <cassert>
 #include <cstdio>
 
-#include <cassert>
 #include <exception>
 #include <tuple>
 #include <type_traits>

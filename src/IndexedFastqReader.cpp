@@ -81,8 +81,10 @@ std::unique_ptr<IndexedFastqReaderImpl> MakeReaderImpl(std::string filename)
 {
     // validate extension
     if (!FormatUtils::IsFastqFilename(filename)) {
-        throw std::runtime_error{"IndexedFastqReader: filename '" + filename +
-                                 "' is not recognized as a FASTQ file."};
+        std::ostringstream s;
+        s << "[pbbam] FASTQ reader ERROR: not a recognized FASTQ extension:\n"
+          << "  file: " << filename;
+        throw std::runtime_error{s.str()};
     }
 
     // determine subsequence "loader" from compression type: plain-text, bgzf, or unsupported
@@ -96,7 +98,7 @@ std::unique_ptr<IndexedFastqReaderImpl> MakeReaderImpl(std::string filename)
 
         case HtslibCompression::GZIP: {
             std::ostringstream msg;
-            msg << "IndexedFastqReader: random-access is not supported for plain gzipped "
+            msg << "[pbbam] FASTQ reader ERROR: random-access is not supported for plain gzipped "
                    "file "
                 << filename << "\n\n"
                 << "Compressed files must be bgzipped, with accompanying *.gzi "
@@ -110,10 +112,13 @@ std::unique_ptr<IndexedFastqReaderImpl> MakeReaderImpl(std::string filename)
                 << "  $ bgzip --index <unzipped_file>\n\n";
             throw std::runtime_error{msg.str()};
         }
-        default:
+        default: {
             assert(false);  // should never get here, the way htslib currently determines type
-            throw std::runtime_error{
-                "IndexedFastqReader: could not determine compression type for file: " + filename};
+            std::ostringstream s;
+            s << "[pbbam] FASTQ reader ERROR: could not determine compression type:\n"
+              << "  file: " << filename;
+            throw std::runtime_error{s.str()};
+        }
     }
 }
 

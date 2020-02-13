@@ -9,6 +9,7 @@
 #include "pbbam/SamTagCodec.h"
 
 #include <cstdint>
+
 #include <limits>
 #include <string>
 
@@ -66,7 +67,8 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
         const auto name = token.substr(0, 2);
         const auto type = token.at(3);
         const auto remainder = token.substr(5);
-        if (remainder.empty()) throw std::runtime_error{"SamTagCodec: malformatted tag: " + token};
+        if (remainder.empty())
+            throw std::runtime_error{"[pbbam] SAM tag ERROR: malformed tag: " + token};
 
         switch (type) {
 
@@ -154,7 +156,7 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
                         break;
                     default:
                         throw std::runtime_error{
-                            "SamTagCodec: unsupported array-tag-type encountered: " +
+                            "[pbbam] SAM tag ERROR: unsupported array-tag-type encountered: " +
                             std::string{1, elementType}};
                 }
                 break;
@@ -162,8 +164,9 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
 
             // unsupported SAM tag type
             default:
-                throw std::runtime_error{"SamTagCodec: unsupported tag-type encountered: " +
-                                         std::string{1, type}};
+                throw std::runtime_error{
+                    "[pbbam] SAM tag ERROR: unsupported tag-type encountered: " +
+                    std::string{1, type}};
         }
     }
 
@@ -174,7 +177,7 @@ std::string SamTagCodec::Encode(const std::string& name, const PacBio::BAM::Tag&
 {
     // upfront checks
     if (name.size() != 2) {
-        throw std::runtime_error{"SamTagCodec: malformatted tag name: " + name};
+        throw std::runtime_error{"[pbbam] SAM tag ERROR: malformed tag name: " + name};
     }
     if (tag.IsNull()) return {};
 
@@ -254,7 +257,7 @@ std::string SamTagCodec::Encode(const std::string& name, const PacBio::BAM::Tag&
                 result << ',' << x;
             break;
         default:
-            throw std::runtime_error{"SamTagCodec: unsupported tag-type encountered: " +
+            throw std::runtime_error{"[pbbam] SAM tag ERROR: unsupported tag-type encountered: " +
                                      std::to_string(static_cast<uint16_t>(tag.Type()))};
     }
     return result.str();

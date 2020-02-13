@@ -9,6 +9,7 @@
 #include "IndexedFastqTextReader.h"
 
 #include <unistd.h>
+
 #include <cassert>
 #include <cstdio>
 
@@ -28,8 +29,8 @@ IndexedFastqTextReader::IndexedFastqTextReader(std::string filename)
     // check file handle
     if (file_ == nullptr) {
         std::ostringstream msg;
-        msg << "IndexedFastqTextReader: could not open file for reading\n"
-            << "  FASTQ file: " << fastqFilename_ << '\n';
+        msg << "[pbbam] FASTQ reader ERROR: could not open file:\n"
+            << "  FASTQ file: " << fastqFilename_;
         throw std::runtime_error{msg.str()};
     }
 
@@ -99,7 +100,7 @@ std::pair<std::string, Data::QualityValues> IndexedFastqTextReader::Subsequence(
     const int64_t length = std::min(available, requested);
     if ((start < 0) || (end < 0) || (length < 0)) {
         std::ostringstream msg;
-        msg << "IndexedFastqTextReader: invalid subsequence region requested from\n"
+        msg << "[pbbam] FASTQ reader ERROR: invalid subsequence region requested:\n"
             << "  FASTQ file: " << fastqFilename_ << '\n'
             << "  requested region: " << id << ':' << start << '-' << end << '\n'
             << "  sequence length:  " << entry.Length << '\n';
@@ -113,7 +114,7 @@ std::pair<std::string, Data::QualityValues> IndexedFastqTextReader::Subsequence(
     auto result = fseek(file_.get(), entry.SeqOffset, SEEK_SET);
     if (result != 0) {
         std::ostringstream msg;
-        msg << "IndexedFastqTextReader: could not seek to requested region\n"
+        msg << "[pbbam] FASTQ reader ERROR: could not seek to requested region:\n"
             << "  FASTQ file: " << fastqFilename_ << '\n'
             << "  requested region: " << id << ':' << start << '-' << end << '\n';
         throw std::runtime_error{msg.str()};
@@ -124,7 +125,7 @@ std::pair<std::string, Data::QualityValues> IndexedFastqTextReader::Subsequence(
     result = FetchRecord();
     if (result < 0) {
         std::ostringstream msg;
-        msg << "IndexedFastqTextReader: error reading from\n"
+        msg << "[pbbam] FASTQ reader ERROR: could not read FASTQ record:\n"
             << "  FASTQ file: " << fastqFilename_ << '\n'
             << "  requested region: " << id << ':' << start << '-' << end << '\n'
             << "  reason: likely truncated quality string\n";

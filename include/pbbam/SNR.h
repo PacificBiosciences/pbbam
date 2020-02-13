@@ -10,6 +10,7 @@
 #include "pbbam/Config.h"
 
 #include <cstddef>
+
 #include <vector>
 
 #include <pbcopper/data/SNR.h>

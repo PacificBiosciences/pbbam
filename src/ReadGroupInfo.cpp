@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
+
 #include <iomanip>
 #include <set>
 #include <sstream>
@@ -23,10 +24,11 @@
 #include <boost/algorithm/cxx14/equal.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "ChemistryTable.h"
 #include "pbbam/MD5.h"
 #include "pbbam/SamTagCodec.h"
 #include "pbbam/StringUtilities.h"
+
+#include "ChemistryTable.h"
 
 namespace PacBio {
 namespace BAM {
@@ -130,7 +132,7 @@ std::string BaseFeatureName(const BaseFeature& feature)
     const auto found = lookup.find(feature);
     if (found != lookup.cend())
         return found->second;
-    throw std::runtime_error{ "ReadGroupInfo: unrecognized base feature" };
+    throw std::runtime_error{ "[pbbam] read group ERROR: unrecognized base feature" };
 }
 
 std::string FrameCodecName(const FrameCodec& codec)
@@ -143,7 +145,7 @@ std::string FrameCodecName(const FrameCodec& codec)
     const auto found = lookup.find(codec);
     if (found != lookup.cend())
         return found->second;
-    throw std::runtime_error{ "ReadGroupInfo: unrecognized frame codec" };
+    throw std::runtime_error{ "[pbbam] read group ERROR: unrecognized frame codec" };
 }
 
 std::string BarcodeModeName(const BarcodeModeType& mode)
@@ -158,7 +160,7 @@ std::string BarcodeModeName(const BarcodeModeType& mode)
     const auto found = lookup.find(mode);
     if (found != lookup.cend())
         return found->second;
-    throw std::runtime_error{ "ReadGroupInfo: unrecognized barcode mode type" };
+    throw std::runtime_error{ "[pbbam] read group ERROR: unrecognized barcode mode type" };
 }
 
 std::string BarcodeQualityName(const BarcodeQualityType& type)
@@ -172,7 +174,7 @@ std::string BarcodeQualityName(const BarcodeQualityType& type)
     const auto found = lookup.find(type);
     if (found != lookup.cend())
         return found->second;
-    throw std::runtime_error{ "ReadGroupInfo: unrecognized barcode quality type" };
+    throw std::runtime_error{ "[pbbam] read group ERROR: unrecognized barcode quality type" };
 }
 
 std::string PlatformModelName(const PlatformModelType& type)
@@ -187,7 +189,7 @@ std::string PlatformModelName(const PlatformModelType& type)
     const auto found = lookup.find(type);
     if (found != lookup.cend())
         return found->second;
-    throw std::runtime_error{ "ReadGroupInfo: unrecognized platform model type" };
+    throw std::runtime_error{ "[pbbam] read group ERROR: unrecognized platform model type" };
 }
 
 static const std::map<std::string, BaseFeature> nameToFeature
@@ -272,14 +274,15 @@ static_assert(std::is_copy_constructible<ReadGroupInfo>::value,
 static_assert(std::is_copy_assignable<ReadGroupInfo>::value,
               "ReadGroupInfo& operator=(const ReadGroupInfo&) is not = default");
 
+#ifndef __INTEL_COMPILER
 static_assert(std::is_nothrow_move_constructible<ReadGroupInfo>::value,
               "ReadGroupInfo(ReadGroupInfo&&) is not = noexcept");
 static_assert(std::is_nothrow_move_assignable<ReadGroupInfo>::value ==
                   std::is_nothrow_move_assignable<std::string>::value,
               "");
+#endif
 
 ReadGroupInfo::ReadGroupInfo(std::string baseId, std::pair<uint16_t, uint16_t> barcodes)
-
 {
     std::ostringstream id;
     id << baseId << '/' << std::to_string(barcodes.first) << "--"
@@ -350,7 +353,7 @@ size_t ReadGroupInfo::BarcodeCount() const
 {
     if (!hasBarcodeData_)
         throw std::runtime_error{
-            "ReadGroupInfo: barcode count requested but barcode data is missing"};
+            "[pbbam] read group ERROR: barcode count requested but barcode data is missing"};
     return barcodeCount_;
 }
 
@@ -370,32 +373,28 @@ ReadGroupInfo& ReadGroupInfo::BarcodeData(std::string barcodeFile, std::string b
 std::string ReadGroupInfo::BarcodeFile() const
 {
     if (!hasBarcodeData_)
-        throw std::runtime_error{
-            "ReadGroupInfo: barcode file requested but barcode data is missing"};
+        throw std::runtime_error{"[pbbam] read group ERROR: barcode file field is missing"};
     return barcodeFile_;
 }
 
 std::string ReadGroupInfo::BarcodeHash() const
 {
     if (!hasBarcodeData_)
-        throw std::runtime_error{
-            "ReadGroupInfo: barcode hash requested but barcode data is missing"};
+        throw std::runtime_error{"[pbbam] read group ERROR: barcode hash field is missing"};
     return barcodeHash_;
 }
 
 BarcodeModeType ReadGroupInfo::BarcodeMode() const
 {
     if (!hasBarcodeData_)
-        throw std::runtime_error{
-            "ReadGroupInfo: barcode mode requested but barcode data is missing"};
+        throw std::runtime_error{"[pbbam] read group ERROR: barcode mode field is missing"};
     return barcodeMode_;
 }
 
 BarcodeQualityType ReadGroupInfo::BarcodeQuality() const
 {
     if (!hasBarcodeData_)
-        throw std::runtime_error{
-            "ReadGroupInfo: barcode quality requested but barcode data is missing"};
+        throw std::runtime_error{"[pbbam] read group ERROR: barcode quality field is missing"};
     return barcodeQuality_;
 }
 
@@ -414,6 +413,19 @@ boost::optional<uint16_t> ReadGroupInfo::BarcodeReverse() const
 }
 
 boost::optional<std::pair<uint16_t, uint16_t>> ReadGroupInfo::Barcodes() const { return barcodes_; }
+
+std::string ReadGroupInfo::BarcodeSequence() const
+{
+    const auto found = custom_.find(sam_BC);
+    if (found == custom_.cend()) return {};
+    return found->second;
+}
+
+ReadGroupInfo& ReadGroupInfo::BarcodeSequence(std::string barcodeSequence)
+{
+    custom_[sam_BC] = std::move(barcodeSequence);
+    return *this;
+}
 
 std::string ReadGroupInfo::BasecallerVersion() const { return basecallerVersion_; }
 
@@ -691,8 +703,9 @@ ReadGroupInfo& ReadGroupInfo::Id(std::string id)
         const auto tokens = Split(id.substr(slashAt + 1), '-');
         if (tokens.size() != 3) {
             throw std::runtime_error{
-                "ReadGroupInfo: could not fetch barcodes from malformatted read group ID: " + id +
-                " Must be in the form: {RGID_STRING}/{bcForward}--{bcReverse}"};
+                "[pbbam] read group ERROR: could not fetch barcodes from malformed read group "
+                "ID: " +
+                id + " Must be in the form: {RGID_STRING}/{bcForward}--{bcReverse}"};
         }
 
         // catch here so we can give more informative message
@@ -701,8 +714,9 @@ ReadGroupInfo& ReadGroupInfo::Id(std::string id)
                                                       static_cast<uint16_t>(std::stoul(tokens[2])));
         } catch (std::exception& e) {
             throw std::runtime_error{
-                "ReadGroupInfo: could not fetch barcodes from malformatted read group ID: " + id +
-                " Must be in the form: {RGID_STRING}/{bcForward}--{bcReverse}"};
+                "[pbbam] read group ERROR: could not fetch barcodes from malformed read group "
+                "ID: " +
+                id + " Must be in the form: {RGID_STRING}/{bcForward}--{bcReverse}"};
         }
     }
 
@@ -847,7 +861,7 @@ std::string ReadGroupInfo::SequencingChemistryFromTriple(const std::string& bind
 {
     const auto verFields = Split(basecallerVersion, '.');
     if (verFields.size() < 2)
-        throw std::runtime_error{"ReadGroupInfo: basecaller version is too short: " +
+        throw std::runtime_error{"[pbbam] read group ERROR: basecaller version is too short: " +
                                  basecallerVersion};
     const std::string version{verFields.at(0) + '.' + verFields.at(1)};
 
@@ -895,11 +909,6 @@ std::string ReadGroupInfo::ToSam() const
     if (!predictedInsertSize_.empty()) out << MakeSamTag(sam_PI, predictedInsertSize_);
     if (!movieName_.empty())           out << MakeSamTag(sam_PU, movieName_);
     if (!sample_.empty())              out << MakeSamTag(sam_SM, sample_);
-    if (barcodes_)
-    {
-        out << '\t' << sam_BC << ':'
-            << barcodes_->first << "--" << barcodes_->second;
-    }
     // clang-format on
 
     out << MakeSamTag(sam_PM, PlatformModelName(platformModel_));
@@ -914,6 +923,22 @@ std::string ReadGroupInfo::ToSam() const
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType)
 {
     return MD5Hash(movieName + "//" + readType).substr(0, 8);
+}
+
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
+                            const std::string& barcodeString)
+{
+    const std::string baseId{
+        MD5Hash(movieName + "//" + readType + "//" + barcodeString).substr(0, 8)};
+    return baseId + "/" + barcodeString;
+}
+
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
+                            const std::pair<int16_t, int16_t>& barcodes)
+{
+    const std::string barcodeString{std::to_string(barcodes.first) + "--" +
+                                    std::to_string(barcodes.second)};
+    return MakeReadGroupId(movieName, readType, barcodeString);
 }
 
 }  // namespace BAM

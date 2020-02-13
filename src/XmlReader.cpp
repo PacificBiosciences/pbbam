@@ -5,13 +5,16 @@
 #include "XmlReader.h"
 
 #include <cassert>
+
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 #include <typeinfo>
 #include <vector>
 
 #include "pbbam/StringUtilities.h"
+
 #include "pugixml/pugixml.hpp"
 
 using DataSetElement = PacBio::BAM::internal::DataSetElement;
@@ -56,7 +59,7 @@ std::unique_ptr<DataSetBase> MakeDataSetBase(const pugi::xml_node& xmlNode)
             return std::make_unique<DataSetBase>(fromInputXml);
         default:
             // unreachable
-            throw std::runtime_error{"XmlReader: unknown data set label: " + name};
+            throw std::runtime_error{"[pbbam] XML reader ERROR: unknown data set label: " + name};
     }
 }
 
@@ -71,12 +74,26 @@ std::shared_ptr<DataSetElement> MakeElement(const pugi::xml_node& xmlNode)
     const FromInputXml fromInputXml{};
     const auto type = ElementTypeFromName(name);
     switch (type) {
-        case XmlElementType::DATASET_METADATA:
-            return std::make_shared<DataSetMetadata>(fromInputXml);
+        case XmlElementType::AUTOMATION:
+            return std::make_shared<Automation>(fromInputXml);
+        case XmlElementType::AUTOMATION_PARAMETER:
+            return std::make_shared<AutomationParameter>(fromInputXml);
+        case XmlElementType::AUTOMATION_PARAMETERS:
+            return std::make_shared<AutomationParameters>(fromInputXml);
+        case XmlElementType::BINDING_KIT:
+            return std::make_shared<BindingKit>(fromInputXml);
         case XmlElementType::BIOSAMPLE:
             return std::make_shared<BioSample>("", fromInputXml);
         case XmlElementType::BIOSAMPLES:
             return std::make_shared<BioSamples>(fromInputXml);
+        case XmlElementType::COLLECTIONS:
+            return std::make_shared<Collections>(fromInputXml);
+        case XmlElementType::COLLECTION_METADATA:
+            return std::make_shared<CollectionMetadata>(fromInputXml);
+        case XmlElementType::CONTROL_KIT:
+            return std::make_shared<ControlKit>(fromInputXml);
+        case XmlElementType::DATASET_METADATA:
+            return std::make_shared<DataSetMetadata>(fromInputXml);
         case XmlElementType::DNA_BARCODE:
             return std::make_shared<DNABarcode>("", fromInputXml);
         case XmlElementType::DNA_BARCODES:
@@ -99,12 +116,19 @@ std::shared_ptr<DataSetElement> MakeElement(const pugi::xml_node& xmlNode)
             return std::make_shared<Filters>(fromInputXml);
         case XmlElementType::PARENT_TOOL:
             return std::make_shared<ParentTool>(fromInputXml);
+        case XmlElementType::PPACONFIG:
+            return std::make_shared<PPAConfig>(fromInputXml);
         case XmlElementType::PROPERTY:
             return std::make_shared<Property>("", "", "", fromInputXml);
         case XmlElementType::PROPERTIES:
             return std::make_shared<Properties>(fromInputXml);
         case XmlElementType::PROVENANCE:
             return std::make_shared<Provenance>(fromInputXml);
+        case XmlElementType::SEQUENCING_KIT_PLATE:
+            return std::make_shared<SequencingKitPlate>(fromInputXml);
+        case XmlElementType::TEMPLATE_PREP_KIT:
+            return std::make_shared<TemplatePrepKit>(fromInputXml);
+
         case XmlElementType::ALIGNMENT_SET:
             return std::make_shared<AlignmentSet>(fromInputXml);
         case XmlElementType::BARCODE_SET:
@@ -133,7 +157,8 @@ std::shared_ptr<DataSetElement> MakeElement(const pugi::xml_node& xmlNode)
             return std::make_shared<DataSetElement>(name, fromInputXml);
         default:
             // unreachable
-            throw std::runtime_error{"XmlReader: unknown data element label: " + name};
+            throw std::runtime_error{"[pbbam] XML reader ERROR: unknown data element label: " +
+                                     name};
     }
 }
 
@@ -143,7 +168,8 @@ void UpdateRegistry(const std::string& attributeName, const std::string& attribu
     std::vector<std::string> nameParts = Split(attributeName, ':');
     assert(!nameParts.empty());
     if (nameParts.size() > 2)
-        throw std::runtime_error{"XmlReader: malformed xmlns attribute: " + attributeName};
+        throw std::runtime_error{"[pbbam] XML reader ERROR: malformed xmlns attribute: " +
+                                 attributeName};
 
     const bool isDefault = (nameParts.size() == 1);
     const XsdType xsd = registry.XsdForUri(attributeValue);
@@ -196,13 +222,13 @@ std::unique_ptr<DataSetBase> XmlReader::FromStream(std::istream& in)
     pugi::xml_document doc;
     const pugi::xml_parse_result loadResult = doc.load(in);
     if (loadResult.status != pugi::status_ok)
-        throw std::runtime_error{"XmlReader: could not read XML file, error code:" +
+        throw std::runtime_error{"[pbbam] XML reader ERROR: could not read XML file, error code:" +
                                  std::to_string(loadResult.status)};
 
     // parse top-level attributes
     pugi::xml_node rootNode = doc.document_element();
     if (rootNode == pugi::xml_node())
-        throw std::runtime_error{"XmlReader: could not fetch XML root node"};
+        throw std::runtime_error{"[pbbam] XML reader ERROR: could not fetch XML root node"};
 
     // create dataset matching type strings
     auto dataset = MakeDataSetBase(rootNode);

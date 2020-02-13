@@ -5,11 +5,13 @@
 #include "ChemistryTable.h"
 
 #include <cstdlib>
+
 #include <fstream>
 #include <map>
 
-#include "FileUtils.h"
 #include "pbbam/exception/BundleChemistryMappingException.h"
+
+#include "FileUtils.h"
 #include "pugixml/pugixml.hpp"
 
 namespace PacBio {
@@ -59,36 +61,9 @@ ChemistryTable ChemistryTableFromXml(const std::string& mappingXml)
 const ChemistryTable& BuiltInChemistryTable()
 {
     // clang-format off
-    static ChemistryTable builtin{
+    const static ChemistryTable builtin{
 
         // BindingKit, SequencingKit, BasecallerVersion, Chemistry
-
-        // 3.0 ("Dromedary"): S/P1-C1/beta
-        {{"100-619-300", "100-620-000", "3.0", "S/P1-C1/beta"}},
-        {{"100-619-300", "100-620-000", "3.1", "S/P1-C1/beta"}},
-
-        // 3.1 ("Echidna"): S/P1-C1.1
-        {{"100-619-300", "100-867-300", "3.1", "S/P1-C1.1"}},
-        {{"100-619-300", "100-867-300", "3.2", "S/P1-C1.1"}},
-        {{"100-619-300", "100-867-300", "3.3", "S/P1-C1.1"}},
-
-        // 3.1.1 ("Flea"): S/P1-C1.2
-        {{"100-619-300", "100-902-100", "3.1", "S/P1-C1.2"}},
-        {{"100-619-300", "100-902-100", "3.2", "S/P1-C1.2"}},
-        {{"100-619-300", "100-902-100", "3.3", "S/P1-C1.2"}},
-        {{"100-619-300", "100-902-100", "4.0", "S/P1-C1.2"}},
-        {{"100-619-300", "100-902-100", "4.1", "S/P1-C1.2"}},
-
-        // 3.2 ("Goat"): S/P1-C1.3
-        {{"100-619-300", "100-972-200", "3.2", "S/P1-C1.3"}},
-        {{"100-619-300", "100-972-200", "3.3", "S/P1-C1.3"}},
-        {{"100-619-300", "100-972-200", "4.0", "S/P1-C1.3"}},
-        {{"100-619-300", "100-972-200", "4.1", "S/P1-C1.3"}},
-
-        // 4.0 ("Seabiscuit"); S/P2-C2
-        {{"100-862-200", "100-861-800", "4.0", "S/P2-C2"}},
-        {{"100-862-200", "100-861-800", "4.1", "S/P2-C2"}},
-        {{"100-862-200", "101-093-700", "4.1", "S/P2-C2"}},
 
         // 5.0 ("Iguana"); S/P2-C2
         {{"100-862-200", "100-861-800", "5.0", "S/P2-C2/5.0"}},
@@ -148,7 +123,14 @@ const ChemistryTable& BuiltInChemistryTable()
         // Sequel® II Binding Kit 2.1; Sequel® II Sequencing Plate 2.0 (4 Rxn)
         {{"101-820-500", "101-826-100", "5.0", "S/P4.1-C2/5.0-8M", "TAGT-420"}},
         // Sequel® II Binding Kit 2.1; Sequel® II Sequencing Plate 2.0 (4 Rxn) - QC
-        {{"101-820-500", "101-820-300", "5.0", "S/P4.1-C2/5.0-8M", "TAGT-420"}}
+        {{"101-820-500", "101-820-300", "5.0", "S/P4.1-C2/5.0-8M", "TAGT-420"}},
+
+        // Sequel® II Binding Kit 2.2; Sequel® II Sequencing Plate 2.0 (4 rxn)
+        {{"101-894-200", "101-826-100", "5.0", "S/P5-C2/5.0-8M", "TAGT-905"}},
+        // Sequel® II Binding Kit 2.2; Sequel® II Sequencing Plate 2.0EA (4 rxn)
+        {{"101-894-200", "101-789-300", "5.0", "S/P5-C2/5.0-8M", "TAGT-905"}},
+        // Sequel® II Binding Kit 2.2; Sequel® II Sequencing Plate 2.0 (4 rxn) - QC
+        {{"101-894-200", "101-820-300", "5.0", "S/P5-C2/5.0-8M", "TAGT-905"}},
     };
     // clang-format on
 

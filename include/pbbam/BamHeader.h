@@ -11,6 +11,7 @@
 
 #include <cstddef>
 #include <cstdint>
+
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -22,6 +23,8 @@
 
 namespace PacBio {
 namespace BAM {
+
+class DataSet;
 
 /// \brief The BamHeader class represents the header section of the %BAM file.
 ///
@@ -48,12 +51,36 @@ public:
     /// \{
 
     ///
-    /// \brief Creates a BamHeader from SAM-formatted text
+    /// \brief Creates an empty header
+    ///
+    BamHeader();
+
+    ///
+    /// \brief Creates a header from SAM-formatted text
     /// \param samHeaderText
     ///
-    BamHeader(const std::string& samHeaderText);
+    explicit BamHeader(const std::string& samHeaderText);
 
-    BamHeader();
+    ///
+    /// \brief Creates a merged header from dataset BAM files.
+    ///
+    /// \param dataset
+    ///
+    explicit BamHeader(const DataSet& dataset);
+
+    ///
+    /// \brief Creates a merged header from BAM files.
+    ///
+    /// \param bamFilenames
+    ///
+    explicit BamHeader(const std::vector<std::string>& bamFilenames);
+
+    ///
+    /// \brief Creates a merged header from input headers
+    ///
+    /// \param headers
+    ///
+    explicit BamHeader(const std::vector<BamHeader>& headers);
 
     /// \brief Detaches underlying data from the shared-pointer, returning a
     ///        independent copy of the header contents.

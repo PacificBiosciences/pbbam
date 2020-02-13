@@ -11,6 +11,7 @@
 
 #include <cstddef>
 #include <cstdint>
+
 #include <string>
 
 #include "pbbam/PbiBuilder.h"

@@ -8,7 +8,11 @@
 #include <gtest/gtest.h>
 #include <htslib/sam.h>
 
+#include <pbbam/BamFile.h>
 #include <pbbam/BamHeader.h>
+#include <pbbam/DataSet.h>
+
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -19,10 +23,26 @@ struct BamHdrDeleter
 {
     void operator()(bam_hdr_t* hdr) const
     {
-        if (hdr) bam_hdr_destroy(hdr);
+        if (hdr != nullptr) {
+            bam_hdr_destroy(hdr);
+        }
         hdr = nullptr;
     }
 };
+
+const std::string MergedConstructorText{
+    "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
+    "@RG\tID:8aaede36\tPL:PACBIO\tDS:READTYPE=SUBREAD;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;"
+    "MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:CodecV1=ip;BINDINGKIT=FakeBindKit;"
+    "SEQUENCINGKIT=FakeSeqKit;BASECALLERVERSION=0.2.0;FRAMERATEHZ=100.000000\tPU:"
+    "ArminsFakeMovie\tPM:SEQUEL\n"
+    "@RG\tID:e83fc9c6\tPL:PACBIO\tDS:READTYPE=SCRAP;DeletionQV=dq;DeletionTag=dt;InsertionQV=iq;"
+    "MergeQV=mq;SubstitutionQV=sq;SubstitutionTag=st;Ipd:CodecV1=ip;BINDINGKIT=FakeBindKit;"
+    "SEQUENCINGKIT=FakeSeqKit;BASECALLERVERSION=0.2.0;FRAMERATEHZ=100.000000\tPU:"
+    "ArminsFakeMovie\tPM:SEQUEL\n"
+    "@PG\tID:BAZ_FORMAT\tVN:0.3.0\n"
+    "@PG\tID:PPA-BAZ2BAM\tVN:0.1.0\n"
+    "@PG\tID:PPA-BAZWRITER\tVN:0.2.0\n"};
 
 }  // namespace BamHeaderTests
 
@@ -56,41 +76,41 @@ TEST(BamHeaderTest, DecodeTest)
         "@CO\tipsum and so on\n"
         "@CO\tcitation needed\n"};
 
-    BamHeader header = BamHeader(text);
+    BamHeader header = BamHeader{text};
 
-    EXPECT_EQ(std::string("1.1"), header.Version());
-    EXPECT_EQ(std::string("queryname"), header.SortOrder());
-    EXPECT_EQ(std::string("3.0.1"), header.PacBioBamVersion());
+    EXPECT_EQ("1.1", header.Version());
+    EXPECT_EQ("queryname", header.SortOrder());
+    EXPECT_EQ("3.0.1", header.PacBioBamVersion());
 
     EXPECT_EQ(3, header.ReadGroups().size());
     EXPECT_TRUE(header.HasReadGroup("rg1"));
     EXPECT_TRUE(header.HasReadGroup("rg2"));
     EXPECT_TRUE(header.HasReadGroup("rg3"));
 
-    EXPECT_EQ(std::string("control"), header.ReadGroup("rg1").Sample());
-    EXPECT_EQ(std::string("condition1"), header.ReadGroup("rg2").Sample());
-    EXPECT_EQ(std::string("condition1"), header.ReadGroup("rg3").Sample());
+    EXPECT_EQ("control", header.ReadGroup("rg1").Sample());
+    EXPECT_EQ("condition1", header.ReadGroup("rg2").Sample());
+    EXPECT_EQ("condition1", header.ReadGroup("rg3").Sample());
 
     EXPECT_EQ(2, header.Sequences().size());
     EXPECT_TRUE(header.HasSequence("chr1"));
     EXPECT_TRUE(header.HasSequence("chr2"));
-    EXPECT_EQ(std::string("chocobo"), header.Sequence("chr1").Species());
-    EXPECT_EQ(std::string("chocobo"), header.Sequence("chr2").Species());
-    EXPECT_EQ(std::string("2038"), header.Sequence("chr1").Length());
-    EXPECT_EQ(std::string("3042"), header.Sequence("chr2").Length());
+    EXPECT_EQ("chocobo", header.Sequence("chr1").Species());
+    EXPECT_EQ("chocobo", header.Sequence("chr2").Species());
+    EXPECT_EQ("2038", header.Sequence("chr1").Length());
+    EXPECT_EQ("3042", header.Sequence("chr2").Length());
 
     EXPECT_EQ(1, header.Programs().size());
     EXPECT_TRUE(header.HasProgram("_foo_"));
-    EXPECT_EQ(std::string("ide"), header.Program("_foo_").Name());
+    EXPECT_EQ("ide", header.Program("_foo_").Name());
 
     EXPECT_EQ(2, header.Comments().size());
-    EXPECT_EQ(std::string("ipsum and so on"), header.Comments().at(0));
-    EXPECT_EQ(std::string("citation needed"), header.Comments().at(1));
+    EXPECT_EQ("ipsum and so on", header.Comments().at(0));
+    EXPECT_EQ("citation needed", header.Comments().at(1));
 }
 
 TEST(BamHeaderTest, VersionCheckOk)
 {
-    auto expectFail = [](std::string&& label, std::string&& text) {
+    auto expectFail = [](const std::string& label, const std::string& text) {
         SCOPED_TRACE(label);
         EXPECT_THROW(BamHeader{text}, std::runtime_error);
     };
@@ -106,19 +126,19 @@ TEST(BamHeaderTest, VersionCheckOk)
 
 TEST(BamHeaderTest, EncodeTest)
 {
-    ReadGroupInfo rg1("rg1");
+    ReadGroupInfo rg1{"rg1"};
     rg1.Sample("control");
-    ReadGroupInfo rg2("rg2");
+    ReadGroupInfo rg2{"rg2"};
     rg2.Sample("condition1");
-    ReadGroupInfo rg3("rg3");
+    ReadGroupInfo rg3{"rg3"};
     rg3.Sample("condition1");
 
-    SequenceInfo seq1("chr1");
+    SequenceInfo seq1{"chr1"};
     seq1.Length("2038").Species("chocobo");
-    SequenceInfo seq2("chr2");
+    SequenceInfo seq2{"chr2"};
     seq2.Length("3042").Species("chocobo");
 
-    ProgramInfo prog1("_foo_");
+    ProgramInfo prog1{"_foo_"};
     prog1.Name("ide");
 
     BamHeader header;
@@ -145,25 +165,24 @@ TEST(BamHeaderTest, EncodeTest)
         "@CO\tipsum and so on\n"
         "@CO\tcitation needed\n"};
 
-    const std::string text = header.ToSam();
-    EXPECT_EQ(expectedText, text);
+    EXPECT_EQ(expectedText, header.ToSam());
 }
 
 TEST(BamHeaderTest, ConvertToRawDataOk)
 {
-    ReadGroupInfo rg1("rg1");
+    ReadGroupInfo rg1{"rg1"};
     rg1.Sample("control");
-    ReadGroupInfo rg2("rg2");
+    ReadGroupInfo rg2{"rg2"};
     rg2.Sample("condition1");
-    ReadGroupInfo rg3("rg3");
+    ReadGroupInfo rg3{"rg3"};
     rg3.Sample("condition1");
 
-    SequenceInfo seq1("chr1");
+    SequenceInfo seq1{"chr1"};
     seq1.Length("2038").Species("chocobo");
-    SequenceInfo seq2("chr2");
+    SequenceInfo seq2{"chr2"};
     seq2.Length("3042").Species("chocobo");
 
-    ProgramInfo prog1("_foo_");
+    ProgramInfo prog1{"_foo_"};
     prog1.Name("ide");
 
     BamHeader header;
@@ -199,25 +218,25 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
     rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
     memcpy(rawData->text, text.c_str(), rawData->l_text);
 
-    const std::string rawText(rawData->text, rawData->l_text);
+    const std::string rawText{rawData->text, rawData->l_text};
     EXPECT_EQ(expectedText, rawText);
 }
 
 TEST(BamHeaderTest, ExtractFromRawDataOk)
 {
-    ReadGroupInfo rg1("rg1");
+    ReadGroupInfo rg1{"rg1"};
     rg1.Sample("control");
-    ReadGroupInfo rg2("rg2");
+    ReadGroupInfo rg2{"rg2"};
     rg2.Sample("condition1");
-    ReadGroupInfo rg3("rg3");
+    ReadGroupInfo rg3{"rg3"};
     rg3.Sample("condition1");
 
-    SequenceInfo seq1("chr1");
+    SequenceInfo seq1{"chr1"};
     seq1.Length("2038").Species("chocobo");
-    SequenceInfo seq2("chr2");
+    SequenceInfo seq2{"chr2"};
     seq2.Length("3042").Species("chocobo");
 
-    ProgramInfo prog1("_foo_");
+    ProgramInfo prog1{"_foo_"};
     prog1.Name("ide");
 
     BamHeader header;
@@ -253,14 +272,12 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
     rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
     memcpy(rawData->text, text.c_str(), rawData->l_text);
 
-    const BamHeader newHeader = BamHeader(std::string(rawData->text, rawData->l_text));
+    const BamHeader newHeader{std::string(rawData->text, rawData->l_text)};
 
     EXPECT_EQ(header.Version(), newHeader.Version());
     EXPECT_EQ(header.SortOrder(), newHeader.SortOrder());
     EXPECT_EQ(header.PacBioBamVersion(), newHeader.PacBioBamVersion());
-
-    text = newHeader.ToSam();
-    EXPECT_EQ(expectedText, text);
+    EXPECT_EQ(expectedText, newHeader.ToSam());
 }
 
 TEST(BamHeaderTest, MergeOk)
@@ -314,8 +331,8 @@ TEST(BamHeaderTest, MergeOk)
 
     {  // operator+
 
-        const BamHeader header1(hdrText1);
-        const BamHeader header2(hdrText2);
+        const BamHeader header1{hdrText1};
+        const BamHeader header2{hdrText2};
         const BamHeader merged = header1 + header2;
         EXPECT_EQ(mergedText, merged.ToSam());
 
@@ -326,8 +343,8 @@ TEST(BamHeaderTest, MergeOk)
 
     {  // operator+=
 
-        BamHeader header1(hdrText1);
-        header1 += BamHeader(hdrText2);
+        BamHeader header1{hdrText1};
+        header1 += BamHeader{hdrText2};
         EXPECT_EQ(mergedText, header1.ToSam());
     }
 }
@@ -344,8 +361,8 @@ TEST(BamHeaderTest, MergeHandlesDuplicateReadGroups)
         "@PG\tID:bax2bam-0.0.2\tPN:bax2bam\tVN:0.0.2\n"};
 
     // duplicate @RG:IDs handled ok (i.e. not duplicated in output)
-    const BamHeader header1(hdrText);
-    const BamHeader header2(hdrText);
+    const BamHeader header1{hdrText};
+    const BamHeader header2{hdrText};
     const BamHeader merged = header1 + header2;
     EXPECT_EQ(hdrText, merged.ToSam());
 }
@@ -353,26 +370,20 @@ TEST(BamHeaderTest, MergeHandlesDuplicateReadGroups)
 TEST(BamHeaderTest, MergeCompatibilityOk)
 {
     {  // different @HD:VN - this IS allowed (as of SAT-465, pbbam v0.7.2)
-        const std::string hdrText1 = {"@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"};
-        const std::string hdrText2 = {"@HD\tVN:1.0\tSO:unknown\tpb:3.0.1\n"};
-        const BamHeader header1(hdrText1);
-        const BamHeader header2(hdrText2);
+        const BamHeader header1{"@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"};
+        const BamHeader header2{"@HD\tVN:1.0\tSO:unknown\tpb:3.0.1\n"};
         EXPECT_NO_THROW(header1 + header2);
     }
 
     {  // different @HD:SO
-        const std::string hdrText1 = {"@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"};
-        const std::string hdrText2 = {"@HD\tVN:1.1\tSO:coordinate\tpb:3.0.1\n"};
-        const BamHeader header1(hdrText1);
-        const BamHeader header2(hdrText2);
+        const BamHeader header1{"@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"};
+        const BamHeader header2{"@HD\tVN:1.1\tSO:coordinate\tpb:3.0.1\n"};
         EXPECT_THROW(header1 + header2, std::runtime_error);
     }
 
     {  // different @HD:pb - this IS allowed (as of SAT-529, pbbam 0.7.4)
-        const std::string hdrText1 = {"@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"};
-        const std::string hdrText2 = {"@HD\tVN:1.1\tSO:unknown\tpb:3.0.3\n"};
-        const BamHeader header1(hdrText1);
-        const BamHeader header2(hdrText2);
+        const BamHeader header1{"@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"};
+        const BamHeader header2{"@HD\tVN:1.1\tSO:unknown\tpb:3.0.3\n"};
         EXPECT_NO_THROW(header1 + header2);
     }
 
@@ -385,8 +396,36 @@ TEST(BamHeaderTest, MergeCompatibilityOk)
             "@HD\tVN:1.1\tSO:coordinate\tpb:3.0.1\n"
             "@SQ\tSN:foo\tLN:42\n"
             "@SQ\tSN:baz\tLN:99\n"};
-        const BamHeader header1(hdrText1);
-        const BamHeader header2(hdrText2);
+        const BamHeader header1{hdrText1};
+        const BamHeader header2{hdrText2};
         EXPECT_THROW(header1 + header2, std::runtime_error);
     }
+}
+
+TEST(BamHeaderTest, CanConstructMergedHeaderFromBamFilenames)
+{
+    const std::vector<std::string> bamFilenames{
+        PbbamTestsConfig::Data_Dir + "/polymerase/production.subreads.bam",
+        PbbamTestsConfig::Data_Dir + "/polymerase/production.scraps.bam"};
+
+    const BamHeader header{bamFilenames};
+    EXPECT_EQ(BamHeaderTests::MergedConstructorText, header.ToSam());
+}
+
+TEST(BamHeaderTest, CanConstructMergedHeaderFromDataset)
+{
+    const DataSet dataset{PbbamTestsConfig::Data_Dir +
+                          "/polymerase/consolidate.subread.dataset.xml"};
+    const BamHeader header{dataset};
+    EXPECT_EQ(BamHeaderTests::MergedConstructorText, header.ToSam());
+}
+
+TEST(BamHeaderTest, CanConstructMergedHeaderFromInputHeaders)
+{
+    const BamFile subreadsBam{PbbamTestsConfig::Data_Dir + "/polymerase/production.subreads.bam"};
+    const BamFile scrapsBam{PbbamTestsConfig::Data_Dir + "/polymerase/production.scraps.bam"};
+    const std::vector<BamHeader> headers{subreadsBam.Header(), scrapsBam.Header()};
+
+    const BamHeader header{headers};
+    EXPECT_EQ(BamHeaderTests::MergedConstructorText, header.ToSam());
 }

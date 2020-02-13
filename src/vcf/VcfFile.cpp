@@ -3,6 +3,7 @@
 #include "pbbam/vcf/VcfFile.h"
 
 #include <cassert>
+
 #include <type_traits>
 
 #include "pbbam/vcf/VcfFormat.h"

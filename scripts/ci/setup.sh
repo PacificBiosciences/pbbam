@@ -33,6 +33,15 @@ case "${GCC_VERSION}" in
     export _artifact_versionprepend="true"
     ;;
 
+  ICC)
+    module load devtoolset/6
+    module load composer_xe/2017.4.196
+    module load gtest/gcc48
+
+    CC="icc"
+    CXX="icpc"
+    ;;
+
   *)
     module load gcc
     module load gtest
@@ -42,8 +51,8 @@ esac
 
 module load ccache
 
-export CC="ccache gcc"
-export CXX="ccache g++"
+export CC="ccache ${CC:-gcc}"
+export CXX="ccache ${CXX:-g++}"
 export CCACHE_BASEDIR="${PWD}"
 
 if [[ -z ${bamboo_planRepository_branchName+x} ]]; then

@@ -17,14 +17,12 @@ namespace internal {
 
 inline DataSetElement::DataSetElement(const std::string& label, const XsdType& xsd)
     : xsd_(xsd), label_(label)
-{
-}
+{}
 
 inline DataSetElement::DataSetElement(const std::string& label, const FromInputXml&,
                                       const XsdType& xsd)
     : xsd_(xsd), label_(label, true)
-{
-}
+{}
 
 inline bool DataSetElement::operator==(const DataSetElement& other) const
 {
@@ -100,8 +98,9 @@ inline const T& DataSetElement::Child(size_t index) const
 {
     DataSetElement* child = children_.at(index).get();
     if (child == nullptr)
-        throw std::runtime_error{"DataSetElement: cannot access null child at index: " +
-                                 std::to_string(index)};
+        throw std::runtime_error{
+            "[pbbam] dataset element ERROR: cannot access null child at index " +
+            std::to_string(index) + " in element: " + QualifiedNameLabel()};
     const T* c = dynamic_cast<const T*>(child);
     return *c;
 }
@@ -111,8 +110,9 @@ inline T& DataSetElement::Child(size_t index)
 {
     DataSetElement* child = children_.at(index).get();
     if (child == nullptr)
-        throw std::runtime_error{"DataSetElement: cannot access null child at index: " +
-                                 std::to_string(index)};
+        throw std::runtime_error{
+            "[pbbam] dataset element ERROR: cannot access null child at index " +
+            std::to_string(index) + " in element: " + QualifiedNameLabel()};
     T* c = dynamic_cast<T*>(child);
     return *c;
 }
@@ -248,8 +248,7 @@ inline const XsdType& DataSetElement::Xsd() const { return xsd_; }
 inline DataSetElementIteratorBase::DataSetElementIteratorBase(const DataSetElement* parent,
                                                               size_t i)
     : parent_(parent), index_(i)
-{
-}
+{}
 
 inline bool DataSetElementIteratorBase::operator==(const DataSetElementIteratorBase& other) const
 {
@@ -277,8 +276,7 @@ inline void DataSetElementIteratorBase::Advance()
 template <typename T>
 inline DataSetElementIterator<T>::DataSetElementIterator(const DataSetElement* parent, size_t i)
     : DataSetElementIteratorBase(parent, i)
-{
-}
+{}
 
 template <typename T>
 inline T& DataSetElementIterator<T>::operator*()
@@ -315,8 +313,7 @@ template <typename T>
 inline DataSetElementConstIterator<T>::DataSetElementConstIterator(const DataSetElement* parent,
                                                                    size_t i)
     : DataSetElementIteratorBase(parent, i)
-{
-}
+{}
 
 template <typename T>
 inline const T& DataSetElementConstIterator<T>::operator*() const

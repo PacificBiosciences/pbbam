@@ -32,6 +32,39 @@ const std::vector<GenomicInterval> ExpectedIntervals {
     {"chr3", 127480532, 127481699}
 };
 
+void CheckManualIteration(const std::string& fn)
+{
+    size_t count = 0;
+    BedReader reader{fn};
+    GenomicInterval interval;
+    while (reader.GetNext(interval)) {
+        EXPECT_EQ(BedReaderTests::ExpectedIntervals.at(count), interval);
+        ++count;
+    }
+    EXPECT_EQ(BedReaderTests::ExpectedIntervals.size(), count);
+}
+
+void CheckRangeFor(const std::string& fn)
+{
+    size_t count = 0;
+    BedReader reader{fn};
+    for (const auto& interval : reader) {
+        EXPECT_EQ(BedReaderTests::ExpectedIntervals.at(count), interval);
+        ++count;
+    }
+    EXPECT_EQ(BedReaderTests::ExpectedIntervals.size(), count);
+}
+
+void CheckReadAll(const std::string& fn)
+{
+    size_t count = 0;
+    for (const auto& interval : BedReader::ReadAll(fn)) {
+        EXPECT_EQ(BedReaderTests::ExpectedIntervals.at(count), interval);
+        ++count;
+    }
+    EXPECT_EQ(BedReaderTests::ExpectedIntervals.size(), count);
+}
+
 }  // namespace BedReaderTests
 
 TEST(BedReaderTest, throws_on_empty_filename)
@@ -46,80 +79,32 @@ TEST(BedReaderTest, throws_on_invalid_extension)
 
 TEST(BedReaderTest, can_iterate_manually_on_text_bed)
 {
-    const auto& fn = BedReaderTests::BedFn;
-
-    size_t count = 0;
-    BedReader reader{fn};
-    GenomicInterval interval;
-    while (reader.GetNext(interval)) {
-        EXPECT_EQ(BedReaderTests::ExpectedIntervals.at(count), interval);
-        ++count;
-    }
-    EXPECT_EQ(BedReaderTests::ExpectedIntervals.size(), count);
+    BedReaderTests::CheckManualIteration(BedReaderTests::BedFn);
 }
 
 TEST(BedReaderTest, can_iterate_manually_on_gzip_bed)
 {
-    const auto& fn = BedReaderTests::GzipBedFn;
-
-    size_t count = 0;
-    BedReader reader{fn};
-    GenomicInterval interval;
-    while (reader.GetNext(interval)) {
-        EXPECT_EQ(BedReaderTests::ExpectedIntervals.at(count), interval);
-        ++count;
-    }
-    EXPECT_EQ(BedReaderTests::ExpectedIntervals.size(), count);
+    BedReaderTests::CheckManualIteration(BedReaderTests::GzipBedFn);
 }
 
 TEST(BedReaderTest, can_iterate_using_range_for_on_text_bed)
 {
-    const auto& fn = BedReaderTests::BedFn;
-
-    size_t count = 0;
-    BedReader reader{fn};
-    for (const auto& interval : reader) {
-        EXPECT_EQ(BedReaderTests::ExpectedIntervals.at(count), interval);
-        ++count;
-    }
-    EXPECT_EQ(BedReaderTests::ExpectedIntervals.size(), count);
+    BedReaderTests::CheckRangeFor(BedReaderTests::BedFn);
 }
 
 TEST(BedReaderTest, can_iterate_using_range_for_on_gzip_bed)
 {
-    const auto& fn = BedReaderTests::GzipBedFn;
-
-    size_t count = 0;
-    BedReader reader{fn};
-    for (const auto& interval : reader) {
-        EXPECT_EQ(BedReaderTests::ExpectedIntervals.at(count), interval);
-        ++count;
-    }
-    EXPECT_EQ(BedReaderTests::ExpectedIntervals.size(), count);
+    BedReaderTests::CheckRangeFor(BedReaderTests::GzipBedFn);
 }
 
 TEST(BedReaderTest, BedReaderTest_can_read_all_from_text_bed)
 {
-    const auto& fn = BedReaderTests::BedFn;
-
-    size_t count = 0;
-    for (const auto& interval : BedReader::ReadAll(fn)) {
-        EXPECT_EQ(BedReaderTests::ExpectedIntervals.at(count), interval);
-        ++count;
-    }
-    EXPECT_EQ(BedReaderTests::ExpectedIntervals.size(), count);
+    BedReaderTests::CheckReadAll(BedReaderTests::BedFn);
 }
 
 TEST(BedReaderTest, BedReaderTest_can_read_all_from_gzip_bed)
 {
-    const auto& fn = BedReaderTests::GzipBedFn;
-
-    size_t count = 0;
-    for (const auto& interval : BedReader::ReadAll(fn)) {
-        EXPECT_EQ(BedReaderTests::ExpectedIntervals.at(count), interval);
-        ++count;
-    }
-    EXPECT_EQ(BedReaderTests::ExpectedIntervals.size(), count);
+    BedReaderTests::CheckReadAll(BedReaderTests::GzipBedFn);
 }
 
 // clang-foramt on

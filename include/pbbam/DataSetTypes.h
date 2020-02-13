@@ -12,11 +12,22 @@
 #include <string>
 
 #include "pbbam/BamFile.h"
+#include "pbbam/CollectionMetadata.h"
 #include "pbbam/DataSetXsd.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 
 namespace PacBio {
 namespace BAM {
+
+///
+/// Set filepath resolving mode for XML output. Default is to always 'absolutize'
+/// paths. Selecting 'ALLOW_RELATIVE' leaves file names verbatim.
+///
+enum class DataSetPathMode
+{
+    ABSOLUTE,
+    ALLOW_RELATIVE
+};
 
 ///
 /// \brief The DNABarcode class represents a %DNABarcode element in
@@ -734,6 +745,16 @@ public:
     ///
     const PacBio::BAM::BioSamples& BioSamples() const;
 
+    ///
+    /// \brief Fetches the CollectionMetadata.
+    ///
+    /// \note Assumes 1 CollectionMetadata child for a given DataSetMetadata instance.
+    ///
+    /// \returns const reference to child element
+    /// \throw std::runtime_error if element does not exist
+    ///
+    const PacBio::BAM::CollectionMetadata& CollectionMetadata() const;
+
     /// \}
 
 public:
@@ -772,6 +793,17 @@ public:
     ///
     PacBio::BAM::BioSamples& BioSamples();
 
+    ///
+    /// \brief Fetches the CollectionMetadata element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \note Assumes 1 CollectionMetadata child for a given DataSetMetadata instance.
+    ///
+    /// \return const CollectionMetadata&
+    ///
+    PacBio::BAM::CollectionMetadata& CollectionMetadata();
+
     /// \}
 
 public:
@@ -809,6 +841,14 @@ public:
     /// \returns reference to this metadata object
     ///
     DataSetMetadata& BioSamples(const PacBio::BAM::BioSamples& samples);
+
+    /// \brief Sets the CollectionMetadata child element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \returns reference to this metadata object
+    ///
+    DataSetMetadata& CollectionMetadata(const PacBio::BAM::CollectionMetadata& metadata);
 
     /// \}
 };
@@ -971,21 +1011,24 @@ public:
     /// \brief Saves dataset XML to file.
     ///
     /// \param[in] outputFilename destination for XML contents
+    /// \param[in] pathMode       print absolute paths or allow relative
     ///
     /// \throws std::runtime_error if file could be opened or if DataSet
     ///         elements could not be converted to XML
     ///
-    void Save(const std::string& outputFilename);
+    void Save(const std::string& outputFilename,
+              DataSetPathMode pathMode = DataSetPathMode::ABSOLUTE);
 
     /// \brief Saves dataset XML to output stream, e.g. std::cout,
     ///        std::stringstream.
     ///
-    /// \param[out] out destination for XML contents
+    /// \param[out] out         destination for XML contents
+    /// \param[in]  pathMode    print absolute paths or allow relative
     ///
     /// \throws std::runtime_error if DataSet elements could not be converted to
     ///         XML
     ///
-    void SaveToStream(std::ostream& out);
+    void SaveToStream(std::ostream& out, DataSetPathMode pathMode = DataSetPathMode::ABSOLUTE);
 
 public:
     ///
@@ -1170,10 +1213,17 @@ enum class XmlElementType
 {
     GENERIC_ELEMENT,
     DATASET_METADATA,
+    AUTOMATION,
+    AUTOMATION_PARAMETER,
+    AUTOMATION_PARAMETERS,
+    BINDING_KIT,
     BIOSAMPLE,
     BIOSAMPLES,
     DNA_BARCODE,
     DNA_BARCODES,
+    COLLECTIONS,
+    COLLECTION_METADATA,
+    CONTROL_KIT,
     EXTENSION,
     EXTENSIONS,
     EXTERNAL_RESOURCE,
@@ -1183,9 +1233,12 @@ enum class XmlElementType
     FILTER,
     FILTERS,
     PARENT_TOOL,
+    PPACONFIG,
     PROPERTY,
     PROPERTIES,
     PROVENANCE,
+    SEQUENCING_KIT_PLATE,
+    TEMPLATE_PREP_KIT,
 
     GENERIC_DATASET,
     ALIGNMENT_SET,

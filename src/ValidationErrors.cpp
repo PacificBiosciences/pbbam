@@ -9,10 +9,12 @@
 #include "pbbam/exception/ValidationException.h"
 
 #include <cstddef>
+
 #include <sstream>
 
-#include "ValidationErrors.h"
 #include "pbbam/StringUtilities.h"
+
+#include "ValidationErrors.h"
 
 namespace PacBio {
 namespace BAM {

@@ -29,10 +29,6 @@ TEST(BgzipFastqWriterTest, writes_bgzf_fastq_data_to_file)
     }
     EXPECT_EQ(HtslibCompression::BGZIP, FormatUtils::CompressionType(fn));
 
-    std::vector<FastqSequence> observed;
-    FastqReader reader{fn};
-    for (const auto& seq : reader)
-        observed.push_back(seq);
-
+    const auto observed = FastqReader::ReadAll(fn);
     EXPECT_TRUE(std::equal(sequences.cbegin(), sequences.cend(), observed.cbegin()));
 }

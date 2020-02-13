@@ -7,8 +7,9 @@
 
 #include "pbbam/DataSetXsd.h"
 
-#include <algorithm>
 #include <cassert>
+
+#include <algorithm>
 #include <map>
 #include <memory>
 #include <stdexcept>

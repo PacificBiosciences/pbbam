@@ -10,6 +10,7 @@
 
 #include <cassert>
 
+#include <sstream>
 #include <stdexcept>
 #include <type_traits>
 
@@ -33,9 +34,12 @@ public:
     {
         // "ru" : read & supply plain output
         bgzf_.reset(bgzf_open(filename_.c_str(), "ru"));
-        if (bgzf_.get() == nullptr)
-            throw std::runtime_error("TextFileReader - could not open zipped file: " + filename_ +
-                                     " for reading");
+        if (bgzf_.get() == nullptr) {
+            std::ostringstream msg;
+            msg << "[pbbam] text file reader ERROR: could not open file:\n"
+                << "  file: " << filename_;
+            throw std::runtime_error{msg.str()};
+        }
 
         // pre-fetch first line
         GetNext();
@@ -67,9 +71,11 @@ public:
 
             // else error
             else {
-                throw std::runtime_error("TextFileReader - could not read from text file: " +
-                                         filename_ + "\nreason: htslib error code " +
-                                         std::to_string(result));
+                std::ostringstream msg;
+                msg << "[pbbam] SAM writer ERROR: could not read from file:\n"
+                    << "  file: " << filename_ << '\n'
+                    << "  htslib error code: " << result;
+                throw std::runtime_error{msg.str()};
             }
         }
     }
@@ -91,6 +97,8 @@ TextFileReader::TextFileReader(TextFileReader&&) noexcept = default;
 TextFileReader& TextFileReader::operator=(TextFileReader&&) noexcept = default;
 
 TextFileReader::~TextFileReader() = default;
+
+const std::string& TextFileReader::Filename() const { return d_->filename_; }
 
 bool TextFileReader::GetNext(std::string& line)
 {

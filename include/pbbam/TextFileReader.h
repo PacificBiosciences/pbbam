@@ -49,6 +49,8 @@ public:
     ~TextFileReader();
 
 public:
+    const std::string& Filename() const;
+
     //
     /// \brief GetNext
     ///

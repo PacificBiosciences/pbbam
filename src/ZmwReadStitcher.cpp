@@ -12,12 +12,13 @@
 #include <stdexcept>
 #include <utility>
 
-#include "VirtualStitching.h"
-#include "VirtualZmwReader.h"
 #include "pbbam/DataSet.h"
 #include "pbbam/EntireFileQuery.h"
 #include "pbbam/PbiFilter.h"
 #include "pbbam/PbiFilterQuery.h"
+
+#include "VirtualStitching.h"
+#include "VirtualZmwReader.h"
 
 namespace PacBio {
 namespace BAM {
@@ -51,7 +52,7 @@ public:
 
         // no reader active
         throw std::runtime_error{
-            "ZmwReadStitcher: "
+            "[pbbam] ZMW stitching ERROR: "
             "no readers active, make sure you use "
             "ZmwReadStitcher::HasNext before "
             "requesting next record"};
@@ -67,7 +68,7 @@ public:
 
         // no reader active
         throw std::runtime_error{
-            "ZmwReadStitcher: "
+            "[pbbam] ZMW stitching ERROR: "
             "no readers active, make sure you use "
             "ZmwReadStitcher::HasNext before "
             "requesting next group of records"};

@@ -13,15 +13,15 @@ using namespace PacBio::BAM;
 
 TEST(CigarTest, TypeToCar)
 {
-    EXPECT_EQ('M', CigarOperation::TypeToChar(CigarOperationType::ALIGNMENT_MATCH) );
-    EXPECT_EQ('I', CigarOperation::TypeToChar(CigarOperationType::INSERTION) );
-    EXPECT_EQ('D', CigarOperation::TypeToChar(CigarOperationType::DELETION) );
-    EXPECT_EQ('N', CigarOperation::TypeToChar(CigarOperationType::REFERENCE_SKIP) );
-    EXPECT_EQ('S', CigarOperation::TypeToChar(CigarOperationType::SOFT_CLIP) );
-    EXPECT_EQ('H', CigarOperation::TypeToChar(CigarOperationType::HARD_CLIP) );
-    EXPECT_EQ('P', CigarOperation::TypeToChar(CigarOperationType::PADDING) );
-    EXPECT_EQ('=', CigarOperation::TypeToChar(CigarOperationType::SEQUENCE_MATCH) );
-    EXPECT_EQ('X', CigarOperation::TypeToChar(CigarOperationType::SEQUENCE_MISMATCH) );
+    EXPECT_EQ('M', CigarOperation::TypeToChar(CigarOperationType::ALIGNMENT_MATCH));
+    EXPECT_EQ('I', CigarOperation::TypeToChar(CigarOperationType::INSERTION));
+    EXPECT_EQ('D', CigarOperation::TypeToChar(CigarOperationType::DELETION));
+    EXPECT_EQ('N', CigarOperation::TypeToChar(CigarOperationType::REFERENCE_SKIP));
+    EXPECT_EQ('S', CigarOperation::TypeToChar(CigarOperationType::SOFT_CLIP));
+    EXPECT_EQ('H', CigarOperation::TypeToChar(CigarOperationType::HARD_CLIP));
+    EXPECT_EQ('P', CigarOperation::TypeToChar(CigarOperationType::PADDING));
+    EXPECT_EQ('=', CigarOperation::TypeToChar(CigarOperationType::SEQUENCE_MATCH));
+    EXPECT_EQ('X', CigarOperation::TypeToChar(CigarOperationType::SEQUENCE_MISMATCH));
 }
 
 TEST(CigarTest, CharToType)
@@ -85,36 +85,31 @@ TEST(CigarTest, SetTypeYieldsCorrectOperation)
 
 TEST(CigarStringTest, FromStdString_Empty)
 {
-    const std::string emptyCigar = "";
-    Cigar cigar = Cigar::FromStdString(emptyCigar);
+    const Cigar cigar = Cigar::FromStdString("");
     EXPECT_TRUE(cigar.empty());
 }
 
 TEST(CigarStringTest, FromStdString_SingleOp)
 {
-    const std::string singleCigar = "100=";
-
-    Cigar cigar = Cigar::FromStdString(singleCigar);
+    const Cigar cigar = Cigar::FromStdString("100=");
     ASSERT_TRUE(cigar.size() == 1);
 
-    const CigarOperation& op = cigar.front();
+    const auto& op = cigar.front();
     EXPECT_TRUE(op.Char()   == '=');
     EXPECT_TRUE(op.Length() == 100);
 }
 
 TEST(CigarStringTest, FromStdString_MultipleOps)
 {
-    const std::string multiCigar = "100=2D34I6=6X6=";
-
-    Cigar cigar = Cigar::FromStdString(multiCigar);
+    const Cigar cigar = Cigar::FromStdString("100=2D34I6=6X6=");
     ASSERT_TRUE(cigar.size() == 6);
 
-    CigarOperation op0 = cigar.at(0);
-    CigarOperation op1 = cigar.at(1);
-    CigarOperation op2 = cigar.at(2);
-    CigarOperation op3 = cigar.at(3);
-    CigarOperation op4 = cigar.at(4);
-    CigarOperation op5 = cigar.at(5);
+    const auto& op0 = cigar.at(0);
+    const auto& op1 = cigar.at(1);
+    const auto& op2 = cigar.at(2);
+    const auto& op3 = cigar.at(3);
+    const auto& op4 = cigar.at(4);
+    const auto& op5 = cigar.at(5);
 
     EXPECT_TRUE(op0.Char()   == '=');
     EXPECT_TRUE(op0.Length() == 100);
@@ -132,34 +127,27 @@ TEST(CigarStringTest, FromStdString_MultipleOps)
 
 TEST(CigarStringTest, ToStdString_Empty)
 {
-    const std::string empty;
-    Cigar cigar;
-    EXPECT_EQ(empty, cigar.ToStdString());
+    const Cigar cigar;
+    EXPECT_EQ("", cigar.ToStdString());
 }
 
 TEST(CigarStringTest, ToStdString_SingleOp)
 {
-    const std::string singleCigar = "100=";
-
     Cigar cigar;
-    cigar.push_back( CigarOperation(CigarOperationType::SEQUENCE_MATCH, 100) );
-
-    EXPECT_EQ(singleCigar, cigar.ToStdString());
+    cigar.emplace_back(CigarOperationType::SEQUENCE_MATCH, 100);
+    EXPECT_EQ("100=", cigar.ToStdString());
 }
 
 TEST(CigarStringTest, ToStdString_MultipleOps)
 {
-    const std::string multiCigar = "100=2D34I6=6X6=";
-
     Cigar cigar;
-    cigar.push_back(CigarOperation(CigarOperationType::SEQUENCE_MATCH,  100));
-    cigar.push_back(CigarOperation(CigarOperationType::DELETION,          2));
-    cigar.push_back(CigarOperation(CigarOperationType::INSERTION,        34));
-    cigar.push_back(CigarOperation(CigarOperationType::SEQUENCE_MATCH,    6));
-    cigar.push_back(CigarOperation(CigarOperationType::SEQUENCE_MISMATCH, 6));
-    cigar.push_back(CigarOperation(CigarOperationType::SEQUENCE_MATCH,    6));
-
-    EXPECT_EQ(multiCigar, cigar.ToStdString());
+    cigar.emplace_back(CigarOperationType::SEQUENCE_MATCH,  100);
+    cigar.emplace_back(CigarOperationType::DELETION,          2);
+    cigar.emplace_back(CigarOperationType::INSERTION,        34);
+    cigar.emplace_back(CigarOperationType::SEQUENCE_MATCH,    6);
+    cigar.emplace_back(CigarOperationType::SEQUENCE_MISMATCH, 6);
+    cigar.emplace_back(CigarOperationType::SEQUENCE_MATCH,    6);
+    EXPECT_EQ("100=2D34I6=6X6=", cigar.ToStdString());
 }
 
 // clang-format on

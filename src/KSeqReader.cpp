@@ -21,7 +21,7 @@ KSeqReader::KSeqReader(const std::string& fn)
     // check file handle
     if (fp_ == nullptr) {
         std::ostringstream msg;
-        msg << "KSeqReader: could not open file for reading\n"
+        msg << "[pbbam] kseq FASTX reader ERROR: could not open file:\n"
             << "  file: " << fn << '\n';
         throw std::runtime_error{msg.str()};
     }

@@ -13,6 +13,8 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
+#include <stdexcept>
 #include <type_traits>
 
 #include <boost/algorithm/string.hpp>
@@ -39,15 +41,19 @@ public:
             // open for gzipped text
             bgzf_.reset(bgzf_open(TempFilename().c_str(), "wg"));
             if (bgzf_.get() == nullptr) {
-                throw std::runtime_error("TextFileWriter - could not open file: " + filename +
-                                         " for writing");
+                std::ostringstream msg;
+                msg << "[pbbam] text file writer ERROR: could not open zipped file:\n"
+                    << "  file: " << filename;
+                throw std::runtime_error{msg.str()};
             }
         } else {
             // open for plain text
             out_.open(TempFilename());
             if (!out_) {
-                throw std::runtime_error("TextFileWriter - could not open file: " + filename +
-                                         " for writing");
+                std::ostringstream msg;
+                msg << "[pbbam] text file writer ERROR: could not open plain text file:\n"
+                    << "  file: " << filename;
+                throw std::runtime_error{msg.str()};
             }
         }
     }
@@ -58,9 +64,12 @@ public:
             const size_t length = line.size();
             ssize_t written = bgzf_write(bgzf_.get(), line.c_str(), length);
             written += bgzf_write(bgzf_.get(), "\n", 1);
-            if (written != static_cast<ssize_t>(length + 1))
-                throw std::runtime_error("TextFileWriter - error writing to file: " +
-                                         TargetFilename());
+            if (written != static_cast<ssize_t>(length + 1)) {
+                std::ostringstream msg;
+                msg << "[pbbam] text file writer ERROR: could not write to file:\n"
+                    << "  file: " << TempFilename();
+                throw std::runtime_error{msg.str()};
+            }
         } else {
             out_ << line << '\n';
         }

@@ -9,10 +9,11 @@
 #include "pbbam/DataSetTypes.h"
 
 #include <cstddef>
+
 #include <set>
+#include <tuple>
 #include <unordered_map>
 
-#include "pbbam/Unused.h"
 #include "pbbam/internal/DataSetBaseTypes.h"
 
 #include "DataSetIO.h"
@@ -26,9 +27,16 @@ namespace {
 using ElementType = PacBio::BAM::XmlElementType;
 const std::unordered_map<std::string, PacBio::BAM::XmlElementType> elementTypeLookup
 {
-    {"DataSetMetadata",        ElementType::DATASET_METADATA},
+    {"Automation",             ElementType::AUTOMATION},
+    {"AutomationParameter",    ElementType::AUTOMATION_PARAMETER},
+    {"AutomationParameters",   ElementType::AUTOMATION_PARAMETERS},
+    {"BindingKit",             ElementType::BINDING_KIT},
     {"BioSample",              ElementType::BIOSAMPLE},
     {"BioSamples",             ElementType::BIOSAMPLES},
+    {"ControlKit",             ElementType::CONTROL_KIT},
+    {"Collections",            ElementType::COLLECTIONS},
+    {"CollectionMetadata",     ElementType::COLLECTION_METADATA},
+    {"DataSetMetadata",        ElementType::DATASET_METADATA},
     {"DNABarcode",             ElementType::DNA_BARCODE},
     {"DNABarcodes",            ElementType::DNA_BARCODES},
     {"ExtensionElement",       ElementType::EXTENSION},
@@ -40,9 +48,13 @@ const std::unordered_map<std::string, PacBio::BAM::XmlElementType> elementTypeLo
     {"Filter",                 ElementType::FILTER},
     {"Filters",                ElementType::FILTERS},
     {"ParentTool",             ElementType::PARENT_TOOL},
+    {"PPAConfig",              ElementType::PPACONFIG},
     {"Property",               ElementType::PROPERTY},
     {"Properties",             ElementType::PROPERTIES},
     {"Provenance",             ElementType::PROVENANCE},
+    {"SequencingKitPlate",     ElementType::SEQUENCING_KIT_PLATE},
+    {"TemplatePrepKit",        ElementType::TEMPLATE_PREP_KIT},
+
     {"AlignmentSet",           ElementType::ALIGNMENT_SET},
     {"BarcodeSet",             ElementType::BARCODE_SET},
     {"ConsensusAlignmentSet",  ElementType::CONSENSUS_ALIGNMENT_SET},
@@ -317,7 +329,7 @@ DataSetBase& DataSetBase::operator+=(const DataSetBase& other)
 {
     // must be same dataset types (or 'other' must be generic)
     if (other.LocalNameLabel() != LocalNameLabel() && other.LocalNameLabel() != "DataSet")
-        throw std::runtime_error{"DataSet: cannot merge different dataset types"};
+        throw std::runtime_error{"[pbbam] dataset ERROR: cannot merge different dataset types"};
 
     // check object metadata
     Metadata() += other.Metadata();
@@ -345,7 +357,7 @@ std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName)
         return std::make_shared<TranscriptAlignmentSet>();
 
     // unknown typename
-    throw std::runtime_error{"DataSet: unsupported type: " + typeName};
+    throw std::runtime_error{"[pbbam] dataset ERROR: unsupported type: " + typeName};
 }
 
 std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName,
@@ -371,15 +383,18 @@ std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName,
         return std::make_shared<TranscriptAlignmentSet>(fromInputXml);
 
     // unknown typename
-    throw std::runtime_error{"DataSet: unsupported type: " + typeName};
+    throw std::runtime_error{"[pbbam] dataset ERROR: unsupported type: " + typeName};
 }
 
-void DataSetBase::Save(const std::string& outputFilename)
+void DataSetBase::Save(const std::string& outputFilename, DataSetPathMode pathMode)
 {
-    DataSetIO::ToFile(*this, outputFilename);
+    DataSetIO::ToFile(*this, outputFilename, pathMode);
 }
 
-void DataSetBase::SaveToStream(std::ostream& out) { DataSetIO::ToStream(*this, out); }
+void DataSetBase::SaveToStream(std::ostream& out, DataSetPathMode pathMode)
+{
+    DataSetIO::ToStream(*this, out, pathMode);
+}
 
 // -------------------
 // DataSetMetadata
@@ -412,6 +427,30 @@ DEFINE_ACCESSORS(DataSetMetadata, BioSamples, BioSamples)
 DataSetMetadata& DataSetMetadata::BioSamples(const PacBio::BAM::BioSamples& samples)
 {
     BioSamples() = samples;
+    return *this;
+}
+
+const PacBio::BAM::CollectionMetadata& DataSetMetadata::CollectionMetadata() const
+{
+    const PacBio::BAM::Collections& collections = Child<PacBio::BAM::Collections>("Collections");
+    assert(collections.Size() >= 1);
+    const PacBio::BAM::CollectionMetadata& cm =
+        collections.Child<PacBio::BAM::CollectionMetadata>(0);
+    return cm;
+}
+
+PacBio::BAM::CollectionMetadata& DataSetMetadata::CollectionMetadata()
+{
+    PacBio::BAM::Collections& collections = Child<PacBio::BAM::Collections>("Collections");
+    if (collections.Size() == 0) collections.AddChild(PacBio::BAM::CollectionMetadata{});
+    PacBio::BAM::CollectionMetadata& cm = collections.Child<PacBio::BAM::CollectionMetadata>(0);
+    return cm;
+}
+
+DataSetMetadata& DataSetMetadata::CollectionMetadata(
+    const PacBio::BAM::CollectionMetadata& metadata)
+{
+    CollectionMetadata() = metadata;
     return *this;
 }
 
@@ -623,7 +662,7 @@ ExternalResource::ExternalResource(const std::string& metatype, const std::strin
                                    const internal::FromInputXml& fromInputXml)
     : IndexedDataType("", filename, "ExternalResource", fromInputXml, XsdType::BASE_DATA_MODEL)
 {
-    UNUSED(metatype);
+    std::ignore = metatype;
 }
 
 DEFINE_ACCESSORS(ExternalResource, ExternalResources, ExternalResources)
@@ -745,7 +784,7 @@ FileIndex::FileIndex(const std::string& metatype, const std::string& filename,
                      const internal::FromInputXml& fromInputXml)
     : InputOutputDataType("", filename, "FileIndex", fromInputXml, XsdType::BASE_DATA_MODEL)
 {
-    UNUSED(metatype);
+    std::ignore = metatype;
 }
 
 // -------------------

@@ -5,6 +5,7 @@
 #include <pbbam/vcf/VcfReader.h>
 
 #include <cassert>
+
 #include <type_traits>
 
 namespace PacBio {

@@ -11,9 +11,12 @@
 
 #include <cstddef>
 #include <cstdint>
+
 #include <memory>
+#include <set>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include <boost/optional.hpp>
 
@@ -441,7 +444,8 @@ public:
     bool Accepts(const PbiRawData& idx, const size_t row) const;
 
 private:
-    PbiFilter compositeFilter_;
+    std::set<std::string> movieNames_;
+    mutable std::set<int32_t> candidateRgIds_;
     Compare::Type cmp_;
 };
 

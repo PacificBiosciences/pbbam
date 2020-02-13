@@ -1,18 +1,20 @@
 // Author: Derek Barnett
 
 #include <unistd.h>
+
 #include <cstddef>
 #include <cstdlib>
+
+#include <iterator>
 #include <stdexcept>
 
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
 #include <pbbam/../../src/FileUtils.h>
 #include <pbbam/BamFile.h>
 #include <pbbam/EntireFileQuery.h>
-#include <pbbam/Unused.h>
+
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -22,13 +24,8 @@ namespace BamFileTests {
 template <typename T>
 void CheckFile(const T& input, const size_t expectedCount)
 {
-    size_t observedCount = 0;
-    EntireFileQuery entireFile(input);
-    for (const BamRecord& r : entireFile) {
-        UNUSED(r);
-        ++observedCount;
-    }
-    EXPECT_EQ(expectedCount, observedCount);
+    EntireFileQuery entireFile{input};
+    EXPECT_EQ(expectedCount, std::distance(entireFile.begin(), entireFile.end()));
 }
 
 }  // namespace BamFileTests
@@ -47,7 +44,7 @@ TEST(BamFileTest, RelativePathBamOk)
 {
     // cache current working directory, then drill down so we can point to
     // BAMs using relative path
-    const std::string cwd = FileUtils::CurrentWorkingDirectory();
+    const std::string cwd{FileUtils::CurrentWorkingDirectory()};
     ASSERT_EQ(0, chdir(PbbamTestsConfig::Data_Dir.c_str()));
     ASSERT_EQ(0, chdir("relative/a"));
 
@@ -59,7 +56,7 @@ TEST(BamFileTest, RelativePathBamOk)
 
     // dataset from BamFile object (itself from relative BAM fn)
     {
-        auto file = BamFile{"../b/test1.bam"};
+        const BamFile file{"../b/test1.bam"};
         BamFileTests::CheckFile(DataSet{file}, 3);
     }
 
@@ -71,7 +68,7 @@ TEST(BamFileTest, RelativePathXmlOk)
 {
     // cache current working directory, then drill down so we can point to
     // BAMs using relative path
-    const std::string cwd = FileUtils::CurrentWorkingDirectory();
+    const std::string cwd{FileUtils::CurrentWorkingDirectory()};
     ASSERT_EQ(0, chdir(PbbamTestsConfig::Data_Dir.c_str()));
 
     // dataset from XML containing relative paths
@@ -85,7 +82,7 @@ TEST(BamFileTest, RelativePathFofnOk)
 {
     // cache current working directory, then drill down so we can point to
     // BAMs using relative path
-    const std::string cwd = FileUtils::CurrentWorkingDirectory();
+    const std::string cwd{FileUtils::CurrentWorkingDirectory()};
     ASSERT_EQ(0, chdir(PbbamTestsConfig::Data_Dir.c_str()));
 
     // dataset from FOFN containing relative paths

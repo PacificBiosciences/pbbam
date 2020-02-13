@@ -42,6 +42,5 @@ No-Header:
 Invalid-Args:
 
   $ $BAM2SAM --header-only --no-header < $DATADIR/phi29.bam
-  bam2sam ERROR: conflicting arguments requested '--no-header' and '--header-only'
+  >|> \d{8} \d{2}:\d{2}:\d{2}\.\d{3} -|- INFO       -|- Version -|- [0-9,a-f,x]+|| -|- caught exception: "conflicting arguments requested '--no-header' and '--header-only'" (re)
   [1]
-

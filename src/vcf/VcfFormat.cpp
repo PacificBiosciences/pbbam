@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <cmath>
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -17,10 +18,11 @@
 #include <pbbam/StringUtilities.h>
 #include <pbbam/vcf/VcfHeader.h>
 
+#include "VcfFormatException.h"
+
 namespace PacBio {
 namespace VCF {
-
-namespace {  // anonymous
+namespace {
 
 // using htslib's current version for better compatibility
 static constexpr const char current_version[] = "VCFv4.2";
@@ -50,11 +52,11 @@ std::string QuotedText(const std::string& d) { return "\"" + d + "\""; }
 std::string UnquotedText(const std::string& d)
 {
     if (d.size() < 2 || d.front() != '"' || d.back() != '"')
-        throw std::runtime_error{"VcfFormat: description text is not quoted: " + d};
+        throw VcfFormatException{"description text is not quoted: " + d};
     return d.substr(1, d.size() - 2);
 }
 
-}  // namespace anonymous
+}  // namespace
 
 const char* VcfFormat::CurrentVersion() { return current_version; }
 
@@ -170,7 +172,7 @@ ContigDefinition VcfFormat::ParsedContigDefinition(std::string line)
     // substring between brackets
     const auto lastBracketPos = line.find_last_of('>');
     if (lastBracketPos == std::string::npos)
-        throw std::runtime_error{"VcfFormat: malformed ##contig line: " + line};
+        throw VcfFormatException{"malformed ##contig line: " + line};
     line = std::string(line.cbegin() + 10, line.cbegin() + lastBracketPos);
 
     std::string id;
@@ -179,9 +181,8 @@ ContigDefinition VcfFormat::ParsedContigDefinition(std::string line)
     const auto fields = PacBio::BAM::Split(line, ',');
     for (const auto& field : fields) {
         const auto tokens = PacBio::BAM::Split(field, '=');
-        if (tokens.size() != 2) {
-            throw std::runtime_error{"VcfFormat: malformed ##contig line: " + line};
-        }
+        if (tokens.size() != 2) throw VcfFormatException{"malformed ##contig line: " + line};
+
         if (tokens[0] == Tokens::id)
             id = tokens[1];
         else
@@ -199,7 +200,7 @@ FilterDefinition VcfFormat::ParsedFilterDefinition(std::string line)
     // substring between brackets
     const auto lastBracketPos = line.find_last_of('>');
     if (lastBracketPos == std::string::npos)
-        throw std::runtime_error{"VcfFormat: malformed FILTER line: " + line};
+        throw VcfFormatException{"malformed FILTER line: " + line};
     line = std::string(line.cbegin() + 10, line.cbegin() + lastBracketPos);
 
     std::string id;
@@ -208,15 +209,14 @@ FilterDefinition VcfFormat::ParsedFilterDefinition(std::string line)
     const auto fields = PacBio::BAM::Split(line, ',');
     for (const auto& field : fields) {
         const auto tokens = PacBio::BAM::Split(field, '=');
-        if (tokens.size() != 2) {
-            throw std::runtime_error{"VcfFormat: malformed FILTER line: " + line};
-        }
+        if (tokens.size() != 2) throw VcfFormatException{"malformed FILTER line: " + line};
+
         if (tokens[0] == Tokens::id)
             id = tokens[1];
-        else if (tokens[0] == Tokens::description) {
+        else if (tokens[0] == Tokens::description)
             description = UnquotedText(tokens[1]);
-        } else
-            throw std::runtime_error{"VcfFormat: unrecognized FILTER field: " + tokens[0]};
+        else
+            throw VcfFormatException{"unrecognized FILTER field: " + tokens[0]};
     }
 
     return FilterDefinition{std::move(id), std::move(description)};
@@ -230,7 +230,7 @@ FormatDefinition VcfFormat::ParsedFormatDefinition(std::string line)
     // substring between brackets
     const auto lastBracketPos = line.find_last_of('>');
     if (lastBracketPos == std::string::npos)
-        throw std::runtime_error{"VcfFormat: malformed FORMAT line: " + line};
+        throw VcfFormatException{"malformed FORMAT line: " + line};
     line = std::string(line.cbegin() + 10, line.cbegin() + lastBracketPos);
 
     std::string id;
@@ -242,7 +242,7 @@ FormatDefinition VcfFormat::ParsedFormatDefinition(std::string line)
     for (const auto& field : fields) {
         const auto tokens = PacBio::BAM::Split(field, '=');
         if (tokens.size() != 2) {
-            throw std::runtime_error{"VcfFormat: malformed FORMAT line: " + line};
+            throw VcfFormatException{"malformed FORMAT line: " + line};
         }
         if (tokens[0] == Tokens::id)
             id = tokens[1];
@@ -253,7 +253,7 @@ FormatDefinition VcfFormat::ParsedFormatDefinition(std::string line)
         else if (tokens[0] == Tokens::description) {
             description = UnquotedText(tokens[1]);
         } else
-            throw std::runtime_error{"VcfFormat: unrecognized FORMAT field: " + tokens[0]};
+            throw VcfFormatException{"unrecognized FORMAT field: " + tokens[0]};
     }
 
     return FormatDefinition{std::move(id), std::move(number), std::move(type),
@@ -263,10 +263,8 @@ FormatDefinition VcfFormat::ParsedFormatDefinition(std::string line)
 GeneralDefinition VcfFormat::ParsedGeneralDefinition(const std::string& line)
 {
     const auto tokens = PacBio::BAM::Split(line, '=');
-    if (tokens.size() != 2 || tokens[0].find(Tokens::double_hash) != 0) {
-        throw std::runtime_error{"VcfFormat: malformed header line: " + line};
-    }
-
+    if (tokens.size() != 2 || tokens[0].find(Tokens::double_hash) != 0)
+        throw VcfFormatException{"malformed header line: " + line};
     return GeneralDefinition{tokens[0].substr(2), tokens[1]};
 }
 
@@ -278,7 +276,7 @@ InfoDefinition VcfFormat::ParsedInfoDefinition(std::string line)
     // substring between brackets
     const auto lastBracketPos = line.find_last_of('>');
     if (lastBracketPos == std::string::npos)
-        throw std::runtime_error{"VcfFormat: malformed INFO line: " + line};
+        throw VcfFormatException{"malformed INFO line: " + line};
     line = std::string(line.cbegin() + 8, line.cbegin() + lastBracketPos);
 
     std::string id;
@@ -291,23 +289,22 @@ InfoDefinition VcfFormat::ParsedInfoDefinition(std::string line)
     const auto fields = PacBio::BAM::Split(line, ',');
     for (const auto& field : fields) {
         const auto tokens = PacBio::BAM::Split(field, '=');
-        if (tokens.size() != 2) {
-            throw std::runtime_error{"VcfFormat: malformed INFO line: " + line};
-        }
+        if (tokens.size() != 2) throw VcfFormatException{"malformed INFO line: " + line};
+
         if (tokens[0] == Tokens::id)
             id = tokens[1];
         else if (tokens[0] == Tokens::number)
             number = tokens[1];
         else if (tokens[0] == Tokens::type)
             type = tokens[1];
-        else if (tokens[0] == Tokens::description) {
+        else if (tokens[0] == Tokens::description)
             description = UnquotedText(tokens[1]);
-        } else if (tokens[0] == Tokens::source) {
+        else if (tokens[0] == Tokens::source)
             source = UnquotedText(tokens[1]);
-        } else if (tokens[0] == Tokens::version) {
+        else if (tokens[0] == Tokens::version)
             version = UnquotedText(tokens[1]);
-        } else
-            throw std::runtime_error{"VcfFormat: unrecognized INFO field: " + tokens[0]};
+        else
+            throw VcfFormatException{"unrecognized INFO field: " + tokens[0]};
     }
 
     return InfoDefinition{std::move(id),          std::move(number), std::move(type),
@@ -323,12 +320,10 @@ VcfHeader VcfFormat::ParsedHeader(const std::string& hdrText)
 
     // quick check for fileformat - should be the first line
     std::getline(text, line);
-    {
-        auto genDef = ParsedGeneralDefinition(line);
-        if (genDef.Id() != Tokens::file_format)
-            throw std::runtime_error{"VcfFormat: file must begin with #fileformat line"};
-        hdr.AddGeneralDefinition(std::move(genDef));
-    }
+    auto genDef = ParsedGeneralDefinition(line);
+    if (genDef.Id() != Tokens::file_format)
+        throw VcfFormatException{"file must begin with #fileformat line"};
+    hdr.AddGeneralDefinition(std::move(genDef));
 
     // read through rest of header
     bool chromLineFound = false;
@@ -374,11 +369,10 @@ VcfHeader VcfFormat::ParsedHeader(const std::string& hdrText)
             chromLineFound = true;
             break;
         } else
-            throw std::runtime_error{"VcfFormat: unexpected line found in header:\n" + line};
+            throw VcfFormatException{"unexpected line found in header:\n" + line};
     }
 
-    if (!chromLineFound) throw std::runtime_error{"VcfFormat: CHROM column line is missing"};
-
+    if (!chromLineFound) throw VcfFormatException{"CHROM column line is missing"};
     return hdr;
 }
 
@@ -407,7 +401,7 @@ VcfHeader VcfFormat::HeaderFromStream(std::istream& in)
 InfoField VcfFormat::ParsedInfoField(const std::string& text)
 {
     const auto& tokens = PacBio::BAM::Split(text, '=');
-    if (tokens.empty()) throw std::runtime_error{"VcfFormat: malformed INFO field: " + text};
+    if (tokens.empty()) throw VcfFormatException{"malformed INFO field: " + text};
 
     // required ID
     InfoField result;
@@ -456,8 +450,7 @@ GenotypeField VcfFormat::ParsedGenotypeField(const std::string& field)
 VcfVariant VcfFormat::ParsedVariant(const std::string& line)
 {
     const auto fields = PacBio::BAM::Split(line, '\t');
-    if (fields.size() < 7)
-        throw std::runtime_error{"VcfFormat: record is missing required fields: " + line};
+    if (fields.size() < 7) throw VcfFormatException{"record is missing required fields: " + line};
 
     // CHROM POS ID REF ALT REF
     auto chrom = fields.at(0);

@@ -12,7 +12,7 @@ using VcfFormat = PacBio::VCF::VcfFormat;
 
 namespace VcfFileTests {
 
-static const std::string BasicHeaderText{
+const std::string BasicHeaderText{
     "##fileformat=VCFv4.2\n"
     "##fileDate=20180509\n"
     "##INFO=<ID=IMPRECISE,Number=0,Type=Flag,Description=\"Imprecise structural variant\">\n"
@@ -30,8 +30,7 @@ static const std::string BasicHeaderText{
     "sample\">\n"
     "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tUnnamedSample"};
 
-static const std::string VcfFn{PacBio::BAM::PbbamTestsConfig::Data_Dir +
-                               "/vcf/structural_variants.vcf"};
+const std::string VcfFn{PacBio::BAM::PbbamTestsConfig::Data_Dir + "/vcf/structural_variants.vcf"};
 
 }  // namespace VcfFileTests
 

@@ -6,10 +6,13 @@
 
 #include <cassert>
 #include <cmath>
+
 #include <type_traits>
 
 #include <pbbam/StringUtilities.h>
 #include <pbbam/vcf/VcfFormat.h>
+
+#include "VcfFormatException.h"
 
 namespace PacBio {
 namespace VCF {
@@ -194,10 +197,10 @@ bool VcfVariant::IsSampleHeterozygous(const size_t sampleIndex) const
     auto fields = PacBio::BAM::Split(data.get(), '/');
     if (fields.size() == 1) fields = PacBio::BAM::Split(data.get(), '|');
 
-    if (fields.size() != 2)
-        throw std::runtime_error{"VcfFormat: malformatted GT field: " + data.get()};
-
-    return fields.at(0) != fields.at(1);
+    if (fields.size() == 2)
+        return fields.at(0) != fields.at(1);
+    else
+        throw VcfFormatException{"malformed GT field: " + data.get()};
 }
 
 bool VcfVariant::IsSamplePhased(const size_t sampleIndex) const

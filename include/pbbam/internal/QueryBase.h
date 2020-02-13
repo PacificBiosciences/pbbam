@@ -5,13 +5,15 @@
 
 #include "pbbam/Config.h"
 
+#include <cassert>
+
+#include <iterator>
+#include <memory>
+#include <vector>
+
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/DataSet.h"
-
-#include <cassert>
-#include <memory>
-#include <vector>
 
 namespace PacBio {
 namespace BAM {
@@ -44,6 +46,12 @@ template <typename T>
 class QueryIterator : public QueryIteratorBase<T>
 {
 public:
+    using iterator_category = std::input_iterator_tag;
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using pointer = T*;
+    using reference = T&;
+
     QueryIterator() = default;
     QueryIterator(QueryBase<T>& query);
 
@@ -58,6 +66,12 @@ template <typename T>
 class QueryConstIterator : public QueryIteratorBase<T>
 {
 public:
+    using iterator_category = std::input_iterator_tag;
+    using value_type = const T;
+    using difference_type = std::ptrdiff_t;
+    using pointer = const T*;
+    using reference = const T&;
+
     QueryConstIterator() = default;
     QueryConstIterator(const QueryBase<T>& query);
 

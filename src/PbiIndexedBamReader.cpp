@@ -10,7 +10,10 @@
 
 #include <cstddef>
 #include <cstdint>
+
 #include <iostream>
+#include <sstream>
+#include <stdexcept>
 
 #include <htslib/bgzf.h>
 
@@ -89,8 +92,13 @@ public:
         // if on new block, seek to its first record
         if (currentBlockReadCount_ == 0) {
             const auto seekResult = bgzf_seek(bgzf, blocks_.at(0).virtualOffset_, SEEK_SET);
-            if (seekResult == -1)
-                throw std::runtime_error{"PbiIndexedBamReader: could not seek in BAM file"};
+            if (seekResult == -1) {
+                std::ostringstream s;
+                s << "[pbbam] indexed BAM reader  ERROR: could not seek in BAM file:\n"
+                  << "  file: " << file_.Filename() << '\n'
+                  << "  offset: " << blocks_.at(0).virtualOffset_;
+                throw std::runtime_error{s.str()};
+            }
         }
 
         // read next record

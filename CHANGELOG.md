@@ -5,10 +5,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [1.0.7] - 2019-10-10
+
 ### Added
  - CCSRecord API to work with the minimally required data for CCS
  - TextFileReader & TextFileWriter for generic line files (plain text or gzipped)
  - BedReader & BedWriter for BED format support
+ - Override switch to allow de-novo generated DataSets to print verbatim (possibly
+   relative) file paths, not only absolute paths.
+
+### Removed
+ - Unused built-in "convenience" queries: BarcodeQuery, QNameQuery, ReadAccuracy,
+   SubreadLengthQuery. The same functionality can recreated via providing a
+   PbiFilterQuery with a PbiFilter describing the corresponding criteria.
 
 ## [1.0.6] - 2019-06-14
 

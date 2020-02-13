@@ -10,16 +10,19 @@
 
 #include <sys/stat.h>
 
+#include <cassert>
+#include <cstdint>
+
 #include <array>
 #include <atomic>
-#include <cassert>
 #include <condition_variable>
-#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <mutex>
+#include <sstream>
 #include <stdexcept>
 #include <thread>
+#include <tuple>
 #include <type_traits>
 
 #include <htslib/bgzf.h>
@@ -34,7 +37,6 @@
 #include "pbbam/BamWriter.h"
 #include "pbbam/PbiRawData.h"
 #include "pbbam/RecordType.h"
-#include "pbbam/Unused.h"
 #include "pbbam/Validator.h"
 
 #include "FileProducer.h"
@@ -42,6 +44,22 @@
 
 namespace PacBio {
 namespace BAM {
+
+struct IndexedBamWriterException : public std::exception
+{
+    IndexedBamWriterException(std::string filename, std::string reason)
+    {
+        std::ostringstream s;
+        s << "[pbbam] indexed BAM writer ERROR: " << reason << ":\n"
+          << "  file: " << filename;
+        msg_ = s.str();
+    }
+
+    const char* what() const noexcept override { return msg_.c_str(); }
+
+    std::string msg_;
+};
+
 namespace internal {
 
 void bgzf_write_safe2(BGZF* fp, const void* data, size_t length)
@@ -49,7 +67,8 @@ void bgzf_write_safe2(BGZF* fp, const void* data, size_t length)
     const auto ret = bgzf_write(fp, data, length);
     if (ret < 0L)
         throw std::runtime_error{
-            "IndexedBamWriter: non-zero returned from bgzf_write(). Out of disk space?"};
+            "[pbbam] indexed BAM writer ERROR: non-zero returned from bgzf_write(). Out of disk "
+            "space?"};
 }
 
 struct GzIndexEntry
@@ -79,8 +98,9 @@ inline void SwapEndianness2(std::vector<T>& data)
                 ed_swap_8p(&data[i]);
             break;
         default:
-            throw std::runtime_error{"IndexedBamWriter: unsupported element size: " +
-                                     std::to_string(elementSize)};
+            throw std::runtime_error{
+                "[pbbam] indexed BAM writer ERROR: unsupported element size: " +
+                std::to_string(elementSize)};
     }
 }
 
@@ -262,9 +282,7 @@ public:
           bcReverseField_{fileBufferSize},
           bcQualField_{fileBufferSize}
     {
-        if (!tempFile_)
-            throw std::runtime_error{"IndexedBamWriter: could not open temp file: " +
-                                     tempFilename_};
+        if (!tempFile_) throw IndexedBamWriterException{tempFilename_, "could not open temp file"};
 
         // TODO: setup for ref data building
     }
@@ -406,7 +424,7 @@ public:
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel_));
         pbiFile_.reset(bgzf_open(pbiFilename_.c_str(), mode.c_str()));
         if (pbiFile_ == nullptr)
-            throw std::runtime_error{"IndexedBamWriter: could not open output PBI file"};
+            throw IndexedBamWriterException{pbiFilename_, "could not open output *.pbi file"};
 
         // if no explicit thread count given, attempt built-in check
         size_t actualNumThreads = numThreads_;
@@ -463,19 +481,27 @@ public:
     {
         // seek to block begin
         const auto ret = std::fseek(tempFile_.get(), block.pos_, SEEK_SET);
-        if (ret != 0)
-            throw std::runtime_error{"IndexedBamWriter: could not seek in temp file: " +
-                                     tempFilename_ + ", offset: " + std::to_string(block.pos_)};
+        if (ret != 0) {
+            std::ostringstream s;
+            s << "[pbbam] indexed BAM writer ERROR: could not seek in temp file:\n"
+              << "  file: " << tempFilename_ << '\n'
+              << "  offset: " << block.pos_;
+            throw std::runtime_error{s.str()};
+        }
 
         // read block elements
         field.buffer_.assign(block.n_, 0);
         const auto numElements =
             std::fread(field.buffer_.data(), sizeof(T), block.n_, tempFile_.get());
 
-        if (numElements != block.n_)
-            throw std::runtime_error{
-                "IndexedBamWriter: could not read expected element count from temp file: " +
-                tempFilename_};
+        if (numElements != block.n_) {
+            std::ostringstream s;
+            s << "[pbbam] indexed BAM writer ERROR: could not read expected element count:\n"
+              << "  file: " << tempFilename_ << '\n'
+              << "  expected: " << block.n_ << '\n'
+              << "  observed: " << numElements;
+            throw std::runtime_error{s.str()};
+        }
     }
 
     template <typename T>
@@ -574,21 +600,22 @@ public:
 
         const std::string gziFn{bamFilename_ + ".gzi"};
         std::unique_ptr<FILE, Utility::FileDeleter> gziFile{fopen(gziFn.c_str(), "rb")};
-        if (!gziFile) throw std::runtime_error{"IndexedBamWriter: could not open gzi file"};
+        if (!gziFile) throw IndexedBamWriterException{gziFn, "could not open *.gzi file"};
 
         uint64_t numElements;
         if (fread(&numElements, sizeof(numElements), 1, gziFile.get()) < 1)
-            throw std::runtime_error{"IndexedBamWriter: could not read from gziFile"};
+            throw IndexedBamWriterException{gziFn, "could not read from *.gzi file"};
         if (ed_is_big()) ed_swap_8(numElements);
 
         std::vector<GzIndexEntry> result;
         result.reserve(numElements);
         for (uint32_t i = 0; i < numElements; ++i) {
             GzIndexEntry entry;
-            if (fread(&entry.vAddress, sizeof(entry.vAddress), 1, gziFile.get()) < 1)
-                throw std::runtime_error{"IndexedBamWriter: could not read from gziFile"};
-            if (fread(&entry.uAddress, sizeof(entry.uAddress), 1, gziFile.get()) < 1)
-                throw std::runtime_error{"IndexedBamWriter: could not read from gziFile"};
+            const auto vReturn = fread(&entry.vAddress, sizeof(entry.vAddress), 1, gziFile.get());
+            const auto uReturn = fread(&entry.uAddress, sizeof(entry.uAddress), 1, gziFile.get());
+            if (vReturn < 1 || uReturn < 1)
+                throw IndexedBamWriterException{gziFn, "could not read from *.gzi file"};
+
             if (ed_is_big()) {
                 ed_swap_8(entry.vAddress);
                 ed_swap_8(entry.uAddress);
@@ -601,7 +628,8 @@ public:
     void WriteVirtualOffsets()
     {
         auto index = LoadGzi();
-        if (index.empty()) throw std::runtime_error{"IndexedBamWriter: empty GZI file"};
+        if (index.empty())
+            throw IndexedBamWriterException{bamFilename_ + ".gzi", "empty *.gzi file contents"};
         std::sort(index.begin(), index.end(),
                   [](const GzIndexEntry& lhs, const GzIndexEntry& rhs) -> bool {
                       return lhs.uAddress < rhs.uAddress;
@@ -712,7 +740,7 @@ public:
     void CloseBam()
     {
         const auto ret = bgzf_flush(bam_.get()->fp.bgzf);
-        UNUSED(ret);
+        std::ignore = ret;
         bam_.reset();
     }
 
@@ -733,17 +761,14 @@ public:
         //       prototyping but need to be tune-able via API.
         //
 
-        if (!header_)
-            throw std::runtime_error{"IndexedBamWriter: null header provided for output file: " +
-                                     bamFilename_};
+        if (!header_) throw IndexedBamWriterException{bamFilename_, "null header provided"};
 
         // open output BAM
         const auto usingFilename = bamFilename_;
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
         bam_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
         if (!bam_)
-            throw std::runtime_error{"IndexedBamWriter: could not open file for writing: " +
-                                     usingFilename};
+            throw IndexedBamWriterException{usingFilename, "could not open file for writing"};
 
         // maybe set multithreaded writing
         size_t actualNumThreads = numThreads;
@@ -757,9 +782,7 @@ public:
 
         // write header
         auto ret = sam_hdr_write(bam_.get(), header_.get());
-        if (ret != 0)
-            throw std::runtime_error{"IndexedBamWriter: could not write header to file: " +
-                                     usingFilename};
+        if (ret != 0) throw IndexedBamWriterException{usingFilename, "could not write header"};
         ret = bgzf_flush(bam_.get()->fp.bgzf);
 
         // store file positions after header
@@ -815,8 +838,7 @@ public:
         auto initBgzf = [&bgzf, &bamFilename, numThreads]() {
             bgzf.reset(bgzf_open(bamFilename.c_str(), "rb"));
             if (!bgzf)
-                throw std::runtime_error{
-                    "IndexedBamWriter: could not open BAM for 'toy train' reading"};
+                throw IndexedBamWriterException{bamFilename, "could not open trailing BAM reader"};
             bgzf_index_build_init(bgzf.get());
             if (numThreads > 1) bgzf_mt(bgzf.get(), numThreads, 256);
         };
@@ -910,7 +932,7 @@ public:
 
         // write record to file
         const auto ret = sam_write1(bam_.get(), header_.get(), rawRecord.get());
-        if (ret <= 0) throw std::runtime_error{"IndexedBamWriter: could not write record to BAM"};
+        if (ret <= 0) throw IndexedBamWriterException{bamFilename_, "could not write record"};
 
         // update file position
         auto recordLength = [](bam1_t* b) {
@@ -938,18 +960,16 @@ public:
         auto gstatus = gziStatus_.load();
         if (gstatus != GziStatus::GOOD) {
             if (gziStatus_.load() == GziStatus::IO_ERROR)
-                throw std::runtime_error(
-                    "IndexedBamWriter: error in gzi thread reading from BAM file " + bamFilename_);
+                throw IndexedBamWriterException{bamFilename_,
+                                                "error in gzi thread reading from BAM file"};
             if (gziStatus_.load() == GziStatus::TRAIL_ERROR)
-                throw std::runtime_error(
-                    "IndexedBamWriter: gzi reader thread failed to properly trail when reading " +
-                    bamFilename_);
+                throw IndexedBamWriterException{
+                    bamFilename_, "gzi reader thread failed to properly trail when reading"};
             if (gziStatus_.load() == GziStatus::GZI_ERROR)
-                throw std::runtime_error(
-                    "IndexedBamWriter: could not dump GZI contents for indexing " + bamFilename_);
+                throw IndexedBamWriterException{bamFilename_,
+                                                "could not dump GZI contents for indexing"};
             if (gziStatus_.load() == GziStatus::MISC_ERROR)
-                throw std::runtime_error("IndexedBamWriter: error computing index file for " +
-                                         bamFilename_);
+                throw IndexedBamWriterException{bamFilename_, "error computing index file"};
             gziStatus_.store(GziStatus::DEAD);
         }
     }
@@ -1002,9 +1022,9 @@ IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamH
     : IRecordWriter(), d_{nullptr}
 {
     if (tempFileBufferSize % 8 != 0)
-        throw std::runtime_error{"IndexedBamWriter: invalid buffer size for PBI builder (" +
-                                 std::to_string(tempFileBufferSize) +
-                                 "). Must be a multiple of 8."};
+        throw std::runtime_error{
+            "[pbbam] indexed BAM writer ERROR: invalid buffer size for PBI builder (" +
+            std::to_string(tempFileBufferSize) + "). Must be a multiple of 8."};
 
 #if PBBAM_AUTOVALIDATE
     Validator::Validate(header);

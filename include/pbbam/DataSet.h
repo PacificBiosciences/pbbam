@@ -16,11 +16,21 @@
 #include <vector>
 
 #include "pbbam/BamFile.h"
+#include "pbbam/BamHeader.h"
 #include "pbbam/DataSetTypes.h"
 #include "pbbam/GenomicInterval.h"
 
 namespace PacBio {
 namespace BAM {
+
+///
+/// Used in some cases to use or ignore filters specified in the *.xml.
+///
+enum class DataSetFilterMode
+{
+    APPLY,
+    IGNORE
+};
 
 /// \brief The DataSet class represents a %PacBio analyis dataset (e.g. from
 ///        XML).
@@ -152,21 +162,25 @@ public:
     /// \brief Saves dataset XML to file.
     ///
     /// \param[in] outputFilename destination for XML contents
+    /// \param[in] pathMode       print absolute paths or allow relative
     ///
     /// \throws std::runtime_error if file could be opened or if DataSet
     ///         elements could not be converted to XML
     ///
-    void Save(const std::string& outputFilename) const;
+    void Save(const std::string& outputFilename,
+              DataSetPathMode pathMode = DataSetPathMode::ABSOLUTE) const;
 
     /// \brief Saves dataset XML to output stream, e.g. std::cout,
     ///        std::stringstream.
     ///
-    /// \param[out] out destination for XML contents
+    /// \param[out] out         destination for XML contents
+    /// \param[in]  pathMode    print absolute paths or allow relative
     ///
     /// \throws std::runtime_error if DataSet elements could not be converted to
     ///         XML
     ///
-    void SaveToStream(std::ostream& out) const;
+    void SaveToStream(std::ostream& out,
+                      DataSetPathMode pathMode = DataSetPathMode::ABSOLUTE) const;
 
     /// \}
 
@@ -368,6 +382,12 @@ public:
     /// \sa DataSet::ResolvedResourceIds
     ///
     std::vector<std::string> FastaFiles() const;
+
+    ///
+    /// \brief Returns a BAM header, resulting from merging this dataset's BAM
+    ///        file headers.
+    ///
+    BamHeader MergedHeader() const;
 
     ///
     /// \returns (absolute) path for dataset

@@ -11,16 +11,18 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+
 #include <map>
 #include <tuple>
 #include <type_traits>
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#include "PbiIndexIO.h"
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
 #include "pbbam/RecordType.h"
+
+#include "PbiIndexIO.h"
 
 namespace PacBio {
 namespace BAM {

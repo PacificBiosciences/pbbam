@@ -9,6 +9,8 @@
 #include "pbbam/BgzipWriter.h"
 
 #include <cassert>
+
+#include <sstream>
 #include <stdexcept>
 #include <thread>
 #include <type_traits>
@@ -41,8 +43,10 @@ public:
             std::string("wb") + std::to_string(static_cast<int>(config.CompressionLevel));
         bgzf_.reset(bgzf_open(usingFilename_.c_str(), mode.c_str()));
         if (!bgzf_) {
-            throw std::runtime_error{"BgzipWriter: could not open file for writing: " +
-                                     usingFilename_};
+            std::ostringstream s;
+            s << "[pbbam] bgzipped file writer ERROR: could not open file for writing:\n"
+              << "  file: " << usingFilename_;
+            throw std::runtime_error{s.str()};
         }
 
         // if no explicit thread count given, attempt built-in check
@@ -61,8 +65,12 @@ public:
     size_t Write(const void* data, size_t numBytes)
     {
         const int written = bgzf_write(bgzf_.get(), data, numBytes);
-        if (written < 0)
-            throw std::runtime_error{"BgzipWriter: error writing to " + usingFilename_};
+        if (written < 0) {
+            std::ostringstream s;
+            s << "[pbbam] bgzipped file writer ERROR: failed writing:\n"
+              << "  file: " << usingFilename_;
+            throw std::runtime_error{s.str()};
+        }
         return static_cast<size_t>(written);
     }
 
