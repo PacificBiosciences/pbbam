@@ -62,21 +62,15 @@ void UpdateControlKit(const boost::optional<ControlKit::CustomSequence>& cache, 
 // Automation
 // ----------------------
 
-Automation::Automation() : internal::DataSetElement{"Automation", XsdType::NONE} {}
+Automation::Automation() : internal::DataSetElement{"Automation", XsdType::COLLECTION_METADATA} {}
 
 Automation::Automation(const internal::FromInputXml& fromInputXml)
-    : internal::DataSetElement{"", fromInputXml, XsdType::NONE}
+    : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
 {
 }
 
-const PacBio::BAM::AutomationParameters& Automation::AutomationParameters() const
-{
-    return Child<PacBio::BAM::AutomationParameters>("AutomationParameters");
-}
-PacBio::BAM::AutomationParameters& Automation::AutomationParameters()
-{
-    return Child<PacBio::BAM::AutomationParameters>("AutomationParameters");
-}
+DEFINE_ACCESSORS(Automation, AutomationParameters, AutomationParameters)
+
 Automation& Automation::AutomationParameters(PacBio::BAM::AutomationParameters params)
 {
     AutomationParameters() = params;
@@ -89,18 +83,18 @@ bool Automation::HasAutomationParameters() const { return HasChild(Element::Auto
 // ----------------------
 
 AutomationParameter::AutomationParameter()
-    : internal::DataSetElement{"AutomationParameter", XsdType::NONE}
+    : internal::DataSetElement{"AutomationParameter", XsdType::BASE_DATA_MODEL}
 {
 }
 
 AutomationParameter::AutomationParameter(const internal::FromInputXml& fromInputXml)
-    : internal::DataSetElement{"", fromInputXml, XsdType::NONE}
+    : internal::DataSetElement{"", fromInputXml, XsdType::BASE_DATA_MODEL}
 {
 }
 
 AutomationParameter::AutomationParameter(const std::string& name, const std::string& type,
                                          const std::string& value)
-    : internal::DataSetElement{"AutomationParameter", XsdType::NONE}
+    : internal::DataSetElement{"AutomationParameter", XsdType::BASE_DATA_MODEL}
 {
     Name(name);
     Type(type);
@@ -110,7 +104,7 @@ AutomationParameter::AutomationParameter(const std::string& name, const std::str
 AutomationParameter::AutomationParameter(const std::string& name, const std::string& type,
                                          const std::string& value,
                                          const internal::FromInputXml& fromInputXml)
-    : internal::DataSetElement{"", fromInputXml, XsdType::NONE}
+    : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
 {
     Name(name);
     Type(type);
@@ -146,11 +140,11 @@ AutomationParameter& AutomationParameter::Value(const std::string& value)
 // ----------------------
 
 AutomationParameters::AutomationParameters()
-    : internal::DataSetElement{"AutomationParameters", XsdType::NONE}
+    : internal::DataSetElement{"AutomationParameters", XsdType::BASE_DATA_MODEL}
 {
 }
 AutomationParameters::AutomationParameters(const internal::FromInputXml& fromInputXml)
-    : internal::DataSetElement{"", fromInputXml, XsdType::NONE}
+    : internal::DataSetElement{"", fromInputXml, XsdType::BASE_DATA_MODEL}
 {
 }
 
@@ -422,10 +416,10 @@ bool AutomationParameters::HasParameter(const std::string& param) const
 // BindingKit
 // ----------------------
 
-BindingKit::BindingKit() : internal::DataSetElement{"BindingKit", XsdType::NONE} {}
+BindingKit::BindingKit() : internal::DataSetElement{"BindingKit", XsdType::COLLECTION_METADATA} {}
 
 BindingKit::BindingKit(const internal::FromInputXml& fromInputXml)
-    : internal::DataSetElement{"", fromInputXml, XsdType::NONE}
+    : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
 {
 }
 
@@ -445,10 +439,12 @@ bool BindingKit::HasPartNumber() { return HasAttribute(Element::PartNumber); }
 // Collections
 // ----------------------
 
-Collections::Collections() : internal::DataSetElement{"Collections", XsdType::NONE} {}
+Collections::Collections() : internal::DataSetElement{"Collections", XsdType::COLLECTION_METADATA}
+{
+}
 
 Collections::Collections(const internal::FromInputXml& fromInputXml)
-    : internal::DataSetElement{"", fromInputXml, XsdType::NONE}
+    : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
 {
 }
 
@@ -456,10 +452,10 @@ Collections::Collections(const internal::FromInputXml& fromInputXml)
 // ControlKit
 // ----------------------
 
-ControlKit::ControlKit() : internal::DataSetElement{"ControlKit", XsdType::NONE} {}
+ControlKit::ControlKit() : internal::DataSetElement{"ControlKit", XsdType::COLLECTION_METADATA} {}
 
 ControlKit::ControlKit(const internal::FromInputXml& fromInputXml)
-    : internal::DataSetElement{"", fromInputXml, XsdType::NONE}
+    : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
 {
 }
 
@@ -526,14 +522,10 @@ bool ControlKit::HasSequence() const { return !Sequence().empty(); }
 // PPAConfig
 // ----------------------
 
-PPAConfig::PPAConfig()
-    : internal::DataSetElement{"PPAConfig", internal::FromInputXml{},  // ensure no prefix
-                               XsdType::NONE}
-{
-}
+PPAConfig::PPAConfig() : internal::DataSetElement{"PPAConfig", XsdType::COLLECTION_METADATA} {}
 
 PPAConfig::PPAConfig(const internal::FromInputXml& fromInputXml)
-    : internal::DataSetElement{"", fromInputXml, XsdType::NONE}
+    : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
 {
 }
 
@@ -552,12 +544,12 @@ PPAConfig& PPAConfig::Json(std::string json)
 // ----------------------
 
 SequencingKitPlate::SequencingKitPlate()
-    : internal::DataSetElement{"SequencingKitPlate", XsdType::NONE}
+    : internal::DataSetElement{"SequencingKitPlate", XsdType::COLLECTION_METADATA}
 {
 }
 
 SequencingKitPlate::SequencingKitPlate(const internal::FromInputXml& fromInputXml)
-    : internal::DataSetElement{"", fromInputXml, XsdType::NONE}
+    : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
 {
 }
 
@@ -577,10 +569,13 @@ bool SequencingKitPlate::HasPartNumber() const { return HasAttribute(Element::Pa
 // TemplatePrepKit
 // ----------------------
 
-TemplatePrepKit::TemplatePrepKit() : internal::DataSetElement{"TemplatePrepKit", XsdType::NONE} {}
+TemplatePrepKit::TemplatePrepKit()
+    : internal::DataSetElement{"TemplatePrepKit", XsdType::COLLECTION_METADATA}
+{
+}
 
 TemplatePrepKit::TemplatePrepKit(const internal::FromInputXml& fromInputXml)
-    : internal::DataSetElement{"", fromInputXml, XsdType::NONE}
+    : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
 {
 }
 
@@ -667,28 +662,44 @@ bool TemplatePrepKit::HasRightPrimerSequence() const
 // CollectionMetadata
 // ----------------------
 
-CollectionMetadata::CollectionMetadata() : CollectionMetadata{internal::FromInputXml{}} {}
+CollectionMetadata::CollectionMetadata()
+    : internal::StrictEntityType{"CollectionMetadata", "CollectionMetadata",
+                                 XsdType::COLLECTION_METADATA}
+{
+}
 
 CollectionMetadata::CollectionMetadata(const internal::FromInputXml& fromInputXml)
     : internal::StrictEntityType{"CollectionMetadata", "CollectionMetadata", fromInputXml,
-                                 XsdType::NONE}
+                                 XsdType::COLLECTION_METADATA}
 {
 }
 
 CollectionMetadata::CollectionMetadata(std::string subreadSetName)
-    : CollectionMetadata{std::move(subreadSetName), internal::FromInputXml{}}
+    : internal::StrictEntityType{"CollectionMetadata", "CollectionMetadata",
+                                 XsdType::COLLECTION_METADATA}
+    , subreadSetName_{std::move(subreadSetName)}
 {
 }
 
 CollectionMetadata::CollectionMetadata(std::string subreadSetName,
                                        const internal::FromInputXml& fromInputXml)
     : internal::StrictEntityType{"CollectionMetadata", "CollectionMetadata", fromInputXml,
-                                 XsdType::NONE}
+                                 XsdType::COLLECTION_METADATA}
     , subreadSetName_{std::move(subreadSetName)}
 {
 }
 
 const std::string& CollectionMetadata::SubreadSetName() const { return subreadSetName_; }
+
+DEFINE_ACCESSORS(CollectionMetadata, Automation, Automation)
+
+CollectionMetadata& CollectionMetadata::Automation(PacBio::BAM::Automation automation)
+{
+    Automation() = automation;
+    return *this;
+}
+
+bool CollectionMetadata::HasAutomation() const { return HasChild(Element::Automation); }
 
 const PacBio::BAM::AutomationParameters& CollectionMetadata::AutomationParameters() const
 {
@@ -764,16 +775,6 @@ CollectionMetadata& CollectionMetadata::TemplatePrepKit(PacBio::BAM::TemplatePre
 }
 
 bool CollectionMetadata::HasTemplatePrepKit() const { return HasChild("TemplatePrepKit"); }
-
-DEFINE_ACCESSORS(CollectionMetadata, Automation, Automation)
-
-CollectionMetadata& CollectionMetadata::Automation(PacBio::BAM::Automation automation)
-{
-    Automation() = automation;
-    return *this;
-}
-
-bool CollectionMetadata::HasAutomation() const { return HasChild(Element::Automation); }
 
 }  // namespace BAM
 }  // namespace PacBio

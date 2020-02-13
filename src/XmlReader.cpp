@@ -74,8 +74,14 @@ std::shared_ptr<DataSetElement> MakeElement(const pugi::xml_node& xmlNode)
     const FromInputXml fromInputXml{};
     const auto type = ElementTypeFromName(name);
     switch (type) {
-        case XmlElementType::DATASET_METADATA:
-            return std::make_shared<DataSetMetadata>(fromInputXml);
+        case XmlElementType::AUTOMATION:
+            return std::make_shared<Automation>(fromInputXml);
+        case XmlElementType::AUTOMATION_PARAMETER:
+            return std::make_shared<AutomationParameter>(fromInputXml);
+        case XmlElementType::AUTOMATION_PARAMETERS:
+            return std::make_shared<AutomationParameters>(fromInputXml);
+        case XmlElementType::BINDING_KIT:
+            return std::make_shared<BindingKit>(fromInputXml);
         case XmlElementType::BIOSAMPLE:
             return std::make_shared<BioSample>("", fromInputXml);
         case XmlElementType::BIOSAMPLES:
@@ -84,6 +90,10 @@ std::shared_ptr<DataSetElement> MakeElement(const pugi::xml_node& xmlNode)
             return std::make_shared<Collections>(fromInputXml);
         case XmlElementType::COLLECTION_METADATA:
             return std::make_shared<CollectionMetadata>(fromInputXml);
+        case XmlElementType::CONTROL_KIT:
+            return std::make_shared<ControlKit>(fromInputXml);
+        case XmlElementType::DATASET_METADATA:
+            return std::make_shared<DataSetMetadata>(fromInputXml);
         case XmlElementType::DNA_BARCODE:
             return std::make_shared<DNABarcode>("", fromInputXml);
         case XmlElementType::DNA_BARCODES:
@@ -114,6 +124,11 @@ std::shared_ptr<DataSetElement> MakeElement(const pugi::xml_node& xmlNode)
             return std::make_shared<Properties>(fromInputXml);
         case XmlElementType::PROVENANCE:
             return std::make_shared<Provenance>(fromInputXml);
+        case XmlElementType::SEQUENCING_KIT_PLATE:
+            return std::make_shared<SequencingKitPlate>(fromInputXml);
+        case XmlElementType::TEMPLATE_PREP_KIT:
+            return std::make_shared<TemplatePrepKit>(fromInputXml);
+
         case XmlElementType::ALIGNMENT_SET:
             return std::make_shared<AlignmentSet>(fromInputXml);
         case XmlElementType::BARCODE_SET:

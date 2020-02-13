@@ -27,11 +27,16 @@ namespace {
 using ElementType = PacBio::BAM::XmlElementType;
 const std::unordered_map<std::string, PacBio::BAM::XmlElementType> elementTypeLookup
 {
-    {"DataSetMetadata",        ElementType::DATASET_METADATA},
+    {"Automation",             ElementType::AUTOMATION},
+    {"AutomationParameter",    ElementType::AUTOMATION_PARAMETER},
+    {"AutomationParameters",   ElementType::AUTOMATION_PARAMETERS},
+    {"BindingKit",             ElementType::BINDING_KIT},
     {"BioSample",              ElementType::BIOSAMPLE},
     {"BioSamples",             ElementType::BIOSAMPLES},
+    {"ControlKit",             ElementType::CONTROL_KIT},
     {"Collections",            ElementType::COLLECTIONS},
     {"CollectionMetadata",     ElementType::COLLECTION_METADATA},
+    {"DataSetMetadata",        ElementType::DATASET_METADATA},
     {"DNABarcode",             ElementType::DNA_BARCODE},
     {"DNABarcodes",            ElementType::DNA_BARCODES},
     {"ExtensionElement",       ElementType::EXTENSION},
@@ -47,6 +52,9 @@ const std::unordered_map<std::string, PacBio::BAM::XmlElementType> elementTypeLo
     {"Property",               ElementType::PROPERTY},
     {"Properties",             ElementType::PROPERTIES},
     {"Provenance",             ElementType::PROVENANCE},
+    {"SequencingKitPlate",     ElementType::SEQUENCING_KIT_PLATE},
+    {"TemplatePrepKit",        ElementType::TEMPLATE_PREP_KIT},
+
     {"AlignmentSet",           ElementType::ALIGNMENT_SET},
     {"BarcodeSet",             ElementType::BARCODE_SET},
     {"ConsensusAlignmentSet",  ElementType::CONSENSUS_ALIGNMENT_SET},

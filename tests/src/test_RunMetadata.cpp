@@ -294,3 +294,48 @@ TEST(RunMetadataTest, can_attach_edited_metadata_to_subreadset)
 
     EXPECT_TRUE(output.find(jsonText) != std::string::npos);
 }
+
+TEST(RunMetadataTest, can_load_collection_metadata_fields_from_subreadset_xml)
+{
+    const std::string fn =
+        PacBio::BAM::PbbamTestsConfig::Data_Dir + "/run_metadata/barcodes.subreadset.xml";
+
+    const PacBio::BAM::DataSet ds(fn);
+    const PacBio::BAM::CollectionMetadata& cmd = ds.Metadata().CollectionMetadata();
+
+    ASSERT_TRUE(cmd.HasAutomation());
+    const PacBio::BAM::Automation& automation = cmd.Automation();
+
+    ASSERT_TRUE(automation.HasAutomationParameters());
+    ASSERT_TRUE(automation.AutomationParameters().HasSNRCut());
+    ASSERT_EQ(1.5, automation.AutomationParameters().SNRCut());
+}
+
+TEST(RunMetadataTest, collection_metadata_has_proper_namespaces)
+{
+    PacBio::BAM::AutomationParameters params;
+    params.AddChild(PacBio::BAM::AutomationParameter{});
+
+    PacBio::BAM::Automation automation;
+    automation.AutomationParameters(params);
+
+    PacBio::BAM::CollectionMetadata cmd;
+    cmd.Automation(automation);
+    cmd.PPAConfig(PacBio::BAM::PPAConfig{});
+
+    PacBio::BAM::DataSet ds;
+    ds.Metadata().CollectionMetadata(cmd);
+
+    std::ostringstream out;
+    ds.SaveToStream(out);
+
+    // pbmeta:
+    EXPECT_TRUE(out.str().find("pbmeta:Collections") != std::string::npos);
+    EXPECT_TRUE(out.str().find("pbmeta:CollectionMetadata") != std::string::npos);
+    EXPECT_TRUE(out.str().find("pbmeta:Automation") != std::string::npos);
+    EXPECT_TRUE(out.str().find("pbmeta:PPAConfig") != std::string::npos);
+
+    // pbbase:
+    EXPECT_TRUE(out.str().find("pbbase:AutomationParameters") != std::string::npos);
+    EXPECT_TRUE(out.str().find("pbbase:AutomationParameter") != std::string::npos);
+}
