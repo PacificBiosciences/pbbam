@@ -32,7 +32,11 @@ std::string Prefix(const std::string& input)
 std::string OutputName(const DataSetElement& node, const NamespaceRegistry& registry)
 {
     // if from input XML, respect the namespaces given
-    if (node.IsVerbatimLabel()) return node.QualifiedNameLabel();
+    if (node.IsVerbatimLabel())
+        return node.QualifiedNameLabel();
+
+    else if (node.LocalNameLabel().to_string() == "Collections")
+        return "Collections";
 
     // otherwise, probably user-generated
     else {
