@@ -284,6 +284,8 @@ TEST(RunMetadataTest, can_attach_edited_metadata_to_subreadset)
     // check for edits in the new dataset output
     const std::string& output = out.str();
 
+    EXPECT_TRUE(output.find("<Collections xmlns=\"http") != std::string::npos);
+
     const std::string adapterSeq =
         R"(&gt;left_adapter\nGATTACA\n&gt;right_adapter\nGATTACA\n&gt;custom_sequence\nAACCGGTT)";
     EXPECT_TRUE(output.find(adapterSeq) != std::string::npos);
@@ -330,7 +332,7 @@ TEST(RunMetadataTest, collection_metadata_has_proper_namespaces)
     ds.SaveToStream(out);
 
     // pbmeta:
-    EXPECT_TRUE(out.str().find("pbmeta:Collections") != std::string::npos);
+    EXPECT_TRUE(out.str().find("<Collections xmlns=\"http") != std::string::npos);
     EXPECT_TRUE(out.str().find("pbmeta:CollectionMetadata") != std::string::npos);
     EXPECT_TRUE(out.str().find("pbmeta:Automation") != std::string::npos);
     EXPECT_TRUE(out.str().find("pbmeta:PPAConfig") != std::string::npos);

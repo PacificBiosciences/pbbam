@@ -439,13 +439,15 @@ bool BindingKit::HasPartNumber() { return HasAttribute(Element::PartNumber); }
 // Collections
 // ----------------------
 
-Collections::Collections() : internal::DataSetElement{"Collections", XsdType::COLLECTION_METADATA}
+Collections::Collections() : internal::DataSetElement{"Collections", XsdType::NONE}
 {
+    Attribute("xmlns", "http://pacificbiosciences.com/PacBioCollectionMetadata.xsd");
 }
 
 Collections::Collections(const internal::FromInputXml& fromInputXml)
-    : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
+    : internal::DataSetElement{"", fromInputXml, XsdType::NONE}
 {
+    Attribute("xmlns", "http://pacificbiosciences.com/PacBioCollectionMetadata.xsd");
 }
 
 // ----------------------
