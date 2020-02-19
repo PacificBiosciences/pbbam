@@ -67,7 +67,11 @@ void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
 
     // store XSD type for later
     const auto prefix = Prefix(label);
-    if (!prefix.empty()) xsdPrefixesUsed[node.Xsd()] = prefix;
+    if (!prefix.empty()) {
+        if (label.find("pbmeta:AutomationParameter") == std::string::npos) {
+            xsdPrefixesUsed[node.Xsd()] = prefix;
+        }
+    }
 
     // add attributes
     const bool resolveFilePaths = (pathMode == DataSetPathMode::ABSOLUTE);
