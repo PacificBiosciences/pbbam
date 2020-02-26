@@ -2758,4 +2758,23 @@ TEST(BamRecordTest, SupportWallStartEndTags)
     EXPECT_EQ(we, bam.QueryEndFrameNumber());
 }
 
+TEST(BamRecordTest, MissingLocalContextFlagsCannotConvertToPbcopperReads)
+{
+    const std::string zmwBamFile{PbbamTestsConfig::Data_Dir +
+        "/zmws/m64004_200204_230803.zmws.bam"};
+
+    BamReader reader{zmwBamFile};
+    BamRecord record;
+    ASSERT_TRUE(reader.GetNext(record));
+
+    try {
+        const auto r = record.ToRead();
+        ASSERT_FALSE("unreachable");
+    } catch (std::runtime_error& e)
+    {
+        const std::string msg{e.what()};
+        EXPECT_TRUE(msg.find("is missing local context flags") != std::string::npos);
+    }
+}
+
 // clang-format on
