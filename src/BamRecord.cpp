@@ -1295,6 +1295,7 @@ BamRecord& BamRecord::LabelQV(const QualityValues& labelQVs)
 
 LocalContextFlags BamRecord::LocalContextFlags() const
 {
+    assert(HasLocalContextFlags());
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::CONTEXT_FLAGS);
     const Tag cxTag = impl_.TagValue(tagName);
     return static_cast<PacBio::BAM::LocalContextFlags>(cxTag.ToUInt8());
@@ -1939,22 +1940,30 @@ Data::Read BamRecord::ToRead(std::string model) const
     Data::Read result{FullName(),      Sequence(),   Qualities(),
                       SignalToNoise(), QueryStart(), QueryEnd()};
     result.Model = std::move(model);
-    result.Flags = LocalContextFlags();
     result.ReadAccuracy = ReadAccuracy();
-    result.FullLength =
-        (result.Flags & Data::ADAPTER_BEFORE) && (result.Flags & Data::ADAPTER_AFTER);
 
-    if (HasPulseWidth())
+    if (HasLocalContextFlags()) {
+        result.Flags = LocalContextFlags();
+        result.FullLength =
+            (result.Flags & Data::ADAPTER_BEFORE) && (result.Flags & Data::ADAPTER_AFTER);
+    } else {
+        throw std::runtime_error{"[pbbam] BAM record ERROR: '" + FullName() +
+                                 "' is missing local context flags (SAM tag 'cx')"};
+    }
+
+    if (HasPulseWidth()) {
         result.PulseWidth = PulseWidth();
-    else if (RecordType::SUBREAD == Type())
+    } else if (RecordType::SUBREAD == Type()) {
         throw std::runtime_error{"[pbbam] BAM record ERROR: '" + FullName() +
                                  "' is missing pulse widths (SAM tag 'pw')"};
+    }
 
-    if (HasIPD())
+    if (HasIPD()) {
         result.IPD = IPD();
-    else if (RecordType::SUBREAD == Type())
+    } else if (RecordType::SUBREAD == Type()) {
         throw std::runtime_error{"[pbbam] BAM record ERROR: '" + FullName() +
                                  "' is missing interpulse durations (SAM tag 'ip')"};
+    }
 
     if (IsMapped() && AlignedStrand() == Data::Strand::REVERSE) {
         ReverseComplement(result.Seq);
