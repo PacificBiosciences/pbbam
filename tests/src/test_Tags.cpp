@@ -7,6 +7,7 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <typeinfo>
 #include <vector>
 
@@ -800,6 +801,18 @@ TEST(TagTest, ConvertToUInt32)
     EXPECT_THROW(floatTag.ToUInt32(), std::exception);
     EXPECT_THROW(stringTag.ToUInt32(), std::exception);
     EXPECT_THROW(arrayTag.ToUInt32(), std::exception);
+}
+
+TEST(TagTest, DemangledConversion)
+{
+    Tag empty;
+    try {
+        std::ignore = empty.ToUInt8();
+        ASSERT_FALSE("unreachable");
+    } catch (const std::exception& e) {
+        const std::string msg = e.what();
+        EXPECT_TRUE(msg.find("boost::blank") != std::string::npos);
+    }
 }
 
 TEST(TagCollectionTest, DefaultConstruction)
