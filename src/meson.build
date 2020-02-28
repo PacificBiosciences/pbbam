@@ -1,3 +1,29 @@
+################
+# version info #
+################
+
+pbbam_ver_arr = meson.project_version().split('.')
+pbbam_major_version = pbbam_ver_arr[0]
+pbbam_minor_version = pbbam_ver_arr[1]
+pbbam_patch_version = pbbam_ver_arr[2]
+
+pbbam_config = configuration_data()
+pbbam_config.set('PBBAM_VERSION', meson.project_version())
+pbbam_config.set('PBBAM_VERSION_MAJOR', pbbam_major_version)
+pbbam_config.set('PBBAM_VERSION_MINOR', pbbam_minor_version)
+pbbam_config.set('PBBAM_VERSION_PATCH', pbbam_patch_version)
+
+pbbam_version_sources = [
+  vcs_tag(
+    input : 'PbbamGitHash.cpp.in',
+    output : 'PbbamGitHash.cpp',
+    command : ['git', 'describe', '--always', '--dirty=*'],
+    replace_string : '@PBBAM_GIT_SHA1@'),
+  configure_file(
+    input : 'PbbamVersion.cpp.in',
+    output : 'PbbamVersion.cpp',
+    configuration : pbbam_config)]
+
 ###########
 # sources #
 ###########
@@ -128,6 +154,8 @@ pbbam_cpp_sources = files([
   # XML I/O
   'pugixml/pugixml.cpp'
 ])
+
+pbbam_cpp_sources += pbbam_version_sources
 
 pbbam_extra_flags = []
 if get_option('auto-validate')
