@@ -295,6 +295,10 @@ TEST(RunMetadataTest, can_attach_edited_metadata_to_subreadset)
     EXPECT_TRUE(output.find(insertSize) != std::string::npos);
 
     EXPECT_TRUE(output.find(jsonText) != std::string::npos);
+
+    // ensure Primary -> PPAConfig -> Secondary element order
+    EXPECT_TRUE(out.str().find("Primary>") < out.str().find("PPAConfig>"));
+    EXPECT_TRUE(out.str().find("PPAConfig>") < out.str().find("Secondary>"));
 }
 
 TEST(RunMetadataTest, can_load_collection_metadata_fields_from_subreadset_xml)
