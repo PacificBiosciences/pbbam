@@ -5,6 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [1.1.0] - 2020-03-12
+
+### Added
+ - Support for barcode-labeled read groups.
+ - "Run metadata" handling for dataset XML.
+
 ## [1.0.7] - 2019-10-10
 
 ### Added
