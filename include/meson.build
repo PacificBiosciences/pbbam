@@ -60,6 +60,7 @@ if not meson.is_subproject()
       'pbbam/MD5.h',
       'pbbam/MoveAppend.h',
       'pbbam/Orientation.h',
+      'pbbam/PbbamVersion.h',
       'pbbam/PbiBasicTypes.h',
       'pbbam/PbiBuilder.h',
       'pbbam/PbiFile.h',

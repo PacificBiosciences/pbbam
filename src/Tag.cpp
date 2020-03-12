@@ -13,6 +13,7 @@
 #include <iostream>
 #include <type_traits>
 
+#include <boost/core/demangle.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 namespace PacBio {
@@ -39,7 +40,8 @@ struct AsciiConvertVisitor : public boost::static_visitor<char>
     template <typename T>
     char operator()(const T&) const
     {
-        throw std::runtime_error{"[pbbam] tag ERROR: cannot convert to ASCII"};
+        const std::string from = boost::core::demangle(typeid(T).name());
+        throw std::runtime_error{"[pbbam] tag ERROR: cannot convert " + from + " to ASCII"};
         return 0;
     }
 
@@ -68,8 +70,8 @@ struct NumericConvertVisitor : public boost::static_visitor<DesiredType>
     template <typename T>
     DesiredType operator()(const T& t) const
     {
-        const std::string from = typeid(t).name();
-        const std::string to = typeid(DesiredType).name();
+        const std::string from = boost::core::demangle(typeid(t).name());
+        const std::string to = boost::core::demangle(typeid(DesiredType).name());
         const std::string msg = "[pbbam] tag ERROR: cannot convert type " + from + " to " + to;
         throw std::runtime_error(msg);
         return 0;

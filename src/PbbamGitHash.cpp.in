@@ -1,0 +1,19 @@
+// Author: Derek Barnett
+
+#include "PbbamInternalConfig.h"
+
+#include <pbbam/PbbamVersion.h>
+
+namespace PacBio {
+namespace BAM {
+namespace {
+
+static constexpr const char LibraryGitSha1[] = "@PBBAM_GIT_SHA1@";
+
+} // namespace
+
+std::string LibraryGitSha1String()
+{ return LibraryGitSha1; }
+
+}  // namespace BAM
+}  // namespace PacBio

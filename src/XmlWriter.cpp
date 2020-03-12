@@ -54,6 +54,12 @@ std::string OutputName(const DataSetElement& node, const NamespaceRegistry& regi
     }
 }
 
+// (admitted hack to) ensure order of CollectionMetadata children
+void CollectionMetadataToXml(const DataSetElement& node, const NamespaceRegistry& registry,
+                             std::map<XsdType, std::string>& xsdPrefixesUsed,
+                             pugi::xml_node& parentXml, const DataSetBase& dataset,
+                             DataSetPathMode pathMode);
+
 void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
            std::map<XsdType, std::string>& xsdPrefixesUsed, pugi::xml_node& parentXml,
            const DataSetBase& dataset, DataSetPathMode pathMode)
@@ -90,8 +96,80 @@ void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
     // additional stuff later? (e.g. comments)
 
     // iterate children, recursively building up subtree
-    for (const auto& child : node.Children())
-        ToXml(*child, registry, xsdPrefixesUsed, xmlNode, dataset, pathMode);
+    for (const auto& child : node.Children()) {
+        // ensure order CollectionMetadata children
+        if (child->QualifiedNameLabel().find("CollectionMetadata") != std::string::npos)
+            CollectionMetadataToXml(*child, registry, xsdPrefixesUsed, xmlNode, dataset, pathMode);
+        else
+            ToXml(*child, registry, xsdPrefixesUsed, xmlNode, dataset, pathMode);
+    }
+}
+
+// (admitted hack to) ensure order of CollectionMetadata children
+void CollectionMetadataToXml(const DataSetElement& node, const NamespaceRegistry& registry,
+                             std::map<XsdType, std::string>& xsdPrefixesUsed,
+                             pugi::xml_node& parentXml, const DataSetBase& dataset,
+                             DataSetPathMode pathMode)
+{
+    // create child of parent, w/ label & text
+    const auto label = OutputName(node, registry);
+    if (label.empty()) return;  // error?
+    auto xmlNode = parentXml.append_child(label.c_str());
+
+    if (!node.Text().empty()) xmlNode.text().set(node.Text().c_str());
+
+    // store XSD type for later
+    const auto prefix = Prefix(label);
+    if (!prefix.empty()) {
+        if (label.find("pbmeta:AutomationParameter") == std::string::npos) {
+            xsdPrefixesUsed[node.Xsd()] = prefix;
+        }
+    }
+
+    // add attributes
+    const bool resolveFilePaths = (pathMode == DataSetPathMode::ABSOLUTE);
+    for (const auto& attribute : node.Attributes()) {
+        const auto& name = attribute.first;
+        if (name.empty()) continue;
+
+        auto attr = xmlNode.append_attribute(name.c_str());
+        std::string value = attribute.second.c_str();
+        // "absolutize" any paths, except relative paths from verbatim input XML
+        if (!dataset.FromInputXml() && resolveFilePaths && name == "ResourceId")
+            value = FileUtils::ResolvedFilePath(value, dataset.Path());
+        attr.set_value(value.c_str());
+    }
+
+    // force child ordering
+    static const std::vector<std::string> childOrder{
+        "MultiJobId",         "ConsensusReadSetRef", "InstCtrlVer",
+        "SigProcVer",         "RunDetails",          "Movie",
+        "WellSample",         "Automation",          "CollectionNumber",
+        "CellIndex",          "SetNumber",           "CellPac",
+        "ControlKit",         "TemplatePrepKit",     "BindingKit",
+        "SequencingKitPlate", "WashKitPlate",        "Primary",
+        "PPAConfig",          "Secondary",           "UserDefinedFields",
+        "ExpirationData",     "ComponentVersions"};
+    std::set<std::string> seen;
+    for (const auto& name : childOrder) {
+        if (node.HasChild(name)) {
+            seen.insert(node.QualifiedNameLabel());
+            const DataSetElement& child = node.Child<DataSetElement>(name);
+            ToXml(child, registry, xsdPrefixesUsed, xmlNode, dataset, pathMode);
+        }
+    }
+
+    // any remaining nodes will be unordered w.r.t. children above,
+    // but at least they're not lost
+    for (const auto& child : node.Children()) {
+        const auto insertResult = seen.insert(child->QualifiedNameLabel());
+        const auto alreadySeen = insertResult.second;
+        if (!alreadySeen) {
+            ToXml(*child, registry, xsdPrefixesUsed, xmlNode, dataset, pathMode);
+        }
+    }
+
+    return;
 }
 
 }  // namespace
