@@ -39,8 +39,7 @@ public:
 
         // open file
         usingFilename_ = (fileProducer_ ? fileProducer_->TempFilename() : filename);
-        const auto mode =
-            std::string("wb") + std::to_string(static_cast<int>(config.CompressionLevel));
+        const auto mode = "wb" + std::to_string(config.CompressionLevel);
         bgzf_.reset(bgzf_open(usingFilename_.c_str(), mode.c_str()));
         if (!bgzf_) {
             std::ostringstream s;
