@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+### Fixed
+ - BgzipWriter: default compression level.
+
 ## [1.1.0] - 2020-03-12
 
 ### Added

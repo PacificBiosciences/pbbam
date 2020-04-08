@@ -18,7 +18,7 @@ namespace BAM {
 struct BgzipWriterConfig
 {
     // Compression level, equivalent to zlib-defined levels
-    const size_t CompressionLevel = 0;
+    const int CompressionLevel = -1;
 
     /// Nnumber of threads for compression. If set to 0, the writer will attempt
     /// to determine a reasonable estimate. If set to 1, this will force
