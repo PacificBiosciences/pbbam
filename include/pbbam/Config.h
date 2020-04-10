@@ -31,6 +31,11 @@
 
 /// \}
 
+/// Disable use of getrandom(), which requires Linux kernel 3.17+
+#ifndef BOOST_UUID_RANDOM_PROVIDER_FORCE_POSIX
+#define BOOST_UUID_RANDOM_PROVIDER_FORCE_POSIX
+#endif
+
 namespace PacBio {
 namespace BAM {
 
