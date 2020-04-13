@@ -525,6 +525,33 @@ public:
                            const Compare::Type cmp = Compare::EQUAL);
 };
 
+/// \brief The PbiNumSubreadsFilter class provides a PbiFilter-compatible
+///        filter on the number of subreads per ZMW hole number.
+///
+class PbiNumSubreadsFilter
+{
+public:
+    /// \brief Creates a filter on the number of subreads per ZMW hole number.
+    ///
+    /// \param[in] numSubreads   value to compare on
+    /// \param[in] cmp                  compare type
+    ///
+    PbiNumSubreadsFilter(int numSubreads, const Compare::Type cmp = Compare::EQUAL);
+
+    PbiNumSubreadsFilter(const PbiNumSubreadsFilter& other);
+    ~PbiNumSubreadsFilter();
+
+    /// \brief Performs the actual index lookup.
+    ///
+    /// Most client code should not need to use this method directly.
+    ///
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
+
+private:
+    struct PbiNumSubreadsFilterPrivate;
+    std::unique_ptr<PbiNumSubreadsFilterPrivate> d_;
+};
+
 /// \brief The PbiQueryEndFilter class provides a PbiFilter-compatible filter
 ///        on query end.
 ///
