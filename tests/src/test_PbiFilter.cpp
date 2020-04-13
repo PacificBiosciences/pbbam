@@ -638,6 +638,49 @@ TEST(PbiFilterTest, NumMismatchesFilterOk)
     }
 }
 
+TEST(PbiFilterTest, NumSubreadsFilterOk)
+{
+    PbiRawData index;
+    index.NumReads(21);
+
+    PbiRawBasicData& subreadData = index.BasicData();
+    subreadData.rgId_       = std::vector<int32_t>(21, 0);
+    subreadData.qStart_     = std::vector<int32_t>(21, 0);
+    subreadData.qEnd_       = std::vector<int32_t>(21, 0);
+    subreadData.readQual_   = std::vector<float>(21, 0);
+    subreadData.ctxtFlag_   = std::vector<uint8_t>(21, 0);
+    subreadData.fileOffset_ = std::vector<int64_t>(21, 0);
+    subreadData.fileNumber_ = std::vector<uint16_t>(21, 0);
+    subreadData.holeNumber_ = {
+        0, 0, 0,
+        1, 1,
+        2, 2, 2, 2, 2,
+        3,
+        4, 4, 4, 4, 4, 4, 4,
+        5, 5,
+        6
+    };
+
+    {   // >= 3
+        const auto filter = PbiNumSubreadsFilter{ 3, Compare::GREATER_THAN_EQUAL };
+        const std::vector<size_t> expectedRows {0,1,2,5,6,7,8,9,11,12,13,14,15,16,17};
+        for (size_t row : expectedRows)
+            EXPECT_TRUE(filter.Accepts(index, row));
+    }
+    {   // < 3
+        const auto filter = PbiNumSubreadsFilter{ 3, Compare::LESS_THAN };
+        const std::vector<size_t> expectedRows {3,4,10,18,19,20};
+        for (size_t row : expectedRows)
+            EXPECT_TRUE(filter.Accepts(index, row));
+    }
+    {   // == 1
+        const auto filter = PbiNumSubreadsFilter{ 1, Compare::EQUAL };
+        const std::vector<size_t> expectedRows {10, 20};
+        for (size_t row : expectedRows)
+            EXPECT_TRUE(filter.Accepts(index, row));
+    }
+}
+
 TEST(PbiFilterTest, QueryEndFilterOk)
 {
     {
