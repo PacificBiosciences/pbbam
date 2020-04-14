@@ -31,9 +31,11 @@
 
 /// \}
 
-/// Disable use of getrandom(), which requires Linux kernel 3.17+
-#ifndef BOOST_UUID_RANDOM_PROVIDER_FORCE_POSIX
-#define BOOST_UUID_RANDOM_PROVIDER_FORCE_POSIX
+/// Disable use of getrandom(), which requires Linux kernel 3.17+.
+/// This define allows use of getentropy() in glibc 2.25+, otherwise
+/// fallback to 'posix' provider
+#ifndef BOOST_UUID_RANDOM_PROVIDER_DISABLE_GETRANDOM
+#define BOOST_UUID_RANDOM_PROVIDER_DISABLE_GETRANDOM
 #endif
 
 namespace PacBio {
