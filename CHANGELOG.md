@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+### Added
+ - FaiIndex::Create(), instead of needing samtools externally.
+
 ### [1.2.0] - 2020-04-10
 
 ### Added
