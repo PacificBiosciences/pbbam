@@ -41,6 +41,12 @@ class FaiIndex
 {
 public:
     ///
+    /// Create *.fai for a FASTA or FASTQ file.
+    ///
+    static void Create(const std::string& fn);
+
+public:
+    ///
     /// \brief Load FAI data from \p fn (*.fai)
     ///
     explicit FaiIndex(const std::string& fn);
