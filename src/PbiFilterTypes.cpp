@@ -531,7 +531,7 @@ PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<std::string>& rgIds,
                                        const Compare::Type cmp)
 {
     std::vector<ReadGroupInfo> readGroups;
-    for (const auto rgId : rgIds)
+    for (const auto& rgId : rgIds)
         readGroups.push_back(rgId);
     *this = PbiReadGroupFilter{readGroups, cmp};
 }
@@ -558,7 +558,7 @@ bool PbiReadGroupFilter::Accepts(const PbiRawData& idx, const size_t row) const
         if (!barcodes) return true;
 
         // Return success on first match, otherwise no match found.
-        for (const auto bcPair : *barcodes) {
+        for (const auto& bcPair : *barcodes) {
             if (index.BarcodeData().bcForward_.at(i) == bcPair.first &&
                 index.BarcodeData().bcReverse_.at(i) == bcPair.second) {
                 return true;
