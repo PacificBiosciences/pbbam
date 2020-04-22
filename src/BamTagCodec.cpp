@@ -29,7 +29,13 @@ inline void appendBamMultiValue(const std::vector<T>& container, kstring_t* str)
 {
     const uint32_t n = container.size();
     kputsn_(&n, sizeof(n), str);
-    kputsn_(reinterpret_cast<const char*>(&container[0]), n * sizeof(T), str);
+
+    // If n == 0, then `container.data()` **might** return a nullptr.
+    // kputsn_() internally memcpy's data from the first pointer, and
+    // if this is a nullptr, we invoke undefined behavior on memcpy.
+    if (n) {
+        kputsn_(reinterpret_cast<const char*>(container.data()), n * sizeof(T), str);
+    }
 }
 
 template <typename T>
