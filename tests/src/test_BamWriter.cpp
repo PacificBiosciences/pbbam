@@ -55,6 +55,7 @@ void checkSingleRecord(bool useTempFile)
     tags["rq"] = static_cast<float>(0.6);
     tags["RG"] = rgId;
     tags["sn"] = expectedSnr;
+    tags["fi"] = std::vector<uint16_t>{};
     bamRecord.Impl().Tags(tags);
 
     // write record to file
