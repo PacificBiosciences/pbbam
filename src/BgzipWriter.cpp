@@ -63,7 +63,7 @@ public:
 
     size_t Write(const void* data, size_t numBytes)
     {
-        const int written = bgzf_write(bgzf_.get(), data, numBytes);
+        const auto written = bgzf_write(bgzf_.get(), data, numBytes);
         if (written < 0) {
             std::ostringstream s;
             s << "[pbbam] bgzipped file writer ERROR: failed writing:\n"

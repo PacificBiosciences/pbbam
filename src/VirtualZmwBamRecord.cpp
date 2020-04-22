@@ -124,20 +124,19 @@ void VirtualZmwBamRecord::StitchSources()
 
         Utility::MoveAppend(b.Qualities(), qualities);
 
-        if (b.HasDeletionQV()) Utility::MoveAppend(std::move(b.DeletionQV()), deletionQv);
+        if (b.HasDeletionQV()) Utility::MoveAppend(b.DeletionQV(), deletionQv);
 
-        if (b.HasInsertionQV()) Utility::MoveAppend(std::move(b.InsertionQV()), insertionQv);
+        if (b.HasInsertionQV()) Utility::MoveAppend(b.InsertionQV(), insertionQv);
 
-        if (b.HasMergeQV()) Utility::MoveAppend(std::move(b.MergeQV()), mergeQv);
+        if (b.HasMergeQV()) Utility::MoveAppend(b.MergeQV(), mergeQv);
 
-        if (b.HasPulseMergeQV()) Utility::MoveAppend(std::move(b.PulseMergeQV()), pulseMergeQv);
+        if (b.HasPulseMergeQV()) Utility::MoveAppend(b.PulseMergeQV(), pulseMergeQv);
 
-        if (b.HasSubstitutionQV())
-            Utility::MoveAppend(std::move(b.SubstitutionQV()), substitutionQv);
+        if (b.HasSubstitutionQV()) Utility::MoveAppend(b.SubstitutionQV(), substitutionQv);
 
-        if (b.HasLabelQV()) Utility::MoveAppend(std::move(b.LabelQV()), labelQv);
+        if (b.HasLabelQV()) Utility::MoveAppend(b.LabelQV(), labelQv);
 
-        if (b.HasAltLabelQV()) Utility::MoveAppend(std::move(b.AltLabelQV()), alternativeLabelQv);
+        if (b.HasAltLabelQV()) Utility::MoveAppend(b.AltLabelQV(), alternativeLabelQv);
 
         if (b.HasDeletionTag()) deletionTag.append(std::move(b.DeletionTag()));
 

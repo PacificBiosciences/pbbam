@@ -19,6 +19,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <htslib/faidx.h>
+
 #include "pbbam/StringUtilities.h"
 
 namespace PacBio {
@@ -101,6 +103,15 @@ FaiIndex& FaiIndex::operator=(FaiIndex&&) noexcept = default;
 FaiIndex::~FaiIndex() = default;
 
 void FaiIndex::Add(std::string name, FaiEntry entry) { d_->Add(std::move(name), std::move(entry)); }
+
+void FaiIndex::Create(const std::string& fn)
+{
+    const auto ret = fai_build(fn.c_str());
+    if (ret < 0) {
+        throw std::runtime_error{"[pbbam] FAI index ERROR: could not create *.fai for file:\n" +
+                                 fn};
+    }
+}
 
 const FaiEntry& FaiIndex::Entry(const std::string& name) const
 {

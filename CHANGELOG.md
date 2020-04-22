@@ -5,6 +5,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+### Added
+ - FaiIndex::Create(), instead of needing samtools externally.
+
+### [1.2.0] - 2020-04-10
+
+### Added
+ - Support for older Linux kernels (<3.17) with our Dataset UUIDs.
+
 ### Fixed
  - BgzipWriter: default compression level.
 

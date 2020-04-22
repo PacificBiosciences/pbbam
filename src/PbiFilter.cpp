@@ -45,11 +45,13 @@ enum class BuiltIn
   , BarcodesFilter
   , IdentityFilter
   , LocalContextFilter
+  , MapQualityFilter
   , MovieNameFilter
   , NumDeletedBasesFilter
   , NumInsertedBasesFilter
   , NumMatchesFilter
   , NumMismatchesFilter
+  , NumSubreadsFilter
   , QIdFilter
   , QueryEndFilter
   , QueryLengthFilter
@@ -83,7 +85,9 @@ static const std::unordered_map<std::string, BuiltIn> builtInLookup =
     { "accuracy",      BuiltIn::IdentityFilter },
     { "identity",      BuiltIn::IdentityFilter },
     { "cx",            BuiltIn::LocalContextFilter },
+    { "mapqv",         BuiltIn::MapQualityFilter },
     { "movie",         BuiltIn::MovieNameFilter },
+    { "n_subreads",    BuiltIn::NumSubreadsFilter },
     { "qid",           BuiltIn::QIdFilter },
     { "qe",            BuiltIn::QueryEndFilter },
     { "qend",          BuiltIn::QueryEndFilter },
@@ -425,6 +429,8 @@ static PbiFilter FromDataSetProperty(const Property& property, const DataSet& da
             case BuiltIn::AlignedStartFilter   : return PbiAlignedStartFilter{ static_cast<uint32_t>(std::stoul(value)), compareType };
             case BuiltIn::BarcodeQualityFilter : return PbiBarcodeQualityFilter{ static_cast<uint8_t>(std::stoul(value)), compareType };
             case BuiltIn::IdentityFilter       : return PbiIdentityFilter{ std::stof(value), compareType };
+            case BuiltIn::MapQualityFilter     : return PbiMapQualityFilter{ static_cast<uint8_t>(std::stoul(value)), compareType };
+            case BuiltIn::NumSubreadsFilter    : return PbiNumSubreadsFilter{ std::stoi(value), compareType };
             case BuiltIn::QueryEndFilter       : return PbiQueryEndFilter{ std::stoi(value), compareType };
             case BuiltIn::QueryLengthFilter    : return PbiQueryLengthFilter{ std::stoi(value), compareType };
             case BuiltIn::QueryStartFilter     : return PbiQueryStartFilter{ std::stoi(value), compareType };

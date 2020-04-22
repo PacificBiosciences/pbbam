@@ -228,7 +228,7 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out, DataSetP
     }
 
     static const std::string xmlnsPrefix = "xmlns:";
-    for (const auto prefixIter : xsdPrefixesUsed) {
+    for (const auto& prefixIter : xsdPrefixesUsed) {
         const auto& xsdType = prefixIter.first;
         const auto& prefix = prefixIter.second;
         if (xsdType == XsdType::NONE || prefix.empty()) continue;
