@@ -1243,6 +1243,14 @@ Frames BamRecord::IPD(Orientation orientation, bool aligned, bool exciseSoftClip
 BamRecord& BamRecord::IPD(const Frames& frames, const FrameEncodingType encoding)
 {
     if (encoding == FrameEncodingType::LOSSY)
+        return IPD(frames, FrameCodec::V1);
+    else
+        return IPD(frames, FrameCodec::RAW);
+}
+
+BamRecord& BamRecord::IPD(const Frames& frames, const FrameCodec encoding)
+{
+    if (encoding == FrameCodec::V1)
         CreateOrEdit(BamRecordTag::IPD, frames.Encode(), &impl_);
     else
         CreateOrEdit(BamRecordTag::IPD, frames.Data(), &impl_);
@@ -1525,6 +1533,11 @@ BamRecord& BamRecord::PreBaseFrames(const Frames& frames, const FrameEncodingTyp
     return IPD(frames, encoding);
 }
 
+BamRecord& BamRecord::PreBaseFrames(const Frames& frames, const FrameCodec encoding)
+{
+    return IPD(frames, encoding);
+}
+
 Frames BamRecord::PrePulseFrames(Orientation orientation, bool aligned, bool exciseSoftClips,
                                  PulseBehavior pulseBehavior) const
 {
@@ -1535,6 +1548,15 @@ Frames BamRecord::PrePulseFrames(Orientation orientation, bool aligned, bool exc
 BamRecord& BamRecord::PrePulseFrames(const Frames& frames, const FrameEncodingType encoding)
 {
     if (encoding == FrameEncodingType::LOSSY) {
+        return PrePulseFrames(frames, FrameCodec::V1);
+    } else {
+        return PrePulseFrames(frames, FrameCodec::RAW);
+    }
+}
+
+BamRecord& BamRecord::PrePulseFrames(const Frames& frames, const FrameCodec encoding)
+{
+    if (encoding == FrameCodec::V1) {
         CreateOrEdit(BamRecordTag::PRE_PULSE_FRAMES, frames.Encode(), &impl_);
     } else {
         CreateOrEdit(BamRecordTag::PRE_PULSE_FRAMES, frames.Data(), &impl_);
@@ -1608,6 +1630,15 @@ Frames BamRecord::PulseCallWidth(Orientation orientation, bool aligned, bool exc
 BamRecord& BamRecord::PulseCallWidth(const Frames& frames, const FrameEncodingType encoding)
 {
     if (encoding == FrameEncodingType::LOSSY) {
+        return PulseCallWidth(frames, FrameCodec::V1);
+    } else {
+        return PulseCallWidth(frames, FrameCodec::RAW);
+    }
+}
+
+BamRecord& BamRecord::PulseCallWidth(const Frames& frames, const FrameCodec encoding)
+{
+    if (encoding == FrameCodec::V1) {
         CreateOrEdit(BamRecordTag::PULSE_CALL_WIDTH, frames.Encode(), &impl_);
     } else {
         CreateOrEdit(BamRecordTag::PULSE_CALL_WIDTH, frames.Data(), &impl_);
@@ -1652,6 +1683,15 @@ Frames BamRecord::PulseWidth(Orientation orientation, bool aligned, bool exciseS
 BamRecord& BamRecord::PulseWidth(const Frames& frames, const FrameEncodingType encoding)
 {
     if (encoding == FrameEncodingType::LOSSY) {
+        return PulseWidth(frames, FrameCodec::V1);
+    } else {
+        return PulseWidth(frames, FrameCodec::RAW);
+    }
+}
+
+BamRecord& BamRecord::PulseWidth(const Frames& frames, const FrameCodec encoding)
+{
+    if (encoding == FrameCodec::V1) {
         CreateOrEdit(BamRecordTag::PULSE_WIDTH, frames.Encode(), &impl_);
     } else {
         CreateOrEdit(BamRecordTag::PULSE_WIDTH, frames.Data(), &impl_);

@@ -243,12 +243,12 @@ void VirtualZmwBamRecord::StitchSources()
     if (!pe.empty()) this->PulseExclusionReason(pe);
 
     // 16 bit arrays
-    if (!ipd.Data().empty()) this->IPD(ipd, FrameEncodingType::LOSSLESS);
-    if (!pw.Data().empty()) this->PulseWidth(pw, FrameEncodingType::LOSSLESS);
+    if (!ipd.Data().empty()) this->IPD(ipd, FrameCodec::RAW);
+    if (!pw.Data().empty()) this->PulseWidth(pw, FrameCodec::RAW);
     if (!pa.empty()) this->Pkmean(pa);
     if (!pm.empty()) this->Pkmid(pm);
-    if (!pd.Data().empty()) this->PrePulseFrames(pd, FrameEncodingType::LOSSLESS);
-    if (!px.Data().empty()) this->PulseCallWidth(px, FrameEncodingType::LOSSLESS);
+    if (!pd.Data().empty()) this->PrePulseFrames(pd, FrameCodec::RAW);
+    if (!px.Data().empty()) this->PulseCallWidth(px, FrameCodec::RAW);
 
     // 32 bit arrays
     if (!sf.empty()) this->StartFrame(sf);

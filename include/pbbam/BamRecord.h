@@ -996,12 +996,23 @@ public:
 
     /// \brief Sets this record's IPD values ("ip" tag).
     ///
+    /// \deprecated since v1.3.0. Use the FrameCodec overload instead
+    ///
     /// \param[in] frames
     /// \param[in] encoding specify how to encode the data (8-bit lossy, or
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& IPD(const Frames& frames, const FrameEncodingType encoding);
+    PBBAM_DEPRECATED_FRAMES BamRecord& IPD(const Frames& frames, const FrameEncodingType encoding);
+
+    /// \brief Sets this record's IPD values ("ip" tag).
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or
+    ///                     16-bit lossless)
+    /// \returns reference to this record
+    ///
+    BamRecord& IPD(const Frames& frames, const FrameCodec encoding);
 
     /// \brief Sets this record's Pkmean values ("pm" tag).
     ///
@@ -1061,12 +1072,36 @@ public:
 
     /// \brief Sets this record's PreBaseFrames aka IPD values ("ip" tag).
     ///
+    /// \deprecated since v1.3.0. Use the FrameCodec overload instead
+    ///
     /// \param[in] frames
     /// \param[in] encoding specify how to encode the data (8-bit lossy, or
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& PreBaseFrames(const Frames& frames, const FrameEncodingType encoding);
+    PBBAM_DEPRECATED_FRAMES BamRecord& PreBaseFrames(const Frames& frames,
+                                                     const FrameEncodingType encoding);
+
+    /// \brief Sets this record's PreBaseFrames aka IPD values ("ip" tag).
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or
+    ///                     16-bit lossless)
+    /// \returns reference to this record
+    ///
+    BamRecord& PreBaseFrames(const Frames& frames, const FrameCodec encoding);
+
+    /// \brief Sets this record's PrePulseFrames values ("pd" tag).
+    ///
+    /// \deprecated since v1.3.0. Use the FrameCodec overload instead
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or
+    ///                     16-bit lossless)
+    /// \returns reference to this record
+    ///
+    PBBAM_DEPRECATED_FRAMES BamRecord& PrePulseFrames(const Frames& frames,
+                                                      const FrameEncodingType encoding);
 
     /// \brief Sets this record's PrePulseFrames values ("pd" tag).
     ///
@@ -1075,7 +1110,7 @@ public:
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& PrePulseFrames(const Frames& frames, const FrameEncodingType encoding);
+    BamRecord& PrePulseFrames(const Frames& frames, const FrameCodec encoding);
 
     /// \brief Sets this record's PulseCall values ("pc" tag).
     ///
@@ -1086,12 +1121,24 @@ public:
 
     /// \brief Sets this record's PulseCallWidth values ("px" tag).
     ///
+    /// \deprecated since v1.3.0. Use the FrameCodec overload instead
+    ///
     /// \param[in] frames
     /// \param[in] encoding specify how to encode the data (8-bit lossy, or
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& PulseCallWidth(const Frames& frames, const FrameEncodingType encoding);
+    PBBAM_DEPRECATED_FRAMES BamRecord& PulseCallWidth(const Frames& frames,
+                                                      const FrameEncodingType encoding);
+
+    /// \brief Sets this record's PulseCallWidth values ("px" tag).
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or
+    ///                     16-bit lossless)
+    /// \returns reference to this record
+    ///
+    BamRecord& PulseCallWidth(const Frames& frames, const FrameCodec encoding);
 
     ///
     /// \\brief Sets this record's PulseExclusionReason values ("pe" tag).
@@ -1109,12 +1156,24 @@ public:
 
     /// \brief Sets this record's PulseWidth values ("pw" tag).
     ///
+    /// \deprecated since v1.3.0. Use the FrameCodec overload instead
+    ///
     /// \param[in] frames
     /// \param[in] encoding specify how to encode the data (8-bit lossy, or
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& PulseWidth(const Frames& frames, const FrameEncodingType encoding);
+    PBBAM_DEPRECATED_FRAMES BamRecord& PulseWidth(const Frames& frames,
+                                                  const FrameEncodingType encoding);
+
+    /// \brief Sets this record's PulseWidth values ("pw" tag).
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or
+    ///                     16-bit lossless)
+    /// \returns reference to this record
+    ///
+    BamRecord& PulseWidth(const Frames& frames, const FrameCodec encoding);
 
     /// \brief Sets this record's StartFrame values ("sf" tag).
     ///
