@@ -21,7 +21,7 @@ namespace BAM {
 /// \sa https://github.com/PacificBiosciences/PacBioFileFormats/blob/3.0/BAM.rst
 ///     for more information on pulse frame encoding schemes.
 ///
-enum class FrameEncodingType
+enum class PBBAM_DEPRECATED_FRAMES FrameEncodingType
 {
     LOSSY,    ///< 8-bit compression (using CodecV1) of frame data
     LOSSLESS  ///< 16-bit native frame data

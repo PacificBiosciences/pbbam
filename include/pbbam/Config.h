@@ -7,9 +7,7 @@
 #ifndef PBBAM_CONFIG_H
 #define PBBAM_CONFIG_H
 
-/// \name Library Import/Export
-/// \{
-
+/// Library Import/Export
 #ifndef PBBAM_EXPORT
 #if defined(WIN32)
 #define PBBAM_EXPORT __declspec(dllimport)
@@ -18,18 +16,19 @@
 #endif
 #endif
 
-/// \}
-
-/// \name Switch for warnings for the pbbam -> pbcopper Data:: move
-/// \{
-
+/// Switch for warnings for the pbbam -> pbcopper Data:: move
 #ifdef PACBIO_NODEPRECATED_API
 #define PBBAM_DEPRECATED [[deprecated("Use the version from pbcopper in Data::")]]
 #else
 #define PBBAM_DEPRECATED
 #endif
 
-/// \}
+/// Switch for warnings for the FrameCodec -> FrameEncodingType move
+#ifdef PACBIO_NODEPRECATED_FRAMES
+#define PBBAM_DEPRECATED_FRAMES [[deprecated("Use FrameCodec instead.")]]
+#else
+#define PBBAM_DEPRECATED_FRAMES
+#endif
 
 /// Disable use of getrandom(), which requires Linux kernel 3.17+.
 /// This define allows use of getentropy() in glibc 2.25+, otherwise
@@ -41,10 +40,7 @@
 namespace PacBio {
 namespace BAM {
 
-/// \name Verbosity Settings
-/// \{
-
-/// \brief Sets the desired verbosity level of htslib warnings.
+/// Sets the desired verbosity level of htslib warnings.
 ///
 /// Change this value to allow debug/warning statements from htslib itself.
 /// The valid range seems to be [0-3], where 0 indicates OFF, and 3 is the
@@ -59,14 +55,8 @@ namespace BAM {
 ///
 extern int HtslibVerbosity;
 
-///
-/// \brief DoesHtslibSupportLongCigar
-///
 /// \return true if runtime htslib is >= v1.7
-///
 bool DoesHtslibSupportLongCigar();
-
-/// \}
 
 }  // namespace BAM
 }  // namespace PacBio
