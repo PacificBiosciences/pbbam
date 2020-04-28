@@ -99,6 +99,7 @@ pbbam_cpp_sources = files([
   'RecordType.cpp',
   'RunMetadata.cpp',
   'RunMetadataParser.cpp',
+  'SamReader.cpp',
   'SamTagCodec.cpp',
   'SamWriter.cpp',
   'SequenceInfo.cpp',
