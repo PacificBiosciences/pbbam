@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+### Added
+ - SamReader
+
 ## [1.3.0] - 2020-04-24
 
 ### Added

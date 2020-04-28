@@ -50,7 +50,7 @@ pbbam_test_cpp_sources = files([
   'test_Pulse2BaseCache.cpp',
   'test_ReadGroupInfo.cpp',
   'test_RunMetadata.cpp',
-  'test_SamWriter.cpp',
+  'test_SamIO.cpp',
   'test_SequenceUtils.cpp',
   'test_StringUtils.cpp',
   'test_Tags.cpp',

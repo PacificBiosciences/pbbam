@@ -8,13 +8,36 @@
 #include <gtest/gtest.h>
 
 #include <pbbam/BamFile.h>
+#include <pbbam/BamReader.h>
 #include <pbbam/EntireFileQuery.h>
+#include <pbbam/SamReader.h>
 #include <pbbam/SamWriter.h>
 #include <pbbam/StringUtilities.h>
 #include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
+
+TEST(SamReaderTest, can_read_basic_sam)
+{
+    const std::string bamFilename{PbbamTestsConfig::Data_Dir + "/aligned.bam"};
+    const std::string samFilename{PbbamTestsConfig::Data_Dir + "/aligned.sam"};
+
+    std::vector<std::string> bamRecordNames;
+    std::vector<std::string> samRecordNames;
+
+    BamReader bamInput{bamFilename};
+    for (const auto& b : bamInput)
+        bamRecordNames.push_back(b.FullName());
+
+    SamReader samInput{samFilename};
+    for (const auto& b : samInput) {
+        std::cout << b.FullName() << '\n';
+        samRecordNames.push_back(b.FullName());
+    }
+
+    EXPECT_EQ(bamRecordNames, samRecordNames);
+}
 
 TEST(SamWriterTest, HeaderOk)
 {
