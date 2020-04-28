@@ -60,6 +60,7 @@ meson \
   -Db_coverage="${ENABLED_COVERAGE:-false}" \
   -Db_lto="${ENABLED_LTO:-false}" \
   -Db_sanitize="${ENABLED_SANITIZERS:-none}" \
+  -Db_lundef="${ENABLED_LUNDEF:-true}" \
   -Dcpp_debugstl="${ENABLED_DEBUGSTL:-false}" \
   -Dtests="${ENABLED_TESTS:-false}" \
   "${CURRENT_BUILD_DIR:-build}" .
