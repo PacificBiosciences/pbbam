@@ -78,6 +78,7 @@ if not meson.is_subproject()
       'pbbam/ReadGroupInfo.h',
       'pbbam/RecordType.h',
       'pbbam/RunMetadata.h',
+      'pbbam/SamReader.h',
       'pbbam/SamTagCodec.h',
       'pbbam/SamWriter.h',
       'pbbam/SequenceInfo.h',

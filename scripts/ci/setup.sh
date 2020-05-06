@@ -33,19 +33,34 @@ case "${GCC_VERSION}" in
     export _artifact_versionprepend="true"
     ;;
 
-  ICC)
+  ICC*)
     module load devtoolset/6
-    module load composer_xe/2017.4.196
+    module load composer_xe/${GCC_VERSION#ICC}
     module load gtest/gcc48
 
     CC="icc"
     CXX="icpc"
     ;;
 
+  clang)
+    module load gtest/gcc48
+
+    source /opt/rh/llvm-toolset-6.0/enable
+    CC="clang"
+    CXX="clang++"
+    ;;
+
   *)
     module load gcc
-    module load gtest
-    module load ${_pbcopper_module}
+
+    if [[ ${ENABLED_WRAP_MODE:-nofallback} == nofallback ]]; then
+      module load gtest
+      module load ${_pbcopper_module}
+    else
+      # don't want to rely on internet connectivity for CI
+      mkdir -p subprojects/packagecache
+      cp /mnt/software/m/meson/packagecache/gtest* subprojects/packagecache/
+    fi
     ;;
 esac
 
