@@ -397,8 +397,6 @@ TEST(BamRecordImplCoreTestsTest, SelfAssignmentTolerated)
     tags["XY"] = int32_t{-42};
     bam1.Tags(tags);
 
-    bam1 = bam1;
-
     EXPECT_EQ(42, bam1.Bin());
     EXPECT_EQ(42, bam1.Flag());
     EXPECT_EQ(42, bam1.InsertSize());

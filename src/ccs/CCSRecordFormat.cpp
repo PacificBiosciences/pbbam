@@ -98,10 +98,10 @@ CCSRecord CCSRecordFormat::DeserializeRecord(const std::string& line)
         throw std::runtime_error{msg.str()};
     }
     result.SignalToNoise = {
-        std::stod(snrs[0]),
-        std::stod(snrs[1]),
-        std::stod(snrs[2]),
-        std::stod(snrs[3])
+        std::stof(snrs[0]),
+        std::stof(snrs[1]),
+        std::stof(snrs[2]),
+        std::stof(snrs[3])
     };
 
     result.Sequence = fields[6];
