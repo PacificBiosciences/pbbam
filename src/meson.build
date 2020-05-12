@@ -37,7 +37,6 @@ pbbam_cpp_sources = files([
   'BamHeader.cpp',
   'BamReader.cpp',
   'BamRecord.cpp',
-  'BamRecordBuilder.cpp',
   'BamRecordImpl.cpp',
   'BamRecordTags.cpp',
   'BamRecordView.cpp',

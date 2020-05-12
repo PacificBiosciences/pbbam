@@ -14,7 +14,6 @@ if not meson.is_subproject()
       'pbbam/BamHeader.h',
       'pbbam/BamReader.h',
       'pbbam/BamRecord.h',
-      'pbbam/BamRecordBuilder.h',
       'pbbam/BamRecordImpl.h',
       'pbbam/BamRecordTag.h',
       'pbbam/BamRecordView.h',
