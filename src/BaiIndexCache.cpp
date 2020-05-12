@@ -15,8 +15,7 @@
 
 #include "pbbam/BamFile.h"
 #include "pbbam/DataSet.h"
-
-#include "MemoryUtils.h"
+#include "pbbam/Deleters.h"
 
 namespace PacBio {
 namespace BAM {

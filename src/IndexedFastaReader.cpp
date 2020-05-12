@@ -16,11 +16,11 @@
 #include <pbcopper/utility/Deleters.h>
 
 #include "pbbam/BamRecord.h"
+#include "pbbam/Deleters.h"
 #include "pbbam/GenomicInterval.h"
 #include "pbbam/Orientation.h"
 #include "pbbam/StringUtilities.h"
 
-#include "MemoryUtils.h"
 #include "SequenceUtils.h"
 
 namespace PacBio {

@@ -8,6 +8,8 @@
 
 #include "ZmwChunkedFastxBgzfReader.h"
 
+#include <cassert>
+
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>

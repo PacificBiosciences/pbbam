@@ -15,8 +15,7 @@
 #include <stdexcept>
 
 #include "pbbam/BaiIndexCache.h"
-
-#include "MemoryUtils.h"
+#include "pbbam/Deleters.h"
 
 namespace PacBio {
 namespace BAM {

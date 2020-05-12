@@ -80,7 +80,7 @@ BamRecordImpl::BamRecordImpl() : d_{nullptr}
 }
 
 BamRecordImpl::BamRecordImpl(const BamRecordImpl& other)
-    : d_{bam_dup1(other.d_.get()), HtslibRecordDeleter()}, tagOffsets_{other.tagOffsets_}
+    : d_{bam_dup1(other.d_.get())}, tagOffsets_{other.tagOffsets_}
 {
     assert(d_);
 }
@@ -95,6 +95,8 @@ BamRecordImpl& BamRecordImpl::operator=(const BamRecordImpl& other)
     assert(d_);
     return *this;
 }
+
+BamRecordImpl::~BamRecordImpl() = default;
 
 bool BamRecordImpl::AddTag(const std::string& tagName, const Tag& value)
 {
@@ -250,10 +252,7 @@ bool BamRecordImpl::HasTag(const BamRecordTag tag) const
 
 void BamRecordImpl::InitializeData()
 {
-    d_.reset(bam_init1(), HtslibRecordDeleter());
-    d_->data = static_cast<uint8_t*>(
-        calloc(0x800, sizeof(uint8_t)));  // maybe make this value tune-able later?
-    d_->m_data = 0x800;
+    d_.reset(bam_init1());
 
     // init unmapped
     Position(PacBio::BAM::UnmappedPosition);
@@ -263,10 +262,8 @@ void BamRecordImpl::InitializeData()
     SetMapped(false);
     MapQuality(255);
 
-    // initialized with empty qname (null term + 3 'extra nulls' for alignment
-    d_->core.l_extranul = 3;
-    d_->core.l_qname = 4;
-    d_->l_data = 4;
+    // init empty QNAME
+    Name("");
 }
 
 int32_t BamRecordImpl::InsertSize() const { return d_->core.isize; }

@@ -15,6 +15,7 @@
 #include <htslib/hfile.h>
 #include <htslib/sam.h>
 
+#include "pbbam/Deleters.h"
 #include "pbbam/Validator.h"
 
 #include "Autovalidate.h"
@@ -64,7 +65,7 @@ public:
         Validator::Validate(record);
 #endif
 
-        const auto rawRecord = BamRecordMemory::GetRawData(record);
+        const auto& rawRecord = BamRecordMemory::GetRawData(record);
 
         // store bin number
         // min_shift=14 & n_lvls=5 are SAM/BAM "magic numbers"

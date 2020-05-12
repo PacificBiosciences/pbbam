@@ -9,6 +9,8 @@
 
 #include <string>
 
+#include "pbbam/Deleters.h"
+
 namespace PacBio {
 namespace BAM {
 

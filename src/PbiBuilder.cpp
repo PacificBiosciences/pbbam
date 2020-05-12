@@ -29,6 +29,7 @@
 
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamRecordImpl.h"
+#include "pbbam/Deleters.h"
 #include "pbbam/PbiRawData.h"
 #include "pbbam/RecordType.h"
 
