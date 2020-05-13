@@ -88,7 +88,6 @@ if not meson.is_subproject()
       'pbbam/TagCollection.h',
       'pbbam/TextFileReader.h',
       'pbbam/TextFileWriter.h',
-      'pbbam/Unused.h',
       'pbbam/Validator.h',
       'pbbam/ZmwGroupQuery.h',
       'pbbam/ZmwQuery.h',
