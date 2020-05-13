@@ -29,7 +29,7 @@ public:
     ///
     /// \throws std::runtime_error if flush fails
     ///
-    virtual void TryFlush() = 0;
+    virtual void TryFlush() {}
 
     /// \brief Write a record to the output %BAM file.
     ///
