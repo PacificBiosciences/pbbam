@@ -114,11 +114,6 @@ public:
 
 public:
     ///
-    /// \brief TryFlush
-    ///
-    void TryFlush() override;
-
-    ///
     /// \brief Write
     ///
     /// \param[in] record

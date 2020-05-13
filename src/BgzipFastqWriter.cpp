@@ -34,8 +34,6 @@ BgzipFastqWriter::BgzipFastqWriter(const std::string& fn, const BgzipWriterConfi
     }
 }
 
-void BgzipFastqWriter::TryFlush() {}
-
 void BgzipFastqWriter::Write(const FastqSequence& fastq)
 {
     Write(fastq.Name(), fastq.Bases(), fastq.Qualities());

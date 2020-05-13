@@ -3,7 +3,6 @@ pbbam_test_cpp_sources = files([
   'test_BamFile.cpp',
   'test_BamHeader.cpp',
   'test_BamRecord.cpp',
-  'test_BamRecordBuilder.cpp',
   'test_BamRecordClipping.cpp',
   'test_BamRecordImplCore.cpp',
   'test_BamRecordImplTags.cpp',

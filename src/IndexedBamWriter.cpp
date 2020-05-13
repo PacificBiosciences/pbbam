@@ -1040,8 +1040,6 @@ IndexedBamWriter& IndexedBamWriter::operator=(IndexedBamWriter&&) noexcept = def
 
 IndexedBamWriter::~IndexedBamWriter() = default;
 
-void IndexedBamWriter::TryFlush() {}  // ignore
-
 void IndexedBamWriter::Write(const BamRecord& record) { d_->Write(record); }
 
 void IndexedBamWriter::Write(const BamRecordImpl& record) { d_->Write(BamRecord{record}); }
