@@ -72,7 +72,7 @@ static void CheckRawData(const BamRecordImpl& bam)
                                         (expectedSeqLength + 1) / 2 + expectedSeqLength +
                                         expectedTagsLength;
 
-    const auto rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
+    const auto& rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
     ASSERT_TRUE(static_cast<bool>(rawData));
 
     EXPECT_EQ(expectedNameNulls, rawData->core.l_extranul);
@@ -116,7 +116,7 @@ TEST(BamRecordImplCoreTestsTest, DefaultValues)
     // check raw data
     // -------------------------------
 
-    const auto rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
+    const auto& rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
     ASSERT_TRUE(static_cast<bool>(rawData));
 
     // fixed-length (core) data
@@ -136,8 +136,7 @@ TEST(BamRecordImplCoreTestsTest, DefaultValues)
 
     // variable length data
     EXPECT_TRUE(rawData->data != nullptr);
-    EXPECT_EQ(4, rawData->l_data);           // initial aligned QNAME
-    EXPECT_EQ(int{0x800}, rawData->m_data);  // check this if we change or tune later
+    EXPECT_EQ(4, rawData->l_data);  // initial aligned QNAME
 
     // -------------------------------
     // check data via API calls
@@ -197,7 +196,7 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
     // check raw data
     // -------------------------------
 
-    const auto rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
+    const auto& rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
     ASSERT_TRUE(static_cast<bool>(rawData));
 
     // fixed-length (core) data
@@ -216,8 +215,7 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
 
     // variable length data
     EXPECT_TRUE(rawData->data != nullptr);
-    EXPECT_EQ(32, rawData->l_data);          // aligned qname + tags
-    EXPECT_EQ(int{0x800}, rawData->m_data);  // check this if we change or tune later
+    EXPECT_EQ(32, rawData->l_data);  // aligned qname + tags
 
     // -------------------------------
     // check data via API calls
@@ -309,11 +307,9 @@ TEST(BamRecordImplCoreTestsTest, DeepCopyFromRawData)
     EXPECT_EQ(42, bam.ReferenceId());
     EXPECT_EQ(x, bam.Tags()["XY"].ToInt32());
 
-    const auto newBamRawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
-    ASSERT_TRUE(static_cast<bool>(newBamRawData));
-
+    const auto& newBamRawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
+    ASSERT_TRUE(newBamRawData);
     EXPECT_TRUE(newBamRawData->data != nullptr);
-    EXPECT_TRUE(newBamRawData->m_data >= int{0x800});  // check this if we change or tune later
 
     // tweak raw data, make sure we've done a deep copy (so BamRecordImpl isn't changed)
     rawData->core.pos = 37;

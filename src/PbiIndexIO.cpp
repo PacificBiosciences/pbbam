@@ -18,10 +18,9 @@
 
 #include "pbbam/BamFile.h"
 #include "pbbam/BamRecord.h"
+#include "pbbam/Deleters.h"
 #include "pbbam/EntireFileQuery.h"
 #include "pbbam/PbiBuilder.h"
-
-#include "MemoryUtils.h"
 
 namespace PacBio {
 namespace BAM {

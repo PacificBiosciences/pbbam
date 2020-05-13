@@ -10,7 +10,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "MemoryUtils.h"
+#include "pbbam/Deleters.h"
 
 namespace PacBio {
 namespace BAM {

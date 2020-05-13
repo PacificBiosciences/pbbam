@@ -17,7 +17,7 @@
 #include <htslib/bgzf.h>
 #include <htslib/kstring.h>
 
-#include "MemoryUtils.h"
+#include "pbbam/Deleters.h"
 
 namespace PacBio {
 namespace BAM {

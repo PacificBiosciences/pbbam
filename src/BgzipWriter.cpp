@@ -18,8 +18,9 @@
 #include <htslib/bgzf.h>
 #include <htslib/hts.h>
 
+#include "pbbam/Deleters.h"
+
 #include "FileProducer.h"
-#include "MemoryUtils.h"
 
 namespace PacBio {
 namespace BAM {

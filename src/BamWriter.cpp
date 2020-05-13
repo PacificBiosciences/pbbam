@@ -20,6 +20,7 @@
 #include <htslib/hts.h>
 
 #include "pbbam/BamFile.h"
+#include "pbbam/Deleters.h"
 #include "pbbam/Validator.h"
 
 #include "Autovalidate.h"
@@ -90,7 +91,7 @@ public:
         Validator::Validate(record);
 #endif
 
-        const auto rawRecord = BamRecordMemory::GetRawData(record);
+        const auto& rawRecord = BamRecordMemory::GetRawData(record);
 
         // (probably) store bins
         // min_shift=14 & n_lvls=5 are BAM "magic numbers"

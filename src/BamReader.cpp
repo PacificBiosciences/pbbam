@@ -21,6 +21,7 @@
 #include <htslib/hts.h>
 #include <boost/optional.hpp>
 
+#include "pbbam/Deleters.h"
 #include "pbbam/Validator.h"
 
 #include "Autovalidate.h"

@@ -43,7 +43,7 @@ static void CheckRawData(const BamRecordImpl& bam)
                                         (expectedSeqLength + 1) / 2 + expectedSeqLength +
                                         expectedTagsLength;
 
-    const auto rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
+    const auto& rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
     ASSERT_TRUE(static_cast<bool>(rawData));
 
     EXPECT_EQ(expectedNameNulls, rawData->core.l_extranul);

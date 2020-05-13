@@ -19,6 +19,7 @@
 
 #include <htslib/sam.h>
 
+#include "pbbam/Deleters.h"
 #include "pbbam/PbiFile.h"
 
 #include "Autovalidate.h"
