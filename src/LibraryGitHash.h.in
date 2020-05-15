@@ -1,0 +1,14 @@
+// Author: Derek Barnett
+
+#ifndef PBBAM_LIBRARY_GITHASH_H
+#define PBBAM_LIBRARY_GITHASH_H
+
+namespace PacBio {
+namespace Pbbam {
+
+constexpr const char LibraryGitSha1[] = "@PBBAM_GIT_SHA1@";
+
+}  // namespace Pbbam
+}  // namespace PacBio
+
+#endif  // PBBAM_LIBRARY_GITHASH_H

@@ -56,6 +56,7 @@ if not meson.is_subproject()
       'pbbam/IndexedFastqReader.h',
       'pbbam/Interval.h',
       'pbbam/IRecordWriter.h',
+      'pbbam/LibraryInfo.h',
       'pbbam/LocalContextFlags.h',
       'pbbam/MD5.h',
       'pbbam/MoveAppend.h',
