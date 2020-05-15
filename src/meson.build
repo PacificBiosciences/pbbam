@@ -14,6 +14,8 @@ pbbam_config.set('PBBAM_VERSION_MINOR', pbbam_minor_version)
 pbbam_config.set('PBBAM_VERSION_PATCH', pbbam_patch_version)
 
 pbbam_version_sources = [
+
+  # old <-- to be removed
   vcs_tag(
     input : 'PbbamGitHash.cpp.in',
     output : 'PbbamGitHash.cpp',
@@ -22,7 +24,19 @@ pbbam_version_sources = [
   configure_file(
     input : 'PbbamVersion.cpp.in',
     output : 'PbbamVersion.cpp',
-    configuration : pbbam_config)]
+    configuration : pbbam_config),
+
+  # new
+  vcs_tag(
+    input : 'LibraryGitHash.h.in',
+    output : 'LibraryGitHash.h',
+    command : ['git', 'describe', '--always', '--dirty=*'],
+    replace_string : '@PBBAM_GIT_SHA1@'),
+  configure_file(
+    input : 'LibraryVersion.h.in',
+    output : 'LibraryVersion.h',
+    configuration : pbbam_config)
+]
 
 ###########
 # sources #
@@ -83,6 +97,7 @@ pbbam_cpp_sources = files([
   'IndexedFastqReaderImpl.cpp',
   'IRecordWriter.cpp',
   'KSeqReader.cpp',
+  'LibraryInfo.cpp',
   'MD5.cpp',
   'MemoryUtils.cpp',
   'PbiBuilder.cpp',
