@@ -15,6 +15,8 @@
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
 
+#include "pbbam/Deleters.h"
+
 #include "MemoryUtils.h"
 
 namespace PacBio {

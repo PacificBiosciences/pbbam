@@ -21,6 +21,7 @@
 
 #include "pbbam/BamRecordTag.h"
 #include "pbbam/Cigar.h"
+#include "pbbam/Deleters.h"
 #include "pbbam/Position.h"
 #include "pbbam/QualityValues.h"
 #include "pbbam/TagCollection.h"
@@ -70,7 +71,7 @@ public:
     BamRecordImpl(BamRecordImpl&& other) noexcept = default;
     BamRecordImpl& operator=(const BamRecordImpl& other);
     BamRecordImpl& operator=(BamRecordImpl&& other) noexcept = default;
-    virtual ~BamRecordImpl() = default;
+    ~BamRecordImpl();
 
     /// \}
 
@@ -580,7 +581,7 @@ private:
 
 private:
     // data members
-    std::shared_ptr<bam1_t> d_;
+    std::unique_ptr<bam1_t, HtslibRecordDeleter> d_;
     mutable std::unordered_map<uint16_t, int> tagOffsets_;
 
     // friends

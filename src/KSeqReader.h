@@ -15,7 +15,7 @@
 #include <htslib/kseq.h>
 #include <zlib.h>
 
-#include "MemoryUtils.h"
+#include "pbbam/Deleters.h"
 
 namespace PacBio {
 namespace BAM {

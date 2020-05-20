@@ -102,7 +102,7 @@ std::pair<int32_t, int32_t> AlignedOffsets(const BamRecord& record, const int se
     int32_t startOffset = 0;
     int32_t endOffset = seqLength;
 
-    const auto b = BamRecordMemory::GetRawData(record);
+    const auto& b = BamRecordMemory::GetRawData(record);
     uint32_t* cigarData = bam_get_cigar(b.get());
     const size_t numCigarOps = b->core.n_cigar;
     if (numCigarOps > 0) {
@@ -1394,7 +1394,7 @@ size_t BamRecord::NumDeletedBases() const
 {
     size_t count = 0;
 
-    auto b = BamRecordMemory::GetRawData(this);
+    auto& b = BamRecordMemory::GetRawData(this);
     uint32_t* cigarData = bam_get_cigar(b.get());
     for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
         const auto type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
@@ -1407,7 +1407,7 @@ size_t BamRecord::NumInsertedBases() const
 {
     size_t count = 0;
 
-    auto b = BamRecordMemory::GetRawData(this);
+    auto& b = BamRecordMemory::GetRawData(this);
     uint32_t* cigarData = bam_get_cigar(b.get());
     for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
         const auto type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
@@ -1422,7 +1422,7 @@ std::pair<size_t, size_t> BamRecord::NumMatchesAndMismatches() const
 {
     std::pair<size_t, size_t> result = std::make_pair(0, 0);
 
-    auto b = BamRecordMemory::GetRawData(this);
+    auto& b = BamRecordMemory::GetRawData(this);
     uint32_t* cigarData = bam_get_cigar(b.get());
     for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
         const auto type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
@@ -1851,7 +1851,7 @@ int32_t BamRecord::ReadGroupNumericId() const { return ReadGroupInfo::IdToInt(Re
 Position BamRecord::ReferenceEnd() const
 {
     if (!impl_.IsMapped()) return PacBio::BAM::UnmappedPosition;
-    const auto htsData = BamRecordMemory::GetRawData(impl_);
+    const auto& htsData = BamRecordMemory::GetRawData(impl_);
     if (!htsData) return PacBio::BAM::UnmappedPosition;
     return bam_endpos(htsData.get());
 }

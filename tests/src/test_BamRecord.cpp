@@ -66,7 +66,7 @@ void CheckRawData(const BamRecordImpl& bam)
                                         (expectedSeqLength + 1) / 2 + expectedSeqLength +
                                         expectedTagsLength;
 
-    const auto rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
+    const auto& rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
     ASSERT_TRUE(static_cast<bool>(rawData));
 
     EXPECT_EQ(expectedNameNulls, rawData->core.l_extranul);
@@ -829,8 +829,6 @@ TEST(BamRecordTest, SelfAssignmentTolerated)
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
     tags["XY"] = int32_t{-42};
     bam1.Impl().Tags(tags);
-
-    bam1 = bam1;
 
     EXPECT_EQ(42, bam1.Impl().Bin());
     EXPECT_EQ(42, bam1.Impl().Flag());

@@ -19,8 +19,9 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "pbbam/Deleters.h"
+
 #include "FileProducer.h"
-#include "MemoryUtils.h"
 
 namespace PacBio {
 namespace BAM {

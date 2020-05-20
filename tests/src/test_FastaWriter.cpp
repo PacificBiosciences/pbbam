@@ -9,7 +9,6 @@
 #include <pbbam/FastaSequence.h>
 #include <pbbam/FastaSequenceQuery.h>
 #include <pbbam/FastaWriter.h>
-#include <pbbam/Unused.h>
 #include <boost/algorithm/string.hpp>
 
 #include "FastxTests.h"

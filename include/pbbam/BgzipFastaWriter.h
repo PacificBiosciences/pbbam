@@ -33,7 +33,6 @@ public:
     void Write(const std::string& name, const std::string& bases);
 
     // IRecordWriter
-    void TryFlush();
     void Write(const BamRecord& bam);
     void Write(const BamRecordImpl& bam);
 

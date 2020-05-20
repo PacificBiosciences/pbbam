@@ -10,7 +10,9 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
+#include <array>
 #include <sstream>
 #include <stdexcept>
 #include <thread>
@@ -19,12 +21,12 @@
 #include <htslib/bgzf.h>
 #include <pbcopper/utility/Deleters.h>
 
+#include "pbbam/Deleters.h"
 #include "pbbam/PbiBuilder.h"
 #include "pbbam/PbiFile.h"
+#include "pbbam/ReadGroupInfo.h"
 #include "pbbam/ccs/CCSHeader.h"
 #include "pbbam/ccs/CCSRecord.h"
-
-#include "MemoryUtils.h"
 
 namespace PacBio {
 namespace CCS {

@@ -9,7 +9,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include "pbbam/DataSetTypes.h"
-#include "pbbam/Unused.h"
 
 #include "DataSetUtils.h"
 #include "TimeUtils.h"

@@ -35,6 +35,7 @@
 #include "pbbam/BamRecord.h"
 #include "pbbam/BamRecordImpl.h"
 #include "pbbam/BamWriter.h"
+#include "pbbam/Deleters.h"
 #include "pbbam/PbiRawData.h"
 #include "pbbam/RecordType.h"
 #include "pbbam/Validator.h"
@@ -924,7 +925,7 @@ public:
         //
         builder_->AddRecord(record, uncompressedFilePos_);
 
-        const auto rawRecord = BamRecordMemory::GetRawData(record);
+        const auto& rawRecord = BamRecordMemory::GetRawData(record);
 
         // update bin
         // min_shift=14 & n_lvls=5 are BAM "magic numbers"
@@ -1039,8 +1040,6 @@ IndexedBamWriter::IndexedBamWriter(IndexedBamWriter&&) noexcept = default;
 IndexedBamWriter& IndexedBamWriter::operator=(IndexedBamWriter&&) noexcept = default;
 
 IndexedBamWriter::~IndexedBamWriter() = default;
-
-void IndexedBamWriter::TryFlush() {}  // ignore
 
 void IndexedBamWriter::Write(const BamRecord& record) { d_->Write(record); }
 
