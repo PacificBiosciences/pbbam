@@ -5,8 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [1.4.0] - 2020-05-22
+
 ### Added
  - SamReader
+
+### Changed
+ - Data::SNR (from pbcopper) values are now float, not double.
+
+### Removed
+ - BamRecordBuilder
 
 ## [1.3.0] - 2020-04-24
 
