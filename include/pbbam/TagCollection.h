@@ -9,6 +9,7 @@
 
 #include "pbbam/Config.h"
 
+#include <iosfwd>
 #include <map>
 #include <string>
 
@@ -28,6 +29,13 @@ public:
     /// \returns true if the collection contains a tag with \p name
     bool Contains(const std::string& name) const;
 };
+
+///
+/// Write tab-separated TagCollection to output stream. Tags are written in the form:
+///
+/// 'name=value'
+///
+std::ostream& operator<<(std::ostream& out, const TagCollection& tags);
 
 }  // namespace BAM
 }  // namespace PacBio

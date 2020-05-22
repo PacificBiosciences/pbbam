@@ -11,6 +11,7 @@
 
 #include <cstdint>
 
+#include <iosfwd>
 #include <string>
 #include <vector>
 
@@ -382,6 +383,11 @@ public:
     Tag& Modifier(const TagModifier m);
 
     /// \}
+
+    ///
+    /// Write tag data to output stream. Values in array-type tags are comma-separated.
+    ///
+    friend std::ostream& operator<<(std::ostream& out, const Tag& tag);
 
 private:
     // clang-format off

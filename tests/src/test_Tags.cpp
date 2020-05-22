@@ -1126,3 +1126,86 @@ TEST(BamTagCodecTest, AsciiTagsTest)
         EXPECT_EQ(expected, data);
     }
 }
+
+TEST(TagTest, OutputOperator)
+{
+    const int8_t i8 = 1;
+    const uint8_t u8 = 2;
+    const int16_t i16 = 3;
+    const uint16_t u16 = 4;
+    const int32_t i32 = 5;
+    const uint32_t u32 = 6;
+    const float f = 7.77f;
+    const std::string str = "eight";
+    const std::vector<int8_t> i8_array{9, 10, 11, 12};
+    const std::vector<uint8_t> u8_array{13, 14, 15, 16};
+    const std::vector<int16_t> i16_array{27, 18, 19, 20};
+    const std::vector<uint16_t> u16_array{21, 22, 23, 24};
+    const std::vector<int32_t> i32_array{25, 26, 27, 28};
+    const std::vector<uint32_t> u32_array{29, 30, 31, 32};
+    const std::vector<float> float_array{33.33f, 34.44f, 35.55f, 36.66f};
+
+    TagCollection tags;
+    tags.emplace("aa", i8);
+    tags.emplace("bb", u8);
+    tags.emplace("cc", i16);
+    tags.emplace("dd", u16);
+    tags.emplace("ee", i32);
+    tags.emplace("ff", u32);
+    tags.emplace("gg", f);
+    tags.emplace("hh", i8_array);
+    tags.emplace("ii", u8_array);
+    tags.emplace("jj", i16_array);
+    tags.emplace("kk", u16_array);
+    tags.emplace("ll", i32_array);
+    tags.emplace("mm", u32_array);
+    tags.emplace("nn", float_array);
+
+    {  // raw Tags, value only
+        const std::string expected{
+            "1\n"
+            "2\n"
+            "3\n"
+            "4\n"
+            "5\n"
+            "6\n"
+            "7.77\n"
+            "9,10,11,12\n"
+            "13,14,15,16\n"
+            "27,18,19,20\n"
+            "21,22,23,24\n"
+            "25,26,27,28\n"
+            "29,30,31,32\n"
+            "33.33,34.44,35.55,36.66\n"};
+
+        std::ostringstream out;
+        for (const auto& tag : tags) {
+            out << tag.second << '\n';
+        }
+        EXPECT_EQ(out.str(), expected);
+    }
+
+    {  // default TagCollection format (with name & tab-separated)
+        const std::string expected{
+            "aa=1\t"
+            "bb=2\t"
+            "cc=3\t"
+            "dd=4\t"
+            "ee=5\t"
+            "ff=6\t"
+            "gg=7.77\t"
+            "hh=9,10,11,12\t"
+            "ii=13,14,15,16\t"
+            "jj=27,18,19,20\t"
+            "kk=21,22,23,24\t"
+            "ll=25,26,27,28\t"
+            "mm=29,30,31,32\t"
+            "nn=33.33,34.44,35.55,36.66\n"};
+
+        std::ostringstream out;
+        out << tags << '\n';
+        EXPECT_EQ(out.str(), expected);
+    }
+
+    // std::cout << tags << '\n';
+}
