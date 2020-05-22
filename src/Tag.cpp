@@ -124,6 +124,59 @@ struct TypenameVisitor : public boost::static_visitor<std::string>
     std::string operator()(const std::vector<float>&) const { return "vector<float>"; }
 };
 
+struct OutputVisitor : public boost::static_visitor<void>
+{
+    OutputVisitor(std::ostream& out) : out_{out} {}
+
+    void operator()(const boost::blank) const { ; }
+    void operator()(const int8_t value) const { out_ << static_cast<int16_t>(value); }
+    void operator()(const uint8_t value) const { out_ << static_cast<uint16_t>(value); }
+    void operator()(const int16_t value) const { out_ << value; }
+    void operator()(const uint16_t value) const { out_ << value; }
+    void operator()(const int32_t value) const { out_ << value; }
+    void operator()(const uint32_t value) const { out_ << value; }
+    void operator()(const float value) const { out_ << value; }
+    void operator()(const std::string& value) const { out_ << value; }
+
+    void operator()(const std::vector<int8_t>& values) const
+    {
+        bool first = true;
+        for (const auto v : values) {
+            if (!first) {
+                out_ << ',';
+            } else
+                first = false;
+            out_ << static_cast<int16_t>(v);
+        }
+    }
+    void operator()(const std::vector<uint8_t>& values) const
+    {
+        bool first = true;
+        for (const auto v : values) {
+            if (!first) {
+                out_ << ',';
+            } else
+                first = false;
+            out_ << static_cast<uint16_t>(v);
+        }
+    }
+
+    template <typename T>
+    void operator()(const T& values) const
+    {
+        bool first = true;
+        for (const auto& v : values) {
+            if (!first) {
+                out_ << ',';
+            } else
+                first = false;
+            out_ << v;
+        }
+    }
+
+    std::ostream& out_;
+};
+
 }  // namespace
 
 static_assert(std::is_copy_constructible<Tag>::value, "Tag(const Tag&) is not = default");
@@ -400,6 +453,12 @@ std::vector<float> Tag::ToFloatArray() const { return boost::get<std::vector<flo
 TagDataType Tag::Type() const { return TagDataType(data_.which()); }
 
 std::string Tag::Typename() const { return boost::apply_visitor(TypenameVisitor(), data_); }
+
+std::ostream& operator<<(std::ostream& out, const Tag& tag)
+{
+    boost::apply_visitor(OutputVisitor(out), tag.data_);
+    return out;
+}
 
 }  // namespace BAM
 }  // namespace PacBio
