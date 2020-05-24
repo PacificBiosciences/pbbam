@@ -6,7 +6,10 @@ if not pbbam_cram_script.found()
   pbbam_cram_script = find_program('scripts/cram.py', required : true)
 endif
 
-pbbam_gtest_dep = dependency('gtest_main', fallback : ['gtest', 'gtest_main_dep'])
+pbbam_gtest_dep = dependency(
+  'gtest',
+  main : true,
+  fallback : ['gtest', 'gtest_main_dep'])
 
 pbbam_PbbamTestData_h_config = configuration_data()
 pbbam_PbbamTestData_h_config.set('PacBioBAM_BinDir', join_paths([meson.current_build_dir(), '../tools']))
