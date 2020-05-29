@@ -34,9 +34,6 @@ class BamFile::BamFilePrivate
 public:
     explicit BamFilePrivate(std::string fn) : filename_{std::move(fn)}, firstAlignmentOffset_{-1}
     {
-        // ensure we've updated htslib verbosity with requested verbosity here
-        hts_verbose = (PacBio::BAM::HtslibVerbosity == -1 ? 0 : PacBio::BAM::HtslibVerbosity);
-
         // attempt open
         auto f = RawOpen();
 
