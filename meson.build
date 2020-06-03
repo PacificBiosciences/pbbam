@@ -1,14 +1,14 @@
 project(
   'PacBioBAM',
   'cpp',
-  version : '1.3.0',
+  version : '1.4.0',
   default_options : [
     'buildtype=release',
     'warning_level=3',
     'cpp_std=c++14',
     'b_ndebug=if-release'],
   license : 'BSD-3',
-  meson_version : '>= 0.46.0')
+  meson_version : '>= 0.52.0')
 
 ############
 # CXXFLAGS #
@@ -48,13 +48,7 @@ endif
 pbbam_thread_dep = dependency('threads', required : true)
 
 # boost
-pbbam_boost_dep = dependency('boost', required : true)
-
-# TODO(dseifert): Add test for Winsock on Windows
-# Winsock for htslib on Windows
-#if(WIN32)
-#    set(SOCKET_LIBRARIES "ws2_32")
-#endif()
+pbbam_boost_dep = dependency('boost', include_type : 'system', required : true)
 
 # zlib
 pbbam_zlib_dep = dependency('zlib', required : true, fallback : ['zlib', 'zlib_dep'])
