@@ -2775,4 +2775,24 @@ TEST(BamRecordTest, MissingLocalContextFlagsCannotConvertToPbcopperReads)
     }
 }
 
+TEST(BamRecordTest, UpdateNameKeepsCcsStrandSuffix)
+{
+    const std::string ccsFn{PbbamTestsConfig::Data_Dir + "/23.ccs.bam"};
+
+    BamReader reader{ccsFn};
+    BamRecord record;
+
+    // "/fwd"
+    ASSERT_TRUE(reader.GetNext(record));
+    std::string originalName = record.FullName();
+    record.UpdateName();
+    EXPECT_EQ(record.FullName(), originalName);
+
+    // "/rev"
+    ASSERT_TRUE(reader.GetNext(record));
+    originalName = record.FullName();
+    record.UpdateName();
+    EXPECT_EQ(record.FullName(), originalName);
+}
+
 // clang-format on
