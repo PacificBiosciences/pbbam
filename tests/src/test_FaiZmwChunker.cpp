@@ -1,10 +1,10 @@
 // Author: Derek Barnett
 
+#include "../../src/FaiZmwChunker.h"
+
 #include <vector>
 
 #include <gtest/gtest.h>
-
-#include "../../src/FaiZmwChunker.h"
 
 #include "FastxTests.h"
 

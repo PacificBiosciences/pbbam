@@ -1,16 +1,17 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
+#include <pbbam/IndexedBamWriter.h>
 
-#include "PbbamTestData.h"
+#include <gtest/gtest.h>
 
 #include <pbbam/BamFile.h>
 #include <pbbam/BamReader.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/EntireFileQuery.h>
-#include <pbbam/IndexedBamWriter.h>
 #include <pbbam/PbiBuilder.h>
 #include <pbbam/PbiRawData.h>
+
+#include "PbbamTestData.h"
 
 // clang-format off
 

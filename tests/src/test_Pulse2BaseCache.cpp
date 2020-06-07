@@ -1,8 +1,8 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
-
 #include <pbbam/../../src/Pulse2BaseCache.h>
+
+#include <gtest/gtest.h>
 
 TEST(Pulse2BaseCacheTest, CountsDetectedInConstructor)
 {

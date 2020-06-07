@@ -1,14 +1,15 @@
 // Author: Derek Barnett
 
+#include <pbbam/DataSet.h>
+
 #include <cstddef>
+
 #include <string>
 
 #include <gtest/gtest.h>
 
 #include "../src/FileUtils.h"
 #include "PbbamTestData.h"
-
-#include <pbbam/DataSet.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;

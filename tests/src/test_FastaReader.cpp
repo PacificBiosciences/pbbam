@@ -1,17 +1,19 @@
 // Author: Derek Barnett
 
+#include <pbbam/FastaReader.h>
+
 #include <cstddef>
 
 #include <gtest/gtest.h>
 
+#include <boost/algorithm/string.hpp>
+
 #include "PbbamTestData.h"
 
 #include <pbbam/EntireFileQuery.h>
-#include <pbbam/FastaReader.h>
 #include <pbbam/FastaSequence.h>
 #include <pbbam/FastaSequenceQuery.h>
 #include <pbbam/FastaWriter.h>
-#include <boost/algorithm/string.hpp>
 
 #include "FastxTests.h"
 

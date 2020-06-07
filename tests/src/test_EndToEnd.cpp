@@ -10,6 +10,7 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+
 #include <htslib/sam.h>
 
 #include <pbbam/BamFile.h>

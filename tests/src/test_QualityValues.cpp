@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/QualityValues.h>
+
 #include <cstddef>
 #include <cstdint>
 
@@ -8,8 +10,6 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-
-#include <pbbam/QualityValues.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;

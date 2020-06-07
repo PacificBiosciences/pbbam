@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/IndexedFastaReader.h>
+
 #include <string>
 
 #include <gtest/gtest.h>
@@ -7,7 +9,6 @@
 #include <pbbam/BamFile.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/EntireFileQuery.h>
-#include <pbbam/IndexedFastaReader.h>
 
 #include "FastxTests.h"
 #include "PbbamTestData.h"

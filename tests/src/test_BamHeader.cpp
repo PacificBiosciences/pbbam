@@ -1,14 +1,16 @@
 // Author: Derek Barnett
 
+#include <pbbam/BamHeader.h>
+
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
+
 #include <htslib/sam.h>
 
 #include <pbbam/BamFile.h>
-#include <pbbam/BamHeader.h>
 #include <pbbam/DataSet.h>
 
 #include "PbbamTestData.h"

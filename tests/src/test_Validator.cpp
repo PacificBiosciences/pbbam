@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/Validator.h>
+
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -11,7 +13,6 @@
 #include <pbbam/BamRecord.h>
 #include <pbbam/Cigar.h>
 #include <pbbam/ReadGroupInfo.h>
-#include <pbbam/Validator.h>
 
 #include "../src/ValidationErrors.h"
 

@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/EntireFileQuery.h>
+
 #include <cstdint>
 
 #include <iterator>
@@ -11,7 +13,6 @@
 #include <boost/any.hpp>
 
 #include <pbbam/DataSet.h>
-#include <pbbam/EntireFileQuery.h>
 #include <pbbam/GenomicIntervalQuery.h>
 #include <pbbam/ZmwGroupQuery.h>
 #include <pbbam/ZmwQuery.h>

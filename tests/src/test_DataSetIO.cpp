@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/DataSet.h>
+
 #include <cstddef>
 
 #include <fstream>
@@ -12,11 +14,10 @@
 
 #include <gtest/gtest.h>
 
+#include <pbbam/internal/DataSetElement.h>
+
 #include "../src/FileUtils.h"
 #include "PbbamTestData.h"
-
-#include <pbbam/DataSet.h>
-#include <pbbam/internal/DataSetElement.h>
 
 // clang-format off
 

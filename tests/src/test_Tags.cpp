@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/TagCollection.h>
+
 #include <cstdint>
 
 #include <algorithm>
@@ -16,7 +18,6 @@
 
 #include <pbbam/BamTagCodec.h>
 #include <pbbam/SamTagCodec.h>
-#include <pbbam/TagCollection.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;

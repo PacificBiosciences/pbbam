@@ -1,10 +1,10 @@
 // Author: Derek Barnett
 
+#include <pbbam/IndexedFastqReader.h>
+
 #include <gtest/gtest.h>
 
 #include <htslib/hts.h>
-
-#include <pbbam/IndexedFastqReader.h>
 
 #include "FastxTests.h"
 #include "PbbamTestData.h"

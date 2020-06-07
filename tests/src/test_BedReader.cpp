@@ -1,12 +1,13 @@
 // Author: Derek Barnett
 
+#include <pbbam/bed/BedReader.h>
+
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
 #include <pbbam/GenomicInterval.h>
-#include <pbbam/bed/BedReader.h>
 
 #include "PbbamTestData.h"
 

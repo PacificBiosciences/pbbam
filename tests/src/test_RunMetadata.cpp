@@ -1,12 +1,13 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
+#include <pbbam/RunMetadata.h>
 
 #include <sstream>
 #include <stdexcept>
 
+#include <gtest/gtest.h>
+
 #include <pbbam/DataSet.h>
-#include <pbbam/RunMetadata.h>
 
 #include "PbbamTestData.h"
 

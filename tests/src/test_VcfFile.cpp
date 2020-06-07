@@ -1,8 +1,9 @@
 // Author: Derek Barnett
 
+#include <pbbam/vcf/VcfFile.h>
+
 #include <gtest/gtest.h>
 
-#include <pbbam/vcf/VcfFile.h>
 #include <pbbam/vcf/VcfFormat.h>
 
 #include "PbbamTestData.h"

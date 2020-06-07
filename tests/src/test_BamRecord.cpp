@@ -1,20 +1,22 @@
 // Author: Derek Barnett
 
-#include <array>
+#include <pbbam/BamRecord.h>
+
 #include <cstddef>
 #include <cstdint>
+
+#include <array>
 #include <initializer_list>
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
 #include <pbbam/BamReader.h>
-#include <pbbam/BamRecord.h>
 #include <pbbam/BamTagCodec.h>
+
 #include "../src/MemoryUtils.h"
+#include "PbbamTestData.h"
 
 // clang-format off
 

@@ -1,6 +1,6 @@
 // Author: Derek Barnett
 
-#include <unistd.h>
+#include <pbbam/BamFile.h>
 
 #include <cstddef>
 #include <cstdlib>
@@ -8,10 +8,11 @@
 #include <iterator>
 #include <stdexcept>
 
+#include <unistd.h>
+
 #include <gtest/gtest.h>
 
 #include <pbbam/../../src/FileUtils.h>
-#include <pbbam/BamFile.h>
 #include <pbbam/EntireFileQuery.h>
 
 #include "PbbamTestData.h"

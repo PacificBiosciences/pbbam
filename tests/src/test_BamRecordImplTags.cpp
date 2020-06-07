@@ -1,12 +1,13 @@
 // Author: Derek Barnett
 
+#include <pbbam/BamRecordImpl.h>
+
 #include <cstdint>
+
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
-
-#include <pbbam/BamRecordImpl.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;

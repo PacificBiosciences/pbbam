@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/../../src/FileUtils.h>
+
 #include <cctype>
 #include <chrono>
 #include <cstdio>
@@ -10,9 +12,9 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+
 #include <boost/algorithm/string.hpp>
 
-#include <pbbam/../../src/FileUtils.h>
 #include <pbbam/../../src/TimeUtils.h>
 
 #include "PbbamTestData.h"

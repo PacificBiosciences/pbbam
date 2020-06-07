@@ -1,13 +1,13 @@
 // Author: Derek Barnett
 
+#include <pbbam/ZmwChunkedFastaReader.h>
+#include <pbbam/ZmwChunkedFastqReader.h>
+
 #include <algorithm>
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
-
-#include "pbbam/ZmwChunkedFastaReader.h"
-#include "pbbam/ZmwChunkedFastqReader.h"
 
 #include "FastxTests.h"
 #include "PbbamTestData.h"

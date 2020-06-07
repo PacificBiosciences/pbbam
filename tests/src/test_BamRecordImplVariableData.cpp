@@ -1,8 +1,11 @@
 // Author: Derek Barnett
 
-#include <algorithm>
+#include <pbbam/BamRecordImpl.h>
+
 #include <cstddef>
 #include <cstdint>
+
+#include <algorithm>
 #include <iterator>
 #include <string>
 #include <utility>
@@ -10,11 +13,11 @@
 
 #include <gtest/gtest.h>
 
-#include <pbbam/BamRecordImpl.h>
 #include <pbbam/BamTagCodec.h>
 #include <pbbam/SamTagCodec.h>
 #include <pbbam/Tag.h>
 #include <pbbam/TagCollection.h>
+
 #include "../src/MemoryUtils.h"
 
 using namespace PacBio;

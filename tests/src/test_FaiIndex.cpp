@@ -1,13 +1,13 @@
 // Author: Derek Barnett
 
+#include <pbbam/FaiIndex.h>
+
 #include <algorithm>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
-
-#include <pbbam/FaiIndex.h>
 
 #include "PbbamTestData.h"
 

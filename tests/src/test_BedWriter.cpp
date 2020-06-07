@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/bed/BedWriter.h>
+
 #include <cstdio>
 
 #include <algorithm>
@@ -11,7 +13,6 @@
 #include <pbbam/FormatUtils.h>
 #include <pbbam/GenomicInterval.h>
 #include <pbbam/bed/BedReader.h>
-#include <pbbam/bed/BedWriter.h>
 
 #include "PbbamTestData.h"
 

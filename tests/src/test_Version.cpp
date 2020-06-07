@@ -1,11 +1,11 @@
 // Author: Derek Barnett
 
+#include "../src/Version.h"
+
 #include <sstream>
 #include <string>
 
 #include <gtest/gtest.h>
-
-#include "../src/Version.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
