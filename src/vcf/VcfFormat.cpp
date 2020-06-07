@@ -8,7 +8,7 @@
 #include <cmath>
 
 #include <fstream>
-#include <iostream>
+#include <istream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -384,7 +384,7 @@ VcfHeader VcfFormat::HeaderFromFile(const std::string& fn)
 
 VcfHeader VcfFormat::HeaderFromStream(std::istream& in)
 {
-    std::stringstream text;
+    std::ostringstream text;
 
     std::string line;
     while (std::getline(in, line)) {

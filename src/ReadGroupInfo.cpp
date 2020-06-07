@@ -14,6 +14,7 @@
 #include <cstdio>
 
 #include <iomanip>
+#include <ios>
 #include <set>
 #include <sstream>
 #include <stdexcept>

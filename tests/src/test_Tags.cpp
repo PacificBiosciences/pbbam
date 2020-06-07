@@ -1,8 +1,8 @@
 // Author: Derek Barnett
 
-#include <algorithm>
 #include <cstdint>
-#include <iostream>
+
+#include <algorithm>
 #include <limits>
 #include <map>
 #include <sstream>
@@ -1206,6 +1206,4 @@ TEST(TagTest, OutputOperator)
         out << tags << '\n';
         EXPECT_EQ(out.str(), expected);
     }
-
-    // std::cout << tags << '\n';
 }

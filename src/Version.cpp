@@ -8,6 +8,7 @@
 
 #include "Version.h"
 
+#include <ostream>
 #include <sstream>
 #include <stdexcept>
 
@@ -50,6 +51,12 @@ std::string Version::ToString() const
     std::ostringstream s;
     s << major_ << '.' << minor_ << '.' << revision_;
     return s.str();
+}
+
+std::ostream& operator<<(std::ostream& out, const Version& version)
+{
+    out << version.ToString();
+    return out;
 }
 
 }  // namespace BAM

@@ -1,12 +1,14 @@
 // Author: Derek Barnett
 
-#include <unistd.h>
 #include <cstddef>
+
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
+
+#include <unistd.h>
 
 #include <gtest/gtest.h>
 

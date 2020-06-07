@@ -11,7 +11,7 @@
 #include <cassert>
 
 #include <fstream>
-#include <iostream>
+#include <ostream>
 #include <sstream>
 #include <stdexcept>
 #include <tuple>

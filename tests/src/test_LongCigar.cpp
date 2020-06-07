@@ -1,6 +1,5 @@
 // Author: Derek Barnett
 
-#include <iostream>
 #include <string>
 #include <tuple>
 

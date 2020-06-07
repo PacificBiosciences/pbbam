@@ -6,8 +6,7 @@
 
 #include <cassert>
 
-#include <fstream>
-#include <iostream>
+#include <istream>
 #include <memory>
 #include <stdexcept>
 #include <typeinfo>

@@ -8,7 +8,6 @@
 
 #include "pbbam/ccs/CCSRecordFormat.h"
 
-#include <iomanip>
 #include <sstream>
 #include <stdexcept>
 

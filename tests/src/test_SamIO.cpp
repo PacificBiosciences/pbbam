@@ -1,8 +1,10 @@
 // Author: Derek Barnett
 
 #include <cstdint>
+
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <string>
 
 #include <gtest/gtest.h>

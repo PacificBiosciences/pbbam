@@ -6,9 +6,8 @@
 
 #include <cstddef>
 
-#include <fstream>
-#include <iostream>
 #include <map>
+#include <ostream>
 #include <stdexcept>
 
 #include "pbbam/DataSet.h"

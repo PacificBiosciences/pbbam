@@ -3,6 +3,7 @@
 #include "CppFormatter.h"
 
 #include <cstdint>
+
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -119,7 +120,7 @@ void CppFormatter::Run(const Settings& settings)
 
     if (rawData.HasMappedData()) {
         s << '\n'
-          << "PbiRawMappedData& mappedData = rawData.MappedData();" << std::endl
+          << "PbiRawMappedData& mappedData = rawData.MappedData();\n"
           << "mappedData.tId_       = {" << printField(mappedData.tId_) << "};\n"
           << "mappedData.tStart_    = {" << printField(mappedData.tStart_) << "};\n"
           << "mappedData.tEnd_      = {" << printField(mappedData.tEnd_) << "};\n"

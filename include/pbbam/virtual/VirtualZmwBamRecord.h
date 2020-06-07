@@ -9,7 +9,6 @@
 
 #include "pbbam/Config.h"
 
-#include <sstream>
 #include <vector>
 
 #include "pbbam/BamHeader.h"

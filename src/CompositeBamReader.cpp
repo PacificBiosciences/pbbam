@@ -6,6 +6,7 @@
 
 #include "PbbamInternalConfig.h"
 
+#include <sstream>
 #include <stdexcept>
 
 #include "pbbam/BamFile.h"

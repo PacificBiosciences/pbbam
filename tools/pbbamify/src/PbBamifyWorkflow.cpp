@@ -5,8 +5,7 @@
 #include <cstdint>
 #include <ctime>
 
-#include <istream>
-#include <ostream>
+#include <sstream>
 #include <string>
 
 #include <pbbam/BamReader.h>

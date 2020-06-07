@@ -9,6 +9,7 @@
 #include "pbbam/ccs/CCSRecordReader.h"
 
 #include <iostream>
+#include <istream>
 #include <stdexcept>
 #include <string>
 #include <vector>

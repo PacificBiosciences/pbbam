@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <sstream>
+
 #include <gtest/gtest.h>
 #include <pbbam/vcf/VcfFormat.h>
 #include <pbbam/vcf/VcfHeader.h>

@@ -9,8 +9,6 @@
 
 #include "pbbam/Config.h"
 
-#include <fstream>
-#include <iostream>
 #include <string>
 
 #include "pbbam/BgzipWriter.h"

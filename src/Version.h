@@ -9,7 +9,7 @@
 
 #include "pbbam/Config.h"
 
-#include <ostream>
+#include <iosfwd>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -62,11 +62,7 @@ private:
     int revision_ = 0;
 };
 
-inline std::ostream& operator<<(std::ostream& out, const Version& version)
-{
-    out << version.ToString();
-    return out;
-}
+std::ostream& operator<<(std::ostream& out, const Version& version);
 
 inline Version::Version(int major, int minor, int revision)
     : major_{major}, minor_{minor}, revision_{revision}

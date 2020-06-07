@@ -10,7 +10,7 @@
 
 #include <cassert>
 
-#include <iostream>
+#include <ostream>
 #include <type_traits>
 
 #include <boost/core/demangle.hpp>

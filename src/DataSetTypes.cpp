@@ -10,6 +10,7 @@
 
 #include <cstddef>
 
+#include <ostream>
 #include <set>
 #include <tuple>
 #include <unordered_map>

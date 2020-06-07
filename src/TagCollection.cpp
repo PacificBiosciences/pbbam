@@ -8,7 +8,7 @@
 
 #include "pbbam/TagCollection.h"
 
-#include <iostream>
+#include <ostream>
 
 namespace PacBio {
 namespace BAM {
