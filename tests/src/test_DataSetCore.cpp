@@ -18,7 +18,7 @@ namespace DataSetCoreTests {
 const std::string subreadsetBioSample{PbbamTestsConfig::Data_Dir +
                                       "/dataset/biosample.subreadset.xml"};
 
-static inline DataSet CreateDataSet()
+static DataSet CreateDataSet()
 {
     DataSet d;
     d.Name("foo");

@@ -123,7 +123,7 @@ static const std::unordered_map<std::string, LocalContextFlags> contextFlagNames
 // clang-format off
 
 // helper methods (for handling maybe-list strings))
-static inline bool isBracketed(const std::string& value)
+static bool isBracketed(const std::string& value)
 {
     static const std::string openBrackets = "[({";
     static const std::string closeBrackets = "])}";
@@ -131,7 +131,7 @@ static inline bool isBracketed(const std::string& value)
            closeBrackets.find(value.at(value.length() - 1)) != std::string::npos;
 }
 
-static inline bool isList(const std::string& value) { return value.find(',') != std::string::npos; }
+static bool isList(const std::string& value) { return value.find(',') != std::string::npos; }
 
 static PbiFilter CreateBarcodeFilter(std::string value, const Compare::Type compareType)
 {

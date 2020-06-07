@@ -57,7 +57,7 @@ static void TestSubread2Xml();
 static void TestSubread3Xml();
 static void TestTransformedXml();
 
-static inline
+static 
 void changeCurrentDirectory(const std::string& dir)
 { ASSERT_EQ(0, chdir(dir.c_str())); }
 

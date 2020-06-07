@@ -45,7 +45,7 @@ BamRecordImpl CreateBamImpl()
     return bam;
 }
 
-static inline
+static 
 BamRecord CreateBam()
 { return BamRecord{ CreateBamImpl() }; }
 
@@ -76,7 +76,7 @@ void CheckRawData(const BamRecordImpl& bam)
     EXPECT_EQ(expectedTotalDataLength, rawData->l_data);
 }
 
-static inline
+static 
 void CheckRawData(const BamRecord& bam)
 { CheckRawData(bam.Impl()); }
 
@@ -94,7 +94,7 @@ BamRecordImpl MakeCigaredImpl(const std::string& seq,
     return impl;
 }
 
-static inline
+static 
 BamRecord MakeCigaredRecord(const std::string& seq,
                             const std::string& cigar,
                             const Strand strand)

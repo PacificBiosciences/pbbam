@@ -33,7 +33,7 @@ namespace CCS {
 namespace internal {
 
 template <typename T>
-inline void SwapEndianness(std::vector<T>& data)
+void SwapEndianness(std::vector<T>& data)
 {
     const size_t elementSize = sizeof(T);
     const size_t numReads = data.size();
@@ -68,7 +68,7 @@ void bgzf_write_safe(BGZF* fp, const void* data, size_t length)
 }
 
 template <typename T>
-inline void WriteBgzfVector(BGZF* fp, std::vector<T>& data)
+void WriteBgzfVector(BGZF* fp, std::vector<T>& data)
 {
     assert(fp);
     if (fp->is_be) SwapEndianness(data);

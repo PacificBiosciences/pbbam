@@ -127,11 +127,11 @@ struct SortUniqueTestFilter2
     }
 };
 
-static inline
+static 
 PbiFilter emptyFilter()
 { return PbiFilter{ }; }
 
-static inline
+static 
 PbiFilter simpleFilter()
 { return PbiFilter{ SimpleFilter{ } }; }
 

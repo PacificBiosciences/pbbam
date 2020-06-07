@@ -66,7 +66,7 @@ private:
 };
 
 template <typename T>
-inline void PbiIndexIO::LoadBgzfVector(BGZF* fp, std::vector<T>& data, const uint32_t numReads)
+void PbiIndexIO::LoadBgzfVector(BGZF* fp, std::vector<T>& data, const uint32_t numReads)
 {
     assert(fp);
     data.resize(numReads);
@@ -76,7 +76,7 @@ inline void PbiIndexIO::LoadBgzfVector(BGZF* fp, std::vector<T>& data, const uin
 }
 
 template <typename T>
-inline void PbiIndexIO::SwapEndianness(std::vector<T>& data)
+void PbiIndexIO::SwapEndianness(std::vector<T>& data)
 {
     const auto elementSize = sizeof(T);
     const auto numReads = data.size();
@@ -101,7 +101,7 @@ inline void PbiIndexIO::SwapEndianness(std::vector<T>& data)
 }
 
 template <typename T>
-inline void PbiIndexIO::WriteBgzfVector(BGZF* fp, const std::vector<T>& data)
+void PbiIndexIO::WriteBgzfVector(BGZF* fp, const std::vector<T>& data)
 {
     assert(fp);
     std::vector<T> output = data;

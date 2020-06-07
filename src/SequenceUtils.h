@@ -79,6 +79,7 @@ T Reversed(const T& input)
     Reverse(result);
     return result;
 }
+
 inline void ReverseComplement(std::string& seq)
 {
     std::transform(seq.begin(), seq.end(), seq.begin(), Complement);

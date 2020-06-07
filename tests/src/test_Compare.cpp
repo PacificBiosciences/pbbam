@@ -17,7 +17,7 @@ using namespace PacBio::BAM;
 
 namespace CompareTests {
 
-static inline
+static 
 BamRecord makeRecordWithTag(const std::string& tagName,
                             const Tag& tag)
 {

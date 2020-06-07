@@ -464,7 +464,7 @@ public:
     /// \}
 
     template <typename T>
-    static inline bool Check(const T& lhs, const T& rhs, const Compare::Type cmp)
+    static bool Check(const T& lhs, const T& rhs, const Compare::Type cmp)
     {
         switch (cmp) {
             case Compare::EQUAL:

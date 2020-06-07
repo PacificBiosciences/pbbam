@@ -40,10 +40,10 @@ public:
     Pulse2BaseCache() = delete;
     Pulse2BaseCache(const Pulse2BaseCache&) = default;
     Pulse2BaseCache(Pulse2BaseCache&&) noexcept(
-        std::is_nothrow_move_constructible<boost::dynamic_bitset<>>::value);
+        std::is_nothrow_move_constructible<boost::dynamic_bitset<>>::value) = default;
     Pulse2BaseCache& operator=(const Pulse2BaseCache&) = default;
     Pulse2BaseCache& operator=(Pulse2BaseCache&&) noexcept(
-        std::is_nothrow_move_assignable<boost::dynamic_bitset<>>::value);
+        std::is_nothrow_move_assignable<boost::dynamic_bitset<>>::value) = default;
     ~Pulse2BaseCache() = default;
 
     ///
@@ -105,12 +105,6 @@ public:
 private:
     boost::dynamic_bitset<> data_;
 };
-
-inline Pulse2BaseCache::Pulse2BaseCache(Pulse2BaseCache&&) noexcept(
-    std::is_nothrow_move_constructible<boost::dynamic_bitset<>>::value) = default;
-
-inline Pulse2BaseCache& Pulse2BaseCache::operator=(Pulse2BaseCache&&) noexcept(
-    std::is_nothrow_move_assignable<boost::dynamic_bitset<>>::value) = default;
 
 }  // namespace BAM
 }  // namespace PacBio
