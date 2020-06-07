@@ -36,7 +36,7 @@ inline bool Compare::MemberFunctionBase<ValueType, fn, CompareType>::operator()(
     return cmp(Proxy::call(lhs), Proxy::call(rhs));
 }
 
-inline bool Compare::None::operator()(const BamRecord&, const BamRecord&) const
+inline bool Compare::None::operator()(const BamRecord&, const BamRecord&) const noexcept
 { return false; }
 
 } // namespace BAM

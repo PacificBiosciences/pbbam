@@ -21,7 +21,7 @@ namespace BamHeaderTests {
 
 struct BamHdrDeleter
 {
-    void operator()(bam_hdr_t* hdr) const
+    void operator()(bam_hdr_t* hdr) const noexcept
     {
         if (hdr != nullptr) {
             bam_hdr_destroy(hdr);

@@ -25,7 +25,7 @@ namespace BamRecordImplCoreTests {
 
 struct Bam1Deleter
 {
-    void operator()(bam1_t* b) const
+    void operator()(bam1_t* b) const noexcept
     {
         if (b != nullptr) {
             bam_destroy1(b);

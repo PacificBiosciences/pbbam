@@ -44,13 +44,16 @@ FastqSequence& FastqSequence::Qualities(QualityValues quals)
     return *this;
 }
 
-bool FastqSequence::operator==(const FastqSequence& other) const
+bool FastqSequence::operator==(const FastqSequence& other) const noexcept
 {
     return std::tie(Name(), Bases(), qualities_) ==
            std::tie(other.Name(), other.Bases(), other.qualities_);
 }
 
-bool FastqSequence::operator!=(const FastqSequence& other) const { return !(*this == other); }
+bool FastqSequence::operator!=(const FastqSequence& other) const noexcept
+{
+    return !(*this == other);
+}
 
 }  // namespace BAM
 }  // namespace PacBio

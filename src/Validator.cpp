@@ -35,7 +35,7 @@ namespace {
 
 struct ilexcompare_wrapper
 {
-    bool operator()(const std::string& lhs, const std::string& rhs) const
+    bool operator()(const std::string& lhs, const std::string& rhs) const noexcept
     {
         return boost::ilexicographical_compare(lhs, rhs);
     }

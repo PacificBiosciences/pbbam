@@ -24,13 +24,13 @@ inline DataSetElement::DataSetElement(const std::string& label, const FromInputX
     : xsd_(xsd), label_(label, true)
 {}
 
-inline bool DataSetElement::operator==(const DataSetElement& other) const
+inline bool DataSetElement::operator==(const DataSetElement& other) const noexcept
 {
     return std::tie(xsd_, label_, text_, attributes_, children_) ==
            std::tie(other.xsd_, other.label_, other.text_, other.attributes_, other.children_);
 }
 
-inline bool DataSetElement::operator!=(const DataSetElement& other) const
+inline bool DataSetElement::operator!=(const DataSetElement& other) const noexcept
 {
     return !(*this == other);
 }
@@ -250,12 +250,12 @@ inline DataSetElementIteratorBase::DataSetElementIteratorBase(const DataSetEleme
     : parent_(parent), index_(i)
 {}
 
-inline bool DataSetElementIteratorBase::operator==(const DataSetElementIteratorBase& other) const
+inline bool DataSetElementIteratorBase::operator==(const DataSetElementIteratorBase& other) const noexcept
 {
     return std::tie(parent_, index_) == std::tie(other.parent_, other.index_);
 }
 
-inline bool DataSetElementIteratorBase::operator!=(const DataSetElementIteratorBase& other) const
+inline bool DataSetElementIteratorBase::operator!=(const DataSetElementIteratorBase& other) const noexcept
 {
     return !(*this == other);
 }
@@ -279,13 +279,13 @@ inline DataSetElementIterator<T>::DataSetElementIterator(const DataSetElement* p
 {}
 
 template <typename T>
-inline T& DataSetElementIterator<T>::operator*()
+inline T& DataSetElementIterator<T>::operator*() noexcept
 {
     return parent_->template Child<T>(index_);
 }
 
 template <typename T>
-inline T* DataSetElementIterator<T>::operator->()
+inline T* DataSetElementIterator<T>::operator->() noexcept
 {
     return &(operator*());
 }
@@ -316,13 +316,13 @@ inline DataSetElementConstIterator<T>::DataSetElementConstIterator(const DataSet
 {}
 
 template <typename T>
-inline const T& DataSetElementConstIterator<T>::operator*() const
+inline const T& DataSetElementConstIterator<T>::operator*() const noexcept
 {
     return parent_->template Child<const T>(index_);
 }
 
 template <typename T>
-inline const T* DataSetElementConstIterator<T>::operator->() const
+inline const T* DataSetElementConstIterator<T>::operator->() const noexcept
 {
     return &(operator*());
 }
@@ -382,12 +382,12 @@ inline XmlName::XmlName(const std::string& localName, const std::string& prefix)
     if (prefixSize_ != 0) ++localNameOffset_;
 }
 
-inline bool XmlName::operator==(const XmlName& other) const
+inline bool XmlName::operator==(const XmlName& other) const noexcept
 {
     return qualifiedName_ == other.qualifiedName_;
 }
 
-inline bool XmlName::operator!=(const XmlName& other) const { return !(*this == other); }
+inline bool XmlName::operator!=(const XmlName& other) const noexcept { return !(*this == other); }
 
 inline const boost::string_ref XmlName::LocalName() const
 {

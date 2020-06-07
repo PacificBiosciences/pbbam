@@ -273,7 +273,7 @@ public:
     ///
     struct None : public Compare::Base
     {
-        bool operator()(const BamRecord&, const BamRecord&) const;
+        bool operator()(const BamRecord&, const BamRecord&) const noexcept;
     };
 
     ///\brief Compares on BamRecord::NumDeletedBases.

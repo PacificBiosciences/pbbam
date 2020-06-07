@@ -59,8 +59,8 @@ public:
     /// \name Operators
     /// \{
 
-    bool operator==(const SequenceInfo& other) const;
-    bool operator!=(const SequenceInfo& other) const;
+    bool operator==(const SequenceInfo& other) const noexcept;
+    bool operator!=(const SequenceInfo& other) const noexcept;
 
     /// \}
 

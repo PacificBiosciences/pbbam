@@ -16,11 +16,11 @@ inline QueryIteratorBase<T>::QueryIteratorBase(QueryBase<T>& query)
 { ReadNext(); }
 
 template<typename T> inline
-bool QueryIteratorBase<T>::operator==(const QueryIteratorBase<T>& other) const
+bool QueryIteratorBase<T>::operator==(const QueryIteratorBase<T>& other) const noexcept
 { return query_ == other.query_; }
 
 template<typename T> inline
-bool QueryIteratorBase<T>::operator!=(const QueryIteratorBase<T>& other) const
+bool QueryIteratorBase<T>::operator!=(const QueryIteratorBase<T>& other) const noexcept
 { return !(*this == other); }
 
 // -------------------
@@ -33,11 +33,11 @@ QueryIterator<T>::QueryIterator(QueryBase<T>& query)
 { }
 
 template<typename T> inline
-T& QueryIterator<T>::operator*()
+T& QueryIterator<T>::operator*() noexcept
 { return QueryIteratorBase<T>::record_; }
 
 template<typename T> inline
-T* QueryIterator<T>::operator->()
+T* QueryIterator<T>::operator->() noexcept
 { return &(operator*()); }
 
 template<typename T> inline
@@ -62,11 +62,11 @@ QueryConstIterator<T>::QueryConstIterator(const QueryBase<T>& query)
 { }
 
 template<typename T> inline
-const T& QueryConstIterator<T>::operator*() const
+const T& QueryConstIterator<T>::operator*() const noexcept
 { return QueryIteratorBase<T>::record_; }
 
 template<typename T> inline
-const T* QueryConstIterator<T>::operator->() const
+const T* QueryConstIterator<T>::operator->() const noexcept
 { return &(operator*()); }
 
 template<typename T> inline

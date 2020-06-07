@@ -36,7 +36,7 @@ private:
     KSEQ_INIT(BGZF*, bgzf_read);
     struct KSeqDeleter
     {
-        void operator()(kseq_t* seq) const
+        void operator()(kseq_t* seq) const noexcept
         {
             if (seq) kseq_destroy(seq);
             seq = nullptr;

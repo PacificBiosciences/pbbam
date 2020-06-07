@@ -48,14 +48,17 @@ SequenceInfo::SequenceInfo(std::string name, std::string length)
 {
 }
 
-bool SequenceInfo::operator==(const SequenceInfo& other) const
+bool SequenceInfo::operator==(const SequenceInfo& other) const noexcept
 {
     return std::tie(assemblyId_, checksum_, length_, name_, species_, uri_, custom_) ==
            std::tie(other.assemblyId_, other.checksum_, other.length_, other.name_, other.species_,
                     other.uri_, other.custom_);
 }
 
-bool SequenceInfo::operator!=(const SequenceInfo& other) const { return !(*this == other); }
+bool SequenceInfo::operator!=(const SequenceInfo& other) const noexcept
+{
+    return !(*this == other);
+}
 
 std::string SequenceInfo::AssemblyId() const { return assemblyId_; }
 

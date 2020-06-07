@@ -188,7 +188,7 @@ public:
     ///
     PbiReferenceEntry(ID id, Row beginRow, Row endRow);
 
-    bool operator==(const PbiReferenceEntry& other) const;
+    bool operator==(const PbiReferenceEntry& other) const noexcept;
 
     /// \}
 

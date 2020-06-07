@@ -235,10 +235,10 @@ public:
     /// \name Comparison Operators
     /// \{
 
-    bool operator==(const ReadGroupInfo& other) const;
+    bool operator==(const ReadGroupInfo& other) const noexcept;
 
     /// Enable sort on RG:ID
-    bool operator<(const ReadGroupInfo& other) const;
+    bool operator<(const ReadGroupInfo& other) const noexcept;
 
     /// \}
 
