@@ -14,6 +14,7 @@
 #include <cstdio>
 
 #include <iomanip>
+#include <ios>
 #include <set>
 #include <sstream>
 #include <stdexcept>
@@ -324,7 +325,7 @@ ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
     platformModel_ = std::move(platform);
 }
 
-bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
+bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const noexcept
 {
     const auto lhsFields = std::tie(
         id_, sequencingCenter_, date_, flowOrder_, keySequence_, library_, programs_,
@@ -347,7 +348,7 @@ bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
                                    other.custom_.cend());
 }
 
-bool ReadGroupInfo::operator<(const ReadGroupInfo& other) const { return id_ < other.id_; }
+bool ReadGroupInfo::operator<(const ReadGroupInfo& other) const noexcept { return id_ < other.id_; }
 
 size_t ReadGroupInfo::BarcodeCount() const
 {

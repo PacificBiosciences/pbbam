@@ -5,7 +5,7 @@
 #include "RunMetadataParser.h"
 
 #include <fstream>
-#include <iostream>
+#include <istream>
 #include <stdexcept>
 
 #include <boost/algorithm/string.hpp>

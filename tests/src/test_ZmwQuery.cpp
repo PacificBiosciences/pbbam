@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/ZmwQuery.h>
+
 #include <algorithm>
 #include <iterator>
 #include <string>
@@ -8,7 +10,6 @@
 #include <gtest/gtest.h>
 
 #include <pbbam/ZmwGroupQuery.h>
-#include <pbbam/ZmwQuery.h>
 
 #include "PbbamTestData.h"
 

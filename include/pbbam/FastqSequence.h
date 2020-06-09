@@ -67,8 +67,8 @@ public:
 
     /// \}
 
-    bool operator==(const FastqSequence& other) const;
-    bool operator!=(const FastqSequence& other) const;
+    bool operator==(const FastqSequence& other) const noexcept;
+    bool operator!=(const FastqSequence& other) const noexcept;
 
 private:
     QualityValues qualities_;

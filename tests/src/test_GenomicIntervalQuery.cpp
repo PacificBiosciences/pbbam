@@ -1,15 +1,15 @@
 // Author: Derek Barnett
 
+#include <pbbam/GenomicIntervalQuery.h>
+
 #include <algorithm>
 #include <functional>
-#include <iostream>
 #include <iterator>
 #include <string>
 
 #include <gtest/gtest.h>
 
 #include <pbbam/BaiIndexCache.h>
-#include <pbbam/GenomicIntervalQuery.h>
 
 #include "PbbamTestData.h"
 

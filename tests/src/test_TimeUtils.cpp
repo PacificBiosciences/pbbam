@@ -1,13 +1,13 @@
 // Author: Derek Barnett
 
+#include <pbbam/../../src/TimeUtils.h>
+
 #include <ctime>
 
 #include <chrono>
 #include <string>
 
 #include <gtest/gtest.h>
-
-#include <pbbam/../../src/TimeUtils.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;

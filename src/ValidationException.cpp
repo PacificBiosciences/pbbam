@@ -8,6 +8,8 @@
 
 #include "pbbam/exception/ValidationException.h"
 
+#include <sstream>
+
 namespace PacBio {
 namespace BAM {
 

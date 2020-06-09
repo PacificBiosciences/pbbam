@@ -1,10 +1,11 @@
 // Author: Derek Barnett
 
+#include <pbbam/AlignmentPrinter.h>
+
 #include <string>
 
 #include <gtest/gtest.h>
 
-#include <pbbam/AlignmentPrinter.h>
 #include <pbbam/BamFile.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/EntireFileQuery.h>

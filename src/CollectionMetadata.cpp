@@ -4,8 +4,6 @@
 
 #include "pbbam/CollectionMetadata.h"
 
-#include <fstream>
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <tuple>

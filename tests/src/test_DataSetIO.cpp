@@ -1,20 +1,23 @@
 // Author: Derek Barnett
 
-#include <unistd.h>
+#include <pbbam/DataSet.h>
+
 #include <cstddef>
+
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
+#include <unistd.h>
+
 #include <gtest/gtest.h>
+
+#include <pbbam/internal/DataSetElement.h>
 
 #include "../src/FileUtils.h"
 #include "PbbamTestData.h"
-
-#include <pbbam/DataSet.h>
-#include <pbbam/internal/DataSetElement.h>
 
 // clang-format off
 
@@ -57,7 +60,7 @@ static void TestSubread2Xml();
 static void TestSubread3Xml();
 static void TestTransformedXml();
 
-static inline
+static 
 void changeCurrentDirectory(const std::string& dir)
 { ASSERT_EQ(0, chdir(dir.c_str())); }
 

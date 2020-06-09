@@ -10,7 +10,7 @@
 
 #include <cassert>
 
-#include <iostream>
+#include <ostream>
 #include <type_traits>
 
 #include <boost/core/demangle.hpp>
@@ -88,17 +88,17 @@ using ToUInt32ConvertVisitor = NumericConvertVisitor<uint32_t>;
 struct IsEqualVisitor : public boost::static_visitor<bool>
 {
     template <typename T, typename U>
-    bool operator()(const T&, const U&) const
+    bool operator()(const T&, const U&) const noexcept
     {
         // maybe allow conversions down the road?
         // but for now, just fail if types are different
         return false;
     }
 
-    bool operator()(const boost::blank&, const boost::blank&) const { return true; }
+    bool operator()(const boost::blank&, const boost::blank&) const noexcept { return true; }
 
     template <typename T>
-    bool operator()(const T& lhs, const T& rhs) const
+    bool operator()(const T& lhs, const T& rhs) const noexcept
     {
         return lhs == rhs;
     }

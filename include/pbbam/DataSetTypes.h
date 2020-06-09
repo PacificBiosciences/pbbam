@@ -9,6 +9,7 @@
 
 #include "pbbam/Config.h"
 
+#include <iosfwd>
 #include <string>
 
 #include "pbbam/BamFile.h"
@@ -1020,7 +1021,7 @@ public:
               DataSetPathMode pathMode = DataSetPathMode::ABSOLUTE);
 
     /// \brief Saves dataset XML to output stream, e.g. std::cout,
-    ///        std::stringstream.
+    ///        std::ostringstream.
     ///
     /// \param[out] out         destination for XML contents
     /// \param[in]  pathMode    print absolute paths or allow relative

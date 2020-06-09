@@ -1,12 +1,12 @@
 // Author: Derek Barnett
 
+#include <pbbam/../../src/SequenceUtils.h>
+
 #include <climits>
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
-
-#include <pbbam/../../src/SequenceUtils.h>
 
 TEST(SequenceUtilsTest, ComplementChar)
 {

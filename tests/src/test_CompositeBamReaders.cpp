@@ -1,10 +1,10 @@
 // Author: Derek Barnett
 
+#include <pbbam/CompositeBamReader.h>
+
 #include <iterator>
 
 #include <gtest/gtest.h>
-
-#include <pbbam/CompositeBamReader.h>
 
 #include "PbbamTestData.h"
 

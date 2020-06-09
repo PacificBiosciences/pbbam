@@ -1,19 +1,21 @@
 // Author: Derek Barnett
 
-#include <chrono>
+#include <pbbam/BamRecord.h>
+
 #include <cstdint>
+
+#include <chrono>
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
 #include <pbbam/BamReader.h>
-#include <pbbam/BamRecord.h>
 #include <pbbam/BamRecordView.h>
 #include <pbbam/BamTagCodec.h>
 #include <pbbam/EntireFileQuery.h>
+
+#include "PbbamTestData.h"
 
 // clang-format off
 

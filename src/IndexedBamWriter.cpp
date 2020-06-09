@@ -16,8 +16,6 @@
 #include <array>
 #include <atomic>
 #include <condition_variable>
-#include <fstream>
-#include <iostream>
 #include <mutex>
 #include <sstream>
 #include <stdexcept>
@@ -79,7 +77,7 @@ struct GzIndexEntry
 };
 
 template <typename T>
-inline void SwapEndianness2(std::vector<T>& data)
+void SwapEndianness2(std::vector<T>& data)
 {
     constexpr const size_t elementSize = sizeof(T);
     const size_t numReads = data.size();
@@ -106,7 +104,7 @@ inline void SwapEndianness2(std::vector<T>& data)
 }
 
 template <typename T>
-inline void WriteBgzfVector2(BGZF* fp, std::vector<T>& data)
+void WriteBgzfVector2(BGZF* fp, std::vector<T>& data)
 {
     assert(fp);
     if (fp->is_be) SwapEndianness2(data);

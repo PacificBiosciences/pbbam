@@ -18,7 +18,7 @@ namespace BAM {
 /// \param[in,out] dst  Output vector that will be appended to
 ///
 template <typename T>
-inline void MoveAppend(std::vector<T>& src, std::vector<T>& dst) noexcept
+void MoveAppend(std::vector<T>& src, std::vector<T>& dst) noexcept
 {
     if (dst.empty()) {
         dst = std::move(src);
@@ -35,7 +35,7 @@ inline void MoveAppend(std::vector<T>& src, std::vector<T>& dst) noexcept
 /// \param[in,out] dst  Output vector that will be appended to
 ///
 template <typename T>
-inline void MoveAppend(std::vector<T>&& src, std::vector<T>& dst) noexcept
+void MoveAppend(std::vector<T>&& src, std::vector<T>& dst) noexcept
 {
     if (dst.empty()) {
         dst = std::move(src);

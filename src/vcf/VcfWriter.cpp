@@ -7,7 +7,6 @@
 #include <cassert>
 
 #include <fstream>
-#include <iostream>
 #include <type_traits>
 
 #include <pbbam/vcf/VcfFormat.h>

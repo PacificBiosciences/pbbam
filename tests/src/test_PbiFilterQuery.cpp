@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/PbiFilterQuery.h>
+
 #include <cstddef>
 #include <cstdint>
 
@@ -10,8 +12,6 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-
-#include <pbbam/PbiFilterQuery.h>
 
 #include "PbbamTestData.h"
 

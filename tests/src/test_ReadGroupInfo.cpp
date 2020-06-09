@@ -1,18 +1,20 @@
 // Author: Derek Barnett, Lance Hepler
 
+#include <pbbam/ReadGroupInfo.h>
+
 #include <cstddef>
 #include <cstdlib>
+
 #include <string>
 #include <tuple>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
-#include <pbbam/ReadGroupInfo.h>
 #include <pbbam/exception/BundleChemistryMappingException.h>
 #include <pbbam/exception/InvalidSequencingChemistryException.h>
+
+#include "PbbamTestData.h"
 
 // clang-format off
 

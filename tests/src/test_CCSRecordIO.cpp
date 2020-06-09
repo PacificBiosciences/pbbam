@@ -1,14 +1,14 @@
 // Author: Derek Barnett
 
+#include <pbbam/ccs/CCSRecord.h>
+
 #include <algorithm>
-#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include <pbbam/ccs/CCSRecord.h>
 #include <pbbam/ccs/CCSRecordFormat.h>
 #include <pbbam/ccs/CCSRecordReader.h>
 #include <pbbam/ccs/CCSRecordWriter.h>

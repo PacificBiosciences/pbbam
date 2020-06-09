@@ -1,16 +1,19 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
+#include <pbbam/BamWriter.h>
+
 #include <cstdint>
+
 #include <string>
 #include <vector>
 
-#include "PbbamTestData.h"
+#include <gtest/gtest.h>
 
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamRecord.h>
-#include <pbbam/BamWriter.h>
 #include <pbbam/EntireFileQuery.h>
+
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;

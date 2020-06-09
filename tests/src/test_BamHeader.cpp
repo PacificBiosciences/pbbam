@@ -1,15 +1,16 @@
 // Author: Derek Barnett
 
-#include <iostream>
+#include <pbbam/BamHeader.h>
+
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
+
 #include <htslib/sam.h>
 
 #include <pbbam/BamFile.h>
-#include <pbbam/BamHeader.h>
 #include <pbbam/DataSet.h>
 
 #include "PbbamTestData.h"
@@ -21,7 +22,7 @@ namespace BamHeaderTests {
 
 struct BamHdrDeleter
 {
-    void operator()(bam_hdr_t* hdr) const
+    void operator()(bam_hdr_t* hdr) const noexcept
     {
         if (hdr != nullptr) {
             bam_hdr_destroy(hdr);

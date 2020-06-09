@@ -1,25 +1,22 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
+#include <pbbam/FastqWriter.h>
+
 #include <cstddef>
 #include <cstdint>
 
-#include "FastxTests.h"
-#include "PbbamTestData.h"
+#include <gtest/gtest.h>
 
 #include <pbbam/BamFileMerger.h>
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/FastqReader.h>
 #include <pbbam/FastqSequence.h>
-#include <pbbam/FastqWriter.h>
 
 #include "FastxTests.h"
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
-
-namespace FastqWriterrTests {
-}  // namespace FastqWriterrTests
 
 TEST(FastqWriterTest, throws_on_empty_filename)
 {

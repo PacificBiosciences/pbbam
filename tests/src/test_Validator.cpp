@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/Validator.h>
+
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -11,7 +13,6 @@
 #include <pbbam/BamRecord.h>
 #include <pbbam/Cigar.h>
 #include <pbbam/ReadGroupInfo.h>
-#include <pbbam/Validator.h>
 
 #include "../src/ValidationErrors.h"
 
@@ -378,7 +379,7 @@ TEST(ValidatorTest, ValidRecord)
     ASSERT_NO_THROW(Validator::Validate(record));
 }
 
-static inline void ModifyTag(BamRecord* record, const std::string& tagName, const Tag& tag)
+static void ModifyTag(BamRecord* record, const std::string& tagName, const Tag& tag)
 {
     if (record->Impl().HasTag(tagName)) {
         record->Impl().EditTag(tagName, tag);
@@ -387,7 +388,7 @@ static inline void ModifyTag(BamRecord* record, const std::string& tagName, cons
     }
 }
 
-static inline void CheckInvalidTagLength(const std::string& tagName, const Tag& tag)
+static void CheckInvalidTagLength(const std::string& tagName, const Tag& tag)
 {
     static const BamHeader validUnmappedHeader{
         "@HD\tVN:1.5\tSO:unknown\tpb:3.0.7\n"

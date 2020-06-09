@@ -37,8 +37,8 @@ public:
     XmlName(const std::string& localName, const std::string& prefix);
 
 public:
-    bool operator==(const XmlName& other) const;
-    bool operator!=(const XmlName& other) const;
+    bool operator==(const XmlName& other) const noexcept;
+    bool operator!=(const XmlName& other) const noexcept;
 
 public:
     const boost::string_ref LocalName() const;
@@ -68,8 +68,8 @@ public:
     virtual ~DataSetElement() = default;
 
 public:
-    bool operator==(const DataSetElement& other) const;
-    bool operator!=(const DataSetElement& other) const;
+    bool operator==(const DataSetElement& other) const noexcept;
+    bool operator!=(const DataSetElement& other) const noexcept;
 
 public:
     const std::string& Attribute(const std::string& name) const;
@@ -156,8 +156,8 @@ private:
 class DataSetElementIteratorBase
 {
 public:
-    bool operator==(const DataSetElementIteratorBase& other) const;
-    bool operator!=(const DataSetElementIteratorBase& other) const;
+    bool operator==(const DataSetElementIteratorBase& other) const noexcept;
+    bool operator!=(const DataSetElementIteratorBase& other) const noexcept;
 
 protected:
     DataSetElementIteratorBase(const DataSetElement* parent, size_t i);
@@ -174,8 +174,8 @@ class DataSetElementIterator : public DataSetElementIteratorBase
 public:
     DataSetElementIterator(const DataSetElement* parent, size_t i);
 
-    T& operator*();
-    T* operator->();
+    T& operator*() noexcept;
+    T* operator->() noexcept;
 
     DataSetElementIterator& operator++();
     DataSetElementIterator operator++(int);
@@ -187,8 +187,8 @@ class DataSetElementConstIterator : public DataSetElementIteratorBase
 public:
     DataSetElementConstIterator(const DataSetElement* parent, size_t i);
 
-    const T& operator*() const;
-    const T* operator->() const;
+    const T& operator*() const noexcept;
+    const T* operator->() const noexcept;
 
     DataSetElementConstIterator& operator++();
     DataSetElementConstIterator operator++(int);

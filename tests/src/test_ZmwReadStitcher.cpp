@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/virtual/ZmwReadStitcher.h>
+
 #include <cstddef>
 
 #include <string>
@@ -11,7 +13,6 @@
 #include <pbbam/PbiFilter.h>
 #include <pbbam/virtual/VirtualPolymeraseCompositeReader.h>
 #include <pbbam/virtual/VirtualPolymeraseReader.h>
-#include <pbbam/virtual/ZmwReadStitcher.h>
 
 #include "PbbamTestData.h"
 

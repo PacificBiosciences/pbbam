@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <exception>
 #include <fstream>
-#include <iostream>
+#include <ostream>
 #include <sstream>
 #include <stdexcept>
 

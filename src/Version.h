@@ -9,7 +9,7 @@
 
 #include "pbbam/Config.h"
 
-#include <ostream>
+#include <iosfwd>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -36,12 +36,12 @@ public:
     Version& operator=(Version&&) noexcept = default;
     ~Version() = default;
 
-    bool operator==(const Version& other) const;
-    bool operator!=(const Version& other) const;
-    bool operator<(const Version& other) const;
-    bool operator<=(const Version& other) const;
-    bool operator>(const Version& other) const;
-    bool operator>=(const Version& other) const;
+    bool operator==(const Version& other) const noexcept;
+    bool operator!=(const Version& other) const noexcept;
+    bool operator<(const Version& other) const noexcept;
+    bool operator<=(const Version& other) const noexcept;
+    bool operator>(const Version& other) const noexcept;
+    bool operator>=(const Version& other) const noexcept;
 
     std::string ToString() const;
     explicit operator std::string() const;
@@ -62,11 +62,7 @@ private:
     int revision_ = 0;
 };
 
-inline std::ostream& operator<<(std::ostream& out, const Version& version)
-{
-    out << version.ToString();
-    return out;
-}
+std::ostream& operator<<(std::ostream& out, const Version& version);
 
 inline Version::Version(int major, int minor, int revision)
     : major_{major}, minor_{minor}, revision_{revision}
@@ -74,24 +70,24 @@ inline Version::Version(int major, int minor, int revision)
     Check();
 }
 
-inline bool Version::operator==(const Version& other) const
+inline bool Version::operator==(const Version& other) const noexcept
 {
     return std::tie(major_, minor_, revision_) ==
            std::tie(other.major_, other.minor_, other.revision_);
 }
 
-inline bool Version::operator!=(const Version& other) const { return !(*this == other); }
+inline bool Version::operator!=(const Version& other) const noexcept { return !(*this == other); }
 
-inline bool Version::operator<(const Version& other) const
+inline bool Version::operator<(const Version& other) const noexcept
 {
     return std::tie(major_, minor_, revision_) <
            std::tie(other.major_, other.minor_, other.revision_);
 }
-inline bool Version::operator<=(const Version& other) const { return !(*this > other); }
+inline bool Version::operator<=(const Version& other) const noexcept { return !(*this > other); }
 
-inline bool Version::operator>(const Version& other) const { return other < *this; }
+inline bool Version::operator>(const Version& other) const noexcept { return other < *this; }
 
-inline bool Version::operator>=(const Version& other) const { return !(*this < other); }
+inline bool Version::operator>=(const Version& other) const noexcept { return !(*this < other); }
 
 inline Version::operator std::string() const { return ToString(); }
 

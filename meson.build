@@ -81,6 +81,7 @@ if not meson.is_subproject()
 
     if get_option('tests')
       pbbam_clang_formatter = find_program('tools/check-formatting')
+      pbbam_eof_check = find_program('tools/check-eof')
       subdir('tests')
     endif
   endif

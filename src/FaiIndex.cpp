@@ -11,7 +11,7 @@
 #include <cassert>
 
 #include <fstream>
-#include <iostream>
+#include <ostream>
 #include <sstream>
 #include <stdexcept>
 #include <tuple>
@@ -31,7 +31,7 @@ static_assert(!std::is_copy_constructible<FaiIndex>::value,
 static_assert(!std::is_copy_assignable<FaiIndex>::value,
               "FaiIndex& operator=(const FaiIndex&) is not = delete");
 
-bool operator==(const FaiEntry& lhs, const FaiEntry& rhs)
+bool operator==(const FaiEntry& lhs, const FaiEntry& rhs) noexcept
 {
     return std::tie(lhs.Length, lhs.SeqOffset, lhs.NumBases, lhs.NumBytes, lhs.QualOffset) ==
            std::tie(rhs.Length, rhs.SeqOffset, rhs.NumBases, rhs.NumBytes, rhs.QualOffset);

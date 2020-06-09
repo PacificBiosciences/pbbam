@@ -1,12 +1,13 @@
 // Author: Derek Barnett
 
+#include <pbbam/DataSetXsd.h>
+
 #include <sstream>
 #include <string>
 
 #include <gtest/gtest.h>
 
 #include <pbbam/DataSet.h>
-#include <pbbam/DataSetXsd.h>
 
 #include "PbbamTestData.h"
 

@@ -1,8 +1,8 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
-
 #include <pbbam/StringUtilities.h>
+
+#include <gtest/gtest.h>
 
 TEST(StringUtilsTest, BasicSplitWithDefaultDelim)
 {

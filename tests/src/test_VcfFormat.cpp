@@ -1,7 +1,12 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
 #include <pbbam/vcf/VcfFormat.h>
+
+#include <sstream>
+#include <string>
+
+#include <gtest/gtest.h>
+
 #include <pbbam/vcf/VcfHeader.h>
 #include <pbbam/vcf/VcfVariant.h>
 

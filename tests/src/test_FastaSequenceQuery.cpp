@@ -1,10 +1,10 @@
 // Author: Derek Barnett
 
+#include <pbbam/FastaSequenceQuery.h>
+
 #include <iterator>
 
 #include <gtest/gtest.h>
-
-#include <pbbam/FastaSequenceQuery.h>
 
 #include "PbbamTestData.h"
 

@@ -9,6 +9,7 @@
 #include "pbbam/ccs/CCSRecordWriter.h"
 
 #include <iostream>
+#include <ostream>
 #include <string>
 #include <vector>
 
