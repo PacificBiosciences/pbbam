@@ -61,11 +61,19 @@ public:
         }
     }
 
-    int ReadRawData(BGZF* bgzf, bam1_t* b)
+    // clang-format off
+    int ReadRawData(samFile* sam, bam1_t* b)
     {
         assert(htsIterator_.get());
-        return hts_itr_next(bgzf, htsIterator_.get(), b, nullptr);
+
+// HTS_VERSION only added >= v1.10
+#if defined(HTS_VERSION) && HTS_VERSION >= 101000
+        return hts_itr_next(sam->fp.bgzf, htsIterator_.get(), b, sam);
+#else
+        return hts_itr_next(sam->fp.bgzf, htsIterator_.get(), b, nullptr);
+#endif
     }
+    // clang-format on
 
     BamFile file_;
     std::shared_ptr<BaiIndexCacheData> index_;
@@ -129,10 +137,10 @@ const GenomicInterval& BaiIndexedBamReader::Interval() const
     return d_->interval_;
 }
 
-int BaiIndexedBamReader::ReadRawData(BGZF* bgzf, bam1_t* b)
+int BaiIndexedBamReader::ReadRawData(samFile* file, bam1_t* b)
 {
     assert(d_);
-    return d_->ReadRawData(bgzf, b);
+    return d_->ReadRawData(file, b);
 }
 
 BaiIndexedBamReader& BaiIndexedBamReader::Interval(const GenomicInterval& interval)

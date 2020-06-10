@@ -72,7 +72,7 @@ bool BamReader::GetNext(BamRecord& record)
 {
     assert(BamRecordMemory::GetRawData(record).get());
 
-    const auto result = ReadRawData(Bgzf(), BamRecordMemory::GetRawData(record).get());
+    const auto result = ReadRawData(d_->htsFile_.get(), BamRecordMemory::GetRawData(record).get());
 
     // success
     if (result >= 0) {
@@ -108,7 +108,7 @@ bool BamReader::GetNext(BamRecord& record)
     }
 }
 
-int BamReader::ReadRawData(BGZF* bgzf, bam1_t* b) { return bam_read1(bgzf, b); }
+int BamReader::ReadRawData(samFile* file, bam1_t* b) { return bam_read1(file->fp.bgzf, b); }
 
 void BamReader::VirtualSeek(int64_t virtualOffset)
 {
