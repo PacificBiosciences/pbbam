@@ -102,7 +102,7 @@ public:
     /// \}
 
 protected:
-    int ReadRawData(BGZF* bgzf, bam1_t* b) override;
+    int ReadRawData(samFile* file, bam1_t* b) override;
 
 private:
     class BaiIndexedBamReaderPrivate;
