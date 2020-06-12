@@ -242,6 +242,8 @@ public:
 class CollectionMetadata : public internal::StrictEntityType
 {
 public:
+    static CollectionMetadata FromRawXml(const std::string& xml);
+
     CollectionMetadata();
     CollectionMetadata(const internal::FromInputXml& fromInputXml);
     CollectionMetadata(std::string subreadSetName);

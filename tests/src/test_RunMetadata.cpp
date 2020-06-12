@@ -2,6 +2,7 @@
 
 #include <pbbam/RunMetadata.h>
 
+#include <fstream>
 #include <sstream>
 #include <stdexcept>
 
@@ -345,4 +346,28 @@ TEST(RunMetadataTest, collection_metadata_has_proper_namespaces)
     // pbbase:
     EXPECT_TRUE(out.str().find("pbbase:AutomationParameters") != std::string::npos);
     EXPECT_TRUE(out.str().find("pbbase:AutomationParameter") != std::string::npos);
+}
+
+TEST(CollectionMetadataTest, can_create_from_raw_text_and_attach_to_dataset)
+{
+    // Create CollectionMetadata from raw XML
+    const std::string xmlFn{PacBio::BAM::PbbamTestsConfig::Data_Dir +
+                            "/run_metadata/collection_metadata.xml"};
+    std::ifstream xmlIn{xmlFn};
+    std::ostringstream xmlText;
+    xmlText << xmlIn.rdbuf();
+
+    const auto collectionMetadata = PacBio::BAM::CollectionMetadata::FromRawXml(xmlText.str());
+    ASSERT_TRUE(collectionMetadata.HasAttribute("InstrumentName"));
+    EXPECT_EQ("Sequel-54076", collectionMetadata.Attribute("InstrumentName"));
+
+    // Load up some existing dataset, check collection metdata
+    PacBio::BAM::DataSet subreadSet{PacBio::BAM::PbbamTestsConfig::Data_Dir +
+                                    "/run_metadata/barcodes.subreadset.xml"};
+    EXPECT_EQ("64008", subreadSet.Metadata().CollectionMetadata().Attribute("InstrumentName"));
+
+    // Attach our new CollectionMetadata and check
+    subreadSet.Metadata().CollectionMetadata(collectionMetadata);
+    EXPECT_EQ("Sequel-54076",
+              subreadSet.Metadata().CollectionMetadata().Attribute("InstrumentName"));
 }
