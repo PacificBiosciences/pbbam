@@ -62,7 +62,15 @@ void CollectionMetadataElementFromXml(const pugi::xml_node& xmlNode,
     const std::string label = xmlNode.name();
     if (label.empty()) return;
 
-    internal::DataSetElement e{label};
+    // ensure 'pbmeta' namespace for child elements, except for
+    // 'AutomationParameter' & 'AutomationParameters' which are 'pbbase'
+    const XsdType xsdType = [&label]() {
+        return (label.find("AutomationParameter") != std::string::npos)
+                   ? XsdType::BASE_DATA_MODEL
+                   : XsdType::COLLECTION_METADATA;
+    }();
+
+    internal::DataSetElement e{label, xsdType};
     e.Text(xmlNode.text().get());
 
     // iterate attributes
@@ -818,7 +826,7 @@ CollectionMetadata CollectionMetadata::FromRawXml(const std::string& input)
     pugi::xml_node rootNode = doc.document_element();
 
     // top-level attributes
-    CollectionMetadata cm;
+    CollectionMetadata cm{internal::FromInputXml{}};
     cm.Label(rootNode.name());
     auto attributeIter = rootNode.attributes_begin();
     auto attributeEnd = rootNode.attributes_end();
