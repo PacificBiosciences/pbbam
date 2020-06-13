@@ -52,8 +52,6 @@ Clone & Build
 .. note::
 
    The following steps are for building the C++ library and command-line utilities. 
-   If you are integrating pbbam into a C#, Python, or R project, take a look at the 
-   instructions for :ref:`additional languages <swig_bindings>`.
 
 The basic steps for obtaining pbbam and building it from source are as follows:
 

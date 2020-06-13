@@ -42,7 +42,7 @@ Normal JSON:
       "properties": {
         "fileSections": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": { "type": "string" }
         },
         "numReads": { "type": "integer" },
         "reads": {
@@ -68,7 +68,7 @@ Normal JSON:
               "rgId": { "type": "integer" },
               "tEnd": { "type": "integer" },
               "tId": { "type": "integer" },
-              "tStart: { "type": "integer" }
+              "tStart": { "type": "integer" }
             },
             "required": [
               "contextFlag",
@@ -92,7 +92,7 @@ Normal JSON:
             },
             "required" : [ "beginRow", "endRow","tId" ]
           }
-        }q
+        },
         "version": { "type": "string" }
       },
       "required": [
@@ -112,7 +112,7 @@ Normal JSON:
       "properties": {
         "barcodeData" : {
           "type" : "object",
-          "properties: {
+          "properties": {
             "bcForward" : {
               "type": "array",
               "items" : { "type": "integer" }
@@ -129,7 +129,7 @@ Normal JSON:
         },
         "basicData" : {
           "type" : "object",
-          "properties: {
+          "properties": {
             "contextFlag" : {
               "type": "array",
               "items" : { "type": "integer" }
@@ -154,7 +154,7 @@ Normal JSON:
               "type": "array",
               "items" : { "type": "number" }
             },
-            "rgId : {
+            "rgId" : {
               "type": "array",
               "items" : { "type": "integer" }
             }
@@ -162,11 +162,11 @@ Normal JSON:
         },
         "fileSections": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": { "type": "string" }
         },
         "mappedData" : {
           "type" : "object",
-          "properties: {
+          "properties": {
             "aEnd" : {
               "type": "array",
               "items" : { "type": "integer" }
