@@ -19,13 +19,13 @@ namespace BAM {
 namespace {
 
 template <typename T>
-inline void appendBamValue(const T& value, kstring_t* str)
+void appendBamValue(const T& value, kstring_t* str)
 {
     kputsn_(reinterpret_cast<const char*>(&value), sizeof(value), str);
 }
 
 template <typename T>
-inline void appendBamMultiValue(const std::vector<T>& container, kstring_t* str)
+void appendBamMultiValue(const std::vector<T>& container, kstring_t* str)
 {
     const uint32_t n = container.size();
     kputsn_(&n, sizeof(n), str);
@@ -39,7 +39,7 @@ inline void appendBamMultiValue(const std::vector<T>& container, kstring_t* str)
 }
 
 template <typename T>
-inline T readBamValue(const uint8_t* src, size_t& offset)
+T readBamValue(const uint8_t* src, size_t& offset)
 {
     T value;
     memcpy(&value, &src[offset], sizeof(value));

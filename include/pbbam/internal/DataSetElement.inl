@@ -17,20 +17,22 @@ namespace internal {
 
 inline DataSetElement::DataSetElement(const std::string& label, const XsdType& xsd)
     : xsd_(xsd), label_(label)
-{}
+{
+}
 
 inline DataSetElement::DataSetElement(const std::string& label, const FromInputXml&,
                                       const XsdType& xsd)
     : xsd_(xsd), label_(label, true)
-{}
+{
+}
 
-inline bool DataSetElement::operator==(const DataSetElement& other) const
+inline bool DataSetElement::operator==(const DataSetElement& other) const noexcept
 {
     return std::tie(xsd_, label_, text_, attributes_, children_) ==
            std::tie(other.xsd_, other.label_, other.text_, other.attributes_, other.children_);
 }
 
-inline bool DataSetElement::operator!=(const DataSetElement& other) const
+inline bool DataSetElement::operator!=(const DataSetElement& other) const noexcept
 {
     return !(*this == other);
 }
@@ -60,7 +62,7 @@ T& DataSetElement::operator[](const std::string& label)
 }
 
 template <typename T>
-inline void DataSetElement::AddChild(const T& e)
+void DataSetElement::AddChild(const T& e)
 {
     children_.push_back(std::make_shared<T>(e));
 }
@@ -94,7 +96,7 @@ inline const std::map<std::string, std::string>& DataSetElement::Attributes() co
 inline std::map<std::string, std::string>& DataSetElement::Attributes() { return attributes_; }
 
 template <typename T>
-inline const T& DataSetElement::Child(size_t index) const
+const T& DataSetElement::Child(size_t index) const
 {
     DataSetElement* child = children_.at(index).get();
     if (child == nullptr)
@@ -106,7 +108,7 @@ inline const T& DataSetElement::Child(size_t index) const
 }
 
 template <typename T>
-inline T& DataSetElement::Child(size_t index)
+T& DataSetElement::Child(size_t index)
 {
     DataSetElement* child = children_.at(index).get();
     if (child == nullptr)
@@ -118,14 +120,14 @@ inline T& DataSetElement::Child(size_t index)
 }
 
 template <typename T>
-inline const T& DataSetElement::Child(const std::string& label) const
+const T& DataSetElement::Child(const std::string& label) const
 {
     const auto index = IndexOf(label);
     return Child<T>(index);
 }
 
 template <typename T>
-inline T& DataSetElement::Child(const std::string& label)
+T& DataSetElement::Child(const std::string& label)
 {
     const int i = IndexOf(label);
     if (i >= 0) {
@@ -248,14 +250,17 @@ inline const XsdType& DataSetElement::Xsd() const { return xsd_; }
 inline DataSetElementIteratorBase::DataSetElementIteratorBase(const DataSetElement* parent,
                                                               size_t i)
     : parent_(parent), index_(i)
-{}
+{
+}
 
 inline bool DataSetElementIteratorBase::operator==(const DataSetElementIteratorBase& other) const
+    noexcept
 {
     return std::tie(parent_, index_) == std::tie(other.parent_, other.index_);
 }
 
 inline bool DataSetElementIteratorBase::operator!=(const DataSetElementIteratorBase& other) const
+    noexcept
 {
     return !(*this == other);
 }
@@ -274,31 +279,32 @@ inline void DataSetElementIteratorBase::Advance()
 // ------------------------
 
 template <typename T>
-inline DataSetElementIterator<T>::DataSetElementIterator(const DataSetElement* parent, size_t i)
+DataSetElementIterator<T>::DataSetElementIterator(const DataSetElement* parent, size_t i)
     : DataSetElementIteratorBase(parent, i)
-{}
+{
+}
 
 template <typename T>
-inline T& DataSetElementIterator<T>::operator*()
+T& DataSetElementIterator<T>::operator*() noexcept
 {
     return parent_->template Child<T>(index_);
 }
 
 template <typename T>
-inline T* DataSetElementIterator<T>::operator->()
+T* DataSetElementIterator<T>::operator->() noexcept
 {
     return &(operator*());
 }
 
 template <typename T>
-inline DataSetElementIterator<T>& DataSetElementIterator<T>::operator++()
+DataSetElementIterator<T>& DataSetElementIterator<T>::operator++()
 {
     Advance();
     return *this;
 }
 
 template <typename T>
-inline DataSetElementIterator<T> DataSetElementIterator<T>::operator++(int)
+DataSetElementIterator<T> DataSetElementIterator<T>::operator++(int)
 {
     DataSetElementIterator<T> result(*this);
     ++(*this);
@@ -310,25 +316,25 @@ inline DataSetElementIterator<T> DataSetElementIterator<T>::operator++(int)
 // -----------------------------
 
 template <typename T>
-inline DataSetElementConstIterator<T>::DataSetElementConstIterator(const DataSetElement* parent,
-                                                                   size_t i)
+DataSetElementConstIterator<T>::DataSetElementConstIterator(const DataSetElement* parent, size_t i)
     : DataSetElementIteratorBase(parent, i)
-{}
+{
+}
 
 template <typename T>
-inline const T& DataSetElementConstIterator<T>::operator*() const
+const T& DataSetElementConstIterator<T>::operator*() const noexcept
 {
     return parent_->template Child<const T>(index_);
 }
 
 template <typename T>
-inline const T* DataSetElementConstIterator<T>::operator->() const
+const T* DataSetElementConstIterator<T>::operator->() const noexcept
 {
     return &(operator*());
 }
 
 template <typename T>
-inline DataSetElementConstIterator<T>& DataSetElementConstIterator<T>::operator++()
+DataSetElementConstIterator<T>& DataSetElementConstIterator<T>::operator++()
 {
     Advance();
     return *this;
@@ -382,12 +388,12 @@ inline XmlName::XmlName(const std::string& localName, const std::string& prefix)
     if (prefixSize_ != 0) ++localNameOffset_;
 }
 
-inline bool XmlName::operator==(const XmlName& other) const
+inline bool XmlName::operator==(const XmlName& other) const noexcept
 {
     return qualifiedName_ == other.qualifiedName_;
 }
 
-inline bool XmlName::operator!=(const XmlName& other) const { return !(*this == other); }
+inline bool XmlName::operator!=(const XmlName& other) const noexcept { return !(*this == other); }
 
 inline const boost::string_ref XmlName::LocalName() const
 {

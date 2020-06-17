@@ -6,9 +6,8 @@
 
 #include <cstddef>
 
-#include <fstream>
-#include <iostream>
 #include <map>
+#include <ostream>
 #include <stdexcept>
 
 #include "pbbam/DataSet.h"
@@ -200,6 +199,9 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out, DataSetP
 
     std::map<XsdType, std::string> xsdPrefixesUsed;
     xsdPrefixesUsed[dataset.Xsd()] = Prefix(label);
+    if (dataset.Metadata().HasChild("Collections")) {
+        xsdPrefixesUsed[XsdType::COLLECTION_METADATA] = "pbmeta";
+    }
 
     // iterate children, recursively building up subtree
     for (const auto& child : dataset.Children())

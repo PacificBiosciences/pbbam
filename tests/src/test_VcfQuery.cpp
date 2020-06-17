@@ -1,5 +1,9 @@
 // Author: Derek Barnett
 
+#include <pbbam/vcf/VcfQuery.h>
+
+#include <cstddef>
+
 #include <algorithm>
 #include <string>
 #include <vector>
@@ -7,7 +11,6 @@
 #include <gtest/gtest.h>
 
 #include <pbbam/vcf/VcfFile.h>
-#include <pbbam/vcf/VcfQuery.h>
 
 #include "PbbamTestData.h"
 

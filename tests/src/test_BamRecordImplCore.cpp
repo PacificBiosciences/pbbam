@@ -1,9 +1,11 @@
 // Author: Derek Barnett
 
-#include <algorithm>
+#include <pbbam/BamRecordImpl.h>
+
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
+
+#include <algorithm>
 #include <iterator>
 #include <memory>
 #include <string>
@@ -12,10 +14,10 @@
 
 #include <gtest/gtest.h>
 
-#include <pbbam/BamRecordImpl.h>
 #include <pbbam/BamTagCodec.h>
 #include <pbbam/Tag.h>
 #include <pbbam/TagCollection.h>
+
 #include "../src/MemoryUtils.h"
 
 using namespace PacBio;
@@ -25,7 +27,7 @@ namespace BamRecordImplCoreTests {
 
 struct Bam1Deleter
 {
-    void operator()(bam1_t* b) const
+    void operator()(bam1_t* b) const noexcept
     {
         if (b != nullptr) {
             bam_destroy1(b);

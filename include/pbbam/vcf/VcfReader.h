@@ -6,7 +6,6 @@
 #include "pbbam/Config.h"
 
 #include <fstream>
-#include <iostream>
 #include <memory>
 #include <string>
 

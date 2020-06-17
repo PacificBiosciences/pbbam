@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/virtual/WhitelistedZmwReadStitcher.h>
+
 #include <cstdint>
 
 #include <string>
@@ -7,12 +9,11 @@
 
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
 #include <pbbam/BamFile.h>
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/PbiRawData.h>
-#include <pbbam/virtual/WhitelistedZmwReadStitcher.h>
+
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;

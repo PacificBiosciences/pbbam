@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/TextFileWriter.h>
+
 #include <cstdio>
 
 #include <algorithm>
@@ -10,7 +12,6 @@
 
 #include <pbbam/FormatUtils.h>
 #include <pbbam/TextFileReader.h>
-#include <pbbam/TextFileWriter.h>
 
 #include "PbbamTestData.h"
 

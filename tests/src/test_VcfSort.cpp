@@ -1,11 +1,12 @@
 // Author: Derek Barnett
 
+#include <pbbam/vcf/VcfSort.h>
+
 #include <cstdio>
 
 #include <gtest/gtest.h>
 
 #include <pbbam/vcf/VcfQuery.h>
-#include <pbbam/vcf/VcfSort.h>
 
 #include "PbbamTestData.h"
 

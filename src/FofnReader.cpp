@@ -4,7 +4,7 @@
 
 #include "FofnReader.h"
 
-#include <iostream>
+#include <istream>
 
 namespace PacBio {
 namespace BAM {

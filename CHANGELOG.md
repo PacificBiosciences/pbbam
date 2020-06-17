@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+### Fixed
+ - Updating BAM record name no longer discards CCS strand suffixes.
+
 ### Removed
  - 'HtslibVerbosity' setting in pbbam config. htslib's own logging to stderr is
    simply disabled at startup by default. In the rare case that client needs to

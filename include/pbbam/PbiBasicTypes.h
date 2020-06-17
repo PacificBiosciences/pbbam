@@ -40,8 +40,8 @@ public:
     IndexResultBlock() = default;
 
 public:
-    bool operator==(const IndexResultBlock& other) const;
-    bool operator!=(const IndexResultBlock& other) const;
+    bool operator==(const IndexResultBlock& other) const noexcept;
+    bool operator!=(const IndexResultBlock& other) const noexcept;
 
 public:
     size_t firstIndex_ = 0;  ///< index of block's first record in BAM/PBI files (e.g. i-th record)

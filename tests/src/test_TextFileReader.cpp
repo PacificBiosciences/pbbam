@@ -1,11 +1,13 @@
 // Author: Derek Barnett
 
+#include <pbbam/TextFileReader.h>
+
+#include <cstddef>
+
 #include <string>
 #include <tuple>
 
 #include <gtest/gtest.h>
-
-#include <pbbam/TextFileReader.h>
 
 #include "FastxTests.h"
 

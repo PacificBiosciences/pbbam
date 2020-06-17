@@ -1,18 +1,23 @@
 // Author: Derek Barnett
 
+#include <pbbam/SamReader.h>
+#include <pbbam/SamWriter.h>
+
 #include <cstdint>
+
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
 #include <pbbam/BamFile.h>
 #include <pbbam/BamReader.h>
 #include <pbbam/EntireFileQuery.h>
-#include <pbbam/SamReader.h>
-#include <pbbam/SamWriter.h>
 #include <pbbam/StringUtilities.h>
+
 #include "PbbamTestData.h"
 
 using namespace PacBio;

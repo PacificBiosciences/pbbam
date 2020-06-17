@@ -1,8 +1,8 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
-
 #include <pbbam/FastaSequence.h>
+
+#include <gtest/gtest.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;

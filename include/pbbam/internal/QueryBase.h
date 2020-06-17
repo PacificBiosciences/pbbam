@@ -28,8 +28,8 @@ class QueryIteratorBase
 public:
     ~QueryIteratorBase() = default;
 
-    bool operator==(const QueryIteratorBase<T>& other) const;
-    bool operator!=(const QueryIteratorBase<T>& other) const;
+    bool operator==(const QueryIteratorBase<T>& other) const noexcept;
+    bool operator!=(const QueryIteratorBase<T>& other) const noexcept;
 
 protected:
     QueryIteratorBase() = default;
@@ -55,8 +55,8 @@ public:
     QueryIterator() = default;
     QueryIterator(QueryBase<T>& query);
 
-    T& operator*();
-    T* operator->();
+    T& operator*() noexcept;
+    T* operator->() noexcept;
 
     QueryIterator<T>& operator++();
     QueryIterator<T> operator++(int);
@@ -75,8 +75,8 @@ public:
     QueryConstIterator() = default;
     QueryConstIterator(const QueryBase<T>& query);
 
-    const T& operator*() const;
-    const T* operator->() const;
+    const T& operator*() const noexcept;
+    const T* operator->() const noexcept;
 
     QueryConstIterator<T>& operator++();
     QueryConstIterator<T> operator++(int);

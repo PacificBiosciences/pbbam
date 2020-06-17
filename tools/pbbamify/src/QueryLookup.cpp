@@ -2,8 +2,7 @@
 
 #include "QueryLookup.h"
 
-#include <iostream>
-#include <ostream>
+#include <sstream>
 #include <string>
 
 #include <pbbam/BamFile.h>

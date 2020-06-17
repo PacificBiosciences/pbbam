@@ -11,7 +11,6 @@
 #include <cstddef>
 #include <cstdint>
 
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 
@@ -185,7 +184,10 @@ const IndexResultBlocks& PbiIndexedBamReader::IndexBlocks() const { return d_->b
 
 uint32_t PbiIndexedBamReader::NumReads() const { return d_->numMatchingReads_; }
 
-int PbiIndexedBamReader::ReadRawData(BGZF* bgzf, bam1_t* b) { return d_->ReadRawData(bgzf, b); }
+int PbiIndexedBamReader::ReadRawData(samFile* sf, bam1_t* b)
+{
+    return d_->ReadRawData(sf->fp.bgzf, b);
+}
 
 }  // namespace BAM
 }  // namespace PacBio

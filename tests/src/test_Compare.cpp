@@ -1,14 +1,15 @@
 // Author: Derek Barnett
 
-#include <algorithm>
+#include <pbbam/Compare.h>
+
 #include <cstdint>
+
+#include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
-
-#include <pbbam/Compare.h>
 
 // clang-format off
 
@@ -17,7 +18,7 @@ using namespace PacBio::BAM;
 
 namespace CompareTests {
 
-static inline
+static 
 BamRecord makeRecordWithTag(const std::string& tagName,
                             const Tag& tag)
 {

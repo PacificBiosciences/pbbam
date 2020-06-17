@@ -12,10 +12,10 @@
 #include <cstddef>
 #include <cstdint>
 
-#include <iostream>
 #include <stdexcept>
 
 #include <htslib/sam.h>
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <pbcopper/data/Clipping.h>
@@ -2060,8 +2060,9 @@ void BamRecord::UpdateName()
     std::string newName;
     newName.reserve(100);
 
+    const auto type = Type();
     const auto holeNumber = (HasHoleNumber() ? std::to_string(HoleNumber()) : "?");
-    if (Type() == RecordType::TRANSCRIPT) {
+    if (type == RecordType::TRANSCRIPT) {
         newName = "transcript/" + holeNumber;
     } else {
         newName += MovieName();
@@ -2069,8 +2070,14 @@ void BamRecord::UpdateName()
         newName += holeNumber;
         newName += "/";
 
-        if (Type() == RecordType::CCS)
+        if (type == RecordType::CCS) {
             newName += "ccs";
+            const auto originalName = FullName();
+            if (boost::ends_with(originalName, "/fwd"))
+                newName += "/fwd";
+            else if (boost::ends_with(originalName, "/rev"))
+                newName += "/rev";
+        }
 
         else {
             if (HasQueryStart())

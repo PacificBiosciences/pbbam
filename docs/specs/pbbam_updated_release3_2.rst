@@ -508,7 +508,7 @@ Primary use cases for pbbam include:
 The typical access pattern involves a client query against BAM data, optionally
 described in DataSet XML. The query may involve some number of filter criteria.
 
-pbbam queries the associated index files (*.pbi) to pre-determine which records
+pbbam queries the associated index files (\*.pbi) to pre-determine which records
 pass filtering criteria and where they reside on disk. The client code is given
 an iterable object, such that each iteration of the main access loop returns a
 valid BAM record for analysis, modification, etc.

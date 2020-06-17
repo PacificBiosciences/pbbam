@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <map>
+#include <ostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>

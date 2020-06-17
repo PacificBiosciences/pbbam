@@ -5,6 +5,8 @@
 #include "RunMetadataParser.h"
 #include "pbbam/RunMetadata.h"
 
+#include <iosfwd>
+
 namespace PacBio {
 namespace BAM {
 

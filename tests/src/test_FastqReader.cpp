@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/FastqReader.h>
+
 #include <cstddef>
 #include <cstdint>
 
@@ -7,7 +9,6 @@
 
 #include <pbbam/BamFileMerger.h>
 #include <pbbam/EntireFileQuery.h>
-#include <pbbam/FastqReader.h>
 #include <pbbam/FastqSequence.h>
 #include <pbbam/FastqWriter.h>
 

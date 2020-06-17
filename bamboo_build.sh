@@ -17,7 +17,7 @@ module load meson
 module load ninja
 
 module load zlib
-module load htslib
+module load htslib${HTSLIB_VERSION}
 module load samtools
 
 # use the same boost version as PA (avoid ODR explosions), TAK-705

@@ -1,17 +1,18 @@
 // Author: Derek Barnett
 
+#include <pbbam/PbiFilter.h>
+
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
 #include "PbbamTestData.h"
-
-#include <pbbam/PbiFilter.h>
 
 // clang-format off
 
@@ -127,11 +128,11 @@ struct SortUniqueTestFilter2
     }
 };
 
-static inline
+static 
 PbiFilter emptyFilter()
 { return PbiFilter{ }; }
 
-static inline
+static 
 PbiFilter simpleFilter()
 { return PbiFilter{ SimpleFilter{ } }; }
 

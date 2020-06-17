@@ -1,12 +1,15 @@
 // Author: Derek Barnett
 
+#include <pbbam/vcf/VcfReader.h>
+
+#include <cstddef>
+
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
 #include <pbbam/vcf/VcfFile.h>
-#include <pbbam/vcf/VcfReader.h>
 
 #include "PbbamTestData.h"
 

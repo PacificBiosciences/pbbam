@@ -41,7 +41,7 @@ public:
 
     VirtualRegion() = default;
 
-    bool operator==(const VirtualRegion& v1) const;
+    bool operator==(const VirtualRegion& v1) const noexcept;
 };
 
 }  // namespace BAM

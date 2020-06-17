@@ -1,7 +1,11 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
 #include <pbbam/vcf/VcfVariant.h>
+
+#include <string>
+#include <vector>
+
+#include <gtest/gtest.h>
 
 using InfoField = PacBio::VCF::InfoField;
 using VcfVariant = PacBio::VCF::VcfVariant;

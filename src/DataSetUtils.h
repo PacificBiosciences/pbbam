@@ -17,7 +17,7 @@ namespace internal {
 static const std::string XML_VERSION = std::string{"3.0.1"};
 
 template <typename T>
-inline const T& NullObject()
+const T& NullObject()
 {
     static const T empty;
     return empty;

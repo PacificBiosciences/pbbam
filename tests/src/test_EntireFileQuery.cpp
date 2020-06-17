@@ -1,12 +1,13 @@
 // Author: Derek Barnett
 
+#include <pbbam/EntireFileQuery.h>
+
 #include <iterator>
 #include <string>
 
 #include <gtest/gtest.h>
 
 #include <pbbam/BamWriter.h>
-#include <pbbam/EntireFileQuery.h>
 
 #include "PbbamTestData.h"
 

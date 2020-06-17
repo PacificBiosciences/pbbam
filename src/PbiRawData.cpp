@@ -320,7 +320,7 @@ PbiRawData& PbiRawData::Version(PbiFile::VersionEnum version)
     return *this;
 }
 
-bool PbiReferenceEntry::operator==(const PbiReferenceEntry& other) const
+bool PbiReferenceEntry::operator==(const PbiReferenceEntry& other) const noexcept
 {
     return std::tie(tId_, beginRow_, endRow_) ==
            std::tie(other.tId_, other.beginRow_, other.endRow_);

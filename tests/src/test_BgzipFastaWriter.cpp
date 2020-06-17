@@ -1,15 +1,17 @@
 // Author: Derek Barnett
 
+#include <pbbam/BgzipFastaWriter.h>
+
 #include <algorithm>
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include <pbbam/BgzipFastaWriter.h>
 #include <pbbam/FastaReader.h>
 #include <pbbam/FastaSequence.h>
 #include <pbbam/FormatUtils.h>
+
 #include "PbbamTestData.h"
 
 using namespace PacBio;

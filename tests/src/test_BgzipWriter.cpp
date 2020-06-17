@@ -1,11 +1,13 @@
 // Author: Derek Barnett
 
+#include <pbbam/BgzipWriter.h>
+
 #include <string>
 
 #include <gtest/gtest.h>
 
-#include <pbbam/BgzipWriter.h>
 #include <pbbam/FormatUtils.h>
+
 #include "PbbamTestData.h"
 
 using namespace PacBio;

@@ -1,8 +1,8 @@
 // Author: David Seifert
 
-#include <gtest/gtest.h>
-
 #include <pbbam/DataSet.h>
+
+#include <gtest/gtest.h>
 
 #include "PbbamTestData.h"
 

@@ -1,20 +1,22 @@
 // Author: Derek Barnett
 
-#include <array>
+#include <pbbam/BamRecord.h>
+
 #include <cstddef>
 #include <cstdint>
+
+#include <array>
 #include <initializer_list>
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
 #include <pbbam/BamReader.h>
-#include <pbbam/BamRecord.h>
 #include <pbbam/BamTagCodec.h>
+
 #include "../src/MemoryUtils.h"
+#include "PbbamTestData.h"
 
 // clang-format off
 
@@ -45,7 +47,7 @@ BamRecordImpl CreateBamImpl()
     return bam;
 }
 
-static inline
+static 
 BamRecord CreateBam()
 { return BamRecord{ CreateBamImpl() }; }
 
@@ -76,7 +78,7 @@ void CheckRawData(const BamRecordImpl& bam)
     EXPECT_EQ(expectedTotalDataLength, rawData->l_data);
 }
 
-static inline
+static 
 void CheckRawData(const BamRecord& bam)
 { CheckRawData(bam.Impl()); }
 
@@ -94,7 +96,7 @@ BamRecordImpl MakeCigaredImpl(const std::string& seq,
     return impl;
 }
 
-static inline
+static 
 BamRecord MakeCigaredRecord(const std::string& seq,
                             const std::string& cigar,
                             const Strand strand)
@@ -2773,6 +2775,26 @@ TEST(BamRecordTest, MissingLocalContextFlagsCannotConvertToPbcopperReads)
         const std::string msg{e.what()};
         EXPECT_TRUE(msg.find("is missing local context flags") != std::string::npos);
     }
+}
+
+TEST(BamRecordTest, UpdateNameKeepsCcsStrandSuffix)
+{
+    const std::string ccsFn{PbbamTestsConfig::Data_Dir + "/23.ccs.bam"};
+
+    BamReader reader{ccsFn};
+    BamRecord record;
+
+    // "/fwd"
+    ASSERT_TRUE(reader.GetNext(record));
+    std::string originalName = record.FullName();
+    record.UpdateName();
+    EXPECT_EQ(record.FullName(), originalName);
+
+    // "/rev"
+    ASSERT_TRUE(reader.GetNext(record));
+    originalName = record.FullName();
+    record.UpdateName();
+    EXPECT_EQ(record.FullName(), originalName);
 }
 
 // clang-format on

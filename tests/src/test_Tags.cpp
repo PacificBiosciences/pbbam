@@ -1,8 +1,10 @@
 // Author: Derek Barnett
 
-#include <algorithm>
+#include <pbbam/TagCollection.h>
+
 #include <cstdint>
-#include <iostream>
+
+#include <algorithm>
 #include <limits>
 #include <map>
 #include <sstream>
@@ -16,7 +18,6 @@
 
 #include <pbbam/BamTagCodec.h>
 #include <pbbam/SamTagCodec.h>
-#include <pbbam/TagCollection.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -1206,6 +1207,4 @@ TEST(TagTest, OutputOperator)
         out << tags << '\n';
         EXPECT_EQ(out.str(), expected);
     }
-
-    // std::cout << tags << '\n';
 }

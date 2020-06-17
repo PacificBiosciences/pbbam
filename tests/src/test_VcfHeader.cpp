@@ -1,9 +1,12 @@
 // Author: Derek Barnett
 
-#include <iostream>
+#include <pbbam/vcf/VcfHeader.h>
+
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <gtest/gtest.h>
-#include <pbbam/vcf/VcfHeader.h>
 
 using ContigDefinition = PacBio::VCF::ContigDefinition;
 using FilterDefinition = PacBio::VCF::FilterDefinition;

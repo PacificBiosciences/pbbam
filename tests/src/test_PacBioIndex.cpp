@@ -1,5 +1,9 @@
 // Author: Derek Barnett
 
+#include <pbbam/EntireFileQuery.h>
+#include <pbbam/PbiBuilder.h>
+#include <pbbam/PbiRawData.h>
+
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -12,9 +16,6 @@
 #include <pbbam/BamFile.h>
 #include <pbbam/BamReader.h>
 #include <pbbam/BamWriter.h>
-#include <pbbam/EntireFileQuery.h>
-#include <pbbam/PbiBuilder.h>
-#include <pbbam/PbiRawData.h>
 
 #include "PbbamTestData.h"
 

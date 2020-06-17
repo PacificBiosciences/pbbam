@@ -25,8 +25,8 @@ class BamRecordTags
 {
 public:
     // tag info
-    static inline bool IsPulse(const BamRecordTag tag);
-    static inline std::string LabelFor(const BamRecordTag tag);
+    static bool IsPulse(const BamRecordTag tag);
+    static std::string LabelFor(const BamRecordTag tag);
 
 private:
     struct BamRecordTagData

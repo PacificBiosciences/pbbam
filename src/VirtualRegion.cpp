@@ -45,7 +45,7 @@ VirtualRegion::VirtualRegion(const VirtualRegionType type_, const int beginPos_,
 {
 }
 
-bool VirtualRegion::operator==(const VirtualRegion& v1) const
+bool VirtualRegion::operator==(const VirtualRegion& v1) const noexcept
 {
     return std::tie(type, beginPos, endPos) == std::tie(v1.type, v1.beginPos, v1.endPos);
 }

@@ -96,7 +96,7 @@ private:
     std::unique_ptr<FaiIndexPrivate> d_;
 };
 
-bool operator==(const FaiEntry& lhs, const FaiEntry& rhs);
+bool operator==(const FaiEntry& lhs, const FaiEntry& rhs) noexcept;
 
 // NOTE: FaiEntry output *does not* include the name column, FaiIndex::Save()
 //       handles this mapping

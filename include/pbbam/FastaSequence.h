@@ -68,8 +68,8 @@ public:
 
     /// \}
 
-    bool operator==(const FastaSequence& other) const;
-    bool operator!=(const FastaSequence& other) const;
+    bool operator==(const FastaSequence& other) const noexcept;
+    bool operator!=(const FastaSequence& other) const noexcept;
 
 private:
     std::string name_;

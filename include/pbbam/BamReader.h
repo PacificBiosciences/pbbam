@@ -134,11 +134,11 @@ protected:
     ///       -1 : EOF (not an error)
     ///     < -1 : error
     ///
-    /// \param[in]  bgzf BGZF stream pointer
-    /// \param[out] b    %BAM record pointer
+    /// \param[in]  file    htslib file pointer
+    /// \param[out] b       %BAM record pointer
     /// \returns integer status code, see description
     ///
-    virtual int ReadRawData(BGZF* bgzf, bam1_t* b);
+    virtual int ReadRawData(samFile* file, bam1_t* b);
 
     /// \}
 

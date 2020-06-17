@@ -12,7 +12,6 @@
 #include <cassert>
 
 #include <fstream>
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>

@@ -4,14 +4,14 @@
 
 #include "pbbam/CollectionMetadata.h"
 
-#include <fstream>
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <tuple>
 #include <vector>
 
 #include <boost/algorithm/string/predicate.hpp>
+
+#include "pugixml/pugixml.hpp"
 
 #include "DataSetUtils.h"
 #include "RunMetadataParser.h"
@@ -54,6 +54,41 @@ void UpdateControlKit(const boost::optional<ControlKit::CustomSequence>& cache, 
         << ">custom_sequence\\n"
         << cache->Sequence;
     kit.ChildText("CustomSequence", seq.str());
+}
+
+void CollectionMetadataElementFromXml(const pugi::xml_node& xmlNode,
+                                      internal::DataSetElement& parent)
+{
+    const std::string label = xmlNode.name();
+    if (label.empty()) return;
+
+    // ensure 'pbmeta' namespace for child elements, except for
+    // 'AutomationParameter' & 'AutomationParameters' which are 'pbbase'
+    const XsdType xsdType = [&label]() {
+        return (label.find("AutomationParameter") != std::string::npos)
+                   ? XsdType::BASE_DATA_MODEL
+                   : XsdType::COLLECTION_METADATA;
+    }();
+
+    internal::DataSetElement e{label, xsdType};
+    e.Text(xmlNode.text().get());
+
+    // iterate attributes
+    auto attrIter = xmlNode.attributes_begin();
+    auto attrEnd = xmlNode.attributes_end();
+    for (; attrIter != attrEnd; ++attrIter) {
+        e.Attribute(attrIter->name(), attrIter->value());
+    }
+
+    // iterate children, recursively building up subtree
+    auto childIter = xmlNode.begin();
+    auto childEnd = xmlNode.end();
+    for (; childIter != childEnd; ++childIter) {
+        pugi::xml_node childNode = *childIter;
+        CollectionMetadataElementFromXml(childNode, e);
+    }
+
+    parent.AddChild(e);
 }
 
 }  // namespace
@@ -777,6 +812,40 @@ CollectionMetadata& CollectionMetadata::TemplatePrepKit(PacBio::BAM::TemplatePre
 }
 
 bool CollectionMetadata::HasTemplatePrepKit() const { return HasChild("TemplatePrepKit"); }
+
+CollectionMetadata CollectionMetadata::FromRawXml(const std::string& input)
+{
+    // load XML
+    pugi::xml_document doc;
+    const pugi::xml_parse_result loadResult = doc.load_string(input.c_str());
+    if (loadResult.status != pugi::status_ok) {
+        throw std::runtime_error{
+            "[pbbam] dataset ERROR: could not create CollectionMetadata from raw XML, error code:" +
+            std::to_string(loadResult.status)};
+    }
+    pugi::xml_node rootNode = doc.document_element();
+
+    // top-level attributes
+    CollectionMetadata cm{internal::FromInputXml{}};
+    cm.Label(rootNode.name());
+    auto attributeIter = rootNode.attributes_begin();
+    auto attributeEnd = rootNode.attributes_end();
+    for (; attributeIter != attributeEnd; ++attributeIter) {
+        std::string name = attributeIter->name();
+        std::string value = attributeIter->value();
+        cm.Attribute(std::move(name), std::move(value));
+    }
+
+    // iterate children, recursively building up subtree
+    auto childIter = rootNode.begin();
+    auto childEnd = rootNode.end();
+    for (; childIter != childEnd; ++childIter) {
+        pugi::xml_node childNode = *childIter;
+        CollectionMetadataElementFromXml(childNode, cm);
+    }
+
+    return cm;
+}
 
 }  // namespace BAM
 }  // namespace PacBio

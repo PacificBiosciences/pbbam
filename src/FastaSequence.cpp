@@ -50,12 +50,15 @@ FastaSequence& FastaSequence::Name(std::string name)
     return *this;
 }
 
-bool FastaSequence::operator==(const FastaSequence& other) const
+bool FastaSequence::operator==(const FastaSequence& other) const noexcept
 {
     return std::tie(name_, bases_) == std::tie(other.name_, other.bases_);
 }
 
-bool FastaSequence::operator!=(const FastaSequence& other) const { return !(*this == other); }
+bool FastaSequence::operator!=(const FastaSequence& other) const noexcept
+{
+    return !(*this == other);
+}
 
 }  // namespace BAM
 }  // namespace PacBio

@@ -8,8 +8,6 @@
 
 #include "pbbam/PbiFilterQuery.h"
 
-#include <iostream>
-
 #include "pbbam/CompositeBamReader.h"
 
 namespace PacBio {

@@ -13,7 +13,6 @@
 #include <cstddef>
 
 #include <iomanip>
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>
@@ -119,7 +118,7 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation o
     }
     const float similarity = matches / seq.size();
 
-    std::stringstream output;
+    std::ostringstream output;
     output << "Read        : " << record.FullName() << '\n'
            << "Reference   : " << record.ReferenceName() << "\n\n"
            << "Read-length : " << seqLength << '\n'
