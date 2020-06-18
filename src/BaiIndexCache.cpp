@@ -36,9 +36,10 @@ BaiIndexCacheData::BaiIndexCacheData(const std::string& bamFilename)
     d_->htsIndex_.reset(bam_index_load(bamFilename.c_str()));
     if (!d_->htsIndex_) {
         std::ostringstream s;
-        s << "[pbbam] BAI index cache ERROR: could not load *.bai index data:\n"
+        s << "[pbbam] BAI index cache ERROR: could not load BAI index data:\n"
           << "  BAM file: " << bamFilename << '\n'
-          << "  BAI file: " + bamFilename + ".bai";
+          << "  BAI file: " + bamFilename + ".bai\n"
+          << "Have you generated the index using 'samtools index " << bamFilename << "'?";
         throw std::runtime_error{s.str()};
     }
 }
