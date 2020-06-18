@@ -51,6 +51,22 @@ TEST(IndexedFastaReaderTest, can_open_bgzf_fasta_for_reading)
     EXPECT_NO_THROW(IndexedFastaReader reader{fn});
 }
 
+TEST(IndexedFastaReaderTest, throws_on_missing_index)
+{
+    const std::string fasta = PbbamTestsConfig::Data_Dir + "/lambdaNEB-missing-fai.fasta";
+    const std::string fai = fasta + ".fai";
+    const std::string errorMsg =
+        "[pbbam] FASTA reader ERROR: could not load FAI index data:\n  FASTA file: " + fasta +
+        "\n  FAI file: " + fai + "\nHave you generated the index using 'samtools faidx " + fasta +
+        "'?";
+
+    try {
+        IndexedFastaReader reader{fasta};
+    } catch (const std::runtime_error& e) {
+        EXPECT_STREQ(errorMsg.c_str(), e.what());
+    }
+}
+
 TEST(IndexedFastaReaderTest, can_fetch_subsequence_from_lambda)
 {
     IndexedFastaReader r{IndexedFastaReaderTests::lambdaFasta};
