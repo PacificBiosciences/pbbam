@@ -136,6 +136,10 @@ const ChemistryTable& BuiltInChemistryTable()
         {{"101-949-200", "101-945-600", "5.0", "S/P4-C2/5.0-8M"}},
         // Berry Genomics Sequel II® Binding Kit 2.1; Sequencing Plate 2.0 (1 Rxn)
         {{"101-949-100", "101-945-600", "5.0", "S/P4.1-C2/5.0-8M"}},
+
+        // Internal support for mixed PB/Berry parts
+        {{"101-789-500", "101-945-600", "5.0", "S/P4-C2/5.0-8M"}},
+        {{"101-820-500", "101-945-600", "5.0", "S/P4.1-C2/5.0-8M"}},
     };
     // clang-format on
 
