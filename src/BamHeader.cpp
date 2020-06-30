@@ -305,6 +305,14 @@ bool BamHeader::HasSequence(const std::string& name) const
 
 size_t BamHeader::NumSequences() const { return d_->sequences_.size(); }
 
+bool BamHeader::Empty() const noexcept
+{
+    assert(d_);
+    return d_->version_.empty() && d_->pacbioBamVersion_.empty() && d_->sortOrder_.empty() &&
+           d_->headerLineCustom_.empty() && d_->readGroups_.empty() && d_->programs_.empty() &&
+           d_->comments_.empty() && d_->sequences_.empty() && d_->sequenceIdLookup_.empty();
+}
+
 std::string BamHeader::PacBioBamVersion() const { return d_->pacbioBamVersion_; }
 
 BamHeader& BamHeader::PacBioBamVersion(const std::string& version)
