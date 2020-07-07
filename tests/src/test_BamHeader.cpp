@@ -57,6 +57,8 @@ TEST(BamHeaderTest, DefaultConstruction)
     EXPECT_TRUE(header.Programs().empty());
     EXPECT_TRUE(header.Comments().empty());
 
+    EXPECT_TRUE(header.Empty());
+
     EXPECT_THROW(header.Program("foo"), std::exception);
     EXPECT_THROW(header.ReadGroup("foo"), std::exception);
     EXPECT_THROW(header.SequenceId("foo"), std::exception);

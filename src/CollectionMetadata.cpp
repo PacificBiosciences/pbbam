@@ -62,12 +62,20 @@ void CollectionMetadataElementFromXml(const pugi::xml_node& xmlNode,
     const std::string label = xmlNode.name();
     if (label.empty()) return;
 
-    // ensure 'pbmeta' namespace for child elements, except for
-    // 'AutomationParameter' & 'AutomationParameters' which are 'pbbase'
-    const XsdType xsdType = [&label]() {
-        return (label.find("AutomationParameter") != std::string::npos)
-                   ? XsdType::BASE_DATA_MODEL
-                   : XsdType::COLLECTION_METADATA;
+    // TODO(DB): This is getting a bit 'hacky'. Should revisit namespace-
+    //           handling internally.
+    ///
+    // ensure 'pbmeta' namespace for child elements, except for:
+    //  - 'AutomationParameter' & 'AutomationParameters' which are 'pbbase'
+    //  - 'BioSample' & 'BioSamples' which are 'pbsample'
+    ///
+    const XsdType xsdType = [&]() {
+        if (label.find("BioSample") != std::string::npos)
+            return XsdType::SAMPLE_INFO;
+        else if (label.find("AutomationParameter") != std::string::npos)
+            return XsdType::BASE_DATA_MODEL;
+        else
+            return XsdType::COLLECTION_METADATA;
     }();
 
     internal::DataSetElement e{label, xsdType};

@@ -70,14 +70,18 @@ class IndexedFastaReader::IndexedFastaReaderPrivate
 {
 public:
     IndexedFastaReaderPrivate(std::string filename)
-        : fastaFilename_{std::move(filename)}, faiFilename_{fastaFilename_ + ".fai"}
+        : fastaFilename_{std::move(filename)}
+        , faiFilename_{fastaFilename_ + ".fai"}
+        , handle_{fai_load3(fastaFilename_.c_str(), faiFilename_.c_str(), NULL,
+                            0  // do not create FAI automagically
+                            )}
     {
-        handle_.reset(fai_load(fastaFilename_.c_str()));
-        if (handle_ == nullptr) {
+        if (!handle_) {
             std::ostringstream msg;
-            msg << "[pbbam] FASTA reader ERROR: could not load *.fai index data:\n"
+            msg << "[pbbam] FASTA reader ERROR: could not load FAI index data:\n"
                 << "  FASTA file: " << fastaFilename_ << '\n'
-                << "  index file: " << fastaFilename_ << ".fai\n";
+                << "  FAI file: " << faiFilename_ << '\n'
+                << "Have you generated the index using 'samtools faidx " << fastaFilename_ << "'?";
             throw std::runtime_error{msg.str()};
         }
     }

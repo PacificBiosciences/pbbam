@@ -130,6 +130,10 @@ public:
     /// \name General Attributes
     /// \{
 
+    /// \returns whether the Header is empty
+    ///
+    bool Empty() const noexcept;
+
     /// \returns the %PacBio %BAM version number (\@HD:pb)
     ///
     /// \note This is different from the SAM/BAM version number

@@ -19,6 +19,9 @@
         <SizeSelectionEnabled>false</SizeSelectionEnabled>
         <UseCount>0</UseCount>
         <DNAControlComplex>Sequel® DNA Internal Control 3.0</DNAControlComplex>
+        <BioSamples xmlns="http://pacificbiosciences.com/PacBioSampleInfo.xsd">
+            <BioSample Name="SEQ6715 bio sample" />
+        </BioSamples>
     </WellSample>
     <Automation Name="Workflow_Diffusion.py">
         <AutomationParameters xmlns="http://pacificbiosciences.com/PacBioBaseDataModel.xsd">
