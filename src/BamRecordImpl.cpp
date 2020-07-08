@@ -89,7 +89,11 @@ BamRecordImpl& BamRecordImpl::operator=(const BamRecordImpl& other)
 {
     if (this != &other) {
         if (d_ == nullptr) InitializeData();
-        bam_copy1(d_.get(), other.d_.get());
+        auto* copyOk = bam_copy1(d_.get(), other.d_.get());
+        if (!copyOk) {
+            throw std::runtime_error{"[pbbam] BAM record ERROR: could not copy data from record '" +
+                                     other.Name() + '\''};
+        }
         tagOffsets_ = other.tagOffsets_;
     }
     assert(d_);
@@ -235,7 +239,11 @@ BamRecordImpl& BamRecordImpl::Flag(uint32_t flag)
 BamRecordImpl BamRecordImpl::FromRawData(const std::shared_ptr<bam1_t>& rawData)
 {
     BamRecordImpl result;
-    bam_copy1(result.d_.get(), rawData.get());
+    auto* copyOk = bam_copy1(result.d_.get(), rawData.get());
+    if (!copyOk) {
+        throw std::runtime_error{
+            "[pbbam] BAM record ERROR: could not create record, copying from raw BAM contents"};
+    }
     return result;
 }
 
