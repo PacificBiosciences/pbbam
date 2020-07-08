@@ -216,7 +216,6 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
     std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()),
                                        BamHeaderTests::BamHdrDeleter());
     rawData->ignore_sam_err = 0;
-    rawData->cigar_tab = nullptr;
     rawData->l_text = text.size();
     rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
     memcpy(rawData->text, text.c_str(), rawData->l_text);
@@ -270,7 +269,6 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
     std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()),
                                        BamHeaderTests::BamHdrDeleter());
     rawData->ignore_sam_err = 0;
-    rawData->cigar_tab = nullptr;
     rawData->l_text = text.size();
     rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
     memcpy(rawData->text, text.c_str(), rawData->l_text);
