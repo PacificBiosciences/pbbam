@@ -696,6 +696,174 @@ private:
 
 }  // namespace internal
 
+// htslib >= v.10
+#if defined(HTS_VERSION) && HTS_VERSION >= 101000
+
+class IndexedBamWriter::IndexedBamWriterPrivate2  //: public internal::FileProducer
+{
+public:
+    IndexedBamWriterPrivate2(const std::string& outputFilename, std::shared_ptr<bam_hdr_t> header,
+                             const BamWriter::CompressionLevel bamCompressionLevel,
+                             const size_t numBamThreads,
+                             const PbiBuilder::CompressionLevel pbiCompressionLevel,
+                             const size_t numPbiThreads, const size_t /*numGziThreads*/,
+                             const size_t tempFileBufferSize)
+        : bamFilename_{outputFilename}, header_{header}
+    {
+        OpenBam(bamCompressionLevel, numBamThreads);
+        OpenPbi(pbiCompressionLevel, numPbiThreads, tempFileBufferSize);
+        isOpen_ = true;
+    }
+
+    ~IndexedBamWriterPrivate2() noexcept
+    {
+        if (isOpen_) {
+            try {
+                Close();
+            } catch (...) {
+                // swallow any exceptions & remain no-throw from dtor
+            }
+        }
+    }
+
+    void Close()
+    {
+        // NOTE: keep this order of closing ( BAM -> PBI )
+        CloseBam();
+        ClosePbi();
+
+        remove(std::string{bamFilename_ + ".gzi"}.c_str());
+        isOpen_ = false;
+    }
+
+    void CloseBam()
+    {
+        auto ret = bgzf_flush(bam_.get()->fp.bgzf);
+
+        // Dump GZI contents to disk.
+        const std::string gziFn{bamFilename_ + ".gzi"};
+        ret = bgzf_index_dump(bam_.get()->fp.bgzf, gziFn.c_str(), nullptr);
+        std::ignore = ret;
+        bam_.reset();
+    }
+
+    void ClosePbi() { builder_->Close(); }
+
+    void OpenBam(const BamWriter::CompressionLevel compressionLevel, const size_t numThreads)
+    {
+        //
+        // TODO: Compression level & numThreads are hardcoded here. Ok for
+        //       prototyping but need to be tune-able via API.
+        //
+
+        if (!header_) throw IndexedBamWriterException{bamFilename_, "null header provided"};
+
+        // open output BAM
+        const auto usingFilename = bamFilename_;
+        const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
+        bam_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
+        if (!bam_)
+            throw IndexedBamWriterException{usingFilename, "could not open file for writing"};
+
+        const auto indexInit = bgzf_index_build_init(bam_.get()->fp.bgzf);
+        if (indexInit != 0) {
+            throw IndexedBamWriterException{usingFilename,
+                                            "could not open initialize on-the-fly gzi index"};
+        }
+
+        // maybe set multithreaded writing
+        size_t actualNumThreads = numThreads;
+        if (actualNumThreads == 0) {
+            actualNumThreads = std::thread::hardware_concurrency();
+
+            // if still unknown, default to single-threaded
+            if (actualNumThreads == 0) actualNumThreads = 1;
+        }
+        if (actualNumThreads > 1) hts_set_threads(bam_.get(), actualNumThreads);
+
+        // write header
+        auto ret = sam_hdr_write(bam_.get(), header_.get());
+        if (ret != 0) throw IndexedBamWriterException{usingFilename, "could not write header"};
+        ret = bgzf_flush(bam_.get()->fp.bgzf);
+
+        // store file positions after header
+        auto headerLength = [](const bam_hdr_t* hdr) -> size_t {
+            const size_t textHeader = 12 + hdr->l_text;
+            size_t refHeader = 0;
+            for (int i = 0; i < hdr->n_targets; ++i) {
+                char* n = hdr->target_name[i];
+                refHeader += (8 + (strlen(n) + 1));
+            }
+            return textHeader + refHeader;
+        };
+        uncompressedFilePos_ = headerLength(header_.get());
+    }
+
+    void OpenPbi(const PbiBuilder::CompressionLevel compressionLevel, const size_t numThreads,
+                 const size_t fileBufferSize)
+    {
+        builder_ = std::make_unique<internal::PbiBuilder2>(
+            bamFilename_, bamFilename_ + ".pbi", compressionLevel, numThreads, fileBufferSize);
+    }
+
+    void Write(const BamRecord& record)
+    {
+// TODO: add API to auto-skip this without special compile flag
+#if PBBAM_AUTOVALIDATE
+        Validator::Validate(record);
+#endif
+        // add record & its to index builder.
+        //
+        // NOTE: This is the record's postiion as if it were _uncompressed_. We
+        //       will return with GZI data later to transform it into BAM
+        //       "virtual offset".
+        //
+        builder_->AddRecord(record, uncompressedFilePos_);
+
+        const auto& rawRecord = BamRecordMemory::GetRawData(record);
+
+        // update bin
+        // min_shift=14 & n_lvls=5 are BAM "magic numbers"
+        rawRecord->core.bin = hts_reg2bin(rawRecord->core.pos, bam_endpos(rawRecord.get()), 14, 5);
+
+        // write record to file
+        const auto ret = sam_write1(bam_.get(), header_.get(), rawRecord.get());
+        if (ret <= 0) throw IndexedBamWriterException{bamFilename_, "could not write record"};
+
+        // update file position
+        auto recordLength = [](bam1_t* b) {
+            auto* c = &b->core;
+
+            static constexpr size_t fixedLength = 36;
+            const size_t qnameLength = (c->l_qname - c->l_extranul);
+
+            // TODO: long CIGAR handling... sigh...
+
+            size_t remainingLength = 0;
+            if (c->n_cigar <= 0xffff)
+                remainingLength = (b->l_data - c->l_qname);
+            else {
+                const size_t cigarEnd = ((uint8_t*)bam_get_cigar(b) - b->data) + (c->n_cigar * 4);
+                remainingLength = 8 + (b->l_data - cigarEnd) + 4 + (4 * c->n_cigar);
+            }
+
+            return fixedLength + qnameLength + remainingLength;
+        };
+        uncompressedFilePos_ += recordLength(rawRecord.get());
+    }
+
+private:
+    std::string bamFilename_;
+
+    std::shared_ptr<bam_hdr_t> header_;
+    std::unique_ptr<samFile, HtslibFileDeleter> bam_;
+    std::unique_ptr<internal::PbiBuilder2> builder_;
+    bool isOpen_ = false;
+    int64_t uncompressedFilePos_ = 0;
+};
+
+#else  // htslib < v1.10
+
 class IndexedBamWriter::IndexedBamWriterPrivate2  //: public internal::FileProducer
 {
 public:
@@ -710,7 +878,6 @@ public:
         OpenBam(bamCompressionLevel, numBamThreads);
         OpenGzi(numGziThreads);
         OpenPbi(pbiCompressionLevel, numPbiThreads, tempFileBufferSize);
-
         isOpen_ = true;
     }
 
@@ -747,8 +914,6 @@ public:
     {
         done_ = true;
         gziThread_.join();
-
-        // TODO: remove GZI file, leaving now for debubging
     }
 
     void ClosePbi() { builder_->Close(); }
@@ -973,8 +1138,6 @@ public:
         }
     }
 
-    size_t MaxReaderLag() const { return maxTrailingDistance_; }
-
 private:
     std::string bamFilename_;
 
@@ -1006,6 +1169,8 @@ private:
 
     int64_t uncompressedFilePos_ = 0;
 };
+
+#endif  // HTS_VERSION
 
 static_assert(!std::is_copy_constructible<IndexedBamWriter>::value,
               "IndexedBamWriter(const IndexedBamWriter&) is not = delete");
@@ -1042,8 +1207,6 @@ IndexedBamWriter::~IndexedBamWriter() = default;
 void IndexedBamWriter::Write(const BamRecord& record) { d_->Write(record); }
 
 void IndexedBamWriter::Write(const BamRecordImpl& record) { d_->Write(BamRecord{record}); }
-
-size_t IndexedBamWriter::MaxReaderLag() const { return d_->MaxReaderLag(); }
 
 }  // namespace BAM
 }  // namespace PacBio

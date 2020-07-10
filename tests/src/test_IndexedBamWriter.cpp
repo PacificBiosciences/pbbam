@@ -2,6 +2,9 @@
 
 #include <pbbam/IndexedBamWriter.h>
 
+#include <string>
+#include <vector>
+
 #include <gtest/gtest.h>
 
 #include <pbbam/BamFile.h>
