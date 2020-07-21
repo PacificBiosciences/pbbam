@@ -27,6 +27,7 @@ pbbam_test_cpp_sources = files([
   'test_EntireFileQuery.cpp',
   'test_FaiIndex.cpp',
   'test_FaiZmwChunker.cpp',
+  'test_FastaCache.cpp',
   'test_FastaReader.cpp',
   'test_FastaSequence.cpp',
   'test_FastaSequenceQuery.cpp',
