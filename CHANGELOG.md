@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+### Added
+ - FastaCache::Check methods for validating input FASTA
+
 ### Fixed
  - Updating BAM record name no longer discards CCS strand suffixes.
 

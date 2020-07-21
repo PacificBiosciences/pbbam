@@ -16,6 +16,26 @@ FastaCacheData::FastaCacheData(const std::string& filename) : cache_{FastaReader
         lookup_.emplace(cache_[i].Name(), i);
 }
 
+std::pair<bool, std::string> FastaCacheData::Check() const
+{
+    return Check([](const FastaSequence& seq) {
+        const auto& bases = seq.Bases();
+        const auto invalid = bases.find_first_not_of("ACGTNacgtn\n");
+        return invalid == std::string::npos;
+    });
+}
+
+std::pair<bool, std::string> FastaCacheData::Check(
+    const std::function<bool(const FastaSequence&)>& callback) const
+{
+    for (const auto& seq : cache_) {
+        if (!callback(seq)) {
+            return {false, seq.Name()};
+        }
+    }
+    return {true, ""};
+}
+
 std::string FastaCacheData::Subsequence(const std::string& name, size_t begin, size_t end) const
 {
     const auto found = lookup_.find(name);
