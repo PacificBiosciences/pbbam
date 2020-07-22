@@ -7,6 +7,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
  - FastaCache::Check methods for validating input FASTA
+ - Detection of empty SAM/BAM input, as distinct from "could not read header"
+   errors).
 
 ### Fixed
  - Updating BAM record name no longer discards CCS strand suffixes.
@@ -15,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - 'HtslibVerbosity' setting in pbbam config. htslib's own logging to stderr is
    simply disabled at startup by default. In the rare case that client needs to
    override this behavior, use 'hts_set_log_level()` instead.
+ - Unused BamFile::FirstAlignmentOffset() method
 
 ## [1.4.0] - 2020-05-22
 

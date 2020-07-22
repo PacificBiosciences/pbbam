@@ -52,6 +52,8 @@ pbbamify_synthetic_dataset = configure_file(
   output : 'synthetic_movie_all.subreadset.xml',
   configuration : pbbam_PbbamTestData_h_config)
 
+subdir('zero_byte_check')
+
 #########
 # tests #
 #########
@@ -76,3 +78,13 @@ test(
   env : [
     'ARGS=-V',
     'VERBOSE=1'])
+
+test(
+  'pbbam zero-byte input check',
+  pbbam_cram_script,
+  args : [
+    '--xunit-file=' + join_paths(meson.build_root(), 'pbbam-cram-zero-byte-check.xml'),
+    '--verbose'] + files('src/cram/zero_byte_check.t'),
+  env : [
+    '__ZERO_BYTE_CHECK_EXE=' + pbbam_zero_byte_check.full_path(),
+  ])

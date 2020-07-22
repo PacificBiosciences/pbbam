@@ -2,6 +2,7 @@ pbbam_test_cpp_sources = files([
   'test_AlignmentPrinter.cpp',
   'test_BamFile.cpp',
   'test_BamHeader.cpp',
+  'test_BamReader.cpp',
   'test_BamRecord.cpp',
   'test_BamRecordClipping.cpp',
   'test_BamRecordImplCore.cpp',
