@@ -161,18 +161,6 @@ public:
 
     /// \}
 
-public:
-    /// \name Additional Attributes
-    /// \{
-
-    /// \returns virtual offset of first alignment. Intended mostly for internal
-    ///          use. Note that this is a BGZF \b virtual offset, not a
-    ///          'normal' file position.
-    ///
-    int64_t FirstAlignmentOffset() const;
-
-    /// \}
-
 private:
     class BamFilePrivate;
     std::unique_ptr<BamFilePrivate> d_;

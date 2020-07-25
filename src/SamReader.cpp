@@ -27,19 +27,34 @@ class SamReader::SamReaderPrivate
 public:
     explicit SamReaderPrivate(std::string fn) : filename_{std::move(fn)}
     {
+        auto displayFilename = [&]() {
+            if (filename_ == "-")
+                return std::string{"  stdin"};
+            else
+                return "  file: " + filename_;
+        };
+
         htsFile_.reset(sam_open(filename_.c_str(), "r"));
-        if (!htsFile_) {
+        if (!htsFile_ || !htsFile_->fp.hfile) {
             std::ostringstream s;
-            s << "[pbbam] SAM reader ERROR: could not open:\n"
-              << "  file: " << filename_;
+            s << "[pbbam] SAM reader ERROR: could not open:\n" << displayFilename() << '\n';
             throw std::runtime_error{s.str()};
         }
-        hdr_.reset(sam_hdr_read(htsFile_.get()));
 
-        if (!htsFile_) {
+        char c;
+        auto peek = hpeek(htsFile_->fp.hfile, &c, 1);
+        if (peek == 0) {
             std::ostringstream s;
-            s << "[pbbam] SAM reader ERROR: could not parse header\n"
-              << "  file: " << filename_;
+            s << "[pbbam] SAM reader ERROR: could not read from empty input:\n"
+              << displayFilename() << '\n';
+            throw std::runtime_error{s.str()};
+        }
+
+        hdr_.reset(sam_hdr_read(htsFile_.get()));
+        if (!hdr_ || hdr_->l_text == 0) {
+            std::ostringstream s;
+            s << "[pbbam] SAM reader ERROR: could not read header from:\n"
+              << displayFilename() << '\n';
             throw std::runtime_error{s.str()};
         }
         fullHeader_ = BamHeaderMemory::FromRawData(hdr_.get());

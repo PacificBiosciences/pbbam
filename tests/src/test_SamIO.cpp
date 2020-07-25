@@ -44,6 +44,18 @@ TEST(SamReaderTest, can_read_basic_sam)
     EXPECT_EQ(bamRecordNames, samRecordNames);
 }
 
+TEST(SamReaderTest, handles_zero_byte_file)
+{
+    try {
+        SamReader reader{PbbamTestsConfig::Data_Dir + "/zero_bytes.sam"};
+        ASSERT_FALSE("should not get here");
+    } catch (const std::exception& e) {
+        const std::string msg{e.what()};
+        EXPECT_TRUE(msg.find("[pbbam] SAM reader ERROR: could not read from empty input:") !=
+                    std::string::npos);
+    }
+}
+
 TEST(SamWriterTest, HeaderOk)
 {
     // setup header
