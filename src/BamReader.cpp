@@ -36,32 +36,29 @@ public:
     {
         auto displayFilename = [&]() {
             if (filename_ == "-")
-                return std::string{"  stdin"};
+                return std::string{" stdin"};
             else
-                return "  file: " + filename_;
+                return "\n  file: " + filename_;
         };
 
         htsFile_.reset(sam_open(filename_.c_str(), "rb"));
         if (!htsFile_ || !htsFile_->fp.bgzf) {
             std::ostringstream s;
-            s << "[pbbam] BAM reader ERROR: could not open for reading:\n"
-              << displayFilename() << '\n';
+            s << "[pbbam] BAM reader ERROR: could not open for reading:" << displayFilename();
             throw std::runtime_error{s.str()};
         }
 
         const auto bgzfPos = bgzf_tell(htsFile_->fp.bgzf);
         if (bgzfPos != 0) {
             std::ostringstream s;
-            s << "[pbbam] BAM reader ERROR: could not read from empty input:\n"
-              << displayFilename() << '\n';
+            s << "[pbbam] BAM reader ERROR: could not read from empty input:" << displayFilename();
             throw std::runtime_error{s.str()};
         }
 
         std::unique_ptr<bam_hdr_t, HtslibHeaderDeleter> hdr(sam_hdr_read(htsFile_.get()));
         if (!hdr) {
             std::ostringstream s;
-            s << "[pbbam] BAM reader ERROR: could not read header from:\n"
-              << displayFilename() << '\n';
+            s << "[pbbam] BAM reader ERROR: could not read header from:" << displayFilename();
             throw std::runtime_error{s.str()};
         }
 
