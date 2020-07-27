@@ -29,15 +29,15 @@ public:
     {
         auto displayFilename = [&]() {
             if (filename_ == "-")
-                return std::string{"  stdin"};
+                return std::string{" stdin"};
             else
-                return "  file: " + filename_;
+                return "\n  file: " + filename_;
         };
 
         htsFile_.reset(sam_open(filename_.c_str(), "r"));
         if (!htsFile_ || !htsFile_->fp.hfile) {
             std::ostringstream s;
-            s << "[pbbam] SAM reader ERROR: could not open:\n" << displayFilename() << '\n';
+            s << "[pbbam] SAM reader ERROR: could not open:" << displayFilename();
             throw std::runtime_error{s.str()};
         }
 
@@ -45,16 +45,14 @@ public:
         auto peek = hpeek(htsFile_->fp.hfile, &c, 1);
         if (peek == 0) {
             std::ostringstream s;
-            s << "[pbbam] SAM reader ERROR: could not read from empty input:\n"
-              << displayFilename() << '\n';
+            s << "[pbbam] SAM reader ERROR: could not read from empty input:" << displayFilename();
             throw std::runtime_error{s.str()};
         }
 
         hdr_.reset(sam_hdr_read(htsFile_.get()));
         if (!hdr_ || hdr_->l_text == 0) {
             std::ostringstream s;
-            s << "[pbbam] SAM reader ERROR: could not read header from:\n"
-              << displayFilename() << '\n';
+            s << "[pbbam] SAM reader ERROR: could not read header from:" << displayFilename();
             throw std::runtime_error{s.str()};
         }
         fullHeader_ = BamHeaderMemory::FromRawData(hdr_.get());

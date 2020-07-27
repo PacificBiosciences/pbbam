@@ -16,7 +16,7 @@ int main(int /* argc */, char* argv[])
             std::ignore = reader;
         }
     } catch (const std::exception& e) {
-        std::cout << e.what();
+        std::cout << e.what() << '\n';
     }
     return 0;
 }
