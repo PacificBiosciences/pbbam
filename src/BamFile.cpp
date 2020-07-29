@@ -32,7 +32,7 @@ namespace BAM {
 class BamFile::BamFilePrivate
 {
 public:
-    explicit BamFilePrivate(std::string fn) : filename_{std::move(fn)}, firstAlignmentOffset_{-1}
+    explicit BamFilePrivate(std::string fn) : filename_{std::move(fn)}
     {
         // attempt open
         auto f = RawOpen();
@@ -60,9 +60,6 @@ public:
         // attempt fetch header
         std::unique_ptr<bam_hdr_t, HtslibHeaderDeleter> hdr(sam_hdr_read(f.get()));
         header_ = BamHeaderMemory::FromRawData(hdr.get());
-
-        // cache first alignment offset
-        firstAlignmentOffset_ = bgzf_tell(f->fp.bgzf);
     }
 
     std::unique_ptr<BamFilePrivate> DeepCopy()
@@ -157,8 +154,6 @@ void BamFile::EnsureStandardIndexExists() const
 }
 
 const std::string& BamFile::Filename() const { return d_->filename_; }
-
-int64_t BamFile::FirstAlignmentOffset() const { return d_->firstAlignmentOffset_; }
 
 bool BamFile::HasEOF() const { return d_->HasEOF(); }
 
