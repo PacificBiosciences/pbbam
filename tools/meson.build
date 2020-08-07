@@ -237,3 +237,49 @@ if get_option('tests')
       'SAMTOOLS=' + pbbam_test_samtools.path()],
     timeout : 1800)
 endif
+
+############################
+# ccs-kinetics-bystrandify #
+############################
+
+pbbam_CcsKineticsBystrandifyVersion_h_config = configuration_data()
+pbbam_CcsKineticsBystrandifyVersion_h_config.set('CcsKineticsBystrandify_VERSION', meson.project_version())
+pbbam_CcsKineticsBystrandifyVersion_h_config.set('PacBioBAM_VERSION', meson.project_version())
+pbbam_CcsKineticsBystrandifyVersion_h_config.set('PacBioBAM_BinDir', meson.current_build_dir())
+pbbam_CcsKineticsBystrandifyVersion_h_config.set('PacBioBAM_TestsDir', join_paths([meson.current_source_dir(), '../tests']))
+pbbam_CcsKineticsBystrandifyVersion_h_config.set('GeneratedTestDataDir', join_paths(meson.current_build_dir()))
+pbbam_CcsKineticsBystrandifyVersion_h_config.set('GeneratedDir', join_paths(meson.current_build_dir(), '../tests'))
+pbbam_CcsKineticsBystrandifyVersion_h = configure_file(
+  input : files('ccs-kinetics-bystrandify/src/CcsKineticsBystrandifyVersion.h.in'),
+  output : 'CcsKineticsBystrandifyVersion.h',
+  configuration : pbbam_CcsKineticsBystrandifyVersion_h_config)
+
+pbbam_ccs_kinetics_bystrandify_cpp_sources = [pbbam_CcsKineticsBystrandifyVersion_h]
+pbbam_ccs_kinetics_bystrandify_cpp_sources += files([
+  'ccs-kinetics-bystrandify/src/main.cpp',
+  'ccs-kinetics-bystrandify/src/CcsKineticsBystrandifySettings.cpp',
+  'ccs-kinetics-bystrandify/src/CcsKineticsBystrandifyWorkflow.cpp',
+  ])
+
+pbbam_ccs_kinetics_bystrandify = executable(
+  'ccs-kinetics-bystrandify',
+  pbbam_ccs_kinetics_bystrandify_cpp_sources,
+  dependencies : [pbbam_boost_dep, pbbam_htslib_dep, pbbam_zlib_dep, pbbam_pbcopper_dep],
+  include_directories : [pbbam_include_directories, include_directories('ccs-kinetics-bystrandify')],
+  link_with : pbbam_lib,
+  install : get_option('build-tools'),
+  cpp_args : pbbam_warning_flags)
+
+# tests
+if get_option('tests')
+  test(
+    'ccs-kinetics-bystrandify_CramTests',
+    pbbam_cram_script,
+    args : [
+      '--xunit-file=' + join_paths(meson.build_root(), 'pbbam-cram-ccs-kinetics-bystrandify-check.xml'),
+      '--verbose'] + files('../tests/src/cram/ccs-kinetics-bystrandify.t'),
+    env : [
+      'CCS_KINETICS_BYSTRANDIFY=' + pbbam_ccs_kinetics_bystrandify.full_path(),
+      'SAMTOOLS=' + pbbam_test_samtools.path(),
+    ])
+endif

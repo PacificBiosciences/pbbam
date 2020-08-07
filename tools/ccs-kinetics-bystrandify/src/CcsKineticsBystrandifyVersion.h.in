@@ -1,0 +1,14 @@
+#ifndef CCSKINETICSBYSTRANDIFY_VERSION_H
+#define CCSKINETICSBYSTRANDIFY_VERSION_H
+
+#include <string>
+
+namespace PacBio {
+namespace CcsKineticsBystrandify {
+
+const std::string Version{"@CcsKineticsBystrandify_VERSION@"};
+
+} // namespace CcsKineticsBystrandify
+} // namespace PacBio
+
+#endif // CCSKINETICSBYSTRANDIFY_VERSION_H
