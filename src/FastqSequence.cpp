@@ -7,7 +7,8 @@
 #include <cassert>
 #include <cstdio>
 
-#include <exception>
+#include <numeric>
+#include <stdexcept>
 #include <tuple>
 #include <type_traits>
 
@@ -34,6 +35,20 @@ FastqSequence::FastqSequence(std::string name, std::string bases, std::string qu
     : FastaSequence{std::move(name), std::move(bases)}
     , qualities_{Data::QualityValues::FromFastq(qualities)}
 {
+}
+
+float FastqSequence::AverageBaseQuality() const
+{
+    if (qualities_.empty()) {
+        throw std::runtime_error{
+            "[pbbam] FASTQ sequence ERROR: cannot calculate average base quality from "
+            "empty sequence"};
+    }
+
+    const float total = std::accumulate(
+        qualities_.cbegin(), qualities_.cend(), 0.0f,
+        [](float currentTotal, const Data::QualityValue& qv) { return currentTotal + qv; });
+    return total / qualities_.size();
 }
 
 const Data::QualityValues& FastqSequence::Qualities() const { return qualities_; }
