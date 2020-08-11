@@ -146,11 +146,16 @@ int Workflow::Runner(const CLI_v2::Results& args)
 
             const std::vector<uint16_t> newPW(std::cbegin(pw) + beginCutBases,
                                               std::cend(pw) - endCutBases);
-            assert((newPW.front() != 0) && (newPW.back() != 0));
 
             assert(newQVs.empty() || (newSequence.size() == newQVs.size()));
             assert(newSequence.size() == newIpd.size());
             assert(newSequence.size() == newPW.size());
+
+            if (std::any_of(std::cbegin(newPW), std::cend(newPW),
+                            [](const uint16_t val) { return val == 0; })) {
+                PBLOG_WARN << "New read '" << newRecordName << "' has '0' PulseWidths, discarding";
+                return;
+            }
 
             BAM::BamRecord newRecord{newHeader};
             auto& newRecordImpl = newRecord.Impl();
