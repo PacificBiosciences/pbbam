@@ -67,6 +67,13 @@ public:
 
     /// \}
 
+    ///
+    /// Return average base quality.
+    ///
+    /// \throw std::runtime_error on empty sequence
+    ///
+    float AverageBaseQuality() const;
+
     bool operator==(const FastqSequence& other) const noexcept;
     bool operator!=(const FastqSequence& other) const noexcept;
 

@@ -34,7 +34,8 @@ public:
         s << "[pbbam] chemistry compatibility ERROR: unsupported sequencing chemistry combination:\n"
           << "    binding kit:        " << bindingKit_ << '\n'
           << "    sequencing kit:     " << sequencingKit_ << '\n'
-          << "    basecaller version: " << basecallerVersion_ << '\n';
+          << "    basecaller version: " << basecallerVersion_ << '\n'
+          << "See SMRT Link release documentation for details about consumables compatibility or contact PacBio Technical Support." << '\n';
         what_ = s.str();
         // clang-format on
     }
