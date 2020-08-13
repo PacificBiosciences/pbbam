@@ -160,3 +160,17 @@ TEST(GenomicIntervalQueryTest, CanReuseBaiIndexCache)
     const size_t expectedCount = 7;
     checkInterval(query2, interval, expectedCount);
 }
+
+TEST(BaiIndexCacheTest, MissingBai)
+{
+    const std::string bam = PbbamTestsConfig::Data_Dir + "/empty.bam";
+    const std::string errorMsg =
+        "[pbbam] BAI index cache ERROR: could not load BAI index data:\n  BAM file: " + bam +
+        "\n  BAI file: " + bam + ".bai\n  reason: No such file or directory";
+    try {
+        auto cache = MakeBaiIndexCache(BamFile{bam});
+        std::ignore = cache;
+    } catch (const std::runtime_error& e) {
+        EXPECT_STREQ(errorMsg.c_str(), e.what());
+    }
+}

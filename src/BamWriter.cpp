@@ -23,6 +23,7 @@
 #include "pbbam/Validator.h"
 
 #include "Autovalidate.h"
+#include "ErrnoReason.h"
 #include "FileProducer.h"
 #include "MemoryUtils.h"
 
@@ -36,6 +37,7 @@ struct BamWriterException : public std::exception
         std::ostringstream s;
         s << "[pbbam] BAM writer ERROR: " << reason << ":\n"
           << "  file: " << filename;
+        MaybePrintErrnoReason(s);
         msg_ = s.str();
     }
 

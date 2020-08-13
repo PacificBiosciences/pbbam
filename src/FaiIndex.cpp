@@ -23,6 +23,8 @@
 
 #include "pbbam/StringUtilities.h"
 
+#include "ErrnoReason.h"
+
 namespace PacBio {
 namespace BAM {
 
@@ -108,8 +110,11 @@ void FaiIndex::Create(const std::string& fn)
 {
     const auto ret = fai_build(fn.c_str());
     if (ret < 0) {
-        throw std::runtime_error{"[pbbam] FAI index ERROR: could not create *.fai for file:\n" +
-                                 fn};
+        std::ostringstream msg;
+        msg << "[pbbam] FAI index ERROR: could not create *.fai for file:\n"
+            << "  file: " << fn;
+        MaybePrintErrnoReason(msg);
+        throw std::runtime_error{msg.str()};
     }
 }
 

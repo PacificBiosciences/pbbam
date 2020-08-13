@@ -74,7 +74,7 @@ size_t FastaCacheData::SequenceLength(const std::string& name) const
     const auto found = lookup_.find(name);
     if (found == lookup_.cend()) {
         std::ostringstream s;
-        s << "[pbbam] FASTA sequence cache ERROR: could not retrieve sequence loength, reference '"
+        s << "[pbbam] FASTA sequence cache ERROR: could not retrieve sequence length, reference '"
           << name << "' not found";
         throw std::runtime_error{s.str()};
     }

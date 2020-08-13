@@ -21,6 +21,7 @@
 #include "pbbam/Orientation.h"
 #include "pbbam/StringUtilities.h"
 
+#include "ErrnoReason.h"
 #include "SequenceUtils.h"
 
 namespace PacBio {
@@ -80,8 +81,8 @@ public:
             std::ostringstream msg;
             msg << "[pbbam] FASTA reader ERROR: could not load FAI index data:\n"
                 << "  FASTA file: " << fastaFilename_ << '\n'
-                << "  FAI file: " << faiFilename_ << '\n'
-                << "Have you generated the index using 'samtools faidx " << fastaFilename_ << "'?";
+                << "  FAI file: " << faiFilename_;
+            MaybePrintErrnoReason(msg);
             throw std::runtime_error{msg.str()};
         }
     }

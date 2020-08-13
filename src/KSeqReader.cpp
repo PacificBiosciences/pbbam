@@ -14,6 +14,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include "ErrnoReason.h"
+
 namespace PacBio {
 namespace BAM {
 
@@ -25,6 +27,7 @@ KSeqReader::KSeqReader(const std::string& fn)
         std::ostringstream msg;
         msg << "[pbbam] kseq FASTX reader ERROR: could not open file:\n"
             << "  file: " << fn << '\n';
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
 

@@ -57,8 +57,7 @@ TEST(IndexedFastaReaderTest, throws_on_missing_index)
     const std::string fai = fasta + ".fai";
     const std::string errorMsg =
         "[pbbam] FASTA reader ERROR: could not load FAI index data:\n  FASTA file: " + fasta +
-        "\n  FAI file: " + fai + "\nHave you generated the index using 'samtools faidx " + fasta +
-        "'?";
+        "\n  FAI file: " + fai + "\n  reason: No such file or directory";
 
     try {
         IndexedFastaReader reader{fasta};

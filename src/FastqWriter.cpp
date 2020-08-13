@@ -16,6 +16,8 @@
 #include "pbbam/FormatUtils.h"
 #include "pbbam/QualityValues.h"
 
+#include "ErrnoReason.h"
+
 namespace PacBio {
 namespace BAM {
 
@@ -33,6 +35,7 @@ FastqWriter::FastqWriter(const std::string& fn) : IFastqWriter{}
         std::ostringstream s;
         s << "[pbbam] FASTQ writer ERROR: could not open file for writing:\n"
           << "  file: " << fn;
+        MaybePrintErrnoReason(s);
         throw std::runtime_error{s.str()};
     }
 }

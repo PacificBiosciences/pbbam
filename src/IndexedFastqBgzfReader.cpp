@@ -14,6 +14,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include "ErrnoReason.h"
+
 namespace PacBio {
 namespace BAM {
 
@@ -27,6 +29,7 @@ IndexedFastqBgzfReader::IndexedFastqBgzfReader(std::string filename)
         std::ostringstream msg;
         msg << "[pbbam] FASTQ reader ERROR: could not open file:\n"
             << "  FASTQ file: " << fastqFilename_ << '\n';
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
 
@@ -39,7 +42,8 @@ IndexedFastqBgzfReader::IndexedFastqBgzfReader(std::string filename)
         std::ostringstream msg;
         msg << "[pbbam] FASTQ reader ERROR: could not load *.gzi index data:\n"
             << "  FASTQ file: " << fastqFilename_ << '\n'
-            << "  index file: " << fastqFilename_ << ".gzi\n";
+            << "  index file: " << fastqFilename_ << ".gzi";
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
 }
