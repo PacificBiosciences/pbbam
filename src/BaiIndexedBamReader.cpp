@@ -17,6 +17,8 @@
 #include "pbbam/BaiIndexCache.h"
 #include "pbbam/Deleters.h"
 
+#include "ErrnoReason.h"
+
 namespace PacBio {
 namespace BAM {
 
@@ -56,6 +58,7 @@ public:
               << interval.Interval() << '\n'
               << "  BAM file: " << file_.Filename() << '\n'
               << "  BAI file: " << file_.StandardIndexFilename();
+            MaybePrintErrnoReason(s);
             throw std::runtime_error{s.str()};
             // clang-format on
         }

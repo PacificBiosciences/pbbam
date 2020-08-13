@@ -54,12 +54,10 @@ std::unique_ptr<ZmwChunkedFastxReaderImpl> MakeFastqReaderImpl(std::string filen
 
         case HtslibCompression::GZIP: {
             std::ostringstream msg;
-            msg << "[pbbam] chunked FASTQ reader ERROR: random-access is not supported for plain "
-                   "gzipped "
-                   "file "
-                << filename << "\n\n"
-                << "Compressed files must be bgzipped, with accompanying *.gzi "
-                   "index.\n\n"
+            msg << "[pbbam] chunked FASTQ reader ERROR: random-access is not supported in standard "
+                   "gzip format\n"
+                << "  file: " << filename << "\n\n"
+                << "Compressed files must be bgzipped, with accompanying *.gzi index.\n\n"
                 << "To keep the original gzipped file unchanged:\n"
                 << "  $ gunzip -c " << filename << " > <unzipped_file>\n"
                 << "or discard the gzipped file:\n"

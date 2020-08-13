@@ -15,6 +15,8 @@
 #include "pbbam/FastqSequence.h"
 #include "pbbam/FormatUtils.h"
 
+#include "ErrnoReason.h"
+
 namespace PacBio {
 namespace BAM {
 
@@ -32,6 +34,7 @@ FastaWriter::FastaWriter(const std::string& fn) : IFastaWriter{}
         std::ostringstream s;
         s << "[pbbam] FASTA writer ERROR: could not open file for writing:\n"
           << "  file: " << fn;
+        MaybePrintErrnoReason(s);
         throw std::runtime_error{s.str()};
     }
 }

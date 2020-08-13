@@ -33,6 +33,7 @@
 #include "pbbam/PbiRawData.h"
 #include "pbbam/RecordType.h"
 
+#include "ErrnoReason.h"
 #include "MemoryUtils.h"
 
 namespace PacBio {
@@ -84,10 +85,12 @@ void SwapEndianness(std::vector<T>& data)
 void bgzf_write_safe(BGZF* fp, const void* data, size_t length)
 {
     const auto ret = bgzf_write(fp, data, length);
-    if (ret < 0L)
-        throw std::runtime_error{
-            "[pbbam] PBI index builder ERROR: non-zero returned from bgzf_write(). Out of disk "
-            "space?"};
+    if (ret < 0L) {
+        std::ostringstream msg;
+        msg << "[pbbam] PBI index builder ERROR: could not write to BGZF file";
+        MaybePrintErrnoReason(msg);
+        throw std::runtime_error{msg.str()};
+    }
 }
 
 template <typename T>
@@ -441,9 +444,12 @@ public:
         // open file handle
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel_));
         pbiFile_.reset(bgzf_open(pbiFilename_.c_str(), mode.c_str()));
-        if (pbiFile_ == nullptr)
-            throw PbiBuilderException{pbiFilename_, "could not open file for writing"};
-
+        if (pbiFile_ == nullptr) {
+            std::ostringstream msg;
+            msg << "[pbbam] PBI index builder ERROR: could not open file for writing:\n"
+                << "  file: " << pbiFilename_ << '\n';
+            throw std::runtime_error{msg.str()};
+        }
         // if no explicit thread count given, attempt built-in check
         size_t actualNumThreads = numThreads_;
         if (actualNumThreads == 0) {
@@ -505,6 +511,7 @@ public:
             s << "[pbbam] PBI index builder ERROR: could not seek in temp file:\n"
               << "  file: " << tempFilename_ << '\n'
               << "  offset: " << block.pos_;
+            MaybePrintErrnoReason(s);
             throw std::runtime_error{s.str()};
         }
 
@@ -513,8 +520,13 @@ public:
         const auto numElements =
             std::fread(field.buffer_.data(), sizeof(T), block.n_, tempFile_.get());
 
-        if (numElements != block.n_)
-            throw PbiBuilderException{tempFilename_, "could not read element count from temp file"};
+        if (numElements != block.n_) {
+            std::ostringstream msg;
+            msg << "[pbbam] PBI builder ERROR: could not read element count from temp file\n"
+                << "  file: " << tempFilename_ << '\n';
+            MaybePrintErrnoReason(msg);
+            throw std::runtime_error{msg.str()};
+        }
     }
 
     template <typename T>

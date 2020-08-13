@@ -38,6 +38,7 @@
 #include "pbbam/RecordType.h"
 #include "pbbam/Validator.h"
 
+#include "ErrnoReason.h"
 #include "FileProducer.h"
 #include "MemoryUtils.h"
 
@@ -51,6 +52,7 @@ struct IndexedBamWriterException : public std::exception
         std::ostringstream s;
         s << "[pbbam] indexed BAM writer ERROR: " << reason << ":\n"
           << "  file: " << filename;
+        MaybePrintErrnoReason(s);
         msg_ = s.str();
     }
 
@@ -621,14 +623,20 @@ public:
             }
             result.push_back(std::move(entry));
         }
+
+        if (result.empty()) {
+            std::ostringstream s;
+            s << "[pbbam] indexed BAM writer ERROR: empty GZI index\n"
+              << "  file: " << bamFilename_ + ".gzi";
+            throw std::runtime_error{s.str()};
+        }
+
         return result;
     }
 
     void WriteVirtualOffsets()
     {
         auto index = LoadGzi();
-        if (index.empty())
-            throw IndexedBamWriterException{bamFilename_ + ".gzi", "empty *.gzi file contents"};
         std::sort(index.begin(), index.end(),
                   [](const GzIndexEntry& lhs, const GzIndexEntry& rhs) -> bool {
                       return lhs.uAddress < rhs.uAddress;
@@ -925,8 +933,6 @@ public:
         //       prototyping but need to be tune-able via API.
         //
 
-        if (!header_) throw IndexedBamWriterException{bamFilename_, "null header provided"};
-
         // open output BAM
         const auto usingFilename = bamFilename_;
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
@@ -945,6 +951,13 @@ public:
         if (actualNumThreads > 1) hts_set_threads(bam_.get(), actualNumThreads);
 
         // write header
+        if (!header_) {
+            std::ostringstream s;
+            s << "[pbbam] indexed BAM writer ERROR: invalid header provided\n"
+              << "  file: " << usingFilename;
+            MaybePrintErrnoReason(s);
+            throw std::runtime_error{s.str()};
+        }
         auto ret = sam_hdr_write(bam_.get(), header_.get());
         if (ret != 0) throw IndexedBamWriterException{usingFilename, "could not write header"};
         ret = bgzf_flush(bam_.get()->fp.bgzf);

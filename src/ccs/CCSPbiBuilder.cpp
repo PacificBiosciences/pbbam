@@ -28,6 +28,8 @@
 #include "pbbam/ccs/CCSHeader.h"
 #include "pbbam/ccs/CCSRecord.h"
 
+#include "ErrnoReason.h"
+
 namespace PacBio {
 namespace CCS {
 namespace internal {
@@ -61,10 +63,12 @@ void SwapEndianness(std::vector<T>& data)
 void bgzf_write_safe(BGZF* fp, const void* data, size_t length)
 {
     const auto ret = bgzf_write(fp, data, length);
-    if (ret < 0L)
-        throw std::runtime_error{
-            "[pbbam] PBI index builder ERROR: non-zero returned from bgzf_write(). Out of disk "
-            "space?"};
+    if (ret < 0L) {
+        std::ostringstream msg;
+        msg << "[pbbam] PBI index builder ERROR: could not write to\n";
+        PacBio::BAM::MaybePrintErrnoReason(msg);
+        throw std::runtime_error{msg.str()};
+    }
 }
 
 template <typename T>
@@ -254,11 +258,12 @@ public:
         // seek to block begin
         const auto ret = std::fseek(tempFile_.get(), block.pos_, SEEK_SET);
         if (ret != 0) {
-            std::ostringstream msg;
-            msg << "[pbbam] PBI builder ERROR: could not seek in temp file:\n"
-                << "  file: " << tempFilename_ << '\n'
-                << "  offset: " << block.pos_ << '\n';
-            throw std::runtime_error{msg.str()};
+            std::ostringstream s;
+            s << "[pbbam] PBI index builder ERROR: could not seek in temp file:\n"
+              << "  file: " << tempFilename_ << '\n'
+              << "  offset: " << block.pos_;
+            BAM::MaybePrintErrnoReason(s);
+            throw std::runtime_error{s.str()};
         }
 
         // read block elements
@@ -270,6 +275,7 @@ public:
             std::ostringstream msg;
             msg << "[pbbam] PBI builder ERROR: could not read element count from temp file\n"
                 << "  file: " << tempFilename_ << '\n';
+            BAM::MaybePrintErrnoReason(msg);
             throw std::runtime_error{msg.str()};
         }
     }

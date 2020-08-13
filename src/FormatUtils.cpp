@@ -12,6 +12,8 @@
 
 #include "pbbam/Deleters.h"
 
+#include "ErrnoReason.h"
+
 namespace PacBio {
 namespace BAM {
 
@@ -45,6 +47,7 @@ HtslibCompression FormatUtils::CompressionType(const std::string& fn)
         std::ostringstream s;
         s << "[pbbam] bgzip utility ERROR: could not open file to determine compression level:\n"
           << "  file: " << fn;
+        MaybePrintErrnoReason(s);
         throw std::runtime_error{s.str()};
     }
     return CompressionType(bgzf.get());

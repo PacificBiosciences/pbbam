@@ -20,6 +20,7 @@
 
 #include "pbbam/Deleters.h"
 
+#include "ErrnoReason.h"
 #include "FileProducer.h"
 
 namespace PacBio {
@@ -44,6 +45,7 @@ public:
                 std::ostringstream msg;
                 msg << "[pbbam] text file writer ERROR: could not open zipped file:\n"
                     << "  file: " << filename;
+                MaybePrintErrnoReason(msg);
                 throw std::runtime_error{msg.str()};
             }
         } else {
@@ -53,6 +55,7 @@ public:
                 std::ostringstream msg;
                 msg << "[pbbam] text file writer ERROR: could not open plain text file:\n"
                     << "  file: " << filename;
+                MaybePrintErrnoReason(msg);
                 throw std::runtime_error{msg.str()};
             }
         }
@@ -68,6 +71,7 @@ public:
                 std::ostringstream msg;
                 msg << "[pbbam] text file writer ERROR: could not write to file:\n"
                     << "  file: " << TempFilename();
+                MaybePrintErrnoReason(msg);
                 throw std::runtime_error{msg.str()};
             }
         } else {
