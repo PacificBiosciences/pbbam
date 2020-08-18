@@ -430,3 +430,22 @@ TEST(BamHeaderTest, CanConstructMergedHeaderFromInputHeaders)
     const BamHeader header{headers};
     EXPECT_EQ(BamHeaderTests::MergedConstructorText, header.ToSam());
 }
+
+TEST(BamHeaderTest, ensures_unique_sq_and_rg_entries)
+{
+    const std::string originalText{
+        "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
+        "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
+        "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
+        "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\tPM:SEQUEL\n"
+        "@RG\tID:rg2\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:condition1\tPM:SEQUEL\n"
+        "@RG\tID:rg3\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:condition1\tPM:SEQUEL\n"
+        "@PG\tID:_foo_\tPN:ide\n"
+        "@CO\tipsum and so on\n"
+        "@CO\tcitation needed\n"};
+
+    BamHeader header{originalText};
+    header.AddSequence(SequenceInfo{"chr1"});
+    header.AddReadGroup(ReadGroupInfo{"rg1"});
+    EXPECT_EQ(originalText, header.ToSam());
+}
