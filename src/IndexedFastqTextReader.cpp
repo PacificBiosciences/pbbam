@@ -17,6 +17,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include "ErrnoReason.h"
+
 namespace PacBio {
 namespace BAM {
 
@@ -30,6 +32,7 @@ IndexedFastqTextReader::IndexedFastqTextReader(std::string filename)
         std::ostringstream msg;
         msg << "[pbbam] FASTQ reader ERROR: could not open file:\n"
             << "  FASTQ file: " << fastqFilename_;
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
 

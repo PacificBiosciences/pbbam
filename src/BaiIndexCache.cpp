@@ -17,6 +17,8 @@
 #include "pbbam/DataSet.h"
 #include "pbbam/Deleters.h"
 
+#include "ErrnoReason.h"
+
 namespace PacBio {
 namespace BAM {
 
@@ -38,8 +40,8 @@ BaiIndexCacheData::BaiIndexCacheData(const std::string& bamFilename)
         std::ostringstream s;
         s << "[pbbam] BAI index cache ERROR: could not load BAI index data:\n"
           << "  BAM file: " << bamFilename << '\n'
-          << "  BAI file: " + bamFilename + ".bai\n"
-          << "Have you generated the index using 'samtools index " << bamFilename << "'?";
+          << "  BAI file: " + bamFilename + ".bai";
+        MaybePrintErrnoReason(s);
         throw std::runtime_error{s.str()};
     }
 }

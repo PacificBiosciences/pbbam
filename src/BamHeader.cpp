@@ -228,15 +228,20 @@ BamHeader& BamHeader::AddProgram(ProgramInfo pg)
 
 BamHeader& BamHeader::AddReadGroup(ReadGroupInfo readGroup)
 {
-    d_->readGroups_[ReadGroupInfo::GetBaseId(readGroup.Id())] = std::move(readGroup);
+    const auto id = readGroup.Id();
+    if (!HasReadGroup(id)) {
+        d_->readGroups_[ReadGroupInfo::GetBaseId(id)] = std::move(readGroup);
+    }
     return *this;
 }
 
 BamHeader& BamHeader::AddSequence(SequenceInfo sequence)
 {
     const std::string name = sequence.Name();
-    d_->sequences_.push_back(std::move(sequence));
-    d_->sequenceIdLookup_[name] = d_->sequences_.size() - 1;
+    if (!HasSequence(name)) {
+        d_->sequences_.push_back(std::move(sequence));
+        d_->sequenceIdLookup_[name] = d_->sequences_.size() - 1;
+    }
     return *this;
 }
 

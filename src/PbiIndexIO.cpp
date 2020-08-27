@@ -22,6 +22,8 @@
 #include "pbbam/EntireFileQuery.h"
 #include "pbbam/PbiBuilder.h"
 
+#include "ErrnoReason.h"
+
 namespace PacBio {
 namespace BAM {
 namespace {
@@ -92,6 +94,7 @@ void PbiIndexIO::Load(PbiRawData& rawData, const std::string& filename)
         std::ostringstream msg;
         msg << "[pbbam] PBI index I/O ERROR: could not open file for reading:\n"
             << "  file: " << filename;
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
 
@@ -303,6 +306,7 @@ void PbiIndexIO::Save(const PbiRawData& index, const std::string& filename)
         std::ostringstream msg;
         msg << "[pbbam] PBI index I/O ERROR: could not open file for writing:\n"
             << "  file: " << filename;
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
 

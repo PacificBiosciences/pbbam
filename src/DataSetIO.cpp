@@ -18,6 +18,7 @@
 
 #include "pbbam/StringUtilities.h"
 
+#include "ErrnoReason.h"
 #include "FileUtils.h"
 #include "FofnReader.h"
 #include "XmlReader.h"
@@ -29,11 +30,12 @@ namespace {
 
 struct DataSetFileException : public std::exception
 {
-    DataSetFileException(std::string filename, std::string reason) : std::exception{}
+    DataSetFileException(std::string filename, std::string description) : std::exception{}
     {
         std::ostringstream s;
-        s << "[pbbam] dataset I/O ERROR: " << reason << ":\n"
+        s << "[pbbam] dataset I/O ERROR: " << description << ":\n"
           << "  file: " << filename;
+        MaybePrintErrnoReason(s);
         msg_ = s.str();
     }
 
@@ -52,7 +54,7 @@ std::unique_ptr<DataSetBase> DataSetFromXml(const std::string& xmlFn)
 std::unique_ptr<DataSetBase> DataSetFromBam(const std::string& bamFn)
 {
     // peek at sort order to determine if file should be an AlignmentSet or else SubreadSet
-    const auto bamFile = BamFile{bamFn};
+    const BamFile bamFile{bamFn};
     const auto& header = bamFile.Header();
     const auto aligned = header.SortOrder() == "coordinate";
 
@@ -115,7 +117,7 @@ std::unique_ptr<DataSetBase> DataSetFromUri(const std::string& uri)
     }
 
     // unknown filename extension
-    throw DataSetFileException{uri, "unsupported extension on input file"};
+    throw std::runtime_error{"[pbbam] dataset I/O ERROR: unsupported extension:\n  file: " + uri};
 }
 
 }  // namespace

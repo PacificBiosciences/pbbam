@@ -17,6 +17,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include "ErrnoReason.h"
+
 namespace PacBio {
 namespace BAM {
 
@@ -30,6 +32,7 @@ ZmwChunkedFastxTextReader::ZmwChunkedFastxTextReader(std::string filename, const
         std::ostringstream msg;
         msg << "[pbbam] chunked FASTX reader ERROR: could not open file:\n"
             << "  file: " << fastxFilename_ << '\n';
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
 
@@ -149,6 +152,7 @@ void ZmwChunkedFastxTextReader::Seek(uint64_t pos)
         msg << "[pbbam] chunked FASTX reader ERROR: could not seek to requested pos: " << pos
             << '\n'
             << "  in file: " << fastxFilename_;
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
     ks_rewind(seq_->f);

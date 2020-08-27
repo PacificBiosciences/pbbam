@@ -16,6 +16,8 @@
 
 #include <htslib/bgzf.h>
 
+#include "ErrnoReason.h"
+
 namespace PacBio {
 namespace BAM {
 
@@ -96,6 +98,7 @@ public:
                 s << "[pbbam] indexed BAM reader  ERROR: could not seek in BAM file:\n"
                   << "  file: " << file_.Filename() << '\n'
                   << "  offset: " << blocks_.at(0).virtualOffset_;
+                MaybePrintErrnoReason(s);
                 throw std::runtime_error{s.str()};
             }
         }

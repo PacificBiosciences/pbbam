@@ -72,6 +72,7 @@ pbbam_cpp_sources = files([
   'DataSetTypes.cpp',
   'DataSetXsd.cpp',
   'EntireFileQuery.cpp',
+  'ErrnoReason.cpp',
   'FaiIndex.cpp',
   'FaiZmwChunker.cpp',
   'FastaCache.cpp',

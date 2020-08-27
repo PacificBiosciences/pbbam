@@ -19,6 +19,7 @@
 #include "pbbam/Validator.h"
 
 #include "Autovalidate.h"
+#include "ErrnoReason.h"
 #include "FileProducer.h"
 #include "MemoryUtils.h"
 
@@ -46,6 +47,7 @@ public:
             std::ostringstream msg;
             msg << "[pbbam] SAM writer ERROR: could not open file for writing:\n"
                 << "  file: " << usingFilename;
+            MaybePrintErrnoReason(msg);
             throw std::runtime_error{msg.str()};
         }
 
@@ -55,6 +57,7 @@ public:
             std::ostringstream msg;
             msg << "[pbbam] SAM writer ERROR: could not write header:\n"
                 << "  file: " << usingFilename;
+            MaybePrintErrnoReason(msg);
             throw std::runtime_error{msg.str()};
         }
     }
@@ -90,7 +93,14 @@ public:
 
         // write record to file
         const int ret = sam_write1(file_.get(), header_.get(), rawRecord.get());
-        if (ret <= 0) throw std::runtime_error{"[pbbam] SAM writer ERROR: could not write record"};
+        if (ret <= 0) {
+            std::ostringstream msg;
+            msg << "[pbbam] SAM writer ERROR: could not write record:\n"
+                << "  record: " << record.FullName() << '\n'
+                << "  file:   " << TempFilename();
+            MaybePrintErrnoReason(msg);
+            throw std::runtime_error{msg.str()};
+        }
     }
 
     std::unique_ptr<samFile, HtslibFileDeleter> file_;
