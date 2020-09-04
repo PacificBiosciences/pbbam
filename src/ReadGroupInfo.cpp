@@ -753,6 +753,14 @@ ReadGroupInfo& ReadGroupInfo::IpdCodec(FrameCodec codec, std::string tag)
     return *this;
 }
 
+Data::FrameEncoder ReadGroupInfo::IpdFrameEncoder() const { return ipdEncoder_; }
+
+ReadGroupInfo& ReadGroupInfo::IpdFrameEncoder(Data::FrameEncoder encoder)
+{
+    ipdEncoder_ = std::move(encoder);
+    return *this;
+}
+
 bool ReadGroupInfo::IsValid() const { return !id_.empty(); }
 
 std::string ReadGroupInfo::KeySequence() const { return keySequence_; }
@@ -815,6 +823,14 @@ ReadGroupInfo& ReadGroupInfo::PulseWidthCodec(FrameCodec codec, std::string tag)
     // update base features map
     const std::string actualTag = (tag.empty() ? "pw" : std::move(tag));
     BaseFeatureTag(BaseFeature::PULSE_WIDTH, actualTag);
+    return *this;
+}
+
+Data::FrameEncoder ReadGroupInfo::PulseWidthFrameEncoder() const { return pulseWidthEncoder_; }
+
+ReadGroupInfo& ReadGroupInfo::PulseWidthFrameEncoder(Data::FrameEncoder encoder)
+{
+    pulseWidthEncoder_ = std::move(encoder);
     return *this;
 }
 
