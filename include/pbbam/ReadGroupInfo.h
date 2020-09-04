@@ -18,6 +18,8 @@
 
 #include <boost/optional.hpp>
 
+#include <pbcopper/data/FrameCodec.h>
+
 #include "pbbam/exception/InvalidSequencingChemistryException.h"
 
 namespace PacBio {
@@ -54,16 +56,7 @@ enum class BaseFeature
     PULSE_EXCLUSION
 };
 
-/// \brief This enum describes the encoding types used for frame data within a
-///        read group's records.
-///
-/// This information is stored in its description (\@RG:DS).
-///
-enum class FrameCodec
-{
-    RAW,
-    V1
-};
+using FrameCodec PBBAM_DEPRECATED = PacBio::Data::FrameCodec;
 
 /// \brief This enum describes the experimental design of the barcodes within a
 ///        read group's records.
