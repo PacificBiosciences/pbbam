@@ -89,28 +89,33 @@ int Workflow::Runner(const CLI_v2::Results& args)
         assert((quals.empty()) || (quals.size() == seq.size()));
 
         const BAM::ReadGroupInfo rg = read.ReadGroup();
-        const BAM::FrameCodec ipdCodec = rg.IpdCodec();
-        const BAM::FrameCodec pwCodec = rg.PulseWidthCodec();
+        const Data::FrameCodec ipdCodec = rg.IpdCodec();
+        const Data::FrameEncoder ipdEncoder = rg.IpdFrameEncoder();
+        const Data::FrameCodec pwCodec = rg.PulseWidthCodec();
+        const Data::FrameEncoder pwEncoder = rg.PulseWidthFrameEncoder();
+
+        auto IpdFrames = [&](const std::string& name) -> Data::Frames {
+            const auto tag = readImpl.TagValue(name);
+            return ipdCodec == Data::FrameCodec::RAW ? Data::Frames{tag.ToUInt16Array()}
+                                                     : ipdEncoder.Decode(tag.ToUInt8Array());
+        };
+        auto PwFrames = [&](const std::string& name) -> Data::Frames {
+            const auto tag = readImpl.TagValue(name);
+            return pwCodec == Data::FrameCodec::RAW ? Data::Frames{tag.ToUInt16Array()}
+                                                    : pwEncoder.Decode(tag.ToUInt8Array());
+        };
 
         const int32_t fwdPasses = readImpl.TagValue("fn").ToInt32();
-        const Data::Frames fwdIPD{ipdCodec == BAM::FrameCodec::V1
-                                      ? Data::Frames::Decode(readImpl.TagValue("fi").ToUInt8Array())
-                                      : Data::Frames{readImpl.TagValue("fi").ToUInt16Array()}};
-        const Data::Frames fwdPW{pwCodec == BAM::FrameCodec::V1
-                                     ? Data::Frames::Decode(readImpl.TagValue("fp").ToUInt8Array())
-                                     : Data::Frames{readImpl.TagValue("fp").ToUInt16Array()}};
+        const Data::Frames fwdIPD = IpdFrames("fi");
+        const Data::Frames fwdPW = PwFrames("fp");
         assert(((fwdPasses == 0) && (fwdIPD.empty())) ||
                ((fwdPasses > 0) && (fwdIPD.size() == seq.size())));
         assert(((fwdPasses == 0) && (fwdPW.empty())) ||
                ((fwdPasses > 0) && (fwdPW.size() == seq.size())));
 
         const int32_t revPasses = readImpl.TagValue("rn").ToInt32();
-        const Data::Frames revIPD{ipdCodec == BAM::FrameCodec::V1
-                                      ? Data::Frames::Decode(readImpl.TagValue("ri").ToUInt8Array())
-                                      : Data::Frames{readImpl.TagValue("ri").ToUInt16Array()}};
-        const Data::Frames revPW{pwCodec == BAM::FrameCodec::V1
-                                     ? Data::Frames::Decode(readImpl.TagValue("rp").ToUInt8Array())
-                                     : Data::Frames{readImpl.TagValue("rp").ToUInt16Array()}};
+        const Data::Frames revIPD = IpdFrames("ri");
+        const Data::Frames revPW = PwFrames("rp");
         assert(((revPasses == 0) && (revIPD.empty())) ||
                ((revPasses > 0) && (revIPD.size() == seq.size())));
         assert(((revPasses == 0) && (revPW.empty())) ||

@@ -19,6 +19,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <pbcopper/data/Clipping.h>
+#include <pbcopper/data/FrameEncoders.h>
 #include <pbcopper/data/internal/ClippingImpl.h>
 
 #include "pbbam/StringUtilities.h"
@@ -306,6 +307,26 @@ void ClipAndGapifyUInt8s(const BamRecordImpl& impl, const bool aligned, const bo
     ClipAndGapify<std::vector<uint8_t>, uint8_t>(impl, aligned, exciseSoftClips, data, 0, 0);
 }
 
+Data::FrameEncoder IpdEncoder(const BamRecord& record)
+{
+    try {
+        return record.ReadGroup().IpdFrameEncoder();
+    } catch (const std::exception&) {
+        // fallback to V1 in corner cases w/ no read group set
+        return Data::V1FrameEncoder{};
+    }
+}
+
+Data::FrameEncoder PwEncoder(const BamRecord& record)
+{
+    try {
+        return record.ReadGroup().PulseWidthFrameEncoder();
+    } catch (const std::exception&) {
+        // fallback to V1 in corner cases w/ no read group set
+        return Data::V1FrameEncoder{};
+    }
+}
+
 RecordType NameToType(const std::string& name)
 {
     if (name == recordTypeName_Subread) return RecordType::SUBREAD;
@@ -574,8 +595,11 @@ BamRecord BamRecord::Clipped(const ClipType clipType, const PacBio::BAM::Positio
 
 void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
 {
-    const auto ipdCodec = ReadGroup().IpdCodec();
-    const auto pwCodec = ReadGroup().PulseWidthCodec();
+    const auto rg = ReadGroup();
+    const auto ipdCodec = rg.IpdCodec();
+    const auto ipdEncoder = rg.IpdFrameEncoder();
+    const auto pwCodec = rg.PulseWidthCodec();
+    const auto pwEncoder = rg.IpdFrameEncoder();
 
     // update BAM tags
     TagCollection tags = impl_.Tags();
@@ -592,20 +616,20 @@ void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
         tags[Label(BamRecordTag::SUBSTITUTION_QV)] =
             ClipSeqQV(SubstitutionQV(Orientation::NATIVE), clipFrom, clipLength).Fastq();
     if (HasIPD()) {
+        const auto label = Label(BamRecordTag::IPD);
+        const auto ipd = IPD(Orientation::NATIVE).Data();
         if (ipdCodec == FrameCodec::RAW)
-            tags[Label(BamRecordTag::IPD)] =
-                ClipSeqQV(IPD(Orientation::NATIVE).Data(), clipFrom, clipLength);
-        else if (ipdCodec == FrameCodec::V1)
-            tags[Label(BamRecordTag::IPD)] =
-                ClipSeqQV(IPD(Orientation::NATIVE).Encode(), clipFrom, clipLength);
+            tags[label] = ClipSeqQV(ipd, clipFrom, clipLength);
+        else
+            tags[label] = ClipSeqQV(ipdEncoder.Encode(ipd), clipFrom, clipLength);
     }
     if (HasPulseWidth()) {
+        const auto label = Label(BamRecordTag::PULSE_WIDTH);
+        const auto pw = PulseWidth(Orientation::NATIVE).Data();
         if (pwCodec == FrameCodec::RAW)
-            tags[Label(BamRecordTag::PULSE_WIDTH)] =
-                ClipSeqQV(PulseWidth(Orientation::NATIVE).Data(), clipFrom, clipLength);
-        else if (pwCodec == FrameCodec::V1)
-            tags[Label(BamRecordTag::PULSE_WIDTH)] =
-                ClipSeqQV(PulseWidth(Orientation::NATIVE).Encode(), clipFrom, clipLength);
+            tags[label] = ClipSeqQV(pw, clipFrom, clipLength);
+        else
+            tags[label] = ClipSeqQV(pwEncoder.Encode(pw), clipFrom, clipLength);
     }
     if (HasDeletionTag())
         tags[Label(BamRecordTag::DELETION_TAG)] =
@@ -855,8 +879,14 @@ Frames BamRecord::FetchFramesRaw(const BamRecordTag tag) const
 
     // lossy frame codes
     if (frameTag.IsUInt8Array()) {
-        const auto codes = frameTag.ToUInt8Array();
-        return Frames::Decode(codes);
+        const auto& decoder = [&]() -> Data::FrameEncoder {
+            assert(tag == BamRecordTag::IPD || tag == BamRecordTag::PULSE_WIDTH);
+            if (tag == BamRecordTag::IPD)
+                return IpdEncoder(*this);
+            else
+                return PwEncoder(*this);
+        }();
+        return decoder.Decode(frameTag.ToUInt8Array());
     }
 
     // lossless frame data
@@ -1243,17 +1273,20 @@ Frames BamRecord::IPD(Orientation orientation, bool aligned, bool exciseSoftClip
 BamRecord& BamRecord::IPD(const Frames& frames, const FrameEncodingType encoding)
 {
     if (encoding == FrameEncodingType::LOSSY)
-        return IPD(frames, FrameCodec::V1);
+        return IPD(frames, ReadGroup().IpdCodec());
     else
         return IPD(frames, FrameCodec::RAW);
 }
 
 BamRecord& BamRecord::IPD(const Frames& frames, const FrameCodec encoding)
 {
-    if (encoding == FrameCodec::V1)
-        CreateOrEdit(BamRecordTag::IPD, frames.Encode(), &impl_);
-    else
-        CreateOrEdit(BamRecordTag::IPD, frames.Data(), &impl_);
+    const auto& frameData = frames.Data();
+    if (encoding == FrameCodec::RAW) {
+        CreateOrEdit(BamRecordTag::IPD, frameData, &impl_);
+    } else {
+        const auto encoder = IpdEncoder(*this);
+        CreateOrEdit(BamRecordTag::IPD, encoder.Encode(frameData), &impl_);
+    }
     return *this;
 }
 
@@ -1683,7 +1716,7 @@ Frames BamRecord::PulseWidth(Orientation orientation, bool aligned, bool exciseS
 BamRecord& BamRecord::PulseWidth(const Frames& frames, const FrameEncodingType encoding)
 {
     if (encoding == FrameEncodingType::LOSSY) {
-        return PulseWidth(frames, FrameCodec::V1);
+        return PulseWidth(frames, ReadGroup().PulseWidthCodec());
     } else {
         return PulseWidth(frames, FrameCodec::RAW);
     }
@@ -1691,10 +1724,12 @@ BamRecord& BamRecord::PulseWidth(const Frames& frames, const FrameEncodingType e
 
 BamRecord& BamRecord::PulseWidth(const Frames& frames, const FrameCodec encoding)
 {
-    if (encoding == FrameCodec::V1) {
-        CreateOrEdit(BamRecordTag::PULSE_WIDTH, frames.Encode(), &impl_);
+    const auto& frameData = frames.Data();
+    if (encoding == FrameCodec::RAW) {
+        CreateOrEdit(BamRecordTag::PULSE_WIDTH, frameData, &impl_);
     } else {
-        CreateOrEdit(BamRecordTag::PULSE_WIDTH, frames.Data(), &impl_);
+        const auto encoder = PwEncoder(*this);
+        CreateOrEdit(BamRecordTag::PULSE_WIDTH, encoder.Encode(frameData), &impl_);
     }
     return *this;
 }
