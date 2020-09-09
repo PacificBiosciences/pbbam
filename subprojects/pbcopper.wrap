@@ -1,4 +1,6 @@
 [wrap-git]
 directory=pbcopper
-url=https://github.com/PacificBiosciences/pbcopper.git
-revision=develop
+#url=https://github.com/PacificBiosciences/pbcopper.git
+#revision=develop
+url=ssh://git@bitbucket.nanofluidics.com:7999/sat/pbcopper.git
+revision=feature/TAK-952-add-v2-codec-enum

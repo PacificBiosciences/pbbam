@@ -18,6 +18,9 @@
 
 #include <boost/optional.hpp>
 
+#include <pbcopper/data/FrameCodec.h>
+#include <pbcopper/data/FrameEncoders.h>
+
 #include "pbbam/exception/InvalidSequencingChemistryException.h"
 
 namespace PacBio {
@@ -54,16 +57,7 @@ enum class BaseFeature
     PULSE_EXCLUSION
 };
 
-/// \brief This enum describes the encoding types used for frame data within a
-///        read group's records.
-///
-/// This information is stored in its description (\@RG:DS).
-///
-enum class FrameCodec
-{
-    RAW,
-    V1
-};
+using FrameCodec PBBAM_DEPRECATED = PacBio::Data::FrameCodec;
 
 /// \brief This enum describes the experimental design of the barcodes within a
 ///        read group's records.
@@ -405,6 +399,9 @@ public:
     /// \returns codec type in use for IPD
     FrameCodec IpdCodec() const;
 
+    /// \returns codec implementation in use for IPD
+    Data::FrameEncoder IpdFrameEncoder() const;
+
     /// \returns string value of \@RG:KS
     std::string KeySequence() const;
 
@@ -428,6 +425,9 @@ public:
 
     /// \returns codec type in use for PulseWidth
     FrameCodec PulseWidthCodec() const;
+
+    /// \returns codec implementation in use for PulseWidth
+    Data::FrameEncoder PulseWidthFrameEncoder() const;
 
     /// \returns string value of read type
     std::string ReadType() const;
@@ -575,6 +575,14 @@ public:
     ///
     ReadGroupInfo& IpdCodec(FrameCodec codec, std::string tag = std::string());
 
+    /// \brief Sets the codec implementation used for IPD
+    ///
+    /// \param[in] encoder  codec implementation
+    /// \param[in] tag      IPD tag
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& IpdFrameEncoder(Data::FrameEncoder encoder);
+
     /// \brief Sets the value for \@RG:KS
     ///
     /// \param[in] sequence      new value
@@ -624,6 +632,13 @@ public:
     /// \returns reference to this object
     ///
     ReadGroupInfo& PulseWidthCodec(FrameCodec codec, std::string tag = std::string());
+
+    /// \brief Sets the codec implementation to use for PulseWidth
+    ///
+    /// \param[in] encoder  codec implementation
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& PulseWidthFrameEncoder(Data::FrameEncoder encoder);
 
     /// \brief Sets the read type.
     ///
@@ -697,6 +712,9 @@ private:
     // (optional) barcode label handling
     boost::optional<std::pair<uint16_t, uint16_t>> barcodes_ = boost::none;
     std::string baseId_;
+
+    Data::FrameEncoder ipdEncoder_ = Data::V1FrameEncoder{};
+    Data::FrameEncoder pulseWidthEncoder_ = Data::V1FrameEncoder{};
 
     // custom attributes
     std::map<std::string, std::string> custom_;  // tag => value

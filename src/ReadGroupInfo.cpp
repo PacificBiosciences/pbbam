@@ -136,17 +136,15 @@ std::string BaseFeatureName(const BaseFeature& feature)
     throw std::runtime_error{ "[pbbam] read group ERROR: unrecognized base feature" };
 }
 
-std::string FrameCodecName(const FrameCodec& codec)
+std::string FrameCodecName(const FrameCodec& codec, const Data::FrameEncoder& encoder)
 {
-    static const std::unordered_map<FrameCodec, std::string> lookup{
-        {FrameCodec::RAW, codec_RAW},
-        {FrameCodec::V1,  codec_V1}
-    };
-
-    const auto found = lookup.find(codec);
-    if (found != lookup.cend())
-        return found->second;
-    throw std::runtime_error{ "[pbbam] read group ERROR: unrecognized frame codec" };
+    switch (codec) {
+        case FrameCodec::RAW : return codec_RAW;
+        case FrameCodec::V1 : return codec_V1;
+        case FrameCodec::V2 : return encoder.Name();
+        default:
+            throw std::runtime_error{"[pbbam] read group ERROR: unrecognized frame codec" };
+    }
 }
 
 std::string BarcodeModeName(const BarcodeModeType& mode)
@@ -257,7 +255,26 @@ bool IsBaseFeature(const std::string& name)
 
 BaseFeature BaseFeatureFromName(const std::string& name) { return nameToFeature.at(name); }
 
-FrameCodec FrameCodecFromName(const std::string& name) { return nameToCodec.at(name); }
+FrameCodec FrameCodecFromName(const std::string& name)
+{
+    const auto foundCodec = nameToCodec.find(name);
+    if (foundCodec != nameToCodec.cend())
+        return foundCodec->second;
+    else if (name.find("CodecV2") == 0)
+        return FrameCodec::V2;
+
+    throw std::runtime_error{"[pbbam] read group ERROR: unknown codec name '" + name + "'"};
+}
+
+Data::FrameEncoder FrameEncoderFromName(const std::string& name)
+{
+    if (name.find("CodecV2") == 0) {
+        const auto codecParts = BAM::Split(name, '/');
+        assert(codecParts.size() == 2);
+        return Data::V2FrameEncoder{std::stoi(codecParts[1])};
+    } else
+        return Data::V1FrameEncoder{};  // default
+}
 
 BarcodeModeType BarcodeModeFromName(const std::string& name) { return nameToBarcodeMode.at(name); }
 
@@ -524,9 +541,11 @@ void ReadGroupInfo::DecodeFrameCodecKey(const std::string& key, std::string valu
         const auto& subkey = keyParts.at(0);
         if (subkey == feature_IP) {
             ipdCodec_ = FrameCodecFromName(keyParts.at(1));
+            ipdEncoder_ = FrameEncoderFromName(keyParts.at(1));
             features_[BaseFeature::IPD] = std::move(value);
         } else if (subkey == feature_PW) {
             pulseWidthCodec_ = FrameCodecFromName(keyParts.at(1));
+            pulseWidthEncoder_ = FrameEncoderFromName(keyParts.at(1));
             features_[BaseFeature::PULSE_WIDTH] = std::move(value);
         }
     }
@@ -588,10 +607,10 @@ std::string ReadGroupInfo::EncodeSamDescription() const
             continue;
         else if (featureName == feature_IP) {
             featureName.push_back(COLON);
-            featureName.append(FrameCodecName(ipdCodec_));
+            featureName.append(FrameCodecName(ipdCodec_, ipdEncoder_));
         } else if (featureName == feature_PW) {
             featureName.push_back(COLON);
-            featureName.append(FrameCodecName(pulseWidthCodec_));
+            featureName.append(FrameCodecName(pulseWidthCodec_, pulseWidthEncoder_));
         }
         result.append(SEP + featureName + EQ + feature.second);
     }
@@ -753,6 +772,14 @@ ReadGroupInfo& ReadGroupInfo::IpdCodec(FrameCodec codec, std::string tag)
     return *this;
 }
 
+Data::FrameEncoder ReadGroupInfo::IpdFrameEncoder() const { return ipdEncoder_; }
+
+ReadGroupInfo& ReadGroupInfo::IpdFrameEncoder(Data::FrameEncoder encoder)
+{
+    ipdEncoder_ = std::move(encoder);
+    return *this;
+}
+
 bool ReadGroupInfo::IsValid() const { return !id_.empty(); }
 
 std::string ReadGroupInfo::KeySequence() const { return keySequence_; }
@@ -815,6 +842,14 @@ ReadGroupInfo& ReadGroupInfo::PulseWidthCodec(FrameCodec codec, std::string tag)
     // update base features map
     const std::string actualTag = (tag.empty() ? "pw" : std::move(tag));
     BaseFeatureTag(BaseFeature::PULSE_WIDTH, actualTag);
+    return *this;
+}
+
+Data::FrameEncoder ReadGroupInfo::PulseWidthFrameEncoder() const { return pulseWidthEncoder_; }
+
+ReadGroupInfo& ReadGroupInfo::PulseWidthFrameEncoder(Data::FrameEncoder encoder)
+{
+    pulseWidthEncoder_ = std::move(encoder);
     return *this;
 }
 
