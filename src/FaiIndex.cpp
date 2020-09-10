@@ -62,6 +62,14 @@ public:
     void LoadFromFile(const std::string& fn)
     {
         std::ifstream f{fn};
+        if (!f) {
+            std::ostringstream msg;
+            msg << "[pbbam] FASTA index ERROR: could not open index file:\n"
+                << "  FAI file: " << fn;
+            MaybePrintErrnoReason(msg);
+            throw std::runtime_error{msg.str()};
+        }
+
         std::string line;
         std::vector<std::string> fields;
         while (std::getline(f, line)) {
