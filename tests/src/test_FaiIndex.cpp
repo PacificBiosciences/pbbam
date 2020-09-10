@@ -110,3 +110,8 @@ TEST(FaiIndexTest, SaveFastqIndexToStream)
     index.Save(out);
     EXPECT_EQ(expected, out.str());
 }
+
+TEST(FaiIndexTest, throws_on_missing_fai_file)
+{
+    EXPECT_THROW(FaiIndex{"does_not_exist.fai"}, std::runtime_error);
+}
