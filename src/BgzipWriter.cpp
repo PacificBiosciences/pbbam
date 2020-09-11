@@ -1,12 +1,6 @@
-// File Description
-/// \file BgzipWriter.cpp
-/// \brief Implements the BgzipWriter class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/BgzipWriter.h"
+#include <pbbam/BgzipWriter.h>
 
 #include <cassert>
 
@@ -18,7 +12,7 @@
 #include <htslib/bgzf.h>
 #include <htslib/hts.h>
 
-#include "pbbam/Deleters.h"
+#include <pbbam/Deleters.h>
 
 #include "ErrnoReason.h"
 #include "FileProducer.h"

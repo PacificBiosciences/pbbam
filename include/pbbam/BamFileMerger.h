@@ -1,20 +1,17 @@
-// Author: Derek Barnett
+#ifndef PBBAM_BAMFILEMERGER_H
+#define PBBAM_BAMFILEMERGER_H
 
-#ifndef BAMFILEMERGER_H
-#define BAMFILEMERGER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 #include <vector>
 
+#include <pbbam/DataSet.h>
+#include <pbbam/IRecordWriter.h>
 #include <pbbam/ProgramInfo.h>
 
 namespace PacBio {
 namespace BAM {
-
-class DataSet;
-class IRecordWriter;
 
 struct BamFileMerger
 {
@@ -46,7 +43,7 @@ struct BamFileMerger
     ///
     /// \throws std::runtime_error if any any errors encountered while reading or writing
     ///
-    static void Merge(const PacBio::BAM::DataSet& dataset, const std::string& outputFilename,
+    static void Merge(const DataSet& dataset, const std::string& outputFilename,
                       bool createPbi = true, const ProgramInfo& pgInfo = ProgramInfo{});
 
     /// \brief Runs merger on BAM files, writing to provided writer.
@@ -66,10 +63,10 @@ struct BamFileMerger
     ///
     /// \throws std::runtime_error if any any errors encountered while reading or writing
     ///
-    static void Merge(const PacBio::BAM::DataSet& dataset, IRecordWriter& writer);
+    static void Merge(const DataSet& dataset, IRecordWriter& writer);
 };
 
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BAMFILEMERGER_H
+#endif  // PBBAM_BAMFILEMERGER_H

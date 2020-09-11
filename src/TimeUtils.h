@@ -1,9 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_TIMEUTILS_H
+#define PBBAM_TIMEUTILS_H
 
-#ifndef TIMEUTILS_H
-#define TIMEUTILS_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cassert>
 #include <ctime>
@@ -71,4 +69,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // TIMEUTILS_H
+#endif  // PBBAM_TIMEUTILS_H

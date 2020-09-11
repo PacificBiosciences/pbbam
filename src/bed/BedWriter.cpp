@@ -1,20 +1,14 @@
-// File Description
-/// \file BedWriter.cpp
-/// \brief Implements the BedWriter class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/bed/BedWriter.h"
+#include <pbbam/bed/BedWriter.h>
 
 #include <cassert>
 
 #include <sstream>
 #include <type_traits>
 
-#include "pbbam/GenomicInterval.h"
-#include "pbbam/TextFileWriter.h"
+#include <pbbam/GenomicInterval.h>
+#include <pbbam/TextFileWriter.h>
 
 namespace PacBio {
 namespace BAM {
@@ -29,7 +23,7 @@ class BedWriter::BedWriterPrivate
 public:
     explicit BedWriterPrivate(const std::string& filename) : writer_{filename} {}
 
-    void Write(const GenomicInterval& interval)
+    void Write(const Data::GenomicInterval& interval)
     {
         line_.str("");
         line_ << interval.Name() << '\t' << interval.Start() << '\t' << interval.Stop();
@@ -49,7 +43,7 @@ BedWriter& BedWriter::operator=(BedWriter&&) noexcept = default;
 
 BedWriter::~BedWriter() = default;
 
-void BedWriter::Write(const GenomicInterval& interval) { d_->Write(interval); }
+void BedWriter::Write(const Data::GenomicInterval& interval) { d_->Write(interval); }
 
 }  // namespace BAM
 }  // namespace PacBio

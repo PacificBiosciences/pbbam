@@ -1,10 +1,4 @@
-// File Description
-/// \file PbiBasicTypes.inl
-/// \brief Inline implementations for the basic data structures used in PBI lookups.
-//
-// Author: Derek Barnett
-
-#include "pbbam/PbiBasicTypes.h"
+#include <pbbam/PbiBasicTypes.h>
 
 #include <tuple>
 

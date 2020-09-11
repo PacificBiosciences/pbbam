@@ -1,13 +1,7 @@
-// File Description
-/// \file BamRecordTag.h
-/// \brief Defines the BamRecordTag enum.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_BAMRECORDTAG_H
+#define PBBAM_BAMRECORDTAG_H
 
-#ifndef BAMRECORDTAG_H
-#define BAMRECORDTAG_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 namespace PacBio {
 namespace BAM {
@@ -61,4 +55,4 @@ enum class BamRecordTag
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BAMRECORDTAG_H
+#endif  // PBBAM_BAMRECORDTAG_H

@@ -1,13 +1,7 @@
-// File Description
-/// \file FrameEncodingType.h
-/// \brief Defines the FrameEncodingType enum.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_FRAMEENCODINGTYPE_H
+#define PBBAM_FRAMEENCODINGTYPE_H
 
-#ifndef FRAMEENCODINGTYPE_H
-#define FRAMEENCODINGTYPE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 namespace PacBio {
 namespace BAM {
@@ -30,4 +24,4 @@ enum class PBBAM_DEPRECATED_FRAMES FrameEncodingType
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FRAMEENCODINGTYPE_H
+#endif  // PBBAM_FRAMEENCODINGTYPE_H

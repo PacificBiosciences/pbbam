@@ -1,11 +1,4 @@
-// File Description
-/// \file CompositeBamReader.inl
-/// \brief Inline implementations for the composite BAM readers, for
-///        working with multiple input files.
-//
-// Author: Derek Barnett
-
-#include "pbbam/CompositeBamReader.h"
+#include <pbbam/CompositeBamReader.h>
 
 #include <algorithm>
 #include <iostream>

@@ -1,19 +1,13 @@
-// File Description
-/// \file TagCollection.h
-/// \brief Defines the TagCollection class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_TAGCOLLECTION_H
+#define PBBAM_TAGCOLLECTION_H
 
-#ifndef TAGCOLLECTION_H
-#define TAGCOLLECTION_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <iosfwd>
 #include <map>
 #include <string>
 
-#include "pbbam/Tag.h"
+#include <pbbam/Tag.h>
 
 namespace PacBio {
 namespace BAM {
@@ -40,4 +34,4 @@ std::ostream& operator<<(std::ostream& out, const TagCollection& tags);
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // TAGCOLLECTION_H
+#endif  // PBBAM_TAGCOLLECTION_H

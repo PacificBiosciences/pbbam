@@ -1,9 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_SEQUENCEUTILS_H
+#define PBBAM_SEQUENCEUTILS_H
 
-#ifndef SEQUENCEUTILS_H
-#define SEQUENCEUTILS_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cctype>
 #include <cstdint>
@@ -12,7 +10,7 @@
 #include <array>
 #include <string>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 namespace PacBio {
 namespace BAM {
@@ -125,4 +123,4 @@ inline std::string ReverseComplemented(const std::string& input)
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // SEQUENCEUTILS_H
+#endif  // PBBAM_SEQUENCEUTILS_H

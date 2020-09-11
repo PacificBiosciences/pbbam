@@ -1,10 +1,4 @@
-// File Description
-/// \file PbiFilterTypes.inl
-/// \brief Inline implementations for the built-in PBI filters.
-//
-// Author: Derek Barnett
-
-#include "pbbam/PbiFilterTypes.h"
+#include <pbbam/PbiFilterTypes.h>
 
 #include <cassert>
 

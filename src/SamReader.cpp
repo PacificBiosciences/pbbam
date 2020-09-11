@@ -1,8 +1,6 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/SamReader.h"
+#include <pbbam/SamReader.h>
 
 #include <cassert>
 #include <cstdint>
@@ -15,7 +13,7 @@
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
 
-#include "pbbam/Deleters.h"
+#include <pbbam/Deleters.h>
 
 #include "MemoryUtils.h"
 
@@ -42,7 +40,7 @@ public:
         }
 
         char c;
-        auto peek = hpeek(htsFile_->fp.hfile, &c, 1);
+        const auto peek = hpeek(htsFile_->fp.hfile, &c, 1);
         if (peek == 0) {
             std::ostringstream s;
             s << "[pbbam] SAM reader ERROR: could not read from empty input:" << displayFilename();

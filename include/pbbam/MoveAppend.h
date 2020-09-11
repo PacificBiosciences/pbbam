@@ -1,9 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_MOVEAPPEND_H
+#define PBBAM_MOVEAPPEND_H
 
-#ifndef MOVEAPPEND_H
-#define MOVEAPPEND_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <iterator>
 #include <utility>
@@ -49,4 +47,4 @@ void MoveAppend(std::vector<T>&& src, std::vector<T>& dst) noexcept
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // MOVEAPPEND_H
+#endif  // PBBAM_MOVEAPPEND_H

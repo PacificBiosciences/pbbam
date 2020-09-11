@@ -1,8 +1,6 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/BamRecordImpl.h"
+#include <pbbam/BamRecordImpl.h>
 
 #include <cassert>
 #include <cstddef>
@@ -18,8 +16,8 @@
 
 #include <htslib/hts_endian.h>
 
-#include "pbbam/BamTagCodec.h"
-#include "pbbam/StringUtilities.h"
+#include <pbbam/BamTagCodec.h>
+#include <pbbam/StringUtilities.h>
 
 #include "BamRecordTags.h"
 #include "MemoryUtils.h"
@@ -31,14 +29,14 @@ namespace {
 
 static const bool has_native_long_cigar_support = DoesHtslibSupportLongCigar();
 
-Cigar FetchRawCigar(const uint32_t* const src, const uint32_t len)
+Data::Cigar FetchRawCigar(const uint32_t* const src, const uint32_t len)
 {
-    Cigar result;
+    Data::Cigar result;
     result.reserve(len);
     for (uint32_t i = 0; i < len; ++i) {
         const uint32_t length = bam_cigar_oplen(src[i]);
-        const auto type = static_cast<CigarOperationType>(bam_cigar_op(src[i]));
-        result.push_back(CigarOperation(type, length));
+        const auto type = static_cast<Data::CigarOperationType>(bam_cigar_op(src[i]));
+        result.push_back({type, length});
     }
     return result;
 }
@@ -52,7 +50,7 @@ bool HasLongCigar(const bam1_t* const b)
 
     // if existing CIGAR doesn't look like a 'fake CIGAR'
     const auto firstCigarOp = *(bam_get_cigar(b));
-    if (bam_cigar_op(firstCigarOp) != static_cast<uint32_t>(CigarOperationType::SOFT_CLIP) ||
+    if (bam_cigar_op(firstCigarOp) != static_cast<uint32_t>(Data::CigarOperationType::SOFT_CLIP) ||
         static_cast<int32_t>(bam_cigar_oplen(firstCigarOp)) != c->l_qseq) {
         return false;
     }
@@ -146,7 +144,7 @@ BamRecordImpl& BamRecordImpl::Bin(uint32_t bin)
     return *this;
 }
 
-Cigar BamRecordImpl::CigarData() const
+Data::Cigar BamRecordImpl::CigarData() const
 {
     const auto* b = d_.get();
     if (!has_native_long_cigar_support && HasLongCigar(b)) {
@@ -160,16 +158,16 @@ Cigar BamRecordImpl::CigarData() const
     }
 }
 
-BamRecordImpl& BamRecordImpl::CigarData(const Cigar& cigar)
+BamRecordImpl& BamRecordImpl::CigarData(const Data::Cigar& cigar)
 {
     // if long CIGAR, using htslib version < 1.7, set it "manually"
     if (!has_native_long_cigar_support && cigar.size() >= 65536) {
         // Add the 'fake' CIGAR in normal place.
-        Cigar fake;
-        fake.emplace_back(CigarOperationType::SOFT_CLIP, SequenceLength());
+        Data::Cigar fake;
+        fake.emplace_back(Data::CigarOperationType::SOFT_CLIP, SequenceLength());
         const uint32_t alignedLength =
             static_cast<uint32_t>(bam_cigar2rlen(d_->core.n_cigar, bam_get_cigar(d_.get())));
-        fake.emplace_back(CigarOperationType::REFERENCE_SKIP, alignedLength);
+        fake.emplace_back(Data::CigarOperationType::REFERENCE_SKIP, alignedLength);
         SetCigarData(fake);
 
         // Add raw CIGAR data to CG tag.
@@ -263,8 +261,8 @@ void BamRecordImpl::InitializeData()
     d_.reset(bam_init1());
 
     // init unmapped
-    Position(PacBio::BAM::UnmappedPosition);
-    MatePosition(PacBio::BAM::UnmappedPosition);
+    Position(Data::UnmappedPosition);
+    MatePosition(Data::UnmappedPosition);
     ReferenceId(-1);
     MateReferenceId(-1);
     SetMapped(false);
@@ -332,9 +330,9 @@ BamRecordImpl& BamRecordImpl::MapQuality(uint8_t mapQual)
     return *this;
 }
 
-PacBio::BAM::Position BamRecordImpl::MatePosition() const { return d_->core.mpos; }
+Data::Position BamRecordImpl::MatePosition() const { return d_->core.mpos; }
 
-BamRecordImpl& BamRecordImpl::MatePosition(PacBio::BAM::Position pos)
+BamRecordImpl& BamRecordImpl::MatePosition(Data::Position pos)
 {
     d_->core.mpos = pos;
     return *this;
@@ -348,9 +346,9 @@ BamRecordImpl& BamRecordImpl::MateReferenceId(int32_t id)
     return *this;
 }
 
-PacBio::BAM::Position BamRecordImpl::Position() const { return d_->core.pos; }
+Data::Position BamRecordImpl::Position() const { return d_->core.pos; }
 
-BamRecordImpl& BamRecordImpl::Position(PacBio::BAM::Position pos)
+BamRecordImpl& BamRecordImpl::Position(Data::Position pos)
 {
     d_->core.pos = pos;
     return *this;
@@ -419,18 +417,18 @@ BamRecordImpl& BamRecordImpl::Name(const std::string& name)
     return *this;
 }
 
-QualityValues BamRecordImpl::Qualities() const
+Data::QualityValues BamRecordImpl::Qualities() const
 {
-    if (d_->core.l_qseq == 0) return QualityValues();
+    if (d_->core.l_qseq == 0) return Data::QualityValues();
 
     uint8_t* qualData = bam_get_qual(d_);
-    if (qualData[0] == 0xff) return QualityValues();
+    if (qualData[0] == 0xff) return Data::QualityValues();
 
     const size_t numQuals = d_->core.l_qseq;
-    QualityValues result;
+    Data::QualityValues result;
     result.reserve(numQuals);
     for (size_t i = 0; i < numQuals; ++i)
-        result.push_back(QualityValue(qualData[i]));
+        result.push_back(Data::QualityValue(qualData[i]));
     return result;
 }
 
@@ -468,7 +466,7 @@ std::string BamRecordImpl::Sequence() const
 
 size_t BamRecordImpl::SequenceLength() const { return d_->core.l_qseq; }
 
-void BamRecordImpl::SetCigarData(const Cigar& cigar)
+void BamRecordImpl::SetCigarData(const Data::Cigar& cigar)
 {
     // determine change in memory needed
     // diffNumBytes: pos -> growing, neg -> shrinking
@@ -489,7 +487,7 @@ void BamRecordImpl::SetCigarData(const Cigar& cigar)
     // fill in new CIGAR data
     uint32_t* cigarDataStart = bam_get_cigar(d_);
     for (size_t i = 0; i < numCigarOps; ++i) {
-        const CigarOperation& cigarOp = cigar.at(i);
+        const Data::CigarOperation& cigarOp = cigar.at(i);
         cigarDataStart[i] = bam_cigar_gen(cigarOp.Length(), static_cast<int>(cigarOp.Type()));
     }
 }

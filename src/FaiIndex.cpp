@@ -1,12 +1,6 @@
-// File Description
-/// \file FastaReader.cpp
-/// \brief Implements the FastaReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/FaiIndex.h"
+#include <pbbam/FaiIndex.h>
 
 #include <cassert>
 
@@ -21,7 +15,7 @@
 
 #include <htslib/faidx.h>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 #include "ErrnoReason.h"
 

@@ -1,20 +1,14 @@
-// File Description
-/// \file VirtualZmwBamRecord.h
-/// \brief Defines the VirtualZmwBamRecord class.
-//
-// Author: Armin Töpfer
+#ifndef PBBAM_VIRTUALZMWBAMRECORD_H
+#define PBBAM_VIRTUALZMWBAMRECORD_H
 
-#ifndef VirtualZmwBAMRECORD_H
-#define VirtualZmwBAMRECORD_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <vector>
 
-#include "pbbam/BamHeader.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/virtual/VirtualRegion.h"
-#include "pbbam/virtual/VirtualRegionType.h"
+#include <pbbam/BamHeader.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/virtual/VirtualRegion.h>
+#include <pbbam/virtual/VirtualRegionType.h>
 
 namespace PacBio {
 namespace BAM {
@@ -49,7 +43,7 @@ public:
 
     /// \returns IPD frame data
     ///
-    Frames IPDV1Frames(Orientation orientation = Orientation::NATIVE) const;
+    Data::Frames IPDV1Frames(Data::Orientation orientation = Data::Orientation::NATIVE) const;
 
     /// \brief Provides all annotations of the polymerase read as a map (type => regions)
     ///
@@ -74,4 +68,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // VirtualZmwBAMRECORD_H
+#endif  // PBBAMVIRTUALZMWBAMRECORD_H

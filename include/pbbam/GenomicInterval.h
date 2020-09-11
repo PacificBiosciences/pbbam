@@ -1,13 +1,7 @@
-// File Description
-/// \file GenomicInterval.h
-/// \brief Defines the GenomicInterval class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_GENOMICINTERVAL_H
+#define PBBAM_GENOMICINTERVAL_H
 
-#ifndef GENOMICINTERVAL_H
-#define GENOMICINTERVAL_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <pbcopper/data/GenomicInterval.h>
 
@@ -19,4 +13,4 @@ using GenomicInterval PBBAM_DEPRECATED = Data::GenomicInterval;
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // GENOMICINTERVAL_H
+#endif  // PBBAM_GENOMICINTERVAL_H

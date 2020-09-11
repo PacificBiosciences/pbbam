@@ -1,14 +1,14 @@
 #ifndef PBBAM_CCS_CCSRECORDWRITER_H
 #define PBBAM_CCS_CCSRECORDWRITER_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <iosfwd>
 #include <memory>
 #include <string>
 
-#include "pbbam/ccs/CCSHeader.h"
-#include "pbbam/ccs/CCSRecord.h"
+#include <pbbam/ccs/CCSHeader.h>
+#include <pbbam/ccs/CCSRecord.h>
 
 namespace PacBio {
 namespace CCS {

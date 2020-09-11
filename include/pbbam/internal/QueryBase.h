@@ -1,9 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_QUERYBASE_H
+#define PBBAM_QUERYBASE_H
 
-#ifndef QUERYBASE_H
-#define QUERYBASE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cassert>
 
@@ -11,9 +9,9 @@
 #include <memory>
 #include <vector>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/DataSet.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/DataSet.h>
 
 namespace PacBio {
 namespace BAM {
@@ -116,6 +114,6 @@ using IGroupQuery = QueryBase<std::vector<BamRecord>>;
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/QueryBase.inl"
+#include <pbbam/internal/QueryBase.inl>
 
-#endif  // QUERYBASE_H
+#endif  // PBBAM_QUERYBASE_H

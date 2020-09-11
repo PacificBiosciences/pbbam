@@ -1,12 +1,6 @@
-// File Description
-/// \file TextFileReader.cpp
-/// \brief Implements the TextFileReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/TextFileReader.h"
+#include <pbbam/TextFileReader.h>
 
 #include <cassert>
 
@@ -17,7 +11,7 @@
 #include <htslib/bgzf.h>
 #include <htslib/kstring.h>
 
-#include "pbbam/Deleters.h"
+#include <pbbam/Deleters.h>
 
 #include "ErrnoReason.h"
 

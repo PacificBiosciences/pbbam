@@ -1,8 +1,6 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/FastqSequence.h"
+#include <pbbam/FastqSequence.h>
 
 #include <cassert>
 #include <cstdio>
@@ -53,7 +51,7 @@ float FastqSequence::AverageBaseQuality() const
 
 const Data::QualityValues& FastqSequence::Qualities() const { return qualities_; }
 
-FastqSequence& FastqSequence::Qualities(QualityValues quals)
+FastqSequence& FastqSequence::Qualities(Data::QualityValues quals)
 {
     qualities_ = std::move(quals);
     return *this;

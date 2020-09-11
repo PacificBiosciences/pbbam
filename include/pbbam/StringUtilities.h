@@ -1,9 +1,7 @@
-// Author: Derek Barnett
-
 #ifndef PBBAM_STRINGUTILITIES_H
 #define PBBAM_STRINGUTILITIES_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 #include <vector>

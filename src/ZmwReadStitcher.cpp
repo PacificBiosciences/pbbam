@@ -1,21 +1,15 @@
-// File Description
-/// \file ZmwReadStitcher.cpp
-/// \brief Implements the ZmwReadStitcher class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/virtual/ZmwReadStitcher.h"
+#include <pbbam/virtual/ZmwReadStitcher.h>
 
 #include <deque>
 #include <stdexcept>
 #include <utility>
 
-#include "pbbam/DataSet.h"
-#include "pbbam/EntireFileQuery.h"
-#include "pbbam/PbiFilter.h"
-#include "pbbam/PbiFilterQuery.h"
+#include <pbbam/DataSet.h>
+#include <pbbam/EntireFileQuery.h>
+#include <pbbam/PbiFilter.h>
+#include <pbbam/PbiFilterQuery.h>
 
 #include "VirtualStitching.h"
 #include "VirtualZmwReader.h"

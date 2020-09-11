@@ -1,12 +1,6 @@
-// File Description
-/// \file SequenceInfo.cpp
-/// \brief Implements the SequenceInfo class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/SequenceInfo.h"
+#include <pbbam/SequenceInfo.h>
 
 #include <cassert>
 #include <cstdint>
@@ -16,8 +10,8 @@
 #include <tuple>
 #include <type_traits>
 
-#include "pbbam/SamTagCodec.h"
-#include "pbbam/StringUtilities.h"
+#include <pbbam/SamTagCodec.h>
+#include <pbbam/StringUtilities.h>
 
 namespace PacBio {
 namespace BAM {

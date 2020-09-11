@@ -1,13 +1,7 @@
-// File Description
-/// \file Strand.h
-/// \brief Defines the Strand enum.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_STRAND_H
+#define PBBAM_STRAND_H
 
-#ifndef STRAND_H
-#define STRAND_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <pbcopper/data/Strand.h>
 
@@ -19,4 +13,4 @@ using Strand PBBAM_DEPRECATED = PacBio::Data::Strand;
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // STRAND_H
+#endif  // PBBAM_STRAND_H

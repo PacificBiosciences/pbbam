@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #ifndef PBBAM_DELETERS_H
 #define PBBAM_DELETERS_H
 

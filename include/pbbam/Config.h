@@ -1,9 +1,3 @@
-// File Description
-/// \file Config.h
-/// \brief Defines library-wide macros & global variables.
-//
-// Author: Derek Barnett
-
 #ifndef PBBAM_CONFIG_H
 #define PBBAM_CONFIG_H
 

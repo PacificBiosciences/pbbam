@@ -1,12 +1,6 @@
-// File Description
-/// \file BamFile.cpp
-/// \brief Implements the BamFile class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/BamFile.h"
+#include <pbbam/BamFile.h>
 
 #include <sys/stat.h>
 
@@ -19,8 +13,8 @@
 
 #include <htslib/sam.h>
 
-#include "pbbam/Deleters.h"
-#include "pbbam/PbiFile.h"
+#include <pbbam/Deleters.h>
+#include <pbbam/PbiFile.h>
 
 #include "Autovalidate.h"
 #include "ErrnoReason.h"
@@ -76,7 +70,7 @@ public:
         if (filename_ == "-") return false;
 
         // attempt open
-        auto f = RawOpen();
+        const auto f = RawOpen();
         return RawEOFCheck(f) == 1;
     }
 

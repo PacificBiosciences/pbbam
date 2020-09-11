@@ -1,9 +1,3 @@
-// File Description
-/// \file Version.cpp
-/// \brief Implements the Version class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "Version.h"
@@ -12,7 +6,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 namespace PacBio {
 namespace BAM {

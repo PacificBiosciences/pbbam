@@ -1,22 +1,15 @@
-// File Description
-/// \file IFastaWriter.h
-/// \brief Defines the IFastaWriter interface.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_IFASTAWRITER_H
+#define PBBAM_IFASTAWRITER_H
 
-#ifndef IFASTAWRITER_H
-#define IFASTAWRITER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 
-#include "pbbam/IRecordWriter.h"
+#include <pbbam/FastaSequence.h>
+#include <pbbam/IRecordWriter.h>
 
 namespace PacBio {
 namespace BAM {
-
-class FastaSequence;
 
 class IFastaWriter : public IRecordWriter
 {
@@ -36,4 +29,4 @@ protected:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // IFASTAWRITER_H
+#endif  // PBBAM_IFASTAWRITER_H

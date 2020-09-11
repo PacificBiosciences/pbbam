@@ -1,20 +1,14 @@
-// File Description
-/// \file SamWriter.h
-/// \brief Defines the SamWriter class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_SAMWRITER_H
+#define PBBAM_SAMWRITER_H
 
-#ifndef SAMWRITER_H
-#define SAMWRITER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
 
-#include "pbbam/BamHeader.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/IRecordWriter.h"
+#include <pbbam/BamHeader.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/IRecordWriter.h>
 
 namespace PacBio {
 namespace BAM {
@@ -93,4 +87,4 @@ private:
 }  // namesapce BAM
 }  // namespace PacBio
 
-#endif  // SAMWRITER_H
+#endif  // PBBAM_SAMWRITER_H

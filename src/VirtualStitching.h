@@ -1,13 +1,7 @@
-// File Description
-/// \file VirtualStitching.h
-/// \brief Utilities for virtual ZMW stitiching.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_VIRTUALSTITCHING_H
+#define PBBAM_VIRTUALSTITCHING_H
 
-#ifndef VIRTUALSTITCHING_H
-#define VIRTUALSTITCHING_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <deque>
 #include <string>
@@ -67,4 +61,4 @@ inline StitchingSources SourcesFromDataset(const DataSet& dataset)
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // VIRTUALSTITCHING_H
+#endif  // PBBAM_VIRTUALSTITCHING_H

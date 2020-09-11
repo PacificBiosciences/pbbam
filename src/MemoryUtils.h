@@ -1,15 +1,13 @@
-// Author: Derek Barnett
+#ifndef PBBAM_MEMORYUTILS_H
+#define PBBAM_MEMORYUTILS_H
 
-#ifndef MEMORYUTILS_H
-#define MEMORYUTILS_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 
-#include "pbbam/BamHeader.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/BamRecordImpl.h"
+#include <pbbam/BamHeader.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/BamRecordImpl.h>
 
 namespace PacBio {
 namespace BAM {
@@ -39,4 +37,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // MEMORYUTILS_H
+#endif  // PBBAM_MEMORYUTILS_H

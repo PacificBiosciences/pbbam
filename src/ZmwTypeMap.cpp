@@ -1,12 +1,6 @@
-// File Description
-/// \file ZmwTypeMap.cpp
-/// \brief Implements the ZmwTypeMap class.
-//
-// Author: Armin Töpfer
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/ZmwTypeMap.h"
+#include <pbbam/ZmwTypeMap.h>
 
 namespace PacBio {
 namespace BAM {

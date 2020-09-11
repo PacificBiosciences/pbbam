@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "XmlReader.h"
@@ -12,7 +10,7 @@
 #include <typeinfo>
 #include <vector>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 #include "pugixml/pugixml.hpp"
 

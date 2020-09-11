@@ -1,8 +1,6 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/FormatUtils.h"
+#include <pbbam/FormatUtils.h>
 
 #include <algorithm>
 #include <sstream>
@@ -10,7 +8,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "pbbam/Deleters.h"
+#include <pbbam/Deleters.h>
 
 #include "ErrnoReason.h"
 
@@ -42,7 +40,7 @@ HtslibCompression FormatUtils::CompressionType(BGZF* bgzf)
 
 HtslibCompression FormatUtils::CompressionType(const std::string& fn)
 {
-    std::unique_ptr<BGZF, HtslibBgzfDeleter> bgzf(bgzf_open(fn.c_str(), "rb"));
+    const std::unique_ptr<BGZF, HtslibBgzfDeleter> bgzf(bgzf_open(fn.c_str(), "rb"));
     if (bgzf == nullptr) {
         std::ostringstream s;
         s << "[pbbam] bgzip utility ERROR: could not open file to determine compression level:\n"

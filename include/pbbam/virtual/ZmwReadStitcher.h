@@ -1,26 +1,19 @@
-// File Description
-/// \file ZmwReadStitcher.h
-/// \brief Defines the ZmwReadStitcher class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_ZMWREADSTITCHER_H
+#define PBBAM_ZMWREADSTITCHER_H
 
-#ifndef ZMWREADSTITCHER_H
-#define ZMWREADSTITCHER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "pbbam/BamRecord.h"
-#include "pbbam/virtual/VirtualZmwBamRecord.h"
+#include <pbbam/BamRecord.h>
+#include <pbbam/DataSet.h>
+#include <pbbam/PbiFilter.h>
+#include <pbbam/virtual/VirtualZmwBamRecord.h>
 
 namespace PacBio {
 namespace BAM {
-
-class DataSet;
-class PbiFilter;
 
 /// \brief The ZmwReadStitcher class provides an interface for re-stitching
 ///        "virtual" polymerase reads from their constituent parts.
@@ -86,4 +79,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // ZMWREADSTITCHER_H
+#endif  // PBBAM_ZMWREADSTITCHER_H

@@ -1,13 +1,7 @@
-// File Description
-/// \file PulseBehavior.h
-/// \brief Defines the PulseBehavior enum.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_PULSEBEHAVIOR_H
+#define PBBAM_PULSEBEHAVIOR_H
 
-#ifndef PULSEBEHAVIOR_H
-#define PULSEBEHAVIOR_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 namespace PacBio {
 namespace BAM {
@@ -24,4 +18,4 @@ enum class PulseBehavior
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // PULSEBEHAVIOR_H
+#endif  // PBBAM_PULSEBEHAVIOR_H

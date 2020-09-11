@@ -1,13 +1,7 @@
-// File Description
-/// \file PulseExclusionReason.h
-/// \brief Defines the PulseExclusionReason enum.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_PULSE_EXCLUSION_REASON_H
+#define PBBAM_PULSE_EXCLUSION_REASON_H
 
-#ifndef PULSE_EXCLUSION_REASON_H
-#define PULSE_EXCLUSION_REASON_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstdint>
 
@@ -27,4 +21,4 @@ enum class PulseExclusionReason : uint8_t
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // PULSE_EXCLUSION_REASON_H
+#endif  // PBBAM_PULSE_EXCLUSION_REASON_H

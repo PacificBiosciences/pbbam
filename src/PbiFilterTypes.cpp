@@ -1,12 +1,6 @@
-// File Description
-/// \file PbiFilterTypes.cpp
-/// \brief Implements the built-in PBI filters.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/PbiFilterTypes.h"
+#include <pbbam/PbiFilterTypes.h>
 
 #include <cassert>
 #include <cstddef>
@@ -17,7 +11,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 namespace PacBio {
 namespace BAM {

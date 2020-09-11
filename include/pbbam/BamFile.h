@@ -1,19 +1,14 @@
-// File Description
-/// \file BamFile.h
-/// \brief Defines the BamFile class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_BAMFILE_H
+#define PBBAM_BAMFILE_H
 
-#ifndef BAMFILE_H
-#define BAMFILE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstdint>
 
+#include <memory>
 #include <string>
 
-#include "pbbam/BamHeader.h"
+#include <pbbam/BamHeader.h>
 
 namespace PacBio {
 namespace BAM {
@@ -169,4 +164,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BAMFILE_H
+#endif  // PBBAM_BAMFILE_H

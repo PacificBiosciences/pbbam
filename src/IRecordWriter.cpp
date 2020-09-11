@@ -1,12 +1,6 @@
-// File Description
-/// \file IRecordWriter.cpp
-/// \brief Implements the IRecordWriter class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/IRecordWriter.h"
+#include <pbbam/IRecordWriter.h>
 
 namespace PacBio {
 namespace BAM {

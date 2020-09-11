@@ -1,13 +1,7 @@
-// File Description
-/// \file ReadGroupInfo.h
-/// \brief Defines the ReadGroupInfo class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_READGROUPINFO_H
+#define PBBAM_READGROUPINFO_H
 
-#ifndef READGROUPINFO_H
-#define READGROUPINFO_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -21,7 +15,7 @@
 #include <pbcopper/data/FrameCodec.h>
 #include <pbcopper/data/FrameEncoders.h>
 
-#include "pbbam/exception/InvalidSequencingChemistryException.h"
+#include <pbbam/exception/InvalidSequencingChemistryException.h>
 
 namespace PacBio {
 namespace BAM {
@@ -57,7 +51,7 @@ enum class BaseFeature
     PULSE_EXCLUSION
 };
 
-using FrameCodec PBBAM_DEPRECATED = PacBio::Data::FrameCodec;
+using FrameCodec PBBAM_DEPRECATED = Data::FrameCodec;
 
 /// \brief This enum describes the experimental design of the barcodes within a
 ///        read group's records.
@@ -397,7 +391,7 @@ public:
     std::string Id() const;
 
     /// \returns codec type in use for IPD
-    FrameCodec IpdCodec() const;
+    Data::FrameCodec IpdCodec() const;
 
     /// \returns codec implementation in use for IPD
     Data::FrameEncoder IpdFrameEncoder() const;
@@ -424,7 +418,7 @@ public:
     std::string Programs() const;
 
     /// \returns codec type in use for PulseWidth
-    FrameCodec PulseWidthCodec() const;
+    Data::FrameCodec PulseWidthCodec() const;
 
     /// \returns codec implementation in use for PulseWidth
     Data::FrameEncoder PulseWidthFrameEncoder() const;
@@ -573,7 +567,7 @@ public:
     /// \param[in] tag      IPD tag
     /// \returns reference to this object
     ///
-    ReadGroupInfo& IpdCodec(FrameCodec codec, std::string tag = std::string());
+    ReadGroupInfo& IpdCodec(Data::FrameCodec codec, std::string tag = std::string());
 
     /// \brief Sets the codec implementation used for IPD
     ///
@@ -631,7 +625,7 @@ public:
     /// \param[in] tag      pulse width tag
     /// \returns reference to this object
     ///
-    ReadGroupInfo& PulseWidthCodec(FrameCodec codec, std::string tag = std::string());
+    ReadGroupInfo& PulseWidthCodec(Data::FrameCodec codec, std::string tag = std::string());
 
     /// \brief Sets the codec implementation to use for PulseWidth
     ///
@@ -699,8 +693,8 @@ private:
     mutable std::string sequencingChemistry_;
     std::string frameRateHz_;
     bool control_ = false;
-    FrameCodec ipdCodec_ = FrameCodec::V1;
-    FrameCodec pulseWidthCodec_ = FrameCodec::V1;
+    Data::FrameCodec ipdCodec_ = Data::FrameCodec::V1;
+    Data::FrameCodec pulseWidthCodec_ = Data::FrameCodec::V1;
     bool hasBarcodeData_ = false;
     std::string barcodeFile_;
     std::string barcodeHash_;
@@ -765,4 +759,4 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // READGROUPINFO_H
+#endif  // PBBAM_READGROUPINFO_H

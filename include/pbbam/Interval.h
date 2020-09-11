@@ -1,13 +1,7 @@
-// File Description
-/// \file Interval.h
-/// \brief Defines the Interval class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_INTERVAL_H
+#define PBBAM_INTERVAL_H
 
-#ifndef INTERVAL_H
-#define INTERVAL_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <pbcopper/data/Interval.h>
 
@@ -19,4 +13,4 @@ using Interval PBBAM_DEPRECATED = Data::Interval;
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // GENOMICINTERVAL_H
+#endif  // PBBAM_INTERVAL_H

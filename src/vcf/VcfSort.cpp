@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "../PbbamInternalConfig.h"
 
 #include <pbbam/vcf/VcfSort.h>
@@ -24,8 +22,8 @@ void SortFile(const VcfFile& file, const std::string& outputFilename)
     std::unordered_map<std::string, size_t> contigLookup;
     const auto& contigDefs = header.ContigDefinitions();
     for (size_t i = 0; i < contigDefs.size(); ++i) {
-        const auto& contigId = contigDefs.at(i).Id();
-        contigLookup.insert(std::make_pair(contigId, i));
+        auto contigId = contigDefs.at(i).Id();
+        contigLookup.emplace(contigId, i);
     }
 
     // read & sort variants

@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "PbiIndexIO.h"
@@ -16,11 +14,11 @@
 #include <pbcopper/utility/MoveAppend.h>
 #include <boost/algorithm/string.hpp>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/Deleters.h"
-#include "pbbam/EntireFileQuery.h"
-#include "pbbam/PbiBuilder.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/Deleters.h>
+#include <pbbam/EntireFileQuery.h>
+#include <pbbam/PbiBuilder.h>
 
 #include "ErrnoReason.h"
 

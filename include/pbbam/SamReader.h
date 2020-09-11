@@ -1,16 +1,14 @@
-// Author: Derek Barnett
-
 #ifndef PBBAM_SAMREADER_H
 #define PBBAM_SAMREADER_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
 
-#include "pbbam/BamHeader.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/internal/QueryBase.h"
+#include <pbbam/BamHeader.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace BAM {

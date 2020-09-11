@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "FileUtils.h"
@@ -16,7 +14,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 namespace PacBio {
 namespace BAM {

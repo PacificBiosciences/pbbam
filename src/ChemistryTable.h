@@ -1,9 +1,7 @@
-// Author: Lance Hepler
+#ifndef PBBAM_CHEMISTRYTABLE_H
+#define PBBAM_CHEMISTRYTABLE_H
 
-#ifndef CHEMISTRYTABLE_H
-#define CHEMISTRYTABLE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <array>
 #include <string>
@@ -21,4 +19,4 @@ const ChemistryTable& GetChemistryTableFromEnv();
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // CHEMISTRYTABLE_H
+#endif  // PBBAM_CHEMISTRYTABLE_H

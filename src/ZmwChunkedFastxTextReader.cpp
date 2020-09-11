@@ -1,9 +1,3 @@
-// File Description
-/// \file ZmwChunkedFastxTextReader.cpp
-/// \brief Implements the ZmwChunkedFastxTextReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "ZmwChunkedFastxTextReader.h"

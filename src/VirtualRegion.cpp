@@ -1,17 +1,11 @@
-// File Description
-/// \file VirtualRegionTypeMap.cpp
-/// \brief Implements the VirtualRegionTypeMap class.
-//
-// Author: Armin Töpfer
-
 #include "PbbamInternalConfig.h"
+
+#include <pbbam/virtual/VirtualRegion.h>
 
 #include <cassert>
 
 #include <tuple>
 #include <type_traits>
-
-#include "pbbam/virtual/VirtualRegion.h"
 
 namespace PacBio {
 namespace BAM {
@@ -33,7 +27,7 @@ VirtualRegion::VirtualRegion(const VirtualRegionType type_, const int beginPos_,
 }
 
 VirtualRegion::VirtualRegion(const VirtualRegionType type_, const int beginPos_, const int endPos_,
-                             const LocalContextFlags cxTag_, const int barcodeLeft_,
+                             const Data::LocalContextFlags cxTag_, const int barcodeLeft_,
                              const int barcodeRight_, const int score_)
     : type{type_}
     , beginPos{beginPos_}

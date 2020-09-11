@@ -1,9 +1,7 @@
-// Author: Derek Barnett
-
 #ifndef PBBAM_VCF_VCFFILE_H
 #define PBBAM_VCF_VCFFILE_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 

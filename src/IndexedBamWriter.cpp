@@ -1,12 +1,6 @@
-/// File Description
-/// \file IndexedBamWriter.cpp
-/// \brief Implements the IndexedBamWriter class
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/IndexedBamWriter.h"
+#include <pbbam/IndexedBamWriter.h>
 
 #include <sys/stat.h>
 
@@ -29,14 +23,14 @@
 #include <pbcopper/utility/Deleters.h>
 #include <boost/numeric/conversion/cast.hpp>
 
-#include "pbbam/BamHeader.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/BamRecordImpl.h"
-#include "pbbam/BamWriter.h"
-#include "pbbam/Deleters.h"
-#include "pbbam/PbiRawData.h"
-#include "pbbam/RecordType.h"
-#include "pbbam/Validator.h"
+#include <pbbam/BamHeader.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/BamRecordImpl.h>
+#include <pbbam/BamWriter.h>
+#include <pbbam/Deleters.h>
+#include <pbbam/PbiRawData.h>
+#include <pbbam/RecordType.h>
+#include <pbbam/Validator.h>
 
 #include "ErrnoReason.h"
 #include "FileProducer.h"
@@ -323,7 +317,7 @@ public:
         const float readAccuracy =
             (b.HasReadAccuracy() ? boost::numeric_cast<float>(b.ReadAccuracy()) : 0.0F);
         const uint8_t ctxt = (b.HasLocalContextFlags() ? b.LocalContextFlags()
-                                                       : LocalContextFlags::NO_LOCAL_CONTEXT);
+                                                       : Data::LocalContextFlags::NO_LOCAL_CONTEXT);
 
         // store
         rgIdField_.Add(rgId);
@@ -344,7 +338,7 @@ public:
         const auto aStart = static_cast<uint32_t>(b.AlignedStart());
         const auto aEnd = static_cast<uint32_t>(b.AlignedEnd());
         const auto isReverseStrand = [&b]() -> uint8_t {
-            return (b.AlignedStrand() == Strand::REVERSE ? 1 : 0);
+            return (b.AlignedStrand() == Data::Strand::REVERSE ? 1 : 0);
         }();
 
         // alignment quality

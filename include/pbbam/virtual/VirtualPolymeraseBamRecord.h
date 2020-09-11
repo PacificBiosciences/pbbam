@@ -1,15 +1,9 @@
-// File Description
-/// \file VirtualPolymeraseBamRecord.h
-/// \brief Defines the VirtualPolymeraseBamRecord class.
-//
-// Author: Armin Töpfer
+#ifndef PBBAM_VIRTUALPOLYMERASEBAMRECORD_H
+#define PBBAM_VIRTUALPOLYMERASEBAMRECORD_H
 
-#ifndef VIRTUALPOLYMERASEBAMRECORD_H
-#define VIRTUALPOLYMERASEBAMRECORD_H
+#include <pbbam/Config.h>
 
-#include "pbbam/Config.h"
-
-#include "pbbam/virtual/VirtualZmwBamRecord.h"
+#include <pbbam/virtual/VirtualZmwBamRecord.h>
 
 namespace PacBio {
 namespace BAM {
@@ -20,4 +14,4 @@ using VirtualPolymeraseBamRecord = VirtualZmwBamRecord;
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // VIRTUALPOLYMERASEBAMRECORD_H
+#endif  // PBBAM_VIRTUALPOLYMERASEBAMRECORD_H

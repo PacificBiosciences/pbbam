@@ -1,18 +1,12 @@
-// File Description
-/// \file PbiFilterQuery.h
-/// \brief Defines the PbiFilterQuery class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_PBIFILTERQUERY_H
+#define PBBAM_PBIFILTERQUERY_H
 
-#ifndef PBIFILTERQUERY_H
-#define PBIFILTERQUERY_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <vector>
 
-#include "pbbam/PbiFilter.h"
-#include "pbbam/internal/QueryBase.h"
+#include <pbbam/PbiFilter.h>
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace BAM {
@@ -77,4 +71,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // PBIFILTERQUERY_H
+#endif  // PBBAM_PBIFILTERQUERY_H

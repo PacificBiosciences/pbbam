@@ -1,6 +1,4 @@
-// Author: Derek Barnett
-
-#include "pbbam/internal/QueryBase.h"
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace BAM {

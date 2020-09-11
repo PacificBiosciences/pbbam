@@ -1,13 +1,7 @@
-// File Description
-/// \file FaiIndex.h
-/// \brief Defines the FaiIndex class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_FAIINDEX_H
+#define PBBAM_FAIINDEX_H
 
-#ifndef FAIINDEX_H
-#define FAIINDEX_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstdint>
 
@@ -105,4 +99,4 @@ std::ostream& operator<<(std::ostream& out, const FaiEntry& entry);
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FAIINDEX_H
+#endif  // PBBAM_FAIINDEX_H

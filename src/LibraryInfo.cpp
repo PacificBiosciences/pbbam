@@ -1,10 +1,11 @@
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/LibraryInfo.h"
+#include <pbbam/LibraryInfo.h>
 
 #include <htslib/hts.h>
-#include <pbcopper/LibraryInfo.h>
 #include <zlib.h>
+
+#include <pbcopper/LibraryInfo.h>
 
 #include "LibraryGitHash.h"
 #include "LibraryVersion.h"

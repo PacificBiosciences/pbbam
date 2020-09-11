@@ -1,12 +1,6 @@
-// File Description
-/// \file Validator.cpp
-/// \brief Implements the Validator class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/Validator.h"
+#include <pbbam/Validator.h>
 
 #include <cstddef>
 
@@ -18,11 +12,11 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/core/ignore_unused.hpp>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/BamHeader.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/EntireFileQuery.h"
-#include "pbbam/ReadGroupInfo.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/BamHeader.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/EntireFileQuery.h>
+#include <pbbam/ReadGroupInfo.h>
 
 #include "ValidationErrors.h"
 #include "Version.h"

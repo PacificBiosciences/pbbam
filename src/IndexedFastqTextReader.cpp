@@ -1,9 +1,3 @@
-// File Description
-/// \file IndexedFastqTextReader.cpp
-/// \brief Implements the IndexedFastqTextReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "IndexedFastqTextReader.h"

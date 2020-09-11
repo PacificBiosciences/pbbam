@@ -1,23 +1,15 @@
-// File Description
-/// \file IFastqWriter.h
-/// \brief Defines the IFastqWriter interface.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_IFASTQWRITER_H
+#define PBBAM_IFASTQWRITER_H
 
-#ifndef IFASTQWRITER_H
-#define IFASTQWRITER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 
-#include "pbbam/IRecordWriter.h"
-#include "pbbam/QualityValues.h"
+#include <pbbam/FastqSequence.h>
+#include <pbbam/IRecordWriter.h>
 
 namespace PacBio {
 namespace BAM {
-
-class FastqSequence;
 
 class IFastqWriter : public IRecordWriter
 {
@@ -29,7 +21,7 @@ public:
 
     virtual void Write(const FastqSequence& fastq) = 0;
     virtual void Write(const std::string& name, const std::string& bases,
-                       const QualityValues& quals) = 0;
+                       const Data::QualityValues& quals) = 0;
     virtual void Write(const std::string& name, const std::string& bases,
                        const std::string& quals) = 0;
 
@@ -40,4 +32,4 @@ protected:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // IFASTQWRITER_H
+#endif  // PBBAM_IFASTQWRITER_H

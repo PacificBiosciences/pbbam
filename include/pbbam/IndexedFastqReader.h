@@ -1,13 +1,7 @@
-// File Description
-/// \file IndexedFastqReader.h
-/// \brief Defines the IndexedFastqReader class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_INDEXEDFASTQREADER_H
+#define PBBAM_INDEXEDFASTQREADER_H
 
-#ifndef INDEXEDFASTQREADER_H
-#define INDEXEDFASTQREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstddef>
 
@@ -17,22 +11,18 @@
 #include <utility>
 #include <vector>
 
-#include "pbbam/FastqReader.h"
-#include "pbbam/Orientation.h"
-#include "pbbam/Position.h"
-#include "pbbam/QualityValues.h"
+#include <pbcopper/data/GenomicInterval.h>
 
-#include "internal/QueryBase.h"
+#include <pbbam/BamRecord.h>
+#include <pbbam/FastqReader.h>
+#include <pbbam/Orientation.h>
+#include <pbbam/Position.h>
+#include <pbbam/QualityValues.h>
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
-namespace Data {
-
-class GenomicInterval;
-}
-
 namespace BAM {
 
-class BamRecord;
 class IndexedFastqReaderImpl;
 
 /// \brief The IndexedFastaReader class provides random-access to FASTQ file
@@ -69,8 +59,9 @@ public:
     ///
     /// \throws std::runtime_error on failure to fetch data
     ///
-    std::pair<std::string, QualityValues> Subsequence(const std::string& id, Position start,
-                                                      Position end);
+    std::pair<std::string, Data::QualityValues> Subsequence(const std::string& id,
+                                                            Data::Position start,
+                                                            Data::Position end);
 
     /// \brief Fetches sequence & qualities for desired interval.
     ///
@@ -80,7 +71,7 @@ public:
     ///
     /// \throws std::runtime_error on failure to fetch data
     ///
-    std::pair<std::string, QualityValues> Subsequence(const Data::GenomicInterval& interval);
+    std::pair<std::string, Data::QualityValues> Subsequence(const Data::GenomicInterval& interval);
 
     /// \brief Fetches sequence & qualities sequence corresponding to a BamRecord, oriented and
     ///        gapped as requested.
@@ -101,9 +92,10 @@ public:
     ///
     /// \throws std::runtime_error on failure to fetch data
     ///
-    std::pair<std::string, QualityValues> ReferenceSubsequence(
-        const BamRecord& bamRecord, const Orientation orientation = Orientation::GENOMIC,
-        const bool gapped = false, const bool exciseSoftClips = false);
+    std::pair<std::string, Data::QualityValues> ReferenceSubsequence(
+        const BamRecord& bamRecord,
+        const Data::Orientation orientation = Data::Orientation::GENOMIC, const bool gapped = false,
+        const bool exciseSoftClips = false);
 
     /// \}
 
@@ -138,4 +130,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // INDEXEDFASTQREADER_H
+#endif  // PBBAM_INDEXEDFASTQREADER_H

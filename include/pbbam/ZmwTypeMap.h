@@ -1,17 +1,11 @@
-// File Description
-/// \file ZmwTypeMap.h
-/// \brief Defines the ZmwTypeMap class.
-//
-// Author: Armin Töpfer
+#ifndef PBBAM_ZMWTYPEMAP_H
+#define PBBAM_ZMWTYPEMAP_H
 
-#ifndef ZMWTYPEMAP_H
-#define ZMWTYPEMAP_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <map>
 
-#include "pbbam/ZmwType.h"
+#include <pbbam/ZmwType.h>
 
 namespace PacBio {
 namespace BAM {
@@ -28,4 +22,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // ZMWTYPEMAP_H
+#endif  // PBBAM_ZMWTYPEMAP_H

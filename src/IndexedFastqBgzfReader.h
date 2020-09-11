@@ -1,13 +1,7 @@
-// File Description
-/// \file IndexedFastqBgzfReader.h
-/// \brief Defines the IndexedFastqBgzfReader class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_INDEXEDFASTQBGZFREADER_H
+#define PBBAM_INDEXEDFASTQBGZFREADER_H
 
-#ifndef INDEXEDFASTQBGZFREADER_H
-#define INDEXEDFASTQBGZFREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include "IndexedFastqReaderImpl.h"
 
@@ -17,7 +11,7 @@
 #include <pbcopper/data/Position.h>
 #include <pbcopper/data/QualityValues.h>
 
-#include "pbbam/Deleters.h"
+#include <pbbam/Deleters.h>
 
 namespace PacBio {
 namespace BAM {
@@ -52,4 +46,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // INDEXEDFASTQBGZFREADER_H
+#endif  // PBBAM_INDEXEDFASTQBGZFREADER_H

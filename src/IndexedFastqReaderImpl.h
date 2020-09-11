@@ -1,13 +1,7 @@
-// File Description
-/// \file IndexedFastqReaderImpl.h
-/// \brief Defines the IndexedFastqReaderImpl class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_INDEXEDFASTQREADERIMPL_H
+#define PBBAM_INDEXEDFASTQREADERIMPL_H
 
-#ifndef INDEXEDFASTQREADERIMPL_H
-#define INDEXEDFASTQREADERIMPL_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 #include <utility>
@@ -15,7 +9,7 @@
 #include <pbcopper/data/Position.h>
 #include <pbcopper/data/QualityValues.h>
 
-#include "pbbam/FaiIndex.h"
+#include <pbbam/FaiIndex.h>
 
 namespace PacBio {
 namespace BAM {
@@ -40,4 +34,4 @@ protected:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // INDEXEDFASTQREADERIMPL_H
+#endif  // PBBAM_INDEXEDFASTQREADERIMPL_H

@@ -1,13 +1,7 @@
-// File Description
-/// \file ZmwChunkedFastxTextReader.h
-/// \brief Defines the ZmwChunkedFastxTextReader class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_ZMWCHUNKEDFASTXTEXTREADER_H
+#define PBBAM_ZMWCHUNKEDFASTXTEXTREADER_H
 
-#ifndef ZMWCHUNKEDFASTXTEXTREADER_H
-#define ZMWCHUNKEDFASTXTEXTREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include "ZmwChunkedFastxReaderImpl.h"
 
@@ -56,4 +50,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // ZMWCHUNKEDFASTXTEXTREADER_H
+#endif  // PBBAM_ZMWCHUNKEDFASTXTEXTREADER_H

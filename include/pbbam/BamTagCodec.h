@@ -1,19 +1,13 @@
-// File Description
-/// \file BamTagCodec.h
-/// \brief Defines the BamTagCodec class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_BAMTAGCODEC_H
+#define PBBAM_BAMTAGCODEC_H
 
-#ifndef BAMTAGCODEC_H
-#define BAMTAGCODEC_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstdint>
 
 #include <vector>
 
-#include "pbbam/TagCollection.h"
+#include <pbbam/TagCollection.h>
 
 namespace PacBio {
 namespace BAM {
@@ -42,7 +36,7 @@ public:
     /// \param[in] tags     TagCollection containing tag data
     /// \returns vector of bytes (encoded BAM data)
     ///
-    static std::vector<uint8_t> Encode(const PacBio::BAM::TagCollection& tags);
+    static std::vector<uint8_t> Encode(const TagCollection& tags);
 
     /// \}
 
@@ -58,7 +52,7 @@ public:
     ///
     /// \returns the SAM/BAM single char code for tag type
     ///
-    static uint8_t TagTypeCode(const PacBio::BAM::Tag& tag,
+    static uint8_t TagTypeCode(const Tag& tag,
                                const TagModifier& additionalModifier = TagModifier::NONE);
 
     /// \brief Encodes a single Tag's contents in %BAM binary
@@ -73,7 +67,7 @@ public:
     /// \returns vector of bytes (encoded BAM data)
     ///
     static std::vector<uint8_t> ToRawData(
-        const PacBio::BAM::Tag& tag, const TagModifier& additionalModifier = TagModifier::NONE);
+        const Tag& tag, const TagModifier& additionalModifier = TagModifier::NONE);
 
     /// \brief Creates a Tag object from binary BAM data.
     ///
@@ -82,7 +76,7 @@ public:
     ///
     /// \returns resulting Tag object
     ///
-    static PacBio::BAM::Tag FromRawData(uint8_t* rawData);
+    static Tag FromRawData(uint8_t* rawData);
 
     /// \}
 };
@@ -90,4 +84,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BAMTAGCODEC_H
+#endif  // PBBAM_BAMTAGCODEC_H
