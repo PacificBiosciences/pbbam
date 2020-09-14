@@ -128,30 +128,30 @@ struct SortUniqueTestFilter2
     }
 };
 
-static 
+static
 PbiFilter emptyFilter()
 { return PbiFilter{ }; }
 
-static 
+static
 PbiFilter simpleFilter()
 { return PbiFilter{ SimpleFilter{ } }; }
 
 } // namespace PbiFilterTests
 
-TEST(PbiFilterTest, DefaultCtorOk)
+TEST(BAM_PbiFilter, default_filter_accepts_all)
 {
     const PbiFilter filter;
     PbiFilterTests::checkFilterInternals(filter, PbiFilter::INTERSECT, 0, std::vector<size_t>{0,1,2,3});
 }
 
-TEST(PbiFilterTest, CompositionOk)
+TEST(BAM_PbiFilter, can_compose_with_child_filters)
 {
     PbiFilter filter;
     filter.Add(PbiFilter{ });
     PbiFilterTests::checkFilterInternals(filter, PbiFilter::INTERSECT, 1, std::vector<size_t>{0,1,2,3});
 }
 
-TEST(PbiFilterTest, CustomFilterOk)
+TEST(BAM_PbiFilter, can_add_user_defined_filter_types)
 {
     { // ctor
         PbiFilter filter{ PbiFilterTests::SimpleFilter{ } };
@@ -167,7 +167,7 @@ TEST(PbiFilterTest, CustomFilterOk)
 //    PbiFilter shouldNotCompileEither; shouldNotCompileEither.Add(PbiFilterTests::NoncompliantFilter{ });   // <-- when uncommented, should not compile
 }
 
-TEST(PbiFilterTest, CopyOk)
+TEST(BAM_PbiFilter, copied_filters_are_equivalent)
 {
     { // empty
         const PbiFilter original;
@@ -193,7 +193,7 @@ TEST(PbiFilterTest, CopyOk)
     }
 }
 
-TEST(PbiFilterTest, MoveOk)
+TEST(BAM_PbiFilter, moved_filters_are_equivalent)
 {
     { // empty
         const PbiFilter original;
@@ -219,7 +219,7 @@ TEST(PbiFilterTest, MoveOk)
     }
 }
 
-TEST(PbiFilterTest, SortsAndUniquesChildFilterResultsOk)
+TEST(BAM_PbiFilter, SortsAndUniquesChildFilterResultsOk)
 {
     const auto childFilter = PbiFilterTests::SortUniqueTestFilter{ };
     const auto filter = PbiFilter{ childFilter };
@@ -227,7 +227,7 @@ TEST(PbiFilterTest, SortsAndUniquesChildFilterResultsOk)
     PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0, 1, 2, 3, 4, 7, 8});
 }
 
-TEST(PbiFilterTest, UnionOk)
+TEST(BAM_PbiFilter, can_filter_union_of_child_filters)
 {
     { // empty
         { // copy
@@ -267,7 +267,7 @@ TEST(PbiFilterTest, UnionOk)
     }
 }
 
-TEST(PbiFilterTest, IntersectOk)
+TEST(BAM_PbiFilter, can_filter_intersection_of_child_filters)
 {
     { // empty
         { // copy
@@ -307,7 +307,7 @@ TEST(PbiFilterTest, IntersectOk)
     }
 }
 
-TEST(PbiFilterTest, AlignedEndFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_aligned_end)
 {
     {
         const auto filter = PbiFilter{ PbiAlignedEndFilter{ 4055 } };
@@ -336,7 +336,7 @@ TEST(PbiFilterTest, AlignedEndFilterOk)
     }
 }
 
-TEST(PbiFilterTest, AlignedLengthFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_aligned_length)
 {
     {
         const auto filter = PbiFilter{ PbiAlignedLengthFilter{ 500, Compare::GREATER_THAN_EQUAL } };
@@ -348,7 +348,7 @@ TEST(PbiFilterTest, AlignedLengthFilterOk)
     }
 }
 
-TEST(PbiFilterTest, AlignedStartFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_aligned_start)
 {
     {
         const auto filter = PbiFilter{ PbiAlignedStartFilter{ 2600, Compare::LESS_THAN } };
@@ -368,7 +368,7 @@ TEST(PbiFilterTest, AlignedStartFilterOk)
     }
 }
 
-TEST(PbiFilterTest, AlignedStrandFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_aligned_strand)
 {
     {
         const auto filter = PbiFilter{ PbiAlignedStrandFilter{ Strand::FORWARD } };
@@ -390,7 +390,7 @@ TEST(PbiFilterTest, AlignedStrandFilterOk)
     EXPECT_THROW(PbiAlignedStrandFilter(Strand::FORWARD, Compare::GREATER_THAN_EQUAL), std::runtime_error);
 }
 
-TEST(PbiFilterTest, BarcodeFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_single_barcode)
 {
     {
         const auto filter = PbiFilter{ PbiBarcodeFilter{ 17 } };
@@ -406,7 +406,7 @@ TEST(PbiFilterTest, BarcodeFilterOk)
     }
 }
 
-TEST(PbiFilterTest, BarcodeForwardFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_barcode_forward)
 {
     {
         const auto filter = PbiFilter{ PbiBarcodeForwardFilter{ 17 } };
@@ -427,7 +427,7 @@ TEST(PbiFilterTest, BarcodeForwardFilterOk)
     }
 }
 
-TEST(PbiFilterTest, BarcodeQualityFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_barcode_quality)
 {
     {
         const auto filter = PbiFilter{ PbiBarcodeQualityFilter{ 80, Compare::GREATER_THAN_EQUAL } };
@@ -439,7 +439,7 @@ TEST(PbiFilterTest, BarcodeQualityFilterOk)
     }
 }
 
-TEST(PbiFilterTest, BarcodeReverseFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_barcode_reverse)
 {
     {
         const auto filter = PbiFilter{ PbiBarcodeReverseFilter{ 18 } };
@@ -460,7 +460,7 @@ TEST(PbiFilterTest, BarcodeReverseFilterOk)
     }
 }
 
-TEST(PbiFilterTest, BarcodesFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_barcode_pair)
 {
     {
         const auto filter = PbiFilter{ PbiBarcodesFilter{ 17, 18 } };
@@ -476,7 +476,7 @@ TEST(PbiFilterTest, BarcodesFilterOk)
     }
 }
 
-TEST(PbiFilterTest, IdentityFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_identity)
 {
     {
         const auto filter = PbiFilter{ PbiIdentityFilter{ 0.95, Compare::GREATER_THAN_EQUAL } };
@@ -484,7 +484,7 @@ TEST(PbiFilterTest, IdentityFilterOk)
     }
 }
 
-TEST(PbiFilterTest, LocalContextFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_local_context_flags)
 {
     { // == NO_LOCAL_CONTEXT
         const auto filter = PbiFilter { PbiLocalContextFilter{ LocalContextFlags::NO_LOCAL_CONTEXT } };
@@ -540,7 +540,7 @@ TEST(PbiFilterTest, LocalContextFilterOk)
     }
 }
 
-TEST(PbiFilterTest, MapQualityFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_map_quality)
 {
     {
         const auto filter = PbiFilter{ PbiMapQualityFilter{ 254 } };
@@ -552,7 +552,7 @@ TEST(PbiFilterTest, MapQualityFilterOk)
     }
 }
 
-TEST(PbiFilterTest, MovieNameFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_movie_name)
 {
     const auto bamFile = BamFile{ PbbamTestsConfig::Data_Dir + std::string{ "/group/test2.bam" } };
     const auto index = PbiRawData{ bamFile.PacBioIndexFilename() };
@@ -587,7 +587,7 @@ TEST(PbiFilterTest, MovieNameFilterOk)
     }
 }
 
-TEST(PbiFilterTest, NumDeletedBasesFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_num_deleted_bases)
 {
     // del: { 12, 38, 45, 11} - calculated from raw data, not stored directly in testing object or read from PBI file
 
@@ -601,7 +601,7 @@ TEST(PbiFilterTest, NumDeletedBasesFilterOk)
     }
 }
 
-TEST(PbiFilterTest, NumInsertedBasesFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_num_inserted_bases)
 {
     // ins: { 17, 63, 65, 20 }  - calculated from raw data, not stored directly testing object or read from PBI file
 
@@ -615,7 +615,7 @@ TEST(PbiFilterTest, NumInsertedBasesFilterOk)
     }
 }
 
-TEST(PbiFilterTest, NumMatchesFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_num_matches)
 {
     {
         const auto filter = PbiFilter{ PbiNumMatchesFilter{ 1000, Compare::GREATER_THAN_EQUAL } };
@@ -627,7 +627,7 @@ TEST(PbiFilterTest, NumMatchesFilterOk)
     }
 }
 
-TEST(PbiFilterTest, NumMismatchesFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_num_mismatches)
 {
     {
         const auto filter = PbiFilter{ PbiNumMismatchesFilter{ 0, Compare::EQUAL } };
@@ -639,7 +639,7 @@ TEST(PbiFilterTest, NumMismatchesFilterOk)
     }
 }
 
-TEST(PbiFilterTest, NumSubreadsFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_num_subreads)
 {
     PbiRawData index;
     index.NumReads(21);
@@ -682,7 +682,7 @@ TEST(PbiFilterTest, NumSubreadsFilterOk)
     }
 }
 
-TEST(PbiFilterTest, QueryEndFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_query_end)
 {
     {
         const auto filter = PbiFilter{ PbiQueryEndFilter{ 4055 } };
@@ -694,7 +694,7 @@ TEST(PbiFilterTest, QueryEndFilterOk)
     }
 }
 
-TEST(PbiFilterTest, QueryLengthFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_query_length)
 {
     {
         const auto filter = PbiFilter{ PbiQueryLengthFilter{ 500, Compare::GREATER_THAN_EQUAL } };
@@ -706,7 +706,7 @@ TEST(PbiFilterTest, QueryLengthFilterOk)
     }
 }
 
-TEST(PbiFilterTest, QueryNameFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_query_name)
 {
     {
         const auto filter = PbiFilter{ PbiQueryNameFilter{ "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2579_4055" } };
@@ -727,7 +727,10 @@ TEST(PbiFilterTest, QueryNameFilterOk)
         const auto filter = PbiFilter{ PbiQueryNameFilter{ names } };
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1,3});
     }
+}
 
+TEST(BAM_PbiFilter, throws_on_invalid_on_query_name)
+{
     // invalid QNAME syntax throws
     EXPECT_THROW(
     {
@@ -755,7 +758,7 @@ TEST(PbiFilterTest, QueryNameFilterOk)
     std::exception); // come back to see why this is not runtime_error but something else
 }
 
-TEST(PbiFilterTest, QueryStartFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_query_start)
 {
     {
         const auto filter = PbiFilter{ PbiQueryStartFilter{ 4101 } };
@@ -771,7 +774,7 @@ TEST(PbiFilterTest, QueryStartFilterOk)
     }
 }
 
-TEST(PbiFilterTest, ReadAccuracyFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_read_accuracy)
 {
     {
         const auto filter = PbiFilter{ PbiReadAccuracyFilter{ 0.9 } };
@@ -783,7 +786,7 @@ TEST(PbiFilterTest, ReadAccuracyFilterOk)
     }
 }
 
-TEST(PbiFilterTest, ReadGroupFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_read_group)
 {
     { // numeric ID
         const auto filter = PbiReadGroupFilter{ -1197849594 };
@@ -826,7 +829,7 @@ TEST(PbiFilterTest, ReadGroupFilterOk)
     }
 }
 
-TEST(PbiFilterTest, ReferenceEndFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_reference_end)
 {
     {
         const auto filter = PbiFilter{ PbiReferenceEndFilter{ 9900 } };
@@ -838,7 +841,7 @@ TEST(PbiFilterTest, ReferenceEndFilterOk)
     }
 }
 
-TEST(PbiFilterTest, ReferenceIdFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_reference_id)
 {
     {
         const auto filter = PbiFilter{ PbiReferenceIdFilter{ 0 } };
@@ -860,7 +863,7 @@ TEST(PbiFilterTest, ReferenceIdFilterOk)
     }
 }
 
-TEST(PbiFilterTest, ReferenceNameFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_reference_name)
 {
     const auto bamFile = BamFile{ PbbamTestsConfig::Data_Dir + std::string{ "/group/test2.bam" } };
     const auto index = PbiRawData{ bamFile.PacBioIndexFilename() };
@@ -893,7 +896,7 @@ TEST(PbiFilterTest, ReferenceNameFilterOk)
     EXPECT_THROW(PbiReferenceNameFilter("foo", Compare::GREATER_THAN_EQUAL), std::runtime_error);
 }
 
-TEST(PbiFilterTest, ReferenceStartFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_reference_start)
 {
     {
         const auto filter = PbiFilter{ PbiReferenceStartFilter{ 8453 } };
@@ -905,7 +908,7 @@ TEST(PbiFilterTest, ReferenceStartFilterOk)
     }
 }
 
-TEST(PbiFilterTest, ZmwFilterOk)
+TEST(BAM_PbiFilter, can_filter_on_zmw)
 {
     {
         const auto filter = PbiFilter{ PbiZmwFilter{ 14743 } };
@@ -929,7 +932,7 @@ TEST(PbiFilterTest, ZmwFilterOk)
     }
 }
 
-TEST(PbiFilterTest, FromDataSetOk)
+TEST(BAM_PbiFilter, can_load_from_dataset)
 {
     const auto expectedFilter =
         PbiFilter::Union(
@@ -971,7 +974,7 @@ TEST(PbiFilterTest, FromDataSetOk)
     }
 }
 
-TEST(PbiFilterTest, BarcodeListFromDataSetXmlOk)
+TEST(BAM_PbiFilter, can_load_from_dataset_with_barcode_list)
 {
     auto runner = [](const Property& property,
                      const PbiFilter& expectedFilter,
@@ -1039,7 +1042,7 @@ TEST(PbiFilterTest, BarcodeListFromDataSetXmlOk)
     expectFail(Property{ "bc", "[18,18,18]", "==" });
 }
 
-TEST(PbiFilterTest, LocalContextFiltersFromDataSetXmlOk)
+TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
 {
     {   // no adapters or barcodes
 

@@ -15,7 +15,7 @@ const std::string inputDir{PbbamTestsConfig::Data_Dir + "/test_GenomicIntervals/
 
 }  // namespace GenomicIntervalsTests
 
-TEST(DataSetGenomicIntervalsTest, NoFilter)
+TEST(BAM_DataSetGenomicIntervals, fetches_intervals_with_no_filter)
 {
     // vanilla AlignmentSet, no filters
     DataSet ds{GenomicIntervalsTests::inputDir + "no_filter.alignmentset.xml"};
@@ -26,7 +26,7 @@ TEST(DataSetGenomicIntervalsTest, NoFilter)
     EXPECT_EQ(correct, result);
 }
 
-TEST(DataSetGenomicIntervalsTest, Empty)
+TEST(BAM_DataSetGenomicIntervals, fetches_no_intervals_with_empty_input)
 {
     // interval contig1:[5, 5), i.e., empty, yet both offsets are within range
     DataSet ds{GenomicIntervalsTests::inputDir + "empty.alignmentset.xml"};
@@ -37,7 +37,7 @@ TEST(DataSetGenomicIntervalsTest, Empty)
     EXPECT_EQ(correct, result);
 }
 
-TEST(DataSetGenomicIntervalsTest, OutOfRange)
+TEST(BAM_DataSetGenomicIntervals, fetches_no_intervals_if_out_of_range)
 {
     // interval contig1:[1000, 10000), i.e., empty, as the selected range
     // lies above the contig1 size of 20
@@ -49,7 +49,7 @@ TEST(DataSetGenomicIntervalsTest, OutOfRange)
     EXPECT_EQ(correct, result);
 }
 
-TEST(DataSetGenomicIntervalsTest, SingleInterval)
+TEST(BAM_DataSetGenomicIntervals, can_fetch_single_normal_interval)
 {
     // interval contig1:[3, 10)
     DataSet ds{GenomicIntervalsTests::inputDir + "single_interval.alignmentset.xml"};
@@ -60,7 +60,7 @@ TEST(DataSetGenomicIntervalsTest, SingleInterval)
     EXPECT_EQ(correct, result);
 }
 
-TEST(DataSetGenomicIntervalsTest, WholeContig)
+TEST(BAM_DataSetGenomicIntervals, can_fetch_whole_contig_with_integers)
 {
     // interval contig1:[0, 20), i.e., select the whole contig
     DataSet ds{GenomicIntervalsTests::inputDir + "whole_contig.alignmentset.xml"};
@@ -71,7 +71,7 @@ TEST(DataSetGenomicIntervalsTest, WholeContig)
     EXPECT_EQ(correct, result);
 }
 
-TEST(DataSetGenomicIntervalsTest, ContigNameOnly)
+TEST(BAM_DataSetGenomicIntervals, can_fetch_whole_contig_with_name_only)
 {
     // interval contig1, i.e., select the whole contig, without a range filter
     DataSet ds{GenomicIntervalsTests::inputDir + "contig_name_only.alignmentset.xml"};
@@ -82,7 +82,7 @@ TEST(DataSetGenomicIntervalsTest, ContigNameOnly)
     EXPECT_EQ(correct, result);
 }
 
-TEST(DataSetGenomicIntervalsTest, SingleIntervalLessOrEqual)
+TEST(BAM_DataSetGenomicIntervals, can_fetch_single_interval_less_than_equal)
 {
     // interval contig1:[3, 11), test "tstart <=" relation
     DataSet ds{GenomicIntervalsTests::inputDir + "single_interval_start_lte.alignmentset.xml"};
@@ -93,7 +93,7 @@ TEST(DataSetGenomicIntervalsTest, SingleIntervalLessOrEqual)
     EXPECT_EQ(correct, result);
 }
 
-TEST(DataSetGenomicIntervalsTest, SingleIntervalGreaterOrEqual)
+TEST(BAM_DataSetGenomicIntervals, can_fetch_single_interval_greater_than_equal)
 {
     // interval contig1:[2, 10), test "tend >=" relation
     DataSet ds{GenomicIntervalsTests::inputDir + "single_interval_end_gte.alignmentset.xml"};
@@ -104,7 +104,7 @@ TEST(DataSetGenomicIntervalsTest, SingleIntervalGreaterOrEqual)
     EXPECT_EQ(correct, result);
 }
 
-TEST(DataSetGenomicIntervalsTest, DisjointIntervals)
+TEST(BAM_DataSetGenomicIntervals, can_fetch_disjoint_intervals)
 {
     // interval contig1:[3, 7),[13, 17), test that disjoint intervals remain disjoint
     DataSet ds{GenomicIntervalsTests::inputDir + "disjoint_intervals.alignmentset.xml"};
@@ -115,7 +115,7 @@ TEST(DataSetGenomicIntervalsTest, DisjointIntervals)
     EXPECT_EQ(correct, result);
 }
 
-TEST(DataSetGenomicIntervalsTest, AdjacentIntervals)
+TEST(BAM_DataSetGenomicIntervals, can_fetch_adjacent_intervals)
 {
     // interval contig1:[3, 17), test that intervals [3, 10) and [10, 17)
     // get merged into a single overall interval
@@ -127,7 +127,7 @@ TEST(DataSetGenomicIntervalsTest, AdjacentIntervals)
     EXPECT_EQ(correct, result);
 }
 
-TEST(DataSetGenomicIntervalsTest, TwoContigs)
+TEST(BAM_DataSetGenomicIntervals, can_fetch_across_multiple_contigs)
 {
     // interval contig1:[3, 11) and contig2:[2, 7), test intervals on
     // different contigs, also test "tstart <=" and "tend >="
@@ -140,7 +140,7 @@ TEST(DataSetGenomicIntervalsTest, TwoContigs)
 }
 
 // Test various invalid AlignmentSets
-TEST(DataSetGenomicIntervalsTest, InvalidMissingRname)
+TEST(BAM_DataSetGenomicIntervals, throws_on_missing_rname)
 {
     // missing "rname"
     DataSet ds{GenomicIntervalsTests::inputDir + "invalid_missing_rname.alignmentset.xml"};
@@ -148,7 +148,7 @@ TEST(DataSetGenomicIntervalsTest, InvalidMissingRname)
     EXPECT_THROW(ds.GenomicIntervals(), std::runtime_error);
 }
 
-TEST(DataSetGenomicIntervalsTest, InvalidRnameOperator)
+TEST(BAM_DataSetGenomicIntervals, throws_on_invalid_rname_operator)
 {
     // non-sensical "rname" operator ">"
     DataSet ds{GenomicIntervalsTests::inputDir + "invalid_rname_operator.alignmentset.xml"};
@@ -156,7 +156,7 @@ TEST(DataSetGenomicIntervalsTest, InvalidRnameOperator)
     EXPECT_THROW(ds.GenomicIntervals(), std::runtime_error);
 }
 
-TEST(DataSetGenomicIntervalsTest, InvalidTstartOperator)
+TEST(BAM_DataSetGenomicIntervals, throws_on_invalid_tstart_operator)
 {
     // non-sensical "tstart" operator "="
     DataSet ds{GenomicIntervalsTests::inputDir + "invalid_tstart_operator.alignmentset.xml"};

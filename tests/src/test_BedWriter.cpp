@@ -46,18 +46,18 @@ void CheckRoundTrip(const std::string& outFn, const HtslibCompression compressio
 
 }  // namespace BedWriterTests
 
-TEST(BedWriterTest, throws_on_empty_filename)
+TEST(BAM_BedWriter, throws_on_empty_filename)
 {
     EXPECT_THROW(BedWriter writer{""}, std::runtime_error);
 }
 
-TEST(BedWriterTest, can_write_plain_text)
+TEST(BAM_BedWriter, can_write_plain_text)
 {
     const std::string outFn = PacBio::BAM::PbbamTestsConfig::GeneratedData_Dir + "/out.bed";
     BedWriterTests::CheckRoundTrip(outFn, HtslibCompression::NONE);
 }
 
-TEST(BedWriterTest, can_write_gzipped_text)
+TEST(BAM_BedWriter, can_write_gzipped_text)
 {
     const std::string outFn = PacBio::BAM::PbbamTestsConfig::GeneratedData_Dir + "/out.bed.gz";
     BedWriterTests::CheckRoundTrip(outFn, HtslibCompression::GZIP);

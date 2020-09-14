@@ -17,7 +17,7 @@ using VcfFormat = PacBio::VCF::VcfFormat;
 using VcfQuery = PacBio::VCF::VcfQuery;
 using VcfWriter = PacBio::VCF::VcfWriter;
 
-TEST(VCF_Writer, correctly_copies_vcf_file)
+TEST(VCF_VcfWriter, correctly_copies_vcf_file)
 {
     const VcfFile initialFile{PacBio::BAM::PbbamTestsConfig::Data_Dir +
                               "/vcf/structural_variants.vcf"};

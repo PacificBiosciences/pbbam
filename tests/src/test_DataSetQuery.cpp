@@ -68,7 +68,7 @@ bool InGroup(const std::string& name, const std::vector<std::string>& group)
 
 }  // namespace DataSetQueryTests
 
-TEST(DataSetQueryTest, EntireFileQueryTest)
+TEST(BAM_DataSetQuery, entire_file_query_can_use_dataset_input)
 {
     // single file
     EXPECT_NO_THROW({
@@ -156,7 +156,7 @@ TEST(DataSetQueryTest, EntireFileQueryTest)
     });
 }
 
-TEST(DataSetQueryTest, GenomicIntervalQueryTest)
+TEST(BAM_DataSetQuery, genomic_interval_query_can_use_dataset_input)
 {
     const std::string rname{"lambda_NEB3011"};
 
@@ -295,7 +295,7 @@ TEST(DataSetQueryTest, GenomicIntervalQueryTest)
 }
 
 // clang-format off
-TEST(DataSetQueryTest, ZmwQueryTest)
+TEST(BAM_DataSetQuery, zmw_query_can_use_dataset_input)
 {
     const std::vector<int32_t> whitelist = {13473, 30983};
 
@@ -336,7 +336,7 @@ TEST(DataSetQueryTest, ZmwQueryTest)
 }
 // clang-format on
 
-TEST(DataSetQueryTest, ZmwGroupQueryTest)
+TEST(BAM_DataSetQuery, zmw_group_query_can_use_dataset_input)
 {
     const std::vector<int32_t> whitelist = {13473, 30983};
 

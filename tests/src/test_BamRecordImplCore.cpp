@@ -86,7 +86,7 @@ static void CheckRawData(const BamRecordImpl& bam)
 
 }  // namespace BamRecordImplCoreTests
 
-TEST(BamRecordImplCoreTestsTest, RawDataDefaultValues)
+TEST(BAM_BamRecordImplCore, initialized_with_correct_raw_htslib_values)
 {
     std::shared_ptr<bam1_t> rawData(bam_init1(), BamRecordImplCoreTests::Bam1Deleter());
     ASSERT_TRUE(static_cast<bool>(rawData));
@@ -110,7 +110,7 @@ TEST(BamRecordImplCoreTestsTest, RawDataDefaultValues)
     EXPECT_EQ(0, rawData->m_data);  // check this if we change or tune later
 }
 
-TEST(BamRecordImplCoreTestsTest, DefaultValues)
+TEST(BAM_BamRecordImplCore, initialized_with_correct_pbbam_values)
 {
     BamRecordImpl bam;
 
@@ -175,7 +175,7 @@ TEST(BamRecordImplCoreTestsTest, DefaultValues)
     BamRecordImplCoreTests::CheckRawData(bam);
 }
 
-TEST(BamRecordImplCoreTestsTest, CoreSetters)
+TEST(BAM_BamRecordImplCore, can_be_modified_with_general_setters)
 {
     BamRecordImpl bam;
     bam.Bin(42);
@@ -240,7 +240,7 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags.at("CA").ToUInt8Array());
 }
 
-TEST(BamRecordImplCoreTestsTest, CopyAssignment)
+TEST(BAM_BamRecordImplCore, can_be_copy_assigned)
 {
     BamRecordImpl bam1;
     bam1.Bin(42);
@@ -296,7 +296,7 @@ TEST(BamRecordImplCoreTestsTest, CopyAssignment)
     BamRecordImplCoreTests::CheckRawData(bam2);
 }
 
-TEST(BamRecordImplCoreTestsTest, SelfAssignmentTolerated)
+TEST(BAM_BamRecordImplCore, self_assignment_is_tolerated)
 {
     BamRecordImpl bam1;
     bam1.Bin(42);
@@ -333,7 +333,7 @@ TEST(BamRecordImplCoreTestsTest, SelfAssignmentTolerated)
     BamRecordImplCoreTests::CheckRawData(bam1);
 }
 
-TEST(BamRecordImplCoreTestsTest, CopyConstructor)
+TEST(BAM_BamRecordImplCore, can_be_copy_constructed)
 {
     BamRecordImpl bam1;
     bam1.Bin(42);
@@ -388,30 +388,7 @@ TEST(BamRecordImplCoreTestsTest, CopyConstructor)
     BamRecordImplCoreTests::CheckRawData(bam2);
 }
 
-TEST(BamRecordImplCoreTestsTest, CreateRecord_InternalTest)
-{
-    BamRecordImpl bam = BamRecordImplCoreTests::CreateBamImpl();
-
-    EXPECT_EQ(42, bam.Bin());
-    EXPECT_EQ(42, bam.Flag());
-    EXPECT_EQ(42, bam.InsertSize());
-    EXPECT_EQ(42, bam.MapQuality());
-    EXPECT_EQ(42, bam.MateReferenceId());
-    EXPECT_EQ(42, bam.MatePosition());
-    EXPECT_EQ(42, bam.Position());
-    EXPECT_EQ(42, bam.ReferenceId());
-
-    TagCollection tags;
-    tags["HX"] = std::string("1abc75");
-    tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
-    bam.Tags(tags);
-
-    BamRecordImplCoreTests::CheckRawData(bam);
-}
-
-TEST(BamRecordImplCoreTestsTest, MoveAssignment)
+TEST(BAM_BamRecordImplCore, can_be_move_assigned)
 {
     BamRecordImpl bam;
 #ifdef __clang__
@@ -441,7 +418,7 @@ TEST(BamRecordImplCoreTestsTest, MoveAssignment)
     BamRecordImplCoreTests::CheckRawData(bam);
 }
 
-TEST(BamRecordImplCoreTestsTest, MoveConstructor)
+TEST(BAM_BamRecordImplCore, can_be_move_constructed)
 {
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -470,7 +447,7 @@ TEST(BamRecordImplCoreTestsTest, MoveConstructor)
     BamRecordImplCoreTests::CheckRawData(bam);
 }
 
-TEST(BamRecordImplCoreTestsTest, AlignmentFlags)
+TEST(BAM_BamRecordImplCore, can_set_and_query_alignment_flags)
 {
     // same set of flags, different ways of getting there
 

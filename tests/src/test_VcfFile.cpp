@@ -35,7 +35,7 @@ const std::string VcfFn{PacBio::BAM::PbbamTestsConfig::Data_Dir + "/vcf/structur
 
 }  // namespace VcfFileTests
 
-TEST(VCF_File, initializes_header_from_input_file)
+TEST(VCF_VcfFile, initializes_header_from_input_file)
 {
     const VcfFile file{VcfFileTests::VcfFn};
     const auto hdrText = VcfFormat::FormattedHeader(file.Header());

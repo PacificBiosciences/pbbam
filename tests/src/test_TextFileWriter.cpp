@@ -40,19 +40,19 @@ void CheckRoundTrip(const std::string& outFn, const PacBio::BAM::HtslibCompressi
 
 }  // namespace TextFileWriterTests
 
-TEST(TextFileWriterTest, throws_on_empty_filename)
+TEST(BAM_TextFileWriter, throws_on_empty_filename)
 {
     EXPECT_THROW(TextFileWriter writer{""}, std::runtime_error);
 }
 
-TEST(TextFileWriterTest, can_write_plain_text)
+TEST(BAM_TextFileWriter, can_write_plain_text)
 {
     TextFileWriterTests::CheckRoundTrip(
         PacBio::BAM::PbbamTestsConfig::GeneratedData_Dir + "/out.txt",
         PacBio::BAM::HtslibCompression::NONE);
 }
 
-TEST(TextFileWriterTest, can_write_gzipped_text)
+TEST(BAM_TextFileWriter, can_write_gzipped_text)
 {
     TextFileWriterTests::CheckRoundTrip(
         PacBio::BAM::PbbamTestsConfig::GeneratedData_Dir + "/out.txt.gz",

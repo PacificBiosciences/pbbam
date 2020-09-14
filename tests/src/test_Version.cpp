@@ -16,7 +16,7 @@ Version MakeVersion(int x, int y, int z) { return Version{x, y, z}; }
 
 }  // namespace VersionTests
 
-TEST(VersionTest, DefaultOk)
+TEST(BAM_Version, default_all_zeros)
 {
     Version v;
     EXPECT_EQ(0, v.Major());
@@ -24,116 +24,40 @@ TEST(VersionTest, DefaultOk)
     EXPECT_EQ(0, v.Revision());
 }
 
-TEST(VersionTest, CopyAndMoveOk)
+TEST(BAM_Version, can_create_from_integers)
 {
-    {  // copy ctor
-        Version v1{3, 1, 1};
-        EXPECT_EQ(3, v1.Major());
-        EXPECT_EQ(1, v1.Minor());
-        EXPECT_EQ(1, v1.Revision());
-
-        Version v2{v1};
-        EXPECT_EQ(3, v2.Major());
-        EXPECT_EQ(1, v2.Minor());
-        EXPECT_EQ(1, v2.Revision());
-    }
-    {  // copy assign
-        Version v1{3, 1, 1};
-        EXPECT_EQ(3, v1.Major());
-        EXPECT_EQ(1, v1.Minor());
-        EXPECT_EQ(1, v1.Revision());
-
-        Version v2;
-        v2 = v1;
-        EXPECT_EQ(3, v2.Major());
-        EXPECT_EQ(1, v2.Minor());
-        EXPECT_EQ(1, v2.Revision());
-    }
-    {  // move ctor
-        Version v{VersionTests::MakeVersion(3, 1, 1)};
-        EXPECT_EQ(3, v.Major());
-        EXPECT_EQ(1, v.Minor());
-        EXPECT_EQ(1, v.Revision());
-    }
-    {  // move assign
-        Version v1{3, 1, 1};
-        EXPECT_EQ(3, v1.Major());
-        EXPECT_EQ(1, v1.Minor());
-        EXPECT_EQ(1, v1.Revision());
-
-        Version v2;
-        v2 = std::move(v1);
-        EXPECT_EQ(3, v2.Major());
-        EXPECT_EQ(1, v2.Minor());
-        EXPECT_EQ(1, v2.Revision());
-    }
+    Version v{3, 1, 1};
+    EXPECT_EQ(3, v.Major());
+    EXPECT_EQ(1, v.Minor());
+    EXPECT_EQ(1, v.Revision());
 }
 
-TEST(VersionTest, FromIntsOk)
+TEST(BAM_Version, throws_on_negative_integers)
 {
-    {  // normal
-        Version v{3, 1, 1};
-        EXPECT_EQ(3, v.Major());
-        EXPECT_EQ(1, v.Minor());
-        EXPECT_EQ(1, v.Revision());
-    }
-
-    // negatives
     EXPECT_THROW(Version(-3, 1, 1), std::runtime_error);
 }
 
-TEST(VersionTest, FromStringOk)
+TEST(BAM_Version, can_create_from_string)
 {
-    {  // normal
-        Version v{"3.1.1"};
-        EXPECT_EQ(3, v.Major());
-        EXPECT_EQ(1, v.Minor());
-        EXPECT_EQ(1, v.Revision());
-    }
-
-    // negatives
-    EXPECT_THROW(Version("-3.1.1"), std::runtime_error);
-
-    // non-numeric
-    EXPECT_THROW(Version("foo.bar.baz"), std::runtime_error);
-
-    // empty
-    EXPECT_THROW(Version(""), std::runtime_error);
-}
-
-TEST(VersionTest, SettersOk)
-{
-    Version v{3, 1, 1};
-
-    v.Major(4);
-
-    EXPECT_EQ(4, v.Major());
+    Version v{"3.1.1"};
+    EXPECT_EQ(3, v.Major());
     EXPECT_EQ(1, v.Minor());
     EXPECT_EQ(1, v.Revision());
-
-    v.Minor(7);
-
-    EXPECT_EQ(4, v.Major());
-    EXPECT_EQ(7, v.Minor());
-    EXPECT_EQ(1, v.Revision());
-
-    v.Revision(23);
-
-    EXPECT_EQ(4, v.Major());
-    EXPECT_EQ(7, v.Minor());
-    EXPECT_EQ(23, v.Revision());
-
-    {  // invalid
-        Version v1{3, 1, 1};
-        Version v2{3, 1, 1};
-        Version v3{3, 1, 1};
-        EXPECT_THROW(v1.Major(-1), std::runtime_error);
-        EXPECT_THROW(v2.Minor(-1), std::runtime_error);
-        EXPECT_THROW(v3.Revision(-1), std::runtime_error);
-    }
 }
 
-TEST(VersionTest, ComparisonsOk)
+TEST(BAM_Version, throws_on_negative_in_string)
+{
+    EXPECT_THROW(Version("-3.1.1"), std::runtime_error);
+}
+
+TEST(BAM_Version, throws_on_non_numeric_string)
+{
+    EXPECT_THROW(Version("foo.bar.baz"), std::runtime_error);
+}
+
+TEST(BAM_Version, throws_on_empty_string) { EXPECT_THROW(Version(""), std::runtime_error); }
+
+TEST(BAM_Version, can_be_compared)
 {
     const Version v0_0_0{0, 0, 0};
     const Version v0_0_4{0, 0, 4};
@@ -260,7 +184,7 @@ TEST(VersionTest, ComparisonsOk)
     EXPECT_TRUE(v3_1_4 >= v0_0_0);
 }
 
-TEST(VersionTest, ToStringOk)
+TEST(BAM_Version, can_be_converted_to_string)
 {
     {
         const Version v{0, 0, 0};
@@ -282,7 +206,7 @@ TEST(VersionTest, ToStringOk)
     }
 }
 
-TEST(VersionTest, OutputStreamOk)
+TEST(BAM_Version, can_write_to_ostream)
 {
     const Version v{3, 1, 4};
     const Version v2{4, 10, 0};

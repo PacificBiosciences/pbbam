@@ -20,14 +20,14 @@ const std::string inputBamFn = PbbamTestsConfig::Data_Dir + "/aligned.bam";
 
 }  // namespace EntireFileQueryTests
 
-TEST(EntireFileQueryTest, CountRecords)
+TEST(BAM_EntireFileQuery, provides_expected_read_count)
 {
     const BamFile bamFile{EntireFileQueryTests::inputBamFn};
     EntireFileQuery entireFile{bamFile};
     EXPECT_EQ(4, std::distance(entireFile.begin(), entireFile.end()));
 }
 
-TEST(BamRecordTest, HandlesDeletionOK)
+TEST(BAM_BamRecord, aligned_qualities_handles_internal_deletion)
 {
     // this file raised no error in Debug mode, but segfaulted when
     // trying to access the aligned qualities in Release mode
@@ -59,7 +59,7 @@ TEST(BamRecordTest, HandlesDeletionOK)
     EXPECT_EQ(1, count);
 }
 
-TEST(BamRecordTest, ReferenceName)
+TEST(BAM_BamRecord, has_expected_reference_name)
 {
     {  // check reference name of first record
         const BamFile bamFile{PbbamTestsConfig::Data_Dir + "/aligned.bam"};

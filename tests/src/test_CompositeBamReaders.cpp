@@ -18,7 +18,7 @@ const std::string phi29BamFn = PbbamTestsConfig::Data_Dir + "/phi29.bam";
 
 }  // namespace CompositeBamReaderTests
 
-TEST(GenomicIntervalCompositeBamReaderTest, ReuseReader)
+TEST(BAM_GenomicIntervalCompositeBamReader, can_be_reused)
 {
     const std::string refName{"lambda_NEB3011"};
     const std::vector<BamFile> bamFiles{BamFile{CompositeBamReaderTests::alignedBamFn},
@@ -58,7 +58,7 @@ TEST(GenomicIntervalCompositeBamReaderTest, ReuseReader)
     EXPECT_EQ(4, std::distance(reader.begin(), reader.end()));
 }
 
-TEST(GenomicIntervalCompositeBamReaderTest, MissingBaiShouldThrow)
+TEST(BAM_GenomicIntervalCompositeBamReader, throws_on_missing_bai)
 {
     const GenomicInterval interval{"lambda_NEB3011", 0, 100};
 
@@ -83,7 +83,7 @@ TEST(GenomicIntervalCompositeBamReaderTest, MissingBaiShouldThrow)
     }
 }
 
-TEST(GenomicIntervalCompositeBamReaderTest, InitializeWithoutInterval)
+TEST(BAM_GenomicIntervalCompositeBamReader, can_be_intialized_without_an_interval)
 {
     const std::vector<BamFile> bamFiles{BamFile{CompositeBamReaderTests::alignedBamFn},
                                         BamFile{CompositeBamReaderTests::alignedBamFn}};
@@ -99,7 +99,7 @@ TEST(GenomicIntervalCompositeBamReaderTest, InitializeWithoutInterval)
 }
 
 // clang-format off
-TEST(PbiFilterCompositeBamReaderTest, BasicFilteringOk)
+TEST(BAM_PbiFilterCompositeBamReader, can_handle_normal_filters)
 {
     const BamFile pbiFilterBam{PbbamTestsConfig::Data_Dir + "/group/test2.bam"};
 
@@ -186,7 +186,7 @@ TEST(PbiFilterCompositeBamReaderTest, BasicFilteringOk)
 }
 // clang-format on
 
-TEST(SequentialCompositeBamReaderTest, CountRecords)
+TEST(BAM_SequentialCompositeBamReader, expected_record_count_across_files)
 {
     const std::vector<BamFile> bamFiles{BamFile{CompositeBamReaderTests::alignedBamFn},
                                         BamFile{CompositeBamReaderTests::alignedBamFn}};

@@ -13,7 +13,7 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-TEST(BgzipWriterTest, writes_bgzf_format_to_file)
+TEST(BAM_BgzipWriter, writes_bgzf_format_to_file)
 {
     const std::string fn{PbbamTestsConfig::GeneratedData_Dir + "/bgzf_writer_out.gz"};
 

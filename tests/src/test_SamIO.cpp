@@ -23,7 +23,7 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-TEST(SamReaderTest, can_read_basic_sam)
+TEST(BAM_SamReader, can_read_basic_sam)
 {
     const std::string bamFilename{PbbamTestsConfig::Data_Dir + "/aligned.bam"};
     const std::string samFilename{PbbamTestsConfig::Data_Dir + "/aligned.sam"};
@@ -44,7 +44,7 @@ TEST(SamReaderTest, can_read_basic_sam)
     EXPECT_EQ(bamRecordNames, samRecordNames);
 }
 
-TEST(SamReaderTest, handles_zero_byte_file)
+TEST(BAM_SamReader, handles_zero_byte_file)
 {
     try {
         SamReader reader{PbbamTestsConfig::Data_Dir + "/zero_bytes.sam"};
@@ -56,7 +56,7 @@ TEST(SamReaderTest, handles_zero_byte_file)
     }
 }
 
-TEST(SamWriterTest, HeaderOk)
+TEST(BAM_SamWriter, can_roundtrip_header)
 {
     // setup header
     const std::string hdrText{
@@ -84,7 +84,7 @@ TEST(SamWriterTest, HeaderOk)
     remove(generatedFn.c_str());
 }
 
-TEST(SamWriterTest, SingleRecordOk)
+TEST(BAM_SamWriter, can_roundtrip_single_record)
 {
 
     // setup header
@@ -151,7 +151,7 @@ TEST(SamWriterTest, SingleRecordOk)
     remove(generatedFn.c_str());
 }
 
-TEST(SamWriterTest, LongCigarFormatting)
+TEST(BAM_SamWriter, can_roundtrip_long_cigar)
 {
     const std::string longCigarFn = PacBio::BAM::PbbamTestsConfig::Data_Dir + "/long-cigar-1.7.bam";
     const std::string samFn =
