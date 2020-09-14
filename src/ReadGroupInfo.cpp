@@ -270,8 +270,10 @@ Data::FrameEncoder FrameEncoderFromName(const std::string& name)
 {
     if (name.find("CodecV2") == 0) {
         const auto codecParts = BAM::Split(name, '/');
-        assert(codecParts.size() == 2);
-        return Data::V2FrameEncoder{std::stoi(codecParts[1])};
+        assert(codecParts.size() == 3);
+        const int exponentBits = std::stoi(codecParts[1]);
+        const int mantissaBits = std::stoi(codecParts[2]);
+        return Data::V2FrameEncoder{exponentBits, mantissaBits};
     } else
         return Data::V1FrameEncoder{};  // default
 }
