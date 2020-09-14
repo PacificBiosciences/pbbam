@@ -298,8 +298,10 @@ std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
 
     std::vector<uint8_t> result;
     result.resize(str.l);
-    memcpy(reinterpret_cast<char*>(result.data()), str.s, str.l);
-    free(str.s);
+    if (str.l) {
+        std::memcpy(reinterpret_cast<char*>(result.data()), str.s, str.l);
+    }
+    std::free(str.s);
     return result;
 }
 

@@ -698,7 +698,9 @@ BamRecordImpl& BamRecordImpl::Tags(const TagCollection& tags)
     tagStart = bam_get_aux(d_);
 
     // fill in new tag data
-    memcpy(static_cast<void*>(tagStart), data, numBytes);
+    if (numBytes) {
+        std::memcpy(static_cast<void*>(tagStart), data, numBytes);
+    }
 
     // update tag info
     UpdateTagMap();
