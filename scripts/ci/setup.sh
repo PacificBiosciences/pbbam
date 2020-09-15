@@ -70,9 +70,11 @@ export CC="ccache ${CC:-gcc}"
 export CXX="ccache ${CXX:-g++}"
 export CCACHE_BASEDIR="${PWD}"
 
-# without -fno-sanitize-recover=all UBSAN failures won't abort the program
-export CFLAGS="${CFLAGS} -fno-sanitize-recover=all"
-export CXXFLAGS="${CXXFLAGS} -fno-sanitize-recover=all"
+if [[ ${GCC_VERSION} != ICC* ]]; then
+  # without -fno-sanitize-recover=all UBSAN failures won't abort the program
+  export CFLAGS="${CFLAGS} -fno-sanitize-recover=all"
+  export CXXFLAGS="${CXXFLAGS} -fno-sanitize-recover=all"
+fi
 
 if [[ -z ${bamboo_planRepository_branchName+x} ]]; then
   : #pass
