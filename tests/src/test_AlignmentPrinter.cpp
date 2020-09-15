@@ -23,7 +23,7 @@ const std::string singleInsertionBam{PbbamTestsConfig::Data_Dir + "/aligned.bam"
 
 }  // namespace AlignmentPrinterTests
 
-TEST(AlignmentPrinterTest, Print)
+TEST(BAM_AlignmentPrinter, can_pretty_print_alignment_as_string)
 {
     IndexedFastaReader r{AlignmentPrinterTests::lambdaFasta};
     AlignmentPrinter pretty{r};

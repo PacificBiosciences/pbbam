@@ -18,7 +18,7 @@ namespace FastaCacheTests {
 
 }  // namespace FastaCacheTests
 
-TEST(FastaCacheTest, can_load_simple)
+TEST(BAM_FastaCache, can_load_simple)
 {
     const std::vector<std::string> expectedNames{
         "seq1", "seq2", "seq3", "seq4", "seq5", "seq6", "seq7", "seq8",
@@ -30,7 +30,7 @@ TEST(FastaCacheTest, can_load_simple)
     EXPECT_EQ(cache->Subsequence("seq5", 5, 10), "CGTAC");
 }
 
-TEST(FastaCacheTest, can_check_sequences)
+TEST(BAM_FastaCache, can_check_sequences)
 {
     {
         const std::string fn{BAM::PbbamTestsConfig::Data_Dir + "/fastx/simple.fa"};
@@ -48,7 +48,7 @@ TEST(FastaCacheTest, can_check_sequences)
     }
 }
 
-TEST(FastaCacheTest, can_check_sequences_using_callback)
+TEST(BAM_FastaCache, can_check_sequences_using_callback)
 {
     {
         const std::string fn{BAM::PbbamTestsConfig::Data_Dir + "/fastx/simple.fa"};

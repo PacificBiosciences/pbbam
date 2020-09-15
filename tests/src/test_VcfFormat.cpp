@@ -71,7 +71,7 @@ const std::string VcfFn{PacBio::BAM::PbbamTestsConfig::Data_Dir + "/vcf/structur
 
 }  // namespace VcfFormatTests
 
-TEST(VCF_Format, provides_current_version)
+TEST(VCF_VcfFormat, provides_current_version)
 {
     const std::string version = VcfFormat::CurrentVersion();
     EXPECT_EQ("VCFv4.2", version);
@@ -83,7 +83,7 @@ TEST(VCF_Format, provides_current_version)
 //
 //## ----------------------------------------------------------------- ##
 
-TEST(VCF_Format, can_format_contig_definition)
+TEST(VCF_VcfFormat, can_format_contig_definition)
 {
     const ContigDefinition def{"ctg1",
                                {{"length", "4200"}, {"assembly", "foo"}, {"md5", "dead123beef"}}};
@@ -91,28 +91,28 @@ TEST(VCF_Format, can_format_contig_definition)
     EXPECT_EQ("##contig=<ID=ctg1,length=4200,assembly=foo,md5=dead123beef>", text);
 }
 
-TEST(VCF_Format, can_format_filter_definition)
+TEST(VCF_VcfFormat, can_format_filter_definition)
 {
     const FilterDefinition def{"FILTER1", "Filter1"};
     const auto text = VcfFormat::FormattedFilterDefinition(def);
     EXPECT_EQ("##FILTER=<ID=FILTER1,Description=\"Filter1\">", text);
 }
 
-TEST(VCF_Format, can_format_format_definition)
+TEST(VCF_VcfFormat, can_format_format_definition)
 {
     const FormatDefinition def{"GT", "1", "String", "Genotype"};
     const auto text = VcfFormat::FormattedFormatDefinition(def);
     EXPECT_EQ("##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">", text);
 }
 
-TEST(VCF_Format, can_format_general_header_definition)
+TEST(VCF_VcfFormat, can_format_general_header_definition)
 {
     const GeneralDefinition def{"phasing", "partial"};
     const auto text = VcfFormat::FormattedGeneralDefinition(def);
     EXPECT_EQ("##phasing=partial", text);
 }
 
-TEST(VCF_Format, can_format_info_definition)
+TEST(VCF_VcfFormat, can_format_info_definition)
 {
     const InfoDefinition def{"IMPRECISE", "0", "Flag", "Imprecise structural variant"};
     const auto text = VcfFormat::FormattedInfoDefinition(def);
@@ -121,7 +121,7 @@ TEST(VCF_Format, can_format_info_definition)
         text);
 }
 
-TEST(VCF_Format, can_format_info_definition_with_optional_fields)
+TEST(VCF_VcfFormat, can_format_info_definition_with_optional_fields)
 {
     {  // with Source
         const InfoDefinition def{"IMPRECISE", "0", "Flag", "Imprecise structural variant",
@@ -153,14 +153,14 @@ TEST(VCF_Format, can_format_info_definition_with_optional_fields)
     }
 }
 
-TEST(VCF_Format, can_format_basic_header)
+TEST(VCF_VcfFormat, can_format_basic_header)
 {
     const VcfHeader header{VcfFormatTests::BasicHeaderText};
     const auto text = VcfFormat::FormattedHeader(header);
     EXPECT_EQ(VcfFormatTests::BasicHeaderText, text);
 }
 
-TEST(VCF_Format, format_basic_header_with_only_filedate)
+TEST(VCF_VcfFormat, format_basic_header_with_only_filedate)
 {
     VcfHeader header;
     header.FileDate("1770704");
@@ -168,7 +168,7 @@ TEST(VCF_Format, format_basic_header_with_only_filedate)
     EXPECT_NO_THROW(text = VcfFormat::FormattedHeader(header));
 }
 
-TEST(VCF_Format, format_basic_header_with_only_version)
+TEST(VCF_VcfFormat, format_basic_header_with_only_version)
 {
     VcfHeader header;
     header.Version("3.14");
@@ -182,19 +182,19 @@ TEST(VCF_Format, format_basic_header_with_only_version)
 //
 //## ----------------------------------------------------------------- ##
 
-TEST(VCF_Format, can_parse_general_header_definition)
+TEST(VCF_VcfFormat, can_parse_general_header_definition)
 {
     const auto phasing = VcfFormat::ParsedGeneralDefinition("##phasing=partial");
     EXPECT_EQ("phasing", phasing.Id());
     EXPECT_EQ("partial", phasing.Text());
 }
 
-TEST(VCF_Format, parsing_general_header_definition_throws_on_empty_string)
+TEST(VCF_VcfFormat, parsing_general_header_definition_throws_on_empty_string)
 {
     EXPECT_THROW(VcfFormat::ParsedGeneralDefinition(""), std::runtime_error);
 }
 
-TEST(VCF_Format, parsing_general_header_definition_throws_on_non_vcf_input)
+TEST(VCF_VcfFormat, parsing_general_header_definition_throws_on_non_vcf_input)
 {
     EXPECT_THROW(VcfFormat::ParsedGeneralDefinition("not_vcf_header_line"), std::runtime_error);
     EXPECT_THROW(VcfFormat::ParsedGeneralDefinition("#line=not_vcf_header_line"),
@@ -203,14 +203,14 @@ TEST(VCF_Format, parsing_general_header_definition_throws_on_non_vcf_input)
                  std::runtime_error);
 }
 
-TEST(VCF_Format, can_parse_contig_definition_with_id_only)
+TEST(VCF_VcfFormat, can_parse_contig_definition_with_id_only)
 {
     const auto contig = VcfFormat::ParsedContigDefinition("##contig=<ID=ctg1>");
     EXPECT_EQ("ctg1", contig.Id());
     EXPECT_TRUE(contig.Attributes().empty());
 }
 
-TEST(VCF_Format, can_parse_contig_definition_with_attributes)
+TEST(VCF_VcfFormat, can_parse_contig_definition_with_attributes)
 {
     const auto contig =
         VcfFormat::ParsedContigDefinition("##contig=<ID=ctg1,assembly=foo,length=3>");
@@ -226,7 +226,7 @@ TEST(VCF_Format, can_parse_contig_definition_with_attributes)
     EXPECT_EQ("3", secondAttr.second);
 }
 
-TEST(VCF_Format, parsing_contig_header_definition_throws_on_malformed_contig_line)
+TEST(VCF_VcfFormat, parsing_contig_header_definition_throws_on_malformed_contig_line)
 {
     // internal code already checks for "##contig=<"
 
@@ -234,7 +234,7 @@ TEST(VCF_Format, parsing_contig_header_definition_throws_on_malformed_contig_lin
     EXPECT_THROW(VcfFormat::ParsedContigDefinition("##contig=<ID=,>"), std::runtime_error);
 }
 
-TEST(VCF_Format, can_parse_filter_definition)
+TEST(VCF_VcfFormat, can_parse_filter_definition)
 {
     const auto filter =
         VcfFormat::ParsedFilterDefinition("##FILTER=<ID=FILTER1,Description=\"Filter1\">\n");
@@ -242,7 +242,7 @@ TEST(VCF_Format, can_parse_filter_definition)
     EXPECT_EQ("Filter1", filter.Description());
 }
 
-TEST(VCF_Format, parsing_filter_definition_throws_on_malformed_filter_line)
+TEST(VCF_VcfFormat, parsing_filter_definition_throws_on_malformed_filter_line)
 {
     // internal code already checks for "##FILTER=<"
 
@@ -250,7 +250,7 @@ TEST(VCF_Format, parsing_filter_definition_throws_on_malformed_filter_line)
     EXPECT_THROW(VcfFormat::ParsedFilterDefinition("##FILTER=<ID=,>"), std::runtime_error);
 }
 
-TEST(VCF_Format, can_parse_format_definition)
+TEST(VCF_VcfFormat, can_parse_format_definition)
 {
     const auto format = VcfFormat::ParsedFormatDefinition(
         "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">\n");
@@ -260,7 +260,7 @@ TEST(VCF_Format, can_parse_format_definition)
     EXPECT_EQ("Genotype", format.Description());
 }
 
-TEST(VCF_Format, parsing_format_definition_throws_on_malformed_filter_line)
+TEST(VCF_VcfFormat, parsing_format_definition_throws_on_malformed_filter_line)
 {
     // internal code already checks for "##FORMAT=<"
 
@@ -268,7 +268,7 @@ TEST(VCF_Format, parsing_format_definition_throws_on_malformed_filter_line)
     EXPECT_THROW(VcfFormat::ParsedFormatDefinition("##FORMAT=<ID=,>"), std::runtime_error);
 }
 
-TEST(VCF_Format, can_parse_info_definition)
+TEST(VCF_VcfFormat, can_parse_info_definition)
 {
     const auto info = VcfFormat::ParsedInfoDefinition(
         "##INFO=<ID=IMPRECISE,Number=0,Type=Flag,Description=\"Imprecise structural variant\">\n");
@@ -280,7 +280,7 @@ TEST(VCF_Format, can_parse_info_definition)
     EXPECT_FALSE(info.Version().is_initialized());
 }
 
-TEST(VCF_Format, parsing_info_definition_throws_on_malformed_info_line)
+TEST(VCF_VcfFormat, parsing_info_definition_throws_on_malformed_info_line)
 {
     // internal code already checks for "##INFO=<"
 
@@ -288,7 +288,7 @@ TEST(VCF_Format, parsing_info_definition_throws_on_malformed_info_line)
     EXPECT_THROW(VcfFormat::ParsedInfoDefinition("##INFO=<ID=,>"), std::runtime_error);
 }
 
-TEST(VCF_Format, can_create_header_from_text)
+TEST(VCF_VcfFormat, can_create_header_from_text)
 {
     const VcfHeader hdr{VcfFormatTests::BasicHeaderText};
 
@@ -326,7 +326,7 @@ TEST(VCF_Format, can_create_header_from_text)
     EXPECT_EQ("UnnamedSample", samples[0]);
 }
 
-TEST(VCF_Format, header_parsing_throws_on_missing_fileformat_line)
+TEST(VCF_VcfFormat, header_parsing_throws_on_missing_fileformat_line)
 {
     const std::string missingFormat{
         "##fileDate=20180509\n"
@@ -335,7 +335,7 @@ TEST(VCF_Format, header_parsing_throws_on_missing_fileformat_line)
     EXPECT_THROW({ VcfHeader h(missingFormat); }, std::runtime_error);
 }
 
-TEST(VCF_Format, header_parsing_throws_on_non_vcf_header_line)
+TEST(VCF_VcfFormat, header_parsing_throws_on_non_vcf_header_line)
 {
     const std::string nonVcfLine{
         "##fileformat=VCFv4.2\n"
@@ -345,14 +345,14 @@ TEST(VCF_Format, header_parsing_throws_on_non_vcf_header_line)
     EXPECT_THROW({ VcfHeader h(nonVcfLine); }, std::runtime_error);
 }
 
-TEST(VCF_Format, can_parse_header_from_stream)
+TEST(VCF_VcfFormat, can_parse_header_from_stream)
 {
     std::istringstream in(VcfFormatTests::BasicHeaderText);
     const auto header = VcfFormat::HeaderFromStream(in);
     EXPECT_EQ(VcfFormatTests::BasicHeaderText, VcfFormat::FormattedHeader(header));
 }
 
-TEST(VCF_Format, can_parse_header_from_file)
+TEST(VCF_VcfFormat, can_parse_header_from_file)
 {
     const std::string fn{VcfFormatTests::VcfFn};
     const auto header = VcfFormat::HeaderFromFile(fn);
@@ -365,7 +365,7 @@ TEST(VCF_Format, can_parse_header_from_file)
 //
 //## ----------------------------------------------------------------- ##
 
-TEST(VCF_Format, can_format_basic_variant)
+TEST(VCF_VcfFormat, can_format_basic_variant)
 {
     const VcfVariant var = VcfFormat::ParsedVariant(VcfFormatTests::BasicVariantText);
     const auto text = VcfFormat::FormattedVariant(var);
@@ -378,7 +378,7 @@ TEST(VCF_Format, can_format_basic_variant)
 //
 //## ----------------------------------------------------------------- ##
 
-TEST(VCF_Format, can_create_variant_from_text)
+TEST(VCF_VcfFormat, can_create_variant_from_text)
 {
     const VcfVariant var = VcfFormat::ParsedVariant(VcfFormatTests::BasicVariantText);
 

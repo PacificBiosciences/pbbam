@@ -7,7 +7,7 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-TEST(FastqSequenceTest, BasicConstructorsOk)
+TEST(BAM_FastqSequence, BasicConstructorsOk)
 {
     const FastqSequence seq1{"1", "GATTACA", "[[[[[[["};
     EXPECT_EQ("1", seq1.Name());
@@ -21,13 +21,13 @@ TEST(FastqSequenceTest, BasicConstructorsOk)
     EXPECT_EQ("[[[[[[[", seq2.Qualities().Fastq());
 }
 
-TEST(FastqSequenceTest, average_base_quality_throws_on_empty_sequence)
+TEST(BAM_FastqSequence, average_base_quality_throws_on_empty_sequence)
 {
     const FastqSequence fastq;
     EXPECT_THROW(fastq.AverageBaseQuality(), std::runtime_error);
 }
 
-TEST(FastqSequenceTest, can_calculate_average_base_quality)
+TEST(BAM_FastqSequence, can_calculate_average_base_quality)
 {
     {
         const std::vector<uint8_t> qvs{20};

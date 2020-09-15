@@ -69,7 +69,7 @@ BamRecord ReadLongCigarRecord(const std::string& fn)
 
 }  // namespace LongCigarTests
 
-TEST(LongCigarTest, ReadAndFetchLongCigar)
+TEST(BAM_LongCigar, can_read_long_cigar)
 {
     const auto b = LongCigarTests::ReadLongCigarRecord(LongCigarTests::LongCigarBam);
 
@@ -81,7 +81,7 @@ TEST(LongCigarTest, ReadAndFetchLongCigar)
     }
 }
 
-TEST(LongCigarTest, EditLongCigar)
+TEST(BAM_LongCigar, can_edit_long_cigar)
 {
     auto b = LongCigarTests::ReadLongCigarRecord(LongCigarTests::LongCigarBam);
     b.Impl().CigarData(b.CigarData());
@@ -94,7 +94,7 @@ TEST(LongCigarTest, EditLongCigar)
     }
 }
 
-TEST(LongCigarTest, WriteLongCigar)
+TEST(BAM_LongCigar, can_write_long_cigar)
 {
     {   // edit & write
         auto b = LongCigarTests::ReadLongCigarRecord(LongCigarTests::LongCigarBam);

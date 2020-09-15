@@ -60,67 +60,67 @@ void CheckReadAll(const std::string& fn)
 
 // clang-format off
 
-TEST(TextFileReaderTest, throws_on_empty_filename)
+TEST(BAM_TextFileReader, throws_on_empty_filename)
 {
     EXPECT_THROW(TextFileReader reader{""}, std::runtime_error);
 }
 
-TEST(TextFileReaderTest, can_open_plain_text)
+TEST(BAM_TextFileReader, can_open_plain_text)
 {
     EXPECT_NO_THROW(TextFileReader reader{FastxTests::simpleFastaFn});
 }
 
-TEST(TextFileReaderTest, can_open_gzip_text)
+TEST(BAM_TextFileReader, can_open_gzip_text)
 {
     EXPECT_NO_THROW(TextFileReader reader{FastxTests::simpleFastaGzipFn});
 }
 
-TEST(TextFileReaderTest, can_open_bgzf_text)
+TEST(BAM_TextFileReader, can_open_bgzf_text)
 {
     EXPECT_NO_THROW(TextFileReader reader{FastxTests::simpleFastaBgzfFn});
 }
 
-TEST(TextFileReaderTest, can_iterate_manually_on_plain_text)
+TEST(BAM_TextFileReader, can_iterate_manually_on_plain_text)
 {
     TextFileReaderTests::CheckManualIteration(FastxTests::simpleFastaFn);
 }
 
-TEST(TextFileReaderTest, can_iterate_manually_on_gzip_text)
+TEST(BAM_TextFileReader, can_iterate_manually_on_gzip_text)
 {
     TextFileReaderTests::CheckManualIteration(FastxTests::simpleFastaGzipFn);
 }
 
-TEST(TextFileReaderTest, can_iterate_manually_on_bgzf_text)
+TEST(BAM_TextFileReader, can_iterate_manually_on_bgzf_text)
 {
     TextFileReaderTests::CheckManualIteration(FastxTests::simpleFastaBgzfFn);
 }
 
-TEST(TextFileReaderTest, can_iterate_using_range_for_on_plain_text)
+TEST(BAM_TextFileReader, can_iterate_using_range_for_on_plain_text)
 {
     TextFileReaderTests::CheckRangeFor(FastxTests::simpleFastaFn);
 }
 
-TEST(TextFileReaderTest, can_iterate_using_range_for_on_gzip_text)
+TEST(BAM_TextFileReader, can_iterate_using_range_for_on_gzip_text)
 {
     TextFileReaderTests::CheckRangeFor(FastxTests::simpleFastaGzipFn);
 }
 
-TEST(TextFileReaderTest, can_iterate_using_range_for_on_bgzf_text)
+TEST(BAM_TextFileReader, can_iterate_using_range_for_on_bgzf_text)
 {
     TextFileReaderTests::CheckRangeFor(FastxTests::simpleFastaBgzfFn);
 }
 
-TEST(TextFileReaderTest, can_read_all_from_plain_text)
+TEST(BAM_TextFileReader, can_read_all_from_plain_text)
 {
     TextFileReaderTests::CheckReadAll(FastxTests::simpleFastaFn);
 }
 
-TEST(TextFileReaderTest, can_read_all_from_gzip_text)
+TEST(BAM_TextFileReader, can_read_all_from_gzip_text)
 {
     TextFileReaderTests::CheckReadAll(FastxTests::simpleFastaGzipFn);
 }
 
-TEST(TextFileReaderTest, can_read_all_from_bgzf_text)
+TEST(BAM_TextFileReader, can_read_all_from_bgzf_text)
 {
     TextFileReaderTests::CheckReadAll(FastxTests::simpleFastaBgzfFn);
 }

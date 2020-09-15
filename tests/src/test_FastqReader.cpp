@@ -64,80 +64,80 @@ void CheckReadAll(const std::string& fn)
 
 }  // namespace FastqReaderTests
 
-TEST(FastqReaderTest, throws_on_empty_filename)
+TEST(BAM_FastqReader, throws_on_empty_filename)
 {
     EXPECT_THROW(FastqReader reader{""}, std::runtime_error);
 }
 
-TEST(FastqReaderTest, throws_on_invalid_extension)
+TEST(BAM_FastqReader, throws_on_invalid_extension)
 {
     EXPECT_THROW(FastqReader reader{"wrong.ext"}, std::runtime_error);
 }
 
-TEST(FastqReaderTest, can_open_text_fastq)
+TEST(BAM_FastqReader, can_open_text_fastq)
 {
     const auto& fn = FastxTests::simpleFastqFn;
     EXPECT_NO_THROW(FastqReader reader{fn});
 }
 
-TEST(FastqReaderTest, can_open_gzip_fastq)
+TEST(BAM_FastqReader, can_open_gzip_fastq)
 {
     const auto& fn = FastxTests::simpleFastqGzipFn;
     EXPECT_NO_THROW(FastqReader reader{fn});
 }
 
-TEST(FastqReaderTest, can_open_bgzf_fastq)
+TEST(BAM_FastqReader, can_open_bgzf_fastq)
 {
     const auto& fn = FastxTests::simpleFastqBgzfFn;
     EXPECT_NO_THROW(FastqReader reader{fn});
 }
 
-TEST(FastqReaderTest, can_iterate_manually_on_text_fastq)
+TEST(BAM_FastqReader, can_iterate_manually_on_text_fastq)
 {
     FastqReaderTests::CheckManualIteration(FastxTests::simpleFastqFn);
 }
 
-TEST(FastqReaderTest, can_iterate_manually_on_gzip_fastq)
+TEST(BAM_FastqReader, can_iterate_manually_on_gzip_fastq)
 {
     FastqReaderTests::CheckManualIteration(FastxTests::simpleFastqGzipFn);
 }
 
-TEST(FastqReaderTest, can_iterate_manually_on_bgzf_fastq)
+TEST(BAM_FastqReader, can_iterate_manually_on_bgzf_fastq)
 {
     FastqReaderTests::CheckManualIteration(FastxTests::simpleFastqBgzfFn);
 }
 
-TEST(FastqReaderTest, can_iterate_using_range_for_on_text_fastq)
+TEST(BAM_FastqReader, can_iterate_using_range_for_on_text_fastq)
 {
     FastqReaderTests::CheckRangeFor(FastxTests::simpleFastqFn);
 }
 
-TEST(FastqReaderTest, can_iterate_using_range_for_on_gzip_fastq)
+TEST(BAM_FastqReader, can_iterate_using_range_for_on_gzip_fastq)
 {
     FastqReaderTests::CheckRangeFor(FastxTests::simpleFastqGzipFn);
 }
 
-TEST(FastqReaderTest, can_iterate_using_range_for_on_bgzf_fastq)
+TEST(BAM_FastqReader, can_iterate_using_range_for_on_bgzf_fastq)
 {
     FastqReaderTests::CheckRangeFor(FastxTests::simpleFastqBgzfFn);
 }
 
-TEST(FastqReaderTest, can_read_all_from_text_fastq)
+TEST(BAM_FastqReader, can_read_all_from_text_fastq)
 {
     FastqReaderTests::CheckReadAll(FastxTests::simpleFastqFn);
 }
 
-TEST(FastqReaderTest, can_read_all_from_gzip_fastq)
+TEST(BAM_FastqReader, can_read_all_from_gzip_fastq)
 {
     FastqReaderTests::CheckReadAll(FastxTests::simpleFastqGzipFn);
 }
 
-TEST(FastqReaderTest, can_read_all_from_bgzf_fastq)
+TEST(BAM_FastqReader, can_read_all_from_bgzf_fastq)
 {
     FastqReaderTests::CheckReadAll(FastxTests::simpleFastqBgzfFn);
 }
 
-TEST(FastqReaderTest, can_handle_windows_style_newlines)
+TEST(BAM_FastqReader, can_handle_windows_style_newlines)
 {
     FastqReader reader{FastxTests::fastxDataDir + "/windows_formatted.fastq"};
     FastqSequence seq;
@@ -147,7 +147,7 @@ TEST(FastqReaderTest, can_handle_windows_style_newlines)
     EXPECT_EQ("~~~~~", seq.Qualities().Fastq());
 }
 
-TEST(FastqMerging, can_merge_bams_to_fastq_output)
+TEST(BAM_FastqMerging, can_merge_bams_to_fastq_output)
 {
     const std::vector<std::string> bamFiles{PbbamTestsConfig::Data_Dir + "/group/test1.bam",
                                             PbbamTestsConfig::Data_Dir + "/group/test2.bam",

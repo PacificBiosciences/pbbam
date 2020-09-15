@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(SequenceUtilsTest, ComplementChar)
+TEST(BAM_SequenceUtils, can_complement_single_char)
 {
     // complement
     const char A = 'A';  // T
@@ -66,7 +66,7 @@ TEST(SequenceUtilsTest, ComplementChar)
     EXPECT_EQ(0, PacBio::BAM::Complement(Z));
 }
 
-TEST(SequenceUtilsTest, ReverseComplement)
+TEST(BAM_SequenceUtils, can_reverse_complement_string)
 {
     std::string seq{"ATATATCCCGGCG"};
     const std::string revComp{"CGCCGGGATATAT"};

@@ -15,7 +15,7 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-TEST(ZmwChunkedFastaReader, standard_fasta_from_chunk)
+TEST(BAM_ZmwChunkedFastaReader, standard_fasta_from_chunk)
 {
     ZmwChunkedFastaReader reader{FastxTests::chunkingFastaFn, 5};
 
@@ -53,7 +53,7 @@ TEST(ZmwChunkedFastaReader, standard_fasta_from_chunk)
     }
 }
 
-TEST(ZmwChunkedFastqReader, standard_fastq_from_chunk)
+TEST(BAM_ZmwChunkedFastqReader, standard_fastq_from_chunk)
 {
     ZmwChunkedFastqReader reader{FastxTests::chunkingFastqFn, 5};
 
