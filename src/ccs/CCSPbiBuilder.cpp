@@ -13,6 +13,7 @@
 #include <cstring>
 
 #include <array>
+#include <limits>
 #include <sstream>
 #include <stdexcept>
 #include <thread>
@@ -145,7 +146,7 @@ public:
         holeNumField_.Add(record.HoleNumber);
         ctxtField_.Add(record.LocalContextFlags);
         readQualField_.Add(record.Accuracy);
-        fileOffsetField_.Add(-1);
+        fileOffsetField_.Add(std::numeric_limits<uint64_t>::max());
 
         FlushBuffers(FlushMode::NO_FORCE);
         ++currentRow_;
