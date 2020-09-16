@@ -220,9 +220,12 @@ std::unique_ptr<DataSetBase> XmlReader::FromStream(std::istream& in)
 {
     pugi::xml_document doc;
     const pugi::xml_parse_result loadResult = doc.load(in);
-    if (loadResult.status != pugi::status_ok)
-        throw std::runtime_error{"[pbbam] XML reader ERROR: could not read XML file, error code:" +
-                                 std::to_string(loadResult.status)};
+    if (!loadResult) {
+        throw std::runtime_error{
+            "[pbbam] XML reader ERROR: could not read XML document\n"
+            "  reason: " +
+            std::string{loadResult.description()}};
+    }
 
     // parse top-level attributes
     pugi::xml_node rootNode = doc.document_element();
