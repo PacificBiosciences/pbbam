@@ -16,8 +16,8 @@
 
 #include "PbbamTestData.h"
 
-using BedReader = PacBio::BAM::BedReader;
-using BedWriter = PacBio::BAM::BedWriter;
+using BedReader = PacBio::BED::BedReader;
+using BedWriter = PacBio::BED::BedWriter;
 using GenomicInterval = PacBio::BAM::GenomicInterval;
 using HtslibCompression = PacBio::BAM::HtslibCompression;
 

@@ -8,7 +8,7 @@
 #include <pbcopper/data/GenomicInterval.h>
 
 namespace PacBio {
-namespace BAM {
+namespace BED {
 
 class BedWriter
 {
@@ -27,7 +27,7 @@ private:
     std::unique_ptr<BedWriterPrivate> d_;
 };
 
-}  // namespace BAM
+}  // namespace BED
 }  // namespace PacBio
 
 #endif  // PBBAM_BED_BEDWRITER_H

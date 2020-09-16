@@ -16,7 +16,7 @@
 #include <pbbam/TextFileReader.h>
 
 namespace PacBio {
-namespace BAM {
+namespace BED {
 
 static_assert(!std::is_copy_constructible<BedReader>::value,
               "BedReader(const BedReader&) is not = delete");
@@ -29,7 +29,7 @@ public:
     explicit BedReaderPrivate(const std::string& fn)
     {
         // validate extension
-        if (!FormatUtils::IsBedFilename(fn)) {
+        if (!BAM::FormatUtils::IsBedFilename(fn)) {
             std::ostringstream msg;
             msg << "[pbbam] BED reader ERROR: not a recognized BED extension:\n"
                 << "  filename: " << fn << '\n';
@@ -37,7 +37,7 @@ public:
         };
 
         // open file stream
-        reader_ = std::make_unique<TextFileReader>(fn);
+        reader_ = std::make_unique<BAM::TextFileReader>(fn);
         if (!reader_) {
             std::ostringstream msg;
             msg << "[pbbam] BED reader ERROR: could not open file:\n"
@@ -79,12 +79,12 @@ public:
         return {fields[0], start, end};
     }
 
-    std::unique_ptr<TextFileReader> reader_;
+    std::unique_ptr<BAM::TextFileReader> reader_;
     boost::optional<Data::GenomicInterval> interval_;
 };
 
 BedReader::BedReader(const std::string& fn)
-    : internal::QueryBase<Data::GenomicInterval>{}, d_{std::make_unique<BedReaderPrivate>(fn)}
+    : BAM::internal::QueryBase<Data::GenomicInterval>{}, d_{std::make_unique<BedReaderPrivate>(fn)}
 {
 }
 
@@ -115,5 +115,5 @@ std::vector<Data::GenomicInterval> BedReader::ReadAll(const std::string& fn)
     return result;
 }
 
-}  // namespace BAM
+}  // namespace BED
 }  // namespace PacBio
