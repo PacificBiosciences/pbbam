@@ -11,7 +11,7 @@
 #include <pbbam/TextFileWriter.h>
 
 namespace PacBio {
-namespace BAM {
+namespace BED {
 
 static_assert(!std::is_copy_constructible<BedWriter>::value,
               "BedWriter(const BedWriter&) is not = delete");
@@ -32,7 +32,7 @@ public:
 
 private:
     std::ostringstream line_;
-    TextFileWriter writer_;
+    BAM::TextFileWriter writer_;
 };
 
 BedWriter::BedWriter(const std::string& fn) : d_{std::make_unique<BedWriterPrivate>(fn)} {}
@@ -45,5 +45,5 @@ BedWriter::~BedWriter() = default;
 
 void BedWriter::Write(const Data::GenomicInterval& interval) { d_->Write(interval); }
 
-}  // namespace BAM
+}  // namespace BED
 }  // namespace PacBio

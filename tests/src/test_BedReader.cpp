@@ -11,7 +11,7 @@
 
 #include "PbbamTestData.h"
 
-using BedReader = PacBio::BAM::BedReader;
+using BedReader = PacBio::BED::BedReader;
 using GenomicInterval = PacBio::BAM::GenomicInterval;
 
 // clang-format off

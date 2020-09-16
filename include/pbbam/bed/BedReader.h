@@ -11,14 +11,14 @@
 #include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
-namespace BAM {
+namespace BED {
 
 ///
 /// \brief The BedReader provides sequential access to BED records.
 ///
 /// Supports plain text or gzipped (gzip or bgzip).
 ///
-class BedReader : public internal::QueryBase<Data::GenomicInterval>
+class BedReader : public BAM::internal::QueryBase<Data::GenomicInterval>
 {
 public:
     ///
@@ -76,7 +76,7 @@ private:
     std::unique_ptr<BedReaderPrivate> d_;
 };
 
-}  // namespace BAM
+}  // namespace BED
 }  // namespace PacBio
 
 #endif  // PBBAM_BED_BEDREADER_H
