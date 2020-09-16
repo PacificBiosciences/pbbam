@@ -1,13 +1,7 @@
-// File Description
-/// \file Autovalidate.h
-/// \brief Sets the default macro for the autovalidation mode.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_AUTOVALIDATE_H
+#define PBBAM_AUTOVALIDATE_H
 
-#ifndef AUTOVALIDATE_H
-#define AUTOVALIDATE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 // \brief Auto-validation
 //
@@ -21,4 +15,4 @@
 #define PBBAM_AUTOVALIDATE 0
 #endif
 
-#endif  // AUTOVALIDATE_H
+#endif  // PBBAM_AUTOVALIDATE_H

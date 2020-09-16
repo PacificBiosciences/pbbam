@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "../PbbamInternalConfig.h"
 
 #include <pbbam/vcf/VcfVariant.h>
@@ -30,10 +28,10 @@ static_assert(std::is_nothrow_move_assignable<VcfVariant>::value ==
 
 VcfVariant::VcfVariant(const std::string& text) { *this = VcfFormat::ParsedVariant(text); }
 
-VcfVariant::VcfVariant() : pos_{PacBio::BAM::UnmappedPosition}, qual_{NAN}, filter_{"PASS"} {}
+VcfVariant::VcfVariant() : pos_{Data::UnmappedPosition}, qual_{NAN}, filter_{"PASS"} {}
 
-VcfVariant::VcfVariant(std::string id, std::string chrom, PacBio::BAM::Position pos,
-                       std::string refAllele, std::string altAllele)
+VcfVariant::VcfVariant(std::string id, std::string chrom, Data::Position pos, std::string refAllele,
+                       std::string altAllele)
     : chrom_{std::move(chrom)}
     , pos_{pos}
     , id_{std::move(id)}
@@ -87,7 +85,7 @@ VcfVariant& VcfVariant::GenotypeIds(std::vector<std::string> ids)
 
     format_ = std::move(ids);
     for (size_t i = 0; i < format_.size(); ++i)
-        genotypeDataLookup_.insert({format_.at(i), i});
+        genotypeDataLookup_.emplace(format_.at(i), i);
     return *this;
 }
 
@@ -194,8 +192,8 @@ bool VcfVariant::IsQualityMissing() const { return std::isnan(qual_); }
 bool VcfVariant::IsSampleHeterozygous(const size_t sampleIndex) const
 {
     const auto data = GenotypeValue(sampleIndex, "GT");
-    auto fields = PacBio::BAM::Split(data.get(), '/');
-    if (fields.size() == 1) fields = PacBio::BAM::Split(data.get(), '|');
+    auto fields = BAM::Split(data.get(), '/');
+    if (fields.size() == 1) fields = BAM::Split(data.get(), '|');
 
     if (fields.size() == 2)
         return fields.at(0) != fields.at(1);
@@ -216,9 +214,9 @@ bool VcfVariant::IsSnp() const
     return refAllele_.size() == 1 && altAllele_.size() == 1 && refAllele_[0] != altAllele_[0];
 }
 
-PacBio::BAM::Position VcfVariant::Position() const { return pos_; }
+Data::Position VcfVariant::Position() const { return pos_; }
 
-VcfVariant& VcfVariant::Position(PacBio::BAM::Position pos)
+VcfVariant& VcfVariant::Position(Data::Position pos)
 {
     pos_ = pos;
     return *this;

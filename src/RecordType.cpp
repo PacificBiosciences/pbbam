@@ -1,12 +1,6 @@
-// File Description
-/// \file RecordType.h
-/// \brief Implements the RecordType-related methods
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/RecordType.h"
+#include <pbbam/RecordType.h>
 
 #include <map>
 #include <stdexcept>

@@ -1,9 +1,3 @@
-// File Description
-/// \file FaiZmwChunker.cpp
-/// \brief Implements the FaiZmwChunker class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "FaiZmwChunker.h"
@@ -106,16 +100,6 @@ FaiZmwChunker::~FaiZmwChunker() = default;
 const FaiZmwChunk& FaiZmwChunker::Chunk(size_t chunk) const { return chunks_.at(chunk); }
 
 size_t FaiZmwChunker::NumChunks() const { return chunks_.size(); }
-
-// size_t FaiZmwChunker::MaxChunkSize(size_t index) const
-// {
-//     const auto max = std::max_element(
-//         chunks_.cbegin(), chunks_.cend(),
-//         [](const ZmwChunk& lhs, const ZmwChunk& rhs) { return lhs.NumZmws < rhs.NumZmws; });
-
-//     if (max == chunks_.cend()) return 0;
-//     return (*max).NumZmws;
-// }
 
 }  // namespace BAM
 }  // namespace PacBio

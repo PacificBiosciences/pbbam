@@ -1,9 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_FOFNREADER_H
+#define PBBAM_FOFNREADER_H
 
-#ifndef FOFNREADER_H
-#define FOFNREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <iosfwd>
 #include <string>
@@ -23,4 +21,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FOFNREADER_H
+#endif  // PBBAM_FOFNREADER_H

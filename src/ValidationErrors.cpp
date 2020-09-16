@@ -1,18 +1,12 @@
-// File Description
-/// \file ValidationErrors.cpp
-/// \brief Implements the ValidationErrors class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/exception/ValidationException.h"
+#include <pbbam/exception/ValidationException.h>
 
 #include <cstddef>
 
 #include <sstream>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 #include "ValidationErrors.h"
 

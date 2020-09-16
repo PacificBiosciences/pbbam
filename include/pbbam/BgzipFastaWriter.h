@@ -1,25 +1,15 @@
-// File Description
-/// \file BgzipFastaWriter.h
-/// \brief Defines the BgzipFastaWriter class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_BGZIPFASTAWRITER_H
+#define PBBAM_BGZIPFASTAWRITER_H
 
-#ifndef BGZIPFASTAWRITER_H
-#define BGZIPFASTAWRITER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 
-#include "pbbam/BgzipWriter.h"
-#include "pbbam/IFastaWriter.h"
+#include <pbbam/BgzipWriter.h>
+#include <pbbam/IFastaWriter.h>
 
 namespace PacBio {
 namespace BAM {
-
-class BamRecord;
-class BamRecordImpl;
-class FastaSequence;
 
 class BgzipFastaWriter final : public IFastaWriter
 {
@@ -43,4 +33,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BGZIPFASTAWRITER_H
+#endif  // PBBAM_BGZIPFASTAWRITER_H

@@ -1,14 +1,12 @@
-// Author: Derek Barnett
+#ifndef PBBAM_XMLWRITER_H
+#define PBBAM_XMLWRITER_H
 
-#ifndef XMLWRITER_H
-#define XMLWRITER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <iosfwd>
 #include <memory>
 
-#include "pbbam/DataSetTypes.h"
+#include <pbbam/DataSetTypes.h>
 
 namespace PacBio {
 namespace BAM {
@@ -26,4 +24,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // XMLWRITER_H
+#endif  // PBBAM_XMLWRITER_H

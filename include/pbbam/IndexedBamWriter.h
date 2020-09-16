@@ -1,27 +1,17 @@
-// File Description
-/// \file IndexedBamWriter.h
-/// \brief Defines the IndexedBamWriter class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_INDEXEDBAMWRITER_H
+#define PBBAM_INDEXEDBAMWRITER_H
 
-#ifndef INDEXEDBAMWRITER_H
-#define INDEXEDBAMWRITER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
 
-#include "pbbam/BamWriter.h"
-#include "pbbam/IRecordWriter.h"
-#include "pbbam/PbiBuilder.h"
+#include <pbbam/BamWriter.h>
+#include <pbbam/IRecordWriter.h>
+#include <pbbam/PbiBuilder.h>
 
 namespace PacBio {
 namespace BAM {
-
-class BamHeader;
-class BamRecord;
-class BamRecordImpl;
 
 struct IndexedBamWriterConfig
 {
@@ -135,4 +125,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // INDEXEDBAMWRITER_H
+#endif  // PBBAM_INDEXEDBAMWRITER_H

@@ -1,13 +1,7 @@
-// File Description
-/// \file Tag.h
-/// \brief Defines the Tag class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_TAG_H
+#define PBBAM_TAG_H
 
-#ifndef TAG_H
-#define TAG_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstdint>
 
@@ -417,4 +411,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // TAG_H
+#endif  // PBBAM_TAG_H

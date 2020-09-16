@@ -1,13 +1,7 @@
-// File Description
-/// \file BamWriter.h
-/// \brief Defines the BamWriter class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_BAMWRITER_H
+#define PBBAM_BAMWRITER_H
 
-#ifndef BAMWRITER_H
-#define BAMWRITER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -16,14 +10,13 @@
 
 #include <htslib/sam.h>
 
-#include "pbbam/BamHeader.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/IRecordWriter.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/BamHeader.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/IRecordWriter.h>
 
 namespace PacBio {
 namespace BAM {
-
-class BamFile;
 
 /// \brief The BamWriter class provides a writing interface for creating
 ///        new %BAM files.
@@ -218,4 +211,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BAMWRITER_H
+#endif  // PBBAM_BAMWRITER_H

@@ -1,9 +1,7 @@
-// Author: Derek Barnett
-
 #ifndef PBBAM_CCS_CCSRECORD_H
 #define PBBAM_CCS_CCSRECORD_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <pbcopper/data/Accuracy.h>
 #include <pbcopper/data/Frames.h>

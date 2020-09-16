@@ -1,15 +1,9 @@
-// File Description
-/// \file VirtualPolymeraseReader.h
-/// \brief Defines the VirtualPolymeraseReader class.
-//
-// Author: Armin Töpfer
+#ifndef PBBAM_VIRTUALPOLYMERASEREADER_H
+#define PBBAM_VIRTUALPOLYMERASEREADER_H
 
-#ifndef VIRTUALPOLYMERASEREADER_H
-#define VIRTUALPOLYMERASEREADER_H
+#include <pbbam/Config.h>
 
-#include "pbbam/Config.h"
-
-#include "pbbam/virtual/ZmwReadStitcher.h"
+#include <pbbam/virtual/ZmwReadStitcher.h>
 
 namespace PacBio {
 namespace BAM {
@@ -20,4 +14,4 @@ using VirtualPolymeraseReader = ZmwReadStitcher;
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // VIRTUALPOLYMERASEREADER_H
+#endif  // PBBAM_VIRTUALPOLYMERASEREADER_H

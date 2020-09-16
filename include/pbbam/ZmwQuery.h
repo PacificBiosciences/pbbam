@@ -1,19 +1,13 @@
-// File Description
-/// \file ZmwQuery.h
-/// \brief Defines the ZmwQuery class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_ZMWQUERY_H
+#define PBBAM_ZMWQUERY_H
 
-#ifndef ZMWQUERY_H
-#define ZMWQUERY_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstdint>
 
 #include <vector>
 
-#include "pbbam/internal/QueryBase.h"
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace BAM {
@@ -60,4 +54,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // ZMWQUERY_H
+#endif  // PBBAM_ZMWQUERY_H

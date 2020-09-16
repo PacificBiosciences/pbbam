@@ -1,13 +1,7 @@
-// File Description
-/// \file InvalidSequencingChemistryException.h
-/// \brief Defines the InvalidSequencingChemistryException class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H
+#define PBBAM_INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H
 
-#ifndef INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H
-#define INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <exception>
 #include <sstream>
@@ -63,4 +57,4 @@ protected:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H
+#endif  // PBBAM_INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H

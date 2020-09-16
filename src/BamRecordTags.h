@@ -1,13 +1,7 @@
-// File Description
-/// \file BamRecordTags.h
-/// \brief Defines the BamRecordTags utility class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_BAMRECORDTAGS_H
+#define PBBAM_BAMRECORDTAGS_H
 
-#ifndef BAMRECORDTAGS_H
-#define BAMRECORDTAGS_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cassert>
 
@@ -54,4 +48,4 @@ inline std::string BamRecordTags::LabelFor(const BamRecordTag tag)
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BAMRECORDTAGS_H
+#endif  // PBBAM_BAMRECORDTAGS_H

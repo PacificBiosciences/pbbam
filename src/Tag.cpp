@@ -1,12 +1,6 @@
-// File Description
-/// \file Tag.cpp
-/// \brief Implements the Tag class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/Tag.h"
+#include <pbbam/Tag.h>
 
 #include <cassert>
 

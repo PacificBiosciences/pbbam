@@ -1,13 +1,7 @@
-// File Description
-/// \file Orientation.h
-/// \brief Defines the Orientation enum.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_ORIENTATION_H
+#define PBBAM_ORIENTATION_H
 
-#ifndef ORIENTATION_H
-#define ORIENTATION_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <pbcopper/data/Orientation.h>
 
@@ -19,4 +13,4 @@ using Orientation PBBAM_DEPRECATED = PacBio::Data::Orientation;
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // ORIENTATION_H
+#endif  // PBBAM_ORIENTATION_H

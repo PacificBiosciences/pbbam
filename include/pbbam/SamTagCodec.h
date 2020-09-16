@@ -1,17 +1,11 @@
-// File Description
-/// \file SamTagCodec.h
-/// \brief Defines the SamTagCodec class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_SAMTAGCODEC_H
+#define PBBAM_SAMTAGCODEC_H
 
-#ifndef SAMTAGCODEC_H
-#define SAMTAGCODEC_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 
-#include "pbbam/TagCollection.h"
+#include <pbbam/TagCollection.h>
 
 namespace PacBio {
 namespace BAM {
@@ -65,4 +59,4 @@ std::string MakeSamTag(std::string tag, std::string value);
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // SAMTAGCODEC_H
+#endif  // PBBAM_SAMTAGCODEC_H

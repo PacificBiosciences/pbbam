@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "MemoryUtils.h"
@@ -9,7 +7,7 @@
 
 #include <string>
 
-#include "pbbam/Deleters.h"
+#include <pbbam/Deleters.h>
 
 namespace PacBio {
 namespace BAM {

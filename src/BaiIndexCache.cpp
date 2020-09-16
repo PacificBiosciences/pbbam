@@ -1,21 +1,15 @@
-// File Description
-/// \file BaiIndexCache.cpp
-/// \brief Implements the BaiIndexCache class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/BaiIndexCache.h"
+#include <pbbam/BaiIndexCache.h>
 
 #include <sstream>
 #include <stdexcept>
 
 #include <htslib/sam.h>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/DataSet.h"
-#include "pbbam/Deleters.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/DataSet.h>
+#include <pbbam/Deleters.h>
 
 #include "ErrnoReason.h"
 
@@ -48,8 +42,8 @@ BaiIndexCacheData::BaiIndexCacheData(const std::string& bamFilename)
 
 BaiIndexCacheData::~BaiIndexCacheData() = default;
 
-hts_itr_t* BaiIndexCacheData::IteratorForInterval(const int32_t refId, const Position start,
-                                                  const Position stop) const
+hts_itr_t* BaiIndexCacheData::IteratorForInterval(const int32_t refId, const Data::Position start,
+                                                  const Data::Position stop) const
 {
     return bam_itr_queryi(d_->htsIndex_.get(), refId, start, stop);
 }
@@ -63,7 +57,7 @@ BaiIndexCache MakeBaiIndexCache(const DataSet& dataset)
 
 BaiIndexCache MakeBaiIndexCache(const std::vector<BamFile>& bamFiles)
 {
-    BaiIndexCache cache = std::make_shared<std::vector<std::shared_ptr<BaiIndexCacheData>>>();
+    auto cache = std::make_shared<std::vector<std::shared_ptr<BaiIndexCacheData>>>();
     auto& indices = *cache.get();
     for (const auto& bamFile : bamFiles)
         indices.push_back(std::make_shared<BaiIndexCacheData>(bamFile));

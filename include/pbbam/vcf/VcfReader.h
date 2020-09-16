@@ -1,9 +1,7 @@
-// Author: Derek Barnett
-
 #ifndef PBBAM_VCF_VCFREADER_H
 #define PBBAM_VCF_VCFREADER_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <fstream>
 #include <memory>

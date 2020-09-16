@@ -1,6 +1,4 @@
-// Author: Derek Barnett
-
-#include "pbbam/internal/DataSetElement.h"
+#include <pbbam/internal/DataSetElement.h>
 
 #include <iostream>
 #include <stdexcept>

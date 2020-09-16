@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "../PbbamInternalConfig.h"
 
 #include <pbbam/vcf/VcfWriter.h>
@@ -23,10 +21,10 @@ static_assert(!std::is_copy_constructible<VcfWriter>::value,
 static_assert(!std::is_copy_assignable<VcfWriter>::value,
               "VcfWriter& operator=(const VcfWriter&) is not = delete");
 
-struct VcfWriter::VcfWriterPrivate : public PacBio::BAM::FileProducer
+struct VcfWriter::VcfWriterPrivate : public BAM::FileProducer
 {
     VcfWriterPrivate(std::string fn, const VcfHeader& header)
-        : PacBio::BAM::FileProducer{std::move(fn)}, out_{TempFilename()}
+        : BAM::FileProducer{std::move(fn)}, out_{TempFilename()}
     {
         out_ << VcfFormat::FormattedHeader(header) << '\n';
     }

@@ -1,14 +1,7 @@
-
-// File Description
-/// \file TextFileWriter.h
-/// \brief Defines the TextFileWriter class.
-//
-// Author: Derek Barnett
-
 #ifndef PBBAM_TEXTFILEWRITER_H
 #define PBBAM_TEXTFILEWRITER_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>

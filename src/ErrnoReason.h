@@ -1,9 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_ERRNOREASON_H
+#define PBBAM_ERRNOREASON_H
 
-#ifndef ERRNOREASON_H
-#define ERRNOREASON_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <iosfwd>
 
@@ -15,4 +13,4 @@ void MaybePrintErrnoReason(std::ostream& out);
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // ERRNOREASON_H
+#endif  // PBBAM_ERRNOREASON_H

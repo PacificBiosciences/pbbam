@@ -1,15 +1,13 @@
-// Author: Derek Barnett
+#ifndef PBBAM_RUNMETADATAPARSER_H
+#define PBBAM_RUNMETADATAPARSER_H
 
-#ifndef RUNMETADATAPARSER_H
-#define RUNMETADATAPARSER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <iosfwd>
 #include <map>
 #include <string>
 
-#include "pbbam/RunMetadata.h"
+#include <pbbam/RunMetadata.h>
 
 #include "pugixml/pugixml.hpp"
 
@@ -78,4 +76,4 @@ struct RunMetadataParser
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // RUNMETADATAPARSER_H
+#endif  // PBBAM_RUNMETADATAPARSER_H

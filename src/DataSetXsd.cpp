@@ -1,12 +1,6 @@
-// File Description
-/// \file DataSetXsd.cpp
-/// \brief Implements the XSD- and namespace-related classes for DataSetXML.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/DataSetXsd.h"
+#include <pbbam/DataSetXsd.h>
 
 #include <cassert>
 

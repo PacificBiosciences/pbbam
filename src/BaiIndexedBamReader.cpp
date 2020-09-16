@@ -1,12 +1,6 @@
-// File Description
-/// \file BaiIndexedBamReader.cpp
-/// \brief Implements the BaiIndexedBamReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/BaiIndexedBamReader.h"
+#include <pbbam/BaiIndexedBamReader.h>
 
 #include <cassert>
 #include <cstddef>
@@ -14,8 +8,8 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "pbbam/BaiIndexCache.h"
-#include "pbbam/Deleters.h"
+#include <pbbam/BaiIndexCache.h>
+#include <pbbam/Deleters.h>
 
 #include "ErrnoReason.h"
 
@@ -32,14 +26,14 @@ public:
         assert(index_);  // should throw in cache load if failed
     }
 
-    BaiIndexedBamReaderPrivate(BamFile file, const GenomicInterval& interval,
+    BaiIndexedBamReaderPrivate(BamFile file, const Data::GenomicInterval& interval,
                                const std::shared_ptr<BaiIndexCacheData>& indexCache)
         : BaiIndexedBamReaderPrivate{std::move(file), indexCache}
     {
         Interval(file_.Header(), interval);
     }
 
-    void Interval(const BamHeader& header, const GenomicInterval& interval)
+    void Interval(const BamHeader& header, const Data::GenomicInterval& interval)
     {
         htsIterator_.reset();
 
@@ -80,7 +74,7 @@ public:
 
     BamFile file_;
     std::shared_ptr<BaiIndexCacheData> index_;
-    GenomicInterval interval_;
+    Data::GenomicInterval interval_;
     std::unique_ptr<hts_itr_t, HtslibIteratorDeleter> htsIterator_;
 };
 
@@ -108,24 +102,26 @@ BaiIndexedBamReader::BaiIndexedBamReader(BamFile bamFile,
 {
 }
 
-BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval, std::string filename)
+BaiIndexedBamReader::BaiIndexedBamReader(const Data::GenomicInterval& interval,
+                                         std::string filename)
     : BaiIndexedBamReader{interval, BamFile{std::move(filename)}, nullptr}
 {
 }
 
-BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval, std::string filename,
+BaiIndexedBamReader::BaiIndexedBamReader(const Data::GenomicInterval& interval,
+                                         std::string filename,
                                          const std::shared_ptr<BaiIndexCacheData>& index)
     : BaiIndexedBamReader{interval, BamFile{std::move(filename)}, index}
 {
 }
 
-BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval, BamFile bamFile)
+BaiIndexedBamReader::BaiIndexedBamReader(const Data::GenomicInterval& interval, BamFile bamFile)
     : BamReader{bamFile.Filename()}
     , d_{std::make_unique<BaiIndexedBamReaderPrivate>(std::move(bamFile), interval, nullptr)}
 {
 }
 
-BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval, BamFile bamFile,
+BaiIndexedBamReader::BaiIndexedBamReader(const Data::GenomicInterval& interval, BamFile bamFile,
                                          const std::shared_ptr<BaiIndexCacheData>& index)
     : BamReader{bamFile.Filename()}
     , d_{std::make_unique<BaiIndexedBamReaderPrivate>(std::move(bamFile), interval, index)}
@@ -134,7 +130,7 @@ BaiIndexedBamReader::BaiIndexedBamReader(const GenomicInterval& interval, BamFil
 
 const BamFile& BaiIndexedBamReader::File() const { return d_->file_; }
 
-const GenomicInterval& BaiIndexedBamReader::Interval() const
+const Data::GenomicInterval& BaiIndexedBamReader::Interval() const
 {
     assert(d_);
     return d_->interval_;
@@ -146,7 +142,7 @@ int BaiIndexedBamReader::ReadRawData(samFile* file, bam1_t* b)
     return d_->ReadRawData(file, b);
 }
 
-BaiIndexedBamReader& BaiIndexedBamReader::Interval(const GenomicInterval& interval)
+BaiIndexedBamReader& BaiIndexedBamReader::Interval(const Data::GenomicInterval& interval)
 {
     assert(d_);
     d_->Interval(Header(), interval);

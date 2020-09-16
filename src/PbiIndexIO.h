@@ -1,9 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_PBIINDEXIO_H
+#define PBBAM_PBIINDEXIO_H
 
-#ifndef PBIINDEXIO_H
-#define PBIINDEXIO_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cassert>
 #include <cstddef>
@@ -17,10 +15,10 @@
 #include <htslib/bgzf.h>
 #include <htslib/sam.h>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/DataSet.h"
-#include "pbbam/PbiFile.h"
-#include "pbbam/PbiRawData.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/DataSet.h>
+#include <pbbam/PbiFile.h>
+#include <pbbam/PbiRawData.h>
 
 namespace PacBio {
 namespace BAM {
@@ -113,4 +111,4 @@ void PbiIndexIO::WriteBgzfVector(BGZF* fp, const std::vector<T>& data)
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // PBIINDEXIO_H
+#endif  // PBBAM_PBIINDEXIO_H

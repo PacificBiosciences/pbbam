@@ -1,13 +1,7 @@
-// File Description
-/// \file VirtualRegionType.h
-/// \brief Defines the VirtualRegionType enum.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_REGIONTYPE_H
+#define PBBAM_REGIONTYPE_H
 
-#ifndef REGIONTYPE_H
-#define REGIONTYPE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 namespace PacBio {
 namespace BAM {
@@ -27,4 +21,4 @@ enum class VirtualRegionType  // : char
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // REGIONTYPE_H
+#endif  // PBBAM_REGIONTYPE_H

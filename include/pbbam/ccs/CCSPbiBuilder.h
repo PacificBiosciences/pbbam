@@ -1,24 +1,21 @@
 #ifndef PBBAM_CCS_CCSPBIBUILDER_H
 #define PBBAM_CCS_CCSPBIBUILDER_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
 
-#include "pbbam/PbiBuilder.h"
-#include "pbbam/ccs/CCSHeader.h"
-#include "pbbam/ccs/CCSRecord.h"
+#include <pbbam/PbiBuilder.h>
+#include <pbbam/ccs/CCSHeader.h>
+#include <pbbam/ccs/CCSRecord.h>
 
 namespace PacBio {
 namespace CCS {
 
-struct CCSHeader;
-struct CCSRecord;
-
 struct CCSPbiBuilderConfig
 {
-    using PbiBuilder = PacBio::BAM::PbiBuilder;
+    using PbiBuilder = BAM::PbiBuilder;
 
     // zlib compression level for PBI file
     PbiBuilder::CompressionLevel CompressionLevel = PbiBuilder::DefaultCompression;
@@ -30,7 +27,6 @@ struct CCSPbiBuilderConfig
 
 class CCSPbiBuilder
 {
-public:
 public:
     CCSPbiBuilder(const std::string& pbiFilename, const std::string& movieName,
                   const CCSPbiBuilderConfig& config = CCSPbiBuilderConfig());

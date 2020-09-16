@@ -1,17 +1,11 @@
-// File Description
-/// \file BamRecordView.h
-/// \brief Defines the BamRecordView class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_BAMRECORDVIEW_H
+#define PBBAM_BAMRECORDVIEW_H
 
-#ifndef BAMRECORDVIEW_H
-#define BAMRECORDVIEW_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstdint>
 
-#include "pbbam/BamRecord.h"
+#include <pbbam/BamRecord.h>
 
 namespace PacBio {
 namespace BAM {
@@ -44,34 +38,34 @@ public:
     /// \param[in] exciseSoftClips  if true, any soft-clipped positions will be
     ///                             removed from query ends
     ///
-    BamRecordView(const BamRecord& record, const Orientation orientation, const bool aligned,
+    BamRecordView(const BamRecord& record, const Data::Orientation orientation, const bool aligned,
                   const bool exciseSoftClips,
                   const PulseBehavior pulseBehavior = PulseBehavior::ALL);
 
 public:
     /// \returns BamRecord::AltLabelQV with this view's parameters applied
-    QualityValues AltLabelQVs() const;
+    Data::QualityValues AltLabelQVs() const;
 
     /// \returns BamRecord::AltLabelTag with this view's parameters applied
     std::string AltLabelTags() const;
 
     /// \returns BamRecord::DeletionQV with this view's parameters applied
-    QualityValues DeletionQVs() const;
+    Data::QualityValues DeletionQVs() const;
 
     /// \returns BamRecord::DeletionTag with this view's parameters applied
     std::string DeletionTags() const;
 
     /// \returns BamRecord::InsertionQV with this view's parameters applied
-    QualityValues InsertionQVs() const;
+    Data::QualityValues InsertionQVs() const;
 
     /// \returns BamRecord::IPD with this view's parameters applied
-    Frames IPD() const;
+    Data::Frames IPD() const;
 
     /// \returns BamRecord::LabelQV with this view's parameters applied
-    QualityValues LabelQVs() const;
+    Data::QualityValues LabelQVs() const;
 
     /// \returns BamRecord::MergeQV with this view's parameters applied
-    QualityValues MergeQVs() const;
+    Data::QualityValues MergeQVs() const;
 
     /// \returns BamRecord::PulseMergeQV with this view's parameters applied
     QualityValues PulseMergeQVs() const;
@@ -89,22 +83,22 @@ public:
     std::vector<float> Pkmid2() const;
 
     /// \returns BamRecord::PreBaseFrames with this view's parameters applied
-    Frames PrebaseFrames() const;
+    Data::Frames PrebaseFrames() const;
 
     /// \returns BamRecord::PrePulseFrames with this view's parameters applied
-    Frames PrePulseFrames() const;
+    Data::Frames PrePulseFrames() const;
 
     /// \returns BamRecord::PulseCalls with this view's parameters applied
     std::string PulseCalls() const;
 
     /// \returns BamRecord::PulseCallWidth with this view's parameters applied
-    Frames PulseCallWidth() const;
+    Data::Frames PulseCallWidth() const;
 
     /// \returns BamRecord::PulseWidths with this view's parameters applied
-    Frames PulseWidths() const;
+    Data::Frames PulseWidths() const;
 
     /// \returns BamRecord::Qualities with this view's parameters applied
-    QualityValues Qualities() const;
+    Data::QualityValues Qualities() const;
 
     /// \returns BamRecord::Sequence with this view's parameters applied
     std::string Sequence() const;
@@ -113,14 +107,14 @@ public:
     std::vector<uint32_t> StartFrames() const;
 
     /// \returns BamRecord::SubstitutionQV with this view's parameters applied
-    QualityValues SubstitutionQVs() const;
+    Data::QualityValues SubstitutionQVs() const;
 
     /// \returns BamRecord::SubstitutionTag with this view's parameters applied
     std::string SubstitutionTags() const;
 
 private:
     const BamRecord& record_;
-    Orientation orientation_;
+    Data::Orientation orientation_;
     bool aligned_;
     bool exciseSoftClips_;
     PulseBehavior pulseBehavior_;
@@ -129,4 +123,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BAMRECORDVIEW_H
+#endif  // PBBAM_BAMRECORDVIEW_H

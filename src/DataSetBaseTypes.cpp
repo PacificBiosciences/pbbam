@@ -1,14 +1,12 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/internal/DataSetBaseTypes.h"
+#include <pbbam/internal/DataSetBaseTypes.h>
 
 #include <cstddef>
 
 #include <boost/algorithm/string.hpp>
 
-#include "pbbam/DataSetTypes.h"
+#include <pbbam/DataSetTypes.h>
 
 #include "DataSetUtils.h"
 #include "TimeUtils.h"

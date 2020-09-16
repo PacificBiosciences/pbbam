@@ -1,12 +1,6 @@
-// File Description
-/// \file TagCollection.cpp
-/// \brief Implements the TagCollection class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/TagCollection.h"
+#include <pbbam/TagCollection.h>
 
 #include <ostream>
 

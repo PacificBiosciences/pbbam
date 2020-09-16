@@ -1,29 +1,19 @@
-// File Description
-/// \file GenomicIntervalQuery.h
-/// \brief Defines the GenomicIntervalQuery class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_GENOMICINTERVALQUERY_H
+#define PBBAM_GENOMICINTERVALQUERY_H
 
-#ifndef GENOMICINTERVALQUERY_H
-#define GENOMICINTERVALQUERY_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 
-#include "pbbam/BaiIndexCache.h"
-#include "pbbam/internal/QueryBase.h"
+#include <pbcopper/data/GenomicInterval.h>
+
+#include <pbbam/BaiIndexCache.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/DataSet.h>
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
-namespace Data {
-
-class GenomicInterval;
-}
-
 namespace BAM {
-
-class BamRecord;
-class DataSet;
 
 /// \brief The GenomicIntervalQuery class provides iterable access to a
 ///        DataSet's %BAM records, limiting results to those overlapping a
@@ -100,4 +90,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // GENOMICINTERVALQUERY_H
+#endif  // PBBAM_GENOMICINTERVALQUERY_H

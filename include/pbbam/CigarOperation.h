@@ -1,17 +1,7 @@
-// File Description
-/// \file CigarOperation.h
-/// \brief Defines the CigarOperationType enum & CigarOperation class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_CIGAROPERATION_H
+#define PBBAM_CIGAROPERATION_H
 
-#ifndef CIGAROPERATION_H
-#define CIGAROPERATION_H
-
-#include "pbbam/Config.h"
-
-#include <cstdint>
-
-#include <stdexcept>
+#include <pbbam/Config.h>
 
 #include <pbcopper/data/CigarOperation.h>
 
@@ -27,4 +17,4 @@ PBBAM_DEPRECATED constexpr auto ConsumesReference = PacBio::Data::ConsumesRefere
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // CIGAROPERATION_H
+#endif  // PBBAM_CIGAROPERATION_H

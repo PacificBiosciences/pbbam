@@ -1,13 +1,7 @@
-// File Description
-/// \file ZmwChunkedFastxBgzfReader.h
-/// \brief Defines the ZmwChunkedFastxBgzfReader class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_ZMWCHUNKEDFASTXBGZFREADER_H
+#define PBBAM_ZMWCHUNKEDFASTXBGZFREADER_H
 
-#ifndef ZMWCHUNKEDFASTXBGZFREADER_H
-#define ZMWCHUNKEDFASTXBGZFREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include "ZmwChunkedFastxReaderImpl.h"
 
@@ -15,7 +9,7 @@
 
 #include <htslib/kseq.h>
 
-#include "pbbam/Deleters.h"
+#include <pbbam/Deleters.h>
 
 namespace PacBio {
 namespace BAM {
@@ -50,4 +44,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // ZMWCHUNKEDFASTXBGZFREADER_H
+#endif  // PBBAM_ZMWCHUNKEDFASTXBGZFREADER_H

@@ -1,22 +1,16 @@
-// File Description
-/// \file VirtualZmwReader.h
-/// \brief Defines the VirtualZmwReader class.
-//
-// Author: Armin Töpfer
+#ifndef PBBAM_VIRTUALZMWREADER_H
+#define PBBAM_VIRTUALZMWREADER_H
 
-#ifndef VIRTUALZMWREADER_H
-#define VIRTUALZMWREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/EntireFileQuery.h"
-#include "pbbam/PbiFilter.h"
-#include "pbbam/PbiFilterQuery.h"
-#include "pbbam/virtual/VirtualZmwBamRecord.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/EntireFileQuery.h>
+#include <pbbam/PbiFilter.h>
+#include <pbbam/PbiFilterQuery.h>
+#include <pbbam/virtual/VirtualZmwBamRecord.h>
 
 namespace PacBio {
 namespace BAM {
@@ -87,4 +81,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // VirtualZmwREADER_H
+#endif  // PBBAM_VIRTUALZMWREADER_H

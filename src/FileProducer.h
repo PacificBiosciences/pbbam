@@ -1,9 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_FILEPRODUCER_H
+#define PBBAM_FILEPRODUCER_H
 
-#ifndef FILEPRODUCER_H
-#define FILEPRODUCER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstdio>
 
@@ -54,4 +52,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FILEPRODUCER_H
+#endif  // PBBAM_FILEPRODUCER_H

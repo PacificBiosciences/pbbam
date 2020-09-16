@@ -1,13 +1,7 @@
-// File Description
-/// \file BgzipWriter.h
-/// \brief Defines the BgzipWriter class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_BGZIPWRITER_H
+#define PBBAM_BGZIPWRITER_H
 
-#ifndef BGZIPWRITER_H
-#define BGZIPWRITER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
@@ -78,4 +72,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BGZIPWRITER_H
+#endif  // PBBAM_BGZIPWRITER_H

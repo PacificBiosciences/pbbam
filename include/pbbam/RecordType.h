@@ -1,13 +1,7 @@
-// File Description
-/// \file RecordType.h
-/// \brief Defines the RecordType enum.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_RECORDTYPE_H
+#define PBBAM_RECORDTYPE_H
 
-#ifndef RECORDTYPE_H
-#define RECORDTYPE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 
@@ -53,4 +47,4 @@ std::string ToString(const RecordType type);
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // RECORDTYPE_H
+#endif  // PBBAM_RECORDTYPE_H

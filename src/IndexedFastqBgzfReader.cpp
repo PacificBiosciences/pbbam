@@ -1,9 +1,3 @@
-// File Description
-/// \file BgzFastqLoader.cpp
-/// \brief Implements the IndexedFastqBgzfReaderr class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "IndexedFastqBgzfReader.h"

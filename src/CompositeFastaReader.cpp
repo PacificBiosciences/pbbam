@@ -1,12 +1,6 @@
-// File Description
-/// \file BamRecordView.cpp
-/// \brief Implements the BamRecordTags utility class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/CompositeFastaReader.h"
+#include <pbbam/CompositeFastaReader.h>
 
 namespace PacBio {
 namespace BAM {

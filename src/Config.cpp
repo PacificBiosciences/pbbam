@@ -1,12 +1,6 @@
-// File Description
-/// \file Config.cpp
-/// \brief Initializes global variable defaults.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <stdexcept>
 #include <string>
@@ -15,7 +9,7 @@
 #include <htslib/hts.h>
 #include <pbcopper/data/CigarOperation.h>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 namespace PacBio {
 namespace BAM {

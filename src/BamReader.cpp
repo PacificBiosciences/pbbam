@@ -1,12 +1,6 @@
-// File Description
-/// \file BamReader.cpp
-/// \brief Implements the BamReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/BamReader.h"
+#include <pbbam/BamReader.h>
 
 #include <cassert>
 #include <cstdint>
@@ -20,8 +14,9 @@
 #include <htslib/hts.h>
 #include <boost/optional.hpp>
 
-#include "pbbam/Deleters.h"
-#include "pbbam/Validator.h"
+#include <pbbam/BamRecord.h>
+#include <pbbam/Deleters.h>
+#include <pbbam/Validator.h>
 
 #include "Autovalidate.h"
 #include "MemoryUtils.h"
@@ -55,7 +50,7 @@ public:
             throw std::runtime_error{s.str()};
         }
 
-        std::unique_ptr<bam_hdr_t, HtslibHeaderDeleter> hdr(sam_hdr_read(htsFile_.get()));
+        const std::unique_ptr<bam_hdr_t, HtslibHeaderDeleter> hdr(sam_hdr_read(htsFile_.get()));
         if (!hdr) {
             std::ostringstream s;
             s << "[pbbam] BAM reader ERROR: could not read header from:" << displayFilename();
@@ -70,14 +65,14 @@ public:
     BamHeader header_;
 };
 
-BamReader::BamReader() : internal::IQuery(), d_{std::make_unique<BamReaderPrivate>("-")} {}
+BamReader::BamReader() : internal::IQuery{}, d_{std::make_unique<BamReaderPrivate>("-")} {}
 
 BamReader::BamReader(std::string fn)
-    : internal::IQuery(), d_{std::make_unique<BamReaderPrivate>(std::move(fn))}
+    : internal::IQuery{}, d_{std::make_unique<BamReaderPrivate>(std::move(fn))}
 {
 }
 
-BamReader::BamReader(BamFile bamFile) : BamReader(bamFile.Filename()) {}
+BamReader::BamReader(BamFile bamFile) : BamReader{bamFile.Filename()} {}
 
 BamReader::~BamReader() = default;
 

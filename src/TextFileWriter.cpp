@@ -1,13 +1,6 @@
-
-// File Description
-/// \file TextFileWriter.cpp
-/// \brief Implements the TextFileWriter class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/TextFileWriter.h"
+#include <pbbam/TextFileWriter.h>
 
 #include <cassert>
 
@@ -18,7 +11,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "pbbam/Deleters.h"
+#include <pbbam/Deleters.h>
 
 #include "ErrnoReason.h"
 #include "FileProducer.h"

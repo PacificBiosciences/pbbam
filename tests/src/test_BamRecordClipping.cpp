@@ -27,7 +27,7 @@ using f_data = std::vector<uint16_t>;
 namespace BamRecordClippingTests {
 
 static
-ReadGroupInfo MakeReadGroup(const FrameCodec codec,
+ReadGroupInfo MakeReadGroup(const Data::FrameCodec codec,
                             const std::string& movieName,
                             const std::string& readType)
 {
@@ -49,7 +49,7 @@ BamRecord MakeRecord(const Position qStart,
                      const std::string& pulseBases = "",
                      const std::string& pulseQuals = "",
                      const f_data& pulseFrames = f_data(),
-                     const FrameCodec codec = FrameCodec::RAW)
+                     const Data::FrameCodec codec = Data::FrameCodec::RAW)
 {
     BamRecordImpl impl;
     impl.SetSequenceAndQualities(seq, quals);

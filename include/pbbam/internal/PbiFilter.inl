@@ -1,10 +1,4 @@
-// File Description
-/// \file PbiFilter.inl
-/// \brief Inline implementations for the PbiFilter class.
-//
-// Author: Derek Barnett
-
-#include "pbbam/PbiFilter.h"
+#include <pbbam/PbiFilter.h>
 
 #include <algorithm>
 #include <iostream>
@@ -46,14 +40,14 @@ public:
     FilterWrapper& operator=(FilterWrapper&&) noexcept = default;
 
 public:
-    bool Accepts(const PacBio::BAM::PbiRawData& idx, const size_t row) const;
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
 
 private:
     struct WrapperInterface
     {
         virtual ~WrapperInterface() = default;
         virtual WrapperInterface* Clone() const = 0;
-        virtual bool Accepts(const PacBio::BAM::PbiRawData& idx, const size_t row) const = 0;
+        virtual bool Accepts(const PbiRawData& idx, const size_t row) const = 0;
     };
 
     template <typename T>
@@ -62,7 +56,7 @@ private:
         WrapperImpl(T x);
         WrapperImpl(const WrapperImpl& other);
         WrapperInterface* Clone() const override;
-        bool Accepts(const PacBio::BAM::PbiRawData& idx, const size_t row) const override;
+        bool Accepts(const PbiRawData& idx, const size_t row) const override;
         T data_;
     };
 
@@ -196,7 +190,7 @@ inline PbiFilter& PbiFilter::operator=(const PbiFilter& other)
     return *this;
 }
 
-inline bool PbiFilter::Accepts(const PacBio::BAM::PbiRawData& idx, const size_t row) const
+inline bool PbiFilter::Accepts(const PbiRawData& idx, const size_t row) const
 {
     return d_->Accepts(idx, row);
 }

@@ -1,9 +1,3 @@
-// File Description
-/// \file BgzFastqLoader.cpp
-/// \brief Implements the ZmwChunkedFastxBgzfReaderr class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "ZmwChunkedFastxBgzfReader.h"
@@ -142,14 +136,14 @@ FastqSequence ZmwChunkedFastxBgzfReader::ReadNextFastq(bool skipName)
     // return FASTQ
     std::string name = (skipName ? "" : std::string{seq_->name.s, seq_->name.l});
     std::string bases{seq_->seq.s, seq_->seq.l};
-    QualityValues quals{std::string{seq_->qual.s, seq_->qual.l}};
+    Data::QualityValues quals{std::string{seq_->qual.s, seq_->qual.l}};
     return FastqSequence{std::move(name), std::move(bases), std::move(quals)};
 }
 
 void ZmwChunkedFastxBgzfReader::Seek(uint64_t pos)
 {
     // seek to sequence 'id' & reset kseq handle
-    auto result = bgzf_useek(file_.get(), pos, SEEK_SET);
+    const auto result = bgzf_useek(file_.get(), pos, SEEK_SET);
     if (result != 0) {
         std::ostringstream msg;
         msg << "[pbbam] chunked FASTX reader ERROR: could not seek to requested pos: " << pos

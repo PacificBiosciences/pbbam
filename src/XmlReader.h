@@ -1,14 +1,12 @@
-// Author: Derek Barnett
+#ifndef PBBAM_XMLREADER_H
+#define PBBAM_XMLREADER_H
 
-#ifndef XMLREADER_H
-#define XMLREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <iosfwd>
 #include <memory>
 
-#include "pbbam/DataSet.h"
+#include <pbbam/DataSet.h>
 
 namespace PacBio {
 namespace BAM {
@@ -22,4 +20,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // XMLREADER_H
+#endif  // PBBAM_XMLREADER_H

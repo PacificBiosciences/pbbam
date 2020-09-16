@@ -1,12 +1,6 @@
-// File Description
-/// \file CCSRecord.cpp
-/// \brief Implements the CCSRecordclass.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/ccs/CCSRecord.h"
+#include <pbbam/ccs/CCSRecord.h>
 
 namespace PacBio {
 namespace CCS {

@@ -1,14 +1,8 @@
-// File Description
-/// \file PbiFilterQuery.cpp
-/// \brief Implements the PbiFilterQuery class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/PbiFilterQuery.h"
+#include <pbbam/PbiFilterQuery.h>
 
-#include "pbbam/CompositeBamReader.h"
+#include <pbbam/CompositeBamReader.h>
 
 namespace PacBio {
 namespace BAM {

@@ -1,8 +1,6 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/CollectionMetadata.h"
+#include <pbbam/CollectionMetadata.h>
 
 #include <sstream>
 #include <stdexcept>
@@ -11,10 +9,9 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 
-#include "pugixml/pugixml.hpp"
-
 #include "DataSetUtils.h"
 #include "RunMetadataParser.h"
+#include "pugixml/pugixml.hpp"
 
 namespace PacBio {
 namespace BAM {
@@ -24,7 +21,7 @@ boost::optional<ControlKit::CustomSequence> UpdateControlKitCache(const ControlK
 {
     if (!kit.HasChild("CustomSequence")) return boost::none;
 
-    const std::string& customSeq = kit.ChildText("CustomSequence");
+    const auto& customSeq = kit.ChildText("CustomSequence");
     const auto lines = [](const std::string& input) {
         std::vector<std::string> result;
         size_t pos = 0;
@@ -114,7 +111,7 @@ Automation::Automation(const internal::FromInputXml& fromInputXml)
 
 DEFINE_ACCESSORS(Automation, AutomationParameters, AutomationParameters)
 
-Automation& Automation::AutomationParameters(PacBio::BAM::AutomationParameters params)
+Automation& Automation::AutomationParameters(BAM::AutomationParameters params)
 {
     AutomationParameters() = params;
     return *this;
@@ -738,7 +735,7 @@ const std::string& CollectionMetadata::SubreadSetName() const { return subreadSe
 
 DEFINE_ACCESSORS(CollectionMetadata, Automation, Automation)
 
-CollectionMetadata& CollectionMetadata::Automation(PacBio::BAM::Automation automation)
+CollectionMetadata& CollectionMetadata::Automation(BAM::Automation automation)
 {
     Automation() = automation;
     return *this;
@@ -746,22 +743,21 @@ CollectionMetadata& CollectionMetadata::Automation(PacBio::BAM::Automation autom
 
 bool CollectionMetadata::HasAutomation() const { return HasChild(Element::Automation); }
 
-const PacBio::BAM::AutomationParameters& CollectionMetadata::AutomationParameters() const
+const BAM::AutomationParameters& CollectionMetadata::AutomationParameters() const
 {
-    const PacBio::BAM::Automation& automation = Automation();
+    const BAM::Automation& automation = Automation();
     return automation.AutomationParameters();
 }
 
-PacBio::BAM::AutomationParameters& CollectionMetadata::AutomationParameters()
+BAM::AutomationParameters& CollectionMetadata::AutomationParameters()
 {
-    PacBio::BAM::Automation& automation = Automation();
+    BAM::Automation& automation = Automation();
     return automation.AutomationParameters();
 }
 
-CollectionMetadata& CollectionMetadata::AutomationParameters(
-    PacBio::BAM::AutomationParameters params)
+CollectionMetadata& CollectionMetadata::AutomationParameters(BAM::AutomationParameters params)
 {
-    // PacBio::BAM::Automation& automation = Automation();
+    // BAM::Automation& automation = Automation();
     AutomationParameters() = params;
     return *this;
 }
@@ -773,7 +769,7 @@ bool CollectionMetadata::HasAutomationParameters() const
 
 DEFINE_ACCESSORS(CollectionMetadata, BindingKit, BindingKit)
 
-CollectionMetadata& CollectionMetadata::BindingKit(PacBio::BAM::BindingKit kit)
+CollectionMetadata& CollectionMetadata::BindingKit(BAM::BindingKit kit)
 {
     BindingKit() = std::move(kit);
     return *this;
@@ -783,7 +779,7 @@ bool CollectionMetadata::HasBindingKit() const { return HasChild("BindingKit"); 
 
 DEFINE_ACCESSORS(CollectionMetadata, ControlKit, ControlKit)
 
-CollectionMetadata& CollectionMetadata::ControlKit(PacBio::BAM::ControlKit kit)
+CollectionMetadata& CollectionMetadata::ControlKit(BAM::ControlKit kit)
 {
     ControlKit() = std::move(kit);
     return *this;
@@ -793,7 +789,7 @@ bool CollectionMetadata::HasControlKit() const { return HasChild("ControlKit"); 
 
 DEFINE_ACCESSORS(CollectionMetadata, PPAConfig, PPAConfig)
 
-CollectionMetadata& CollectionMetadata::PPAConfig(PacBio::BAM::PPAConfig config)
+CollectionMetadata& CollectionMetadata::PPAConfig(BAM::PPAConfig config)
 {
     PPAConfig() = std::move(config);
     return *this;
@@ -803,7 +799,7 @@ bool CollectionMetadata::HasPPAConfig() const { return HasChild("PPAConfig"); }
 
 DEFINE_ACCESSORS(CollectionMetadata, SequencingKitPlate, SequencingKitPlate)
 
-CollectionMetadata& CollectionMetadata::SequencingKitPlate(PacBio::BAM::SequencingKitPlate kit)
+CollectionMetadata& CollectionMetadata::SequencingKitPlate(BAM::SequencingKitPlate kit)
 {
     SequencingKitPlate() = std::move(kit);
     return *this;
@@ -813,7 +809,7 @@ bool CollectionMetadata::HasSequencingKitPlate() const { return HasChild("Sequen
 
 DEFINE_ACCESSORS(CollectionMetadata, TemplatePrepKit, TemplatePrepKit)
 
-CollectionMetadata& CollectionMetadata::TemplatePrepKit(PacBio::BAM::TemplatePrepKit kit)
+CollectionMetadata& CollectionMetadata::TemplatePrepKit(BAM::TemplatePrepKit kit)
 {
     TemplatePrepKit() = std::move(kit);
     return *this;

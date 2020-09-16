@@ -1,13 +1,7 @@
-// File Description
-/// \file MD5.h
-/// \brief Defines basic MD5 hash utilities
-//
-// Author: Brett Bowman
+#ifndef PBBAM_MD5_H
+#define PBBAM_MD5_H
 
-#ifndef MD5_H
-#define MD5_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 
@@ -21,4 +15,4 @@ std::string MD5Hash(const std::string& str);
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // MD5_H
+#endif  // PBBAM_MD5_H

@@ -1,21 +1,14 @@
-// File Description
-/// \file FastqReader.h
-/// \brief Defines the FastqReader class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_FASTQREADER_H
+#define PBBAM_FASTQREADER_H
 
-#ifndef FASTQREADER_H
-#define FASTQREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "pbbam/FastqSequence.h"
-
-#include "pbbam/internal/QueryBase.h"
+#include <pbbam/FastqSequence.h>
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace BAM {
@@ -82,4 +75,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FASTQREADER_H
+#endif  // PBBAM_FASTQREADER_H

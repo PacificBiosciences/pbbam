@@ -1,13 +1,7 @@
-// File Description
-/// \file BamReader.h
-/// \brief Defines the BamReader class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_BAMREADER_H
+#define PBBAM_BAMREADER_H
 
-#ifndef BAMREADER_H
-#define BAMREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstdint>
 
@@ -16,11 +10,10 @@
 
 #include <htslib/sam.h>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/BamHeader.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/GenomicInterval.h"
-#include "pbbam/internal/QueryBase.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/BamHeader.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace BAM {
@@ -150,4 +143,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BAMREADER_H
+#endif  // PBBAM_BAMREADER_H

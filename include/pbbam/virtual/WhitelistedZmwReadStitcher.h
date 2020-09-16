@@ -1,13 +1,7 @@
-// File Description
-/// \file WhitelistedZmwReadStitcher.h
-/// \brief Defines the  ZmwReadStitcher class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_WHITELISTEDZMWREADSTITCHER_H
+#define PBBAM_WHITELISTEDZMWREADSTITCHER_H
 
-#ifndef WHITELISTEDZMWREADSTITCHER_H
-#define WHITELISTEDZMWREADSTITCHER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstdint>
 
@@ -15,13 +9,13 @@
 #include <string>
 #include <vector>
 
-#include "pbbam/virtual/VirtualZmwBamRecord.h"
+#include <pbbam/BamRecord.h>
+#include <pbbam/DataSet.h>
+#include <pbbam/PbiFilter.h>
+#include <pbbam/virtual/VirtualZmwBamRecord.h>
 
 namespace PacBio {
 namespace BAM {
-
-class DataSet;
-class PbiFilter;
 
 /// \brief The WhitelistedZmwReadStitcher class provides an interface for
 ///        re-stitching "virtual" ZMW reads from their constituent parts,
@@ -101,4 +95,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // WHITELISTEDZMWREADSTITCHER
+#endif  // PBBAM_WHITELISTEDZMWREADSTITCHER

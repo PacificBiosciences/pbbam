@@ -1,13 +1,7 @@
-// File Description
-/// \file ValidationException.h
-/// \brief Defines the ValidationException class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_VALIDATIONEXCEPTION_H
+#define PBBAM_VALIDATIONEXCEPTION_H
 
-#ifndef VALIDATIONEXCEPTION_H
-#define VALIDATIONEXCEPTION_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <map>
 #include <stdexcept>

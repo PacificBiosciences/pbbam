@@ -1,5 +1,3 @@
-// Author: Lance Hepler
-
 #include "PbbamInternalConfig.h"
 
 #include "ChemistryTable.h"
@@ -9,7 +7,7 @@
 #include <fstream>
 #include <map>
 
-#include "pbbam/exception/BundleChemistryMappingException.h"
+#include <pbbam/exception/BundleChemistryMappingException.h>
 
 #include "FileUtils.h"
 #include "pugixml/pugixml.hpp"
@@ -32,7 +30,7 @@ ChemistryTable ChemistryTableFromXml(const std::string& mappingXml)
             mappingXml, "unparseable XML, error code:" + std::to_string(loadResult.status)};
 
     // parse top-level attributes
-    pugi::xml_node rootNode = doc.document_element();
+    const pugi::xml_node rootNode = doc.document_element();
     if (rootNode == pugi::xml_node())
         throw BundleChemistryMappingException{mappingXml, "could not fetch XML root node"};
 

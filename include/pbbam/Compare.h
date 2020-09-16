@@ -1,14 +1,7 @@
-// File Description
-/// \file Compare.h
-/// \brief Defines the Compare class & a number of function objects for
-///       comparing BamRecords.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_COMPARE_H
+#define PBBAM_COMPARE_H
 
-#ifndef COMPARE_H
-#define COMPARE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -17,7 +10,7 @@
 #include <string>
 #include <utility>
 
-#include "pbbam/BamRecord.h"
+#include <pbbam/BamRecord.h>
 
 namespace PacBio {
 namespace BAM {
@@ -141,7 +134,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct AlignedEnd : public MemberFunctionBase<Position, &BamRecord::AlignedEnd>
+    struct AlignedEnd : public MemberFunctionBase<Data::Position, &BamRecord::AlignedEnd>
     {
     };
 
@@ -153,7 +146,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct AlignedStart : public MemberFunctionBase<Position, &BamRecord::AlignedStart>
+    struct AlignedStart : public MemberFunctionBase<Data::Position, &BamRecord::AlignedStart>
     {
     };
 
@@ -165,7 +158,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct AlignedStrand : public MemberFunctionBase<Strand, &BamRecord::AlignedStrand>
+    struct AlignedStrand : public MemberFunctionBase<Data::Strand, &BamRecord::AlignedStrand>
     {
     };
 
@@ -238,7 +231,7 @@ public:
     ///       ascending value).
     ///
     struct LocalContextFlag
-        : public MemberFunctionBase<LocalContextFlags, &BamRecord::LocalContextFlags>
+        : public MemberFunctionBase<Data::LocalContextFlags, &BamRecord::LocalContextFlags>
     {
     };
 
@@ -344,7 +337,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct QueryEnd : public MemberFunctionBase<Position, &BamRecord::QueryEnd>
+    struct QueryEnd : public MemberFunctionBase<Data::Position, &BamRecord::QueryEnd>
     {
     };
 
@@ -356,7 +349,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct QueryStart : public MemberFunctionBase<Position, &BamRecord::QueryStart>
+    struct QueryStart : public MemberFunctionBase<Data::Position, &BamRecord::QueryStart>
     {
     };
 
@@ -368,7 +361,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct ReadAccuracy : public MemberFunctionBase<Accuracy, &BamRecord::ReadAccuracy>
+    struct ReadAccuracy : public MemberFunctionBase<Data::Accuracy, &BamRecord::ReadAccuracy>
     {
     };
 
@@ -409,7 +402,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct ReferenceEnd : public MemberFunctionBase<Position, &BamRecord::ReferenceEnd>
+    struct ReferenceEnd : public MemberFunctionBase<Data::Position, &BamRecord::ReferenceEnd>
     {
     };
 
@@ -445,7 +438,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct ReferenceStart : public MemberFunctionBase<Position, &BamRecord::ReferenceStart>
+    struct ReferenceStart : public MemberFunctionBase<Data::Position, &BamRecord::ReferenceStart>
     {
     };
 
@@ -492,6 +485,6 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/Compare.inl"
+#include <pbbam/internal/Compare.inl>
 
-#endif  // COMPARE_H
+#endif  // PBBAM_COMPARE_H

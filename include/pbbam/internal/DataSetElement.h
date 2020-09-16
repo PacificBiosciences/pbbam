@@ -1,11 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_DATASETELEMENT_H
+#define PBBAM_DATASETELEMENT_H
 
-#ifndef DATASETELEMENT_H
-#define DATASETELEMENT_H
-
-#include "pbbam/Config.h"
-
-#include "pbbam/DataSetXsd.h"
+#include <pbbam/Config.h>
 
 #include <cassert>
 
@@ -17,6 +13,8 @@
 #include <vector>
 
 #include <boost/utility/string_ref.hpp>
+
+#include <pbbam/DataSetXsd.h>
 
 namespace PacBio {
 namespace BAM {
@@ -198,6 +196,6 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/DataSetElement.inl"
+#include <pbbam/internal/DataSetElement.inl>
 
-#endif  // DATASETELEMENT_H
+#endif  // PBBAM_DATASETELEMENT_H
