@@ -1,12 +1,6 @@
-// File Description
-/// \file PbiBuilder.cpp
-/// \brief Implements the PbiBuilder class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/PbiBuilder.h"
+#include <pbbam/PbiBuilder.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -27,11 +21,13 @@
 
 #include <pbcopper/utility/Deleters.h>
 
-#include "pbbam/BamRecord.h"
-#include "pbbam/BamRecordImpl.h"
-#include "pbbam/PbiRawData.h"
-#include "pbbam/RecordType.h"
+#include <pbbam/BamRecord.h>
+#include <pbbam/BamRecordImpl.h>
+#include <pbbam/Deleters.h>
+#include <pbbam/PbiRawData.h>
+#include <pbbam/RecordType.h>
 
+#include "ErrnoReason.h"
 #include "MemoryUtils.h"
 
 namespace PacBio {
@@ -55,7 +51,7 @@ struct PbiBuilderException : public std::exception
 namespace internal {
 
 template <typename T>
-inline void SwapEndianness(std::vector<T>& data)
+void SwapEndianness(std::vector<T>& data)
 {
     const size_t elementSize = sizeof(T);
     const size_t numReads = data.size();
@@ -83,14 +79,16 @@ inline void SwapEndianness(std::vector<T>& data)
 void bgzf_write_safe(BGZF* fp, const void* data, size_t length)
 {
     const auto ret = bgzf_write(fp, data, length);
-    if (ret < 0L)
-        throw std::runtime_error{
-            "[pbbam] PBI index builder ERROR: non-zero returned from bgzf_write(). Out of disk "
-            "space?"};
+    if (ret < 0L) {
+        std::ostringstream msg;
+        msg << "[pbbam] PBI index builder ERROR: could not write to BGZF file";
+        MaybePrintErrnoReason(msg);
+        throw std::runtime_error{msg.str()};
+    }
 }
 
 template <typename T>
-inline void WriteBgzfVector(BGZF* fp, std::vector<T>& data)
+void WriteBgzfVector(BGZF* fp, std::vector<T>& data)
 {
     assert(fp);
     if (fp->is_be) SwapEndianness(data);
@@ -140,7 +138,7 @@ public:
 
 private:
     int32_t lastRefId_ = -1;
-    Position lastPos_ = -1;
+    Data::Position lastPos_ = -1;
     std::map<uint32_t, PbiReferenceEntry> rawReferenceEntries_;
 };
 
@@ -307,7 +305,7 @@ public:
     void AddRecord(const BamRecord& b, const int64_t uOffset)
     {
         // ensure updated data (necessary?)
-        PacBio::BAM::BamRecordMemory::UpdateRecordTags(b);
+        BAM::BamRecordMemory::UpdateRecordTags(b);
         b.ResetCachedPositions();
 
         // store record data & maybe flush to temp file
@@ -339,7 +337,7 @@ public:
         const float readAccuracy =
             (b.HasReadAccuracy() ? boost::numeric_cast<float>(b.ReadAccuracy()) : 0.0F);
         const uint8_t ctxt = (b.HasLocalContextFlags() ? b.LocalContextFlags()
-                                                       : LocalContextFlags::NO_LOCAL_CONTEXT);
+                                                       : Data::LocalContextFlags::NO_LOCAL_CONTEXT);
 
         // store
         rgIdField_.Add(rgId);
@@ -360,7 +358,7 @@ public:
         const auto aStart = static_cast<uint32_t>(b.AlignedStart());
         const auto aEnd = static_cast<uint32_t>(b.AlignedEnd());
         const auto isReverseStrand = [&b]() -> uint8_t {
-            return (b.AlignedStrand() == Strand::REVERSE ? 1 : 0);
+            return (b.AlignedStrand() == Data::Strand::REVERSE ? 1 : 0);
         }();
 
         // alignment quality
@@ -440,9 +438,12 @@ public:
         // open file handle
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel_));
         pbiFile_.reset(bgzf_open(pbiFilename_.c_str(), mode.c_str()));
-        if (pbiFile_ == nullptr)
-            throw PbiBuilderException{pbiFilename_, "could not open file for writing"};
-
+        if (pbiFile_ == nullptr) {
+            std::ostringstream msg;
+            msg << "[pbbam] PBI index builder ERROR: could not open file for writing:\n"
+                << "  file: " << pbiFilename_ << '\n';
+            throw std::runtime_error{msg.str()};
+        }
         // if no explicit thread count given, attempt built-in check
         size_t actualNumThreads = numThreads_;
         if (actualNumThreads == 0) {
@@ -504,6 +505,7 @@ public:
             s << "[pbbam] PBI index builder ERROR: could not seek in temp file:\n"
               << "  file: " << tempFilename_ << '\n'
               << "  offset: " << block.pos_;
+            MaybePrintErrnoReason(s);
             throw std::runtime_error{s.str()};
         }
 
@@ -512,8 +514,13 @@ public:
         const auto numElements =
             std::fread(field.buffer_.data(), sizeof(T), block.n_, tempFile_.get());
 
-        if (numElements != block.n_)
-            throw PbiBuilderException{tempFilename_, "could not read element count from temp file"};
+        if (numElements != block.n_) {
+            std::ostringstream msg;
+            msg << "[pbbam] PBI builder ERROR: could not read element count from temp file\n"
+                << "  file: " << tempFilename_ << '\n';
+            MaybePrintErrnoReason(msg);
+            throw std::runtime_error{msg.str()};
+        }
     }
 
     template <typename T>

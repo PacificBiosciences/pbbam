@@ -1,10 +1,11 @@
 // Author: Derek Barnett
 
+#include <pbbam/AlignmentPrinter.h>
+
 #include <string>
 
 #include <gtest/gtest.h>
 
-#include <pbbam/AlignmentPrinter.h>
 #include <pbbam/BamFile.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/EntireFileQuery.h>
@@ -22,7 +23,7 @@ const std::string singleInsertionBam{PbbamTestsConfig::Data_Dir + "/aligned.bam"
 
 }  // namespace AlignmentPrinterTests
 
-TEST(AlignmentPrinterTest, Print)
+TEST(BAM_AlignmentPrinter, can_pretty_print_alignment_as_string)
 {
     IndexedFastaReader r{AlignmentPrinterTests::lambdaFasta};
     AlignmentPrinter pretty{r};

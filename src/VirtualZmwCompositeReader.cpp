@@ -1,9 +1,3 @@
-// File Description
-/// \file VirtualZmwCompositeReader.cpp
-/// \brief Implements the VirtualZmwCompositeReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "VirtualZmwCompositeReader.h"

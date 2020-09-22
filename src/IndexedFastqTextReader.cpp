@@ -1,9 +1,3 @@
-// File Description
-/// \file IndexedFastqTextReader.cpp
-/// \brief Implements the IndexedFastqTextReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "IndexedFastqTextReader.h"
@@ -13,10 +7,11 @@
 #include <cassert>
 #include <cstdio>
 
-#include <iostream>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
+
+#include "ErrnoReason.h"
 
 namespace PacBio {
 namespace BAM {
@@ -31,6 +26,7 @@ IndexedFastqTextReader::IndexedFastqTextReader(std::string filename)
         std::ostringstream msg;
         msg << "[pbbam] FASTQ reader ERROR: could not open file:\n"
             << "  FASTQ file: " << fastqFilename_;
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
 

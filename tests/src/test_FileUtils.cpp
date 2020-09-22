@@ -1,19 +1,20 @@
 // Author: Derek Barnett
 
+#include <pbbam/../../src/FileUtils.h>
+
 #include <cctype>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
 
-#include <iostream>
 #include <string>
 #include <tuple>
 #include <vector>
 
 #include <gtest/gtest.h>
+
 #include <boost/algorithm/string.hpp>
 
-#include <pbbam/../../src/FileUtils.h>
 #include <pbbam/../../src/TimeUtils.h>
 
 #include "PbbamTestData.h"
@@ -21,7 +22,7 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-TEST(FileUtilsTest, ExistsOk)
+TEST(BAM_FileUtils, can_determines_if_file_exists)
 {
     EXPECT_FALSE(FileUtils::Exists("does_not_exist.txt"));
 
@@ -31,7 +32,7 @@ TEST(FileUtilsTest, ExistsOk)
     EXPECT_TRUE(FileUtils::Exists(tmp));
 }
 
-TEST(FileUtilsTest, LastModifiedOk)
+TEST(BAM_FileUtils, can_determines_last_modified_time)
 {
     // a little tricky to check without going a full 'mock' filesystem route, but we can approximate
     //
@@ -57,7 +58,7 @@ TEST(FileUtilsTest, LastModifiedOk)
     EXPECT_LE(thenSeconds, stampSeconds + skew);
 }
 
-TEST(FileUtilsTest, ResolvedFilePathOk)
+TEST(BAM_FileUtils, can_resolve_file_paths)
 {
     const std::string testFrom = "/path/to/myDir";
 
@@ -110,7 +111,7 @@ TEST(FileUtilsTest, ResolvedFilePathOk)
     EXPECT_EQ("./file.txt", resolvedNoPathSchemeFn_defaultFrom);
 }
 
-TEST(FileUtilsTest, SizeOk)
+TEST(BAM_FileUtils, can_determines_file_size)
 {
     const std::string tmp = PbbamTestsConfig::GeneratedData_Dir + "/pbbam_empty_file.tmp";
     const std::string cmd = "touch " + tmp;
@@ -209,7 +210,7 @@ std::string native_resolvedFilePath(const std::string& filePath, const std::stri
 
 }  // namespace test_windows
 
-TEST(FileUtilsTest, WindowsPathsOk)
+TEST(BAM_FileUtils, handles_windows_file_paths)
 {
     {  // remove disk name
 

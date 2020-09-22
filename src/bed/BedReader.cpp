@@ -1,12 +1,6 @@
-// File Description
-/// \file BedReader.cpp
-/// \brief Implements the BedReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/bed/BedReader.h"
+#include <pbbam/bed/BedReader.h>
 
 #include <cassert>
 
@@ -17,12 +11,12 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/optional.hpp>
 
-#include "pbbam/FormatUtils.h"
-#include "pbbam/StringUtilities.h"
-#include "pbbam/TextFileReader.h"
+#include <pbbam/FormatUtils.h>
+#include <pbbam/StringUtilities.h>
+#include <pbbam/TextFileReader.h>
 
 namespace PacBio {
-namespace BAM {
+namespace BED {
 
 static_assert(!std::is_copy_constructible<BedReader>::value,
               "BedReader(const BedReader&) is not = delete");
@@ -35,7 +29,7 @@ public:
     explicit BedReaderPrivate(const std::string& fn)
     {
         // validate extension
-        if (!FormatUtils::IsBedFilename(fn)) {
+        if (!BAM::FormatUtils::IsBedFilename(fn)) {
             std::ostringstream msg;
             msg << "[pbbam] BED reader ERROR: not a recognized BED extension:\n"
                 << "  filename: " << fn << '\n';
@@ -43,7 +37,7 @@ public:
         };
 
         // open file stream
-        reader_ = std::make_unique<TextFileReader>(fn);
+        reader_ = std::make_unique<BAM::TextFileReader>(fn);
         if (!reader_) {
             std::ostringstream msg;
             msg << "[pbbam] BED reader ERROR: could not open file:\n"
@@ -64,13 +58,13 @@ public:
         if (reader_->GetNext(line)) interval_ = ParseInterval(std::move(line));
     }
 
-    GenomicInterval ParseInterval(std::string line)
+    Data::GenomicInterval ParseInterval(std::string line)
     {
         // trim any trailing whitespace
         boost::trim_right(line);
 
         // split into token fields
-        const auto fields = PacBio::BAM::Split(line, '\t');
+        const auto fields = BAM::Split(line, '\t');
         if (fields.size() < 3) {
             std::ostringstream msg;
             msg << "[pbbam] BED reader ERROR: invalid BED record. Line has fewer than 3 fields:\n"
@@ -80,17 +74,17 @@ public:
         }
 
         // convert fields into interval
-        const Position start = std::stoi(fields[1]);
-        const Position end = std::stoi(fields[2]);
+        const Data::Position start = std::stoi(fields[1]);
+        const Data::Position end = std::stoi(fields[2]);
         return {fields[0], start, end};
     }
 
-    std::unique_ptr<TextFileReader> reader_;
-    boost::optional<GenomicInterval> interval_;
+    std::unique_ptr<BAM::TextFileReader> reader_;
+    boost::optional<Data::GenomicInterval> interval_;
 };
 
 BedReader::BedReader(const std::string& fn)
-    : internal::QueryBase<GenomicInterval>{}, d_{std::make_unique<BedReaderPrivate>(fn)}
+    : BAM::internal::QueryBase<Data::GenomicInterval>{}, d_{std::make_unique<BedReaderPrivate>(fn)}
 {
 }
 
@@ -102,7 +96,7 @@ BedReader::~BedReader() = default;
 
 const std::string& BedReader::Filename() const { return d_->Filename(); }
 
-bool BedReader::GetNext(GenomicInterval& interval)
+bool BedReader::GetNext(Data::GenomicInterval& interval)
 {
     if (!d_->interval_) return false;
 
@@ -111,9 +105,9 @@ bool BedReader::GetNext(GenomicInterval& interval)
     return true;
 }
 
-std::vector<GenomicInterval> BedReader::ReadAll(const std::string& fn)
+std::vector<Data::GenomicInterval> BedReader::ReadAll(const std::string& fn)
 {
-    std::vector<GenomicInterval> result;
+    std::vector<Data::GenomicInterval> result;
     result.reserve(256);
     BedReader reader{fn};
     for (const auto& seq : reader)
@@ -121,5 +115,5 @@ std::vector<GenomicInterval> BedReader::ReadAll(const std::string& fn)
     return result;
 }
 
-}  // namespace BAM
+}  // namespace BED
 }  // namespace PacBio

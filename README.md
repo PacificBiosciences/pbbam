@@ -1,7 +1,5 @@
 # pbbam
 
-[![Build Status](https://travis-ci.org/PacificBiosciences/pbbam.svg?branch=master)](https://travis-ci.org/PacificBiosciences/pbbam) [![Documentation Status](https://readthedocs.org/projects/pbbam/badge/?version=latest)](http://pbbam.readthedocs.org/en/latest/?badge=latest)
-
 As of the 3.0 release of SMRTanalysis, PacBio is embracing the industry standard BAM
 format for (both aligned and unaligned) basecall data files. We have also formulated
 a BAM companion file format (bam.pbi) enabling fast access to a richer set of per-read

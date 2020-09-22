@@ -1,27 +1,15 @@
-// File Description
-/// \file BgzipFastqWriter.h
-/// \brief Defines the BgzipFastqWriter class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_BGZIPFASTQWRITER_H
+#define PBBAM_BGZIPFASTQWRITER_H
 
-#ifndef BGZIPFASTQWRITER_H
-#define BGZIPFASTQWRITER_H
+#include <pbbam/Config.h>
 
-#include "pbbam/Config.h"
-
-#include <fstream>
-#include <iostream>
 #include <string>
 
-#include "pbbam/BgzipWriter.h"
-#include "pbbam/IFastqWriter.h"
+#include <pbbam/BgzipWriter.h>
+#include <pbbam/IFastqWriter.h>
 
 namespace PacBio {
 namespace BAM {
-
-class BamRecord;
-class BamRecordImpl;
-class FastqSequence;
 
 class BgzipFastqWriter final : public IFastqWriter
 {
@@ -32,11 +20,10 @@ public:
 public:
     // IFastqWriter
     void Write(const FastqSequence& fastq);
-    void Write(const std::string& name, const std::string& bases, const QualityValues& quals);
+    void Write(const std::string& name, const std::string& bases, const Data::QualityValues& quals);
     void Write(const std::string& name, const std::string& bases, const std::string& quals);
 
     // IRecordWriter
-    void TryFlush();
     void Write(const BamRecord& bam);
     void Write(const BamRecordImpl& bam);
 
@@ -47,4 +34,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BGZFFASTQWRITER_H
+#endif  // PBBAM_BGZFFASTQWRITER_H

@@ -1,18 +1,19 @@
 // Author: Derek Barnett
 
+#include <pbbam/FastaReader.h>
+
 #include <cstddef>
 
 #include <gtest/gtest.h>
 
+#include <boost/algorithm/string.hpp>
+
 #include "PbbamTestData.h"
 
 #include <pbbam/EntireFileQuery.h>
-#include <pbbam/FastaReader.h>
 #include <pbbam/FastaSequence.h>
 #include <pbbam/FastaSequenceQuery.h>
 #include <pbbam/FastaWriter.h>
-#include <pbbam/Unused.h>
-#include <boost/algorithm/string.hpp>
 
 #include "FastxTests.h"
 
@@ -65,80 +66,80 @@ void CheckReadAll(const std::string& fn)
 
 }  // namespace FastaReaderTests
 
-TEST(FastaReaderTest, throws_on_empty_filename)
+TEST(BAM_FastaReader, throws_on_empty_filename)
 {
     EXPECT_THROW(FastaReader reader{""}, std::runtime_error);
 }
 
-TEST(FastaReaderTest, throws_on_invalid_extension)
+TEST(BAM_FastaReader, throws_on_invalid_extension)
 {
     EXPECT_THROW(FastaReader reader{"wrong.ext"}, std::runtime_error);
 }
 
-TEST(FastaReaderTest, can_open_text_fasta)
+TEST(BAM_FastaReader, can_open_text_fasta)
 {
     const auto& fn = FastxTests::simpleFastaFn;
     EXPECT_NO_THROW(FastaReader reader{fn});
 }
 
-TEST(FastaReaderTest, can_open_gzip_fasta)
+TEST(BAM_FastaReader, can_open_gzip_fasta)
 {
     const auto& fn = FastxTests::simpleFastaGzipFn;
     EXPECT_NO_THROW(FastaReader reader{fn});
 }
 
-TEST(FastaReaderTest, can_open_bgzf_fasta)
+TEST(BAM_FastaReader, can_open_bgzf_fasta)
 {
     const auto& fn = FastxTests::simpleFastaBgzfFn;
     EXPECT_NO_THROW(FastaReader reader{fn});
 }
 
-TEST(FastaReaderTest, can_iterate_manually_on_text_fasta)
+TEST(BAM_FastaReader, can_iterate_manually_on_text_fasta)
 {
     FastaReaderTests::CheckManualIteration(FastxTests::simpleFastaFn);
 }
 
-TEST(FastaReaderTest, can_iterate_manually_on_gzip_fasta)
+TEST(BAM_FastaReader, can_iterate_manually_on_gzip_fasta)
 {
     FastaReaderTests::CheckManualIteration(FastxTests::simpleFastaGzipFn);
 }
 
-TEST(FastaReaderTest, can_iterate_manually_on_bgzf_fasta)
+TEST(BAM_FastaReader, can_iterate_manually_on_bgzf_fasta)
 {
     FastaReaderTests::CheckManualIteration(FastxTests::simpleFastaBgzfFn);
 }
 
-TEST(FastaReaderTest, can_iterate_using_range_for_on_text_fasta)
+TEST(BAM_FastaReader, can_iterate_using_range_for_on_text_fasta)
 {
     FastaReaderTests::CheckRangeFor(FastxTests::simpleFastaFn);
 }
 
-TEST(FastaReaderTest, can_iterate_using_range_for_on_gzip_fasta)
+TEST(BAM_FastaReader, can_iterate_using_range_for_on_gzip_fasta)
 {
     FastaReaderTests::CheckRangeFor(FastxTests::simpleFastaGzipFn);
 }
 
-TEST(FastaReaderTest, can_iterate_using_range_for_on_bgzf_fasta)
+TEST(BAM_FastaReader, can_iterate_using_range_for_on_bgzf_fasta)
 {
     FastaReaderTests::CheckRangeFor(FastxTests::simpleFastaBgzfFn);
 }
 
-TEST(FastaReaderTest, can_read_all_from_text_fasta)
+TEST(BAM_FastaReader, can_read_all_from_text_fasta)
 {
     FastaReaderTests::CheckReadAll(FastxTests::simpleFastaFn);
 }
 
-TEST(FastaReaderTest, can_read_all_from_gzip_fasta)
+TEST(BAM_FastaReader, can_read_all_from_gzip_fasta)
 {
     FastaReaderTests::CheckReadAll(FastxTests::simpleFastaGzipFn);
 }
 
-TEST(FastaReaderTest, can_read_all_from_bgzf_fasta)
+TEST(BAM_FastaReader, can_read_all_from_bgzf_fasta)
 {
     FastaReaderTests::CheckReadAll(FastxTests::simpleFastaBgzfFn);
 }
 
-TEST(FastaReaderTest, can_handle_windows_style_newlines)
+TEST(BAM_FastaReader, can_handle_windows_style_newlines)
 {
     size_t count = 0;
     FastaReader reader{FastxTests::fastxDataDir + "/windows_formatted.fasta"};

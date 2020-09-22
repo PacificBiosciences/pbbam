@@ -1,7 +1,11 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
 #include <pbbam/vcf/VcfVariant.h>
+
+#include <string>
+#include <vector>
+
+#include <gtest/gtest.h>
 
 using InfoField = PacBio::VCF::InfoField;
 using VcfVariant = PacBio::VCF::VcfVariant;
@@ -15,7 +19,7 @@ const std::string BasicVariantText{
 
 }  // namespace VcfVariantTests
 
-TEST(VCF_Variant, default_ctor_provides_proper_default_values)
+TEST(VCF_VcfVariant, default_ctor_provides_proper_default_values)
 {
     VcfVariant v;
 
@@ -32,7 +36,7 @@ TEST(VCF_Variant, default_ctor_provides_proper_default_values)
     EXPECT_FALSE(v.IsSnp());
 }
 
-TEST(VCF_Variant, can_create_snp)
+TEST(VCF_VcfVariant, can_create_snp)
 {
     const VcfVariant v{"var_snp", "3", 3000, "C", "G"};
 
@@ -49,7 +53,7 @@ TEST(VCF_Variant, can_create_snp)
     EXPECT_TRUE(v.IsSnp());
 }
 
-TEST(VCF_Variant, can_create_insertion)
+TEST(VCF_VcfVariant, can_create_insertion)
 {
     const VcfVariant v{"var_ins", "3", 3000, "C", "CTAG"};
 
@@ -66,7 +70,7 @@ TEST(VCF_Variant, can_create_insertion)
     EXPECT_FALSE(v.IsSnp());
 }
 
-TEST(VCF_Variant, can_create_deletion)
+TEST(VCF_VcfVariant, can_create_deletion)
 {
     const VcfVariant v{"var_del", "3", 3000, "TCG", "T"};
 
@@ -83,14 +87,14 @@ TEST(VCF_Variant, can_create_deletion)
     EXPECT_FALSE(v.IsSnp());
 }
 
-TEST(VCF_Variant, can_determine_if_info_field_is_present)
+TEST(VCF_VcfVariant, can_determine_if_info_field_is_present)
 {
     const VcfVariant v{VcfVariantTests::BasicVariantText};
     EXPECT_TRUE(v.HasInfoField("SVLEN"));
     EXPECT_FALSE(v.HasInfoField("nope"));
 }
 
-TEST(VCF_Variant, can_fetch_single_value_info_field)
+TEST(VCF_VcfVariant, can_fetch_single_value_info_field)
 {
     const VcfVariant v{VcfVariantTests::BasicVariantText};
     const auto& value = v.InfoValue("SVTYPE");
@@ -98,7 +102,7 @@ TEST(VCF_Variant, can_fetch_single_value_info_field)
     EXPECT_EQ("INS", value.get());
 }
 
-TEST(VCF_Variant, can_add_single_value_info_field)
+TEST(VCF_VcfVariant, can_add_single_value_info_field)
 {
     VcfVariant v{VcfVariantTests::BasicVariantText};
 
@@ -111,7 +115,7 @@ TEST(VCF_Variant, can_add_single_value_info_field)
     EXPECT_EQ("42", v.InfoValue("NEW").get());
 }
 
-TEST(VCF_Variant, can_fetch_multi_value_info_field)
+TEST(VCF_VcfVariant, can_fetch_multi_value_info_field)
 {
     const VcfVariant v{VcfVariantTests::BasicVariantText};
     const auto& values = v.InfoValues("MULTI");
@@ -122,7 +126,7 @@ TEST(VCF_Variant, can_fetch_multi_value_info_field)
     EXPECT_EQ("3", values->at(2));
 }
 
-TEST(VCF_Variant, can_edit_single_value_info_field)
+TEST(VCF_VcfVariant, can_edit_single_value_info_field)
 {
     VcfVariant v{VcfVariantTests::BasicVariantText};
     auto value = v.InfoValue("SVTYPE");
@@ -136,7 +140,7 @@ TEST(VCF_Variant, can_edit_single_value_info_field)
     EXPECT_EQ("FOO", value.get());
 }
 
-TEST(VCF_Variant, can_edit_multi_value_info_field)
+TEST(VCF_VcfVariant, can_edit_multi_value_info_field)
 {
     VcfVariant v{VcfVariantTests::BasicVariantText};
 
@@ -158,7 +162,7 @@ TEST(VCF_Variant, can_edit_multi_value_info_field)
     EXPECT_EQ("42", values->at(2));
 }
 
-TEST(VCF_Variant, can_add_multi_value_info_field)
+TEST(VCF_VcfVariant, can_add_multi_value_info_field)
 {
     VcfVariant v{VcfVariantTests::BasicVariantText};
     InfoField i;
@@ -174,7 +178,7 @@ TEST(VCF_Variant, can_add_multi_value_info_field)
     EXPECT_EQ("42", values->at(2));
 }
 
-TEST(VCF_Variant, can_remove_info_field)
+TEST(VCF_VcfVariant, can_remove_info_field)
 {
     VcfVariant v{VcfVariantTests::BasicVariantText};
 
@@ -187,7 +191,7 @@ TEST(VCF_Variant, can_remove_info_field)
     EXPECT_EQ("INS", v.InfoValue("SVTYPE").get());
 }
 
-TEST(VCF_Variant, can_fetch_all_genotype_ids)
+TEST(VCF_VcfVariant, can_fetch_all_genotype_ids)
 {
     const VcfVariant v{VcfVariantTests::BasicVariantText};
     const auto& genotypeIds = v.GenotypeIds();
@@ -198,14 +202,14 @@ TEST(VCF_Variant, can_fetch_all_genotype_ids)
     EXPECT_EQ("AC", genotypeIds.at(3));
 }
 
-TEST(VCF_Variant, can_fetch_all_genotype_fields)
+TEST(VCF_VcfVariant, can_fetch_all_genotype_fields)
 {
     const VcfVariant v{VcfVariantTests::BasicVariantText};
     const auto& genotypeFields = v.Genotypes();
     ASSERT_EQ(1, genotypeFields.size());
 }
 
-TEST(VCF_Variant, can_fetch_single_value_genotype_field)
+TEST(VCF_VcfVariant, can_fetch_single_value_genotype_field)
 {
     const VcfVariant v{VcfVariantTests::BasicVariantText};
     const auto& value = v.GenotypeValue(0, "AD");
@@ -213,7 +217,7 @@ TEST(VCF_Variant, can_fetch_single_value_genotype_field)
     EXPECT_EQ("2", value.get());
 }
 
-TEST(VCF_Variant, can_fetch_multi_value_genotype_field)
+TEST(VCF_VcfVariant, can_fetch_multi_value_genotype_field)
 {
     const VcfVariant v{VcfVariantTests::BasicVariantText};
     const auto& values = v.GenotypeValues(0, "AC");
@@ -221,13 +225,13 @@ TEST(VCF_Variant, can_fetch_multi_value_genotype_field)
     ASSERT_EQ(2, values->size());
 }
 
-TEST(VCF_Variant, can_determine_if_sample_is_heterozygous)
+TEST(VCF_VcfVariant, can_determine_if_sample_is_heterozygous)
 {
     const VcfVariant v{VcfVariantTests::BasicVariantText};
     EXPECT_TRUE(v.IsSampleHeterozygous(0));
 }
 
-TEST(VCF_Variant, can_determine_if_sample_is_phased)
+TEST(VCF_VcfVariant, can_determine_if_sample_is_phased)
 {
     const VcfVariant v{VcfVariantTests::BasicVariantText};
     EXPECT_FALSE(v.IsSamplePhased(0));

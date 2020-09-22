@@ -1,13 +1,15 @@
 // Author: Derek Barnett
 
-#include <chrono>
+#include <pbbam/BamRecord.h>
+
 #include <cstdint>
+
+#include <chrono>
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include <pbbam/BamRecord.h>
 #include <pbbam/BamRecordView.h>
 #include <pbbam/BamTagCodec.h>
 
@@ -52,7 +54,7 @@ BamRecord MakeRecord(const Position qStart,
 
 } // namespace BamRecordMappingTests
 
-TEST(BamRecordMappingTest, BasicMap)
+TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
 {
     const Position qStart = 500;
     const Position qEnd   = 510;
@@ -330,7 +332,7 @@ TEST(BamRecordMappingTest, BasicMap)
     }
 }
 
-TEST(BamRecordMappingTest, SoftClipMapping)
+TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
 {
     const Position qStart = 500;
     const Position qEnd   = 515;
@@ -609,7 +611,7 @@ TEST(BamRecordMappingTest, SoftClipMapping)
     }
 }
 
-TEST(BamRecordMappingTest, MappedCopy)
+TEST(BAM_BamRecordMapping, can_created_mapped_copy_of_record)
 {
     const Position qStart = 500;
     const Position qEnd   = 510;
@@ -654,7 +656,7 @@ TEST(BamRecordMappingTest, MappedCopy)
     EXPECT_EQ(frames,   view.IPD().Data());
 }
 
-TEST(BamRecordMappingTest, StaticMapped)
+TEST(BAM_BamRecordMapping, can_created_mapped_copy_of_record_static)
 {
     const Position qStart = 500;
     const Position qEnd   = 510;

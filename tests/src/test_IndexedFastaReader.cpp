@@ -1,7 +1,7 @@
 // Author: Derek Barnett
 
-#include <iostream>
-#include <sstream>
+#include <pbbam/IndexedFastaReader.h>
+
 #include <string>
 
 #include <gtest/gtest.h>
@@ -9,7 +9,6 @@
 #include <pbbam/BamFile.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/EntireFileQuery.h>
-#include <pbbam/IndexedFastaReader.h>
 
 #include "FastxTests.h"
 #include "PbbamTestData.h"
@@ -24,35 +23,50 @@ const std::string singleInsertionBam = PbbamTestsConfig::Data_Dir + "/aligned.ba
 
 }  // namespace IndexedFastaReaderTests
 
-TEST(IndexedFastaReaderTest, throws_on_empty_filename)
+TEST(BAM_IndexedFastaReader, throws_on_empty_filename)
 {
     EXPECT_THROW(IndexedFastaReader reader{""}, std::runtime_error);
 }
 
-TEST(IndexedFastaReaderTest, throws_on_invalid_extension)
+TEST(BAM_IndexedFastaReader, throws_on_invalid_extension)
 {
     EXPECT_THROW(IndexedFastaReader reader{"wrong.ext"}, std::runtime_error);
 }
 
-TEST(IndexedFastaReaderTest, can_open_text_fasta_for_reading)
+TEST(BAM_IndexedFastaReader, can_open_text_fasta_for_reading)
 {
     const auto& fn = FastxTests::simpleFastaFn;
     EXPECT_NO_THROW(IndexedFastaReader reader{fn});
 }
 
-TEST(IndexedFastaReaderTest, throws_on_gzip_fasta)
+TEST(BAM_IndexedFastaReader, throws_on_gzip_fasta)
 {
     const auto& fn = FastxTests::simpleFastaGzipFn;
     EXPECT_THROW(IndexedFastaReader reader{fn}, std::runtime_error);
 }
 
-TEST(IndexedFastaReaderTest, can_open_bgzf_fasta_for_reading)
+TEST(BAM_IndexedFastaReader, can_open_bgzf_fasta_for_reading)
 {
     const auto& fn = FastxTests::simpleFastaBgzfFn;
     EXPECT_NO_THROW(IndexedFastaReader reader{fn});
 }
 
-TEST(IndexedFastaReaderTest, can_fetch_subsequence_from_lambda)
+TEST(BAM_IndexedFastaReader, throws_on_missing_index)
+{
+    const std::string fasta = PbbamTestsConfig::Data_Dir + "/lambdaNEB-missing-fai.fasta";
+    const std::string fai = fasta + ".fai";
+    const std::string errorMsg =
+        "[pbbam] FASTA reader ERROR: could not load FAI index data:\n  FASTA file: " + fasta +
+        "\n  FAI file: " + fai + "\n  reason: No such file or directory";
+
+    try {
+        IndexedFastaReader reader{fasta};
+    } catch (const std::runtime_error& e) {
+        EXPECT_STREQ(errorMsg.c_str(), e.what());
+    }
+}
+
+TEST(BAM_IndexedFastaReader, can_fetch_subsequence_from_lambda)
 {
     IndexedFastaReader r{IndexedFastaReaderTests::lambdaFasta};
 
@@ -76,7 +90,7 @@ TEST(IndexedFastaReaderTest, can_fetch_subsequence_from_lambda)
     EXPECT_EQ("", emptySeq);
 }
 
-TEST(IndexedFastaReaderTest, prints_clipped_and_gapped_subsequences_from_lambda)
+TEST(BAM_IndexedFastaReader, prints_clipped_and_gapped_subsequences_from_lambda)
 {
     IndexedFastaReader r{IndexedFastaReaderTests::lambdaFasta};
 
@@ -132,7 +146,7 @@ TEST(IndexedFastaReaderTest, prints_clipped_and_gapped_subsequences_from_lambda)
 }
 
 // Come back
-TEST(IndexedFastaReaderTest, throws_on_invalid_subsequence_requests)
+TEST(BAM_IndexedFastaReader, throws_on_invalid_subsequence_requests)
 {
     IndexedFastaReader r{IndexedFastaReaderTests::lambdaFasta};
     EXPECT_THROW(r.SequenceLength("dog"), std::exception);
@@ -140,7 +154,7 @@ TEST(IndexedFastaReaderTest, throws_on_invalid_subsequence_requests)
 }
 
 //
-TEST(IndexedFastaReaderTest, can_fetch_name_info_from_lambda)
+TEST(BAM_IndexedFastaReader, can_fetch_name_info_from_lambda)
 {
     IndexedFastaReader r{IndexedFastaReaderTests::lambdaFasta};
     const std::vector<std::string> names{"lambda_NEB3011"};

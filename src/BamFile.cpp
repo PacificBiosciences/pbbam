@@ -1,12 +1,6 @@
-// File Description
-/// \file BamFile.cpp
-/// \brief Implements the BamFile class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/BamFile.h"
+#include <pbbam/BamFile.h>
 
 #include <sys/stat.h>
 
@@ -19,9 +13,11 @@
 
 #include <htslib/sam.h>
 
-#include "pbbam/PbiFile.h"
+#include <pbbam/Deleters.h>
+#include <pbbam/PbiFile.h>
 
 #include "Autovalidate.h"
+#include "ErrnoReason.h"
 #include "FileUtils.h"
 #include "MemoryUtils.h"
 
@@ -31,11 +27,8 @@ namespace BAM {
 class BamFile::BamFilePrivate
 {
 public:
-    explicit BamFilePrivate(std::string fn) : filename_{std::move(fn)}, firstAlignmentOffset_{-1}
+    explicit BamFilePrivate(std::string fn) : filename_{std::move(fn)}
     {
-        // ensure we've updated htslib verbosity with requested verbosity here
-        hts_verbose = (PacBio::BAM::HtslibVerbosity == -1 ? 0 : PacBio::BAM::HtslibVerbosity);
-
         // attempt open
         auto f = RawOpen();
 
@@ -51,20 +44,19 @@ public:
             if (eofCheck == 0)
                 e << "[pbbam] BAM file ERROR: missing EOF block:\n"
                   << "  file: " << fn;
-            else
+            else {
                 e << "[pbbam] BAM file ERROR: unknown error encountered while checking EOF:\n"
-                  << "  file: " << fn << '\n'
-                  << "  htslib status code: " << eofCheck;
-            throw std::runtime_error{e.str()};
+                  << "  file: " << fn;
+                MaybePrintErrnoReason(e);
+                e << "\n  htslib status code: " << eofCheck;
+                throw std::runtime_error{e.str()};
+            }
         }
 #endif
 
         // attempt fetch header
         std::unique_ptr<bam_hdr_t, HtslibHeaderDeleter> hdr(sam_hdr_read(f.get()));
         header_ = BamHeaderMemory::FromRawData(hdr.get());
-
-        // cache first alignment offset
-        firstAlignmentOffset_ = bgzf_tell(f->fp.bgzf);
     }
 
     std::unique_ptr<BamFilePrivate> DeepCopy()
@@ -78,7 +70,7 @@ public:
         if (filename_ == "-") return false;
 
         // attempt open
-        auto f = RawOpen();
+        const auto f = RawOpen();
         return RawEOFCheck(f) == 1;
     }
 
@@ -92,11 +84,11 @@ public:
     std::unique_ptr<samFile, HtslibFileDeleter> RawOpen() const
     {
         std::unique_ptr<samFile, HtslibFileDeleter> f(sam_open(filename_.c_str(), "rb"));
-
         if (!f || !f->fp.bgzf) {
             std::ostringstream s;
             s << "[pbbam] BAM file ERROR: could not open:\n"
               << "  file: " << filename_;
+            MaybePrintErrnoReason(s);
             throw std::runtime_error{s.str()};
         }
         if (f->format.format != bam) {
@@ -142,8 +134,9 @@ void BamFile::CreateStandardIndex() const
     if (ret != 0) {
         std::ostringstream s;
         s << "[pbbam] BAM file ERROR: could not create *.bai index:\n"
-          << "  file: " << d_->filename_ << '\n'
-          << "  htslib status code: " << ret;
+          << "  file: " << d_->filename_;
+        MaybePrintErrnoReason(s);
+        s << "\n  htslib status code: " << ret;
         throw std::runtime_error{s.str()};
     }
 }
@@ -159,8 +152,6 @@ void BamFile::EnsureStandardIndexExists() const
 }
 
 const std::string& BamFile::Filename() const { return d_->filename_; }
-
-int64_t BamFile::FirstAlignmentOffset() const { return d_->firstAlignmentOffset_; }
 
 bool BamFile::HasEOF() const { return d_->HasEOF(); }
 

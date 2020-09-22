@@ -1,39 +1,44 @@
 // Author: Derek Barnett, Lance Hepler
 
+#include <pbbam/ReadGroupInfo.h>
+
 #include <cstddef>
 #include <cstdlib>
+
 #include <string>
 #include <tuple>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
-#include <pbbam/ReadGroupInfo.h>
 #include <pbbam/exception/BundleChemistryMappingException.h>
 #include <pbbam/exception/InvalidSequencingChemistryException.h>
+
+#include "PbbamTestData.h"
 
 // clang-format off
 
 using namespace PacBio::BAM;
 
-TEST(ReadGroupInfoTest, GetBaseId)
+TEST(BAM_ReadGroupInfo, can_generate_base_id_from_id_string)
 {
-    const std::string a{"123456578"};
-    const std::string b{"123456578/0--0"};
-
-    EXPECT_EQ("123456578", ReadGroupInfo::GetBaseId(a));
-    EXPECT_EQ("123456578", ReadGroupInfo::GetBaseId(b));
+    const std::string rg{"123456578"};
+    EXPECT_EQ("123456578", ReadGroupInfo::GetBaseId(rg));
 }
 
-TEST(ReadGroupInfoTest, IdFromMovieNameAndReadType)
+TEST(BAM_ReadGroupInfo, can_generate_base_id_from_id_string_with_barcodes)
+{
+    const std::string rg{"123456578/0--0"};
+    EXPECT_EQ("123456578", ReadGroupInfo::GetBaseId(rg));
+}
+
+TEST(BAM_ReadGroupInfo, can_generate_id_from_movie_and_read_type)
 {
     const ReadGroupInfo rg{"m140905_042212_sidney_c100564852550000001823085912221377_s1_X0", "HQREGION"};
     EXPECT_EQ("00082ba1", rg.Id());
 }
 
-TEST(ReadGroupInfoTest, FrameCodecSetOk)
+TEST(BAM_ReadGroupInfo, can_describe_frame_codec)
 {
     ReadGroupInfo rg{"test"};
     rg.IpdCodec(FrameCodec::V1);
@@ -42,7 +47,7 @@ TEST(ReadGroupInfoTest, FrameCodecSetOk)
     EXPECT_EQ(FrameCodec::V1, rg.IpdCodec());
 }
 
-TEST(ReadGroupInfoTest, SequencingChemistryOk)
+TEST(BAM_ReadGroupInfo, can_lookup_chemistry_from_compiled_chemistry_table)
 {
     {   // S/P3-C3/5.0 (Release 6.0)
         const std::string chem{"S/P3-C3/5.0"};
@@ -103,7 +108,7 @@ int unsetenv(const char* name) {
 }
 #endif
 
-TEST(ReadGroupInfoTest, SequencingChemistryFromMappingXml)
+TEST(BAM_ReadGroupInfo, can_lookup_chemistry_from_mapping_xml)
 {
     ReadGroupInfo rg{"MAYBE"};
     rg.BindingKit("1")
@@ -133,7 +138,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryFromMappingXml)
     EXPECT_EQ(0, unsetenv(varname));
 }
 
-TEST(ReadGroupInfoTest, SequencingChemistryThrowsOnBadTriple)
+TEST(BAM_ReadGroupInfo, throws_on_bad_chemistry_triple)
 {
     try {
         ReadGroupInfo rg{"BAD"};
@@ -149,7 +154,7 @@ TEST(ReadGroupInfoTest, SequencingChemistryThrowsOnBadTriple)
     }
 }
 
-TEST(ReadGroupInfoTest, BasecallerVersion)
+TEST(BAM_ReadGroupInfo, throws_on_invalid_basecaller_version)
 {
     // too short
     {
@@ -180,7 +185,7 @@ TEST(ReadGroupInfoTest, BasecallerVersion)
     //EXPECT_THROW(rg.SequencingChemistry(), InvalidSequencingChemistryException);
 }
 
-TEST(ReadGroupInfoTest, ClearBaseFeatures)
+TEST(BAM_ReadGroupInfo, can_clear_all_base_features)
 {
     ReadGroupInfo rg{"test"};
     rg.BaseFeatureTag(BaseFeature::DELETION_QV,     "dq");
@@ -199,7 +204,7 @@ TEST(ReadGroupInfoTest, ClearBaseFeatures)
     EXPECT_FALSE(rg.HasBaseFeature(BaseFeature::SUBSTITUTION_QV));
 }
 
-TEST(ReadGroupInfoTest, RemoveBaseFeature)
+TEST(BAM_ReadGroupInfo, can_remove_single_base_feature)
 {
     ReadGroupInfo rg{"test"};
     rg.BaseFeatureTag(BaseFeature::DELETION_QV,     "dq");
@@ -222,21 +227,21 @@ TEST(ReadGroupInfoTest, RemoveBaseFeature)
     EXPECT_TRUE(rg.HasBaseFeature(BaseFeature::PULSE_EXCLUSION));
 }
 
-TEST(ReadGroupInfoTest, BaseIdFromBarcodedId)
+TEST(BAM_ReadGroupInfo, can_fetch_id_types_from_barcoded_id)
 {
     const ReadGroupInfo rg{"00082ba1/0--1"};
     EXPECT_EQ("00082ba1/0--1", rg.Id());
     EXPECT_EQ("00082ba1", rg.BaseId());
 }
 
-TEST(ReadGroupInfoTest, BaseIdFromNonBarcodedId)
+TEST(BAM_ReadGroupInfo, can_fetch_id_types_from_standard_id)
 {
     const ReadGroupInfo rg{"00082ba1"};
     EXPECT_EQ("00082ba1", rg.Id());
     EXPECT_EQ("00082ba1", rg.BaseId());
 }
 
-TEST(ReadGroupInfoTest, BarcodeDataFromBarcodedId)
+TEST(BAM_ReadGroupInfo, can_determine_barcodes_from_barcoded_id_string)
 {
     const ReadGroupInfo rg{"00082ba1/0--1"};
     EXPECT_EQ("00082ba1/0--1", rg.Id());
@@ -250,7 +255,7 @@ TEST(ReadGroupInfoTest, BarcodeDataFromBarcodedId)
     EXPECT_EQ(1, rg.BarcodeReverse().get());
 }
 
-TEST(ReadGroupInfoTest, BarcodeDataFromIdPlusBarcodesCtor)
+TEST(BAM_ReadGroupInfo, can_determine_barcodes_from_id_string_and_barcode_pair)
 {
     const ReadGroupInfo rg{"00082ba1", std::make_pair(0,1)};
     EXPECT_EQ("00082ba1/0--1", rg.Id());
@@ -264,7 +269,7 @@ TEST(ReadGroupInfoTest, BarcodeDataFromIdPlusBarcodesCtor)
     EXPECT_EQ(1, rg.BarcodeReverse().get());
 }
 
-TEST(ReadGroupInfoTest, NoBarcodeDataFromNonbarcodedId)
+TEST(BAM_ReadGroupInfo, returns_no_barcodes_from_non_barcoded_id)
 {
     {   // "standard" ID
         const ReadGroupInfo rg{"00082ba1"};
@@ -285,7 +290,7 @@ TEST(ReadGroupInfoTest, NoBarcodeDataFromNonbarcodedId)
     }
 }
 
-TEST(ReadGroupInfoTest, NoBarcodeDataFromEmptyId)
+TEST(BAM_ReadGroupInfo, returns_no_barcodes_from_empty_id)
 {
     const ReadGroupInfo rg{""};
     const auto barcodes = rg.Barcodes();
@@ -294,7 +299,7 @@ TEST(ReadGroupInfoTest, NoBarcodeDataFromEmptyId)
     EXPECT_EQ(boost::none, rg.BarcodeReverse());
 }
 
-TEST(ReadGroupInfoTest, ThrowsOnConstructingIdFromMalformattedBarcodeLabels)
+TEST(BAM_ReadGroupInfo, throws_on_malformatted_barcoded_ids)
 {
     EXPECT_THROW(ReadGroupInfo{"00082ba1/0-1"}, std::runtime_error);
     EXPECT_THROW(ReadGroupInfo{"00082ba1/0---1"}, std::runtime_error);

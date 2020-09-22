@@ -1,11 +1,12 @@
 // Author: Derek Barnett
 
+#include <pbbam/ccs/CCSPbiBuilder.h>
+
 #include <cstdio>
 
 #include <gtest/gtest.h>
 
 #include <pbbam/PbiRawData.h>
-#include <pbbam/ccs/CCSPbiBuilder.h>
 
 using namespace PacBio;
 using namespace PacBio::CCS;
@@ -33,7 +34,7 @@ const CCSRecord& ValidRecord()
 
 }  // namespace CCSPbiBuilderTests
 
-TEST(CCSPbiBuilderTest, can_create_pbi_file_from_ccs_records)
+TEST(CCS_CCSPbiBuilder, can_create_pbi_file_from_ccs_records)
 {
     const std::string pbiFilename{"test.pbi"};
 

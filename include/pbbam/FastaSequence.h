@@ -1,13 +1,7 @@
-// File Description
-/// \file FastaSequence.h
-/// \brief Defines the FastaSequence class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_FASTASEQUENCE_H
+#define PBBAM_FASTASEQUENCE_H
 
-#ifndef FASTASEQUENCE_H
-#define FASTASEQUENCE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 
@@ -68,8 +62,8 @@ public:
 
     /// \}
 
-    bool operator==(const FastaSequence& other) const;
-    bool operator!=(const FastaSequence& other) const;
+    bool operator==(const FastaSequence& other) const noexcept;
+    bool operator!=(const FastaSequence& other) const noexcept;
 
 private:
     std::string name_;
@@ -79,4 +73,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FASTASEQUENCE_H
+#endif  // PBBAM_FASTASEQUENCE_H

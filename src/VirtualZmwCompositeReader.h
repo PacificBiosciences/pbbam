@@ -1,13 +1,7 @@
-// File Description
-/// \file VirtualZmwCompositeReader.h
-/// \brief Defines the VirtualZmwCompositeReader class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_VIRTUALZMWCOMPOSITEREADER_H
+#define PBBAM_VIRTUALZMWCOMPOSITEREADER_H
 
-#ifndef VIRTUALZMWCOMPOSITEREADER_H
-#define VIRTUALZMWCOMPOSITEREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <deque>
 #include <memory>
@@ -76,4 +70,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // VIRTUALCOMPOSITEREADER_H
+#endif  // PBBAM_VIRTUALCOMPOSITEREADER_H

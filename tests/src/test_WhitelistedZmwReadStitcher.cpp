@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/virtual/WhitelistedZmwReadStitcher.h>
+
 #include <cstdint>
 
 #include <string>
@@ -7,12 +9,11 @@
 
 #include <gtest/gtest.h>
 
-#include "PbbamTestData.h"
-
 #include <pbbam/BamFile.h>
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/PbiRawData.h>
-#include <pbbam/virtual/WhitelistedZmwReadStitcher.h>
+
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -84,7 +85,18 @@ void Compare(const BamRecord& b1, const BamRecord& b2)
 
 }  // namespace WhitelistedZmwReadStitcherTests
 
-TEST(WhitelistedZmwReadStitching, EmptyList)
+TEST(BAM_WhitelistedZmwReadStitcher, returns_no_records_from_unknown_zmw)
+{
+    const std::vector<int32_t> whitelist{42};  // ZMW not in our files
+    WhitelistedZmwReadStitcher stitcher{
+        whitelist, PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
+        PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam"};
+
+    EXPECT_FALSE(stitcher.HasNext());
+    EXPECT_TRUE(stitcher.NextRaw().empty());
+}
+
+TEST(BAM_WhitelistedZmwReadStitcher, returns_no_records_from_empty_whitelist)
 {
     const std::vector<int32_t> whitelist;
     WhitelistedZmwReadStitcher stitcher{
@@ -94,7 +106,7 @@ TEST(WhitelistedZmwReadStitching, EmptyList)
     EXPECT_TRUE(stitcher.NextRaw().empty());
 }
 
-TEST(WhitelistedZmwReadStitching, SingleValue)
+TEST(BAM_WhitelistedZmwReadStitcher, can_process_single_value_whitelist)
 {
     const std::vector<int32_t> whitelist{200000};
     WhitelistedZmwReadStitcher stitcher{
@@ -121,18 +133,7 @@ TEST(WhitelistedZmwReadStitching, SingleValue)
     WhitelistedZmwReadStitcherTests::Compare(polyRecord, virtualRecord);
 }
 
-TEST(WhitelistedZmwReadStitching, UnknownZmw)
-{
-    const std::vector<int32_t> whitelist{42};  // ZMW not in our files
-    WhitelistedZmwReadStitcher stitcher{
-        whitelist, PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
-        PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam"};
-
-    EXPECT_FALSE(stitcher.HasNext());
-    EXPECT_TRUE(stitcher.NextRaw().empty());
-}
-
-TEST(WhitelistedZmwReadStitching, MultiValue)
+TEST(BAM_WhitelistedZmwReadStitcher, can_process_multiple_value_whitelist)
 {
     const std::vector<int32_t> whitelist{100000, 300000};
     WhitelistedZmwReadStitcher stitcher{
@@ -167,7 +168,8 @@ TEST(WhitelistedZmwReadStitching, MultiValue)
     WhitelistedZmwReadStitcherTests::Compare(polyRecord2, virtualRecord2);
 }
 
-TEST(WhitelistedZmwReadStitching, MultiValue_MixedKnownAndUnknown)
+TEST(BAM_WhitelistedZmwReadStitcher,
+     can_process_multiple_value_whitelist_with_mixed_known_unknown_zmws)
 {
     const std::vector<int32_t> whitelist{42, 200000, 24};
     WhitelistedZmwReadStitcher stitcher{
@@ -197,7 +199,7 @@ TEST(WhitelistedZmwReadStitching, MultiValue_MixedKnownAndUnknown)
     WhitelistedZmwReadStitcherTests::Compare(polyRecord, virtualRecord);
 }
 
-TEST(WhitelistedZmwReadStitching, EmptyScrapsFileOk)
+TEST(BAM_WhitelistedZmwReadStitcher, EmptyScrapsFileOk)
 {
     const std::vector<int32_t> whitelist{10944689, 10944690};
     const std::string primaryBamFn =

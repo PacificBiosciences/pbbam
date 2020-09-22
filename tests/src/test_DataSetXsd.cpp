@@ -1,12 +1,13 @@
 // Author: Derek Barnett
 
+#include <pbbam/DataSetXsd.h>
+
 #include <sstream>
 #include <string>
 
 #include <gtest/gtest.h>
 
 #include <pbbam/DataSet.h>
-#include <pbbam/DataSetXsd.h>
 
 #include "PbbamTestData.h"
 
@@ -15,7 +16,7 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-TEST(DataSetXsdTest, DefaultsOk)
+TEST(BAM_DataSetXsd, populates_default_namespaces)
 {
     const NamespaceRegistry registry;
 
@@ -34,7 +35,7 @@ TEST(DataSetXsdTest, DefaultsOk)
     EXPECT_EQ("http://pacificbiosciences.com/PacBioDatasets.xsd",      defaultInfo.Uri());
 }
 
-TEST(DataSetXsdTest, EditDefaultOk)
+TEST(BAM_DataSetXsd, can_reset_default_namespace)
 {
     NamespaceRegistry registry;
     registry.SetDefaultXsd(XsdType::DATASETS);
@@ -46,7 +47,7 @@ TEST(DataSetXsdTest, EditDefaultOk)
     EXPECT_EQ("http://pacificbiosciences.com/PacBioDatasets.xsd", defaultInfo.Uri());
 }
 
-TEST(DataSetXsdTest, EditRegistryOk)
+TEST(BAM_DataSetXsd, can_edit_namespace_registry)
 {
     NamespaceRegistry registry;
     registry.Register(XsdType::DATASETS, NamespaceInfo{"custom", "http://custom/uri.xsd"});
@@ -57,7 +58,7 @@ TEST(DataSetXsdTest, EditRegistryOk)
     EXPECT_EQ("http://custom/uri.xsd", dsInfo.Uri());
 }
 
-TEST(DataSetXsdTest, EditDatasetRegistry)
+TEST(BAM_DataSetXsd, edited_registry_reflected_in_output_xml)
 {
     DataSet dataset{DataSet::ALIGNMENT};
     dataset.CreatedAt("2015-01-27T09:00:01");
@@ -84,7 +85,7 @@ TEST(DataSetXsdTest, EditDatasetRegistry)
     EXPECT_NE(result.find("custom:ExternalResource"), std::string::npos);
 }
 
-TEST(DataSetXsdTest, ElementRegistryOk)
+TEST(BAM_DataSetXsd, namespaces_are_propagated_to_child_elements)
 {
     { // default namespaces
 

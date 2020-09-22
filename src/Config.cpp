@@ -1,12 +1,6 @@
-// File Description
-/// \file Config.cpp
-/// \brief Initializes global variable defaults.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <stdexcept>
 #include <string>
@@ -15,15 +9,17 @@
 #include <htslib/hts.h>
 #include <pbcopper/data/CigarOperation.h>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 namespace PacBio {
 namespace BAM {
 
-// Initialized to -1 to indicate default. We will set this to HTS_LOG_OFF unless
-// client code overrides. This keeps htslib from polluting stdout/stderr on its own.
-//
-int HtslibVerbosity = -1;
+// Disable htslib's own logging at startup. Client code can still override with
+// hts_set_log_level(HTS_LOG_FOO).
+static const int DisableHtslibLogging = []() {
+    hts_set_log_level(HTS_LOG_OFF);
+    return 0;
+}();
 
 bool DoesHtslibSupportLongCigar()
 {

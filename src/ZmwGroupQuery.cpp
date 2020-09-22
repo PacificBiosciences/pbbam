@@ -1,21 +1,15 @@
-// File Description
-/// \file ZmwQuery.cpp
-/// \brief Implements the ZmwQuery class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/ZmwGroupQuery.h"
+#include <pbbam/ZmwGroupQuery.h>
 
 #include <cstdint>
 
 #include <algorithm>
 #include <deque>
 
-#include "pbbam/BamRecord.h"
-#include "pbbam/CompositeBamReader.h"
-#include "pbbam/PbiFilterTypes.h"
+#include <pbbam/BamRecord.h>
+#include <pbbam/CompositeBamReader.h>
+#include <pbbam/PbiFilterTypes.h>
 
 #include "MemoryUtils.h"
 

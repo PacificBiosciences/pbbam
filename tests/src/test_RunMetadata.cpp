@@ -1,17 +1,19 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
+#include <pbbam/RunMetadata.h>
 
+#include <fstream>
 #include <sstream>
 #include <stdexcept>
 
+#include <gtest/gtest.h>
+
 #include <pbbam/DataSet.h>
-#include <pbbam/RunMetadata.h>
 
 #include "PbbamTestData.h"
 
 // clang-format off
-TEST(RunMetadataTest, throws_on_invalid_xml)
+TEST(BAM_RunMetadata, throws_on_invalid_xml)
 {
     auto expectThrow = [](const std::string& xml)
     {
@@ -162,7 +164,7 @@ TEST(RunMetadataTest, throws_on_invalid_xml)
 
 // clang-format on
 
-TEST(RunMetadataTest, can_load_single_collection_from_xml_file)
+TEST(BAM_RunMetadata, can_load_single_collection_from_xml_file)
 {
     const std::string xmlFn{PacBio::BAM::PbbamTestsConfig::Data_Dir +
                             "/run_metadata/id.metadata.xml"};
@@ -233,7 +235,7 @@ TEST(RunMetadataTest, can_load_single_collection_from_xml_file)
     EXPECT_EQ("aacggaggaggagga", templatePrepKit.RightPrimerSequence());
 }
 
-TEST(RunMetadataTest, can_load_multiple_collections_from_xml_file)
+TEST(BAM_RunMetadata, can_load_multiple_collections_from_xml_file)
 {
     const std::string xmlFn{PacBio::BAM::PbbamTestsConfig::Data_Dir +
                             "/run_metadata/id.run.metadata.xml"};
@@ -244,7 +246,7 @@ TEST(RunMetadataTest, can_load_multiple_collections_from_xml_file)
     EXPECT_TRUE(collections.find("Hydrav2-8A-2-Cell2") != collections.cend());
 }
 
-TEST(RunMetadataTest, can_attach_edited_metadata_to_subreadset)
+TEST(BAM_RunMetadata, can_attach_edited_metadata_to_subreadset)
 {
     // load run metadata
     const std::string metadataXml{PacBio::BAM::PbbamTestsConfig::Data_Dir +
@@ -295,9 +297,13 @@ TEST(RunMetadataTest, can_attach_edited_metadata_to_subreadset)
     EXPECT_TRUE(output.find(insertSize) != std::string::npos);
 
     EXPECT_TRUE(output.find(jsonText) != std::string::npos);
+
+    // ensure Primary -> PPAConfig -> Secondary element order
+    EXPECT_TRUE(out.str().find("Primary>") < out.str().find("PPAConfig>"));
+    EXPECT_TRUE(out.str().find("PPAConfig>") < out.str().find("Secondary>"));
 }
 
-TEST(RunMetadataTest, can_load_collection_metadata_fields_from_subreadset_xml)
+TEST(BAM_RunMetadata, can_load_collection_metadata_fields_from_subreadset_xml)
 {
     const std::string fn =
         PacBio::BAM::PbbamTestsConfig::Data_Dir + "/run_metadata/barcodes.subreadset.xml";
@@ -313,7 +319,7 @@ TEST(RunMetadataTest, can_load_collection_metadata_fields_from_subreadset_xml)
     ASSERT_EQ(1.5, automation.AutomationParameters().SNRCut());
 }
 
-TEST(RunMetadataTest, collection_metadata_has_proper_namespaces)
+TEST(BAM_RunMetadata, collection_metadata_has_proper_namespaces)
 {
     PacBio::BAM::AutomationParameters params;
     params.AddChild(PacBio::BAM::AutomationParameter{});

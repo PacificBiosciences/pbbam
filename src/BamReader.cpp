@@ -1,18 +1,11 @@
-// File Description
-/// \file BamReader.cpp
-/// \brief Implements the BamReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/BamReader.h"
+#include <pbbam/BamReader.h>
 
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
 
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 
@@ -21,7 +14,9 @@
 #include <htslib/hts.h>
 #include <boost/optional.hpp>
 
-#include "pbbam/Validator.h"
+#include <pbbam/BamRecord.h>
+#include <pbbam/Deleters.h>
+#include <pbbam/Validator.h>
 
 #include "Autovalidate.h"
 #include "MemoryUtils.h"
@@ -34,15 +29,34 @@ class BamReader::BamReaderPrivate
 public:
     explicit BamReaderPrivate(std::string fn) : filename_{std::move(fn)}
     {
+        auto displayFilename = [&]() {
+            if (filename_ == "-")
+                return std::string{" stdin"};
+            else
+                return "\n  file: " + filename_;
+        };
+
         htsFile_.reset(sam_open(filename_.c_str(), "rb"));
         if (!htsFile_ || !htsFile_->fp.bgzf) {
             std::ostringstream s;
-            s << "[pbbam] BAM reader ERROR: could not open:\n"
-              << "  file: " << filename_;
+            s << "[pbbam] BAM reader ERROR: could not open for reading:" << displayFilename();
             throw std::runtime_error{s.str()};
         }
 
-        std::unique_ptr<bam_hdr_t, HtslibHeaderDeleter> hdr(sam_hdr_read(htsFile_.get()));
+        const auto bgzfPos = bgzf_tell(htsFile_->fp.bgzf);
+        if (bgzfPos != 0) {
+            std::ostringstream s;
+            s << "[pbbam] BAM reader ERROR: could not read from empty input:" << displayFilename();
+            throw std::runtime_error{s.str()};
+        }
+
+        const std::unique_ptr<bam_hdr_t, HtslibHeaderDeleter> hdr(sam_hdr_read(htsFile_.get()));
+        if (!hdr) {
+            std::ostringstream s;
+            s << "[pbbam] BAM reader ERROR: could not read header from:" << displayFilename();
+            throw std::runtime_error{s.str()};
+        }
+
         header_ = BamHeaderMemory::FromRawData(hdr.get());
     }
 
@@ -51,14 +65,14 @@ public:
     BamHeader header_;
 };
 
-BamReader::BamReader() : internal::IQuery(), d_{std::make_unique<BamReaderPrivate>("-")} {}
+BamReader::BamReader() : internal::IQuery{}, d_{std::make_unique<BamReaderPrivate>("-")} {}
 
 BamReader::BamReader(std::string fn)
-    : internal::IQuery(), d_{std::make_unique<BamReaderPrivate>(std::move(fn))}
+    : internal::IQuery{}, d_{std::make_unique<BamReaderPrivate>(std::move(fn))}
 {
 }
 
-BamReader::BamReader(BamFile bamFile) : BamReader(bamFile.Filename()) {}
+BamReader::BamReader(BamFile bamFile) : BamReader{bamFile.Filename()} {}
 
 BamReader::~BamReader() = default;
 
@@ -72,7 +86,7 @@ bool BamReader::GetNext(BamRecord& record)
 {
     assert(BamRecordMemory::GetRawData(record).get());
 
-    const auto result = ReadRawData(Bgzf(), BamRecordMemory::GetRawData(record).get());
+    const auto result = ReadRawData(d_->htsFile_.get(), BamRecordMemory::GetRawData(record).get());
 
     // success
     if (result >= 0) {
@@ -108,7 +122,7 @@ bool BamReader::GetNext(BamRecord& record)
     }
 }
 
-int BamReader::ReadRawData(BGZF* bgzf, bam1_t* b) { return bam_read1(bgzf, b); }
+int BamReader::ReadRawData(samFile* file, bam1_t* b) { return bam_read1(file->fp.bgzf, b); }
 
 void BamReader::VirtualSeek(int64_t virtualOffset)
 {

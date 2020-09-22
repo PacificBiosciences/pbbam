@@ -1,9 +1,7 @@
-// Author: Derek Barnett
-
 #ifndef PBBAM_CCS_CCSHEADER_H
 #define PBBAM_CCS_CCSHEADER_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 

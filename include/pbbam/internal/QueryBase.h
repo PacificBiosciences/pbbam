@@ -1,9 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_QUERYBASE_H
+#define PBBAM_QUERYBASE_H
 
-#ifndef QUERYBASE_H
-#define QUERYBASE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cassert>
 
@@ -11,9 +9,9 @@
 #include <memory>
 #include <vector>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/DataSet.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/DataSet.h>
 
 namespace PacBio {
 namespace BAM {
@@ -28,8 +26,8 @@ class QueryIteratorBase
 public:
     ~QueryIteratorBase() = default;
 
-    bool operator==(const QueryIteratorBase<T>& other) const;
-    bool operator!=(const QueryIteratorBase<T>& other) const;
+    bool operator==(const QueryIteratorBase<T>& other) const noexcept;
+    bool operator!=(const QueryIteratorBase<T>& other) const noexcept;
 
 protected:
     QueryIteratorBase() = default;
@@ -55,8 +53,8 @@ public:
     QueryIterator() = default;
     QueryIterator(QueryBase<T>& query);
 
-    T& operator*();
-    T* operator->();
+    T& operator*() noexcept;
+    T* operator->() noexcept;
 
     QueryIterator<T>& operator++();
     QueryIterator<T> operator++(int);
@@ -75,8 +73,8 @@ public:
     QueryConstIterator() = default;
     QueryConstIterator(const QueryBase<T>& query);
 
-    const T& operator*() const;
-    const T* operator->() const;
+    const T& operator*() const noexcept;
+    const T* operator->() const noexcept;
 
     QueryConstIterator<T>& operator++();
     QueryConstIterator<T> operator++(int);
@@ -116,6 +114,6 @@ using IGroupQuery = QueryBase<std::vector<BamRecord>>;
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/QueryBase.inl"
+#include <pbbam/internal/QueryBase.inl>
 
-#endif  // QUERYBASE_H
+#endif  // PBBAM_QUERYBASE_H

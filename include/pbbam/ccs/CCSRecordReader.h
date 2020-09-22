@@ -1,17 +1,15 @@
-// Author: Derek Barnett
-
 #ifndef PBBAM_CCS_CCSRECORDREADER_H
 #define PBBAM_CCS_CCSRECORDREADER_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <iosfwd>
 #include <memory>
 #include <string>
 
-#include "pbbam/ccs/CCSHeader.h"
-#include "pbbam/ccs/CCSRecord.h"
-#include "pbbam/internal/QueryBase.h"
+#include <pbbam/ccs/CCSHeader.h>
+#include <pbbam/ccs/CCSRecord.h>
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace CCS {
@@ -19,7 +17,7 @@ namespace CCS {
 ///
 /// Reads CCSRecords from stdin
 //
-class CCSRecordReader : public PacBio::BAM::internal::QueryBase<CCSRecord>
+class CCSRecordReader : public BAM::internal::QueryBase<CCSRecord>
 {
 public:
     CCSRecordReader();

@@ -1,22 +1,18 @@
-// File Description
-/// \file AlignmentPrinter.cpp
-/// \brief Implements the AlignmentPrinter class.
-//
-// Author: Armin Töpfer
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/AlignmentPrinter.h"
+#include <pbbam/AlignmentPrinter.h>
 
 #include <cassert>
 #include <cmath>
 #include <cstddef>
 
 #include <iomanip>
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>
+
+#include <pbbam/BamRecord.h>
+#include <pbbam/IndexedFastaReader.h>
 
 namespace PacBio {
 namespace BAM {
@@ -36,7 +32,7 @@ AlignmentPrinter::AlignmentPrinter(const IndexedFastaReader& ifr)
 {
 }
 
-std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation orientation)
+std::string AlignmentPrinter::Print(const BamRecord& record, const Data::Orientation orientation)
 {
     const std::string seq{record.Sequence(orientation, true, true)};
     const std::string ref{ifr_->ReferenceSubsequence(record, orientation, true, true)};
@@ -52,8 +48,8 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation o
     int seqLength = 0;
     float matches = 0;
     std::string pretty;
-    Position refCoord = record.ReferenceStart();
-    Position seqCoord = BAM::IsCcsOrTranscript(record.Type()) ? 0 : record.QueryStart();
+    Data::Position refCoord = record.ReferenceStart();
+    Data::Position seqCoord = BAM::IsCcsOrTranscript(record.Type()) ? 0 : record.QueryStart();
 
     for (size_t i = 0; i < seq.size();) {
         auto refCoordStr = std::to_string(refCoord);
@@ -119,7 +115,7 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Orientation o
     }
     const float similarity = matches / seq.size();
 
-    std::stringstream output;
+    std::ostringstream output;
     output << "Read        : " << record.FullName() << '\n'
            << "Reference   : " << record.ReferenceName() << "\n\n"
            << "Read-length : " << seqLength << '\n'

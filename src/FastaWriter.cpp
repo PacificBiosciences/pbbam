@@ -1,19 +1,15 @@
-// File Description
-/// \file FastaWriter.cpp
-/// \brief Implements the FastaWriter class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/FastaWriter.h"
+#include <pbbam/FastaWriter.h>
 
 #include <sstream>
 #include <stdexcept>
 
-#include "pbbam/BamRecord.h"
-#include "pbbam/FastqSequence.h"
-#include "pbbam/FormatUtils.h"
+#include <pbbam/BamRecord.h>
+#include <pbbam/FastqSequence.h>
+#include <pbbam/FormatUtils.h>
+
+#include "ErrnoReason.h"
 
 namespace PacBio {
 namespace BAM {
@@ -32,6 +28,7 @@ FastaWriter::FastaWriter(const std::string& fn) : IFastaWriter{}
         std::ostringstream s;
         s << "[pbbam] FASTA writer ERROR: could not open file for writing:\n"
           << "  file: " << fn;
+        MaybePrintErrnoReason(s);
         throw std::runtime_error{s.str()};
     }
 }

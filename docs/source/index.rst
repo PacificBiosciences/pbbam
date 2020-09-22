@@ -22,7 +22,6 @@ additional languages, and command-line utilities.
 
    getting_started
    api_reference
-   swig_bindings
    commandline_utilities
 
 

@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "DataSetIO.h"
@@ -10,14 +8,15 @@
 #include <algorithm>
 #include <exception>
 #include <fstream>
-#include <iostream>
+#include <ostream>
 #include <sstream>
 #include <stdexcept>
 
 #include <boost/algorithm/string.hpp>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
+#include "ErrnoReason.h"
 #include "FileUtils.h"
 #include "FofnReader.h"
 #include "XmlReader.h"
@@ -29,11 +28,12 @@ namespace {
 
 struct DataSetFileException : public std::exception
 {
-    DataSetFileException(std::string filename, std::string reason) : std::exception{}
+    DataSetFileException(std::string filename, std::string description) : std::exception{}
     {
         std::ostringstream s;
-        s << "[pbbam] dataset I/O ERROR: " << reason << ":\n"
+        s << "[pbbam] dataset I/O ERROR: " << description << ":\n"
           << "  file: " << filename;
+        MaybePrintErrnoReason(s);
         msg_ = s.str();
     }
 
@@ -44,7 +44,7 @@ struct DataSetFileException : public std::exception
 
 std::unique_ptr<DataSetBase> DataSetFromXml(const std::string& xmlFn)
 {
-    std::ifstream in(xmlFn);
+    std::ifstream in{xmlFn};
     if (!in) throw DataSetFileException{xmlFn, "could not open XML file for reading"};
     return XmlReader::FromStream(in);
 }
@@ -52,7 +52,7 @@ std::unique_ptr<DataSetBase> DataSetFromXml(const std::string& xmlFn)
 std::unique_ptr<DataSetBase> DataSetFromBam(const std::string& bamFn)
 {
     // peek at sort order to determine if file should be an AlignmentSet or else SubreadSet
-    const auto bamFile = BamFile{bamFn};
+    const BamFile bamFile{bamFn};
     const auto& header = bamFile.Header();
     const auto aligned = header.SortOrder() == "coordinate";
 
@@ -64,7 +64,15 @@ std::unique_ptr<DataSetBase> DataSetFromBam(const std::string& bamFn)
 
     auto& resources = dataset->ExternalResources();
     resources.Add(ExternalResource(BamFile(bamFn)));
-    return dataset;
+    return
+#ifdef __INTEL_COMPILER
+        std::move(
+#endif
+            dataset
+#ifdef __INTEL_COMPILER
+            )
+#endif
+            ;
 }
 
 std::unique_ptr<DataSetBase> DataSetFromFasta(const std::string& fasta)
@@ -87,7 +95,7 @@ std::unique_ptr<DataSetBase> DataSetFromFasta(const std::string& fasta)
 std::unique_ptr<DataSetBase> DataSetFromFofn(const std::string& fofn)
 {
     const auto fofnDir = FileUtils::DirectoryName(fofn);
-    std::ifstream in(fofn);
+    std::ifstream in{fofn};
     if (!in) throw DataSetFileException{fofn, "could not open FOFN for reading"};
 
     auto filenames = FofnReader::Files(in);
@@ -115,7 +123,7 @@ std::unique_ptr<DataSetBase> DataSetFromUri(const std::string& uri)
     }
 
     // unknown filename extension
-    throw DataSetFileException{uri, "unsupported extension on input file"};
+    throw std::runtime_error{"[pbbam] dataset I/O ERROR: unsupported extension:\n  file: " + uri};
 }
 
 }  // namespace

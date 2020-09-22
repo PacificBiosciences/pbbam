@@ -3,7 +3,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -11,6 +10,7 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+
 #include <htslib/sam.h>
 
 #include <pbbam/BamFile.h>
@@ -26,7 +26,7 @@ namespace EndToEndTests {
 
 struct Bam1Deleter
 {
-    void operator()(bam1_t* b) const
+    void operator()(bam1_t* b) const noexcept
     {
         if (b != nullptr) {
             bam_destroy1(b);
@@ -37,7 +37,7 @@ struct Bam1Deleter
 
 struct SamFileDeleter
 {
-    void operator()(samFile* file) const
+    void operator()(samFile* file) const noexcept
     {
         if (file != nullptr) {
             sam_close(file);
@@ -48,7 +48,7 @@ struct SamFileDeleter
 
 struct BamHdrDeleter
 {
-    void operator()(bam_hdr_t* hdr) const
+    void operator()(bam_hdr_t* hdr) const noexcept
     {
         if (hdr != nullptr) {
             bam_hdr_destroy(hdr);
@@ -98,7 +98,7 @@ void CheckGeneratedOutput()
 }  // namespace EndToEndTests
 
 // sanity check for rest of tests below
-TEST(EndToEndTest, ReadAndWrite_PureHtslib)
+TEST(BAM_EndToEnd, sanity_check_using_htslib_api_directly)
 {
     {  // scoped to force flush & close before conversion/diff
 
@@ -136,7 +136,7 @@ TEST(EndToEndTest, ReadAndWrite_PureHtslib)
     EndToEndTests::CheckGeneratedOutput();
 }
 
-TEST(EndToEndTest, ReadAndWrite_SingleThread)
+TEST(BAM_EndToEnd, can_roundtrip_single_thread_count_writing)
 {
     {
         const BamFile bamFile{EndToEndTests::inputBamFn};
@@ -151,7 +151,7 @@ TEST(EndToEndTest, ReadAndWrite_SingleThread)
     EndToEndTests::CheckGeneratedOutput();
 }
 
-TEST(EndToEndTest, ReadAndWrite_APIDefaultThreadCount)
+TEST(BAM_EndToEnd, can_roundtrip_default_thread_count_writing)
 {
     {
         const BamFile bamFile{EndToEndTests::inputBamFn};
@@ -165,7 +165,7 @@ TEST(EndToEndTest, ReadAndWrite_APIDefaultThreadCount)
     EndToEndTests::CheckGeneratedOutput();
 }
 
-TEST(EndToEndTest, ReadAndWrite_SystemDefaultThreadCount)
+TEST(BAM_EndToEnd, can_roundtrip_system_thread_count_writing)
 {
     {
         const BamFile bamFile{EndToEndTests::inputBamFn};
@@ -180,7 +180,7 @@ TEST(EndToEndTest, ReadAndWrite_SystemDefaultThreadCount)
     EndToEndTests::CheckGeneratedOutput();
 }
 
-TEST(EndToEndTest, ReadAndWrite_UserThreadCount)
+TEST(BAM_EndToEnd, can_roundtrip_user_thread_count_writing)
 {
     {
         const BamFile bamFile{EndToEndTests::inputBamFn};

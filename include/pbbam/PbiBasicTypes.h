@@ -1,13 +1,7 @@
-// File Description
-/// \file PbiBasicTypes.h
-/// \brief Defines the basic data structures used in PBI lookups.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_PBIBASICTYPES_H
+#define PBBAM_PBIBASICTYPES_H
 
-#ifndef PBIBASICTYPES_H
-#define PBIBASICTYPES_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -16,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-#include "pbbam/Compare.h"
+#include <pbbam/Compare.h>
 
 namespace PacBio {
 namespace BAM {
@@ -40,8 +34,8 @@ public:
     IndexResultBlock() = default;
 
 public:
-    bool operator==(const IndexResultBlock& other) const;
-    bool operator!=(const IndexResultBlock& other) const;
+    bool operator==(const IndexResultBlock& other) const noexcept;
+    bool operator!=(const IndexResultBlock& other) const noexcept;
 
 public:
     size_t firstIndex_ = 0;  ///< index of block's first record in BAM/PBI files (e.g. i-th record)
@@ -74,6 +68,6 @@ using IndexRange = std::pair<size_t, size_t>;
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/PbiBasicTypes.inl"
+#include <pbbam/internal/PbiBasicTypes.inl>
 
-#endif  // PBIBASICTYPES_H
+#endif  // PBBAM_PBIBASICTYPES_H

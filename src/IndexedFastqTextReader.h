@@ -1,15 +1,7 @@
-// File Description
-/// \file IndexedFastqTextReader.h
-/// \brief Defines the IndexedFastqTextReader class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_INDEXEDFASTQTEXTREADER_H
+#define PBBAM_INDEXEDFASTQTEXTREADER_H
 
-#ifndef INDEXEDFASTQTEXTREADER_H
-#define INDEXEDFASTQTEXTREADER_H
-
-#include "pbbam/Config.h"
-
-#include "IndexedFastqReaderImpl.h"
+#include <pbbam/Config.h>
 
 #include <cstdio>
 
@@ -17,6 +9,8 @@
 
 #include <htslib/kseq.h>
 #include <pbcopper/utility/Deleters.h>
+
+#include "IndexedFastqReaderImpl.h"
 
 namespace PacBio {
 namespace BAM {
@@ -42,7 +36,7 @@ private:
     KSEQ_INIT(FILE*, ReadFromFile)
     struct KSeqDeleter
     {
-        void operator()(kseq_t* seq) const
+        void operator()(kseq_t* seq) const noexcept
         {
             if (seq) kseq_destroy(seq);
             seq = nullptr;
@@ -56,4 +50,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // INDEXEDFASTQTEXTREADER_H
+#endif  // PBBAM_INDEXEDFASTQTEXTREADER_H

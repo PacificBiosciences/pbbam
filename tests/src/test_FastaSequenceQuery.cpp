@@ -1,17 +1,17 @@
 // Author: Derek Barnett
 
+#include <pbbam/FastaSequenceQuery.h>
+
 #include <iterator>
 
 #include <gtest/gtest.h>
-
-#include <pbbam/FastaSequenceQuery.h>
 
 #include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-TEST(FastaSequenceQueryTest, can_read_from_fasta_file)
+TEST(BAM_FastaSequenceQuery, can_read_from_fasta_file)
 {
     const std::string fn = PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa";
 
@@ -28,7 +28,7 @@ TEST(FastaSequenceQueryTest, can_read_from_fasta_file)
     }
 }
 
-TEST(FastaSequenceQueryTest, can_read_from_dataset)
+TEST(BAM_FastaSequenceQuery, can_read_from_dataset)
 {
     const std::string fn = PbbamTestsConfig::Data_Dir + "/referenceset.xml";
 

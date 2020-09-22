@@ -1,17 +1,7 @@
-// File Description
-/// \file SNR.h
-/// \brief Defines the SNR struct
-//
-// Author: Lance Hepler, Derek Barnett
+#ifndef PBBAM_SNR_H
+#define PBBAM_SNR_H
 
-#ifndef SNR_H
-#define SNR_H
-
-#include "pbbam/Config.h"
-
-#include <cstddef>
-
-#include <vector>
+#include <pbbam/Config.h>
 
 #include <pbcopper/data/SNR.h>
 
@@ -25,4 +15,4 @@ PBBAM_DEPRECATED constexpr auto ClampSNR = PacBio::Data::ClampSNR;
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // SNR_H
+#endif  // PBBAM_SNR_H

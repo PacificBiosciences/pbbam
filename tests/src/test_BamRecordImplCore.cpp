@@ -1,9 +1,11 @@
 // Author: Derek Barnett
 
-#include <algorithm>
+#include <pbbam/BamRecordImpl.h>
+
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
+
+#include <algorithm>
 #include <iterator>
 #include <memory>
 #include <string>
@@ -12,10 +14,10 @@
 
 #include <gtest/gtest.h>
 
-#include <pbbam/BamRecordImpl.h>
 #include <pbbam/BamTagCodec.h>
 #include <pbbam/Tag.h>
 #include <pbbam/TagCollection.h>
+
 #include "../src/MemoryUtils.h"
 
 using namespace PacBio;
@@ -25,7 +27,7 @@ namespace BamRecordImplCoreTests {
 
 struct Bam1Deleter
 {
-    void operator()(bam1_t* b) const
+    void operator()(bam1_t* b) const noexcept
     {
         if (b != nullptr) {
             bam_destroy1(b);
@@ -72,7 +74,7 @@ static void CheckRawData(const BamRecordImpl& bam)
                                         (expectedSeqLength + 1) / 2 + expectedSeqLength +
                                         expectedTagsLength;
 
-    const auto rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
+    const auto& rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
     ASSERT_TRUE(static_cast<bool>(rawData));
 
     EXPECT_EQ(expectedNameNulls, rawData->core.l_extranul);
@@ -84,7 +86,7 @@ static void CheckRawData(const BamRecordImpl& bam)
 
 }  // namespace BamRecordImplCoreTests
 
-TEST(BamRecordImplCoreTestsTest, RawDataDefaultValues)
+TEST(BAM_BamRecordImplCore, initialized_with_correct_raw_htslib_values)
 {
     std::shared_ptr<bam1_t> rawData(bam_init1(), BamRecordImplCoreTests::Bam1Deleter());
     ASSERT_TRUE(static_cast<bool>(rawData));
@@ -108,7 +110,7 @@ TEST(BamRecordImplCoreTestsTest, RawDataDefaultValues)
     EXPECT_EQ(0, rawData->m_data);  // check this if we change or tune later
 }
 
-TEST(BamRecordImplCoreTestsTest, DefaultValues)
+TEST(BAM_BamRecordImplCore, initialized_with_correct_pbbam_values)
 {
     BamRecordImpl bam;
 
@@ -116,7 +118,7 @@ TEST(BamRecordImplCoreTestsTest, DefaultValues)
     // check raw data
     // -------------------------------
 
-    const auto rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
+    const auto& rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
     ASSERT_TRUE(static_cast<bool>(rawData));
 
     // fixed-length (core) data
@@ -136,8 +138,7 @@ TEST(BamRecordImplCoreTestsTest, DefaultValues)
 
     // variable length data
     EXPECT_TRUE(rawData->data != nullptr);
-    EXPECT_EQ(4, rawData->l_data);           // initial aligned QNAME
-    EXPECT_EQ(int{0x800}, rawData->m_data);  // check this if we change or tune later
+    EXPECT_EQ(4, rawData->l_data);  // initial aligned QNAME
 
     // -------------------------------
     // check data via API calls
@@ -174,7 +175,7 @@ TEST(BamRecordImplCoreTestsTest, DefaultValues)
     BamRecordImplCoreTests::CheckRawData(bam);
 }
 
-TEST(BamRecordImplCoreTestsTest, CoreSetters)
+TEST(BAM_BamRecordImplCore, can_be_modified_with_general_setters)
 {
     BamRecordImpl bam;
     bam.Bin(42);
@@ -197,7 +198,7 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
     // check raw data
     // -------------------------------
 
-    const auto rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
+    const auto& rawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
     ASSERT_TRUE(static_cast<bool>(rawData));
 
     // fixed-length (core) data
@@ -216,8 +217,7 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
 
     // variable length data
     EXPECT_TRUE(rawData->data != nullptr);
-    EXPECT_EQ(32, rawData->l_data);          // aligned qname + tags
-    EXPECT_EQ(int{0x800}, rawData->m_data);  // check this if we change or tune later
+    EXPECT_EQ(32, rawData->l_data);  // aligned qname + tags
 
     // -------------------------------
     // check data via API calls
@@ -240,89 +240,7 @@ TEST(BamRecordImplCoreTestsTest, CoreSetters)
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags.at("CA").ToUInt8Array());
 }
 
-TEST(BamRecordImplCoreTestsTest, DeepCopyFromRawData)
-{
-    // init raw data
-    std::shared_ptr<bam1_t> rawData(bam_init1(), BamRecordImplCoreTests::Bam1Deleter());
-    ASSERT_TRUE(static_cast<bool>(rawData));
-
-    rawData->core.tid = 42;
-    rawData->core.pos = 42;
-    rawData->core.bin = 42;
-    rawData->core.qual = 42;
-    rawData->core.flag = 42;
-    rawData->core.mtid = 42;
-    rawData->core.mpos = 42;
-    rawData->core.isize = 42;
-
-    const int32_t x = 42;
-    char valueBytes[sizeof x];
-    std::copy(static_cast<const char*>(static_cast<const void*>(&x)),
-              static_cast<const char*>(static_cast<const void*>(&x)) + sizeof x, valueBytes);
-    bam_aux_append(rawData.get(), "XY", 'i', sizeof(x), reinterpret_cast<uint8_t*>(&valueBytes[0]));
-
-    EXPECT_EQ(42, rawData->core.tid);
-    EXPECT_EQ(42, rawData->core.pos);
-    EXPECT_EQ(42, rawData->core.bin);
-    EXPECT_EQ(42, rawData->core.qual);
-    EXPECT_EQ(0, rawData->core.l_qname);
-    EXPECT_EQ(42, rawData->core.flag);
-    EXPECT_EQ(0, rawData->core.n_cigar);
-    EXPECT_EQ(0, rawData->core.l_qseq);
-    EXPECT_EQ(42, rawData->core.mtid);
-    EXPECT_EQ(42, rawData->core.mpos);
-    EXPECT_EQ(42, rawData->core.isize);
-    const int32_t fetchedX = bam_aux2i(bam_aux_get(rawData.get(), "XY"));
-    EXPECT_EQ(42, fetchedX);
-
-    // create from raw data
-    BamRecordImpl bam = [&rawData]() {
-        BamRecordImpl result;
-        bam_copy1(PacBio::BAM::BamRecordMemory::GetRawData(result).get(), rawData.get());
-        return result;
-    }();
-
-    // make sure raw data is still valid
-    EXPECT_EQ(42, rawData->core.tid);
-    EXPECT_EQ(42, rawData->core.pos);
-    EXPECT_EQ(42, rawData->core.bin);
-    EXPECT_EQ(42, rawData->core.qual);
-    EXPECT_EQ(0, rawData->core.l_qname);
-    EXPECT_EQ(42, rawData->core.flag);
-    EXPECT_EQ(0, rawData->core.n_cigar);
-    EXPECT_EQ(0, rawData->core.l_qseq);
-    EXPECT_EQ(42, rawData->core.mtid);
-    EXPECT_EQ(42, rawData->core.mpos);
-    EXPECT_EQ(42, rawData->core.isize);
-    EXPECT_TRUE(rawData->data != nullptr);
-    EXPECT_TRUE(0 != rawData->l_data);
-    EXPECT_TRUE(0 != rawData->m_data);
-
-    // check new record
-    EXPECT_EQ(42, bam.Bin());
-    EXPECT_EQ(42, bam.Flag());
-    EXPECT_EQ(42, bam.InsertSize());
-    EXPECT_EQ(42, bam.MapQuality());
-    EXPECT_EQ(42, bam.MateReferenceId());
-    EXPECT_EQ(42, bam.MatePosition());
-    EXPECT_EQ(42, bam.Position());
-    EXPECT_EQ(42, bam.ReferenceId());
-    EXPECT_EQ(x, bam.Tags()["XY"].ToInt32());
-
-    const auto newBamRawData = PacBio::BAM::BamRecordMemory::GetRawData(bam);
-    ASSERT_TRUE(static_cast<bool>(newBamRawData));
-
-    EXPECT_TRUE(newBamRawData->data != nullptr);
-    EXPECT_TRUE(newBamRawData->m_data >= int{0x800});  // check this if we change or tune later
-
-    // tweak raw data, make sure we've done a deep copy (so BamRecordImpl isn't changed)
-    rawData->core.pos = 37;
-    EXPECT_EQ(37, rawData->core.pos);
-    EXPECT_EQ(42, bam.Position());
-    EXPECT_EQ(42, newBamRawData->core.pos);
-}
-
-TEST(BamRecordImplCoreTestsTest, CopyAssignment)
+TEST(BAM_BamRecordImplCore, can_be_copy_assigned)
 {
     BamRecordImpl bam1;
     bam1.Bin(42);
@@ -378,7 +296,7 @@ TEST(BamRecordImplCoreTestsTest, CopyAssignment)
     BamRecordImplCoreTests::CheckRawData(bam2);
 }
 
-TEST(BamRecordImplCoreTestsTest, SelfAssignmentTolerated)
+TEST(BAM_BamRecordImplCore, self_assignment_is_tolerated)
 {
     BamRecordImpl bam1;
     bam1.Bin(42);
@@ -396,8 +314,6 @@ TEST(BamRecordImplCoreTestsTest, SelfAssignmentTolerated)
     tags["CA"] = std::vector<uint8_t>({34, 5, 125});
     tags["XY"] = int32_t{-42};
     bam1.Tags(tags);
-
-    bam1 = bam1;
 
     EXPECT_EQ(42, bam1.Bin());
     EXPECT_EQ(42, bam1.Flag());
@@ -417,7 +333,7 @@ TEST(BamRecordImplCoreTestsTest, SelfAssignmentTolerated)
     BamRecordImplCoreTests::CheckRawData(bam1);
 }
 
-TEST(BamRecordImplCoreTestsTest, CopyConstructor)
+TEST(BAM_BamRecordImplCore, can_be_copy_constructed)
 {
     BamRecordImpl bam1;
     bam1.Bin(42);
@@ -472,30 +388,7 @@ TEST(BamRecordImplCoreTestsTest, CopyConstructor)
     BamRecordImplCoreTests::CheckRawData(bam2);
 }
 
-TEST(BamRecordImplCoreTestsTest, CreateRecord_InternalTest)
-{
-    BamRecordImpl bam = BamRecordImplCoreTests::CreateBamImpl();
-
-    EXPECT_EQ(42, bam.Bin());
-    EXPECT_EQ(42, bam.Flag());
-    EXPECT_EQ(42, bam.InsertSize());
-    EXPECT_EQ(42, bam.MapQuality());
-    EXPECT_EQ(42, bam.MateReferenceId());
-    EXPECT_EQ(42, bam.MatePosition());
-    EXPECT_EQ(42, bam.Position());
-    EXPECT_EQ(42, bam.ReferenceId());
-
-    TagCollection tags;
-    tags["HX"] = std::string("1abc75");
-    tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
-    bam.Tags(tags);
-
-    BamRecordImplCoreTests::CheckRawData(bam);
-}
-
-TEST(BamRecordImplCoreTestsTest, MoveAssignment)
+TEST(BAM_BamRecordImplCore, can_be_move_assigned)
 {
     BamRecordImpl bam;
 #ifdef __clang__
@@ -525,7 +418,7 @@ TEST(BamRecordImplCoreTestsTest, MoveAssignment)
     BamRecordImplCoreTests::CheckRawData(bam);
 }
 
-TEST(BamRecordImplCoreTestsTest, MoveConstructor)
+TEST(BAM_BamRecordImplCore, can_be_move_constructed)
 {
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -554,7 +447,7 @@ TEST(BamRecordImplCoreTestsTest, MoveConstructor)
     BamRecordImplCoreTests::CheckRawData(bam);
 }
 
-TEST(BamRecordImplCoreTestsTest, AlignmentFlags)
+TEST(BAM_BamRecordImplCore, can_set_and_query_alignment_flags)
 {
     // same set of flags, different ways of getting there
 

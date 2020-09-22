@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+readonly CHECK_DIRS=( include src tests/src tools )
+
+# idea taken from https://unix.stackexchange.com/a/322884
+wrong_files=()
+
+readonly NEWLINE='
+'
+while IFS="" read -d $'\0' -r f ; do
+    t=$(tail -c2 "${f}"; printf x)
+    [[ ${t%x} =~ ${NEWLINE}$ ]] || wrong_files+=( "${f}" )
+done < <(find ${CHECK_DIRS[*]} -type f \( \
+    -name '*.c' -o \
+    -name '*.cpp' -o \
+    -name '*.h' \) -print0)
+
+if (( ${#wrong_files[@]} )); then
+    echo "The following files are missing a proper EOL marker at the end:"
+    for i in "${wrong_files[@]}"; do
+        echo "-- ${i}"
+    done
+    exit 1
+fi
+exit 0

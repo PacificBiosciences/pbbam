@@ -1,13 +1,7 @@
-// File Description
-/// \file PbiFilterTypes.h
-/// \brief Defines the built-in PBI filters.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_PBIFILTERTYPES_H
+#define PBBAM_PBIFILTERTYPES_H
 
-#ifndef PBIFILTERTYPES_H
-#define PBIFILTERTYPES_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -20,9 +14,9 @@
 
 #include <boost/optional.hpp>
 
-#include "pbbam/Compare.h"
-#include "pbbam/PbiFile.h"
-#include "pbbam/PbiFilter.h"
+#include <pbbam/Compare.h>
+#include <pbbam/PbiFile.h>
+#include <pbbam/PbiFilter.h>
 
 namespace PacBio {
 namespace BAM {
@@ -169,7 +163,7 @@ public:
 /// \sa BamRecord::AlignedStrand
 ///
 class PbiAlignedStrandFilter
-    : public internal::MappedDataFilterBase<Strand, PbiFile::MappedField::STRAND>
+    : public internal::MappedDataFilterBase<Data::Strand, PbiFile::MappedField::STRAND>
 {
 public:
     /// \brief Creates a strand filter.
@@ -380,10 +374,12 @@ public:
 /// Example: \include code/PbiLocalContextFilter.txt
 ///
 class PbiLocalContextFilter
-    : public internal::BasicDataFilterBase<LocalContextFlags, PbiFile::BasicField::CONTEXT_FLAG>
+    : public internal::BasicDataFilterBase<Data::LocalContextFlags,
+                                           PbiFile::BasicField::CONTEXT_FLAG>
 {
 public:
-    PbiLocalContextFilter(const LocalContextFlags& flags, const Compare::Type cmp = Compare::EQUAL);
+    PbiLocalContextFilter(const Data::LocalContextFlags& flags,
+                          const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiMapQualityFilter class provides a PbiFilter-compatible filter on
@@ -525,6 +521,33 @@ public:
                            const Compare::Type cmp = Compare::EQUAL);
 };
 
+/// \brief The PbiNumSubreadsFilter class provides a PbiFilter-compatible
+///        filter on the number of subreads per ZMW hole number.
+///
+class PbiNumSubreadsFilter
+{
+public:
+    /// \brief Creates a filter on the number of subreads per ZMW hole number.
+    ///
+    /// \param[in] numSubreads   value to compare on
+    /// \param[in] cmp                  compare type
+    ///
+    PbiNumSubreadsFilter(int numSubreads, const Compare::Type cmp = Compare::EQUAL);
+
+    PbiNumSubreadsFilter(const PbiNumSubreadsFilter& other);
+    ~PbiNumSubreadsFilter();
+
+    /// \brief Performs the actual index lookup.
+    ///
+    /// Most client code should not need to use this method directly.
+    ///
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
+
+private:
+    struct PbiNumSubreadsFilterPrivate;
+    std::unique_ptr<PbiNumSubreadsFilterPrivate> d_;
+};
+
 /// \brief The PbiQueryEndFilter class provides a PbiFilter-compatible filter
 ///        on query end.
 ///
@@ -642,7 +665,7 @@ public:
 /// \sa BamRecord::ReadAccuracy
 ///
 class PbiReadAccuracyFilter
-    : public internal::BasicDataFilterBase<Accuracy, PbiFile::BasicField::READ_QUALITY>
+    : public internal::BasicDataFilterBase<Data::Accuracy, PbiFile::BasicField::READ_QUALITY>
 {
 public:
     /// \brief Creates a filter on read accuracy.
@@ -650,7 +673,7 @@ public:
     /// \param[in] accuracy value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiReadAccuracyFilter(const Accuracy accuracy, const Compare::Type cmp = Compare::EQUAL);
+    PbiReadAccuracyFilter(const Data::Accuracy accuracy, const Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiReadGroupFilter class provides a PbiFilter-compatible filter
@@ -928,6 +951,6 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/PbiFilterTypes.inl"
+#include <pbbam/internal/PbiFilterTypes.inl>
 
-#endif  // PBIFILTERTYPES_H
+#endif  // PBBAM_PBIFILTERTYPES_H

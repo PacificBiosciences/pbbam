@@ -1,9 +1,12 @@
 // Author: Derek Barnett
 
-#include <iostream>
+#include <pbbam/vcf/VcfHeader.h>
+
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <gtest/gtest.h>
-#include <pbbam/vcf/VcfHeader.h>
 
 using ContigDefinition = PacBio::VCF::ContigDefinition;
 using FilterDefinition = PacBio::VCF::FilterDefinition;
@@ -103,13 +106,13 @@ TEST(VCF_InfoDefinition, missing_optional_fields_is_not_error)
     EXPECT_TRUE(info.Version().is_initialized());
 }
 
-TEST(VCF_Header, defaults_to_current_version)
+TEST(VCF_VcfHeader, defaults_to_current_version)
 {
     VcfHeader hdr;
     EXPECT_EQ("VCFv4.2", hdr.Version());
 }
 
-TEST(VCF_Header, can_lookup_contig_defnition_by_id)
+TEST(VCF_VcfHeader, can_lookup_contig_defnition_by_id)
 {
     const VcfHeader hdr{VcfHeaderTests::BasicHeaderText};
     const auto& contig = hdr.ContigDefinition("ctg1");
@@ -119,28 +122,28 @@ TEST(VCF_Header, can_lookup_contig_defnition_by_id)
     EXPECT_EQ("md5", contig.Attributes().at(2).first);
 }
 
-TEST(VCF_Header, can_lookup_format_definition_by_id)
+TEST(VCF_VcfHeader, can_lookup_format_definition_by_id)
 {
     const VcfHeader hdr{VcfHeaderTests::BasicHeaderText};
     const auto& format = hdr.FormatDefinition("GT");
     EXPECT_EQ("GT", format.Id());
 }
 
-TEST(VCF_Header, can_lookup_general_definition_by_id)
+TEST(VCF_VcfHeader, can_lookup_general_definition_by_id)
 {
     const VcfHeader hdr{VcfHeaderTests::BasicHeaderText};
     const auto& def = hdr.GeneralDefinition("fileformat");
     EXPECT_EQ("fileformat", def.Id());
 }
 
-TEST(VCF_Header, can_lookup_info_definition_by_id)
+TEST(VCF_VcfHeader, can_lookup_info_definition_by_id)
 {
     const VcfHeader hdr{VcfHeaderTests::BasicHeaderText};
     const auto& info = hdr.InfoDefinition("IMPRECISE");
     EXPECT_EQ("IMPRECISE", info.Id());
 }
 
-TEST(VCF_Header, can_lookup_sample)
+TEST(VCF_VcfHeader, can_lookup_sample)
 {
     const VcfHeader hdr{VcfHeaderTests::BasicHeaderText};
     const auto idx = hdr.IndexOfSample("UnnamedSample");
@@ -148,7 +151,7 @@ TEST(VCF_Header, can_lookup_sample)
     EXPECT_EQ("UnnamedSample", sample);
 }
 
-TEST(VCF_Header, add_duplicate_format_replaces_existing_definition)
+TEST(VCF_VcfHeader, add_duplicate_format_replaces_existing_definition)
 {
     VcfHeader hdr{VcfHeaderTests::BasicHeaderText};
     const auto initialFormat = hdr.FormatDefinition("GT");
@@ -167,7 +170,7 @@ TEST(VCF_Header, add_duplicate_format_replaces_existing_definition)
     EXPECT_EQ("DP", formatDefs.at(2).Id());
 }
 
-TEST(VCF_Header, add_duplicate_info_replaces_existing_definition)
+TEST(VCF_VcfHeader, add_duplicate_info_replaces_existing_definition)
 {
     VcfHeader hdr{VcfHeaderTests::BasicHeaderText};
     const auto initialInfo = hdr.InfoDefinition("IMPRECISE");

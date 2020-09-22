@@ -1,5 +1,9 @@
 // Author: Derek Barnett
 
+#include <pbbam/EntireFileQuery.h>
+#include <pbbam/PbiBuilder.h>
+#include <pbbam/PbiRawData.h>
+
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -12,9 +16,6 @@
 #include <pbbam/BamFile.h>
 #include <pbbam/BamReader.h>
 #include <pbbam/BamWriter.h>
-#include <pbbam/EntireFileQuery.h>
-#include <pbbam/PbiBuilder.h>
-#include <pbbam/PbiRawData.h>
 
 #include "PbbamTestData.h"
 
@@ -138,7 +139,7 @@ void ExpectRawIndicesEqual(const PbiRawData& expected, const PbiRawData& actual)
 
 }  // namespace PacBioIndexTests
 
-TEST(PacBioIndexTest, CreateFromExistingBam)
+TEST(BAM_PacBioIndex, can_create_from_bam_file)
 {
     // do this in temp directory, so we can ensure write access
     const std::string tempDir = PbbamTestsConfig::GeneratedData_Dir + "/";
@@ -176,7 +177,7 @@ TEST(PacBioIndexTest, CreateFromExistingBam)
         return ::testing::AssertionFailure() << "i: " << i;
 }
 
-TEST(PacBioIndexTest, CreateOnTheFly)
+TEST(BAM_PacBioIndex, can_create_inline_with_bam_writer)
 {
     // do this in temp directory, so we can ensure write access
     const std::string tempDir = PbbamTestsConfig::GeneratedData_Dir + "/";
@@ -246,7 +247,7 @@ TEST(PacBioIndexTest, CreateOnTheFly)
     remove(tempPbiFn.c_str());
 }
 
-TEST(PacBioIndexTest, RawLoadFromPbiFile)
+TEST(BAM_PacBioIndex, can_load_from_pbi_file)
 {
     const BamFile bamFile{PacBioIndexTests::test2BamFn};
     const std::string pbiFilename = bamFile.PacBioIndexFilename();
@@ -257,7 +258,7 @@ TEST(PacBioIndexTest, RawLoadFromPbiFile)
     PacBioIndexTests::ExpectRawIndicesEqual(expectedIndex, loadedIndex);
 }
 
-TEST(PacBioIndexTest, BasicAndBarodeSectionsOnly)
+TEST(BAM_PacBioIndex, can_load_sections_from_pbi_file)
 {
     // do this in temp directory, so we can ensure write access
     const std::string tempDir = PbbamTestsConfig::GeneratedData_Dir + "/";
@@ -306,14 +307,14 @@ TEST(PacBioIndexTest, BasicAndBarodeSectionsOnly)
     remove(tempPbiFn.c_str());
 }
 
-TEST(PacBioIndexTest, ReferenceDataNotLoadedOnUnsortedBam)
+TEST(BAM_PacBioIndex, reference_data_is_absent_from_unsorted_bam)
 {
     const BamFile bamFile{PacBioIndexTests::test2BamFn};
     const PbiRawData raw{bamFile.PacBioIndexFilename()};
     EXPECT_TRUE(raw.HasReferenceData());
 }
 
-TEST(PacBioIndexTest, LookupLoadFromFileOk)
+TEST(BAM_PacBioIndex, loads_offsets_from_pbi_file)
 {
     const uint32_t expectedNumReads = 10;
     const std::vector<int64_t> expectedOffsets{33816576, 33825163, 33831333, 33834264, 33836542,
@@ -325,12 +326,12 @@ TEST(PacBioIndexTest, LookupLoadFromFileOk)
     EXPECT_EQ(expectedOffsets, index.BasicData().fileOffset_);
 }
 
-TEST(PacBioIndexTest, ThrowOnNonExistentPbiFile)
+TEST(BAM_PacBioIndex, throws_on_nonexistent_pbi_file)
 {
     EXPECT_THROW(PbiRawData("does_not_exist.pbi"), std::exception);
 }
 
-TEST(PacBioIndexTest, ThrowOnNonPbiFile)
+TEST(BAM_PacBioIndex, throws_on_wrong_format_file)
 {
     // completely wrong format
     EXPECT_THROW(PbiRawData idx{PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa"}, std::runtime_error);
@@ -339,7 +340,7 @@ TEST(PacBioIndexTest, ThrowOnNonPbiFile)
     EXPECT_THROW(PbiRawData idx{PbbamTestsConfig::Data_Dir + "/ex2.bam"}, std::runtime_error);
 }
 
-TEST(PacBioIndexTest, AggregatePBI)
+TEST(BAM_PacBioIndex, can_aggregate_multiple_pbi_file_data_from_dataset)
 {
 
     DataSet ds;
@@ -408,7 +409,7 @@ TEST(PacBioIndexTest, AggregatePBI)
     EXPECT_EQ(-1, mergedBarcodeData.bcForward_.at(12));  // file 3
 }
 
-TEST(PbiIndexCacheTest, LoadsExpectedIndexData)
+TEST(BAM_PbiIndexCache, can_load_from_dataset)
 {
     const DataSet ds{PbbamTestsConfig::Data_Dir + "/chunking/chunking.subreadset.xml"};
 

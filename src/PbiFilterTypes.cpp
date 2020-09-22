@@ -1,24 +1,17 @@
-// File Description
-/// \file PbiFilterTypes.cpp
-/// \brief Implements the built-in PBI filters.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/PbiFilterTypes.h"
+#include <pbbam/PbiFilterTypes.h>
 
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 
-#include <sstream>
 #include <string>
 #include <unordered_map>
 
 #include <boost/algorithm/string.hpp>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 namespace PacBio {
 namespace BAM {
@@ -180,6 +173,80 @@ bool PbiMovieNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
 
     assert(cmp_ == Compare::CONTAINS || cmp_ == Compare::NOT_CONTAINS);
     return (cmp_ == Compare::CONTAINS ? accepted : !accepted);
+}
+
+// PbiNumSubreadsFilter
+
+struct PbiNumSubreadsFilter::PbiNumSubreadsFilterPrivate
+{
+    PbiNumSubreadsFilterPrivate(int numSubreads, const Compare::Type cmp)
+        : numSubreads_{numSubreads}, cmp_{cmp}
+    {
+    }
+
+    PbiNumSubreadsFilterPrivate(const std::unique_ptr<PbiNumSubreadsFilterPrivate>& other)
+    {
+        if (other) {
+            numSubreads_ = other->numSubreads_;
+            lookup_ = other->lookup_;
+            cmp_ = other->cmp_;
+        }
+    }
+
+    bool Accepts(const PbiRawData& idx, const size_t row) const
+    {
+        // lazy-load
+        if (!lookup_.is_initialized()) {
+            InitializeLookup(idx);
+        }
+        const auto holeNumber = idx.BasicData().holeNumber_[row];
+        return (lookup_->find(holeNumber) != lookup_->cend());
+    }
+
+    void InitializeLookup(const PbiRawData& idx) const
+    {
+        lookup_ = std::set<int32_t>{};
+        const auto& zmws = idx.BasicData().holeNumber_;
+
+        auto shouldKeep = [this](int count) {
+            return Compare::Check(count, this->numSubreads_, this->cmp_);
+        };
+
+        auto start = zmws.begin();
+        auto current = zmws.begin();
+        int count = 0;
+        while (current < zmws.cend()) {
+            if (*start != *current) {
+                if (shouldKeep(count)) lookup_->insert(*start);
+                start = current;
+                count = 0;
+            }
+            ++count;
+            ++current;
+        }
+        if (shouldKeep(count)) lookup_->insert(*start);
+    }
+
+    int numSubreads_;
+    Compare::Type cmp_;
+    mutable boost::optional<std::set<int32_t>> lookup_;  // mutable for lazy-load
+};
+
+PbiNumSubreadsFilter::PbiNumSubreadsFilter(int numSubreads, const Compare::Type cmp)
+    : d_{std::make_unique<PbiNumSubreadsFilter::PbiNumSubreadsFilterPrivate>(numSubreads, cmp)}
+{
+}
+
+PbiNumSubreadsFilter::PbiNumSubreadsFilter(const PbiNumSubreadsFilter& other)
+    : d_{std::make_unique<PbiNumSubreadsFilter::PbiNumSubreadsFilterPrivate>(other.d_)}
+{
+}
+
+PbiNumSubreadsFilter::~PbiNumSubreadsFilter() = default;
+
+bool PbiNumSubreadsFilter::Accepts(const PbiRawData& idx, const size_t row) const
+{
+    return d_->Accepts(idx, row);
 }
 
 // PbiQueryLengthFilter
@@ -457,7 +524,7 @@ PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<std::string>& rgIds,
                                        const Compare::Type cmp)
 {
     std::vector<ReadGroupInfo> readGroups;
-    for (const auto rgId : rgIds)
+    for (const auto& rgId : rgIds)
         readGroups.push_back(rgId);
     *this = PbiReadGroupFilter{readGroups, cmp};
 }
@@ -484,7 +551,7 @@ bool PbiReadGroupFilter::Accepts(const PbiRawData& idx, const size_t row) const
         if (!barcodes) return true;
 
         // Return success on first match, otherwise no match found.
-        for (const auto bcPair : *barcodes) {
+        for (const auto& bcPair : *barcodes) {
             if (index.BarcodeData().bcForward_.at(i) == bcPair.first &&
                 index.BarcodeData().bcReverse_.at(i) == bcPair.second) {
                 return true;
@@ -553,10 +620,11 @@ void PbiReferenceNameFilter::Validate() const
         return false;
     }();
     if (!compareTypeOk) {
-        throw std::runtime_error{
-            "[pbbam] PBI filter ERROR: unsupported compare type (" + Compare::TypeToName(cmp_) +
-            ") for this property. "
-            "Reference name filter can only compare equality or presence in whitelist/blacklist."};
+        throw std::runtime_error{"[pbbam] PBI filter ERROR: unsupported compare type (" +
+                                 Compare::TypeToName(cmp_) +
+                                 ") for this property. "
+                                 "Reference name filter can only compare equality or presence "
+                                 "in whitelist/blacklist."};
     }
 }
 

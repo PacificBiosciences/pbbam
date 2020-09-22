@@ -1,21 +1,16 @@
-// File Description
-/// \file PbiIndexedBamReader.cpp
-/// \brief Implements the PbiIndexedBamReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/PbiIndexedBamReader.h"
+#include <pbbam/PbiIndexedBamReader.h>
 
 #include <cstddef>
 #include <cstdint>
 
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 
 #include <htslib/bgzf.h>
+
+#include "ErrnoReason.h"
 
 namespace PacBio {
 namespace BAM {
@@ -72,8 +67,8 @@ public:
         if (indices.empty()) return {};
 
         std::sort(indices.begin(), indices.end());
-        auto newEndIter = std::unique(indices.begin(), indices.end());
-        auto numIndices = std::distance(indices.begin(), newEndIter);
+        const auto newEndIter = std::unique(indices.begin(), indices.end());
+        const auto numIndices = std::distance(indices.begin(), newEndIter);
         auto result = IndexResultBlocks{IndexResultBlock{indices.at(0), 1}};
         for (auto i = 1; i < numIndices; ++i) {
             if (indices.at(i) == indices.at(i - 1) + 1)
@@ -97,6 +92,7 @@ public:
                 s << "[pbbam] indexed BAM reader  ERROR: could not seek in BAM file:\n"
                   << "  file: " << file_.Filename() << '\n'
                   << "  offset: " << blocks_.at(0).virtualOffset_;
+                MaybePrintErrnoReason(s);
                 throw std::runtime_error{s.str()};
             }
         }
@@ -185,7 +181,10 @@ const IndexResultBlocks& PbiIndexedBamReader::IndexBlocks() const { return d_->b
 
 uint32_t PbiIndexedBamReader::NumReads() const { return d_->numMatchingReads_; }
 
-int PbiIndexedBamReader::ReadRawData(BGZF* bgzf, bam1_t* b) { return d_->ReadRawData(bgzf, b); }
+int PbiIndexedBamReader::ReadRawData(samFile* sf, bam1_t* b)
+{
+    return d_->ReadRawData(sf->fp.bgzf, b);
+}
 
 }  // namespace BAM
 }  // namespace PacBio

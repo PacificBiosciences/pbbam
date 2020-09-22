@@ -1,21 +1,16 @@
-// File Description
-/// \file SamTagCodec.h
-/// \brief Implements the SamTagCodec class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/SamTagCodec.h"
+#include <pbbam/SamTagCodec.h>
 
 #include <cstdint>
 
 #include <limits>
+#include <sstream>
 #include <string>
 
 #include <boost/lexical_cast.hpp>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 namespace PacBio {
 namespace BAM {

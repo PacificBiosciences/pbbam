@@ -1,29 +1,24 @@
-// File Description
-/// \file BamRecord.cpp
-/// \brief Implements the BamRecord class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/BamRecord.h"
+#include <pbbam/BamRecord.h>
 
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 
-#include <iostream>
 #include <stdexcept>
 
 #include <htslib/sam.h>
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <pbcopper/data/Clipping.h>
+#include <pbcopper/data/FrameEncoders.h>
 #include <pbcopper/data/internal/ClippingImpl.h>
 
-#include "pbbam/StringUtilities.h"
-#include "pbbam/ZmwTypeMap.h"
-#include "pbbam/virtual/VirtualRegionTypeMap.h"
+#include <pbbam/StringUtilities.h>
+#include <pbbam/ZmwTypeMap.h>
+#include <pbbam/virtual/VirtualRegionTypeMap.h>
 
 #include "BamRecordTags.h"
 #include "MemoryUtils.h"
@@ -60,7 +55,7 @@ int32_t HoleNumberFromName(const std::string& fullName)
     }
 }
 
-Position QueryEndFromName(const std::string& fullName)
+Data::Position QueryEndFromName(const std::string& fullName)
 {
     const auto mainTokens = Split(fullName, '/');
     if (mainTokens.size() != 3)
@@ -70,10 +65,10 @@ Position QueryEndFromName(const std::string& fullName)
     if (queryTokens.size() != 2)
         throw std::runtime_error{"[pbbam] BAM record ERROR: malformed record name: " + fullName};
 
-    return stoi(queryTokens.at(1));
+    return std::stoi(queryTokens.at(1));
 }
 
-Position QueryStartFromName(const std::string& fullName)
+Data::Position QueryStartFromName(const std::string& fullName)
 {
     const auto mainTokens = Split(fullName, '/');
     if (mainTokens.size() != 3)
@@ -83,7 +78,7 @@ Position QueryStartFromName(const std::string& fullName)
     if (queryTokens.size() != 2)
         throw std::runtime_error{"[pbbam] BAM record ERROR: malformed record name: " + fullName};
 
-    return stoi(queryTokens.at(0));
+    return std::stoi(queryTokens.at(0));
 }
 
 std::string Label(const BamRecordTag tag) { return BamRecordTags::LabelFor(tag); }
@@ -102,20 +97,20 @@ std::pair<int32_t, int32_t> AlignedOffsets(const BamRecord& record, const int se
     int32_t startOffset = 0;
     int32_t endOffset = seqLength;
 
-    const auto b = BamRecordMemory::GetRawData(record);
+    const auto& b = BamRecordMemory::GetRawData(record);
     uint32_t* cigarData = bam_get_cigar(b.get());
     const size_t numCigarOps = b->core.n_cigar;
     if (numCigarOps > 0) {
 
         // start offset
         for (size_t i = 0; i < numCigarOps; ++i) {
-            const auto type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
-            if (type == CigarOperationType::HARD_CLIP) {
+            const auto type = static_cast<Data::CigarOperationType>(bam_cigar_op(cigarData[i]));
+            if (type == Data::CigarOperationType::HARD_CLIP) {
                 if (startOffset != 0 && startOffset != seqLength) {
                     startOffset = -1;
                     break;
                 }
-            } else if (type == CigarOperationType::SOFT_CLIP)
+            } else if (type == Data::CigarOperationType::SOFT_CLIP)
                 startOffset += bam_cigar_oplen(cigarData[i]);
             else
                 break;
@@ -123,13 +118,13 @@ std::pair<int32_t, int32_t> AlignedOffsets(const BamRecord& record, const int se
 
         // end offset
         for (int i = numCigarOps - 1; i >= 0; --i) {
-            const auto type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
-            if (type == CigarOperationType::HARD_CLIP) {
+            const auto type = static_cast<Data::CigarOperationType>(bam_cigar_op(cigarData[i]));
+            if (type == Data::CigarOperationType::HARD_CLIP) {
                 if (endOffset != 0 && endOffset != seqLength) {
                     endOffset = -1;
                     break;
                 }
-            } else if (type == CigarOperationType::SOFT_CLIP)
+            } else if (type == Data::CigarOperationType::SOFT_CLIP)
                 endOffset -= bam_cigar_oplen(cigarData[i]);
             else
                 break;
@@ -154,8 +149,7 @@ T ClipSeqQV(const T& input, const size_t pos, const size_t len)
 }
 
 template <typename T>
-T ClipPulse(const T& input, PacBio::BAM::Pulse2BaseCache* p2bCache, const size_t pos,
-            const size_t len)
+T ClipPulse(const T& input, Pulse2BaseCache* p2bCache, const size_t pos, const size_t len)
 {
     assert(p2bCache);
     if (input.empty()) return {};
@@ -189,15 +183,15 @@ void ClipAndGapify(const BamRecordImpl& impl, const bool aligned, const bool exc
     const bool clipOrGapRequested = aligned || exciseSoftClips;
     if (impl.IsMapped() && clipOrGapRequested) {
         // determine final container length
-        auto incrementsOutputLength = [](const CigarOperationType type, const bool isAligned,
+        auto incrementsOutputLength = [](const Data::CigarOperationType type, const bool isAligned,
                                          const bool exciseSoftClipsFromAln) {
-            if (type == CigarOperationType::HARD_CLIP ||
-                type == CigarOperationType::REFERENCE_SKIP) {
+            if (type == Data::CigarOperationType::HARD_CLIP ||
+                type == Data::CigarOperationType::REFERENCE_SKIP) {
                 return false;
-            } else if (type == CigarOperationType::SOFT_CLIP && exciseSoftClipsFromAln) {
+            } else if (type == Data::CigarOperationType::SOFT_CLIP && exciseSoftClipsFromAln) {
                 return false;
-            } else if (!isAligned && (type == CigarOperationType::DELETION ||
-                                      type == CigarOperationType::PADDING)) {
+            } else if (!isAligned && (type == Data::CigarOperationType::DELETION ||
+                                      type == Data::CigarOperationType::PADDING)) {
                 return false;
             } else
                 return true;
@@ -205,7 +199,7 @@ void ClipAndGapify(const BamRecordImpl& impl, const bool aligned, const bool exc
 
         size_t outputLength = 0;
         const auto cigar = impl.CigarData();
-        for (const CigarOperation& op : cigar) {
+        for (const auto& op : cigar) {
             if (incrementsOutputLength(op.Type(), aligned, exciseSoftClips))
                 outputLength += op.Length();
         }
@@ -217,18 +211,18 @@ void ClipAndGapify(const BamRecordImpl& impl, const bool aligned, const bool exc
         // apply CIGAR ops
         size_t srcIndex = 0;
         size_t dstIndex = 0;
-        for (const CigarOperation& op : cigar) {
+        for (const auto& op : cigar) {
             const auto opType = op.Type();
             const auto opLength = op.Length();
 
             // nothing to do for hard-clipped & ref-skipped positions
-            if (opType == CigarOperationType::HARD_CLIP ||
-                opType == CigarOperationType::REFERENCE_SKIP) {
+            if (opType == Data::CigarOperationType::HARD_CLIP ||
+                opType == Data::CigarOperationType::REFERENCE_SKIP) {
                 continue;
             }
 
             // maybe skip soft-clipped positions
-            else if (opType == CigarOperationType::SOFT_CLIP) {
+            else if (opType == Data::CigarOperationType::SOFT_CLIP) {
                 if (exciseSoftClips)
                     srcIndex += opLength;
                 else {
@@ -240,14 +234,14 @@ void ClipAndGapify(const BamRecordImpl& impl, const bool aligned, const bool exc
 
             // maybe add deletion/padding values
             // either way, srcIndex is not incremented
-            else if (opType == CigarOperationType::DELETION) {
+            else if (opType == Data::CigarOperationType::DELETION) {
                 if (aligned) {
                     for (size_t i = 0; i < opLength; ++i) {
                         (*seq)[dstIndex] = deletionNullValue;
                         ++dstIndex;
                     }
                 }
-            } else if (opType == CigarOperationType::PADDING) {
+            } else if (opType == Data::CigarOperationType::PADDING) {
                 if (aligned) {
                     for (size_t i = 0; i < opLength; ++i) {
                         (*seq)[dstIndex] = paddingNullValue;
@@ -273,7 +267,7 @@ void ClipAndGapifyBases(const BamRecordImpl& impl, const bool aligned, const boo
 }
 
 void ClipAndGapifyFrames(const BamRecordImpl& impl, const bool aligned, const bool exciseSoftClips,
-                         Frames* frames)
+                         Data::Frames* frames)
 {
     assert(frames);
     std::vector<uint16_t> data{std::move(frames->Data())};
@@ -288,10 +282,10 @@ void ClipAndGapifyPhotons(const BamRecordImpl& impl, const bool aligned, const b
 }
 
 void ClipAndGapifyQualities(const BamRecordImpl& impl, const bool aligned,
-                            const bool exciseSoftClips, QualityValues* quals)
+                            const bool exciseSoftClips, Data::QualityValues* quals)
 {
-    ClipAndGapify<QualityValues, QualityValue>(impl, aligned, exciseSoftClips, quals,
-                                               QualityValue(0), QualityValue(0));
+    ClipAndGapify<Data::QualityValues, Data::QualityValue>(
+        impl, aligned, exciseSoftClips, quals, Data::QualityValue{0}, Data::QualityValue{0});
 }
 
 void ClipAndGapifyUInts(const BamRecordImpl& impl, const bool aligned, const bool exciseSoftClips,
@@ -306,6 +300,26 @@ void ClipAndGapifyUInt8s(const BamRecordImpl& impl, const bool aligned, const bo
     ClipAndGapify<std::vector<uint8_t>, uint8_t>(impl, aligned, exciseSoftClips, data, 0, 0);
 }
 
+Data::FrameEncoder IpdEncoder(const BamRecord& record)
+{
+    try {
+        return record.ReadGroup().IpdFrameEncoder();
+    } catch (const std::exception&) {
+        // fallback to V1 in corner cases w/ no read group set
+        return Data::V1FrameEncoder{};
+    }
+}
+
+Data::FrameEncoder PwEncoder(const BamRecord& record)
+{
+    try {
+        return record.ReadGroup().PulseWidthFrameEncoder();
+    } catch (const std::exception&) {
+        // fallback to V1 in corner cases w/ no read group set
+        return Data::V1FrameEncoder{};
+    }
+}
+
 RecordType NameToType(const std::string& name)
 {
     if (name == recordTypeName_Subread) return RecordType::SUBREAD;
@@ -317,8 +331,8 @@ RecordType NameToType(const std::string& name)
     return RecordType::UNKNOWN;
 }
 
-void OrientBasesAsRequested(std::string* bases, Orientation current, Orientation requested,
-                            bool isReverseStrand, bool isPulse)
+void OrientBasesAsRequested(std::string* bases, Data::Orientation current,
+                            Data::Orientation requested, bool isReverseStrand, bool isPulse)
 {
     assert(bases);
     if (current != requested && isReverseStrand) {
@@ -330,8 +344,8 @@ void OrientBasesAsRequested(std::string* bases, Orientation current, Orientation
 }
 
 template <typename Container>
-void OrientTagDataAsRequested(Container* data, Orientation current, Orientation requested,
-                              bool isReverseStrand)
+void OrientTagDataAsRequested(Container* data, Data::Orientation current,
+                              Data::Orientation requested, bool isReverseStrand)
 {
     assert(data);
     if (current != requested && isReverseStrand) std::reverse(data->begin(), data->end());
@@ -341,24 +355,11 @@ void OrientTagDataAsRequested(Container* data, Orientation current, Orientation 
 
 const float BamRecord::photonFactor = 10.0;
 
-BamRecord::BamRecord()
-    : alignedStart_{PacBio::BAM::UnmappedPosition}, alignedEnd_{PacBio::BAM::UnmappedPosition}
-{
-}
+BamRecord::BamRecord() = default;
 
-BamRecord::BamRecord(BamHeader header)
-    : header_{std::move(header)}
-    , alignedStart_{PacBio::BAM::UnmappedPosition}
-    , alignedEnd_{PacBio::BAM::UnmappedPosition}
-{
-}
+BamRecord::BamRecord(BamHeader header) : header_{std::move(header)} {}
 
-BamRecord::BamRecord(BamRecordImpl impl)
-    : impl_{std::move(impl)}
-    , alignedStart_{PacBio::BAM::UnmappedPosition}
-    , alignedEnd_{PacBio::BAM::UnmappedPosition}
-{
-}
+BamRecord::BamRecord(BamRecordImpl impl) : impl_{std::move(impl)} {}
 
 BamRecord::BamRecord(const BamRecord& other)
     : impl_{other.impl_}
@@ -386,38 +387,38 @@ BamRecord& BamRecord::operator=(BamRecord&&) noexcept = default;
 
 BamRecord::~BamRecord() = default;
 
-Position BamRecord::AlignedEnd() const
+Data::Position BamRecord::AlignedEnd() const
 {
-    if (alignedEnd_ == PacBio::BAM::UnmappedPosition) CalculateAlignedPositions();
+    if (alignedEnd_ == Data::UnmappedPosition) CalculateAlignedPositions();
     return alignedEnd_;
 }
 
-Position BamRecord::AlignedStart() const
+Data::Position BamRecord::AlignedStart() const
 {
-    if (alignedStart_ == PacBio::BAM::UnmappedPosition) CalculateAlignedPositions();
+    if (alignedStart_ == Data::UnmappedPosition) CalculateAlignedPositions();
     return alignedStart_;
 }
 
-Strand BamRecord::AlignedStrand() const
+Data::Strand BamRecord::AlignedStrand() const
 {
-    return impl_.IsReverseStrand() ? Strand::REVERSE : Strand::FORWARD;
+    return impl_.IsReverseStrand() ? Data::Strand::REVERSE : Data::Strand::FORWARD;
 }
 
-QualityValues BamRecord::AltLabelQV(Orientation orientation, bool aligned, bool exciseSoftClips,
-                                    PulseBehavior pulseBehavior) const
+Data::QualityValues BamRecord::AltLabelQV(Data::Orientation orientation, bool aligned,
+                                          bool exciseSoftClips, PulseBehavior pulseBehavior) const
 {
     return FetchQualities(BamRecordTag::ALT_LABEL_QV, orientation, aligned, exciseSoftClips,
                           pulseBehavior);
 }
 
-BamRecord& BamRecord::AltLabelQV(const QualityValues& altLabelQVs)
+BamRecord& BamRecord::AltLabelQV(const Data::QualityValues& altLabelQVs)
 {
     CreateOrEdit(BamRecordTag::ALT_LABEL_QV, altLabelQVs.Fastq(), &impl_);
     return *this;
 }
 
-std::string BamRecord::AltLabelTag(Orientation orientation, bool aligned, bool exciseSoftClips,
-                                   PulseBehavior pulseBehavior) const
+std::string BamRecord::AltLabelTag(Data::Orientation orientation, bool aligned,
+                                   bool exciseSoftClips, PulseBehavior pulseBehavior) const
 {
     return FetchBases(BamRecordTag::ALT_LABEL_TAG, orientation, aligned, exciseSoftClips,
                       pulseBehavior);
@@ -451,7 +452,7 @@ BamRecord& BamRecord::BarcodeQuality(const uint8_t quality)
 std::pair<int16_t, int16_t> BamRecord::Barcodes() const
 {
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::BARCODES);
-    const Tag bc = impl_.TagValue(tagName);
+    const auto bc = impl_.TagValue(tagName);
     if (bc.IsNull())
         throw std::runtime_error{
             "[pbbam] BAM record ERROR: barcode tag (bc) was requested but is missing"};
@@ -491,10 +492,10 @@ void BamRecord::CalculateAlignedPositions() const
     // get the query start/end
     const auto seqLength = static_cast<int>(impl_.SequenceLength());
     const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
-    const Position qStart = isCcsOrTranscript ? 0 : QueryStart();
-    const Position qEnd = isCcsOrTranscript ? seqLength : QueryEnd();
+    const Data::Position qStart = isCcsOrTranscript ? 0 : QueryStart();
+    const Data::Position qEnd = isCcsOrTranscript ? seqLength : QueryEnd();
 
-    if (qStart == PacBio::BAM::UnmappedPosition || qEnd == PacBio::BAM::UnmappedPosition) return;
+    if (qStart == Data::UnmappedPosition || qEnd == Data::UnmappedPosition) return;
 
     // determine clipped end ranges
     const auto alignedOffsets = AlignedOffsets(*this, seqLength);
@@ -521,16 +522,17 @@ void BamRecord::CalculatePulse2BaseCache() const
     if (!HasPulseCall())
         throw std::runtime_error{
             "[pbbam] BAM record ERROR: cannot calculate pulse2base mapping without 'pc' tag."};
-    const auto pulseCalls =
-        FetchBases(BamRecordTag::PULSE_CALL, Orientation::NATIVE, false, false, PulseBehavior::ALL);
+    const auto pulseCalls = FetchBases(BamRecordTag::PULSE_CALL, Data::Orientation::NATIVE, false,
+                                       false, PulseBehavior::ALL);
     p2bCache_ = std::make_unique<Pulse2BaseCache>(pulseCalls);
 }
 
-Cigar BamRecord::CigarData(bool exciseAllClips) const
+Data::Cigar BamRecord::CigarData(bool exciseAllClips) const
 {
-    auto isClippingOp = [](const CigarOperation& op) {
+    auto isClippingOp = [](const auto& op) {
         const auto type = op.Type();
-        return type == CigarOperationType::SOFT_CLIP || type == CigarOperationType::HARD_CLIP;
+        return type == Data::CigarOperationType::SOFT_CLIP ||
+               type == Data::CigarOperationType::HARD_CLIP;
     };
 
     auto cigar = impl_.CigarData();
@@ -540,8 +542,8 @@ Cigar BamRecord::CigarData(bool exciseAllClips) const
     return cigar;
 }
 
-BamRecord& BamRecord::Clip(const ClipType clipType, const Position start, const Position end,
-                           const bool exciseFlankingInserts)
+BamRecord& BamRecord::Clip(const ClipType clipType, const Data::Position start,
+                           const Data::Position end, const bool exciseFlankingInserts)
 {
     switch (clipType) {
         case ClipType::CLIP_NONE:
@@ -557,15 +559,14 @@ BamRecord& BamRecord::Clip(const ClipType clipType, const Position start, const 
 }
 
 BamRecord BamRecord::Clipped(const BamRecord& input, const ClipType clipType,
-                             const PacBio::BAM::Position start, const PacBio::BAM::Position end,
+                             const Data::Position start, const Data::Position end,
                              const bool exciseFlankingInserts)
 {
     return input.Clipped(clipType, start, end, exciseFlankingInserts);
 }
 
-BamRecord BamRecord::Clipped(const ClipType clipType, const PacBio::BAM::Position start,
-                             const PacBio::BAM::Position end,
-                             const bool exciseFlankingInserts) const
+BamRecord BamRecord::Clipped(const ClipType clipType, const Data::Position start,
+                             const Data::Position end, const bool exciseFlankingInserts) const
 {
     BamRecord result(*this);
     result.Clip(clipType, start, end, exciseFlankingInserts);
@@ -574,45 +575,48 @@ BamRecord BamRecord::Clipped(const ClipType clipType, const PacBio::BAM::Positio
 
 void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
 {
-    const auto ipdCodec = ReadGroup().IpdCodec();
-    const auto pwCodec = ReadGroup().PulseWidthCodec();
+    const auto rg = ReadGroup();
+    const auto ipdCodec = rg.IpdCodec();
+    const auto ipdEncoder = rg.IpdFrameEncoder();
+    const auto pwCodec = rg.PulseWidthCodec();
+    const auto pwEncoder = rg.IpdFrameEncoder();
 
     // update BAM tags
     TagCollection tags = impl_.Tags();
     if (HasDeletionQV())
         tags[Label(BamRecordTag::DELETION_QV)] =
-            ClipSeqQV(DeletionQV(Orientation::NATIVE), clipFrom, clipLength).Fastq();
+            ClipSeqQV(DeletionQV(Data::Orientation::NATIVE), clipFrom, clipLength).Fastq();
     if (HasInsertionQV())
         tags[Label(BamRecordTag::INSERTION_QV)] =
-            ClipSeqQV(InsertionQV(Orientation::NATIVE), clipFrom, clipLength).Fastq();
+            ClipSeqQV(InsertionQV(Data::Orientation::NATIVE), clipFrom, clipLength).Fastq();
     if (HasMergeQV())
         tags[Label(BamRecordTag::MERGE_QV)] =
-            ClipSeqQV(MergeQV(Orientation::NATIVE), clipFrom, clipLength).Fastq();
+            ClipSeqQV(MergeQV(Data::Orientation::NATIVE), clipFrom, clipLength).Fastq();
     if (HasSubstitutionQV())
         tags[Label(BamRecordTag::SUBSTITUTION_QV)] =
-            ClipSeqQV(SubstitutionQV(Orientation::NATIVE), clipFrom, clipLength).Fastq();
+            ClipSeqQV(SubstitutionQV(Data::Orientation::NATIVE), clipFrom, clipLength).Fastq();
     if (HasIPD()) {
-        if (ipdCodec == FrameCodec::RAW)
-            tags[Label(BamRecordTag::IPD)] =
-                ClipSeqQV(IPD(Orientation::NATIVE).Data(), clipFrom, clipLength);
-        else if (ipdCodec == FrameCodec::V1)
-            tags[Label(BamRecordTag::IPD)] =
-                ClipSeqQV(IPD(Orientation::NATIVE).Encode(), clipFrom, clipLength);
+        const auto label = Label(BamRecordTag::IPD);
+        const auto ipd = IPD(Data::Orientation::NATIVE).Data();
+        if (ipdCodec == Data::FrameCodec::RAW)
+            tags[label] = ClipSeqQV(ipd, clipFrom, clipLength);
+        else
+            tags[label] = ClipSeqQV(ipdEncoder.Encode(ipd), clipFrom, clipLength);
     }
     if (HasPulseWidth()) {
-        if (pwCodec == FrameCodec::RAW)
-            tags[Label(BamRecordTag::PULSE_WIDTH)] =
-                ClipSeqQV(PulseWidth(Orientation::NATIVE).Data(), clipFrom, clipLength);
-        else if (pwCodec == FrameCodec::V1)
-            tags[Label(BamRecordTag::PULSE_WIDTH)] =
-                ClipSeqQV(PulseWidth(Orientation::NATIVE).Encode(), clipFrom, clipLength);
+        const auto label = Label(BamRecordTag::PULSE_WIDTH);
+        const auto pw = PulseWidth(Data::Orientation::NATIVE).Data();
+        if (pwCodec == Data::FrameCodec::RAW)
+            tags[label] = ClipSeqQV(pw, clipFrom, clipLength);
+        else
+            tags[label] = ClipSeqQV(pwEncoder.Encode(pw), clipFrom, clipLength);
     }
     if (HasDeletionTag())
         tags[Label(BamRecordTag::DELETION_TAG)] =
-            ClipSeqQV(DeletionTag(Orientation::NATIVE), clipFrom, clipLength);
+            ClipSeqQV(DeletionTag(Data::Orientation::NATIVE), clipFrom, clipLength);
     if (HasSubstitutionTag())
         tags[Label(BamRecordTag::SUBSTITUTION_TAG)] =
-            ClipSeqQV(SubstitutionTag(Orientation::NATIVE), clipFrom, clipLength);
+            ClipSeqQV(SubstitutionTag(Data::Orientation::NATIVE), clipFrom, clipLength);
 
     // internal BAM tags
     if (HasPulseCall()) {
@@ -623,41 +627,43 @@ void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
 
         if (HasAltLabelQV())
             tags[Label(BamRecordTag::ALT_LABEL_QV)] =
-                ClipPulse(AltLabelQV(Orientation::NATIVE), p2bCache, clipFrom, clipLength).Fastq();
+                ClipPulse(AltLabelQV(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength)
+                    .Fastq();
         if (HasLabelQV())
             tags[Label(BamRecordTag::LABEL_QV)] =
-                ClipPulse(LabelQV(Orientation::NATIVE), p2bCache, clipFrom, clipLength).Fastq();
+                ClipPulse(LabelQV(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength)
+                    .Fastq();
         if (HasPulseMergeQV())
             tags[Label(BamRecordTag::PULSE_MERGE_QV)] =
-                ClipPulse(PulseMergeQV(Orientation::NATIVE), p2bCache, clipFrom, clipLength)
+                ClipPulse(PulseMergeQV(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength)
                     .Fastq();
         if (HasAltLabelTag())
             tags[Label(BamRecordTag::ALT_LABEL_TAG)] =
-                ClipPulse(AltLabelTag(Orientation::NATIVE), p2bCache, clipFrom, clipLength);
+                ClipPulse(AltLabelTag(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength);
         if (HasPulseCall())
             tags[Label(BamRecordTag::PULSE_CALL)] =
-                ClipPulse(PulseCall(Orientation::NATIVE), p2bCache, clipFrom, clipLength);
+                ClipPulse(PulseCall(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength);
         if (HasPkmean())
             tags[Label(BamRecordTag::PKMEAN)] = EncodePhotons(
-                ClipPulse(Pkmean(Orientation::NATIVE), p2bCache, clipFrom, clipLength));
+                ClipPulse(Pkmean(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength));
         if (HasPkmid())
             tags[Label(BamRecordTag::PKMID)] = EncodePhotons(
-                ClipPulse(Pkmid(Orientation::NATIVE), p2bCache, clipFrom, clipLength));
+                ClipPulse(Pkmid(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength));
         if (HasPkmean2())
             tags[Label(BamRecordTag::PKMEAN_2)] = EncodePhotons(
-                ClipPulse(Pkmean2(Orientation::NATIVE), p2bCache, clipFrom, clipLength));
+                ClipPulse(Pkmean2(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength));
         if (HasPkmid2())
             tags[Label(BamRecordTag::PKMID_2)] = EncodePhotons(
-                ClipPulse(Pkmid2(Orientation::NATIVE), p2bCache, clipFrom, clipLength));
+                ClipPulse(Pkmid2(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength));
         if (HasPrePulseFrames())
             tags[Label(BamRecordTag::PRE_PULSE_FRAMES)] = ClipPulse(
-                PrePulseFrames(Orientation::NATIVE).Data(), p2bCache, clipFrom, clipLength);
+                PrePulseFrames(Data::Orientation::NATIVE).Data(), p2bCache, clipFrom, clipLength);
         if (HasPulseCallWidth())
             tags[Label(BamRecordTag::PULSE_CALL_WIDTH)] = ClipPulse(
-                PulseCallWidth(Orientation::NATIVE).Data(), p2bCache, clipFrom, clipLength);
+                PulseCallWidth(Data::Orientation::NATIVE).Data(), p2bCache, clipFrom, clipLength);
         if (HasStartFrame())
             tags[Label(BamRecordTag::START_FRAME)] =
-                ClipPulse(StartFrame(Orientation::NATIVE), p2bCache, clipFrom, clipLength);
+                ClipPulse(StartFrame(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength);
     }
 
     impl_.Tags(tags);
@@ -665,11 +671,12 @@ void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
 
 void BamRecord::ClipFields(const size_t clipFrom, const size_t clipLength)
 {
-    const bool isForwardStrand = (AlignedStrand() == Strand::FORWARD);
+    const bool isForwardStrand = (AlignedStrand() == Data::Strand::FORWARD);
 
     // clip seq, quals
-    std::string sequence{ClipSeqQV(Sequence(Orientation::NATIVE), clipFrom, clipLength)};
-    QualityValues qualities{ClipSeqQV(Qualities(Orientation::NATIVE), clipFrom, clipLength)};
+    std::string sequence{ClipSeqQV(Sequence(Data::Orientation::NATIVE), clipFrom, clipLength)};
+    Data::QualityValues qualities{
+        ClipSeqQV(Qualities(Data::Orientation::NATIVE), clipFrom, clipLength)};
     if (!isForwardStrand) {
         ReverseComplement(sequence);
         Reverse(qualities);
@@ -679,13 +686,13 @@ void BamRecord::ClipFields(const size_t clipFrom, const size_t clipLength)
     ClipTags(clipFrom, clipLength);
 }
 
-BamRecord& BamRecord::ClipToQuery(const Position start, const Position end)
+BamRecord& BamRecord::ClipToQuery(const Data::Position start, const Data::Position end)
 {
     // cache original coords, skip out if clip not needed
     const size_t seqLength = impl_.SequenceLength();
     const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
-    const Position origQStart = isCcsOrTranscript ? 0 : QueryStart();
-    const Position origQEnd = isCcsOrTranscript ? seqLength : QueryEnd();
+    const Data::Position origQStart = isCcsOrTranscript ? 0 : QueryStart();
+    const Data::Position origQEnd = isCcsOrTranscript ? seqLength : QueryEnd();
     if (start <= origQStart && end >= origQEnd) return *this;
 
     // calculate clipping
@@ -715,7 +722,7 @@ BamRecord& BamRecord::ClipToQuery(const Position start, const Position end)
     return *this;
 }
 
-BamRecord& BamRecord::ClipToReference(const Position start, const Position end,
+BamRecord& BamRecord::ClipToReference(const Data::Position start, const Data::Position end,
                                       const bool exciseFlankingInserts)
 {
     // skip if not mapped, clipping to reference doesn't make sense
@@ -725,10 +732,10 @@ BamRecord& BamRecord::ClipToReference(const Position start, const Position end,
     // cache original coords
     const int seqLength = static_cast<int>(impl_.SequenceLength());
     const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
-    const Position origQStart = isCcsOrTranscript ? 0 : QueryStart();
-    const Position origQEnd = isCcsOrTranscript ? seqLength : QueryEnd();
-    const Position origTStart = ReferenceStart();
-    const Position origTEnd = ReferenceEnd();
+    const Data::Position origQStart = isCcsOrTranscript ? 0 : QueryStart();
+    const Data::Position origQEnd = isCcsOrTranscript ? seqLength : QueryEnd();
+    const Data::Position origTStart = ReferenceStart();
+    const Data::Position origTEnd = ReferenceEnd();
 
     // skip if already within requested clip range
     if (start <= origTStart && end >= origTEnd) return *this;
@@ -748,8 +755,8 @@ BamRecord& BamRecord::ClipToReference(const Position start, const Position end,
     impl_.Position(result.refPos_);
 
     // clip SEQ, QUAL, tags
-    const Position qStart = result.qStart_;
-    const Position qEnd = result.qEnd_;
+    const Data::Position qStart = result.qStart_;
+    const Data::Position qEnd = result.qEnd_;
     const size_t clipFrom = result.clipOffset_;
     const size_t clipLength = qEnd - qStart;
     ClipFields(clipFrom, clipLength);
@@ -763,19 +770,19 @@ BamRecord& BamRecord::ClipToReference(const Position start, const Position end,
     return *this;
 }
 
-QualityValues BamRecord::DeletionQV(Orientation orientation, bool aligned,
-                                    bool exciseSoftClips) const
+Data::QualityValues BamRecord::DeletionQV(Data::Orientation orientation, bool aligned,
+                                          bool exciseSoftClips) const
 {
     return FetchQualities(BamRecordTag::DELETION_QV, orientation, aligned, exciseSoftClips);
 }
 
-BamRecord& BamRecord::DeletionQV(const QualityValues& deletionQVs)
+BamRecord& BamRecord::DeletionQV(const Data::QualityValues& deletionQVs)
 {
     CreateOrEdit(BamRecordTag::DELETION_QV, deletionQVs.Fastq(), &impl_);
     return *this;
 }
 
-std::string BamRecord::DeletionTag(Orientation orientation, bool aligned,
+std::string BamRecord::DeletionTag(Data::Orientation orientation, bool aligned,
                                    bool exciseSoftClips) const
 {
     return FetchBases(BamRecordTag::DELETION_TAG, orientation, aligned, exciseSoftClips);
@@ -802,7 +809,7 @@ std::string BamRecord::FetchBasesRaw(const BamRecordTag tag) const
     return seqTag.ToString();
 }
 
-std::string BamRecord::FetchBases(const BamRecordTag tag, const Orientation orientation,
+std::string BamRecord::FetchBases(const BamRecordTag tag, const Data::Orientation orientation,
                                   const bool aligned, const bool exciseSoftClips,
                                   const PulseBehavior pulseBehavior) const
 {
@@ -811,13 +818,13 @@ std::string BamRecord::FetchBases(const BamRecordTag tag, const Orientation orie
 
     // fetch raw
     std::string bases;
-    Orientation current;
+    Data::Orientation current;
     if (isBamSeq) {  // SEQ stored in genomic orientation
         bases = impl_.Sequence();
-        current = Orientation::GENOMIC;
+        current = Data::Orientation::GENOMIC;
     } else {  // all tags stored in native orientation
         bases = FetchBasesRaw(tag);
-        current = Orientation::NATIVE;
+        current = Data::Orientation::NATIVE;
     }
 
     // maybe strip 'squashed' pulse loci
@@ -835,9 +842,9 @@ std::string BamRecord::FetchBases(const BamRecordTag tag, const Orientation orie
                 "soft-clipping are requested. Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
-        OrientBasesAsRequested(&bases, current, Orientation::GENOMIC, impl_.IsReverseStrand(),
+        OrientBasesAsRequested(&bases, current, Data::Orientation::GENOMIC, impl_.IsReverseStrand(),
                                isPulse);
-        current = Orientation::GENOMIC;
+        current = Data::Orientation::GENOMIC;
 
         // clip & gapify as requested
         ClipAndGapifyBases(impl_, aligned, exciseSoftClips, &bases);
@@ -848,33 +855,39 @@ std::string BamRecord::FetchBases(const BamRecordTag tag, const Orientation orie
     return bases;
 }
 
-Frames BamRecord::FetchFramesRaw(const BamRecordTag tag) const
+Data::Frames BamRecord::FetchFramesRaw(const BamRecordTag tag) const
 {
-    const Tag frameTag = impl_.TagValue(tag);
+    const auto frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) return {};  // throw ?
 
     // lossy frame codes
     if (frameTag.IsUInt8Array()) {
-        const auto codes = frameTag.ToUInt8Array();
-        return Frames::Decode(codes);
+        const auto& decoder = [&]() -> Data::FrameEncoder {
+            assert(tag == BamRecordTag::IPD || tag == BamRecordTag::PULSE_WIDTH);
+            if (tag == BamRecordTag::IPD)
+                return IpdEncoder(*this);
+            else
+                return PwEncoder(*this);
+        }();
+        return decoder.Decode(frameTag.ToUInt8Array());
     }
 
     // lossless frame data
     else {
         assert(frameTag.IsUInt16Array());
-        return Frames{frameTag.ToUInt16Array()};
+        return Data::Frames{frameTag.ToUInt16Array()};
     }
 }
 
-Frames BamRecord::FetchFrames(const BamRecordTag tag, const Orientation orientation,
-                              const bool aligned, const bool exciseSoftClips,
-                              const PulseBehavior pulseBehavior) const
+Data::Frames BamRecord::FetchFrames(const BamRecordTag tag, const Data::Orientation orientation,
+                                    const bool aligned, const bool exciseSoftClips,
+                                    const PulseBehavior pulseBehavior) const
 {
     const bool isPulse = BamRecordTags::IsPulse(tag);
 
     // fetch raw
-    Frames frames = FetchFramesRaw(tag);
-    Orientation current = Orientation::NATIVE;
+    Data::Frames frames = FetchFramesRaw(tag);
+    Data::Orientation current = Data::Orientation::NATIVE;
 
     // maybe strip 'squashed' pulse loci
     if (isPulse && pulseBehavior == PulseBehavior::BASECALLS_ONLY) {
@@ -891,8 +904,9 @@ Frames BamRecord::FetchFrames(const BamRecordTag tag, const Orientation orientat
                 "soft-clipping are requested. Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
-        OrientTagDataAsRequested(&frames, current, Orientation::GENOMIC, impl_.IsReverseStrand());
-        current = Orientation::GENOMIC;
+        OrientTagDataAsRequested(&frames, current, Data::Orientation::GENOMIC,
+                                 impl_.IsReverseStrand());
+        current = Data::Orientation::GENOMIC;
 
         // clip & gapify as requested
         ClipAndGapifyFrames(impl_, aligned, exciseSoftClips, &frames);
@@ -905,7 +919,7 @@ Frames BamRecord::FetchFrames(const BamRecordTag tag, const Orientation orientat
 
 std::vector<float> BamRecord::FetchPhotonsRaw(const BamRecordTag tag) const
 {
-    const Tag frameTag = impl_.TagValue(tag);
+    const auto frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) return {};
     if (!frameTag.IsUInt16Array())
         throw std::runtime_error{
@@ -920,15 +934,16 @@ std::vector<float> BamRecord::FetchPhotonsRaw(const BamRecordTag tag) const
     return photons;
 }
 
-std::vector<float> BamRecord::FetchPhotons(const BamRecordTag tag, const Orientation orientation,
-                                           const bool aligned, const bool exciseSoftClips,
+std::vector<float> BamRecord::FetchPhotons(const BamRecordTag tag,
+                                           const Data::Orientation orientation, const bool aligned,
+                                           const bool exciseSoftClips,
                                            const PulseBehavior pulseBehavior) const
 {
     const bool isPulse = BamRecordTags::IsPulse(tag);
 
     // fetch raw
     auto data = FetchPhotonsRaw(tag);
-    Orientation current = Orientation::NATIVE;
+    Data::Orientation current = Data::Orientation::NATIVE;
 
     if (isPulse && pulseBehavior == PulseBehavior::BASECALLS_ONLY) {
         // strip 'squashed' pulse loci
@@ -944,8 +959,9 @@ std::vector<float> BamRecord::FetchPhotons(const BamRecordTag tag, const Orienta
                 "soft-clipping are requested. Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
-        OrientTagDataAsRequested(&data, current, Orientation::GENOMIC, impl_.IsReverseStrand());
-        current = Orientation::GENOMIC;
+        OrientTagDataAsRequested(&data, current, Data::Orientation::GENOMIC,
+                                 impl_.IsReverseStrand());
+        current = Data::Orientation::GENOMIC;
 
         // clip & gapify as requested
         ClipAndGapifyPhotons(impl_, aligned, exciseSoftClips, &data);
@@ -956,29 +972,30 @@ std::vector<float> BamRecord::FetchPhotons(const BamRecordTag tag, const Orienta
     return data;
 }
 
-QualityValues BamRecord::FetchQualitiesRaw(const BamRecordTag tag) const
+Data::QualityValues BamRecord::FetchQualitiesRaw(const BamRecordTag tag) const
 {
-    const Tag qvsTag = impl_.TagValue(tag);
-    return QualityValues::FromFastq(qvsTag.ToString());
+    const auto qvsTag = impl_.TagValue(tag);
+    return Data::QualityValues::FromFastq(qvsTag.ToString());
 }
 
-QualityValues BamRecord::FetchQualities(const BamRecordTag tag, const Orientation orientation,
-                                        const bool aligned, const bool exciseSoftClips,
-                                        const PulseBehavior pulseBehavior) const
+Data::QualityValues BamRecord::FetchQualities(const BamRecordTag tag,
+                                              const Data::Orientation orientation,
+                                              const bool aligned, const bool exciseSoftClips,
+                                              const PulseBehavior pulseBehavior) const
 {
     // requested data info
     const bool isBamQual = (tag == BamRecordTag::QUAL);
     const bool isPulse = BamRecordTags::IsPulse(tag);
 
     // fetch raw
-    QualityValues quals;
-    Orientation current;
+    Data::QualityValues quals;
+    Data::Orientation current;
     if (isBamQual) {  // QUAL stored in genomic orientation
         quals = impl_.Qualities();
-        current = Orientation::GENOMIC;
+        current = Data::Orientation::GENOMIC;
     } else {  // all tags stored in native orientation
         quals = FetchQualitiesRaw(tag);
-        current = Orientation::NATIVE;
+        current = Data::Orientation::NATIVE;
     }
 
     if (isPulse && pulseBehavior == PulseBehavior::BASECALLS_ONLY) {
@@ -996,8 +1013,9 @@ QualityValues BamRecord::FetchQualities(const BamRecordTag tag, const Orientatio
                 "soft-clipping are requested. Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
-        OrientTagDataAsRequested(&quals, current, Orientation::GENOMIC, impl_.IsReverseStrand());
-        current = Orientation::GENOMIC;
+        OrientTagDataAsRequested(&quals, current, Data::Orientation::GENOMIC,
+                                 impl_.IsReverseStrand());
+        current = Data::Orientation::GENOMIC;
 
         // clip & gapify as requested
         ClipAndGapifyQualities(impl_, aligned, exciseSoftClips, &quals);
@@ -1011,7 +1029,7 @@ QualityValues BamRecord::FetchQualities(const BamRecordTag tag, const Orientatio
 std::vector<uint32_t> BamRecord::FetchUInt32sRaw(const BamRecordTag tag) const
 {
     // fetch tag data
-    const Tag frameTag = impl_.TagValue(tag);
+    const auto frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) return {};
     if (!frameTag.IsUInt32Array())
         throw std::runtime_error{
@@ -1020,7 +1038,8 @@ std::vector<uint32_t> BamRecord::FetchUInt32sRaw(const BamRecordTag tag) const
     return frameTag.ToUInt32Array();
 }
 
-std::vector<uint32_t> BamRecord::FetchUInt32s(const BamRecordTag tag, const Orientation orientation,
+std::vector<uint32_t> BamRecord::FetchUInt32s(const BamRecordTag tag,
+                                              const Data::Orientation orientation,
                                               const bool aligned, const bool exciseSoftClips,
                                               const PulseBehavior pulseBehavior) const
 {
@@ -1028,7 +1047,7 @@ std::vector<uint32_t> BamRecord::FetchUInt32s(const BamRecordTag tag, const Orie
 
     // fetch raw
     auto arr = FetchUInt32sRaw(tag);
-    Orientation current = Orientation::NATIVE;
+    Data::Orientation current = Data::Orientation::NATIVE;
 
     if (isPulse && pulseBehavior == PulseBehavior::BASECALLS_ONLY) {
         // strip 'squashed' pulse loci
@@ -1044,8 +1063,9 @@ std::vector<uint32_t> BamRecord::FetchUInt32s(const BamRecordTag tag, const Orie
                 "soft-clipping are requested. Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
-        OrientTagDataAsRequested(&arr, current, Orientation::GENOMIC, impl_.IsReverseStrand());
-        current = Orientation::GENOMIC;
+        OrientTagDataAsRequested(&arr, current, Data::Orientation::GENOMIC,
+                                 impl_.IsReverseStrand());
+        current = Data::Orientation::GENOMIC;
 
         // clip & gapify as requested
         ClipAndGapifyUInts(impl_, aligned, exciseSoftClips, &arr);
@@ -1059,7 +1079,7 @@ std::vector<uint32_t> BamRecord::FetchUInt32s(const BamRecordTag tag, const Orie
 std::vector<uint8_t> BamRecord::FetchUInt8sRaw(const BamRecordTag tag) const
 {
     // fetch tag data
-    const Tag frameTag = impl_.TagValue(tag);
+    const auto frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) return {};
     if (!frameTag.IsUInt8Array())
         throw std::runtime_error{
@@ -1068,15 +1088,16 @@ std::vector<uint8_t> BamRecord::FetchUInt8sRaw(const BamRecordTag tag) const
     return frameTag.ToUInt8Array();
 }
 
-std::vector<uint8_t> BamRecord::FetchUInt8s(const BamRecordTag tag, const Orientation orientation,
-                                            const bool aligned, const bool exciseSoftClips,
+std::vector<uint8_t> BamRecord::FetchUInt8s(const BamRecordTag tag,
+                                            const Data::Orientation orientation, const bool aligned,
+                                            const bool exciseSoftClips,
                                             const PulseBehavior pulseBehavior) const
 {
     const bool isPulse = BamRecordTags::IsPulse(tag);
 
     // fetch raw
     auto arr = FetchUInt8sRaw(tag);
-    Orientation current = Orientation::NATIVE;
+    Data::Orientation current = Data::Orientation::NATIVE;
 
     if (isPulse && pulseBehavior == PulseBehavior::BASECALLS_ONLY) {
         // strip 'squashed' pulse loci
@@ -1092,8 +1113,9 @@ std::vector<uint8_t> BamRecord::FetchUInt8s(const BamRecordTag tag, const Orient
                 "soft-clipping are requested. Use PulseBehavior::BASECALLS_ONLY instead."};
 
         // force into genomic orientation
-        OrientTagDataAsRequested(&arr, current, Orientation::GENOMIC, impl_.IsReverseStrand());
-        current = Orientation::GENOMIC;
+        OrientTagDataAsRequested(&arr, current, Data::Orientation::GENOMIC,
+                                 impl_.IsReverseStrand());
+        current = Data::Orientation::GENOMIC;
 
         // clip & gapify as requested
         ClipAndGapifyUInt8s(impl_, aligned, exciseSoftClips, &arr);
@@ -1223,39 +1245,50 @@ BamRecordImpl& BamRecord::Impl() { return impl_; }
 
 const BamRecordImpl& BamRecord::Impl() const { return impl_; }
 
-QualityValues BamRecord::InsertionQV(Orientation orientation, bool aligned,
-                                     bool exciseSoftClips) const
+Data::QualityValues BamRecord::InsertionQV(Data::Orientation orientation, bool aligned,
+                                           bool exciseSoftClips) const
 {
     return FetchQualities(BamRecordTag::INSERTION_QV, orientation, aligned, exciseSoftClips);
 }
 
-BamRecord& BamRecord::InsertionQV(const QualityValues& insertionQVs)
+BamRecord& BamRecord::InsertionQV(const Data::QualityValues& insertionQVs)
 {
     CreateOrEdit(BamRecordTag::INSERTION_QV, insertionQVs.Fastq(), &impl_);
     return *this;
 }
 
-Frames BamRecord::IPD(Orientation orientation, bool aligned, bool exciseSoftClips) const
+Data::Frames BamRecord::IPD(Data::Orientation orientation, bool aligned, bool exciseSoftClips) const
 {
     return FetchFrames(BamRecordTag::IPD, orientation, aligned, exciseSoftClips);
 }
 
-BamRecord& BamRecord::IPD(const Frames& frames, const FrameEncodingType encoding)
+BamRecord& BamRecord::IPD(const Data::Frames& frames, const FrameEncodingType encoding)
 {
     if (encoding == FrameEncodingType::LOSSY)
-        CreateOrEdit(BamRecordTag::IPD, frames.Encode(), &impl_);
+        return IPD(frames, ReadGroup().IpdCodec());
     else
-        CreateOrEdit(BamRecordTag::IPD, frames.Data(), &impl_);
+        return IPD(frames, Data::FrameCodec::RAW);
+}
+
+BamRecord& BamRecord::IPD(const Data::Frames& frames, const Data::FrameCodec encoding)
+{
+    const auto& frameData = frames.Data();
+    if (encoding == Data::FrameCodec::RAW) {
+        CreateOrEdit(BamRecordTag::IPD, frameData, &impl_);
+    } else {
+        const auto encoder = IpdEncoder(*this);
+        CreateOrEdit(BamRecordTag::IPD, encoder.Encode(frameData), &impl_);
+    }
     return *this;
 }
 
-Frames BamRecord::IPDRaw(Orientation orientation) const
+Data::Frames BamRecord::IPDRaw(Data::Orientation orientation) const
 {
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::IPD);
-    const Tag frameTag = impl_.TagValue(tagName);
+    const auto frameTag = impl_.TagValue(tagName);
     if (frameTag.IsNull()) return {};
 
-    Frames frames;
+    Data::Frames frames;
 
     // lossy frame codes
     if (frameTag.IsUInt8Array()) {
@@ -1272,42 +1305,44 @@ Frames BamRecord::IPDRaw(Orientation orientation) const
 
     // return in requested orientation
     OrientTagDataAsRequested(&frames,
-                             Orientation::NATIVE,  // current
-                             orientation,          // requested
+                             Data::Orientation::NATIVE,  // current
+                             orientation,                // requested
                              impl_.IsReverseStrand());
     return frames;
 }
 
 bool BamRecord::IsMapped() const { return impl_.IsMapped(); }
 
-QualityValues BamRecord::LabelQV(Orientation orientation, bool aligned, bool exciseSoftClips,
-                                 PulseBehavior pulseBehavior) const
+Data::QualityValues BamRecord::LabelQV(Data::Orientation orientation, bool aligned,
+                                       bool exciseSoftClips, PulseBehavior pulseBehavior) const
 {
     return FetchQualities(BamRecordTag::LABEL_QV, orientation, aligned, exciseSoftClips,
                           pulseBehavior);
 }
 
-BamRecord& BamRecord::LabelQV(const QualityValues& labelQVs)
+BamRecord& BamRecord::LabelQV(const Data::QualityValues& labelQVs)
 {
     CreateOrEdit(BamRecordTag::LABEL_QV, labelQVs.Fastq(), &impl_);
     return *this;
 }
 
-LocalContextFlags BamRecord::LocalContextFlags() const
+Data::LocalContextFlags BamRecord::LocalContextFlags() const
 {
+    assert(HasLocalContextFlags());
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::CONTEXT_FLAGS);
-    const Tag cxTag = impl_.TagValue(tagName);
-    return static_cast<PacBio::BAM::LocalContextFlags>(cxTag.ToUInt8());
+    const auto cxTag = impl_.TagValue(tagName);
+    return static_cast<Data::LocalContextFlags>(cxTag.ToUInt8());
 }
 
-BamRecord& BamRecord::LocalContextFlags(const PacBio::BAM::LocalContextFlags flags)
+BamRecord& BamRecord::LocalContextFlags(const Data::LocalContextFlags flags)
 {
     CreateOrEdit(BamRecordTag::CONTEXT_FLAGS, static_cast<uint8_t>(flags), &impl_);
     return *this;
 }
 
-BamRecord& BamRecord::Map(const int32_t referenceId, const Position refStart, const Strand strand,
-                          const Cigar& cigar, const uint8_t mappingQuality)
+BamRecord& BamRecord::Map(const int32_t referenceId, const Data::Position refStart,
+                          const Data::Strand strand, const Data::Cigar& cigar,
+                          const uint8_t mappingQuality)
 {
     impl_.Position(refStart);
     impl_.ReferenceId(referenceId);
@@ -1315,16 +1350,16 @@ BamRecord& BamRecord::Map(const int32_t referenceId, const Position refStart, co
     impl_.MapQuality(mappingQuality);
     impl_.SetMapped(true);
 
-    if (strand == Strand::FORWARD)
+    if (strand == Data::Strand::FORWARD)
         impl_.SetReverseStrand(false);
 
     else {
-        assert(strand == Strand::REVERSE);
+        assert(strand == Data::Strand::REVERSE);
         impl_.SetReverseStrand(true);
 
         // switch seq & qual
-        std::string sequence = impl_.Sequence();
-        QualityValues qualities = impl_.Qualities();
+        auto sequence = impl_.Sequence();
+        auto qualities = impl_.Qualities();
 
         ReverseComplement(sequence);
         Reverse(qualities);
@@ -1333,21 +1368,22 @@ BamRecord& BamRecord::Map(const int32_t referenceId, const Position refStart, co
     }
 
     // reset any cached aligned start/end
-    alignedStart_ = PacBio::BAM::UnmappedPosition;
-    alignedEnd_ = PacBio::BAM::UnmappedPosition;
+    alignedStart_ = Data::UnmappedPosition;
+    alignedEnd_ = Data::UnmappedPosition;
 
     return *this;
 }
 
 BamRecord BamRecord::Mapped(const BamRecord& input, const int32_t referenceId,
-                            const Position refStart, const Strand strand, const Cigar& cigar,
-                            const uint8_t mappingQuality)
+                            const Data::Position refStart, const Data::Strand strand,
+                            const Data::Cigar& cigar, const uint8_t mappingQuality)
 {
     return input.Mapped(referenceId, refStart, strand, cigar, mappingQuality);
 }
 
-BamRecord BamRecord::Mapped(const int32_t referenceId, const Position refStart, const Strand strand,
-                            const Cigar& cigar, const uint8_t mappingQuality) const
+BamRecord BamRecord::Mapped(const int32_t referenceId, const Data::Position refStart,
+                            const Data::Strand strand, const Data::Cigar& cigar,
+                            const uint8_t mappingQuality) const
 {
     BamRecord result(*this);
     result.Map(referenceId, refStart, strand, cigar, mappingQuality);
@@ -1356,12 +1392,13 @@ BamRecord BamRecord::Mapped(const int32_t referenceId, const Position refStart, 
 
 uint8_t BamRecord::MapQuality() const { return impl_.MapQuality(); }
 
-QualityValues BamRecord::MergeQV(Orientation orientation, bool aligned, bool exciseSoftClips) const
+Data::QualityValues BamRecord::MergeQV(Data::Orientation orientation, bool aligned,
+                                       bool exciseSoftClips) const
 {
     return FetchQualities(BamRecordTag::MERGE_QV, orientation, aligned, exciseSoftClips);
 }
 
-BamRecord& BamRecord::MergeQV(const QualityValues& mergeQVs)
+BamRecord& BamRecord::MergeQV(const Data::QualityValues& mergeQVs)
 {
     CreateOrEdit(BamRecordTag::MERGE_QV, mergeQVs.Fastq(), &impl_);
     return *this;
@@ -1385,11 +1422,11 @@ size_t BamRecord::NumDeletedBases() const
 {
     size_t count = 0;
 
-    auto b = BamRecordMemory::GetRawData(this);
+    auto& b = BamRecordMemory::GetRawData(this);
     uint32_t* cigarData = bam_get_cigar(b.get());
     for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
-        const auto type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
-        if (type == CigarOperationType::DELETION) count += bam_cigar_oplen(cigarData[i]);
+        const auto type = static_cast<Data::CigarOperationType>(bam_cigar_op(cigarData[i]));
+        if (type == Data::CigarOperationType::DELETION) count += bam_cigar_oplen(cigarData[i]);
     }
     return count;
 }
@@ -1398,11 +1435,11 @@ size_t BamRecord::NumInsertedBases() const
 {
     size_t count = 0;
 
-    auto b = BamRecordMemory::GetRawData(this);
+    auto& b = BamRecordMemory::GetRawData(this);
     uint32_t* cigarData = bam_get_cigar(b.get());
     for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
-        const auto type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
-        if (type == CigarOperationType::INSERTION) count += bam_cigar_oplen(cigarData[i]);
+        const auto type = static_cast<Data::CigarOperationType>(bam_cigar_op(cigarData[i]));
+        if (type == Data::CigarOperationType::INSERTION) count += bam_cigar_oplen(cigarData[i]);
     }
     return count;
 }
@@ -1413,13 +1450,13 @@ std::pair<size_t, size_t> BamRecord::NumMatchesAndMismatches() const
 {
     std::pair<size_t, size_t> result = std::make_pair(0, 0);
 
-    auto b = BamRecordMemory::GetRawData(this);
+    auto& b = BamRecordMemory::GetRawData(this);
     uint32_t* cigarData = bam_get_cigar(b.get());
     for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
-        const auto type = static_cast<CigarOperationType>(bam_cigar_op(cigarData[i]));
-        if (type == CigarOperationType::SEQUENCE_MATCH)
+        const auto type = static_cast<Data::CigarOperationType>(bam_cigar_op(cigarData[i]));
+        if (type == Data::CigarOperationType::SEQUENCE_MATCH)
             result.first += bam_cigar_oplen(cigarData[i]);
-        else if (type == CigarOperationType::SEQUENCE_MISMATCH)
+        else if (type == Data::CigarOperationType::SEQUENCE_MISMATCH)
             result.second += bam_cigar_oplen(cigarData[i]);
     }
     return result;
@@ -1430,7 +1467,7 @@ size_t BamRecord::NumMismatches() const { return NumMatchesAndMismatches().secon
 int32_t BamRecord::NumPasses() const
 {
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::NUM_PASSES);
-    const Tag numPasses = impl_.TagValue(tagName);
+    const auto numPasses = impl_.TagValue(tagName);
     return numPasses.ToInt32();
 }
 
@@ -1440,8 +1477,8 @@ BamRecord& BamRecord::NumPasses(const int32_t numPasses)
     return *this;
 }
 
-std::vector<float> BamRecord::Pkmean(Orientation orientation, bool aligned, bool exciseSoftClips,
-                                     PulseBehavior pulseBehavior) const
+std::vector<float> BamRecord::Pkmean(Data::Orientation orientation, bool aligned,
+                                     bool exciseSoftClips, PulseBehavior pulseBehavior) const
 {
     return FetchPhotons(BamRecordTag::PKMEAN, orientation, aligned, exciseSoftClips, pulseBehavior);
 }
@@ -1458,8 +1495,8 @@ BamRecord& BamRecord::Pkmean(const std::vector<uint16_t>& encodedPhotons)
     return *this;
 }
 
-std::vector<float> BamRecord::Pkmid(Orientation orientation, bool aligned, bool exciseSoftClips,
-                                    PulseBehavior pulseBehavior) const
+std::vector<float> BamRecord::Pkmid(Data::Orientation orientation, bool aligned,
+                                    bool exciseSoftClips, PulseBehavior pulseBehavior) const
 {
     return FetchPhotons(BamRecordTag::PKMID, orientation, aligned, exciseSoftClips, pulseBehavior);
 }
@@ -1476,8 +1513,8 @@ BamRecord& BamRecord::Pkmid(const std::vector<uint16_t>& encodedPhotons)
     return *this;
 }
 
-std::vector<float> BamRecord::Pkmean2(Orientation orientation, bool aligned, bool exciseSoftClips,
-                                      PulseBehavior pulseBehavior) const
+std::vector<float> BamRecord::Pkmean2(Data::Orientation orientation, bool aligned,
+                                      bool exciseSoftClips, PulseBehavior pulseBehavior) const
 {
     return FetchPhotons(BamRecordTag::PKMEAN_2, orientation, aligned, exciseSoftClips,
                         pulseBehavior);
@@ -1495,8 +1532,8 @@ BamRecord& BamRecord::Pkmean2(const std::vector<uint16_t>& encodedPhotons)
     return *this;
 }
 
-std::vector<float> BamRecord::Pkmid2(Orientation orientation, bool aligned, bool exciseSoftClips,
-                                     PulseBehavior pulseBehavior) const
+std::vector<float> BamRecord::Pkmid2(Data::Orientation orientation, bool aligned,
+                                     bool exciseSoftClips, PulseBehavior pulseBehavior) const
 {
     return FetchPhotons(BamRecordTag::PKMID_2, orientation, aligned, exciseSoftClips,
                         pulseBehavior);
@@ -1514,26 +1551,41 @@ BamRecord& BamRecord::Pkmid2(const std::vector<uint16_t>& encodedPhotons)
     return *this;
 }
 
-Frames BamRecord::PreBaseFrames(Orientation orientation, bool aligned, bool exciseSoftClips) const
+Data::Frames BamRecord::PreBaseFrames(Data::Orientation orientation, bool aligned,
+                                      bool exciseSoftClips) const
 {
     return IPD(orientation, aligned, exciseSoftClips);
 }
 
-BamRecord& BamRecord::PreBaseFrames(const Frames& frames, const FrameEncodingType encoding)
+BamRecord& BamRecord::PreBaseFrames(const Data::Frames& frames, const FrameEncodingType encoding)
 {
     return IPD(frames, encoding);
 }
 
-Frames BamRecord::PrePulseFrames(Orientation orientation, bool aligned, bool exciseSoftClips,
-                                 PulseBehavior pulseBehavior) const
+BamRecord& BamRecord::PreBaseFrames(const Data::Frames& frames, const Data::FrameCodec encoding)
+{
+    return IPD(frames, encoding);
+}
+
+Data::Frames BamRecord::PrePulseFrames(Data::Orientation orientation, bool aligned,
+                                       bool exciseSoftClips, PulseBehavior pulseBehavior) const
 {
     return FetchFrames(BamRecordTag::PRE_PULSE_FRAMES, orientation, aligned, exciseSoftClips,
                        pulseBehavior);
 }
 
-BamRecord& BamRecord::PrePulseFrames(const Frames& frames, const FrameEncodingType encoding)
+BamRecord& BamRecord::PrePulseFrames(const Data::Frames& frames, const FrameEncodingType encoding)
 {
     if (encoding == FrameEncodingType::LOSSY) {
+        return PrePulseFrames(frames, Data::FrameCodec::V1);
+    } else {
+        return PrePulseFrames(frames, Data::FrameCodec::RAW);
+    }
+}
+
+BamRecord& BamRecord::PrePulseFrames(const Data::Frames& frames, const Data::FrameCodec encoding)
+{
+    if (encoding == Data::FrameCodec::V1) {
         CreateOrEdit(BamRecordTag::PRE_PULSE_FRAMES, frames.Encode(), &impl_);
     } else {
         CreateOrEdit(BamRecordTag::PRE_PULSE_FRAMES, frames.Data(), &impl_);
@@ -1541,14 +1593,14 @@ BamRecord& BamRecord::PrePulseFrames(const Frames& frames, const FrameEncodingTy
     return *this;
 }
 
-Frames BamRecord::PulseWidthRaw(Orientation orientation, bool /* aligned */,
-                                bool /* exciseSoftClips */) const
+Data::Frames BamRecord::PulseWidthRaw(Data::Orientation orientation, bool /* aligned */,
+                                      bool /* exciseSoftClips */) const
 {
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::PULSE_WIDTH);
-    const Tag frameTag = impl_.TagValue(tagName);
+    const auto frameTag = impl_.TagValue(tagName);
     if (frameTag.IsNull()) return {};
 
-    Frames frames;
+    Data::Frames frames;
 
     // lossy frame codes
     if (frameTag.IsUInt8Array()) {
@@ -1565,26 +1617,26 @@ Frames BamRecord::PulseWidthRaw(Orientation orientation, bool /* aligned */,
 
     // return in requested orientation
     OrientTagDataAsRequested(&frames,
-                             Orientation::NATIVE,  // current
-                             orientation,          // requested
+                             Data::Orientation::NATIVE,  // current
+                             orientation,                // requested
                              impl_.IsReverseStrand());
     return frames;
 }
 
-QualityValues BamRecord::PulseMergeQV(Orientation orientation, bool aligned, bool exciseSoftClips,
-                                      PulseBehavior pulseBehavior) const
+Data::QualityValues BamRecord::PulseMergeQV(Data::Orientation orientation, bool aligned,
+                                            bool exciseSoftClips, PulseBehavior pulseBehavior) const
 {
     return FetchQualities(BamRecordTag::PULSE_MERGE_QV, orientation, aligned, exciseSoftClips,
                           pulseBehavior);
 }
 
-BamRecord& BamRecord::PulseMergeQV(const QualityValues& mergeQVs)
+BamRecord& BamRecord::PulseMergeQV(const Data::QualityValues& mergeQVs)
 {
     CreateOrEdit(BamRecordTag::PULSE_MERGE_QV, mergeQVs.Fastq(), &impl_);
     return *this;
 }
 
-std::string BamRecord::PulseCall(Orientation orientation, bool aligned, bool exciseSoftClips,
+std::string BamRecord::PulseCall(Data::Orientation orientation, bool aligned, bool exciseSoftClips,
                                  PulseBehavior pulseBehavior) const
 {
     return FetchBases(BamRecordTag::PULSE_CALL, orientation, aligned, exciseSoftClips,
@@ -1597,16 +1649,25 @@ BamRecord& BamRecord::PulseCall(const std::string& tags)
     return *this;
 }
 
-Frames BamRecord::PulseCallWidth(Orientation orientation, bool aligned, bool exciseSoftClips,
-                                 PulseBehavior pulseBehavior) const
+Data::Frames BamRecord::PulseCallWidth(Data::Orientation orientation, bool aligned,
+                                       bool exciseSoftClips, PulseBehavior pulseBehavior) const
 {
     return FetchFrames(BamRecordTag::PULSE_CALL_WIDTH, orientation, aligned, exciseSoftClips,
                        pulseBehavior);
 }
 
-BamRecord& BamRecord::PulseCallWidth(const Frames& frames, const FrameEncodingType encoding)
+BamRecord& BamRecord::PulseCallWidth(const Data::Frames& frames, const FrameEncodingType encoding)
 {
     if (encoding == FrameEncodingType::LOSSY) {
+        return PulseCallWidth(frames, Data::FrameCodec::V1);
+    } else {
+        return PulseCallWidth(frames, Data::FrameCodec::RAW);
+    }
+}
+
+BamRecord& BamRecord::PulseCallWidth(const Data::Frames& frames, const Data::FrameCodec encoding)
+{
+    if (encoding == Data::FrameCodec::V1) {
         CreateOrEdit(BamRecordTag::PULSE_CALL_WIDTH, frames.Encode(), &impl_);
     } else {
         CreateOrEdit(BamRecordTag::PULSE_CALL_WIDTH, frames.Data(), &impl_);
@@ -1614,61 +1675,71 @@ BamRecord& BamRecord::PulseCallWidth(const Frames& frames, const FrameEncodingTy
     return *this;
 }
 
-std::vector<PacBio::BAM::PulseExclusionReason> BamRecord::PulseExclusionReason(
-    Orientation orientation, bool aligned, bool exciseSoftClips, PulseBehavior pulseBehavior) const
+std::vector<BAM::PulseExclusionReason> BamRecord::PulseExclusionReason(
+    Data::Orientation orientation, bool aligned, bool exciseSoftClips,
+    PulseBehavior pulseBehavior) const
 {
-    std::vector<PacBio::BAM::PulseExclusionReason> reasons;
+    std::vector<BAM::PulseExclusionReason> reasons;
 
     const auto reasonNums = FetchUInt8s(BamRecordTag::PULSE_EXCLUSION, orientation, aligned,
                                         exciseSoftClips, pulseBehavior);
 
-    std::transform(
-        reasonNums.cbegin(), reasonNums.cend(), std::back_inserter(reasons),
-        [](const uint8_t num) { return static_cast<PacBio::BAM::PulseExclusionReason>(num); });
+    std::transform(reasonNums.cbegin(), reasonNums.cend(), std::back_inserter(reasons),
+                   [](const uint8_t num) { return static_cast<BAM::PulseExclusionReason>(num); });
 
     return reasons;
 }
 
-BamRecord& BamRecord::PulseExclusionReason(
-    const std::vector<PacBio::BAM::PulseExclusionReason>& reasons)
+BamRecord& BamRecord::PulseExclusionReason(const std::vector<BAM::PulseExclusionReason>& reasons)
 {
     std::vector<uint8_t> reasonNums;
-    std::transform(reasons.cbegin(), reasons.cend(), std::back_inserter(reasonNums),
-                   [](const PacBio::BAM::PulseExclusionReason& reason) {
-                       return static_cast<uint8_t>(reason);
-                   });
+    std::transform(
+        reasons.cbegin(), reasons.cend(), std::back_inserter(reasonNums),
+        [](const BAM::PulseExclusionReason& reason) { return static_cast<uint8_t>(reason); });
 
     CreateOrEdit(BamRecordTag::PULSE_EXCLUSION, reasonNums, &impl_);
     return *this;
 }
 
-Frames BamRecord::PulseWidth(Orientation orientation, bool aligned, bool exciseSoftClips) const
+Data::Frames BamRecord::PulseWidth(Data::Orientation orientation, bool aligned,
+                                   bool exciseSoftClips) const
 {
     return FetchFrames(BamRecordTag::PULSE_WIDTH, orientation, aligned, exciseSoftClips,
                        PulseBehavior::ALL);
 }
 
-BamRecord& BamRecord::PulseWidth(const Frames& frames, const FrameEncodingType encoding)
+BamRecord& BamRecord::PulseWidth(const Data::Frames& frames, const FrameEncodingType encoding)
 {
     if (encoding == FrameEncodingType::LOSSY) {
-        CreateOrEdit(BamRecordTag::PULSE_WIDTH, frames.Encode(), &impl_);
+        return PulseWidth(frames, ReadGroup().PulseWidthCodec());
     } else {
-        CreateOrEdit(BamRecordTag::PULSE_WIDTH, frames.Data(), &impl_);
+        return PulseWidth(frames, Data::FrameCodec::RAW);
+    }
+}
+
+BamRecord& BamRecord::PulseWidth(const Data::Frames& frames, const Data::FrameCodec encoding)
+{
+    const auto& frameData = frames.Data();
+    if (encoding == Data::FrameCodec::RAW) {
+        CreateOrEdit(BamRecordTag::PULSE_WIDTH, frameData, &impl_);
+    } else {
+        const auto encoder = PwEncoder(*this);
+        CreateOrEdit(BamRecordTag::PULSE_WIDTH, encoder.Encode(frameData), &impl_);
     }
     return *this;
 }
 
-QualityValues BamRecord::Qualities(Orientation orientation, bool aligned,
-                                   bool exciseSoftClips) const
+Data::QualityValues BamRecord::Qualities(Data::Orientation orientation, bool aligned,
+                                         bool exciseSoftClips) const
 {
     return FetchQualities(BamRecordTag::QUAL, orientation, aligned, exciseSoftClips);
 }
 
-Position BamRecord::QueryEnd() const
+Data::Position BamRecord::QueryEnd() const
 {
     // try 'qe' tag
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::QUERY_END);
-    const Tag qe = impl_.TagValue(tagName);
+    const auto qe = impl_.TagValue(tagName);
     if (!qe.IsNull()) return qe.ToInt32();
 
     // tag missing, need to check movie name (fallback for non-PB BAMs, but ignore for CCS reads)
@@ -1694,7 +1765,7 @@ Position BamRecord::QueryEnd() const
     }
 }
 
-BamRecord& BamRecord::QueryEnd(const Position pos)
+BamRecord& BamRecord::QueryEnd(const Data::Position pos)
 {
     CreateOrEdit(BamRecordTag::QUERY_END, static_cast<int32_t>(pos), &impl_);
     UpdateName();
@@ -1704,7 +1775,7 @@ BamRecord& BamRecord::QueryEnd(const Position pos)
 int32_t BamRecord::QueryEndFrameNumber() const
 {
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::QUERY_END_FRAME_NUMBER);
-    const Tag qs = impl_.TagValue(tagName);
+    const auto qs = impl_.TagValue(tagName);
     if (!qs.IsNull()) return qs.ToInt32();
     return 0;
 }
@@ -1715,11 +1786,11 @@ BamRecord& BamRecord::QueryEndFrameNumber(const int32_t frameNumber)
     return *this;
 }
 
-Position BamRecord::QueryStart() const
+Data::Position BamRecord::QueryStart() const
 {
     // try 'qs' tag
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::QUERY_START);
-    const Tag qs = impl_.TagValue(tagName);
+    const auto qs = impl_.TagValue(tagName);
     if (!qs.IsNull()) return qs.ToInt32();
 
     // tag missing, need to check movie name (fallback for non-PB BAMs, but ignore for CCS reads)
@@ -1745,7 +1816,7 @@ Position BamRecord::QueryStart() const
     }
 }
 
-BamRecord& BamRecord::QueryStart(const Position pos)
+BamRecord& BamRecord::QueryStart(const Data::Position pos)
 {
     CreateOrEdit(BamRecordTag::QUERY_START, static_cast<int32_t>(pos), &impl_);
     UpdateName();
@@ -1755,7 +1826,7 @@ BamRecord& BamRecord::QueryStart(const Position pos)
 int32_t BamRecord::QueryStartFrameNumber() const
 {
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::QUERY_START_FRAME_NUMBER);
-    const Tag qs = impl_.TagValue(tagName);
+    const auto qs = impl_.TagValue(tagName);
     if (!qs.IsNull()) return qs.ToInt32();
     return 0;
 }
@@ -1766,14 +1837,14 @@ BamRecord& BamRecord::QueryStartFrameNumber(const int32_t frameNumber)
     return *this;
 }
 
-Accuracy BamRecord::ReadAccuracy() const
+Data::Accuracy BamRecord::ReadAccuracy() const
 {
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::READ_ACCURACY);
-    const Tag readAccuracy = impl_.TagValue(tagName);
+    const auto readAccuracy = impl_.TagValue(tagName);
     return {readAccuracy.ToFloat()};
 }
 
-BamRecord& BamRecord::ReadAccuracy(const Accuracy& accuracy)
+BamRecord& BamRecord::ReadAccuracy(const Data::Accuracy& accuracy)
 {
     CreateOrEdit(BamRecordTag::READ_ACCURACY, static_cast<float>(accuracy), &impl_);
     return *this;
@@ -1791,7 +1862,7 @@ BamRecord& BamRecord::ReadGroup(const ReadGroupInfo& rg)
 std::string BamRecord::ReadGroupId() const
 {
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::READ_GROUP);
-    const Tag rgTag = impl_.TagValue(tagName);
+    const auto rgTag = impl_.TagValue(tagName);
     if (rgTag.IsNull()) return {};
     return rgTag.ToString();
 }
@@ -1807,11 +1878,11 @@ BamRecord& BamRecord::ReadGroupId(const std::string& id)
 
 int32_t BamRecord::ReadGroupNumericId() const { return ReadGroupInfo::IdToInt(ReadGroupBaseId()); }
 
-Position BamRecord::ReferenceEnd() const
+Data::Position BamRecord::ReferenceEnd() const
 {
-    if (!impl_.IsMapped()) return PacBio::BAM::UnmappedPosition;
-    const auto htsData = BamRecordMemory::GetRawData(impl_);
-    if (!htsData) return PacBio::BAM::UnmappedPosition;
+    if (!impl_.IsMapped()) return Data::UnmappedPosition;
+    const auto& htsData = BamRecordMemory::GetRawData(impl_);
+    if (!htsData) return Data::UnmappedPosition;
     return bam_endpos(htsData.get());
 }
 
@@ -1826,24 +1897,24 @@ std::string BamRecord::ReferenceName() const
             "[pbbam] BAM record ERROR: unmapped record has no associated reference name"};
 }
 
-Position BamRecord::ReferenceStart() const { return impl_.Position(); }
+Data::Position BamRecord::ReferenceStart() const { return impl_.Position(); }
 
 void BamRecord::ResetCachedPositions() const
 {
-    alignedEnd_ = PacBio::BAM::UnmappedPosition;
-    alignedStart_ = PacBio::BAM::UnmappedPosition;
+    alignedEnd_ = Data::UnmappedPosition;
+    alignedStart_ = Data::UnmappedPosition;
 }
 
 void BamRecord::ResetCachedPositions()
 {
-    alignedEnd_ = PacBio::BAM::UnmappedPosition;
-    alignedStart_ = PacBio::BAM::UnmappedPosition;
+    alignedEnd_ = Data::UnmappedPosition;
+    alignedStart_ = Data::UnmappedPosition;
 }
 
 VirtualRegionType BamRecord::ScrapRegionType() const
 {
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SCRAP_REGION_TYPE);
-    const Tag srTag = impl_.TagValue(tagName);
+    const auto srTag = impl_.TagValue(tagName);
     return VirtualRegionTypeMap::ParseChar[srTag.ToUInt8()];
 }
 
@@ -1862,7 +1933,7 @@ BamRecord& BamRecord::ScrapRegionType(const char type)
 ZmwType BamRecord::ScrapZmwType() const
 {
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SCRAP_ZMW_TYPE);
-    const Tag szTag = impl_.TagValue(tagName);
+    const auto szTag = impl_.TagValue(tagName);
     return ZmwTypeMap::ParseChar[szTag.ToUInt8()];
 }
 
@@ -1878,7 +1949,7 @@ BamRecord& BamRecord::ScrapZmwType(const char type)
     return *this;
 }
 
-std::string BamRecord::Sequence(const Orientation orientation, bool aligned,
+std::string BamRecord::Sequence(const Data::Orientation orientation, bool aligned,
                                 bool exciseSoftClips) const
 {
     return FetchBases(BamRecordTag::SEQ, orientation, aligned, exciseSoftClips);
@@ -1887,7 +1958,7 @@ std::string BamRecord::Sequence(const Orientation orientation, bool aligned,
 std::vector<float> BamRecord::SignalToNoise() const
 {
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SIGNAL_TO_NOISE);
-    const Tag snTag = impl_.TagValue(tagName);
+    const auto snTag = impl_.TagValue(tagName);
     return snTag.ToFloatArray();
 }
 
@@ -1897,7 +1968,7 @@ BamRecord& BamRecord::SignalToNoise(const std::vector<float>& snr)
     return *this;
 }
 
-std::vector<uint32_t> BamRecord::StartFrame(Orientation orientation, bool aligned,
+std::vector<uint32_t> BamRecord::StartFrame(Data::Orientation orientation, bool aligned,
                                             bool exciseSoftClips, PulseBehavior pulseBehavior) const
 {
     return FetchUInt32s(BamRecordTag::START_FRAME, orientation, aligned, exciseSoftClips,
@@ -1910,19 +1981,19 @@ BamRecord& BamRecord::StartFrame(const std::vector<uint32_t>& startFrame)
     return *this;
 }
 
-QualityValues BamRecord::SubstitutionQV(Orientation orientation, bool aligned,
+QualityValues BamRecord::SubstitutionQV(Data::Orientation orientation, bool aligned,
                                         bool exciseSoftClips) const
 {
     return FetchQualities(BamRecordTag::SUBSTITUTION_QV, orientation, aligned, exciseSoftClips);
 }
 
-BamRecord& BamRecord::SubstitutionQV(const QualityValues& substitutionQVs)
+BamRecord& BamRecord::SubstitutionQV(const Data::QualityValues& substitutionQVs)
 {
     CreateOrEdit(BamRecordTag::SUBSTITUTION_QV, substitutionQVs.Fastq(), &impl_);
     return *this;
 }
 
-std::string BamRecord::SubstitutionTag(Orientation orientation, bool aligned,
+std::string BamRecord::SubstitutionTag(Data::Orientation orientation, bool aligned,
                                        bool exciseSoftClips) const
 {
     return FetchBases(BamRecordTag::SUBSTITUTION_TAG, orientation, aligned, exciseSoftClips);
@@ -1939,22 +2010,30 @@ Data::Read BamRecord::ToRead(std::string model) const
     Data::Read result{FullName(),      Sequence(),   Qualities(),
                       SignalToNoise(), QueryStart(), QueryEnd()};
     result.Model = std::move(model);
-    result.Flags = LocalContextFlags();
     result.ReadAccuracy = ReadAccuracy();
-    result.FullLength =
-        (result.Flags & Data::ADAPTER_BEFORE) && (result.Flags & Data::ADAPTER_AFTER);
 
-    if (HasPulseWidth())
+    if (HasLocalContextFlags()) {
+        result.Flags = LocalContextFlags();
+        result.FullLength =
+            (result.Flags & Data::ADAPTER_BEFORE) && (result.Flags & Data::ADAPTER_AFTER);
+    } else {
+        throw std::runtime_error{"[pbbam] BAM record ERROR: '" + FullName() +
+                                 "' is missing local context flags (SAM tag 'cx')"};
+    }
+
+    if (HasPulseWidth()) {
         result.PulseWidth = PulseWidth();
-    else if (RecordType::SUBREAD == Type())
+    } else if (RecordType::SUBREAD == Type()) {
         throw std::runtime_error{"[pbbam] BAM record ERROR: '" + FullName() +
                                  "' is missing pulse widths (SAM tag 'pw')"};
+    }
 
-    if (HasIPD())
+    if (HasIPD()) {
         result.IPD = IPD();
-    else if (RecordType::SUBREAD == Type())
+    } else if (RecordType::SUBREAD == Type()) {
         throw std::runtime_error{"[pbbam] BAM record ERROR: '" + FullName() +
                                  "' is missing interpulse durations (SAM tag 'ip')"};
+    }
 
     if (IsMapped() && AlignedStrand() == Data::Strand::REVERSE) {
         ReverseComplement(result.Seq);
@@ -2011,8 +2090,9 @@ void BamRecord::UpdateName()
     std::string newName;
     newName.reserve(100);
 
+    const auto type = Type();
     const auto holeNumber = (HasHoleNumber() ? std::to_string(HoleNumber()) : "?");
-    if (Type() == RecordType::TRANSCRIPT) {
+    if (type == RecordType::TRANSCRIPT) {
         newName = "transcript/" + holeNumber;
     } else {
         newName += MovieName();
@@ -2020,8 +2100,14 @@ void BamRecord::UpdateName()
         newName += holeNumber;
         newName += "/";
 
-        if (Type() == RecordType::CCS)
+        if (type == RecordType::CCS) {
             newName += "ccs";
+            const auto originalName = FullName();
+            if (boost::ends_with(originalName, "/fwd"))
+                newName += "/fwd";
+            else if (boost::ends_with(originalName, "/rev"))
+                newName += "/rev";
+        }
 
         else {
             if (HasQueryStart())

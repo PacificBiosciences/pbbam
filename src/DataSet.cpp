@@ -1,15 +1,10 @@
-// File Description
-/// \file DataSet.cpp
-/// \brief Implements the DataSet class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/DataSet.h"
+#include <pbbam/DataSet.h>
 
 #include <algorithm>
 #include <map>
+#include <ostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -21,7 +16,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/optional.hpp>
 
-#include "pbbam/internal/DataSetBaseTypes.h"
+#include <pbbam/internal/DataSetBaseTypes.h>
 
 #include "DataSetIO.h"
 #include "DataSetUtils.h"
@@ -176,10 +171,9 @@ DataSet& DataSet::Attribute(const std::string& name, const std::string& value)
 
 std::vector<BamFile> DataSet::BamFiles() const
 {
+    const auto fns = BamFilenames();
     std::vector<BamFile> result;
-    std::vector<std::string> fns = BamFilenames();
     result.reserve(fns.size());
-
     for (const auto& fn : fns) {
         result.emplace_back(fn);
     }
@@ -189,7 +183,7 @@ std::vector<BamFile> DataSet::BamFiles() const
 std::vector<std::string> DataSet::BamFilenames() const
 {
     std::vector<std::string> result;
-    const PacBio::BAM::ExternalResources& resources = ExternalResources();
+    const BAM::ExternalResources& resources = ExternalResources();
 
     result.reserve(resources.Size());
     for (const ExternalResource& ext : resources) {
@@ -198,7 +192,7 @@ std::vector<std::string> DataSet::BamFilenames() const
         boost::iterator_range<std::string::const_iterator> bamFound =
             boost::algorithm::ifind_first(ext.MetaType(), "bam");
         if (!bamFound.empty()) {
-            const std::string fn = ResolvePath(ext.ResourceId());
+            const auto fn = ResolvePath(ext.ResourceId());
             result.emplace_back(fn);
         }
     }
@@ -215,24 +209,21 @@ DataSet& DataSet::CreatedAt(const std::string& createdAt)
     return *this;
 }
 
-const PacBio::BAM::Extensions& DataSet::Extensions() const { return d_->Extensions(); }
+const BAM::Extensions& DataSet::Extensions() const { return d_->Extensions(); }
 
-PacBio::BAM::Extensions& DataSet::Extensions() { return d_->Extensions(); }
+BAM::Extensions& DataSet::Extensions() { return d_->Extensions(); }
 
-DataSet& DataSet::Extensions(const PacBio::BAM::Extensions& extensions)
+DataSet& DataSet::Extensions(const BAM::Extensions& extensions)
 {
     d_->Extensions(extensions);
     return *this;
 }
 
-const PacBio::BAM::ExternalResources& DataSet::ExternalResources() const
-{
-    return d_->ExternalResources();
-}
+const BAM::ExternalResources& DataSet::ExternalResources() const { return d_->ExternalResources(); }
 
-PacBio::BAM::ExternalResources& DataSet::ExternalResources() { return d_->ExternalResources(); }
+BAM::ExternalResources& DataSet::ExternalResources() { return d_->ExternalResources(); }
 
-DataSet& DataSet::ExternalResources(const PacBio::BAM::ExternalResources& resources)
+DataSet& DataSet::ExternalResources(const BAM::ExternalResources& resources)
 {
     d_->ExternalResources(resources);
     return *this;
@@ -240,7 +231,7 @@ DataSet& DataSet::ExternalResources(const PacBio::BAM::ExternalResources& resour
 
 std::vector<std::string> DataSet::FastaFiles() const
 {
-    const PacBio::BAM::ExternalResources& resources = ExternalResources();
+    const BAM::ExternalResources& resources = ExternalResources();
 
     std::vector<std::string> result;
     result.reserve(resources.Size());
@@ -250,18 +241,18 @@ std::vector<std::string> DataSet::FastaFiles() const
         boost::iterator_range<std::string::const_iterator> fastaFound =
             boost::algorithm::ifind_first(ext.MetaType(), "fasta");
         if (!fastaFound.empty()) {
-            const std::string fn = ResolvePath(ext.ResourceId());
+            const auto fn = ResolvePath(ext.ResourceId());
             result.push_back(fn);
         }
     }
     return result;
 }
 
-const PacBio::BAM::Filters& DataSet::Filters() const { return d_->Filters(); }
+const BAM::Filters& DataSet::Filters() const { return d_->Filters(); }
 
-PacBio::BAM::Filters& DataSet::Filters() { return d_->Filters(); }
+BAM::Filters& DataSet::Filters() { return d_->Filters(); }
 
-DataSet& DataSet::Filters(const PacBio::BAM::Filters& filters)
+DataSet& DataSet::Filters(const BAM::Filters& filters)
 {
     d_->Filters(filters);
     return *this;
@@ -324,9 +315,9 @@ std::vector<GenomicInterval> DataSet::GenomicIntervals() const
         intT intersectedInterval{intInterval{0, std::numeric_limits<int32_t>::max()}};
 
         for (const auto& xmlProperty : xmlFilter.Properties()) {
-            const std::string XmlName = xmlProperty.Name();
-            const std::string XmlOperator = xmlProperty.Operator();
-            const std::string XmlValue = xmlProperty.Value();
+            const auto& XmlName = xmlProperty.Name();
+            const auto& XmlOperator = xmlProperty.Operator();
+            const auto& XmlValue = xmlProperty.Value();
 
             if ("rname" == XmlName) {
                 if ("=" == XmlOperator) {
@@ -374,7 +365,7 @@ std::vector<GenomicInterval> DataSet::GenomicIntervals() const
     if (numFilters) {
         // have some filters, only return regions passing filters
         for (const auto& contigs : contigIntervals) {
-            const std::string& contigName = contigs.first;
+            const auto& contigName = contigs.first;
             for (const auto& i : contigs.second) {
                 // don't append empty intervals to the result
                 if (boost::icl::length(i)) result.emplace_back(contigName, i.lower(), i.upper());
@@ -391,11 +382,11 @@ std::vector<GenomicInterval> DataSet::GenomicIntervals() const
 
 BamHeader DataSet::MergedHeader() const { return BamHeader{*this}; }
 
-const PacBio::BAM::DataSetMetadata& DataSet::Metadata() const { return d_->Metadata(); }
+const BAM::DataSetMetadata& DataSet::Metadata() const { return d_->Metadata(); }
 
-PacBio::BAM::DataSetMetadata& DataSet::Metadata() { return d_->Metadata(); }
+BAM::DataSetMetadata& DataSet::Metadata() { return d_->Metadata(); }
 
-DataSet& DataSet::Metadata(const PacBio::BAM::DataSetMetadata& metadata)
+DataSet& DataSet::Metadata(const BAM::DataSetMetadata& metadata)
 {
     d_->Metadata(metadata);
     return *this;
@@ -458,7 +449,7 @@ const std::string& DataSet::Path() const { return d_->Path(); }
 
 std::vector<std::string> DataSet::ResolvedResourceIds() const
 {
-    const PacBio::BAM::ExternalResources& resources = ExternalResources();
+    const BAM::ExternalResources& resources = ExternalResources();
 
     std::vector<std::string> result;
     result.reserve(resources.Size());
@@ -495,26 +486,24 @@ void DataSet::SaveToStream(std::ostream& out, DataSetPathMode pathMode) const
 
 std::set<std::string> DataSet::SequencingChemistries() const
 {
-    const std::vector<BamFile> bamFiles{BamFiles()};
-
     std::set<std::string> result;
-    for (const BamFile& bf : bamFiles) {
+    for (const auto& bf : BamFiles()) {
         if (!bf.IsPacBioBAM())
             throw std::runtime_error{
                 "[pbbam] dataset ERROR: only PacBio BAMs are supported for fetching chemistry "
                 "info"};
         const std::vector<ReadGroupInfo> readGroups{bf.Header().ReadGroups()};
-        for (const ReadGroupInfo& rg : readGroups)
+        for (const auto& rg : readGroups)
             result.insert(rg.SequencingChemistry());
     }
     return result;
 }
 
-const PacBio::BAM::SubDataSets& DataSet::SubDataSets() const { return d_->SubDataSets(); }
+const BAM::SubDataSets& DataSet::SubDataSets() const { return d_->SubDataSets(); }
 
-PacBio::BAM::SubDataSets& DataSet::SubDataSets() { return d_->SubDataSets(); }
+BAM::SubDataSets& DataSet::SubDataSets() { return d_->SubDataSets(); }
 
-DataSet& DataSet::SubDataSets(const PacBio::BAM::SubDataSets& subdatasets)
+DataSet& DataSet::SubDataSets(const BAM::SubDataSets& subdatasets)
 {
     d_->SubDataSets(subdatasets);
     return *this;

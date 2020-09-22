@@ -1,20 +1,15 @@
-// File Description
-/// \file DataSetTypes.cpp
-/// \brief Implementations for the public DataSet component classes.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/DataSetTypes.h"
+#include <pbbam/DataSetTypes.h>
 
 #include <cstddef>
 
+#include <ostream>
 #include <set>
 #include <tuple>
 #include <unordered_map>
 
-#include "pbbam/internal/DataSetBaseTypes.h"
+#include <pbbam/internal/DataSetBaseTypes.h>
 
 #include "DataSetIO.h"
 #include "DataSetUtils.h"
@@ -25,7 +20,7 @@ namespace {
 
 // clang-format off
 using ElementType = PacBio::BAM::XmlElementType;
-const std::unordered_map<std::string, PacBio::BAM::XmlElementType> elementTypeLookup
+const std::unordered_map<std::string, ElementType> elementTypeLookup
 {
     {"Automation",             ElementType::AUTOMATION},
     {"AutomationParameter",    ElementType::AUTOMATION_PARAMETER},
@@ -119,7 +114,7 @@ BioSample::BioSample(const std::string& name, const internal::FromInputXml& from
 
 DEFINE_ACCESSORS(BioSample, DNABarcodes, DNABarcodes)
 
-BioSample& BioSample::DNABarcodes(const PacBio::BAM::DNABarcodes& barcodes)
+BioSample& BioSample::DNABarcodes(const BAM::DNABarcodes& barcodes)
 {
     DNABarcodes() = barcodes;
     return *this;
@@ -249,19 +244,19 @@ DataSetBase::DataSetBase(const std::string& metatype, const std::string& label,
 {
 }
 
-const PacBio::BAM::ExternalResources& DataSetBase::ExternalResources() const
+const BAM::ExternalResources& DataSetBase::ExternalResources() const
 {
-    return Child<PacBio::BAM::ExternalResources>("ExternalResources");
+    return Child<BAM::ExternalResources>("ExternalResources");
 }
 
-PacBio::BAM::ExternalResources& DataSetBase::ExternalResources()
+BAM::ExternalResources& DataSetBase::ExternalResources()
 {
-    if (!HasChild("ExternalResources")) AddChild(PacBio::BAM::ExternalResources());
-    auto& c = Child<PacBio::BAM::ExternalResources>("ExternalResources");
+    if (!HasChild("ExternalResources")) AddChild(BAM::ExternalResources());
+    auto& c = Child<BAM::ExternalResources>("ExternalResources");
     return c;
 }
 
-DataSetBase& DataSetBase::ExternalResources(const PacBio::BAM::ExternalResources& resources)
+DataSetBase& DataSetBase::ExternalResources(const BAM::ExternalResources& resources)
 {
     ExternalResources() = resources;
     return *this;
@@ -269,7 +264,7 @@ DataSetBase& DataSetBase::ExternalResources(const PacBio::BAM::ExternalResources
 
 DEFINE_ACCESSORS(DataSetBase, Filters, Filters)
 
-DataSetBase& DataSetBase::Filters(const PacBio::BAM::Filters& filters)
+DataSetBase& DataSetBase::Filters(const BAM::Filters& filters)
 {
     Filters() = filters;
     return *this;
@@ -281,7 +276,7 @@ void DataSetBase::FromInputXml(bool ok) { fromInputXml_ = ok; }
 
 DEFINE_ACCESSORS(DataSetBase, DataSetMetadata, Metadata)
 
-DataSetBase& DataSetBase::Metadata(const PacBio::BAM::DataSetMetadata& metadata)
+DataSetBase& DataSetBase::Metadata(const BAM::DataSetMetadata& metadata)
 {
     Metadata() = metadata;
     return *this;
@@ -295,22 +290,22 @@ void DataSetBase::Path(const std::string& path) { path_ = path; }
 
 const std::string& DataSetBase::Path() const { return path_; }
 
-const PacBio::BAM::SubDataSets& DataSetBase::SubDataSets() const
+const BAM::SubDataSets& DataSetBase::SubDataSets() const
 {
     try {
-        return Child<PacBio::BAM::SubDataSets>("DataSets");
+        return Child<BAM::SubDataSets>("DataSets");
     } catch (std::exception&) {
-        return internal::NullObject<PacBio::BAM::SubDataSets>();
+        return internal::NullObject<BAM::SubDataSets>();
     }
 }
 
-PacBio::BAM::SubDataSets& DataSetBase::SubDataSets()
+BAM::SubDataSets& DataSetBase::SubDataSets()
 {
-    if (!HasChild("DataSets")) AddChild(internal::NullObject<PacBio::BAM::SubDataSets>());
-    return Child<PacBio::BAM::SubDataSets>("DataSets");
+    if (!HasChild("DataSets")) AddChild(internal::NullObject<BAM::SubDataSets>());
+    return Child<BAM::SubDataSets>("DataSets");
 }
 
-DataSetBase& DataSetBase::SubDataSets(const PacBio::BAM::SubDataSets& subdatasets)
+DataSetBase& DataSetBase::SubDataSets(const BAM::SubDataSets& subdatasets)
 {
     SubDataSets() = subdatasets;
     return *this;
@@ -424,31 +419,29 @@ DataSetMetadata::DataSetMetadata(const std::string& numRecords, const std::strin
 
 DEFINE_ACCESSORS(DataSetMetadata, BioSamples, BioSamples)
 
-DataSetMetadata& DataSetMetadata::BioSamples(const PacBio::BAM::BioSamples& samples)
+DataSetMetadata& DataSetMetadata::BioSamples(const BAM::BioSamples& samples)
 {
     BioSamples() = samples;
     return *this;
 }
 
-const PacBio::BAM::CollectionMetadata& DataSetMetadata::CollectionMetadata() const
+const BAM::CollectionMetadata& DataSetMetadata::CollectionMetadata() const
 {
-    const PacBio::BAM::Collections& collections = Child<PacBio::BAM::Collections>("Collections");
+    const BAM::Collections& collections = Child<BAM::Collections>("Collections");
     assert(collections.Size() >= 1);
-    const PacBio::BAM::CollectionMetadata& cm =
-        collections.Child<PacBio::BAM::CollectionMetadata>(0);
+    const BAM::CollectionMetadata& cm = collections.Child<BAM::CollectionMetadata>(0);
     return cm;
 }
 
-PacBio::BAM::CollectionMetadata& DataSetMetadata::CollectionMetadata()
+BAM::CollectionMetadata& DataSetMetadata::CollectionMetadata()
 {
-    PacBio::BAM::Collections& collections = Child<PacBio::BAM::Collections>("Collections");
-    if (collections.Size() == 0) collections.AddChild(PacBio::BAM::CollectionMetadata{});
-    PacBio::BAM::CollectionMetadata& cm = collections.Child<PacBio::BAM::CollectionMetadata>(0);
+    BAM::Collections& collections = Child<BAM::Collections>("Collections");
+    if (collections.Size() == 0) collections.AddChild(BAM::CollectionMetadata{});
+    BAM::CollectionMetadata& cm = collections.Child<BAM::CollectionMetadata>(0);
     return cm;
 }
 
-DataSetMetadata& DataSetMetadata::CollectionMetadata(
-    const PacBio::BAM::CollectionMetadata& metadata)
+DataSetMetadata& DataSetMetadata::CollectionMetadata(const BAM::CollectionMetadata& metadata)
 {
     CollectionMetadata() = metadata;
     return *this;
@@ -456,7 +449,7 @@ DataSetMetadata& DataSetMetadata::CollectionMetadata(
 
 DEFINE_ACCESSORS(DataSetMetadata, Provenance, Provenance)
 
-DataSetMetadata& DataSetMetadata::Provenance(const PacBio::BAM::Provenance& provenance)
+DataSetMetadata& DataSetMetadata::Provenance(const BAM::Provenance& provenance)
 {
     Provenance() = provenance;
     return *this;
@@ -667,8 +660,7 @@ ExternalResource::ExternalResource(const std::string& metatype, const std::strin
 
 DEFINE_ACCESSORS(ExternalResource, ExternalResources, ExternalResources)
 
-ExternalResource& ExternalResource::ExternalResources(
-    const PacBio::BAM::ExternalResources& resources)
+ExternalResource& ExternalResource::ExternalResources(const BAM::ExternalResources& resources)
 {
     ExternalResources() = resources;
     return *this;
@@ -846,7 +838,7 @@ Filter::Filter(const internal::FromInputXml& fromInputXml)
 
 DEFINE_ACCESSORS(Filter, Properties, Properties)
 
-Filter& Filter::Properties(const PacBio::BAM::Properties& properties)
+Filter& Filter::Properties(const BAM::Properties& properties)
 {
     Properties() = properties;
     return *this;
@@ -1083,7 +1075,7 @@ Provenance& Provenance::ParentJobId(const std::string& id)
     return *this;
 }
 
-Provenance& Provenance::ParentTool(const PacBio::BAM::ParentTool& tool)
+Provenance& Provenance::ParentTool(const BAM::ParentTool& tool)
 {
     ParentTool() = tool;
     return *this;

@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "../PbbamInternalConfig.h"
 
 #include <pbbam/vcf/VcfFormat.h>
@@ -8,7 +6,7 @@
 #include <cmath>
 
 #include <fstream>
-#include <iostream>
+#include <istream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -178,9 +176,9 @@ ContigDefinition VcfFormat::ParsedContigDefinition(std::string line)
     std::string id;
     std::vector<std::pair<std::string, std::string>> attributes;
 
-    const auto fields = PacBio::BAM::Split(line, ',');
+    const auto fields = BAM::Split(line, ',');
     for (const auto& field : fields) {
-        const auto tokens = PacBio::BAM::Split(field, '=');
+        const auto tokens = BAM::Split(field, '=');
         if (tokens.size() != 2) throw VcfFormatException{"malformed ##contig line: " + line};
 
         if (tokens[0] == Tokens::id)
@@ -206,9 +204,9 @@ FilterDefinition VcfFormat::ParsedFilterDefinition(std::string line)
     std::string id;
     std::string description;
 
-    const auto fields = PacBio::BAM::Split(line, ',');
+    const auto fields = BAM::Split(line, ',');
     for (const auto& field : fields) {
-        const auto tokens = PacBio::BAM::Split(field, '=');
+        const auto tokens = BAM::Split(field, '=');
         if (tokens.size() != 2) throw VcfFormatException{"malformed FILTER line: " + line};
 
         if (tokens[0] == Tokens::id)
@@ -238,9 +236,9 @@ FormatDefinition VcfFormat::ParsedFormatDefinition(std::string line)
     std::string type;
     std::string description;
 
-    const auto fields = PacBio::BAM::Split(line, ',');
+    const auto fields = BAM::Split(line, ',');
     for (const auto& field : fields) {
-        const auto tokens = PacBio::BAM::Split(field, '=');
+        const auto tokens = BAM::Split(field, '=');
         if (tokens.size() != 2) {
             throw VcfFormatException{"malformed FORMAT line: " + line};
         }
@@ -262,7 +260,7 @@ FormatDefinition VcfFormat::ParsedFormatDefinition(std::string line)
 
 GeneralDefinition VcfFormat::ParsedGeneralDefinition(const std::string& line)
 {
-    const auto tokens = PacBio::BAM::Split(line, '=');
+    const auto tokens = BAM::Split(line, '=');
     if (tokens.size() != 2 || tokens[0].find(Tokens::double_hash) != 0)
         throw VcfFormatException{"malformed header line: " + line};
     return GeneralDefinition{tokens[0].substr(2), tokens[1]};
@@ -286,9 +284,9 @@ InfoDefinition VcfFormat::ParsedInfoDefinition(std::string line)
     std::string source;
     std::string version;
 
-    const auto fields = PacBio::BAM::Split(line, ',');
+    const auto fields = BAM::Split(line, ',');
     for (const auto& field : fields) {
-        const auto tokens = PacBio::BAM::Split(field, '=');
+        const auto tokens = BAM::Split(field, '=');
         if (tokens.size() != 2) throw VcfFormatException{"malformed INFO line: " + line};
 
         if (tokens[0] == Tokens::id)
@@ -360,7 +358,7 @@ VcfHeader VcfFormat::ParsedHeader(const std::string& hdrText)
             // If samples are present, skip the fixed colums & FORMAT column (9)
             // and read the remaining column labels as sample names.
             //
-            auto columns = PacBio::BAM::Split(line, '\t');
+            auto columns = BAM::Split(line, '\t');
             for (size_t i = 9; i < columns.size(); ++i)
                 samples.push_back(std::move(columns[i]));
             hdr.Samples(std::move(samples));
@@ -384,7 +382,7 @@ VcfHeader VcfFormat::HeaderFromFile(const std::string& fn)
 
 VcfHeader VcfFormat::HeaderFromStream(std::istream& in)
 {
-    std::stringstream text;
+    std::ostringstream text;
 
     std::string line;
     while (std::getline(in, line)) {
@@ -400,7 +398,7 @@ VcfHeader VcfFormat::HeaderFromStream(std::istream& in)
 
 InfoField VcfFormat::ParsedInfoField(const std::string& text)
 {
-    const auto& tokens = PacBio::BAM::Split(text, '=');
+    const auto tokens = BAM::Split(text, '=');
     if (tokens.empty()) throw VcfFormatException{"malformed INFO field: " + text};
 
     // required ID
@@ -412,10 +410,7 @@ InfoField VcfFormat::ParsedInfoField(const std::string& text)
     const auto& valueStr = tokens.at(1);
     const auto commaFound = valueStr.find(',');
     if (commaFound != std::string::npos) {
-        std::vector<std::string> values;
-        for (auto&& value : PacBio::BAM::Split(valueStr, ','))
-            values.push_back(std::move(value));
-        result.values = std::move(values);
+        result.values = BAM::Split(valueStr, ',');
     } else
         result.value = valueStr;
 
@@ -425,7 +420,7 @@ InfoField VcfFormat::ParsedInfoField(const std::string& text)
 std::vector<InfoField> VcfFormat::ParsedInfoFields(const std::string& text)
 {
     std::vector<InfoField> result;
-    const auto& fields = PacBio::BAM::Split(text, ';');
+    const auto& fields = BAM::Split(text, ';');
     for (const auto& field : fields)
         result.push_back(ParsedInfoField(field));
     return result;
@@ -434,14 +429,14 @@ std::vector<InfoField> VcfFormat::ParsedInfoFields(const std::string& text)
 GenotypeField VcfFormat::ParsedGenotypeField(const std::string& field)
 {
     GenotypeField result;
-    const auto fieldValues = PacBio::BAM::Split(field, ':');
+    const auto fieldValues = BAM::Split(field, ':');
     for (const auto& fieldValue : fieldValues) {
         GenotypeData data;
-        const auto genotypeDataValues = PacBio::BAM::Split(fieldValue, ',');
+        auto genotypeDataValues = BAM::Split(fieldValue, ',');
         if (genotypeDataValues.size() == 1)
-            data.value = genotypeDataValues.at(0);
+            data.value = std::move(genotypeDataValues[0]);
         else
-            data.values = genotypeDataValues;
+            data.values = std::move(genotypeDataValues);
         result.data.push_back(std::move(data));
     }
     return result;
@@ -449,33 +444,32 @@ GenotypeField VcfFormat::ParsedGenotypeField(const std::string& field)
 
 VcfVariant VcfFormat::ParsedVariant(const std::string& line)
 {
-    const auto fields = PacBio::BAM::Split(line, '\t');
+    auto fields = BAM::Split(line, '\t');
     if (fields.size() < 7) throw VcfFormatException{"record is missing required fields: " + line};
 
     // CHROM POS ID REF ALT REF
-    auto chrom = fields.at(0);
-    auto pos = std::stoi(fields.at(1));
-    auto id = fields.at(2);
-    auto ref = fields.at(3);
-    auto alt = fields.at(4);
+    auto chrom = std::move(fields[0]);
+    auto pos = std::stoi(fields[1]);
+    auto id = std::move(fields[2]);
+    auto ref = std::move(fields[3]);
+    auto alt = std::move(fields[4]);
 
     VcfVariant var{std::move(id), std::move(chrom), std::move(pos), std::move(ref), std::move(alt)};
 
     // QUAL
-    const auto& qualStr = fields.at(5);
-    const float qual = (qualStr == "." ? NAN : stof(qualStr));
+    const auto& qualStr = fields[5];
+    const float qual = (qualStr == "." ? NAN : std::stof(qualStr));
     var.Quality(qual);
 
     // FILTER
-    auto filter = fields.at(6);
-    var.Filter(std::move(filter));
+    var.Filter(std::move(fields[6]));
 
     // INFO (allow empty)
     if (fields.size() >= 8) var.InfoFields(ParsedInfoFields(fields.at(7)));
 
     // GENOTYPE (samples)
     if (fields.size() > 9) {
-        var.GenotypeIds(PacBio::BAM::Split(fields.at(8), ':'));
+        var.GenotypeIds(BAM::Split(fields.at(8), ':'));
 
         std::vector<GenotypeField> genotypes;
         for (size_t i = 9; i < fields.size(); ++i)
@@ -493,7 +487,7 @@ std::string VcfFormat::FormattedInfoField(const InfoField& field)
     if (field.value.is_initialized())
         out << '=' << field.value.get();
     else if (field.values.is_initialized())
-        out << '=' << PacBio::BAM::Join(field.values.get(), ',');
+        out << '=' << BAM::Join(field.values.get(), ',');
     return out.str();
 }
 
@@ -502,7 +496,7 @@ std::string VcfFormat::FormattedInfoFields(const std::vector<InfoField>& fields)
     std::vector<std::string> result;
     for (const auto& field : fields)
         result.push_back(FormattedInfoField(field));
-    return PacBio::BAM::Join(result, ';');
+    return BAM::Join(result, ';');
 }
 
 std::string VcfFormat::FormattedGenotypeField(const GenotypeField& field)
@@ -515,7 +509,7 @@ std::string VcfFormat::FormattedGenotypeField(const GenotypeField& field)
             result += d.value.get();
         else {
             assert(d.values.is_initialized());
-            result += PacBio::BAM::Join(d.values.get(), ',');
+            result += BAM::Join(d.values.get(), ',');
         }
         firstDataEntry = false;
     }
@@ -530,10 +524,10 @@ std::string VcfFormat::FormattedVariant(const VcfVariant& var)
         << (var.IsQualityMissing() ? "." : std::to_string(var.Quality())) << '\t' << var.Filter()
         << '\t' << FormattedInfoFields(var.InfoFields());
 
-    const auto& genotypeIds = var.GenotypeIds();
+    const auto genotypeIds = var.GenotypeIds();
     if (!genotypeIds.empty()) {
-        out << '\t' << PacBio::BAM::Join(genotypeIds, ':');
-        const auto& genotypes = var.Genotypes();
+        out << '\t' << BAM::Join(genotypeIds, ':');
+        const auto genotypes = var.Genotypes();
         for (const auto& genotype : genotypes)
             out << '\t' << FormattedGenotypeField(genotype);
     }

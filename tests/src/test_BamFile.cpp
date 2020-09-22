@@ -1,6 +1,6 @@
 // Author: Derek Barnett
 
-#include <unistd.h>
+#include <pbbam/BamFile.h>
 
 #include <cstddef>
 #include <cstdlib>
@@ -8,10 +8,11 @@
 #include <iterator>
 #include <stdexcept>
 
+#include <unistd.h>
+
 #include <gtest/gtest.h>
 
 #include <pbbam/../../src/FileUtils.h>
-#include <pbbam/BamFile.h>
 #include <pbbam/EntireFileQuery.h>
 
 #include "PbbamTestData.h"
@@ -30,17 +31,23 @@ void CheckFile(const T& input, const size_t expectedCount)
 
 }  // namespace BamFileTests
 
-TEST(BamFileTest, NonExistentFileThrows)
+TEST(BAM_BamFile, throws_on_non_existent_file)
 {
     EXPECT_THROW(BamFile{"does_not_exist.bam"}, std::runtime_error);
 }
 
-TEST(BamFileTest, NonBamFileThrows)
+TEST(BAM_BamFile, throws_on_wrong_file_format)
 {
     EXPECT_THROW(BamFile{PbbamTestsConfig::Data_Dir + "/lambdaNEB.fa.fai"}, std::runtime_error);
 }
 
-TEST(BamFileTest, RelativePathBamOk)
+TEST(BAM_BamFile, throws_on_truncated_file)
+{
+    EXPECT_THROW(BamFile{PbbamTestsConfig::GeneratedData_Dir + "/truncated.bam"},
+                 std::runtime_error);
+}
+
+TEST(BAM_BamFile, can_load_from_relative_path_bam)
 {
     // cache current working directory, then drill down so we can point to
     // BAMs using relative path
@@ -64,7 +71,7 @@ TEST(BamFileTest, RelativePathBamOk)
     ASSERT_EQ(0, chdir(cwd.c_str()));
 }
 
-TEST(BamFileTest, RelativePathXmlOk)
+TEST(BAM_BamFile, can_load_from_relative_path_dataset)
 {
     // cache current working directory, then drill down so we can point to
     // BAMs using relative path
@@ -78,7 +85,7 @@ TEST(BamFileTest, RelativePathXmlOk)
     ASSERT_EQ(0, chdir(cwd.c_str()));
 }
 
-TEST(BamFileTest, RelativePathFofnOk)
+TEST(BAM_BamFile, can_load_from_relative_path_fofn)
 {
     // cache current working directory, then drill down so we can point to
     // BAMs using relative path
@@ -93,10 +100,4 @@ TEST(BamFileTest, RelativePathFofnOk)
 
     // restore working directory
     ASSERT_EQ(0, chdir(cwd.c_str()));
-}
-
-TEST(BamFileTest, TruncatedFileThrowsOk)
-{
-    EXPECT_THROW(BamFile{PbbamTestsConfig::GeneratedData_Dir + "/truncated.bam"},
-                 std::runtime_error);
 }

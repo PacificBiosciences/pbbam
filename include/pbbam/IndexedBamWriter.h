@@ -1,27 +1,17 @@
-// File Description
-/// \file IndexedBamWriter.h
-/// \brief Defines the IndexedBamWriter class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_INDEXEDBAMWRITER_H
+#define PBBAM_INDEXEDBAMWRITER_H
 
-#ifndef INDEXEDBAMWRITER_H
-#define INDEXEDBAMWRITER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
 
-#include "pbbam/BamWriter.h"
-#include "pbbam/IRecordWriter.h"
-#include "pbbam/PbiBuilder.h"
+#include <pbbam/BamWriter.h>
+#include <pbbam/IRecordWriter.h>
+#include <pbbam/PbiBuilder.h>
 
 namespace PacBio {
 namespace BAM {
-
-class BamHeader;
-class BamRecord;
-class BamRecordImpl;
 
 struct IndexedBamWriterConfig
 {
@@ -114,11 +104,6 @@ public:
 
 public:
     ///
-    /// \brief TryFlush
-    ///
-    void TryFlush() override;
-
-    ///
     /// \brief Write
     ///
     /// \param[in] record
@@ -132,18 +117,6 @@ public:
     ///
     void Write(const BamRecordImpl& record) override;
 
-    /// \brief ReaderTrailingDistance
-    ///
-    /// Allows calling code to monitor how far behind (in bytes)
-    /// the reader thread trails behind the tip of the current
-    /// being written BAM file.  May be useful for diagnosing
-    /// performance issues if the reader thread falls enough behind
-    /// that caching is insufficient to prevent an IO hit from the
-    /// extra read operations.
-    ///
-    /// Note: Returns a "high water mark", not a current value.
-    size_t MaxReaderLag() const;
-
 private:
     class IndexedBamWriterPrivate2;
     std::unique_ptr<IndexedBamWriterPrivate2> d_;
@@ -152,4 +125,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // INDEXEDBAMWRITER_H
+#endif  // PBBAM_INDEXEDBAMWRITER_H

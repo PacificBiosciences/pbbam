@@ -1,0 +1,23 @@
+#include "PbbamInternalConfig.h"
+
+#include <pbbam/PbbamVersion.h>
+
+namespace PacBio {
+namespace BAM {
+namespace {
+
+static constexpr const char LibraryVersion[] = "@PBBAM_VERSION@";
+static constexpr const int LibraryMajor      = @PBBAM_VERSION_MAJOR@;
+static constexpr const int LibraryMinor      = @PBBAM_VERSION_MINOR@;
+static constexpr const int LibraryPatch      = @PBBAM_VERSION_PATCH@;
+
+} // namespace
+
+std::string LibraryVersionString()
+{ return LibraryVersion; }
+
+std::tuple<int, int, int> LibraryVersionTriple()
+{ return std::make_tuple(LibraryMajor, LibraryMinor, LibraryPatch); }
+
+}  // namespace BAM
+}  // namespace PacBio

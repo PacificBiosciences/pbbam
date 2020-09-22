@@ -1,18 +1,13 @@
-// File Description
-/// \file Tag.cpp
-/// \brief Implements the Tag class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/Tag.h"
+#include <pbbam/Tag.h>
 
 #include <cassert>
 
-#include <iostream>
+#include <ostream>
 #include <type_traits>
 
+#include <boost/core/demangle.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 namespace PacBio {
@@ -39,7 +34,8 @@ struct AsciiConvertVisitor : public boost::static_visitor<char>
     template <typename T>
     char operator()(const T&) const
     {
-        throw std::runtime_error{"[pbbam] tag ERROR: cannot convert to ASCII"};
+        const std::string from = boost::core::demangle(typeid(T).name());
+        throw std::runtime_error{"[pbbam] tag ERROR: cannot convert " + from + " to ASCII"};
         return 0;
     }
 
@@ -68,8 +64,8 @@ struct NumericConvertVisitor : public boost::static_visitor<DesiredType>
     template <typename T>
     DesiredType operator()(const T& t) const
     {
-        const std::string from = typeid(t).name();
-        const std::string to = typeid(DesiredType).name();
+        const std::string from = boost::core::demangle(typeid(t).name());
+        const std::string to = boost::core::demangle(typeid(DesiredType).name());
         const std::string msg = "[pbbam] tag ERROR: cannot convert type " + from + " to " + to;
         throw std::runtime_error(msg);
         return 0;
@@ -86,17 +82,17 @@ using ToUInt32ConvertVisitor = NumericConvertVisitor<uint32_t>;
 struct IsEqualVisitor : public boost::static_visitor<bool>
 {
     template <typename T, typename U>
-    bool operator()(const T&, const U&) const
+    bool operator()(const T&, const U&) const noexcept
     {
         // maybe allow conversions down the road?
         // but for now, just fail if types are different
         return false;
     }
 
-    bool operator()(const boost::blank&, const boost::blank&) const { return true; }
+    bool operator()(const boost::blank&, const boost::blank&) const noexcept { return true; }
 
     template <typename T>
-    bool operator()(const T& lhs, const T& rhs) const
+    bool operator()(const T& lhs, const T& rhs) const noexcept
     {
         return lhs == rhs;
     }
@@ -120,6 +116,59 @@ struct TypenameVisitor : public boost::static_visitor<std::string>
     std::string operator()(const std::vector<int32_t>&) const { return "vector<int32_t>"; }
     std::string operator()(const std::vector<uint32_t>&) const { return "vector<uint32_t>"; }
     std::string operator()(const std::vector<float>&) const { return "vector<float>"; }
+};
+
+struct OutputVisitor : public boost::static_visitor<void>
+{
+    OutputVisitor(std::ostream& out) : out_{out} {}
+
+    void operator()(const boost::blank) const { ; }
+    void operator()(const int8_t value) const { out_ << static_cast<int16_t>(value); }
+    void operator()(const uint8_t value) const { out_ << static_cast<uint16_t>(value); }
+    void operator()(const int16_t value) const { out_ << value; }
+    void operator()(const uint16_t value) const { out_ << value; }
+    void operator()(const int32_t value) const { out_ << value; }
+    void operator()(const uint32_t value) const { out_ << value; }
+    void operator()(const float value) const { out_ << value; }
+    void operator()(const std::string& value) const { out_ << value; }
+
+    void operator()(const std::vector<int8_t>& values) const
+    {
+        bool first = true;
+        for (const auto v : values) {
+            if (!first) {
+                out_ << ',';
+            } else
+                first = false;
+            out_ << static_cast<int16_t>(v);
+        }
+    }
+    void operator()(const std::vector<uint8_t>& values) const
+    {
+        bool first = true;
+        for (const auto v : values) {
+            if (!first) {
+                out_ << ',';
+            } else
+                first = false;
+            out_ << static_cast<uint16_t>(v);
+        }
+    }
+
+    template <typename T>
+    void operator()(const T& values) const
+    {
+        bool first = true;
+        for (const auto& v : values) {
+            if (!first) {
+                out_ << ',';
+            } else
+                first = false;
+            out_ << v;
+        }
+    }
+
+    std::ostream& out_;
 };
 
 }  // namespace
@@ -398,6 +447,12 @@ std::vector<float> Tag::ToFloatArray() const { return boost::get<std::vector<flo
 TagDataType Tag::Type() const { return TagDataType(data_.which()); }
 
 std::string Tag::Typename() const { return boost::apply_visitor(TypenameVisitor(), data_); }
+
+std::ostream& operator<<(std::ostream& out, const Tag& tag)
+{
+    boost::apply_visitor(OutputVisitor(out), tag.data_);
+    return out;
+}
 
 }  // namespace BAM
 }  // namespace PacBio

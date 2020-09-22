@@ -1,16 +1,14 @@
-// Author: Derek Barnett
+#ifndef PBBAM_COLLECTIONMETADATA_H
+#define PBBAM_COLLECTIONMETADATA_H
 
-#ifndef COLLECTIONMETADATA_H
-#define COLLECTIONMETADATA_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <map>
 #include <string>
 
 #include <boost/optional.hpp>
 
-#include "pbbam/internal/DataSetBaseTypes.h"
+#include <pbbam/internal/DataSetBaseTypes.h>
 
 namespace PacBio {
 namespace BAM {
@@ -136,9 +134,9 @@ public:
     Automation();
     Automation(const internal::FromInputXml& fromInputXml);
 
-    const PacBio::BAM::AutomationParameters& AutomationParameters() const;
-    PacBio::BAM::AutomationParameters& AutomationParameters();
-    BAM::Automation& AutomationParameters(PacBio::BAM::AutomationParameters params);
+    const BAM::AutomationParameters& AutomationParameters() const;
+    BAM::AutomationParameters& AutomationParameters();
+    BAM::Automation& AutomationParameters(BAM::AutomationParameters params);
     bool HasAutomationParameters() const;
 };
 
@@ -242,6 +240,8 @@ public:
 class CollectionMetadata : public internal::StrictEntityType
 {
 public:
+    static CollectionMetadata FromRawXml(const std::string& xml);
+
     CollectionMetadata();
     CollectionMetadata(const internal::FromInputXml& fromInputXml);
     CollectionMetadata(std::string subreadSetName);
@@ -249,39 +249,39 @@ public:
 
     const std::string& SubreadSetName() const;
 
-    const PacBio::BAM::Automation& Automation() const;
-    PacBio::BAM::Automation& Automation();
-    CollectionMetadata& Automation(PacBio::BAM::Automation automation);
+    const BAM::Automation& Automation() const;
+    BAM::Automation& Automation();
+    CollectionMetadata& Automation(BAM::Automation automation);
     bool HasAutomation() const;
 
-    const PacBio::BAM::AutomationParameters& AutomationParameters() const;
-    PacBio::BAM::AutomationParameters& AutomationParameters();
-    CollectionMetadata& AutomationParameters(PacBio::BAM::AutomationParameters params);
+    const BAM::AutomationParameters& AutomationParameters() const;
+    BAM::AutomationParameters& AutomationParameters();
+    CollectionMetadata& AutomationParameters(BAM::AutomationParameters params);
     bool HasAutomationParameters() const;
 
-    const PacBio::BAM::BindingKit& BindingKit() const;
-    PacBio::BAM::BindingKit& BindingKit();
-    CollectionMetadata& BindingKit(PacBio::BAM::BindingKit kit);
+    const BAM::BindingKit& BindingKit() const;
+    BAM::BindingKit& BindingKit();
+    CollectionMetadata& BindingKit(BAM::BindingKit kit);
     bool HasBindingKit() const;
 
-    const PacBio::BAM::ControlKit& ControlKit() const;
-    PacBio::BAM::ControlKit& ControlKit();
-    CollectionMetadata& ControlKit(PacBio::BAM::ControlKit kit);
+    const BAM::ControlKit& ControlKit() const;
+    BAM::ControlKit& ControlKit();
+    CollectionMetadata& ControlKit(BAM::ControlKit kit);
     bool HasControlKit() const;
 
-    const PacBio::BAM::PPAConfig& PPAConfig() const;
-    PacBio::BAM::PPAConfig& PPAConfig();
-    CollectionMetadata& PPAConfig(PacBio::BAM::PPAConfig config);
+    const BAM::PPAConfig& PPAConfig() const;
+    BAM::PPAConfig& PPAConfig();
+    CollectionMetadata& PPAConfig(BAM::PPAConfig config);
     bool HasPPAConfig() const;
 
-    const PacBio::BAM::SequencingKitPlate& SequencingKitPlate() const;
-    PacBio::BAM::SequencingKitPlate& SequencingKitPlate();
-    CollectionMetadata& SequencingKitPlate(PacBio::BAM::SequencingKitPlate kit);
+    const BAM::SequencingKitPlate& SequencingKitPlate() const;
+    BAM::SequencingKitPlate& SequencingKitPlate();
+    CollectionMetadata& SequencingKitPlate(BAM::SequencingKitPlate kit);
     bool HasSequencingKitPlate() const;
 
-    const PacBio::BAM::TemplatePrepKit& TemplatePrepKit() const;
-    PacBio::BAM::TemplatePrepKit& TemplatePrepKit();
-    CollectionMetadata& TemplatePrepKit(PacBio::BAM::TemplatePrepKit kit);
+    const BAM::TemplatePrepKit& TemplatePrepKit() const;
+    BAM::TemplatePrepKit& TemplatePrepKit();
+    CollectionMetadata& TemplatePrepKit(BAM::TemplatePrepKit kit);
     bool HasTemplatePrepKit() const;
 
 private:
@@ -298,4 +298,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  //  COLLECTIONMETADATA_H
+#endif  //  PBBAM_COLLECTIONMETADATA_H

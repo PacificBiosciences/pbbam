@@ -1,13 +1,7 @@
-// File Description
-/// \file ProgramInfo.h
-/// \brief Defines the ProgramInfo class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_PROGRAMINFO_H
+#define PBBAM_PROGRAMINFO_H
 
-#ifndef PROGRAMINFO_H
-#define PROGRAMINFO_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <map>
 #include <string>
@@ -175,4 +169,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // PROGRAMINFO_H
+#endif  // PBBAM_PROGRAMINFO_H

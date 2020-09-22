@@ -1,9 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_DATASETIO_H
+#define PBBAM_DATASETIO_H
 
-#ifndef DATASETIO_H
-#define DATASETIO_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <iosfwd>
 #include <memory>
@@ -35,4 +33,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // DATASETIO_H
+#endif  // PBBAM_DATASETIO_H

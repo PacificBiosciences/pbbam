@@ -1,12 +1,6 @@
-// File Description
-/// \file SequenceInfo.cpp
-/// \brief Implements the SequenceInfo class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 #include <algorithm>
 #include <sstream>

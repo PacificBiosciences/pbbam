@@ -1,9 +1,8 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
+#include <pbbam/RunMetadata.h>
+
 #include "RunMetadataParser.h"
-#include "pbbam/RunMetadata.h"
 
 namespace PacBio {
 namespace BAM {

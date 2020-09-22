@@ -1,11 +1,4 @@
-// File Description
-/// \file CompositeBamReader.inl
-/// \brief Inline implementations for the composite BAM readers, for
-///        working with multiple input files.
-//
-// Author: Derek Barnett
-
-#include "pbbam/CompositeBamReader.h"
+#include <pbbam/CompositeBamReader.h>
 
 #include <algorithm>
 #include <iostream>
@@ -23,15 +16,17 @@ namespace internal {
 
 inline CompositeMergeItem::CompositeMergeItem(std::unique_ptr<BamReader> rdr)
     : reader{std::move(rdr)}
-{}
+{
+}
 
 inline CompositeMergeItem::CompositeMergeItem(std::unique_ptr<BamReader> rdr, BamRecord rec)
     : reader{std::move(rdr)}, record{std::move(rec)}
-{}
+{
+}
 
 template <typename CompareType>
-inline bool CompositeMergeItemSorter<CompareType>::operator()(const CompositeMergeItem& lhs,
-                                                              const CompositeMergeItem& rhs) const
+bool CompositeMergeItemSorter<CompareType>::operator()(const CompositeMergeItem& lhs,
+                                                       const CompositeMergeItem& rhs) const
 {
     const auto& l = lhs.record;
     const auto& r = rhs.record;
@@ -47,7 +42,8 @@ inline bool CompositeMergeItemSorter<CompareType>::operator()(const CompositeMer
 template <typename OrderByType>
 SortedCompositeBamReader<OrderByType>::SortedCompositeBamReader(const DataSet& dataset)
     : SortedCompositeBamReader(dataset.BamFiles())
-{}
+{
+}
 
 template <typename OrderByType>
 SortedCompositeBamReader<OrderByType>::SortedCompositeBamReader(std::vector<BamFile> bamFiles)
@@ -62,7 +58,8 @@ SortedCompositeBamReader<OrderByType>::SortedCompositeBamReader(std::vector<BamF
 
 template <typename OrderByType>
 SortedCompositeBamReader<OrderByType>::~SortedCompositeBamReader()
-{}
+{
+}
 
 template <typename OrderByType>
 bool SortedCompositeBamReader<OrderByType>::GetNext(BamRecord& record)
@@ -87,13 +84,14 @@ bool SortedCompositeBamReader<OrderByType>::GetNext(BamRecord& record)
 // ------------------------------
 
 template <typename OrderByType>
-inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(
+PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(
     const PbiFilter& filter, const std::vector<BamFile>& bamFiles)
     : PbiFilterCompositeBamReader<OrderByType>{filter, bamFiles, MakePbiIndexCache(bamFiles)}
-{}
+{
+}
 
 template <typename OrderByType>
-inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(
+PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(
     const PbiFilter& filter, const std::vector<BamFile>& bamFiles, const PbiIndexCache& cache)
     : SortedCompositeBamReader<OrderByType>{bamFiles}, indexCache_{cache}, numReads_{0}
 {
@@ -101,19 +99,22 @@ inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(
 }
 
 template <typename OrderByType>
-inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(
-    const PbiFilter& filter, const DataSet& dataset)
+PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(const PbiFilter& filter,
+                                                                      const DataSet& dataset)
     : PbiFilterCompositeBamReader<OrderByType>{filter, dataset.BamFiles()}
-{}
+{
+}
 
 template <typename OrderByType>
-inline PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(
-    const PbiFilter& filter, const DataSet& dataset, const PbiIndexCache& cache)
+PbiFilterCompositeBamReader<OrderByType>::PbiFilterCompositeBamReader(const PbiFilter& filter,
+                                                                      const DataSet& dataset,
+                                                                      const PbiIndexCache& cache)
     : PbiFilterCompositeBamReader<OrderByType>{filter, dataset.BamFiles(), cache}
-{}
+{
+}
 
 template <typename OrderByType>
-inline PbiFilterCompositeBamReader<OrderByType>& PbiFilterCompositeBamReader<OrderByType>::Filter(
+PbiFilterCompositeBamReader<OrderByType>& PbiFilterCompositeBamReader<OrderByType>::Filter(
     const PbiFilter& filter)
 {
     // reset reader queue
@@ -154,7 +155,7 @@ inline PbiFilterCompositeBamReader<OrderByType>& PbiFilterCompositeBamReader<Ord
 }
 
 template <typename OrderByType>
-inline uint32_t PbiFilterCompositeBamReader<OrderByType>::NumReads() const
+uint32_t PbiFilterCompositeBamReader<OrderByType>::NumReads() const
 {
     return numReads_;
 }

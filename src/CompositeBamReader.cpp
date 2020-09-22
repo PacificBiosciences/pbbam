@@ -1,15 +1,11 @@
-// File Description
-/// \file CompositeBamReader.cpp
-/// \brief Implements the CompositeBamReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
+#include <pbbam/CompositeBamReader.h>
+
+#include <sstream>
 #include <stdexcept>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/CompositeBamReader.h"
+#include <pbbam/BamFile.h>
 
 namespace PacBio {
 namespace BAM {
@@ -84,7 +80,7 @@ GenomicIntervalCompositeBamReader& GenomicIntervalCompositeBamReader::Interval(
         const auto& bamFile = bamFiles_.at(i);
         if (bamFile.StandardIndexExists()) {
             internal::CompositeMergeItem item{std::unique_ptr<BamReader>{
-                new BaiIndexedBamReader{interval, std::move(bamFile), indexCache_->at(i)}}};
+                new BaiIndexedBamReader{interval, bamFile, indexCache_->at(i)}}};
             if (item.reader->GetNext(item.record)) updatedMergeItems.insert(std::move(item));
             // else not an error, simply no data matching interval
         } else {

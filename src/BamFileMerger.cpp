@@ -1,26 +1,20 @@
-// File Description
-/// \file BamFileMerger.cpp
-/// \brief Implements the BamFileMerger & helper classes.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/BamFileMerger.h"
+#include <pbbam/BamFileMerger.h>
 
 #include <memory>
 #include <stdexcept>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/BamHeader.h"
-#include "pbbam/BamReader.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/CompositeBamReader.h"
-#include "pbbam/DataSet.h"
-#include "pbbam/IRecordWriter.h"
-#include "pbbam/IndexedBamWriter.h"
-#include "pbbam/PbiFilter.h"
-#include "pbbam/PbiIndexedBamReader.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/BamHeader.h>
+#include <pbbam/BamReader.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/CompositeBamReader.h>
+#include <pbbam/DataSet.h>
+#include <pbbam/IRecordWriter.h>
+#include <pbbam/IndexedBamWriter.h>
+#include <pbbam/PbiFilter.h>
+#include <pbbam/PbiIndexedBamReader.h>
 
 namespace PacBio {
 namespace BAM {
@@ -81,7 +75,7 @@ void MergeToWriter(const DataSet& dataset, IRecordWriter& writer)
 void MergeToFile(const DataSet& dataset, const std::string& outputFilename, bool createPbi,
                  const ProgramInfo& pgInfo)
 {
-    BamHeader header{dataset};
+    const BamHeader header{dataset};
     auto writer = MakeBamWriter(header, outputFilename, createPbi, pgInfo);
     MergeToWriter(dataset, header, *writer);
 }

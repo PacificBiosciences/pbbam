@@ -1,9 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_FORMAT_UTILS_H
+#define PBBAM_FORMAT_UTILS_H
 
-#ifndef FORMAT_UTILS_H
-#define FORMAT_UTILS_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 #include <vector>
@@ -41,4 +39,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FORMAT_UTILS_H
+#endif  // PBBAM_FORMAT_UTILS_H

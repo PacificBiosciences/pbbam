@@ -1,26 +1,15 @@
-// File Description
-/// \file FastqWriter.h
-/// \brief Defines the FastqWriter class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_FASTQWRITER_H
+#define PBBAM_FASTQWRITER_H
 
-#ifndef FASTQWRITER_H
-#define FASTQWRITER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <fstream>
-#include <iostream>
 #include <string>
 
-#include "pbbam/IFastqWriter.h"
+#include <pbbam/IFastqWriter.h>
 
 namespace PacBio {
 namespace BAM {
-
-class BamRecord;
-class BamRecordImpl;
-class FastqSequence;
 
 class FastqWriter final : public IFastqWriter
 {
@@ -30,7 +19,7 @@ public:
 public:
     // IFastqWriter
     void Write(const FastqSequence& fastq);
-    void Write(const std::string& name, const std::string& bases, const QualityValues& quals);
+    void Write(const std::string& name, const std::string& bases, const Data::QualityValues& quals);
     void Write(const std::string& name, const std::string& bases, const std::string& quals);
 
     // IRecordWriter
@@ -45,4 +34,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FASTQWRITER_H
+#endif  // PBBAM_FASTQWRITER_H

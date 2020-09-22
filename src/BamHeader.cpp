@@ -1,12 +1,6 @@
-// File Description
-/// \file BamHeader.cpp
-/// \brief Implements the BamHeader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/BamHeader.h"
+#include <pbbam/BamHeader.h>
 
 #include <cassert>
 #include <cstddef>
@@ -19,10 +13,10 @@
 
 #include <htslib/hts.h>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/DataSet.h"
-#include "pbbam/SamTagCodec.h"
-#include "pbbam/StringUtilities.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/DataSet.h>
+#include <pbbam/SamTagCodec.h>
+#include <pbbam/StringUtilities.h>
 
 #include "Version.h"
 
@@ -44,8 +38,6 @@ bool CheckSortOrder(const std::string& lhs, const std::string& rhs) { return lhs
 
 bool CheckPbVersion(const std::string& lhs, const std::string& rhs)
 {
-    using Version = PacBio::BAM::Version;
-
     return (Version{lhs} >= Version::Minimum && Version{rhs} >= Version::Minimum);
 }
 
@@ -88,15 +80,15 @@ void ParseHeaderLine(const std::string& line, BamHeader& hdr)
     const auto tokens = Split(line.substr(4), '\t');
     for (const auto& token : tokens) {
         const auto tokenTag = token.substr(0, 2);
-        const auto tokenValue = token.substr(3);
+        auto tokenValue = token.substr(3);
 
         // set header contents
         if (tokenTag == BamHeaderTokenVN)
-            hdr.Version(tokenValue);
+            hdr.Version(std::move(tokenValue));
         else if (tokenTag == BamHeaderTokenSO)
-            hdr.SortOrder(tokenValue);
+            hdr.SortOrder(std::move(tokenValue));
         else if (tokenTag == BamHeaderTokenpb)
-            hdr.PacBioBamVersion(tokenValue);
+            hdr.PacBioBamVersion(std::move(tokenValue));
     }
 }
 
@@ -140,7 +132,7 @@ BamHeader::BamHeader(const std::vector<std::string>& bamFilenames) : BamHeader{}
 
     std::vector<BamHeader> headers;
     for (const auto& fn : bamFilenames) {
-        const BamFile& bamFile{fn};
+        const BamFile bamFile{fn};
         headers.push_back(bamFile.Header());
     }
 
@@ -228,15 +220,20 @@ BamHeader& BamHeader::AddProgram(ProgramInfo pg)
 
 BamHeader& BamHeader::AddReadGroup(ReadGroupInfo readGroup)
 {
-    d_->readGroups_[ReadGroupInfo::GetBaseId(readGroup.Id())] = std::move(readGroup);
+    const auto id = readGroup.Id();
+    if (!HasReadGroup(id)) {
+        d_->readGroups_[ReadGroupInfo::GetBaseId(id)] = std::move(readGroup);
+    }
     return *this;
 }
 
 BamHeader& BamHeader::AddSequence(SequenceInfo sequence)
 {
-    const std::string name = sequence.Name();
-    d_->sequences_.push_back(std::move(sequence));
-    d_->sequenceIdLookup_[name] = d_->sequences_.size() - 1;
+    const auto name = sequence.Name();
+    if (!HasSequence(name)) {
+        d_->sequences_.push_back(std::move(sequence));
+        d_->sequenceIdLookup_[name] = d_->sequences_.size() - 1;
+    }
     return *this;
 }
 
@@ -305,12 +302,20 @@ bool BamHeader::HasSequence(const std::string& name) const
 
 size_t BamHeader::NumSequences() const { return d_->sequences_.size(); }
 
+bool BamHeader::Empty() const noexcept
+{
+    assert(d_);
+    return d_->version_.empty() && d_->pacbioBamVersion_.empty() && d_->sortOrder_.empty() &&
+           d_->headerLineCustom_.empty() && d_->readGroups_.empty() && d_->programs_.empty() &&
+           d_->comments_.empty() && d_->sequences_.empty() && d_->sequenceIdLookup_.empty();
+}
+
 std::string BamHeader::PacBioBamVersion() const { return d_->pacbioBamVersion_; }
 
 BamHeader& BamHeader::PacBioBamVersion(const std::string& version)
 {
     d_->pacbioBamVersion_ = version;
-    const PacBio::BAM::Version fileVersion{version};
+    const BAM::Version fileVersion{version};
     if (fileVersion < Version::Minimum) {
         throw std::runtime_error{"[pbbam] BAM header ERROR: invalid PacBio BAM version number (" +
                                  fileVersion.ToString() +

@@ -1,3 +1,43 @@
+################
+# version info #
+################
+
+pbbam_ver_arr = meson.project_version().split('.')
+pbbam_major_version = pbbam_ver_arr[0]
+pbbam_minor_version = pbbam_ver_arr[1]
+pbbam_patch_version = pbbam_ver_arr[2]
+
+pbbam_config = configuration_data()
+pbbam_config.set('PBBAM_VERSION', meson.project_version())
+pbbam_config.set('PBBAM_VERSION_MAJOR', pbbam_major_version)
+pbbam_config.set('PBBAM_VERSION_MINOR', pbbam_minor_version)
+pbbam_config.set('PBBAM_VERSION_PATCH', pbbam_patch_version)
+
+pbbam_version_sources = [
+
+  # old <-- to be removed
+  vcs_tag(
+    input : 'PbbamGitHash.cpp.in',
+    output : 'PbbamGitHash.cpp',
+    command : ['git', 'describe', '--always', '--dirty=*'],
+    replace_string : '@PBBAM_GIT_SHA1@'),
+  configure_file(
+    input : 'PbbamVersion.cpp.in',
+    output : 'PbbamVersion.cpp',
+    configuration : pbbam_config),
+
+  # new
+  vcs_tag(
+    input : 'LibraryGitHash.h.in',
+    output : 'LibraryGitHash.h',
+    command : ['git', 'describe', '--always', '--dirty=*'],
+    replace_string : '@PBBAM_GIT_SHA1@'),
+  configure_file(
+    input : 'LibraryVersion.h.in',
+    output : 'LibraryVersion.h',
+    configuration : pbbam_config)
+]
+
 ###########
 # sources #
 ###########
@@ -11,7 +51,6 @@ pbbam_cpp_sources = files([
   'BamHeader.cpp',
   'BamReader.cpp',
   'BamRecord.cpp',
-  'BamRecordBuilder.cpp',
   'BamRecordImpl.cpp',
   'BamRecordTags.cpp',
   'BamRecordView.cpp',
@@ -33,6 +72,7 @@ pbbam_cpp_sources = files([
   'DataSetTypes.cpp',
   'DataSetXsd.cpp',
   'EntireFileQuery.cpp',
+  'ErrnoReason.cpp',
   'FaiIndex.cpp',
   'FaiZmwChunker.cpp',
   'FastaCache.cpp',
@@ -58,6 +98,7 @@ pbbam_cpp_sources = files([
   'IndexedFastqReaderImpl.cpp',
   'IRecordWriter.cpp',
   'KSeqReader.cpp',
+  'LibraryInfo.cpp',
   'MD5.cpp',
   'MemoryUtils.cpp',
   'PbiBuilder.cpp',
@@ -73,6 +114,7 @@ pbbam_cpp_sources = files([
   'RecordType.cpp',
   'RunMetadata.cpp',
   'RunMetadataParser.cpp',
+  'SamReader.cpp',
   'SamTagCodec.cpp',
   'SamWriter.cpp',
   'SequenceInfo.cpp',
@@ -128,6 +170,8 @@ pbbam_cpp_sources = files([
   # XML I/O
   'pugixml/pugixml.cpp'
 ])
+
+pbbam_cpp_sources += pbbam_version_sources
 
 pbbam_extra_flags = []
 if get_option('auto-validate')

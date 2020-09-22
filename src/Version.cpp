@@ -1,17 +1,12 @@
-// File Description
-/// \file Version.cpp
-/// \brief Implements the Version class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "Version.h"
 
+#include <ostream>
 #include <sstream>
 #include <stdexcept>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 namespace PacBio {
 namespace BAM {
@@ -50,6 +45,12 @@ std::string Version::ToString() const
     std::ostringstream s;
     s << major_ << '.' << minor_ << '.' << revision_;
     return s.str();
+}
+
+std::ostream& operator<<(std::ostream& out, const Version& version)
+{
+    out << version.ToString();
+    return out;
 }
 
 }  // namespace BAM

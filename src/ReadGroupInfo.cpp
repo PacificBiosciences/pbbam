@@ -1,12 +1,6 @@
-// File Description
-/// \file ReadGroupInfo.cpp
-/// \brief Implements the ReadGroupInfo class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/ReadGroupInfo.h"
+#include <pbbam/ReadGroupInfo.h>
 
 #include <cassert>
 #include <cstddef>
@@ -14,6 +8,7 @@
 #include <cstdio>
 
 #include <iomanip>
+#include <ios>
 #include <set>
 #include <sstream>
 #include <stdexcept>
@@ -24,9 +19,9 @@
 #include <boost/algorithm/cxx14/equal.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "pbbam/MD5.h"
-#include "pbbam/SamTagCodec.h"
-#include "pbbam/StringUtilities.h"
+#include <pbbam/MD5.h>
+#include <pbbam/SamTagCodec.h>
+#include <pbbam/StringUtilities.h>
 
 #include "ChemistryTable.h"
 
@@ -135,17 +130,15 @@ std::string BaseFeatureName(const BaseFeature& feature)
     throw std::runtime_error{ "[pbbam] read group ERROR: unrecognized base feature" };
 }
 
-std::string FrameCodecName(const FrameCodec& codec)
+std::string FrameCodecName(const Data::FrameCodec& codec, const Data::FrameEncoder& encoder)
 {
-    static const std::unordered_map<FrameCodec, std::string> lookup{
-        {FrameCodec::RAW, codec_RAW},
-        {FrameCodec::V1,  codec_V1}
-    };
-
-    const auto found = lookup.find(codec);
-    if (found != lookup.cend())
-        return found->second;
-    throw std::runtime_error{ "[pbbam] read group ERROR: unrecognized frame codec" };
+    switch (codec) {
+        case Data::FrameCodec::RAW : return codec_RAW;
+        case Data::FrameCodec::V1 : return codec_V1;
+        case Data::FrameCodec::V2 : return encoder.Name();
+        default:
+            throw std::runtime_error{"[pbbam] read group ERROR: unrecognized frame codec" };
+    }
 }
 
 std::string BarcodeModeName(const BarcodeModeType& mode)
@@ -217,10 +210,10 @@ static const std::map<std::string, BaseFeature> nameToFeature
     { feature_PE, BaseFeature::PULSE_EXCLUSION }
 };
 
-static const std::map<std::string, FrameCodec> nameToCodec
+static const std::map<std::string, Data::FrameCodec> nameToCodec
 {
-    { codec_RAW, FrameCodec::RAW },
-    { codec_V1,  FrameCodec::V1 }
+    { codec_RAW, Data::FrameCodec::RAW },
+    { codec_V1,  Data::FrameCodec::V1 }
 };
 
 static const std::map<std::string, BarcodeModeType> nameToBarcodeMode
@@ -256,7 +249,28 @@ bool IsBaseFeature(const std::string& name)
 
 BaseFeature BaseFeatureFromName(const std::string& name) { return nameToFeature.at(name); }
 
-FrameCodec FrameCodecFromName(const std::string& name) { return nameToCodec.at(name); }
+Data::FrameCodec FrameCodecFromName(const std::string& name)
+{
+    const auto foundCodec = nameToCodec.find(name);
+    if (foundCodec != nameToCodec.cend())
+        return foundCodec->second;
+    else if (name.find("CodecV2") == 0)
+        return Data::FrameCodec::V2;
+
+    throw std::runtime_error{"[pbbam] read group ERROR: unknown codec name '" + name + "'"};
+}
+
+Data::FrameEncoder FrameEncoderFromName(const std::string& name)
+{
+    if (name.find("CodecV2") == 0) {
+        const auto codecParts = BAM::Split(name, '/');
+        assert(codecParts.size() == 3);
+        const int exponentBits = std::stoi(codecParts[1]);
+        const int mantissaBits = std::stoi(codecParts[2]);
+        return Data::V2FrameEncoder{exponentBits, mantissaBits};
+    } else
+        return Data::V1FrameEncoder{};  // default
+}
 
 BarcodeModeType BarcodeModeFromName(const std::string& name) { return nameToBarcodeMode.at(name); }
 
@@ -324,7 +338,7 @@ ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
     platformModel_ = std::move(platform);
 }
 
-bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
+bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const noexcept
 {
     const auto lhsFields = std::tie(
         id_, sequencingCenter_, date_, flowOrder_, keySequence_, library_, programs_,
@@ -347,7 +361,7 @@ bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const
                                    other.custom_.cend());
 }
 
-bool ReadGroupInfo::operator<(const ReadGroupInfo& other) const { return id_ < other.id_; }
+bool ReadGroupInfo::operator<(const ReadGroupInfo& other) const noexcept { return id_ < other.id_; }
 
 size_t ReadGroupInfo::BarcodeCount() const
 {
@@ -523,9 +537,11 @@ void ReadGroupInfo::DecodeFrameCodecKey(const std::string& key, std::string valu
         const auto& subkey = keyParts.at(0);
         if (subkey == feature_IP) {
             ipdCodec_ = FrameCodecFromName(keyParts.at(1));
+            ipdEncoder_ = FrameEncoderFromName(keyParts.at(1));
             features_[BaseFeature::IPD] = std::move(value);
         } else if (subkey == feature_PW) {
             pulseWidthCodec_ = FrameCodecFromName(keyParts.at(1));
+            pulseWidthEncoder_ = FrameEncoderFromName(keyParts.at(1));
             features_[BaseFeature::PULSE_WIDTH] = std::move(value);
         }
     }
@@ -587,10 +603,10 @@ std::string ReadGroupInfo::EncodeSamDescription() const
             continue;
         else if (featureName == feature_IP) {
             featureName.push_back(COLON);
-            featureName.append(FrameCodecName(ipdCodec_));
+            featureName.append(FrameCodecName(ipdCodec_, ipdEncoder_));
         } else if (featureName == feature_PW) {
             featureName.push_back(COLON);
-            featureName.append(FrameCodecName(pulseWidthCodec_));
+            featureName.append(FrameCodecName(pulseWidthCodec_, pulseWidthEncoder_));
         }
         result.append(SEP + featureName + EQ + feature.second);
     }
@@ -739,9 +755,9 @@ std::string ReadGroupInfo::IntToId(const int32_t id)
     return s.str();
 }
 
-FrameCodec ReadGroupInfo::IpdCodec() const { return ipdCodec_; }
+Data::FrameCodec ReadGroupInfo::IpdCodec() const { return ipdCodec_; }
 
-ReadGroupInfo& ReadGroupInfo::IpdCodec(FrameCodec codec, std::string tag)
+ReadGroupInfo& ReadGroupInfo::IpdCodec(Data::FrameCodec codec, std::string tag)
 {
     // store desired codec type
     ipdCodec_ = std::move(codec);
@@ -749,6 +765,14 @@ ReadGroupInfo& ReadGroupInfo::IpdCodec(FrameCodec codec, std::string tag)
     // update base features map
     const std::string actualTag = (tag.empty() ? "ip" : std::move(tag));
     BaseFeatureTag(BaseFeature::IPD, actualTag);
+    return *this;
+}
+
+Data::FrameEncoder ReadGroupInfo::IpdFrameEncoder() const { return ipdEncoder_; }
+
+ReadGroupInfo& ReadGroupInfo::IpdFrameEncoder(Data::FrameEncoder encoder)
+{
+    ipdEncoder_ = std::move(encoder);
     return *this;
 }
 
@@ -804,9 +828,9 @@ ReadGroupInfo& ReadGroupInfo::Programs(std::string programs)
     return *this;
 }
 
-FrameCodec ReadGroupInfo::PulseWidthCodec() const { return pulseWidthCodec_; }
+Data::FrameCodec ReadGroupInfo::PulseWidthCodec() const { return pulseWidthCodec_; }
 
-ReadGroupInfo& ReadGroupInfo::PulseWidthCodec(FrameCodec codec, std::string tag)
+ReadGroupInfo& ReadGroupInfo::PulseWidthCodec(Data::FrameCodec codec, std::string tag)
 {
     // store desired codec type
     pulseWidthCodec_ = std::move(codec);
@@ -814,6 +838,14 @@ ReadGroupInfo& ReadGroupInfo::PulseWidthCodec(FrameCodec codec, std::string tag)
     // update base features map
     const std::string actualTag = (tag.empty() ? "pw" : std::move(tag));
     BaseFeatureTag(BaseFeature::PULSE_WIDTH, actualTag);
+    return *this;
+}
+
+Data::FrameEncoder ReadGroupInfo::PulseWidthFrameEncoder() const { return pulseWidthEncoder_; }
+
+ReadGroupInfo& ReadGroupInfo::PulseWidthFrameEncoder(Data::FrameEncoder encoder)
+{
+    pulseWidthEncoder_ = std::move(encoder);
     return *this;
 }
 

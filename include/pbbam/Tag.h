@@ -1,16 +1,11 @@
-// File Description
-/// \file Tag.h
-/// \brief Defines the Tag class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_TAG_H
+#define PBBAM_TAG_H
 
-#ifndef TAG_H
-#define TAG_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstdint>
 
+#include <iosfwd>
 #include <string>
 #include <vector>
 
@@ -383,6 +378,11 @@ public:
 
     /// \}
 
+    ///
+    /// Write tag data to output stream. Values in array-type tags are comma-separated.
+    ///
+    friend std::ostream& operator<<(std::ostream& out, const Tag& tag);
+
 private:
     // clang-format off
     // NOTE - keep this synced with TagDataType enum ordering
@@ -411,4 +411,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // TAG_H
+#endif  // PBBAM_TAG_H

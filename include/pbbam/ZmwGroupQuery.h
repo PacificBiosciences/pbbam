@@ -1,21 +1,15 @@
-// File Description
-/// \file ZmwGroupQuery.h
-/// \brief Defines the ZmwGroupQuery class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_ZMWGROUPQUERY_H
+#define PBBAM_ZMWGROUPQUERY_H
 
-#ifndef ZMWGROUPQUERY_H
-#define ZMWGROUPQUERY_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstdint>
 
 #include <vector>
 
-#include "pbbam/DataSet.h"
-#include "pbbam/PbiFilter.h"
-#include "pbbam/internal/QueryBase.h"
+#include <pbbam/DataSet.h>
+#include <pbbam/PbiFilter.h>
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace BAM {
@@ -106,4 +100,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // ZMWGROUPQUERY_H
+#endif  // PBBAM_ZMWGROUPQUERY_H

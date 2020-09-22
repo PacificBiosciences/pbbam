@@ -1,13 +1,7 @@
-// File Description
-/// \file BamRecord.h
-/// \brief Defines the BamRecord class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_BAMRECORD_H
+#define PBBAM_BAMRECORD_H
 
-#ifndef BAMRECORD_H
-#define BAMRECORD_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -20,22 +14,22 @@
 #include <pbcopper/data/MappedRead.h>
 #include <pbcopper/data/Read.h>
 
-#include "pbbam/Accuracy.h"
-#include "pbbam/BamHeader.h"
-#include "pbbam/BamRecordImpl.h"
-#include "pbbam/ClipType.h"
-#include "pbbam/FrameEncodingType.h"
-#include "pbbam/Frames.h"
-#include "pbbam/LocalContextFlags.h"
-#include "pbbam/Orientation.h"
-#include "pbbam/PulseBehavior.h"
-#include "pbbam/PulseExclusionReason.h"
-#include "pbbam/QualityValues.h"
-#include "pbbam/ReadGroupInfo.h"
-#include "pbbam/RecordType.h"
-#include "pbbam/Strand.h"
-#include "pbbam/ZmwType.h"
-#include "pbbam/virtual/VirtualRegionType.h"
+#include <pbbam/Accuracy.h>
+#include <pbbam/BamHeader.h>
+#include <pbbam/BamRecordImpl.h>
+#include <pbbam/ClipType.h>
+#include <pbbam/FrameEncodingType.h>
+#include <pbbam/Frames.h>
+#include <pbbam/LocalContextFlags.h>
+#include <pbbam/Orientation.h>
+#include <pbbam/PulseBehavior.h>
+#include <pbbam/PulseExclusionReason.h>
+#include <pbbam/QualityValues.h>
+#include <pbbam/ReadGroupInfo.h>
+#include <pbbam/RecordType.h>
+#include <pbbam/Strand.h>
+#include <pbbam/ZmwType.h>
+#include <pbbam/virtual/VirtualRegionType.h>
 
 namespace PacBio {
 namespace BAM {
@@ -92,7 +86,7 @@ public:
     int32_t HoleNumber() const;
 
     /// \returns this record's LocalContextFlags
-    PacBio::BAM::LocalContextFlags LocalContextFlags() const;
+    Data::LocalContextFlags LocalContextFlags() const;
 
     /// \returns this record's movie name
     std::string MovieName() const;
@@ -105,7 +99,7 @@ public:
     /// \note QueryEnd is in polymerase read coordinates, NOT genomic
     ///       coordinates.
     ///
-    Position QueryEnd() const;
+    Data::Position QueryEnd() const;
 
     /// \returns the number of frames from start of movie to the last base of read
     ///
@@ -116,14 +110,14 @@ public:
     /// \note QueryStart is in polymerase read coordinates, NOT genomic
     ///       coordinates.
     ///
-    Position QueryStart() const;
+    Data::Position QueryStart() const;
 
     /// \returns the number of frames from start of movie to the first base of read
     ///
     int32_t QueryStartFrameNumber() const;
 
     /// \returns this record's expected read accuracy [0, 1000]
-    Accuracy ReadAccuracy() const;
+    Data::Accuracy ReadAccuracy() const;
 
     /// \returns ReadGroupInfo object for this record
     ReadGroupInfo ReadGroup() const;
@@ -195,24 +189,24 @@ public:
     /// \note AlignedEnd is in polymerase read coordinates, NOT genomic
     ///       coordinates.
     ///
-    Position AlignedEnd() const;
+    Data::Position AlignedEnd() const;
 
     /// \returns the record's aligned start position
     ///
     /// \note AlignedStart is in polymerase read coordinates, NOT genomic
     ///       coordinates.
     ///
-    Position AlignedStart() const;
+    Data::Position AlignedStart() const;
 
     /// \returns the record's strand as a Strand enum value
-    Strand AlignedStrand() const;
+    Data::Strand AlignedStrand() const;
 
     /// \returns the record's CIGAR data as a Cigar object
     ///
     /// \param[in] exciseAllClips   if true, remove all clipping operations
     ///                             (hard & soft) [default:false]
     ///
-    Cigar CigarData(bool exciseAllClips = false) const;
+    Data::Cigar CigarData(bool exciseAllClips = false) const;
 
     /// \returns true if this record was mapped by aligner
     bool IsMapped() const;
@@ -257,7 +251,7 @@ public:
     /// \note ReferenceEnd is in reference coordinates, NOT polymerase read
     ///       coordinates.
     ///
-    Position ReferenceEnd() const;
+    Data::Position ReferenceEnd() const;
 
     /// \returns the record's reference start position, or UnmappedPosition if
     ///          unmapped
@@ -265,7 +259,7 @@ public:
     /// \note ReferenceStart is in reference coordinates, NOT polymerase read
     ///       coordinates.
     ///
-    Position ReferenceStart() const;
+    Data::Position ReferenceStart() const;
 
     /// \}
 
@@ -429,8 +423,8 @@ public:
     ///
     /// \returns AltLabelTags string
     ///
-    std::string AltLabelTag(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                            bool exciseSoftClips = false,
+    std::string AltLabelTag(Data::Orientation orientation = Data::Orientation::NATIVE,
+                            bool aligned = false, bool exciseSoftClips = false,
                             PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's DeletionTag values ("dt" tag).
@@ -446,8 +440,8 @@ public:
     ///
     /// \returns DeletionTag string
     ///
-    std::string DeletionTag(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                            bool exciseSoftClips = false) const;
+    std::string DeletionTag(Data::Orientation orientation = Data::Orientation::NATIVE,
+                            bool aligned = false, bool exciseSoftClips = false) const;
 
     /// \brief Fetches this record's DNA sequence (SEQ field).
     ///
@@ -462,8 +456,8 @@ public:
     ///
     /// \returns sequence string
     ///
-    std::string Sequence(const Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                         bool exciseSoftClips = false) const;
+    std::string Sequence(const Data::Orientation orientation = Data::Orientation::NATIVE,
+                         bool aligned = false, bool exciseSoftClips = false) const;
 
     /// \brief Fetches this record's SubstitutionTag values ("st" tag).
     ///
@@ -478,8 +472,8 @@ public:
     ///
     /// \returns SubstitutionTags string
     ///
-    std::string SubstitutionTag(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                                bool exciseSoftClips = false) const;
+    std::string SubstitutionTag(Data::Orientation orientation = Data::Orientation::NATIVE,
+                                bool aligned = false, bool exciseSoftClips = false) const;
 
     /// \}
 
@@ -496,9 +490,9 @@ public:
     ///
     /// \returns AltLabelQV as QualityValues object
     ///
-    QualityValues AltLabelQV(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                             bool exciseSoftClips = false,
-                             PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    Data::QualityValues AltLabelQV(Data::Orientation orientation = Data::Orientation::NATIVE,
+                                   bool aligned = false, bool exciseSoftClips = false,
+                                   PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's DeletionQV values ("dq" tag).
     ///
@@ -513,8 +507,8 @@ public:
     ///
     /// \returns DeletionQV as QualityValues object
     ///
-    QualityValues DeletionQV(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                             bool exciseSoftClips = false) const;
+    Data::QualityValues DeletionQV(Data::Orientation orientation = Data::Orientation::NATIVE,
+                                   bool aligned = false, bool exciseSoftClips = false) const;
 
     /// \brief Fetches this record's InsertionQV values ("iq" tag).
     ///
@@ -529,8 +523,8 @@ public:
     ///
     /// \returns InsertionQVs as QualityValues object
     ///
-    QualityValues InsertionQV(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                              bool exciseSoftClips = false) const;
+    Data::QualityValues InsertionQV(Data::Orientation orientation = Data::Orientation::NATIVE,
+                                    bool aligned = false, bool exciseSoftClips = false) const;
 
     /// \brief Fetches this record's LabelQV values ("pq" tag).
     ///
@@ -541,9 +535,9 @@ public:
     ///
     /// \returns LabelQV as QualityValues object
     ///
-    QualityValues LabelQV(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                          bool exciseSoftClips = false,
-                          PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    Data::QualityValues LabelQV(Data::Orientation orientation = Data::Orientation::NATIVE,
+                                bool aligned = false, bool exciseSoftClips = false,
+                                PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's MergeQV values ("mq" tag).
     ///
@@ -558,8 +552,8 @@ public:
     ///
     /// \returns MergeQV as QualityValues object
     ///
-    QualityValues MergeQV(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                          bool exciseSoftClips = false) const;
+    Data::QualityValues MergeQV(Data::Orientation orientation = Data::Orientation::NATIVE,
+                                bool aligned = false, bool exciseSoftClips = false) const;
 
     /// \brief Fetches  this record's %BAM quality values (QUAL field).
     ///
@@ -574,8 +568,8 @@ public:
     ///
     /// \returns %BAM qualities as QualityValues object
     ///
-    QualityValues Qualities(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                            bool exciseSoftClips = false) const;
+    Data::QualityValues Qualities(Data::Orientation orientation = Data::Orientation::NATIVE,
+                                  bool aligned = false, bool exciseSoftClips = false) const;
 
     /// \brief Fetches this record's SubstitutionQV values ("sq" tag).
     ///
@@ -590,8 +584,8 @@ public:
     ///
     /// \returns SubstitutionQV as QualityValues object
     ///
-    QualityValues SubstitutionQV(Orientation orientation = Orientation::NATIVE,
-                                 bool aligned = false, bool exciseSoftClips = false) const;
+    Data::QualityValues SubstitutionQV(Data::Orientation orientation = Data::Orientation::NATIVE,
+                                       bool aligned = false, bool exciseSoftClips = false) const;
 
     /// \}
 
@@ -612,23 +606,23 @@ public:
     ///
     /// \returns IPD as Frames object
     ///
-    Frames IPD(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-               bool exciseSoftClips = false) const;
+    Data::Frames IPD(Data::Orientation orientation = Data::Orientation::NATIVE,
+                     bool aligned = false, bool exciseSoftClips = false) const;
 
     /// \brief Fetches this record's IPD values ("ip" tag), but does not upscale.
     ///
     /// \param[in] orientation     Orientation of output.
     /// \returns IPD as Frames object
     ///
-    Frames IPDRaw(Orientation orientation = Orientation::NATIVE) const;
+    Data::Frames IPDRaw(Data::Orientation orientation = Data::Orientation::NATIVE) const;
 
     /// \brief Fetches this record's Pkmean values ("pa" tag).
     ///
     /// \param[in] orientation     Orientation of output.
     /// \returns Pkmean as vector<float> object
     ///
-    std::vector<float> Pkmean(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                              bool exciseSoftClips = false,
+    std::vector<float> Pkmean(Data::Orientation orientation = Data::Orientation::NATIVE,
+                              bool aligned = false, bool exciseSoftClips = false,
                               PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's Pkmid values ("pm" tag).
@@ -636,8 +630,8 @@ public:
     /// \param[in] orientation     Orientation of output.
     /// \returns Pkmid as vector<float> object
     ///
-    std::vector<float> Pkmid(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                             bool exciseSoftClips = false,
+    std::vector<float> Pkmid(Data::Orientation orientation = Data::Orientation::NATIVE,
+                             bool aligned = false, bool exciseSoftClips = false,
                              PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's Pkmean2 values ("pi" tag).
@@ -645,8 +639,8 @@ public:
     /// \param[in] orientation     Orientation of output.
     /// \returns Pkmean as vector<float> object
     ///
-    std::vector<float> Pkmean2(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                               bool exciseSoftClips = false,
+    std::vector<float> Pkmean2(Data::Orientation orientation = Data::Orientation::NATIVE,
+                               bool aligned = false, bool exciseSoftClips = false,
                                PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's Pkmid2 values ("ps" tag).
@@ -654,8 +648,8 @@ public:
     /// \param[in] orientation     Orientation of output.
     /// \returns Pkmid as vector<float> object
     ///
-    std::vector<float> Pkmid2(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                              bool exciseSoftClips = false,
+    std::vector<float> Pkmid2(Data::Orientation orientation = Data::Orientation::NATIVE,
+                              bool aligned = false, bool exciseSoftClips = false,
                               PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's PreBaseFrames aka IPD values ("ip" tag).
@@ -671,25 +665,25 @@ public:
     ///
     /// \returns IPD as Frames object
     ///
-    Frames PreBaseFrames(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                         bool exciseSoftClips = false) const;
+    Data::Frames PreBaseFrames(Data::Orientation orientation = Data::Orientation::NATIVE,
+                               bool aligned = false, bool exciseSoftClips = false) const;
 
     /// \brief Fetches this record's PrePulseFrames values ("pd" tag).
     ///
     /// \param[in] orientation     Orientation of output.
     /// \returns PrePulseFrames as Frames object
     ///
-    Frames PrePulseFrames(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                          bool exciseSoftClips = false,
-                          PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    Data::Frames PrePulseFrames(Data::Orientation orientation = Data::Orientation::NATIVE,
+                                bool aligned = false, bool exciseSoftClips = false,
+                                PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's PulseCall values ("pc" tag).
     ///
     /// \param[in] orientation     Orientation of output.
     /// \returns PulseCalls string
     ///
-    std::string PulseCall(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                          bool exciseSoftClips = false,
+    std::string PulseCall(Data::Orientation orientation = Data::Orientation::NATIVE,
+                          bool aligned = false, bool exciseSoftClips = false,
                           PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's PulseCallWidth values ("px" tag).
@@ -697,16 +691,16 @@ public:
     /// \param[in] orientation     Orientation of output.
     /// \returns PulseCallWidth as Frames object
     ///
-    Frames PulseCallWidth(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                          bool exciseSoftClips = false,
-                          PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    Data::Frames PulseCallWidth(Data::Orientation orientation = Data::Orientation::NATIVE,
+                                bool aligned = false, bool exciseSoftClips = false,
+                                PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's PulseExclusionReason values ("pe" tag).
     ///
     /// \returns vector of pulse exclusion reason value
     ///
-    std::vector<PacBio::BAM::PulseExclusionReason> PulseExclusionReason(
-        Orientation orientation = Orientation::NATIVE, bool aligned = false,
+    std::vector<BAM::PulseExclusionReason> PulseExclusionReason(
+        Data::Orientation orientation = Data::Orientation::NATIVE, bool aligned = false,
         bool exciseSoftClips = false, PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetch this record's PulseMergeQV values ("pg" tag).
@@ -714,9 +708,9 @@ public:
     /// \param[in] orientation     Orientation of output.
     /// \returns PulseMergeQV as QualityValues object
     ///
-    QualityValues PulseMergeQV(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                               bool exciseSoftClips = false,
-                               PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    Data::QualityValues PulseMergeQV(Data::Orientation orientation = Data::Orientation::NATIVE,
+                                     bool aligned = false, bool exciseSoftClips = false,
+                                     PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \brief Fetches this record's PulseWidth values ("pw" tag).
     ///
@@ -731,8 +725,8 @@ public:
     ///
     /// \returns PulseWidths as Frames object
     ///
-    Frames PulseWidth(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                      bool exciseSoftClips = false) const;
+    Data::Frames PulseWidth(Data::Orientation orientation = Data::Orientation::NATIVE,
+                            bool aligned = false, bool exciseSoftClips = false) const;
 
     /// \brief Fetches this record's PulseWidth values ("pw" tag), but does not
     ///        upscale.
@@ -749,7 +743,7 @@ public:
     ///
     /// \returns StartFrame as uint32_t vector
     ///
-    std::vector<uint32_t> StartFrame(Orientation orientation = Orientation::NATIVE,
+    std::vector<uint32_t> StartFrame(Data::Orientation orientation = Data::Orientation::NATIVE,
                                      bool aligned = false, bool exciseSoftClips = false,
                                      PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
@@ -793,7 +787,7 @@ public:
     /// \param[in] flags
     /// \returns reference to this record
     ///
-    BamRecord& LocalContextFlags(const PacBio::BAM::LocalContextFlags flags);
+    BamRecord& LocalContextFlags(const Data::LocalContextFlags flags);
 
     /// \brief Sets this record's "number of complete passes of the insert".
     ///
@@ -809,7 +803,7 @@ public:
     /// \param[in] pos
     /// \returns reference to this record
     ///
-    BamRecord& QueryEnd(const PacBio::BAM::Position pos);
+    BamRecord& QueryEnd(const Data::Position pos);
 
     /// \brief Sets this record's query end frame number
     ///
@@ -825,7 +819,7 @@ public:
     /// \param[in] pos
     /// \returns reference to this record
     ///
-    BamRecord& QueryStart(const PacBio::BAM::Position pos);
+    BamRecord& QueryStart(const Data::Position pos);
 
     /// \brief Sets this record's query start frame number
     ///
@@ -839,7 +833,7 @@ public:
     /// \param[in] accuracy
     /// \returns reference to this record
     ///
-    BamRecord& ReadAccuracy(const Accuracy& accuracy);
+    BamRecord& ReadAccuracy(const Data::Accuracy& accuracy);
 
     /// \brief Attaches this record to the provided read group, changing the
     ///        record name & 'RG' tag.
@@ -951,21 +945,21 @@ public:
     /// \param[in] altLabelQVs
     /// \returns reference to this record
     ///
-    BamRecord& AltLabelQV(const QualityValues& altLabelQVs);
+    BamRecord& AltLabelQV(const Data::QualityValues& altLabelQVs);
 
     /// \brief Sets this record's DeletionQV values ("dq" tag).
     ///
     /// \param[in] deletionQVs
     /// \returns reference to this record
     ///
-    BamRecord& DeletionQV(const QualityValues& deletionQVs);
+    BamRecord& DeletionQV(const Data::QualityValues& deletionQVs);
 
     /// \brief Sets this record's InsertionQV values ("iq" tag).
     ///
     /// \param[in] insertionQVs
     /// \returns reference to this record
     ///
-    BamRecord& InsertionQV(const QualityValues& insertionQVs);
+    BamRecord& InsertionQV(const Data::QualityValues& insertionQVs);
 
     /// \brief Sets this record's LabelQV values ("pq" tag).
     ///
@@ -979,14 +973,14 @@ public:
     /// \param[in] mergeQVs
     /// \returns reference to this record
     ///
-    BamRecord& MergeQV(const QualityValues& mergeQVs);
+    BamRecord& MergeQV(const Data::QualityValues& mergeQVs);
 
     /// \brief Sets this record's SubstitutionQV values ("sq" tag).
     ///
     /// \param[in] substitutionQVs
     /// \returns reference to this record
     ///
-    BamRecord& SubstitutionQV(const QualityValues& substitutionQVs);
+    BamRecord& SubstitutionQV(const Data::QualityValues& substitutionQVs);
 
     /// \}
 
@@ -996,12 +990,24 @@ public:
 
     /// \brief Sets this record's IPD values ("ip" tag).
     ///
+    /// \deprecated since v1.3.0. Use the FrameCodec overload instead
+    ///
     /// \param[in] frames
     /// \param[in] encoding specify how to encode the data (8-bit lossy, or
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& IPD(const Frames& frames, const FrameEncodingType encoding);
+    PBBAM_DEPRECATED_FRAMES BamRecord& IPD(const Data::Frames& frames,
+                                           const FrameEncodingType encoding);
+
+    /// \brief Sets this record's IPD values ("ip" tag).
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or
+    ///                     16-bit lossless)
+    /// \returns reference to this record
+    ///
+    BamRecord& IPD(const Data::Frames& frames, const Data::FrameCodec encoding);
 
     /// \brief Sets this record's Pkmean values ("pm" tag).
     ///
@@ -1061,12 +1067,36 @@ public:
 
     /// \brief Sets this record's PreBaseFrames aka IPD values ("ip" tag).
     ///
+    /// \deprecated since v1.3.0. Use the FrameCodec overload instead
+    ///
     /// \param[in] frames
     /// \param[in] encoding specify how to encode the data (8-bit lossy, or
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& PreBaseFrames(const Frames& frames, const FrameEncodingType encoding);
+    PBBAM_DEPRECATED_FRAMES BamRecord& PreBaseFrames(const Data::Frames& frames,
+                                                     const FrameEncodingType encoding);
+
+    /// \brief Sets this record's PreBaseFrames aka IPD values ("ip" tag).
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or
+    ///                     16-bit lossless)
+    /// \returns reference to this record
+    ///
+    BamRecord& PreBaseFrames(const Data::Frames& frames, const Data::FrameCodec encoding);
+
+    /// \brief Sets this record's PrePulseFrames values ("pd" tag).
+    ///
+    /// \deprecated since v1.3.0. Use the FrameCodec overload instead
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or
+    ///                     16-bit lossless)
+    /// \returns reference to this record
+    ///
+    PBBAM_DEPRECATED_FRAMES BamRecord& PrePulseFrames(const Data::Frames& frames,
+                                                      const FrameEncodingType encoding);
 
     /// \brief Sets this record's PrePulseFrames values ("pd" tag).
     ///
@@ -1075,7 +1105,7 @@ public:
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& PrePulseFrames(const Frames& frames, const FrameEncodingType encoding);
+    BamRecord& PrePulseFrames(const Data::Frames& frames, const Data::FrameCodec encoding);
 
     /// \brief Sets this record's PulseCall values ("pc" tag).
     ///
@@ -1086,26 +1116,50 @@ public:
 
     /// \brief Sets this record's PulseCallWidth values ("px" tag).
     ///
+    /// \deprecated since v1.3.0. Use the FrameCodec overload instead
+    ///
     /// \param[in] frames
     /// \param[in] encoding specify how to encode the data (8-bit lossy, or
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& PulseCallWidth(const Frames& frames, const FrameEncodingType encoding);
+    PBBAM_DEPRECATED_FRAMES BamRecord& PulseCallWidth(const Data::Frames& frames,
+                                                      const FrameEncodingType encoding);
+
+    /// \brief Sets this record's PulseCallWidth values ("px" tag).
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or
+    ///                     16-bit lossless)
+    /// \returns reference to this record
+    ///
+    BamRecord& PulseCallWidth(const Data::Frames& frames, const Data::FrameCodec encoding);
 
     ///
     /// \\brief Sets this record's PulseExclusionReason values ("pe" tag).
     /// \param[in] reasons
     /// \return reference to this record
     ///
-    BamRecord& PulseExclusionReason(const std::vector<PacBio::BAM::PulseExclusionReason>& reasons);
+    BamRecord& PulseExclusionReason(const std::vector<BAM::PulseExclusionReason>& reasons);
 
     /// \brief Sets this record's PulseMergeQV values ("pg" tag).
     ///
     /// \param[in] pulseMergeQVs
     /// \returns reference to this record
     ///
-    BamRecord& PulseMergeQV(const QualityValues& pulseMergeQVs);
+    BamRecord& PulseMergeQV(const Data::QualityValues& pulseMergeQVs);
+
+    /// \brief Sets this record's PulseWidth values ("pw" tag).
+    ///
+    /// \deprecated since v1.3.0. Use the FrameCodec overload instead
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or
+    ///                     16-bit lossless)
+    /// \returns reference to this record
+    ///
+    PBBAM_DEPRECATED_FRAMES BamRecord& PulseWidth(const Data::Frames& frames,
+                                                  const FrameEncodingType encoding);
 
     /// \brief Sets this record's PulseWidth values ("pw" tag).
     ///
@@ -1114,7 +1168,7 @@ public:
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& PulseWidth(const Frames& frames, const FrameEncodingType encoding);
+    BamRecord& PulseWidth(const Data::Frames& frames, const Data::FrameCodec encoding);
 
     /// \brief Sets this record's StartFrame values ("sf" tag).
     ///
@@ -1190,30 +1244,31 @@ public:
 
     /// Creates a copied record from input, with clipping applied
     static BamRecord Clipped(const BamRecord& input, const ClipType clipType,
-                             const PacBio::BAM::Position start, const PacBio::BAM::Position end,
+                             const Data::Position start, const Data::Position end,
                              const bool exciseFlankingInserts = false);
 
     /// Creates a copied record from input, with mapping applied
     static BamRecord Mapped(const BamRecord& input, const int32_t referenceId,
-                            const Position refStart, const Strand strand, const Cigar& cigar,
-                            const uint8_t mappingQuality);
+                            const Data::Position refStart, const Data::Strand strand,
+                            const Data::Cigar& cigar, const uint8_t mappingQuality);
 
     /// Applies clipping to this record
-    BamRecord& Clip(const ClipType clipType, const PacBio::BAM::Position start,
-                    const PacBio::BAM::Position end, const bool exciseFlankingInserts = false);
+    BamRecord& Clip(const ClipType clipType, const Data::Position start, const Data::Position end,
+                    const bool exciseFlankingInserts = false);
 
     /// Creates a copied record from this one, with clipping applied
-    BamRecord Clipped(const ClipType clipType, const PacBio::BAM::Position start,
-                      const PacBio::BAM::Position end,
+    BamRecord Clipped(const ClipType clipType, const Data::Position start, const Data::Position end,
                       const bool exciseFlankingInserts = false) const;
 
     /// Applies mapping to this record
-    BamRecord& Map(const int32_t referenceId, const Position refStart, const Strand strand,
-                   const Cigar& cigar, const uint8_t mappingQuality);
+    BamRecord& Map(const int32_t referenceId, const Data::Position refStart,
+                   const Data::Strand strand, const Data::Cigar& cigar,
+                   const uint8_t mappingQuality);
 
     /// Creates a copied record from this one, with mapping applied
-    BamRecord Mapped(const int32_t referenceId, const Position refStart, const Strand strand,
-                     const Cigar& cigar, const uint8_t mappingQuality) const;
+    BamRecord Mapped(const int32_t referenceId, const Data::Position refStart,
+                     const Data::Strand strand, const Data::Cigar& cigar,
+                     const uint8_t mappingQuality) const;
     /// \}
 
 private:
@@ -1227,8 +1282,8 @@ public:
 private:
     /// \internal
     /// cached positions (mutable to allow lazy-calc in const methods)
-    mutable Position alignedStart_;
-    mutable Position alignedEnd_;
+    mutable Data::Position alignedStart_ = Data::UnmappedPosition;
+    mutable Data::Position alignedEnd_ = Data::UnmappedPosition;
 
 private:
     /// \internal
@@ -1245,8 +1300,8 @@ private:
 
     void ClipFields(const size_t clipPos, const size_t clipLength);
 
-    BamRecord& ClipToQuery(const PacBio::BAM::Position start, const PacBio::BAM::Position end);
-    BamRecord& ClipToReference(const PacBio::BAM::Position start, const PacBio::BAM::Position end,
+    BamRecord& ClipToQuery(const Data::Position start, const Data::Position end);
+    BamRecord& ClipToReference(const Data::Position start, const Data::Position end,
                                const bool exciseFlankingInserts);
 
 private:
@@ -1261,24 +1316,25 @@ private:
                            const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     // frame tags
-    Frames FetchFramesRaw(const BamRecordTag tag) const;
-    Frames FetchFrames(const BamRecordTag tag, const Orientation orientation = Orientation::NATIVE,
-                       const bool aligned = false, const bool exciseSoftClips = false,
-                       const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    Data::Frames FetchFramesRaw(const BamRecordTag tag) const;
+    Data::Frames FetchFrames(const BamRecordTag tag,
+                             const Data::Orientation orientation = Data::Orientation::NATIVE,
+                             const bool aligned = false, const bool exciseSoftClips = false,
+                             const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     // pulse tags
     std::vector<float> FetchPhotonsRaw(const BamRecordTag tag) const;
     std::vector<float> FetchPhotons(const BamRecordTag tag,
-                                    const Orientation orientation = Orientation::NATIVE,
+                                    const Data::Orientation orientation = Data::Orientation::NATIVE,
                                     const bool aligned = false, const bool exciseSoftClips = false,
                                     const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     // QV tags
-    QualityValues FetchQualitiesRaw(const BamRecordTag tag) const;
-    QualityValues FetchQualities(const BamRecordTag tag,
-                                 const Orientation orientation = Orientation::NATIVE,
-                                 const bool aligned = false, const bool exciseSoftClips = false,
-                                 const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    Data::QualityValues FetchQualitiesRaw(const BamRecordTag tag) const;
+    Data::QualityValues FetchQualities(
+        const BamRecordTag tag, const Data::Orientation orientation = Data::Orientation::NATIVE,
+        const bool aligned = false, const bool exciseSoftClips = false,
+        const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     // UInt tags (e.g. start frame)
     //
@@ -1286,7 +1342,7 @@ private:
     //
     std::vector<uint32_t> FetchUInt32sRaw(const BamRecordTag tag) const;
     std::vector<uint32_t> FetchUInt32s(
-        const BamRecordTag tag, const Orientation orientation = Orientation::NATIVE,
+        const BamRecordTag tag, const Data::Orientation orientation = Data::Orientation::NATIVE,
         const bool aligned = false, const bool exciseSoftClips = false,
         const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
@@ -1295,10 +1351,10 @@ private:
     // ODO (DB): clean this up w.r.t FetchUInt32s
     //
     std::vector<uint8_t> FetchUInt8sRaw(const BamRecordTag tag) const;
-    std::vector<uint8_t> FetchUInt8s(const BamRecordTag tag,
-                                     const Orientation orientation = Orientation::NATIVE,
-                                     const bool aligned = false, const bool exciseSoftClips = false,
-                                     const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    std::vector<uint8_t> FetchUInt8s(
+        const BamRecordTag tag, const Data::Orientation orientation = Data::Orientation::NATIVE,
+        const bool aligned = false, const bool exciseSoftClips = false,
+        const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
 private:
     ///\internal
@@ -1313,4 +1369,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BAMRECORD_H
+#endif  // PBBAM_BAMRECORD_H

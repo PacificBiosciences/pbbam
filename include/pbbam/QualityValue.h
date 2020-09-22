@@ -1,18 +1,7 @@
-// File Description
-/// \file QualityValue.h
-/// \brief Defines the QualityValue class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_QUALITYVALUE_H
+#define PBBAM_QUALITYVALUE_H
 
-#ifndef QUALITYVALUE_H
-#define QUALITYVALUE_H
-
-#include "pbbam/Config.h"
-
-#include <cstdint>
-
-#include <string>
-#include <vector>
+#include <pbbam/Config.h>
 
 #include <pbcopper/data/QualityValue.h>
 
@@ -24,4 +13,4 @@ using QualityValue PBBAM_DEPRECATED = PacBio::Data::QualityValue;
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // QUALITYVALUE_H
+#endif  // PBBAM_QUALITYVALUE_H

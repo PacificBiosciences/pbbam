@@ -1,21 +1,23 @@
 // Author: Derek Barnett
 
+#include <pbbam/BgzipFastaWriter.h>
+
 #include <algorithm>
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include <pbbam/BgzipFastaWriter.h>
 #include <pbbam/FastaReader.h>
 #include <pbbam/FastaSequence.h>
 #include <pbbam/FormatUtils.h>
+
 #include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-TEST(BgzipFastaWriterTest, writes_bgzf_fasta_data_to_file)
+TEST(BAM_BgzipFastaWriter, writes_bgzf_fasta_data_to_file)
 {
     const std::string fn{PbbamTestsConfig::GeneratedData_Dir + "/bgzf_fasta_out.fa.gz"};
 

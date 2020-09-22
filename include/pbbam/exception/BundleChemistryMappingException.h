@@ -1,13 +1,7 @@
-// File Description
-/// \file BundleChemistryMappingException.h
-/// \brief Defines the BundleChemistryMappingException class.
-//
-// Author: Derek Barnett, Lance Hepler
+#ifndef PBBAM_BUNDLECHEMISTRYMAPPINGEXCEPTION_H
+#define PBBAM_BUNDLECHEMISTRYMAPPINGEXCEPTION_H
 
-#ifndef BUNDLECHEMISTRYMAPPINGEXCEPTION_H
-#define BUNDLECHEMISTRYMAPPINGEXCEPTION_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <exception>
 #include <string>
@@ -43,4 +37,4 @@ protected:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BUNDLECHEMISTRYMAPPINGEXCEPTION_H
+#endif  // PBBAM_BUNDLECHEMISTRYMAPPINGEXCEPTION_H

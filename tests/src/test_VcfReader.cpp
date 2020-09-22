@@ -1,12 +1,15 @@
 // Author: Derek Barnett
 
+#include <pbbam/vcf/VcfReader.h>
+
+#include <cstddef>
+
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
 #include <pbbam/vcf/VcfFile.h>
-#include <pbbam/vcf/VcfReader.h>
 
 #include "PbbamTestData.h"
 
@@ -26,7 +29,19 @@ const std::string VcfFn{PacBio::BAM::PbbamTestsConfig::Data_Dir + "/vcf/structur
 
 }  // namespace VcfReaderTests
 
-TEST(VCF_Reader, can_fetch_variants_from_vcf_filename)
+TEST(VCF_VcfReader, throws_on_empty_file)
+{
+    EXPECT_THROW(VcfReader{PacBio::BAM::PbbamTestsConfig::Data_Dir + "/vcf/empty.vcf"},
+                 std::runtime_error);
+}
+
+TEST(VCF_VcfReader, throws_on_non_vcf_file)
+{
+    EXPECT_THROW(VcfReader{PacBio::BAM::PbbamTestsConfig::Data_Dir + "/phi29.bam"},
+                 std::runtime_error);
+}
+
+TEST(VCF_VcfReader, can_fetch_variants_from_vcf_filename)
 {
     size_t i = 0;
     VcfReader rdr{VcfReaderTests::VcfFn};
@@ -37,7 +52,7 @@ TEST(VCF_Reader, can_fetch_variants_from_vcf_filename)
     }
 }
 
-TEST(VCF_Reader, can_fetch_variants_from_vcf_file_object)
+TEST(VCF_VcfReader, can_fetch_variants_from_vcf_file_object)
 {
     const VcfFile file{VcfReaderTests::VcfFn};
 

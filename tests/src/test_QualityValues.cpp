@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/QualityValues.h>
+
 #include <cstddef>
 #include <cstdint>
 
@@ -9,19 +11,17 @@
 
 #include <gtest/gtest.h>
 
-#include <pbbam/QualityValues.h>
-
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-TEST(QualityValueTest, DefaultsOk)
+TEST(BAM_QualityValue, defaults_to_zero)
 {
     const QualityValue value;
     EXPECT_EQ(0, value);
     EXPECT_EQ('!', value.Fastq());
 }
 
-TEST(QualityValueTest, FromNumber)
+TEST(BAM_QualityValue, can_create_from_integer)
 {
     const QualityValue zero = 0;
     const QualityValue thirtyThree = 33;
@@ -45,7 +45,7 @@ TEST(QualityValueTest, FromNumber)
     EXPECT_EQ('~', wayTooHigh.Fastq());
 }
 
-TEST(QualityValueTest, FromFastq)
+TEST(QualityValueTest, can_create_from_fastq_character)
 {
     EXPECT_EQ(0, QualityValue::FromFastq('!'));
     EXPECT_EQ(33, QualityValue::FromFastq('B'));
@@ -53,14 +53,14 @@ TEST(QualityValueTest, FromFastq)
     EXPECT_EQ(93, QualityValue::FromFastq('~'));
 }
 
-TEST(QualityValuesTest, Default)
+TEST(BAM_QualityValues, default_is_empty)
 {
     const QualityValues qvs;
     EXPECT_TRUE(qvs.empty());
     EXPECT_EQ("", qvs.Fastq());
 }
 
-TEST(QualityValuesTest, FromNumbers)
+TEST(BAM_QualityValues, can_create_from_integer_vector)
 {
     const std::string fastqString{"~~~KKBB!!"};
     const std::vector<uint8_t> values{93, 93, 93, 42, 42, 33, 33, 0, 0};
@@ -71,7 +71,7 @@ TEST(QualityValuesTest, FromNumbers)
     EXPECT_EQ(fastqString, qvs.Fastq());
 }
 
-TEST(QualityValuesTest, FromFastq)
+TEST(BAM_QualityValues, can_create_from_fastq_string)
 {
     const std::string fastqString{"~~~KKBB!!"};
     const std::vector<uint8_t> values{93, 93, 93, 42, 42, 33, 33, 0, 0};

@@ -1,16 +1,17 @@
 // Author: Derek Barnett
 
+#include <pbbam/FastaWriter.h>
+
 #include <cstddef>
 
 #include <gtest/gtest.h>
+
+#include <boost/algorithm/string.hpp>
 
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/FastaReader.h>
 #include <pbbam/FastaSequence.h>
 #include <pbbam/FastaSequenceQuery.h>
-#include <pbbam/FastaWriter.h>
-#include <pbbam/Unused.h>
-#include <boost/algorithm/string.hpp>
 
 #include "FastxTests.h"
 #include "PbbamTestData.h"
@@ -21,17 +22,17 @@ using namespace PacBio::BAM;
 namespace FastaWriterTests {
 }  // namespace FastaWriterTests
 
-TEST(FastaWriterTest, throws_on_empty_filename)
+TEST(BAM_FastaWriter, throws_on_empty_filename)
 {
     EXPECT_THROW(FastaWriter writer{""}, std::runtime_error);
 }
 
-TEST(FastaWriterTest, throws_on_invalid_extension)
+TEST(BAM_FastaWriter, throws_on_invalid_extension)
 {
     EXPECT_THROW(FastaWriter writer{"wrong.ext"}, std::runtime_error);
 }
 
-TEST(FastaWriterTest, can_write_fasta_sequence)
+TEST(BAM_FastaWriter, can_write_fasta_sequence)
 {
     const std::string outFasta = PbbamTestsConfig::GeneratedData_Dir + "/out.fa";
     const FastaSequence seq{"name", "GATTACA"};
@@ -49,7 +50,7 @@ TEST(FastaWriterTest, can_write_fasta_sequence)
     remove(outFasta.c_str());
 }
 
-TEST(FastaWriterTest, can_write_fasta_from_bam)
+TEST(BAM_FastaWriter, can_write_fasta_from_bam)
 {
     const std::string fn = PbbamTestsConfig::Data_Dir + "/aligned.bam";
     const std::string outFasta = PbbamTestsConfig::GeneratedData_Dir + "/out.fa";
@@ -85,7 +86,7 @@ TEST(FastaWriterTest, can_write_fasta_from_bam)
     remove(outFasta.c_str());
 }
 
-TEST(FastaWriterTest, can_write_fasta_from_strings)
+TEST(BAM_FastaWriter, can_write_fasta_from_strings)
 {
     const std::string outFasta = PbbamTestsConfig::GeneratedData_Dir + "/out.fa";
     const std::string name = "name";

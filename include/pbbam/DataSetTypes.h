@@ -1,20 +1,15 @@
-// File Description
-/// \file DataSetTypes.h
-/// \brief Defines the public DataSet component classes.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_DATASETTYPES_H
+#define PBBAM_DATASETTYPES_H
 
-#ifndef DATASETTYPES_H
-#define DATASETTYPES_H
+#include <pbbam/Config.h>
 
-#include "pbbam/Config.h"
-
+#include <iosfwd>
 #include <string>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/CollectionMetadata.h"
-#include "pbbam/DataSetXsd.h"
-#include "pbbam/internal/DataSetBaseTypes.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/CollectionMetadata.h>
+#include <pbbam/DataSetXsd.h>
+#include <pbbam/internal/DataSetBaseTypes.h>
 
 namespace PacBio {
 namespace BAM {
@@ -88,9 +83,9 @@ public:
     BioSample(const std::string& name);
     BioSample(const std::string& name, const internal::FromInputXml& fromInputXml);
 
-    const PacBio::BAM::DNABarcodes& DNABarcodes() const;
-    PacBio::BAM::DNABarcodes& DNABarcodes();
-    BioSample& DNABarcodes(const PacBio::BAM::DNABarcodes& barcodes);
+    const BAM::DNABarcodes& DNABarcodes() const;
+    BAM::DNABarcodes& DNABarcodes();
+    BioSample& DNABarcodes(const BAM::DNABarcodes& barcodes);
 
     const std::string& Name() const;
     std::string& Name();
@@ -197,7 +192,7 @@ public:
     /// \returns const reference to child element
     /// \throws std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::ExternalResources& ExternalResources() const;
+    const BAM::ExternalResources& ExternalResources() const;
 
 public:
     /// \brief Fetches the resource's ExternalResources child element.
@@ -206,7 +201,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::ExternalResources& ExternalResources();
+    BAM::ExternalResources& ExternalResources();
 
     /// \brief Sets this resource's ExternalResources child element.
     ///
@@ -215,7 +210,7 @@ public:
     /// \param[in] resources  new value for the element
     /// \returns reference to this resource object
     ///
-    ExternalResource& ExternalResources(const PacBio::BAM::ExternalResources& resources);
+    ExternalResource& ExternalResources(const BAM::ExternalResources& resources);
 
 public:
     /// \brief Converts an ExternalResource to a BamFile object
@@ -355,7 +350,7 @@ public:
     /// \returns const reference to child element
     /// \throws std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::Properties& Properties() const;
+    const BAM::Properties& Properties() const;
 
 public:
     /// \brief Fetches the filter's property list child element.
@@ -364,7 +359,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::Properties& Properties();
+    BAM::Properties& Properties();
 
     /// \brief Sets this filter's Properties child element.
     ///
@@ -373,7 +368,7 @@ public:
     /// \param[in] properties new value for the element
     /// \returns reference to this filter object
     ///
-    Filter& Properties(const PacBio::BAM::Properties& properties);
+    Filter& Properties(const BAM::Properties& properties);
 };
 
 /// \brief The Filters class represents a %Filters list element in DataSetXML.
@@ -584,7 +579,7 @@ public:
     /// \returns const reference to child element
     /// \throws std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::ParentTool& ParentTool() const;
+    const BAM::ParentTool& ParentTool() const;
 
 public:
     /// \brief Fetches the value of CreatedBy attribute.
@@ -629,7 +624,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::ParentTool& ParentTool();
+    BAM::ParentTool& ParentTool();
 
 public:
     /// \brief Sets the CreatedBy attribute.
@@ -675,7 +670,7 @@ public:
     /// \param[in] tool  new value for the element
     /// \returns reference to this dataset object
     ///
-    Provenance& ParentTool(const PacBio::BAM::ParentTool& tool);
+    Provenance& ParentTool(const BAM::ParentTool& tool);
 };
 
 /// \brief The DataSetMetadata class represents the %DataSetMetadata child
@@ -736,14 +731,14 @@ public:
     /// \returns const reference to child element
     /// \throws std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::Provenance& Provenance() const;
+    const BAM::Provenance& Provenance() const;
 
     /// \brief Fetches the BioSamples element.
     ///
     /// \returns const reference to child element
     /// \throws std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::BioSamples& BioSamples() const;
+    const BAM::BioSamples& BioSamples() const;
 
     ///
     /// \brief Fetches the CollectionMetadata.
@@ -753,7 +748,7 @@ public:
     /// \returns const reference to child element
     /// \throw std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::CollectionMetadata& CollectionMetadata() const;
+    const BAM::CollectionMetadata& CollectionMetadata() const;
 
     /// \}
 
@@ -783,7 +778,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::Provenance& Provenance();
+    BAM::Provenance& Provenance();
 
     /// \brief Fetches BioSamples element.
     ///
@@ -791,7 +786,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::BioSamples& BioSamples();
+    BAM::BioSamples& BioSamples();
 
     ///
     /// \brief Fetches the CollectionMetadata element.
@@ -802,7 +797,7 @@ public:
     ///
     /// \return const CollectionMetadata&
     ///
-    PacBio::BAM::CollectionMetadata& CollectionMetadata();
+    BAM::CollectionMetadata& CollectionMetadata();
 
     /// \}
 
@@ -832,7 +827,7 @@ public:
     ///
     /// \returns reference to this metadata object
     ///
-    DataSetMetadata& Provenance(const PacBio::BAM::Provenance& provenance);
+    DataSetMetadata& Provenance(const BAM::Provenance& provenance);
 
     /// \brief Sets the BioSamples child element.
     ///
@@ -840,7 +835,7 @@ public:
     ///
     /// \returns reference to this metadata object
     ///
-    DataSetMetadata& BioSamples(const PacBio::BAM::BioSamples& samples);
+    DataSetMetadata& BioSamples(const BAM::BioSamples& samples);
 
     /// \brief Sets the CollectionMetadata child element.
     ///
@@ -848,7 +843,7 @@ public:
     ///
     /// \returns reference to this metadata object
     ///
-    DataSetMetadata& CollectionMetadata(const PacBio::BAM::CollectionMetadata& metadata);
+    DataSetMetadata& CollectionMetadata(const BAM::CollectionMetadata& metadata);
 
     /// \}
 };
@@ -903,25 +898,25 @@ public:
     /// \returns const reference to child element
     /// \throws std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::ExternalResources& ExternalResources() const;
+    const BAM::ExternalResources& ExternalResources() const;
 
     /// \brief Fetches the dataset's Filters element.
     ///
     /// \returns const reference to child element
     ///
-    const PacBio::BAM::Filters& Filters() const;
+    const BAM::Filters& Filters() const;
 
     /// \brief Fetches the dataset's DataSetMetadata element.
     ///
     /// \returns const reference to child element
     ///
-    const PacBio::BAM::DataSetMetadata& Metadata() const;
+    const BAM::DataSetMetadata& Metadata() const;
 
     /// \brief Fetches the dataset's DataSets element.
     ///
     /// \returns const reference to child element
     ///
-    const PacBio::BAM::SubDataSets& SubDataSets() const;
+    const BAM::SubDataSets& SubDataSets() const;
 
 public:
     /// \brief Access this dataset's namespace info.
@@ -937,7 +932,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::ExternalResources& ExternalResources();
+    BAM::ExternalResources& ExternalResources();
 
     /// \brief Fetches the dataset's Filters element.
     ///
@@ -945,7 +940,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::Filters& Filters();
+    BAM::Filters& Filters();
 
     /// \brief Fetches the dataset's DataSetMetadata element.
     ///
@@ -953,7 +948,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::DataSetMetadata& Metadata();
+    BAM::DataSetMetadata& Metadata();
 
     /// \brief Fetches the dataset's DataSets element.
     ///
@@ -961,7 +956,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::SubDataSets& SubDataSets();
+    BAM::SubDataSets& SubDataSets();
 
 public:
     /// \brief Sets this dataset's ExternalResources element.
@@ -971,7 +966,7 @@ public:
     /// \param[in] resources  new value for the element
     /// \returns reference to this dataset object
     ///
-    DataSetBase& ExternalResources(const PacBio::BAM::ExternalResources& resources);
+    DataSetBase& ExternalResources(const BAM::ExternalResources& resources);
 
     /// \brief Sets this dataset's Filters element.
     ///
@@ -980,7 +975,7 @@ public:
     /// \param[in] filters  new value for the element
     /// \returns reference to this dataset object
     ///
-    DataSetBase& Filters(const PacBio::BAM::Filters& filters);
+    DataSetBase& Filters(const BAM::Filters& filters);
 
     /// \brief Sets this dataset's DataSetMetadata element.
     ///
@@ -989,7 +984,7 @@ public:
     /// \param[in] metadata  new value for the element
     /// \returns reference to this dataset object
     ///
-    DataSetBase& Metadata(const PacBio::BAM::DataSetMetadata& metadata);
+    DataSetBase& Metadata(const BAM::DataSetMetadata& metadata);
 
     /// \brief Sets this dataset's DataSets element.
     ///
@@ -998,7 +993,7 @@ public:
     /// \param[in] subdatasets  new value for the element
     /// \returns reference to this dataset object
     ///
-    DataSetBase& SubDataSets(const PacBio::BAM::SubDataSets& subdatasets);
+    DataSetBase& SubDataSets(const BAM::SubDataSets& subdatasets);
 
 public:
     /// \brief Access this dataset's namespace info.
@@ -1020,7 +1015,7 @@ public:
               DataSetPathMode pathMode = DataSetPathMode::ABSOLUTE);
 
     /// \brief Saves dataset XML to output stream, e.g. std::cout,
-    ///        std::stringstream.
+    ///        std::ostringstream.
     ///
     /// \param[out] out         destination for XML contents
     /// \param[in]  pathMode    print absolute paths or allow relative
@@ -1261,4 +1256,4 @@ XmlElementType ElementTypeFromName(const std::string& name);
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // DATASETTYPES_H
+#endif  // PBBAM_DATASETTYPES_H

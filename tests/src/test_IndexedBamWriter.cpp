@@ -1,20 +1,24 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
+#include <pbbam/IndexedBamWriter.h>
 
-#include "PbbamTestData.h"
+#include <string>
+#include <vector>
+
+#include <gtest/gtest.h>
 
 #include <pbbam/BamFile.h>
 #include <pbbam/BamReader.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/EntireFileQuery.h>
-#include <pbbam/IndexedBamWriter.h>
 #include <pbbam/PbiBuilder.h>
 #include <pbbam/PbiRawData.h>
 
+#include "PbbamTestData.h"
+
 // clang-format off
 
-TEST(IndexedBamWriter, WritesValidIndex)
+TEST(BAM_IndexedBamWriter, writes_valid_bam_and_pbi_on_success)
 {
     using namespace PacBio::BAM;
 
@@ -89,7 +93,7 @@ TEST(IndexedBamWriter, WritesValidIndex)
     }
 }
 
-TEST(IndexedBamWriter, HandlesVeryLongReads)
+TEST(BAM_IndexedBamWriter, can_handle_long_reads_spanning_bgzf_blocks)
 {
     using namespace PacBio::BAM;
 

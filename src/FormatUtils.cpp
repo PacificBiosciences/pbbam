@@ -1,8 +1,6 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/FormatUtils.h"
+#include <pbbam/FormatUtils.h>
 
 #include <algorithm>
 #include <sstream>
@@ -10,7 +8,9 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "MemoryUtils.h"
+#include <pbbam/Deleters.h>
+
+#include "ErrnoReason.h"
 
 namespace PacBio {
 namespace BAM {
@@ -40,11 +40,12 @@ HtslibCompression FormatUtils::CompressionType(BGZF* bgzf)
 
 HtslibCompression FormatUtils::CompressionType(const std::string& fn)
 {
-    std::unique_ptr<BGZF, HtslibBgzfDeleter> bgzf(bgzf_open(fn.c_str(), "rb"));
+    const std::unique_ptr<BGZF, HtslibBgzfDeleter> bgzf(bgzf_open(fn.c_str(), "rb"));
     if (bgzf == nullptr) {
         std::ostringstream s;
         s << "[pbbam] bgzip utility ERROR: could not open file to determine compression level:\n"
           << "  file: " << fn;
+        MaybePrintErrnoReason(s);
         throw std::runtime_error{s.str()};
     }
     return CompressionType(bgzf.get());

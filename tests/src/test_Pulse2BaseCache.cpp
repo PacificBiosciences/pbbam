@@ -1,10 +1,10 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
-
 #include <pbbam/../../src/Pulse2BaseCache.h>
 
-TEST(Pulse2BaseCacheTest, CountsDetectedInConstructor)
+#include <gtest/gtest.h>
+
+TEST(BAM_Pulse2BaseCache, can_determine_pulse_counts)
 {
     const std::string pulseCalls{"ACccTTAGtTCAtG"};
     const std::string trimmedPC{"ACTTAGTCAG"};
@@ -14,7 +14,7 @@ TEST(Pulse2BaseCacheTest, CountsDetectedInConstructor)
     EXPECT_EQ(trimmedPC.size(), cache.NumBases());
 }
 
-TEST(Pulse2BaseCacheTest, RemovesSquashedPulsesFromString)
+TEST(BAM_Pulse2BaseCache, can_remove_squashed_pulses_from_string)
 {
     const std::string pulseCalls{"ACccTTAGtTCAtG"};
     const std::string trimmedPC{"ACTTAGTCAG"};
@@ -26,7 +26,7 @@ TEST(Pulse2BaseCacheTest, RemovesSquashedPulsesFromString)
     EXPECT_EQ(trimmedAlt, cache.RemoveSquashedPulses(altLabel));
 }
 
-TEST(Pulse2BaseCacheTest, RemovesSquashedPulsesFromVector)
+TEST(BAM_Pulse2BaseCache, can_remove_squashed_pulses_from_integer_vector)
 {
     const std::string pulseCalls{"ACccTTAGtTCAtG"};
     const std::vector<uint16_t> pkMean{5, 4, 2, 2, 3, 8, 8, 8, 4, 7, 7, 7, 3, 4};

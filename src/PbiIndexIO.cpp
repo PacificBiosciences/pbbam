@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "PbiIndexIO.h"
@@ -16,12 +14,13 @@
 #include <pbcopper/utility/MoveAppend.h>
 #include <boost/algorithm/string.hpp>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/EntireFileQuery.h"
-#include "pbbam/PbiBuilder.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/Deleters.h>
+#include <pbbam/EntireFileQuery.h>
+#include <pbbam/PbiBuilder.h>
 
-#include "MemoryUtils.h"
+#include "ErrnoReason.h"
 
 namespace PacBio {
 namespace BAM {
@@ -93,6 +92,7 @@ void PbiIndexIO::Load(PbiRawData& rawData, const std::string& filename)
         std::ostringstream msg;
         msg << "[pbbam] PBI index I/O ERROR: could not open file for reading:\n"
             << "  file: " << filename;
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
 
@@ -304,6 +304,7 @@ void PbiIndexIO::Save(const PbiRawData& index, const std::string& filename)
         std::ostringstream msg;
         msg << "[pbbam] PBI index I/O ERROR: could not open file for writing:\n"
             << "  file: " << filename;
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
 

@@ -1,9 +1,3 @@
-// File Description
-/// \file VirtualZmwReader.cpp
-/// \brief Implements the VirtualZmwReader class.
-//
-// Author: Armin Töpfer
-
 #include "PbbamInternalConfig.h"
 
 #include "VirtualZmwReader.h"
@@ -11,7 +5,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "pbbam/ReadGroupInfo.h"
+#include <pbbam/ReadGroupInfo.h>
 
 namespace PacBio {
 namespace BAM {
@@ -81,13 +75,11 @@ std::vector<BamRecord> VirtualZmwReader::NextRaw()
 
     // Current hole number, the smallest of scraps and primary.
     // It can be that the next ZMW is scrap only.
-    int currentHoleNumber;
-    if (primaryIt_ == primaryQuery_->end())
-        currentHoleNumber = (*scrapsIt_).HoleNumber();
-    else if (scrapsIt_ == scrapsQuery_->end())
-        currentHoleNumber = (*primaryIt_).HoleNumber();
-    else
-        currentHoleNumber = std::min((*primaryIt_).HoleNumber(), (*scrapsIt_).HoleNumber());
+    const int currentHoleNumber = [&]() {
+        if (primaryIt_ == primaryQuery_->end()) return (*scrapsIt_).HoleNumber();
+        if (scrapsIt_ == scrapsQuery_->end()) return (*primaryIt_).HoleNumber();
+        return std::min((*primaryIt_).HoleNumber(), (*scrapsIt_).HoleNumber());
+    }();
 
     // collect subreads or hqregions
     while (primaryIt_ != primaryQuery_->end() && currentHoleNumber == (*primaryIt_).HoleNumber()) {

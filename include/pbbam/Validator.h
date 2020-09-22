@@ -1,19 +1,13 @@
-// File Description
-/// \file Validator.h
-/// \brief Defines the Validator class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_VALIDATOR_H
+#define PBBAM_VALIDATOR_H
 
-#ifndef VALIDATOR_H
-#define VALIDATOR_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstddef>
 
 #include <limits>
 
-#include "pbbam/exception/ValidationException.h"
+#include <pbbam/exception/ValidationException.h>
 
 namespace PacBio {
 namespace BAM {
@@ -153,4 +147,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // VALIDATOR_H
+#endif  // PBBAM_VALIDATOR_H

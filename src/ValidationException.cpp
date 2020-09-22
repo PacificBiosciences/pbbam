@@ -1,12 +1,8 @@
-// File Description
-/// \file ValidationException.cpp
-/// \brief Implements the ValidationException class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/exception/ValidationException.h"
+#include <pbbam/exception/ValidationException.h>
+
+#include <sstream>
 
 namespace PacBio {
 namespace BAM {

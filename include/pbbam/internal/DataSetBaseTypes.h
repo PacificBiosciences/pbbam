@@ -1,11 +1,9 @@
-// Author: Derek Barnett
+#ifndef PBBAM_DATASETBASETYPES_H
+#define PBBAM_DATASETBASETYPES_H
 
-#ifndef DATASETBASETYPES_H
-#define DATASETBASETYPES_H
+#include <pbbam/Config.h>
 
-#include "pbbam/Config.h"
-
-#include "pbbam/internal/DataSetElement.h"
+#include <pbbam/internal/DataSetElement.h>
 
 #include <string>
 
@@ -146,4 +144,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // DATASETBASETYPES_H
+#endif  // PBBAM_DATASETBASETYPES_H

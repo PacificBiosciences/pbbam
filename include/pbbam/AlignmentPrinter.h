@@ -1,25 +1,18 @@
-// File Description
-/// \file AlignmentPrinter.h
-/// \brief Defines the AlignmentPrinter class.
-//
-// Author: Armin Töpfer
+#ifndef PBBAM_ALIGNMENTPRINTER_H
+#define PBBAM_ALIGNMENTPRINTER_H
 
-#ifndef ALIGNMENTPRINTER_H
-#define ALIGNMENTPRINTER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
 
-#include "pbbam/BamRecord.h"
-#include "pbbam/IndexedFastaReader.h"
-#include "pbbam/Orientation.h"
+#include <pbcopper/data/Orientation.h>
+
+#include <pbbam/BamRecord.h>
+#include <pbbam/IndexedFastaReader.h>
 
 namespace PacBio {
 namespace BAM {
-
-class BamRecord;
 
 /// \brief The AlignmentPrinter class "pretty-prints" an alignment with respect
 ///        to its associated reference sequence.
@@ -57,7 +50,7 @@ public:
     ///          information
     ///
     std::string Print(const BamRecord& record,
-                      const Orientation orientation = Orientation::GENOMIC);
+                      const Data::Orientation orientation = Data::Orientation::GENOMIC);
 
     /// \}
 
@@ -68,4 +61,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // ALIGNMENTPRINTER_H
+#endif  // PBBAM_ALIGNMENTPRINTER_H

@@ -1,15 +1,16 @@
 // Author: Derek Barnett
 
-#include <iostream>
+#include <pbbam/BamHeader.h>
+
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
+
 #include <htslib/sam.h>
 
 #include <pbbam/BamFile.h>
-#include <pbbam/BamHeader.h>
 #include <pbbam/DataSet.h>
 
 #include "PbbamTestData.h"
@@ -21,7 +22,7 @@ namespace BamHeaderTests {
 
 struct BamHdrDeleter
 {
-    void operator()(bam_hdr_t* hdr) const
+    void operator()(bam_hdr_t* hdr) const noexcept
     {
         if (hdr != nullptr) {
             bam_hdr_destroy(hdr);
@@ -46,7 +47,7 @@ const std::string MergedConstructorText{
 
 }  // namespace BamHeaderTests
 
-TEST(BamHeaderTest, DefaultConstruction)
+TEST(BAM_BamHeader, default_is_empty)
 {
     BamHeader header;
     EXPECT_TRUE(header.Version().empty());
@@ -56,6 +57,8 @@ TEST(BamHeaderTest, DefaultConstruction)
     EXPECT_TRUE(header.Programs().empty());
     EXPECT_TRUE(header.Comments().empty());
 
+    EXPECT_TRUE(header.Empty());
+
     EXPECT_THROW(header.Program("foo"), std::exception);
     EXPECT_THROW(header.ReadGroup("foo"), std::exception);
     EXPECT_THROW(header.SequenceId("foo"), std::exception);
@@ -63,7 +66,7 @@ TEST(BamHeaderTest, DefaultConstruction)
     EXPECT_THROW(header.SequenceName(42), std::exception);
 }
 
-TEST(BamHeaderTest, DecodeTest)
+TEST(BAM_BamHeader, can_decode_from_text)
 {
     const std::string text{
         "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
@@ -108,7 +111,7 @@ TEST(BamHeaderTest, DecodeTest)
     EXPECT_EQ("citation needed", header.Comments().at(1));
 }
 
-TEST(BamHeaderTest, VersionCheckOk)
+TEST(BAM_BamHeader, validates_pacbio_bam_version)
 {
     auto expectFail = [](const std::string& label, const std::string& text) {
         SCOPED_TRACE(label);
@@ -124,7 +127,7 @@ TEST(BamHeaderTest, VersionCheckOk)
     EXPECT_NO_THROW(BamHeader{"@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"});
 }
 
-TEST(BamHeaderTest, EncodeTest)
+TEST(BAM_BamHeader, can_encode_to_text)
 {
     ReadGroupInfo rg1{"rg1"};
     rg1.Sample("control");
@@ -168,7 +171,7 @@ TEST(BamHeaderTest, EncodeTest)
     EXPECT_EQ(expectedText, header.ToSam());
 }
 
-TEST(BamHeaderTest, ConvertToRawDataOk)
+TEST(BAM_BamHeader, can_encode_to_raw_bam_binary)
 {
     ReadGroupInfo rg1{"rg1"};
     rg1.Sample("control");
@@ -213,7 +216,6 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
     std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()),
                                        BamHeaderTests::BamHdrDeleter());
     rawData->ignore_sam_err = 0;
-    rawData->cigar_tab = nullptr;
     rawData->l_text = text.size();
     rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
     memcpy(rawData->text, text.c_str(), rawData->l_text);
@@ -222,7 +224,7 @@ TEST(BamHeaderTest, ConvertToRawDataOk)
     EXPECT_EQ(expectedText, rawText);
 }
 
-TEST(BamHeaderTest, ExtractFromRawDataOk)
+TEST(BAM_BamHeader, can_decode_from_raw_bam_binary)
 {
     ReadGroupInfo rg1{"rg1"};
     rg1.Sample("control");
@@ -267,7 +269,6 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
     std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()),
                                        BamHeaderTests::BamHdrDeleter());
     rawData->ignore_sam_err = 0;
-    rawData->cigar_tab = nullptr;
     rawData->l_text = text.size();
     rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
     memcpy(rawData->text, text.c_str(), rawData->l_text);
@@ -280,7 +281,7 @@ TEST(BamHeaderTest, ExtractFromRawDataOk)
     EXPECT_EQ(expectedText, newHeader.ToSam());
 }
 
-TEST(BamHeaderTest, MergeOk)
+TEST(BAM_BamHeader, can_be_merged)
 {
     const std::string hdrText1{
         "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
@@ -349,7 +350,7 @@ TEST(BamHeaderTest, MergeOk)
     }
 }
 
-TEST(BamHeaderTest, MergeHandlesDuplicateReadGroups)
+TEST(BAM_BamHeader, merged_header_contains_unique_read_groups)
 {
     const std::string hdrText{
         "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
@@ -367,7 +368,7 @@ TEST(BamHeaderTest, MergeHandlesDuplicateReadGroups)
     EXPECT_EQ(hdrText, merged.ToSam());
 }
 
-TEST(BamHeaderTest, MergeCompatibilityOk)
+TEST(BAM_BamHeader, validates_compatible_merges)
 {
     {  // different @HD:VN - this IS allowed (as of SAT-465, pbbam v0.7.2)
         const BamHeader header1{"@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"};
@@ -402,7 +403,7 @@ TEST(BamHeaderTest, MergeCompatibilityOk)
     }
 }
 
-TEST(BamHeaderTest, CanConstructMergedHeaderFromBamFilenames)
+TEST(BAM_BamHeader, can_merge_from_bam_files)
 {
     const std::vector<std::string> bamFilenames{
         PbbamTestsConfig::Data_Dir + "/polymerase/production.subreads.bam",
@@ -412,7 +413,7 @@ TEST(BamHeaderTest, CanConstructMergedHeaderFromBamFilenames)
     EXPECT_EQ(BamHeaderTests::MergedConstructorText, header.ToSam());
 }
 
-TEST(BamHeaderTest, CanConstructMergedHeaderFromDataset)
+TEST(BAM_BamHeader, can_merge_from_dataset)
 {
     const DataSet dataset{PbbamTestsConfig::Data_Dir +
                           "/polymerase/consolidate.subread.dataset.xml"};
@@ -420,7 +421,7 @@ TEST(BamHeaderTest, CanConstructMergedHeaderFromDataset)
     EXPECT_EQ(BamHeaderTests::MergedConstructorText, header.ToSam());
 }
 
-TEST(BamHeaderTest, CanConstructMergedHeaderFromInputHeaders)
+TEST(BAM_BamHeader, can_merge_from_header_objects)
 {
     const BamFile subreadsBam{PbbamTestsConfig::Data_Dir + "/polymerase/production.subreads.bam"};
     const BamFile scrapsBam{PbbamTestsConfig::Data_Dir + "/polymerase/production.scraps.bam"};
@@ -428,4 +429,23 @@ TEST(BamHeaderTest, CanConstructMergedHeaderFromInputHeaders)
 
     const BamHeader header{headers};
     EXPECT_EQ(BamHeaderTests::MergedConstructorText, header.ToSam());
+}
+
+TEST(BAM_BamHeader, ensures_unique_sq_and_rg_entries)
+{
+    const std::string originalText{
+        "@HD\tVN:1.1\tSO:queryname\tpb:3.0.1\n"
+        "@SQ\tSN:chr1\tLN:2038\tSP:chocobo\n"
+        "@SQ\tSN:chr2\tLN:3042\tSP:chocobo\n"
+        "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\tPM:SEQUEL\n"
+        "@RG\tID:rg2\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:condition1\tPM:SEQUEL\n"
+        "@RG\tID:rg3\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:condition1\tPM:SEQUEL\n"
+        "@PG\tID:_foo_\tPN:ide\n"
+        "@CO\tipsum and so on\n"
+        "@CO\tcitation needed\n"};
+
+    BamHeader header{originalText};
+    header.AddSequence(SequenceInfo{"chr1"});
+    header.AddReadGroup(ReadGroupInfo{"rg1"});
+    EXPECT_EQ(originalText, header.ToSam());
 }

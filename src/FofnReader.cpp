@@ -1,10 +1,8 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "FofnReader.h"
 
-#include <iostream>
+#include <istream>
 
 namespace PacBio {
 namespace BAM {

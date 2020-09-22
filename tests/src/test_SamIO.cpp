@@ -1,22 +1,62 @@
 // Author: Derek Barnett
 
+#include <pbbam/SamReader.h>
+#include <pbbam/SamWriter.h>
+
 #include <cstdint>
+
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
 #include <pbbam/BamFile.h>
+#include <pbbam/BamReader.h>
 #include <pbbam/EntireFileQuery.h>
-#include <pbbam/SamWriter.h>
 #include <pbbam/StringUtilities.h>
+
 #include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-TEST(SamWriterTest, HeaderOk)
+TEST(BAM_SamReader, can_read_basic_sam)
+{
+    const std::string bamFilename{PbbamTestsConfig::Data_Dir + "/aligned.bam"};
+    const std::string samFilename{PbbamTestsConfig::Data_Dir + "/aligned.sam"};
+
+    std::vector<std::string> bamRecordNames;
+    std::vector<std::string> samRecordNames;
+
+    BamReader bamInput{bamFilename};
+    for (const auto& b : bamInput)
+        bamRecordNames.push_back(b.FullName());
+
+    SamReader samInput{samFilename};
+    for (const auto& b : samInput) {
+        std::cout << b.FullName() << '\n';
+        samRecordNames.push_back(b.FullName());
+    }
+
+    EXPECT_EQ(bamRecordNames, samRecordNames);
+}
+
+TEST(BAM_SamReader, handles_zero_byte_file)
+{
+    try {
+        SamReader reader{PbbamTestsConfig::Data_Dir + "/zero_bytes.sam"};
+        ASSERT_FALSE("should not get here");
+    } catch (const std::exception& e) {
+        const std::string msg{e.what()};
+        EXPECT_TRUE(msg.find("[pbbam] SAM reader ERROR: could not read from empty input:") !=
+                    std::string::npos);
+    }
+}
+
+TEST(BAM_SamWriter, can_roundtrip_header)
 {
     // setup header
     const std::string hdrText{
@@ -44,7 +84,7 @@ TEST(SamWriterTest, HeaderOk)
     remove(generatedFn.c_str());
 }
 
-TEST(SamWriterTest, SingleRecordOk)
+TEST(BAM_SamWriter, can_roundtrip_single_record)
 {
 
     // setup header
@@ -111,7 +151,7 @@ TEST(SamWriterTest, SingleRecordOk)
     remove(generatedFn.c_str());
 }
 
-TEST(SamWriterTest, LongCigarFormatting)
+TEST(BAM_SamWriter, can_roundtrip_long_cigar)
 {
     const std::string longCigarFn = PacBio::BAM::PbbamTestsConfig::Data_Dir + "/long-cigar-1.7.bam";
     const std::string samFn =

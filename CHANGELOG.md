@@ -5,6 +5,59 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [1.5.0] - 2020-08-05
+
+### Added
+ - FastaCache::Check methods for validating input FASTA
+ - Detection of empty SAM/BAM input, as distinct from "could not read header"
+   errors).
+ - Full htslib v1.10 compatibility
+
+### Fixed
+ - Updating BAM record name no longer discards CCS strand suffixes.
+
+### Changed
+ - IndexedFastaReader no longer implicitly creates FASTA index (*.fai).
+
+### Removed
+ - 'HtslibVerbosity' setting in pbbam config. htslib's own logging to stderr is
+   simply disabled at startup by default. In the rare case that client code needs
+   to override this behavior, use 'hts_set_log_level()` directly.
+ - Unused BamFile::FirstAlignmentOffset() method
+
+## [1.4.0] - 2020-05-22
+
+### Added
+ - SamReader
+
+### Changed
+ - Data::SNR (from pbcopper) values are now float, not double.
+
+### Removed
+ - BamRecordBuilder
+
+## [1.3.0] - 2020-04-24
+
+### Added
+ - FaiIndex::Create(), instead of needing samtools externally.
+
+### Changed
+ - Deprecated FrameEncodingType (not yet removed). Use FrameCodec instead.
+
+## [1.2.0] - 2020-04-10
+
+### Added
+ - Support for older Linux kernels (<3.17) with our Dataset UUIDs.
+
+### Fixed
+ - BgzipWriter: default compression level.
+
+## [1.1.0] - 2020-03-12
+
+### Added
+ - Support for barcode-labeled read groups.
+ - "Run metadata" handling for dataset XML.
+
 ## [1.0.7] - 2019-10-10
 
 ### Added

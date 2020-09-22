@@ -1,14 +1,11 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/BamWriter.h"
+#include <pbbam/BamWriter.h>
 
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <thread>
@@ -19,10 +16,12 @@
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/Validator.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/Deleters.h>
+#include <pbbam/Validator.h>
 
 #include "Autovalidate.h"
+#include "ErrnoReason.h"
 #include "FileProducer.h"
 #include "MemoryUtils.h"
 
@@ -36,6 +35,7 @@ struct BamWriterException : public std::exception
         std::ostringstream s;
         s << "[pbbam] BAM writer ERROR: " << reason << ":\n"
           << "  file: " << filename;
+        MaybePrintErrnoReason(s);
         msg_ = s.str();
     }
 
@@ -62,10 +62,10 @@ public:
         if (useTempFile) fileProducer_ = std::make_unique<FileProducer>(filename);
 
         // open file
-        const auto usingFilename = (fileProducer_ ? fileProducer_->TempFilename() : filename);
+        outputFilename_ = (fileProducer_ ? fileProducer_->TempFilename() : filename);
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
-        file_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
-        if (!file_) throw BamWriterException{usingFilename, "could not open file for writing"};
+        file_.reset(sam_open(outputFilename_.c_str(), mode.c_str()));
+        if (!file_) throw BamWriterException{outputFilename_, "could not open file for writing"};
 
         // if no explicit thread count given, attempt built-in check
         size_t actualNumThreads = numThreads;
@@ -81,7 +81,7 @@ public:
 
         // write header
         const auto ret = sam_hdr_write(file_.get(), header_.get());
-        if (ret != 0) throw BamWriterException{usingFilename, "could not write header"};
+        if (ret != 0) throw BamWriterException{outputFilename_, "could not write header"};
     }
 
     void Write(const BamRecord& record)
@@ -90,7 +90,7 @@ public:
         Validator::Validate(record);
 #endif
 
-        const auto rawRecord = BamRecordMemory::GetRawData(record);
+        const auto& rawRecord = BamRecordMemory::GetRawData(record);
 
         // (probably) store bins
         // min_shift=14 & n_lvls=5 are BAM "magic numbers"
@@ -100,8 +100,9 @@ public:
 
         // write record to file
         const auto ret = sam_write1(file_.get(), header_.get(), rawRecord.get());
-        if (ret <= 0)
-            throw BamWriterException{fileProducer_->TempFilename(), "could not write record"};
+        if (ret <= 0) {
+            throw BamWriterException{outputFilename_, "could not write record"};
+        }
     }
 
     void Write(const BamRecord& record, int64_t* vOffset)
@@ -129,6 +130,7 @@ public:
     std::unique_ptr<samFile, HtslibFileDeleter> file_;
     std::shared_ptr<bam_hdr_t> header_;
     std::unique_ptr<FileProducer> fileProducer_;
+    std::string outputFilename_;
 };
 
 BamWriter::BamWriter(const std::string& filename, const BamHeader& header,
@@ -168,9 +170,9 @@ BamWriter::~BamWriter()
 void BamWriter::TryFlush()
 {
     const auto ret = bgzf_flush(d_->file_.get()->fp.bgzf);
-    if (ret != 0)
-        throw BamWriterException{d_->fileProducer_->TempFilename(),
-                                 "could not flush buffer contents"};
+    if (ret != 0) {
+        throw BamWriterException{d_->outputFilename_, "could not flush buffer contents"};
+    }
 }
 
 void BamWriter::Write(const BamRecord& record) { d_->Write(record); }

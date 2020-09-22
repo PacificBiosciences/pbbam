@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "MemoryUtils.h"
@@ -8,6 +6,8 @@
 #include <cstring>
 
 #include <string>
+
+#include <pbbam/Deleters.h>
 
 namespace PacBio {
 namespace BAM {
@@ -30,10 +30,15 @@ std::shared_ptr<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& heade
     std::shared_ptr<bam_hdr_t> rawData(sam_hdr_parse(text.size(), text.c_str()),
                                        HtslibHeaderDeleter());
     rawData->ignore_sam_err = 0;
-    rawData->cigar_tab = nullptr;
     rawData->l_text = text.size();
     rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
     memcpy(rawData->text, text.c_str(), rawData->l_text);
+
+// HTS_VERSION only added >= v1.10, and this step is only necessary before then
+#ifndef HTS_VERSION
+    rawData->cigar_tab = nullptr;
+#endif
+
     return rawData;
 }
 

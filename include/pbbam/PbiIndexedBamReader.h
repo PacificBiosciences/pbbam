@@ -1,20 +1,14 @@
-// File Description
-/// \file PbiIndexedBamReader.h
-/// \brief Defines the PbiIndexedBamReader class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_PBIINDEXEDBAMREADER_H
+#define PBBAM_PBIINDEXEDBAMREADER_H
 
-#ifndef PBIINDEXEDBAMREADER_H
-#define PBIINDEXEDBAMREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/BamReader.h"
-#include "pbbam/PbiBasicTypes.h"
-#include "pbbam/PbiFilter.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/BamReader.h>
+#include <pbbam/PbiBasicTypes.h>
+#include <pbbam/PbiFilter.h>
 
 namespace PacBio {
 namespace BAM {
@@ -111,7 +105,7 @@ public:
     /// \}
 
 protected:
-    int ReadRawData(BGZF* bgzf, bam1_t* b) override;
+    int ReadRawData(samFile* file, bam1_t* b) override;
 
 private:
     class PbiIndexedBamReaderPrivate;
@@ -121,4 +115,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // PBIINDEXEDBAMREADER_H
+#endif  // PBBAM_PBIINDEXEDBAMREADER_H

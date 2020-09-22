@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/PbiFilterQuery.h>
+
 #include <cstddef>
 #include <cstdint>
 
@@ -11,14 +13,12 @@
 
 #include <gtest/gtest.h>
 
-#include <pbbam/PbiFilterQuery.h>
-
 #include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-TEST(PbiFilterQueryTest, QueryOk)
+TEST(BAM_PbiFilterQuery, can_perform_normal_filtered_queries)
 {
     const auto bamFile = BamFile{PbbamTestsConfig::Data_Dir + std::string{"/group/test2.bam"}};
 
@@ -97,7 +97,7 @@ TEST(PbiFilterQueryTest, QueryOk)
 }
 
 // clang-format off
-TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
+TEST(BAM_PbiFilterQuery, can_iterate_zmw_range_from_dataset_input)
 {
     const std::string expectedMovieName{"m64004_190414_193017"};
 
@@ -186,7 +186,7 @@ TEST(PbiFilterQueryTest, ZmwRangeFromDatasetOk)
 }
 // clang-format on
 
-TEST(PbiFilterQueryTest, MissingPbiShouldThrow)
+TEST(BAM_PbiFilterQuery, throws_on_missing_pbi_file)
 {
     const PbiFilter filter{PbiZmwFilter{31883}};
     const std::string phi29Bam = PbbamTestsConfig::GeneratedData_Dir + "/missing_pbi.bam";
@@ -214,7 +214,7 @@ TEST(PbiFilterQueryTest, MissingPbiShouldThrow)
     }
 }
 
-TEST(PbiFilterQueryTest, QNameWhitelistFile)
+TEST(BAM_PbiFilterQuery, can_filter_using_qname_whitelist_file)
 {
     const DataSet ds(PbbamTestsConfig::Data_Dir + "/polymerase/qnameFiltered.subreads.dataset.xml");
     const PbiFilter filter = PbiFilter::FromDataSet(ds);
@@ -223,7 +223,7 @@ TEST(PbiFilterQueryTest, QNameWhitelistFile)
     EXPECT_EQ(3, std::distance(query.begin(), query.end()));
 }
 
-TEST(PbiFilterQueryTest, EmptyFiles)
+TEST(BAM_PbiFilterQuery, returns_no_records_from_empty_input)
 {
     const BamFile file{PbbamTestsConfig::Data_Dir + "/empty.bam"};
     PbiFilterQuery query{PbiFilter{}, file};
@@ -231,7 +231,7 @@ TEST(PbiFilterQueryTest, EmptyFiles)
     EXPECT_EQ(0, std::distance(query.begin(), query.end()));
 }
 
-TEST(PbiFilterQueryTest, BarcodeData)
+TEST(BAM_PbiFilterQuery, can_filter_on_barcoded_data)
 {
     const BamFile file{PbbamTestsConfig::Data_Dir + "/phi29.bam"};
 
@@ -272,7 +272,7 @@ TEST(PbiFilterQueryTest, BarcodeData)
     }
 }
 
-TEST(PbiFilterQueryTest, BarcodeQualityFromXml)
+TEST(BAM_PbiFilterQuery, can_filter_barcodes_from_xml)
 {
 
     const std::string xml_all = R"_XML_(
@@ -375,7 +375,7 @@ TEST(PbiFilterQueryTest, BarcodeQualityFromXml)
     }
 }
 
-TEST(PbiFilterQueryTest, ReadGroupFilterFromXml)
+TEST(BAM_PbiFilterQuery, can_filter_read_groups_from_xml)
 {
     const BamFile file{PbbamTestsConfig::Data_Dir + "/phi29.bam"};
     const std::string xmlHeader = R"_XML_(
@@ -441,7 +441,7 @@ TEST(PbiFilterQueryTest, ReadGroupFilterFromXml)
     }
 }
 
-TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
+TEST(BAM_PbiFilterQuery, can_filter_zmws_from_xml)
 {
     const BamFile file{PbbamTestsConfig::Data_Dir + "/phi29.bam"};
     const std::string xmlHeader = R"_XML_(
@@ -536,7 +536,7 @@ TEST(PbiFilterQueryTest, ZmwWhitelistFromXml)
     }
 }
 
-TEST(PbiFilterQueryTest, TranscriptRecords)
+TEST(BAM_PbiFilterQuery, can_handle_transcript_records)
 {
     const std::string transcriptFn = PbbamTestsConfig::Data_Dir + "/transcript.subreads.bam";
 
@@ -633,7 +633,7 @@ TEST(PbiFilterQueryTest, TranscriptRecords)
     }
 }
 
-TEST(PbiFilterQueryTest, BarcodedReadGroupId)
+TEST(BAM_PbiFilterQuery, can_filter_on_barcoded_read_group_id)
 {
     const BamFile bamFile{PbbamTestsConfig::Data_Dir + std::string{"/barcoded_read_groups.bam"}};
 
@@ -666,7 +666,7 @@ TEST(PbiFilterQueryTest, BarcodedReadGroupId)
 }
 
 // clang-format off
-TEST(PbiFilterQueryTest, CanReusePbiIndexCache)
+TEST(BAM_PbiFilterQuery, can_reuse_pbi_index_cache)
 {
     const DataSet ds(PbbamTestsConfig::Data_Dir + "/chunking/chunking.subreadset.xml");
     const auto indexCache = MakePbiIndexCache(ds);
@@ -698,7 +698,7 @@ TEST(PbiFilterQueryTest, CanReusePbiIndexCache)
 }
 // clang-format on
 
-TEST(PbiFilterQueryTest, ConsistentWhitelistAndBlacklist)
+TEST(BAM_PbiFilterQuery, can_filter_on_qname_whitelist_and_blacklist)
 {
     const std::string fn{PbbamTestsConfig::Data_Dir + "/dataset/qname_filter.bam"};
 
@@ -768,7 +768,7 @@ TEST(PbiFilterQueryTest, ConsistentWhitelistAndBlacklist)
     }
 }
 
-TEST(PbiFilterTest, MovieNameFilterWorksWithBarcodedReadGroups)
+TEST(BAM_PbiFilter, can_filter_by_movie_name_with_barcoded_read_group_ids)
 {
     const auto inputXml = PbbamTestsConfig::Data_Dir + "/barcoded_movie_filter/barcoded.xml";
     const DataSet dataset{inputXml};

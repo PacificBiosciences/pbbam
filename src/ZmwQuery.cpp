@@ -1,17 +1,11 @@
-// File Description
-/// \file ZmwQuery.cpp
-/// \brief Implements the ZmwQuery class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/ZmwQuery.h"
+#include <pbbam/ZmwQuery.h>
 
 #include <cstdint>
 
-#include "pbbam/CompositeBamReader.h"
-#include "pbbam/PbiFilterTypes.h"
+#include <pbbam/CompositeBamReader.h>
+#include <pbbam/PbiFilterTypes.h>
 
 namespace PacBio {
 namespace BAM {

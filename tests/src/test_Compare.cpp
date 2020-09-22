@@ -1,14 +1,15 @@
 // Author: Derek Barnett
 
-#include <algorithm>
+#include <pbbam/Compare.h>
+
 #include <cstdint>
+
+#include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
-
-#include <pbbam/Compare.h>
 
 // clang-format off
 
@@ -17,7 +18,7 @@ using namespace PacBio::BAM;
 
 namespace CompareTests {
 
-static inline
+static
 BamRecord makeRecordWithTag(const std::string& tagName,
                             const Tag& tag)
 {
@@ -91,7 +92,7 @@ std::vector<BamRecord> makeMappedRecords()
 
 } // namespace CompareTests
 
-TEST(CompareTest, TypeToNameOk)
+TEST(BAM_Compare, can_convert_type_to_name)
 {
     EXPECT_EQ(std::string{"Compare::EQUAL"},              Compare::TypeToName(Compare::EQUAL));
     EXPECT_EQ(std::string{"Compare::NOT_EQUAL"},          Compare::TypeToName(Compare::NOT_EQUAL));
@@ -103,7 +104,7 @@ TEST(CompareTest, TypeToNameOk)
     EXPECT_EQ(std::string{"Compare::NOT_CONTAINS"},       Compare::TypeToName(Compare::NOT_CONTAINS));
 }
 
-TEST(CompareTest, TypeToOperatorOk)
+TEST(BAM_Compare, can_convert_type_to_operator)
 {
     { // normal
         EXPECT_EQ(Compare::TypeToOperator(Compare::EQUAL),              std::string{"=="});
@@ -128,7 +129,7 @@ TEST(CompareTest, TypeToOperatorOk)
     }
 }
 
-TEST(CompareTest, FromOperatorOk)
+TEST(BAM_Compare, can_be_created_from_operator)
 {
     EXPECT_EQ(Compare::EQUAL,              Compare::TypeFromOperator("=="));
     EXPECT_EQ(Compare::EQUAL,              Compare::TypeFromOperator("="));
@@ -155,7 +156,7 @@ TEST(CompareTest, FromOperatorOk)
     EXPECT_THROW(Compare::TypeFromOperator("invalid"), std::runtime_error);
 }
 
-TEST(CompareTest, AlignedEndOk)
+TEST(BAM_Compare, can_compare_bam_record_aligned_end)
 {
     BamRecord r1;
     r1.Map(0, 290, Strand::FORWARD, Cigar{"10="}, 255);
@@ -178,7 +179,7 @@ TEST(CompareTest, AlignedEndOk)
     EXPECT_EQ(r3.AlignedEnd(), records.at(3).AlignedEnd());
 }
 
-TEST(CompareTest, AlignedStartOk)
+TEST(BAM_Compare, can_compare_bam_record_aligned_start)
 {
     BamRecord r1;
     r1.Map(0, 300, Strand::FORWARD, Cigar{"10="}, 255);
@@ -201,7 +202,7 @@ TEST(CompareTest, AlignedStartOk)
     EXPECT_EQ(r3.AlignedStart(), records.at(3).AlignedStart());
 }
 
-TEST(CompareTest, AlignedStrandOk)
+TEST(BAM_Compare, can_compare_bam_record_aligned_strand)
 {
     BamRecord r1; r1.Impl().SetReverseStrand(true);
     BamRecord r2; r2.Impl().SetReverseStrand(false);
@@ -217,7 +218,7 @@ TEST(CompareTest, AlignedStrandOk)
     EXPECT_EQ(Strand::REVERSE, records.at(3).AlignedStrand());
 }
 
-TEST(CompareTest, BarcodeForwardOk)
+TEST(BAM_Compare, can_compare_bam_record_barcode_forward)
 {
     BamRecord r1; r1.Barcodes(std::make_pair<int16_t,int16_t>(30,20));
     BamRecord r2; r2.Barcodes(std::make_pair<int16_t,int16_t>(20,30));
@@ -233,7 +234,7 @@ TEST(CompareTest, BarcodeForwardOk)
     EXPECT_EQ(r3.BarcodeForward(), records.at(3).BarcodeForward());
 }
 
-TEST(CompareTest, BarcodeReverseOk)
+TEST(BAM_Compare, can_compare_bam_record_barcode_reverse)
 {
     BamRecord r1; r1.Barcodes(std::make_pair<int16_t,int16_t>(30,20));
     BamRecord r2; r2.Barcodes(std::make_pair<int16_t,int16_t>(20,30));
@@ -249,7 +250,7 @@ TEST(CompareTest, BarcodeReverseOk)
     EXPECT_EQ(r4.BarcodeReverse(), records.at(3).BarcodeReverse());
 }
 
-TEST(CompareTest, BarcodeQualityOk)
+TEST(BAM_Compare, can_compare_bam_record_barcode_quality)
 {
     uint8_t q1 = 30;
     uint8_t q2 = 20;
@@ -271,7 +272,7 @@ TEST(CompareTest, BarcodeQualityOk)
     EXPECT_EQ(q3, records.at(3).BarcodeQuality());
 }
 
-TEST(CompareTest, CustomCompareOk)
+TEST(BAM_Compare, can_compare_bam_record_with_custom_comparator)
 {
     struct CustomCompare : public Compare::MemberFunctionBase<bool, &BamRecord::HasDeletionTag> { };
 
@@ -300,7 +301,7 @@ TEST(CompareTest, CustomCompareOk)
     EXPECT_TRUE(records.at(7).HasDeletionTag());
 }
 
-TEST(CompareTest, FullNameOk)
+TEST(BAM_Compare, can_compare_bam_record_full_name)
 {
     BamRecord r1; r1.Impl().Name("c");
     BamRecord r2; r2.Impl().Name("b");
@@ -316,7 +317,7 @@ TEST(CompareTest, FullNameOk)
     EXPECT_EQ(r3.FullName(), records.at(3).FullName());
 }
 
-TEST(CompareTest, LocalContextFlagOk)
+TEST(BAM_Compare, can_compare_bam_record_local_context_flag)
 {
     BamRecord r1; r1.LocalContextFlags(LocalContextFlags::BARCODE_AFTER);
     BamRecord r2; r2.LocalContextFlags(LocalContextFlags::ADAPTER_AFTER);
@@ -332,7 +333,7 @@ TEST(CompareTest, LocalContextFlagOk)
     EXPECT_EQ(r3.LocalContextFlags(), records.at(3).LocalContextFlags());
 }
 
-TEST(CompareTest, MapQualityOk)
+TEST(BAM_Compare, can_compare_bam_record_map_quality)
 {
     BamRecord r1; r1.Impl().MapQuality(30);
     BamRecord r2; r2.Impl().MapQuality(20);
@@ -348,7 +349,7 @@ TEST(CompareTest, MapQualityOk)
     EXPECT_EQ(r3.MapQuality(), records.at(3).MapQuality());
 }
 
-TEST(CompareTest, MovieNameOk)
+TEST(BAM_Compare, can_compare_bam_record_movie_name)
 {
     auto rg1 = ReadGroupInfo { "a", "SUBREAD" };
     auto rg2 = ReadGroupInfo { "b", "SUBREAD" };
@@ -375,7 +376,7 @@ TEST(CompareTest, MovieNameOk)
     EXPECT_EQ(r3.MovieName(), records.at(3).MovieName());
 }
 
-TEST(CompareTest, NoneOk)
+TEST(BAM_Compare, can_compare_bam_record_null_compare)
 {
     BamRecord r1; r1.Impl().Name("c");
     BamRecord r2; r2.Impl().Name("b");
@@ -391,7 +392,7 @@ TEST(CompareTest, NoneOk)
     EXPECT_EQ(r4.FullName(), records.at(3).FullName());
 }
 
-TEST(CompareTest, NumDeletedBasesOk)
+TEST(BAM_Compare, can_compare_bam_record_num_deleted_bases)
 {
     // create test data
     auto records = CompareTests::makeMappedRecords();
@@ -415,7 +416,7 @@ TEST(CompareTest, NumDeletedBasesOk)
     EXPECT_EQ(3, records.at(5).NumDeletedBases());
 }
 
-TEST(CompareTest, NumInsertedBasesOk)
+TEST(BAM_Compare, can_compare_bam_record_num_inserted_bases)
 {
     // create test data
     auto records = CompareTests::makeMappedRecords();
@@ -439,7 +440,7 @@ TEST(CompareTest, NumInsertedBasesOk)
     EXPECT_EQ(2, records.at(5).NumInsertedBases());
 }
 
-TEST(CompareTest, NumMatchesOk)
+TEST(BAM_Compare, can_compare_bam_record_num_matches)
 {
     // create test data
     auto records = CompareTests::makeMappedRecords();
@@ -463,7 +464,7 @@ TEST(CompareTest, NumMatchesOk)
     EXPECT_EQ(10, records.at(5).NumMatches());
 }
 
-TEST(CompareTest, NumMismatchesOk)
+TEST(BAM_Compare, can_compare_bam_record_num_mismatches)
 {
     // create test data
     auto records = CompareTests::makeMappedRecords();
@@ -487,7 +488,7 @@ TEST(CompareTest, NumMismatchesOk)
     EXPECT_EQ(2, records.at(5).NumMismatches());
 }
 
-TEST(CompareTest, QueryEndOk)
+TEST(BAM_Compare, can_compare_bam_record_query_end)
 {
     Position q1 = 30;
     Position q2 = 20;
@@ -509,7 +510,7 @@ TEST(CompareTest, QueryEndOk)
     EXPECT_EQ(q3, records.at(3).QueryEnd());
 }
 
-TEST(CompareTest, QueryStartOk)
+TEST(BAM_Compare, can_compare_bam_record_query_start)
 {
     Position q1 = 30;
     Position q2 = 20;
@@ -531,7 +532,7 @@ TEST(CompareTest, QueryStartOk)
     EXPECT_EQ(q3, records.at(3).QueryStart());
 }
 
-TEST(CompareTest, ReadGroupIdOk)
+TEST(BAM_Compare, can_compare_bam_record_read_group_id)
 {
     auto rg1 = ReadGroupInfo { "foo", "SUBREAD" };
     auto rg2 = ReadGroupInfo { "bar", "SUBREAD" };
@@ -558,7 +559,7 @@ TEST(CompareTest, ReadGroupIdOk)
     EXPECT_EQ(r2.ReadGroupId(), records.at(3).ReadGroupId());
 }
 
-TEST(CompareTest, ReadGroupNumericIdOk)
+TEST(BAM_Compare, can_compare_bam_record_read_group_numeric_id)
 {
     auto rg1 = ReadGroupInfo { "a", "SUBREAD" };
     auto rg2 = ReadGroupInfo { "b", "SUBREAD" };
@@ -585,7 +586,7 @@ TEST(CompareTest, ReadGroupNumericIdOk)
     EXPECT_EQ(r3.ReadGroupNumericId(), records.at(3).ReadGroupNumericId());
 }
 
-TEST(CompareTest, ReadAccuracyOk)
+TEST(BAM_Compare, can_compare_bam_record_read_accuracy)
 {
     Accuracy a1 = 30;
     Accuracy a2 = 20;
@@ -607,7 +608,7 @@ TEST(CompareTest, ReadAccuracyOk)
     EXPECT_EQ(a3, records.at(3).ReadAccuracy());
 }
 
-TEST(CompareTest, ReferenceEndOk)
+TEST(BAM_Compare, can_compare_bam_record_reference_end)
 {
     // create test data
     auto records = CompareTests::makeMappedRecords();
@@ -631,7 +632,7 @@ TEST(CompareTest, ReferenceEndOk)
     EXPECT_EQ(113, records.at(5).ReferenceEnd());
 }
 
-TEST(CompareTest, ReferenceIdOk)
+TEST(BAM_Compare, can_compare_bam_record_reference_id)
 {
     BamRecord r1; r1.Impl().ReferenceId(30);
     BamRecord r2; r2.Impl().ReferenceId(20);
@@ -647,7 +648,7 @@ TEST(CompareTest, ReferenceIdOk)
     EXPECT_EQ(r3.ReferenceId(), records.at(3).ReferenceId());
 }
 
-TEST(CompareTest, ReferenceNameOk)
+TEST(BAM_Compare, can_compare_bam_record_reference_name)
 {
     auto seq1 = SequenceInfo { "seq1" };
     auto seq2 = SequenceInfo { "seq2" };
@@ -674,7 +675,7 @@ TEST(CompareTest, ReferenceNameOk)
     EXPECT_EQ(seq4.Name(), records.at(3).ReferenceName());
 }
 
-TEST(CompareTest, ReferenceStartOk)
+TEST(BAM_Compare, can_compare_bam_record_reference_start)
 {
     BamRecord r1; r1.Impl().Position(30);
     BamRecord r2; r2.Impl().Position(20);
@@ -690,7 +691,7 @@ TEST(CompareTest, ReferenceStartOk)
     EXPECT_EQ(r3.ReferenceStart(), records.at(3).ReferenceStart());
 }
 
-TEST(CompareTest, ZmwOk)
+TEST(BAM_Compare, can_compare_bam_record_zmw)
 {
     int32_t z1 = 30;
     int32_t z2 = 20;

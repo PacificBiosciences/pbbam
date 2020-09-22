@@ -1,18 +1,12 @@
-// File Description
-/// \file FaiZmwChunker.h
-/// \brief Defines the FaiZmwChunker enum.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_FAIZMWCHUNKER_H
+#define PBBAM_FAIZMWCHUNKER_H
 
-#ifndef FAIZMWCHUNKER_H
-#define FAIZMWCHUNKER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 #include <vector>
 
-#include "pbbam/FaiIndex.h"
+#include <pbbam/FaiIndex.h>
 
 namespace PacBio {
 namespace BAM {
@@ -69,10 +63,7 @@ public:
 
 public:
     const FaiZmwChunk& Chunk(size_t chunk) const;
-
     size_t NumChunks() const;
-
-    // size_t MaxChunkSize(size_t index) const;
 
 private:
     std::vector<FaiZmwChunk> chunks_;
@@ -81,4 +72,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FAIZMWCHUNKER_H
+#endif  // PBBAM_FAIZMWCHUNKER_H

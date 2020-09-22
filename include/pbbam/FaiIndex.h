@@ -1,13 +1,7 @@
-// File Description
-/// \file FaiIndex.h
-/// \brief Defines the FaiIndex class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_FAIINDEX_H
+#define PBBAM_FAIINDEX_H
 
-#ifndef FAIINDEX_H
-#define FAIINDEX_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstdint>
 
@@ -39,6 +33,12 @@ struct FaiEntry
 
 class FaiIndex
 {
+public:
+    ///
+    /// Create *.fai for a FASTA or FASTQ file.
+    ///
+    static void Create(const std::string& fn);
+
 public:
     ///
     /// \brief Load FAI data from \p fn (*.fai)
@@ -90,7 +90,7 @@ private:
     std::unique_ptr<FaiIndexPrivate> d_;
 };
 
-bool operator==(const FaiEntry& lhs, const FaiEntry& rhs);
+bool operator==(const FaiEntry& lhs, const FaiEntry& rhs) noexcept;
 
 // NOTE: FaiEntry output *does not* include the name column, FaiIndex::Save()
 //       handles this mapping
@@ -99,4 +99,4 @@ std::ostream& operator<<(std::ostream& out, const FaiEntry& entry);
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FAIINDEX_H
+#endif  // PBBAM_FAIINDEX_H

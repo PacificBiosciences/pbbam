@@ -1,12 +1,13 @@
 // Author: Derek Barnett
 
+#include <pbbam/BamRecordImpl.h>
+
 #include <cstdint>
+
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
-
-#include <pbbam/BamRecordImpl.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -15,7 +16,7 @@ using namespace PacBio::BAM;
 //       For raw Tag/TagCollection tests, see test_Tags.cpp
 //       For encoding tests, see test_BamRecordImplVariableData.cpp
 
-TEST(BamRecordImplTagsTest, HasTagTest)
+TEST(BAM_BamRecordImplTags, can_check_presence_of_tag)
 {
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -43,7 +44,7 @@ TEST(BamRecordImplTagsTest, HasTagTest)
     EXPECT_FALSE(fetchedTags.Contains("some_too_long_name"));
 }
 
-TEST(BamRecordImplTagsTest, SimpleAddTag)
+TEST(BAM_BamRecordImplTags, can_add_tag)
 {
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -79,7 +80,7 @@ TEST(BamRecordImplTagsTest, SimpleAddTag)
     EXPECT_FALSE(bam.AddTag("XY", int32_t{-42}));  // reject duplicate
 }
 
-TEST(BamRecordImplTagsTest, SimpleRemoveTag)
+TEST(BAM_BamRecordImplTags, can_remove_tag)
 {
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -115,7 +116,7 @@ TEST(BamRecordImplTagsTest, SimpleRemoveTag)
     EXPECT_FALSE(bam.RemoveTag("zz"));  // reject remove unknown
 }
 
-TEST(BamRecordImplTagsTest, SimpleEditTag)
+TEST(BAM_BamRecordImplTags, can_edit_tag)
 {
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
@@ -150,7 +151,7 @@ TEST(BamRecordImplTagsTest, SimpleEditTag)
     EXPECT_FALSE(bam.EditTag("zz", 500));  // reject edit unknown
 }
 
-TEST(BamRecordImplTagsTest, SimpleQueryTag)
+TEST(BAM_BamRecordImplTags, can_query_tag)
 {
     TagCollection tags;
     tags["HX"] = std::string("1abc75");

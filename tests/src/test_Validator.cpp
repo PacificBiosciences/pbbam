@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/Validator.h>
+
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -11,7 +13,6 @@
 #include <pbbam/BamRecord.h>
 #include <pbbam/Cigar.h>
 #include <pbbam/ReadGroupInfo.h>
-#include <pbbam/Validator.h>
 
 #include "../src/ValidationErrors.h"
 
@@ -114,7 +115,19 @@ static const BamRecord validUnmappedRecord = makeValidUnmappedRecord();
 
 }  // namespace ValidatorTests
 
-TEST(ValidatorErrorsTest, SetMaxNumErrors)
+TEST(ValidatorErrorsTest, default_uses_max)
+{
+    ValidationErrors errors;
+    EXPECT_EQ(ValidationErrors::MAX, errors.MaxNumErrors());
+}
+
+TEST(ValidatorErrorsTest, zero_max_num_errors_fallsback_to_max)
+{
+    ValidationErrors errors(0);
+    EXPECT_EQ(ValidationErrors::MAX, errors.MaxNumErrors());
+}
+
+TEST(ValidatorErrorsTest, can_specify_max_num_errors)
 {
     {  // default - use "no max"
         ValidationErrors errors;
@@ -134,7 +147,7 @@ TEST(ValidatorErrorsTest, SetMaxNumErrors)
     }
 }
 
-TEST(ValidatorErrorsTest, ThrowOnMaxReached)
+TEST(ValidatorErrorsTest, throws_when_max_errors_reached)
 {
     {
         ValidationErrors errors(1);
@@ -147,7 +160,7 @@ TEST(ValidatorErrorsTest, ThrowOnMaxReached)
     }
 }
 
-TEST(ValidatorErrorsTest, ExceptionFromResults)
+TEST(ValidatorErrorsTest, constructs_expected_validation_exception)
 {
     const std::string error1 = "error1";
     const std::string error2 = "error2";
@@ -171,12 +184,12 @@ TEST(ValidatorErrorsTest, ExceptionFromResults)
     }
 }
 
-TEST(ValidatorTest, ValidReadGroup)
+TEST(BAM_Validator, success_on_valid_read_group)
 {
     ASSERT_NO_THROW(Validator::Validate(ValidatorTests::validReadGroup));
 }
 
-TEST(ValidatorTest, ReadGroupRequiredComponents)
+TEST(BAM_Validator, reports_missing_read_group_components)
 {
     {  // missing ID
         ReadGroupInfo rg = ValidatorTests::validReadGroup;
@@ -222,7 +235,7 @@ TEST(ValidatorTest, ReadGroupRequiredComponents)
     }
 }
 
-TEST(ValidatorTest, ReadGroupValues)
+TEST(BAM_Validator, reports_invalid_read_group_data)
 {
     {  // mismatch expected ID vs stored ID - change ID
         ReadGroupInfo rg = ValidatorTests::validReadGroup;
@@ -278,7 +291,7 @@ TEST(ValidatorTest, ReadGroupValues)
     }
 }
 
-TEST(ValidatorTest, ValidHeader)
+TEST(BAM_Validator, success_on_valid_header)
 {
     static const BamHeader validMappedHeader{
         "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.7\n"
@@ -300,7 +313,7 @@ TEST(ValidatorTest, ValidHeader)
     ASSERT_NO_THROW(Validator::Validate(validUnmappedHeader));
 }
 
-TEST(ValidatorTest, ValidateHeader)
+TEST(BAM_Validator, reports_invalid_header_data)
 {
     static const BamHeader validMappedHeader{
         "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.7\n"
@@ -363,7 +376,7 @@ TEST(ValidatorTest, ValidateHeader)
     }
 }
 
-TEST(ValidatorTest, ValidRecord)
+TEST(BAM_Validator, success_on_valid_bam_record)
 {
     static const BamHeader validMappedHeader{
         "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.7\n"
@@ -378,7 +391,7 @@ TEST(ValidatorTest, ValidRecord)
     ASSERT_NO_THROW(Validator::Validate(record));
 }
 
-static inline void ModifyTag(BamRecord* record, const std::string& tagName, const Tag& tag)
+static void ModifyTag(BamRecord* record, const std::string& tagName, const Tag& tag)
 {
     if (record->Impl().HasTag(tagName)) {
         record->Impl().EditTag(tagName, tag);
@@ -387,7 +400,7 @@ static inline void ModifyTag(BamRecord* record, const std::string& tagName, cons
     }
 }
 
-static inline void CheckInvalidTagLength(const std::string& tagName, const Tag& tag)
+static void CheckInvalidTagLength(const std::string& tagName, const Tag& tag)
 {
     static const BamHeader validUnmappedHeader{
         "@HD\tVN:1.5\tSO:unknown\tpb:3.0.7\n"
@@ -404,7 +417,7 @@ static inline void CheckInvalidTagLength(const std::string& tagName, const Tag& 
     EXPECT_FALSE(Validator::IsValid(record));
 }
 
-TEST(ValidatorTest, TagDataLengths)
+TEST(BAM_Validator, reports_invalid_tag_lengths)
 {
     static const BamHeader validUnmappedHeader{
         "@HD\tVN:1.5\tSO:unknown\tpb:3.0.7\n"
@@ -453,7 +466,7 @@ TEST(ValidatorTest, TagDataLengths)
     //    CheckInvalidTagLength("pi", pulses); // Pkmid2
 }
 
-TEST(ValidatorTest, TagDataValues)
+TEST(BAM_Validator, reports_invalid_tag_data)
 {
     static const BamHeader validMappedHeader{
         "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.7\n"
@@ -515,7 +528,7 @@ TEST(ValidatorTest, TagDataValues)
     }
 }
 
-TEST(ValidatorTest, MappedRecords)
+TEST(BAM_Validator, reports_invalid_mapped_record_data)
 {
     static const BamHeader validMappedHeader{
         "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.7\n"
@@ -544,7 +557,7 @@ TEST(ValidatorTest, MappedRecords)
     }
 }
 
-TEST(ValidatorTest, UnmappedRecords)
+TEST(BAM_Validator, reports_invalid_unmapped_record_data)
 {
     static const BamHeader validUnmappedHeader{
         "@HD\tVN:1.5\tSO:unknown\tpb:3.0.7\n"

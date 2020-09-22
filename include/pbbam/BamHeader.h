@@ -1,25 +1,18 @@
-// File Description
-/// \file BamHeader.h
-/// \brief Defines the BamHeader class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_BAMHEADER_H
+#define PBBAM_BAMHEADER_H
 
-#ifndef BAMHEADER_H
-#define BAMHEADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstddef>
 #include <cstdint>
 
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
-#include "pbbam/ProgramInfo.h"
-#include "pbbam/ReadGroupInfo.h"
-#include "pbbam/SequenceInfo.h"
+#include <pbbam/ProgramInfo.h>
+#include <pbbam/ReadGroupInfo.h>
+#include <pbbam/SequenceInfo.h>
 
 namespace PacBio {
 namespace BAM {
@@ -129,6 +122,10 @@ public:
 public:
     /// \name General Attributes
     /// \{
+
+    /// \returns whether the Header is empty
+    ///
+    bool Empty() const noexcept;
 
     /// \returns the %PacBio %BAM version number (\@HD:pb)
     ///
@@ -408,4 +405,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BAMHEADER_H
+#endif  // PBBAM_BAMHEADER_H

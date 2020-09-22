@@ -1,16 +1,17 @@
 // Author: Derek Barnett
 
+#include <pbbam/bed/BedReader.h>
+
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
 #include <pbbam/GenomicInterval.h>
-#include <pbbam/bed/BedReader.h>
 
 #include "PbbamTestData.h"
 
-using BedReader = PacBio::BAM::BedReader;
+using BedReader = PacBio::BED::BedReader;
 using GenomicInterval = PacBio::BAM::GenomicInterval;
 
 // clang-format off
@@ -67,42 +68,42 @@ void CheckReadAll(const std::string& fn)
 
 }  // namespace BedReaderTests
 
-TEST(BedReaderTest, throws_on_empty_filename)
+TEST(BAM_BedReader, throws_on_empty_filename)
 {
     EXPECT_THROW(BedReader reader{""}, std::runtime_error);
 }
 
-TEST(BedReaderTest, throws_on_invalid_extension)
+TEST(BAM_BedReader, throws_on_invalid_extension)
 {
     EXPECT_THROW(BedReader reader{"wrong.ext"}, std::runtime_error);
 }
 
-TEST(BedReaderTest, can_iterate_manually_on_text_bed)
+TEST(BAM_BedReader, can_iterate_manually_on_text_bed)
 {
     BedReaderTests::CheckManualIteration(BedReaderTests::BedFn);
 }
 
-TEST(BedReaderTest, can_iterate_manually_on_gzip_bed)
+TEST(BAM_BedReader, can_iterate_manually_on_gzip_bed)
 {
     BedReaderTests::CheckManualIteration(BedReaderTests::GzipBedFn);
 }
 
-TEST(BedReaderTest, can_iterate_using_range_for_on_text_bed)
+TEST(BAM_BedReader, can_iterate_using_range_for_on_text_bed)
 {
     BedReaderTests::CheckRangeFor(BedReaderTests::BedFn);
 }
 
-TEST(BedReaderTest, can_iterate_using_range_for_on_gzip_bed)
+TEST(BAM_BedReader, can_iterate_using_range_for_on_gzip_bed)
 {
     BedReaderTests::CheckRangeFor(BedReaderTests::GzipBedFn);
 }
 
-TEST(BedReaderTest, BedReaderTest_can_read_all_from_text_bed)
+TEST(BAM_BedReader, BedReaderTest_can_read_all_from_text_bed)
 {
     BedReaderTests::CheckReadAll(BedReaderTests::BedFn);
 }
 
-TEST(BedReaderTest, BedReaderTest_can_read_all_from_gzip_bed)
+TEST(BAM_BedReader, BedReaderTest_can_read_all_from_gzip_bed)
 {
     BedReaderTests::CheckReadAll(BedReaderTests::GzipBedFn);
 }

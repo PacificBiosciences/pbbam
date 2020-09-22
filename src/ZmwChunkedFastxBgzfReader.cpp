@@ -1,16 +1,14 @@
-// File Description
-/// \file BgzFastqLoader.cpp
-/// \brief Implements the ZmwChunkedFastxBgzfReaderr class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "ZmwChunkedFastxBgzfReader.h"
 
+#include <cassert>
+
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
+
+#include "ErrnoReason.h"
 
 namespace PacBio {
 namespace BAM {
@@ -25,6 +23,7 @@ ZmwChunkedFastxBgzfReader::ZmwChunkedFastxBgzfReader(std::string filename, const
         std::ostringstream msg;
         msg << "[pbbam] chunked FASTX reader ERROR: could not open file:\n"
             << "  file: " << fastxFilename_ << '\n';
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
 
@@ -37,7 +36,8 @@ ZmwChunkedFastxBgzfReader::ZmwChunkedFastxBgzfReader(std::string filename, const
         std::ostringstream msg;
         msg << "[pbbam] chunked FASTX reader ERROR: could not load bgzf index data:\n"
             << "  file: " << fastxFilename_ << '\n'
-            << "  index file: " << fastxFilename_ << ".gzi\n";
+            << "  index file: " << fastxFilename_ << ".gzi";
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
 }
@@ -136,19 +136,20 @@ FastqSequence ZmwChunkedFastxBgzfReader::ReadNextFastq(bool skipName)
     // return FASTQ
     std::string name = (skipName ? "" : std::string{seq_->name.s, seq_->name.l});
     std::string bases{seq_->seq.s, seq_->seq.l};
-    QualityValues quals{std::string{seq_->qual.s, seq_->qual.l}};
+    Data::QualityValues quals{std::string{seq_->qual.s, seq_->qual.l}};
     return FastqSequence{std::move(name), std::move(bases), std::move(quals)};
 }
 
 void ZmwChunkedFastxBgzfReader::Seek(uint64_t pos)
 {
     // seek to sequence 'id' & reset kseq handle
-    auto result = bgzf_useek(file_.get(), pos, SEEK_SET);
+    const auto result = bgzf_useek(file_.get(), pos, SEEK_SET);
     if (result != 0) {
         std::ostringstream msg;
         msg << "[pbbam] chunked FASTX reader ERROR: could not seek to requested pos: " << pos
             << '\n'
             << "  in file: " << fastxFilename_;
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
     ks_rewind(seq_->f);

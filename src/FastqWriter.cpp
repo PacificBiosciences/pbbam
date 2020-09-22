@@ -1,20 +1,16 @@
-// File Description
-/// \file FastqWriter.cpp
-/// \brief Implements the FastqWriter class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/FastqWriter.h"
+#include <pbbam/FastqWriter.h>
 
 #include <sstream>
 #include <stdexcept>
 
-#include "pbbam/BamRecord.h"
-#include "pbbam/FastqSequence.h"
-#include "pbbam/FormatUtils.h"
-#include "pbbam/QualityValues.h"
+#include <pbbam/BamRecord.h>
+#include <pbbam/FastqSequence.h>
+#include <pbbam/FormatUtils.h>
+#include <pbbam/QualityValues.h>
+
+#include "ErrnoReason.h"
 
 namespace PacBio {
 namespace BAM {
@@ -33,6 +29,7 @@ FastqWriter::FastqWriter(const std::string& fn) : IFastqWriter{}
         std::ostringstream s;
         s << "[pbbam] FASTQ writer ERROR: could not open file for writing:\n"
           << "  file: " << fn;
+        MaybePrintErrnoReason(s);
         throw std::runtime_error{s.str()};
     }
 }

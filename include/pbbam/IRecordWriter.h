@@ -1,19 +1,13 @@
-// File Description
-/// \file IRecordWriter.h
-/// \brief Defines the IRecordWriter interface.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_IRECORDWRITER_H
+#define PBBAM_IRECORDWRITER_H
 
-#ifndef IRECORDWRITER_H
-#define IRECORDWRITER_H
+#include <pbbam/Config.h>
 
-#include "pbbam/Config.h"
+#include <pbbam/BamRecord.h>
+#include <pbbam/BamRecordImpl.h>
 
 namespace PacBio {
 namespace BAM {
-
-class BamRecord;
-class BamRecordImpl;
 
 class IRecordWriter
 {
@@ -29,7 +23,7 @@ public:
     ///
     /// \throws std::runtime_error if flush fails
     ///
-    virtual void TryFlush() = 0;
+    virtual void TryFlush() {}
 
     /// \brief Write a record to the output %BAM file.
     ///
@@ -54,4 +48,4 @@ protected:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // IRECORDWRITER_H
+#endif  // PBBAM_IRECORDWRITER_H

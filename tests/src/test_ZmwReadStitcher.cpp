@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/virtual/ZmwReadStitcher.h>
+
 #include <cstddef>
 
 #include <string>
@@ -11,7 +13,6 @@
 #include <pbbam/PbiFilter.h>
 #include <pbbam/virtual/VirtualPolymeraseCompositeReader.h>
 #include <pbbam/virtual/VirtualPolymeraseReader.h>
-#include <pbbam/virtual/ZmwReadStitcher.h>
 
 #include "PbbamTestData.h"
 
@@ -96,7 +97,7 @@ static size_t NumVirtualRecords(const std::string& primaryBamFn, const std::stri
 
 }  // namespace ZmwReadStitcherTests
 
-TEST(ZmwReadStitching, FromBams_NoFilter)
+TEST(BAM_ZmwReadStitcher, can_stitch_from_unfiltered_bams)
 {
     ZmwReadStitcher stitcher{PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
                              PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam"};
@@ -108,7 +109,7 @@ TEST(ZmwReadStitching, FromBams_NoFilter)
     EXPECT_EQ(3, count);
 }
 
-TEST(ZmwReadStitching, FromBams_Filtered)
+TEST(BAM_ZmwReadStitcher, can_stitch_from_filtered_bams)
 {
     PbiFilter filter{PbiZmwFilter{100000}};  // setup to match DataSet w/ filter
     ZmwReadStitcher stitcher{PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
@@ -123,7 +124,7 @@ TEST(ZmwReadStitching, FromBams_Filtered)
     EXPECT_EQ(1, count);
 }
 
-TEST(ZmwReadStitching, FromDataSet_NoFilter)
+TEST(BAM_ZmwReadStitcher, can_stitch_from_unfiltered_dataset)
 {
     // dataset contains these resources (subreads/scraps + hqregion/scraps BAMs)
     const std::string primaryFn1 =
@@ -150,7 +151,7 @@ TEST(ZmwReadStitching, FromDataSet_NoFilter)
     EXPECT_EQ(numExpectedRecords, numObservedRecords);
 }
 
-TEST(ZmwReadStitching, FromDataSet_Filtered)
+TEST(BAM_ZmwReadStitcher, can_stitch_from_filtered_dataset)
 {
     // dataset contains these resources (subreads/scraps + hqregion/scraps BAMs)
     const std::string primaryFn1 =
@@ -182,13 +183,13 @@ TEST(ZmwReadStitching, FromDataSet_Filtered)
     EXPECT_EQ(1, numObservedRecords);
 }
 
-TEST(ZmwReadStitching, FromDataSet_EmptyDataSet)
+TEST(BAM_ZmwReadStitcher, can_handle_empty_input)
 {
     ZmwReadStitcher stitcher{DataSet{}};
     EXPECT_FALSE(stitcher.HasNext());
 }
 
-TEST(ZmwReadStitching, EmptyScrapsFile)
+TEST(BAM_ZmwReadStitcher, can_handle_empty_scraps_file)
 {
     const std::string primaryBamFn =
         PbbamTestsConfig::Data_Dir + "/polymerase/scrapless.subreads.bam";
@@ -210,7 +211,7 @@ TEST(ZmwReadStitching, EmptyScrapsFile)
     EXPECT_EQ(3, count);
 }
 
-TEST(ZmwReadStitching, VirtualRegions)
+TEST(BAM_ZmwReadStitcher, properly_parses_virtual_regions)
 {
     // Create virtual polymerase read
     ZmwReadStitcher stitcher{PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
@@ -283,7 +284,7 @@ TEST(ZmwReadStitching, VirtualRegions)
     EXPECT_EQ(7034, hqregion[0].endPos);
 }
 
-TEST(ZmwReadStitching, InternalSubreadsToOriginal)
+TEST(BAM_ZmwReadStitcher, can_stitch_internal_subreads)
 {
     // Create virtual polymerase read
     ZmwReadStitcher stitcher{PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
@@ -303,7 +304,7 @@ TEST(ZmwReadStitching, InternalSubreadsToOriginal)
     ZmwReadStitcherTests::Compare(polyRecord, virtualRecord);
 }
 
-TEST(ZmwReadStitching, InternalHQToOriginal)
+TEST(BAM_ZmwReadStitcher, can_stitch_internal_hq_regions)
 {
     // Create virtual polymerase read
     ZmwReadStitcher stitcher{PbbamTestsConfig::Data_Dir + "/polymerase/internal.hqregions.bam",
@@ -323,7 +324,7 @@ TEST(ZmwReadStitching, InternalHQToOriginal)
     ZmwReadStitcherTests::Compare(polyRecord, virtualRecord);
 }
 
-TEST(ZmwReadStitching, ProductionSubreadsToOriginal)
+TEST(BAM_ZmwReadStitcher, can_stitch_production_subreads)
 {
     // Create virtual polymerase read
     ZmwReadStitcher stitcher{PbbamTestsConfig::Data_Dir + "/polymerase/production.subreads.bam",
@@ -358,7 +359,7 @@ TEST(ZmwReadStitching, ProductionSubreadsToOriginal)
     EXPECT_EQ(polyRecord.ReadGroup(), virtualRecord.ReadGroup());
 }
 
-TEST(ZmwReadStitching, ProductionHQToOriginal)
+TEST(BAM_ZmwReadStitcher, can_stitch_production_hq_regions)
 {
     // Create virtual polymerase read
     ZmwReadStitcher stitcher{PbbamTestsConfig::Data_Dir + "/polymerase/production_hq.hqregion.bam",
@@ -428,7 +429,7 @@ TEST(ZmwReadStitching, ProductionHQToOriginal)
     EXPECT_FALSE(virtualRecord.HasPulseCallWidth());
 }
 
-TEST(ZmwReadStitching, VirtualRecord_VirtualRegionsTable)
+TEST(BAM_ZmwReadStitcher, properly_fills_virtual_regions_table)
 {
     ZmwReadStitcher stitcher{PbbamTestsConfig::Data_Dir + "/polymerase/production.subreads.bam",
                              PbbamTestsConfig::Data_Dir + "/polymerase/production.scraps.bam"};
@@ -450,7 +451,7 @@ TEST(ZmwReadStitching, VirtualRecord_VirtualRegionsTable)
     EXPECT_TRUE(filtered.empty());  // this type not present in this data
 }
 
-TEST(ZmwReadStitching, LegacyTypedefsOk)
+TEST(BAM_ZmwReadStitcher, can_work_via_legacy_vpr_typedef)
 {
     {
         VirtualPolymeraseReader reader{
@@ -469,7 +470,7 @@ TEST(ZmwReadStitching, LegacyTypedefsOk)
     }
 }
 
-TEST(ZmwReadStitching, EmptyScrapSorting)
+TEST(BAM_ZmwReadStitcher, can_sort_with_empty_scraps_file)
 {
     ZmwReadStitcher stitcher{PbbamTestsConfig::Data_Dir + "/stitching/test_qstart.subreads.bam",
                              PbbamTestsConfig::Data_Dir + "/stitching/test_qstart.scraps.bam"};

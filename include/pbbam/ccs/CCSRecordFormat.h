@@ -1,13 +1,13 @@
 #ifndef PBBAM_CCS_CCSRECORDFORMAT_H
 #define PBBAM_CCS_CCSRECORDFORMAT_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 #include <vector>
 
-#include "pbbam/ccs/CCSHeader.h"
-#include "pbbam/ccs/CCSRecord.h"
+#include <pbbam/ccs/CCSHeader.h>
+#include <pbbam/ccs/CCSRecord.h>
 
 namespace PacBio {
 namespace CCS {

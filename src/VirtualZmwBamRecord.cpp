@@ -1,18 +1,10 @@
-// File Description
-/// \file VirtualZmwBamRecord.cpp
-/// \brief Implements the VirtualZmwBamRecord class.
-//
-// Author: Armin Töpfer
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/virtual/VirtualZmwBamRecord.h"
+#include <pbbam/virtual/VirtualZmwBamRecord.h>
 
 #include <cassert>
 #include <cstdint>
 
-#include <iostream>
-#include <sstream>
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
@@ -20,8 +12,8 @@
 
 #include <pbcopper/utility/MoveAppend.h>
 
-#include "pbbam/virtual/VirtualRegionType.h"
-#include "pbbam/virtual/VirtualRegionTypeMap.h"
+#include <pbbam/virtual/VirtualRegionType.h>
+#include <pbbam/virtual/VirtualRegionTypeMap.h>
 
 namespace PacBio {
 namespace BAM {
@@ -58,11 +50,11 @@ bool VirtualZmwBamRecord::HasVirtualRegionType(const VirtualRegionType regionTyp
     return virtualRegionsMap_.find(regionType) != virtualRegionsMap_.end();
 }
 
-Frames VirtualZmwBamRecord::IPDV1Frames(Orientation orientation) const
+Data::Frames VirtualZmwBamRecord::IPDV1Frames(Data::Orientation orientation) const
 {
     const auto rawFrames = this->IPDRaw(orientation);
     const std::vector<uint8_t> rawData(rawFrames.Data().begin(), rawFrames.Data().end());
-    return Frames::Decode(rawData);
+    return Data::Frames::Decode(rawData);
 }
 
 void VirtualZmwBamRecord::StitchSources()
@@ -76,23 +68,23 @@ void VirtualZmwBamRecord::StitchSources()
     std::string alternativeLabelTag;
     std::string pulseCall;
 
-    QualityValues qualities;
-    QualityValues deletionQv;
-    QualityValues insertionQv;
-    QualityValues mergeQv;
-    QualityValues pulseMergeQv;
-    QualityValues substitutionQv;
-    QualityValues labelQv;
-    QualityValues alternativeLabelQv;
+    Data::QualityValues qualities;
+    Data::QualityValues deletionQv;
+    Data::QualityValues insertionQv;
+    Data::QualityValues mergeQv;
+    Data::QualityValues pulseMergeQv;
+    Data::QualityValues substitutionQv;
+    Data::QualityValues labelQv;
+    Data::QualityValues alternativeLabelQv;
 
-    Frames ipd;
-    Frames pw;
-    Frames pd;
-    Frames px;
+    Data::Frames ipd;
+    Data::Frames pw;
+    Data::Frames pd;
+    Data::Frames px;
     std::vector<float> pa;
     std::vector<float> pm;
     std::vector<uint32_t> sf;
-    std::vector<PacBio::BAM::PulseExclusionReason> pe;
+    std::vector<BAM::PulseExclusionReason> pe;
 
     // initialize capacity
     const auto stitchedSize = lastRecord.QueryEnd() - firstRecord.QueryStart();
@@ -124,20 +116,19 @@ void VirtualZmwBamRecord::StitchSources()
 
         Utility::MoveAppend(b.Qualities(), qualities);
 
-        if (b.HasDeletionQV()) Utility::MoveAppend(std::move(b.DeletionQV()), deletionQv);
+        if (b.HasDeletionQV()) Utility::MoveAppend(b.DeletionQV(), deletionQv);
 
-        if (b.HasInsertionQV()) Utility::MoveAppend(std::move(b.InsertionQV()), insertionQv);
+        if (b.HasInsertionQV()) Utility::MoveAppend(b.InsertionQV(), insertionQv);
 
-        if (b.HasMergeQV()) Utility::MoveAppend(std::move(b.MergeQV()), mergeQv);
+        if (b.HasMergeQV()) Utility::MoveAppend(b.MergeQV(), mergeQv);
 
-        if (b.HasPulseMergeQV()) Utility::MoveAppend(std::move(b.PulseMergeQV()), pulseMergeQv);
+        if (b.HasPulseMergeQV()) Utility::MoveAppend(b.PulseMergeQV(), pulseMergeQv);
 
-        if (b.HasSubstitutionQV())
-            Utility::MoveAppend(std::move(b.SubstitutionQV()), substitutionQv);
+        if (b.HasSubstitutionQV()) Utility::MoveAppend(b.SubstitutionQV(), substitutionQv);
 
-        if (b.HasLabelQV()) Utility::MoveAppend(std::move(b.LabelQV()), labelQv);
+        if (b.HasLabelQV()) Utility::MoveAppend(b.LabelQV(), labelQv);
 
-        if (b.HasAltLabelQV()) Utility::MoveAppend(std::move(b.AltLabelQV()), alternativeLabelQv);
+        if (b.HasAltLabelQV()) Utility::MoveAppend(b.AltLabelQV(), alternativeLabelQv);
 
         if (b.HasDeletionTag()) deletionTag.append(std::move(b.DeletionTag()));
 
@@ -244,12 +235,12 @@ void VirtualZmwBamRecord::StitchSources()
     if (!pe.empty()) this->PulseExclusionReason(pe);
 
     // 16 bit arrays
-    if (!ipd.Data().empty()) this->IPD(ipd, FrameEncodingType::LOSSLESS);
-    if (!pw.Data().empty()) this->PulseWidth(pw, FrameEncodingType::LOSSLESS);
+    if (!ipd.Data().empty()) this->IPD(ipd, Data::FrameCodec::RAW);
+    if (!pw.Data().empty()) this->PulseWidth(pw, Data::FrameCodec::RAW);
     if (!pa.empty()) this->Pkmean(pa);
     if (!pm.empty()) this->Pkmid(pm);
-    if (!pd.Data().empty()) this->PrePulseFrames(pd, FrameEncodingType::LOSSLESS);
-    if (!px.Data().empty()) this->PulseCallWidth(px, FrameEncodingType::LOSSLESS);
+    if (!pd.Data().empty()) this->PrePulseFrames(pd, Data::FrameCodec::RAW);
+    if (!px.Data().empty()) this->PulseCallWidth(px, Data::FrameCodec::RAW);
 
     // 32 bit arrays
     if (!sf.empty()) this->StartFrame(sf);

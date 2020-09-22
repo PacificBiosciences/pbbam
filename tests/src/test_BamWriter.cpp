@@ -1,16 +1,19 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
+#include <pbbam/BamWriter.h>
+
 #include <cstdint>
+
 #include <string>
 #include <vector>
 
-#include "PbbamTestData.h"
+#include <gtest/gtest.h>
 
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamRecord.h>
-#include <pbbam/BamWriter.h>
 #include <pbbam/EntireFileQuery.h>
+
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -55,6 +58,7 @@ void checkSingleRecord(bool useTempFile)
     tags["rq"] = static_cast<float>(0.6);
     tags["RG"] = rgId;
     tags["sn"] = expectedSnr;
+    tags["fi"] = std::vector<uint16_t>{};
     bamRecord.Impl().Tags(tags);
 
     // write record to file
@@ -99,12 +103,12 @@ void checkSingleRecord(bool useTempFile)
 
 } // namespace BamWriterTests
 
-TEST(BamWriterTest, SingleWrite_UserRecord_WithTempFile)
+TEST(BAM_BamWriter, can_write_using_temp_file)
 {
     BamWriterTests::checkSingleRecord(true);
 }
 
-TEST(BamWriterTest, SingleWrite_UserRecord_NoTempFile)
+TEST(BAM_BamWriter, can_write_without_temp_file)
 {
     BamWriterTests::checkSingleRecord(false);
 }

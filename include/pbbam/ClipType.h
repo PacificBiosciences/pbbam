@@ -1,13 +1,7 @@
-// File Description
-/// \file ClipType.h
-/// \brief Defines the ClipType enum.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_CLIPTYPE_H
+#define PBBAM_CLIPTYPE_H
 
-#ifndef CLIPTYPE_H
-#define CLIPTYPE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 namespace PacBio {
 namespace BAM {
@@ -29,4 +23,4 @@ enum class ClipType
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // CLIPTYPE_H
+#endif  // PBBAM_CLIPTYPE_H

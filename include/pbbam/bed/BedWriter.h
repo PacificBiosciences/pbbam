@@ -1,23 +1,14 @@
-// File Description
-/// \file BedWriter.h
-/// \brief Defines the BedWriter class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_BED_BEDWRITER_H
+#define PBBAM_BED_BEDWRITER_H
 
-#ifndef PBBAM_BEDWRITER_H
-#define PBBAM_BEDWRITER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 
+#include <pbcopper/data/GenomicInterval.h>
+
 namespace PacBio {
-namespace Data {
-
-class GenomicInterval;
-}
-
-namespace BAM {
+namespace BED {
 
 class BedWriter
 {
@@ -36,7 +27,7 @@ private:
     std::unique_ptr<BedWriterPrivate> d_;
 };
 
-}  // namespace BAM
+}  // namespace BED
 }  // namespace PacBio
 
-#endif  // FASTQWRITER_H
+#endif  // PBBAM_BED_BEDWRITER_H

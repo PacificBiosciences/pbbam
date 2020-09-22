@@ -1,0 +1,12 @@
+#ifndef PBBAM_LIBRARY_VERION_H
+#define PBBAM_LIBRARY_VERION_H
+
+namespace PacBio {
+namespace Pbbam {
+
+constexpr const char ReleaseVersion[] = "@PBBAM_VERSION@";
+
+}  // namespace Pbbam
+}  // namespace PacBio
+
+#endif  // PBBAM_LIBRARY_VERION_H

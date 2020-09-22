@@ -1,11 +1,11 @@
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/FastaCache.h"
+#include <pbbam/FastaCache.h>
 
 #include <sstream>
 #include <stdexcept>
 
-#include "pbbam/FastaReader.h"
+#include <pbbam/FastaReader.h>
 
 namespace PacBio {
 namespace BAM {
@@ -14,6 +14,26 @@ FastaCacheData::FastaCacheData(const std::string& filename) : cache_{FastaReader
 {
     for (size_t i = 0; i < cache_.size(); ++i)
         lookup_.emplace(cache_[i].Name(), i);
+}
+
+std::pair<bool, std::string> FastaCacheData::Check() const
+{
+    return Check([](const FastaSequence& seq) {
+        const auto& bases = seq.Bases();
+        const auto invalid = bases.find_first_not_of("ACGTNacgtn\n");
+        return invalid == std::string::npos;
+    });
+}
+
+std::pair<bool, std::string> FastaCacheData::Check(
+    const std::function<bool(const FastaSequence&)>& callback) const
+{
+    for (const auto& seq : cache_) {
+        if (!callback(seq)) {
+            return {false, seq.Name()};
+        }
+    }
+    return {true, ""};
 }
 
 std::string FastaCacheData::Subsequence(const std::string& name, size_t begin, size_t end) const
@@ -54,7 +74,7 @@ size_t FastaCacheData::SequenceLength(const std::string& name) const
     const auto found = lookup_.find(name);
     if (found == lookup_.cend()) {
         std::ostringstream s;
-        s << "[pbbam] FASTA sequence cache ERROR: could not retrieve sequence loength, reference '"
+        s << "[pbbam] FASTA sequence cache ERROR: could not retrieve sequence length, reference '"
           << name << "' not found";
         throw std::runtime_error{s.str()};
     }

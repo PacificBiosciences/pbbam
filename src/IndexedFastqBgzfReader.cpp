@@ -1,16 +1,14 @@
-// File Description
-/// \file BgzFastqLoader.cpp
-/// \brief Implements the IndexedFastqBgzfReaderr class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "IndexedFastqBgzfReader.h"
 
+#include <cassert>
+
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
+
+#include "ErrnoReason.h"
 
 namespace PacBio {
 namespace BAM {
@@ -25,6 +23,7 @@ IndexedFastqBgzfReader::IndexedFastqBgzfReader(std::string filename)
         std::ostringstream msg;
         msg << "[pbbam] FASTQ reader ERROR: could not open file:\n"
             << "  FASTQ file: " << fastqFilename_ << '\n';
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
 
@@ -37,7 +36,8 @@ IndexedFastqBgzfReader::IndexedFastqBgzfReader(std::string filename)
         std::ostringstream msg;
         msg << "[pbbam] FASTQ reader ERROR: could not load *.gzi index data:\n"
             << "  FASTQ file: " << fastqFilename_ << '\n'
-            << "  index file: " << fastqFilename_ << ".gzi\n";
+            << "  index file: " << fastqFilename_ << ".gzi";
+        MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
 }
@@ -87,9 +87,8 @@ int IndexedFastqBgzfReader::FetchRecord()
     return seq_->seq.l;
 }
 
-std::pair<std::string, QualityValues> IndexedFastqBgzfReader::Subsequence(const std::string& id,
-                                                                          Position start,
-                                                                          Position end)
+std::pair<std::string, Data::QualityValues> IndexedFastqBgzfReader::Subsequence(
+    const std::string& id, Data::Position start, Data::Position end)
 {
     // check requested region is valid
     const auto& entry = index_.Entry(id);
@@ -134,7 +133,7 @@ std::pair<std::string, QualityValues> IndexedFastqBgzfReader::Subsequence(const 
     const std::string seq{seq_->seq.s, seq_->seq.l};
     const std::string quals{seq_->qual.s, seq_->qual.l};
     return std::make_pair(seq.substr(start, length),
-                          QualityValues::FromFastq(quals.substr(start, length)));
+                          Data::QualityValues::FromFastq(quals.substr(start, length)));
 }
 
 }  // namespace BAM

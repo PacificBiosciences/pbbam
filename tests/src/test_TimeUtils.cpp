@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/../../src/TimeUtils.h>
+
 #include <ctime>
 
 #include <chrono>
@@ -7,12 +9,10 @@
 
 #include <gtest/gtest.h>
 
-#include <pbbam/../../src/TimeUtils.h>
-
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-TEST(TimeUtilsTest, ToIso8601)
+TEST(BAM_TimeUtils, can_convert_time_point_to_iso8601)
 {
     const time_t rawTime = 436428750L;
     const auto timestamp = std::chrono::system_clock::from_time_t(rawTime);
@@ -22,7 +22,7 @@ TEST(TimeUtilsTest, ToIso8601)
     EXPECT_EQ(expected, actual);
 }
 
-TEST(TimeUtilsTest, ToDataSetFormat)
+TEST(BAM_TimeUtils, can_convert_time_point_to_pacbio_dataset_format)
 {
     const time_t rawTime = 436428750L;
     const auto timestamp = std::chrono::system_clock::from_time_t(rawTime);

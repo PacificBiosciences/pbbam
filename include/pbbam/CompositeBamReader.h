@@ -1,14 +1,7 @@
-// File Description
-/// \file CompositeBamReader.h
-/// \brief Defines the composite BAM readers, for working with multiple input
-///       files.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_COMPOSITEBAMREADER_H
+#define PBBAM_COMPOSITEBAMREADER_H
 
-#ifndef COMPOSITEBAMREADER_H
-#define COMPOSITEBAMREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <deque>
 #include <functional>
@@ -17,15 +10,15 @@
 #include <string>
 #include <vector>
 
-#include "pbbam/BaiIndexCache.h"
-#include "pbbam/BaiIndexedBamReader.h"
-#include "pbbam/BamFile.h"
-#include "pbbam/BamHeader.h"
-#include "pbbam/BamReader.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/DataSet.h"
-#include "pbbam/GenomicInterval.h"
-#include "pbbam/PbiIndexedBamReader.h"
+#include <pbbam/BaiIndexCache.h>
+#include <pbbam/BaiIndexedBamReader.h>
+#include <pbbam/BamFile.h>
+#include <pbbam/BamHeader.h>
+#include <pbbam/BamReader.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/DataSet.h>
+#include <pbbam/GenomicInterval.h>
+#include <pbbam/PbiIndexedBamReader.h>
 
 namespace PacBio {
 namespace BAM {
@@ -305,6 +298,6 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/internal/CompositeBamReader.inl"
+#include <pbbam/internal/CompositeBamReader.inl>
 
-#endif  // COMPOSITEBAMREADER_H
+#endif  // PBBAM_COMPOSITEBAMREADER_H

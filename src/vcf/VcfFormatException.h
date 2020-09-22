@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #ifndef PBBAM_VCF_VCFFORMATEXCEPTION_H
 #define PBBAM_VCF_VCFFORMATEXCEPTION_H
 

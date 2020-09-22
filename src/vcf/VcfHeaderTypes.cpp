@@ -1,6 +1,6 @@
 #include "../PbbamInternalConfig.h"
 
-#include "pbbam/vcf/VcfHeaderTypes.h"
+#include <pbbam/vcf/VcfHeaderTypes.h>
 
 #include <cassert>
 

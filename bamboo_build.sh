@@ -10,17 +10,19 @@ type module >& /dev/null || . /mnt/software/Modules/current/init/bash
 
 module purge
 
-[[ ${GCC_VERSION} == ICC ]] && module use /pbi/dept/primary/modulefiles
+[[ ${GCC_VERSION} == ICC* ]] && module use /pbi/dept/primary/modulefiles
 module use /mnt/software/modulefiles
 
 module load meson
 module load ninja
 
 module load zlib
-module load htslib
+module load htslib${HTSLIB_VERSION}
 module load samtools
 
-module load boost
+# use the same boost version as PA (avoid ODR explosions), TAK-705
+[[ ${GCC_VERSION} == ICC2017* || ${GCC_VERSION} == PA ]] && PA_BOOST_VERSION="/1.58"
+module load boost${PA_BOOST_VERSION}
 
 module load cram
 

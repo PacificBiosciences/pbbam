@@ -1,26 +1,15 @@
-// File Description
-/// \file FastaWriter.h
-/// \brief Defines the FastaWriter class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_FASTAWRITER_H
+#define PBBAM_FASTAWRITER_H
 
-#ifndef FASTAWRITER_H
-#define FASTAWRITER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <fstream>
-#include <iostream>
 #include <string>
 
-#include "pbbam/IFastaWriter.h"
+#include <pbbam/IFastaWriter.h>
 
 namespace PacBio {
 namespace BAM {
-
-class BamRecord;
-class BamRecordImpl;
-class FastaSequence;
 
 class FastaWriter final : public IFastaWriter
 {
@@ -44,4 +33,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FASTAWRITER_H
+#endif  // PBBAM_FASTAWRITER_H

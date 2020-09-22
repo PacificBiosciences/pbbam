@@ -1,30 +1,22 @@
-// File Description
-/// \file Validator.cpp
-/// \brief Implements the Validator class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/Validator.h"
+#include <pbbam/Validator.h>
 
 #include <cstddef>
 
-#include <iostream>
 #include <map>
 #include <set>
-#include <sstream>
 #include <stdexcept>
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/core/ignore_unused.hpp>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/BamHeader.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/EntireFileQuery.h"
-#include "pbbam/ReadGroupInfo.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/BamHeader.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/EntireFileQuery.h>
+#include <pbbam/ReadGroupInfo.h>
 
 #include "ValidationErrors.h"
 #include "Version.h"
@@ -35,7 +27,7 @@ namespace {
 
 struct ilexcompare_wrapper
 {
-    bool operator()(const std::string& lhs, const std::string& rhs) const
+    bool operator()(const std::string& lhs, const std::string& rhs) const noexcept
     {
         return boost::ilexicographical_compare(lhs, rhs);
     }

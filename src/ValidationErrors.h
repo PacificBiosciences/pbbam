@@ -1,13 +1,7 @@
-// File Description
-/// \file ValidationErrors.h
-/// \brief Defines the ValidationErrors class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_VALIDATIONERRORS_H
+#define PBBAM_VALIDATIONERRORS_H
 
-#ifndef VALIDATIONERRORS_H
-#define VALIDATIONERRORS_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstddef>
 
@@ -63,4 +57,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // VALIDATIONERRORS_H
+#endif  // PBBAM_VALIDATIONERRORS_H

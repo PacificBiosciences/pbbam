@@ -1,13 +1,7 @@
-// File Description
-/// \file PbiRawData.h
-/// \brief Defines the classes used for working with raw PBI data.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_PBIRAWDATA_H
+#define PBBAM_PBIRAWDATA_H
 
-#ifndef PBIRAWDATA_H
-#define PBIRAWDATA_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -16,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "pbbam/PbiFile.h"
+#include <pbbam/PbiFile.h>
 
 namespace PacBio {
 namespace BAM {
@@ -188,7 +182,7 @@ public:
     ///
     PbiReferenceEntry(ID id, Row beginRow, Row endRow);
 
-    bool operator==(const PbiReferenceEntry& other) const;
+    bool operator==(const PbiReferenceEntry& other) const noexcept;
 
     /// \}
 
@@ -463,4 +457,4 @@ PbiIndexCache MakePbiIndexCache(const BamFile& bamFile);
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // PBIRAWDATA_H
+#endif  // PBBAM_PBIRAWDATA_H

@@ -1,12 +1,6 @@
-// File Description
-/// \file WhitelistedZmwReadStitcher.cpp
-/// \brief Implements the WhitelistedZmwReadStitcher class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/virtual/WhitelistedZmwReadStitcher.h"
+#include <pbbam/virtual/WhitelistedZmwReadStitcher.h>
 
 #include <cassert>
 #include <cstdint>
@@ -14,7 +8,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "pbbam/PbiIndexedBamReader.h"
+#include <pbbam/PbiIndexedBamReader.h>
 
 #include "VirtualZmwReader.h"
 

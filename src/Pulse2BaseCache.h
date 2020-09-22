@@ -1,9 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_PULSE2BASECACHE_H
+#define PBBAM_PULSE2BASECACHE_H
 
-#ifndef PULSE2BASECACHE_H
-#define PULSE2BASECACHE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cassert>
 #include <cctype>
@@ -40,10 +38,10 @@ public:
     Pulse2BaseCache() = delete;
     Pulse2BaseCache(const Pulse2BaseCache&) = default;
     Pulse2BaseCache(Pulse2BaseCache&&) noexcept(
-        std::is_nothrow_move_constructible<boost::dynamic_bitset<>>::value);
+        std::is_nothrow_move_constructible<boost::dynamic_bitset<>>::value) = default;
     Pulse2BaseCache& operator=(const Pulse2BaseCache&) = default;
     Pulse2BaseCache& operator=(Pulse2BaseCache&&) noexcept(
-        std::is_nothrow_move_assignable<boost::dynamic_bitset<>>::value);
+        std::is_nothrow_move_assignable<boost::dynamic_bitset<>>::value) = default;
     ~Pulse2BaseCache() = default;
 
     ///
@@ -106,13 +104,7 @@ private:
     boost::dynamic_bitset<> data_;
 };
 
-inline Pulse2BaseCache::Pulse2BaseCache(Pulse2BaseCache&&) noexcept(
-    std::is_nothrow_move_constructible<boost::dynamic_bitset<>>::value) = default;
-
-inline Pulse2BaseCache& Pulse2BaseCache::operator=(Pulse2BaseCache&&) noexcept(
-    std::is_nothrow_move_assignable<boost::dynamic_bitset<>>::value) = default;
-
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // PULSE2BASECACHE_H
+#endif  // PBBAM_PULSE2BASECACHE_H

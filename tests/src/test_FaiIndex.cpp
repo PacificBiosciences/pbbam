@@ -1,12 +1,13 @@
 // Author: Derek Barnett
 
+#include <pbbam/FaiIndex.h>
+
 #include <algorithm>
+#include <sstream>
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
-
-#include <pbbam/FaiIndex.h>
 
 #include "PbbamTestData.h"
 
@@ -22,7 +23,7 @@ const std::string simpleFastqFaiFn{PbbamTestsConfig::Data_Dir + "/fastx/simple.f
 
 }  // namespace FaiIndexTests
 
-TEST(FaiIndexTest, LoadsFromFastaFaiFile)
+TEST(BAM_FaiIndex, can_load_from_fasta_fai)
 {
     const std::vector<std::string> expectedNames{"seq1", "seq2", "seq3", "seq4",
                                                  "seq5", "seq6", "seq7", "seq8"};
@@ -35,7 +36,7 @@ TEST(FaiIndexTest, LoadsFromFastaFaiFile)
     EXPECT_EQ(expectedEntry, index.Entry("seq3"));
 }
 
-TEST(FaiIndexTest, LoadsFromFastqFaiFile)
+TEST(BAM_FaiIndex, can_load_from_fastq_fai)
 {
     const std::vector<std::string> expectedNames{"seq1", "seq2", "seq3", "seq4",
                                                  "seq5", "seq6", "seq7", "seq8"};
@@ -48,7 +49,7 @@ TEST(FaiIndexTest, LoadsFromFastqFaiFile)
     EXPECT_EQ(expectedEntry, index.Entry("seq3"));
 }
 
-TEST(FaiIndexTest, SaveFastaIndexToStream)
+TEST(BAM_FaiIndex, can_write_fasta_index_to_ostream)
 {
     // clang-format off
     const std::string expected
@@ -79,7 +80,7 @@ TEST(FaiIndexTest, SaveFastaIndexToStream)
     EXPECT_EQ(expected, out.str());
 }
 
-TEST(FaiIndexTest, SaveFastqIndexToStream)
+TEST(BAM_FaiIndex, can_write_fastq_index_to_ostream)
 {
     // clang-format off
     const std::string expected
@@ -108,4 +109,9 @@ TEST(FaiIndexTest, SaveFastqIndexToStream)
     std::ostringstream out;
     index.Save(out);
     EXPECT_EQ(expected, out.str());
+}
+
+TEST(BAM_FaiIndex, throws_on_missing_fai_file)
+{
+    EXPECT_THROW(FaiIndex{"does_not_exist.fai"}, std::runtime_error);
 }

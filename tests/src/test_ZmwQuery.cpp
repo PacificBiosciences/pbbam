@@ -1,5 +1,7 @@
 // Author: Derek Barnett
 
+#include <pbbam/ZmwQuery.h>
+
 #include <algorithm>
 #include <iterator>
 #include <string>
@@ -8,7 +10,6 @@
 #include <gtest/gtest.h>
 
 #include <pbbam/ZmwGroupQuery.h>
-#include <pbbam/ZmwQuery.h>
 
 #include "PbbamTestData.h"
 
@@ -19,7 +20,7 @@ const std::string input =
 
 }  // namespace ZmwQueryTests
 
-TEST(ZmwQueryTest, whitelist_query_returns_nothing_from_empty_whitelist)
+TEST(BAM_ZmwQuery, whitelist_query_returns_nothing_from_empty_whitelist)
 {
     const std::vector<int32_t> whitelist;
 
@@ -27,7 +28,7 @@ TEST(ZmwQueryTest, whitelist_query_returns_nothing_from_empty_whitelist)
     EXPECT_EQ(0, std::distance(query.begin(), query.end()));
 }
 
-TEST(ZmwQueryTest, whitelist_query_returns_only_requested_zmws)
+TEST(BAM_ZmwQuery, whitelist_query_returns_only_requested_zmws)
 {
     const std::vector<int32_t> whitelist{
         1411,   // 12
@@ -39,7 +40,7 @@ TEST(ZmwQueryTest, whitelist_query_returns_only_requested_zmws)
     EXPECT_EQ(48, std::distance(query.begin(), query.end()));
 }
 
-TEST(ZmwGroupQueryTest, whitelist_query_returns_nothing_from_empty_whitelist)
+TEST(BAM_ZmwGroupQuery, whitelist_query_returns_nothing_from_empty_whitelist)
 {
     const std::vector<int32_t> whitelist;
 
@@ -54,7 +55,7 @@ TEST(ZmwGroupQueryTest, whitelist_query_returns_nothing_from_empty_whitelist)
     EXPECT_EQ(0, recordCount);
 }
 
-TEST(ZmwGroupQueryTest, whitelist_query_returns_only_requested_zmws)
+TEST(BAM_ZmwGroupQuery, whitelist_query_returns_only_requested_zmws)
 {
     const std::vector<int32_t> whitelist{
         1411,   // 12
@@ -73,7 +74,7 @@ TEST(ZmwGroupQueryTest, whitelist_query_returns_only_requested_zmws)
     EXPECT_EQ(48, recordCount);
 }
 
-TEST(ZmwGroupQueryTest, round_robin_query_can_return_records_applying_dataset_filter)
+TEST(BAM_ZmwGroupQuery, round_robin_query_can_return_records_applying_dataset_filter)
 {
     size_t zmwCount = 0;
     size_t totalRecordCount = 0;
@@ -97,7 +98,7 @@ TEST(ZmwGroupQueryTest, round_robin_query_can_return_records_applying_dataset_fi
                            expectedNumRecordsPerZmw.cbegin()));
 }
 
-TEST(ZmwGroupQueryTest, round_robin_query_can_return_records_ignoring_dataset_filter)
+TEST(BAM_ZmwGroupQuery, round_robin_query_can_return_records_ignoring_dataset_filter)
 {
     size_t zmwCount = 0;
     size_t recordCount = 0;
@@ -125,7 +126,7 @@ TEST(ZmwGroupQueryTest, round_robin_query_can_return_records_ignoring_dataset_fi
         std::equal(holeNumbers.cbegin(), holeNumbers.cbegin() + 6, expectedHoleNumbers.cbegin()));
 }
 
-TEST(ZmwGroupQueryTest, sequential_query_can_return_records_ignoring_dataset_filter)
+TEST(BAM_ZmwGroupQuery, sequential_query_can_return_records_ignoring_dataset_filter)
 {
     size_t zmwCount = 0;
     size_t recordCount = 0;
@@ -147,7 +148,7 @@ TEST(ZmwGroupQueryTest, sequential_query_can_return_records_ignoring_dataset_fil
         std::equal(holeNumbers.cbegin(), holeNumbers.cbegin() + 5, expectedHoleNumbers.cbegin()));
 }
 
-TEST(ZmwGroupQueryTest, can_apply_custom_pbi_filter)
+TEST(BAM_ZmwGroupQuery, can_apply_custom_pbi_filter)
 {
     size_t zmwCount = 0;
     size_t recordCount = 0;

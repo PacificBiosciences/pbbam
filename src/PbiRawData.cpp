@@ -1,12 +1,6 @@
-// File Description
-/// \file PbiRawData.cpp
-/// \brief Implements the classes used for working with raw PBI data.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/PbiRawData.h"
+#include <pbbam/PbiRawData.h>
 
 #include <cassert>
 #include <cstddef>
@@ -18,9 +12,9 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/BamRecord.h"
-#include "pbbam/RecordType.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/RecordType.h>
 
 #include "PbiIndexIO.h"
 
@@ -232,7 +226,7 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
     holeNumber_.push_back(b.HasHoleNumber() ? b.HoleNumber() : 0);
     readQual_.push_back(b.HasReadAccuracy() ? static_cast<float>(b.ReadAccuracy()) : 0.0f);
     ctxtFlag_.push_back(b.HasLocalContextFlags() ? b.LocalContextFlags()
-                                                 : LocalContextFlags::NO_LOCAL_CONTEXT);
+                                                 : Data::LocalContextFlags::NO_LOCAL_CONTEXT);
 
     // virtual offset of record start
     fileOffset_.push_back(offset);
@@ -320,7 +314,7 @@ PbiRawData& PbiRawData::Version(PbiFile::VersionEnum version)
     return *this;
 }
 
-bool PbiReferenceEntry::operator==(const PbiReferenceEntry& other) const
+bool PbiReferenceEntry::operator==(const PbiReferenceEntry& other) const noexcept
 {
     return std::tie(tId_, beginRow_, endRow_) ==
            std::tie(other.tId_, other.beginRow_, other.endRow_);

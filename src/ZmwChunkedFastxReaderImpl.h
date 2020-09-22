@@ -1,20 +1,14 @@
-// File Description
-/// \file ZmwChunkedFastxReaderImpl.h
-/// \brief Defines the ZmwChunkedFastxReaderImpl class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_ZMWCHUNKEDFASTXREADERIMPL_H
+#define PBBAM_ZMWCHUNKEDFASTXREADERIMPL_H
 
-#ifndef ZMWCHUNKEDFASTXREADERIMPL_H
-#define ZMWCHUNKEDFASTXREADERIMPL_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 #include <utility>
 
-#include "pbbam/FaiIndex.h"
-#include "pbbam/FastaSequence.h"
-#include "pbbam/FastqSequence.h"
+#include <pbbam/FaiIndex.h>
+#include <pbbam/FastaSequence.h>
+#include <pbbam/FastqSequence.h>
 
 #include "FaiZmwChunker.h"
 
@@ -42,4 +36,4 @@ protected:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // ZMWCHUNKEDFASTXREADERIMPL_H
+#endif  // PBBAM_ZMWCHUNKEDFASTXREADERIMPL_H

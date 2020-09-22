@@ -1,12 +1,6 @@
-// File Description
-/// \file TextFileReader.cpp
-/// \brief Implements the TextFileReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/TextFileReader.h"
+#include <pbbam/TextFileReader.h>
 
 #include <cassert>
 
@@ -17,7 +11,9 @@
 #include <htslib/bgzf.h>
 #include <htslib/kstring.h>
 
-#include "MemoryUtils.h"
+#include <pbbam/Deleters.h>
+
+#include "ErrnoReason.h"
 
 namespace PacBio {
 namespace BAM {
@@ -38,6 +34,7 @@ public:
             std::ostringstream msg;
             msg << "[pbbam] text file reader ERROR: could not open file:\n"
                 << "  file: " << filename_;
+            MaybePrintErrnoReason(msg);
             throw std::runtime_error{msg.str()};
         }
 
@@ -72,9 +69,10 @@ public:
             // else error
             else {
                 std::ostringstream msg;
-                msg << "[pbbam] SAM writer ERROR: could not read from file:\n"
+                msg << "[pbbam] text file reader ERROR: could not read from file:\n"
                     << "  file: " << filename_ << '\n'
                     << "  htslib error code: " << result;
+                MaybePrintErrnoReason(msg);
                 throw std::runtime_error{msg.str()};
             }
         }

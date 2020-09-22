@@ -1,17 +1,11 @@
-// File Description
-/// \file FastaReader.cpp
-/// \brief Implements the FastaReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/FaiIndex.h"
+#include <pbbam/FaiIndex.h>
 
 #include <cassert>
 
 #include <fstream>
-#include <iostream>
+#include <ostream>
 #include <sstream>
 #include <stdexcept>
 #include <tuple>
@@ -19,7 +13,11 @@
 #include <unordered_map>
 #include <vector>
 
-#include "pbbam/StringUtilities.h"
+#include <htslib/faidx.h>
+
+#include <pbbam/StringUtilities.h>
+
+#include "ErrnoReason.h"
 
 namespace PacBio {
 namespace BAM {
@@ -29,7 +27,7 @@ static_assert(!std::is_copy_constructible<FaiIndex>::value,
 static_assert(!std::is_copy_assignable<FaiIndex>::value,
               "FaiIndex& operator=(const FaiIndex&) is not = delete");
 
-bool operator==(const FaiEntry& lhs, const FaiEntry& rhs)
+bool operator==(const FaiEntry& lhs, const FaiEntry& rhs) noexcept
 {
     return std::tie(lhs.Length, lhs.SeqOffset, lhs.NumBases, lhs.NumBytes, lhs.QualOffset) ==
            std::tie(rhs.Length, rhs.SeqOffset, rhs.NumBases, rhs.NumBytes, rhs.QualOffset);
@@ -58,6 +56,14 @@ public:
     void LoadFromFile(const std::string& fn)
     {
         std::ifstream f{fn};
+        if (!f) {
+            std::ostringstream msg;
+            msg << "[pbbam] FASTA index ERROR: could not open index file:\n"
+                << "  FAI file: " << fn;
+            MaybePrintErrnoReason(msg);
+            throw std::runtime_error{msg.str()};
+        }
+
         std::string line;
         std::vector<std::string> fields;
         while (std::getline(f, line)) {
@@ -101,6 +107,18 @@ FaiIndex& FaiIndex::operator=(FaiIndex&&) noexcept = default;
 FaiIndex::~FaiIndex() = default;
 
 void FaiIndex::Add(std::string name, FaiEntry entry) { d_->Add(std::move(name), std::move(entry)); }
+
+void FaiIndex::Create(const std::string& fn)
+{
+    const auto ret = fai_build(fn.c_str());
+    if (ret < 0) {
+        std::ostringstream msg;
+        msg << "[pbbam] FAI index ERROR: could not create *.fai for file:\n"
+            << "  file: " << fn;
+        MaybePrintErrnoReason(msg);
+        throw std::runtime_error{msg.str()};
+    }
+}
 
 const FaiEntry& FaiIndex::Entry(const std::string& name) const
 {

@@ -1,20 +1,16 @@
-// File Description
-/// \file FastaCache.h
-/// \brief Defines the FastaCache
-//
-// Author: Derek Barnett
+#ifndef PBBAM_FASTACACHE_H
+#define PBBAM_FASTACACHE_H
 
-#ifndef FASTACACHE_H
-#define FASTACACHE_H
+#include <pbbam/Config.h>
 
-#include "pbbam/Config.h"
-
+#include <functional>
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
-#include "pbbam/FastaSequence.h"
+#include <pbbam/FastaSequence.h>
 
 namespace PacBio {
 namespace BAM {
@@ -23,6 +19,28 @@ class FastaCacheData
 {
 public:
     explicit FastaCacheData(const std::string& filename);
+
+    ///
+    /// \brief Check FASTA data for valid bases.
+    ///
+    /// Check to see if sequences contain only [ACGTNacgtn] characters.
+    ///
+    /// \returns a pair consisting of a bool denoting success/fail and, on failure,
+    ///          the name of the first failing FASTA entry.
+    ///
+    std::pair<bool, std::string> Check() const;
+
+    ///
+    /// \brief Check FASTA data using custom callback.
+    ///
+    /// Uses the callable provided for validation, which should return
+    /// success or fail for a given FASTA entry.
+    ///
+    /// \returns a pair consisting of a bool denoting success/fail and, on failure,
+    ///          the name of the first failing FASTA entry.
+    ///
+    std::pair<bool, std::string> Check(
+        const std::function<bool(const FastaSequence&)>& callback) const;
 
     /// \brief Fetches FASTA sequence for desired interval.
     ///
@@ -57,4 +75,4 @@ FastaCache MakeFastaCache(const std::string& filename);
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FASTACACHE_H
+#endif  // PBBAM_FASTACACHE_H

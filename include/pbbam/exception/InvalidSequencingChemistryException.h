@@ -1,13 +1,7 @@
-// File Description
-/// \file InvalidSequencingChemistryException.h
-/// \brief Defines the InvalidSequencingChemistryException class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H
+#define PBBAM_INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H
 
-#ifndef INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H
-#define INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <exception>
 #include <sstream>
@@ -34,7 +28,8 @@ public:
         s << "[pbbam] chemistry compatibility ERROR: unsupported sequencing chemistry combination:\n"
           << "    binding kit:        " << bindingKit_ << '\n'
           << "    sequencing kit:     " << sequencingKit_ << '\n'
-          << "    basecaller version: " << basecallerVersion_ << '\n';
+          << "    basecaller version: " << basecallerVersion_ << '\n'
+          << "See SMRT Link release documentation for details about consumables compatibility or contact PacBio Technical Support." << '\n';
         what_ = s.str();
         // clang-format on
     }
@@ -62,4 +57,4 @@ protected:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H
+#endif  // PBBAM_INVALIDSEQUENCINGCHEMISTRYEXCEPTION_H

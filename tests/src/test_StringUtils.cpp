@@ -1,10 +1,10 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
-
 #include <pbbam/StringUtilities.h>
 
-TEST(StringUtilsTest, BasicSplitWithDefaultDelim)
+#include <gtest/gtest.h>
+
+TEST(BAM_StringUtils, can_split_using_default_delimiter)
 {
     const auto tokens = PacBio::BAM::Split("foo\tbar\tbaz");
     ASSERT_EQ(3, tokens.size());
@@ -13,7 +13,7 @@ TEST(StringUtilsTest, BasicSplitWithDefaultDelim)
     EXPECT_EQ("baz", tokens[2]);
 }
 
-TEST(StringUtilsTest, BasicSplitWithProvidedDelim)
+TEST(BAM_StringUtils, can_split_using_specified_delimiter)
 {
     const auto tokens = PacBio::BAM::Split("foo:bar:baz", ':');
     ASSERT_EQ(3, tokens.size());
@@ -22,13 +22,13 @@ TEST(StringUtilsTest, BasicSplitWithProvidedDelim)
     EXPECT_EQ("baz", tokens[2]);
 }
 
-TEST(StringUtilsTest, SplitEmptyStringReturnsEmptyResult)
+TEST(BAM_StringUtils, splitting_empty_string_returns_no_tokens)
 {
     const auto tokens = PacBio::BAM::Split("");
     EXPECT_TRUE(tokens.empty());
 }
 
-TEST(StringUtilsTest, SplitKeepsEmptyTokens)
+TEST(BAM_StringUtils, splitting_with_consecutive_delimiters_keeps_empty_tokens)
 {
     const auto tokens = PacBio::BAM::Split("foo\tbar\t\tbaz");
     ASSERT_EQ(4, tokens.size());
@@ -38,14 +38,14 @@ TEST(StringUtilsTest, SplitKeepsEmptyTokens)
     EXPECT_EQ("baz", tokens[3]);
 }
 
-TEST(StringUtilsTest, RemoveWhitespaceNormal)
+TEST(BAM_StringUtils, can_remove_whitespace_from_string)
 {
     const auto result =
         PacBio::BAM::RemoveAllWhitespace(" \f\r\v  Lorem ipsum     \tdolor sit\n\namet ");
     EXPECT_EQ("Loremipsumdolorsitamet", result);
 }
 
-TEST(StringUtilsTest, RemoveWhitespaceOnEmptyString)
+TEST(BAM_StringUtils, remove_whitespace_can_handle_empty_string)
 {
     const auto result = PacBio::BAM::RemoveAllWhitespace("");
     EXPECT_TRUE(result.empty());

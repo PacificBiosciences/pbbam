@@ -1,5 +1,9 @@
 // Author: Derek Barnett
 
+#include <pbbam/vcf/VcfQuery.h>
+
+#include <cstddef>
+
 #include <algorithm>
 #include <string>
 #include <vector>
@@ -7,7 +11,6 @@
 #include <gtest/gtest.h>
 
 #include <pbbam/vcf/VcfFile.h>
-#include <pbbam/vcf/VcfQuery.h>
 
 #include "PbbamTestData.h"
 
@@ -27,7 +30,7 @@ const std::string VcfFn{PacBio::BAM::PbbamTestsConfig::Data_Dir + "/vcf/structur
 
 }  // namespace VcfQueryTests
 
-TEST(VCF_Query, can_use_range_over_input_filename)
+TEST(VCF_VcfQuery, can_use_range_over_input_filename)
 {
     size_t i = 0;
     VcfQuery query{VcfQueryTests::VcfFn};
@@ -37,7 +40,7 @@ TEST(VCF_Query, can_use_range_over_input_filename)
     }
 }
 
-TEST(VCF_Query, can_use_range_over_input_file_object)
+TEST(VCF_VcfQuery, can_use_range_over_input_file_object)
 {
     const VcfFile file{VcfQueryTests::VcfFn};
 

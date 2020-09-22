@@ -1,30 +1,30 @@
 // Author: Derek Barnett
 
+#include "../../src/FaiZmwChunker.h"
+
 #include <vector>
 
 #include <gtest/gtest.h>
-
-#include "../../src/FaiZmwChunker.h"
 
 #include "FastxTests.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-TEST(FaiZmwChunkerTest, empty_input_zmws_yields_no_chunks)
+TEST(BAM_FaiZmwChunker, empty_input_zmws_yields_no_chunks)
 {
     FaiIndex index;
     FaiZmwChunker chunker{index, 5};
     EXPECT_EQ(0, chunker.NumChunks());
 }
 
-TEST(FaiZmwChunkerTest, throws_if_requested_num_chunks_is_zero)
+TEST(BAM_FaiZmwChunker, throws_if_requested_num_chunks_is_zero)
 {
     FaiIndex index;
     EXPECT_THROW(FaiZmwChunker(index, 0), std::runtime_error);
 }
 
-TEST(FaiZmwChunkerTest, standard_chunking)
+TEST(BAM_FaiZmwChunker, standard_chunking)
 {
     {
         FaiZmwChunker chunker{FastxTests::chunkingFastaFaiFn, 5};
@@ -80,7 +80,7 @@ TEST(FaiZmwChunkerTest, standard_chunking)
     }
 }
 
-TEST(FaiZmwChunkerTest, one_chunk_contains_all_records)
+TEST(BAM_FaiZmwChunker, one_chunk_contains_all_records)
 {
     FaiZmwChunker chunker{FastxTests::chunkingFastaFaiFn, 1};
     ASSERT_EQ(1, chunker.NumChunks());
@@ -93,7 +93,7 @@ TEST(FaiZmwChunkerTest, one_chunk_contains_all_records)
     EXPECT_EQ(7, chunker.Chunk(0).FirstSeqOffset);
 }
 
-TEST(FaiZmwChunkerTest, one_zmw_per_chunk_if_requested_count_is_larger_than_input)
+TEST(BAM_FaiZmwChunker, one_zmw_per_chunk_if_requested_count_is_larger_than_input)
 {
     FaiZmwChunker chunker{FastxTests::chunkingFastaFaiFn, 50};
     ASSERT_EQ(32, chunker.NumChunks());

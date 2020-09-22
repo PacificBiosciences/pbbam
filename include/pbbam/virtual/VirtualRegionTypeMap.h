@@ -1,17 +1,11 @@
-// File Description
-/// \file VirtualRegionTypeMap.h
-/// \brief Defines the VirtualRegionTypeMap class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_VIRTUALREGIONTYPEMAP_H
+#define PBBAM_VIRTUALREGIONTYPEMAP_H
 
-#ifndef VIRTUALREGIONTYPEMAP_H
-#define VIRTUALREGIONTYPEMAP_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <map>
 
-#include "pbbam/virtual/VirtualRegionType.h"
+#include <pbbam/virtual/VirtualRegionType.h>
 
 namespace PacBio {
 namespace BAM {
@@ -28,4 +22,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // VIRTUALREGIONTYPEMAP_H
+#endif  // PBBAM_VIRTUALREGIONTYPEMAP_H

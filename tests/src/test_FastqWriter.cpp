@@ -1,37 +1,34 @@
 // Author: Derek Barnett
 
-#include <gtest/gtest.h>
+#include <pbbam/FastqWriter.h>
+
 #include <cstddef>
 #include <cstdint>
 
-#include "FastxTests.h"
-#include "PbbamTestData.h"
+#include <gtest/gtest.h>
 
 #include <pbbam/BamFileMerger.h>
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/FastqReader.h>
 #include <pbbam/FastqSequence.h>
-#include <pbbam/FastqWriter.h>
 
 #include "FastxTests.h"
+#include "PbbamTestData.h"
 
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-namespace FastqWriterrTests {
-}  // namespace FastqWriterrTests
-
-TEST(FastqWriterTest, throws_on_empty_filename)
+TEST(BAM_FastqWriter, throws_on_empty_filename)
 {
     EXPECT_THROW(FastqWriter writer{""}, std::runtime_error);
 }
 
-TEST(FastqWriterTest, throws_on_invalid_extension)
+TEST(BAM_FastqWriter, throws_on_invalid_extension)
 {
     EXPECT_THROW(FastqWriter writer{"wrong.ext"}, std::runtime_error);
 }
 
-TEST(FastqWriterTest, can_write_fastq_sequence)
+TEST(BAM_FastqWriter, can_write_fastq_sequence)
 {
     const std::string outFastq = PbbamTestsConfig::GeneratedData_Dir + "/out.fq";
     const FastqSequence seq{"name", "GATTACA", "!!!!!!!"};
@@ -50,7 +47,7 @@ TEST(FastqWriterTest, can_write_fastq_sequence)
     remove(outFastq.c_str());
 }
 
-TEST(FastqWriterTest, can_write_fastq_from_bam)
+TEST(BAM_FastqWriter, can_write_fastq_from_bam)
 {
     const std::string fn = PbbamTestsConfig::Data_Dir + "/unmap1.bam";
     const std::string outFastq = PbbamTestsConfig::GeneratedData_Dir + "/out.fq";
@@ -79,7 +76,7 @@ TEST(FastqWriterTest, can_write_fastq_from_bam)
     remove(outFastq.c_str());
 }
 
-TEST(FastqWriterTest, can_write_fastq_from_strings)
+TEST(BAM_FastqWriter, can_write_fastq_from_strings)
 {
     const std::string outFastq = PbbamTestsConfig::GeneratedData_Dir + "/out.fq";
     const std::string name = "name";

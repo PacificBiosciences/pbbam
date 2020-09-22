@@ -1,13 +1,7 @@
-// File Description
-/// \file FrameEncodingType.h
-/// \brief Defines the FrameEncodingType enum.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_FRAMEENCODINGTYPE_H
+#define PBBAM_FRAMEENCODINGTYPE_H
 
-#ifndef FRAMEENCODINGTYPE_H
-#define FRAMEENCODINGTYPE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 namespace PacBio {
 namespace BAM {
@@ -21,7 +15,7 @@ namespace BAM {
 /// \sa https://github.com/PacificBiosciences/PacBioFileFormats/blob/3.0/BAM.rst
 ///     for more information on pulse frame encoding schemes.
 ///
-enum class FrameEncodingType
+enum class PBBAM_DEPRECATED_FRAMES FrameEncodingType
 {
     LOSSY,    ///< 8-bit compression (using CodecV1) of frame data
     LOSSLESS  ///< 16-bit native frame data
@@ -30,4 +24,4 @@ enum class FrameEncodingType
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FRAMEENCODINGTYPE_H
+#endif  // PBBAM_FRAMEENCODINGTYPE_H

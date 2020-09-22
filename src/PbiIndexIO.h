@@ -1,9 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_PBIINDEXIO_H
+#define PBBAM_PBIINDEXIO_H
 
-#ifndef PBIINDEXIO_H
-#define PBIINDEXIO_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cassert>
 #include <cstddef>
@@ -17,10 +15,10 @@
 #include <htslib/bgzf.h>
 #include <htslib/sam.h>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/DataSet.h"
-#include "pbbam/PbiFile.h"
-#include "pbbam/PbiRawData.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/DataSet.h>
+#include <pbbam/PbiFile.h>
+#include <pbbam/PbiRawData.h>
 
 namespace PacBio {
 namespace BAM {
@@ -66,7 +64,7 @@ private:
 };
 
 template <typename T>
-inline void PbiIndexIO::LoadBgzfVector(BGZF* fp, std::vector<T>& data, const uint32_t numReads)
+void PbiIndexIO::LoadBgzfVector(BGZF* fp, std::vector<T>& data, const uint32_t numReads)
 {
     assert(fp);
     data.resize(numReads);
@@ -76,7 +74,7 @@ inline void PbiIndexIO::LoadBgzfVector(BGZF* fp, std::vector<T>& data, const uin
 }
 
 template <typename T>
-inline void PbiIndexIO::SwapEndianness(std::vector<T>& data)
+void PbiIndexIO::SwapEndianness(std::vector<T>& data)
 {
     const auto elementSize = sizeof(T);
     const auto numReads = data.size();
@@ -101,7 +99,7 @@ inline void PbiIndexIO::SwapEndianness(std::vector<T>& data)
 }
 
 template <typename T>
-inline void PbiIndexIO::WriteBgzfVector(BGZF* fp, const std::vector<T>& data)
+void PbiIndexIO::WriteBgzfVector(BGZF* fp, const std::vector<T>& data)
 {
     assert(fp);
     std::vector<T> output = data;
@@ -113,4 +111,4 @@ inline void PbiIndexIO::WriteBgzfVector(BGZF* fp, const std::vector<T>& data)
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // PBIINDEXIO_H
+#endif  // PBBAM_PBIINDEXIO_H

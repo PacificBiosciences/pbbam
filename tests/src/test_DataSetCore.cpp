@@ -1,14 +1,15 @@
 // Author: Derek Barnett
 
+#include <pbbam/DataSet.h>
+
 #include <cstddef>
+
 #include <string>
 
 #include <gtest/gtest.h>
 
 #include "../src/FileUtils.h"
 #include "PbbamTestData.h"
-
-#include <pbbam/DataSet.h>
 
 using namespace PacBio;
 using namespace PacBio::BAM;
@@ -18,7 +19,7 @@ namespace DataSetCoreTests {
 const std::string subreadsetBioSample{PbbamTestsConfig::Data_Dir +
                                       "/dataset/biosample.subreadset.xml"};
 
-static inline DataSet CreateDataSet()
+static DataSet CreateDataSet()
 {
     DataSet d;
     d.Name("foo");
@@ -27,7 +28,7 @@ static inline DataSet CreateDataSet()
 
 }  // namespace DataSetCoreTests
 
-TEST(DataSetCoreTest, XmlNameParts)
+TEST(BAM_DataSetCore, can_parse_xml_name_parts)
 {
     internal::XmlName name{"ns:node_name"};
     EXPECT_EQ(boost::string_ref("ns"), name.Prefix());
@@ -45,7 +46,7 @@ TEST(DataSetCoreTest, XmlNameParts)
     EXPECT_EQ(boost::string_ref(":node_name"), leadingColon.QualifiedName());
 }
 
-TEST(DataSetCoreTest, DefaultsOk)
+TEST(BAM_DataSetCore, created_with_correct_defaults)
 {
     const DataSet dataset;
     EXPECT_EQ(DataSet::GENERIC, dataset.Type());
@@ -69,7 +70,7 @@ TEST(DataSetCoreTest, DefaultsOk)
     EXPECT_EQ(std::string{"3.0.1"}, dataset.Version());
 }
 
-TEST(DataSetCoreTest, TimeStampedNamesOk)
+TEST(BAM_DataSetCore, default_constructed_generates_time_stamped_name)
 {
     const DataSet dataset;
     const AlignmentSet alignmentSet;
@@ -95,7 +96,7 @@ TEST(DataSetCoreTest, TimeStampedNamesOk)
     EXPECT_EQ(0, transcriptSet.TimeStampedName().find("pacbio_dataset_transcriptset-"));
 }
 
-TEST(DataSetCoreTest, BasicGettersSettersOk)
+TEST(BAM_DataSetCore, can_be_modified_via_setters)
 {
     DataSet dataset;
     dataset.CreatedAt("now");
@@ -121,7 +122,7 @@ TEST(DataSetCoreTest, BasicGettersSettersOk)
     EXPECT_EQ("0.0.0", dataset.Version());
 }
 
-TEST(DataSetCoreTest, CopyOk)
+TEST(BAM_DataSetCore, can_be_copied)
 {
     DataSet d1;
     d1.Name("foo");
@@ -136,7 +137,7 @@ TEST(DataSetCoreTest, CopyOk)
     EXPECT_EQ("foo", d3.Name());
 }
 
-TEST(DataSetCoreTest, MoveOk)
+TEST(BAM_DataSetCore, can_be_moved)
 {
     DataSet d1;
     d1.Name("foo");
@@ -151,7 +152,7 @@ TEST(DataSetCoreTest, MoveOk)
     EXPECT_EQ("foo", d3.Name());
 }
 
-TEST(DataSetCoreTest, AddExternalResources)
+TEST(BAM_DataSetCore, can_add_external_resources)
 {
     DataSet dataset;
     EXPECT_EQ(0, dataset.ExternalResources().Size());
@@ -188,7 +189,7 @@ TEST(DataSetCoreTest, AddExternalResources)
     }
 }
 
-TEST(DataSetCoreTest, EditExternalResources)
+TEST(BAM_DataSetCore, can_edit_external_resources)
 {
     DataSet dataset;
 
@@ -206,7 +207,7 @@ TEST(DataSetCoreTest, EditExternalResources)
     EXPECT_EQ("file2", dataset.ExternalResources()[1].Name());
 }
 
-TEST(DataSetCoreTest, NestedExternalResources)
+TEST(BAM_DataSetCore, can_create_nested_external_resources)
 {
     ExternalResource resource{"metatype", "filename"};
     resource.ExternalResources().Add(ExternalResource{"metatype.child", "filename.child"});
@@ -220,7 +221,40 @@ TEST(DataSetCoreTest, NestedExternalResources)
     EXPECT_EQ("filename.child2", childResources[1].ResourceId());
 }
 
-TEST(DataSetCoreTest, AddFilters)
+TEST(BAM_DataSetCore, can_remove_external_resources)
+{
+    DataSet dataset;
+    EXPECT_EQ(0, dataset.ExternalResources().Size());
+
+    ExternalResource resource1{"metatype", "id"};
+    resource1.Name("file1");
+
+    ExternalResource resource2{"metatype", "id2"};
+    resource2.Name("file2");
+
+    dataset.ExternalResources().Add(resource1);
+    dataset.ExternalResources().Add(resource2);
+    EXPECT_EQ(2, dataset.ExternalResources().Size());
+
+    // remove
+    dataset.ExternalResources().Remove(resource1);
+    EXPECT_EQ(1, dataset.ExternalResources().Size());
+
+    // direct access
+    const ExternalResources& resources = dataset.ExternalResources();
+    EXPECT_EQ("file2", resources[0].Name());
+
+    // iterable
+    size_t i = 0;
+    for (auto r : resources) {
+        if (i == 0) {
+            EXPECT_EQ("file2", r.Name());
+        }
+        ++i;
+    }
+}
+
+TEST(BAM_DataSetCore, can_add_filters)
 {
     DataSet dataset;
     EXPECT_EQ(0, dataset.Filters().Size());
@@ -302,7 +336,7 @@ TEST(DataSetCoreTest, AddFilters)
     }
 }
 
-TEST(DataSetCoreTest, EditFilters)
+TEST(BAM_DataSetCore, can_edit_filters)
 {
     DataSet dataset;
     EXPECT_EQ(0, dataset.Filters().Size());
@@ -350,7 +384,34 @@ TEST(DataSetCoreTest, EditFilters)
     EXPECT_EQ("!=", p3.Operator());
 }
 
-TEST(DataSetCoreTest, AddSubDataSets)
+TEST(BAM_DataSetCore, can_remove_filters)
+{
+    DataSet dataset;
+    EXPECT_EQ(0, dataset.Filters().Size());
+
+    Filter filter;
+    filter.Properties().Add(Property{"rq", "0.85", ">"});
+    filter.Properties().Add(Property{"RNAME", "chr1", "=="});
+    EXPECT_EQ(2, filter.Properties().Size());
+
+    Filter filter2;
+    filter2.Properties().Add(Property{"rq", "0.50", ">="});
+    filter2.Properties().Add(Property{"RNAME", "chr2", "!="});
+    EXPECT_EQ(2, filter2.Properties().Size());
+
+    dataset.Filters().Add(filter);
+    dataset.Filters().Add(filter2);
+    EXPECT_EQ(2, dataset.Filters().Size());
+
+    // remove
+    dataset.Filters().Remove(filter);
+    EXPECT_EQ(1, dataset.Filters().Size());
+
+    const Filters& filters = dataset.Filters();
+    EXPECT_EQ(2, filters[0].Properties().Size());
+}
+
+TEST(BAM_DataSetCore, can_add_subdatasets)
 {
     DataSet dataset;
     EXPECT_EQ(0, dataset.SubDataSets().Size());
@@ -381,7 +442,7 @@ TEST(DataSetCoreTest, AddSubDataSets)
     }
 }
 
-TEST(DataSetCoreTest, EditSubDataSets)
+TEST(BAM_DataSetCore, can_edit_subdatasets)
 {
     DataSet dataset;
     EXPECT_EQ(0, dataset.SubDataSets().Size());
@@ -415,67 +476,7 @@ TEST(DataSetCoreTest, EditSubDataSets)
     }
 }
 
-TEST(DataSetCoreTest, RemoveExternalResources)
-{
-    DataSet dataset;
-    EXPECT_EQ(0, dataset.ExternalResources().Size());
-
-    ExternalResource resource1{"metatype", "id"};
-    resource1.Name("file1");
-
-    ExternalResource resource2{"metatype", "id2"};
-    resource2.Name("file2");
-
-    dataset.ExternalResources().Add(resource1);
-    dataset.ExternalResources().Add(resource2);
-    EXPECT_EQ(2, dataset.ExternalResources().Size());
-
-    // remove
-    dataset.ExternalResources().Remove(resource1);
-    EXPECT_EQ(1, dataset.ExternalResources().Size());
-
-    // direct access
-    const ExternalResources& resources = dataset.ExternalResources();
-    EXPECT_EQ("file2", resources[0].Name());
-
-    // iterable
-    size_t i = 0;
-    for (auto r : resources) {
-        if (i == 0) {
-            EXPECT_EQ("file2", r.Name());
-        }
-        ++i;
-    }
-}
-
-TEST(DataSetCoreTest, RemoveFilters)
-{
-    DataSet dataset;
-    EXPECT_EQ(0, dataset.Filters().Size());
-
-    Filter filter;
-    filter.Properties().Add(Property{"rq", "0.85", ">"});
-    filter.Properties().Add(Property{"RNAME", "chr1", "=="});
-    EXPECT_EQ(2, filter.Properties().Size());
-
-    Filter filter2;
-    filter2.Properties().Add(Property{"rq", "0.50", ">="});
-    filter2.Properties().Add(Property{"RNAME", "chr2", "!="});
-    EXPECT_EQ(2, filter2.Properties().Size());
-
-    dataset.Filters().Add(filter);
-    dataset.Filters().Add(filter2);
-    EXPECT_EQ(2, dataset.Filters().Size());
-
-    // remove
-    dataset.Filters().Remove(filter);
-    EXPECT_EQ(1, dataset.Filters().Size());
-
-    const Filters& filters = dataset.Filters();
-    EXPECT_EQ(2, filters[0].Properties().Size());
-}
-
-TEST(DataSetCoreTest, RemoveSubDataSets)
+TEST(BAM_DataSetCore, can_remove_subdatasets)
 {
     DataSet dataset;
     EXPECT_EQ(0, dataset.SubDataSets().Size());
@@ -495,7 +496,7 @@ TEST(DataSetCoreTest, RemoveSubDataSets)
     EXPECT_EQ(1, dataset.SubDataSets().Size());
 }
 
-TEST(DataSetCoreTest, EnsureCreatedAtAttribute)
+TEST(BAM_DataSetCore, generates_created_at_attribute)
 {
     const DataSet ds;
     const ReferenceSet ref;
@@ -503,7 +504,7 @@ TEST(DataSetCoreTest, EnsureCreatedAtAttribute)
     EXPECT_FALSE(ref.CreatedAt().empty());
 }
 
-TEST(DataSetCoreTest, BiosamplesOk)
+TEST(BAM_DataSetCore, can_add_biosamples)
 {
     const std::string barcode_1_1{"lbc1--lbc1"};
     const std::string barcode_1_2{"lbc1--lbc2"};
@@ -544,7 +545,7 @@ TEST(DataSetCoreTest, BiosamplesOk)
     EXPECT_EQ("Bob", metadata.BioSamples()[1].Name());
 }
 
-TEST(DataSetCoreTest, BiosamplesFromXML)
+TEST(BAM_DataSetCore, can_load_biosamples_from_xml)
 {
     BAM::DataSet ds{DataSetCoreTests::subreadsetBioSample};
     const auto& metadata = ds.Metadata();

@@ -1,12 +1,6 @@
-// File Description
-/// \file Compare.cpp
-/// \brief Implements the Compare class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/Compare.h"
+#include <pbbam/Compare.h>
 
 #include <cstddef>
 
@@ -32,7 +26,7 @@ struct TypeAlias
 
 struct CompareTypeHash
 {
-    size_t operator()(const Compare::Type& t) const
+    size_t operator()(const Compare::Type& t) const noexcept
     {
         return std::hash<int>()(static_cast<int>(t));
     }

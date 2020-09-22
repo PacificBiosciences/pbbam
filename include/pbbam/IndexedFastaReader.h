@@ -1,34 +1,23 @@
-// File Description
-/// \file IndexedFastaReader.h
-/// \brief Defines the IndexedFastaReader class.
-//
-// Author: David Alexander
+#ifndef PBBAM_INDEXEDFASTAREADER_H
+#define PBBAM_INDEXEDFASTAREADER_H
 
-#ifndef INDEXEDFASTAREADER_H
-#define INDEXEDFASTAREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstddef>
 
-#include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
-#include "pbbam/Orientation.h"
-#include "pbbam/Position.h"
+#include <pbcopper/data/GenomicInterval.h>
+
+#include <pbbam/BamRecord.h>
+#include <pbbam/Orientation.h>
+#include <pbbam/Position.h>
 
 namespace PacBio {
-namespace Data {
-
-class GenomicInterval;
-}
-
 namespace BAM {
-
-class BamRecord;
 
 /// \brief The IndexedFastaReader class provides random-access to FASTA file
 ///        data.
@@ -64,7 +53,7 @@ public:
     ///
     /// \throws std::runtime_error on failure to fetch sequence
     ///
-    std::string Subsequence(const std::string& id, Position begin, Position end) const;
+    std::string Subsequence(const std::string& id, Data::Position begin, Data::Position end) const;
 
     /// \brief Fetches FASTA sequence for desired interval.
     ///
@@ -106,10 +95,10 @@ public:
     ///
     /// \throws std::runtime_error on failure to fetch sequence
     ///
-    std::string ReferenceSubsequence(const BamRecord& bamRecord,
-                                     const Orientation orientation = Orientation::GENOMIC,
-                                     const bool gapped = false,
-                                     const bool exciseSoftClips = false) const;
+    std::string ReferenceSubsequence(
+        const BamRecord& bamRecord,
+        const Data::Orientation orientation = Data::Orientation::GENOMIC, const bool gapped = false,
+        const bool exciseSoftClips = false) const;
 
     /// \}
 
@@ -145,4 +134,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // INDEXEDFASTAREADER_H
+#endif  // PBBAM_INDEXEDFASTAREADER_H

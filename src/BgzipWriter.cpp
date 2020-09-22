@@ -1,12 +1,6 @@
-// File Description
-/// \file BgzipWriter.cpp
-/// \brief Implements the BgzipWriter class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/BgzipWriter.h"
+#include <pbbam/BgzipWriter.h>
 
 #include <cassert>
 
@@ -18,8 +12,10 @@
 #include <htslib/bgzf.h>
 #include <htslib/hts.h>
 
+#include <pbbam/Deleters.h>
+
+#include "ErrnoReason.h"
 #include "FileProducer.h"
-#include "MemoryUtils.h"
 
 namespace PacBio {
 namespace BAM {
@@ -39,13 +35,13 @@ public:
 
         // open file
         usingFilename_ = (fileProducer_ ? fileProducer_->TempFilename() : filename);
-        const auto mode =
-            std::string("wb") + std::to_string(static_cast<int>(config.CompressionLevel));
+        const auto mode = "wb" + std::to_string(config.CompressionLevel);
         bgzf_.reset(bgzf_open(usingFilename_.c_str(), mode.c_str()));
         if (!bgzf_) {
             std::ostringstream s;
             s << "[pbbam] bgzipped file writer ERROR: could not open file for writing:\n"
               << "  file: " << usingFilename_;
+            MaybePrintErrnoReason(s);
             throw std::runtime_error{s.str()};
         }
 
@@ -64,11 +60,12 @@ public:
 
     size_t Write(const void* data, size_t numBytes)
     {
-        const int written = bgzf_write(bgzf_.get(), data, numBytes);
+        const auto written = bgzf_write(bgzf_.get(), data, numBytes);
         if (written < 0) {
             std::ostringstream s;
             s << "[pbbam] bgzipped file writer ERROR: failed writing:\n"
               << "  file: " << usingFilename_;
+            MaybePrintErrnoReason(s);
             throw std::runtime_error{s.str()};
         }
         return static_cast<size_t>(written);
