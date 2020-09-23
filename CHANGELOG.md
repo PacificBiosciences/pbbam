@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [1.6.0] - 2020-09-23
+
+### Added
+ - ccs-kinetics-bystrandify tool.
+ - 'errno' context for more informative I/O failure messages.
+ - Support for alternative frame encodings.
+
+### Changed
+ - Moved BedReader/Writer to PacBio::BED namespace.
+
 ## [1.5.0] - 2020-08-05
 
 ### Added
