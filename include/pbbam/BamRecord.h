@@ -319,6 +319,12 @@ public:
     /// \returns true if this record has DeletionTag data
     bool HasDeletionTag() const;
 
+    /// \returns true if this record has forward IPD data
+    bool HasForwardIPD() const;
+
+    /// \returns true if this record has forward pulse width data
+    bool HasForwardPulseWidth() const;
+
     /// \returns true if this record has a HoleNumber
     bool HasHoleNumber() const;
 
@@ -387,6 +393,12 @@ public:
 
     /// \returns true if this record has QueryStartFrameNumber data
     bool HasQueryStartFrameNumber() const;
+
+    /// \returns true if this record has reverse IPD data
+    bool HasReverseIPD() const;
+
+    /// \returns true if this record has reverse pulse width data
+    bool HasReversePulseWidth() const;
 
     /// \returns true if this record has ScrapRegionType data (only in SCRAP)
     bool HasScrapRegionType() const;
@@ -593,6 +605,38 @@ public:
     /// \name Pulse Data
     /// \{
 
+    /// \brief Fetches this record's forward IPD values ("fi" tag).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the
+    ///       new frames will have a value of 0;
+    ///
+    /// \param[in] orientation      Orientation of output.
+    /// \param[in] aligned          if true, gaps/padding will be inserted, per
+    ///                             Cigar info.
+    /// \param[in] exciseSoftClips  if true, any soft-clipped positions will be
+    ///                             removed from query ends
+    ///
+    /// \returns forward IPD as Frames object
+    ///
+    Data::Frames ForwardIPD(Data::Orientation orientation = Data::Orientation::NATIVE,
+                            bool aligned = false, bool exciseSoftClips = false) const;
+
+    /// \brief Fetches this record's forward pulse width values ("fp" tag).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the
+    ///       new frames will have a value of 0;
+    ///
+    /// \param[in] orientation      Orientation of output.
+    /// \param[in] aligned          if true, gaps/padding will be inserted, per
+    ///                             Cigar info.
+    /// \param[in] exciseSoftClips  if true, any soft-clipped positions will be
+    ///                             removed from query ends
+    ///
+    /// \returns foward PW as Frames object
+    ///
+    Data::Frames ForwardPulseWidth(Data::Orientation orientation = Data::Orientation::NATIVE,
+                                   bool aligned = false, bool exciseSoftClips = false) const;
+
     /// \brief Fetches this record's IPD values ("ip" tag).
     ///
     /// \note If \p aligned is true, and gaps/padding need to be inserted, the
@@ -736,6 +780,38 @@ public:
     ///
     Frames PulseWidthRaw(Orientation orientation = Orientation::NATIVE, bool aligned = false,
                          bool exciseSoftClips = false) const;
+
+    /// \brief Fetches this record's reverse IPD values ("ri" tag).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the
+    ///       new frames will have a value of 0;
+    ///
+    /// \param[in] orientation      Orientation of output.
+    /// \param[in] aligned          if true, gaps/padding will be inserted, per
+    ///                             Cigar info.
+    /// \param[in] exciseSoftClips  if true, any soft-clipped positions will be
+    ///                             removed from query ends
+    ///
+    /// \returns reverse IPD as Frames object
+    ///
+    Data::Frames ReverseIPD(Data::Orientation orientation = Data::Orientation::NATIVE,
+                            bool aligned = false, bool exciseSoftClips = false) const;
+
+    /// \brief Fetches this record's reverse pulse width values ("rp" tag).
+    ///
+    /// \note If \p aligned is true, and gaps/padding need to be inserted, the
+    ///       new frames will have a value of 0.
+    ///
+    /// \param[in] orientation      Orientation of output.
+    /// \param[in] aligned          if true, gaps/padding will be inserted, per
+    ///                             Cigar info.
+    /// \param[in] exciseSoftClips  if true, any soft-clipped positions will be
+    ///                             removed from query ends
+    ///
+    /// \returns reverse PulseWidths as Frames object
+    ///
+    Data::Frames ReversePulseWidth(Data::Orientation orientation = Data::Orientation::NATIVE,
+                                   bool aligned = false, bool exciseSoftClips = false) const;
 
     /// \brief Fetches this record's StartFrame values ("sf" tag).
     ///
@@ -988,6 +1064,24 @@ public:
     /// \name Pulse Data
     /// \{
 
+    /// \brief Sets this record's forward IPD values ("fi" tag).
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or
+    ///                     16-bit lossless)
+    /// \returns reference to this record
+    ///
+    BamRecord& ForwardIPD(const Data::Frames& frames, const Data::FrameCodec encoding);
+
+    /// \brief Sets this record's forward pulse width values ("fp" tag).
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or
+    ///                     16-bit lossless)
+    /// \returns reference to this record
+    ///
+    BamRecord& ForwardPulseWidth(const Data::Frames& frames, const Data::FrameCodec encoding);
+
     /// \brief Sets this record's IPD values ("ip" tag).
     ///
     /// \deprecated since v1.3.0. Use the FrameCodec overload instead
@@ -1169,6 +1263,24 @@ public:
     /// \returns reference to this record
     ///
     BamRecord& PulseWidth(const Data::Frames& frames, const Data::FrameCodec encoding);
+
+    /// \brief Sets this record's reverse IPD values ("ri" tag).
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or
+    ///                     16-bit lossless)
+    /// \returns reference to this record
+    ///
+    BamRecord& ReverseIPD(const Data::Frames& frames, const Data::FrameCodec encoding);
+
+    /// \brief Sets this record's reverse pulse width values ("rp" tag).
+    ///
+    /// \param[in] frames
+    /// \param[in] encoding specify how to encode the data (8-bit lossy, or
+    ///                     16-bit lossless)
+    /// \returns reference to this record
+    ///
+    BamRecord& ReversePulseWidth(const Data::Frames& frames, const Data::FrameCodec encoding);
 
     /// \brief Sets this record's StartFrame values ("sf" tag).
     ///
