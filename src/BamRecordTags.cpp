@@ -21,6 +21,8 @@ const BamRecordTags::TagLookupType BamRecordTags::tagLookup =
     { BamRecordTag::CONTEXT_FLAGS,            {"cx", false} },
     { BamRecordTag::DELETION_QV,              {"dq", false} },
     { BamRecordTag::DELETION_TAG,             {"dt", false} },
+    { BamRecordTag::FORWARD_IPD,              {"fi", false} },
+    { BamRecordTag::FORWARD_PW,               {"fp", false} },
     { BamRecordTag::HOLE_NUMBER,              {"zm", false} },
     { BamRecordTag::INSERTION_QV,             {"iq", false} },
     { BamRecordTag::IPD,                      {"ip", false} },
@@ -38,6 +40,8 @@ const BamRecordTags::TagLookupType BamRecordTags::tagLookup =
     { BamRecordTag::PULSE_EXCLUSION,          {"pe", true}  },
     { BamRecordTag::PULSE_MERGE_QV,           {"pg", true}  },
     { BamRecordTag::PULSE_WIDTH,              {"pw", false} }, // 'pulse' in the name; but stored per-base, not per-pulse
+    { BamRecordTag::REVERSE_IPD,              {"ri", false} },
+    { BamRecordTag::REVERSE_PW,               {"rp", false} },
     { BamRecordTag::QUERY_END,                {"qe", false} },
     { BamRecordTag::QUERY_END_FRAME_NUMBER,   {"we", false} },
     { BamRecordTag::QUERY_START,              {"qs", false} },
