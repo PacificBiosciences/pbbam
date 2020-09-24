@@ -1,12 +1,6 @@
-// File Description
-/// \file FastaReader.cpp
-/// \brief Implements the FastaReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/FastaReader.h"
+#include <pbbam/FastaReader.h>
 
 #include <cassert>
 
@@ -17,7 +11,7 @@
 #include <type_traits>
 #include <vector>
 
-#include "pbbam/FormatUtils.h"
+#include <pbbam/FormatUtils.h>
 
 #include "KSeqReader.h"
 

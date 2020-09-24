@@ -1,13 +1,7 @@
-// File Description
-/// \file LocalContextFlags.h
-/// \brief Defines the LocalContextFlags enum & helper method(s).
-//
-// Author: Lance Hepler
+#ifndef PBBAM_LOCALCONTEXTFLAGS_H
+#define PBBAM_LOCALCONTEXTFLAGS_H
 
-#ifndef LOCALCONTEXTFLAGS_H
-#define LOCALCONTEXTFLAGS_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <pbcopper/data/LocalContextFlags.h>
 
@@ -29,4 +23,4 @@ using PacBio::Data::REVERSE_PASS;
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // LOCALCONTEXTFLAGS_H
+#endif  // PBBAM_LOCALCONTEXTFLAGS_H

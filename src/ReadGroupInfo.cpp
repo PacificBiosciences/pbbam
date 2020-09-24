@@ -1,12 +1,6 @@
-// File Description
-/// \file ReadGroupInfo.cpp
-/// \brief Implements the ReadGroupInfo class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/ReadGroupInfo.h"
+#include <pbbam/ReadGroupInfo.h>
 
 #include <cassert>
 #include <cstddef>
@@ -25,9 +19,9 @@
 #include <boost/algorithm/cxx14/equal.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "pbbam/MD5.h"
-#include "pbbam/SamTagCodec.h"
-#include "pbbam/StringUtilities.h"
+#include <pbbam/MD5.h>
+#include <pbbam/SamTagCodec.h>
+#include <pbbam/StringUtilities.h>
 
 #include "ChemistryTable.h"
 
@@ -136,12 +130,12 @@ std::string BaseFeatureName(const BaseFeature& feature)
     throw std::runtime_error{ "[pbbam] read group ERROR: unrecognized base feature" };
 }
 
-std::string FrameCodecName(const FrameCodec& codec, const Data::FrameEncoder& encoder)
+std::string FrameCodecName(const Data::FrameCodec& codec, const Data::FrameEncoder& encoder)
 {
     switch (codec) {
-        case FrameCodec::RAW : return codec_RAW;
-        case FrameCodec::V1 : return codec_V1;
-        case FrameCodec::V2 : return encoder.Name();
+        case Data::FrameCodec::RAW : return codec_RAW;
+        case Data::FrameCodec::V1 : return codec_V1;
+        case Data::FrameCodec::V2 : return encoder.Name();
         default:
             throw std::runtime_error{"[pbbam] read group ERROR: unrecognized frame codec" };
     }
@@ -216,10 +210,10 @@ static const std::map<std::string, BaseFeature> nameToFeature
     { feature_PE, BaseFeature::PULSE_EXCLUSION }
 };
 
-static const std::map<std::string, FrameCodec> nameToCodec
+static const std::map<std::string, Data::FrameCodec> nameToCodec
 {
-    { codec_RAW, FrameCodec::RAW },
-    { codec_V1,  FrameCodec::V1 }
+    { codec_RAW, Data::FrameCodec::RAW },
+    { codec_V1,  Data::FrameCodec::V1 }
 };
 
 static const std::map<std::string, BarcodeModeType> nameToBarcodeMode
@@ -255,13 +249,13 @@ bool IsBaseFeature(const std::string& name)
 
 BaseFeature BaseFeatureFromName(const std::string& name) { return nameToFeature.at(name); }
 
-FrameCodec FrameCodecFromName(const std::string& name)
+Data::FrameCodec FrameCodecFromName(const std::string& name)
 {
     const auto foundCodec = nameToCodec.find(name);
     if (foundCodec != nameToCodec.cend())
         return foundCodec->second;
     else if (name.find("CodecV2") == 0)
-        return FrameCodec::V2;
+        return Data::FrameCodec::V2;
 
     throw std::runtime_error{"[pbbam] read group ERROR: unknown codec name '" + name + "'"};
 }
@@ -270,8 +264,10 @@ Data::FrameEncoder FrameEncoderFromName(const std::string& name)
 {
     if (name.find("CodecV2") == 0) {
         const auto codecParts = BAM::Split(name, '/');
-        assert(codecParts.size() == 2);
-        return Data::V2FrameEncoder{std::stoi(codecParts[1])};
+        assert(codecParts.size() == 3);
+        const int exponentBits = std::stoi(codecParts[1]);
+        const int mantissaBits = std::stoi(codecParts[2]);
+        return Data::V2FrameEncoder{exponentBits, mantissaBits};
     } else
         return Data::V1FrameEncoder{};  // default
 }
@@ -759,9 +755,9 @@ std::string ReadGroupInfo::IntToId(const int32_t id)
     return s.str();
 }
 
-FrameCodec ReadGroupInfo::IpdCodec() const { return ipdCodec_; }
+Data::FrameCodec ReadGroupInfo::IpdCodec() const { return ipdCodec_; }
 
-ReadGroupInfo& ReadGroupInfo::IpdCodec(FrameCodec codec, std::string tag)
+ReadGroupInfo& ReadGroupInfo::IpdCodec(Data::FrameCodec codec, std::string tag)
 {
     // store desired codec type
     ipdCodec_ = std::move(codec);
@@ -832,9 +828,9 @@ ReadGroupInfo& ReadGroupInfo::Programs(std::string programs)
     return *this;
 }
 
-FrameCodec ReadGroupInfo::PulseWidthCodec() const { return pulseWidthCodec_; }
+Data::FrameCodec ReadGroupInfo::PulseWidthCodec() const { return pulseWidthCodec_; }
 
-ReadGroupInfo& ReadGroupInfo::PulseWidthCodec(FrameCodec codec, std::string tag)
+ReadGroupInfo& ReadGroupInfo::PulseWidthCodec(Data::FrameCodec codec, std::string tag)
 {
     // store desired codec type
     pulseWidthCodec_ = std::move(codec);

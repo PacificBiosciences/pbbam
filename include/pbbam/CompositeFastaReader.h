@@ -1,23 +1,16 @@
-// File Description
-/// \file CompositeFastaReader.h
-/// \brief Defines the composite FASTA reader, for working with multiple input
-///       files.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_COMPOSITEFASTAREADER_H
+#define PBBAM_COMPOSITEFASTAREADER_H
 
-#ifndef COMPOSITEFASTAREADER_H
-#define COMPOSITEFASTAREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <deque>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "pbbam/DataSet.h"
-#include "pbbam/FastaReader.h"
-#include "pbbam/FastaSequence.h"
+#include <pbbam/DataSet.h>
+#include <pbbam/FastaReader.h>
+#include <pbbam/FastaSequence.h>
 
 namespace PacBio {
 namespace BAM {
@@ -60,4 +53,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // COMPOSITEFASTAREADER_H
+#endif  // PBBAM_COMPOSITEFASTAREADER_H

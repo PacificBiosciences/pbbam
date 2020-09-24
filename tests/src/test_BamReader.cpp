@@ -10,7 +10,7 @@
 
 using namespace PacBio;
 
-TEST(BamReaderTest, handles_zero_byte_file)
+TEST(BAM_BamReader, handles_zero_byte_file)
 {
     try {
         BAM::BamReader reader{BAM::PbbamTestsConfig::Data_Dir + "/zero_bytes.bam"};

@@ -1,9 +1,3 @@
-// File Description
-/// \file BamRecordTags.h
-/// \brief Implements the BamRecordTags utility class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "BamRecordTags.h"

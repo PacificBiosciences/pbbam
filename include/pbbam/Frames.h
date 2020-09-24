@@ -1,18 +1,7 @@
-// File Description
-/// \file Frames.h
-/// \brief Defines the Frames class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_FRAMES_H
+#define PBBAM_FRAMES_H
 
-#ifndef FRAMES_H
-#define FRAMES_H
-
-#include "pbbam/Config.h"
-
-#include <cstddef>
-#include <cstdint>
-
-#include <vector>
+#include <pbbam/Config.h>
 
 #include <pbcopper/data/Frames.h>
 
@@ -24,4 +13,4 @@ using Frames PBBAM_DEPRECATED = PacBio::Data::Frames;
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FRAMES_H
+#endif  // PBBAM_FRAMES_H

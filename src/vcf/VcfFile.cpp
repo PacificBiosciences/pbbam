@@ -1,12 +1,12 @@
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/vcf/VcfFile.h"
+#include <pbbam/vcf/VcfFile.h>
 
 #include <cassert>
 
 #include <type_traits>
 
-#include "pbbam/vcf/VcfFormat.h"
+#include <pbbam/vcf/VcfFormat.h>
 
 namespace PacBio {
 namespace VCF {

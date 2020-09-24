@@ -1,13 +1,7 @@
-// File Description
-/// \file SequenceInfo.h
-/// \brief Defines the SequenceInfo class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_SEQUENCEINFO_H
+#define PBBAM_SEQUENCEINFO_H
 
-#ifndef SEQUENCEINFO_H
-#define SEQUENCEINFO_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <map>
 #include <string>
@@ -185,4 +179,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // SEQUENCEINFO_H
+#endif  // PBBAM_SEQUENCEINFO_H

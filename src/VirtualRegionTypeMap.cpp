@@ -1,12 +1,6 @@
-// File Description
-/// \file VirtualRegionTypeMap.cpp
-/// \brief Implements the VirtualRegionTypeMap class.
-//
-// Author: Armin Töpfer
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/virtual/VirtualRegionTypeMap.h"
+#include <pbbam/virtual/VirtualRegionTypeMap.h>
 
 namespace PacBio {
 namespace BAM {

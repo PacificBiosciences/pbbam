@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "FileProducer.h"

@@ -1,22 +1,14 @@
+#ifndef PBBAM_ZMWCHUNKEDFASTQREADER_H
+#define PBBAM_ZMWCHUNKEDFASTQREADER_H
 
-
-// File Description
-/// \file ZmwChunkedFastqReader.h
-/// \brief Defines the ZmwChunkedFastqReader class.
-//
-// Author: Derek Barnett
-
-#ifndef ZMWCHUNKEDFASTQREADER_H
-#define ZMWCHUNKEDFASTQREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "pbbam/FastqSequence.h"
-#include "pbbam/internal/QueryBase.h"
+#include <pbbam/FastqSequence.h>
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace BAM {
@@ -99,4 +91,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // ZMWCHUNKEDFASTQREADER_H
+#endif  // PBBAM_ZMWCHUNKEDFASTQREADER_H

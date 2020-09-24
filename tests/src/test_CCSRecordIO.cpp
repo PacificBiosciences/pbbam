@@ -91,14 +91,14 @@ void CheckRecord(const CCSRecord& expected, const CCSRecord& observed)
 
 // clang-format on
 
-TEST(CCSRecordIOTest, can_deserialize_valid_header_text)
+TEST(CCS_CCSRecordIO, can_deserialize_valid_header_text)
 {
     const auto& lines = CCSRecordIOTests::ValidHeaderText;
     const CCSHeader result = CCSRecordFormat::DeserializeHeader(lines);
     CCSRecordIOTests::CheckHeader(CCSRecordIOTests::ValidHeader(), result);
 }
 
-TEST(CCSRecordIOTest, deserialization_throws_on_invalid_header_text)
+TEST(CCS_CCSRecordIO, deserialization_throws_on_invalid_header_text)
 {
     // clang-format off
 
@@ -153,21 +153,21 @@ TEST(CCSRecordIOTest, deserialization_throws_on_invalid_header_text)
     // clang-format on
 }
 
-TEST(CCSRecordIOTest, can_serialize_header)
+TEST(CCS_CCSRecordIO, can_serialize_header)
 {
     const auto& expected = CCSRecordIOTests::ValidHeaderText;
     const auto lines = CCSRecordFormat::SerializeHeader(CCSRecordIOTests::ValidHeader());
     EXPECT_TRUE(std::equal(lines.cbegin(), lines.cend(), expected.cbegin()));
 }
 
-TEST(CCSRecordIOTest, can_deserialize_valid_record)
+TEST(CCS_CCSRecordIO, can_deserialize_valid_record)
 {
     const auto& line = CCSRecordIOTests::ValidRecordText;
     const auto observed = CCSRecordFormat::DeserializeRecord(line);
     CCSRecordIOTests::CheckRecord(CCSRecordIOTests::ValidRecord(), observed);
 }
 
-TEST(CCSRecordIOTest, deserialization_throws_on_invalid_record)
+TEST(CCS_CCSRecordIO, deserialization_throws_on_invalid_record)
 {
     // clang-format off
 
@@ -198,14 +198,14 @@ TEST(CCSRecordIOTest, deserialization_throws_on_invalid_record)
     // clang-format on
 }
 
-TEST(CCSRecordIOTest, can_serialize_record)
+TEST(CCS_CCSRecordIO, can_serialize_record)
 {
     const auto& expected = CCSRecordIOTests::ValidRecordText;
     const auto result = CCSRecordFormat::SerializeRecord(CCSRecordIOTests::ValidRecord());
     EXPECT_EQ(expected, result);
 }
 
-TEST(CCSRecordIOTest, can_do_round_trip_read_and_write_to_iostreams)
+TEST(CCS_CCSRecordIO, can_do_round_trip_read_and_write_to_iostreams)
 {
     const size_t NumOutputRecords = 3;
 
@@ -232,31 +232,4 @@ TEST(CCSRecordIOTest, can_do_round_trip_read_and_write_to_iostreams)
         ++recordCount;
     }
     EXPECT_EQ(NumOutputRecords, recordCount);
-}
-
-TEST(CCSRecordTest, can_convert_to_read)
-{
-    const int32_t holeNumber = 77;
-    const Data::Position qStart = 1000;
-    const Data::Position qEnd = 1010;
-    const Data::LocalContextFlags ctxtFlags =
-        Data::LocalContextFlags::ADAPTER_BEFORE | Data::LocalContextFlags::ADAPTER_AFTER;
-    const Data::Accuracy acc = 0.95f;
-    const Data::SNR snr{0.4, 0.4, 0.4, 0.4};
-    const std::string seq{"GGTTAACCAA"};
-    const Data::Frames pw{3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
-    const std::string movie = "movie";
-    const std::string chemistry = "chemistry";
-
-    const CCS::CCSRecord ccsRecord{holeNumber, qStart, qEnd, ctxtFlags, acc, snr, seq, pw};
-
-    const auto read = ccsRecord.ToRead(movie, chemistry);
-    EXPECT_EQ(holeNumber, read.Id.HoleNumber);
-    EXPECT_EQ(qStart, read.QueryStart);
-    EXPECT_EQ(qEnd, read.QueryEnd);
-    EXPECT_EQ(ctxtFlags, read.Flags);
-    EXPECT_EQ(acc, read.ReadAccuracy);
-    EXPECT_EQ(snr, read.SignalToNoise);
-    EXPECT_EQ(seq, read.Seq);
-    EXPECT_EQ(pw, read.PulseWidth);
 }

@@ -1,22 +1,16 @@
-// File Description
-/// \file BaiIndexedBamReader.h
-/// \brief Defines the BaiIndexedBamReader class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_BAIINDEXEDBAMREADER_H
+#define PBBAM_BAIINDEXEDBAMREADER_H
 
-#ifndef BAIINDEXEDBAMREADER_H
-#define BAIINDEXEDBAMREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 
 #include <htslib/sam.h>
 
-#include "pbbam/BaiIndexCache.h"
-#include "pbbam/BamFile.h"
-#include "pbbam/BamReader.h"
-#include "pbbam/GenomicInterval.h"
+#include <pbbam/BaiIndexCache.h>
+#include <pbbam/BamFile.h>
+#include <pbbam/BamReader.h>
+#include <pbbam/GenomicInterval.h>
 
 namespace PacBio {
 namespace BAM {
@@ -112,4 +106,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BAIINDEXEDBAMREADER_H
+#endif  // PBBAM_BAIINDEXEDBAMREADER_H

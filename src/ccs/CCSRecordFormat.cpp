@@ -1,17 +1,11 @@
-// File Description
-/// \file CCSRecordFormat.cpp
-/// \brief Implements the CCSRecordFormat class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/ccs/CCSRecordFormat.h"
+#include <pbbam/ccs/CCSRecordFormat.h>
 
 #include <sstream>
 #include <stdexcept>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 namespace {
 
@@ -35,7 +29,7 @@ CCSHeader CCSRecordFormat::DeserializeHeader(const std::vector<std::string>& lin
     CCSHeader result;
     std::vector<std::string> fields;
     for (const auto& line : lines) {
-        fields = PacBio::BAM::Split(line, '=');
+        fields = BAM::Split(line, '=');
         if (fields.size() != 2) {
             std::ostringstream msg;
             msg << "[pbbam] CCS record format ERROR: must have syntax 'name=value' in header "
@@ -75,7 +69,7 @@ std::vector<std::string> CCSRecordFormat::SerializeHeader(const CCSHeader& heade
 
 CCSRecord CCSRecordFormat::DeserializeRecord(const std::string& line)
 {
-    const auto fields = PacBio::BAM::Split(line);
+    const auto fields = BAM::Split(line);
     if (fields.size() != 8) {
         std::ostringstream msg;
         msg << "[pbbam] CCS record format ERROR: malformed record line:\n" << line;
@@ -90,7 +84,7 @@ CCSRecord CCSRecordFormat::DeserializeRecord(const std::string& line)
     result.LocalContextFlags = static_cast<Data::LocalContextFlags>(std::stoul(fields[3]));
     result.Accuracy = std::stof(fields[4]);
 
-    const auto snrs = PacBio::BAM::Split(fields[5], ',');
+    const auto snrs = BAM::Split(fields[5], ',');
     if (snrs.size() != 4) {
         std::ostringstream msg;
         msg << "[pbbam] CCS record format ERROR: SNR field must have 4 values";
@@ -105,7 +99,7 @@ CCSRecord CCSRecordFormat::DeserializeRecord(const std::string& line)
 
     result.Sequence = fields[6];
 
-    const auto pwStrings = PacBio::BAM::Split(fields[7], ',');
+    const auto pwStrings = BAM::Split(fields[7], ',');
     std::vector<uint16_t> pws;
     pws.reserve(pwStrings.size());
     for (const auto& pwString : pwStrings)

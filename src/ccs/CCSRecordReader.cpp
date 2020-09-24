@@ -1,12 +1,6 @@
-// File Description
-/// \file CCSRecordReader.cpp
-/// \brief Implements the CCSRecordReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/ccs/CCSRecordReader.h"
+#include <pbbam/ccs/CCSRecordReader.h>
 
 #include <iostream>
 #include <istream>
@@ -14,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "pbbam/ccs/CCSRecordFormat.h"
+#include <pbbam/ccs/CCSRecordFormat.h>
 
 namespace PacBio {
 namespace CCS {

@@ -1,21 +1,14 @@
-// File Description
-/// \file FastaReader.h
-/// \brief Defines the FastaReader class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_FASTAREADER_H
+#define PBBAM_FASTAREADER_H
 
-#ifndef FASTAREADER_H
-#define FASTAREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "pbbam/FastaSequence.h"
-
-#include "pbbam/internal/QueryBase.h"
+#include <pbbam/FastaSequence.h>
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace BAM {
@@ -82,4 +75,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FASTAREADER_H
+#endif  // PBBAM_FASTAREADER_H

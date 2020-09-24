@@ -1,18 +1,13 @@
-// File Description
-/// \file CCSPbiBuilder.cpp
-/// \brief Implements the CCSPbiBuilder.cpp class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/ccs/CCSPbiBuilder.h"
+#include <pbbam/ccs/CCSPbiBuilder.h>
 
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
 #include <array>
+#include <limits>
 #include <sstream>
 #include <stdexcept>
 #include <thread>
@@ -21,12 +16,12 @@
 #include <htslib/bgzf.h>
 #include <pbcopper/utility/Deleters.h>
 
-#include "pbbam/Deleters.h"
-#include "pbbam/PbiBuilder.h"
-#include "pbbam/PbiFile.h"
-#include "pbbam/ReadGroupInfo.h"
-#include "pbbam/ccs/CCSHeader.h"
-#include "pbbam/ccs/CCSRecord.h"
+#include <pbbam/Deleters.h>
+#include <pbbam/PbiBuilder.h>
+#include <pbbam/PbiFile.h>
+#include <pbbam/ReadGroupInfo.h>
+#include <pbbam/ccs/CCSHeader.h>
+#include <pbbam/ccs/CCSRecord.h>
 
 #include "ErrnoReason.h"
 
@@ -37,7 +32,7 @@ namespace internal {
 template <typename T>
 void SwapEndianness(std::vector<T>& data)
 {
-    const size_t elementSize = sizeof(T);
+    constexpr const size_t elementSize = sizeof(T);
     const size_t numReads = data.size();
     switch (elementSize) {
         case 1:
@@ -66,7 +61,7 @@ void bgzf_write_safe(BGZF* fp, const void* data, size_t length)
     if (ret < 0L) {
         std::ostringstream msg;
         msg << "[pbbam] PBI index builder ERROR: could not write to\n";
-        PacBio::BAM::MaybePrintErrnoReason(msg);
+        BAM::MaybePrintErrnoReason(msg);
         throw std::runtime_error{msg.str()};
     }
 }
@@ -145,7 +140,7 @@ public:
         holeNumField_.Add(record.HoleNumber);
         ctxtField_.Add(record.LocalContextFlags);
         readQualField_.Add(record.Accuracy);
-        fileOffsetField_.Add(-1);
+        fileOffsetField_.Add(std::numeric_limits<uint64_t>::max());
 
         FlushBuffers(FlushMode::NO_FORCE);
         ++currentRow_;
@@ -231,9 +226,9 @@ public:
         static constexpr const std::array<char, 4> magic{{'P', 'B', 'I', '\1'}};
         internal::bgzf_write_safe(bgzf, magic.data(), 4);
 
-        PacBio::BAM::PbiFile::Sections sections = PacBio::BAM::PbiFile::BASIC;
+        const BAM::PbiFile::Sections sections = BAM::PbiFile::BASIC;
         // version, pbi_flags, & n_reads
-        auto version = static_cast<uint32_t>(PacBio::BAM::PbiFile::CurrentVersion);
+        auto version = static_cast<uint32_t>(BAM::PbiFile::CurrentVersion);
         uint16_t pbi_flags = sections;
         auto numReads = currentRow_;
         if (bgzf->is_be) {
@@ -306,9 +301,8 @@ public:
     std::string pbiFilename_;
     std::string tempFilename_;
     std::unique_ptr<FILE, Utility::FileDeleter> tempFile_;
-    std::unique_ptr<BGZF, PacBio::BAM::HtslibBgzfDeleter> pbiFile_;
-    PacBio::BAM::PbiBuilder::CompressionLevel compressionLevel_ =
-        PacBio::BAM::PbiBuilder::DefaultCompression;
+    std::unique_ptr<BGZF, BAM::HtslibBgzfDeleter> pbiFile_;
+    BAM::PbiBuilder::CompressionLevel compressionLevel_ = BAM::PbiBuilder::DefaultCompression;
     size_t numThreads_;
 
     // PBI field buffers

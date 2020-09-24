@@ -1,14 +1,8 @@
-// File Description
-/// \file EntireFileQuery.cpp
-/// \brief Implements the EntireFileQuery class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/EntireFileQuery.h"
+#include <pbbam/EntireFileQuery.h>
 
-#include "pbbam/CompositeBamReader.h"
+#include <pbbam/CompositeBamReader.h>
 
 namespace PacBio {
 namespace BAM {
@@ -16,13 +10,13 @@ namespace BAM {
 class EntireFileQuery::EntireFileQueryPrivate
 {
 public:
-    EntireFileQueryPrivate(const DataSet &dataset) : reader_(dataset) {}
+    EntireFileQueryPrivate(const DataSet &dataset) : reader_{dataset} {}
 
     SequentialCompositeBamReader reader_;
 };
 
 EntireFileQuery::EntireFileQuery(const DataSet &dataset)
-    : internal::IQuery(), d_(new EntireFileQueryPrivate(dataset))
+    : internal::IQuery{}, d_(new EntireFileQueryPrivate(dataset))
 {
 }
 

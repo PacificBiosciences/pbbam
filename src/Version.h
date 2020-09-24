@@ -1,13 +1,7 @@
-// File Description
-/// \file Version.h
-/// \brief Defines the Version class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_VERSION_H
+#define PBBAM_VERSION_H
 
-#ifndef PACBIOBAM_VERSION_H
-#define PACBIOBAM_VERSION_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <iosfwd>
 #include <stdexcept>
@@ -127,4 +121,4 @@ inline Version& Version::Revision(int revision)
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // PACBIOBAM_VERSION_H
+#endif  // PBBAM_VERSION_H

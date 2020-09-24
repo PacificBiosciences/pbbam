@@ -12,7 +12,21 @@
 
 #include "PbbamTestData.h"
 
-TEST(CollectionMetadataTest, can_create_from_raw_text_and_attach_to_dataset)
+TEST(BAM_CollectionMetadata, throws_on_empty_xml)
+{
+    EXPECT_THROW(
+        { const auto collectionMetadata = PacBio::BAM::CollectionMetadata::FromRawXml(""); },
+        std::runtime_error);
+}
+
+TEST(BAM_CollectionMetadata, throws_on_invalid_xml)
+{
+    EXPECT_THROW(
+        { const auto collectionMetadata = PacBio::BAM::CollectionMetadata::FromRawXml("bad xml"); },
+        std::runtime_error);
+}
+
+TEST(BAM_CollectionMetadata, can_create_from_raw_text_and_attach_to_dataset)
 {
     // Create CollectionMetadata from raw XML
     const std::string xmlFn{PacBio::BAM::PbbamTestsConfig::Data_Dir +
@@ -36,7 +50,7 @@ TEST(CollectionMetadataTest, can_create_from_raw_text_and_attach_to_dataset)
               subreadSet.Metadata().CollectionMetadata().Attribute("InstrumentName"));
 }
 
-TEST(CollectionMetadataTest, output_correct_biosample)
+TEST(BAM_CollectionMetadata, output_correct_biosample)
 {
     // Create CollectionMetadata from raw XML
     const std::string xmlFn{PacBio::BAM::PbbamTestsConfig::Data_Dir +

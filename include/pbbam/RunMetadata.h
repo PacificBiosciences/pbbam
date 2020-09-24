@@ -1,15 +1,13 @@
-// Author: Derek Barnett
+#ifndef PBBAM_RUNMETADATA_H
+#define PBBAM_RUNMETADATA_H
 
-#ifndef RUNMETADATA_H
-#define RUNMETADATA_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <iosfwd>
 #include <map>
 #include <string>
 
-#include "pbbam/CollectionMetadata.h"
+#include <pbbam/CollectionMetadata.h>
 
 namespace PacBio {
 namespace BAM {
@@ -46,4 +44,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // RUNMETADATA_H
+#endif  // PBBAM_RUNMETADATA_H

@@ -1,15 +1,9 @@
-// File Description
-/// \file ZmwWhitelistVirtualReader.h
-/// \brief Defines the ZmwWhitelistVirtualReader class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_ZMWWHITELISTVIRTUALREADER_H
+#define PBBAM_ZMWWHITELISTVIRTUALREADER_H
 
-#ifndef ZMWWHITELISTVIRTUALREADER_H
-#define ZMWWHITELISTVIRTUALREADER_H
+#include <pbbam/Config.h>
 
-#include "pbbam/Config.h"
-
-#include "pbbam/virtual/WhitelistedZmwReadStitcher.h"
+#include <pbbam/virtual/WhitelistedZmwReadStitcher.h>
 
 namespace PacBio {
 namespace BAM {
@@ -20,4 +14,4 @@ using ZmwWhitelistVirtualReader = WhitelistedZmwReadStitcher;
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // ZMWWHITELISTVIRTUALREADER_H
+#endif  // PBBAM_ZMWWHITELISTVIRTUALREADER_H

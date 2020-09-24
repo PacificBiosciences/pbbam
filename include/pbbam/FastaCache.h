@@ -1,13 +1,7 @@
-// File Description
-/// \file FastaCache.h
-/// \brief Defines the FastaCache
-//
-// Author: Derek Barnett
+#ifndef PBBAM_FASTACACHE_H
+#define PBBAM_FASTACACHE_H
 
-#ifndef FASTACACHE_H
-#define FASTACACHE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <functional>
 #include <memory>
@@ -16,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-#include "pbbam/FastaSequence.h"
+#include <pbbam/FastaSequence.h>
 
 namespace PacBio {
 namespace BAM {
@@ -81,4 +75,4 @@ FastaCache MakeFastaCache(const std::string& filename);
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FASTACACHE_H
+#endif  // PBBAM_FASTACACHE_H

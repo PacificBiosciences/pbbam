@@ -1,9 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_DATASETUTILS_H
+#define PBBAM_DATASETUTILS_H
 
-#ifndef DATASETUTILS_H
-#define DATASETUTILS_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -70,4 +68,4 @@ inline std::string GenerateUuid()
     FETCH_CHILD_REF(Class, Type, Method)
 #endif
 
-#endif  // DATASETUTILS_H
+#endif  // PBBAM_DATASETUTILS_H

@@ -27,7 +27,7 @@ using f_data = std::vector<uint16_t>;
 namespace BamRecordClippingTests {
 
 static
-ReadGroupInfo MakeReadGroup(const FrameCodec codec,
+ReadGroupInfo MakeReadGroup(const Data::FrameCodec codec,
                             const std::string& movieName,
                             const std::string& readType)
 {
@@ -49,7 +49,7 @@ BamRecord MakeRecord(const Position qStart,
                      const std::string& pulseBases = "",
                      const std::string& pulseQuals = "",
                      const f_data& pulseFrames = f_data(),
-                     const FrameCodec codec = FrameCodec::RAW)
+                     const Data::FrameCodec codec = Data::FrameCodec::RAW)
 {
     BamRecordImpl impl;
     impl.SetSequenceAndQualities(seq, quals);
@@ -126,7 +126,7 @@ BamRecord MakeCCSRecord(const std::string& seq,
 
 } // namespace BamRecordClippingTests
 
-TEST(BamRecordClippingTest, ClipToQuery_Basic)
+TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
 {
     const Position qStart  = 500;
     const Position qEnd    = 510;
@@ -439,7 +439,7 @@ TEST(BamRecordClippingTest, ClipToQuery_Basic)
     }
 }
 
-TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
+TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
 {
     const Position qStart = 500;
     const Position qEnd   = 515;
@@ -727,7 +727,7 @@ TEST(BamRecordClippingTest, ClipToQuery_WithSoftClips)
     }
 }
 
-TEST(BamRecordClippingTest, ClipToReference_Basic)
+TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
 {
     const Position qStart = 500;
     const Position qEnd   = 510;
@@ -1026,7 +1026,7 @@ TEST(BamRecordClippingTest, ClipToReference_Basic)
     }
 }
 
-TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
+TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips)
 {
     const Position qStart = 500;
     const Position qEnd   = 515;
@@ -1378,7 +1378,7 @@ TEST(BamRecordClippingTest, ClipToReference_WithSoftClips)
     }
 }
 
-TEST(BamRecordClippingTest, ClippedToQueryCopy)
+TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_query)
 {
     const Position qStart = 500;
     const Position qEnd   = 510;
@@ -1438,7 +1438,7 @@ TEST(BamRecordClippingTest, ClippedToQueryCopy)
     EXPECT_EQ(frames_clipped,   view.IPD().Data());
 }
 
-TEST(BamRecordClippingTest, ClippedToReferenceCopy)
+TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_reference)
 {
     const Position qStart = 500;
     const Position qEnd   = 510;
@@ -1497,7 +1497,7 @@ TEST(BamRecordClippingTest, ClippedToReferenceCopy)
     EXPECT_EQ(s3_frames_clipped,   view.IPD().Data());
 }
 
-TEST(BamRecordClippingTest, StaticClippedToQuery)
+TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_query_static_method)
 {
     const Position qStart = 500;
     const Position qEnd   = 510;
@@ -1557,7 +1557,7 @@ TEST(BamRecordClippingTest, StaticClippedToQuery)
     EXPECT_EQ(frames_clipped,   view.IPD().Data());
 }
 
-TEST(BamRecordClippingTest, StaticClippedToReference)
+TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_reference_static_method)
 {
     const Position qStart = 500;
     const Position qEnd   = 510;
@@ -1616,7 +1616,7 @@ TEST(BamRecordClippingTest, StaticClippedToReference)
     EXPECT_EQ(s3_frames_clipped,   view.IPD().Data());
 }
 
-TEST(BamRecordTest, ClipCigarData)
+TEST(BAM_BamRecordClipping, correctly_clips_cigar)
 {
     const Position qStart = 500;
     const Position qEnd   = 515;
@@ -1642,7 +1642,7 @@ TEST(BamRecordTest, ClipCigarData)
     EXPECT_EQ(std::string("4=1D2I2D4="), s3_cigar_clipped.ToStdString());
 }
 
-TEST(BamRecordTest, CCS_ClipToQuery)
+TEST(BAM_BamRecordClipping, can_make_ccs_record_clipped_to_query)
 {
     const int32_t  tId     = 0;
     const Position tPos    = 100;
@@ -1698,7 +1698,7 @@ TEST(BamRecordTest, CCS_ClipToQuery)
     EXPECT_EQ(frames_clipped,   view.IPD().Data());
 }
 
-TEST(BamRecordTest, CCS_ClipToReference)
+TEST(BAM_BamRecordClipping, can_make_ccs_record_clipped_to_reference)
 {
     const std::string seq      = "AACCGTTAGC";
     const std::string quals    = "?]?]?]?]?*";
@@ -1752,7 +1752,7 @@ TEST(BamRecordTest, CCS_ClipToReference)
     EXPECT_EQ(s3_frames_clipped,   view.IPD().Data());
 }
 
-TEST(BamRecordTest, ClipEncodedFrames)
+TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
 {
     const Position qStart  = 500;
     const Position qEnd    = 510;
@@ -2051,7 +2051,7 @@ TEST(BamRecordTest, ClipEncodedFrames)
     }
 }
 
-TEST(BamRecordClippingTest, ExciseSoftClipsFromFramesWithDeletions)
+TEST(BAM_BamRecordClipping, can_excise_soft_clips_from_frames_with_deletions)
 {
     const std::string expectedName{"m141008_060349_42194_c100704972550000001823137703241586_s1_p0/14/2409_2745"};
     const PacBio::BAM::Strand expectedStrand = PacBio::BAM::Strand::FORWARD;
@@ -2117,7 +2117,7 @@ TEST(BamRecordClippingTest, ExciseSoftClipsFromFramesWithDeletions)
     EXPECT_EQ(expectedClippedIpds, clippedIpds);
 }
 
-TEST(BamRecordTest, ClipToQuery_Stranded)
+TEST(BAM_BamRecordClipping, can_clip_to_query_stranded)
 {
     using namespace PacBio::BAM;
 
@@ -2178,7 +2178,7 @@ TEST(BamRecordTest, ClipToQuery_Stranded)
     }
 }
 
-TEST(BamRecordTest, ClippingFlankingInserts_IgnoredOnClipToQuery)
+TEST(BAM_BamRecordClipping, clipping_flanking_inserts_is_ignored_on_clip_to_query)
 {
     const Position qStart = 500;
     const Position qEnd   = 515;
@@ -2252,7 +2252,7 @@ TEST(BamRecordTest, ClippingFlankingInserts_IgnoredOnClipToQuery)
     }
 }
 
-TEST(BamRecordTest, ClipToReference_Forward_ExciseFlankingInserts)
+TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_reference_forward)
 {
     const Position qStart = 500;
     const Position qEnd   = 526;
@@ -2324,7 +2324,7 @@ TEST(BamRecordTest, ClipToReference_Forward_ExciseFlankingInserts)
     EXPECT_EQ(113, withoutInserts.ReferenceEnd());
 }
 
-TEST(BamRecordTest, ClipToReference_Reverse_ExciseFlankingInserts)
+TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_reference_reverse)
 {
     const Position qStart = 500;
     const Position qEnd   = 526;

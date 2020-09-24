@@ -1,19 +1,13 @@
-// File Description
-/// \file FastaWriter.cpp
-/// \brief Implements the FastaWriter class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/FastaWriter.h"
+#include <pbbam/FastaWriter.h>
 
 #include <sstream>
 #include <stdexcept>
 
-#include "pbbam/BamRecord.h"
-#include "pbbam/FastqSequence.h"
-#include "pbbam/FormatUtils.h"
+#include <pbbam/BamRecord.h>
+#include <pbbam/FastqSequence.h>
+#include <pbbam/FormatUtils.h>
 
 #include "ErrnoReason.h"
 

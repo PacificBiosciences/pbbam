@@ -1,18 +1,16 @@
-// Author: Derek Barnett
-
 #ifndef PBBAM_VCF_VCFWRITER_H
 #define PBBAM_VCF_VCFWRITER_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
 
+#include <pbbam/vcf/VcfHeader.h>
+#include <pbbam/vcf/VcfVariant.h>
+
 namespace PacBio {
 namespace VCF {
-
-class VcfHeader;
-class VcfVariant;
 
 class VcfWriter
 {

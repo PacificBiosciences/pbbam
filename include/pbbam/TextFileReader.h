@@ -1,18 +1,12 @@
-// File Description
-/// \file TextFileReader.h
-/// \brief Defines the TextFileReader class.
-//
-// Author: Derek Barnett
-
 #ifndef PBBAM_TEXTFILEREADER_H
 #define PBBAM_TEXTFILEREADER_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
 
-#include "pbbam/internal/QueryBase.h"
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace BAM {

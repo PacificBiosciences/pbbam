@@ -1,20 +1,14 @@
-// File Description
-/// \file FastaSequenceQuery.h
-/// \brief Defines the FastaSequenceQuery class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_FASTASEQUENCEQUERY_H
+#define PBBAM_FASTASEQUENCEQUERY_H
 
-#ifndef FASTASEQUENCEQUERY_H
-#define FASTASEQUENCEQUERY_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
 
-#include "pbbam/DataSet.h"
-#include "pbbam/FastaSequence.h"
-#include "pbbam/internal/QueryBase.h"
+#include <pbbam/DataSet.h>
+#include <pbbam/FastaSequence.h>
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace BAM {
@@ -28,7 +22,7 @@ public:
     /// \name Constructors & Related Methods
     /// \{
 
-    FastaSequenceQuery(const PacBio::BAM::DataSet& dataset);
+    FastaSequenceQuery(const BAM::DataSet& dataset);
     ~FastaSequenceQuery() override;
 
     /// \}
@@ -49,4 +43,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FASTASEQUENCEQUERY_H
+#endif  // PBBAM_FASTASEQUENCEQUERY_H

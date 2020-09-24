@@ -1,17 +1,11 @@
-// File Description
-/// \file EntireFileQuery.h
-/// \brief Defines the EntireFileQuery class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_ENTIREFILEQUERY_H
+#define PBBAM_ENTIREFILEQUERY_H
 
-#ifndef ENTIREFILEQUERY_H
-#define ENTIREFILEQUERY_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 
-#include "pbbam/internal/QueryBase.h"
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace BAM {
@@ -43,7 +37,7 @@ public:
     /// \throws std::runtime_error on failure to open/read underlying %BAM
     ///         files.
     ///
-    EntireFileQuery(const PacBio::BAM::DataSet& dataset);
+    EntireFileQuery(const DataSet& dataset);
     ~EntireFileQuery() override;
 
 public:
@@ -62,4 +56,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // ENTIREFILEQUERY_H
+#endif  // PBBAM_ENTIREFILEQUERY_H

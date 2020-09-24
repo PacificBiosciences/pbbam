@@ -1,13 +1,7 @@
-// File Description
-/// \file PbiBuilder.h
-/// \brief Defines the PbiBuilder class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_PBIBUILDER_H
+#define PBBAM_PBIBUILDER_H
 
-#ifndef PBIBUILDER_H
-#define PBIBUILDER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -177,4 +171,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // PBIBUILDER_H
+#endif  // PBBAM_PBIBUILDER_H

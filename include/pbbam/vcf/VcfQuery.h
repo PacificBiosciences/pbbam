@@ -1,22 +1,19 @@
-// Author: Derek Barnett
-
 #ifndef PBBAM_VCF_VCFQUERY_H
 #define PBBAM_VCF_VCFQUERY_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 
+#include <pbbam/internal/QueryBase.h>
 #include <pbbam/vcf/VcfFile.h>
 #include <pbbam/vcf/VcfReader.h>
 #include <pbbam/vcf/VcfVariant.h>
 
-#include <pbbam/internal/QueryBase.h>
-
 namespace PacBio {
 namespace VCF {
 
-class VcfQuery : public PacBio::BAM::internal::QueryBase<VcfVariant>
+class VcfQuery : public BAM::internal::QueryBase<VcfVariant>
 {
 public:
     explicit VcfQuery(std::string fn);

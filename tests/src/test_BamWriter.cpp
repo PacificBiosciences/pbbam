@@ -103,12 +103,12 @@ void checkSingleRecord(bool useTempFile)
 
 } // namespace BamWriterTests
 
-TEST(BamWriterTest, SingleWrite_UserRecord_WithTempFile)
+TEST(BAM_BamWriter, can_write_using_temp_file)
 {
     BamWriterTests::checkSingleRecord(true);
 }
 
-TEST(BamWriterTest, SingleWrite_UserRecord_NoTempFile)
+TEST(BAM_BamWriter, can_write_without_temp_file)
 {
     BamWriterTests::checkSingleRecord(false);
 }

@@ -1,9 +1,7 @@
-// Author: Derek Barnett
-
 #ifndef PBBAM_VCF_VCFHEADER_H
 #define PBBAM_VCF_VCFHEADER_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <stdexcept>
 #include <string>
@@ -32,27 +30,27 @@ public:
     const std::string& FileDate() const;
     const std::string& Version() const;
 
-    const std::vector<PacBio::VCF::GeneralDefinition>& GeneralDefinitions() const;
-    const PacBio::VCF::GeneralDefinition& GeneralDefinition(const std::string& id) const;
+    const std::vector<VCF::GeneralDefinition>& GeneralDefinitions() const;
+    const VCF::GeneralDefinition& GeneralDefinition(const std::string& id) const;
 
     // ##contig
-    const std::vector<PacBio::VCF::ContigDefinition>& ContigDefinitions() const;
-    const PacBio::VCF::ContigDefinition& ContigDefinition(const std::string& id) const;
+    const std::vector<VCF::ContigDefinition>& ContigDefinitions() const;
+    const VCF::ContigDefinition& ContigDefinition(const std::string& id) const;
 
     // INFO
 
-    const std::vector<PacBio::VCF::InfoDefinition>& InfoDefinitions() const;
-    const PacBio::VCF::InfoDefinition& InfoDefinition(const std::string& id) const;
+    const std::vector<VCF::InfoDefinition>& InfoDefinitions() const;
+    const VCF::InfoDefinition& InfoDefinition(const std::string& id) const;
 
     // FILTER
 
-    const std::vector<PacBio::VCF::FilterDefinition>& FilterDefinitions() const;
-    const PacBio::VCF::FilterDefinition& FilterDefinition(const std::string& id) const;
+    const std::vector<VCF::FilterDefinition>& FilterDefinitions() const;
+    const VCF::FilterDefinition& FilterDefinition(const std::string& id) const;
 
     // FORMAT
 
-    const std::vector<PacBio::VCF::FormatDefinition>& FormatDefinitions() const;
-    const PacBio::VCF::FormatDefinition& FormatDefinition(const std::string& id) const;
+    const std::vector<VCF::FormatDefinition>& FormatDefinitions() const;
+    const VCF::FormatDefinition& FormatDefinition(const std::string& id) const;
 
     // samples
 
@@ -66,27 +64,27 @@ public:
     VcfHeader& FileDate(std::string fileDate);
     VcfHeader& Version(std::string version);
 
-    VcfHeader& AddGeneralDefinition(PacBio::VCF::GeneralDefinition def);
-    VcfHeader& GeneralDefinitions(std::vector<PacBio::VCF::GeneralDefinition> defs);
+    VcfHeader& AddGeneralDefinition(VCF::GeneralDefinition def);
+    VcfHeader& GeneralDefinitions(std::vector<VCF::GeneralDefinition> defs);
 
     // ##contig
-    VcfHeader& AddContigDefinition(PacBio::VCF::ContigDefinition def);
-    VcfHeader& ContigDefinitions(std::vector<PacBio::VCF::ContigDefinition> defs);
+    VcfHeader& AddContigDefinition(VCF::ContigDefinition def);
+    VcfHeader& ContigDefinitions(std::vector<VCF::ContigDefinition> defs);
 
     // INFO
 
-    VcfHeader& AddInfoDefinition(PacBio::VCF::InfoDefinition info);
-    VcfHeader& InfoDefinitions(std::vector<PacBio::VCF::InfoDefinition> defs);
+    VcfHeader& AddInfoDefinition(VCF::InfoDefinition info);
+    VcfHeader& InfoDefinitions(std::vector<VCF::InfoDefinition> defs);
 
     // FILTER
 
-    VcfHeader& AddFilterDefinition(PacBio::VCF::FilterDefinition filter);
-    VcfHeader& FilterDefinitions(std::vector<PacBio::VCF::FilterDefinition> defs);
+    VcfHeader& AddFilterDefinition(VCF::FilterDefinition filter);
+    VcfHeader& FilterDefinitions(std::vector<VCF::FilterDefinition> defs);
 
     // FORMAT
 
-    VcfHeader& AddFormatDefinition(PacBio::VCF::FormatDefinition format);
-    VcfHeader& FormatDefinitions(std::vector<PacBio::VCF::FormatDefinition> defs);
+    VcfHeader& AddFormatDefinition(VCF::FormatDefinition format);
+    VcfHeader& FormatDefinitions(std::vector<VCF::FormatDefinition> defs);
 
     // samples
 
@@ -94,12 +92,12 @@ public:
     VcfHeader& Samples(std::vector<std::string> names);
 
 private:
-    std::vector<PacBio::VCF::GeneralDefinition> generalDefinitions_;
-    std::vector<PacBio::VCF::ContigDefinition> contigDefinitions_;
-    std::vector<PacBio::VCF::InfoDefinition> infoDefinitions_;
-    std::vector<PacBio::VCF::FilterDefinition> filterDefinitions_;
-    std::vector<PacBio::VCF::FormatDefinition> formatDefinitions_;
-    std::vector<PacBio::VCF::Sample> samples_;
+    std::vector<VCF::GeneralDefinition> generalDefinitions_;
+    std::vector<VCF::ContigDefinition> contigDefinitions_;
+    std::vector<VCF::InfoDefinition> infoDefinitions_;
+    std::vector<VCF::FilterDefinition> filterDefinitions_;
+    std::vector<VCF::FormatDefinition> formatDefinitions_;
+    std::vector<VCF::Sample> samples_;
 
     std::unordered_map<std::string, size_t> generalLookup_;
     std::unordered_map<std::string, size_t> contigLookup_;

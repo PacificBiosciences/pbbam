@@ -47,7 +47,7 @@ BamRecordImpl CreateBamImpl()
     return bam;
 }
 
-static 
+static
 BamRecord CreateBam()
 { return BamRecord{ CreateBamImpl() }; }
 
@@ -78,7 +78,7 @@ void CheckRawData(const BamRecordImpl& bam)
     EXPECT_EQ(expectedTotalDataLength, rawData->l_data);
 }
 
-static 
+static
 void CheckRawData(const BamRecord& bam)
 { CheckRawData(bam.Impl()); }
 
@@ -96,7 +96,7 @@ BamRecordImpl MakeCigaredImpl(const std::string& seq,
     return impl;
 }
 
-static 
+static
 BamRecord MakeCigaredRecord(const std::string& seq,
                             const std::string& cigar,
                             const Strand strand)
@@ -629,7 +629,7 @@ void CheckPulseUIntTags(const std::string& cigar,
 
 } // namespace BamRecordTests
 
-TEST(BamRecordTest, DefaultValues)
+TEST(BAM_BamRecord, constructed_with_correct_defaults)
 {
     BamRecord bam;
     const std::string emptyString;
@@ -697,7 +697,7 @@ TEST(BamRecordTest, DefaultValues)
     BamRecordTests::CheckRawData(bam);
 }
 
-TEST(BamRecordTest, FromBamRecordImpl)
+TEST(BAM_BamRecord, can_be_constructed_from_bamrecordimpl)
 {
     // check generic data
     BamRecordImpl genericBam = BamRecordTests::CreateBamImpl();
@@ -813,7 +813,7 @@ TEST(BamRecordTest, FromBamRecordImpl)
     EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), bam4Tags.at("CA").ToUInt8Array());
 }
 
-TEST(BamRecordTest, SelfAssignmentTolerated)
+TEST(BAM_BamRecord, tolerates_self_assignment)
 {
     BamRecord bam1;
     bam1.Impl().Bin(42);
@@ -850,7 +850,7 @@ TEST(BamRecordTest, SelfAssignmentTolerated)
     BamRecordTests::CheckRawData(bam1);
 }
 
-TEST(BamRecordTest, CoreSetters)
+TEST(BAM_BamRecord, can_be_modified_via_general_setters)
 {
     // create basic BAM with (generic) data
     BamRecord bam = BamRecordTests::CreateBam();
@@ -860,23 +860,6 @@ TEST(BamRecordTest, CoreSetters)
     testQVs.push_back(1);
 
     const std::string testTags = "GATTACA";
-
-    // now set PacBio data
-//    bam.AlignedStart(42);
-//    bam.AlignedEnd(42);
-//    bam.DeletionQVs(testQVs);
-//    bam.DeletionTags(testTags);
-//    bam.HoleNumber(42);
-//    bam.InsertionQVs(testQVs);
-//    bam.MergeQVs(testQVs);
-//    bam.NumPasses(42);
-//    bam.QueryEnd(42);
-//    bam.QueryStart(42);
-//    bam.ReadAccuracy(42);
-//    bam.ReferenceEnd(42);
-//    bam.ReferenceStart(42);
-//    bam.SubstitutionQVs(testQVs);
-//    bam.SubstitutionTags(testTags);
 
     // check generic data
     EXPECT_EQ(42, bam.Impl().Bin());
@@ -888,24 +871,6 @@ TEST(BamRecordTest, CoreSetters)
     EXPECT_EQ(42, bam.Impl().Position());
     EXPECT_EQ(42, bam.Impl().ReferenceId());
 
-    // check PacBio data
-//    EXPECT_EQ(42, bam.AlignedStart());
-//    EXPECT_EQ(42, bam.AlignedEnd());
-//    EXPECT_EQ(testQVs, bam.DeletionQVs());
-//    EXPECT_EQ(testTags, bam.DeletionTags());
-//    EXPECT_EQ(42, bam.HoleNumber());
-//    EXPECT_EQ(testQVs, bam.InsertionQVs());
-//    EXPECT_EQ(testQVs, bam.MergeQVs());
-
-//    EXPECT_EQ(42, bam.NumPasses());
-//    EXPECT_EQ(42, bam.QueryEnd());
-//    EXPECT_EQ(42, bam.QueryStart());
-//    EXPECT_EQ(42, bam.ReadAccuracy());
-//    EXPECT_EQ(42, bam.ReferenceEnd());
-//    EXPECT_EQ(42, bam.ReferenceStart());
-//    EXPECT_EQ(testQVs, bam.SubstitutionQVs());
-//    EXPECT_EQ(testTags, bam.SubstitutionTags());
-
     // check tags
     const TagCollection fetchedTags = bam.Impl().Tags();
     EXPECT_TRUE(fetchedTags.at("HX").HasModifier(TagModifier::HEX_STRING));
@@ -916,7 +881,7 @@ TEST(BamRecordTest, CoreSetters)
     BamRecordTests::CheckRawData(bam);
 }
 
-TEST(BamRecordTest, SequenceOrientation)
+TEST(BAM_BamRecord, correctly_orients_sequence)
 {
     {
         SCOPED_TRACE("Simple CIGAR Sequence");
@@ -941,7 +906,7 @@ TEST(BamRecordTest, SequenceOrientation)
     }
 }
 
-TEST(BamRecordTest, QualitiesOrientation)
+TEST(BAM_BamRecord, correctly_orients_qualities)
 {
     {
         SCOPED_TRACE("Simple CIGAR Qualities");
@@ -966,7 +931,7 @@ TEST(BamRecordTest, QualitiesOrientation)
     }
 }
 
-TEST(BamRecordTest, SequenceTagsOrientation)
+TEST(BAM_BamRecord, correctly_orients_sequence_tags)
 {
     {
         SCOPED_TRACE("Simple CIGAR Base Tags");
@@ -991,7 +956,7 @@ TEST(BamRecordTest, SequenceTagsOrientation)
     }
 }
 
-TEST(BamRecordTest, FrameTagsOrientation)
+TEST(BAM_BamRecord, correctly_orients_frame_tags)
 {
     {
         SCOPED_TRACE("Simple CIGAR Frames");
@@ -1016,7 +981,7 @@ TEST(BamRecordTest, FrameTagsOrientation)
     }
 }
 
-TEST(BamRecordTest, QualityTagsOrientation)
+TEST(BAM_BamRecord, correctly_orients_quality_tags)
 {
     {
         SCOPED_TRACE("Simple CIGAR Quality Tags");
@@ -1041,7 +1006,7 @@ TEST(BamRecordTest, QualityTagsOrientation)
     }
 }
 
-TEST(BamRecordTest, SequenceClippedAndAligned)
+TEST(BAM_BamRecord, correctly_clips_sequence)
 {
     {
         SCOPED_TRACE("CIGAR: 10=");
@@ -1192,7 +1157,7 @@ TEST(BamRecordTest, SequenceClippedAndAligned)
     }
 }
 
-TEST(BamRecordTest, ClippingOrientationAndAlignment)
+TEST(BAM_BamRecord, correctly_clips_and_aligns_sequence)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
@@ -1322,7 +1287,7 @@ TEST(BamRecordTest, ClippingOrientationAndAlignment)
     }
 }
 
-TEST(BamRecordTest, QualityTagsClippedAndAligned)
+TEST(BAM_BamRecord, correctly_clips_qualities)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
@@ -1452,7 +1417,7 @@ TEST(BamRecordTest, QualityTagsClippedAndAligned)
     }
 }
 
-TEST(BamRecordTest, BaseTagsClippedAndAligned)
+TEST(BAM_BamRecord, correctly_clips_and_aligns_base_tags)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
@@ -1582,7 +1547,7 @@ TEST(BamRecordTest, BaseTagsClippedAndAligned)
     }
 }
 
-TEST(BamRecordTest, FrameTagsClippedAndAligned)
+TEST(BAM_BamRecord, correctly_clips_and_aligns_frame_tags)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
@@ -1712,7 +1677,7 @@ TEST(BamRecordTest, FrameTagsClippedAndAligned)
     }
 }
 
-TEST(BamRecordTest, PulseBaseTags)
+TEST(BAM_BamRecord, correctly_clips_and_aligns_pulse_base_tags)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
@@ -1953,7 +1918,7 @@ TEST(BamRecordTest, PulseBaseTags)
     }
 }
 
-TEST(BamRecordTest, PulseQualityTags)
+TEST(BAM_BamRecord, correctly_clips_and_aligns_pulse_quality_tags)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
@@ -2194,7 +2159,7 @@ TEST(BamRecordTest, PulseQualityTags)
     }
 }
 
-TEST(BamRecordTest, PulseFrameTags)
+TEST(BAM_BamRecord, correctly_clips_and_aligns_pulse_frame_tags)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
@@ -2438,7 +2403,7 @@ TEST(BamRecordTest, PulseFrameTags)
     }
 }
 
-TEST(BamRecordTest, PulseUIntTags)
+TEST(BAM_BamRecord, correctly_clips_and_aligns_pulse_uint_tags)
 {
     {
         SCOPED_TRACE("CIGAR: 4=3D4=");
@@ -2682,7 +2647,7 @@ TEST(BamRecordTest, PulseUIntTags)
     }
 }
 
-TEST(BamRecordTest, PulseExclusionTag)
+TEST(BAM_BamRecord, correctly_describes_pulse_exclusion_tag)
 {
     const std::vector<PacBio::BAM::PulseExclusionReason> reasons =
     {
@@ -2703,7 +2668,7 @@ TEST(BamRecordTest, PulseExclusionTag)
 
 }
 
-TEST(BamRecordTest, TranscriptRecord)
+TEST(BAM_BamRecord, correctly_describes_transcript_record)
 {
     const std::string readTypeStr{"TRANSCRIPT"};
     const auto readGroupId = MakeReadGroupId("transcript", readTypeStr);
@@ -2725,7 +2690,7 @@ TEST(BamRecordTest, TranscriptRecord)
     EXPECT_THROW({bam.QueryEnd();}, std::runtime_error);
 }
 
-TEST(BamRecordTest, NumDeletedBasesExcludesRefskips)
+TEST(BAM_BamRecord, num_deleted_bases_excludes_ref_skips)
 {
     const std::string file{PbbamTestsConfig::Data_Dir + "/refskip.bam"};
 
@@ -2739,7 +2704,7 @@ TEST(BamRecordTest, NumDeletedBasesExcludesRefskips)
     EXPECT_EQ(expectedNumDel, record.NumDeletedBases());
 }
 
-TEST(BamRecordTest, SupportWallStartEndTags)
+TEST(BAM_BamRecord, correctly_describes_wall_start_and_end_times)
 {
     const int ws = 100;
     const int we = 500;
@@ -2758,7 +2723,7 @@ TEST(BamRecordTest, SupportWallStartEndTags)
     EXPECT_EQ(we, bam.QueryEndFrameNumber());
 }
 
-TEST(BamRecordTest, MissingLocalContextFlagsCannotConvertToPbcopperReads)
+TEST(BAM_BamRecord, cannot_be_converted_to_pbcopper_read_if_local_context_is_missing)
 {
     const std::string zmwBamFile{PbbamTestsConfig::Data_Dir +
         "/zmws/m64004_200204_230803.zmws.bam"};
@@ -2777,7 +2742,7 @@ TEST(BamRecordTest, MissingLocalContextFlagsCannotConvertToPbcopperReads)
     }
 }
 
-TEST(BamRecordTest, UpdateNameKeepsCcsStrandSuffix)
+TEST(BAM_BamRecord, updating_read_name_keeps_ccs_strand_suffix)
 {
     const std::string ccsFn{PbbamTestsConfig::Data_Dir + "/23.ccs.bam"};
 

@@ -1,13 +1,7 @@
-// File Description
-/// \file KSeqReader.h
-/// \brief Defines the KSeqReader class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_KSEQREADER_H
+#define PBBAM_KSEQREADER_H
 
-#ifndef KSEQREADER_H
-#define KSEQREADER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
@@ -15,7 +9,7 @@
 #include <htslib/kseq.h>
 #include <zlib.h>
 
-#include "pbbam/Deleters.h"
+#include <pbbam/Deleters.h>
 
 namespace PacBio {
 namespace BAM {
@@ -56,4 +50,4 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // KSEQREADER_H
+#endif  // PBBAM_KSEQREADER_H

@@ -20,7 +20,7 @@ const std::string outputFn = PacBio::BAM::PbbamTestsConfig::GeneratedData_Dir + 
 
 }  // namespace VcfSortTests
 
-TEST(VCF_Sort, sorts_input_file)
+TEST(VCF_VcfSort, sorts_input_file)
 {
     const VcfFile file{VcfSortTests::inputFn};
     PacBio::VCF::SortFile(file, VcfSortTests::outputFn);

@@ -1,13 +1,7 @@
-// File Description
-/// \file FastqSequence.h
-/// \brief Defines the FastqSequence class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_FASTQSEQUENCE_H
+#define PBBAM_FASTQSEQUENCE_H
 
-#ifndef FASTQSEQUENCE_H
-#define FASTQSEQUENCE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <string>
 
@@ -33,7 +27,7 @@ public:
     /// \param bases
     /// \param qualities
     ///
-    explicit FastqSequence(std::string name, std::string bases, QualityValues qualities);
+    explicit FastqSequence(std::string name, std::string bases, Data::QualityValues qualities);
 
     ///
     /// \brief FastaSequence
@@ -55,7 +49,7 @@ public:
     /// \brief Qualities
     /// \return
     ///
-    const QualityValues& Qualities() const;
+    const Data::QualityValues& Qualities() const;
 
     ///
     /// \brief
@@ -63,7 +57,7 @@ public:
     /// \param quals
     /// \return FastqSequence
     ///
-    FastqSequence& Qualities(QualityValues quals);
+    FastqSequence& Qualities(Data::QualityValues quals);
 
     /// \}
 
@@ -78,10 +72,10 @@ public:
     bool operator!=(const FastqSequence& other) const noexcept;
 
 private:
-    QualityValues qualities_;
+    Data::QualityValues qualities_;
 };
 
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FASTQSEQUENCE_H
+#endif  // PBBAM_FASTQSEQUENCE_H

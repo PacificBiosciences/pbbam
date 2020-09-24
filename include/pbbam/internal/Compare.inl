@@ -1,10 +1,4 @@
-// File Description
-/// \file Compare.inl
-/// \brief Inline implementations for the Compare class & inner classes.
-//
-// Author: Derek Barnett
-
-#include "pbbam/Compare.h"
+#include <pbbam/Compare.h>
 
 namespace PacBio {
 namespace BAM {

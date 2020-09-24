@@ -1,16 +1,10 @@
-// File Description
-/// \file VirtualRegion.h
-/// \brief Defines the VirtualRegion class.
-//
-// Author: Armin Töpfer
+#ifndef PBBAM_VIRTUALREGION_H
+#define PBBAM_VIRTUALREGION_H
 
-#ifndef VIRTUALREGION_H
-#define VIRTUALREGION_H
+#include <pbbam/Config.h>
 
-#include "pbbam/Config.h"
-
-#include "pbbam/LocalContextFlags.h"
-#include "pbbam/virtual/VirtualRegionType.h"
+#include <pbbam/LocalContextFlags.h>
+#include <pbbam/virtual/VirtualRegionType.h>
 
 namespace PacBio {
 namespace BAM {
@@ -23,7 +17,7 @@ public:
     VirtualRegionType type;
     int beginPos;
     int endPos;
-    LocalContextFlags cxTag = LocalContextFlags::NO_LOCAL_CONTEXT;
+    Data::LocalContextFlags cxTag = Data::LocalContextFlags::NO_LOCAL_CONTEXT;
     int barcodeLeft = -1;
     int barcodeRight = -1;
     int score = 0;
@@ -36,8 +30,8 @@ public:
     /// \brief Creates a virtual region with type/position info, as well as context & barcode.
     ///
     VirtualRegion(const VirtualRegionType type_, const int beginPos_, const int endPos_,
-                  const LocalContextFlags cxTag_, const int barcodeLeft_, const int barcodeRight_,
-                  const int score_ = 0);
+                  const Data::LocalContextFlags cxTag_, const int barcodeLeft_,
+                  const int barcodeRight_, const int score_ = 0);
 
     VirtualRegion() = default;
 
@@ -47,4 +41,4 @@ public:
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // VIRTUALREGION_H
+#endif  // PBBAM_VIRTUALREGION_H

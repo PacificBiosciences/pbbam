@@ -1,13 +1,7 @@
-// File Description
-/// \file Position.h
-/// \brief Defines the Position typedef.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_POSITION_H
+#define PBBAM_POSITION_H
 
-#ifndef POSITION_H
-#define POSITION_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstdint>
 
@@ -32,4 +26,4 @@ PBBAM_DEPRECATED constexpr Position UnmappedPosition{-1};
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // POSITION_H
+#endif  // PBBAM_POSITION_H

@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "DataSetIO.h"
@@ -16,7 +14,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 #include "ErrnoReason.h"
 #include "FileUtils.h"
@@ -46,7 +44,7 @@ struct DataSetFileException : public std::exception
 
 std::unique_ptr<DataSetBase> DataSetFromXml(const std::string& xmlFn)
 {
-    std::ifstream in(xmlFn);
+    std::ifstream in{xmlFn};
     if (!in) throw DataSetFileException{xmlFn, "could not open XML file for reading"};
     return XmlReader::FromStream(in);
 }
@@ -66,7 +64,15 @@ std::unique_ptr<DataSetBase> DataSetFromBam(const std::string& bamFn)
 
     auto& resources = dataset->ExternalResources();
     resources.Add(ExternalResource(BamFile(bamFn)));
-    return dataset;
+    return
+#ifdef __INTEL_COMPILER
+        std::move(
+#endif
+            dataset
+#ifdef __INTEL_COMPILER
+            )
+#endif
+            ;
 }
 
 std::unique_ptr<DataSetBase> DataSetFromFasta(const std::string& fasta)
@@ -89,7 +95,7 @@ std::unique_ptr<DataSetBase> DataSetFromFasta(const std::string& fasta)
 std::unique_ptr<DataSetBase> DataSetFromFofn(const std::string& fofn)
 {
     const auto fofnDir = FileUtils::DirectoryName(fofn);
-    std::ifstream in(fofn);
+    std::ifstream in{fofn};
     if (!in) throw DataSetFileException{fofn, "could not open FOFN for reading"};
 
     auto filenames = FofnReader::Files(in);

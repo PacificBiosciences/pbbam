@@ -1,13 +1,7 @@
-// File Description
-/// \file PbiFilter.h
-/// \brief Defines the PbiFilter class & helper 'concept'.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_PBIFILTER_H
+#define PBBAM_PBIFILTER_H
 
-#ifndef PBIFILTER_H
-#define PBIFILTER_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstddef>
 
@@ -17,9 +11,9 @@
 
 #include <boost/concept_check.hpp>
 
-#include "pbbam/DataSet.h"
-#include "pbbam/PbiBasicTypes.h"
-#include "pbbam/PbiRawData.h"
+#include <pbbam/DataSet.h>
+#include <pbbam/PbiBasicTypes.h>
+#include <pbbam/PbiRawData.h>
 
 namespace PacBio {
 namespace BAM {
@@ -232,7 +226,7 @@ public:
     /// \returns true if record at \p row passes this filter criteria,
     ///          including children (if any)
     ///
-    bool Accepts(const BAM::PbiRawData& idx, const size_t row) const;
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
 
     /// \}
 
@@ -243,7 +237,7 @@ private:
 }  // namespace BAM
 }  // namespace PacBio
 
-#include "pbbam/PbiFilterTypes.h"
-#include "pbbam/internal/PbiFilter.inl"
+#include <pbbam/PbiFilterTypes.h>
+#include <pbbam/internal/PbiFilter.inl>
 
-#endif  // PBIFILTER_H
+#endif  // PBBAM_PBIFILTER_H

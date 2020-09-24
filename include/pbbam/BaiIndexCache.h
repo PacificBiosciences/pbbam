@@ -1,13 +1,7 @@
-// File Description
-/// \file BaiIndexCache.h
-/// \brief Defines the BaiIndexCache class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_BAIINDEXCACHE_H
+#define PBBAM_BAIINDEXCACHE_H
 
-#ifndef BAIINDEXCACHE_H
-#define BAIINDEXCACHE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
@@ -15,7 +9,7 @@
 
 #include <htslib/hts.h>
 
-#include "pbbam/Position.h"
+#include <pbcopper/data/Position.h>
 
 namespace PacBio {
 namespace BAM {
@@ -40,8 +34,8 @@ public:
     ///
     /// \note Does not own the returned pointer; caller is responsible.
     ///
-    hts_itr_t* IteratorForInterval(const int32_t refId, const Position start,
-                                   const Position stop) const;
+    hts_itr_t* IteratorForInterval(const int32_t refId, const Data::Position start,
+                                   const Data::Position stop) const;
 
 private:
     struct BaiIndexCacheDataPrivate;
@@ -57,4 +51,4 @@ BaiIndexCache MakeBaiIndexCache(const BamFile& bamFile);
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // BAIINDEXCACHE_H
+#endif  // PBBAM_BAIINDEXCACHE_H

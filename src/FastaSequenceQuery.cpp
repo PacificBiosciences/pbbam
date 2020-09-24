@@ -1,14 +1,8 @@
-// File Description
-/// \file FastaSequenceQuery.cpp
-/// \brief Implements the FastaSequenceQuery class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/FastaSequenceQuery.h"
+#include <pbbam/FastaSequenceQuery.h>
 
-#include "pbbam/CompositeFastaReader.h"
+#include <pbbam/CompositeFastaReader.h>
 
 namespace PacBio {
 namespace BAM {

@@ -1,12 +1,6 @@
-// File Description
-/// \file PbiFilter.cpp
-/// \brief Implements the PbiFilter class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/PbiFilter.h"
+#include <pbbam/PbiFilter.h>
 
 #include <cctype>
 #include <cstdint>
@@ -21,8 +15,8 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
-#include "pbbam/PbiFilterTypes.h"
-#include "pbbam/StringUtilities.h"
+#include <pbbam/PbiFilterTypes.h>
+#include <pbbam/StringUtilities.h>
 
 #include "FileUtils.h"
 
@@ -124,8 +118,8 @@ static const std::unordered_map<std::string, LocalContextFlags> contextFlagNames
 // helper methods (for handling maybe-list strings))
 static bool isBracketed(const std::string& value)
 {
-    static const std::string openBrackets = "[({";
-    static const std::string closeBrackets = "])}";
+    static const std::string openBrackets{"[({"};
+    static const std::string closeBrackets{"])}"};
     return openBrackets.find(value.at(0)) != std::string::npos &&
            closeBrackets.find(value.at(value.length() - 1)) != std::string::npos;
 }
@@ -148,7 +142,7 @@ static PbiFilter CreateBarcodeFilter(std::string value, const Compare::Type comp
                                  boost::numeric_cast<int16_t>(std::stoi(barcodes.at(1))),
                                  compareType};
     } else
-        return PbiBarcodeFilter{boost::numeric_cast<int16_t>(stoi(value)), compareType};
+        return PbiBarcodeFilter{boost::numeric_cast<int16_t>(std::stoi(value)), compareType};
 }
 
 static PbiFilter CreateBarcodeForwardFilter(std::string value, const Compare::Type compareType)
@@ -165,7 +159,7 @@ static PbiFilter CreateBarcodeForwardFilter(std::string value, const Compare::Ty
         std::vector<int16_t> barcodes;
         barcodes.reserve(tokens.size());
         for (const auto& t : tokens)
-            barcodes.push_back(boost::numeric_cast<int16_t>(stoi(t)));
+            barcodes.push_back(boost::numeric_cast<int16_t>(std::stoi(t)));
         return PbiBarcodeForwardFilter{std::move(barcodes)};
     } else
         return PbiBarcodeForwardFilter{boost::numeric_cast<int16_t>(std::stoi(value)), compareType};
@@ -188,17 +182,17 @@ static PbiFilter CreateBarcodeReverseFilter(std::string value, const Compare::Ty
             barcodes.push_back(boost::numeric_cast<int16_t>(std::stoi(t)));
         return PbiBarcodeReverseFilter{std::move(barcodes)};
     } else
-        return PbiBarcodeReverseFilter{boost::numeric_cast<int16_t>(stoi(value)), compareType};
+        return PbiBarcodeReverseFilter{boost::numeric_cast<int16_t>(std::stoi(value)), compareType};
 }
 
 static PbiFilter CreateLocalContextFilter(const std::string& value, const Compare::Type compareType)
 {
     if (value.empty()) throw std::runtime_error{"[pbbam] PBI filter ERROR: empty value for local context filter property"};
 
-    LocalContextFlags filterValue = LocalContextFlags::NO_LOCAL_CONTEXT;
+    Data::LocalContextFlags filterValue = Data::LocalContextFlags::NO_LOCAL_CONTEXT;
 
     // if raw integer
-    if (isdigit(value.at(0))) filterValue = static_cast<LocalContextFlags>(stoi(value));
+    if (isdigit(value.at(0))) filterValue = static_cast<Data::LocalContextFlags>(std::stoi(value));
 
     // else interpret as flag names
     else {
@@ -222,7 +216,6 @@ static PbiFilter CreateMovieNameFilter(std::string value, const Compare::Type co
     }
 
     if (isList(value)) {
-
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
             throw std::runtime_error{"[pbbam] PBI filter ERROR: unsupported compare type on movie property"};
 
@@ -242,7 +235,6 @@ static PbiFilter CreateQIdFilter(std::string value, const Compare::Type compareT
     }
 
     if (isList(value)) {
-
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
             throw std::runtime_error{"[pbbam] PBI filter ERROR: unsupported compare type on qid property"};
 
@@ -263,7 +255,7 @@ static PbiFilter CreateQueryNamesFilterFromFile(const std::string& value, const 
         throw std::runtime_error{"[pbbam] PBI filter ERROR: unsupported compare type on query name property"};
 
     // resolve file from dataset, value
-    const std::string resolvedFilename = dataset.ResolvePath(value);
+    const auto resolvedFilename = dataset.ResolvePath(value);
     std::vector<std::string> whitelist;
     std::string fn;
     std::ifstream in(resolvedFilename);
@@ -277,19 +269,17 @@ static PbiFilter CreateQueryNameFilter(std::string value, const DataSet& dataset
     if (value.empty()) throw std::runtime_error{"[pbbam] PBI filter ERROR: empty value for query name property"};
 
     // try possible filename first
-    const std::string resolvedFilename = dataset.ResolvePath(value);
+    const auto resolvedFilename = dataset.ResolvePath(value);
     if (FileUtils::Exists(value))
         return CreateQueryNamesFilterFromFile(value, dataset, compareType);
 
     // otherwise "normal" qname (single, or list)
-
     if (isBracketed(value)) {
         value.erase(0, 1);
         value.pop_back();
     }
 
     if (isList(value)) {
-
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
             throw std::runtime_error{"[pbbam] PBI filter ERROR: unsupported compare type on query name property"};
 
@@ -309,7 +299,6 @@ static PbiFilter CreateReadGroupFilter(std::string value, const Compare::Type co
     }
 
     if (isList(value)) {
-
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
             throw std::runtime_error{"[pbbam] PBI filter ERROR: unsupported compare type on read group property"};
 
@@ -329,18 +318,17 @@ static PbiFilter CreateReferenceIdFilter(std::string value, const Compare::Type 
     }
 
     if (isList(value)) {
-
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
             throw std::runtime_error{"[pbbam] PBI filter ERROR: unsupported compare type on reference name ID property"};
 
-        std::vector<std::string> tokens = Split(value, ',');
+        const std::vector<std::string> tokens = Split(value, ',');
         std::vector<int32_t> ids;
         ids.reserve(tokens.size());
         for (const auto& t : tokens)
-            ids.push_back(boost::numeric_cast<int32_t>(stoi(t)));
+            ids.push_back(boost::numeric_cast<int32_t>(std::stoi(t)));
         return PbiReferenceIdFilter{std::move(ids), compareType};
     } else
-        return PbiReferenceIdFilter{boost::numeric_cast<int32_t>(stoi(value)), compareType};
+        return PbiReferenceIdFilter{boost::numeric_cast<int32_t>(std::stoi(value)), compareType};
 }
 
 static PbiFilter CreateReferenceNameFilter(std::string value, const Compare::Type compareType)
@@ -353,7 +341,6 @@ static PbiFilter CreateReferenceNameFilter(std::string value, const Compare::Typ
     }
 
     if (isList(value)) {
-
         if (compareType != Compare::EQUAL && compareType != Compare::NOT_EQUAL)
             throw std::runtime_error{"[pbbam] PBI filter ERROR: unsupported compare type on reference name property"};
 
@@ -373,14 +360,14 @@ static PbiFilter CreateZmwFilter(std::string value, const Compare::Type compareT
     }
 
     if (isList(value)) {
-        std::vector<std::string> tokens = Split(value, ',');
+        const std::vector<std::string> tokens = Split(value, ',');
         std::vector<int32_t> zmws;
         zmws.reserve(tokens.size());
         for (const auto& t : tokens)
-            zmws.push_back(boost::numeric_cast<int32_t>(stoi(t)));
+            zmws.push_back(boost::numeric_cast<int32_t>(std::stoi(t)));
         return PbiZmwFilter{std::move(zmws)};
     } else
-        return PbiZmwFilter{boost::numeric_cast<int32_t>(stoi(value)), compareType};
+        return PbiZmwFilter{boost::numeric_cast<int32_t>(std::stoi(value)), compareType};
 }
 
 static PbiFilter CreateZmwModuloFilter(const Property& property)
@@ -411,7 +398,6 @@ static PbiFilter FromDataSetProperty(const Property& property, const DataSet& da
 {
     try {
         const std::string& value = property.Value();
-
         if (property.Name() == "zm" && property.HasAttribute("Modulo"))
             return CreateZmwModuloFilter(property);
 

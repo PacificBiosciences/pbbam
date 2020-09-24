@@ -1,12 +1,6 @@
-// File Description
-/// \file BamTagCodec.cpp
-/// \brief Implements the BamTagCodec class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/BamTagCodec.h"
+#include <pbbam/BamTagCodec.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -115,7 +109,7 @@ TagCollection BamTagCodec::Decode(const std::vector<uint8_t>& data)
             case 'Z':
             case 'H': {
                 const size_t dataLength = strlen(reinterpret_cast<const char*>(&pData[i]));
-                std::string value(reinterpret_cast<const char*>(&pData[i]), dataLength);
+                const std::string value(reinterpret_cast<const char*>(&pData[i]), dataLength);
                 tags[tagName] = value;
                 if (tagType == 'H') tags[tagName].Modifier(TagModifier::HEX_STRING);
                 i += dataLength + 1;
@@ -298,8 +292,10 @@ std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
 
     std::vector<uint8_t> result;
     result.resize(str.l);
-    memcpy(reinterpret_cast<char*>(result.data()), str.s, str.l);
-    free(str.s);
+    if (str.l) {
+        std::memcpy(reinterpret_cast<char*>(result.data()), str.s, str.l);
+    }
+    std::free(str.s);
     return result;
 }
 
@@ -333,7 +329,7 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
         case 'Z':
         case 'H': {
             const size_t dataLength = strlen(reinterpret_cast<const char*>(&rawData[0]));
-            std::string value(reinterpret_cast<const char*>(&rawData[0]), dataLength);
+            const std::string value(reinterpret_cast<const char*>(&rawData[0]), dataLength);
             Tag t{value};
             if (tagType == 'H') t.Modifier(TagModifier::HEX_STRING);
             return t;
@@ -373,7 +369,7 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
                 "[pbbam] BAM tag format ERROR: unsupported tag-type encountered: " +
                 std::string{1, tagType}};
     }
-    return Tag();  // to avoid compiler warning
+    return {};
 }
 
 std::vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag, const TagModifier& additionalModifier)
@@ -552,7 +548,7 @@ uint8_t BamTagCodec::TagTypeCode(const Tag& tag, const TagModifier& additionalMo
                 "[pbbam] BAM tag format ERROR: unsupported tag-type encountered: " +
                 std::to_string(static_cast<uint16_t>(tag.Type()))};
     }
-    return 0;  // to avoid compiler warning
+    return 0;
 }
 
 }  // namespace BAM

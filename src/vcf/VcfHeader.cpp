@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "../PbbamInternalConfig.h"
 
 #include <pbbam/vcf/VcfHeader.h>
@@ -27,7 +25,7 @@ VcfHeader::VcfHeader() { Version(VcfFormat::CurrentVersion()); }
 
 VcfHeader::VcfHeader(const std::string& hdrText) { *this = VcfFormat::ParsedHeader(hdrText); }
 
-VcfHeader& VcfHeader::AddContigDefinition(PacBio::VCF::ContigDefinition contig)
+VcfHeader& VcfHeader::AddContigDefinition(VCF::ContigDefinition contig)
 {
     const auto found = contigLookup_.find(contig.Id());
     if (found == contigLookup_.cend()) {
@@ -38,7 +36,7 @@ VcfHeader& VcfHeader::AddContigDefinition(PacBio::VCF::ContigDefinition contig)
     return *this;
 }
 
-VcfHeader& VcfHeader::AddFilterDefinition(PacBio::VCF::FilterDefinition filter)
+VcfHeader& VcfHeader::AddFilterDefinition(VCF::FilterDefinition filter)
 {
     const auto found = filterLookup_.find(filter.Id());
     if (found == filterLookup_.cend()) {
@@ -49,7 +47,7 @@ VcfHeader& VcfHeader::AddFilterDefinition(PacBio::VCF::FilterDefinition filter)
     return *this;
 }
 
-VcfHeader& VcfHeader::AddFormatDefinition(PacBio::VCF::FormatDefinition format)
+VcfHeader& VcfHeader::AddFormatDefinition(VCF::FormatDefinition format)
 {
     const auto found = formatLookup_.find(format.Id());
     if (found == formatLookup_.cend()) {
@@ -60,7 +58,7 @@ VcfHeader& VcfHeader::AddFormatDefinition(PacBio::VCF::FormatDefinition format)
     return *this;
 }
 
-VcfHeader& VcfHeader::AddGeneralDefinition(PacBio::VCF::GeneralDefinition def)
+VcfHeader& VcfHeader::AddGeneralDefinition(VCF::GeneralDefinition def)
 {
     const auto found = generalLookup_.find(def.Id());
     if (found == generalLookup_.cend()) {
@@ -71,7 +69,7 @@ VcfHeader& VcfHeader::AddGeneralDefinition(PacBio::VCF::GeneralDefinition def)
     return *this;
 }
 
-VcfHeader& VcfHeader::AddInfoDefinition(PacBio::VCF::InfoDefinition info)
+VcfHeader& VcfHeader::AddInfoDefinition(VCF::InfoDefinition info)
 {
     const auto found = infoLookup_.find(info.Id());
     if (found == infoLookup_.cend()) {
@@ -93,17 +91,17 @@ VcfHeader& VcfHeader::AddSample(std::string sample)
     return *this;
 }
 
-const std::vector<PacBio::VCF::ContigDefinition>& VcfHeader::ContigDefinitions() const
+const std::vector<VCF::ContigDefinition>& VcfHeader::ContigDefinitions() const
 {
     return contigDefinitions_;
 }
 
-const PacBio::VCF::ContigDefinition& VcfHeader::ContigDefinition(const std::string& id) const
+const VCF::ContigDefinition& VcfHeader::ContigDefinition(const std::string& id) const
 {
     return contigDefinitions_.at(contigLookup_.at(id));
 }
 
-VcfHeader& VcfHeader::ContigDefinitions(std::vector<PacBio::VCF::ContigDefinition> defs)
+VcfHeader& VcfHeader::ContigDefinitions(std::vector<VCF::ContigDefinition> defs)
 {
     contigDefinitions_.clear();
     contigLookup_.clear();
@@ -123,17 +121,17 @@ VcfHeader& VcfHeader::FileDate(std::string fileDate)
     return *this;
 }
 
-const std::vector<PacBio::VCF::FilterDefinition>& VcfHeader::FilterDefinitions() const
+const std::vector<VCF::FilterDefinition>& VcfHeader::FilterDefinitions() const
 {
     return filterDefinitions_;
 }
 
-const PacBio::VCF::FilterDefinition& VcfHeader::FilterDefinition(const std::string& id) const
+const VCF::FilterDefinition& VcfHeader::FilterDefinition(const std::string& id) const
 {
     return filterDefinitions_.at(filterLookup_.at(id));
 }
 
-VcfHeader& VcfHeader::FilterDefinitions(std::vector<PacBio::VCF::FilterDefinition> defs)
+VcfHeader& VcfHeader::FilterDefinitions(std::vector<VCF::FilterDefinition> defs)
 {
     filterDefinitions_.clear();
     filterLookup_.clear();
@@ -142,17 +140,17 @@ VcfHeader& VcfHeader::FilterDefinitions(std::vector<PacBio::VCF::FilterDefinitio
     return *this;
 }
 
-const std::vector<PacBio::VCF::FormatDefinition>& VcfHeader::FormatDefinitions() const
+const std::vector<VCF::FormatDefinition>& VcfHeader::FormatDefinitions() const
 {
     return formatDefinitions_;
 }
 
-const PacBio::VCF::FormatDefinition& VcfHeader::FormatDefinition(const std::string& id) const
+const VCF::FormatDefinition& VcfHeader::FormatDefinition(const std::string& id) const
 {
     return formatDefinitions_.at(formatLookup_.at(id));
 }
 
-VcfHeader& VcfHeader::FormatDefinitions(std::vector<PacBio::VCF::FormatDefinition> defs)
+VcfHeader& VcfHeader::FormatDefinitions(std::vector<VCF::FormatDefinition> defs)
 {
     formatDefinitions_.clear();
     formatLookup_.clear();
@@ -161,17 +159,17 @@ VcfHeader& VcfHeader::FormatDefinitions(std::vector<PacBio::VCF::FormatDefinitio
     return *this;
 }
 
-const std::vector<PacBio::VCF::GeneralDefinition>& VcfHeader::GeneralDefinitions() const
+const std::vector<VCF::GeneralDefinition>& VcfHeader::GeneralDefinitions() const
 {
     return generalDefinitions_;
 }
 
-const PacBio::VCF::GeneralDefinition& VcfHeader::GeneralDefinition(const std::string& id) const
+const VCF::GeneralDefinition& VcfHeader::GeneralDefinition(const std::string& id) const
 {
     return generalDefinitions_.at(generalLookup_.at(id));
 }
 
-VcfHeader& VcfHeader::GeneralDefinitions(std::vector<PacBio::VCF::GeneralDefinition> defs)
+VcfHeader& VcfHeader::GeneralDefinitions(std::vector<VCF::GeneralDefinition> defs)
 {
     generalDefinitions_.clear();
     generalLookup_.clear();
@@ -180,16 +178,16 @@ VcfHeader& VcfHeader::GeneralDefinitions(std::vector<PacBio::VCF::GeneralDefinit
     return *this;
 }
 
-const std::vector<PacBio::VCF::InfoDefinition>& VcfHeader::InfoDefinitions() const
+const std::vector<VCF::InfoDefinition>& VcfHeader::InfoDefinitions() const
 {
     return infoDefinitions_;
 }
-const PacBio::VCF::InfoDefinition& VcfHeader::InfoDefinition(const std::string& id) const
+const VCF::InfoDefinition& VcfHeader::InfoDefinition(const std::string& id) const
 {
     return infoDefinitions_.at(infoLookup_.at(id));
 }
 
-VcfHeader& VcfHeader::InfoDefinitions(std::vector<PacBio::VCF::InfoDefinition> defs)
+VcfHeader& VcfHeader::InfoDefinitions(std::vector<VCF::InfoDefinition> defs)
 {
     infoDefinitions_.clear();
     infoLookup_.clear();

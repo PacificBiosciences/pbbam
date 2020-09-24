@@ -1,13 +1,7 @@
-// File Description
-/// \file ZmwType.h
-/// \brief Defines the ZmwType enum.
-//
-// Author: Armin Töpfer
+#ifndef PBBAM_ZMWTYPE_H
+#define PBBAM_ZMWTYPE_H
 
-#ifndef ZMWTYPE_H
-#define ZMWTYPE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 namespace PacBio {
 namespace BAM {
@@ -25,4 +19,4 @@ enum class ZmwType : char
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // ZMWTYPE_H
+#endif  // PBBAM_ZMWTYPE_H

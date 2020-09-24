@@ -60,13 +60,13 @@ static void TestSubread2Xml();
 static void TestSubread3Xml();
 static void TestTransformedXml();
 
-static 
+static
 void changeCurrentDirectory(const std::string& dir)
 { ASSERT_EQ(0, chdir(dir.c_str())); }
 
 } // namespace DataSetIOTests
 
-TEST(DataSetIOTest, FromBamFilename)
+TEST(BAM_DataSetIO, can_create_from_single_bam_path)
 {
     DataSet dataset(DataSetIOTests::alignedBamFn);
 
@@ -76,7 +76,7 @@ TEST(DataSetIOTest, FromBamFilename)
     EXPECT_EQ(DataSetIOTests::alignedBamFn, bamRef.ResourceId());
 }
 
-TEST(DataSetIOTest, FromBamFilenames)
+TEST(BAM_DataSetIO, can_create_from_multiple_bam_paths)
 {
     std::ifstream fofn(DataSetIOTests::bamGroupFofn);
     std::vector<std::string> files;
@@ -86,7 +86,7 @@ TEST(DataSetIOTest, FromBamFilenames)
     EXPECT_EQ(3, dataset.ExternalResources().Size());
 }
 
-TEST(DataSetIOTest, FromBamFileObject)
+TEST(BAM_DataSetIO, can_create_from_bam_file_object)
 {
     BamFile bamFile(DataSetIOTests::alignedBamFn);
     DataSet dataset(bamFile.Filename());
@@ -97,18 +97,18 @@ TEST(DataSetIOTest, FromBamFileObject)
     EXPECT_EQ(DataSetIOTests::alignedBamFn, bamRef.ResourceId());
 }
 
-TEST(DataSetIOTest, FromFofn)
+TEST(BAM_DataSetIO, FromFofn)
 {
     DataSet dataset(DataSetIOTests::bamGroupFofn);
     EXPECT_EQ(3, dataset.ExternalResources().Size());
 }
 
-TEST(DataSetIOTest, FromXml)
+TEST(BAM_DataSetIO, can_create_from_fofn)
 {
     EXPECT_NO_THROW(DataSetIOTests::TestFromXmlString());
 }
 
-TEST(DataSetIOTest, FromXmlFile)
+TEST(BAM_DataSetIO, can_create_from_xml)
 {
     EXPECT_NO_THROW(DataSetIOTests::TestAli1Xml());
     EXPECT_NO_THROW(DataSetIOTests::TestAli2Xml());
@@ -126,28 +126,28 @@ TEST(DataSetIOTest, FromXmlFile)
     EXPECT_NO_THROW(DataSetIOTests::TestTransformedXml());
 }
 
-TEST(DataSetIOTest, ThrowsOnNonexistentFofnFile)
+TEST(BAM_DataSetIO, throws_on_nonexistent_fofn)
 {
     EXPECT_THROW(DataSet("does/not/exist.fofn"), std::exception);
 }
 
-TEST(DataSetIOTest, ThrowsOnNonexistentXmlFile)
+TEST(BAM_DataSetIO, throws_on_nonexistent_xml)
 {
     EXPECT_THROW(DataSet("does/not/exist.xml"), std::exception);
 }
 
-TEST(DataSetIOTest, ThrowsOnUnsupportedExtension)
+TEST(BAM_DataSetIO, throws_on_supported_extension)
 {
     EXPECT_THROW(DataSet("bad/extension.foo"), std::exception);
 }
 
-TEST(DataSetIOTest, ThrowsIfCannotOpenSaveFile)
+TEST(BAM_DataSetIO, throws_if_cannot_save_to_file)
 {
     DataSet ds;
     EXPECT_THROW(ds.Save("fake_directory_that_should_not_exist/out.xml"), std::exception);
 }
 
-TEST(DataSetIOTest, ToXml)
+TEST(BAM_DataSetIO, can_write_normal_alignmentset_as_xml)
 {
     // top-level data
     DataSet dataset(DataSet::ALIGNMENT);
@@ -304,7 +304,7 @@ TEST(DataSetIOTest, ToXml)
     EXPECT_EQ(expectedXml, s.str());
 }
 
-TEST(DataSetIOTest, DataSetBaseTypeToXml)
+TEST(BAM_DataSetIO, can_write_normal_contigset_as_xml)
 {
     // top-level data
     ContigSet dataset;
@@ -1366,156 +1366,8 @@ static void TestTransformedXml()
 
 } // namespace DataSetIOTests
 
-//
-// NOTE(DB): 2020 Feb 14
-//           Removing this test, it was dirty hack to be permissive and not choke
-//           on an older malformed XML pathology. We have better validation &
-//           tool support now. This test is getting in the way of actual format
-//           bugfixes.
-//
-// TEST(DataSetIOTest, InspectMalformedXml)
-// {
-//     const std::string xmlFn = PbbamTestsConfig::Data_Dir + "/dataset/malformed.xml";
 
-//     DataSet ds(xmlFn);
-//     std::ostringstream s;
-//     ds.SaveToStream(s);
-
-//     const std::string expected{
-//         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-//         "<SubreadSet CreatedAt=\"2015-08-19T15:39:36.331\" Description=\"Merged dataset from 1 files using DatasetMerger 0.1.2\" "
-//                     "MetaType=\"PacBio.DataSet.HdfSubreadSet\" Name=\"Subreads from runr000013_42267_150403\" "
-//                     "Tags=\"pacbio.secondary.instrument=RS\" TimeStampedName=\"hdfsubreadset_2015-08-19T15:39:36.331-07:00\" "
-//                     "UniqueId=\"b4741521-2a4c-42df-8a13-0a755ca9ed1e\" Version=\"0.5\" "
-//                     "xmlns=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
-//                     "xmlns:ns0=\"http://pacificbiosciences.com/PacBioBaseDataModel.xsd\" "
-//                     "xmlns:ns1=\"http://pacificbiosciences.com/PacBioSampleInfo.xsd\" "
-//                     "xmlns:ns2=\"http://pacificbiosciences.com/PacBioCollectionMetadata.xsd\" "
-//                     "xmlns:ns3=\"http://pacificbiosciences.com/PacBioReagentKit.xsd\" "
-//                     "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-//                     "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDatasets.xsd\">\n"
-//         "\t<ns0:ExternalResources>\n"
-//         "\t\t<ns0:ExternalResource MetaType=\"SubreadFile.SubreadBamFile\" "
-//                                   "ResourceId=\"file:///mnt/secondary-siv/jenkins/jenkins-bot01/workspace/Ubuntu1404_Mainline_SA3_Tiny_tests/software/smrtanalysis/siv/testkit-jobs/sa3_pipelines/mapping/tiny/job_output-ubuntu1404/tasks/pbsmrtpipe.tasks.h5_subreads_to_subread-0//mnt/secondary-siv/jenkins/jenkins-bot01/workspace/Ubuntu1404_Mainline_SA3_Tiny_tests/software/smrtanalysis/siv/testkit-jobs/sa3_pipelines/mapping/tiny/job_output-ubuntu1404/tasks/pbsmrtpipe.tasks.h5_subreads_to_subread-0/file.subreads.subreads.bam\" "
-//                                   "TimeStampedName=\"SubreadFile.SubreadBamFile_00000000000000\" "
-//                                   "UniqueId=\"251acf71-9eb0-489e-9dd1-cdbd11432753\" />\n"
-//         "\t</ns0:ExternalResources>\n"
-//         "\t<DataSetMetadata>\n"
-//         "\t\t<TotalLength>50000000</TotalLength>\n"
-//         "\t\t<NumRecords>150000</NumRecords>\n"
-//         "\t\t<ns2:Collections>\n"
-//         "\t\t\t<ns2:CollectionMetadata Context=\"m150404_101626_42267_c100807920800000001823174110291514_s1_p0\" "
-//                                       "InstrumentId=\"1\" InstrumentName=\"42267\" MetaType=\"PacBio.Collection\" "
-//                                       "TimeStampedName=\"m150404_101626_42267_c100807920800000001823174110291514_s1_p0\" "
-//                                       "UniqueId=\"d66c8372-2b70-4dcf-b64f-9f8b5cc351fd\">\n"
-//         "\t\t\t\t<ns2:InstCtrlVer>2.3.0.1.142990</ns2:InstCtrlVer>\n"
-//         "\t\t\t\t<ns2:SigProcVer>NRT@172.31.128.10:8082, SwVer=2301.142990, HwVer=1.0</ns2:SigProcVer>\n"
-//         "\t\t\t\t<ns2:RunDetails>\n"
-//         "\t\t\t\t\t<ns2:RunId>r000013_42267_150403</ns2:RunId>\n"
-//         "\t\t\t\t\t<ns2:Name>Inst42267-040315-SAT-100pM-2kb-P6C4</ns2:Name>\n"
-//         "\t\t\t\t</ns2:RunDetails>\n"
-//         "\t\t\t\t<ns2:WellSample Name=\"Inst42267-040315-SAT-100pM-2kb-P6C4\">\n"
-//         "\t\t\t\t\t<ns2:PlateId>Inst42267-040315-SAT-100pM-2kb-P6C4</ns2:PlateId>\n"
-//         "\t\t\t\t\t<ns2:WellName>Inst42267-040315-SAT-100pM-2kb-P6C4</ns2:WellName>\n"
-//         "\t\t\t\t\t<ns2:Concentration>0.0</ns2:Concentration>\n"
-//         "\t\t\t\t\t<ns2:SampleReuseEnabled>false</ns2:SampleReuseEnabled>\n"
-//         "\t\t\t\t\t<ns2:StageHotstartEnabled>false</ns2:StageHotstartEnabled>\n"
-//         "\t\t\t\t\t<ns2:SizeSelectionEnabled>false</ns2:SizeSelectionEnabled>\n"
-//         "\t\t\t\t\t<ns2:UseCount>1</ns2:UseCount>\n"
-//         "\t\t\t\t\t<ns1:BioSamplePointers>\n"
-//         "\t\t\t\t\t\t<ns1:BioSamplePointer>251acf71-9eb0-489e-9dd1-cdbd11432752</ns1:BioSamplePointer>\n"
-//         "\t\t\t\t\t</ns1:BioSamplePointers>\n"
-//         "\t\t\t\t</ns2:WellSample>\n"
-//         "\t\t\t\t<ns2:Automation>\n"
-//         "\t\t\t\t\t<ns0:AutomationParameters>\n"
-//         "\t\t\t\t\t\t<ns0:AutomationParameter />\n"
-//         "\t\t\t\t\t</ns0:AutomationParameters>\n"
-//         "\t\t\t\t</ns2:Automation>\n"
-//         "\t\t\t\t<ns2:CollectionNumber>7</ns2:CollectionNumber>\n"
-//         "\t\t\t\t<ns2:CellIndex>4</ns2:CellIndex>\n"
-//         "\t\t\t\t<ns2:CellPac Barcode=\"10080792080000000182317411029151\" />\n"
-//         "\t\t\t\t<ns2:Primary>\n"
-//         "\t\t\t\t\t<ns2:AutomationName>BasecallerV1</ns2:AutomationName>\n"
-//         "\t\t\t\t\t<ns2:ConfigFileName>2-3-0_P6-C4.xml</ns2:ConfigFileName>\n"
-//         "\t\t\t\t\t<ns2:SequencingCondition />\n"
-//         "\t\t\t\t\t<ns2:OutputOptions>\n"
-//         "\t\t\t\t\t\t<ns2:ResultsFolder>Analysis_Results</ns2:ResultsFolder>\n"
-//         "\t\t\t\t\t\t<ns2:CollectionPathUri>rsy://mp-rsync/vol55//RS_DATA_STAGING/42267/Inst42267-040315-SAT-100pM-2kb-P6C4_13/A04_7/</ns2:CollectionPathUri>\n"
-//         "\t\t\t\t\t\t<ns2:CopyFiles>\n"
-//         "\t\t\t\t\t\t\t<ns2:CollectionFileCopy>Fasta</ns2:CollectionFileCopy>\n"
-//         "\t\t\t\t\t\t</ns2:CopyFiles>\n"
-//         "\t\t\t\t\t\t<ns2:Readout>Bases</ns2:Readout>\n"
-//         "\t\t\t\t\t\t<ns2:MetricsVerbosity>Minimal</ns2:MetricsVerbosity>\n"
-//         "\t\t\t\t\t</ns2:OutputOptions>\n"
-//         "\t\t\t\t</ns2:Primary>\n"
-//         "\t\t\t</ns2:CollectionMetadata>\n"
-//         "\t\t</ns2:Collections>\n"
-//         "\t\t<ns1:BioSamples>\n"
-//         "\t\t\t<ns1:BioSample Description=\"Inst42267-SAT-100pM-2kbLambda-P6C4-Std120_CPS_040315\" "
-//                             "MetaType=\"PacBio.Sample\" Name=\"Inst42267-040315-SAT-100pM-2kb-P6C4\" "
-//                             "TimeStampedName=\"biosample_2015-08-19T15:39:36.331-07:00\" UniqueId=\"251acf71-9eb0-489e-9dd1-cdbd11432752\" />\n"
-//         "\t\t</ns1:BioSamples>\n"
-//         "\t</DataSetMetadata>\n"
-//         "</SubreadSet>\n"};
-
-//     EXPECT_EQ(expected, s.str());
-// }
-
-// TEST(DataSetIOTest, RelativePathCarriedThroughOk_FromString)
-// {
-//     const std::string inputXml{
-//         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-//         "<pbds:AlignmentSet "
-//             "CreatedAt=\"2015-01-27T09:00:01\" "
-//             "MetaType=\"PacBio.DataSet.AlignmentSet\" "
-//             "Name=\"DataSet_AlignmentSet\" "
-//             "Tags=\"barcode moreTags mapping mytags\" "
-//             "TimeStampedName=\"biosample_2015-08-19T15:39:36.331-07:00\" "
-//             "UniqueId=\"b095d0a3-94b8-4918-b3af-a3f81bbe519c\" "
-//             "Version=\"2.3.0\" "
-//             "xmlns=\"http://pacificbiosciences.com/PacBioDataModel.xsd\" "
-//             "xmlns:pbbase=\"http://pacificbiosciences.com/PacBioBaseDataModel.xsd\" "
-//             "xmlns:pbds=\"http://pacificbiosciences.com/PacBioDatasets.xsd\" "
-//             "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-//             "xsi:schemaLocation=\"http://pacificbiosciences.com/PacBioDataModel.xsd\">\n"
-//         "\t<pbbase:ExternalResources>\n"
-//         "\t\t<pbbase:ExternalResource "
-//                 "Description=\"Points to an example Alignments BAM file.\" "
-//                 "MetaType=\"AlignmentFile.AlignmentBamFile\" "
-//                 "Name=\"Third Alignments BAM\" "
-//                 "ResourceId=\"../path/to/resource1.bam\" "
-//                 "Tags=\"Example\">\n"
-//         "\t\t\t<pbbase:FileIndices>\n"
-//         "\t\t\t\t<pbbase:FileIndex "
-//                     "MetaType=\"PacBio.Index.PacBioIndex\" "
-//                     "ResourceId=\"../path/to/resource1.bam.pbi\" />\n"
-//         "\t\t\t</pbbase:FileIndices>\n"
-//         "\t\t</pbbase:ExternalResource>\n"
-//         "\t\t<pbbase:ExternalResource "
-//                 "Description=\"Points to another example Alignments BAM file, by relative path.\" "
-//                 "MetaType=\"AlignmentFile.AlignmentBamFile\" "
-//                 "Name=\"Fourth Alignments BAM\" "
-//                 "ResourceId=\"../path/to/resource2.bam\" "
-//                 "Tags=\"Example\">\n"
-//         "\t\t\t<pbbase:FileIndices>\n"
-//         "\t\t\t\t<pbbase:FileIndex "
-//                     "MetaType=\"PacBio.Index.PacBioIndex\" "
-//                     "ResourceId=\"../path/to/resource2.bam.pbi\" />\n"
-//         "\t\t\t</pbbase:FileIndices>\n"
-//         "\t\t</pbbase:ExternalResource>\n"
-//         "\t</pbbase:ExternalResources>\n"
-//         "</pbds:AlignmentSet>\n"};
-
-//     auto dataset = DataSet::FromXml(inputXml);
-
-//     std::ostringstream stream;
-//     dataset.SaveToStream(stream);
-//     auto outputXml = stream.str();
-
-//     EXPECT_EQ(inputXml, outputXml);
-// }
-
-TEST(DataSetIOTest, RelativePathCarriedThroughOk_FromFile)
+TEST(BAM_DataSetIO, relative_path_is_passed_through_from_input_xml)
 {
     DataSet dataset(PbbamTestsConfig::Data_Dir + "/relative/relative.xml");
     auto resources = dataset.ExternalResources();
@@ -1533,7 +1385,7 @@ TEST(DataSetIOTest, RelativePathCarriedThroughOk_FromFile)
     EXPECT_EQ("./b/test2.bam", newResources[2].ResourceId());
 }
 
-TEST(DataSetIOTest, DataSetFromRelativeBamFilename)
+TEST(BAM_DataSetIO, relative_path_is_passed_through_from_input_bam_path)
 {
     // cache initial directory and move to location so we can test relatvie filename ok
     const std::string startingDirectory = FileUtils::CurrentWorkingDirectory();
@@ -1554,7 +1406,7 @@ TEST(DataSetIOTest, DataSetFromRelativeBamFilename)
     DataSetIOTests::changeCurrentDirectory(startingDirectory);
 }
 
-TEST(DataaSetIOTest, AllFiles)
+TEST(BAM_DataSetIO, can_fetch_all_file_paths)
 {
     // check  BamFiles only
     EXPECT_NO_THROW(
@@ -1573,7 +1425,7 @@ TEST(DataaSetIOTest, AllFiles)
     });
 }
 
-TEST(DataSetIOTest, MetadataDefaultChildrenProperlyOrderedPerXsd)
+TEST(BAM_DataSetIO, correctly_orders_metadata_default_children)
 {
     DataSet dataset(DataSet::ALIGNMENT);
     dataset.CreatedAt("2015-01-27T09:00:01");
@@ -1613,7 +1465,7 @@ TEST(DataSetIOTest, MetadataDefaultChildrenProperlyOrderedPerXsd)
     EXPECT_TRUE(xmlnsPbbaseFound < xmlnsPbdsFound);
 }
 
-TEST(DataSetIOTest, MakeReferenceSetFromSubdataset)
+TEST(BAM_DataSetIO, can_make_referenceset_from_subdataset)
 {
     // ReferenceSet with ReferenceSet subdataset
     const std::string referenceSetXml{
@@ -1694,7 +1546,7 @@ TEST(DataSetIOTest, MakeReferenceSetFromSubdataset)
     EXPECT_NO_THROW(DataSet::FromXml(alignmentSetXml));
 }
 
-TEST(DataSetIOTest, AbsolutePathsForGenericAndDerivedDatasets)
+TEST(BAM_DataSetIO, can_absolutize_resource_paths)
 {
     DataSet dataset;
     ReferenceSet referenceDataset;
@@ -1716,7 +1568,7 @@ TEST(DataSetIOTest, AbsolutePathsForGenericAndDerivedDatasets)
     EXPECT_NE(referenceDatasetXml.find(expectedReferenceFn), std::string::npos);
 }
 
-TEST(DataSetIOTest, AmpersandsAreEscaped)
+TEST(BAM_DataSetIO, ampersands_are_escaped_in_ouput)
 {
     SubreadSet ds;
     internal::DataSetElement e{"Description", XsdType::COLLECTION_METADATA};
@@ -1728,7 +1580,7 @@ TEST(DataSetIOTest, AmpersandsAreEscaped)
     EXPECT_TRUE(out.str().find("R&amp;D") != std::string::npos);
 }
 
-TEST(DataSetIOTest, CanWriteRelativePathsInDoNovoDataset)
+TEST(BAM_DataSetIO, can_write_relative_paths_in_denovo_datasets)
 {
     const std::string file1{"file1.bam"};
     const std::string file2{"subdir/file2.bam"};

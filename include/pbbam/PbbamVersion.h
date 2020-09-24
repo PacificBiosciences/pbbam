@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #ifndef PBBAM_PBBAMVERSION_H
 #define PBBAM_PBBAMVERSION_H
 

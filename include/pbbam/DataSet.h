@@ -1,13 +1,7 @@
-// File Description
-/// \file DataSet.h
-/// \brief Defines the DataSet class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_DATASET_H
+#define PBBAM_DATASET_H
 
-#ifndef DATASET_H
-#define DATASET_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <chrono>
 #include <iosfwd>
@@ -16,10 +10,10 @@
 #include <string>
 #include <vector>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/BamHeader.h"
-#include "pbbam/DataSetTypes.h"
-#include "pbbam/GenomicInterval.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/BamHeader.h>
+#include <pbbam/DataSetTypes.h>
+#include <pbbam/GenomicInterval.h>
 
 namespace PacBio {
 namespace BAM {
@@ -285,7 +279,7 @@ public:
     ///
     /// \returns dataset type enum
     ///
-    PacBio::BAM::DataSet::TypeEnum Type() const;
+    BAM::DataSet::TypeEnum Type() const;
 
     /// \brief Fetches the dataset's type.
     ///
@@ -304,32 +298,32 @@ public:
     /// \returns const reference to child element
     /// \throws std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::Extensions& Extensions() const;
+    const BAM::Extensions& Extensions() const;
 
     /// \brief Fetches the dataset's ExternalResources element.
     ///
     /// \returns const reference to child element
     /// \throws std::runtime_error if element does not exist
     ///
-    const PacBio::BAM::ExternalResources& ExternalResources() const;
+    const BAM::ExternalResources& ExternalResources() const;
 
     /// \brief Fetches the dataset's Filters element.
     ///
     /// \returns const reference to child element
     ///
-    const PacBio::BAM::Filters& Filters() const;
+    const BAM::Filters& Filters() const;
 
     /// \brief Fetches the dataset's DataSetMetadata element.
     ///
     /// \returns const reference to child element
     ///
-    const PacBio::BAM::DataSetMetadata& Metadata() const;
+    const BAM::DataSetMetadata& Metadata() const;
 
     /// \brief Fetches the dataset's DataSets element.
     ///
     /// \returns const reference to child element
     ///
-    const PacBio::BAM::SubDataSets& SubDataSets() const;
+    const BAM::SubDataSets& SubDataSets() const;
 
     /// \}
 
@@ -686,7 +680,7 @@ public:
     /// \param[in] type  new dataset type
     /// \returns reference to this dataset object
     ///
-    DataSet& Type(const PacBio::BAM::DataSet::TypeEnum type);
+    DataSet& Type(const BAM::DataSet::TypeEnum type);
 
     /// \}
 
@@ -700,7 +694,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::Extensions& Extensions();
+    BAM::Extensions& Extensions();
 
     /// \brief Fetches the dataset's ExternalResources element.
     ///
@@ -708,7 +702,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::ExternalResources& ExternalResources();
+    BAM::ExternalResources& ExternalResources();
 
     /// \brief Fetches the dataset's Filters element.
     ///
@@ -716,7 +710,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::Filters& Filters();
+    BAM::Filters& Filters();
 
     /// \brief Fetches the dataset's DataSetMetadata element.
     ///
@@ -724,7 +718,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::DataSetMetadata& Metadata();
+    BAM::DataSetMetadata& Metadata();
 
     /// \brief Fetches the dataset's DataSets element.
     ///
@@ -732,7 +726,7 @@ public:
     ///
     /// \returns non-const reference to child element
     ///
-    PacBio::BAM::SubDataSets& SubDataSets();
+    BAM::SubDataSets& SubDataSets();
 
     /// \}
 
@@ -747,7 +741,7 @@ public:
     /// \param[in] extensions  new value for the element
     /// \returns reference to this dataset object
     ///
-    DataSet& Extensions(const PacBio::BAM::Extensions& extensions);
+    DataSet& Extensions(const BAM::Extensions& extensions);
 
     /// \brief Sets this dataset's ExternalResources element.
     ///
@@ -756,7 +750,7 @@ public:
     /// \param[in] resources  new value for the element
     /// \returns reference to this dataset object
     ///
-    DataSet& ExternalResources(const PacBio::BAM::ExternalResources& resources);
+    DataSet& ExternalResources(const BAM::ExternalResources& resources);
 
     /// \brief Sets this dataset's Filters element.
     ///
@@ -765,7 +759,7 @@ public:
     /// \param[in] filters  new value for the element
     /// \returns reference to this dataset object
     ///
-    DataSet& Filters(const PacBio::BAM::Filters& filters);
+    DataSet& Filters(const BAM::Filters& filters);
 
     /// \brief Sets this dataset's DataSetMetadata element.
     ///
@@ -774,7 +768,7 @@ public:
     /// \param[in] metadata  new value for the element
     /// \returns reference to this dataset object
     ///
-    DataSet& Metadata(const PacBio::BAM::DataSetMetadata& metadata);
+    DataSet& Metadata(const BAM::DataSetMetadata& metadata);
 
     /// \brief Sets this dataset's DataSets element.
     ///
@@ -783,7 +777,7 @@ public:
     /// \param[in] subdatasets  new value for the element
     /// \returns reference to this dataset object
     ///
-    DataSet& SubDataSets(const PacBio::BAM::SubDataSets& subdatasets);
+    DataSet& SubDataSets(const BAM::SubDataSets& subdatasets);
 
     /// \}
 
@@ -853,4 +847,4 @@ PBBAM_EXPORT std::string ToIso8601(const time_t& t);
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // DATASET_H
+#endif  // PBBAM_DATASET_H

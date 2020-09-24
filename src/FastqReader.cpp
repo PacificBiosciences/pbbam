@@ -1,12 +1,6 @@
-// File Description
-/// \file FastqReader.cpp
-/// \brief Implements the FastqReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/FastqReader.h"
+#include <pbbam/FastqReader.h>
 
 #include <cassert>
 
@@ -14,7 +8,7 @@
 #include <stdexcept>
 #include <type_traits>
 
-#include "pbbam/FormatUtils.h"
+#include <pbbam/FormatUtils.h>
 
 #include "KSeqReader.h"
 

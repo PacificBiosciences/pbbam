@@ -1,8 +1,6 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/FastaSequence.h"
+#include <pbbam/FastaSequence.h>
 
 #include <cassert>
 #include <cstdio>

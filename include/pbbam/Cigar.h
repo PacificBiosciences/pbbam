@@ -1,20 +1,11 @@
-// File Description
-/// \file Cigar.h
-/// \brief Defines the Cigar class.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_CIGAR_H
+#define PBBAM_CIGAR_H
 
-#ifndef CIGAR_H
-#define CIGAR_H
-
-#include "pbbam/Config.h"
-
-#include <string>
-#include <vector>
+#include <pbbam/Config.h>
 
 #include <pbcopper/data/Cigar.h>
 
-#include "pbbam/CigarOperation.h"
+#include <pbbam/CigarOperation.h>
 
 namespace PacBio {
 namespace BAM {
@@ -26,4 +17,4 @@ PBBAM_DEPRECATED constexpr auto ReferenceLength = PacBio::Data::ReferenceLength;
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // CIGAR_H
+#endif  // PBBAM_CIGAR_H

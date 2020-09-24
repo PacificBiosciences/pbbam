@@ -1,20 +1,14 @@
-// File Description
-/// \file PbiFile.h
-/// \brief Defines the PbiFile enums, typedefs, and methods.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_PBIFILE_H
+#define PBBAM_PBIFILE_H
 
-#ifndef PBIFILE_H
-#define PBIFILE_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <cstddef>
 #include <cstdint>
 
 #include <string>
 
-#include "pbbam/PbiBuilder.h"
+#include <pbbam/PbiBuilder.h>
 
 namespace PacBio {
 namespace BAM {
@@ -108,4 +102,4 @@ struct PbiFile
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // PBIFILE_H
+#endif  // PBBAM_PBIFILE_H

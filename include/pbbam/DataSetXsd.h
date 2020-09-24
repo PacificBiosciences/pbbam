@@ -1,13 +1,7 @@
-// File Description
-/// \file DataSetXsd.h
-/// \brief Defines the XSD- and namespace-related classes for DataSetXML.
-//
-// Author: Derek Barnett
+#ifndef PBBAM_DATASETXSD_H
+#define PBBAM_DATASETXSD_H
 
-#ifndef DATASETXSD_H
-#define DATASETXSD_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <map>
 #include <string>
@@ -113,4 +107,4 @@ private:
 }  // namespace PacBio
 }  // namespace BAM
 
-#endif  // DATASETXSD_H
+#endif  // PBBAM_DATASETXSD_H

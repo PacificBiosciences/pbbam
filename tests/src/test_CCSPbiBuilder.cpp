@@ -34,7 +34,7 @@ const CCSRecord& ValidRecord()
 
 }  // namespace CCSPbiBuilderTests
 
-TEST(CCSPbiBuilderTest, can_create_pbi_file_from_ccs_records)
+TEST(CCS_CCSPbiBuilder, can_create_pbi_file_from_ccs_records)
 {
     const std::string pbiFilename{"test.pbi"};
 

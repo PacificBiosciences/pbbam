@@ -1,9 +1,7 @@
-// Author: Derek Barnett
+#ifndef PBBAM_FILEUTILS_H
+#define PBBAM_FILEUTILS_H
 
-#ifndef FILEUTILS_H
-#define FILEUTILS_H
-
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <chrono>
 #include <string>
@@ -105,4 +103,4 @@ inline off_t FileUtils::Size(const std::string& fn) { return FileUtils::Size(fn.
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif  // FILEUTILS_H
+#endif  // PBBAM_FILEUTILS_H

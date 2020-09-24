@@ -1,12 +1,6 @@
-// File Description
-/// \file ZmwChunkedFastaReader.cpp
-/// \brief Implements the ZmwChunkedFastaReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/ZmwChunkedFastaReader.h"
+#include <pbbam/ZmwChunkedFastaReader.h>
 
 #include <cassert>
 #include <cstdio>
@@ -20,8 +14,8 @@
 
 #include <htslib/kseq.h>
 
-#include "pbbam/FaiIndex.h"
-#include "pbbam/FormatUtils.h"
+#include <pbbam/FaiIndex.h>
+#include <pbbam/FormatUtils.h>
 
 #include "MemoryUtils.h"
 #include "ZmwChunkedFastxBgzfReader.h"

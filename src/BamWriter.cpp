@@ -1,8 +1,6 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/BamWriter.h"
+#include <pbbam/BamWriter.h>
 
 #include <cassert>
 #include <cstddef>
@@ -18,9 +16,9 @@
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
 
-#include "pbbam/BamFile.h"
-#include "pbbam/Deleters.h"
-#include "pbbam/Validator.h"
+#include <pbbam/BamFile.h>
+#include <pbbam/Deleters.h>
+#include <pbbam/Validator.h>
 
 #include "Autovalidate.h"
 #include "ErrnoReason.h"

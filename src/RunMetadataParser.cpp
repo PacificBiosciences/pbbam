@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "RunMetadataParser.h"
@@ -127,9 +125,11 @@ std::map<std::string, CollectionMetadata> CollectionsFromXml(std::istream& in)
 
     pugi::xml_document doc;
     const pugi::xml_parse_result loadResult = doc.load(in);
-    if (loadResult.status != pugi::status_ok) {
-        throw std::runtime_error{"[pbbam] run metadata ERROR: could not read XML, error code:" +
-                                 std::to_string(loadResult.status)};
+    if (!loadResult) {
+        throw std::runtime_error{
+            "[pbbam] run metadata ERROR: could not read XML document\n"
+            "  reason: " +
+            std::string{loadResult.description()}};
     }
 
     const auto subreadSetsNode = FetchSubreadSetsNode(doc);

@@ -15,7 +15,7 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-TEST(BgzipFastqWriterTest, writes_bgzf_fastq_data_to_file)
+TEST(BAM_BgzipFastqWriter, writes_bgzf_fastq_data_to_file)
 {
     const std::string fn{PbbamTestsConfig::GeneratedData_Dir + "/bgzf_fastq_out.fq.gz"};
 

@@ -21,7 +21,7 @@ const std::string inputBamFn = PbbamTestsConfig::Data_Dir + "/aligned.bam";
 const std::string inputBamFn_2 = PbbamTestsConfig::Data_Dir + "/aligned2.bam";
 }  // namespace GenomicIntervalQueryTests
 
-TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
+TEST(BAM_GenomicIntervalQuery, can_be_reused_over_multiple_intervals)
 {
     const std::string rname{"lambda_NEB3011"};
     const BamFile bamFile{GenomicIntervalQueryTests::inputBamFn};
@@ -60,7 +60,7 @@ TEST(GenomicIntervalQueryTest, ReuseQueryAndCountRecords)
     EXPECT_EQ(2, std::distance(query.begin(), query.end()));
 }
 
-TEST(GenomicIntervalQueryTest, NonConstBamRecord)
+TEST(BAM_GenomicIntervalQuery, loads_expected_read_count)
 {
     const BamFile bamFile{GenomicIntervalQueryTests::inputBamFn};
     const GenomicInterval interval{"lambda_NEB3011", 8000, 10000};
@@ -68,7 +68,7 @@ TEST(GenomicIntervalQueryTest, NonConstBamRecord)
     EXPECT_EQ(2, std::distance(query.begin(), query.end()));
 }
 
-TEST(GenomicIntervalQueryTest, MissingBaiShouldThrow)
+TEST(BAM_GenomicIntervalQuery, throws_on_missing_bai)
 {
     const GenomicInterval interval{"lambda_NEB3011", 0, 100};
     const std::string phi29Bam = PbbamTestsConfig::Data_Dir + "/phi29.bam";
@@ -94,7 +94,7 @@ TEST(GenomicIntervalQueryTest, MissingBaiShouldThrow)
     }
 }
 
-TEST(GenomicIntervalQueryTest, InitializeWithoutInterval)
+TEST(BAM_GenomicIntervalQuery, is_initialized_with_empty_interval)
 {
     const std::string rname = "lambda_NEB3011";
 
@@ -110,7 +110,7 @@ TEST(GenomicIntervalQueryTest, InitializeWithoutInterval)
     EXPECT_EQ(2, std::distance(query.begin(), query.end()));
 }
 
-TEST(GenomicIntervalQueryTest, CanReuseBaiIndexCache)
+TEST(BAM_GenomicIntervalQuery, can_reuse_bai_cache)
 {
     const std::string refName{"lambda_NEB3011"};
     const std::vector<std::string> filenames{GenomicIntervalQueryTests::inputBamFn,
@@ -161,7 +161,7 @@ TEST(GenomicIntervalQueryTest, CanReuseBaiIndexCache)
     checkInterval(query2, interval, expectedCount);
 }
 
-TEST(BaiIndexCacheTest, MissingBai)
+TEST(BAM_BaiIndexCache, throws_on_missing_bai)
 {
     const std::string bam = PbbamTestsConfig::Data_Dir + "/empty.bam";
     const std::string errorMsg =

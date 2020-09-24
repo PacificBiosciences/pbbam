@@ -1,30 +1,24 @@
-// File Description
-/// \file BedReader.h
-/// \brief Defines the BedReader class.
-//
-// Author: Derek Barnett
-
 #ifndef PBBAM_BED_BEDREADER_H
 #define PBBAM_BED_BEDREADER_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "pbbam/GenomicInterval.h"
-#include "pbbam/internal/QueryBase.h"
+#include <pbbam/GenomicInterval.h>
+#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
-namespace BAM {
+namespace BED {
 
 ///
 /// \brief The BedReader provides sequential access to BED records.
 ///
 /// Supports plain text or gzipped (gzip or bgzip).
 ///
-class BedReader : public internal::QueryBase<GenomicInterval>
+class BedReader : public BAM::internal::QueryBase<Data::GenomicInterval>
 {
 public:
     ///
@@ -33,7 +27,7 @@ public:
     /// \param fn   BED filename
     /// \return vector of intervals
     ///
-    static std::vector<GenomicInterval> ReadAll(const std::string& fn);
+    static std::vector<Data::GenomicInterval> ReadAll(const std::string& fn);
 
 public:
     /// \name Constructors & Related Methods
@@ -75,14 +69,14 @@ public:
     /// \param[out] record
     /// \return success/failure
     ///
-    bool GetNext(GenomicInterval& interval);
+    bool GetNext(Data::GenomicInterval& interval);
 
 private:
     class BedReaderPrivate;
     std::unique_ptr<BedReaderPrivate> d_;
 };
 
-}  // namespace BAM
+}  // namespace BED
 }  // namespace PacBio
 
 #endif  // PBBAM_BED_BEDREADER_H

@@ -1,12 +1,6 @@
-// File Description
-/// \file FastaReader.cpp
-/// \brief Implements the FastaReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/FaiIndex.h"
+#include <pbbam/FaiIndex.h>
 
 #include <cassert>
 
@@ -21,7 +15,7 @@
 
 #include <htslib/faidx.h>
 
-#include "pbbam/StringUtilities.h"
+#include <pbbam/StringUtilities.h>
 
 #include "ErrnoReason.h"
 
@@ -62,6 +56,14 @@ public:
     void LoadFromFile(const std::string& fn)
     {
         std::ifstream f{fn};
+        if (!f) {
+            std::ostringstream msg;
+            msg << "[pbbam] FASTA index ERROR: could not open index file:\n"
+                << "  FAI file: " << fn;
+            MaybePrintErrnoReason(msg);
+            throw std::runtime_error{msg.str()};
+        }
+
         std::string line;
         std::vector<std::string> fields;
         while (std::getline(f, line)) {

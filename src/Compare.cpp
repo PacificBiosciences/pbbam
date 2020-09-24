@@ -1,12 +1,6 @@
-// File Description
-/// \file Compare.cpp
-/// \brief Implements the Compare class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/Compare.h"
+#include <pbbam/Compare.h>
 
 #include <cstddef>
 

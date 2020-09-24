@@ -1,12 +1,6 @@
-// File Description
-/// \file VirtualZmwBamRecord.cpp
-/// \brief Implements the VirtualZmwBamRecord class.
-//
-// Author: Armin Töpfer
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/virtual/VirtualZmwBamRecord.h"
+#include <pbbam/virtual/VirtualZmwBamRecord.h>
 
 #include <cassert>
 #include <cstdint>
@@ -18,8 +12,8 @@
 
 #include <pbcopper/utility/MoveAppend.h>
 
-#include "pbbam/virtual/VirtualRegionType.h"
-#include "pbbam/virtual/VirtualRegionTypeMap.h"
+#include <pbbam/virtual/VirtualRegionType.h>
+#include <pbbam/virtual/VirtualRegionTypeMap.h>
 
 namespace PacBio {
 namespace BAM {
@@ -56,11 +50,11 @@ bool VirtualZmwBamRecord::HasVirtualRegionType(const VirtualRegionType regionTyp
     return virtualRegionsMap_.find(regionType) != virtualRegionsMap_.end();
 }
 
-Frames VirtualZmwBamRecord::IPDV1Frames(Orientation orientation) const
+Data::Frames VirtualZmwBamRecord::IPDV1Frames(Data::Orientation orientation) const
 {
     const auto rawFrames = this->IPDRaw(orientation);
     const std::vector<uint8_t> rawData(rawFrames.Data().begin(), rawFrames.Data().end());
-    return Frames::Decode(rawData);
+    return Data::Frames::Decode(rawData);
 }
 
 void VirtualZmwBamRecord::StitchSources()
@@ -74,23 +68,23 @@ void VirtualZmwBamRecord::StitchSources()
     std::string alternativeLabelTag;
     std::string pulseCall;
 
-    QualityValues qualities;
-    QualityValues deletionQv;
-    QualityValues insertionQv;
-    QualityValues mergeQv;
-    QualityValues pulseMergeQv;
-    QualityValues substitutionQv;
-    QualityValues labelQv;
-    QualityValues alternativeLabelQv;
+    Data::QualityValues qualities;
+    Data::QualityValues deletionQv;
+    Data::QualityValues insertionQv;
+    Data::QualityValues mergeQv;
+    Data::QualityValues pulseMergeQv;
+    Data::QualityValues substitutionQv;
+    Data::QualityValues labelQv;
+    Data::QualityValues alternativeLabelQv;
 
-    Frames ipd;
-    Frames pw;
-    Frames pd;
-    Frames px;
+    Data::Frames ipd;
+    Data::Frames pw;
+    Data::Frames pd;
+    Data::Frames px;
     std::vector<float> pa;
     std::vector<float> pm;
     std::vector<uint32_t> sf;
-    std::vector<PacBio::BAM::PulseExclusionReason> pe;
+    std::vector<BAM::PulseExclusionReason> pe;
 
     // initialize capacity
     const auto stitchedSize = lastRecord.QueryEnd() - firstRecord.QueryStart();
@@ -241,12 +235,12 @@ void VirtualZmwBamRecord::StitchSources()
     if (!pe.empty()) this->PulseExclusionReason(pe);
 
     // 16 bit arrays
-    if (!ipd.Data().empty()) this->IPD(ipd, FrameCodec::RAW);
-    if (!pw.Data().empty()) this->PulseWidth(pw, FrameCodec::RAW);
+    if (!ipd.Data().empty()) this->IPD(ipd, Data::FrameCodec::RAW);
+    if (!pw.Data().empty()) this->PulseWidth(pw, Data::FrameCodec::RAW);
     if (!pa.empty()) this->Pkmean(pa);
     if (!pm.empty()) this->Pkmid(pm);
-    if (!pd.Data().empty()) this->PrePulseFrames(pd, FrameCodec::RAW);
-    if (!px.Data().empty()) this->PulseCallWidth(px, FrameCodec::RAW);
+    if (!pd.Data().empty()) this->PrePulseFrames(pd, Data::FrameCodec::RAW);
+    if (!px.Data().empty()) this->PulseCallWidth(px, Data::FrameCodec::RAW);
 
     // 32 bit arrays
     if (!sf.empty()) this->StartFrame(sf);

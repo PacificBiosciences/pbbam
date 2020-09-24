@@ -1,9 +1,3 @@
-// File Description
-/// \file KSeqReader.cpp
-/// \brief Implements the KSeqReader class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "KSeqReader.h"

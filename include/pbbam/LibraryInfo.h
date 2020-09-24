@@ -1,9 +1,7 @@
-// Author: Derek Barnett
-
 #ifndef PBBAM_LIBRARYINFO_H
 #define PBBAM_LIBRARYINFO_H
 
-#include "pbbam/Config.h"
+#include <pbbam/Config.h>
 
 #include <pbcopper/library/Bundle.h>
 #include <pbcopper/library/Info.h>

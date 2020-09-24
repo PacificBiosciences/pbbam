@@ -1,12 +1,6 @@
-// File Description
-/// \file MD5.cpp
-/// \brief Implements basic MD5 hash utilities
-//
-// Author: Brett Bowman
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/MD5.h"
+#include <pbbam/MD5.h>
 
 #include <stdexcept>
 

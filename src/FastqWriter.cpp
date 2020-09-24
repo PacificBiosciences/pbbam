@@ -1,20 +1,14 @@
-// File Description
-/// \file FastqWriter.cpp
-/// \brief Implements the FastqWriter class.
-//
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
-#include "pbbam/FastqWriter.h"
+#include <pbbam/FastqWriter.h>
 
 #include <sstream>
 #include <stdexcept>
 
-#include "pbbam/BamRecord.h"
-#include "pbbam/FastqSequence.h"
-#include "pbbam/FormatUtils.h"
-#include "pbbam/QualityValues.h"
+#include <pbbam/BamRecord.h>
+#include <pbbam/FastqSequence.h>
+#include <pbbam/FormatUtils.h>
+#include <pbbam/QualityValues.h>
 
 #include "ErrnoReason.h"
 

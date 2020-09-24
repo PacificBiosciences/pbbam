@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbbamInternalConfig.h"
 
 #include "XmlWriter.h"
@@ -10,7 +8,7 @@
 #include <ostream>
 #include <stdexcept>
 
-#include "pbbam/DataSet.h"
+#include <pbbam/DataSet.h>
 
 #include "FileUtils.h"
 #include "pugixml/pugixml.hpp"

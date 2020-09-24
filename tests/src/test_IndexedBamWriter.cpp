@@ -18,7 +18,7 @@
 
 // clang-format off
 
-TEST(IndexedBamWriter, WritesValidIndex)
+TEST(BAM_IndexedBamWriter, writes_valid_bam_and_pbi_on_success)
 {
     using namespace PacBio::BAM;
 
@@ -93,7 +93,7 @@ TEST(IndexedBamWriter, WritesValidIndex)
     }
 }
 
-TEST(IndexedBamWriter, HandlesVeryLongReads)
+TEST(BAM_IndexedBamWriter, can_handle_long_reads_spanning_bgzf_blocks)
 {
     using namespace PacBio::BAM;
 
