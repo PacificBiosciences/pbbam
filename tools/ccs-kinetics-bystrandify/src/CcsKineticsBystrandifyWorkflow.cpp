@@ -4,46 +4,165 @@
 #include <cstdint>
 
 #include <algorithm>
+#include <memory>
 #include <stdexcept>
 #include <string>
 
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/optional.hpp>
 
 #include <pbcopper/data/LocalContextFlags.h>
 #include <pbcopper/logging/Logging.h>
+#include <pbcopper/utility/FileUtils.h>
 #include <pbcopper/utility/SequenceUtils.h>
 #include <pbcopper/utility/Ssize.h>
 
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamReader.h>
-#include <pbbam/BamWriter.h>
+#include <pbbam/DataSet.h>
+#include <pbbam/IndexedBamWriter.h>
+#include <pbbam/PbiFilterQuery.h>
 #include <pbbam/ProgramInfo.h>
 
 #include "CcsKineticsBystrandifySettings.h"
 #include "CcsKineticsBystrandifyVersion.h"
 
-using namespace std::literals::string_literals;
-
 namespace PacBio {
 namespace CcsKineticsBystrandify {
+namespace {
+
+struct UserIO
+{
+    UserIO(const Settings& settings)
+    {
+        auto CheckInputFile = [](const std::string& fn) {
+            if (!Utility::FileExists(fn)) {
+                throw std::runtime_error{"Input file does not exist: '" + fn + "' "};
+            }
+        };
+
+        auto CheckOutputFile = [](const std::string& fn) {
+            if (Utility::FileExists(fn)) {
+                PBLOG_WARN << "Overwriting existing output file: " << fn;
+            }
+        };
+
+        auto UpdateHeader = [&](const BAM::BamHeader& inputHeader) {
+            NewHeader = inputHeader.DeepCopy();
+
+            // add @PG entry to header
+            BAM::ProgramInfo ccskineticsbystrandifyProgram;
+            ccskineticsbystrandifyProgram
+                .Id("ccs-kinetics-bystrandify-" + CcsKineticsBystrandify::Version)
+                .Name("ccs-kinetics-bystrandify")
+                .Version(CcsKineticsBystrandify::Version);
+            NewHeader.AddProgram(ccskineticsbystrandifyProgram);
+        };
+
+        auto SetupBamIO = [&]() {
+            InputBamFile = settings.InputFilename;
+            OutputBamFile = settings.OutputFilename;
+
+            CheckInputFile(InputBamFile);
+            CheckOutputFile(OutputBamFile);
+            CheckOutputFile(OutputBamFile + ".pbi");
+
+            auto bamReader = std::make_unique<BAM::BamReader>(InputBamFile);
+            UpdateHeader(bamReader->Header());
+            BAM::BamReader* br = bamReader.release();
+            Query.reset(br);
+
+            Writer = std::make_unique<BAM::IndexedBamWriter>(OutputBamFile, NewHeader);
+        };
+
+        auto SetupXmlIO = [&]() {
+            IsXml = true;
+
+            InputDatasetFile = settings.InputFilename;
+            OutputDatasetFile = settings.OutputFilename;
+            CheckInputFile(*InputDatasetFile);
+            CheckOutputFile(*OutputDatasetFile);
+
+            const BAM::DataSet dataset{settings.InputFilename};
+            assert(dataset.Type() == BAM::DataSet::CONSENSUS_READ);
+            const auto bamFilenames = dataset.BamFilenames();
+            if (bamFilenames.size() != 1) {
+                throw std::runtime_error{"Dataset must contain only 1 BAM resource"};
+            }
+            InputBamFile = bamFilenames.front();
+
+            OutputBamFile = *OutputDatasetFile;
+            boost::ireplace_all(OutputBamFile, ".consensusreadset.xml", ".bam");
+            dataset.ResolvePath(OutputBamFile);
+
+            CheckInputFile(InputBamFile);
+            CheckOutputFile(OutputBamFile);
+            CheckOutputFile(OutputBamFile + ".pbi");
+
+            Query = std::make_unique<BAM::PbiFilterQuery>(dataset);
+
+            UpdateHeader(dataset.MergedHeader());
+            Writer = std::make_unique<BAM::IndexedBamWriter>(OutputBamFile, NewHeader);
+        };
+
+        if (boost::iends_with(settings.InputFilename, ".bam")) {
+            SetupBamIO();
+        } else if (boost::iends_with(settings.InputFilename, ".consensusreadset.xml")) {
+            SetupXmlIO();
+        } else {
+            throw std::runtime_error{
+                "Input type is not supported - must be BAM or ConsensusReadSet XML"};
+        }
+    }
+
+    void WriteXml(int64_t numBases, int64_t numRecords) const
+    {
+        assert(InputDatasetFile);
+        assert(OutputDatasetFile);
+
+        const BAM::DataSet inputDataset{*InputDatasetFile};
+
+        BAM::ConsensusReadSet dataset;
+        dataset.Name(inputDataset.Name());
+        dataset.Tags(inputDataset.Tags());
+        dataset.Filters(inputDataset.Filters());
+        dataset.Metadata(inputDataset.Metadata());
+        dataset.Metadata().NumRecords(std::to_string(numRecords));
+        dataset.Metadata().TotalLength(std::to_string(numBases));
+
+        BAM::ExternalResource outputBam{"PacBio.ConsensusReadFile.ConsensusReadBamFile",
+                                        OutputBamFile};
+        BAM::FileIndex pbi{"PacBio.Index.PacBioIndex", OutputBamFile + ".pbi"};
+        outputBam.FileIndices().Add(pbi);
+        dataset.ExternalResources().Add(outputBam);
+
+        dataset.Save(*OutputDatasetFile);
+    }
+
+    bool IsXml = false;
+
+    std::string InputBamFile;
+    std::string OutputBamFile;
+    boost::optional<std::string> InputDatasetFile;
+    boost::optional<std::string> OutputDatasetFile;
+
+    BAM::BamHeader NewHeader;
+    std::unique_ptr<BAM::internal::IQuery> Query;
+    std::unique_ptr<BAM::IndexedBamWriter> Writer;
+};
+
+}  // namespace
 
 int Workflow::Runner(const CLI_v2::Results& args)
 {
     const Settings settings{args};
+    UserIO uio{settings};
 
-    BAM::BamReader inputBamReader{settings.InputFilename};
+    int64_t numBases = 0;
+    int64_t numRecords = 0;
 
-    // setup our @PG entry to add to header
-    BAM::ProgramInfo ccskineticsbystrandifyProgram;
-    ccskineticsbystrandifyProgram.Id("ccs-kinetics-bystrandify-"s + CcsKineticsBystrandify::Version)
-        .Name("ccs-kinetics-bystrandify")
-        .Version(CcsKineticsBystrandify::Version);
-    BAM::BamHeader newHeader{inputBamReader.Header().DeepCopy()};
-    newHeader.AddProgram(ccskineticsbystrandifyProgram);
-
-    BAM::BamWriter bamWriter{settings.OutputFilename, newHeader};
-
-    for (const auto& read : inputBamReader) {
+    for (const auto& read : *uio.Query) {
         const std::string readName = read.FullName();
         PBLOG_VERBOSE << "Processing " << readName;
 
@@ -121,8 +240,8 @@ int Workflow::Runner(const CLI_v2::Results& args)
         assert(((revPasses == 0) && (revPW.empty())) ||
                ((revPasses > 0) && (revPW.size() == seq.size())));
 
-        const auto recordWriter = [&newHeader, ipdCodec, pwCodec, holeNumber, &snr, &rq, &rg,
-                                   &bamWriter](
+        const auto recordWriter = [&uio, ipdCodec, pwCodec, holeNumber, &snr, &rq, &rg, &numBases,
+                                   &numRecords](
             const std::string& newRecordName, const int32_t numPasses, const std::string& sequence,
             const Data::QualityValues& qvs, const Data::Frames& ipd, const Data::Frames& pw) {
 
@@ -162,7 +281,7 @@ int Workflow::Runner(const CLI_v2::Results& args)
                 return;
             }
 
-            BAM::BamRecord newRecord{newHeader};
+            BAM::BamRecord newRecord{uio.NewHeader};
             auto& newRecordImpl = newRecord.Impl();
 
             // standard CCS defaults
@@ -192,7 +311,10 @@ int Workflow::Runner(const CLI_v2::Results& args)
                 .ReadAccuracy(rq)
                 .ReadGroup(rg);
 
-            bamWriter.Write(newRecord);
+            uio.Writer->Write(newRecord);
+
+            ++numRecords;
+            numBases += newRecordImpl.SequenceLength();
         };
 
         if (fwdPasses >= settings.MinCoverage) {
@@ -207,6 +329,9 @@ int Workflow::Runner(const CLI_v2::Results& args)
         }
     }
 
+    if (uio.IsXml) {
+        uio.WriteXml(numBases, numRecords);
+    }
     return EXIT_SUCCESS;
 }
 

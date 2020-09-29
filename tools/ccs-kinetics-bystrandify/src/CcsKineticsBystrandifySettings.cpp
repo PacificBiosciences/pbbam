@@ -17,21 +17,20 @@ R"({
         "Specifies the minimum number of passes per strand (fn/rn) ",
         "for creating a strand-specific read."
     ],
-    "type" : "int",
-    "default" : 1
-})"};
+    "type" : "int"
+})", Settings::Defaults::MinCoverage};
 
 const CLI_v2::PositionalArgument InputFile{
 R"({
-    "name" : "IN.bam",
-    "description" : "Input BAM file",
+    "name" : "IN.bam|xml",
+    "description" : "CCS BAM or ConsensusReadSet XML",
     "type" : "file"
 })"};
 
 const CLI_v2::PositionalArgument OutputFile{
 R"({
     "name" : "OUT.bam",
-    "description" : "Output BAM file",
+    "description" : "Output CCS BAM or ConsensusReadSet XML",
     "type" : "file"
 })"};
 // clang-format on

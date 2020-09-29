@@ -12,14 +12,18 @@ namespace CcsKineticsBystrandify {
 
 struct Settings
 {
-    static CLI_v2::Interface CreateCLI();
-
-    explicit Settings(const CLI_v2::Results& args);
+    struct Defaults
+    {
+        static constexpr int32_t MinCoverage = 1;
+    };
 
     std::string InputFilename;
     std::string OutputFilename;
 
-    int32_t MinCoverage;
+    int32_t MinCoverage = Defaults::MinCoverage;
+
+    static CLI_v2::Interface CreateCLI();
+    explicit Settings(const CLI_v2::Results& args);
 };
 
 }  // namespace CcsKineticsBystrandify
