@@ -22,7 +22,7 @@
 #include <pbbam/BamReader.h>
 #include <pbbam/DataSet.h>
 #include <pbbam/IndexedBamWriter.h>
-#include <pbbam/PbiFilterQuery.h>
+#include <pbbam/PbiIndexedBamReader.h>
 #include <pbbam/ProgramInfo.h>
 
 #include "CcsKineticsBystrandifySettings.h"
@@ -32,51 +32,90 @@ namespace PacBio {
 namespace CcsKineticsBystrandify {
 namespace {
 
+struct StrandifyTask
+{
+    std::string InputBamFile;
+    std::string OutputBamFile;
+
+    BAM::BamHeader NewHeader;
+    std::unique_ptr<BAM::BamReader> Reader;
+    std::unique_ptr<BAM::IndexedBamWriter> Writer;
+};
+
 struct UserIO
 {
     UserIO(const Settings& settings)
     {
-        auto CheckInputFile = [](const std::string& fn) {
+        const auto CheckInputFile = [](const std::string& fn) {
             if (!Utility::FileExists(fn)) {
                 throw std::runtime_error{"Input file does not exist: '" + fn + "' "};
             }
         };
 
-        auto CheckOutputFile = [](const std::string& fn) {
+        const auto CheckOutputFile = [](const std::string& fn) {
             if (Utility::FileExists(fn)) {
                 PBLOG_WARN << "Overwriting existing output file: " << fn;
             }
         };
 
-        auto UpdateHeader = [&](const BAM::BamHeader& inputHeader) {
-            NewHeader = inputHeader.DeepCopy();
+        const auto MakeHeaderFrom = [&](const BAM::BamHeader& inputHeader) {
 
             // add @PG entry to header
             BAM::ProgramInfo ccskineticsbystrandifyProgram;
             ccskineticsbystrandifyProgram
                 .Id("ccs-kinetics-bystrandify-" + CcsKineticsBystrandify::Version)
                 .Name("ccs-kinetics-bystrandify")
-                .Version(CcsKineticsBystrandify::Version);
-            NewHeader.AddProgram(ccskineticsbystrandifyProgram);
+                .Version(CcsKineticsBystrandify::Version)
+                .CommandLine(settings.CLI);
+
+            BAM::BamHeader header = inputHeader.DeepCopy();
+            header.AddProgram(ccskineticsbystrandifyProgram);
+            return header;
         };
 
-        auto SetupBamIO = [&]() {
-            InputBamFile = settings.InputFilename;
-            OutputBamFile = settings.OutputFilename;
+        const auto SetupBamIO = [&]() {
 
-            CheckInputFile(InputBamFile);
-            CheckOutputFile(OutputBamFile);
-            CheckOutputFile(OutputBamFile + ".pbi");
+            StrandifyTask task;
+            task.InputBamFile = settings.InputFilename;
+            task.OutputBamFile = settings.OutputFilename;
 
-            auto bamReader = std::make_unique<BAM::BamReader>(InputBamFile);
-            UpdateHeader(bamReader->Header());
-            BAM::BamReader* br = bamReader.release();
-            Query.reset(br);
+            CheckInputFile(task.InputBamFile);
+            CheckOutputFile(task.OutputBamFile);
+            CheckOutputFile(task.OutputBamFile + ".pbi");
 
-            Writer = std::make_unique<BAM::IndexedBamWriter>(OutputBamFile, NewHeader);
+            task.Reader = std::make_unique<BAM::BamReader>(task.InputBamFile);
+            task.NewHeader = MakeHeaderFrom(task.Reader->Header());
+            task.Writer =
+                std::make_unique<BAM::IndexedBamWriter>(task.OutputBamFile, task.NewHeader);
+
+            Tasks.push_back(std::move(task));
         };
 
-        auto SetupXmlIO = [&]() {
+        const auto ResolveBamPath = [](std::string originalBamPath, std::string datasetPath) {
+            assert(!originalBamPath.empty());
+
+            std::string resolvedBamPath;
+
+            // input BAM:  absolute path in input XML
+            // output BAM: absolute path in output XML
+            if (originalBamPath[0] == '/') {
+                resolvedBamPath = originalBamPath;
+            }
+
+            // input BAM:  BAM path is relative to input XML
+            // output BAM: use same relative-ness to output XML
+            else {
+                const auto lastSlash = datasetPath.rfind('/');
+                if (lastSlash != std::string::npos) {
+                    resolvedBamPath = datasetPath.substr(0, lastSlash + 1);
+                }
+                resolvedBamPath += originalBamPath;
+            }
+
+            return resolvedBamPath;
+        };
+
+        const auto SetupXmlIO = [&]() {
             IsXml = true;
 
             InputDatasetFile = settings.InputFilename;
@@ -85,25 +124,34 @@ struct UserIO
             CheckOutputFile(*OutputDatasetFile);
 
             const BAM::DataSet dataset{settings.InputFilename};
+            const auto filter = BAM::PbiFilter::FromDataSet(dataset);
             assert(dataset.Type() == BAM::DataSet::CONSENSUS_READ);
-            const auto bamFilenames = dataset.BamFilenames();
-            if (bamFilenames.size() != 1) {
-                throw std::runtime_error{"Dataset must contain only 1 BAM resource"};
+            for (const BAM::ExternalResource& ext : dataset.ExternalResources()) {
+                const std::string& bamFilename = ext.ResourceId();
+                if (!boost::iends_with(bamFilename, ".bam")) continue;
+
+                StrandifyTask task;
+                task.InputBamFile = ResolveBamPath(bamFilename, *InputDatasetFile);
+                task.OutputBamFile = ResolveBamPath(bamFilename, *OutputDatasetFile);
+                boost::ireplace_all(task.OutputBamFile, ".bam", ".bystrand.bam");
+
+                CheckInputFile(task.InputBamFile);
+                CheckOutputFile(task.OutputBamFile);
+                CheckOutputFile(task.OutputBamFile + ".pbi");
+
+                BAM::BamFile bamFile{task.InputBamFile};
+                task.NewHeader = MakeHeaderFrom(bamFile.Header());
+
+                task.Reader =
+                    filter.IsEmpty()
+                        ? std::make_unique<BAM::BamReader>(std::move(bamFile))
+                        : std::make_unique<BAM::PbiIndexedBamReader>(filter, std::move(bamFile));
+
+                task.Writer =
+                    std::make_unique<BAM::IndexedBamWriter>(task.OutputBamFile, task.NewHeader);
+
+                Tasks.push_back(std::move(task));
             }
-            InputBamFile = bamFilenames.front();
-
-            OutputBamFile = *OutputDatasetFile;
-            boost::ireplace_all(OutputBamFile, ".consensusreadset.xml", ".bam");
-            dataset.ResolvePath(OutputBamFile);
-
-            CheckInputFile(InputBamFile);
-            CheckOutputFile(OutputBamFile);
-            CheckOutputFile(OutputBamFile + ".pbi");
-
-            Query = std::make_unique<BAM::PbiFilterQuery>(dataset);
-
-            UpdateHeader(dataset.MergedHeader());
-            Writer = std::make_unique<BAM::IndexedBamWriter>(OutputBamFile, NewHeader);
         };
 
         if (boost::iends_with(settings.InputFilename, ".bam")) {
@@ -131,38 +179,28 @@ struct UserIO
         dataset.Metadata().NumRecords(std::to_string(numRecords));
         dataset.Metadata().TotalLength(std::to_string(numBases));
 
-        BAM::ExternalResource outputBam{"PacBio.ConsensusReadFile.ConsensusReadBamFile",
-                                        OutputBamFile};
-        BAM::FileIndex pbi{"PacBio.Index.PacBioIndex", OutputBamFile + ".pbi"};
-        outputBam.FileIndices().Add(pbi);
-        dataset.ExternalResources().Add(outputBam);
+        for (const auto& task : Tasks) {
+            BAM::ExternalResource outputBam{"PacBio.ConsensusReadFile.ConsensusReadBamFile",
+                                            task.OutputBamFile};
+            BAM::FileIndex pbi{"PacBio.Index.PacBioIndex", task.OutputBamFile + ".pbi"};
+            outputBam.FileIndices().Add(pbi);
+            dataset.ExternalResources().Add(outputBam);
+        }
 
         dataset.Save(*OutputDatasetFile);
     }
 
     bool IsXml = false;
-
-    std::string InputBamFile;
-    std::string OutputBamFile;
     boost::optional<std::string> InputDatasetFile;
     boost::optional<std::string> OutputDatasetFile;
 
-    BAM::BamHeader NewHeader;
-    std::unique_ptr<BAM::internal::IQuery> Query;
-    std::unique_ptr<BAM::IndexedBamWriter> Writer;
+    std::vector<StrandifyTask> Tasks;
 };
 
-}  // namespace
-
-int Workflow::Runner(const CLI_v2::Results& args)
+void Strandify(StrandifyTask& task, const CcsKineticsBystrandify::Settings& settings,
+               int64_t& numBases, int64_t& numRecords)
 {
-    const Settings settings{args};
-    UserIO uio{settings};
-
-    int64_t numBases = 0;
-    int64_t numRecords = 0;
-
-    for (const auto& read : *uio.Query) {
+    for (const auto& read : *task.Reader) {
         const std::string readName = read.FullName();
         PBLOG_VERBOSE << "Processing " << readName;
 
@@ -240,7 +278,7 @@ int Workflow::Runner(const CLI_v2::Results& args)
         assert(((revPasses == 0) && (revPW.empty())) ||
                ((revPasses > 0) && (revPW.size() == seq.size())));
 
-        const auto recordWriter = [&uio, ipdCodec, pwCodec, holeNumber, &snr, &rq, &rg, &numBases,
+        const auto recordWriter = [&task, ipdCodec, pwCodec, holeNumber, &snr, &rq, &rg, &numBases,
                                    &numRecords](
             const std::string& newRecordName, const int32_t numPasses, const std::string& sequence,
             const Data::QualityValues& qvs, const Data::Frames& ipd, const Data::Frames& pw) {
@@ -281,7 +319,7 @@ int Workflow::Runner(const CLI_v2::Results& args)
                 return;
             }
 
-            BAM::BamRecord newRecord{uio.NewHeader};
+            BAM::BamRecord newRecord{task.NewHeader};
             auto& newRecordImpl = newRecord.Impl();
 
             // standard CCS defaults
@@ -311,7 +349,7 @@ int Workflow::Runner(const CLI_v2::Results& args)
                 .ReadAccuracy(rq)
                 .ReadGroup(rg);
 
-            uio.Writer->Write(newRecord);
+            task.Writer->Write(newRecord);
 
             ++numRecords;
             numBases += newRecordImpl.SequenceLength();
@@ -328,10 +366,25 @@ int Workflow::Runner(const CLI_v2::Results& args)
             recordWriter(readName + "/rev", revPasses, seq, quals, revIPD, revPW);
         }
     }
+}
+
+}  // namespace
+
+int Workflow::Runner(const CLI_v2::Results& args)
+{
+    const Settings settings{args};
+    UserIO uio{settings};
+
+    int64_t numBases = 0;
+    int64_t numRecords = 0;
+    for (auto& task : uio.Tasks) {
+        Strandify(task, settings, numBases, numRecords);
+    }
 
     if (uio.IsXml) {
         uio.WriteXml(numBases, numRecords);
     }
+
     return EXIT_SUCCESS;
 }
 

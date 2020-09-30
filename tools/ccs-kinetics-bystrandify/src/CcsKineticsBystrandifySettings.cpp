@@ -64,7 +64,7 @@ CLI_v2::Interface Settings::CreateCLI()
 }
 
 Settings::Settings(const CLI_v2::Results& args)
-    : MinCoverage{std::max<int32_t>(1, args[Options::MinCoverage])}
+    : CLI(args.InputCommandLine()), MinCoverage{std::max<int32_t>(1, args[Options::MinCoverage])}
 {
     // Reference & unaligned PacBio BAM files
     const auto& posArgs = args.PositionalArguments();
