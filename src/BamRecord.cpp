@@ -42,16 +42,15 @@ const std::string recordTypeName_Unknown{"UNKNOWN"};
 int32_t HoleNumberFromName(const std::string& fullName)
 {
     const auto mainTokens = Split(fullName, '/');
-    if (mainTokens.at(0) == "transcript") {
-        if (mainTokens.size() != 2)
-            throw std::runtime_error{
-                "[pbbam] BAM record ERROR: malformed transcript record name: " + fullName};
+    if (mainTokens.size() < 2) {
+        throw std::runtime_error{"[pbbam] BAM record ERROR: malformed record name: " + fullName};
+    }
+
+    try {
         return std::stoi(mainTokens.at(1));
-    } else {
-        if (mainTokens.size() != 3)
-            throw std::runtime_error{"[pbbam] BAM record ERROR: malformed record name: " +
-                                     fullName};
-        return std::stoi(mainTokens.at(1));
+    } catch (const std::exception&) {
+        throw std::runtime_error{"[pbbam] BAM record ERROR: invalid hole number: '" +
+                                 mainTokens.at(1) + "'"};
     }
 }
 

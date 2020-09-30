@@ -2762,4 +2762,47 @@ TEST(BAM_BamRecord, updating_read_name_keeps_ccs_strand_suffix)
     EXPECT_EQ(record.FullName(), originalName);
 }
 
+TEST(BAM_BamRecord, fetches_holenumber_from_name_subread)
+{
+    BamRecord bam;
+    bam.Impl().Name("movie/123/0_100");
+    EXPECT_EQ(123, bam.HoleNumber());
+
+    bam.Impl().Name("movie");
+    EXPECT_THROW(bam.HoleNumber(), std::runtime_error);
+
+    bam.Impl().Name("movie/text");
+    EXPECT_THROW(bam.HoleNumber(), std::runtime_error);
+}
+
+TEST(BAM_BamRecord, fetches_holenumber_from_name_transcript)
+{
+    BamRecord bam;
+    bam.Impl().Name("transcript/123");
+    EXPECT_EQ(123, bam.HoleNumber());
+
+    bam.Impl().Name("transcript");
+    EXPECT_THROW(bam.HoleNumber(), std::runtime_error);
+
+    bam.Impl().Name("transcript/text");
+    EXPECT_THROW(bam.HoleNumber(), std::runtime_error);
+}
+
+TEST(BAM_BamRecord, fetches_holenumber_from_name_ccs)
+{
+    BamRecord bam;
+    bam.Impl().Name("movie/123/ccs");
+    EXPECT_EQ(123, bam.HoleNumber());
+    bam.Impl().Name("movie/123/ccs/fwd");
+    EXPECT_EQ(123, bam.HoleNumber());
+    bam.Impl().Name("movie/123/ccs/rev");
+    EXPECT_EQ(123, bam.HoleNumber());
+
+    bam.Impl().Name("movie");
+    EXPECT_THROW(bam.HoleNumber(), std::runtime_error);
+
+    bam.Impl().Name("movie/text/ccs");
+    EXPECT_THROW(bam.HoleNumber(), std::runtime_error);
+}
+
 // clang-format on
