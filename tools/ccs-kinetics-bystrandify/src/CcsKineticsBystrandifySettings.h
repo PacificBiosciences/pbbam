@@ -17,6 +17,7 @@ struct Settings
         static constexpr int32_t MinCoverage = 1;
     };
 
+    std::string CLI;
     std::string InputFilename;
     std::string OutputFilename;
 

@@ -6,9 +6,14 @@
                                 <pbbase:FileIndex MetaType="PacBio.Index.PacBioIndex" ResourceId="ccs-kinetics-bystrandify-mock-input.bam.pbi" TimeStampedName="pacbio_index_pacbioindex-200929_151726950" UniqueId="e724b18c-330d-4ba0-be3c-7fd953b58865"/>
                         </pbbase:FileIndices>
                 </pbbase:ExternalResource>
+                <pbbase:ExternalResource MetaType="PacBio.ConsensusReadFile.ConsensusReadBamFile" ResourceId="ccs-kinetics-bystrandify-mock-input.2.bam" TimeStampedName="pacbio_consensusreadfile_consensusreadbamfile-200929_151726959" UniqueId="10cac0db-5712-4c91-a314-8804754c7017">
+                        <pbbase:FileIndices>
+                                <pbbase:FileIndex MetaType="PacBio.Index.PacBioIndex" ResourceId="ccs-kinetics-bystrandify-mock-input.2.bam.pbi" TimeStampedName="pacbio_index_pacbioindex-200929_151726950" UniqueId="e724b18c-330d-4ba0-be3c-7fd953b58865"/>
+                        </pbbase:FileIndices>
+                </pbbase:ExternalResource>
         </pbbase:ExternalResources>
         <pbds:DataSetMetadata>
-                <pbds:TotalLength>44</pbds:TotalLength>
-                <pbds:NumRecords>4</pbds:NumRecords>
+                <pbds:TotalLength>88</pbds:TotalLength>
+                <pbds:NumRecords>8</pbds:NumRecords>
         </pbds:DataSetMetadata>
 </pbds:ConsensusReadSet>
