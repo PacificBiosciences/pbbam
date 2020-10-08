@@ -17,21 +17,20 @@ R"({
         "Specifies the minimum number of passes per strand (fn/rn) ",
         "for creating a strand-specific read."
     ],
-    "type" : "int",
-    "default" : 1
-})"};
+    "type" : "int"
+})", Settings::Defaults::MinCoverage};
 
 const CLI_v2::PositionalArgument InputFile{
 R"({
-    "name" : "IN.bam",
-    "description" : "Input BAM file",
+    "name" : "IN.bam|xml",
+    "description" : "CCS BAM or ConsensusReadSet XML",
     "type" : "file"
 })"};
 
 const CLI_v2::PositionalArgument OutputFile{
 R"({
     "name" : "OUT.bam",
-    "description" : "Output BAM file",
+    "description" : "Output CCS BAM or ConsensusReadSet XML",
     "type" : "file"
 })"};
 // clang-format on
@@ -65,7 +64,7 @@ CLI_v2::Interface Settings::CreateCLI()
 }
 
 Settings::Settings(const CLI_v2::Results& args)
-    : MinCoverage{std::max<int32_t>(1, args[Options::MinCoverage])}
+    : CLI(args.InputCommandLine()), MinCoverage{std::max<int32_t>(1, args[Options::MinCoverage])}
 {
     // Reference & unaligned PacBio BAM files
     const auto& posArgs = args.PositionalArguments();

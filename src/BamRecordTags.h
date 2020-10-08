@@ -19,7 +19,9 @@ class BamRecordTags
 {
 public:
     // tag info
+    static bool IsIPD(const BamRecordTag tag);
     static bool IsPulse(const BamRecordTag tag);
+    static bool IsPW(const BamRecordTag tag);
     static std::string LabelFor(const BamRecordTag tag);
 
 private:
@@ -33,10 +35,22 @@ private:
     static const TagLookupType tagLookup;
 };
 
+inline bool BamRecordTags::IsIPD(const BamRecordTag tag)
+{
+    return tag == BamRecordTag::IPD || tag == BamRecordTag::FORWARD_IPD ||
+           tag == BamRecordTag::REVERSE_IPD;
+}
+
 inline bool BamRecordTags::IsPulse(const BamRecordTag tag)
 {
     assert(tagLookup.find(tag) != tagLookup.cend());
     return tagLookup.at(tag).isPulse_;
+}
+
+inline bool BamRecordTags::IsPW(const BamRecordTag tag)
+{
+    return tag == BamRecordTag::PULSE_WIDTH || tag == BamRecordTag::FORWARD_PW ||
+           tag == BamRecordTag::REVERSE_PW;
 }
 
 inline std::string BamRecordTags::LabelFor(const BamRecordTag tag)
