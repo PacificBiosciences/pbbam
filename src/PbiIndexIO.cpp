@@ -2,19 +2,17 @@
 
 #include "PbiIndexIO.h"
 
-#include <cstddef>
-#include <cstdint>
+#include <cassert>
 
 #include <array>
 #include <sstream>
 #include <stdexcept>
-#include <tuple>
-#include <vector>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/optional.hpp>
 
 #include <pbcopper/utility/MoveAppend.h>
-#include <boost/algorithm/string.hpp>
 
-#include <pbbam/BamFile.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/Deleters.h>
 #include <pbbam/EntireFileQuery.h>
@@ -65,18 +63,16 @@ void CheckExpectedSize(const PbiRawMappedData& mappedData, const size_t numReads
     CheckContainer("MappedData.nM", numReads, mappedData.nM_.size());
     CheckContainer("MappedData.nMM", numReads, mappedData.nMM_.size());
     CheckContainer("MappedData.mapQV", numReads, mappedData.mapQV_.size());
+
+    if (mappedData.hasIndelOps_) {
+        CheckContainer("MappedData.nInsOps", numReads, mappedData.nInsOps_.size());
+        CheckContainer("MappedData.nDelOps", numReads, mappedData.nDelOps_.size());
+    }
 }
 
 }  // namespace
 
-PbiRawData PbiIndexIO::Load(const std::string& pbiFilename)
-{
-    PbiRawData rawData;
-    Load(rawData, pbiFilename);
-    return rawData;
-}
-
-void PbiIndexIO::Load(PbiRawData& rawData, const std::string& filename)
+void PbiIndexIO::LoadFromFile(PbiRawData& rawData, const std::string& filename)
 {
     // open file for reading
     if (!boost::algorithm::iends_with(filename, ".pbi")) {
@@ -111,15 +107,34 @@ void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData, const DataSet& datas
 {
     aggregateData.NumReads(0);
     aggregateData.FileSections(PbiFile::BASIC | PbiFile::MAPPED | PbiFile::BARCODE);
-    aggregateData.Version(PbiFile::CurrentVersion);
+
+    // Some GCC configurations give false-positive warnings against using uninitialized
+    // boost::optional here, hence the 'old-fashioned' bool flag.
+    bool isSet = false;
+    PbiFile::VersionEnum aggregateVersion = PbiFile::CurrentVersion;
+    const auto compatibleVersion = [&](PbiFile::VersionEnum next) {
+        if (!isSet) {
+            aggregateVersion = next;
+            isSet = true;
+            return true;
+        } else {
+            return (aggregateVersion < PbiFile::Version_4_0_0 && next < PbiFile::Version_4_0_0) ||
+                   (aggregateVersion >= PbiFile::Version_4_0_0 && next >= PbiFile::Version_4_0_0);
+        }
+    };
 
     const auto bamFiles = dataset.BamFiles();
     uint16_t fileNumber = 0;
     for (const auto& bamFile : bamFiles) {
         PbiRawData currentPbi{bamFile.PacBioIndexFilename()};
-        const auto currentPbiCount = currentPbi.NumReads();
+        if (!compatibleVersion(currentPbi.Version())) {
+            throw std::runtime_error{
+                "[pbbam] PBI index I/O ERROR: dataset contains incompatible PBI index versions. "
+                "Please rerun BAM files through 'pbindex' to ensure compatibility."};
+        }
 
         // read count
+        const auto currentPbiCount = currentPbi.NumReads();
         aggregateData.NumReads(aggregateData.NumReads() + currentPbiCount);
 
         // BasicData
@@ -170,6 +185,13 @@ void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData, const DataSet& datas
             Utility::MoveAppend(std::move(currentMappedData.nM_), aggregateMappedData.nM_);
             Utility::MoveAppend(std::move(currentMappedData.nMM_), aggregateMappedData.nMM_);
             Utility::MoveAppend(std::move(currentMappedData.mapQV_), aggregateMappedData.mapQV_);
+            if (aggregateVersion >= PbiFile::Version_4_0_0) {
+                Utility::MoveAppend(std::move(currentMappedData.nInsOps_),
+                                    aggregateMappedData.nInsOps_);
+                Utility::MoveAppend(std::move(currentMappedData.nDelOps_),
+                                    aggregateMappedData.nDelOps_);
+            }
+
         } else {
             Utility::MoveAppend(std::vector<int32_t>(currentPbiCount, -1),
                                 aggregateMappedData.tId_);
@@ -188,10 +210,18 @@ void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData, const DataSet& datas
                                 aggregateMappedData.nMM_);
             Utility::MoveAppend(std::vector<uint8_t>(currentPbiCount, 255),
                                 aggregateMappedData.mapQV_);
+            if (aggregateVersion >= PbiFile::Version_4_0_0) {
+                Utility::MoveAppend(std::vector<uint8_t>(currentPbiCount, 0),
+                                    aggregateMappedData.nInsOps_);
+                Utility::MoveAppend(std::vector<uint8_t>(currentPbiCount, 0),
+                                    aggregateMappedData.nDelOps_);
+            }
         }
 
         ++fileNumber;
     }
+
+    aggregateData.Version(aggregateVersion);
 }
 
 void PbiIndexIO::LoadBarcodeData(PbiRawBarcodeData& barcodeData, const uint32_t numReads, BGZF* fp)
@@ -227,9 +257,12 @@ void PbiIndexIO::LoadHeader(PbiRawData& index, BGZF* fp)
         numReads = ed_swap_4(numReads);
     }
 
-    index.Version(PbiFile::VersionEnum(version));
+    index.Version(static_cast<PbiFile::VersionEnum>(version));
     index.FileSections(sections);
     index.NumReads(numReads);
+
+    if (static_cast<PbiFile::VersionEnum>(version) < PbiFile::Version_4_0_0)
+        index.MappedData().hasIndelOps_ = false;
 
     // skip reserved section
     size_t reservedLength = 18;
@@ -250,6 +283,11 @@ void PbiIndexIO::LoadMappedData(PbiRawMappedData& mappedData, const uint32_t num
     LoadBgzfVector(fp, mappedData.nM_, numReads);
     LoadBgzfVector(fp, mappedData.nMM_, numReads);
     LoadBgzfVector(fp, mappedData.mapQV_, numReads);
+
+    if (mappedData.hasIndelOps_) {
+        LoadBgzfVector(fp, mappedData.nInsOps_, numReads);
+        LoadBgzfVector(fp, mappedData.nDelOps_, numReads);
+    }
 
     // validate
     CheckExpectedSize(mappedData, numReads);
@@ -373,6 +411,11 @@ void PbiIndexIO::WriteMappedData(const PbiRawMappedData& mappedData, const uint3
     WriteBgzfVector(fp, mappedData.nM_);
     WriteBgzfVector(fp, mappedData.nMM_);
     WriteBgzfVector(fp, mappedData.mapQV_);
+
+    if (mappedData.hasIndelOps_) {
+        WriteBgzfVector(fp, mappedData.nInsOps_);
+        WriteBgzfVector(fp, mappedData.nDelOps_);
+    }
 }
 
 void PbiIndexIO::WriteReferenceData(const PbiRawReferenceData& referenceData, BGZF* fp)

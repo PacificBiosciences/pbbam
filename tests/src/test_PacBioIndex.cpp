@@ -55,6 +55,8 @@ PbiRawData Test2Bam_CoreIndexData()
     mappedData.nM_ = {460, 704, 339, 216, 118, 1394, 1581, 1313, 583, 333};
     mappedData.nMM_ = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     mappedData.mapQV_ = {254, 254, 254, 254, 254, 254, 254, 254, 254, 254};
+    mappedData.nInsOps_ = {16, 28, 3, 8, 5, 43, 71, 46, 15, 10};
+    mappedData.nDelOps_ = {11, 13, 12, 11, 4, 49, 36, 28, 26, 9};
 
     PbiRawReferenceData& referenceData = rawData.ReferenceData();
     referenceData.entries_ = {PbiReferenceEntry{0, 0, 10},
@@ -116,6 +118,11 @@ void ExpectRawIndicesEqual(const PbiRawData& expected, const PbiRawData& actual)
         EXPECT_EQ(e2.nM_, a2.nM_);
         EXPECT_EQ(e2.nMM_, a2.nMM_);
         EXPECT_EQ(e2.mapQV_, a2.mapQV_);
+
+        if (e2.hasIndelOps_ && a2.hasIndelOps_) {
+            EXPECT_EQ(e2.nInsOps_, a2.nInsOps_);
+            EXPECT_EQ(e2.nDelOps_, a2.nDelOps_);
+        }
     }
 
     // reference data
@@ -407,6 +414,12 @@ TEST(BAM_PacBioIndex, can_aggregate_multiple_pbi_file_data_from_dataset)
     EXPECT_EQ(92, mergedBarcodeData.bcForward_.at(4));  // file 2
     EXPECT_EQ(92, mergedBarcodeData.bcForward_.at(5));
     EXPECT_EQ(-1, mergedBarcodeData.bcForward_.at(12));  // file 3
+}
+
+TEST(BAM_PacBioIndex, throws_on_incompatible_version_in_index)
+{
+    const DataSet ds{PbbamTestsConfig::Data_Dir + "/pbi_version/incompatible.alignmentset.xml"};
+    EXPECT_THROW(PbiRawData{ds}, std::runtime_error);
 }
 
 TEST(BAM_PbiIndexCache, can_load_from_dataset)

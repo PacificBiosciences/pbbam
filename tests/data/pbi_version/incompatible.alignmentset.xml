@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pbds:AlignmentSet CreatedAt="2020-10-09T08:07:50" MetaType="PacBio.DataSet.AlignmentSet" Name="pacbio_dataset_alignmentset-201009_150750593" Tags="" TimeStampedName="pacbio_dataset_alignmentset-201009_150750593" UniqueId="90ae77d6-227a-0eda-ed16-fa42a2418e82" Version="3.0.1" xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+        <pbbase:ExternalResources>
+                <pbbase:ExternalResource MetaType="PacBio.AlignmentFile.AlignmentBamFile" ResourceId="/home/UNIXHOME/dbarnett/development/pbbam/tests/data/pbi_version/version3.bam" TimeStampedName="pacbio_alignmentfile_alignmentbamfile-201009_150750592" UniqueId="97e96010-ccc8-43d7-a2b9-27a239b98dc6">
+                        <pbbase:FileIndices>
+                                <pbbase:FileIndex MetaType="PacBio.Index.PacBioIndex" ResourceId="/home/UNIXHOME/dbarnett/development/pbbam/tests/data/pbi_version/version3.bam.pbi" TimeStampedName="pacbio_index_pacbioindex-201009_150750589" UniqueId="16089b40-3c54-4218-ac2b-93a85d037ee4"/>
+                        </pbbase:FileIndices>
+                </pbbase:ExternalResource>
+                <pbbase:ExternalResource MetaType="PacBio.AlignmentFile.AlignmentBamFile" ResourceId="/home/UNIXHOME/dbarnett/development/pbbam/tests/data/pbi_version/version4.bam" TimeStampedName="pacbio_alignmentfile_alignmentbamfile-201009_150750592" UniqueId="3f37a762-1a28-4016-953f-4df7393e7fa3">
+                        <pbbase:FileIndices>
+                                <pbbase:FileIndex MetaType="PacBio.Index.PacBioIndex" ResourceId="/home/UNIXHOME/dbarnett/development/pbbam/tests/data/pbi_version/version4.bam.pbi" TimeStampedName="pacbio_index_pacbioindex-201009_150750592" UniqueId="ac61f518-d67e-4f65-871e-6412e895310c"/>
+                        </pbbase:FileIndices>
+                </pbbase:ExternalResource>
+        </pbbase:ExternalResources>
+        <pbds:DataSetMetadata>
+                <pbds:TotalLength>7525</pbds:TotalLength>
+                <pbds:NumRecords>14</pbds:NumRecords>
+        </pbds:DataSetMetadata>
+</pbds:AlignmentSet>

@@ -31,6 +31,9 @@ void FormatMetadata(const BAM::PbiRawData& index, JSON::Json& result)
         case BAM::PbiFile::Version_3_0_2:
             version = "3.0.2";
             break;
+        case BAM::PbiFile::Version_4_0_0:
+            version = "4.0.0";
+            break;
         default:
             throw std::runtime_error{"unsupported PBI version encountered"};
     }
@@ -78,6 +81,11 @@ void FormatRaw(const BAM::PbiRawData& index, JSON::Json& result)
         result["mappedData"]["nM"] = mappedData.nM_;
         result["mappedData"]["nMM"] = mappedData.nMM_;
         result["mappedData"]["mapQV"] = mappedData.mapQV_;
+
+        if (mappedData.hasIndelOps_) {
+            result["mappedData"]["nInsOps"] = mappedData.nInsOps_;
+            result["mappedData"]["nDelOps"] = mappedData.nDelOps_;
+        }
     }
 }
 
@@ -125,6 +133,11 @@ void FormatRecords(const BAM::PbiRawData& index, JSON::Json& result)
             read["nMM"] = mappedData.nMM_[i];
             read["mapQuality"] = mappedData.mapQV_[i];
             read["reverseStrand"] = mappedData.revStrand_[i];
+
+            if (mappedData.hasIndelOps_) {
+                read["nInsOps"] = mappedData.nInsOps_[i];
+                read["nDelOps"] = mappedData.nDelOps_[i];
+            }
         }
 
         reads.push_back(std::move(read));

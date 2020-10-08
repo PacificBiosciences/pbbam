@@ -139,6 +139,10 @@ public:
     std::vector<uint32_t> nM_;
     std::vector<uint32_t> nMM_;
     std::vector<uint8_t> mapQV_;
+    std::vector<uint32_t> nInsOps_;
+    std::vector<uint32_t> nDelOps_;
+
+    bool hasIndelOps_ = true;
 
     /// \}
 };

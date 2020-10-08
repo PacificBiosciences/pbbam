@@ -273,6 +273,8 @@ public:
           nMField_{fileBufferSize},
           nMMField_{fileBufferSize},
           mapQualField_{fileBufferSize},
+          nInsOpsField_{fileBufferSize},
+          nDelOpsField_{fileBufferSize},
           bcForwardField_{fileBufferSize},
           bcReverseField_{fileBufferSize},
           bcQualField_{fileBufferSize}
@@ -347,6 +349,11 @@ public:
         const auto nMM = static_cast<uint32_t>(matchData.second);
         const auto mapQuality = b.MapQuality();
 
+        // indel operations
+        const auto indelOps = b.NumInsertionAndDeletionOperations();
+        const auto nInsOps = indelOps.first;
+        const auto nDelOps = indelOps.second;
+
         if (tId >= 0) hasMappedData_ = true;
 
         // store
@@ -359,6 +366,8 @@ public:
         nMField_.Add(nM);
         nMMField_.Add(nMM);
         mapQualField_.Add(mapQuality);
+        nInsOpsField_.Add(nInsOps);
+        nDelOpsField_.Add(nDelOps);
     }
 
     void AddBarcodeData(const BamRecord& b)
@@ -465,6 +474,8 @@ public:
         MaybeFlushBuffer(nMField_, force);
         MaybeFlushBuffer(nMMField_, force);
         MaybeFlushBuffer(mapQualField_, force);
+        MaybeFlushBuffer(nInsOpsField_, force);
+        MaybeFlushBuffer(nDelOpsField_, force);
 
         MaybeFlushBuffer(bcForwardField_, force);
         MaybeFlushBuffer(bcReverseField_, force);
@@ -531,6 +542,8 @@ public:
             WriteField(nMField_);
             WriteField(nMMField_);
             WriteField(mapQualField_);
+            WriteField(nInsOpsField_);
+            WriteField(nDelOpsField_);
         }
 
         if (refDataBuilder_) WriteReferenceData();
@@ -682,6 +695,8 @@ private:
     PbiField2<uint32_t> nMField_;
     PbiField2<uint32_t> nMMField_;
     PbiField2<uint8_t> mapQualField_;
+    PbiField2<uint32_t> nInsOpsField_;
+    PbiField2<uint32_t> nDelOpsField_;
     PbiField2<int16_t> bcForwardField_;
     PbiField2<int16_t> bcReverseField_;
     PbiField2<int8_t> bcQualField_;
