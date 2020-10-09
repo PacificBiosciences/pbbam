@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+### Added
+ - Support for PBI index format version 4.0.0.
+
 ## [1.6.0] - 2020-09-23
 
 ### Added

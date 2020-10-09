@@ -1478,30 +1478,54 @@ std::string BamRecord::MovieName() const
     }
 }
 
-size_t BamRecord::NumDeletedBases() const
-{
-    size_t count = 0;
+size_t BamRecord::NumDeletedBases() const { return NumInsertedAndDeletedBases().second; }
 
-    auto& b = BamRecordMemory::GetRawData(this);
-    uint32_t* cigarData = bam_get_cigar(b.get());
-    for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
-        const auto type = static_cast<Data::CigarOperationType>(bam_cigar_op(cigarData[i]));
-        if (type == Data::CigarOperationType::DELETION) count += bam_cigar_oplen(cigarData[i]);
-    }
-    return count;
+size_t BamRecord::NumDeletionOperations() const
+{
+    return NumInsertionAndDeletionOperations().second;
 }
 
-size_t BamRecord::NumInsertedBases() const
+std::pair<size_t, size_t> BamRecord::NumInsertedAndDeletedBases() const
 {
-    size_t count = 0;
+    size_t nInsBases = 0;
+    size_t nDelBases = 0;
 
     auto& b = BamRecordMemory::GetRawData(this);
     uint32_t* cigarData = bam_get_cigar(b.get());
     for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
         const auto type = static_cast<Data::CigarOperationType>(bam_cigar_op(cigarData[i]));
-        if (type == Data::CigarOperationType::INSERTION) count += bam_cigar_oplen(cigarData[i]);
+        if (type == Data::CigarOperationType::INSERTION) {
+            nInsBases += bam_cigar_oplen(cigarData[i]);
+        } else if (type == Data::CigarOperationType::DELETION) {
+            nDelBases += bam_cigar_oplen(cigarData[i]);
+        }
     }
-    return count;
+    return {nInsBases, nDelBases};
+}
+
+size_t BamRecord::NumInsertedBases() const { return NumInsertedAndDeletedBases().first; }
+
+std::pair<size_t, size_t> BamRecord::NumInsertionAndDeletionOperations() const
+{
+    size_t nInsOps = 0;
+    size_t nDelOps = 0;
+
+    auto& b = BamRecordMemory::GetRawData(this);
+    uint32_t* cigarData = bam_get_cigar(b.get());
+    for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
+        const auto type = static_cast<Data::CigarOperationType>(bam_cigar_op(cigarData[i]));
+        if (type == Data::CigarOperationType::INSERTION) {
+            ++nInsOps;
+        } else if (type == Data::CigarOperationType::DELETION) {
+            ++nDelOps;
+        }
+    }
+    return {nInsOps, nDelOps};
+}
+
+size_t BamRecord::NumInsertionOperations() const
+{
+    return NumInsertionAndDeletionOperations().first;
 }
 
 size_t BamRecord::NumMatches() const { return NumMatchesAndMismatches().first; }

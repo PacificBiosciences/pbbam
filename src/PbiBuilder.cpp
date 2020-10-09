@@ -281,6 +281,8 @@ public:
         , nMField_{MaxBufferSize}
         , nMMField_{MaxBufferSize}
         , mapQualField_{MaxBufferSize}
+        , nInsOpsField_{MaxBufferSize}
+        , nDelOpsField_{MaxBufferSize}
         , bcForwardField_{MaxBufferSize}
         , bcReverseField_{MaxBufferSize}
         , bcQualField_{MaxBufferSize}
@@ -367,6 +369,11 @@ public:
         const auto nMM = static_cast<uint32_t>(matchData.second);
         const auto mapQuality = b.MapQuality();
 
+        // indel operations
+        const auto indelOps = b.NumInsertionAndDeletionOperations();
+        const auto nInsOps = indelOps.first;
+        const auto nDelOps = indelOps.second;
+
         if (tId >= 0) hasMappedData_ = true;
 
         // store
@@ -379,6 +386,8 @@ public:
         nMField_.Add(nM);
         nMMField_.Add(nMM);
         mapQualField_.Add(mapQuality);
+        nInsOpsField_.Add(nInsOps);
+        nDelOpsField_.Add(nDelOps);
     }
 
     void AddBarcodeData(const BamRecord& b)
@@ -488,6 +497,8 @@ public:
         MaybeFlushBuffer(nMField_, force);
         MaybeFlushBuffer(nMMField_, force);
         MaybeFlushBuffer(mapQualField_, force);
+        MaybeFlushBuffer(nInsOpsField_, force);
+        MaybeFlushBuffer(nDelOpsField_, force);
 
         MaybeFlushBuffer(bcForwardField_, force);
         MaybeFlushBuffer(bcReverseField_, force);
@@ -554,6 +565,8 @@ public:
             WriteField(nMField_);
             WriteField(nMMField_);
             WriteField(mapQualField_);
+            WriteField(nInsOpsField_);
+            WriteField(nDelOpsField_);
         }
 
         if (refDataBuilder_) WriteReferenceData();
@@ -637,6 +650,8 @@ private:
     internal::PbiField<uint32_t> nMField_;
     internal::PbiField<uint32_t> nMMField_;
     internal::PbiField<uint8_t> mapQualField_;
+    internal::PbiField<uint32_t> nInsOpsField_;
+    internal::PbiField<uint32_t> nDelOpsField_;
     internal::PbiField<int16_t> bcForwardField_;
     internal::PbiField<int16_t> bcReverseField_;
     internal::PbiField<int8_t> bcQualField_;

@@ -86,6 +86,9 @@ void CppFormatter::Run(const Settings& settings)
         case BAM::PbiFile::Version_3_0_2:
             version = "PbiFile::Version_3_0_2";
             break;
+        case BAM::PbiFile::Version_4_0_0:
+            version = "PbiFile::Version_4_0_0";
+            break;
         default:
             throw std::runtime_error("unsupported PBI version encountered");
     }
@@ -130,6 +133,10 @@ void CppFormatter::Run(const Settings& settings)
           << "mappedData.nM_        = {" << printField(mappedData.nM_) << "};\n"
           << "mappedData.nMM_       = {" << printField(mappedData.nMM_) << "};\n"
           << "mappedData.mapQV_     = {" << printField(mappedData.mapQV_) << "};\n";
+        if (mappedData.hasIndelOps_) {
+            s << "mappedData.nInsOps_   = {" << printField(mappedData.nInsOps_) << "};\n"
+              << "mappedData.nDelOps_   = {" << printField(mappedData.nDelOps_) << "};\n";
+        }
     }
 
     if (rawData.HasReferenceData()) {

@@ -219,8 +219,24 @@ public:
     /// \returns the number of deleted bases (relative to reference)
     size_t NumDeletedBases() const;
 
+    /// \returns the number of deletion operations (e.g. 'D' in CIGAR)
+    size_t NumDeletionOperations() const;
+
+    /// \returns a tuple containing NumInsertedBases (first) and NumDeletedBases
+    ///         (second)
+    ///
+    std::pair<size_t, size_t> NumInsertedAndDeletedBases() const;
+
     /// \returns the number of inserted bases (relative to reference)
     size_t NumInsertedBases() const;
+
+    /// \returns a tuple containing NumInsertionOperations (first) and
+    ///          NumDeletionOperations (second)
+    ///
+    std::pair<size_t, size_t> NumInsertionAndDeletionOperations() const;
+
+    /// \returns the number of insertion operations (e.g. 'I' in CIGAR)
+    size_t NumInsertionOperations() const;
 
     /// \returns the number of matching bases (sum of '=' CIGAR op lengths)
     size_t NumMatches() const;
