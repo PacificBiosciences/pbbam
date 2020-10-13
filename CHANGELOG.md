@@ -8,6 +8,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - Support for PBI index format version 4.0.0.
 
+### Removed
+ - Unused experimental 'CCSRecord' API
+
 ## [1.6.0] - 2020-09-23
 
 ### Added
