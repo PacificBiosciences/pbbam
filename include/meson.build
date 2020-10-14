@@ -105,16 +105,6 @@ if not meson.is_subproject()
 
   install_headers(
     files([
-      'pbbam/ccs/CCSHeader.h',
-      'pbbam/ccs/CCSPbiBuilder.h',
-      'pbbam/ccs/CCSRecord.h',
-      'pbbam/ccs/CCSRecordFormat.h',
-      'pbbam/ccs/CCSRecordReader.h',
-      'pbbam/ccs/CCSRecordWriter.h']),
-    subdir : 'pbbam/ccs')
-
-  install_headers(
-    files([
       'pbbam/exception/BundleChemistryMappingException.h',
       'pbbam/exception/InvalidSequencingChemistryException.h',
       'pbbam/exception/ValidationException.h']),

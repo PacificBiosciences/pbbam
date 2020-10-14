@@ -149,13 +149,6 @@ pbbam_cpp_sources = files([
   'bed/BedReader.cpp',
   'bed/BedWriter.cpp',
 
-  # ccs
-  'ccs/CCSPbiBuilder.cpp',
-  'ccs/CCSRecord.cpp',
-  'ccs/CCSRecordFormat.cpp',
-  'ccs/CCSRecordReader.cpp',
-  'ccs/CCSRecordWriter.cpp',
-
   # vcf
   'vcf/VcfFile.cpp',
   'vcf/VcfFormat.cpp',
