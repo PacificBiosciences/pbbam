@@ -35,36 +35,13 @@
 #include "ErrnoReason.h"
 #include "FileProducer.h"
 #include "MemoryUtils.h"
+#include "PbiBuilderBase.h"
 
 namespace PacBio {
 namespace BAM {
 
-struct IndexedBamWriterException : public std::exception
-{
-    IndexedBamWriterException(std::string filename, std::string reason)
-    {
-        std::ostringstream s;
-        s << "[pbbam] indexed BAM writer ERROR: " << reason << ":\n"
-          << "  file: " << filename;
-        MaybePrintErrnoReason(s);
-        msg_ = s.str();
-    }
-
-    const char* what() const noexcept override { return msg_.c_str(); }
-
-    std::string msg_;
-};
-
-namespace internal {
-
-void bgzf_write_safe2(BGZF* fp, const void* data, size_t length)
-{
-    const auto ret = bgzf_write(fp, data, length);
-    if (ret < 0L)
-        throw std::runtime_error{
-            "[pbbam] indexed BAM writer ERROR: non-zero returned from bgzf_write(). Out of disk "
-            "space?"};
-}
+// using PbiBuilderException = PbiBuilderException;
+// using IndexedBamWriterException = IndexedBamWriterException;
 
 struct GzIndexEntry
 {
@@ -72,533 +49,19 @@ struct GzIndexEntry
     int64_t uAddress;
 };
 
-template <typename T>
-void SwapEndianness2(std::vector<T>& data)
-{
-    constexpr const size_t elementSize = sizeof(T);
-    const size_t numReads = data.size();
-    switch (elementSize) {
-        case 1:
-            break;  // no swapping necessary
-        case 2:
-            for (size_t i = 0; i < numReads; ++i)
-                ed_swap_2p(&data[i]);
-            break;
-        case 4:
-            for (size_t i = 0; i < numReads; ++i)
-                ed_swap_4p(&data[i]);
-            break;
-        case 8:
-            for (size_t i = 0; i < numReads; ++i)
-                ed_swap_8p(&data[i]);
-            break;
-        default:
-            throw std::runtime_error{
-                "[pbbam] indexed BAM writer ERROR: unsupported element size: " +
-                std::to_string(elementSize)};
-    }
-}
-
-template <typename T>
-void WriteBgzfVector2(BGZF* fp, std::vector<T>& data)
-{
-    assert(fp);
-    if (fp->is_be) SwapEndianness2(data);
-    bgzf_write_safe2(fp, data.data(), data.size() * sizeof(T));
-}
-
-struct PbiFieldBlock2
-{
-    int64_t pos_;  // file position of block start
-    size_t n_;     // number of entries in block
-};
-
-template <typename T>
-class PbiField2
-{
-    constexpr static const size_t ElementSize = sizeof(T);
-
-public:
-    PbiField2(size_t maxBufferSize) : maxElementCount_{maxBufferSize / ElementSize}
-    {
-        buffer_.reserve(maxElementCount_);
-    }
-
-    void Add(T value) { buffer_.push_back(value); }
-    bool IsFull() const { return buffer_.size() == maxElementCount_; }
-
-    size_t maxElementCount_;
-    std::vector<T> buffer_;
-    std::vector<PbiFieldBlock2> blocks_;
-};
-
-class PbiReferenceDataBuilder2
-{
-public:
-    using ReferenceRows = std::pair<int32_t, int32_t>;  // [startRow, endRow)
-
-    explicit PbiReferenceDataBuilder2(const size_t numReferenceSequences)
-    {
-        // initialize with number of references we expect to see
-        //
-        // we can add more later, but want to ensure known references have an entry
-        // even if no records are observed mapping to it
-        //
-        for (size_t i = 0; i < numReferenceSequences; ++i)
-            rawReferenceEntries_[i] = PbiReferenceEntry(i);
-
-        // also create an "unmapped" entry
-        rawReferenceEntries_[PbiReferenceEntry::UNMAPPED_ID] = PbiReferenceEntry{};
-    }
-
-    bool AddRecord(const BamRecord& record, const int32_t rowNumber)
-    {
-        // fetch ref ID & pos for record
-        const int32_t tId = record.ReferenceId();
-        const int32_t pos = record.ReferenceStart();
-
-        // sanity checks to protect against non-coordinate-sorted BAMs
-        if (lastRefId_ != tId || (lastRefId_ >= 0 && tId < 0)) {
-            if (tId >= 0) {
-
-                // if we've already seen unmapped reads, but our current tId is valid
-                //
-                // error: unmapped reads should all be at the end (can stop checking refs)
-                //
-                PbiReferenceEntry& unmappedEntry =
-                    rawReferenceEntries_.at(PbiReferenceEntry::UNMAPPED_ID);
-                if (unmappedEntry.beginRow_ != PbiReferenceEntry::UNSET_ROW) return false;
-
-                // if we've already seen data for this new tId
-                // (remember we're coming from another tId)
-                //
-                // error: refs are out of order (can stop checking refs)
-                //
-                PbiReferenceEntry& currentEntry =
-                    rawReferenceEntries_.at(static_cast<uint32_t>(tId));
-                if (currentEntry.beginRow_ != PbiReferenceEntry::UNSET_ROW) return false;
-            }
-            lastRefId_ = tId;
-        } else if (tId >= 0 && lastPos_ > pos)
-            return false;  // error: positions out of order
-
-        // update row numbers
-        PbiReferenceEntry& entry = rawReferenceEntries_.at(static_cast<uint32_t>(tId));
-        if (entry.beginRow_ == PbiReferenceEntry::UNSET_ROW) entry.beginRow_ = rowNumber;
-        entry.endRow_ = rowNumber + 1;
-
-        // update pos (for sorting check next go-round)
-        lastPos_ = pos;
-        return true;
-    }
-
-    PbiRawReferenceData Result() const
-    {
-        // PbiReferenceEntries will be sorted thanks to std::map
-        // tId will be at end since we're sorting on the uint cast of -1
-        PbiRawReferenceData result;
-        result.entries_.reserve(rawReferenceEntries_.size());
-        for (const auto& entry : rawReferenceEntries_)
-            result.entries_.push_back(entry.second);
-        return result;
-    }
-
-    void WriteData(BGZF* bgzf)
-    {
-        const auto refData = Result();
-
-        // num_refs
-        uint32_t numRefs = refData.entries_.size();
-        if (bgzf->is_be) numRefs = ed_swap_4(numRefs);
-        bgzf_write_safe2(bgzf, &numRefs, 4);
-
-        // reference entries
-        numRefs = refData.entries_.size();  // need to reset after maybe endian-swapping
-        for (size_t i = 0; i < numRefs; ++i) {
-            auto& entry = refData.entries_[i];
-            auto tId = entry.tId_;
-            auto beginRow = entry.beginRow_;
-            auto endRow = entry.endRow_;
-            if (bgzf->is_be) {
-                tId = ed_swap_4(tId);
-                beginRow = ed_swap_4(beginRow);
-                endRow = ed_swap_4(endRow);
-            }
-            bgzf_write_safe2(bgzf, &tId, 4);
-            bgzf_write_safe2(bgzf, &beginRow, 4);
-            bgzf_write_safe2(bgzf, &endRow, 4);
-        }
-    }
-
-private:
-    int32_t lastRefId_ = -1;
-    Position lastPos_ = -1;
-    std::map<uint32_t, PbiReferenceEntry> rawReferenceEntries_;
-};
-
 // TODO: come back to refseqs, sorting, etc
-class PbiBuilder2
+class PbiBuilder2 : public PacBio::BAM::PbiBuilderBase
 {
-    enum class FlushMode
-    {
-        FORCE,
-        NO_FORCE
-    };
-
 public:
     PbiBuilder2(const std::string& bamFilename, const std::string& pbiFilename,
                 const PbiBuilder::CompressionLevel compressionLevel, const size_t numThreads,
                 const size_t fileBufferSize)
         //                const size_t numReferenceSequences = 0
         //                const bool isCoordinateSorted = false
-        : bamFilename_{bamFilename},
-          pbiFilename_{pbiFilename},
-          tempFilename_{pbiFilename + ".build"},
-          tempFile_{std::fopen(tempFilename_.c_str(), "w+b")},
-          compressionLevel_{compressionLevel},
-          numThreads_{numThreads},
-          rgIdField_{fileBufferSize},
-          qStartField_{fileBufferSize},
-          qEndField_{fileBufferSize},
-          holeNumField_{fileBufferSize},
-          readQualField_{fileBufferSize},
-          ctxtField_{fileBufferSize},
-          fileOffsetField_{fileBufferSize},
-          tIdField_{fileBufferSize},
-          tStartField_{fileBufferSize},
-          tEndField_{fileBufferSize},
-          aStartField_{fileBufferSize},
-          aEndField_{fileBufferSize},
-          revStrandField_{fileBufferSize},
-          nMField_{fileBufferSize},
-          nMMField_{fileBufferSize},
-          mapQualField_{fileBufferSize},
-          nInsOpsField_{fileBufferSize},
-          nDelOpsField_{fileBufferSize},
-          bcForwardField_{fileBufferSize},
-          bcReverseField_{fileBufferSize},
-          bcQualField_{fileBufferSize}
+        : PacBio::BAM::PbiBuilderBase{pbiFilename, compressionLevel, numThreads, fileBufferSize},
+          bamFilename_{bamFilename}
     {
-        if (!tempFile_) throw IndexedBamWriterException{tempFilename_, "could not open temp file"};
-
-        // TODO: setup for ref data building
     }
-
-    void AddRecord(const BamRecord& b, const int64_t uOffset)
-    {
-        // ensure updated data (necessary?)
-        PacBio::BAM::BamRecordMemory::UpdateRecordTags(b);
-        b.ResetCachedPositions();
-
-        // store record data & maybe flush to temp file
-        AddBasicData(b, uOffset);
-        AddMappedData(b);
-        AddBarcodeData(b);
-        AddReferenceData(b, currentRow_);
-        FlushBuffers(FlushMode::NO_FORCE);
-
-        ++currentRow_;
-    }
-
-    void AddBasicData(const BamRecord& b, const int64_t uOffset)
-    {
-        // read group ID
-        const auto rgId = [&b]() -> int32_t {
-            auto rgIdString = b.ReadGroupBaseId();
-            if (rgIdString.empty()) rgIdString = MakeReadGroupId(b.MovieName(), ToString(b.Type()));
-            return std::stoul(rgIdString, nullptr, 16);
-        }();
-
-        // query start/end
-        const auto isCcsOrTranscript = (IsCcsOrTranscript(b.Type()));
-        const int32_t qStart = (isCcsOrTranscript ? 0 : b.QueryStart());
-        const int32_t qEnd = (isCcsOrTranscript ? b.Impl().SequenceLength() : b.QueryEnd());
-
-        // add'l data
-        const int32_t holeNum = (b.HasHoleNumber() ? b.HoleNumber() : 0);
-        const float readAccuracy =
-            (b.HasReadAccuracy() ? boost::numeric_cast<float>(b.ReadAccuracy()) : 0.0F);
-        const uint8_t ctxt = (b.HasLocalContextFlags() ? b.LocalContextFlags()
-                                                       : Data::LocalContextFlags::NO_LOCAL_CONTEXT);
-
-        // store
-        rgIdField_.Add(rgId);
-        qStartField_.Add(qStart);
-        qEndField_.Add(qEnd);
-        holeNumField_.Add(holeNum);
-        ctxtField_.Add(ctxt);
-        readQualField_.Add(readAccuracy);
-        fileOffsetField_.Add(uOffset);
-    }
-
-    void AddMappedData(const BamRecord& b)
-    {
-        // alignment position
-        const auto tId = b.ReferenceId();
-        const auto tStart = static_cast<uint32_t>(b.ReferenceStart());
-        const auto tEnd = static_cast<uint32_t>(b.ReferenceEnd());
-        const auto aStart = static_cast<uint32_t>(b.AlignedStart());
-        const auto aEnd = static_cast<uint32_t>(b.AlignedEnd());
-        const auto isReverseStrand = [&b]() -> uint8_t {
-            return (b.AlignedStrand() == Data::Strand::REVERSE ? 1 : 0);
-        }();
-
-        // alignment quality
-        const auto matchData = b.NumMatchesAndMismatches();
-        const auto nM = static_cast<uint32_t>(matchData.first);
-        const auto nMM = static_cast<uint32_t>(matchData.second);
-        const auto mapQuality = b.MapQuality();
-
-        // indel operations
-        const auto indelOps = b.NumInsertionAndDeletionOperations();
-        const auto nInsOps = indelOps.first;
-        const auto nDelOps = indelOps.second;
-
-        if (tId >= 0) hasMappedData_ = true;
-
-        // store
-        tIdField_.Add(tId);
-        tStartField_.Add(tStart);
-        tEndField_.Add(tEnd);
-        aStartField_.Add(aStart);
-        aEndField_.Add(aEnd);
-        revStrandField_.Add(isReverseStrand);
-        nMField_.Add(nM);
-        nMMField_.Add(nMM);
-        mapQualField_.Add(mapQuality);
-        nInsOpsField_.Add(nInsOps);
-        nDelOpsField_.Add(nDelOps);
-    }
-
-    void AddBarcodeData(const BamRecord& b)
-    {
-        // initialize w/ 'missing' value
-        int16_t bcForward = -1;
-        int16_t bcReverse = -1;
-        int8_t bcQuality = -1;
-
-        // check for any barcode data (both required)
-        if (b.HasBarcodes() && b.HasBarcodeQuality()) {
-            // fetch data from record
-            std::tie(bcForward, bcReverse) = b.Barcodes();
-            bcQuality = static_cast<int8_t>(b.BarcodeQuality());
-
-            // double-check & reset to 'missing' value if any less than zero
-            if (bcForward < 0 && bcReverse < 0 && bcQuality < 0) {
-                bcForward = -1;
-                bcReverse = -1;
-                bcQuality = -1;
-            } else
-                hasBarcodeData_ = true;
-        }
-
-        // store
-        bcForwardField_.Add(bcForward);
-        bcReverseField_.Add(bcReverse);
-        bcQualField_.Add(bcQuality);
-    }
-
-    void AddReferenceData(const BamRecord& b, const uint32_t currentRow)
-    {
-        // only add if coordinate-sorted hint is set
-        // update with info from refDataBuilder
-        if (refDataBuilder_) {
-            const auto sorted = refDataBuilder_->AddRecord(b, currentRow);
-            if (!sorted) refDataBuilder_.reset();
-        }
-    }
-
-    void Close()
-    {
-        if (isClosed_) return;
-
-        FlushBuffers(FlushMode::FORCE);
-
-        OpenPbiFile();
-        WritePbiHeader();
-        WriteFromTempFile();
-
-        remove(tempFilename_.c_str());
-        isClosed_ = true;
-    }
-
-    void OpenPbiFile()
-    {
-        // open file handle
-        const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel_));
-        pbiFile_.reset(bgzf_open(pbiFilename_.c_str(), mode.c_str()));
-        if (pbiFile_ == nullptr)
-            throw IndexedBamWriterException{pbiFilename_, "could not open output *.pbi file"};
-
-        // if no explicit thread count given, attempt built-in check
-        size_t actualNumThreads = numThreads_;
-        if (actualNumThreads == 0) {
-            actualNumThreads = std::thread::hardware_concurrency();
-
-            // if still unknown, default to single-threaded
-            if (actualNumThreads == 0) actualNumThreads = 1;
-        }
-
-        // if multithreading requested, enable it
-        if (actualNumThreads > 1) bgzf_mt(pbiFile_.get(), actualNumThreads, 256);
-    }
-
-    template <typename T>
-    void MaybeFlushBuffer(PbiField2<T>& field, bool force)
-    {
-        // replace with lambda, in FlushBuffer(), once PPA can use C++14 ?
-        if (field.IsFull() || force) {
-            WriteToTempFile(field);
-            field.buffer_.clear();
-        }
-    }
-
-    void FlushBuffers(FlushMode mode)
-    {
-        const auto force = (mode == FlushMode::FORCE);
-
-        MaybeFlushBuffer(rgIdField_, force);
-        MaybeFlushBuffer(qStartField_, force);
-        MaybeFlushBuffer(qEndField_, force);
-        MaybeFlushBuffer(holeNumField_, force);
-        MaybeFlushBuffer(readQualField_, force);
-        MaybeFlushBuffer(ctxtField_, force);
-        MaybeFlushBuffer(fileOffsetField_, force);
-
-        MaybeFlushBuffer(tIdField_, force);
-        MaybeFlushBuffer(tStartField_, force);
-        MaybeFlushBuffer(tEndField_, force);
-        MaybeFlushBuffer(aStartField_, force);
-        MaybeFlushBuffer(aEndField_, force);
-        MaybeFlushBuffer(revStrandField_, force);
-        MaybeFlushBuffer(nMField_, force);
-        MaybeFlushBuffer(nMMField_, force);
-        MaybeFlushBuffer(mapQualField_, force);
-        MaybeFlushBuffer(nInsOpsField_, force);
-        MaybeFlushBuffer(nDelOpsField_, force);
-
-        MaybeFlushBuffer(bcForwardField_, force);
-        MaybeFlushBuffer(bcReverseField_, force);
-        MaybeFlushBuffer(bcQualField_, force);
-    }
-
-    template <typename T>
-    void LoadFieldBlockFromTempFile(PbiField2<T>& field, const PbiFieldBlock2& block)
-    {
-        // seek to block begin
-        const auto ret = std::fseek(tempFile_.get(), block.pos_, SEEK_SET);
-        if (ret != 0) {
-            std::ostringstream s;
-            s << "[pbbam] indexed BAM writer ERROR: could not seek in temp file:\n"
-              << "  file: " << tempFilename_ << '\n'
-              << "  offset: " << block.pos_;
-            throw std::runtime_error{s.str()};
-        }
-
-        // read block elements
-        field.buffer_.assign(block.n_, 0);
-        const auto numElements =
-            std::fread(field.buffer_.data(), sizeof(T), block.n_, tempFile_.get());
-
-        if (numElements != block.n_) {
-            std::ostringstream s;
-            s << "[pbbam] indexed BAM writer ERROR: could not read expected element count:\n"
-              << "  file: " << tempFilename_ << '\n'
-              << "  expected: " << block.n_ << '\n'
-              << "  observed: " << numElements;
-            throw std::runtime_error{s.str()};
-        }
-    }
-
-    template <typename T>
-    void WriteField(PbiField2<T>& field)
-    {
-        for (const auto& block : field.blocks_) {
-            LoadFieldBlockFromTempFile(field, block);
-            WriteBgzfVector2(pbiFile_.get(), field.buffer_);
-        }
-    }
-
-    void WriteFromTempFile()
-    {
-        // load from temp file, in PBI format order, and write to index
-
-        WriteField(rgIdField_);
-        WriteField(qStartField_);
-        WriteField(qEndField_);
-        WriteField(holeNumField_);
-        WriteField(readQualField_);
-        WriteField(ctxtField_);
-
-        WriteVirtualOffsets();
-
-        if (hasMappedData_) {
-            WriteField(tIdField_);
-            WriteField(tStartField_);
-            WriteField(tEndField_);
-            WriteField(aStartField_);
-            WriteField(aEndField_);
-            WriteField(revStrandField_);
-            WriteField(nMField_);
-            WriteField(nMMField_);
-            WriteField(mapQualField_);
-            WriteField(nInsOpsField_);
-            WriteField(nDelOpsField_);
-        }
-
-        if (refDataBuilder_) WriteReferenceData();
-
-        if (hasBarcodeData_) {
-            WriteField(bcForwardField_);
-            WriteField(bcReverseField_);
-            WriteField(bcQualField_);
-        }
-    }
-
-    template <typename T>
-    void WriteToTempFile(PbiField2<T>& field)
-    {
-        if (field.buffer_.empty()) return;
-
-        const auto pos = std::ftell(tempFile_.get());
-        const auto numElements =
-            std::fwrite(field.buffer_.data(), sizeof(T), field.buffer_.size(), tempFile_.get());
-        field.blocks_.emplace_back(PbiFieldBlock2{pos, numElements});
-    }
-
-    void WritePbiHeader()
-    {
-        BGZF* bgzf = pbiFile_.get();
-
-        // 'magic' string
-        static constexpr const std::array<char, 4> magic{{'P', 'B', 'I', '\1'}};
-        bgzf_write_safe2(bgzf, magic.data(), 4);
-
-        PbiFile::Sections sections = PbiFile::BASIC;
-        if (hasMappedData_) sections |= PbiFile::MAPPED;
-        if (hasBarcodeData_) sections |= PbiFile::BARCODE;
-        if (refDataBuilder_) sections |= PbiFile::REFERENCE;
-
-        // version, pbi_flags, & n_reads
-        auto version = static_cast<uint32_t>(PbiFile::CurrentVersion);
-        uint16_t pbi_flags = sections;
-        auto numReads = currentRow_;
-        if (bgzf->is_be) {
-            version = ed_swap_4(version);
-            pbi_flags = ed_swap_2(pbi_flags);
-            numReads = ed_swap_4(numReads);
-        }
-        bgzf_write_safe2(bgzf, &version, 4);
-        bgzf_write_safe2(bgzf, &pbi_flags, 2);
-        bgzf_write_safe2(bgzf, &numReads, 4);
-
-        // reserved space
-        char reserved[18];
-        memset(reserved, 0, 18);
-        bgzf_write_safe2(bgzf, reserved, 18);
-    }
-
-    void WriteReferenceData() { refDataBuilder_->WriteData(pbiFile_.get()); }
 
     std::vector<GzIndexEntry> LoadGzi()
     {
@@ -641,7 +104,7 @@ public:
         return result;
     }
 
-    void WriteVirtualOffsets()
+    void WriteVirtualOffsets() final
     {
         auto index = LoadGzi();
         std::sort(index.begin(), index.end(),
@@ -664,54 +127,13 @@ public:
                 const auto result = ((e.vAddress << 16) | uOffset);
                 fileOffsetField_.buffer_[j] = result;
             }
-            WriteBgzfVector2(pbiFile_.get(), fileOffsetField_.buffer_);
+            WriteBgzfVector(pbiFile_.get(), fileOffsetField_.buffer_);
         }
     }
 
 private:
-    // file info
     std::string bamFilename_;
-    std::string pbiFilename_;
-    std::string tempFilename_;
-    std::unique_ptr<FILE, Utility::FileDeleter> tempFile_;
-    std::unique_ptr<BGZF, HtslibBgzfDeleter> pbiFile_;
-    PbiBuilder::CompressionLevel compressionLevel_;
-    size_t numThreads_;
-
-    // PBI field buffers
-    PbiField2<int32_t> rgIdField_;
-    PbiField2<int32_t> qStartField_;
-    PbiField2<int32_t> qEndField_;
-    PbiField2<int32_t> holeNumField_;
-    PbiField2<float> readQualField_;
-    PbiField2<uint8_t> ctxtField_;
-    PbiField2<uint64_t> fileOffsetField_;
-    PbiField2<int32_t> tIdField_;
-    PbiField2<uint32_t> tStartField_;
-    PbiField2<uint32_t> tEndField_;
-    PbiField2<uint32_t> aStartField_;
-    PbiField2<uint32_t> aEndField_;
-    PbiField2<uint8_t> revStrandField_;
-    PbiField2<uint32_t> nMField_;
-    PbiField2<uint32_t> nMMField_;
-    PbiField2<uint8_t> mapQualField_;
-    PbiField2<uint32_t> nInsOpsField_;
-    PbiField2<uint32_t> nDelOpsField_;
-    PbiField2<int16_t> bcForwardField_;
-    PbiField2<int16_t> bcReverseField_;
-    PbiField2<int8_t> bcQualField_;
-
-    // reference data
-    std::unique_ptr<PbiReferenceDataBuilder2> refDataBuilder_;
-
-    // tracking data
-    uint32_t currentRow_ = 0;
-    bool isClosed_ = false;
-    bool hasBarcodeData_ = false;
-    bool hasMappedData_ = false;
 };
-
-}  // namespace internal
 
 // htslib >= v.10
 #if defined(HTS_VERSION) && HTS_VERSION >= 101000
@@ -819,8 +241,8 @@ public:
     void OpenPbi(const PbiBuilder::CompressionLevel compressionLevel, const size_t numThreads,
                  const size_t fileBufferSize)
     {
-        builder_ = std::make_unique<internal::PbiBuilder2>(
-            bamFilename_, bamFilename_ + ".pbi", compressionLevel, numThreads, fileBufferSize);
+        builder_ = std::make_unique<PbiBuilder2>(bamFilename_, bamFilename_ + ".pbi",
+                                                 compressionLevel, numThreads, fileBufferSize);
     }
 
     void Write(const BamRecord& record)
@@ -874,7 +296,7 @@ private:
 
     std::shared_ptr<bam_hdr_t> header_;
     std::unique_ptr<samFile, HtslibFileDeleter> bam_;
-    std::unique_ptr<internal::PbiBuilder2> builder_;
+    std::unique_ptr<PbiBuilder2> builder_;
     bool isOpen_ = false;
     int64_t uncompressedFilePos_ = 0;
 };
@@ -999,8 +421,8 @@ public:
     void OpenPbi(const PbiBuilder::CompressionLevel compressionLevel, const size_t numThreads,
                  const size_t fileBufferSize)
     {
-        builder_ = std::make_unique<internal::PbiBuilder2>(
-            bamFilename_, bamFilename_ + ".pbi", compressionLevel, numThreads, fileBufferSize);
+        builder_ = std::make_unique<PbiBuilder2>(bamFilename_, bamFilename_ + ".pbi",
+                                                 compressionLevel, numThreads, fileBufferSize);
     }
 
     void RunGziThread(size_t numThreads)
@@ -1165,7 +587,7 @@ private:
 
     std::shared_ptr<bam_hdr_t> header_;
     std::unique_ptr<samFile, HtslibFileDeleter> bam_;
-    std::unique_ptr<internal::PbiBuilder2> builder_;
+    std::unique_ptr<PbiBuilder2> builder_;
 
     // used as a type of error return code for the gziThread, so
     // that errors are delayed until at least the bam file is

@@ -13,6 +13,7 @@ namespace PacBio {
 namespace BAM {
 
 class BamRecord;
+class PbiBuilderPrivate;
 class PbiRawData;
 
 /// \brief The PbiBuilder class construct PBI index data from %BAM record data.
@@ -164,7 +165,6 @@ public:
     /// \}
 
 private:
-    class PbiBuilderPrivate;
     std::unique_ptr<PbiBuilderPrivate> d_;
 };
 

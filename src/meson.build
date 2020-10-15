@@ -102,6 +102,7 @@ pbbam_cpp_sources = files([
   'MD5.cpp',
   'MemoryUtils.cpp',
   'PbiBuilder.cpp',
+  'PbiBuilderBase.cpp',
   'PbiFile.cpp',
   'PbiFilter.cpp',
   'PbiFilterQuery.cpp',
