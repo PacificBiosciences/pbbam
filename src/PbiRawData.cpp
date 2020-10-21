@@ -94,6 +94,8 @@ PbiRawMappedData::PbiRawMappedData(uint32_t numReads)
     nM_.reserve(numReads);
     nMM_.reserve(numReads);
     mapQV_.reserve(numReads);
+    nInsOps_.reserve(numReads);
+    nDelOps_.reserve(numReads);
 }
 
 void PbiRawMappedData::AddRecord(const BamRecord& b)
@@ -109,6 +111,10 @@ void PbiRawMappedData::AddRecord(const BamRecord& b)
     const auto matchesAndMismatches = b.NumMatchesAndMismatches();
     nM_.push_back(matchesAndMismatches.first);
     nMM_.push_back(matchesAndMismatches.second);
+
+    const auto insertionAndDeletionOps = b.NumInsertionAndDeletionOperations();
+    nInsOps_.push_back(insertionAndDeletionOps.first);
+    nDelOps_.push_back(insertionAndDeletionOps.second);
 }
 
 uint32_t PbiRawMappedData::NumDeletedBasesAt(size_t recordIndex) const
@@ -252,7 +258,7 @@ static_assert(std::is_nothrow_move_assignable<PbiRawData>::value ==
 
 PbiRawData::PbiRawData(std::string pbiFilename) : filename_{std::move(pbiFilename)}
 {
-    PbiIndexIO::Load(*this, filename_);
+    PbiIndexIO::LoadFromFile(*this, filename_);
 }
 
 PbiRawData::PbiRawData(const DataSet& dataset)

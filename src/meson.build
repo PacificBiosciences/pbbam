@@ -102,6 +102,7 @@ pbbam_cpp_sources = files([
   'MD5.cpp',
   'MemoryUtils.cpp',
   'PbiBuilder.cpp',
+  'PbiBuilderBase.cpp',
   'PbiFile.cpp',
   'PbiFilter.cpp',
   'PbiFilterQuery.cpp',
@@ -148,13 +149,6 @@ pbbam_cpp_sources = files([
   # bed
   'bed/BedReader.cpp',
   'bed/BedWriter.cpp',
-
-  # ccs
-  'ccs/CCSPbiBuilder.cpp',
-  'ccs/CCSRecord.cpp',
-  'ccs/CCSRecordFormat.cpp',
-  'ccs/CCSRecordReader.cpp',
-  'ccs/CCSRecordWriter.cpp',
 
   # vcf
   'vcf/VcfFile.cpp',
