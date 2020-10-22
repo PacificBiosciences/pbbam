@@ -51,13 +51,13 @@ bool FilterBase<T>::CompareMultiHelper(const T& lhs) const
 
     // whitelist - return true on any hit
     if (cmp_ == Compare::CONTAINS) {
-        for (const auto x : multiValue_.get())
+        for (const auto& x : multiValue_.get())
             if (x == lhs) return true;
         return false;
     }
     // blacklist - return false on any hit
     else {
-        for (const auto x : multiValue_.get())
+        for (const auto& x : multiValue_.get())
             if (x == lhs) return false;
         return true;
     }
