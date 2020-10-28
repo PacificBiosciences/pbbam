@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pbds:SubreadSet CreatedAt="2020-10-28T12:07:56" MetaType="PacBio.DataSet.SubreadSet" Name="dataset-sample-test" Tags="" TimeStampedName="pacbio_dataset_subreadset-201028_190756744" UniqueId="53ea4426-e3a6-03c8-2928-74d48915ac1c" Version="3.0.1" xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+	<pbbase:ExternalResources>
+		<pbbase:ExternalResource MetaType="PacBio.SubreadFile.SubreadBamFile" ResourceId="/home/UNIXHOME/dbarnett/development/pbbam/tests/data/dataset/samples/sample1_a.bam" TimeStampedName="pacbio_subreadfile_subreadbamfile-201028_190756743" UniqueId="08389d09-159a-4223-9854-5e536b802ecb"/>
+		<pbbase:ExternalResource MetaType="PacBio.SubreadFile.SubreadBamFile" ResourceId="/home/UNIXHOME/dbarnett/development/pbbam/tests/data/dataset/samples/sample1_b.bam" TimeStampedName="pacbio_subreadfile_subreadbamfile-201028_190756743" UniqueId="5f4b6454-2a65-4b1a-9686-fa5476ba59b1"/>
+		<pbbase:ExternalResource MetaType="PacBio.SubreadFile.SubreadBamFile" ResourceId="/home/UNIXHOME/dbarnett/development/pbbam/tests/data/dataset/samples/sample2.bam" TimeStampedName="pacbio_subreadfile_subreadbamfile-201028_190756743" UniqueId="84bad21a-7e0c-4398-b8b0-911e7318d3a6"/>
+	</pbbase:ExternalResources>
+	<pbds:DataSetMetadata>
+		<pbds:TotalLength>0</pbds:TotalLength>
+		<pbds:NumRecords>0</pbds:NumRecords>
+	</pbds:DataSetMetadata>
+</pbds:SubreadSet>
