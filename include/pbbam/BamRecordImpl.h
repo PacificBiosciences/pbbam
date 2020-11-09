@@ -9,7 +9,7 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <unordered_map>
+#include <vector>
 
 #include <htslib/sam.h>
 
@@ -576,7 +576,12 @@ private:
 private:
     // data members
     std::unique_ptr<bam1_t, HtslibRecordDeleter> d_;
-    mutable std::unordered_map<uint16_t, int> tagOffsets_;
+    struct TagOffsetEntry
+    {
+        uint16_t Code = 0;
+        int Offset = -1;
+    };
+    mutable std::vector<TagOffsetEntry> tagOffsets_;
 
     // friends
     friend class BamRecordMemory;

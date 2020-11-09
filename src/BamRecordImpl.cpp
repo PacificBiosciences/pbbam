@@ -270,6 +270,8 @@ void BamRecordImpl::InitializeData()
 
     // init empty QNAME
     Name("");
+
+    tagOffsets_.reserve(32);
 }
 
 int32_t BamRecordImpl::InsertSize() const { return d_->core.isize; }
@@ -676,8 +678,10 @@ int BamRecordImpl::TagOffset(const std::string& tagName) const
 
     const uint16_t tagCode =
         (static_cast<uint8_t>(tagName.at(0)) << 8) | static_cast<uint8_t>(tagName.at(1));
-    const auto found = tagOffsets_.find(tagCode);
-    return (found != tagOffsets_.cend() ? found->second : -1);
+    for (const auto& tag : tagOffsets_) {
+        if (tag.Code == tagCode) return tag.Offset;
+    }
+    return -1;  // not found
 }
 
 BamRecordImpl& BamRecordImpl::Tags(const TagCollection& tags)
@@ -735,9 +739,7 @@ Tag BamRecordImpl::TagValue(const BamRecordTag tag) const
 
 void BamRecordImpl::UpdateTagMap() const
 {
-    // clear out offsets, leave map structure basically intact
-    for (auto& tag : tagOffsets_)
-        tag.second = -1;
+    tagOffsets_.clear();
 
     const uint8_t* tagStart = bam_get_aux(d_);
     if (tagStart == nullptr) return;
@@ -748,13 +750,13 @@ void BamRecordImpl::UpdateTagMap() const
     // anyway, so this should be a nice lookup mechanism.
     //
     uint16_t tagNameCode;
-    int64_t i = 0;
+    int i = 0;
     while (i < numBytes) {
 
         // store (tag name code -> start offset into tag data)
         tagNameCode = static_cast<char>(tagStart[i]) << 8 | static_cast<char>(tagStart[i + 1]);
         i += 2;
-        tagOffsets_[tagNameCode] = i;
+        tagOffsets_.push_back(TagOffsetEntry{tagNameCode, i});
 
         // skip tag contents
         const auto tagType = static_cast<char>(tagStart[i++]);
