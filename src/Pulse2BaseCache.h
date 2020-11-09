@@ -11,6 +11,7 @@
 #include <type_traits>
 
 #include <boost/dynamic_bitset.hpp>
+#include <boost/version.hpp>
 
 namespace PacBio {
 namespace BAM {
@@ -97,6 +98,29 @@ public:
             if (data_[i]) result.push_back(pulseData.at(inputIndex));
             ++inputIndex;
         }
+        return result;
+    }
+
+    ///
+    /// \returns estimated number of bytes used by this record
+    ///
+    /// \warning The actual usage is heavily implementation-dependent, w.r.t.
+    ///          data structure layout and alignment. A general estimate is
+    ///          provided here, but no guarantee can be made.
+    ///
+    int EstimatedBytesUsed() const
+    {
+        int result = sizeof(boost::dynamic_bitset<>);
+#if BOOST_VERSION >= 106200
+        // bitset::capacity() (added in boost v1.62) returns the number of bits
+        // that can be stored before reallocating.
+        result += (data_.capacity() / sizeof(unsigned long));
+#else
+        // Cannot directly query the underlying container size prior to v1.62.
+        // This will likely undershoot the actual space used, but this provides
+        // at least a minimum.
+        result += (data_.size() / sizeof(unsigned long));
+#endif
         return result;
     }
 

@@ -226,6 +226,22 @@ bool BamRecordImpl::EditTag(const BamRecordTag tag, const Tag& newValue,
     return EditTag(BamRecordTags::LabelFor(tag), newValue, additionalModifier);
 }
 
+int BamRecordImpl::EstimatedBytesUsed() const noexcept
+{
+    // bam1_t
+    int result = sizeof(std::unique_ptr<bam1_t, HtslibRecordDeleter>);
+    if (d_) {
+        bam1_t* b = d_.get();
+        result += sizeof(bam1_t);
+        result += b->m_data * sizeof(uint8_t);  // allocated data block
+    }
+
+    // tag offsets cache
+    result += sizeof(std::vector<TagOffsetEntry>);
+    result += tagOffsets_.capacity() * sizeof(TagOffsetEntry);
+    return result;
+}
+
 uint32_t BamRecordImpl::Flag() const { return d_->core.flag; }
 
 BamRecordImpl& BamRecordImpl::Flag(uint32_t flag)
