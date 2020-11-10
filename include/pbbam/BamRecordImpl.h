@@ -548,6 +548,15 @@ public:
 
     /// \}
 
+    ///
+    /// \returns estimated number of bytes used by this record
+    ///
+    /// \warning The actual usage is heavily implementation-dependent, w.r.t.
+    ///          data structure layout and alignment. A general estimate is
+    ///          provided here, but no guarantee can be made.
+    ///
+    int EstimatedBytesUsed() const noexcept;
+
 private:
     // returns a BamRecordImpl object, with a deep copy of @rawData contents
     static BamRecordImpl FromRawData(const std::shared_ptr<bam1_t>& rawData);

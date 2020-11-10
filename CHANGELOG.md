@@ -5,8 +5,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [1.6.1] - 2020-11-10
+
 ### Added
  - Support for PBI index format version 4.0.0.
+ - "Estimated bytes used" diagnostic for BamRecords. Memory usage is heavily
+   implementation-dependent, w.r.t. data structure layout and alignment. This
+   diagnostic is provided as a lower bound, but **no guarantee** is made for the
+   exact value.
 
 ### Removed
  - Unused experimental 'CCSRecord' API

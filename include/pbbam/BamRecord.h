@@ -1399,6 +1399,15 @@ public:
                      const uint8_t mappingQuality) const;
     /// \}
 
+    ///
+    /// \returns estimated number of bytes used by this record
+    ///
+    /// \warning The actual usage is heavily implementation-dependent, w.r.t.
+    ///          data structure layout and alignment. A general estimate is
+    ///          provided here, but no guarantee can be made.
+    ///
+    int EstimatedBytesUsed() const noexcept;
+
 private:
     BamRecordImpl impl_;
 

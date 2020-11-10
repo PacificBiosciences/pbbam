@@ -802,6 +802,16 @@ std::vector<uint16_t> BamRecord::EncodePhotons(const std::vector<float>& data)
     return encoded;
 }
 
+int BamRecord::EstimatedBytesUsed() const noexcept
+{
+    int result = impl_.EstimatedBytesUsed();
+    result += sizeof(std::shared_ptr<BamHeader>);
+    result += (2 * sizeof(Data::Position));
+    result += sizeof(std::unique_ptr<Pulse2BaseCache>);
+    if (p2bCache_) result += p2bCache_->EstimatedBytesUsed();
+    return result;
+}
+
 std::string BamRecord::FetchBasesRaw(const BamRecordTag tag) const
 {
     const Tag seqTag = impl_.TagValue(tag);
