@@ -10,6 +10,8 @@
 #include <boost/core/demangle.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
+#include <pbcopper/utility/Ssize.h>
+
 namespace PacBio {
 namespace BAM {
 namespace {
@@ -46,6 +48,36 @@ private:
         if (!InAsciiRange(x))
             throw std::runtime_error{"[pbbam] tag ERROR: char is outside valid ASCII range"};
         return static_cast<char>(x);
+    }
+};
+
+struct BytesUsedVisitor : public boost::static_visitor<int>
+{
+    static constexpr int BaseVariantSize = sizeof(Tag::var_t) + sizeof(TagModifier);
+
+    int operator()(const boost::blank&) const noexcept { return BaseVariantSize; }
+    int operator()(const int8_t&) const noexcept { return BaseVariantSize; }
+    int operator()(const uint8_t&) const noexcept { return BaseVariantSize; }
+    int operator()(const int16_t&) const noexcept { return BaseVariantSize; }
+    int operator()(const uint16_t&) const noexcept { return BaseVariantSize; }
+    int operator()(const int32_t&) const noexcept { return BaseVariantSize; }
+    int operator()(const uint32_t&) const noexcept { return BaseVariantSize; }
+    int operator()(const float&) const noexcept { return BaseVariantSize; }
+
+    int operator()(const std::string& s) const noexcept
+    {
+        static const int sso = static_cast<int>(std::string().capacity());
+        if (Utility::Ssize(s) <= sso) {
+            return BaseVariantSize;  // can squeeze into std::string on stack
+        } else {
+            return BaseVariantSize + s.capacity();
+        }
+    }
+
+    template <typename T>
+    int operator()(const std::vector<T>& v) const noexcept
+    {
+        return BaseVariantSize + (v.capacity() * sizeof(T));
     }
 };
 
@@ -317,6 +349,11 @@ bool Tag::operator==(const Tag& other) const
 }
 
 bool Tag::operator!=(const Tag& other) const { return !(*this == other); }
+
+int Tag::EstimatedBytesUsed() const noexcept
+{
+    return boost::apply_visitor(BytesUsedVisitor(), data_);
+}
 
 bool Tag::HasModifier(const TagModifier m) const
 {

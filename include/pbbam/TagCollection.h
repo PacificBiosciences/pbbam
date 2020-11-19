@@ -22,6 +22,13 @@ class PBBAM_EXPORT TagCollection : public std::map<std::string, Tag>
 public:
     /// \returns true if the collection contains a tag with \p name
     bool Contains(const std::string& name) const;
+
+    /// \returns estimated number of bytes used by this tag collection
+    ///
+    /// \warning The actual usage is heavily implementation-dependent. A reasonable
+    ///          estimate is provided here, but no guarantee can be made.
+    ///
+    int EstimatedBytesUsed() const noexcept;
 };
 
 ///
