@@ -126,13 +126,27 @@ struct UserIO
             const BAM::DataSet dataset{settings.InputFilename};
             const auto filter = BAM::PbiFilter::FromDataSet(dataset);
             assert(dataset.Type() == BAM::DataSet::CONSENSUS_READ);
-            for (const BAM::ExternalResource& ext : dataset.ExternalResources()) {
+
+            const bool isOutputBam = boost::iends_with(*OutputDatasetFile, ".bam");
+            const auto& externalResources = dataset.ExternalResources();
+            if (isOutputBam && externalResources.Size() != 1) {
+                throw std::runtime_error{
+                    "Output is BAM. Input XML must only contain 1 input BAM file"};
+            }
+
+            for (const BAM::ExternalResource& ext : externalResources) {
                 const std::string& bamFilename = ext.ResourceId();
                 if (!boost::iends_with(bamFilename, ".bam")) continue;
 
                 StrandifyTask task;
                 task.InputBamFile = ResolveBamPath(bamFilename, *InputDatasetFile);
-                task.OutputBamFile = ResolveBamPath(bamFilename, *OutputDatasetFile);
+                task.OutputBamFile = [&]() {
+                    if (isOutputBam) {
+                        return *OutputDatasetFile;
+                    } else {
+                        return ResolveBamPath(bamFilename, *OutputDatasetFile);
+                    }
+                }();
                 boost::ireplace_all(task.OutputBamFile, ".bam", ".bystrand.bam");
 
                 CheckInputFile(task.InputBamFile);
