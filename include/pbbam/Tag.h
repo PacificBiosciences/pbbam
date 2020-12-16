@@ -383,7 +383,15 @@ public:
     ///
     friend std::ostream& operator<<(std::ostream& out, const Tag& tag);
 
-private:
+    ///
+    /// \returns estimated number of bytes used by this tag value
+    ///
+    /// \warning The actual usage is heavily implementation-dependent, w.r.t.
+    ///          data structure layout and alignment. A general estimate is
+    ///          provided here, but no guarantee can be made.
+    ///
+    int EstimatedBytesUsed() const noexcept;
+
     // clang-format off
     // NOTE - keep this synced with TagDataType enum ordering
     using var_t = boost::variant<boost::blank, // <-- default constructor creates variant of this type
@@ -402,10 +410,11 @@ private:
                                  std::vector<int32_t>,
                                  std::vector<uint32_t>,
                                  std::vector<float> >;
+    // clang-format on
 
+private:
     var_t data_;
     TagModifier modifier_ = TagModifier::NONE;
-    // clang-format on
 };
 
 }  // namespace BAM

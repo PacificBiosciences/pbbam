@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pbds:ConsensusReadSet CreatedAt="2020-09-29T08:17:26" MetaType="PacBio.DataSet.ConsensusReadSet" Name="pacbio_dataset_consensusreadset-200929_151726960" Tags="" TimeStampedName="pacbio_dataset_consensusreadset-200929_151726960" UniqueId="7497bd48-b333-823a-06bf-9ae255e68dda" Version="3.0.1" xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+        <pbbase:ExternalResources>
+                <pbbase:ExternalResource MetaType="PacBio.ConsensusReadFile.ConsensusReadBamFile" ResourceId="ccs-kinetics-bystrandify-mock-input.bam" TimeStampedName="pacbio_consensusreadfile_consensusreadbamfile-200929_151726959" UniqueId="10cac0db-5712-4c91-a314-8804754c7017">
+                        <pbbase:FileIndices>
+                                <pbbase:FileIndex MetaType="PacBio.Index.PacBioIndex" ResourceId="ccs-kinetics-bystrandify-mock-input.bam.pbi" TimeStampedName="pacbio_index_pacbioindex-200929_151726950" UniqueId="e724b18c-330d-4ba0-be3c-7fd953b58865"/>
+                        </pbbase:FileIndices>
+                </pbbase:ExternalResource>
+                <pbbase:ExternalResource MetaType="PacBio.ConsensusReadFile.ConsensusReadBamFile" ResourceId="ccs-kinetics-bystrandify-mock-input.2.bam" TimeStampedName="pacbio_consensusreadfile_consensusreadbamfile-200929_151726959" UniqueId="10cac0db-5712-4c91-a314-8804754c7017">
+                        <pbbase:FileIndices>
+                                <pbbase:FileIndex MetaType="PacBio.Index.PacBioIndex" ResourceId="ccs-kinetics-bystrandify-mock-input.2.bam.pbi" TimeStampedName="pacbio_index_pacbioindex-200929_151726950" UniqueId="e724b18c-330d-4ba0-be3c-7fd953b58865"/>
+                        </pbbase:FileIndices>
+                </pbbase:ExternalResource>
+        </pbbase:ExternalResources>
+        <pbds:DataSetMetadata>
+                <pbds:TotalLength>88</pbds:TotalLength>
+                <pbds:NumRecords>8</pbds:NumRecords>
+        </pbds:DataSetMetadata>
+</pbds:ConsensusReadSet>

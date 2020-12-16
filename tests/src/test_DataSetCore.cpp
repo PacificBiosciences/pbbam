@@ -554,3 +554,12 @@ TEST(BAM_DataSetCore, can_load_biosamples_from_xml)
     ASSERT_EQ(1, biosamples.Size());
     EXPECT_EQ("test test", biosamples[0].Name());
 }
+
+TEST(BAM_DataSetCore, can_fetch_samples)
+{
+    const std::set<std::string> expected = {"sample1", "sample2"};
+    const BAM::DataSet dataset{PbbamTestsConfig::Data_Dir +
+                               "/dataset/samples/dataset_sample_test.subreadset.xml"};
+    EXPECT_EQ(dataset.BamFilenames().size(), 3);
+    EXPECT_EQ(dataset.Samples(), expected);
+}

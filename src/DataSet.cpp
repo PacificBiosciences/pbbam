@@ -499,6 +499,17 @@ std::set<std::string> DataSet::SequencingChemistries() const
     return result;
 }
 
+std::set<std::string> DataSet::Samples() const
+{
+    std::set<std::string> result;
+    for (const auto& bf : BamFiles()) {
+        const std::vector<ReadGroupInfo> readGroups{bf.Header().ReadGroups()};
+        for (const auto& rg : readGroups)
+            result.insert(rg.Sample());
+    }
+    return result;
+}
+
 const BAM::SubDataSets& DataSet::SubDataSets() const { return d_->SubDataSets(); }
 
 BAM::SubDataSets& DataSet::SubDataSets() { return d_->SubDataSets(); }

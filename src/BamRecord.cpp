@@ -42,16 +42,15 @@ const std::string recordTypeName_Unknown{"UNKNOWN"};
 int32_t HoleNumberFromName(const std::string& fullName)
 {
     const auto mainTokens = Split(fullName, '/');
-    if (mainTokens.at(0) == "transcript") {
-        if (mainTokens.size() != 2)
-            throw std::runtime_error{
-                "[pbbam] BAM record ERROR: malformed transcript record name: " + fullName};
+    if (mainTokens.size() < 2) {
+        throw std::runtime_error{"[pbbam] BAM record ERROR: malformed record name: " + fullName};
+    }
+
+    try {
         return std::stoi(mainTokens.at(1));
-    } else {
-        if (mainTokens.size() != 3)
-            throw std::runtime_error{"[pbbam] BAM record ERROR: malformed record name: " +
-                                     fullName};
-        return std::stoi(mainTokens.at(1));
+    } catch (const std::exception&) {
+        throw std::runtime_error{"[pbbam] BAM record ERROR: invalid hole number: '" +
+                                 mainTokens.at(1) + "'"};
     }
 }
 
@@ -803,6 +802,16 @@ std::vector<uint16_t> BamRecord::EncodePhotons(const std::vector<float>& data)
     return encoded;
 }
 
+int BamRecord::EstimatedBytesUsed() const noexcept
+{
+    int result = impl_.EstimatedBytesUsed();
+    result += sizeof(std::shared_ptr<BamHeader>);
+    result += (2 * sizeof(Data::Position));
+    result += sizeof(std::unique_ptr<Pulse2BaseCache>);
+    if (p2bCache_) result += p2bCache_->EstimatedBytesUsed();
+    return result;
+}
+
 std::string BamRecord::FetchBasesRaw(const BamRecordTag tag) const
 {
     const Tag seqTag = impl_.TagValue(tag);
@@ -863,11 +872,12 @@ Data::Frames BamRecord::FetchFramesRaw(const BamRecordTag tag) const
     // lossy frame codes
     if (frameTag.IsUInt8Array()) {
         const auto& decoder = [&]() -> Data::FrameEncoder {
-            assert(tag == BamRecordTag::IPD || tag == BamRecordTag::PULSE_WIDTH);
-            if (tag == BamRecordTag::IPD)
+            if (BamRecordTags::IsIPD(tag)) {
                 return IpdEncoder(*this);
-            else
+            } else {
+                assert(BamRecordTags::IsPW(tag));
                 return PwEncoder(*this);
+            }
         }();
         return decoder.Decode(frameTag.ToUInt8Array());
     }
@@ -1126,6 +1136,42 @@ std::vector<uint8_t> BamRecord::FetchUInt8s(const BamRecordTag tag,
     return arr;
 }
 
+Data::Frames BamRecord::ForwardIPD(Data::Orientation orientation, bool aligned,
+                                   bool exciseSoftClips) const
+{
+    return FetchFrames(BamRecordTag::FORWARD_IPD, orientation, aligned, exciseSoftClips);
+}
+
+BamRecord& BamRecord::ForwardIPD(const Data::Frames& frames, const Data::FrameCodec encoding)
+{
+    const auto& frameData = frames.Data();
+    if (encoding == Data::FrameCodec::RAW) {
+        CreateOrEdit(BamRecordTag::FORWARD_IPD, frameData, &impl_);
+    } else {
+        const auto encoder = IpdEncoder(*this);
+        CreateOrEdit(BamRecordTag::FORWARD_IPD, encoder.Encode(frameData), &impl_);
+    }
+    return *this;
+}
+
+Data::Frames BamRecord::ForwardPulseWidth(Data::Orientation orientation, bool aligned,
+                                          bool exciseSoftClips) const
+{
+    return FetchFrames(BamRecordTag::FORWARD_PW, orientation, aligned, exciseSoftClips);
+}
+
+BamRecord& BamRecord::ForwardPulseWidth(const Data::Frames& frames, const Data::FrameCodec encoding)
+{
+    const auto& frameData = frames.Data();
+    if (encoding == Data::FrameCodec::RAW) {
+        CreateOrEdit(BamRecordTag::FORWARD_PW, frameData, &impl_);
+    } else {
+        const auto encoder = PwEncoder(*this);
+        CreateOrEdit(BamRecordTag::FORWARD_PW, encoder.Encode(frameData), &impl_);
+    }
+    return *this;
+}
+
 std::string BamRecord::FullName() const { return impl_.Name(); }
 
 bool BamRecord::HasAltLabelQV() const { return impl_.HasTag(BamRecordTag::ALT_LABEL_QV); }
@@ -1141,6 +1187,18 @@ bool BamRecord::HasLabelQV() const { return impl_.HasTag(BamRecordTag::LABEL_QV)
 bool BamRecord::HasDeletionQV() const { return impl_.HasTag(BamRecordTag::DELETION_QV); }
 
 bool BamRecord::HasDeletionTag() const { return impl_.HasTag(BamRecordTag::DELETION_TAG); }
+
+bool BamRecord::HasForwardIPD() const
+{
+    return impl_.HasTag(BamRecordTag::FORWARD_IPD) &&
+           !impl_.TagValue(BamRecordTag::FORWARD_IPD).IsNull();
+}
+
+bool BamRecord::HasForwardPulseWidth() const
+{
+    return impl_.HasTag(BamRecordTag::FORWARD_PW) &&
+           !impl_.TagValue(BamRecordTag::FORWARD_PW).IsNull();
+}
 
 bool BamRecord::HasHoleNumber() const
 {
@@ -1202,6 +1260,18 @@ bool BamRecord::HasReadAccuracy() const
 {
     return impl_.HasTag(BamRecordTag::READ_ACCURACY) &&
            !impl_.TagValue(BamRecordTag::READ_ACCURACY).IsNull();
+}
+
+bool BamRecord::HasReverseIPD() const
+{
+    return impl_.HasTag(BamRecordTag::REVERSE_IPD) &&
+           !impl_.TagValue(BamRecordTag::REVERSE_IPD).IsNull();
+}
+
+bool BamRecord::HasReversePulseWidth() const
+{
+    return impl_.HasTag(BamRecordTag::REVERSE_PW) &&
+           !impl_.TagValue(BamRecordTag::REVERSE_PW).IsNull();
 }
 
 bool BamRecord::HasScrapRegionType() const
@@ -1418,30 +1488,54 @@ std::string BamRecord::MovieName() const
     }
 }
 
-size_t BamRecord::NumDeletedBases() const
-{
-    size_t count = 0;
+size_t BamRecord::NumDeletedBases() const { return NumInsertedAndDeletedBases().second; }
 
-    auto& b = BamRecordMemory::GetRawData(this);
-    uint32_t* cigarData = bam_get_cigar(b.get());
-    for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
-        const auto type = static_cast<Data::CigarOperationType>(bam_cigar_op(cigarData[i]));
-        if (type == Data::CigarOperationType::DELETION) count += bam_cigar_oplen(cigarData[i]);
-    }
-    return count;
+size_t BamRecord::NumDeletionOperations() const
+{
+    return NumInsertionAndDeletionOperations().second;
 }
 
-size_t BamRecord::NumInsertedBases() const
+std::pair<size_t, size_t> BamRecord::NumInsertedAndDeletedBases() const
 {
-    size_t count = 0;
+    size_t nInsBases = 0;
+    size_t nDelBases = 0;
 
     auto& b = BamRecordMemory::GetRawData(this);
     uint32_t* cigarData = bam_get_cigar(b.get());
     for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
         const auto type = static_cast<Data::CigarOperationType>(bam_cigar_op(cigarData[i]));
-        if (type == Data::CigarOperationType::INSERTION) count += bam_cigar_oplen(cigarData[i]);
+        if (type == Data::CigarOperationType::INSERTION) {
+            nInsBases += bam_cigar_oplen(cigarData[i]);
+        } else if (type == Data::CigarOperationType::DELETION) {
+            nDelBases += bam_cigar_oplen(cigarData[i]);
+        }
     }
-    return count;
+    return {nInsBases, nDelBases};
+}
+
+size_t BamRecord::NumInsertedBases() const { return NumInsertedAndDeletedBases().first; }
+
+std::pair<size_t, size_t> BamRecord::NumInsertionAndDeletionOperations() const
+{
+    size_t nInsOps = 0;
+    size_t nDelOps = 0;
+
+    auto& b = BamRecordMemory::GetRawData(this);
+    uint32_t* cigarData = bam_get_cigar(b.get());
+    for (uint32_t i = 0; i < b->core.n_cigar; ++i) {
+        const auto type = static_cast<Data::CigarOperationType>(bam_cigar_op(cigarData[i]));
+        if (type == Data::CigarOperationType::INSERTION) {
+            ++nInsOps;
+        } else if (type == Data::CigarOperationType::DELETION) {
+            ++nDelOps;
+        }
+    }
+    return {nInsOps, nDelOps};
+}
+
+size_t BamRecord::NumInsertionOperations() const
+{
+    return NumInsertionAndDeletionOperations().first;
 }
 
 size_t BamRecord::NumMatches() const { return NumMatchesAndMismatches().first; }
@@ -1898,6 +1992,42 @@ std::string BamRecord::ReferenceName() const
 }
 
 Data::Position BamRecord::ReferenceStart() const { return impl_.Position(); }
+
+Data::Frames BamRecord::ReverseIPD(Data::Orientation orientation, bool aligned,
+                                   bool exciseSoftClips) const
+{
+    return FetchFrames(BamRecordTag::REVERSE_IPD, orientation, aligned, exciseSoftClips);
+}
+
+BamRecord& BamRecord::ReverseIPD(const Data::Frames& frames, const Data::FrameCodec encoding)
+{
+    const auto& frameData = frames.Data();
+    if (encoding == Data::FrameCodec::RAW) {
+        CreateOrEdit(BamRecordTag::REVERSE_IPD, frameData, &impl_);
+    } else {
+        const auto encoder = IpdEncoder(*this);
+        CreateOrEdit(BamRecordTag::REVERSE_IPD, encoder.Encode(frameData), &impl_);
+    }
+    return *this;
+}
+
+Data::Frames BamRecord::ReversePulseWidth(Data::Orientation orientation, bool aligned,
+                                          bool exciseSoftClips) const
+{
+    return FetchFrames(BamRecordTag::REVERSE_PW, orientation, aligned, exciseSoftClips);
+}
+
+BamRecord& BamRecord::ReversePulseWidth(const Data::Frames& frames, const Data::FrameCodec encoding)
+{
+    const auto& frameData = frames.Data();
+    if (encoding == Data::FrameCodec::RAW) {
+        CreateOrEdit(BamRecordTag::REVERSE_PW, frameData, &impl_);
+    } else {
+        const auto encoder = PwEncoder(*this);
+        CreateOrEdit(BamRecordTag::REVERSE_PW, encoder.Encode(frameData), &impl_);
+    }
+    return *this;
+}
 
 void BamRecord::ResetCachedPositions() const
 {

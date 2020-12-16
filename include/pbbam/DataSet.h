@@ -424,6 +424,12 @@ public:
     ///
     std::set<std::string> SequencingChemistries() const;
 
+    /// \returns sample names (SM tag) for all read groups in this dataset
+    ///
+    /// \sa ReadGroupInfo::Sample
+    ///
+    std::set<std::string> Samples() const;
+
     /// \brief Return a minimal list of genomic intervals covered by filters.
     ///
     /// \returns vector of genomic intervals

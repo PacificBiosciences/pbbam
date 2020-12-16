@@ -9,7 +9,7 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <unordered_map>
+#include <vector>
 
 #include <htslib/sam.h>
 
@@ -548,6 +548,15 @@ public:
 
     /// \}
 
+    ///
+    /// \returns estimated number of bytes used by this record
+    ///
+    /// \warning The actual usage is heavily implementation-dependent, w.r.t.
+    ///          data structure layout and alignment. A general estimate is
+    ///          provided here, but no guarantee can be made.
+    ///
+    int EstimatedBytesUsed() const noexcept;
+
 private:
     // returns a BamRecordImpl object, with a deep copy of @rawData contents
     static BamRecordImpl FromRawData(const std::shared_ptr<bam1_t>& rawData);
@@ -576,7 +585,12 @@ private:
 private:
     // data members
     std::unique_ptr<bam1_t, HtslibRecordDeleter> d_;
-    mutable std::unordered_map<uint16_t, int> tagOffsets_;
+    struct TagOffsetEntry
+    {
+        uint16_t Code = 0;
+        int Offset = -1;
+    };
+    mutable std::vector<TagOffsetEntry> tagOffsets_;
 
     // friends
     friend class BamRecordMemory;
