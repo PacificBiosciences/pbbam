@@ -9,6 +9,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Use multi-threaded BAM reading,
    configurable via env variable PB_BAMREADER_THREADS
 
+### Changed
+ - Do not enforce subreads to have kinetics when converting BamRecord to Read
+
 ## [1.6.1] - 2020-11-10
 
 ### Added
