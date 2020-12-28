@@ -5,13 +5,16 @@
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 
 #include <sstream>
 #include <stdexcept>
+#include <string>
 
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
+#include <htslib/thread_pool.h>
 #include <boost/optional.hpp>
 
 #include <pbbam/BamRecord.h>
@@ -43,6 +46,28 @@ public:
             throw std::runtime_error{s.str()};
         }
 
+        // Use environment variable as number of BamReader threads
+        if (const char* envCStr = std::getenv("PB_BAMREADER_THREADS")) {
+            try {
+                const int32_t numThreads = std::stoi(envCStr);
+                if (numThreads <= 0) {
+                    std::ostringstream s;
+                    s << "[pbbam] BAM reader ERROR: environment variable PB_BAMREADER_THREADS is "
+                         "not a positive, non-negative number:"
+                      << envCStr;
+                    throw std::runtime_error{s.str()};
+                }
+                p.pool = hts_tpool_init(numThreads);
+                hts_set_opt(htsFile_.get(), HTS_OPT_THREAD_POOL, &p);
+            } catch (const std::exception&) {
+                std::ostringstream s;
+                s << "[pbbam] BAM reader ERROR: environment variable PB_BAMREADER_THREADS is not a "
+                     "number:"
+                  << envCStr;
+                throw std::runtime_error{s.str()};
+            }
+        }
+
         const auto bgzfPos = bgzf_tell(htsFile_->fp.bgzf);
         if (bgzfPos != 0) {
             std::ostringstream s;
@@ -60,6 +85,12 @@ public:
         header_ = BamHeaderMemory::FromRawData(hdr.get());
     }
 
+    ~BamReaderPrivate()
+    {
+        if (p.pool) hts_tpool_destroy(p.pool);
+    }
+
+    htsThreadPool p = {NULL, 0};
     std::string filename_;
     std::unique_ptr<samFile, HtslibFileDeleter> htsFile_;
     BamHeader header_;
