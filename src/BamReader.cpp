@@ -5,13 +5,16 @@
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 
 #include <sstream>
 #include <stdexcept>
+#include <string>
 
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
+#include <htslib/thread_pool.h>
 #include <boost/optional.hpp>
 
 #include <pbbam/BamRecord.h>
@@ -23,6 +26,24 @@
 
 namespace PacBio {
 namespace BAM {
+
+struct SamFileHandle
+{
+    htsThreadPool ThreadPool = {NULL, 0};
+    samFile* File = nullptr;
+
+    ~SamFileHandle()
+    {
+        if (File) {
+            sam_close(File);
+            File = nullptr;
+        }
+        if (ThreadPool.pool) {
+            hts_tpool_destroy(ThreadPool.pool);
+            ThreadPool.pool = nullptr;
+        }
+    }
+};
 
 class BamReader::BamReaderPrivate
 {
@@ -36,21 +57,43 @@ public:
                 return "\n  file: " + filename_;
         };
 
-        htsFile_.reset(sam_open(filename_.c_str(), "rb"));
-        if (!htsFile_ || !htsFile_->fp.bgzf) {
+        handle_.File = sam_open(filename_.c_str(), "rb");
+        if (!handle_.File || !handle_.File->fp.bgzf) {
             std::ostringstream s;
             s << "[pbbam] BAM reader ERROR: could not open for reading:" << displayFilename();
             throw std::runtime_error{s.str()};
         }
 
-        const auto bgzfPos = bgzf_tell(htsFile_->fp.bgzf);
+        // Use environment variable as number of BamReader threads
+        if (const char* envCStr = std::getenv("PB_BAMREADER_THREADS")) {
+            try {
+                const int32_t numThreads = std::stoi(envCStr);
+                if (numThreads <= 0) {
+                    std::ostringstream s;
+                    s << "[pbbam] BAM reader ERROR: environment variable PB_BAMREADER_THREADS is "
+                         "not a positive, non-negative number:"
+                      << envCStr;
+                    throw std::runtime_error{s.str()};
+                }
+                handle_.ThreadPool.pool = hts_tpool_init(numThreads);
+                hts_set_opt(handle_.File, HTS_OPT_THREAD_POOL, &handle_.ThreadPool);
+            } catch (const std::exception&) {
+                std::ostringstream s;
+                s << "[pbbam] BAM reader ERROR: environment variable PB_BAMREADER_THREADS is not a "
+                     "number:"
+                  << envCStr;
+                throw std::runtime_error{s.str()};
+            }
+        }
+
+        const auto bgzfPos = bgzf_tell(handle_.File->fp.bgzf);
         if (bgzfPos != 0) {
             std::ostringstream s;
             s << "[pbbam] BAM reader ERROR: could not read from empty input:" << displayFilename();
             throw std::runtime_error{s.str()};
         }
 
-        const std::unique_ptr<bam_hdr_t, HtslibHeaderDeleter> hdr(sam_hdr_read(htsFile_.get()));
+        const std::unique_ptr<bam_hdr_t, HtslibHeaderDeleter> hdr(sam_hdr_read(handle_.File));
         if (!hdr) {
             std::ostringstream s;
             s << "[pbbam] BAM reader ERROR: could not read header from:" << displayFilename();
@@ -61,7 +104,7 @@ public:
     }
 
     std::string filename_;
-    std::unique_ptr<samFile, HtslibFileDeleter> htsFile_;
+    SamFileHandle handle_;
     BamHeader header_;
 };
 
@@ -76,7 +119,7 @@ BamReader::BamReader(BamFile bamFile) : BamReader{bamFile.Filename()} {}
 
 BamReader::~BamReader() = default;
 
-BGZF* BamReader::Bgzf() const { return d_->htsFile_->fp.bgzf; }
+BGZF* BamReader::Bgzf() const { return d_->handle_.File->fp.bgzf; }
 
 const std::string& BamReader::Filename() const { return d_->filename_; }
 
@@ -86,7 +129,7 @@ bool BamReader::GetNext(BamRecord& record)
 {
     assert(BamRecordMemory::GetRawData(record).get());
 
-    const auto result = ReadRawData(d_->htsFile_.get(), BamRecordMemory::GetRawData(record).get());
+    const auto result = ReadRawData(d_->handle_.File, BamRecordMemory::GetRawData(record).get());
 
     // success
     if (result >= 0) {

@@ -16,6 +16,8 @@
 
 #include <htslib/hts_endian.h>
 
+#include <pbcopper/utility/Ssize.h>
+
 #include <pbbam/BamTagCodec.h>
 #include <pbbam/StringUtilities.h>
 
@@ -410,12 +412,12 @@ BamRecordImpl& BamRecordImpl::Name(const std::string& name)
 {
     // determine change in memory needed
     // diffNumBytes: pos -> growing, neg -> shrinking
-    const size_t numChars = name.size() + 1;  // +1 for NULL-term
-    const size_t numExtraNulls = 4 - (numChars % 4);
-    const size_t totalNameSize = numChars + numExtraNulls;
+    const auto numChars = Utility::Ssize(name) + 1;  // +1 for NULL-term
+    const auto numExtraNulls = 4 - (numChars % 4);
+    const auto totalNameSize = numChars + numExtraNulls;
 
-    const int diffNumBytes = totalNameSize - d_->core.l_qname;
-    const int oldLengthData = d_->l_data;
+    const auto diffNumBytes = totalNameSize - d_->core.l_qname;
+    const auto oldLengthData = d_->l_data;
     d_->l_data += diffNumBytes;
     MaybeReallocData();
 
@@ -488,10 +490,10 @@ void BamRecordImpl::SetCigarData(const Data::Cigar& cigar)
 {
     // determine change in memory needed
     // diffNumBytes: pos -> growing, neg -> shrinking
-    const size_t numCigarOps = cigar.size();
-    const int diffNumCigars = numCigarOps - d_->core.n_cigar;
-    const int diffNumBytes = diffNumCigars * sizeof(uint32_t);
-    const int oldLengthData = d_->l_data;
+    const auto numCigarOps = Utility::Ssize(cigar);
+    const auto diffNumCigars = numCigarOps - d_->core.n_cigar;
+    const auto diffNumBytes = diffNumCigars * static_cast<int>(sizeof(uint32_t));
+    const auto oldLengthData = d_->l_data;
     d_->l_data += diffNumBytes;
     MaybeReallocData();
 
@@ -504,7 +506,7 @@ void BamRecordImpl::SetCigarData(const Data::Cigar& cigar)
 
     // fill in new CIGAR data
     uint32_t* cigarDataStart = bam_get_cigar(d_);
-    for (size_t i = 0; i < numCigarOps; ++i) {
+    for (int i = 0; i < numCigarOps; ++i) {
         const Data::CigarOperation& cigarOp = cigar.at(i);
         cigarDataStart[i] = bam_cigar_gen(cigarOp.Length(), static_cast<int>(cigarOp.Type()));
     }
@@ -704,12 +706,12 @@ BamRecordImpl& BamRecordImpl::Tags(const TagCollection& tags)
 {
     // convert tags to binary
     const std::vector<uint8_t> tagData = BamTagCodec::Encode(tags);
-    const size_t numBytes = tagData.size();
+    const int numBytes = Utility::Ssize(tagData);
     const uint8_t* data = tagData.data();
 
     // determine change in memory needed
     uint8_t* tagStart = bam_get_aux(d_);
-    const size_t oldNumBytes = d_->l_data - (tagStart - d_->data);
+    const int oldNumBytes = d_->l_data - (tagStart - d_->data);
     const int diffNumBytes = numBytes - oldNumBytes;
     d_->l_data += diffNumBytes;
     MaybeReallocData();
