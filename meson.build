@@ -75,27 +75,18 @@ subdir('src')
 # tests #
 #########
 
-if not meson.is_subproject()
-  if get_option('build-tools') or get_option('tests')
-    pbbam_python = find_program('python')
-
-    if get_option('tests')
-      pbbam_clang_formatter = find_program('tools/check-formatting')
-      pbbam_eof_check = find_program('tools/check-eof')
-      subdir('tests')
-    endif
-  endif
+pbbam_run_tests = (not meson.is_subproject()) and get_option('tests')
+if pbbam_run_tests
+  pbbam_clang_formatter = find_program('tools/check-formatting')
+  pbbam_eof_check = find_program('tools/check-eof')
+  subdir('tests')
 endif
 
 #########
 # tools #
 #########
 
-if not meson.is_subproject()
-  if get_option('build-tools') or get_option('tests')
-    subdir('tools')
-  endif
-endif
+subdir('tools')
 
 #################
 # documentation #
