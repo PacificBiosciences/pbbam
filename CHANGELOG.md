@@ -5,6 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [1.6.2] - 2021-02-16
+
 ### Added
  - Use multi-threaded BAM reading,
    configurable via env variable PB_BAMREADER_THREADS
