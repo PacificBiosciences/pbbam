@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+### Fixed
+ - Query name parsing for CCS/transcript records in PbiQueryNameFilter
+
 ## [1.6.2] - 2021-02-16
 
 ### Added

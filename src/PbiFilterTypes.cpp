@@ -10,6 +10,7 @@
 #include <unordered_map>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/optional.hpp>
 
 #include <pbbam/StringUtilities.h>
 
@@ -267,9 +268,8 @@ struct PbiQueryNameFilter::PbiQueryNameFilterPrivate
 public:
     using QueryInterval = std::pair<int32_t, int32_t>;
     using QueryIntervals = std::set<QueryInterval>;
-    using ZmwLookup = std::unordered_map<int32_t, QueryIntervals>;
-    using ZmwLookupPtr = std::shared_ptr<ZmwLookup>;  // may be shared by more than one rgId
-    using RgIdLookup = std::unordered_map<int32_t, ZmwLookupPtr>;
+    using ZmwData = std::unordered_map<int32_t, boost::optional<QueryIntervals>>;
+    using RgIdLookup = std::unordered_map<int32_t, std::shared_ptr<ZmwData>>;
 
     PbiQueryNameFilterPrivate(const std::vector<std::string>& queryNames,
                               const Compare::Type cmp = Compare::EQUAL)
@@ -313,10 +313,15 @@ public:
             // see if row's QueryStart/QueryEnd known
             // CCS names already covered in lookup construction phase
             const auto& queryIntervals = zmwFound->second;
-            const auto qStart = basicData.qStart_.at(row);
-            const auto qEnd = basicData.qEnd_.at(row);
-            const auto queryInterval = std::make_pair(qStart, qEnd);
-            return (queryIntervals.find(queryInterval) != queryIntervals.end());
+            if (queryIntervals) {
+                const auto qStart = basicData.qStart_.at(row);
+                const auto qEnd = basicData.qEnd_.at(row);
+                const QueryInterval queryInterval = std::make_pair(qStart, qEnd);
+                return (queryIntervals->find(queryInterval) != queryIntervals->end());
+            } else {
+                // CCS or transcript record
+                return true;
+            }
         }();
 
         if (cmp_ == Compare::EQUAL || cmp_ == Compare::CONTAINS)
@@ -347,74 +352,76 @@ public:
 
     void HandleName(const std::string& queryName, const RecordType type)
     {
-        // split name into main parts
         const auto nameParts = Split(queryName, '/');
-
-        // verify syntax
-        if (IsCcsOrTranscript(type)) {
-            if (nameParts.size() != 2) {
-                const auto typeName = (type == RecordType::CCS) ? "CCS" : "transcript";
-                throw std::runtime_error{"[pbbam] PBI filter ERROR: requested QNAME (" + queryName +
-                                         ") is not valid for PacBio " + typeName +
-                                         " reads. See spec for details."};
-            }
-        } else {
-            if (nameParts.size() != 3) {
-                throw std::runtime_error{"[pbbam] PBI filter ERROR: requested QNAME (" + queryName +
-                                         ") is not a valid PacBio BAM QNAME. See spec for details"};
-            }
+        if (nameParts.size() < 2) {
+            throw std::runtime_error{"[pbbam] PBI filter ERROR: requested QNAME (" + queryName +
+                                     ") is not a valid PacBio BAM QNAME. See spec for details"};
         }
 
         // generate candidate read group IDs from movie name & record type, then
         // add to lookup table
-        const auto zmwPtr = UpdateRgLookup(CandidateRgIds(nameParts.at(0), type));
+        const std::shared_ptr<ZmwData> zmw = UpdateRgLookup(CandidateRgIds(nameParts.at(0), type));
 
-        // add qStart/qEnd interval to zmw lookup
-        const auto zmw = std::stoi(nameParts.at(1));
-        if (IsCcsOrTranscript(type))
-            UpdateZmwQueryIntervals(zmwPtr.get(), zmw, -1, -1);
-        else {
+        // add ZMW to read group. Add qStart/qEnd to ZMW if not a CCS/transcript record
+        const auto zmwId = [&]() {
+            try {
+                return std::stoi(nameParts.at(1));
+            } catch (const std::invalid_argument&) {
+                throw std::runtime_error{
+                    "[pbbam] PBI filter ERROR: requested QNAME (" + queryName +
+                    ") is not a valid PacBio BAM QNAME. ZMW id must be a number."};
+            }
+        }();
+
+        if (IsCcsOrTranscript(type)) {
+            zmw->emplace(zmwId, boost::optional<QueryIntervals>{});
+        } else {
+
             const auto queryIntervalParts = Split(nameParts.at(2), '_');
             if (queryIntervalParts.size() != 2) {
                 throw std::runtime_error{"[pbbam] PBI filter ERROR: requested QNAME (" + queryName +
                                          ") is not a valid PacBio BAM QNAME. See spec for details"};
             }
-            UpdateZmwQueryIntervals(zmwPtr.get(), zmw, std::stoi(queryIntervalParts.at(0)),
-                                    std::stoi(queryIntervalParts.at(1)));
+
+            const auto queryInterval = [&]() {
+                try {
+                    return std::make_pair(std::stoi(queryIntervalParts.at(0)),
+                                          std::stoi(queryIntervalParts.at(1)));
+                } catch (const std::invalid_argument&) {
+                    throw std::runtime_error{
+                        "[pbbam] PBI filter ERROR: requested QNAME (" + queryName +
+                        ") is not a valid PacBio BAM QNAME. qStart/qEnd must be numbers."};
+                }
+            }();
+
+            const auto zmwResult = zmw->emplace(zmwId, QueryIntervals{});
+            const auto zmwIter = zmwResult.first;
+            auto& queryIntervals = zmwIter->second;
+            queryIntervals->emplace(queryInterval);
         }
     }
 
-    ZmwLookupPtr UpdateRgLookup(std::vector<int32_t>&& rgIds)
+    std::shared_ptr<ZmwData> UpdateRgLookup(const std::vector<int32_t>& rgIds)
     {
         assert(!rgIds.empty());
 
-        ZmwLookupPtr zmwPtr;
+        std::shared_ptr<ZmwData> zmw;
 
         const auto rgFound = lookup_.find(rgIds.front());
         if (rgFound == lookup_.end()) {
-            zmwPtr = std::make_shared<ZmwLookup>();
+            zmw = std::make_shared<ZmwData>();
             for (const auto& rg : rgIds) {
                 assert(lookup_.find(rg) == lookup_.end());
-                lookup_.emplace(rg, zmwPtr);
+                lookup_.emplace(rg, zmw);
             }
         } else {
 #ifndef NDEBUG
             for (const auto& rg : rgIds)
                 assert(lookup_.find(rg) != lookup_.end());
 #endif
-            zmwPtr = rgFound->second;
+            zmw = rgFound->second;
         }
-        return zmwPtr;
-    }
-
-    // add QS/QE pair to ZMW lookup
-    void UpdateZmwQueryIntervals(ZmwLookup* const zmwPtr, const int32_t zmw,
-                                 const int32_t queryStart, const int32_t queryEnd)
-    {
-        const auto zmwFound = zmwPtr->find(zmw);
-        if (zmwFound == zmwPtr->end()) zmwPtr->emplace(zmw, QueryIntervals{});
-        auto& queryIntervals = zmwPtr->at(zmw);
-        queryIntervals.emplace(std::make_pair(queryStart, queryEnd));
+        return zmw;
     }
 
 private:
