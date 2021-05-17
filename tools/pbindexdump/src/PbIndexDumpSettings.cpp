@@ -75,7 +75,7 @@ CLI_v2::Interface Settings::CreateCLI()
         "Supported output formats:\n"
         "  json: 'pretty-printed' JSON\n"
         "  cpp:  copy/paste-able C++ code that can be used to construct the\n"
-        "        equivalent BAM::PbiRawData object."
+        "        equivalent BAM::PbiRawData object.\n"
     });
     // clang-format on
 
