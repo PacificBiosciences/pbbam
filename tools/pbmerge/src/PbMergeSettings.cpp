@@ -57,7 +57,8 @@ CLI_v2::Interface Settings::CreateCLI()
     interface.HelpFooter(R"(Examples:
     $ pbmerge -o merged.bam data.subreadset.xml
     $ pbmerge -o merged.bam data_1.bam data_2.bam data_3.bam
-    $ pbmerge -o merged.bam data_bams.fofn)");
+    $ pbmerge -o merged.bam data_bams.fofn
+)");
 
     // clang-format on
     return interface;
