@@ -892,7 +892,7 @@ public:
 ///
 /// \sa BamRecord::HoleNumber
 ///
-class PbiZmwFilter : public internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::ZMW>
+class PbiZmwFilter
 {
 public:
     /// \brief Creates a single-value ZMW hole number filter.
@@ -913,6 +913,17 @@ public:
     /// \param[in] cmp  compare type
     ///
     PbiZmwFilter(std::vector<int32_t> zmws, const Compare::Type cmp = Compare::CONTAINS);
+
+    /// \brief Performs the actual index lookup.
+    ///
+    /// Most client code should not need to use this method directly.
+    ///
+    bool Accepts(const PbiRawData& idx, const size_t row) const;
+
+private:
+    Compare::Type cmp_;
+    int32_t singleZmw_;
+    std::set<int32_t> zmwLookup_;
 };
 
 // ----------------------------------------------
