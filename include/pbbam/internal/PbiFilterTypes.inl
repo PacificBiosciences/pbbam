@@ -463,18 +463,6 @@ inline PbiReferenceStartFilter::PbiReferenceStartFilter(const uint32_t tStart,
 {
 }
 
-// PbiZmwFilter
-
-inline PbiZmwFilter::PbiZmwFilter(const int32_t zmw, const Compare::Type cmp)
-    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::ZMW>{zmw, cmp}
-{
-}
-
-inline PbiZmwFilter::PbiZmwFilter(std::vector<int32_t> whitelist, const Compare::Type cmp)
-    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::ZMW>{std::move(whitelist), cmp}
-{
-}
-
 // PbiZmwModuloFilter
 
 inline PbiZmwModuloFilter::PbiZmwModuloFilter(const uint32_t denominator, const uint32_t value,

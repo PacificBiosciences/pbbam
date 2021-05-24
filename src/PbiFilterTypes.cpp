@@ -635,5 +635,39 @@ void PbiReferenceNameFilter::Validate() const
     }
 }
 
+// PbiZmwFilter
+
+PbiZmwFilter::PbiZmwFilter(const int32_t zmw, const Compare::Type cmp) : cmp_{cmp}, singleZmw_{zmw}
+{
+}
+
+PbiZmwFilter::PbiZmwFilter(std::vector<int32_t> whitelist, const Compare::Type cmp)
+    : cmp_{cmp}, zmwLookup_{whitelist.begin(), whitelist.end()}
+{
+    // verify white list compare type
+    if (cmp_ == Compare::EQUAL) {
+        cmp_ = Compare::CONTAINS;
+    } else if (cmp_ == Compare::NOT_EQUAL) {
+        cmp_ = Compare::NOT_CONTAINS;
+    }
+    if (cmp_ != Compare::CONTAINS && cmp_ != Compare::NOT_CONTAINS) {
+        throw std::runtime_error{
+            "[pbbam] PBI filter ERROR: multi-valued filters (e.g. whitelists) can only check for "
+            "containment."};
+    }
+}
+
+bool PbiZmwFilter::Accepts(const PbiRawData& idx, const size_t row) const
+{
+    const auto zmw = idx.BasicData().holeNumber_.at(row);
+    if (cmp_ == Compare::CONTAINS) {
+        return zmwLookup_.find(zmw) != zmwLookup_.cend();
+    } else if (cmp_ == Compare::NOT_CONTAINS) {
+        return zmwLookup_.find(zmw) == zmwLookup_.cend();
+    } else {
+        return Compare::Check(zmw, singleZmw_, cmp_);
+    }
+}
+
 }  // namespace BAM
 }  // namespace PacBio
