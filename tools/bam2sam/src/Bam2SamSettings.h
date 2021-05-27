@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #ifndef BAM2SAM_SETTINGS_H
 #define BAM2SAM_SETTINGS_H
 

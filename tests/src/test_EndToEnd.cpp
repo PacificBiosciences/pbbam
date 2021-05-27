@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <cstdio>
 #include <cstdlib>
 

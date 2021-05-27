@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #ifndef PBINDEXDUMP_SETTINGS_H
 #define PBINDEXDUMP_SETTINGS_H
 

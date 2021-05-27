@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/DataSet.h>
 
 #include <cstddef>

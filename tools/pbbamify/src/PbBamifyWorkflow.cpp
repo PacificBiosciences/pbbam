@@ -1,5 +1,3 @@
-// Author: Ivan Sovic
-
 #include "PbBamifyWorkflow.h"
 
 #include <cstdint>

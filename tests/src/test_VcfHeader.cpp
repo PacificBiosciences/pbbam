@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/vcf/VcfHeader.h>
 
 #include <string>

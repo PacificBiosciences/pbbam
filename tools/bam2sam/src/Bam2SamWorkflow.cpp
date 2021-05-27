@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "Bam2SamWorkflow.h"
 
 #include <memory>

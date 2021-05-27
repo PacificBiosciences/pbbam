@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbIndexDumpSettings.h"
 
 #include <stdexcept>

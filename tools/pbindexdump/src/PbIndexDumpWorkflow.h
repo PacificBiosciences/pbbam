@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #ifndef PBINDEXDUMP_WORKFLOW_H
 #define PBINDEXDUMP_WORKFLOW_H
 

@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/FastqSequence.h>
 
 #include <gtest/gtest.h>
