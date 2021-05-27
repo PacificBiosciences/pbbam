@@ -2,8 +2,6 @@
 
 #include <pbbam/ProgramInfo.h>
 
-#include <cassert>
-
 #include <sstream>
 #include <type_traits>
 
@@ -22,17 +20,6 @@ const std::string ProgramInfoTokenPP{"PP"};
 const std::string ProgramInfoTokenVN{"VN"};
 
 }  // namespace
-
-static_assert(std::is_copy_constructible<ProgramInfo>::value,
-              "ProgramInfo(const ProgramInfo&) is not = default");
-static_assert(std::is_copy_assignable<ProgramInfo>::value,
-              "ProgramInfo& operator=(const ProgramInfo&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<ProgramInfo>::value,
-              "ProgramInfo(ProgramInfo&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<ProgramInfo>::value ==
-                  std::is_nothrow_move_assignable<std::string>::value,
-              "");
 
 ProgramInfo::ProgramInfo(std::string id) : id_{std::move(id)} {}
 

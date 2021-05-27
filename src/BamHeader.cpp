@@ -94,16 +94,6 @@ void ParseHeaderLine(const std::string& line, BamHeader& hdr)
 
 }  // namespace
 
-static_assert(std::is_copy_constructible<BamHeader>::value,
-              "BamHeader(const BamHeader&) is not = default");
-static_assert(std::is_copy_assignable<BamHeader>::value,
-              "BamHeader& operator=(const BamHeader&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<BamHeader>::value,
-              "BamHeader(BamHeader&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<BamHeader>::value,
-              "BamHeader& operator=(BamHeader&&) is not = noexcept");
-
 class BamHeader::BamHeaderPrivate
 {
 public:

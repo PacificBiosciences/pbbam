@@ -2,8 +2,6 @@
 
 #include <pbbam/TextFileReader.h>
 
-#include <cassert>
-
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>
@@ -17,11 +15,6 @@
 
 namespace PacBio {
 namespace BAM {
-
-static_assert(!std::is_copy_constructible<TextFileReader>::value,
-              "TextFileReader(const TextFileReader&) is not = delete");
-static_assert(!std::is_copy_assignable<TextFileReader>::value,
-              "TextFileReader& operator=(const TextFileReader&) is not = delete");
 
 class TextFileReader::TextFileReaderPrivate
 {

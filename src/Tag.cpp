@@ -2,8 +2,6 @@
 
 #include <pbbam/Tag.h>
 
-#include <cassert>
-
 #include <ostream>
 #include <type_traits>
 
@@ -204,14 +202,6 @@ struct OutputVisitor : public boost::static_visitor<void>
 };
 
 }  // namespace
-
-static_assert(std::is_copy_constructible<Tag>::value, "Tag(const Tag&) is not = default");
-static_assert(std::is_copy_assignable<Tag>::value, "Tag& operator=(const Tag&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<Tag>::value, "Tag(Tag&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<Tag>::value ==
-                  std::is_nothrow_move_assignable<std::string>::value,
-              "");
 
 Tag::Tag(int8_t value) : data_{value} {}
 Tag::Tag(uint8_t value) : data_{value} {}

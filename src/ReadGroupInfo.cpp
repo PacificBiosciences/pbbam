@@ -283,19 +283,6 @@ PlatformModelType PlatformModelFromName(std::string name) { return nameToPlatfor
 
 }  // namespace
 
-static_assert(std::is_copy_constructible<ReadGroupInfo>::value,
-              "ReadGroupInfo(const ReadGroupInfo&) is not = default");
-static_assert(std::is_copy_assignable<ReadGroupInfo>::value,
-              "ReadGroupInfo& operator=(const ReadGroupInfo&) is not = default");
-
-#ifndef __INTEL_COMPILER
-static_assert(std::is_nothrow_move_constructible<ReadGroupInfo>::value,
-              "ReadGroupInfo(ReadGroupInfo&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<ReadGroupInfo>::value ==
-                  std::is_nothrow_move_assignable<std::string>::value,
-              "");
-#endif
-
 ReadGroupInfo::ReadGroupInfo(std::string baseId, std::pair<uint16_t, uint16_t> barcodes)
 {
     std::ostringstream id;

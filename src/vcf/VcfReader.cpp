@@ -2,24 +2,10 @@
 
 #include <pbbam/vcf/VcfReader.h>
 
-#include <cassert>
-
 #include <type_traits>
 
 namespace PacBio {
 namespace VCF {
-
-static_assert(!std::is_copy_constructible<VcfReader>::value,
-              "VcfReader(const VcfReader&) is not = delete");
-static_assert(!std::is_copy_assignable<VcfReader>::value,
-              "VcfReader& operator=(const VcfReader&) is not = delete");
-
-static_assert(std::is_nothrow_move_constructible<VcfReader>::value ==
-                  std::is_nothrow_move_constructible<std::ifstream>::value,
-              "");
-static_assert(std::is_nothrow_move_assignable<VcfReader>::value ==
-                  std::is_nothrow_move_assignable<std::ifstream>::value,
-              "");
 
 VcfReader::VcfReader(std::string fn) : VcfReader{VcfFile{std::move(fn)}} {}
 

@@ -2,8 +2,6 @@
 
 #include <pbbam/bed/BedReader.h>
 
-#include <cassert>
-
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>
@@ -17,11 +15,6 @@
 
 namespace PacBio {
 namespace BED {
-
-static_assert(!std::is_copy_constructible<BedReader>::value,
-              "BedReader(const BedReader&) is not = delete");
-static_assert(!std::is_copy_assignable<BedReader>::value,
-              "BedReader& operator=(const BedReader&) is not = delete");
 
 class BedReader::BedReaderPrivate
 {

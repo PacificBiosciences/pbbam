@@ -2,8 +2,6 @@
 
 #include <pbbam/vcf/VcfHeaderTypes.h>
 
-#include <cassert>
-
 #include <type_traits>
 
 #include <pbbam/vcf/VcfHeader.h>
@@ -16,17 +14,6 @@ namespace VCF {
 // -------------------
 // ContigDefinition
 // -------------------
-
-static_assert(std::is_copy_constructible<ContigDefinition>::value,
-              "ContigDefinition(const ContigDefinition&) is not = default");
-static_assert(std::is_copy_assignable<ContigDefinition>::value,
-              "ContigDefinition& operator=(const ContigDefinition&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<ContigDefinition>::value,
-              "ContigDefinition(ContigDefinition&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<ContigDefinition>::value ==
-                  std::is_nothrow_move_assignable<std::string>::value,
-              "");
 
 ContigDefinition::ContigDefinition(std::string id) : ContigDefinition{std::move(id), {}} {}
 
@@ -69,17 +56,6 @@ const std::string& ContigDefinition::Id() const { return id_; }
 // FilterDefinition
 // -------------------
 
-static_assert(std::is_copy_constructible<FilterDefinition>::value,
-              "FilterDefinition(const FilterDefinition&) is not = default");
-static_assert(std::is_copy_assignable<FilterDefinition>::value,
-              "FilterDefinition& operator=(const FilterDefinition&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<FilterDefinition>::value,
-              "FilterDefinition(FilterDefinition&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<FilterDefinition>::value ==
-                  std::is_nothrow_move_assignable<std::string>::value,
-              "");
-
 // clang-format off
 FilterDefinition::FilterDefinition(std::string id, std::string description)
     : id_{std::move(id)}, description_{std::move(description)}
@@ -99,17 +75,6 @@ const std::string& FilterDefinition::Id() const { return id_; }
 // -------------------
 // FormatDefinition
 // -------------------
-
-static_assert(std::is_copy_constructible<FormatDefinition>::value,
-              "FormatDefinition(const FormatDefinition&) is not = default");
-static_assert(std::is_copy_assignable<FormatDefinition>::value,
-              "FormatDefinition& operator=(const FormatDefinition&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<FormatDefinition>::value,
-              "FormatDefinition(FormatDefinition&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<FormatDefinition>::value ==
-                  std::is_nothrow_move_assignable<std::string>::value,
-              "");
 
 // clang-format off
 FormatDefinition::FormatDefinition(std::string id, std::string number, std::string type,
@@ -145,17 +110,6 @@ const std::string& FormatDefinition::Type() const { return type_; }
 // GeneralDefinition
 // -------------------
 
-static_assert(std::is_copy_constructible<GeneralDefinition>::value,
-              "GeneralDefinition(const GeneralDefinition&) is not = default");
-static_assert(std::is_copy_assignable<GeneralDefinition>::value,
-              "GeneralDefinition& operator=(const GeneralDefinition&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<GeneralDefinition>::value,
-              "GeneralDefinition(GeneralDefinition&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<GeneralDefinition>::value ==
-                  std::is_nothrow_move_assignable<std::string>::value,
-              "");
-
 // clang-format off
 GeneralDefinition::GeneralDefinition(std::string id, std::string text)
     : id_{std::move(id)}, text_{std::move(text)}
@@ -175,19 +129,6 @@ const std::string& GeneralDefinition::Text() const { return text_; }
 // -------------------
 // InfoDefinition
 // -------------------
-
-static_assert(std::is_copy_constructible<InfoDefinition>::value,
-              "InfoDefinition(const InfoDefinition&) is not = default");
-static_assert(std::is_copy_assignable<InfoDefinition>::value,
-              "InfoDefinition& operator=(const InfoDefinition&) is not = default");
-
-#ifndef __INTEL_COMPILER
-static_assert(std::is_nothrow_move_constructible<InfoDefinition>::value,
-              "InfoDefinition(InfoDefinition&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<InfoDefinition>::value ==
-                  std::is_nothrow_move_assignable<std::string>::value,
-              "");
-#endif
 
 // clang-format off
 InfoDefinition::InfoDefinition(std::string id, std::string number, std::string type,

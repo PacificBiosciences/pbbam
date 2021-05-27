@@ -4,7 +4,6 @@
 
 #include <sys/stat.h>
 
-#include <cassert>
 #include <cstdint>
 
 #include <array>
@@ -615,11 +614,6 @@ private:
 };
 
 #endif  // HTS_VERSION
-
-static_assert(!std::is_copy_constructible<IndexedBamWriter>::value,
-              "IndexedBamWriter(const IndexedBamWriter&) is not = delete");
-static_assert(!std::is_copy_assignable<IndexedBamWriter>::value,
-              "IndexedBamWriter& operator=(const IndexedBamWriter&) is not = delete");
 
 IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamHeader& header,
                                    const BamWriter::CompressionLevel bamCompressionLevel,
