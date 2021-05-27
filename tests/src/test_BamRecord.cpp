@@ -2,6 +2,7 @@
 
 #include <pbbam/BamRecord.h>
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 

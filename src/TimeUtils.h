@@ -3,7 +3,6 @@
 
 #include <pbbam/Config.h>
 
-#include <cassert>
 #include <ctime>
 
 #include <chrono>
