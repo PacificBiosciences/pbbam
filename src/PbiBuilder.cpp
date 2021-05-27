@@ -46,8 +46,9 @@ public:
         : PacBio::BAM::PbiBuilderBase{pbiFilename, compressionLevel, numThreads, MaxBufferSize}
     {
 
-        if (isCoordinateSorted && numReferenceSequences > 0)
+        if (isCoordinateSorted && numReferenceSequences > 0) {
             refDataBuilder_ = std::make_unique<PbiReferenceDataBuilder>(numReferenceSequences);
+        }
     }
 };
 

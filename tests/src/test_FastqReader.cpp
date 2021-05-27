@@ -180,8 +180,9 @@ TEST(BAM_FastqMerging, can_merge_bams_to_fastq_output)
 
     const auto seqs = FastqReader::ReadAll(outFastq);
     ASSERT_EQ(mergedFastqNames.size(), seqs.size());
-    for (size_t i = 0; i < seqs.size(); ++i)
+    for (size_t i = 0; i < seqs.size(); ++i) {
         EXPECT_EQ(mergedFastqNames[i], seqs[i].Name());
+    }
 
     remove(outFastq.c_str());
 }

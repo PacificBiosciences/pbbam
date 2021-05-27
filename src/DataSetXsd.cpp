@@ -190,7 +190,9 @@ XsdType NamespaceRegistry::XsdForUri(const std::string& uri) const
 {
     for (const auto& entry : data_) {
         const auto& info = entry.second;
-        if (info.Uri() == uri) return entry.first;
+        if (info.Uri() == uri) {
+            return entry.first;
+        }
     }
     return XsdType::NONE;
 }

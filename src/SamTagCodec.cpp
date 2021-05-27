@@ -21,8 +21,9 @@ std::vector<float> readFloatSamMultiValue(const std::string& data)
     std::vector<float> result;
     auto* c = const_cast<char*>(data.c_str());
     const char* end = c + data.length();
-    while (c + 1 < end)
+    while (c + 1 < end) {
         result.emplace_back(strtof(c + 1, &c));
+    }
     return result;
 }
 
@@ -32,8 +33,9 @@ std::vector<T> readSignedSamMultiValue(const std::string& data)
     std::vector<T> result;
     auto* c = const_cast<char*>(data.c_str());
     const char* end = c + data.length();
-    while (c + 1 < end)
+    while (c + 1 < end) {
         result.emplace_back(strtol(c + 1, &c, 0));
+    }
     return result;
 }
 
@@ -43,8 +45,9 @@ std::vector<T> readUnsignedSamMultiValue(const std::string& data)
     std::vector<T> result;
     auto* c = const_cast<char*>(data.c_str());
     const char* end = c + data.length();
-    while (c + 1 < end)
+    while (c + 1 < end) {
         result.emplace_back(strtoul(c + 1, &c, 0));
+    }
     return result;
 }
 
@@ -56,14 +59,16 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
 
     const auto tokens = Split(tagString, '\t');
     for (const auto& token : tokens) {
-        if (token.size() < 6)  // TT:t:X
+        if (token.size() < 6) {  // TT:t:X
             continue;
+        }
 
         const auto name = token.substr(0, 2);
         const auto type = token.at(3);
         const auto remainder = token.substr(5);
-        if (remainder.empty())
+        if (remainder.empty()) {
             throw std::runtime_error{"[pbbam] SAM tag ERROR: malformed tag: " + token};
+        }
 
         switch (type) {
 
@@ -88,23 +93,25 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
                 // negative value (force signed int)
                 if (remainder[0] == '-') {
                     const auto x = boost::lexical_cast<int32_t>(remainder);
-                    if (x >= std::numeric_limits<int8_t>::min())
+                    if (x >= std::numeric_limits<int8_t>::min()) {
                         tags[name] = static_cast<int8_t>(x);
-                    else if (x >= std::numeric_limits<int16_t>::min())
+                    } else if (x >= std::numeric_limits<int16_t>::min()) {
                         tags[name] = static_cast<int16_t>(x);
-                    else
+                    } else {
                         tags[name] = x;
+                    }
                 }
 
                 // unsigned int
                 else {
                     const auto x = boost::lexical_cast<uint32_t>(remainder);
-                    if (x <= std::numeric_limits<uint8_t>::max())
+                    if (x <= std::numeric_limits<uint8_t>::max()) {
                         tags[name] = static_cast<uint8_t>(x);
-                    else if (x <= std::numeric_limits<uint16_t>::max())
+                    } else if (x <= std::numeric_limits<uint16_t>::max()) {
                         tags[name] = static_cast<uint16_t>(x);
-                    else
+                    } else {
                         tags[name] = x;
+                    }
                 }
                 break;
             }
@@ -174,7 +181,9 @@ std::string SamTagCodec::Encode(const std::string& name, const PacBio::BAM::Tag&
     if (name.size() != 2) {
         throw std::runtime_error{"[pbbam] SAM tag ERROR: malformed tag name: " + name};
     }
-    if (tag.IsNull()) return {};
+    if (tag.IsNull()) {
+        return {};
+    }
 
     // "<TAG>:"
     std::ostringstream result;
@@ -218,38 +227,45 @@ std::string SamTagCodec::Encode(const std::string& name, const PacBio::BAM::Tag&
             break;
         case TagDataType::INT8_ARRAY:
             result << "B:c";
-            for (const int8_t x : tag.ToInt8Array())
+            for (const int8_t x : tag.ToInt8Array()) {
                 result << ',' << static_cast<int32_t>(x);
+            }
             break;
         case TagDataType::UINT8_ARRAY:
             result << "B:C";
-            for (const uint8_t x : tag.ToUInt8Array())
+            for (const uint8_t x : tag.ToUInt8Array()) {
                 result << ',' << static_cast<uint32_t>(x);
+            }
             break;
         case TagDataType::INT16_ARRAY:
             result << "B:s";
-            for (const int16_t x : tag.ToInt16Array())
+            for (const int16_t x : tag.ToInt16Array()) {
                 result << ',' << x;
+            }
             break;
         case TagDataType::UINT16_ARRAY:
             result << "B:S";
-            for (const uint16_t x : tag.ToUInt16Array())
+            for (const uint16_t x : tag.ToUInt16Array()) {
                 result << ',' << x;
+            }
             break;
         case TagDataType::INT32_ARRAY:
             result << "B:i";
-            for (const int32_t x : tag.ToInt32Array())
+            for (const int32_t x : tag.ToInt32Array()) {
                 result << ',' << x;
+            }
             break;
         case TagDataType::UINT32_ARRAY:
             result << "B:I";
-            for (const uint32_t x : tag.ToUInt32Array())
+            for (const uint32_t x : tag.ToUInt32Array()) {
                 result << ',' << x;
+            }
             break;
         case TagDataType::FLOAT_ARRAY:
             result << "B:f";
-            for (const float x : tag.ToFloatArray())
+            for (const float x : tag.ToFloatArray()) {
                 result << ',' << x;
+            }
             break;
         default:
             throw std::runtime_error{"[pbbam] SAM tag ERROR: unsupported tag-type encountered: " +
@@ -264,7 +280,9 @@ std::string SamTagCodec::Encode(const TagCollection& tags)
     for (const auto& tagIter : tags) {
         const std::string& name = tagIter.first;
         const Tag& tag = tagIter.second;
-        if (!result.str().empty()) result << '\t';
+        if (!result.str().empty()) {
+            result << '\t';
+        }
         result << Encode(name, tag);
     }
     return result.str();

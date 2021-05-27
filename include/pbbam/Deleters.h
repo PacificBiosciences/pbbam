@@ -17,7 +17,9 @@ struct GzFileDeleter
 {
     void operator()(gzFile fp) const noexcept
     {
-        if (fp) gzclose(fp);
+        if (fp) {
+            gzclose(fp);
+        }
         fp = nullptr;
     }
 };
@@ -44,7 +46,9 @@ struct HtslibFileDeleter
 {
     void operator()(samFile* file) const noexcept
     {
-        if (file) sam_close(file);
+        if (file) {
+            sam_close(file);
+        }
         file = nullptr;
     }
 };

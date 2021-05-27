@@ -23,8 +23,9 @@ TEST(BAM_ZmwChunkedFastaReader, standard_fasta_from_chunk)
         reader.Chunk(0);
 
         std::vector<std::string> names;
-        for (const auto& seq : reader)
+        for (const auto& seq : reader) {
             names.push_back(seq.Name());
+        }
         EXPECT_EQ(expectedNames, names);
     }
     {
@@ -33,8 +34,9 @@ TEST(BAM_ZmwChunkedFastaReader, standard_fasta_from_chunk)
         reader.Chunk(2);
 
         std::vector<std::string> names;
-        for (const auto& seq : reader)
+        for (const auto& seq : reader) {
             names.push_back(seq.Name());
+        }
         EXPECT_EQ(expectedNames, names);
     }
     {
@@ -45,8 +47,9 @@ TEST(BAM_ZmwChunkedFastaReader, standard_fasta_from_chunk)
         reader.Chunk(4);
 
         std::vector<std::string> names;
-        for (const auto& seq : reader)
+        for (const auto& seq : reader) {
             names.push_back(seq.Name());
+        }
         EXPECT_EQ(expectedNames, names);
     }
 }
@@ -61,8 +64,9 @@ TEST(BAM_ZmwChunkedFastqReader, standard_fastq_from_chunk)
         reader.Chunk(0);
 
         std::vector<std::string> names;
-        for (const auto& seq : reader)
+        for (const auto& seq : reader) {
             names.push_back(seq.Name());
+        }
         EXPECT_EQ(expectedNames, names);
     }
     {
@@ -71,8 +75,9 @@ TEST(BAM_ZmwChunkedFastqReader, standard_fastq_from_chunk)
         reader.Chunk(2);
 
         std::vector<std::string> names;
-        for (const auto& seq : reader)
+        for (const auto& seq : reader) {
             names.push_back(seq.Name());
+        }
         EXPECT_EQ(expectedNames, names);
     }
     {
@@ -83,8 +88,9 @@ TEST(BAM_ZmwChunkedFastqReader, standard_fastq_from_chunk)
         reader.Chunk(4);
 
         std::vector<std::string> names;
-        for (const auto& seq : reader)
+        for (const auto& seq : reader) {
             names.push_back(seq.Name());
+        }
         EXPECT_EQ(expectedNames, names);
     }
 }

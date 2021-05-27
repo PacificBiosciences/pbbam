@@ -32,8 +32,9 @@ public:
         // squashed pulse   -> data[i] == 0
         //
         const auto numPulses = pulseCalls.size();
-        for (size_t i = 0; i < numPulses; ++i)
+        for (size_t i = 0; i < numPulses; ++i) {
             data_[i] = std::isupper(pulseCalls.at(i));
+        }
     }
 
     Pulse2BaseCache() = delete;
@@ -95,7 +96,9 @@ public:
         //
         size_t inputIndex = 0;
         for (size_t i = 0; i < numPulses; ++i) {
-            if (data_[i]) result.push_back(pulseData.at(inputIndex));
+            if (data_[i]) {
+                result.push_back(pulseData.at(inputIndex));
+            }
             ++inputIndex;
         }
         return result;

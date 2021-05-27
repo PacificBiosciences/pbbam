@@ -19,7 +19,9 @@ namespace {
 
 boost::optional<ControlKit::CustomSequence> UpdateControlKitCache(const ControlKit& kit)
 {
-    if (!kit.HasChild("CustomSequence")) return boost::none;
+    if (!kit.HasChild("CustomSequence")) {
+        return boost::none;
+    }
 
     const auto& customSeq = kit.ChildText("CustomSequence");
     const auto lines = [](const std::string& input) {
@@ -35,8 +37,9 @@ boost::optional<ControlKit::CustomSequence> UpdateControlKitCache(const ControlK
         return result;
     }(customSeq);
 
-    if (lines.size() != 6)
+    if (lines.size() != 6) {
         throw std::runtime_error{"[pbbam] run metadata ERROR: malformatted CustomSequence node"};
+    }
 
     return ControlKit::CustomSequence{lines.at(1), lines.at(3), lines.at(5)};
 }
@@ -57,7 +60,9 @@ void CollectionMetadataElementFromXml(const pugi::xml_node& xmlNode,
                                       internal::DataSetElement& parent)
 {
     const std::string label = xmlNode.name();
-    if (label.empty()) return;
+    if (label.empty()) {
+        return;
+    }
 
     // TODO(DB): This is getting a bit 'hacky'. Should revisit namespace-
     //           handling internally.
@@ -67,12 +72,13 @@ void CollectionMetadataElementFromXml(const pugi::xml_node& xmlNode,
     //  - 'BioSample' & 'BioSamples' which are 'pbsample'
     ///
     const XsdType xsdType = [&]() {
-        if (label.find("BioSample") != std::string::npos)
+        if (label.find("BioSample") != std::string::npos) {
             return XsdType::SAMPLE_INFO;
-        else if (label.find("AutomationParameter") != std::string::npos)
+        } else if (label.find("AutomationParameter") != std::string::npos) {
             return XsdType::BASE_DATA_MODEL;
-        else
+        } else {
             return XsdType::COLLECTION_METADATA;
+        }
     }();
 
     internal::DataSetElement e{label, xsdType};
@@ -416,7 +422,9 @@ std::string AutomationParameters::GetParameter(const std::string& param) const
     const size_t count = NumChildren();
     for (size_t i = 0; i < count; ++i) {
         const internal::DataSetElement& child = *(children_.at(i).get());
-        if (child.Attribute("Name") == param) return child.Attribute("SimpleValue");
+        if (child.Attribute("Name") == param) {
+            return child.Attribute("SimpleValue");
+        }
     }
 
     throw std::runtime_error{""};
@@ -446,7 +454,9 @@ bool AutomationParameters::HasParameter(const std::string& param) const
     const size_t count = NumChildren();
     for (size_t i = 0; i < count; ++i) {
         const internal::DataSetElement* child = children_.at(i).get();
-        if (child->Attribute("Name") == param) return true;
+        if (child->Attribute("Name") == param) {
+            return true;
+        }
     }
 
     return false;
@@ -514,13 +524,17 @@ bool ControlKit::HasPartNumber() const { return HasAttribute(Element::PartNumber
 
 const std::string& ControlKit::LeftAdapter() const
 {
-    if (!cache_) cache_ = UpdateControlKitCache(*this);
+    if (!cache_) {
+        cache_ = UpdateControlKitCache(*this);
+    }
     return cache_->LeftAdapter;
 }
 
 ControlKit& ControlKit::LeftAdapter(std::string s)
 {
-    if (!cache_) cache_ = UpdateControlKitCache(*this);
+    if (!cache_) {
+        cache_ = UpdateControlKitCache(*this);
+    }
     cache_->LeftAdapter = s;
     UpdateControlKit(cache_, *this);
     return *this;
@@ -530,13 +544,17 @@ bool ControlKit::HasLeftAdapter() const { return !LeftAdapter().empty(); }
 
 const std::string& ControlKit::RightAdapter() const
 {
-    if (!cache_) cache_ = UpdateControlKitCache(*this);
+    if (!cache_) {
+        cache_ = UpdateControlKitCache(*this);
+    }
     return cache_->RightAdapter;
 }
 
 ControlKit& ControlKit::RightAdapter(std::string s)
 {
-    if (!cache_) cache_ = UpdateControlKitCache(*this);
+    if (!cache_) {
+        cache_ = UpdateControlKitCache(*this);
+    }
     cache_->RightAdapter = s;
     UpdateControlKit(cache_, *this);
     return *this;
@@ -546,13 +564,17 @@ bool ControlKit::HasRightAdapter() const { return !RightAdapter().empty(); }
 
 const std::string& ControlKit::Sequence() const
 {
-    if (!cache_) cache_ = UpdateControlKitCache(*this);
+    if (!cache_) {
+        cache_ = UpdateControlKitCache(*this);
+    }
     return cache_->Sequence;
 }
 
 ControlKit& ControlKit::Sequence(std::string s)
 {
-    if (!cache_) cache_ = UpdateControlKitCache(*this);
+    if (!cache_) {
+        cache_ = UpdateControlKitCache(*this);
+    }
     cache_->Sequence = s;
     UpdateControlKit(cache_, *this);
     return *this;

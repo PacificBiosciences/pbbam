@@ -21,10 +21,11 @@ int Workflow::Runner(const CLI_v2::Results& args)
         .Version(PbMerge::Version);
 
     BAM::DataSet dataset;
-    if (settings.InputFiles.size() == 1)
+    if (settings.InputFiles.size() == 1) {
         dataset = BAM::DataSet(settings.InputFiles.front());
-    else
+    } else {
         dataset = BAM::DataSet(settings.InputFiles);
+    }
 
     BAM::BamFileMerger::Merge(dataset, settings.OutputFile, settings.CreatePbi, mergeProgram);
 

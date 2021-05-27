@@ -66,17 +66,22 @@ Settings::Settings(const CLI_v2::Results& args) : OutputFile(args[Options::Outpu
 {
     // input file(s)
     const auto& posArgs = args.PositionalArguments();
-    if (posArgs.empty()) throw std::runtime_error{"at least input one file must be specified"};
+    if (posArgs.empty()) {
+        throw std::runtime_error{"at least input one file must be specified"};
+    }
     InputFiles = posArgs;
 
     // output (stdout?)
-    if (OutputFile.empty()) OutputFile = "-";
+    if (OutputFile.empty()) {
+        OutputFile = "-";
+    }
 
     // create PBI?
-    if (OutputFile == "-")
+    if (OutputFile == "-") {
         CreatePbi = false;  // always skip PBI if writing to stdout
-    else
+    } else {
         CreatePbi = !args[Options::NoPbi];  // create PBI unless requested
+    }
 }
 
 }  // namespace PbMerge

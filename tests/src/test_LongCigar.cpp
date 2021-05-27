@@ -19,8 +19,6 @@ using CigarOp = PacBio::BAM::CigarOperation;
 using PacBio::BAM::CigarOperationType;
 using Tag = PacBio::BAM::Tag;
 
-// clang-format off
-
 namespace LongCigarTests {
 
 bool DoesHtslibSupportLongCigar()
@@ -29,21 +27,22 @@ bool DoesHtslibSupportLongCigar()
 
     // remove any "-<blah>" for non-release versions
     const auto versionBase = PacBio::BAM::Split(htsVersion, '-');
-    if (versionBase.empty())
+    if (versionBase.empty()) {
         throw std::runtime_error{"invalid htslib version format: " + htsVersion};
+    }
 
     // grab major/minor version numbers
     const auto versionParts = PacBio::BAM::Split(versionBase[0], '.');
-    if (versionParts.size() < 2)
-         throw std::runtime_error{"invalid htslib version format: " + htsVersion};
+    if (versionParts.size() < 2) {
+        throw std::runtime_error{"invalid htslib version format: " + htsVersion};
+    }
 
     // check against v1.7
     const int versionMajor = std::stoi(versionParts[0]);
     const int versionMinor = std::stoi(versionParts[1]);
     static constexpr const int v17_major = 1;
     static constexpr const int v17_minor = 7;
-    return std::tie(versionMajor, versionMinor) >=
-           std::tie(v17_major, v17_minor);
+    return std::tie(versionMajor, versionMinor) >= std::tie(v17_major, v17_minor);
 }
 
 const bool has_native_long_cigar_support = DoesHtslibSupportLongCigar();
@@ -94,7 +93,7 @@ TEST(BAM_LongCigar, can_edit_long_cigar)
 
 TEST(BAM_LongCigar, can_write_long_cigar)
 {
-    {   // edit & write
+    {  // edit & write
         auto b = LongCigarTests::ReadLongCigarRecord(LongCigarTests::LongCigarBam);
         b.Impl().CigarData(b.CigarData());
 
@@ -109,7 +108,7 @@ TEST(BAM_LongCigar, can_write_long_cigar)
         writer.Write(b);
     }
 
-    {   // read back in
+    {  // read back in
         const auto b = LongCigarTests::ReadLongCigarRecord(LongCigarTests::LongCigarOut);
 
         EXPECT_EQ(LongCigarTests::numOps, b.CigarData().size());
@@ -120,5 +119,3 @@ TEST(BAM_LongCigar, can_write_long_cigar)
         }
     }
 }
-
-// clang-format on

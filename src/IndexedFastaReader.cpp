@@ -33,7 +33,9 @@ void ClipAndGapify(std::string& subseq, const Data::Cigar& cigar, bool exciseSof
         const auto opLength = op.Length();
 
         // do nothing for hard clips
-        if (type == Data::CigarOperationType::HARD_CLIP) continue;
+        if (type == Data::CigarOperationType::HARD_CLIP) {
+            continue;
+        }
 
         // maybe remove soft clips
         if (type == Data::CigarOperationType::SOFT_CLIP) {
@@ -102,7 +104,9 @@ IndexedFastaReader::IndexedFastaReader(IndexedFastaReader&&) noexcept = default;
 
 IndexedFastaReader& IndexedFastaReader::operator=(const IndexedFastaReader& rhs)
 {
-    if (this != &rhs) *this = IndexedFastaReader{rhs};
+    if (this != &rhs) {
+        *this = IndexedFastaReader{rhs};
+    }
     return *this;
 }
 
@@ -117,7 +121,9 @@ std::string IndexedFastaReader::Subsequence(const std::string& id, Data::Positio
     // htslib is dumb and will not consider empty intervals valid,
     // that is, a call to faidx_fetch_seq will *always* return a
     // sequence consisting of at least one base.
-    if (begin == end) return std::string{};
+    if (begin == end) {
+        return std::string{};
+    }
 
     int len;
     // Derek: *Annoyingly* htslib seems to interpret "end" as inclusive in
@@ -163,12 +169,15 @@ std::string IndexedFastaReader::ReferenceSubsequence(const BamRecord& bamRecord,
     std::string subseq = Subsequence(bamRecord.ReferenceName(), bamRecord.ReferenceStart(),
                                      bamRecord.ReferenceEnd());
 
-    if (bamRecord.Impl().IsMapped() && gapped)
+    if (bamRecord.Impl().IsMapped() && gapped) {
         ClipAndGapify(subseq, bamRecord.Impl().CigarData(), exciseSoftClips);
+    }
 
     const auto reverse =
         (orientation != Data::Orientation::GENOMIC) && bamRecord.Impl().IsReverseStrand();
-    if (reverse) ReverseComplementCaseSens(subseq);
+    if (reverse) {
+        ReverseComplementCaseSens(subseq);
+    }
 
     return subseq;
 }
@@ -179,8 +188,9 @@ std::vector<std::string> IndexedFastaReader::Names() const
 {
     std::vector<std::string> names;
     names.reserve(NumSequences());
-    for (int i = 0; i < NumSequences(); ++i)
+    for (int i = 0; i < NumSequences(); ++i) {
         names.emplace_back(faidx_iseq(d_->handle_.get(), i));
+    }
     return names;
 }
 

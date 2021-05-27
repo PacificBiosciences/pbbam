@@ -61,9 +61,9 @@ void FastqWriter::Write(const std::string& name, const std::string& bases, const
 {
     file_ << "@" << name << '\n' << bases << '\n' << "+\n";
 
-    if (!quals.empty())
+    if (!quals.empty()) {
         file_ << quals;
-    else {
+    } else {
         std::string q(bases.size(), '!');
         file_ << q;
     }

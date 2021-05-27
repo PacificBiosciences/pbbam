@@ -83,7 +83,9 @@ public:
         static const bool has_native_long_cigar_support = DoesHtslibSupportLongCigar();
         const auto cigar = record.CigarData();
         if (!has_native_long_cigar_support && cigar.size() > 65535) {
-            if (record.Impl().HasTag("CG")) record.Impl().RemoveTag("CG");
+            if (record.Impl().HasTag("CG")) {
+                record.Impl().RemoveTag("CG");
+            }
             record.Impl().SetCigarData(cigar);
         }
 
@@ -122,9 +124,10 @@ SamWriter::~SamWriter() = default;
 void SamWriter::TryFlush()
 {
     const auto ret = d_->file_.get()->fp.hfile;
-    if (ret != nullptr)
+    if (ret != nullptr) {
         throw std::runtime_error{
             "[pbbam] SAM writer ERROR: could not flush output buffer contents"};
+    }
 }
 
 void SamWriter::Write(const BamRecord& record) { d_->Write(record); }

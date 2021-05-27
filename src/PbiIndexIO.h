@@ -68,7 +68,9 @@ void PbiIndexIO::LoadBgzfVector(BGZF* fp, std::vector<T>& data, const uint32_t n
     assert(fp);
     data.resize(numReads);
     auto ret = bgzf_read(fp, &data[0], numReads * sizeof(T));
-    if (fp->is_be) SwapEndianness(data);
+    if (fp->is_be) {
+        SwapEndianness(data);
+    }
     std::ignore = ret;
 }
 
@@ -81,16 +83,19 @@ void PbiIndexIO::SwapEndianness(std::vector<T>& data)
         case 1:
             break;  // no swapping necessary
         case 2:
-            for (size_t i = 0; i < numReads; ++i)
+            for (size_t i = 0; i < numReads; ++i) {
                 ed_swap_2p(&data[i]);
+            }
             break;
         case 4:
-            for (size_t i = 0; i < numReads; ++i)
+            for (size_t i = 0; i < numReads; ++i) {
                 ed_swap_4p(&data[i]);
+            }
             break;
         case 8:
-            for (size_t i = 0; i < numReads; ++i)
+            for (size_t i = 0; i < numReads; ++i) {
                 ed_swap_8p(&data[i]);
+            }
             break;
         default:
             throw std::runtime_error{"unsupported element size"};
@@ -102,7 +107,9 @@ void PbiIndexIO::WriteBgzfVector(BGZF* fp, const std::vector<T>& data)
 {
     assert(fp);
     std::vector<T> output = data;
-    if (fp->is_be) SwapEndianness(output);
+    if (fp->is_be) {
+        SwapEndianness(output);
+    }
     auto ret = bgzf_write(fp, &output[0], data.size() * sizeof(T));
     std::ignore = ret;
 }

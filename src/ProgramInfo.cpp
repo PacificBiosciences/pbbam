@@ -51,7 +51,9 @@ ProgramInfo ProgramInfo::FromSam(const std::string& sam)
 {
     // pop off '@PG\t', then split rest of line into tokens
     const auto tokens = Split(sam.substr(4), '\t');
-    if (tokens.empty()) return {};
+    if (tokens.empty()) {
+        return {};
+    }
 
     ProgramInfo prog;
     std::map<std::string, std::string> custom;
@@ -62,18 +64,23 @@ ProgramInfo ProgramInfo::FromSam(const std::string& sam)
         auto tokenValue = token.substr(3);
 
         // set program contents
-        // clang-format off
-        if      (tokenTag == ProgramInfoTokenID) prog.Id(std::move(tokenValue));
-        else if (tokenTag == ProgramInfoTokenCL) prog.CommandLine(std::move(tokenValue));
-        else if (tokenTag == ProgramInfoTokenDS) prog.Description(std::move(tokenValue));
-        else if (tokenTag == ProgramInfoTokenPN) prog.Name(std::move(tokenValue));
-        else if (tokenTag == ProgramInfoTokenPP) prog.PreviousProgramId(std::move(tokenValue));
-        else if (tokenTag == ProgramInfoTokenVN) prog.Version(std::move(tokenValue));
-        // clang-format on
+        if (tokenTag == ProgramInfoTokenID) {
+            prog.Id(std::move(tokenValue));
+        } else if (tokenTag == ProgramInfoTokenCL) {
+            prog.CommandLine(std::move(tokenValue));
+        } else if (tokenTag == ProgramInfoTokenDS) {
+            prog.Description(std::move(tokenValue));
+        } else if (tokenTag == ProgramInfoTokenPN) {
+            prog.Name(std::move(tokenValue));
+        } else if (tokenTag == ProgramInfoTokenPP) {
+            prog.PreviousProgramId(std::move(tokenValue));
+        } else if (tokenTag == ProgramInfoTokenVN) {
+            prog.Version(std::move(tokenValue));
 
-        // otherwise, "custom" tag
-        else
+            // otherwise, "custom" tag
+        } else {
             custom[tokenTag] = std::move(tokenValue);
+        }
     }
 
     prog.CustomTags(custom);
@@ -113,17 +120,26 @@ std::string ProgramInfo::ToSam() const
     std::ostringstream out;
     out << "@PG" << MakeSamTag(ProgramInfoTokenID, id_);
 
-    // clang-format off
-    if (!name_.empty())              out << MakeSamTag(ProgramInfoTokenPN, name_);
-    if (!version_.empty())           out << MakeSamTag(ProgramInfoTokenVN, version_);
-    if (!description_.empty())       out << MakeSamTag(ProgramInfoTokenDS, description_);
-    if (!previousProgramId_.empty()) out << MakeSamTag(ProgramInfoTokenPP, previousProgramId_);
-    if (!commandLine_.empty())       out << MakeSamTag(ProgramInfoTokenCL, commandLine_);
-    // clang-format on
+    if (!name_.empty()) {
+        out << MakeSamTag(ProgramInfoTokenPN, name_);
+    }
+    if (!version_.empty()) {
+        out << MakeSamTag(ProgramInfoTokenVN, version_);
+    }
+    if (!description_.empty()) {
+        out << MakeSamTag(ProgramInfoTokenDS, description_);
+    }
+    if (!previousProgramId_.empty()) {
+        out << MakeSamTag(ProgramInfoTokenPP, previousProgramId_);
+    }
+    if (!commandLine_.empty()) {
+        out << MakeSamTag(ProgramInfoTokenCL, commandLine_);
+    }
 
     // append any custom tags
-    for (const auto& attribute : custom_)
+    for (const auto& attribute : custom_) {
         out << MakeSamTag(attribute.first, attribute.second);
+    }
     return out.str();
 }
 

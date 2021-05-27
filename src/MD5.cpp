@@ -14,8 +14,9 @@ class Md5ContextHelper
 public:
     Md5ContextHelper() : data_(hts_md5_init())
     {
-        if (data_ == nullptr)
+        if (data_ == nullptr) {
             throw std::runtime_error{"[pbbam] MD5 hash ERROR: could not initialize context"};
+        }
     }
 
     ~Md5ContextHelper() { hts_md5_destroy(data_); }

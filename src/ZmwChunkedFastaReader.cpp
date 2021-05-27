@@ -93,7 +93,9 @@ public:
 
     bool GetNext(FastaSequence& record)
     {
-        if (remaining == 0) return false;
+        if (remaining == 0) {
+            return false;
+        }
         record = reader_->ReadNextFasta(firstRecord);
         if (firstRecord) {
             record.Name(reader_->chunker_.Chunk(currentChunkId_).FirstSeqName);

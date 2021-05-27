@@ -79,7 +79,9 @@ TEST(BAM_DataSetIO, can_create_from_multiple_bam_paths)
     std::ifstream fofn(DataSetIOTests::bamGroupFofn);
     std::vector<std::string> files;
     std::string file;
-    while (std::getline(fofn, file)) if (!file.empty()) files.emplace_back(file);
+    while (std::getline(fofn, file)) { if (!file.empty()) { files.emplace_back(file);
+}
+}
     DataSet dataset(files);
     EXPECT_EQ(3, dataset.ExternalResources().Size());
 }

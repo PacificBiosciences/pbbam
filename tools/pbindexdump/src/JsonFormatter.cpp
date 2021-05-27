@@ -38,9 +38,15 @@ void FormatMetadata(const BAM::PbiRawData& index, JSON::Json& result)
 
     JSON::Json fileSections;
     fileSections.push_back("BasicData");
-    if (index.HasBarcodeData()) fileSections.push_back("BarcodeData");
-    if (index.HasMappedData()) fileSections.push_back("MappedData");
-    if (index.HasReferenceData()) fileSections.push_back("ReferenceData");
+    if (index.HasBarcodeData()) {
+        fileSections.push_back("BarcodeData");
+    }
+    if (index.HasMappedData()) {
+        fileSections.push_back("MappedData");
+    }
+    if (index.HasReferenceData()) {
+        fileSections.push_back("ReferenceData");
+    }
 
     result["version"] = version;
     result["fileSections"] = fileSections;
@@ -168,10 +174,11 @@ void JsonFormatter::Run(const Settings& settings)
     FormatMetadata(index, result);
     FormatReferences(index, result);
 
-    if (settings.JsonRaw)
+    if (settings.JsonRaw) {
         FormatRaw(index, result);
-    else
+    } else {
         FormatRecords(index, result);
+    }
 
     // print
     std::cout << result.dump(settings.JsonIndentLevel) << '\n';

@@ -67,11 +67,13 @@ void checkFilterRows(const PbiFilter& filter, const std::vector<size_t> expected
 {
     if (expectedRows.empty())
     {
-        for (size_t row = 0; row < shared_index.NumReads(); ++row)
+        for (size_t row = 0; row < shared_index.NumReads(); ++row) {
             EXPECT_FALSE(filter.Accepts(shared_index, row));
+}
     } else {
-        for (size_t row : expectedRows)
+        for (size_t row : expectedRows) {
             EXPECT_TRUE(filter.Accepts(shared_index, row));
+}
     }
 }
 
@@ -558,30 +560,34 @@ TEST(BAM_PbiFilter, can_filter_on_movie_name)
     {
         const auto filter = PbiFilter{ PbiMovieNameFilter{ "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0" } };
         const auto expectedRows = std::vector<size_t>{0,1,2,3};
-        for (size_t row : expectedRows)
+        for (size_t row : expectedRows) {
             EXPECT_TRUE(filter.Accepts(index, row));
+}
     }
     {
         const auto filter = PbiFilter{ PbiMovieNameFilter{ "does_not_exist" } };
         const auto expectedRows = std::vector<size_t>{};
-        for (size_t row : expectedRows)
+        for (size_t row : expectedRows) {
             EXPECT_TRUE(filter.Accepts(index, row));
+}
     }
     {
         const auto names = std::vector<std::string>{"does_not_exist",
                                           "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0"};
         const auto filter = PbiFilter{ PbiMovieNameFilter{ names } };
         const auto expectedRows = std::vector<size_t>{0,1,2,3};
-        for (size_t row : expectedRows)
+        for (size_t row : expectedRows) {
             EXPECT_TRUE(filter.Accepts(index, row));
+}
     }
     {
         // blacklist
         const auto names = std::vector<std::string>{"does_not_exist",
                                           "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0"};
         const auto filter = PbiFilter{ PbiMovieNameFilter{ names, Compare::NOT_CONTAINS } };
-        for (size_t row = 0; row < index.NumReads(); ++row)
+        for (size_t row = 0; row < index.NumReads(); ++row) {
             EXPECT_FALSE(filter.Accepts(index, row));
+}
     }
 }
 
@@ -663,20 +669,23 @@ TEST(BAM_PbiFilter, can_filter_on_num_subreads)
     {   // >= 3
         const auto filter = PbiNumSubreadsFilter{ 3, Compare::GREATER_THAN_EQUAL };
         const std::vector<size_t> expectedRows {0,1,2,5,6,7,8,9,11,12,13,14,15,16,17};
-        for (size_t row : expectedRows)
+        for (size_t row : expectedRows) {
             EXPECT_TRUE(filter.Accepts(index, row));
+}
     }
     {   // < 3
         const auto filter = PbiNumSubreadsFilter{ 3, Compare::LESS_THAN };
         const std::vector<size_t> expectedRows {3,4,10,18,19,20};
-        for (size_t row : expectedRows)
+        for (size_t row : expectedRows) {
             EXPECT_TRUE(filter.Accepts(index, row));
+}
     }
     {   // == 1
         const auto filter = PbiNumSubreadsFilter{ 1, Compare::EQUAL };
         const std::vector<size_t> expectedRows {10, 20};
-        for (size_t row : expectedRows)
+        for (size_t row : expectedRows) {
             EXPECT_TRUE(filter.Accepts(index, row));
+}
     }
 }
 
@@ -869,22 +878,25 @@ TEST(BAM_PbiFilter, can_filter_on_reference_name)
     {
         const auto filter = PbiFilter{ PbiReferenceNameFilter{ "lambda_NEB3011" } };
         const auto expectedRows = std::vector<size_t>{0,1,2,3};
-        for (size_t row : expectedRows)
+        for (size_t row : expectedRows) {
             EXPECT_TRUE(filter.Accepts(index, row));
+}
 
     }
     {
         const auto filter = PbiFilter{ PbiReferenceNameFilter{ "lambda_NEB3011", Compare::NOT_EQUAL } };
         const auto expectedRows = std::vector<size_t>{};
-        for (size_t row : expectedRows)
+        for (size_t row : expectedRows) {
             EXPECT_TRUE(filter.Accepts(index, row));
+}
     }
     {
         const auto names = std::vector<std::string>({ "lambda_NEB3011" }); // this file only has 1 :(
         const auto filter = PbiFilter{ PbiReferenceNameFilter{ names } };
         const auto expectedRows = std::vector<size_t>{0,1,2,3};
-        for (size_t row : expectedRows)
+        for (size_t row : expectedRows) {
             EXPECT_TRUE(filter.Accepts(index, row));
+}
     }
 
     // unsupported compare types throw

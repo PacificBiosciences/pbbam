@@ -164,16 +164,17 @@ void UpdateRegistry(const std::string& attributeName, const std::string& attribu
 {
     std::vector<std::string> nameParts = Split(attributeName, ':');
     assert(!nameParts.empty());
-    if (nameParts.size() > 2)
+    if (nameParts.size() > 2) {
         throw std::runtime_error{"[pbbam] XML reader ERROR: malformed xmlns attribute: " +
                                  attributeName};
+    }
 
     const bool isDefault = (nameParts.size() == 1);
     const XsdType xsd = registry.XsdForUri(attributeValue);
 
-    if (isDefault)
+    if (isDefault) {
         registry.SetDefaultXsd(xsd);
-    else {
+    } else {
         assert(nameParts.size() == 2);
         const std::string& name = nameParts.at(1);
         const std::string& uri = attributeValue;
@@ -189,7 +190,9 @@ void FromXml(const pugi::xml_node& xmlNode, DataSetElement& parent)
     // pugi::xml separates XML parts into more node types than we use
     //
     const std::string label = xmlNode.name();
-    if (label.empty()) return;
+    if (label.empty()) {
+        return;
+    }
 
     auto e = MakeElement(xmlNode);
     e->Label(xmlNode.name());
@@ -198,8 +201,9 @@ void FromXml(const pugi::xml_node& xmlNode, DataSetElement& parent)
     // iterate attributes
     auto attrIter = xmlNode.attributes_begin();
     auto attrEnd = xmlNode.attributes_end();
-    for (; attrIter != attrEnd; ++attrIter)
+    for (; attrIter != attrEnd; ++attrIter) {
         e->Attribute(attrIter->name(), attrIter->value());
+    }
 
     // iterate children, recursively building up subtree
     auto childIter = xmlNode.begin();
@@ -227,8 +231,9 @@ std::unique_ptr<DataSetBase> XmlReader::FromStream(std::istream& in)
 
     // parse top-level attributes
     pugi::xml_node rootNode = doc.document_element();
-    if (rootNode == pugi::xml_node())
+    if (rootNode == pugi::xml_node()) {
         throw std::runtime_error{"[pbbam] XML reader ERROR: could not fetch XML root node"};
+    }
 
     // create dataset matching type strings
     auto dataset = MakeDataSetBase(rootNode);

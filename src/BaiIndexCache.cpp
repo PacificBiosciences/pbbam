@@ -59,8 +59,9 @@ BaiIndexCache MakeBaiIndexCache(const std::vector<BamFile>& bamFiles)
 {
     auto cache = std::make_shared<std::vector<std::shared_ptr<BaiIndexCacheData>>>();
     auto& indices = *cache.get();
-    for (const auto& bamFile : bamFiles)
+    for (const auto& bamFile : bamFiles) {
         indices.push_back(std::make_shared<BaiIndexCacheData>(bamFile));
+    }
     return cache;
 }
 

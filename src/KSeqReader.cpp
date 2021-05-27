@@ -44,8 +44,9 @@ std::string KSeqReader::Qualities() const { return std::string{seq_->qual.s, seq
 bool KSeqReader::ReadNext()
 {
     const auto result = kseq_read(seq_.get());
-    if (result == -1)  // EOF
+    if (result == -1) {  // EOF
         return false;
+    }
     return true;
 }
 

@@ -23,17 +23,30 @@ std::shared_ptr<internal::DataSetElement> MakeRunMetadataElement(const pugi::xml
     }
 
     const internal::FromInputXml fromInputXml;
-    if (name == Element::Automation) return std::make_shared<Automation>(fromInputXml);
-    if (name == Element::AutomationParameter)
+    if (name == Element::Automation) {
+        return std::make_shared<Automation>(fromInputXml);
+    }
+    if (name == Element::AutomationParameter) {
         return std::make_shared<AutomationParameter>(fromInputXml);
-    if (name == Element::AutomationParameters)
+    }
+    if (name == Element::AutomationParameters) {
         return std::make_shared<AutomationParameters>(fromInputXml);
-    if (name == Element::BindingKit) return std::make_shared<BindingKit>(fromInputXml);
-    if (name == Element::Collections) return std::make_shared<Collections>(fromInputXml);
-    if (name == Element::ControlKit) return std::make_shared<ControlKit>(fromInputXml);
-    if (name == Element::SequencingKitPlate)
+    }
+    if (name == Element::BindingKit) {
+        return std::make_shared<BindingKit>(fromInputXml);
+    }
+    if (name == Element::Collections) {
+        return std::make_shared<Collections>(fromInputXml);
+    }
+    if (name == Element::ControlKit) {
+        return std::make_shared<ControlKit>(fromInputXml);
+    }
+    if (name == Element::SequencingKitPlate) {
         return std::make_shared<SequencingKitPlate>(fromInputXml);
-    if (name == Element::TemplatePrepKit) return std::make_shared<TemplatePrepKit>(fromInputXml);
+    }
+    if (name == Element::TemplatePrepKit) {
+        return std::make_shared<TemplatePrepKit>(fromInputXml);
+    }
 
     return std::make_shared<internal::DataSetElement>(name, internal::FromInputXml{});
 }
@@ -41,7 +54,9 @@ std::shared_ptr<internal::DataSetElement> MakeRunMetadataElement(const pugi::xml
 void FromRunMetadataXml(const pugi::xml_node& xmlNode, internal::DataSetElement& parent)
 {
     const std::string label = xmlNode.name();
-    if (label.empty()) return;
+    if (label.empty()) {
+        return;
+    }
 
     auto e = MakeRunMetadataElement(xmlNode);
     e->Label(xmlNode.name());
@@ -50,8 +65,9 @@ void FromRunMetadataXml(const pugi::xml_node& xmlNode, internal::DataSetElement&
     // iterate attributes
     auto attrIter = xmlNode.attributes_begin();
     auto attrEnd = xmlNode.attributes_end();
-    for (; attrIter != attrEnd; ++attrIter)
+    for (; attrIter != attrEnd; ++attrIter) {
         e->Attribute(attrIter->name(), attrIter->value());
+    }
 
     // iterate children, recursively building up subtree
     auto childIter = xmlNode.begin();
@@ -71,8 +87,9 @@ CollectionMetadata SubreadSetCollection(const std::string& subreadSetName,
     const auto cmNode = subreadSetNode.child(Element::DataSetMetadata)
                             .child(Element::Collections)
                             .child(Element::CollectionMetadata);
-    if (!cmNode)
+    if (!cmNode) {
         throw std::runtime_error{"[pbbam] run metadata ERROR: XML is missing expected elements"};
+    }
 
     CollectionMetadata cm{subreadSetName};
     cm.Label(cmNode.name());
@@ -100,8 +117,9 @@ CollectionMetadata SubreadSetCollection(const std::string& subreadSetName,
 pugi::xml_node FetchSubreadSetsNode(const pugi::xml_document& doc)
 {
     const auto rootNode = doc.document_element();
-    if (!rootNode)
+    if (!rootNode) {
         throw std::runtime_error{"[pbbam] run metadata ERROR: could not fetch XML root node"};
+    }
     if (std::string{rootNode.name()} != Element::PacBioDataModel) {
         throw std::runtime_error{
             "[pbbam] run metadata ERROR: expected 'PacBioDataModel' as root node, instead "
@@ -114,8 +132,9 @@ pugi::xml_node FetchSubreadSetsNode(const pugi::xml_document& doc)
                             .child(Element::Run)
                             .child(Element::Outputs)
                             .child(Element::SubreadSets);
-    if (!result)
+    if (!result) {
         throw std::runtime_error{"[pbbam] run metadata ERROR: XML is missing expected elements"};
+    }
     return result;
 }
 

@@ -176,10 +176,11 @@ TEST(BAM_PacBioIndex, can_create_from_bam_file)
 
 ::testing::AssertionResult CanRead(BamReader& reader, BamRecord& record, int i)
 {
-    if (reader.GetNext(record))
+    if (reader.GetNext(record)) {
         return ::testing::AssertionSuccess() << "i: " << i;
-    else
+    } else {
         return ::testing::AssertionFailure() << "i: " << i;
+    }
 }
 
 TEST(BAM_PacBioIndex, can_create_inline_with_bam_writer)

@@ -26,7 +26,9 @@ FileProducer::FileProducer(std::string targetFilename, std::string tempFilename)
     //
     // setting temp filename to '-' keeps consistent interfaces
     // for derived classes to actually operate on temp filename
-    if (targetFilename_ == "-") tempFilename_ = "-";
+    if (targetFilename_ == "-") {
+        tempFilename_ = "-";
+    }
 }
 
 FileProducer::~FileProducer()

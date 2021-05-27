@@ -106,7 +106,9 @@ TEST(BAM_ZmwGroupQuery, round_robin_query_can_return_records_ignoring_dataset_fi
                                      PacBio::BAM::DataSetFilterMode::IGNORE};
     for (const auto& zmw : query) {
         ++zmwCount;
-        if (!zmw.empty()) holeNumbers.push_back(zmw.front().HoleNumber());
+        if (!zmw.empty()) {
+            holeNumbers.push_back(zmw.front().HoleNumber());
+        }
         recordCount += zmw.size();
     }
     EXPECT_EQ(90, zmwCount);       // 30 + 30 + 30
@@ -134,7 +136,9 @@ TEST(BAM_ZmwGroupQuery, sequential_query_can_return_records_ignoring_dataset_fil
                                      PacBio::BAM::DataSetFilterMode::IGNORE};
     for (const auto& zmw : query) {
         ++zmwCount;
-        if (!zmw.empty() && holeNumbers.size() < 5) holeNumbers.push_back(zmw.front().HoleNumber());
+        if (!zmw.empty() && holeNumbers.size() < 5) {
+            holeNumbers.push_back(zmw.front().HoleNumber());
+        }
         recordCount += zmw.size();
     }
     EXPECT_EQ(90, zmwCount);       // 30 + 30 + 30

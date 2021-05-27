@@ -24,8 +24,9 @@ TEST(BAM_BgzipFastqWriter, writes_bgzf_fastq_data_to_file)
 
     {
         BgzipFastqWriter writer{fn};
-        for (const auto& seq : sequences)
+        for (const auto& seq : sequences) {
             writer.Write(seq);
+        }
     }
     EXPECT_EQ(HtslibCompression::BGZIP, FormatUtils::CompressionType(fn));
 

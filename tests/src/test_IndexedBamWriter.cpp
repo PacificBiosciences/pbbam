@@ -104,8 +104,9 @@ TEST(BAM_IndexedBamWriter, can_handle_long_reads_spanning_bgzf_blocks)
         BamFile file{inBamFn};
         IndexedBamWriter writer{outBamFn, file.Header()};
         EntireFileQuery query{file};
-        for (const auto& b : query)
+        for (const auto& b : query) {
             writer.Write(b);
+}
     }
 
     {

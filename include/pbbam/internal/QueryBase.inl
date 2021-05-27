@@ -145,7 +145,9 @@ template <typename T>
 void QueryIteratorBase<T>::ReadNext()
 {
     assert(query_);
-    if (!query_->GetNext(record_)) query_ = nullptr;
+    if (!query_->GetNext(record_)) {
+        query_ = nullptr;
+    }
 }
 
 }  // namespace internal

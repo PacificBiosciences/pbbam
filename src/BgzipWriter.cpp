@@ -24,7 +24,9 @@ public:
     BgzipWriterPrivate(std::string filename,
                        const BgzipWriterConfig& config = BgzipWriterConfig{})  // : filename_
     {
-        if (config.UseTempFile) fileProducer_ = std::make_unique<FileProducer>(filename);
+        if (config.UseTempFile) {
+            fileProducer_ = std::make_unique<FileProducer>(filename);
+        }
 
         // open file
         usingFilename_ = (fileProducer_ ? fileProducer_->TempFilename() : filename);
@@ -44,11 +46,15 @@ public:
             actualNumThreads = std::thread::hardware_concurrency();
 
             // if still unknown, default to single-threaded
-            if (actualNumThreads == 0) actualNumThreads = 1;
+            if (actualNumThreads == 0) {
+                actualNumThreads = 1;
+            }
         }
 
         // if multithreading requested, enable it
-        if (actualNumThreads > 1) bgzf_mt(bgzf_.get(), actualNumThreads, 256);
+        if (actualNumThreads > 1) {
+            bgzf_mt(bgzf_.get(), actualNumThreads, 256);
+        }
     }
 
     size_t Write(const void* data, size_t numBytes)

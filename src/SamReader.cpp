@@ -26,10 +26,11 @@ public:
     explicit SamReaderPrivate(std::string fn) : filename_{std::move(fn)}
     {
         auto displayFilename = [&]() {
-            if (filename_ == "-")
+            if (filename_ == "-") {
                 return std::string{" stdin"};
-            else
+            } else {
                 return "\n  file: " + filename_;
+            }
         };
 
         htsFile_.reset(sam_open(filename_.c_str(), "r"));
@@ -90,23 +91,24 @@ bool SamReader::GetNext(BamRecord& record)
     }
 
     // EOF or end-of-data range (not an error)
-    else if (result == -1)
+    else if (result == -1) {
         return false;
 
-    // error corrupted file
-    else {
+        // error corrupted file
+    } else {
         std::ostringstream msg;
         msg << "[pbbam] SAM reader ERROR: cannot read from corrupted file:\n"
             << "  file: " << Filename() << '\n'
             << "  reason: ";
-        if (result == -2)
+        if (result == -2) {
             msg << "probably truncated";
-        else if (result == -3)
+        } else if (result == -3) {
             msg << "could not read SAM record's' core data";
-        else if (result == -4)
+        } else if (result == -4) {
             msg << "could not read SAM record's' variable-length data";
-        else
+        } else {
             msg << "unknown reason (status code = " << result << ") (" << Filename() << ')';
+        }
         throw std::runtime_error{msg.str()};
     }
 }
