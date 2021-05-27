@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/PbiBuilder.h>
 #include <pbbam/PbiRawData.h>

@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/PbiFilterQuery.h>
 
 #include <cstddef>

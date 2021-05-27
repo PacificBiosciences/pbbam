@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "CppFormatter.h"
 
 #include <cstdint>

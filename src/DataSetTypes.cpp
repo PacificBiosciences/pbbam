@@ -2,6 +2,7 @@
 
 #include <pbbam/DataSetTypes.h>
 
+#include <cassert>
 #include <cstddef>
 
 #include <ostream>

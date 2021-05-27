@@ -1,5 +1,7 @@
 #include <pbbam/internal/QueryBase.h>
 
+#include <cassert>
+
 namespace PacBio {
 namespace BAM {
 namespace internal {

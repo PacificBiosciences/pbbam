@@ -1,7 +1,6 @@
-// Author: Derek Barnett
-
 #include <pbbam/../../src/FileUtils.h>
 
+#include <cassert>
 #include <cctype>
 #include <chrono>
 #include <cstdio>

@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #ifndef PBINDEXDUMP_CPPFORMATTER_H
 #define PBINDEXDUMP_CPPFORMATTER_H
 

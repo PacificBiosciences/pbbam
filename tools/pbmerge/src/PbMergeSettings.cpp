@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbMergeSettings.h"
 
 #include <stdexcept>

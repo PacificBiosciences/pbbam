@@ -2,6 +2,8 @@
 
 #include "PbiBuilderBase.h"
 
+#include <cassert>
+
 namespace PacBio {
 namespace BAM {
 

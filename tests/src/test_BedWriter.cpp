@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/bed/BedWriter.h>
 
 #include <cstdio>

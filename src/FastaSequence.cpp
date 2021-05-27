@@ -2,7 +2,6 @@
 
 #include <pbbam/FastaSequence.h>
 
-#include <cassert>
 #include <cstdio>
 
 #include <exception>
@@ -13,17 +12,6 @@
 
 namespace PacBio {
 namespace BAM {
-
-static_assert(std::is_copy_constructible<FastaSequence>::value,
-              "FastaSequence(const FastaSequence&) is not = default");
-static_assert(std::is_copy_assignable<FastaSequence>::value,
-              "FastaSequence& operator=(const FastaSequence&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<FastaSequence>::value,
-              "FastaSequence(FastaSequence&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<FastaSequence>::value ==
-                  std::is_nothrow_move_assignable<std::string>::value,
-              "");
 
 FastaSequence::FastaSequence(std::string name, std::string bases)
     : name_{std::move(name)}, bases_{std::move(bases)}

@@ -2,8 +2,6 @@
 
 #include <pbbam/bed/BedWriter.h>
 
-#include <cassert>
-
 #include <sstream>
 #include <type_traits>
 
@@ -12,11 +10,6 @@
 
 namespace PacBio {
 namespace BED {
-
-static_assert(!std::is_copy_constructible<BedWriter>::value,
-              "BedWriter(const BedWriter&) is not = delete");
-static_assert(!std::is_copy_assignable<BedWriter>::value,
-              "BedWriter& operator=(const BedWriter&) is not = delete");
 
 class BedWriter::BedWriterPrivate
 {

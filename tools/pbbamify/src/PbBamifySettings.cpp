@@ -1,5 +1,3 @@
-// Author: Ivan Sovic
-
 #include "PbBamifySettings.h"
 
 #include <stdexcept>

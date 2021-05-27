@@ -1,5 +1,7 @@
 #include <pbbam/internal/DataSetElement.h>
 
+#include <cassert>
+
 #include <iostream>
 #include <stdexcept>
 #include <tuple>

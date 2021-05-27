@@ -2,7 +2,6 @@
 
 #include <pbbam/FastqSequence.h>
 
-#include <cassert>
 #include <cstdio>
 
 #include <numeric>
@@ -12,17 +11,6 @@
 
 namespace PacBio {
 namespace BAM {
-
-static_assert(std::is_copy_constructible<FastqSequence>::value,
-              "FastqSequence(const FastqSequence&) is not = default");
-static_assert(std::is_copy_assignable<FastqSequence>::value,
-              "FastqSequence& operator=(const FastqSequence&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<FastqSequence>::value,
-              "FastqSequence(FastqSequence&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<FastqSequence>::value ==
-                  std::is_nothrow_move_assignable<FastaSequence>::value,
-              "");
 
 FastqSequence::FastqSequence(std::string name, std::string bases, Data::QualityValues qualities)
     : FastaSequence{std::move(name), std::move(bases)}, qualities_{std::move(qualities)}

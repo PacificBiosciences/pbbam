@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/QualityValues.h>
 
 #include <cstddef>

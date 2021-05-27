@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #ifndef BAM2SAM_WORKFLOW_H
 #define BAM2SAM_WORKFLOW_H
 

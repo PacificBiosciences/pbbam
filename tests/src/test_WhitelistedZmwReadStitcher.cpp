@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/virtual/WhitelistedZmwReadStitcher.h>
 
 #include <cstdint>

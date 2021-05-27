@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "JsonFormatter.h"
 
 #include <cmath>

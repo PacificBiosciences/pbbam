@@ -2,6 +2,8 @@
 
 #include <pbbam/IndexedFastaReader.h>
 
+#include <cassert>
+
 #include <memory>
 #include <sstream>
 #include <stdexcept>

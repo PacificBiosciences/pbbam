@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #ifndef PBINDEXDUMP_JSONFORMATTER_H
 #define PBINDEXDUMP_JSONFORMATTER_H
 

@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/../../src/Pulse2BaseCache.h>
 
 #include <gtest/gtest.h>

@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/SamReader.h>
 #include <pbbam/SamWriter.h>
 

@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/EntireFileQuery.h>
 
 #include <cstdint>

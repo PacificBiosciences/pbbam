@@ -44,11 +44,6 @@ struct BamWriterException : public std::exception
     std::string msg_;
 };
 
-static_assert(!std::is_copy_constructible<BamWriter>::value,
-              "BamWriter(const BamWriter&) is not = delete");
-static_assert(!std::is_copy_assignable<BamWriter>::value,
-              "BamWriter& operator=(const BamWriter&) is not = delete");
-
 class BamWriter::BamWriterPrivate
 {
 public:

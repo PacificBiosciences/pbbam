@@ -1,5 +1,3 @@
-// Author: Ivan Sovic
-
 #ifndef PBBAMIFY_WORKFLOW_H
 #define PBBAMIFY_WORKFLOW_H
 

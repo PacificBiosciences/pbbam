@@ -3,8 +3,6 @@
 
 #include <pbbam/Config.h>
 
-#include <cassert>
-
 #include <algorithm>
 #include <map>
 #include <memory>

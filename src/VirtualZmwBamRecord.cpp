@@ -2,7 +2,6 @@
 
 #include <pbbam/virtual/VirtualZmwBamRecord.h>
 
-#include <cassert>
 #include <cstdint>
 
 #include <stdexcept>
@@ -17,16 +16,6 @@
 
 namespace PacBio {
 namespace BAM {
-
-static_assert(std::is_copy_constructible<VirtualZmwBamRecord>::value,
-              "VirtualZmwBamRecord(const VirtualZmwBamRecord&) is not = default");
-static_assert(std::is_copy_assignable<VirtualZmwBamRecord>::value,
-              "VirtualZmwBamRecord& operator=(const VirtualZmwBamRecord&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<VirtualZmwBamRecord>::value,
-              "VirtualZmwBamRecord(VirtualZmwBamRecord&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<VirtualZmwBamRecord>::value,
-              "VirtualZmwBamRecord& operator=(VirtualZmwBamRecord&&) is not = noexcept");
 
 VirtualZmwBamRecord::VirtualZmwBamRecord(std::vector<BamRecord> unorderedSources,
                                          const BamHeader& header)

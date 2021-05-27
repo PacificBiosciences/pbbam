@@ -2,6 +2,8 @@
 
 #include <pbbam/IndexedFastqReader.h>
 
+#include <cassert>
+
 #include <sstream>
 #include <stdexcept>
 #include <utility>

@@ -2,6 +2,7 @@
 
 #include "XmlWriter.h"
 
+#include <cassert>
 #include <cstddef>
 
 #include <map>

@@ -1,5 +1,7 @@
 #include <pbbam/PbiFilter.h>
 
+#include <cassert>
+
 #include <algorithm>
 #include <iostream>
 #include <map>

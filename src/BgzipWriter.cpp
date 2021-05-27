@@ -2,8 +2,6 @@
 
 #include <pbbam/BgzipWriter.h>
 
-#include <cassert>
-
 #include <sstream>
 #include <stdexcept>
 #include <thread>
@@ -19,11 +17,6 @@
 
 namespace PacBio {
 namespace BAM {
-
-static_assert(!std::is_copy_constructible<BgzipWriter>::value,
-              "BgzipWriter(const BgzipWriter&) is not = delete");
-static_assert(!std::is_copy_assignable<BgzipWriter>::value,
-              "BgzipWriter& operator=(const BgzipWriter&) is not = delete");
 
 class BgzipWriter::BgzipWriterPrivate
 {

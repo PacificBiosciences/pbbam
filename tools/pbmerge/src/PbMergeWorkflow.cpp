@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbMergeWorkflow.h"
 
 #include <pbbam/BamFileMerger.h>

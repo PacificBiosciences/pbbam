@@ -1,5 +1,3 @@
-// Author: Ivan Sovic
-
 #include <cstdlib>
 
 #include <iostream>

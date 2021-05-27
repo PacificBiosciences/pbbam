@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/DataSetXsd.h>
 
 #include <sstream>

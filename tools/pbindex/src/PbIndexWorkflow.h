@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #ifndef PBINDEX_WORKFLOW_H
 #define PBINDEX_WORKFLOW_H
 

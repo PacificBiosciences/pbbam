@@ -2,7 +2,6 @@
 
 #include <pbbam/PbiRawData.h>
 
-#include <cassert>
 #include <cstddef>
 #include <cstdint>
 
@@ -24,16 +23,6 @@ namespace BAM {
 // ----------------------------------
 // PbiRawBarcodeData implementation
 // ----------------------------------
-
-static_assert(std::is_copy_constructible<PbiRawBarcodeData>::value,
-              "PbiRawBarcodeData(const PbiRawBarcodeData&) is not = default");
-static_assert(std::is_copy_assignable<PbiRawBarcodeData>::value,
-              "PbiRawBarcodeData& operator=(const PbiRawBarcodeData&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<PbiRawBarcodeData>::value,
-              "PbiRawBarcodeData(PbiRawBarcodeData&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<PbiRawBarcodeData>::value,
-              "PbiRawBarcodeData& operator=(PbiRawBarcodeData&&) is not = noexcept");
 
 PbiRawBarcodeData::PbiRawBarcodeData(uint32_t numReads)
 {
@@ -72,16 +61,6 @@ void PbiRawBarcodeData::AddRecord(const BamRecord& b)
 // ----------------------------------
 // PbiRawMappedData implementation
 // ----------------------------------
-
-static_assert(std::is_copy_constructible<PbiRawMappedData>::value,
-              "PbiRawMappedData(const PbiRawMappedData&) is not = default");
-static_assert(std::is_copy_assignable<PbiRawMappedData>::value,
-              "PbiRawMappedData& operator=(const PbiRawMappedData&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<PbiRawMappedData>::value,
-              "PbiRawMappedData(PbiRawMappedData&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<PbiRawMappedData>::value,
-              "PbiRawMappedData& operator=(PbiRawMappedData&&) is not = noexcept");
 
 PbiRawMappedData::PbiRawMappedData(uint32_t numReads)
 {
@@ -146,16 +125,6 @@ uint32_t PbiRawMappedData::NumInsertedBasesAt(size_t recordIndex) const
 // PbiReferenceEntry implementation
 // ------------------------------------
 
-static_assert(std::is_copy_constructible<PbiReferenceEntry>::value,
-              "PbiReferenceEntry(const PbiReferenceEntry&) is not = default");
-static_assert(std::is_copy_assignable<PbiReferenceEntry>::value,
-              "PbiReferenceEntry& operator=(const PbiReferenceEntry&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<PbiReferenceEntry>::value,
-              "PbiReferenceEntry(PbiReferenceEntry&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<PbiReferenceEntry>::value,
-              "PbiReferenceEntry& operator=(PbiReferenceEntry&&) is not = noexcept");
-
 const PbiReferenceEntry::ID PbiReferenceEntry::UNMAPPED_ID = static_cast<PbiReferenceEntry::ID>(-1);
 const PbiReferenceEntry::Row PbiReferenceEntry::UNSET_ROW = static_cast<PbiReferenceEntry::Row>(-1);
 
@@ -172,31 +141,11 @@ PbiReferenceEntry::PbiReferenceEntry(ID id, Row beginRow, Row endRow)
 // PbiRawReferenceData implementation
 // ------------------------------------
 
-static_assert(std::is_copy_constructible<PbiRawReferenceData>::value,
-              "PbiRawReferenceData(const PbiRawReferenceData&) is not = default");
-static_assert(std::is_copy_assignable<PbiRawReferenceData>::value,
-              "PbiRawReferenceData& operator=(const PbiRawReferenceData&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<PbiRawReferenceData>::value,
-              "PbiRawReferenceData(PbiRawReferenceData&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<PbiRawReferenceData>::value,
-              "PbiRawReferenceData& operator=(PbiRawReferenceData&&) is not = noexcept");
-
 PbiRawReferenceData::PbiRawReferenceData(uint32_t numRefs) { entries_.reserve(numRefs); }
 
 // ----------------------------------
 // PbiRawBasicData implementation
 // ----------------------------------
-
-static_assert(std::is_copy_constructible<PbiRawBasicData>::value,
-              "PbiRawBasicData(const PbiRawBasicData&) is not = default");
-static_assert(std::is_copy_assignable<PbiRawBasicData>::value,
-              "PbiRawBasicData& operator=(const PbiRawBasicData&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<PbiRawBasicData>::value,
-              "PbiRawBasicData(PbiRawBasicData&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<PbiRawBasicData>::value,
-              "PbiRawBasicData& operator=(PbiRawBasicData&&) is not = noexcept");
 
 PbiRawBasicData::PbiRawBasicData(uint32_t numReads)
 {
@@ -244,17 +193,6 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
 // ----------------------------------
 // PbiRawData implementation
 // ----------------------------------
-
-static_assert(std::is_copy_constructible<PbiRawData>::value,
-              "PbiRawData(const PbiRawData&) is not = default");
-static_assert(std::is_copy_assignable<PbiRawData>::value,
-              "PbiRawData& operator=(const PbiRawData&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<PbiRawData>::value,
-              "PbiRawData(PbiRawData&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<PbiRawData>::value ==
-                  std::is_nothrow_move_assignable<std::string>::value,
-              "");
 
 PbiRawData::PbiRawData(std::string pbiFilename) : filename_{std::move(pbiFilename)}
 {

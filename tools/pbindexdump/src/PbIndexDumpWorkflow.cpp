@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbIndexDumpWorkflow.h"
 
 #include <cassert>

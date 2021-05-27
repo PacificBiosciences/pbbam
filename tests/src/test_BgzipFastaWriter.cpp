@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/BgzipFastaWriter.h>
 
 #include <algorithm>

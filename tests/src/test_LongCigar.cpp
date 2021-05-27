@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <string>
 #include <tuple>
 

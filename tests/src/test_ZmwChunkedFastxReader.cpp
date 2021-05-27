@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/ZmwChunkedFastaReader.h>
 #include <pbbam/ZmwChunkedFastqReader.h>
 

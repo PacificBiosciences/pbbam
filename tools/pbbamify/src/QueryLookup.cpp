@@ -1,5 +1,3 @@
-// Author: Ivan Sovic
-
 #include "QueryLookup.h"
 
 #include <sstream>

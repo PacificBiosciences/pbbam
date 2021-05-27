@@ -1,5 +1,3 @@
-// Author: Derek Barnett, Lance Hepler
-
 #include <pbbam/ReadGroupInfo.h>
 
 #include <cstddef>

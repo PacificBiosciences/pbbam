@@ -2,7 +2,6 @@
 
 #include <pbbam/virtual/WhitelistedZmwReadStitcher.h>
 
-#include <cassert>
 #include <cstdint>
 
 #include <sstream>
