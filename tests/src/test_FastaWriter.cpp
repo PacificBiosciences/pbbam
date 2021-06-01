@@ -56,8 +56,9 @@ TEST(BAM_FastaWriter, can_write_fasta_from_bam)
     {
         FastaWriter writer{outFasta};
         EntireFileQuery query{fn};
-        for (const auto& bam : query)
+        for (const auto& bam : query) {
             writer.Write(bam);
+        }
     }
     const auto seqs = FastaReader::ReadAll(outFasta);
     ASSERT_EQ(4, seqs.size());

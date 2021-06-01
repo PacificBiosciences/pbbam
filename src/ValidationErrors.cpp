@@ -18,7 +18,9 @@ const size_t ValidationErrors::MAX;
 ValidationErrors::ValidationErrors(const size_t maxNumErrors)
     : maxNumErrors_{maxNumErrors}, currentNumErrors_{0}
 {
-    if (maxNumErrors_ == 0) maxNumErrors_ = ValidationErrors::MAX;
+    if (maxNumErrors_ == 0) {
+        maxNumErrors_ = ValidationErrors::MAX;
+    }
 }
 
 void ValidationErrors::AddFileError(const std::string& fn, std::string details)
@@ -57,7 +59,9 @@ size_t ValidationErrors::MaxNumErrors() const { return maxNumErrors_; }
 void ValidationErrors::OnErrorAdded()
 {
     ++currentNumErrors_;
-    if (currentNumErrors_ == maxNumErrors_) ThrowErrors();
+    if (currentNumErrors_ == maxNumErrors_) {
+        ThrowErrors();
+    }
 }
 
 void ValidationErrors::ThrowErrors()

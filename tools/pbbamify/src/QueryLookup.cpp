@@ -25,8 +25,9 @@ void QueryLookup::Load()
         if (!headerInitialized) {
             jointHeader = header.DeepCopy();
             headerInitialized = true;
-        } else
+        } else {
             jointHeader += header;
+        }
     }
 
     // Set-up a vector of readers for each BAM in the PacBio dataset
@@ -62,11 +63,11 @@ void QueryLookup::Load()
         std::transform(type.begin(), type.end(), type.begin(), ::tolower);
 
         out.str("");
-        if (type == "subread")
+        if (type == "subread") {
             out << movieName << '/' << zmw << '/' << qStart << '_' << qEnd;
-        else if (type == "ccs")
+        } else if (type == "ccs") {
             out << movieName << '/' << zmw << '/' << "ccs";
-        else {
+        } else {
             out << "Unknown read group type '" << type << "'.";
             throw std::runtime_error(out.str());
         }
@@ -89,10 +90,14 @@ void QueryLookup::Load()
 bool QueryLookup::Find(const std::string& qName, BAM::BamRecord& record) const
 {
     const auto it = lookup_.find(qName);
-    if (it == lookup_.end()) return false;
+    if (it == lookup_.end()) {
+        return false;
+    }
 
     readers_.at(it->second.fileNumber)->VirtualSeek(it->second.fileOffset);
-    if (!readers_.at(it->second.fileNumber)->GetNext(record)) return false;
+    if (!readers_.at(it->second.fileNumber)->GetNext(record)) {
+        return false;
+    }
 
     return true;
 }

@@ -111,7 +111,9 @@ TagCollection BamTagCodec::Decode(const std::vector<uint8_t>& data)
                 const size_t dataLength = strlen(reinterpret_cast<const char*>(&pData[i]));
                 const std::string value(reinterpret_cast<const char*>(&pData[i]), dataLength);
                 tags[tagName] = value;
-                if (tagType == 'H') tags[tagName].Modifier(TagModifier::HEX_STRING);
+                if (tagType == 'H') {
+                    tags[tagName].Modifier(TagModifier::HEX_STRING);
+                }
                 i += dataLength + 1;
                 break;
             }
@@ -169,12 +171,15 @@ std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
     for (const auto& tagIter : tags) {
 
         const auto& name = tagIter.first;
-        if (name.size() != 2)
+        if (name.size() != 2) {
             throw std::runtime_error{"[pbbam] BAM tag format ERROR: tag name (" + name +
                                      ") must have 2 characters only"};
+        }
 
         const auto& tag = tagIter.second;
-        if (tag.IsNull()) continue;
+        if (tag.IsNull()) {
+            continue;
+        }
 
         // "<TAG>:"
         kputsn_(name.c_str(), 2, &str);
@@ -228,10 +233,11 @@ std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
             }
 
             case TagDataType::STRING: {
-                if (tag.HasModifier(TagModifier::HEX_STRING))
+                if (tag.HasModifier(TagModifier::HEX_STRING)) {
                     kputc_('H', &str);
-                else
+                } else {
                     kputc_('Z', &str);
+                }
                 const auto s = tag.ToString();
                 kputsn_(s.c_str(), s.size() + 1, &str);  // this adds the null-term
                 break;
@@ -331,7 +337,9 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
             const size_t dataLength = strlen(reinterpret_cast<const char*>(&rawData[0]));
             const std::string value(reinterpret_cast<const char*>(&rawData[0]), dataLength);
             Tag t{value};
-            if (tagType == 'H') t.Modifier(TagModifier::HEX_STRING);
+            if (tagType == 'H') {
+                t.Modifier(TagModifier::HEX_STRING);
+            }
             return t;
         }
 
@@ -380,7 +388,9 @@ std::vector<uint8_t> BamTagCodec::ToRawData(const Tag& tag, const TagModifier& a
     // "<TYPE>:<DATA>" for printable, ASCII char
     if (tag.HasModifier(TagModifier::ASCII_CHAR) || additionalModifier == TagModifier::ASCII_CHAR) {
         const char c = tag.ToAscii();
-        if (c != '\0') kputc_(c, &str);
+        if (c != '\0') {
+            kputc_(c, &str);
+        }
     }
 
     // for all others
@@ -503,10 +513,11 @@ uint8_t BamTagCodec::TagTypeCode(const Tag& tag, const TagModifier& additionalMo
         }
 
         // ensure value is in valid ASCII char range
-        if (value < 33 || value > 126)
+        if (value < 33 || value > 126) {
             throw std::runtime_error{
                 "[pbbam] BAM tag format ERROR: invalid integer value for ASCII char, value: " +
                 std::to_string(value)};
+        }
 
         return static_cast<uint8_t>('A');
     }
@@ -529,8 +540,9 @@ uint8_t BamTagCodec::TagTypeCode(const Tag& tag, const TagModifier& additionalMo
 
         case TagDataType::STRING: {
             if (tag.HasModifier(TagModifier::HEX_STRING) ||
-                additionalModifier == TagModifier::HEX_STRING)
+                additionalModifier == TagModifier::HEX_STRING) {
                 return static_cast<uint8_t>('H');
+            }
             return static_cast<uint8_t>('Z');
         }
 

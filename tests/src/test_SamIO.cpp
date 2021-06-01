@@ -30,8 +30,9 @@ TEST(BAM_SamReader, can_read_basic_sam)
     std::vector<std::string> samRecordNames;
 
     BamReader bamInput{bamFilename};
-    for (const auto& b : bamInput)
+    for (const auto& b : bamInput) {
         bamRecordNames.push_back(b.FullName());
+    }
 
     SamReader samInput{samFilename};
     for (const auto& b : samInput) {

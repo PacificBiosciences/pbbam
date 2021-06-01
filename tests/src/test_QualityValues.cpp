@@ -64,8 +64,9 @@ TEST(BAM_QualityValues, can_create_from_integer_vector)
     const std::vector<uint8_t> values{93, 93, 93, 42, 42, 33, 33, 0, 0};
 
     QualityValues qvs;
-    for (auto qv : values)
+    for (auto qv : values) {
         qvs.push_back(qv);
+    }
     EXPECT_EQ(fastqString, qvs.Fastq());
 }
 

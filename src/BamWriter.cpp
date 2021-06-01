@@ -52,15 +52,21 @@ public:
                      const BamWriter::BinCalculationMode binCalculationMode, const bool useTempFile)
         : calculateBins_{binCalculationMode == BamWriter::BinCalculation_ON}, header_{rawHeader}
     {
-        if (!header_) throw BamWriterException{filename, "null header provided"};
+        if (!header_) {
+            throw BamWriterException{filename, "null header provided"};
+        }
 
-        if (useTempFile) fileProducer_ = std::make_unique<FileProducer>(filename);
+        if (useTempFile) {
+            fileProducer_ = std::make_unique<FileProducer>(filename);
+        }
 
         // open file
         outputFilename_ = (fileProducer_ ? fileProducer_->TempFilename() : filename);
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
         file_.reset(sam_open(outputFilename_.c_str(), mode.c_str()));
-        if (!file_) throw BamWriterException{outputFilename_, "could not open file for writing"};
+        if (!file_) {
+            throw BamWriterException{outputFilename_, "could not open file for writing"};
+        }
 
         // if no explicit thread count given, attempt built-in check
         size_t actualNumThreads = numThreads;
@@ -68,15 +74,21 @@ public:
             actualNumThreads = std::thread::hardware_concurrency();
 
             // if still unknown, default to single-threaded
-            if (actualNumThreads == 0) actualNumThreads = 1;
+            if (actualNumThreads == 0) {
+                actualNumThreads = 1;
+            }
         }
 
         // if multithreading requested, enable it
-        if (actualNumThreads > 1) hts_set_threads(file_.get(), actualNumThreads);
+        if (actualNumThreads > 1) {
+            hts_set_threads(file_.get(), actualNumThreads);
+        }
 
         // write header
         const auto ret = sam_hdr_write(file_.get(), header_.get());
-        if (ret != 0) throw BamWriterException{outputFilename_, "could not write header"};
+        if (ret != 0) {
+            throw BamWriterException{outputFilename_, "could not write header"};
+        }
     }
 
     void Write(const BamRecord& record)
@@ -89,9 +101,10 @@ public:
 
         // (probably) store bins
         // min_shift=14 & n_lvls=5 are BAM "magic numbers"
-        if (calculateBins_)
+        if (calculateBins_) {
             rawRecord->core.bin =
                 hts_reg2bin(rawRecord->core.pos, bam_endpos(rawRecord.get()), 14, 5);
+        }
 
         // write record to file
         const auto ret = sam_write1(file_.get(), header_.get(), rawRecord.get());

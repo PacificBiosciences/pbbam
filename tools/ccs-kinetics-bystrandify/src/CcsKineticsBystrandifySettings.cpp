@@ -68,8 +68,9 @@ Settings::Settings(const CLI_v2::Results& args)
 {
     // Reference & unaligned PacBio BAM files
     const auto& posArgs = args.PositionalArguments();
-    if (posArgs.size() != 2)
+    if (posArgs.size() != 2) {
         throw std::runtime_error{"exactly two positional arguments must be provided"};
+    }
     InputFilename = posArgs[0];
     OutputFilename = posArgs[1];
 }

@@ -31,7 +31,9 @@ public:
     bool GetNext(FastqSequence& record)
     {
         const auto ok = reader_->ReadNext();
-        if (!ok) return false;  // not error, could be EOF
+        if (!ok) {
+            return false;  // not error, could be EOF
+        }
 
         record = FastqSequence{reader_->Name(), reader_->Bases(), reader_->Qualities()};
         return true;
@@ -58,8 +60,9 @@ std::vector<FastqSequence> FastqReader::ReadAll(const std::string& fn)
     std::vector<FastqSequence> result;
     result.reserve(256);
     FastqReader reader{fn};
-    for (const auto& seq : reader)
+    for (const auto& seq : reader) {
         result.emplace_back(seq);
+    }
     return result;
 }
 

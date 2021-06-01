@@ -52,7 +52,9 @@ SortedCompositeBamReader<OrderByType>::SortedCompositeBamReader(std::vector<BamF
     // create readers for files
     for (const auto& bamFile : bamFiles_) {
         internal::CompositeMergeItem item{std::make_unique<BamReader>(bamFile)};
-        if (item.reader->GetNext(item.record)) mergeItems_.insert(std::move(item));
+        if (item.reader->GetNext(item.record)) {
+            mergeItems_.insert(std::move(item));
+        }
     }
 }
 
@@ -64,7 +66,9 @@ SortedCompositeBamReader<OrderByType>::~SortedCompositeBamReader()
 template <typename OrderByType>
 bool SortedCompositeBamReader<OrderByType>::GetNext(BamRecord& record)
 {
-    if (mergeItems_.empty()) return false;
+    if (mergeItems_.empty()) {
+        return false;
+    }
 
     // Move first record into our result
     auto& firstItem = const_cast<internal::CompositeMergeItem&>(*mergeItems_.begin());
@@ -75,7 +79,9 @@ bool SortedCompositeBamReader<OrderByType>::GetNext(BamRecord& record)
     // into the set. Otherwise, just drop it (dtor will release resource).
     internal::CompositeMergeItem tmp(std::move(firstItem));
     mergeItems_.erase(mergeItems_.begin());
-    if (tmp.reader->GetNext(tmp.record)) mergeItems_.insert(std::move(tmp));
+    if (tmp.reader->GetNext(tmp.record)) {
+        mergeItems_.insert(std::move(tmp));
+    }
     return true;
 }
 
@@ -128,10 +134,13 @@ PbiFilterCompositeBamReader<OrderByType>& PbiFilterCompositeBamReader<OrderByTyp
         if (bamFile.PacBioIndexExists()) {
             auto item = internal::CompositeMergeItem{std::unique_ptr<BamReader>{
                 new PbiIndexedBamReader{filter, std::move(bamFile), indexCache_->at(i)}}};
-            if (item.reader->GetNext(item.record)) updatedMergeItems.insert(std::move(item));
+            if (item.reader->GetNext(item.record)) {
+                updatedMergeItems.insert(std::move(item));
+            }
             // else not an error, simply no data matching filter
-        } else
+        } else {
             missingPbi.push_back(bamFile.Filename());
+        }
     }
 
     // throw if any files missing PBI
@@ -139,8 +148,9 @@ PbiFilterCompositeBamReader<OrderByType>& PbiFilterCompositeBamReader<OrderByTyp
         std::ostringstream e;
         e << "[pbbam] composite BAM reader ERROR: failed to open because the following files are "
              "missing a *.pbi index:\n";
-        for (const auto& fn : missingPbi)
+        for (const auto& fn : missingPbi) {
             e << "  " << fn << '\n';
+        }
         throw std::runtime_error{e.str()};
     }
 

@@ -19,12 +19,16 @@ std::string printReferenceData(const BAM::PbiRawReferenceData& referenceData)
 {
     std::ostringstream out;
     for (const auto& entry : referenceData.entries_) {
-        if (!out.str().empty()) out << ",\n";
+        if (!out.str().empty()) {
+            out << ",\n";
+        }
 
         out << "    PbiReferenceEntry{" << entry.tId_ << "," << entry.beginRow_ << ","
             << entry.endRow_ << "}";
     }
-    if (!out.str().empty()) out << '\n';
+    if (!out.str().empty()) {
+        out << '\n';
+    }
     return out.str();
 }
 
@@ -32,10 +36,13 @@ template <typename T>
 std::string printField(const std::vector<T>& c)
 {
     std::ostringstream out;
-    for (const auto& e : c)
+    for (const auto& e : c) {
         out << e << ",";
+    }
     auto result = out.str();
-    if (!result.empty()) result.pop_back();  // remove final comma
+    if (!result.empty()) {
+        result.pop_back();  // remove final comma
+    }
     return result;
 }
 
@@ -43,11 +50,14 @@ template <>
 std::string printField(const std::vector<uint8_t>& c)
 {
     std::ostringstream out;
-    for (const auto& e : c)
+    for (const auto& e : c) {
         out << static_cast<uint16_t>(e)
             << ",";  // cast to larger uint, force print as number not character
+    }
     auto result = out.str();
-    if (!result.empty()) result.pop_back();  // remove final comma
+    if (!result.empty()) {
+        result.pop_back();  // remove final comma
+    }
     return result;
 }
 
@@ -55,11 +65,14 @@ template <>
 std::string printField(const std::vector<int8_t>& c)
 {
     std::ostringstream out;
-    for (const auto& e : c)
+    for (const auto& e : c) {
         out << static_cast<int16_t>(e)
             << ",";  // cast to larger int, force print as number not character
+    }
     auto result = out.str();
-    if (!result.empty()) result.pop_back();  // remove final comma
+    if (!result.empty()) {
+        result.pop_back();  // remove final comma
+    }
     return result;
 }
 
@@ -92,9 +105,15 @@ void CppFormatter::Run(const Settings& settings)
     }
 
     std::string fileSections{"PbiFile::BASIC"};
-    if (rawData.HasBarcodeData()) fileSections += std::string{" | PbiFile::BARCODE"};
-    if (rawData.HasMappedData()) fileSections += std::string{" | PbiFile::MAPPED"};
-    if (rawData.HasReferenceData()) fileSections += std::string{" | PbiFile::REFERENCE"};
+    if (rawData.HasBarcodeData()) {
+        fileSections += std::string{" | PbiFile::BARCODE"};
+    }
+    if (rawData.HasMappedData()) {
+        fileSections += std::string{" | PbiFile::MAPPED"};
+    }
+    if (rawData.HasReferenceData()) {
+        fileSections += std::string{" | PbiFile::REFERENCE"};
+    }
 
     std::ostringstream s;
     s << "PbiRawData rawData;\n"

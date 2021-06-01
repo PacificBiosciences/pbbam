@@ -48,7 +48,9 @@ public:
     {
         interval_ = boost::none;
         std::string line;
-        if (reader_->GetNext(line)) interval_ = ParseInterval(std::move(line));
+        if (reader_->GetNext(line)) {
+            interval_ = ParseInterval(std::move(line));
+        }
     }
 
     Data::GenomicInterval ParseInterval(std::string line)
@@ -91,7 +93,9 @@ const std::string& BedReader::Filename() const { return d_->Filename(); }
 
 bool BedReader::GetNext(Data::GenomicInterval& interval)
 {
-    if (!d_->interval_) return false;
+    if (!d_->interval_) {
+        return false;
+    }
 
     interval = *d_->interval_;
     d_->GetNext();
@@ -103,8 +107,9 @@ std::vector<Data::GenomicInterval> BedReader::ReadAll(const std::string& fn)
     std::vector<Data::GenomicInterval> result;
     result.reserve(256);
     BedReader reader{fn};
-    for (const auto& seq : reader)
+    for (const auto& seq : reader) {
         result.emplace_back(seq);
+    }
     return result;
 }
 

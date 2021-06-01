@@ -179,10 +179,11 @@ TEST(BAM_DataSetCore, can_add_external_resources)
     // iterable
     size_t i = 0;
     for (auto r : resources) {
-        if (i == 0)
+        if (i == 0) {
             EXPECT_EQ("file1", r.Name());
-        else
+        } else {
             EXPECT_EQ("file2", r.Name());
+        }
         ++i;
     }
 }
@@ -432,10 +433,11 @@ TEST(BAM_DataSetCore, can_add_subdatasets)
     // iterable
     size_t i = 0;
     for (const DataSetBase& ds : subdatasets) {
-        if (i == 0)
+        if (i == 0) {
             EXPECT_EQ("subset_1", ds.Name());
-        else
+        } else {
             EXPECT_EQ("subset_2", ds.Name());
+        }
         ++i;
     }
 }
@@ -466,10 +468,11 @@ TEST(BAM_DataSetCore, can_edit_subdatasets)
     // iterable
     size_t i = 0;
     for (const DataSetBase& ds : subdatasets) {
-        if (i == 0)
+        if (i == 0) {
             EXPECT_EQ("subset_1_edited", ds.Name());
-        else
+        } else {
             EXPECT_EQ("subset_2", ds.Name());
+        }
         ++i;
     }
 }

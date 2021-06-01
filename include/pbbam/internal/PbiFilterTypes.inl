@@ -22,10 +22,11 @@ FilterBase<T>::FilterBase(std::vector<T> values, const Compare::Type cmp)
 {
     // "=="/"!=" can come in from XML, e.g. <Property Name="zmw" Operator="==" Value="(x,y,z)" />"
     // switch to whitelist/blacklist containment for multi-value filters
-    if (cmp_ == Compare::EQUAL)
+    if (cmp_ == Compare::EQUAL) {
         cmp_ = Compare::CONTAINS;
-    else if (cmp_ == Compare::NOT_EQUAL)
+    } else if (cmp_ == Compare::NOT_EQUAL) {
         cmp_ = Compare::NOT_CONTAINS;
+    }
 
     if (cmp_ != Compare::CONTAINS && cmp_ != Compare::NOT_CONTAINS) {
         throw std::runtime_error{
@@ -37,10 +38,11 @@ FilterBase<T>::FilterBase(std::vector<T> values, const Compare::Type cmp)
 template <typename T>
 bool FilterBase<T>::CompareHelper(const T& lhs) const
 {
-    if (multiValue_ == boost::none)
+    if (multiValue_ == boost::none) {
         return CompareSingleHelper(lhs);
-    else
+    } else {
         return CompareMultiHelper(lhs);
+    }
 }
 
 template <typename T>
@@ -51,14 +53,20 @@ bool FilterBase<T>::CompareMultiHelper(const T& lhs) const
 
     // whitelist - return true on any hit
     if (cmp_ == Compare::CONTAINS) {
-        for (const auto& x : multiValue_.get())
-            if (x == lhs) return true;
+        for (const auto& x : multiValue_.get()) {
+            if (x == lhs) {
+                return true;
+            }
+        }
         return false;
     }
     // blacklist - return false on any hit
     else {
-        for (const auto& x : multiValue_.get())
-            if (x == lhs) return false;
+        for (const auto& x : multiValue_.get()) {
+            if (x == lhs) {
+                return false;
+            }
+        }
         return true;
     }
 }
@@ -268,10 +276,11 @@ inline PbiAlignedStartFilter::PbiAlignedStartFilter(const uint32_t position,
 inline PbiAlignedStrandFilter::PbiAlignedStrandFilter(const Strand strand, const Compare::Type cmp)
     : internal::MappedDataFilterBase<Strand, PbiFile::MappedField::STRAND>{strand, cmp}
 {
-    if (cmp != Compare::EQUAL && cmp != Compare::NOT_EQUAL)
+    if (cmp != Compare::EQUAL && cmp != Compare::NOT_EQUAL) {
         throw std::runtime_error{
             "[pbbam] PBI filter ERROR: compare type for aligned strand must be either EQUAL or "
             "NOT_EQUAL"};
+    }
 }
 
 // PbiBarcodeFilter

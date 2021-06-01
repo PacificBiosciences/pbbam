@@ -13,7 +13,9 @@ std::string Join(const std::vector<std::string>& tokens, const char delim)
     std::string result;
     bool first = true;
     for (const auto& token : tokens) {
-        if (!first) result += delim;
+        if (!first) {
+            result += delim;
+        }
         result += token;
         first = false;
     }
@@ -25,8 +27,9 @@ std::vector<std::string> Split(const std::string& line, const char delim)
     std::vector<std::string> tokens;
     std::istringstream lineStream(line);
     std::string token;
-    while (std::getline(lineStream, token, delim))
+    while (std::getline(lineStream, token, delim)) {
         tokens.push_back(token);
+    }
     return tokens;
 }
 

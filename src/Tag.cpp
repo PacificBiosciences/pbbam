@@ -43,8 +43,9 @@ private:
     template <typename T>
     char Helper(const T& x) const
     {
-        if (!InAsciiRange(x))
+        if (!InAsciiRange(x)) {
             throw std::runtime_error{"[pbbam] tag ERROR: char is outside valid ASCII range"};
+        }
         return static_cast<char>(x);
     }
 };
@@ -168,8 +169,9 @@ struct OutputVisitor : public boost::static_visitor<void>
         for (const auto v : values) {
             if (!first) {
                 out_ << ',';
-            } else
+            } else {
                 first = false;
+            }
             out_ << static_cast<int16_t>(v);
         }
     }
@@ -179,8 +181,9 @@ struct OutputVisitor : public boost::static_visitor<void>
         for (const auto v : values) {
             if (!first) {
                 out_ << ',';
-            } else
+            } else {
                 first = false;
+            }
             out_ << static_cast<uint16_t>(v);
         }
     }
@@ -192,8 +195,9 @@ struct OutputVisitor : public boost::static_visitor<void>
         for (const auto& v : values) {
             if (!first) {
                 out_ << ',';
-            } else
+            } else {
                 first = false;
+            }
             out_ << v;
         }
     }
@@ -221,19 +225,21 @@ Tag::Tag(std::vector<float> value) : data_{std::move(value)} {}
 
 Tag::Tag(int8_t value, const TagModifier mod) : data_{value}, modifier_(mod)
 {
-    if (mod == TagModifier::HEX_STRING)
+    if (mod == TagModifier::HEX_STRING) {
         throw std::runtime_error{
             "[pbbam] tag ERROR: HEX_STRING is not a valid tag modifier for int8_t data. "
             "It is intended for string-type data only."};
+    }
 }
 
 Tag::Tag(std::string value, TagModifier mod) : data_{std::move(value)}, modifier_{mod}
 {
-    if (mod == TagModifier::ASCII_CHAR)
+    if (mod == TagModifier::ASCII_CHAR) {
         throw std::runtime_error{
             "[pbbam] tag ERROR: ASCII_CHAR is not a valid tag modifier for string-type data. "
             "To construct an ASCII char tag, use a single-quoted value (e.g. 'X' instead of "
             "\"X\")"};
+    }
 }
 
 Tag& Tag::operator=(boost::blank value)
@@ -413,37 +419,49 @@ char Tag::ToAscii() const { return boost::apply_visitor(AsciiConvertVisitor(), d
 
 int8_t Tag::ToInt8() const
 {
-    if (IsInt8()) return boost::get<int8_t>(data_);
+    if (IsInt8()) {
+        return boost::get<int8_t>(data_);
+    }
     return boost::apply_visitor(ToInt8ConvertVisitor(), data_);
 }
 
 uint8_t Tag::ToUInt8() const
 {
-    if (IsUInt8()) return boost::get<uint8_t>(data_);
+    if (IsUInt8()) {
+        return boost::get<uint8_t>(data_);
+    }
     return boost::apply_visitor(ToUInt8ConvertVisitor(), data_);
 }
 
 int16_t Tag::ToInt16() const
 {
-    if (IsInt16()) return boost::get<int16_t>(data_);
+    if (IsInt16()) {
+        return boost::get<int16_t>(data_);
+    }
     return boost::apply_visitor(ToInt16ConvertVisitor(), data_);
 }
 
 uint16_t Tag::ToUInt16() const
 {
-    if (IsUInt16()) return boost::get<uint16_t>(data_);
+    if (IsUInt16()) {
+        return boost::get<uint16_t>(data_);
+    }
     return boost::apply_visitor(ToUInt16ConvertVisitor(), data_);
 }
 
 int32_t Tag::ToInt32() const
 {
-    if (IsInt32()) return boost::get<int32_t>(data_);
+    if (IsInt32()) {
+        return boost::get<int32_t>(data_);
+    }
     return boost::apply_visitor(ToInt32ConvertVisitor(), data_);
 }
 
 uint32_t Tag::ToUInt32() const
 {
-    if (IsUInt32()) return boost::get<uint32_t>(data_);
+    if (IsUInt32()) {
+        return boost::get<uint32_t>(data_);
+    }
     return boost::apply_visitor(ToUInt32ConvertVisitor(), data_);
 }
 

@@ -23,24 +23,29 @@ namespace {
 std::unique_ptr<IRecordWriter> MakeBamWriter(BamHeader header, const std::string& outputFilename,
                                              const bool createPbi, const ProgramInfo& pgInfo)
 {
-    if (outputFilename.empty())
+    if (outputFilename.empty()) {
         throw std::runtime_error{"[pbbam] BAM file merging ERROR: no output filename provided"};
+    }
 
-    if (pgInfo.IsValid()) header.AddProgram(pgInfo);
+    if (pgInfo.IsValid()) {
+        header.AddProgram(pgInfo);
+    }
 
     // make BAM writer
-    if (createPbi)
+    if (createPbi) {
         return std::make_unique<IndexedBamWriter>(outputFilename, header);
-    else
+    } else {
         return std::make_unique<BamWriter>(outputFilename, header);
+    }
 }
 
 template <typename Reader>
 void MergeImpl(IRecordWriter& writer, Reader& reader)
 {
     BamRecord record;
-    while (reader.GetNext(record))
+    while (reader.GetNext(record)) {
         writer.Write(record);
+    }
 }
 
 void MergeToWriter(const DataSet& dataset, const BamHeader& header, IRecordWriter& writer)

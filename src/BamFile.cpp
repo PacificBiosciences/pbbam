@@ -41,10 +41,10 @@ public:
             // 0:  EOF absent
             // -1: some other error
             std::ostringstream e;
-            if (eofCheck == 0)
+            if (eofCheck == 0) {
                 e << "[pbbam] BAM file ERROR: missing EOF block:\n"
                   << "  file: " << fn;
-            else {
+            } else {
                 e << "[pbbam] BAM file ERROR: unknown error encountered while checking EOF:\n"
                   << "  file: " << fn;
                 MaybePrintErrnoReason(e);
@@ -67,7 +67,9 @@ public:
     bool HasEOF() const
     {
         // streamed input is unknown, since it's not random-accessible
-        if (filename_ == "-") return false;
+        if (filename_ == "-") {
+            return false;
+        }
 
         // attempt open
         const auto f = RawOpen();
@@ -143,12 +145,16 @@ void BamFile::CreateStandardIndex() const
 
 void BamFile::EnsurePacBioIndexExists() const
 {
-    if (!PacBioIndexExists()) CreatePacBioIndex();
+    if (!PacBioIndexExists()) {
+        CreatePacBioIndex();
+    }
 }
 
 void BamFile::EnsureStandardIndexExists() const
 {
-    if (!StandardIndexExists()) CreateStandardIndex();
+    if (!StandardIndexExists()) {
+        CreateStandardIndex();
+    }
 }
 
 const std::string& BamFile::Filename() const { return d_->filename_; }

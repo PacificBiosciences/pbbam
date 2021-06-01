@@ -45,7 +45,9 @@ struct DataSetFileException : public std::exception
 std::unique_ptr<DataSetBase> DataSetFromXml(const std::string& xmlFn)
 {
     std::ifstream in{xmlFn};
-    if (!in) throw DataSetFileException{xmlFn, "could not open XML file for reading"};
+    if (!in) {
+        throw DataSetFileException{xmlFn, "could not open XML file for reading"};
+    }
     return XmlReader::FromStream(in);
 }
 
@@ -57,10 +59,11 @@ std::unique_ptr<DataSetBase> DataSetFromBam(const std::string& bamFn)
     const auto aligned = header.SortOrder() == "coordinate";
 
     std::unique_ptr<DataSetBase> dataset;
-    if (aligned)
+    if (aligned) {
         dataset = std::make_unique<AlignmentSet>();
-    else
+    } else {
         dataset = std::make_unique<SubreadSet>();
+    }
 
     auto& resources = dataset->ExternalResources();
     resources.Add(ExternalResource(BamFile(bamFn)));
@@ -96,7 +99,9 @@ std::unique_ptr<DataSetBase> DataSetFromFofn(const std::string& fofn)
 {
     const auto fofnDir = FileUtils::DirectoryName(fofn);
     std::ifstream in{fofn};
-    if (!in) throw DataSetFileException{fofn, "could not open FOFN for reading"};
+    if (!in) {
+        throw DataSetFileException{fofn, "could not open FOFN for reading"};
+    }
 
     auto filenames = FofnReader::Files(in);
     std::transform(
@@ -111,14 +116,14 @@ std::unique_ptr<DataSetBase> DataSetFromUri(const std::string& uri)
     //       basically just treating as a regular filename for now
 
     // handle on extension
-    if (boost::algorithm::iends_with(uri, ".xml"))
+    if (boost::algorithm::iends_with(uri, ".xml")) {
         return DataSetFromXml(uri);
-    else if (boost::algorithm::iends_with(uri, ".bam"))
+    } else if (boost::algorithm::iends_with(uri, ".bam")) {
         return DataSetFromBam(uri);
-    else if (boost::algorithm::iends_with(uri, ".fofn"))
+    } else if (boost::algorithm::iends_with(uri, ".fofn")) {
         return DataSetFromFofn(uri);
-    else if (boost::algorithm::iends_with(uri, ".fasta") ||
-             boost::algorithm::iends_with(uri, ".fa")) {
+    } else if (boost::algorithm::iends_with(uri, ".fasta") ||
+               boost::algorithm::iends_with(uri, ".fa")) {
         return DataSetFromFasta(uri);
     }
 
@@ -135,20 +140,24 @@ std::unique_ptr<DataSetBase> DataSetIO::FromUri(const std::string& uri)
 
 std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>& uris)
 {
-    if (uris.empty()) throw std::runtime_error{"[pbbam] dataset I/O ERROR: empty input URI list"};
+    if (uris.empty()) {
+        throw std::runtime_error{"[pbbam] dataset I/O ERROR: empty input URI list"};
+    }
 
     // create dataset(s) from URI(s)
     std::vector<std::unique_ptr<DataSetBase> > datasets;
     datasets.reserve(uris.size());
-    for (const auto& uri : uris)
+    for (const auto& uri : uris) {
         datasets.emplace_back(DataSetFromUri(uri));
+    }
     assert(!datasets.empty());
 
     // if only 1, just return
-    if (datasets.size() == 1) return std::unique_ptr<DataSetBase>(datasets.front().release());
+    if (datasets.size() == 1) {
+        return std::unique_ptr<DataSetBase>(datasets.front().release());
 
-    // else merge
-    else {
+        // else merge
+    } else {
         auto& result = datasets.at(0);
         for (size_t i = 1; i < datasets.size(); ++i) {
             const auto& next = datasets.at(i);
@@ -160,8 +169,9 @@ std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>&
 
 std::unique_ptr<DataSetBase> DataSetIO::FromXmlString(const std::string& xml)
 {
-    if (xml.empty())
+    if (xml.empty()) {
         throw std::runtime_error{"[pbbam] dataset I/O ERROR: cannot load from empty XML string"};
+    }
     std::istringstream s{xml};
     return XmlReader::FromStream(s);
 }
@@ -181,7 +191,9 @@ void DataSetIO::ToStream(const std::unique_ptr<DataSetBase>& dataset, std::ostre
 void DataSetIO::ToFile(DataSetBase& dataset, const std::string& fn, DataSetPathMode pathMode)
 {
     std::ofstream out(fn);
-    if (!out) throw DataSetFileException{fn, "could not open XML file for writing"};
+    if (!out) {
+        throw DataSetFileException{fn, "could not open XML file for writing"};
+    }
     XmlWriter::ToStream(dataset, out, pathMode);
 }
 

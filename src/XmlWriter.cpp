@@ -23,32 +23,36 @@ namespace {
 std::string Prefix(const std::string& input)
 {
     const auto colonFound = input.find(':');
-    if (colonFound == std::string::npos || colonFound == 0) return std::string();
+    if (colonFound == std::string::npos || colonFound == 0) {
+        return std::string();
+    }
     return input.substr(0, colonFound);
 }
 
 std::string OutputName(const DataSetElement& node, const NamespaceRegistry& registry)
 {
     // if from input XML, respect the namespaces given
-    if (node.IsVerbatimLabel())
+    if (node.IsVerbatimLabel()) {
         return node.QualifiedNameLabel();
 
-    else if (node.LocalNameLabel().to_string() == "Collections")
+    } else if (node.LocalNameLabel().to_string() == "Collections") {
         return "Collections";
 
-    // otherwise, probably user-generated
-    else {
+        // otherwise, probably user-generated
+    } else {
         // if no namespace prefix, prepend the appropriate one & return
         if (node.PrefixLabel().empty()) {
             static const std::string colon = ":";
             auto xsdType = node.Xsd();
-            if (xsdType == XsdType::NONE)
+            if (xsdType == XsdType::NONE) {
                 xsdType = registry.XsdForElement(node.LocalNameLabel().to_string());
+            }
             return registry.Namespace(xsdType).Name() + colon + node.LocalNameLabel().to_string();
         }
         // otherwise, has prefix - return full name
-        else
+        else {
             return node.QualifiedNameLabel();
+        }
     }
 }
 
@@ -64,10 +68,14 @@ void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
 {
     // create child of parent, w/ label & text
     const auto label = OutputName(node, registry);
-    if (label.empty()) return;  // error?
+    if (label.empty()) {
+        return;  // error?
+    }
     auto xmlNode = parentXml.append_child(label.c_str());
 
-    if (!node.Text().empty()) xmlNode.text().set(node.Text().c_str());
+    if (!node.Text().empty()) {
+        xmlNode.text().set(node.Text().c_str());
+    }
 
     // store XSD type for later
     const auto prefix = Prefix(label);
@@ -81,13 +89,16 @@ void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
     const bool resolveFilePaths = (pathMode == DataSetPathMode::ABSOLUTE);
     for (const auto& attribute : node.Attributes()) {
         const auto& name = attribute.first;
-        if (name.empty()) continue;
+        if (name.empty()) {
+            continue;
+        }
 
         auto attr = xmlNode.append_attribute(name.c_str());
         std::string value = attribute.second.c_str();
         // "absolutize" any paths, except relative paths from verbatim input XML
-        if (!dataset.FromInputXml() && resolveFilePaths && name == "ResourceId")
+        if (!dataset.FromInputXml() && resolveFilePaths && name == "ResourceId") {
             value = FileUtils::ResolvedFilePath(value, dataset.Path());
+        }
         attr.set_value(value.c_str());
     }
 
@@ -96,10 +107,11 @@ void ToXml(const DataSetElement& node, const NamespaceRegistry& registry,
     // iterate children, recursively building up subtree
     for (const auto& child : node.Children()) {
         // ensure order CollectionMetadata children
-        if (child->QualifiedNameLabel().find("CollectionMetadata") != std::string::npos)
+        if (child->QualifiedNameLabel().find("CollectionMetadata") != std::string::npos) {
             CollectionMetadataToXml(*child, registry, xsdPrefixesUsed, xmlNode, dataset, pathMode);
-        else
+        } else {
             ToXml(*child, registry, xsdPrefixesUsed, xmlNode, dataset, pathMode);
+        }
     }
 }
 
@@ -111,10 +123,14 @@ void CollectionMetadataToXml(const DataSetElement& node, const NamespaceRegistry
 {
     // create child of parent, w/ label & text
     const auto label = OutputName(node, registry);
-    if (label.empty()) return;  // error?
+    if (label.empty()) {
+        return;  // error?
+    }
     auto xmlNode = parentXml.append_child(label.c_str());
 
-    if (!node.Text().empty()) xmlNode.text().set(node.Text().c_str());
+    if (!node.Text().empty()) {
+        xmlNode.text().set(node.Text().c_str());
+    }
 
     // store XSD type for later
     const auto prefix = Prefix(label);
@@ -128,13 +144,16 @@ void CollectionMetadataToXml(const DataSetElement& node, const NamespaceRegistry
     const bool resolveFilePaths = (pathMode == DataSetPathMode::ABSOLUTE);
     for (const auto& attribute : node.Attributes()) {
         const auto& name = attribute.first;
-        if (name.empty()) continue;
+        if (name.empty()) {
+            continue;
+        }
 
         auto attr = xmlNode.append_attribute(name.c_str());
         std::string value = attribute.second.c_str();
         // "absolutize" any paths, except relative paths from verbatim input XML
-        if (!dataset.FromInputXml() && resolveFilePaths && name == "ResourceId")
+        if (!dataset.FromInputXml() && resolveFilePaths && name == "ResourceId") {
             value = FileUtils::ResolvedFilePath(value, dataset.Path());
+        }
         attr.set_value(value.c_str());
     }
 
@@ -180,18 +199,23 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out, DataSetP
 
     // create top-level dataset XML node
     const auto label = OutputName(dataset, registry);
-    if (label.empty())
+    if (label.empty()) {
         throw std::runtime_error{"[pbbam] XML writer ERROR: could not convert dataset node to XML"};
+    }
     auto root = doc.append_child(label.c_str());
 
     const auto& text = dataset.Text();
-    if (!text.empty()) root.text().set(text.c_str());
+    if (!text.empty()) {
+        root.text().set(text.c_str());
+    }
 
     // add top-level attributes
     for (const auto& attribute : dataset.Attributes()) {
         const auto& name = attribute.first;
         const auto& value = attribute.second;
-        if (name.empty()) continue;
+        if (name.empty()) {
+            continue;
+        }
         auto attr = root.append_attribute(name.c_str());
         attr.set_value(value.c_str());
     }
@@ -203,8 +227,9 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out, DataSetP
     }
 
     // iterate children, recursively building up subtree
-    for (const auto& child : dataset.Children())
+    for (const auto& child : dataset.Children()) {
         ToXml(*child, registry, xsdPrefixesUsed, root, dataset, pathMode);
+    }
 
     // write XML to stream
     auto decl = doc.prepend_child(pugi::node_declaration);
@@ -232,7 +257,9 @@ void XmlWriter::ToStream(const DataSetBase& dataset, std::ostream& out, DataSetP
     for (const auto& prefixIter : xsdPrefixesUsed) {
         const auto& xsdType = prefixIter.first;
         const auto& prefix = prefixIter.second;
-        if (xsdType == XsdType::NONE || prefix.empty()) continue;
+        if (xsdType == XsdType::NONE || prefix.empty()) {
+            continue;
+        }
 
         const auto& nsInfo = registry.Namespace(xsdType);
         assert(nsInfo.Name() == prefix);

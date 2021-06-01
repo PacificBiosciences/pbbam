@@ -45,10 +45,12 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Data::Orienta
         auto seqCoordStr = std::to_string(seqCoord);
 
         size_t maxCoordLength = std::max(refCoordStr.size(), seqCoordStr.size());
-        while (refCoordStr.size() < maxCoordLength)
+        while (refCoordStr.size() < maxCoordLength) {
             refCoordStr = " " + refCoordStr;
-        while (seqCoordStr.size() < maxCoordLength)
+        }
+        while (seqCoordStr.size() < maxCoordLength) {
             seqCoordStr = " " + seqCoordStr;
+        }
 
         std::string seqWrap{seqCoordStr + " : "};
         std::string refWrap{refCoordStr + " : "};
@@ -61,9 +63,9 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Data::Orienta
 
             if (seq[i] == ref[i]) {
                 ++matches;
-                if (refCoord == 0 || refCoord % 10)
+                if (refCoord == 0 || refCoord % 10) {
                     prettyWrap += '|';
-                else {
+                } else {
                     prettyWrap += "\033" "[1m" "\x1b" "[31m";
                     prettyWrap += '|';
                     prettyWrap += "\033" "[0m" "\x1b" "[39;49m";
@@ -92,10 +94,12 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Data::Orienta
         seqCoordStr = std::to_string(seqCoord);
 
         maxCoordLength = std::max(refCoordStr.size(), seqCoordStr.size());
-        while (refCoordStr.size() < maxCoordLength)
+        while (refCoordStr.size() < maxCoordLength) {
             refCoordStr = " " + refCoordStr;
-        while (seqCoordStr.size() < maxCoordLength)
+        }
+        while (seqCoordStr.size() < maxCoordLength) {
             seqCoordStr = " " + seqCoordStr;
+        }
 
         seqWrap += " : " + seqCoordStr;
         refWrap += " : " + refCoordStr;

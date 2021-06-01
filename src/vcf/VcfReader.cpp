@@ -14,8 +14,9 @@ VcfReader::VcfReader(const VcfFile& file) : in_{file.Filename()}, header_{file.H
     // skip header lines
     const auto& header = file.Header();
     std::string line;
-    for (size_t i = header.NumLines(); i > 0; --i)
+    for (size_t i = header.NumLines(); i > 0; --i) {
         std::getline(in_, line);
+    }
 
     FetchNext();
 }
@@ -28,7 +29,9 @@ void VcfReader::FetchNext()
 
 bool VcfReader::GetNext(VcfVariant& var)
 {
-    if (line_.empty()) return false;
+    if (line_.empty()) {
+        return false;
+    }
     var = VcfVariant{line_};
     FetchNext();
     return true;

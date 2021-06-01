@@ -56,14 +56,21 @@ int ZmwChunkedFastxBgzfReader::FetchRecord(bool skipName)
     if (!skipName) {
 
         if (seq->last_char == 0) { /* then jump to the next header line */
-            while ((c = ks_getc(ks)) != -1 && c != '>' && c != '@')
+            while ((c = ks_getc(ks)) != -1 && c != '>' && c != '@') {
                 ;
-            if (c == -1) return -1; /* end of file */
+            }
+            if (c == -1) {
+                return -1; /* end of file */
+            }
             seq->last_char = c;
         } /* else: the first header char has been read in the previous call */
 
-        if (ks_getuntil(ks, 0, &seq->name, &c) < 0) return -1;         /* normal exit: EOF */
-        if (c != '\n') ks_getuntil(ks, KS_SEP_LINE, &seq->comment, 0); /* read FASTA/Q comment */
+        if (ks_getuntil(ks, 0, &seq->name, &c) < 0) {
+            return -1; /* normal exit: EOF */
+        }
+        if (c != '\n') {
+            ks_getuntil(ks, KS_SEP_LINE, &seq->comment, 0); /* read FASTA/Q comment */
+        }
     }
 
     if (seq_->seq.s == 0) { /* we can do this in the loop below, but that is slower */
@@ -71,12 +78,16 @@ int ZmwChunkedFastxBgzfReader::FetchRecord(bool skipName)
         seq_->seq.s = (char*)malloc(seq_->seq.m);
     }
     while ((c = ks_getc(ks)) != -1 && c != '>' && c != '+' && c != '@') {
-        if (c == '\n') continue;        /* skip empty lines */
+        if (c == '\n') {
+            continue; /* skip empty lines */
+        }
         seq_->seq.s[seq_->seq.l++] = c; /* this is safe: we always have enough space for 1 char */
         ks_getuntil2(ks, KS_SEP_LINE, &seq_->seq, 0, 1); /* read the rest of the line */
     }
 
-    if (c == '>' || c == '@') seq_->last_char = c; /* the first header char has been read */
+    if (c == '>' || c == '@') {
+        seq_->last_char = c; /* the first header char has been read */
+    }
     if (seq_->seq.l + 1 >=
         seq_->seq.m) { /* seq_->seq.s[seq_->seq.l] below may be out of boundary */
         seq_->seq.m = seq_->seq.l + 2;
@@ -85,21 +96,29 @@ int ZmwChunkedFastxBgzfReader::FetchRecord(bool skipName)
     }
     seq_->seq.s[seq_->seq.l] = 0; /* null terminated string */
 
-    if (c != '+') return seq_->seq.l; /* FASTA */
+    if (c != '+') {
+        return seq_->seq.l; /* FASTA */
+    }
     if (seq_->qual.m < seq_->seq.m) { /* allocate memory for qual in case insufficient */
         seq_->qual.m = seq_->seq.m;
         seq_->qual.s = (char*)realloc(seq_->qual.s, seq_->qual.m);
     }
 
-    while ((c = ks_getc(ks)) != -1 && c != '\n')
-        ;                   /* skip the rest of '+' line */
-    if (c == -1) return -2; /* error: no quality string */
-    while (ks_getuntil2(ks, KS_SEP_LINE, &seq_->qual, 0, 1) >= 0 && seq_->qual.l < seq_->seq.l)
+    while ((c = ks_getc(ks)) != -1 && c != '\n') {
+        ; /* skip the rest of '+' line */
+    }
+    if (c == -1) {
+        return -2; /* error: no quality string */
+    }
+    while (ks_getuntil2(ks, KS_SEP_LINE, &seq_->qual, 0, 1) >= 0 && seq_->qual.l < seq_->seq.l) {
         ;
+    }
 
     seq_->last_char = 0; /* we have not come to the next header line */
 
-    if (seq_->seq.l != seq_->qual.l) return -2; /* error: qual string is of a different length */
+    if (seq_->seq.l != seq_->qual.l) {
+        return -2; /* error: qual string is of a different length */
+    }
     return seq_->seq.l;
 }
 

@@ -19,8 +19,9 @@ VcfHeader& VcfHeader::AddContigDefinition(VCF::ContigDefinition contig)
     if (found == contigLookup_.cend()) {
         contigLookup_.insert({contig.Id(), contigDefinitions_.size()});
         contigDefinitions_.push_back(std::move(contig));
-    } else
+    } else {
         contigDefinitions_.at(found->second) = std::move(contig);
+    }
     return *this;
 }
 
@@ -30,8 +31,9 @@ VcfHeader& VcfHeader::AddFilterDefinition(VCF::FilterDefinition filter)
     if (found == filterLookup_.cend()) {
         filterLookup_.insert({filter.Id(), filterDefinitions_.size()});
         filterDefinitions_.push_back(std::move(filter));
-    } else
+    } else {
         filterDefinitions_.at(found->second) = std::move(filter);
+    }
     return *this;
 }
 
@@ -41,8 +43,9 @@ VcfHeader& VcfHeader::AddFormatDefinition(VCF::FormatDefinition format)
     if (found == formatLookup_.cend()) {
         formatLookup_.insert({format.Id(), formatDefinitions_.size()});
         formatDefinitions_.push_back(std::move(format));
-    } else
+    } else {
         formatDefinitions_.at(found->second) = std::move(format);
+    }
     return *this;
 }
 
@@ -52,8 +55,9 @@ VcfHeader& VcfHeader::AddGeneralDefinition(VCF::GeneralDefinition def)
     if (found == generalLookup_.cend()) {
         generalLookup_.insert({def.Id(), generalDefinitions_.size()});
         generalDefinitions_.push_back(std::move(def));
-    } else
+    } else {
         generalDefinitions_.at(found->second) = std::move(def);
+    }
     return *this;
 }
 
@@ -63,8 +67,9 @@ VcfHeader& VcfHeader::AddInfoDefinition(VCF::InfoDefinition info)
     if (found == infoLookup_.cend()) {
         infoLookup_.insert({info.Id(), infoDefinitions_.size()});
         infoDefinitions_.push_back(std::move(info));
-    } else
+    } else {
         infoDefinitions_.at(found->second) = std::move(info);
+    }
     return *this;
 }
 
@@ -74,8 +79,9 @@ VcfHeader& VcfHeader::AddSample(std::string sample)
     if (found == sampleLookup_.cend()) {
         sampleLookup_.insert({sample, samples_.size()});
         samples_.push_back(std::move(sample));
-    } else
+    } else {
         samples_.at(found->second) = std::move(sample);
+    }
     return *this;
 }
 
@@ -93,8 +99,9 @@ VcfHeader& VcfHeader::ContigDefinitions(std::vector<VCF::ContigDefinition> defs)
 {
     contigDefinitions_.clear();
     contigLookup_.clear();
-    for (auto&& def : defs)
+    for (auto&& def : defs) {
         AddContigDefinition(std::move(def));
+    }
     return *this;
 }
 
@@ -123,8 +130,9 @@ VcfHeader& VcfHeader::FilterDefinitions(std::vector<VCF::FilterDefinition> defs)
 {
     filterDefinitions_.clear();
     filterLookup_.clear();
-    for (auto&& def : defs)
+    for (auto&& def : defs) {
         AddFilterDefinition(std::move(def));
+    }
     return *this;
 }
 
@@ -142,8 +150,9 @@ VcfHeader& VcfHeader::FormatDefinitions(std::vector<VCF::FormatDefinition> defs)
 {
     formatDefinitions_.clear();
     formatLookup_.clear();
-    for (auto&& def : defs)
+    for (auto&& def : defs) {
         AddFormatDefinition(std::move(def));
+    }
     return *this;
 }
 
@@ -161,8 +170,9 @@ VcfHeader& VcfHeader::GeneralDefinitions(std::vector<VCF::GeneralDefinition> def
 {
     generalDefinitions_.clear();
     generalLookup_.clear();
-    for (auto&& def : defs)
+    for (auto&& def : defs) {
         AddGeneralDefinition(std::move(def));
+    }
     return *this;
 }
 
@@ -179,8 +189,9 @@ VcfHeader& VcfHeader::InfoDefinitions(std::vector<VCF::InfoDefinition> defs)
 {
     infoDefinitions_.clear();
     infoLookup_.clear();
-    for (auto&& def : defs)
+    for (auto&& def : defs) {
         AddInfoDefinition(std::move(def));
+    }
     return *this;
 }
 
@@ -201,8 +212,9 @@ VcfHeader& VcfHeader::Samples(std::vector<Sample> names)
 {
     samples_.clear();
     sampleLookup_.clear();
-    for (auto&& name : names)
+    for (auto&& name : names) {
         AddSample(std::move(name));
+    }
     return *this;
 }
 

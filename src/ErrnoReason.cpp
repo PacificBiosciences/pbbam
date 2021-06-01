@@ -12,7 +12,9 @@ namespace BAM {
 
 void MaybePrintErrnoReason(std::ostream& out)
 {
-    if (errno != 0) out << "\n  reason: " << std::strerror(errno);
+    if (errno != 0) {
+        out << "\n  reason: " << std::strerror(errno);
+    }
 }
 
 }  // namespace BAM
