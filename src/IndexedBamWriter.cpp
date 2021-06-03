@@ -4,7 +4,6 @@
 
 #include <sys/stat.h>
 
-#include <cassert>
 #include <cstdint>
 
 #include <array>
@@ -71,12 +70,17 @@ public:
 
         const std::string gziFn{bamFilename_ + ".gzi"};
         std::unique_ptr<FILE, Utility::FileDeleter> gziFile{fopen(gziFn.c_str(), "rb")};
-        if (!gziFile) throw IndexedBamWriterException{gziFn, "could not open *.gzi file"};
+        if (!gziFile) {
+            throw IndexedBamWriterException{gziFn, "could not open *.gzi file"};
+        }
 
         uint64_t numElements;
-        if (fread(&numElements, sizeof(numElements), 1, gziFile.get()) < 1)
+        if (fread(&numElements, sizeof(numElements), 1, gziFile.get()) < 1) {
             throw IndexedBamWriterException{gziFn, "could not read from *.gzi file"};
-        if (ed_is_big()) ed_swap_8(numElements);
+        }
+        if (ed_is_big()) {
+            ed_swap_8(numElements);
+        }
 
         std::vector<GzIndexEntry> result;
         result.reserve(numElements);
@@ -84,8 +88,9 @@ public:
             GzIndexEntry entry;
             const auto vReturn = fread(&entry.vAddress, sizeof(entry.vAddress), 1, gziFile.get());
             const auto uReturn = fread(&entry.uAddress, sizeof(entry.uAddress), 1, gziFile.get());
-            if (vReturn < 1 || uReturn < 1)
+            if (vReturn < 1 || uReturn < 1) {
                 throw IndexedBamWriterException{gziFn, "could not read from *.gzi file"};
+            }
 
             if (ed_is_big()) {
                 ed_swap_8(entry.vAddress);
@@ -195,14 +200,17 @@ public:
         //       prototyping but need to be tune-able via API.
         //
 
-        if (!header_) throw IndexedBamWriterException{bamFilename_, "null header provided"};
+        if (!header_) {
+            throw IndexedBamWriterException{bamFilename_, "null header provided"};
+        }
 
         // open output BAM
         const auto usingFilename = bamFilename_;
         const auto mode = std::string("wb") + std::to_string(static_cast<int>(compressionLevel));
         bam_.reset(sam_open(usingFilename.c_str(), mode.c_str()));
-        if (!bam_)
+        if (!bam_) {
             throw IndexedBamWriterException{usingFilename, "could not open file for writing"};
+        }
 
         const auto indexInit = bgzf_index_build_init(bam_.get()->fp.bgzf);
         if (indexInit != 0) {
@@ -216,13 +224,19 @@ public:
             actualNumThreads = std::thread::hardware_concurrency();
 
             // if still unknown, default to single-threaded
-            if (actualNumThreads == 0) actualNumThreads = 1;
+            if (actualNumThreads == 0) {
+                actualNumThreads = 1;
+            }
         }
-        if (actualNumThreads > 1) hts_set_threads(bam_.get(), actualNumThreads);
+        if (actualNumThreads > 1) {
+            hts_set_threads(bam_.get(), actualNumThreads);
+        }
 
         // write header
         auto ret = sam_hdr_write(bam_.get(), header_.get());
-        if (ret != 0) throw IndexedBamWriterException{usingFilename, "could not write header"};
+        if (ret != 0) {
+            throw IndexedBamWriterException{usingFilename, "could not write header"};
+        }
         ret = bgzf_flush(bam_.get()->fp.bgzf);
 
         // store file positions after header
@@ -267,7 +281,9 @@ public:
 
         // write record to file
         const auto ret = sam_write1(bam_.get(), header_.get(), rawRecord.get());
-        if (ret <= 0) throw IndexedBamWriterException{bamFilename_, "could not write record"};
+        if (ret <= 0) {
+            throw IndexedBamWriterException{bamFilename_, "could not write record"};
+        }
 
         // update file position
         auto recordLength = [](bam1_t* b) {
@@ -279,9 +295,9 @@ public:
             // TODO: long CIGAR handling... sigh...
 
             size_t remainingLength = 0;
-            if (c->n_cigar <= 0xffff)
+            if (c->n_cigar <= 0xffff) {
                 remainingLength = (b->l_data - c->l_qname);
-            else {
+            } else {
                 const size_t cigarEnd = ((uint8_t*)bam_get_cigar(b) - b->data) + (c->n_cigar * 4);
                 remainingLength = 8 + (b->l_data - cigarEnd) + 4 + (4 * c->n_cigar);
             }
@@ -616,11 +632,6 @@ private:
 
 #endif  // HTS_VERSION
 
-static_assert(!std::is_copy_constructible<IndexedBamWriter>::value,
-              "IndexedBamWriter(const IndexedBamWriter&) is not = delete");
-static_assert(!std::is_copy_assignable<IndexedBamWriter>::value,
-              "IndexedBamWriter& operator=(const IndexedBamWriter&) is not = delete");
-
 IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamHeader& header,
                                    const BamWriter::CompressionLevel bamCompressionLevel,
                                    const size_t numBamThreads,
@@ -629,10 +640,11 @@ IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamH
                                    const size_t tempFileBufferSize)
     : IRecordWriter(), d_{nullptr}
 {
-    if (tempFileBufferSize % 8 != 0)
+    if (tempFileBufferSize % 8 != 0) {
         throw std::runtime_error{
             "[pbbam] indexed BAM writer ERROR: invalid buffer size for PBI builder (" +
             std::to_string(tempFileBufferSize) + "). Must be a multiple of 8."};
+    }
 
 #if PBBAM_AUTOVALIDATE
     Validator::Validate(header);

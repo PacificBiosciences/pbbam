@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/virtual/ZmwReadStitcher.h>
 
 #include <cstddef>

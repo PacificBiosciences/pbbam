@@ -3,7 +3,6 @@
 
 #include <pbbam/Config.h>
 
-#include <cassert>
 #include <ctime>
 
 #include <chrono>
@@ -56,7 +55,9 @@ public:
         char date_time_str[50];
         strftime(date_time_str, sizeof(date_time_str), date_time_format, ttm);
         std::string result(date_time_str);
-        if (ms.count() > 0) result.append(std::to_string(ms.count()));
+        if (ms.count() > 0) {
+            result.append(std::to_string(ms.count()));
+        }
         return result;
     }
 

@@ -1,5 +1,7 @@
 #include <pbbam/internal/DataSetElement.h>
 
+#include <cassert>
+
 #include <iostream>
 #include <stdexcept>
 #include <tuple>
@@ -77,7 +79,9 @@ inline std::string& DataSetElement::Attribute(const std::string& name) { return 
 inline const std::string& DataSetElement::Attribute(const std::string& name) const
 {
     auto iter = attributes_.find(name);
-    if (iter == attributes_.cend()) return SharedNullString();
+    if (iter == attributes_.cend()) {
+        return SharedNullString();
+    }
     return iter->second;
 }
 
@@ -97,10 +101,11 @@ template <typename T>
 const T& DataSetElement::Child(size_t index) const
 {
     DataSetElement* child = children_.at(index).get();
-    if (child == nullptr)
+    if (child == nullptr) {
         throw std::runtime_error{
             "[pbbam] dataset element ERROR: cannot access null child at index " +
             std::to_string(index) + " in element: " + QualifiedNameLabel()};
+    }
     const T* c = dynamic_cast<const T*>(child);
     return *c;
 }
@@ -109,10 +114,11 @@ template <typename T>
 T& DataSetElement::Child(size_t index)
 {
     DataSetElement* child = children_.at(index).get();
-    if (child == nullptr)
+    if (child == nullptr) {
         throw std::runtime_error{
             "[pbbam] dataset element ERROR: cannot access null child at index " +
             std::to_string(index) + " in element: " + QualifiedNameLabel()};
+    }
     T* c = dynamic_cast<T*>(child);
     return *c;
 }
@@ -162,13 +168,17 @@ inline std::vector<std::shared_ptr<DataSetElement>>& DataSetElement::Children()
 
 inline const std::string& DataSetElement::ChildText(const std::string& label) const
 {
-    if (!HasChild(label)) return SharedNullString();
+    if (!HasChild(label)) {
+        return SharedNullString();
+    }
     return Child<DataSetElement>(label).Text();
 }
 
 inline std::string& DataSetElement::ChildText(const std::string& label)
 {
-    if (!HasChild(label)) AddChild(DataSetElement(label));
+    if (!HasChild(label)) {
+        AddChild(DataSetElement(label));
+    }
     return Child<DataSetElement>(label).Text();
 }
 
@@ -188,8 +198,9 @@ inline int DataSetElement::IndexOf(const std::string& label) const
     for (size_t i = 0; i < count; ++i) {
         const DataSetElement& child = *(children_.at(i).get());
         if (child.LocalNameLabel() == label || child.QualifiedNameLabel() == label ||
-            child.label_ == label)
+            child.label_ == label) {
             return i;
+        }
     }
     return -1;
 }
@@ -215,7 +226,9 @@ inline void DataSetElement::RemoveChild(const DataSetElement& e)
 {
     std::vector<std::shared_ptr<DataSetElement>> newChildren;
     for (std::shared_ptr<DataSetElement>& child : children_) {
-        if (*(child.get()) != e) newChildren.push_back(std::move(child));
+        if (*(child.get()) != e) {
+            newChildren.push_back(std::move(child));
+        }
     }
     children_ = std::move(newChildren);
 }
@@ -358,16 +371,18 @@ inline XmlName::XmlName(std::string fullName, bool verbatim)
     , verbatim_(verbatim)
 {
     const size_t colonFound = qualifiedName_.find(':');
-    if (colonFound == std::string::npos || colonFound == 0)
+    if (colonFound == std::string::npos || colonFound == 0) {
         localNameSize_ = qualifiedName_.size();
-    else {
+    } else {
         prefixSize_ = colonFound;
         localNameSize_ = (qualifiedName_.size() - colonFound) - 1;
     }
 
     // adjust for colon if prefix present
     localNameOffset_ = prefixSize_;
-    if (prefixSize_ != 0) ++localNameOffset_;
+    if (prefixSize_ != 0) {
+        ++localNameOffset_;
+    }
 }
 
 inline XmlName::XmlName(const std::string& localName, const std::string& prefix)
@@ -379,11 +394,15 @@ inline XmlName::XmlName(const std::string& localName, const std::string& prefix)
     qualifiedName_.clear();
     qualifiedName_.reserve(localNameSize_ + prefixSize_ + 1);
     qualifiedName_.append(prefix);
-    if (!qualifiedName_.empty()) qualifiedName_.append(1, ':');
+    if (!qualifiedName_.empty()) {
+        qualifiedName_.append(1, ':');
+    }
     qualifiedName_.append(localName);
 
     // adjust for colon if prefix present
-    if (prefixSize_ != 0) ++localNameOffset_;
+    if (prefixSize_ != 0) {
+        ++localNameOffset_;
+    }
 }
 
 inline bool XmlName::operator==(const XmlName& other) const noexcept

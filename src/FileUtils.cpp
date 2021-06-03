@@ -116,7 +116,9 @@ static std::string native_resolvedFilePath(const std::string& filePath, const st
 
     // if empty or already absolute path, just return it
     // upfront empty check simplifies further parsing logic
-    if (schemeLess.empty() || native_pathIsAbsolute(schemeLess)) return schemeLess;
+    if (schemeLess.empty() || native_pathIsAbsolute(schemeLess)) {
+        return schemeLess;
+    }
 
     // else make relative from the provided 'from' directory
     //
@@ -127,7 +129,9 @@ static std::string native_resolvedFilePath(const std::string& filePath, const st
     //
     const bool thisDirAtStart = (schemeLess.find(".") == 0);
     if (thisDirAtStart) {
-        if (schemeLess.find(native_pathSeparator) == 1) schemeLess = schemeLess.substr(2);
+        if (schemeLess.find(native_pathSeparator) == 1) {
+            schemeLess = schemeLess.substr(2);
+        }
     }
     return from + native_pathSeparator + schemeLess;
 }
@@ -144,22 +148,28 @@ std::string FileUtils::CurrentWorkingDirectory()
 
     // stack-based buffer for 'normal' case
     char buffer[chunkSize];
-    if (getcwd(buffer, sizeof(buffer)) != nullptr) return std::string(buffer);
+    if (getcwd(buffer, sizeof(buffer)) != nullptr) {
+        return std::string(buffer);
+    }
 
     // if error is not ERANGE, then it's not a problem of too-long name... something else happened
-    if (errno != ERANGE)
+    if (errno != ERANGE) {
         throw std::runtime_error{
             "[pbbam] file utilities ERROR: could not determine current working directory path"};
+    }
 
     // long path - use heap, trying progressively longer buffers
     for (size_t chunks = 2; chunks < maxNumChunks; ++chunks) {
         std::unique_ptr<char> cwd(new char[chunkSize * chunks]);
-        if (getcwd(cwd.get(), chunkSize * chunks) != nullptr) return std::string(cwd.get());
+        if (getcwd(cwd.get(), chunkSize * chunks) != nullptr) {
+            return std::string(cwd.get());
+        }
 
         // if error is not ERANGE, then it's not a problem of too-long name... something else happened
-        if (errno != ERANGE)
+        if (errno != ERANGE) {
             throw std::runtime_error{
                 "[pbbam] file utilities ERROR: could not determine current working directory path"};
+        }
     }
 
     // crazy long path name
@@ -171,7 +181,9 @@ std::string FileUtils::CurrentWorkingDirectory()
 std::string FileUtils::DirectoryName(const std::string& file)
 {
     const auto found = file.rfind(Separator(), file.length());
-    if (found != std::string::npos) return file.substr(0, found);
+    if (found != std::string::npos) {
+        return file.substr(0, found);
+    }
     return std::string(".");
 }
 

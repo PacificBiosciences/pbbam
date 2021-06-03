@@ -1,5 +1,3 @@
-// Author: Ivan Sovic
-
 #ifndef PBBAMIFY_SETTINGS_H
 #define PBBAMIFY_SETTINGS_H
 

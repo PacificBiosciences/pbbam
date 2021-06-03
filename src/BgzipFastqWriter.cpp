@@ -53,10 +53,11 @@ void BgzipFastqWriter::Write(const std::string& name, const std::string& bases,
                              const std::string& quals)
 {
     std::string out{"@" + name + '\n' + bases + "\n+\n"};
-    if (!quals.empty())
+    if (!quals.empty()) {
         out += quals;
-    else
+    } else {
         out += std::string(bases.size(), '!');
+    }
     out.push_back('\n');
     writer_.Write(out);
 }

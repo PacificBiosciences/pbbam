@@ -1,7 +1,6 @@
-// Author: Derek Barnett
-
 #include <pbbam/../../src/FileUtils.h>
 
+#include <cassert>
 #include <cctype>
 #include <chrono>
 #include <cstdio>
@@ -140,7 +139,9 @@ std::string removeFileUriScheme(const std::string& uri)
     const std::string fileScheme = "file://";
     const auto schemeFound = schemeLess.find(fileScheme);
     if (schemeFound != std::string::npos) {
-        if (schemeFound != 0) throw std::runtime_error{"Malformed URI: scheme not at beginning"};
+        if (schemeFound != 0) {
+            throw std::runtime_error{"Malformed URI: scheme not at beginning"};
+        }
         schemeLess = schemeLess.substr(fileScheme.size());
     }
     return schemeLess;
@@ -150,7 +151,9 @@ std::string removeDiskName(const std::string& filePath)
 {
     if (filePath.size() >= 2) {
         const char firstChar = filePath.at(0);
-        if ((isalpha(firstChar) != 0) && (filePath.at(1) == ':')) return filePath.substr(2);
+        if ((isalpha(firstChar) != 0) && (filePath.at(1) == ':')) {
+            return filePath.substr(2);
+        }
     }
     return filePath;
 }
@@ -162,10 +165,14 @@ bool native_pathIsAbsolute(const std::string& filePath)
     assert(!filePath.empty());
 
     // if starts with single slash or double slash [cases 1,3]
-    if (boost::algorithm::starts_with(filePath, "\\")) return true;
+    if (boost::algorithm::starts_with(filePath, "\\")) {
+        return true;
+    }
 
     // if starts with single or double-dots -> not absolute [case 4 + ".\file.txt"]
-    if (boost::algorithm::starts_with(filePath, ".")) return false;
+    if (boost::algorithm::starts_with(filePath, ".")) {
+        return false;
+    }
 
     // if starts with drive name and colon ("C:\foo\bar.txt")
     if (filePath.size() >= 2) {
@@ -203,7 +210,9 @@ std::string native_resolvedFilePath(const std::string& filePath, const std::stri
 
     const bool thisDirAtStart = (schemeLess.find(".") == 0);
     if (thisDirAtStart) {
-        if (schemeLess.find(native_pathSeparator) == 1) schemeLess = schemeLess.substr(2);
+        if (schemeLess.find(native_pathSeparator) == 1) {
+            schemeLess = schemeLess.substr(2);
+        }
     }
     return from + native_pathSeparator + schemeLess;
 }

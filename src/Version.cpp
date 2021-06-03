@@ -21,12 +21,15 @@ Version::Version(const std::string& v) : major_{0}, minor_{0}, revision_{0}
     try {
         const auto fields = Split(v, '.');
         const auto numFields = fields.size();
-        if (numFields == 0)
+        if (numFields == 0) {
             throw std::runtime_error{"[pbbam] version string parsing ERROR: empty string"};
+        }
         major_ = std::stoi(fields.at(0));
         if (numFields > 1) {
             minor_ = std::stoi(fields.at(1));
-            if (numFields > 2) revision_ = std::stoi(fields.at(2));
+            if (numFields > 2) {
+                revision_ = std::stoi(fields.at(2));
+            }
         }
     } catch (std::exception& e) {
         std::ostringstream msg;

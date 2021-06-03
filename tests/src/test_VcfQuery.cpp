@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/vcf/VcfQuery.h>
 
 #include <cstddef>

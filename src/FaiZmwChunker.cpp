@@ -16,12 +16,15 @@ namespace {
 int32_t HoleNumber(const std::string& name)
 {
     const auto firstSlash = name.find('/');
-    if (firstSlash == std::string::npos)
+    if (firstSlash == std::string::npos) {
         throw std::runtime_error{
             "[pbbam] FAI chunking ERROR: could not parse hole number from name: " + name};
+    }
 
     auto numberEnd = name.find('/', firstSlash + 1);
-    if (numberEnd == std::string::npos) numberEnd = name.size();
+    if (numberEnd == std::string::npos) {
+        numberEnd = name.size();
+    }
 
     return std::stoi(name.substr(firstSlash + 1, (numberEnd - firstSlash)));
 }
@@ -31,13 +34,16 @@ int32_t HoleNumber(const std::string& name)
 FaiZmwChunker::FaiZmwChunker(const FaiIndex& index, const size_t numChunks)
 {
     // zero chunks is error
-    if (numChunks == 0)
+    if (numChunks == 0) {
         throw std::runtime_error{
             "[pbbam] FAI chunking ERROR: requested chunk count must be greater than zero"};
+    }
 
     // empty index is not (?), but quick return
     const auto& names = index.Names();
-    if (names.empty()) return;
+    if (names.empty()) {
+        return;
+    }
 
     // tease apart unique ZMWs
     int32_t currentHoleNumber = -1;
@@ -47,8 +53,9 @@ FaiZmwChunker::FaiZmwChunker(const FaiIndex& index, const size_t numChunks)
         if (holeNumber != currentHoleNumber) {
             rawChunks.emplace_back(FaiZmwChunk{name, index.Entry(name).SeqOffset, 1, 1});
             currentHoleNumber = holeNumber;
-        } else
+        } else {
             ++rawChunks.back().NumRecords;
+        }
     }
 
     // no empty chunks (e.g. reduce the requested number, if small ZMW input)
@@ -58,8 +65,9 @@ FaiZmwChunker::FaiZmwChunker(const FaiIndex& index, const size_t numChunks)
     const int minimum = (rawChunks.size() / actualNumChunks);
     const int modulo = (rawChunks.size() % actualNumChunks);
     std::vector<size_t> chunkCounts(actualNumChunks, minimum);
-    for (int i = 0; i < modulo; ++i)
+    for (int i = 0; i < modulo; ++i) {
         ++chunkCounts.at(i);
+    }
 
     // collate zmw data into larger chunks
     size_t begin = 0;
@@ -73,8 +81,9 @@ FaiZmwChunker::FaiZmwChunker(const FaiIndex& index, const size_t numChunks)
         // add data for this chunk
         FaiZmwChunk result = rawChunks.at(begin);
         result.NumZmws = n;
-        for (size_t j = begin + 1; j < end; ++j)
+        for (size_t j = begin + 1; j < end; ++j) {
             result.NumRecords += rawChunks.at(j).NumRecords;
+        }
         chunks_.emplace_back(std::move(result));
 
         // slide to next chunk

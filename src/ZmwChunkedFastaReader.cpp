@@ -93,7 +93,9 @@ public:
 
     bool GetNext(FastaSequence& record)
     {
-        if (remaining == 0) return false;
+        if (remaining == 0) {
+            return false;
+        }
         record = reader_->ReadNextFasta(firstRecord);
         if (firstRecord) {
             record.Name(reader_->chunker_.Chunk(currentChunkId_).FirstSeqName);
@@ -109,11 +111,6 @@ public:
     bool firstRecord;
     size_t remaining;
 };
-
-static_assert(!std::is_copy_constructible<ZmwChunkedFastaReader>::value,
-              "ZmwChunkedFastaReader(const ZmwChunkedFastaReader&) is not = delete");
-static_assert(!std::is_copy_assignable<ZmwChunkedFastaReader>::value,
-              "ZmwChunkedFastaReader& operator=(const ZmwChunkedFastaReader&) is not = delete");
 
 ZmwChunkedFastaReader::ZmwChunkedFastaReader(const std::string& fn, const size_t numChunks)
     : internal::QueryBase<FastaSequence>{}

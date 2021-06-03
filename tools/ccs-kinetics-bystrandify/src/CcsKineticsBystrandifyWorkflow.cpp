@@ -136,7 +136,9 @@ struct UserIO
 
             for (const BAM::ExternalResource& ext : externalResources) {
                 const std::string& bamFilename = ext.ResourceId();
-                if (!boost::iends_with(bamFilename, ".bam")) continue;
+                if (!boost::iends_with(bamFilename, ".bam")) {
+                    continue;
+                }
 
                 StrandifyTask task;
                 task.InputBamFile = ResolveBamPath(bamFilename, *InputDatasetFile);
@@ -218,37 +220,48 @@ void Strandify(StrandifyTask& task, const CcsKineticsBystrandify::Settings& sett
         const std::string readName = read.FullName();
         PBLOG_VERBOSE << "Processing " << readName;
 
-        if (read.Type() != BAM::RecordType::CCS)
+        if (read.Type() != BAM::RecordType::CCS) {
             throw std::runtime_error{"Read '" + readName + "' is of " + BAM::ToString(read.Type()) +
                                      " type, only CCS reads can be converted"};
-        if (read.IsMapped())
+        }
+        if (read.IsMapped()) {
             throw std::runtime_error{"Read '" + readName +
                                      "' is aligned, only unaligned CCS reads can be converted"};
-        if (read.HasPulseWidth())
+        }
+        if (read.HasPulseWidth()) {
             throw std::runtime_error{
                 "Read '" + readName +
                 "' already has 'pw' tag, have you processed this file already?"};
-        if (read.HasIPD())
+        }
+        if (read.HasIPD()) {
             throw std::runtime_error{
                 "Read '" + readName +
                 "' already has 'ip' tag, have you processed this file already?"};
+        }
 
         const BAM::BamRecordImpl& readImpl = read.Impl();
-        if (!readImpl.HasTag("fn"))
+        if (!readImpl.HasTag("fn")) {
             throw std::runtime_error{"Read '" + readName + "' is missing 'fn' CCS-Kinetics tag"};
-        if (!readImpl.HasTag("fp"))
+        }
+        if (!readImpl.HasTag("fp")) {
             throw std::runtime_error{"Read '" + readName + "' is missing 'fp' CCS-Kinetics tag"};
-        if (!readImpl.HasTag("fi"))
+        }
+        if (!readImpl.HasTag("fi")) {
             throw std::runtime_error{"Read '" + readName + "' is missing 'fi' CCS-Kinetics tag"};
-        if (!readImpl.HasTag("rn"))
+        }
+        if (!readImpl.HasTag("rn")) {
             throw std::runtime_error{"Read '" + readName + "' is missing 'rn' CCS-Kinetics tag"};
-        if (!readImpl.HasTag("rp"))
+        }
+        if (!readImpl.HasTag("rp")) {
             throw std::runtime_error{"Read '" + readName + "' is missing 'rp' CCS-Kinetics tag"};
-        if (!readImpl.HasTag("ri"))
+        }
+        if (!readImpl.HasTag("ri")) {
             throw std::runtime_error{"Read '" + readName + "' is missing 'ri' CCS-Kinetics tag"};
+        }
 
-        if (boost::ends_with(readName, "/fwd") || boost::ends_with(readName, "/rev"))
+        if (boost::ends_with(readName, "/fwd") || boost::ends_with(readName, "/rev")) {
             throw std::runtime_error{"Read '" + readName + "' is already by-strandified"};
+        }
 
         // all necessary fields validated, let's create the individual records
         const int32_t holeNumber = read.HoleNumber();

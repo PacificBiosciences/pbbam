@@ -1,7 +1,6 @@
-// Author: Derek Barnett
-
 #include <pbbam/BamRecord.h>
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 

@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <cstdio>
 #include <cstdlib>
 
@@ -79,8 +77,9 @@ int RunDiff(const std::string& fn1, const std::string& fn2)
 
 void Remove(const std::vector<std::string>& files)
 {
-    for (const auto& fn : files)
+    for (const auto& fn : files) {
         remove(fn.c_str());
+    }
 }
 
 void CheckGeneratedOutput()
@@ -144,8 +143,9 @@ TEST(BAM_EndToEnd, can_roundtrip_single_thread_count_writing)
                          BamWriter::DefaultCompression, 1};
 
         EntireFileQuery entireFile{bamFile};
-        for (const BamRecord& record : entireFile)
+        for (const BamRecord& record : entireFile) {
             writer.Write(record);
+        }
     }
 
     EndToEndTests::CheckGeneratedOutput();
@@ -158,8 +158,9 @@ TEST(BAM_EndToEnd, can_roundtrip_default_thread_count_writing)
         BamWriter writer{EndToEndTests::generatedBamFn, bamFile.Header()};
 
         EntireFileQuery entireFile{bamFile};
-        for (const BamRecord& record : entireFile)
+        for (const BamRecord& record : entireFile) {
             writer.Write(record);
+        }
     }
 
     EndToEndTests::CheckGeneratedOutput();
@@ -173,8 +174,9 @@ TEST(BAM_EndToEnd, can_roundtrip_system_thread_count_writing)
                          BamWriter::DefaultCompression, 0};
 
         EntireFileQuery entireFile{bamFile};
-        for (const BamRecord& record : entireFile)
+        for (const BamRecord& record : entireFile) {
             writer.Write(record);
+        }
     }
 
     EndToEndTests::CheckGeneratedOutput();
@@ -188,8 +190,9 @@ TEST(BAM_EndToEnd, can_roundtrip_user_thread_count_writing)
                          BamWriter::DefaultCompression, 3};
 
         EntireFileQuery entireFile{bamFile};
-        for (const BamRecord& record : entireFile)
+        for (const BamRecord& record : entireFile) {
             writer.Write(record);
+        }
     }
 
     EndToEndTests::CheckGeneratedOutput();

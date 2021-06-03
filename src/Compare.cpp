@@ -80,14 +80,19 @@ bool Compare::AlignmentPosition::operator()(const BamRecord& lhs, const BamRecor
     const int32_t rhsId = rhs.ReferenceId();
 
     // push unmapped reads to bottom
-    if (lhsId == -1) return false;
-    if (rhsId == -1) return true;
+    if (lhsId == -1) {
+        return false;
+    }
+    if (rhsId == -1) {
+        return true;
+    }
 
     // compare by refId, then position
-    if (lhsId == rhsId)
+    if (lhsId == rhsId) {
         return lhs.ReferenceStart() < rhs.ReferenceStart();
-    else
+    } else {
         return lhsId < rhsId;
+    }
 }
 
 bool Compare::QName::operator()(const BamRecord& lhs, const BamRecord& rhs) const
@@ -96,21 +101,31 @@ bool Compare::QName::operator()(const BamRecord& lhs, const BamRecord& rhs) cons
     const auto lMovieName = lhs.MovieName();
     const auto rMovieName = rhs.MovieName();
     const int cmp = lMovieName.compare(rMovieName);
-    if (cmp != 0) return cmp < 0;
+    if (cmp != 0) {
+        return cmp < 0;
+    }
 
     // hole number
     const auto lhsZmw = lhs.HoleNumber();
     const auto rhsZmw = rhs.HoleNumber();
-    if (lhsZmw != rhsZmw) return lhsZmw < rhsZmw;
+    if (lhsZmw != rhsZmw) {
+        return lhsZmw < rhsZmw;
+    }
 
     // shuffle CCS/transcript reads after all others
-    if (IsCcsOrTranscript(lhs.Type())) return false;
-    if (IsCcsOrTranscript(rhs.Type())) return true;
+    if (IsCcsOrTranscript(lhs.Type())) {
+        return false;
+    }
+    if (IsCcsOrTranscript(rhs.Type())) {
+        return true;
+    }
 
     // sort on qStart, then finally qEnd
     const auto lhsQStart = lhs.QueryStart();
     const auto rhsQStart = rhs.QueryStart();
-    if (lhsQStart != rhsQStart) return lhsQStart < rhsQStart;
+    if (lhsQStart != rhsQStart) {
+        return lhsQStart < rhsQStart;
+    }
 
     const auto lhsQEnd = lhs.QueryEnd();
     const auto rhsQEnd = rhs.QueryEnd();

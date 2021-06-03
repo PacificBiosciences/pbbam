@@ -12,8 +12,9 @@ namespace BAM {
 
 FastaCacheData::FastaCacheData(const std::string& filename) : cache_{FastaReader::ReadAll(filename)}
 {
-    for (size_t i = 0; i < cache_.size(); ++i)
+    for (size_t i = 0; i < cache_.size(); ++i) {
         lookup_.emplace(cache_[i].Name(), i);
+    }
 }
 
 std::pair<bool, std::string> FastaCacheData::Check() const
@@ -64,8 +65,9 @@ std::vector<std::string> FastaCacheData::Names() const
 {
     std::vector<std::string> result;
     result.reserve(cache_.size());
-    for (const auto& seq : cache_)
+    for (const auto& seq : cache_) {
         result.push_back(seq.Name());
+    }
     return result;
 }
 

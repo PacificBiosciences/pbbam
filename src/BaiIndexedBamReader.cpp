@@ -22,7 +22,9 @@ public:
     BaiIndexedBamReaderPrivate(BamFile file, const std::shared_ptr<BaiIndexCacheData>& index)
         : file_{std::move(file)}, index_{index}
     {
-        if (!index_) index_ = std::make_shared<BaiIndexCacheData>(file_);
+        if (!index_) {
+            index_ = std::make_shared<BaiIndexCacheData>(file_);
+        }
         assert(index_);  // should throw in cache load if failed
     }
 

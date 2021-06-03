@@ -1,5 +1,7 @@
 #include <pbbam/PbiFilter.h>
 
+#include <cassert>
+
 #include <algorithm>
 #include <iostream>
 #include <map>
@@ -119,8 +121,9 @@ struct PbiFilterPrivate
 {
     PbiFilterPrivate(PbiFilter::CompositionType type = PbiFilter::INTERSECT) : type_{type}
     {
-        if (type_ != PbiFilter::INTERSECT && type_ != PbiFilter::UNION)
+        if (type_ != PbiFilter::INTERSECT && type_ != PbiFilter::UNION) {
             throw std::runtime_error{"[pbbam] PBI filter ERROR: invalid composite filter type"};
+        }
     }
 
     template <typename T>
@@ -139,12 +142,16 @@ struct PbiFilterPrivate
     bool Accepts(const PbiRawData& idx, const size_t row) const
     {
         // no filter -> accepts every record
-        if (filters_.empty()) return true;
+        if (filters_.empty()) {
+            return true;
+        }
 
         // intersection of child filters
         if (type_ == PbiFilter::INTERSECT) {
             for (const auto& filter : filters_) {
-                if (!filter.Accepts(idx, row)) return false;  // break early on failure
+                if (!filter.Accepts(idx, row)) {
+                    return false;  // break early on failure
+                }
             }
             return true;  // all passed
         }
@@ -153,7 +160,9 @@ struct PbiFilterPrivate
         else {
             assert(type_ == PbiFilter::UNION);
             for (const auto& filter : filters_) {
-                if (filter.Accepts(idx, row)) return true;  // break early on pass
+                if (filter.Accepts(idx, row)) {
+                    return true;  // break early on pass
+                }
             }
             return false;  // none passed
         }
@@ -210,8 +219,9 @@ inline PbiFilter& PbiFilter::Add(PbiFilter filter)
 
 inline PbiFilter& PbiFilter::Add(std::vector<PbiFilter> filters)
 {
-    for (auto&& filter : filters)
+    for (auto&& filter : filters) {
         d_->Add(std::move(filter));
+    }
     return *this;
 }
 

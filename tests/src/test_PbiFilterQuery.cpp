@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/PbiFilterQuery.h>
 
 #include <cstddef>
@@ -78,12 +76,12 @@ TEST(BAM_PbiFilterQuery, can_perform_normal_filtered_queries)
             ++count;
             EXPECT_EQ(std::string("b89a4406"), r.ReadGroupId());
             EXPECT_GE((r.NumMatches()), 1200);
-            if (count == 1)
+            if (count == 1) {
                 EXPECT_EQ(
                     std::string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/"
                                 "14743/2579_4055"),
                     r.FullName());
-            else {
+            } else {
                 if (count == 2) {
                     EXPECT_EQ(
                         std::string("m140905_042212_sidney_c100564852550000001823085912221377_s1_"
@@ -541,8 +539,9 @@ TEST(BAM_PbiFilterQuery, can_handle_transcript_records)
     const std::string transcriptFn = PbbamTestsConfig::Data_Dir + "/transcript.subreads.bam";
 
     PbiFilterQuery query{PbiFilter{}, transcriptFn};
-    for (const auto& b : query)
+    for (const auto& b : query) {
         EXPECT_TRUE(b.HasHoleNumber());
+    }
 
     {  // zmw whitelist
         const std::vector<int32_t> whitelist = {1, 3};

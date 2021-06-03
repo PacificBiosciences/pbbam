@@ -48,7 +48,9 @@ bool HasLongCigar(const bam1_t* const b)
     auto* c = &b->core;
 
     // if empty CIGAR or unmapped
-    if (c->n_cigar == 0 || c->tid < 0 || c->pos < 0) return false;
+    if (c->n_cigar == 0 || c->tid < 0 || c->pos < 0) {
+        return false;
+    }
 
     // if existing CIGAR doesn't look like a 'fake CIGAR'
     const auto firstCigarOp = *(bam_get_cigar(b));
@@ -59,13 +61,19 @@ bool HasLongCigar(const bam1_t* const b)
 
     // if CG tag missing, not expected type
     const uint8_t* const CG = bam_aux_get(b, "CG");
-    if (CG == nullptr) return false;
-    if (CG[0] != 'B' || CG[1] != 'I') return false;
+    if (CG == nullptr) {
+        return false;
+    }
+    if (CG[0] != 'B' || CG[1] != 'I') {
+        return false;
+    }
 
     // if CG tag data is empty
     uint32_t numElements = 0;
     memcpy(&numElements, &CG[2], sizeof(uint32_t));
-    if (numElements == 0) return false;
+    if (numElements == 0) {
+        return false;
+    }
 
     // we've found long CIGAR data in the CG tag
     return true;
@@ -88,7 +96,9 @@ BamRecordImpl::BamRecordImpl(const BamRecordImpl& other)
 BamRecordImpl& BamRecordImpl::operator=(const BamRecordImpl& other)
 {
     if (this != &other) {
-        if (d_ == nullptr) InitializeData();
+        if (d_ == nullptr) {
+            InitializeData();
+        }
         auto* copyOk = bam_copy1(d_.get(), other.d_.get());
         if (!copyOk) {
             throw std::runtime_error{"[pbbam] BAM record ERROR: could not copy data from record '" +
@@ -115,9 +125,13 @@ bool BamRecordImpl::AddTag(const BamRecordTag tag, const Tag& value)
 bool BamRecordImpl::AddTag(const std::string& tagName, const Tag& value,
                            const TagModifier additionalModifier)
 {
-    if (tagName.size() != 2 || HasTag(tagName)) return false;
+    if (tagName.size() != 2 || HasTag(tagName)) {
+        return false;
+    }
     const auto added = AddTagImpl(tagName, value, additionalModifier);
-    if (added) UpdateTagMap();
+    if (added) {
+        UpdateTagMap();
+    }
     return added;
 }
 
@@ -131,7 +145,9 @@ bool BamRecordImpl::AddTagImpl(const std::string& tagName, const Tag& value,
                                const TagModifier additionalModifier)
 {
     const auto rawData = BamTagCodec::ToRawData(value, additionalModifier);
-    if (rawData.empty()) return false;
+    if (rawData.empty()) {
+        return false;
+    }
 
     bam_aux_append(d_.get(), tagName.c_str(), BamTagCodec::TagTypeCode(value, additionalModifier),
                    rawData.size(), const_cast<uint8_t*>(rawData.data()));
@@ -179,15 +195,18 @@ BamRecordImpl& BamRecordImpl::CigarData(const Data::Cigar& cigar)
             const CigarOperation& op = cigar.at(i);
             cigarData[i] = bam_cigar_gen(op.Length(), static_cast<int>(op.Type()));
         }
-        if (HasTag("CG"))
+        if (HasTag("CG")) {
             EditTag("CG", Tag{cigarData});
-        else
+        } else {
             AddTag("CG", Tag{cigarData});
+        }
     }
 
     // otherwise (v1.7+ or short CIGAR), use standard APIs
     else {
-        if (HasTag("CG")) RemoveTag("CG");
+        if (HasTag("CG")) {
+            RemoveTag("CG");
+        }
         SetCigarData(cigar);
     }
 
@@ -214,11 +233,15 @@ bool BamRecordImpl::EditTag(const std::string& tagName, const Tag& newValue,
 {
     // try remove old value (with delayed tag map update)
     const bool removed = RemoveTagImpl(tagName);
-    if (!removed) return false;
+    if (!removed) {
+        return false;
+    }
 
     // if old value removed, add new value
     const bool added = AddTagImpl(tagName, newValue, additionalModifier);
-    if (added) UpdateTagMap();
+    if (added) {
+        UpdateTagMap();
+    }
     return added;
 }
 
@@ -265,7 +288,9 @@ BamRecordImpl BamRecordImpl::FromRawData(const std::shared_ptr<bam1_t>& rawData)
 
 bool BamRecordImpl::HasTag(const std::string& tagName) const
 {
-    if (tagName.size() != 2) return false;
+    if (tagName.size() != 2) {
+        return false;
+    }
     return TagOffset(tagName) != -1;
 }
 
@@ -384,10 +409,11 @@ BamRecordImpl& BamRecordImpl::ReferenceId(int32_t id)
 
 BamRecordImpl& BamRecordImpl::SetDuplicate(bool ok)
 {
-    if (ok)
+    if (ok) {
         d_->core.flag |= BamRecordImpl::DUPLICATE;
-    else
+    } else {
         d_->core.flag &= ~BamRecordImpl::DUPLICATE;
+    }
     return *this;
 }
 
@@ -439,23 +465,30 @@ BamRecordImpl& BamRecordImpl::Name(const std::string& name)
 
 Data::QualityValues BamRecordImpl::Qualities() const
 {
-    if (d_->core.l_qseq == 0) return Data::QualityValues();
+    if (d_->core.l_qseq == 0) {
+        return Data::QualityValues();
+    }
 
     uint8_t* qualData = bam_get_qual(d_);
-    if (qualData[0] == 0xff) return Data::QualityValues();
+    if (qualData[0] == 0xff) {
+        return Data::QualityValues();
+    }
 
     const size_t numQuals = d_->core.l_qseq;
     Data::QualityValues result;
     result.reserve(numQuals);
-    for (size_t i = 0; i < numQuals; ++i)
+    for (size_t i = 0; i < numQuals; ++i) {
         result.push_back(Data::QualityValue(qualData[i]));
+    }
     return result;
 }
 
 bool BamRecordImpl::RemoveTag(const std::string& tagName)
 {
     const bool removed = RemoveTagImpl(tagName);
-    if (removed) UpdateTagMap();
+    if (removed) {
+        UpdateTagMap();
+    }
     return removed;
 }
 
@@ -466,9 +499,13 @@ bool BamRecordImpl::RemoveTag(const BamRecordTag tag)
 
 bool BamRecordImpl::RemoveTagImpl(const std::string& tagName)
 {
-    if (tagName.size() != 2) return false;
+    if (tagName.size() != 2) {
+        return false;
+    }
     uint8_t* data = bam_aux_get(d_.get(), tagName.c_str());
-    if (data == nullptr) return false;
+    if (data == nullptr) {
+        return false;
+    }
     const bool ok = bam_aux_del(d_.get(), data) == 0;
     return ok;
 }
@@ -479,8 +516,9 @@ std::string BamRecordImpl::Sequence() const
     static const constexpr std::array<char, 16> DnaLookup{
         {'=', 'A', 'C', 'M', 'G', 'R', 'S', 'V', 'T', 'W', 'Y', 'H', 'K', 'D', 'B', 'N'}};
     const uint8_t* seqData = bam_get_seq(d_);
-    for (int i = 0; i < d_->core.l_qseq; ++i)
+    for (int i = 0; i < d_->core.l_qseq; ++i) {
         result[i] = DnaLookup[bam_seqi(seqData, i)];
+    }
     return result;
 }
 
@@ -514,91 +552,101 @@ void BamRecordImpl::SetCigarData(const Data::Cigar& cigar)
 
 BamRecordImpl& BamRecordImpl::SetFailedQC(bool ok)
 {
-    if (ok)
+    if (ok) {
         d_->core.flag |= BamRecordImpl::FAILED_QC;
-    else
+    } else {
         d_->core.flag &= ~BamRecordImpl::FAILED_QC;
+    }
     return *this;
 }
 
 BamRecordImpl& BamRecordImpl::SetFirstMate(bool ok)
 {
-    if (ok)
+    if (ok) {
         d_->core.flag |= BamRecordImpl::MATE_1;
-    else
+    } else {
         d_->core.flag &= ~BamRecordImpl::MATE_1;
+    }
     return *this;
 }
 
 BamRecordImpl& BamRecordImpl::SetMapped(bool ok)
 {
-    if (ok)
+    if (ok) {
         d_->core.flag &= ~BamRecordImpl::UNMAPPED;
-    else
+    } else {
         d_->core.flag |= BamRecordImpl::UNMAPPED;
+    }
     return *this;
 }
 
 BamRecordImpl& BamRecordImpl::SetMateMapped(bool ok)
 {
-    if (ok)
+    if (ok) {
         d_->core.flag &= ~BamRecordImpl::MATE_UNMAPPED;
-    else
+    } else {
         d_->core.flag |= BamRecordImpl::MATE_UNMAPPED;
+    }
     return *this;
 }
 
 BamRecordImpl& BamRecordImpl::SetMateReverseStrand(bool ok)
 {
-    if (ok)
+    if (ok) {
         d_->core.flag |= BamRecordImpl::MATE_REVERSE_STRAND;
-    else
+    } else {
         d_->core.flag &= ~BamRecordImpl::MATE_REVERSE_STRAND;
+    }
     return *this;
 }
 
 BamRecordImpl& BamRecordImpl::SetPaired(bool ok)
 {
-    if (ok)
+    if (ok) {
         d_->core.flag |= BamRecordImpl::PAIRED;
-    else
+    } else {
         d_->core.flag &= ~BamRecordImpl::PAIRED;
+    }
     return *this;
 }
 
 BamRecordImpl& BamRecordImpl::SetPrimaryAlignment(bool ok)
 {
-    if (ok)
+    if (ok) {
         d_->core.flag &= ~BamRecordImpl::SECONDARY;
-    else
+    } else {
         d_->core.flag |= BamRecordImpl::SECONDARY;
+    }
     return *this;
 }
 
 BamRecordImpl& BamRecordImpl::SetProperPair(bool ok)
 {
-    if (ok)
+    if (ok) {
         d_->core.flag |= BamRecordImpl::PROPER_PAIR;
-    else
+    } else {
         d_->core.flag &= ~BamRecordImpl::PROPER_PAIR;
+    }
     return *this;
 }
 
 BamRecordImpl& BamRecordImpl::SetReverseStrand(bool ok)
 {
-    if (ok)
+    if (ok) {
         d_->core.flag |= BamRecordImpl::REVERSE_STRAND;
-    else
+    } else {
         d_->core.flag &= ~BamRecordImpl::REVERSE_STRAND;
+    }
     return *this;
 }
 
 BamRecordImpl& BamRecordImpl::SetSecondMate(bool ok)
 {
-    if (ok)
+    if (ok) {
         d_->core.flag |= BamRecordImpl::MATE_2;
-    else
+    } else {
         d_->core.flag &= ~BamRecordImpl::MATE_2;
+    }
     return *this;
 }
 
@@ -661,43 +709,51 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
         memcpy(pEncodedSequence, sequence, encodedSequenceLength);
     } else {
         memset(pEncodedSequence, 0, encodedSequenceLength);
-        for (size_t i = 0; i < sequenceLength; ++i)
+        for (size_t i = 0; i < sequenceLength; ++i) {
             pEncodedSequence[i >> 1] |= seq_nt16_table[static_cast<int>(sequence[i])]
                                         << ((~i & 1) << 2);
+        }
     }
 
     // fill in quality values
     uint8_t* encodedQualities = bam_get_qual(d_);
-    if ((qualities == nullptr) || (strlen(qualities) == 0))
+    if ((qualities == nullptr) || (strlen(qualities) == 0)) {
         memset(encodedQualities, 0xff, sequenceLength);
-    else {
-        for (size_t i = 0; i < sequenceLength; ++i)
+    } else {
+        for (size_t i = 0; i < sequenceLength; ++i) {
             encodedQualities[i] = qualities[i] - 33;  // FASTQ ASCII -> int conversion
+        }
     }
     return *this;
 }
 
 BamRecordImpl& BamRecordImpl::SetSupplementaryAlignment(bool ok)
 {
-    if (ok)
+    if (ok) {
         d_->core.flag |= BamRecordImpl::SUPPLEMENTARY;
-    else
+    } else {
         d_->core.flag &= ~BamRecordImpl::SUPPLEMENTARY;
+    }
     return *this;
 }
 
 int BamRecordImpl::TagOffset(const std::string& tagName) const
 {
-    if (tagName.size() != 2)
+    if (tagName.size() != 2) {
         throw std::runtime_error{"[pbbam] BAM record ERROR: tag name (" + tagName +
                                  ") must have 2 characters only"};
+    }
 
-    if (tagOffsets_.empty()) UpdateTagMap();
+    if (tagOffsets_.empty()) {
+        UpdateTagMap();
+    }
 
     const uint16_t tagCode =
         (static_cast<uint8_t>(tagName.at(0)) << 8) | static_cast<uint8_t>(tagName.at(1));
     for (const auto& tag : tagOffsets_) {
-        if (tag.Code == tagCode) return tag.Offset;
+        if (tag.Code == tagCode) {
+            return tag.Offset;
+        }
     }
     return -1;  // not found
 }
@@ -736,15 +792,21 @@ TagCollection BamRecordImpl::Tags() const
 
 Tag BamRecordImpl::TagValue(const std::string& tagName) const
 {
-    if (tagName.size() != 2) return {};
+    if (tagName.size() != 2) {
+        return {};
+    }
 
     const int offset = TagOffset(tagName);
-    if (offset == -1) return {};
+    if (offset == -1) {
+        return {};
+    }
 
     bam1_t* b = d_.get();
     assert(bam_get_aux(b));
     uint8_t* tagData = bam_get_aux(b) + offset;
-    if (offset >= b->l_data) return {};
+    if (offset >= b->l_data) {
+        return {};
+    }
 
     // skip tag name
     return BamTagCodec::FromRawData(tagData);
@@ -760,7 +822,9 @@ void BamRecordImpl::UpdateTagMap() const
     tagOffsets_.clear();
 
     const uint8_t* tagStart = bam_get_aux(d_);
-    if (tagStart == nullptr) return;
+    if (tagStart == nullptr) {
+        return;
+    }
     const ptrdiff_t numBytes = d_->l_data - (tagStart - d_->data);
 
     // NOTE: using a 16-bit 'code' for tag name here instead of string, to avoid

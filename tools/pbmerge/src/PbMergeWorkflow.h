@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #ifndef PBMERGE_WORKFLOW_H
 #define PBMERGE_WORKFLOW_H
 

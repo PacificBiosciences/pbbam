@@ -29,8 +29,9 @@ void SortFile(const VcfFile& file, const std::string& outputFilename)
     // read & sort variants
     std::vector<VcfVariant> variants;
     VcfQuery query{file};
-    for (const auto& v : query)
+    for (const auto& v : query) {
         variants.push_back(v);
+    }
 
     std::sort(variants.begin(), variants.end(),
               [&contigLookup](const VcfVariant& lhs, const VcfVariant& rhs) {
@@ -43,8 +44,9 @@ void SortFile(const VcfFile& file, const std::string& outputFilename)
 
     // write results to file
     VcfWriter writer{outputFilename, header};
-    for (const auto& var : variants)
+    for (const auto& var : variants) {
         writer.Write(var);
+    }
 }
 
 void SortFile(const std::string& inputFilename, const std::string& outputFilename)

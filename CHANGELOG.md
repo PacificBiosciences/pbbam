@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [1.6.3] - 2021-05-24
+
+### Changed
+ - Speed up ZMW filter on include/exclude-lists
+
 ### Fixed
  - Query name parsing for CCS/transcript records in PbiQueryNameFilter
 

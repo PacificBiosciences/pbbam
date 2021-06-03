@@ -1,5 +1,3 @@
-// Author: Ivan Sovic
-
 #include "PbBamifyWorkflow.h"
 
 #include <cstdint>
@@ -59,7 +57,9 @@ int Workflow::Runner(const CLI_v2::Results& args)
         BAM::BamWriter bamWriter{settings.OutputFilename, newHeader};
         const bool result = AugmentAlignments(queryLookup, indexedRefReader, inputBamReader,
                                               bamWriter, settings.VerboseLevel);
-        if (result == false) return EXIT_FAILURE;
+        if (result == false) {
+            return EXIT_FAILURE;
+        }
     }
 
     return EXIT_SUCCESS;
@@ -80,14 +80,16 @@ BAM::BamHeader Workflow::ComposeHeader(const BAM::DataSet& dataset, BAM::FastaRe
         if (!headerInitialized) {
             retHeader = header.DeepCopy();
             headerInitialized = true;
-        } else
+        } else {
             retHeader += header;
+        }
     }
 
     // Merge the alignment PG to the header.
     auto inputHeader = input.Header();
-    for (auto& program : inputHeader.Programs())
+    for (auto& program : inputHeader.Programs()) {
         retHeader.AddProgram(program);
+    }
 
     // Add the sequence info to the header.
     BAM::FastaSequence record;
@@ -116,7 +118,9 @@ BAM::BamHeader Workflow::ComposeHeader(const BAM::DataSet& dataset, BAM::FastaRe
 bool Workflow::IsHardClipped(const Data::Cigar& cigarData)
 {
     // If it's empty, just return.
-    if (cigarData.size() == 0) return false;
+    if (cigarData.size() == 0) {
+        return false;
+    }
 
     // If there is no hard clipping, just return.
     if (cigarData.front().Type() == Data::CigarOperationType::HARD_CLIP ||
@@ -132,7 +136,9 @@ Data::Cigar Workflow::ConvertHardToSoftClipping(const Data::Cigar& cigarData)
     Data::Cigar softCigar;
 
     // If it's empty, just return.
-    if (cigarData.size() == 0) return softCigar;
+    if (cigarData.size() == 0) {
+        return softCigar;
+    }
 
     Data::CigarOperationType prevOp = Data::CigarOperationType::UNKNOWN_OP;
 
@@ -148,8 +154,9 @@ Data::Cigar Workflow::ConvertHardToSoftClipping(const Data::Cigar& cigarData)
         if (softCigar.size() > 0 && op == prevOp) {
             auto prevLen = softCigar.back().Length();
             softCigar.back() = Data::CigarOperation{op, len + prevLen};
-        } else
+        } else {
             softCigar.emplace_back(Data::CigarOperation{op, len});
+        }
 
         prevOp = op;
     }
@@ -161,7 +168,9 @@ size_t Workflow::SequenceLengthFromCigar(const Data::Cigar& cigarData)
 {
     size_t len = 0;
 
-    if (cigarData.size() == 0) return len;
+    if (cigarData.size() == 0) {
+        return len;
+    }
 
     for (const auto& cigar : cigarData) {
         if (Data::ConsumesQuery(cigar.Type()) ||
@@ -176,7 +185,9 @@ size_t Workflow::SequenceLengthFromCigar(const Data::Cigar& cigarData)
 bool Workflow::CheckIsCigarBasic(const Data::Cigar& cigarData)
 {
     for (const auto& cigar : cigarData) {
-        if (cigar.Type() == Data::CigarOperationType::ALIGNMENT_MATCH) return true;
+        if (cigar.Type() == Data::CigarOperationType::ALIGNMENT_MATCH) {
+            return true;
+        }
     }
     return false;
 }
@@ -200,7 +211,9 @@ Data::Cigar Workflow::BasicToExtendedCigar(const BAM::IndexedFastaReader& indexe
     for (const auto& cigar : cigarData) {
 
         // This shouldn't happen, but let's keep it safe.
-        if (cigar.Length() == 0) continue;
+        if (cigar.Length() == 0) {
+            continue;
+        }
 
         if (cigar.Type() == Data::CigarOperationType::ALIGNMENT_MATCH) {
             // Decode the prev op.
@@ -226,11 +239,16 @@ Data::Cigar Workflow::BasicToExtendedCigar(const BAM::IndexedFastaReader& indexe
 
             // Add the last operation.
             extCigar.emplace_back(Data::CigarOperation{prevOp, prevCount});
-        } else
+        } else {
             extCigar.emplace_back(cigar);
+        }
 
-        if (Data::ConsumesQuery(cigar.Type())) qpos += cigar.Length();
-        if (Data::ConsumesReference(cigar.Type())) rpos += cigar.Length();
+        if (Data::ConsumesQuery(cigar.Type())) {
+            qpos += cigar.Length();
+        }
+        if (Data::ConsumesReference(cigar.Type())) {
+            rpos += cigar.Length();
+        }
     }
 
     return extCigar;
@@ -283,7 +301,9 @@ bool Workflow::AugmentAlignments(const std::shared_ptr<QueryLookup> queryLookup,
         // Update the BAM record with additional data from the PacBio dataset.
         // In case of failure, skip the alignment. Failures should be reported by AugmentAlignment.
         const bool rv = AugmentAlignment(queryLookup, indexedRefReader, record, verboseLevel);
-        if (rv == false) continue;
+        if (rv == false) {
+            continue;
+        }
 
         // Finally, write the output.
         writer.Write(record);
@@ -314,8 +334,9 @@ bool Workflow::AugmentAlignment(const std::shared_ptr<QueryLookup> queryLookup,
     BAM::BamRecord datasetRecord;
     const bool isFound = queryLookup->Find(record.FullName(), datasetRecord);
     if (!isFound) {
-        if (verboseLevel > 0)
+        if (verboseLevel > 0) {
             PBLOG_WARN << "No records found for query '" << record.FullName() << "'. Skipping.";
+        }
         return false;
     }
 
@@ -351,16 +372,19 @@ bool Workflow::AugmentAlignment(const std::shared_ptr<QueryLookup> queryLookup,
     // produced by a mapper.
     // For example, BLASR will generate a RG tag even if the input was FASTA.
     for (auto& tag : datasetRecord.Impl().Tags()) {
-        if (record.Impl().Tags().Contains(tag.first))
+        if (record.Impl().Tags().Contains(tag.first)) {
             record.Impl().EditTag(tag.first, tag.second);
-        else
+        } else {
             record.Impl().AddTag(tag.first, tag.second);
+        }
     }
 
     // Some downstream tools might not work well with the
     // "undefined" mapping quality value of 255. Here
     // we set it to a valid arbitrary value.
-    if (record.Impl().MapQuality() == 255) record.Impl().MapQuality(254);
+    if (record.Impl().MapQuality() == 255) {
+        record.Impl().MapQuality(254);
+    }
 
     // If the alignment has hard clipping, simply take both the seq and
     // qual fields from the dataset. This will stomp over any custom
@@ -379,7 +403,9 @@ bool Workflow::AugmentAlignment(const std::shared_ptr<QueryLookup> queryLookup,
 
         // PacBio datasets, when converted to SAM, contain '!' ASCII QVs.
         // In case QVs aren't provided otherwise, this block adds the '!' values.
-        if (quals.size() == 0) quals = std::string(qseq.size(), '!');
+        if (quals.size() == 0) {
+            quals = std::string(qseq.size(), '!');
+        }
 
         // Replace the seq, qual, & cigar fields.
         record.Impl().SetSequenceAndQualities(qseq, quals);

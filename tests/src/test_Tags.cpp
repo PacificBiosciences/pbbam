@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/TagCollection.h>
 
 #include <cstdint>

@@ -26,8 +26,9 @@ public:
     void ApplyOffsets()
     {
         const auto& fileOffsets = index_->BasicData().fileOffset_;
-        for (IndexResultBlock& block : blocks_)
+        for (IndexResultBlock& block : blocks_) {
             block.virtualOffset_ = fileOffsets.at(block.firstIndex_);
+        }
     }
 
     void Filter(const PbiFilter filter)
@@ -64,17 +65,20 @@ public:
 
     IndexResultBlocks MergedIndexBlocks(IndexList indices) const
     {
-        if (indices.empty()) return {};
+        if (indices.empty()) {
+            return {};
+        }
 
         std::sort(indices.begin(), indices.end());
         const auto newEndIter = std::unique(indices.begin(), indices.end());
         const auto numIndices = std::distance(indices.begin(), newEndIter);
         auto result = IndexResultBlocks{IndexResultBlock{indices.at(0), 1}};
         for (auto i = 1; i < numIndices; ++i) {
-            if (indices.at(i) == indices.at(i - 1) + 1)
+            if (indices.at(i) == indices.at(i - 1) + 1) {
                 ++result.back().numReads_;
-            else
+            } else {
                 result.emplace_back(indices.at(i), 1);
+            }
         }
         return result;
     }
@@ -82,7 +86,9 @@ public:
     int ReadRawData(BGZF* bgzf, bam1_t* b)
     {
         // no data to fetch, return false
-        if (blocks_.empty()) return -1;  // "EOF"
+        if (blocks_.empty()) {
+            return -1;  // "EOF"
+        }
 
         // if on new block, seek to its first record
         if (currentBlockReadCount_ == 0) {

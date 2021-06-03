@@ -3,8 +3,6 @@
 
 #include <pbbam/Config.h>
 
-#include <cassert>
-
 #include <string>
 #include <unordered_map>
 #include <vector>

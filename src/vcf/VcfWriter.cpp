@@ -2,8 +2,6 @@
 
 #include <pbbam/vcf/VcfWriter.h>
 
-#include <cassert>
-
 #include <fstream>
 #include <type_traits>
 
@@ -15,11 +13,6 @@
 
 namespace PacBio {
 namespace VCF {
-
-static_assert(!std::is_copy_constructible<VcfWriter>::value,
-              "VcfWriter(const VcfWriter&) is not = delete");
-static_assert(!std::is_copy_assignable<VcfWriter>::value,
-              "VcfWriter& operator=(const VcfWriter&) is not = delete");
 
 struct VcfWriter::VcfWriterPrivate : public BAM::FileProducer
 {

@@ -1,5 +1,3 @@
-// Author: Ivan Sovic
-
 #include "PbBamifySettings.h"
 
 #include <stdexcept>
@@ -98,19 +96,26 @@ Settings::Settings(const CLI_v2::Results& args)
 {
     // Reference & unaligned PacBio BAM files
     const auto& posArgs = args.PositionalArguments();
-    if (posArgs.size() != 2)
+    if (posArgs.size() != 2) {
         throw std::runtime_error{"exactly two positional arguments must be provided"};
+    }
     ReferenceFilename = posArgs[0];
     PbbamFilename = posArgs[1];
 
     // Input non-PacBio BAM
-    if (InputFilename.empty()) InputFilename = "-";
+    if (InputFilename.empty()) {
+        InputFilename = "-";
+    }
 
     // Output aligned PacBio BAM
-    if (OutputFilename.empty()) OutputFilename = "-";
+    if (OutputFilename.empty()) {
+        OutputFilename = "-";
+    }
 
     // Verbosity
-    if (VerboseLevel < 0) VerboseLevel = 0;
+    if (VerboseLevel < 0) {
+        VerboseLevel = 0;
+    }
 
     // Allow 'M' tags
     Data::CigarOperation::DisableAutoValidation();

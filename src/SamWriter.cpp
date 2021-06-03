@@ -2,8 +2,6 @@
 
 #include <pbbam/SamWriter.h>
 
-#include <cassert>
-
 #include <memory>
 #include <sstream>
 #include <stdexcept>
@@ -85,7 +83,9 @@ public:
         static const bool has_native_long_cigar_support = DoesHtslibSupportLongCigar();
         const auto cigar = record.CigarData();
         if (!has_native_long_cigar_support && cigar.size() > 65535) {
-            if (record.Impl().HasTag("CG")) record.Impl().RemoveTag("CG");
+            if (record.Impl().HasTag("CG")) {
+                record.Impl().RemoveTag("CG");
+            }
             record.Impl().SetCigarData(cigar);
         }
 
@@ -104,11 +104,6 @@ public:
     std::unique_ptr<samFile, HtslibFileDeleter> file_;
     std::shared_ptr<bam_hdr_t> header_;
 };
-
-static_assert(!std::is_copy_constructible<SamWriter>::value,
-              "SamWriter(const SamWriter&) is not = delete");
-static_assert(!std::is_copy_assignable<SamWriter>::value,
-              "SamWriter& operator=(const SamWriter&) is not = delete");
 
 SamWriter::SamWriter(std::string filename, const BamHeader& header)
     : IRecordWriter()
@@ -129,9 +124,10 @@ SamWriter::~SamWriter() = default;
 void SamWriter::TryFlush()
 {
     const auto ret = d_->file_.get()->fp.hfile;
-    if (ret != nullptr)
+    if (ret != nullptr) {
         throw std::runtime_error{
             "[pbbam] SAM writer ERROR: could not flush output buffer contents"};
+    }
 }
 
 void SamWriter::Write(const BamRecord& record) { d_->Write(record); }

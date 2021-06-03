@@ -2,8 +2,6 @@
 
 #include <pbbam/TextFileReader.h>
 
-#include <cassert>
-
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>
@@ -17,11 +15,6 @@
 
 namespace PacBio {
 namespace BAM {
-
-static_assert(!std::is_copy_constructible<TextFileReader>::value,
-              "TextFileReader(const TextFileReader&) is not = delete");
-static_assert(!std::is_copy_assignable<TextFileReader>::value,
-              "TextFileReader& operator=(const TextFileReader&) is not = delete");
 
 class TextFileReader::TextFileReaderPrivate
 {
@@ -59,15 +52,15 @@ public:
             }
 
             // empty line, try again
-            else if (result == 0)
+            else if (result == 0) {
                 continue;
 
-            // EOF (no error, but will stop next TextFileReader iteration
-            else if (result == -1)
+                // EOF (no error, but will stop next TextFileReader iteration
+            } else if (result == -1) {
                 return;
 
-            // else error
-            else {
+                // else error
+            } else {
                 std::ostringstream msg;
                 msg << "[pbbam] text file reader ERROR: could not read from file:\n"
                     << "  file: " << filename_ << '\n'
@@ -100,7 +93,9 @@ const std::string& TextFileReader::Filename() const { return d_->filename_; }
 
 bool TextFileReader::GetNext(std::string& line)
 {
-    if (d_->line_.empty()) return false;
+    if (d_->line_.empty()) {
+        return false;
+    }
 
     line = d_->line_;
     d_->GetNext();
@@ -112,8 +107,9 @@ std::vector<std::string> TextFileReader::ReadAll(const std::string& fn)
     std::vector<std::string> result;
     result.reserve(256);
     TextFileReader reader{fn};
-    for (const auto& seq : reader)
+    for (const auto& seq : reader) {
         result.emplace_back(seq);
+    }
     return result;
 }
 

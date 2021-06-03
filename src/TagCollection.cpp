@@ -26,10 +26,11 @@ std::ostream& operator<<(std::ostream& out, const TagCollection& tags)
 {
     bool first = true;
     for (const auto& tag : tags) {
-        if (!first)
+        if (!first) {
             out << '\t';
-        else
+        } else {
             first = false;
+        }
         out << tag.first << '=' << tag.second;
     }
 

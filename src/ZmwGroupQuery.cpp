@@ -47,12 +47,15 @@ public:
     bool GetNext(std::vector<BamRecord>& records) override
     {
         records.clear();
-        if (!reader_) return false;
+        if (!reader_) {
+            return false;
+        }
 
         // get all records matching ZMW
         BamRecord r;
-        while (reader_->GetNext(r))
+        while (reader_->GetNext(r)) {
             records.push_back(r);
+        }
 
         // set next ZMW (if any left)
         if (!whitelist_.empty()) {
@@ -61,8 +64,9 @@ public:
         }
 
         // otherwise destroy reader, next iteration will return false
-        else
+        else {
             reader_.reset();
+        }
 
         return true;
     }
@@ -82,15 +86,18 @@ public:
         for (const auto& fn : bamFilenames) {
             // create reader for file
             auto makeReader = [&]() -> std::unique_ptr<BamReader> {
-                if (pbiFilter.IsEmpty())
+                if (pbiFilter.IsEmpty()) {
                     return std::make_unique<BamReader>(fn);
-                else
+                } else {
                     return std::make_unique<PbiIndexedBamReader>(pbiFilter, fn);
+                }
             };
             internal::CompositeMergeItem item{makeReader()};
 
             // try load first record, ignore file if nothing found
-            if (item.reader->GetNext(item.record)) readerItems_.push_back(std::move(item));
+            if (item.reader->GetNext(item.record)) {
+                readerItems_.push_back(std::move(item));
+            }
         }
     }
 
@@ -99,7 +106,9 @@ public:
         records.clear();
 
         // quick exit if nothing left
-        if (readerItems_.empty()) return false;
+        if (readerItems_.empty()) {
+            return false;
+        }
 
         // pop first reader from the queue & store its record
         auto firstIter = readerItems_.begin();
@@ -115,17 +124,18 @@ public:
 
                 // if same ZMW, store and continue
                 // else stop reading & re-queue this reader for later
-                if (item.record.HoleNumber() == zmw)
+                if (item.record.HoleNumber() == zmw) {
                     records.push_back(item.record);
-                else {
+                } else {
                     readerItems_.push_back(std::move(item));
                     break;
                 }
             }
 
             // no data remaining for this reader, let it go
-            else
+            else {
                 break;
+            }
         }
 
         return !records.empty();
@@ -145,15 +155,18 @@ public:
         for (const auto& fn : bamFilenames) {
             // create reader for file
             auto makeReader = [&]() -> std::unique_ptr<BamReader> {
-                if (pbiFilter.IsEmpty())
+                if (pbiFilter.IsEmpty()) {
                     return std::make_unique<BamReader>(fn);
-                else
+                } else {
                     return std::make_unique<PbiIndexedBamReader>(pbiFilter, fn);
+                }
             };
             internal::CompositeMergeItem item{makeReader()};
 
             // try load first record, ignore file if nothing found
-            if (item.reader->GetNext(item.record)) readerItems_.push_back(std::move(item));
+            if (item.reader->GetNext(item.record)) {
+                readerItems_.push_back(std::move(item));
+            }
         }
     }
 
@@ -162,7 +175,9 @@ public:
         records.clear();
 
         // quick exit if nothing left
-        if (readerItems_.empty()) return false;
+        if (readerItems_.empty()) {
+            return false;
+        }
 
         // pop first reader from the queue & store its record
         auto firstIter = readerItems_.begin();
@@ -176,17 +191,18 @@ public:
             if (item.reader->GetNext(item.record)) {
                 // if same ZMW, store and continue
                 // else stop reading and keep this reader/record for next time
-                if (item.record.HoleNumber() == zmw)
+                if (item.record.HoleNumber() == zmw) {
                     records.push_back(item.record);
-                else {
+                } else {
                     readerItems_.push_front(std::move(item));
                     break;
                 }
             }
 
             // no data remaining for this reader, let it go
-            else
+            else {
                 break;
+            }
         }
         return !records.empty();
     }
@@ -200,12 +216,15 @@ ZmwGroupQuery::ZmwGroupQuery(const DataSet& dataset, const ZmwFileIterationMode 
     : internal::IGroupQuery()
 {
     PbiFilter filter;
-    if (filterMode == DataSetFilterMode::APPLY) filter = PbiFilter::FromDataSet(dataset);
+    if (filterMode == DataSetFilterMode::APPLY) {
+        filter = PbiFilter::FromDataSet(dataset);
+    }
 
-    if (iterationMode == ZmwFileIterationMode::SEQUENTIAL)
+    if (iterationMode == ZmwFileIterationMode::SEQUENTIAL) {
         d_ = std::make_unique<SequentialZmwGroupQuery>(dataset, filter);
-    else
+    } else {
         d_ = std::make_unique<RoundRobinZmwGroupQuery>(dataset, filter);
+    }
 }
 
 // ZmwGroupQuery(const DataSet& dataset, const PbiFilter& filter) {}

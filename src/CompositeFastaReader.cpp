@@ -7,8 +7,9 @@ namespace BAM {
 
 CompositeFastaReader::CompositeFastaReader(const std::vector<std::string>& fastaFiles)
 {
-    for (const auto& fn : fastaFiles)
+    for (const auto& fn : fastaFiles) {
         readers_.emplace_back(std::make_unique<FastaReader>(fn));
+    }
 }
 
 CompositeFastaReader::CompositeFastaReader(const DataSet& dataset)
@@ -22,10 +23,11 @@ bool CompositeFastaReader::GetNext(FastaSequence& seq)
     // else pop reader and try next, until all readers exhausted
     while (!readers_.empty()) {
         auto& reader = readers_.front();
-        if (reader->GetNext(seq))
+        if (reader->GetNext(seq)) {
             return true;
-        else
+        } else {
             readers_.pop_front();
+        }
     }
 
     // no readers available

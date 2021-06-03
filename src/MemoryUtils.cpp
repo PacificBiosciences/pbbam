@@ -15,10 +15,14 @@ namespace BAM {
 BamHeader BamHeaderMemory::FromRawData(bam_hdr_t* hdr)
 {
     // null input - error
-    if (hdr == nullptr) throw std::runtime_error{"[pbbam] BAM header ERROR: null BAM header"};
+    if (hdr == nullptr) {
+        throw std::runtime_error{"[pbbam] BAM header ERROR: null BAM header"};
+    }
 
     // empty text input - ok
-    if (hdr->text == nullptr || hdr->l_text == 0) return BamHeader();
+    if (hdr->text == nullptr || hdr->l_text == 0) {
+        return BamHeader();
+    }
 
     // parse normal SAM text input
     return BamHeader(std::string(hdr->text, hdr->l_text));
