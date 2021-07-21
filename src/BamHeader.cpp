@@ -34,6 +34,8 @@ const std::string BamHeaderTokenVN{"VN"};
 const std::string BamHeaderTokenSO{"SO"};
 const std::string BamHeaderTokenpb{"pb"};
 
+const std::string CurrentSamFormatVersion{"1.6"};
+
 bool CheckSortOrder(const std::string& lhs, const std::string& rhs) { return lhs == rhs; }
 
 bool CheckPbVersion(const std::string& lhs, const std::string& rhs)
@@ -473,7 +475,7 @@ std::string BamHeader::ToSam() const
     std::ostringstream out;
 
     // @HD
-    const auto outputVersion = (d_->version_.empty() ? std::string{hts_version()} : d_->version_);
+    const auto outputVersion = (d_->version_.empty() ? CurrentSamFormatVersion : d_->version_);
     const auto outputSortOrder = (d_->sortOrder_.empty() ? std::string{"unknown"} : d_->sortOrder_);
     const auto outputPbBamVersion =
         (d_->pacbioBamVersion_.empty() ? Version::Current.ToString() : d_->pacbioBamVersion_);
