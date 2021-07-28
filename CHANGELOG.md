@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+### Fixed
+ - Header version number (@HD VN) to represent SAM/BAM spec version, not 
+   htslib version.
+
 ## [1.6.3] - 2021-05-24
 
 ### Changed
