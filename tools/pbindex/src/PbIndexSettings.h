@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #ifndef PBINDEX_SETTINGS_H
 #define PBINDEX_SETTINGS_H
 

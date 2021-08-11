@@ -2,6 +2,7 @@
 
 #include <pbbam/DataSetTypes.h>
 
+#include <cassert>
 #include <cstddef>
 
 #include <ostream>
@@ -251,7 +252,9 @@ const BAM::ExternalResources& DataSetBase::ExternalResources() const
 
 BAM::ExternalResources& DataSetBase::ExternalResources()
 {
-    if (!HasChild("ExternalResources")) AddChild(BAM::ExternalResources());
+    if (!HasChild("ExternalResources")) {
+        AddChild(BAM::ExternalResources());
+    }
     auto& c = Child<BAM::ExternalResources>("ExternalResources");
     return c;
 }
@@ -301,7 +304,9 @@ const BAM::SubDataSets& DataSetBase::SubDataSets() const
 
 BAM::SubDataSets& DataSetBase::SubDataSets()
 {
-    if (!HasChild("DataSets")) AddChild(internal::NullObject<BAM::SubDataSets>());
+    if (!HasChild("DataSets")) {
+        AddChild(internal::NullObject<BAM::SubDataSets>());
+    }
     return Child<BAM::SubDataSets>("DataSets");
 }
 
@@ -323,8 +328,9 @@ DataSetBase* DataSetBase::DeepCopy() const
 DataSetBase& DataSetBase::operator+=(const DataSetBase& other)
 {
     // must be same dataset types (or 'other' must be generic)
-    if (other.LocalNameLabel() != LocalNameLabel() && other.LocalNameLabel() != "DataSet")
+    if (other.LocalNameLabel() != LocalNameLabel() && other.LocalNameLabel() != "DataSet") {
         throw std::runtime_error{"[pbbam] dataset ERROR: cannot merge different dataset types"};
+    }
 
     // check object metadata
     Metadata() += other.Metadata();
@@ -337,19 +343,39 @@ DataSetBase& DataSetBase::operator+=(const DataSetBase& other)
 
 std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName)
 {
-    if (typeName == std::string("DataSet")) return std::make_shared<DataSetBase>();
-    if (typeName == std::string("SubreadSet")) return std::make_shared<SubreadSet>();
-    if (typeName == std::string("AlignmentSet")) return std::make_shared<AlignmentSet>();
-    if (typeName == std::string("BarcodeSet")) return std::make_shared<BarcodeSet>();
-    if (typeName == std::string("ConsensusAlignmentSet"))
+    if (typeName == std::string("DataSet")) {
+        return std::make_shared<DataSetBase>();
+    }
+    if (typeName == std::string("SubreadSet")) {
+        return std::make_shared<SubreadSet>();
+    }
+    if (typeName == std::string("AlignmentSet")) {
+        return std::make_shared<AlignmentSet>();
+    }
+    if (typeName == std::string("BarcodeSet")) {
+        return std::make_shared<BarcodeSet>();
+    }
+    if (typeName == std::string("ConsensusAlignmentSet")) {
         return std::make_shared<ConsensusAlignmentSet>();
-    if (typeName == std::string("ConsensusReadSet")) return std::make_shared<ConsensusReadSet>();
-    if (typeName == std::string("ContigSet")) return std::make_shared<ContigSet>();
-    if (typeName == std::string("HdfSubreadSet")) return std::make_shared<HdfSubreadSet>();
-    if (typeName == std::string("ReferenceSet")) return std::make_shared<ReferenceSet>();
-    if (typeName == std::string("TranscriptSet")) return std::make_shared<TranscriptSet>();
-    if (typeName == std::string("TranscriptAlignmentSet"))
+    }
+    if (typeName == std::string("ConsensusReadSet")) {
+        return std::make_shared<ConsensusReadSet>();
+    }
+    if (typeName == std::string("ContigSet")) {
+        return std::make_shared<ContigSet>();
+    }
+    if (typeName == std::string("HdfSubreadSet")) {
+        return std::make_shared<HdfSubreadSet>();
+    }
+    if (typeName == std::string("ReferenceSet")) {
+        return std::make_shared<ReferenceSet>();
+    }
+    if (typeName == std::string("TranscriptSet")) {
+        return std::make_shared<TranscriptSet>();
+    }
+    if (typeName == std::string("TranscriptAlignmentSet")) {
         return std::make_shared<TranscriptAlignmentSet>();
+    }
 
     // unknown typename
     throw std::runtime_error{"[pbbam] dataset ERROR: unsupported type: " + typeName};
@@ -358,24 +384,39 @@ std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName)
 std::shared_ptr<DataSetBase> DataSetBase::Create(const std::string& typeName,
                                                  const internal::FromInputXml& fromInputXml)
 {
-    if (typeName == std::string("DataSet")) return std::make_shared<DataSetBase>(fromInputXml);
-    if (typeName == std::string("SubreadSet")) return std::make_shared<SubreadSet>(fromInputXml);
-    if (typeName == std::string("AlignmentSet"))
+    if (typeName == std::string("DataSet")) {
+        return std::make_shared<DataSetBase>(fromInputXml);
+    }
+    if (typeName == std::string("SubreadSet")) {
+        return std::make_shared<SubreadSet>(fromInputXml);
+    }
+    if (typeName == std::string("AlignmentSet")) {
         return std::make_shared<AlignmentSet>(fromInputXml);
-    if (typeName == std::string("BarcodeSet")) return std::make_shared<BarcodeSet>(fromInputXml);
-    if (typeName == std::string("ConsensusAlignmentSet"))
+    }
+    if (typeName == std::string("BarcodeSet")) {
+        return std::make_shared<BarcodeSet>(fromInputXml);
+    }
+    if (typeName == std::string("ConsensusAlignmentSet")) {
         return std::make_shared<ConsensusAlignmentSet>(fromInputXml);
-    if (typeName == std::string("ConsensusReadSet"))
+    }
+    if (typeName == std::string("ConsensusReadSet")) {
         return std::make_shared<ConsensusReadSet>(fromInputXml);
-    if (typeName == std::string("ContigSet")) return std::make_shared<ContigSet>(fromInputXml);
-    if (typeName == std::string("HdfSubreadSet"))
+    }
+    if (typeName == std::string("ContigSet")) {
+        return std::make_shared<ContigSet>(fromInputXml);
+    }
+    if (typeName == std::string("HdfSubreadSet")) {
         return std::make_shared<HdfSubreadSet>(fromInputXml);
-    if (typeName == std::string("ReferenceSet"))
+    }
+    if (typeName == std::string("ReferenceSet")) {
         return std::make_shared<ReferenceSet>(fromInputXml);
-    if (typeName == std::string("TranscriptSet"))
+    }
+    if (typeName == std::string("TranscriptSet")) {
         return std::make_shared<TranscriptSet>(fromInputXml);
-    if (typeName == std::string("TranscriptAlignmentSet"))
+    }
+    if (typeName == std::string("TranscriptAlignmentSet")) {
         return std::make_shared<TranscriptAlignmentSet>(fromInputXml);
+    }
 
     // unknown typename
     throw std::runtime_error{"[pbbam] dataset ERROR: unsupported type: " + typeName};
@@ -436,7 +477,9 @@ const BAM::CollectionMetadata& DataSetMetadata::CollectionMetadata() const
 BAM::CollectionMetadata& DataSetMetadata::CollectionMetadata()
 {
     BAM::Collections& collections = Child<BAM::Collections>("Collections");
-    if (collections.Size() == 0) collections.AddChild(BAM::CollectionMetadata{});
+    if (collections.Size() == 0) {
+        collections.AddChild(BAM::CollectionMetadata{});
+    }
     BAM::CollectionMetadata& cm = collections.Child<BAM::CollectionMetadata>(0);
     return cm;
 }
@@ -696,11 +739,14 @@ ExternalResources& ExternalResources::operator+=(const ExternalResources& other)
     for (size_t i = 0; i < numOtherResourceIds; ++i) {
         const std::string& resourceId = other[i].ResourceId();
         auto found = myResourceIds.find(resourceId);
-        if (found == myResourceIds.cend()) newResourceIndices.push_back(i);
+        if (found == myResourceIds.cend()) {
+            newResourceIndices.push_back(i);
+        }
     }
 
-    for (size_t index : newResourceIndices)
+    for (size_t index : newResourceIndices) {
         Add(other[index]);
+    }
     return *this;
 }
 
@@ -713,7 +759,9 @@ void ExternalResources::Add(const ExternalResource& ext)
         myResourceIds.insert(resource.ResourceId());
     }
 
-    if (myResourceIds.find(ext.ResourceId()) == myResourceIds.cend()) AddChild(ext);
+    if (myResourceIds.find(ext.ResourceId()) == myResourceIds.cend()) {
+        AddChild(ext);
+    }
 }
 
 std::vector<BamFile> ExternalResources::BamFiles() const
@@ -722,8 +770,9 @@ std::vector<BamFile> ExternalResources::BamFiles() const
     std::vector<BamFile> result;
     const int numResources = Size();
     result.reserve(numResources);
-    for (const ExternalResource& ext : *this)
+    for (const ExternalResource& ext : *this) {
         result.push_back(ext.ToBamFile());
+    }
     return result;
 }
 
@@ -857,8 +906,9 @@ Filters::Filters(const internal::FromInputXml& fromInputXml)
 
 Filters& Filters::operator+=(const Filters& other)
 {
-    for (auto& newFilter : other)
+    for (auto& newFilter : other) {
         AddChild(newFilter);
+    }
     return *this;
 }
 
@@ -1114,8 +1164,9 @@ SubDataSets& SubDataSets::operator+=(const DataSetBase& other)
 
 SubDataSets& SubDataSets::operator+=(const SubDataSets& other)
 {
-    for (auto& newSubDataset : other)
+    for (auto& newSubDataset : other) {
         AddChild(newSubDataset);
+    }
     return *this;
 }
 
@@ -1199,7 +1250,9 @@ TranscriptAlignmentSet::TranscriptAlignmentSet(const internal::FromInputXml& fro
 XmlElementType ElementTypeFromName(const std::string& name)
 {
     const auto found = elementTypeLookup.find(name);
-    if (found == elementTypeLookup.cend()) return XmlElementType::GENERIC_ELEMENT;
+    if (found == elementTypeLookup.cend()) {
+        return XmlElementType::GENERIC_ELEMENT;
+    }
     return found->second;
 }
 

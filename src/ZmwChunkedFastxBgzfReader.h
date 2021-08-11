@@ -32,7 +32,9 @@ private:
     {
         void operator()(kseq_t* seq) const noexcept
         {
-            if (seq) kseq_destroy(seq);
+            if (seq) {
+                kseq_destroy(seq);
+            }
             seq = nullptr;
         }
     };

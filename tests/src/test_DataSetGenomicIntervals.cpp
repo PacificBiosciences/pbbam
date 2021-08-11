@@ -1,5 +1,3 @@
-// Author: David Seifert
-
 #include <pbbam/DataSet.h>
 
 #include <gtest/gtest.h>

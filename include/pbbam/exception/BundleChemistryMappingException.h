@@ -18,8 +18,8 @@ class BundleChemistryMappingException : public std::exception
 public:
     BundleChemistryMappingException(std::string mappingXml, std::string msg)
         : mappingXml_{std::move(mappingXml)}
-        , what_{"[pbbam] chemistry bundle ERROR: could not load from" + mappingXml_ + ", reason: " +
-                std::move(msg)}
+        , what_{"[pbbam] chemistry bundle ERROR: could not load from " + mappingXml_ +
+                ", reason: " + std::move(msg)}
     {
     }
 

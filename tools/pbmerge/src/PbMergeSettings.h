@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #ifndef PBMERGE_SETTINGS_H
 #define PBMERGE_SETTINGS_H
 

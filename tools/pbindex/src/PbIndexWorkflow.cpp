@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbIndexWorkflow.h"
 
 #include <pbbam/BamFile.h>

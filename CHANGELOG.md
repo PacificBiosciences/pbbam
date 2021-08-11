@@ -5,6 +5,27 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+### Fixed
+ - Header version number (@HD VN) to represent SAM/BAM spec version, not 
+   htslib version.
+
+## [1.6.3] - 2021-05-24
+
+### Changed
+ - Speed up ZMW filter on include/exclude-lists
+
+### Fixed
+ - Query name parsing for CCS/transcript records in PbiQueryNameFilter
+
+## [1.6.2] - 2021-02-16
+
+### Added
+ - Use multi-threaded BAM reading,
+   configurable via env variable PB_BAMREADER_THREADS
+
+### Changed
+ - Do not enforce subreads to have kinetics when converting BamRecord to Read
+
 ## [1.6.1] - 2020-11-10
 
 ### Added

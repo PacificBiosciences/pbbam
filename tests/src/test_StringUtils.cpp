@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/StringUtilities.h>
 
 #include <gtest/gtest.h>

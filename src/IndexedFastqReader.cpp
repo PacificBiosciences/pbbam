@@ -2,6 +2,8 @@
 
 #include <pbbam/IndexedFastqReader.h>
 
+#include <cassert>
+
 #include <sstream>
 #include <stdexcept>
 #include <utility>
@@ -35,7 +37,9 @@ void ClipAndGapify(std::pair<std::string, Data::QualityValues>& seqQual, const D
         const auto opLength = op.Length();
 
         // do nothing for hard clips
-        if (type == Data::CigarOperationType::HARD_CLIP) continue;
+        if (type == Data::CigarOperationType::HARD_CLIP) {
+            continue;
+        }
 
         // maybe remove soft clips
         if (type == Data::CigarOperationType::SOFT_CLIP) {
@@ -132,7 +136,9 @@ IndexedFastqReader::IndexedFastqReader(IndexedFastqReader&&) noexcept = default;
 
 IndexedFastqReader& IndexedFastqReader::operator=(const IndexedFastqReader& rhs)
 {
-    if (this != &rhs) *this = IndexedFastqReader{rhs};
+    if (this != &rhs) {
+        *this = IndexedFastqReader{rhs};
+    }
     return *this;
 }
 

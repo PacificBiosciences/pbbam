@@ -81,16 +81,19 @@ void SwapEndianness(std::vector<T>& data)
         case 1:
             break;  // no swapping necessary
         case 2:
-            for (size_t i = 0; i < numReads; ++i)
+            for (size_t i = 0; i < numReads; ++i) {
                 ed_swap_2p(&data[i]);
+            }
             break;
         case 4:
-            for (size_t i = 0; i < numReads; ++i)
+            for (size_t i = 0; i < numReads; ++i) {
                 ed_swap_4p(&data[i]);
+            }
             break;
         case 8:
-            for (size_t i = 0; i < numReads; ++i)
+            for (size_t i = 0; i < numReads; ++i) {
                 ed_swap_8p(&data[i]);
+            }
             break;
         default:
             throw std::runtime_error{"[pbbam] PBI index builder ERROR: unsupported element size (" +
@@ -113,7 +116,9 @@ template <typename T>
 void WriteBgzfVector(BGZF* fp, std::vector<T>& data)
 {
     assert(fp);
-    if (fp->is_be) SwapEndianness(data);
+    if (fp->is_be) {
+        SwapEndianness(data);
+    }
     bgzf_write_safe(fp, &data[0], data.size() * sizeof(T));
 }
 
@@ -232,7 +237,9 @@ struct PbiBuilderBase
     template <typename T>
     void WriteToTempFile(PbiField<T>& field)
     {
-        if (field.buffer_.empty()) return;
+        if (field.buffer_.empty()) {
+            return;
+        }
 
         const auto pos = std::ftell(tempFile_.get());
         const auto numElements =

@@ -97,9 +97,15 @@ void PbiIndexIO::LoadFromFile(PbiRawData& rawData, const std::string& filename)
     const auto numReads = rawData.NumReads();
     if (numReads > 0) {
         LoadBasicData(rawData.BasicData(), numReads, fp);
-        if (rawData.HasMappedData()) LoadMappedData(rawData.MappedData(), numReads, fp);
-        if (rawData.HasReferenceData()) LoadReferenceData(rawData.ReferenceData(), fp);
-        if (rawData.HasBarcodeData()) LoadBarcodeData(rawData.BarcodeData(), numReads, fp);
+        if (rawData.HasMappedData()) {
+            LoadMappedData(rawData.MappedData(), numReads, fp);
+        }
+        if (rawData.HasReferenceData()) {
+            LoadReferenceData(rawData.ReferenceData(), fp);
+        }
+        if (rawData.HasBarcodeData()) {
+            LoadBarcodeData(rawData.BarcodeData(), numReads, fp);
+        }
     }
 }
 
@@ -240,9 +246,10 @@ void PbiIndexIO::LoadHeader(PbiRawData& index, BGZF* fp)
     // 'magic' string
     char magic[4];
     auto bytesRead = bgzf_read(fp, magic, 4);
-    if (bytesRead != 4 || strncmp(magic, "PBI\1", 4))
+    if (bytesRead != 4 || strncmp(magic, "PBI\1", 4)) {
         throw std::runtime_error{
             "[pbbam] PBI index I/O ERROR: expected PBI file, found unknown format instead"};
+    }
 
     // version, pbi_flags, & n_reads
     uint32_t version;
@@ -261,8 +268,9 @@ void PbiIndexIO::LoadHeader(PbiRawData& index, BGZF* fp)
     index.FileSections(sections);
     index.NumReads(numReads);
 
-    if (static_cast<PbiFile::VersionEnum>(version) < PbiFile::Version_4_0_0)
+    if (static_cast<PbiFile::VersionEnum>(version) < PbiFile::Version_4_0_0) {
         index.MappedData().hasIndelOps_ = false;
+    }
 
     // skip reserved section
     size_t reservedLength = 18;
@@ -301,7 +309,9 @@ void PbiIndexIO::LoadReferenceData(PbiRawReferenceData& referenceData, BGZF* fp)
     // num refs
     uint32_t numRefs;
     auto ret = bgzf_read(fp, &numRefs, 4);
-    if (fp->is_be) numRefs = ed_swap_4(numRefs);
+    if (fp->is_be) {
+        numRefs = ed_swap_4(numRefs);
+    }
 
     // reference entries
     referenceData.entries_.clear();
@@ -351,9 +361,15 @@ void PbiIndexIO::Save(const PbiRawData& index, const std::string& filename)
     if (numReads > 0) {
         WriteBasicData(index.BasicData(), numReads, fp);
 
-        if (index.HasMappedData()) WriteMappedData(index.MappedData(), numReads, fp);
-        if (index.HasReferenceData()) WriteReferenceData(index.ReferenceData(), fp);
-        if (index.HasBarcodeData()) WriteBarcodeData(index.BarcodeData(), numReads, fp);
+        if (index.HasMappedData()) {
+            WriteMappedData(index.MappedData(), numReads, fp);
+        }
+        if (index.HasReferenceData()) {
+            WriteReferenceData(index.ReferenceData(), fp);
+        }
+        if (index.HasBarcodeData()) {
+            WriteBarcodeData(index.BarcodeData(), numReads, fp);
+        }
     }
 }
 
@@ -422,7 +438,9 @@ void PbiIndexIO::WriteReferenceData(const PbiRawReferenceData& referenceData, BG
 {
     // num_refs
     auto numRefs = referenceData.entries_.size();
-    if (fp->is_be) numRefs = ed_swap_4(numRefs);
+    if (fp->is_be) {
+        numRefs = ed_swap_4(numRefs);
+    }
     auto ret = bgzf_write(fp, &numRefs, 4);
 
     // reference entries

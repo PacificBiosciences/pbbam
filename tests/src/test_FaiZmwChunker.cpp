@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "../../src/FaiZmwChunker.h"
 
 #include <vector>

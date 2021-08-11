@@ -40,7 +40,9 @@ public:
     {
         if (currentReader_) {
             const auto result = currentReader_->Next();
-            if (!currentReader_->HasNext()) OpenNextReader();
+            if (!currentReader_->HasNext()) {
+                OpenNextReader();
+            }
             return result;
         }
 
@@ -56,7 +58,9 @@ public:
     {
         if (currentReader_) {
             const auto result = currentReader_->NextRaw();
-            if (!currentReader_->HasNext()) OpenNextReader();
+            if (!currentReader_->HasNext()) {
+                OpenNextReader();
+            }
             return result;
         }
 
@@ -90,7 +94,9 @@ private:
 
             currentReader_ =
                 std::make_unique<VirtualZmwReader>(nextSource.first, nextSource.second, filter_);
-            if (currentReader_->HasNext()) return;
+            if (currentReader_->HasNext()) {
+                return;
+            }
         }
     }
 };

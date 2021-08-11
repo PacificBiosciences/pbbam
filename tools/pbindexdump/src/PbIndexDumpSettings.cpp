@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "PbIndexDumpSettings.h"
 
 #include <stdexcept>
@@ -75,7 +73,7 @@ CLI_v2::Interface Settings::CreateCLI()
         "Supported output formats:\n"
         "  json: 'pretty-printed' JSON\n"
         "  cpp:  copy/paste-able C++ code that can be used to construct the\n"
-        "        equivalent BAM::PbiRawData object."
+        "        equivalent BAM::PbiRawData object.\n"
     });
     // clang-format on
 
@@ -89,16 +87,18 @@ Settings::Settings(const CLI_v2::Results& args)
 {
     // input file
     const auto& posArgs = args.PositionalArguments();
-    if (posArgs.empty())
+    if (posArgs.empty()) {
         InputFile = "-";
-    else if (posArgs.size() == 1)
+    } else if (posArgs.size() == 1) {
         InputFile = posArgs[0];
-    else
+    } else {
         throw std::runtime_error{"too many arguments provided."};
+    }
 
     // format sanity check
-    if (Format != "json" && Format != "cpp")
+    if (Format != "json" && Format != "cpp") {
         throw std::runtime_error{"unsupported format requested: '" + Format + "'"};
+    }
 
     // JSON options sanity check
     if (Format != "json") {

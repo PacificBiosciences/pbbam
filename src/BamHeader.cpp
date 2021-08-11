@@ -34,6 +34,8 @@ const std::string BamHeaderTokenVN{"VN"};
 const std::string BamHeaderTokenSO{"SO"};
 const std::string BamHeaderTokenpb{"pb"};
 
+const std::string CurrentSamFormatVersion{"1.6"};
+
 bool CheckSortOrder(const std::string& lhs, const std::string& rhs) { return lhs == rhs; }
 
 bool CheckPbVersion(const std::string& lhs, const std::string& rhs)
@@ -53,7 +55,9 @@ static void EnsureCanMerge(const BamHeader& lhs, const BamHeader& rhs)
     const auto sortOrderOk = CheckSortOrder(lhs.SortOrder(), rhs.SortOrder());
     const auto pbVersionOk = CheckPbVersion(lhs.PacBioBamVersion(), rhs.PacBioBamVersion());
     const auto sequencesOk = CheckSequences(lhs.SortOrder(), lhs.Sequences(), rhs.Sequences());
-    if (sortOrderOk && pbVersionOk && sequencesOk) return;
+    if (sortOrderOk && pbVersionOk && sequencesOk) {
+        return;
+    }
 
     // if any checks failed, format error message & throw
     std::ostringstream e;
@@ -69,7 +73,9 @@ static void EnsureCanMerge(const BamHeader& lhs, const BamHeader& rhs)
           << rhs.PacBioBamVersion() << ")\n";
     }
 
-    if (!sequencesOk) e << "  mismatched sequence lists (@SQ entries)\n";
+    if (!sequencesOk) {
+        e << "  mismatched sequence lists (@SQ entries)\n";
+    }
 
     throw std::runtime_error{e.str()};
 }
@@ -83,26 +89,17 @@ void ParseHeaderLine(const std::string& line, BamHeader& hdr)
         auto tokenValue = token.substr(3);
 
         // set header contents
-        if (tokenTag == BamHeaderTokenVN)
+        if (tokenTag == BamHeaderTokenVN) {
             hdr.Version(std::move(tokenValue));
-        else if (tokenTag == BamHeaderTokenSO)
+        } else if (tokenTag == BamHeaderTokenSO) {
             hdr.SortOrder(std::move(tokenValue));
-        else if (tokenTag == BamHeaderTokenpb)
+        } else if (tokenTag == BamHeaderTokenpb) {
             hdr.PacBioBamVersion(std::move(tokenValue));
+        }
     }
 }
 
 }  // namespace
-
-static_assert(std::is_copy_constructible<BamHeader>::value,
-              "BamHeader(const BamHeader&) is not = default");
-static_assert(std::is_copy_assignable<BamHeader>::value,
-              "BamHeader& operator=(const BamHeader&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<BamHeader>::value,
-              "BamHeader(BamHeader&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<BamHeader>::value,
-              "BamHeader& operator=(BamHeader&&) is not = noexcept");
 
 class BamHeader::BamHeaderPrivate
 {
@@ -127,8 +124,9 @@ BamHeader::BamHeader(const DataSet& dataset) : BamHeader{dataset.BamFilenames()}
 
 BamHeader::BamHeader(const std::vector<std::string>& bamFilenames) : BamHeader{}
 {
-    if (bamFilenames.empty())
+    if (bamFilenames.empty()) {
         throw std::runtime_error{"[pbbam] BAM header merging ERROR: no input filenames provided"};
+    }
 
     std::vector<BamHeader> headers;
     for (const auto& fn : bamFilenames) {
@@ -137,18 +135,21 @@ BamHeader::BamHeader(const std::vector<std::string>& bamFilenames) : BamHeader{}
     }
 
     *this = headers.at(0);
-    for (size_t i = 1; i < headers.size(); ++i)
+    for (size_t i = 1; i < headers.size(); ++i) {
         *this += headers.at(i);
+    }
 }
 
 BamHeader::BamHeader(const std::vector<BamHeader>& headers) : BamHeader()
 {
-    if (headers.empty())
+    if (headers.empty()) {
         throw std::runtime_error{"[pbbam] BAM header merging ERROR: no input headers provided"};
+    }
 
     *this = headers.at(0);
-    for (size_t i = 1; i < headers.size(); ++i)
+    for (size_t i = 1; i < headers.size(); ++i) {
         *this += headers.at(i);
+    }
 }
 
 BamHeader::BamHeader(const std::string& samHeaderText) : d_{std::make_shared<BamHeaderPrivate>()}
@@ -159,27 +160,32 @@ BamHeader::BamHeader(const std::string& samHeaderText) : d_{std::make_shared<Bam
     while (std::getline(s, line)) {
 
         // skip if line is not long enough to contain true values
-        if (line.length() < 5) continue;
+        if (line.length() < 5) {
+            continue;
+        }
 
         // determine token at beginning of line
         firstToken = line.substr(0, 3);
 
         if (firstToken == BamHeaderPrefixHD) {
             ParseHeaderLine(line, *this);
-            if (Version().empty()) Version(std::string{hts_version()});
+            if (Version().empty()) {
+                Version(std::string{hts_version()});
+            }
         }
 
-        else if (firstToken == BamHeaderPrefixSQ)
+        else if (firstToken == BamHeaderPrefixSQ) {
             AddSequence(SequenceInfo::FromSam(line));
 
-        else if (firstToken == BamHeaderPrefixRG)
+        } else if (firstToken == BamHeaderPrefixRG) {
             AddReadGroup(ReadGroupInfo::FromSam(line));
 
-        else if (firstToken == BamHeaderPrefixPG)
+        } else if (firstToken == BamHeaderPrefixPG) {
             AddProgram(ProgramInfo::FromSam(line));
 
-        else if (firstToken == BamHeaderPrefixCO)
+        } else if (firstToken == BamHeaderPrefixCO) {
             AddComment(line.substr(4));
+        }
     }
 }
 
@@ -189,17 +195,22 @@ BamHeader& BamHeader::operator+=(const BamHeader& other)
 
     // merge read groups
     for (const auto& rg : other.ReadGroups()) {
-        if (!HasReadGroup(rg.Id())) AddReadGroup(rg);
+        if (!HasReadGroup(rg.Id())) {
+            AddReadGroup(rg);
+        }
     }
 
     // merge programs
     for (const auto& pg : other.Programs()) {
-        if (!HasProgram(pg.Id())) AddProgram(pg);
+        if (!HasProgram(pg.Id())) {
+            AddProgram(pg);
+        }
     }
 
     // merge comments
-    for (const auto& comment : other.Comments())
+    for (const auto& comment : other.Comments()) {
         AddComment(comment);
+    }
 
     return *this;
 }
@@ -328,8 +339,9 @@ BamHeader& BamHeader::PacBioBamVersion(const std::string& version)
 ProgramInfo BamHeader::Program(const std::string& id) const
 {
     const auto iter = d_->programs_.find(id);
-    if (iter == d_->programs_.cend())
+    if (iter == d_->programs_.cend()) {
         throw std::runtime_error{"[pbbam] BAM header ERROR: program ID not found: " + id};
+    }
     return iter->second;
 }
 
@@ -337,8 +349,9 @@ std::vector<std::string> BamHeader::ProgramIds() const
 {
     std::vector<std::string> result;
     result.reserve(d_->programs_.size());
-    for (const auto& pg : d_->programs_)
+    for (const auto& pg : d_->programs_) {
         result.push_back(pg.first);
+    }
     return result;
 }
 
@@ -346,24 +359,27 @@ std::vector<ProgramInfo> BamHeader::Programs() const
 {
     std::vector<ProgramInfo> result;
     result.reserve(d_->programs_.size());
-    for (const auto& pg : d_->programs_)
+    for (const auto& pg : d_->programs_) {
         result.push_back(pg.second);
+    }
     return result;
 }
 
 BamHeader& BamHeader::Programs(std::vector<ProgramInfo> programs)
 {
     d_->programs_.clear();
-    for (const auto& pg : programs)
+    for (const auto& pg : programs) {
         d_->programs_[pg.Id()] = std::move(pg);
+    }
     return *this;
 }
 
 ReadGroupInfo BamHeader::ReadGroup(const std::string& id) const
 {
     const auto iter = d_->readGroups_.find(ReadGroupInfo::GetBaseId(id));
-    if (iter == d_->readGroups_.cend())
+    if (iter == d_->readGroups_.cend()) {
         throw std::runtime_error{"[pbbam] BAM header ERROR: read group ID not found: " + id};
+    }
     return iter->second;
 }
 
@@ -371,8 +387,9 @@ std::vector<std::string> BamHeader::ReadGroupIds() const
 {
     std::vector<std::string> result;
     result.reserve(d_->readGroups_.size());
-    for (const auto& rg : d_->readGroups_)
+    for (const auto& rg : d_->readGroups_) {
         result.push_back(rg.first);
+    }
     return result;
 }
 
@@ -380,16 +397,18 @@ std::vector<ReadGroupInfo> BamHeader::ReadGroups() const
 {
     std::vector<ReadGroupInfo> result;
     result.reserve(d_->readGroups_.size());
-    for (const auto& rg : d_->readGroups_)
+    for (const auto& rg : d_->readGroups_) {
         result.push_back(rg.second);
+    }
     return result;
 }
 
 BamHeader& BamHeader::ReadGroups(std::vector<ReadGroupInfo> readGroups)
 {
     d_->readGroups_.clear();
-    for (auto&& rg : readGroups)
+    for (auto&& rg : readGroups) {
         AddReadGroup(std::move(rg));
+    }
     return *this;
 }
 
@@ -400,7 +419,9 @@ SequenceInfo BamHeader::Sequence(const std::string& name) const
     // TODO: SequenceId(name) throws if not found, should we do so here as well?
 
     const auto iter = d_->sequenceIdLookup_.find(name);
-    if (iter == d_->sequenceIdLookup_.cend()) return SequenceInfo();
+    if (iter == d_->sequenceIdLookup_.cend()) {
+        return SequenceInfo();
+    }
     const auto index = iter->second;
     assert(index >= 0 && static_cast<size_t>(index) < d_->sequences_.size());
     return d_->sequences_.at(index);
@@ -409,8 +430,9 @@ SequenceInfo BamHeader::Sequence(const std::string& name) const
 int32_t BamHeader::SequenceId(const std::string& name) const
 {
     const auto iter = d_->sequenceIdLookup_.find(name);
-    if (iter == d_->sequenceIdLookup_.cend())
+    if (iter == d_->sequenceIdLookup_.cend()) {
         throw std::runtime_error{"[pbbam] BAM header ERROR: sequence name not found: " + name};
+    }
     return iter->second;
 }
 
@@ -422,8 +444,9 @@ std::vector<std::string> BamHeader::SequenceNames() const
 {
     std::vector<std::string> result;
     result.reserve(d_->sequences_.size());
-    for (const auto& seq : d_->sequences_)
+    for (const auto& seq : d_->sequences_) {
         result.push_back(seq.Name());
+    }
     return result;
 }
 
@@ -432,8 +455,9 @@ std::vector<SequenceInfo> BamHeader::Sequences() const { return d_->sequences_; 
 BamHeader& BamHeader::Sequences(std::vector<SequenceInfo> sequences)
 {
     d_->sequences_.clear();
-    for (auto&& seq : sequences)
+    for (auto&& seq : sequences) {
         AddSequence(std::move(seq));
+    }
     return *this;
 }
 
@@ -451,7 +475,7 @@ std::string BamHeader::ToSam() const
     std::ostringstream out;
 
     // @HD
-    const auto outputVersion = (d_->version_.empty() ? std::string{hts_version()} : d_->version_);
+    const auto outputVersion = (d_->version_.empty() ? CurrentSamFormatVersion : d_->version_);
     const auto outputSortOrder = (d_->sortOrder_.empty() ? std::string{"unknown"} : d_->sortOrder_);
     const auto outputPbBamVersion =
         (d_->pacbioBamVersion_.empty() ? Version::Current.ToString() : d_->pacbioBamVersion_);
@@ -461,20 +485,24 @@ std::string BamHeader::ToSam() const
         << MakeSamTag(BamHeaderTokenpb, outputPbBamVersion) << '\n';
 
     // @SQ
-    for (const auto& seq : d_->sequences_)
+    for (const auto& seq : d_->sequences_) {
         out << seq.ToSam() << '\n';
+    }
 
     // @RG
-    for (const auto& rgIter : d_->readGroups_)
+    for (const auto& rgIter : d_->readGroups_) {
         out << rgIter.second.ToSam() << '\n';
+    }
 
     // @PG
-    for (const auto& progIter : d_->programs_)
+    for (const auto& progIter : d_->programs_) {
         out << progIter.second.ToSam() << '\n';
+    }
 
     // @CO
-    for (const auto& comment : d_->comments_)
+    for (const auto& comment : d_->comments_) {
         out << BamHeaderPrefixCO << '\t' << comment << '\n';
+    }
 
     // return result
     return out.str();

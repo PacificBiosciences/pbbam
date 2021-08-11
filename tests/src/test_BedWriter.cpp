@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/bed/BedWriter.h>
 
 #include <cstdio>
@@ -32,8 +30,9 @@ void CheckRoundTrip(const std::string& outFn, const HtslibCompression compressio
 {
     {
         BedWriter writer{outFn};
-        for (const auto& interval : BedWriterTests::Intervals)
+        for (const auto& interval : BedWriterTests::Intervals) {
             writer.Write(interval);
+        }
     }
     EXPECT_EQ(compressionType, PacBio::BAM::FormatUtils::CompressionType(outFn));
 

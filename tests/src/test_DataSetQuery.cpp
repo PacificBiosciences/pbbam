@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/EntireFileQuery.h>
 
 #include <cstdint>
@@ -61,7 +59,9 @@ const std::vector<std::string> group_file3_names{
 bool InGroup(const std::string& name, const std::vector<std::string>& group)
 {
     for (const std::string& s : group) {
-        if (s == name) return true;
+        if (s == name) {
+            return true;
+        }
     }
     return false;
 }
@@ -352,7 +352,9 @@ TEST(BAM_DataSetQuery, zmw_group_query_can_use_dataset_input)
         for (const std::vector<BamRecord>& group : query) {
             for (const BamRecord& record : group) {
                 const auto holeNumber = record.HoleNumber();
-                if (groupZmw == -1) groupZmw = holeNumber;
+                if (groupZmw == -1) {
+                    groupZmw = holeNumber;
+                }
                 EXPECT_TRUE(holeNumber == 13473 || holeNumber == 30983);
                 EXPECT_EQ(groupZmw, holeNumber);
                 ++count;
@@ -382,17 +384,20 @@ TEST(BAM_DataSetQuery, zmw_group_query_can_use_dataset_input)
             for (const BamRecord& record : group) {
                 const auto holeNumber = record.HoleNumber();
                 ++numRecordsInGroup;
-                if (groupZmw == -1) groupZmw = holeNumber;
+                if (groupZmw == -1) {
+                    groupZmw = holeNumber;
+                }
                 EXPECT_TRUE(holeNumber == 13473 || holeNumber == 30983);
                 EXPECT_EQ(groupZmw, holeNumber);
                 ++totalCount;
             }
-            if (groupCount == 0)
+            if (groupCount == 0) {
                 EXPECT_EQ(4, numRecordsInGroup);
-            else if (groupCount == 1)
+            } else if (groupCount == 1) {
                 EXPECT_EQ(4, numRecordsInGroup);
-            else
+            } else {
                 EXPECT_TRUE(false);  // should not get here
+            }
             numRecordsInGroup = 0;
             ++groupCount;
             groupZmw = -1;

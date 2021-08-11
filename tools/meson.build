@@ -23,11 +23,11 @@ pbbam_bam2sam = executable(
   pbbam_bam2sam_cpp_sources,
   dependencies : [pbbam_htslib_dep, pbbam_thread_dep, pbbam_zlib_dep, pbbam_boost_dep, pbbam_pbcopper_dep],
   include_directories : [pbbam_include_directories, include_directories('bam2sam')],
-  install : get_option('build-tools'),
+  install : not meson.is_subproject(),
   cpp_args : pbbam_warning_flags)
 
 # tests
-if get_option('tests')
+if pbbam_run_tests
   bam2sam_t = configure_file(
     input : pbbam_cram_bam2sam_t_in,
     output : 'bam2sam.t',
@@ -66,7 +66,7 @@ pbbam_pbindex = executable(
   dependencies : [pbbam_htslib_dep, pbbam_zlib_dep, pbbam_boost_dep, pbbam_pbcopper_dep],
   include_directories : [pbbam_include_directories, include_directories('pbindex')],
   link_with : pbbam_lib,
-  install : get_option('build-tools'),
+  install : not meson.is_subproject(),
   cpp_args : pbbam_warning_flags)
 
 ###############
@@ -96,11 +96,11 @@ pbbam_pbindexdump = executable(
   dependencies : [pbbam_htslib_dep, pbbam_zlib_dep, pbbam_boost_dep, pbbam_pbcopper_dep],
   include_directories : [pbbam_include_directories, include_directories('pbindexdump')],
   link_with : pbbam_lib,
-  install : get_option('build-tools'),
+  install : not meson.is_subproject(),
   cpp_args : pbbam_warning_flags)
 
 # tests
-if get_option('tests')
+if pbbam_run_tests
   pbindexdump_json_t = configure_file(
     input : pbbam_cram_pbindexdump_json_t_in,
     output : 'pbindexdump_json.t',
@@ -148,11 +148,11 @@ pbbam_pbmerge = executable(
   dependencies : [pbbam_boost_dep, pbbam_htslib_dep, pbbam_zlib_dep, pbbam_pbcopper_dep],
   include_directories : [pbbam_include_directories, include_directories('pbmerge')],
   link_with : pbbam_lib,
-  install : get_option('build-tools'),
+  install : not meson.is_subproject(),
   cpp_args : pbbam_warning_flags)
 
 # tests
-if get_option('tests') and not get_option('auto-validate')
+if pbbam_run_tests and (not get_option('auto-validate'))
   pbmerge_pacbio_ordering_t = configure_file(
     input : pbbam_cram_pbmerge_pacbio_ordering_t_in,
     output : 'pbmerge_pacbio_ordering.t', configuration : pbbam_PbMergeVersion_h_config)
@@ -213,12 +213,12 @@ pbbam_pbbamify = executable(
   dependencies : [pbbam_boost_dep, pbbam_htslib_dep, pbbam_zlib_dep, pbbam_pbcopper_dep],
   include_directories : [pbbam_include_directories, include_directories('pbbamify')],
   link_with : pbbam_lib,
-  install : get_option('build-tools'),
+  install : not meson.is_subproject(),
   cpp_args : pbbam_warning_flags)
 
 
 # tests
-if get_option('tests')
+if pbbam_run_tests
   pbbam_test_samtools = find_program('samtools', required : true)
 
   pbbamify_t = configure_file(
@@ -267,11 +267,11 @@ pbbam_ccs_kinetics_bystrandify = executable(
   dependencies : [pbbam_boost_dep, pbbam_htslib_dep, pbbam_zlib_dep, pbbam_pbcopper_dep],
   include_directories : [pbbam_include_directories, include_directories('ccs-kinetics-bystrandify')],
   link_with : pbbam_lib,
-  install : get_option('build-tools'),
+  install : not meson.is_subproject(),
   cpp_args : pbbam_warning_flags)
 
 # tests
-if get_option('tests')
+if pbbam_run_tests
   test(
     'ccs-kinetics-bystrandify_CramTests',
     pbbam_cram_script,

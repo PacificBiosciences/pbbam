@@ -2,8 +2,6 @@
 
 #include <pbbam/FaiIndex.h>
 
-#include <cassert>
-
 #include <fstream>
 #include <ostream>
 #include <sstream>
@@ -22,11 +20,6 @@
 namespace PacBio {
 namespace BAM {
 
-static_assert(!std::is_copy_constructible<FaiIndex>::value,
-              "FaiIndex(const FaiIndex&) is not = delete");
-static_assert(!std::is_copy_assignable<FaiIndex>::value,
-              "FaiIndex& operator=(const FaiIndex&) is not = delete");
-
 bool operator==(const FaiEntry& lhs, const FaiEntry& rhs) noexcept
 {
     return std::tie(lhs.Length, lhs.SeqOffset, lhs.NumBases, lhs.NumBytes, lhs.QualOffset) ==
@@ -37,7 +30,9 @@ std::ostream& operator<<(std::ostream& out, const FaiEntry& entry)
 {
     out << entry.Length << '\t' << entry.SeqOffset << '\t' << entry.NumBases << '\t'
         << entry.NumBytes;
-    if (entry.QualOffset >= 0) out << '\t' << entry.QualOffset;
+    if (entry.QualOffset >= 0) {
+        out << '\t' << entry.QualOffset;
+    }
     return out;
 }
 
@@ -86,7 +81,9 @@ public:
             entry.SeqOffset = std::stoull(fields[2]);
             entry.NumBases = std::stoul(fields[3]);
             entry.NumBytes = std::stoul(fields[4]);
-            if (numFields == 6) entry.QualOffset = std::stoll(fields[5]);
+            if (numFields == 6) {
+                entry.QualOffset = std::stoll(fields[5]);
+            }
 
             Add(std::move(fields[0]), std::move(entry));
         }
@@ -123,9 +120,10 @@ void FaiIndex::Create(const std::string& fn)
 const FaiEntry& FaiIndex::Entry(const std::string& name) const
 {
     const auto found = d_->data_.find(name);
-    if (found == d_->data_.cend())
+    if (found == d_->data_.cend()) {
         throw std::runtime_error{
             "[pbbam] FAI index ERROR: could not find entry for sequence name: " + name};
+    }
     return found->second;
 }
 

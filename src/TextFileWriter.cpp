@@ -2,8 +2,6 @@
 
 #include <pbbam/TextFileWriter.h>
 
-#include <cassert>
-
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -18,11 +16,6 @@
 
 namespace PacBio {
 namespace BAM {
-
-static_assert(!std::is_copy_constructible<TextFileWriter>::value,
-              "TextFileWriter(const TextFileWriter&) is not = delete");
-static_assert(!std::is_copy_assignable<TextFileWriter>::value,
-              "TextFileWriter& operator=(const TextFileWriter&) is not = delete");
 
 class TextFileWriter::TextFileWriterPrivate : public FileProducer
 {

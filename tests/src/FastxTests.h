@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #ifndef FASTXTESTS_H
 #define FASTXTESTS_H
 

@@ -8,6 +8,7 @@
 #include <map>
 
 #include <pbbam/exception/BundleChemistryMappingException.h>
+#include <pbcopper/logging/Logging.h>
 
 #include "FileUtils.h"
 #include "pugixml/pugixml.hpp"
@@ -18,38 +19,60 @@ namespace {
 
 ChemistryTable ChemistryTableFromXml(const std::string& mappingXml)
 {
-    if (!FileUtils::Exists(mappingXml))
+    if (!FileUtils::Exists(mappingXml)) {
         throw BundleChemistryMappingException{
             mappingXml, "SMRT_CHEMISTRY_BUNDLE_DIR defined but file not found"};
+    }
+
+    PBLOG_INFO << "Parsing bundle chemistry mapping from env $SMRT_CHEMISTRY_BUNDLE_DIR: "
+               << mappingXml;
 
     std::ifstream in(mappingXml);
     pugi::xml_document doc;
     const pugi::xml_parse_result loadResult = doc.load(in);
-    if (loadResult.status != pugi::status_ok)
+    if (loadResult.status != pugi::status_ok) {
         throw BundleChemistryMappingException{
             mappingXml, "unparseable XML, error code:" + std::to_string(loadResult.status)};
+    }
 
     // parse top-level attributes
     const pugi::xml_node rootNode = doc.document_element();
-    if (rootNode == pugi::xml_node())
+    if (rootNode == pugi::xml_node()) {
         throw BundleChemistryMappingException{mappingXml, "could not fetch XML root node"};
+    }
 
-    if (std::string(rootNode.name()) != "MappingTable")
+    if (std::string(rootNode.name()) != "MappingTable") {
         throw BundleChemistryMappingException{mappingXml, "MappingTable not found"};
+    }
 
     ChemistryTable table;
+    bool mappingsFound = false;
     try {
         for (const auto& childNode : rootNode) {
             const std::string childName = childNode.name();
-            if (childName != "Mapping") continue;
-            table.push_back({childNode.child("BindingKit").child_value(),
-                             childNode.child("SequencingKit").child_value(),
-                             childNode.child("SoftwareVersion").child_value(),
-                             childNode.child("SequencingChemistry").child_value()});
+            if (childName != "Mapping") {
+                continue;
+            }
+            const std::string bindingKit{childNode.child("BindingKit").child_value()};
+            const std::string sequencingKit{childNode.child("SequencingKit").child_value()};
+            const std::string softwareVersion{childNode.child("SoftwareVersion").child_value()};
+            const std::string sequencingChemistry{
+                childNode.child("SequencingChemistry").child_value()};
+            table.push_back({bindingKit, sequencingKit, softwareVersion, sequencingChemistry});
+            PBLOG_INFO << "Using chemistry mapping :";
+            PBLOG_INFO << " - BindingKit           : " << bindingKit;
+            PBLOG_INFO << " - SequencingKit        : " << sequencingKit;
+            PBLOG_INFO << " - SoftwareVersion      : " << softwareVersion;
+            PBLOG_INFO << " - SequencingChemistry  : " << sequencingChemistry;
+            mappingsFound = true;
         }
     } catch (std::exception& e) {
         const std::string msg = std::string{"Mapping entries unparseable - "} + e.what();
         throw BundleChemistryMappingException{mappingXml, msg};
+    }
+
+    if (!mappingsFound) {
+        PBLOG_INFO << "No chemistry mappings found in $SMRT_CHEMISTRY_BUNDLE_DIR!";
     }
     return table;
 }
@@ -142,13 +165,16 @@ const ChemistryTable& GetChemistryTableFromEnv()
 
     std::string chemPath;
     const char* pth = getenv("SMRT_CHEMISTRY_BUNDLE_DIR");
-    if (pth != nullptr && pth[0] != '\0')
+    if (pth != nullptr && pth[0] != '\0') {
         chemPath = pth;
-    else
+    } else {
         return empty;
+    }
 
     auto it = tableCache.find(chemPath);
-    if (it != tableCache.end()) return it->second;
+    if (it != tableCache.end()) {
+        return it->second;
+    }
 
     auto tbl = ChemistryTableFromXml(chemPath + "/chemistry.xml");
     it = tableCache.emplace(std::move(chemPath), std::move(tbl)).first;

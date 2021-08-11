@@ -40,8 +40,9 @@ void ValidationException::FormatMessage()
     if (!fileErrors_.empty()) {
         for (const auto& fileError : fileErrors_) {
             s << "  In file (" << fileError.first << ") : \n";
-            for (const auto& e : fileError.second)
+            for (const auto& e : fileError.second) {
                 s << "    " << e << '\n';
+            }
         }
     }
 
@@ -49,8 +50,9 @@ void ValidationException::FormatMessage()
     if (!readGroupErrors_.empty()) {
         for (const auto& rgError : readGroupErrors_) {
             s << "  In read group (" << rgError.first << ") :\n";
-            for (const auto& e : rgError.second)
+            for (const auto& e : rgError.second) {
                 s << "    " << e << '\n';
+            }
         }
     }
 
@@ -58,8 +60,9 @@ void ValidationException::FormatMessage()
     if (!recordErrors_.empty()) {
         for (const auto& recordError : readGroupErrors_) {
             s << "  In record (" << recordError.first << ") : \n";
-            for (const auto& e : recordError.second)
+            for (const auto& e : recordError.second) {
                 s << "    " << e << '\n';
+            }
         }
     }
 

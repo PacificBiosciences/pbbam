@@ -15,17 +15,6 @@
 namespace PacBio {
 namespace VCF {
 
-static_assert(std::is_copy_constructible<VcfVariant>::value,
-              "VcfVariant(const VcfVariant&) is not = default");
-static_assert(std::is_copy_assignable<VcfVariant>::value,
-              "VcfVariant& operator=(const VcfVariant&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<VcfVariant>::value,
-              "VcfVariant(VcfVariant&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<VcfVariant>::value ==
-                  std::is_nothrow_move_assignable<std::string>::value,
-              "");
-
 VcfVariant::VcfVariant(const std::string& text) { *this = VcfFormat::ParsedVariant(text); }
 
 VcfVariant::VcfVariant() : pos_{Data::UnmappedPosition}, qual_{NAN}, filter_{"PASS"} {}
@@ -48,8 +37,9 @@ VcfVariant& VcfVariant::AddInfoField(InfoField field)
     if (found == infoLookup_.cend()) {
         infoLookup_.insert({field.id, infoFields_.size()});
         infoFields_.push_back(std::move(field));
-    } else
+    } else {
         infoFields_.at(found->second) = std::move(field);
+    }
     return *this;
 }
 
@@ -84,8 +74,9 @@ VcfVariant& VcfVariant::GenotypeIds(std::vector<std::string> ids)
     genotypeDataLookup_.clear();
 
     format_ = std::move(ids);
-    for (size_t i = 0; i < format_.size(); ++i)
+    for (size_t i = 0; i < format_.size(); ++i) {
         genotypeDataLookup_.emplace(format_.at(i), i);
+    }
     return *this;
 }
 
@@ -155,8 +146,9 @@ VcfVariant& VcfVariant::InfoFields(std::vector<InfoField> fields)
 {
     infoFields_.clear();
     infoLookup_.clear();
-    for (auto&& field : fields)
+    for (auto&& field : fields) {
         AddInfoField(std::move(field));
+    }
     return *this;
 }
 
@@ -193,19 +185,24 @@ bool VcfVariant::IsSampleHeterozygous(const size_t sampleIndex) const
 {
     const auto data = GenotypeValue(sampleIndex, "GT");
     auto fields = BAM::Split(data.get(), '/');
-    if (fields.size() == 1) fields = BAM::Split(data.get(), '|');
+    if (fields.size() == 1) {
+        fields = BAM::Split(data.get(), '|');
+    }
 
-    if (fields.size() == 2)
+    if (fields.size() == 2) {
         return fields.at(0) != fields.at(1);
-    else
+    } else {
         throw VcfFormatException{"malformed GT field: " + data.get()};
+    }
 }
 
 bool VcfVariant::IsSamplePhased(const size_t sampleIndex) const
 {
     const auto data = GenotypeValue(sampleIndex, "GT");
     const auto phaseFound = data.get().find('|') != std::string::npos;
-    if (phaseFound) assert(data.get().find('/') == std::string::npos);
+    if (phaseFound) {
+        assert(data.get().find('/') == std::string::npos);
+    }
     return phaseFound;
 }
 
@@ -241,7 +238,9 @@ VcfVariant& VcfVariant::RefAllele(std::string refAllele)
 VcfVariant& VcfVariant::RemoveInfoField(const std::string& id)
 {
     const auto found = infoLookup_.find(id);
-    if (found == infoLookup_.cend()) return *this;
+    if (found == infoLookup_.cend()) {
+        return *this;
+    }
 
     const auto currentFields = InfoFields();
 
@@ -249,7 +248,9 @@ VcfVariant& VcfVariant::RemoveInfoField(const std::string& id)
     infoLookup_.clear();
 
     for (auto&& field : currentFields) {
-        if (field.id != id) AddInfoField(std::move(field));
+        if (field.id != id) {
+            AddInfoField(std::move(field));
+        }
     }
 
     return *this;

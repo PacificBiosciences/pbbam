@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/vcf/VcfFile.h>
 
 #include <gtest/gtest.h>

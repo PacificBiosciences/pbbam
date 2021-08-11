@@ -2,8 +2,6 @@
 
 #include <pbbam/DataSetXsd.h>
 
-#include <cassert>
-
 #include <type_traits>
 #include <unordered_map>
 
@@ -151,17 +149,6 @@ static const auto elementRegistry = std::unordered_map<std::string, XsdType>
 // NamespaceInfo
 // ---------------
 
-static_assert(std::is_copy_constructible<NamespaceInfo>::value,
-              "NamespaceInfo(const NamespaceInfo&) is not = default");
-static_assert(std::is_copy_assignable<NamespaceInfo>::value,
-              "NamespaceInfo& operator=(const NamespaceInfo&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<NamespaceInfo>::value,
-              "NamespaceInfo(NamespaceInfo&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<NamespaceInfo>::value ==
-                  std::is_nothrow_move_assignable<std::string>::value,
-              "");
-
 NamespaceInfo::NamespaceInfo(std::string name, std::string uri)
     : name_{std::move(name)}, uri_{std::move(uri)}
 {
@@ -174,16 +161,6 @@ const std::string& NamespaceInfo::Uri() const { return uri_; }
 // -------------------
 // NamespaceRegistry
 // -------------------
-
-static_assert(std::is_copy_constructible<NamespaceRegistry>::value,
-              "NamespaceRegistry(const NamespaceRegistry&) is not = default");
-static_assert(std::is_copy_assignable<NamespaceRegistry>::value,
-              "NamespaceRegistry& operator=(const NamespaceRegistry&) is not = default");
-
-static_assert(std::is_nothrow_move_constructible<NamespaceRegistry>::value,
-              "NamespaceRegistry(NamespaceRegistry&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<NamespaceRegistry>::value,
-              "NamespaceRegistry& operator=(NamespaceRegistry&&) is not = noexcept");
 
 NamespaceRegistry::NamespaceRegistry() : data_{internal::DefaultRegistry()} {}
 
@@ -213,7 +190,9 @@ XsdType NamespaceRegistry::XsdForUri(const std::string& uri) const
 {
     for (const auto& entry : data_) {
         const auto& info = entry.second;
-        if (info.Uri() == uri) return entry.first;
+        if (info.Uri() == uri) {
+            return entry.first;
+        }
     }
     return XsdType::NONE;
 }

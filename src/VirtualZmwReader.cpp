@@ -76,8 +76,12 @@ std::vector<BamRecord> VirtualZmwReader::NextRaw()
     // Current hole number, the smallest of scraps and primary.
     // It can be that the next ZMW is scrap only.
     const int currentHoleNumber = [&]() {
-        if (primaryIt_ == primaryQuery_->end()) return (*scrapsIt_).HoleNumber();
-        if (scrapsIt_ == scrapsQuery_->end()) return (*primaryIt_).HoleNumber();
+        if (primaryIt_ == primaryQuery_->end()) {
+            return (*scrapsIt_).HoleNumber();
+        }
+        if (scrapsIt_ == scrapsQuery_->end()) {
+            return (*primaryIt_).HoleNumber();
+        }
         return std::min((*primaryIt_).HoleNumber(), (*scrapsIt_).HoleNumber());
     }();
 

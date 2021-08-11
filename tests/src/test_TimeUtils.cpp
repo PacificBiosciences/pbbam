@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/../../src/TimeUtils.h>
 
 #include <ctime>

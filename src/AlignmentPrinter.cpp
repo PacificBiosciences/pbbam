@@ -2,7 +2,6 @@
 
 #include <pbbam/AlignmentPrinter.h>
 
-#include <cassert>
 #include <cmath>
 #include <cstddef>
 
@@ -16,16 +15,6 @@
 
 namespace PacBio {
 namespace BAM {
-
-static_assert(!std::is_copy_constructible<AlignmentPrinter>::value,
-              "AlignmentPrinter(const AlignmentPrinter&) is not = delete");
-static_assert(!std::is_copy_assignable<AlignmentPrinter>::value,
-              "AlignmentPrinter& operator=(const AlignmentPrinter&) is not = delete");
-
-static_assert(std::is_nothrow_move_constructible<AlignmentPrinter>::value,
-              "AlignmentPrinter(AlignmentPrinter&&) is not = noexcept");
-static_assert(std::is_nothrow_move_assignable<AlignmentPrinter>::value,
-              "AlignmentPrinter& operator=(AlignmentPrinter&&) is not = noexcept");
 
 AlignmentPrinter::AlignmentPrinter(const IndexedFastaReader& ifr)
     : ifr_{std::make_unique<IndexedFastaReader>(ifr)}
@@ -56,10 +45,12 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Data::Orienta
         auto seqCoordStr = std::to_string(seqCoord);
 
         size_t maxCoordLength = std::max(refCoordStr.size(), seqCoordStr.size());
-        while (refCoordStr.size() < maxCoordLength)
+        while (refCoordStr.size() < maxCoordLength) {
             refCoordStr = " " + refCoordStr;
-        while (seqCoordStr.size() < maxCoordLength)
+        }
+        while (seqCoordStr.size() < maxCoordLength) {
             seqCoordStr = " " + seqCoordStr;
+        }
 
         std::string seqWrap{seqCoordStr + " : "};
         std::string refWrap{refCoordStr + " : "};
@@ -72,9 +63,9 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Data::Orienta
 
             if (seq[i] == ref[i]) {
                 ++matches;
-                if (refCoord == 0 || refCoord % 10)
+                if (refCoord == 0 || refCoord % 10) {
                     prettyWrap += '|';
-                else {
+                } else {
                     prettyWrap += "\033" "[1m" "\x1b" "[31m";
                     prettyWrap += '|';
                     prettyWrap += "\033" "[0m" "\x1b" "[39;49m";
@@ -103,10 +94,12 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Data::Orienta
         seqCoordStr = std::to_string(seqCoord);
 
         maxCoordLength = std::max(refCoordStr.size(), seqCoordStr.size());
-        while (refCoordStr.size() < maxCoordLength)
+        while (refCoordStr.size() < maxCoordLength) {
             refCoordStr = " " + refCoordStr;
-        while (seqCoordStr.size() < maxCoordLength)
+        }
+        while (seqCoordStr.size() < maxCoordLength) {
             seqCoordStr = " " + seqCoordStr;
+        }
 
         seqWrap += " : " + seqCoordStr;
         refWrap += " : " + refCoordStr;

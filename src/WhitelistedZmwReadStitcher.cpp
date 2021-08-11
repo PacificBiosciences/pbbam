@@ -2,7 +2,6 @@
 
 #include <pbbam/virtual/WhitelistedZmwReadStitcher.h>
 
-#include <cassert>
 #include <cstdint>
 
 #include <sstream>
@@ -61,17 +60,21 @@ public:
     std::vector<BamRecord> NextRaw()
     {
         std::vector<BamRecord> result;
-        if (!HasNext()) return result;
+        if (!HasNext()) {
+            return result;
+        }
 
         const auto& zmw = zmwWhitelist_.front();
         primaryReader_->Filter(PbiZmwFilter{zmw});
         scrapsReader_->Filter(PbiZmwFilter{zmw});
 
         BamRecord record;
-        while (primaryReader_->GetNext(record))
+        while (primaryReader_->GetNext(record)) {
             result.push_back(record);
-        while (scrapsReader_->GetNext(record))
+        }
+        while (scrapsReader_->GetNext(record)) {
             result.push_back(record);
+        }
 
         zmwWhitelist_.pop_front();
         return result;
@@ -99,15 +102,19 @@ private:
 
         // toss them all into a set (for uniqueness & lookup here soon)
         std::set<int32_t> inputZmws;
-        for (const auto& zmw : primaryZmws)
+        for (const auto& zmw : primaryZmws) {
             inputZmws.insert(zmw);
-        for (const auto& zmw : scrapsZmws)
+        }
+        for (const auto& zmw : scrapsZmws) {
             inputZmws.insert(zmw);
+        }
 
         // check our requested whitelist against files' ZMWs, keep if found
         const auto inputEnd = inputZmws.cend();
         for (const int32_t zmw : zmwWhitelist) {
-            if (inputZmws.find(zmw) != inputEnd) zmwWhitelist_.push_back(zmw);
+            if (inputZmws.find(zmw) != inputEnd) {
+                zmwWhitelist_.push_back(zmw);
+            }
         }
     }
 };

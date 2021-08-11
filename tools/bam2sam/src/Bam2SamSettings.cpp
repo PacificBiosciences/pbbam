@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "Bam2SamSettings.h"
 
 #include <stdexcept>
@@ -65,10 +63,11 @@ Settings::Settings(const CLI_v2::Results& args)
 {
     // input file
     const auto& posArgs = args.PositionalArguments();
-    if (posArgs.empty())
+    if (posArgs.empty()) {
         InputFilename = "-";
-    else
+    } else {
         InputFilename = posArgs.front();
+    }
 
     // validate header print mode
     if (NoHeader && HeaderOnly) {

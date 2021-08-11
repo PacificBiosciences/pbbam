@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/TextFileWriter.h>
 
 #include <cstdio>
@@ -26,8 +24,9 @@ void CheckRoundTrip(const std::string& outFn, const PacBio::BAM::HtslibCompressi
 {
     {
         TextFileWriter writer{outFn};
-        for (const auto& interval : TextFileWriterTests::Lines)
+        for (const auto& interval : TextFileWriterTests::Lines) {
             writer.Write(interval);
+        }
     }
     EXPECT_EQ(compressionType, PacBio::BAM::FormatUtils::CompressionType(outFn));
 

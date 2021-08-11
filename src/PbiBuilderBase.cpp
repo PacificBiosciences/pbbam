@@ -2,6 +2,8 @@
 
 #include "PbiBuilderBase.h"
 
+#include <cassert>
+
 namespace PacBio {
 namespace BAM {
 
@@ -39,7 +41,9 @@ PbiBuilderBase::PbiBuilderBase(const std::string& pbiFilename,
     , bcReverseField_{bufferSize}
     , bcQualField_{bufferSize}
 {
-    if (!tempFile_) throw PbiBuilderException{tempFilename_, "could not open temp file"};
+    if (!tempFile_) {
+        throw PbiBuilderException{tempFilename_, "could not open temp file"};
+    }
 }
 
 PbiBuilderBase::~PbiBuilderBase() noexcept
@@ -71,8 +75,9 @@ void PbiBuilderBase::AddBarcodeData(const BamRecord& b)
             bcForward = -1;
             bcReverse = -1;
             bcQuality = -1;
-        } else
+        } else {
             hasBarcodeData_ = true;
+        }
     }
 
     // store
@@ -86,7 +91,9 @@ void PbiBuilderBase::AddBasicData(const BamRecord& b, int64_t uOffset)
     // read group ID
     const auto rgId = [&b]() -> int32_t {
         auto rgIdString = b.ReadGroupBaseId();
-        if (rgIdString.empty()) rgIdString = MakeReadGroupId(b.MovieName(), ToString(b.Type()));
+        if (rgIdString.empty()) {
+            rgIdString = MakeReadGroupId(b.MovieName(), ToString(b.Type()));
+        }
         return std::stoul(rgIdString, nullptr, 16);
     }();
 
@@ -135,7 +142,9 @@ void PbiBuilderBase::AddMappedData(const BamRecord& b)
     const auto nInsOps = indelOps.first;
     const auto nDelOps = indelOps.second;
 
-    if (tId >= 0) hasMappedData_ = true;
+    if (tId >= 0) {
+        hasMappedData_ = true;
+    }
 
     // store
     tIdField_.Add(tId);
@@ -173,13 +182,17 @@ void PbiBuilderBase::AddReferenceData(const BamRecord& b, uint32_t currentRow)
     // update with info from refDataBuilder
     if (refDataBuilder_) {
         const auto sorted = refDataBuilder_->AddRecord(b, currentRow);
-        if (!sorted) refDataBuilder_.reset();
+        if (!sorted) {
+            refDataBuilder_.reset();
+        }
     }
 }
 
 void PbiBuilderBase::Close()
 {
-    if (isClosed_) return;
+    if (isClosed_) {
+        return;
+    }
 
     FlushBuffers(FlushMode::FORCE);
 
@@ -237,11 +250,15 @@ void PbiBuilderBase::OpenPbiFile()
         actualNumThreads = std::thread::hardware_concurrency();
 
         // if still unknown, default to single-threaded
-        if (actualNumThreads == 0) actualNumThreads = 1;
+        if (actualNumThreads == 0) {
+            actualNumThreads = 1;
+        }
     }
 
     // if multithreading requested, enable it
-    if (actualNumThreads > 1) bgzf_mt(pbiFile_.get(), actualNumThreads, 256);
+    if (actualNumThreads > 1) {
+        bgzf_mt(pbiFile_.get(), actualNumThreads, 256);
+    }
 }
 
 void PbiBuilderBase::WriteFromTempFile()
@@ -271,7 +288,9 @@ void PbiBuilderBase::WriteFromTempFile()
         WriteField(nDelOpsField_);
     }
 
-    if (refDataBuilder_) WriteReferenceData();
+    if (refDataBuilder_) {
+        WriteReferenceData();
+    }
 
     if (hasBarcodeData_) {
         WriteField(bcForwardField_);
@@ -289,9 +308,15 @@ void PbiBuilderBase::WritePbiHeader()
     bgzf_write_safe(bgzf, magic.data(), 4);
 
     PbiFile::Sections sections = PbiFile::BASIC;
-    if (hasMappedData_) sections |= PbiFile::MAPPED;
-    if (hasBarcodeData_) sections |= PbiFile::BARCODE;
-    if (refDataBuilder_) sections |= PbiFile::REFERENCE;
+    if (hasMappedData_) {
+        sections |= PbiFile::MAPPED;
+    }
+    if (hasBarcodeData_) {
+        sections |= PbiFile::BARCODE;
+    }
+    if (refDataBuilder_) {
+        sections |= PbiFile::REFERENCE;
+    }
 
     // version, pbi_flags, & n_reads
     auto version = static_cast<uint32_t>(PbiFile::CurrentVersion);
@@ -329,8 +354,9 @@ PbiReferenceDataBuilder::PbiReferenceDataBuilder(size_t numReferenceSequences)
     // we can add more later, but want to ensure known references have an entry
     // even if no records are observed mapping to it
     //
-    for (size_t i = 0; i < numReferenceSequences; ++i)
+    for (size_t i = 0; i < numReferenceSequences; ++i) {
         rawReferenceEntries_[i] = PbiReferenceEntry(i);
+    }
 
     // also create an "unmapped" entry
     rawReferenceEntries_[PbiReferenceEntry::UNMAPPED_ID] = PbiReferenceEntry{};
@@ -352,7 +378,9 @@ bool PbiReferenceDataBuilder::AddRecord(const BamRecord& record, int32_t rowNumb
             //
             PbiReferenceEntry& unmappedEntry =
                 rawReferenceEntries_.at(PbiReferenceEntry::UNMAPPED_ID);
-            if (unmappedEntry.beginRow_ != PbiReferenceEntry::UNSET_ROW) return false;
+            if (unmappedEntry.beginRow_ != PbiReferenceEntry::UNSET_ROW) {
+                return false;
+            }
 
             // if we've already seen data for this new tId
             // (remember we're coming from another tId)
@@ -360,15 +388,20 @@ bool PbiReferenceDataBuilder::AddRecord(const BamRecord& record, int32_t rowNumb
             // error: refs are out of order (can stop checking refs)
             //
             PbiReferenceEntry& currentEntry = rawReferenceEntries_.at(static_cast<uint32_t>(tId));
-            if (currentEntry.beginRow_ != PbiReferenceEntry::UNSET_ROW) return false;
+            if (currentEntry.beginRow_ != PbiReferenceEntry::UNSET_ROW) {
+                return false;
+            }
         }
         lastRefId_ = tId;
-    } else if (tId >= 0 && lastPos_ > pos)
+    } else if (tId >= 0 && lastPos_ > pos) {
         return false;  // error: positions out of order
+    }
 
     // update row numbers
     PbiReferenceEntry& entry = rawReferenceEntries_.at(static_cast<uint32_t>(tId));
-    if (entry.beginRow_ == PbiReferenceEntry::UNSET_ROW) entry.beginRow_ = rowNumber;
+    if (entry.beginRow_ == PbiReferenceEntry::UNSET_ROW) {
+        entry.beginRow_ = rowNumber;
+    }
     entry.endRow_ = rowNumber + 1;
 
     // update pos (for sorting check next go-round)
@@ -382,8 +415,9 @@ PbiRawReferenceData PbiReferenceDataBuilder::Result() const
     // tId will be at end since we're sorting on the uint cast of -1
     PbiRawReferenceData result;
     result.entries_.reserve(rawReferenceEntries_.size());
-    for (const auto& entry : rawReferenceEntries_)
+    for (const auto& entry : rawReferenceEntries_) {
         result.entries_.push_back(entry.second);
+    }
     return result;
 }
 
@@ -393,7 +427,9 @@ void PbiReferenceDataBuilder::WriteData(BGZF* bgzf)
 
     // num_refs
     uint32_t numRefs = refData.entries_.size();
-    if (bgzf->is_be) numRefs = ed_swap_4(numRefs);
+    if (bgzf->is_be) {
+        numRefs = ed_swap_4(numRefs);
+    }
     bgzf_write_safe(bgzf, &numRefs, 4);
 
     // reference entries

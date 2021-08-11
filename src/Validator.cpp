@@ -58,20 +58,31 @@ static void ValidateReadGroup(const ReadGroupInfo& rg, std::unique_ptr<Validatio
     const std::string id = rg.Id();
 
     // has required fields
-    if (id.empty()) errors->AddReadGroupError(id, "missing ID");
-    if (rg.MovieName().empty()) errors->AddReadGroupError(id, "missing movie name (PU tag)");
+    if (id.empty()) {
+        errors->AddReadGroupError(id, "missing ID");
+    }
+    if (rg.MovieName().empty()) {
+        errors->AddReadGroupError(id, "missing movie name (PU tag)");
+    }
     // 3.0.2 adds required RG:PM - do not check for now, we'll add version-aware
     // validation down the road
 
     // description tag has required components
-    if (rg.ReadType().empty()) errors->AddReadGroupError(id, "missing READTYPE in description");
-    if (rg.BindingKit().empty()) errors->AddReadGroupError(id, "missing BINDINGKIT in description");
-    if (rg.SequencingKit().empty())
+    if (rg.ReadType().empty()) {
+        errors->AddReadGroupError(id, "missing READTYPE in description");
+    }
+    if (rg.BindingKit().empty()) {
+        errors->AddReadGroupError(id, "missing BINDINGKIT in description");
+    }
+    if (rg.SequencingKit().empty()) {
         errors->AddReadGroupError(id, "missing SEQUENCINGKIT in description");
-    if (rg.BasecallerVersion().empty())
+    }
+    if (rg.BasecallerVersion().empty()) {
         errors->AddReadGroupError(id, "missing BASECALLERVERSION in description");
-    if (rg.FrameRateHz().empty())
+    }
+    if (rg.FrameRateHz().empty()) {
         errors->AddReadGroupError(id, "missing FRAMERATEHZ in description");
+    }
 
     // stored ID matches expected ID (as calculated from movie & type)
     if (!id.empty()) {
@@ -85,8 +96,9 @@ static void ValidateReadGroup(const ReadGroupInfo& rg, std::unique_ptr<Validatio
 
     // valid read type
     if (!rg.ReadType().empty()) {
-        if (AcceptedReadTypes.find(rg.ReadType()) == AcceptedReadTypes.cend())
+        if (AcceptedReadTypes.find(rg.ReadType()) == AcceptedReadTypes.cend()) {
             errors->AddReadGroupError(id, "read type: " + rg.ReadType() + " is unknown");
+        }
     }
 
     // valid read chemistry (binding, sequencing, chemistry)
@@ -126,8 +138,9 @@ static void ValidateHeader(const BamHeader& header, const std::string& filename,
 
     // sort order
     const std::string sortOrder = header.SortOrder();
-    if (AcceptedSortOrders.find(sortOrder) == AcceptedSortOrders.end())
+    if (AcceptedSortOrders.find(sortOrder) == AcceptedSortOrders.end()) {
         errors->AddFileError(fn, std::string{"unknown sort order: "} + sortOrder);
+    }
 
     // PacBio version
     try {
@@ -148,8 +161,9 @@ static void ValidateHeader(const BamHeader& header, const std::string& filename,
     // sequences?
 
     // read groups
-    for (const ReadGroupInfo& rg : header.ReadGroups())
+    for (const ReadGroupInfo& rg : header.ReadGroups()) {
         ValidateReadGroup(rg, errors);
+    }
 }
 
 static void ValidateMetadata(const BamFile& file, std::unique_ptr<ValidationErrors>& errors)
@@ -167,10 +181,14 @@ static void ValidateMetadata(const BamFile& file, std::unique_ptr<ValidationErro
     }
 
     // EOF
-    if (!file.HasEOF()) errors->AddFileError(fn, "missing end-of-file marker");
+    if (!file.HasEOF()) {
+        errors->AddFileError(fn, "missing end-of-file marker");
+    }
 
     // has PBI
-    if (!file.PacBioIndexExists()) errors->AddFileError(fn, "missing PBI file");
+    if (!file.PacBioIndexExists()) {
+        errors->AddFileError(fn, "missing PBI file");
+    }
 
     // header
     ValidateHeader(file.Header(), file.Filename(), errors);
@@ -179,8 +197,12 @@ static void ValidateMetadata(const BamFile& file, std::unique_ptr<ValidationErro
 void ValidateMappedRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
     const std::string name{b.FullName()};
-    if (b.ReferenceStart() < 0) errors->AddRecordError(name, "mapped record position is invalid");
-    if (b.ReferenceId() < 0) errors->AddRecordError(name, "mapped record reference ID is invalid");
+    if (b.ReferenceStart() < 0) {
+        errors->AddRecordError(name, "mapped record position is invalid");
+    }
+    if (b.ReferenceId() < 0) {
+        errors->AddRecordError(name, "mapped record reference ID is invalid");
+    }
 
     // what else??
 }
@@ -217,32 +239,43 @@ void ValidateRecordRequiredTags(const BamRecord& b, std::unique_ptr<ValidationEr
         if (hasQueryStart && hasQueryEnd) {
             const auto qStart = b.QueryStart();
             const auto qEnd = b.QueryEnd();
-            if (qStart >= qEnd)
+            if (qStart >= qEnd) {
                 errors->AddRecordError(name, "queryStart (qs) should be < queryEnd (qe)");
+            }
         } else {
-            if (!hasQueryStart) errors->AddRecordError(name, "missing tag: qs (queryStart)");
-            if (!hasQueryEnd) errors->AddRecordError(name, "missing tag: qe (queryEnd)");
+            if (!hasQueryStart) {
+                errors->AddRecordError(name, "missing tag: qs (queryStart)");
+            }
+            if (!hasQueryEnd) {
+                errors->AddRecordError(name, "missing tag: qe (queryEnd)");
+            }
         }
     }
 
     // zm
-    if (!b.HasHoleNumber()) errors->AddRecordError(name, "missing tag: zm (ZMW hole number)");
+    if (!b.HasHoleNumber()) {
+        errors->AddRecordError(name, "missing tag: zm (ZMW hole number)");
+    }
 
     // np
-    if (!b.HasNumPasses())
+    if (!b.HasNumPasses()) {
         errors->AddRecordError(name, "missing tag: np (num passes)");
-    else {
+    } else {
         const auto numPasses = b.NumPasses();
-        if (!isCcsOrTranscript && numPasses != 1)
+        if (!isCcsOrTranscript && numPasses != 1) {
             errors->AddRecordError(name, "np (numPasses) tag for non-CCS records should be 1");
+        }
     }
 
     // rq
-    if (!b.HasReadAccuracy()) errors->AddRecordError(name, "missing tag: rq (read accuracy)");
+    if (!b.HasReadAccuracy()) {
+        errors->AddRecordError(name, "missing tag: rq (read accuracy)");
+    }
 
     // sn
-    if (!b.HasSignalToNoise())
+    if (!b.HasSignalToNoise()) {
         errors->AddRecordError(name, "missing tag: sn (signal-to-noise ratio)");
+    }
 }
 
 void ValidateRecordTagLengths(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
@@ -252,41 +285,49 @@ void ValidateRecordTagLengths(const BamRecord& b, std::unique_ptr<ValidationErro
         (IsCcsOrTranscript(b.Type()) ? b.Sequence().size() : (b.QueryEnd() - b.QueryStart()));
 
     // check "per-base"-type data lengths are compatible
-    if (b.Sequence().size() != expectedLength)
+    if (b.Sequence().size() != expectedLength) {
         errors->AddRecordError(name, "sequence length does not match expected length");
+    }
 
     if (b.HasDeletionQV()) {
-        if (b.DeletionQV().size() != expectedLength)
+        if (b.DeletionQV().size() != expectedLength) {
             errors->AddTagLengthError(name, "DeletionQV", "dq", b.DeletionQV().size(),
                                       expectedLength);
+        }
     }
     if (b.HasDeletionTag()) {
-        if (b.DeletionTag().size() != expectedLength)
+        if (b.DeletionTag().size() != expectedLength) {
             errors->AddTagLengthError(name, "DeletionTag", "dt", b.DeletionTag().size(),
                                       expectedLength);
+        }
     }
     if (b.HasInsertionQV()) {
-        if (b.InsertionQV().size() != expectedLength)
+        if (b.InsertionQV().size() != expectedLength) {
             errors->AddTagLengthError(name, "InsertionQV", "iq", b.InsertionQV().size(),
                                       expectedLength);
+        }
     }
     if (b.HasMergeQV()) {
-        if (b.MergeQV().size() != expectedLength)
+        if (b.MergeQV().size() != expectedLength) {
             errors->AddTagLengthError(name, "MergeQV", "mq", b.MergeQV().size(), expectedLength);
+        }
     }
     if (b.HasSubstitutionQV()) {
-        if (b.SubstitutionQV().size() != expectedLength)
+        if (b.SubstitutionQV().size() != expectedLength) {
             errors->AddTagLengthError(name, "SubstitutionQV", "sq", b.SubstitutionQV().size(),
                                       expectedLength);
+        }
     }
     if (b.HasSubstitutionTag()) {
-        if (b.SubstitutionTag().size() != expectedLength)
+        if (b.SubstitutionTag().size() != expectedLength) {
             errors->AddTagLengthError(name, "SubstitutionTag", "st", b.SubstitutionTag().size(),
                                       expectedLength);
+        }
     }
     if (b.HasIPD()) {
-        if (b.IPD().size() != expectedLength)
+        if (b.IPD().size() != expectedLength) {
             errors->AddTagLengthError(name, "IPD", "ip", b.IPD().size(), expectedLength);
+        }
     }
 
     // NOTE: disabling "internal" tag checks for now, only production tags
@@ -295,8 +336,12 @@ void ValidateRecordTagLengths(const BamRecord& b, std::unique_ptr<ValidationErro
 void ValidateUnmappedRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
     const std::string name{b.FullName()};
-    if (b.ReferenceStart() != -1) errors->AddRecordError(name, "unmapped record has a position");
-    if (b.ReferenceId() != -1) errors->AddRecordError(name, "unmapped record has a reference ID");
+    if (b.ReferenceStart() != -1) {
+        errors->AddRecordError(name, "unmapped record has a position");
+    }
+    if (b.ReferenceId() != -1) {
+        errors->AddRecordError(name, "unmapped record has a reference ID");
+    }
 }
 
 static void ValidateRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
@@ -305,10 +350,11 @@ static void ValidateRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>
     ValidateRecordReadGroup(b, errors);
     ValidateRecordRequiredTags(b, errors);
     ValidateRecordTagLengths(b, errors);
-    if (b.IsMapped())
+    if (b.IsMapped()) {
         ValidateMappedRecord(b, errors);
-    else
+    } else {
         ValidateUnmappedRecord(b, errors);
+    }
 }
 
 }  // namespace
@@ -316,10 +362,11 @@ static void ValidateRecord(const BamRecord& b, std::unique_ptr<ValidationErrors>
 bool Validator::IsValid(const BamFile& file, const bool entireFile)
 {
     try {
-        if (entireFile)
+        if (entireFile) {
             ValidateEntireFile(file, 1);
-        else
+        } else {
             ValidateFileMetadata(file, 1);
+        }
         return true;
     } catch (std::exception&) {
         return false;
@@ -360,21 +407,27 @@ void Validator::Validate(const BamHeader& header, const size_t maxErrors)
 {
     auto errors = std::make_unique<ValidationErrors>(maxErrors);
     ValidateHeader(header, "unknown", errors);
-    if (!errors->IsEmpty()) errors->ThrowErrors();
+    if (!errors->IsEmpty()) {
+        errors->ThrowErrors();
+    }
 }
 
 void Validator::Validate(const ReadGroupInfo& rg, const size_t maxErrors)
 {
     auto errors = std::make_unique<ValidationErrors>(maxErrors);
     ValidateReadGroup(rg, errors);
-    if (!errors->IsEmpty()) errors->ThrowErrors();
+    if (!errors->IsEmpty()) {
+        errors->ThrowErrors();
+    }
 }
 
 void Validator::Validate(const BamRecord& b, const size_t maxErrors)
 {
     auto errors = std::make_unique<ValidationErrors>(maxErrors);
     ValidateRecord(b, errors);
-    if (!errors->IsEmpty()) errors->ThrowErrors();
+    if (!errors->IsEmpty()) {
+        errors->ThrowErrors();
+    }
 }
 
 void Validator::ValidateEntireFile(const BamFile& file, const size_t maxErrors)
@@ -383,17 +436,22 @@ void Validator::ValidateEntireFile(const BamFile& file, const size_t maxErrors)
     ValidateMetadata(file, errors);
 
     EntireFileQuery query(file);
-    for (const BamRecord& record : query)
+    for (const BamRecord& record : query) {
         ValidateRecord(record, errors);
+    }
 
-    if (!errors->IsEmpty()) errors->ThrowErrors();
+    if (!errors->IsEmpty()) {
+        errors->ThrowErrors();
+    }
 }
 
 void Validator::ValidateFileMetadata(const BamFile& file, const size_t maxErrors)
 {
     auto errors = std::make_unique<ValidationErrors>(maxErrors);
     ValidateMetadata(file, errors);
-    if (!errors->IsEmpty()) errors->ThrowErrors();
+    if (!errors->IsEmpty()) {
+        errors->ThrowErrors();
+    }
 }
 
 }  // namespace BAM

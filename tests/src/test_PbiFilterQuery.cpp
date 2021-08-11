@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include <pbbam/PbiFilterQuery.h>
 
 #include <cstddef>
@@ -78,12 +76,12 @@ TEST(BAM_PbiFilterQuery, can_perform_normal_filtered_queries)
             ++count;
             EXPECT_EQ(std::string("b89a4406"), r.ReadGroupId());
             EXPECT_GE((r.NumMatches()), 1200);
-            if (count == 1)
+            if (count == 1) {
                 EXPECT_EQ(
                     std::string("m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/"
                                 "14743/2579_4055"),
                     r.FullName());
-            else {
+            } else {
                 if (count == 2) {
                     EXPECT_EQ(
                         std::string("m140905_042212_sidney_c100564852550000001823085912221377_s1_"
@@ -541,8 +539,9 @@ TEST(BAM_PbiFilterQuery, can_handle_transcript_records)
     const std::string transcriptFn = PbbamTestsConfig::Data_Dir + "/transcript.subreads.bam";
 
     PbiFilterQuery query{PbiFilter{}, transcriptFn};
-    for (const auto& b : query)
+    for (const auto& b : query) {
         EXPECT_TRUE(b.HasHoleNumber());
+    }
 
     {  // zmw whitelist
         const std::vector<int32_t> whitelist = {1, 3};
@@ -788,4 +787,49 @@ TEST(BAM_PbiFilter, can_filter_by_movie_name_with_barcoded_read_group_ids)
         EXPECT_EQ(1, query.NumReads());
         EXPECT_EQ(1, std::distance(query.begin(), query.end()));
     }
+}
+
+TEST(BAM_PbiFilter, can_filter_subread_records_by_qname)
+{
+    const std::string fn{
+        PbbamTestsConfig::Data_Dir +
+        "/chunking/m150404_101626_42267_c100807920800000001823174110291514_s1_p0.1.subreads.bam"};
+
+    const std::vector<std::string> qnames{"m64004_190414_193017/2865/7276_7872",
+                                          "m64004_190414_193017/2865/15855_16411"};
+
+    int count = 0;
+    PbiFilterQuery query{PbiQueryNameFilter{qnames}, fn};
+    for (const auto& b : query) {
+        std::ignore = b;
+        ++count;
+    }
+    EXPECT_EQ(2, count);
+}
+
+TEST(BAM_PbiFilter, can_filter_ccs_records_by_qname)
+{
+    const std::string fn{PbbamTestsConfig::Data_Dir +
+                         "/ccs-kinetics-bystrandify/ccs-kinetics-bystrandify-mock-input.2.bam"};
+
+    int count = 0;
+    PbiFilterQuery query{PbiQueryNameFilter{"m64011_190228_190319/3/ccs"}, fn};
+    for (const auto& b : query) {
+        std::ignore = b;
+        ++count;
+    }
+    EXPECT_EQ(1, count);
+}
+
+TEST(BAM_PbiFilter, can_filter_transcript_records_by_qname)
+{
+    const std::string fn{PbbamTestsConfig::Data_Dir + "/transcript.subreads.bam"};
+
+    int count = 0;
+    PbiFilterQuery query{PbiQueryNameFilter{"transcript/2"}, fn};
+    for (const auto& b : query) {
+        std::ignore = b;
+        ++count;
+    }
+    EXPECT_EQ(1, count);
 }

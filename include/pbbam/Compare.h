@@ -3,6 +3,7 @@
 
 #include <pbbam/Config.h>
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 

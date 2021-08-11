@@ -2,8 +2,6 @@
 
 #include <pbbam/FastaReader.h>
 
-#include <cassert>
-
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
@@ -17,11 +15,6 @@
 
 namespace PacBio {
 namespace BAM {
-
-static_assert(!std::is_copy_constructible<FastaReader>::value,
-              "FastaReader(const FastaReader&) is not = delete");
-static_assert(!std::is_copy_assignable<FastaReader>::value,
-              "FastaReader& operator=(const FastaReader&) is not = delete");
 
 class FastaReader::FastaReaderPrivate
 {
@@ -41,7 +34,9 @@ public:
     bool GetNext(FastaSequence& record)
     {
         const auto readOk = reader_->ReadNext();
-        if (!readOk) return false;  // not error, could be EOF
+        if (!readOk) {
+            return false;  // not error, could be EOF
+        }
 
         record = FastaSequence{reader_->Name(), reader_->Bases()};
         return true;
@@ -68,8 +63,9 @@ std::vector<FastaSequence> FastaReader::ReadAll(const std::string& fn)
     std::vector<FastaSequence> result;
     result.reserve(256);
     FastaReader reader{fn};
-    for (const auto& seq : reader)
+    for (const auto& seq : reader) {
         result.emplace_back(seq);
+    }
     return result;
 }
 

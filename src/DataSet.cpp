@@ -37,8 +37,9 @@ void GetAllFiles(const ExternalResources& resources, std::vector<std::string>* r
         result->push_back(resource.ResourceId());
 
         // store any child indices
-        for (const auto& idx : resource.FileIndices())
+        for (const auto& idx : resource.FileIndices()) {
             result->push_back(idx.ResourceId());
+        }
 
         // recurse into any other child resources
         GetAllFiles(resource.ExternalResources(), result);
@@ -114,7 +115,9 @@ DataSet::DataSet(const std::string& filename) : d_(DataSetIO::FromUri(filename))
     }
 
     else {
-        if (boost::algorithm::iends_with(filename, ".xml")) d_->FromInputXml(true);
+        if (boost::algorithm::iends_with(filename, ".xml")) {
+            d_->FromInputXml(true);
+        }
         d_->Path(FileUtils::DirectoryName(filename));
     }
 }
@@ -137,7 +140,9 @@ DataSet::DataSet(const DataSet& other)
 
 DataSet& DataSet::operator=(const DataSet& other)
 {
-    if (this != &other) *this = DataSet{other};
+    if (this != &other) {
+        *this = DataSet{other};
+    }
     return *this;
 }
 
@@ -289,9 +294,9 @@ std::vector<GenomicInterval> DataSet::GenomicIntervals() const
             const int32_t refLength = boost::lexical_cast<int32_t>(header.SequenceLength(i));
 
             const auto it = contigLengths.find(refName);
-            if (it == contigLengths.cend())
+            if (it == contigLengths.cend()) {
                 contigLengths.emplace(refName, refLength);
-            else if (it->second != refLength) {
+            } else if (it->second != refLength) {
                 throw std::runtime_error{"[pbbam] dataset ERROR: " + refName +
                                          " occurs twice with different lengths ('" +
                                          std::to_string(it->second) + "' and '" +
@@ -324,40 +329,46 @@ std::vector<GenomicInterval> DataSet::GenomicIntervals() const
                     contigName = XmlValue;
 
                     const auto it = contigLengths.find(XmlValue);
-                    if (it == contigLengths.cend())
+                    if (it == contigLengths.cend()) {
                         throw std::runtime_error{"[pbbam] dataset ERROR: could not find contig '" +
                                                  XmlValue + "' in BAM files"};
-                    else
+                    } else {
                         intersectedInterval &= intInterval(0, it->second);
-                } else
+                    }
+                } else {
                     throw std::runtime_error{
                         "[pbbam] dataset ERROR: '" + XmlOperator +
                         "' is an unrecognized property operator, only '=' is recognized"};
+                }
             } else if ("tstart" == XmlName) {
-                if ((XmlOperator != "<") && (XmlOperator != "<="))
+                if ((XmlOperator != "<") && (XmlOperator != "<=")) {
                     throw std::runtime_error{
                         "[pbbam] dataset ERROR: 'tstart' only supports '<' and '<=' operators"};
+                }
 
                 const int32_t end = boost::lexical_cast<int32_t>(XmlValue) + ("<=" == XmlOperator);
                 intersectedInterval &= intInterval(0, end);
             } else if ("tend" == XmlName) {
-                if ((XmlOperator != ">") && (XmlOperator != ">="))
+                if ((XmlOperator != ">") && (XmlOperator != ">=")) {
                     throw std::runtime_error{
                         "[pbbam] dataset ERROR: 'tend' only supports '>' and '>=' operators"};
+                }
 
                 const int32_t start =
                     boost::lexical_cast<int32_t>(XmlValue) - (">=" == XmlOperator);
                 intersectedInterval &= intInterval(start, std::numeric_limits<int32_t>::max());
-            } else
+            } else {
                 throw std::runtime_error{"[pbbam] dataset ERROR: '" + XmlName +
                                          "' is an unrecognized filter property name"};
+            }
         }
 
-        if (contigName)
+        if (contigName) {
             contigIntervals[contigName.value()] |= intersectedInterval;
-        else
+        } else {
             throw std::runtime_error{
                 "[pbbam] dataset ERROR: current filter does not have a valid 'rname' attribute"};
+        }
     }
 
     // extract all GenomicIntervals
@@ -368,13 +379,16 @@ std::vector<GenomicInterval> DataSet::GenomicIntervals() const
             const auto& contigName = contigs.first;
             for (const auto& i : contigs.second) {
                 // don't append empty intervals to the result
-                if (boost::icl::length(i)) result.emplace_back(contigName, i.lower(), i.upper());
+                if (boost::icl::length(i)) {
+                    result.emplace_back(contigName, i.lower(), i.upper());
+                }
             }
         }
     } else {
         // no filters, return complete list of intervals
-        for (const auto& contigs : contigLengths)
+        for (const auto& contigs : contigLengths) {
             result.emplace_back(contigs.first, 0, contigs.second);
+        }
     }
 
     return result;
@@ -488,13 +502,15 @@ std::set<std::string> DataSet::SequencingChemistries() const
 {
     std::set<std::string> result;
     for (const auto& bf : BamFiles()) {
-        if (!bf.IsPacBioBAM())
+        if (!bf.IsPacBioBAM()) {
             throw std::runtime_error{
                 "[pbbam] dataset ERROR: only PacBio BAMs are supported for fetching chemistry "
                 "info"};
+        }
         const std::vector<ReadGroupInfo> readGroups{bf.Header().ReadGroups()};
-        for (const auto& rg : readGroups)
+        for (const auto& rg : readGroups) {
             result.insert(rg.SequencingChemistry());
+        }
     }
     return result;
 }
@@ -504,8 +520,9 @@ std::set<std::string> DataSet::Samples() const
     std::set<std::string> result;
     for (const auto& bf : BamFiles()) {
         const std::vector<ReadGroupInfo> readGroups{bf.Header().ReadGroups()};
-        for (const auto& rg : readGroups)
+        for (const auto& rg : readGroups) {
             result.insert(rg.Sample());
+        }
     }
     return result;
 }

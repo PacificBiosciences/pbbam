@@ -1,5 +1,3 @@
-// Author: Ivan Sovic
-
 #ifndef PBBAMIFY_QUERYLOOKUP_H
 #define PBBAMIFY_QUERYLOOKUP_H
 

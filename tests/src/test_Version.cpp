@@ -1,5 +1,3 @@
-// Author: Derek Barnett
-
 #include "../src/Version.h"
 
 #include <sstream>

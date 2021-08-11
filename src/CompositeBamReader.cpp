@@ -81,7 +81,9 @@ GenomicIntervalCompositeBamReader& GenomicIntervalCompositeBamReader::Interval(
         if (bamFile.StandardIndexExists()) {
             internal::CompositeMergeItem item{std::unique_ptr<BamReader>{
                 new BaiIndexedBamReader{interval, bamFile, indexCache_->at(i)}}};
-            if (item.reader->GetNext(item.record)) updatedMergeItems.insert(std::move(item));
+            if (item.reader->GetNext(item.record)) {
+                updatedMergeItems.insert(std::move(item));
+            }
             // else not an error, simply no data matching interval
         } else {
             // maybe handle PBI-backed interval searches if BAI missing, but for now treat as error
@@ -94,8 +96,9 @@ GenomicIntervalCompositeBamReader& GenomicIntervalCompositeBamReader::Interval(
         std::ostringstream e;
         e << "[pbbam] composite BAM reader ERROR: failed to open because the following files are "
              "missing a *.bai index:\n";
-        for (const auto& fn : missingBai)
+        for (const auto& fn : missingBai) {
             e << "  " << fn << '\n';
+        }
         throw std::runtime_error{e.str()};
     }
 
@@ -111,8 +114,9 @@ GenomicIntervalCompositeBamReader& GenomicIntervalCompositeBamReader::Interval(
 SequentialCompositeBamReader::SequentialCompositeBamReader(std::vector<BamFile> bamFiles)
     : internal::IQuery{}
 {
-    for (const auto& bamFile : bamFiles)
+    for (const auto& bamFile : bamFiles) {
         readers_.emplace_back(std::make_unique<BamReader>(bamFile));
+    }
 }
 
 SequentialCompositeBamReader::SequentialCompositeBamReader(const DataSet& dataset)
@@ -126,10 +130,11 @@ bool SequentialCompositeBamReader::GetNext(BamRecord& record)
     // else pop reader and try next, until all readers exhausted
     while (!readers_.empty()) {
         auto& reader = readers_.front();
-        if (reader->GetNext(record))
+        if (reader->GetNext(record)) {
             return true;
-        else
+        } else {
             readers_.pop_front();
+        }
     }
 
     // no readers available
