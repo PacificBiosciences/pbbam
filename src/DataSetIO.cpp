@@ -123,6 +123,7 @@ std::unique_ptr<DataSetBase> DataSetFromUri(const std::string& uri)
     } else if (boost::algorithm::iends_with(uri, ".fofn")) {
         return DataSetFromFofn(uri);
     } else if (boost::algorithm::iends_with(uri, ".fasta") ||
+               boost::algorithm::iends_with(uri, ".fsa") ||
                boost::algorithm::iends_with(uri, ".fa")) {
         return DataSetFromFasta(uri);
     }

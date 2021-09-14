@@ -23,7 +23,7 @@ const std::vector<std::string>& FormatUtils::BedExtensions()
 
 const std::vector<std::string>& FormatUtils::FastaExtensions()
 {
-    static const std::vector<std::string> extensions{"fa", "fasta", "fa.gz", "fasta.gz"};
+    static const std::vector<std::string> extensions{"fa", "fasta", "fa.gz", "fasta.gz", "fsa"};
     return extensions;
 }
 
