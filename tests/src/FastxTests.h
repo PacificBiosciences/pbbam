@@ -22,6 +22,8 @@ const std::string fastxDataDir = PacBio::BAM::PbbamTestsConfig::Data_Dir + "/fas
 
 const std::string simpleFastaFn        = fastxDataDir + "simple.fa";
 const std::string simpleFastaFaiFn     = fastxDataDir + "simple.fa.fai";
+const std::string simpleFsaFn          = fastxDataDir + "simple.fsa";
+const std::string simpleFsaFaiFn       = fastxDataDir + "simple.fsa.fai";
 const std::string simpleFastaGzipFn    = fastxDataDir + "simple-gzip.fa.gz";
 const std::string simpleFastaBgzfFn    = fastxDataDir + "simple-bgzf.fa.gz";
 const std::string simpleFastaBgzfGziFn = fastxDataDir + "simple-bgzf.fa.gz.gzi";
