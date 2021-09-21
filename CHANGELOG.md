@@ -5,8 +5,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [1.7.0] - 2021-09-21
+
+### Added
+ - Support for *.fsa format
+
 ### Fixed
- - Header version number (@HD VN) to represent SAM/BAM spec version, not 
+ - Header version number (@HD VN) to represent SAM/BAM spec version, not
    htslib version.
 
 ## [1.6.3] - 2021-05-24
