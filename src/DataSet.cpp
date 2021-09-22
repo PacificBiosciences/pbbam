@@ -110,6 +110,7 @@ DataSet::DataSet(const std::string& filename) : d_(DataSetIO::FromUri(filename))
     if (boost::algorithm::iends_with(filename, ".fofn") ||
         boost::algorithm::iends_with(filename, ".bam") ||
         boost::algorithm::iends_with(filename, ".fasta") ||
+        boost::algorithm::iends_with(filename, ".fsa") ||
         boost::algorithm::iends_with(filename, ".fa")) {
         d_->Path(FileUtils::CurrentWorkingDirectory());
     }
