@@ -3,6 +3,7 @@
 #include <cstddef>
 
 #include <fstream>
+
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -11,6 +12,7 @@
 #include <unistd.h>
 
 #include <gtest/gtest.h>
+#include <boost/algorithm/string.hpp>
 
 #include <pbbam/internal/DataSetElement.h>
 
@@ -1671,4 +1673,15 @@ TEST(BAM_DataSetIO, can_write_relative_paths_in_denovo_datasets)
     EXPECT_NE(std::string::npos, unresolvedXml.find(file2));
     EXPECT_NE(std::string::npos, unresolvedXml.find(relativeResource1));
     EXPECT_NE(std::string::npos, unresolvedXml.find(relativeResource2));
+}
+
+TEST(BAM_DataSetIO, can_fetch_all_fasta_files)
+{
+    const DataSet ds{PbbamTestsConfig::Data_Dir + "/fastx/fasta_extension.referenceset.xml"};
+    const auto fastaFiles = ds.FastaFiles();
+    EXPECT_EQ(3, fastaFiles.size());
+    for (const auto& fn : fastaFiles) {
+        EXPECT_TRUE(boost::iends_with(fn, "fasta") || boost::iends_with(fn, "fa") ||
+                    boost::iends_with(fn, "fsa"));
+    }
 }

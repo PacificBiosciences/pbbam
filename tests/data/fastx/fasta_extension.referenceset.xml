@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pbds:ReferenceSet CreatedAt="2021-09-14T09:11:17" MetaType="PacBio.DataSet.ReferenceSet" Name="pacbio_dataset_referenceset-210914_161117339" Tags="" TimeStampedName="pacbio_dataset_referenceset-210914_161117339" UniqueId="c6df98f1-b191-88f0-4609-aec754e83db1" Version="3.0.1" xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+	<pbbase:ExternalResources>
+		<pbbase:ExternalResource MetaType="PacBio.ContigFile.ContigFastaFile" ResourceId="simple.fa" TimeStampedName="pacbio_contigfile_contigfastafile-210914_161117338" UniqueId="47bbd75a-6161-4eab-ad3a-99685d47adf8">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex MetaType="PacBio.Index.SamIndex" ResourceId="simple.fa.fai" TimeStampedName="pacbio_index_samindex-210914_161117328" UniqueId="c1d8c7e8-dbae-4922-8461-9720f832744a"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+		<pbbase:ExternalResource MetaType="PacBio.ContigFile.ContigFastaFile" ResourceId="simple.fsa" TimeStampedName="-210914_161117338" UniqueId="0de04dce-0966-4bfd-a0c7-d9dc781fb1cc">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex MetaType="PacBio.Index.SamIndex" ResourceId="simple.fsa.fai" TimeStampedName="pacbio_index_samindex-210914_161117332" UniqueId="cd9a4d64-8c27-4030-9d78-d429ffd26372"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+		<pbbase:ExternalResource MetaType="PacBio.ContigFile.ContigFastaFile" ResourceId="windows_formatted.fasta" TimeStampedName="pacbio_contigfile_contigfastafile-210914_161117337" UniqueId="d79f09c4-7d5b-4ce9-a8d3-2d30b4573477">
+			<pbbase:FileIndices/>
+		</pbbase:ExternalResource>
+	</pbbase:ExternalResources>
+	<pbds:DataSetMetadata>
+		<pbds:TotalLength>0</pbds:TotalLength>
+		<pbds:NumRecords>0</pbds:NumRecords>
+		<pbds:Organism>unknown</pbds:Organism>
+		<pbds:Ploidy>haploid</pbds:Ploidy>
+	</pbds:DataSetMetadata>
+</pbds:ReferenceSet>

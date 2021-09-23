@@ -97,6 +97,11 @@ TEST(BAM_FastaReader, can_iterate_manually_on_text_fasta)
     FastaReaderTests::CheckManualIteration(FastxTests::simpleFastaFn);
 }
 
+TEST(BAM_FastaReader, can_iterate_manually_on_text_fsa)
+{
+    FastaReaderTests::CheckManualIteration(FastxTests::simpleFsaFn);
+}
+
 TEST(BAM_FastaReader, can_iterate_manually_on_gzip_fasta)
 {
     FastaReaderTests::CheckManualIteration(FastxTests::simpleFastaGzipFn);
