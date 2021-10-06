@@ -2396,4 +2396,110 @@ TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_refe
 
 }
 
+TEST(BAM_BamRecordClipping, clips_ccs_kinetics_tags)
+{
+    auto MakeCcsKineticsRecord = []()
+    {
+        BamRecordImpl impl;
+        impl.SetSequenceAndQualities("AACCGTTAGC",
+                                     "!#%(+0<Z]m");
+
+        // tags
+        TagCollection tags;
+        tags["fi"] = std::vector<uint16_t>{0,10,20,30,40,50,60,70,80,90};
+        tags["fp"] = std::vector<uint16_t>{2,12,22,32,42,52,62,72,82,92};
+        tags["ri"] = std::vector<uint16_t>{4,14,24,34,44,54,64,74,84,94};
+        tags["rp"] = std::vector<uint16_t>{6,16,26,36,46,56,66,76,86,96};
+        impl.Tags(tags);
+
+        const auto rg = BamRecordClippingTests::MakeReadGroup(Data::FrameCodec::V1, "movie", "CCS");
+
+        BamRecord b(std::move(impl));
+        b.header_.AddReadGroup(rg);
+        b.ReadGroup(rg);
+        return b;
+    };
+
+    {   // normal clip - 2,7
+        auto bamRecord = MakeCcsKineticsRecord();
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 2, 7);
+        EXPECT_EQ(bamRecord.Sequence(), "CCGTT");
+        EXPECT_EQ(bamRecord.Qualities().Fastq(), "%(+0<");
+
+        const std::vector<uint16_t> expected_fi{20,30,40,50,60};
+        const std::vector<uint16_t> expected_fp{22,32,42,52,62};
+        const std::vector<uint16_t> expected_ri{34,44,54,64,74};
+        const std::vector<uint16_t> expected_rp{36,46,56,66,76};
+
+        EXPECT_EQ(expected_fi, bamRecord.ForwardIPD().DataRaw());
+        EXPECT_EQ(expected_fp, bamRecord.ForwardPulseWidth().DataRaw());
+        EXPECT_EQ(expected_ri, bamRecord.ReverseIPD().DataRaw());
+        EXPECT_EQ(expected_rp, bamRecord.ReversePulseWidth().DataRaw());
+    }
+    {   // normal clip - 1,4
+        auto bamRecord = MakeCcsKineticsRecord();
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 1, 4);
+        EXPECT_EQ(bamRecord.Sequence(), "ACC");
+        EXPECT_EQ(bamRecord.Qualities().Fastq(), "#%(");
+
+        const std::vector<uint16_t> expected_fi{10,20,30};
+        const std::vector<uint16_t> expected_fp{12,22,32};
+        const std::vector<uint16_t> expected_ri{64,74,84};
+        const std::vector<uint16_t> expected_rp{66,76,86};
+
+        EXPECT_EQ(expected_fi, bamRecord.ForwardIPD().DataRaw());
+        EXPECT_EQ(expected_fp, bamRecord.ForwardPulseWidth().DataRaw());
+        EXPECT_EQ(expected_ri, bamRecord.ReverseIPD().DataRaw());
+        EXPECT_EQ(expected_rp, bamRecord.ReversePulseWidth().DataRaw());
+    }
+    {   // effectively no clipping
+        auto bamRecord = MakeCcsKineticsRecord();
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 0, 10);
+        EXPECT_EQ(bamRecord.Sequence(), "AACCGTTAGC");
+        EXPECT_EQ(bamRecord.Qualities().Fastq(), "!#%(+0<Z]m");
+
+        const std::vector<uint16_t> expected_fi{0,10,20,30,40,50,60,70,80,90};
+        const std::vector<uint16_t> expected_fp{2,12,22,32,42,52,62,72,82,92};
+        const std::vector<uint16_t> expected_ri{4,14,24,34,44,54,64,74,84,94};
+        const std::vector<uint16_t> expected_rp{6,16,26,36,46,56,66,76,86,96};
+
+        EXPECT_EQ(expected_fi, bamRecord.ForwardIPD().DataRaw());
+        EXPECT_EQ(expected_fp, bamRecord.ForwardPulseWidth().DataRaw());
+        EXPECT_EQ(expected_ri, bamRecord.ReverseIPD().DataRaw());
+        EXPECT_EQ(expected_rp, bamRecord.ReversePulseWidth().DataRaw());
+    }
+    {   // clip to single base
+        auto bamRecord = MakeCcsKineticsRecord();
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 6, 7);
+        EXPECT_EQ(bamRecord.Sequence(), "T");
+        EXPECT_EQ(bamRecord.Qualities().Fastq(), "<");
+
+        const std::vector<uint16_t> expected_fi{60};
+        const std::vector<uint16_t> expected_fp{62};
+        const std::vector<uint16_t> expected_ri{34};
+        const std::vector<uint16_t> expected_rp{36};
+
+        EXPECT_EQ(expected_fi, bamRecord.ForwardIPD().DataRaw());
+        EXPECT_EQ(expected_fp, bamRecord.ForwardPulseWidth().DataRaw());
+        EXPECT_EQ(expected_ri, bamRecord.ReverseIPD().DataRaw());
+        EXPECT_EQ(expected_rp, bamRecord.ReversePulseWidth().DataRaw());
+    }
+    {   // clip to empty
+        auto bamRecord = MakeCcsKineticsRecord();
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 8, 8);
+        EXPECT_EQ(bamRecord.Sequence(), "");
+        EXPECT_EQ(bamRecord.Qualities().Fastq(), "");
+
+        const std::vector<uint16_t> expected_fi;
+        const std::vector<uint16_t> expected_fp;
+        const std::vector<uint16_t> expected_ri;
+        const std::vector<uint16_t> expected_rp;
+
+        EXPECT_EQ(expected_fi, bamRecord.ForwardIPD().DataRaw());
+        EXPECT_EQ(expected_fp, bamRecord.ForwardPulseWidth().DataRaw());
+        EXPECT_EQ(expected_ri, bamRecord.ReverseIPD().DataRaw());
+        EXPECT_EQ(expected_rp, bamRecord.ReversePulseWidth().DataRaw());
+    }
+}
+
 // clang-format on
