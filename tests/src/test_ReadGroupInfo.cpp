@@ -9,6 +9,8 @@
 
 #include <gtest/gtest.h>
 
+#include <boost/optional/optional_io.hpp>
+
 #include <pbbam/exception/BundleChemistryMappingException.h>
 #include <pbbam/exception/InvalidSequencingChemistryException.h>
 
@@ -275,14 +277,14 @@ TEST(BAM_ReadGroupInfo, returns_no_barcodes_from_non_barcoded_id)
         EXPECT_EQ("00082ba1", rg.BaseId());
 
         const auto barcodes = rg.Barcodes();
-        EXPECT_EQ(boost::none, barcodes);
+        EXPECT_FALSE(barcodes);
         EXPECT_EQ(boost::none, rg.BarcodeForward());
         EXPECT_EQ(boost::none, rg.BarcodeReverse());
     }
     {   // no '/' found
         const ReadGroupInfo rg{"00082ba1.0--1"};
         const auto barcodes = rg.Barcodes();
-        EXPECT_EQ(boost::none, barcodes);
+        EXPECT_FALSE(barcodes);
         EXPECT_EQ(boost::none, rg.BarcodeForward());
         EXPECT_EQ(boost::none, rg.BarcodeReverse());
     }
@@ -292,7 +294,7 @@ TEST(BAM_ReadGroupInfo, returns_no_barcodes_from_empty_id)
 {
     const ReadGroupInfo rg{""};
     const auto barcodes = rg.Barcodes();
-    EXPECT_EQ(boost::none, barcodes);
+    EXPECT_FALSE(barcodes);
     EXPECT_EQ(boost::none, rg.BarcodeForward());
     EXPECT_EQ(boost::none, rg.BarcodeReverse());
 }
