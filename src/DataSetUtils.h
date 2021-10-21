@@ -2,10 +2,6 @@
 #define PBBAM_DATASETUTILS_H
 
 #include <pbbam/Config.h>
-
-#include <boost/uuid/random_generator.hpp>
-#include <boost/uuid/uuid_io.hpp>
-
 #include <pbbam/DataSetTypes.h>
 
 namespace PacBio {
@@ -28,12 +24,7 @@ inline const PacBio::BAM::DataSetMetadata& NullObject()
     return empty;
 }
 
-inline std::string GenerateUuid()
-{
-    static boost::uuids::random_generator gen;
-    const boost::uuids::uuid uuid = gen();
-    return boost::uuids::to_string(uuid);
-}
+std::string GenerateUuid();
 
 }  // namespace internal
 }  // namespace BAM

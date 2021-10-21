@@ -5,6 +5,8 @@
 #include <cstddef>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/uuid/random_generator.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 #include <pbbam/DataSetTypes.h>
 
@@ -14,6 +16,13 @@
 namespace PacBio {
 namespace BAM {
 namespace internal {
+
+std::string GenerateUuid()
+{
+    static boost::uuids::random_generator gen;
+    const boost::uuids::uuid uuid = gen();
+    return boost::uuids::to_string(uuid);
+}
 
 // ----------------
 // BaseEntityType
