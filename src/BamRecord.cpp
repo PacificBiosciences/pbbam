@@ -621,56 +621,65 @@ BamRecord BamRecord::Clipped(const ClipType clipType, const Data::Position start
 
 void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
 {
+    TagCollection tags = impl_.Tags();
+
+    const auto ClipQualTag = [&](const BamRecordTag tag) {
+        if (impl_.HasTag(tag)) {
+            tags[Label(tag)] =
+                ClipSeqQV(FetchQualities(tag, Data::Orientation::NATIVE), clipFrom, clipLength)
+                    .Fastq();
+        }
+    };
+    ClipQualTag(BamRecordTag::DELETION_QV);
+    ClipQualTag(BamRecordTag::INSERTION_QV);
+    ClipQualTag(BamRecordTag::MERGE_QV);
+    ClipQualTag(BamRecordTag::SUBSTITUTION_QV);
+
+    const auto ClipSeqTag = [&](const BamRecordTag tag) {
+        if (impl_.HasTag(tag)) {
+            tags[Label(tag)] =
+                ClipSeqQV(FetchBases(tag, Data::Orientation::NATIVE), clipFrom, clipLength);
+        }
+    };
+    ClipSeqTag(BamRecordTag::DELETION_TAG);
+    ClipSeqTag(BamRecordTag::SUBSTITUTION_TAG);
+
+    const auto ClipKineticsTag = [&](const BamRecordTag tag, const Data::FrameCodec codec,
+                                     const Data::FrameEncoder& encoder) {
+        if (impl_.HasTag(tag)) {
+            const auto frames = FetchFrames(tag).Data();
+            if (codec == Data::FrameCodec::RAW) {
+                tags[Label(tag)] = ClipSeqQV(frames, clipFrom, clipLength);
+            } else {
+                tags[Label(tag)] = ClipSeqQV(encoder.Encode(frames), clipFrom, clipLength);
+            }
+        }
+    };
+    const auto ClipReverseKineticsTag = [&](const BamRecordTag tag, const Data::FrameCodec codec,
+                                            const Data::FrameEncoder& encoder) {
+        if (impl_.HasTag(tag)) {
+            const auto frames = FetchFrames(tag).Data();
+            const size_t originalClipEnd = clipFrom + clipLength;
+            assert(originalClipEnd <= frames.size());
+            const size_t reverseClipFrom = frames.size() - originalClipEnd;
+            if (codec == Data::FrameCodec::RAW) {
+                tags[Label(tag)] = ClipSeqQV(frames, reverseClipFrom, clipLength);
+            } else {
+                tags[Label(tag)] = ClipSeqQV(encoder.Encode(frames), reverseClipFrom, clipLength);
+            }
+        }
+    };
     const auto rg = ReadGroup();
     const auto ipdCodec = rg.IpdCodec();
     const auto ipdEncoder = rg.IpdFrameEncoder();
     const auto pwCodec = rg.PulseWidthCodec();
     const auto pwEncoder = rg.IpdFrameEncoder();
-
-    // update BAM tags
-    TagCollection tags = impl_.Tags();
-    if (HasDeletionQV()) {
-        tags[Label(BamRecordTag::DELETION_QV)] =
-            ClipSeqQV(DeletionQV(Data::Orientation::NATIVE), clipFrom, clipLength).Fastq();
-    }
-    if (HasInsertionQV()) {
-        tags[Label(BamRecordTag::INSERTION_QV)] =
-            ClipSeqQV(InsertionQV(Data::Orientation::NATIVE), clipFrom, clipLength).Fastq();
-    }
-    if (HasMergeQV()) {
-        tags[Label(BamRecordTag::MERGE_QV)] =
-            ClipSeqQV(MergeQV(Data::Orientation::NATIVE), clipFrom, clipLength).Fastq();
-    }
-    if (HasSubstitutionQV()) {
-        tags[Label(BamRecordTag::SUBSTITUTION_QV)] =
-            ClipSeqQV(SubstitutionQV(Data::Orientation::NATIVE), clipFrom, clipLength).Fastq();
-    }
-    if (HasIPD()) {
-        const auto label = Label(BamRecordTag::IPD);
-        const auto ipd = IPD(Data::Orientation::NATIVE).Data();
-        if (ipdCodec == Data::FrameCodec::RAW) {
-            tags[label] = ClipSeqQV(ipd, clipFrom, clipLength);
-        } else {
-            tags[label] = ClipSeqQV(ipdEncoder.Encode(ipd), clipFrom, clipLength);
-        }
-    }
-    if (HasPulseWidth()) {
-        const auto label = Label(BamRecordTag::PULSE_WIDTH);
-        const auto pw = PulseWidth(Data::Orientation::NATIVE).Data();
-        if (pwCodec == Data::FrameCodec::RAW) {
-            tags[label] = ClipSeqQV(pw, clipFrom, clipLength);
-        } else {
-            tags[label] = ClipSeqQV(pwEncoder.Encode(pw), clipFrom, clipLength);
-        }
-    }
-    if (HasDeletionTag()) {
-        tags[Label(BamRecordTag::DELETION_TAG)] =
-            ClipSeqQV(DeletionTag(Data::Orientation::NATIVE), clipFrom, clipLength);
-    }
-    if (HasSubstitutionTag()) {
-        tags[Label(BamRecordTag::SUBSTITUTION_TAG)] =
-            ClipSeqQV(SubstitutionTag(Data::Orientation::NATIVE), clipFrom, clipLength);
-    }
+    ClipKineticsTag(BamRecordTag::IPD, ipdCodec, ipdEncoder);
+    ClipKineticsTag(BamRecordTag::PULSE_WIDTH, pwCodec, pwEncoder);
+    ClipKineticsTag(BamRecordTag::FORWARD_IPD, ipdCodec, ipdEncoder);
+    ClipKineticsTag(BamRecordTag::FORWARD_PW, pwCodec, pwEncoder);
+    ClipReverseKineticsTag(BamRecordTag::REVERSE_IPD, ipdCodec, ipdEncoder);
+    ClipReverseKineticsTag(BamRecordTag::REVERSE_PW, pwCodec, pwEncoder);
 
     // internal BAM tags
     if (HasPulseCall()) {
@@ -679,57 +688,53 @@ void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
         CalculatePulse2BaseCache();
         Pulse2BaseCache* p2bCache = p2bCache_.get();
 
-        if (HasAltLabelQV()) {
-            tags[Label(BamRecordTag::ALT_LABEL_QV)] =
-                ClipPulse(AltLabelQV(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength)
-                    .Fastq();
-        }
-        if (HasLabelQV()) {
-            tags[Label(BamRecordTag::LABEL_QV)] =
-                ClipPulse(LabelQV(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength)
-                    .Fastq();
-        }
-        if (HasPulseMergeQV()) {
-            tags[Label(BamRecordTag::PULSE_MERGE_QV)] =
-                ClipPulse(PulseMergeQV(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength)
-                    .Fastq();
-        }
-        if (HasAltLabelTag()) {
-            tags[Label(BamRecordTag::ALT_LABEL_TAG)] =
-                ClipPulse(AltLabelTag(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength);
-        }
-        if (HasPulseCall()) {
-            tags[Label(BamRecordTag::PULSE_CALL)] =
-                ClipPulse(PulseCall(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength);
-        }
-        if (HasPkmean()) {
-            tags[Label(BamRecordTag::PKMEAN)] = EncodePhotons(
-                ClipPulse(Pkmean(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength));
-        }
-        if (HasPkmid()) {
-            tags[Label(BamRecordTag::PKMID)] = EncodePhotons(
-                ClipPulse(Pkmid(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength));
-        }
-        if (HasPkmean2()) {
-            tags[Label(BamRecordTag::PKMEAN_2)] = EncodePhotons(
-                ClipPulse(Pkmean2(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength));
-        }
-        if (HasPkmid2()) {
-            tags[Label(BamRecordTag::PKMID_2)] = EncodePhotons(
-                ClipPulse(Pkmid2(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength));
-        }
-        if (HasPrePulseFrames()) {
-            tags[Label(BamRecordTag::PRE_PULSE_FRAMES)] = ClipPulse(
-                PrePulseFrames(Data::Orientation::NATIVE).Data(), p2bCache, clipFrom, clipLength);
-        }
-        if (HasPulseCallWidth()) {
-            tags[Label(BamRecordTag::PULSE_CALL_WIDTH)] = ClipPulse(
-                PulseCallWidth(Data::Orientation::NATIVE).Data(), p2bCache, clipFrom, clipLength);
-        }
-        if (HasStartFrame()) {
-            tags[Label(BamRecordTag::START_FRAME)] =
-                ClipPulse(StartFrame(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength);
-        }
+        const auto ClipPulseQualTag = [&](const BamRecordTag tag) {
+            if (impl_.HasTag(tag)) {
+                tags[Label(tag)] = ClipPulse(FetchQualities(tag, Data::Orientation::NATIVE),
+                                             p2bCache, clipFrom, clipLength)
+                                       .Fastq();
+            }
+        };
+        ClipPulseQualTag(BamRecordTag::ALT_LABEL_QV);
+        ClipPulseQualTag(BamRecordTag::LABEL_QV);
+        ClipPulseQualTag(BamRecordTag::PULSE_MERGE_QV);
+
+        const auto ClipPulseSeqTag = [&](const BamRecordTag tag) {
+            if (impl_.HasTag(tag)) {
+                tags[Label(tag)] = ClipPulse(FetchBases(tag, Data::Orientation::NATIVE), p2bCache,
+                                             clipFrom, clipLength);
+            }
+        };
+        ClipPulseSeqTag(BamRecordTag::ALT_LABEL_TAG);
+        ClipPulseSeqTag(BamRecordTag::PULSE_CALL);
+
+        const auto ClipPhotonTag = [&](const BamRecordTag tag) {
+            if (impl_.HasTag(tag)) {
+                tags[Label(tag)] = EncodePhotons(ClipPulse(
+                    FetchPhotons(tag, Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength));
+            }
+        };
+        ClipPhotonTag(BamRecordTag::PKMEAN);
+        ClipPhotonTag(BamRecordTag::PKMEAN_2);
+        ClipPhotonTag(BamRecordTag::PKMID);
+        ClipPhotonTag(BamRecordTag::PKMID_2);
+
+        const auto ClipPulseFrames = [&](const BamRecordTag tag) {
+            if (impl_.HasTag(tag)) {
+                tags[Label(tag)] = ClipPulse(FetchFrames(tag, Data::Orientation::NATIVE).Data(),
+                                             p2bCache, clipFrom, clipLength);
+            }
+        };
+        ClipPulseFrames(BamRecordTag::PRE_PULSE_FRAMES);
+        ClipPulseFrames(BamRecordTag::PULSE_CALL_WIDTH);
+
+        const auto ClipStartFrames = [&](const BamRecordTag tag) {
+            if (impl_.HasTag(tag)) {
+                tags[Label(tag)] = ClipPulse(FetchUInt32s(tag, Data::Orientation::NATIVE), p2bCache,
+                                             clipFrom, clipLength);
+            }
+        };
+        ClipStartFrames(BamRecordTag::START_FRAME);
     }
 
     impl_.Tags(tags);
