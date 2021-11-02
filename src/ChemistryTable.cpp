@@ -138,6 +138,10 @@ const ChemistryTable& BuiltInChemistryTable()
         {{"101-789-500", "101-826-100", "5.0", "S/P4-C2/5.0-8M", "TAGT-420"}},
         // Sequel® II Binding Kit 2.0; Sequel® II Sequencing Plate 2.0 (4 Rxn) - QC
         {{"101-789-500", "101-820-300", "5.0", "S/P4-C2/5.0-8M", "TAGT-420"}},
+        // Sequel® II Binding Kit 2.0; Sequel II Sequencing Plate 3.0 (1 rxn)
+        {{"101-789-500", "102-186-000", "5.0", "S/P4-C2/5.0-8M"}},
+        // Sequel® II Binding Kit 2.0; Sequel II Sequencing Plate 3.0 (1 rxn), QC
+        {{"101-789-500", "102-186-100", "5.0", "S/P4-C2/5.0-8M"}},
 
         // Sequel® II Binding Kit 2.1; Sequel® II Sequencing Plate 2.0EA (4 Rxn)
         {{"101-820-500", "101-789-300", "5.0", "S/P4.1-C2/5.0-8M", "TAGT-419"}},
@@ -145,6 +149,10 @@ const ChemistryTable& BuiltInChemistryTable()
         {{"101-820-500", "101-826-100", "5.0", "S/P4.1-C2/5.0-8M", "TAGT-420"}},
         // Sequel® II Binding Kit 2.1; Sequel® II Sequencing Plate 2.0 (4 Rxn) - QC
         {{"101-820-500", "101-820-300", "5.0", "S/P4.1-C2/5.0-8M", "TAGT-420"}},
+        // Sequel® II Binding Kit 2.1; Sequel II Sequencing Plate 3.0 (1 rxn)
+        {{"101-820-500", "102-186-000", "5.0", "S/P4.1-C2/5.0-8M"}},
+        // Sequel® II Binding Kit 2.1; Sequel II Sequencing Plate 3.0 (1 rxn), QC
+        {{"101-820-500", "102-186-100", "5.0", "S/P4.1-C2/5.0-8M"}},
 
         // Sequel® II Binding Kit 2.2; Sequel® II Sequencing Plate 2.0 (4 rxn)
         {{"101-894-200", "101-826-100", "5.0", "S/P5-C2/5.0-8M", "TAGT-905"}},
@@ -152,6 +160,10 @@ const ChemistryTable& BuiltInChemistryTable()
         {{"101-894-200", "101-789-300", "5.0", "S/P5-C2/5.0-8M", "TAGT-905"}},
         // Sequel® II Binding Kit 2.2; Sequel® II Sequencing Plate 2.0 (4 rxn) - QC
         {{"101-894-200", "101-820-300", "5.0", "S/P5-C2/5.0-8M", "TAGT-905"}},
+        // Sequel® II Binding Kit 2.2; Sequel II Sequencing Plate 3.0 (1 rxn)
+        {{"101-894-200", "102-186-000", "5.0", "S/P5-C2/5.0-8M"}},
+        // Sequel® II Binding Kit 2.2; Sequel II Sequencing Plate 3.0 (1 rxn), QC
+        {{"101-894-200", "102-186-100", "5.0", "S/P5-C2/5.0-8M"}},
     };
     // clang-format on
 
