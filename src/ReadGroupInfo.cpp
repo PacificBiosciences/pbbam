@@ -1012,8 +1012,7 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
                             const std::string& barcodeString)
 {
-    const std::string baseId{
-        MD5Hash(movieName + "//" + readType + "//" + barcodeString).substr(0, 8)};
+    const std::string baseId{MakeReadGroupId(movieName, readType)};
     return baseId + "/" + barcodeString;
 }
 
