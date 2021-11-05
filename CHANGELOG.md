@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [1.8.0] - 2021-11-10
+
+### Fixed
+ - Incorrect hashing scheme to generate IDs for barcoded read groups
+
 ## [1.7.0] - 2021-09-21
 
 ### Added
