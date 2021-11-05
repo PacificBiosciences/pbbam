@@ -637,7 +637,7 @@ TEST(BAM_PbiFilterQuery, can_filter_on_barcoded_read_group_id)
     const BamFile bamFile{PbbamTestsConfig::Data_Dir + std::string{"/barcoded_read_groups.bam"}};
 
     {  //  query read group with no barcodes - should catche all, barcoded or not
-        const PbiReadGroupFilter filter{"8b14849f"};
+        const PbiReadGroupFilter filter{"0d7b28fa"};
 
         PbiFilterQuery query{filter, bamFile};
         EXPECT_EQ(5, query.NumReads());
@@ -645,7 +645,7 @@ TEST(BAM_PbiFilterQuery, can_filter_on_barcoded_read_group_id)
     }
     {  // query read group with barcode label
 
-        const ReadGroupInfo rg{"8b14849f/0--0"};
+        const ReadGroupInfo rg{"0d7b28fa/0--0"};
         const PbiReadGroupFilter filter{rg};
 
         PbiFilterQuery query{filter, bamFile};
@@ -654,8 +654,8 @@ TEST(BAM_PbiFilterQuery, can_filter_on_barcoded_read_group_id)
     }
     {  // query multiple read groups with barcode label
 
-        const ReadGroupInfo rg{"8b14849f/0--0"};
-        const ReadGroupInfo rg1{"8b14849f/1--0"};
+        const ReadGroupInfo rg{"0d7b28fa/0--0"};
+        const ReadGroupInfo rg1{"0d7b28fa/1--0"};
         const PbiReadGroupFilter filter{std::vector<ReadGroupInfo>{rg, rg1}};
 
         PbiFilterQuery query{filter, bamFile};

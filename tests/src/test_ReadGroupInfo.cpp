@@ -308,24 +308,4 @@ TEST(BAM_ReadGroupInfo, throws_on_malformatted_barcoded_ids)
     EXPECT_THROW(ReadGroupInfo{"00082ba1/A--B"}, std::runtime_error);
 }
 
-TEST(BAM_ReadGroupInfo, barcodes_do_not_affect_read_group_hash)
-{
-    const std::string id{"d9020782"};
-    const std::string movieName{"dummy_movie"};
-    const std::string readType{"SUBREAD"};
-    const std::pair<uint16_t, uint16_t> barcodes{32,32};
-
-    const ReadGroupInfo rg0{id};
-    const ReadGroupInfo rg1{movieName, readType};
-    const ReadGroupInfo rg2{movieName, readType, barcodes};
-    const ReadGroupInfo rg3{id, barcodes};
-
-    const std::string expectedId{"d9020782"};
-    const std::string expectedBarcodedId{"d9020782/32--32"};
-    EXPECT_EQ(expectedId, rg0.Id());
-    EXPECT_EQ(expectedId, rg1.Id());
-    EXPECT_EQ(expectedBarcodedId, rg2.Id());
-    EXPECT_EQ(expectedBarcodedId, rg3.Id());
-}
-
 // clang-format on
