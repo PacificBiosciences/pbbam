@@ -269,11 +269,11 @@ static PbiFilter CreateQIdFilter(std::string value, const Compare::Type compareT
 
         std::vector<int32_t> rgIds;
         for (const auto& t : Split(value, ',')) {
-            rgIds.push_back(static_cast<int32_t>(std::stoul(t)));
+            rgIds.push_back(std::stoi(t));
         }
         return PbiReadGroupFilter{rgIds, compareType};
     } else {
-        const auto n = static_cast<int32_t>(std::stoul(value));
+        const int32_t n = std::stoi(value);
         return PbiReadGroupFilter{n, compareType};
     }
 }

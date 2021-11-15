@@ -752,7 +752,7 @@ public:
     /// \param[in] cmp          compare type
     ///
     PbiReadGroupFilter(const std::vector<ReadGroupInfo>& readGroups,
-                       const Compare::Type cmp = Compare::EQUAL);
+                       const Compare::Type cmp = Compare::CONTAINS);
 
     /// \brief Performs the actual index lookup.
     ///
@@ -761,8 +761,9 @@ public:
     bool Accepts(const PbiRawData& idx, const size_t row) const;
 
 private:
-    // RGID number => barcode(s) filter
-    std::unordered_map<int32_t, boost::optional<std::vector<std::pair<int16_t, int16_t>>>> lookup_;
+    void AddReadGroups(const std::vector<ReadGroupInfo>& readGroups);
+
+    std::unordered_map<int32_t, std::vector<ReadGroupInfo>> readGroups_;
     Compare::Type cmp_;
 };
 
