@@ -564,3 +564,92 @@ TEST(BAM_DataSetCore, can_fetch_samples)
     EXPECT_EQ(dataset.BamFilenames().size(), 3);
     EXPECT_EQ(dataset.Samples(), expected);
 }
+
+TEST(BAM_DataSetCore, can_add_supplemental_resources)
+{
+    DataSet dataset;
+    EXPECT_EQ(0, dataset.SupplementalResources().Size());
+
+    ExternalResource resource1{"metatype", "id"};
+    resource1.Name("file1");
+
+    ExternalResource resource2{"metatype", "id2"};
+    resource2.Name("file2");
+
+    dataset.SupplementalResources().Add(resource1);
+    dataset.SupplementalResources().Add(resource2);
+    EXPECT_EQ(2, dataset.SupplementalResources().Size());
+
+    // disallow duplicates (checking on ResourceId)
+    const ExternalResource duplicateResource{"metatype", "id"};
+    dataset.SupplementalResources().Add(duplicateResource);
+    EXPECT_EQ(2, dataset.SupplementalResources().Size());
+
+    // direct access
+    const SupplementalResources& resources = dataset.SupplementalResources();
+    ASSERT_EQ(2, resources.Size());
+    EXPECT_EQ("file1", resources[0].Name());
+    EXPECT_EQ("file2", resources[1].Name());
+
+    // iterable
+    size_t i = 0;
+    for (auto r : resources) {
+        if (i == 0) {
+            EXPECT_EQ("file1", r.Name());
+        } else {
+            EXPECT_EQ("file2", r.Name());
+        }
+        ++i;
+    }
+}
+
+TEST(BAM_DataSetCore, can_edit_supplemental_resources)
+{
+    DataSet dataset;
+
+    ExternalResource resource{"metatype", "id"};
+    resource.Name("file1");
+    dataset.SupplementalResources().Add(resource);
+
+    resource.Name("file2").ResourceId("id2");
+    dataset.SupplementalResources().Add(resource);
+    EXPECT_EQ(2, dataset.SupplementalResources().Size());
+
+    // edit
+    dataset.SupplementalResources()[0].Name("some new name");
+    EXPECT_EQ("some new name", dataset.SupplementalResources()[0].Name());
+    EXPECT_EQ("file2", dataset.SupplementalResources()[1].Name());
+}
+
+TEST(BAM_DataSetCore, can_remove_supplemental_resources)
+{
+    DataSet dataset;
+    EXPECT_EQ(0, dataset.SupplementalResources().Size());
+
+    ExternalResource resource1{"metatype", "id"};
+    resource1.Name("file1");
+
+    ExternalResource resource2{"metatype", "id2"};
+    resource2.Name("file2");
+
+    dataset.SupplementalResources().Add(resource1);
+    dataset.SupplementalResources().Add(resource2);
+    EXPECT_EQ(2, dataset.SupplementalResources().Size());
+
+    // remove
+    dataset.SupplementalResources().Remove(resource1);
+    EXPECT_EQ(1, dataset.SupplementalResources().Size());
+
+    // direct access
+    const SupplementalResources& resources = dataset.SupplementalResources();
+    EXPECT_EQ("file2", resources[0].Name());
+
+    // iterable
+    size_t i = 0;
+    for (auto r : resources) {
+        if (i == 0) {
+            EXPECT_EQ("file2", r.Name());
+        }
+        ++i;
+    }
+}

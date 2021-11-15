@@ -325,6 +325,13 @@ public:
     ///
     const BAM::SubDataSets& SubDataSets() const;
 
+    /// \brief Fetches the dataset's SupplementalResources element.
+    ///
+    /// \returns const reference to child element
+    /// \throws std::runtime_error if element does not exist
+    ///
+    const BAM::SupplementalResources& SupplementalResources() const;
+
     /// \}
 
 public:
@@ -734,6 +741,14 @@ public:
     ///
     BAM::SubDataSets& SubDataSets();
 
+    /// \brief Fetches the dataset's SupplementalResources element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \returns non-const reference to child element
+    ///
+    BAM::SupplementalResources& SupplementalResources();
+
     /// \}
 
 public:
@@ -784,6 +799,15 @@ public:
     /// \returns reference to this dataset object
     ///
     DataSet& SubDataSets(const BAM::SubDataSets& subdatasets);
+
+    /// \brief Sets this dataset's SupplementalResources element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \param[in] resources  new value for the element
+    /// \returns reference to this dataset object
+    ///
+    DataSet& SupplementalResources(const BAM::SupplementalResources& resources);
 
     /// \}
 
