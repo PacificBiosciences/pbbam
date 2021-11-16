@@ -48,6 +48,8 @@ enum class BamRecordTag
     START_FRAME,
     SUBSTITUTION_QV,
     SUBSTITUTION_TAG,
+    BASEMOD_LOCI,
+    BASEMOD_QV,
 
     //
     // not tags per se, but faking these here to simplify data fetching
