@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [1.8.1] - 2021-11-15
+
+### Added
+ - SupplementalResources dataset element.
+
 ## [1.8.0] - 2021-11-10
 
 ### Fixed

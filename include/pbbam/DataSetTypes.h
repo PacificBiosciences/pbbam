@@ -673,6 +673,45 @@ public:
     Provenance& ParentTool(const BAM::ParentTool& tool);
 };
 
+/// \brief The SupplementalResources class represents an %SupplementalResources element
+///        in DataSetXML.
+///
+/// The SupplementalResources element is essentially just a list of ExternalResource
+/// elements.
+///
+class PBBAM_EXPORT SupplementalResources : public internal::DataSetElement
+{
+public:
+    /// \brief Creates an empty resource list.
+    SupplementalResources();
+    SupplementalResources(const internal::FromInputXml& fromInputXml);
+
+    /// \brief Merges \p other resource list with this one.
+    SupplementalResources& operator+=(const SupplementalResources& other);
+
+public:
+    /// \brief Adds an ExternalResource to this list.
+    void Add(const ExternalResource& ext);
+
+    /// \brief Removes an ExternalResource from this list.
+    void Remove(const ExternalResource& ext);
+
+public:
+    using value_type = ExternalResource;
+    using iterator_type = internal::DataSetElementIterator<value_type>;
+    using const_iterator_type = internal::DataSetElementConstIterator<value_type>;
+
+    const value_type& operator[](size_t index) const;
+    value_type& operator[](size_t index);
+
+    iterator_type begin();
+    const_iterator_type begin() const;
+    const_iterator_type cbegin() const;
+    iterator_type end();
+    const_iterator_type end() const;
+    const_iterator_type cend() const;
+};
+
 /// \brief The DataSetMetadata class represents the %DataSetMetadata child
 ///        element in DataSetXML.
 ///
@@ -918,6 +957,13 @@ public:
     ///
     const BAM::SubDataSets& SubDataSets() const;
 
+    /// \brief Fetches the dataset's SupplementalResources element.
+    ///
+    /// \returns const reference to child element
+    /// \throws std::runtime_error if element does not exist
+    ///
+    const BAM::SupplementalResources& SupplementalResources() const;
+
 public:
     /// \brief Access this dataset's namespace info.
     ///
@@ -958,6 +1004,14 @@ public:
     ///
     BAM::SubDataSets& SubDataSets();
 
+    /// \brief Fetches the dataset's SupplementalResources element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \returns non-const reference to child element
+    ///
+    BAM::SupplementalResources& SupplementalResources();
+
 public:
     /// \brief Sets this dataset's ExternalResources element.
     ///
@@ -994,6 +1048,15 @@ public:
     /// \returns reference to this dataset object
     ///
     DataSetBase& SubDataSets(const BAM::SubDataSets& subdatasets);
+
+    /// \brief Sets this dataset's SupplementalResources element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \param[in] resources  new value for the element
+    /// \returns reference to this dataset object
+    ///
+    DataSetBase& SupplementalResources(const BAM::SupplementalResources& resources);
 
 public:
     /// \brief Access this dataset's namespace info.
@@ -1233,6 +1296,7 @@ enum class XmlElementType
     PROPERTIES,
     PROVENANCE,
     SEQUENCING_KIT_PLATE,
+    SUPPLEMENTAL_RESOURCES,
     TEMPLATE_PREP_KIT,
 
     GENERIC_DATASET,
