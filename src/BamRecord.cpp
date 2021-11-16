@@ -3,10 +3,15 @@
 #include <pbbam/BamRecord.h>
 
 #include <cassert>
+#include <cctype>
 #include <cstddef>
 #include <cstdint>
 
+#include <algorithm>
+#include <iterator>
+#include <sstream>
 #include <stdexcept>
+#include <utility>
 
 #include <htslib/sam.h>
 #include <boost/algorithm/string/predicate.hpp>
@@ -681,6 +686,84 @@ void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
     ClipReverseKineticsTag(BamRecordTag::REVERSE_IPD, ipdCodec, ipdEncoder);
     ClipReverseKineticsTag(BamRecordTag::REVERSE_PW, pwCodec, pwEncoder);
 
+    // basemods tags
+    if (impl_.HasTag(BamRecordTag::BASEMOD_LOCI)) {
+        if (!impl_.HasTag(BamRecordTag::BASEMOD_QV)) {
+            throw std::runtime_error{
+                "[pbbam] BAM record ERROR: cannot clip 'Mm' tag without a corresponding 'Ml' tag."};
+        }
+
+        const std::string seq = Sequence(Data::Orientation::NATIVE);
+        assert(clipFrom <= seq.size());
+        const int32_t numClippedC = std::count(std::cbegin(seq), std::cbegin(seq) + clipFrom, 'C');
+        assert(clipFrom + clipLength <= seq.size());
+        const int32_t numRetainedC =
+            std::count(std::cbegin(seq) + clipFrom, std::cbegin(seq) + clipFrom + clipLength, 'C');
+
+        const std::string oldBasemodsString{impl_.TagValue(BamRecordTag::BASEMOD_LOCI).ToString()};
+        assert(oldBasemodsString.size() >= 4);
+        assert(oldBasemodsString.substr(0, 3) == "C+m");
+        const char* oldBasemodsStringView = oldBasemodsString.c_str() + 3;  // skip the "C+m" prefix
+        const int32_t oldBasemodsStringLen = oldBasemodsString.size() - 3;
+
+        const std::vector<uint8_t> basemodsQVs{
+            impl_.TagValue(BamRecordTag::BASEMOD_QV).ToUInt8Array()};
+
+        // convert "C+m,3,1,4;" to std::vector{3, 1, 4}
+        int32_t currentNumber = 0;
+        std::vector<int32_t> separatingC;
+        std::vector<int32_t> prefixSum;
+        int32_t pSum = 0;
+        // has to be either ',' or ';'
+        assert((*oldBasemodsStringView == ',') || (*oldBasemodsStringView == ';'));
+        for (int32_t i = 1; i < oldBasemodsStringLen; ++i) {
+            // yes, this has to be an unsigned char for the EOF edge case on unsigned platforms (hi ARM!)
+            const unsigned char ch = oldBasemodsStringView[i];
+            if (std::isdigit(ch)) {
+                currentNumber *= 10;
+                currentNumber += (ch - 48);
+            } else {
+                // have a comma or semi-colon
+                assert((ch == ',') || (ch == ';'));
+                separatingC.emplace_back(currentNumber);
+                pSum += (currentNumber + 1);
+                prefixSum.emplace_back(pSum);
+                currentNumber = 0;
+            }
+        }
+        assert(separatingC.size() == basemodsQVs.size());
+
+        // find the first retained CpG site
+        const auto startIt =
+            std::lower_bound(std::cbegin(prefixSum), std::cend(prefixSum), numClippedC + 1);
+        // find one past the last retained CpG site
+        const auto endIt = std::upper_bound(std::cbegin(prefixSum), std::cend(prefixSum),
+                                            numClippedC + numRetainedC);
+
+        const auto startPos = std::distance(std::cbegin(prefixSum), startIt);
+        const auto endPos = std::distance(std::cbegin(prefixSum), endIt);
+        assert(startPos <= endPos);
+
+        std::vector<int32_t> newSeparatingC{std::cbegin(separatingC) + startPos,
+                                            std::cbegin(separatingC) + endPos};
+        if (endPos - startPos) {
+            // we discarded some intervening Cs
+            newSeparatingC.front() = prefixSum[startPos] - numClippedC - 1;
+        }
+        std::vector<uint8_t> newBasemodsQVs{std::cbegin(basemodsQVs) + startPos,
+                                            std::cbegin(basemodsQVs) + endPos};
+
+        std::ostringstream newBasemodsString;
+        newBasemodsString << "C+m";
+        for (const auto val : newSeparatingC) {
+            newBasemodsString << ',' << val;
+        }
+        newBasemodsString << ';';
+
+        tags[Label(BamRecordTag::BASEMOD_LOCI)] = newBasemodsString.str();
+        tags[Label(BamRecordTag::BASEMOD_QV)] = std::move(newBasemodsQVs);
+    }
+
     // internal BAM tags
     if (HasPulseCall()) {
 
@@ -752,9 +835,12 @@ void BamRecord::ClipFields(const size_t clipFrom, const size_t clipLength)
         ReverseComplement(sequence);
         Reverse(qualities);
     }
-    impl_.SetSequenceAndQualities(sequence, qualities.Fastq());
 
     ClipTags(clipFrom, clipLength);
+
+    // do *NOT* move this above ClipTags(), since we need the full/old sequence
+    // when clipping the `Mm` and `Ml` basemods tags
+    impl_.SetSequenceAndQualities(sequence, qualities.Fastq());
 }
 
 BamRecord& BamRecord::ClipToQuery(const Data::Position start, const Data::Position end)
