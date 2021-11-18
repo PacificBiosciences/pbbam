@@ -538,6 +538,19 @@ DataSet& DataSet::SubDataSets(const BAM::SubDataSets& subdatasets)
     return *this;
 }
 
+const BAM::SupplementalResources& DataSet::SupplementalResources() const
+{
+    return d_->SupplementalResources();
+}
+
+BAM::SupplementalResources& DataSet::SupplementalResources() { return d_->SupplementalResources(); }
+
+DataSet& DataSet::SupplementalResources(const BAM::SupplementalResources& resources)
+{
+    d_->SupplementalResources(resources);
+    return *this;
+}
+
 const std::string& DataSet::Tags() const { return d_->Tags(); }
 
 std::string& DataSet::Tags() { return d_->Tags(); }

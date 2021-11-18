@@ -22,6 +22,40 @@ namespace PbiFilterTests {
 static PbiRawData test2Bam_RawIndex()
 {
     PbiRawData index;
+    index.FileSections(PbiFile::BASIC | PbiFile::MAPPED | PbiFile::REFERENCE);
+    index.NumReads(4);
+
+    PbiRawBasicData& subreadData = index.BasicData();
+    subreadData.rgId_ = {-1197849594, -1197849594, -1197849594, -1197849594};
+    subreadData.qStart_ = {2114, 2579, 4101, 5615};
+    subreadData.qEnd_ = {2531, 4055, 5571, 6237};
+    subreadData.holeNumber_ = {14743, 14743, 14743, 14743};
+    subreadData.readQual_ = {0.901, 0.601, 0.901, 0.601};
+    subreadData.ctxtFlag_ = {0, 1, 2, 3};
+    subreadData.fileOffset_ = {35651584, 35655125, 35667128, 35679170};
+
+    PbiRawMappedData& mappedData = index.MappedData();
+    mappedData.tId_ = {0, 0, 0, 0};
+    mappedData.tStart_ = {9507, 8453, 8455, 9291};
+    mappedData.tEnd_ = {9903, 9902, 9893, 9900};
+    mappedData.aStart_ = {2130, 2581, 4102, 5619};
+    mappedData.aEnd_ = {2531, 4055, 5560, 6237};
+    mappedData.revStrand_ = {0, 1, 0, 1};
+    mappedData.mapQV_ = {254, 254, 254, 254};
+    mappedData.nM_ = {384, 1411, 1393, 598};
+    mappedData.nMM_ = {0, 0, 0, 0};
+
+    PbiRawReferenceData& referenceData = index.ReferenceData();
+    referenceData.entries_.emplace_back(0, 0, 3);
+    referenceData.entries_.emplace_back(1);
+    referenceData.entries_.emplace_back(PbiReferenceEntry::UNMAPPED_ID);
+
+    return index;
+}
+
+static PbiRawData test2Bam_RawBarcodedIndex()
+{
+    PbiRawData index;
     index.NumReads(4);
 
     PbiRawBasicData& subreadData = index.BasicData();
@@ -58,6 +92,7 @@ static PbiRawData test2Bam_RawIndex()
 }
 
 static const PbiRawData shared_index = test2Bam_RawIndex();
+static const PbiRawData shared_barcoded_index = test2Bam_RawBarcodedIndex();
 
 static void checkFilterRows(const PbiFilter& filter, const std::vector<size_t> expectedRows)
 {
@@ -68,6 +103,19 @@ static void checkFilterRows(const PbiFilter& filter, const std::vector<size_t> e
     } else {
         for (size_t row : expectedRows) {
             EXPECT_TRUE(filter.Accepts(shared_index, row));
+        }
+    }
+}
+
+static void checkFilterBarcodedRows(const PbiFilter& filter, const std::vector<size_t> expectedRows)
+{
+    if (expectedRows.empty()) {
+        for (size_t row = 0; row < shared_barcoded_index.NumReads(); ++row) {
+            EXPECT_FALSE(filter.Accepts(shared_barcoded_index, row));
+        }
+    } else {
+        for (size_t row : expectedRows) {
+            EXPECT_TRUE(filter.Accepts(shared_barcoded_index, row));
         }
     }
 }
@@ -412,15 +460,15 @@ TEST(BAM_PbiFilter, can_filter_on_single_barcode)
 {
     {
         const auto filter = PbiFilter{PbiBarcodeFilter{17}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1, 3});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{1, 3});
     }
     {
         const auto filter = PbiFilter{PbiBarcodeFilter{18}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1, 3});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{1, 3});
     }
     {
         const auto filter = PbiFilter{PbiBarcodeFilter{0}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{0});
     }
 }
 
@@ -428,20 +476,20 @@ TEST(BAM_PbiFilter, can_filter_on_barcode_forward)
 {
     {
         const auto filter = PbiFilter{PbiBarcodeForwardFilter{17}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1, 3});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{1, 3});
     }
     {
         const auto filter = PbiFilter{PbiBarcodeForwardFilter{400}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{});
     }
     {
         const auto filter = PbiFilter{PbiBarcodeForwardFilter{{0, 256}}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0, 2});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{0, 2});
     }
     {
         //blacklist
         const auto filter = PbiFilter{PbiBarcodeForwardFilter{{0, 256}, Compare::NOT_CONTAINS}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1, 3});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{1, 3});
     }
 }
 
@@ -449,11 +497,11 @@ TEST(BAM_PbiFilter, can_filter_on_barcode_quality)
 {
     {
         const auto filter = PbiFilter{PbiBarcodeQualityFilter{80, Compare::GREATER_THAN_EQUAL}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1, 3});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{1, 3});
     }
     {
         const auto filter = PbiFilter{PbiBarcodeQualityFilter{40, Compare::LESS_THAN}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{});
     }
 }
 
@@ -461,20 +509,20 @@ TEST(BAM_PbiFilter, can_filter_on_barcode_reverse)
 {
     {
         const auto filter = PbiFilter{PbiBarcodeReverseFilter{18}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1, 3});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{1, 3});
     }
     {
         const auto filter = PbiFilter{PbiBarcodeReverseFilter{400}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{});
     }
     {
         const auto filter = PbiFilter{PbiBarcodeReverseFilter{{1, 257}}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0, 2});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{0, 2});
     }
     {
         // blacklist
         const auto filter = PbiFilter{PbiBarcodeReverseFilter{{1, 257}, Compare::NOT_CONTAINS}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1, 3});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{1, 3});
     }
 }
 
@@ -482,15 +530,15 @@ TEST(BAM_PbiFilter, can_filter_on_barcode_pair)
 {
     {
         const auto filter = PbiFilter{PbiBarcodesFilter{17, 18}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1, 3});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{1, 3});
     }
     {
         const auto filter = PbiFilter{PbiBarcodesFilter{17, 19}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{});
     }
     {
         const auto filter = PbiFilter{PbiBarcodesFilter{std::make_pair(17, 18)}};
-        PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1, 3});
+        PbiFilterTests::checkFilterBarcodedRows(filter, std::vector<size_t>{1, 3});
     }
 }
 
@@ -995,8 +1043,8 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_barcode_list)
         dataset.Filters().Add(filter);
 
         const auto generatedFilter = PbiFilter::FromDataSet(dataset);
-        PbiFilterTests::checkFilterRows(expectedFilter, expectedResults);
-        PbiFilterTests::checkFilterRows(generatedFilter, expectedResults);
+        PbiFilterTests::checkFilterBarcodedRows(expectedFilter, expectedResults);
+        PbiFilterTests::checkFilterBarcodedRows(generatedFilter, expectedResults);
     };
 
     // single barcode
@@ -1059,8 +1107,8 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
         dataset.Filters().Add(filter);
 
         const auto generatedFilter = PbiFilter::FromDataSet(dataset);
-        PbiFilterTests::checkFilterRows(expectedFilter, std::vector<size_t>{0});
-        PbiFilterTests::checkFilterRows(generatedFilter, std::vector<size_t>{0});
+        PbiFilterTests::checkFilterBarcodedRows(expectedFilter, std::vector<size_t>{0});
+        PbiFilterTests::checkFilterBarcodedRows(generatedFilter, std::vector<size_t>{0});
     }
     {  // any adapters or barcodes
 

@@ -375,7 +375,7 @@ TEST(BAM_PbiFilterQuery, can_filter_barcodes_from_xml)
 
 TEST(BAM_PbiFilterQuery, can_filter_read_groups_from_xml)
 {
-    const BamFile file{PbbamTestsConfig::Data_Dir + "/phi29.bam"};
+    const BamFile file{PbbamTestsConfig::Data_Dir + "/transcript.subreads.bam"};
     const std::string xmlHeader = R"_XML_(
         <?xml version="1.0" encoding="utf-8"?>
         <pbds:SubreadSet
@@ -398,13 +398,13 @@ TEST(BAM_PbiFilterQuery, can_filter_read_groups_from_xml)
                UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5193"
                TimeStampedName="subread_bam_150304_231155"
                MetaType="PacBio.SubreadFile.SubreadBamFile"
-               ResourceId="phi29.bam">
+               ResourceId="transcript.subreads.bam">
                <pbbase:FileIndices>
                    <pbbase:FileIndex
                        UniqueId="b095d0a3-94b8-4918-b3af-a3f81bbe5194"
                        TimeStampedName="bam_index_150304_231155"
                        MetaType="PacBio.Index.PacBioIndex"
-                       ResourceId="phi29.bam.pbi"/>
+                       ResourceId="transcipt.subreads.bam.pbi"/>
                </pbbase:FileIndices>
            </pbbase:ExternalResource>
         </pbbase:ExternalResources>
@@ -421,16 +421,16 @@ TEST(BAM_PbiFilterQuery, can_filter_read_groups_from_xml)
 
     {  // equal
         const std::string xmlProperty =
-            R"_XML_(<pbbase:Property Name="qid" Operator="==" Value="-1453990154"/>\n)_XML_";
+            R"_XML_(<pbbase:Property Name="qid" Operator="==" Value="-460161759"/>\n)_XML_";
         const std::string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
-        EXPECT_EQ(120, query.NumReads());
-        EXPECT_EQ(120, std::distance(query.begin(), query.end()));
+        EXPECT_EQ(4, query.NumReads());
+        EXPECT_EQ(4, std::distance(query.begin(), query.end()));
     }
     {  // not equal
         const std::string xmlProperty =
-            R"_XML_(<pbbase:Property Name="qid" Operator="!=" Value="-1453990154"/>\n)_XML_";
+            R"_XML_(<pbbase:Property Name="qid" Operator="!=" Value="-460161759"/>\n)_XML_";
         const std::string xml = xmlHeader + xmlProperty + xmlFooter;
         const DataSet ds = DataSet::FromXml(xml);
         const PbiFilterQuery query{PbiFilter::FromDataSet(ds), file};
@@ -636,15 +636,17 @@ TEST(BAM_PbiFilterQuery, can_filter_on_barcoded_read_group_id)
 {
     const BamFile bamFile{PbbamTestsConfig::Data_Dir + std::string{"/barcoded_read_groups.bam"}};
 
-    {  //  query read group with no barcodes - should catche all, barcoded or not
+    {
+        // query read group with no barcodes, should not be mixed in barcoded files
+        // barcoded BAMs are "all or nothing", per the PBI spec
         const PbiReadGroupFilter filter{"0d7b28fa"};
 
         PbiFilterQuery query{filter, bamFile};
-        EXPECT_EQ(5, query.NumReads());
-        EXPECT_EQ(5, std::distance(query.begin(), query.end()));
+        EXPECT_EQ(0, query.NumReads());
+        EXPECT_EQ(0, std::distance(query.begin(), query.end()));
     }
-    {  // query read group with barcode label
-
+    {
+        // query read group with barcode label
         const ReadGroupInfo rg{"0d7b28fa/0--0"};
         const PbiReadGroupFilter filter{rg};
 
@@ -652,8 +654,8 @@ TEST(BAM_PbiFilterQuery, can_filter_on_barcoded_read_group_id)
         EXPECT_EQ(1, query.NumReads());
         EXPECT_EQ(1, std::distance(query.begin(), query.end()));
     }
-    {  // query multiple read groups with barcode label
-
+    {
+        // query multiple read groups with barcode label
         const ReadGroupInfo rg{"0d7b28fa/0--0"};
         const ReadGroupInfo rg1{"0d7b28fa/1--0"};
         const PbiReadGroupFilter filter{std::vector<ReadGroupInfo>{rg, rg1}};

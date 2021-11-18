@@ -1004,6 +1004,8 @@ std::string ReadGroupInfo::ToSam() const
     return out.str();
 }
 
+// ---------------------------------------------------------
+
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType)
 {
     return MD5Hash(movieName + "//" + readType).substr(0, 8);
@@ -1012,8 +1014,7 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
                             const std::string& barcodeString)
 {
-    const std::string baseId{
-        MD5Hash(movieName + "//" + readType + "//" + barcodeString).substr(0, 8)};
+    const std::string baseId{MakeReadGroupId(movieName, readType)};
     return baseId + "/" + barcodeString;
 }
 
@@ -1023,6 +1024,53 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
     const std::string barcodeString{std::to_string(barcodes.first) + "--" +
                                     std::to_string(barcodes.second)};
     return MakeReadGroupId(movieName, readType, barcodeString);
+}
+
+std::string MakeReadGroupId(const ReadGroupInfo& readGroup)
+{
+    const auto barcodes = readGroup.Barcodes();
+    if (barcodes) {
+        const int16_t bcFor = barcodes->first;
+        const int16_t bcRev = barcodes->second;
+        return MakeReadGroupId(readGroup.MovieName(), readGroup.ReadType(),
+                               std::make_pair(bcFor, bcRev));
+    } else {
+        return MakeReadGroupId(readGroup.MovieName(), readGroup.ReadType());
+    }
+}
+
+std::string MakeLegacyReadGroupId(const std::string& movieName, const std::string& readType)
+{
+    return MD5Hash(movieName + "//" + readType).substr(0, 8);
+}
+
+std::string MakeLegacyReadGroupId(const std::string& movieName, const std::string& readType,
+                                  const std::string& barcodeString)
+{
+    const std::string baseId{
+        MD5Hash(movieName + "//" + readType + "//" + barcodeString).substr(0, 8)};
+    return baseId + "/" + barcodeString;
+}
+
+std::string MakeLegacyReadGroupId(const std::string& movieName, const std::string& readType,
+                                  const std::pair<int16_t, int16_t>& barcodes)
+{
+    const std::string barcodeString{std::to_string(barcodes.first) + "--" +
+                                    std::to_string(barcodes.second)};
+    return MakeLegacyReadGroupId(movieName, readType, barcodeString);
+}
+
+std::string MakeLegacyReadGroupId(const ReadGroupInfo& readGroup)
+{
+    const auto barcodes = readGroup.Barcodes();
+    if (barcodes) {
+        const int16_t bcFor = barcodes->first;
+        const int16_t bcRev = barcodes->second;
+        return MakeLegacyReadGroupId(readGroup.MovieName(), readGroup.ReadType(),
+                                     std::make_pair(bcFor, bcRev));
+    } else {
+        return MakeLegacyReadGroupId(readGroup.MovieName(), readGroup.ReadType());
+    }
 }
 
 }  // namespace BAM
