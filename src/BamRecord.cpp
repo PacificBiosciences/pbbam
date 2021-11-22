@@ -653,6 +653,10 @@ void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
                                      const Data::FrameEncoder& encoder) {
         if (impl_.HasTag(tag)) {
             const auto frames = FetchFrames(tag).Data();
+            if (frames.empty()) {
+                return;
+            }
+
             if (codec == Data::FrameCodec::RAW) {
                 tags[Label(tag)] = ClipSeqQV(frames, clipFrom, clipLength);
             } else {
@@ -664,6 +668,10 @@ void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
                                             const Data::FrameEncoder& encoder) {
         if (impl_.HasTag(tag)) {
             const auto frames = FetchFrames(tag).Data();
+            if (frames.empty()) {
+                return;
+            }
+
             const size_t originalClipEnd = clipFrom + clipLength;
             assert(originalClipEnd <= frames.size());
             const size_t reverseClipFrom = frames.size() - originalClipEnd;
