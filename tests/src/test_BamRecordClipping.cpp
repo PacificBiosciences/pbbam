@@ -2554,13 +2554,17 @@ TEST(BAM_BamRecordClipping, clips_ccs_kinetics_tags)
 
 // clang-format on
 
+constexpr char defaultSequence[] = "ACTCCACGACTCGTCACACTCACGTCTCA";
+constexpr char defaultBasemods[] = "C+m,3,1,4;";
+const std::vector<uint8_t> defaultBasemodsQVs = {18, 128, 234};
+
 TEST(BAM_BamRecordClipping, clips_basemods_tags)
 {
     const auto MakeCcsBasemodsRecord = [](
-        const std::string& str = "ACTCCACGACTCGTCACACTCACGTCTCA",
+        const std::string& str = defaultSequence,
         const std::string& qual = "hNfLpfSlpk59K>22LC'x*2W=*0GWv",
-        const std::string& basemods = "C+m,3,1,4;",
-        const std::vector<uint8_t>& basemodsQVs = {18, 128, 234}) {
+        const std::string& basemods = defaultBasemods,
+        const std::vector<uint8_t>& basemodsQVs = defaultBasemodsQVs) {
         BamRecordImpl impl;
         impl.SetSequenceAndQualities(str, qual);
 
@@ -2579,8 +2583,13 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
     };
 
     {  // empty clip, no CpG site - 1,4
-        auto bamRecord = MakeCcsBasemodsRecord("ATTGA", "!#a%(", "C+m;", {});
-        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 1, 4);
+        static const char seq[] = "ATTGA";
+        static const char basemods[] = "C+m;";
+        constexpr int32_t start = 1;
+        constexpr int32_t end = 4;
+
+        auto bamRecord = MakeCcsBasemodsRecord(seq, "!#a%(", basemods, {});
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, start, end);
         EXPECT_EQ(bamRecord.Sequence(), "TTG");
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "#a%");
 
@@ -2590,11 +2599,27 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{};
         EXPECT_EQ(basemodsQVs, expectedQvs);
+
+        const auto splitBasemods =
+            BamRecord::ClipBasemodsTag(seq, basemods, {}, start, end - start);
+
+        EXPECT_EQ(splitBasemods.LeadingSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.LeadingQuals, (std::vector<uint8_t>{}));
+        EXPECT_EQ(splitBasemods.PrefixLostBases, 0);
+
+        EXPECT_EQ(splitBasemods.RetainedSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.RetainedQuals, (std::vector<uint8_t>{}));
+
+        EXPECT_EQ(splitBasemods.TrailingSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.TrailingQuals, (std::vector<uint8_t>{}));
     }
 
     {  // lost all basemods clip (before first CpG site) - 1,5
+        constexpr int32_t start = 1;
+        constexpr int32_t end = 5;
+
         auto bamRecord = MakeCcsBasemodsRecord();
-        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 1, 5);
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, start, end);
         EXPECT_EQ(bamRecord.Sequence(), "CTCC");
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "NfLp");
 
@@ -2604,11 +2629,27 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{};
         EXPECT_EQ(basemodsQVs, expectedQvs);
+
+        const auto splitBasemods = BamRecord::ClipBasemodsTag(
+            defaultSequence, defaultBasemods, defaultBasemodsQVs, start, end - start);
+
+        EXPECT_EQ(splitBasemods.LeadingSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.LeadingQuals, (std::vector<uint8_t>{}));
+        EXPECT_EQ(splitBasemods.PrefixLostBases, 0);
+
+        EXPECT_EQ(splitBasemods.RetainedSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.RetainedQuals, (std::vector<uint8_t>{}));
+
+        EXPECT_EQ(splitBasemods.TrailingSeparatingC, (std::vector<int32_t>{3, 1, 4}));
+        EXPECT_EQ(splitBasemods.TrailingQuals, (std::vector<uint8_t>{18, 128, 234}));
     }
 
     {  // lost all basemods clip (between CpG sites) - 13,16
+        constexpr int32_t start = 13;
+        constexpr int32_t end = 16;
+
         auto bamRecord = MakeCcsBasemodsRecord();
-        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 13, 16);
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, start, end);
         EXPECT_EQ(bamRecord.Sequence(), "TCA");
         EXPECT_EQ(bamRecord.Qualities().Fastq(), ">22");
 
@@ -2618,11 +2659,27 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{};
         EXPECT_EQ(basemodsQVs, expectedQvs);
+
+        const auto splitBasemods = BamRecord::ClipBasemodsTag(
+            defaultSequence, defaultBasemods, defaultBasemodsQVs, start, end - start);
+
+        EXPECT_EQ(splitBasemods.LeadingSeparatingC, (std::vector<int32_t>{3, 1}));
+        EXPECT_EQ(splitBasemods.LeadingQuals, (std::vector<uint8_t>{18, 128}));
+        EXPECT_EQ(splitBasemods.PrefixLostBases, 0);
+
+        EXPECT_EQ(splitBasemods.RetainedSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.RetainedQuals, (std::vector<uint8_t>{}));
+
+        EXPECT_EQ(splitBasemods.TrailingSeparatingC, (std::vector<int32_t>{4}));
+        EXPECT_EQ(splitBasemods.TrailingQuals, (std::vector<uint8_t>{234}));
     }
 
     {  // lost all basemods clip (past last CpG site) - 25,28
+        constexpr int32_t start = 25;
+        constexpr int32_t end = 28;
+
         auto bamRecord = MakeCcsBasemodsRecord();
-        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 25, 28);
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, start, end);
         EXPECT_EQ(bamRecord.Sequence(), "CTC");
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "0GW");
 
@@ -2632,11 +2689,27 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{};
         EXPECT_EQ(basemodsQVs, expectedQvs);
+
+        const auto splitBasemods = BamRecord::ClipBasemodsTag(
+            defaultSequence, defaultBasemods, defaultBasemodsQVs, start, end - start);
+
+        EXPECT_EQ(splitBasemods.LeadingSeparatingC, (std::vector<int32_t>{3, 1, 4}));
+        EXPECT_EQ(splitBasemods.LeadingQuals, (std::vector<uint8_t>{18, 128, 234}));
+        EXPECT_EQ(splitBasemods.PrefixLostBases, 0);
+
+        EXPECT_EQ(splitBasemods.RetainedSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.RetainedQuals, (std::vector<uint8_t>{}));
+
+        EXPECT_EQ(splitBasemods.TrailingSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.TrailingQuals, (std::vector<uint8_t>{}));
     }
 
     {  // normal clip, first CpG site, lost some leading Cs - 3,9
+        constexpr int32_t start = 3;
+        constexpr int32_t end = 9;
+
         auto bamRecord = MakeCcsBasemodsRecord();
-        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 3, 9);
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, start, end);
         EXPECT_EQ(bamRecord.Sequence(), "CCACGA");
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "LpfSlp");
 
@@ -2646,11 +2719,27 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{18};
         EXPECT_EQ(basemodsQVs, expectedQvs);
+
+        const auto splitBasemods = BamRecord::ClipBasemodsTag(
+            defaultSequence, defaultBasemods, defaultBasemodsQVs, start, end - start);
+
+        EXPECT_EQ(splitBasemods.LeadingSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.LeadingQuals, (std::vector<uint8_t>{}));
+        EXPECT_EQ(splitBasemods.PrefixLostBases, 1);
+
+        EXPECT_EQ(splitBasemods.RetainedSeparatingC, (std::vector<int32_t>{2}));
+        EXPECT_EQ(splitBasemods.RetainedQuals, (std::vector<uint8_t>{18}));
+
+        EXPECT_EQ(splitBasemods.TrailingSeparatingC, (std::vector<int32_t>{1, 4}));
+        EXPECT_EQ(splitBasemods.TrailingQuals, (std::vector<uint8_t>{128, 234}));
     }
 
     {  // normal clip, first CpG site, lost all leading Cs - 6,10
+        constexpr int32_t start = 6;
+        constexpr int32_t end = 10;
+
         auto bamRecord = MakeCcsBasemodsRecord();
-        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 6, 10);
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, start, end);
         EXPECT_EQ(bamRecord.Sequence(), "CGAC");
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "Slpk");
 
@@ -2660,11 +2749,27 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{18};
         EXPECT_EQ(basemodsQVs, expectedQvs);
+
+        const auto splitBasemods = BamRecord::ClipBasemodsTag(
+            defaultSequence, defaultBasemods, defaultBasemodsQVs, start, end - start);
+
+        EXPECT_EQ(splitBasemods.LeadingSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.LeadingQuals, (std::vector<uint8_t>{}));
+        EXPECT_EQ(splitBasemods.PrefixLostBases, 3);
+
+        EXPECT_EQ(splitBasemods.RetainedSeparatingC, (std::vector<int32_t>{0}));
+        EXPECT_EQ(splitBasemods.RetainedQuals, (std::vector<uint8_t>{18}));
+
+        EXPECT_EQ(splitBasemods.TrailingSeparatingC, (std::vector<int32_t>{1, 4}));
+        EXPECT_EQ(splitBasemods.TrailingQuals, (std::vector<uint8_t>{128, 234}));
     }
 
     {  // normal clip, middle CpG site - 9,18
+        constexpr int32_t start = 9;
+        constexpr int32_t end = 18;
+
         auto bamRecord = MakeCcsBasemodsRecord();
-        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 9, 18);
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, start, end);
         EXPECT_EQ(bamRecord.Sequence(), "CTCGTCACA");
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "k59K>22LC");
 
@@ -2674,11 +2779,27 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{128};
         EXPECT_EQ(basemodsQVs, expectedQvs);
+
+        const auto splitBasemods = BamRecord::ClipBasemodsTag(
+            defaultSequence, defaultBasemods, defaultBasemodsQVs, start, end - start);
+
+        EXPECT_EQ(splitBasemods.LeadingSeparatingC, (std::vector<int32_t>{3}));
+        EXPECT_EQ(splitBasemods.LeadingQuals, (std::vector<uint8_t>{18}));
+        EXPECT_EQ(splitBasemods.PrefixLostBases, 0);
+
+        EXPECT_EQ(splitBasemods.RetainedSeparatingC, (std::vector<int32_t>{1}));
+        EXPECT_EQ(splitBasemods.RetainedQuals, (std::vector<uint8_t>{128}));
+
+        EXPECT_EQ(splitBasemods.TrailingSeparatingC, (std::vector<int32_t>{4}));
+        EXPECT_EQ(splitBasemods.TrailingQuals, (std::vector<uint8_t>{234}));
     }
 
     {  // normal clip, last CpG site - 12,27
+        constexpr int32_t start = 12;
+        constexpr int32_t end = 27;
+
         auto bamRecord = MakeCcsBasemodsRecord();
-        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 12, 27);
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, start, end);
         EXPECT_EQ(bamRecord.Sequence(), "GTCACACTCACGTCT");
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "K>22LC'x*2W=*0G");
 
@@ -2688,11 +2809,27 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{234};
         EXPECT_EQ(basemodsQVs, expectedQvs);
+
+        const auto splitBasemods = BamRecord::ClipBasemodsTag(
+            defaultSequence, defaultBasemods, defaultBasemodsQVs, start, end - start);
+
+        EXPECT_EQ(splitBasemods.LeadingSeparatingC, (std::vector<int32_t>{3, 1}));
+        EXPECT_EQ(splitBasemods.LeadingQuals, (std::vector<uint8_t>{18, 128}));
+        EXPECT_EQ(splitBasemods.PrefixLostBases, 0);
+
+        EXPECT_EQ(splitBasemods.RetainedSeparatingC, (std::vector<int32_t>{4}));
+        EXPECT_EQ(splitBasemods.RetainedQuals, (std::vector<uint8_t>{234}));
+
+        EXPECT_EQ(splitBasemods.TrailingSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.TrailingQuals, (std::vector<uint8_t>{}));
     }
 
     {  // normal clip, first two CpG sites - 4,20
+        constexpr int32_t start = 4;
+        constexpr int32_t end = 20;
+
         auto bamRecord = MakeCcsBasemodsRecord();
-        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 4, 20);
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, start, end);
         EXPECT_EQ(bamRecord.Sequence(), "CACGACTCGTCACACT");
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "pfSlpk59K>22LC'x");
 
@@ -2702,11 +2839,27 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{18, 128};
         EXPECT_EQ(basemodsQVs, expectedQvs);
+
+        const auto splitBasemods = BamRecord::ClipBasemodsTag(
+            defaultSequence, defaultBasemods, defaultBasemodsQVs, start, end - start);
+
+        EXPECT_EQ(splitBasemods.LeadingSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.LeadingQuals, (std::vector<uint8_t>{}));
+        EXPECT_EQ(splitBasemods.PrefixLostBases, 2);
+
+        EXPECT_EQ(splitBasemods.RetainedSeparatingC, (std::vector<int32_t>{1, 1}));
+        EXPECT_EQ(splitBasemods.RetainedQuals, (std::vector<uint8_t>{18, 128}));
+
+        EXPECT_EQ(splitBasemods.TrailingSeparatingC, (std::vector<int32_t>{4}));
+        EXPECT_EQ(splitBasemods.TrailingQuals, (std::vector<uint8_t>{234}));
     }
 
     {  // normal clip, last two CpG sites - 10,26
+        constexpr int32_t start = 10;
+        constexpr int32_t end = 26;
+
         auto bamRecord = MakeCcsBasemodsRecord();
-        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 10, 26);
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, start, end);
         EXPECT_EQ(bamRecord.Sequence(), "TCGTCACACTCACGTC");
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "59K>22LC'x*2W=*0");
 
@@ -2716,11 +2869,27 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{128, 234};
         EXPECT_EQ(basemodsQVs, expectedQvs);
+
+        const auto splitBasemods = BamRecord::ClipBasemodsTag(
+            defaultSequence, defaultBasemods, defaultBasemodsQVs, start, end - start);
+
+        EXPECT_EQ(splitBasemods.LeadingSeparatingC, (std::vector<int32_t>{3}));
+        EXPECT_EQ(splitBasemods.LeadingQuals, (std::vector<uint8_t>{18}));
+        EXPECT_EQ(splitBasemods.PrefixLostBases, 1);
+
+        EXPECT_EQ(splitBasemods.RetainedSeparatingC, (std::vector<int32_t>{0, 4}));
+        EXPECT_EQ(splitBasemods.RetainedQuals, (std::vector<uint8_t>{128, 234}));
+
+        EXPECT_EQ(splitBasemods.TrailingSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.TrailingQuals, (std::vector<uint8_t>{}));
     }
 
     {  // cut into last CpG site - 1,23
+        constexpr int32_t start = 1;
+        constexpr int32_t end = 23;
+
         auto bamRecord = MakeCcsBasemodsRecord();
-        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 1, 23);
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, start, end);
         EXPECT_EQ(bamRecord.Sequence(), "CTCCACGACTCGTCACACTCAC");
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "NfLpfSlpk59K>22LC'x*2W");
 
@@ -2730,11 +2899,27 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{18, 128, 234};
         EXPECT_EQ(basemodsQVs, expectedQvs);
+
+        const auto splitBasemods = BamRecord::ClipBasemodsTag(
+            defaultSequence, defaultBasemods, defaultBasemodsQVs, start, end - start);
+
+        EXPECT_EQ(splitBasemods.LeadingSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.LeadingQuals, (std::vector<uint8_t>{}));
+        EXPECT_EQ(splitBasemods.PrefixLostBases, 0);
+
+        EXPECT_EQ(splitBasemods.RetainedSeparatingC, (std::vector<int32_t>{3, 1, 4}));
+        EXPECT_EQ(splitBasemods.RetainedQuals, (std::vector<uint8_t>{18, 128, 234}));
+
+        EXPECT_EQ(splitBasemods.TrailingSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.TrailingQuals, (std::vector<uint8_t>{}));
     }
 
     {  // no cut - 0,29
+        constexpr int32_t start = 0;
+        constexpr int32_t end = 29;
+
         auto bamRecord = MakeCcsBasemodsRecord();
-        bamRecord.Clip(ClipType::CLIP_TO_QUERY, 0, 29);
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, start, end);
         EXPECT_EQ(bamRecord.Sequence(), "ACTCCACGACTCGTCACACTCACGTCTCA");
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "hNfLpfSlpk59K>22LC'x*2W=*0GWv");
 
@@ -2744,5 +2929,18 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{18, 128, 234};
         EXPECT_EQ(basemodsQVs, expectedQvs);
+
+        const auto splitBasemods = BamRecord::ClipBasemodsTag(
+            defaultSequence, defaultBasemods, defaultBasemodsQVs, start, end - start);
+
+        EXPECT_EQ(splitBasemods.LeadingSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.LeadingQuals, (std::vector<uint8_t>{}));
+        EXPECT_EQ(splitBasemods.PrefixLostBases, 0);
+
+        EXPECT_EQ(splitBasemods.RetainedSeparatingC, (std::vector<int32_t>{3, 1, 4}));
+        EXPECT_EQ(splitBasemods.RetainedQuals, (std::vector<uint8_t>{18, 128, 234}));
+
+        EXPECT_EQ(splitBasemods.TrailingSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.TrailingQuals, (std::vector<uint8_t>{}));
     }
 }

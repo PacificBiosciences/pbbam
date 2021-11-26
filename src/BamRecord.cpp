@@ -701,75 +701,17 @@ void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
                 "[pbbam] BAM record ERROR: cannot clip 'Mm' tag without a corresponding 'Ml' tag."};
         }
 
-        const std::string seq = Sequence(Data::Orientation::NATIVE);
-        assert(clipFrom <= seq.size());
-        const int32_t numClippedC = std::count(std::cbegin(seq), std::cbegin(seq) + clipFrom, 'C');
-        assert(clipFrom + clipLength <= seq.size());
-        const int32_t numRetainedC =
-            std::count(std::cbegin(seq) + clipFrom, std::cbegin(seq) + clipFrom + clipLength, 'C');
-
+        const std::string seq{Sequence(Data::Orientation::NATIVE)};
         const std::string oldBasemodsString{impl_.TagValue(BamRecordTag::BASEMOD_LOCI).ToString()};
-        assert(oldBasemodsString.size() >= 4);
-        assert(oldBasemodsString.substr(0, 3) == "C+m");
-        const char* oldBasemodsStringView = oldBasemodsString.c_str() + 3;  // skip the "C+m" prefix
-        const int32_t oldBasemodsStringLen = oldBasemodsString.size() - 3;
-
         const std::vector<uint8_t> basemodsQVs{
             impl_.TagValue(BamRecordTag::BASEMOD_QV).ToUInt8Array()};
 
-        // convert "C+m,3,1,4;" to std::vector{3, 1, 4}
-        int32_t currentNumber = 0;
-        std::vector<int32_t> separatingC;
-        std::vector<int32_t> prefixSum;
-        int32_t pSum = 0;
-        // has to be either ',' or ';'
-        assert((*oldBasemodsStringView == ',') || (*oldBasemodsStringView == ';'));
-        for (int32_t i = 1; i < oldBasemodsStringLen; ++i) {
-            // yes, this has to be an unsigned char for the EOF edge case on unsigned platforms (hi ARM!)
-            const unsigned char ch = oldBasemodsStringView[i];
-            if (std::isdigit(ch)) {
-                currentNumber *= 10;
-                currentNumber += (ch - 48);
-            } else {
-                // have a comma or semi-colon
-                assert((ch == ',') || (ch == ';'));
-                separatingC.emplace_back(currentNumber);
-                pSum += (currentNumber + 1);
-                prefixSum.emplace_back(pSum);
-                currentNumber = 0;
-            }
-        }
-        assert(separatingC.size() == basemodsQVs.size());
+        SplitBasemods sb =
+            ClipBasemodsTag(seq, oldBasemodsString, basemodsQVs, clipFrom, clipLength);
 
-        // find the first retained CpG site
-        const auto startIt =
-            std::lower_bound(std::cbegin(prefixSum), std::cend(prefixSum), numClippedC + 1);
-        // find one past the last retained CpG site
-        const auto endIt = std::upper_bound(std::cbegin(prefixSum), std::cend(prefixSum),
-                                            numClippedC + numRetainedC);
-
-        const auto startPos = std::distance(std::cbegin(prefixSum), startIt);
-        const auto endPos = std::distance(std::cbegin(prefixSum), endIt);
-        assert(startPos <= endPos);
-
-        std::vector<int32_t> newSeparatingC{std::cbegin(separatingC) + startPos,
-                                            std::cbegin(separatingC) + endPos};
-        if (endPos - startPos) {
-            // we discarded some intervening Cs
-            newSeparatingC.front() = prefixSum[startPos] - numClippedC - 1;
-        }
-        std::vector<uint8_t> newBasemodsQVs{std::cbegin(basemodsQVs) + startPos,
-                                            std::cbegin(basemodsQVs) + endPos};
-
-        std::ostringstream newBasemodsString;
-        newBasemodsString << "C+m";
-        for (const auto val : newSeparatingC) {
-            newBasemodsString << ',' << val;
-        }
-        newBasemodsString << ';';
-
-        tags[Label(BamRecordTag::BASEMOD_LOCI)] = newBasemodsString.str();
-        tags[Label(BamRecordTag::BASEMOD_QV)] = std::move(newBasemodsQVs);
+        tags[Label(BamRecordTag::BASEMOD_LOCI)] =
+            SplitBasemods::SeparatingCToString(sb.RetainedSeparatingC);
+        tags[Label(BamRecordTag::BASEMOD_QV)] = std::move(sb.RetainedQuals);
     }
 
     // internal BAM tags
@@ -1656,6 +1598,112 @@ BamRecord BamRecord::Mapped(const int32_t referenceId, const Data::Position refS
     BamRecord result(*this);
     result.Map(referenceId, refStart, strand, cigar, mappingQuality);
     return result;
+}
+
+BamRecord::SplitBasemods BamRecord::ClipBasemodsTag(const std::string& seq,
+                                                    const std::string& basemodsStr,
+                                                    const std::vector<uint8_t>& basemodsQVs,
+                                                    const size_t clipFrom, const size_t clipLength)
+{
+    assert(clipFrom <= seq.size());
+    const int32_t numClippedC = std::count(std::cbegin(seq), std::cbegin(seq) + clipFrom, 'C');
+    assert(clipFrom + clipLength <= seq.size());
+    const int32_t numRetainedC =
+        std::count(std::cbegin(seq) + clipFrom, std::cbegin(seq) + clipFrom + clipLength, 'C');
+
+    const std::vector<int32_t> separatingC{SplitBasemods::SplitBasemodsString(basemodsStr)};
+    assert(separatingC.size() == basemodsQVs.size());
+
+    // prefix sum (with an off-by-one) for divide-and-conquer later
+    //
+    //   input:  separatingC == {3, 1, 4}
+    //   output: prefixSum   == {4, 6, 11}
+    //
+    // i.e., prefixSum[i] accounts for all Cs we have seen so far up to CpG island i, including itself
+    //
+    // TODO(dseifert):
+    // replace with std::inclusive_scan in C++17
+    std::vector<int32_t> prefixSum;
+    prefixSum.reserve(separatingC.size());
+    int32_t pSum = 0;
+    for (const int32_t p : separatingC) {
+        pSum += (p + 1);
+        prefixSum.emplace_back(pSum);
+    }
+
+    // find the first retained CpG site
+    const auto startIt =
+        std::lower_bound(std::cbegin(prefixSum), std::cend(prefixSum), numClippedC + 1);
+    // find one past the last retained CpG site
+    const auto endIt =
+        std::upper_bound(std::cbegin(prefixSum), std::cend(prefixSum), numClippedC + numRetainedC);
+
+    const auto startPos = std::distance(std::cbegin(prefixSum), startIt);
+    const auto endPos = std::distance(std::cbegin(prefixSum), endIt);
+    assert(startPos <= endPos);
+
+    BamRecord::SplitBasemods result{
+        // Leading
+        {std::cbegin(separatingC) + 0, std::cbegin(separatingC) + startPos},
+        {std::cbegin(basemodsQVs) + 0, std::cbegin(basemodsQVs) + startPos},
+        // Retained
+        {std::cbegin(separatingC) + startPos, std::cbegin(separatingC) + endPos},
+        {std::cbegin(basemodsQVs) + startPos, std::cbegin(basemodsQVs) + endPos},
+        // Trailing
+        {std::cbegin(separatingC) + endPos, std::cbegin(separatingC) + separatingC.size()},
+        {std::cbegin(basemodsQVs) + endPos, std::cbegin(basemodsQVs) + basemodsQVs.size()},
+    };
+
+    if (endPos - startPos) {
+        // we lost some intervening Cs
+        result.RetainedSeparatingC.front() = prefixSum[startPos] - numClippedC - 1;
+        result.PrefixLostBases = numClippedC - ((startPos >= 1) ? prefixSum[startPos - 1] : 0);
+    }
+
+    return result;
+}
+
+std::vector<int32_t> BamRecord::SplitBasemods::SplitBasemodsString(const std::string& str)
+{
+    assert(str.size() >= 4);
+    assert(boost::algorithm::starts_with(str, "C+m"));
+    assert(boost::algorithm::ends_with(str, ";"));
+
+    const char* strView = str.c_str() + 3;  // skip the "C+m" prefix
+    const int32_t strLen = str.size() - 3;
+
+    // convert "C+m,3,1,4;" to std::vector{3, 1, 4}
+    std::vector<int32_t> result;
+    int32_t currentNumber = 0;
+    assert((strView[0] == ',') ||
+           (strView[0] == ';'));  // first character has to be either ',' or ';'
+    for (int32_t i = 1; i < strLen; ++i) {
+        // yes, this has to be an unsigned char for the EOF edge case on unsigned platforms (hi ARM!)
+        const unsigned char ch = strView[i];
+        if (std::isdigit(ch)) {
+            currentNumber *= 10;
+            currentNumber += (ch - 48);
+        } else {
+            // have a comma or semi-colon
+            assert((ch == ',') || (ch == ';'));
+            result.emplace_back(currentNumber);
+            currentNumber = 0;
+        }
+    }
+
+    return result;
+}
+
+std::string BamRecord::SplitBasemods::SeparatingCToString(const std::vector<int32_t>& vec)
+{
+    std::ostringstream newBasemodsString;
+    newBasemodsString << "C+m";
+    for (const auto val : vec) {
+        newBasemodsString << ',' << val;
+    }
+    newBasemodsString << ';';
+
+    return newBasemodsString.str();
 }
 
 uint8_t BamRecord::MapQuality() const { return impl_.MapQuality(); }
