@@ -20,7 +20,7 @@ namespace {
 boost::optional<ControlKit::CustomSequence> UpdateControlKitCache(const ControlKit& kit)
 {
     if (!kit.HasChild("CustomSequence")) {
-        return boost::none;
+        return {};
     }
 
     const auto& customSeq = kit.ChildText("CustomSequence");

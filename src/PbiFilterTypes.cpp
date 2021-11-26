@@ -677,7 +677,7 @@ void PbiReferenceNameFilter::Initialize(const PbiRawData& idx) const
     const BamFile bamFile{bamFilename};
 
     // single-value
-    if (rnameWhitelist_ == boost::none) {
+    if (!rnameWhitelist_) {
         const auto tId = bamFile.ReferenceId(rname_);
         subFilter_ = PbiReferenceIdFilter{tId, cmp_};
     }
