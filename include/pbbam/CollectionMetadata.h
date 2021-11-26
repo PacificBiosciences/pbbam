@@ -183,7 +183,7 @@ public:
     };
 
 private:
-    mutable boost::optional<CustomSequence> cache_ = boost::none;
+    mutable boost::optional<CustomSequence> cache_;
 };
 
 class PPAConfig : public internal::DataSetElement

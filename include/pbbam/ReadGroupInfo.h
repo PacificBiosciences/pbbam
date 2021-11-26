@@ -704,7 +704,7 @@ private:
     std::map<BaseFeature, std::string> features_;
 
     // (optional) barcode label handling
-    boost::optional<std::pair<uint16_t, uint16_t>> barcodes_ = boost::none;
+    boost::optional<std::pair<uint16_t, uint16_t>> barcodes_;
     std::string baseId_;
 
     Data::FrameEncoder ipdEncoder_ = Data::V1FrameEncoder{};

@@ -26,7 +26,7 @@ inline boost::optional<std::string> ScrapsFileId(const ExternalResource& resourc
             return childResource.ResourceId();
         }
     }
-    return boost::none;
+    return {};
 }
 
 inline StitchingSources SourcesFromDataset(const DataSet& dataset)

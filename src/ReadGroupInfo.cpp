@@ -402,7 +402,7 @@ boost::optional<uint16_t> ReadGroupInfo::BarcodeForward() const
     if (barcodes) {
         return barcodes->first;
     }
-    return boost::make_optional(false, uint16_t{0});
+    return {};
 }
 
 boost::optional<uint16_t> ReadGroupInfo::BarcodeReverse() const
@@ -411,7 +411,7 @@ boost::optional<uint16_t> ReadGroupInfo::BarcodeReverse() const
     if (barcodes) {
         return barcodes->second;
     }
-    return boost::make_optional(false, uint16_t{0});
+    return {};
 }
 
 boost::optional<std::pair<uint16_t, uint16_t>> ReadGroupInfo::Barcodes() const { return barcodes_; }

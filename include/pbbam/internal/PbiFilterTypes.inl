@@ -38,10 +38,10 @@ FilterBase<T>::FilterBase(std::vector<T> values, const Compare::Type cmp)
 template <typename T>
 bool FilterBase<T>::CompareHelper(const T& lhs) const
 {
-    if (multiValue_ == boost::none) {
-        return CompareSingleHelper(lhs);
-    } else {
+    if (multiValue_) {
         return CompareMultiHelper(lhs);
+    } else {
+        return CompareSingleHelper(lhs);
     }
 }
 

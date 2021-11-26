@@ -278,15 +278,15 @@ TEST(BAM_ReadGroupInfo, returns_no_barcodes_from_non_barcoded_id)
 
         const auto barcodes = rg.Barcodes();
         EXPECT_FALSE(barcodes);
-        EXPECT_EQ(boost::none, rg.BarcodeForward());
-        EXPECT_EQ(boost::none, rg.BarcodeReverse());
+        EXPECT_FALSE(rg.BarcodeForward());
+        EXPECT_FALSE(rg.BarcodeReverse());
     }
     {   // no '/' found
         const ReadGroupInfo rg{"00082ba1.0--1"};
         const auto barcodes = rg.Barcodes();
         EXPECT_FALSE(barcodes);
-        EXPECT_EQ(boost::none, rg.BarcodeForward());
-        EXPECT_EQ(boost::none, rg.BarcodeReverse());
+        EXPECT_FALSE(rg.BarcodeForward());
+        EXPECT_FALSE(rg.BarcodeReverse());
     }
 }
 
@@ -295,8 +295,8 @@ TEST(BAM_ReadGroupInfo, returns_no_barcodes_from_empty_id)
     const ReadGroupInfo rg{""};
     const auto barcodes = rg.Barcodes();
     EXPECT_FALSE(barcodes);
-    EXPECT_EQ(boost::none, rg.BarcodeForward());
-    EXPECT_EQ(boost::none, rg.BarcodeReverse());
+    EXPECT_FALSE(rg.BarcodeForward());
+    EXPECT_FALSE(rg.BarcodeReverse());
 }
 
 TEST(BAM_ReadGroupInfo, throws_on_malformatted_barcoded_ids)
