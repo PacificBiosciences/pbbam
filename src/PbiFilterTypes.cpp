@@ -239,7 +239,7 @@ struct PbiNumSubreadsFilter::PbiNumSubreadsFilterPrivate
     bool Accepts(const PbiRawData& idx, const size_t row) const
     {
         // lazy-load
-        if (!lookup_.is_initialized()) {
+        if (!lookup_) {
             InitializeLookup(idx);
         }
         const auto holeNumber = idx.BasicData().holeNumber_[row];
@@ -685,7 +685,7 @@ void PbiReferenceNameFilter::Initialize(const PbiRawData& idx) const
     // multi-value (whitelist/blacklist)
     else {
         std::vector<int32_t> ids;
-        for (const auto& rname : rnameWhitelist_.get()) {
+        for (const auto& rname : *rnameWhitelist_) {
             ids.push_back(bamFile.ReferenceId(rname));
         }
         subFilter_ = PbiReferenceIdFilter{std::move(ids), cmp_};

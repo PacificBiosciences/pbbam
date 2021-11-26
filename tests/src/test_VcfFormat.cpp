@@ -274,8 +274,8 @@ TEST(VCF_VcfFormat, can_parse_info_definition)
     EXPECT_EQ("0", info.Number());
     EXPECT_EQ("Flag", info.Type());
     EXPECT_EQ("Imprecise structural variant", info.Description());
-    EXPECT_FALSE(info.Source().is_initialized());
-    EXPECT_FALSE(info.Version().is_initialized());
+    EXPECT_FALSE(info.Source());
+    EXPECT_FALSE(info.Version());
 }
 
 TEST(VCF_VcfFormat, parsing_info_definition_throws_on_malformed_info_line)
@@ -411,13 +411,13 @@ TEST(VCF_VcfFormat, can_create_variant_from_text)
 
     const auto& sampleGenotype = genotypes.at(0);
     ASSERT_EQ(4, sampleGenotype.data.size());
-    EXPECT_EQ("0/1", sampleGenotype.data.at(0).value.get());
-    EXPECT_EQ("2", sampleGenotype.data.at(1).value.get());
-    EXPECT_EQ("5", sampleGenotype.data.at(2).value.get());
+    EXPECT_EQ("0/1", *sampleGenotype.data.at(0).value);
+    EXPECT_EQ("2", *sampleGenotype.data.at(1).value);
+    EXPECT_EQ("5", *sampleGenotype.data.at(2).value);
     const auto& acData = sampleGenotype.data.at(3);
     ASSERT_EQ(2, acData.values->size());
     EXPECT_EQ("1", acData.values->at(0));
     EXPECT_EQ("2", acData.values->at(1));
 
-    //    ASSERT_TRUE(sampleGenotype.values.is_initialized());
+    //    ASSERT_TRUE(sampleGenotype.values);
 }

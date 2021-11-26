@@ -184,24 +184,24 @@ bool VcfVariant::IsQualityMissing() const { return std::isnan(qual_); }
 bool VcfVariant::IsSampleHeterozygous(const size_t sampleIndex) const
 {
     const auto data = GenotypeValue(sampleIndex, "GT");
-    auto fields = BAM::Split(data.get(), '/');
+    auto fields = BAM::Split(*data, '/');
     if (fields.size() == 1) {
-        fields = BAM::Split(data.get(), '|');
+        fields = BAM::Split(*data, '|');
     }
 
     if (fields.size() == 2) {
         return fields.at(0) != fields.at(1);
     } else {
-        throw VcfFormatException{"malformed GT field: " + data.get()};
+        throw VcfFormatException{"malformed GT field: " + *data};
     }
 }
 
 bool VcfVariant::IsSamplePhased(const size_t sampleIndex) const
 {
     const auto data = GenotypeValue(sampleIndex, "GT");
-    const auto phaseFound = data.get().find('|') != std::string::npos;
+    const auto phaseFound = data->find('|') != std::string::npos;
     if (phaseFound) {
-        assert(data.get().find('/') == std::string::npos);
+        assert(data->find('/') == std::string::npos);
     }
     return phaseFound;
 }
