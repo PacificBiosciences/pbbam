@@ -94,14 +94,14 @@ TEST(VCF_InfoDefinition, missing_optional_fields_is_not_error)
 {
     InfoDefinition info{"id", "num", "type", "description"};
 
-    EXPECT_FALSE(info.Source().is_initialized());
-    EXPECT_FALSE(info.Version().is_initialized());
+    EXPECT_FALSE(info.Source());
+    EXPECT_FALSE(info.Version());
 
     info.Source("source");
     info.Version("version");
 
-    EXPECT_TRUE(info.Source().is_initialized());
-    EXPECT_TRUE(info.Version().is_initialized());
+    EXPECT_TRUE(info.Source());
+    EXPECT_TRUE(info.Version());
 }
 
 TEST(VCF_VcfHeader, defaults_to_current_version)

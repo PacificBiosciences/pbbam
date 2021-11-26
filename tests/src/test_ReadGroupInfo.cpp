@@ -251,8 +251,8 @@ TEST(BAM_ReadGroupInfo, can_determine_barcodes_from_barcoded_id_string)
     ASSERT_TRUE(barcodes);
     EXPECT_EQ(0, barcodes->first);
     EXPECT_EQ(1, barcodes->second);
-    EXPECT_EQ(0, rg.BarcodeForward().get());
-    EXPECT_EQ(1, rg.BarcodeReverse().get());
+    EXPECT_EQ(0, *rg.BarcodeForward());
+    EXPECT_EQ(1, *rg.BarcodeReverse());
 }
 
 TEST(BAM_ReadGroupInfo, can_determine_barcodes_from_id_string_and_barcode_pair)
@@ -265,8 +265,8 @@ TEST(BAM_ReadGroupInfo, can_determine_barcodes_from_id_string_and_barcode_pair)
     ASSERT_TRUE(barcodes);
     EXPECT_EQ(0, barcodes->first);
     EXPECT_EQ(1, barcodes->second);
-    EXPECT_EQ(0, rg.BarcodeForward().get());
-    EXPECT_EQ(1, rg.BarcodeReverse().get());
+    EXPECT_EQ(0, *rg.BarcodeForward());
+    EXPECT_EQ(1, *rg.BarcodeReverse());
 }
 
 TEST(BAM_ReadGroupInfo, returns_no_barcodes_from_non_barcoded_id)
