@@ -518,6 +518,10 @@ PbiQueryNameFilter::PbiQueryNameFilter(const PbiQueryNameFilter& other)
 {
 }
 
+PbiQueryNameFilter::PbiQueryNameFilter(PbiQueryNameFilter&&) noexcept = default;
+
+PbiQueryNameFilter& PbiQueryNameFilter::operator=(PbiQueryNameFilter&&) noexcept = default;
+
 PbiQueryNameFilter::~PbiQueryNameFilter() = default;
 
 bool PbiQueryNameFilter::Accepts(const PbiRawData& idx, const size_t row) const

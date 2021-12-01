@@ -628,6 +628,9 @@ public:
                        const Compare::Type cmp = Compare::CONTAINS);
 
     PbiQueryNameFilter(const PbiQueryNameFilter& other);
+
+    PbiQueryNameFilter(PbiQueryNameFilter&&) noexcept;
+    PbiQueryNameFilter& operator=(PbiQueryNameFilter&&) noexcept;
     ~PbiQueryNameFilter();
 
     /// \brief Performs the actual index lookup.
