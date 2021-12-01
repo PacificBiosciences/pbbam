@@ -56,6 +56,8 @@ public:
     GenomicIntervalQuery(const Data::GenomicInterval& interval, const DataSet& dataset,
                          const BaiIndexCache& cache);
 
+    GenomicIntervalQuery(GenomicIntervalQuery&&) noexcept;
+    GenomicIntervalQuery& operator=(GenomicIntervalQuery&&) noexcept;
     ~GenomicIntervalQuery() override;
 
 public:

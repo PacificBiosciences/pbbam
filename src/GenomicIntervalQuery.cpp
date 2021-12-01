@@ -49,6 +49,10 @@ GenomicIntervalQuery::GenomicIntervalQuery(const Data::GenomicInterval& interval
 {
 }
 
+GenomicIntervalQuery::GenomicIntervalQuery(GenomicIntervalQuery&&) noexcept = default;
+
+GenomicIntervalQuery& GenomicIntervalQuery::operator=(GenomicIntervalQuery&&) noexcept = default;
+
 GenomicIntervalQuery::~GenomicIntervalQuery() = default;
 
 bool GenomicIntervalQuery::GetNext(BamRecord& r) { return d_->reader_.GetNext(r); }
