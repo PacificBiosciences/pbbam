@@ -70,6 +70,10 @@ SamReader::SamReader(std::string fn)
 {
 }
 
+SamReader::SamReader(SamReader&&) noexcept = default;
+
+SamReader& SamReader::operator=(SamReader&&) noexcept = default;
+
 SamReader::~SamReader() = default;
 
 const std::string& SamReader::Filename() const { return d_->filename_; }
