@@ -289,6 +289,10 @@ PbiNumSubreadsFilter::PbiNumSubreadsFilter(const PbiNumSubreadsFilter& other)
 {
 }
 
+PbiNumSubreadsFilter::PbiNumSubreadsFilter(PbiNumSubreadsFilter&&) noexcept = default;
+
+PbiNumSubreadsFilter& PbiNumSubreadsFilter::operator=(PbiNumSubreadsFilter&&) noexcept = default;
+
 PbiNumSubreadsFilter::~PbiNumSubreadsFilter() = default;
 
 bool PbiNumSubreadsFilter::Accepts(const PbiRawData& idx, const size_t row) const

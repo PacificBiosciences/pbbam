@@ -535,6 +535,9 @@ public:
     PbiNumSubreadsFilter(int numSubreads, const Compare::Type cmp = Compare::EQUAL);
 
     PbiNumSubreadsFilter(const PbiNumSubreadsFilter& other);
+
+    PbiNumSubreadsFilter(PbiNumSubreadsFilter&&) noexcept;
+    PbiNumSubreadsFilter& operator=(PbiNumSubreadsFilter&&) noexcept;
     ~PbiNumSubreadsFilter();
 
     /// \brief Performs the actual index lookup.
