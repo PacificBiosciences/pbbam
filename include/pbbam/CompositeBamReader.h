@@ -90,9 +90,12 @@ public:
 public:
     SortedCompositeBamReader(const DataSet& dataset);
     SortedCompositeBamReader(std::vector<BamFile> bamFiles);
-    virtual ~SortedCompositeBamReader();
 
-    bool GetNext(BamRecord& record);
+    SortedCompositeBamReader(SortedCompositeBamReader&&) noexcept;
+    SortedCompositeBamReader& operator=(SortedCompositeBamReader&&) noexcept;
+    ~SortedCompositeBamReader() override;
+
+    bool GetNext(BamRecord& record) override;
 
 protected:
     std::vector<BamFile> bamFiles_;

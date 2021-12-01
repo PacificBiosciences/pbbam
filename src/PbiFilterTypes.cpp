@@ -289,6 +289,10 @@ PbiNumSubreadsFilter::PbiNumSubreadsFilter(const PbiNumSubreadsFilter& other)
 {
 }
 
+PbiNumSubreadsFilter::PbiNumSubreadsFilter(PbiNumSubreadsFilter&&) noexcept = default;
+
+PbiNumSubreadsFilter& PbiNumSubreadsFilter::operator=(PbiNumSubreadsFilter&&) noexcept = default;
+
 PbiNumSubreadsFilter::~PbiNumSubreadsFilter() = default;
 
 bool PbiNumSubreadsFilter::Accepts(const PbiRawData& idx, const size_t row) const
@@ -513,6 +517,10 @@ PbiQueryNameFilter::PbiQueryNameFilter(const PbiQueryNameFilter& other)
     : d_{std::make_unique<PbiQueryNameFilter::PbiQueryNameFilterPrivate>(other.d_)}
 {
 }
+
+PbiQueryNameFilter::PbiQueryNameFilter(PbiQueryNameFilter&&) noexcept = default;
+
+PbiQueryNameFilter& PbiQueryNameFilter::operator=(PbiQueryNameFilter&&) noexcept = default;
 
 PbiQueryNameFilter::~PbiQueryNameFilter() = default;
 

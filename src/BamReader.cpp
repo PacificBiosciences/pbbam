@@ -118,6 +118,10 @@ BamReader::BamReader(std::string fn)
 
 BamReader::BamReader(BamFile bamFile) : BamReader{bamFile.Filename()} {}
 
+BamReader::BamReader(BamReader&&) noexcept = default;
+
+BamReader& BamReader::operator=(BamReader&&) noexcept = default;
+
 BamReader::~BamReader() = default;
 
 BGZF* BamReader::Bgzf() const { return d_->handle_.File->fp.bgzf; }

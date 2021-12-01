@@ -37,6 +37,8 @@ public:
     /// maybe filtered, from DataSet input
     ZmwReadStitcher(const DataSet& dataset);
 
+    ZmwReadStitcher(ZmwReadStitcher&&) noexcept;
+    ZmwReadStitcher& operator=(ZmwReadStitcher&&) noexcept;
     ~ZmwReadStitcher();
 
     /// \}

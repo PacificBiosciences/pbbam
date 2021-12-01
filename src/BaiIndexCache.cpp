@@ -40,6 +40,10 @@ BaiIndexCacheData::BaiIndexCacheData(const std::string& bamFilename)
     }
 }
 
+BaiIndexCacheData::BaiIndexCacheData(BaiIndexCacheData&&) noexcept = default;
+
+BaiIndexCacheData& BaiIndexCacheData::operator=(BaiIndexCacheData&&) noexcept = default;
+
 BaiIndexCacheData::~BaiIndexCacheData() = default;
 
 hts_itr_t* BaiIndexCacheData::IteratorForInterval(const int32_t refId, const Data::Position start,

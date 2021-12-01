@@ -56,6 +56,8 @@ public:
                                const std::string& primaryBamFilePath,
                                const std::string& scrapsBamFilePath);
 
+    WhitelistedZmwReadStitcher(WhitelistedZmwReadStitcher&&) noexcept;
+    WhitelistedZmwReadStitcher& operator=(WhitelistedZmwReadStitcher&&) noexcept;
     ~WhitelistedZmwReadStitcher();
 
     /// \}

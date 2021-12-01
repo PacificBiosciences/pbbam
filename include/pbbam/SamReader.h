@@ -28,7 +28,9 @@ public:
     ///
     explicit SamReader(std::string fn);
 
-    virtual ~SamReader();
+    SamReader(SamReader&&) noexcept;
+    SamReader& operator=(SamReader&&) noexcept;
+    ~SamReader() override;
 
 public:
     /// \returns SAM filename
@@ -50,7 +52,7 @@ public:
     /// \throw std::runtime_error if failed to read from file (e.g. possible
     ///        truncated or corrupted file).
     ///
-    bool GetNext(BamRecord& record);
+    bool GetNext(BamRecord& record) override;
 
 private:
     class SamReaderPrivate;

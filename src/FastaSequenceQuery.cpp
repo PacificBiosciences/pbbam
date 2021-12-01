@@ -20,6 +20,10 @@ FastaSequenceQuery::FastaSequenceQuery(const DataSet& dataset)
 {
 }
 
+FastaSequenceQuery::FastaSequenceQuery(FastaSequenceQuery&&) noexcept = default;
+
+FastaSequenceQuery& FastaSequenceQuery::operator=(FastaSequenceQuery&&) noexcept = default;
+
 FastaSequenceQuery::~FastaSequenceQuery() = default;
 
 bool FastaSequenceQuery::GetNext(FastaSequence& seq) { return d_->reader_.GetNext(seq); }

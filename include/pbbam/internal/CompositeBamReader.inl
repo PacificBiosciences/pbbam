@@ -59,9 +59,15 @@ SortedCompositeBamReader<OrderByType>::SortedCompositeBamReader(std::vector<BamF
 }
 
 template <typename OrderByType>
-SortedCompositeBamReader<OrderByType>::~SortedCompositeBamReader()
-{
-}
+SortedCompositeBamReader<OrderByType>::SortedCompositeBamReader(
+    SortedCompositeBamReader&&) noexcept = default;
+
+template <typename OrderByType>
+SortedCompositeBamReader<OrderByType>& SortedCompositeBamReader<OrderByType>::operator=(
+    SortedCompositeBamReader&&) noexcept = default;
+
+template <typename OrderByType>
+SortedCompositeBamReader<OrderByType>::~SortedCompositeBamReader() = default;
 
 template <typename OrderByType>
 bool SortedCompositeBamReader<OrderByType>::GetNext(BamRecord& record)

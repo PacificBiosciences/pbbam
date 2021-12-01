@@ -26,6 +26,8 @@ public:
     explicit BaiIndexCacheData(const BamFile& bamFile);
     explicit BaiIndexCacheData(const std::string& bamFilename);
 
+    BaiIndexCacheData(BaiIndexCacheData&&) noexcept;
+    BaiIndexCacheData& operator=(BaiIndexCacheData&&) noexcept;
     ~BaiIndexCacheData();
 
     /// \note This is very much an internal method and should not be considered

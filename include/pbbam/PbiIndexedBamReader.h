@@ -78,6 +78,8 @@ public:
     PbiIndexedBamReader(BamFile bamFile);
     PbiIndexedBamReader(BamFile bamFile, const std::shared_ptr<PbiRawData>& index);
 
+    PbiIndexedBamReader(PbiIndexedBamReader&&) noexcept;
+    PbiIndexedBamReader& operator=(PbiIndexedBamReader&&) noexcept;
     ~PbiIndexedBamReader() override;
 
     /// \}

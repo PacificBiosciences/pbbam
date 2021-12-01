@@ -23,6 +23,9 @@ public:
     /// \{
 
     FastaSequenceQuery(const BAM::DataSet& dataset);
+
+    FastaSequenceQuery(FastaSequenceQuery&&) noexcept;
+    FastaSequenceQuery& operator=(FastaSequenceQuery&&) noexcept;
     ~FastaSequenceQuery() override;
 
     /// \}

@@ -50,6 +50,8 @@ public:
 
     PbiFilterQuery(const PbiFilter& filter, const DataSet& dataset, const PbiIndexCache& cache);
 
+    PbiFilterQuery(PbiFilterQuery&&) noexcept;
+    PbiFilterQuery& operator=(PbiFilterQuery&&) noexcept;
     ~PbiFilterQuery() override;
 
     /// \brief Main iteration point for record access.
