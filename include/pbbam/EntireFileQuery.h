@@ -38,6 +38,9 @@ public:
     ///         files.
     ///
     EntireFileQuery(const DataSet& dataset);
+
+    EntireFileQuery(EntireFileQuery&&) noexcept;
+    EntireFileQuery& operator=(EntireFileQuery&&) noexcept;
     ~EntireFileQuery() override;
 
 public:
