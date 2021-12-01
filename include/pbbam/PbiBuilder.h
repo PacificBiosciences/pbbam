@@ -121,6 +121,9 @@ public:
                const PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
                const size_t numThreads = 4);
 
+    PbiBuilder(PbiBuilder&&) noexcept;
+    PbiBuilder& operator=(PbiBuilder&&) noexcept;
+
     /// \brief Destroys builder, writing its data out to PBI file.
     ///
     ///
