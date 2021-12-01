@@ -79,7 +79,10 @@ public:
     ///         PBI files.
     ///
     ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset);
-    ~ZmwGroupQuery();
+
+    ZmwGroupQuery(ZmwGroupQuery&&) noexcept;
+    ZmwGroupQuery& operator=(ZmwGroupQuery&&) noexcept;
+    ~ZmwGroupQuery() override;
 
 public:
     /// \brief Main iteration point for record access.
