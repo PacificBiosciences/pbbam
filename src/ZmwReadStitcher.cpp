@@ -122,6 +122,10 @@ ZmwReadStitcher::ZmwReadStitcher(const DataSet& dataset)
 {
 }
 
+ZmwReadStitcher::ZmwReadStitcher(ZmwReadStitcher&&) noexcept = default;
+
+ZmwReadStitcher& ZmwReadStitcher::operator=(ZmwReadStitcher&&) noexcept = default;
+
 ZmwReadStitcher::~ZmwReadStitcher() = default;
 
 bool ZmwReadStitcher::HasNext() { return d_->HasNext(); }
