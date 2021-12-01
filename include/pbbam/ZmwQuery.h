@@ -37,7 +37,9 @@ public:
     ///
     ZmwQuery(std::vector<int32_t> zmwWhitelist, const DataSet& dataset);
 
-    ~ZmwQuery();
+    ZmwQuery(ZmwQuery&&) noexcept;
+    ZmwQuery& operator=(ZmwQuery&&) noexcept;
+    ~ZmwQuery() override;
 
     /// \brief Main iteration point for record access.
     ///
