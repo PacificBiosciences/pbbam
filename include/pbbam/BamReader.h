@@ -47,7 +47,9 @@ public:
     ///
     explicit BamReader(BamFile bamFile);
 
-    virtual ~BamReader();
+    BamReader(BamReader&&) noexcept;
+    BamReader& operator=(BamReader&&) noexcept;
+    ~BamReader() override;
 
     /// \}
 
@@ -83,7 +85,7 @@ public:
     /// \throws std::runtime_error if failed to read from file (e.g. possible
     ///         truncated or corrupted file).
     ///
-    bool GetNext(BamRecord& record);
+    bool GetNext(BamRecord& record) override;
 
     /// \brief Seeks to virtual offset in %BAM.
     ///
