@@ -171,6 +171,10 @@ PbiIndexedBamReader::PbiIndexedBamReader(BamFile bamFile, const std::shared_ptr<
 {
 }
 
+PbiIndexedBamReader::PbiIndexedBamReader(PbiIndexedBamReader&&) noexcept = default;
+
+PbiIndexedBamReader& PbiIndexedBamReader::operator=(PbiIndexedBamReader&&) noexcept = default;
+
 PbiIndexedBamReader::~PbiIndexedBamReader() = default;
 
 const BamFile& PbiIndexedBamReader::File() const { return d_->file_; }
