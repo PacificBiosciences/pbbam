@@ -164,6 +164,8 @@ const ChemistryTable& BuiltInChemistryTable()
         {{"101-894-200", "102-186-000", "5.0", "S/P5-C2/5.0-8M"}},
         // Sequel® II Binding Kit 2.2; Sequel II Sequencing Plate 3.0 (1 rxn), QC
         {{"101-894-200", "102-186-100", "5.0", "S/P5-C2/5.0-8M"}},
+        // Future PN placeholder; SequencingChemistry and SoftwareVersion need to be reviewed/updated prior to integration/release
+        {{"101-894-200", "102-118-800", "5.0", "S/P5-C2/5.0-8M"}},
     };
     // clang-format on
 
