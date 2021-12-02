@@ -46,7 +46,7 @@ public:
 
     void GetNext()
     {
-        interval_ = boost::none;
+        interval_.reset();
         std::string line;
         if (reader_->GetNext(line)) {
             interval_ = ParseInterval(std::move(line));

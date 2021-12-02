@@ -26,7 +26,7 @@ inline boost::optional<std::string> ScrapsFileId(const ExternalResource& resourc
             return childResource.ResourceId();
         }
     }
-    return boost::none;
+    return {};
 }
 
 inline StitchingSources SourcesFromDataset(const DataSet& dataset)
@@ -49,8 +49,8 @@ inline StitchingSources SourcesFromDataset(const DataSet& dataset)
 
         // if found, resolve paths & store
         if (primaryId && scrapsId) {
-            std::string primaryFn = dataset.ResolvePath(primaryId.get());
-            std::string scrapsFn = dataset.ResolvePath(scrapsId.get());
+            std::string primaryFn = dataset.ResolvePath(*primaryId);
+            std::string scrapsFn = dataset.ResolvePath(*scrapsId);
             sources.emplace_back(std::make_pair(primaryFn, scrapsFn));
         }
     }

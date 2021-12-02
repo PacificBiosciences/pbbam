@@ -96,8 +96,8 @@ TEST(VCF_VcfVariant, can_fetch_single_value_info_field)
 {
     const VcfVariant v{VcfVariantTests::BasicVariantText};
     const auto& value = v.InfoValue("SVTYPE");
-    EXPECT_TRUE(value.is_initialized());
-    EXPECT_EQ("INS", value.get());
+    EXPECT_TRUE(value);
+    EXPECT_EQ("INS", *value);
 }
 
 TEST(VCF_VcfVariant, can_add_single_value_info_field)
@@ -110,14 +110,14 @@ TEST(VCF_VcfVariant, can_add_single_value_info_field)
     v.AddInfoField(i);
 
     EXPECT_TRUE(v.HasInfoField("NEW"));
-    EXPECT_EQ("42", v.InfoValue("NEW").get());
+    EXPECT_EQ("42", *v.InfoValue("NEW"));
 }
 
 TEST(VCF_VcfVariant, can_fetch_multi_value_info_field)
 {
     const VcfVariant v{VcfVariantTests::BasicVariantText};
     const auto& values = v.InfoValues("MULTI");
-    EXPECT_TRUE(values.is_initialized());
+    EXPECT_TRUE(values);
     EXPECT_EQ(3, values->size());
     EXPECT_EQ("1", values->at(0));
     EXPECT_EQ("2", values->at(1));
@@ -128,14 +128,14 @@ TEST(VCF_VcfVariant, can_edit_single_value_info_field)
 {
     VcfVariant v{VcfVariantTests::BasicVariantText};
     auto value = v.InfoValue("SVTYPE");
-    EXPECT_TRUE(value.is_initialized());
-    EXPECT_EQ("INS", value.get());
+    EXPECT_TRUE(value);
+    EXPECT_EQ("INS", *value);
 
     v.InfoValue("SVTYPE", std::string{"FOO"});
 
     value = v.InfoValue("SVTYPE");
-    EXPECT_TRUE(value.is_initialized());
-    EXPECT_EQ("FOO", value.get());
+    EXPECT_TRUE(value);
+    EXPECT_EQ("FOO", *value);
 }
 
 TEST(VCF_VcfVariant, can_edit_multi_value_info_field)
@@ -143,7 +143,7 @@ TEST(VCF_VcfVariant, can_edit_multi_value_info_field)
     VcfVariant v{VcfVariantTests::BasicVariantText};
 
     auto values = v.InfoValues("MULTI");
-    EXPECT_TRUE(values.is_initialized());
+    EXPECT_TRUE(values);
     EXPECT_EQ(3, values->size());
     EXPECT_EQ("1", values->at(0));
     EXPECT_EQ("2", values->at(1));
@@ -153,7 +153,7 @@ TEST(VCF_VcfVariant, can_edit_multi_value_info_field)
     v.InfoValues("MULTI", newData);
 
     values = v.InfoValues("MULTI");
-    EXPECT_TRUE(values.is_initialized());
+    EXPECT_TRUE(values);
     EXPECT_EQ(3, values->size());
     EXPECT_EQ("42", values->at(0));
     EXPECT_EQ("42", values->at(1));
@@ -181,12 +181,12 @@ TEST(VCF_VcfVariant, can_remove_info_field)
     VcfVariant v{VcfVariantTests::BasicVariantText};
 
     EXPECT_TRUE(v.HasInfoField("SVLEN"));
-    EXPECT_EQ("INS", v.InfoValue("SVTYPE").get());
+    EXPECT_EQ("INS", *v.InfoValue("SVTYPE"));
 
     v.RemoveInfoField("SVLEN");
 
     EXPECT_FALSE(v.HasInfoField("SVLEN"));
-    EXPECT_EQ("INS", v.InfoValue("SVTYPE").get());
+    EXPECT_EQ("INS", *v.InfoValue("SVTYPE"));
 }
 
 TEST(VCF_VcfVariant, can_fetch_all_genotype_ids)
@@ -211,15 +211,15 @@ TEST(VCF_VcfVariant, can_fetch_single_value_genotype_field)
 {
     const VcfVariant v{VcfVariantTests::BasicVariantText};
     const auto& value = v.GenotypeValue(0, "AD");
-    EXPECT_TRUE(value.is_initialized());
-    EXPECT_EQ("2", value.get());
+    EXPECT_TRUE(value);
+    EXPECT_EQ("2", *value);
 }
 
 TEST(VCF_VcfVariant, can_fetch_multi_value_genotype_field)
 {
     const VcfVariant v{VcfVariantTests::BasicVariantText};
     const auto& values = v.GenotypeValues(0, "AC");
-    EXPECT_TRUE(values.is_initialized());
+    EXPECT_TRUE(values);
     ASSERT_EQ(2, values->size());
 }
 

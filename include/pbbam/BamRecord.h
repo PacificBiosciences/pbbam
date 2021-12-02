@@ -1380,6 +1380,29 @@ public:
                             const Data::Position refStart, const Data::Strand strand,
                             const Data::Cigar& cigar, const uint8_t mappingQuality);
 
+    /// Splits the (5mC) basemods `Mm` and `Ml` tags
+    struct SplitBasemods
+    {
+        std::vector<int32_t> LeadingSeparatingC;
+        std::vector<uint8_t> LeadingQuals;
+
+        std::vector<int32_t> RetainedSeparatingC;
+        std::vector<uint8_t> RetainedQuals;
+
+        std::vector<int32_t> TrailingSeparatingC;
+        std::vector<uint8_t> TrailingQuals;
+
+        int32_t PrefixLostBases{0};
+
+        static std::vector<int32_t> SplitBasemodsString(const std::string& str);
+
+        static std::string SeparatingCToString(const std::vector<int32_t>& vec);
+    };
+    static SplitBasemods ClipBasemodsTag(const std::string& seq,
+                                         const std::string& oldBasemodsString,
+                                         const std::vector<uint8_t>& basemodsQVs, size_t clipFrom,
+                                         size_t clipLength);
+
     /// Applies clipping to this record
     BamRecord& Clip(const ClipType clipType, const Data::Position start, const Data::Position end,
                     const bool exciseFlankingInserts = false);

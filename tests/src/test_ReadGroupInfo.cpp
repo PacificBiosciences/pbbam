@@ -251,8 +251,8 @@ TEST(BAM_ReadGroupInfo, can_determine_barcodes_from_barcoded_id_string)
     ASSERT_TRUE(barcodes);
     EXPECT_EQ(0, barcodes->first);
     EXPECT_EQ(1, barcodes->second);
-    EXPECT_EQ(0, rg.BarcodeForward().get());
-    EXPECT_EQ(1, rg.BarcodeReverse().get());
+    EXPECT_EQ(0, *rg.BarcodeForward());
+    EXPECT_EQ(1, *rg.BarcodeReverse());
 }
 
 TEST(BAM_ReadGroupInfo, can_determine_barcodes_from_id_string_and_barcode_pair)
@@ -265,8 +265,8 @@ TEST(BAM_ReadGroupInfo, can_determine_barcodes_from_id_string_and_barcode_pair)
     ASSERT_TRUE(barcodes);
     EXPECT_EQ(0, barcodes->first);
     EXPECT_EQ(1, barcodes->second);
-    EXPECT_EQ(0, rg.BarcodeForward().get());
-    EXPECT_EQ(1, rg.BarcodeReverse().get());
+    EXPECT_EQ(0, *rg.BarcodeForward());
+    EXPECT_EQ(1, *rg.BarcodeReverse());
 }
 
 TEST(BAM_ReadGroupInfo, returns_no_barcodes_from_non_barcoded_id)
@@ -278,15 +278,15 @@ TEST(BAM_ReadGroupInfo, returns_no_barcodes_from_non_barcoded_id)
 
         const auto barcodes = rg.Barcodes();
         EXPECT_FALSE(barcodes);
-        EXPECT_EQ(boost::none, rg.BarcodeForward());
-        EXPECT_EQ(boost::none, rg.BarcodeReverse());
+        EXPECT_FALSE(rg.BarcodeForward());
+        EXPECT_FALSE(rg.BarcodeReverse());
     }
     {   // no '/' found
         const ReadGroupInfo rg{"00082ba1.0--1"};
         const auto barcodes = rg.Barcodes();
         EXPECT_FALSE(barcodes);
-        EXPECT_EQ(boost::none, rg.BarcodeForward());
-        EXPECT_EQ(boost::none, rg.BarcodeReverse());
+        EXPECT_FALSE(rg.BarcodeForward());
+        EXPECT_FALSE(rg.BarcodeReverse());
     }
 }
 
@@ -295,8 +295,8 @@ TEST(BAM_ReadGroupInfo, returns_no_barcodes_from_empty_id)
     const ReadGroupInfo rg{""};
     const auto barcodes = rg.Barcodes();
     EXPECT_FALSE(barcodes);
-    EXPECT_EQ(boost::none, rg.BarcodeForward());
-    EXPECT_EQ(boost::none, rg.BarcodeReverse());
+    EXPECT_FALSE(rg.BarcodeForward());
+    EXPECT_FALSE(rg.BarcodeReverse());
 }
 
 TEST(BAM_ReadGroupInfo, throws_on_malformatted_barcoded_ids)
