@@ -80,6 +80,10 @@ static const std::string token_BC{"BarcodeCount"};
 static const std::string token_BM{"BarcodeMode"};
 static const std::string token_BQ{"BarcodeQuality"};
 
+static const std::string token_ST{"STRAND"};
+static const std::string strand_FWD{"Forward"};
+static const std::string strand_REV{"Reverse"};
+
 static const std::string codec_RAW{"Frames"};
 static const std::string codec_V1{"CodecV1"};
 
@@ -290,22 +294,21 @@ ReadGroupInfo::ReadGroupInfo() : readType_{"UNKNOWN"} {}
 ReadGroupInfo::ReadGroupInfo(std::string id) : readType_{"UNKNOWN"} { Id(std::move(id)); }
 
 ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType)
-    : ReadGroupInfo{ReadGroupInfoConfig{
-          std::move(movieName), std::move(readType), PlatformModelType::SEQUEL, {}}}
+    : ReadGroupInfo{
+          ReadGroupInfoConfig{std::move(movieName), std::move(readType), PlatformModelType::SEQUEL}}
 {
 }
 
 ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
                              std::pair<uint16_t, uint16_t> barcodes)
-    : ReadGroupInfo{ReadGroupInfoConfig{
-          std::move(movieName), std::move(readType), PlatformModelType::SEQUEL, std::move(barcodes),
-      }}
+    : ReadGroupInfo{ReadGroupInfoConfig{std::move(movieName), std::move(readType),
+                                        PlatformModelType::SEQUEL, std::move(barcodes)}}
 {
 }
 
 ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
                              PlatformModelType platform)
-    : ReadGroupInfo{ReadGroupInfoConfig{std::move(movieName), std::move(readType), platform, {}}}
+    : ReadGroupInfo{ReadGroupInfoConfig{std::move(movieName), std::move(readType), platform}}
 {
 }
 
@@ -317,13 +320,13 @@ ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
 }
 
 ReadGroupInfo::ReadGroupInfo(ReadGroupInfoConfig config)
-    : movieName_{config.MovieName}, readType_{config.ReadType}
+    : movieName_{config.MovieName}, readType_{config.ReadType}, strand_{config.Strand}
 {
     if (config.Barcodes) {
-        Id(MakeReadGroupId(config.MovieName, config.ReadType, *config.Barcodes));
+        Id(MakeReadGroupId(config.MovieName, config.ReadType, *config.Barcodes, config.Strand));
         barcodes_ = std::move(config.Barcodes);
     } else {
-        Id(MakeReadGroupId(config.MovieName, config.ReadType));
+        Id(MakeReadGroupId(config.MovieName, config.ReadType, config.Strand));
     }
     if (config.Platform) {
         platformModel_ = *config.Platform;
@@ -536,6 +539,25 @@ void ReadGroupInfo::DecodeBarcodeKey(const std::string& key, std::string value)
     }
 }
 
+void ReadGroupInfo::DecodeStrand(std::string value)
+{
+    if (value == strand_FWD) {
+        strand_ = Data::Strand::FORWARD;
+    } else {
+        assert(value == strand_REV);
+        strand_ = Data::Strand::REVERSE;
+    }
+}
+
+std::string ReadGroupInfo::EncodeStrand(Data::Strand strand) const
+{
+    if (strand == Data::Strand::FORWARD) {
+        return strand_FWD;
+    }
+    assert(strand == Data::Strand::REVERSE);
+    return strand_REV;
+}
+
 void ReadGroupInfo::DecodeFrameCodecKey(const std::string& key, std::string value)
 {
     const auto keyParts = Split(key, ':');
@@ -593,6 +615,10 @@ void ReadGroupInfo::DecodeSamDescription(const std::string& description)
         } else if (IsLikelyBarcodeKey(key)) {
             DecodeBarcodeKey(key, std::move(value));
 
+            // strand
+        } else if (key == token_ST) {
+            DecodeStrand(std::move(value));
+
             // frame codecs
         } else {
             DecodeFrameCodecKey(key, std::move(value));
@@ -649,6 +675,10 @@ std::string ReadGroupInfo::EncodeSamDescription() const
                                       BarcodeModeName(barcodeMode_) + SEP + token_BQ + EQ +
                                       BarcodeQualityName(barcodeQuality_)};
         result.append(barcodeData);
+    }
+
+    if (strand_) {
+        result.append(SEP + token_ST + EQ + EncodeStrand(*strand_));
     }
 
     return result;
@@ -967,6 +997,14 @@ ReadGroupInfo& ReadGroupInfo::SequencingKit(std::string kitNumber)
     return *this;
 }
 
+boost::optional<Data::Strand> ReadGroupInfo::Strand() const { return strand_; }
+
+ReadGroupInfo& ReadGroupInfo::Strand(Data::Strand strand)
+{
+    strand_ = std::move(strand);
+    return *this;
+}
+
 std::string ReadGroupInfo::ToSam(const ReadGroupInfo& rg) { return rg.ToSam(); }
 
 std::string ReadGroupInfo::ToSam() const
@@ -1019,24 +1057,35 @@ std::string ReadGroupInfo::ToSam() const
 
 // ---------------------------------------------------------
 
-std::string MakeReadGroupId(const std::string& movieName, const std::string& readType)
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
+                            const boost::optional<Data::Strand> strand)
 {
-    return MD5Hash(movieName + "//" + readType).substr(0, 8);
+    std::string content{movieName + "//" + readType};
+    if (strand) {
+        if (strand == Data::Strand::FORWARD) {
+            content += "//fwd";
+        } else if (strand == Data::Strand::REVERSE) {
+            content += "//rev";
+        }
+    }
+    return MD5Hash(content).substr(0, 8);
 }
 
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
-                            const std::string& barcodeString)
+                            const std::string& barcodeString,
+                            const boost::optional<Data::Strand> strand)
 {
-    const std::string baseId{MakeReadGroupId(movieName, readType)};
+    const std::string baseId{MakeReadGroupId(movieName, readType, strand)};
     return baseId + "/" + barcodeString;
 }
 
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
-                            const std::pair<int16_t, int16_t>& barcodes)
+                            const std::pair<int16_t, int16_t>& barcodes,
+                            const boost::optional<Data::Strand> strand)
 {
     const std::string barcodeString{std::to_string(barcodes.first) + "--" +
                                     std::to_string(barcodes.second)};
-    return MakeReadGroupId(movieName, readType, barcodeString);
+    return MakeReadGroupId(movieName, readType, barcodeString, strand);
 }
 
 std::string MakeReadGroupId(const ReadGroupInfo& readGroup)
@@ -1046,9 +1095,9 @@ std::string MakeReadGroupId(const ReadGroupInfo& readGroup)
         const int16_t bcFor = barcodes->first;
         const int16_t bcRev = barcodes->second;
         return MakeReadGroupId(readGroup.MovieName(), readGroup.ReadType(),
-                               std::make_pair(bcFor, bcRev));
+                               std::make_pair(bcFor, bcRev), readGroup.Strand());
     } else {
-        return MakeReadGroupId(readGroup.MovieName(), readGroup.ReadType());
+        return MakeReadGroupId(readGroup.MovieName(), readGroup.ReadType(), readGroup.Strand());
     }
 }
 
