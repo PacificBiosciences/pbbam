@@ -91,6 +91,16 @@ enum class PlatformModelType
     SEQUELII
 };
 
+/// \brief Aggregate to simplify ReadGroupInfo constructor.
+///
+struct ReadGroupInfoConfig
+{
+    std::string MovieName;
+    std::string ReadType;
+    boost::optional<PlatformModelType> Platform;
+    boost::optional<std::pair<uint16_t, uint16_t>> Barcodes;
+};
+
 /// \brief The ReadGroupInfo class represents a read group entry (\@RG) in the
 ///        SAM header.
 ///
@@ -216,6 +226,15 @@ public:
     ///
     ReadGroupInfo(std::string movieName, std::string readType, PlatformModelType platform,
                   std::pair<uint16_t, uint16_t> barcodes);
+
+    /// \brief Creates a read group info object from a ReadGroupInfoConfig
+    ///
+    /// \param[in] config       aggregate that contains all information to
+    ///                         create a ReadGroupInfo
+    ///
+    /// \sa RecordType
+    ///
+    ReadGroupInfo(ReadGroupInfoConfig config);
 
     /// \}
 

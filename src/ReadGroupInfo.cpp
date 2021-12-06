@@ -290,31 +290,44 @@ ReadGroupInfo::ReadGroupInfo() : readType_{"UNKNOWN"} {}
 ReadGroupInfo::ReadGroupInfo(std::string id) : readType_{"UNKNOWN"} { Id(std::move(id)); }
 
 ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType)
-    : ReadGroupInfo{std::move(movieName), std::move(readType), PlatformModelType::SEQUEL}
+    : ReadGroupInfo{ReadGroupInfoConfig{
+          std::move(movieName), std::move(readType), PlatformModelType::SEQUEL, {}}}
 {
 }
 
 ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
                              std::pair<uint16_t, uint16_t> barcodes)
-    : ReadGroupInfo{std::move(movieName), std::move(readType), PlatformModelType::SEQUEL,
-                    std::move(barcodes)}
+    : ReadGroupInfo{ReadGroupInfoConfig{
+          std::move(movieName), std::move(readType), PlatformModelType::SEQUEL, std::move(barcodes),
+      }}
 {
 }
 
 ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
                              PlatformModelType platform)
-    : platformModel_{std::move(platform)}
+    : ReadGroupInfo{ReadGroupInfoConfig{std::move(movieName), std::move(readType), platform, {}}}
 {
-    Id(MakeReadGroupId(movieName, readType));
-    movieName_ = std::move(movieName);
-    readType_ = std::move(readType);
 }
 
 ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
                              PlatformModelType platform, std::pair<uint16_t, uint16_t> barcodes)
-    : ReadGroupInfo{MakeReadGroupId(movieName, readType), std::move(barcodes)}
+    : ReadGroupInfo{ReadGroupInfoConfig{std::move(movieName), std::move(readType), platform,
+                                        std::move(barcodes)}}
 {
-    platformModel_ = std::move(platform);
+}
+
+ReadGroupInfo::ReadGroupInfo(ReadGroupInfoConfig config)
+    : movieName_{config.MovieName}, readType_{config.ReadType}
+{
+    if (config.Barcodes) {
+        Id(MakeReadGroupId(config.MovieName, config.ReadType, *config.Barcodes));
+        barcodes_ = std::move(config.Barcodes);
+    } else {
+        Id(MakeReadGroupId(config.MovieName, config.ReadType));
+    }
+    if (config.Platform) {
+        platformModel_ = *config.Platform;
+    }
 }
 
 bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const noexcept
