@@ -81,8 +81,8 @@ static const std::string token_BM{"BarcodeMode"};
 static const std::string token_BQ{"BarcodeQuality"};
 
 static const std::string token_ST{"STRAND"};
-static const std::string strand_FWD{"Forward"};
-static const std::string strand_REV{"Reverse"};
+static const std::string strand_FWD{"FORWARD"};
+static const std::string strand_REV{"REVERSE"};
 
 static const std::string codec_RAW{"Frames"};
 static const std::string codec_V1{"CodecV1"};
