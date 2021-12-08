@@ -2,9 +2,26 @@
 
 #include <pbbam/IndexedBamWriter.h>
 
-#include <sys/stat.h>
+#include <pbbam/BamHeader.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/BamRecordImpl.h>
+#include <pbbam/BamWriter.h>
+#include <pbbam/Deleters.h>
+#include <pbbam/PbiRawData.h>
+#include <pbbam/RecordType.h>
+#include <pbbam/Validator.h>
+#include "ErrnoReason.h"
+#include "FileProducer.h"
+#include "MemoryUtils.h"
+#include "PbiBuilderBase.h"
 
-#include <cstdint>
+#include <pbcopper/utility/Deleters.h>
+
+#include <boost/numeric/conversion/cast.hpp>
+
+#include <htslib/bgzf.h>
+#include <htslib/hfile.h>
+#include <htslib/hts.h>
 
 #include <array>
 #include <atomic>
@@ -16,25 +33,9 @@
 #include <tuple>
 #include <type_traits>
 
-#include <htslib/bgzf.h>
-#include <htslib/hfile.h>
-#include <htslib/hts.h>
-#include <pbcopper/utility/Deleters.h>
-#include <boost/numeric/conversion/cast.hpp>
+#include <cstdint>
 
-#include <pbbam/BamHeader.h>
-#include <pbbam/BamRecord.h>
-#include <pbbam/BamRecordImpl.h>
-#include <pbbam/BamWriter.h>
-#include <pbbam/Deleters.h>
-#include <pbbam/PbiRawData.h>
-#include <pbbam/RecordType.h>
-#include <pbbam/Validator.h>
-
-#include "ErrnoReason.h"
-#include "FileProducer.h"
-#include "MemoryUtils.h"
-#include "PbiBuilderBase.h"
+#include <sys/stat.h>
 
 namespace PacBio {
 namespace BAM {

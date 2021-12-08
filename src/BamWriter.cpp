@@ -2,9 +2,17 @@
 
 #include <pbbam/BamWriter.h>
 
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
+#include <pbbam/BamFile.h>
+#include <pbbam/Deleters.h>
+#include <pbbam/Validator.h>
+#include "Autovalidate.h"
+#include "ErrnoReason.h"
+#include "FileProducer.h"
+#include "MemoryUtils.h"
+
+#include <htslib/bgzf.h>
+#include <htslib/hfile.h>
+#include <htslib/hts.h>
 
 #include <sstream>
 #include <stdexcept>
@@ -12,18 +20,9 @@
 #include <tuple>
 #include <type_traits>
 
-#include <htslib/bgzf.h>
-#include <htslib/hfile.h>
-#include <htslib/hts.h>
-
-#include <pbbam/BamFile.h>
-#include <pbbam/Deleters.h>
-#include <pbbam/Validator.h>
-
-#include "Autovalidate.h"
-#include "ErrnoReason.h"
-#include "FileProducer.h"
-#include "MemoryUtils.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

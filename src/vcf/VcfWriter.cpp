@@ -2,14 +2,13 @@
 
 #include <pbbam/vcf/VcfWriter.h>
 
-#include <fstream>
-#include <type_traits>
-
 #include <pbbam/vcf/VcfFormat.h>
 #include <pbbam/vcf/VcfHeader.h>
 #include <pbbam/vcf/VcfVariant.h>
-
 #include "../FileProducer.h"
+
+#include <fstream>
+#include <type_traits>
 
 namespace PacBio {
 namespace VCF {

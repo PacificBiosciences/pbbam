@@ -2,12 +2,12 @@
 
 #include "MemoryUtils.h"
 
-#include <cstdlib>
-#include <cstring>
+#include <pbbam/Deleters.h>
 
 #include <string>
 
-#include <pbbam/Deleters.h>
+#include <cstdlib>
+#include <cstring>
 
 namespace PacBio {
 namespace BAM {

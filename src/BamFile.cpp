@@ -2,24 +2,23 @@
 
 #include <pbbam/BamFile.h>
 
-#include <sys/stat.h>
+#include <pbbam/Deleters.h>
+#include <pbbam/PbiFile.h>
+#include "Autovalidate.h"
+#include "ErrnoReason.h"
+#include "FileUtils.h"
+#include "MemoryUtils.h"
 
-#include <cassert>
-#include <cstdint>
+#include <htslib/sam.h>
 
 #include <memory>
 #include <sstream>
 #include <string>
 
-#include <htslib/sam.h>
+#include <cassert>
+#include <cstdint>
 
-#include <pbbam/Deleters.h>
-#include <pbbam/PbiFile.h>
-
-#include "Autovalidate.h"
-#include "ErrnoReason.h"
-#include "FileUtils.h"
-#include "MemoryUtils.h"
+#include <sys/stat.h>
 
 namespace PacBio {
 namespace BAM {

@@ -3,22 +3,22 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
-#include <cstdint>
-
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
-
-#include <htslib/sam.h>
-
 #include <pbbam/BamRecordTag.h>
 #include <pbbam/Cigar.h>
 #include <pbbam/Deleters.h>
 #include <pbbam/Position.h>
 #include <pbbam/QualityValues.h>
 #include <pbbam/TagCollection.h>
+
+#include <htslib/sam.h>
+
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

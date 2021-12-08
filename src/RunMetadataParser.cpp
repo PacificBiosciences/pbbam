@@ -2,13 +2,13 @@
 
 #include "RunMetadataParser.h"
 
-#include <fstream>
-#include <istream>
-#include <stdexcept>
+#include <pbcopper/utility/StringUtils.h>
 
 #include <boost/algorithm/string.hpp>
 
-#include <pbcopper/utility/StringUtils.h>
+#include <fstream>
+#include <istream>
+#include <stdexcept>
 
 namespace PacBio {
 namespace BAM {

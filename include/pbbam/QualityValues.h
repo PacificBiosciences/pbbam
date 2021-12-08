@@ -3,9 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <pbcopper/data/QualityValues.h>
-
 #include <pbbam/QualityValue.h>
+
+#include <pbcopper/data/QualityValues.h>
 
 namespace PacBio {
 namespace BAM {

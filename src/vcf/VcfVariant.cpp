@@ -2,15 +2,14 @@
 
 #include <pbbam/vcf/VcfVariant.h>
 
-#include <cassert>
-#include <cmath>
+#include <pbbam/StringUtilities.h>
+#include <pbbam/vcf/VcfFormat.h>
+#include "VcfFormatException.h"
 
 #include <type_traits>
 
-#include <pbbam/StringUtilities.h>
-#include <pbbam/vcf/VcfFormat.h>
-
-#include "VcfFormatException.h"
+#include <cassert>
+#include <cmath>
 
 namespace PacBio {
 namespace VCF {

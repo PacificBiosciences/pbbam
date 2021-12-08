@@ -3,10 +3,10 @@
 
 #include <pbbam/Config.h>
 
-#include <string>
-
 #include <pbbam/FastqSequence.h>
 #include <pbbam/IRecordWriter.h>
+
+#include <string>
 
 namespace PacBio {
 namespace BAM {

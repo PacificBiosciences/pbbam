@@ -3,14 +3,14 @@
 
 #include <pbbam/Config.h>
 
+#include <pbbam/FastaSequence.h>
+
 #include <functional>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-
-#include <pbbam/FastaSequence.h>
 
 namespace PacBio {
 namespace BAM {

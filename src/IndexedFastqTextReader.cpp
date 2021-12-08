@@ -2,16 +2,16 @@
 
 #include "IndexedFastqTextReader.h"
 
-#include <unistd.h>
-
-#include <cassert>
-#include <cstdio>
+#include "ErrnoReason.h"
 
 #include <memory>
 #include <sstream>
 #include <stdexcept>
 
-#include "ErrnoReason.h"
+#include <cassert>
+#include <cstdio>
+
+#include <unistd.h>
 
 namespace PacBio {
 namespace BAM {

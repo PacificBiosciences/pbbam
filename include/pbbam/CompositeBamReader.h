@@ -3,13 +3,6 @@
 
 #include <pbbam/Config.h>
 
-#include <deque>
-#include <functional>
-#include <memory>
-#include <set>
-#include <string>
-#include <vector>
-
 #include <pbbam/BaiIndexCache.h>
 #include <pbbam/BaiIndexedBamReader.h>
 #include <pbbam/BamFile.h>
@@ -19,6 +12,13 @@
 #include <pbbam/DataSet.h>
 #include <pbbam/GenomicInterval.h>
 #include <pbbam/PbiIndexedBamReader.h>
+
+#include <deque>
+#include <functional>
+#include <memory>
+#include <set>
+#include <string>
+#include <vector>
 
 namespace PacBio {
 namespace BAM {

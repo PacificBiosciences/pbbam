@@ -3,12 +3,12 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
-#include <cstdint>
+#include <pbbam/PbiBuilder.h>
 
 #include <string>
 
-#include <pbbam/PbiBuilder.h>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

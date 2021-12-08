@@ -3,10 +3,10 @@
 
 #include <pbbam/Config.h>
 
+#include <pbbam/internal/QueryBase.h>
+
 #include <memory>
 #include <string>
-
-#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace BAM {

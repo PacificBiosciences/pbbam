@@ -3,13 +3,12 @@
 
 #include <pbbam/Config.h>
 
+#include <pbbam/RunMetadata.h>
+#include "pugixml/pugixml.hpp"
+
 #include <iosfwd>
 #include <map>
 #include <string>
-
-#include <pbbam/RunMetadata.h>
-
-#include "pugixml/pugixml.hpp"
 
 namespace PacBio {
 namespace BAM {

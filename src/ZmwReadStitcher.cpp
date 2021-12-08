@@ -2,17 +2,16 @@
 
 #include <pbbam/virtual/ZmwReadStitcher.h>
 
-#include <deque>
-#include <stdexcept>
-#include <utility>
-
 #include <pbbam/DataSet.h>
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/PbiFilter.h>
 #include <pbbam/PbiFilterQuery.h>
-
 #include "VirtualStitching.h"
 #include "VirtualZmwReader.h"
+
+#include <deque>
+#include <stdexcept>
+#include <utility>
 
 namespace PacBio {
 namespace BAM {

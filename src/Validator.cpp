@@ -2,24 +2,23 @@
 
 #include <pbbam/Validator.h>
 
-#include <cstddef>
+#include <pbbam/BamFile.h>
+#include <pbbam/BamHeader.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/EntireFileQuery.h>
+#include <pbbam/ReadGroupInfo.h>
+#include "ValidationErrors.h"
+#include "Version.h"
+
+#include <boost/algorithm/string.hpp>
+#include <boost/core/ignore_unused.hpp>
 
 #include <map>
 #include <set>
 #include <stdexcept>
 #include <vector>
 
-#include <boost/algorithm/string.hpp>
-#include <boost/core/ignore_unused.hpp>
-
-#include <pbbam/BamFile.h>
-#include <pbbam/BamHeader.h>
-#include <pbbam/BamRecord.h>
-#include <pbbam/EntireFileQuery.h>
-#include <pbbam/ReadGroupInfo.h>
-
-#include "ValidationErrors.h"
-#include "Version.h"
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

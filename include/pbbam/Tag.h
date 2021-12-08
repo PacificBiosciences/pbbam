@@ -3,13 +3,13 @@
 
 #include <pbbam/Config.h>
 
-#include <cstdint>
+#include <boost/variant.hpp>
 
 #include <iosfwd>
 #include <string>
 #include <vector>
 
-#include <boost/variant.hpp>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

@@ -3,16 +3,15 @@
 
 #include <pbbam/Config.h>
 
+#include <pbbam/DataSet.h>
+#include <pbbam/PbiFilter.h>
+#include "VirtualStitching.h"
+#include "VirtualZmwReader.h"
+
 #include <deque>
 #include <memory>
 #include <string>
 #include <utility>
-
-#include <pbbam/DataSet.h>
-#include <pbbam/PbiFilter.h>
-
-#include "VirtualStitching.h"
-#include "VirtualZmwReader.h"
 
 namespace PacBio {
 namespace BAM {

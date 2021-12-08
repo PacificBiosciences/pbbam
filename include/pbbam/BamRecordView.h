@@ -3,9 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <cstdint>
-
 #include <pbbam/BamRecord.h>
+
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

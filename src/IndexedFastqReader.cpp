@@ -2,21 +2,20 @@
 
 #include <pbbam/IndexedFastqReader.h>
 
-#include <cassert>
+#include <pbbam/BamRecord.h>
+#include <pbbam/FaiIndex.h>
+#include <pbbam/FormatUtils.h>
+#include <pbbam/GenomicInterval.h>
+#include "IndexedFastqBgzfReader.h"
+#include "IndexedFastqReaderImpl.h"
+#include "IndexedFastqTextReader.h"
+#include "SequenceUtils.h"
 
 #include <sstream>
 #include <stdexcept>
 #include <utility>
 
-#include <pbbam/BamRecord.h>
-#include <pbbam/FaiIndex.h>
-#include <pbbam/FormatUtils.h>
-#include <pbbam/GenomicInterval.h>
-
-#include "IndexedFastqBgzfReader.h"
-#include "IndexedFastqReaderImpl.h"
-#include "IndexedFastqTextReader.h"
-#include "SequenceUtils.h"
+#include <cassert>
 
 namespace PacBio {
 namespace BAM {

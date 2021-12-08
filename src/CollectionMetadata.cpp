@@ -2,16 +2,16 @@
 
 #include <pbbam/CollectionMetadata.h>
 
+#include "DataSetUtils.h"
+#include "RunMetadataParser.h"
+#include "pugixml/pugixml.hpp"
+
+#include <boost/algorithm/string/predicate.hpp>
+
 #include <sstream>
 #include <stdexcept>
 #include <tuple>
 #include <vector>
-
-#include <boost/algorithm/string/predicate.hpp>
-
-#include "DataSetUtils.h"
-#include "RunMetadataParser.h"
-#include "pugixml/pugixml.hpp"
 
 namespace PacBio {
 namespace BAM {

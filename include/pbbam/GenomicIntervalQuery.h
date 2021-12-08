@@ -3,14 +3,14 @@
 
 #include <pbbam/Config.h>
 
-#include <memory>
-
-#include <pbcopper/data/GenomicInterval.h>
-
 #include <pbbam/BaiIndexCache.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/DataSet.h>
 #include <pbbam/internal/QueryBase.h>
+
+#include <pbcopper/data/GenomicInterval.h>
+
+#include <memory>
 
 namespace PacBio {
 namespace BAM {

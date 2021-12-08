@@ -3,17 +3,17 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
-#include <cstdint>
-
-#include <string>
-
-#include <htslib/sam.h>
-
 #include <pbbam/BamFile.h>
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/IRecordWriter.h>
+
+#include <htslib/sam.h>
+
+#include <string>
+
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

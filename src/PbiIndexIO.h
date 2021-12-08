@@ -3,22 +3,22 @@
 
 #include <pbbam/Config.h>
 
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
+#include <pbbam/BamFile.h>
+#include <pbbam/DataSet.h>
+#include <pbbam/PbiFile.h>
+#include <pbbam/PbiRawData.h>
+
+#include <htslib/bgzf.h>
+#include <htslib/sam.h>
 
 #include <memory>
 #include <string>
 #include <tuple>
 #include <vector>
 
-#include <htslib/bgzf.h>
-#include <htslib/sam.h>
-
-#include <pbbam/BamFile.h>
-#include <pbbam/DataSet.h>
-#include <pbbam/PbiFile.h>
-#include <pbbam/PbiRawData.h>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

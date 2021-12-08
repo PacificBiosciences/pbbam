@@ -3,12 +3,12 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
-
 #include <limits>
 #include <map>
 #include <string>
 #include <vector>
+
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

@@ -3,12 +3,12 @@
 
 #include <pbbam/Config.h>
 
+#include <pbbam/FastqSequence.h>
+#include <pbbam/internal/QueryBase.h>
+
 #include <memory>
 #include <string>
 #include <vector>
-
-#include <pbbam/FastqSequence.h>
-#include <pbbam/internal/QueryBase.h>
 
 namespace PacBio {
 namespace BAM {

@@ -3,11 +3,11 @@
 
 #include <pbbam/Config.h>
 
-#include <cstdint>
+#include <pbbam/internal/QueryBase.h>
 
 #include <vector>
 
-#include <pbbam/internal/QueryBase.h>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

@@ -3,10 +3,10 @@
 
 #include <pbbam/Config.h>
 
-#include <vector>
-
 #include <pbbam/PbiFilter.h>
 #include <pbbam/internal/QueryBase.h>
+
+#include <vector>
 
 namespace PacBio {
 namespace BAM {

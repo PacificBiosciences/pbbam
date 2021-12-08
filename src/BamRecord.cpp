@@ -2,10 +2,22 @@
 
 #include <pbbam/BamRecord.h>
 
-#include <cassert>
-#include <cctype>
-#include <cstddef>
-#include <cstdint>
+#include <pbbam/StringUtilities.h>
+#include <pbbam/ZmwTypeMap.h>
+#include <pbbam/virtual/VirtualRegionTypeMap.h>
+#include "BamRecordTags.h"
+#include "MemoryUtils.h"
+#include "Pulse2BaseCache.h"
+#include "SequenceUtils.h"
+
+#include <pbcopper/data/Clipping.h>
+#include <pbcopper/data/FrameEncoders.h>
+#include <pbcopper/data/internal/ClippingImpl.h>
+
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/numeric/conversion/cast.hpp>
+
+#include <htslib/sam.h>
 
 #include <algorithm>
 #include <iterator>
@@ -13,22 +25,10 @@
 #include <stdexcept>
 #include <utility>
 
-#include <htslib/sam.h>
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/numeric/conversion/cast.hpp>
-
-#include <pbcopper/data/Clipping.h>
-#include <pbcopper/data/FrameEncoders.h>
-#include <pbcopper/data/internal/ClippingImpl.h>
-
-#include <pbbam/StringUtilities.h>
-#include <pbbam/ZmwTypeMap.h>
-#include <pbbam/virtual/VirtualRegionTypeMap.h>
-
-#include "BamRecordTags.h"
-#include "MemoryUtils.h"
-#include "Pulse2BaseCache.h"
-#include "SequenceUtils.h"
+#include <cassert>
+#include <cctype>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

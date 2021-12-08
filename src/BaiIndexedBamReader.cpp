@@ -2,16 +2,15 @@
 
 #include <pbbam/BaiIndexedBamReader.h>
 
-#include <cassert>
-#include <cstddef>
+#include <pbbam/BaiIndexCache.h>
+#include <pbbam/Deleters.h>
+#include "ErrnoReason.h"
 
 #include <sstream>
 #include <stdexcept>
 
-#include <pbbam/BaiIndexCache.h>
-#include <pbbam/Deleters.h>
-
-#include "ErrnoReason.h"
+#include <cassert>
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

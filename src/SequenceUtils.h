@@ -3,14 +3,14 @@
 
 #include <pbbam/Config.h>
 
-#include <cctype>
-#include <cstdint>
+#include <pbbam/StringUtilities.h>
 
 #include <algorithm>
 #include <array>
 #include <string>
 
-#include <pbbam/StringUtilities.h>
+#include <cctype>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

@@ -3,17 +3,17 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
+#include <pbbam/DataSet.h>
+#include <pbbam/PbiBasicTypes.h>
+#include <pbbam/PbiRawData.h>
+
+#include <boost/concept_check.hpp>
 
 #include <memory>
 #include <string>
 #include <tuple>
 
-#include <boost/concept_check.hpp>
-
-#include <pbbam/DataSet.h>
-#include <pbbam/PbiBasicTypes.h>
-#include <pbbam/PbiRawData.h>
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

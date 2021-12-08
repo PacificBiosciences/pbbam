@@ -3,10 +3,10 @@
 
 #include <pbbam/Config.h>
 
+#include <pbbam/FaiIndex.h>
+
 #include <string>
 #include <vector>
-
-#include <pbbam/FaiIndex.h>
 
 namespace PacBio {
 namespace BAM {

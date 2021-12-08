@@ -3,17 +3,17 @@
 
 #include <pbbam/Config.h>
 
-#include <cstdint>
-
-#include <memory>
-#include <string>
-
-#include <htslib/sam.h>
-
 #include <pbbam/BamFile.h>
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/internal/QueryBase.h>
+
+#include <htslib/sam.h>
+
+#include <memory>
+#include <string>
+
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

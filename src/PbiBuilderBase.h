@@ -3,9 +3,20 @@
 
 #include "PbbamInternalConfig.h"
 
-#include <cassert>
-#include <cctype>
-#include <cstddef>
+#include <pbbam/BamRecord.h>
+#include <pbbam/PbiRawData.h>
+#include "ErrnoReason.h"
+#include "FileProducer.h"
+#include "MemoryUtils.h"
+
+#include <pbcopper/data/Position.h>
+#include <pbcopper/utility/Deleters.h>
+
+#include <boost/numeric/conversion/cast.hpp>
+
+#include <htslib/bgzf.h>
+#include <htslib/hfile.h>
+#include <htslib/hts.h>
 
 #include <map>
 #include <sstream>
@@ -15,21 +26,9 @@
 #include <type_traits>
 #include <vector>
 
-#include <boost/numeric/conversion/cast.hpp>
-
-#include <htslib/bgzf.h>
-#include <htslib/hfile.h>
-#include <htslib/hts.h>
-
-#include <pbcopper/data/Position.h>
-#include <pbcopper/utility/Deleters.h>
-
-#include <pbbam/BamRecord.h>
-#include <pbbam/PbiRawData.h>
-
-#include "ErrnoReason.h"
-#include "FileProducer.h"
-#include "MemoryUtils.h"
+#include <cassert>
+#include <cctype>
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

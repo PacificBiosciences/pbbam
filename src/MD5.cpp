@@ -2,9 +2,9 @@
 
 #include <pbbam/MD5.h>
 
-#include <stdexcept>
-
 #include <htslib/hts.h>
+
+#include <stdexcept>
 
 namespace PacBio {
 namespace BAM {

@@ -2,10 +2,10 @@
 
 #include "VirtualZmwReader.h"
 
+#include <pbbam/ReadGroupInfo.h>
+
 #include <sstream>
 #include <stdexcept>
-
-#include <pbbam/ReadGroupInfo.h>
 
 namespace PacBio {
 namespace BAM {

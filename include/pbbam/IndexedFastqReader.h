@@ -3,7 +3,14 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
+#include <pbbam/BamRecord.h>
+#include <pbbam/FastqReader.h>
+#include <pbbam/Orientation.h>
+#include <pbbam/Position.h>
+#include <pbbam/QualityValues.h>
+#include <pbbam/internal/QueryBase.h>
+
+#include <pbcopper/data/GenomicInterval.h>
 
 #include <memory>
 #include <stdexcept>
@@ -11,14 +18,7 @@
 #include <utility>
 #include <vector>
 
-#include <pbcopper/data/GenomicInterval.h>
-
-#include <pbbam/BamRecord.h>
-#include <pbbam/FastqReader.h>
-#include <pbbam/Orientation.h>
-#include <pbbam/Position.h>
-#include <pbbam/QualityValues.h>
-#include <pbbam/internal/QueryBase.h>
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

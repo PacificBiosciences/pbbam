@@ -3,10 +3,10 @@
 
 #include <pbbam/Config.h>
 
+#include <pbbam/DataSetTypes.h>
+
 #include <iosfwd>
 #include <memory>
-
-#include <pbbam/DataSetTypes.h>
 
 namespace PacBio {
 namespace BAM {

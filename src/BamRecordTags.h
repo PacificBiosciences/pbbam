@@ -3,14 +3,14 @@
 
 #include <pbbam/Config.h>
 
-#include <cassert>
+#include <pbbam/BamRecord.h>
+#include <pbbam/BamRecordImpl.h>
+#include <pbbam/BamRecordTag.h>
 
 #include <string>
 #include <unordered_map>
 
-#include <pbbam/BamRecord.h>
-#include <pbbam/BamRecordImpl.h>
-#include <pbbam/BamRecordTag.h>
+#include <cassert>
 
 namespace PacBio {
 namespace BAM {

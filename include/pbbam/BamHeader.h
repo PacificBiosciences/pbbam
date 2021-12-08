@@ -3,16 +3,16 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
-#include <cstdint>
+#include <pbbam/ProgramInfo.h>
+#include <pbbam/ReadGroupInfo.h>
+#include <pbbam/SequenceInfo.h>
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <pbbam/ProgramInfo.h>
-#include <pbbam/ReadGroupInfo.h>
-#include <pbbam/SequenceInfo.h>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

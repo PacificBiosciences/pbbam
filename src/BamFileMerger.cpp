@@ -2,9 +2,6 @@
 
 #include <pbbam/BamFileMerger.h>
 
-#include <memory>
-#include <stdexcept>
-
 #include <pbbam/BamFile.h>
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamReader.h>
@@ -15,6 +12,9 @@
 #include <pbbam/IndexedBamWriter.h>
 #include <pbbam/PbiFilter.h>
 #include <pbbam/PbiIndexedBamReader.h>
+
+#include <memory>
+#include <stdexcept>
 
 namespace PacBio {
 namespace BAM {

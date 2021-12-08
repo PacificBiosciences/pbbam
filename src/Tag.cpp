@@ -2,13 +2,13 @@
 
 #include <pbbam/Tag.h>
 
-#include <ostream>
-#include <type_traits>
+#include <pbcopper/utility/Ssize.h>
 
 #include <boost/core/demangle.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
-#include <pbcopper/utility/Ssize.h>
+#include <ostream>
+#include <type_traits>
 
 namespace PacBio {
 namespace BAM {

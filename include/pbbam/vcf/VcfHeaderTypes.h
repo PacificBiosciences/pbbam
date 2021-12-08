@@ -3,11 +3,11 @@
 
 #include <pbbam/Config.h>
 
+#include <boost/optional.hpp>
+
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <boost/optional.hpp>
 
 namespace PacBio {
 namespace VCF {

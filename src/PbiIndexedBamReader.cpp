@@ -2,15 +2,15 @@
 
 #include <pbbam/PbiIndexedBamReader.h>
 
-#include <cstddef>
-#include <cstdint>
+#include "ErrnoReason.h"
+
+#include <htslib/bgzf.h>
 
 #include <sstream>
 #include <stdexcept>
 
-#include <htslib/bgzf.h>
-
-#include "ErrnoReason.h"
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

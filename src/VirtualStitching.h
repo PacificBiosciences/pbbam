@@ -3,13 +3,13 @@
 
 #include <pbbam/Config.h>
 
-#include <deque>
-#include <string>
-#include <utility>
+#include <pbbam/DataSet.h>
 
 #include <boost/optional.hpp>
 
-#include <pbbam/DataSet.h>
+#include <deque>
+#include <string>
+#include <utility>
 
 namespace PacBio {
 namespace BAM {

@@ -2,10 +2,10 @@
 
 #include <pbbam/Compare.h>
 
-#include <cstddef>
-
 #include <functional>
 #include <unordered_map>
+
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

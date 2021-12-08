@@ -3,14 +3,14 @@
 
 #include <pbbam/Config.h>
 
-#include <memory>
-
-#include <htslib/sam.h>
-
 #include <pbbam/BaiIndexCache.h>
 #include <pbbam/BamFile.h>
 #include <pbbam/BamReader.h>
 #include <pbbam/GenomicInterval.h>
+
+#include <htslib/sam.h>
+
+#include <memory>
 
 namespace PacBio {
 namespace BAM {

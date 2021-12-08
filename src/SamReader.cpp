@@ -2,20 +2,19 @@
 
 #include <pbbam/SamReader.h>
 
-#include <cassert>
-#include <cstdint>
-#include <cstdio>
-
-#include <sstream>
-#include <stdexcept>
+#include <pbbam/Deleters.h>
+#include "MemoryUtils.h"
 
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
 
-#include <pbbam/Deleters.h>
+#include <sstream>
+#include <stdexcept>
 
-#include "MemoryUtils.h"
+#include <cassert>
+#include <cstdint>
+#include <cstdio>
 
 namespace PacBio {
 namespace BAM {

@@ -3,13 +3,13 @@
 
 #include <pbbam/Config.h>
 
-#include <memory>
-#include <string>
+#include <pbbam/BamRecord.h>
+#include <pbbam/IndexedFastaReader.h>
 
 #include <pbcopper/data/Orientation.h>
 
-#include <pbbam/BamRecord.h>
-#include <pbbam/IndexedFastaReader.h>
+#include <memory>
+#include <string>
 
 namespace PacBio {
 namespace BAM {

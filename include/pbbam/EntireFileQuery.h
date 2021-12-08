@@ -3,9 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <memory>
-
 #include <pbbam/internal/QueryBase.h>
+
+#include <memory>
 
 namespace PacBio {
 namespace BAM {

@@ -2,6 +2,7 @@
 #define PBBAM_DATASETUTILS_H
 
 #include <pbbam/Config.h>
+
 #include <pbbam/DataSetTypes.h>
 
 namespace PacBio {
