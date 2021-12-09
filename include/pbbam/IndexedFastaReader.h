@@ -95,10 +95,9 @@ public:
     ///
     /// \throws std::runtime_error on failure to fetch sequence
     ///
-    std::string ReferenceSubsequence(
-        const BamRecord& bamRecord,
-        const Data::Orientation orientation = Data::Orientation::GENOMIC, const bool gapped = false,
-        const bool exciseSoftClips = false) const;
+    std::string ReferenceSubsequence(const BamRecord& bamRecord,
+                                     Data::Orientation orientation = Data::Orientation::GENOMIC,
+                                     bool gapped = false, bool exciseSoftClips = false) const;
 
     /// \}
 
@@ -110,7 +109,7 @@ public:
     bool HasSequence(const std::string& name) const;
 
     /// \returns the names of the sequence at a specific index in the FASTA file
-    std::string Name(const size_t idx) const;
+    std::string Name(size_t idx) const;
 
     /// \returns the names of all sequences stored in the FASTA file
     std::vector<std::string> Names() const;

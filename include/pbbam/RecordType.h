@@ -33,7 +33,7 @@ enum class RecordType
 ///
 /// \param[in] type
 ///
-bool IsCcsOrTranscript(const RecordType type);
+bool IsCcsOrTranscript(RecordType type);
 
 ///
 /// \brief Returns string representation of RecordType
@@ -42,7 +42,7 @@ bool IsCcsOrTranscript(const RecordType type);
 /// \return std::string
 /// \throws std::runtime_error if type is unrecognized
 ///
-std::string ToString(const RecordType type);
+std::string ToString(RecordType type);
 
 }  // namespace BAM
 }  // namespace PacBio

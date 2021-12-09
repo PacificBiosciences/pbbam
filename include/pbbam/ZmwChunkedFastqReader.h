@@ -29,7 +29,7 @@ public:
     /// Actual chunk count may be smaller than the requested number, if the input
     /// size is smaller.
     ///
-    ZmwChunkedFastqReader(const std::string& fn, const size_t numChunks);
+    ZmwChunkedFastqReader(const std::string& fn, size_t numChunks);
 
     ZmwChunkedFastqReader(ZmwChunkedFastqReader&&) noexcept;
     ZmwChunkedFastqReader& operator=(ZmwChunkedFastqReader&&) noexcept;

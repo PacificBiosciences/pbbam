@@ -484,7 +484,7 @@ public:
     ///
     /// \returns sequence string
     ///
-    std::string Sequence(const Data::Orientation orientation = Data::Orientation::NATIVE,
+    std::string Sequence(Data::Orientation orientation = Data::Orientation::NATIVE,
                          bool aligned = false, bool exciseSoftClips = false) const;
 
     /// \brief Fetches this record's SubstitutionTag values ("st" tag).
@@ -872,21 +872,21 @@ public:
     /// \param[in] holeNumber
     /// \returns reference to this record
     ///
-    BamRecord& HoleNumber(const int32_t holeNumber);
+    BamRecord& HoleNumber(int32_t holeNumber);
 
     /// \brief Sets this record's local context flags
     ///
     /// \param[in] flags
     /// \returns reference to this record
     ///
-    BamRecord& LocalContextFlags(const Data::LocalContextFlags flags);
+    BamRecord& LocalContextFlags(Data::LocalContextFlags flags);
 
     /// \brief Sets this record's "number of complete passes of the insert".
     ///
     /// \param[in] numPasses
     /// \returns reference to this record
     ///
-    BamRecord& NumPasses(const int32_t numPasses);
+    BamRecord& NumPasses(int32_t numPasses);
 
     /// \brief Sets this record's query end position.
     ///
@@ -895,14 +895,14 @@ public:
     /// \param[in] pos
     /// \returns reference to this record
     ///
-    BamRecord& QueryEnd(const Data::Position pos);
+    BamRecord& QueryEnd(Data::Position pos);
 
     /// \brief Sets this record's query end frame number
     ///
     /// \param[in] frame number
     /// \returns reference to this record
     ///
-    BamRecord& QueryEndFrameNumber(const int32_t frameNumber);
+    BamRecord& QueryEndFrameNumber(int32_t frameNumber);
 
     /// \brief Sets this record's query start position.
     ///
@@ -911,14 +911,14 @@ public:
     /// \param[in] pos
     /// \returns reference to this record
     ///
-    BamRecord& QueryStart(const Data::Position pos);
+    BamRecord& QueryStart(Data::Position pos);
 
     /// \brief Sets this record's query start frame number
     ///
     /// \param[in] frame number
     /// \returns reference to this record
     ///
-    BamRecord& QueryStartFrameNumber(const int32_t frameNumber);
+    BamRecord& QueryStartFrameNumber(int32_t frameNumber);
 
     /// \brief Sets this record's expected read accuracy [0, 1000]
     ///
@@ -948,28 +948,28 @@ public:
     /// \param[in] type
     /// \returns reference to this record
     ///
-    BamRecord& ScrapRegionType(const VirtualRegionType type);
+    BamRecord& ScrapRegionType(VirtualRegionType type);
 
     /// \brief Sets this scrap record's ScrapRegionType
     ///
     /// \param[in] type character equivalent of VirtualRegionType
     /// \returns reference to this record
     ///
-    BamRecord& ScrapRegionType(const char type);
+    BamRecord& ScrapRegionType(char type);
 
     /// \brief Sets this scrap record's ScrapZmwType
     ///
     /// \param[in] type
     /// \returns reference to this record
     ///
-    BamRecord& ScrapZmwType(const ZmwType type);
+    BamRecord& ScrapZmwType(ZmwType type);
 
     /// \brief Sets this scrap record's ScrapZmwType
     ///
     /// \param[in] type character equivalent of ZmwType
     /// \returns reference to this record
     ///
-    BamRecord& ScrapZmwType(const char type);
+    BamRecord& ScrapZmwType(char type);
 
     /// \brief Sets this record's average signal-to-noise in each of A, C, G,
     ///        and T
@@ -997,7 +997,7 @@ public:
     /// \param[in] quality Phred-scaled confidence call
     /// \returns reference to this record
     ///
-    BamRecord& BarcodeQuality(const uint8_t quality);
+    BamRecord& BarcodeQuality(uint8_t quality);
 
     /// \}
 
@@ -1087,7 +1087,7 @@ public:
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& ForwardIPD(const Data::Frames& frames, const Data::FrameCodec encoding);
+    BamRecord& ForwardIPD(const Data::Frames& frames, Data::FrameCodec encoding);
 
     /// \brief Sets this record's forward pulse width values ("fp" tag).
     ///
@@ -1096,7 +1096,7 @@ public:
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& ForwardPulseWidth(const Data::Frames& frames, const Data::FrameCodec encoding);
+    BamRecord& ForwardPulseWidth(const Data::Frames& frames, Data::FrameCodec encoding);
 
     /// \brief Sets this record's IPD values ("ip" tag).
     ///
@@ -1107,8 +1107,7 @@ public:
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    PBBAM_DEPRECATED_FRAMES BamRecord& IPD(const Data::Frames& frames,
-                                           const FrameEncodingType encoding);
+    PBBAM_DEPRECATED_FRAMES BamRecord& IPD(const Data::Frames& frames, FrameEncodingType encoding);
 
     /// \brief Sets this record's IPD values ("ip" tag).
     ///
@@ -1117,7 +1116,7 @@ public:
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& IPD(const Data::Frames& frames, const Data::FrameCodec encoding);
+    BamRecord& IPD(const Data::Frames& frames, Data::FrameCodec encoding);
 
     /// \brief Sets this record's Pkmean values ("pm" tag).
     ///
@@ -1185,7 +1184,7 @@ public:
     /// \returns reference to this record
     ///
     PBBAM_DEPRECATED_FRAMES BamRecord& PreBaseFrames(const Data::Frames& frames,
-                                                     const FrameEncodingType encoding);
+                                                     FrameEncodingType encoding);
 
     /// \brief Sets this record's PreBaseFrames aka IPD values ("ip" tag).
     ///
@@ -1194,7 +1193,7 @@ public:
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& PreBaseFrames(const Data::Frames& frames, const Data::FrameCodec encoding);
+    BamRecord& PreBaseFrames(const Data::Frames& frames, Data::FrameCodec encoding);
 
     /// \brief Sets this record's PrePulseFrames values ("pd" tag).
     ///
@@ -1206,7 +1205,7 @@ public:
     /// \returns reference to this record
     ///
     PBBAM_DEPRECATED_FRAMES BamRecord& PrePulseFrames(const Data::Frames& frames,
-                                                      const FrameEncodingType encoding);
+                                                      FrameEncodingType encoding);
 
     /// \brief Sets this record's PrePulseFrames values ("pd" tag).
     ///
@@ -1215,7 +1214,7 @@ public:
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& PrePulseFrames(const Data::Frames& frames, const Data::FrameCodec encoding);
+    BamRecord& PrePulseFrames(const Data::Frames& frames, Data::FrameCodec encoding);
 
     /// \brief Sets this record's PulseCall values ("pc" tag).
     ///
@@ -1234,7 +1233,7 @@ public:
     /// \returns reference to this record
     ///
     PBBAM_DEPRECATED_FRAMES BamRecord& PulseCallWidth(const Data::Frames& frames,
-                                                      const FrameEncodingType encoding);
+                                                      FrameEncodingType encoding);
 
     /// \brief Sets this record's PulseCallWidth values ("px" tag).
     ///
@@ -1243,7 +1242,7 @@ public:
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& PulseCallWidth(const Data::Frames& frames, const Data::FrameCodec encoding);
+    BamRecord& PulseCallWidth(const Data::Frames& frames, Data::FrameCodec encoding);
 
     ///
     /// \\brief Sets this record's PulseExclusionReason values ("pe" tag).
@@ -1269,7 +1268,7 @@ public:
     /// \returns reference to this record
     ///
     PBBAM_DEPRECATED_FRAMES BamRecord& PulseWidth(const Data::Frames& frames,
-                                                  const FrameEncodingType encoding);
+                                                  FrameEncodingType encoding);
 
     /// \brief Sets this record's PulseWidth values ("pw" tag).
     ///
@@ -1278,7 +1277,7 @@ public:
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& PulseWidth(const Data::Frames& frames, const Data::FrameCodec encoding);
+    BamRecord& PulseWidth(const Data::Frames& frames, Data::FrameCodec encoding);
 
     /// \brief Sets this record's reverse IPD values ("ri" tag).
     ///
@@ -1287,7 +1286,7 @@ public:
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& ReverseIPD(const Data::Frames& frames, const Data::FrameCodec encoding);
+    BamRecord& ReverseIPD(const Data::Frames& frames, Data::FrameCodec encoding);
 
     /// \brief Sets this record's reverse pulse width values ("rp" tag).
     ///
@@ -1296,7 +1295,7 @@ public:
     ///                     16-bit lossless)
     /// \returns reference to this record
     ///
-    BamRecord& ReversePulseWidth(const Data::Frames& frames, const Data::FrameCodec encoding);
+    BamRecord& ReversePulseWidth(const Data::Frames& frames, Data::FrameCodec encoding);
 
     /// \brief Sets this record's StartFrame values ("sf" tag).
     ///
@@ -1371,14 +1370,12 @@ public:
     /// \{
 
     /// Creates a copied record from input, with clipping applied
-    static BamRecord Clipped(const BamRecord& input, const ClipType clipType,
-                             const Data::Position start, const Data::Position end,
-                             const bool exciseFlankingInserts = false);
+    static BamRecord Clipped(const BamRecord& input, ClipType clipType, Data::Position start,
+                             Data::Position end, bool exciseFlankingInserts = false);
 
     /// Creates a copied record from input, with mapping applied
-    static BamRecord Mapped(const BamRecord& input, const int32_t referenceId,
-                            const Data::Position refStart, const Data::Strand strand,
-                            const Data::Cigar& cigar, const uint8_t mappingQuality);
+    static BamRecord Mapped(const BamRecord& input, int32_t referenceId, Data::Position refStart,
+                            Data::Strand strand, const Data::Cigar& cigar, uint8_t mappingQuality);
 
     /// Splits the (5mC) basemods `Mm` and `Ml` tags
     struct SplitBasemods
@@ -1404,22 +1401,20 @@ public:
                                          size_t clipLength);
 
     /// Applies clipping to this record
-    BamRecord& Clip(const ClipType clipType, const Data::Position start, const Data::Position end,
-                    const bool exciseFlankingInserts = false);
+    BamRecord& Clip(ClipType clipType, Data::Position start, Data::Position end,
+                    bool exciseFlankingInserts = false);
 
     /// Creates a copied record from this one, with clipping applied
-    BamRecord Clipped(const ClipType clipType, const Data::Position start, const Data::Position end,
-                      const bool exciseFlankingInserts = false) const;
+    BamRecord Clipped(ClipType clipType, Data::Position start, Data::Position end,
+                      bool exciseFlankingInserts = false) const;
 
     /// Applies mapping to this record
-    BamRecord& Map(const int32_t referenceId, const Data::Position refStart,
-                   const Data::Strand strand, const Data::Cigar& cigar,
-                   const uint8_t mappingQuality);
+    BamRecord& Map(int32_t referenceId, Data::Position refStart, Data::Strand strand,
+                   const Data::Cigar& cigar, uint8_t mappingQuality);
 
     /// Creates a copied record from this one, with mapping applied
-    BamRecord Mapped(const int32_t referenceId, const Data::Position refStart,
-                     const Data::Strand strand, const Data::Cigar& cigar,
-                     const uint8_t mappingQuality) const;
+    BamRecord Mapped(int32_t referenceId, Data::Position refStart, Data::Strand strand,
+                     const Data::Cigar& cigar, uint8_t mappingQuality) const;
     /// \}
 
     ///
@@ -1452,69 +1447,68 @@ private:
 
 public:
     /// clips the PacBio tags to a specified length
-    void ClipTags(const size_t clipPos, const size_t clipLength);
+    void ClipTags(size_t clipPos, size_t clipLength);
 
 private:
     ///\internal
     /// clipping methods
 
-    void ClipFields(const size_t clipPos, const size_t clipLength);
+    void ClipFields(size_t clipPos, size_t clipLength);
 
-    BamRecord& ClipToQuery(const Data::Position start, const Data::Position end);
-    BamRecord& ClipToReference(const Data::Position start, const Data::Position end,
-                               const bool exciseFlankingInserts);
+    BamRecord& ClipToQuery(Data::Position start, Data::Position end);
+    BamRecord& ClipToReference(Data::Position start, Data::Position end,
+                               bool exciseFlankingInserts);
 
 private:
     ///\internal
     /// raw tag data fetching
 
     // sequence tags
-    std::string FetchBasesRaw(const BamRecordTag tag) const;
-    std::string FetchBases(const BamRecordTag tag,
-                           const Orientation orientation = Orientation::NATIVE,
-                           const bool aligned = false, const bool exciseSoftClips = false,
-                           const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    std::string FetchBasesRaw(BamRecordTag tag) const;
+    std::string FetchBases(BamRecordTag tag, Orientation orientation = Orientation::NATIVE,
+                           bool aligned = false, bool exciseSoftClips = false,
+                           PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     // frame tags
-    Data::Frames FetchFramesRaw(const BamRecordTag tag) const;
-    Data::Frames FetchFrames(const BamRecordTag tag,
-                             const Data::Orientation orientation = Data::Orientation::NATIVE,
-                             const bool aligned = false, const bool exciseSoftClips = false,
-                             const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    Data::Frames FetchFramesRaw(BamRecordTag tag) const;
+    Data::Frames FetchFrames(BamRecordTag tag,
+                             Data::Orientation orientation = Data::Orientation::NATIVE,
+                             bool aligned = false, bool exciseSoftClips = false,
+                             PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     // pulse tags
-    std::vector<float> FetchPhotonsRaw(const BamRecordTag tag) const;
-    std::vector<float> FetchPhotons(const BamRecordTag tag,
-                                    const Data::Orientation orientation = Data::Orientation::NATIVE,
-                                    const bool aligned = false, const bool exciseSoftClips = false,
-                                    const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    std::vector<float> FetchPhotonsRaw(BamRecordTag tag) const;
+    std::vector<float> FetchPhotons(BamRecordTag tag,
+                                    Data::Orientation orientation = Data::Orientation::NATIVE,
+                                    bool aligned = false, bool exciseSoftClips = false,
+                                    PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     // QV tags
-    Data::QualityValues FetchQualitiesRaw(const BamRecordTag tag) const;
-    Data::QualityValues FetchQualities(
-        const BamRecordTag tag, const Data::Orientation orientation = Data::Orientation::NATIVE,
-        const bool aligned = false, const bool exciseSoftClips = false,
-        const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    Data::QualityValues FetchQualitiesRaw(BamRecordTag tag) const;
+    Data::QualityValues FetchQualities(BamRecordTag tag,
+                                       Data::Orientation orientation = Data::Orientation::NATIVE,
+                                       bool aligned = false, bool exciseSoftClips = false,
+                                       PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     // UInt tags (e.g. start frame)
     //
     // TODO (DB): clean this up w.r.t FetchUInt8s
     //
-    std::vector<uint32_t> FetchUInt32sRaw(const BamRecordTag tag) const;
-    std::vector<uint32_t> FetchUInt32s(
-        const BamRecordTag tag, const Data::Orientation orientation = Data::Orientation::NATIVE,
-        const bool aligned = false, const bool exciseSoftClips = false,
-        const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    std::vector<uint32_t> FetchUInt32sRaw(BamRecordTag tag) const;
+    std::vector<uint32_t> FetchUInt32s(BamRecordTag tag,
+                                       Data::Orientation orientation = Data::Orientation::NATIVE,
+                                       bool aligned = false, bool exciseSoftClips = false,
+                                       PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     // UInt tags (e.g. pulse exclusion)
     //
     // ODO (DB): clean this up w.r.t FetchUInt32s
     //
-    std::vector<uint8_t> FetchUInt8sRaw(const BamRecordTag tag) const;
-    std::vector<uint8_t> FetchUInt8s(
-        const BamRecordTag tag, const Data::Orientation orientation = Data::Orientation::NATIVE,
-        const bool aligned = false, const bool exciseSoftClips = false,
-        const PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    std::vector<uint8_t> FetchUInt8sRaw(BamRecordTag tag) const;
+    std::vector<uint8_t> FetchUInt8s(BamRecordTag tag,
+                                     Data::Orientation orientation = Data::Orientation::NATIVE,
+                                     bool aligned = false, bool exciseSoftClips = false,
+                                     PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
 private:
     ///\internal

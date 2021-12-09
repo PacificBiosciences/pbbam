@@ -89,7 +89,7 @@ public:
     /// \param[in] type dataset type
     /// \throws std::runtime_error if \p type is unknown
     ///
-    DataSet(const DataSet::TypeEnum type);
+    DataSet(DataSet::TypeEnum type);
 
     /// \brief Constructs a DataSet from a %BAM file.
     ///
@@ -693,7 +693,7 @@ public:
     /// \param[in] type  new dataset type
     /// \returns reference to this dataset object
     ///
-    DataSet& Type(const BAM::DataSet::TypeEnum type);
+    DataSet& Type(BAM::DataSet::TypeEnum type);
 
     /// \}
 

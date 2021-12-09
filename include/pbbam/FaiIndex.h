@@ -63,7 +63,7 @@ public:
     ///
     /// \returns FAI entry at \p row
     ///
-    const FaiEntry& Entry(const uint32_t row) const;
+    const FaiEntry& Entry(uint32_t row) const;
 
     ///
     /// \returns true if sequence name found in index

@@ -154,7 +154,7 @@ public:
 
     explicit PbiReferenceDataBuilder(size_t numReferenceSequences);
 
-    bool AddRecord(const BamRecord& record, const int32_t rowNumber);
+    bool AddRecord(const BamRecord& record, int32_t rowNumber);
     PbiRawReferenceData Result() const;
     void WriteData(BGZF* bgzf);
 
@@ -168,7 +168,7 @@ struct PbiBuilderBase
 {
     PbiBuilderBase() = delete;
     explicit PbiBuilderBase(const std::string& pbiFilename,
-                            const PbiBuilder::CompressionLevel compressionLevel, size_t numThreads,
+                            PbiBuilder::CompressionLevel compressionLevel, size_t numThreads,
                             size_t bufferSize);
     virtual ~PbiBuilderBase() noexcept;
 

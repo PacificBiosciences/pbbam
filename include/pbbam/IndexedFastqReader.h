@@ -93,9 +93,8 @@ public:
     /// \throws std::runtime_error on failure to fetch data
     ///
     std::pair<std::string, Data::QualityValues> ReferenceSubsequence(
-        const BamRecord& bamRecord,
-        const Data::Orientation orientation = Data::Orientation::GENOMIC, const bool gapped = false,
-        const bool exciseSoftClips = false);
+        const BamRecord& bamRecord, Data::Orientation orientation = Data::Orientation::GENOMIC,
+        bool gapped = false, bool exciseSoftClips = false);
 
     /// \}
 
@@ -107,7 +106,7 @@ public:
     bool HasSequence(const std::string& name) const;
 
     /// \returns the names of the sequence at a specific index in the FASTQ file
-    std::string Name(const size_t idx) const;
+    std::string Name(size_t idx) const;
 
     /// \returns the names of all sequences stored in the FASTQ file
     std::vector<std::string> Names() const;

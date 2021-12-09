@@ -29,7 +29,7 @@ public:
     FaiZmwChunker chunker_;
 
 protected:
-    ZmwChunkedFastxReaderImpl(std::string fastxFilename, const size_t numChunks);
+    ZmwChunkedFastxReaderImpl(std::string fastxFilename, size_t numChunks);
 };
 
 }  // namespace BAM

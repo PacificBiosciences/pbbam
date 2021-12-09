@@ -107,7 +107,7 @@ public:
     ///
     /// \throws runtime_error if \p modifier is not valid for int8_t data
     ///
-    Tag(int8_t value, const TagModifier mod);
+    Tag(int8_t value, TagModifier mod);
 
     /// \brief Creates a Tag from an unsigned 8-bit integer or character.
     ///
@@ -364,7 +364,7 @@ public:
     std::string Typename() const;
 
     /// \returns true if tag data modifier \p m is set
-    bool HasModifier(const TagModifier m) const;
+    bool HasModifier(TagModifier m) const;
 
     /// \returns current tag data modifier
     TagModifier Modifier() const;
@@ -374,7 +374,7 @@ public:
     /// \param[in] m    new modifier value
     ///
     /// \returns reference to this tag
-    Tag& Modifier(const TagModifier m);
+    Tag& Modifier(TagModifier m);
 
     /// \}
 

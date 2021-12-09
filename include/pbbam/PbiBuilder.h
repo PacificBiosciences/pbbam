@@ -71,8 +71,8 @@ public:
     /// \throws std::runtime_error if PBI file cannot be opened for writing
     ///
     PbiBuilder(const std::string& pbiFilename,
-               const PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
-               const size_t numThreads = 4);
+               PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
+               size_t numThreads = 4);
 
     /// \brief Initializes builder to write data to \p pbiFilename.
     ///
@@ -92,9 +92,9 @@ public:
     ///
     /// \throws std::runtime_error if PBI file cannot be opened for writing
     ///
-    PbiBuilder(const std::string& pbiFilename, const size_t numReferenceSequences,
-               const PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
-               const size_t numThreads = 4);
+    PbiBuilder(const std::string& pbiFilename, size_t numReferenceSequences,
+               PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
+               size_t numThreads = 4);
 
     /// \brief Initializes builder to write data to \p pbiFilename.
     ///
@@ -116,10 +116,10 @@ public:
     ///
     /// \throws std::runtime_error if PBI file cannot be opened for writing
     ///
-    PbiBuilder(const std::string& pbiFilename, const size_t numReferenceSequences,
-               const bool isCoordinateSorted,
-               const PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
-               const size_t numThreads = 4);
+    PbiBuilder(const std::string& pbiFilename, size_t numReferenceSequences,
+               bool isCoordinateSorted,
+               PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
+               size_t numThreads = 4);
 
     PbiBuilder(PbiBuilder&&) noexcept;
     PbiBuilder& operator=(PbiBuilder&&) noexcept;
@@ -154,7 +154,7 @@ public:
     /// \param[in] record   input BamRecord to pull index data from
     /// \param[in] vOffset  \b virtual offset into %BAM file where record begins
     ///
-    void AddRecord(const BamRecord& record, const int64_t vOffset);
+    void AddRecord(const BamRecord& record, int64_t vOffset);
 
     /// \brief Writes data out to PBI file & closes builder.
     ///

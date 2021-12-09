@@ -184,4 +184,4 @@ uint32_t PbiFilterCompositeBamReader<OrderByType>::NumReads() const
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif // PBBAM_COMPOSITEREADER_INL
+#endif  // PBBAM_COMPOSITEREADER_INL

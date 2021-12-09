@@ -197,13 +197,13 @@ public:
     ///
     /// \sa SequenceInfo::Length, BamHeader::SequenceId
     ///
-    std::string SequenceLength(const int32_t id) const;
+    std::string SequenceLength(int32_t id) const;
 
     /// \returns the name of the sequence (\@SQ:SN) at index \p id
     ///
     /// \sa SequenceInfo::Name, BamHeader::SequenceId
     ///
-    std::string SequenceName(const int32_t id) const;
+    std::string SequenceName(int32_t id) const;
 
     /// \returns vector of sequence names (\@SQ:SN) stored in this header
     ///
@@ -216,7 +216,7 @@ public:
     /// \throws std::out_of_range if \p is an invalid or unknown index
     /// \sa BamHeader::SequenceId
     ///
-    SequenceInfo Sequence(const int32_t id) const;
+    SequenceInfo Sequence(int32_t id) const;
 
     /// \returns SequenceInfo for the sequence matching \p name
     SequenceInfo Sequence(const std::string& name) const;
