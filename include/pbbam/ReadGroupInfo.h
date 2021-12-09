@@ -3,12 +3,7 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
-#include <cstdint>
-
-#include <map>
-#include <string>
-#include <utility>
+#include <pbbam/exception/InvalidSequencingChemistryException.h>
 
 #include <boost/optional.hpp>
 
@@ -16,7 +11,12 @@
 #include <pbcopper/data/FrameEncoders.h>
 #include <pbcopper/data/Strand.h>
 
-#include <pbbam/exception/InvalidSequencingChemistryException.h>
+#include <map>
+#include <string>
+#include <utility>
+
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

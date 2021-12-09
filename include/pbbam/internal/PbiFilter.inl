@@ -1,12 +1,17 @@
-#include <pbbam/PbiFilter.h>
+#ifndef PBBAM_PBIFILTER_INL
+#define PBBAM_PBIFILTER_INL
 
-#include <cassert>
+#include <pbbam/Config.h>
+
+#include <pbbam/PbiFilter.h>
 
 #include <algorithm>
 #include <iostream>
 #include <map>
 #include <set>
 #include <vector>
+
+#include <cassert>
 
 namespace PacBio {
 namespace BAM {
@@ -233,3 +238,5 @@ inline PbiFilter::CompositionType PbiFilter::Type() const { return d_->type_; }
 
 }  // namespace BAM
 }  // namespace PacBio
+
+#endif // PBBAM_PBIFILTER_INL

@@ -2,16 +2,15 @@
 
 #include <pbbam/ZmwGroupQuery.h>
 
-#include <cstdint>
+#include <pbbam/BamRecord.h>
+#include <pbbam/CompositeBamReader.h>
+#include <pbbam/PbiFilterTypes.h>
+#include "MemoryUtils.h"
 
 #include <algorithm>
 #include <deque>
 
-#include <pbbam/BamRecord.h>
-#include <pbbam/CompositeBamReader.h>
-#include <pbbam/PbiFilterTypes.h>
-
-#include "MemoryUtils.h"
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

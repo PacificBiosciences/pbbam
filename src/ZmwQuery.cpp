@@ -2,10 +2,10 @@
 
 #include <pbbam/ZmwQuery.h>
 
-#include <cstdint>
-
 #include <pbbam/CompositeBamReader.h>
 #include <pbbam/PbiFilterTypes.h>
+
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

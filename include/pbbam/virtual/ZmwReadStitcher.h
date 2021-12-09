@@ -3,14 +3,14 @@
 
 #include <pbbam/Config.h>
 
-#include <memory>
-#include <string>
-#include <vector>
-
 #include <pbbam/BamRecord.h>
 #include <pbbam/DataSet.h>
 #include <pbbam/PbiFilter.h>
 #include <pbbam/virtual/VirtualZmwBamRecord.h>
+
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace PacBio {
 namespace BAM {

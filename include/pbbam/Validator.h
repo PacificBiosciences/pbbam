@@ -3,11 +3,11 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
+#include <pbbam/exception/ValidationException.h>
 
 #include <limits>
 
-#include <pbbam/exception/ValidationException.h>
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

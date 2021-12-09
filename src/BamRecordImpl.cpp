@@ -2,11 +2,14 @@
 
 #include <pbbam/BamRecordImpl.h>
 
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
+#include <pbbam/BamTagCodec.h>
+#include <pbbam/StringUtilities.h>
+#include "BamRecordTags.h"
+#include "MemoryUtils.h"
+
+#include <pbcopper/utility/Ssize.h>
+
+#include <htslib/hts_endian.h>
 
 #include <algorithm>
 #include <array>
@@ -14,15 +17,11 @@
 #include <tuple>
 #include <utility>
 
-#include <htslib/hts_endian.h>
-
-#include <pbcopper/utility/Ssize.h>
-
-#include <pbbam/BamTagCodec.h>
-#include <pbbam/StringUtilities.h>
-
-#include "BamRecordTags.h"
-#include "MemoryUtils.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
 
 namespace PacBio {
 namespace BAM {

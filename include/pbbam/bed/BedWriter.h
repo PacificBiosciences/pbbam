@@ -3,9 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <memory>
-
 #include <pbcopper/data/GenomicInterval.h>
+
+#include <memory>
 
 namespace PacBio {
 namespace BED {

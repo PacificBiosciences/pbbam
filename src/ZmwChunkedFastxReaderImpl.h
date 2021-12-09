@@ -3,14 +3,13 @@
 
 #include <pbbam/Config.h>
 
-#include <string>
-#include <utility>
-
 #include <pbbam/FaiIndex.h>
 #include <pbbam/FastaSequence.h>
 #include <pbbam/FastqSequence.h>
-
 #include "FaiZmwChunker.h"
+
+#include <string>
+#include <utility>
 
 namespace PacBio {
 namespace BAM {

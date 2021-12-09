@@ -3,14 +3,14 @@
 
 #include <pbbam/Config.h>
 
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include <pbbam/Position.h>
+#include <pbbam/vcf/VcfHeaderTypes.h>
 
 #include <boost/optional.hpp>
 
-#include <pbbam/Position.h>
-#include <pbbam/vcf/VcfHeaderTypes.h>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace PacBio {
 namespace VCF {

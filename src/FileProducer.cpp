@@ -2,9 +2,9 @@
 
 #include "FileProducer.h"
 
-#include <cstdio>
-
 #include <stdexcept>
+
+#include <cstdio>
 
 namespace PacBio {
 namespace BAM {

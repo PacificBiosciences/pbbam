@@ -3,13 +3,13 @@
 
 #include <pbbam/Config.h>
 
-#include <cstdint>
-
-#include <vector>
-
 #include <pbbam/DataSet.h>
 #include <pbbam/PbiFilter.h>
 #include <pbbam/internal/QueryBase.h>
+
+#include <vector>
+
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

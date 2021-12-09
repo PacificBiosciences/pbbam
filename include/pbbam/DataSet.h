@@ -3,17 +3,17 @@
 
 #include <pbbam/Config.h>
 
+#include <pbbam/BamFile.h>
+#include <pbbam/BamHeader.h>
+#include <pbbam/DataSetTypes.h>
+#include <pbbam/GenomicInterval.h>
+
 #include <chrono>
 #include <iosfwd>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
-
-#include <pbbam/BamFile.h>
-#include <pbbam/BamHeader.h>
-#include <pbbam/DataSetTypes.h>
-#include <pbbam/GenomicInterval.h>
 
 namespace PacBio {
 namespace BAM {

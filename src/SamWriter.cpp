@@ -2,22 +2,21 @@
 
 #include <pbbam/SamWriter.h>
 
+#include <pbbam/Deleters.h>
+#include <pbbam/Validator.h>
+#include "Autovalidate.h"
+#include "ErrnoReason.h"
+#include "FileProducer.h"
+#include "MemoryUtils.h"
+
+#include <htslib/hfile.h>
+#include <htslib/sam.h>
+
 #include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-
-#include <htslib/hfile.h>
-#include <htslib/sam.h>
-
-#include <pbbam/Deleters.h>
-#include <pbbam/Validator.h>
-
-#include "Autovalidate.h"
-#include "ErrnoReason.h"
-#include "FileProducer.h"
-#include "MemoryUtils.h"
 
 namespace PacBio {
 namespace BAM {

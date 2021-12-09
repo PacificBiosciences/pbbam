@@ -2,12 +2,12 @@
 
 #include "FaiZmwChunker.h"
 
-#include <cassert>
-
 #include <algorithm>
 #include <numeric>
 #include <stdexcept>
 #include <string>
+
+#include <cassert>
 
 namespace PacBio {
 namespace BAM {

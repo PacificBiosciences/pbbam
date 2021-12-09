@@ -5,12 +5,13 @@
 
 #include "ZmwChunkedFastxReaderImpl.h"
 
-#include <cstdio>
+#include <pbcopper/utility/Deleters.h>
+
+#include <htslib/kseq.h>
 
 #include <memory>
 
-#include <htslib/kseq.h>
-#include <pbcopper/utility/Deleters.h>
+#include <cstdio>
 
 namespace PacBio {
 namespace BAM {

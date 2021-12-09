@@ -2,14 +2,15 @@
 
 #include <pbbam/Config.h>
 
+#include <pbbam/StringUtilities.h>
+
+#include <pbcopper/data/CigarOperation.h>
+
+#include <htslib/hts.h>
+
 #include <stdexcept>
 #include <string>
 #include <tuple>
-
-#include <htslib/hts.h>
-#include <pbcopper/data/CigarOperation.h>
-
-#include <pbbam/StringUtilities.h>
 
 namespace PacBio {
 namespace BAM {

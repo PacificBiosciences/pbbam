@@ -3,8 +3,11 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
-#include <cstdint>
+#include <pbbam/Compare.h>
+#include <pbbam/PbiFile.h>
+#include <pbbam/PbiFilter.h>
+
+#include <boost/optional.hpp>
 
 #include <memory>
 #include <set>
@@ -12,11 +15,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include <boost/optional.hpp>
-
-#include <pbbam/Compare.h>
-#include <pbbam/PbiFile.h>
-#include <pbbam/PbiFilter.h>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

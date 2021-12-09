@@ -3,12 +3,12 @@
 
 #include <pbbam/Config.h>
 
-#include <memory>
-#include <string>
-
 #include <pbbam/BamWriter.h>
 #include <pbbam/IRecordWriter.h>
 #include <pbbam/PbiBuilder.h>
+
+#include <memory>
+#include <string>
 
 namespace PacBio {
 namespace BAM {

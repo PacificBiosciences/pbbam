@@ -1,3 +1,6 @@
+#ifndef PBBAM_QUERYBASE_INL
+#define PBBAM_QUERYBASE_INL
+
 #include <pbbam/internal/QueryBase.h>
 
 #include <cassert>
@@ -153,3 +156,5 @@ void QueryIteratorBase<T>::ReadNext()
 }  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
+
+#endif // PBBAM_QUERYBASE_INL

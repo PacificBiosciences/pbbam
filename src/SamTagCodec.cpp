@@ -2,15 +2,15 @@
 
 #include <pbbam/SamTagCodec.h>
 
-#include <cstdint>
+#include <pbbam/StringUtilities.h>
+
+#include <boost/lexical_cast.hpp>
 
 #include <limits>
 #include <sstream>
 #include <string>
 
-#include <boost/lexical_cast.hpp>
-
-#include <pbbam/StringUtilities.h>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

@@ -2,17 +2,17 @@
 
 #include <pbbam/virtual/VirtualZmwBamRecord.h>
 
-#include <cstdint>
+#include <pbbam/virtual/VirtualRegionType.h>
+#include <pbbam/virtual/VirtualRegionTypeMap.h>
+
+#include <pbcopper/utility/MoveAppend.h>
 
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
 #include <vector>
 
-#include <pbcopper/utility/MoveAppend.h>
-
-#include <pbbam/virtual/VirtualRegionType.h>
-#include <pbbam/virtual/VirtualRegionTypeMap.h>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

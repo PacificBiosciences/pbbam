@@ -2,10 +2,10 @@
 
 #include <pbbam/FastaCache.h>
 
+#include <pbbam/FastaReader.h>
+
 #include <sstream>
 #include <stdexcept>
-
-#include <pbbam/FastaReader.h>
 
 namespace PacBio {
 namespace BAM {

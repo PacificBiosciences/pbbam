@@ -2,8 +2,14 @@
 
 #include <pbbam/ZmwChunkedFastaReader.h>
 
-#include <cassert>
-#include <cstdio>
+#include <pbbam/FaiIndex.h>
+#include <pbbam/FormatUtils.h>
+#include "MemoryUtils.h"
+#include "ZmwChunkedFastxBgzfReader.h"
+#include "ZmwChunkedFastxReaderImpl.h"
+#include "ZmwChunkedFastxTextReader.h"
+
+#include <htslib/kseq.h>
 
 #include <algorithm>
 #include <sstream>
@@ -12,15 +18,8 @@
 #include <type_traits>
 #include <vector>
 
-#include <htslib/kseq.h>
-
-#include <pbbam/FaiIndex.h>
-#include <pbbam/FormatUtils.h>
-
-#include "MemoryUtils.h"
-#include "ZmwChunkedFastxBgzfReader.h"
-#include "ZmwChunkedFastxReaderImpl.h"
-#include "ZmwChunkedFastxTextReader.h"
+#include <cassert>
+#include <cstdio>
 
 namespace PacBio {
 namespace BAM {

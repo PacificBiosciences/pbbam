@@ -3,13 +3,13 @@
 
 #include <pbbam/Config.h>
 
-#include <memory>
-#include <string>
-#include <vector>
+#include <pbcopper/data/Position.h>
 
 #include <htslib/hts.h>
 
-#include <pbcopper/data/Position.h>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace PacBio {
 namespace BAM {

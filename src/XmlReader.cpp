@@ -2,7 +2,8 @@
 
 #include "XmlReader.h"
 
-#include <cassert>
+#include <pbbam/StringUtilities.h>
+#include "pugixml/pugixml.hpp"
 
 #include <istream>
 #include <memory>
@@ -10,9 +11,7 @@
 #include <typeinfo>
 #include <vector>
 
-#include <pbbam/StringUtilities.h>
-
-#include "pugixml/pugixml.hpp"
+#include <cassert>
 
 using DataSetElement = PacBio::BAM::internal::DataSetElement;
 using FromInputXml = PacBio::BAM::internal::FromInputXml;

@@ -2,13 +2,12 @@
 
 #include <pbbam/exception/ValidationException.h>
 
-#include <cstddef>
+#include <pbbam/StringUtilities.h>
+#include "ValidationErrors.h"
 
 #include <sstream>
 
-#include <pbbam/StringUtilities.h>
-
-#include "ValidationErrors.h"
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

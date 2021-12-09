@@ -2,12 +2,12 @@
 
 #include <pbbam/FastqSequence.h>
 
-#include <cstdio>
-
 #include <numeric>
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
+
+#include <cstdio>
 
 namespace PacBio {
 namespace BAM {

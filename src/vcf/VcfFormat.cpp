@@ -2,8 +2,11 @@
 
 #include <pbbam/vcf/VcfFormat.h>
 
-#include <cassert>
-#include <cmath>
+#include <pbbam/StringUtilities.h>
+#include <pbbam/vcf/VcfHeader.h>
+#include "VcfFormatException.h"
+
+#include <htslib/vcf.h>
 
 #include <fstream>
 #include <istream>
@@ -11,12 +14,8 @@
 #include <stdexcept>
 #include <string>
 
-#include <htslib/vcf.h>
-
-#include <pbbam/StringUtilities.h>
-#include <pbbam/vcf/VcfHeader.h>
-
-#include "VcfFormatException.h"
+#include <cassert>
+#include <cmath>
 
 namespace PacBio {
 namespace VCF {

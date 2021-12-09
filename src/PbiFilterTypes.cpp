@@ -2,18 +2,18 @@
 
 #include <pbbam/PbiFilterTypes.h>
 
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
+#include <pbbam/StringUtilities.h>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/optional.hpp>
 
 #include <algorithm>
 #include <string>
 #include <unordered_map>
 
-#include <boost/algorithm/string.hpp>
-#include <boost/optional.hpp>
-
-#include <pbbam/StringUtilities.h>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

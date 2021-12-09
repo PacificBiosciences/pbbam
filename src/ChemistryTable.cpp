@@ -2,16 +2,16 @@
 
 #include "ChemistryTable.h"
 
-#include <cstdlib>
+#include <pbbam/exception/BundleChemistryMappingException.h>
+#include "FileUtils.h"
+#include "pugixml/pugixml.hpp"
+
+#include <pbcopper/logging/Logging.h>
 
 #include <fstream>
 #include <map>
 
-#include <pbbam/exception/BundleChemistryMappingException.h>
-#include <pbcopper/logging/Logging.h>
-
-#include "FileUtils.h"
-#include "pugixml/pugixml.hpp"
+#include <cstdlib>
 
 namespace PacBio {
 namespace BAM {

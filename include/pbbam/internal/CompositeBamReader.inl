@@ -1,3 +1,8 @@
+#ifndef PBBAM_COMPOSITEREADER_INL
+#define PBBAM_COMPOSITEREADER_INL
+
+#include <pbbam/Config.h>
+
 #include <pbbam/CompositeBamReader.h>
 
 #include <algorithm>
@@ -178,3 +183,5 @@ uint32_t PbiFilterCompositeBamReader<OrderByType>::NumReads() const
 
 }  // namespace BAM
 }  // namespace PacBio
+
+#endif // PBBAM_COMPOSITEREADER_INL

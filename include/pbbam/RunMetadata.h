@@ -3,11 +3,11 @@
 
 #include <pbbam/Config.h>
 
+#include <pbbam/CollectionMetadata.h>
+
 #include <iosfwd>
 #include <map>
 #include <string>
-
-#include <pbbam/CollectionMetadata.h>
 
 namespace PacBio {
 namespace BAM {

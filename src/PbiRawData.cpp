@@ -2,20 +2,19 @@
 
 #include <pbbam/PbiRawData.h>
 
-#include <cstddef>
-#include <cstdint>
+#include <pbbam/BamFile.h>
+#include <pbbam/BamRecord.h>
+#include <pbbam/RecordType.h>
+#include "PbiIndexIO.h"
+
+#include <boost/numeric/conversion/cast.hpp>
 
 #include <map>
 #include <tuple>
 #include <type_traits>
 
-#include <boost/numeric/conversion/cast.hpp>
-
-#include <pbbam/BamFile.h>
-#include <pbbam/BamRecord.h>
-#include <pbbam/RecordType.h>
-
-#include "PbiIndexIO.h"
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

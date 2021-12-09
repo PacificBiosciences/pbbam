@@ -2,10 +2,13 @@
 
 #include <pbbam/ReadGroupInfo.h>
 
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstdio>
+#include <pbbam/MD5.h>
+#include <pbbam/SamTagCodec.h>
+#include <pbbam/StringUtilities.h>
+#include "ChemistryTable.h"
+
+#include <boost/algorithm/cxx14/equal.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <iomanip>
 #include <ios>
@@ -16,14 +19,10 @@
 #include <type_traits>
 #include <unordered_map>
 
-#include <boost/algorithm/cxx14/equal.hpp>
-#include <boost/algorithm/string.hpp>
-
-#include <pbbam/MD5.h>
-#include <pbbam/SamTagCodec.h>
-#include <pbbam/StringUtilities.h>
-
-#include "ChemistryTable.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
 
 namespace PacBio {
 namespace BAM {

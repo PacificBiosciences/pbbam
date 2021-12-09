@@ -2,6 +2,11 @@
 
 #include <pbbam/FaiIndex.h>
 
+#include <pbbam/StringUtilities.h>
+#include "ErrnoReason.h"
+
+#include <htslib/faidx.h>
+
 #include <fstream>
 #include <ostream>
 #include <sstream>
@@ -10,12 +15,6 @@
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
-
-#include <htslib/faidx.h>
-
-#include <pbbam/StringUtilities.h>
-
-#include "ErrnoReason.h"
 
 namespace PacBio {
 namespace BAM {

@@ -3,12 +3,12 @@
 
 #include <pbbam/Config.h>
 
-#include <string>
-
 #include <pbbam/BamFile.h>
 #include <pbbam/BamReader.h>
 #include <pbbam/PbiBasicTypes.h>
 #include <pbbam/PbiFilter.h>
+
+#include <string>
 
 namespace PacBio {
 namespace BAM {

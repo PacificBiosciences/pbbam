@@ -2,10 +2,10 @@
 
 #include <pbbam/CompositeBamReader.h>
 
+#include <pbbam/BamFile.h>
+
 #include <sstream>
 #include <stdexcept>
-
-#include <pbbam/BamFile.h>
 
 namespace PacBio {
 namespace BAM {

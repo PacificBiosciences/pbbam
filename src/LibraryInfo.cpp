@@ -2,13 +2,13 @@
 
 #include <pbbam/LibraryInfo.h>
 
-#include <htslib/hts.h>
-#include <zlib.h>
+#include "LibraryGitHash.h"
+#include "LibraryVersion.h"
 
 #include <pbcopper/LibraryInfo.h>
 
-#include "LibraryGitHash.h"
-#include "LibraryVersion.h"
+#include <htslib/hts.h>
+#include <zlib.h>
 
 namespace PacBio {
 namespace Pbbam {

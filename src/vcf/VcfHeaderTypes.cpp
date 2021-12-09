@@ -2,11 +2,10 @@
 
 #include <pbbam/vcf/VcfHeaderTypes.h>
 
-#include <type_traits>
-
 #include <pbbam/vcf/VcfHeader.h>
-
 #include "VcfFormatException.h"
+
+#include <type_traits>
 
 namespace PacBio {
 namespace VCF {

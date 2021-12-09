@@ -2,16 +2,15 @@
 
 #include <pbbam/internal/DataSetBaseTypes.h>
 
-#include <cstddef>
+#include <pbbam/DataSetTypes.h>
+#include "DataSetUtils.h"
+#include "TimeUtils.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
-#include <pbbam/DataSetTypes.h>
-
-#include "DataSetUtils.h"
-#include "TimeUtils.h"
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

@@ -3,13 +3,13 @@
 
 #include <pbbam/Config.h>
 
-#include <iosfwd>
-#include <string>
-
 #include <pbbam/BamFile.h>
 #include <pbbam/CollectionMetadata.h>
 #include <pbbam/DataSetXsd.h>
 #include <pbbam/internal/DataSetBaseTypes.h>
+
+#include <iosfwd>
+#include <string>
 
 namespace PacBio {
 namespace BAM {

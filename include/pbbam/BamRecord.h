@@ -3,17 +3,6 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
-#include <cstdint>
-
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
-
-#include <pbcopper/data/MappedRead.h>
-#include <pbcopper/data/Read.h>
-
 #include <pbbam/Accuracy.h>
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamRecordImpl.h>
@@ -30,6 +19,17 @@
 #include <pbbam/Strand.h>
 #include <pbbam/ZmwType.h>
 #include <pbbam/virtual/VirtualRegionType.h>
+
+#include <pbcopper/data/MappedRead.h>
+#include <pbcopper/data/Read.h>
+
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

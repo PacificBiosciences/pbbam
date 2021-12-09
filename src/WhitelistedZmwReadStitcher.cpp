@@ -2,14 +2,13 @@
 
 #include <pbbam/virtual/WhitelistedZmwReadStitcher.h>
 
-#include <cstdint>
+#include <pbbam/PbiIndexedBamReader.h>
+#include "VirtualZmwReader.h"
 
 #include <sstream>
 #include <stdexcept>
 
-#include <pbbam/PbiIndexedBamReader.h>
-
-#include "VirtualZmwReader.h"
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

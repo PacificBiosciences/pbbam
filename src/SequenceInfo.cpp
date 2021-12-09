@@ -2,15 +2,15 @@
 
 #include <pbbam/SequenceInfo.h>
 
-#include <cstdint>
+#include <pbbam/SamTagCodec.h>
+#include <pbbam/StringUtilities.h>
 
 #include <limits>
 #include <sstream>
 #include <tuple>
 #include <type_traits>
 
-#include <pbbam/SamTagCodec.h>
-#include <pbbam/StringUtilities.h>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

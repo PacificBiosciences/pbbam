@@ -1,3 +1,8 @@
+#ifndef PBBAM_PBIBASICTYPES_INL
+#define PBBAM_PBIBASICTYPES_INL
+
+#include <pbbam/Config.h>
+
 #include <pbbam/PbiBasicTypes.h>
 
 #include <tuple>
@@ -23,3 +28,5 @@ inline bool IndexResultBlock::operator!=(const IndexResultBlock& other) const no
 
 }  // namespace BAM
 }  // namespace PacBio
+
+#endif // PBBAM_PBIBASICTYPES_INL

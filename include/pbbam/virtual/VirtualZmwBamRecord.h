@@ -3,12 +3,12 @@
 
 #include <pbbam/Config.h>
 
-#include <vector>
-
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/virtual/VirtualRegion.h>
 #include <pbbam/virtual/VirtualRegionType.h>
+
+#include <vector>
 
 namespace PacBio {
 namespace BAM {
