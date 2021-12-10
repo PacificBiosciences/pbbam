@@ -157,4 +157,4 @@ void QueryIteratorBase<T>::ReadNext()
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif // PBBAM_QUERYBASE_INL
+#endif  // PBBAM_QUERYBASE_INL

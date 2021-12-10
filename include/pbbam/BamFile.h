@@ -146,13 +146,13 @@ public:
     int ReferenceId(const std::string& name) const;
 
     /// \return name of reference matching \p id, empty string if not found
-    std::string ReferenceName(const int id) const;
+    std::string ReferenceName(int id) const;
 
     /// \returns length of requested reference \p name. 0 if not found
     uint32_t ReferenceLength(const std::string& name) const;
 
     /// \returns length of requested reference \p id. 0 if not found
-    uint32_t ReferenceLength(const int id) const;
+    uint32_t ReferenceLength(int id) const;
 
     /// \}
 

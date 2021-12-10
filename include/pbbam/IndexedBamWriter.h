@@ -80,11 +80,10 @@ public:
     ///
     IndexedBamWriter(
         const std::string& outputFilename, const BamHeader& header,
-        const BamWriter::CompressionLevel bamCompressionLevel = BamWriter::DefaultCompression,
-        const size_t numBamThreads = 4,
-        const PbiBuilder::CompressionLevel pbiCompressionLevel = PbiBuilder::DefaultCompression,
-        const size_t numPbiThreads = 4, const size_t numGziThreads = 4,
-        const size_t tempFileBufferSize = 0x10000);
+        BamWriter::CompressionLevel bamCompressionLevel = BamWriter::DefaultCompression,
+        size_t numBamThreads = 4,
+        PbiBuilder::CompressionLevel pbiCompressionLevel = PbiBuilder::DefaultCompression,
+        size_t numPbiThreads = 4, size_t numGziThreads = 4, size_t tempFileBufferSize = 0x10000);
 
     /// \brief IndexedBamWRiter
     ///

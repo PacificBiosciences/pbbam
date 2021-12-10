@@ -51,8 +51,8 @@ public:
     /// \param filterMode       apply/ignore any filters in XML, if present
     ///
     ZmwGroupQuery(const DataSet& dataset,
-                  const ZmwFileIterationMode iterationMode = ZmwFileIterationMode::SEQUENTIAL,
-                  const DataSetFilterMode filterMode = DataSetFilterMode::APPLY);
+                  ZmwFileIterationMode iterationMode = ZmwFileIterationMode::SEQUENTIAL,
+                  DataSetFilterMode filterMode = DataSetFilterMode::APPLY);
 
     ///
     /// \brief Creates a new ZmwGroupQuery, limiting record results to only those

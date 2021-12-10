@@ -31,14 +31,13 @@ public:
 
     static const size_t MAX = std::numeric_limits<size_t>::max();
 
-    explicit ValidationErrors(const size_t maxNumErrors = ValidationErrors::MAX);
+    explicit ValidationErrors(size_t maxNumErrors = ValidationErrors::MAX);
 
     void AddFileError(const std::string& fn, std::string details);
     void AddReadGroupError(const std::string& rg, std::string details);
     void AddRecordError(const std::string& name, std::string details);
     void AddTagLengthError(const std::string& name, const std::string& tagLabel,
-                           const std::string& tagName, const size_t observed,
-                           const size_t expected);
+                           const std::string& tagName, size_t observed, size_t expected);
 
     bool IsEmpty() const;
     size_t MaxNumErrors() const;

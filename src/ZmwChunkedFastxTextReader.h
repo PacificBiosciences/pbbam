@@ -19,7 +19,7 @@ namespace BAM {
 class ZmwChunkedFastxTextReader final : public ZmwChunkedFastxReaderImpl
 {
 public:
-    ZmwChunkedFastxTextReader(std::string filename, const size_t numChunks);
+    ZmwChunkedFastxTextReader(std::string filename, size_t numChunks);
 
     void Seek(uint64_t pos) final;
     FastaSequence ReadNextFasta(bool skipName) final;

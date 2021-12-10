@@ -41,4 +41,4 @@ inline bool Compare::None::operator()(const BamRecord&, const BamRecord&) const 
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif // PBBAM_COMPARE_INL
+#endif  // PBBAM_COMPARE_INL

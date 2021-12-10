@@ -17,7 +17,7 @@ namespace BAM {
 ///
 /// \return joined string
 ///
-std::string Join(const std::vector<std::string>& tokens, const char delim);
+std::string Join(const std::vector<std::string>& tokens, char delim);
 
 /// \brief Splits a string into tokens
 ///
@@ -26,7 +26,7 @@ std::string Join(const std::vector<std::string>& tokens, const char delim);
 ///
 /// \returns vector of tokens
 ///
-std::vector<std::string> Split(const std::string& line, const char delim = '\t');
+std::vector<std::string> Split(const std::string& line, char delim = '\t');
 
 /// \brief Remove all whitespace from input string (start, end, & internal)
 ///

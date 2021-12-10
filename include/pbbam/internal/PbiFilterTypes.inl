@@ -529,4 +529,4 @@ inline bool PbiZmwModuloFilter::Accepts(const PbiRawData& idx, const size_t row)
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif // PBBAM_PBIFILTERTYPES_INL
+#endif  // PBBAM_PBIFILTERTYPES_INL

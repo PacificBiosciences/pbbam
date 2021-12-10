@@ -435,4 +435,4 @@ inline bool XmlName::Verbatim() const { return verbatim_; }
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif // PBBAM_DATASETELEMENT_INL
+#endif  // PBBAM_DATASETELEMENT_INL

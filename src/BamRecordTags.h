@@ -19,10 +19,10 @@ class BamRecordTags
 {
 public:
     // tag info
-    static bool IsIPD(const BamRecordTag tag);
-    static bool IsPulse(const BamRecordTag tag);
-    static bool IsPW(const BamRecordTag tag);
-    static std::string LabelFor(const BamRecordTag tag);
+    static bool IsIPD(BamRecordTag tag);
+    static bool IsPulse(BamRecordTag tag);
+    static bool IsPW(BamRecordTag tag);
+    static std::string LabelFor(BamRecordTag tag);
 
 private:
     struct BamRecordTagData

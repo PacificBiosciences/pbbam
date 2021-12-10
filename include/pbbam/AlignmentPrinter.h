@@ -50,7 +50,7 @@ public:
     ///          information
     ///
     std::string Print(const BamRecord& record,
-                      const Data::Orientation orientation = Data::Orientation::GENOMIC);
+                      Data::Orientation orientation = Data::Orientation::GENOMIC);
 
     /// \}
 

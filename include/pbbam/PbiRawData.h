@@ -337,7 +337,7 @@ public:
     /// \returns true if index has \b section
     /// \param[in] section PbiFile::Section identifier
     ///
-    bool HasSection(const PbiFile::Section section) const;
+    bool HasSection(PbiFile::Section section) const;
 
     /// \returns index filename ("*.pbi")
     ///

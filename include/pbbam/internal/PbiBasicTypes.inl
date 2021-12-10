@@ -29,4 +29,4 @@ inline bool IndexResultBlock::operator!=(const IndexResultBlock& other) const no
 }  // namespace BAM
 }  // namespace PacBio
 
-#endif // PBBAM_PBIBASICTYPES_INL
+#endif  // PBBAM_PBIBASICTYPES_INL

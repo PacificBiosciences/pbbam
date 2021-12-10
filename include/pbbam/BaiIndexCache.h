@@ -36,8 +36,7 @@ public:
     ///
     /// \note Does not own the returned pointer; caller is responsible.
     ///
-    hts_itr_t* IteratorForInterval(const int32_t refId, const Data::Position start,
-                                   const Data::Position stop) const;
+    hts_itr_t* IteratorForInterval(int32_t refId, Data::Position start, Data::Position stop) const;
 
 private:
     struct BaiIndexCacheDataPrivate;

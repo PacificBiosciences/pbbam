@@ -152,7 +152,7 @@ public:
     /// \param[in] id     read group ID number
     /// \returns hexadecimal string representation of ID
     ///
-    static std::string IntToId(const int32_t id);
+    static std::string IntToId(int32_t id);
 
     /// \returns sequencing chemistry from (bindingKig, sequencingKit,
     ///          basecallerVersion)
@@ -762,7 +762,7 @@ private:
 /// \returns hexadecimal string read group ID, e.g. "4c1bc9e4"
 ///
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
-                            const boost::optional<Data::Strand> strand = {});
+                            boost::optional<Data::Strand> strand = {});
 
 /// \brief Creates a read group ID from a movie name, read type, and barcode string.
 ///
@@ -775,7 +775,7 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 ///
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
                             const std::string& barcodeString,
-                            const boost::optional<Data::Strand> strand = {});
+                            boost::optional<Data::Strand> strand = {});
 
 /// \brief Creates a read group ID from a movie name, read type, and barcode IDs
 ///
@@ -788,7 +788,7 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 ///
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
                             const std::pair<int16_t, int16_t>& barcodes,
-                            const boost::optional<Data::Strand> strand = {});
+                            boost::optional<Data::Strand> strand = {});
 
 /// \brief Creates a read group ID from a read group object
 ///
