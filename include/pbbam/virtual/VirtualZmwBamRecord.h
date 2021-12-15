@@ -3,12 +3,12 @@
 
 #include <pbbam/Config.h>
 
-#include <vector>
-
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/virtual/VirtualRegion.h>
 #include <pbbam/virtual/VirtualRegionType.h>
+
+#include <vector>
 
 namespace PacBio {
 namespace BAM {
@@ -39,7 +39,7 @@ public:
 
     /// \returns true if requested VirtualRegionType has been annotated.
     ///
-    bool HasVirtualRegionType(const VirtualRegionType regionType) const;
+    bool HasVirtualRegionType(VirtualRegionType regionType) const;
 
     /// \returns IPD frame data
     ///
@@ -54,7 +54,7 @@ public:
     /// \param[in] regionType  requested region type
     /// \returns regions that match the requested type (empty vector if none found).
     ///
-    std::vector<VirtualRegion> VirtualRegionsTable(const VirtualRegionType regionType) const;
+    std::vector<VirtualRegion> VirtualRegionsTable(VirtualRegionType regionType) const;
 
     /// \}
 

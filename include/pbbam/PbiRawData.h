@@ -3,14 +3,14 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
-#include <cstdint>
+#include <pbbam/PbiFile.h>
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <pbbam/PbiFile.h>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -337,7 +337,7 @@ public:
     /// \returns true if index has \b section
     /// \param[in] section PbiFile::Section identifier
     ///
-    bool HasSection(const PbiFile::Section section) const;
+    bool HasSection(PbiFile::Section section) const;
 
     /// \returns index filename ("*.pbi")
     ///

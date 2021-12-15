@@ -2,10 +2,10 @@
 
 #include <pbbam/ZmwQuery.h>
 
-#include <cstdint>
-
 #include <pbbam/CompositeBamReader.h>
 #include <pbbam/PbiFilterTypes.h>
+
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -25,6 +25,10 @@ ZmwQuery::ZmwQuery(std::vector<int32_t> zmwWhitelist, const DataSet& dataset)
     : internal::IQuery(), d_{std::make_unique<ZmwQueryPrivate>(zmwWhitelist, dataset)}
 {
 }
+
+ZmwQuery::ZmwQuery(ZmwQuery&&) noexcept = default;
+
+ZmwQuery& ZmwQuery::operator=(ZmwQuery&&) noexcept = default;
 
 ZmwQuery::~ZmwQuery() = default;
 

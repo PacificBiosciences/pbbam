@@ -3,13 +3,13 @@
 
 #include <pbbam/Config.h>
 
-#include <string>
-#include <utility>
+#include <pbbam/FaiIndex.h>
 
 #include <pbcopper/data/Position.h>
 #include <pbcopper/data/QualityValues.h>
 
-#include <pbbam/FaiIndex.h>
+#include <string>
+#include <utility>
 
 namespace PacBio {
 namespace BAM {

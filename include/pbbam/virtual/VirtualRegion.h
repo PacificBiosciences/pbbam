@@ -24,14 +24,12 @@ public:
 
     /// \brief Creates a virtual region with basic type & position info.
     ///
-    VirtualRegion(const VirtualRegionType type_, const int beginPos_, const int endPos_,
-                  const int score_ = 0);
+    VirtualRegion(VirtualRegionType type, int beginPos, int endPos, int score = 0);
 
     /// \brief Creates a virtual region with type/position info, as well as context & barcode.
     ///
-    VirtualRegion(const VirtualRegionType type_, const int beginPos_, const int endPos_,
-                  const Data::LocalContextFlags cxTag_, const int barcodeLeft_,
-                  const int barcodeRight_, const int score_ = 0);
+    VirtualRegion(VirtualRegionType type, int beginPos, int endPos, Data::LocalContextFlags cxTag,
+                  int barcodeLeft, int barcodeRight, int score = 0);
 
     VirtualRegion() = default;
 

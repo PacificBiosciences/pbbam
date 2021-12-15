@@ -3,14 +3,13 @@
 
 #include <pbbam/Config.h>
 
-#include <string>
-#include <utility>
-
 #include <pbbam/FaiIndex.h>
 #include <pbbam/FastaSequence.h>
 #include <pbbam/FastqSequence.h>
-
 #include "FaiZmwChunker.h"
+
+#include <string>
+#include <utility>
 
 namespace PacBio {
 namespace BAM {
@@ -30,7 +29,7 @@ public:
     FaiZmwChunker chunker_;
 
 protected:
-    ZmwChunkedFastxReaderImpl(std::string fastxFilename, const size_t numChunks);
+    ZmwChunkedFastxReaderImpl(std::string fastxFilename, size_t numChunks);
 };
 
 }  // namespace BAM

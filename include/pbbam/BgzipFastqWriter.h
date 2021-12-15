@@ -3,10 +3,10 @@
 
 #include <pbbam/Config.h>
 
-#include <string>
-
 #include <pbbam/BgzipWriter.h>
 #include <pbbam/IFastqWriter.h>
+
+#include <string>
 
 namespace PacBio {
 namespace BAM {

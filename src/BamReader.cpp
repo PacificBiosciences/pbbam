@@ -2,27 +2,27 @@
 
 #include <pbbam/BamReader.h>
 
-#include <cassert>
-#include <cstdint>
-#include <cstdio>
-#include <cstdlib>
+#include <pbbam/BamRecord.h>
+#include <pbbam/Deleters.h>
+#include <pbbam/Validator.h>
+#include "Autovalidate.h"
+#include "MemoryUtils.h"
 
-#include <sstream>
-#include <stdexcept>
-#include <string>
+#include <boost/optional.hpp>
 
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
 #include <htslib/thread_pool.h>
-#include <boost/optional.hpp>
 
-#include <pbbam/BamRecord.h>
-#include <pbbam/Deleters.h>
-#include <pbbam/Validator.h>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 
-#include "Autovalidate.h"
-#include "MemoryUtils.h"
+#include <cassert>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 
 namespace PacBio {
 namespace BAM {
@@ -117,6 +117,10 @@ BamReader::BamReader(std::string fn)
 }
 
 BamReader::BamReader(BamFile bamFile) : BamReader{bamFile.Filename()} {}
+
+BamReader::BamReader(BamReader&&) noexcept = default;
+
+BamReader& BamReader::operator=(BamReader&&) noexcept = default;
 
 BamReader::~BamReader() = default;
 

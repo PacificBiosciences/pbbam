@@ -3,10 +3,10 @@
 
 #include <pbbam/Config.h>
 
-#include <string>
-
 #include <pbbam/FastaSequence.h>
 #include <pbbam/QualityValues.h>
+
+#include <string>
 
 namespace PacBio {
 namespace BAM {

@@ -3,14 +3,14 @@
 
 #include <pbbam/Config.h>
 
-#include <memory>
-#include <string>
-#include <vector>
-
 #include <pbbam/BamRecord.h>
 #include <pbbam/DataSet.h>
 #include <pbbam/PbiFilter.h>
 #include <pbbam/virtual/VirtualZmwBamRecord.h>
+
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace PacBio {
 namespace BAM {
@@ -37,6 +37,8 @@ public:
     /// maybe filtered, from DataSet input
     ZmwReadStitcher(const DataSet& dataset);
 
+    ZmwReadStitcher(ZmwReadStitcher&&) noexcept;
+    ZmwReadStitcher& operator=(ZmwReadStitcher&&) noexcept;
     ~ZmwReadStitcher();
 
     /// \}

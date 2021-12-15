@@ -3,14 +3,15 @@
 
 #include <pbbam/Config.h>
 
-#include <cstdio>
+#include "IndexedFastqReaderImpl.h"
+
+#include <pbcopper/utility/Deleters.h>
+
+#include <htslib/kseq.h>
 
 #include <memory>
 
-#include <htslib/kseq.h>
-#include <pbcopper/utility/Deleters.h>
-
-#include "IndexedFastqReaderImpl.h"
+#include <cstdio>
 
 namespace PacBio {
 namespace BAM {

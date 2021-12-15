@@ -2,13 +2,13 @@
 
 #include "KSeqReader.h"
 
-#include <cassert>
+#include "ErrnoReason.h"
 
 #include <sstream>
 #include <stdexcept>
 #include <vector>
 
-#include "ErrnoReason.h"
+#include <cassert>
 
 namespace PacBio {
 namespace BAM {

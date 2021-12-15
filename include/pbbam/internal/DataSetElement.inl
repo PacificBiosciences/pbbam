@@ -1,11 +1,16 @@
-#include <pbbam/internal/DataSetElement.h>
+#ifndef PBBAM_DATASETELEMENT_INL
+#define PBBAM_DATASETELEMENT_INL
 
-#include <cassert>
+#include <pbbam/Config.h>
+
+#include <pbbam/internal/DataSetElement.h>
 
 #include <iostream>
 #include <stdexcept>
 #include <tuple>
 #include <typeinfo>
+
+#include <cassert>
 
 namespace PacBio {
 namespace BAM {
@@ -429,3 +434,5 @@ inline bool XmlName::Verbatim() const { return verbatim_; }
 }  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
+
+#endif  // PBBAM_DATASETELEMENT_INL

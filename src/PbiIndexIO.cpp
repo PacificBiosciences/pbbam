@@ -2,23 +2,22 @@
 
 #include "PbiIndexIO.h"
 
-#include <cassert>
+#include <pbbam/BamRecord.h>
+#include <pbbam/Deleters.h>
+#include <pbbam/EntireFileQuery.h>
+#include <pbbam/PbiBuilder.h>
+#include "ErrnoReason.h"
+
+#include <pbcopper/utility/MoveAppend.h>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/optional.hpp>
 
 #include <array>
 #include <sstream>
 #include <stdexcept>
 
-#include <boost/algorithm/string.hpp>
-#include <boost/optional.hpp>
-
-#include <pbcopper/utility/MoveAppend.h>
-
-#include <pbbam/BamRecord.h>
-#include <pbbam/Deleters.h>
-#include <pbbam/EntireFileQuery.h>
-#include <pbbam/PbiBuilder.h>
-
-#include "ErrnoReason.h"
+#include <cassert>
 
 namespace PacBio {
 namespace BAM {

@@ -3,10 +3,10 @@
 
 #include <pbbam/Config.h>
 
+#include <pbbam/FaiIndex.h>
+
 #include <string>
 #include <vector>
-
-#include <pbbam/FaiIndex.h>
 
 namespace PacBio {
 namespace BAM {
@@ -42,7 +42,7 @@ public:
     /// Actual chunk count may be smaller than the requested number, if the input
     /// size is smaller.
     ///
-    FaiZmwChunker(const FaiIndex& index, const size_t numChunks);
+    FaiZmwChunker(const FaiIndex& index, size_t numChunks);
 
     ///
     /// \brief Construct a new FaiZmwChunker
@@ -53,7 +53,7 @@ public:
     /// Actual chunk count may be smaller than the requested number, if the input
     /// size is smaller.
     ///
-    FaiZmwChunker(const std::string& filename, const size_t numChunks);
+    FaiZmwChunker(const std::string& filename, size_t numChunks);
 
     FaiZmwChunker(const FaiZmwChunker&);
     FaiZmwChunker(FaiZmwChunker&&) noexcept;

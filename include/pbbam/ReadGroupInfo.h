@@ -3,19 +3,20 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
-#include <cstdint>
-
-#include <map>
-#include <string>
-#include <utility>
+#include <pbbam/exception/InvalidSequencingChemistryException.h>
 
 #include <boost/optional.hpp>
 
 #include <pbcopper/data/FrameCodec.h>
 #include <pbcopper/data/FrameEncoders.h>
+#include <pbcopper/data/Strand.h>
 
-#include <pbbam/exception/InvalidSequencingChemistryException.h>
+#include <map>
+#include <string>
+#include <utility>
+
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -91,6 +92,17 @@ enum class PlatformModelType
     SEQUELII
 };
 
+/// \brief Aggregate to simplify ReadGroupInfo constructor.
+///
+struct ReadGroupInfoConfig
+{
+    std::string MovieName;
+    std::string ReadType;
+    boost::optional<PlatformModelType> Platform{};
+    boost::optional<std::pair<uint16_t, uint16_t>> Barcodes{};
+    boost::optional<Data::Strand> Strand{};
+};
+
 /// \brief The ReadGroupInfo class represents a read group entry (\@RG) in the
 ///        SAM header.
 ///
@@ -140,7 +152,7 @@ public:
     /// \param[in] id     read group ID number
     /// \returns hexadecimal string representation of ID
     ///
-    static std::string IntToId(const int32_t id);
+    static std::string IntToId(int32_t id);
 
     /// \returns sequencing chemistry from (bindingKig, sequencingKit,
     ///          basecallerVersion)
@@ -216,6 +228,15 @@ public:
     ///
     ReadGroupInfo(std::string movieName, std::string readType, PlatformModelType platform,
                   std::pair<uint16_t, uint16_t> barcodes);
+
+    /// \brief Creates a read group info object from a ReadGroupInfoConfig
+    ///
+    /// \param[in] config       aggregate that contains all information to
+    ///                         create a ReadGroupInfo
+    ///
+    /// \sa RecordType
+    ///
+    ReadGroupInfo(ReadGroupInfoConfig config);
 
     /// \}
 
@@ -437,6 +458,9 @@ public:
 
     /// \returns sequencing kit part number
     std::string SequencingKit() const;
+
+    /// \returns CCS strand
+    boost::optional<Data::Strand> Strand() const;
 
     /// \}
 
@@ -669,6 +693,13 @@ public:
     ///
     ReadGroupInfo& SequencingKit(std::string kitNumber);
 
+    /// \brief Sets the ccs strand.
+    ///
+    /// \param[in] strand       new value
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& Strand(Data::Strand strand);
+
     /// \}
 
 private:
@@ -702,6 +733,7 @@ private:
     BarcodeModeType barcodeMode_ = BarcodeModeType::NONE;
     BarcodeQualityType barcodeQuality_ = BarcodeQualityType::NONE;
     std::map<BaseFeature, std::string> features_;
+    boost::optional<Data::Strand> strand_;
 
     // (optional) barcode label handling
     boost::optional<std::pair<uint16_t, uint16_t>> barcodes_;
@@ -717,6 +749,8 @@ private:
     std::string EncodeSamDescription() const;
     void DecodeSamDescription(const std::string& description);
     void DecodeBarcodeKey(const std::string& key, std::string value);
+    void DecodeStrand(std::string value);
+    std::string EncodeStrand(Data::Strand strand) const;
     void DecodeFrameCodecKey(const std::string& key, std::string value);
 };
 
@@ -727,7 +761,8 @@ private:
 ///
 /// \returns hexadecimal string read group ID, e.g. "4c1bc9e4"
 ///
-std::string MakeReadGroupId(const std::string& movieName, const std::string& readType);
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
+                            boost::optional<Data::Strand> strand = {});
 
 /// \brief Creates a read group ID from a movie name, read type, and barcode string.
 ///
@@ -739,7 +774,8 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 ///          label "/x--y", e.g. "4c1bc9e4/0--1"
 ///
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
-                            const std::string& barcodeString);
+                            const std::string& barcodeString,
+                            boost::optional<Data::Strand> strand = {});
 
 /// \brief Creates a read group ID from a movie name, read type, and barcode IDs
 ///
@@ -751,7 +787,8 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 ///          label "/x--y", e.g. "4c1bc9e4/0--1"
 ///
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
-                            const std::pair<int16_t, int16_t>& barcodes);
+                            const std::pair<int16_t, int16_t>& barcodes,
+                            boost::optional<Data::Strand> strand = {});
 
 /// \brief Creates a read group ID from a read group object
 ///

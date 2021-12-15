@@ -1,12 +1,17 @@
-#include <pbbam/PbiFilter.h>
+#ifndef PBBAM_PBIFILTER_INL
+#define PBBAM_PBIFILTER_INL
 
-#include <cassert>
+#include <pbbam/Config.h>
+
+#include <pbbam/PbiFilter.h>
 
 #include <algorithm>
 #include <iostream>
 #include <map>
 #include <set>
 #include <vector>
+
+#include <cassert>
 
 namespace PacBio {
 namespace BAM {
@@ -49,7 +54,7 @@ private:
     {
         virtual ~WrapperInterface() = default;
         virtual WrapperInterface* Clone() const = 0;
-        virtual bool Accepts(const PbiRawData& idx, const size_t row) const = 0;
+        virtual bool Accepts(const PbiRawData& idx, size_t row) const = 0;
     };
 
     template <typename T>
@@ -58,7 +63,7 @@ private:
         WrapperImpl(T x);
         WrapperImpl(const WrapperImpl& other);
         WrapperInterface* Clone() const override;
-        bool Accepts(const PbiRawData& idx, const size_t row) const override;
+        bool Accepts(const PbiRawData& idx, size_t row) const override;
         T data_;
     };
 
@@ -233,3 +238,5 @@ inline PbiFilter::CompositionType PbiFilter::Type() const { return d_->type_; }
 
 }  // namespace BAM
 }  // namespace PacBio
+
+#endif  // PBBAM_PBIFILTER_INL

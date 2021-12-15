@@ -3,16 +3,16 @@
 
 #include <pbbam/Config.h>
 
+#include <pbbam/DataSetXsd.h>
+
+#include <boost/utility/string_ref.hpp>
+
 #include <algorithm>
 #include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-#include <boost/utility/string_ref.hpp>
-
-#include <pbbam/DataSetXsd.h>
 
 namespace PacBio {
 namespace BAM {

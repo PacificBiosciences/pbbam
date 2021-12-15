@@ -3,11 +3,11 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
+#include <pbbam/exception/ValidationException.h>
 
 #include <limits>
 
-#include <pbbam/exception/ValidationException.h>
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {
@@ -44,7 +44,7 @@ public:
     ///
     /// \sa Validator::ValidateFileMetdata, Validator::ValidateEntireFile
     ///
-    static bool IsValid(const BamFile& file, const bool entireFile);
+    static bool IsValid(const BamFile& file, bool entireFile);
 
     /// \brief Checks that a %BAM header conforms to the %PacBio specification.
     ///
@@ -86,7 +86,7 @@ public:
     /// \throws ValidationException if \p header fails validation checks
     ///
     static void Validate(const BamHeader& header,
-                         const size_t maxErrors = std::numeric_limits<size_t>::max());
+                         size_t maxErrors = std::numeric_limits<size_t>::max());
 
     /// \brief Checks that a %BAM read group conforms to the %PacBio
     ///        specification.
@@ -97,7 +97,7 @@ public:
     /// \throws ValidationException if \p rg fails validation checks
     ///
     static void Validate(const ReadGroupInfo& rg,
-                         const size_t maxErrors = std::numeric_limits<size_t>::max());
+                         size_t maxErrors = std::numeric_limits<size_t>::max());
 
     /// \brief Checks that a %BAM record conforms to the %PacBio specification.
     ///
@@ -107,7 +107,7 @@ public:
     /// \throws ValidationException if \p record fails validation checks
     ///
     static void Validate(const BamRecord& record,
-                         const size_t maxErrors = std::numeric_limits<size_t>::max());
+                         size_t maxErrors = std::numeric_limits<size_t>::max());
 
     /// \brief Checks that a %BAM file's (entire) contents conform to the
     ///        %PacBio specification.
@@ -127,7 +127,7 @@ public:
     /// \throws ValidationException if \p file fails validation checks
     ///
     static void ValidateEntireFile(const BamFile& file,
-                                   const size_t maxErrors = std::numeric_limits<size_t>::max());
+                                   size_t maxErrors = std::numeric_limits<size_t>::max());
 
     /// \brief Checks that a %BAM file's metadata conforms to the
     ///        %PacBio specification.
@@ -141,7 +141,7 @@ public:
     /// \throws ValidationException if \p header fails validation checks
     ///
     static void ValidateFileMetadata(const BamFile& file,
-                                     const size_t maxErrors = std::numeric_limits<size_t>::max());
+                                     size_t maxErrors = std::numeric_limits<size_t>::max());
 };
 
 }  // namespace BAM

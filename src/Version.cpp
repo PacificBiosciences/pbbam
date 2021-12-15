@@ -2,11 +2,11 @@
 
 #include "Version.h"
 
+#include <pbbam/StringUtilities.h>
+
 #include <ostream>
 #include <sstream>
 #include <stdexcept>
-
-#include <pbbam/StringUtilities.h>
 
 namespace PacBio {
 namespace BAM {

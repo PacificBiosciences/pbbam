@@ -3,13 +3,13 @@
 
 #include <pbbam/Config.h>
 
-#include <iterator>
-#include <memory>
-#include <vector>
-
 #include <pbbam/BamFile.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/DataSet.h>
+
+#include <iterator>
+#include <memory>
+#include <vector>
 
 namespace PacBio {
 namespace BAM {

@@ -3,15 +3,15 @@
 
 #include <pbbam/Config.h>
 
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
+#include <pbbam/BamRecord.h>
 
 #include <functional>
 #include <string>
 #include <utility>
 
-#include <pbbam/BamRecord.h>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

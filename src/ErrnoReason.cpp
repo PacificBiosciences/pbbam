@@ -2,10 +2,10 @@
 
 #include "ErrnoReason.h"
 
+#include <iostream>
+
 #include <cerrno>
 #include <cstring>
-
-#include <iostream>
 
 namespace PacBio {
 namespace BAM {

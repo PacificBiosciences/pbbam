@@ -2,20 +2,19 @@
 
 #include <pbbam/DataSetTypes.h>
 
-#include <cassert>
-#include <cstddef>
+#include <pbbam/internal/DataSetBaseTypes.h>
+#include "DataSetIO.h"
+#include "DataSetUtils.h"
+#include "FileUtils.h"
+#include "TimeUtils.h"
 
 #include <ostream>
 #include <set>
 #include <tuple>
 #include <unordered_map>
 
-#include <pbbam/internal/DataSetBaseTypes.h>
-
-#include "DataSetIO.h"
-#include "DataSetUtils.h"
-#include "FileUtils.h"
-#include "TimeUtils.h"
+#include <cassert>
+#include <cstddef>
 
 namespace {
 

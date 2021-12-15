@@ -2,8 +2,13 @@
 
 #include <pbbam/PbiFilter.h>
 
-#include <cctype>
-#include <cstdint>
+#include <pbbam/PbiFilterTypes.h>
+#include <pbbam/StringUtilities.h>
+#include "FileUtils.h"
+
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include <algorithm>
 #include <fstream>
@@ -11,14 +16,8 @@
 #include <string>
 #include <unordered_map>
 
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/numeric/conversion/cast.hpp>
-
-#include <pbbam/PbiFilterTypes.h>
-#include <pbbam/StringUtilities.h>
-
-#include "FileUtils.h"
+#include <cctype>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

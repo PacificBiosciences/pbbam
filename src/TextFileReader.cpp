@@ -2,16 +2,15 @@
 
 #include <pbbam/TextFileReader.h>
 
-#include <sstream>
-#include <stdexcept>
-#include <type_traits>
+#include <pbbam/Deleters.h>
+#include "ErrnoReason.h"
 
 #include <htslib/bgzf.h>
 #include <htslib/kstring.h>
 
-#include <pbbam/Deleters.h>
-
-#include "ErrnoReason.h"
+#include <sstream>
+#include <stdexcept>
+#include <type_traits>
 
 namespace PacBio {
 namespace BAM {

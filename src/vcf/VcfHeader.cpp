@@ -2,9 +2,9 @@
 
 #include <pbbam/vcf/VcfHeader.h>
 
-#include <type_traits>
-
 #include <pbbam/vcf/VcfFormat.h>
+
+#include <type_traits>
 
 namespace PacBio {
 namespace VCF {

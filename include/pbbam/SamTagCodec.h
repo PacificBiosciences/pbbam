@@ -3,9 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <string>
-
 #include <pbbam/TagCollection.h>
+
+#include <string>
 
 namespace PacBio {
 namespace BAM {

@@ -3,22 +3,22 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
-#include <cstdint>
-
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
-
-#include <htslib/sam.h>
-
 #include <pbbam/BamRecordTag.h>
 #include <pbbam/Cigar.h>
 #include <pbbam/Deleters.h>
 #include <pbbam/Position.h>
 #include <pbbam/QualityValues.h>
 #include <pbbam/TagCollection.h>
+
+#include <htslib/sam.h>
+
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -317,7 +317,7 @@ public:
     ///
     /// \returns reference to this record.
     ///
-    BamRecordImpl& SetSequenceAndQualities(const char* sequence, const size_t sequenceLength,
+    BamRecordImpl& SetSequenceAndQualities(const char* sequence, size_t sequenceLength,
                                            const char* qualities = nullptr);
 
     /// \brief Sets the record's DNA sequence and quality values.
@@ -344,7 +344,7 @@ public:
     ///     const size_t sequenceLength, const char* qualities)
     ///
     BamRecordImpl& SetPreencodedSequenceAndQualities(const char* encodedSequence,
-                                                     const size_t rawSequenceLength,
+                                                     size_t rawSequenceLength,
                                                      const char* qualities = nullptr);
 
     /// \}
@@ -387,7 +387,7 @@ public:
     ///                     to be added
     /// \returns true if tag was successfully added.
     ///
-    bool AddTag(const BamRecordTag tag, const Tag& value);
+    bool AddTag(BamRecordTag tag, const Tag& value);
 
     /// \brief Adds a new tag to this record, with an optional modifier.
     ///
@@ -407,7 +407,7 @@ public:
     ///
     /// \returns true if tag was successfully added.
     ///
-    bool AddTag(const std::string& tagName, const Tag& value, const TagModifier additionalModifier);
+    bool AddTag(const std::string& tagName, const Tag& value, TagModifier additionalModifier);
 
     /// \brief Adds a new tag to this record, with an optional modifier.
     ///
@@ -421,7 +421,7 @@ public:
     ///
     /// \returns true if tag was successfully added.
     ///
-    bool AddTag(const BamRecordTag tag, const Tag& value, const TagModifier additionalModifier);
+    bool AddTag(BamRecordTag tag, const Tag& value, TagModifier additionalModifier);
 
     /// \brief Edits an existing tag on this record.
     ///
@@ -452,7 +452,7 @@ public:
     ///
     /// \returns true if tag was successfully edited.
     ///
-    bool EditTag(const BamRecordTag tag, const Tag& newValue);
+    bool EditTag(BamRecordTag tag, const Tag& newValue);
 
     /// \brief Edits an existing tag on this record.
     ///
@@ -473,8 +473,7 @@ public:
     ///
     /// \returns true if tag was successfully edited.
     ///
-    bool EditTag(const std::string& tagName, const Tag& value,
-                 const TagModifier additionalModifier);
+    bool EditTag(const std::string& tagName, const Tag& value, TagModifier additionalModifier);
 
     /// \brief Edits an existing tag on this record.
     ///
@@ -488,7 +487,7 @@ public:
     ///
     /// \returns true if tag was successfully edited.
     ///
-    bool EditTag(const BamRecordTag tag, const Tag& value, const TagModifier additionalModifier);
+    bool EditTag(BamRecordTag tag, const Tag& value, TagModifier additionalModifier);
 
     /// \returns true if a tag with this name is present in this record.
     bool HasTag(const std::string& tagName) const;
@@ -497,7 +496,7 @@ public:
     ///
     /// This is an overloaded method.
     ///
-    bool HasTag(const BamRecordTag tag) const;
+    bool HasTag(BamRecordTag tag) const;
 
     /// \brief Removes an existing tag from this record.
     ///
@@ -519,7 +518,7 @@ public:
     ///          previously unknown)
     /// \sa HasTag
     ///
-    bool RemoveTag(const BamRecordTag tag);
+    bool RemoveTag(BamRecordTag tag);
 
     /// \brief Fetches a tag from this record.
     ///
@@ -539,7 +538,7 @@ public:
     /// \returns Tag object for the requested name. If name is unknown, a
     ///          default constructed Tag is returned (Tag::IsNull() is true).
     ///
-    Tag TagValue(const BamRecordTag tag) const;
+    Tag TagValue(BamRecordTag tag) const;
 
     // change above to Tag();
 
@@ -568,8 +567,7 @@ private:
                                 // (lazy update on request)
 
     // internal tag helper methods
-    bool AddTagImpl(const std::string& tagName, const Tag& value,
-                    const TagModifier additionalModifier);
+    bool AddTagImpl(const std::string& tagName, const Tag& value, TagModifier additionalModifier);
     bool RemoveTagImpl(const std::string& tagName);
 
     int TagOffset(const std::string& tagName) const;
@@ -578,8 +576,7 @@ private:
     void SetCigarData(const Data::Cigar& cigar);
 
     // core seq/qual logic shared by the public API
-    BamRecordImpl& SetSequenceAndQualitiesInternal(const char* sequence,
-                                                   const size_t sequenceLength,
+    BamRecordImpl& SetSequenceAndQualitiesInternal(const char* sequence, size_t sequenceLength,
                                                    const char* qualities, bool isPreencoded);
 
 private:

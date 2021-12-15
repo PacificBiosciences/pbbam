@@ -3,14 +3,14 @@
 
 #include <pbbam/Config.h>
 
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include <pbbam/Position.h>
+#include <pbbam/vcf/VcfHeaderTypes.h>
 
 #include <boost/optional.hpp>
 
-#include <pbbam/Position.h>
-#include <pbbam/vcf/VcfHeaderTypes.h>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace PacBio {
 namespace VCF {
@@ -101,18 +101,18 @@ public:
     std::vector<GenotypeField> Genotypes() const;
     VcfVariant& Genotypes(std::vector<GenotypeField> genotypes);
 
-    const boost::optional<std::string>& GenotypeValue(const size_t sampleIndex,
+    const boost::optional<std::string>& GenotypeValue(size_t sampleIndex,
                                                       const std::string& id) const;
-    VcfVariant& GenotypeValue(const size_t sampleIndex, const std::string& id,
+    VcfVariant& GenotypeValue(size_t sampleIndex, const std::string& id,
                               boost::optional<std::string> value);
 
-    const boost::optional<std::vector<std::string>>& GenotypeValues(const size_t sampleIndex,
+    const boost::optional<std::vector<std::string>>& GenotypeValues(size_t sampleIndex,
                                                                     const std::string& id) const;
-    VcfVariant& GenotypeValues(const size_t sampleIndex, const std::string& id,
+    VcfVariant& GenotypeValues(size_t sampleIndex, const std::string& id,
                                boost::optional<std::vector<std::string>> values);
 
-    bool IsSampleHeterozygous(const size_t sampleIndex) const;
-    bool IsSamplePhased(const size_t sampleIndex) const;
+    bool IsSampleHeterozygous(size_t sampleIndex) const;
+    bool IsSamplePhased(size_t sampleIndex) const;
 
 private:
     // FIXED data

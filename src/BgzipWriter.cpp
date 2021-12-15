@@ -2,18 +2,17 @@
 
 #include <pbbam/BgzipWriter.h>
 
-#include <sstream>
-#include <stdexcept>
-#include <thread>
-#include <type_traits>
+#include <pbbam/Deleters.h>
+#include "ErrnoReason.h"
+#include "FileProducer.h"
 
 #include <htslib/bgzf.h>
 #include <htslib/hts.h>
 
-#include <pbbam/Deleters.h>
-
-#include "ErrnoReason.h"
-#include "FileProducer.h"
+#include <sstream>
+#include <stdexcept>
+#include <thread>
+#include <type_traits>
 
 namespace PacBio {
 namespace BAM {

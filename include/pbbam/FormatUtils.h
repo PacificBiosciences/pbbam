@@ -3,10 +3,10 @@
 
 #include <pbbam/Config.h>
 
+#include <htslib/bgzf.h>
+
 #include <string>
 #include <vector>
-
-#include <htslib/bgzf.h>
 
 namespace PacBio {
 namespace BAM {

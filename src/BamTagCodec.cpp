@@ -2,11 +2,11 @@
 
 #include <pbbam/BamTagCodec.h>
 
+#include <htslib/kstring.h>
+
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-
-#include <htslib/kstring.h>
 
 namespace PacBio {
 namespace BAM {

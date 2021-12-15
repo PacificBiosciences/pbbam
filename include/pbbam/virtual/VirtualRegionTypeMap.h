@@ -3,9 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <map>
-
 #include <pbbam/virtual/VirtualRegionType.h>
+
+#include <map>
 
 namespace PacBio {
 namespace BAM {

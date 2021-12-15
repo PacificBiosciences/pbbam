@@ -2,15 +2,15 @@
 
 #include <pbbam/PbiIndexedBamReader.h>
 
-#include <cstddef>
-#include <cstdint>
+#include "ErrnoReason.h"
+
+#include <htslib/bgzf.h>
 
 #include <sstream>
 #include <stdexcept>
 
-#include <htslib/bgzf.h>
-
-#include "ErrnoReason.h"
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -170,6 +170,10 @@ PbiIndexedBamReader::PbiIndexedBamReader(BamFile bamFile, const std::shared_ptr<
     , d_{std::make_unique<PbiIndexedBamReaderPrivate>(std::move(bamFile), index)}
 {
 }
+
+PbiIndexedBamReader::PbiIndexedBamReader(PbiIndexedBamReader&&) noexcept = default;
+
+PbiIndexedBamReader& PbiIndexedBamReader::operator=(PbiIndexedBamReader&&) noexcept = default;
 
 PbiIndexedBamReader::~PbiIndexedBamReader() = default;
 

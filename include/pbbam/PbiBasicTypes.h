@@ -3,14 +3,14 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
-#include <cstdint>
+#include <pbbam/Compare.h>
 
 #include <deque>
 #include <utility>
 #include <vector>
 
-#include <pbbam/Compare.h>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

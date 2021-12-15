@@ -2,16 +2,16 @@
 
 #include <pbbam/bed/BedReader.h>
 
-#include <sstream>
-#include <stdexcept>
-#include <type_traits>
+#include <pbbam/FormatUtils.h>
+#include <pbbam/StringUtilities.h>
+#include <pbbam/TextFileReader.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/optional.hpp>
 
-#include <pbbam/FormatUtils.h>
-#include <pbbam/StringUtilities.h>
-#include <pbbam/TextFileReader.h>
+#include <sstream>
+#include <stdexcept>
+#include <type_traits>
 
 namespace PacBio {
 namespace BED {

@@ -3,11 +3,11 @@
 
 #include <pbbam/Config.h>
 
-#include <ctime>
-
 #include <chrono>
 #include <stdexcept>
 #include <string>
+
+#include <ctime>
 
 namespace PacBio {
 namespace BAM {

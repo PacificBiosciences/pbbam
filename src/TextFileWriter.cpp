@@ -2,17 +2,16 @@
 
 #include <pbbam/TextFileWriter.h>
 
+#include <pbbam/Deleters.h>
+#include "ErrnoReason.h"
+#include "FileProducer.h"
+
+#include <boost/algorithm/string.hpp>
+
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>
-
-#include <boost/algorithm/string.hpp>
-
-#include <pbbam/Deleters.h>
-
-#include "ErrnoReason.h"
-#include "FileProducer.h"
 
 namespace PacBio {
 namespace BAM {

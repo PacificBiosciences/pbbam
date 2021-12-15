@@ -2,17 +2,16 @@
 
 #include "XmlWriter.h"
 
-#include <cassert>
-#include <cstddef>
+#include <pbbam/DataSet.h>
+#include "FileUtils.h"
+#include "pugixml/pugixml.hpp"
 
 #include <map>
 #include <ostream>
 #include <stdexcept>
 
-#include <pbbam/DataSet.h>
-
-#include "FileUtils.h"
-#include "pugixml/pugixml.hpp"
+#include <cassert>
+#include <cstddef>
 
 using DataSetElement = PacBio::BAM::internal::DataSetElement;
 

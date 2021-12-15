@@ -1,10 +1,15 @@
+#ifndef PBBAM_PBIFILTERTYPES_INL
+#define PBBAM_PBIFILTERTYPES_INL
+
+#include <pbbam/Config.h>
+
 #include <pbbam/PbiFilterTypes.h>
 
-#include <cassert>
+#include <boost/functional/hash/hash.hpp>
 
 #include <stdexcept>
 
-#include <boost/functional/hash/hash.hpp>
+#include <cassert>
 
 namespace PacBio {
 namespace BAM {
@@ -523,3 +528,5 @@ inline bool PbiZmwModuloFilter::Accepts(const PbiRawData& idx, const size_t row)
 
 }  // namespace BAM
 }  // namespace PacBio
+
+#endif  // PBBAM_PBIFILTERTYPES_INL

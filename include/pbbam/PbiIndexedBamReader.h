@@ -3,12 +3,12 @@
 
 #include <pbbam/Config.h>
 
-#include <string>
-
 #include <pbbam/BamFile.h>
 #include <pbbam/BamReader.h>
 #include <pbbam/PbiBasicTypes.h>
 #include <pbbam/PbiFilter.h>
+
+#include <string>
 
 namespace PacBio {
 namespace BAM {
@@ -78,6 +78,8 @@ public:
     PbiIndexedBamReader(BamFile bamFile);
     PbiIndexedBamReader(BamFile bamFile, const std::shared_ptr<PbiRawData>& index);
 
+    PbiIndexedBamReader(PbiIndexedBamReader&&) noexcept;
+    PbiIndexedBamReader& operator=(PbiIndexedBamReader&&) noexcept;
     ~PbiIndexedBamReader() override;
 
     /// \}

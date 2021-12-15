@@ -3,9 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <cstdio>
-
 #include <string>
+
+#include <cstdio>
 
 namespace PacBio {
 namespace BAM {

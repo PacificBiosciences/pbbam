@@ -3,9 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <cstdint>
-
 #include <pbcopper/data/Position.h>
+
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

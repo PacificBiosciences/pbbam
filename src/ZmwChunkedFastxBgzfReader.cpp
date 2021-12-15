@@ -2,13 +2,13 @@
 
 #include "ZmwChunkedFastxBgzfReader.h"
 
-#include <cassert>
+#include "ErrnoReason.h"
 
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
 
-#include "ErrnoReason.h"
+#include <cassert>
 
 namespace PacBio {
 namespace BAM {

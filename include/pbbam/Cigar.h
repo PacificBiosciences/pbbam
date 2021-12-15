@@ -3,9 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <pbcopper/data/Cigar.h>
-
 #include <pbbam/CigarOperation.h>
+
+#include <pbcopper/data/Cigar.h>
 
 namespace PacBio {
 namespace BAM {

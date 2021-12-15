@@ -2,34 +2,32 @@
 
 #include <pbbam/PbiBuilder.h>
 
-#include <cstddef>
-#include <cstdint>
-#include <cstdio>
-
-#include <array>
-#include <memory>
-#include <sstream>
-#include <stdexcept>
-#include <thread>
-#include <tuple>
-
-#include <htslib/bgzf.h>
-#include <htslib/hfile.h>
-#include <htslib/hts.h>
-
-#include <boost/numeric/conversion/cast.hpp>
-
-#include <pbcopper/utility/Deleters.h>
-
 #include <pbbam/BamRecord.h>
 #include <pbbam/BamRecordImpl.h>
 #include <pbbam/Deleters.h>
 #include <pbbam/PbiRawData.h>
 #include <pbbam/RecordType.h>
-
 #include "ErrnoReason.h"
 #include "MemoryUtils.h"
 #include "PbiBuilderBase.h"
+
+#include <pbcopper/utility/Deleters.h>
+
+#include <boost/numeric/conversion/cast.hpp>
+
+#include <htslib/bgzf.h>
+#include <htslib/hfile.h>
+#include <htslib/hts.h>
+
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <memory>
+#include <sstream>
+#include <stdexcept>
+#include <thread>
+#include <tuple>
 
 namespace PacBio {
 namespace BAM {
@@ -76,6 +74,10 @@ PbiBuilder::PbiBuilder(const std::string& pbiFilename, const size_t numReference
                                              compressionLevel, numThreads)}
 {
 }
+
+PbiBuilder::PbiBuilder(PbiBuilder&&) noexcept = default;
+
+PbiBuilder& PbiBuilder::operator=(PbiBuilder&&) noexcept = default;
 
 PbiBuilder::~PbiBuilder() noexcept = default;
 

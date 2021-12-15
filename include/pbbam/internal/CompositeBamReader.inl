@@ -1,3 +1,8 @@
+#ifndef PBBAM_COMPOSITEREADER_INL
+#define PBBAM_COMPOSITEREADER_INL
+
+#include <pbbam/Config.h>
+
 #include <pbbam/CompositeBamReader.h>
 
 #include <algorithm>
@@ -59,9 +64,15 @@ SortedCompositeBamReader<OrderByType>::SortedCompositeBamReader(std::vector<BamF
 }
 
 template <typename OrderByType>
-SortedCompositeBamReader<OrderByType>::~SortedCompositeBamReader()
-{
-}
+SortedCompositeBamReader<OrderByType>::SortedCompositeBamReader(
+    SortedCompositeBamReader&&) noexcept = default;
+
+template <typename OrderByType>
+SortedCompositeBamReader<OrderByType>& SortedCompositeBamReader<OrderByType>::operator=(
+    SortedCompositeBamReader&&) noexcept = default;
+
+template <typename OrderByType>
+SortedCompositeBamReader<OrderByType>::~SortedCompositeBamReader() = default;
 
 template <typename OrderByType>
 bool SortedCompositeBamReader<OrderByType>::GetNext(BamRecord& record)
@@ -172,3 +183,5 @@ uint32_t PbiFilterCompositeBamReader<OrderByType>::NumReads() const
 
 }  // namespace BAM
 }  // namespace PacBio
+
+#endif  // PBBAM_COMPOSITEREADER_INL

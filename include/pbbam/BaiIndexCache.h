@@ -3,13 +3,13 @@
 
 #include <pbbam/Config.h>
 
-#include <memory>
-#include <string>
-#include <vector>
+#include <pbcopper/data/Position.h>
 
 #include <htslib/hts.h>
 
-#include <pbcopper/data/Position.h>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace PacBio {
 namespace BAM {
@@ -26,6 +26,8 @@ public:
     explicit BaiIndexCacheData(const BamFile& bamFile);
     explicit BaiIndexCacheData(const std::string& bamFilename);
 
+    BaiIndexCacheData(BaiIndexCacheData&&) noexcept;
+    BaiIndexCacheData& operator=(BaiIndexCacheData&&) noexcept;
     ~BaiIndexCacheData();
 
     /// \note This is very much an internal method and should not be considered
@@ -34,8 +36,7 @@ public:
     ///
     /// \note Does not own the returned pointer; caller is responsible.
     ///
-    hts_itr_t* IteratorForInterval(const int32_t refId, const Data::Position start,
-                                   const Data::Position stop) const;
+    hts_itr_t* IteratorForInterval(int32_t refId, Data::Position start, Data::Position stop) const;
 
 private:
     struct BaiIndexCacheDataPrivate;

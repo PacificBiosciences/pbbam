@@ -2,16 +2,15 @@
 
 #include <pbbam/BaiIndexCache.h>
 
-#include <sstream>
-#include <stdexcept>
-
-#include <htslib/sam.h>
-
 #include <pbbam/BamFile.h>
 #include <pbbam/DataSet.h>
 #include <pbbam/Deleters.h>
-
 #include "ErrnoReason.h"
+
+#include <htslib/sam.h>
+
+#include <sstream>
+#include <stdexcept>
 
 namespace PacBio {
 namespace BAM {
@@ -39,6 +38,10 @@ BaiIndexCacheData::BaiIndexCacheData(const std::string& bamFilename)
         throw std::runtime_error{s.str()};
     }
 }
+
+BaiIndexCacheData::BaiIndexCacheData(BaiIndexCacheData&&) noexcept = default;
+
+BaiIndexCacheData& BaiIndexCacheData::operator=(BaiIndexCacheData&&) noexcept = default;
 
 BaiIndexCacheData::~BaiIndexCacheData() = default;
 

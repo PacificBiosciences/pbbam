@@ -3,17 +3,17 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
-#include <cstdint>
-
-#include <string>
-
-#include <htslib/sam.h>
-
 #include <pbbam/BamFile.h>
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/IRecordWriter.h>
+
+#include <htslib/sam.h>
+
+#include <string>
+
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -136,10 +136,10 @@ public:
     ///         writing or if an error occurred while writing the header
     ///
     BamWriter(const std::string& filename, const BamHeader& header,
-              const BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
-              const size_t numThreads = 4,
-              const BinCalculationMode binCalculationMode = BamWriter::BinCalculation_ON,
-              const bool useTempFile = true);
+              BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
+              size_t numThreads = 4,
+              BinCalculationMode binCalculationMode = BamWriter::BinCalculation_ON,
+              bool useTempFile = true);
 
     ///
     /// \brief Opens a %BAM file for writing & writes the header information.

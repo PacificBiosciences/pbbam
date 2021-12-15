@@ -3,12 +3,12 @@
 
 #include <pbbam/Config.h>
 
-#include <map>
-#include <string>
+#include <pbbam/internal/DataSetBaseTypes.h>
 
 #include <boost/optional.hpp>
 
-#include <pbbam/internal/DataSetBaseTypes.h>
+#include <map>
+#include <string>
 
 namespace PacBio {
 namespace BAM {

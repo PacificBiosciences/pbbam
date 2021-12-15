@@ -2,23 +2,22 @@
 
 #include <pbbam/BamHeader.h>
 
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
+#include <pbbam/BamFile.h>
+#include <pbbam/DataSet.h>
+#include <pbbam/SamTagCodec.h>
+#include <pbbam/StringUtilities.h>
+#include "Version.h"
+
+#include <htslib/hts.h>
 
 #include <set>
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>
 
-#include <htslib/hts.h>
-
-#include <pbbam/BamFile.h>
-#include <pbbam/DataSet.h>
-#include <pbbam/SamTagCodec.h>
-#include <pbbam/StringUtilities.h>
-
-#include "Version.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

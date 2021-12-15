@@ -2,14 +2,13 @@
 
 #include <pbbam/virtual/WhitelistedZmwReadStitcher.h>
 
-#include <cstdint>
+#include <pbbam/PbiIndexedBamReader.h>
+#include "VirtualZmwReader.h"
 
 #include <sstream>
 #include <stdexcept>
 
-#include <pbbam/PbiIndexedBamReader.h>
-
-#include "VirtualZmwReader.h"
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -130,6 +129,12 @@ WhitelistedZmwReadStitcher::WhitelistedZmwReadStitcher(const std::vector<int32_t
                                                              scrapsBamFilePath)}
 {
 }
+
+WhitelistedZmwReadStitcher::WhitelistedZmwReadStitcher(WhitelistedZmwReadStitcher&&) noexcept =
+    default;
+
+WhitelistedZmwReadStitcher& WhitelistedZmwReadStitcher::operator=(
+    WhitelistedZmwReadStitcher&&) noexcept = default;
 
 WhitelistedZmwReadStitcher::~WhitelistedZmwReadStitcher() = default;
 

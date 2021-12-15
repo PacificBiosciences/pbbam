@@ -2,6 +2,17 @@
 
 #include <pbbam/DataSet.h>
 
+#include <pbbam/internal/DataSetBaseTypes.h>
+#include "DataSetIO.h"
+#include "DataSetUtils.h"
+#include "FileUtils.h"
+#include "TimeUtils.h"
+
+#include <boost/algorithm/string.hpp>
+#include <boost/icl/interval_set.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/optional.hpp>
+
 #include <algorithm>
 #include <map>
 #include <ostream>
@@ -10,18 +21,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-#include <boost/algorithm/string.hpp>
-#include <boost/icl/interval_set.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/optional.hpp>
-
-#include <pbbam/internal/DataSetBaseTypes.h>
-
-#include "DataSetIO.h"
-#include "DataSetUtils.h"
-#include "FileUtils.h"
-#include "TimeUtils.h"
 
 namespace PacBio {
 namespace BAM {

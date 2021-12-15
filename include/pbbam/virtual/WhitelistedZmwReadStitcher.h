@@ -3,16 +3,16 @@
 
 #include <pbbam/Config.h>
 
-#include <cstdint>
+#include <pbbam/BamRecord.h>
+#include <pbbam/DataSet.h>
+#include <pbbam/PbiFilter.h>
+#include <pbbam/virtual/VirtualZmwBamRecord.h>
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <pbbam/BamRecord.h>
-#include <pbbam/DataSet.h>
-#include <pbbam/PbiFilter.h>
-#include <pbbam/virtual/VirtualZmwBamRecord.h>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -56,6 +56,8 @@ public:
                                const std::string& primaryBamFilePath,
                                const std::string& scrapsBamFilePath);
 
+    WhitelistedZmwReadStitcher(WhitelistedZmwReadStitcher&&) noexcept;
+    WhitelistedZmwReadStitcher& operator=(WhitelistedZmwReadStitcher&&) noexcept;
     ~WhitelistedZmwReadStitcher();
 
     /// \}

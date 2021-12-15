@@ -3,9 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <cstdint>
-
 #include <pbbam/BamRecord.h>
+
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -38,9 +38,8 @@ public:
     /// \param[in] exciseSoftClips  if true, any soft-clipped positions will be
     ///                             removed from query ends
     ///
-    BamRecordView(const BamRecord& record, const Data::Orientation orientation, const bool aligned,
-                  const bool exciseSoftClips,
-                  const PulseBehavior pulseBehavior = PulseBehavior::ALL);
+    BamRecordView(const BamRecord& record, Data::Orientation orientation, bool aligned,
+                  bool exciseSoftClips, PulseBehavior pulseBehavior = PulseBehavior::ALL);
 
 public:
     /// \returns BamRecord::AltLabelQV with this view's parameters applied

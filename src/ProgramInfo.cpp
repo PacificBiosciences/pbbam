@@ -2,11 +2,11 @@
 
 #include <pbbam/ProgramInfo.h>
 
-#include <sstream>
-#include <type_traits>
-
 #include <pbbam/SamTagCodec.h>
 #include <pbbam/StringUtilities.h>
+
+#include <sstream>
+#include <type_traits>
 
 namespace PacBio {
 namespace BAM {

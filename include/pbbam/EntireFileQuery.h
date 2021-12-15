@@ -3,9 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <memory>
-
 #include <pbbam/internal/QueryBase.h>
+
+#include <memory>
 
 namespace PacBio {
 namespace BAM {
@@ -38,6 +38,9 @@ public:
     ///         files.
     ///
     EntireFileQuery(const DataSet& dataset);
+
+    EntireFileQuery(EntireFileQuery&&) noexcept;
+    EntireFileQuery& operator=(EntireFileQuery&&) noexcept;
     ~EntireFileQuery() override;
 
 public:
