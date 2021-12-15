@@ -51,10 +51,10 @@ pbbam_thread_dep = dependency('threads', required : true)
 pbbam_boost_dep = dependency('boost', include_type : 'system', required : true)
 
 # zlib
-pbbam_zlib_dep = dependency('zlib', required : true, fallback : ['zlib', 'zlib_dep'])
+pbbam_zlib_dep = dependency('zlib', include_type : 'system', required : true, fallback : ['zlib', 'zlib_dep'])
 
 # htslib
-pbbam_htslib_dep = dependency('htslib', required : true, version : '>=1.4', fallback : ['htslib', 'htslib_dep'])
+pbbam_htslib_dep = dependency('htslib', include_type : 'system', required : true, version : '>=1.4', fallback : ['htslib', 'htslib_dep'])
 
 # pbcopper
 pbbam_pbcopper_dep = dependency('pbcopper', required : true, fallback : ['pbcopper', 'pbcopper_dep'])
