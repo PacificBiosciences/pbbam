@@ -1,14 +1,14 @@
 project(
   'PacBioBAM',
   'cpp',
-  version : '1.8.1',
+  version : '2.0.0',
   default_options : [
     'buildtype=release',
     'warning_level=3',
-    'cpp_std=c++14',
+    'cpp_std=c++20',
     'b_ndebug=if-release'],
   license : 'BSD-3',
-  meson_version : '>= 0.52.0')
+  meson_version : '>= 0.57.0')
 
 ############
 # CXXFLAGS #
