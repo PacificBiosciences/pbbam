@@ -234,7 +234,7 @@ if pbbam_run_tests
       '--verbose'] + [
         pbbamify_t],
     env : [
-      'SAMTOOLS=' + pbbam_test_samtools.path()],
+      'SAMTOOLS=' + pbbam_test_samtools.full_path()],
     timeout : 1800)
 endif
 
@@ -280,6 +280,6 @@ if pbbam_run_tests
       '--verbose'] + files('../tests/src/cram/ccs-kinetics-bystrandify.t'),
     env : [
       'CCS_KINETICS_BYSTRANDIFY=' + pbbam_ccs_kinetics_bystrandify.full_path(),
-      'SAMTOOLS=' + pbbam_test_samtools.path(),
+      'SAMTOOLS=' + pbbam_test_samtools.full_path(),
     ])
 endif
