@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+### Changed
+ - C++20 is now a *hard* minimum.
+
 ## [1.8.1] - 2021-11-15
 
 ### Added
