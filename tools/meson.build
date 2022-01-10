@@ -37,7 +37,7 @@ if pbbam_run_tests
     'bam2sam_CramTests',
     pbbam_cram_script,
     args : [
-      '--xunit-file=' + join_paths(meson.build_root(), 'pbbam-cram-bam2sam.xml'),
+      '--xunit-file=' + join_paths(meson.project_build_root(), 'pbbam-cram-bam2sam.xml'),
       '--verbose'] + [
         bam2sam_t],
     timeout : 1800)
@@ -114,7 +114,7 @@ if pbbam_run_tests
     'pbindexdump_CramTests',
     pbbam_cram_script,
     args : [
-      '--xunit-file=' + join_paths(meson.build_root(), 'pbbam-cram-pbindexdump.xml'),
+      '--xunit-file=' + join_paths(meson.project_build_root(), 'pbbam-cram-pbindexdump.xml'),
       '--verbose'] + [
         pbindexdump_json_t,
         pbindexdump_cpp_t],
@@ -173,7 +173,7 @@ if pbbam_run_tests and (not get_option('auto-validate'))
     'pbmerge_CramTests',
     pbbam_cram_script,
     args : [
-      '--xunit-file=' + join_paths(meson.build_root(), 'pbbam-cram-pbmerge.xml'),
+      '--xunit-file=' + join_paths(meson.project_build_root(), 'pbbam-cram-pbmerge.xml'),
       '--verbose'] + [
         pbmerge_pacbio_ordering_t,
         pbmerge_aligned_ordering_t,
@@ -230,7 +230,7 @@ if pbbam_run_tests
     'pbbamify_CramTests',
     pbbam_cram_script,
     args : [
-      '--xunit-file=' + join_paths(meson.build_root(), 'pbbam-cram-pbbamify.xml'),
+      '--xunit-file=' + join_paths(meson.project_build_root(), 'pbbam-cram-pbbamify.xml'),
       '--verbose'] + [
         pbbamify_t],
     env : [
@@ -276,7 +276,7 @@ if pbbam_run_tests
     'ccs-kinetics-bystrandify_CramTests',
     pbbam_cram_script,
     args : [
-      '--xunit-file=' + join_paths(meson.build_root(), 'pbbam-cram-ccs-kinetics-bystrandify-check.xml'),
+      '--xunit-file=' + join_paths(meson.project_build_root(), 'pbbam-cram-ccs-kinetics-bystrandify-check.xml'),
       '--verbose'] + files('../tests/src/cram/ccs-kinetics-bystrandify.t'),
     env : [
       'CCS_KINETICS_BYSTRANDIFY=' + pbbam_ccs_kinetics_bystrandify.full_path(),
