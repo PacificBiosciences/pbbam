@@ -64,12 +64,12 @@ test(
   pbbam_clang_formatter,
   args : [
     '--all'],
-  workdir : meson.source_root())
+  workdir : meson.project_source_root())
 
 test(
   'pbbam EOF check',
   pbbam_eof_check,
-  workdir : meson.source_root())
+  workdir : meson.project_source_root())
 
 test(
   'pbbam gtest unittests',
