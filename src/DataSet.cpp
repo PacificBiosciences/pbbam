@@ -578,7 +578,7 @@ DataSet& DataSet::Type(const DataSet::TypeEnum type)
     return *this;
 }
 
-std::string DataSet::TypeName() const { return d_->LocalNameLabel().to_string(); }
+std::string DataSet::TypeName() const { return std::string{d_->LocalNameLabel()}; }
 
 std::string DataSet::TypeToName(const DataSet::TypeEnum& type)
 {

@@ -5,13 +5,12 @@
 
 #include <pbbam/DataSetXsd.h>
 
-#include <boost/utility/string_ref.hpp>
-
 #include <algorithm>
 #include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace PacBio {
@@ -37,8 +36,8 @@ public:
     bool operator!=(const XmlName& other) const noexcept;
 
 public:
-    const boost::string_ref LocalName() const;
-    const boost::string_ref Prefix() const;
+    const std::string_view LocalName() const;
+    const std::string_view Prefix() const;
     const std::string& QualifiedName() const;
     bool Verbatim() const;
 
@@ -78,8 +77,8 @@ public:
     std::vector<std::shared_ptr<DataSetElement>>& Children();
     bool HasChild(const std::string& label) const;
 
-    const boost::string_ref LocalNameLabel() const;
-    const boost::string_ref PrefixLabel() const;
+    const std::string_view LocalNameLabel() const;
+    const std::string_view PrefixLabel() const;
     const std::string& QualifiedNameLabel() const;
     bool IsVerbatimLabel() const;
 

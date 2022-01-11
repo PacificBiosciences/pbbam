@@ -29,19 +29,19 @@ static DataSet CreateDataSet()
 TEST(BAM_DataSetCore, can_parse_xml_name_parts)
 {
     internal::XmlName name{"ns:node_name"};
-    EXPECT_EQ(boost::string_ref("ns"), name.Prefix());
-    EXPECT_EQ(boost::string_ref("node_name"), name.LocalName());
-    EXPECT_EQ(boost::string_ref("ns:node_name"), name.QualifiedName());
+    EXPECT_EQ("ns", name.Prefix());
+    EXPECT_EQ("node_name", name.LocalName());
+    EXPECT_EQ("ns:node_name", name.QualifiedName());
 
     internal::XmlName bareName{"node_name"};
-    EXPECT_EQ(boost::string_ref(""), bareName.Prefix());
-    EXPECT_EQ(boost::string_ref("node_name"), bareName.LocalName());
-    EXPECT_EQ(boost::string_ref("node_name"), bareName.QualifiedName());
+    EXPECT_EQ("", bareName.Prefix());
+    EXPECT_EQ("node_name", bareName.LocalName());
+    EXPECT_EQ("node_name", bareName.QualifiedName());
 
     internal::XmlName leadingColon{":node_name"};
-    EXPECT_EQ(boost::string_ref(""), leadingColon.Prefix());
-    EXPECT_EQ(boost::string_ref(":node_name"), leadingColon.LocalName());
-    EXPECT_EQ(boost::string_ref(":node_name"), leadingColon.QualifiedName());
+    EXPECT_EQ("", leadingColon.Prefix());
+    EXPECT_EQ(":node_name", leadingColon.LocalName());
+    EXPECT_EQ(":node_name", leadingColon.QualifiedName());
 }
 
 TEST(BAM_DataSetCore, created_with_correct_defaults)
