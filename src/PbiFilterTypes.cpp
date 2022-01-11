@@ -5,9 +5,9 @@
 #include <pbbam/StringUtilities.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/optional.hpp>
 
 #include <algorithm>
+#include <optional>
 #include <string>
 #include <unordered_map>
 
@@ -276,7 +276,7 @@ struct PbiNumSubreadsFilter::PbiNumSubreadsFilterPrivate
 
     int numSubreads_;
     Compare::Type cmp_;
-    mutable boost::optional<std::set<int32_t>> lookup_;  // mutable for lazy-load
+    mutable std::optional<std::set<int32_t>> lookup_;  // mutable for lazy-load
 };
 
 PbiNumSubreadsFilter::PbiNumSubreadsFilter(int numSubreads, const Compare::Type cmp)
@@ -318,7 +318,7 @@ struct PbiQueryNameFilter::PbiQueryNameFilterPrivate
 public:
     using QueryInterval = std::pair<int32_t, int32_t>;
     using QueryIntervals = std::set<QueryInterval>;
-    using ZmwData = std::unordered_map<int32_t, boost::optional<QueryIntervals>>;
+    using ZmwData = std::unordered_map<int32_t, std::optional<QueryIntervals>>;
     using RgIdLookup = std::unordered_map<int32_t, std::shared_ptr<ZmwData>>;
 
     PbiQueryNameFilterPrivate(const std::vector<std::string>& queryNames,
@@ -442,7 +442,7 @@ public:
         }();
 
         if (IsCcsOrTranscript(type)) {
-            zmw->emplace(zmwId, boost::optional<QueryIntervals>{});
+            zmw->emplace(zmwId, std::optional<QueryIntervals>{});
         } else {
 
             const auto queryIntervalParts = Split(nameParts.at(2), '_');

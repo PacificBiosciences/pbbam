@@ -8,13 +8,12 @@
 #include "Autovalidate.h"
 #include "MemoryUtils.h"
 
-#include <boost/optional.hpp>
-
 #include <htslib/bgzf.h>
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
 #include <htslib/thread_pool.h>
 
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <string>

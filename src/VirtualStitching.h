@@ -5,9 +5,8 @@
 
 #include <pbbam/DataSet.h>
 
-#include <boost/optional.hpp>
-
 #include <deque>
+#include <optional>
 #include <string>
 #include <utility>
 
@@ -16,7 +15,7 @@ namespace BAM {
 
 using StitchingSources = std::deque<std::pair<std::string, std::string>>;
 
-inline boost::optional<std::string> ScrapsFileId(const ExternalResource& resource)
+inline std::optional<std::string> ScrapsFileId(const ExternalResource& resource)
 {
     const auto& childResources = resource.ExternalResources();
     for (const auto& childResource : childResources) {
@@ -36,8 +35,8 @@ inline StitchingSources SourcesFromDataset(const DataSet& dataset)
     const ExternalResources& resources = dataset.ExternalResources();
     for (const ExternalResource& resource : resources) {
 
-        boost::optional<std::string> primaryId;
-        boost::optional<std::string> scrapsId;
+        std::optional<std::string> primaryId;
+        std::optional<std::string> scrapsId;
 
         // if resource is possible "primary" BAM, store & look for associated scraps
         const auto& metatype = resource.MetaType();

@@ -411,7 +411,7 @@ BarcodeQualityType ReadGroupInfo::BarcodeQuality() const
     return barcodeQuality_;
 }
 
-boost::optional<uint16_t> ReadGroupInfo::BarcodeForward() const
+std::optional<uint16_t> ReadGroupInfo::BarcodeForward() const
 {
     const auto barcodes = Barcodes();
     if (barcodes) {
@@ -420,7 +420,7 @@ boost::optional<uint16_t> ReadGroupInfo::BarcodeForward() const
     return {};
 }
 
-boost::optional<uint16_t> ReadGroupInfo::BarcodeReverse() const
+std::optional<uint16_t> ReadGroupInfo::BarcodeReverse() const
 {
     const auto barcodes = Barcodes();
     if (barcodes) {
@@ -429,7 +429,7 @@ boost::optional<uint16_t> ReadGroupInfo::BarcodeReverse() const
     return {};
 }
 
-boost::optional<std::pair<uint16_t, uint16_t>> ReadGroupInfo::Barcodes() const { return barcodes_; }
+std::optional<std::pair<uint16_t, uint16_t>> ReadGroupInfo::Barcodes() const { return barcodes_; }
 
 std::string ReadGroupInfo::BarcodeSequence() const
 {
@@ -996,7 +996,7 @@ ReadGroupInfo& ReadGroupInfo::SequencingKit(std::string kitNumber)
     return *this;
 }
 
-boost::optional<Data::Strand> ReadGroupInfo::Strand() const { return strand_; }
+std::optional<Data::Strand> ReadGroupInfo::Strand() const { return strand_; }
 
 ReadGroupInfo& ReadGroupInfo::Strand(Data::Strand strand)
 {
@@ -1057,7 +1057,7 @@ std::string ReadGroupInfo::ToSam() const
 // ---------------------------------------------------------
 
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
-                            const boost::optional<Data::Strand> strand)
+                            const std::optional<Data::Strand> strand)
 {
     std::string content{movieName + "//" + readType};
     if (strand) {
@@ -1072,7 +1072,7 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
                             const std::string& barcodeString,
-                            const boost::optional<Data::Strand> strand)
+                            const std::optional<Data::Strand> strand)
 {
     const std::string baseId{MakeReadGroupId(movieName, readType, strand)};
     return baseId + "/" + barcodeString;
@@ -1080,7 +1080,7 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
                             const std::pair<int16_t, int16_t>& barcodes,
-                            const boost::optional<Data::Strand> strand)
+                            const std::optional<Data::Strand> strand)
 {
     const std::string barcodeString{std::to_string(barcodes.first) + "--" +
                                     std::to_string(barcodes.second)};

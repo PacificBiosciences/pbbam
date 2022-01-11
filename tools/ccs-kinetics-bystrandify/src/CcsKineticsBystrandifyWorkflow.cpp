@@ -5,12 +5,12 @@
 
 #include <algorithm>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/optional.hpp>
 
 #include <pbcopper/data/LocalContextFlags.h>
 #include <pbcopper/logging/Logging.h>
@@ -207,8 +207,8 @@ struct UserIO
     }
 
     bool IsXml = false;
-    boost::optional<std::string> InputDatasetFile;
-    boost::optional<std::string> OutputDatasetFile;
+    std::optional<std::string> InputDatasetFile;
+    std::optional<std::string> OutputDatasetFile;
 
     std::vector<StrandifyTask> Tasks;
 };

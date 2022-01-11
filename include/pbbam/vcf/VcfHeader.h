@@ -5,8 +5,6 @@
 
 #include <pbbam/vcf/VcfHeaderTypes.h>
 
-#include <boost/optional.hpp>
-
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
