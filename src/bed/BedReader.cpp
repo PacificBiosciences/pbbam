@@ -7,8 +7,8 @@
 #include <pbbam/TextFileReader.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/optional.hpp>
 
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>
@@ -75,7 +75,7 @@ public:
     }
 
     std::unique_ptr<BAM::TextFileReader> reader_;
-    boost::optional<Data::GenomicInterval> interval_;
+    std::optional<Data::GenomicInterval> interval_;
 };
 
 BedReader::BedReader(const std::string& fn)

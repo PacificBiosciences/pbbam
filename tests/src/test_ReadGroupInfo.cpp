@@ -9,8 +9,6 @@
 
 #include <gtest/gtest.h>
 
-#include <boost/optional/optional_io.hpp>
-
 #include <pbbam/MD5.h>
 #include <pbbam/exception/BundleChemistryMappingException.h>
 #include <pbbam/exception/InvalidSequencingChemistryException.h>

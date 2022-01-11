@@ -168,7 +168,7 @@ const std::string& InfoDefinition::Id() const { return id_; }
 
 const std::string& InfoDefinition::Number() const { return number_; }
 
-const boost::optional<std::string>& InfoDefinition::Source() const { return source_; }
+const std::optional<std::string>& InfoDefinition::Source() const { return source_; }
 
 InfoDefinition& InfoDefinition::Source(std::string s)
 {
@@ -178,7 +178,7 @@ InfoDefinition& InfoDefinition::Source(std::string s)
 
 const std::string& InfoDefinition::Type() const { return type_; }
 
-const boost::optional<std::string>& InfoDefinition::Version() const { return version_; }
+const std::optional<std::string>& InfoDefinition::Version() const { return version_; }
 
 InfoDefinition& InfoDefinition::Version(std::string v)
 {

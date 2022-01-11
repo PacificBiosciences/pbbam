@@ -87,8 +87,8 @@ VcfVariant& VcfVariant::Genotypes(std::vector<GenotypeField> genotypes)
     return *this;
 }
 
-const boost::optional<std::string>& VcfVariant::GenotypeValue(const size_t sampleIndex,
-                                                              const std::string& id) const
+const std::optional<std::string>& VcfVariant::GenotypeValue(const size_t sampleIndex,
+                                                            const std::string& id) const
 {
     const auto& genotypeField = sampleGenotypes_.at(sampleIndex);
     const auto genotypeDataIndex = genotypeDataLookup_.at(id);
@@ -97,7 +97,7 @@ const boost::optional<std::string>& VcfVariant::GenotypeValue(const size_t sampl
 }
 
 VcfVariant& VcfVariant::GenotypeValue(const size_t sampleIndex, const std::string& id,
-                                      boost::optional<std::string> value)
+                                      std::optional<std::string> value)
 {
     auto& genotypeField = sampleGenotypes_.at(sampleIndex);
     const auto genotypeDataIndex = genotypeDataLookup_.at(id);
@@ -106,7 +106,7 @@ VcfVariant& VcfVariant::GenotypeValue(const size_t sampleIndex, const std::strin
     return *this;
 }
 
-const boost::optional<std::vector<std::string>>& VcfVariant::GenotypeValues(
+const std::optional<std::vector<std::string>>& VcfVariant::GenotypeValues(
     const size_t sampleIndex, const std::string& id) const
 {
     const auto& genotypeField = sampleGenotypes_.at(sampleIndex);
@@ -116,7 +116,7 @@ const boost::optional<std::vector<std::string>>& VcfVariant::GenotypeValues(
 }
 
 VcfVariant& VcfVariant::GenotypeValues(const size_t sampleIndex, const std::string& id,
-                                       boost::optional<std::vector<std::string>> values)
+                                       std::optional<std::vector<std::string>> values)
 {
     auto& genotypeField = sampleGenotypes_.at(sampleIndex);
     const auto genotypeDataIndex = genotypeDataLookup_.at(id);
@@ -151,24 +151,24 @@ VcfVariant& VcfVariant::InfoFields(std::vector<InfoField> fields)
     return *this;
 }
 
-const boost::optional<std::string> VcfVariant::InfoValue(const std::string& id) const
+const std::optional<std::string> VcfVariant::InfoValue(const std::string& id) const
 {
     return infoFields_.at(infoLookup_.at(id)).value;
 }
 
-VcfVariant& VcfVariant::InfoValue(const std::string& id, boost::optional<std::string> value)
+VcfVariant& VcfVariant::InfoValue(const std::string& id, std::optional<std::string> value)
 {
     infoFields_.at(infoLookup_.at(id)).value = std::move(value);
     return *this;
 }
 
-const boost::optional<std::vector<std::string>> VcfVariant::InfoValues(const std::string& id) const
+const std::optional<std::vector<std::string>> VcfVariant::InfoValues(const std::string& id) const
 {
     return infoFields_.at(infoLookup_.at(id)).values;
 }
 
 VcfVariant& VcfVariant::InfoValues(const std::string& id,
-                                   boost::optional<std::vector<std::string>> values)
+                                   std::optional<std::vector<std::string>> values)
 {
     infoFields_.at(infoLookup_.at(id)).values = std::move(values);
     return *this;

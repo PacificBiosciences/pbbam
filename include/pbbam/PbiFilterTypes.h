@@ -7,9 +7,8 @@
 #include <pbbam/PbiFile.h>
 #include <pbbam/PbiFilter.h>
 
-#include <boost/optional.hpp>
-
 #include <memory>
+#include <optional>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -32,7 +31,7 @@ class FilterBase
 {
 public:
     T value_;
-    boost::optional<std::vector<T>> multiValue_;
+    std::optional<std::vector<T>> multiValue_;
     Compare::Type cmp_;
 
 protected:
@@ -855,7 +854,7 @@ private:
     mutable bool initialized_ = false;
     mutable PbiFilter subFilter_;
     std::string rname_;
-    boost::optional<std::vector<std::string>> rnameWhitelist_;
+    std::optional<std::vector<std::string>> rnameWhitelist_;
     Compare::Type cmp_;
 
     // marked const so we can delay setup of filter in Accepts(), once we have
