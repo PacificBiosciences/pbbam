@@ -5,13 +5,12 @@
 
 #include <pbbam/exception/InvalidSequencingChemistryException.h>
 
-#include <boost/optional.hpp>
-
 #include <pbcopper/data/FrameCodec.h>
 #include <pbcopper/data/FrameEncoders.h>
 #include <pbcopper/data/Strand.h>
 
 #include <map>
+#include <optional>
 #include <string>
 #include <utility>
 
@@ -98,9 +97,9 @@ struct ReadGroupInfoConfig
 {
     std::string MovieName;
     std::string ReadType;
-    boost::optional<PlatformModelType> Platform{};
-    boost::optional<std::pair<uint16_t, uint16_t>> Barcodes{};
-    boost::optional<Data::Strand> Strand{};
+    std::optional<PlatformModelType> Platform{};
+    std::optional<std::pair<uint16_t, uint16_t>> Barcodes{};
+    std::optional<Data::Strand> Strand{};
 };
 
 /// \brief The ReadGroupInfo class represents a read group entry (\@RG) in the
@@ -318,19 +317,19 @@ public:
     ///
     /// \note This does **NOT** refer to any data in the description (DS) tag.
     ///
-    boost::optional<std::pair<uint16_t, uint16_t>> Barcodes() const;
+    std::optional<std::pair<uint16_t, uint16_t>> Barcodes() const;
 
     /// \returns forward barcode label stored in the read group ID (\@RG:ID)
     ///
     /// \note This does **NOT** refer to any data in the description (DS) tag.
     ///
-    boost::optional<uint16_t> BarcodeForward() const;
+    std::optional<uint16_t> BarcodeForward() const;
 
     /// \returns reverse barcode label stored in the read group ID (\@RG:ID)
     ///
     /// \note This does **NOT** refer to any data in the description (DS) tag.
     ///
-    boost::optional<uint16_t> BarcodeReverse() const;
+    std::optional<uint16_t> BarcodeReverse() const;
 
     //// \returns string value of \@RG:BC
     std::string BarcodeSequence() const;
@@ -460,7 +459,7 @@ public:
     std::string SequencingKit() const;
 
     /// \returns CCS strand
-    boost::optional<Data::Strand> Strand() const;
+    std::optional<Data::Strand> Strand() const;
 
     /// \}
 
@@ -733,10 +732,10 @@ private:
     BarcodeModeType barcodeMode_ = BarcodeModeType::NONE;
     BarcodeQualityType barcodeQuality_ = BarcodeQualityType::NONE;
     std::map<BaseFeature, std::string> features_;
-    boost::optional<Data::Strand> strand_;
+    std::optional<Data::Strand> strand_;
 
     // (optional) barcode label handling
-    boost::optional<std::pair<uint16_t, uint16_t>> barcodes_;
+    std::optional<std::pair<uint16_t, uint16_t>> barcodes_;
     std::string baseId_;
 
     Data::FrameEncoder ipdEncoder_ = Data::V1FrameEncoder{};
@@ -762,7 +761,7 @@ private:
 /// \returns hexadecimal string read group ID, e.g. "4c1bc9e4"
 ///
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
-                            boost::optional<Data::Strand> strand = {});
+                            std::optional<Data::Strand> strand = {});
 
 /// \brief Creates a read group ID from a movie name, read type, and barcode string.
 ///
@@ -775,7 +774,7 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 ///
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
                             const std::string& barcodeString,
-                            boost::optional<Data::Strand> strand = {});
+                            std::optional<Data::Strand> strand = {});
 
 /// \brief Creates a read group ID from a movie name, read type, and barcode IDs
 ///
@@ -788,7 +787,7 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 ///
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
                             const std::pair<int16_t, int16_t>& barcodes,
-                            boost::optional<Data::Strand> strand = {});
+                            std::optional<Data::Strand> strand = {});
 
 /// \brief Creates a read group ID from a read group object
 ///

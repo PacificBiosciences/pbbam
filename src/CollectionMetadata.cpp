@@ -17,7 +17,7 @@ namespace PacBio {
 namespace BAM {
 namespace {
 
-boost::optional<ControlKit::CustomSequence> UpdateControlKitCache(const ControlKit& kit)
+std::optional<ControlKit::CustomSequence> UpdateControlKitCache(const ControlKit& kit)
 {
     if (!kit.HasChild("CustomSequence")) {
         return {};
@@ -44,7 +44,7 @@ boost::optional<ControlKit::CustomSequence> UpdateControlKitCache(const ControlK
     return ControlKit::CustomSequence{lines.at(1), lines.at(3), lines.at(5)};
 }
 
-void UpdateControlKit(const boost::optional<ControlKit::CustomSequence>& cache, ControlKit& kit)
+void UpdateControlKit(const std::optional<ControlKit::CustomSequence>& cache, ControlKit& kit)
 {
     std::ostringstream seq;
     seq << ">left_adapter\\n"

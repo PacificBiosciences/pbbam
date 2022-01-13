@@ -11,9 +11,9 @@
 #include <pbcopper/utility/MoveAppend.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/optional.hpp>
 
 #include <array>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 
@@ -114,7 +114,7 @@ void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData, const DataSet& datas
     aggregateData.FileSections(PbiFile::BASIC | PbiFile::MAPPED | PbiFile::BARCODE);
 
     // Some GCC configurations give false-positive warnings against using uninitialized
-    // boost::optional here, hence the 'old-fashioned' bool flag.
+    // std::optional here, hence the 'old-fashioned' bool flag.
     bool isSet = false;
     PbiFile::VersionEnum aggregateVersion = PbiFile::CurrentVersion;
     const auto compatibleVersion = [&](PbiFile::VersionEnum next) {

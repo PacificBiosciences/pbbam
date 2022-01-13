@@ -477,7 +477,7 @@ uint8_t BamRecord::BarcodeQuality() const
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::BARCODE_QUALITY);
     const auto bq = impl_.TagValue(tagName);
     if (bq.IsNull()) {
-        return 0;  // ?? "missing" value for tags ?? should we consider boost::optional<T> for these kind of guys ??
+        return 0;  // ?? "missing" value for tags ?? should we consider std::optional<T> for these kind of guys ??
     }
     return bq.ToUInt8();
 }

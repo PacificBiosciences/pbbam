@@ -6,8 +6,7 @@
 #include <pbbam/Position.h>
 #include <pbbam/vcf/VcfHeaderTypes.h>
 
-#include <boost/optional.hpp>
-
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -18,14 +17,14 @@ namespace VCF {
 struct InfoField
 {
     std::string id;
-    boost::optional<std::string> value;
-    boost::optional<std::vector<std::string>> values;
+    std::optional<std::string> value;
+    std::optional<std::vector<std::string>> values;
 };
 
 struct GenotypeData
 {
-    boost::optional<std::string> value;
-    boost::optional<std::vector<std::string>> values;
+    std::optional<std::string> value;
+    std::optional<std::vector<std::string>> values;
 };
 
 struct GenotypeField
@@ -84,11 +83,11 @@ public:
 
     bool HasInfoField(const std::string& id) const;
 
-    const boost::optional<std::string> InfoValue(const std::string& id) const;
-    VcfVariant& InfoValue(const std::string& id, boost::optional<std::string> value);
+    const std::optional<std::string> InfoValue(const std::string& id) const;
+    VcfVariant& InfoValue(const std::string& id, std::optional<std::string> value);
 
-    const boost::optional<std::vector<std::string>> InfoValues(const std::string& id) const;
-    VcfVariant& InfoValues(const std::string& id, boost::optional<std::vector<std::string>> values);
+    const std::optional<std::vector<std::string>> InfoValues(const std::string& id) const;
+    VcfVariant& InfoValues(const std::string& id, std::optional<std::vector<std::string>> values);
 
 public:
     // sample genotypes
@@ -101,15 +100,15 @@ public:
     std::vector<GenotypeField> Genotypes() const;
     VcfVariant& Genotypes(std::vector<GenotypeField> genotypes);
 
-    const boost::optional<std::string>& GenotypeValue(size_t sampleIndex,
-                                                      const std::string& id) const;
+    const std::optional<std::string>& GenotypeValue(size_t sampleIndex,
+                                                    const std::string& id) const;
     VcfVariant& GenotypeValue(size_t sampleIndex, const std::string& id,
-                              boost::optional<std::string> value);
+                              std::optional<std::string> value);
 
-    const boost::optional<std::vector<std::string>>& GenotypeValues(size_t sampleIndex,
-                                                                    const std::string& id) const;
+    const std::optional<std::vector<std::string>>& GenotypeValues(size_t sampleIndex,
+                                                                  const std::string& id) const;
     VcfVariant& GenotypeValues(size_t sampleIndex, const std::string& id,
-                               boost::optional<std::vector<std::string>> values);
+                               std::optional<std::vector<std::string>> values);
 
     bool IsSampleHeterozygous(size_t sampleIndex) const;
     bool IsSamplePhased(size_t sampleIndex) const;

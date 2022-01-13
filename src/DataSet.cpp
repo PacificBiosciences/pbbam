@@ -11,10 +11,10 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/icl/interval_set.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/optional.hpp>
 
 #include <algorithm>
 #include <map>
+#include <optional>
 #include <ostream>
 #include <sstream>
 #include <stdexcept>
@@ -315,7 +315,7 @@ std::vector<GenomicInterval> DataSet::GenomicIntervals() const
 
     for (const auto& xmlFilter : Filters()) {
         ++numFilters;
-        boost::optional<std::string> contigName;
+        std::optional<std::string> contigName;
 
         intT intersectedInterval{intInterval{0, std::numeric_limits<int32_t>::max()}};
 
@@ -578,7 +578,7 @@ DataSet& DataSet::Type(const DataSet::TypeEnum type)
     return *this;
 }
 
-std::string DataSet::TypeName() const { return d_->LocalNameLabel().to_string(); }
+std::string DataSet::TypeName() const { return std::string{d_->LocalNameLabel()}; }
 
 std::string DataSet::TypeToName(const DataSet::TypeEnum& type)
 {
