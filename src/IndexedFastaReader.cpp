@@ -2,23 +2,23 @@
 
 #include <pbbam/IndexedFastaReader.h>
 
-#include <cassert>
-
-#include <memory>
-#include <sstream>
-#include <stdexcept>
-
-#include <htslib/faidx.h>
-#include <pbcopper/utility/Deleters.h>
-
 #include <pbbam/BamRecord.h>
 #include <pbbam/Deleters.h>
 #include <pbbam/GenomicInterval.h>
 #include <pbbam/Orientation.h>
 #include <pbbam/StringUtilities.h>
-
 #include "ErrnoReason.h"
 #include "SequenceUtils.h"
+
+#include <pbcopper/utility/Deleters.h>
+
+#include <htslib/faidx.h>
+
+#include <memory>
+#include <sstream>
+#include <stdexcept>
+
+#include <cassert>
 
 namespace PacBio {
 namespace BAM {

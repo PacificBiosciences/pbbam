@@ -2,28 +2,33 @@
 
 #include <pbbam/BamRecord.h>
 
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-
-#include <stdexcept>
-
-#include <htslib/sam.h>
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/numeric/conversion/cast.hpp>
+#include <pbbam/StringUtilities.h>
+#include <pbbam/ZmwTypeMap.h>
+#include <pbbam/virtual/VirtualRegionTypeMap.h>
+#include "BamRecordTags.h"
+#include "MemoryUtils.h"
+#include "Pulse2BaseCache.h"
+#include "SequenceUtils.h"
 
 #include <pbcopper/data/Clipping.h>
 #include <pbcopper/data/FrameEncoders.h>
 #include <pbcopper/data/internal/ClippingImpl.h>
 
-#include <pbbam/StringUtilities.h>
-#include <pbbam/ZmwTypeMap.h>
-#include <pbbam/virtual/VirtualRegionTypeMap.h>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
-#include "BamRecordTags.h"
-#include "MemoryUtils.h"
-#include "Pulse2BaseCache.h"
-#include "SequenceUtils.h"
+#include <htslib/sam.h>
+
+#include <algorithm>
+#include <iterator>
+#include <sstream>
+#include <stdexcept>
+#include <utility>
+
+#include <cassert>
+#include <cctype>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -472,7 +477,7 @@ uint8_t BamRecord::BarcodeQuality() const
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::BARCODE_QUALITY);
     const auto bq = impl_.TagValue(tagName);
     if (bq.IsNull()) {
-        return 0;  // ?? "missing" value for tags ?? should we consider boost::optional<T> for these kind of guys ??
+        return 0;  // ?? "missing" value for tags ?? should we consider std::optional<T> for these kind of guys ??
     }
     return bq.ToUInt8();
 }
@@ -621,55 +626,92 @@ BamRecord BamRecord::Clipped(const ClipType clipType, const Data::Position start
 
 void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
 {
+    TagCollection tags = impl_.Tags();
+
+    const auto ClipQualTag = [&](const BamRecordTag tag) {
+        if (impl_.HasTag(tag)) {
+            tags[Label(tag)] =
+                ClipSeqQV(FetchQualities(tag, Data::Orientation::NATIVE), clipFrom, clipLength)
+                    .Fastq();
+        }
+    };
+    ClipQualTag(BamRecordTag::DELETION_QV);
+    ClipQualTag(BamRecordTag::INSERTION_QV);
+    ClipQualTag(BamRecordTag::MERGE_QV);
+    ClipQualTag(BamRecordTag::SUBSTITUTION_QV);
+
+    const auto ClipSeqTag = [&](const BamRecordTag tag) {
+        if (impl_.HasTag(tag)) {
+            tags[Label(tag)] =
+                ClipSeqQV(FetchBases(tag, Data::Orientation::NATIVE), clipFrom, clipLength);
+        }
+    };
+    ClipSeqTag(BamRecordTag::DELETION_TAG);
+    ClipSeqTag(BamRecordTag::SUBSTITUTION_TAG);
+
+    const auto ClipKineticsTag = [&](const BamRecordTag tag, const Data::FrameCodec codec,
+                                     const Data::FrameEncoder& encoder) {
+        if (impl_.HasTag(tag)) {
+            const auto frames = FetchFrames(tag).Data();
+            if (frames.empty()) {
+                return;
+            }
+
+            if (codec == Data::FrameCodec::RAW) {
+                tags[Label(tag)] = ClipSeqQV(frames, clipFrom, clipLength);
+            } else {
+                tags[Label(tag)] = ClipSeqQV(encoder.Encode(frames), clipFrom, clipLength);
+            }
+        }
+    };
+    const auto ClipReverseKineticsTag = [&](const BamRecordTag tag, const Data::FrameCodec codec,
+                                            const Data::FrameEncoder& encoder) {
+        if (impl_.HasTag(tag)) {
+            const auto frames = FetchFrames(tag).Data();
+            if (frames.empty()) {
+                return;
+            }
+
+            const size_t originalClipEnd = clipFrom + clipLength;
+            assert(originalClipEnd <= frames.size());
+            const size_t reverseClipFrom = frames.size() - originalClipEnd;
+            if (codec == Data::FrameCodec::RAW) {
+                tags[Label(tag)] = ClipSeqQV(frames, reverseClipFrom, clipLength);
+            } else {
+                tags[Label(tag)] = ClipSeqQV(encoder.Encode(frames), reverseClipFrom, clipLength);
+            }
+        }
+    };
     const auto rg = ReadGroup();
     const auto ipdCodec = rg.IpdCodec();
     const auto ipdEncoder = rg.IpdFrameEncoder();
     const auto pwCodec = rg.PulseWidthCodec();
     const auto pwEncoder = rg.IpdFrameEncoder();
+    ClipKineticsTag(BamRecordTag::IPD, ipdCodec, ipdEncoder);
+    ClipKineticsTag(BamRecordTag::PULSE_WIDTH, pwCodec, pwEncoder);
+    ClipKineticsTag(BamRecordTag::FORWARD_IPD, ipdCodec, ipdEncoder);
+    ClipKineticsTag(BamRecordTag::FORWARD_PW, pwCodec, pwEncoder);
+    ClipReverseKineticsTag(BamRecordTag::REVERSE_IPD, ipdCodec, ipdEncoder);
+    ClipReverseKineticsTag(BamRecordTag::REVERSE_PW, pwCodec, pwEncoder);
 
-    // update BAM tags
-    TagCollection tags = impl_.Tags();
-    if (HasDeletionQV()) {
-        tags[Label(BamRecordTag::DELETION_QV)] =
-            ClipSeqQV(DeletionQV(Data::Orientation::NATIVE), clipFrom, clipLength).Fastq();
-    }
-    if (HasInsertionQV()) {
-        tags[Label(BamRecordTag::INSERTION_QV)] =
-            ClipSeqQV(InsertionQV(Data::Orientation::NATIVE), clipFrom, clipLength).Fastq();
-    }
-    if (HasMergeQV()) {
-        tags[Label(BamRecordTag::MERGE_QV)] =
-            ClipSeqQV(MergeQV(Data::Orientation::NATIVE), clipFrom, clipLength).Fastq();
-    }
-    if (HasSubstitutionQV()) {
-        tags[Label(BamRecordTag::SUBSTITUTION_QV)] =
-            ClipSeqQV(SubstitutionQV(Data::Orientation::NATIVE), clipFrom, clipLength).Fastq();
-    }
-    if (HasIPD()) {
-        const auto label = Label(BamRecordTag::IPD);
-        const auto ipd = IPD(Data::Orientation::NATIVE).Data();
-        if (ipdCodec == Data::FrameCodec::RAW) {
-            tags[label] = ClipSeqQV(ipd, clipFrom, clipLength);
-        } else {
-            tags[label] = ClipSeqQV(ipdEncoder.Encode(ipd), clipFrom, clipLength);
+    // basemods tags
+    if (impl_.HasTag(BamRecordTag::BASEMOD_LOCI)) {
+        if (!impl_.HasTag(BamRecordTag::BASEMOD_QV)) {
+            throw std::runtime_error{
+                "[pbbam] BAM record ERROR: cannot clip 'Mm' tag without a corresponding 'Ml' tag."};
         }
-    }
-    if (HasPulseWidth()) {
-        const auto label = Label(BamRecordTag::PULSE_WIDTH);
-        const auto pw = PulseWidth(Data::Orientation::NATIVE).Data();
-        if (pwCodec == Data::FrameCodec::RAW) {
-            tags[label] = ClipSeqQV(pw, clipFrom, clipLength);
-        } else {
-            tags[label] = ClipSeqQV(pwEncoder.Encode(pw), clipFrom, clipLength);
-        }
-    }
-    if (HasDeletionTag()) {
-        tags[Label(BamRecordTag::DELETION_TAG)] =
-            ClipSeqQV(DeletionTag(Data::Orientation::NATIVE), clipFrom, clipLength);
-    }
-    if (HasSubstitutionTag()) {
-        tags[Label(BamRecordTag::SUBSTITUTION_TAG)] =
-            ClipSeqQV(SubstitutionTag(Data::Orientation::NATIVE), clipFrom, clipLength);
+
+        const std::string seq{Sequence(Data::Orientation::NATIVE)};
+        const std::string oldBasemodsString{impl_.TagValue(BamRecordTag::BASEMOD_LOCI).ToString()};
+        const std::vector<uint8_t> basemodsQVs{
+            impl_.TagValue(BamRecordTag::BASEMOD_QV).ToUInt8Array()};
+
+        SplitBasemods sb =
+            ClipBasemodsTag(seq, oldBasemodsString, basemodsQVs, clipFrom, clipLength);
+
+        tags[Label(BamRecordTag::BASEMOD_LOCI)] =
+            SplitBasemods::SeparatingCToString(sb.RetainedSeparatingC);
+        tags[Label(BamRecordTag::BASEMOD_QV)] = std::move(sb.RetainedQuals);
     }
 
     // internal BAM tags
@@ -679,57 +721,53 @@ void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
         CalculatePulse2BaseCache();
         Pulse2BaseCache* p2bCache = p2bCache_.get();
 
-        if (HasAltLabelQV()) {
-            tags[Label(BamRecordTag::ALT_LABEL_QV)] =
-                ClipPulse(AltLabelQV(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength)
-                    .Fastq();
-        }
-        if (HasLabelQV()) {
-            tags[Label(BamRecordTag::LABEL_QV)] =
-                ClipPulse(LabelQV(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength)
-                    .Fastq();
-        }
-        if (HasPulseMergeQV()) {
-            tags[Label(BamRecordTag::PULSE_MERGE_QV)] =
-                ClipPulse(PulseMergeQV(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength)
-                    .Fastq();
-        }
-        if (HasAltLabelTag()) {
-            tags[Label(BamRecordTag::ALT_LABEL_TAG)] =
-                ClipPulse(AltLabelTag(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength);
-        }
-        if (HasPulseCall()) {
-            tags[Label(BamRecordTag::PULSE_CALL)] =
-                ClipPulse(PulseCall(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength);
-        }
-        if (HasPkmean()) {
-            tags[Label(BamRecordTag::PKMEAN)] = EncodePhotons(
-                ClipPulse(Pkmean(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength));
-        }
-        if (HasPkmid()) {
-            tags[Label(BamRecordTag::PKMID)] = EncodePhotons(
-                ClipPulse(Pkmid(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength));
-        }
-        if (HasPkmean2()) {
-            tags[Label(BamRecordTag::PKMEAN_2)] = EncodePhotons(
-                ClipPulse(Pkmean2(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength));
-        }
-        if (HasPkmid2()) {
-            tags[Label(BamRecordTag::PKMID_2)] = EncodePhotons(
-                ClipPulse(Pkmid2(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength));
-        }
-        if (HasPrePulseFrames()) {
-            tags[Label(BamRecordTag::PRE_PULSE_FRAMES)] = ClipPulse(
-                PrePulseFrames(Data::Orientation::NATIVE).Data(), p2bCache, clipFrom, clipLength);
-        }
-        if (HasPulseCallWidth()) {
-            tags[Label(BamRecordTag::PULSE_CALL_WIDTH)] = ClipPulse(
-                PulseCallWidth(Data::Orientation::NATIVE).Data(), p2bCache, clipFrom, clipLength);
-        }
-        if (HasStartFrame()) {
-            tags[Label(BamRecordTag::START_FRAME)] =
-                ClipPulse(StartFrame(Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength);
-        }
+        const auto ClipPulseQualTag = [&](const BamRecordTag tag) {
+            if (impl_.HasTag(tag)) {
+                tags[Label(tag)] = ClipPulse(FetchQualities(tag, Data::Orientation::NATIVE),
+                                             p2bCache, clipFrom, clipLength)
+                                       .Fastq();
+            }
+        };
+        ClipPulseQualTag(BamRecordTag::ALT_LABEL_QV);
+        ClipPulseQualTag(BamRecordTag::LABEL_QV);
+        ClipPulseQualTag(BamRecordTag::PULSE_MERGE_QV);
+
+        const auto ClipPulseSeqTag = [&](const BamRecordTag tag) {
+            if (impl_.HasTag(tag)) {
+                tags[Label(tag)] = ClipPulse(FetchBases(tag, Data::Orientation::NATIVE), p2bCache,
+                                             clipFrom, clipLength);
+            }
+        };
+        ClipPulseSeqTag(BamRecordTag::ALT_LABEL_TAG);
+        ClipPulseSeqTag(BamRecordTag::PULSE_CALL);
+
+        const auto ClipPhotonTag = [&](const BamRecordTag tag) {
+            if (impl_.HasTag(tag)) {
+                tags[Label(tag)] = EncodePhotons(ClipPulse(
+                    FetchPhotons(tag, Data::Orientation::NATIVE), p2bCache, clipFrom, clipLength));
+            }
+        };
+        ClipPhotonTag(BamRecordTag::PKMEAN);
+        ClipPhotonTag(BamRecordTag::PKMEAN_2);
+        ClipPhotonTag(BamRecordTag::PKMID);
+        ClipPhotonTag(BamRecordTag::PKMID_2);
+
+        const auto ClipPulseFrames = [&](const BamRecordTag tag) {
+            if (impl_.HasTag(tag)) {
+                tags[Label(tag)] = ClipPulse(FetchFrames(tag, Data::Orientation::NATIVE).Data(),
+                                             p2bCache, clipFrom, clipLength);
+            }
+        };
+        ClipPulseFrames(BamRecordTag::PRE_PULSE_FRAMES);
+        ClipPulseFrames(BamRecordTag::PULSE_CALL_WIDTH);
+
+        const auto ClipStartFrames = [&](const BamRecordTag tag) {
+            if (impl_.HasTag(tag)) {
+                tags[Label(tag)] = ClipPulse(FetchUInt32s(tag, Data::Orientation::NATIVE), p2bCache,
+                                             clipFrom, clipLength);
+            }
+        };
+        ClipStartFrames(BamRecordTag::START_FRAME);
     }
 
     impl_.Tags(tags);
@@ -747,9 +785,12 @@ void BamRecord::ClipFields(const size_t clipFrom, const size_t clipLength)
         ReverseComplement(sequence);
         Reverse(qualities);
     }
-    impl_.SetSequenceAndQualities(sequence, qualities.Fastq());
 
     ClipTags(clipFrom, clipLength);
+
+    // do *NOT* move this above ClipTags(), since we need the full/old sequence
+    // when clipping the `Mm` and `Ml` basemods tags
+    impl_.SetSequenceAndQualities(sequence, qualities.Fastq());
 }
 
 BamRecord& BamRecord::ClipToQuery(const Data::Position start, const Data::Position end)
@@ -1557,6 +1598,112 @@ BamRecord BamRecord::Mapped(const int32_t referenceId, const Data::Position refS
     BamRecord result(*this);
     result.Map(referenceId, refStart, strand, cigar, mappingQuality);
     return result;
+}
+
+BamRecord::SplitBasemods BamRecord::ClipBasemodsTag(const std::string& seq,
+                                                    const std::string& basemodsStr,
+                                                    const std::vector<uint8_t>& basemodsQVs,
+                                                    const size_t clipFrom, const size_t clipLength)
+{
+    assert(clipFrom <= seq.size());
+    const int32_t numClippedC = std::count(std::cbegin(seq), std::cbegin(seq) + clipFrom, 'C');
+    assert(clipFrom + clipLength <= seq.size());
+    const int32_t numRetainedC =
+        std::count(std::cbegin(seq) + clipFrom, std::cbegin(seq) + clipFrom + clipLength, 'C');
+
+    const std::vector<int32_t> separatingC{SplitBasemods::SplitBasemodsString(basemodsStr)};
+    assert(separatingC.size() == basemodsQVs.size());
+
+    // prefix sum (with an off-by-one) for divide-and-conquer later
+    //
+    //   input:  separatingC == {3, 1, 4}
+    //   output: prefixSum   == {4, 6, 11}
+    //
+    // i.e., prefixSum[i] accounts for all Cs we have seen so far up to CpG island i, including itself
+    //
+    // TODO(dseifert):
+    // replace with std::inclusive_scan in C++17
+    std::vector<int32_t> prefixSum;
+    prefixSum.reserve(separatingC.size());
+    int32_t pSum = 0;
+    for (const int32_t p : separatingC) {
+        pSum += (p + 1);
+        prefixSum.emplace_back(pSum);
+    }
+
+    // find the first retained CpG site
+    const auto startIt =
+        std::lower_bound(std::cbegin(prefixSum), std::cend(prefixSum), numClippedC + 1);
+    // find one past the last retained CpG site
+    const auto endIt =
+        std::upper_bound(std::cbegin(prefixSum), std::cend(prefixSum), numClippedC + numRetainedC);
+
+    const auto startPos = std::distance(std::cbegin(prefixSum), startIt);
+    const auto endPos = std::distance(std::cbegin(prefixSum), endIt);
+    assert(startPos <= endPos);
+
+    BamRecord::SplitBasemods result{
+        // Leading
+        {std::cbegin(separatingC) + 0, std::cbegin(separatingC) + startPos},
+        {std::cbegin(basemodsQVs) + 0, std::cbegin(basemodsQVs) + startPos},
+        // Retained
+        {std::cbegin(separatingC) + startPos, std::cbegin(separatingC) + endPos},
+        {std::cbegin(basemodsQVs) + startPos, std::cbegin(basemodsQVs) + endPos},
+        // Trailing
+        {std::cbegin(separatingC) + endPos, std::cbegin(separatingC) + separatingC.size()},
+        {std::cbegin(basemodsQVs) + endPos, std::cbegin(basemodsQVs) + basemodsQVs.size()},
+    };
+
+    if (endPos - startPos) {
+        // we lost some intervening Cs
+        result.RetainedSeparatingC.front() = prefixSum[startPos] - numClippedC - 1;
+        result.PrefixLostBases = numClippedC - ((startPos >= 1) ? prefixSum[startPos - 1] : 0);
+    }
+
+    return result;
+}
+
+std::vector<int32_t> BamRecord::SplitBasemods::SplitBasemodsString(const std::string& str)
+{
+    assert(str.size() >= 4);
+    assert(boost::algorithm::starts_with(str, "C+m"));
+    assert(boost::algorithm::ends_with(str, ";"));
+
+    const char* strView = str.c_str() + 3;  // skip the "C+m" prefix
+    const int32_t strLen = str.size() - 3;
+
+    // convert "C+m,3,1,4;" to std::vector{3, 1, 4}
+    std::vector<int32_t> result;
+    int32_t currentNumber = 0;
+    assert((strView[0] == ',') ||
+           (strView[0] == ';'));  // first character has to be either ',' or ';'
+    for (int32_t i = 1; i < strLen; ++i) {
+        // yes, this has to be an unsigned char for the EOF edge case on unsigned platforms (hi ARM!)
+        const unsigned char ch = strView[i];
+        if (std::isdigit(ch)) {
+            currentNumber *= 10;
+            currentNumber += (ch - 48);
+        } else {
+            // have a comma or semi-colon
+            assert((ch == ',') || (ch == ';'));
+            result.emplace_back(currentNumber);
+            currentNumber = 0;
+        }
+    }
+
+    return result;
+}
+
+std::string BamRecord::SplitBasemods::SeparatingCToString(const std::vector<int32_t>& vec)
+{
+    std::ostringstream newBasemodsString;
+    newBasemodsString << "C+m";
+    for (const auto val : vec) {
+        newBasemodsString << ',' << val;
+    }
+    newBasemodsString << ';';
+
+    return newBasemodsString.str();
 }
 
 uint8_t BamRecord::MapQuality() const { return impl_.MapQuality(); }

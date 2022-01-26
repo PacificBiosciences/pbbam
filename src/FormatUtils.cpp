@@ -2,15 +2,14 @@
 
 #include <pbbam/FormatUtils.h>
 
-#include <algorithm>
-#include <sstream>
-#include <stdexcept>
+#include <pbbam/Deleters.h>
+#include "ErrnoReason.h"
 
 #include <boost/algorithm/string.hpp>
 
-#include <pbbam/Deleters.h>
-
-#include "ErrnoReason.h"
+#include <algorithm>
+#include <sstream>
+#include <stdexcept>
 
 namespace PacBio {
 namespace BAM {

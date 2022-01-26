@@ -2,12 +2,12 @@
 
 #include <pbbam/PbiFile.h>
 
-#include <cstddef>
-#include <cstdint>
-
 #include <pbbam/BamFile.h>
 #include <pbbam/BamReader.h>
 #include <pbbam/PbiBuilder.h>
+
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

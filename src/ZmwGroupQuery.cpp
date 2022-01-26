@@ -2,16 +2,15 @@
 
 #include <pbbam/ZmwGroupQuery.h>
 
-#include <cstdint>
+#include <pbbam/BamRecord.h>
+#include <pbbam/CompositeBamReader.h>
+#include <pbbam/PbiFilterTypes.h>
+#include "MemoryUtils.h"
 
 #include <algorithm>
 #include <deque>
 
-#include <pbbam/BamRecord.h>
-#include <pbbam/CompositeBamReader.h>
-#include <pbbam/PbiFilterTypes.h>
-
-#include "MemoryUtils.h"
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -238,6 +237,10 @@ ZmwGroupQuery::ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist, const Dat
     : internal::IGroupQuery(), d_{std::make_unique<WhitelistedZmwGroupQuery>(zmwWhitelist, dataset)}
 {
 }
+
+ZmwGroupQuery::ZmwGroupQuery(ZmwGroupQuery&&) noexcept = default;
+
+ZmwGroupQuery& ZmwGroupQuery::operator=(ZmwGroupQuery&&) noexcept = default;
 
 ZmwGroupQuery::~ZmwGroupQuery() = default;
 

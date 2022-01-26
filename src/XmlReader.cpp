@@ -2,7 +2,8 @@
 
 #include "XmlReader.h"
 
-#include <cassert>
+#include <pbbam/StringUtilities.h>
+#include "pugixml/pugixml.hpp"
 
 #include <istream>
 #include <memory>
@@ -10,9 +11,7 @@
 #include <typeinfo>
 #include <vector>
 
-#include <pbbam/StringUtilities.h>
-
-#include "pugixml/pugixml.hpp"
+#include <cassert>
 
 using DataSetElement = PacBio::BAM::internal::DataSetElement;
 using FromInputXml = PacBio::BAM::internal::FromInputXml;
@@ -123,6 +122,8 @@ std::shared_ptr<DataSetElement> MakeElement(const pugi::xml_node& xmlNode)
             return std::make_shared<Provenance>(fromInputXml);
         case XmlElementType::SEQUENCING_KIT_PLATE:
             return std::make_shared<SequencingKitPlate>(fromInputXml);
+        case XmlElementType::SUPPLEMENTAL_RESOURCES:
+            return std::make_shared<SupplementalResources>(fromInputXml);
         case XmlElementType::TEMPLATE_PREP_KIT:
             return std::make_shared<TemplatePrepKit>(fromInputXml);
 

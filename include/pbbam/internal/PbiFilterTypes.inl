@@ -1,10 +1,15 @@
+#ifndef PBBAM_PBIFILTERTYPES_INL
+#define PBBAM_PBIFILTERTYPES_INL
+
+#include <pbbam/Config.h>
+
 #include <pbbam/PbiFilterTypes.h>
 
-#include <cassert>
+#include <boost/functional/hash/hash.hpp>
 
 #include <stdexcept>
 
-#include <boost/functional/hash/hash.hpp>
+#include <cassert>
 
 namespace PacBio {
 namespace BAM {
@@ -38,10 +43,10 @@ FilterBase<T>::FilterBase(std::vector<T> values, const Compare::Type cmp)
 template <typename T>
 bool FilterBase<T>::CompareHelper(const T& lhs) const
 {
-    if (multiValue_ == boost::none) {
-        return CompareSingleHelper(lhs);
-    } else {
+    if (multiValue_) {
         return CompareMultiHelper(lhs);
+    } else {
+        return CompareSingleHelper(lhs);
     }
 }
 
@@ -53,7 +58,7 @@ bool FilterBase<T>::CompareMultiHelper(const T& lhs) const
 
     // whitelist - return true on any hit
     if (cmp_ == Compare::CONTAINS) {
-        for (const auto& x : multiValue_.get()) {
+        for (const auto& x : *multiValue_) {
             if (x == lhs) {
                 return true;
             }
@@ -62,7 +67,7 @@ bool FilterBase<T>::CompareMultiHelper(const T& lhs) const
     }
     // blacklist - return false on any hit
     else {
-        for (const auto& x : multiValue_.get()) {
+        for (const auto& x : *multiValue_) {
             if (x == lhs) {
                 return false;
             }
@@ -523,3 +528,5 @@ inline bool PbiZmwModuloFilter::Accepts(const PbiRawData& idx, const size_t row)
 
 }  // namespace BAM
 }  // namespace PacBio
+
+#endif  // PBBAM_PBIFILTERTYPES_INL

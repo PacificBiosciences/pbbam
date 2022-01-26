@@ -3,13 +3,13 @@
 
 #include <pbbam/Config.h>
 
-#include <memory>
-#include <string>
+#include <pbbam/Deleters.h>
 
 #include <htslib/kseq.h>
 #include <zlib.h>
 
-#include <pbbam/Deleters.h>
+#include <memory>
+#include <string>
 
 namespace PacBio {
 namespace BAM {

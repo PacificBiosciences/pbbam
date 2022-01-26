@@ -2,17 +2,18 @@
 
 #include <pbbam/PbiFilterTypes.h>
 
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
+#include <pbbam/StringUtilities.h>
 
+#include <boost/algorithm/string.hpp>
+
+#include <algorithm>
+#include <optional>
 #include <string>
 #include <unordered_map>
 
-#include <boost/algorithm/string.hpp>
-#include <boost/optional.hpp>
-
-#include <pbbam/StringUtilities.h>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -121,6 +122,7 @@ PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& movieName
             "Movie name filter can only compare equality or presence in whitelist/blacklist."};
     }
 
+    // clang-format off
     for (const auto& movieName : movieNames) {
         candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "CCS")));
         candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "TRANSCRIPT")));
@@ -130,8 +132,17 @@ PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& movieName
         candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "SCRAP")));
         candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "UNKNOWN")));
         candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "ZMW")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "CCS")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "TRANSCRIPT")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "POLYMERASE")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "HQREGION")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "SUBREAD")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "SCRAP")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "UNKNOWN")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "ZMW")));
         movieNames_.insert(movieName);
     }
+    // clang-format on
 }
 
 bool PbiMovieNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
@@ -156,12 +167,20 @@ bool PbiMovieNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
             std::make_pair(barcodeData.bcForward_.at(i), barcodeData.bcReverse_.at(i));
         for (const auto& movieName : movieNames_) {
             const auto tryBarcodedType = [&](const std::string& readType) {
-                const int32_t barcodedId =
+                int32_t barcodedId =
                     ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, readType, barcodes));
                 if (barcodedId == rgId) {
                     candidateRgIds_.insert(barcodedId);  // found combo, save for future lookup
                     return true;
                 }
+
+                barcodedId =
+                    ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, readType, barcodes));
+                if (barcodedId == rgId) {
+                    candidateRgIds_.insert(barcodedId);  // found combo, save for future lookup
+                    return true;
+                }
+
                 return false;
             };
 
@@ -220,7 +239,7 @@ struct PbiNumSubreadsFilter::PbiNumSubreadsFilterPrivate
     bool Accepts(const PbiRawData& idx, const size_t row) const
     {
         // lazy-load
-        if (!lookup_.is_initialized()) {
+        if (!lookup_) {
             InitializeLookup(idx);
         }
         const auto holeNumber = idx.BasicData().holeNumber_[row];
@@ -257,7 +276,7 @@ struct PbiNumSubreadsFilter::PbiNumSubreadsFilterPrivate
 
     int numSubreads_;
     Compare::Type cmp_;
-    mutable boost::optional<std::set<int32_t>> lookup_;  // mutable for lazy-load
+    mutable std::optional<std::set<int32_t>> lookup_;  // mutable for lazy-load
 };
 
 PbiNumSubreadsFilter::PbiNumSubreadsFilter(int numSubreads, const Compare::Type cmp)
@@ -269,6 +288,10 @@ PbiNumSubreadsFilter::PbiNumSubreadsFilter(const PbiNumSubreadsFilter& other)
     : d_{std::make_unique<PbiNumSubreadsFilter::PbiNumSubreadsFilterPrivate>(other.d_)}
 {
 }
+
+PbiNumSubreadsFilter::PbiNumSubreadsFilter(PbiNumSubreadsFilter&&) noexcept = default;
+
+PbiNumSubreadsFilter& PbiNumSubreadsFilter::operator=(PbiNumSubreadsFilter&&) noexcept = default;
 
 PbiNumSubreadsFilter::~PbiNumSubreadsFilter() = default;
 
@@ -295,7 +318,7 @@ struct PbiQueryNameFilter::PbiQueryNameFilterPrivate
 public:
     using QueryInterval = std::pair<int32_t, int32_t>;
     using QueryIntervals = std::set<QueryInterval>;
-    using ZmwData = std::unordered_map<int32_t, boost::optional<QueryIntervals>>;
+    using ZmwData = std::unordered_map<int32_t, std::optional<QueryIntervals>>;
     using RgIdLookup = std::unordered_map<int32_t, std::shared_ptr<ZmwData>>;
 
     PbiQueryNameFilterPrivate(const std::vector<std::string>& queryNames,
@@ -369,11 +392,15 @@ public:
     std::vector<int32_t> CandidateRgIds(const std::string& movieName, const RecordType type)
     {
         if (type == RecordType::CCS) {
-            return {ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "CCS"))};
+            return {
+                ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "CCS")),
+                ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "CCS")),
+            };
         }
 
         if (type == RecordType::TRANSCRIPT) {
-            return {ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "TRANSCRIPT"))};
+            return {ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "TRANSCRIPT")),
+                    ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "TRANSCRIPT"))};
         }
 
         // we can't know for sure from QNAME alone
@@ -382,7 +409,13 @@ public:
                 ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "SUBREAD")),
                 ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "SCRAP")),
                 ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "UNKNOWN")),
-                ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "ZMW"))};
+                ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "ZMW")),
+                ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "POLYMERASE")),
+                ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "HQREGION")),
+                ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "SUBREAD")),
+                ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "SCRAP")),
+                ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "UNKNOWN")),
+                ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "ZMW"))};
     }
 
     void HandleName(const std::string& queryName, const RecordType type)
@@ -409,7 +442,7 @@ public:
         }();
 
         if (IsCcsOrTranscript(type)) {
-            zmw->emplace(zmwId, boost::optional<QueryIntervals>{});
+            zmw->emplace(zmwId, std::optional<QueryIntervals>{});
         } else {
 
             const auto queryIntervalParts = Split(nameParts.at(2), '_');
@@ -446,8 +479,11 @@ public:
         if (rgFound == lookup_.end()) {
             zmw = std::make_shared<ZmwData>();
             for (const auto& rg : rgIds) {
-                assert(lookup_.find(rg) == lookup_.end());
-                lookup_.emplace(rg, zmw);
+                // Extra RG hashes (fixed & legacy) have been calculated as
+                // candidates, but sometimes these are the same. Only store once.
+                if (lookup_.find(rg) == lookup_.end()) {
+                    lookup_.emplace(rg, zmw);
+                }
             }
         } else {
 #ifndef NDEBUG
@@ -482,6 +518,10 @@ PbiQueryNameFilter::PbiQueryNameFilter(const PbiQueryNameFilter& other)
 {
 }
 
+PbiQueryNameFilter::PbiQueryNameFilter(PbiQueryNameFilter&&) noexcept = default;
+
+PbiQueryNameFilter& PbiQueryNameFilter::operator=(PbiQueryNameFilter&&) noexcept = default;
+
 PbiQueryNameFilter::~PbiQueryNameFilter() = default;
 
 bool PbiQueryNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
@@ -494,28 +534,10 @@ bool PbiQueryNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
 PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<int32_t>& rgIds, const Compare::Type cmp)
     : cmp_{cmp}
 {
-    if (cmp_ == Compare::EQUAL) {
-        cmp_ = Compare::CONTAINS;
-    } else if (cmp_ == Compare::NOT_EQUAL) {
-        cmp_ = Compare::NOT_CONTAINS;
-    }
-
-    if (cmp_ != Compare::CONTAINS && cmp_ != Compare::NOT_CONTAINS) {
-        throw std::runtime_error{
-            "[pbbam] PBI filter ERROR: unsupported compare type (" + Compare::TypeToName(cmp) +
-            ") for this property. "
-            "Read group filter can only compare equality or presence in whitelist/blacklist."};
-    }
-
-    // Add RG ID & empty filter if not present. The empty filter will work for
-    // non-barcoded IDs that match the expected number(s).
-    //
-    for (const auto& rgId : rgIds) {
-        const auto found = lookup_.find(rgId);
-        if (found == lookup_.cend()) {
-            lookup_.emplace(rgId, boost::none);
-        }
-    }
+    std::vector<ReadGroupInfo> readGroups{rgIds.size()};
+    std::transform(rgIds.cbegin(), rgIds.cend(), readGroups.begin(),
+                   [](const int32_t rgId) { return ReadGroupInfo{ReadGroupInfo::IntToId(rgId)}; });
+    AddReadGroups(readGroups);
 }
 
 PbiReadGroupFilter::PbiReadGroupFilter(const int32_t rgId, const Compare::Type cmp)
@@ -527,43 +549,7 @@ PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<ReadGroupInfo>& readGro
                                        const Compare::Type cmp)
     : cmp_{cmp}
 {
-    if (cmp_ == Compare::EQUAL) {
-        cmp_ = Compare::CONTAINS;
-    } else if (cmp_ == Compare::NOT_EQUAL) {
-        cmp_ = Compare::NOT_CONTAINS;
-    }
-
-    if (cmp_ != Compare::CONTAINS && cmp_ != Compare::NOT_CONTAINS) {
-        throw std::runtime_error{
-            "[pbbam] PBI filter ERROR: unsupported compare type (" + Compare::TypeToName(cmp) +
-            ") for this property. "
-            "Read group filter can only compare equality or presence in whitelist/blacklist."};
-    }
-
-    for (const auto& rg : readGroups) {
-        // Add RG base ID with no filter if not present. The empty filter will
-        // work for non-barcoded IDs. We'll add to it if the base read group ID
-        // also has barcode labels,so that any barcode pair whitelisted for this
-        // read group filter will be a match.
-        //
-        const auto idNum = ReadGroupInfo::IdToInt(rg.BaseId());
-        const auto found = lookup_.find(idNum);
-        if (found == lookup_.cend()) {
-            lookup_.emplace(idNum, boost::none);
-        }
-
-        // Maybe add barcodes to base ID
-        const auto barcodes = rg.Barcodes();
-        if (barcodes) {
-            const auto bcFor = static_cast<int16_t>(barcodes->first);
-            const auto bcRev = static_cast<int16_t>(barcodes->second);
-            auto& idBarcodes = lookup_.at(idNum);
-            if (!idBarcodes) {
-                idBarcodes = std::vector<std::pair<int16_t, int16_t>>{};
-            }
-            idBarcodes->push_back(std::make_pair(bcFor, bcRev));
-        }
-    }
+    AddReadGroups(readGroups);
 }
 
 PbiReadGroupFilter::PbiReadGroupFilter(const ReadGroupInfo& rg, const Compare::Type cmp)
@@ -573,51 +559,98 @@ PbiReadGroupFilter::PbiReadGroupFilter(const ReadGroupInfo& rg, const Compare::T
 
 PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<std::string>& rgIds,
                                        const Compare::Type cmp)
+    : cmp_{cmp}
 {
-    std::vector<ReadGroupInfo> readGroups;
-    for (const auto& rgId : rgIds) {
-        readGroups.push_back(rgId);
-    }
-    *this = PbiReadGroupFilter{readGroups, cmp};
+    std::vector<ReadGroupInfo> readGroups{rgIds.size()};
+    std::transform(rgIds.cbegin(), rgIds.cend(), readGroups.begin(),
+                   [](const std::string& rgId) { return ReadGroupInfo{rgId}; });
+    AddReadGroups(readGroups);
 }
 
-PbiReadGroupFilter::PbiReadGroupFilter(const std::string& rgId, const Compare::Type cmp)
-    : PbiReadGroupFilter{ReadGroupInfo{rgId}, cmp}
+PbiReadGroupFilter::PbiReadGroupFilter(const std::string& rgId,
+                                       const Compare::Type cmp)  //: cmp_{cmp}
+    : PbiReadGroupFilter{std::vector<std::string>{rgId}, cmp}
 {
 }
 
 bool PbiReadGroupFilter::Accepts(const PbiRawData& idx, const size_t row) const
 {
-    const auto accepted = [this](const PbiRawData& index, const size_t i) {
-        // Check that read group base ID is found.
-        const auto rowRgId = index.BasicData().rgId_.at(i);
-        const auto foundAt = lookup_.find(rowRgId);
-        if (foundAt == lookup_.cend()) {
+    const auto DoFiltersMatch = [&](const int32_t rowRgId) {
+        const auto foundInFilterList = readGroups_.find(rowRgId);
+        if (foundInFilterList == readGroups_.cend()) {
             return false;
         }
 
-        // Read group's base ID is found, check for filtered barcodes.
-        //
-        // For non-barcoded read groups, the filter is empty. This is
-        // essentially a no-op for allowing all candidate rows.
-        //
-        const auto& barcodes = foundAt->second;
-        if (!barcodes) {
-            return true;
-        }
+        // matching ID found, check for potential barcode requirements
 
-        // Return success on first match, otherwise no match found.
-        for (const auto& bcPair : *barcodes) {
-            if (index.BarcodeData().bcForward_.at(i) == bcPair.first &&
-                index.BarcodeData().bcReverse_.at(i) == bcPair.second) {
-                return true;
+        if (idx.HasBarcodeData()) {
+            const int16_t rowBcForward = idx.BarcodeData().bcForward_.at(row);
+            const int16_t rowBcReverse = idx.BarcodeData().bcReverse_.at(row);
+
+            for (const auto& filterReadGroup : foundInFilterList->second) {
+                const auto& filterBarcodes = filterReadGroup.Barcodes();
+                if (filterBarcodes) {
+                    const int16_t filterBcForward = filterBarcodes->first;
+                    const int16_t filterBcReverse = filterBarcodes->second;
+                    if ((rowBcForward == filterBcForward) && (rowBcReverse == filterBcReverse)) {
+                        // found matching barcodes
+                        return true;
+                    }
+                }
             }
-        }
-        return false;
-    }(idx, row);
 
-    assert(cmp_ == Compare::CONTAINS || cmp_ == Compare::NOT_CONTAINS);
-    return (cmp_ == Compare::CONTAINS ? accepted : !accepted);
+            // no read groups in filter match this index row's barcodes
+            return false;
+        } else {
+            for (const auto& filterReadGroup : foundInFilterList->second) {
+                const auto& filterBarcodes = filterReadGroup.Barcodes();
+                if (!filterBarcodes) {
+                    // found a read group that matches ID & does not require a barcode match
+                    return true;
+                }
+            }
+
+            // all filter read groups require barcodes, but index does not
+            // contain any barcode information
+            return false;
+        }
+    };
+
+    const int rowRgId = idx.BasicData().rgId_.at(row);
+    const bool rowMatched = DoFiltersMatch(rowRgId);
+    const bool lookingForEquality = (cmp_ == Compare::CONTAINS) || (cmp_ == Compare::EQUAL);
+    return (lookingForEquality ? rowMatched : !rowMatched);
+}
+
+void PbiReadGroupFilter::AddReadGroups(const std::vector<ReadGroupInfo>& readGroups)
+{
+    if (cmp_ == Compare::EQUAL) {
+        cmp_ = Compare::CONTAINS;
+    } else if (cmp_ == Compare::NOT_EQUAL) {
+        cmp_ = Compare::NOT_CONTAINS;
+    }
+
+    if (cmp_ != Compare::CONTAINS && cmp_ != Compare::NOT_CONTAINS) {
+        throw std::runtime_error{"[pbbam] PBI filter ERROR: unsupported compare type (" +
+                                 Compare::TypeToName(cmp_) +
+                                 ") for this property. Read group filter can only compare equality "
+                                 "or presence in whitelist/blacklist."};
+    }
+
+    //
+    // Ensure we track all potential representations of a read group's ID.
+    //
+    // NOTE: Storing the read group object more than once for equivalent IDs is
+    //       allowed here. The matching phase does a linear walk over the read groups
+    //       stored here to determine a match. This does not change the result.
+    //
+    for (const auto& rg : readGroups) {
+        const std::string rgId = rg.Id();
+        readGroups_[ReadGroupInfo::IdToInt(rgId)].push_back(rg);
+        readGroups_[ReadGroupInfo::IdToInt(ReadGroupInfo::GetBaseId(rgId))].push_back(rg);
+        readGroups_[ReadGroupInfo::IdToInt(MakeReadGroupId(rg))].push_back(rg);
+        readGroups_[ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(rg))].push_back(rg);
+    }
 }
 
 // PbiReferenceNameFilter
@@ -652,7 +685,7 @@ void PbiReferenceNameFilter::Initialize(const PbiRawData& idx) const
     const BamFile bamFile{bamFilename};
 
     // single-value
-    if (rnameWhitelist_ == boost::none) {
+    if (!rnameWhitelist_) {
         const auto tId = bamFile.ReferenceId(rname_);
         subFilter_ = PbiReferenceIdFilter{tId, cmp_};
     }
@@ -660,7 +693,7 @@ void PbiReferenceNameFilter::Initialize(const PbiRawData& idx) const
     // multi-value (whitelist/blacklist)
     else {
         std::vector<int32_t> ids;
-        for (const auto& rname : rnameWhitelist_.get()) {
+        for (const auto& rname : *rnameWhitelist_) {
             ids.push_back(bamFile.ReferenceId(rname));
         }
         subFilter_ = PbiReferenceIdFilter{std::move(ids), cmp_};
@@ -712,7 +745,8 @@ PbiZmwFilter::PbiZmwFilter(std::vector<int32_t> whitelist, const Compare::Type c
     }
     if (cmp_ != Compare::CONTAINS && cmp_ != Compare::NOT_CONTAINS) {
         throw std::runtime_error{
-            "[pbbam] PBI filter ERROR: multi-valued filters (e.g. whitelists) can only check for "
+            "[pbbam] PBI filter ERROR: multi-valued filters (e.g. whitelists) can only check "
+            "for "
             "containment."};
     }
 }

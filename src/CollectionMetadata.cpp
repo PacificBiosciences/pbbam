@@ -2,25 +2,25 @@
 
 #include <pbbam/CollectionMetadata.h>
 
+#include "DataSetUtils.h"
+#include "RunMetadataParser.h"
+#include "pugixml/pugixml.hpp"
+
+#include <boost/algorithm/string/predicate.hpp>
+
 #include <sstream>
 #include <stdexcept>
 #include <tuple>
 #include <vector>
 
-#include <boost/algorithm/string/predicate.hpp>
-
-#include "DataSetUtils.h"
-#include "RunMetadataParser.h"
-#include "pugixml/pugixml.hpp"
-
 namespace PacBio {
 namespace BAM {
 namespace {
 
-boost::optional<ControlKit::CustomSequence> UpdateControlKitCache(const ControlKit& kit)
+std::optional<ControlKit::CustomSequence> UpdateControlKitCache(const ControlKit& kit)
 {
     if (!kit.HasChild("CustomSequence")) {
-        return boost::none;
+        return {};
     }
 
     const auto& customSeq = kit.ChildText("CustomSequence");
@@ -44,7 +44,7 @@ boost::optional<ControlKit::CustomSequence> UpdateControlKitCache(const ControlK
     return ControlKit::CustomSequence{lines.at(1), lines.at(3), lines.at(5)};
 }
 
-void UpdateControlKit(const boost::optional<ControlKit::CustomSequence>& cache, ControlKit& kit)
+void UpdateControlKit(const std::optional<ControlKit::CustomSequence>& cache, ControlKit& kit)
 {
     std::ostringstream seq;
     seq << ">left_adapter\\n"

@@ -2,16 +2,16 @@
 
 #include <pbbam/bed/BedReader.h>
 
-#include <sstream>
-#include <stdexcept>
-#include <type_traits>
-
-#include <boost/algorithm/string.hpp>
-#include <boost/optional.hpp>
-
 #include <pbbam/FormatUtils.h>
 #include <pbbam/StringUtilities.h>
 #include <pbbam/TextFileReader.h>
+
+#include <boost/algorithm/string.hpp>
+
+#include <optional>
+#include <sstream>
+#include <stdexcept>
+#include <type_traits>
 
 namespace PacBio {
 namespace BED {
@@ -46,7 +46,7 @@ public:
 
     void GetNext()
     {
-        interval_ = boost::none;
+        interval_.reset();
         std::string line;
         if (reader_->GetNext(line)) {
             interval_ = ParseInterval(std::move(line));
@@ -75,7 +75,7 @@ public:
     }
 
     std::unique_ptr<BAM::TextFileReader> reader_;
-    boost::optional<Data::GenomicInterval> interval_;
+    std::optional<Data::GenomicInterval> interval_;
 };
 
 BedReader::BedReader(const std::string& fn)

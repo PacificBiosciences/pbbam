@@ -3,12 +3,11 @@
 
 #include <pbbam/Config.h>
 
-#include <map>
-#include <string>
-
-#include <boost/optional.hpp>
-
 #include <pbbam/internal/DataSetBaseTypes.h>
+
+#include <map>
+#include <optional>
+#include <string>
 
 namespace PacBio {
 namespace BAM {
@@ -183,7 +182,7 @@ public:
     };
 
 private:
-    mutable boost::optional<CustomSequence> cache_ = boost::none;
+    mutable std::optional<CustomSequence> cache_;
 };
 
 class PPAConfig : public internal::DataSetElement

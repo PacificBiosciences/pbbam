@@ -2,20 +2,19 @@
 
 #include <pbbam/DataSetTypes.h>
 
-#include <cassert>
-#include <cstddef>
+#include <pbbam/internal/DataSetBaseTypes.h>
+#include "DataSetIO.h"
+#include "DataSetUtils.h"
+#include "FileUtils.h"
+#include "TimeUtils.h"
 
 #include <ostream>
 #include <set>
 #include <tuple>
 #include <unordered_map>
 
-#include <pbbam/internal/DataSetBaseTypes.h>
-
-#include "DataSetIO.h"
-#include "DataSetUtils.h"
-#include "FileUtils.h"
-#include "TimeUtils.h"
+#include <cassert>
+#include <cstddef>
 
 namespace {
 
@@ -49,6 +48,7 @@ const std::unordered_map<std::string, ElementType> elementTypeLookup
     {"Properties",             ElementType::PROPERTIES},
     {"Provenance",             ElementType::PROVENANCE},
     {"SequencingKitPlate",     ElementType::SEQUENCING_KIT_PLATE},
+    {"SupplementalResources",  ElementType::SUPPLEMENTAL_RESOURCES},
     {"TemplatePrepKit",        ElementType::TEMPLATE_PREP_KIT},
 
     {"AlignmentSet",           ElementType::ALIGNMENT_SET},
@@ -316,6 +316,26 @@ DataSetBase& DataSetBase::SubDataSets(const BAM::SubDataSets& subdatasets)
     return *this;
 }
 
+const BAM::SupplementalResources& DataSetBase::SupplementalResources() const
+{
+    return Child<BAM::SupplementalResources>("SupplementalResources");
+}
+
+BAM::SupplementalResources& DataSetBase::SupplementalResources()
+{
+    if (!HasChild("SupplementalResources")) {
+        AddChild(BAM::SupplementalResources());
+    }
+    auto& c = Child<BAM::SupplementalResources>("SupplementalResources");
+    return c;
+}
+
+DataSetBase& DataSetBase::SupplementalResources(const BAM::SupplementalResources& resources)
+{
+    SupplementalResources() = resources;
+    return *this;
+}
+
 DataSetBase* DataSetBase::DeepCopy() const
 {
     auto* copyDataset = new DataSetElement(*this);
@@ -337,6 +357,9 @@ DataSetBase& DataSetBase::operator+=(const DataSetBase& other)
     ExternalResources() += other.ExternalResources();
     Filters() += other.Filters();
     SubDataSets() += other;
+    if (HasChild("SupplementalResources") || other.HasChild("SupplementalResources")) {
+        SupplementalResources() += other.SupplementalResources();
+    }
 
     return *this;
 }
@@ -1216,6 +1239,96 @@ SubreadSet::SubreadSet() : DataSetBase("PacBio.DataSet.SubreadSet", "SubreadSet"
 SubreadSet::SubreadSet(const internal::FromInputXml& fromInputXml)
     : DataSetBase("", "SubreadSet", fromInputXml, XsdType::DATASETS)
 {
+}
+
+// ---------------------
+// SupplentalResources
+// ---------------------
+
+SupplementalResources::SupplementalResources()
+    : DataSetElement("SupplementalResources", XsdType::BASE_DATA_MODEL)
+{
+}
+
+SupplementalResources::SupplementalResources(const internal::FromInputXml& fromInputXml)
+    : DataSetElement("", fromInputXml, XsdType::BASE_DATA_MODEL)
+{
+}
+
+SupplementalResources& SupplementalResources::operator+=(const SupplementalResources& other)
+{
+    // only keep unique resource ids
+    std::set<std::string> myResourceIds;
+    for (size_t i = 0; i < NumChildren(); ++i) {
+        const ExternalResource& resource = this->operator[](i);
+        myResourceIds.insert(resource.ResourceId());
+    }
+
+    std::vector<size_t> newResourceIndices;
+    const size_t numOtherResourceIds = other.Size();
+    for (size_t i = 0; i < numOtherResourceIds; ++i) {
+        const std::string& resourceId = other[i].ResourceId();
+        auto found = myResourceIds.find(resourceId);
+        if (found == myResourceIds.cend()) {
+            newResourceIndices.push_back(i);
+        }
+    }
+
+    for (size_t index : newResourceIndices) {
+        Add(other[index]);
+    }
+
+    return *this;
+}
+
+void SupplementalResources::Add(const ExternalResource& ext)
+{
+    // disallow external resources w/ duplicate ResourceIds
+    std::set<std::string> myResourceIds;
+    for (size_t i = 0; i < NumChildren(); ++i) {
+        const ExternalResource& resource = this->operator[](i);
+        myResourceIds.insert(resource.ResourceId());
+    }
+
+    if (myResourceIds.find(ext.ResourceId()) == myResourceIds.cend()) {
+        AddChild(ext);
+    }
+}
+
+void SupplementalResources::Remove(const ExternalResource& ext) { RemoveChild(ext); }
+
+SupplementalResources::iterator_type SupplementalResources::begin()
+{
+    return SupplementalResources::iterator_type(this, 0);
+}
+
+SupplementalResources::const_iterator_type SupplementalResources::begin() const { return cbegin(); }
+
+SupplementalResources::const_iterator_type SupplementalResources::cbegin() const
+{
+    return SupplementalResources::const_iterator_type(this, 0);
+}
+
+SupplementalResources::iterator_type SupplementalResources::end()
+{
+    return SupplementalResources::iterator_type(this, NumChildren());
+}
+
+SupplementalResources::const_iterator_type SupplementalResources::end() const { return cend(); }
+
+SupplementalResources::const_iterator_type SupplementalResources::cend() const
+{
+    return SupplementalResources::const_iterator_type(this, NumChildren());
+}
+
+const SupplementalResources::value_type& SupplementalResources::operator[](size_t index) const
+{
+    return dynamic_cast<const SupplementalResources::value_type&>(*(children_.at(index).get()));
+}
+
+SupplementalResources::value_type& SupplementalResources::operator[](size_t index)
+{
+    return dynamic_cast<SupplementalResources::value_type&>(*(children_.at(index).get()));
 }
 
 // -------------------

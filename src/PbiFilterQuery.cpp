@@ -40,6 +40,10 @@ PbiFilterQuery::PbiFilterQuery(const PbiFilter& filter, const DataSet& dataset,
 {
 }
 
+PbiFilterQuery::PbiFilterQuery(PbiFilterQuery&&) noexcept = default;
+
+PbiFilterQuery& PbiFilterQuery::operator=(PbiFilterQuery&&) noexcept = default;
+
 PbiFilterQuery::~PbiFilterQuery() = default;
 
 bool PbiFilterQuery::GetNext(BamRecord& r) { return d_->reader_.GetNext(r); }

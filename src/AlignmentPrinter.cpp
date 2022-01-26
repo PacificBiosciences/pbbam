@@ -2,16 +2,16 @@
 
 #include <pbbam/AlignmentPrinter.h>
 
-#include <cmath>
-#include <cstddef>
+#include <pbbam/BamRecord.h>
+#include <pbbam/IndexedFastaReader.h>
 
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>
 
-#include <pbbam/BamRecord.h>
-#include <pbbam/IndexedFastaReader.h>
+#include <cmath>
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

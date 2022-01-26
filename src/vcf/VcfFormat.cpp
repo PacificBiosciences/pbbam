@@ -2,8 +2,11 @@
 
 #include <pbbam/vcf/VcfFormat.h>
 
-#include <cassert>
-#include <cmath>
+#include <pbbam/StringUtilities.h>
+#include <pbbam/vcf/VcfHeader.h>
+#include "VcfFormatException.h"
+
+#include <htslib/vcf.h>
 
 #include <fstream>
 #include <istream>
@@ -11,12 +14,8 @@
 #include <stdexcept>
 #include <string>
 
-#include <htslib/vcf.h>
-
-#include <pbbam/StringUtilities.h>
-#include <pbbam/vcf/VcfHeader.h>
-
-#include "VcfFormatException.h"
+#include <cassert>
+#include <cmath>
 
 namespace PacBio {
 namespace VCF {
@@ -113,12 +112,12 @@ std::string VcfFormat::FormattedInfoDefinition(const InfoDefinition& def)
          << def.Number() << ',' << Tokens::type << '=' << def.Type() << ',' << Tokens::description
          << '=' << QuotedText(def.Description());
 
-    if (def.Source().is_initialized() && !def.Source().get().empty()) {
-        text << ',' << Tokens::source << '=' << QuotedText(def.Source().get());
+    if (def.Source() && !def.Source()->empty()) {
+        text << ',' << Tokens::source << '=' << QuotedText(*def.Source());
     }
 
-    if (def.Version().is_initialized() && !def.Version().get().empty()) {
-        text << ',' << Tokens::version << '=' << QuotedText(def.Version().get());
+    if (def.Version() && !def.Version()->empty()) {
+        text << ',' << Tokens::version << '=' << QuotedText(*def.Version());
     }
 
     text << '>';
@@ -534,10 +533,10 @@ std::string VcfFormat::FormattedInfoField(const InfoField& field)
 {
     std::ostringstream out;
     out << field.id;
-    if (field.value.is_initialized()) {
-        out << '=' << field.value.get();
-    } else if (field.values.is_initialized()) {
-        out << '=' << BAM::Join(field.values.get(), ',');
+    if (field.value) {
+        out << '=' << *field.value;
+    } else if (field.values) {
+        out << '=' << BAM::Join(*field.values, ',');
     }
     return out.str();
 }
@@ -559,11 +558,11 @@ std::string VcfFormat::FormattedGenotypeField(const GenotypeField& field)
         if (!firstDataEntry) {
             result += ':';
         }
-        if (d.value.is_initialized()) {
-            result += d.value.get();
+        if (d.value) {
+            result += *d.value;
         } else {
-            assert(d.values.is_initialized());
-            result += BAM::Join(d.values.get(), ',');
+            assert(d.values);
+            result += BAM::Join(*d.values, ',');
         }
         firstDataEntry = false;
     }

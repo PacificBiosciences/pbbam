@@ -3,11 +3,11 @@
 
 #include <pbbam/Config.h>
 
+#include <pbbam/DataSet.h>
+
 #include <iosfwd>
 #include <string>
 #include <vector>
-
-#include <pbbam/DataSet.h>
 
 namespace PacBio {
 namespace BAM {

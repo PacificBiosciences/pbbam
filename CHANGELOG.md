@@ -5,6 +5,21 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [2.0.0] - TBD
+
+### Changed
+ - C++20 is now a *hard* minimum.
+
+## [1.8.1] - 2021-11-15
+
+### Added
+ - SupplementalResources dataset element.
+
+## [1.8.0] - 2021-11-10
+
+### Fixed
+ - Incorrect hashing scheme to generate IDs for barcoded read groups
+
 ## [1.7.0] - 2021-09-21
 
 ### Added

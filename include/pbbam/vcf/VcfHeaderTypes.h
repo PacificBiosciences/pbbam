@@ -3,11 +3,10 @@
 
 #include <pbbam/Config.h>
 
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <boost/optional.hpp>
 
 namespace PacBio {
 namespace VCF {
@@ -100,8 +99,8 @@ public:
     const std::string& Number() const;
     const std::string& Type() const;
     const std::string& Description() const;
-    const boost::optional<std::string>& Source() const;
-    const boost::optional<std::string>& Version() const;
+    const std::optional<std::string>& Source() const;
+    const std::optional<std::string>& Version() const;
 
     InfoDefinition& Source(std::string s);
     InfoDefinition& Version(std::string v);
@@ -115,8 +114,8 @@ private:
     std::string description_;
 
     // optional fields - settable after ctor
-    boost::optional<std::string> source_;
-    boost::optional<std::string> version_;
+    std::optional<std::string> source_;
+    std::optional<std::string> version_;
 };
 
 }  // namespace VCF

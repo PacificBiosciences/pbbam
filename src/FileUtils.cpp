@@ -2,19 +2,19 @@
 
 #include "FileUtils.h"
 
-#include <sys/stat.h>
-#include <unistd.h>
+#include <pbbam/StringUtilities.h>
 
-#include <cassert>
-#include <cstddef>
+#include <boost/algorithm/string.hpp>
 
 #include <memory>
 #include <sstream>
 #include <stdexcept>
 
-#include <boost/algorithm/string.hpp>
+#include <cassert>
+#include <cstddef>
 
-#include <pbbam/StringUtilities.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 namespace PacBio {
 namespace BAM {

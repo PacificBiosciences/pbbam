@@ -3,9 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <string>
-
 #include <pbbam/vcf/VcfFile.h>
+
+#include <string>
 
 namespace PacBio {
 namespace VCF {

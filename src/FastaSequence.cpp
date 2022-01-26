@@ -2,13 +2,13 @@
 
 #include <pbbam/FastaSequence.h>
 
-#include <cstdio>
+#include <boost/algorithm/string.hpp>
 
 #include <exception>
 #include <tuple>
 #include <type_traits>
 
-#include <boost/algorithm/string.hpp>
+#include <cstdio>
 
 namespace PacBio {
 namespace BAM {

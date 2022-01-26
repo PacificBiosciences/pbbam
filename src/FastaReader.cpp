@@ -2,16 +2,15 @@
 
 #include <pbbam/FastaReader.h>
 
+#include <pbbam/FormatUtils.h>
+#include "KSeqReader.h"
+
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <vector>
-
-#include <pbbam/FormatUtils.h>
-
-#include "KSeqReader.h"
 
 namespace PacBio {
 namespace BAM {

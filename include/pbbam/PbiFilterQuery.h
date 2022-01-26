@@ -3,10 +3,10 @@
 
 #include <pbbam/Config.h>
 
-#include <vector>
-
 #include <pbbam/PbiFilter.h>
 #include <pbbam/internal/QueryBase.h>
+
+#include <vector>
 
 namespace PacBio {
 namespace BAM {
@@ -50,6 +50,8 @@ public:
 
     PbiFilterQuery(const PbiFilter& filter, const DataSet& dataset, const PbiIndexCache& cache);
 
+    PbiFilterQuery(PbiFilterQuery&&) noexcept;
+    PbiFilterQuery& operator=(PbiFilterQuery&&) noexcept;
     ~PbiFilterQuery() override;
 
     /// \brief Main iteration point for record access.

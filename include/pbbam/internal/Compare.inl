@@ -1,3 +1,8 @@
+#ifndef PBBAM_COMPARE_INL
+#define PBBAM_COMPARE_INL
+
+#include <pbbam/Config.h>
+
 #include <pbbam/Compare.h>
 
 namespace PacBio {
@@ -35,3 +40,5 @@ inline bool Compare::None::operator()(const BamRecord&, const BamRecord&) const 
 
 }  // namespace BAM
 }  // namespace PacBio
+
+#endif  // PBBAM_COMPARE_INL

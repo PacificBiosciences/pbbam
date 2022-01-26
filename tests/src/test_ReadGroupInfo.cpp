@@ -9,8 +9,10 @@
 
 #include <gtest/gtest.h>
 
+#include <pbbam/MD5.h>
 #include <pbbam/exception/BundleChemistryMappingException.h>
 #include <pbbam/exception/InvalidSequencingChemistryException.h>
+#include <pbcopper/data/Strand.h>
 
 #include "PbbamTestData.h"
 
@@ -249,8 +251,8 @@ TEST(BAM_ReadGroupInfo, can_determine_barcodes_from_barcoded_id_string)
     ASSERT_TRUE(barcodes);
     EXPECT_EQ(0, barcodes->first);
     EXPECT_EQ(1, barcodes->second);
-    EXPECT_EQ(0, rg.BarcodeForward().get());
-    EXPECT_EQ(1, rg.BarcodeReverse().get());
+    EXPECT_EQ(0, *rg.BarcodeForward());
+    EXPECT_EQ(1, *rg.BarcodeReverse());
 }
 
 TEST(BAM_ReadGroupInfo, can_determine_barcodes_from_id_string_and_barcode_pair)
@@ -263,8 +265,8 @@ TEST(BAM_ReadGroupInfo, can_determine_barcodes_from_id_string_and_barcode_pair)
     ASSERT_TRUE(barcodes);
     EXPECT_EQ(0, barcodes->first);
     EXPECT_EQ(1, barcodes->second);
-    EXPECT_EQ(0, rg.BarcodeForward().get());
-    EXPECT_EQ(1, rg.BarcodeReverse().get());
+    EXPECT_EQ(0, *rg.BarcodeForward());
+    EXPECT_EQ(1, *rg.BarcodeReverse());
 }
 
 TEST(BAM_ReadGroupInfo, returns_no_barcodes_from_non_barcoded_id)
@@ -275,16 +277,16 @@ TEST(BAM_ReadGroupInfo, returns_no_barcodes_from_non_barcoded_id)
         EXPECT_EQ("00082ba1", rg.BaseId());
 
         const auto barcodes = rg.Barcodes();
-        EXPECT_EQ(boost::none, barcodes);
-        EXPECT_EQ(boost::none, rg.BarcodeForward());
-        EXPECT_EQ(boost::none, rg.BarcodeReverse());
+        EXPECT_FALSE(barcodes);
+        EXPECT_FALSE(rg.BarcodeForward());
+        EXPECT_FALSE(rg.BarcodeReverse());
     }
     {   // no '/' found
         const ReadGroupInfo rg{"00082ba1.0--1"};
         const auto barcodes = rg.Barcodes();
-        EXPECT_EQ(boost::none, barcodes);
-        EXPECT_EQ(boost::none, rg.BarcodeForward());
-        EXPECT_EQ(boost::none, rg.BarcodeReverse());
+        EXPECT_FALSE(barcodes);
+        EXPECT_FALSE(rg.BarcodeForward());
+        EXPECT_FALSE(rg.BarcodeReverse());
     }
 }
 
@@ -292,9 +294,9 @@ TEST(BAM_ReadGroupInfo, returns_no_barcodes_from_empty_id)
 {
     const ReadGroupInfo rg{""};
     const auto barcodes = rg.Barcodes();
-    EXPECT_EQ(boost::none, barcodes);
-    EXPECT_EQ(boost::none, rg.BarcodeForward());
-    EXPECT_EQ(boost::none, rg.BarcodeReverse());
+    EXPECT_FALSE(barcodes);
+    EXPECT_FALSE(rg.BarcodeForward());
+    EXPECT_FALSE(rg.BarcodeReverse());
 }
 
 TEST(BAM_ReadGroupInfo, throws_on_malformatted_barcoded_ids)
@@ -304,6 +306,70 @@ TEST(BAM_ReadGroupInfo, throws_on_malformatted_barcoded_ids)
     EXPECT_THROW(ReadGroupInfo{"00082ba1/0..1"};, std::runtime_error);
     EXPECT_THROW(ReadGroupInfo{"00082ba1/0"}, std::runtime_error);
     EXPECT_THROW(ReadGroupInfo{"00082ba1/A--B"}, std::runtime_error);
+}
+
+TEST(BAM_ReadGroupInfo, strandness_and_new_rg_ctors)
+{
+    const std::string movieName{"m64012_210628_093300"};
+    const std::string readType{"CCS"};
+    const PlatformModelType platform{PlatformModelType::SEQUELII};
+    const std::pair<uint16_t, uint16_t> barcodes{2,6};
+    const PacBio::Data::Strand fwd{PacBio::Data::Strand::FORWARD};
+    const PacBio::Data::Strand rev{PacBio::Data::Strand::REVERSE};
+
+    {
+        const ReadGroupInfo rg{ReadGroupInfoConfig{movieName, readType}};
+        const ReadGroupInfo rgPlatform{ReadGroupInfoConfig{movieName, readType, platform}};
+        EXPECT_EQ(rg.Id(), rgPlatform.Id());
+        EXPECT_EQ(MD5Hash(movieName + "//" + readType).substr(0, 8), rg.Id());
+    }
+    {
+        const ReadGroupInfo rg{ReadGroupInfoConfig{movieName, readType, platform, barcodes}};
+        EXPECT_EQ(MD5Hash(movieName + "//" + readType).substr(0, 8) + "/2--6", rg.Id());
+    }
+    {
+        const ReadGroupInfo rg{ReadGroupInfoConfig{movieName, readType, platform, {}, fwd}};
+        EXPECT_EQ(fwd, rg.Strand());
+        EXPECT_EQ(MD5Hash(movieName + "//" + readType + "//fwd").substr(0, 8), rg.Id());
+    }
+    {
+        const ReadGroupInfo rg{ReadGroupInfoConfig{movieName, readType, platform, {}, rev}};
+        EXPECT_EQ(rev, rg.Strand());
+        EXPECT_EQ(MD5Hash(movieName + "//" + readType + "//rev").substr(0, 8), rg.Id());
+    }
+    {
+        const ReadGroupInfo rg{ReadGroupInfoConfig{movieName, readType, platform, barcodes, fwd}};
+        EXPECT_EQ(fwd, rg.Strand());
+        EXPECT_EQ(MD5Hash(movieName + "//" + readType + "//fwd").substr(0, 8) + "/2--6", rg.Id());
+    }
+    {
+        const ReadGroupInfo rg{ReadGroupInfoConfig{movieName, readType, platform, barcodes, rev}};
+        EXPECT_EQ(rev, rg.Strand());
+        EXPECT_EQ(MD5Hash(movieName + "//" + readType + "//rev").substr(0, 8) + "/2--6", rg.Id());
+
+    }
+    {
+        const ReadGroupInfo rgOrig{ReadGroupInfoConfig{movieName, readType, platform, barcodes, fwd}};
+        const ReadGroupInfo rg = ReadGroupInfo::FromSam(rgOrig.ToSam());
+        EXPECT_EQ(fwd, rg.Strand());
+        EXPECT_EQ(barcodes.first, rg.Barcodes()->first);
+        EXPECT_EQ(barcodes.second, rg.Barcodes()->second);
+        EXPECT_EQ(movieName, rg.MovieName());
+        EXPECT_EQ(readType, rg.ReadType());
+        EXPECT_EQ(platform, rg.PlatformModel());
+        EXPECT_EQ(MD5Hash(movieName + "//" + readType + "//fwd").substr(0, 8) + "/2--6", rg.Id());
+    }
+    {
+        const ReadGroupInfo rgOrig{ReadGroupInfoConfig{movieName, readType, platform, barcodes, rev}};
+        const ReadGroupInfo rg = ReadGroupInfo::FromSam(rgOrig.ToSam());
+        EXPECT_EQ(rev, rg.Strand());
+        EXPECT_EQ(barcodes.first, rg.Barcodes()->first);
+        EXPECT_EQ(barcodes.second, rg.Barcodes()->second);
+        EXPECT_EQ(movieName, rg.MovieName());
+        EXPECT_EQ(readType, rg.ReadType());
+        EXPECT_EQ(platform, rg.PlatformModel());
+        EXPECT_EQ(MD5Hash(movieName + "//" + readType + "//rev").substr(0, 8) + "/2--6", rg.Id());
+    }
 }
 
 // clang-format on

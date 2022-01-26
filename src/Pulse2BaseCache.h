@@ -3,15 +3,15 @@
 
 #include <pbbam/Config.h>
 
-#include <cassert>
-#include <cctype>
-#include <cstddef>
+#include <boost/dynamic_bitset.hpp>
+#include <boost/version.hpp>
 
 #include <string>
 #include <type_traits>
 
-#include <boost/dynamic_bitset.hpp>
-#include <boost/version.hpp>
+#include <cassert>
+#include <cctype>
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

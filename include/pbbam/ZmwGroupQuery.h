@@ -3,13 +3,13 @@
 
 #include <pbbam/Config.h>
 
-#include <cstdint>
-
-#include <vector>
-
 #include <pbbam/DataSet.h>
 #include <pbbam/PbiFilter.h>
 #include <pbbam/internal/QueryBase.h>
+
+#include <vector>
+
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -51,8 +51,8 @@ public:
     /// \param filterMode       apply/ignore any filters in XML, if present
     ///
     ZmwGroupQuery(const DataSet& dataset,
-                  const ZmwFileIterationMode iterationMode = ZmwFileIterationMode::SEQUENTIAL,
-                  const DataSetFilterMode filterMode = DataSetFilterMode::APPLY);
+                  ZmwFileIterationMode iterationMode = ZmwFileIterationMode::SEQUENTIAL,
+                  DataSetFilterMode filterMode = DataSetFilterMode::APPLY);
 
     ///
     /// \brief Creates a new ZmwGroupQuery, limiting record results to only those
@@ -79,7 +79,10 @@ public:
     ///         PBI files.
     ///
     ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset);
-    ~ZmwGroupQuery();
+
+    ZmwGroupQuery(ZmwGroupQuery&&) noexcept;
+    ZmwGroupQuery& operator=(ZmwGroupQuery&&) noexcept;
+    ~ZmwGroupQuery() override;
 
 public:
     /// \brief Main iteration point for record access.

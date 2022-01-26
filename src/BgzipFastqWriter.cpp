@@ -2,12 +2,12 @@
 
 #include <pbbam/BgzipFastqWriter.h>
 
-#include <sstream>
-#include <stdexcept>
-
 #include <pbbam/BamRecord.h>
 #include <pbbam/FastqSequence.h>
 #include <pbbam/FormatUtils.h>
+
+#include <sstream>
+#include <stdexcept>
 
 namespace PacBio {
 namespace BAM {

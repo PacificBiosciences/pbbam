@@ -2,26 +2,25 @@
 
 #include <pbbam/DataSet.h>
 
+#include <pbbam/internal/DataSetBaseTypes.h>
+#include "DataSetIO.h"
+#include "DataSetUtils.h"
+#include "FileUtils.h"
+#include "TimeUtils.h"
+
+#include <boost/algorithm/string.hpp>
+#include <boost/icl/interval_set.hpp>
+#include <boost/lexical_cast.hpp>
+
 #include <algorithm>
 #include <map>
+#include <optional>
 #include <ostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-#include <boost/algorithm/string.hpp>
-#include <boost/icl/interval_set.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/optional.hpp>
-
-#include <pbbam/internal/DataSetBaseTypes.h>
-
-#include "DataSetIO.h"
-#include "DataSetUtils.h"
-#include "FileUtils.h"
-#include "TimeUtils.h"
 
 namespace PacBio {
 namespace BAM {
@@ -316,7 +315,7 @@ std::vector<GenomicInterval> DataSet::GenomicIntervals() const
 
     for (const auto& xmlFilter : Filters()) {
         ++numFilters;
-        boost::optional<std::string> contigName;
+        std::optional<std::string> contigName;
 
         intT intersectedInterval{intInterval{0, std::numeric_limits<int32_t>::max()}};
 
@@ -538,6 +537,19 @@ DataSet& DataSet::SubDataSets(const BAM::SubDataSets& subdatasets)
     return *this;
 }
 
+const BAM::SupplementalResources& DataSet::SupplementalResources() const
+{
+    return d_->SupplementalResources();
+}
+
+BAM::SupplementalResources& DataSet::SupplementalResources() { return d_->SupplementalResources(); }
+
+DataSet& DataSet::SupplementalResources(const BAM::SupplementalResources& resources)
+{
+    d_->SupplementalResources(resources);
+    return *this;
+}
+
 const std::string& DataSet::Tags() const { return d_->Tags(); }
 
 std::string& DataSet::Tags() { return d_->Tags(); }
@@ -566,7 +578,7 @@ DataSet& DataSet::Type(const DataSet::TypeEnum type)
     return *this;
 }
 
-std::string DataSet::TypeName() const { return d_->LocalNameLabel().to_string(); }
+std::string DataSet::TypeName() const { return std::string{d_->LocalNameLabel()}; }
 
 std::string DataSet::TypeToName(const DataSet::TypeEnum& type)
 {

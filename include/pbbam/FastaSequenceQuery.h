@@ -3,12 +3,12 @@
 
 #include <pbbam/Config.h>
 
-#include <memory>
-#include <string>
-
 #include <pbbam/DataSet.h>
 #include <pbbam/FastaSequence.h>
 #include <pbbam/internal/QueryBase.h>
+
+#include <memory>
+#include <string>
 
 namespace PacBio {
 namespace BAM {
@@ -23,6 +23,9 @@ public:
     /// \{
 
     FastaSequenceQuery(const BAM::DataSet& dataset);
+
+    FastaSequenceQuery(FastaSequenceQuery&&) noexcept;
+    FastaSequenceQuery& operator=(FastaSequenceQuery&&) noexcept;
     ~FastaSequenceQuery() override;
 
     /// \}

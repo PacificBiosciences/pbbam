@@ -3,17 +3,17 @@
 
 #include <pbbam/Config.h>
 
+#include <pbbam/BamFile.h>
+#include <pbbam/BamHeader.h>
+#include <pbbam/DataSetTypes.h>
+#include <pbbam/GenomicInterval.h>
+
 #include <chrono>
 #include <iosfwd>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
-
-#include <pbbam/BamFile.h>
-#include <pbbam/BamHeader.h>
-#include <pbbam/DataSetTypes.h>
-#include <pbbam/GenomicInterval.h>
 
 namespace PacBio {
 namespace BAM {
@@ -89,7 +89,7 @@ public:
     /// \param[in] type dataset type
     /// \throws std::runtime_error if \p type is unknown
     ///
-    DataSet(const DataSet::TypeEnum type);
+    DataSet(DataSet::TypeEnum type);
 
     /// \brief Constructs a DataSet from a %BAM file.
     ///
@@ -324,6 +324,13 @@ public:
     /// \returns const reference to child element
     ///
     const BAM::SubDataSets& SubDataSets() const;
+
+    /// \brief Fetches the dataset's SupplementalResources element.
+    ///
+    /// \returns const reference to child element
+    /// \throws std::runtime_error if element does not exist
+    ///
+    const BAM::SupplementalResources& SupplementalResources() const;
 
     /// \}
 
@@ -686,7 +693,7 @@ public:
     /// \param[in] type  new dataset type
     /// \returns reference to this dataset object
     ///
-    DataSet& Type(const BAM::DataSet::TypeEnum type);
+    DataSet& Type(BAM::DataSet::TypeEnum type);
 
     /// \}
 
@@ -733,6 +740,14 @@ public:
     /// \returns non-const reference to child element
     ///
     BAM::SubDataSets& SubDataSets();
+
+    /// \brief Fetches the dataset's SupplementalResources element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \returns non-const reference to child element
+    ///
+    BAM::SupplementalResources& SupplementalResources();
 
     /// \}
 
@@ -784,6 +799,15 @@ public:
     /// \returns reference to this dataset object
     ///
     DataSet& SubDataSets(const BAM::SubDataSets& subdatasets);
+
+    /// \brief Sets this dataset's SupplementalResources element.
+    ///
+    /// This element will be created if it does not yet exist.
+    ///
+    /// \param[in] resources  new value for the element
+    /// \returns reference to this dataset object
+    ///
+    DataSet& SupplementalResources(const BAM::SupplementalResources& resources);
 
     /// \}
 

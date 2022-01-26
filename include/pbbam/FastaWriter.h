@@ -3,10 +3,10 @@
 
 #include <pbbam/Config.h>
 
+#include <pbbam/IFastaWriter.h>
+
 #include <fstream>
 #include <string>
-
-#include <pbbam/IFastaWriter.h>
 
 namespace PacBio {
 namespace BAM {

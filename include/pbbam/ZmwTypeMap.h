@@ -3,9 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <map>
-
 #include <pbbam/ZmwType.h>
+
+#include <map>
 
 namespace PacBio {
 namespace BAM {

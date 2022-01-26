@@ -2,17 +2,16 @@
 
 #include "XmlWriter.h"
 
-#include <cassert>
-#include <cstddef>
+#include <pbbam/DataSet.h>
+#include "FileUtils.h"
+#include "pugixml/pugixml.hpp"
 
 #include <map>
 #include <ostream>
 #include <stdexcept>
 
-#include <pbbam/DataSet.h>
-
-#include "FileUtils.h"
-#include "pugixml/pugixml.hpp"
+#include <cassert>
+#include <cstddef>
 
 using DataSetElement = PacBio::BAM::internal::DataSetElement;
 
@@ -35,7 +34,7 @@ std::string OutputName(const DataSetElement& node, const NamespaceRegistry& regi
     if (node.IsVerbatimLabel()) {
         return node.QualifiedNameLabel();
 
-    } else if (node.LocalNameLabel().to_string() == "Collections") {
+    } else if (node.LocalNameLabel() == "Collections") {
         return "Collections";
 
         // otherwise, probably user-generated
@@ -45,9 +44,9 @@ std::string OutputName(const DataSetElement& node, const NamespaceRegistry& regi
             static const std::string colon = ":";
             auto xsdType = node.Xsd();
             if (xsdType == XsdType::NONE) {
-                xsdType = registry.XsdForElement(node.LocalNameLabel().to_string());
+                xsdType = registry.XsdForElement(std::string{node.LocalNameLabel()});
             }
-            return registry.Namespace(xsdType).Name() + colon + node.LocalNameLabel().to_string();
+            return registry.Namespace(xsdType).Name() + colon + std::string{node.LocalNameLabel()};
         }
         // otherwise, has prefix - return full name
         else {

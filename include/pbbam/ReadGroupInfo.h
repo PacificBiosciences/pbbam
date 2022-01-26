@@ -3,19 +3,19 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
-#include <cstdint>
-
-#include <map>
-#include <string>
-#include <utility>
-
-#include <boost/optional.hpp>
+#include <pbbam/exception/InvalidSequencingChemistryException.h>
 
 #include <pbcopper/data/FrameCodec.h>
 #include <pbcopper/data/FrameEncoders.h>
+#include <pbcopper/data/Strand.h>
 
-#include <pbbam/exception/InvalidSequencingChemistryException.h>
+#include <map>
+#include <optional>
+#include <string>
+#include <utility>
+
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -91,6 +91,17 @@ enum class PlatformModelType
     SEQUELII
 };
 
+/// \brief Aggregate to simplify ReadGroupInfo constructor.
+///
+struct ReadGroupInfoConfig
+{
+    std::string MovieName;
+    std::string ReadType;
+    std::optional<PlatformModelType> Platform{};
+    std::optional<std::pair<uint16_t, uint16_t>> Barcodes{};
+    std::optional<Data::Strand> Strand{};
+};
+
 /// \brief The ReadGroupInfo class represents a read group entry (\@RG) in the
 ///        SAM header.
 ///
@@ -140,7 +151,7 @@ public:
     /// \param[in] id     read group ID number
     /// \returns hexadecimal string representation of ID
     ///
-    static std::string IntToId(const int32_t id);
+    static std::string IntToId(int32_t id);
 
     /// \returns sequencing chemistry from (bindingKig, sequencingKit,
     ///          basecallerVersion)
@@ -216,6 +227,15 @@ public:
     ///
     ReadGroupInfo(std::string movieName, std::string readType, PlatformModelType platform,
                   std::pair<uint16_t, uint16_t> barcodes);
+
+    /// \brief Creates a read group info object from a ReadGroupInfoConfig
+    ///
+    /// \param[in] config       aggregate that contains all information to
+    ///                         create a ReadGroupInfo
+    ///
+    /// \sa RecordType
+    ///
+    ReadGroupInfo(ReadGroupInfoConfig config);
 
     /// \}
 
@@ -297,19 +317,19 @@ public:
     ///
     /// \note This does **NOT** refer to any data in the description (DS) tag.
     ///
-    boost::optional<std::pair<uint16_t, uint16_t>> Barcodes() const;
+    std::optional<std::pair<uint16_t, uint16_t>> Barcodes() const;
 
     /// \returns forward barcode label stored in the read group ID (\@RG:ID)
     ///
     /// \note This does **NOT** refer to any data in the description (DS) tag.
     ///
-    boost::optional<uint16_t> BarcodeForward() const;
+    std::optional<uint16_t> BarcodeForward() const;
 
     /// \returns reverse barcode label stored in the read group ID (\@RG:ID)
     ///
     /// \note This does **NOT** refer to any data in the description (DS) tag.
     ///
-    boost::optional<uint16_t> BarcodeReverse() const;
+    std::optional<uint16_t> BarcodeReverse() const;
 
     //// \returns string value of \@RG:BC
     std::string BarcodeSequence() const;
@@ -437,6 +457,9 @@ public:
 
     /// \returns sequencing kit part number
     std::string SequencingKit() const;
+
+    /// \returns CCS strand
+    std::optional<Data::Strand> Strand() const;
 
     /// \}
 
@@ -669,6 +692,13 @@ public:
     ///
     ReadGroupInfo& SequencingKit(std::string kitNumber);
 
+    /// \brief Sets the ccs strand.
+    ///
+    /// \param[in] strand       new value
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& Strand(Data::Strand strand);
+
     /// \}
 
 private:
@@ -702,9 +732,10 @@ private:
     BarcodeModeType barcodeMode_ = BarcodeModeType::NONE;
     BarcodeQualityType barcodeQuality_ = BarcodeQualityType::NONE;
     std::map<BaseFeature, std::string> features_;
+    std::optional<Data::Strand> strand_;
 
     // (optional) barcode label handling
-    boost::optional<std::pair<uint16_t, uint16_t>> barcodes_ = boost::none;
+    std::optional<std::pair<uint16_t, uint16_t>> barcodes_;
     std::string baseId_;
 
     Data::FrameEncoder ipdEncoder_ = Data::V1FrameEncoder{};
@@ -717,6 +748,8 @@ private:
     std::string EncodeSamDescription() const;
     void DecodeSamDescription(const std::string& description);
     void DecodeBarcodeKey(const std::string& key, std::string value);
+    void DecodeStrand(std::string value);
+    std::string EncodeStrand(Data::Strand strand) const;
     void DecodeFrameCodecKey(const std::string& key, std::string value);
 };
 
@@ -725,12 +758,68 @@ private:
 /// \param[in] movieName    sequencing movie name
 /// \param[in] readType     string version of read type
 ///
-/// \returns hexadecimal string read group ID
+/// \returns hexadecimal string read group ID, e.g. "4c1bc9e4"
 ///
-PBBAM_EXPORT
-std::string MakeReadGroupId(const std::string& movieName, const std::string& readType);
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
+                            std::optional<Data::Strand> strand = {});
 
 /// \brief Creates a read group ID from a movie name, read type, and barcode string.
+///
+/// \param[in] movieName        sequencing movie name
+/// \param[in] readType         string version of read type
+/// \param[in] barcodeString    string version of barcode pair ("0--0")
+///
+/// \returns string containing the concatenation of the hex value with barcode
+///          label "/x--y", e.g. "4c1bc9e4/0--1"
+///
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
+                            const std::string& barcodeString,
+                            std::optional<Data::Strand> strand = {});
+
+/// \brief Creates a read group ID from a movie name, read type, and barcode IDs
+///
+/// \param[in] movieName    sequencing movie name
+/// \param[in] readType     string version of read type
+/// \param[in] barcodes     pair of barcode indices (0,0)
+///
+/// \returns string containing the concatenation of the hex value with barcode
+///          label "/x--y", e.g. "4c1bc9e4/0--1"
+///
+std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
+                            const std::pair<int16_t, int16_t>& barcodes,
+                            std::optional<Data::Strand> strand = {});
+
+/// \brief Creates a read group ID from a read group object
+///
+/// This convenience method detects whether barcode information is available and
+/// returns the appropriate label.
+///
+/// \param[in] readGroup    ReadGroupInfo object
+///
+/// \returns string containing the concatenation of the hex value, optionally with
+///          barcode label "/x--y", e.g. "4c1bc9e4" or "4c1bc9e4/0--1"
+///
+std::string MakeReadGroupId(const ReadGroupInfo& readGroup);
+
+/// \brief Creates a \b LEGACY read group ID from a movie name & read type.
+///
+/// \warning The IDs generated by the "legacy" group of methods were incorrect, where
+///          barcode information was included as part of the MD5 hash generated.
+///          These are provided in case there is a need to reproduce the old behavior.
+///
+/// \param[in] movieName    sequencing movie name
+/// \param[in] readType     string version of read type
+///
+/// \returns hexadecimal string read group ID
+///
+std::string MakeLegacyReadGroupId(const std::string& movieName, const std::string& readType);
+
+/// \brief Creates a \b LEGACY read group ID from a movie name, read type,
+///        and barcode string.
+///
+/// \warning The IDs generated by the "legacy" group of methods were incorrect, where
+///          barcode information was included as part of the MD5 hash generated.
+///          These are provided in case there is a need to reproduce the old behavior.
 ///
 /// \param[in] movieName        sequencing movie name
 /// \param[in] readType         string version of read type
@@ -739,11 +828,15 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 /// \returns string containing the concatenation of the hex value with barcode label "/x--y"
 ///          (e.g. "4c1bc9e4/0--1")
 ///
-PBBAM_EXPORT
-std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
-                            const std::string& barcodeString);
+std::string MakeLegacyReadGroupId(const std::string& movieName, const std::string& readType,
+                                  const std::string& barcodeString);
 
-/// \brief Creates a read group ID from a movie name, read type, and barcode IDs
+/// \brief Creates a \b LEGACY read group ID from a movie name, read type, and
+///        barcode IDs.
+///
+/// \warning The IDs generated by the "legacy" group of methods were incorrect, where
+///          barcode information was included as part of the MD5 hash generated.
+///          These are provided in case there is a need to reproduce the old behavior.
 ///
 /// \param[in] movieName    sequencing movie name
 /// \param[in] readType     string version of read type
@@ -752,9 +845,24 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 /// \returns string containing the concatenation of the hex value with barcode label "/x--y"
 ///          (e.g. "4c1bc9e4/0--1")
 ///
-PBBAM_EXPORT
-std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
-                            const std::pair<int16_t, int16_t>& barcodes);
+std::string MakeLegacyReadGroupId(const std::string& movieName, const std::string& readType,
+                                  const std::pair<int16_t, int16_t>& barcodes);
+
+/// \brief Creates a \b LEGACY read group ID from a read group object
+///
+/// This convenience method detects whether barcode information is available and
+/// returns the appropriate label.
+///
+/// \warning The IDs generated by the "legacy" group of methods were incorrect, where
+///          barcode information was included as part of the MD5 hash generated.
+///          These are provided in case there is a need to reproduce the old behavior.
+///
+/// \param[in] readGroup    ReadGroupInfo object
+///
+/// \returns string containing the concatenation of the hex value, optionally with
+///          barcode label "/x--y", e.g. "4c1bc9e4" or "4c1bc9e4/0--1"
+///
+std::string MakeLegacyReadGroupId(const ReadGroupInfo& readGroup);
 
 }  // namespace BAM
 }  // namespace PacBio

@@ -3,12 +3,12 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
-#include <cstdint>
+#include <pbbam/PbiBuilder.h>
 
 #include <string>
 
-#include <pbbam/PbiBuilder.h>
+#include <cstddef>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
@@ -96,10 +96,9 @@ struct PbiFile
     ///
     /// \throws std::runtime_error if index file could not be created
     ///
-    static void CreateFrom(
-        const BamFile& bamFile,
-        const PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
-        const size_t numThreads = 4);
+    static void CreateFrom(const BamFile& bamFile, PbiBuilder::CompressionLevel compressionLevel =
+                                                       PbiBuilder::DefaultCompression,
+                           size_t numThreads = 4);
 };
 
 }  // namespace BAM

@@ -1,11 +1,16 @@
-#include <pbbam/internal/DataSetElement.h>
+#ifndef PBBAM_DATASETELEMENT_INL
+#define PBBAM_DATASETELEMENT_INL
 
-#include <cassert>
+#include <pbbam/Config.h>
+
+#include <pbbam/internal/DataSetElement.h>
 
 #include <iostream>
 #include <stdexcept>
 #include <tuple>
 #include <typeinfo>
+
+#include <cassert>
 
 namespace PacBio {
 namespace BAM {
@@ -205,9 +210,9 @@ inline int DataSetElement::IndexOf(const std::string& label) const
     return -1;
 }
 
-inline const boost::string_ref DataSetElement::LocalNameLabel() const { return label_.LocalName(); }
+inline const std::string_view DataSetElement::LocalNameLabel() const { return label_.LocalName(); }
 
-inline const boost::string_ref DataSetElement::PrefixLabel() const { return label_.Prefix(); }
+inline const std::string_view DataSetElement::PrefixLabel() const { return label_.Prefix(); }
 
 inline const std::string& DataSetElement::QualifiedNameLabel() const
 {
@@ -412,14 +417,14 @@ inline bool XmlName::operator==(const XmlName& other) const noexcept
 
 inline bool XmlName::operator!=(const XmlName& other) const noexcept { return !(*this == other); }
 
-inline const boost::string_ref XmlName::LocalName() const
+inline const std::string_view XmlName::LocalName() const
 {
-    return boost::string_ref(qualifiedName_.data() + localNameOffset_, localNameSize_);
+    return {qualifiedName_.data() + localNameOffset_, localNameSize_};
 }
 
-inline const boost::string_ref XmlName::Prefix() const
+inline const std::string_view XmlName::Prefix() const
 {
-    return boost::string_ref(qualifiedName_.data(), prefixSize_);
+    return {qualifiedName_.data(), prefixSize_};
 }
 
 inline const std::string& XmlName::QualifiedName() const { return qualifiedName_; }
@@ -429,3 +434,5 @@ inline bool XmlName::Verbatim() const { return verbatim_; }
 }  // namespace internal
 }  // namespace BAM
 }  // namespace PacBio
+
+#endif  // PBBAM_DATASETELEMENT_INL

@@ -2,8 +2,14 @@
 
 #include "DataSetIO.h"
 
-#include <cassert>
-#include <cstddef>
+#include <pbbam/StringUtilities.h>
+#include "ErrnoReason.h"
+#include "FileUtils.h"
+#include "FofnReader.h"
+#include "XmlReader.h"
+#include "XmlWriter.h"
+
+#include <boost/algorithm/string.hpp>
 
 #include <algorithm>
 #include <exception>
@@ -12,15 +18,8 @@
 #include <sstream>
 #include <stdexcept>
 
-#include <boost/algorithm/string.hpp>
-
-#include <pbbam/StringUtilities.h>
-
-#include "ErrnoReason.h"
-#include "FileUtils.h"
-#include "FofnReader.h"
-#include "XmlReader.h"
-#include "XmlWriter.h"
+#include <cassert>
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {

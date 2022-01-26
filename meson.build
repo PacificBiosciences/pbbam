@@ -1,14 +1,14 @@
 project(
   'PacBioBAM',
   'cpp',
-  version : '1.7.0',
+  version : '2.0.0',
   default_options : [
     'buildtype=release',
     'warning_level=3',
-    'cpp_std=c++14',
+    'cpp_std=c++20',
     'b_ndebug=if-release'],
   license : 'BSD-3',
-  meson_version : '>= 0.52.0')
+  meson_version : '>= 0.57.0')
 
 ############
 # CXXFLAGS #
@@ -51,10 +51,10 @@ pbbam_thread_dep = dependency('threads', required : true)
 pbbam_boost_dep = dependency('boost', include_type : 'system', required : true)
 
 # zlib
-pbbam_zlib_dep = dependency('zlib', required : true, fallback : ['zlib', 'zlib_dep'])
+pbbam_zlib_dep = dependency('zlib', include_type : 'system', required : true, fallback : ['zlib', 'zlib_dep'])
 
 # htslib
-pbbam_htslib_dep = dependency('htslib', required : true, version : '>=1.4', fallback : ['htslib', 'htslib_dep'])
+pbbam_htslib_dep = dependency('htslib', include_type : 'system', required : true, version : '>=1.4', fallback : ['htslib', 'htslib_dep'])
 
 # pbcopper
 pbbam_pbcopper_dep = dependency('pbcopper', required : true, fallback : ['pbcopper', 'pbcopper_dep'])

@@ -2,17 +2,16 @@
 
 #include <pbbam/virtual/ZmwReadStitcher.h>
 
-#include <deque>
-#include <stdexcept>
-#include <utility>
-
 #include <pbbam/DataSet.h>
 #include <pbbam/EntireFileQuery.h>
 #include <pbbam/PbiFilter.h>
 #include <pbbam/PbiFilterQuery.h>
-
 #include "VirtualStitching.h"
 #include "VirtualZmwReader.h"
+
+#include <deque>
+#include <stdexcept>
+#include <utility>
 
 namespace PacBio {
 namespace BAM {
@@ -121,6 +120,10 @@ ZmwReadStitcher::ZmwReadStitcher(const DataSet& dataset)
     : d_{std::make_unique<ZmwReadStitcherPrivate>(dataset)}
 {
 }
+
+ZmwReadStitcher::ZmwReadStitcher(ZmwReadStitcher&&) noexcept = default;
+
+ZmwReadStitcher& ZmwReadStitcher::operator=(ZmwReadStitcher&&) noexcept = default;
 
 ZmwReadStitcher::~ZmwReadStitcher() = default;
 

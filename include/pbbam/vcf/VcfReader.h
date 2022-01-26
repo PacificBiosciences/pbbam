@@ -3,13 +3,13 @@
 
 #include <pbbam/Config.h>
 
-#include <fstream>
-#include <memory>
-#include <string>
-
 #include <pbbam/vcf/VcfFile.h>
 #include <pbbam/vcf/VcfHeader.h>
 #include <pbbam/vcf/VcfVariant.h>
+
+#include <fstream>
+#include <memory>
+#include <string>
 
 namespace PacBio {
 namespace VCF {

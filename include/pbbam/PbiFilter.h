@@ -3,17 +3,17 @@
 
 #include <pbbam/Config.h>
 
-#include <cstddef>
+#include <pbbam/DataSet.h>
+#include <pbbam/PbiBasicTypes.h>
+#include <pbbam/PbiRawData.h>
+
+#include <boost/concept_check.hpp>
 
 #include <memory>
 #include <string>
 #include <tuple>
 
-#include <boost/concept_check.hpp>
-
-#include <pbbam/DataSet.h>
-#include <pbbam/PbiBasicTypes.h>
-#include <pbbam/PbiRawData.h>
+#include <cstddef>
 
 namespace PacBio {
 namespace BAM {
@@ -149,7 +149,7 @@ public:
     ///                 If INTERSECT, a record must match all child filters. If
     ///                 UNION, a record must match any child filter.
     ///
-    PbiFilter(const CompositionType type = INTERSECT);
+    PbiFilter(CompositionType type = INTERSECT);
 
     /// \brief Creates a composite filter (of INTERSECT type) with an initial
     ///        child filter.
@@ -226,7 +226,7 @@ public:
     /// \returns true if record at \p row passes this filter criteria,
     ///          including children (if any)
     ///
-    bool Accepts(const PbiRawData& idx, const size_t row) const;
+    bool Accepts(const PbiRawData& idx, size_t row) const;
 
     /// \}
 

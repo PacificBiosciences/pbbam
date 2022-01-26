@@ -3,11 +3,11 @@
 
 #include <pbbam/Config.h>
 
-#include <cstdint>
+#include <pbbam/TagCollection.h>
 
 #include <vector>
 
-#include <pbbam/TagCollection.h>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {

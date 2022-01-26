@@ -3,14 +3,14 @@
 
 #include <pbbam/Config.h>
 
-#include <cassert>
+#include <pbbam/BamRecord.h>
+#include <pbbam/BamRecordImpl.h>
+#include <pbbam/BamRecordTag.h>
 
 #include <string>
 #include <unordered_map>
 
-#include <pbbam/BamRecord.h>
-#include <pbbam/BamRecordImpl.h>
-#include <pbbam/BamRecordTag.h>
+#include <cassert>
 
 namespace PacBio {
 namespace BAM {
@@ -19,10 +19,10 @@ class BamRecordTags
 {
 public:
     // tag info
-    static bool IsIPD(const BamRecordTag tag);
-    static bool IsPulse(const BamRecordTag tag);
-    static bool IsPW(const BamRecordTag tag);
-    static std::string LabelFor(const BamRecordTag tag);
+    static bool IsIPD(BamRecordTag tag);
+    static bool IsPulse(BamRecordTag tag);
+    static bool IsPW(BamRecordTag tag);
+    static std::string LabelFor(BamRecordTag tag);
 
 private:
     struct BamRecordTagData

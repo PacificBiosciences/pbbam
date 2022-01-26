@@ -2,11 +2,11 @@
 
 #include <pbbam/bed/BedWriter.h>
 
-#include <sstream>
-#include <type_traits>
-
 #include <pbbam/GenomicInterval.h>
 #include <pbbam/TextFileWriter.h>
+
+#include <sstream>
+#include <type_traits>
 
 namespace PacBio {
 namespace BED {

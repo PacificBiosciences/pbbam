@@ -2,14 +2,14 @@
 
 #include <pbbam/vcf/VcfSort.h>
 
+#include <pbbam/vcf/VcfQuery.h>
+#include <pbbam/vcf/VcfWriter.h>
+
 #include <algorithm>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-
-#include <pbbam/vcf/VcfQuery.h>
-#include <pbbam/vcf/VcfWriter.h>
 
 namespace PacBio {
 namespace VCF {

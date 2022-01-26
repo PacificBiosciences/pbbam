@@ -2,14 +2,13 @@
 
 #include <pbbam/FastaWriter.h>
 
-#include <sstream>
-#include <stdexcept>
-
 #include <pbbam/BamRecord.h>
 #include <pbbam/FastqSequence.h>
 #include <pbbam/FormatUtils.h>
-
 #include "ErrnoReason.h"
+
+#include <sstream>
+#include <stdexcept>
 
 namespace PacBio {
 namespace BAM {

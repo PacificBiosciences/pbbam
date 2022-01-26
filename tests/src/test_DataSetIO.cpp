@@ -1685,3 +1685,58 @@ TEST(BAM_DataSetIO, can_fetch_all_fasta_files)
                     boost::iends_with(fn, "fsa"));
     }
 }
+
+TEST(BAM_DataSetIO, can_read_write_supplemental_resources)
+{
+    DataSet ds1{PbbamTestsConfig::Data_Dir +
+                "/dataset/supplemental_resource1.consensusreadset.xml"};
+    const DataSet ds2{PbbamTestsConfig::Data_Dir +
+                      "/dataset/supplemental_resource2.consensusreadset.xml"};
+
+    ASSERT_EQ(1, ds1.SupplementalResources().Size());
+    EXPECT_EQ("report.txt", ds1.SupplementalResources()[0].ResourceId());
+    ASSERT_EQ(1, ds2.SupplementalResources().Size());
+    EXPECT_EQ("report2.txt", ds2.SupplementalResources()[0].ResourceId());
+
+    ds1 += ds2;
+    ASSERT_EQ(2, ds1.SupplementalResources().Size());
+    EXPECT_EQ("report.txt", ds1.SupplementalResources()[0].ResourceId());
+    EXPECT_EQ("report2.txt", ds1.SupplementalResources()[1].ResourceId());
+
+    std::ostringstream out;
+    ds1.SaveToStream(out);
+
+    const DataSet ds3 = DataSet::FromXml(out.str());
+    ASSERT_EQ(2, ds3.SupplementalResources().Size());
+    EXPECT_EQ("report.txt", ds3.SupplementalResources()[0].ResourceId());
+    EXPECT_EQ("report2.txt", ds3.SupplementalResources()[1].ResourceId());
+}
+
+TEST(Bam_DataSetIO, can_merge_from_various_supplemental_resource_counts)
+{
+    DataSet dataset{PbbamTestsConfig::Data_Dir +
+                    "/dataset/supplemental_resource1.consensusreadset.xml"};
+    EXPECT_EQ(1, dataset.SupplementalResources().Size());
+
+    const DataSet singleResoureDataset{PbbamTestsConfig::Data_Dir +
+                                       "/dataset/supplemental_resource2.consensusreadset.xml"};
+    EXPECT_EQ(1, singleResoureDataset.SupplementalResources().Size());
+
+    const DataSet noResourceDataset{PbbamTestsConfig::Data_Dir +
+                                    "/dataset/supplemental_resource_empty.consensusreadset.xml"};
+    EXPECT_EQ(0, noResourceDataset.SupplementalResources().Size());
+
+    const DataSet mutlipleResourceDataset{
+        PbbamTestsConfig::Data_Dir +
+        "/dataset/supplemental_resource_multiple.consensusreadset.xml"};
+    EXPECT_EQ(3, mutlipleResourceDataset.SupplementalResources().Size());
+
+    dataset += singleResoureDataset;
+    EXPECT_EQ(2, dataset.SupplementalResources().Size());
+
+    dataset += noResourceDataset;
+    EXPECT_EQ(2, dataset.SupplementalResources().Size());
+
+    dataset += mutlipleResourceDataset;
+    EXPECT_EQ(5, dataset.SupplementalResources().Size());
+}

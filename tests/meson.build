@@ -64,18 +64,18 @@ test(
   pbbam_clang_formatter,
   args : [
     '--all'],
-  workdir : meson.source_root())
+  workdir : meson.project_source_root())
 
 test(
   'pbbam EOF check',
   pbbam_eof_check,
-  workdir : meson.source_root())
+  workdir : meson.project_source_root())
 
 test(
   'pbbam gtest unittests',
   pbbam_test,
   args : [
-    '--gtest_output=xml:' + join_paths(meson.build_root(), 'pbbam-gtest-unittests.xml')],
+    '--gtest_output=xml:' + join_paths(meson.project_build_root(), 'pbbam-gtest-unittests.xml')],
   env : [
     'ARGS=-V',
     'VERBOSE=1'])
@@ -84,7 +84,7 @@ test(
   'pbbam zero-byte input check',
   pbbam_cram_script,
   args : [
-    '--xunit-file=' + join_paths(meson.build_root(), 'pbbam-cram-zero-byte-check.xml'),
+    '--xunit-file=' + join_paths(meson.project_build_root(), 'pbbam-cram-zero-byte-check.xml'),
     '--verbose'] + files('src/cram/zero_byte_check.t'),
   env : [
     '__ZERO_BYTE_CHECK_EXE=' + pbbam_zero_byte_check.full_path(),

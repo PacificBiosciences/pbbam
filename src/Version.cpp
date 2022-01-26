@@ -2,16 +2,16 @@
 
 #include "Version.h"
 
+#include <pbbam/StringUtilities.h>
+
 #include <ostream>
 #include <sstream>
 #include <stdexcept>
 
-#include <pbbam/StringUtilities.h>
-
 namespace PacBio {
 namespace BAM {
 
-const Version Version::Current = Version(3, 0, 7);
+const Version Version::Current = Version(5, 0, 0);
 const Version Version::Minimum = Version(3, 0, 1);
 
 // string must be "<major>.<minor>.<version>"
