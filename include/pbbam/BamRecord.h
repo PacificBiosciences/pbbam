@@ -22,6 +22,7 @@
 
 #include <pbcopper/data/MappedRead.h>
 #include <pbcopper/data/Read.h>
+#include <pbcopper/json/JSON.h>
 
 #include <memory>
 #include <string>
@@ -314,6 +315,45 @@ public:
     /// \}
 
 public:
+    /// \name Segment Read Data
+
+    /// \returns true if segmented read
+    ///
+    /// \note Queries the record's read group, not the tags.
+    ///
+    bool IsSegment() const;
+
+    /// \returns segment read index
+    ///
+    /// \throws std::runtime_error if segment read data is absent or malformed.
+    /// \sa HasSegmentIndex
+    ///
+    int32_t SegmentIndex() const;
+
+    /// \returns index of left adapater
+    ///
+    /// \throws std::runtime_error if segment read data is absent or malformed.
+    /// \sa HasSegmentLeadingAdapterIndex
+    ///
+    int32_t SegmentLeftAdapterIndex() const;
+
+    /// \returns index of right adapater
+    ///
+    /// \throws std::runtime_error if segment read data is absent or malformed.
+    /// \sa HasSegmentTrailingAdapterIndex
+    ///
+    int32_t SegmentRightAdapterIndex() const;
+
+    /// \returns segment read supplemental data, decoded to JSON
+    ///
+    /// \throws std::runtime_error if segment read data is absent or malformed.
+    /// \sa HasSegmentSupplementalData
+    ///
+    JSON::Json SegmentSupplementalData() const;
+
+    /// \}
+
+public:
     /// \name Auxiliary Data Queries
     /// \{
 
@@ -421,6 +461,18 @@ public:
 
     /// \returns true if this record has scrap ZMW type data (only in SCRAP)
     bool HasScrapZmwType() const;
+
+    /// \returns true if this record has segment index
+    bool HasSegmentIndex() const;
+
+    /// \returns true if this record has segment's left adapter index
+    bool HasSegmentLeftAdapterIndex() const;
+
+    /// \returns true if this record has segment's right adapter index
+    bool HasSegmentRightAdapterIndex() const;
+
+    /// \returns true if this record has segment supplemental data
+    bool HasSegmentSupplementalData() const;
 
     /// \returns true if this record has signal-to-noise data (absent in
     ///          POLYMERASE)
@@ -998,6 +1050,39 @@ public:
     /// \returns reference to this record
     ///
     BamRecord& BarcodeQuality(uint8_t quality);
+
+    /// \}
+
+public:
+    /// \name Segment Data
+
+    /// \brief Sets this record's segment index ('di' tag)
+    ///
+    /// \param[in] index    0-based index of this segment within its source read
+    /// \returns reference to this record
+    ///
+    BamRecord& SegmentIndex(int32_t index);
+
+    /// \returns Sets this segment's left adapter index ('dl' tag)
+    ///
+    /// \param[in] index    0-based index of segment left adapter
+    /// \returns reference to this record
+    ///
+    BamRecord& SegmentLeftAdapterIndex(int32_t index);
+
+    /// \returns Sets this segment's right adapter index ('dr' tag)
+    ///
+    /// \param[in] index    0-based index of segment right adapter
+    /// \returns reference to this record
+    ///
+    BamRecord& SegmentRightAdapterIndex(int32_t index);
+
+    /// \returns Sets this segment's supplemental data ('ds' tag)
+    ///
+    /// \param[in] data     JSON object (not encoded)
+    /// \returns reference to this record
+    ///
+    BamRecord& SegmentSupplementalData(const JSON::Json& data);
 
     /// \}
 

@@ -21,6 +21,7 @@ enum class RecordType
     SCRAP,       ///< Additional sequence (barcodes, adapters, etc.)
     UNKNOWN,     ///< Unknown read type
     TRANSCRIPT,  ///< Transcript
+    SEGMENT,     ///< Segment read
 
     POLYMERASE = ZMW  ///< \deprecated as of PacBio BAM spec v 3.0.4 (use RecordType::ZMW instead)
 };
@@ -43,6 +44,15 @@ bool IsCcsOrTranscript(RecordType type);
 /// \throws std::runtime_error if type is unrecognized
 ///
 std::string ToString(RecordType type);
+
+///
+/// \brief Returns RecordType from string representation
+///
+/// \param type
+/// \return record type
+/// \throws std::runtime_error if name is unrecognized
+///
+RecordType RecordTypeFromString(const std::string& type);
 
 }  // namespace BAM
 }  // namespace PacBio

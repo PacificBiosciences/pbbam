@@ -38,7 +38,7 @@ static const std::set<std::string, ilexcompare_wrapper> AcceptedSortOrders
     "unknown",
     "unsorted",
     "queryname",
-    "coordinate"
+    "coordinate",
 };
 
 static const std::set<std::string> AcceptedReadTypes
@@ -48,7 +48,9 @@ static const std::set<std::string> AcceptedReadTypes
     "SUBREAD",
     "CCS",
     "SCRAP",
-    "UNKNOWN"
+    "UNKNOWN",
+    "TRANSCRIPT",
+    "SEGMENT",
 };
 // clang-format on
 
@@ -94,9 +96,22 @@ static void ValidateReadGroup(const ReadGroupInfo& rg, std::unique_ptr<Validatio
     }
 
     // valid read type
-    if (!rg.ReadType().empty()) {
-        if (AcceptedReadTypes.find(rg.ReadType()) == AcceptedReadTypes.cend()) {
-            errors->AddReadGroupError(id, "read type: " + rg.ReadType() + " is unknown");
+    const std::string readType = rg.ReadType();
+    if (!readType.empty()) {
+        if (!AcceptedReadTypes.contains(readType)) {
+            errors->AddReadGroupError(id, "read type: " + readType + " is unknown");
+        }
+
+        if (readType == "SEGMENT") {
+            if (!rg.SegmentSource().has_value()) {
+                errors->AddReadGroupError(
+                    id, "read type: " + readType + " is missing a SOURCE read type");
+            }
+        } else {
+            if (rg.SegmentSource().has_value()) {
+                errors->AddReadGroupError(
+                    id, "read type: " + readType + " cannot have a SOURCE read type");
+            }
         }
     }
 
@@ -261,7 +276,7 @@ void ValidateRecordRequiredTags(const BamRecord& b, std::unique_ptr<ValidationEr
         errors->AddRecordError(name, "missing tag: np (num passes)");
     } else {
         const auto numPasses = b.NumPasses();
-        if (!isCcsOrTranscript && numPasses != 1) {
+        if ((!isCcsOrTranscript || !b.IsSegment()) && (numPasses != 1)) {
             errors->AddRecordError(name, "np (numPasses) tag for non-CCS records should be 1");
         }
     }
@@ -274,6 +289,25 @@ void ValidateRecordRequiredTags(const BamRecord& b, std::unique_ptr<ValidationEr
     // sn
     if (!b.HasSignalToNoise()) {
         errors->AddRecordError(name, "missing tag: sn (signal-to-noise ratio)");
+    }
+
+    // segment reads
+    if (b.IsSegment()) {
+        if (!b.HasSegmentIndex()) {
+            errors->AddRecordError(name, "segment read missing tag: di (segment index)");
+        }
+        if (!b.HasSegmentLeftAdapterIndex()) {
+            errors->AddRecordError(name,
+                                   "segment read missing tag: dl (segment left adapter index)");
+        }
+        if (!b.HasSegmentRightAdapterIndex()) {
+            errors->AddRecordError(name,
+                                   "segment read missing tag: dr (segment right adapter index");
+        }
+        if (!b.HasSegmentSupplementalData()) {
+            errors->AddRecordError(name,
+                                   "segment read missing tag: ds (segment read supplemental data");
+        }
     }
 }
 

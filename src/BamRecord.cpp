@@ -6,6 +6,7 @@
 #include <pbbam/StringUtilities.h>
 #include <pbbam/ZmwTypeMap.h>
 #include <pbbam/virtual/VirtualRegionTypeMap.h>
+
 #include "BamRecordTags.h"
 #include "MemoryUtils.h"
 #include "Pulse2BaseCache.h"
@@ -13,7 +14,9 @@
 
 #include <pbcopper/data/Clipping.h>
 #include <pbcopper/data/FrameEncoders.h>
+#include <pbcopper/data/Position.h>
 #include <pbcopper/data/internal/ClippingImpl.h>
+#include <pbcopper/utility/Ssize.h>
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -25,6 +28,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <utility>
+#include <vector>
 
 #include <cassert>
 #include <cctype>
@@ -34,16 +38,6 @@
 namespace PacBio {
 namespace BAM {
 namespace {
-
-// record type names
-const std::string recordTypeName_ZMW{"ZMW"};
-const std::string recordTypeName_Polymerase{"POLYMERASE"};
-const std::string recordTypeName_HqRegion{"HQREGION"};
-const std::string recordTypeName_Subread{"SUBREAD"};
-const std::string recordTypeName_CCS{"CCS"};
-const std::string recordTypeName_Scrap{"SCRAP"};
-const std::string recordTypeName_Transcript{"TRANSCRIPT"};
-const std::string recordTypeName_Unknown{"UNKNOWN"};
 
 int32_t HoleNumberFromName(const std::string& fullName)
 {
@@ -60,34 +54,32 @@ int32_t HoleNumberFromName(const std::string& fullName)
     }
 }
 
-Data::Position QueryEndFromName(const std::string& fullName)
+std::pair<Data::Position, Data::Position> QueryIntervalFromName(const std::string& fullName)
 {
     const auto mainTokens = Split(fullName, '/');
-    if (mainTokens.size() != 3) {
+    if (Utility::Ssize(mainTokens) < 3) {
         throw std::runtime_error{"[pbbam] BAM record ERROR: malformed record name: " + fullName};
     }
 
-    const auto queryTokens = Split(mainTokens.at(2), '_');
+    const auto queryTokens = Split(mainTokens.back(), '_');
     if (queryTokens.size() != 2) {
         throw std::runtime_error{"[pbbam] BAM record ERROR: malformed record name: " + fullName};
     }
 
-    return std::stoi(queryTokens.at(1));
+    return {
+        std::stoi(queryTokens.at(0)),
+        std::stoi(queryTokens.at(1)),
+    };
+}
+
+Data::Position QueryEndFromName(const std::string& fullName)
+{
+    return QueryIntervalFromName(fullName).second;
 }
 
 Data::Position QueryStartFromName(const std::string& fullName)
 {
-    const auto mainTokens = Split(fullName, '/');
-    if (mainTokens.size() != 3) {
-        throw std::runtime_error{"[pbbam] BAM record ERROR: malformed record name: " + fullName};
-    }
-
-    const auto queryTokens = Split(mainTokens.at(2), '_');
-    if (queryTokens.size() != 2) {
-        throw std::runtime_error{"[pbbam] BAM record ERROR: malformed record name: " + fullName};
-    }
-
-    return std::stoi(queryTokens.at(0));
+    return QueryIntervalFromName(fullName).first;
 }
 
 std::string Label(const BamRecordTag tag) { return BamRecordTags::LabelFor(tag); }
@@ -338,29 +330,6 @@ Data::FrameEncoder PwEncoder(const BamRecord& record)
         // fallback to V1 in corner cases w/ no read group set
         return Data::V1FrameEncoder{};
     }
-}
-
-RecordType NameToType(const std::string& name)
-{
-    if (name == recordTypeName_Subread) {
-        return RecordType::SUBREAD;
-    }
-    if (name == recordTypeName_ZMW || name == recordTypeName_Polymerase) {
-        return RecordType::ZMW;
-    }
-    if (name == recordTypeName_HqRegion) {
-        return RecordType::HQREGION;
-    }
-    if (name == recordTypeName_CCS) {
-        return RecordType::CCS;
-    }
-    if (name == recordTypeName_Scrap) {
-        return RecordType::SCRAP;
-    }
-    if (name == recordTypeName_Transcript) {
-        return RecordType::TRANSCRIPT;
-    }
-    return RecordType::UNKNOWN;
 }
 
 void OrientBasesAsRequested(std::string* bases, Data::Orientation current,
@@ -907,6 +876,107 @@ BamRecord& BamRecord::DeletionTag(const std::string& tags)
     return *this;
 }
 
+int32_t BamRecord::SegmentIndex() const
+{
+    const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SEGMENT_INDEX);
+    const auto diTag = impl_.TagValue(tagName);
+    if (diTag.IsNull()) {
+        throw std::runtime_error{
+            "[pbbam] BAM record ERROR: segment read's index tag (di) was requested but is missing"};
+    }
+    return diTag.ToInt32();
+}
+
+BamRecord& BamRecord::SegmentIndex(int32_t index)
+{
+    CreateOrEdit(BamRecordTag::SEGMENT_INDEX, index, &impl_);
+    return *this;
+}
+
+int32_t BamRecord::SegmentLeftAdapterIndex() const
+{
+    const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SEGMENT_ADAPTER_LEFT);
+    const auto dlTag = impl_.TagValue(tagName);
+    if (dlTag.IsNull()) {
+        throw std::runtime_error{
+            "[pbbam] BAM record ERROR: segment read's left adapter tag (dl) was requested but is "
+            "missing"};
+    }
+    return dlTag.ToInt32();
+}
+
+BamRecord& BamRecord::SegmentLeftAdapterIndex(int32_t index)
+{
+    CreateOrEdit(BamRecordTag::SEGMENT_ADAPTER_LEFT, index, &impl_);
+    return *this;
+}
+
+int32_t BamRecord::SegmentRightAdapterIndex() const
+{
+    const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SEGMENT_ADAPTER_RIGHT);
+    const auto drTag = impl_.TagValue(tagName);
+    if (drTag.IsNull()) {
+        throw std::runtime_error{
+            "[pbbam] BAM record ERROR: segment read's right adapter tag (dr) was requested but is "
+            "missing"};
+    }
+    return drTag.ToInt32();
+}
+
+BamRecord& BamRecord::SegmentRightAdapterIndex(int32_t index)
+{
+    CreateOrEdit(BamRecordTag::SEGMENT_ADAPTER_RIGHT, index, &impl_);
+    return *this;
+}
+
+JSON::Json BamRecord::SegmentSupplementalData() const
+{
+    // tag lookup
+    const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SEGMENT_SUPPLEMENTAL);
+    const auto dsTag = impl_.TagValue(tagName);
+    if (dsTag.IsNull()) {
+        throw std::runtime_error{
+            "[pbbam] BAM record ERROR: segment read's supplemental tag (ds) was requested but is "
+            "missing"};
+    }
+    const std::vector<uint8_t> dsRaw = dsTag.ToUInt8Array();
+
+    // decode msg_pack -> JSON
+    try {
+        const auto decoded = JSON::Json::from_msgpack(dsRaw);
+        // from_msgpack may return object in single-element array
+        if (decoded.is_array() && !decoded.empty()) {
+            return decoded.front();
+        }
+        return decoded;
+    }
+    // convert JSON library exception to pbbam-style exception
+    catch (const JSON::Json::parse_error& e) {
+        std::ostringstream msg;
+        msg << "[pbbam] BAM record ERROR: could not decode segment read's supplemental tag (ds)\n"
+            << "  reason: " << e.what();
+        throw std::runtime_error{msg.str()};
+    }
+}
+
+BamRecord& BamRecord::SegmentSupplementalData(const JSON::Json& data)
+{
+    // encode JSON -> msg_pack
+    std::vector<uint8_t> encoded;
+    try {
+        encoded = JSON::Json::to_msgpack(data);
+    }
+    // convert JSON library exception to pbbam-style exception
+    catch (const JSON::Json::parse_error& e) {
+        std::ostringstream msg;
+        msg << "[pbbam] BAM record ERROR: could not encode segment read's supplemental tag (ds)\n"
+            << "  reason: " << e.what();
+        throw std::runtime_error{msg.str()};
+    }
+    CreateOrEdit(BamRecordTag::SEGMENT_SUPPLEMENTAL, encoded, &impl_);
+    return *this;
+}
+
 std::vector<uint16_t> BamRecord::EncodePhotons(const std::vector<float>& data)
 {
     std::vector<uint16_t> encoded;
@@ -1421,9 +1491,26 @@ bool BamRecord::HasScrapZmwType() const
            !impl_.TagValue(BamRecordTag::SCRAP_ZMW_TYPE).IsNull();
 }
 
-bool BamRecord::HasStartFrame() const { return impl_.HasTag(BamRecordTag::START_FRAME); }
+bool BamRecord::HasSegmentIndex() const { return impl_.HasTag(BamRecordTag::SEGMENT_INDEX); }
+
+bool BamRecord::HasSegmentLeftAdapterIndex() const
+{
+    return impl_.HasTag(BamRecordTag::SEGMENT_ADAPTER_LEFT);
+}
+
+bool BamRecord::HasSegmentRightAdapterIndex() const
+{
+    return impl_.HasTag(BamRecordTag::SEGMENT_ADAPTER_RIGHT);
+}
+
+bool BamRecord::HasSegmentSupplementalData() const
+{
+    return impl_.HasTag(BamRecordTag::SEGMENT_SUPPLEMENTAL);
+}
 
 bool BamRecord::HasSignalToNoise() const { return impl_.HasTag(BamRecordTag::SIGNAL_TO_NOISE); }
+
+bool BamRecord::HasStartFrame() const { return impl_.HasTag(BamRecordTag::START_FRAME); }
 
 bool BamRecord::HasSubstitutionQV() const { return impl_.HasTag(BamRecordTag::SUBSTITUTION_QV); }
 
@@ -1522,6 +1609,8 @@ Data::Frames BamRecord::IPDRaw(Data::Orientation orientation) const
 }
 
 bool BamRecord::IsMapped() const { return impl_.IsMapped(); }
+
+bool BamRecord::IsSegment() const { return ReadGroup().IsSegment(); }
 
 Data::QualityValues BamRecord::LabelQV(Data::Orientation orientation, bool aligned,
                                        bool exciseSoftClips, PulseBehavior pulseBehavior) const
@@ -2466,21 +2555,27 @@ Data::MappedRead BamRecord::ToMappedRead(std::string model, const Data::Position
 RecordType BamRecord::Type() const
 {
     try {
-        const auto typeName = ReadGroup().ReadType();
-        return NameToType(typeName);
+        const std::string typeName = ReadGroup().ReadType();
+        return RecordTypeFromString(typeName);
     } catch (std::exception&) {
 
-        // read group not found, peek at name to see if we're possibly
-        // CCS or TRANSCRIPT
+        // read group not found, peek at name to see if we're possibly one of:
+        //   CCS, TRANSCRIPT, SEGMENT
         //
         const auto name = FullName();
         if (name.find("transcript") == 0) {
             return RecordType::TRANSCRIPT;
-        } else if (name.find("/ccs") != std::string::npos) {
-            return RecordType::CCS;
-        } else {
-            return RecordType::UNKNOWN;
         }
+        if (name.find("ccs") != std::string::npos) {
+            if (boost::algorithm::ends_with(name, "ccs") ||
+                boost::algorithm::ends_with(name, "fwd") ||
+                boost::algorithm::ends_with(name, "rev")) {
+                return RecordType::CCS;
+            }
+            assert(std::isdigit(name.back()));
+            return RecordType::SEGMENT;
+        }
+        return RecordType::UNKNOWN;
     }
 }
 
@@ -2497,19 +2592,23 @@ void BamRecord::UpdateName()
         newName += MovieName();
         newName += "/";
         newName += holeNumber;
-        newName += "/";
 
-        if (type == RecordType::CCS) {
-            newName += "ccs";
+        // ccs-related label
+        if ((type == RecordType::CCS) || (type == RecordType::SEGMENT)) {
+            newName += "/ccs";
             const auto originalName = FullName();
-            if (boost::ends_with(originalName, "/fwd")) {
+            // ensure we keep strand label, converting either direction
+            if (originalName.find("/fwd") != std::string::npos) {
                 newName += "/fwd";
-            } else if (boost::ends_with(originalName, "/rev")) {
+            } else if (originalName.find("/rev") != std::string::npos) {
                 newName += "/rev";
             }
         }
 
-        else {
+        // qStart/qEnd label
+        if (type != RecordType::CCS) {
+            newName += "/";
+
             if (HasQueryStart()) {
                 newName += std::to_string(QueryStart());
             } else {

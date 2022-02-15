@@ -458,7 +458,7 @@ public:
     /// \returns sequencing kit part number
     std::string SequencingKit() const;
 
-    /// \returns CCS strand
+    /// \returns CCS or segmented CCS strand, if present
     std::optional<Data::Strand> Strand() const;
 
     /// \}
@@ -692,12 +692,42 @@ public:
     ///
     ReadGroupInfo& SequencingKit(std::string kitNumber);
 
-    /// \brief Sets the ccs strand.
+    /// \brief Sets the CCS or CCS segment's strand.
     ///
     /// \param[in] strand       new value
     /// \returns reference to this object
     ///
     ReadGroupInfo& Strand(Data::Strand strand);
+
+    /// \}
+
+public:
+    /// \name Segment reads
+    /// \{
+
+    /// \returns true if read type is segment
+    bool IsSegment() const;
+
+    ///
+    /// \brief Converts this read group to a SEGMENT and updates ID
+    ///
+    /// Sets SOURCE read type from current READTYPE.
+    ///
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& MakeSegment();
+
+    ///
+    /// \brief Reverts this read group from a SEGMENT and updates ID
+    ///
+    /// Sets READTYPE from current SOURCE read type.
+    ///
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& RevertSegment();
+
+    /// \returns string value of segment's source read type, if present
+    std::optional<std::string> SegmentSource() const;
 
     /// \}
 
@@ -717,6 +747,7 @@ private:
 
     // DS:<Description> components
     std::string readType_;
+    std::optional<std::string> sourceReadType_;
     std::string bindingKit_;
     std::string sequencingKit_;
     std::string basecallerVersion_;

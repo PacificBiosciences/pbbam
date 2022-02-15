@@ -402,7 +402,7 @@ static void CheckInvalidTagLength(const std::string& tagName, const Tag& tag)
 {
     static const BamHeader validUnmappedHeader{
         "@HD\tVN:1.5\tSO:unknown\tpb:3.0.7\n"
-        "@RG\tID:db972a04\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
+        "@RG\tID:b5482b33\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
         "BINDINGKIT=101-717-300;SEQUENCINGKIT=101-644-500;BASECALLERVERSION=5.0.0;FRAMERATEHZ=100."
         "000000\t"
         "PU:m64004_190414_193017\tPM:SEQUELII\n"};
@@ -419,7 +419,7 @@ TEST(BAM_Validator, reports_invalid_tag_lengths)
 {
     static const BamHeader validUnmappedHeader{
         "@HD\tVN:1.5\tSO:unknown\tpb:3.0.7\n"
-        "@RG\tID:db972a04\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
+        "@RG\tID:b5482b33\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
         "BINDINGKIT=101-717-300;SEQUENCINGKIT=101-644-500;BASECALLERVERSION=5.0.0;FRAMERATEHZ=100."
         "000000\t"
         "PU:m64004_190414_193017\tPM:SEQUELII\n"};
@@ -559,7 +559,7 @@ TEST(BAM_Validator, reports_invalid_unmapped_record_data)
 {
     static const BamHeader validUnmappedHeader{
         "@HD\tVN:1.5\tSO:unknown\tpb:3.0.7\n"
-        "@RG\tID:db972a04\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
+        "@RG\tID:b5482b33\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
         "BINDINGKIT=101-717-300;SEQUENCINGKIT=101-644-500;BASECALLERVERSION=5.0.0;FRAMERATEHZ=100."
         "000000\t"
         "PU:m64004_190414_193017\tPM:SEQUELII\n"};
