@@ -13,8 +13,7 @@ class VcfFormatException : public std::runtime_error
 public:
     VcfFormatException(std::string reason)
         : std::runtime_error{"[pbbam] VCF format ERROR: " + std::move(reason)}
-    {
-    }
+    {}
 };
 
 }  // namespace VCF

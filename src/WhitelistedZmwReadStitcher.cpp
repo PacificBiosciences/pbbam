@@ -127,8 +127,7 @@ WhitelistedZmwReadStitcher::WhitelistedZmwReadStitcher(const std::vector<int32_t
                                                        const std::string& scrapsBamFilePath)
     : d_{std::make_unique<WhitelistedZmwReadStitcherPrivate>(zmwWhitelist, primaryBamFilePath,
                                                              scrapsBamFilePath)}
-{
-}
+{}
 
 WhitelistedZmwReadStitcher::WhitelistedZmwReadStitcher(WhitelistedZmwReadStitcher&&) noexcept =
     default;

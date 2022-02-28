@@ -102,8 +102,7 @@ bool PbiIdentityFilter::Accepts(const PbiRawData& idx, const size_t row) const
 
 PbiMovieNameFilter::PbiMovieNameFilter(const std::string& movieName, const Compare::Type cmp)
     : PbiMovieNameFilter{{1, movieName}, cmp}
-{
-}
+{}
 
 PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& movieNames,
                                        const Compare::Type cmp)
@@ -148,7 +147,6 @@ PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& movieName
 bool PbiMovieNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
 {
     const auto accepted = [this](const PbiRawData& index, const size_t i) {
-
         // straightforward lookup
         const auto& rgId = index.BasicData().rgId_.at(i);
         const auto foundAt = candidateRgIds_.find(rgId);
@@ -224,8 +222,7 @@ struct PbiNumSubreadsFilter::PbiNumSubreadsFilterPrivate
 {
     PbiNumSubreadsFilterPrivate(int numSubreads, const Compare::Type cmp)
         : numSubreads_{numSubreads}, cmp_{cmp}
-    {
-    }
+    {}
 
     PbiNumSubreadsFilterPrivate(const std::unique_ptr<PbiNumSubreadsFilterPrivate>& other)
     {
@@ -281,13 +278,11 @@ struct PbiNumSubreadsFilter::PbiNumSubreadsFilterPrivate
 
 PbiNumSubreadsFilter::PbiNumSubreadsFilter(int numSubreads, const Compare::Type cmp)
     : d_{std::make_unique<PbiNumSubreadsFilter::PbiNumSubreadsFilterPrivate>(numSubreads, cmp)}
-{
-}
+{}
 
 PbiNumSubreadsFilter::PbiNumSubreadsFilter(const PbiNumSubreadsFilter& other)
     : d_{std::make_unique<PbiNumSubreadsFilter::PbiNumSubreadsFilterPrivate>(other.d_)}
-{
-}
+{}
 
 PbiNumSubreadsFilter::PbiNumSubreadsFilter(PbiNumSubreadsFilter&&) noexcept = default;
 
@@ -504,19 +499,16 @@ private:
 PbiQueryNameFilter::PbiQueryNameFilter(const std::string& qname, const Compare::Type cmp)
     : d_{std::make_unique<PbiQueryNameFilter::PbiQueryNameFilterPrivate>(
           std::vector<std::string>{1, qname}, cmp)}
-{
-}
+{}
 
 PbiQueryNameFilter::PbiQueryNameFilter(const std::vector<std::string>& queryNames,
                                        const Compare::Type cmp)
     : d_{std::make_unique<PbiQueryNameFilter::PbiQueryNameFilterPrivate>(queryNames, cmp)}
-{
-}
+{}
 
 PbiQueryNameFilter::PbiQueryNameFilter(const PbiQueryNameFilter& other)
     : d_{std::make_unique<PbiQueryNameFilter::PbiQueryNameFilterPrivate>(other.d_)}
-{
-}
+{}
 
 PbiQueryNameFilter::PbiQueryNameFilter(PbiQueryNameFilter&&) noexcept = default;
 
@@ -542,8 +534,7 @@ PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<int32_t>& rgIds, const 
 
 PbiReadGroupFilter::PbiReadGroupFilter(const int32_t rgId, const Compare::Type cmp)
     : PbiReadGroupFilter{std::vector<int32_t>{rgId}, cmp}
-{
-}
+{}
 
 PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<ReadGroupInfo>& readGroups,
                                        const Compare::Type cmp)
@@ -554,8 +545,7 @@ PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<ReadGroupInfo>& readGro
 
 PbiReadGroupFilter::PbiReadGroupFilter(const ReadGroupInfo& rg, const Compare::Type cmp)
     : PbiReadGroupFilter{std::vector<ReadGroupInfo>{rg}, cmp}
-{
-}
+{}
 
 PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<std::string>& rgIds,
                                        const Compare::Type cmp)
@@ -570,8 +560,7 @@ PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<std::string>& rgIds,
 PbiReadGroupFilter::PbiReadGroupFilter(const std::string& rgId,
                                        const Compare::Type cmp)  //: cmp_{cmp}
     : PbiReadGroupFilter{std::vector<std::string>{rgId}, cmp}
-{
-}
+{}
 
 bool PbiReadGroupFilter::Accepts(const PbiRawData& idx, const size_t row) const
 {
@@ -731,8 +720,7 @@ void PbiReferenceNameFilter::Validate() const
 // PbiZmwFilter
 
 PbiZmwFilter::PbiZmwFilter(const int32_t zmw, const Compare::Type cmp) : cmp_{cmp}, singleZmw_{zmw}
-{
-}
+{}
 
 PbiZmwFilter::PbiZmwFilter(std::vector<int32_t> whitelist, const Compare::Type cmp)
     : cmp_{cmp}, zmwLookup_{whitelist.begin(), whitelist.end()}

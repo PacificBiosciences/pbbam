@@ -12,9 +12,7 @@
 
 using namespace PacBio;
 
-namespace FastaCacheTests {
-
-}  // namespace FastaCacheTests
+namespace FastaCacheTests {}  // namespace FastaCacheTests
 
 TEST(BAM_FastaCache, can_load_simple)
 {

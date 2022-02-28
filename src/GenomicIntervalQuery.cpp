@@ -14,40 +14,34 @@ class GenomicIntervalQuery::GenomicIntervalQueryPrivate
 public:
     GenomicIntervalQueryPrivate(const DataSet& dataset, const BaiIndexCache& cache)
         : reader_{dataset, cache}
-    {
-    }
+    {}
 
     GenomicIntervalQueryPrivate(const Data::GenomicInterval& interval, const DataSet& dataset,
                                 const BaiIndexCache& cache)
         : reader_{interval, dataset, cache}
-    {
-    }
+    {}
 
     GenomicIntervalCompositeBamReader reader_;
 };
 
 GenomicIntervalQuery::GenomicIntervalQuery(const DataSet& dataset)
     : GenomicIntervalQuery{dataset, MakeBaiIndexCache(dataset)}
-{
-}
+{}
 
 GenomicIntervalQuery::GenomicIntervalQuery(const DataSet& dataset, const BaiIndexCache& cache)
     : internal::IQuery{}, d_{std::make_unique<GenomicIntervalQueryPrivate>(dataset, cache)}
-{
-}
+{}
 
 GenomicIntervalQuery::GenomicIntervalQuery(const Data::GenomicInterval& interval,
                                            const DataSet& dataset)
     : GenomicIntervalQuery{interval, dataset, MakeBaiIndexCache(dataset)}
-{
-}
+{}
 
 GenomicIntervalQuery::GenomicIntervalQuery(const Data::GenomicInterval& interval,
                                            const DataSet& dataset, const BaiIndexCache& cache)
     : internal::IQuery{}
     , d_{std::make_unique<GenomicIntervalQueryPrivate>(interval, dataset, cache)}
-{
-}
+{}
 
 GenomicIntervalQuery::GenomicIntervalQuery(GenomicIntervalQuery&&) noexcept = default;
 

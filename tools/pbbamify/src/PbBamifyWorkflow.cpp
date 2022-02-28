@@ -265,16 +265,13 @@ bool Workflow::AugmentAlignments(const std::shared_ptr<QueryLookup> queryLookup,
 
     // Sets the frequency of the proof of life when
     // processing larger input BAMs.
-    int32_t verboseFrequency =
-        (verboseLevel <= 2)
-            ? 1000000
-            : (verboseLevel == 3)
-                  ? 100000
-                  : (verboseLevel == 4)
-                        ? 10000
-                        : (verboseLevel == 5)
-                              ? 1000
-                              : (verboseLevel == 6) ? 100 : (verboseLevel == 7) ? 10 : 1;
+    int32_t verboseFrequency = (verboseLevel <= 2)   ? 1000000
+                               : (verboseLevel == 3) ? 100000
+                               : (verboseLevel == 4) ? 10000
+                               : (verboseLevel == 5) ? 1000
+                               : (verboseLevel == 6) ? 100
+                               : (verboseLevel == 7) ? 10
+                                                     : 1;
 
     // Counters for verbose output.
     size_t numRecords = 0, numWithoutSeq = 0;

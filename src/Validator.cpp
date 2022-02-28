@@ -87,8 +87,8 @@ static void ValidateReadGroup(const ReadGroupInfo& rg, std::unique_ptr<Validatio
     if (!id.empty()) {
         const auto expectedId = MakeReadGroupId(rg.MovieName(), rg.ReadType());
         if (expectedId != id) {
-            const std::string msg{"stored ID: " + id + " does not match computed ID: " +
-                                  expectedId};
+            const std::string msg{"stored ID: " + id +
+                                  " does not match computed ID: " + expectedId};
             errors->AddReadGroupError(id, std::move(msg));
         }
     }

@@ -133,8 +133,7 @@ PbiReferenceEntry::PbiReferenceEntry(ID id) : PbiReferenceEntry{id, UNSET_ROW, U
 
 PbiReferenceEntry::PbiReferenceEntry(ID id, Row beginRow, Row endRow)
     : tId_{id}, beginRow_{beginRow}, endRow_{endRow}
-{
-}
+{}
 
 // ------------------------------------
 // PbiRawReferenceData implementation

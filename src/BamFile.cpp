@@ -108,8 +108,7 @@ public:
 };
 
 BamFile::BamFile(std::string filename) : d_{std::make_unique<BamFilePrivate>(std::move(filename))}
-{
-}
+{}
 
 BamFile::BamFile(const BamFile& other) : d_{other.d_->DeepCopy()} {}
 

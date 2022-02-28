@@ -2560,11 +2560,11 @@ const std::vector<uint8_t> defaultBasemodsQVs = {18, 128, 234};
 
 TEST(BAM_BamRecordClipping, clips_basemods_tags)
 {
-    const auto MakeCcsBasemodsRecord = [](
-        const std::string& str = defaultSequence,
-        const std::string& qual = "hNfLpfSlpk59K>22LC'x*2W=*0GWv",
-        const std::string& basemods = defaultBasemods,
-        const std::vector<uint8_t>& basemodsQVs = defaultBasemodsQVs) {
+    const auto MakeCcsBasemodsRecord = [](const std::string& str = defaultSequence,
+                                          const std::string& qual = "hNfLpfSlpk59K>22LC'x*2W=*0GWv",
+                                          const std::string& basemods = defaultBasemods,
+                                          const std::vector<uint8_t>& basemodsQVs =
+                                              defaultBasemodsQVs) {
         BamRecordImpl impl;
         impl.SetSequenceAndQualities(str, qual);
 

@@ -151,8 +151,7 @@ static const auto elementRegistry = std::unordered_map<std::string, XsdType>
 
 NamespaceInfo::NamespaceInfo(std::string name, std::string uri)
     : name_{std::move(name)}, uri_{std::move(uri)}
-{
-}
+{}
 
 const std::string& NamespaceInfo::Name() const { return name_; }
 

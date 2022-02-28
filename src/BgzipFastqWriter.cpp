@@ -14,8 +14,7 @@ namespace BAM {
 
 BgzipFastqWriter::BgzipFastqWriter(const std::string& fn)
     : BgzipFastqWriter{fn, BgzipWriterConfig{}}
-{
-}
+{}
 
 BgzipFastqWriter::BgzipFastqWriter(const std::string& fn, const BgzipWriterConfig& config)
     : IFastqWriter{}, writer_{fn, config}

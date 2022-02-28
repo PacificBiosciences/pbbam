@@ -80,8 +80,7 @@ public:
 
 BedReader::BedReader(const std::string& fn)
     : BAM::internal::QueryBase<Data::GenomicInterval>{}, d_{std::make_unique<BedReaderPrivate>(fn)}
-{
-}
+{}
 
 BedReader::BedReader(BedReader&&) noexcept = default;
 

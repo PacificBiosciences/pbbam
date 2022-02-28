@@ -114,8 +114,7 @@ public:
 ZmwChunkedFastqReader::ZmwChunkedFastqReader(const std::string& fn, const size_t numChunks)
     : internal::QueryBase<FastqSequence>{}
     , d_{std::make_unique<ZmwChunkedFastqReaderPrivate>(fn, numChunks)}
-{
-}
+{}
 
 ZmwChunkedFastqReader::ZmwChunkedFastqReader(ZmwChunkedFastqReader&&) noexcept = default;
 

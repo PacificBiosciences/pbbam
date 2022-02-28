@@ -22,8 +22,7 @@ struct BaiIndexCacheData::BaiIndexCacheDataPrivate
 };
 
 BaiIndexCacheData::BaiIndexCacheData(const BamFile& bamFile) : BaiIndexCacheData(bamFile.Filename())
-{
-}
+{}
 
 BaiIndexCacheData::BaiIndexCacheData(const std::string& bamFilename)
     : d_{std::make_unique<BaiIndexCacheData::BaiIndexCacheDataPrivate>()}

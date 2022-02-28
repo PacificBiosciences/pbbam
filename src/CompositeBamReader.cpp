@@ -17,8 +17,7 @@ namespace BAM {
 GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
     const std::vector<BamFile>& bamFiles)
     : GenomicIntervalCompositeBamReader{bamFiles, MakeBaiIndexCache(bamFiles)}
-{
-}
+{}
 
 GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
     const std::vector<BamFile>& bamFiles, const BaiIndexCache& cache)
@@ -30,20 +29,17 @@ GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
 
 GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(const DataSet& dataset)
     : GenomicIntervalCompositeBamReader{dataset.BamFiles()}
-{
-}
+{}
 
 GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(const DataSet& dataset,
                                                                      const BaiIndexCache& cache)
     : GenomicIntervalCompositeBamReader{dataset.BamFiles(), cache}
-{
-}
+{}
 
 GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
     const GenomicInterval& interval, const std::vector<BamFile>& bamFiles)
     : GenomicIntervalCompositeBamReader{interval, bamFiles, MakeBaiIndexCache(bamFiles)}
-{
-}
+{}
 
 GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
     const GenomicInterval& interval, const std::vector<BamFile>& bamFiles,
@@ -56,14 +52,12 @@ GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
 GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
     const GenomicInterval& interval, const DataSet& dataset)
     : GenomicIntervalCompositeBamReader{interval, dataset.BamFiles()}
-{
-}
+{}
 
 GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
     const GenomicInterval& interval, const DataSet& dataset, const BaiIndexCache& cache)
     : GenomicIntervalCompositeBamReader{interval, dataset.BamFiles(), cache}
-{
-}
+{}
 
 const GenomicInterval& GenomicIntervalCompositeBamReader::Interval() const { return interval_; }
 
@@ -121,8 +115,7 @@ SequentialCompositeBamReader::SequentialCompositeBamReader(std::vector<BamFile> 
 
 SequentialCompositeBamReader::SequentialCompositeBamReader(const DataSet& dataset)
     : SequentialCompositeBamReader{dataset.BamFiles()}
-{
-}
+{}
 
 bool SequentialCompositeBamReader::GetNext(BamRecord& record)
 {

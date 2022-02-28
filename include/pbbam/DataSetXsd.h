@@ -104,7 +104,7 @@ private:
     XsdType defaultXsdType_ = XsdType::DATASETS;
 };
 
-}  // namespace PacBio
 }  // namespace BAM
+}  // namespace PacBio
 
 #endif  // PBBAM_DATASETXSD_H

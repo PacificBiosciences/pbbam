@@ -1,19 +1,27 @@
 #!/usr/bin/env bash
 
-readonly CHECK_DIRS=( include src tests/src tools )
+TOOLSPATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+CHECK_DIRS=()
+for DIR in "include" "src" "tests/src" "tests/unit" "tools"; do [ -d "$TOOLSPATH/../$DIR" ] && CHECK_DIRS+=("$TOOLSPATH/../$DIR") ; done
 
 # idea taken from https://unix.stackexchange.com/a/322884
 wrong_files=()
 
 readonly NEWLINE='
 '
+
+pushd "$TOOLSPATH/.." > /dev/null
 while IFS="" read -d $'\0' -r f ; do
     t=$(tail -c2 "${f}"; printf x)
     [[ ${t%x} =~ ${NEWLINE}$ ]] || wrong_files+=( "${f}" )
 done < <(find ${CHECK_DIRS[*]} -type f \( \
     -name '*.c' -o \
     -name '*.cpp' -o \
+    -name '*.cu' -o \
+    -name '*.cuh' -o \
+    -name '*.hpp' -o \
     -name '*.h' \) -print0)
+popd > /dev/null
 
 if (( ${#wrong_files[@]} )); then
     echo "The following files are missing a proper EOL marker at the end:"

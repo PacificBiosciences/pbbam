@@ -161,8 +161,7 @@ BamWriter::BamWriter(const std::string& filename, const BamHeader& header,
                 config.numThreads,
                 config.binCalculationMode,
                 config.useTempFile}
-{
-}
+{}
 
 BamWriter::BamWriter(BamWriter&&) noexcept = default;
 

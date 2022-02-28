@@ -295,28 +295,24 @@ ReadGroupInfo::ReadGroupInfo(std::string id) : readType_{"UNKNOWN"} { Id(std::mo
 ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType)
     : ReadGroupInfo{
           ReadGroupInfoConfig{std::move(movieName), std::move(readType), PlatformModelType::SEQUEL}}
-{
-}
+{}
 
 ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
                              std::pair<uint16_t, uint16_t> barcodes)
     : ReadGroupInfo{ReadGroupInfoConfig{std::move(movieName), std::move(readType),
                                         PlatformModelType::SEQUEL, std::move(barcodes)}}
-{
-}
+{}
 
 ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
                              PlatformModelType platform)
     : ReadGroupInfo{ReadGroupInfoConfig{std::move(movieName), std::move(readType), platform}}
-{
-}
+{}
 
 ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
                              PlatformModelType platform, std::pair<uint16_t, uint16_t> barcodes)
     : ReadGroupInfo{ReadGroupInfoConfig{std::move(movieName), std::move(readType), platform,
                                         std::move(barcodes)}}
-{
-}
+{}
 
 ReadGroupInfo::ReadGroupInfo(ReadGroupInfoConfig config)
     : movieName_{config.MovieName}, readType_{config.ReadType}, strand_{config.Strand}

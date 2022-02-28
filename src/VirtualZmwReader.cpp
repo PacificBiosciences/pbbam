@@ -13,8 +13,7 @@ namespace BAM {
 VirtualZmwReader::VirtualZmwReader(const std::string& primaryBamFilepath,
                                    const std::string& scrapsBamFilepath)
     : VirtualZmwReader(primaryBamFilepath, scrapsBamFilepath, PbiFilter{})
-{
-}
+{}
 
 VirtualZmwReader::VirtualZmwReader(const std::string& primaryBamFilepath,
                                    const std::string& scrapsBamFilepath, const PbiFilter& filter)

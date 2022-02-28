@@ -20,8 +20,7 @@ struct TypeAlias
     TypeAlias(std::string name = std::string(), std::string op = std::string(),
               std::string opAlpha = std::string())
         : name_(std::move(name)), op_(std::move(op)), opAlpha_(std::move(opAlpha))
-    {
-    }
+    {}
 };
 
 struct CompareTypeHash

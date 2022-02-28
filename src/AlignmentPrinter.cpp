@@ -18,8 +18,7 @@ namespace BAM {
 
 AlignmentPrinter::AlignmentPrinter(const IndexedFastaReader& ifr)
     : ifr_{std::make_unique<IndexedFastaReader>(ifr)}
-{
-}
+{}
 
 std::string AlignmentPrinter::Print(const BamRecord& record, const Data::Orientation orientation)
 {

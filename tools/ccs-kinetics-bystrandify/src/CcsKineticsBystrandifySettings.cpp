@@ -44,15 +44,17 @@ CLI_v2::Interface Settings::CreateCLI()
         "CCS BAM with pw/ip tags that can be used as a substitute for subreads in applications "
         "expecting such kinetic information."};
 
-    CLI_v2::Interface interface{"ccs-kinetics-bystrandify", description,
-                                CcsKineticsBystrandify::Version};
+    CLI_v2::Interface interface {
+        "ccs-kinetics-bystrandify", description, CcsKineticsBystrandify::Version
+    };
     interface.DisableNumThreadsOption();
 
     interface.AddOptions({
         Options::MinCoverage,
     });
     interface.AddPositionalArguments({
-        Options::InputFile, Options::OutputFile,
+        Options::InputFile,
+        Options::OutputFile,
     });
 
     Logging::LogConfig logConfig{Logging::LogLevel::INFO};

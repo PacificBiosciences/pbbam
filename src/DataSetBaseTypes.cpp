@@ -41,8 +41,7 @@ BaseEntityType::BaseEntityType(const std::string& label, const XsdType& xsd)
 BaseEntityType::BaseEntityType(const std::string& label, const FromInputXml& fromInputXml,
                                const XsdType& xsd)
     : DataSetElement(label, fromInputXml, xsd)
-{
-}
+{}
 
 const std::string& BaseEntityType::CreatedAt() const { return Attribute("CreatedAt"); }
 
@@ -138,14 +137,12 @@ BaseEntityType& BaseEntityType::Version(const std::string& version)
 
 DataEntityType::DataEntityType(const std::string& label, const XsdType& xsd)
     : BaseEntityType(label, xsd)
-{
-}
+{}
 
 DataEntityType::DataEntityType(const std::string& label, const FromInputXml& fromInputXml,
                                const XsdType& xsd)
     : BaseEntityType(label, fromInputXml, xsd)
-{
-}
+{}
 
 const std::string& DataEntityType::Checksum() const { return ChildText("Checksum"); }
 
@@ -224,15 +221,13 @@ DataEntityType& DataEntityType::ValueDataType(const std::string& valueDataType)
 IndexedDataType::IndexedDataType(const std::string& metatype, const std::string& filename,
                                  const std::string& label, const XsdType& xsd)
     : InputOutputDataType(metatype, filename, label, xsd)
-{
-}
+{}
 
 IndexedDataType::IndexedDataType(const std::string& metatype, const std::string& filename,
                                  const std::string& label, const FromInputXml& fromInputXml,
                                  const XsdType& xsd)
     : InputOutputDataType(metatype, filename, label, fromInputXml, xsd)
-{
-}
+{}
 
 DEFINE_ACCESSORS(IndexedDataType, FileIndices, FileIndices)
 
@@ -291,8 +286,7 @@ StrictEntityType::StrictEntityType(const std::string& metatype, const std::strin
 StrictEntityType::StrictEntityType(const std::string& /*metatype*/, const std::string& label,
                                    const FromInputXml& fromInputXml, const XsdType& xsd)
     : BaseEntityType(label, fromInputXml, xsd)
-{
-}
+{}
 
 const std::string& StrictEntityType::MetaType() const { return Attribute("MetaType"); }
 

@@ -11,8 +11,7 @@ namespace BAM {
 VirtualRegion::VirtualRegion(const VirtualRegionType type_, const int beginPos_, const int endPos_,
                              const int score_)
     : type{type_}, beginPos{beginPos_}, endPos{endPos_}, cxTag{}, score{score_}
-{
-}
+{}
 
 VirtualRegion::VirtualRegion(const VirtualRegionType type_, const int beginPos_, const int endPos_,
                              const Data::LocalContextFlags cxTag_, const int barcodeLeft_,
@@ -24,8 +23,7 @@ VirtualRegion::VirtualRegion(const VirtualRegionType type_, const int beginPos_,
     , barcodeLeft{barcodeLeft_}
     , barcodeRight{barcodeRight_}
     , score{score_}
-{
-}
+{}
 
 bool VirtualRegion::operator==(const VirtualRegion& v1) const noexcept
 {

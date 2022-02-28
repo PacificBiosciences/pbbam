@@ -76,13 +76,11 @@ public:
 
 BgzipWriter::BgzipWriter(std::string filename)
     : d_{std::make_unique<BgzipWriterPrivate>(std::move(filename))}
-{
-}
+{}
 
 BgzipWriter::BgzipWriter(std::string filename, const BgzipWriterConfig& config)
     : d_{std::make_unique<BgzipWriterPrivate>(std::move(filename), config)}
-{
-}
+{}
 
 BgzipWriter::BgzipWriter(BgzipWriter&&) noexcept = default;
 
