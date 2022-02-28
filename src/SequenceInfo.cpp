@@ -27,8 +27,7 @@ const std::string token_UR{"UR"};
 
 SequenceInfo::SequenceInfo(std::string name, std::string length)
     : name_(std::move(name)), length_(std::move(length))
-{
-}
+{}
 
 bool SequenceInfo::operator==(const SequenceInfo& other) const noexcept
 {

@@ -10,8 +10,7 @@ ZmwChunkedFastxReaderImpl::ZmwChunkedFastxReaderImpl(std::string filename, const
     , faiFilename_{fastxFilename_ + ".fai"}
     , index_{faiFilename_}
     , chunker_{index_, numChunks}
-{
-}
+{}
 
 ZmwChunkedFastxReaderImpl::~ZmwChunkedFastxReaderImpl() = default;
 

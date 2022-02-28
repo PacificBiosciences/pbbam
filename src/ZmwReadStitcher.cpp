@@ -106,20 +106,17 @@ private:
 
 ZmwReadStitcher::ZmwReadStitcher(std::string primaryBamFilePath, std::string scrapsBamFilePath)
     : ZmwReadStitcher{std::move(primaryBamFilePath), std::move(scrapsBamFilePath), PbiFilter{}}
-{
-}
+{}
 
 ZmwReadStitcher::ZmwReadStitcher(std::string primaryBamFilePath, std::string scrapsBamFilePath,
                                  PbiFilter filter)
     : d_{std::make_unique<ZmwReadStitcherPrivate>(std::move(primaryBamFilePath),
                                                   std::move(scrapsBamFilePath), std::move(filter))}
-{
-}
+{}
 
 ZmwReadStitcher::ZmwReadStitcher(const DataSet& dataset)
     : d_{std::make_unique<ZmwReadStitcherPrivate>(dataset)}
-{
-}
+{}
 
 ZmwReadStitcher::ZmwReadStitcher(ZmwReadStitcher&&) noexcept = default;
 

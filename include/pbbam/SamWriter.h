@@ -84,7 +84,7 @@ private:
     std::unique_ptr<SamWriterPrivate> d_;
 };
 
-}  // namesapce BAM
+}  // namespace BAM
 }  // namespace PacBio
 
 #endif  // PBBAM_SAMWRITER_H

@@ -17,8 +17,7 @@ public:
 
 EntireFileQuery::EntireFileQuery(const DataSet& dataset)
     : internal::IQuery{}, d_(new EntireFileQueryPrivate(dataset))
-{
-}
+{}
 
 EntireFileQuery::EntireFileQuery(EntireFileQuery&&) noexcept = default;
 

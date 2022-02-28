@@ -11,8 +11,7 @@ namespace VCF {
 
 VcfFile::VcfFile(std::string fn)
     : filename_{std::move(fn)}, header_{VcfFormat::HeaderFromFile(filename_)}
-{
-}
+{}
 
 const std::string& VcfFile::Filename() const { return filename_; }
 

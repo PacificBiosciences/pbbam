@@ -79,8 +79,7 @@ public:
 TextFileReader::TextFileReader(std::string filename)
     : PacBio::BAM::internal::QueryBase<std::string>{}
     , d_{std::make_unique<TextFileReaderPrivate>(std::move(filename))}
-{
-}
+{}
 
 TextFileReader::TextFileReader(TextFileReader&&) noexcept = default;
 

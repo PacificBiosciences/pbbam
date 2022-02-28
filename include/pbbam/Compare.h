@@ -92,8 +92,7 @@ public:
     /// Custom comparators may be used by inheriting from this class.
     ///
     struct Base : public std::function<bool(const BamRecord&, const BamRecord&)>
-    {
-    };
+    {};
 
 private:
     /// \internal
@@ -136,8 +135,7 @@ public:
     ///       ascending value).
     ///
     struct AlignedEnd : public MemberFunctionBase<Data::Position, &BamRecord::AlignedEnd>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::AlignedStart.
     ///
@@ -148,8 +146,7 @@ public:
     ///       ascending value).
     ///
     struct AlignedStart : public MemberFunctionBase<Data::Position, &BamRecord::AlignedStart>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::AlignedStrand
     ///
@@ -160,8 +157,7 @@ public:
     ///       ascending value).
     ///
     struct AlignedStrand : public MemberFunctionBase<Data::Strand, &BamRecord::AlignedStrand>
-    {
-    };
+    {};
 
     /// \brief Compares on reference ID, then by position.
     ///
@@ -182,8 +178,7 @@ public:
     ///       ascending value).
     ///
     struct BarcodeForward : public MemberFunctionBase<int16_t, &BamRecord::BarcodeForward>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::BarcodeQuality.
     ///
@@ -194,8 +189,7 @@ public:
     ///       ascending value).
     ///
     struct BarcodeQuality : public MemberFunctionBase<uint8_t, &BamRecord::BarcodeQuality>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::BarcodeReverse.
     ///
@@ -206,8 +200,7 @@ public:
     ///       ascending value).
     ///
     struct BarcodeReverse : public MemberFunctionBase<int16_t, &BamRecord::BarcodeReverse>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::FullName (lexicographical).
     ///
@@ -220,8 +213,7 @@ public:
     ///       ascending value).
     ///
     struct FullName : public MemberFunctionBase<std::string, &BamRecord::FullName>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::LocalContextFlags.
     ///
@@ -233,8 +225,7 @@ public:
     ///
     struct LocalContextFlag
         : public MemberFunctionBase<Data::LocalContextFlags, &BamRecord::LocalContextFlags>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::MapQuality.
     ///
@@ -245,8 +236,7 @@ public:
     ///       ascending value).
     ///
     struct MapQuality : public MemberFunctionBase<uint8_t, &BamRecord::MapQuality>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::MovieName.
     ///
@@ -257,8 +247,7 @@ public:
     ///       ascending value).
     ///
     struct MovieName : public MemberFunctionBase<std::string, &BamRecord::MovieName>
-    {
-    };
+    {};
 
     /// \brief Provides an operator() is essentially a no-op for
     ///        comparing/sorting.
@@ -279,8 +268,7 @@ public:
     ///       ascending value).
     ///
     struct NumDeletedBases : public MemberFunctionBase<size_t, &BamRecord::NumDeletedBases>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::NumInsertedBases.
     ///
@@ -291,8 +279,7 @@ public:
     ///       ascending value).
     ///
     struct NumInsertedBases : public MemberFunctionBase<size_t, &BamRecord::NumInsertedBases>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::NumMatches.
     ///
@@ -303,8 +290,7 @@ public:
     ///       ascending value).
     ///
     struct NumMatches : public MemberFunctionBase<size_t, &BamRecord::NumMatches>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::NumMismatches.
     ///
@@ -315,8 +301,7 @@ public:
     ///       ascending value).
     ///
     struct NumMismatches : public MemberFunctionBase<size_t, &BamRecord::NumMismatches>
-    {
-    };
+    {};
 
     /// \brief Compares BamRecords' QNAMEs, via PacBio BAM spec-aware
     ///        sorting order.
@@ -339,8 +324,7 @@ public:
     ///       ascending value).
     ///
     struct QueryEnd : public MemberFunctionBase<Data::Position, &BamRecord::QueryEnd>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::QueryStart.
     ///
@@ -351,8 +335,7 @@ public:
     ///       ascending value).
     ///
     struct QueryStart : public MemberFunctionBase<Data::Position, &BamRecord::QueryStart>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::ReadAccuracy.
     ///
@@ -363,8 +346,7 @@ public:
     ///       ascending value).
     ///
     struct ReadAccuracy : public MemberFunctionBase<Data::Accuracy, &BamRecord::ReadAccuracy>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::ReadGroupId.
     ///
@@ -380,8 +362,7 @@ public:
     ///       ascending value).
     ///
     struct ReadGroupId : public MemberFunctionBase<std::string, &BamRecord::ReadGroupId>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::ReadGroupNumericId.
     ///
@@ -392,8 +373,7 @@ public:
     ///       ascending value).
     ///
     struct ReadGroupNumericId : public MemberFunctionBase<int32_t, &BamRecord::ReadGroupNumericId>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::ReferenceEnd.
     ///
@@ -404,8 +384,7 @@ public:
     ///       ascending value).
     ///
     struct ReferenceEnd : public MemberFunctionBase<Data::Position, &BamRecord::ReferenceEnd>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::ReferenceId.
     ///
@@ -416,8 +395,7 @@ public:
     ///       ascending value).
     ///
     struct ReferenceId : public MemberFunctionBase<int32_t, &BamRecord::ReferenceId>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::ReferenceName.
     ///
@@ -428,8 +406,7 @@ public:
     ///       ascending value).
     ///
     struct ReferenceName : public MemberFunctionBase<std::string, &BamRecord::ReferenceName>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::ReferenceStart.
     ///
@@ -440,8 +417,7 @@ public:
     ///       ascending value).
     ///
     struct ReferenceStart : public MemberFunctionBase<Data::Position, &BamRecord::ReferenceStart>
-    {
-    };
+    {};
 
     /// \brief Compares on BamRecord::HoleNumber.
     ///
@@ -452,8 +428,7 @@ public:
     ///       ascending value).
     ///
     struct Zmw : public MemberFunctionBase<int32_t, &BamRecord::HoleNumber>
-    {
-    };
+    {};
 
     /// \}
 

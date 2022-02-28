@@ -77,26 +77,22 @@ namespace BAM {
 
 AlignmentSet::AlignmentSet()
     : DataSetBase("PacBio.DataSet.AlignmentSet", "AlignmentSet", XsdType::DATASETS)
-{
-}
+{}
 
 AlignmentSet::AlignmentSet(const internal::FromInputXml& fromInputXml)
     : DataSetBase("", "AlignmentSet", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 // -------------------
 // BarcodeSet
 // -------------------
 
 BarcodeSet::BarcodeSet() : DataSetBase("PacBio.DataSet.BarcodeSet", "BarcodeSet", XsdType::DATASETS)
-{
-}
+{}
 
 BarcodeSet::BarcodeSet(const internal::FromInputXml& fromInputXml)
     : DataSetBase("", "BarcodeSet", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 // -------------------
 // BioSample
@@ -139,8 +135,7 @@ BioSamples::BioSamples() : DataSetElement("BioSamples", XsdType::SAMPLE_INFO) {}
 
 BioSamples::BioSamples(const internal::FromInputXml& fromInputXml)
     : DataSetElement("", fromInputXml, XsdType::SAMPLE_INFO)
-{
-}
+{}
 
 void BioSamples::Add(const BioSample& sample) { AddChild(sample); }
 
@@ -184,13 +179,11 @@ BioSamples::value_type& BioSamples::operator[](size_t index)
 ConsensusAlignmentSet::ConsensusAlignmentSet()
     : DataSetBase("PacBio.DataSet.ConsensusAlignmentSet", "ConsensusAlignmentSet",
                   XsdType::DATASETS)
-{
-}
+{}
 
 ConsensusAlignmentSet::ConsensusAlignmentSet(const internal::FromInputXml& fromInputXml)
     : DataSetBase("", "ConsensusAlignmentSet", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 // -------------------
 // ConsensusReadSet
@@ -198,13 +191,11 @@ ConsensusAlignmentSet::ConsensusAlignmentSet(const internal::FromInputXml& fromI
 
 ConsensusReadSet::ConsensusReadSet()
     : DataSetBase("PacBio.DataSet.ConsensusReadSet", "ConsensusReadSet", XsdType::DATASETS)
-{
-}
+{}
 
 ConsensusReadSet::ConsensusReadSet(const internal::FromInputXml& fromInputXml)
     : DataSetBase("", "ConsensusReadSet", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 // -------------------
 // ContigSet
@@ -214,8 +205,7 @@ ContigSet::ContigSet() : DataSetBase("PacBio.DataSet.ContigSet", "ContigSet", Xs
 
 ContigSet::ContigSet(const internal::FromInputXml& fromInputXml)
     : DataSetBase("", "ContigSet", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 // -------------------
 // DataSetBase
@@ -224,26 +214,22 @@ ContigSet::ContigSet(const internal::FromInputXml& fromInputXml)
 DataSetBase::DataSetBase()
     : StrictEntityType("PacBio.DataSet.DataSet", "DataSet", XsdType::DATASETS)
     , path_(FileUtils::CurrentWorkingDirectory())
-{
-}
+{}
 
 DataSetBase::DataSetBase(const internal::FromInputXml& fromInputXml)
     : StrictEntityType("", "DataSet", fromInputXml, XsdType::DATASETS)
     , path_(FileUtils::CurrentWorkingDirectory())
-{
-}
+{}
 
 DataSetBase::DataSetBase(const std::string& metatype, const std::string& label, const XsdType& xsd)
     : StrictEntityType(metatype, label, xsd), path_(FileUtils::CurrentWorkingDirectory())
-{
-}
+{}
 
 DataSetBase::DataSetBase(const std::string& metatype, const std::string& label,
                          const internal::FromInputXml& fromInputXml, const XsdType& xsd)
     : StrictEntityType(metatype, label, fromInputXml, xsd)
     , path_(FileUtils::CurrentWorkingDirectory())
-{
-}
+{}
 
 const BAM::ExternalResources& DataSetBase::ExternalResources() const
 {
@@ -463,8 +449,7 @@ DataSetMetadata::DataSetMetadata() : DataSetElement("DataSetMetadata", XsdType::
 
 DataSetMetadata::DataSetMetadata(const internal::FromInputXml& fromInputXml)
     : DataSetElement("", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 DataSetMetadata::DataSetMetadata(const std::string& numRecords, const std::string& totalLength)
     : DataSetElement("DataSetMetadata", XsdType::DATASETS)
@@ -609,8 +594,7 @@ DNABarcodes::DNABarcodes() : DataSetElement("DNABarcodes", XsdType::SAMPLE_INFO)
 
 DNABarcodes::DNABarcodes(const internal::FromInputXml& fromInputXml)
     : DataSetElement("", fromInputXml, XsdType::SAMPLE_INFO)
-{
-}
+{}
 
 void DNABarcodes::Add(const DNABarcode& barcode) { AddChild(barcode); }
 
@@ -652,13 +636,11 @@ DNABarcodes::value_type& DNABarcodes::operator[](size_t index)
 // -------------------
 
 ExtensionElement::ExtensionElement() : DataSetElement("ExtensionElement", XsdType::BASE_DATA_MODEL)
-{
-}
+{}
 
 ExtensionElement::ExtensionElement(const internal::FromInputXml& fromInputXml)
     : DataSetElement("", fromInputXml, XsdType::BASE_DATA_MODEL)
-{
-}
+{}
 
 // -------------------
 // Extensions
@@ -668,8 +650,7 @@ Extensions::Extensions() : DataSetElement("Extensions", XsdType::BASE_DATA_MODEL
 
 Extensions::Extensions(const internal::FromInputXml& fromInputXml)
     : DataSetElement("", fromInputXml, XsdType::BASE_DATA_MODEL)
-{
-}
+{}
 
 Extensions::iterator_type Extensions::begin() { return Extensions::iterator_type(this, 0); }
 
@@ -709,13 +690,11 @@ Extensions::value_type& Extensions::operator[](size_t index)
 ExternalResource::ExternalResource(const BamFile& bamFile)
     : IndexedDataType("PacBio.SubreadFile.SubreadBamFile", bamFile.Filename(), "ExternalResource",
                       XsdType::BASE_DATA_MODEL)
-{
-}
+{}
 
 ExternalResource::ExternalResource(const std::string& metatype, const std::string& filename)
     : IndexedDataType(metatype, filename, "ExternalResource", XsdType::BASE_DATA_MODEL)
-{
-}
+{}
 
 ExternalResource::ExternalResource(const std::string& metatype, const std::string& filename,
                                    const internal::FromInputXml& fromInputXml)
@@ -740,13 +719,11 @@ BamFile ExternalResource::ToBamFile() const { return BamFile(ResourceId()); }
 
 ExternalResources::ExternalResources()
     : DataSetElement("ExternalResources", XsdType::BASE_DATA_MODEL)
-{
-}
+{}
 
 ExternalResources::ExternalResources(const internal::FromInputXml& fromInputXml)
     : DataSetElement("", fromInputXml, XsdType::BASE_DATA_MODEL)
-{
-}
+{}
 
 ExternalResources& ExternalResources::operator+=(const ExternalResources& other)
 {
@@ -841,8 +818,7 @@ ExternalResources::value_type& ExternalResources::operator[](size_t index)
 
 FileIndex::FileIndex(const std::string& metatype, const std::string& filename)
     : InputOutputDataType(metatype, filename, "FileIndex", XsdType::BASE_DATA_MODEL)
-{
-}
+{}
 
 FileIndex::FileIndex(const std::string& metatype, const std::string& filename,
                      const internal::FromInputXml& fromInputXml)
@@ -859,8 +835,7 @@ FileIndices::FileIndices() : DataSetElement("FileIndices", XsdType::BASE_DATA_MO
 
 FileIndices::FileIndices(const internal::FromInputXml& fromInputXml)
     : DataSetElement("", fromInputXml, XsdType::BASE_DATA_MODEL)
-{
-}
+{}
 
 void FileIndices::Add(const FileIndex& index) { AddChild(index); }
 
@@ -905,8 +880,7 @@ Filter::Filter() : DataSetElement("Filter", XsdType::DATASETS) {}
 
 Filter::Filter(const internal::FromInputXml& fromInputXml)
     : DataSetElement("Filter", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 DEFINE_ACCESSORS(Filter, Properties, Properties)
 
@@ -924,8 +898,7 @@ Filters::Filters() : DataSetElement("Filters", XsdType::DATASETS) {}
 
 Filters::Filters(const internal::FromInputXml& fromInputXml)
     : DataSetElement("", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 Filters& Filters::operator+=(const Filters& other)
 {
@@ -973,13 +946,11 @@ Filters::value_type& Filters::operator[](size_t index)
 
 HdfSubreadSet::HdfSubreadSet()
     : DataSetBase("PacBio.DataSet.HdfSubreadSet", "HdfSubreadSet", XsdType::DATASETS)
-{
-}
+{}
 
 HdfSubreadSet::HdfSubreadSet(const internal::FromInputXml& fromInputXml)
     : DataSetBase("", "HdfSubreadSet", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 // -------------------
 // ParentTool
@@ -989,8 +960,7 @@ ParentTool::ParentTool() : BaseEntityType("ParentTool", XsdType::DATASETS) {}
 
 ParentTool::ParentTool(const internal::FromInputXml& fromInputXml)
     : BaseEntityType("", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 // -------------------
 // Properties
@@ -1000,8 +970,7 @@ Properties::Properties() : DataSetElement("Properties", XsdType::BASE_DATA_MODEL
 
 Properties::Properties(const internal::FromInputXml& fromInputXml)
     : DataSetElement("", fromInputXml, XsdType::BASE_DATA_MODEL)
-{
-}
+{}
 
 void Properties::Add(const Property& property) { AddChild(property); }
 
@@ -1097,8 +1066,7 @@ Provenance::Provenance() : DataSetElement("Provenance", XsdType::DATASETS) {}
 
 Provenance::Provenance(const internal::FromInputXml& fromInputXml)
     : DataSetElement("", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 DEFINE_ACCESSORS(Provenance, ParentTool, ParentTool)
 
@@ -1160,13 +1128,11 @@ Provenance& Provenance::ParentTool(const BAM::ParentTool& tool)
 
 ReferenceSet::ReferenceSet()
     : DataSetBase("PacBio.DataSet.ReferenceSet", "ReferenceSet", XsdType::DATASETS)
-{
-}
+{}
 
 ReferenceSet::ReferenceSet(const internal::FromInputXml& fromInputXml)
     : DataSetBase("", "ReferenceSet", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 // -------------------
 // SubDataSets
@@ -1176,8 +1142,7 @@ SubDataSets::SubDataSets() : DataSetElement("DataSets", XsdType::DATASETS) {}
 
 SubDataSets::SubDataSets(const internal::FromInputXml& fromInputXml)
     : DataSetElement("", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 SubDataSets& SubDataSets::operator+=(const DataSetBase& other)
 {
@@ -1233,13 +1198,11 @@ SubDataSets::value_type& SubDataSets::operator[](size_t index)
 // -------------------
 
 SubreadSet::SubreadSet() : DataSetBase("PacBio.DataSet.SubreadSet", "SubreadSet", XsdType::DATASETS)
-{
-}
+{}
 
 SubreadSet::SubreadSet(const internal::FromInputXml& fromInputXml)
     : DataSetBase("", "SubreadSet", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 // ---------------------
 // SupplentalResources
@@ -1247,13 +1210,11 @@ SubreadSet::SubreadSet(const internal::FromInputXml& fromInputXml)
 
 SupplementalResources::SupplementalResources()
     : DataSetElement("SupplementalResources", XsdType::BASE_DATA_MODEL)
-{
-}
+{}
 
 SupplementalResources::SupplementalResources(const internal::FromInputXml& fromInputXml)
     : DataSetElement("", fromInputXml, XsdType::BASE_DATA_MODEL)
-{
-}
+{}
 
 SupplementalResources& SupplementalResources::operator+=(const SupplementalResources& other)
 {
@@ -1337,13 +1298,11 @@ SupplementalResources::value_type& SupplementalResources::operator[](size_t inde
 
 TranscriptSet::TranscriptSet()
     : DataSetBase("PacBio.DataSet.TranscriptSet", "TranscriptSet", XsdType::DATASETS)
-{
-}
+{}
 
 TranscriptSet::TranscriptSet(const internal::FromInputXml& fromInputXml)
     : DataSetBase("", "TranscriptSet", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 // -------------------
 // TranscriptAlignmentSet
@@ -1352,13 +1311,11 @@ TranscriptSet::TranscriptSet(const internal::FromInputXml& fromInputXml)
 TranscriptAlignmentSet::TranscriptAlignmentSet()
     : DataSetBase("PacBio.DataSet.TranscriptAlignmentSet", "TranscriptAlignmentSet",
                   XsdType::DATASETS)
-{
-}
+{}
 
 TranscriptAlignmentSet::TranscriptAlignmentSet(const internal::FromInputXml& fromInputXml)
     : DataSetBase("", "TranscriptAlignmentSet", fromInputXml, XsdType::DATASETS)
-{
-}
+{}
 
 XmlElementType ElementTypeFromName(const std::string& name)
 {

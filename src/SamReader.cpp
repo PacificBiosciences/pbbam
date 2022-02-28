@@ -66,8 +66,7 @@ SamReader::SamReader() : internal::IQuery{}, d_{std::make_unique<SamReaderPrivat
 
 SamReader::SamReader(std::string fn)
     : internal::IQuery{}, d_{std::make_unique<SamReaderPrivate>(std::move(fn))}
-{
-}
+{}
 
 SamReader::SamReader(SamReader&&) noexcept = default;
 

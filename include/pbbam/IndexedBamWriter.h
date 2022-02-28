@@ -94,8 +94,7 @@ public:
         : IndexedBamWriter(config.outputFilename, config.header, config.bamCompressionLevel,
                            config.numBamThreads, config.pbiCompressionLevel, config.numPbiThreads,
                            config.numGziThreads, config.tempFileBufferSize)
-    {
-    }
+    {}
 
     IndexedBamWriter(IndexedBamWriter&&) noexcept;
     IndexedBamWriter& operator=(IndexedBamWriter&&) noexcept;

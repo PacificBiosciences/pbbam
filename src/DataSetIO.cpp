@@ -72,7 +72,7 @@ std::unique_ptr<DataSetBase> DataSetFromBam(const std::string& bamFn)
 #endif
             dataset
 #ifdef __INTEL_COMPILER
-            )
+        )
 #endif
             ;
 }
@@ -89,7 +89,7 @@ std::unique_ptr<DataSetBase> DataSetFromFasta(const std::string& fasta)
 #endif
             dataset
 #ifdef __INTEL_COMPILER
-            )
+        )
 #endif
             ;
 }

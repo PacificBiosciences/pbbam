@@ -27,8 +27,7 @@ VcfVariant::VcfVariant(std::string id, std::string chrom, Data::Position pos, st
     , altAllele_{std::move(altAllele)}
     , qual_{NAN}
     , filter_{"PASS"}
-{
-}
+{}
 
 VcfVariant& VcfVariant::AddInfoField(InfoField field)
 {

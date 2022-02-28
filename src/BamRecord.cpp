@@ -400,8 +400,7 @@ BamRecord::BamRecord(const BamRecord& other)
     , header_{other.header_}
     , alignedStart_{other.alignedStart_}
     , alignedEnd_{other.alignedEnd_}
-{
-}
+{}
 
 BamRecord::BamRecord(BamRecord&&) noexcept = default;
 

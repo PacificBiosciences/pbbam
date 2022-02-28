@@ -13,8 +13,7 @@ BamRecordView::BamRecordView(const BamRecord& record, const Data::Orientation or
     , aligned_{aligned}
     , exciseSoftClips_{exciseSoftClips}
     , pulseBehavior_{pulseBehavior}
-{
-}
+{}
 
 Data::QualityValues BamRecordView::AltLabelQVs() const
 {

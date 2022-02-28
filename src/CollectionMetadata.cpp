@@ -112,8 +112,7 @@ Automation::Automation() : internal::DataSetElement{"Automation", XsdType::COLLE
 
 Automation::Automation(const internal::FromInputXml& fromInputXml)
     : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
-{
-}
+{}
 
 DEFINE_ACCESSORS(Automation, AutomationParameters, AutomationParameters)
 
@@ -130,13 +129,11 @@ bool Automation::HasAutomationParameters() const { return HasChild(Element::Auto
 
 AutomationParameter::AutomationParameter()
     : internal::DataSetElement{"AutomationParameter", XsdType::BASE_DATA_MODEL}
-{
-}
+{}
 
 AutomationParameter::AutomationParameter(const internal::FromInputXml& fromInputXml)
     : internal::DataSetElement{"", fromInputXml, XsdType::BASE_DATA_MODEL}
-{
-}
+{}
 
 AutomationParameter::AutomationParameter(const std::string& name, const std::string& type,
                                          const std::string& value)
@@ -187,12 +184,10 @@ AutomationParameter& AutomationParameter::Value(const std::string& value)
 
 AutomationParameters::AutomationParameters()
     : internal::DataSetElement{"AutomationParameters", XsdType::BASE_DATA_MODEL}
-{
-}
+{}
 AutomationParameters::AutomationParameters(const internal::FromInputXml& fromInputXml)
     : internal::DataSetElement{"", fromInputXml, XsdType::BASE_DATA_MODEL}
-{
-}
+{}
 
 AutomationParameters::iterator_type AutomationParameters::begin()
 {
@@ -470,8 +465,7 @@ BindingKit::BindingKit() : internal::DataSetElement{"BindingKit", XsdType::COLLE
 
 BindingKit::BindingKit(const internal::FromInputXml& fromInputXml)
     : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
-{
-}
+{}
 
 const std::string& BindingKit::PartNumber() const { return Attribute(Element::PartNumber); }
 
@@ -508,8 +502,7 @@ ControlKit::ControlKit() : internal::DataSetElement{"ControlKit", XsdType::COLLE
 
 ControlKit::ControlKit(const internal::FromInputXml& fromInputXml)
     : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
-{
-}
+{}
 
 const std::string& ControlKit::PartNumber() const { return Attribute(Element::PartNumber); }
 
@@ -590,8 +583,7 @@ PPAConfig::PPAConfig() : internal::DataSetElement{"PPAConfig", XsdType::COLLECTI
 
 PPAConfig::PPAConfig(const internal::FromInputXml& fromInputXml)
     : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
-{
-}
+{}
 
 const std::string& PPAConfig::Json() const { return Text(); }
 
@@ -609,13 +601,11 @@ PPAConfig& PPAConfig::Json(std::string json)
 
 SequencingKitPlate::SequencingKitPlate()
     : internal::DataSetElement{"SequencingKitPlate", XsdType::COLLECTION_METADATA}
-{
-}
+{}
 
 SequencingKitPlate::SequencingKitPlate(const internal::FromInputXml& fromInputXml)
     : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
-{
-}
+{}
 
 const std::string& SequencingKitPlate::PartNumber() const { return Attribute(Element::PartNumber); }
 
@@ -635,13 +625,11 @@ bool SequencingKitPlate::HasPartNumber() const { return HasAttribute(Element::Pa
 
 TemplatePrepKit::TemplatePrepKit()
     : internal::DataSetElement{"TemplatePrepKit", XsdType::COLLECTION_METADATA}
-{
-}
+{}
 
 TemplatePrepKit::TemplatePrepKit(const internal::FromInputXml& fromInputXml)
     : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
-{
-}
+{}
 
 const std::string& TemplatePrepKit::PartNumber() const { return Attribute(Element::PartNumber); }
 
@@ -729,29 +717,25 @@ bool TemplatePrepKit::HasRightPrimerSequence() const
 CollectionMetadata::CollectionMetadata()
     : internal::StrictEntityType{"CollectionMetadata", "CollectionMetadata",
                                  XsdType::COLLECTION_METADATA}
-{
-}
+{}
 
 CollectionMetadata::CollectionMetadata(const internal::FromInputXml& fromInputXml)
     : internal::StrictEntityType{"CollectionMetadata", "CollectionMetadata", fromInputXml,
                                  XsdType::COLLECTION_METADATA}
-{
-}
+{}
 
 CollectionMetadata::CollectionMetadata(std::string subreadSetName)
     : internal::StrictEntityType{"CollectionMetadata", "CollectionMetadata",
                                  XsdType::COLLECTION_METADATA}
     , subreadSetName_{std::move(subreadSetName)}
-{
-}
+{}
 
 CollectionMetadata::CollectionMetadata(std::string subreadSetName,
                                        const internal::FromInputXml& fromInputXml)
     : internal::StrictEntityType{"CollectionMetadata", "CollectionMetadata", fromInputXml,
                                  XsdType::COLLECTION_METADATA}
     , subreadSetName_{std::move(subreadSetName)}
-{
-}
+{}
 
 const std::string& CollectionMetadata::SubreadSetName() const { return subreadSetName_; }
 

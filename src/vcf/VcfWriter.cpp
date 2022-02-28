@@ -32,8 +32,7 @@ struct VcfWriter::VcfWriterPrivate : public BAM::FileProducer
 
 VcfWriter::VcfWriter(std::string fn, const VcfHeader& header)
     : d_{std::make_unique<VcfWriterPrivate>(std::move(fn), header)}
-{
-}
+{}
 
 VcfWriter::VcfWriter(VcfWriter&&) noexcept = default;
 

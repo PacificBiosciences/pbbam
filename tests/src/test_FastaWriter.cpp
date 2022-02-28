@@ -17,8 +17,7 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-namespace FastaWriterTests {
-}  // namespace FastaWriterTests
+namespace FastaWriterTests {}  // namespace FastaWriterTests
 
 TEST(BAM_FastaWriter, throws_on_empty_filename)
 {

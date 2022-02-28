@@ -93,8 +93,7 @@ FaiZmwChunker::FaiZmwChunker(const FaiIndex& index, const size_t numChunks)
 
 FaiZmwChunker::FaiZmwChunker(const std::string& filename, const size_t numChunks)
     : FaiZmwChunker{FaiIndex{filename}, numChunks}
-{
-}
+{}
 
 FaiZmwChunker::FaiZmwChunker(const FaiZmwChunker&) = default;
 

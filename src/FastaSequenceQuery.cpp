@@ -17,8 +17,7 @@ public:
 
 FastaSequenceQuery::FastaSequenceQuery(const DataSet& dataset)
     : internal::QueryBase<FastaSequence>(), d_{std::make_unique<FastaSequenceQueryPrivate>(dataset)}
-{
-}
+{}
 
 FastaSequenceQuery::FastaSequenceQuery(FastaSequenceQuery&&) noexcept = default;
 

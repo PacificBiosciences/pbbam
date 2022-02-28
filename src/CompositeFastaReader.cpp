@@ -14,8 +14,7 @@ CompositeFastaReader::CompositeFastaReader(const std::vector<std::string>& fasta
 
 CompositeFastaReader::CompositeFastaReader(const DataSet& dataset)
     : CompositeFastaReader{dataset.FastaFiles()}
-{
-}
+{}
 
 bool CompositeFastaReader::GetNext(FastaSequence& seq)
 {

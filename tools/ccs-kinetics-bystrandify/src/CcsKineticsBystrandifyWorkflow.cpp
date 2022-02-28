@@ -59,7 +59,6 @@ struct UserIO
         };
 
         const auto MakeHeaderFrom = [&](const BAM::BamHeader& inputHeader) {
-
             // add @PG entry to header
             BAM::ProgramInfo ccskineticsbystrandifyProgram;
             ccskineticsbystrandifyProgram
@@ -74,7 +73,6 @@ struct UserIO
         };
 
         const auto SetupBamIO = [&]() {
-
             StrandifyTask task;
             task.InputBamFile = settings.InputFilename;
             task.OutputBamFile = settings.OutputFilename;
@@ -307,9 +305,9 @@ void Strandify(StrandifyTask& task, const CcsKineticsBystrandify::Settings& sett
 
         const auto recordWriter = [&task, ipdCodec, pwCodec, holeNumber, &snr, &rq, &rg, &numBases,
                                    &numRecords](
-            const std::string& newRecordName, const int32_t numPasses, const std::string& sequence,
-            const Data::QualityValues& qvs, const Data::Frames& ipd, const Data::Frames& pw) {
-
+                                      const std::string& newRecordName, const int32_t numPasses,
+                                      const std::string& sequence, const Data::QualityValues& qvs,
+                                      const Data::Frames& ipd, const Data::Frames& pw) {
             // trim flanking zeroes from IPD/PW vectors (lack of coverage)
             const auto fromStartIt = std::find_if(std::cbegin(ipd), std::cend(ipd),
                                                   [](const uint16_t val) -> bool { return val; });

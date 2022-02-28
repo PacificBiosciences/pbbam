@@ -14,14 +14,12 @@ namespace BAM {
 
 FastqSequence::FastqSequence(std::string name, std::string bases, Data::QualityValues qualities)
     : FastaSequence{std::move(name), std::move(bases)}, qualities_{std::move(qualities)}
-{
-}
+{}
 
 FastqSequence::FastqSequence(std::string name, std::string bases, std::string qualities)
     : FastaSequence{std::move(name), std::move(bases)}
     , qualities_{Data::QualityValues::FromFastq(qualities)}
-{
-}
+{}
 
 float FastqSequence::AverageBaseQuality() const
 {

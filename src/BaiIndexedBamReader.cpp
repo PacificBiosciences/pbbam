@@ -81,53 +81,45 @@ public:
 
 BaiIndexedBamReader::BaiIndexedBamReader(std::string filename)
     : BaiIndexedBamReader{BamFile{std::move(filename)}, nullptr}
-{
-}
+{}
 
 BaiIndexedBamReader::BaiIndexedBamReader(std::string filename,
                                          const std::shared_ptr<BaiIndexCacheData>& index)
     : BaiIndexedBamReader{BamFile{std::move(filename)}, index}
-{
-}
+{}
 
 BaiIndexedBamReader::BaiIndexedBamReader(BamFile bamFile)
     : BamReader{bamFile.Filename()}
     , d_{std::make_unique<BaiIndexedBamReaderPrivate>(std::move(bamFile), nullptr)}
-{
-}
+{}
 
 BaiIndexedBamReader::BaiIndexedBamReader(BamFile bamFile,
                                          const std::shared_ptr<BaiIndexCacheData>& index)
     : BamReader{bamFile.Filename()}
     , d_{std::make_unique<BaiIndexedBamReaderPrivate>(std::move(bamFile), index)}
-{
-}
+{}
 
 BaiIndexedBamReader::BaiIndexedBamReader(const Data::GenomicInterval& interval,
                                          std::string filename)
     : BaiIndexedBamReader{interval, BamFile{std::move(filename)}, nullptr}
-{
-}
+{}
 
 BaiIndexedBamReader::BaiIndexedBamReader(const Data::GenomicInterval& interval,
                                          std::string filename,
                                          const std::shared_ptr<BaiIndexCacheData>& index)
     : BaiIndexedBamReader{interval, BamFile{std::move(filename)}, index}
-{
-}
+{}
 
 BaiIndexedBamReader::BaiIndexedBamReader(const Data::GenomicInterval& interval, BamFile bamFile)
     : BamReader{bamFile.Filename()}
     , d_{std::make_unique<BaiIndexedBamReaderPrivate>(std::move(bamFile), interval, nullptr)}
-{
-}
+{}
 
 BaiIndexedBamReader::BaiIndexedBamReader(const Data::GenomicInterval& interval, BamFile bamFile,
                                          const std::shared_ptr<BaiIndexCacheData>& index)
     : BamReader{bamFile.Filename()}
     , d_{std::make_unique<BaiIndexedBamReaderPrivate>(std::move(bamFile), interval, index)}
-{
-}
+{}
 
 const BamFile& BaiIndexedBamReader::File() const { return d_->file_; }
 

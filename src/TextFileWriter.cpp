@@ -71,8 +71,7 @@ public:
 
 TextFileWriter::TextFileWriter(const std::string& filename)
     : d_{std::make_unique<TextFileWriterPrivate>(filename)}
-{
-}
+{}
 
 TextFileWriter::TextFileWriter(TextFileWriter&&) noexcept = default;
 

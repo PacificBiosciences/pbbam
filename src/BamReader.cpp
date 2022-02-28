@@ -112,8 +112,7 @@ BamReader::BamReader() : internal::IQuery{}, d_{std::make_unique<BamReaderPrivat
 
 BamReader::BamReader(std::string fn)
     : internal::IQuery{}, d_{std::make_unique<BamReaderPrivate>(std::move(fn))}
-{
-}
+{}
 
 BamReader::BamReader(BamFile bamFile) : BamReader{bamFile.Filename()} {}
 

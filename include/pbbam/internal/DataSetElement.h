@@ -50,8 +50,7 @@ private:
 };
 
 struct FromInputXml
-{
-};
+{};
 
 class DataSetElement
 {

@@ -92,13 +92,11 @@ public:
 
 IndexedFastaReader::IndexedFastaReader(std::string filename)
     : d_{std::make_unique<IndexedFastaReaderPrivate>(std::move(filename))}
-{
-}
+{}
 
 IndexedFastaReader::IndexedFastaReader(const IndexedFastaReader& other)
     : d_{std::make_unique<IndexedFastaReaderPrivate>(other.d_->fastaFilename_)}
-{
-}
+{}
 
 IndexedFastaReader::IndexedFastaReader(IndexedFastaReader&&) noexcept = default;
 

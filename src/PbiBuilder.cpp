@@ -57,23 +57,20 @@ public:
 PbiBuilder::PbiBuilder(const std::string& pbiFilename, const CompressionLevel compressionLevel,
                        const size_t numThreads)
     : PbiBuilder{pbiFilename, 0, false, compressionLevel, numThreads}
-{
-}
+{}
 
 PbiBuilder::PbiBuilder(const std::string& pbiFilename, const size_t numReferenceSequences,
                        const CompressionLevel compressionLevel, const size_t numThreads)
     : PbiBuilder{pbiFilename, numReferenceSequences, (numReferenceSequences > 0), compressionLevel,
                  numThreads}
-{
-}
+{}
 
 PbiBuilder::PbiBuilder(const std::string& pbiFilename, const size_t numReferenceSequences,
                        const bool isCoordinateSorted, const CompressionLevel compressionLevel,
                        const size_t numThreads)
     : d_{std::make_unique<PbiBuilderPrivate>(pbiFilename, numReferenceSequences, isCoordinateSorted,
                                              compressionLevel, numThreads)}
-{
-}
+{}
 
 PbiBuilder::PbiBuilder(PbiBuilder&&) noexcept = default;
 

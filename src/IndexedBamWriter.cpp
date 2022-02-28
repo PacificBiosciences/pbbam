@@ -58,10 +58,9 @@ public:
                 const size_t fileBufferSize)
         //                const size_t numReferenceSequences = 0
         //                const bool isCoordinateSorted = false
-        : PacBio::BAM::PbiBuilderBase{pbiFilename, compressionLevel, numThreads, fileBufferSize},
-          bamFilename_{bamFilename}
-    {
-    }
+        : PacBio::BAM::PbiBuilderBase{pbiFilename, compressionLevel, numThreads, fileBufferSize}
+        , bamFilename_{bamFilename}
+    {}
 
     std::vector<GzIndexEntry> LoadGzi()
     {

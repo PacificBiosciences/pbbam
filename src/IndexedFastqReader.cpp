@@ -123,13 +123,11 @@ std::unique_ptr<IndexedFastqReaderImpl> MakeReaderImpl(std::string filename)
 
 IndexedFastqReader::IndexedFastqReader(std::string filename)
     : d_{MakeReaderImpl(std::move(filename))}
-{
-}
+{}
 
 IndexedFastqReader::IndexedFastqReader(const IndexedFastqReader& other)
     : d_{MakeReaderImpl(other.d_->faiFilename_)}
-{
-}
+{}
 
 IndexedFastqReader::IndexedFastqReader(IndexedFastqReader&&) noexcept = default;
 

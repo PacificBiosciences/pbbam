@@ -20,8 +20,7 @@ public:
         : mappingXml_{std::move(mappingXml)}
         , what_{"[pbbam] chemistry bundle ERROR: could not load from " + mappingXml_ +
                 ", reason: " + std::move(msg)}
-    {
-    }
+    {}
 
     // This is a work around for the Intel PHI compiler (icpc)
     ~BundleChemistryMappingException() throw() {}

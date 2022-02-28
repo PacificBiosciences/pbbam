@@ -11,8 +11,7 @@ namespace BAM {
 
 FileProducer::FileProducer(std::string targetFilename)
     : FileProducer(targetFilename, targetFilename + ".tmp")
-{
-}
+{}
 
 FileProducer::FileProducer(std::string targetFilename, std::string tempFilename)
     : targetFilename_{std::move(targetFilename)}, tempFilename_{std::move(tempFilename)}

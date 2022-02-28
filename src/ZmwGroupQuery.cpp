@@ -230,13 +230,11 @@ ZmwGroupQuery::ZmwGroupQuery(const DataSet& dataset, const ZmwFileIterationMode 
 
 ZmwGroupQuery::ZmwGroupQuery(const DataSet& dataset, const PbiFilter& filter)
     : internal::IGroupQuery(), d_{std::make_unique<SequentialZmwGroupQuery>(dataset, filter)}
-{
-}
+{}
 
 ZmwGroupQuery::ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset)
     : internal::IGroupQuery(), d_{std::make_unique<WhitelistedZmwGroupQuery>(zmwWhitelist, dataset)}
-{
-}
+{}
 
 ZmwGroupQuery::ZmwGroupQuery(ZmwGroupQuery&&) noexcept = default;
 

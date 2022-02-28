@@ -43,8 +43,7 @@ public:
 
 FastqReader::FastqReader(const std::string& fn)
     : internal::QueryBase<FastqSequence>{}, d_{std::make_unique<FastqReaderPrivate>(fn)}
-{
-}
+{}
 
 FastqReader::FastqReader(FastqReader&&) noexcept = default;
 

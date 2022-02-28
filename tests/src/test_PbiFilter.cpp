@@ -132,12 +132,14 @@ static void checkFilterInternals(const PbiFilter& filter,
 
 struct SimpleFilter
 {
-    bool Accepts(const PbiRawData& /* idx */, const size_t /* row */) const { /*()idx; ()row;*/ return true; }
+    bool Accepts(const PbiRawData& /* idx */, const size_t /* row */) const
+    { /*()idx; ()row;*/
+        return true;
+    }
 };
 
 struct NoncompliantFilter
-{
-};
+{};
 
 struct SortUniqueTestFilter
 {
