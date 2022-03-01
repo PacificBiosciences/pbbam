@@ -67,11 +67,6 @@ test(
   workdir : meson.project_source_root())
 
 test(
-  'pbbam EOF check',
-  pbbam_eof_check,
-  workdir : meson.project_source_root())
-
-test(
   'pbbam gtest unittests',
   pbbam_test,
   args : [

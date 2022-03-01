@@ -78,7 +78,6 @@ subdir('src')
 pbbam_run_tests = (not meson.is_subproject()) and get_option('tests')
 if pbbam_run_tests
   pbbam_clang_formatter = find_program('tools/check-formatting')
-  pbbam_eof_check = find_program('tools/check-eof')
   subdir('tests')
 endif
 
