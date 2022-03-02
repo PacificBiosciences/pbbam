@@ -2,7 +2,7 @@
 # documentation #
 #################
 
-doxygen = find_program('doxygen', required : true)
+doxygen = find_program('doxygen')
 
 pbbam_doxygen_config = configuration_data()
 pbbam_doxygen_config.set('PacBioBAM_NAME', meson.project_name())

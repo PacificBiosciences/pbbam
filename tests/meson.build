@@ -4,7 +4,7 @@ pbbam_python = find_program('python')
 pbbam_cram_script = find_program('cram', required : false)
 if not pbbam_cram_script.found()
   warning('Using bundled cram script')
-  pbbam_cram_script = find_program('scripts/cram.py', required : true)
+  pbbam_cram_script = find_program('scripts/cram.py')
 endif
 
 pbbam_gtest_dep = dependency(
