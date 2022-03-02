@@ -219,7 +219,7 @@ pbbam_pbbamify = executable(
 
 # tests
 if pbbam_run_tests
-  pbbam_test_samtools = find_program('samtools', required : true)
+  pbbam_test_samtools = find_program('samtools')
 
   pbbamify_t = configure_file(
     input : pbbam_cram_pbbamify_t_in,
