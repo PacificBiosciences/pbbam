@@ -78,7 +78,7 @@ public:
     /// \throws std::runtime_error on failure to open/read underlying %BAM or
     ///         PBI files.
     ///
-    ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset);
+    ZmwGroupQuery(std::vector<int32_t> zmwWhitelist, const DataSet& dataset);
 
     ZmwGroupQuery(ZmwGroupQuery&&) noexcept;
     ZmwGroupQuery& operator=(ZmwGroupQuery&&) noexcept;
@@ -93,11 +93,7 @@ public:
     bool GetNext(std::vector<BamRecord>& records) override;
 
 private:
-    class ZmwGroupQueryPrivate;
-    class RoundRobinZmwGroupQuery;
-    class SequentialZmwGroupQuery;
-    class WhitelistedZmwGroupQuery;
-    std::unique_ptr<ZmwGroupQueryPrivate> d_;
+    std::unique_ptr<internal::IGroupQuery> d_;
 };
 
 }  // namespace BAM
