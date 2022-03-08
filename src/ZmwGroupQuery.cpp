@@ -2,37 +2,80 @@
 
 #include <pbbam/ZmwGroupQuery.h>
 
+#include <pbbam/BamHeader.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/CompositeBamReader.h>
+#include <pbbam/PbiFilterQuery.h>
 #include <pbbam/PbiFilterTypes.h>
+#include <pbbam/internal/QueryBase.h>
 #include "MemoryUtils.h"
 
 #include <algorithm>
 #include <deque>
+#include <memory>
 
 #include <cstdint>
 
 namespace PacBio {
 namespace BAM {
 
-class ZmwGroupQuery::ZmwGroupQueryPrivate
-{
-public:
-    virtual ~ZmwGroupQueryPrivate() = default;
-    virtual bool GetNext(std::vector<BamRecord>& records) = 0;
-
-protected:
-    ZmwGroupQueryPrivate() {}
-};
-
-class ZmwGroupQuery::WhitelistedZmwGroupQuery : public ZmwGroupQuery::ZmwGroupQueryPrivate
+class WhitelistedQuery : public internal::IGroupQuery
 {
     using ReaderType = PbiFilterCompositeBamReader<Compare::Zmw>;
 
 public:
-    WhitelistedZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset)
-        : ZmwGroupQuery::ZmwGroupQueryPrivate()
-        , whitelist_(zmwWhitelist.cbegin(), zmwWhitelist.cend())
+    WhitelistedQuery(std::vector<int32_t> zmwWhitelist, const DataSet& dataset)
+        : reader_{std::make_unique<ReaderType>(PbiZmwFilter{std::move(zmwWhitelist)}, dataset)}
+    {
+        if (!reader_->GetNext(currentRecord_)) {
+            // No data is not an error, an actual error would be thrown by reader.
+            // Reset reader to halt further iteration.
+            reader_.reset();
+        }
+    }
+
+    bool GetNext(std::vector<BamRecord>& records) override
+    {
+        records.clear();
+        if (!reader_) {
+            return false;
+        }
+
+        const int currentHoleNumber = currentRecord_.HoleNumber();
+        records.push_back(currentRecord_);
+        while (reader_->GetNext(currentRecord_)) {
+            if (currentRecord_.HoleNumber() != currentHoleNumber) {
+                // end of block, saving current record for next iteration
+                return true;
+            }
+            // still in ZMW block
+            records.push_back(currentRecord_);
+        }
+
+        // end of data, reset reader to halt further iteration
+        reader_.reset();
+        return true;
+    }
+
+private:
+    BamRecord currentRecord_;
+    std::unique_ptr<ReaderType> reader_;
+};
+
+///
+/// Special case: aligned BAMs are not ordered by ZMW, but by mapping (chrom/pos).
+/// This allows you to grab a block of ZMW subreads scattered anywhere in the file.
+///
+/// NOTE: This used to be the default behavior but is horribly inefficient for
+///       blocks sorted by ZMW hole number.
+///
+class WhitelistedAlignmentQuery : public internal::IGroupQuery
+{
+    using ReaderType = PbiFilterCompositeBamReader<Compare::Zmw>;
+
+public:
+    WhitelistedAlignmentQuery(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset)
+        : whitelist_(zmwWhitelist.cbegin(), zmwWhitelist.cend())
     {
         std::sort(whitelist_.begin(), whitelist_.end());
         whitelist_.erase(std::unique(whitelist_.begin(), whitelist_.end()), whitelist_.end());
@@ -75,11 +118,20 @@ private:
     std::unique_ptr<ReaderType> reader_;
 };
 
-class ZmwGroupQuery::RoundRobinZmwGroupQuery : public ZmwGroupQuery::ZmwGroupQueryPrivate
+std::unique_ptr<internal::IGroupQuery> MakeWhitelistedQuery(std::vector<int32_t> zmwWhitelist,
+                                                            const DataSet& dataset)
+{
+    const auto mergedHeader = dataset.MergedHeader();
+    if (mergedHeader.SortOrder() == "coordinate") {
+        return std::make_unique<WhitelistedAlignmentQuery>(zmwWhitelist, dataset);
+    }
+    return std::make_unique<WhitelistedQuery>(std::move(zmwWhitelist), dataset);
+}
+
+class RoundRobinZmwGroupQuery : public internal::IGroupQuery
 {
 public:
     RoundRobinZmwGroupQuery(const DataSet& dataset, const PbiFilter& pbiFilter)
-        : ZmwGroupQuery::ZmwGroupQueryPrivate()
     {
         const auto bamFilenames = dataset.BamFilenames();
         for (const auto& fn : bamFilenames) {
@@ -144,11 +196,10 @@ private:
     std::deque<internal::CompositeMergeItem> readerItems_;
 };
 
-class ZmwGroupQuery::SequentialZmwGroupQuery : public ZmwGroupQuery::ZmwGroupQueryPrivate
+class SequentialZmwGroupQuery : public internal::IGroupQuery
 {
 public:
     SequentialZmwGroupQuery(const DataSet& dataset, const PbiFilter& pbiFilter)
-        : ZmwGroupQuery::ZmwGroupQueryPrivate()
     {
         const auto bamFilenames = dataset.BamFilenames();
         for (const auto& fn : bamFilenames) {
@@ -226,14 +277,12 @@ ZmwGroupQuery::ZmwGroupQuery(const DataSet& dataset, const ZmwFileIterationMode 
     }
 }
 
-// ZmwGroupQuery(const DataSet& dataset, const PbiFilter& filter) {}
-
 ZmwGroupQuery::ZmwGroupQuery(const DataSet& dataset, const PbiFilter& filter)
     : internal::IGroupQuery(), d_{std::make_unique<SequentialZmwGroupQuery>(dataset, filter)}
 {}
 
-ZmwGroupQuery::ZmwGroupQuery(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset)
-    : internal::IGroupQuery(), d_{std::make_unique<WhitelistedZmwGroupQuery>(zmwWhitelist, dataset)}
+ZmwGroupQuery::ZmwGroupQuery(std::vector<int32_t> zmwWhitelist, const DataSet& dataset)
+    : internal::IGroupQuery(), d_{MakeWhitelistedQuery(std::move(zmwWhitelist), dataset)}
 {}
 
 ZmwGroupQuery::ZmwGroupQuery(ZmwGroupQuery&&) noexcept = default;
