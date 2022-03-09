@@ -124,6 +124,7 @@ pbbam_cpp_sources = files([
   'TagCollection.cpp',
   'TextFileReader.cpp',
   'TextFileWriter.cpp',
+  'TimeUtils.cpp',
   'Validator.cpp',
   'ValidationErrors.cpp',
   'ValidationException.cpp',
