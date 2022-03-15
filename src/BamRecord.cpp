@@ -2,6 +2,7 @@
 
 #include <pbbam/BamRecord.h>
 
+#include <pbbam/RecordType.h>
 #include <pbbam/StringUtilities.h>
 #include <pbbam/ZmwTypeMap.h>
 #include <pbbam/virtual/VirtualRegionTypeMap.h>
@@ -2405,8 +2406,13 @@ BamRecord& BamRecord::SubstitutionTag(const std::string& tags)
 
 Data::Read BamRecord::ToRead(std::string model) const
 {
-    Data::Read result{FullName(),      Sequence(),   Qualities(),
-                      SignalToNoise(), QueryStart(), QueryEnd()};
+    const bool isCcs = Type() == RecordType::CCS;
+    Data::Read result{FullName(),
+                      Sequence(),
+                      Qualities(),
+                      SignalToNoise(),
+                      (isCcs ? -1 : QueryStart()),
+                      (isCcs ? -1 : QueryEnd())};
     result.Model = std::move(model);
     result.ReadAccuracy = ReadAccuracy();
 
@@ -2414,7 +2420,7 @@ Data::Read BamRecord::ToRead(std::string model) const
         result.Flags = LocalContextFlags();
         result.FullLength =
             (result.Flags & Data::ADAPTER_BEFORE) && (result.Flags & Data::ADAPTER_AFTER);
-    } else {
+    } else if (!isCcs) {
         throw std::runtime_error{"[pbbam] BAM record ERROR: '" + FullName() +
                                  "' is missing local context flags (SAM tag 'cx')"};
     }
