@@ -1,21 +1,24 @@
 #include <pbbam/BamRecord.h>
 
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
+#include <pbbam/BamReader.h>
+#include <pbbam/BamTagCodec.h>
+#include <pbbam/RecordType.h>
+#include "../src/MemoryUtils.h"
+#include "PbbamTestData.h"
+
+#include <pbcopper/data/Read.h>
+
+#include <gtest/gtest.h>
 
 #include <array>
+#include <exception>
 #include <initializer_list>
 #include <string>
 #include <vector>
 
-#include <gtest/gtest.h>
-
-#include <pbbam/BamReader.h>
-#include <pbbam/BamTagCodec.h>
-
-#include "../src/MemoryUtils.h"
-#include "PbbamTestData.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
 
 // clang-format off
 
@@ -2738,6 +2741,23 @@ TEST(BAM_BamRecord, cannot_be_converted_to_pbcopper_read_if_local_context_is_mis
     {
         const std::string msg{e.what()};
         EXPECT_TRUE(msg.find("is missing local context flags") != std::string::npos);
+    }
+}
+
+TEST(BAM_BamRecord, can_convert_ccs_read_to_pbcopper_read) 
+{
+    const std::string ccsFn{PbbamTestsConfig::Data_Dir + "/23.ccs.bam"};
+    BamRecord bam;
+    BamReader reader{ccsFn};
+    while (reader.GetNext(bam)) {
+        try {
+            const Data::Read read = bam.ToRead();
+            EXPECT_EQ(read.QueryStart, -1);
+            EXPECT_EQ(read.QueryEnd, -1);
+            EXPECT_EQ(read.Flags, Data::NO_LOCAL_CONTEXT);
+        } catch (const std::exception& e) {
+            EXPECT_TRUE(false);
+        }
     }
 }
 
