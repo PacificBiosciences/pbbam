@@ -2,6 +2,7 @@
 
 #include <pbbam/PbiFilterTypes.h>
 
+#include <pbbam/RecordType.h>
 #include <pbbam/StringUtilities.h>
 
 #include <boost/algorithm/string.hpp>
@@ -131,6 +132,7 @@ PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& movieName
         candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "SCRAP")));
         candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "UNKNOWN")));
         candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "ZMW")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "SEGMENT")));
         candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "CCS")));
         candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "TRANSCRIPT")));
         candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "POLYMERASE")));
@@ -139,6 +141,7 @@ PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& movieName
         candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "SCRAP")));
         candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "UNKNOWN")));
         candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "ZMW")));
+        candidateRgIds_.insert(ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "SEGMENT")));
         movieNames_.insert(movieName);
     }
     // clang-format on
@@ -182,6 +185,9 @@ bool PbiMovieNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
                 return false;
             };
 
+            if (tryBarcodedType("SEGMENT")) {
+                return true;
+            }
             if (tryBarcodedType("CCS")) {
                 return true;
             }
@@ -321,12 +327,21 @@ public:
         : cmp_{cmp}
     {
         for (const auto& queryName : queryNames) {
-
             if (queryName.find("transcript/") == 0) {
                 HandleName(queryName, RecordType::TRANSCRIPT);
             } else if (queryName.find("/ccs") != std::string::npos) {
-                HandleName(queryName, RecordType::CCS);
+
+                // normal CCS
+                if (queryName.ends_with("ccs") || queryName.ends_with("fwd") ||
+                    queryName.ends_with("rev")) {
+                    HandleName(queryName, RecordType::CCS);
+                } else {
+                    // CCS segment
+                    assert(std::isdigit(queryName.back()));
+                    HandleName(queryName, RecordType::SEGMENT);
+                }
             } else {
+                // all other read types
                 HandleName(queryName, RecordType::UNKNOWN);
             }
         }
@@ -386,6 +401,13 @@ public:
 
     std::vector<int32_t> CandidateRgIds(const std::string& movieName, const RecordType type)
     {
+        if (type == RecordType::SEGMENT) {
+            return {
+                ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "SEGMENT")),
+                ReadGroupInfo::IdToInt(MakeLegacyReadGroupId(movieName, "SEGMENT")),
+            };
+        }
+
         if (type == RecordType::CCS) {
             return {
                 ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, "CCS")),
@@ -416,7 +438,7 @@ public:
     void HandleName(const std::string& queryName, const RecordType type)
     {
         const auto nameParts = Split(queryName, '/');
-        if (nameParts.size() < 2) {
+        if (std::ssize(nameParts) < 2) {
             throw std::runtime_error{"[pbbam] PBI filter ERROR: requested QNAME (" + queryName +
                                      ") is not a valid PacBio BAM QNAME. See spec for details"};
         }
@@ -435,13 +457,13 @@ public:
                     ") is not a valid PacBio BAM QNAME. ZMW id must be a number."};
             }
         }();
-
         if (IsCcsOrTranscript(type)) {
+            // normal CCS and TRANSCRIPT types have no interval
             zmw->emplace(zmwId, std::optional<QueryIntervals>{});
         } else {
 
-            const auto queryIntervalParts = Split(nameParts.at(2), '_');
-            if (queryIntervalParts.size() != 2) {
+            const auto queryIntervalParts = Split(nameParts.back(), '_');
+            if (std::ssize(queryIntervalParts) != 2) {
                 throw std::runtime_error{"[pbbam] PBI filter ERROR: requested QNAME (" + queryName +
                                          ") is not a valid PacBio BAM QNAME. See spec for details"};
             }

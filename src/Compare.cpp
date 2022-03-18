@@ -2,7 +2,11 @@
 
 #include <pbbam/Compare.h>
 
+#include <pbbam/BamRecord.h>
+#include <pbbam/RecordType.h>
+
 #include <functional>
+#include <stdexcept>
 #include <unordered_map>
 
 #include <cstddef>
@@ -111,24 +115,44 @@ bool Compare::QName::operator()(const BamRecord& lhs, const BamRecord& rhs) cons
         return lhsZmw < rhsZmw;
     }
 
-    // shuffle CCS/transcript reads after all others
-    if (IsCcsOrTranscript(lhs.Type())) {
+    // "subread"-like (SUBREAD, SCRAP, etc)
+    // CCS
+    // segment
+    // transcript
+    static const std::map<RecordType, int> typePriorities{
+        {RecordType::ZMW, 0},   {RecordType::HQREGION, 0}, {RecordType::SUBREAD, 0},
+        {RecordType::SCRAP, 0}, {RecordType::UNKNOWN, 0},  {RecordType::POLYMERASE, 0},
+        {RecordType::CCS, 1},   {RecordType::SEGMENT, 2},  {RecordType::TRANSCRIPT, 3}};
+
+    const RecordType lhsType = lhs.Type();
+    const RecordType rhsType = rhs.Type();
+    const int lhsPriority = typePriorities.at(lhsType);
+    const int rhsPriority = typePriorities.at(rhsType);
+    if (lhsPriority < rhsPriority) {
         return false;
     }
-    if (IsCcsOrTranscript(rhs.Type())) {
-        return true;
+    if (lhsPriority > rhsPriority) {
+        return false;
+    }
+    assert(lhsPriority == rhsPriority);
+
+    // subread-like & segment have qStart_qEnd
+    if (lhsPriority == 0 || lhsPriority == 2) {
+        // sort on qStart, then finally qEnd
+        const auto lhsQStart = lhs.QueryStart();
+        const auto rhsQStart = rhs.QueryStart();
+        if (lhsQStart != rhsQStart) {
+            return lhsQStart < rhsQStart;
+        }
+
+        const auto lhsQEnd = lhs.QueryEnd();
+        const auto rhsQEnd = rhs.QueryEnd();
+        return lhsQEnd < rhsQEnd;
     }
 
-    // sort on qStart, then finally qEnd
-    const auto lhsQStart = lhs.QueryStart();
-    const auto rhsQStart = rhs.QueryStart();
-    if (lhsQStart != rhsQStart) {
-        return lhsQStart < rhsQStart;
-    }
-
-    const auto lhsQEnd = lhs.QueryEnd();
-    const auto rhsQEnd = rhs.QueryEnd();
-    return lhsQEnd < rhsQEnd;
+    throw std::runtime_error{
+        "[pbbam] comparison ERROR: cannot sort CCS/transcripts that share both movie name & ZMW "
+        "hole number"};
 }
 
 Compare::Type Compare::TypeFromOperator(const std::string& opString)

@@ -5,7 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
-## [2.0.0] - TBD
+## [2.1.0] - 2022-03-18
+
+### Added 
+ - Segmented read data type
+
+## [2.0.0] - 2022-01-10
 
 ### Changed
  - C++20 is now a *hard* minimum.

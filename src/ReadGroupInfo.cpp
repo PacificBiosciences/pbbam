@@ -7,11 +7,14 @@
 #include <pbbam/StringUtilities.h>
 #include "ChemistryTable.h"
 
+#include <pbcopper/data/Strand.h>
+
 #include <boost/algorithm/cxx14/equal.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <iomanip>
 #include <ios>
+#include <optional>
 #include <set>
 #include <sstream>
 #include <stdexcept>
@@ -72,6 +75,7 @@ static const std::string token_SK{"SEQUENCINGKIT"};
 static const std::string token_BV{"BASECALLERVERSION"};
 static const std::string token_FR{"FRAMERATEHZ"};
 static const std::string token_CT{"CONTROL"};
+static const std::string token_SO{"SOURCE"};
 
 static const std::string token_BF{"BarcodeFile"};
 static const std::string token_BH{"BarcodeHash"};
@@ -591,6 +595,8 @@ void ReadGroupInfo::DecodeSamDescription(const std::string& description)
         // 'mandatory' items
         if (key == token_RT) {
             readType_ = std::move(value);
+        } else if (key == token_SO) {
+            sourceReadType_ = std::move(value);
         } else if (key == token_BK) {
             bindingKit_ = std::move(value);
         } else if (key == token_BV) {
@@ -601,26 +607,38 @@ void ReadGroupInfo::DecodeSamDescription(const std::string& description)
             frameRateHz_ = std::move(value);
         } else if (key == token_CT) {
             control_ = (value == "TRUE");
-
-            // base features
-        } else if (IsBaseFeature(key)) {
+        }
+        // base features
+        else if (IsBaseFeature(key)) {
             features_[BaseFeatureFromName(key)] = std::move(value);
-
-            // barcode data
-        } else if (IsLikelyBarcodeKey(key)) {
+        }
+        // barcode data
+        else if (IsLikelyBarcodeKey(key)) {
             DecodeBarcodeKey(key, std::move(value));
-
-            // strand
-        } else if (key == token_ST) {
+        }
+        // strand
+        else if (key == token_ST) {
             DecodeStrand(std::move(value));
-
-            // frame codecs
-        } else {
+        }
+        // frame codecs
+        else {
             DecodeFrameCodecKey(key, std::move(value));
         }
     }
 
     hasBarcodeData_ = !barcodeFile_.empty();
+
+    if (readType_ == "SEGMENT") {
+        if (!sourceReadType_.has_value()) {
+            throw std::runtime_error{
+                "[pbbam] read group ERROR: segment read group is missing SOURCE type;"};
+        }
+    } else {
+        if (sourceReadType_.has_value()) {
+            throw std::runtime_error{
+                "[pbbam] read group ERROR: non-segment read groups cannot have a SOURCE type"};
+        }
+    }
 }
 
 std::string ReadGroupInfo::EncodeSamDescription() const
@@ -630,14 +648,17 @@ std::string ReadGroupInfo::EncodeSamDescription() const
     constexpr static const char EQ = '=';
 
     std::string result{token_RT + EQ + readType_};
+    if (sourceReadType_.has_value()) {
+        result.append(SEP + token_SO + EQ + sourceReadType_.value());
+    }
 
     std::string featureName;
     for (const auto& feature : features_) {
-
         featureName = BaseFeatureName(feature.first);
         if (featureName.empty() || feature.second.empty()) {
             continue;
-        } else if (featureName == feature_IP) {
+        }
+        if (featureName == feature_IP) {
             featureName.push_back(COLON);
             featureName.append(FrameCodecName(ipdCodec_, ipdEncoder_));
         } else if (featureName == feature_PW) {
@@ -838,6 +859,8 @@ ReadGroupInfo& ReadGroupInfo::IpdFrameEncoder(Data::FrameEncoder encoder)
     return *this;
 }
 
+bool ReadGroupInfo::IsSegment() const { return readType_ == "SEGMENT"; }
+
 bool ReadGroupInfo::IsValid() const { return !id_.empty(); }
 
 std::string ReadGroupInfo::KeySequence() const { return keySequence_; }
@@ -853,6 +876,20 @@ std::string ReadGroupInfo::Library() const { return library_; }
 ReadGroupInfo& ReadGroupInfo::Library(std::string library)
 {
     library_ = std::move(library);
+    return *this;
+}
+
+ReadGroupInfo& ReadGroupInfo::MakeSegment()
+{
+    sourceReadType_ = readType_;
+    readType_ = "SEGMENT";
+
+    // update RG ID
+    if (barcodes_.has_value()) {
+        Id(MakeReadGroupId(movieName_, readType_, barcodes_.value(), strand_));
+    } else {
+        Id(MakeReadGroupId(movieName_, readType_, strand_));
+    }
     return *this;
 }
 
@@ -928,6 +965,25 @@ ReadGroupInfo& ReadGroupInfo::RemoveBaseFeature(BaseFeature feature)
     return *this;
 }
 
+ReadGroupInfo& ReadGroupInfo::RevertSegment()
+{
+    if (!sourceReadType_.has_value()) {
+        throw std::runtime_error{
+            "[pbbam] read group ERROR: cannot revert from SEGMENT without a SOURCE read type"};
+    }
+
+    readType_ = sourceReadType_.value();
+    sourceReadType_ = std::nullopt;
+
+    // update RG ID
+    if (barcodes_.has_value()) {
+        Id(MakeReadGroupId(movieName_, readType_, barcodes_.value(), strand_));
+    } else {
+        Id(MakeReadGroupId(movieName_, readType_, strand_));
+    }
+    return *this;
+}
+
 std::string ReadGroupInfo::Sample() const { return sample_; }
 
 ReadGroupInfo& ReadGroupInfo::Sample(std::string sample)
@@ -935,6 +991,8 @@ ReadGroupInfo& ReadGroupInfo::Sample(std::string sample)
     sample_ = std::move(sample);
     return *this;
 }
+
+std::optional<std::string> ReadGroupInfo::SegmentSource() const { return sourceReadType_; }
 
 std::string ReadGroupInfo::SequencingCenter() const { return sequencingCenter_; }
 
