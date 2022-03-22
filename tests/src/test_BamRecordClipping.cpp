@@ -2570,8 +2570,8 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
 
         // tags
         TagCollection tags;
-        tags["Mm"] = basemods;
-        tags["Ml"] = basemodsQVs;
+        tags["MM"] = basemods;
+        tags["ML"] = basemodsQVs;
         impl.Tags(tags);
 
         const auto rg = BamRecordClippingTests::MakeReadGroup(Data::FrameCodec::V1, "movie", "CCS");
@@ -2594,9 +2594,9 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "#a%");
 
         const BamRecordImpl impl = bamRecord.Impl();
-        const std::string basemodsString{impl.TagValue("Mm").ToString()};
+        const std::string basemodsString{impl.TagValue("MM").ToString()};
         EXPECT_EQ(basemodsString, "C+m;");
-        const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
+        const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{};
         EXPECT_EQ(basemodsQVs, expectedQvs);
 
@@ -2624,9 +2624,9 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "NfLp");
 
         const BamRecordImpl impl = bamRecord.Impl();
-        const std::string basemodsString{impl.TagValue("Mm").ToString()};
+        const std::string basemodsString{impl.TagValue("MM").ToString()};
         EXPECT_EQ(basemodsString, "C+m;");
-        const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
+        const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{};
         EXPECT_EQ(basemodsQVs, expectedQvs);
 
@@ -2654,9 +2654,9 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         EXPECT_EQ(bamRecord.Qualities().Fastq(), ">22");
 
         const BamRecordImpl impl = bamRecord.Impl();
-        const std::string basemodsString{impl.TagValue("Mm").ToString()};
+        const std::string basemodsString{impl.TagValue("MM").ToString()};
         EXPECT_EQ(basemodsString, "C+m;");
-        const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
+        const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{};
         EXPECT_EQ(basemodsQVs, expectedQvs);
 
@@ -2684,9 +2684,9 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "0GW");
 
         const BamRecordImpl impl = bamRecord.Impl();
-        const std::string basemodsString{impl.TagValue("Mm").ToString()};
+        const std::string basemodsString{impl.TagValue("MM").ToString()};
         EXPECT_EQ(basemodsString, "C+m;");
-        const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
+        const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{};
         EXPECT_EQ(basemodsQVs, expectedQvs);
 
@@ -2714,9 +2714,9 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "LpfSlp");
 
         const BamRecordImpl impl = bamRecord.Impl();
-        const std::string basemodsString{impl.TagValue("Mm").ToString()};
+        const std::string basemodsString{impl.TagValue("MM").ToString()};
         EXPECT_EQ(basemodsString, "C+m,2;");
-        const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
+        const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{18};
         EXPECT_EQ(basemodsQVs, expectedQvs);
 
@@ -2744,9 +2744,9 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "Slpk");
 
         const BamRecordImpl impl = bamRecord.Impl();
-        const std::string basemodsString{impl.TagValue("Mm").ToString()};
+        const std::string basemodsString{impl.TagValue("MM").ToString()};
         EXPECT_EQ(basemodsString, "C+m,0;");
-        const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
+        const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{18};
         EXPECT_EQ(basemodsQVs, expectedQvs);
 
@@ -2774,9 +2774,9 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "k59K>22LC");
 
         const BamRecordImpl impl = bamRecord.Impl();
-        const std::string basemodsString{impl.TagValue("Mm").ToString()};
+        const std::string basemodsString{impl.TagValue("MM").ToString()};
         EXPECT_EQ(basemodsString, "C+m,1;");
-        const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
+        const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{128};
         EXPECT_EQ(basemodsQVs, expectedQvs);
 
@@ -2804,9 +2804,9 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "K>22LC'x*2W=*0G");
 
         const BamRecordImpl impl = bamRecord.Impl();
-        const std::string basemodsString{impl.TagValue("Mm").ToString()};
+        const std::string basemodsString{impl.TagValue("MM").ToString()};
         EXPECT_EQ(basemodsString, "C+m,4;");
-        const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
+        const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{234};
         EXPECT_EQ(basemodsQVs, expectedQvs);
 
@@ -2834,9 +2834,9 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "pfSlpk59K>22LC'x");
 
         const BamRecordImpl impl = bamRecord.Impl();
-        const std::string basemodsString{impl.TagValue("Mm").ToString()};
+        const std::string basemodsString{impl.TagValue("MM").ToString()};
         EXPECT_EQ(basemodsString, "C+m,1,1;");
-        const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
+        const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{18, 128};
         EXPECT_EQ(basemodsQVs, expectedQvs);
 
@@ -2864,9 +2864,9 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "59K>22LC'x*2W=*0");
 
         const BamRecordImpl impl = bamRecord.Impl();
-        const std::string basemodsString{impl.TagValue("Mm").ToString()};
+        const std::string basemodsString{impl.TagValue("MM").ToString()};
         EXPECT_EQ(basemodsString, "C+m,0,4;");
-        const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
+        const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{128, 234};
         EXPECT_EQ(basemodsQVs, expectedQvs);
 
@@ -2894,9 +2894,9 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "NfLpfSlpk59K>22LC'x*2W");
 
         const BamRecordImpl impl = bamRecord.Impl();
-        const std::string basemodsString{impl.TagValue("Mm").ToString()};
+        const std::string basemodsString{impl.TagValue("MM").ToString()};
         EXPECT_EQ(basemodsString, "C+m,3,1,4;");
-        const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
+        const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{18, 128, 234};
         EXPECT_EQ(basemodsQVs, expectedQvs);
 
@@ -2924,9 +2924,9 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         EXPECT_EQ(bamRecord.Qualities().Fastq(), "hNfLpfSlpk59K>22LC'x*2W=*0GWv");
 
         const BamRecordImpl impl = bamRecord.Impl();
-        const std::string basemodsString{impl.TagValue("Mm").ToString()};
+        const std::string basemodsString{impl.TagValue("MM").ToString()};
         EXPECT_EQ(basemodsString, "C+m,3,1,4;");
-        const std::vector<uint8_t> basemodsQVs{impl.TagValue("Ml").ToUInt8Array()};
+        const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{18, 128, 234};
         EXPECT_EQ(basemodsQVs, expectedQvs);
 

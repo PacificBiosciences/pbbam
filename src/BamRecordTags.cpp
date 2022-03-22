@@ -52,8 +52,8 @@ const BamRecordTags::TagLookupType BamRecordTags::tagLookup =
     { BamRecordTag::START_FRAME,              {"sf", true}  },
     { BamRecordTag::SUBSTITUTION_QV,          {"sq", false} },
     { BamRecordTag::SUBSTITUTION_TAG,         {"st", false} },
-    { BamRecordTag::BASEMOD_LOCI,             {"Mm", false} },
-    { BamRecordTag::BASEMOD_QV,               {"Ml", false} },
+    { BamRecordTag::BASEMOD_LOCI,             {"MM", false} },
+    { BamRecordTag::BASEMOD_QV,               {"ML", false} },
 
     // faux tags
     { BamRecordTag::SEQ,  {"  ",  false} },
