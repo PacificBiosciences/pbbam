@@ -10,7 +10,6 @@
 #include "PbbamTestData.h"
 
 using BedReader = PacBio::BED::BedReader;
-using GenomicInterval = PacBio::BAM::GenomicInterval;
 
 // clang-format off
 
@@ -19,7 +18,7 @@ namespace BedReaderTests {
 const std::string BedFn = PacBio::BAM::PbbamTestsConfig::Data_Dir + "/bed/test.bed";
 const std::string GzipBedFn = PacBio::BAM::PbbamTestsConfig::Data_Dir + "/bed/test.bed.gz";
 
-const std::vector<GenomicInterval> ExpectedIntervals {
+const std::vector<PacBio::BAM::GenomicInterval> ExpectedIntervals {
     {"chr1", 213941196, 213942363},
     {"chr1", 213942363, 213943530},
     {"chr1", 213943530, 213944697},
@@ -35,7 +34,7 @@ void CheckManualIteration(const std::string& fn)
 {
     size_t count = 0;
     BedReader reader{fn};
-    GenomicInterval interval;
+    PacBio::BAM::GenomicInterval interval;
     while (reader.GetNext(interval)) {
         EXPECT_EQ(BedReaderTests::ExpectedIntervals.at(count), interval);
         ++count;
