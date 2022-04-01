@@ -765,9 +765,8 @@ void BamRecord::ClipFields(const size_t clipFrom, const size_t clipLength)
 BamRecord& BamRecord::ClipToQuery(const Data::Position start, const Data::Position end)
 {
     // cache original coords, skip out if clip not needed
-    const std::string source = ReadGroup().SegmentSource().value_or("UNKNOWN");
     const size_t seqLength = impl_.SequenceLength();
-    const bool isCcsOrTranscript = IsCcsOrTranscript(Type()) || (source == "CCS");
+    const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
     const Data::Position origQStart = isCcsOrTranscript ? 0 : QueryStart();
     const Data::Position origQEnd = isCcsOrTranscript ? seqLength : QueryEnd();
     if (start <= origQStart && end >= origQEnd) {
