@@ -85,7 +85,9 @@ endif
 # tools #
 #########
 
-subdir('tools')
+if get_option('build-tools')
+  subdir('tools')
+endif
 
 #################
 # documentation #

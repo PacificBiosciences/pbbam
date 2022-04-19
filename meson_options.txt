@@ -17,3 +17,8 @@ option('permissive-cigar',
     type : 'boolean',
     value : false,
     description : 'Allows loading BAM records which contain "M" operations in CIGAR strings.')
+
+option('build-tools',
+    type : 'boolean',
+    value : true,
+    description : 'Build PacBioBAM\'s tools')
