@@ -73,7 +73,7 @@ TEST(BAM_IndexedFastaReader, can_fetch_subsequence_from_lambda)
     EXPECT_EQ(1, r.NumSequences());
     EXPECT_EQ(48502, r.SequenceLength("lambda_NEB3011"));
 
-    std::string seq = r.Subsequence("lambda_NEB3011:0-10");
+    std::string seq = r.Subsequence("lambda_NEB3011:1-10");
     EXPECT_EQ("GGGCGGCGAC", seq);
 
     std::string seq2 = r.Subsequence("lambda_NEB3011", 0, 10);
