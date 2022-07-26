@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [2.2.0] - 2022-07-26
+
+### Fixed
+ - Use tabix 1-based indexing
+
 ## [2.1.0] - 2022-04-19
 
 ### Added
