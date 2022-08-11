@@ -2556,6 +2556,7 @@ TEST(BAM_BamRecordClipping, clips_ccs_kinetics_tags)
 
 constexpr char defaultSequence[] = "ACTCCACGACTCGTCACACTCACGTCTCA";
 constexpr char defaultBasemods[] = "C+m,3,1,4;";
+constexpr char defaultBasemodsSpec[] = "C+m?,3,1,4;";
 const std::vector<uint8_t> defaultBasemodsQVs = {18, 128, 234};
 
 TEST(BAM_BamRecordClipping, clips_basemods_tags)
@@ -2595,7 +2596,7 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
 
         const BamRecordImpl impl = bamRecord.Impl();
         const std::string basemodsString{impl.TagValue("MM").ToString()};
-        EXPECT_EQ(basemodsString, "C+m;");
+        EXPECT_EQ(basemodsString, "C+m?;");
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{};
         EXPECT_EQ(basemodsQVs, expectedQvs);
@@ -2625,7 +2626,7 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
 
         const BamRecordImpl impl = bamRecord.Impl();
         const std::string basemodsString{impl.TagValue("MM").ToString()};
-        EXPECT_EQ(basemodsString, "C+m;");
+        EXPECT_EQ(basemodsString, "C+m?;");
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{};
         EXPECT_EQ(basemodsQVs, expectedQvs);
@@ -2655,7 +2656,7 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
 
         const BamRecordImpl impl = bamRecord.Impl();
         const std::string basemodsString{impl.TagValue("MM").ToString()};
-        EXPECT_EQ(basemodsString, "C+m;");
+        EXPECT_EQ(basemodsString, "C+m?;");
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{};
         EXPECT_EQ(basemodsQVs, expectedQvs);
@@ -2685,7 +2686,7 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
 
         const BamRecordImpl impl = bamRecord.Impl();
         const std::string basemodsString{impl.TagValue("MM").ToString()};
-        EXPECT_EQ(basemodsString, "C+m;");
+        EXPECT_EQ(basemodsString, "C+m?;");
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{};
         EXPECT_EQ(basemodsQVs, expectedQvs);
@@ -2715,7 +2716,7 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
 
         const BamRecordImpl impl = bamRecord.Impl();
         const std::string basemodsString{impl.TagValue("MM").ToString()};
-        EXPECT_EQ(basemodsString, "C+m,2;");
+        EXPECT_EQ(basemodsString, "C+m?,2;");
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{18};
         EXPECT_EQ(basemodsQVs, expectedQvs);
@@ -2745,7 +2746,7 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
 
         const BamRecordImpl impl = bamRecord.Impl();
         const std::string basemodsString{impl.TagValue("MM").ToString()};
-        EXPECT_EQ(basemodsString, "C+m,0;");
+        EXPECT_EQ(basemodsString, "C+m?,0;");
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{18};
         EXPECT_EQ(basemodsQVs, expectedQvs);
@@ -2775,7 +2776,7 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
 
         const BamRecordImpl impl = bamRecord.Impl();
         const std::string basemodsString{impl.TagValue("MM").ToString()};
-        EXPECT_EQ(basemodsString, "C+m,1;");
+        EXPECT_EQ(basemodsString, "C+m?,1;");
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{128};
         EXPECT_EQ(basemodsQVs, expectedQvs);
@@ -2805,7 +2806,7 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
 
         const BamRecordImpl impl = bamRecord.Impl();
         const std::string basemodsString{impl.TagValue("MM").ToString()};
-        EXPECT_EQ(basemodsString, "C+m,4;");
+        EXPECT_EQ(basemodsString, "C+m?,4;");
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{234};
         EXPECT_EQ(basemodsQVs, expectedQvs);
@@ -2835,7 +2836,7 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
 
         const BamRecordImpl impl = bamRecord.Impl();
         const std::string basemodsString{impl.TagValue("MM").ToString()};
-        EXPECT_EQ(basemodsString, "C+m,1,1;");
+        EXPECT_EQ(basemodsString, "C+m?,1,1;");
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{18, 128};
         EXPECT_EQ(basemodsQVs, expectedQvs);
@@ -2865,7 +2866,38 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
 
         const BamRecordImpl impl = bamRecord.Impl();
         const std::string basemodsString{impl.TagValue("MM").ToString()};
-        EXPECT_EQ(basemodsString, "C+m,0,4;");
+        EXPECT_EQ(basemodsString, "C+m?,0,4;");
+        const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
+        const std::vector<uint8_t> expectedQvs{128, 234};
+        EXPECT_EQ(basemodsQVs, expectedQvs);
+
+        const auto splitBasemods = BamRecord::ClipBasemodsTag(
+            defaultSequence, defaultBasemods, defaultBasemodsQVs, start, end - start);
+
+        EXPECT_EQ(splitBasemods.LeadingSeparatingC, (std::vector<int32_t>{3}));
+        EXPECT_EQ(splitBasemods.LeadingQuals, (std::vector<uint8_t>{18}));
+        EXPECT_EQ(splitBasemods.PrefixLostBases, 1);
+
+        EXPECT_EQ(splitBasemods.RetainedSeparatingC, (std::vector<int32_t>{0, 4}));
+        EXPECT_EQ(splitBasemods.RetainedQuals, (std::vector<uint8_t>{128, 234}));
+
+        EXPECT_EQ(splitBasemods.TrailingSeparatingC, (std::vector<int32_t>{}));
+        EXPECT_EQ(splitBasemods.TrailingQuals, (std::vector<uint8_t>{}));
+    }
+
+    {  // using tag according to spec, normal clip, last two CpG sites - 10,26
+        constexpr int32_t start = 10;
+        constexpr int32_t end = 26;
+
+        auto bamRecord = MakeCcsBasemodsRecord(defaultSequence, "hNfLpfSlpk59K>22LC'x*2W=*0GWv",
+                                               defaultBasemodsSpec, defaultBasemodsQVs);
+        bamRecord.Clip(ClipType::CLIP_TO_QUERY, start, end);
+        EXPECT_EQ(bamRecord.Sequence(), "TCGTCACACTCACGTC");
+        EXPECT_EQ(bamRecord.Qualities().Fastq(), "59K>22LC'x*2W=*0");
+
+        const BamRecordImpl impl = bamRecord.Impl();
+        const std::string basemodsString{impl.TagValue("MM").ToString()};
+        EXPECT_EQ(basemodsString, "C+m?,0,4;");
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{128, 234};
         EXPECT_EQ(basemodsQVs, expectedQvs);
@@ -2895,7 +2927,7 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
 
         const BamRecordImpl impl = bamRecord.Impl();
         const std::string basemodsString{impl.TagValue("MM").ToString()};
-        EXPECT_EQ(basemodsString, "C+m,3,1,4;");
+        EXPECT_EQ(basemodsString, "C+m?,3,1,4;");
         const std::vector<uint8_t> basemodsQVs{impl.TagValue("ML").ToUInt8Array()};
         const std::vector<uint8_t> expectedQvs{18, 128, 234};
         EXPECT_EQ(basemodsQVs, expectedQvs);

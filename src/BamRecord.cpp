@@ -1758,10 +1758,11 @@ std::vector<int32_t> BamRecord::SplitBasemods::SplitBasemodsString(const std::st
     assert(boost::algorithm::starts_with(str, "C+m"));
     assert(boost::algorithm::ends_with(str, ";"));
 
-    const char* strView = str.c_str() + 3;  // skip the "C+m" prefix
-    const int32_t strLen = str.size() - 3;
+    const int32_t skipPrefix = 3 + boost::algorithm::starts_with(str, "C+m?");
+    const char* strView = str.c_str() + skipPrefix;  // skip the "C+m?" or "C+m" prefix
+    const int32_t strLen = str.size() - skipPrefix;
 
-    // convert "C+m,3,1,4;" to std::vector{3, 1, 4}
+    // convert "C+m?,3,1,4;" to std::vector{3, 1, 4}
     std::vector<int32_t> result;
     int32_t currentNumber = 0;
     assert((strView[0] == ',') ||
@@ -1786,7 +1787,7 @@ std::vector<int32_t> BamRecord::SplitBasemods::SplitBasemodsString(const std::st
 std::string BamRecord::SplitBasemods::SeparatingCToString(const std::vector<int32_t>& vec)
 {
     std::ostringstream newBasemodsString;
-    newBasemodsString << "C+m";
+    newBasemodsString << "C+m?";
     for (const auto val : vec) {
         newBasemodsString << ',' << val;
     }
