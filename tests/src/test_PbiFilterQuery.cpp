@@ -29,8 +29,8 @@ TEST(BAM_PbiFilterQuery, can_perform_normal_filtered_queries)
         // all records aligned to reverse strand && pos >= 9200
         const std::string queryName{
             "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/5615_6237"};
-        const Strand strand = Strand::REVERSE;
-        const Position start = 9200;
+        const Data::Strand strand = Data::Strand::REVERSE;
+        const Data::Position start = 9200;
         const auto filter =
             PbiFilter::Intersection({PbiAlignedStrandFilter{strand},
                                      PbiReferenceStartFilter{start, Compare::GREATER_THAN_EQUAL}});
@@ -47,10 +47,10 @@ TEST(BAM_PbiFilterQuery, can_perform_normal_filtered_queries)
         // all records aligned to forward strand && pos >= 9200
         const std::string queryName{
             "m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2114_2531"};
-        const Strand strand = Strand::FORWARD;
-        const Position start = 9200;
+        const Data::Strand strand = Data::Strand::FORWARD;
+        const Data::Position start = 9200;
         const auto filter =
-            PbiFilter::Intersection({PbiAlignedStrandFilter{Strand::FORWARD},
+            PbiFilter::Intersection({PbiAlignedStrandFilter{Data::Strand::FORWARD},
                                      PbiReferenceStartFilter{9200, Compare::GREATER_THAN_EQUAL}});
 
         PbiFilterQuery query(filter, bamFile);

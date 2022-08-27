@@ -14,9 +14,9 @@
 using BamReader = PacBio::BAM::BamReader;
 using BamRecord = PacBio::BAM::BamRecord;
 using BamWriter = PacBio::BAM::BamWriter;
-using Cigar = PacBio::BAM::Cigar;
-using CigarOp = PacBio::BAM::CigarOperation;
-using PacBio::BAM::CigarOperationType;
+using Cigar = PacBio::Data::Cigar;
+using CigarOp = PacBio::Data::CigarOperation;
+using PacBio::Data::CigarOperationType;
 using Tag = PacBio::BAM::Tag;
 
 namespace LongCigarTests {

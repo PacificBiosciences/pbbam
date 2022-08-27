@@ -4,7 +4,8 @@
 
 #include <pbbam/CompositeBamReader.h>
 #include <pbbam/DataSet.h>
-#include <pbbam/GenomicInterval.h>
+
+#include <pbcopper/data/GenomicInterval.h>
 
 namespace PacBio {
 namespace BAM {

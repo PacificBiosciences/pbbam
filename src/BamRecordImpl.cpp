@@ -191,7 +191,7 @@ BamRecordImpl& BamRecordImpl::CigarData(const Data::Cigar& cigar)
         std::vector<uint32_t> cigarData(cigar.size());
         cigarData.reserve(cigar.size());
         for (size_t i = 0; i < cigar.size(); ++i) {
-            const CigarOperation& op = cigar.at(i);
+            const Data::CigarOperation& op = cigar.at(i);
             cigarData[i] = bam_cigar_gen(op.Length(), static_cast<int>(op.Type()));
         }
         if (HasTag("CG")) {
@@ -214,7 +214,7 @@ BamRecordImpl& BamRecordImpl::CigarData(const Data::Cigar& cigar)
 
 BamRecordImpl& BamRecordImpl::CigarData(const std::string& cigarString)
 {
-    return CigarData(Cigar::FromStdString(cigarString));
+    return CigarData(Data::Cigar::FromStdString(cigarString));
 }
 
 bool BamRecordImpl::EditTag(const std::string& tagName, const Tag& newValue)

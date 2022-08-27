@@ -6,7 +6,8 @@
 #include <pbbam/BamFile.h>
 #include <pbbam/BamHeader.h>
 #include <pbbam/DataSetTypes.h>
-#include <pbbam/GenomicInterval.h>
+
+#include <pbcopper/data/GenomicInterval.h>
 
 #include <chrono>
 #include <iosfwd>
@@ -444,7 +445,7 @@ public:
     /// \throws std::runtime_error if DataSet contains invalid or non-sensical
     ///         filters, such as rname appearing twice, etc.
     ///
-    std::vector<GenomicInterval> GenomicIntervals() const;
+    std::vector<Data::GenomicInterval> GenomicIntervals() const;
 
     /// \}
 

@@ -25,7 +25,7 @@ TEST(BAM_GenomicIntervalQuery, can_be_reused_over_multiple_intervals)
     const BamFile bamFile{GenomicIntervalQueryTests::inputBamFn};
 
     // setup with normal interval
-    GenomicInterval interval{rname, 5000, 6000};
+    Data::GenomicInterval interval{rname, 5000, 6000};
     GenomicIntervalQuery query{interval, bamFile};
     EXPECT_EQ(2, std::distance(query.begin(), query.end()));
 
@@ -61,14 +61,14 @@ TEST(BAM_GenomicIntervalQuery, can_be_reused_over_multiple_intervals)
 TEST(BAM_GenomicIntervalQuery, loads_expected_read_count)
 {
     const BamFile bamFile{GenomicIntervalQueryTests::inputBamFn};
-    const GenomicInterval interval{"lambda_NEB3011", 8000, 10000};
+    const Data::GenomicInterval interval{"lambda_NEB3011", 8000, 10000};
     GenomicIntervalQuery query{interval, bamFile};
     EXPECT_EQ(2, std::distance(query.begin(), query.end()));
 }
 
 TEST(BAM_GenomicIntervalQuery, throws_on_missing_bai)
 {
-    const GenomicInterval interval{"lambda_NEB3011", 0, 100};
+    const Data::GenomicInterval interval{"lambda_NEB3011", 0, 100};
     const std::string phi29Bam = PbbamTestsConfig::Data_Dir + "/phi29.bam";
     const std::string hasBaiBam = PbbamTestsConfig::Data_Dir + "/aligned.bam";
 
@@ -103,7 +103,7 @@ TEST(BAM_GenomicIntervalQuery, is_initialized_with_empty_interval)
     EXPECT_EQ(0, std::distance(query.begin(), query.end()));
 
     // pass in actual interval
-    GenomicInterval interval{"lambda_NEB3011", 9300, 9400};
+    Data::GenomicInterval interval{"lambda_NEB3011", 9300, 9400};
     query.Interval(interval);
     EXPECT_EQ(2, std::distance(query.begin(), query.end()));
 }
@@ -117,13 +117,13 @@ TEST(BAM_GenomicIntervalQuery, can_reuse_bai_cache)
     const DataSet ds{filenames};
     const auto indexCache = MakeBaiIndexCache(ds);
 
-    auto checkInterval = [](GenomicIntervalQuery& query, const GenomicInterval& interval,
+    auto checkInterval = [](GenomicIntervalQuery& query, const Data::GenomicInterval& interval,
                             const size_t expectedCount) {
         // update query
         query.Interval(interval);
 
         // checkout results
-        std::vector<Position> startPositions;
+        std::vector<Data::Position> startPositions;
         for (const BamRecord& r : query) {
             EXPECT_EQ(interval.Name(), r.ReferenceName());
             EXPECT_TRUE(r.ReferenceStart() < interval.Stop());
@@ -137,24 +137,24 @@ TEST(BAM_GenomicIntervalQuery, can_reuse_bai_cache)
     // reuse cache between interval updates
     GenomicIntervalQuery query{ds, indexCache};
     {
-        const GenomicInterval interval{refName, 5000, 8000};
+        const Data::GenomicInterval interval{refName, 5000, 8000};
         const size_t expectedCount = 7;
         checkInterval(query, interval, expectedCount);
     }
     {
-        const GenomicInterval interval{refName, 0, 100};
+        const Data::GenomicInterval interval{refName, 0, 100};
         const size_t expectedCount = 1;
         checkInterval(query, interval, expectedCount);
     }
     {
-        const GenomicInterval interval{refName, 9300, 9400};
+        const Data::GenomicInterval interval{refName, 9300, 9400};
         const size_t expectedCount = 2;
         checkInterval(query, interval, expectedCount);
     }
 
     // reuse cache in independent query
     GenomicIntervalQuery query2{ds, indexCache};
-    const GenomicInterval interval{refName, 5000, 8000};
+    const Data::GenomicInterval interval{refName, 5000, 8000};
     const size_t expectedCount = 7;
     checkInterval(query2, interval, expectedCount);
 }

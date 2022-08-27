@@ -99,48 +99,48 @@ TEST(BAM_IndexedFastaReader, prints_clipped_and_gapped_subsequences_from_lambda)
     auto it = bamQuery.begin();
     auto record = *it++;
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-              r.ReferenceSubsequence(record, Orientation::NATIVE, true));
+              r.ReferenceSubsequence(record, Data::Orientation::NATIVE, true));
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-              r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
+              r.ReferenceSubsequence(record, Data::Orientation::NATIVE, true, true));
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-              r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
+              r.ReferenceSubsequence(record, Data::Orientation::GENOMIC, true));
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-              r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
+              r.ReferenceSubsequence(record, Data::Orientation::GENOMIC, true, true));
     record = *it++;
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-              r.ReferenceSubsequence(record, Orientation::NATIVE, true));
+              r.ReferenceSubsequence(record, Data::Orientation::NATIVE, true));
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-              r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
+              r.ReferenceSubsequence(record, Data::Orientation::NATIVE, true, true));
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-              r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
+              r.ReferenceSubsequence(record, Data::Orientation::GENOMIC, true));
     EXPECT_EQ("GGCTGCAGTGTACAGCGGTCAGGAGGCC-ATTGATGCCGGACTGGCTGAT",
-              r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
+              r.ReferenceSubsequence(record, Data::Orientation::GENOMIC, true, true));
     record = *it++;
     EXPECT_EQ(
         "----------------------------------------------------"
         "AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
-        r.ReferenceSubsequence(record, Orientation::NATIVE, true));
+        r.ReferenceSubsequence(record, Data::Orientation::NATIVE, true));
     EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
-              r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
+              r.ReferenceSubsequence(record, Data::Orientation::NATIVE, true, true));
     EXPECT_EQ(
         "----------------------------------------------------"
         "AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
-        r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
+        r.ReferenceSubsequence(record, Data::Orientation::GENOMIC, true));
     EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
-              r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
+              r.ReferenceSubsequence(record, Data::Orientation::GENOMIC, true, true));
     record = *it++;
     EXPECT_EQ(
         "AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA-----------------------------"
         "-----------------------",
-        r.ReferenceSubsequence(record, Orientation::GENOMIC, true));
+        r.ReferenceSubsequence(record, Data::Orientation::GENOMIC, true));
     EXPECT_EQ(
         "----------------------------------------------------TTGCCGCTGTT-"
         "ACCGTGCTGCGATCTTCTGCCATCGACGGACGTCCCACATTGGTGACTT",
-        r.ReferenceSubsequence(record, Orientation::NATIVE, true));
+        r.ReferenceSubsequence(record, Data::Orientation::NATIVE, true));
     EXPECT_EQ("AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGATCGCAGCACGGT-AACAGCGGCAA",
-              r.ReferenceSubsequence(record, Orientation::GENOMIC, true, true));
+              r.ReferenceSubsequence(record, Data::Orientation::GENOMIC, true, true));
     EXPECT_EQ("TTGCCGCTGTT-ACCGTGCTGCGATCTTCTGCCATCGACGGACGTCCCACATTGGTGACTT",
-              r.ReferenceSubsequence(record, Orientation::NATIVE, true, true));
+              r.ReferenceSubsequence(record, Data::Orientation::NATIVE, true, true));
 }
 
 // Come back

@@ -5,8 +5,9 @@
 #include <pbbam/BamRecord.h>
 #include <pbbam/FastqSequence.h>
 #include <pbbam/FormatUtils.h>
-#include <pbbam/QualityValues.h>
 #include "ErrnoReason.h"
+
+#include <pbcopper/data/QualityValues.h>
 
 #include <sstream>
 #include <stdexcept>

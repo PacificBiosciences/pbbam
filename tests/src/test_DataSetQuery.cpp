@@ -165,7 +165,7 @@ TEST(BAM_DataSetQuery, genomic_interval_query_can_use_dataset_input)
         const DataSet dataset{DataSetQueryTests::alignedBamFn};  // from BAM filename
 
         // count records
-        GenomicInterval interval{rname, 5000, 6000};
+        Data::GenomicInterval interval{rname, 5000, 6000};
         GenomicIntervalQuery query{interval, dataset};
         EXPECT_EQ(2, std::distance(query.begin(), query.end()));
 
@@ -203,7 +203,7 @@ TEST(BAM_DataSetQuery, genomic_interval_query_can_use_dataset_input)
         int count = 0;
         int prevId = 0;
         int prevPos = 0;
-        GenomicInterval interval{rname, 5000, 6000};
+        Data::GenomicInterval interval{rname, 5000, 6000};
         GenomicIntervalQuery query{interval, dataset};
         for (const BamRecord& record : query) {
 
@@ -253,7 +253,7 @@ TEST(BAM_DataSetQuery, genomic_interval_query_can_use_dataset_input)
         int count = 0;
         int prevId = 0;
         int prevPos = 0;
-        GenomicInterval interval{rname, 5000, 6000};
+        Data::GenomicInterval interval{rname, 5000, 6000};
         GenomicIntervalQuery query{interval, dataset};
         for (const BamRecord& record : query) {
 

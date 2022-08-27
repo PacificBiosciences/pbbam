@@ -35,8 +35,8 @@ TEST(BAM_BamRecord, aligned_qualities_handles_internal_deletion)
     EntireFileQuery entireFile{bamFile};
     for (const BamRecord& record : entireFile) {
 
-        const auto rawQualities = record.Qualities(Orientation::GENOMIC, false);
-        const auto alignedQualities = record.Qualities(Orientation::GENOMIC, true);
+        const auto rawQualities = record.Qualities(Data::Orientation::GENOMIC, false);
+        const auto alignedQualities = record.Qualities(Data::Orientation::GENOMIC, true);
 
         const std::string rawExpected{
             "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII"

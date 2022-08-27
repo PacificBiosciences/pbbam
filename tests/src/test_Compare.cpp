@@ -26,8 +26,8 @@ BamRecord makeRecordWithTag(const std::string& tagName,
 }
 
 static
-BamRecord makeRecord(const Position qStart,
-                     const Position qEnd,
+BamRecord makeRecord(const Data::Position qStart,
+                     const Data::Position qEnd,
                      const std::string& seq,
                      const std::string& quals,
                      const std::string& tagBases,
@@ -58,8 +58,8 @@ BamRecord makeRecord(const Position qStart,
 static
 std::vector<BamRecord> makeMappedRecords()
 {
-    const Position qStart = 500;
-    const Position qEnd   = 510;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 510;
     const std::string seq      = "AACCGTTAGC";
     const std::string quals    = "?]?]?]?]?*";
     const std::string tagBases = "AACCGTTAGC";
@@ -78,12 +78,12 @@ std::vector<BamRecord> makeMappedRecords()
     BamRecord s2_rev = CompareTests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     BamRecord s3_rev = CompareTests::makeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
 
-    s1.Map(0, 100, Strand::FORWARD, s1_cigar, mapQual);
-    s2.Map(0, 100, Strand::FORWARD, s2_cigar, mapQual);
-    s3.Map(0, 100, Strand::FORWARD, s3_cigar, mapQual);
-    s1_rev.Map(0, 100, Strand::REVERSE, s1_cigar, mapQual);
-    s2_rev.Map(0, 100, Strand::REVERSE, s2_cigar, mapQual);
-    s3_rev.Map(0, 100, Strand::REVERSE, s3_cigar, mapQual);
+    s1.Map(0, 100, Data::Strand::FORWARD, s1_cigar, mapQual);
+    s2.Map(0, 100, Data::Strand::FORWARD, s2_cigar, mapQual);
+    s3.Map(0, 100, Data::Strand::FORWARD, s3_cigar, mapQual);
+    s1_rev.Map(0, 100, Data::Strand::REVERSE, s1_cigar, mapQual);
+    s2_rev.Map(0, 100, Data::Strand::REVERSE, s2_cigar, mapQual);
+    s3_rev.Map(0, 100, Data::Strand::REVERSE, s3_cigar, mapQual);
 
     return std::vector<BamRecord> { s1, s2, s3, s1_rev, s2_rev, s3_rev };
 }
@@ -157,16 +157,16 @@ TEST(BAM_Compare, can_be_created_from_operator)
 TEST(BAM_Compare, can_compare_bam_record_aligned_end)
 {
     BamRecord r1;
-    r1.Map(0, 290, Strand::FORWARD, Cigar{"10="}, 255);
+    r1.Map(0, 290, Data::Strand::FORWARD, Data::Cigar{"10="}, 255);
 
     BamRecord r2;
-    r2.Map(0, 190, Strand::FORWARD, Cigar{"10="}, 255);
+    r2.Map(0, 190, Data::Strand::FORWARD, Data::Cigar{"10="}, 255);
 
     BamRecord r3;
-    r3.Map(0, 290, Strand::FORWARD, Cigar{"10="}, 255);
+    r3.Map(0, 290, Data::Strand::FORWARD, Data::Cigar{"10="}, 255);
 
     BamRecord r4;
-    r4.Map(0, 90, Strand::FORWARD, Cigar{"10="}, 255);
+    r4.Map(0, 90, Data::Strand::FORWARD, Data::Cigar{"10="}, 255);
 
     auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::AlignedEnd());
@@ -180,16 +180,16 @@ TEST(BAM_Compare, can_compare_bam_record_aligned_end)
 TEST(BAM_Compare, can_compare_bam_record_aligned_start)
 {
     BamRecord r1;
-    r1.Map(0, 300, Strand::FORWARD, Cigar{"10="}, 255);
+    r1.Map(0, 300, Data::Strand::FORWARD, Data::Cigar{"10="}, 255);
 
     BamRecord r2;
-    r2.Map(0, 200, Strand::FORWARD, Cigar{"10="}, 255);
+    r2.Map(0, 200, Data::Strand::FORWARD, Data::Cigar{"10="}, 255);
 
     BamRecord r3;
-    r3.Map(0, 400, Strand::FORWARD, Cigar{"10="}, 255);
+    r3.Map(0, 400, Data::Strand::FORWARD, Data::Cigar{"10="}, 255);
 
     BamRecord r4;
-    r4.Map(0, 100, Strand::FORWARD, Cigar{"10="}, 255);
+    r4.Map(0, 100, Data::Strand::FORWARD, Data::Cigar{"10="}, 255);
 
     auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::AlignedStart());
@@ -210,10 +210,10 @@ TEST(BAM_Compare, can_compare_bam_record_aligned_strand)
     auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::AlignedStrand());
 
-    EXPECT_EQ(Strand::FORWARD, records.at(0).AlignedStrand());
-    EXPECT_EQ(Strand::FORWARD, records.at(1).AlignedStrand());
-    EXPECT_EQ(Strand::REVERSE, records.at(2).AlignedStrand());
-    EXPECT_EQ(Strand::REVERSE, records.at(3).AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, records.at(0).AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, records.at(1).AlignedStrand());
+    EXPECT_EQ(Data::Strand::REVERSE, records.at(2).AlignedStrand());
+    EXPECT_EQ(Data::Strand::REVERSE, records.at(3).AlignedStrand());
 }
 
 TEST(BAM_Compare, can_compare_bam_record_barcode_forward)
@@ -317,10 +317,10 @@ TEST(BAM_Compare, can_compare_bam_record_full_name)
 
 TEST(BAM_Compare, can_compare_bam_record_local_context_flag)
 {
-    BamRecord r1; r1.LocalContextFlags(LocalContextFlags::BARCODE_AFTER);
-    BamRecord r2; r2.LocalContextFlags(LocalContextFlags::ADAPTER_AFTER);
-    BamRecord r3; r3.LocalContextFlags(LocalContextFlags::REVERSE_PASS);
-    BamRecord r4; r4.LocalContextFlags(LocalContextFlags::NO_LOCAL_CONTEXT);
+    BamRecord r1; r1.LocalContextFlags(Data::LocalContextFlags::BARCODE_AFTER);
+    BamRecord r2; r2.LocalContextFlags(Data::LocalContextFlags::ADAPTER_AFTER);
+    BamRecord r3; r3.LocalContextFlags(Data::LocalContextFlags::REVERSE_PASS);
+    BamRecord r4; r4.LocalContextFlags(Data::LocalContextFlags::NO_LOCAL_CONTEXT);
 
     auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::LocalContextFlag());
@@ -488,10 +488,10 @@ TEST(BAM_Compare, can_compare_bam_record_num_mismatches)
 
 TEST(BAM_Compare, can_compare_bam_record_query_end)
 {
-    Position q1 = 30;
-    Position q2 = 20;
-    Position q3 = 40;
-    Position q4 = 10;
+    Data::Position q1 = 30;
+    Data::Position q2 = 20;
+    Data::Position q3 = 40;
+    Data::Position q4 = 10;
 
     auto records = std::vector<BamRecord>
     {
@@ -510,10 +510,10 @@ TEST(BAM_Compare, can_compare_bam_record_query_end)
 
 TEST(BAM_Compare, can_compare_bam_record_query_start)
 {
-    Position q1 = 30;
-    Position q2 = 20;
-    Position q3 = 40;
-    Position q4 = 10;
+    Data::Position q1 = 30;
+    Data::Position q2 = 20;
+    Data::Position q3 = 40;
+    Data::Position q4 = 10;
 
     auto records = std::vector<BamRecord>
     {
@@ -586,10 +586,10 @@ TEST(BAM_Compare, can_compare_bam_record_read_group_numeric_id)
 
 TEST(BAM_Compare, can_compare_bam_record_read_accuracy)
 {
-    Accuracy a1 = 30;
-    Accuracy a2 = 20;
-    Accuracy a3 = 40;
-    Accuracy a4 = 10;
+    Data::Accuracy a1 = 30;
+    Data::Accuracy a2 = 20;
+    Data::Accuracy a3 = 40;
+    Data::Accuracy a4 = 10;
 
     auto records = std::vector<BamRecord>
     {

@@ -18,9 +18,9 @@ TEST(BAM_BgzipFastqWriter, writes_bgzf_fastq_data_to_file)
     const std::string fn{PbbamTestsConfig::GeneratedData_Dir + "/bgzf_fastq_out.fq.gz"};
 
     const std::vector<FastqSequence> sequences{
-        FastqSequence{"seq1", "ACGT", QualityValues{"zzzz"}},
-        FastqSequence{"seq2", "GATTACA", QualityValues{"~~~~~~~"}},
-        FastqSequence{"seq3", "CCCC", QualityValues{"$$$$"}}};
+        FastqSequence{"seq1", "ACGT", Data::QualityValues{"zzzz"}},
+        FastqSequence{"seq2", "GATTACA", Data::QualityValues{"~~~~~~~"}},
+        FastqSequence{"seq3", "CCCC", Data::QualityValues{"$$$$"}}};
 
     {
         BgzipFastqWriter writer{fn};

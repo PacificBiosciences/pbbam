@@ -4,7 +4,8 @@
 #include <pbbam/Config.h>
 
 #include <pbbam/FastaSequence.h>
-#include <pbbam/QualityValues.h>
+
+#include <pbcopper/data/QualityValues.h>
 
 #include <string>
 

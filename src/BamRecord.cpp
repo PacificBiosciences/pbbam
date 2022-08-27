@@ -2470,8 +2470,8 @@ BamRecord& BamRecord::StartFrame(const std::vector<uint32_t>& startFrame)
     return *this;
 }
 
-QualityValues BamRecord::SubstitutionQV(Data::Orientation orientation, bool aligned,
-                                        bool exciseSoftClips) const
+Data::QualityValues BamRecord::SubstitutionQV(Data::Orientation orientation, bool aligned,
+                                              bool exciseSoftClips) const
 {
     return FetchQualities(BamRecordTag::SUBSTITUTION_QV, orientation, aligned, exciseSoftClips);
 }

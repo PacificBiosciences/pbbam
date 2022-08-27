@@ -21,8 +21,8 @@ using f_data = std::vector<uint16_t>;
 namespace BamRecordMappingTests {
 
 static
-BamRecord MakeRecord(const Position qStart,
-                     const Position qEnd,
+BamRecord MakeRecord(const Data::Position qStart,
+                     const Data::Position qEnd,
                      const std::string& seq,
                      const std::string& quals,
                      const std::string& tagBases,
@@ -54,8 +54,8 @@ BamRecord MakeRecord(const Position qStart,
 
 TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 510;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 510;
     const std::string seq      = "AACCGTTAGC";
     const std::string quals    = "?]?]?]?]?*";
     const std::string tagBases = "AACCGTTAGC";
@@ -80,17 +80,17 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
     BamRecord s2_rev = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     BamRecord s3_rev = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
 
-    s1.Map(0, 100, Strand::FORWARD, s1_cigar, mapQual);
-    s2.Map(0, 100, Strand::FORWARD, s2_cigar, mapQual);
-    s3.Map(0, 100, Strand::FORWARD, s3_cigar, mapQual);
-    s1_rev.Map(0, 100, Strand::REVERSE, s1_cigar, mapQual);
-    s2_rev.Map(0, 100, Strand::REVERSE, s2_cigar, mapQual);
-    s3_rev.Map(0, 100, Strand::REVERSE, s3_cigar, mapQual);
+    s1.Map(0, 100, Data::Strand::FORWARD, s1_cigar, mapQual);
+    s2.Map(0, 100, Data::Strand::FORWARD, s2_cigar, mapQual);
+    s3.Map(0, 100, Data::Strand::FORWARD, s3_cigar, mapQual);
+    s1_rev.Map(0, 100, Data::Strand::REVERSE, s1_cigar, mapQual);
+    s2_rev.Map(0, 100, Data::Strand::REVERSE, s2_cigar, mapQual);
+    s3_rev.Map(0, 100, Data::Strand::REVERSE, s3_cigar, mapQual);
 
     {   // s1 - FORWARD
         EXPECT_TRUE(s1.IsMapped());
         EXPECT_EQ(0, s1.ReferenceId());
-        EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s1.AlignedStrand());
         EXPECT_EQ(mapQual, s1.MapQuality());
 
         EXPECT_EQ(qStart, s1.QueryStart());
@@ -103,7 +103,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
         const BamRecordView view
         {
             s1,
-            Orientation::NATIVE,
+            Data::Orientation::NATIVE,
             false,
             false,
             PulseBehavior::ALL
@@ -122,7 +122,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
 
         EXPECT_TRUE(s1_rev.IsMapped());
         EXPECT_EQ(0, s1_rev.ReferenceId());
-        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s1_rev.AlignedStrand());
         EXPECT_EQ(mapQual, s1_rev.MapQuality());
 
         EXPECT_EQ(qStart, s1_rev.QueryStart());
@@ -136,7 +136,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
         const BamRecordView nativeView
         {
             s1_rev,
-            Orientation::NATIVE,
+            Data::Orientation::NATIVE,
             false,
             false,
             PulseBehavior::ALL
@@ -153,7 +153,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
         const BamRecordView genomicView
         {
             s1_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -171,7 +171,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
 
         EXPECT_TRUE(s2.IsMapped());
         EXPECT_EQ(0, s2.ReferenceId());
-        EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s2.AlignedStrand());
         EXPECT_EQ(mapQual, s2.MapQuality());
 
         EXPECT_EQ(qStart, s2.QueryStart());
@@ -184,7 +184,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
         const BamRecordView view
         {
             s2,
-            Orientation::NATIVE,
+            Data::Orientation::NATIVE,
             false,
             false,
             PulseBehavior::ALL
@@ -203,7 +203,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
 
         EXPECT_TRUE(s2_rev.IsMapped());
         EXPECT_EQ(0, s2_rev.ReferenceId());
-        EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s2_rev.AlignedStrand());
         EXPECT_EQ(mapQual, s2_rev.MapQuality());
 
         EXPECT_EQ(qStart, s2_rev.QueryStart());
@@ -217,7 +217,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
         const BamRecordView nativeView
         {
             s2_rev,
-            Orientation::NATIVE,
+            Data::Orientation::NATIVE,
             false,
             false,
             PulseBehavior::ALL
@@ -234,7 +234,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
         const BamRecordView genomicView
         {
             s2_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -252,7 +252,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
 
         EXPECT_TRUE(s3.IsMapped());
         EXPECT_EQ(0, s3.ReferenceId());
-        EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
         EXPECT_EQ(mapQual, s3.MapQuality());
 
         EXPECT_EQ(qStart, s3.QueryStart());
@@ -265,7 +265,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
         const BamRecordView view
         {
             s3,
-            Orientation::NATIVE,
+            Data::Orientation::NATIVE,
             false,
             false,
             PulseBehavior::ALL
@@ -284,7 +284,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
 
         EXPECT_TRUE(s3_rev.IsMapped());
         EXPECT_EQ(0, s3_rev.ReferenceId());
-        EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s3_rev.AlignedStrand());
         EXPECT_EQ(mapQual, s3_rev.MapQuality());
 
         EXPECT_EQ(qStart, s3_rev.QueryStart());
@@ -298,7 +298,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
         const BamRecordView nativeView
         {
             s3_rev,
-            Orientation::NATIVE,
+            Data::Orientation::NATIVE,
             false,
             false,
             PulseBehavior::ALL
@@ -315,7 +315,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
         const BamRecordView genomicView
         {
             s3_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -332,8 +332,8 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
 
 TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 515;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 515;
     const std::string seq      = "TTAACCGTTAGCAAA";
     const std::string quals    = "--?]?]?]?]?*+++";
     const std::string tagBases = "TTAACCGTTAGCAAA";
@@ -358,18 +358,18 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
     BamRecord s2_rev = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
     BamRecord s3_rev = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
 
-    s1.Map(0, 100, Strand::FORWARD, s1_cigar, mapQual);
-    s2.Map(0, 100, Strand::FORWARD, s2_cigar, mapQual);
-    s3.Map(0, 100, Strand::FORWARD, s3_cigar, mapQual);
-    s1_rev.Map(0, 100, Strand::REVERSE, s1_cigar, mapQual);
-    s2_rev.Map(0, 100, Strand::REVERSE, s2_cigar, mapQual);
-    s3_rev.Map(0, 100, Strand::REVERSE, s3_cigar, mapQual);
+    s1.Map(0, 100, Data::Strand::FORWARD, s1_cigar, mapQual);
+    s2.Map(0, 100, Data::Strand::FORWARD, s2_cigar, mapQual);
+    s3.Map(0, 100, Data::Strand::FORWARD, s3_cigar, mapQual);
+    s1_rev.Map(0, 100, Data::Strand::REVERSE, s1_cigar, mapQual);
+    s2_rev.Map(0, 100, Data::Strand::REVERSE, s2_cigar, mapQual);
+    s3_rev.Map(0, 100, Data::Strand::REVERSE, s3_cigar, mapQual);
 
     {   // s1 - FORWARD
 
         EXPECT_TRUE(s1.IsMapped());
         EXPECT_EQ(0, s1.ReferenceId());
-        EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s1.AlignedStrand());
         EXPECT_EQ(mapQual, s1.MapQuality());
 
         EXPECT_EQ(qStart, s1.QueryStart());      // 500
@@ -382,7 +382,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
         const BamRecordView view
         {
             s1,
-            Orientation::NATIVE,
+            Data::Orientation::NATIVE,
             false,
             false,
             PulseBehavior::ALL
@@ -401,7 +401,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
 
         EXPECT_TRUE(s1_rev.IsMapped());
         EXPECT_EQ(0, s1_rev.ReferenceId());
-        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s1_rev.AlignedStrand());
         EXPECT_EQ(mapQual, s1_rev.MapQuality());
 
         EXPECT_EQ(qStart, s1_rev.QueryStart());      // 500
@@ -415,7 +415,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
         const BamRecordView nativeView
         {
             s1_rev,
-            Orientation::NATIVE,
+            Data::Orientation::NATIVE,
             false,
             false,
             PulseBehavior::ALL
@@ -432,7 +432,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
         const BamRecordView genomicView
         {
             s1_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -450,7 +450,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
 
         EXPECT_TRUE(s2.IsMapped());
         EXPECT_EQ(0, s2.ReferenceId());
-        EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s2.AlignedStrand());
         EXPECT_EQ(mapQual, s2.MapQuality());
 
         EXPECT_EQ(qStart, s2.QueryStart());      // 500
@@ -463,7 +463,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
         const BamRecordView view
         {
             s2,
-            Orientation::NATIVE,
+            Data::Orientation::NATIVE,
             false,
             false,
             PulseBehavior::ALL
@@ -482,7 +482,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
 
         EXPECT_TRUE(s2_rev.IsMapped());
         EXPECT_EQ(0, s2_rev.ReferenceId());
-        EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s2_rev.AlignedStrand());
         EXPECT_EQ(mapQual, s2_rev.MapQuality());
 
         EXPECT_EQ(qStart, s2_rev.QueryStart());      // 500
@@ -496,7 +496,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
         const BamRecordView nativeView
         {
             s2_rev,
-            Orientation::NATIVE,
+            Data::Orientation::NATIVE,
             false,
             false,
             PulseBehavior::ALL
@@ -513,7 +513,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
         const BamRecordView genomicView
         {
             s2_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -531,7 +531,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
 
         EXPECT_TRUE(s3.IsMapped());
         EXPECT_EQ(0, s3.ReferenceId());
-        EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
         EXPECT_EQ(mapQual, s3.MapQuality());
 
         EXPECT_EQ(qStart, s3.QueryStart());      // 500
@@ -544,7 +544,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
         const BamRecordView view
         {
             s2,
-            Orientation::NATIVE,
+            Data::Orientation::NATIVE,
             false,
             false,
             PulseBehavior::ALL
@@ -563,7 +563,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
 
         EXPECT_TRUE(s3_rev.IsMapped());
         EXPECT_EQ(0, s3_rev.ReferenceId());
-        EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s3_rev.AlignedStrand());
         EXPECT_EQ(mapQual, s3_rev.MapQuality());
 
         EXPECT_EQ(qStart, s3_rev.QueryStart());      // 500
@@ -577,7 +577,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
         const BamRecordView nativeView
         {
             s3_rev,
-            Orientation::NATIVE,
+            Data::Orientation::NATIVE,
             false,
             false,
             PulseBehavior::ALL
@@ -594,7 +594,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
         const BamRecordView genomicView
         {
             s3_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -611,8 +611,8 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
 
 TEST(BAM_BamRecordMapping, can_created_mapped_copy_of_record)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 510;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 510;
     const std::string seq      = "AACCGTTAGC";
     const std::string quals    = "?]?]?]?]?*";
     const std::string tagBases = "AACCGTTAGC";
@@ -622,11 +622,11 @@ TEST(BAM_BamRecordMapping, can_created_mapped_copy_of_record)
     const std::string cigar    = "4=1D2I2D4=";
 
     const BamRecord orig = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    const BamRecord mapped = orig.Mapped(0, 100, Strand::FORWARD, cigar, mapQual);
+    const BamRecord mapped = orig.Mapped(0, 100, Data::Strand::FORWARD, cigar, mapQual);
 
     EXPECT_TRUE(mapped.IsMapped());
     EXPECT_EQ(0, mapped.ReferenceId());
-    EXPECT_EQ(Strand::FORWARD, mapped.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, mapped.AlignedStrand());
     EXPECT_EQ(mapQual, mapped.MapQuality());
 
     EXPECT_EQ(500, mapped.QueryStart());      // 500
@@ -639,7 +639,7 @@ TEST(BAM_BamRecordMapping, can_created_mapped_copy_of_record)
     const BamRecordView view
     {
         mapped,
-        Orientation::NATIVE,
+        Data::Orientation::NATIVE,
         false,
         false,
         PulseBehavior::ALL
@@ -656,8 +656,8 @@ TEST(BAM_BamRecordMapping, can_created_mapped_copy_of_record)
 
 TEST(BAM_BamRecordMapping, can_created_mapped_copy_of_record_static)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 510;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 510;
     const std::string seq      = "AACCGTTAGC";
     const std::string quals    = "?]?]?]?]?*";
     const std::string tagBases = "AACCGTTAGC";
@@ -667,11 +667,11 @@ TEST(BAM_BamRecordMapping, can_created_mapped_copy_of_record_static)
     const std::string cigar    = "4=1D2I2D4=";
 
     const BamRecord orig = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
-    const BamRecord mapped = BamRecord::Mapped(orig, 0, 100, Strand::FORWARD, cigar, mapQual);
+    const BamRecord mapped = BamRecord::Mapped(orig, 0, 100, Data::Strand::FORWARD, cigar, mapQual);
 
     EXPECT_TRUE(mapped.IsMapped());
     EXPECT_EQ(0, mapped.ReferenceId());
-    EXPECT_EQ(Strand::FORWARD, mapped.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, mapped.AlignedStrand());
     EXPECT_EQ(mapQual, mapped.MapQuality());
 
     EXPECT_EQ(500, mapped.QueryStart());      // 500
@@ -684,7 +684,7 @@ TEST(BAM_BamRecordMapping, can_created_mapped_copy_of_record_static)
     const BamRecordView view
     {
         mapped,
-        Orientation::NATIVE,
+        Data::Orientation::NATIVE,
         false,
         false,
         PulseBehavior::ALL

@@ -200,13 +200,13 @@ void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData, const DataSet& datas
         } else {
             Utility::MoveAppend(std::vector<int32_t>(currentPbiCount, -1),
                                 aggregateMappedData.tId_);
-            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, UnmappedPosition),
+            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UnmappedPosition),
                                 aggregateMappedData.tStart_);
-            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, UnmappedPosition),
+            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UnmappedPosition),
                                 aggregateMappedData.tEnd_);
-            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, UnmappedPosition),
+            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UnmappedPosition),
                                 aggregateMappedData.aStart_);
-            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, UnmappedPosition),
+            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UnmappedPosition),
                                 aggregateMappedData.aEnd_);
             Utility::MoveAppend(std::vector<uint8_t>(currentPbiCount, 0),
                                 aggregateMappedData.revStrand_);

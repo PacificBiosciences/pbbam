@@ -50,7 +50,7 @@ TEST(BAM_AlignmentPrinter, can_pretty_print_alignment_as_string)
         "\n"};
 
     auto record = *it++;
-    EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
+    EXPECT_EQ(expected, pretty.Print(record, Data::Orientation::GENOMIC));
 
     expected =
         "Read        : singleInsertion/200/0_49\n"
@@ -71,7 +71,7 @@ TEST(BAM_AlignmentPrinter, can_pretty_print_alignment_as_string)
         "\n";
 
     record = *it++;
-    EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
+    EXPECT_EQ(expected, pretty.Print(record, Data::Orientation::GENOMIC));
 
     expected =
         "Read        : singleInsertion/100/0_111\n"
@@ -93,7 +93,7 @@ TEST(BAM_AlignmentPrinter, can_pretty_print_alignment_as_string)
         "\n";
 
     record = *it++;
-    EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
+    EXPECT_EQ(expected, pretty.Print(record, Data::Orientation::GENOMIC));
 
     expected =
         "Read        : singleInsertion/100/0_111\n"
@@ -115,5 +115,5 @@ TEST(BAM_AlignmentPrinter, can_pretty_print_alignment_as_string)
         "\n";
 
     record = *it++;
-    EXPECT_EQ(expected, pretty.Print(record, Orientation::GENOMIC));
+    EXPECT_EQ(expected, pretty.Print(record, Data::Orientation::GENOMIC));
 }

@@ -282,7 +282,7 @@ DataSet DataSet::FromXml(const std::string& xml)
     return result;
 }
 
-std::vector<GenomicInterval> DataSet::GenomicIntervals() const
+std::vector<Data::GenomicInterval> DataSet::GenomicIntervals() const
 {
     // need to gather the contig lengths
     std::map<std::string, int32_t> contigLengths;
@@ -372,7 +372,7 @@ std::vector<GenomicInterval> DataSet::GenomicIntervals() const
     }
 
     // extract all GenomicIntervals
-    std::vector<GenomicInterval> result;
+    std::vector<Data::GenomicInterval> result;
     if (numFilters) {
         // have some filters, only return regions passing filters
         for (const auto& contigs : contigIntervals) {

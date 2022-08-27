@@ -5,11 +5,12 @@
 #include <pbbam/BamRecord.h>
 #include <pbbam/FaiIndex.h>
 #include <pbbam/FormatUtils.h>
-#include <pbbam/GenomicInterval.h>
 #include "IndexedFastqBgzfReader.h"
 #include "IndexedFastqReaderImpl.h"
 #include "IndexedFastqTextReader.h"
 #include "SequenceUtils.h"
+
+#include <pbcopper/data/GenomicInterval.h>
 
 #include <sstream>
 #include <stdexcept>
@@ -191,7 +192,7 @@ std::pair<std::string, Data::QualityValues> IndexedFastqReader::Subsequence(cons
     return d_->Subsequence(id, start, end);
 }
 
-std::pair<std::string, QualityValues> IndexedFastqReader::Subsequence(
+std::pair<std::string, Data::QualityValues> IndexedFastqReader::Subsequence(
     const Data::GenomicInterval& interval)
 {
     return Subsequence(interval.Name(), interval.Start(), interval.Stop());

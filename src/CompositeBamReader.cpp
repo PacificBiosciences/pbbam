@@ -37,12 +37,12 @@ GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(const DataS
 {}
 
 GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
-    const GenomicInterval& interval, const std::vector<BamFile>& bamFiles)
+    const Data::GenomicInterval& interval, const std::vector<BamFile>& bamFiles)
     : GenomicIntervalCompositeBamReader{interval, bamFiles, MakeBaiIndexCache(bamFiles)}
 {}
 
 GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
-    const GenomicInterval& interval, const std::vector<BamFile>& bamFiles,
+    const Data::GenomicInterval& interval, const std::vector<BamFile>& bamFiles,
     const BaiIndexCache& cache)
     : GenomicIntervalCompositeBamReader{bamFiles, cache}
 {
@@ -50,19 +50,22 @@ GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
 }
 
 GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
-    const GenomicInterval& interval, const DataSet& dataset)
+    const Data::GenomicInterval& interval, const DataSet& dataset)
     : GenomicIntervalCompositeBamReader{interval, dataset.BamFiles()}
 {}
 
 GenomicIntervalCompositeBamReader::GenomicIntervalCompositeBamReader(
-    const GenomicInterval& interval, const DataSet& dataset, const BaiIndexCache& cache)
+    const Data::GenomicInterval& interval, const DataSet& dataset, const BaiIndexCache& cache)
     : GenomicIntervalCompositeBamReader{interval, dataset.BamFiles(), cache}
 {}
 
-const GenomicInterval& GenomicIntervalCompositeBamReader::Interval() const { return interval_; }
+const Data::GenomicInterval& GenomicIntervalCompositeBamReader::Interval() const
+{
+    return interval_;
+}
 
 GenomicIntervalCompositeBamReader& GenomicIntervalCompositeBamReader::Interval(
-    const GenomicInterval& interval)
+    const Data::GenomicInterval& interval)
 {
     // reset readers
     mergeItems_.clear();

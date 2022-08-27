@@ -60,7 +60,7 @@ TEST(BAM_IndexedFastqReader, subsequence_from_text_fastq)
     IndexedFastqReader r{FastxTests::simpleFastqFn};
     {
         const std::string expectedSeq{"GCATGCATGC"};
-        const QualityValues expectedQuals{"~}|{zyxwvu"};
+        const Data::QualityValues expectedQuals{"~}|{zyxwvu"};
 
         const auto subsequence = r.Subsequence("seq2", 0, 10);
 
@@ -69,7 +69,7 @@ TEST(BAM_IndexedFastqReader, subsequence_from_text_fastq)
     }
     {
         const std::string expectedSeq{"ATGCATGCAT"};
-        const QualityValues expectedQuals{R"(`_^]\[ZYXW)"};
+        const Data::QualityValues expectedQuals{R"(`_^]\[ZYXW)"};
 
         const auto subsequence = r.Subsequence("seq6", 30, 40);
 
@@ -83,7 +83,7 @@ TEST(BAM_IndexedFastqReader, subsequence_from_bgzf_fastq)
     IndexedFastqReader r{FastxTests::simpleFastqBgzfFn};
     {
         const std::string expectedSeq{"GCATGCATGC"};
-        const QualityValues expectedQuals{"~}|{zyxwvu"};
+        const Data::QualityValues expectedQuals{"~}|{zyxwvu"};
 
         const auto subsequence = r.Subsequence("seq2", 0, 10);
 
@@ -92,7 +92,7 @@ TEST(BAM_IndexedFastqReader, subsequence_from_bgzf_fastq)
     }
     {
         const std::string expectedSeq{"ATGCATGCAT"};
-        const QualityValues expectedQuals{R"(`_^]\[ZYXW)"};
+        const Data::QualityValues expectedQuals{R"(`_^]\[ZYXW)"};
 
         const auto subsequence = r.Subsequence("seq6", 30, 40);
 

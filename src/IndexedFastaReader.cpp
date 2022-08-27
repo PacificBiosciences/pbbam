@@ -4,12 +4,12 @@
 
 #include <pbbam/BamRecord.h>
 #include <pbbam/Deleters.h>
-#include <pbbam/GenomicInterval.h>
-#include <pbbam/Orientation.h>
 #include <pbbam/StringUtilities.h>
 #include "ErrnoReason.h"
 #include "SequenceUtils.h"
 
+#include <pbcopper/data/GenomicInterval.h>
+#include <pbcopper/data/Orientation.h>
 #include <pbcopper/utility/Deleters.h>
 
 #include <htslib/faidx.h>

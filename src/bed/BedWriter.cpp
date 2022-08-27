@@ -2,8 +2,9 @@
 
 #include <pbbam/bed/BedWriter.h>
 
-#include <pbbam/GenomicInterval.h>
 #include <pbbam/TextFileWriter.h>
+
+#include <pbcopper/data/GenomicInterval.h>
 
 #include <sstream>
 #include <type_traits>

@@ -5,12 +5,12 @@
 
 #include <pbbam/BamRecord.h>
 #include <pbbam/FastqReader.h>
-#include <pbbam/Orientation.h>
-#include <pbbam/Position.h>
-#include <pbbam/QualityValues.h>
 #include <pbbam/internal/QueryBase.h>
 
 #include <pbcopper/data/GenomicInterval.h>
+#include <pbcopper/data/Orientation.h>
+#include <pbcopper/data/Position.h>
+#include <pbcopper/data/QualityValues.h>
 
 #include <memory>
 #include <stdexcept>

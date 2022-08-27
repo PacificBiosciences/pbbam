@@ -36,8 +36,8 @@ ReadGroupInfo MakeReadGroup(const Data::FrameCodec codec,
 }
 
 static
-BamRecord MakeRecord(const Position qStart,
-                     const Position qEnd,
+BamRecord MakeRecord(const Data::Position qStart,
+                     const Data::Position qEnd,
                      const std::string& seq,
                      const std::string& quals,
                      const std::string& tagBases,
@@ -126,8 +126,8 @@ BamRecord MakeCCSRecord(const std::string& seq,
 
 TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
 {
-    const Position qStart  = 500;
-    const Position qEnd    = 510;
+    const Data::Position qStart  = 500;
+    const Data::Position qEnd    = 510;
     const std::string seq       = "AACCGTTAGC";
     const std::string quals     = "?]?]?]?]?*";
     const std::string tagBases  = "AACCGTTAGC";
@@ -140,11 +140,11 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
     const f_data pulseFrames = { 0,0,10,0,10,0,0,20,20,30,0,0,0,0,40,40,10,0,0,0,30,20,0 };
 
     const int32_t  tId     = 0;
-    const Position tPos    = 100;
+    const Data::Position tPos    = 100;
     const uint8_t  mapQual = 80;
 
-    const Position clipStart = 502;
-    const Position clipEnd   = 509;
+    const Data::Position clipStart = 502;
+    const Data::Position clipEnd   = 509;
 
     const std::string seq_clipped      = "CCGTTAG";
     const std::string quals_clipped    = "?]?]?]?";
@@ -195,15 +195,15 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
         EXPECT_FALSE(s0.IsMapped());
         EXPECT_EQ(clipStart, s0.QueryStart());
         EXPECT_EQ(clipEnd,   s0.QueryEnd());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.AlignedStart());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.AlignedEnd());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.ReferenceStart());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.ReferenceEnd());
+        EXPECT_EQ(Data::UnmappedPosition, s0.AlignedStart());
+        EXPECT_EQ(Data::UnmappedPosition, s0.AlignedEnd());
+        EXPECT_EQ(Data::UnmappedPosition, s0.ReferenceStart());
+        EXPECT_EQ(Data::UnmappedPosition, s0.ReferenceEnd());
 
         const BamRecordView view
         {
             s0,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -221,11 +221,11 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
     {
         SCOPED_TRACE("s1 - FORWARD");
 
-        BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
+        BamRecord s1 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s1_cigar, mapQual);
         s1.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s1.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s1.AlignedStrand());
         EXPECT_EQ(clipStart, s1.QueryStart());
         EXPECT_EQ(clipEnd,   s1.QueryEnd());
         EXPECT_EQ(clipStart, s1.AlignedStart());   // queryStart (no soft clips)
@@ -238,7 +238,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
         const BamRecordView view
         {
             s1,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -256,10 +256,10 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
     {
         SCOPED_TRACE("s1 - REVERSE");
 
-        BamRecord s1_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s1_cigar, mapQual);
+        BamRecord s1_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s1_cigar, mapQual);
 
         EXPECT_TRUE(s1_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s1_rev.AlignedStrand());
         EXPECT_EQ(500,  s1_rev.QueryStart());
         EXPECT_EQ(510,  s1_rev.QueryEnd());
         EXPECT_EQ(500,  s1_rev.AlignedStart());    // queryStart (no soft clips)
@@ -270,7 +270,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
 
         s1_rev.Clip(ClipType::CLIP_TO_QUERY, 502, 509);
         EXPECT_TRUE(s1_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s1_rev.AlignedStrand());
         EXPECT_EQ(502, s1_rev.QueryStart());
         EXPECT_EQ(509, s1_rev.QueryEnd());
         EXPECT_EQ(502, s1_rev.AlignedStart());    // queryStart (no soft clips)
@@ -282,7 +282,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
         const BamRecordView view
         {
             s1_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -299,11 +299,11 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
     {
         SCOPED_TRACE("s2 - FORWARD");
 
-        BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
+        BamRecord s2 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s2_cigar, mapQual);
         s2.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s2.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s2.AlignedStrand());
         EXPECT_EQ(clipStart, s2.QueryStart());
         EXPECT_EQ(clipEnd,   s2.QueryEnd());
         EXPECT_EQ(clipStart, s2.AlignedStart());   // queryStart (no soft clips)
@@ -316,7 +316,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
         const BamRecordView view
         {
             s2,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -333,11 +333,11 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
     {
         SCOPED_TRACE("s2 - REVERSE");
 
-        BamRecord s2_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s2_cigar, mapQual);
+        BamRecord s2_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s2_cigar, mapQual);
         s2_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s2_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s2_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s2_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s2_rev.QueryEnd());
         EXPECT_EQ(clipStart, s2_rev.AlignedStart());    // queryStart (no soft clips)
@@ -350,7 +350,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
         const BamRecordView view
         {
             s2_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -368,11 +368,11 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
     {
         SCOPED_TRACE("s3 - FORWARD");
 
-        BamRecord s3 = prototype.Mapped(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+        BamRecord s3 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
         s3.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s3.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
         EXPECT_EQ(clipStart, s3.QueryStart());
         EXPECT_EQ(clipEnd,   s3.QueryEnd());
         EXPECT_EQ(clipStart, s3.AlignedStart());     // queryStart (no soft clips)
@@ -385,7 +385,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
         const BamRecordView view
         {
             s3,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -403,11 +403,11 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
     {
         SCOPED_TRACE("s3 - REVERSE");
 
-        BamRecord s3_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s3_cigar, mapQual);
+        BamRecord s3_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s3_cigar, mapQual);
         s3_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s3_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s3_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s3_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s3_rev.QueryEnd());
         EXPECT_EQ(clipStart, s3_rev.AlignedStart());     // queryStart (no soft clips)
@@ -420,7 +420,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
         const BamRecordView view
         {
             s3_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -439,8 +439,8 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_simple)
 
 TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 515;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 515;
     const std::string seq      = "TTAACCGTTAGCAAA";
     const std::string seq_rev  = "TTTGCTAACGGTTAA";
     const std::string quals    = "--?]?]?]?]?*+++";
@@ -451,11 +451,11 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
     const f_data frames_rev = { 10, 10, 10, 20, 30, 10, 40, 40, 30, 20, 20, 10, 10, 40, 40 };
 
     const int32_t  tId     = 0;
-    const Position tPos    = 100;
+    const Data::Position tPos    = 100;
     const uint8_t  mapQual = 80;
 
-    const Position clipStart = 502;
-    const Position clipEnd   = 509;
+    const Data::Position clipStart = 502;
+    const Data::Position clipEnd   = 509;
 
     const std::string s1_cigar = "2S10=3S";
     const std::string s1_cigar_clipped = "7=";
@@ -505,7 +505,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
     {
         SCOPED_TRACE("s1 - FORWARD");
 
-        BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
+        BamRecord s1 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s1_cigar, mapQual);
         EXPECT_TRUE(s1.IsMapped());
         EXPECT_EQ(100, s1.ReferenceStart());
         EXPECT_EQ(110, s1.ReferenceEnd()); // 10=
@@ -513,7 +513,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
         s1.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s1.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s1.AlignedStrand());
         EXPECT_EQ(clipStart, s1.QueryStart());
         EXPECT_EQ(clipEnd,   s1.QueryEnd());
         EXPECT_EQ(clipStart, s1.AlignedStart());    // queryStart (no soft clips left)
@@ -526,7 +526,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
         const BamRecordView view
         {
             s1,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -541,7 +541,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
     {
         SCOPED_TRACE("s1 - REVERSE");
 
-        BamRecord s1_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s1_cigar, mapQual);
+        BamRecord s1_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s1_cigar, mapQual);
         EXPECT_TRUE(s1_rev.IsMapped());
         EXPECT_EQ(100, s1_rev.ReferenceStart());
         EXPECT_EQ(110, s1_rev.ReferenceEnd()); // 10=
@@ -549,7 +549,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
         s1_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s1_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s1_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s1_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s1_rev.QueryEnd());
         EXPECT_EQ(503, s1_rev.AlignedStart());    // queryStart (no soft clips)
@@ -562,7 +562,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
         const BamRecordView view
         {
             s1_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -577,7 +577,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
     {
         SCOPED_TRACE("s2 - FORWARD");
 
-        BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
+        BamRecord s2 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s2_cigar, mapQual);
         EXPECT_TRUE(s2.IsMapped());
         EXPECT_EQ(100, s2.ReferenceStart());
         EXPECT_EQ(113, s2.ReferenceEnd());   // 5= + 3D + 5=
@@ -585,7 +585,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
         s2.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s2.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s2.AlignedStrand());
         EXPECT_EQ(clipStart, s2.QueryStart());
         EXPECT_EQ(clipEnd,   s2.QueryEnd());
         EXPECT_EQ(clipStart, s2.AlignedStart());    // queryStart (no soft clips left)
@@ -598,7 +598,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
         const BamRecordView view
         {
             s2,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -613,7 +613,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
     {
         SCOPED_TRACE("s2 - REVERSE");
 
-        BamRecord s2_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s2_cigar, mapQual);
+        BamRecord s2_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s2_cigar, mapQual);
         EXPECT_TRUE(s2_rev.IsMapped());
         EXPECT_EQ(100, s2_rev.ReferenceStart());
         EXPECT_EQ(113, s2_rev.ReferenceEnd());   // 5= + 3D + 5=
@@ -621,7 +621,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
         s2_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s2_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s2_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s2_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s2_rev.QueryEnd());
         EXPECT_EQ(503, s2_rev.AlignedStart());    // queryStart (no soft clips left)
@@ -634,7 +634,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
         const BamRecordView view
         {
             s2_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -650,7 +650,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
     {
         SCOPED_TRACE("s3 - FORWARD");
 
-        BamRecord s3 = prototype.Mapped(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+        BamRecord s3 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
         EXPECT_TRUE(s3.IsMapped());
         EXPECT_EQ(100, s3.ReferenceStart());
         EXPECT_EQ(111, s3.ReferenceEnd());   // 4= + 1D + 2D + 4=
@@ -658,7 +658,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
         s3.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s3.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
         EXPECT_EQ(clipStart, s3.QueryStart());
         EXPECT_EQ(clipEnd,   s3.QueryEnd());
         EXPECT_EQ(clipStart, s3.AlignedStart());    // queryStart (no soft clips left)
@@ -671,7 +671,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
         const BamRecordView view
         {
             s3,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -688,7 +688,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
     {
         SCOPED_TRACE("s3 - REVERSE");
 
-        BamRecord s3_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s3_cigar, mapQual);
+        BamRecord s3_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s3_cigar, mapQual);
         EXPECT_TRUE(s3_rev.IsMapped());
         EXPECT_EQ(100, s3_rev.ReferenceStart());
         EXPECT_EQ(111, s3_rev.ReferenceEnd());   // 4= + 1D + 2D + 4=
@@ -696,7 +696,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
         s3_rev.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
         EXPECT_TRUE(s3_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s3_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s3_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s3_rev.QueryEnd());
         EXPECT_EQ(503, s3_rev.AlignedStart());    // queryStart + 1S
@@ -709,7 +709,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
         const BamRecordView view
         {
             s3_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -727,8 +727,8 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_query_with_soft_clips)
 
 TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 510;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 510;
     const std::string seq      = "AACCGTTAGC";
     const std::string quals    = "?]?]?]?]?*";
     const std::string tagBases = "AACCGTTAGC";
@@ -737,11 +737,11 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
     const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
 
     const int32_t  tId     = 0;
-    const Position tPos    = 100;
+    const Data::Position tPos    = 100;
     const uint8_t  mapQual = 80;
 
-    const Position clipStart = 102;
-    const Position clipEnd   = 107;
+    const Data::Position clipStart = 102;
+    const Data::Position clipEnd   = 107;
 
     const std::string s1_cigar = "10=";
     const std::string s1_cigar_clipped = "5=";
@@ -785,12 +785,12 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
     const BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                                   seq, tagBases, tagQuals, frames);
     BamRecord s0 = prototype;
-    BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
-    BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
-    BamRecord s3 = prototype.Mapped(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
-    BamRecord s1_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s1_cigar, mapQual);
-    BamRecord s2_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s2_cigar, mapQual);
-    BamRecord s3_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s3_cigar, mapQual);
+    BamRecord s1 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s1_cigar, mapQual);
+    BamRecord s2 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s2_cigar, mapQual);
+    BamRecord s3 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
+    BamRecord s1_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s1_cigar, mapQual);
+    BamRecord s2_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s2_cigar, mapQual);
+    BamRecord s3_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s3_cigar, mapQual);
 
     s0.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd);
     s1.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd);
@@ -813,7 +813,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
         const BamRecordView protoView
         {
             prototype,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -822,7 +822,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
         const BamRecordView view
         {
             s0,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -840,7 +840,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
     {   // s1 - FORWARD
 
         EXPECT_TRUE(s1.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s1.AlignedStrand());
         EXPECT_EQ(502,   s1.QueryStart());
         EXPECT_EQ(507,   s1.QueryEnd());
         EXPECT_EQ(502,   s1.AlignedStart());       // queryStart (no soft clips)
@@ -853,7 +853,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
         const BamRecordView view
         {
             s1,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -871,7 +871,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
     {   // s1 - REVERSE
 
         EXPECT_TRUE(s1_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s1_rev.AlignedStrand());
         EXPECT_EQ(503, s1_rev.QueryStart());
         EXPECT_EQ(508, s1_rev.QueryEnd());
         EXPECT_EQ(503, s1_rev.AlignedStart());          // queryStart (no soft clips)
@@ -884,7 +884,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
         const BamRecordView view
         {
             s1_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -902,7 +902,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
     {   // s2 - FORWARD
 
         EXPECT_TRUE(s2.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s2.AlignedStrand());
         EXPECT_EQ(502, s2.QueryStart());
         EXPECT_EQ(505, s2.QueryEnd());
         EXPECT_EQ(502, s2.AlignedStart());     // queryStart (no soft clips)
@@ -915,7 +915,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
         const BamRecordView view
         {
             s2,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -933,7 +933,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
     {   // s2 - REVERSE
 
         EXPECT_TRUE(s2_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s2_rev.AlignedStrand());
         EXPECT_EQ(505, s2_rev.QueryStart());
         EXPECT_EQ(508, s2_rev.QueryEnd());
         EXPECT_EQ(505, s2_rev.AlignedStart());    // queryStart (no soft clips)
@@ -946,7 +946,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
         const BamRecordView view
         {
             s2_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -964,7 +964,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
     {   // s3 - FORWARD
 
         EXPECT_TRUE(s3.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
         EXPECT_EQ(502, s3.QueryStart());
         EXPECT_EQ(506, s3.QueryEnd());
         EXPECT_EQ(502, s3.AlignedStart());     // queryStart (no soft clips)
@@ -977,7 +977,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
         const BamRecordView view
         {
             s3,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -995,7 +995,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
     {   // s3 - REVERSE
 
         EXPECT_TRUE(s3_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s3_rev.AlignedStrand());
         EXPECT_EQ(504, s3_rev.QueryStart());
         EXPECT_EQ(508, s3_rev.QueryEnd());
         EXPECT_EQ(504, s3_rev.AlignedStart());     // queryStart (no soft clips)
@@ -1008,7 +1008,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
         const BamRecordView view
         {
             s3_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -1026,8 +1026,8 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_simple)
 
 TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 515;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 515;
     const std::string seq      = "TTAACCGTTAGCAAA";
     const std::string quals    = "--?]?]?]?]?*+++";
     const std::string tagBases = "TTAACCGTTAGCAAA";
@@ -1036,11 +1036,11 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
     const f_data frames   = { 40, 40, 10, 10, 20, 20, 30, 40, 40, 10, 30, 20, 10, 10, 10 };
 
     const int32_t  tId     = 0;
-    const Position tPos    = 100;
+    const Data::Position tPos    = 100;
     const uint8_t  mapQual = 80;
 
-    const Position clipStart = 102;
-    const Position clipEnd   = 107;
+    const Data::Position clipStart = 102;
+    const Data::Position clipEnd   = 107;
 
     const std::string seq_rev      = "TTTGCTAACGGTTAA";
     const std::string quals_rev    = "+++*?]?]?]?]?--";
@@ -1088,12 +1088,12 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
     const BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                                   seq, tagBases, tagQuals, frames);
     BamRecord s0 = prototype;
-    BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
-    BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
-    BamRecord s3 = prototype.Mapped(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
-    BamRecord s1_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s1_cigar, mapQual);
-    BamRecord s2_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s2_cigar, mapQual);
-    BamRecord s3_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s3_cigar, mapQual);
+    BamRecord s1 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s1_cigar, mapQual);
+    BamRecord s2 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s2_cigar, mapQual);
+    BamRecord s3 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
+    BamRecord s1_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s1_cigar, mapQual);
+    BamRecord s2_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s2_cigar, mapQual);
+    BamRecord s3_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s3_cigar, mapQual);
 
     // sanity checks before clipping
     EXPECT_FALSE(s0.IsMapped());
@@ -1167,7 +1167,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
         const BamRecordView protoView
         {
             prototype,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -1176,7 +1176,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
         const BamRecordView view
         {
             s0,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -1194,7 +1194,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
     {   // s1 - FORWARD
 
         EXPECT_TRUE(s1.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s1.AlignedStrand());
         EXPECT_EQ(504,   s1.QueryStart());         // new queryStart
         EXPECT_EQ(509,   s1.QueryEnd());           // queryStart + new seqLength
         EXPECT_EQ(504,   s1.AlignedStart());       // queryStart (no soft clips remaining)
@@ -1207,7 +1207,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
         const BamRecordView view
         {
             s1,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -1225,7 +1225,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
     {   // s1 - REVERSE
 
         EXPECT_TRUE(s1_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s1_rev.AlignedStrand());
         EXPECT_EQ(506,   s1_rev.QueryStart());         // new queryStart
         EXPECT_EQ(511,   s1_rev.QueryEnd());           // queryStart + new seqLength
         EXPECT_EQ(506,   s1_rev.AlignedStart());       // queryStart (no soft clips remaining)
@@ -1238,7 +1238,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
         const BamRecordView view
         {
             s1_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -1256,7 +1256,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
     {   // s2 - FORWARD
 
         EXPECT_TRUE(s2.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s2.AlignedStrand());
         EXPECT_EQ(504, s2.QueryStart());
         EXPECT_EQ(507, s2.QueryEnd());
         EXPECT_EQ(504, s2.AlignedStart());     // queryStart (no soft clips)
@@ -1269,7 +1269,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
         const BamRecordView view
         {
             s2,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -1287,7 +1287,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
     {   // s2 - REVERSE
 
         EXPECT_TRUE(s2_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s2_rev.AlignedStrand());
         EXPECT_EQ(508,   s2_rev.QueryStart());         // new queryStart
         EXPECT_EQ(511,   s2_rev.QueryEnd());           // queryStart + new seqLength
         EXPECT_EQ(508,   s2_rev.AlignedStart());       // queryStart (no soft clips remaining)
@@ -1300,7 +1300,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
         const BamRecordView view
         {
             s2_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -1317,7 +1317,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
 
     {   // s3 - FORWARD
         EXPECT_TRUE(s3.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
         EXPECT_EQ(504, s3.QueryStart());
         EXPECT_EQ(508, s3.QueryEnd());
         EXPECT_EQ(504, s3.AlignedStart());     // queryStart (no soft clips)
@@ -1330,7 +1330,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
         const BamRecordView view
         {
             s3,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -1347,7 +1347,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
 
     {   // s3 - REVERSE
         EXPECT_TRUE(s3_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s3_rev.AlignedStrand());
         EXPECT_EQ(507,   s3_rev.QueryStart());         // new queryStart
         EXPECT_EQ(511,   s3_rev.QueryEnd());           // queryStart + new seqLength
         EXPECT_EQ(507,   s3_rev.AlignedStart());       // queryStart (no soft clips remaining)
@@ -1360,7 +1360,7 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
         const BamRecordView view
         {
             s3_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -1378,13 +1378,13 @@ TEST(BAM_BamRecordClipping, correctly_performs_clip_to_reference_with_soft_clips
 
 TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_query)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 510;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 510;
     const int32_t  tId     = 0;
-    const Position tPos    = 100;
+    const Data::Position tPos    = 100;
     const uint8_t  mapQual = 80;
-    const Position clipStart = 502;
-    const Position clipEnd   = 509;
+    const Data::Position clipStart = 502;
+    const Data::Position clipEnd   = 509;
 
     const std::string seq      = "AACCGTTAGC";
     const std::string quals    = "?]?]?]?]?*";
@@ -1403,12 +1403,12 @@ TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_query)
 
     BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                             seq, tagBases, tagQuals, frames);
-    prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+    prototype.Map(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
 
     BamRecord s3 = prototype.Clipped(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
     EXPECT_TRUE(s3.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
     EXPECT_EQ(clipStart, s3.QueryStart());
     EXPECT_EQ(clipEnd,   s3.QueryEnd());
     EXPECT_EQ(clipStart, s3.AlignedStart());     // queryStart (no soft clips)
@@ -1421,7 +1421,7 @@ TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_query)
     const BamRecordView view
     {
         s3,
-        Orientation::GENOMIC,
+        Data::Orientation::GENOMIC,
         false,
         false,
         PulseBehavior::ALL
@@ -1438,18 +1438,18 @@ TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_query)
 
 TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_reference)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 510;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 510;
     const std::string seq      = "AACCGTTAGC";
     const std::string quals    = "?]?]?]?]?*";
     const std::string tagBases = "AACCGTTAGC";
     const std::string tagQuals = "?]?]?]?]?*";
     const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
     const int32_t  tId     = 0;
-    const Position tPos    = 100;
+    const Data::Position tPos    = 100;
     const uint8_t  mapQual = 80;
-    const Position clipStart = 102;
-    const Position clipEnd   = 107;
+    const Data::Position clipStart = 102;
+    const Data::Position clipEnd   = 107;
 
     const std::string s3_cigar = "4=1D2I2D4=";
     const std::string s3_cigar_clipped = "2=1D2I2D";
@@ -1461,13 +1461,13 @@ TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_reference)
 
     BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                             seq, tagBases, tagQuals, frames);
-    prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+    prototype.Map(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
 
     const BamRecord s3 = prototype.Clipped(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd);
 
     // s3 - FORWARD
     EXPECT_TRUE(s3.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
     EXPECT_EQ(502, s3.QueryStart());
     EXPECT_EQ(506, s3.QueryEnd());
     EXPECT_EQ(502, s3.AlignedStart());     // queryStart (no soft clips)
@@ -1480,7 +1480,7 @@ TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_reference)
     const BamRecordView view
     {
         s3,
-        Orientation::GENOMIC,
+        Data::Orientation::GENOMIC,
         false,
         false,
         PulseBehavior::ALL
@@ -1497,13 +1497,13 @@ TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_reference)
 
 TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_query_static_method)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 510;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 510;
     const int32_t  tId     = 0;
-    const Position tPos    = 100;
+    const Data::Position tPos    = 100;
     const uint8_t  mapQual = 80;
-    const Position clipStart = 502;
-    const Position clipEnd   = 509;
+    const Data::Position clipStart = 502;
+    const Data::Position clipEnd   = 509;
 
     const std::string seq      = "AACCGTTAGC";
     const std::string quals    = "?]?]?]?]?*";
@@ -1522,12 +1522,12 @@ TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_query_static_method
 
     BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                             seq, tagBases, tagQuals, frames);
-    prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+    prototype.Map(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
 
     const BamRecord s3 = BamRecord::Clipped(prototype, ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
     EXPECT_TRUE(s3.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
     EXPECT_EQ(clipStart, s3.QueryStart());
     EXPECT_EQ(clipEnd,   s3.QueryEnd());
     EXPECT_EQ(clipStart, s3.AlignedStart());     // queryStart (no soft clips)
@@ -1540,7 +1540,7 @@ TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_query_static_method
     const BamRecordView view
     {
         s3,
-        Orientation::GENOMIC,
+        Data::Orientation::GENOMIC,
         false,
         false,
         PulseBehavior::ALL
@@ -1557,18 +1557,18 @@ TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_query_static_method
 
 TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_reference_static_method)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 510;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 510;
     const std::string seq      = "AACCGTTAGC";
     const std::string quals    = "?]?]?]?]?*";
     const std::string tagBases = "AACCGTTAGC";
     const std::string tagQuals = "?]?]?]?]?*";
     const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
     const int32_t  tId     = 0;
-    const Position tPos    = 100;
+    const Data::Position tPos    = 100;
     const uint8_t  mapQual = 80;
-    const Position clipStart = 102;
-    const Position clipEnd   = 107;
+    const Data::Position clipStart = 102;
+    const Data::Position clipEnd   = 107;
 
     const std::string s3_cigar = "4=1D2I2D4=";
     const std::string s3_cigar_clipped = "2=1D2I2D";
@@ -1580,13 +1580,13 @@ TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_reference_static_me
 
     BamRecord prototype = BamRecordClippingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames,
                                             seq, tagBases, tagQuals, frames);
-    prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+    prototype.Map(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
 
     const BamRecord s3 = BamRecord::Clipped(prototype, ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd);
 
     // s3 - FORWARD
     EXPECT_TRUE(s3.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
     EXPECT_EQ(502, s3.QueryStart());
     EXPECT_EQ(506, s3.QueryEnd());
     EXPECT_EQ(502, s3.AlignedStart());     // queryStart (no soft clips)
@@ -1599,7 +1599,7 @@ TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_reference_static_me
     const BamRecordView view
     {
         s3,
-        Orientation::GENOMIC,
+        Data::Orientation::GENOMIC,
         false,
         false,
         PulseBehavior::ALL
@@ -1616,8 +1616,8 @@ TEST(BAM_BamRecordClipping, can_create_new_record_clipped_to_reference_static_me
 
 TEST(BAM_BamRecordClipping, correctly_clips_cigar)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 515;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 515;
     const std::string seq      = "TTAACCGTTAGCAAA";
     const std::string quals    = "--?]?]?]?]?*+++";
     const std::string tagBases = "TTAACCGTTAGCAAA";
@@ -1630,11 +1630,11 @@ TEST(BAM_BamRecordClipping, correctly_clips_cigar)
                                          seq, tagBases, tagQuals, frames);
 
     const std::string s3_cigar = "5H2S4=1D2I2D4=3S7H";
-    s3.Map(0, 100, Strand::FORWARD, s3_cigar, mapQual);
-    s3_rev.Map(0, 100, Strand::REVERSE, s3_cigar, mapQual);
+    s3.Map(0, 100, Data::Strand::FORWARD, s3_cigar, mapQual);
+    s3_rev.Map(0, 100, Data::Strand::REVERSE, s3_cigar, mapQual);
 
-    const Cigar s3_cigar_raw     = s3.CigarData();
-    const Cigar s3_cigar_clipped = s3.CigarData(true);
+    const Data::Cigar s3_cigar_raw     = s3.CigarData();
+    const Data::Cigar s3_cigar_clipped = s3.CigarData(true);
 
     EXPECT_EQ(s3_cigar, s3_cigar_raw.ToStdString());
     EXPECT_EQ(std::string("4=1D2I2D4="), s3_cigar_clipped.ToStdString());
@@ -1643,10 +1643,10 @@ TEST(BAM_BamRecordClipping, correctly_clips_cigar)
 TEST(BAM_BamRecordClipping, can_make_ccs_record_clipped_to_query)
 {
     const int32_t  tId     = 0;
-    const Position tPos    = 100;
+    const Data::Position tPos    = 100;
     const uint8_t  mapQual = 80;
-    const Position clipStart = 2;
-    const Position clipEnd   = 9;
+    const Data::Position clipStart = 2;
+    const Data::Position clipEnd   = 9;
 
     const std::string seq      = "AACCGTTAGC";
     const std::string quals    = "?]?]?]?]?*";
@@ -1665,12 +1665,12 @@ TEST(BAM_BamRecordClipping, can_make_ccs_record_clipped_to_query)
 
     BamRecord prototype = BamRecordClippingTests::MakeCCSRecord(seq, quals, tagBases, tagQuals, frames,
                                                seq, tagBases, tagQuals, frames);
-    prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+    prototype.Map(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
 
     BamRecord s3 = prototype.Clipped(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
 
     EXPECT_TRUE(s3.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
     EXPECT_EQ(0,   s3.AlignedStart());     // record start (no soft clips)
     EXPECT_EQ(7,   s3.AlignedEnd());       // alignStart + clipped seqLength
     EXPECT_EQ(102, s3.ReferenceStart());         // 100 + startOffset
@@ -1681,7 +1681,7 @@ TEST(BAM_BamRecordClipping, can_make_ccs_record_clipped_to_query)
     const BamRecordView view
     {
         s3,
-        Orientation::GENOMIC,
+        Data::Orientation::GENOMIC,
         false,
         false,
         PulseBehavior::ALL
@@ -1704,10 +1704,10 @@ TEST(BAM_BamRecordClipping, can_make_ccs_record_clipped_to_reference)
     const std::string tagQuals = "?]?]?]?]?*";
     const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
     const int32_t  tId     = 0;
-    const Position tPos    = 100;
+    const Data::Position tPos    = 100;
     const uint8_t  mapQual = 80;
-    const Position clipStart = 102;
-    const Position clipEnd   = 107;
+    const Data::Position clipStart = 102;
+    const Data::Position clipEnd   = 107;
 
     const std::string s3_cigar = "4=1D2I2D4=";
     const std::string s3_cigar_clipped = "2=1D2I2D";
@@ -1719,12 +1719,12 @@ TEST(BAM_BamRecordClipping, can_make_ccs_record_clipped_to_reference)
 
     BamRecord prototype = BamRecordClippingTests::MakeCCSRecord(seq, quals, tagBases, tagQuals, frames,
                                                seq, tagBases, tagQuals, frames);
-    prototype.Map(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
+    prototype.Map(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
 
     const BamRecord s3 = BamRecord::Clipped(prototype, ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd);
 
     EXPECT_TRUE(s3.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
     EXPECT_EQ(0, s3.AlignedStart());     // record tart (no soft clips)
     EXPECT_EQ(4, s3.AlignedEnd());       // alignStart + clipped seqLength (4)
     EXPECT_EQ(clipStart, s3.ReferenceStart());   // clipStart
@@ -1735,7 +1735,7 @@ TEST(BAM_BamRecordClipping, can_make_ccs_record_clipped_to_reference)
     const BamRecordView view
     {
         s3,
-        Orientation::GENOMIC,
+        Data::Orientation::GENOMIC,
         false,
         false,
         PulseBehavior::ALL
@@ -1752,8 +1752,8 @@ TEST(BAM_BamRecordClipping, can_make_ccs_record_clipped_to_reference)
 
 TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
 {
-    const Position qStart  = 500;
-    const Position qEnd    = 510;
+    const Data::Position qStart  = 500;
+    const Data::Position qEnd    = 510;
     const std::string seq       = "AACCGTTAGC";
     const std::string quals     = "?]?]?]?]?*";
     const std::string tagBases  = "AACCGTTAGC";
@@ -1766,11 +1766,11 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
     const f_data pulseFrames = { 0,0,10,0,10,0,0,20,20,30,0,0,0,0,40,40,10,0,0,0,30,20,0 };
 
     const int32_t  tId     = 0;
-    const Position tPos    = 100;
+    const Data::Position tPos    = 100;
     const uint8_t  mapQual = 80;
 
-    const Position clipStart = 502;
-    const Position clipEnd   = 509;
+    const Data::Position clipStart = 502;
+    const Data::Position clipEnd   = 509;
 
     const std::string seq_clipped      = "CCGTTAG";
     const std::string quals_clipped    = "?]?]?]?";
@@ -1813,12 +1813,12 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
                                                   pulseCall, pulseBases, pulseQuals, pulseFrames, FrameCodec::V1);
 
     BamRecord s0 = prototype; // unmapped record
-    BamRecord s1 = prototype.Mapped(tId, tPos, Strand::FORWARD, s1_cigar, mapQual);
-    BamRecord s2 = prototype.Mapped(tId, tPos, Strand::FORWARD, s2_cigar, mapQual);
-    BamRecord s3 = prototype.Mapped(tId, tPos, Strand::FORWARD, s3_cigar, mapQual);
-    BamRecord s1_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s1_cigar, mapQual);
-    BamRecord s2_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s2_cigar, mapQual);
-    BamRecord s3_rev = prototype.Mapped(tId, tPos, Strand::REVERSE, s3_cigar, mapQual);
+    BamRecord s1 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s1_cigar, mapQual);
+    BamRecord s2 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s2_cigar, mapQual);
+    BamRecord s3 = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, s3_cigar, mapQual);
+    BamRecord s1_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s1_cigar, mapQual);
+    BamRecord s2_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s2_cigar, mapQual);
+    BamRecord s3_rev = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, s3_cigar, mapQual);
 
     s0.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
     s1.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd);
@@ -1833,15 +1833,15 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
         EXPECT_FALSE(s0.IsMapped());
         EXPECT_EQ(clipStart, s0.QueryStart());
         EXPECT_EQ(clipEnd,   s0.QueryEnd());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.AlignedStart());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.AlignedEnd());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.ReferenceStart());
-        EXPECT_EQ(PacBio::BAM::UnmappedPosition, s0.ReferenceEnd());
+        EXPECT_EQ(Data::UnmappedPosition, s0.AlignedStart());
+        EXPECT_EQ(Data::UnmappedPosition, s0.AlignedEnd());
+        EXPECT_EQ(Data::UnmappedPosition, s0.ReferenceStart());
+        EXPECT_EQ(Data::UnmappedPosition, s0.ReferenceEnd());
 
         const BamRecordView view
         {
             s0,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -1860,7 +1860,7 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
     {   // s1 - FORWARD
 
         EXPECT_TRUE(s1.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s1.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s1.AlignedStrand());
         EXPECT_EQ(clipStart, s1.QueryStart());
         EXPECT_EQ(clipEnd,   s1.QueryEnd());
         EXPECT_EQ(clipStart, s1.AlignedStart());   // queryStart (no soft clips)
@@ -1873,7 +1873,7 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
         const BamRecordView view
         {
             s1,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -1892,7 +1892,7 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
     {   // s1 - REVERSE
 
         EXPECT_TRUE(s1_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s1_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s1_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s1_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s1_rev.QueryEnd());
         EXPECT_EQ(clipStart, s1_rev.AlignedStart());    // queryStart (no soft clips)
@@ -1905,7 +1905,7 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
         const BamRecordView view
         {
             s1_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -1924,7 +1924,7 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
     {   // s2 - FORWARD
 
         EXPECT_TRUE(s2.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s2.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s2.AlignedStrand());
         EXPECT_EQ(clipStart, s2.QueryStart());
         EXPECT_EQ(clipEnd,   s2.QueryEnd());
         EXPECT_EQ(clipStart, s2.AlignedStart());   // queryStart (no soft clips)
@@ -1937,7 +1937,7 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
         const BamRecordView view
         {
             s2,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -1955,7 +1955,7 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
     {   // s2 - REVERSE
 
         EXPECT_TRUE(s2_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s2_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s2_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s2_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s2_rev.QueryEnd());
         EXPECT_EQ(clipStart, s2_rev.AlignedStart());    // queryStart (no soft clips)
@@ -1968,7 +1968,7 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
         const BamRecordView view
         {
             s2_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -1987,7 +1987,7 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
     {   // s3 - FORWARD
 
         EXPECT_TRUE(s3.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s3.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s3.AlignedStrand());
         EXPECT_EQ(clipStart, s3.QueryStart());
         EXPECT_EQ(clipEnd,   s3.QueryEnd());
         EXPECT_EQ(clipStart, s3.AlignedStart());     // queryStart (no soft clips)
@@ -2000,7 +2000,7 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
         const BamRecordView view
         {
             s3,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -2019,7 +2019,7 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
     {   // s3 - REVERSE
 
         EXPECT_TRUE(s3_rev.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s3_rev.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s3_rev.AlignedStrand());
         EXPECT_EQ(clipStart, s3_rev.QueryStart());
         EXPECT_EQ(clipEnd,   s3_rev.QueryEnd());
         EXPECT_EQ(clipStart, s3_rev.AlignedStart());     // queryStart (no soft clips)
@@ -2032,7 +2032,7 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
         const BamRecordView view
         {
             s3_rev,
-            Orientation::GENOMIC,
+            Data::Orientation::GENOMIC,
             false,
             false,
             PulseBehavior::ALL
@@ -2052,7 +2052,7 @@ TEST(BAM_BamRecordClipping, correctly_clips_encoded_frames)
 TEST(BAM_BamRecordClipping, can_excise_soft_clips_from_frames_with_deletions)
 {
     const std::string expectedName{"m141008_060349_42194_c100704972550000001823137703241586_s1_p0/14/2409_2745"};
-    const PacBio::BAM::Strand expectedStrand = PacBio::BAM::Strand::FORWARD;
+    const Data::Strand expectedStrand = Data::Strand::FORWARD;
     const std::string expectedCigar{
         "20S11=1I47=1I2=1I6=1I22=1I2=1I9=1I29=1D6=1I16=1I6=1I7=1I8=2I5=1I5=1I11=1I5=5I2=3I1=1I1=1I1=3I5=2D19=1I14=1I17=28S"};
     const std::string expectedRawSeq{
@@ -2103,14 +2103,14 @@ TEST(BAM_BamRecordClipping, can_excise_soft_clips_from_frames_with_deletions)
     EXPECT_EQ(expectedStrand, record.AlignedStrand());
     EXPECT_EQ(expectedCigar, record.CigarData().ToStdString());
 
-    const auto rawSeq = record.Sequence(PacBio::BAM::Orientation::GENOMIC);
-    const auto clippedSeq = record.Sequence(PacBio::BAM::Orientation::GENOMIC, false, true);
+    const auto rawSeq = record.Sequence(Data::Orientation::GENOMIC);
+    const auto clippedSeq = record.Sequence(Data::Orientation::GENOMIC, false, true);
     EXPECT_EQ(expectedRawSeq, rawSeq);
     EXPECT_EQ(expectedClippedSeq, clippedSeq);
 
     ASSERT_TRUE(record.HasIPD());
-    const auto rawIpds = record.IPD(PacBio::BAM::Orientation::GENOMIC).Encode();
-    const auto clippedIpds = record.IPD(PacBio::BAM::Orientation::GENOMIC, false, true).Encode();
+    const auto rawIpds = record.IPD(Data::Orientation::GENOMIC).Encode();
+    const auto clippedIpds = record.IPD(Data::Orientation::GENOMIC, false, true).Encode();
     EXPECT_EQ(expectedRawIpds, rawIpds);
     EXPECT_EQ(expectedClippedIpds, clippedIpds);
 }
@@ -2125,13 +2125,13 @@ TEST(BAM_BamRecordClipping, can_clip_to_query_stranded)
     EntireFileQuery query{bamFile};
     for (auto& i : query)
     {
-        Strand expectedStrand;
+        Data::Strand expectedStrand;
         std::string scope;
         if (first) {
-            expectedStrand = Strand::FORWARD;
+            expectedStrand = Data::Strand::FORWARD;
             scope = "First record (FORWARD strand)";
         } else {
-            expectedStrand = Strand::REVERSE;
+            expectedStrand = Data::Strand::REVERSE;
             scope = "Second record (REVERSE strand)";
         }
 
@@ -2155,8 +2155,8 @@ TEST(BAM_BamRecordClipping, can_clip_to_query_stranded)
         EXPECT_EQ("3=1I", i.CigarData().ToStdString());
 
         // second clip
-        Position qS;
-        Position qE;
+        Data::Position qS;
+        Data::Position qE;
         if (first) {
             qS = i.QueryStart();
             qE = i.QueryEnd() - 1;
@@ -2178,8 +2178,8 @@ TEST(BAM_BamRecordClipping, can_clip_to_query_stranded)
 
 TEST(BAM_BamRecordClipping, clipping_flanking_inserts_is_ignored_on_clip_to_query)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 515;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 515;
     const std::string seq      = "TTAACCGTTAGCAAA";
     const std::string quals    = "--?]?]?]?]?*+++";
     const std::string tagBases = "TTAACCGTTAGCAAA";
@@ -2193,11 +2193,11 @@ TEST(BAM_BamRecordClipping, clipping_flanking_inserts_is_ignored_on_clip_to_quer
     {   // aligned forward
 
         const int32_t  tId     = 0;
-        const Position tPos    = 100;
+        const Data::Position tPos    = 100;
         const uint8_t  mapQual = 80;
-        const Cigar cigar{"4I5=6I"};
+        const Data::Cigar cigar{"4I5=6I"};
 
-        BamRecord s = prototype.Mapped(tId, tPos, Strand::FORWARD, cigar, mapQual);
+        BamRecord s = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, cigar, mapQual);
         EXPECT_TRUE(s.IsMapped());
         EXPECT_EQ(100, s.ReferenceStart());
         EXPECT_EQ(105, s.ReferenceEnd());
@@ -2209,7 +2209,7 @@ TEST(BAM_BamRecordClipping, clipping_flanking_inserts_is_ignored_on_clip_to_quer
         s.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd, exciseFlankingInserts);
 
         EXPECT_TRUE(s.IsMapped());
-        EXPECT_EQ(Strand::FORWARD, s.AlignedStrand());
+        EXPECT_EQ(Data::Strand::FORWARD, s.AlignedStrand());
         EXPECT_EQ("2I5=3I", s.CigarData().ToStdString());
 
         EXPECT_EQ(clipStart, s.QueryStart());
@@ -2222,11 +2222,11 @@ TEST(BAM_BamRecordClipping, clipping_flanking_inserts_is_ignored_on_clip_to_quer
     {   // aligned reverse
 
         const int32_t  tId     = 0;
-        const Position tPos    = 100;
+        const Data::Position tPos    = 100;
         const uint8_t  mapQual = 80;
-        const Cigar cigar{"4I5=6I"};
+        const Data::Cigar cigar{"4I5=6I"};
 
-        BamRecord s = prototype.Mapped(tId, tPos, Strand::REVERSE, cigar, mapQual);
+        BamRecord s = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, cigar, mapQual);
         EXPECT_TRUE(s.IsMapped());
         EXPECT_EQ(100, s.ReferenceStart());
         EXPECT_EQ(105, s.ReferenceEnd());
@@ -2238,7 +2238,7 @@ TEST(BAM_BamRecordClipping, clipping_flanking_inserts_is_ignored_on_clip_to_quer
         s.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd, exciseFlankingInserts);
 
         EXPECT_TRUE(s.IsMapped());
-        EXPECT_EQ(Strand::REVERSE, s.AlignedStrand());
+        EXPECT_EQ(Data::Strand::REVERSE, s.AlignedStrand());
         EXPECT_EQ("1I5=4I", s.CigarData().ToStdString());
 
         EXPECT_EQ(clipStart, s.QueryStart());
@@ -2252,8 +2252,8 @@ TEST(BAM_BamRecordClipping, clipping_flanking_inserts_is_ignored_on_clip_to_quer
 
 TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_reference_forward)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 526;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 526;
     const std::string seq      = "TTAACCGTTAGCAAATTAACCGTTAG";
     const std::string quals    = "--?]?]?]?]?*+++--?]?]?]?]?";
     const std::string tagBases = "TTAACCGTTAGCAAATTAACCGTTAG";
@@ -2268,9 +2268,9 @@ TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_refe
                                            frames, seq, tagBases, tagQuals, frames);
 
     const int32_t  tId     = 0;
-    const Position tPos    = 100;
+    const Data::Position tPos    = 100;
     const uint8_t  mapQual = 80;
-    const Cigar cigar{"3=6I10=6I1="};
+    const Data::Cigar cigar{"3=6I10=6I1="};
 
     const size_t clipStart = 103;
     const size_t clipEnd = 113;
@@ -2280,7 +2280,7 @@ TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_refe
 
     bool exciseFlankingInserts = false;
 
-    BamRecord withInserts = prototype.Mapped(tId, tPos, Strand::FORWARD, cigar, mapQual);
+    BamRecord withInserts = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, cigar, mapQual);
     EXPECT_TRUE(withInserts.IsMapped());
     EXPECT_EQ(100, withInserts.ReferenceStart());
     EXPECT_EQ(114, withInserts.ReferenceEnd());
@@ -2288,7 +2288,7 @@ TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_refe
     withInserts.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd, exciseFlankingInserts);
 
     EXPECT_TRUE(withInserts.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, withInserts.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, withInserts.AlignedStrand());
     EXPECT_EQ("6I10=6I", withInserts.CigarData().ToStdString());
 
     EXPECT_EQ(503, withInserts.QueryStart());
@@ -2303,7 +2303,7 @@ TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_refe
 
     exciseFlankingInserts = true;
 
-    BamRecord withoutInserts = prototype.Mapped(tId, tPos, Strand::FORWARD, cigar, mapQual);
+    BamRecord withoutInserts = prototype.Mapped(tId, tPos, Data::Strand::FORWARD, cigar, mapQual);
     EXPECT_TRUE(withoutInserts.IsMapped());
     EXPECT_EQ(100, withoutInserts.ReferenceStart());
     EXPECT_EQ(114, withoutInserts.ReferenceEnd());
@@ -2311,7 +2311,7 @@ TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_refe
     withoutInserts.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd, exciseFlankingInserts);
 
     EXPECT_TRUE(withoutInserts.IsMapped());
-    EXPECT_EQ(Strand::FORWARD, withoutInserts.AlignedStrand());
+    EXPECT_EQ(Data::Strand::FORWARD, withoutInserts.AlignedStrand());
     EXPECT_EQ("10=", withoutInserts.CigarData().ToStdString());
 
     EXPECT_EQ(509, withoutInserts.QueryStart());
@@ -2324,8 +2324,8 @@ TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_refe
 
 TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_reference_reverse)
 {
-    const Position qStart = 500;
-    const Position qEnd   = 526;
+    const Data::Position qStart = 500;
+    const Data::Position qEnd   = 526;
     const std::string seq      = "TTAACCGTTAGCAAATTAACCGTTAG";
     const std::string quals    = "--?]?]?]?]?*+++--?]?]?]?]?";
     const std::string tagBases = "TTAACCGTTAGCAAATTAACCGTTAG";
@@ -2340,9 +2340,9 @@ TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_refe
                                            frames, seq, tagBases, tagQuals, frames);
 
     const int32_t  tId     = 0;
-    const Position tPos    = 100;
+    const Data::Position tPos    = 100;
     const uint8_t  mapQual = 80;
-    const Cigar cigar{"3=6I10=6I1="};
+    const Data::Cigar cigar{"3=6I10=6I1="};
 
     const size_t clipStart = 103;
     const size_t clipEnd = 113;
@@ -2352,7 +2352,7 @@ TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_refe
 
     bool exciseFlankingInserts = false;
 
-    BamRecord withInserts = prototype.Mapped(tId, tPos, Strand::REVERSE, cigar, mapQual);
+    BamRecord withInserts = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, cigar, mapQual);
 
     EXPECT_TRUE(withInserts.IsMapped());
     EXPECT_EQ(100, withInserts.ReferenceStart());
@@ -2361,7 +2361,7 @@ TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_refe
     withInserts.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd, exciseFlankingInserts);
 
     EXPECT_TRUE(withInserts.IsMapped());
-    EXPECT_EQ(Strand::REVERSE, withInserts.AlignedStrand());
+    EXPECT_EQ(Data::Strand::REVERSE, withInserts.AlignedStrand());
     EXPECT_EQ("6I10=6I", withInserts.CigarData().ToStdString());
 
     EXPECT_EQ(501, withInserts.QueryStart());
@@ -2376,7 +2376,7 @@ TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_refe
 
     exciseFlankingInserts = true;
 
-    BamRecord withoutInserts = prototype.Mapped(tId, tPos, Strand::REVERSE, cigar, mapQual);
+    BamRecord withoutInserts = prototype.Mapped(tId, tPos, Data::Strand::REVERSE, cigar, mapQual);
     EXPECT_TRUE(withoutInserts.IsMapped());
     EXPECT_EQ(100, withoutInserts.ReferenceStart());
     EXPECT_EQ(114, withoutInserts.ReferenceEnd());
@@ -2384,7 +2384,7 @@ TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_refe
     withoutInserts.Clip(ClipType::CLIP_TO_REFERENCE, clipStart, clipEnd, exciseFlankingInserts);
 
     EXPECT_TRUE(withoutInserts.IsMapped());
-    EXPECT_EQ(Strand::REVERSE, withoutInserts.AlignedStrand());
+    EXPECT_EQ(Data::Strand::REVERSE, withoutInserts.AlignedStrand());
     EXPECT_EQ("10=", withoutInserts.CigarData().ToStdString());
 
     EXPECT_EQ(507, withoutInserts.QueryStart());

@@ -3,8 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <pbbam/Position.h>
 #include <pbbam/vcf/VcfHeaderTypes.h>
+
+#include <pbcopper/data/Position.h>
 
 #include <optional>
 #include <string>

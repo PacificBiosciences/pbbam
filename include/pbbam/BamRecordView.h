@@ -67,7 +67,7 @@ public:
     Data::QualityValues MergeQVs() const;
 
     /// \returns BamRecord::PulseMergeQV with this view's parameters applied
-    QualityValues PulseMergeQVs() const;
+    Data::QualityValues PulseMergeQVs() const;
 
     /// \returns BamRecord::Pkmean with this view's parameters applied
     std::vector<float> Pkmean() const;

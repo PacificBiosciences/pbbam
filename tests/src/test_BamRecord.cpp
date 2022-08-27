@@ -87,27 +87,27 @@ void CheckRawData(const BamRecord& bam)
 static
 BamRecordImpl MakeCigaredImpl(const std::string& seq,
                               const std::string& cigar,
-                              const Strand strand)
+                              const Data::Strand strand)
 {
     BamRecordImpl impl;
     impl.SetMapped(true).ReferenceId(0).Position(0).MapQuality(0);
-    impl.CigarData(Cigar::FromStdString(cigar));
+    impl.CigarData(Data::Cigar::FromStdString(cigar));
     impl.MateReferenceId(-1).MatePosition(-1).InsertSize(0);
     impl.SetSequenceAndQualities(seq, std::string(seq.size(), '*'));
-    impl.SetReverseStrand(strand == Strand::REVERSE);
+    impl.SetReverseStrand(strand == Data::Strand::REVERSE);
     return impl;
 }
 
 static
 BamRecord MakeCigaredRecord(const std::string& seq,
                             const std::string& cigar,
-                            const Strand strand)
+                            const Data::Strand strand)
 { return BamRecord{ MakeCigaredImpl(seq, cigar, strand) }; }
 
 static
 BamRecord MakeCigaredBaseRecord(const std::string& bases,
                                 const std::string& cigar,
-                                const Strand strand)
+                                const Data::Strand strand)
 {
     TagCollection tags;
     tags["dt"] = bases;
@@ -122,7 +122,7 @@ BamRecord MakeCigaredBaseRecord(const std::string& bases,
 static
 BamRecord MakeCigaredFrameRecord(const std::vector<uint16_t>& frames,
                                  const std::string& cigar,
-                                 const Strand strand)
+                                 const Data::Strand strand)
 {
     TagCollection tags;
     tags["ip"] = frames;
@@ -137,7 +137,7 @@ BamRecord MakeCigaredFrameRecord(const std::vector<uint16_t>& frames,
 static
 BamRecord MakeCigaredQualRecord(const std::string& quals,
                                 const std::string& cigar,
-                                const Strand strand)
+                                const Data::Strand strand)
 {
     TagCollection tags;
     tags["dq"] = quals;
@@ -156,7 +156,7 @@ BamRecord MakeCigaredPulseBaseRecord(const std::string& seqBases,
                                      const std::string& pulseCalls,
                                      const std::string& pulseBases,
                                      const std::string& cigar,
-                                     const Strand strand)
+                                     const Data::Strand strand)
 {
     TagCollection tags;
     tags["pc"] = pulseCalls; // PulseCall
@@ -172,7 +172,7 @@ BamRecord MakeCigaredPulseQualRecord(const std::string& seqBases,
                                      const std::string& pulseCalls,
                                      const std::string& pulseQuals,
                                      const std::string& cigar,
-                                     const Strand strand)
+                                     const Data::Strand strand)
 {
     TagCollection tags;
     tags["pc"] = pulseCalls;
@@ -190,7 +190,7 @@ BamRecord MakeCigaredPulseFrameRecord(const std::string& seqBases,
                                      const std::string& pulseCalls,
                                      const std::vector<uint16_t>& pulseFrames,
                                      const std::string& cigar,
-                                     const Strand strand)
+                                     const Data::Strand strand)
 {
     TagCollection tags;
     tags["pc"] = pulseCalls;
@@ -207,7 +207,7 @@ BamRecord MakeCigaredPulseUIntRecord(const std::string& seqBases,
                                      const std::string& pulseCalls,
                                      const std::vector<uint32_t>& pulseUInts,
                                      const std::string& cigar,
-                                     const Strand strand)
+                                     const Data::Strand strand)
 {
     TagCollection tags;
     tags["pc"] = pulseCalls;
@@ -260,22 +260,22 @@ void CheckAlignAndClip(const std::string& cigar,
                        const FetchDataType& fetchData)
 {
     {   // map to forward strand
-        const BamRecord b = makeRecord(input, cigar, Strand::FORWARD);
-        EXPECT_EQ(e.ForwardGenomic(),               fetchData(b, Orientation::GENOMIC, false, false));
-        EXPECT_EQ(e.ForwardNative(),                fetchData(b, Orientation::NATIVE,  false, false));
-        EXPECT_EQ(e.ForwardGenomicAligned(),        fetchData(b, Orientation::GENOMIC, true,  false));
-        EXPECT_EQ(e.ForwardNativeAligned(),         fetchData(b, Orientation::NATIVE,  true,  false));
-        EXPECT_EQ(e.ForwardGenomicAlignedClipped(), fetchData(b, Orientation::GENOMIC, true,  true));
-        EXPECT_EQ(e.ForwardNativeAlignedClipped(),  fetchData(b, Orientation::NATIVE,  true,  true));
+        const BamRecord b = makeRecord(input, cigar, Data::Strand::FORWARD);
+        EXPECT_EQ(e.ForwardGenomic(),               fetchData(b, Data::Orientation::GENOMIC, false, false));
+        EXPECT_EQ(e.ForwardNative(),                fetchData(b, Data::Orientation::NATIVE,  false, false));
+        EXPECT_EQ(e.ForwardGenomicAligned(),        fetchData(b, Data::Orientation::GENOMIC, true,  false));
+        EXPECT_EQ(e.ForwardNativeAligned(),         fetchData(b, Data::Orientation::NATIVE,  true,  false));
+        EXPECT_EQ(e.ForwardGenomicAlignedClipped(), fetchData(b, Data::Orientation::GENOMIC, true,  true));
+        EXPECT_EQ(e.ForwardNativeAlignedClipped(),  fetchData(b, Data::Orientation::NATIVE,  true,  true));
     }
     {   // map to reverse strand
-        const BamRecord b = makeRecord(input, cigar, Strand::REVERSE);
-        EXPECT_EQ(e.ReverseGenomic(),               fetchData(b, Orientation::GENOMIC, false, false));
-        EXPECT_EQ(e.ReverseNative(),                fetchData(b, Orientation::NATIVE,  false, false));
-        EXPECT_EQ(e.ReverseGenomicAligned(),        fetchData(b, Orientation::GENOMIC, true,  false));
-        EXPECT_EQ(e.ReverseNativeAligned(),         fetchData(b, Orientation::NATIVE,  true,  false));
-        EXPECT_EQ(e.ReverseGenomicAlignedClipped(), fetchData(b, Orientation::GENOMIC, true,  true));
-        EXPECT_EQ(e.ReverseNativeAlignedClipped(),  fetchData(b, Orientation::NATIVE,  true,  true));
+        const BamRecord b = makeRecord(input, cigar, Data::Strand::REVERSE);
+        EXPECT_EQ(e.ReverseGenomic(),               fetchData(b, Data::Orientation::GENOMIC, false, false));
+        EXPECT_EQ(e.ReverseNative(),                fetchData(b, Data::Orientation::NATIVE,  false, false));
+        EXPECT_EQ(e.ReverseGenomicAligned(),        fetchData(b, Data::Orientation::GENOMIC, true,  false));
+        EXPECT_EQ(e.ReverseNativeAligned(),         fetchData(b, Data::Orientation::NATIVE,  true,  false));
+        EXPECT_EQ(e.ReverseGenomicAlignedClipped(), fetchData(b, Data::Orientation::GENOMIC, true,  true));
+        EXPECT_EQ(e.ReverseNativeAlignedClipped(),  fetchData(b, Data::Orientation::NATIVE,  true,  true));
     }
 }
 
@@ -290,32 +290,32 @@ void CheckPulseDataAlignAndClip(const std::string& cigar,
                                 const FetchDataType& fetchData)
 {
     {   // map to forward strand
-        const BamRecord b = makeRecord(seqBases, pulseCalls, input, cigar, Strand::FORWARD);
+        const BamRecord b = makeRecord(seqBases, pulseCalls, input, cigar, Data::Strand::FORWARD);
 
-        EXPECT_EQ(allPulses.ForwardGenomic(),               fetchData(b, Orientation::GENOMIC, false, false, PulseBehavior::ALL));
-        EXPECT_EQ(allPulses.ForwardNative(),                fetchData(b, Orientation::NATIVE,  false, false, PulseBehavior::ALL));
+        EXPECT_EQ(allPulses.ForwardGenomic(),               fetchData(b, Data::Orientation::GENOMIC, false, false, PulseBehavior::ALL));
+        EXPECT_EQ(allPulses.ForwardNative(),                fetchData(b, Data::Orientation::NATIVE,  false, false, PulseBehavior::ALL));
         // no align/clipping operations available on ALL pulses
 
-        EXPECT_EQ(basecallsOnly.ForwardGenomic(),               fetchData(b, Orientation::GENOMIC, false, false, PulseBehavior::BASECALLS_ONLY));
-        EXPECT_EQ(basecallsOnly.ForwardNative(),                fetchData(b, Orientation::NATIVE,  false, false, PulseBehavior::BASECALLS_ONLY));
-        EXPECT_EQ(basecallsOnly.ForwardGenomicAligned(),        fetchData(b, Orientation::GENOMIC, true,  false, PulseBehavior::BASECALLS_ONLY));
-        EXPECT_EQ(basecallsOnly.ForwardNativeAligned(),         fetchData(b, Orientation::NATIVE,  true,  false, PulseBehavior::BASECALLS_ONLY));
-        EXPECT_EQ(basecallsOnly.ForwardGenomicAlignedClipped(), fetchData(b, Orientation::GENOMIC, true,  true,  PulseBehavior::BASECALLS_ONLY));
-        EXPECT_EQ(basecallsOnly.ForwardNativeAlignedClipped(),  fetchData(b, Orientation::NATIVE,  true,  true,  PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ForwardGenomic(),               fetchData(b, Data::Orientation::GENOMIC, false, false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ForwardNative(),                fetchData(b, Data::Orientation::NATIVE,  false, false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ForwardGenomicAligned(),        fetchData(b, Data::Orientation::GENOMIC, true,  false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ForwardNativeAligned(),         fetchData(b, Data::Orientation::NATIVE,  true,  false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ForwardGenomicAlignedClipped(), fetchData(b, Data::Orientation::GENOMIC, true,  true,  PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ForwardNativeAlignedClipped(),  fetchData(b, Data::Orientation::NATIVE,  true,  true,  PulseBehavior::BASECALLS_ONLY));
     }
     {   // map to reverse strand
-        const BamRecord b = makeRecord(seqBases, pulseCalls, input, cigar, Strand::REVERSE);
+        const BamRecord b = makeRecord(seqBases, pulseCalls, input, cigar, Data::Strand::REVERSE);
 
-        EXPECT_EQ(allPulses.ReverseGenomic(),               fetchData(b, Orientation::GENOMIC, false, false, PulseBehavior::ALL));
-        EXPECT_EQ(allPulses.ReverseNative(),                fetchData(b, Orientation::NATIVE,  false, false, PulseBehavior::ALL));
+        EXPECT_EQ(allPulses.ReverseGenomic(),               fetchData(b, Data::Orientation::GENOMIC, false, false, PulseBehavior::ALL));
+        EXPECT_EQ(allPulses.ReverseNative(),                fetchData(b, Data::Orientation::NATIVE,  false, false, PulseBehavior::ALL));
         // no align/clipping operations available on ALL pulses
 
-        EXPECT_EQ(basecallsOnly.ReverseGenomic(),               fetchData(b, Orientation::GENOMIC, false, false, PulseBehavior::BASECALLS_ONLY));
-        EXPECT_EQ(basecallsOnly.ReverseNative(),                fetchData(b, Orientation::NATIVE,  false, false, PulseBehavior::BASECALLS_ONLY));
-        EXPECT_EQ(basecallsOnly.ReverseGenomicAligned(),        fetchData(b, Orientation::GENOMIC, true,  false, PulseBehavior::BASECALLS_ONLY));
-        EXPECT_EQ(basecallsOnly.ReverseNativeAligned(),         fetchData(b, Orientation::NATIVE,  true,  false, PulseBehavior::BASECALLS_ONLY));
-        EXPECT_EQ(basecallsOnly.ReverseGenomicAlignedClipped(), fetchData(b, Orientation::GENOMIC, true,  true,  PulseBehavior::BASECALLS_ONLY));
-        EXPECT_EQ(basecallsOnly.ReverseNativeAlignedClipped(),  fetchData(b, Orientation::NATIVE,  true,  true,  PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ReverseGenomic(),               fetchData(b, Data::Orientation::GENOMIC, false, false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ReverseNative(),                fetchData(b, Data::Orientation::NATIVE,  false, false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ReverseGenomicAligned(),        fetchData(b, Data::Orientation::GENOMIC, true,  false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ReverseNativeAligned(),         fetchData(b, Data::Orientation::NATIVE,  true,  false, PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ReverseGenomicAlignedClipped(), fetchData(b, Data::Orientation::GENOMIC, true,  true,  PulseBehavior::BASECALLS_ONLY));
+        EXPECT_EQ(basecallsOnly.ReverseNativeAlignedClipped(),  fetchData(b, Data::Orientation::NATIVE,  true,  true,  PulseBehavior::BASECALLS_ONLY));
     }
 }
 
@@ -327,13 +327,13 @@ void CheckBaseTagsClippedAndAligned(const std::string& cigar,
     // aligned record + DeletionTag, SubstitutionTag
     auto makeRecord = [](const std::string& newBases,
                          const std::string& newCigar,
-                         const Strand newStrand)
+                         const Data::Strand newStrand)
     { return MakeCigaredBaseRecord(newBases, newCigar, newStrand); };
 
     // DeletionTag
     CheckAlignAndClip(cigar, input, e, makeRecord,
                       [](const BamRecord& b,
-                         Orientation orientation,
+                         Data::Orientation orientation,
                          bool aligned,
                          bool exciseSoftClips)
                       { return b.DeletionTag(orientation, aligned, exciseSoftClips); }
@@ -342,7 +342,7 @@ void CheckBaseTagsClippedAndAligned(const std::string& cigar,
     // SubstitutionTag
     CheckAlignAndClip(cigar, input, e, makeRecord,
                       [](const BamRecord& b,
-                         Orientation orientation,
+                         Data::Orientation orientation,
                          bool aligned,
                          bool exciseSoftClips)
                       { return b.SubstitutionTag(orientation, aligned, exciseSoftClips); }
@@ -358,13 +358,13 @@ void CheckFrameTagsClippedAndAligned(const std::string& cigar,
     // aligned record + IPD, PulseWidth
     auto makeRecord = [](const std::vector<uint16_t>& newFrames,
                          const std::string& newCigar,
-                         const Strand newStrand)
+                         const Data::Strand newStrand)
     { return BamRecordTests::MakeCigaredFrameRecord(newFrames, newCigar, newStrand); };
 
     // IPD
     CheckAlignAndClip(cigar, input, e, makeRecord,
                       [](const BamRecord& b,
-                         Orientation orientation,
+                         Data::Orientation orientation,
                          bool aligned,
                          bool exciseSoftClips)
                       { return b.IPD(orientation, aligned, exciseSoftClips).Data(); }
@@ -373,7 +373,7 @@ void CheckFrameTagsClippedAndAligned(const std::string& cigar,
     // PulseWidth
     CheckAlignAndClip(cigar, input, e, makeRecord,
                       [](const BamRecord& b,
-                         Orientation orientation,
+                         Data::Orientation orientation,
                          bool aligned,
                          bool exciseSoftClips)
                       { return b.PulseWidth(orientation, aligned, exciseSoftClips).Data(); }
@@ -388,13 +388,13 @@ void CheckQualityTagsClippedAndAligned(const std::string& cigar,
     // aligned record + DeletionQV, InsertionQV, MergeQV, SubstitutionQV
     auto makeRecord = [](const std::string& newQuals,
                          const std::string& newCigar,
-                         const Strand newStrand)
+                         const Data::Strand newStrand)
     { return BamRecordTests::MakeCigaredQualRecord(newQuals, newCigar, newStrand); };
 
     // DeletionQV
     CheckAlignAndClip(cigar, input, e, makeRecord,
                       [](const BamRecord& b,
-                         Orientation orientation,
+                         Data::Orientation orientation,
                          bool aligned,
                          bool exciseSoftClips)
                       { return b.DeletionQV(orientation, aligned, exciseSoftClips).Fastq(); }
@@ -403,7 +403,7 @@ void CheckQualityTagsClippedAndAligned(const std::string& cigar,
     // InsertionQV
     CheckAlignAndClip(cigar, input, e, makeRecord,
                       [](const BamRecord& b,
-                         Orientation orientation,
+                         Data::Orientation orientation,
                          bool aligned,
                          bool exciseSoftClips)
                       { return b.InsertionQV(orientation, aligned, exciseSoftClips).Fastq(); }
@@ -412,7 +412,7 @@ void CheckQualityTagsClippedAndAligned(const std::string& cigar,
     // MergeQV
     CheckAlignAndClip(cigar, input, e, makeRecord,
                       [](const BamRecord& b,
-                         Orientation orientation,
+                         Data::Orientation orientation,
                          bool aligned,
                          bool exciseSoftClips)
                       { return b.MergeQV(orientation, aligned, exciseSoftClips).Fastq(); }
@@ -421,7 +421,7 @@ void CheckQualityTagsClippedAndAligned(const std::string& cigar,
     // SubstitutionQV
     CheckAlignAndClip(cigar, input, e, makeRecord,
                       [](const BamRecord& b,
-                         Orientation orientation,
+                         Data::Orientation orientation,
                          bool aligned,
                          bool exciseSoftClips)
                       { return b.SubstitutionQV(orientation, aligned, exciseSoftClips).Fastq(); }
@@ -436,7 +436,7 @@ void CheckQualitiesClippedAndAligned(const std::string& cigar,
     // aligned record w/ dummy SEQ & QUALs under test
     auto makeRecord = [](const std::string& newQuals,
                          const std::string& newCigar,
-                         const Strand newStrand)
+                         const Data::Strand newStrand)
     {
         const std::string seq = std::string(newQuals.size(), 'N');
         auto record = BamRecordTests::MakeCigaredRecord(seq, newCigar, newStrand);
@@ -447,7 +447,7 @@ void CheckQualitiesClippedAndAligned(const std::string& cigar,
     // QUAL
     CheckAlignAndClip(cigar, input, e, makeRecord,
                       [](const BamRecord& b,
-                         Orientation orientation,
+                         Data::Orientation orientation,
                          bool aligned,
                          bool exciseSoftClips)
                       { return b.Qualities(orientation, aligned, exciseSoftClips).Fastq(); }
@@ -462,13 +462,13 @@ void CheckSequenceClippedAndAligned(const std::string& cigar,
     // aligned record w/ SEQ
     auto makeRecord = [](const std::string& newSeq,
                          const std::string& newCigar,
-                         const Strand newStrand)
+                         const Data::Strand newStrand)
     { return BamRecordTests::MakeCigaredRecord(newSeq, newCigar, newStrand); };
 
     // SEQ
     CheckAlignAndClip(cigar, input, e, makeRecord,
                       [](const BamRecord& b,
-                         Orientation orientation,
+                         Data::Orientation orientation,
                          bool aligned,
                          bool exciseSoftClips)
                       { return b.Sequence(orientation, aligned, exciseSoftClips); }
@@ -488,13 +488,13 @@ void CheckPulseBaseTags(const std::string& cigar,
                          const std::string& newPulseCalls,
                          const std::string& newPulseBases,
                          const std::string& newCigar,
-                         const Strand newStrand)
+                         const Data::Strand newStrand)
     { return MakeCigaredPulseBaseRecord(newSeqBases, newPulseCalls, newPulseBases, newCigar, newStrand); };
 
     // AltLabelTag
     CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseBases, allPulses, basecallsOnly, makeRecord,
                               [](const BamRecord& b,
-                                 Orientation orientation,
+                                 Data::Orientation orientation,
                                  bool aligned,
                                  bool exciseSoftClips,
                                  PulseBehavior pulseBehavior)
@@ -503,7 +503,7 @@ void CheckPulseBaseTags(const std::string& cigar,
     // PulseCall
     CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseBases, allPulses, basecallsOnly, makeRecord,
                               [](const BamRecord& b,
-                                 Orientation orientation,
+                                 Data::Orientation orientation,
                                  bool aligned,
                                  bool exciseSoftClips,
                                  PulseBehavior pulseBehavior)
@@ -524,13 +524,13 @@ void CheckPulseFrameTags(const std::string& cigar,
                          const std::string& newPulseCalls,
                          const std::vector<uint16_t>& newPulseFrames,
                          const std::string& newCigar,
-                         const Strand newStrand)
+                         const Data::Strand newStrand)
     { return MakeCigaredPulseFrameRecord(newSeqBases, newPulseCalls, newPulseFrames, newCigar, newStrand); };
 
     // PrePulseFrame
     CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseFrames, allPulses, basecallsOnly, makeRecord,
                               [](const BamRecord& b,
-                                 Orientation orientation,
+                                 Data::Orientation orientation,
                                  bool aligned,
                                  bool exciseSoftClips,
                                  PulseBehavior pulseBehavior)
@@ -539,7 +539,7 @@ void CheckPulseFrameTags(const std::string& cigar,
     // PulseCallWidth
     CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseFrames, allPulses, basecallsOnly, makeRecord,
                               [](const BamRecord& b,
-                                 Orientation orientation,
+                                 Data::Orientation orientation,
                                  bool aligned,
                                  bool exciseSoftClips,
                                  PulseBehavior pulseBehavior)
@@ -568,13 +568,13 @@ void CheckPulseQualityTags(const std::string& cigar,
                          const std::string& newPulseCalls,
                          const std::string& newPulseQuals,
                          const std::string& newCigar,
-                         const Strand newStrand)
+                         const Data::Strand newStrand)
     { return MakeCigaredPulseQualRecord(newSeqBases, newPulseCalls, newPulseQuals, newCigar, newStrand); };
 
     // AltLabelQV
     CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseQuals, allPulses, basecallsOnly, makeRecord,
                               [](const BamRecord& b,
-                                 Orientation orientation,
+                                 Data::Orientation orientation,
                                  bool aligned,
                                  bool exciseSoftClips,
                                  PulseBehavior pulseBehavior)
@@ -583,7 +583,7 @@ void CheckPulseQualityTags(const std::string& cigar,
     // LabelQV
     CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseQuals, allPulses, basecallsOnly, makeRecord,
                               [](const BamRecord& b,
-                                 Orientation orientation,
+                                 Data::Orientation orientation,
                                  bool aligned,
                                  bool exciseSoftClips,
                                  PulseBehavior pulseBehavior)
@@ -592,7 +592,7 @@ void CheckPulseQualityTags(const std::string& cigar,
     // PulseMergeQV
     CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, pulseQuals, allPulses, basecallsOnly, makeRecord,
                               [](const BamRecord& b,
-                                 Orientation orientation,
+                                 Data::Orientation orientation,
                                  bool aligned,
                                  bool exciseSoftClips,
                                  PulseBehavior pulseBehavior)
@@ -613,13 +613,13 @@ void CheckPulseUIntTags(const std::string& cigar,
                         const std::string& newPulseCalls,
                         const std::vector<uint32_t>& newStartFrames,
                         const std::string& newCigar,
-                        const Strand newStrand)
+                        const Data::Strand newStrand)
    { return MakeCigaredPulseUIntRecord(newSeqBases, newPulseCalls, newStartFrames, newCigar, newStrand); };
 
    // StartFrame
    CheckPulseDataAlignAndClip(cigar, seqBases, pulseCalls, startFrames, allPulses, basecallsOnly, makeRecord,
                              [](const BamRecord& b,
-                                Orientation orientation,
+                                Data::Orientation orientation,
                                 bool aligned,
                                 bool exciseSoftClips,
                                 PulseBehavior pulseBehavior)
@@ -857,7 +857,7 @@ TEST(BAM_BamRecord, can_be_modified_via_general_setters)
     // create basic BAM with (generic) data
     BamRecord bam = BamRecordTests::CreateBam();
 
-    QualityValues testQVs;
+    Data::QualityValues testQVs;
     testQVs.push_back(0);
     testQVs.push_back(1);
 

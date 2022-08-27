@@ -9,8 +9,9 @@
 #include <pbbam/BamFile.h>
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamRecord.h>
-#include <pbbam/Cigar.h>
 #include <pbbam/ReadGroupInfo.h>
+
+#include <pbcopper/data/Cigar.h>
 
 #include "../src/ValidationErrors.h"
 
@@ -33,7 +34,7 @@ static BamRecord makeValidMappedRecord()
     impl.ReferenceId(0);
     impl.SetMapped(true);
     impl.SetSequenceAndQualities("AATGAGGAGA");
-    impl.CigarData(Cigar{"10="});
+    impl.CigarData(Data::Cigar{"10="});
 
     TagCollection tags;
     tags["RG"] = std::string{"db972a04"};
@@ -435,14 +436,14 @@ TEST(BAM_Validator, reports_invalid_tag_lengths)
         EXPECT_FALSE(Validator::IsValid(record));
     }
 
-    CheckInvalidTagLength("dq", QualityValues("@@").Fastq());  // DeletionQV
-    CheckInvalidTagLength("iq", QualityValues("@@").Fastq());  // InsertionQV
-    CheckInvalidTagLength("mq", QualityValues("@@").Fastq());  // MergeQV
-    CheckInvalidTagLength("sq", QualityValues("@@").Fastq());  // SubstitutionQV
-    CheckInvalidTagLength("dt", std::string("AA"));            // DeletionTag
-    CheckInvalidTagLength("st", std::string("AA"));            // SubstitutionTag
+    CheckInvalidTagLength("dq", Data::QualityValues("@@").Fastq());  // DeletionQV
+    CheckInvalidTagLength("iq", Data::QualityValues("@@").Fastq());  // InsertionQV
+    CheckInvalidTagLength("mq", Data::QualityValues("@@").Fastq());  // MergeQV
+    CheckInvalidTagLength("sq", Data::QualityValues("@@").Fastq());  // SubstitutionQV
+    CheckInvalidTagLength("dt", std::string("AA"));                  // DeletionTag
+    CheckInvalidTagLength("st", std::string("AA"));                  // SubstitutionTag
 
-    const Frames f{{42, 42, 42}};
+    const Data::Frames f{{42, 42, 42}};
     const auto& frames = f.Data();
     CheckInvalidTagLength("ip", frames);  // IPD
 

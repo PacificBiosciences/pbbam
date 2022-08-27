@@ -3,8 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <pbbam/LocalContextFlags.h>
 #include <pbbam/virtual/VirtualRegionType.h>
+
+#include <pbcopper/data/LocalContextFlags.h>
 
 namespace PacBio {
 namespace BAM {

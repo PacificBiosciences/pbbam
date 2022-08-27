@@ -435,26 +435,27 @@ TEST(BAM_PbiFilter, can_filter_on_aligned_start)
 TEST(BAM_PbiFilter, can_filter_on_aligned_strand)
 {
     {
-        const auto filter = PbiFilter{PbiAlignedStrandFilter{Strand::FORWARD}};
+        const auto filter = PbiFilter{PbiAlignedStrandFilter{Data::Strand::FORWARD}};
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0, 2});
     }
     {
-        const auto filter = PbiFilter{PbiAlignedStrandFilter{Strand::REVERSE}};
+        const auto filter = PbiFilter{PbiAlignedStrandFilter{Data::Strand::REVERSE}};
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1, 3});
     }
     {
         const auto filter = PbiFilter{PbiAlignedStrandFilter{
-            Strand::FORWARD, Compare::NOT_EQUAL}};  // same as Strand::REVERSE
+            Data::Strand::FORWARD, Compare::NOT_EQUAL}};  // same as Data::Strand::REVERSE
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1, 3});
     }
 
     // unsupported compare types throw
-    EXPECT_THROW(PbiAlignedStrandFilter(Strand::FORWARD, Compare::LESS_THAN), std::runtime_error);
-    EXPECT_THROW(PbiAlignedStrandFilter(Strand::FORWARD, Compare::LESS_THAN_EQUAL),
+    EXPECT_THROW(PbiAlignedStrandFilter(Data::Strand::FORWARD, Compare::LESS_THAN),
                  std::runtime_error);
-    EXPECT_THROW(PbiAlignedStrandFilter(Strand::FORWARD, Compare::GREATER_THAN),
+    EXPECT_THROW(PbiAlignedStrandFilter(Data::Strand::FORWARD, Compare::LESS_THAN_EQUAL),
                  std::runtime_error);
-    EXPECT_THROW(PbiAlignedStrandFilter(Strand::FORWARD, Compare::GREATER_THAN_EQUAL),
+    EXPECT_THROW(PbiAlignedStrandFilter(Data::Strand::FORWARD, Compare::GREATER_THAN),
+                 std::runtime_error);
+    EXPECT_THROW(PbiAlignedStrandFilter(Data::Strand::FORWARD, Compare::GREATER_THAN_EQUAL),
                  std::runtime_error);
 }
 
@@ -555,49 +556,50 @@ TEST(BAM_PbiFilter, can_filter_on_identity)
 TEST(BAM_PbiFilter, can_filter_on_local_context_flags)
 {
     {  // == NO_LOCAL_CONTEXT
-        const auto filter = PbiFilter{PbiLocalContextFilter{LocalContextFlags::NO_LOCAL_CONTEXT}};
+        const auto filter =
+            PbiFilter{PbiLocalContextFilter{Data::LocalContextFlags::NO_LOCAL_CONTEXT}};
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0});
     }
     {  // != ADAPTER_BEFORE (exact match)
-        const auto filter =
-            PbiFilter{PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_EQUAL}};
+        const auto filter = PbiFilter{
+            PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_EQUAL}};
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0, 2, 3});
     }
     {  // contains ADAPTER_BEFORE
-        const auto filter =
-            PbiFilter{PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS}};
+        const auto filter = PbiFilter{
+            PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS}};
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1, 3});
     }
     {  // does not contain ADAPTER_BEFORE
         const auto filter = PbiFilter{
-            PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS}};
+            PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS}};
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0, 2});
     }
     {  // include both ADAPTER_BEFORE and ADAPTER_AFTER
         const auto filter = PbiFilter::Intersection(
-            {PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS},
-             PbiLocalContextFilter{LocalContextFlags::ADAPTER_AFTER, Compare::CONTAINS}});
+            {PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS},
+             PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_AFTER, Compare::CONTAINS}});
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{3});
     }
     {  // exclude both ADAPTER_BEFORE and ADAPTER_AFTER
         const auto filter = PbiFilter::Intersection(
-            {PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS},
-             PbiLocalContextFilter{LocalContextFlags::ADAPTER_AFTER, Compare::NOT_CONTAINS}});
+            {PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS},
+             PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_AFTER, Compare::NOT_CONTAINS}});
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{0});
     }
     {  // include everything with either ADAPTER_BEFORE or ADAPTER_AFTER
         const auto filter = PbiFilter::Union(
-            {PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS},
-             PbiLocalContextFilter{LocalContextFlags::ADAPTER_AFTER, Compare::CONTAINS}});
+            {PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS},
+             PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_AFTER, Compare::CONTAINS}});
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1, 2, 3});
     }
     {  // include everything with either ADAPTER_BEFORE or ADAPTER_AFTER, but not both
         const auto filter = PbiFilter::Intersection(
-            {PbiLocalContextFilter{LocalContextFlags::NO_LOCAL_CONTEXT, Compare::NOT_EQUAL},
-             PbiFilter::Union(
-                 {PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS},
-                  PbiLocalContextFilter{LocalContextFlags::ADAPTER_AFTER,
-                                        Compare::NOT_CONTAINS}})});
+            {PbiLocalContextFilter{Data::LocalContextFlags::NO_LOCAL_CONTEXT, Compare::NOT_EQUAL},
+             PbiFilter::Union({PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_BEFORE,
+                                                     Compare::NOT_CONTAINS},
+                               PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_AFTER,
+                                                     Compare::NOT_CONTAINS}})});
         PbiFilterTests::checkFilterRows(filter, std::vector<size_t>{1, 2});
     }
 }
@@ -1098,7 +1100,7 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     {  // no adapters or barcodes
 
         const auto expectedFilter =
-            PbiLocalContextFilter{LocalContextFlags::NO_LOCAL_CONTEXT, Compare::EQUAL};
+            PbiLocalContextFilter{Data::LocalContextFlags::NO_LOCAL_CONTEXT, Compare::EQUAL};
 
         // XML: <Property Name="cx" Value="0" Operator="==" />
         Property property("cx", "0", "==");
@@ -1115,7 +1117,7 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     {  // any adapters or barcodes
 
         const auto expectedFilter =
-            PbiLocalContextFilter{LocalContextFlags::NO_LOCAL_CONTEXT, Compare::NOT_EQUAL};
+            PbiLocalContextFilter{Data::LocalContextFlags::NO_LOCAL_CONTEXT, Compare::NOT_EQUAL};
 
         // XML: <Property Name="cx" Value="0" Operator="!=" />
         Property property("cx", "0", "!=");
@@ -1132,7 +1134,7 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     {  // contains adapter_before
 
         const auto expectedFilter =
-            PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS};
+            PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS};
 
         // XML: <Property Name="cx" Value="1" Operator="&" />
         Property property("cx", "1", "&");
@@ -1149,7 +1151,7 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     {  // contains adapter_before
 
         const auto expectedFilter =
-            PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS};
+            PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS};
 
         // XML: <Property Name="cx" Value="ADAPTER_BEFORE" Operator="&" />
         Property property("cx", "ADAPTER_BEFORE", "&");
@@ -1166,7 +1168,7 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     {  // contains adapter_after
 
         const auto expectedFilter =
-            PbiLocalContextFilter{LocalContextFlags::ADAPTER_AFTER, Compare::CONTAINS};
+            PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_AFTER, Compare::CONTAINS};
 
         // XML: <Property Name="cx" Value="2" Operator="&" />
         Property property("cx", "2", "&");
@@ -1183,7 +1185,7 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     {  // contains adapter_before or adapter_after
 
         const auto expectedFilter = PbiLocalContextFilter{
-            LocalContextFlags::ADAPTER_BEFORE | LocalContextFlags::ADAPTER_AFTER,
+            Data::LocalContextFlags::ADAPTER_BEFORE | Data::LocalContextFlags::ADAPTER_AFTER,
             Compare::CONTAINS};
 
         // XML: <Property Name="cx" Value="3" Operator="&" />
@@ -1201,7 +1203,7 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     {  // contains adapter_before or adapter_after
 
         const auto expectedFilter = PbiLocalContextFilter{
-            LocalContextFlags::ADAPTER_BEFORE | LocalContextFlags::ADAPTER_AFTER,
+            Data::LocalContextFlags::ADAPTER_BEFORE | Data::LocalContextFlags::ADAPTER_AFTER,
             Compare::CONTAINS};
 
         // XML: <Property Name="cx" Value="ADAPTER_BEFORE | ADAPTER_AFTER" Operator="&" />
@@ -1219,7 +1221,7 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     {  // contains adapter_before or adapter_after - no whitespace separation
 
         const auto expectedFilter = PbiLocalContextFilter{
-            LocalContextFlags::ADAPTER_BEFORE | LocalContextFlags::ADAPTER_AFTER,
+            Data::LocalContextFlags::ADAPTER_BEFORE | Data::LocalContextFlags::ADAPTER_AFTER,
             Compare::CONTAINS};
 
         // XML: <Property Name="cx" Value="ADAPTER_BEFORE|ADAPTER_AFTER" Operator="&" />
@@ -1237,7 +1239,7 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     {  // contains adapter_before or adapter_after - a lot of whitespace separation
 
         const auto expectedFilter = PbiLocalContextFilter{
-            LocalContextFlags::ADAPTER_BEFORE | LocalContextFlags::ADAPTER_AFTER,
+            Data::LocalContextFlags::ADAPTER_BEFORE | Data::LocalContextFlags::ADAPTER_AFTER,
             Compare::CONTAINS};
 
         // XML: <Property Name="cx" Value="ADAPTER_BEFORE        |           ADAPTER_AFTER" Operator="&" />
@@ -1254,14 +1256,17 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     }
     {  // contains adapter_before or adapter_after, but not both
 
-        const auto expectedFilter = PbiFilter::Union(
-            {PbiFilter::Intersection(
-                 {PbiLocalContextFilter{LocalContextFlags::NO_LOCAL_CONTEXT, Compare::NOT_EQUAL},
-                  PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS}}),
-             PbiFilter::Intersection(
-                 {PbiLocalContextFilter{LocalContextFlags::NO_LOCAL_CONTEXT, Compare::NOT_EQUAL},
-                  PbiLocalContextFilter{LocalContextFlags::ADAPTER_AFTER,
-                                        Compare::NOT_CONTAINS}})});
+        const auto expectedFilter =
+            PbiFilter::Union({PbiFilter::Intersection(
+                                  {PbiLocalContextFilter{Data::LocalContextFlags::NO_LOCAL_CONTEXT,
+                                                         Compare::NOT_EQUAL},
+                                   PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_BEFORE,
+                                                         Compare::NOT_CONTAINS}}),
+                              PbiFilter::Intersection(
+                                  {PbiLocalContextFilter{Data::LocalContextFlags::NO_LOCAL_CONTEXT,
+                                                         Compare::NOT_EQUAL},
+                                   PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_AFTER,
+                                                         Compare::NOT_CONTAINS}})});
 
         // XML:
         // <Filters>
@@ -1298,8 +1303,8 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     {  // contains adapter_before or adapter_after
 
         const auto expectedFilter = PbiFilter::Union(
-            {PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS},
-             PbiLocalContextFilter{LocalContextFlags::ADAPTER_AFTER, Compare::CONTAINS}});
+            {PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS},
+             PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_AFTER, Compare::CONTAINS}});
 
         // XML:
         // <Filters>
@@ -1332,8 +1337,8 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     {  // adapter_before and adapter_after
 
         const auto expectedFilter = PbiFilter::Intersection(
-            {PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS},
-             PbiLocalContextFilter{LocalContextFlags::ADAPTER_AFTER, Compare::CONTAINS}});
+            {PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS},
+             PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_AFTER, Compare::CONTAINS}});
 
         // XML:
         // <Property Name="cx" Value="1" Operator="&" />
@@ -1354,8 +1359,8 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     {  // adapter_before, but no adapter_after
 
         const auto expectedFilter = PbiFilter::Intersection(
-            {PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS},
-             PbiLocalContextFilter{LocalContextFlags::ADAPTER_AFTER, Compare::NOT_CONTAINS}});
+            {PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_BEFORE, Compare::CONTAINS},
+             PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_AFTER, Compare::NOT_CONTAINS}});
 
         // XML:
         // <Property Name="cx" Value="1" Operator="&" />
@@ -1376,7 +1381,7 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     {  // contains no adapter_before
 
         const auto expectedFilter =
-            PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS};
+            PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS};
 
         // XML: <Property Name="cx" Value="1" Operator="~" />
         Property property("cx", "1", "~");
@@ -1393,8 +1398,8 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     {  // contains no adapter_before or adapter_after
 
         const auto expectedFilter = PbiFilter::Intersection(
-            {PbiLocalContextFilter{LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS},
-             PbiLocalContextFilter{LocalContextFlags::ADAPTER_AFTER, Compare::NOT_CONTAINS}});
+            {PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_BEFORE, Compare::NOT_CONTAINS},
+             PbiLocalContextFilter{Data::LocalContextFlags::ADAPTER_AFTER, Compare::NOT_CONTAINS}});
 
         // XML:
         // <Property Name="cx" Value="1" Operator="~" />
@@ -1415,7 +1420,7 @@ TEST(BAM_PbiFilter, can_load_from_dataset_with_local_context)
     {  // contains no adapter_before or adapter_after
 
         const auto expectedFilter = PbiLocalContextFilter{
-            LocalContextFlags::ADAPTER_BEFORE | LocalContextFlags::ADAPTER_AFTER,
+            Data::LocalContextFlags::ADAPTER_BEFORE | Data::LocalContextFlags::ADAPTER_AFTER,
             Compare::NOT_CONTAINS};
 
         // XML: <Property Name="cx" Value="3" Operator="~" />

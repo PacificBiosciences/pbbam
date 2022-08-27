@@ -4,11 +4,12 @@
 #include <pbbam/Config.h>
 
 #include <pbbam/BamRecordTag.h>
-#include <pbbam/Cigar.h>
 #include <pbbam/Deleters.h>
-#include <pbbam/Position.h>
-#include <pbbam/QualityValues.h>
 #include <pbbam/TagCollection.h>
+
+#include <pbcopper/data/Cigar.h>
+#include <pbcopper/data/Position.h>
+#include <pbcopper/data/QualityValues.h>
 
 #include <htslib/sam.h>
 
@@ -242,7 +243,7 @@ public:
 
     /// Sets the record's CIGAR data using a Cigar object
     ///
-    /// \param[in] cigar PacBio::BAM::Cigar object
+    /// \param[in] cigar PacBio::Data::Cigar object
     /// \returns reference to this record
     ///
     BamRecordImpl& CigarData(const Data::Cigar& cigar);

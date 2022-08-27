@@ -23,7 +23,7 @@ TEST(BAM_GenomicIntervalCompositeBamReader, can_be_reused)
                                         BamFile{CompositeBamReaderTests::alignedBamFn}};
 
     // setup with normal interval
-    GenomicInterval interval{refName, 5000, 6000};
+    PacBio::Data::GenomicInterval interval{refName, 5000, 6000};
     GenomicIntervalCompositeBamReader reader{interval, bamFiles};
     EXPECT_EQ(4, std::distance(reader.begin(), reader.end()));
 
@@ -58,7 +58,7 @@ TEST(BAM_GenomicIntervalCompositeBamReader, can_be_reused)
 
 TEST(BAM_GenomicIntervalCompositeBamReader, throws_on_missing_bai)
 {
-    const GenomicInterval interval{"lambda_NEB3011", 0, 100};
+    const PacBio::Data::GenomicInterval interval{"lambda_NEB3011", 0, 100};
 
     {  // single file, missing BAI
         const std::vector<BamFile> bamFiles{BamFile{CompositeBamReaderTests::phi29BamFn}};
@@ -91,7 +91,7 @@ TEST(BAM_GenomicIntervalCompositeBamReader, can_be_intialized_without_an_interva
     EXPECT_EQ(0, std::distance(reader.begin(), reader.end()));
 
     // pass in actual interval
-    GenomicInterval interval{"lambda_NEB3011", 9300, 9400};
+    PacBio::Data::GenomicInterval interval{"lambda_NEB3011", 9300, 9400};
     reader.Interval(interval);
     EXPECT_EQ(4, std::distance(reader.begin(), reader.end()));
 }
@@ -120,7 +120,7 @@ TEST(BAM_PbiFilterCompositeBamReader, can_handle_normal_filters)
     {
         // all records aligned to reverse strand && pos >= 9200
         const std::string queryName{"m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/5615_6237"};
-        const Strand strand = Strand::REVERSE;
+        const PacBio::Data::Strand strand = PacBio::Data::Strand::REVERSE;
         const uint32_t minPos = 9200;
         const auto filter = PbiFilter::Intersection({
             PbiAlignedStrandFilter{strand},
@@ -131,7 +131,7 @@ TEST(BAM_PbiFilterCompositeBamReader, can_handle_normal_filters)
         const auto count = std::count_if(reader.begin(), reader.end(),
             [&](const BamRecord& r) {
                 return r.AlignedStrand() == strand &&
-                       r.ReferenceStart() >= static_cast<Position>(minPos) &&
+                       r.ReferenceStart() >= static_cast<PacBio::Data::Position>(minPos) &&
                        r.FullName() == queryName;
             });
         EXPECT_EQ(2, count);
@@ -139,7 +139,7 @@ TEST(BAM_PbiFilterCompositeBamReader, can_handle_normal_filters)
     {
         // all records aligned to forward strand && pos >= 9200
         const std::string queryName{"m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2114_2531"};
-        const Strand strand = Strand::FORWARD;
+        const PacBio::Data::Strand strand = PacBio::Data::Strand::FORWARD;
         const uint32_t minPos = 9200;
         const auto filter = PbiFilter::Intersection({
             PbiAlignedStrandFilter{strand},
@@ -150,7 +150,7 @@ TEST(BAM_PbiFilterCompositeBamReader, can_handle_normal_filters)
         const auto count = std::count_if(reader.begin(), reader.end(),
             [&](const BamRecord& r) {
                 return r.AlignedStrand() == strand &&
-                       r.ReferenceStart() >= static_cast<Position>(minPos) &&
+                       r.ReferenceStart() >= static_cast<PacBio::Data::Position>(minPos) &&
                        r.FullName() == queryName;
             });
         EXPECT_EQ(1, count);

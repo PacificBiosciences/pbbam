@@ -170,7 +170,7 @@ public:
     /// \param[in] strand  strand value to compare on
     /// \param[in] cmp     compare type
     ///
-    PbiAlignedStrandFilter(Strand strand, Compare::Type cmp = Compare::EQUAL);
+    PbiAlignedStrandFilter(Data::Strand strand, Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiBarcodeFilter class provides a PbiFilter-compatible filter on

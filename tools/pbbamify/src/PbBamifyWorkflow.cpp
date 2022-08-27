@@ -205,7 +205,7 @@ Data::Cigar Workflow::BasicToExtendedCigar(const BAM::IndexedFastaReader& indexe
 
     std::string qseq{record.Impl().Sequence()};
     std::string rseq =
-        indexedRefReader.ReferenceSubsequence(record, BAM::Orientation::GENOMIC, false, false);
+        indexedRefReader.ReferenceSubsequence(record, Data::Orientation::GENOMIC, false, false);
 
     size_t qpos = 0, rpos = 0;  // The rpos should be 0 because the reference portion is yanked out.
     for (const auto& cigar : cigarData) {

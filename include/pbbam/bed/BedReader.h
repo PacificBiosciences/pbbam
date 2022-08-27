@@ -3,8 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <pbbam/GenomicInterval.h>
 #include <pbbam/internal/QueryBase.h>
+
+#include <pbcopper/data/GenomicInterval.h>
 
 #include <memory>
 #include <string>

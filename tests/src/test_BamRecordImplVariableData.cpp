@@ -172,8 +172,8 @@ TEST(BAM_BamRecordImplVarData, default_construction_cigar_is_empty)
 
 TEST(BAM_BamRecordImplVarData, can_set_cigar_from_cigar_object)
 {
-    Cigar cigar;
-    cigar.push_back(CigarOperation('=', 100));
+    Data::Cigar cigar;
+    cigar.push_back(Data::CigarOperation('=', 100));
 
     BamRecordImpl bam;
     bam.CigarData(cigar);

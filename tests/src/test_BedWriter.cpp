@@ -9,14 +9,15 @@
 #include <gtest/gtest.h>
 
 #include <pbbam/FormatUtils.h>
-#include <pbbam/GenomicInterval.h>
 #include <pbbam/bed/BedReader.h>
+
+#include <pbcopper/data/GenomicInterval.h>
 
 #include "PbbamTestData.h"
 
 using BedReader = PacBio::BED::BedReader;
 using BedWriter = PacBio::BED::BedWriter;
-using GenomicInterval = PacBio::BAM::GenomicInterval;
+using GenomicInterval = PacBio::Data::GenomicInterval;
 using HtslibCompression = PacBio::BAM::HtslibCompression;
 
 namespace BedWriterTests {

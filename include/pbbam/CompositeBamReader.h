@@ -10,8 +10,9 @@
 #include <pbbam/BamReader.h>
 #include <pbbam/BamRecord.h>
 #include <pbbam/DataSet.h>
-#include <pbbam/GenomicInterval.h>
 #include <pbbam/PbiIndexedBamReader.h>
+
+#include <pbcopper/data/GenomicInterval.h>
 
 #include <deque>
 #include <functional>
@@ -153,9 +154,9 @@ public:
     /// \throws std::runtime_error on failure to open/read underlying %BAM or
     ///         BAI files.
     ///
-    GenomicIntervalCompositeBamReader(const GenomicInterval& interval,
+    GenomicIntervalCompositeBamReader(const Data::GenomicInterval& interval,
                                       const std::vector<BamFile>& bamFiles);
-    GenomicIntervalCompositeBamReader(const GenomicInterval& interval,
+    GenomicIntervalCompositeBamReader(const Data::GenomicInterval& interval,
                                       const std::vector<BamFile>& bamFiles,
                                       const BaiIndexCache& cache);
 
@@ -168,8 +169,9 @@ public:
     /// \throws std::runtime_error on failure to open/read underlying %BAM or
     ///         BAI files.
     ///
-    GenomicIntervalCompositeBamReader(const GenomicInterval& interval, const DataSet& dataset);
-    GenomicIntervalCompositeBamReader(const GenomicInterval& interval, const DataSet& dataset,
+    GenomicIntervalCompositeBamReader(const Data::GenomicInterval& interval,
+                                      const DataSet& dataset);
+    GenomicIntervalCompositeBamReader(const Data::GenomicInterval& interval, const DataSet& dataset,
                                       const BaiIndexCache& cache);
 
     /// \}
@@ -182,17 +184,17 @@ public:
     ///
     /// \returns reference to this reader
     ///
-    GenomicIntervalCompositeBamReader& Interval(const GenomicInterval& interval);
+    GenomicIntervalCompositeBamReader& Interval(const Data::GenomicInterval& interval);
 
     /// \returns the current specified interval
     ///
-    const GenomicInterval& Interval() const;
+    const Data::GenomicInterval& Interval() const;
 
     /// \}
 
 private:
     BaiIndexCache indexCache_;
-    GenomicInterval interval_;
+    Data::GenomicInterval interval_;
 };
 
 /// \brief Provides read access to multipe %BAM files, limiting results to those

@@ -3,25 +3,25 @@
 
 #include <pbbam/Config.h>
 
-#include <pbbam/Accuracy.h>
 #include <pbbam/BamHeader.h>
 #include <pbbam/BamRecordImpl.h>
 #include <pbbam/ClipType.h>
 #include <pbbam/FrameEncodingType.h>
-#include <pbbam/Frames.h>
-#include <pbbam/LocalContextFlags.h>
-#include <pbbam/Orientation.h>
 #include <pbbam/PulseBehavior.h>
 #include <pbbam/PulseExclusionReason.h>
-#include <pbbam/QualityValues.h>
 #include <pbbam/ReadGroupInfo.h>
 #include <pbbam/RecordType.h>
-#include <pbbam/Strand.h>
 #include <pbbam/ZmwType.h>
 #include <pbbam/virtual/VirtualRegionType.h>
 
+#include <pbcopper/data/Accuracy.h>
+#include <pbcopper/data/Frames.h>
+#include <pbcopper/data/LocalContextFlags.h>
 #include <pbcopper/data/MappedRead.h>
+#include <pbcopper/data/Orientation.h>
+#include <pbcopper/data/QualityValues.h>
 #include <pbcopper/data/Read.h>
+#include <pbcopper/data/Strand.h>
 #include <pbcopper/json/JSON.h>
 
 #include <memory>
@@ -846,8 +846,8 @@ public:
     /// \param[in] orientation     Orientation of output.
     /// \returns PulseWidth as Frames object
     ///
-    Frames PulseWidthRaw(Orientation orientation = Orientation::NATIVE, bool aligned = false,
-                         bool exciseSoftClips = false) const;
+    Data::Frames PulseWidthRaw(Data::Orientation orientation = Data::Orientation::NATIVE,
+                               bool aligned = false, bool exciseSoftClips = false) const;
 
     /// \brief Fetches this record's reverse IPD values ("ri" tag).
     ///
@@ -1143,7 +1143,7 @@ public:
     /// \param[in] labelQVs
     /// \returns reference to this record
     ///
-    BamRecord& LabelQV(const QualityValues& labelQVs);
+    BamRecord& LabelQV(const Data::QualityValues& labelQVs);
 
     /// \brief Sets this record's MergeQV values ("mq" tag).
     ///
@@ -1550,7 +1550,8 @@ private:
 
     // sequence tags
     std::string FetchBasesRaw(BamRecordTag tag) const;
-    std::string FetchBases(BamRecordTag tag, Orientation orientation = Orientation::NATIVE,
+    std::string FetchBases(BamRecordTag tag,
+                           Data::Orientation orientation = Data::Orientation::NATIVE,
                            bool aligned = false, bool exciseSoftClips = false,
                            PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 

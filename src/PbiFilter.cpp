@@ -100,17 +100,17 @@ static const std::unordered_map<std::string, BuiltIn> builtInLookup =
     { "zmw",           BuiltIn::ZmwFilter }
 };
 
-static const std::unordered_map<std::string, LocalContextFlags> contextFlagNames =
+static const std::unordered_map<std::string, Data::LocalContextFlags> contextFlagNames =
 {
-    { "NO_LOCAL_CONTEXT",   LocalContextFlags::NO_LOCAL_CONTEXT },
-    { "ADAPTER_BEFORE",     LocalContextFlags::ADAPTER_BEFORE },
-    { "ADAPTER_AFTER",      LocalContextFlags::ADAPTER_AFTER },
-    { "BARCODE_BEFORE",     LocalContextFlags::BARCODE_BEFORE },
-    { "BARCODE_AFTER",      LocalContextFlags::BARCODE_AFTER },
-    { "FORWARD_PASS",       LocalContextFlags::FORWARD_PASS },
-    { "REVERSE_PASS",       LocalContextFlags::REVERSE_PASS },
-    { "ADAPTER_BEFORE_BAD", LocalContextFlags::ADAPTER_BEFORE_BAD},
-    { "ADAPTER_AFTER_BAD",  LocalContextFlags::ADAPTER_AFTER_BAD}
+    { "NO_LOCAL_CONTEXT",   Data::LocalContextFlags::NO_LOCAL_CONTEXT },
+    { "ADAPTER_BEFORE",     Data::LocalContextFlags::ADAPTER_BEFORE },
+    { "ADAPTER_AFTER",      Data::LocalContextFlags::ADAPTER_AFTER },
+    { "BARCODE_BEFORE",     Data::LocalContextFlags::BARCODE_BEFORE },
+    { "BARCODE_AFTER",      Data::LocalContextFlags::BARCODE_AFTER },
+    { "FORWARD_PASS",       Data::LocalContextFlags::FORWARD_PASS },
+    { "REVERSE_PASS",       Data::LocalContextFlags::REVERSE_PASS },
+    { "ADAPTER_BEFORE_BAD", Data::LocalContextFlags::ADAPTER_BEFORE_BAD},
+    { "ADAPTER_AFTER_BAD",  Data::LocalContextFlags::ADAPTER_AFTER_BAD}
 };
 // clang-format on
 

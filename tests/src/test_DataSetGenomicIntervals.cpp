@@ -19,8 +19,8 @@ TEST(BAM_DataSetGenomicIntervals, fetches_intervals_with_no_filter)
     DataSet ds{GenomicIntervalsTests::inputDir + "no_filter.alignmentset.xml"};
     ds.Type(DataSet::ALIGNMENT);
 
-    const std::vector<GenomicInterval> result = ds.GenomicIntervals();
-    const std::vector<GenomicInterval> correct{{"contig1", 0, 20}, {"contig2", 0, 10}};
+    const std::vector<Data::GenomicInterval> result = ds.GenomicIntervals();
+    const std::vector<Data::GenomicInterval> correct{{"contig1", 0, 20}, {"contig2", 0, 10}};
     EXPECT_EQ(correct, result);
 }
 
@@ -30,8 +30,8 @@ TEST(BAM_DataSetGenomicIntervals, fetches_no_intervals_with_empty_input)
     DataSet ds{GenomicIntervalsTests::inputDir + "empty.alignmentset.xml"};
     ds.Type(DataSet::ALIGNMENT);
 
-    const std::vector<GenomicInterval> result = ds.GenomicIntervals();
-    const std::vector<GenomicInterval> correct;
+    const std::vector<Data::GenomicInterval> result = ds.GenomicIntervals();
+    const std::vector<Data::GenomicInterval> correct;
     EXPECT_EQ(correct, result);
 }
 
@@ -42,8 +42,8 @@ TEST(BAM_DataSetGenomicIntervals, fetches_no_intervals_if_out_of_range)
     DataSet ds{GenomicIntervalsTests::inputDir + "out_of_range.alignmentset.xml"};
     ds.Type(DataSet::ALIGNMENT);
 
-    const std::vector<GenomicInterval> result = ds.GenomicIntervals();
-    const std::vector<GenomicInterval> correct;
+    const std::vector<Data::GenomicInterval> result = ds.GenomicIntervals();
+    const std::vector<Data::GenomicInterval> correct;
     EXPECT_EQ(correct, result);
 }
 
@@ -53,8 +53,8 @@ TEST(BAM_DataSetGenomicIntervals, can_fetch_single_normal_interval)
     DataSet ds{GenomicIntervalsTests::inputDir + "single_interval.alignmentset.xml"};
     ds.Type(DataSet::ALIGNMENT);
 
-    const std::vector<GenomicInterval> result = ds.GenomicIntervals();
-    const std::vector<GenomicInterval> correct{{"contig1", 3, 10}};
+    const std::vector<Data::GenomicInterval> result = ds.GenomicIntervals();
+    const std::vector<Data::GenomicInterval> correct{{"contig1", 3, 10}};
     EXPECT_EQ(correct, result);
 }
 
@@ -64,8 +64,8 @@ TEST(BAM_DataSetGenomicIntervals, can_fetch_whole_contig_with_integers)
     DataSet ds{GenomicIntervalsTests::inputDir + "whole_contig.alignmentset.xml"};
     ds.Type(DataSet::ALIGNMENT);
 
-    const std::vector<GenomicInterval> result = ds.GenomicIntervals();
-    const std::vector<GenomicInterval> correct{{"contig1", 0, 20}};
+    const std::vector<Data::GenomicInterval> result = ds.GenomicIntervals();
+    const std::vector<Data::GenomicInterval> correct{{"contig1", 0, 20}};
     EXPECT_EQ(correct, result);
 }
 
@@ -75,8 +75,8 @@ TEST(BAM_DataSetGenomicIntervals, can_fetch_whole_contig_with_name_only)
     DataSet ds{GenomicIntervalsTests::inputDir + "contig_name_only.alignmentset.xml"};
     ds.Type(DataSet::ALIGNMENT);
 
-    const std::vector<GenomicInterval> result = ds.GenomicIntervals();
-    const std::vector<GenomicInterval> correct{{"contig1", 0, 20}};
+    const std::vector<Data::GenomicInterval> result = ds.GenomicIntervals();
+    const std::vector<Data::GenomicInterval> correct{{"contig1", 0, 20}};
     EXPECT_EQ(correct, result);
 }
 
@@ -86,8 +86,8 @@ TEST(BAM_DataSetGenomicIntervals, can_fetch_single_interval_less_than_equal)
     DataSet ds{GenomicIntervalsTests::inputDir + "single_interval_start_lte.alignmentset.xml"};
     ds.Type(DataSet::ALIGNMENT);
 
-    const std::vector<GenomicInterval> result = ds.GenomicIntervals();
-    const std::vector<GenomicInterval> correct{{"contig1", 3, 11}};
+    const std::vector<Data::GenomicInterval> result = ds.GenomicIntervals();
+    const std::vector<Data::GenomicInterval> correct{{"contig1", 3, 11}};
     EXPECT_EQ(correct, result);
 }
 
@@ -97,8 +97,8 @@ TEST(BAM_DataSetGenomicIntervals, can_fetch_single_interval_greater_than_equal)
     DataSet ds{GenomicIntervalsTests::inputDir + "single_interval_end_gte.alignmentset.xml"};
     ds.Type(DataSet::ALIGNMENT);
 
-    const std::vector<GenomicInterval> result = ds.GenomicIntervals();
-    const std::vector<GenomicInterval> correct{{"contig1", 2, 10}};
+    const std::vector<Data::GenomicInterval> result = ds.GenomicIntervals();
+    const std::vector<Data::GenomicInterval> correct{{"contig1", 2, 10}};
     EXPECT_EQ(correct, result);
 }
 
@@ -108,8 +108,8 @@ TEST(BAM_DataSetGenomicIntervals, can_fetch_disjoint_intervals)
     DataSet ds{GenomicIntervalsTests::inputDir + "disjoint_intervals.alignmentset.xml"};
     ds.Type(DataSet::ALIGNMENT);
 
-    const std::vector<GenomicInterval> result = ds.GenomicIntervals();
-    const std::vector<GenomicInterval> correct{{"contig1", 3, 7}, {"contig1", 13, 17}};
+    const std::vector<Data::GenomicInterval> result = ds.GenomicIntervals();
+    const std::vector<Data::GenomicInterval> correct{{"contig1", 3, 7}, {"contig1", 13, 17}};
     EXPECT_EQ(correct, result);
 }
 
@@ -120,8 +120,8 @@ TEST(BAM_DataSetGenomicIntervals, can_fetch_adjacent_intervals)
     DataSet ds{GenomicIntervalsTests::inputDir + "adjacent_intervals.alignmentset.xml"};
     ds.Type(DataSet::ALIGNMENT);
 
-    const std::vector<GenomicInterval> result = ds.GenomicIntervals();
-    const std::vector<GenomicInterval> correct{{"contig1", 3, 17}};
+    const std::vector<Data::GenomicInterval> result = ds.GenomicIntervals();
+    const std::vector<Data::GenomicInterval> correct{{"contig1", 3, 17}};
     EXPECT_EQ(correct, result);
 }
 
@@ -132,8 +132,8 @@ TEST(BAM_DataSetGenomicIntervals, can_fetch_across_multiple_contigs)
     DataSet ds{GenomicIntervalsTests::inputDir + "two_contigs.alignmentset.xml"};
     ds.Type(DataSet::ALIGNMENT);
 
-    const std::vector<GenomicInterval> result = ds.GenomicIntervals();
-    const std::vector<GenomicInterval> correct{{"contig1", 3, 11}, {"contig2", 2, 7}};
+    const std::vector<Data::GenomicInterval> result = ds.GenomicIntervals();
+    const std::vector<Data::GenomicInterval> correct{{"contig1", 3, 11}, {"contig2", 2, 7}};
     EXPECT_EQ(correct, result);
 }
 

@@ -83,7 +83,7 @@ bool FilterBase<T>::CompareSingleHelper(const T& lhs) const
 }
 
 template <>
-inline bool FilterBase<LocalContextFlags>::CompareSingleHelper(const LocalContextFlags& lhs) const
+inline bool FilterBase<Data::LocalContextFlags>::CompareSingleHelper(const Data::LocalContextFlags& lhs) const
 {
     switch (cmp_) {
         case Compare::EQUAL:
@@ -183,15 +183,15 @@ bool BasicDataFilterBase<T, field>::BasicDataFilterBase::Accepts(const PbiRawDat
 
 // this typedef exists purely so that the next method signature isn't 2 screen widths long
 using LocalContextFilter__ =
-    BasicDataFilterBase<LocalContextFlags, PbiFile::BasicField::CONTEXT_FLAG>;
+    BasicDataFilterBase<Data::LocalContextFlags, PbiFile::BasicField::CONTEXT_FLAG>;
 
 template <>
 inline bool LocalContextFilter__::BasicDataFilterBase::Accepts(const PbiRawData& idx,
                                                                const size_t row) const
 {
     const auto& basicData = idx.BasicData();
-    const auto rowFlags = static_cast<LocalContextFlags>(basicData.ctxtFlag_.at(row));
-    return FilterBase<LocalContextFlags>::CompareHelper(rowFlags);
+    const auto rowFlags = static_cast<Data::LocalContextFlags>(basicData.ctxtFlag_.at(row));
+    return FilterBase<Data::LocalContextFlags>::CompareHelper(rowFlags);
 }
 
 // BasicDataFilterBase
@@ -210,12 +210,12 @@ MappedDataFilterBase<T, field>::MappedDataFilterBase(std::vector<T> values, cons
 
 template <>
 inline bool
-MappedDataFilterBase<Strand, PbiFile::MappedField::STRAND>::MappedDataFilterBase::Accepts(
+MappedDataFilterBase<Data::Strand, PbiFile::MappedField::STRAND>::MappedDataFilterBase::Accepts(
     const PbiRawData& idx, const size_t row) const
 {
     const PbiRawMappedData& mappedData = idx.MappedData();
-    const Strand strand = (mappedData.revStrand_.at(row) == 1 ? Strand::REVERSE : Strand::FORWARD);
-    return FilterBase<Strand>::CompareHelper(strand);
+    const Data::Strand strand = (mappedData.revStrand_.at(row) == 1 ? Data::Strand::REVERSE : Data::Strand::FORWARD);
+    return FilterBase<Data::Strand>::CompareHelper(strand);
 }
 
 template <typename T, PbiFile::MappedField field>
@@ -278,8 +278,8 @@ inline PbiAlignedStartFilter::PbiAlignedStartFilter(const uint32_t position,
 
 // PbiAlignedStrandFilter
 
-inline PbiAlignedStrandFilter::PbiAlignedStrandFilter(const Strand strand, const Compare::Type cmp)
-    : internal::MappedDataFilterBase<Strand, PbiFile::MappedField::STRAND>{strand, cmp}
+inline PbiAlignedStrandFilter::PbiAlignedStrandFilter(const Data::Strand strand, const Compare::Type cmp)
+    : internal::MappedDataFilterBase<Data::Strand, PbiFile::MappedField::STRAND>{strand, cmp}
 {
     if (cmp != Compare::EQUAL && cmp != Compare::NOT_EQUAL) {
         throw std::runtime_error{
@@ -374,9 +374,9 @@ inline PbiIdentityFilter::PbiIdentityFilter(const float identity, const Compare:
 
 // PbiLocalContextFilter
 
-inline PbiLocalContextFilter::PbiLocalContextFilter(const LocalContextFlags& flags,
+inline PbiLocalContextFilter::PbiLocalContextFilter(const Data::LocalContextFlags& flags,
                                                     const Compare::Type cmp)
-    : internal::BasicDataFilterBase<LocalContextFlags, PbiFile::BasicField::CONTEXT_FLAG>{flags,
+    : internal::BasicDataFilterBase<Data::LocalContextFlags, PbiFile::BasicField::CONTEXT_FLAG>{flags,
                                                                                           cmp}
 {
 }
@@ -443,9 +443,9 @@ inline PbiQueryStartFilter::PbiQueryStartFilter(const int32_t position, const Co
 
 // PbiReadAccuracyFilter
 
-inline PbiReadAccuracyFilter::PbiReadAccuracyFilter(const Accuracy accuracy,
+inline PbiReadAccuracyFilter::PbiReadAccuracyFilter(const Data::Accuracy accuracy,
                                                     const Compare::Type cmp)
-    : internal::BasicDataFilterBase<Accuracy, PbiFile::BasicField::READ_QUALITY>{accuracy, cmp}
+    : internal::BasicDataFilterBase<Data::Accuracy, PbiFile::BasicField::READ_QUALITY>{accuracy, cmp}
 {
 }
 
