@@ -44,7 +44,6 @@ pbbam_test_cpp_sources = files([
   'test_PacBioIndex.cpp',
   'test_PbiFilter.cpp',
   'test_PbiFilterQuery.cpp',
-  'test_QualityValues.cpp',
   'test_Pulse2BaseCache.cpp',
   'test_ReadGroupHashing.cpp',
   'test_ReadGroupInfo.cpp',
