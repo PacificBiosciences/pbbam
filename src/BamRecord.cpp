@@ -392,7 +392,7 @@ BamRecord::~BamRecord() = default;
 
 Data::Position BamRecord::AlignedEnd() const
 {
-    if (alignedEnd_ == Data::UnmappedPosition) {
+    if (alignedEnd_ == Data::UNMAPPED_POSITION) {
         CalculateAlignedPositions();
     }
     return alignedEnd_;
@@ -400,7 +400,7 @@ Data::Position BamRecord::AlignedEnd() const
 
 Data::Position BamRecord::AlignedStart() const
 {
-    if (alignedStart_ == Data::UnmappedPosition) {
+    if (alignedStart_ == Data::UNMAPPED_POSITION) {
         CalculateAlignedPositions();
     }
     return alignedStart_;
@@ -508,7 +508,7 @@ void BamRecord::CalculateAlignedPositions() const
     const Data::Position qStart = isCcsOrTranscript ? 0 : QueryStart();
     const Data::Position qEnd = isCcsOrTranscript ? seqLength : QueryEnd();
 
-    if (qStart == Data::UnmappedPosition || qEnd == Data::UnmappedPosition) {
+    if (qStart == Data::UNMAPPED_POSITION || qEnd == Data::UNMAPPED_POSITION) {
         return;
     }
 
@@ -1667,8 +1667,8 @@ BamRecord& BamRecord::Map(const int32_t referenceId, const Data::Position refSta
     }
 
     // reset any cached aligned start/end
-    alignedStart_ = Data::UnmappedPosition;
-    alignedEnd_ = Data::UnmappedPosition;
+    alignedStart_ = Data::UNMAPPED_POSITION;
+    alignedEnd_ = Data::UNMAPPED_POSITION;
 
     return *this;
 }
@@ -2329,11 +2329,11 @@ int32_t BamRecord::ReadGroupNumericId() const { return ReadGroupInfo::IdToInt(Re
 Data::Position BamRecord::ReferenceEnd() const
 {
     if (!impl_.IsMapped()) {
-        return Data::UnmappedPosition;
+        return Data::UNMAPPED_POSITION;
     }
     const auto& htsData = BamRecordMemory::GetRawData(impl_);
     if (!htsData) {
-        return Data::UnmappedPosition;
+        return Data::UNMAPPED_POSITION;
     }
     return bam_endpos(htsData.get());
 }
@@ -2390,14 +2390,14 @@ BamRecord& BamRecord::ReversePulseWidth(const Data::Frames& frames, const Data::
 
 void BamRecord::ResetCachedPositions() const
 {
-    alignedEnd_ = Data::UnmappedPosition;
-    alignedStart_ = Data::UnmappedPosition;
+    alignedEnd_ = Data::UNMAPPED_POSITION;
+    alignedStart_ = Data::UNMAPPED_POSITION;
 }
 
 void BamRecord::ResetCachedPositions()
 {
-    alignedEnd_ = Data::UnmappedPosition;
-    alignedStart_ = Data::UnmappedPosition;
+    alignedEnd_ = Data::UNMAPPED_POSITION;
+    alignedStart_ = Data::UNMAPPED_POSITION;
 }
 
 VirtualRegionType BamRecord::ScrapRegionType() const

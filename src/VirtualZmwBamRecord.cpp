@@ -205,14 +205,14 @@ void VirtualZmwBamRecord::StitchSources()
                 barcodes = b.Barcodes();
             }
 
-            static constexpr const auto regionType = VirtualRegionType::SUBREAD;
-            if (!HasVirtualRegionType(regionType)) {
-                virtualRegionsMap_[regionType] = std::vector<VirtualRegion>{};
+            constexpr auto REGION_TYPE = VirtualRegionType::SUBREAD;
+            if (!HasVirtualRegionType(REGION_TYPE)) {
+                virtualRegionsMap_[REGION_TYPE] = std::vector<VirtualRegion>{};
             }
 
-            virtualRegionsMap_[regionType].emplace_back(regionType, b.QueryStart(), b.QueryEnd(),
-                                                        b.LocalContextFlags(), barcodes.first,
-                                                        barcodes.second);
+            virtualRegionsMap_[REGION_TYPE].emplace_back(REGION_TYPE, b.QueryStart(), b.QueryEnd(),
+                                                         b.LocalContextFlags(), barcodes.first,
+                                                         barcodes.second);
         }
 
         if (b.HasBarcodes() && !this->HasBarcodes()) {

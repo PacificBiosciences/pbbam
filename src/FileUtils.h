@@ -72,7 +72,7 @@ public:
     static std::string ResolvedFilePath(const std::string& filePath, const std::string& from = ".");
 
     /// \returns native path separator
-    constexpr static char Separator();
+    static char Separator();
 
     /// Check size of file.
     ///

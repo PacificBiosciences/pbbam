@@ -121,7 +121,10 @@ Automation& Automation::AutomationParameters(BAM::AutomationParameters params)
     AutomationParameters() = params;
     return *this;
 }
-bool Automation::HasAutomationParameters() const { return HasChild(Element::AutomationParameters); }
+bool Automation::HasAutomationParameters() const
+{
+    return HasChild(Element::AUTOMATION_PARAMETERS);
+}
 
 // ----------------------
 // AutomationParameter
@@ -215,201 +218,207 @@ AutomationParameters::const_iterator_type AutomationParameters::cend() const
 
 int32_t AutomationParameters::CellNFCIndex() const
 {
-    return std::stoi(GetParameter(Element::CellNFCIndex));
+    return std::stoi(GetParameter(Element::CELL_NFC_INDEX));
 }
 
 AutomationParameters& AutomationParameters::CellNFCIndex(int32_t i)
 {
-    return SetParameter(Element::CellNFCIndex, "Int32", std::to_string(i));
+    return SetParameter(Element::CELL_NFC_INDEX, "Int32", std::to_string(i));
 }
 
-bool AutomationParameters::HasCellNFCIndex() const { return HasParameter(Element::CellNFCIndex); }
+bool AutomationParameters::HasCellNFCIndex() const { return HasParameter(Element::CELL_NFC_INDEX); }
 
 int32_t AutomationParameters::CollectionNumber() const
 {
-    return std::stoi(GetParameter(Element::CollectionNumber));
+    return std::stoi(GetParameter(Element::COLLECTION_NUMBER));
 }
 
 AutomationParameters& AutomationParameters::CollectionNumber(int32_t i)
 {
-    return SetParameter(Element::CollectionNumber, "Int32", std::to_string(i));
+    return SetParameter(Element::COLLECTION_NUMBER, "Int32", std::to_string(i));
 }
 
 bool AutomationParameters::HasCollectionNumber() const
 {
-    return HasParameter(Element::CellNFCIndex);
+    return HasParameter(Element::CELL_NFC_INDEX);
 }
 
-double AutomationParameters::Exposure() const { return std::stod(GetParameter(Element::Exposure)); }
+double AutomationParameters::Exposure() const { return std::stod(GetParameter(Element::EXPOSURE)); }
 
 AutomationParameters& AutomationParameters::Exposure(double d)
 {
-    return SetParameter(Element::Exposure, "Double", std::to_string(d));
+    return SetParameter(Element::EXPOSURE, "Double", std::to_string(d));
 }
 
-bool AutomationParameters::HasExposure() const { return HasParameter(Element::Exposure); }
+bool AutomationParameters::HasExposure() const { return HasParameter(Element::EXPOSURE); }
 
 bool AutomationParameters::ExtendFirst() const
 {
-    return boost::iequals(GetParameter(Element::ExtendFirst), "True");
+    return boost::iequals(GetParameter(Element::EXTEND_FIRST), "True");
 }
 
 AutomationParameters& AutomationParameters::ExtendFirst(bool ok)
 {
-    return SetParameter(Element::ExtendFirst, "Boolean", (ok ? "True" : "False"));
+    return SetParameter(Element::EXTEND_FIRST, "Boolean", (ok ? "True" : "False"));
 }
 
-bool AutomationParameters::HasExtendFirst() const { return HasParameter(Element::ExtendFirst); }
+bool AutomationParameters::HasExtendFirst() const { return HasParameter(Element::EXTEND_FIRST); }
 
 double AutomationParameters::ExtensionTime() const
 {
-    return std::stod(GetParameter(Element::ExtensionTime));
+    return std::stod(GetParameter(Element::EXTENSION_TIME));
 }
 
 AutomationParameters& AutomationParameters::ExtensionTime(double d)
 {
-    return SetParameter(Element::ExtensionTime, "Double", std::to_string(d));
+    return SetParameter(Element::EXTENSION_TIME, "Double", std::to_string(d));
 }
 
-bool AutomationParameters::HasExtensionTime() const { return HasParameter(Element::ExtensionTime); }
+bool AutomationParameters::HasExtensionTime() const
+{
+    return HasParameter(Element::EXTENSION_TIME);
+}
 
 int32_t AutomationParameters::ExtraIMWashes() const
 {
-    return std::stoi(GetParameter(Element::ExtraIMWashes));
+    return std::stoi(GetParameter(Element::EXTRA_IM_WASHES));
 }
 
 AutomationParameters& AutomationParameters::ExtraIMWashes(int32_t i)
 {
-    return SetParameter(Element::ExtraIMWashes, "Int32", std::to_string(i));
+    return SetParameter(Element::EXTRA_IM_WASHES, "Int32", std::to_string(i));
 }
 
-bool AutomationParameters::HasExtraIMWashes() const { return HasParameter(Element::ExtraIMWashes); }
+bool AutomationParameters::HasExtraIMWashes() const
+{
+    return HasParameter(Element::EXTRA_IM_WASHES);
+}
 
 bool AutomationParameters::HasN2Switch() const
 {
-    return boost::iequals(GetParameter(Element::HasN2Switch), "True");
+    return boost::iequals(GetParameter(Element::HAS_N2_SWITCH), "True");
 }
 
 AutomationParameters& AutomationParameters::HasN2Switch(bool ok)
 {
-    return SetParameter(Element::HasN2Switch, "Boolean", (ok ? "True" : "False"));
+    return SetParameter(Element::HAS_N2_SWITCH, "Boolean", (ok ? "True" : "False"));
 }
 
-bool AutomationParameters::HasHasN2Switch() const { return HasParameter(Element::HasN2Switch); }
+bool AutomationParameters::HasHasN2Switch() const { return HasParameter(Element::HAS_N2_SWITCH); }
 
-std::string AutomationParameters::HQRFMethod() const { return GetParameter(Element::HQRFMethod); }
+std::string AutomationParameters::HQRFMethod() const { return GetParameter(Element::HQRF_METHOD); }
 
 AutomationParameters& AutomationParameters::HQRFMethod(std::string s)
 {
-    return SetParameter(Element::HQRFMethod, "String", s);
+    return SetParameter(Element::HQRF_METHOD, "String", s);
 }
 
-bool AutomationParameters::HasHQRFMethod() const { return HasParameter(Element::HQRFMethod); }
+bool AutomationParameters::HasHQRFMethod() const { return HasParameter(Element::HQRF_METHOD); }
 
 double AutomationParameters::ImmobilizationTime() const
 {
-    return std::stod(GetParameter(Element::ImmobilizationTime));
+    return std::stod(GetParameter(Element::IMMOBILIZATION_TIME));
 }
 
 AutomationParameters& AutomationParameters::ImmobilizationTime(double d)
 {
-    return SetParameter(Element::ImmobilizationTime, "Double", std::to_string(d));
+    return SetParameter(Element::IMMOBILIZATION_TIME, "Double", std::to_string(d));
 }
 
 bool AutomationParameters::HasImmobilizationTime() const
 {
-    return HasParameter(Element::ImmobilizationTime);
+    return HasParameter(Element::IMMOBILIZATION_TIME);
 }
 
 int32_t AutomationParameters::InsertSize() const
 {
-    return std::stoi(GetParameter(Element::InsertSize));
+    return std::stoi(GetParameter(Element::INSERT_SIZE));
 }
 
 AutomationParameters& AutomationParameters::InsertSize(int32_t i)
 {
-    return SetParameter(Element::InsertSize, "Int32", std::to_string(i));
+    return SetParameter(Element::INSERT_SIZE, "Int32", std::to_string(i));
 }
 
-bool AutomationParameters::HasInsertSize() const { return HasParameter(Element::InsertSize); }
+bool AutomationParameters::HasInsertSize() const { return HasParameter(Element::INSERT_SIZE); }
 
 double AutomationParameters::MovieLength() const
 {
-    return std::stod(GetParameter(Element::MovieLength));
+    return std::stod(GetParameter(Element::MOVIE_LENGTH));
 }
 
 AutomationParameters& AutomationParameters::MovieLength(double d)
 {
-    return SetParameter(Element::ImmobilizationTime, "Double", std::to_string(d));
+    return SetParameter(Element::IMMOBILIZATION_TIME, "Double", std::to_string(d));
 }
 
-bool AutomationParameters::HasMovieLength() const { return HasParameter(Element::MovieLength); }
+bool AutomationParameters::HasMovieLength() const { return HasParameter(Element::MOVIE_LENGTH); }
 
 bool AutomationParameters::PCDinPlate() const
 {
-    return boost::iequals(GetParameter(Element::PCDinPlate), "True");
+    return boost::iequals(GetParameter(Element::PCD_IN_PLATE), "True");
 }
 
 AutomationParameters& AutomationParameters::PCDinPlate(bool ok)
 {
-    return SetParameter(Element::PCDinPlate, "Boolean", (ok ? "True" : "False"));
+    return SetParameter(Element::PCD_IN_PLATE, "Boolean", (ok ? "True" : "False"));
 }
 
-bool AutomationParameters::HasPCDinPlate() const { return HasParameter(Element::PCDinPlate); }
+bool AutomationParameters::HasPCDinPlate() const { return HasParameter(Element::PCD_IN_PLATE); }
 
 bool AutomationParameters::PreExtensionWorkflow() const
 {
-    return boost::iequals(GetParameter(Element::PreExtensionWorkflow), "True");
+    return boost::iequals(GetParameter(Element::PRE_EXTENSION_WORKFLOW), "True");
 }
 
 AutomationParameters& AutomationParameters::PreExtensionWorkflow(bool ok)
 {
-    return SetParameter(Element::PreExtensionWorkflow, "Boolean", (ok ? "True" : "False"));
+    return SetParameter(Element::PRE_EXTENSION_WORKFLOW, "Boolean", (ok ? "True" : "False"));
 }
 
 bool AutomationParameters::HasPreExtensionWorkflow() const
 {
-    return HasParameter(Element::PreExtensionWorkflow);
+    return HasParameter(Element::PRE_EXTENSION_WORKFLOW);
 }
 
-double AutomationParameters::SNRCut() const { return std::stod(GetParameter(Element::SNRCut)); }
+double AutomationParameters::SNRCut() const { return std::stod(GetParameter(Element::SNR_CUT)); }
 
 AutomationParameters& AutomationParameters::SNRCut(double d)
 {
-    return SetParameter(Element::SNRCut, "Double", std::to_string(d));
+    return SetParameter(Element::SNR_CUT, "Double", std::to_string(d));
 }
 
-bool AutomationParameters::HasSNRCut() const { return HasParameter(Element::SNRCut); }
+bool AutomationParameters::HasSNRCut() const { return HasParameter(Element::SNR_CUT); }
 
 int32_t AutomationParameters::TipSearchMaxDuration() const
 {
-    return std::stoi(GetParameter(Element::TipSearchMaxDuration));
+    return std::stoi(GetParameter(Element::TIP_SEARCH_MAX_DURATION));
 }
 
 AutomationParameters& AutomationParameters::TipSearchMaxDuration(int32_t i)
 {
-    return SetParameter(Element::TipSearchMaxDuration, "Int32", std::to_string(i));
+    return SetParameter(Element::TIP_SEARCH_MAX_DURATION, "Int32", std::to_string(i));
 }
 
 bool AutomationParameters::HasTipSearchMaxDuration() const
 {
-    return HasParameter(Element::TipSearchMaxDuration);
+    return HasParameter(Element::TIP_SEARCH_MAX_DURATION);
 }
 
 bool AutomationParameters::UseStageHotStart() const
 {
-    return boost::iequals(GetParameter(Element::UseStageHotStart), "True");
+    return boost::iequals(GetParameter(Element::USE_STAGE_HOT_START), "True");
 }
 
 AutomationParameters& AutomationParameters::UseStageHotStart(bool ok)
 {
-    return SetParameter(Element::UseStageHotStart, "Boolean", (ok ? "True" : "False"));
+    return SetParameter(Element::USE_STAGE_HOT_START, "Boolean", (ok ? "True" : "False"));
     return *this;
 }
 
 bool AutomationParameters::HasUseStageHotStart() const
 {
-    return HasParameter(Element::UseStageHotStart);
+    return HasParameter(Element::USE_STAGE_HOT_START);
 }
 
 std::string AutomationParameters::GetParameter(const std::string& param) const
@@ -467,17 +476,17 @@ BindingKit::BindingKit(const internal::FromInputXml& fromInputXml)
     : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
 {}
 
-const std::string& BindingKit::PartNumber() const { return Attribute(Element::PartNumber); }
+const std::string& BindingKit::PartNumber() const { return Attribute(Element::PART_NUMBER); }
 
-std::string& BindingKit::PartNumber() { return Attribute(Element::PartNumber); }
+std::string& BindingKit::PartNumber() { return Attribute(Element::PART_NUMBER); }
 
 BindingKit& BindingKit::PartNumber(std::string s)
 {
-    Attribute(Element::PartNumber, s);
+    Attribute(Element::PART_NUMBER, s);
     return *this;
 }
 
-bool BindingKit::HasPartNumber() { return HasAttribute(Element::PartNumber); }
+bool BindingKit::HasPartNumber() { return HasAttribute(Element::PART_NUMBER); }
 
 // ----------------------
 // Collections
@@ -504,16 +513,16 @@ ControlKit::ControlKit(const internal::FromInputXml& fromInputXml)
     : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
 {}
 
-const std::string& ControlKit::PartNumber() const { return Attribute(Element::PartNumber); }
+const std::string& ControlKit::PartNumber() const { return Attribute(Element::PART_NUMBER); }
 
-std::string& ControlKit::PartNumber() { return Attribute(Element::PartNumber); }
+std::string& ControlKit::PartNumber() { return Attribute(Element::PART_NUMBER); }
 
 ControlKit& ControlKit::PartNumber(std::string s)
 {
-    Attribute(Element::PartNumber, s);
+    Attribute(Element::PART_NUMBER, s);
     return *this;
 }
-bool ControlKit::HasPartNumber() const { return HasAttribute(Element::PartNumber); }
+bool ControlKit::HasPartNumber() const { return HasAttribute(Element::PART_NUMBER); }
 
 const std::string& ControlKit::LeftAdapter() const
 {
@@ -607,17 +616,20 @@ SequencingKitPlate::SequencingKitPlate(const internal::FromInputXml& fromInputXm
     : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
 {}
 
-const std::string& SequencingKitPlate::PartNumber() const { return Attribute(Element::PartNumber); }
+const std::string& SequencingKitPlate::PartNumber() const
+{
+    return Attribute(Element::PART_NUMBER);
+}
 
-std::string& SequencingKitPlate::PartNumber() { return Attribute(Element::PartNumber); }
+std::string& SequencingKitPlate::PartNumber() { return Attribute(Element::PART_NUMBER); }
 
 SequencingKitPlate& SequencingKitPlate::PartNumber(std::string s)
 {
-    Attribute(Element::PartNumber, s);
+    Attribute(Element::PART_NUMBER, s);
     return *this;
 }
 
-bool SequencingKitPlate::HasPartNumber() const { return HasAttribute(Element::PartNumber); }
+bool SequencingKitPlate::HasPartNumber() const { return HasAttribute(Element::PART_NUMBER); }
 
 // ----------------------
 // TemplatePrepKit
@@ -631,83 +643,83 @@ TemplatePrepKit::TemplatePrepKit(const internal::FromInputXml& fromInputXml)
     : internal::DataSetElement{"", fromInputXml, XsdType::COLLECTION_METADATA}
 {}
 
-const std::string& TemplatePrepKit::PartNumber() const { return Attribute(Element::PartNumber); }
+const std::string& TemplatePrepKit::PartNumber() const { return Attribute(Element::PART_NUMBER); }
 
-std::string& TemplatePrepKit::PartNumber() { return Attribute(Element::PartNumber); }
+std::string& TemplatePrepKit::PartNumber() { return Attribute(Element::PART_NUMBER); }
 
 TemplatePrepKit& TemplatePrepKit::PartNumber(std::string s)
 {
-    Attribute(Element::PartNumber, s);
+    Attribute(Element::PART_NUMBER, s);
     return *this;
 }
 
 bool TemplatePrepKit::TemplatePrepKit::HasPartNumber() const
 {
-    return HasAttribute(Element::PartNumber);
+    return HasAttribute(Element::PART_NUMBER);
 }
 
 std::string TemplatePrepKit::LeftAdaptorSequence() const
 {
-    return ChildText(Element::LeftAdaptorSequence);
+    return ChildText(Element::LEFT_ADAPTOR_SEQUENCE);
 }
 
 TemplatePrepKit& TemplatePrepKit::LeftAdaptorSequence(std::string s)
 {
-    ChildText(Element::LeftAdaptorSequence, s);
+    ChildText(Element::LEFT_ADAPTOR_SEQUENCE, s);
     return *this;
 }
 
 bool TemplatePrepKit::HasLeftAdaptorSequence() const
 {
-    return HasChild(Element::LeftAdaptorSequence);
+    return HasChild(Element::LEFT_ADAPTOR_SEQUENCE);
 }
 
 std::string TemplatePrepKit::LeftPrimerSequence() const
 {
-    return ChildText(Element::LeftPrimerSequence);
+    return ChildText(Element::LEFT_PRIMER_SEQUENCE);
 }
 
 TemplatePrepKit& TemplatePrepKit::LeftPrimerSequence(std::string s)
 {
-    ChildText(Element::LeftPrimerSequence, s);
+    ChildText(Element::LEFT_PRIMER_SEQUENCE, s);
     return *this;
 }
 
 bool TemplatePrepKit::HasLeftPrimerSequence() const
 {
-    return HasChild(Element::LeftPrimerSequence);
+    return HasChild(Element::LEFT_PRIMER_SEQUENCE);
 }
 
 std::string TemplatePrepKit::RightAdaptorSequence() const
 {
-    return ChildText(Element::RightAdaptorSequence);
+    return ChildText(Element::RIGHT_ADAPTOR_SEQUENCE);
 }
 
 TemplatePrepKit& TemplatePrepKit::RightAdaptorSequence(std::string s)
 {
-    ChildText(Element::RightAdaptorSequence, s);
+    ChildText(Element::RIGHT_ADAPTOR_SEQUENCE, s);
     return *this;
 }
 
 bool TemplatePrepKit::HasRightAdaptorSequence() const
 {
-    return HasChild(Element::RightAdaptorSequence);
+    return HasChild(Element::RIGHT_ADAPTOR_SEQUENCE);
 }
 
 std::string TemplatePrepKit::RightPrimerSequence() const
 {
-    return ChildText(Element::RightPrimerSequence);
+    return ChildText(Element::RIGHT_PRIMER_SEQUENCE);
 }
 
 TemplatePrepKit& TemplatePrepKit::RightPrimerSequence(std::string s)
 {
-    ChildText(Element::RightPrimerSequence, s);
+    ChildText(Element::RIGHT_PRIMER_SEQUENCE, s);
     return *this;
 }
 
 bool TemplatePrepKit::HasRightPrimerSequence() const
 {
-    return HasChild(Element::RightPrimerSequence);
+    return HasChild(Element::RIGHT_PRIMER_SEQUENCE);
 }
 
 // ----------------------
@@ -747,7 +759,7 @@ CollectionMetadata& CollectionMetadata::Automation(BAM::Automation automation)
     return *this;
 }
 
-bool CollectionMetadata::HasAutomation() const { return HasChild(Element::Automation); }
+bool CollectionMetadata::HasAutomation() const { return HasChild(Element::AUTOMATION); }
 
 const BAM::AutomationParameters& CollectionMetadata::AutomationParameters() const
 {

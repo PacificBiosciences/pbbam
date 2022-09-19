@@ -289,7 +289,7 @@ public:
         auto recordLength = [](bam1_t* b) {
             auto* c = &b->core;
 
-            static constexpr size_t fixedLength = 36;
+            constexpr size_t FIXED_LENGTH = 36;
             const size_t qnameLength = (c->l_qname - c->l_extranul);
 
             // TODO: long CIGAR handling... sigh...
@@ -302,7 +302,7 @@ public:
                 remainingLength = 8 + (b->l_data - cigarEnd) + 4 + (4 * c->n_cigar);
             }
 
-            return fixedLength + qnameLength + remainingLength;
+            return FIXED_LENGTH + qnameLength + remainingLength;
         };
         uncompressedFilePos_ += recordLength(rawRecord.get());
     }
@@ -562,7 +562,7 @@ public:
         auto recordLength = [](bam1_t* b) {
             auto* c = &b->core;
 
-            static constexpr size_t fixedLength = 36;
+            constexpr size_t FIXED_LENGTH = 36;
             const size_t qnameLength = (c->l_qname - c->l_extranul);
 
             // TODO: long CIGAR handling... sigh...
@@ -575,7 +575,7 @@ public:
                 remainingLength = 8 + (b->l_data - cigarEnd) + 4 + (4 * c->n_cigar);
             }
 
-            return fixedLength + qnameLength + remainingLength;
+            return FIXED_LENGTH + qnameLength + remainingLength;
         };
         uncompressedFilePos_ += recordLength(rawRecord.get());
 

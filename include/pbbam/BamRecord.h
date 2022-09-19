@@ -262,7 +262,7 @@ public:
     ///
     std::string ReferenceName() const;
 
-    /// \returns the record's reference end position, or UnmappedPosition if
+    /// \returns the record's reference end position, or UNMAPPED_POSITION if
     ///          unmapped
     ///
     /// \note ReferenceEnd is in reference coordinates, NOT polymerase read
@@ -270,7 +270,7 @@ public:
     ///
     Data::Position ReferenceEnd() const;
 
-    /// \returns the record's reference start position, or UnmappedPosition if
+    /// \returns the record's reference start position, or UNMAPPED_POSITION if
     ///          unmapped
     ///
     /// \note ReferenceStart is in reference coordinates, NOT polymerase read
@@ -1522,8 +1522,8 @@ public:
 private:
     /// \internal
     /// cached positions (mutable to allow lazy-calc in const methods)
-    mutable Data::Position alignedStart_ = Data::UnmappedPosition;
-    mutable Data::Position alignedEnd_ = Data::UnmappedPosition;
+    mutable Data::Position alignedStart_ = Data::UNMAPPED_POSITION;
+    mutable Data::Position alignedEnd_ = Data::UNMAPPED_POSITION;
 
 private:
     /// \internal

@@ -17,7 +17,7 @@ namespace {
 template <typename T>
 bool InAsciiRange(const T x)
 {
-    return (x >= 33 && x <= 127);
+    return (x >= 33) && (x <= 127);
 }
 
 struct AsciiConvertVisitor : public boost::static_visitor<char>
@@ -52,31 +52,31 @@ private:
 
 struct BytesUsedVisitor : public boost::static_visitor<int>
 {
-    static constexpr int BaseVariantSize = sizeof(Tag::var_t) + sizeof(TagModifier);
+    static constexpr int BASE_VARIANT_SIZE = sizeof(Tag::var_t) + sizeof(TagModifier);
 
-    int operator()(const boost::blank&) const noexcept { return BaseVariantSize; }
-    int operator()(const int8_t&) const noexcept { return BaseVariantSize; }
-    int operator()(const uint8_t&) const noexcept { return BaseVariantSize; }
-    int operator()(const int16_t&) const noexcept { return BaseVariantSize; }
-    int operator()(const uint16_t&) const noexcept { return BaseVariantSize; }
-    int operator()(const int32_t&) const noexcept { return BaseVariantSize; }
-    int operator()(const uint32_t&) const noexcept { return BaseVariantSize; }
-    int operator()(const float&) const noexcept { return BaseVariantSize; }
+    int operator()(const boost::blank&) const noexcept { return BASE_VARIANT_SIZE; }
+    int operator()(const int8_t&) const noexcept { return BASE_VARIANT_SIZE; }
+    int operator()(const uint8_t&) const noexcept { return BASE_VARIANT_SIZE; }
+    int operator()(const int16_t&) const noexcept { return BASE_VARIANT_SIZE; }
+    int operator()(const uint16_t&) const noexcept { return BASE_VARIANT_SIZE; }
+    int operator()(const int32_t&) const noexcept { return BASE_VARIANT_SIZE; }
+    int operator()(const uint32_t&) const noexcept { return BASE_VARIANT_SIZE; }
+    int operator()(const float&) const noexcept { return BASE_VARIANT_SIZE; }
 
     int operator()(const std::string& s) const noexcept
     {
         static const int sso = static_cast<int>(std::string().capacity());
         if (Utility::Ssize(s) <= sso) {
-            return BaseVariantSize;  // can squeeze into std::string on stack
+            return BASE_VARIANT_SIZE;  // can squeeze into std::string on stack
         } else {
-            return BaseVariantSize + s.capacity();
+            return BASE_VARIANT_SIZE + s.capacity();
         }
     }
 
     template <typename T>
     int operator()(const std::vector<T>& v) const noexcept
     {
-        return BaseVariantSize + (v.capacity() * sizeof(T));
+        return BASE_VARIANT_SIZE + (v.capacity() * sizeof(T));
     }
 };
 

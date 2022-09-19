@@ -16,7 +16,7 @@ namespace VCF {
 
 VcfVariant::VcfVariant(const std::string& text) { *this = VcfFormat::ParsedVariant(text); }
 
-VcfVariant::VcfVariant() : pos_{Data::UnmappedPosition}, qual_{NAN}, filter_{"PASS"} {}
+VcfVariant::VcfVariant() : pos_{Data::UNMAPPED_POSITION}, qual_{NAN}, filter_{"PASS"} {}
 
 VcfVariant::VcfVariant(std::string id, std::string chrom, Data::Position pos, std::string refAllele,
                        std::string altAllele)

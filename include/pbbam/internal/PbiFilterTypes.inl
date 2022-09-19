@@ -489,10 +489,10 @@ inline uint32_t UnsignedLongIntCast(const int32_t zm) { return static_cast<uint3
 
 inline uint32_t BoostHashCombine(const int32_t zm)
 {
-    constexpr static const uint16_t mask = 0xFFFF;
+    constexpr uint16_t MASK = 0xFFFF;
 
-    const uint16_t upper = (zm >> 16) & mask;
-    const uint16_t lower = zm & mask;
+    const uint16_t upper = (zm >> 16) & MASK;
+    const uint16_t lower = zm & MASK;
 
     // FIXME: discrepancies with Python API. Will return to nail down.
 

@@ -303,8 +303,8 @@ void BamRecordImpl::InitializeData()
     d_.reset(bam_init1());
 
     // init unmapped
-    Position(Data::UnmappedPosition);
-    MatePosition(Data::UnmappedPosition);
+    Position(Data::UNMAPPED_POSITION);
+    MatePosition(Data::UNMAPPED_POSITION);
     ReferenceId(-1);
     MateReferenceId(-1);
     SetMapped(false);
@@ -512,11 +512,11 @@ bool BamRecordImpl::RemoveTagImpl(const std::string& tagName)
 std::string BamRecordImpl::Sequence() const
 {
     std::string result(d_->core.l_qseq, '\0');
-    static const constexpr std::array<char, 16> DnaLookup{
+    constexpr std::array<char, 16> DNA_LOOKUP{
         {'=', 'A', 'C', 'M', 'G', 'R', 'S', 'V', 'T', 'W', 'Y', 'H', 'K', 'D', 'B', 'N'}};
     const uint8_t* seqData = bam_get_seq(d_);
     for (int i = 0; i < d_->core.l_qseq; ++i) {
-        result[i] = DnaLookup[bam_seqi(seqData, i)];
+        result[i] = DNA_LOOKUP[bam_seqi(seqData, i)];
     }
     return result;
 }

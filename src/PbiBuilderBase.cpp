@@ -304,8 +304,8 @@ void PbiBuilderBase::WritePbiHeader()
     BGZF* bgzf = pbiFile_.get();
 
     // 'magic' string
-    static constexpr const std::array<char, 4> magic{{'P', 'B', 'I', '\1'}};
-    bgzf_write_safe(bgzf, magic.data(), 4);
+    static constexpr std::array<char, 4> MAGIC{{'P', 'B', 'I', '\1'}};
+    bgzf_write_safe(bgzf, MAGIC.data(), 4);
 
     PbiFile::Sections sections = PbiFile::BASIC;
     if (hasMappedData_) {

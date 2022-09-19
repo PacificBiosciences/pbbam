@@ -23,28 +23,28 @@ std::shared_ptr<internal::DataSetElement> MakeRunMetadataElement(const pugi::xml
     }
 
     const internal::FromInputXml fromInputXml;
-    if (name == Element::Automation) {
+    if (name == Element::AUTOMATION) {
         return std::make_shared<Automation>(fromInputXml);
     }
-    if (name == Element::AutomationParameter) {
+    if (name == Element::AUTOMATION_PARAMETER) {
         return std::make_shared<AutomationParameter>(fromInputXml);
     }
-    if (name == Element::AutomationParameters) {
+    if (name == Element::AUTOMATION_PARAMETERS) {
         return std::make_shared<AutomationParameters>(fromInputXml);
     }
-    if (name == Element::BindingKit) {
+    if (name == Element::BINDING_KIT) {
         return std::make_shared<BindingKit>(fromInputXml);
     }
-    if (name == Element::Collections) {
+    if (name == Element::COLLECTIONS) {
         return std::make_shared<Collections>(fromInputXml);
     }
-    if (name == Element::ControlKit) {
+    if (name == Element::CONTROL_KIT) {
         return std::make_shared<ControlKit>(fromInputXml);
     }
-    if (name == Element::SequencingKitPlate) {
+    if (name == Element::SEQUENCING_KIT_PLATE) {
         return std::make_shared<SequencingKitPlate>(fromInputXml);
     }
-    if (name == Element::TemplatePrepKit) {
+    if (name == Element::TEMPLATE_PREP_KIT) {
         return std::make_shared<TemplatePrepKit>(fromInputXml);
     }
 
@@ -84,9 +84,9 @@ CollectionMetadata SubreadSetCollection(const std::string& subreadSetName,
                                         const pugi::xml_node& subreadSetNode)
 {
     // find & initialize CollectionMetadata from node
-    const auto cmNode = subreadSetNode.child(Element::DataSetMetadata)
-                            .child(Element::Collections)
-                            .child(Element::CollectionMetadata);
+    const auto cmNode = subreadSetNode.child(Element::DATASET_METADATA)
+                            .child(Element::COLLECTIONS)
+                            .child(Element::COLLECTION_METADATA);
     if (!cmNode) {
         throw std::runtime_error{"[pbbam] run metadata ERROR: XML is missing expected elements"};
     }
@@ -120,18 +120,18 @@ pugi::xml_node FetchSubreadSetsNode(const pugi::xml_document& doc)
     if (!rootNode) {
         throw std::runtime_error{"[pbbam] run metadata ERROR: could not fetch XML root node"};
     }
-    if (std::string{rootNode.name()} != Element::PacBioDataModel) {
+    if (std::string{rootNode.name()} != Element::PACBIO_DATA_MODEL) {
         throw std::runtime_error{
             "[pbbam] run metadata ERROR: expected 'PacBioDataModel' as root node, instead "
             "found: " +
             std::string{rootNode.name()}};
     }
 
-    const auto result = rootNode.child(Element::ExperimentContainer)
-                            .child(Element::Runs)
-                            .child(Element::Run)
-                            .child(Element::Outputs)
-                            .child(Element::SubreadSets);
+    const auto result = rootNode.child(Element::EXPERIMENT_CONTAINER)
+                            .child(Element::RUNS)
+                            .child(Element::RUN)
+                            .child(Element::OUTPUTS)
+                            .child(Element::SUBREADSETS);
     if (!result) {
         throw std::runtime_error{"[pbbam] run metadata ERROR: XML is missing expected elements"};
     }

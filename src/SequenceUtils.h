@@ -17,7 +17,7 @@ namespace BAM {
 
 inline char Complement(const char character)
 {
-    constexpr const std::array<char, 256> lookupTable{
+    constexpr std::array<char, 256> LOOKUP_TABLE{
         {/*   0 -   7: */ 0,   0,   0,   0,   0,   0,   0,   0,
          /*   8 -  15: */ 0,   0,   0,   0,   0,   0,   0,   0,
          /*  16 -  23: */ 0,   0,   0,   0,   0,   0,   0,   0,
@@ -54,7 +54,7 @@ inline char Complement(const char character)
          /* 240 - 247: */ 0,   0,   0,   0,   0,   0,   0,   0,
          /* 248 - 255: */ 0,   0,   0,   0,   0,   0,   0,   0}};
 
-    return lookupTable[static_cast<unsigned char>(character)];
+    return LOOKUP_TABLE[static_cast<unsigned char>(character)];
 }
 
 template <typename T>
@@ -98,7 +98,7 @@ inline std::string MaybeReverseComplement(std::string&& seq, bool reverse)
 inline void ReverseComplementCaseSens(std::string& seq)
 {
     const std::string original = seq;
-    constexpr const static int8_t rc_table[128] = {
+    constexpr std::array<int8_t, 128> RC_TABLE{
         4,  4, 4, 4, 4, 4, 4,  4,  4, 4, 4, 4, 4,  4,  4, 4,  4,  4, 4, 4,   4, 4,   4, 4, 4, 4,
         4,  4, 4, 4, 4, 4, 32, 4,  4, 4, 4, 4, 4,  4,  4, 4,  42, 4, 4, 45,  4, 4,   4, 4, 4, 4,
         4,  4, 4, 4, 4, 4, 4,  4,  4, 4, 4, 4, 4,  84, 4, 71, 4,  4, 4, 67,  4, 4,   4, 4, 4, 4,
@@ -106,8 +106,7 @@ inline void ReverseComplementCaseSens(std::string& seq)
         4,  4, 4, 4, 4, 4, 4,  4,  4, 4, 4, 4, 97, 97, 4, 4,  4,  4, 4, 4,   4, 4,   4, 4};
     std::string reverseCompl(original.length(), 'N');
     for (uint32_t i = 0; i < original.length(); ++i) {
-        reverseCompl[original.length() - i - 1] =
-            static_cast<char>(rc_table[static_cast<int8_t>(original[i])]);
+        reverseCompl[original.length() - i - 1] = RC_TABLE[static_cast<int32_t>(original[i])];
     }
     seq = reverseCompl;
 }

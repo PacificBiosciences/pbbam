@@ -35,13 +35,13 @@ namespace BAM {
 class PbiBuilderPrivate : public PacBio::BAM::PbiBuilderBase
 {
     // TODO: Make this tweak-able, a la IndexedBamWriter's buffers
-    constexpr static const size_t MaxBufferSize = 0x10000;
+    static constexpr size_t MAX_BUFFER_SIZE = 0x10000;
 
 public:
     PbiBuilderPrivate(const std::string& pbiFilename, const size_t numReferenceSequences,
                       const bool isCoordinateSorted,
                       const PbiBuilder::CompressionLevel compressionLevel, const size_t numThreads)
-        : PacBio::BAM::PbiBuilderBase{pbiFilename, compressionLevel, numThreads, MaxBufferSize}
+        : PacBio::BAM::PbiBuilderBase{pbiFilename, compressionLevel, numThreads, MAX_BUFFER_SIZE}
     {
 
         if (isCoordinateSorted && numReferenceSequences > 0) {

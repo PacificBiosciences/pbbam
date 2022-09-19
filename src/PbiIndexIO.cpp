@@ -200,13 +200,13 @@ void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData, const DataSet& datas
         } else {
             Utility::MoveAppend(std::vector<int32_t>(currentPbiCount, -1),
                                 aggregateMappedData.tId_);
-            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UnmappedPosition),
+            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UNMAPPED_POSITION),
                                 aggregateMappedData.tStart_);
-            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UnmappedPosition),
+            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UNMAPPED_POSITION),
                                 aggregateMappedData.tEnd_);
-            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UnmappedPosition),
+            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UNMAPPED_POSITION),
                                 aggregateMappedData.aStart_);
-            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UnmappedPosition),
+            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UNMAPPED_POSITION),
                                 aggregateMappedData.aEnd_);
             Utility::MoveAppend(std::vector<uint8_t>(currentPbiCount, 0),
                                 aggregateMappedData.revStrand_);
@@ -387,8 +387,8 @@ void PbiIndexIO::WriteBarcodeData(const PbiRawBarcodeData& barcodeData, const ui
 void PbiIndexIO::WriteHeader(const PbiRawData& index, BGZF* fp)
 {
     // 'magic' string
-    constexpr static const std::array<char, 4> magic{{'P', 'B', 'I', '\1'}};
-    auto ret = bgzf_write(fp, magic.data(), 4);
+    static constexpr std::array<char, 4> MAGIC{'P', 'B', 'I', '\1'};
+    auto ret = bgzf_write(fp, MAGIC.data(), 4);
 
     // version, pbi_flags, & n_reads
     auto version = static_cast<uint32_t>(index.Version());

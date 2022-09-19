@@ -1,10 +1,12 @@
 #ifndef PBBAM_LIBRARY_VERION_H
 #define PBBAM_LIBRARY_VERION_H
 
+#include <string_view>
+
 namespace PacBio {
 namespace Pbbam {
 
-constexpr const char ReleaseVersion[] = "@PBBAM_VERSION@";
+constexpr std::string_view RELEASE_VERSION{"@PBBAM_VERSION@"};
 
 }  // namespace Pbbam
 }  // namespace PacBio

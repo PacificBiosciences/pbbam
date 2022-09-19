@@ -52,7 +52,7 @@ static std::string removeDiskName(const std::string& filePath)
     return filePath;
 }
 
-static const char native_pathSeparator = '\\';
+constexpr char NATIVE_PATH_SEPARATOR = '\\';
 
 static bool native_pathIsAbsolute(const std::string& filePath)
 {
@@ -98,14 +98,14 @@ static std::string native_resolvedFilePath(const std::string& filePath, const st
 
     const bool thisDirAtStart = (schemeLess.find(".") == 0);
     if (thisDirAtStart) {
-        if (schemeLess.find(native_pathSeparator) == 1) schemeLess = schemeLess.substr(2);
+        if (schemeLess.find(NATIVE_PATH_SEPARATOR) == 1) schemeLess = schemeLess.substr(2);
     }
-    return from + native_pathSeparator + schemeLess;
+    return from + NATIVE_PATH_SEPARATOR + schemeLess;
 }
 
 #else  // else for non-Windows systems
 
-static const char native_pathSeparator = '/';
+constexpr char NATIVE_PATH_SEPARATOR = '/';
 
 static bool native_pathIsAbsolute(const std::string& filePath) { return filePath.at(0) == '/'; }
 
@@ -129,11 +129,11 @@ static std::string native_resolvedFilePath(const std::string& filePath, const st
     //
     const bool thisDirAtStart = (schemeLess.find(".") == 0);
     if (thisDirAtStart) {
-        if (schemeLess.find(native_pathSeparator) == 1) {
+        if (schemeLess.find(NATIVE_PATH_SEPARATOR) == 1) {
             schemeLess = schemeLess.substr(2);
         }
     }
-    return from + native_pathSeparator + schemeLess;
+    return from + NATIVE_PATH_SEPARATOR + schemeLess;
 }
 
 #endif  // PBBAM_WIN_FILEPATHS
@@ -210,7 +210,7 @@ std::string FileUtils::ResolvedFilePath(const std::string& filePath, const std::
     return native_resolvedFilePath(filePath, from);
 }
 
-constexpr char FileUtils::Separator() { return native_pathSeparator; }
+char FileUtils::Separator() { return NATIVE_PATH_SEPARATOR; }
 
 off_t FileUtils::Size(const char* fn)
 {

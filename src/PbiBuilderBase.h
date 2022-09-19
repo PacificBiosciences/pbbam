@@ -130,11 +130,11 @@ struct PbiFieldBlock
 template <typename T>
 class PbiField
 {
-    constexpr static const size_t ElementSize = sizeof(T);
-    static_assert(ElementSize > 0, "");
+    static constexpr size_t ELEMENT_SIZE = sizeof(T);
+    static_assert(ELEMENT_SIZE > 0);
 
 public:
-    PbiField(size_t maxBufferSize = 0) : maxElementCount_{maxBufferSize / ElementSize}
+    PbiField(size_t maxBufferSize = 0) : maxElementCount_{maxBufferSize / ELEMENT_SIZE}
     {
         buffer_.reserve(maxElementCount_);
     }

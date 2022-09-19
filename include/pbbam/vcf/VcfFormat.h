@@ -8,6 +8,7 @@
 
 #include <iosfwd>
 #include <string>
+#include <string_view>
 
 namespace PacBio {
 namespace VCF {
@@ -18,7 +19,7 @@ public:
     /// \name General format info
     /// \{
 
-    static const char* CurrentVersion();
+    static std::string_view CurrentVersion();
 
     /// \}
 

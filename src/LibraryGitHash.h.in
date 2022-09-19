@@ -1,10 +1,12 @@
 #ifndef PBBAM_LIBRARY_GITHASH_H
 #define PBBAM_LIBRARY_GITHASH_H
 
+#include <string_view>
+
 namespace PacBio {
 namespace Pbbam {
 
-constexpr const char LibraryGitSha1[] = "@PBBAM_GIT_SHA1@";
+constexpr std::string_view LIBRARY_GIT_SHA1{"@PBBAM_GIT_SHA1@"};
 
 }  // namespace Pbbam
 }  // namespace PacBio

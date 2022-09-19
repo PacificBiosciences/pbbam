@@ -2,16 +2,14 @@
 
 #include <pbbam/PbbamVersion.h>
 
+#include <string_view>
+
 namespace PacBio {
 namespace BAM {
-namespace {
 
-static constexpr const char LibraryGitSha1[] = "@PBBAM_GIT_SHA1@";
+constexpr std::string_view LIBRARY_GIT_SHA1{"@PBBAM_GIT_SHA1@"};
 
-} // namespace
-
-std::string LibraryGitSha1String()
-{ return LibraryGitSha1; }
+std::string LibraryGitSha1String() { return std::string{LIBRARY_GIT_SHA1}; }
 
 }  // namespace BAM
 }  // namespace PacBio

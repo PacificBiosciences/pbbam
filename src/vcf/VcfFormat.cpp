@@ -22,25 +22,25 @@ namespace VCF {
 namespace {
 
 // using htslib's current version for better compatibility
-static constexpr const char current_version[] = "VCFv4.2";
+constexpr std::string_view CURRENT_VERSION{"VCFv4.2"};
 
 namespace Tokens {
 
-static constexpr const char file_format[] = "fileformat";
+constexpr std::string_view FILE_FORMAT{"fileformat"};
 
-static constexpr const char double_hash[] = "##";
-static constexpr const char contig_lead[] = "##contig=<";
-static constexpr const char filter_lead[] = "##FILTER=<";
-static constexpr const char format_lead[] = "##FORMAT=<";
-static constexpr const char info_lead[] = "##INFO=<";
-static constexpr const char chrom_lead[] = "#CHROM";
+constexpr std::string_view DOUBLE_HASH{"##"};
+constexpr std::string_view CONTIG_LEAD{"##contig=<"};
+constexpr std::string_view FILTER_LEAD{"##FILTER=<"};
+constexpr std::string_view FORMAT_LEAD{"##FORMAT=<"};
+constexpr std::string_view INFO_LEAD{"##INFO=<"};
+constexpr std::string_view CHROM_LEAD{"#CHROM"};
 
-static constexpr const char id[] = "ID";
-static constexpr const char number[] = "Number";
-static constexpr const char type[] = "Type";
-static constexpr const char description[] = "Description";
-static constexpr const char source[] = "Source";
-static constexpr const char version[] = "Version";
+constexpr std::string_view ID{"ID"};
+constexpr std::string_view NUMBER{"Number"};
+constexpr std::string_view TYPE{"Type"};
+constexpr std::string_view DESCRIPTION{"Description"};
+constexpr std::string_view SOURCE{"Source"};
+constexpr std::string_view VERSION{"Version"};
 
 }  // namespace Tokens
 
@@ -56,14 +56,14 @@ std::string UnquotedText(const std::string& d)
 
 }  // namespace
 
-const char* VcfFormat::CurrentVersion() { return current_version; }
+std::string_view VcfFormat::CurrentVersion() { return CURRENT_VERSION; }
 
 std::string VcfFormat::FormattedContigDefinition(const ContigDefinition& def)
 {
     std::ostringstream text;
 
     // ID
-    text << Tokens::contig_lead << Tokens::id << '=' << def.Id();
+    text << Tokens::CONTIG_LEAD << Tokens::ID << '=' << def.Id();
 
     // attributes
     if (!def.Attributes().empty()) {
@@ -84,7 +84,7 @@ std::string VcfFormat::FormattedContigDefinition(const ContigDefinition& def)
 std::string VcfFormat::FormattedFilterDefinition(const FilterDefinition& def)
 {
     std::ostringstream text;
-    text << Tokens::filter_lead << Tokens::id << '=' << def.Id() << ',' << Tokens::description
+    text << Tokens::FILTER_LEAD << Tokens::ID << '=' << def.Id() << ',' << Tokens::DESCRIPTION
          << '=' << QuotedText(def.Description()) << '>';
     return text.str();
 }
@@ -92,8 +92,8 @@ std::string VcfFormat::FormattedFilterDefinition(const FilterDefinition& def)
 std::string VcfFormat::FormattedFormatDefinition(const FormatDefinition& def)
 {
     std::ostringstream text;
-    text << Tokens::format_lead << Tokens::id << '=' << def.Id() << ',' << Tokens::number << '='
-         << def.Number() << ',' << Tokens::type << '=' << def.Type() << ',' << Tokens::description
+    text << Tokens::FORMAT_LEAD << Tokens::ID << '=' << def.Id() << ',' << Tokens::NUMBER << '='
+         << def.Number() << ',' << Tokens::TYPE << '=' << def.Type() << ',' << Tokens::DESCRIPTION
          << '=' << QuotedText(def.Description()) << '>';
     return text.str();
 }
@@ -101,23 +101,23 @@ std::string VcfFormat::FormattedFormatDefinition(const FormatDefinition& def)
 std::string VcfFormat::FormattedGeneralDefinition(const GeneralDefinition& def)
 {
     std::ostringstream text;
-    text << Tokens::double_hash << def.Id() << '=' << def.Text();
+    text << Tokens::DOUBLE_HASH << def.Id() << '=' << def.Text();
     return text.str();
 }
 
 std::string VcfFormat::FormattedInfoDefinition(const InfoDefinition& def)
 {
     std::ostringstream text;
-    text << Tokens::info_lead << Tokens::id << '=' << def.Id() << ',' << Tokens::number << '='
-         << def.Number() << ',' << Tokens::type << '=' << def.Type() << ',' << Tokens::description
+    text << Tokens::INFO_LEAD << Tokens::ID << '=' << def.Id() << ',' << Tokens::NUMBER << '='
+         << def.Number() << ',' << Tokens::TYPE << '=' << def.Type() << ',' << Tokens::DESCRIPTION
          << '=' << QuotedText(def.Description());
 
     if (def.Source() && !def.Source()->empty()) {
-        text << ',' << Tokens::source << '=' << QuotedText(*def.Source());
+        text << ',' << Tokens::SOURCE << '=' << QuotedText(*def.Source());
     }
 
     if (def.Version() && !def.Version()->empty()) {
-        text << ',' << Tokens::version << '=' << QuotedText(*def.Version());
+        text << ',' << Tokens::VERSION << '=' << QuotedText(*def.Version());
     }
 
     text << '>';
@@ -128,12 +128,12 @@ std::string VcfFormat::FormattedHeader(const VcfHeader& header)
 {
     std::ostringstream out;
 
-    const auto& fileformat = header.GeneralDefinition(Tokens::file_format);
+    const auto& fileformat = header.GeneralDefinition(std::string{Tokens::FILE_FORMAT});
     out << FormattedGeneralDefinition(fileformat) << '\n';
 
     // remaining general definiitions
     for (const auto& def : header.GeneralDefinitions()) {
-        if (def.Id() != Tokens::file_format) {
+        if (def.Id() != Tokens::FILE_FORMAT) {
             out << FormattedGeneralDefinition(def) << '\n';
         }
     }
@@ -176,7 +176,7 @@ std::string VcfFormat::FormattedHeader(const VcfHeader& header)
 ContigDefinition VcfFormat::ParsedContigDefinition(std::string line)
 {
     // should already be checked by "normal" code path
-    assert(line.find(Tokens::contig_lead) == 0);
+    assert(line.find(Tokens::CONTIG_LEAD) == 0);
 
     // substring between brackets
     const auto lastBracketPos = line.find_last_of('>');
@@ -195,7 +195,7 @@ ContigDefinition VcfFormat::ParsedContigDefinition(std::string line)
             throw VcfFormatException{"malformed ##contig line: " + line};
         }
 
-        if (tokens[0] == Tokens::id) {
+        if (tokens[0] == Tokens::ID) {
             id = tokens[1];
         } else {
             attributes.push_back(std::make_pair(tokens[0], tokens[1]));
@@ -208,7 +208,7 @@ ContigDefinition VcfFormat::ParsedContigDefinition(std::string line)
 FilterDefinition VcfFormat::ParsedFilterDefinition(std::string line)
 {
     // should already be checked by "normal" code path
-    assert(line.find(Tokens::filter_lead) == 0);
+    assert(line.find(Tokens::FILTER_LEAD) == 0);
 
     // substring between brackets
     const auto lastBracketPos = line.find_last_of('>');
@@ -227,9 +227,9 @@ FilterDefinition VcfFormat::ParsedFilterDefinition(std::string line)
             throw VcfFormatException{"malformed FILTER line: " + line};
         }
 
-        if (tokens[0] == Tokens::id) {
+        if (tokens[0] == Tokens::ID) {
             id = tokens[1];
-        } else if (tokens[0] == Tokens::description) {
+        } else if (tokens[0] == Tokens::DESCRIPTION) {
             description = UnquotedText(tokens[1]);
         } else {
             throw VcfFormatException{"unrecognized FILTER field: " + tokens[0]};
@@ -242,7 +242,7 @@ FilterDefinition VcfFormat::ParsedFilterDefinition(std::string line)
 FormatDefinition VcfFormat::ParsedFormatDefinition(std::string line)
 {
     // should already be checked by "normal" code path
-    assert(line.find(Tokens::format_lead) == 0);
+    assert(line.find(Tokens::FORMAT_LEAD) == 0);
 
     // substring between brackets
     const auto lastBracketPos = line.find_last_of('>');
@@ -262,13 +262,13 @@ FormatDefinition VcfFormat::ParsedFormatDefinition(std::string line)
         if (tokens.size() != 2) {
             throw VcfFormatException{"malformed FORMAT line: " + line};
         }
-        if (tokens[0] == Tokens::id) {
+        if (tokens[0] == Tokens::ID) {
             id = tokens[1];
-        } else if (tokens[0] == Tokens::number) {
+        } else if (tokens[0] == Tokens::NUMBER) {
             number = tokens[1];
-        } else if (tokens[0] == Tokens::type) {
+        } else if (tokens[0] == Tokens::TYPE) {
             type = tokens[1];
-        } else if (tokens[0] == Tokens::description) {
+        } else if (tokens[0] == Tokens::DESCRIPTION) {
             description = UnquotedText(tokens[1]);
         } else {
             throw VcfFormatException{"unrecognized FORMAT field: " + tokens[0]};
@@ -282,7 +282,7 @@ FormatDefinition VcfFormat::ParsedFormatDefinition(std::string line)
 GeneralDefinition VcfFormat::ParsedGeneralDefinition(const std::string& line)
 {
     const auto tokens = BAM::Split(line, '=');
-    if (tokens.size() != 2 || tokens[0].find(Tokens::double_hash) != 0) {
+    if (tokens.size() != 2 || tokens[0].find(Tokens::DOUBLE_HASH) != 0) {
         throw VcfFormatException{"malformed header line: " + line};
     }
     return GeneralDefinition{tokens[0].substr(2), tokens[1]};
@@ -291,7 +291,7 @@ GeneralDefinition VcfFormat::ParsedGeneralDefinition(const std::string& line)
 InfoDefinition VcfFormat::ParsedInfoDefinition(std::string line)
 {
     // should already be checked by "normal" code path
-    assert(line.find(Tokens::info_lead) == 0);
+    assert(line.find(Tokens::INFO_LEAD) == 0);
 
     // substring between brackets
     const auto lastBracketPos = line.find_last_of('>');
@@ -314,17 +314,17 @@ InfoDefinition VcfFormat::ParsedInfoDefinition(std::string line)
             throw VcfFormatException{"malformed INFO line: " + line};
         }
 
-        if (tokens[0] == Tokens::id) {
+        if (tokens[0] == Tokens::ID) {
             id = tokens[1];
-        } else if (tokens[0] == Tokens::number) {
+        } else if (tokens[0] == Tokens::NUMBER) {
             number = tokens[1];
-        } else if (tokens[0] == Tokens::type) {
+        } else if (tokens[0] == Tokens::TYPE) {
             type = tokens[1];
-        } else if (tokens[0] == Tokens::description) {
+        } else if (tokens[0] == Tokens::DESCRIPTION) {
             description = UnquotedText(tokens[1]);
-        } else if (tokens[0] == Tokens::source) {
+        } else if (tokens[0] == Tokens::SOURCE) {
             source = UnquotedText(tokens[1]);
-        } else if (tokens[0] == Tokens::version) {
+        } else if (tokens[0] == Tokens::VERSION) {
             version = UnquotedText(tokens[1]);
         } else {
             throw VcfFormatException{"unrecognized INFO field: " + tokens[0]};
@@ -345,7 +345,7 @@ VcfHeader VcfFormat::ParsedHeader(const std::string& hdrText)
     // quick check for fileformat - should be the first line
     std::getline(text, line);
     auto genDef = ParsedGeneralDefinition(line);
-    if (genDef.Id() != Tokens::file_format) {
+    if (genDef.Id() != Tokens::FILE_FORMAT) {
         throw VcfFormatException{"file must begin with #fileformat line"};
     }
     hdr.AddGeneralDefinition(std::move(genDef));
@@ -358,19 +358,19 @@ VcfHeader VcfFormat::ParsedHeader(const std::string& hdrText)
         }
 
         // info line
-        if (line.find(Tokens::info_lead) == 0) {
+        if (line.find(Tokens::INFO_LEAD) == 0) {
             hdr.AddInfoDefinition(ParsedInfoDefinition(line));
 
             // filter line
-        } else if (line.find(Tokens::filter_lead) == 0) {
+        } else if (line.find(Tokens::FILTER_LEAD) == 0) {
             hdr.AddFilterDefinition(ParsedFilterDefinition(line));
 
             // format line
-        } else if (line.find(Tokens::format_lead) == 0) {
+        } else if (line.find(Tokens::FORMAT_LEAD) == 0) {
             hdr.AddFormatDefinition(ParsedFormatDefinition(line));
 
             // contig line
-        } else if (line.find(Tokens::contig_lead) == 0) {
+        } else if (line.find(Tokens::CONTIG_LEAD) == 0) {
             hdr.AddContigDefinition(ParsedContigDefinition(line));
 
             // general comment line
@@ -378,11 +378,11 @@ VcfHeader VcfFormat::ParsedHeader(const std::string& hdrText)
             // NOTE: Check this after all other specific header line types. This
             //       catches all remaining lines starting with "##"
             //
-        } else if (line.find(Tokens::double_hash) == 0) {
+        } else if (line.find(Tokens::DOUBLE_HASH) == 0) {
             hdr.AddGeneralDefinition(ParsedGeneralDefinition(line));
 
             // CHROM line (maybe w/ samples)
-        } else if (line.find(Tokens::chrom_lead) == 0) {
+        } else if (line.find(Tokens::CHROM_LEAD) == 0) {
             std::vector<Sample> samples;
 
             // If samples are present, skip the fixed colums & FORMAT column (9)

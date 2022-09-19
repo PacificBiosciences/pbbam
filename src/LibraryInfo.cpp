@@ -26,7 +26,10 @@ Library::Bundle LibraryBundle()
     return bundle;
 }
 
-Library::Info LibraryInfo() { return {"pbbam", Pbbam::ReleaseVersion, Pbbam::LibraryGitSha1}; }
+Library::Info LibraryInfo()
+{
+    return {"pbbam", std::string{Pbbam::RELEASE_VERSION}, std::string{Pbbam::LIBRARY_GIT_SHA1}};
+}
 
 }  // namespace Pbbam
 }  // namespace PacBio

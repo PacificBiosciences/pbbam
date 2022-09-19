@@ -43,9 +43,9 @@ bool DoesHtslibSupportLongCigar()
     // check against v1.7
     const int versionMajor = std::stoi(versionParts[0]);
     const int versionMinor = std::stoi(versionParts[1]);
-    static constexpr const int v17_major = 1;
-    static constexpr const int v17_minor = 7;
-    return std::tie(versionMajor, versionMinor) >= std::tie(v17_major, v17_minor);
+    constexpr int V17_MAJOR = 1;
+    constexpr int V17_MINOR = 7;
+    return std::tie(versionMajor, versionMinor) >= std::tie(V17_MAJOR, V17_MINOR);
 }
 
 #ifdef PBBAM_PERMISSIVE_CIGAR

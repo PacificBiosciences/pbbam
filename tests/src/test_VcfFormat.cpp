@@ -71,7 +71,7 @@ const std::string VcfFn{PacBio::BAM::PbbamTestsConfig::Data_Dir + "/vcf/structur
 
 TEST(VCF_VcfFormat, provides_current_version)
 {
-    const std::string version = VcfFormat::CurrentVersion();
+    const auto version = VcfFormat::CurrentVersion();
     EXPECT_EQ("VCFv4.2", version);
 }
 

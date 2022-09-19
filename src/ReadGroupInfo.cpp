@@ -643,9 +643,9 @@ void ReadGroupInfo::DecodeSamDescription(const std::string& description)
 
 std::string ReadGroupInfo::EncodeSamDescription() const
 {
-    constexpr static const char SEP = ';';
-    constexpr static const char COLON = ':';
-    constexpr static const char EQ = '=';
+    constexpr char SEP = ';';
+    constexpr char COLON = ':';
+    constexpr char EQ = '=';
 
     std::string result{token_RT + EQ + readType_};
     if (sourceReadType_.has_value()) {
