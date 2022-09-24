@@ -182,11 +182,11 @@ bool BasicDataFilterBase<T, field>::BasicDataFilterBase::Accepts(const PbiRawDat
 }
 
 // this typedef exists purely so that the next method signature isn't 2 screen widths long
-using LocalContextFilter__ =
+using LocalContextFilterInternal =
     BasicDataFilterBase<Data::LocalContextFlags, PbiFile::BasicField::CONTEXT_FLAG>;
 
 template <>
-inline bool LocalContextFilter__::BasicDataFilterBase::Accepts(const PbiRawData& idx,
+inline bool LocalContextFilterInternal::BasicDataFilterBase::Accepts(const PbiRawData& idx,
                                                                const size_t row) const
 {
     const auto& basicData = idx.BasicData();
