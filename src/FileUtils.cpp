@@ -160,7 +160,7 @@ std::string FileUtils::CurrentWorkingDirectory()
 
     // long path - use heap, trying progressively longer buffers
     for (size_t chunks = 2; chunks < maxNumChunks; ++chunks) {
-        std::unique_ptr<char> cwd(new char[chunkSize * chunks]);
+        auto cwd = std::make_unique<char[]>(chunkSize * chunks);
         if (getcwd(cwd.get(), chunkSize * chunks) != nullptr) {
             return std::string(cwd.get());
         }
