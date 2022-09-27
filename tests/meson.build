@@ -1,6 +1,6 @@
 subdir('src')
 
-pbbam_python = find_program('python')
+pbbam_python = import('python').find_installation('python3')
 pbbam_cram_script = find_program('cram', required : false)
 if not pbbam_cram_script.found()
   warning('Using bundled cram script')
