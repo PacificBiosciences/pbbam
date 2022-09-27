@@ -8,7 +8,7 @@ Setup:
 
 Forward alignments with and without user specified tags, one alignment with undefined mapq, some alignments with basic CIGAR operations, 2 alignemtns with hard clipping, and several invalid alignments (1 without a seq field and 1 not present in the dataset) which should be skipped:
 
-  $ $PBBAMIFY --log-file=pbbamify.log --input=$DATADIR/pbbamify/input-aligned-1.bam $DATADIR/pbbamify/synthetic-ref-1.fa $DATADIR/pbbamify/synthetic_movie_1.subreads.bam | $SAMTOOLS view -h | grep -v '@PG	ID:samtools'
+  $ $PBBAMIFY --log-file=pbbamify.log --input=$DATADIR/pbbamify/input-aligned-1.bam $DATADIR/pbbamify/synthetic-ref-1.fa $DATADIR/pbbamify/synthetic_movie_1.subreads.bam | samtools view -h | grep -v '@PG	ID:samtools'
   @HD\tVN:1.5\tSO:unknown\tpb:3.0.3 (esc)
   @SQ\tSN:synthetic_ref_1\tLN:150\tM5:e1e940d621d949c9617566ddf3055922 (esc)
   @RG\tID:8d2370c0\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;BINDINGKIT=100-862-200;SEQUENCINGKIT=100-861-800;BASECALLERVERSION=5.0.0.5552;FRAMERATEHZ=80.000000\tPU:synthetic_movie_1\tPM:SEQUEL (esc)
@@ -36,7 +36,7 @@ Forward alignments with and without user specified tags, one alignment with unde
   $ rm pbbamify.log
 
 Reverse alignments: 2 primary alignments and 7 secondary, 6 alignments with extended CIGAR and 2 with basic CIGAR strings, 1 alignment with undefined (255) mapq, 2 alignments with hard clipping, 1 alignment with user defined tag. All alignments have a read group assigned which is different than the dataset.
-  $ $PBBAMIFY --log-file=pbbamify.log --input=$DATADIR/pbbamify/input-aligned-2.bam $DATADIR/pbbamify/synthetic-ref-1.fa $DATADIR/pbbamify/synthetic_movie_2.subreads.bam | $SAMTOOLS view -h | grep -v '@PG	ID:samtools'
+  $ $PBBAMIFY --log-file=pbbamify.log --input=$DATADIR/pbbamify/input-aligned-2.bam $DATADIR/pbbamify/synthetic-ref-1.fa $DATADIR/pbbamify/synthetic_movie_2.subreads.bam | samtools view -h | grep -v '@PG	ID:samtools'
   @HD\tVN:1.5\tSO:unknown\tpb:3.0.3 (esc)
   @SQ\tSN:synthetic_ref_1\tLN:150\tM5:e1e940d621d949c9617566ddf3055922 (esc)
   @RG\tID:7a515ee0\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;BINDINGKIT=100-862-200;SEQUENCINGKIT=100-861-800;BASECALLERVERSION=5.0.0.5552;FRAMERATEHZ=80.000000\tPU:synthetic_movie_2\tPM:SEQUEL (esc)
@@ -60,7 +60,7 @@ Reverse alignments: 2 primary alignments and 7 secondary, 6 alignments with exte
 
 CCS read:
 
-  $ $PBBAMIFY --log-file=pbbamify.log --input=$DATADIR/pbbamify/input-aligned-3.bam $DATADIR/pbbamify/synthetic-ref-1.fa $DATADIR/pbbamify/synthetic_movie_3.subreads.bam | $SAMTOOLS view -h | grep -v '@PG	ID:samtools'
+  $ $PBBAMIFY --log-file=pbbamify.log --input=$DATADIR/pbbamify/input-aligned-3.bam $DATADIR/pbbamify/synthetic-ref-1.fa $DATADIR/pbbamify/synthetic_movie_3.subreads.bam | samtools view -h | grep -v '@PG	ID:samtools'
   @HD\tVN:1.5\tSO:unknown\tpb:3.0.1 (esc)
   @SQ\tSN:synthetic_ref_1\tLN:150\tM5:e1e940d621d949c9617566ddf3055922 (esc)
   @RG\tID:67e06f58\tPL:PACBIO\tDS:READTYPE=CCS;BINDINGKIT=100-862-200;SEQUENCINGKIT=101-093-700;BASECALLERVERSION=5.0.0.5049;FRAMERATEHZ=80.000000\tPU:synthetic_movie_3\tPM:SEQUEL (esc)
@@ -74,7 +74,7 @@ CCS read:
 
 No verbose output:
 
-  $ $PBBAMIFY --log-file=pbbamify.log --input=$DATADIR/pbbamify/input-aligned-1.bam --verbose-level=0 $DATADIR/pbbamify/synthetic-ref-1.fa $DATADIR/pbbamify/synthetic_movie_1.subreads.bam | $SAMTOOLS view -h | grep -v '@PG	ID:samtools'
+  $ $PBBAMIFY --log-file=pbbamify.log --input=$DATADIR/pbbamify/input-aligned-1.bam --verbose-level=0 $DATADIR/pbbamify/synthetic-ref-1.fa $DATADIR/pbbamify/synthetic_movie_1.subreads.bam | samtools view -h | grep -v '@PG	ID:samtools'
   @HD\tVN:1.5\tSO:unknown\tpb:3.0.3 (esc)
   @SQ\tSN:synthetic_ref_1\tLN:150\tM5:e1e940d621d949c9617566ddf3055922 (esc)
   @RG\tID:8d2370c0\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;BINDINGKIT=100-862-200;SEQUENCINGKIT=100-861-800;BASECALLERVERSION=5.0.0.5552;FRAMERATEHZ=80.000000\tPU:synthetic_movie_1\tPM:SEQUEL (esc)
@@ -101,7 +101,7 @@ No verbose output:
 
 Test on a dataset, input contains alignments from all subread sets.
 
-  $ $PBBAMIFY --log-file=pbbamify.log --input=$DATADIR/pbbamify/input-aligned-all.bam $DATADIR/pbbamify/synthetic-ref-1.fa $GENERATEDDATADIR/synthetic_movie_all.subreadset.xml | $SAMTOOLS view -h | grep -v '@PG	ID:samtools'
+  $ $PBBAMIFY --log-file=pbbamify.log --input=$DATADIR/pbbamify/input-aligned-all.bam $DATADIR/pbbamify/synthetic-ref-1.fa $GENERATEDDATADIR/synthetic_movie_all.subreadset.xml | samtools view -h | grep -v '@PG	ID:samtools'
   @HD\tVN:1.5\tSO:unknown\tpb:3.0.3 (esc)
   @SQ\tSN:synthetic_ref_1\tLN:150\tM5:e1e940d621d949c9617566ddf3055922 (esc)
   @RG\tID:67e06f58\tPL:PACBIO\tDS:READTYPE=CCS;BINDINGKIT=100-862-200;SEQUENCINGKIT=101-093-700;BASECALLERVERSION=5.0.0.5049;FRAMERATEHZ=80.000000\tPU:synthetic_movie_3\tPM:SEQUEL (esc)
