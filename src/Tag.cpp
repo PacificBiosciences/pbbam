@@ -20,7 +20,7 @@ bool InAsciiRange(const T x)
     return (x >= 33) && (x <= 127);
 }
 
-struct AsciiConvertVisitor : public boost::static_visitor<char>
+struct AsciiConvertVisitor
 {
     // only valid for numeric types - maybe even more restrictive?
     char operator()(const int8_t& x) const { return Helper(x); }
@@ -50,11 +50,11 @@ private:
     }
 };
 
-struct BytesUsedVisitor : public boost::static_visitor<int>
+struct BytesUsedVisitor
 {
     static constexpr int BASE_VARIANT_SIZE = sizeof(Tag::var_t) + sizeof(TagModifier);
 
-    int operator()(const boost::blank&) const noexcept { return BASE_VARIANT_SIZE; }
+    int operator()(const std::monostate&) const noexcept { return BASE_VARIANT_SIZE; }
     int operator()(const int8_t&) const noexcept { return BASE_VARIANT_SIZE; }
     int operator()(const uint8_t&) const noexcept { return BASE_VARIANT_SIZE; }
     int operator()(const int16_t&) const noexcept { return BASE_VARIANT_SIZE; }
@@ -81,7 +81,7 @@ struct BytesUsedVisitor : public boost::static_visitor<int>
 };
 
 template <typename DesiredType>
-struct NumericConvertVisitor : public boost::static_visitor<DesiredType>
+struct NumericConvertVisitor
 {
     // only valid for integral types
     DesiredType operator()(const int8_t& x) const { return boost::numeric_cast<DesiredType>(x); }
@@ -110,7 +110,7 @@ using ToUInt16ConvertVisitor = NumericConvertVisitor<uint16_t>;
 using ToInt32ConvertVisitor = NumericConvertVisitor<int32_t>;
 using ToUInt32ConvertVisitor = NumericConvertVisitor<uint32_t>;
 
-struct IsEqualVisitor : public boost::static_visitor<bool>
+struct IsEqualVisitor
 {
     template <typename T, typename U>
     bool operator()(const T&, const U&) const noexcept
@@ -120,7 +120,7 @@ struct IsEqualVisitor : public boost::static_visitor<bool>
         return false;
     }
 
-    bool operator()(const boost::blank&, const boost::blank&) const noexcept { return true; }
+    bool operator()(const std::monostate&, const std::monostate&) const noexcept { return true; }
 
     template <typename T>
     bool operator()(const T& lhs, const T& rhs) const noexcept
@@ -129,9 +129,9 @@ struct IsEqualVisitor : public boost::static_visitor<bool>
     }
 };
 
-struct TypenameVisitor : public boost::static_visitor<std::string>
+struct TypenameVisitor
 {
-    std::string operator()(const boost::blank&) const { return "none"; }
+    std::string operator()(const std::monostate&) const { return "none"; }
     std::string operator()(const int8_t&) const { return "int8_t"; }
     std::string operator()(const uint8_t&) const { return "uint8_t"; }
     std::string operator()(const int16_t&) const { return "int16_t"; }
@@ -149,11 +149,11 @@ struct TypenameVisitor : public boost::static_visitor<std::string>
     std::string operator()(const std::vector<float>&) const { return "vector<float>"; }
 };
 
-struct OutputVisitor : public boost::static_visitor<void>
+struct OutputVisitor
 {
     OutputVisitor(std::ostream& out) : out_{out} {}
 
-    void operator()(const boost::blank) const { ; }
+    void operator()(const std::monostate) const {}
     void operator()(const int8_t value) const { out_ << static_cast<int16_t>(value); }
     void operator()(const uint8_t value) const { out_ << static_cast<uint16_t>(value); }
     void operator()(const int16_t value) const { out_ << value; }
@@ -242,7 +242,7 @@ Tag::Tag(std::string value, TagModifier mod) : data_{std::move(value)}, modifier
     }
 }
 
-Tag& Tag::operator=(boost::blank value)
+Tag& Tag::operator=(std::monostate value)
 {
     data_ = value;
     return *this;
@@ -340,16 +340,12 @@ Tag& Tag::operator=(std::vector<float> value)
 
 bool Tag::operator==(const Tag& other) const
 {
-    return boost::apply_visitor(IsEqualVisitor(), data_, other.data_) &&
-           (modifier_ == other.modifier_);
+    return std::visit(IsEqualVisitor{}, data_, other.data_) && (modifier_ == other.modifier_);
 }
 
 bool Tag::operator!=(const Tag& other) const { return !(*this == other); }
 
-int Tag::EstimatedBytesUsed() const noexcept
-{
-    return boost::apply_visitor(BytesUsedVisitor(), data_);
-}
+int Tag::EstimatedBytesUsed() const noexcept { return std::visit(BytesUsedVisitor{}, data_); }
 
 bool Tag::HasModifier(const TagModifier m) const
 {
@@ -415,87 +411,81 @@ Tag& Tag::Modifier(const TagModifier m)
     return *this;
 }
 
-char Tag::ToAscii() const { return boost::apply_visitor(AsciiConvertVisitor(), data_); }
+char Tag::ToAscii() const { return std::visit(AsciiConvertVisitor{}, data_); }
 
 int8_t Tag::ToInt8() const
 {
     if (IsInt8()) {
-        return boost::get<int8_t>(data_);
+        return std::get<int8_t>(data_);
     }
-    return boost::apply_visitor(ToInt8ConvertVisitor(), data_);
+    return std::visit(ToInt8ConvertVisitor{}, data_);
 }
 
 uint8_t Tag::ToUInt8() const
 {
     if (IsUInt8()) {
-        return boost::get<uint8_t>(data_);
+        return std::get<uint8_t>(data_);
     }
-    return boost::apply_visitor(ToUInt8ConvertVisitor(), data_);
+    return std::visit(ToUInt8ConvertVisitor{}, data_);
 }
 
 int16_t Tag::ToInt16() const
 {
     if (IsInt16()) {
-        return boost::get<int16_t>(data_);
+        return std::get<int16_t>(data_);
     }
-    return boost::apply_visitor(ToInt16ConvertVisitor(), data_);
+    return std::visit(ToInt16ConvertVisitor{}, data_);
 }
 
 uint16_t Tag::ToUInt16() const
 {
     if (IsUInt16()) {
-        return boost::get<uint16_t>(data_);
+        return std::get<uint16_t>(data_);
     }
-    return boost::apply_visitor(ToUInt16ConvertVisitor(), data_);
+    return std::visit(ToUInt16ConvertVisitor{}, data_);
 }
 
 int32_t Tag::ToInt32() const
 {
     if (IsInt32()) {
-        return boost::get<int32_t>(data_);
+        return std::get<int32_t>(data_);
     }
-    return boost::apply_visitor(ToInt32ConvertVisitor(), data_);
+    return std::visit(ToInt32ConvertVisitor{}, data_);
 }
 
 uint32_t Tag::ToUInt32() const
 {
     if (IsUInt32()) {
-        return boost::get<uint32_t>(data_);
+        return std::get<uint32_t>(data_);
     }
-    return boost::apply_visitor(ToUInt32ConvertVisitor(), data_);
+    return std::visit(ToUInt32ConvertVisitor{}, data_);
 }
 
-float Tag::ToFloat() const { return boost::get<float>(data_); }
+float Tag::ToFloat() const { return std::get<float>(data_); }
 
-std::string Tag::ToString() const { return boost::get<std::string>(data_); }
+std::string Tag::ToString() const { return std::get<std::string>(data_); }
 
-std::vector<int8_t> Tag::ToInt8Array() const { return boost::get<std::vector<int8_t> >(data_); }
+std::vector<int8_t> Tag::ToInt8Array() const { return std::get<std::vector<int8_t> >(data_); }
 
-std::vector<uint8_t> Tag::ToUInt8Array() const { return boost::get<std::vector<uint8_t> >(data_); }
+std::vector<uint8_t> Tag::ToUInt8Array() const { return std::get<std::vector<uint8_t> >(data_); }
 
-std::vector<int16_t> Tag::ToInt16Array() const { return boost::get<std::vector<int16_t> >(data_); }
+std::vector<int16_t> Tag::ToInt16Array() const { return std::get<std::vector<int16_t> >(data_); }
 
-std::vector<uint16_t> Tag::ToUInt16Array() const
-{
-    return boost::get<std::vector<uint16_t> >(data_);
-}
+std::vector<uint16_t> Tag::ToUInt16Array() const { return std::get<std::vector<uint16_t> >(data_); }
 
-std::vector<int32_t> Tag::ToInt32Array() const { return boost::get<std::vector<int32_t> >(data_); }
+std::vector<int32_t> Tag::ToInt32Array() const { return std::get<std::vector<int32_t> >(data_); }
 
-std::vector<uint32_t> Tag::ToUInt32Array() const
-{
-    return boost::get<std::vector<uint32_t> >(data_);
-}
+std::vector<uint32_t> Tag::ToUInt32Array() const { return std::get<std::vector<uint32_t> >(data_); }
 
-std::vector<float> Tag::ToFloatArray() const { return boost::get<std::vector<float> >(data_); }
+std::vector<float> Tag::ToFloatArray() const { return std::get<std::vector<float> >(data_); }
 
-TagDataType Tag::Type() const { return TagDataType(data_.which()); }
+TagDataType Tag::Type() const { return TagDataType(data_.index()); }
 
-std::string Tag::Typename() const { return boost::apply_visitor(TypenameVisitor(), data_); }
+std::string Tag::Typename() const { return std::visit(TypenameVisitor{}, data_); }
 
 std::ostream& operator<<(std::ostream& out, const Tag& tag)
 {
-    boost::apply_visitor(OutputVisitor(out), tag.data_);
+    std::visit(OutputVisitor{out}, tag.data_);
     return out;
 }
 

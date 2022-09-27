@@ -809,7 +809,9 @@ TEST(BAM_Tag, empty_tag_cannot_be_converted_to_value_type)
         ASSERT_FALSE("unreachable");
     } catch (const std::exception& e) {
         const std::string msg = e.what();
-        EXPECT_TRUE(msg.find("boost::blank") != std::string::npos);
+        // cannot fully qualify std::monostate due to
+        // inline namespaces in libc++
+        EXPECT_TRUE(msg.find("monostate") != std::string::npos);
     }
 }
 

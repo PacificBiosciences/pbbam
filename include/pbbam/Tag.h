@@ -3,10 +3,9 @@
 
 #include <pbbam/Config.h>
 
-#include <boost/variant.hpp>
-
 #include <iosfwd>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include <cstdint>
@@ -19,7 +18,7 @@ namespace BAM {
 ///
 enum class TagDataType
 {
-    INVALID = 0,       ///< boost::blank
+    INVALID = 0,       ///< std::monostate
     INT8,              ///< int8_t
     UINT8,             ///< uint8_t
     INT16,             ///< int16_t
@@ -165,7 +164,7 @@ public:
 
     Tag() = default;
 
-    Tag& operator=(boost::blank value);
+    Tag& operator=(std::monostate value);
     Tag& operator=(int8_t value);
     Tag& operator=(uint8_t value);
     Tag& operator=(int16_t value);
@@ -394,22 +393,22 @@ public:
 
     // clang-format off
     // NOTE - keep this synced with TagDataType enum ordering
-    using var_t = boost::variant<boost::blank, // <-- default constructor creates variant of this type
-                                 int8_t,
-                                 uint8_t,
-                                 int16_t,
-                                 uint16_t,
-                                 int32_t,
-                                 uint32_t,
-                                 float,
-                                 std::string,
-                                 std::vector<int8_t>,
-                                 std::vector<uint8_t>,
-                                 std::vector<int16_t>,
-                                 std::vector<uint16_t>,
-                                 std::vector<int32_t>,
-                                 std::vector<uint32_t>,
-                                 std::vector<float> >;
+    using var_t = std::variant<std::monostate, // <-- default constructor creates variant of this type
+                               int8_t,
+                               uint8_t,
+                               int16_t,
+                               uint16_t,
+                               int32_t,
+                               uint32_t,
+                               float,
+                               std::string,
+                               std::vector<int8_t>,
+                               std::vector<uint8_t>,
+                               std::vector<int16_t>,
+                               std::vector<uint16_t>,
+                               std::vector<int32_t>,
+                               std::vector<uint32_t>,
+                               std::vector<float> >;
     // clang-format on
 
 private:

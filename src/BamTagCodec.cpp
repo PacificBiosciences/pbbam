@@ -8,6 +8,8 @@
 #include <cstdint>
 #include <cstring>
 
+#include <stdexcept>
+
 namespace PacBio {
 namespace BAM {
 namespace {
