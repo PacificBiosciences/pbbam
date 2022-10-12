@@ -175,7 +175,8 @@ const ChemistryTable& BuiltInChemistryTable()
         {{"101-894-200", "102-186-000", "5.0", "S/P5-C2/5.0-8M"}},
         // Sequel® II Binding Kit 2.2; Sequel II Sequencing Plate 3.0 (1 rxn), QC
         {{"101-894-200", "102-186-100", "5.0", "S/P5-C2/5.0-8M"}},
-        // Future PN placeholder; SequencingChemistry and SoftwareVersion need to be reviewed/updated prior to integration/release
+
+        // Deprecated engineering tuple, remove prior to release, update product name prior to release
         {{"101-894-200", "102-118-800", "5.0", "S/P5-C3/5.0-25M"}},
 
         // Sequel® II Binding Kit 3.1; Sequel® II Sequencing Plate 2.0EA (4 Rxn)
@@ -199,6 +200,15 @@ const ChemistryTable& BuiltInChemistryTable()
         {{"102-194-100", "102-186-100", "5.0", "S/P5-C2/5.0-8M", "TAGT-5381"}},
         // Sequel® II Binding Kit 3.2; Sequel® II Sequencing Plate 2.0 (4 Rxn) - QC
         {{"102-194-100", "101-820-300", "5.0", "S/P5-C2/5.0-8M", "TAGT-5381"}},
+
+        // Future Binding Kit; Future Sequencing Plate 1.0 (4 rxn)
+        {{"102-739-100", "102-118-800", "5.0", "S/P5-C3/5.0-25M"}},
+        // Future Binding Kit; Future Sequencing Plate 1.0 (1 rxn)
+        {{"102-739-100", "102-412-400", "5.0", "S/P5-C3/5.0-25M"}},
+        // Future Binding Kit; Future Sequencing Plate QC
+        {{"102-739-100", "102-118-900", "5.0", "S/P5-C3/5.0-25M"}},
+        // Future Binding Kit; Future Sequencing Plate Internal
+        {{"102-739-100", "102-171-000", "5.0", "S/P5-C3/5.0-25M"}},
     };
 
     return builtin;
