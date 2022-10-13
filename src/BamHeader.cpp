@@ -375,11 +375,24 @@ BamHeader& BamHeader::Programs(std::vector<ProgramInfo> programs)
 
 ReadGroupInfo BamHeader::ReadGroup(const std::string& id) const
 {
-    const auto iter = d_->readGroups_.find(id);
-    if (iter == d_->readGroups_.cend()) {
-        throw std::runtime_error{"[pbbam] BAM header ERROR: read group ID not found: " + id};
+    // standard ID lookup
+    auto found = d_->readGroups_.find(id);
+    if (found != std::cend(d_->readGroups_)) {
+        return found->second;
     }
-    return iter->second;
+
+    // verbatim ID not found, see if we are mixing correct & legacy IDs
+    const size_t slashFound = id.find('/');
+    if (slashFound != std::string::npos) {
+        const std::string trimmedId = id.substr(0, slashFound);
+        found = d_->readGroups_.find(trimmedId);
+        if (found != std::cend(d_->readGroups_)) {
+            return found->second;
+        }
+    }
+
+    // no match found
+    throw std::runtime_error{"[pbbam] BAM header ERROR: read group ID not found: " + id};
 }
 
 std::vector<std::string> BamHeader::ReadGroupIds() const

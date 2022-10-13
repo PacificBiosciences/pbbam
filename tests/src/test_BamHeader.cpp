@@ -447,3 +447,14 @@ TEST(BAM_BamHeader, ensures_unique_sq_and_rg_entries)
     header.AddReadGroup(ReadGroupInfo{"rg1"});
     EXPECT_EQ(originalText, header.ToSam());
 }
+
+TEST(BAM_BamHeader, can_handle_lookup_with_mixed_correct_and_legacy_barcoded_rg_ids)
+{
+    const std::string text{
+        "@HD\tVN:1.5\tSO:unknown\tpb:3.0.1\n"
+        "@RG\tID:3cecb623\tPL:PACBIO\tDS:READTYPE=CCS;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw\n"};
+
+    const BamHeader header{text};
+    EXPECT_NO_THROW(header.ReadGroup("3cecb623"));
+    EXPECT_NO_THROW(header.ReadGroup("3cecb623/73--73"));
+}
