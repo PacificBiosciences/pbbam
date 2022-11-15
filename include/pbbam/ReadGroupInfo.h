@@ -88,7 +88,8 @@ enum class PlatformModelType
     ASTRO,
     RS,
     SEQUEL,
-    SEQUELII
+    SEQUELII,
+    REVIO,
 };
 
 /// \brief Aggregate to simplify ReadGroupInfo constructor.

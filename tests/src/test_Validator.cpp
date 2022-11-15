@@ -312,6 +312,28 @@ TEST(BAM_Validator, success_on_valid_header)
     ASSERT_NO_THROW(Validator::Validate(validUnmappedHeader));
 }
 
+TEST(BAM_Validator, success_on_valid_revio_header)
+{
+    static const BamHeader validMappedHeader{
+        "@HD\tVN:1.5\tSO:coordinate\tpb:3.0.7\n"
+        "@SQ\tSN:ecoliK12_pbi_March2013_2955000_to_2980000\tLN:25000\tM5:"
+        "734d5f3b2859595f4bd87a2fe6b7389b\n"
+        "@RG\tID:db972a04\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
+        "BINDINGKIT=101-717-300;SEQUENCINGKIT=101-644-500;BASECALLERVERSION=5.0.0;FRAMERATEHZ=100."
+        "000000"
+        "\tPU:m64004_190414_193017\tPM:REVIO\n"};
+
+    static const BamHeader validUnmappedHeader{
+        "@HD\tVN:1.5\tSO:unknown\tpb:3.0.7\n"
+        "@RG\tID:db972a04\tPL:PACBIO\tDS:READTYPE=SUBREAD;Ipd:CodecV1=ip;PulseWidth:CodecV1=pw;"
+        "BINDINGKIT=101-717-300;SEQUENCINGKIT=101-644-500;BASECALLERVERSION=5.0.0;FRAMERATEHZ=100."
+        "000000\t"
+        "PU:m64004_190414_193017\tPM:REVIO\n"};
+
+    ASSERT_NO_THROW(Validator::Validate(validMappedHeader));
+    ASSERT_NO_THROW(Validator::Validate(validUnmappedHeader));
+}
+
 TEST(BAM_Validator, reports_invalid_header_data)
 {
     static const BamHeader validMappedHeader{

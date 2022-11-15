@@ -103,6 +103,7 @@ static const std::string platformModelType_ASTRO{"ASTRO"};
 static const std::string platformModelType_RS{"RS"};
 static const std::string platformModelType_SEQUEL{"SEQUEL"};
 static const std::string platformModelType_SEQUELII{"SEQUELII"};
+static const std::string platformModelType_REVIO{"REVIO"};
 
 std::string BaseFeatureName(const BaseFeature& feature)
 {
@@ -185,7 +186,8 @@ std::string PlatformModelName(const PlatformModelType& type)
         {PlatformModelType::ASTRO, platformModelType_ASTRO},
         {PlatformModelType::RS, platformModelType_RS},
         {PlatformModelType::SEQUEL, platformModelType_SEQUEL},
-        {PlatformModelType::SEQUELII, platformModelType_SEQUELII}};
+        {PlatformModelType::SEQUELII, platformModelType_SEQUELII},
+        {PlatformModelType::REVIO, platformModelType_REVIO}};
 
     const auto found = lookup.find(type);
     if (found != lookup.cend()) {
@@ -235,7 +237,8 @@ static const std::map<std::string, PlatformModelType> nameToPlatformModel{
     {platformModelType_ASTRO, PlatformModelType::ASTRO},
     {platformModelType_RS, PlatformModelType::RS},
     {platformModelType_SEQUEL, PlatformModelType::SEQUEL},
-    {platformModelType_SEQUELII, PlatformModelType::SEQUELII}};
+    {platformModelType_SEQUELII, PlatformModelType::SEQUELII},
+    {platformModelType_REVIO, PlatformModelType::REVIO}};
 
 bool IsLikelyBarcodeKey(const std::string& name) { return name.find("Barcode") == 0; }
 
