@@ -201,14 +201,14 @@ const ChemistryTable& BuiltInChemistryTable()
         // Sequel® II Binding Kit 3.2; Sequel® II Sequencing Plate 2.0 (4 Rxn) - QC
         {{"102-194-100", "101-820-300", "5.0", "S/P5-C2/5.0-8M", "TAGT-5381"}},
 
-        // Future Binding Kit; Future Sequencing Plate 1.0 (4 rxn)
-        {{"102-739-100", "102-118-800", "5.0", "S/P5-C3/5.0-25M"}},
-        // Future Binding Kit; Future Sequencing Plate 1.0 (1 rxn)
-        {{"102-739-100", "102-412-400", "5.0", "S/P5-C3/5.0-25M"}},
-        // Future Binding Kit; Future Sequencing Plate QC
-        {{"102-739-100", "102-118-900", "5.0", "S/P5-C3/5.0-25M"}},
-        // Future Binding Kit; Future Sequencing Plate Internal
-        {{"102-739-100", "102-171-000", "5.0", "S/P5-C3/5.0-25M"}},
+        // Revio® Kit; Revio® Sequencing Plate 1.0 (4 rxn)
+        {{"102-739-100", "102-118-800", "5.0", "R/P1-C1/5.0-25M"}},
+        // Revio® Kit; Revio® Sequencing Plate 1.0 (1 rxn)
+        {{"102-739-100", "102-412-400", "5.0", "R/P1-C1/5.0-25M"}},
+        // Revio® Kit; Revio® Sequencing Plate QC
+        {{"102-739-100", "102-118-900", "5.0", "R/P1-C1/5.0-25M"}},
+        // Revio® Kit; Revio® Sequencing Plate Internal
+        {{"102-739-100", "102-171-000", "5.0", "R/P1-C1/5.0-25M"}},
     };
 
     return builtin;
