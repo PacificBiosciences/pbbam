@@ -177,7 +177,7 @@ const ChemistryTable& BuiltInChemistryTable()
         {{"101-894-200", "102-186-100", "5.0", "S/P5-C2/5.0-8M"}},
 
         // Deprecated engineering tuple, remove prior to release, update product name prior to release
-        {{"101-894-200", "102-118-800", "5.0", "S/P5-C3/5.0-25M"}},
+        {{"101-894-200", "102-118-800", "5.0", "R/P1-C1/5.0-25M"}},
 
         // Sequel® II Binding Kit 3.1; Sequel® II Sequencing Plate 2.0EA (4 Rxn)
         {{"102-194-200", "101-789-300", "5.0", "S/P5-C2/5.0-8M", "TAGT-5381"}},
