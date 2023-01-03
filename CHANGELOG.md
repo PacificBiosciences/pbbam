@@ -5,6 +5,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+## [2.3.0] - 2022-01-03
+
+### Removed
+ - Deprecated APIs (now part of pbcopper)
+
+### Fixed
+ - Read group lookup for "legacy" barcoded IDs (different syntax)
+
 ## [2.2.0] - 2022-07-26
 
 ### Fixed
