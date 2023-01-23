@@ -281,7 +281,14 @@ BarcodeQualityType BarcodeQualityFromName(const std::string& name)
     return nameToBarcodeQuality.at(name);
 }
 
-PlatformModelType PlatformModelFromName(std::string name) { return nameToPlatformModel.at(name); }
+PlatformModelType PlatformModelFromName(const std::string& name)
+{
+    try {
+        return nameToPlatformModel.at(name);
+    } catch (const std::out_of_range&) {
+        throw std::runtime_error{"[pbbam] read group ERROR: unknown platform model '" + name + "'"};
+    }
+}
 
 }  // namespace
 
@@ -758,7 +765,7 @@ ReadGroupInfo ReadGroupInfo::FromSam(const std::string& sam)
         } else if (tokenTag == sam_DS) {
             rg.DecodeSamDescription(std::move(tokenValue));
         } else if (tokenTag == sam_PM) {
-            rg.PlatformModel(PlatformModelFromName(std::move(tokenValue)));
+            rg.PlatformModel(PlatformModelFromName(tokenValue));
 
             // if not platform name (always "PACBIO" for us), store as a custom tag
         } else if (tokenTag != sam_PL) {
