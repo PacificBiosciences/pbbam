@@ -604,3 +604,28 @@ TEST(BAM_Validator, reports_invalid_unmapped_record_data)
         EXPECT_FALSE(Validator::IsValid(record));
     }
 }
+
+TEST(BAM_Validator, optional_fields_settable)
+{
+    const std::string smrtCellKit{"thisSmrtCellKit"};
+    const std::string smrtCellId{"thisSmrtCellId"};
+    const std::string runId{"thisRunId"};
+    const std::string icsVersion{"thisIcsVersion"};
+
+    ReadGroupInfo rg = ValidatorTests::validReadGroup;
+    // Valid without optional fields.
+    ASSERT_NO_THROW(Validator::Validate(rg));
+
+    rg.SmrtCellKit(smrtCellKit)  //
+        .SmrtCellId(smrtCellId)
+        .RunId(runId)
+        .IcsVersion(icsVersion);
+    // Valid with optional fields.
+    ASSERT_NO_THROW(Validator::Validate(rg));
+
+    // Optional fields can read back.
+    EXPECT_EQ(smrtCellKit, rg.SmrtCellKit());
+    EXPECT_EQ(smrtCellId, rg.SmrtCellId());
+    EXPECT_EQ(runId, rg.RunId());
+    EXPECT_EQ(icsVersion, rg.IcsVersion());
+}

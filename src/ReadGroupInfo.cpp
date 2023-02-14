@@ -73,6 +73,10 @@ static const std::string token_RT{"READTYPE"};
 static const std::string token_BK{"BINDINGKIT"};
 static const std::string token_SK{"SEQUENCINGKIT"};
 static const std::string token_BV{"BASECALLERVERSION"};
+static const std::string token_SC{"SMRTCELLKIT"};
+static const std::string token_SI{"SMRTCELLID"};
+static const std::string token_RI{"RUNID"};
+static const std::string token_IV{"ICSVERSION"};
 static const std::string token_FR{"FRAMERATEHZ"};
 static const std::string token_CT{"CONTROL"};
 static const std::string token_SO{"SOURCE"};
@@ -344,17 +348,19 @@ ReadGroupInfo::ReadGroupInfo(ReadGroupInfoConfig config)
 
 bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const noexcept
 {
-    const auto lhsFields = std::tie(
-        id_, sequencingCenter_, date_, flowOrder_, keySequence_, library_, programs_,
-        platformModel_, predictedInsertSize_, movieName_, sample_, readType_, bindingKit_,
-        sequencingKit_, basecallerVersion_, frameRateHz_, control_, ipdCodec_, pulseWidthCodec_,
-        hasBarcodeData_, barcodeFile_, barcodeHash_, barcodeCount_, barcodeMode_, barcodeQuality_);
+    const auto lhsFields =
+        std::tie(id_, sequencingCenter_, date_, flowOrder_, keySequence_, library_, programs_,
+                 platformModel_, predictedInsertSize_, movieName_, sample_, readType_, bindingKit_,
+                 sequencingKit_, smrtCellKit_, smrtCellId_, runId_, basecallerVersion_, icsVersion_,
+                 frameRateHz_, control_, ipdCodec_, pulseWidthCodec_, hasBarcodeData_, barcodeFile_,
+                 barcodeHash_, barcodeCount_, barcodeMode_, barcodeQuality_);
 
     const auto rhsFields = std::tie(
         other.id_, other.sequencingCenter_, other.date_, other.flowOrder_, other.keySequence_,
         other.library_, other.programs_, other.platformModel_, other.predictedInsertSize_,
         other.movieName_, other.sample_, other.readType_, other.bindingKit_, other.sequencingKit_,
-        other.basecallerVersion_, other.frameRateHz_, other.control_, other.ipdCodec_,
+        other.smrtCellKit_, other.smrtCellId_, other.runId_, other.basecallerVersion_,
+        other.icsVersion_, other.frameRateHz_, other.control_, other.ipdCodec_,
         other.pulseWidthCodec_, other.hasBarcodeData_, other.barcodeFile_, other.barcodeHash_,
         other.barcodeCount_, other.barcodeMode_, other.barcodeQuality_);
 
@@ -613,6 +619,14 @@ void ReadGroupInfo::DecodeSamDescription(const std::string& description)
             basecallerVersion_ = std::move(value);
         } else if (key == token_SK) {
             sequencingKit_ = std::move(value);
+        } else if (key == token_IV) {
+            icsVersion_ = std::move(value);
+        } else if (key == token_SC) {
+            smrtCellKit_ = std::move(value);
+        } else if (key == token_SI) {
+            smrtCellId_ = std::move(value);
+        } else if (key == token_RI) {
+            runId_ = std::move(value);
         } else if (key == token_FR) {
             frameRateHz_ = std::move(value);
         } else if (key == token_CT) {
@@ -686,6 +700,18 @@ std::string ReadGroupInfo::EncodeSamDescription() const
     }
     if (!basecallerVersion_.empty()) {
         result.append(SEP + token_BV + EQ + basecallerVersion_);
+    }
+    if (!smrtCellKit_.empty()) {
+        result.append(SEP + token_SC + EQ + smrtCellKit_);
+    }
+    if (!smrtCellId_.empty()) {
+        result.append(SEP + token_SI + EQ + smrtCellId_);
+    }
+    if (!runId_.empty()) {
+        result.append(SEP + token_RI + EQ + runId_);
+    }
+    if (!icsVersion_.empty()) {
+        result.append(SEP + token_IV + EQ + icsVersion_);
     }
     if (!frameRateHz_.empty()) {
         result.append(SEP + token_FR + EQ + frameRateHz_);
@@ -792,6 +818,14 @@ bool ReadGroupInfo::HasBarcodeData() const { return hasBarcodeData_; }
 bool ReadGroupInfo::HasBaseFeature(BaseFeature feature) const
 {
     return features_.find(feature) != features_.end();
+}
+
+std::string ReadGroupInfo::IcsVersion() const { return icsVersion_; }
+
+ReadGroupInfo& ReadGroupInfo::IcsVersion(std::string versionNumber)
+{
+    icsVersion_ = std::move(versionNumber);
+    return *this;
 }
 
 std::string ReadGroupInfo::Id() const { return id_; }
@@ -994,6 +1028,14 @@ ReadGroupInfo& ReadGroupInfo::RevertSegment()
     return *this;
 }
 
+std::string ReadGroupInfo::RunId() const { return runId_; }
+
+ReadGroupInfo& ReadGroupInfo::RunId(std::string id)
+{
+    runId_ = std::move(id);
+    return *this;
+}
+
 std::string ReadGroupInfo::Sample() const { return sample_; }
 
 ReadGroupInfo& ReadGroupInfo::Sample(std::string sample)
@@ -1057,6 +1099,22 @@ ReadGroupInfo& ReadGroupInfo::SequencingKit(std::string kitNumber)
         sequencingKit_ = std::move(kitNumber);
         sequencingChemistry_.clear();  // reset cached chemistry name
     }
+    return *this;
+}
+
+std::string ReadGroupInfo::SmrtCellId() const { return smrtCellId_; }
+
+ReadGroupInfo& ReadGroupInfo::SmrtCellId(std::string id)
+{
+    smrtCellId_ = std::move(id);
+    return *this;
+}
+
+std::string ReadGroupInfo::SmrtCellKit() const { return smrtCellKit_; }
+
+ReadGroupInfo& ReadGroupInfo::SmrtCellKit(std::string kitNumber)
+{
+    smrtCellKit_ = std::move(kitNumber);
     return *this;
 }
 

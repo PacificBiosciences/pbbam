@@ -393,6 +393,9 @@ public:
     /// \returns true if read group has an entry for the specified base feature
     bool HasBaseFeature(BaseFeature feature) const;
 
+    /// \returns ICS version number (e.g. "12.0.0.172107")
+    std::string IcsVersion() const;
+
     /// \returns full string value of \@RG:ID, whether optional barcode labels
     ///          are present
     ///
@@ -447,6 +450,9 @@ public:
     /// \returns string value of read type
     std::string ReadType() const;
 
+    /// \returns Run ID
+    std::string RunId() const;
+
     /// \returns string value of \@RG:SM
     std::string Sample() const;
 
@@ -458,6 +464,12 @@ public:
 
     /// \returns sequencing kit part number
     std::string SequencingKit() const;
+
+    /// \returns SMRT cell ID
+    std::string SmrtCellId() const;
+
+    /// \returns SMRT cell kit part number
+    std::string SmrtCellKit() const;
 
     /// \returns CCS or segmented CCS strand, if present
     std::optional<Data::Strand> Strand() const;
@@ -570,6 +582,13 @@ public:
     ///
     ReadGroupInfo& FrameRateHz(std::string frameRateHz);
 
+    /// \brief Sets the ICS version number.
+    ///
+    /// \param[in] versionNumber   new value
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& IcsVersion(std::string versionNumber);
+
     /// \brief Sets the read group's ID.
     ///
     /// \param[in] id     string value of ID
@@ -672,6 +691,13 @@ public:
     ///
     ReadGroupInfo& RemoveBaseFeature(BaseFeature feature);
 
+    /// \brief Sets the Run ID.
+    ///
+    /// \param[in] id    new value
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& RunId(std::string id);
+
     /// \brief Sets the value for \@RG:SM
     ///
     /// \param[in] sample       new value
@@ -692,6 +718,20 @@ public:
     /// \returns reference to this object
     ///
     ReadGroupInfo& SequencingKit(std::string kitNumber);
+
+    /// \brief Sets the SMRT cell ID.
+    ///
+    /// \param[in] id    new value
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& SmrtCellId(std::string id);
+
+    /// \brief Sets the SMRT cell kit part number.
+    ///
+    /// \param[in] kitNumber    new value
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& SmrtCellKit(std::string kitNumber);
 
     /// \brief Sets the CCS or CCS segment's strand.
     ///
@@ -752,6 +792,10 @@ private:
     std::string bindingKit_;
     std::string sequencingKit_;
     std::string basecallerVersion_;
+    std::string smrtCellKit_;
+    std::string smrtCellId_;
+    std::string runId_;
+    std::string icsVersion_;
     mutable std::string sequencingChemistry_;
     std::string frameRateHz_;
     bool control_ = false;

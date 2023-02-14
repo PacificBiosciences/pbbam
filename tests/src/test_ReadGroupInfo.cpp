@@ -372,4 +372,28 @@ TEST(BAM_ReadGroupInfo, strandness_and_new_rg_ctors)
     }
 }
 
+TEST(BAM_ReadGroupInfo, can_read_write_optional_description_fields) 
+{
+    const std::string input{
+        "@RG\tID:9123b4a8\tPL:PACBIO\t"
+        "DS:READTYPE=SUBREAD;Ipd:Frames=ip;PulseWidth:Frames=pw;BINDINGKIT=102-739-100;"
+        "SEQUENCINGKIT=102-118-800;SMRTCELLKIT=102-202-200;SMRTCELLID=EA008011;"
+        "RUNID=r84029_20230127_224717;BASECALLERVERSION=5.0;ICSVERSION=12.0.0.172107;"
+        "FRAMERATEHZ=100.000000\tLB:20230127_84029_FAT_transferoff-1st_Postload_6hPE_11k-unclean-1_108pM_FL6W7_EA008011\t"
+        "PU:m84029_230127_225449_s1\tSM:11k-unclean-1_108pM_FL6W7_EA008011\tPM:REVIO"
+    };
+
+    const ReadGroupInfo rg = ReadGroupInfo::FromSam(input);
+    EXPECT_EQ(rg.IcsVersion(), "12.0.0.172107");
+    EXPECT_EQ(rg.RunId(), "r84029_20230127_224717");
+    EXPECT_EQ(rg.SmrtCellId(), "EA008011");
+    EXPECT_EQ(rg.SmrtCellKit(), "102-202-200");
+
+    const std::string output = rg.ToSam();
+    EXPECT_NE(output.find("SMRTCELLKIT=102-202-200"), std::string::npos);
+    EXPECT_NE(output.find("SMRTCELLID=EA008011"), std::string::npos);
+    EXPECT_NE(output.find("RUNID=r84029_20230127_224717"), std::string::npos);
+    EXPECT_NE(output.find("ICSVERSION=12.0.0.172107"), std::string::npos);
+}
+
 // clang-format on
