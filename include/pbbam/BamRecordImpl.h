@@ -15,6 +15,7 @@
 
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -520,6 +521,16 @@ public:
     /// \sa HasTag
     ///
     bool RemoveTag(BamRecordTag tag);
+
+    /// \brief Length of array- or string-type tag with this name
+    ///
+    /// \returns tag data length, or std::nullopt if tag is not present or is scalar value
+    std::optional<int> TagLength(const std::string& tagName) const;
+
+    /// \brief Length of array- or string-type tag
+    ///
+    /// \returns tag data length, or std::nullopt if tag is not present or is scalar value
+    std::optional<int> TagLength(BamRecordTag tag) const;
 
     /// \brief Fetches a tag from this record.
     ///

@@ -176,3 +176,38 @@ TEST(BAM_BamRecordImplTags, can_query_tag)
     EXPECT_EQ(Tag(), bam.TagValue(""));
     EXPECT_EQ(Tag(), bam.TagValue("some_too_long_name"));
 }
+
+TEST(BAM_BamRecordImplTags, can_query_array_or_string_tag_length)
+{
+    TagCollection tags;
+    tags["xx"] = std::vector<int32_t>{};
+    tags["yy"] = std::string{};
+    tags["aa"] = std::vector<uint8_t>({34, 5, 125});
+    tags["bb"] = std::string{"triforce"};
+    tags["cc"] = int32_t{-42};
+
+    BamRecordImpl bam;
+    bam.Tags(tags);
+
+    // empty array
+    ASSERT_TRUE(bam.TagLength("xx").has_value());
+    EXPECT_EQ(0, bam.TagLength("xx").value());
+
+    // empty string
+    ASSERT_TRUE(bam.TagLength("yy").has_value());
+    EXPECT_EQ(0, bam.TagLength("yy").value());
+
+    // non-empty array
+    ASSERT_TRUE(bam.TagLength("aa").has_value());
+    EXPECT_EQ(3, bam.TagLength("aa").value());
+
+    // non-empty string
+    ASSERT_TRUE(bam.TagLength("bb").has_value());
+    EXPECT_EQ(8, bam.TagLength("bb").value());
+
+    // scalar value
+    EXPECT_FALSE(bam.TagLength("cc").has_value());
+
+    // does not exist
+    EXPECT_FALSE(bam.TagLength("dd").has_value());
+}

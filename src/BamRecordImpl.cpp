@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <array>
+#include <optional>
 #include <sstream>
 #include <tuple>
 #include <utility>
@@ -734,6 +735,53 @@ BamRecordImpl& BamRecordImpl::SetSupplementaryAlignment(bool ok)
         d_->core.flag &= ~BamRecordImpl::SUPPLEMENTARY;
     }
     return *this;
+}
+
+std::optional<int> BamRecordImpl::TagLength(const std::string& tagName) const
+{
+    const int offset = TagOffset(tagName);
+
+    // not present
+    if (offset == -1) {
+        return std::nullopt;
+    }
+
+    // fetch tag data section
+    bam1_t* b = d_.get();
+    assert(bam_get_aux(b));
+    uint8_t* tagData = bam_get_aux(b) + offset;
+    if (offset >= b->l_data) {
+        return std::nullopt;
+    }
+
+    // determine tag length
+    const auto tagType = static_cast<char>(*tagData++);
+    switch (tagType) {
+
+        // string tag
+        case 'H':
+            [[fallthrough]];
+        case 'Z': {
+            return strlen(reinterpret_cast<const char*>(&tagData[0]));
+        }
+
+        // array tag
+        case 'B': {
+            ++tagData;  // skip array's value type code
+            uint32_t numElements = 0;
+            memcpy(&numElements, &tagData[0], sizeof(uint32_t));
+            return numElements;
+        }
+
+        // scalar tag
+        default:
+            return std::nullopt;
+    }
+}
+
+std::optional<int> BamRecordImpl::TagLength(const BamRecordTag tag) const
+{
+    return TagLength(BamRecordTags::LabelFor(tag));
 }
 
 int BamRecordImpl::TagOffset(const std::string& tagName) const
