@@ -458,3 +458,136 @@ TEST(BAM_BamHeader, can_handle_lookup_with_mixed_correct_and_legacy_barcoded_rg_
     EXPECT_NO_THROW(header.ReadGroup("3cecb623"));
     EXPECT_NO_THROW(header.ReadGroup("3cecb623/73--73"));
 }
+
+TEST(BAM_BamHeader, program_entries_maintain_the_order_from_input_not_sorted_by_id)
+{
+    const std::string originalText{
+        "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
+        "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\tPM:SEQUEL\n"
+        "@PG\tID:ghijkl\tPN:application_run_first\n"
+        "@PG\tID:abcdef\tPN:application_run_second\n"
+        "@CO\tcitation needed\n"};
+
+    const BamHeader header{originalText};
+    EXPECT_EQ(originalText, header.ToSam());
+}
+
+TEST(BAM_BamHeader, program_entries_maintain_the_order_added_not_sorted_by_id)
+{
+    const std::string originalText{
+        "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
+        "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\tPM:SEQUEL\n"
+        "@PG\tID:ghijkl\tPN:application_run_first\n"
+        "@CO\tcitation needed\n"};
+
+    const std::string expectedText{
+        "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
+        "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\tPM:SEQUEL\n"
+        "@PG\tID:ghijkl\tPN:application_run_first\n"
+        "@PG\tID:abcdef\tPN:application_run_second\n"
+        "@CO\tcitation needed\n"};
+
+    BamHeader header{originalText};
+    header.AddProgram(ProgramInfo::FromSam("@PG\tID:abcdef\tPN:application_run_second"));
+    EXPECT_EQ(expectedText, header.ToSam());
+}
+
+// clang-format off
+TEST(BAM_BamHeader, unique_program_ids)
+{
+    const std::string originalText{
+        "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
+        "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\tPM:SEQUEL\n"
+        "@PG\tID:zmwfilter\tPN:zmwfilter\tCL:zmwfilter --include zmws.txt in.bam filtered.bam\n"
+        "@CO\tcitation needed\n"};
+
+    // Input is BAM from zmwfilter with include-listed zmwfilter.
+    // Simulate 2 additional runs of zmwfilter:
+    //  - downsample fraction
+    //  - additional downsample
+
+    BamHeader header{originalText};
+    header.AddProgram(ProgramInfo::FromSam(
+        "@PG\tID:zmwfilter\tPN:zmwfilter\tCL:zmwfilter --downsample 0.2 filtered.bam filtered.downsampled.bam"));
+    {
+        const std::string expectedText{
+            "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
+            "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\tPM:SEQUEL\n"
+            "@PG\tID:zmwfilter\tPN:zmwfilter\tCL:zmwfilter --include zmws.txt in.bam filtered.bam\n"
+            "@PG\tID:zmwfilter.1\tPN:zmwfilter\tCL:zmwfilter --downsample 0.2 filtered.bam filtered.downsampled.bam\n"
+            "@CO\tcitation needed\n"};
+        EXPECT_EQ(expectedText, header.ToSam());
+    }
+
+    header.AddProgram(ProgramInfo::FromSam(
+        "@PG\tID:zmwfilter\tPN:zmwfilter\tCL:zmwfilter --downsample 0.1 filtered.downsampled.bam filtered.downsampled.again.bam"));
+    {
+        const std::string expectedText{
+            "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
+            "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\tPM:SEQUEL\n"
+            "@PG\tID:zmwfilter\tPN:zmwfilter\tCL:zmwfilter --include zmws.txt in.bam filtered.bam\n"
+            "@PG\tID:zmwfilter.1\tPN:zmwfilter\tCL:zmwfilter --downsample 0.2 filtered.bam filtered.downsampled.bam\n"
+            "@PG\tID:zmwfilter.2\tPN:zmwfilter\tCL:zmwfilter --downsample 0.1 filtered.downsampled.bam filtered.downsampled.again.bam\n"
+            "@CO\tcitation needed\n"};
+        EXPECT_EQ(expectedText, header.ToSam());
+    }
+}
+
+TEST(BAM_BamHeader, merging_headers_bypasses_pg_numerical_suffix_for_duplicates_and_ignores_them) 
+{
+    const BamHeader header1{
+        "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
+        "@RG\tID:readgroup1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\tPM:SEQUEL\n"
+        "@PG\tID:zmwfilter\tPN:zmwfilter\tCL:zmwfilter --include zmws.txt in.bam filtered.bam\n"
+        "@CO\tcitation needed\n"
+    };
+
+    const BamHeader header2{
+        "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
+        "@RG\tID:readgroup2\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\tPM:SEQUEL\n"
+        "@PG\tID:zmwfilter\tPN:zmwfilter\tCL:zmwfilter --include zmws.txt in.bam filtered.bam\n"
+        "@CO\tcitation needed\n"
+    };
+
+    // Merging BAMs, e.g. from chunked analysis, should not end up with N program entries
+    const BamHeader mergedHeader = header1 + header2;
+    const std::vector<ProgramInfo> mergedPrograms = mergedHeader.Programs();
+    EXPECT_EQ(1, mergedPrograms.size());
+    EXPECT_EQ("zmwfilter", mergedPrograms.front().Id());
+
+    // Sanity check we still did the merge
+    const std::string mergedText = mergedHeader.ToSam();
+    EXPECT_TRUE(mergedText.find("@RG\tID:readgroup1") != std::string::npos);
+    EXPECT_TRUE(mergedText.find("@RG\tID:readgroup2") != std::string::npos);
+}
+
+TEST(BAM_BamHeader, replacing_program_list_resets_suffix_counter) 
+{
+    BamHeader header{
+        "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
+        "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\tPM:SEQUEL\n"
+        "@PG\tID:zmwfilter\tPN:zmwfilter\tCL:zmwfilter --include zmws.txt in.bam filtered.bam\n"
+        "@PG\tID:zmwfilter.1\tPN:zmwfilter\tCL:zmwfilter --downsample 0.2 filtered.bam filtered.downsampled.bam\n"
+        "@PG\tID:zmwfilter.2\tPN:zmwfilter\tCL:zmwfilter --downsample 0.1 filtered.downsampled.bam filtered.downsampled.again.bam\n"
+        "@CO\tcitation needed\n"
+    };
+
+    std::vector<ProgramInfo> replacementPgs {
+        ProgramInfo::FromSam("@PG\tID:zmwfilter\tPN:zmwfilter\tCL:zmwfilter --new-run 1"),
+        ProgramInfo::FromSam("@PG\tID:zmwfilter\tPN:zmwfilter\tCL:zmwfilter --new-run 2"),
+    };
+
+    header.Programs(std::move(replacementPgs));
+
+    // new entries, not zmwfilter.3 and zmwfilter.4 
+    const std::string expectedText{
+        "@HD\tVN:1.1\tSO:unknown\tpb:3.0.1\n"
+        "@RG\tID:rg1\tPL:PACBIO\tDS:READTYPE=UNKNOWN\tSM:control\tPM:SEQUEL\n"
+        "@PG\tID:zmwfilter\tPN:zmwfilter\tCL:zmwfilter --new-run 1\n"
+        "@PG\tID:zmwfilter.1\tPN:zmwfilter\tCL:zmwfilter --new-run 2\n"
+        "@CO\tcitation needed\n"
+    };
+    EXPECT_EQ(expectedText, header.ToSam());
+}
+
+// clang-format on

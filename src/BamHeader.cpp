@@ -100,6 +100,12 @@ void ParseHeaderLine(const std::string& line, BamHeader& hdr)
 
 }  // namespace
 
+enum class AddProgramMode
+{
+    DIRECT,
+    FROM_MERGE,
+};
+
 class BamHeader::BamHeaderPrivate
 {
 public:
@@ -109,12 +115,41 @@ public:
     std::map<std::string, std::string> headerLineCustom_;
 
     std::map<std::string, ReadGroupInfo> readGroups_;  // id => read group info
-    std::map<std::string, ProgramInfo> programs_;      // id => program info
+    std::vector<ProgramInfo> programs_;                // id => program info
     std::vector<std::string> comments_;
 
     // we need to preserve insertion order, use lookup for access by name
     std::vector<SequenceInfo> sequences_;
     std::map<std::string, int32_t> sequenceIdLookup_;
+
+    std::set<std::string> uniqueProgramIds_;
+    void AddProgram(ProgramInfo pg, const AddProgramMode mode)
+    {
+        const std::string originalPgId = pg.Id();
+
+        // PG ID not seen, just append and return
+        if (!uniqueProgramIds_.contains(originalPgId)) {
+            uniqueProgramIds_.insert(originalPgId);
+            programs_.push_back(std::move(pg));
+            return;
+        }
+
+        // PG ID seen before. Ignore if coming from a merge operation, we don't
+        // need to explode the number of PG entries. Otherwise, this is coming from
+        // another run of the same tool (e.g. another round of zmwfilter). We'll
+        // mimic samtools and add increasing number suffix until we find a unique hit.
+        if (mode == AddProgramMode::DIRECT) {
+            std::string usingPgId = originalPgId;
+            int suffix = 1;
+            while (uniqueProgramIds_.contains(usingPgId)) {
+                usingPgId = originalPgId + '.' + std::to_string(suffix);
+                ++suffix;
+            }
+            pg.Id(usingPgId);
+            uniqueProgramIds_.insert(usingPgId);
+            programs_.push_back(std::move(pg));
+        }
+    }
 };
 
 BamHeader::BamHeader() : d_{std::make_shared<BamHeaderPrivate>()} {}
@@ -201,9 +236,7 @@ BamHeader& BamHeader::operator+=(const BamHeader& other)
 
     // merge programs
     for (const auto& pg : other.Programs()) {
-        if (!HasProgram(pg.Id())) {
-            AddProgram(pg);
-        }
+        d_->AddProgram(pg, AddProgramMode::FROM_MERGE);
     }
 
     // merge comments
@@ -224,7 +257,7 @@ BamHeader& BamHeader::AddComment(std::string comment)
 
 BamHeader& BamHeader::AddProgram(ProgramInfo pg)
 {
-    d_->programs_[pg.Id()] = std::move(pg);
+    d_->AddProgram(std::move(pg), AddProgramMode::DIRECT);
     return *this;
 }
 
@@ -292,12 +325,18 @@ BamHeader BamHeader::DeepCopy() const
     result.d_->comments_ = d_->comments_;
     result.d_->sequences_ = d_->sequences_;
     result.d_->sequenceIdLookup_ = d_->sequenceIdLookup_;
+    result.d_->uniqueProgramIds_ = d_->uniqueProgramIds_;
     return result;
 }
 
 bool BamHeader::HasProgram(const std::string& id) const
 {
-    return d_->programs_.find(id) != d_->programs_.cend();
+    for (const auto& pg : d_->programs_) {
+        if (pg.Id() == id) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool BamHeader::HasReadGroup(const std::string& id) const
@@ -337,11 +376,12 @@ BamHeader& BamHeader::PacBioBamVersion(const std::string& version)
 
 ProgramInfo BamHeader::Program(const std::string& id) const
 {
-    const auto iter = d_->programs_.find(id);
-    if (iter == d_->programs_.cend()) {
-        throw std::runtime_error{"[pbbam] BAM header ERROR: program ID not found: " + id};
+    for (const auto& pg : d_->programs_) {
+        if (pg.Id() == id) {
+            return pg;
+        }
     }
-    return iter->second;
+    throw std::runtime_error{"[pbbam] BAM header ERROR: program ID not found: " + id};
 }
 
 std::vector<std::string> BamHeader::ProgramIds() const
@@ -349,26 +389,19 @@ std::vector<std::string> BamHeader::ProgramIds() const
     std::vector<std::string> result;
     result.reserve(d_->programs_.size());
     for (const auto& pg : d_->programs_) {
-        result.push_back(pg.first);
+        result.push_back(pg.Id());
     }
     return result;
 }
 
-std::vector<ProgramInfo> BamHeader::Programs() const
-{
-    std::vector<ProgramInfo> result;
-    result.reserve(d_->programs_.size());
-    for (const auto& pg : d_->programs_) {
-        result.push_back(pg.second);
-    }
-    return result;
-}
+std::vector<ProgramInfo> BamHeader::Programs() const { return d_->programs_; }
 
 BamHeader& BamHeader::Programs(std::vector<ProgramInfo> programs)
 {
+    d_->uniqueProgramIds_.clear();
     d_->programs_.clear();
-    for (const auto& pg : programs) {
-        d_->programs_[pg.Id()] = std::move(pg);
+    for (ProgramInfo& pg : programs) {
+        d_->AddProgram(std::move(pg), AddProgramMode::DIRECT);
     }
     return *this;
 }
@@ -507,8 +540,8 @@ std::string BamHeader::ToSam() const
     }
 
     // @PG
-    for (const auto& progIter : d_->programs_) {
-        out << progIter.second.ToSam() << '\n';
+    for (const auto& pg : d_->programs_) {
+        out << pg.ToSam() << '\n';
     }
 
     // @CO
