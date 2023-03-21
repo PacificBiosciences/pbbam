@@ -1,5 +1,6 @@
 #include <pbbam/IndexedBamWriter.h>
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -106,4 +107,37 @@ TEST(BAM_IndexedBamWriter, can_handle_long_reads_spanning_bgzf_blocks)
 
     remove(outBamFn.c_str());
     remove(outPbiFn.c_str());
+}
+
+TEST(BAM_IndexedBamWriter, removes_gzi_file_for_bam_with_no_records)
+{
+    const std::string inBamFn = PacBio::BAM::PbbamTestsConfig::Data_Dir + "/long_reads.bam";
+    const std::string outBamFn =
+        PacBio::BAM::PbbamTestsConfig::GeneratedData_Dir + "/long_reads.copy.bam";
+
+    PacBio::BAM::BamFile file{inBamFn};
+
+    // GZI file removed for normal, non-empty BAM (header + records)
+    {
+        PacBio::BAM::IndexedBamWriter writer{outBamFn, file.Header()};
+        PacBio::BAM::EntireFileQuery query{file};
+        for (const auto& record : query) {
+            writer.Write(record);
+        }
+    }
+    EXPECT_TRUE(std::filesystem::exists(outBamFn));
+    EXPECT_TRUE(std::filesystem::exists(outBamFn + ".pbi"));
+    EXPECT_FALSE(std::filesystem::exists(outBamFn + ".gzi"));
+    std::filesystem::remove(outBamFn);
+    std::filesystem::remove(outBamFn + ".pbi");
+
+    // GZI file removed for empty BAM (header-only)
+    {
+        PacBio::BAM::IndexedBamWriter writer{outBamFn, file.Header()};
+    }
+    EXPECT_TRUE(std::filesystem::exists(outBamFn));
+    EXPECT_TRUE(std::filesystem::exists(outBamFn + ".pbi"));
+    EXPECT_FALSE(std::filesystem::exists(outBamFn + ".gzi"));
+    std::filesystem::remove(outBamFn);
+    std::filesystem::remove(outBamFn + ".pbi");
 }

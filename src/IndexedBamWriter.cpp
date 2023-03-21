@@ -26,9 +26,12 @@
 #include <array>
 #include <atomic>
 #include <condition_variable>
+#include <exception>
+#include <filesystem>
 #include <mutex>
 #include <sstream>
 #include <stdexcept>
+#include <system_error>
 #include <thread>
 #include <tuple>
 #include <type_traits>
@@ -161,13 +164,19 @@ public:
 
     ~IndexedBamWriterPrivate2() noexcept
     {
+        // Finalize index creation and delete temporaries.
         if (isOpen_) {
             try {
                 Close();
             } catch (...) {
-                // swallow any exceptions & remain no-throw from dtor
+                // Swallow any exceptions & remain no-throw from dtor
             }
         }
+
+        // The GZI file may still need deletion if Close() threw and quit early.
+        // This overload of remove() does not throw.
+        std::error_code ec;
+        std::filesystem::remove(bamFilename_ + ".gzi", ec);
     }
 
     void Close()
