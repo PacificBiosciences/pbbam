@@ -92,6 +92,13 @@ if not meson.is_subproject()
 
   install_headers(
     files([
+      'pbbam/csv/CsvReader.h',
+      'pbbam/csv/CsvTypes.h',
+      'pbbam/csv/CsvWriter.h']),
+    subdir : 'pbbam/csv')
+
+  install_headers(
+    files([
       'pbbam/exception/BundleChemistryMappingException.h',
       'pbbam/exception/InvalidSequencingChemistryException.h',
       'pbbam/exception/ValidationException.h']),

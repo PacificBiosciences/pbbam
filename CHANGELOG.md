@@ -5,6 +5,22 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
+### Added 
+ - New description fields in BAM header read group (@RG) entries: 
+   SMRTCELLKIT, SMRTCELLID, RUNID, and ICSVERSION
+ - Generic CSV file API
+
+### Changed
+ - Program entries (@PG) in BAM header are now maintained in the order added,
+   not sorted by ID. If a program is added that already has a matching ID entry,
+   a unique, increasingly numeric suffix is added (e.g. app.1, app.2). This 
+   matches samtools behavior.
+
+### Fixed
+ - Temporary .gzi files (used in the IndexedBamWriter) are now deleted when the 
+   output BAM file has no records. Previously these were not properly deleted 
+   during IBW destruction in that situation.
+
 ## [2.3.0] - 2022-01-03
 
 ### Removed

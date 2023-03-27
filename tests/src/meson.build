@@ -18,6 +18,7 @@ pbbam_test_cpp_sources = files([
   'test_CollectionMetadata.cpp',
   'test_Compare.cpp',
   'test_CompositeBamReaders.cpp',
+  'test_Csv.cpp',
   'test_DataSetCore.cpp',
   'test_DataSetGenomicIntervals.cpp',
   'test_DataSetIO.cpp',
