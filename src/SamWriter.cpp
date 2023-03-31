@@ -69,24 +69,7 @@ public:
         // min_shift=14 & n_lvls=5 are SAM/BAM "magic numbers"
         rawRecord->core.bin = hts_reg2bin(rawRecord->core.pos, bam_endpos(rawRecord.get()), 14, 5);
 
-        // Maybe adjust location of long CIGAR (>65535 ops) data, depending on the
-        // runtime htslib version.
-        //
-        // SAM formatting in htslib verions previous to 1.7 are unaware of the new
-        // long CIGAR implementation ("CG") tag. So we need to move that back to the
-        // "standard" field so that SAM output is correct. Versions >=1.7 properly
-        // display long CIGARs.
-        //
-        // This transform will become unecessary when we drop support for htslib pre-v1.7.
-        //
-        static const bool has_native_long_cigar_support = DoesHtslibSupportLongCigar();
         const auto cigar = record.CigarData();
-        if (!has_native_long_cigar_support && cigar.size() > 65535) {
-            if (record.Impl().HasTag("CG")) {
-                record.Impl().RemoveTag("CG");
-            }
-            record.Impl().SetCigarData(cigar);
-        }
 
         // write record to file
         const int ret = sam_write1(file_.get(), header_.get(), rawRecord.get());

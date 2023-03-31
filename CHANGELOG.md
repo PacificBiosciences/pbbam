@@ -16,6 +16,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
    a unique, increasingly numeric suffix is added (e.g. app.1, app.2). This 
    matches samtools behavior.
 
+### Removed
+ - Support for pre-1.7 htslib. Overlong CIGAR support is now a hard requirement.
+
 ### Fixed
  - Temporary .gzi files (used in the IndexedBamWriter) are now deleted when the 
    output BAM file has no records. Previously these were not properly deleted 

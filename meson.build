@@ -54,7 +54,7 @@ pbbam_boost_dep = dependency('boost', include_type : 'system')
 pbbam_zlib_dep = dependency('zlib', include_type : 'system', fallback : ['zlib', 'zlib_dep'])
 
 # htslib
-pbbam_htslib_dep = dependency('htslib', include_type : 'system', version : '>=1.4', fallback : ['htslib', 'htslib_dep'])
+pbbam_htslib_dep = dependency('htslib', include_type : 'system', version : '>=1.7', fallback : ['htslib', 'htslib_dep'])
 
 # pbcopper
 pbbam_pbcopper_dep = dependency('pbcopper', fallback : ['pbcopper', 'pbcopper_dep'])

@@ -21,32 +21,6 @@ using Tag = PacBio::BAM::Tag;
 
 namespace LongCigarTests {
 
-bool DoesHtslibSupportLongCigar()
-{
-    const std::string htsVersion = hts_version();
-
-    // remove any "-<blah>" for non-release versions
-    const auto versionBase = PacBio::BAM::Split(htsVersion, '-');
-    if (versionBase.empty()) {
-        throw std::runtime_error{"invalid htslib version format: " + htsVersion};
-    }
-
-    // grab major/minor version numbers
-    const auto versionParts = PacBio::BAM::Split(versionBase[0], '.');
-    if (versionParts.size() < 2) {
-        throw std::runtime_error{"invalid htslib version format: " + htsVersion};
-    }
-
-    // check against v1.7
-    const int versionMajor = std::stoi(versionParts[0]);
-    const int versionMinor = std::stoi(versionParts[1]);
-    constexpr int V17_MAJOR = 1;
-    constexpr int V17_MINOR = 7;
-    return std::tie(versionMajor, versionMinor) >= std::tie(V17_MAJOR, V17_MINOR);
-}
-
-const bool has_native_long_cigar_support = DoesHtslibSupportLongCigar();
-
 // BAM record in this file has its CIGAR data in the new "CG" tag
 const std::string LongCigarBam = PacBio::BAM::PbbamTestsConfig::Data_Dir + "/long-cigar-1.7.bam";
 
@@ -71,11 +45,7 @@ TEST(BAM_LongCigar, can_read_long_cigar)
     const auto b = LongCigarTests::ReadLongCigarRecord(LongCigarTests::LongCigarBam);
 
     EXPECT_EQ(LongCigarTests::numOps, b.CigarData().size());
-    if (LongCigarTests::has_native_long_cigar_support) {
-        EXPECT_FALSE(b.Impl().HasTag("CG"));
-    } else {
-        EXPECT_TRUE(b.Impl().HasTag("CG"));
-    }
+    EXPECT_FALSE(b.Impl().HasTag("CG"));
 }
 
 TEST(BAM_LongCigar, can_edit_long_cigar)
@@ -84,11 +54,7 @@ TEST(BAM_LongCigar, can_edit_long_cigar)
     b.Impl().CigarData(b.CigarData());
 
     EXPECT_EQ(LongCigarTests::numOps, b.CigarData().size());
-    if (LongCigarTests::has_native_long_cigar_support) {
-        EXPECT_FALSE(b.Impl().HasTag("CG"));
-    } else {
-        EXPECT_TRUE(b.Impl().HasTag("CG"));
-    }
+    EXPECT_FALSE(b.Impl().HasTag("CG"));
 }
 
 TEST(BAM_LongCigar, can_write_long_cigar)
@@ -98,11 +64,7 @@ TEST(BAM_LongCigar, can_write_long_cigar)
         b.Impl().CigarData(b.CigarData());
 
         EXPECT_EQ(LongCigarTests::numOps, b.CigarData().size());
-        if (LongCigarTests::has_native_long_cigar_support) {
-            EXPECT_FALSE(b.Impl().HasTag("CG"));
-        } else {
-            EXPECT_TRUE(b.Impl().HasTag("CG"));
-        }
+        EXPECT_FALSE(b.Impl().HasTag("CG"));
 
         BamWriter writer{LongCigarTests::LongCigarOut, b.header_};
         writer.Write(b);
@@ -112,10 +74,6 @@ TEST(BAM_LongCigar, can_write_long_cigar)
         const auto b = LongCigarTests::ReadLongCigarRecord(LongCigarTests::LongCigarOut);
 
         EXPECT_EQ(LongCigarTests::numOps, b.CigarData().size());
-        if (LongCigarTests::has_native_long_cigar_support) {
-            EXPECT_FALSE(b.Impl().HasTag("CG"));
-        } else {
-            EXPECT_TRUE(b.Impl().HasTag("CG"));
-        }
+        EXPECT_FALSE(b.Impl().HasTag("CG"));
     }
 }

@@ -31,13 +31,4 @@
 #define BOOST_UUID_RANDOM_PROVIDER_DISABLE_GETRANDOM
 #endif
 
-namespace PacBio {
-namespace BAM {
-
-/// \return true if runtime htslib is >= v1.7
-bool DoesHtslibSupportLongCigar();
-
-}  // namespace BAM
-}  // namespace PacBio
-
 #endif  // PBBAM_CONFIG_H

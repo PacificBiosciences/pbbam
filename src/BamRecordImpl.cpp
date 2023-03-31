@@ -29,8 +29,6 @@ namespace BAM {
 
 namespace {
 
-static const bool has_native_long_cigar_support = DoesHtslibSupportLongCigar();
-
 Data::Cigar FetchRawCigar(const uint32_t* const src, const uint32_t len)
 {
     Data::Cigar result;
@@ -41,42 +39,6 @@ Data::Cigar FetchRawCigar(const uint32_t* const src, const uint32_t len)
         result.push_back({type, length});
     }
     return result;
-}
-
-bool HasLongCigar(const bam1_t* const b)
-{
-    auto* c = &b->core;
-
-    // if empty CIGAR or unmapped
-    if (c->n_cigar == 0 || c->tid < 0 || c->pos < 0) {
-        return false;
-    }
-
-    // if existing CIGAR doesn't look like a 'fake CIGAR'
-    const auto firstCigarOp = *(bam_get_cigar(b));
-    if (bam_cigar_op(firstCigarOp) != static_cast<uint32_t>(Data::CigarOperationType::SOFT_CLIP) ||
-        static_cast<int32_t>(bam_cigar_oplen(firstCigarOp)) != c->l_qseq) {
-        return false;
-    }
-
-    // if CG tag missing, not expected type
-    const uint8_t* const CG = bam_aux_get(b, "CG");
-    if (CG == nullptr) {
-        return false;
-    }
-    if (CG[0] != 'B' || CG[1] != 'I') {
-        return false;
-    }
-
-    // if CG tag data is empty
-    uint32_t numElements = 0;
-    memcpy(&numElements, &CG[2], sizeof(uint32_t));
-    if (numElements == 0) {
-        return false;
-    }
-
-    // we've found long CIGAR data in the CG tag
-    return true;
 }
 
 }  // namespace
@@ -165,50 +127,15 @@ BamRecordImpl& BamRecordImpl::Bin(uint32_t bin)
 Data::Cigar BamRecordImpl::CigarData() const
 {
     const auto* b = d_.get();
-    if (!has_native_long_cigar_support && HasLongCigar(b)) {
-        // fetch long CIGAR from tag
-        const auto cigarTag = TagValue("CG");
-        const auto cigarTagValue = cigarTag.ToUInt32Array();
-        return FetchRawCigar(cigarTagValue.data(), cigarTagValue.size());
-    } else {
-        // fetch CIGAR from the standard location
-        return FetchRawCigar(bam_get_cigar(b), b->core.n_cigar);
-    }
+    return FetchRawCigar(bam_get_cigar(b), b->core.n_cigar);
 }
 
 BamRecordImpl& BamRecordImpl::CigarData(const Data::Cigar& cigar)
 {
-    // if long CIGAR, using htslib version < 1.7, set it "manually"
-    if (!has_native_long_cigar_support && cigar.size() >= 65536) {
-        // Add the 'fake' CIGAR in normal place.
-        Data::Cigar fake;
-        fake.emplace_back(Data::CigarOperationType::SOFT_CLIP, SequenceLength());
-        const uint32_t alignedLength =
-            static_cast<uint32_t>(bam_cigar2rlen(d_->core.n_cigar, bam_get_cigar(d_.get())));
-        fake.emplace_back(Data::CigarOperationType::REFERENCE_SKIP, alignedLength);
-        SetCigarData(fake);
-
-        // Add raw CIGAR data to CG tag.
-        std::vector<uint32_t> cigarData(cigar.size());
-        cigarData.reserve(cigar.size());
-        for (size_t i = 0; i < cigar.size(); ++i) {
-            const Data::CigarOperation& op = cigar.at(i);
-            cigarData[i] = bam_cigar_gen(op.Length(), static_cast<int>(op.Type()));
-        }
-        if (HasTag("CG")) {
-            EditTag("CG", Tag{cigarData});
-        } else {
-            AddTag("CG", Tag{cigarData});
-        }
+    if (HasTag("CG")) {
+        RemoveTag("CG");
     }
-
-    // otherwise (v1.7+ or short CIGAR), use standard APIs
-    else {
-        if (HasTag("CG")) {
-            RemoveTag("CG");
-        }
-        SetCigarData(cigar);
-    }
+    SetCigarData(cigar);
 
     return *this;
 }
