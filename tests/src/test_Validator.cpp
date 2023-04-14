@@ -611,6 +611,7 @@ TEST(BAM_Validator, optional_fields_settable)
     const std::string smrtCellId{"thisSmrtCellId"};
     const std::string runId{"thisRunId"};
     const std::string icsVersion{"thisIcsVersion"};
+    const std::string movieLength{"thisMovieLength"};
 
     ReadGroupInfo rg = ValidatorTests::validReadGroup;
     // Valid without optional fields.
@@ -619,7 +620,8 @@ TEST(BAM_Validator, optional_fields_settable)
     rg.SmrtCellKit(smrtCellKit)  //
         .SmrtCellId(smrtCellId)
         .RunId(runId)
-        .IcsVersion(icsVersion);
+        .IcsVersion(icsVersion)
+        .MovieLength(movieLength);
     // Valid with optional fields.
     ASSERT_NO_THROW(Validator::Validate(rg));
 
@@ -628,4 +630,5 @@ TEST(BAM_Validator, optional_fields_settable)
     EXPECT_EQ(smrtCellId, rg.SmrtCellId());
     EXPECT_EQ(runId, rg.RunId());
     EXPECT_EQ(icsVersion, rg.IcsVersion());
+    EXPECT_EQ(movieLength, rg.MovieLength());
 }

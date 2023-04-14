@@ -77,6 +77,7 @@ static const std::string token_SC{"SMRTCELLKIT"};
 static const std::string token_SI{"SMRTCELLID"};
 static const std::string token_RI{"RUNID"};
 static const std::string token_IV{"ICSVERSION"};
+static const std::string token_ML{"MOVIELENGTH"};
 static const std::string token_FR{"FRAMERATEHZ"};
 static const std::string token_CT{"CONTROL"};
 static const std::string token_SO{"SOURCE"};
@@ -352,15 +353,15 @@ bool ReadGroupInfo::operator==(const ReadGroupInfo& other) const noexcept
         std::tie(id_, sequencingCenter_, date_, flowOrder_, keySequence_, library_, programs_,
                  platformModel_, predictedInsertSize_, movieName_, sample_, readType_, bindingKit_,
                  sequencingKit_, smrtCellKit_, smrtCellId_, runId_, basecallerVersion_, icsVersion_,
-                 frameRateHz_, control_, ipdCodec_, pulseWidthCodec_, hasBarcodeData_, barcodeFile_,
-                 barcodeHash_, barcodeCount_, barcodeMode_, barcodeQuality_);
+                 movieLength_, frameRateHz_, control_, ipdCodec_, pulseWidthCodec_, hasBarcodeData_,
+                 barcodeFile_, barcodeHash_, barcodeCount_, barcodeMode_, barcodeQuality_);
 
     const auto rhsFields = std::tie(
         other.id_, other.sequencingCenter_, other.date_, other.flowOrder_, other.keySequence_,
         other.library_, other.programs_, other.platformModel_, other.predictedInsertSize_,
         other.movieName_, other.sample_, other.readType_, other.bindingKit_, other.sequencingKit_,
         other.smrtCellKit_, other.smrtCellId_, other.runId_, other.basecallerVersion_,
-        other.icsVersion_, other.frameRateHz_, other.control_, other.ipdCodec_,
+        other.icsVersion_, other.movieLength_, other.frameRateHz_, other.control_, other.ipdCodec_,
         other.pulseWidthCodec_, other.hasBarcodeData_, other.barcodeFile_, other.barcodeHash_,
         other.barcodeCount_, other.barcodeMode_, other.barcodeQuality_);
 
@@ -625,6 +626,8 @@ void ReadGroupInfo::DecodeSamDescription(const std::string& description)
             smrtCellKit_ = std::move(value);
         } else if (key == token_SI) {
             smrtCellId_ = std::move(value);
+        } else if (key == token_ML) {
+            movieLength_ = std::move(value);
         } else if (key == token_RI) {
             runId_ = std::move(value);
         } else if (key == token_FR) {
@@ -712,6 +715,9 @@ std::string ReadGroupInfo::EncodeSamDescription() const
     }
     if (!icsVersion_.empty()) {
         result.append(SEP + token_IV + EQ + icsVersion_);
+    }
+    if (!movieLength_.empty()) {
+        result.append(SEP + token_ML + EQ + movieLength_);
     }
     if (!frameRateHz_.empty()) {
         result.append(SEP + token_FR + EQ + frameRateHz_);
@@ -934,6 +940,14 @@ ReadGroupInfo& ReadGroupInfo::MakeSegment()
     } else {
         Id(MakeReadGroupId(movieName_, readType_, strand_));
     }
+    return *this;
+}
+
+std::string ReadGroupInfo::MovieLength() const { return movieLength_; }
+
+ReadGroupInfo& ReadGroupInfo::MovieLength(std::string movieLength)
+{
+    movieLength_ = std::move(movieLength);
     return *this;
 }
 

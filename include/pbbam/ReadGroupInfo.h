@@ -426,6 +426,9 @@ public:
     /// \returns string value of \@RG:LB
     std::string Library() const;
 
+    /// \returns movie length
+    std::string MovieLength() const;
+
     /// \returns movie name (stored in \@RG:PU)
     std::string MovieName() const;
 
@@ -634,6 +637,13 @@ public:
     ///
     ReadGroupInfo& Library(std::string library);
 
+    /// \brief Sets the movie length.
+    ///
+    /// \param[in] movieLength  new value
+    /// \returns reference to this object
+    ///
+    ReadGroupInfo& MovieLength(std::string movieLength);
+
     /// \brief Sets the value for movie name (stored in \@RG:PU).
     ///
     /// \param[in] movieName    new value
@@ -796,6 +806,7 @@ private:
     std::string smrtCellId_;
     std::string runId_;
     std::string icsVersion_;
+    std::string movieLength_;
     mutable std::string sequencingChemistry_;
     std::string frameRateHz_;
     bool control_ = false;
