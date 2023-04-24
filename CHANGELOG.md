@@ -5,26 +5,28 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Active
 
-### Added 
- - New description fields in BAM header read group (@RG) entries: 
-   SMRTCELLKIT, SMRTCELLID, RUNID, and ICSVERSION
+## [2.4.0] - 2023-04-24
+
+### Added
+ - New description fields in BAM header read group (@RG) entries:
+   SMRTCELLKIT, SMRTCELLID, RUNID, ICSVERSION, and MOVIELENGTH
  - Generic CSV file API
 
 ### Changed
  - Program entries (@PG) in BAM header are now maintained in the order added,
    not sorted by ID. If a program is added that already has a matching ID entry,
-   a unique, increasingly numeric suffix is added (e.g. app.1, app.2). This 
+   a unique, increasingly numeric suffix is added (e.g. app.1, app.2). This
    matches samtools behavior.
 
 ### Removed
  - Support for pre-1.7 htslib. Overlong CIGAR support is now a hard requirement.
 
 ### Fixed
- - Temporary .gzi files (used in the IndexedBamWriter) are now deleted when the 
-   output BAM file has no records. Previously these were not properly deleted 
+ - Temporary .gzi files (used in the IndexedBamWriter) are now deleted when the
+   output BAM file has no records. Previously these were not properly deleted
    during IBW destruction in that situation.
 
-## [2.3.0] - 2022-01-03
+## [2.3.0] - 2023-01-03
 
 ### Removed
  - Deprecated APIs (now part of pbcopper)
