@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 
+#include <filesystem>
 #include <iostream>
 #include <stdexcept>
 #include <string_view>
@@ -13,6 +14,11 @@
 using namespace PacBio;
 
 namespace CsvReaderTests {
+
+const std::vector<std::string> Comments{
+    "#Some comment",
+    "##Another comment",
+};
 
 // clang-format off
 void CheckBasicCsv(CSV::CsvReader& reader) 
@@ -35,10 +41,41 @@ void CheckBasicCsv(CSV::CsvReader& reader)
         observedRecords.push_back(std::move(record));
     }
     EXPECT_EQ(observedRecords, expectedRecords);
+
+    // check comments
+    EXPECT_EQ(Comments, reader.Comments());
 }
 // clang-format on
 
 }  // namespace CsvReaderTests
+
+TEST(CSV_CsvReader, throws_on_empty_file)
+{
+    EXPECT_THROW(CSV::CsvReader reader{BAM::PbbamTestsConfig::Data_Dir + "/csv/empty.csv"},
+                 std::runtime_error);
+}
+
+TEST(CSV_CsvReader, throws_on_comments_only)
+{
+    EXPECT_THROW(CSV::CsvReader{BAM::PbbamTestsConfig::Data_Dir + "/csv/comments_only.csv"},
+                 std::runtime_error);
+}
+
+TEST(CSV_CsvReader, header_only_yields_no_records)
+{
+    const std::filesystem::path fn{BAM::PbbamTestsConfig::Data_Dir + "/csv/header_only.csv"};
+
+    CSV::CsvReader reader{fn};
+    int count = 0;
+    for (const auto& record : reader) {
+        std::ignore = record;
+        ++count;
+    }
+    EXPECT_EQ(0, count);
+
+    const CSV::CsvHeader expectedHeader{"fruit", "direction", "triforce"};
+    EXPECT_EQ(reader.Header(), expectedHeader);
+}
 
 TEST(CSV_CsvReader, can_read_basic_comma_separated)
 {
@@ -65,6 +102,20 @@ TEST(CSV_CsvReader, can_read_gzipped_tab_separated)
 {
     const std::filesystem::path fn{BAM::PbbamTestsConfig::Data_Dir + "/csv/tab_separated.csv.gz"};
     CSV::CsvReader reader{fn, '\t'};
+    CsvReaderTests::CheckBasicCsv(reader);
+}
+
+TEST(CSV_CsvReader, can_handle_internal_comment)
+{
+    const std::filesystem::path fn{BAM::PbbamTestsConfig::Data_Dir + "/csv/internal_comment.csv"};
+    CSV::CsvReader reader{fn};
+    CsvReaderTests::CheckBasicCsv(reader);
+}
+
+TEST(CSV_CsvReader, can_handle_end_of_file_comment)
+{
+    const std::filesystem::path fn{BAM::PbbamTestsConfig::Data_Dir + "/csv/end_comment.csv"};
+    CSV::CsvReader reader{fn};
     CsvReaderTests::CheckBasicCsv(reader);
 }
 
@@ -140,7 +191,7 @@ TEST(CSV_CsvWriter, can_roundtrip_comma_separated)
 
     {
         CSV::CsvReader reader{inputFn};
-        CSV::CsvWriter writer{outputFn, reader.Header(), ','};
+        CSV::CsvWriter writer{outputFn, reader.Header(), ',', CsvReaderTests::Comments};
         for (const auto& record : reader) {
             writer.Write(record);
         }
@@ -160,7 +211,7 @@ TEST(CSV_CsvWriter, can_roundtrip_gzipped_comma_separated)
 
     {
         CSV::CsvReader reader{inputFn};
-        CSV::CsvWriter writer{outputFn, reader.Header(), ','};
+        CSV::CsvWriter writer{outputFn, reader.Header(), ',', CsvReaderTests::Comments};
         for (const auto& record : reader) {
             writer.Write(record);
         }
@@ -179,7 +230,7 @@ TEST(CSV_CsvWriter, can_roundtrip_tab_separated)
 
     {
         CSV::CsvReader reader{inputFn};
-        CSV::CsvWriter writer{outputFn, reader.Header(), '\t'};
+        CSV::CsvWriter writer{outputFn, reader.Header(), '\t', CsvReaderTests::Comments};
         for (const auto& record : reader) {
             writer.Write(record);
         }
@@ -199,7 +250,7 @@ TEST(CSV_CsvWriter, can_roundtrip_gzipped_tab_separated)
 
     {
         CSV::CsvReader reader{inputFn};
-        CSV::CsvWriter writer{outputFn, reader.Header(), '\t'};
+        CSV::CsvWriter writer{outputFn, reader.Header(), '\t', CsvReaderTests::Comments};
         for (const auto& record : reader) {
             writer.Write(record);
         }

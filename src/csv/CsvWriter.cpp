@@ -4,12 +4,26 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include <sstream>
+#include <stdexcept>
+
 namespace PacBio {
 namespace CSV {
 
-CsvWriter::CsvWriter(const std::filesystem::path& filename, CsvHeader header, const char delimiter)
+CsvWriter::CsvWriter(const std::filesystem::path& filename, CsvHeader header, const char delimiter,
+                     const std::vector<std::string>& comments)
     : writer_{filename.string()}, header_{std::move(header)}, delimiter_(1, delimiter)
 {
+    for (const auto& comment : comments) {
+        writer_.Write(comment);
+    }
+
+    if (header_.empty()) {
+        std::ostringstream s;
+        s << "[pbbam] CSV writer ERROR: cannot write empty header line\n"
+          << "  file: " << filename;
+        throw std::runtime_error{s.str()};
+    }
     const std::string headerText{boost::join(header_, delimiter_)};
     writer_.Write(headerText);
 

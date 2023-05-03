@@ -42,8 +42,19 @@ char DetectDelimiter(const std::filesystem::path& filename)
         std::string line;
         BAM::TextFileReader reader{filename.string()};
         while ((lines.size() < PEEK_LINE_COUNT) && reader.GetNext(line)) {
+            if (line.starts_with("#")) {
+                continue;
+            }
             lines.push_back(std::move(line));
         }
+    }
+
+    // throw if there are no (non-comment) lines available for detection
+    if (lines.empty()) {
+        std::ostringstream s;
+        s << "[pbbam] CSV reader ERROR: cannot read records\n"
+          << "  file: " << filename;
+        throw std::runtime_error{s.str()};
     }
 
     //
@@ -95,22 +106,41 @@ CsvReader::CsvReader(const std::filesystem::path& filename)
 CsvReader::CsvReader(const std::filesystem::path& filename, const char delimiter)
     : reader_{filename.string()}, delimiter_{delimiter}
 {
-    // read 1st line as header
+    // read first line & skip any leading comments
     if (!reader_.GetNext(line_)) {
         std::ostringstream s;
-        s << "[pbbam] CSV reader ERROR: could read header:\n"
+        s << "[pbbam] CSV reader ERROR: could not read from file\n"
           << "  file: " << filename;
         BAM::MaybePrintErrnoReason(s);
         throw std::runtime_error{s.str()};
     }
+    SkipAndStoreLeadingComments();
+
+    // throw if there is no header available (will have thrown in delimiter
+    // autodetection, but this covers the explicit delimiter case)
+    if (line_.empty()) {
+        std::ostringstream s;
+        s << "[pbbam] CSV reader ERROR: missing header line\n"
+          << "  file: " << filename;
+        throw std::runtime_error{s.str()};
+    }
     header_ = MakeHeader(line_, delimiter_);
 }
+
+const std::vector<std::string>& CsvReader::Comments() const { return comments_; }
 
 bool CsvReader::GetNext(CsvRecord& record)
 {
     // likely EOF
     if (!reader_.GetNext(line_)) {
         return false;
+    }
+
+    // skip (but do not store) comment lines, quit if error or EOF reached
+    while (line_.starts_with('#')) {
+        if (!reader_.GetNext(line_)) {
+            return false;
+        }
     }
     ++lineNumber_;
 
@@ -138,6 +168,19 @@ bool CsvReader::GetNext(CsvRecord& record)
 }
 
 const CsvHeader& CsvReader::Header() const { return header_; }
+
+void CsvReader::SkipAndStoreLeadingComments()
+{
+    while (line_.starts_with("#")) {
+        comments_.push_back(line_);
+
+        // quit if reader error or EOF reached
+        if (!reader_.GetNext(line_)) {
+            line_.clear();
+            return;
+        }
+    }
+}
 
 }  // namespace CSV
 }  // namespace PacBio

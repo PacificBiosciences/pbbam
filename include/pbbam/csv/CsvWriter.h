@@ -31,13 +31,17 @@ namespace CSV {
 //     }
 /// \endcode
 ///
-/// Both plain-text and gzipped input are supported. Use the ".gz" filename suffix
+/// Leading comments before the header may be provided. These are written verbatim,
+/// so the caller must be sure to provide the desired prefix (typically '#').
+///
+/// Both plain-text and gzipped output are supported. Use the ".gz" filename suffix
 /// to enable compression.
 ///
 class CsvWriter
 {
 public:
-    CsvWriter(const std::filesystem::path& filename, CsvHeader header, char delimiter);
+    CsvWriter(const std::filesystem::path& filename, CsvHeader header, char delimiter,
+              const std::vector<std::string>& comments = {});
     void Write(const CsvRecord& record);
 
 private:

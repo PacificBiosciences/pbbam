@@ -34,6 +34,12 @@ namespace CSV {
 /// the exact delimiter is known for a file, that character may be specified.
 /// (This method is preferred, in case the detection heuristic fails.)
 ///
+/// Leading comments before the header (starting with '#') will be skipped but
+/// stored, verbatim, for access later. Note that, for simplicity, this is the
+/// only comment prefix supported. The first line beginning with anything else
+/// will be considered the header. Comments found among records will be skipped
+/// but not stored.
+///
 /// Both plain-text and gzipped input are supported.
 ///
 class CsvReader : public BAM::internal::QueryBase<CsvRecord>
@@ -45,6 +51,9 @@ public:
     // Use explicit delimiter. Prefer this ctor if known.
     CsvReader(const std::filesystem::path& filename, char delimiter);
 
+    // Returns list of comment lines (anything beginning with "#" before the header)
+    const std::vector<std::string>& Comments() const;
+
     // Returns list of column names, as seen in file
     const CsvHeader& Header() const;
 
@@ -52,12 +61,15 @@ public:
     bool GetNext(CsvRecord& record) final;
 
 private:
+    void SkipAndStoreLeadingComments();
+
     BAM::TextFileReader reader_;
     CsvHeader header_;
     char delimiter_;
     std::string line_;
     std::vector<std::string> buffer_;
     int lineNumber_ = 0;
+    std::vector<std::string> comments_;
 };
 
 }  // namespace CSV
